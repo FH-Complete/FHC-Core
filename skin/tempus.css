@@ -1,0 +1,48 @@
+@import url("chrome://communicator/skin/");
+
+label.kalenderwoche
+{
+	font-size: medium;
+}
+button
+{
+	font-size: x-small;
+	min-width: 10px;
+}
+menubar,menupopup,toolbar,tabpanels,tabbox,iframe,box,hbox,vbox,tree,label,description
+{
+	border: 0px;
+  	border-top: 0px;
+  	border-bottom: 0px;
+  	border-left: 0px;
+  	border-right: 0px;
+  	border-top-width: 0px;
+  	border-bottom-width: 0px;
+  	border-left-width: 0px;
+  	border-right-width: 0px;
+  	padding-top: 0px;
+  	padding-bottom: 0px;
+  	padding-left: 0px;
+  	padding-right: 0px;
+}
+grid.lvaStundenplan
+{
+	font-size: x-small;
+}
+grid.lvaStundenplan button
+{
+	font-size: x-small;
+	border: 0px;
+  	border-top: 0px;
+  	border-bottom: 0px;
+  	border-left: 0px;
+  	border-right: 0px;
+  	border-top-width: 0px;
+  	border-bottom-width: 0px;
+  	border-left-width: 0px;
+  	border-right-width: 0px;
+  	padding-top: 0px;
+  	padding-bottom: 0px;
+  	padding-left: 0px;
+  	padding-right: 0px;
+}

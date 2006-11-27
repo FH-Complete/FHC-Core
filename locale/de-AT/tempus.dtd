@@ -1,0 +1,33 @@
+<!ENTITY window.title			"Tempus"> 
+<!ENTITY window.version			"1.0 vom 1.April 2005"> 
+
+
+<!ENTITY menu-file:label              	"Datei">
+<!ENTITY menu-file:accesskey           	"D">
+
+<!ENTITY menu-file-close:key           	"D">
+<!ENTITY menu-file-close:label         	"Beenden">
+<!ENTITY menu-file-close:accesskey     	"B">
+
+
+<!ENTITY menu-help:label              	"Hilfe">
+<!ENTITY menu-help:accesskey          	"H">
+
+<!ENTITY menu-help-close:key          	"H">
+<!ENTITY menu-help-close:label        	"Ueber">
+<!ENTITY menu-help-close:accesskey    	"U">
+
+
+<!ENTITY menu-prefs:label              	"Einstellungen">
+<!ENTITY menu-prefs:accesskey          	"E">
+
+<!ENTITY menu-prefs-stpltable:label    	"Stpl-Tabelle">
+<!ENTITY menu-prefs-stpltable:accesskey	"T">
+
+<!ENTITY menu-prefs-stpltable-stundenplan:key      	"s">
+<!ENTITY menu-prefs-stpltable-stundenplan:label    	"stundenplan">
+<!ENTITY menu-prefs-stpltable-stundenplan:accesskey	"s">
+
+<!ENTITY menu-prefs-stpltable-stundenplandev:key      	"d">
+<!ENTITY menu-prefs-stpltable-stundenplandev:label    	"stundenplandev">
+<!ENTITY menu-prefs-stpltable-stundenplandev:accesskey	"d">

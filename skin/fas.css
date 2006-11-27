@@ -1,0 +1,43 @@
+@import url("chrome://navigator/skin/");
+tree treecol 
+{
+	background-color: #82DCFF; 	/*F2F2FC*/
+}
+
+treechildren::-moz-tree-row(selected) { background-color: #50D1E1; }
+treechildren::-moz-tree-row(odd) { background-color: #EEEEEE; }
+treechildren::-moz-tree-row(odd, selected) { background-color: #50D1E1; }
+treechildren::-moz-tree-row(even, selected) { background-color: #50D1E1; }
+treechildren::-moz-tree-cell-text(selected) { color: #000000; }
+treechildren::-moz-tree-cell-text(odd, selected) { color: #000000; }
+
+menubar,menulist,toolbar,tabpanels,tabbox,iframe,box,hbox,vbox,tree,description
+{
+	border-width: 0px;
+  	border-color: #AAAAAA;
+  	padding: 0px;
+}
+
+
+button.change
+{
+	border-style:solid;
+	padding:0px;
+	margin:	0px;
+}
+
+.hbox-tree
+{
+	padding: 5px;
+}
+
+.style-groupbox
+{
+   padding-bottom: 5px;
+}
+
+.pflichtfeld
+{
+	/*Formatierungen fuer die Pflichtfelder*/
+}
+
