@@ -1,0 +1,664 @@
+/* $Header: /cvsroot/phpldapadmin/phpldapadmin/htdocs/css/style.css,v 1.45 2005/12/10 10:34:54 wurley Exp $ */
+span.hint {
+	font-size: small;
+	font-weight: normal;
+	color: #888;
+}
+
+span.warning {
+	font-size: small;
+	font-weight: normal;
+	color: #f00;
+}
+
+span.x-small {
+	font-size: x-small;
+}
+
+table.schema_oclasses {
+	border-left: 1px solid black;
+	border-right: 1px solid black;
+	border-bottom: 1px solid black;
+	border-top: 0;
+	margin-bottom: 10px;
+	background-color: #eee;
+}
+
+table.schema_oclasses td {
+	vertical-align: top;
+	text-align: left;
+	padding-left: 5px;
+}
+
+table.schema_attr th {
+	background-color: #016;
+	padding: 5px;
+	color: white;
+	font-weight: bold;
+	font-size: 125%;
+}
+
+table.schema_attr td {
+	padding: 5px;
+	vertical-align: top;
+}
+
+table.schema_attr tr.even {
+	background-color: #eee;
+}
+
+table.schema_attr tr.odd {
+	background-color: #ccc;
+}
+
+table.schema_attr tr.highlight{
+	background-color: #bcd;
+	font-weight: Bold;
+}
+
+table.notice tr td {
+	font-size: 9pt;
+	padding: 2px;
+	margin: 0px;
+	background-color: #eee;
+}
+
+table.error {
+	width: 500px;
+	border: 2px solid black;
+}
+
+table.error tr td table.bug tr td{
+	padding: 6px;
+	margin: 0px;
+	background-color: #eee;
+}
+
+table.error tr td {
+	vertical-align: top;
+	text-align: left;
+	padding: 15px;
+	border: 0px;
+}
+
+table.error tr td h2 {
+	margin: 5px;
+	margin-bottom: 20px;
+}
+
+table.error tr td.img {
+	vertical-align: middle;
+	text-align: center;
+	width: 20px;
+}
+
+table.confirm th {
+	background-color: #016;
+	padding: 5px;
+	color: white;
+	font-weight: normal;
+}
+
+table.confirm tr td {
+	padding: 4px;
+}
+
+table.confirm tr.spacer {
+	background-color: #ddd;
+}
+
+table.confirm tr.even {
+	background-color: #ccc;
+}
+
+table.confirm tr.odd {
+	background-color: #eee;
+}
+
+table.confirm tr td.heading {
+	text-align: right;
+	font-size: 75%;
+}
+
+table.confirm td.icon {
+	text-align: center;
+}
+
+table.browse tr td {
+	border: 0;
+	margin: 0;
+	padding: 0;
+}
+
+table.template_display tr td {
+    vertical-align: top;
+}
+
+table.templates tr td {
+	text-align: left;
+	vertical-align: middle;
+}
+
+table.templates tr {
+	height: 25px;
+}
+
+table.templates td.icon {
+	text-align: center;
+}
+
+table.exporters tr td {
+	text-align: left;
+	vertical-align: middle;
+}
+
+table.exporters tr {
+	height: 25px;
+}
+
+a img {
+	border: 0px;
+}
+
+body {
+	font-family: arial, helvetica, sans-serif;
+	background-color: white;
+	font-size: 12pt;
+}
+
+table.tree tr.login td {
+}
+
+table.tree td.links {
+	padding: 0px;
+	font-size: 10px;
+	padding-left: 12px;
+	font-size: 10px;
+}
+
+table.tree td.links a {
+	font-size: 10px;
+}
+
+table.tree {
+	border: 0px;
+}
+
+table.tree img {
+	border: 0px;
+}
+	
+table.tree td {
+	padding: 2px;
+	border: 0px solid black;
+}
+
+table.tree tr {
+}
+
+table.tree tr.server td.icon {
+	width: 14px;
+}
+
+table.tree tr.server td {
+	padding-top: 15px;
+	padding-bottom: 0px;
+	vertical-align: top;
+	font-size: 20px;
+	text-align: left;
+}
+
+table.tree td.icon {
+	text-align: center;
+	padding: 0px;
+	width: 14px;
+	font-size: 1px;
+}
+
+table.tree td.rdn {
+	width: 500px;
+}
+
+table.tree td.rdn a {
+	text-decoration: none;
+	color: black;
+}
+
+table.tree td.rdn a:hover {
+	text-decoration: underline;
+	color: blue;
+}
+
+table.tree td.create {
+}
+
+table.tree td.create a {
+	text-decoration: none;
+	color: black;
+}
+
+table.tree td.create a:hover {
+	text-decoration: underline;
+	color: blue;
+}
+
+
+table.tree td.spacer {
+	width: 22px;
+}
+
+table.tree td.expander {
+	text-align: center;
+	width: 22px;
+	max-width: 22px;
+	min-width: 22px;
+}
+
+table.tree td span.count {
+	color: gray;
+	font-size: 85%;
+}
+
+h3.title {
+	text-align: center;
+	margin: 0px;
+	padding: 10px;
+	color: white;
+	background-color: #018;
+	border: 1px solid black;
+	font-weight: normal;
+	font-size: 150%;
+}
+
+h3.subtitle {
+	text-align: center;
+	margin: 0px;
+	margin-bottom: 15px;
+	font-size: 75%;
+	color: white;
+	border-bottom: 1px solid black;
+	border-left: 1px solid black;
+	border-right: 1px solid black;
+	background: #018;
+	padding: 4px;
+	font-weight: normal;
+}
+
+table.comp_dn {
+	border-collapse: collapse;
+	border-spacing: 0px;
+	empty-cells: show;
+	font-size: 80%;
+}
+
+table.comp_dn tr {
+	width: 200px;
+}
+table.comp_dn tr td.attr {
+	background-color: #eee;
+	vertical-align: top;
+}
+
+table.comp_dn tr td.attr_note {
+	text-align: right;
+	background-color: #eee;
+	padding-right: 50px;
+}
+
+table.edit_dn {
+	border-collapse: collapse;
+	border-spacing: 0px;
+	empty-cells: show;
+	width: 600px;
+}
+
+table.edit_dn input {
+	margin: 1px;
+}
+
+table.edit_dn input.val {
+	font-size: 14px;
+	width: 350px; 
+	font-family: arial, helvetica, sans-serif;
+	background-color: white;
+}
+
+table.edit_dn textarea.val {
+	font-size: 14px;
+	width: 350px; 
+	font-family: arial, helvetica, sans-serif;
+	background-color: white;
+}
+
+table.edit_dn tr td {
+	padding: 4px;
+	padding-right: 0px;
+}
+
+table.edit_dn tr td.attr {
+	background-color: #eee;
+	vertical-align: top;
+}
+
+table.edit_dn tr td.heading {
+	border-top: 3px solid #ccc;
+	font-weight: bold;
+}
+
+table.edit_dn tr td.attr_note {
+    text-align: right;
+	background-color: #eee;
+}
+
+table.edit_dn tr td.attr a {
+	text-decoration: none;
+	color: black;
+}
+
+table.edit_dn tr td.attr a:hover {
+	text-decoration: underline;
+	color: #016;
+}
+
+table.edit_dn tr td.val {
+	text-align: left;
+	vertical-align: middle;
+	padding-bottom: 10px;
+	padding-left: 50px;
+}
+
+
+/** When an attr is updated, it is highlighted to indicate such */
+table.edit_dn tr.updated_attr td.attr {
+	border-top: 1px dashed green;
+	border-left: 1px dashed green;
+	background-color: #ded;
+}
+
+table.edit_dn tr.updated_attr td.attr_note {
+	border-top: 1px dashed green;
+	border-right: 1px dashed green;
+	background-color: #ded;
+}
+
+/** An extra row that sits at the bottom of recently modified attrs to encase them in dashes */
+table.edit_dn tr.updated_attr td.bottom {
+	border-top: 1px dashed green;
+}
+
+/** Formatting for the value cell when it is the attribute that has been recently modified */
+table.edit_dn tr.updated_attr td.val {
+	border-left: 1px dashed green;
+	border-right: 1px dashed green;
+}
+
+/* Neede to prevent sub-tables (like the one in which jpegPhotos are displayed)
+ * from drawing borders as well. */
+table.edit_dn tr.updated_attr td table td {
+	border: 0px;
+}
+
+table.edit_dn tr.updated_attr a {
+}
+
+table.edit_dn tr.mod_dn {
+	background: #def;
+}
+
+table.edit_dn tr.row1 {
+	background: #eee;
+}
+
+table.edit_dn tr.row2 {
+	background: #ccc;
+}
+
+input.update_dn {
+	font-size: 65%;
+}
+
+small {
+	font-size: 10pt;
+}
+
+form.edit_dn {
+	margin: 0px;
+	padding: 0px;
+}
+
+h4.oclass {
+	background: #016;
+	padding: 5px;
+	margin: 0px;
+	margin-top: 8px;
+	font-weight: normal;
+	border: 1px solid black;
+	font-size: 140%;
+	color: white;
+}
+
+h4.oclass_sub {
+	background: #dde;
+	border: 1px solid black;
+	border-top: 0px;
+	font-weight: normal;
+	margin: 0px;
+	padding: 2px;
+	padding-left: 5px;
+	font-size: 80%;
+}
+
+ul.schema {
+	margin: 5px;
+	margin-left: 0px;
+	padding-left: 20px;
+}
+
+ul.schema li {
+	margin-left: 0px;
+	padding-left: 0px;
+}
+
+ul.schema li small {
+	font-size: 75%;
+	color: #777;
+}
+
+ul.schema li small a {
+	color: #77c;
+}
+
+ul.current_values {
+	padding: 5px;
+	padding-left: 25px;
+	width: 200px;
+	margin-left: 50px;
+}
+
+form.new_value {
+	margin-left: 70px;
+}
+
+table.search_result_table {
+    border-spacing: 0;
+    border-collapse: collapse;
+    empty-cells: show;
+}
+
+table.search_result_table td {
+    vertical-align: top;
+    border: 1px solid gray;
+    padding: 4px;
+}
+
+table.search_result_table th {
+    border: 1px solid gray;
+    padding: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+table.search_result_table tr.highlight {
+    background-color: #eee;
+}
+
+
+ul.search {
+	font-weight: bold;
+}
+
+table.search_header {
+	background-color: #ddf;
+    width: 100%;
+    vertical-align: top;
+}
+
+div.search_result {
+	list-style-type: none;
+	padding: 6px;
+	padding-left: 20px;
+	margin-right: 40px;
+}
+
+table.attrs {
+	font-weight: normal;
+	font-size: 75%;
+	margin: 0px;
+	margin-left: 35px;
+}
+
+table.attrs td {
+	padding-right: 10px;
+}
+
+table.attrs td.attr {
+	color: #aaa;
+	padding-left: 15px;
+}
+
+form.search {
+	width: 500px;
+	background-color: #ddf;
+	padding: 5px;
+}
+
+table.edit_dn_menu {
+	font-size: 75%;
+}
+
+table.edit_dn_menu td.icon {
+	width: 16px;
+	text-align: center;
+}
+
+input.scary {
+	background: red;
+	font-weight: bold;
+	color: white;
+}
+
+input.cancel {
+	padding-left: 10px;
+	padding-right: 10px;
+	font-weight: bold;
+}
+
+input.happy {
+	background: green;
+	font-weight: bold;
+	color: white;
+}
+
+table.delete_confirm {
+	width: 76%;
+	background-color: #ddf;
+	padding: 20px;
+	text-align: left;
+}
+
+table.login {
+	background-color: #ddf;
+	padding: 10px;
+}
+
+table.login td {
+	padding: 5px;
+}
+
+table.create {
+	font-size: 75%;
+}
+
+table.create td.heading {
+	vertical-align: top;
+	padding: 10px;
+}
+
+table.create td.name {
+	font-size: 13px;
+	width: 350px; 
+}
+
+div.add_value {
+	font-size: 10pt;
+	margin: 0px;
+    padding: 0px;
+}
+
+a.logged_in_dn {
+	text-decoration: none;
+	color: black;
+}
+
+a.logged_in_dn:hover {
+	text-decoration: underline;
+	color: blue;
+}
+
+a:hover {
+	color: red;
+}
+
+
+/* Styles for formatting the documentation page */
+
+h3.doc {
+	margin-left: 60px;
+}
+
+h2.doc {
+	margin-left: 20px;
+}
+
+p.doc {
+	margin-left: 100px;
+}
+
+table.export_form {
+	font-size: 75%;
+	width: 400px;
+	border-spacing: 10px;
+	border-collapse: separate;
+}
+
+table.export_form tr td {
+	font-size: 13px;
+	text-align: left;
+	vertical-align: top;
+	padding: 4px;
+}
+
+table.form tr td {
+	vertical-align: top;
+	padding: 4px;
+}
+
+
+.attribute_failed {
+	color: red;
+}
+
+img.chooser {
+        /* This makes the chooser image line up properly when placed next to a form element in a table cell*/
+        vertical-align: bottom;
+}
