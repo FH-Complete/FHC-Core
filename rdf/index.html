@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+</head>
+<body>
+<h1 style="text-align: center;">RDF-Spezifikationen am Technikum Wien</h1>
+<br>
+Diese Seite beschreibt den Inhalt und die Verwendung aller vorhandenen
+RDF-Files am Technikum Wien. Die gesamte RDF-Struktur ist gerade im
+Aufbau und kann sich deshalb jederzeit &auml;ndern. Es sei darauf
+hingewiesen, dass die RDF-Files von heute, morgen vielleicht gar nicht
+mehr oder anders zu verwenden sind.<br>
+<br>
+<h2>Student</h2>
+<span style="font-weight: bold;">Aufruf:</span>
+student.rdf.php?stg_kz=...&amp;sem=...&amp;ver=...&amp;grp=...&amp;einheit=...&amp;uid=...<br>
+Beispiel: <a target="_blank" href="student.rdf.php?stg_kz=227&amp;sem=2">student.rdf.php?stg_kz=227&amp;sem=2</a><br>
+<span style="font-weight: bold;"><br>
+Parameter</span>: <br>
+<ul>
+  <li>stg_kz: Studiengangskennzahl<br>
+  </li>
+  <li>sem: Semester (optional)<br>
+  </li>
+  <li>ver: Verband (optional)</li>
+  <li>grp: Gruppe (optional)</li>
+  <li>einheit: Spezialgruppen, Module, ... (optional)</li>
+  <li>uid: UID eines bestimmten Studenten (Wenn gesetzt werden alle anderen Parameter nicht verwendet)</li>
+</ul>
+<span style="font-weight: bold;"><br>
+Attribute:</span><br>
+<ul>
+  <li>uid</li>
+  <li>titel</li>
+  <li>vornamen</li>
+  <li>nachname</li>
+  <li>matrikelnummer</li>
+  <li>geburtsdatum</li>
+  <li>email</li>
+  <li>homepage</li>
+  <li>aktiv</li>
+  <li>gebort</li>
+  <li>gebzeit</li>
+  <li>foto</li>
+  <li>anmerkungen</li>
+  <li>updateamum</li>
+  <li>updatevon</li>
+  <li>gruppe</li>
+  <li>verband</li>
+  <li>semester</li>
+  <li>studiengang_kz</li>
+  <li>stg_bezeichnung</li>
+</ul>
+<br>
+<h2>Lehrstunde</h2>
+<span style="font-weight: bold;">Aufruf:</span>
+lehrstunde.rdf.php?datum=...&amp;datum_bis=...stg_kz=...&amp;sem=...&amp;ver=...&amp;grp=...&amp;einheit=...<br>
+Beispiel: <a target="_blank"
+ href="lehrstunde.rdf.php?datum=2006-03-20&amp;stg_kz=258">lehrstunde.rdf.php?datum=2006-03-20&amp;stg_kz=258</a><span
+ style="font-weight: bold;"><br>
+<br>
+Parameter</span>: <br>
+<ul>
+  <li>datum</li>
+  <li>datum_bis: Endedatum (optional)<br>
+  </li>
+  <li>stunde</li>
+  <li>type</li>
+  <li>stg_kz</li>
+  <li>sem</li>
+  <li>ver</li>
+  <li>grp</li>
+  <li>einheit</li>
+  <li>pers_uid</li>
+  <li>ort_kurzbz<br>
+  </li>
+</ul>
+<span style="font-weight: bold;"><br>
+Attribute:</span><br>
+<ul>
+  <li>datum</li>
+  <li>stunde</li>
+  <li>unr</li>
+  <li>ort_kurzbz</li>
+  <li>lehrfach</li>
+  <li>lehrfach_bez</li>
+  <li>lehrform</li>
+  <li>lektor</li>
+  <li>semester</li>
+  <li>verband</li>
+  <li>gruppe</li>
+  <li>einheit</li>
+  <li>lehrform</li>
+  <li>studiengang</li>
+  <li>farbe</li>
+  <li>anmerkung<br>
+  </li>
+</ul>
+</body>
+</html>

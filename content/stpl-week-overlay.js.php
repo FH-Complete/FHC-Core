@@ -1,0 +1,203 @@
+<?php
+include('../vilesci/config.inc.php');
+?>
+
+// LVA-Panel aktualisieren
+function onLVARefresh()
+{
+	// LVAs
+	var vboxLehrveranstalungPlanung=document.getElementById('vboxLehrveranstalungPlanung');
+	var datasources=vboxLehrveranstalungPlanung.getAttribute('datasources');
+	//alert (datasources);
+	vboxLehrveranstalungPlanung.setAttribute('datasources',datasources+"&bla=");
+}
+
+function onJumpNow()
+{
+	var contentFrame=document.getElementById('iframeTimeTableWeek');
+	var daten=window.TimeTableWeek.document.getElementById('TimeTableWeekData');
+	var datum=parseInt(daten.getAttribute("datum"));
+	var type=daten.getAttribute("stpl_type");
+	var stg_kz=daten.getAttribute("stg_kz");
+	var sem=daten.getAttribute("sem");
+	var ver=daten.getAttribute("ver");
+	var grp=daten.getAttribute("grp");
+	var einheit=daten.getAttribute("einheit");
+	var ort=daten.getAttribute("ort");
+	var pers_uid=daten.getAttribute("pers_uid");
+
+	var d = new Date();
+    var datum=0;
+    //Aktuelles Datum ermitteln
+    datum = ((d.getDate()+3)*60*60*24)+((d.getMonth())*31*24*60*60)+((d.getFullYear()-1970)*365*24*60*60);
+	//alert(datum);
+	var attributes="?type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&einheit="+einheit;
+	var url = "<?php echo APP_ROOT; ?>content/timetable-week.xul.php";
+	url+=attributes;
+	if (url)
+		contentFrame.setAttribute('src', url);
+}
+
+function onJumpDate(wochen)
+{
+	var contentFrame=document.getElementById('iframeTimeTableWeek');
+	var daten=window.TimeTableWeek.document.getElementById('TimeTableWeekData');
+	var datum=parseInt(daten.getAttribute("datum"));
+	var type=daten.getAttribute("stpl_type");
+	var stg_kz=daten.getAttribute("stg_kz");
+	var sem=daten.getAttribute("sem");
+	var ver=daten.getAttribute("ver");
+	var grp=daten.getAttribute("grp");
+	var einheit=daten.getAttribute("einheit");
+	var ort=daten.getAttribute("ort");
+	var pers_uid=daten.getAttribute("pers_uid");
+
+	// neues Datum berechnen. Eine Woche sind 604800 Sekunden.
+	datum+=(604800*wochen)+1;
+
+	var attributes="?type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&einheit="+einheit;
+	var url = "<?php echo APP_ROOT; ?>content/timetable-week.xul.php";
+	url+=attributes;
+	if (url)
+		contentFrame.setAttribute('src', url);
+}
+
+function onJumpDateRel(evt)
+{
+	var contentFrame=document.getElementById('iframeTimeTableWeek');
+	var daten=window.TimeTableWeek.document.getElementById('TimeTableWeekData');
+	var datum=parseInt(daten.getAttribute("datum"));
+	var type=daten.getAttribute("stpl_type");
+	var stg_kz=daten.getAttribute("stg_kz");
+	var sem=daten.getAttribute("sem");
+	var ver=daten.getAttribute("ver");
+	var grp=daten.getAttribute("grp");
+	var einheit=daten.getAttribute("einheit");
+	var ort=daten.getAttribute("ort");
+	var pers_uid=daten.getAttribute("pers_uid");
+	var kw=daten.getAttribute("kw");
+	var KWZiel=evt.target.getAttribute("kw");
+	var wochen=KWZiel-kw;
+
+	// neues Datum berechnen. Eine Woche sind 604800 Sekunden.
+	datum+=(604800*wochen)+1;
+
+	var attributes="?type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&einheit="+einheit;
+	var url = "<?php echo APP_ROOT; ?>content/timetable-week.xul.php";
+	url+=attributes;
+	if (url)
+		contentFrame.setAttribute('src', url);
+}
+
+function onLVAdoStpl(evt)
+{
+	var contentFrame=document.getElementById('iframeTimeTableWeek');
+	var daten=window.TimeTableWeek.document.getElementById('TimeTableWeekData');
+	var datum=parseInt(daten.getAttribute("datum"));
+	var type=daten.getAttribute("stpl_type");
+	var stg_kz=daten.getAttribute("stg_kz");
+	var sem=daten.getAttribute("sem");
+	var ver=daten.getAttribute("ver");
+	var grp=daten.getAttribute("grp");
+	var einheit=daten.getAttribute("einheit");
+	var ort=daten.getAttribute("ort");
+	var pers_uid=daten.getAttribute("pers_uid");
+	var aktion=evt.target.getAttribute("aktion");
+	var doIt=true;
+	var oneDate=new Date();
+	if (aktion=='lva_stpl_del_single')
+		doIt=confirm('Es werden alle Lehrveranstaltungen aus dem Stundenplan dieser Woche geloescht!\nSind Sie sicher?')
+	else
+		if (aktion=='lva_stpl_del_multi')
+			doIt=confirm('Es werden alle Lehrveranstaltungen aus dem Stundenplan ab dieser Woche geloescht!\nSind Sie sicher?')
+		else
+			aktion+="_search";
+	var idList=evt.target.getAttribute("idList");
+
+	var attributes="?type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&einheit="+einheit;
+	attributes+=idList+"&aktion="+aktion+"&time="+oneDate.getTime();
+	var url = "<?php echo APP_ROOT; ?>content/timetable-week.xul.php";
+	url+=attributes+"&bla=";
+	//dump(url);
+	if (url && doIt)
+		contentFrame.setAttribute('src', url);
+}
+
+function onStplSearchRoom(event)
+{
+	//alert ("clickCount="+event.clickCount+" button="+event.button);
+	if (event.button == 1)
+	{
+		var contentFrame=document.getElementById('iframeTimeTableWeek');
+		var daten=document.getElementById('TimeTableWeekData');
+		var datum=parseInt(daten.getAttribute("datum"));
+		var type=daten.getAttribute("stpl_type");
+		var	stg_kz=daten.getAttribute("stg_kz");
+		var sem=daten.getAttribute("sem");
+		var ver=daten.getAttribute("ver");
+		var grp=daten.getAttribute("grp");
+		var einheit=daten.getAttribute("einheit");
+		var ort=daten.getAttribute("ort");
+		var pers_uid=daten.getAttribute("pers_uid");
+		var aktion=event.target.getAttribute("aktion");
+		aktion+="_single_search";
+		var idList=event.target.getAttribute("idList");
+
+		var attributes="\n?type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid+"\n&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"\n&einheit="+einheit;
+		attributes+=idList+"&aktion="+aktion;
+		var url = "<?php echo APP_ROOT; ?>content/timetable-week.xul.php";
+		url+=attributes;
+		//alert(url);
+		if (url)
+			location.href=url;
+	}
+}
+
+function onStplDelete(aktion)
+{
+	var contentFrame=document.getElementById('iframeTimeTableWeek');
+	var daten=document.getElementById('TimeTableWeekData');
+	var datum=parseInt(daten.getAttribute("datum"));
+	var type=daten.getAttribute("stpl_type");
+	var	stg_kz=daten.getAttribute("stg_kz");
+	var sem=daten.getAttribute("sem");
+	var ver=daten.getAttribute("ver");
+	var grp=daten.getAttribute("grp");
+	var einheit=daten.getAttribute("einheit");
+	var ort=daten.getAttribute("ort");
+	var pers_uid=daten.getAttribute("pers_uid");
+	var idList=document.popupNode.getAttribute("idList");
+	var doIt=true;
+	doIt=confirm('Es werden die gewaehlten Eintraege aus dem Stundenplan geloescht!\nSind Sie sicher?')
+
+	var attributes="\n?type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid+"\n&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"\n&einheit="+einheit;
+	attributes+=idList+"&aktion="+aktion;
+	var url = "<?php echo APP_ROOT; ?>content/timetable-week.xul.php";
+	url+=attributes;
+	//alert(url);
+	if (url && doIt)
+		location.href=url;
+}
+
+function onStplDetail(event)
+{
+	var idList=event.target.getAttribute("idList");
+	var type=event.target.getAttribute("stpltype");
+	var stg_kz=event.target.getAttribute("stg_kz");
+	var sem=event.target.getAttribute("sem");
+	var ver=event.target.getAttribute("ver");
+	var grp=event.target.getAttribute("grp");
+	var einheit=event.target.getAttribute("einheit");
+	var datum=event.target.getAttribute("datum");
+	var stunde=event.target.getAttribute("stunde");
+	var pers_uid=event.target.getAttribute("pers_uid");
+	var ort_kurzbz=event.target.getAttribute("ort_kurzbz");
+
+	var attributes="?type="+type+"&datum="+datum+"&stunde="+stunde+"&ort_kurzbz="+ort_kurzbz+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&einheit="+einheit+"&ort_kurzbz="+ort_kurzbz;
+	attributes+=idList;
+	var url = "<?php echo APP_ROOT; ?>content/lehrstunde.rdf.php";
+	url+=attributes;
+	//alert(url);
+	var treeStplDetails=parent.document.getElementById('treeStplDetails');
+	treeStplDetails.setAttribute('datasources',url);
+}

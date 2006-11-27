@@ -1,0 +1,89 @@
+
+.stplDetailRow {
+        margin:0px;
+	padding:0px;
+	-moz-binding: url('lfvtbinding.xml.php#stplDetailRow');
+}
+
+
+.stplDetail {
+        overflow:auto;
+	margin:0px;
+	-moz-binding: url('lfvtbinding.xml.php#stplDetail');
+}
+
+
+customMenulist.fachbereich {
+	-moz-binding: url('lfvtbinding.xml.php#fachbereichListe');
+}
+
+
+customMenulist.lehrform {
+	-moz-binding: url('lfvtbinding.xml.php#lehrformListe');
+}
+
+customMenulist.raumtyp {
+	-moz-binding: url('lfvtbinding.xml.php#raumtypListe');
+}
+
+customMenulist.raum {
+	-moz-binding: url('lfvtbinding.xml.php#raumListe');
+}
+
+customMenulist.studiengang {
+	-moz-binding: url('lfvtbinding.xml.php#stgListe');
+}
+
+customMenulist.lektor {
+	-moz-binding: url('lfvtbinding.xml.php#lektorenListe');
+}
+
+customMenulist.einheit {
+	-moz-binding: url('lfvtbinding.xml.php#einheitenListe');
+}
+
+customMenulist.lehrfach {
+	-moz-binding: url('lfvtbinding.xml.php#lehrfaecherListe');
+}
+
+customMenulist.studiensemester {
+	-moz-binding: url('lfvtbinding.xml.php#studiensemesterListe');
+}
+
+tree.lvaTree {
+    -moz-binding: url('lfvtbinding.xml.php#lfvtTree');	
+}
+
+tree treecol {
+	background-color: #FFFFCC; 
+	border: 1px solid black;	
+}
+
+tree {
+	font-size:9pt;
+	font-family:Arial;	
+}
+
+box.lvaDetail {
+    -moz-binding: url('lfvtbinding.xml.php#lfvtDetail');
+}
+
+box.studentDetail {
+    -moz-binding: url('lfvtbinding.xml.php#studentDetail');
+}
+
+label,textbox {
+	font-size:9pt;
+	font-family:Arial;
+}
+
+#gridLFVT > rows > row {padding:2px;vertical-align:bottom;}
+
+
+
+treechildren::-moz-tree-row(selected) { background-color: #FFFFAA; }
+treechildren::-moz-tree-row(odd) { background-color: #EEEEEE; }
+treechildren::-moz-tree-row(odd, selected) { background-color: #FFFFAA; }
+treechildren::-moz-tree-row(even, selected) { background-color: #FFFFAA; }
+treechildren::-moz-tree-cell-text(selected) { color: #000000; }
+treechildren::-moz-tree-cell-text(odd, selected) { color: #000000; }

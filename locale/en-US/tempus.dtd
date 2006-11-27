@@ -1,0 +1,7 @@
+<!ENTITY window.title               "Tempus"> 
+
+<!ENTITY menu-file:label              "File">
+<!ENTITY menu-file:accesskey           "F">
+<!ENTITY menu-file-close:key           "W">
+<!ENTITY menu-file-close:label         "Close">
+<!ENTITY menu-file-close:accesskey     "C">
