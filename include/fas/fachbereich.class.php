@@ -13,10 +13,15 @@ class fachbereich
 	
 	//Tabellenspalten
 	var $fachbereich_id; // @var integer
-	var $erhalter_id;    // @var integer
-	var $name;           // @var string
+	var $bezeichnung;           // @var string
+	var $kurzbz;   //@var string
+	var $farbe;   //@var string
 	var $updateamum;     // @var timestamp
 	var $updatevon=0;    // @var string
+	var $insertamum;   //@var timestamp
+	var $insertvon=0;   //@var string
+	var $ext_id;   //@var bigint
+	
 	
 	/**
 	 * Konstruktor
@@ -26,12 +31,6 @@ class fachbereich
 	function fachbereich($conn, $fachb_id=null)
 	{
 		$this->conn = $conn;
-		$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-			return false;
-		}
 		if($fachb_id != null)
 			$this->load($fachb_id);
 	}
@@ -120,8 +119,61 @@ class fachbereich
 	 */
 	function save()
 	{
-		$this->errormsg = 'Noch nicht implementiert';
-		return false;
+		//Gueltigkeit der Variablen pruefen
+		if(!$this->checkvars())
+			return false;
+			
+		if($this->new)
+		{
+			//Neuen Datensatz anlegen		
+
+			$qry = "INSERT INTO fachbereich (bezeichnung, kurzbz, farbe, ".
+				"ext_id, insertamum, insertvon, updateamum, updatevon) VALUES (".
+				"'$this->bezeichnung', '$this->kurzbz', '$this->farbe'".
+				"'$this->ext_id', '$this->insertamum', '$this->insertvon', '$this->updateamum', '$this->updatevon');";
+		}
+		else 
+		{
+			//bestehenden Datensatz akualisieren
+			
+			//Pruefen ob lehrveranstaltung_id eine gueltige Zahl ist
+			if(!is_numeric($this->fachbereich_id_id) || $this->fachbereich_id == '')
+			{
+				$this->errormsg = 'fachbereich_id muss eine gueltige Zahl sein';
+				return false;
+			}
+			
+			$qry = "UPDATE fachbereich SET fachbereich_id='$this->fachbereich_id', bezeichnung='$this->bezeichnung', ".
+				"kurzbz='$this->kurzbz', farbe='$this->farbe', ext_id='$this->ext_id', insertamum='$this->insertamum', ".
+				"insertvon='$this->insertvon', updateamum='$this->updateamum', updatevon='$this->updatevon' ".
+				"WHERE fachbereich_id = '$this->fachbereich_id';";
+		}
+		
+		if(pg_query($this->conn, $qry))
+		{
+			//Log schreiben
+			$sql = $qry;
+			$qry = "SELECT nextval('log_seq') as id;";
+			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
+			{
+				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
+				return false;
+			}
+						
+			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
+			if(pg_query($this->conn, $qry))
+				return true;
+			else 
+			{
+				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
+			return false;
+		}		
 	}
 }
 ?>
