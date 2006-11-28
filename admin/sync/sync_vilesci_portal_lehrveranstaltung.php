@@ -32,6 +32,7 @@ if($result = pg_query($conn_vilesci, $qry))
 	while($row = pg_fetch_object($result))
 	{
 		$lehrveranstaltung = new lehrveranstaltung($conn);
+		$lehrveranstaltung->studiengang_kz=$row->studiengang_kz;
 		$lehrveranstaltung->bezeichnung=$row->bezeichnung;
 		$lehrveranstaltung->kurzbz=$row->kurzbz;
 		$lehrveranstaltung->semester=$row->semester;
@@ -48,15 +49,15 @@ if($result = pg_query($conn_vilesci, $qry))
 		//$lehrveranstaltung->insertamum=now();
 		$lehrveranstaltung->insertvon='SYNC';
 		//$lehrveranstaltung->updateamum=now();
-		$lehrveranstaltung->updatevon=$row->updatevon;
+		//$lehrveranstaltung->updatevon=$row->updatevon;
 		$lehrveranstaltung->ext_id='';
-		
-		
+		$lehrveranstaltung->new=true;
 		
 		if(!$lehrveranstaltung->save())
 				$error_log.=$lehrveranstaltung->errormsg."\n";
 	
 	}
+	$text.="abgeschlossen";
 }
 else
 	$error_log .= 'Lehrveranstaltungsdatensaetze konnten nicht geladen werden';
