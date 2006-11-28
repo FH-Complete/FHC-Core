@@ -13,7 +13,7 @@ class lehrveranstaltung
 	var $lehrveranstaltung_nr;	// @var serial
 	var $studiengang_kz;  	//@var integer
 	var $bezeichnung;   		//@var string
-	var $kurzbez;   		//@var string
+	var $kurzbz;   		//@var string
 	var $semester;   		//@var smallint
 	var $ects;   			//@var numeric(5,2)
 	var $semesterstunden;   	//@var smallint
@@ -209,6 +209,10 @@ class lehrveranstaltung
 		
 		return true;		
 	}
+	function addslashes($var)
+	{
+		return ($var!=''?"'".addslashes($var)."'":'null');
+	}
 	
 	/**
 	 * Prueft die Gueltigkeit der Variablen
@@ -218,7 +222,7 @@ class lehrveranstaltung
 	{	
 		//$this->name = str_replace("'",'´',$this->name);
 		$this->bezeichnung = str_replace("'",'´',$this->bezeichnung);
-		$this->kurzbez = str_replace("'",'´',$this->kurzbez);
+		$this->kurzbz = str_replace("'",'´',$this->kurzbz);
 		$this->anmerkung = str_replace("'",'´',$this->anmerkung);
 		
 		//Laenge Pruefen
@@ -227,7 +231,7 @@ class lehrveranstaltung
 			$this->errormsg = 'Bezeichnung darf nicht laenger als 64 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->kurzbez)>16)
+		if(strlen($this->kurzbz)>16)
 		{
 			$this->errormsg = 'Kurzbez darf nicht laenger als 16 Zeichen sein';
 			return false;
@@ -239,7 +243,7 @@ class lehrveranstaltung
 		}
 		if(!is_numeric($this->studiengang_kz))         
 		{
-			$this->errormsg = 'Studiengang_kz ist ungueltig';
+			$this->errormsg = 'Studiengang_kz ist ungueltig: '.$this->studiengang_kz;
 			return false;
 		}
 		if($this->semester!='' && !is_numeric($this->semester))
@@ -287,13 +291,28 @@ class lehrveranstaltung
 			//Neuen Datensatz anlegen
 						
 			//naechste ID aus der Sequence holen
-			$qry = "INSERT INTO lehrveranstaltung (studiengang_kz, bezeichnung, kurzbez, ".
-				"semester, ects, semesterstunden, gemeinsam, anmerkung, lehre, lehreverzeichnis, aktiv, ext_id, insertamum, ".
-				"insertvon, planfaktor, planlektoren, planpersonalkosten, updateamum, updatevon) VALUES (".
-				"'$this->studiengang_kz', '$this->bezeichnung', '$this->kurzbez', '$this->semester', ".
-				"'$this->ects', '$this->semesterstunden', '$this->gemeinsam', '$this->anmerkung', '$this->lehre', '$this->lehreverzeichnis', ".
-				"'$this->aktiv', '$this->ext_id', '$this->insertamum', '$this->insertvon', '$this->planfaktor', '$this->planlektoren', ".
-				"'$this->planpersonalkosten', '$this->updateamum', '$this->updatevon');";
+			$qry = 'INSERT INTO tbl_lehrveranstaltung (studiengang_kz, bezeichnung, kurzbz, 
+				semester, ects, semesterstunden, gemeinsam, anmerkung, lehre, lehreverzeichnis, aktiv, ext_id, insertamum, 
+				insertvon, planfaktor, planlektoren, planpersonalkosten, updateamum, updatevon) VALUES ('.
+				$this->addslashes($this->studiengang_kz).', '.
+				$this->addslashes($this->bezeichnung).', '.
+				$this->addslashes($this->kurzbz).', '. 
+				$this->addslashes($this->semester).', '.
+				$this->addslashes($this->ects).', '.
+				$this->addslashes($this->semesterstunden).', '. 
+				$this->addslashes($this->gemeinsam).', '.
+				$this->addslashes($this->anmerkung).', '.
+				($this->lehre?'true':'false').','.
+				$this->addslashes($this->lehreverzeichnis).', '.
+				($this->aktiv?'true':'false').', '.
+				$this->addslashes($this->ext_id).', '.
+				$this->addslashes($this->insertamum).', '.
+				$this->addslashes($this->insertvon).', '.
+				$this->addslashes($this->planfaktor).', '.
+				$this->addslashes($this->planlektoren).', '.
+				$this->addslashes($this->planpersonalkosten).', '.
+				$this->addslashes($this->updateamum).', '.
+				$this->addslashes($this->updatevon).');';
 		}
 		else 
 		{
@@ -306,17 +325,31 @@ class lehrveranstaltung
 				return false;
 			}
 			
-			$qry = "UPDATE lehrveranstaltung SET lehrveranstaltung_nr='$this->lehrveranstaltung_nr', ".
-				"studiengang_kz='$this->studiengang_kz', bezeichnung='$this->bezeichnung', kurzbez='$this->kurzbez', ".
-				"semester='$this->semester', ects='$this->ects', semesterstunden='$this->semesterstunden', ".
-				"gemeinsam='$this->gemeinsam', anmerkung='$this->anmerkung', lehre='$this->lehre', ".
-				"lehreverzeichnis='$this->lehreverzeichnis', aktiv='$this->aktiv', ext_id='$this->ext_id', insertamum='$this->insertamum', ".
-				"insertvon='$this->insertvon', planfaktor='$this->planfaktor', planlektoren='$this->planlektoren', ".
-				"planpersonalkosten='$this->planpersonalkosten', updateamum='$this->updateamum', updatevon='$this->updatevon' ".
-				"WHERE lehrveranstaltung_nr = '$this->lehrveranstaltung_nr';";
+			$qry = 'UPDATE tbl_lehrveranstaltung SET'. 
+				'lehrveranstaltung_nr='.$this->addslashes($this->lehrveranstaltung_nr) .','.
+				'studiengang_kz='.$this->addslashes($this->studiengang_kz) .','.
+				'bezeichnung='.$this->addslashes($this->bezeichnung) .','.
+				'kurzbez='.$this->addslashes($this->kurzbz) .','.
+				'semester='.$this->addslashes($this->semester) .','.
+				'ects='.$this->addslashes($this->ects) .','.
+				'semesterstunden='.$this->addslashes($this->semesterstunden) .','.
+				'gemeinsam='.$this->addslashes($this->gemeinsam) .','.
+				'anmerkung='.$this->addslashes($this->anmerkung) .','.
+				'lehre='.$this->addslashes($this->lehre) .','.
+				'lehreverzeichnis='.$this->addslashes($this->lehreverzeichnis) .','.
+				'aktiv='.($this->aktiv?'true':'false') .','.
+				'ext_id='.$this->addslashes($this->ext_id) .','.
+				'insertamum='.$this->addslashes($this->insertamum) .','.
+				'insertvon='.$this->addslashes($this->insertvon) .','.
+				'planfaktor='.$this->addslashes($this->planfaktor) .','.
+				'planlektoren='.$this->addslashes($this->planlektoren) .','.
+				'planpersonalkosten='.$this->addslashes($this->planpersonalkosten) .','.
+				'updateamum='.$this->addslashes($this->updateamum) .','.
+				'updatevon='.$this->addslashes($this->updatevon) .','.
+				'WHERE lehrveranstaltung_nr = '.$this->this->addslashes(lehrveranstaltung_nr).';';
 		}
 		
-		if(pg_query($this->conn, $qry))
+		/*if(pg_query($this->conn, $qry))
 		{
 			//Log schreiben
 			$sql = $qry;
@@ -327,7 +360,7 @@ class lehrveranstaltung
 				return false;
 			}
 						
-			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
+			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".$this->addslashes($sql)."')";
 			if(pg_query($this->conn, $qry))
 				return true;
 			else 
@@ -340,7 +373,7 @@ class lehrveranstaltung
 		{
 			$this->errormsg = 'Fehler beim speichern des Datensatzes';
 			return false;
-		}		
+		}*/		
 	}
 	
 	/**
@@ -371,7 +404,7 @@ class lehrveranstaltung
 				return false;
 			}
 						
-			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
+			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".$this->addslashes($sql)."')";
 			if(pg_query($this->conn, $qry))
 				return true;
 			else 
