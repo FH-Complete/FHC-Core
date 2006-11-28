@@ -8,18 +8,17 @@ class mitarbeiter extends benutzer
 {
 	
     //Tabellenspalten
-	//var $uid;				
-	var $ausbildungcode;
-	var $personalnummer;
-	var $kurzbz;
-	var $lektor;
-	var $fixangestellt;
-	var $telefonklappe;
+	var $ausbildungcode;	//integer
+	var $personalnummer;	//serial
+	var $kurzbz;			//varchar(8)
+	var $lektor;			//boolean
+	var $fixangestellt;		//boolean
+	var $telefonklappe;		//varchar(25)
 
 	/**
 	 * Konstruktor
 	 */
-	function mitarbeiter($conn, $unicode=false, $person_id=null)
+	function mitarbeiter($conn, $person_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
 		
@@ -30,7 +29,7 @@ class mitarbeiter extends benutzer
 			
 		if(!pg_query($conn,$qry))
 		{
-			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
+			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
 		
@@ -58,6 +57,11 @@ class mitarbeiter extends benutzer
 		if($this->ausbildungcode!='' && !is_numeric($this->ausbildungcode))
 		{
 			$this->errormsg = 'Ausbildungscode ist ungueltig';
+			return false;
+		}
+		if(!is_numeric($this->personalnummer))
+		{
+			$this->errormsg = 'Personalnummer muss eine gueltige Zahl sein';
 			return false;
 		}
 		if(strlen($this->kurzbz)>8)
@@ -100,11 +104,11 @@ class mitarbeiter extends benutzer
 		if(!$this->validate())
 			return false;
 			
-		pg_query($this->conn,"Begin;");
+		pg_query($this->conn,'BEGIN;');
 		//Basisdaten speichern
 		if(!benutzer::save())
 		{
-			pg_query($this->conn,"Rollback;");
+			pg_query($this->conn,'ROLLBACK;');
 			return false;
 		}
 		
@@ -114,35 +118,39 @@ class mitarbeiter extends benutzer
 			$qry = "INSERT INTO tbl_mitarbeiter(uid, ausbildungcode, personalnummer, kurzbz, lektor, 
 			                    fixangestellt, telefonklappe, updateamum, updatevon)
 			        VALUES('".addslashes($this->uid)."',".
-			 	 	$this->addslashes($this->ausbildungcode).",'".$this->personalnummer."',".
-			 	 	$this->addslashes($this->kurzbz).",".($this->lektor?'true':'false').",".
-			       ($this->fixangestellt?'true':'false').",".$this->addslashes($this->telefonklappe).
-			       ",now(),'".$this->updatevon."');";
+			 	 	$this->addslashes($this->ausbildungcode).",'".
+			 	 	$this->personalnummer."',". //TODO: in Produktivversion nicht angeben
+			 	 	$this->addslashes($this->kurzbz).','.
+			 	 	($this->lektor?'true':'false').','.
+					($this->fixangestellt?'true':'false').','.
+					$this->addslashes($this->telefonklappe).','.
+					$this->addslashes($this->updateamum).','.
+					$this->updatevon."');";
 		}
 		else 
 		{
 			//Bestehenden Datensatz updaten
-			$qry = "UPDATE tbl_mitarbeiter SET".
-			       " ausbildungcode=".$this->addslashes($this->ausbildungcode).",".
-			       //" personalnummer='$this->personalnummer',".
-			       " kurzbz=".$this->addslashes($this->kurzbz).",".
-			       " lektor=".($this->lektor?'true':'false').",".
-			       " fixangestellt=".($this->fixangestellt?'true':'false').",".
-			       " telefonklappe=".$this->addslashes($this->telefonklappe).",".
-			       " updateamum=now(),".
-			       " updatevon=".$this->addslashes($this->updatevon).
+			$qry = 'UPDATE tbl_mitarbeiter SET'.
+			       ' ausbildungcode='.$this->addslashes($this->ausbildungcode).','.
+			       " personalnummer='$this->personalnummer',". //TODO: in Produktivversion nicht angeben
+			       ' kurzbz='.$this->addslashes($this->kurzbz).','.
+			       ' lektor='.($this->lektor?'true':'false').','.
+			       ' fixangestellt='.($this->fixangestellt?'true':'false').','.
+			       ' telefonklappe='.$this->addslashes($this->telefonklappe).','.
+			       ' updateamum='.$this->addslashes($this->updateamum).','.
+			       ' updatevon='.$this->addslashes($this->updatevon).
 			       " WHERE uid='".addslashes($this->uid)."';";
 		}
 		
 		if(pg_query($this->conn,$qry))
 		{
-			pg_query($this->conn,"Commit;");
+			pg_query($this->conn,'COMMIT;');
 			//Log schreiben
 			return true;
 		}
 		else 
 		{			
-			pg_query($this->conn,"Rollback;");
+			pg_query($this->conn,'ROLLBACK;');
 			$this->errormsg = 'Fehler beim Speichern des Mitarbeiter-Datensatzes'.$qry;
 			return false;
 		}

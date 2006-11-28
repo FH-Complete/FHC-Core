@@ -1,15 +1,31 @@
 <?php
-/**
- * Basisklasse Person (PORTAL)
- * @create 27-11-2006
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
 class person
 {
-	var $conn;     // @var resource DB-Handle
-	var $errormsg; // @var string
-	var $new;      // @var boolean
-	var $personen = array(); // @var person Objekt
+	var $conn;     // resource DB-Handle
+	var $errormsg; // string
+	var $new;      // boolean
+	var $personen = array(); // person Objekt
 	
 	//Tabellenspalten
 	var $person_id;        	// integer
@@ -42,7 +58,7 @@ class person
 	 * @param $conn      Datenbank-Connection
 	 *        $person_id Person die geladen werden soll (default=null)
 	 */
-	function person($conn, $unicode=false, $person_id=null)
+	function person($conn, $person_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
 		
@@ -53,7 +69,7 @@ class person
 			
 		if(!pg_query($conn,$qry))
 		{
-			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
+			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
 		
@@ -118,7 +134,7 @@ class person
 		}
 		else
 		{
-			$this->errormsg = "Die person_id muss eine gueltige Zahl sein";
+			$this->errormsg = 'Die person_id muss eine gueltige Zahl sein';
 			return false;
 		}
 	}
@@ -127,30 +143,31 @@ class person
 	{
 		if(strlen($this->sprache)>16)
 		{
-			$this->errormsg = "Sprache darf nicht laenger als 16 Zeichen sein";
+			$this->errormsg = 'Sprache darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->anrede)>16)
 		{
-			$this->errormsg = "Anrede darf nicht laenger als 16 Zeichen sein";
+			$this->errormsg = 'Anrede darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->titelpost)>32)
 		{
-			$this->errormsg = "Titelpost darf nicht laenger als 32 Zeichen sein";
+			$this->errormsg = 'Titelpost darf nicht laenger als 32 Zeichen sein';
 			return false;
 		} 
 		if(strlen($this->titelpre)>64)
 		{
-			$this->errormsg = "Titelpre darf nicht laenger als 64 Zeichen sein";
+			$this->errormsg = 'Titelpre darf nicht laenger als 64 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->nachname)>64)
 		{
-			$this->errormsg = "Nachname darf nicht laenger als 64 Zeichen sein";
+			$this->errormsg = 'Nachname darf nicht laenger als 64 Zeichen sein';
 			return false;
 		}
 		//...
+		return true;
 		
 	}
 	
@@ -170,78 +187,103 @@ class person
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
 			return false;
-		
+		/*	
+		if(!pg_query($this->conn,'BEGIN;'))
+		{
+			$this->errormsg = 'Transaktion konnte nicht gesetzt werden';
+			return false;
+		}
+		*/
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = "INSERT INTO tbl_person (sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen, 
+			$qry = 'INSERT INTO tbl_person (sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen, 
 			                    gebdatum, gebort, gebzeit, foto, anmerkungen, homepage, svnr, ersatzkennzeichen, 
 			                    familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon , ext_id)
-			        VALUES('".addslashes($this->sprache)."','".addslashes($this->anrede)."','".addslashes($this->titelpost)."','".
-			        addslashes($this->titelpre)."','".addslashes($this->nachname)."','".addslashes($this->vorname)."','".
-			        addslashes($this->vornamen)."','".addslashes($this->gebdatum)."','".addslashes($this->gebort)."',".
-			        ($this->gebzeit!=''?"'".addslashes($this->gebzeit)."'":'null').",".
-			        ($this->foto!=''?"'".addslashes($this->foto)."'":'null').",'".addslashes($this->anmerkungen)."','".
-			        addslashes($this->homepage)."',".
-			        ($this->svnr!=''?"'".addslashes($this->svnr)."'":'null').",".
-			        ($this->ersatzkennzeichen!=''?"'".addslashes($this->ersatzkennzeichen)."'":'null').",'".
-			        addslashes($this->familienstand)."',".
-			        ($this->anzahlkinder!=''?"'".addslashes($this->anzahlkinder)."'":'null').",".
-			        ($this->aktiv?'true':'false').",".
-			        "'now()','".addslashes($this->insertvon)."','now()', '".addslashes($this->updatevon)."',".
-			        ($this->ext_id!=''?"'".addslashes($this->ext_id)."'":'null').");";
+			        VALUES('.$this->addslashes($this->sprache).','.
+					$this->addslashes($this->anrede).','.
+					$this->addslashes($this->titelpost).','.
+			        $this->addslashes($this->titelpre).','.
+			        $this->addslashes($this->nachname).','.
+			        $this->addslashes($this->vorname).','.
+			        $this->addslashes($this->vornamen).','.
+			        $this->addslashes($this->gebdatum).','.
+			        $this->addslashes($this->gebort).','.
+			        $this->addslashes($this->gebzeit).','.
+			        $this->addslashes($this->foto).','.
+			        $this->addslashes($this->anmerkungen).','.
+			        $this->addslashes($this->homepage).','.
+			        $this->addslashes($this->svnr).','.
+			        $this->addslashes($this->ersatzkennzeichen).','.
+			        $this->addslashes($this->familienstand).','.
+			        $this->addslashes($this->anzahlkinder).','.
+			        ($this->aktiv?'true':'false').','.
+			        $this->addslashes($this->insertamum).','.
+			        $this->addslashes($this->insertvon).','.
+			        $this->addslashes($this->updateamum).','.
+			        $this->addslashes($this->updatevon).','.
+			        $this->addslashes($this->ext_id).');';
 		}
 		else
 		{
 			//person_id auf gueltigkeit pruefen
 			if(!is_numeric($this->person_id))
-			{
+			{				
 				$this->errormsg = 'person_id muss eine gueltige Zahl sein';
 				return false;
 			}
-			
-			$qry = "UPDATE tbl_person SET".
-			       " sprache=".$this->addslashes($this->sprache).",".
-			       " anrede=".$this->addslashes($this->anrede).",".
-			       " titelpost=".$this->addslashes($this->titelpost).",".
-			       " titelpre=".$this->addslashes($this->titelpre).",".
-			       " nachname=".$this->addslashes($this->nachname).",".
-			       " vorname=".$this->addslashes($this->vorname).",".
-			       " vornamen=".$this->addslashes($this->vornamen).",".
-			       " gebdatum=".$this->addslashes($this->gebdatum).",".
-			       " gebort=".$this->addslashes($this->gebort).",".
-			       " gebzeit=".$this->addslashes($this->gebzeit).",".
-			       " foto=".$this->addslashes($this->foto).",".
-			       " anmerkungen=".$this->addslashes($this->anmerkungen).",".
-			       " homepage=".$this->addslashes($this->homepage).",".
-			       " svnr=".$this->addslashes($this->svnr).",".
-			       " ersatzkennzeichen=".$this->addslashes($this->ersatzkennzeichen).",".
-			       " familienstand=".$this->addslashes($this->familienstand).",".
-			       " anzahlkinder=".$this->addslashes($this->anzahlkinder).",".
-			       " aktiv=".($this->aktiv?'true':'false').",".
-			       " updateamum='now()', updatevon=".$this->addslashes($this->updatevon).",".
-			       " ext_id=".$this->addslashes($this->ext_id).
-			       " WHERE person_id='$this->person_id'";			
+
+			$qry = 'UPDATE tbl_person SET'.
+			       ' sprache='.$this->addslashes($this->sprache).','.
+			       ' anrede='.$this->addslashes($this->anrede).','.
+			       ' titelpost='.$this->addslashes($this->titelpost).','.
+			       ' titelpre='.$this->addslashes($this->titelpre).','.
+			       ' nachname='.$this->addslashes($this->nachname).','.
+			       ' vorname='.$this->addslashes($this->vorname).','.
+			       ' vornamen='.$this->addslashes($this->vornamen).','.
+			       ' gebdatum='.$this->addslashes($this->gebdatum).','.
+			       ' gebort='.$this->addslashes($this->gebort).','.
+			       ' gebzeit='.$this->addslashes($this->gebzeit).','.
+			       ' foto='.$this->addslashes($this->foto).','.
+			       ' anmerkungen='.$this->addslashes($this->anmerkungen).','.
+			       ' homepage='.$this->addslashes($this->homepage).','.
+			       ' svnr='.$this->addslashes($this->svnr).','.
+			       ' ersatzkennzeichen='.$this->addslashes($this->ersatzkennzeichen).','.
+			       ' familienstand='.$this->addslashes($this->familienstand).','.
+			       ' anzahlkinder='.$this->addslashes($this->anzahlkinder).','.
+			       ' aktiv='.($this->aktiv?'true':'false').','.
+			       ' updateamum='.$this->addslashes($this->updateamum).','.
+			       ' updatevon='.$this->addslashes($this->updatevon).','.
+			       ' ext_id='.$this->addslashes($this->ext_id).
+			       " WHERE person_id='$this->person_id'";
 		}
-		
+
 		if(pg_query($this->conn,$qry))
 		{
 			if($this->new)
 			{
-				$qry = "Select currval('tbl_person_person_id_seq') as id;";
+				$qry = "SELECT currval('tbl_person_person_id_seq') AS id;";
 				if($row=pg_fetch_object(pg_query($this->conn,$qry)))
+				{					
 					$this->person_id=$row->id;
-				else 
-				{
+					/*if(!pg_query($this->conn,'COMMIT;'))
+					{
+						$this->errormsg = 'Personentransaktion konnte nicht commitet werden';
+						return false;
+					}*/
+				}
+				else
+				{					
 					$this->errormsg = 'Sequence konnte nicht ausgelesen werden';
-					pg_query($this->conn,'ROLLBACK');
+					//pg_query($this->conn,'ROLLBACK;');
 					return false;
 				}
 			}
 			//Log schreiben
 			return true;
+			
 		}
-		else 
-		{
+		else
+		{			
 			$this->errormsg = 'Fehler beim Speichern des Person-Datensatzes:'.$qry;
 			return false;
 		}
