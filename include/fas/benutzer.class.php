@@ -1,28 +1,38 @@
 <?php
-/**
- * Benutzer (PORTAL)
- * @create 27-11-2006
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
 class benutzer extends person
 {
-	//var $conn;     // @var resource DB-Handle
-	//var $errormsg; // @var string
-	//var $new;      // @var boolean
-	//var $benutzer = array(); // @var person Objekt
-	
 	//Tabellenspalten
 	var $uid;		// varchar(16)
-	var $bnaktiv;		// boolean
+	var $bnaktiv;	// boolean
 	var $alias;		// varchar(256)
-	//var $person_id;	// integer
 		
 	/**
 	 * Konstruktor - Uebergibt die Connection und laedt optional einen benutzer
 	 * @param $conn			Datenbank-Connection
 	 *        $benutzer_id	Benutzer der geladen werden soll (default=null)
 	 */
-	function benutzer($conn, $unicode=false, $benutzer_id=null)
+	function benutzer($conn, $benutzer_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
 		
@@ -33,7 +43,7 @@ class benutzer extends person
 			
 		if(!pg_query($conn,$qry))
 		{
-			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
+			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
 		
@@ -98,29 +108,53 @@ class benutzer extends person
 		if(!person::save())
 			return false;
 				
+		/*if(!pg_query($this->conn,'BEGIN;'))
+		{
+			$this->errormsg = 'Benutzertransaktion konnte nicht gesetzt werden';
+			return false;
+		}*/
+		
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = "INSERT INTO tbl_benutzer (uid, aktiv, alias, person_id) VALUES(".
-			       "'".addslashes($this->uid)."',".($this->aktiv?'true':'false').",".
-			       $this->addslashes($this->alias).",'".$this->person_id."');";
+			$qry = 'INSERT INTO tbl_benutzer (uid, aktiv, alias, person_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
+			       "'".addslashes($this->uid)."',".
+			       ($this->aktiv?'true':'false').','.
+			       $this->addslashes($this->alias).",'".
+			       $this->person_id."',".
+			       $this->addslashes($this->insertamum).",".
+			       $this->addslashes($this->insertvon).",".
+			       $this->addslashes($this->updateamum).",".
+			       $this->addslashes($this->updatevon).",".
+			       ");";
 		}
 		else
 		{			
-			$qry = "UPDATE tbl_benutzer SET".
-			       " aktiv=".($this->aktiv?'true':'false').",".
-			       " alias=".$this->addslashes($this->alias).",".
-			       " person_id='".$this->person_id."'".
+			$qry = 'UPDATE tbl_benutzer SET'.
+			       ' aktiv='.($this->aktiv?'true':'false').','.
+			       ' alias='.$this->addslashes($this->alias).','.
+			       " person_id='".$this->person_id."',".
+			       ' updateamum='.$this->addslashes($this->updateamum).','.
+			       ' updatevon='.$this->addslashes($this->updatevon).
 			       " WHERE uid='".addslashes($this->uid)."';";
 		}
 		
 		if(pg_query($this->conn,$qry))
 		{
-			//Log schreiben
-			return true;
+			/*if(!pg_query($this->conn,'COMMIT;'))
+			{
+				$this->errormsg = 'Bentuzer commit fehlgeschlagen';
+				return false;
+			}
+			else 
+			{*/
+				//Log schreiben
+				return true;
+			/*}*/
 		}
 		else 
-		{
-			$this->errormsg = "Fehler beim Speichern des Person-Datensatzes:".$qry;
+		{			
+			//pg_query($this->conn,'ROLLBACK;');
+			$this->errormsg = 'Fehler beim Speichern des Benutzer-Datensatzes:'.$qry;
 			return false;
 		}
 	}
