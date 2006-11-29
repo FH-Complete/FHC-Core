@@ -53,11 +53,11 @@ class person
 	var $updatevon;         // varchar(16)
 	var $ext_id;            // bigint
 	
-	/**
-	 * Konstruktor - Uebergibt die Connection und laedt optional eine Person
-	 * @param $conn      Datenbank-Connection
-	 *        $person_id Person die geladen werden soll (default=null)
-	 */
+	// ***********************************************************************
+	// * Konstruktor - Uebergibt die Connection und laedt optional eine Person
+	// * @param $conn      Datenbank-Connection
+	// *        $person_id Person die geladen werden soll (default=null)
+	// ***********************************************************************
 	function person($conn, $person_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
@@ -77,10 +77,10 @@ class person
 			$this->load($person_id);
 	}
 	
-	/**
-	 * Laedt Person mit der uebergebenen ID
-	 * @param $person_id ID der Person die geladen werden soll
-	 */
+	// *********************************************************
+	// * Laedt Person mit der uebergebenen ID
+	// * @param $person_id ID der Person die geladen werden soll
+	// *********************************************************
 	function load($person_id)
 	{
 		//person_id auf gueltigkeit pruefen
@@ -117,7 +117,7 @@ class person
 				$this->ersatzkennzeichen = $row->ersatzkennzeichen;
 				$this->familienstand = $row->familienstand;
 				$this->anzahlkinder = $row->anzahlkinder;
-				$this->aktiv = $row->aktiv;
+				$this->aktiv = ($row->aktiv=='t'?true:false);
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
@@ -139,6 +139,11 @@ class person
 		}
 	}
 	
+	// *******************************************
+	// * Prueft die Variablen vor dem Speichern 
+	// * auf Gueltigkeit.
+	// * @return true wenn ok, false im Fehlerfall
+	// *******************************************
 	function validate()
 	{
 		if(strlen($this->sprache)>16)
@@ -166,28 +171,104 @@ class person
 			$this->errormsg = 'Nachname darf nicht laenger als 64 Zeichen sein';
 			return false;
 		}
-		//...
-		return true;
+		if(strlen($this->vorname)>32)
+		{
+			$this->errormsg = 'Vorname darf nicht laenger als 32 Zeichen sein';
+			return false;
+		}
+		if(strlen($this->vornamen)>128)
+		{
+			$this->errormsg = 'Vornamen darf nicht laenger als 128 Zeichen sein';
+			return false;
+		}
+		//ToDo Gebdatum pruefen -> laut bis muss er aelter als 10 Jahre sein
+		if(strlen($this->gebort)>128)
+		{
+			$this->errormsg = 'Geburtsort darf nicht laenger als 128 Zeichen sein';
+			return false;
+		}
+		if($this->foto!='' && !is_numeric($this->foto))
+		{
+			$this->errormsg = 'FotoOID ist ungueltig';
+			return false;
+		}
+		if(strlen($this->anmerkungen)>256)
+		{
+			$this->errormsg = 'Anmerkungen darf nicht laenger als 256 Zeichen sein';
+			return false;
+		}
+		if(strlen($this->homepage)>256)
+		{
+			$this->errormsg = 'Homepage darf nicht laenger als 256 Zeichen sein';
+			return false;
+		}
+		if(strlen($this->svnr)>10)
+		{
+			$this->errormsg = 'SVNR darf nicht laenger als 10 Zeichen sein';
+			return false;
+		}
+		if(strlen($this->ersatzkennzeichen)>10)
+		{
+			$this->errormsg = 'Ersatzkennzeichen darf nicht laenger als 10 Zeichen sein';
+			return false;
+		}
+		if(strlen($this->familienstand)>1)
+		{
+			$this->errormsg = 'Familienstand ist ungueltig';
+			return false;
+		}
+		if($this->anzahlkinder!='' && !is_numeric($this->anzahlkinder))
+		{
+			$this->errormsg = 'Anzahl der Kinder ist ungueltig';
+			return false;
+		}
+		if(!is_bool($this->aktiv))
+		{
+			$this->errormsg = 'Aktiv ist ungueltig';
+			return false;
+		}
+		if(strlen($this->insertvon)>16)
+		{
+			$this->errormsg = 'Insertvon darf nicht laenger als 16 Zeichen sien';
+			return false;
+		}
+		if(strlen($this->updatevon)>16)
+		{
+			$this->errormsg = 'Updatevon darf nicht laenger als 16 Zeichen sein';
+			return false;
+		}
+		if($this->ext_id!='' && !is_numeric($this->ext_id))
+		{
+			$this->errormsg = 'Ext_ID ist keine gueltige Zahl';
+			return false;
+		}
 		
+		return true;		
 	}
 	
+	// ************************************************
+	// * wenn $var '' ist wird "null" zurueckgegeben
+	// * wenn $var !='' ist werden Datenbankkritische 
+	// * zeichen mit backslash versehen und das ergbnis
+	// * unter hochkomma gesetzt.
+	// ************************************************
 	function addslashes($var)
 	{
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
 	
-	/**
-	 * Speichert die Personendaten in die Datenbank
-	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz angelegt
-	 * ansonsten der Datensatz mit $person_id upgedated
-	 * @return true wenn erfolgreich, false im Fehlerfall
-	 */
+	// ************************************************************
+	// * Speichert die Personendaten in die Datenbank
+	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	// * angelegt, ansonsten der Datensatz mit $person_id upgedated
+	// * @return true wenn erfolgreich, false im Fehlerfall
+	// ************************************************************
 	function save()
 	{
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
 			return false;
-		/*	
+		/*	Verschachtelte transaktionen funktionieren nicht!
 		if(!pg_query($this->conn,'BEGIN;'))
 		{
 			$this->errormsg = 'Transaktion konnte nicht gesetzt werden';

@@ -31,9 +31,11 @@ class student extends benutzer
 	var $verband;
 	var $gruppe;
 
-	/**
-	 * Konstruktor
-	 */
+	// ***********************************************************************
+	// * Konstruktor - Uebergibt die Connection und laedt optional eine Person
+	// * @param $conn      Datenbank-Connection
+	// *        $person_id Person die geladen werden soll (default=null)
+	// ***********************************************************************
 	function student($conn, $student_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
@@ -54,10 +56,11 @@ class student extends benutzer
 			$this->load($student_id);
 	}
 	
-	/**
-	 * ueberprueft die Variablen auf Gueltigkeit
-	 * @return true wenn gueltig, false im Fehlerfall
-	 */
+	// *******************************************
+	// * Prueft die Variablen vor dem Speichern 
+	// * auf Gueltigkeit.
+	// * @return true wenn ok, false im Fehlerfall
+	// *******************************************
 	function validate()
 	{	    
 		if(strlen($this->uid)>16)
@@ -110,10 +113,12 @@ class student extends benutzer
 	}
 	
 	
-	/**
-	 * Speichert die Studentendaten in die Datenbank
-	 * @return true wenn ok, false im Fehlerfall
-	 */
+	// ************************************************************
+	// * Speichert die Studentendaten in die Datenbank
+	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	// * angelegt, ansonsten der Datensatz mit $person_id upgedated
+	// * @return true wenn erfolgreich, false im Fehlerfall
+	// ************************************************************
 	function save()
 	{
 		//Variablen checken		
