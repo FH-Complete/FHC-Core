@@ -1,4 +1,24 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
 /**
  * Klasse funktionen (FAS-Online)
  * Verwaltet die Funktionen der Mitarbeiter
@@ -7,10 +27,10 @@
 
 class funktion
 {
-	var $conn;    					// @var resource DB-Handle
-	var $errormsg; 					// @var string
-	var $new;      					// @var boolean
-	var $result = array(); 			// @var funktion Objekt
+	var $conn;    				// @var resource DB-Handle
+	var $errormsg; 			// @var string
+	var $new;      				// @var boolean
+	var $result = array(); 		// @var funktion Objekt
 	
 	//vars fuer Tabellenspalten
 	var $funktion_id;        		// @var integer
@@ -19,22 +39,22 @@ class funktion
 	var $erhalter_id;        		// @var integer
 	var $studiengang_id;     		// @var integer
 	var $fachbereich_id;     		// @var integer
-	var $name;               		// @var string
-	var $funktion;          		// @var integer ( 0 = Mitarbeiter, 1 = Lektor, 2 = Fachbereichskoordinatior, 3 = Assistenz, 
-	                         		//                4 = Rektor, 5 = Studiengangsleiter, 6 = Fachbereichsleiter)
+	var $name;       	        		// @var string
+	var $funktion;          			// @var integer ( 0 = Mitarbeiter, 1 = Lektor, 2 = Fachbereichskoordinatior, 3 = Assistenz, 
+	                         			//                4 = Rektor, 5 = Studiengangsleiter, 6 = Fachbereichsleiter)
 	var $updateamum;         		// @var timestamp
 	var $updatevon=0;          		// @var string
 	var $beschart1;         		// @var integer ( 1 = Dienstverhaeltnis zum Bund, 2 = Dienstverhaeltnis zu einer anderen Gebietskoerperschaft,
-	                            	//                3 = Echter Dienstvertrag, 4 = Freier Dienstvertrag, 5 = Lehre/Ausbildung, 6 = Sonstiges)
+	                            			//                3 = Echter Dienstvertrag, 4 = Freier Dienstvertrag, 5 = Lehre/Ausbildung, 6 = Sonstiges)
 	var $beschart2;          		// @var integer ( 1 = befristet, 2 = unbefristet)
 	var $verwendung;         		// @var integer
 	var $hauptberuflich;     		// @var boolean
 	var $hauptberuf;         		// @var integer
 	var $entwicklungsteam;   		// @var boolean
 	var $besonderequalifikation; 	// @var integer
-	var $sws;                		// @var float wird nicht verwendet
+	var $sws;                			// @var float wird nicht verwendet
 	var $ausmass;            		// @var float ( 1 = Vollzeit, 2 = <=15 Wochenstd, 3 = 15-25 Wochenstd, 4 = 26-36 Wochenstd, 5 = Karenz)
-	var $status;					// @var integer Aktstatus der Person (wird bei loeschen einer funktion gesetzt)
+	var $status;				// @var integer Aktstatus der Person (wird bei loeschen einer funktion gesetzt)
 		
 	/**
 	 * Konstruktor
