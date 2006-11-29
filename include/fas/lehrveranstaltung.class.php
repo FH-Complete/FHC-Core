@@ -1,4 +1,24 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
 /**
  * Klasse lehrveranstaltung (FAS-Online)
  * @create 16-03-2006
@@ -37,11 +57,11 @@ class lehrveranstaltung
 	 * @param $conn Connection zur Datenbank
 	 *        $lehrveranstaltung_id ID der zu ladenden Lehrveranstaltung
 	 */
-	function lehrveranstaltung($conn, $lehrveranstaltung_id=null)
+	function lehrveranstaltung($conn, $lehrveranstaltung_nr=null)
 	{
 		$this->conn = $conn;
-		if($lehrveranstaltung_id != null)
-			$this->load($lehrveranstaltung_id);
+		if($lehrveranstaltung_nr != null)
+			$this->load($lehrveranstaltung_nr);
 	}
 	
 	/**
@@ -228,50 +248,59 @@ class lehrveranstaltung
 		//Laenge Pruefen
 		if(strlen($this->bezeichnung)>64)           
 		{
-			$this->errormsg = 'Bezeichnung darf nicht laenger als 64 Zeichen sein';
+			$this->errormsg = "Bezeichnung darf nicht laenger als 64 Zeichen sein bei <b>$this->ext_id</b> - $this->bezeichnung";
 			return false;
 		}
 		if(strlen($this->kurzbz)>16)
 		{
-			$this->errormsg = 'Kurzbez darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg = "Kurzbez darf nicht laenger als 16 Zeichen sein bei <b>$this->ext_id</b> - $this->kurzbz";
 			return false;
 		}
 		if(strlen($this->anmerkung)>64)
 		{
-			$this->errormsg = 'Anmerkung darf nicht laenger als 64 Zeichen sein';
+			$this->errormsg = "Anmerkung darf nicht laenger als 64 Zeichen sein bei <b>$this->ext_id</b> - $this->anmerkung";
+			return false;
+		}
+		if(strlen($this->lehreverzeichnis)>16)
+		{
+			$this->errormsg = "Lehreverzeichnis darf nicht laenger als 16 Zeichen sein bei <b>$this->ext_id</b> - $this->lehreverzeichnis";
 			return false;
 		}
 		if(!is_numeric($this->studiengang_kz))         
 		{
-			$this->errormsg = 'Studiengang_kz ist ungueltig: '.$this->studiengang_kz;
+			$this->errormsg = "Studiengang_kz ist ungueltig bei <b>$this->ext_id</b> - $this->studiengang_kz";
 			return false;
 		}
 		if($this->semester!='' && !is_numeric($this->semester))
 		{
-			$this->errormsg = 'Semester ist ungueltig';
+			$this->errormsg = "Semester ist ungueltig bei <b>$this->ext_id</b> - $this->semester";
 			return false;
 		}
 		if($this->planfaktor!='' && !is_numeric($this->planfaktor))
 		{
-			$this->errormsg = 'Planfaktor ist ungueltig';
+			$this->errormsg = "Planfaktor ist ungueltig bei <b>$this->ext_id</b> - $this->planfaktor";
 			return false;
 		}
 		if($this->semesterstunden!='' && !is_numeric($this->semesterstunden)) 
 		{
-			$this->errormsg = 'Semesterstunden ist ungueltig';
+			$this->errormsg = "Semesterstunden ist ungueltig bei <b>$this->ext_id</b> - $this->semesterstunden";
 			return false;
 		}
 		if($this->planlektoren!='' && !is_numeric($this->planlektoren))
 		{
-			$this->errormsg = "Planlektoren ist ungueltig";
+			$this->errormsg = "Planlektoren ist ungueltig bei <b>$this->ext_id</b> - $this->planlektoren";
 			return false;
 		}
 		if($this->ects!='' && !is_numeric($this->ects))
 		{
-			$this->errormsg = 'ECTS sind ungueltig';
+			$this->errormsg = "ECTS sind ungueltig bei <b>$this->ext_id</b> - $this->ects";
 			return false;
 		}		
-				
+		if($this->ects>40)
+		{
+			$this->errormsg = "ECTS größer als 40 bei <b>$this->ext_id</b> - $this->ects";
+			return false;
+		}		
 		$this->errormsg = '';
 		return true;		
 	}
@@ -289,8 +318,6 @@ class lehrveranstaltung
 		if($this->new)
 		{
 			//Neuen Datensatz anlegen
-						
-			//naechste ID aus der Sequence holen
 			$qry = 'INSERT INTO tbl_lehrveranstaltung (studiengang_kz, bezeichnung, kurzbz, 
 				semester, ects, semesterstunden, gemeinsam, anmerkung, lehre, lehreverzeichnis, aktiv, ext_id, insertamum, 
 				insertvon, planfaktor, planlektoren, planpersonalkosten, updateamum, updatevon) VALUES ('.
@@ -321,38 +348,37 @@ class lehrveranstaltung
 			//Pruefen ob lehrveranstaltung_id eine gueltige Zahl ist
 			if(!is_numeric($this->lehrveranstaltung_nr) || $this->lehrveranstaltung_nr == '')
 			{
-				$this->errormsg = 'lehrveranstaltung_id muss eine gueltige Zahl sein';
+				$this->errormsg = 'lehrveranstaltung_nr muss eine gueltige Zahl sein';
 				return false;
 			}
-			
-			$qry = 'UPDATE tbl_lehrveranstaltung SET'. 
-				'lehrveranstaltung_nr='.$this->addslashes($this->lehrveranstaltung_nr) .','.
-				'studiengang_kz='.$this->addslashes($this->studiengang_kz) .','.
-				'bezeichnung='.$this->addslashes($this->bezeichnung) .','.
-				'kurzbez='.$this->addslashes($this->kurzbz) .','.
-				'semester='.$this->addslashes($this->semester) .','.
-				'ects='.$this->addslashes($this->ects) .','.
-				'semesterstunden='.$this->addslashes($this->semesterstunden) .','.
-				'gemeinsam='.$this->addslashes($this->gemeinsam) .','.
-				'anmerkung='.$this->addslashes($this->anmerkung) .','.
-				'lehre='.$this->addslashes($this->lehre) .','.
-				'lehreverzeichnis='.$this->addslashes($this->lehreverzeichnis) .','.
-				'aktiv='.($this->aktiv?'true':'false') .','.
-				'ext_id='.$this->addslashes($this->ext_id) .','.
-				'insertamum='.$this->addslashes($this->insertamum) .','.
-				'insertvon='.$this->addslashes($this->insertvon) .','.
-				'planfaktor='.$this->addslashes($this->planfaktor) .','.
-				'planlektoren='.$this->addslashes($this->planlektoren) .','.
-				'planpersonalkosten='.$this->addslashes($this->planpersonalkosten) .','.
+			$qry = 'UPDATE tbl_lehrveranstaltung SET '. 
+				//'lehrveranstaltung_nr= '.$this->addslashes($this->lehrveranstaltung_nr) .', '.
+				'studiengang_kz='.$this->addslashes($this->studiengang_kz) .', '.
+				'bezeichnung='.$this->addslashes($this->bezeichnung) .', '.
+				'kurzbz='.$this->addslashes($this->kurzbz) .', '.
+				'semester='.$this->addslashes($this->semester) .', '.
+				'ects='.$this->addslashes($this->ects) .', '.
+				'semesterstunden='.$this->addslashes($this->semesterstunden) .', '.
+				'gemeinsam='.$this->addslashes($this->gemeinsam) .', '.
+				'anmerkung='.$this->addslashes($this->anmerkung) .', '.
+				'lehre='.$this->addslashes($this->lehre) .', '.
+				'lehreverzeichnis='.$this->addslashes($this->lehreverzeichnis) .', '.
+				'aktiv='.($this->aktiv?'true':'false') .', '.
+				'ext_id='.$this->addslashes($this->ext_id) .', '.
+				'insertamum='.$this->addslashes($this->insertamum) .', '.
+				'insertvon='.$this->addslashes($this->insertvon) .', '.
+				'planfaktor='.$this->addslashes($this->planfaktor) .', '.
+				'planlektoren='.$this->addslashes($this->planlektoren) .', '.
+				'planpersonalkosten='.$this->addslashes($this->planpersonalkosten) .', '.
 				'updateamum='.$this->addslashes($this->updateamum) .','.
-				'updatevon='.$this->addslashes($this->updatevon) .','.
-				'WHERE lehrveranstaltung_nr = '.$this->this->addslashes(lehrveranstaltung_nr).';';
+				'updatevon='.$this->addslashes($this->updatevon) .' '.
+				'WHERE ext_id = '.$this->addslashes($this->lehrveranstaltung_nr).';';
 		}
 		
-		/*if(pg_query($this->conn, $qry))
+		if(pg_query($this->conn, $qry))
 		{
 			//Log schreiben
-			$sql = $qry;
+			/*$sql = $qry;
 			$qry = "SELECT nextval('log_seq') as id;";
 			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
 			{
@@ -367,13 +393,14 @@ class lehrveranstaltung
 			{
 				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
 				return false;
-			}
+			}*/
+			return true;
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim speichern des Datensatzes';
+			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
 			return false;
-		}*/		
+		}		
 	}
 	
 	/**
