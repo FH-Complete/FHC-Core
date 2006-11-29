@@ -27,11 +27,11 @@ class benutzer extends person
 	var $bnaktiv;	// boolean
 	var $alias;		// varchar(256)
 		
-	/**
-	 * Konstruktor - Uebergibt die Connection und laedt optional einen benutzer
-	 * @param $conn			Datenbank-Connection
-	 *        $benutzer_id	Benutzer der geladen werden soll (default=null)
-	 */
+	// **************************************************************************
+	// * Konstruktor - Uebergibt die Connection und laedt optional einen Benutzer
+	// * @param $conn			Datenbank-Connection
+	// *        $benutzer_id	Benutzer der geladen werden soll (default=null)
+	// **************************************************************************
 	function benutzer($conn, $benutzer_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
@@ -51,18 +51,20 @@ class benutzer extends person
 			$this->load($benutzer_id);
 	}
 	
-	/**
-	 * Laedt Benutzer mit der uebergebenen ID
-	 * @param $benutzer_id ID der Person die geladen werden soll
-	 */
+	// ***********************************************************
+	// * Laedt Benutzer mit der uebergebenen ID
+	// * @param $benutzer_id ID der Person die geladen werden soll
+	// ***********************************************************
 	function load($benutzer_id)
 	{
 		
 	}
 	
-	/**
-	 * Prueft die Variablen auf gueltigkeit
-	 */
+	// *******************************************
+	// * Prueft die Variablen vor dem Speichern 
+	// * auf Gueltigkeit.
+	// * @return true wenn ok, false im Fehlerfall
+	// *******************************************
 	function validate()
 	{
 		if(strlen($this->uid)>16)
@@ -92,12 +94,12 @@ class benutzer extends person
 		}
 	}
 	
-	/**
-	 * Speichert die Benutzerdaten in die Datenbank
-	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz angelegt
-	 * ansonsten der Datensatz mit $uid upgedated
-	 * @return true wenn erfolgreich, false im Fehlerfall
-	 */
+	// ******************************************************************
+	// * Speichert die Benutzerdaten in die Datenbank
+	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz angelegt
+	// * ansonsten der Datensatz mit $uid upgedated
+	// * @return true wenn erfolgreich, false im Fehlerfall
+	// ******************************************************************
 	function save()
 	{
 		//Variablen auf Gueltigkeit pruefen
@@ -124,8 +126,7 @@ class benutzer extends person
 			       $this->addslashes($this->insertamum).",".
 			       $this->addslashes($this->insertvon).",".
 			       $this->addslashes($this->updateamum).",".
-			       $this->addslashes($this->updatevon).",".
-			       ");";
+			       $this->addslashes($this->updatevon).");";
 		}
 		else
 		{			

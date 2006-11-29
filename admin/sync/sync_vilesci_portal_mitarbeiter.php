@@ -1,6 +1,26 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
 /**
- * Synchronisiert Personendatensaetze von Vilesci DB in PORTAL DB
+ * Synchronisiert Mitarbeiterdatensaetze von Vilesci DB in PORTAL DB
  *
  */
 require_once('../../vilesci/config.inc.php');
@@ -21,7 +41,7 @@ $anzahl_fehler=0;
 // ***********************************
 
 //Mitarbeiter
-$qry = "SELECT * FROM tbl_person JOIN tbl_mitarbeiter USING(uid) WHERE personalnummer<>'OFF'";
+$qry = "SELECT * FROM tbl_person JOIN tbl_mitarbeiter USING(uid) WHERE personalnummer<>'OFF' AND uid NOT LIKE '\_dummy%' AND uid NOT LIKE '\_Dummy%'";
 
 if($result = pg_query($conn_vilesci, $qry))
 {
@@ -40,7 +60,7 @@ if($result = pg_query($conn_vilesci, $qry))
 			$mitarbeiter->nachname=$row->nachname;
 			if(!$len=strpos($row->vornamen,' '))
 			{
-				$student->vorname=$row->vornamen;
+				$mitarbeiter->vorname=$row->vornamen;
 				$mitarbeiter->vornamen='';
 			}
 			else
@@ -111,8 +131,10 @@ if($result = pg_query($conn_vilesci, $qry))
 					$anzahl_fehler++;
 			}
 			else 
-				$error_log .= "$row->nachname ($row->uid) hat keine Personalnummer\n";
+				$error_log .= "Fehler beim ermitteln der UID\n";
 		}
+		else 
+			$error_log .= "$row->nachname ($row->uid) hat keine Personalnummer\n";
 	}
 }
 else
@@ -123,7 +145,7 @@ $text.="Anzahl der Fehler: $anzahl_fehler\n";
 
 <html>
 <head>
-<title>Synchro - Vilesci -> Portal - Personen</title>
+<title>Synchro - Vilesci -> Portal - Mitarbeiter</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
 <body>

@@ -4,9 +4,6 @@
  *
  */
 require_once('../../vilesci/config.inc.php');
-require_once('../../include/fas/person.class.php');
-require_once('../../include/fas/benutzer.class.php');
-require_once('../../include/fas/mitarbeiter.class.php');
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_vilesci=pg_connect(CONN_STRING_VILESCI) or die("Connection zur Vilesci Datenbank fehlgeschlagen");
@@ -43,7 +40,7 @@ $text .= "Anzahl der Fehler: $anzahl_fehler\n";
 ?>
 <html>
 <head>
-<title>Synchro - Vilesci -> Portal - Personen</title>
+<title>Synchro - Vilesci -> Portal - Lehrverbaende</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
 <body>

@@ -1,7 +1,23 @@
 <?php
-/**
- * Klasse Mitarbeiter abgeleitet von Benutzer (Portal)
- * @create 27-11-2006
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
 class mitarbeiter extends benutzer
@@ -15,9 +31,11 @@ class mitarbeiter extends benutzer
 	var $fixangestellt;		//boolean
 	var $telefonklappe;		//varchar(25)
 
-	/**
-	 * Konstruktor
-	 */
+	// ***********************************************************************
+	// * Konstruktor - Uebergibt die Connection und laedt optional eine Person
+	// * @param $conn      Datenbank-Connection
+	// *        $person_id Person die geladen werden soll (default=null)
+	// ***********************************************************************
 	function mitarbeiter($conn, $person_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
@@ -38,10 +56,10 @@ class mitarbeiter extends benutzer
 			$this->load($person_id);
 	}
 	
-	/**
-	 * ueberprueft die Variablen auf Gueltigkeit
-	 * @return true wenn gueltig, false im Fehlerfall
-	 */
+	// ************************************************
+	// * ueberprueft die Variablen auf Gueltigkeit
+	// * @return true wenn gueltig, false im Fehlerfall
+	// ************************************************
 	function validate()
 	{	    
 		if(strlen($this->uid)>16)
@@ -94,10 +112,10 @@ class mitarbeiter extends benutzer
 	}
 	
 	
-	/**
-	 * Speichert die Mitarbeiterdaten in die Datenbank
-	 * @return true wenn ok, false im Fehlerfall
-	 */
+	// *************************************************
+	// * Speichert die Mitarbeiterdaten in die Datenbank
+	// * @return true wenn ok, false im Fehlerfall
+	// *************************************************
 	function save()
 	{
 		//Variablen checken		
@@ -125,7 +143,7 @@ class mitarbeiter extends benutzer
 					($this->fixangestellt?'true':'false').','.
 					$this->addslashes($this->telefonklappe).','.
 					$this->addslashes($this->updateamum).','.
-					$this->updatevon."');";
+					$this->addslashes($this->updatevon).');';
 		}
 		else 
 		{
