@@ -64,9 +64,9 @@ if($result = pg_query($conn_vilesci, $qry))
 		$fachbereich->bezeichnung=$row->bezeichnung;
 		$fachbereich->kurzbz=$row->kurzbz;
 		$fachbereich->farbe=$row->farbe;
-		//$fachbereich->insertamum=now();
+		//$fachbereich->insertamum='';
 		$fachbereich->insertvon='SYNC';
-		//$fachbereich->updateamum=now();
+		//$fachbereich->updateamum='';
 		//$fachbereich->updatevon=$row->updatevon;
 		$fachbereich->ext_id=$row->fachbereich_id;
 		
