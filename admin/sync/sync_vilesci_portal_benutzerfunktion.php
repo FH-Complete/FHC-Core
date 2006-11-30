@@ -26,7 +26,7 @@
 //*
 
 include('../../vilesci/config.inc.php');
-include('../../include/fas/funktion.class.php');
+include('../../include/fas/benutzerfunktion.class.php');
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_vilesci=pg_connect(CONN_STRING_VILESCI) or die("Connection zur Vilesci Datenbank fehlgeschlagen");
@@ -48,52 +48,53 @@ function validate($row)
  * VILESCI-PORTAL - Synchronisation
  */
 
-//funktion
-$qry = "SELECT * FROM tbl_funktion";
+//benutzerfunktion
+$qry = "SELECT * FROM tbl_personfunktion";
 
 if($result = pg_query($conn_vilesci, $qry))
 {
-	echo nl2br("Funktion Sync\n----------------------\n");
+	echo nl2br("Benutzerfunktion Sync\n----------------------\n");
 	$anzahl_quelle=pg_num_rows($result);
 	while($row = pg_fetch_object($result))
 	{
 		$error=false;
-		$funktion = new funktion($conn);
-		$funktion->bezeichnung=$row->bezeichnung;
-		$funktion->funktion_kurzbz=$row->funktion_kurzbz;
-		$funktion->aktiv=($row->aktiv=='t'?true:false);
-		//$funktion->insertamum='';
-		$funktion->insertvon='SYNC';
-		//$funktion->updateamum='';
-		//$funktion->updatevon=$row->updatevon;
+		$benutzerfunktion = new benutzerfunktion($conn);
+		$benutzerfunktion->fachbereich_id=$row->fachbereich_id;
+		$benutzerfunktion->uid=$row->uid;
+		$benutzerfunktion->studiengang_kz=$row->studiengang_kz;
+		$benutzerfunktion->funktion_kurzbz=$row->funktion_kurzbz;
+		//$benutzerfunktion->insertamum='';
+		$benutzerfunktion->insertvon='SYNC';
+		//$benutzerfunktion->updateamum='';
+		//$benutzerfunktion->updatevon=$row->updatevon;
 		
-		$qry = "SELECT funktion_kurzbz FROM tbl_funktion WHERE funktion_kurzbz='$funktion->funktion_kurzbz'";
+		$qry = "SELECT benutzerfunktion_id FROM tbl_benutzerfunktion WHERE benutzerfunktion_id='$row->personfunktion_id'";
 			if($result1 = pg_query($conn, $qry))
 			{		
 				if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist
 				{
 					if($row1=pg_fetch_object($result1))
 					{
-						//Funktionsdaten updaten
-						$funktion->new=false;
-						$funktion->funktion_kurzbz=$row->funktion_kurzbz;
+						//Benutzerfunktionsdaten updaten
+						$benutzerfunktion->new=false;
+						$benutzerfunktion->benutzerfunktion_id=$row->personfunktion_id;
 					}
 					else 
 					{
-						$error_log.="funktion_kurzbz von $row->funktion_kurzbz konnte nicht ermittelt werden\n";
+						$error_log.="benutzerfunktion_id von $row->personfunktion_id konnte nicht ermittelt werden\n";
 						$error=true;
 					}
 				}
 				else 
 				{
-					//Funktion neu anlegen
-					$funktion->new=true;
+					//Benutzerfunktion neu anlegen
+					$benutzerfunktion->new=true;
 				}
 				
 				if(!$error)
-					if(!$funktion->save())
+					if(!$benutzerfunktion->save())
 					{
-						$error_log.=$funktion->errormsg."\n";
+						$error_log.=$benutzerfunktion->errormsg."\n";
 						$anzahl_fehler++;
 					}
 					else 
@@ -111,7 +112,7 @@ else
 
 <html>
 <head>
-<title>Synchro - Vilesci -> Portal - Funktionen</title>
+<title>Synchro - Vilesci -> Portal - Benutzerfunktionen</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
 <body>
