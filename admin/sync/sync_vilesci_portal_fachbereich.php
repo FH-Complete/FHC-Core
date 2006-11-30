@@ -77,7 +77,7 @@ if($result = pg_query($conn_vilesci, $qry))
 				{
 					if($row1=pg_fetch_object($result1))
 					{
-						//Lehrveranstaltungsdaten updaten
+						//Fachbereichsdaten updaten
 						$fachbereich->new=false;
 						$fachbereich->fachbereich_id=$row->fachbereich_id;
 					}
