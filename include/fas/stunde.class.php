@@ -20,26 +20,26 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-class lehrform
+class stunde
 {
 	var $conn;     // resource DB-Handle
 	var $errormsg; // string
 	var $new;      // boolean
-	var $lehrform = array(); // lehrform Objekt
+	var $stunden = array(); // stunde Objekt
 	
 	//Tabellenspalten
-	var $lehrform_kurbz;	// varchar(8)
-	var $bezeichnung;		// varchar (256)
-	var $verplanen; 		// boolean
+	var $stunde;	// smalint
+	var $beginn;	// time without timezone
+	var $ende;		// time without timezone
 	
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
 	// * @param $conn        	Datenbank-Connection
-	// *        $lehrform_kurbz Lehrform die geladen werden soll (default=null)
+	// *        $stunde			Stunde die geladen werden soll
 	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
-	function lehrform($conn, $lehrform_kurzbz=null, $unicode=false)
+	function stunde($conn, $stunde=null, $unicode=false)
 	{
 		$this->conn = $conn;
 		
@@ -54,37 +54,17 @@ class lehrform
 			return false;
 		}
 		
-		if($lehrform_kurzbz != null)
-			$this->load($lehrform_kurzbz);
+		if($stunde!=null)
+			$this->load($stunde);
 	}
 	
 	// *********************************************************
-	// * Laedt Lehrform mit der uebergebenen ID
-	// * @param $lehrform_kurzbz Lehrform die geladen werden soll
+	// * Laedt eine Stunde
+	// * @param 
 	// *********************************************************
-	function load($lehrform_kurzbz)
-	{		
-		$qry = "SELECT * FROM tbl_lehrform WHERE lehrform_kurzbz='".addslashes($lehrfach_nr)."'";
-		if(!$result=pg_query($this->conn,$qry))
-		{
-			$this->errormsg = 'Fehler beim lesen der Lehrform';
-			return false;
-		}
-		
-		if($row = pg_fetch_object($result))
-		{
-			$this->lehrform_kurbz = $row->lehrform_kurzbz;
-			$this->bezeichnung = $row->bezeichung;
-			$this->verplanen = ($row->verplanen?true:false);
-		}
-		else
-		{
-			$this->errormsg = 'Es ist keine Lehrform mit der Kurzbz '.$lehrform_kurzbz.' vorhanden';
-			return false;
-		}
-		
+	function load($stunde)
+	{
 		return true;
-		
 	}
 	
 	// *******************************************
@@ -94,30 +74,19 @@ class lehrform
 	// *******************************************
 	function validate()
 	{
-		if(strlen($this->lehrform_kurbz)>8)
+		if(!is_numeric($this->stunde))
 		{
-			$this->errormsg = 'Lehrform Kurzbezeichnung darf nicht laenger als 8 Zeichen sein.';
+			$this->errormsg = 'Stunde muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(strlen($this->bezeichnung)>256)
-		{
-			$this->errormsg = 'Bezeichnung darf nicht laenger als 256 Zeichen sein';
-			return false;
-		}
-		if(!is_bool($this->verplanen))
-		{
-			$this->errormsg = 'Verplanen muss ein boolscher Wert sein';
-			return false;
-		}
-
 		return true;
 	}
 
 	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
+	// * wenn $var '' ist wird NULL zurueckgegeben
 	// * wenn $var !='' ist werden Datenbankkritische 
-	// * zeichen mit backslash versehen und das ergbnis
-	// * unter hochkomma gesetzt.
+	// * Zeichen mit Backslash versehen und das Ergbnis
+	// * unter Hochkomma gesetzt.
 	// ************************************************
 	function addslashes($var)
 	{
@@ -125,7 +94,7 @@ class lehrform
 	}
 
 	// ************************************************************
-	// * Speichert die Lehrform in die Datenbank
+	// * Speichert eine Stunde in die Datenbank
 	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
 	// * angelegt, ansonsten der Datensatz mit $lehrfach_nr upgedated
 	// * @return true wenn erfolgreich, false im Fehlerfall
@@ -138,17 +107,17 @@ class lehrform
 
 		if($this->new)
 		{
-			$qry = "INSERT INTO tbl_lehrform (lehrform_kurzbz, bezeichnung, verplanen)
-			        VALUES('".addslashes($this->lehrform_kurzbz)."',".
-					$this->addslashes($this->bezeichnung).','.
-					($this->verplanen?'true':'false').');';
+			$qry = "INSERT INTO tbl_stunde (stunde, beginn, ende)
+			        VALUES('".$this->stunde."',".
+					$this->addslashes($this->beginn).','.
+					$this->addslashes($this->ende).');';
 		}
 		else
 		{
-			$qry = 'UPDATE tbl_lehrform SET'.
-			       ' bezeichnung='.$this->addslashes($this->bezeichnung).','.
-			       ' verplanen='.($this->verplanen?'true':'false').
-			       " WHERE lehrform_kurzbz='$this->lehrform_kurzbz'";
+			$qry = 'UPDATE tbl_stunde SET'.
+			       ' beginn='.$this->addslashes($this->beginn).','.
+			       ' ende='.$this->addslashes($this->ende).
+			       " WHERE stunde=".$this->stunde;
 		}
 
 		if(pg_query($this->conn,$qry))
@@ -158,7 +127,7 @@ class lehrform
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der Lehrform:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern der Stunde:'.$qry;
 			return false;
 		}
 	}

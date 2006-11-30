@@ -20,11 +20,11 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 /**
- * Synchronisiert Lehrfaecher von Vilesci DB in PORTAL DB
+ * Synchronisiert die Zeiwuensche von Vilesci DB in PORTAL DB
  *
  */
 require_once('../../vilesci/config.inc.php');
-require_once('../../include/fas/lehrfach.class.php');
+require_once('../../include/fas/zeitwunsch.class.php');
 
 $conn=pg_connect(CONN_STRING) or die('Connection zur Portal Datenbank fehlgeschlagen');
 $conn_vilesci=pg_connect(CONN_STRING_VILESCI) or die('Connection zur Vilesci Datenbank fehlgeschlagen');
@@ -38,56 +38,45 @@ $anzahl_fehler=0;
 // * VILESCI->PORTAL - Synchronisation
 // ***********************************
 
-//Mitarbeiter
-$qry = 'Select * FROM tbl_lehrfach';
+$qry = 'SELECT * FROM tbl_zeitwunsch';
 
 if($result = pg_query($conn_vilesci, $qry))
 {
-	$text.="\n Sync Lehrfaecher\n\n";
-	while($row = pg_fetch_object($result))
+	$text.="Sync der Zeitwuensche\n\n";
+	while($row=pg_fetch_object($result))
 	{
-		$error=false;
-		$lf = new lehrfach($conn);
+		$zw = new zeitwunsch($conn);
+		$zw->uid = $row->uid;
+		$zw->stunde = $row->stunde;
+		$zw->tag = $row->tag;
+		$zw->gewicht = $row->gewicht;
 		
-		$lf->lehrfach_nr = $row->lehrfach_nr;
-		$lf->studiengang_kz = $row->studiengang_kz;
-		$lf->fachbereich_id = $row->fachbereich_id;
-		$lf->kurzbz = $row->kurzbz;
-		$lf->bezeichnung = $row->bezeichnung;
-		$lf->farbe = $row->farbe;
-		$lf->aktiv = ($row->aktiv=='t'?true:false);
-		$lf->semester = $row->semester;
-		$lf->sprache = ($row->sprache!=''?$row->sprache:'German');
-		
-		$qry = "SELECT count(*) as anz FROM tbl_lehrfach WHERE lehrfach_nr='$row->lehrfach_nr'";
-		if($row1 = pg_fetch_object(pg_query($conn, $qry)))
-		{		
-			if($row1->anz>0) //wenn dieser eintrag schon vorhanden ist
-				$lf->new=false;
-			else 
-				$lf->new=true;
+		$qry ="SELECT count(*) as anz FROM tbl_zeitwunsch where uid='".addslashes($row->uid)."' AND stunde='".addslashes($row->stunde)."' AND tag='".addslashes($row->tag)."';";
+		if($row = pg_fetch_object(pg_query($conn, $qry)))
+		{
+			$zw->new = ($row->anz>0?false:true);
 			
-			if(!$lf->save())
+			if(!$zw->save())
 			{
-				$error_log.=$lf->errormsg."\n";
+				$error_log.= "Fehler beim einfuegen des Datensatzes: $qry";
 				$anzahl_fehler++;
 			}
 			else 
 				$anzahl_eingefuegt++;
 		}
-		else 
-			$error_log .= "Fehler beim ermitteln der UID\n";
+		else
+		{
+			$this->error_log .= "Fehler beim ermitteln des Zeitwunsches: $qry";
+			$anzahl_fehler++;
+		}
 	}
 }
-else
-	$error_log .= "Lehrfaecher konnten nicht geladen werden\n";
-$text.="Anzahl aktualisierte Datensaetze: $anzahl_eingefuegt\n";
-$text.="Anzahl der Fehler: $anzahl_fehler\n";
+$text .= "Anzahl eingefuegter Datensaetze: $anzahl_eingefuegt\n";
+$text .= "Anzahl der Fehler: $anzahl_fehler\n";
 ?>
-
 <html>
 <head>
-<title>Synchro - Vilesci -> Portal - Lehrfach</title>
+<title>Synchro - Vilesci -> Portal - Zeitwunsch</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
 <body>

@@ -31,12 +31,14 @@ class mitarbeiter extends benutzer
 	var $fixangestellt;		//boolean
 	var $telefonklappe;		//varchar(25)
 
-	// ***********************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Person
-	// * @param $conn      Datenbank-Connection
-	// *        $person_id Person die geladen werden soll (default=null)
-	// ***********************************************************************
-	function mitarbeiter($conn, $person_id=null, $unicode=false)
+	// *************************************************************************
+	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
+	// * @param $conn        	Datenbank-Connection
+	// *        $uid            Mitarbeiter der geladen werden soll (default=null)
+	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
+	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
+	// *************************************************************************
+	function mitarbeiter($conn, $uid=null, $unicode=false)
 	{
 		$this->conn = $conn;
 		
@@ -52,8 +54,8 @@ class mitarbeiter extends benutzer
 		}
 		
 		//Mitarbeiter laden
-		if($person_id!=null)
-			$this->load($person_id);
+		//if($uid!=null)
+		//	$this->load($uid);
 	}
 	
 	// ************************************************
@@ -76,12 +78,12 @@ class mitarbeiter extends benutzer
 		{
 			$this->errormsg = 'Ausbildungscode ist ungueltig';
 			return false;
-		}
-		if(!is_numeric($this->personalnummer))
+		}		
+		if($this->personalnummer!='' && !is_numeric($this->personalnummer))
 		{
 			$this->errormsg = 'Personalnummer muss eine gueltige Zahl sein';
 			return false;
-		}
+		}		
 		if(strlen($this->kurzbz)>8)
 		{
 			$this->errormsg = 'kurzbz darf nicht laenger als 8 Zeichen sein';
@@ -136,8 +138,8 @@ class mitarbeiter extends benutzer
 			$qry = "INSERT INTO tbl_mitarbeiter(uid, ausbildungcode, personalnummer, kurzbz, lektor, 
 			                    fixangestellt, telefonklappe, updateamum, updatevon)
 			        VALUES('".addslashes($this->uid)."',".
-			 	 	$this->addslashes($this->ausbildungcode).",'".
-			 	 	$this->personalnummer."',". //TODO: in Produktivversion nicht angeben
+			 	 	$this->addslashes($this->ausbildungcode).",".
+			 	 	$this->addslashes($this->personalnummer).",". //TODO: in Produktivversion nicht angeben
 			 	 	$this->addslashes($this->kurzbz).','.
 			 	 	($this->lektor?'true':'false').','.
 					($this->fixangestellt?'true':'false').','.
@@ -150,7 +152,7 @@ class mitarbeiter extends benutzer
 			//Bestehenden Datensatz updaten
 			$qry = 'UPDATE tbl_mitarbeiter SET'.
 			       ' ausbildungcode='.$this->addslashes($this->ausbildungcode).','.
-			       " personalnummer='$this->personalnummer',". //TODO: in Produktivversion nicht angeben
+			       " personalnummer=".$this->addslashes($this->personalnummer).",". //TODO: in Produktivversion nicht angeben
 			       ' kurzbz='.$this->addslashes($this->kurzbz).','.
 			       ' lektor='.($this->lektor?'true':'false').','.
 			       ' fixangestellt='.($this->fixangestellt?'true':'false').','.

@@ -31,11 +31,13 @@ class student extends benutzer
 	var $verband;
 	var $gruppe;
 
-	// ***********************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Person
-	// * @param $conn      Datenbank-Connection
-	// *        $person_id Person die geladen werden soll (default=null)
-	// ***********************************************************************
+	// *************************************************************************
+	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
+	// * @param $conn        	Datenbank-Connection
+	// *        $student_id     Student der geladen werden soll (default=null)
+	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
+	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
+	// *************************************************************************
 	function student($conn, $student_id=null, $unicode=false)
 	{
 		$this->conn = $conn;

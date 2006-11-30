@@ -25,8 +25,8 @@
  */
 require_once('../../vilesci/config.inc.php');
 
-$conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
-$conn_vilesci=pg_connect(CONN_STRING_VILESCI) or die("Connection zur Vilesci Datenbank fehlgeschlagen");
+$conn=pg_connect(CONN_STRING) or die('Connection zur Portal Datenbank fehlgeschlagen');
+$conn_vilesci=pg_connect(CONN_STRING_VILESCI) or die('Connection zur Vilesci Datenbank fehlgeschlagen');
 
 $error_log='';
 $text = '';
@@ -37,7 +37,7 @@ $anzahl_fehler=0;
 // * VILESCI->PORTAL - Synchronisation
 // ***********************************
 
-$qry = "SELECT sprache FROM tbl_sprache";
+$qry = 'SELECT sprache FROM tbl_sprache';
 
 if($result = pg_query($conn_vilesci, $qry))
 {

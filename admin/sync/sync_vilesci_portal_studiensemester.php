@@ -20,11 +20,11 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 /**
- * Synchronisiert Lehrfaecher von Vilesci DB in PORTAL DB
+ * Synchronisiert die Studiensemester von Vilesci DB in PORTAL DB
  *
  */
 require_once('../../vilesci/config.inc.php');
-require_once('../../include/fas/lehrfach.class.php');
+require_once('../../include/fas/studiensemester.class.php');
 
 $conn=pg_connect(CONN_STRING) or die('Connection zur Portal Datenbank fehlgeschlagen');
 $conn_vilesci=pg_connect(CONN_STRING_VILESCI) or die('Connection zur Vilesci Datenbank fehlgeschlagen');
@@ -38,56 +38,50 @@ $anzahl_fehler=0;
 // * VILESCI->PORTAL - Synchronisation
 // ***********************************
 
-//Mitarbeiter
-$qry = 'Select * FROM tbl_lehrfach';
+$qry = 'SELECT * FROM tbl_studiensemester';
 
 if($result = pg_query($conn_vilesci, $qry))
 {
-	$text.="\n Sync Lehrfaecher\n\n";
+	$text.="\n Sync Studiensemester\n\n";
 	while($row = pg_fetch_object($result))
 	{
 		$error=false;
-		$lf = new lehrfach($conn);
+		$stsem = new studiensemester($conn);
 		
-		$lf->lehrfach_nr = $row->lehrfach_nr;
-		$lf->studiengang_kz = $row->studiengang_kz;
-		$lf->fachbereich_id = $row->fachbereich_id;
-		$lf->kurzbz = $row->kurzbz;
-		$lf->bezeichnung = $row->bezeichnung;
-		$lf->farbe = $row->farbe;
-		$lf->aktiv = ($row->aktiv=='t'?true:false);
-		$lf->semester = $row->semester;
-		$lf->sprache = ($row->sprache!=''?$row->sprache:'German');
+		$stsem->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+		$stsem->start = $row->start;
+		$stsem->ende = $row->ende;
+					
+		$qry = "SELECT count(*) as anz FROM tbl_studiensemester WHERE studiensemester_kurzbz='".addslashes($row->studiensemester_kurzbz)."'";
 		
-		$qry = "SELECT count(*) as anz FROM tbl_lehrfach WHERE lehrfach_nr='$row->lehrfach_nr'";
-		if($row1 = pg_fetch_object(pg_query($conn, $qry)))
+		if($row = pg_fetch_object(pg_query($conn, $qry)))
 		{		
-			if($row1->anz>0) //wenn dieser eintrag schon vorhanden ist
-				$lf->new=false;
+			if($row->anz>0) //wenn dieser eintrag schon vorhanden ist
+				$stsem->new=false;
 			else 
-				$lf->new=true;
+				$stsem->new=true;
 			
-			if(!$lf->save())
+			if(!$stsem->save())
 			{
-				$error_log.=$lf->errormsg."\n";
+				$error_log.=$stsem->errormsg."\n";
 				$anzahl_fehler++;
 			}
 			else 
 				$anzahl_eingefuegt++;
 		}
 		else 
-			$error_log .= "Fehler beim ermitteln der UID\n";
+			$error_log .= "Fehler beim lesen aus der Datenbank\n";
 	}
 }
 else
-	$error_log .= "Lehrfaecher konnten nicht geladen werden\n";
+	$error_log .= "Studiensemester konnten nicht geladen werden\n";
 $text.="Anzahl aktualisierte Datensaetze: $anzahl_eingefuegt\n";
 $text.="Anzahl der Fehler: $anzahl_fehler\n";
 ?>
 
 <html>
 <head>
-<title>Synchro - Vilesci -> Portal - Lehrfach</title>
+<title>Synchro - Vilesci -> Portal - Studiensemester</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
 <body>

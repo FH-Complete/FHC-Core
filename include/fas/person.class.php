@@ -53,11 +53,13 @@ class person
 	var $updatevon;         // varchar(16)
 	var $ext_id;            // bigint
 	
-	// ***********************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Person
-	// * @param $conn      Datenbank-Connection
-	// *        $person_id Person die geladen werden soll (default=null)
-	// ***********************************************************************
+	// *************************************************************************
+	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
+	// * @param $conn        	Datenbank-Connection
+	// *        $person_id      Person die geladen werden soll (default=null)
+	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
+	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
+	// *************************************************************************
 	function person($conn, $person_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
