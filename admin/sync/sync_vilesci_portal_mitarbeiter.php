@@ -51,8 +51,8 @@ if($result = pg_query($conn_vilesci, $qry))
 		$error=false;
 		$mitarbeiter = new mitarbeiter($conn);
 		
-		if($row->personalnummer!='')
-		{
+		//if($row->personalnummer!='')
+		//{
 			$mitarbeiter->sprache='German';
 			$mitarbeiter->anrede='';
 			$mitarbeiter->titelpost='';
@@ -90,7 +90,10 @@ if($result = pg_query($conn_vilesci, $qry))
 			$mitarbeiter->alias=$row->alias;
 			
 			$mitarbeiter->ausbildungcode='';
-			$mitarbeiter->personalnummer=$row->personalnummer;
+			if($row->personalnummer=='OFF')
+				$mitarbeiter->personalnummer='';
+			else
+				$mitarbeiter->personalnummer=$row->personalnummer;
 			$mitarbeiter->kurzbz=$row->kurzbz;
 			$mitarbeiter->lektor=($row->lektor=='t'?true:false);
 			$mitarbeiter->fixangestellt=($row->fixangestellt=='t'?true:false);
@@ -132,9 +135,9 @@ if($result = pg_query($conn_vilesci, $qry))
 			}
 			else 
 				$error_log .= "Fehler beim ermitteln der UID\n";
-		}
-		else 
-			$error_log .= "$row->nachname ($row->uid) hat keine Personalnummer\n";
+		//}
+		//else 
+		//	$error_log .= "$row->nachname ($row->uid) hat keine Personalnummer\n";
 	}
 }
 else

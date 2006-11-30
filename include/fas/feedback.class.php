@@ -20,26 +20,28 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-class lehrform
+class feedback
 {
 	var $conn;     // resource DB-Handle
 	var $errormsg; // string
 	var $new;      // boolean
-	var $lehrform = array(); // lehrform Objekt
+	var $feedback = array(); // feedback Objekt
 	
 	//Tabellenspalten
-	var $lehrform_kurbz;	// varchar(8)
-	var $bezeichnung;		// varchar (256)
-	var $verplanen; 		// boolean
+	var $feedback_id;	// integer
+	var $betreff;		// varchar(128)
+	var $text;			// text
+	var $datum;			// date
+	var $uid;			// varchar(16)
 	
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
 	// * @param $conn        	Datenbank-Connection
-	// *        $lehrform_kurbz Lehrform die geladen werden soll (default=null)
+	// *        $feedback_id    
 	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
-	function lehrform($conn, $lehrform_kurzbz=null, $unicode=false)
+	function feedback($conn, $feedback_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
 		
@@ -54,37 +56,17 @@ class lehrform
 			return false;
 		}
 		
-		if($lehrform_kurzbz != null)
-			$this->load($lehrform_kurzbz);
+		if($feedback_id!=null)
+			$this->load($feedback_id);
 	}
 	
 	// *********************************************************
-	// * Laedt Lehrform mit der uebergebenen ID
-	// * @param $lehrform_kurzbz Lehrform die geladen werden soll
+	// * Laedt ein Feedback
+	// * @param 
 	// *********************************************************
-	function load($lehrform_kurzbz)
-	{		
-		$qry = "SELECT * FROM tbl_lehrform WHERE lehrform_kurzbz='".addslashes($lehrfach_nr)."'";
-		if(!$result=pg_query($this->conn,$qry))
-		{
-			$this->errormsg = 'Fehler beim lesen der Lehrform';
-			return false;
-		}
-		
-		if($row = pg_fetch_object($result))
-		{
-			$this->lehrform_kurbz = $row->lehrform_kurzbz;
-			$this->bezeichnung = $row->bezeichung;
-			$this->verplanen = ($row->verplanen?true:false);
-		}
-		else
-		{
-			$this->errormsg = 'Es ist keine Lehrform mit der Kurzbz '.$lehrform_kurzbz.' vorhanden';
-			return false;
-		}
-		
+	function load($feedback_id)
+	{
 		return true;
-		
 	}
 	
 	// *******************************************
@@ -94,30 +76,25 @@ class lehrform
 	// *******************************************
 	function validate()
 	{
-		if(strlen($this->lehrform_kurbz)>8)
+		if(strlen($this->betreff)>128)
 		{
-			$this->errormsg = 'Lehrform Kurzbezeichnung darf nicht laenger als 8 Zeichen sein.';
+			$this->errormsg = 'Betreff darf nicht laenger als 128 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->bezeichnung)>256)
+		if(strlen($this->uid)>16)
 		{
-			$this->errormsg = 'Bezeichnung darf nicht laenger als 256 Zeichen sein';
+			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
-		if(!is_bool($this->verplanen))
-		{
-			$this->errormsg = 'Verplanen muss ein boolscher Wert sein';
-			return false;
-		}
-
+	
 		return true;
 	}
 
 	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
+	// * wenn $var '' ist wird NULL zurueckgegeben
 	// * wenn $var !='' ist werden Datenbankkritische 
-	// * zeichen mit backslash versehen und das ergbnis
-	// * unter hochkomma gesetzt.
+	// * Zeichen mit Backslash versehen und das Ergbnis
+	// * unter Hochkomma gesetzt.
 	// ************************************************
 	function addslashes($var)
 	{
@@ -125,9 +102,9 @@ class lehrform
 	}
 
 	// ************************************************************
-	// * Speichert die Lehrform in die Datenbank
+	// * Speichert Feedback in die Datenbank
 	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz mit $lehrfach_nr upgedated
+	// * angelegt, ansonsten der Datensatz upgedated
 	// * @return true wenn erfolgreich, false im Fehlerfall
 	// ************************************************************
 	function save()
@@ -138,17 +115,22 @@ class lehrform
 
 		if($this->new)
 		{
-			$qry = "INSERT INTO tbl_lehrform (lehrform_kurzbz, bezeichnung, verplanen)
-			        VALUES('".addslashes($this->lehrform_kurzbz)."',".
-					$this->addslashes($this->bezeichnung).','.
-					($this->verplanen?'true':'false').');';
+			//ToDo: Feedback_ID wieder entfernen und per Seq fuellen
+			$qry = 'INSERT INTO tbl_feedback (feedback_id, betreff, text, datum, uid)
+			        VALUES('.$this->addslashes($this->feedback_id).','.
+					$this->addslashes($this->betreff).','.
+					$this->addslashes($this->text).','.
+					$this->addslashes($this->datum).','.
+					$this->addslashes($this->uid).');';
 		}
 		else
 		{
-			$qry = 'UPDATE tbl_lehrform SET'.
-			       ' bezeichnung='.$this->addslashes($this->bezeichnung).','.
-			       ' verplanen='.($this->verplanen?'true':'false').
-			       " WHERE lehrform_kurzbz='$this->lehrform_kurzbz'";
+			$qry = 'UPDATE tbl_feedback SET'.
+			       ' betreff='.$this->addslashes($this->betreff).','.
+			       ' text='.$this->addslashes($this->text).','.
+			       ' datum='.$this->addslashes($this->datum).','.
+			       ' uid='.$this->addslashes($this->uid).
+			       " WHERE feedback_id='".addslashes($this->feedback_id)."'";
 		}
 
 		if(pg_query($this->conn,$qry))
@@ -158,7 +140,7 @@ class lehrform
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der Lehrform:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern des Feedbacks:'.$qry;
 			return false;
 		}
 	}

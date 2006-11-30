@@ -27,12 +27,14 @@ class benutzer extends person
 	var $bnaktiv;	// boolean
 	var $alias;		// varchar(256)
 		
-	// **************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional einen Benutzer
-	// * @param $conn			Datenbank-Connection
-	// *        $benutzer_id	Benutzer der geladen werden soll (default=null)
-	// **************************************************************************
-	function benutzer($conn, $benutzer_id=null, $unicode=false)
+	// *************************************************************************
+	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
+	// * @param $conn        	Datenbank-Connection
+	// *        $uid            Benutzer der geladen werden soll (default=null)
+	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
+	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
+	// *************************************************************************
+	function benutzer($conn, $uid=null, $unicode=false)
 	{
 		$this->conn = $conn;
 		
@@ -47,15 +49,15 @@ class benutzer extends person
 			return false;
 		}
 		
-		if($benutzer_id != null)
-			$this->load($benutzer_id);
+		if($uid != null)
+			$this->load($uid);
 	}
 	
 	// ***********************************************************
 	// * Laedt Benutzer mit der uebergebenen ID
-	// * @param $benutzer_id ID der Person die geladen werden soll
+	// * @param $uid ID der Person die geladen werden soll
 	// ***********************************************************
-	function load($benutzer_id)
+	function load($uid)
 	{
 		
 	}

@@ -20,26 +20,29 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-class lehrform
+class zeitwunsch
 {
 	var $conn;     // resource DB-Handle
 	var $errormsg; // string
 	var $new;      // boolean
-	var $lehrform = array(); // lehrform Objekt
+	var $zeitwuensche = array(); // zeitwunsch Objekt
 	
 	//Tabellenspalten
-	var $lehrform_kurbz;	// varchar(8)
-	var $bezeichnung;		// varchar (256)
-	var $verplanen; 		// boolean
+	var $stunde;	// smalint
+	var $uid;		// varchar(16)
+	var $tag;		// smalint
+	var $gewicht;	// smalint
 	
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
 	// * @param $conn        	Datenbank-Connection
-	// *        $lehrform_kurbz Lehrform die geladen werden soll (default=null)
+	// *        $uid			Uid des Mitarbeiters
+	// *        $tag            Tag des Zeitwunsches
+	// *        $stunde         Stunde des Zeitwunsches
 	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
-	function lehrform($conn, $lehrform_kurzbz=null, $unicode=false)
+	function zeitwunsch($conn, $uid=null, $tag=null, $stunde=null, $unicode=false)
 	{
 		$this->conn = $conn;
 		
@@ -54,37 +57,17 @@ class lehrform
 			return false;
 		}
 		
-		if($lehrform_kurzbz != null)
-			$this->load($lehrform_kurzbz);
+		if($uid != null && $tag!=null && $stunde!=null)
+			$this->load($uid, $tag, $stunde);
 	}
 	
 	// *********************************************************
-	// * Laedt Lehrform mit der uebergebenen ID
-	// * @param $lehrform_kurzbz Lehrform die geladen werden soll
+	// * Laedt einen Zeitwunsch
+	// * @param 
 	// *********************************************************
-	function load($lehrform_kurzbz)
-	{		
-		$qry = "SELECT * FROM tbl_lehrform WHERE lehrform_kurzbz='".addslashes($lehrfach_nr)."'";
-		if(!$result=pg_query($this->conn,$qry))
-		{
-			$this->errormsg = 'Fehler beim lesen der Lehrform';
-			return false;
-		}
-		
-		if($row = pg_fetch_object($result))
-		{
-			$this->lehrform_kurbz = $row->lehrform_kurzbz;
-			$this->bezeichnung = $row->bezeichung;
-			$this->verplanen = ($row->verplanen?true:false);
-		}
-		else
-		{
-			$this->errormsg = 'Es ist keine Lehrform mit der Kurzbz '.$lehrform_kurzbz.' vorhanden';
-			return false;
-		}
-		
+	function load($uid, $tag, $stunde)
+	{
 		return true;
-		
 	}
 	
 	// *******************************************
@@ -94,30 +77,40 @@ class lehrform
 	// *******************************************
 	function validate()
 	{
-		if(strlen($this->lehrform_kurbz)>8)
+		if(strlen($this->uid)>16)
 		{
-			$this->errormsg = 'Lehrform Kurzbezeichnung darf nicht laenger als 8 Zeichen sein.';
+			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein.';
 			return false;
 		}
-		if(strlen($this->bezeichnung)>256)
+		if($this->uid == '')
 		{
-			$this->errormsg = 'Bezeichnung darf nicht laenger als 256 Zeichen sein';
+			$this->errormsg = 'UID muss angegeben werden';
 			return false;
 		}
-		if(!is_bool($this->verplanen))
+		if(!is_numeric($this->stunde))
 		{
-			$this->errormsg = 'Verplanen muss ein boolscher Wert sein';
+			$this->errormsg = 'Stunde muss eine gueltige Zahl sein';
 			return false;
 		}
+		if(!is_numeric($this->gewicht))
+		{
+			$this->errormsg = 'Gewicht muss eine gueltige Zahl sein';
+			return false;
+		}
+		if(!is_numeric($this->tag))
+		{
+			$this->errormsg = 'Tag muss eine gueltige Zahl sein';
+			return false;
+		}			
 
 		return true;
 	}
 
 	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
+	// * wenn $var '' ist wird NULL zurueckgegeben
 	// * wenn $var !='' ist werden Datenbankkritische 
-	// * zeichen mit backslash versehen und das ergbnis
-	// * unter hochkomma gesetzt.
+	// * Zeichen mit Backslash versehen und das Ergbnis
+	// * unter Hochkomma gesetzt.
 	// ************************************************
 	function addslashes($var)
 	{
@@ -125,7 +118,7 @@ class lehrform
 	}
 
 	// ************************************************************
-	// * Speichert die Lehrform in die Datenbank
+	// * Speichert einen Zeitwunsch in die Datenbank
 	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
 	// * angelegt, ansonsten der Datensatz mit $lehrfach_nr upgedated
 	// * @return true wenn erfolgreich, false im Fehlerfall
@@ -138,17 +131,16 @@ class lehrform
 
 		if($this->new)
 		{
-			$qry = "INSERT INTO tbl_lehrform (lehrform_kurzbz, bezeichnung, verplanen)
-			        VALUES('".addslashes($this->lehrform_kurzbz)."',".
-					$this->addslashes($this->bezeichnung).','.
-					($this->verplanen?'true':'false').');';
+			$qry = "INSERT INTO tbl_zeitwunsch (uid, tag, stunde, gewicht)
+			        VALUES('".addslashes($this->uid)."',".
+					$this->tag.','.$this->stunde.','.$this->gewicht.');';
 		}
 		else
 		{
-			$qry = 'UPDATE tbl_lehrform SET'.
-			       ' bezeichnung='.$this->addslashes($this->bezeichnung).','.
-			       ' verplanen='.($this->verplanen?'true':'false').
-			       " WHERE lehrform_kurzbz='$this->lehrform_kurzbz'";
+			$qry = 'UPDATE tbl_zeitwunsch SET'.
+			       ' gewicht='.$this->gewicht.
+			       " WHERE uid='".addslashes($this->uid)."' AND 
+			         tag=".$this->tag.' AND stunde='.$this->stunde;
 		}
 
 		if(pg_query($this->conn,$qry))
@@ -158,7 +150,7 @@ class lehrform
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der Lehrform:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern des Zeitwunsches:'.$qry;
 			return false;
 		}
 	}
