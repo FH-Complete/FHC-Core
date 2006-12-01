@@ -26,7 +26,7 @@
 //*
 
 include('../../vilesci/config.inc.php');
-include('../../include/fas/ortraumtyp.class.php');
+include('../../include/fas/raumtyp.class.php');
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_vilesci=pg_connect(CONN_STRING_VILESCI) or die("Connection zur Vilesci Datenbank fehlgeschlagen");
@@ -49,33 +49,32 @@ function validate($row)
  */
 
 //funktion
-$qry = "SELECT * FROM tbl_ortraumtyp";
+$qry = "SELECT * FROM tbl_raumtyp";
 
 if($result = pg_query($conn_vilesci, $qry))
 {
-	echo nl2br("OrtRaumtyp Sync\n------------------\n");
+	echo nl2br("Raumtyp Sync\n---------------\n");
 	$anzahl_quelle=pg_num_rows($result);
 	while($row = pg_fetch_object($result))
 	{
 		$error=false;
-		$ortraumtyp = new ortraumtyp($conn);
-		$ortraumtyp->ort_kurzbz=$row->ort_kurzbz;
-		$ortraumtyp->hierarchie=$row->hierarchie;
-		$ortraumtyp->raumtyp_kurzbz=$row->raumtyp_kurzbz;
-		//$ortraumtyp->insertamum='';
-		$ortraumtyp->insertvon='SYNC';
-		//ortraumtyp->updateamum='';
-		//$ortraumtyp->updatevon=$row->updatevon;
+		$raumtyp = new raumtyp($conn);
+		$raumtyp->beschreibung=$row->beschreibung;
+		$raumtyp->raumtyp_kurzbz=$row->raumtyp_kurzbz;
+		//$raumtyp->insertamum='';
+		$raumtyp->insertvon='SYNC';
+		//raumtyp->updateamum='';
+		//$raumtyp->updatevon=$row->updatevon;
 		
-		$qry = "SELECT ort_kurzbz, hierarchie FROM tbl_ortraumtyp WHERE ort_kurzbz = '$row->ort_kurzbz' AND hierarchie = '$row->hierarchie'";
+		$qry = "SELECT raumtyp_kurzbz FROM tbl_raumtyp WHERE raumtyp_kurzbz = '$row->raumtyp_kurzbz'";
 			if($result1 = pg_query($conn, $qry))
 			{		
 				if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist
 				{
 					if($row1=pg_fetch_object($result1))
 					{
-						//OrtRaumtypdaten updaten
-						$ortraumtyp->new=false;
+						//Raumtypdaten updaten
+						$raumtyp->new=false;
 					}
 					else 
 					{
@@ -85,14 +84,14 @@ if($result = pg_query($conn_vilesci, $qry))
 				}
 				else 
 				{
-					//OrtRaumtyp neu anlegen
-					$ortraumtyp->new=true;
+					//Raumtyp neu anlegen
+					$raumtyp->new=true;
 				}
 				
 				if(!$error)
-					if(!$ortraumtyp->save())
+					if(!$raumtyp->save())
 					{
-						$error_log.=$ortraumtyp->errormsg."\n";
+						$error_log.=$ort->errormsg."\n";
 						$anzahl_fehler++;
 					}
 					else 
@@ -110,7 +109,7 @@ else
 
 <html>
 <head>
-<title>Synchro - Vilesci -> Portal - OrtRaumtyp</title>
+<title>Synchro - Vilesci -> Portal - Raumtyp</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
 <body>
