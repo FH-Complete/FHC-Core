@@ -144,7 +144,7 @@ class ort
 	
 	/**
 	 * Loescht einen Datensatz
-	 * @param $fachb_id id des Datensatzes der geloescht werden soll
+	 * @param $ort_kurzbz ID des Datensatzes der geloescht werden soll
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	function delete($ort_kurzbz)
@@ -163,18 +163,24 @@ class ort
 	function checkvars()
 	{	
 		$this->bezeichnung = str_replace("'",'´',$this->bezeichnung);
+		$this->ort_kurzbz = str_replace("'",'´',$this->ort_kurzbz);
 		$this->planbezeichnung = str_replace("'",'´',$this->planbezeichnung);
 
 		
 		//Laenge Pruefen
 		if(strlen($this->bezeichnung)>30)           
 		{
-			$this->errormsg = "Bezeichnung darf nicht laenger als 30 Zeichen sein bei <b>$this->ext_id</b> - $this->bezeichnung";
+			$this->errormsg = "Bezeichnung darf nicht laenger als 30 Zeichen sein bei <b>$this->ort_kurzbz</b> - $this->bezeichnung";
 			return false;
 		}		
-		if(strlen($this->planbezeichnung)>5)
+		if(strlen($this->planbezeichnung)>30)           
 		{
-			$this->errormsg = "Planbezeichnung darf nicht laenger als 5 Zeichen sein bei <b>$this->ext_id</b> - $this->kurzbz";
+			$this->errormsg = "Planbezeichnung darf nicht laenger als 30 Zeichen sein bei <b>$this->ort_kurzbz</b> - $this->planbezeichnung";
+			return false;
+		}
+		if(strlen($this->ort_kurzbz)>8)
+		{
+			$this->errormsg = "Ort_kurzbz darf nicht laenger als 8 Zeichen sein bei <b>$this->ort_kurzbz/b>";
 			return false;
 		}	
 		$this->errormsg = '';
@@ -219,7 +225,7 @@ class ort
 		else 
 		{
 			//bestehenden Datensatz akualisieren
-			
+
 			//Pruefen ob ort_kurzbz gueltig ist
 			if($this->ort_kurzbz == '')
 			{
@@ -228,7 +234,6 @@ class ort
 			}
 			
 			$qry = 'UPDATE tbl_ort SET '. 
-				'ort_kurzbz='.$this->addslashes($this->ort_kurzbz).', '.
 				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
 				'planbezeichnung='.$this->addslashes($this->planbezeichnung).', '.
 				'max_person='.$this->addslashes($this->max_person).', '.
