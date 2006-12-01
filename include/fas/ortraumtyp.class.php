@@ -20,11 +20,11 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 /** 
- * Klasse funktion (FAS-Online)
+ * Klasse ortraumtyp (FAS-Online)
  * @create 14-03-2006
  */
 
-class funktion
+class ortraumtyp
 {
 	var $conn;   			// @var resource DB-Handle
 	var $new;     			// @var boolean
@@ -32,73 +32,72 @@ class funktion
 	var $result = array(); 	// @var fachbereich Objekt 
 	
 	//Tabellenspalten
-	var $funktion_kurzbz;	// @var integer
-	var $bezeichnung;		// @var string
-	var $aktiv;			// @var boolean
+	var $ort_kurzbz;		// @var string
+	var $hierarchie;		// @var smallint
+	var $raumtyp_kurzbz;	// @var string
 	var $updateamum;		// @var timestamp
 	var $updatevon=0;		// @var string
 	var $insertamum;		// @var timestamp
 	var $insertvon=0;		// @var string
-	var $ext_id;			// @var bigint
 	
 	
 	/**
 	 * Konstruktor
 	 * @param $conn Connection zur DB
-	 *        $funktion_kurzbz ID der zu ladenden Funktion
+	 *        $ort_kurzbz und hierarchie ID des zu ladenden OrtRaumtyps
 	 */
-	function funktion($conn, $funktion_kurzbz=null)
+	function ortraumtyp($conn, $ort_kurzbz=null, $hierarchie=0)
 	{
 		$this->conn = $conn;
-		if($funktion_kurzbz != null)
-			$this->load($funktion_kurzbz);
+		if($ort_kurzbz != null && $hierarchie!=null && is_numeric($hierarchie))
+			$this->load($ort_kurzbz, $hierarchie);
 	}
 	
 	/**
-	 * Laedt alle verfuegbaren Funktionen
+	 * Laedt alle verfuegbaren OrtRaumtypen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	function getAll()
 	{
-		$qry = 'SELECT * FROM tbl_funktion order by funktion_kurzbz;';
+		$qry = 'SELECT * FROM tbl_ortraumtyp order by ort_kurzbz, hierarchie;';
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
-			$this->errormsg = 'Fehler beim laden der Datensaetze';
+			$this->errormsg = 'Fehler beim Laden der Datensaetze';
 			return false;
 		}
 		
 		while($row = pg_fetch_object($res))
 		{
-			$funktion_obj = new funktion($this->conn);
+			$ortraumtyp_obj = new ort($this->conn);
 			
-			$funktion_obj->funktion_kurzbz = $row->funktion_kurzbz;
-			$funktion_obj->bezeichnung    = $row->bezeichnung;
-			$funktion_obj->aktiv           = $row->aktiv;
-			$funktion_obj->insertamum=$row->insertamum;
-			$funktion_obj->insertvon=$$row->insertvon;
-			$funktion_obj->updateamum=$row->updateamum;
-			$funktion_obj->updatevon=$row->updatevon;
+			$ortraumtyp_obj->ort_kurzbz = $row->ort_kurzbz;
+			$ortraumtyp_obj->hierarchie = $row->hierarchie;
+			$ortraumtyp_obj->raumtyp_kurzbz = $row->raumtyp_kurzbz;
+			$ortraumtyp_obj->insertamum = $row->insertamum;
+			$ortraumtyp_obj->insertvon = $row->insertvon;
+			$ortraumtyp_obj->updateamum = $row->updateamum;
+			$ortraumtyp_obj->updatevon     = $row->updatevon;
 			
-			$this->result[] = $funktion_obj;
+			$this->result[] = $ortraumtyp_obj;
 		}
 		return true;
 	}
 	
 	/**
-	 * Laedt eine Funktion
-	 * @param $funktion_kurzbz ID der zu ladenden Funktion
+	 * Laedt einen OrtRaumtyp
+	 * @param $ortraumtyp, hierarchie ID des zu ladenden OrtRaumtyps
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load($funktion_kurzbz)
+	function load($ort_kurzbz, $hierarchie)
 	{
-		if($funktion_kurzbz == '')
+		if($ort_kurzbz == '' || !is_numeric($hierarche) || $hierarchie=='')
 		{
-			$this->errormsg = 'funktion_bz darf nicht leer sein';
+			$this->errormsg = 'Kein gültiger Schlüssel vorhanden';
 			return false;
 		}
 		
-		$qry = "SELECT * FROM tbl_funktion WHERE funktion_kurzbz = '$funktion_kurzbz';";
+		$qry = "SELECT * FROM tbl_ortraumtyp WHERE ort_kurzbz = '$ort_kurzbz' AND hierarchie = '$hierarchie';";
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -108,13 +107,13 @@ class funktion
 		
 		if($row=pg_fetch_object($res))
 		{
-			$this->funktion_kurzbz	= $row->funktion_kurzbz;
-			$this->bezeichnung		= $row->bezeichnung;
-			$this->aktiv			= $row->aktiv;
-			$this->insertamum		=$row->insertamum;
-			$this->insertvon		=$row->insertvon;
-			$this->updateamum		= $row->updateamum;
-			$this->updatevon		= $row->updatevon;
+			$this->ort_kurzbz = $row->ort_kurzbz;
+			$this->hierarchie = $row->hierarchie;
+			$this->raumtyp_kurzbz = $row->kurzbz;
+			$this->insertamum = $row->insertamum;
+			$this->insertvon = $row->insertvon;
+			$this->updateamum = $row->updateamum;
+			$this->updatevon     = $row->updatevon;
 		}
 		else 
 		{
@@ -127,10 +126,10 @@ class funktion
 	
 	/**
 	 * Loescht einen Datensatz
-	 * @param $funktion_id id des Datensatzes der geloescht werden soll
+	 * @param $ort_kurzbz, hierarchie ID des Datensatzes der geloescht werden soll
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function delete($funktion_kurzbz)
+	function delete($ort_kurzbz)
 	{
 		$this->errormsg = 'Noch nicht implementiert';
 		return false;
@@ -140,27 +139,33 @@ class funktion
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
 	/**
-	 * Speichert den aktuellen Datensatz
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	/**
 	 * Prueft die Gueltigkeit der Variablen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	function checkvars()
 	{	
-		$this->bezeichnung = str_replace("'",'´',$this->bezeichnung);
+		$this->ort_kurzbz = str_replace("'",'´',$this->ort_kurzbz);
+		$this->raumtyp_kurzbz = str_replace("'",'´',$this->raumtyp_kurzbz);
+
 		
 		//Laenge Pruefen
-		if(strlen($this->bezeichnung)>64)           
+		if(strlen($this->ort_kurzbz)>8)           
 		{
-			$this->errormsg = "Bezeichnung darf nicht laenger als 128 Zeichen sein bei <b>$this->funktion_kurzbz</b> - $this->bezeichnung";
+			$this->errormsg = "Ort_kurzbz darf nicht laenger als 8 Zeichen sein bei <b>$this->kurzbz, $hierarchie</b>";
 			return false;
-		}
-				
+		}		
+		if(strlen($this->raumtyp_kurzbz)>8)
+		{
+			$this->errormsg = "Raumtyp_kurzbz darf nicht laenger als 8 Zeichen sein bei <b>$this->kurzbz, $hierarchie</b> - $this->raumtyp_kurzbz";
+			return false;
+		}	
 		$this->errormsg = '';
 		return true;		
 	}
+	/**
+	 * Speichert den aktuellen Datensatz
+	 * @return true wenn ok, false im Fehlerfall
+	 */
 	function save()
 	{
 		//Gueltigkeit der Variablen pruefen
@@ -169,42 +174,42 @@ class funktion
 			
 		if($this->new)
 		{
-			//Pruefen ob funktion_kurzbz befüllt ist
-			if($this->funktion_kurzbz == '')
+			//Pruefen ob id gültig ist
+			if($this->ort_kurzbz == '' || !is_numeric($this->hierarchie) || $this_hierarchie=='')
 			{
-				$this->errormsg = 'funktion_kurzbz darf nicht leer sein';
+				$this->errormsg = 'Keine gültige ID';
 				return false;
 			}
 			//Neuen Datensatz anlegen		
-			$qry = 'INSERT INTO tbl_funktion (funktion_kurzbz, bezeichnung, aktiv, insertamum, insertvon, 
-				updateamum, updatevon) VALUES ('.
-				$this->addslashes($this->funktion_kurzbz).', '.
-				$this->addslashes($this->bezeichnung).', '.
-				($this->aktiv?'true':'false').', '. 
+			$qry = 'INSERT INTO tbl_ortraumtyp (ort_kurzbz, hierarchie, raumtyp_kurzbz, 
+				insertamum, insertvon, updateamum, updatevon) VALUES ('.
+				$this->addslashes($this->ort_kurzbz).', '.
+				$this->addslashes($this->hierarchie).', '.
+				$this->addslashes($this->raumtyp_kurzbz).', '.
 				$this->addslashes($this->insertamum).', '.
 				$this->addslashes($this->insertvon).', '.
 				$this->addslashes($this->updateamum).', '.
-				$this->addslashes($this->updatevon).'); ';
+				$this->addslashes($this->updatevon).');';
+
 		}
 		else 
 		{
 			//bestehenden Datensatz akualisieren
-			
-			//Pruefen ob fachbereich_id eine gueltige Zahl ist
-			if( $this->funktion_kurzbz == '')
+
+			//Pruefen ob id gueltig ist
+			if($this->ort_kurzbz == '' || !is_numeric($this->hierarchie) || $this->hierarchie=='')
 			{
-				$this->errormsg = 'funktion_kurzbz darf nicht leer sein';
+				$this->errormsg = 'Keine gültige ID';
 				return false;
 			}
 			
-			$qry = 'UPDATE tbl_funktion SET '. 
-				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
-				'aktiv='.($this->aktiv?'true':'false') .', '.
+			$qry = 'UPDATE tbl_ortraumtyp SET '. 
+				'raumtyp_kurzbz='.$this->addslashes($this->raumtyp_kurzbz).', '.
 				'insertamum='.$this->addslashes($this->insertamum).', '.
 				'insertvon='.$this->addslashes($this->insertvon).', '.
 				'updateamum='.$this->addslashes($this->updateamum).', '.
-				'updatevon='.$this->addslashes($this->updatevon).', '.
-				'WHERE funktion_kurzbz = '.$this->addslashes($this->funktion_kurzbz).';';
+				'updatevon='.$this->addslashes($this->updatevon).' '.
+				'WHERE ort_kurzbz = '.$this->addslashes($this->ort_kurzbz).' AND hierarchie = '.$this->addslashes($this->hierarchie).';';
 		}
 		
 		if(pg_query($this->conn, $qry))

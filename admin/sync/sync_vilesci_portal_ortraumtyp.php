@@ -26,7 +26,7 @@
 //*
 
 include('../../vilesci/config.inc.php');
-include('../../include/fas/ort.class.php');
+include('../../include/fas/ortraumtyp.class.php');
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_vilesci=pg_connect(CONN_STRING_VILESCI) or die("Connection zur Vilesci Datenbank fehlgeschlagen");
@@ -49,39 +49,33 @@ function validate($row)
  */
 
 //funktion
-$qry = "SELECT * FROM tbl_ort";
+$qry = "SELECT * FROM tbl_ortraumtyp";
 
 if($result = pg_query($conn_vilesci, $qry))
 {
-	echo nl2br("Ort Sync\n---------\n");
+	echo nl2br("OrtRaumtyp Sync\n----------------\n");
 	$anzahl_quelle=pg_num_rows($result);
 	while($row = pg_fetch_object($result))
 	{
 		$error=false;
-		$ort = new ort($conn);
-		$ort->bezeichnung=$row->bezeichnung;
-		$ort->planbezeichnung=$row->planbezeichnung;
-		$ort->max_person=$row->max_person;
-		$ort->aktiv=($row->aktiv=='t'?true:false);
-		$ort->lageplan=$row->lageplan;
-		$ort->dislozierung=$row->dislozierung;
-		$ort->kosten=$row->kosten;
-		$ort->lehre=($row->lehre=='t'?true:false);
+		$ortraumtyp = new ortraumtyp($conn);
+		$ortraumtyp->ort_kurzbz=$row->ort_kurzbz;
+		$ortraumtyp->hierarchie=$row->hierarchie;
+		$ortraumtyp->raumtyp_kurzbz=$row->raumtyp_kurzbz;
 		//$ort->insertamum='';
-		$ort->insertvon='SYNC';
+		$ortraumtyp->insertvon='SYNC';
 		//ort->updateamum='';
 		//$ort->updatevon=$row->updatevon;
 		
-		$qry = "SELECT ort_kurzbz FROM tbl_ort WHERE ort_kurzbz='$row->ort_kurzbz'";
+		$qry = "SELECT ort_kurzbz, hierarchie FROM tbl_ortraumtyp WHERE ort_kurzbz='$row->ort_kurzbz' AND hierarchie='$row->hierarchie'";
 			if($result1 = pg_query($conn, $qry))
 			{		
 				if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist
 				{
 					if($row1=pg_fetch_object($result1))
 					{
-						//Ortdaten updaten
-						$ort->new=false;
-						$ort->ort_kurzbz=$row->ort_kurzbz;
+						//OrtRaumtypdaten updaten
+						$ortraumtyp->new=false;
 					}
 					else 
 					{
@@ -91,13 +85,12 @@ if($result = pg_query($conn_vilesci, $qry))
 				}
 				else 
 				{
-					//Ort neu anlegen
+					//OrtRaumtyp neu anlegen
 					$ort->new=true;
-					$ort->ort_kurzbz=$row->ort_kurzbz;
 				}
 				
 				if(!$error)
-					if(!$ort->save())
+					if(!$ortraumtyp->save())
 					{
 						$error_log.=$ort->errormsg."\n";
 						$anzahl_fehler++;
@@ -117,7 +110,7 @@ else
 
 <html>
 <head>
-<title>Synchro - Vilesci -> Portal - Ort</title>
+<title>Synchro - Vilesci -> Portal - OrtRaumtyp</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
 <body>
