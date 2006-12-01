@@ -20,11 +20,11 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 /** 
- * Klasse benutzerfunktion (FAS-Online)
+ * Klasse news (FAS-Online)
  * @create 14-03-2006
  */
 
-class benutzerfunktion
+class news
 {
 	var $conn;   			// @var resource DB-Handle
 	var $new;     			// @var boolean
@@ -32,28 +32,29 @@ class benutzerfunktion
 	var $result = array(); 	// @var fachbereich Objekt 
 	
 	//Tabellenspalten
-	var $benutzerfunktion_id;	// @var serial
-	var $fachbereich_id;		// @var integer
+	var $news_id;			// @var serial
+	var $betreff;			// @var varchar(128)
+	var $text;			// @var string
+	var $semester;		// @var smallint
 	var $uid;			// @var varchar(16)
 	var $studiengang_kz;	// @var integer
-	var $funktion_kurzbz;	// @var varchar(16)
+	var $verfasser;		// @var varchar(64)
 	var $updateamum;		// @var timestamp
 	var $updatevon=0;		// @var string
 	var $insertamum;		// @var timestamp
 	var $insertvon=0;		// @var string
-	var $ext_id;			// @var bigint
 	
 	
 	/**
 	 * Konstruktor
 	 * @param $conn Connection zur DB
-	 *        $benutzerfunktion_id ID der zu ladenden Funktion
+	 *        $news_id ID der zu ladenden Funktion
 	 */
-	function benutzerfunktion($conn, $benutzerfunktion_id=null)
+	function news($conn, $news_id=null)
 	{
 		$this->conn = $conn;
-		if($benutzerfunktion_id != null)
-			$this->load($benutzerfunktion_id);
+		if($news_id != null)
+			$this->load($news_id);
 	}
 	
 	/**
@@ -62,7 +63,7 @@ class benutzerfunktion
 	 */
 	function getAll()
 	{
-		$qry = 'SELECT * FROM tbl_benutzerfunktion order by benutzerfunktion_id;';
+		$qry = 'SELECT * FROM tbl_news order by news_id;';
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -72,37 +73,38 @@ class benutzerfunktion
 		
 		while($row = pg_fetch_object($res))
 		{
-			$pfunktion_obj = new personenfunktion($this->conn);
+			$news_obj = new news($this->conn);
+			$news_obj->news_id = $row->news_id;
+			$news_obj->betreff = $row->betreff;
+			$news_obj->text = $row->text;
+			$news_obj->semester = $row->semester;
+			$news_obj->uid = $row->uid;
+			$news_obj->studiengang_kz=$row->studiengang_kz;
+			$news_obj->verfasser = $row->verfasser;
+			$news_obj->insertamum=$row->insertamum;
+			$news_obj->insertvon=$row->insertvon;
+			$news_obj->updateamum=$row->updateamum;
+			$news_obj->updatevon=$row->updatevon;
 			
-			$pfunktion_obj->benutzerfunktion_id = $row->benutzerfunktion_id;
-			$pfunktion_obj->fachbereich_id = $row->fachbereich_id;
-			$pfunktion_obj->uid = $row->uid;
-			$pfunktion_obj->studiengang_kz=$row->studiengang_kz;
-			$pfunktion_obj->funktion_kurzbz=$row->funtion_kurzbz;
-			$pfunktion_obj->insertamum=$row->insertamum;
-			$pfunktion_obj->insertvon=$row->insertvon;
-			$pfunktion_obj->updateamum=$row->updateamum;
-			$pfunktion_obj->updatevon=$row->updatevon;
-			
-			$this->result[] = $pfunktion_obj;
+			$this->result[] = $news_obj;
 		}
 		return true;
 	}
 	
 	/**
-	 * Laedt eine Benutzerfunktion
-	 * @param $bnutzerfunktion_id ID der zu ladenden Funktion
+	 * Laedt eine News
+	 * @param $news_id ID der zu ladenden Funktion
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load($benutzerfunktion_id)
+	function load($news_id)
 	{
-		if($benutzerfunktion_id == '')
+		if($news_id == '' || !is_nan($news_id))
 		{
-			$this->errormsg = 'benutzerfunktion_id muß eine gültige Zahl sein';
+			$this->errormsg = 'news_id muß eine gültige Zahl sein';
 			return false;
 		}
 		
-		$qry = "SELECT * FROM tbl_benutzerfunktion WHERE benutzerfunktion_id = '$this->benutzerfunktion_id';";
+		$qry = "SELECT * FROM tbl_news WHERE news_id = '$this->news_id';";
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -112,11 +114,13 @@ class benutzerfunktion
 		
 		if($row=pg_fetch_object($res))
 		{
-			$this->benutzerfunktion_id	= $row->benutzerfunktion_id;
-			$this->fachbereich_id	= $row->fachbereich_id;
+			$this->news_id		= $row->news_id;
+			$this->betreff			= $row->betreff;
+			$this->text			= $row->text;
+			$this->semester		= $row->semester;
 			$this->uid			= $row->uid;
 			$this->studiengang_kz	= $row->studiengang_kz;
-			$this->funktion_kurzbz	= $row->funktion_kurzbz;
+			$this->verfasser		= $row->verfasser;
 			$this->insertamum		=$row->insertamum;
 			$this->insertvon		=$row->insertvon;
 			$this->updateamum		= $row->updateamum;
@@ -133,10 +137,10 @@ class benutzerfunktion
 	
 	/**
 	 * Loescht einen Datensatz
-	 * @param $fbenutzerfunktion_id id des Datensatzes der geloescht werden soll
+	 * @param $news_id id des Datensatzes der geloescht werden soll
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function delete($benutzerfunktion_id)
+	function delete($news_id)
 	{
 		$this->errormsg = 'Noch nicht implementiert';
 		return false;
@@ -146,44 +150,58 @@ class benutzerfunktion
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
 	/**
-	 * Speichert den aktuellen Datensatz
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	/**
 	 * Prueft die Gueltigkeit der Variablen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	
+	function checkvars()
+	{	
+		$this->betreff = str_replace("'",'´',$this->betreff);
+		$this->text = str_replace("'",'´',$this->text);
+		$this->verfasser = str_replace("'",'´',$this->verfasser);
+
+		
+		//Laenge Pruefen
+		if(strlen($this->betreff)>128)           
+		{
+			$this->errormsg = "Betreff darf nicht laenger als 128 Zeichen sein bei <b>$this->news_id</b> - $this->betreff";
+			return false;
+		}		
+		if(strlen($this->verfasser)>64)
+		{
+			$this->errormsg = "Verfasser darf nicht laenger als 64 Zeichen sein bei <b>$this->news_id</b> - $this->verfasser";
+			return false;
+		}	
+		$this->errormsg = '';
+		return true;		
+	}
+	/**
+	 * Speichert den aktuellen Datensatz
+	 * @return true wenn ok, false im Fehlerfall
+	 */	
 	function save()
 	{
 		//Gueltigkeit der Variablen pruefen
-		//if(!$this->checkvars())
-		//	return false;
+		if(!$this->checkvars())
+			return false;
 			
 		if($this->new)
 		{
 			//Neuen Datensatz anlegen	
-			//Pruefen ob uid vorhanden
-			$qry = "SELECT uid FROM tbl_benutzer WHERE uid = '$this->uid';";
-			if(!$resx = pg_query($this->conn, $qry))
+			//Pruefen ob funktion_kurzbz befüllt ist
+			if($this->news_id == '' || !is_numeric($this->news_id))
 			{
-				$this->errormsg = 'Fehler beim laden des Datensatzes';
+				$this->errormsg = 'News_id ungültig';
 				return false;
-			}	
-			else 
-			{
-				if (pg_num_rows($resx)==0)
-				{
-					$this->errormsg = "uid <b>$this->uid</b> in Tabelle tbl_benutzer nicht gefunden!";
-					return false;
-				}	
 			}
-			$qry = 'INSERT INTO tbl_benutzerfunktion (fachbereich_id, uid, studiengang_kz, funktion_kurzbz, insertamum, insertvon, 
+			$qry = 'INSERT INTO tbl_news (news_id, betreff, text, semester, uid, studiengang_kz, verfasser, insertamum, insertvon, 
 				updateamum, updatevon) VALUES ('.
-				$this->addslashes($this->fachbereich_id).', '.
+				$this->addslashes($this->news_id).', '.
+				$this->addslashes($this->betreff).', '.
+				$this->addslashes($this->text).', '.
+				$this->addslashes($this->semester).', '.
 				$this->addslashes($this->uid).', '.
 				$this->addslashes($this->studiengang_kz).', '.
-				$this->addslashes($this->funktion_kurzbz).', '.
+				$this->addslashes($this->verfasser).', '.
 				$this->addslashes($this->insertamum).', '.
 				$this->addslashes($this->insertvon).', '.
 				$this->addslashes($this->updateamum).', '.
@@ -193,24 +211,26 @@ class benutzerfunktion
 		{
 			//bestehenden Datensatz akualisieren
 			
-			//Pruefen ob benutzerfunktion_id eine gueltige Zahl ist
-			if(!is_numeric($this->benutzerfunktion_id) || $this->benutzerfunktion_id == '')
+			//Pruefen ob news_id eine gueltige Zahl ist
+			if(!is_numeric($this->news_id) || $this->news_id == '')
 			{
-				$this->errormsg = 'benutzerfunktion_id muss eine gueltige Zahl sein';
+				$this->errormsg = 'News_id muss eine gueltige Zahl sein';
 				return false;
 			}
 			
-			$qry = 'UPDATE tbl_benutzerfunktion SET '. 
-				'benutzerfunktion_id='.$this->addslashes($this->benutzerfunktion_id).', '.
-				'fachbereich_id='.$this->addslashes($this->fachbereich_id).', '.
+			$qry = 'UPDATE tbl_news SET '. 
+				'news_id='.$this->addslashes($this->news_id).', '.
+				'betreff='.$this->addslashes($this->betreff).', '.
+				'text='.$this->addslashes($this->text).', '.
+				'semester='.$this->addslashes($this->semester).', '.
 				'uid='.$this->addslashes($this->uid).', '.
 				'studiengang_kz='.$this->addslashes($this->studiengang_kz).', '.
-				'funktion_kurzbz='.$this->addslashes($this->funktion_kurzbz).', '.
+				'verfasser='.$this->addslashes($this->verfasser).', '.
 				'insertamum='.$this->addslashes($this->insertamum).', '.
 				'insertvon='.$this->addslashes($this->insertvon).', '.
 				'updateamum='.$this->addslashes($this->updateamum).', '.
 				'updatevon='.$this->addslashes($this->updatevon).'  '.
-				'WHERE benutzerfunktion_id = '.$this->addslashes($this->benutzerfunktion_id).';';
+				'WHERE news_id = '.$this->addslashes($this->news_id).';';
 		}
 		
 		if(pg_query($this->conn, $qry))
