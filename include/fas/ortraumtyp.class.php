@@ -175,7 +175,7 @@ class ortraumtyp
 		if($this->new)
 		{
 			//Pruefen ob id gültig ist
-			if($this->ort_kurzbz == '' || !is_numeric($this->hierarchie) || $this_hierarchie=='')
+			if($this->ort_kurzbz == '' || !is_numeric($this->hierarchie) || $this->hierarchie=='')
 			{
 				$this->errormsg = 'Keine gültige ID';
 				return false;
