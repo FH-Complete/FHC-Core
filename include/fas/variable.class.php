@@ -20,26 +20,27 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-class stunde
+class variable
 {
 	var $conn;     // resource DB-Handle
 	var $errormsg; // string
 	var $new;      // boolean
-	var $stunden = array(); // stunde Objekt
+	var $variables = array(); // variable Objekt
 	
 	//Tabellenspalten
-	var $stunde;	// smalint
-	var $beginn;	// time without timezone
-	var $ende;		// time without timezone
+	var $uid;	// varchar(16)
+	var $name;	// varchar(64)
+	var $wert;	// varchar(64)
 	
 	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Stunde
+	// * Konstruktor - Uebergibt die Connection und laedt optional eine Variable
 	// * @param $conn        	Datenbank-Connection
-	// *        $stunde			Stunde die geladen werden soll
+	// *        $uid
+	// *		$name
 	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
-	function stunde($conn, $stunde=null, $unicode=false)
+	function variable($conn, $uid=null, $name=null, $unicode=false)
 	{
 		$this->conn = $conn;
 		
@@ -54,17 +55,17 @@ class stunde
 			return false;
 		}
 		
-		if($stunde!=null)
-			$this->load($stunde);
+		if($uid!=null && $name!=null)
+			$this->load($uid, $name);
 	}
 	
 	// *********************************************************
-	// * Laedt eine Stunde
-	// * @param $stunde
+	// * Laedt die Variablen
+	// * @param 
 	// *********************************************************
-	function load($stunde)
+	function load($uid, $name)
 	{
-		return true;
+		return false;
 	}
 	
 	// *******************************************
@@ -74,11 +75,22 @@ class stunde
 	// *******************************************
 	function validate()
 	{
-		if(!is_numeric($this->stunde))
+		if(strlen($this->uid)>16)
 		{
-			$this->errormsg = 'Stunde muss eine gueltige Zahl sein';
+			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein';
+			return true;
+		}
+		if(strlen($this->name)>64)
+		{
+			$this->errormsg = 'Name darf nicht laenger als 64 Zeichen sein';
 			return false;
 		}
+		if(strlen($this->wert)>64)
+		{
+			$this->errormsg = 'Wert darf nicht laenger als 64 Zeichen sein';
+			return false;
+		}
+		
 		return true;
 	}
 
@@ -94,30 +106,32 @@ class stunde
 	}
 
 	// ************************************************************
-	// * Speichert eine Stunde in die Datenbank
+	// * Speichert Variable in die Datenbank
 	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz mit $lehrfach_nr upgedated
+	// * angelegt, ansonsten der Datensatz upgedated
 	// * @return true wenn erfolgreich, false im Fehlerfall
 	// ************************************************************
-	function save()
+	function save($new=null)
 	{
+		if(is_null($new))
+			$new = $this->new;
+					
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
 			return false;
 
-		if($this->new)
-		{
-			$qry = "INSERT INTO tbl_stunde (stunde, beginn, ende)
-			        VALUES('".$this->stunde."',".
-					$this->addslashes($this->beginn).','.
-					$this->addslashes($this->ende).');';
+		if($new)
+		{		
+			$qry = 'INSERT INTO tbl_variable (uid, name, wert)
+			        VALUES('.$this->addslashes($this->uid).','.
+					$this->addslashes($this->name).','.
+					$this->addslashes($this->wert).');';
 		}
 		else
 		{
-			$qry = 'UPDATE tbl_stunde SET'.
-			       ' beginn='.$this->addslashes($this->beginn).','.
-			       ' ende='.$this->addslashes($this->ende).
-			       " WHERE stunde=".$this->stunde;
+			$qry = 'UPDATE tbl_variable SET'.
+			       ' wert='.$this->addslashes($this->wert).
+			       " WHERE uid='".addslashes($this->uid)."' AND name='".addslashes($this->name)."';";
 		}
 
 		if(pg_query($this->conn,$qry))
@@ -127,7 +141,7 @@ class stunde
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der Stunde:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern der Variable:'.$qry;
 			return false;
 		}
 	}

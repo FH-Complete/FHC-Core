@@ -32,7 +32,7 @@ class mitarbeiter extends benutzer
 	var $telefonklappe;		//varchar(25)
 
 	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
+	// * Konstruktor - Uebergibt die Connection und laedt optional einen Mitarbeiter
 	// * @param $conn        	Datenbank-Connection
 	// *        $uid            Mitarbeiter der geladen werden soll (default=null)
 	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 

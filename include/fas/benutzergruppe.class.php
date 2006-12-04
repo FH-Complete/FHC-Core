@@ -20,26 +20,30 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-class stunde
+class benutzergruppe
 {
 	var $conn;     // resource DB-Handle
 	var $errormsg; // string
 	var $new;      // boolean
-	var $stunden = array(); // stunde Objekt
+	var $benutzergruppen = array(); // benutzergruppe Objekt
 	
 	//Tabellenspalten
-	var $stunde;	// smalint
-	var $beginn;	// time without timezone
-	var $ende;		// time without timezone
+	var $uid;			// varchar(16)
+	var $gruppe_kurzbz;	// varchar(16)
+	var $updateamum;	// timestamp
+	var $updatevon;		// varchar(16)
+	var $insertamum;	// timestamp
+	var $insertvon;		// varchar(16)
 	
 	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Stunde
+	// * Konstruktor - Uebergibt die Connection und laedt optional eine BenutzerGruppe
 	// * @param $conn        	Datenbank-Connection
-	// *        $stunde			Stunde die geladen werden soll
+	// *		$uid
+	// *        $gruppe_kurzbz
 	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
-	function stunde($conn, $stunde=null, $unicode=false)
+	function benutzergruppe($conn, $uid=null, $gruppe_kurzbz=null, $unicode=false)
 	{
 		$this->conn = $conn;
 		
@@ -54,17 +58,18 @@ class stunde
 			return false;
 		}
 		
-		if($stunde!=null)
-			$this->load($stunde);
+		if($gruppe_kurzbz!=null && $uid!=null)
+			$this->load($uid, $gruppe_kurzbz);
 	}
 	
 	// *********************************************************
-	// * Laedt eine Stunde
-	// * @param $stunde
+	// * Laedt die BenutzerGruppe
+	// * @param gruppe_kurzbz
 	// *********************************************************
-	function load($stunde)
+	function load($uid, $gruppe_kurzbz)
 	{
-		return true;
+		
+		return false;
 	}
 	
 	// *******************************************
@@ -74,11 +79,27 @@ class stunde
 	// *******************************************
 	function validate()
 	{
-		if(!is_numeric($this->stunde))
+		if(strlen($this->uid)>16)
 		{
-			$this->errormsg = 'Stunde muss eine gueltige Zahl sein';
+			$this->errormsg = 'UID darf nich laenger als 16 Zeichen sein';
 			return false;
 		}
+		if(strlen($this->gruppe_kurzbz)>16)
+		{
+			$this->errormsg = 'Gruppe_kurzbz darf nicht laenger als 16 Zeichen sein';
+			return false;
+		}
+		if(strlen($this->updatevon)>16)
+		{
+			//ToDo: Just 4 Sync dannach wieder errormsg setzen
+			$this->updatevon = substr($this->updatevon,0,15);
+		}
+		if(strlen($this->insertvon)>16)
+		{
+			$this->errormsg = 'Insertvon darf nicht laenger als 16 Zeichen sein';
+			return false;
+		}
+		
 		return true;
 	}
 
@@ -94,30 +115,34 @@ class stunde
 	}
 
 	// ************************************************************
-	// * Speichert eine Stunde in die Datenbank
+	// * Speichert BenutzerGruppe in die Datenbank
 	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz mit $lehrfach_nr upgedated
+	// * angelegt, ansonsten der Datensatz upgedated
 	// * @return true wenn erfolgreich, false im Fehlerfall
 	// ************************************************************
-	function save()
+	function save($new=null)
 	{
+		if(is_null($new))
+			$new = $this->new;
+					
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
 			return false;
 
-		if($this->new)
-		{
-			$qry = "INSERT INTO tbl_stunde (stunde, beginn, ende)
-			        VALUES('".$this->stunde."',".
-					$this->addslashes($this->beginn).','.
-					$this->addslashes($this->ende).');';
+		if($new)
+		{		
+			$qry = 'INSERT INTO tbl_benutzergruppe (uid, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon)
+			        VALUES('.$this->addslashes($this->uid).','.
+					$this->addslashes($this->gruppe_kurzbz).','.
+					$this->addslashes($this->updateamum).','.
+					$this->addslashes($this->updatevon).','.
+					$this->addslashes($this->insertamum).','.
+					$this->addslashes($this->insertvon).');';
 		}
 		else
 		{
-			$qry = 'UPDATE tbl_stunde SET'.
-			       ' beginn='.$this->addslashes($this->beginn).','.
-			       ' ende='.$this->addslashes($this->ende).
-			       " WHERE stunde=".$this->stunde;
+			//ToDo
+			$qry = 'Select 1;';
 		}
 
 		if(pg_query($this->conn,$qry))
@@ -127,7 +152,7 @@ class stunde
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der Stunde:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern der BenutzerGruppe:'.$qry;
 			return false;
 		}
 	}
