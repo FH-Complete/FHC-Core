@@ -71,7 +71,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		$lehrveranstaltung->insertvon='SYNC';
 		//$lehrveranstaltung->updateamum='';
 		//$lehrveranstaltung->updatevon=$row->updatevon;
-		$lehrveranstaltung->ext_id='';
+		$lehrveranstaltung->ext_id=$row->lehrfach_nr;
 		$lehrveranstaltung->new=true;
 		
 		if(!$lehrveranstaltung->save())
