@@ -28,7 +28,7 @@ class benutzer extends person
 	var $alias;		// varchar(256)
 		
 	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
+	// * Konstruktor - Uebergibt die Connection und laedt optional einen Benutzer
 	// * @param $conn        	Datenbank-Connection
 	// *        $uid            Benutzer der geladen werden soll (default=null)
 	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
@@ -94,6 +94,7 @@ class benutzer extends person
 			$this->errormsg = 'aktiv muss ein boolscher wert sein';
 			return false;
 		}
+		return true;
 	}
 	
 	// ******************************************************************
@@ -104,19 +105,13 @@ class benutzer extends person
 	// ******************************************************************
 	function save()
 	{
-		//Variablen auf Gueltigkeit pruefen
-		if(!$this->validate())
-			return false;
-	
 		//Personen Datensatz speichern
 		if(!person::save())
 			return false;
-				
-		/*if(!pg_query($this->conn,'BEGIN;'))
-		{
-			$this->errormsg = 'Benutzertransaktion konnte nicht gesetzt werden';
+			
+		//Variablen auf Gueltigkeit pruefen
+		if(!benutzer::validate())
 			return false;
-		}*/
 		
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
@@ -143,20 +138,11 @@ class benutzer extends person
 		
 		if(pg_query($this->conn,$qry))
 		{
-			/*if(!pg_query($this->conn,'COMMIT;'))
-			{
-				$this->errormsg = 'Bentuzer commit fehlgeschlagen';
-				return false;
-			}
-			else 
-			{*/
-				//Log schreiben
-				return true;
-			/*}*/
+			//Log schreiben
+			return true;
 		}
 		else 
-		{			
-			//pg_query($this->conn,'ROLLBACK;');
+		{	
 			$this->errormsg = 'Fehler beim Speichern des Benutzer-Datensatzes:'.$qry;
 			return false;
 		}

@@ -54,7 +54,7 @@ class person
 	var $ext_id;            // bigint
 	
 	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
+	// * Konstruktor - Uebergibt die Connection und laedt optional eine Person
 	// * @param $conn        	Datenbank-Connection
 	// *        $person_id      Person die geladen werden soll (default=null)
 	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
@@ -173,6 +173,12 @@ class person
 			$this->errormsg = 'Nachname darf nicht laenger als 64 Zeichen sein';
 			return false;
 		}
+		if($this->nachname=='' || is_null($this->nachname))
+		{
+			$this->errormsg = 'Nachname muss eingegeben werden';
+			return false;
+		}		
+		
 		if(strlen($this->vorname)>32)
 		{
 			$this->errormsg = 'Vorname darf nicht laenger als 32 Zeichen sein';
@@ -184,6 +190,11 @@ class person
 			return false;
 		}
 		//ToDo Gebdatum pruefen -> laut bis muss er aelter als 10 Jahre sein
+		if(strlen($this->gebdatum)==0 || is_null($this->gebdatum))
+		{
+			$this->errormsg = 'Geburtsdatum muss eingegeben werden';
+			return false;
+		}
 		if(strlen($this->gebort)>128)
 		{
 			$this->errormsg = 'Geburtsort darf nicht laenger als 128 Zeichen sein';
@@ -266,17 +277,11 @@ class person
 	// * @return true wenn erfolgreich, false im Fehlerfall
 	// ************************************************************
 	function save()
-	{
+	{		
 		//Variablen auf Gueltigkeit pruefen
-		if(!$this->validate())
+		if(!person::validate())
 			return false;
-		/*	Verschachtelte transaktionen funktionieren nicht!
-		if(!pg_query($this->conn,'BEGIN;'))
-		{
-			$this->errormsg = 'Transaktion konnte nicht gesetzt werden';
-			return false;
-		}
-		*/
+		
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
 			$qry = 'INSERT INTO tbl_person (sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen, 
@@ -346,18 +351,10 @@ class person
 			{
 				$qry = "SELECT currval('tbl_person_person_id_seq') AS id;";
 				if($row=pg_fetch_object(pg_query($this->conn,$qry)))
-				{					
 					$this->person_id=$row->id;
-					/*if(!pg_query($this->conn,'COMMIT;'))
-					{
-						$this->errormsg = 'Personentransaktion konnte nicht commitet werden';
-						return false;
-					}*/
-				}
 				else
 				{					
 					$this->errormsg = 'Sequence konnte nicht ausgelesen werden';
-					//pg_query($this->conn,'ROLLBACK;');
 					return false;
 				}
 			}
@@ -367,7 +364,7 @@ class person
 		}
 		else
 		{			
-			$this->errormsg = 'Fehler beim Speichern des Person-Datensatzes:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern des Person-Datensatzes:'.$this->nachname.' '.$qry;
 			return false;
 		}
 	}

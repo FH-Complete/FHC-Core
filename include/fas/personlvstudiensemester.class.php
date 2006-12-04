@@ -20,26 +20,28 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-class stunde
+class personlvstudiensemester
 {
 	var $conn;     // resource DB-Handle
 	var $errormsg; // string
 	var $new;      // boolean
-	var $stunden = array(); // stunde Objekt
+	var $personlvstudiensemester = array(); // personlvstudiensemester Objekt
 	
 	//Tabellenspalten
-	var $stunde;	// smalint
-	var $beginn;	// time without timezone
-	var $ende;		// time without timezone
+	var $uid;						// varchar(16)
+	var $studiensemester_kurzbz;	// varchar(16)
+	var $lehrveranstaltung_nr;		// integer
 	
 	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Stunde
+	// * Konstruktor - Uebergibt die Connection und laedt optional eine Zuteilung
 	// * @param $conn        	Datenbank-Connection
-	// *        $stunde			Stunde die geladen werden soll
+	// *        $uid
+	// * 		$studiensemester_kurzbz
+	// *		$lehrveranstaltung_nr
 	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
-	function stunde($conn, $stunde=null, $unicode=false)
+	function personlvstudiensemester($conn, $uid=null, $studiensemester_kurzbz=null, $lehrveranstaltung_nr=null, $unicode=false)
 	{
 		$this->conn = $conn;
 		
@@ -53,18 +55,21 @@ class stunde
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
+		else 
+			$this->new = true;
 		
-		if($stunde!=null)
-			$this->load($stunde);
+		if($uid!=null && $studiensemester_kurzbz!=null && $lehrveranstaltung_nr!=null)
+			$this->load($uid, $studiensemester_kurzbz, $lehrveranstaltung_nr);
 	}
 	
 	// *********************************************************
-	// * Laedt eine Stunde
-	// * @param $stunde
+	// * Laedt eine Zuteilung
+	// * @param $uid, $studiensemester_kurzbz, $lehrveranstaltung_nr
 	// *********************************************************
-	function load($stunde)
+	function load($uid, $studiensemester_kurzbz, $lehrveranstaltung_nr)
 	{
-		return true;
+		$this->errormsg = 'Not implemented';
+		return false;
 	}
 	
 	// *******************************************
@@ -74,9 +79,19 @@ class stunde
 	// *******************************************
 	function validate()
 	{
-		if(!is_numeric($this->stunde))
+		if(strlen($this->uid)>16)
 		{
-			$this->errormsg = 'Stunde muss eine gueltige Zahl sein';
+			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein';
+			return false;
+		}
+		if(strlen($this->studiensemester_kurzbz)>16)
+		{
+			$this->errormsg = 'Studiensemester_kurzbz darf nicht laenger als 16 Zeichen sein';
+			return false;
+		}
+		if(!is_numeric($this->lehrveranstaltung_nr))
+		{
+			$this->errormsg = 'Lehrveranstaltungsnummer muss eine gueltige Zahl sein';
 			return false;
 		}
 		return true;
@@ -94,40 +109,42 @@ class stunde
 	}
 
 	// ************************************************************
-	// * Speichert eine Stunde in die Datenbank
+	// * Speichert Zuteilung in die Datenbank
 	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz mit $lehrfach_nr upgedated
+	// * angelegt, ansonsten der Datensatz upgedated
 	// * @return true wenn erfolgreich, false im Fehlerfall
 	// ************************************************************
-	function save()
+	function save($new=null)
 	{
+		if(!is_null($new))
+			$this->new = $new;
+
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
 			return false;
 
 		if($this->new)
-		{
-			$qry = "INSERT INTO tbl_stunde (stunde, beginn, ende)
-			        VALUES('".$this->stunde."',".
-					$this->addslashes($this->beginn).','.
-					$this->addslashes($this->ende).');';
+		{			
+			$qry = 'INSERT INTO tbl_personlvstudiensemester (uid, studiensemester_kurzbz, lehrveranstaltung_nr)
+			        VALUES('.$this->addslashes($this->uid).','.
+					$this->addslashes($this->studiensemester_kurzbz).','.
+					$this->addslashes($this->lehrveranstaltung_nr).');';
 		}
 		else
 		{
-			$qry = 'UPDATE tbl_stunde SET'.
-			       ' beginn='.$this->addslashes($this->beginn).','.
-			       ' ende='.$this->addslashes($this->ende).
-			       " WHERE stunde=".$this->stunde;
+			// ToDo
+			$qry = 'Select 1;';
 		}
 
 		if(pg_query($this->conn,$qry))
 		{
 			//Log schreiben
+			$this->new = false;
 			return true;
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der Stunde:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern der PersonLVStudiensemester:'.$qry;
 			return false;
 		}
 	}

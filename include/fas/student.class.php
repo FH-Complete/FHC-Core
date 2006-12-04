@@ -32,7 +32,7 @@ class student extends benutzer
 	var $gruppe;
 
 	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
+	// * Konstruktor - Uebergibt die Connection und laedt optional einen Studenten
 	// * @param $conn        	Datenbank-Connection
 	// *        $student_id     Student der geladen werden soll (default=null)
 	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
