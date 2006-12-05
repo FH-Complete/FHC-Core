@@ -59,13 +59,13 @@ if($result = pg_query($conn_vilesci, $qry))
 	{
 		$error=false;
 		$ortraumtyp = new ortraumtyp($conn);
-		$ortraumtyp->ort_kurzbz=$row->ort_kurzbz;
-		$ortraumtyp->hierarchie=$row->hierarchie;
-		$ortraumtyp->raumtyp_kurzbz=$row->raumtyp_kurzbz;
-		//$ortraumtyp->insertamum='';
-		$ortraumtyp->insertvon='SYNC';
-		//ortraumtyp->updateamum='';
-		//$ortraumtyp->updatevon=$row->updatevon;
+		$ortraumtyp->ort_kurzbz		=$row->ort_kurzbz;
+		$ortraumtyp->hierarchie		=$row->hierarchie;
+		$ortraumtyp->raumtyp_kurzbz	=$row->raumtyp_kurzbz;
+		//$ortraumtyp->insertamum		='';
+		$ortraumtyp->insertvon		='SYNC';
+		//ortraumtyp->updateamum		='';
+		//$ortraumtyp->updatevon		=$row->updatevon;
 		
 		$qry = "SELECT ort_kurzbz, hierarchie FROM tbl_ortraumtyp WHERE ort_kurzbz = '$row->ort_kurzbz' AND hierarchie = '$row->hierarchie'";
 			if($result1 = pg_query($conn, $qry))

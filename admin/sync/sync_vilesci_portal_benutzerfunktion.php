@@ -59,14 +59,14 @@ if($result = pg_query($conn_vilesci, $qry))
 	{
 		$error=false;
 		$benutzerfunktion = new benutzerfunktion($conn);
-		$benutzerfunktion->fachbereich_id=$row->fachbereich_id;
-		$benutzerfunktion->uid=$row->uid;
-		$benutzerfunktion->studiengang_kz=$row->studiengang_kz;
-		$benutzerfunktion->funktion_kurzbz=$row->funktion_kurzbz;
-		//$benutzerfunktion->insertamum='';
-		$benutzerfunktion->insertvon='SYNC';
-		//$benutzerfunktion->updateamum='';
-		//$benutzerfunktion->updatevon=$row->updatevon;
+		$benutzerfunktion->fachbereich_id		=$row->fachbereich_id;
+		$benutzerfunktion->uid			=$row->uid;
+		$benutzerfunktion->studiengang_kz	=$row->studiengang_kz;
+		$benutzerfunktion->funktion_kurzbz	=$row->funktion_kurzbz;
+		//$benutzerfunktion->insertamum		='';
+		$benutzerfunktion->insertvon		='SYNC';
+		//$benutzerfunktion->updateamum		='';
+		//$benutzerfunktion->updatevon		=$row->updatevon;
 		
 		$qry = "SELECT benutzerfunktion_id FROM tbl_benutzerfunktion WHERE benutzerfunktion_id='$row->personfunktion_id'";
 			if($result1 = pg_query($conn, $qry))

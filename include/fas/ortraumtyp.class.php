@@ -71,13 +71,13 @@ class ortraumtyp
 		{
 			$ortraumtyp_obj = new ort($this->conn);
 			
-			$ortraumtyp_obj->ort_kurzbz = $row->ort_kurzbz;
-			$ortraumtyp_obj->hierarchie = $row->hierarchie;
+			$ortraumtyp_obj->ort_kurzbz 	= $row->ort_kurzbz;
+			$ortraumtyp_obj->hierarchie 	= $row->hierarchie;
 			$ortraumtyp_obj->raumtyp_kurzbz = $row->raumtyp_kurzbz;
-			$ortraumtyp_obj->insertamum = $row->insertamum;
-			$ortraumtyp_obj->insertvon = $row->insertvon;
-			$ortraumtyp_obj->updateamum = $row->updateamum;
-			$ortraumtyp_obj->updatevon     = $row->updatevon;
+			$ortraumtyp_obj->insertamum 	= $row->insertamum;
+			$ortraumtyp_obj->insertvon 	= $row->insertvon;
+			$ortraumtyp_obj->updateamum 	= $row->updateamum;
+			$ortraumtyp_obj->updatevon     	= $row->updatevon;
 			
 			$this->result[] = $ortraumtyp_obj;
 		}
@@ -107,13 +107,13 @@ class ortraumtyp
 		
 		if($row=pg_fetch_object($res))
 		{
-			$this->ort_kurzbz = $row->ort_kurzbz;
-			$this->hierarchie = $row->hierarchie;
-			$this->raumtyp_kurzbz = $row->kurzbz;
-			$this->insertamum = $row->insertamum;
-			$this->insertvon = $row->insertvon;
-			$this->updateamum = $row->updateamum;
-			$this->updatevon     = $row->updatevon;
+			$this->ort_kurzbz 		= $row->ort_kurzbz;
+			$this->hierarchie 		= $row->hierarchie;
+			$this->raumtyp_kurzbz 	= $row->kurzbz;
+			$this->insertamum 		= $row->insertamum;
+			$this->insertvon 		= $row->insertvon;
+			$this->updateamum 		= $row->updateamum;
+			$this->updatevon     		= $row->updatevon;
 		}
 		else 
 		{

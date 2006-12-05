@@ -70,12 +70,12 @@ class raumtyp
 		{
 			$raumtyp_obj = new ort($this->conn);
 			
-			$raumtyp_obj->beschreibung = $row->beschreibung;
-			$raumtyp_obj->raumtyp_kurzbz = $row->raumtyp_kurzbz;
-			$raumtyp_obj->insertamum = $row->insertamum;
-			$raumtyp_obj->insertvon = $row->insertvon;
-			$raumtyp_obj->updateamum = $row->updateamum;
-			$raumtyp_obj->updatevon     = $row->updatevon;
+			$raumtyp_obj->beschreibung 	= $row->beschreibung;
+			$raumtyp_obj->raumtyp_kurzbz 	= $row->raumtyp_kurzbz;
+			$raumtyp_obj->insertamum 	= $row->insertamum;
+			$raumtyp_obj->insertvon 		= $row->insertvon;
+			$raumtyp_obj->updateamum 	= $row->updateamum;
+			$raumtyp_obj->updatevon     	= $row->updatevon;
 			
 			$this->result[] = $raumtyp_obj;
 		}
@@ -105,12 +105,12 @@ class raumtyp
 		
 		if($row=pg_fetch_object($res))
 		{
-			$this->beschreibung = $row->beschreibung;
-			$this->raumtyp_kurzbz = $row->kurzbz;
-			$this->insertamum = $row->insertamum;
-			$this->insertvon = $row->insertvon;
-			$this->updateamum = $row->updateamum;
-			$this->updatevon     = $row->updatevon;
+			$this->beschreibung 	= $row->beschreibung;
+			$this->raumtyp_kurzbz 	= $row->kurzbz;
+			$this->insertamum 		= $row->insertamum;
+			$this->insertvon 		= $row->insertvon;
+			$this->updateamum 		= $row->updateamum;
+			$this->updatevon     		= $row->updatevon;
 		}
 		else 
 		{

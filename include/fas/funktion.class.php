@@ -72,13 +72,13 @@ class funktion
 		{
 			$funktion_obj = new funktion($this->conn);
 			
-			$funktion_obj->funktion_kurzbz = $row->funktion_kurzbz;
-			$funktion_obj->bezeichnung    = $row->bezeichnung;
-			$funktion_obj->aktiv           = $row->aktiv;
-			$funktion_obj->insertamum=$row->insertamum;
-			$funktion_obj->insertvon=$$row->insertvon;
-			$funktion_obj->updateamum=$row->updateamum;
-			$funktion_obj->updatevon=$row->updatevon;
+			$funktion_obj->funktion_kurzbz 	= $row->funktion_kurzbz;
+			$funktion_obj->bezeichnung    	= $row->bezeichnung;
+			$funktion_obj->aktiv           		= $row->aktiv;
+			$funktion_obj->insertamum		=$row->insertamum;
+			$funktion_obj->insertvon		=$row->insertvon;
+			$funktion_obj->updateamum	=$row->updateamum;
+			$funktion_obj->updatevon		=$row->updatevon;
 			
 			$this->result[] = $funktion_obj;
 		}
