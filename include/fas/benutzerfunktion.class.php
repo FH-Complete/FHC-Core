@@ -74,15 +74,15 @@ class benutzerfunktion
 		{
 			$pfunktion_obj = new personenfunktion($this->conn);
 			
-			$pfunktion_obj->benutzerfunktion_id = $row->benutzerfunktion_id;
-			$pfunktion_obj->fachbereich_id = $row->fachbereich_id;
-			$pfunktion_obj->uid = $row->uid;
-			$pfunktion_obj->studiengang_kz=$row->studiengang_kz;
-			$pfunktion_obj->funktion_kurzbz=$row->funtion_kurzbz;
-			$pfunktion_obj->insertamum=$row->insertamum;
-			$pfunktion_obj->insertvon=$row->insertvon;
-			$pfunktion_obj->updateamum=$row->updateamum;
-			$pfunktion_obj->updatevon=$row->updatevon;
+			$pfunktion_obj->benutzerfunktion_id 	= $row->benutzerfunktion_id;
+			$pfunktion_obj->fachbereich_id 		= $row->fachbereich_id;
+			$pfunktion_obj->uid 				= $row->uid;
+			$pfunktion_obj->studiengang_kz		= $row->studiengang_kz;
+			$pfunktion_obj->funktion_kurzbz		= $row->funtion_kurzbz;
+			$pfunktion_obj->insertamum		= $row->insertamum;
+			$pfunktion_obj->insertvon			= $row->insertvon;
+			$pfunktion_obj->updateamum		= $row->updateamum;
+			$pfunktion_obj->updatevon			= $row->updatevon;
 			
 			$this->result[] = $pfunktion_obj;
 		}
@@ -117,8 +117,8 @@ class benutzerfunktion
 			$this->uid			= $row->uid;
 			$this->studiengang_kz	= $row->studiengang_kz;
 			$this->funktion_kurzbz	= $row->funktion_kurzbz;
-			$this->insertamum		=$row->insertamum;
-			$this->insertvon		=$row->insertvon;
+			$this->insertamum		= $row->insertamum;
+			$this->insertvon		= $row->insertvon;
 			$this->updateamum		= $row->updateamum;
 			$this->updatevon		= $row->updatevon;
 		}

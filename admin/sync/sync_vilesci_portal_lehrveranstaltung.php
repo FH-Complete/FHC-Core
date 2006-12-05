@@ -53,26 +53,26 @@ if($result = pg_query($conn_vilesci, $qry))
 	while($row = pg_fetch_object($result))
 	{
 		$lehrveranstaltung = new lehrveranstaltung($conn);
-		$lehrveranstaltung->studiengang_kz=$row->studiengang_kz;
-		$lehrveranstaltung->bezeichnung=$row->bezeichnung;
-		$lehrveranstaltung->kurzbz=$row->kurzbz;
-		$lehrveranstaltung->semester=$row->semester;
-		$lehrveranstaltung->ects=$row->ects;
-		$lehrveranstaltung->semesterstunden=0;
-		$lehrveranstaltung->gemeinsam='false';
-		$lehrveranstaltung->anmerkung='';
-		$lehrveranstaltung->lehre=($row->aktiv=='t'?true:false);
-		$lehrveranstaltung->lehreverzeichnis=$row->lehrevz;
-		$lehrveranstaltung->aktiv=($row->aktiv=='t'?true:false);
-		$lehrveranstaltung->planfaktor='1.0';
-		$lehrveranstaltung->planlektoren='1';
-		$lehrveranstaltung->planpersonalkosten='80';
-		//$lehrveranstaltung->insertamum='';
-		$lehrveranstaltung->insertvon='SYNC';
-		//$lehrveranstaltung->updateamum='';
-		//$lehrveranstaltung->updatevon=$row->updatevon;
-		$lehrveranstaltung->ext_id=$row->lehrfach_nr;
-		$lehrveranstaltung->new=true;
+		$lehrveranstaltung->studiengang_kz	=$row->studiengang_kz;
+		$lehrveranstaltung->bezeichnung		=$row->bezeichnung;
+		$lehrveranstaltung->kurzbz			=$row->kurzbz;
+		$lehrveranstaltung->semester		=$row->semester;
+		$lehrveranstaltung->ects			=$row->ects;
+		$lehrveranstaltung->semesterstunden	=0;
+		$lehrveranstaltung->gemeinsam		='false';
+		$lehrveranstaltung->anmerkung		='';
+		$lehrveranstaltung->lehre			=($row->aktiv=='t'?true:false);
+		$lehrveranstaltung->lehreverzeichnis	=$row->lehrevz;
+		$lehrveranstaltung->aktiv			=($row->aktiv=='t'?true:false);
+		$lehrveranstaltung->planfaktor		='1.0';
+		$lehrveranstaltung->planlektoren		='1';
+		$lehrveranstaltung->planpersonalkosten	='80';
+		//$lehrveranstaltung->insertamum		='';
+		$lehrveranstaltung->insertvon		='SYNC';
+		//$lehrveranstaltung->updateamum	='';
+		//$lehrveranstaltung->updatevon		=$row->updatevon;
+		$lehrveranstaltung->ext_id			=$row->lehrfach_nr;
+		$lehrveranstaltung->new			=true;
 		
 		if(!$lehrveranstaltung->save())
 				$error_log.=$lehrveranstaltung->errormsg."\n";

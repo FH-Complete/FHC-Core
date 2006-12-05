@@ -66,7 +66,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		$lvinfo->unterlagen			=$row->unterlagen;
 		$lvinfo->pruefungsordnung		=$row->pruefungsordnung;
 		$lvinfo->anmerkungen		=$row->anmerkungen;
-		//$lvinfo->kurzbz			=$row->kurzbz;
+		$lvinfo->kurzbz			=$row->niveau;
 		$lvinfo->lehrformen			=$row->lehrformen;
 		$lvinfo->genehmigt			=($row->genehmigt=='t'?true:false);
 		$lvinfo->aktiv				=($row->aktiv=='t'?true:false);
@@ -77,6 +77,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		//$funktion->updateamum		='';
 		//$funktion->updatevon		=$row->updatevon;
 		
+		//schon da?
 		$qry = "SELECT lvinfo_id FROM tbl_lvinfo WHERE lvinfo_id='$lvinfo->lvinfo_id'";
 			if($result1 = pg_query($conn, $qry))
 			{		
@@ -99,6 +100,7 @@ if($result = pg_query($conn_vilesci, $qry))
 					//LVInfo neu anlegen
 					$lvinfo->new=true;
 					
+					//neue Lehrveranstaltungsnummer von tbl_lehrveranstaltung holen
 					$qry = "SELECT lehrveranstaltung_nr FROM tbl_lehrveranstaltung WHERE ext_id = '$row->lehrfach_nr' ;";
 					if ($result2 = pg_query($conn, $qry))
 					{					
