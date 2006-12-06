@@ -21,7 +21,7 @@
  */
 
 //*
-//* Synchronisiert Funktiondatensaetze von Vilesci DB in PORTAL DB
+//* Synchronisiert Raumtypdatensaetze von Vilesci DB in PORTAL DB
 //*
 //*
 
@@ -48,7 +48,7 @@ function validate($row)
  * VILESCI-PORTAL - Synchronisation
  */
 
-//funktion
+//raumtyp
 $qry = "SELECT * FROM tbl_raumtyp";
 
 if($result = pg_query($conn_vilesci, $qry))

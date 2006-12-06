@@ -21,7 +21,7 @@
  */
 /** 
  * Klasse fachbereich (FAS-Online)
- * @create 14-03-2006
+ * @create 04-12-2006
  */
 
 class fachbereich
@@ -66,7 +66,7 @@ class fachbereich
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
-			$this->errormsg = 'Fehler beim laden der Datensaetze';
+			$this->errormsg = 'Fehler beim Laden der Datensaetze';
 			return false;
 		}
 		
@@ -74,11 +74,11 @@ class fachbereich
 		{
 			$fachb_obj = new fachbereich($this->conn);
 			
-			$fachb_obj->fachbereich_id = $row->fachbereich_pk;
-			$fachb_obj->erhalter_id    = $row->erhalter_fk;
-			$fachb_obj->name           = $row->name;
-			$fachb_obj->updateamum     = $row->creationdate;
-			$fachb_obj->updatevon     = $row->creationuser;
+			$fachb_obj->fachbereich_id 	= $row->fachbereich_pk;
+			$fachb_obj->erhalter_id   		= $row->erhalter_fk;
+			$fachb_obj->name           		= $row->name;
+			$fachb_obj->updateamum     	= $row->creationdate;
+			$fachb_obj->updatevon     		= $row->creationuser;
 			
 			$this->result[] = $fachb_obj;
 		}
@@ -102,17 +102,17 @@ class fachbereich
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
-			$this->errormsg = 'Fehler beim laden des Datensatzes';
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
 		
 		if($row=pg_fetch_object($res))
 		{
-			$this->fachbereich_id = $row->fachbereich_pk;
-			$this->erhalter_id    = $row->erhalter_fk;
-			$this->name           = $row->name;
-			$this->updateamum     = $row->creationdate;
-			$this->updatevon      = $row->creationuser;
+			$this->fachbereich_id 	= $row->fachbereich_pk;
+			$this->erhalter_id    		= $row->erhalter_fk;
+			$this->name           		= $row->name;
+			$this->updateamum     	= $row->creationdate;
+			$this->updatevon      	= $row->creationuser;
 		}
 		else 
 		{

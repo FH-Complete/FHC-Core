@@ -21,7 +21,7 @@
  */
 /** 
  * Klasse ortraumtyp (FAS-Online)
- * @create 14-03-2006
+ * @create 04-12-2006
  */
 
 class ortraumtyp
@@ -101,7 +101,7 @@ class ortraumtyp
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
-			$this->errormsg = 'Fehler beim laden des Datensatzes';
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
 		

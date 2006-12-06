@@ -21,7 +21,7 @@
  */
 /** 
  * Klasse benutzerfunktion (FAS-Online)
- * @create 14-03-2006
+ * @create 04-12-2006
  */
 
 class benutzerfunktion
@@ -62,11 +62,11 @@ class benutzerfunktion
 	 */
 	function getAll()
 	{
-		$qry = 'SELECT * FROM tbl_benutzerfunktion order by benutzerfunktion_id;';
+		$qry = 'SELECT * FROM tbl_benutzerfunktion ORDER BY benutzerfunktion_id;';
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
-			$this->errormsg = 'Fehler beim laden der Datensaetze';
+			$this->errormsg = 'Fehler beim Laden der Datensaetze';
 			return false;
 		}
 		
@@ -167,7 +167,7 @@ class benutzerfunktion
 			$qry = "SELECT uid FROM tbl_benutzer WHERE uid = '$this->uid';";
 			if(!$resx = pg_query($this->conn, $qry))
 			{
-				$this->errormsg = 'Fehler beim laden des Datensatzes';
+				$this->errormsg = 'Fehler beim Laden des Datensatzes';
 				return false;
 			}	
 			else 

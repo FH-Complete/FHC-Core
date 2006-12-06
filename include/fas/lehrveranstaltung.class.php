@@ -21,7 +21,7 @@
  */
 /**
  * Klasse lehrveranstaltung (FAS-Online)
- * @create 16-03-2006
+ * @create 06-12-2006
  */
 class lehrveranstaltung
 {
@@ -30,26 +30,26 @@ class lehrveranstaltung
 	var $new;					// @var boolean
 	var $lehrveranstaltungen = array();	// @var lehrveranstaltung Objekt	
 	
-	var $lehrveranstaltung_nr;	// @var serial
-	var $studiengang_kz;  	//@var integer
-	var $bezeichnung;   		//@var string
-	var $kurzbz;   		//@var string
-	var $semester;   		//@var smallint
-	var $ects;   			//@var numeric(5,2)
-	var $semesterstunden;   	//@var smallint
-	var $gemeinsam;   		//@var boolean
-	var $anmerkung;   		//@var string
-	var $lehre;  			//@var boolean
-	var $lehreverzeichnis;   	//@var string
-	var $aktiv;   			//@var boolean
-	var $ext_id;   			//@var bigint
-	var $insertamum;   		//@var timestamp
-	var $insertvon;   		//@var string
-	var $planfaktor;   		//@var numeric(3,2)
-	var $planlektoren;   		//@var integer
-	var $planpersonalkosten;  	//@var numeric(7,2)
-	var $updateamum;   		//@var timestamp
-	var $updatevon;   		//@var string
+	var $lehrveranstaltung_nr;			// @var serial
+	var $studiengang_kz;		  	//@var integer
+	var $bezeichnung;   				//@var string
+	var $kurzbz;   				//@var string
+	var $semester;  		 		//@var smallint
+	var $ects;   					//@var numeric(5,2)
+	var $semesterstunden;   			//@var smallint
+	var $gemeinsam;   				//@var boolean
+	var $anmerkung;   				//@var string
+	var $lehre;  					//@var boolean
+	var $lehreverzeichnis;   			//@var string
+	var $aktiv;   					//@var boolean
+	var $ext_id;   					//@var bigint
+	var $insertamum;   				//@var timestamp
+	var $insertvon;   				//@var string
+	var $planfaktor;   				//@var numeric(3,2)
+	var $planlektoren;   				//@var integer
+	var $planpersonalkosten;  			//@var numeric(7,2)
+	var $updateamum;   				//@var timestamp
+	var $updatevon;   				//@var string
 	
 	
 	/**
@@ -122,7 +122,7 @@ class lehrveranstaltung
 	 */
 	function getAll()
 	{						
-		$qry = "SELECT * FROM lehrveranstaltung;";
+		$qry = "SELECT * FROM tbl_lehrveranstaltung;";
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -186,7 +186,7 @@ class lehrveranstaltung
 		}
 		
 		//Select Befehl zusammenbauen
-		$qry = "SELECT * FROM lehrveranstaltung WHERE studiengang_fk = '$studiengang_id'";
+		$qry = "SELECT * FROM tbl_lehrveranstaltung WHERE studiengang_fk = '$studiengang_id'";
 		
 		if($studiensemester_id != null)
 			$qry .= " AND studiensemester_fk = '$studiensemester_id'";
@@ -418,7 +418,7 @@ class lehrveranstaltung
 		}
 		
 		//Loeschen des Datensatzes
-		$qry = "DELETE FROM lehrveranstaltung WHERE lehrveranstaltung_pk = '$lehrveranstaltung_id';";
+		$qry = "DELETE FROM tbl_lehrveranstaltung WHERE lehrveranstaltung_pk = '$lehrveranstaltung_id';";
 		
 		if(pg_query($this->conn, $qry))
 		{

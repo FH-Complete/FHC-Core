@@ -48,7 +48,7 @@ function validate($row)
  * VILESCI-PORTAL - Synchronisation
  */
 
-//newsfunktion
+//news
 $qry = "SELECT * FROM tbl_news";
 
 if($result = pg_query($conn_vilesci, $qry))
@@ -59,17 +59,17 @@ if($result = pg_query($conn_vilesci, $qry))
 	{
 		$error=false;
 		$news = new news($conn);
-		$news->news_id=$row->news_id;
-		$news->betreff=$row->betreff;
-		$news->text=$row->text;
-		$news->semester=$row->semester;
-		$news->uid=$row->uid;
-		$news->studiengang_kz=$row->studiengang_kz;
-		$news->verfasser=$row->verfasser;
-		//$news->insertamum='';
-		$news->insertvon='SYNC';
-		$news->updateamum=$row->updateamum;
-		//$news->updatevon=$row->updatevon;
+		$news->news_id		=$row->news_id;
+		$news->betreff		=$row->betreff;
+		$news->text			=$row->text;
+		$news->semester		=$row->semester;
+		$news->uid			=$row->uid;
+		$news->studiengang_kz	=$row->studiengang_kz;
+		$news->verfasser		=$row->verfasser;
+		//$news->insertamum	='';
+		$news->insertvon		='SYNC';
+		$news->updateamum	=$row->updateamum;
+		//$news->updatevon		=$row->updatevon;
 		
 		$qry = "SELECT news_id FROM tbl_news WHERE news_id='$row->news_id'";
 			if($result1 = pg_query($conn, $qry))
