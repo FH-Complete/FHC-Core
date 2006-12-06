@@ -21,7 +21,7 @@
  */
 
 //*
-//* Synchronisiert Funktiondatensaetze von Vilesci DB in PORTAL DB
+//* Synchronisiert OrtRaumtypdatensaetze von Vilesci DB in PORTAL DB
 //*
 //*
 
@@ -48,7 +48,7 @@ function validate($row)
  * VILESCI-PORTAL - Synchronisation
  */
 
-//funktion
+//ortraumtyp
 $qry = "SELECT * FROM tbl_ortraumtyp";
 
 if($result = pg_query($conn_vilesci, $qry))
@@ -104,7 +104,7 @@ if($result = pg_query($conn_vilesci, $qry))
 	echo nl2br("abgeschlossen\n\n");
 }
 else
-	$error_log .= 'Funktiondatensaetze konnten nicht geladen werden';
+	$error_log .= 'OrtRaumtypdatensaetze konnten nicht geladen werden';
 	
 ?>
 

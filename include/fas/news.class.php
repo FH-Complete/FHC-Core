@@ -21,7 +21,7 @@
  */
 /** 
  * Klasse news (FAS-Online)
- * @create 14-03-2006
+ * @create 04-12-2006
  */
 
 class news

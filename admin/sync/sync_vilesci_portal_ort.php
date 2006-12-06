@@ -48,7 +48,7 @@ function validate($row)
  * VILESCI-PORTAL - Synchronisation
  */
 
-//funktion
+//ort
 $qry = "SELECT * FROM tbl_ort";
 
 if($result = pg_query($conn_vilesci, $qry))
@@ -59,14 +59,14 @@ if($result = pg_query($conn_vilesci, $qry))
 	{
 		$error=false;
 		$ort = new ort($conn);
-		$ort->bezeichnung=$row->bezeichnung;
-		$ort->planbezeichnung=$row->planbezeichnung;
-		$ort->max_person=$row->max_person;
-		$ort->aktiv=($row->aktiv=='t'?true:false);
-		$ort->lageplan=$row->lageplan;
-		$ort->dislozierung=$row->dislozierung;
-		$ort->kosten=$row->kosten;
-		$ort->lehre=($row->lehre=='t'?true:false);
+		$ort->bezeichnung		=$row->bezeichnung;
+		$ort->planbezeichnung	=$row->planbezeichnung;
+		$ort->max_person		=$row->max_person;
+		$ort->aktiv			=($row->aktiv=='t'?true:false);																																					
+		$ort->lageplan		=$row->lageplan;
+		$ort->dislozierung		=$row->dislozierung;
+		$ort->kosten			=$row->kosten;
+		$ort->lehre																																																																																																																																																																																																					=($row->lehre=='t'?true:false);
 		//$ort->insertamum='';
 		$ort->insertvon='SYNC';
 		//ort->updateamum='';

@@ -21,7 +21,7 @@
  */
 /** 
  * Klasse ort (FAS-Online)
- * @create 14-03-2006
+ * @create 04-12-2006
  */
 
 class ort
@@ -69,7 +69,7 @@ class ort
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
-			$this->errormsg = 'Fehler beim laden der Datensaetze';
+			$this->errormsg = 'Fehler beim Laden der Datensaetze';
 			return false;
 		}
 		
@@ -77,19 +77,19 @@ class ort
 		{
 			$ort_obj = new ort($this->conn);
 			
-			$ort_obj->ort_kurzbz = $row->ort_kurzbz;
-			$ort_obj->bezeichnung = $row->bezeichnung;
-			$ort_obj->planbezeichnung = $row->planbezeichnung;
-			$ort_obj->max_person = $row->max_person;
-			$ort_obj->aktiv = $row->aktiv;
-			$ort_obj->lageplan = $row->lageplan;
-			$ort_obj->dislozierung = $row->dislozierung;
-			$ort_obj->kosten = $row->kosten;
-			$ort_obj->lehre = $row->lehre;
-			$ort_obj->insertamum = $row->insertamum;
-			$ort_obj->insertvon = $row->insertvon;
-			$ort_obj->updateamum = $row->updateamum;
-			$ort_obj->updatevon     = $row->updatevon;
+			$ort_obj->ort_kurzbz 		= $row->ort_kurzbz;
+			$ort_obj->bezeichnung 		= $row->bezeichnung;
+			$ort_obj->planbezeichnung 	= $row->planbezeichnung;
+			$ort_obj->max_person 		= $row->max_person;
+			$ort_obj->aktiv 			= $row->aktiv;
+			$ort_obj->lageplan 			= $row->lageplan;
+			$ort_obj->dislozierung 		= $row->dislozierung;
+			$ort_obj->kosten 			= $row->kosten;
+			$ort_obj->lehre 			= $row->lehre;
+			$ort_obj->insertamum 		= $row->insertamum;
+			$ort_obj->insertvon 			= $row->insertvon;
+			$ort_obj->updateamum 		= $row->updateamum;
+			$ort_obj->updatevon     		= $row->updatevon;
 			
 			$this->result[] = $ort_obj;
 		}
@@ -113,25 +113,25 @@ class ort
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
-			$this->errormsg = 'Fehler beim laden des Datensatzes';
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
 		
 		if($row=pg_fetch_object($res))
 		{
-			$this->ort_kurzbz = $row->ort_kurzbz;
-			$this->bezeichnung = $row->bezeichnung;
-			$this->planbezeichnung = $row->planbezeichnung;
-			$this->max_person = $row->max_person;
-			$this->aktiv = $row->aktiv;
-			$this->lageplan = $row->lageplan;
-			$this->dislozierung = $row->dislozierung;
-			$this->kosten = $row->kosten;
-			$this->lehre = $row->lehre;
-			$this->insertamum = $row->insertamum;
-			$this->insertvon = $row->insertvon;
-			$this->updateamum = $row->updateamum;
-			$this->updatevon     = $row->updatevon;
+			$this->ort_kurzbz 		= $row->ort_kurzbz;
+			$this->bezeichnung 		= $row->bezeichnung;
+			$this->planbezeichnung 	= $row->planbezeichnung;
+			$this->max_person 		= $row->max_person;
+			$this->aktiv 			= $row->aktiv;
+			$this->lageplan 		= $row->lageplan;
+			$this->dislozierung 		= $row->dislozierung;
+			$this->kosten 		= $row->kosten;
+			$this->lehre 			= $row->lehre;
+			$this->insertamum 		= $row->insertamum;
+			$this->insertvon 		= $row->insertvon;
+			$this->updateamum 		= $row->updateamum;
+			$this->updatevon     		= $row->updatevon;
 		}
 		else 
 		{

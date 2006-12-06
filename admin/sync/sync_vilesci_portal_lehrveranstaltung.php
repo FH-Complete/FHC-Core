@@ -36,6 +36,9 @@ $adress='ruhan@technikum-wien.at';
 
 $error_log='';
 $text = '';
+$anzahl_quelle=0;
+$anzahl_eingefuegt=0;
+$anzahl_fehler=0;
 function validate($row)
 {
 }
@@ -49,9 +52,11 @@ $qry = "SELECT * FROM tbl_lehrfach";
 
 if($result = pg_query($conn_vilesci, $qry))
 {
+	$anzahl_quelle=pg_num_rows($result);
 	$text.="Lehrveranstaltung Sync\n----------------------\n";
 	while($row = pg_fetch_object($result))
 	{
+		$error=false;
 		$lehrveranstaltung = new lehrveranstaltung($conn);
 		$lehrveranstaltung->studiengang_kz	=$row->studiengang_kz;
 		$lehrveranstaltung->bezeichnung		=$row->bezeichnung;
@@ -72,11 +77,42 @@ if($result = pg_query($conn_vilesci, $qry))
 		//$lehrveranstaltung->updateamum	='';
 		//$lehrveranstaltung->updatevon		=$row->updatevon;
 		$lehrveranstaltung->ext_id			=$row->lehrfach_nr;
-		$lehrveranstaltung->new			=true;
+		//$lehrveranstaltung->new			=true;
 		
-		if(!$lehrveranstaltung->save())
-				$error_log.=$lehrveranstaltung->errormsg."\n";
-	
+		$qry = "SELECT lehrveranstaltung_nr FROM tbl_lehrveranstaltung WHERE ext_id='$lehrveranstaltung->ext_id'";
+			if($result1 = pg_query($conn, $qry))
+			{		
+				if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist
+				{
+					if($row1=pg_fetch_object($result1))
+					{
+						//Lehrveranstaltungsdaten updaten
+						$lehrveranstaltung->new=false;
+						$lehrveranstaltung->lehrveranstaltung_nr=$row1->lehrveranstaltung_nr;
+					}
+					else 
+					{
+						$error_log.="lehrveranstaltung_nr von $row->lehrveranstaltung_nr konnte nicht ermittelt werden\n";
+						$error=true;
+					}
+				}
+				else 
+				{
+					//Lehrveranstaltung neu anlegen
+					$lehrveranstaltung->new=true;
+				}
+				
+				if(!$error)
+					if(!$lehrveranstaltung->save())
+					{
+						$error_log.=$lehrveranstaltung->errormsg."\n";
+						$anzahl_fehler++;
+					}
+					else 
+						$anzahl_eingefuegt++;
+				else 
+					$anzahl_fehler++;
+			}	
 	}
 	$text.="abgeschlossen";
 }
@@ -95,6 +131,7 @@ else
 
 echo nl2br($text);
 echo nl2br($error_log);
+echo nl2br("\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
 
 ?>
 </body>
