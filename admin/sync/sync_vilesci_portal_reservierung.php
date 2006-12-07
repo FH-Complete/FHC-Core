@@ -59,7 +59,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		$reservierung->gruppe = $row->gruppe;
 		$reservierung->gruppe_kurzbz = $row->einheit_kurzbz;
 		
-		$qry = "SELECT count(*) as anz FROM tbl_reservierung where reservierung_id='".addslashes($row->reservierung_id)."'";
+		$qry = "SELECT count(*) as anz FROM campus.tbl_reservierung where reservierung_id='".addslashes($row->reservierung_id)."'";
 		
 		if($row1 =pg_fetch_object(pg_query($conn,$qry)))
 		{

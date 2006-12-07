@@ -24,7 +24,7 @@
  *
  */
 require_once('../../vilesci/config.inc.php');
-require_once('../../include/fas/personlvstudiensemester.class.php');
+require_once('../../include/fas/benutzerlvstudiensemester.class.php');
 
 $conn=pg_connect(CONN_STRING) or die('Connection zur Portal Datenbank fehlgeschlagen');
 $conn_vilesci=pg_connect(CONN_STRING_VILESCI) or die('Connection zur Vilesci Datenbank fehlgeschlagen');
@@ -42,10 +42,10 @@ $qry = 'SELECT * FROM tbl_personlehrfachstudiensemester';
 
 if($result = pg_query($conn_vilesci, $qry))
 {
-	$text.="\n Sync Personlvstudiensemester\n\n";
+	$text.="\n Sync Benutzerlvstudiensemester\n\n";
 	while($row = pg_fetch_object($result))
 	{
-		$obj = new personlvstudiensemester($conn);
+		$obj = new benutzerlvstudiensemester($conn);
 		$obj->uid = $row->uid;
 		$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 		$qry = "SELECT lehrveranstaltung_nr FROM tbl_lehrveranstaltung WHERE ext_id=$row->lehrfach_nr";
@@ -53,7 +53,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		{
 			$obj->lehrveranstaltung_nr = $row1->lehrveranstaltung_nr;
 
-			$qry = "SELECT count(*) as anz FROM tbl_personlvstudiensemester WHERE 
+			$qry = "SELECT count(*) as anz FROM tbl_benutzerlvstudiensemester WHERE 
 		        	uid='".addslashes($row->uid)."' AND studiensemester_kurzbz='".addslashes($row->studiensemester_kurzbz)."'
 		        	AND lehrveranstaltung_nr='".addslashes($row1->lehrveranstaltung_nr)."';";
 		
@@ -90,7 +90,7 @@ $text.="Anzahl der Fehler: $anzahl_fehler\n";
 
 <html>
 <head>
-<title>Synchro - Vilesci -> Portal - PersonLVStudiensemester</title>
+<title>Synchro - Vilesci -> Portal - BenutzerLVStudiensemester</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
 <body>

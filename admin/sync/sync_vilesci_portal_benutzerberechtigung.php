@@ -39,7 +39,7 @@ $anzahl_fehler=0;
 // ***********************************
 
 //Mitarbeiter
-$qry = 'Select * FROM tbl_userberechtigung';
+$qry = 'Select * FROM tbl_userberechtigung left join tbl_fachbereich using(fachbereich_id)';
 
 if($result = pg_query($conn_vilesci, $qry))
 {
@@ -49,7 +49,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		$error=false;
 		$benutzerberechtigung = new benutzerberechtigung($conn);
 		$benutzerberechtigung->art = $row->art;
-		$benutzerberechtigung->fachbereich_id = $row->fachbereich_id;
+		$benutzerberechtigung->fachbereich_kurzbz = $row->kurzbz;
 		$benutzerberechtigung->studiengang_kz = $row->studiengang_kz;
 		$benutzerberechtigung->berechtigung_kurzbz = $row->berechtigung_kurzbz;
 		$benutzerberechtigung->uid = $row->uid;

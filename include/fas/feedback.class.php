@@ -33,6 +33,7 @@ class feedback
 	var $text;			// text
 	var $datum;			// date
 	var $uid;			// varchar(16)
+	var $lehrveranstaltung_id; // integer
 	
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
@@ -86,6 +87,11 @@ class feedback
 			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
+		if(!is_numeric($this->lehrveranstaltung_id))
+		{
+			$this->errormsg = 'Lehrveranstaltung_id muss eine gueltige Zahl sein';
+			return false;
+		}
 	
 		return true;
 	}
@@ -116,16 +122,17 @@ class feedback
 		if($this->new)
 		{
 			//ToDo: Feedback_ID wieder entfernen und per Seq fuellen
-			$qry = 'INSERT INTO tbl_feedback (feedback_id, betreff, text, datum, uid)
+			$qry = 'INSERT INTO campus.tbl_feedback (feedback_id, betreff, text, datum, uid, lehrveranstaltung_id)
 			        VALUES('.$this->addslashes($this->feedback_id).','.
 					$this->addslashes($this->betreff).','.
 					$this->addslashes($this->text).','.
 					$this->addslashes($this->datum).','.
-					$this->addslashes($this->uid).');';
+					$this->addslashes($this->uid).','.
+					$this->addslashes($this->lehrveranstaltung_id).');';
 		}
 		else
 		{
-			$qry = 'UPDATE tbl_feedback SET'.
+			$qry = 'UPDATE campus.tbl_feedback SET'.
 			       ' betreff='.$this->addslashes($this->betreff).','.
 			       ' text='.$this->addslashes($this->text).','.
 			       ' datum='.$this->addslashes($this->datum).','.

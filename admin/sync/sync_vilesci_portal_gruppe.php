@@ -56,11 +56,11 @@ if($result = pg_query($conn_vilesci, $qry))
 		$gruppe = new gruppe($conn);
 		$gruppe->gruppe_kurzbz = $row->gruppe_kurzbz;
 		$gruppe->studiengang_kz = $row->studiengang_kz;
-		$gruppe->bezeichnung = $row->bezeichnung;
+		$gruppe->bezeichnung = substr($row->bezeichnung,0,32);
 		$gruppe->semester = $row->semester;
-		$gruppe->typ = $row->typ;
-		$gruppe->mailgrp_kurzbz = $row->mailgrp_kurzbz;
-		$gruppe->mailgrp_beschreibung = $row->mailgrp_beschreibung;
+		$gruppe->sort = $row->typ;
+		$gruppe->mailgrp = ($row->mailgrp_kurzbz!=''?true:false);
+		$gruppe->beschreibung = $row->mailgrp_beschreibung;
 		$gruppe->sichtbar = ($row->sichtbar=='f'?true:false);
 		$gruppe->aktiv = ($row->aktiv=='t'?true:false);
 		$gruppe->updateamum = $row->updateamum;

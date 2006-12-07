@@ -53,8 +53,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		$lehrform->bezeichnung = $row->bezeichnung;
 		$lehrform->verplanen = ($row->verplanen=='t'?true:false);
 					
-		$qry = "SELECT count(*) as anz FROM tbl_lehrform WHERE lehrform_kurzbz='$row->lehrform_kurzbz'";
-			
+		$qry = "SELECT count(*) as anz FROM lehre.tbl_lehrform WHERE lehrform_kurzbz='$row->lehrform_kurzbz'";
 		
 		if($row = pg_fetch_object(pg_query($conn, $qry)))
 		{		
@@ -69,10 +68,10 @@ if($result = pg_query($conn_vilesci, $qry))
 				$anzahl_fehler++;
 			}
 			else 
-					$anzahl_fehler++;
+					$anzahl_eingefuegt++;
 		}
 		else 
-			$error_log .= "damm\n";
+			$error_log .= "Fehler bei Select: $qry\n";
 	}
 }
 else

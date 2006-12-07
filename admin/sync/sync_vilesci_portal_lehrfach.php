@@ -39,7 +39,10 @@ $anzahl_fehler=0;
 // ***********************************
 
 //Mitarbeiter
-$qry = 'Select * FROM tbl_lehrfach';
+$qry = 'SELECT lehrfach_nr, tbl_lehrfach.studiengang_kz as studiengang_kz, tbl_fachbereich.kurzbz as fachbereich_kurzbz, 
+        tbl_lehrfach.kurzbz as kurzbz, tbl_lehrfach.bezeichnung as bezeichnung, tbl_lehrfach.farbe as farbe, 
+        tbl_lehrfach.aktiv as aktiv, tbl_lehrfach.semester as semester, tbl_lehrfach.sprache as sprache 
+        FROM tbl_lehrfach LEFT JOIN tbl_fachbereich using(fachbereich_id)';
 
 if($result = pg_query($conn_vilesci, $qry))
 {
@@ -49,9 +52,9 @@ if($result = pg_query($conn_vilesci, $qry))
 		$error=false;
 		$lf = new lehrfach($conn);
 		
-		$lf->lehrfach_nr = $row->lehrfach_nr;
+		$lf->lehrfach_id = $row->lehrfach_nr;
 		$lf->studiengang_kz = $row->studiengang_kz;
-		$lf->fachbereich_id = $row->fachbereich_id;
+		$lf->fachbereich_kurzbz = $row->fachbereich_kurzbz;
 		$lf->kurzbz = $row->kurzbz;
 		$lf->bezeichnung = $row->bezeichnung;
 		$lf->farbe = $row->farbe;
@@ -59,7 +62,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		$lf->semester = $row->semester;
 		$lf->sprache = ($row->sprache!=''?$row->sprache:'German');
 		
-		$qry = "SELECT count(*) as anz FROM tbl_lehrfach WHERE lehrfach_nr='$row->lehrfach_nr'";
+		$qry = "SELECT count(*) as anz FROM lehre.tbl_lehrfach WHERE lehrfach_id='$row->lehrfach_nr'";
 		if($row1 = pg_fetch_object(pg_query($conn, $qry)))
 		{		
 			if($row1->anz>0) //wenn dieser eintrag schon vorhanden ist

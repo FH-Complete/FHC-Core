@@ -30,7 +30,7 @@ class benutzerberechtigung
 	//Tabellenspalten
 	var $benutzerberechtigung_id;	// int
 	var $art;						// varchar(16)
-	var $fachbereich_id;			// int
+	var $fachbereich_kurzbz;		// int
 	var $studiengang_kz;			// int
 	var $berechtigung_kurzbz;		// varchar(16)
 	var $uid;						// varchar(16)
@@ -86,9 +86,9 @@ class benutzerberechtigung
 			return false;
 		}
 		
-		if($this->fachbereich_id!='' && !is_numeric($this->fachbereich_id))
+		if(strlen($this->fachbereich_kurzbz)>16)
 		{
-			$this->errormsg = 'Fachbereich_id muss eine gueltige Zahl sein';
+			$this->errormsg = 'Fachbereich_id darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
 		if($this->studiengang_kz!='' && !is_numeric($this->studiengang_kz))
@@ -145,10 +145,10 @@ class benutzerberechtigung
 
 		if($this->new)
 		{			
-			$qry = 'INSERT INTO tbl_benutzerberechtigung (art, fachbereich_id, studiengang_kz, berechtigung_kurzbz, 
+			$qry = 'INSERT INTO tbl_benutzerberechtigung (art, fachbereich_kurzbz, studiengang_kz, berechtigung_kurzbz, 
 			                                              uid, studiensemester_kurzbz, start, ende)
 			        VALUES('.$this->addslashes($this->art).','.
-					$this->addslashes($this->fachbereich_id).','.
+					$this->addslashes($this->fachbereich_kurzbz).','.
 					$this->addslashes($this->studiengang_kz).','.
 					$this->addslashes($this->berechtigung_kurzbz).','.
 					$this->addslashes($this->uid).','.
@@ -160,7 +160,7 @@ class benutzerberechtigung
 		{
 			$qry = 'UPDATE tbl_benutzerberechtigung SET'.
 			       ' art='.$this->addslashes($this->art).','.
-			       ' fachbereich_id='.$this->addslashes($this->fachbereich_id).','.
+			       ' fachbereich_kurzbz='.$this->addslashes($this->fachbereich_kurzbz).','.
 			       ' studiengang_kz='.$this->addslashes($this->studiengang_kz).','.
 			       ' berechtigung_kurzbz='.$this->addslashes($this->berechtigung_kurzbz).','.
 			       ' uid='.$this->addslashes($this->uid).','.
