@@ -29,7 +29,7 @@ class news
 	var $conn;   			// @var resource DB-Handle
 	var $new;     			// @var boolean
 	var $errormsg; 		// @var string
-	var $result = array(); 	// @var fachbereich Objekt 
+	var $result = array(); 	// @var news Objekt 
 	
 	//Tabellenspalten
 	var $news_id;			// @var serial
@@ -67,7 +67,7 @@ class news
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
-			$this->errormsg = 'Fehler beim laden der Datensaetze';
+			$this->errormsg = 'Fehler beim Laden der Datensaetze';
 			return false;
 		}
 		
@@ -108,7 +108,7 @@ class news
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
-			$this->errormsg = 'Fehler beim laden des Datensatzes';
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
 		

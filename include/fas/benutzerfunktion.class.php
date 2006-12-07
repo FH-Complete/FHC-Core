@@ -29,7 +29,7 @@ class benutzerfunktion
 	var $conn;   			// @var resource DB-Handle
 	var $new;     			// @var boolean
 	var $errormsg; 		// @var string
-	var $result = array(); 	// @var fachbereich Objekt 
+	var $result = array(); 	// @var benutzerfunktion Objekt 
 	
 	//Tabellenspalten
 	var $benutzerfunktion_id;	// @var serial
