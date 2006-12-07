@@ -59,12 +59,11 @@ if($result = pg_query($conn_vilesci, $qry))
 	{
 		$error=false;
 		$fachbereich = new fachbereich($conn);
-		
-		$fachbereich->studiengang_kz=$row->studiengang_kz;
-		$fachbereich->bezeichnung=$row->bezeichnung;
-		$fachbereich->fachbereich_kurzbz=$row->kurzbz;
-		$fachbereich->farbe=$row->farbe;
-		$fachbereich->ext_id=$row->fachbereich_id;
+		$fachbereich->fachbereich_kurzbz	=$row->kurzbz;
+		$fachbereich->studiengang_kz	=$row->studiengang_kz;
+		$fachbereich->bezeichnung		=$row->bezeichnung;
+		$fachbereich->farbe			=$row->farbe;
+		$fachbereich->ext_id		=$row->fachbereich_id;
 		
 		$qry = "SELECT ext_id FROM tbl_fachbereich WHERE ext_id='$fachbereich->ext_id'";
 			if($result1 = pg_query($conn, $qry))
@@ -75,7 +74,7 @@ if($result = pg_query($conn_vilesci, $qry))
 					{
 						//Fachbereichsdaten updaten
 						$fachbereich->new=false;
-						$fachbereich->fachbereich_id=$row->fachbereich_id;
+						//$fachbereich->fachbereich_kurzbz=$row->fachbereich_kurzbz;
 					}
 					else 
 					{

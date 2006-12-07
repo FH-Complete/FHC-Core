@@ -30,14 +30,14 @@ class lehrveranstaltung
 	var $new;					// @var boolean
 	var $lehrveranstaltungen = array();	// @var lehrveranstaltung Objekt	
 	
-	var $lehrveranstaltung_nr;			// @var serial
+	var $lehrveranstaltung_id;			// @var serial
 	var $studiengang_kz;		  	//@var integer
 	var $bezeichnung;   				//@var string
 	var $kurzbz;   				//@var string
 	var $semester;  		 		//@var smallint
 	var $ects;   					//@var numeric(5,2)
 	var $semesterstunden;   			//@var smallint
-	var $gemeinsam;   				//@var boolean
+
 	var $anmerkung;   				//@var string
 	var $lehre;  					//@var boolean
 	var $lehreverzeichnis;   			//@var string
@@ -57,28 +57,28 @@ class lehrveranstaltung
 	 * @param $conn Connection zur Datenbank
 	 *        $lehrveranstaltung_id ID der zu ladenden Lehrveranstaltung
 	 */
-	function lehrveranstaltung($conn, $lehrveranstaltung_nr=null)
+	function lehrveranstaltung($conn, $lehrveranstaltung_id=null)
 	{
 		$this->conn = $conn;
-		if($lehrveranstaltung_nr != null)
-			$this->load($lehrveranstaltung_nr);
+		if($lehrveranstaltung_id != null)
+			$this->load($lehrveranstaltung_id);
 	}
 	
 	/**
 	 * Laedt einen Datensatz
-	 * @param $lehrveranstaltung_nr  ID des zu ladenden Datensatzes
+	 * @param $lehrveranstaltung_id  ID des zu ladenden Datensatzes
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load($lehrveranstaltung_nr)
+	function load($lehrveranstaltung_id)
 	{
-		//gueltigkeit von lehrveranstaltung_nr pruefen
-		if(!is_numeric($lehrveranstaltung_nr) || $lehrveranstaltung_id == '')
+		//gueltigkeit von lehrveranstaltung_id pruefen
+		if(!is_numeric($lehrveranstaltung_id) || $lehrveranstaltung_id == '')
 		{
-			$this->errormsg = 'lehrveranstaltung_nr muss eine gueltige Zahl sein';
+			$this->errormsg = 'lehrveranstaltung_id muss eine gueltige Zahl sein';
 			return false;
 		}
 		
-		$qry = "SELECT * FROM lehrveranstaltung WHERE lehrveranstaltung_pk = '$lehrveranstaltung_id';";
+		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_pk = '$lehrveranstaltung_id';";
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -122,7 +122,7 @@ class lehrveranstaltung
 	 */
 	function getAll()
 	{						
-		$qry = "SELECT * FROM tbl_lehrveranstaltung;";
+		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung;";
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -186,7 +186,7 @@ class lehrveranstaltung
 		}
 		
 		//Select Befehl zusammenbauen
-		$qry = "SELECT * FROM tbl_lehrveranstaltung WHERE studiengang_fk = '$studiengang_id'";
+		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung WHERE studiengang_fk = '$studiengang_id'";
 		
 		if($studiensemester_id != null)
 			$qry .= " AND studiensemester_fk = '$studiensemester_id'";
@@ -246,9 +246,9 @@ class lehrveranstaltung
 		$this->anmerkung = str_replace("'",'´',$this->anmerkung);
 		
 		//Laenge Pruefen
-		if(strlen($this->bezeichnung)>64)           
+		if(strlen($this->bezeichnung)>128)           
 		{
-			$this->errormsg = "Bezeichnung darf nicht laenger als 64 Zeichen sein bei <b>$this->ext_id</b> - $this->bezeichnung";
+			$this->errormsg = "Bezeichnung darf nicht laenger als 128 Zeichen sein bei <b>$this->ext_id</b> - $this->bezeichnung";
 			return false;
 		}
 		if(strlen($this->kurzbz)>16)
@@ -318,8 +318,8 @@ class lehrveranstaltung
 		if($this->new)
 		{
 			//Neuen Datensatz anlegen
-			$qry = 'INSERT INTO tbl_lehrveranstaltung (studiengang_kz, bezeichnung, kurzbz, 
-				semester, ects, semesterstunden, gemeinsam, anmerkung, lehre, lehreverzeichnis, aktiv, ext_id, insertamum, 
+			$qry = 'INSERT INTO lehre.tbl_lehrveranstaltung (studiengang_kz, bezeichnung, kurzbz, 
+				semester, ects, semesterstunden,  anmerkung, lehre, lehreverzeichnis, aktiv, ext_id, insertamum, 
 				insertvon, planfaktor, planlektoren, planpersonalkosten, updateamum, updatevon) VALUES ('.
 				$this->addslashes($this->studiengang_kz).', '.
 				$this->addslashes($this->bezeichnung).', '.
@@ -327,7 +327,6 @@ class lehrveranstaltung
 				$this->addslashes($this->semester).', '.
 				$this->addslashes($this->ects).', '.
 				$this->addslashes($this->semesterstunden).', '. 
-				$this->addslashes($this->gemeinsam).', '.
 				$this->addslashes($this->anmerkung).', '.
 				($this->lehre?'true':'false').','.
 				$this->addslashes($this->lehreverzeichnis).', '.
@@ -346,20 +345,19 @@ class lehrveranstaltung
 			//bestehenden Datensatz akualisieren
 			
 			//Pruefen ob lehrveranstaltung_id eine gueltige Zahl ist
-			if(!is_numeric($this->lehrveranstaltung_nr) || $this->lehrveranstaltung_nr == '')
+			if(!is_numeric($this->lehrveranstaltung_id) || $this->lehrveranstaltung_id == '')
 			{
-				$this->errormsg = 'lehrveranstaltung_nr muss eine gueltige Zahl sein';
+				$this->errormsg = 'lehrveranstaltung_id muss eine gueltige Zahl sein';
 				return false;
 			}
-			$qry = 'UPDATE tbl_lehrveranstaltung SET '. 
-				//'lehrveranstaltung_nr= '.$this->addslashes($this->lehrveranstaltung_nr) .', '.
+			$qry = 'UPDATE lehre.tbl_lehrveranstaltung SET '. 
+				//'lehrveranstaltung_id= '.$this->addslashes($this->lehrveranstaltung_id) .', '.
 				'studiengang_kz='.$this->addslashes($this->studiengang_kz) .', '.
 				'bezeichnung='.$this->addslashes($this->bezeichnung) .', '.
 				'kurzbz='.$this->addslashes($this->kurzbz) .', '.
 				'semester='.$this->addslashes($this->semester) .', '.
 				'ects='.$this->addslashes($this->ects) .', '.
 				'semesterstunden='.$this->addslashes($this->semesterstunden) .', '.
-				'gemeinsam='.$this->addslashes($this->gemeinsam) .', '.
 				'anmerkung='.$this->addslashes($this->anmerkung) .', '.
 				'lehre='.$this->addslashes($this->lehre) .', '.
 				'lehreverzeichnis='.$this->addslashes($this->lehreverzeichnis) .', '.
@@ -372,7 +370,7 @@ class lehrveranstaltung
 				'planpersonalkosten='.$this->addslashes($this->planpersonalkosten) .', '.
 				'updateamum='.$this->addslashes($this->updateamum) .','.
 				'updatevon='.$this->addslashes($this->updatevon) .' '.
-				'WHERE ext_id = '.$this->addslashes($this->lehrveranstaltung_nr).';';
+				'WHERE ext_id = '.$this->addslashes($this->lehrveranstaltung_id).';';
 		}
 		
 		if(pg_query($this->conn, $qry))
@@ -418,7 +416,7 @@ class lehrveranstaltung
 		}
 		
 		//Loeschen des Datensatzes
-		$qry = "DELETE FROM tbl_lehrveranstaltung WHERE lehrveranstaltung_pk = '$lehrveranstaltung_id';";
+		$qry = "DELETE FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_pk = '$lehrveranstaltung_id';";
 		
 		if(pg_query($this->conn, $qry))
 		{

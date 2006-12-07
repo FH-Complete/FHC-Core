@@ -35,10 +35,6 @@ class funktion
 	var $funktion_kurzbz;	// @var integer
 	var $bezeichnung;		// @var string
 	var $aktiv;			// @var boolean
-	var $updateamum;		// @var timestamp
-	var $updatevon=0;		// @var string
-	var $insertamum;		// @var timestamp
-	var $insertvon=0;		// @var string
 	var $ext_id;			// @var bigint
 	
 	
@@ -75,10 +71,6 @@ class funktion
 			$funktion_obj->funktion_kurzbz 	= $row->funktion_kurzbz;
 			$funktion_obj->bezeichnung    	= $row->bezeichnung;
 			$funktion_obj->aktiv           		= $row->aktiv;
-			$funktion_obj->insertamum		=$row->insertamum;
-			$funktion_obj->insertvon		=$row->insertvon;
-			$funktion_obj->updateamum	=$row->updateamum;
-			$funktion_obj->updatevon		=$row->updatevon;
 			
 			$this->result[] = $funktion_obj;
 		}
@@ -111,10 +103,6 @@ class funktion
 			$this->funktion_kurzbz	= $row->funktion_kurzbz;
 			$this->bezeichnung		= $row->bezeichnung;
 			$this->aktiv			= $row->aktiv;
-			$this->insertamum		=$row->insertamum;
-			$this->insertvon		=$row->insertvon;
-			$this->updateamum		= $row->updateamum;
-			$this->updatevon		= $row->updatevon;
 		}
 		else 
 		{
@@ -176,15 +164,10 @@ class funktion
 				return false;
 			}
 			//Neuen Datensatz anlegen		
-			$qry = 'INSERT INTO tbl_funktion (funktion_kurzbz, bezeichnung, aktiv, insertamum, insertvon, 
-				updateamum, updatevon) VALUES ('.
+			$qry = 'INSERT INTO tbl_funktion (funktion_kurzbz, bezeichnung, aktiv) VALUES ('.
 				$this->addslashes($this->funktion_kurzbz).', '.
 				$this->addslashes($this->bezeichnung).', '.
-				($this->aktiv?'true':'false').', '. 
-				$this->addslashes($this->insertamum).', '.
-				$this->addslashes($this->insertvon).', '.
-				$this->addslashes($this->updateamum).', '.
-				$this->addslashes($this->updatevon).'); ';
+				($this->aktiv?'true':'false').'); ';
 		}
 		else 
 		{
@@ -199,11 +182,7 @@ class funktion
 			
 			$qry = 'UPDATE tbl_funktion SET '. 
 				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
-				'aktiv='.($this->aktiv?'true':'false') .', '.
-				'insertamum='.$this->addslashes($this->insertamum).', '.
-				'insertvon='.$this->addslashes($this->insertvon).', '.
-				'updateamum='.$this->addslashes($this->updateamum).', '.
-				'updatevon='.$this->addslashes($this->updatevon).', '.
+				'aktiv='.($this->aktiv?'true':'false') .' '.
 				'WHERE funktion_kurzbz = '.$this->addslashes($this->funktion_kurzbz).';';
 		}
 		

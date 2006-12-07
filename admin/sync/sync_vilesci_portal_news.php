@@ -71,7 +71,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		$news->updateamum	=$row->updateamum;
 		//$news->updatevon		=$row->updatevon;
 		
-		$qry = "SELECT news_id FROM tbl_news WHERE news_id='$row->news_id'";
+		$qry = "SELECT news_id FROM campus.tbl_news WHERE news_id='$row->news_id'";
 			if($result1 = pg_query($conn, $qry))
 			{		
 				if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist

@@ -33,7 +33,7 @@ class benutzerfunktion
 	
 	//Tabellenspalten
 	var $benutzerfunktion_id;	// @var serial
-	var $fachbereich_id;		// @var integer
+	var $fachbereich_kurzbz;		// @var integer
 	var $uid;			// @var varchar(16)
 	var $studiengang_kz;	// @var integer
 	var $funktion_kurzbz;	// @var varchar(16)
@@ -75,7 +75,7 @@ class benutzerfunktion
 			$pfunktion_obj = new personenfunktion($this->conn);
 			
 			$pfunktion_obj->benutzerfunktion_id 	= $row->benutzerfunktion_id;
-			$pfunktion_obj->fachbereich_id 		= $row->fachbereich_id;
+			$pfunktion_obj->fachbereich_kurzbz 		= $row->fachbereich_kurzbz;
 			$pfunktion_obj->uid 				= $row->uid;
 			$pfunktion_obj->studiengang_kz		= $row->studiengang_kz;
 			$pfunktion_obj->funktion_kurzbz		= $row->funtion_kurzbz;
@@ -113,7 +113,7 @@ class benutzerfunktion
 		if($row=pg_fetch_object($res))
 		{
 			$this->benutzerfunktion_id	= $row->benutzerfunktion_id;
-			$this->fachbereich_id	= $row->fachbereich_id;
+			$this->fachbereich_kurzbz	= $row->fachbereich_kurzbz;
 			$this->uid			= $row->uid;
 			$this->studiengang_kz	= $row->studiengang_kz;
 			$this->funktion_kurzbz	= $row->funktion_kurzbz;
@@ -178,9 +178,9 @@ class benutzerfunktion
 					return false;
 				}	
 			}
-			$qry = 'INSERT INTO tbl_benutzerfunktion (fachbereich_id, uid, studiengang_kz, funktion_kurzbz, insertamum, insertvon, 
+			$qry = 'INSERT INTO tbl_benutzerfunktion (fachbereich_kurzbz, uid, studiengang_kz, funktion_kurzbz, insertamum, insertvon, 
 				updateamum, updatevon) VALUES ('.
-				$this->addslashes($this->fachbereich_id).', '.
+				$this->addslashes($this->fachbereich_kurzbz).', '.
 				$this->addslashes($this->uid).', '.
 				$this->addslashes($this->studiengang_kz).', '.
 				$this->addslashes($this->funktion_kurzbz).', '.
@@ -202,7 +202,7 @@ class benutzerfunktion
 			
 			$qry = 'UPDATE tbl_benutzerfunktion SET '. 
 				'benutzerfunktion_id='.$this->addslashes($this->benutzerfunktion_id).', '.
-				'fachbereich_id='.$this->addslashes($this->fachbereich_id).', '.
+				'fachbereich_kurzbz='.$this->addslashes($this->fachbereich_kurzbz).', '.
 				'uid='.$this->addslashes($this->uid).', '.
 				'studiengang_kz='.$this->addslashes($this->studiengang_kz).', '.
 				'funktion_kurzbz='.$this->addslashes($this->funktion_kurzbz).', '.

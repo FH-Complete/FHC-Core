@@ -34,10 +34,6 @@ class raumtyp
 	//Tabellenspalten
 	var $beschreibung;		// @var string
 	var $raumtyp_kurzbz;	// @var string
-	var $updateamum;		// @var timestamp
-	var $updatevon=0;		// @var string
-	var $insertamum;		// @var timestamp
-	var $insertvon=0;		// @var string
 	
 	
 	/**
@@ -72,10 +68,7 @@ class raumtyp
 			
 			$raumtyp_obj->beschreibung 	= $row->beschreibung;
 			$raumtyp_obj->raumtyp_kurzbz 	= $row->raumtyp_kurzbz;
-			$raumtyp_obj->insertamum 	= $row->insertamum;
-			$raumtyp_obj->insertvon 		= $row->insertvon;
-			$raumtyp_obj->updateamum 	= $row->updateamum;
-			$raumtyp_obj->updatevon     	= $row->updatevon;
+
 			
 			$this->result[] = $raumtyp_obj;
 		}
@@ -107,10 +100,7 @@ class raumtyp
 		{
 			$this->beschreibung 	= $row->beschreibung;
 			$this->raumtyp_kurzbz 	= $row->kurzbz;
-			$this->insertamum 		= $row->insertamum;
-			$this->insertvon 		= $row->insertvon;
-			$this->updateamum 		= $row->updateamum;
-			$this->updatevon     		= $row->updatevon;
+
 		}
 		else 
 		{
@@ -178,14 +168,9 @@ class raumtyp
 				return false;
 			}
 			//Neuen Datensatz anlegen		
-			$qry = 'INSERT INTO tbl_raumtyp (beschreibung, raumtyp_kurzbz, 
-				insertamum, insertvon, updateamum, updatevon) VALUES ('.
+			$qry = 'INSERT INTO tbl_raumtyp (beschreibung, raumtyp_kurzbz) VALUES ('.
 				$this->addslashes($this->beschreibung).', '.
-				$this->addslashes($this->raumtyp_kurzbz).', '.
-				$this->addslashes($this->insertamum).', '.
-				$this->addslashes($this->insertvon).', '.
-				$this->addslashes($this->updateamum).', '.
-				$this->addslashes($this->updatevon).');';
+				$this->addslashes($this->raumtyp_kurzbz).');';
 
 		}
 		else 
@@ -200,11 +185,7 @@ class raumtyp
 			}
 			
 			$qry = 'UPDATE tbl_raumtyp SET '. 
-				'beschreibung='.$this->addslashes($this->beschreibung).', '.
-				'insertamum='.$this->addslashes($this->insertamum).', '.
-				'insertvon='.$this->addslashes($this->insertvon).', '.
-				'updateamum='.$this->addslashes($this->updateamum).', '.
-				'updatevon='.$this->addslashes($this->updatevon).' '.
+				'beschreibung='.$this->addslashes($this->beschreibung).' '.
 				'WHERE raumtyp_kurzbz = '.$this->addslashes($this->ort_kurzbz).';';
 		}
 		

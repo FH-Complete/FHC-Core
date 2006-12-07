@@ -35,11 +35,6 @@ class ortraumtyp
 	var $ort_kurzbz;		// @var string
 	var $hierarchie;		// @var smallint
 	var $raumtyp_kurzbz;	// @var string
-	var $updateamum;		// @var timestamp
-	var $updatevon=0;		// @var string
-	var $insertamum;		// @var timestamp
-	var $insertvon=0;		// @var string
-	
 	
 	/**
 	 * Konstruktor
@@ -74,10 +69,6 @@ class ortraumtyp
 			$ortraumtyp_obj->ort_kurzbz 	= $row->ort_kurzbz;
 			$ortraumtyp_obj->hierarchie 	= $row->hierarchie;
 			$ortraumtyp_obj->raumtyp_kurzbz = $row->raumtyp_kurzbz;
-			$ortraumtyp_obj->insertamum 	= $row->insertamum;
-			$ortraumtyp_obj->insertvon 	= $row->insertvon;
-			$ortraumtyp_obj->updateamum 	= $row->updateamum;
-			$ortraumtyp_obj->updatevon     	= $row->updatevon;
 			
 			$this->result[] = $ortraumtyp_obj;
 		}
@@ -110,10 +101,6 @@ class ortraumtyp
 			$this->ort_kurzbz 		= $row->ort_kurzbz;
 			$this->hierarchie 		= $row->hierarchie;
 			$this->raumtyp_kurzbz 	= $row->kurzbz;
-			$this->insertamum 		= $row->insertamum;
-			$this->insertvon 		= $row->insertvon;
-			$this->updateamum 		= $row->updateamum;
-			$this->updatevon     		= $row->updatevon;
 		}
 		else 
 		{
@@ -181,15 +168,10 @@ class ortraumtyp
 				return false;
 			}
 			//Neuen Datensatz anlegen		
-			$qry = 'INSERT INTO tbl_ortraumtyp (ort_kurzbz, hierarchie, raumtyp_kurzbz, 
-				insertamum, insertvon, updateamum, updatevon) VALUES ('.
+			$qry = 'INSERT INTO tbl_ortraumtyp (ort_kurzbz, hierarchie, raumtyp_kurzbz) VALUES ('.
 				$this->addslashes($this->ort_kurzbz).', '.
 				$this->addslashes($this->hierarchie).', '.
-				$this->addslashes($this->raumtyp_kurzbz).', '.
-				$this->addslashes($this->insertamum).', '.
-				$this->addslashes($this->insertvon).', '.
-				$this->addslashes($this->updateamum).', '.
-				$this->addslashes($this->updatevon).');';
+				$this->addslashes($this->raumtyp_kurzbz).');';
 
 		}
 		else 
@@ -204,11 +186,7 @@ class ortraumtyp
 			}
 			
 			$qry = 'UPDATE tbl_ortraumtyp SET '. 
-				'raumtyp_kurzbz='.$this->addslashes($this->raumtyp_kurzbz).', '.
-				'insertamum='.$this->addslashes($this->insertamum).', '.
-				'insertvon='.$this->addslashes($this->insertvon).', '.
-				'updateamum='.$this->addslashes($this->updateamum).', '.
-				'updatevon='.$this->addslashes($this->updatevon).' '.
+				'raumtyp_kurzbz='.$this->addslashes($this->raumtyp_kurzbz).' '.
 				'WHERE ort_kurzbz = '.$this->addslashes($this->ort_kurzbz).' AND hierarchie = '.$this->addslashes($this->hierarchie).';';
 		}
 		

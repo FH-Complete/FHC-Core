@@ -40,12 +40,7 @@ class ort
 	var $lageplan;		// @var oid
 	var $dislozierung;		// @var smallint
 	var $kosten;			// @var numeric(8,2)
-	var $lehre;			// @var boolean
-	var $updateamum;		// @var timestamp
-	var $updatevon=0;		// @var string
-	var $insertamum;		// @var timestamp
-	var $insertvon=0;		// @var string
-	
+
 	
 	/**
 	 * Konstruktor
@@ -85,11 +80,6 @@ class ort
 			$ort_obj->lageplan 			= $row->lageplan;
 			$ort_obj->dislozierung 		= $row->dislozierung;
 			$ort_obj->kosten 			= $row->kosten;
-			$ort_obj->lehre 			= $row->lehre;
-			$ort_obj->insertamum 		= $row->insertamum;
-			$ort_obj->insertvon 			= $row->insertvon;
-			$ort_obj->updateamum 		= $row->updateamum;
-			$ort_obj->updatevon     		= $row->updatevon;
 			
 			$this->result[] = $ort_obj;
 		}
@@ -127,11 +117,6 @@ class ort
 			$this->lageplan 		= $row->lageplan;
 			$this->dislozierung 		= $row->dislozierung;
 			$this->kosten 		= $row->kosten;
-			$this->lehre 			= $row->lehre;
-			$this->insertamum 		= $row->insertamum;
-			$this->insertvon 		= $row->insertvon;
-			$this->updateamum 		= $row->updateamum;
-			$this->updatevon     		= $row->updatevon;
 		}
 		else 
 		{
@@ -206,7 +191,7 @@ class ort
 			}
 			//Neuen Datensatz anlegen		
 			$qry = 'INSERT INTO tbl_ort (ort_kurzbz, bezeichnung, planbezeichnung, max_person, aktiv, lageplan, 
-				dislozierung, kosten, lehre, insertamum, insertvon, updateamum, updatevon) VALUES ('.
+				dislozierung, kosten) VALUES ('.
 				$this->addslashes($this->ort_kurzbz).', '.
 				$this->addslashes($this->bezeichnung).', '.
 				$this->addslashes($this->planbezeichnung).', '.
@@ -214,13 +199,7 @@ class ort
 				($this->aktiv?'true':'false').', '. 
 				$this->addslashes($this->lageplan).', '.
 				$this->addslashes($this->dislozierung).', '.
-				$this->addslashes($this->kosten).', '.
-				($this->lehre?'true':'false').', '. 
-				$this->addslashes($this->insertamum).', '.
-				$this->addslashes($this->insertvon).', '.
-				$this->addslashes($this->updateamum).', '.
-				$this->addslashes($this->updatevon).');';
-
+				$this->addslashes($this->kosten).');';
 		}
 		else 
 		{
@@ -240,12 +219,7 @@ class ort
 				'aktiv='.($this->aktiv?'true':'false') .', '.
 				'lageplan='.$this->addslashes($this->lageplan).', '.
 				'dislozierung='.$this->addslashes($this->dislozierung).', '.
-				'kosten='.$this->addslashes($this->kosten).', '.
-				'lehre='.($this->lehre?'true':'false') .', '.
-				'insertamum='.$this->addslashes($this->insertamum).', '.
-				'insertvon='.$this->addslashes($this->insertvon).', '.
-				'updateamum='.$this->addslashes($this->updateamum).', '.
-				'updatevon='.$this->addslashes($this->updatevon).' '.
+				'kosten='.$this->addslashes($this->kosten).' '.
 				'WHERE ort_kurzbz = '.$this->addslashes($this->ort_kurzbz).';';
 		}
 		
