@@ -20,29 +20,31 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-class zeitwunsch
+class lehreinheitmitarbeiter
 {
 	var $conn;     // resource DB-Handle
 	var $errormsg; // string
 	var $new;      // boolean
-	var $zeitwuensche = array(); // zeitwunsch Objekt
+	var $lehreinheitmitarbeiter = array(); // lehreinheitmitarbeiter Objekt
 	
 	//Tabellenspalten
-	var $stunde;	// smalint
-	var $uid;		// varchar(16)
-	var $tag;		// smalint
-	var $gewicht;	// smalint
+	var $lehreinheit_id;	// integer
+	var $uid;				// varchar(16)
+	var $semesterstunden;	// smalint
+	var $planstunden;		// smalint
+	var $stundensatz;		// numeric(6,2)
+	var $faktor;			// numeric(2,1)
+	var $anmerkung;			// varchar(256)	
 	
 	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
+	// * Konstruktor - Uebergibt die Connection und laedt optional eine LE
 	// * @param $conn        	Datenbank-Connection
-	// *        $uid			Uid des Mitarbeiters
-	// *        $tag            Tag des Zeitwunsches
-	// *        $stunde         Stunde des Zeitwunsches
+	// *        $lehreinheit_id
+	// *		$uid
 	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
-	function zeitwunsch($conn, $uid=null, $tag=null, $stunde=null, $unicode=false)
+	function lehreinheitmitarbeiter($conn, $lehreinheit_id=null, $uid=null, $unicode=false)
 	{
 		$this->conn = $conn;
 		
@@ -57,17 +59,17 @@ class zeitwunsch
 			return false;
 		}
 		
-		if($uid != null && $tag!=null && $stunde!=null)
-			$this->load($uid, $tag, $stunde);
+		if($lehreinheit_id!=null && $uid!=null)
+			$this->load($lehreinheit_id, $uid);
 	}
 	
 	// *********************************************************
-	// * Laedt einen Zeitwunsch
-	// * @param 
+	// * Laedt die LEMitarbeiter
+	// * @param lehreinheit_id
 	// *********************************************************
-	function load($uid, $tag, $stunde)
+	function load($lehreinheit_id, $uid)
 	{
-		return true;
+		return false;
 	}
 	
 	// *******************************************
@@ -77,32 +79,6 @@ class zeitwunsch
 	// *******************************************
 	function validate()
 	{
-		if(strlen($this->uid)>16)
-		{
-			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein.';
-			return false;
-		}
-		if($this->uid == '')
-		{
-			$this->errormsg = 'UID muss angegeben werden';
-			return false;
-		}
-		if(!is_numeric($this->stunde))
-		{
-			$this->errormsg = 'Stunde muss eine gueltige Zahl sein';
-			return false;
-		}
-		if(!is_numeric($this->gewicht))
-		{
-			$this->errormsg = 'Gewicht muss eine gueltige Zahl sein';
-			return false;
-		}
-		if(!is_numeric($this->tag))
-		{
-			$this->errormsg = 'Tag muss eine gueltige Zahl sein';
-			return false;
-		}			
-
 		return true;
 	}
 
@@ -118,29 +94,43 @@ class zeitwunsch
 	}
 
 	// ************************************************************
-	// * Speichert einen Zeitwunsch in die Datenbank
+	// * Speichert LEMitarbeiter in die Datenbank
 	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz mit $lehrfach_nr upgedated
+	// * angelegt, ansonsten der Datensatz upgedated
 	// * @return true wenn erfolgreich, false im Fehlerfall
 	// ************************************************************
-	function save()
+	function save($new=null)
 	{
+		if(is_null($new))
+			$new = $this->new;
+					
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
 			return false;
 
-		if($this->new)
+		if($new)
 		{
-			$qry = "INSERT INTO campus.tbl_zeitwunsch (uid, tag, stunde, gewicht)
-			        VALUES('".addslashes($this->uid)."',".
-					$this->tag.','.$this->stunde.','.$this->gewicht.');';
+			//ToDo ID entfernen
+			$qry = 'INSERT INTO lehre.tbl_lehreinheitmitarbeiter (lehreinheit_id, uid, semesterstunden, planstunden, 
+			                                                stundensatz, faktor, anmerkung)
+			        VALUES('.$this->addslashes($this->lehreinheit_id).','.
+					$this->addslashes($this->uid).','.
+					$this->addslashes($this->semesterstunden).','.
+					$this->addslashes($this->planstunden).','.
+					$this->addslashes($this->stundensatz).','.
+					$this->addslashes($this->faktor).','.
+					$this->addslashes($this->anmerkung).');';
 		}
 		else
 		{
-			$qry = 'UPDATE campus.tbl_zeitwunsch SET'.
-			       ' gewicht='.$this->gewicht.
-			       " WHERE uid='".addslashes($this->uid)."' AND 
-			         tag=".$this->tag.' AND stunde='.$this->stunde;
+			$qry = 'UPDATE lehre.tbl_lehreinheitmitarbeiter SET'.
+			       ' semesterstunden='.$this->addslashes($this->semesterstunden).','.
+			       ' planstunden='.$this->addslashes($this->planstunden).','.
+			       ' stundensatz='.$this->addslashes($this->stundensatz).','.
+			       ' faktor='.$this->addslashes($this->faktor).','.
+			       ' anmerkung='.$this->addslashes($this->anmerkung).','.
+			       " WHERE lehreinheit_id=".$this->addslashes($this->lehreinheit_id)." AND
+			               uid=".$this->lehreinheit_id.";";
 		}
 
 		if(pg_query($this->conn,$qry))
@@ -150,7 +140,7 @@ class zeitwunsch
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern des Zeitwunsches:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern der LEMitarbeiter:'.$qry;
 			return false;
 		}
 	}

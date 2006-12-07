@@ -20,28 +20,27 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-class personlvstudiensemester
+class lehrverband
 {
 	var $conn;     // resource DB-Handle
 	var $errormsg; // string
 	var $new;      // boolean
-	var $personlvstudiensemester = array(); // personlvstudiensemester Objekt
+	var $lehrverbaende = array(); // lehrverband Objekt
 	
 	//Tabellenspalten
-	var $uid;						// varchar(16)
-	var $studiensemester_kurzbz;	// varchar(16)
-	var $lehrveranstaltung_nr;		// integer
+	var $studiengang_kz;	// integer
+	var $semester;			// integer
+	var $verband;			// integer
+	var $gruppe;			// integer	
 	
 	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Zuteilung
+	// * Konstruktor - Uebergibt die Connection und laedt optional einen Lehrverband
 	// * @param $conn        	Datenbank-Connection
-	// *        $uid
-	// * 		$studiensemester_kurzbz
-	// *		$lehrveranstaltung_nr
+	// *        
 	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
-	function personlvstudiensemester($conn, $uid=null, $studiensemester_kurzbz=null, $lehrveranstaltung_nr=null, $unicode=false)
+	function lehrverband($conn, $unicode=false)
 	{
 		$this->conn = $conn;
 		
@@ -49,27 +48,38 @@ class personlvstudiensemester
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else 
 			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
+		
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
+		}		
+	}
+		
+	function exists($studiengang_kz, $semester, $verband, $gruppe)
+	{
+		$qry = "SELECT count(*) as anzahl FROM tbl_lehrverband WHERE 
+		            studiengang_kz='".addslashes($studiengang_kz)."' AND
+		            semester='".addslashes($semester)."' AND
+		            verband='".addslashes($verband)."' AND
+		            gruppe='".addslashes($gruppe)."'";
+		
+		if($row=pg_fetch_object(pg_query($this->conn, $qry)))
+		{
+			if($row->anzahl>0)
+			{
+				return true;
+			}
+			else 
+			{
+				return false;
+			}
 		}
 		else 
-			$this->new = true;
-		
-		if($uid!=null && $studiensemester_kurzbz!=null && $lehrveranstaltung_nr!=null)
-			$this->load($uid, $studiensemester_kurzbz, $lehrveranstaltung_nr);
-	}
-	
-	// *********************************************************
-	// * Laedt eine Zuteilung
-	// * @param $uid, $studiensemester_kurzbz, $lehrveranstaltung_nr
-	// *********************************************************
-	function load($uid, $studiensemester_kurzbz, $lehrveranstaltung_nr)
-	{
-		$this->errormsg = 'Not implemented';
-		return false;
+		{
+			$this->errormsg = 'Fehler bei Abfrage: '.$qry;
+			return false;
+		}
 	}
 	
 	// *******************************************
@@ -79,20 +89,23 @@ class personlvstudiensemester
 	// *******************************************
 	function validate()
 	{
-		if(strlen($this->uid)>16)
+		if(!is_numeric($this->semester))
 		{
-			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg = 'Semester muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(strlen($this->studiensemester_kurzbz)>16)
+		if(!is_numeric($this->studiengang_kz))
 		{
-			$this->errormsg = 'Studiensemester_kurzbz darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg = 'Studiengang muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(!is_numeric($this->lehrveranstaltung_nr))
+		if($this->verband=='')
 		{
-			$this->errormsg = 'Lehrveranstaltungsnummer muss eine gueltige Zahl sein';
-			return false;
+			$this->verband=' ';
+		}
+		if($this->gruppe=='')
+		{
+			$this->gruppe=' ';
 		}
 		return true;
 	}
@@ -109,42 +122,31 @@ class personlvstudiensemester
 	}
 
 	// ************************************************************
-	// * Speichert Zuteilung in die Datenbank
+	// * Speichert Lehrverband in die Datenbank
 	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
 	// * angelegt, ansonsten der Datensatz upgedated
 	// * @return true wenn erfolgreich, false im Fehlerfall
 	// ************************************************************
-	function save($new=null)
+	function save()
 	{
-		if(!is_null($new))
-			$this->new = $new;
-
+					
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
 			return false;
-
-		if($this->new)
-		{			
-			$qry = 'INSERT INTO tbl_personlvstudiensemester (uid, studiensemester_kurzbz, lehrveranstaltung_nr)
-			        VALUES('.$this->addslashes($this->uid).','.
-					$this->addslashes($this->studiensemester_kurzbz).','.
-					$this->addslashes($this->lehrveranstaltung_nr).');';
-		}
-		else
-		{
-			// ToDo
-			$qry = 'Select 1;';
-		}
-
+		
+		$qry = 'INSERT INTO tbl_lehrverband (studiengang_kz, semester, verband, gruppe)
+		        VALUES('.$this->addslashes($this->studiengang_kz).','.
+				$this->addslashes($this->semester).','.
+				$this->addslashes($this->verband).','.
+				$this->addslashes($this->gruppe).');';
 		if(pg_query($this->conn,$qry))
 		{
 			//Log schreiben
-			$this->new = false;
 			return true;
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der PersonLVStudiensemester:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern des Lehrverbands:'.$qry;
 			return false;
 		}
 	}

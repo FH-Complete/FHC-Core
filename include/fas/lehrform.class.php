@@ -64,7 +64,7 @@ class lehrform
 	// *********************************************************
 	function load($lehrform_kurzbz)
 	{		
-		$qry = "SELECT * FROM tbl_lehrform WHERE lehrform_kurzbz='".addslashes($lehrfach_nr)."'";
+		$qry = "SELECT * FROM lehre.tbl_lehrform WHERE lehrform_kurzbz='".addslashes($lehrfach_nr)."'";
 		if(!$result=pg_query($this->conn,$qry))
 		{
 			$this->errormsg = 'Fehler beim lesen der Lehrform';
@@ -138,14 +138,14 @@ class lehrform
 
 		if($this->new)
 		{
-			$qry = "INSERT INTO tbl_lehrform (lehrform_kurzbz, bezeichnung, verplanen)
+			$qry = "INSERT INTO lehre.tbl_lehrform (lehrform_kurzbz, bezeichnung, verplanen)
 			        VALUES('".addslashes($this->lehrform_kurzbz)."',".
 					$this->addslashes($this->bezeichnung).','.
 					($this->verplanen?'true':'false').');';
 		}
 		else
 		{
-			$qry = 'UPDATE tbl_lehrform SET'.
+			$qry = 'UPDATE lehre.tbl_lehrform SET'.
 			       ' bezeichnung='.$this->addslashes($this->bezeichnung).','.
 			       ' verplanen='.($this->verplanen?'true':'false').
 			       " WHERE lehrform_kurzbz='$this->lehrform_kurzbz'";

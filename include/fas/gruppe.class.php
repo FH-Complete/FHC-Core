@@ -28,13 +28,13 @@ class gruppe
 	var $gruppen = array(); // gruppen Objekt
 	
 	//Tabellenspalten
-	var $gruppe_kurzbz;			// varchar(10)
+	var $gruppe_kurzbz;			// varchar(16)
 	var $studiengang_kz;		// integer
-	var $bezeichnung;			// varchar(64)
+	var $bezeichnung;			// varchar(32)
 	var $semester;				// smallint
-	var $typ;					// smallint
-	var $mailgrp_kurzbz;		// varchar(16)
-	var $mailgrp_beschreibung;	// varchar(64)
+	var $sort;					// smallint
+	var $mailgrp;				// boolean
+	var $beschreibung;			// varchar(128)
 	var $sichtbar;				// boolean
 	var $aktiv;					// boolean
 	var $updateamum;			// timestamp
@@ -68,6 +68,29 @@ class gruppe
 			$this->load($gruppe_kurzbz);
 	}
 	
+	// ****************************************
+	// * Prueft ob bereits eine Gruppe mit der
+	// * uebergebenen Kurzbezeichnung existiert
+	// * @param gruppe_kurzbz
+	// ****************************************
+	function exists($gruppe_kurzbz)
+	{
+		$qry = "SELECT count(*) as anzahl FROM tbl_gruppe WHERE gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
+		
+		if($row = pg_fetch_object(pg_query($this->conn,$qry)))
+		{
+			if($row->anzahl>0)
+				return true;
+			else 
+				return false;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler bei einer Abfrage: '.$qry;
+			return false;
+		}
+	}
+	
 	// *********************************************************
 	// * Laedt die Gruppe
 	// * @param gruppe_kurzbz
@@ -84,9 +107,9 @@ class gruppe
 	// *******************************************
 	function validate()
 	{
-		if(strlen($this->gruppe_kurzbz)>10)
+		if(strlen($this->gruppe_kurzbz)>16)
 		{
-			$this->errormsg = 'Gruppe_kurzbz darf nicht laenger als 10 Zeichen sein';
+			$this->errormsg = 'Gruppe_kurzbz darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
 		if($this->gruppe_kurzbz=='')
@@ -99,9 +122,9 @@ class gruppe
 			$this->errormsg = 'Studiengang_kz muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(strlen($this->bezeichnung)>64)
+		if(strlen($this->bezeichnung)>32)
 		{
-			$this->errormsg = 'Bezeichnung darf nicht laenger als 64 Zeichen sein';
+			$this->errormsg = 'Bezeichnung darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
 		if($this->semester!='' && !is_numeric($this->semester))
@@ -109,19 +132,19 @@ class gruppe
 			$this->errormsg = 'Semester muss eine gueltige Zahl sein';
 			return false;
 		}
-		if($this->typ!='' && !is_numeric($this->typ))
+		if($this->sort!='' && !is_numeric($this->sort))
 		{
 			$this->errormsg = 'Typ muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(strlen($this->mailgrp_kurzbz)>16)
+		if(!is_bool($this->mailgrp))
 		{
-			$this->errormsg = 'Mailgrp_kurzbz darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg = 'Mailgrp muss ein boolscher wert sein';
 			return false;
 		}
-		if(strlen($this->mailgrp_beschreibung)>64)
+		if(strlen($this->beschreibung)>128)
 		{
-			$this->errormsg = 'Mailgrp_beschreibung darf nicht laenger als 64 Zeichen sein';
+			$this->errormsg = 'Beschreibung darf nicht laenger als 128 Zeichen sein';
 			return false;
 		}
 		if(!is_bool($this->sichtbar))
@@ -176,16 +199,16 @@ class gruppe
 
 		if($new)
 		{		
-			$qry = 'INSERT INTO tbl_gruppe (gruppe_kurzbz, studiengang_kz, bezeichnung, semester, typ, 
-			                                mailgrp_kurzbz, mailgrp_beschreibung, sichtbar, aktiv, 
+			$qry = 'INSERT INTO tbl_gruppe (gruppe_kurzbz, studiengang_kz, bezeichnung, semester, sort, 
+			                                mailgrp, beschreibung, sichtbar, aktiv, 
 			                                updateamum, updatevon, insertamum, insertvon)
 			        VALUES('.$this->addslashes($this->gruppe_kurzbz).','.
 					$this->addslashes($this->studiengang_kz).','.
 					$this->addslashes($this->bezeichnung).','.
 					$this->addslashes($this->semester).','.
-					$this->addslashes($this->typ).','.
-					$this->addslashes($this->mailgrp_kurzbz).','.
-					$this->addslashes($this->mailgrp_beschreibung).','.
+					$this->addslashes($this->sort).','.
+					($this->mailgrp?'true':'false').','.
+					$this->addslashes($this->beschreibung).','.
 					($this->sichtbar?'true':'false').','.
 					($this->aktiv?'true':'false').','.
 					$this->addslashes($this->updateamum).','.
@@ -199,9 +222,9 @@ class gruppe
 			       ' studiengang_kz='.$this->addslashes($this->studiengang_kz).','.
 			       ' bezeichnung='.$this->addslashes($this->bezeichnung).','.
 			       ' semester='.$this->addslashes($this->semester).','.
-			       ' typ='.$this->addslashes($this->typ).','.
-			       ' mailgrp_kurzbz='.$this->addslashes($this->mailgrp_kurzbz).','.
-			       ' mailgrp_beschreibung='.$this->addslashes($this->mailgrp_beschreibung).','.
+			       ' sort='.$this->addslashes($this->sort).','.
+			       ' mailgrp='.($this->mailgrp?'true':'false').','.
+			       ' beschreibung='.$this->addslashes($this->beschreibung).','.
 			       ' sichtbar='.($this->sichtbar?'true':'false').','.
 			       ' aktiv='.($this->aktiv?'true':'false').','.
 			       ' updateamum='.$this->addslashes($this->updateamum).','.

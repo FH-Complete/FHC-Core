@@ -168,7 +168,7 @@ class reservierung
 
 		if($this->new)
 		{			
-			$qry = 'INSERT INTO tbl_reservierung (reservierung_id, ort_kurzbz, studiengang_kz, uid, stunde, datum, titel, 
+			$qry = 'INSERT INTO campus.tbl_reservierung (reservierung_id, ort_kurzbz, studiengang_kz, uid, stunde, datum, titel, 
 			                                      beschreibung, semester, verband, gruppe, gruppe_kurzbz)
 			        VALUES('.$this->addslashes($this->reservierung_id).','.
 					$this->addslashes($this->ort_kurzbz).','.
@@ -185,7 +185,7 @@ class reservierung
 		}
 		else
 		{
-			$qry = 'UPDATE tbl_reservierung SET'.
+			$qry = 'UPDATE campus.tbl_reservierung SET'.
 			       ' ort_kurzbz='.$this->addslashes($this->ort_kurzbz).','.
 			       ' studiengang_kz='.$this->addslashes($this->studiengang_kz).','.
 			       ' uid='.$this->addslashes($this->uid).','.

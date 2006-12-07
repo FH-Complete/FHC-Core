@@ -20,29 +20,30 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-class zeitwunsch
+class lehreinheitgruppe
 {
 	var $conn;     // resource DB-Handle
 	var $errormsg; // string
 	var $new;      // boolean
-	var $zeitwuensche = array(); // zeitwunsch Objekt
+	var $lehreinheitgruppe = array(); // lehreinheitgruppe Objekt
 	
 	//Tabellenspalten
-	var $stunde;	// smalint
-	var $uid;		// varchar(16)
-	var $tag;		// smalint
-	var $gewicht;	// smalint
+	var $lehreinheitgruppe_id;	//integer
+	var $lehreinheit_id;		// integer
+	var $studiengang_kz;		// integer
+	var $semester;				// smalint
+	var $verband;				// char(1)
+	var $gruppe;				// char(1)
+	var $gruppe_kurzbz;			// varchar(16)
 	
 	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
+	// * Konstruktor - Uebergibt die Connection und laedt optional eine LE
 	// * @param $conn        	Datenbank-Connection
-	// *        $uid			Uid des Mitarbeiters
-	// *        $tag            Tag des Zeitwunsches
-	// *        $stunde         Stunde des Zeitwunsches
+	// *        $gruppelehreinheit_id
 	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
-	function zeitwunsch($conn, $uid=null, $tag=null, $stunde=null, $unicode=false)
+	function lehreinheitgruppe($conn, $lehreinheitgruppe_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
 		
@@ -50,24 +51,24 @@ class zeitwunsch
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else 
 			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
+		
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
 		
-		if($uid != null && $tag!=null && $stunde!=null)
-			$this->load($uid, $tag, $stunde);
+		if($lehreinheitgruppe_id!=null)
+			$this->load($lehreinheitgruppe_id);
 	}
 	
 	// *********************************************************
-	// * Laedt einen Zeitwunsch
-	// * @param 
+	// * Laedt die LEGruppe
+	// * @param lehreinheit_id
 	// *********************************************************
-	function load($uid, $tag, $stunde)
+	function load($lehreinheitgruppe_id)
 	{
-		return true;
+		return false;
 	}
 	
 	// *******************************************
@@ -77,32 +78,36 @@ class zeitwunsch
 	// *******************************************
 	function validate()
 	{
-		if(strlen($this->uid)>16)
+		if(!is_numeric($this->lehreinheit_id))
 		{
-			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein.';
+			$this->errormsg = 'Lehreinheit_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		if($this->uid == '')
+		if(!is_numeric($this->studiengang_kz))
 		{
-			$this->errormsg = 'UID muss angegeben werden';
+			$this->errormsg = 'Studiengang_kz muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(!is_numeric($this->stunde))
+		if($this->semester!='' && !is_numeric($this->semester))
 		{
-			$this->errormsg = 'Stunde muss eine gueltige Zahl sein';
+			$this->errormsg = 'Semester muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(!is_numeric($this->gewicht))
+		if(strlen($this->verband)>1)
 		{
-			$this->errormsg = 'Gewicht muss eine gueltige Zahl sein';
+			$this->verband = 'Verband darf nicht laenger als 1 Zeichen sein';
 			return false;
 		}
-		if(!is_numeric($this->tag))
+		if(strlen($this->gruppe)>1)
 		{
-			$this->errormsg = 'Tag muss eine gueltige Zahl sein';
+			$this->gruppe = 'Gruppe darf nicht laenger als 1 Zeichen sein';
 			return false;
-		}			
-
+		}
+		if(strlen($this->gruppe_kurzbz)>16)
+		{
+			$this->errormsg = 'Gruppe_kurzbz darf nicht laenger als 16 Zeichen sein';
+			return false;
+		}
 		return true;
 	}
 
@@ -118,29 +123,41 @@ class zeitwunsch
 	}
 
 	// ************************************************************
-	// * Speichert einen Zeitwunsch in die Datenbank
+	// * Speichert GruppeLE in die Datenbank
 	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz mit $lehrfach_nr upgedated
+	// * angelegt, ansonsten der Datensatz upgedated
 	// * @return true wenn erfolgreich, false im Fehlerfall
 	// ************************************************************
-	function save()
+	function save($new=null)
 	{
+		if(is_null($new))
+			$new = $this->new;
+					
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
 			return false;
 
-		if($this->new)
+		if($new)
 		{
-			$qry = "INSERT INTO campus.tbl_zeitwunsch (uid, tag, stunde, gewicht)
-			        VALUES('".addslashes($this->uid)."',".
-					$this->tag.','.$this->stunde.','.$this->gewicht.');';
+			//ToDo ID entfernen
+			$qry = 'INSERT INTO lehre.tbl_lehreinheitgruppe (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz)
+			        VALUES('.$this->addslashes($this->lehreinheit_id).','.
+					$this->addslashes($this->studiengang_kz).','.
+					$this->addslashes($this->semester).','.
+					$this->addslashes($this->verband).','.
+					$this->addslashes($this->gruppe).','.
+					$this->addslashes($this->gruppe_kurzbz).');';
 		}
 		else
 		{
-			$qry = 'UPDATE campus.tbl_zeitwunsch SET'.
-			       ' gewicht='.$this->gewicht.
-			       " WHERE uid='".addslashes($this->uid)."' AND 
-			         tag=".$this->tag.' AND stunde='.$this->stunde;
+			$qry = 'UPDATE lehre.tbl_lehreinheitgruppe SET'.
+			       ' lehreinheit_id='.$this->addslashes($this->lehreinheit_id).','.
+			       ' studiengang_kz='.$this->addslashes($this->studiengang_kz).','.
+			       ' semester='.$this->addslashes($this->semester).','.
+			       ' verband='.$this->addslashes($this->verband).','.
+			       ' gruppe='.$this->addslashes($this->gruppe).','.
+			       ' gruppe_kurzbz='.$this->addslashes($this->gruppe_kurzbz).','.
+			       " WHERE lehreinheitgruppe_id=".$this->addslashes($this->lehreinheitgruppe_id).";";
 		}
 
 		if(pg_query($this->conn,$qry))
@@ -150,7 +167,7 @@ class zeitwunsch
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern des Zeitwunsches:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern der GruppeLE:'.$qry;
 			return false;
 		}
 	}

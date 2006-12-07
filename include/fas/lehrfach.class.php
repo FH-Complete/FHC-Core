@@ -28,9 +28,9 @@ class lehrfach
 	var $lehrfaecher = array(); // lehrfach Objekt
 	
 	//Tabellenspalten
-	var $lehrfach_nr;		// integer
+	var $lehrfach_id;		// integer
 	var $studiengang_kz;	// integer
-	var $fachbereich_id;	// integer
+	var $fachbereich_kurzbz;// integer
 	var $kurzbz;			// varchar(12)
 	var $bezeichnung;		// varchar(255)
 	var $farbe;				// char(6)
@@ -45,7 +45,7 @@ class lehrfach
 	// *        $unicode     Gibt an ob die Daten mit UNICODE Codierung 
 	// *                     oder LATIN9 Codierung verarbeitet werden sollen
 	// ***********************************************************************
-	function lehrfach($conn, $lehrfach_nr=null, $unicode=false)
+	function lehrfach($conn, $lehrfach_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
 		
@@ -60,20 +60,20 @@ class lehrfach
 			return false;
 		}
 		
-		if($lehrfach_nr != null)
-			$this->load($lehrfach_nr);
+		if($lehrfach_id != null)
+			$this->load($lehrfach_id);
 	}
 	
 	// *********************************************************
 	// * Laedt Lehrfach mit der uebergebenen ID
 	// * @param $lehrfach_nr Nr des LF das geladen werden soll
 	// *********************************************************
-	function load($lehrfach_nr)
+	function load($lehrfach_id)
 	{
 		//lehrfach_nr auf Gueltigkeit pruefen
-		if(is_numeric($lehrfach_nr) && $lehrfach_nr!='')
+		if(is_numeric($lehrfach_id) && $lehrfach_id!='')
 		{
-			$qry = "SELECT * FROM tbl_lehrfach WHERE lehrfach_nr='$lehrfach_nr'";
+			$qry = "SELECT * FROM lehre.tbl_lehrfach WHERE lehrfach_id='$lehrfach_id'";
 			
 			if(!$result=pg_query($this->conn,$qry))
 			{
@@ -83,9 +83,9 @@ class lehrfach
 			
 			if($row = pg_fetch_object($result))
 			{
-				$this->lehrfach_nr = $row->lehrfach_nr;
+				$this->lehrfach_id = $row->lehrfach_id;
 				$this->studiengang_kz = $row->studiengang_kz;
-				$this->fachbereich_id = $row->fachbereich_id;
+				$this->fachbereich_kurzbz = $row->fachbereich_kurzbz;
 				$this->kurzbz = $row->kurzbz;
 				$this->bezeichnung = $row->bezeichnung;
 				$this->farbe = $row->farbe;
@@ -95,7 +95,7 @@ class lehrfach
 			}
 			else
 			{
-				$this->errormsg = 'Es ist kein Lehrfach mit der Nr '.$lehrfach_nr.' vorhanden';
+				$this->errormsg = 'Es ist kein Lehrfach mit der ID '.$lehrfach_id.' vorhanden';
 				return false;
 			}
 			
@@ -120,9 +120,9 @@ class lehrfach
 			$this->errormsg = 'Studiengang_kz muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(!is_numeric($this->fachbereich_id))
+		if(strlen($this->fachbereich_kurzbz)>16)
 		{
-			$this->errormsg = 'Fachbereich_id muss eine gueltige Zahl sein';
+			$this->errormsg = 'Fachbereich_kurzbz darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->kurzbz)>12)
@@ -184,11 +184,11 @@ class lehrfach
 
 		if($this->new)
 		{
-			$qry = 'INSERT INTO tbl_lehrfach (lehrfach_nr, studiengang_kz, fachbereich_id, kurzbz, 
+			$qry = 'INSERT INTO lehre.tbl_lehrfach (lehrfach_id, studiengang_kz, fachbereich_kurzbz, kurzbz, 
 			                                  bezeichnung, farbe, aktiv, semester, sprache)
-			        VALUES('.$this->addslashes($this->lehrfach_nr).','.
+			        VALUES('.$this->addslashes($this->lehrfach_id).','.
 					$this->addslashes($this->studiengang_kz).','.
-					$this->addslashes($this->fachbereich_id).','.
+					$this->addslashes($this->fachbereich_kurzbz).','.
 					$this->addslashes($this->kurzbz).','.
 					$this->addslashes($this->bezeichnung).','.
 					$this->addslashes($this->farbe).','.
@@ -205,16 +205,16 @@ class lehrfach
 				return false;
 			}
 
-			$qry = 'UPDATE tbl_lehrfach SET'.
+			$qry = 'UPDATE lehre.tbl_lehrfach SET'.
 			       ' studiengang_kz='.$this->addslashes($this->studiengang_kz).','.
-			       ' fachbereich_id='.$this->addslashes($this->fachbereich_id).','.
+			       ' fachbereich_kurzbz='.$this->addslashes($this->fachbereich_kurzbz).','.
 			       ' kurzbz='.$this->addslashes($this->kurzbz).','.
 			       ' bezeichnung='.$this->addslashes($this->bezeichnung).','.
 			       ' farbe='.$this->addslashes($this->farbe).','.
 			       ' aktiv='.($this->aktiv?'true':'false').','.
 			       ' semester='.$this->semester.','.
 			       ' sprache='.$this->addslashes($this->sprache).
-			       " WHERE lehrfach_nr='$this->lehrfach_nr'";
+			       " WHERE lehrfach_id='$this->lehrfach_id'";
 		}
 
 		if(pg_query($this->conn,$qry))

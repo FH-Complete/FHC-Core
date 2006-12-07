@@ -53,7 +53,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		$stunde->beginn = $row->beginn;
 		$stunde->ende = $row->ende;
 		
-		$qry = "SELECT count(*) as anz FROM tbl_stunde WHERE stunde='$row->stunde'";
+		$qry = "SELECT count(*) as anz FROM lehre.tbl_stunde WHERE stunde='$row->stunde'";
 		if($row1 = pg_fetch_object(pg_query($conn, $qry)))
 		{		
 			$stunde->new = ($row1->anz>0?false:true);

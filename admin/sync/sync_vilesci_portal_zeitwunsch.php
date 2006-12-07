@@ -51,7 +51,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		$zw->tag = $row->tag;
 		$zw->gewicht = $row->gewicht;
 		
-		$qry ="SELECT count(*) as anz FROM tbl_zeitwunsch where uid='".addslashes($row->uid)."' AND stunde='".addslashes($row->stunde)."' AND tag='".addslashes($row->tag)."';";
+		$qry ="SELECT count(*) as anz FROM campus.tbl_zeitwunsch where uid='".addslashes($row->uid)."' AND stunde='".addslashes($row->stunde)."' AND tag='".addslashes($row->tag)."';";
 		if($row = pg_fetch_object(pg_query($conn, $qry)))
 		{
 			$zw->new = ($row->anz>0?false:true);

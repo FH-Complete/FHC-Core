@@ -20,11 +20,11 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 /**
- * Synchronisiert Feedback von Vilesci DB in PORTAL DB
+ * Synchronisiert tbl_personlvstudiensemester von Vilesci DB in PORTAL DB
  *
  */
 require_once('../../vilesci/config.inc.php');
-require_once('../../include/fas/feedback.class.php');
+require_once('../../include/fas/benutzerlvstudiensemester.class.php');
 
 $conn=pg_connect(CONN_STRING) or die('Connection zur Portal Datenbank fehlgeschlagen');
 $conn_vilesci=pg_connect(CONN_STRING_VILESCI) or die('Connection zur Vilesci Datenbank fehlgeschlagen');
@@ -38,58 +38,59 @@ $anzahl_fehler=0;
 // * VILESCI->PORTAL - Synchronisation
 // ***********************************
 
-//Mitarbeiter
-$qry = 'Select * FROM tbl_feedback';
+$qry = 'SELECT * FROM tbl_personlehrfachstudiensemester';
 
 if($result = pg_query($conn_vilesci, $qry))
 {
-	$text.="\n Sync Feedback\n\n";
+	$text.="\n Sync Benutzerlvstudiensemester\n\n";
 	while($row = pg_fetch_object($result))
 	{
-		$qry = "SELECT lehrveranstaltung_id FROM lehre.tbl_lehrveranstaltung WHERE ext_id='$row->lehrfach_nr'";
+		$obj = new benutzerlvstudiensemester($conn);
+		$obj->uid = $row->uid;
+		$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+		$qry = "SELECT lehrveranstaltung_id FROM lehre.tbl_lehrveranstaltung WHERE ext_id=$row->lehrfach_nr";
 		if($row1 = pg_fetch_object(pg_query($conn,$qry)))
 		{
-			$error=false;
-			$feedback = new feedback($conn);
-			$feedback->feedback_id = $row->feedback_id;
-			$feedback->betreff = $row->betreff;
-			$feedback->text = $row->text;
-			$feedback->datum = $row->datum;
-			$feedback->uid = $row->uid;
-			$feedback->lehrveranstaltung_id = $row1->lehrveranstaltung_id;
+			$obj->lehrveranstaltung_id = $row1->lehrveranstaltung_id;
+
+			$qry = "SELECT count(*) as anz FROM campus.tbl_benutzerlvstudiensemester WHERE 
+		        	uid='".addslashes($row->uid)."' AND studiensemester_kurzbz='".addslashes($row->studiensemester_kurzbz)."'
+		        	AND lehrveranstaltung_id='".addslashes($row1->lehrveranstaltung_id)."';";
+		
+			if($row1=pg_fetch_object(pg_query($conn,$qry)))
+			{
+				$new = ($row1->anz>0?false:true);
 			
-			$qry = "SELECT count(*) as anz FROM campus.tbl_feedback WHERE feedback_id='$row->feedback_id'";
-			if($row1 = pg_fetch_object(pg_query($conn, $qry)))
-			{		
-				$feedback->new = ($row1->anz>0?false:true);
-				
-				if(!$feedback->save())
-				{
-					$error_log.=$feedback->errormsg."\n";
+				if(!$obj->save($new))
+				{				
 					$anzahl_fehler++;
+					$error_log .= $obj->errormsg."\n";
 				}
 				else 
 					$anzahl_eingefuegt++;
 			}
 			else 
-				$error_log .= "Fehler beim ermitteln der UID\n";
+			{
+				$error_log.='Fehler beim Auslesen';
+				$anzahl_fehler++;
+			}
 		}
 		else 
 		{
+			$error_log .= 'Fehler beim auslesen der Lehrveranstaltung_nr\n';
 			$anzahl_fehler++;
-			$error_log .= 'Lehrveranstaltung konnte nicht ermittelt werden mit LFnr:'.$row->lehrfach_nr;
-		}			
+		}
 	}
 }
 else
-	$error_log .= "Feedback konnte nicht geladen werden\n";
+	$error_log .= "PersonLVStudiensemester konnten nicht geladen werden\n";
 $text.="Anzahl aktualisierte Datensaetze: $anzahl_eingefuegt\n";
 $text.="Anzahl der Fehler: $anzahl_fehler\n";
 ?>
 
 <html>
 <head>
-<title>Synchro - Vilesci -> Portal - Feedback</title>
+<title>Synchro - Vilesci -> Portal - BenutzerLVStudiensemester</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
 <body>

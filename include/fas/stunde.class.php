@@ -107,14 +107,14 @@ class stunde
 
 		if($this->new)
 		{
-			$qry = "INSERT INTO tbl_stunde (stunde, beginn, ende)
+			$qry = "INSERT INTO lehre.tbl_stunde (stunde, beginn, ende)
 			        VALUES('".$this->stunde."',".
 					$this->addslashes($this->beginn).','.
 					$this->addslashes($this->ende).');';
 		}
 		else
 		{
-			$qry = 'UPDATE tbl_stunde SET'.
+			$qry = 'UPDATE lehre.tbl_stunde SET'.
 			       ' beginn='.$this->addslashes($this->beginn).','.
 			       ' ende='.$this->addslashes($this->ende).
 			       " WHERE stunde=".$this->stunde;
