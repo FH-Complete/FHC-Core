@@ -39,12 +39,10 @@ class lvinfo
 	var $unterlagen;		// @var string
 	var $pruefungsordnung;	// @var string
 	var $anmerkungen;		// @var string
-	var $kurzbz;			// @var string
-	var $lehrformen;		// @var string
+	var $kurzbeschreibung;	// @var string
 	var $genehmigt;		// @var boolean
 	var $aktiv;			// @var boolean
 	var $sprache;			// @var string
-	var $lehrveranstaltung_nr;	// @var integer
 	var $updateamum;		// @var timestamp
 	var $updatevon=0;		// @var string
 	var $insertamum;		// @var timestamp
@@ -66,7 +64,7 @@ class lvinfo
 	 */
 	function getAll()
 	{
-		$qry = 'SELECT * FROM tbl_lvinfo order by lvinfo_id;';
+		$qry = 'SELECT * FROM campus.tbl_lvinfo order by lvinfo_id;';
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -85,12 +83,10 @@ class lvinfo
 			$lvinfo_obj->unterlagen 		= $row->unterlagen;
 			$lvinfo_obj->pruefungsordnung 	= $row->pruefungsordnung;
 			$lvinfo_obj->anmerkungen 		= $row->anmerkungen;
-			$lvinfo_obj->kurzbz 			= $row->kurzbz;
-			$lvinfo_obj->lehrformen 		= $row->lehrformen;
+			$lvinfo_obj->kurzbeschreibung	= $row->kurzbeschreibung;
 			$lvinfo_obj->genehmigt 		= $row->genehmigt;
 			$lvinfo_obj->aktiv 			= $row->aktiv;
 			$lvinfo_obj->sprache 		= $row->sprache;
-			$lvinfo_obj->lehrveranstaltung_nr 	= $row->lehrveranstaltung_nr;
 			$lvinfo_obj->insertamum 		= $row->insertamum;
 			$lvinfo_obj->insertvon 		= $row->insertvon;
 			$lvinfo_obj->updateamum 		= $row->updateamum;
@@ -113,7 +109,7 @@ class lvinfo
 			$this->errormsg = 'lvinfo_id ungültig';
 			return false;
 		}
-		$qry = "SELECT * FROM tbl_lvinfo WHERE lvinfo_id = '$lvinfo_id';";
+		$qry = "SELECT * FROM campus.tbl_lvinfo WHERE lvinfo_id = '$lvinfo_id';";
 		if(!$res = pg_query($this->conn, $qry))
 		{
 			$this->errormsg = 'Fehler beim Laden des Datensatzes';
@@ -128,12 +124,10 @@ class lvinfo
 			$this->unterlagen 			= $row->unterlagen;
 			$this->pruefungsordnung 		= $row->pruefungsordnung;
 			$this->anmerkungen 		= $row->anmerkungen;
-			$this->kurzbz 				= $row->kurzbz;
-			$this->lehrformen 			= $row->lehrformen;
+			$this->kurzbeschreibung		= $row->kurzbeschreibung;
 			$this->genehmigt 			= $row->genehmigt;
 			$this->aktiv 				= $row->aktiv;
 			$this->sprache 			= $row->sprache;
-			$this->lehrveranstaltung_nr 	= $row->lehrveranstaltung_nr;
 			$this->kosten 			= $row->kosten;
 			$this->insertamum 			= $row->insertamum;
 			$this->insertvon 			= $row->insertvon;
@@ -175,14 +169,13 @@ class lvinfo
 		$this->unterlagen 		= str_replace("'",'´',$this->unterlagen);
 		$this->pruefungsordnung 	= str_replace("'",'´',$this->pruefungsordnung);
 		$this->anmerkungen 	= str_replace("'",'´',$this->anmerkungen);
-		$this->kurzbz			= str_replace("'",'´',$this->kurzbz);
-		$this->lehrformen		= str_replace("'",'´',$this->lehrformen);
+		$this->kurzbeschreibung	= str_replace("'",'´',$this->kurzbeschreibung);
 		$this->sprache		= str_replace("'",'´',$this->sprache);
 		
 		//Laenge Pruefen
-		if(strlen($this->sprache)>30)           
+		if(strlen($this->sprache)>16)           
 		{
-			$this->errormsg = "Lehrziele darf nicht laenger als 16 Zeichen sein bei <b>".$this->$lvinfo_id."</b> - $this->sprache";
+			$this->errormsg = "Sprache darf nicht laenger als 16 Zeichen sein bei <b>".$this->$lvinfo_id."</b> - $this->sprache";
 			return false;
 		}		
 		$this->errormsg = '';
@@ -208,8 +201,8 @@ class lvinfo
 			}
 			
 			//Neuen Datensatz anlegen		
-			$qry = 'INSERT INTO tbl_lvinfo (lehrziele, lehrinhalte, voraussetzungen, unterlagen, pruefungsordnung, anmerkungen, 
-				kurzbz, lehrformen, genehmigt, aktiv, sprache, lehrveranstaltung_nr, insertamum, insertvon, updateamum, 
+			$qry = 'BEGIN; INSERT INTO campus.tbl_lvinfo (lehrziele, lehrinhalte, voraussetzungen, unterlagen, pruefungsordnung, anmerkungen, 
+				kurzbeschreibung, genehmigt, aktiv, sprache, insertamum, insertvon, updateamum, 
 				updatevon) VALUES ('.
 				$this->addslashes($this->lehrziele).', '.
 				$this->addslashes($this->lehrinhalte).', '.
@@ -217,12 +210,10 @@ class lvinfo
 				$this->addslashes($this->unterlagen).', '.
 				$this->addslashes($this->pruefungsordnung).', '.
 				$this->addslashes($this->anmerkungen).', '.
-				$this->addslashes($this->kurzbz).', '.
-				$this->addslashes($this->lehrformen).', '.
+				$this->addslashes($this->kurzbeschreibung).', '.
 				($this->genehmigt?'true':'false').', '. 
 				($this->aktiv?'true':'false').', '. 
 				$this->addslashes($this->sprache).', '.
-				$this->addslashes($this->lehrveranstaltung_nr).', '.
 				$this->addslashes($this->insertamum).', '.
 				$this->addslashes($this->insertvon).', '.
 				$this->addslashes($this->updateamum).', '.
@@ -240,19 +231,17 @@ class lvinfo
 				return false;
 			}
 			
-			$qry = 'UPDATE tbl_lvinfo SET '. 
-				'lvinfo_id='.$this->addslashes($this->lvinfo_id).', '.
+			$qry = 'BEGIN; UPDATE campus.tbl_lvinfo SET '. 
+				//'lvinfo_id='.$this->addslashes($this->lvinfo_id).', '.
 				'lehrziele='.$this->addslashes($this->lehrziele).', '.
 				'lehrinhalte='.$this->addslashes($this->lehrinhalte).', '.
 				'voraussetzungen='.$this->addslashes($this->voraussetzungen).', '.
 				'pruefungsordnung='.$this->addslashes($this->pruefungsordnung).', '.
 				'anmerkungen='.$this->addslashes($this->anmerkungen).', '.
-				'kurzbz='.$this->addslashes($this->kurzbz).', '.
-				'lehrformen='.$this->addslashes($this->lehrformen).', '.
+				'kurzbeschreibung='.$this->addslashes($this->kurzbeschreibung).', '.
 				'genehmigt='.($this->aktiv?'true':'false') .', '.
 				'aktiv='.($this->aktiv?'true':'false') .', '.
 				'sprache='.$this->addslashes($this->sprache).', '.
-				'lehrveranstaltung_nr='.$this->addslashes($this->lehrveranstaltung_nr).', '.
 				'insertamum='.$this->addslashes($this->insertamum).', '.
 				'insertvon='.$this->addslashes($this->insertvon).', '.
 				'updateamum='.$this->addslashes($this->updateamum).', '.
@@ -279,6 +268,19 @@ class lvinfo
 				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
 				return false;
 			}*/
+			$qry = "SELECT currval('campus.tbl_lvinfo_lvinfo_id_seq') as id;";
+			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
+			{
+				$this->errormsg = 'Fehler!';
+				pg_query($this->conn, "ROLLBACK");
+				return false;
+			}
+			else 
+			{
+				$this->lvinfo_id = $row->id;
+				pg_query($this->conn, "COMMIT");
+			}
+			
 			return true;
 		}
 		else

@@ -64,7 +64,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		$ferien->vondatum		=$row->vondatum;
 		$ferien->bisdatum		=$row->bisdatum;
 		
-		$qry = "SELECT bezeichnung, studiengang_kz FROM tbl_ferien WHERE bezeichnung='$row->bezeichnung' AND studiengang_kz='$row->studiengang_kz'";
+		$qry = "SELECT bezeichnung, studiengang_kz FROM lehre.tbl_ferien WHERE bezeichnung='$row->bezeichnung' AND studiengang_kz='$row->studiengang_kz'";
 			if($result1 = pg_query($conn, $qry))
 			{		
 				if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist

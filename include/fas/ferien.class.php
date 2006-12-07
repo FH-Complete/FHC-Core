@@ -55,7 +55,7 @@ class ferien
 	 */
 	function getAll()
 	{
-		$qry = 'SELECT * FROM tbl_ferien order by bezeichnung, studiengang_kz;';
+		$qry = 'SELECT * FROM lehre.tbl_ferien order by bezeichnung, studiengang_kz;';
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -89,7 +89,7 @@ class ferien
 			return false;
 		}
 		
-		$qry = "SELECT * FROM tbl_ferien WHERE bezeichnung = '$this->bezeichnung' AND studiengang_kz = '$this->studiengang_kz';";
+		$qry = "SELECT * FROM lehre.tbl_ferien WHERE bezeichnung = '$this->bezeichnung' AND studiengang_kz = '$this->studiengang_kz';";
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -163,7 +163,7 @@ class ferien
 				$this->errormsg = 'ID ungültig';
 				return false;
 			}
-			$qry = 'INSERT INTO tbl_ferien (bezeichnung, studiengang_kz, vondatum, bisdatum) VALUES ('.
+			$qry = 'INSERT INTO lehre.tbl_ferien (bezeichnung, studiengang_kz, vondatum, bisdatum) VALUES ('.
 				$this->addslashes($this->bezeichnung).', '.
 				$this->addslashes($this->studiengang_kz).', '.
 				$this->addslashes($this->vondatum).', '.
@@ -179,7 +179,7 @@ class ferien
 				return false;
 			}
 			
-			$qry = 'UPDATE tbl_ferien SET '. 
+			$qry = 'UPDATE lehre.tbl_ferien SET '. 
 				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
 				'studiengang_kz='.$this->addslashes($this->studiengang_kz).', '.
 				'vondatum='.$this->addslashes($this->vondatum).', '.

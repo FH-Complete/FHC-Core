@@ -63,7 +63,7 @@ class news
 	 */
 	function getAll()
 	{
-		$qry = 'SELECT * FROM tbl_news order by news_id;';
+		$qry = 'SELECT * FROM campus.tbl_news order by news_id;';
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -104,7 +104,7 @@ class news
 			return false;
 		}
 		
-		$qry = "SELECT * FROM tbl_news WHERE news_id = '$this->news_id';";
+		$qry = "SELECT * FROM campus.tbl_news WHERE news_id = '$this->news_id';";
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -121,8 +121,8 @@ class news
 			$this->uid			= $row->uid;
 			$this->studiengang_kz	= $row->studiengang_kz;
 			$this->verfasser		= $row->verfasser;
-			$this->insertamum		=$row->insertamum;
-			$this->insertvon		=$row->insertvon;
+			$this->insertamum		= $row->insertamum;
+			$this->insertvon		= $row->insertvon;
 			$this->updateamum		= $row->updateamum;
 			$this->updatevon		= $row->updatevon;
 		}
@@ -155,9 +155,9 @@ class news
 	 */
 	function checkvars()
 	{	
-		$this->betreff = str_replace("'",'´',$this->betreff);
-		$this->text = str_replace("'",'´',$this->text);
-		$this->verfasser = str_replace("'",'´',$this->verfasser);
+		$this->betreff 	= str_replace("'",'´',$this->betreff);
+		$this->text 		= str_replace("'",'´',$this->text);
+		$this->verfasser 	= str_replace("'",'´',$this->verfasser);
 
 		
 		//Laenge Pruefen
@@ -193,7 +193,7 @@ class news
 				$this->errormsg = 'News_id ungültig';
 				return false;
 			}
-			$qry = 'INSERT INTO tbl_news (news_id, betreff, text, semester, uid, studiengang_kz, verfasser, insertamum, insertvon, 
+			$qry = 'INSERT INTO campus.tbl_news (news_id, betreff, text, semester, uid, studiengang_kz, verfasser, insertamum, insertvon, 
 				updateamum, updatevon) VALUES ('.
 				$this->addslashes($this->news_id).', '.
 				$this->addslashes($this->betreff).', '.
@@ -218,7 +218,7 @@ class news
 				return false;
 			}
 			
-			$qry = 'UPDATE tbl_news SET '. 
+			$qry = 'UPDATE campus.tbl_news SET '. 
 				'news_id='.$this->addslashes($this->news_id).', '.
 				'betreff='.$this->addslashes($this->betreff).', '.
 				'text='.$this->addslashes($this->text).', '.

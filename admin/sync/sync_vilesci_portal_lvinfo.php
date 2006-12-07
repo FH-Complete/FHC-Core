@@ -66,19 +66,19 @@ if($result = pg_query($conn_vilesci, $qry))
 		$lvinfo->unterlagen			=$row->unterlagen;
 		$lvinfo->pruefungsordnung		=$row->pruefungsordnung;
 		$lvinfo->anmerkungen		=$row->anmerkungen;
-		$lvinfo->kurzbz			=$row->niveau;
+		$lvinfo->kurzbeschreibung		=$row->niveau;
 		$lvinfo->lehrformen			=$row->lehrformen;
 		$lvinfo->genehmigt			=($row->genehmigt=='t'?true:false);
 		$lvinfo->aktiv				=($row->aktiv=='t'?true:false);
 		$lvinfo->sprache			=$row->sprache;
-		$lvinfo->lehrveranstaltung_nr	=$row->lehrfach_nr;
+		$lvinfo->lehrveranstaltung_id	=$row->lehrfach_nr;
 		//$funktion->insertamum		='';
 		$funktion->insertvon			='SYNC';
 		//$funktion->updateamum		='';
 		//$funktion->updatevon		=$row->updatevon;
 		
 		//schon da?
-		$qry = "SELECT lvinfo_id FROM tbl_lvinfo WHERE lvinfo_id='$lvinfo->lvinfo_id'";
+		$qry = "SELECT lvinfo_id FROM campus.tbl_lvinfo WHERE lvinfo_id='$lvinfo->lvinfo_id'";
 			if($result1 = pg_query($conn, $qry))
 			{		
 				if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist
@@ -99,24 +99,6 @@ if($result = pg_query($conn_vilesci, $qry))
 				{
 					//LVInfo neu anlegen
 					$lvinfo->new=true;
-					
-					//neue Lehrveranstaltungsnummer von tbl_lehrveranstaltung holen
-					$qry = "SELECT lehrveranstaltung_nr FROM tbl_lehrveranstaltung WHERE ext_id = '$row->lehrfach_nr' ;";
-					if ($result2 = pg_query($conn, $qry))
-					{					
-						if(pg_num_rows($result2)>0)
-						{
-							if ($row2=pg_fetch_object($result2))
-							{
-								$lvinfo->lehrverantaltung_nr = $row2->lehrveranstaltung_nr;
-							}
-						}
-						else 
-						{
-							$error_log.= "Lehrveranstaltung <b>".$row->lehrfach_nr."</b> nicht gefunden\n";
-							$error=true;
-						}
-					}
 				}
 				
 				if(!$error)
@@ -126,7 +108,15 @@ if($result = pg_query($conn_vilesci, $qry))
 						$anzahl_fehler++;
 					}
 					else 
+					{
+						$qry = "UPDATE lehre.tbl_lehrveranstaltung SET lvinfo_id='$lvinfo->lvinfo_id' WHERE ext_id = '$row->lehrfach_nr';";
+						if (!$result2 = pg_query($conn, $qry))
+						{
+							$error_log.= "Lehrveranstaltung <b>".$row->lehrfach_nr."</b> nicht gefunden\n";
+							$error=true;
+						}
 						$anzahl_eingefuegt++;
+					}
 				else 
 					$anzahl_fehler++;
 			}	

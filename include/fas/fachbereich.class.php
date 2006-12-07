@@ -19,17 +19,22 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+/** 
+ * Klasse fachbereich (FAS-Online)
+ * @create 04-12-2006
+ */
+
 class fachbereich
 {
 	var $conn;   			// @var resource DB-Handle
 	var $new;     			// @var boolean
-	var $errormsg; 			// @var string
+	var $errormsg; 		// @var string
 	var $result = array(); 	// @var fachbereich Objekt 
 	
 	//Tabellenspalten
-	var $fachbereich_kurzbz;// @var integer
+	var $fachbereich_kurzbz;	// @var string
 	var $bezeichnung;		// @var string
-	var $farbe;				// @var string
+	var $farbe;			// @var string
 	var $studiengang_kz;	// @var integer
 	var $ext_id;			// @var bigint
 	
@@ -39,23 +44,9 @@ class fachbereich
 	 * @param $conn Connection zur DB
 	 *        $fachb_id ID des zu ladenden Fachbereiches
 	 */
-	function fachbereich($conn, $fachbereich_kurzbz=null, $unicode=false)
+	function fachbereich($conn, $fachbereich_kurzbz=null)
 	{
 		$this->conn = $conn;
-		
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-		else 
-			$this->new = true;
-			
 		if($fachbereich_kurzbz != null)
 			$this->load($fachbereich_kurzbz);
 	}
@@ -66,7 +57,7 @@ class fachbereich
 	 */
 	function getAll()
 	{
-		$qry = 'SELECT * FROM tbl_fachbereich order by name;';
+		$qry = 'SELECT * FROM tbl_fachbereich order by fachbereich_kurzbz;';
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -78,11 +69,9 @@ class fachbereich
 		{
 			$fachb_obj = new fachbereich($this->conn);
 			
-			$fachb_obj->fachbereich_id 	= $row->fachbereich_pk;
+			$fachb_obj->fachbereich_kurzbz 	= $row->fachbereich_kurzbz;
 			$fachb_obj->erhalter_id   		= $row->erhalter_fk;
 			$fachb_obj->name           		= $row->name;
-			$fachb_obj->updateamum     	= $row->creationdate;
-			$fachb_obj->updatevon     		= $row->creationuser;
 			
 			$this->result[] = $fachb_obj;
 		}
@@ -96,9 +85,9 @@ class fachbereich
 	 */
 	function load($fachbereich_kurzbz)
 	{
-		if(!is_numeric($fachbereich_kurzbz) || $fachbereich_kurzbz == '')
+		if($fachbereich_kurzbz == '')
 		{
-			$this->errormsg = 'fachbereich_id muss eine gueltige Zahl sein';
+			$this->errormsg = 'fachbereich_kurzbz ungueltig!';
 			return false;
 		}
 		
@@ -115,8 +104,6 @@ class fachbereich
 			$this->fachbereich_kurzbz 	= $row->fachbereich_kurzbz;
 			$this->erhalter_id    		= $row->erhalter_fk;
 			$this->name           		= $row->name;
-			$this->updateamum     	= $row->creationdate;
-			$this->updatevon      	= $row->creationuser;
 		}
 		else 
 		{
@@ -132,7 +119,7 @@ class fachbereich
 	 * @param $fachb_id id des Datensatzes der geloescht werden soll
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function delete($fachbereich_kurzbz)
+	function delete($fachb_id)
 	{
 		$this->errormsg = 'Noch nicht implementiert';
 		return false;
@@ -145,8 +132,12 @@ class fachbereich
 	 * Prueft die Gueltigkeit der Variablen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function validate()
-	{			
+	function checkvars()
+	{	
+		$this->bezeichnung = str_replace("'",'´',$this->bezeichnung);
+		$this->fachbereich_kurzbz = str_replace("'",'´',$this->fachbereich_kurzbz);
+
+		
 		//Laenge Pruefen
 		if(strlen($this->bezeichnung)>128)           
 		{
@@ -155,7 +146,7 @@ class fachbereich
 		}
 		if(strlen($this->fachbereich_kurzbz)>16)
 		{
-			$this->errormsg = "Kurzbez darf nicht laenger als 16 Zeichen sein bei <b>$this->ext_id</b> - $this->kurzbz";
+			$this->errormsg = "Kurzbez darf nicht laenger als 16 Zeichen sein bei <b>$this->ext_id</b> - $this->fachbereich_kurzbz";
 			return false;
 		}		
 		$this->errormsg = '';
@@ -168,13 +159,20 @@ class fachbereich
 	function save()
 	{
 		//Gueltigkeit der Variablen pruefen
-		if(!$this->validate())
+		if(!$this->checkvars())
 			return false;
 			
 		if($this->new)
-		{			
+		{
+			//Pruefen ob fachbereich_kurzbz gueltig ist
+			if($this->fachbereich_id == '')
+			{
+				$this->errormsg = 'fachbereich_id ungueltig!';
+				return false;
+			}
 			//Neuen Datensatz anlegen		
-			$qry = 'INSERT INTO tbl_fachbereich (fachbereich_kurzbz, bezeichnung, farbe, ext_id, studiengang_kz) VALUES ('.
+			$qry = 'INSERT INTO tbl_fachbereich (fachbereich_kurzbz, bezeichnung, farbe, ext_id, insertamum, insertvon, 
+				updateamum, updatevon, studiengang_kz) VALUES ('.
 				$this->addslashes($this->fachbereich_kurzbz).', '.
 				$this->addslashes($this->bezeichnung).', '.
 				$this->addslashes($this->farbe).', '.
@@ -183,8 +181,17 @@ class fachbereich
 		}
 		else 
 		{
-			//bestehenden Datensatz akualisieren			
+			//bestehenden Datensatz akualisieren
+			
+			//Pruefen ob fachbereich_kurzbz gueltig ist
+			if($this->fachbereich_kurzbz == '')
+			{
+				$this->errormsg = 'fachbereich_kurzbz ungueltig.';
+				return false;
+			}
+			
 			$qry = 'UPDATE tbl_fachbereich SET '. 
+				'fachbereich_kurzbz='.$this->addslashes($this->fachbereich_kurzbz).', '.
 				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
 				'farbe='.$this->addslashes($this->farbe).', '.
 				'ext_id='.$this->addslashes($this->ext_id).', '.
@@ -194,7 +201,23 @@ class fachbereich
 		
 		if(pg_query($this->conn, $qry))
 		{
-			//Log schreiben
+			/*//Log schreiben
+			$sql = $qry;
+			$qry = "SELECT nextval('log_seq') as id;";
+			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
+			{
+				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
+				return false;
+			}
+						
+			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
+			if(pg_query($this->conn, $qry))
+				return true;
+			else 
+			{
+				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
+				return false;
+			}*/
 			return true;
 		}
 		else

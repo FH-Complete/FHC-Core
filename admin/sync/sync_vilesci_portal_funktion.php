@@ -62,10 +62,6 @@ if($result = pg_query($conn_vilesci, $qry))
 		$funktion->bezeichnung	=$row->bezeichnung;
 		$funktion->funktion_kurzbz	=$row->funktion_kurzbz;
 		$funktion->aktiv		=($row->aktiv=='t'?true:false);
-		//$funktion->insertamum	='';
-		$funktion->insertvon		='SYNC';
-		//$funktion->updateamum	='';
-		//$funktion->updatevon	=$row->updatevon;
 		
 		$qry = "SELECT funktion_kurzbz FROM tbl_funktion WHERE funktion_kurzbz='$funktion->funktion_kurzbz'";
 			if($result1 = pg_query($conn, $qry))

@@ -61,10 +61,6 @@ if($result = pg_query($conn_vilesci, $qry))
 		$raumtyp = new raumtyp($conn);
 		$raumtyp->beschreibung		=$row->beschreibung;
 		$raumtyp->raumtyp_kurzbz		=$row->raumtyp_kurzbz;
-		//$raumtyp->insertamum		='';
-		$raumtyp->insertvon			='SYNC';
-		//raumtyp->updateamum		='';
-		//$raumtyp->updatevon		=$row->updatevon;
 		
 		$qry = "SELECT raumtyp_kurzbz FROM tbl_raumtyp WHERE raumtyp_kurzbz = '$row->raumtyp_kurzbz'";
 			if($result1 = pg_query($conn, $qry))

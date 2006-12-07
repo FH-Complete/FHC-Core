@@ -53,7 +53,7 @@ $qry = "SELECT * FROM tbl_lehrfach";
 if($result = pg_query($conn_vilesci, $qry))
 {
 	$anzahl_quelle=pg_num_rows($result);
-	$text.="Lehrveranstaltung Sync\n----------------------\n";
+	$text.="Lehrveranstaltung Sync\n-----------------------\n";
 	while($row = pg_fetch_object($result))
 	{
 		$error=false;
@@ -64,7 +64,6 @@ if($result = pg_query($conn_vilesci, $qry))
 		$lehrveranstaltung->semester		=$row->semester;
 		$lehrveranstaltung->ects			=$row->ects;
 		$lehrveranstaltung->semesterstunden	=0;
-		$lehrveranstaltung->gemeinsam		='false';
 		$lehrveranstaltung->anmerkung		='';
 		$lehrveranstaltung->lehre			=($row->aktiv=='t'?true:false);
 		$lehrveranstaltung->lehreverzeichnis	=$row->lehrevz;
@@ -79,7 +78,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		$lehrveranstaltung->ext_id			=$row->lehrfach_nr;
 		//$lehrveranstaltung->new			=true;
 		
-		$qry = "SELECT lehrveranstaltung_nr FROM tbl_lehrveranstaltung WHERE ext_id='$lehrveranstaltung->ext_id'";
+		$qry = "SELECT lehrveranstaltung_id FROM lehre.tbl_lehrveranstaltung WHERE ext_id='$lehrveranstaltung->ext_id'";
 			if($result1 = pg_query($conn, $qry))
 			{		
 				if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist
@@ -88,11 +87,11 @@ if($result = pg_query($conn_vilesci, $qry))
 					{
 						//Lehrveranstaltungsdaten updaten
 						$lehrveranstaltung->new=false;
-						$lehrveranstaltung->lehrveranstaltung_nr=$row1->lehrveranstaltung_nr;
+						$lehrveranstaltung->lehrveranstaltung_id=$row1->lehrveranstaltung_id;
 					}
 					else 
 					{
-						$error_log.="lehrveranstaltung_nr von $row->lehrveranstaltung_nr konnte nicht ermittelt werden\n";
+						$error_log.="lehrveranstaltung_id von $row->lehrveranstaltung_id konnte nicht ermittelt werden\n";
 						$error=true;
 					}
 				}

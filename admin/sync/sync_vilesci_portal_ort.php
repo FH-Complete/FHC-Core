@@ -65,10 +65,9 @@ if($result = pg_query($conn_vilesci, $qry))
 		$ort->aktiv			=($row->aktiv=='t'?true:false);																																					
 		$ort->lageplan		=$row->lageplan;
 		$ort->dislozierung		=$row->dislozierung;
-		$ort->kosten			=$row->kosten;
-		$ort->lehre																																																																																																																																																																																																					=($row->lehre=='t'?true:false);
+		$ort->kosten			=$row->kosten;	
 		//$ort->insertamum='';
-		$ort->insertvon='SYNC';
+		//$ort->insertvon='SYNC';
 		//ort->updateamum='';
 		//$ort->updatevon=$row->updatevon;
 		
