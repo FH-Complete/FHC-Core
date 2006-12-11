@@ -53,7 +53,7 @@ $qry = "SELECT * FROM tbl_fachbereich";
 
 if($result = pg_query($conn_vilesci, $qry))
 {
-	echo nl2br("Fachbereich Sync\n---------------\n");
+	echo nl2br("Fachbereich Sync\n-----------------\n");
 	$anzahl_quelle=pg_num_rows($result);
 	while($row = pg_fetch_object($result))
 	{
