@@ -165,14 +165,13 @@ class fachbereich
 		if($this->new)
 		{
 			//Pruefen ob fachbereich_kurzbz gueltig ist
-			if($this->fachbereich_id == '')
+			if($this->fachbereich_kurzbz == '')
 			{
 				$this->errormsg = 'fachbereich_id ungueltig!';
 				return false;
 			}
 			//Neuen Datensatz anlegen		
-			$qry = 'INSERT INTO tbl_fachbereich (fachbereich_kurzbz, bezeichnung, farbe, ext_id, insertamum, insertvon, 
-				updateamum, updatevon, studiengang_kz) VALUES ('.
+			$qry = 'INSERT INTO tbl_fachbereich (fachbereich_kurzbz, bezeichnung, farbe, ext_id, studiengang_kz) VALUES ('.
 				$this->addslashes($this->fachbereich_kurzbz).', '.
 				$this->addslashes($this->bezeichnung).', '.
 				$this->addslashes($this->farbe).', '.
