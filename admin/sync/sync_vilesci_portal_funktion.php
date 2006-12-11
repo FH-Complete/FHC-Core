@@ -53,13 +53,13 @@ $qry = "SELECT * FROM tbl_funktion";
 
 if($result = pg_query($conn_vilesci, $qry))
 {
-	echo nl2br("Funktion Sync\n----------------------\n");
+	echo nl2br("Funktion Sync\n----------------\n");
 	$anzahl_quelle=pg_num_rows($result);
 	while($row = pg_fetch_object($result))
 	{
 		$error=false;
 		$funktion = new funktion($conn);
-		$funktion->bezeichnung	=$row->bezeichnung;
+		$funktion->beschreibung	=$row->bezeichnung;
 		$funktion->funktion_kurzbz	=$row->funktion_kurzbz;
 		$funktion->aktiv		=($row->aktiv=='t'?true:false);
 		
