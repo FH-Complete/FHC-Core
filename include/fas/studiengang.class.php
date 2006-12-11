@@ -22,10 +22,12 @@ class studiengang
 	var $betreuerstunden;    // @var float
 	var $emailkuerzel;       // @var string
 	var $endedatum;          // @var date
+	var $erhalter_id;        // @var integer
 	var $kennzahl;           // @var integer
 	var $kennzahl_neu;       // @var integer
 	var $kuerzel;            // @var string
 	var $name;               // @var string
+	var $nummerintern;       // @var integer
 	var $organisationsform;  // @var integer	
 	var $regelstudiendauer;  // @var integer
 	var $regelwochenstunden; // @var integer
@@ -36,8 +38,6 @@ class studiengang
 	var $telefonnummer;      // @var string
 	var $updateamum;         // @var timestamp
 	var $updatevon;          // @var string
-	var $insertamum;         // @var timestamp
-	var $insertvon;          // @var string
 	
 	/**
 	 * Konstruktor

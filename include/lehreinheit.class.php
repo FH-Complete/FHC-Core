@@ -20,18 +20,18 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-class stundenplan
+class lehreinheit
 {
 	var $conn;     // resource DB-Handle
 	var $errormsg; // string
 	var $new;      // boolean
-	var $stundenplan = array(); // stundenplan Objekt
+	var $lehreinheiten = array(); // lehreinheit Objekt
 	
 	//Tabellenspalten
 	var $lehreinheit_id;			// integer
-	var $lehrveranstaltung_nr;		// integer
+	var $lehrveranstaltung_id;		// integer
 	var $studiensemester_kurzbz; 	// varchar(16)
-	var $lehrfach_nr;				// integer
+	var $lehrfach_id;				// integer
 	var $lehrform_kurzbz;			// varchar(8)
 	var $stundenblockung;			// smalint
 	var $wochenrythmus;				// smalint
@@ -90,7 +90,7 @@ class stundenplan
 			$this->errormsg = 'Lehreinheit_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(!is_numeric($this->lehrveranstaltung_nr))
+		if(!is_numeric($this->lehrveranstaltung_id))
 		{
 			$this->errormsg = 'LehrveranstaltungsNr muss eine gueltige Zahl sein';
 			return false;
@@ -105,9 +105,9 @@ class stundenplan
 			$this->errormsg = 'Studiensemester muss angegeben werden';
 			return false;
 		}
-		if(!is_numeric($this->lehrfach_nr))
+		if(!is_numeric($this->lehrfach_id))
 		{
-			$this->errormsg = 'Lehrfach_nr muss eine gueltige Zahl sein';
+			$this->errormsg = 'Lehrfach_id muss eine gueltige Zahl sein';
 			return false;
 		}
 		if(strlen($this->lehrform_kurzbz)>8)
@@ -210,12 +210,12 @@ class stundenplan
 		if($new)
 		{
 			//ToDo ID entfernen
-			$qry = 'INSERT INTO lehre.tbl_lehreinheit (lehrveranstaltung_nr, studiensemester_kurzbz, 
-			                                     lehrfach_nr, lehrform_kurzbz, stundenblockung, wochenrythmus, 
+			$qry = 'INSERT INTO lehre.tbl_lehreinheit (lehrveranstaltung_id, studiensemester_kurzbz, 
+			                                     lehrfach_id, lehrform_kurzbz, stundenblockung, wochenrythmus, 
 			                                     start_kw, raumtyp, raumtypalternativ, lehre, anmerkung, unr, ext_id)
-			        VALUES('.$this->addslashes($this->lehrveranstaltung_nr).','.
+			        VALUES('.$this->addslashes($this->lehrveranstaltung_id).','.
 					$this->addslashes($this->studiensemester_kurzbz).','.
-					$this->addslashes($this->lehrfach_nr).','.
+					$this->addslashes($this->lehrfach_id).','.
 					$this->addslashes($this->lehrform_kurzbz).','.
 					$this->addslashes($this->stundenblockung).','.
 					$this->addslashes($this->wochenrythmus).','.
@@ -230,9 +230,9 @@ class stundenplan
 		else
 		{
 			$qry = 'UPDATE lehre.tbl_lehreinheit SET'.
-			       ' lehrveranstaltung_nr='.$this->addslashes($this->lehrveranstaltung_nr).','.
+			       ' lehrveranstaltung_nr='.$this->addslashes($this->lehrveranstaltung_id).','.
 			       ' studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).','.
-			       ' lehrfach_nr='.$this->addslashes($this->lehrfach_nr).','.
+			       ' lehrfach_id='.$this->addslashes($this->lehrfach_id).','.
 			       ' lehrform_kurzbz='.$this->addslashes($this->lehrform_kurzbz).','.
 			       ' stundenblockung='.$this->addslashes($this->stundenblockung).','.
 			       ' wochenrythmus='.$this->addslashes($this->wochenrythmus).','.

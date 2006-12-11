@@ -1,54 +1,39 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
- *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
- */
 /** 
  * Klasse fachbereich (FAS-Online)
- * @create 04-12-2006
+ * @create 14-03-2006
  */
 
 class fachbereich
 {
-	var $conn;   			// @var resource DB-Handle
-	var $new;     			// @var boolean
-	var $errormsg; 		// @var string
-	var $result = array(); 	// @var fachbereich Objekt 
+	var $conn;    // @var resource DB-Handle
+	var $new;      // @var boolean
+	var $errormsg; // @var string
+	var $result = array(); // @var fachbereich Objekt 
 	
 	//Tabellenspalten
-	var $fachbereich_kurzbz;	// @var string
-	var $bezeichnung;		// @var string
-	var $farbe;			// @var string
-	var $studiengang_kz;	// @var integer
-	var $ext_id;			// @var bigint
-	
+	var $fachbereich_id; // @var integer
+	var $erhalter_id;    // @var integer
+	var $name;           // @var string
+	var $updateamum;     // @var timestamp
+	var $updatevon=0;    // @var string
 	
 	/**
 	 * Konstruktor
 	 * @param $conn Connection zur DB
 	 *        $fachb_id ID des zu ladenden Fachbereiches
 	 */
-	function fachbereich($conn, $fachbereich_kurzbz=null)
+	function fachbereich($conn, $fachb_id=null)
 	{
 		$this->conn = $conn;
-		if($fachbereich_kurzbz != null)
-			$this->load($fachbereich_kurzbz);
+		$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+		if(!pg_query($conn,$qry))
+		{
+			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
+			return false;
+		}
+		if($fachb_id != null)
+			$this->load($fachb_id);
 	}
 	
 	/**
@@ -57,11 +42,11 @@ class fachbereich
 	 */
 	function getAll()
 	{
-		$qry = 'SELECT * FROM tbl_fachbereich order by fachbereich_kurzbz;';
+		$qry = 'SELECT * FROM fachbereich order by name;';
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
-			$this->errormsg = 'Fehler beim Laden der Datensaetze';
+			$this->errormsg = 'Fehler beim laden der Datensaetze';
 			return false;
 		}
 		
@@ -69,9 +54,11 @@ class fachbereich
 		{
 			$fachb_obj = new fachbereich($this->conn);
 			
-			$fachb_obj->fachbereich_kurzbz 	= $row->fachbereich_kurzbz;
-			$fachb_obj->erhalter_id   		= $row->erhalter_fk;
-			$fachb_obj->name           		= $row->name;
+			$fachb_obj->fachbereich_id = $row->fachbereich_pk;
+			$fachb_obj->erhalter_id    = $row->erhalter_fk;
+			$fachb_obj->name           = $row->name;
+			$fachb_obj->updateamum     = $row->creationdate;
+			$fachb_obj->updatevon     = $row->creationuser;
 			
 			$this->result[] = $fachb_obj;
 		}
@@ -83,27 +70,29 @@ class fachbereich
 	 * @param $fachb_id ID des zu ladenden Fachbereiches
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load($fachbereich_kurzbz)
+	function load($fachb_id)
 	{
-		if($fachbereich_kurzbz == '')
+		if(!is_numeric($fachb_id) || $fachb_id == '')
 		{
-			$this->errormsg = 'fachbereich_kurzbz ungueltig!';
+			$this->errormsg = 'fachb_id muss eine gueltige Zahl sein';
 			return false;
 		}
 		
-		$qry = "SELECT * FROM tbl_fachbereich WHERE fachbereich_kurzbz = '$fachbereich_kurzbz';";
+		$qry = "SELECT * FROM fachbereich WHERE fachbereich_pk = '$fachb_id';";
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
-			$this->errormsg = 'Fehler beim Laden des Datensatzes';
+			$this->errormsg = 'Fehler beim laden des Datensatzes';
 			return false;
 		}
 		
 		if($row=pg_fetch_object($res))
 		{
-			$this->fachbereich_kurzbz 	= $row->fachbereich_kurzbz;
-			$this->erhalter_id    		= $row->erhalter_fk;
-			$this->name           		= $row->name;
+			$this->fachbereich_id = $row->fachbereich_pk;
+			$this->erhalter_id    = $row->erhalter_fk;
+			$this->name           = $row->name;
+			$this->updateamum     = $row->creationdate;
+			$this->updatevon      = $row->creationuser;
 		}
 		else 
 		{
@@ -124,106 +113,15 @@ class fachbereich
 		$this->errormsg = 'Noch nicht implementiert';
 		return false;
 	}
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-	/**
-	 * Prueft die Gueltigkeit der Variablen
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	function checkvars()
-	{	
-		$this->bezeichnung = str_replace("'",'´',$this->bezeichnung);
-		$this->fachbereich_kurzbz = str_replace("'",'´',$this->fachbereich_kurzbz);
-
-		
-		//Laenge Pruefen
-		if(strlen($this->bezeichnung)>128)           
-		{
-			$this->errormsg = "Bezeichnung darf nicht laenger als 128 Zeichen sein bei <b>$this->ext_id</b> - $this->bezeichnung";
-			return false;
-		}
-		if(strlen($this->fachbereich_kurzbz)>16)
-		{
-			$this->errormsg = "Kurzbez darf nicht laenger als 16 Zeichen sein bei <b>$this->ext_id</b> - $this->fachbereich_kurzbz";
-			return false;
-		}		
-		$this->errormsg = '';
-		return true;		
-	}
+	
 	/**
 	 * Speichert den aktuellen Datensatz
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	function save()
 	{
-		//Gueltigkeit der Variablen pruefen
-		if(!$this->checkvars())
-			return false;
-			
-		if($this->new)
-		{
-			//Pruefen ob fachbereich_kurzbz gueltig ist
-			if($this->fachbereich_kurzbz == '')
-			{
-				$this->errormsg = 'fachbereich_id ungueltig!';
-				return false;
-			}
-			//Neuen Datensatz anlegen		
-			$qry = 'INSERT INTO tbl_fachbereich (fachbereich_kurzbz, bezeichnung, farbe, ext_id, studiengang_kz) VALUES ('.
-				$this->addslashes($this->fachbereich_kurzbz).', '.
-				$this->addslashes($this->bezeichnung).', '.
-				$this->addslashes($this->farbe).', '.
-				$this->addslashes($this->ext_id).', '.
-				$this->addslashes($this->studiengang_kz).');';
-		}
-		else 
-		{
-			//bestehenden Datensatz akualisieren
-			
-			//Pruefen ob fachbereich_kurzbz gueltig ist
-			if($this->fachbereich_kurzbz == '')
-			{
-				$this->errormsg = 'fachbereich_kurzbz ungueltig.';
-				return false;
-			}
-			
-			$qry = 'UPDATE tbl_fachbereich SET '. 
-				'fachbereich_kurzbz='.$this->addslashes($this->fachbereich_kurzbz).', '.
-				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
-				'farbe='.$this->addslashes($this->farbe).', '.
-				'ext_id='.$this->addslashes($this->ext_id).', '.
-				'studiengang_kz='.$this->addslashes($this->studiengang_kz).' '.
-				'WHERE fachbereich_kurzbz = '.$this->addslashes($this->fachbereich_kurzbz).';';
-		}
-		
-		if(pg_query($this->conn, $qry))
-		{
-			/*//Log schreiben
-			$sql = $qry;
-			$qry = "SELECT nextval('log_seq') as id;";
-			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
-			{
-				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
-				return false;
-			}
-						
-			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
-			if(pg_query($this->conn, $qry))
-				return true;
-			else 
-			{
-				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
-				return false;
-			}*/
-			return true;
-		}
-		else
-		{
-			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
-			return false;
-		}		
+		$this->errormsg = 'Noch nicht implementiert';
+		return false;
 	}
 }
 ?>

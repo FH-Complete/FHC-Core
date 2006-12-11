@@ -1,247 +1,202 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
- *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+/**
+ * Klasse gruppe (FAS-Online)
+ * @create 15-03-2006
  */
-
 class gruppe
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $gruppen = array(); // gruppen Objekt
+	var $conn;    // @var resource DB-Handle
+	var $new;      // @var boolean
+	var $errormsg; // @var string
+	var $result = array(); // @var gruppe Objekt
 	
-	//Tabellenspalten
-	var $gruppe_kurzbz;			// varchar(16)
-	var $studiengang_kz;		// integer
-	var $bezeichnung;			// varchar(32)
-	var $semester;				// smallint
-	var $sort;					// smallint
-	var $mailgrp;				// boolean
-	var $beschreibung;			// varchar(128)
-	var $sichtbar;				// boolean
-	var $aktiv;					// boolean
-	var $updateamum;			// timestamp
-	var $updatevon;				// varchar(16)
-	var $insertamum;			// timestamp
-	var $insertvon;				// varchar(16)
-	
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Gruppe
-	// * @param $conn        	Datenbank-Connection
-	// *        $gruppe_kurzbz
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function gruppe($conn, $gruppe_kurzbz=null, $unicode=false)
+	var $ausbildungssemester_id; // @var integer
+	var $gruppe_id;              // @var integer
+	var $name;                   // @var string
+	var $nummerintern;           // @var integer
+	var $obergruppe_id;          // @var integer
+	var $ordnung;                // @var integer
+	var $studiengang_id;         // @var integer
+	var $typ;                    // @var integer ( Ebene ??)
+	var $updateamum;             // @var timestamp
+	var $updatevon=0;            // @var string
+	var $fullname;               // @var string
+
+	/**
+	 * Konstruktor
+	 * @param $conn Connection zur Datenbank
+	 *        $gruppe_id ID der zu ladenden Gruppe
+	 */
+	function gruppe($conn, $gruppe_id=null)
 	{
 		$this->conn = $conn;
-		
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
+		$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		if(!pg_query($conn,$qry))
 		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
+			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
+			return false;
+		}
+		if($gruppe_id != null)
+			$this->load($gruppe_id);
+	}
+	
+	/**
+	 * Laedt eine Gruppe
+	 * @param gruppe_id ID der Gruppe
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	function load($gruppe_id)
+	{
+		//gruppe_id auf gueltigkeit pruefen
+		if(!is_numeric($gruppe_id) || $gruppe_id =='')
+		{
+			$this->errormsg = 'gruppe_id muss eine gueltige Zahl sein';
 			return false;
 		}
 		
-		if($gruppe_kurzbz!=null)
-			$this->load($gruppe_kurzbz);
-	}
-	
-	// ****************************************
-	// * Prueft ob bereits eine Gruppe mit der
-	// * uebergebenen Kurzbezeichnung existiert
-	// * @param gruppe_kurzbz
-	// ****************************************
-	function exists($gruppe_kurzbz)
-	{
-		$qry = "SELECT count(*) as anzahl FROM tbl_gruppe WHERE gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
+		$qry = "SELECT * FROM gruppe WHERE gruppe_pk='$gruppe_id';";
 		
-		if($row = pg_fetch_object(pg_query($this->conn,$qry)))
+		if(!$res = pg_query($this->conn, $qry))
 		{
-			if($row->anzahl>0)
-				return true;
-			else 
-				return false;
+			$this->errormsg = 'Datensatz konnte nicht geladen werden';
+			return false;
+		}
+		
+		if($row = pg_fetch_object($res))
+		{
+			$this->ausbildungssemester_id = $row->ausbildungssemester_fk;
+			$this->gruppe_id              = $row->gruppe_pk;
+			$this->name                   = $row->name;
+			$this->nummerintern           = $row->nummerintern;
+			$this->obergruppe_id          = $row->obergruppe_fk;
+			$this->ordnung                = $row->ordnung;
+			$this->studiengang_id         = $row->studiengang_fk;
+			$this->typ                    = $row->typ;
+			$this->updateamum             = $row->creationdate;
+			$this->updatevon              = $row->creationuser;
+			
+			$this->fullname = $this->getFullName($row->gruppe_pk);
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler bei einer Abfrage: '.$qry;
+			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;
 		}
+		
+		return true;		
 	}
 	
-	// *********************************************************
-	// * Laedt die Gruppe
-	// * @param gruppe_kurzbz
-	// *********************************************************
-	function load($gruppe_kurzbz)
+	/**
+	 * Liefert den vollen namen einer Gruppe
+	 * @param $gruppe_id
+	 * @return voller name, false im Fehlerfall
+	 */
+	function getFullName($gruppe_id)
 	{
+		//gruppe_id auf gueltigkeit pruefen
+		if(!is_numeric($gruppe_id) || $gruppe_id == '')
+		{
+			$this->errormsg = 'gruppe_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		//gesamten gruppennamen ermitteln
+		$qry = "SELECT fas_function_get_fullname_from_gruppe($gruppe_id) as fullname;";
+	
+		if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
+		{
+			$this->errormsg = 'Gruppenname konnte nicht ermittelt werden';
+			return false;
+		}
+		
+		return $row->fullname;
+	}
+	
+	/**
+	 * Laedt alle Gruppen eines Studienganges/studiensemesters/ausbildungssemesters
+	 * @param studiengang_id ID des studienganges
+	 *        studiensemester_id ID des Studiensemesters (optional)
+	 *        ausbildungssemester_id ID des Ausbildungssemesters (optional)
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	function load_gruppen($studiengang_id, $studiensemester_id=null, $ausbildungssemester_id=null)
+	{
+		//Pruefen ob gueltige Werte uebergeben wurden
+		if(!is_numeric($studiengang_id) || $studiengang_id == '')
+		{
+			$this->errormsg = 'studiengang_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		if($studiensemester_id!=null && (!is_numeric($studiensemester_id) || $studiensemester_id == ''))
+		{
+			$this->errormsg = 'studiensemester_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		if($ausbildungssemester_id!=null && (!is_numeric($ausbildungssemester_id) || $ausbildungssemester_id == ''))
+		{
+			$this->errormsg = 'ausbildungssemester_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		//Befehl zusammenbauen
+		$qry = "SELECT * FROM gruppe WHERE studiengang_fk='$studiengang_id' ";
+		
+		if($ausbildungssemester_id!=null)
+			$qry .= "AND ausbildungssemester_fk='$ausbildungssemester_id' ";
+		
+		if($studiensemester_id != null)
+			$qry .= "AND studiensemester_fk='$studiensemester_id' ";
+		
+		if(!$res = pg_query($this->conn, $qry))
+		{
+			$this->errormsg = 'Datensatz konnte nicht geladen werden';
+			return false;
+		}
+		//Daten laden
+		while($row = pg_fetch_object($res))
+		{
+			$grp_obj = new gruppe($this->conn);
+			
+			$grp_obj->ausbildungssemester_id = $row->ausbildungssemester_fk;
+			$grp_obj->gruppe_id              = $row->gruppe_pk;
+			$grp_obj->name                   = $row->name;
+			$grp_obj->nummerintern           = $row->nummerintern;
+			$grp_obj->obergruppe_id          = $row->obergruppe_fk;
+			$grp_obj->ordnung                = $row->ordnung;
+			$grp_obj->studiengang_id         = $row->studiengang_fk;
+			$grp_obj->typ                    = $row->typ;
+			$grp_obj->updateamum             = $row->creationdate;
+			$grp_obj->updatevon              = $row->creationuser;
+			
+			$grp_obj->fullname = $this->getFullName($row->gruppe_pk);
+			
+			$this->result[] = $grp_obj;
+		}
+				
+		return true;
+	}
+	
+	/**
+	 * Speichert den aktuellen Datensatz in die DB
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	function save()
+	{
+		$this->errormsg = 'Noch nicht implementiert';
 		return false;
 	}
 	
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern 
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Loescht einen Datensatz
+	 * @param $gruppe_id ID des zu loeschenden Datensatzes
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	function delete($gruppe_id)
 	{
-		if(strlen($this->gruppe_kurzbz)>16)
-		{
-			$this->errormsg = 'Gruppe_kurzbz darf nicht laenger als 16 Zeichen sein';
-			return false;
-		}
-		if($this->gruppe_kurzbz=='')
-		{
-			$this->errormsg = 'Gruppe muss angegeben werden';
-			return false;
-		}
-		if(!is_numeric($this->studiengang_kz))
-		{
-			$this->errormsg = 'Studiengang_kz muss eine gueltige Zahl sein';
-			return false;
-		}
-		if(strlen($this->bezeichnung)>32)
-		{
-			$this->errormsg = 'Bezeichnung darf nicht laenger als 32 Zeichen sein';
-			return false;
-		}
-		if($this->semester!='' && !is_numeric($this->semester))
-		{
-			$this->errormsg = 'Semester muss eine gueltige Zahl sein';
-			return false;
-		}
-		if($this->sort!='' && !is_numeric($this->sort))
-		{
-			$this->errormsg = 'Typ muss eine gueltige Zahl sein';
-			return false;
-		}
-		if(!is_bool($this->mailgrp))
-		{
-			$this->errormsg = 'Mailgrp muss ein boolscher wert sein';
-			return false;
-		}
-		if(strlen($this->beschreibung)>128)
-		{
-			$this->errormsg = 'Beschreibung darf nicht laenger als 128 Zeichen sein';
-			return false;
-		}
-		if(!is_bool($this->sichtbar))
-		{
-			$this->errormsg = 'Sichtbar muss ein boolscher Wert sein';
-			return false;
-		}
-		if(!is_bool($this->aktiv))
-		{
-			$this->errormsg = 'Aktiv muss ein boolscher Wert sein';
-			return false;
-		}
-		if(strlen($this->updatevon)>16)
-		{
-			$this->errormsg = 'Updatevon darf nicht laenger als 16 Zeichen sein';
-			return false;
-		}
-		if(strlen($this->insertvon)>16)
-		{
-			$this->errormsg = 'Insertvon darf nicht laenger als 16 Zeichen sein';
-			return false;
-		}
-		
-		return true;
-	}
-
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische 
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// ************************************************************
-	// * Speichert Gruppe in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function save($new=null)
-	{
-		if(is_null($new))
-			$new = $this->new;
-					
-		//Variablen auf Gueltigkeit pruefen
-		if(!$this->validate())
-			return false;
-
-		if($new)
-		{		
-			$qry = 'INSERT INTO tbl_gruppe (gruppe_kurzbz, studiengang_kz, bezeichnung, semester, sort, 
-			                                mailgrp, beschreibung, sichtbar, aktiv, 
-			                                updateamum, updatevon, insertamum, insertvon)
-			        VALUES('.$this->addslashes($this->gruppe_kurzbz).','.
-					$this->addslashes($this->studiengang_kz).','.
-					$this->addslashes($this->bezeichnung).','.
-					$this->addslashes($this->semester).','.
-					$this->addslashes($this->sort).','.
-					($this->mailgrp?'true':'false').','.
-					$this->addslashes($this->beschreibung).','.
-					($this->sichtbar?'true':'false').','.
-					($this->aktiv?'true':'false').','.
-					$this->addslashes($this->updateamum).','.
-					$this->addslashes($this->updatevon).','.
-					$this->addslashes($this->insertamum).','.
-					$this->addslashes($this->insertvon).');';
-		}
-		else
-		{
-			$qry = 'UPDATE tbl_gruppe SET'.
-			       ' studiengang_kz='.$this->addslashes($this->studiengang_kz).','.
-			       ' bezeichnung='.$this->addslashes($this->bezeichnung).','.
-			       ' semester='.$this->addslashes($this->semester).','.
-			       ' sort='.$this->addslashes($this->sort).','.
-			       ' mailgrp='.($this->mailgrp?'true':'false').','.
-			       ' beschreibung='.$this->addslashes($this->beschreibung).','.
-			       ' sichtbar='.($this->sichtbar?'true':'false').','.
-			       ' aktiv='.($this->aktiv?'true':'false').','.
-			       ' updateamum='.$this->addslashes($this->updateamum).','.
-			       ' updatevon='.$this->addslashes($this->updatevon).
-			       " WHERE gruppe_kurzbz=".$this->addslashes($this->gruppe_kurzbz).";";
-		}
-
-		if(pg_query($this->conn,$qry))
-		{
-			//Log schreiben
-			return true;
-		}
-		else
-		{
-			$this->errormsg = 'Fehler beim Speichern der Gruppe:'.$qry;
-			return false;
-		}
+		$this->errormsg = 'Noch nicht implementiert';
+		return false;
 	}
 }
 ?>

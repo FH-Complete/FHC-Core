@@ -1,220 +1,126 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
- *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+/**
+ * Klasse raumtyp (FAS-Online)
+ * @create 14-03-2006
  */
-/** 
- * Klasse ortraumtyp (FAS-Online)
- * @create 04-12-2006
- */
-
 class raumtyp
 {
-	var $conn;   			// @var resource DB-Handle
-	var $new;     			// @var boolean
-	var $errormsg; 		// @var string
-	var $result = array(); 	// @var fachbereich Objekt 
+	var $conn;    // @var resource DB-Handle
+	var $new;      // @var boolean
+	var $errormsg; // @var string
+	var $result = array(); // @var raumtyp Objekt
 	
-	//Tabellenspalten
-	var $beschreibung;		// @var string
-	var $raumtyp_kurzbz;	// @var string
-	
+	var $raumtyp_id;      // @var integer
+	var $bezeichnung;     // @var string
+	var $kurzbezeichnung; // @var string
+	var $plaetze;         // @var integer
+	var $updateamum;      // @var timestamp
+	var $updatevon;       // @var string
 	
 	/**
 	 * Konstruktor
-	 * @param $conn Connection zur DB
-	 *        $ort_kurzbz und hierarchie ID des zu ladenden OrtRaumtyps
+	 * @param conn Connection zur Datenbank
+	 *        raum_id ID des zu ladenden Raumes (default=null)
 	 */
-	function raumtyp($conn, $raumtyp_kurzbz=null)
+	 function raumtyp($conn, $raum_id=null)
 	{
 		$this->conn = $conn;
-		if($raumtyp_kurzbz != null)
-			$this->load($raumtyp_kurzbz);
+		$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+		if(!pg_query($conn,$qry))
+		{
+			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
+			return false;
+		}
+		if($raum_id != null)
+			$this->load($raum_id);
 	}
 	
-	/**
-	 * Laedt alle verfuegbaren OrtRaumtypen
+	/** 
+	 * Laedt einen Datensatz
+	 * @param $raum_id ID des zu ladenden Datensatzes
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function getAll()
+	 function load($raum_id)
 	{
-		$qry = 'SELECT * FROM tbl_raumtyp order by raumtyp_kurzbz;';
+		if(!is_numeric($raum_id) || $raum_id == '')
+		{
+			$this->errormsg = 'raum_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM raumtyp WHERE raumtyp_pk = '$raum_id';";
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
-			$this->errormsg = 'Fehler beim Laden der Datensaetze';
+			$this->errormsg = 'Fehler beim laden des Datenstatzes';
 			return false;
 		}
 		
-		while($row = pg_fetch_object($res))
+		if($row = pg_fetch_object($res))
 		{
-			$raumtyp_obj = new ort($this->conn);
-			
-			$raumtyp_obj->beschreibung 	= $row->beschreibung;
-			$raumtyp_obj->raumtyp_kurzbz 	= $row->raumtyp_kurzbz;
-
-			
-			$this->result[] = $raumtyp_obj;
-		}
-		return true;
-	}
-	
-	/**
-	 * Laedt einen Raumtyp
-	 * @param $raumtyp ID des zu ladenden Raumtyps
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	function load($raumtyp_kurzbz)
-	{
-		if($raum_kurzbz == '')
-		{
-			$this->errormsg = 'Kein gültiger Schlüssel vorhanden';
-			return false;
-		}
-		
-		$qry = "SELECT * FROM tbl_raumtyp WHERE raumtyp_kurzbz = '$raumtyp_kurzbz';";
-		
-		if(!$res = pg_query($this->conn, $qry))
-		{
-			$this->errormsg = 'Fehler beim Laden des Datensatzes';
-			return false;
-		}
-		
-		if($row=pg_fetch_object($res))
-		{
-			$this->beschreibung 	= $row->beschreibung;
-			$this->raumtyp_kurzbz 	= $row->kurzbz;
-
+			$this->raumtyp_id      = $row->raumtyp_pk;
+			$this->bezeichnung     = $row->bezeichnung;
+			$this->kurzbezeichnung = $row->kurzbezeichnung;
+			$this->plaetze         = $row->plaetze;
+			$this->updateamum      = $row->creationdate;
+			$this->updatevon       = $row->creationuser;	
 		}
 		else 
 		{
 			$this->errormsg = 'Es ist kein Datensatz mit dieser ID vorhanden';
 			return false;
 		}
-		
 		return true;
 	}
 	
 	/**
-	 * Loescht einen Datensatz
-	 * @param $raumtyp_kurzbz ID des Datensatzes der geloescht werden soll
-	 * @return true wenn ok, false im Fehlerfall
+	 * Laedt alle Datensaetze
+	 * @return ture wenn ok, false im Fehlerfall
 	 */
-	function delete($raumtyp_kurzbz)
+	 function getAll()
 	{
-		$this->errormsg = 'Noch nicht implementiert';
-		return false;
-	}
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-	/**
-	 * Prueft die Gueltigkeit der Variablen
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	function checkvars()
-	{	
-		$this->beschreibung = str_replace("'",'´',$this->beschreibung);
-		$this->raumtyp_kurzbz = str_replace("'",'´',$this->raumtyp_kurzbz);
-
+		$qry = "SELECT * FROM raumtyp;";
 		
-		//Laenge Pruefen
-		if(strlen($this->beschreibung)>256)           
+		if(!$res = pg_query($this->conn, $qry))
 		{
-			$this->errormsg = "Beschreibung darf nicht laenger als 256 Zeichen sein bei <b>$this->raumtyp_kurzbz</b> - ".$this->beschreibung;
+			$this->errormsg = 'Fehler beim laden der Datensaetze';
 			return false;
-		}		
-		if(strlen($this->raumtyp_kurzbz)>8)
+		}
+		
+		while($row = pg_fetch_object($res))
 		{
-			$this->errormsg = "Raumtyp_kurzbz darf nicht laenger als 8 Zeichen sein bei <b>$this->raumtyp_kurzbz</b>";
-			return false;
-		}	
-		$this->errormsg = '';
-		return true;		
+			$raum_obj = new raumtyp($this->conn);
+			
+			$raum_obj->raumtyp_id      = $row->raumtyp_pk;
+			$raum_obj->bezeichnung     = $row->bezeichnung;
+			$raum_obj->kurzbezeichnung = $row->kurzbezeichnung;
+			$raum_obj->plaetze         = $row->plaetze;
+			$raum_obj->updateamum      = $row->creationdate;
+			$raum_obj->updatevon       = $row->creationuser;
+			
+			$this->result[] = $raum_obj;
+		}
+		return true;
 	}
+	
 	/**
 	 * Speichert den aktuellen Datensatz
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function save()
+	 function save()
 	{
-		//Gueltigkeit der Variablen pruefen
-		if(!$this->checkvars())
-			return false;
-			
-		if($this->new)
-		{
-			//Pruefen ob id gültig ist
-			if($this->raumtyp_kurzbz == '')
-			{
-				$this->errormsg = 'Keine gültige ID';
-				return false;
-			}
-			//Neuen Datensatz anlegen		
-			$qry = 'INSERT INTO tbl_raumtyp (beschreibung, raumtyp_kurzbz) VALUES ('.
-				$this->addslashes($this->beschreibung).', '.
-				$this->addslashes($this->raumtyp_kurzbz).');';
-
-		}
-		else 
-		{
-			//bestehenden Datensatz akualisieren
-
-			//Pruefen ob id gueltig ist
-			if($this->raumtyp_kurzbz == '')
-			{
-				$this->errormsg = 'Keine gültige ID';
-				return false;
-			}
-			
-			$qry = 'UPDATE tbl_raumtyp SET '. 
-				'beschreibung='.$this->addslashes($this->beschreibung).' '.
-				'WHERE raumtyp_kurzbz = '.$this->addslashes($this->ort_kurzbz).';';
-		}
-		
-		if(pg_query($this->conn, $qry))
-		{
-			/*//Log schreiben
-			$sql = $qry;
-			$qry = "SELECT nextval('log_seq') as id;";
-			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
-			{
-				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
-				return false;
-			}
-						
-			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
-			if(pg_query($this->conn, $qry))
-				return true;
-			else 
-			{
-				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
-				return false;
-			}*/
-			return true;
-		}
-		else
-		{
-			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
-			return false;
-		}		
+		$this->errormsg = 'Noch nicht Implementiert';
+		return false;
+	}
+	
+	/**
+	 * Loescht einen Datensatz
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	 function delete($raum_id)
+	{	
+		$this->errormsg = 'Noch nicht Implementiert';
+		return false;
 	}
 }
 ?>
