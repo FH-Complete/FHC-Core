@@ -106,7 +106,7 @@ class benutzerfunktion
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
-			$this->errormsg = 'Fehler beim laden des Datensatzes';
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
 		
