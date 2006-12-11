@@ -19,26 +19,22 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-/** 
- * Klasse news (FAS-Online)
- * @create 04-12-2006
- */
 
 class news
 {
 	var $conn;   			// @var resource DB-Handle
 	var $new;     			// @var boolean
-	var $errormsg; 		// @var string
+	var $errormsg; 			// @var string
 	var $result = array(); 	// @var news Objekt 
 	
 	//Tabellenspalten
 	var $news_id;			// @var serial
 	var $betreff;			// @var varchar(128)
-	var $text;			// @var string
-	var $semester;		// @var smallint
-	var $uid;			// @var varchar(16)
+	var $text;				// @var string
+	var $semester;			// @var smallint
+	var $uid;				// @var varchar(16)
 	var $studiengang_kz;	// @var integer
-	var $verfasser;		// @var varchar(64)
+	var $verfasser;			// @var varchar(64)
 	var $updateamum;		// @var timestamp
 	var $updatevon=0;		// @var string
 	var $insertamum;		// @var timestamp
@@ -89,6 +85,43 @@ class news
 			$this->result[] = $news_obj;
 		}
 		return true;
+	}
+	
+	// **********************************
+	// * Laedt alle News die nicht aelter
+	// * als $maxalter Tage sind
+	// * @param $maxalter
+	// **********************************
+	function getnews($maxalter)
+	{
+		$qry = "SELECT * FROM campus.tbl_news WHERE now()-updateamum>$maxalter order by updateamum DESC;";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$newsobj = new news($this->conn);
+				$newsobj->news_id = $row->news_id;
+				$newsobj->uid = $row->uid;
+				$newsobj->studiengang_kz = $row->studiengang_kz;
+				$newsobj->semester = $row->semester;
+				$newsobj->betreff = $row->betreff;
+				$newsobj->text = $row->text;
+				$newsobj->verfasser = $row->verfasser;
+				$newsobj->updateamum = $row->updateamum;
+				$newsobj->updatevon = $row->updatevon;
+				$newsobj->insertamum = $row->insertamum;
+				$newsobj->insertvon = $row->insertvon;
+				
+				$this->result = $newsobj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der News';
+			return false;
+		}
 	}
 	
 	/**
@@ -145,10 +178,12 @@ class news
 		$this->errormsg = 'Noch nicht implementiert';
 		return false;
 	}
+	
 	function addslashes($var)
 	{
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
+	
 	/**
 	 * Prueft die Gueltigkeit der Variablen
 	 * @return true wenn ok, false im Fehlerfall
@@ -174,6 +209,7 @@ class news
 		$this->errormsg = '';
 		return true;		
 	}
+	
 	/**
 	 * Speichert den aktuellen Datensatz
 	 * @return true wenn ok, false im Fehlerfall
@@ -219,7 +255,6 @@ class news
 			}
 			
 			$qry = 'UPDATE campus.tbl_news SET '. 
-				'news_id='.$this->addslashes($this->news_id).', '.
 				'betreff='.$this->addslashes($this->betreff).', '.
 				'text='.$this->addslashes($this->text).', '.
 				'semester='.$this->addslashes($this->semester).', '.

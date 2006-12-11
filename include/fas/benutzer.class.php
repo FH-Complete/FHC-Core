@@ -1,151 +1,386 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
- *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+/**
+ * Klasse fuer Berechtigungen der User
+ * @author Christian Paminger
+ * @version 1.0
+ * @updated 11-Feb-2004
  */
-
-class benutzer extends person
+class benutzer
 {
-	//Tabellenspalten
-	var $uid;		// varchar(16)
-	var $bnaktiv;	// boolean
-	var $alias;		// varchar(256)
-		
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional einen Benutzer
-	// * @param $conn        	Datenbank-Connection
-	// *        $uid            Benutzer der geladen werden soll (default=null)
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function benutzer($conn, $uid=null, $unicode=false)
-	{
-		$this->conn = $conn;
-		
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-		
-		if($uid != null)
-			$this->load($uid);
-	}
+	/**
+	 * interne userberechtigung_id (Zaehler aus DB)
+	 * @var integer
+	 */
+	var $userberechtigung_id;
+	/**
+	 * @var integer
+	 */
+	var $studiengang_kz;
+	/**
+	 * @var integer
+	 */
+	var $fachbereich_id;
+	/**
+	 * @var string
+	 */
+	var $berechtigung_kurzbz;
+	/**
+	 * @var string
+	 */
+	var $uid;
+	/**
+	 * @var string
+	 */
+	var $studiensemester_kurzbz;
+	/**
+	 * @var integer
+	 */
+	var $start;
+	/**
+	 * @var integer
+	 */
+	var $ende;
+	/**
+	 * @var integer
+	 */
+	var $starttimestamp;
+	/**
+	 * @var integer
+	 */
+	var $endetimestamp;
+	/**
+	 * @var string
+	 */
+	var $art;
+
+	/**
+	 * @var array
+	 */
+	var $berechtigungen=array();
+
+	/**
+	 * @var string
+	 */
+
+	var $variable;
 	
-	// ***********************************************************
-	// * Laedt Benutzer mit der uebergebenen ID
-	// * @param $uid ID der Person die geladen werden soll
-	// ***********************************************************
-	function load($uid)
+	var $conn; //Vilesci Connection
+	/**
+	 * @var boolean
+	 */
+	var $new;
+	var $errormsg;
+
+	function benutzer($conn)
 	{
-		
+		$this->conn=$conn;
+		$this->new=true;
 	}
-	
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern 
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+
+
+	/**
+	 * Ladet die Attribute der Berechtigung aus der Datenbank. Bei Fehler ist der
+	 * Rueckgabewert 'false' und die Fehlermeldung steht in 'errormsg'.
+	 * @return boolean true=ok, false=fehler
+	 */
+	function load($id)
 	{
-		if(strlen($this->uid)>16)
+		// Berechtigung holen
+		$sql_query="SELECT * FROM tbl_userberechtigung WHERE userberechtigung_id=$id";
+	    //echo $sql_query;
+		if(!($erg=pg_exec($this->conn, $sql_query)))
 		{
-			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg=pg_errormessage($this->conn);
 			return false;
 		}
-		if($this->uid == '')
+		$num_rows=pg_numrows($erg);
+		if($num_rows!=1)
 		{
-			$this->errormsg = 'UID muss eingegeben werden';
+			$this->errormsg="Zuwenige oder zuviele Ergebnisse (Anzahl: $num_rows)!";
 			return false;
 		}
-		if(strlen($this->alias)>256)
+   		$row=pg_fetch_object($erg,0);
+
+		$this->userberechtigung_id=$row->userberechtigung_id;
+		$this->studiengang_kz=$row->studiengang_kz;
+		$this->fachbereich_id=$row->fachbereich_id;
+		$this->berechtigung_kurzbz=$row->berechtigung_kurzbz;
+		$this->uid=$row->uid;
+		$this->studiensemester_kurzbz=$row->studiensemester_kurzbz;
+		$this->start=$row->start;
+		$this->ende=$row->ende;
+		$this->art=$row->art;
+		$this->new=false;
+		
+		return true;
+	}
+
+	/**
+	 * @return boolean true=ok, false=fehler
+	 */
+	function save()
+	{
+		/*
+		// Connection holen
+		if (is_null($conn=$this->getConnection()))
 		{
-			$this->errormsg = 'Alias darf nicht laenger als 256 Zeichen sein';
 			return false;
 		}
-		if(!is_numeric($this->person_id))
-		{
-			$this->errormsg = 'person_id muss eine gueltige Zahl sein';
+		// Daten zur Person speichern
+
+		if (!person::save()) {
+			$this->errormsg.="Daten zur LVA konnten nicht gespeichert werden.";
 			return false;
 		}
-		if(!is_bool($this->aktiv))
+		if ($this->new) {
+			$qry="INSERT INTO tbl_lehrveranstaltung(lvnr,unr,einheit_kurzbz,".
+				 "lektor,lehrfach_nr,studiengang_kz,fachbereich_id,semester,verband,".
+				 "gruppe,raumtyp,raumtypalternativ,semesterstunden,stundenblockung,".
+				 "wochenrythmus,start_kw,anmerkung)".
+				 "values(".
+				 "'".$this->lvnr."',".
+				 "'".$this->unr."',".
+				 "'".$this->einheit_kurzbz."',".
+				 "'".$this->lektor."',".
+				 (strlen($this->lehrfach_nr)>0?$this->lehrfach_nr:NULL).",".
+				 (strlen($this->studiengang_kz)>0?$this->studiengang_kz:NULL).",".
+				 (strlen($this->fachbereich_id)>0?$this->fachbereich_id:NULL).",".
+				 (strlen($this->semester)>0?$this->semester:NULL).",".
+				 "'".$this->verband."',".
+				 "'".$this->gruppe."',".
+				 (strlen($this->raumtyp)>0?"'".$this->raumtyp."'":NULL).",".
+				 (strlen($this->raumtypalternativ)>0?"'".$this->raumtypalternativ."'":NULL).",".
+				 (strlen($this->semesterstunden)>0?$this->semesterstunden:NULL).",".
+				 (strlen($this->stundenblockung)>0?$this->stundenblockung:NULL).",".
+				 (strlen($this->wochenrythmus)>0?$this->wochenrythmus:NULL).",".
+				 (strlen($this->start_kw)>0?$this->start_kw:NULL).",".
+				 (strlen($this->anmerkung)>0?"'".$this->anmerkung."'":NULL).",".
+				 ")";
+		} else
 		{
-			$this->errormsg = 'aktiv muss ein boolscher wert sein';
+			$qry="UPDATE tbl_lehrveranstaltung ".
+				 "SET lvnr='".$this->lvnr."',".
+				 "unr='".$this->unr."',".
+				 "einheit_kurzbz='".$this->einheit_kurzbz."',".
+				 "lektor='".$this->lehrfach_nr."',".
+				 "lehrfach_nr=".(strlen($this->lehrfach_nr)>0?$this->lehrfach_nr:NULL).",".
+				 "studiengang_kz=".(strlen($this->studiengang_kz)>0?$this->studiengang_kz:NULL).",".
+				 "fachbereich_id=".(strlen($this->fachbereich_id)>0?$this->fachbereich_id:NULL).",".
+				 "semester=".(strlen($this->semester)>0?$this->semester:NULL).",".
+				 "verband='".$this->verband."',".
+				 "gruppe='".$this->gruppe."',".
+				 "raumtyp=".(strlen($this->raumtyp)>0?"'".$this->raumtyp."'":NULL).",".
+				 "raumtypalternativ=".(strlen($this->raumtypalternativ)>0?"'".$this->raumtypalternativ."'":NULL).",".
+				 "semesterstunden=".(strlen($this->semesterstunden)>0?$this->semesterstunden:NULL).",".
+				 "stundenblockung=".(strlen($this->stundenblockung)>0?$this->stundenblockung:NULL).",".
+				 "wochenrythmus=".(strlen($this->wochenrythmus)>0?$this->wochenrythmus:NULL).",".
+				 "start_kw=".(strlen($this->start_kw)>0?$this->start_kw:NULL).",".
+				 "anmerkung=".(strlen($this->anmerkung)>0?"'".$this->anmerkung."'":NULL).
+				 " WHERE lehrveranstaltung_id='".$this->lehrveranstaltung_id."'";
+		}
+		//echo "<br>".$qry;
+		if(!@pg_query($conn, $qry))
+		{
+			$this->errormsg=pg_errormessage($conn);
 			return false;
+		}
+		return true;
+		*/
+	}
+
+
+	/**
+	 * Rueckgabewert ist ein Array mit den Ergebnissen. Bei Fehler false und die
+	 * Fehlermeldung liegt in errormsg.
+	 * Wenn der Parameter stg_kz NULL ist tritt einheit_kurzbzb in Kraft.
+	 * @param string $uid    UserID
+	 * @return variabel Array mit LVA; <b>false</b> bei Fehler
+	 */
+	function getBerechtigungen($uid)
+	{
+		// Berechtigungen holen
+		$sql_query="SELECT * FROM tbl_userberechtigung WHERE uid='$uid' AND (start<now() OR start IS NULL) AND (ende>now() OR ende IS NULL)";
+	    //echo $sql_query;
+		if(!$erg=@pg_query($this->conn, $sql_query))
+		{
+			$this->errormsg=pg_errormessage($this->conn);
+			return false;
+		}
+		//$num_rows=pg_numrows($erg);
+		while($row=pg_fetch_object($erg))
+		{
+   			$b=new berechtigung($this->conn);
+			$b->userberechtigung_id=$row->userberechtigung_id;
+			$b->studiengang_kz=$row->studiengang_kz;
+			$b->fachbereich_id=$row->fachbereich_id;
+			$b->berechtigung_kurzbz=$row->berechtigung_kurzbz;
+			$b->uid=$row->uid;
+			$b->studiensemester_kurzbz=$row->studiensemester_kurzbz;
+			$b->start=$row->start;
+			if ($row->start!=null)
+				$b->starttimestamp=mktime(0,0,0,substr($row->start,5,2),substr($row->start,8),substr($row->start,0,4));
+			else
+				$b->starttimestamp=null;
+			$b->ende=$row->ende;
+			if ($row->ende!=null)
+				$b->endetimestamp=mktime(23,59,59,substr($row->ende,5,2),substr($row->ende,8),substr($row->ende,0,4));
+			else
+				$b->endetimestamp=null;
+			$b->art=$row->art;
+			$this->berechtigungen[]=$b;
 		}
 		return true;
 	}
 	
-	// ******************************************************************
-	// * Speichert die Benutzerdaten in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * ansonsten der Datensatz mit $uid upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ******************************************************************
-	function save()
+
+	function isBerechtigt($berechtigung,$studiengang_kz=null,$art=null)
 	{
-		//Personen Datensatz speichern
-		if(!person::save())
-			return false;
-			
-		//Variablen auf Gueltigkeit pruefen
-		if(!benutzer::validate())
-			return false;
-		
-		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
+		$timestamp=time();
+		foreach ($this->berechtigungen as $b)
 		{
-			$qry = 'INSERT INTO tbl_benutzer (uid, aktiv, alias, person_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
-			       "'".addslashes($this->uid)."',".
-			       ($this->aktiv?'true':'false').','.
-			       $this->addslashes($this->alias).",'".
-			       $this->person_id."',".
-			       $this->addslashes($this->insertamum).",".
-			       $this->addslashes($this->insertvon).",".
-			       $this->addslashes($this->updateamum).",".
-			       $this->addslashes($this->updatevon).");";
+			if($berechtigung == $b->berechtigung_kurzbz && $studiengang_kz==null && $art==null)
+			   if ($b->starttimestamp!=null && $b->endetimestamp!=null)
+				{
+					if ($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp)
+						return true;
+				}
+				else
+					return true;
+			   
+			if	($berechtigung==$b->berechtigung_kurzbz 
+			     && ($studiengang_kz==$b->studiengang_kz || $b->studiengang_kz==0) && $art==null)
+				if ($b->starttimestamp!=null && $b->endetimestamp!=null)
+				{
+					if ($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp)
+						return true;
+				}
+				else
+					return true;
+					
+			if	($berechtigung==$b->berechtigung_kurzbz 
+			     && ($studiengang_kz==$b->studiengang_kz || $b->studiengang_kz==0) 
+			     && strstr($b->art,$art))
+				if ($b->starttimestamp!=null && $b->endetimestamp!=null)
+				{
+					if ($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp)
+						return true;
+				}
+				else
+					return true;
 		}
-		else
-		{			
-			$qry = 'UPDATE tbl_benutzer SET'.
-			       ' aktiv='.($this->aktiv?'true':'false').','.
-			       ' alias='.$this->addslashes($this->alias).','.
-			       " person_id='".$this->person_id."',".
-			       ' updateamum='.$this->addslashes($this->updateamum).','.
-			       ' updatevon='.$this->addslashes($this->updatevon).
-			       " WHERE uid='".addslashes($this->uid)."';";
-		}
+		return false;
+	}
+
+	/**
+	* Gibt Array mit Kennzahlen der Studiengaenge sortiert zurueck.
+	* Optional wird auf Berechtigung eingeschraenkt.
+	* Wenn Berechtigung ueber alle Studiengaenge steht im ersten Feld 0.
+	*/
+	function getStgKz($berechtigung=null)
+	{
+		$studiengang_kz=array();
+		$timestamp=time();
 		
-		if(pg_query($this->conn,$qry))
+		foreach ($this->berechtigungen as $b)
+			if	($berechtigung==$b->berechtigung_kurzbz || $berechtigung==null)
+				$studiengang_kz[]=$b->studiengang_kz;
+		$studiengang_kz=array_unique($studiengang_kz);
+		sort($studiengang_kz);
+		return $studiengang_kz;
+	}
+	
+	/**
+	 * Setzt die Studiensemester Variable
+	 */
+	function setVariableStudiensemester($user,$stsem)
+	{
+		//Vorhandende Variable aendern
+		$qry = "Update tbl_variable SET wert='$stsem' WHERE uid='$user' AND name='semester_aktuell'";
+		if($result = pg_query($this->conn,$qry))
 		{
-			//Log schreiben
-			return true;
+			if(pg_affected_rows($result)==0)
+			{
+				//Falls Variable nicht vorhanden ist eine neue anlegen
+				$qry = "INSERT INTO tbl_variable(uid, name, wert) values('$user', 'semester_aktuell', '$stsem')";
+				if(pg_query($this->conn,$qry))
+					return true;
+				else 
+				{
+					$this->errormsg.=pg_errormessage($this->conn);
+					return false;
+				}
+			}
+			else 
+				return true;
 		}
 		else 
-		{	
-			$this->errormsg = 'Fehler beim Speichern des Benutzer-Datensatzes:'.$qry;
+		{
+			$this->errormsg.=pg_errormessage($this->conn);
 			return false;
 		}
+	}
+	
+	function getpossibilities($variable)
+	{
+		$ret = array();
+		
+		switch($variable)
+		{
+			case 'semester_aktuell':
+				$qry = "Select * from tbl_studiensemester order by start";
+				if($result = pg_query($this->conn,$qry))
+				{
+					while($row=pg_fetch_object($result))
+						$ret[] = $row->studiensemester_kurzbz;
+				}
+				break;
+		}		
+		return $ret;
+	}
+	
+	function loadVariables($user)
+	{			
+		if(!($result=@pg_query($this->conn, "SELECT * FROM tbl_variable WHERE uid='$user'")))
+		{
+			$this->errormsg.=pg_errormessage($this->conn);
+			return false;
+		}
+		else
+			$num_rows=@pg_numrows($result);
+		
+		while($row=pg_fetch_object($result))
+		{				
+			$this->variable->{$row->name}=$row->wert;			
+		}
+		
+		if (!isset($this->variable->semester_aktuell))
+		{
+			if(!($result=@pg_query($this->conn, 'SELECT * FROM tbl_studiensemester WHERE ende>now() ORDER BY start LIMIT 1')))
+			{
+				$this->errormsg.=pg_errormessage($this->conn);
+				return false;
+			}
+			else
+			{
+				$num_rows=@pg_numrows($result);
+				if ($num_rows>0)
+				{
+					$row=pg_fetch_object($result);
+					$this->variable->semester_aktuell=$row->studiensemester_kurzbz;
+				}
+			}
+		}
+		
+		if (!isset($this->variable->db_stpl_table))
+			$this->variable->db_stpl_table='stundenplan';
+			
+		if (!isset($this->variable->fas_id))
+			$this->variable->fas_id=0;
+			
+		if (!isset($this->variable->sleep_time))
+			$this->variable->sleep_time=300;
+			
+		return true;
 	}
 }
 ?>

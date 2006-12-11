@@ -1,154 +1,160 @@
-<?php 
+<?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
 
-class studiensemester 
+class studiensemester
 {
-
-	/**
-	 * @var string 
-	 */
-	var $kurzbz;
-	/**
-	 * @var string 
-	 */
-	var $start;
-	/**
-	 * @var string
-	 */
-	var $ende;
-
-	/**
-	 * @var string
-	 */
-	var $errormsg;
-
-	/**
-	 * @var conn
-	 */
-	var $conn;
+	var $conn;     // resource DB-Handle
+	var $errormsg; // string
+	var $new;      // boolean
+	var $studiensemester = array(); // studiensemester Objekt
 	
-	function studiensemester($conn)
-	{
-		$this->conn=$conn;
-	}
-
-	/**
-	* Verbindung zur Datenbank herstellen
-	* @return PostgreSQL-Connection oder NULL
+	//Tabellenspalten
+	var $studiensemester_kurzbz; // varchar(16)
+	var $start; // date
+	var $ende;  // date
 	
-	function getConnection()
+	// ***********************************************************************
+	// * Konstruktor - Uebergibt die Connection und laedt optional ein LF
+	// * @param $conn        Datenbank-Connection
+	// *        $studiensemester_kurzbz StSem das geladen werden soll (default=null)
+	// *        $unicode     Gibt an ob die Daten mit UNICODE Codierung 
+	// *                     oder LATIN9 Codierung verarbeitet werden sollen
+	// ***********************************************************************
+	function studiensemester($conn, $studiensemester_kurzbz=null, $unicode=false)
 	{
-		if (!$conn = @ pg_pconnect(CONN_STRING))
-		{
-			$this->errormsg = "Es konnte keine Verbindung zum Server "."aufgebaut werden.";
-			return null;
-		}
-		return $conn;
-	}*/
-
-	function load()
-	{
-
-	}
-
-	/**
-	 * Alle Studiensemester zurückgeben
-	 * @return array mit Studiensemester oder false=fehler
-	 */
-	function getAll($order='studiensemester_kurzbz')
-	{
-		if (is_null($this->conn))
-		{
-			return false;
-		}
-		$qry = "select * from tbl_studiensemester ".
-			   "order by $order";
-		//echo $qry;
-		if (!($erg = pg_exec($this->conn, $qry)))
-		{
-			$this->errormsg = pg_errormessage($this->conn);
-			return false;
-		}
-		$result = array();
-		$num_rows = pg_numrows($erg);
-		for ($i = 0; $i < $num_rows; $i ++)
-		{
-			// Record holen
-			$row = pg_fetch_object($erg, $i);
-			// Instanz erzeugen
-			$lf = new studiensemester($this->conn);
-			$lf->kurzbz = $row->studiensemester_kurzbz;			
-			$lf->start = $row->start;
-			$lf->ende = $row->ende;
-			// in array speichern
-			$result[] = $lf;
-		}
-		return $result;
-	}
-
-	/**
-	 * Liefert das Aktuelle Studiensemester
-	 * @return aktuelles Studiensemester oder false wenn es keines gibt
-	 */
-	function getakt()
-	{
-		$qry = "Select studiensemester_kurzbz from tbl_studiensemester where start <= now() and ende >= now()";
-		if(!$res=pg_exec($this->conn,$qry))
-		{
-			$this->errormsg = pg_errormessage($this->conn);
-			return false;
-		}
+		$this->conn = $conn;
 		
-		if(pg_num_rows($res)>0)
-		{
-		   $erg = pg_fetch_object($res);
-		   return $erg->studiensemester_kurzbz;
-		}
+		if($unicode)
+			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else 
+			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+
+		if(!pg_query($conn,$qry))
 		{
-			$this->errormsg = "Kein aktuelles Studiensemester vorhanden";
+			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
+
+		if($studiensemester_kurzbz != null)
+			$this->load($studiensemester_kurzbz);
 	}
-	
-	/**
-	 * Liefert das Aktuelle Studiensemester oder das darauffolgende
-	 * @return Studiensemester oder false wenn es keines gibt
-	 */
-	function getaktorNext()
+
+	// **************************************************************
+	// * Laedt das Studiensemester mit der uebergebenen ID
+	// * @param $studiensemester_kurzbz Stsem das geladen werden soll
+	// **************************************************************
+	function load($studiensemester_kurzbz)
 	{
-		if($stsem=$this->getakt())
-		   return $stsem;
-		else 
+		$qry = "SELECT * FROM tbl_studiensemester WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+
+		if(!$result=pg_query($this->conn,$qry))
 		{
-			$qry = "Select studiensemester_kurzbz from tbl_studiensemester where ende >= now() ORDER BY ende";
-			if(!$res=pg_exec($this->conn,$qry))
-		    {
-				$this->errormsg = pg_errormessage($this->conn);
-				return false;
-		    }
-		
-			if(pg_num_rows($res)>0)
-			{
-			   $erg = pg_fetch_object($res);
-			   return $erg->studiensemester_kurzbz;
-			}
-			else 
-			{
-				$this->errormsg = "Kein aktuelles Studiensemester vorhanden";
-				return false;
-			}
+			$this->errormsg = 'Fehler beim lesen des Studiensemesters';
+			return false;
 		}
+
+		if($row = pg_fetch_object($result))
+		{
+			$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+			$this->start = $row->start;
+			$this->ende = $row->ende;
+		}
+		else
+		{
+			$this->errormsg = "Es ist kein Studiensemester mit der Kurzbezeichung $studiensemester_kurzbz vorhanden";
+			return false;
+		}
+
+		return true;
 	}
-	
+
+	// *******************************************
+	// * Prueft die Variablen vor dem Speichern
+	// * auf Gueltigkeit.
+	// * @return true wenn ok, false im Fehlerfall
+	// *******************************************
+	function validate()
+	{
+		if(strlen($this->studiensemester_kurzbz)>16)
+		{
+			$this->errormsg = 'Studiensemester Kurzbezeichnung darf nicht laenger als 16 Zeichen sein';
+			return false;
+		}
+		if($this->studiensemester_kurzbz=='')
+		{
+			$this->errormsg = 'Es muss eine Kurzbezeichnung eingegeben werden';
+			return false;
+		}
+		return true;
+	}
+
+	// ************************************************
+	// * wenn $var '' ist wird "null" zurueckgegeben
+	// * wenn $var !='' ist werden Datenbankkritische 
+	// * zeichen mit backslash versehen und das ergbnis
+	// * unter hochkomma gesetzt.
+	// ************************************************
+	function addslashes($var)
+	{
+		return ($var!=''?"'".addslashes($var)."'":'null');
+	}
+
+	// ************************************************************
+	// * Speichert das Studiensemester in die Datenbank
+	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	// * angelegt, ansonsten der Datensatz upgedated
+	// * @return true wenn erfolgreich, false im Fehlerfall
+	// ************************************************************
 	function save()
 	{
+		//Variablen auf Gueltigkeit pruefen
+		if(!$this->validate())
+			return false;
 
+		if($this->new)
+		{
+			$qry = "INSERT INTO tbl_studiensemester (studiensemester_kurzbz, start, ende)
+			        VALUES('".addslashes($this->studiensemester_kurzbz)."',".
+					$this->addslashes($this->start).','.
+					$this->addslashes($this->ende).');';
+		}
+		else
+		{			
+			$qry = 'UPDATE tbl_studiensemester SET'.
+			       ' start='.$this->addslashes($this->start).','.
+			       ' ende='.$this->addslashes($this->ende).
+			       " WHERE studiensemester_kurzbz='$this->studiensemester_kurzbz'";
+		}
+
+		if(pg_query($this->conn,$qry))
+		{
+			//Log schreiben
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern des Studiensemesters:'.$qry;
+			return false;
+		}
 	}
-
-	function delete()
-	{
-
-	}
-
 }
 ?>

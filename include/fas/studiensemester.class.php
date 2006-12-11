@@ -1,160 +1,163 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
- *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+/**
+ * Klasse studiensemester (FAS-Online)
+ * @create 15-03-2006
  */
-
 class studiensemester
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $studiensemester = array(); // studiensemester Objekt
+	var $conn;    // @var resource DB-Handle
+	var $new;      // @var boolean
+	var $errormsg; // @var string
+	var $result = array(); // @var studiensemester Objekt
 	
-	//Tabellenspalten
-	var $studiensemester_kurzbz; // varchar(16)
-	var $start; // date
-	var $ende;  // date
+	var $studiensemester_id; // @var integer
+	var $aktuell;            // @var boolean
+	var $art;                // @var integer ( 1 = Wintersemester, 2 = Sommersemester )
+	var $jahr;	            // @var integer
+	var $updateamum;         // @var timestamp
+	var $updatevon;          // @var string
 	
-	// ***********************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional ein LF
-	// * @param $conn        Datenbank-Connection
-	// *        $studiensemester_kurzbz StSem das geladen werden soll (default=null)
-	// *        $unicode     Gibt an ob die Daten mit UNICODE Codierung 
-	// *                     oder LATIN9 Codierung verarbeitet werden sollen
-	// ***********************************************************************
-	function studiensemester($conn, $studiensemester_kurzbz=null, $unicode=false)
+	/**
+	 * Konstruktor
+	 * @param $conn Connection zur Datenbank
+	 *        $stsem_id ID des Studiensemesters das geladen werden soll
+	 */
+	function studiensemester($conn, $stsem_id=null)
 	{
 		$this->conn = $conn;
-		
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
+		$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		if(!pg_query($conn,$qry))
 		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
+			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
 			return false;
 		}
-
-		if($studiensemester_kurzbz != null)
-			$this->load($studiensemester_kurzbz);
+		if($stsem_id != null)
+			$this->load($stsem_id);
 	}
-
-	// **************************************************************
-	// * Laedt das Studiensemester mit der uebergebenen ID
-	// * @param $studiensemester_kurzbz Stsem das geladen werden soll
-	// **************************************************************
-	function load($studiensemester_kurzbz)
+	
+	/**
+	 * Laedt den Datensatz mit der ID die uebergeben wird
+	 * @param stsem_id ID des zu ladenden Datensatzes
+	 * @return true wenn  ok, false im fehlerfall;
+	 */
+	function load($stsem_id)
 	{
-		$qry = "SELECT * FROM tbl_studiensemester WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
-
-		if(!$result=pg_query($this->conn,$qry))
+		//Pruefen ob stsem_id eine gueltige Zahl ist
+		if(!is_numeric($stsem_id) || $stsem_id == '')
 		{
-			$this->errormsg = 'Fehler beim lesen des Studiensemesters';
+			$this->errormsg = 'stsem_id muss eine gueltige Zahl sein';
 			return false;
 		}
-
-		if($row = pg_fetch_object($result))
+		
+		//Laden eines Datensatzes
+		$qry = "SELECT * FROM studiensemester WHERE studiensemester_pk = '$stsem_id';";
+		
+		if(!$res = pg_query($this->conn, $qry))
 		{
-			$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
-			$this->start = $row->start;
-			$this->ende = $row->ende;
-		}
-		else
-		{
-			$this->errormsg = "Es ist kein Studiensemester mit der Kurzbezeichung $studiensemester_kurzbz vorhanden";
+			$this->errormsg = 'Fehler beim laden des Datensatzes';
 			return false;
 		}
-
+		
+		if($row = pg_fetch_object($res))
+		{
+			$this->studiensemester_id = $row->studiensemester_pk;
+			$this->aktuell            = ($row->aktuell=='J'?true:false);
+			$this->art                = $row->art;
+			$this->jahr               = $row->jahr;
+			$this->updateamum         = $row->creationdate;
+			$this->updatevon          = $row->creationuser;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden des Datensatzes';
+			return false;
+		}
+		
 		return true;
 	}
-
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	
+	
+	/**
+	 * Laedt das aktuelle Studiensemester
+	 * @return true wenn ok, false im Fehlerfall 
+	 */
+	function load_akt()
 	{
-		if(strlen($this->studiensemester_kurzbz)>16)
+		$qry = "SELECT * FROM studiensemester WHERE aktuell='J'";
+		
+		if(!$res = pg_query($this->conn, $qry))
 		{
-			$this->errormsg = 'Studiensemester Kurzbezeichnung darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg = 'Fehler beim laden des Datensatzes';
 			return false;
 		}
-		if($this->studiensemester_kurzbz=='')
+		
+		if($row = pg_fetch_object($res))
 		{
-			$this->errormsg = 'Es muss eine Kurzbezeichnung eingegeben werden';
+			$this->studiensemester_id = $row->studiensemester_pk;
+			$this->aktuell            = ($row->aktuell=='J'?true:false);
+			$this->art                = $row->art;
+			$this->jahr               = $row->jahr;
+			$this->updateamum         = $row->creationdate;
+			$this->updatevon          = $row->creationuser;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden des Datensatzes';
 			return false;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Laedt alle studiensemester
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	function getAll()
+	{
+		$qry = "SELECT * FROM studiensemester order by jahr, art desc;";
+		
+		if(!$res = pg_query($this->conn, $qry))
+		{
+			$this->errormsg = 'Fehler beim laden des Datensatzes';
+			return false;
+		}
+		
+		while($row = pg_fetch_object($res))
+		{
+			$stsem_obj = new studiensemester($this->conn);
+			
+			$stsem_obj->studiensemester_id = $row->studiensemester_pk;
+			$stsem_obj->aktuell            = ($row->aktuell=='J'?true:false);
+			$stsem_obj->art                = $row->art;
+			$stsem_obj->jahr               = $row->jahr;
+			$stsem_obj->updateamum         = $row->creationdate;
+			$stsem_obj->updatevon          = $row->creationuser;
+			
+			$this->result[] = $stsem_obj;
 		}
 		return true;
 	}
-
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische 
-	// * zeichen mit backslash versehen und das ergbnis
-	// * unter hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
+	
+	/**
+	 * Loescht einen Datensatz
+	 * @param $stsem_id ID des zu loeschenden Datensatzes
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	function delete($stsem_id)
 	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
+		$this->errormsg = 'Noch nicht implementiert';
+		return false;
 	}
-
-	// ************************************************************
-	// * Speichert das Studiensemester in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
+	
+	/**
+	 * Speichert den aktuellen Datensatz
+	 * @return true wenn ok, false im Fehlerfall
+	 */
 	function save()
 	{
-		//Variablen auf Gueltigkeit pruefen
-		if(!$this->validate())
-			return false;
-
-		if($this->new)
-		{
-			$qry = "INSERT INTO tbl_studiensemester (studiensemester_kurzbz, start, ende)
-			        VALUES('".addslashes($this->studiensemester_kurzbz)."',".
-					$this->addslashes($this->start).','.
-					$this->addslashes($this->ende).');';
-		}
-		else
-		{			
-			$qry = 'UPDATE tbl_studiensemester SET'.
-			       ' start='.$this->addslashes($this->start).','.
-			       ' ende='.$this->addslashes($this->ende).
-			       " WHERE studiensemester_kurzbz='$this->studiensemester_kurzbz'";
-		}
-
-		if(pg_query($this->conn,$qry))
-		{
-			//Log schreiben
-			return true;
-		}
-		else
-		{
-			$this->errormsg = 'Fehler beim Speichern des Studiensemesters:'.$qry;
-			return false;
-		}
+		$this->errormsg = 'Noch nicht implementiert';
+		return false;
 	}
 }
 ?>

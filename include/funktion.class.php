@@ -1,279 +1,217 @@
-<?php 
-
-
-/**
- * @author Christian Paminger, Werner Masik
- * @version 1.0
- * @created 22-Okt-2004
- * @update  28.10.2004
+<?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+/** 
+ * Klasse funktion (FAS-Online)
+ * @create 14-03-2006
+ */
+
 class funktion
 {
-
+	var $conn;   			// @var resource DB-Handle
+	var $new;     			// @var boolean
+	var $errormsg; 		// @var string
+	var $result = array(); 	// @var fachbereich Objekt 
+	
+	//Tabellenspalten
+	var $funktion_kurzbz;	// @var integer
+	var $bezeichnung;		// @var string
+	var $aktiv;			// @var boolean
+	var $ext_id;			// @var bigint
+	
+	
 	/**
-	 * @var string
+	 * Konstruktor
+	 * @param $conn Connection zur DB
+	 *        $funktion_kurzbz ID der zu ladenden Funktion
 	 */
-	var $kurzbz;
-	/**
-	 * @var string
-	 */
-	var $bezeichnung;
-	/**
-	 * @var boolean
-	 */
-	var $aktiv;
-	/**
-	 * @var string
-	 */
-	var $errormsg;
-	/**
-	 * @var boolean
-	 */
-	var $new=true;
-
-	/**
-	 * @var resource
-	 */
-	var $conn;
-
-	function funktion($conn)
+	function funktion($conn, $funktion_kurzbz=null)
 	{
 		$this->conn = $conn;
+		if($funktion_kurzbz != null)
+			$this->load($funktion_kurzbz);
 	}
-
-
+	
 	/**
-	 * Ladet die Attribute der Funktion aus der Datenbank. Bei Fehler ist der
-	 * Rueckgabewert 'false' und die Fehlermeldung steht in 'errormsg'.
-	 * @return boolean true=ok, false=fehler
+	 * Laedt alle verfuegbaren Funktionen
+	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load($kurzbz)
+	function getAll()
 	{
-		$this->kurzbz=$kurzbz;
-		$qry="select * from tbl_funktion where funktion_kurzbz='$kurzbz'";
-		if (is_null($this->conn)) {
-			return false;	
-		}		
-		if(!($erg=@pg_exec($this->conn, $qry)))
+		$qry = 'SELECT * FROM tbl_funktion order by funktion_kurzbz;';
+		
+		if(!$res = pg_query($this->conn, $qry))
 		{
-			$this->errormsg=pg_errormessage($this->conn);
+			$this->errormsg = 'Fehler beim laden der Datensaetze';
 			return false;
 		}
-		$num_rows=pg_numrows($erg);
-		if($num_rows!=1) {
-			$this->errormsg="Zuwenige oder zuviele Ergebnisse (Anzahl: $num_rows)!";
-			return false;
+		
+		while($row = pg_fetch_object($res))
+		{
+			$funktion_obj = new funktion($this->conn);
+			
+			$funktion_obj->funktion_kurzbz 	= $row->funktion_kurzbz;
+			$funktion_obj->bezeichnung    	= $row->bezeichnung;
+			$funktion_obj->aktiv           		= $row->aktiv;
+			
+			$this->result[] = $funktion_obj;
 		}
-		$row=pg_fetch_object($erg,0);		
-		$this->bezeichnung=$row->bezeichnung;
-		$this->aktiv=$row->aktiv=='t'?true:false;
-		$this->new=false;		
 		return true;
 	}
-
+	
 	/**
-	 * Speichert die Funktion in die Datenbank. Bei Fehler ist der Rueckgabewert
-	 * 'false' und die Fehlermeldung steht in 'errormsg'. INSERT oder DELETE wird
-	 * durch 'new' bestimmt.
-	 * @return boolean true=ok, false=fehler
+	 * Laedt eine Funktion
+	 * @param $funktion_kurzbz ID der zu ladenden Funktion
+	 * @return true wenn ok, false im Fehlerfall
 	 */
+	function load($funktion_kurzbz)
+	{
+		if($funktion_kurzbz == '')
+		{
+			$this->errormsg = 'funktion_bz darf nicht leer sein';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM tbl_funktion WHERE funktion_kurzbz = '$funktion_kurzbz';";
+		
+		if(!$res = pg_query($this->conn, $qry))
+		{
+			$this->errormsg = 'Fehler beim laden des Datensatzes';
+			return false;
+		}
+		
+		if($row=pg_fetch_object($res))
+		{
+			$this->funktion_kurzbz	= $row->funktion_kurzbz;
+			$this->bezeichnung		= $row->bezeichnung;
+			$this->aktiv			= $row->aktiv;
+		}
+		else 
+		{
+			$this->errormsg = 'Es ist kein Datensatz mit dieser ID vorhanden';
+			return false;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Loescht einen Datensatz
+	 * @param $funktion_id id des Datensatzes der geloescht werden soll
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	function delete($funktion_kurzbz)
+	{
+		$this->errormsg = 'Noch nicht implementiert';
+		return false;
+	}
+	function addslashes($var)
+	{
+		return ($var!=''?"'".addslashes($var)."'":'null');
+	}
+	/**
+	 * Speichert den aktuellen Datensatz
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	/**
+	 * Prueft die Gueltigkeit der Variablen
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	function checkvars()
+	{	
+		$this->bezeichnung = str_replace("'",'´',$this->bezeichnung);
+		
+		//Laenge Pruefen
+		if(strlen($this->bezeichnung)>64)           
+		{
+			$this->errormsg = "Bezeichnung darf nicht laenger als 128 Zeichen sein bei <b>$this->funktion_kurzbz</b> - $this->bezeichnung";
+			return false;
+		}
+				
+		$this->errormsg = '';
+		return true;		
+	}
 	function save()
 	{
-		if (is_null($this->conn)) {
-			return false;	
-		}	
-		if (strlen($this->kurzbz)==0) 
-		{
-			$this->errormsg="<i>kurzbz</i> nicht gesetzt";
+		//Gueltigkeit der Variablen pruefen
+		if(!$this->checkvars())
 			return false;
-		}
-		if ($this->new) 
+			
+		if($this->new)
 		{
-			$qry="insert into tbl_funktion(funktion_kurzbz,bezeichnung,aktiv) ".
-				 "values('".$this->kurzbz."','".$this->bezeichnung."',".($this->aktiv?'t':'f').")";
-		} else 
-		{
-			$qry="update tbl_funktion set bezeichnung='".$this->bezeichnung."',".
-				 "aktiv=".($this->aktiv?'t':'f')." where funktion_kurzbzb='$this->kurzbz'";
-		} 
-		if(!($erg=@pg_exec($this->conn, $qry)))
-		{
-			$this->errormsg=pg_errormessage($this->conn);
-			return false;
-		}		
-		return true;
-	}
-
-	/**
-	 * Loescht die Funktion aus der Datenbank. Bei Fehler ist der Rueckgabewert
-	 * 'false' und die Fehlermeldung steht in 'errormsg'.
-	 * @return boolean true=ok, false=fehler
-	 */
-	function delete()
-	{
-		if (is_null($this->conn)) {
-			return false;	
-		}	
-		if (strlen($this->kurzbz)==0) 
-		{
-			$this->errormsg="<i>kurzbz</i> nicht gesetzt";
-			return false;
-		}
-		$qry="delete from tbl_funktion where funktion_kurzbz='".$this->kurzbz."'";
-		if(!($erg=@pg_exec($this->conn, $qry)))
-		{
-			$this->errormsg=pg_errormessage($this->conn);
-			return false;
-		}		
-		return true;
-	}
-
-	/**
-	 * alle Personen mit dieser Funktion holen
-	 * @param string $kurzbz Kurzbezeichnung der Funktion (wenn nicht angegeben
-	 * wird lokale $kurzbz verwendet)
-	 * @return array key=personfunktion_id, value=array('person','studiengang_kz'',
-	 * 'studiengang_kurzbz','fachbereich_id', 'fachbereich_kurzbz')  oder false, wenn Fehler
-	 */
-	function getPersonen($kurzbz='') 
-	{
-		// Array für Suchergebnis
-		$result=array();
-		
-		if (strlen($kurzbz)==0)
-		{
-			$search_kurzbz=$this->kurzbz;
-		} else
-		{
-			$search_kurzbz=$kurzbz;
-		}
-		$qry="select tbl_personfunktion.*,tbl_studiengang.kurzbz as studiengang_kurzbz,tbl_fachbereich.kurzbz as fachbereich_kurzbz from tbl_personfunktion join tbl_person using(uid) ".
-			 "left join tbl_studiengang using(studiengang_kz) ".
-			 "left join tbl_fachbereich using(fachbereich_id) ".
-			 "where funktion_kurzbz='$search_kurzbz' ".
-			 "order by upper(tbl_person.nachname)";
-		if (is_null($this->conn)) {
-			return false;	
-		}	
-		//echo "'".$qry."'";
-		if(!($erg=@pg_exec($this->conn, $qry)))
-		{
-			$this->errormsg=pg_errormessage($this->conn);
-			return false;
-		}		
-		$num_rows=pg_numrows($erg);
-		for ($i=0;$i<$num_rows;$i++) 
-		{			
-			// Person laden (nicht für große Anzahl von Personen geeignet)
-			$temp_person=new person($this->conn);
-			$temp_person->load(pg_result($erg,$i,'uid'));
-			// und in Array speichern
-			$result[pg_result($erg,$i,'personfunktion_id')]=array(
-				'person'=>$temp_person,
-				'studiengang_kz'=>@pg_result($erg,$i,'studiengang_kz'),
-				'studiengang_kurzbz'=>@pg_result($erg,$i,'studiengang_kurzbz'),
-				'fachbereich_kurzbz'=>@pg_result($erg,$i,'fachbereich_kurzbz'),
-				'fachbereich_id'=>@pg_result($erg,$i,'fachbereich_id') 				
-				);
-		}		
-		return $result;
-	}
-
-	/**
-	 * Person Funktion dazugeben
-	 * @param string $uid User-ID
-	 * @param string $studiengang_kz Studiengang-Kennzahl (optional)
-	 * @param integer $fachbereich_id optional
-	 * @return boolean true=ok, false=fehler
-	 */
-	function addPerson($uid,$studiengang_kz=null,$fachbereich_id=null) 
-	{
-		if (is_null($this->conn)) {
-			return false;	
-		}	
-		$targetlist="uid,funktion_kurzbz";
-		if (strlen($studiengang_kz)>0) $targetlist.=",studiengang_kz";
-		if (strlen($fachbereich_id)>0) $targetlist.=",fachbereich_id";
-		$values="'$uid','".$this->kurzbz."'";
-		if (strlen($studiengang_kz)>0) $values.=",$studiengang_kz";
-		if (strlen($fachbereich_id)>0) $values.=",$fachbereich_id";
-		$qry="insert into tbl_personfunktion($targetlist) ".
-			 "values($values)";
-		//echo $qry;
-		if(!($erg=@pg_exec($this->conn, $qry)))
-		{
-			$this->errormsg=pg_errormessage($this->conn);
-			return false;
-		}		
-		return true;	 
-	}
-	
-	/**
-	 * Person Funktion wegnehmen
-	 * @param string $uid User-ID
-	 * @param string $studiengang_kz Studiengang-Kennzahl (optional)
-	 * @param integer $fachbereich_id optional
-	 * @return boolean true=ok, false=fehler
-	 */
-	function removePerson($personfunktion_id) 
-	{
-		if (is_null($this->conn)) {
-			return false;	
-		}		
-		if (strlen($personfunktion_id)==0) {
-			$this->errormsg="personfunktion_id darf nicht NULL sein";
-			return false;
-		}
-		$qry="delete from tbl_personfunktion where personfunktion_id=$personfunktion_id";
-		if(!($erg=@pg_exec($this->conn, $qry)))
-		{
-			$this->errormsg=pg_errormessage($this->conn);
-			return false;
-		}	
-		return true;		 
-	}
-	
-	/**
-	 * Personfunktion aktualisieren	 
-	 * @param integer $personfunktion ID aus der Zuordnungstabelle
-	 * @param string $uid User-ID
-	 * @param string $studiengang_kz Studiengang-Kennzahl (optional)
-	 * @param integer $fachbereich_id optional
-	 * @return boolean true=ok, false=fehler
-	 */
-	function updatePerson($personfunktion_id,$uid,$studiengang_kz=null,
-		$fachbereich_id=null) {
-		if (is_null($this->conn)) {
-			return false;	
-		}
-		if (strlen($studiengang_kz)>0) 
-		{
-			$values.=",studiengang_kz=$studiengang_kz ";
-		} else
-		{
-			$values.=",studiengang_kz=NULL ";
-		}
-		if (strlen($fachbereich_id)>0) 
-		{
-			$values.=",fachbereich_id=$fachbereich_id";
-		} else 
-		{
-			if (strlen($studiengang_kz)==0) {
-				$this->errormsg="Studiengang oder Fachbereich fehlt.";
-				return false;	
+			//Pruefen ob funktion_kurzbz befüllt ist
+			if($this->funktion_kurzbz == '')
+			{
+				$this->errormsg = 'funktion_kurzbz darf nicht leer sein';
+				return false;
 			}
-			$values.=",fachbereich_id=NULL";
+			//Neuen Datensatz anlegen		
+			$qry = 'INSERT INTO tbl_funktion (funktion_kurzbz, bezeichnung, aktiv) VALUES ('.
+				$this->addslashes($this->funktion_kurzbz).', '.
+				$this->addslashes($this->bezeichnung).', '.
+				($this->aktiv?'true':'false').'); ';
 		}
-		$qry="update tbl_personfunktion set ".
-			 "uid='$uid'$values ".
-			 "where personfunktion_id=$personfunktion_id";
-		//echo $qry;
-		if(!($erg=@pg_exec($this->conn, $qry)))
+		else 
 		{
-			$this->errormsg=pg_errormessage($this->conn);
+			//bestehenden Datensatz akualisieren
+			
+			//Pruefen ob fachbereich_id eine gueltige Zahl ist
+			if( $this->funktion_kurzbz == '')
+			{
+				$this->errormsg = 'funktion_kurzbz darf nicht leer sein';
+				return false;
+			}
+			
+			$qry = 'UPDATE tbl_funktion SET '. 
+				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
+				'aktiv='.($this->aktiv?'true':'false') .' '.
+				'WHERE funktion_kurzbz = '.$this->addslashes($this->funktion_kurzbz).';';
+		}
+		
+		if(pg_query($this->conn, $qry))
+		{
+			/*//Log schreiben
+			$sql = $qry;
+			$qry = "SELECT nextval('log_seq') as id;";
+			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
+			{
+				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
+				return false;
+			}
+						
+			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
+			if(pg_query($this->conn, $qry))
+				return true;
+			else 
+			{
+				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
+				return false;
+			}*/
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
 			return false;
-		}	
-		return true;
+		}		
 	}
 }
 ?>

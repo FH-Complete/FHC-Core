@@ -1,362 +1,179 @@
-<?php 
-/**
- * @author Christian Paminger, Werner Masik (werner@gefi.at)
- * @version 1.0
- * @created 22-Okt-2004 
- * @updated 29.10.2004 (WM)
+<?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-class mitarbeiter extends person
+
+class mitarbeiter extends benutzer
 {
-	/**
-	 * @var boolean
-	 */
-	var $personalnr;
-	/**
-	 * @var string
-	 */
-	var $kurzbz;
-	/**
-	 * @var boolean true=lektor, false=sonstiger MA
-	 */
-	var $lektor;
-	/**
-	 * @var boolean
-	 */
-	var $fixangestellt;
-	/**
-	 * @var string
-	 */
-	var $telefonklappe;
-	/**
-	 * @var funktion
-	 */
-	var $funktion;
-	/**
-	 * @var mitarbeiter
-	 */
-	var $mitarbeiter;
-	/**
-	 * @var string
-	 */
-	var $errormsg;
-	/**
-	 * @var string?
-	 */
-	var $updateamum;
-	/**
-	 * @var string
-	 */
-	var $updatevon;
-	/**
-	 * @var string
-	 */
-	var $ort_kurzbz='0';
-	  
+	
+    //Tabellenspalten
+	var $ausbildungcode;	//integer
+	var $personalnummer;	//serial
+	var $kurzbz;			//varchar(8)
+	var $lektor;			//boolean
+	var $fixangestellt;		//boolean
+	var $telefonklappe;		//varchar(25)
 
-	function mitarbeiter($conn,$uid='')
+	// *************************************************************************
+	// * Konstruktor - Uebergibt die Connection und laedt optional einen Mitarbeiter
+	// * @param $conn        	Datenbank-Connection
+	// *        $uid            Mitarbeiter der geladen werden soll (default=null)
+	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
+	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
+	// *************************************************************************
+	function mitarbeiter($conn, $uid=null, $unicode=false)
 	{
-		$this->conn=$conn;
-		if (strlen($uid)>0) {
-			$this->uid=$uid;
-			$this->load();
+		$this->conn = $conn;
+		
+		if($unicode)
+			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+		else 
+			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+			
+		if(!pg_query($conn,$qry))
+		{
+			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
+			return false;
 		}
+		
+		//Mitarbeiter laden
+		//if($uid!=null)
+		//	$this->load($uid);
 	}
-
-	/**
-	 * @return boolean true=ok, false=fehler
-	 */
+	
+	// ************************************************
+	// * ueberprueft die Variablen auf Gueltigkeit
+	// * @return true wenn gueltig, false im Fehlerfall
+	// ************************************************
+	function validate()
+	{	    
+		if(strlen($this->uid)>16)
+		{
+			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein';
+			return false;
+		}
+		if($this->uid=='')
+		{
+			$this->errormsg = 'UID muss eingegeben werden';
+			return false;
+		}
+		if($this->ausbildungcode!='' && !is_numeric($this->ausbildungcode))
+		{
+			$this->errormsg = 'Ausbildungscode ist ungueltig';
+			return false;
+		}		
+		if($this->personalnummer!='' && !is_numeric($this->personalnummer))
+		{
+			$this->errormsg = 'Personalnummer muss eine gueltige Zahl sein';
+			return false;
+		}		
+		if(strlen($this->kurzbz)>8)
+		{
+			$this->errormsg = 'kurzbz darf nicht laenger als 8 Zeichen sein';
+			return false;
+		}
+		if(!is_bool($this->lektor))
+		{
+			$this->errormsg = 'lektor muss boolean sein'.$this->lektor;
+			return false;
+		}
+		if(!is_bool($this->fixangestellt))
+		{
+			$this->errormsg = 'fixangestellt muss boolean sein';
+			return false;
+		}
+		if(strlen($this->telefonklappe)>25)
+		{
+			$this->errormsg = 'telefonklappe darf nicht laenger als 25 Zeichen sein';
+			return false;
+		}
+		if(strlen($this->updatevon)>32)
+		{
+			$this->errormsg = 'updatevon darf nicht laenger als 32 Zeichen sein';
+			return false;
+		}
+			
+		return true;
+	}
+	
+	
+	// *************************************************
+	// * Speichert die Mitarbeiterdaten in die Datenbank
+	// * @return true wenn ok, false im Fehlerfall
+	// *************************************************
 	function save()
 	{
-		global $auth;
-		// uid vorhanden?
-		if (strlen($this->uid)==0) {
-			$this->errormsg='<i>uid</i> nicht gesetzt.';
-			return false;	
+		//Variablen checken		
+		if(!$this->validate())
+			return false;
+			
+		pg_query($this->conn,'BEGIN;');
+		//Basisdaten speichern
+		if(!benutzer::save())
+		{
+			pg_query($this->conn,'ROLLBACK;');
+			return false;
 		}
-		// Connection holen
-		if (is_null($conn=person::getConnection())) {
-			return false;	
-		}
-		// Daten zur Person speichern		
 		
-		if (!person::save()) {
-			$this->errormsg.="<br/>Daten zur Person konnten nicht gespeichert werden.";			
-			return false;
-		}
-		if ($this->new) {
-			$qry="INSERT INTO tbl_mitarbeiter(uid,personalnummer,kurzbz,".
-				 "lektor,fixangestellt,telefonklappe,updateamum,updatevon, ort_kurzbz)".
-				 "values(".
-				 "'".$this->uid."',".
-				 "'".$this->personalnummer."',".
-				 "'".$this->kurzbz."','".
-				 ($this->lektor?'t':'f')."','".
-				 ($this->fixangestellt?'t':'f')."',".
-				 "'".$this->telefonklappe."',".
-				 "now(),'".$_SERVER['PHP_AUTH_USER']."', ".($this->ort_kurzbz!='0'?"'$this->ort_kurzbz'":'NULL').
-				 ")";			
-		} else
+		if($this->new)
 		{
-			$qry="UPDATE tbl_mitarbeiter ".
-				 "SET personalnummer='".$this->personalnummer."',".
-				 "kurzbz='".$this->kurzbz."',".
-				 "lektor='".($this->lektor?'t':'f')."',".
-				 "fixangestellt='".($this->fixangestellt?'t':'f')."',".
-				 "telefonklappe='".$this->telefonklappe."',".
-				 "updateamum=now(),updatevon='".$_SERVER['PHP_AUTH_USER']."', ort_kurzbz=".($this->ort_kurzbz!='0'?"'$this->ort_kurzbz'":'NULL').
-				 " WHERE uid='".$this->uid."'";	
-		}	
-		//echo "<br>".$qry;	
-		if(!($erg=pg_exec($conn, $qry)))
+			//Neuen Datensatz anlegen							
+			$qry = "INSERT INTO tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, 
+			                    fixangestellt, telefonklappe, updateamum, updatevon)
+			        VALUES('".addslashes($this->uid)."',".
+			 	 	$this->addslashes($this->ausbildungcode).",".
+			 	 	$this->addslashes($this->personalnummer).",". //TODO: in Produktivversion nicht angeben
+			 	 	$this->addslashes($this->kurzbz).','.
+			 	 	($this->lektor?'true':'false').','.
+					($this->fixangestellt?'true':'false').','.
+					$this->addslashes($this->telefonklappe).','.
+					$this->addslashes($this->updateamum).','.
+					$this->addslashes($this->updatevon).');';
+		}
+		else 
 		{
-			$this->errormsg=pg_errormessage($conn);
-			return false;
+			//Bestehenden Datensatz updaten
+			$qry = 'UPDATE tbl_mitarbeiter SET'.
+			       ' ausbildungcode='.$this->addslashes($this->ausbildungcode).','.
+			       " personalnummer=".$this->addslashes($this->personalnummer).",". //TODO: in Produktivversion nicht angeben
+			       ' kurzbz='.$this->addslashes($this->kurzbz).','.
+			       ' lektor='.($this->lektor?'true':'false').','.
+			       ' fixangestellt='.($this->fixangestellt?'true':'false').','.
+			       ' telefonklappe='.$this->addslashes($this->telefonklappe).','.
+			       ' updateamum='.$this->addslashes($this->updateamum).','.
+			       ' updatevon='.$this->addslashes($this->updatevon).
+			       " WHERE mitarbeiter_uid='".addslashes($this->uid)."';";
 		}
-		return true;
-	}
-
-	/**
-	 * Ladet die Attribute des Studenten aus der Datenbank. Bei Fehler ist der
-	 * Rueckgabewert 'false' und die Fehlermeldung steht in 'errormsg'.
-	 * @return boolean true=ok, false=fehler
-	 */
-	function load($uid='')
-	{
-		// optional: uid setzen
-		if (strlen($uid)>0) 
-			$this->uid=$uid;
-		// uid vorhanden?
-		if (strlen($this->uid)==0) {
-			$this->errormsg='<i>uid</i> nicht gesetzt.';
-			return false;	
-		}
-		// Connection holen
-		if (is_null($conn=person::getConnection())) {
-			return false;	
-		}
-		// Daten zur Person laden
-		if (!person::load()) {
-			$this->errormsg.="<br/>Daten zur Person konnten nicht geladen werden.";			
-			return false;
-		}
-		// MA-Daten holen
-		$sql_query="SELECT m.personalnummer,m.kurzbz,m.lektor,m.fixangestellt,m.telefonklappe,m.updateamum,m.updatevon, m.ort_kurzbz ".
-		           "FROM tbl_mitarbeiter as m ".
-	               "WHERE uid='".$this->uid."'";
-		if(!($erg=pg_exec($conn, $sql_query)))
-			die(pg_errormessage($conn));
-		$num_rows=pg_numrows($erg);
-		if($num_rows!=1) {
-			$this->errormsg="Zuwenige oder zuviele Ergebnisse (Anzahl: $num_rows)!";
-			return false;
-		}
-   		$row=pg_fetch_object($erg,0);
-	
-		$this->personalnummer=$row->personalnummer;
-		$this->kurzbz=$row->kurzbz;
-		$this->lektor=$row->lektor=='t'?true:false;	
-		$this->fixangestellt=$row->fixangestellt=='t'?true:false;	
-		$this->telefonklappe=$row->telefonklappe;
-		$this->updateamum=$row->updateamum;
-		$this->updatevon=$row->updatevon;
-		$this->ort_kurzbz=$row->ort_kurzbz;
-				
 		
-		return true;
-	}
-
-	/**
-	 * Loescht den Mitarbeiter aus der Datenbank. Bei Fehler ist der Rueckgabewert
-	 * 'false' und die Fehlermeldung steht in 'errormsg'.
-	 * @return boolean true=ok, false=fehler
-	 * vererbt, wenn Person gelöscht wird, sollte wahrscheinlich auch
-	 * automatisch der Eintrag in den anderen Tabellen gelöscht werden
-	 */
-	 /*
-	function delete()
-	{
-		if (is_null($conn=$this->getConnection())) {
-			return false;	
-		}	
-		
-		
-		return true;
-	}*/
-
-	/**
-	 * gibt array mit allen Lektoren zurück
-	 * @return array mit Lektoren
-	 */
-	function getLektoren() 
-	{
-		if (is_null($conn=$this->getConnection())) 
+		if(pg_query($this->conn,$qry))
 		{
-			return false;	
-		}	
-		$sql_query="set datestyle to german;SELECT tbl_person.*,".
-				   "m.personalnummer,m.kurzbz,m.lektor,m.fixangestellt,m.telefonklappe, m.ort_kurzbz ".
-		           "FROM tbl_person join tbl_mitarbeiter as m using(uid) ".
-	               "WHERE m.lektor=true ".
-	               "ORDER by upper(tbl_person.nachname),upper(tbl_person.vornamen)";
-		if(!($erg=@pg_exec($conn, $sql_query))) {
-			$this->errormsg=pg_errormessage($conn);
+			pg_query($this->conn,'COMMIT;');
+			//Log schreiben
+			return true;
+		}
+		else 
+		{			
+			pg_query($this->conn,'ROLLBACK;');
+			$this->errormsg = 'Fehler beim Speichern des Mitarbeiter-Datensatzes'.$qry;
 			return false;
 		}
-		$num_rows=pg_numrows($erg);		
-		$result=array();
-		for($i=0;$i<$num_rows;$i++)
-		{
-   			$row=pg_fetch_object($erg,$i);
-			$l=new mitarbeiter($this->conn);
-			// Personendaten
-			$l->uid=$row->uid;
-			$l->titel=$row->titel;		
-			$l->vornamen=$row->vornamen;
-			$l->nachname=$row->nachname;
-			$l->gebdatum=$row->gebdatum;
-			$l->gebort=$row->gebort;
-			$l->gebzeit=$row->gebzeit;
-			$l->foto=$row->foto;
-			$l->anmerkungen=$row->anmerkungen;
-			$l->aktiv=$row->aktiv=='t'?true:false;
-			$l->email=$row->email;
-			$l->homepage=$row->homepage;
-			$l->updateamum=$row->updateamum;
-			$l->updatevon=$row->updatevon;
-			// Lektorendaten
-			$l->personalnummer=$row->personalnummer;
-			$l->kurzbz=$row->kurzbz;
-			$l->lektor=$row->lektor=='t'?true:false;	
-			$l->fixangestellt=$row->fixangestellt=='t'?true:false;	
-			$l->telefonklappe=$row->telefonklappe;
-			$l->ort_kurzbz=$row->ort_kurzbz;
-			// Lektor in Array speichern
-			$result[]=$l;
-		}
-		return $result;
-	}
-
-	/**
-	 * gibt array mit allen Mitarbeitern zurück
-	 * @param $order gibt die spalte an nach der Sortiert werden soll
-	 * @return array mit MA
-	 */
-	function getAll($order='upper(tbl_person.nachname),upper(tbl_person.vornamen)') 
-	{
-		if (is_null($conn=$this->getConnection())) 
-		{
-			return false;	
-		}	
-		$sql_query="set datestyle to german;SELECT tbl_person.*,".
-				   "m.personalnummer,m.kurzbz,m.lektor,m.fixangestellt,m.telefonklappe, m.ort_kurzbz ".
-		           "FROM tbl_person join tbl_mitarbeiter as m using(uid) ".	               
-	               "ORDER by $order";
-		if(!($erg=@pg_exec($conn, $sql_query))) 
-		{
-			$this->errormsg=pg_errormessage($conn);
-			return false;
-		}
-		$num_rows=pg_numrows($erg);		
-		$result=array();
-		for($i=0;$i<$num_rows;$i++)
-		{
-   			$row=pg_fetch_object($erg,$i);
-			$l=new mitarbeiter($this->conn);
-			// Personendaten
-			$l->uid=$row->uid;
-			$l->titel=$row->titel;		
-			$l->vornamen=$row->vornamen;
-			$l->nachname=$row->nachname;
-			$l->gebdatum=$row->gebdatum;
-			$l->gebort=$row->gebort;
-			$l->gebzeit=$row->gebzeit;
-			$l->foto=$row->foto;
-			$l->anmerkungen=$row->anmerkungen;
-			$l->aktiv=$row->aktiv=='t'?true:false;
-			$l->email=$row->email;
-			$l->homepage=$row->homepage;
-			$l->updateamum=$row->updateamum;
-			$l->updatevon=$row->updatevon;
-			// Lektorendaten
-			$l->personalnummer=$row->personalnummer;
-			$l->kurzbz=$row->kurzbz;
-			$l->lektor=($row->lektor=='t'?'true':'false');	
-			$l->fixangestellt=($row->fixangestellt=='t'?'true':'false');	
-			$l->telefonklappe=$row->telefonklappe;
-			$l->ort_kurzbz=$row->ort_kurzbz;
-			// MA in Array speichern
-			$result[]=$l;
-		}
-		return $result;
-		
-	}
-	
-	/**
-	 * gibt array mit allen Mitarbeitern zurueck
-	 * @return array mit Mitarbeitern
-	 */
-	function getMitarbeiter($lektor=true,$fixangestellt=null,$stg_kz=null,$fachbereich_id=null) 
-	{
-		if (is_null($conn=$this->getConnection())) 
-		{
-			return false;	
-		}	
-		$sql_query='SELECT DISTINCT vw_mitarbeiter.* FROM vw_mitarbeiter 
-					LEFT OUTER JOIN tbl_personfunktion USING(uid)
-					WHERE';
-		if (!$lektor)
-			$sql_query.=' NOT';
-		$sql_query.=' lektor';
-		if ($fixangestellt!=null)
-		{
-			$sql_query.=' AND';
-			if (!$fixangestellt)
-				$sql_query.=' NOT';
-			$sql_query.=' fixangestellt';
-		}
-		if ($stg_kz!=null)
-			$sql_query.=' AND studiengang_kz='.$stg_kz;
-		if ($fachbereich_id!=null)
-			$sql_query.=' AND fachbereich_id='.$fachbereich_id;
-	    $sql_query.=' ORDER BY nachname, vornamen, kurzbz';
-	    //echo $sql_query;
-		if(!($erg=@pg_query($conn, $sql_query))) 
-		{
-			$this->errormsg=pg_errormessage($conn);
-			return false;
-		}
-		$num_rows=pg_numrows($erg);		
-		$result=array();
-		for($i=0;$i<$num_rows;$i++)
-		{
-   			$row=pg_fetch_object($erg,$i);
-			$l=new mitarbeiter($this->conn);
-			// Personendaten
-			$l->uid=$row->uid;
-			$l->titel=$row->titel;		
-			$l->vornamen=$row->vornamen;
-			$l->nachname=$row->nachname;
-			$l->gebdatum=$row->gebdatum;
-			$l->gebort=$row->gebort;
-			$l->gebzeit=$row->gebzeit;
-			$l->foto=$row->foto;
-			$l->anmerkungen=$row->anmerkungen;
-			$l->aktiv=$row->aktiv=='t'?true:false;
-			$l->email=$row->email;
-			$l->homepage=$row->homepage;
-			$l->updateamum=$row->updateamum;
-			$l->updatevon=$row->updatevon;
-			// Lektorendaten
-			$l->personalnummer=$row->personalnummer;
-			$l->kurzbz=$row->kurzbz;
-			$l->lektor=$row->lektor=='t'?true:false;	
-			$l->fixangestellt=$row->fixangestellt=='t'?true:false;	
-			$l->telefonklappe=$row->telefonklappe;
-			//$l->ort_kurzbz=$row->ort_kurzbz;
-			// Lektor in Array speichern
-			$result[]=$l;
-		}
-		return $result;
 	}
 }
 ?>

@@ -15,7 +15,7 @@ function get_uid()
 function check_lektor($uid, $conn)
 {
 	// uid von View 'Lektor' holen
-	$sql_query="SELECT uid FROM vw_lektor WHERE uid='$uid'";
+	$sql_query="SELECT mitarbeiter_uid FROM tbl_mitarbeiter WHERE mitarbeiter_uid='$uid'";
 	//echo $sql_query;
 	$result=pg_query($conn, $sql_query) or die(pg_last_error($conn));
 	$num_rows=pg_numrows($result);
@@ -23,7 +23,7 @@ function check_lektor($uid, $conn)
 	if ($num_rows>0)
 	{
 		$row=pg_fetch_object($result);
-		return $row->uid;
+		return $row->mitarbeiter_uid;
 	}
 	else
 		return 0;

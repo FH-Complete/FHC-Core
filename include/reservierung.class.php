@@ -1,354 +1,216 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
 
 class reservierung
 {
-	/**
-	 * @var integer primary key
-	 */
-	var $id;
-	/**
-	 * @var string ort
-	 */
-	var $ort_kurzbz;
-	/**
-	 * @var string studiengang
-	 */
-	var $studiengang_kz;
-	/**
-	 * @var string Lektor/Mitarbeiter
-	 */
-	var $uid;
-	/**
-	 * @var integer stunde-id
-	 */
-	var $stunde;
-	/**
-	 * @var integer unix-datum
-	 */
-	var $datum;
-	/**
-	 * @var string titel
-	 */
-	var $titel;
-	/**
-	 * @var string beschreibung der reservierung
-	 */
-	var $beschreibung;
-	/**
-	 * @var integer
-	 */
-	var $semester;
-	/**
-	 * @var string verband-id
-	 */
-	var $verband;
-	/**
-	 * @var string gruppe-id
-	 */
-	var $gruppe;
-	/**
-	 * @var einheit-kurzbezeichnung
-	 */
-	var $einheit_kurzbz;
-	/**
-	 * @var boolean
-	 */
-	var $new=true;
-	var $errormsg;
-	var $conn;
-
-	function reservierung($conn,$id='')
+	var $conn;     // resource DB-Handle
+	var $errormsg; // string
+	var $new;      // boolean
+	var $reservierungen = array(); // reservierung Objekt
+	
+	//Tabellenspalten
+	var $reservierung_id;	// int
+	var $ort_kurzbz;		// varchar(8)
+	var $studiengang_kz;	// int
+	var $uid;				// varchar(16)
+	var $stunde;			// smalint
+	var $datum;				// date
+	var $titel;				// varchar(10)
+	var $beschreibung;		// varchar(32)
+	var $semester;			// smalint
+	var $verband;			// char(1)
+	var $gruppe;			// char(1)
+	var $gruppe_kurzbz;		// varchar(10)
+		
+	// *************************************************************************
+	// * Konstruktor - Uebergibt die Connection und laedt optional eine Reservierung
+	// * @param $conn        	Datenbank-Connection
+	// *        $reservierung_id
+	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
+	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
+	// *************************************************************************
+	function reservierung($conn, $reservierung_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		if (strlen($id)>0) {
-			$this->id=$id;
-			$this->load();
+		
+		if($unicode)
+			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+		else 
+			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+			
+		if(!pg_query($conn,$qry))
+		{
+			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
+			return false;
 		}
+		else 
+			$this->new = true;
+		
+		if($reservierung_id!=null)
+			$this->load($reservierung_id);
 	}
-
-	/**
-	 * Verbindung zur Datenbank herstellen
-	 * @return PostgreSQL-Connection oder NULL
-
-	function getConnection() {
-		if (!$conn = @pg_pconnect(CONN_STRING)) {
-	   		$this->errormsg="Es konnte keine Verbindung zum Server ".
-	   						"aufgebaut werden.";
-	   		return null;
-		}
-		return $conn;
-	} */
-
-	function load($id='')
+	
+	// *********************************************************
+	// * Laedt eine Reservierung
+	// * @param reservierung_id
+	// *********************************************************
+	function load($reservierung_id)
 	{
-		if (is_null($this->conn))
-		{
-			return false;
-		}
-		$sql_query="select * from tbl_reservierung where reservierung_id=".$this->id;
-		if(!($erg=@pg_exec($this->conn, $sql_query))) {
-			$this->errormsg=pg_errormessage($this->conn);
-			return false;
-		}
-		$num_rows=pg_numrows($erg);
-		if($num_rows!=1) {
-			$this->errormsg="Zuwenige oder zuviele Ergebnisse (Anzahl: $num_rows)!";
-			return false;
-		}
-   		$row=pg_fetch_object($erg,0);
-
-		$this->new=false;
-		$this->id=$row->reservierung_id;
-		$this->ort_kurzbz=$row->ort_kurzbz;
-		$this->studiengang_kz=$row->studiengang_kz;
-		$this->uid=$row->uid;
-		$this->stunde=$row->stunde;
-		$this->datum=$this->unixDate($row->datum);
-		$this->titel=$row->titel;
-		$this->beschreibung=$row->beschreibung;
-		$this->semester=$row->semester;
-		$this->verband=$row->verband;
-		$this->gruppe=$row->gruppe;
-		$this->einheit_kurzbz=$row->einheit_kurzbz;
-		return true;
-	}
-
-	function save()
-	{
-		if (is_null($this->conn))
-		{
-			return false;
-		}
-		if ($this->new)
-		{
-			// Kollision-Check
-			$r=$this->exists($this->datum,$this->stunde,$this->ort_kurzbz);
-			if ($r!==false)
-			{
-				$this->errormsg("Kollision mit bereits bestehender Reservierung: ".$r->titel." (".$r->uid.")");
-				return false;
-			}
-			// Stundenplan-Kollision?
-			$kollisionen=$this->collisionStundenplan($this->datum,$this->stunde,$this->ort_kurzbz);
-			if ($kollisionen>0)
-			{
-				$this->errormsg="Kollisionen mit Stundenplan: $kollisionen";
-				return false;
-			}
-			$qry="insert into tbl_reservierung(ort_kurzbz,studiengang_kz,uid,stunde,datum,titel,beschreibung,semester,verband,gruppe,einheit_kurzbz)".
-				 "values('".$this->ort_kurzbz."',".
-				 $this->studiengang_kz.",'".
-				 $this->uid."',".$this->stunde.",'".
-				 date("d.m.Y",$this->datum)."','".
-				 $this->titel."','".$this->beschreibung."',".
-				 (ctype_digit($this->semester)?$this->semester:'NULL').",".
-				 (strlen($this->verband)>0?"'".$this->verband."'":'NULL').",".
-				 (strlen($this->gruppe)>0?"'".$this->gruppe."'":'NULL').",".
-				 (strlen($this->einheit_kurzbz)>0?"'".$this->einheit_kurzbz."'":'NULL').
-				")";
-		} else
-		{
-			$qry="update tbl_reservierung set ".
-				 "ort_kurzbz='".$this->ort_kurzbz."',".
-				 "studiengang_kz='".$this->studiengang_kz."',".
-				 "uid='".$this->uid."',".
-				 "stunde=".$this->stunde.",".
-				 "datum='".date("d.m.Y",$this->datum)."',".
-				 "titel='".$this->titel."',".
-				 "beschreibung='".$this->beschreibung."',".
-				 "semester=".(ctype_digit($this->semester)?$this->semester:'NULL').",".
-				 "verband=".(strlen($this->verband)>0?"'".$this->verband."'":'NULL').",".
-				 "gruppe=".(strlen($this->gruppe)>0?"'".$this->gruppe."'":'NULL').",".
-				 "einheit_kurzbz=".(strlen($this->einheit_kurzbz)>0?"'".$this->einheit_kurzbz."'":'NULL').
-				 "WHERE reservierung_id=".$this->reservierung_id;
-
-		}
-		$qry="set datestyle to german;".$qry;
-		//echo $qry;
-		if(!($erg=pg_exec($this->conn, $qry)))
-		{
-			$this->errormsg=pg_errormessage($this->conn);
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Überprüfen ob eine Kollision mit dem Stundenplan besteht
-	 * @param integer $datum datum im unix-format
-	 * @param integer $stunde id der stunde
-	 * @param string $ort_kurzbz ort-ID
-	 * @return integer anzahl der Kollisionen, -1 bei fehler
-	 */
-	function collisionStundenplan($datum,$stunde,$ort_kurzbz)
-	{
-		if (is_null($this->conn)) {
-			return -1;
-		}
-		$qry="SELECT uid, lehrfach_nr, studiengang_kz, stundenplan_id, unr, datum, stunde, ort_kurzbz, semester, verband, gruppe, einheit_kurzbz, titel, anmerkung, fix, stg_kurzbz, stg_kurzbzlang, stg_bezeichnung, fachbereich_id, lehrfach, farbe, lehrform, aktiv, lektor, fixangestellt ".
-			 "FROM vw_stundenplan ".
-			 "WHERE datum='".date('d.m.Y',$datum)."' ".
-			 	   "AND stunde=".$stunde." ".
-			 	   "AND ort_kurzbz='".$ort_kurzbz."' ".
-			 "order by semester,verband,gruppe";
-		if(!($erg=pg_exec($this->conn, $qry)))
-		{
-			$this->errormsg=pg_errormessage($this->conn);
-			return -1;
-		}
-		$num_rows=pg_numrows($erg);
-		return $num_rows;
-	}
-
-	/**
-	 * Überprüfen, ob bereits eine Reservierung existiert
-	 * @param integer $datum datum im unix-format
-	 * @param integer $stunde id der stunde
-	 * @param string $ort_kurzbz ort-ID
-	 * @return reservierung reservierung die bereits existiert
-	 */
-	function exists($datum,$stunde,$ort_kurzbz)
-	{
-		if (is_null($this->conn)) {
-			return false;
-		}
-		$qry="SELECT reservierung_id from tbl_reservierung ".
-			 "WHERE datum='".date('d.m.Y',$datum)."' ".
-			 	   "AND stunde=".$stunde." ".
-			 	   "AND ort_kurzbz='".$ort_kurzbz."' ".
-			 "ORDER BY semester,verband,gruppe";
-		if(!($erg=pg_exec($this->conn, $qry)))
-		{
-			$this->errormsg=pg_errormessage($this->conn);
-			return false;
-		}
-		$num_rows=pg_numrows($erg);
-		$row=pg_fetch_object($erg,0);
-		$id=$row->reservierung_id;
-		$r=new reservierung($id);
-		// bereits vorhandene reservierung zurückgeben
-		if ($r!==false) return $r;
-		// reservierung konnte nicht geladen werden
-		$this->errormsg='Reservierung konnte nicht geladen werden';
+		$this->errormsg = 'Not implemented';
 		return false;
 	}
-
-
-
-	/**
-	 * reservierung löschen
-	 */
-	function delete()
+	
+	// *******************************************
+	// * Prueft die Variablen vor dem Speichern 
+	// * auf Gueltigkeit.
+	// * @return true wenn ok, false im Fehlerfall
+	// *******************************************
+	function validate()
 	{
-		if (is_null($conn=$this->getConnection())) {
+		if(strlen($this->ort_kurzbz)>8)
+		{
+			$this->errormsg = 'Ort_Kurzbz darf nicht laenger als 8 Zeichen sein';
 			return false;
 		}
-		$sql_query="DELETE FROM tbl_reservierung WHERE reservierung_id=".$this->id;
-		$result=pg_exec($this->conn, $sql_query);
-		$num_rows=pg_numrows($result);
-		if ($result)
+		if(!is_numeric($this->studiengang_kz))
 		{
-			print_r($result);
+			$this->errormsg = 'Studiengang_kz muss eine gueltige Zahl sein';
+			return false;
+		}
+		if(strlen($this->uid)>16)
+		{
+			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein';
+			return false;
+		}
+		if(!is_numeric($this->stunde))
+		{
+			$this->errormsg = 'Stunde ist ungueltig';
+			return false;
+		}
+		if(strlen($this->titel)>10)
+		{
+			$this->errormsg = 'Titel darf nicht laenger als 10 Zeichen sein';
+			return false;
+		}
+		if(strlen($this->beschreibung)>32)
+		{
+			$this->beschreibung = 'Beschreibung darf nicht laenger als 32 Zeichen sein';
+			return false;
+		}
+		if($this->semester!='' && !is_numeric($this->semester))
+		{
+			$this->errormsg = 'Semester ist ungueltig';
+			return false;
+		}
+		if(strlen($this->verband)>1)
+		{
+			$this->errormsg = 'Verband darf nicht laenger als 1 Zeichen sein';
+			return false;
+		}
+		if(strlen($this->gruppe)>1)
+		{
+			$this->errormsg = 'Gruppe darf nicht laenger als 1 Zeichen sein';
+			return false;
+		}
+		if(strlen($this->gruppe_kurzbz)>10)
+		{
+			$this->gruppe_kurzbz = 'Gruppe_kurzbz darf nicht laenger als 10 Zeichen sein';
+			return false;
+		}
+		
+		return true;
+	}
+
+	// ************************************************
+	// * wenn $var '' ist wird NULL zurueckgegeben
+	// * wenn $var !='' ist werden Datenbankkritische 
+	// * Zeichen mit Backslash versehen und das Ergbnis
+	// * unter Hochkomma gesetzt.
+	// ************************************************
+	function addslashes($var)
+	{
+		return ($var!=''?"'".addslashes($var)."'":'null');
+	}
+
+	// ************************************************************
+	// * Speichert Reservierung in die Datenbank
+	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	// * angelegt, ansonsten der Datensatz upgedated
+	// * @return true wenn erfolgreich, false im Fehlerfall
+	// ************************************************************
+	function save($new=null)
+	{
+		if(!is_null($new))
+			$this->new = $new;
+
+		//Variablen auf Gueltigkeit pruefen
+		if(!$this->validate())
+			return false;
+
+		if($this->new)
+		{			
+			$qry = 'INSERT INTO campus.tbl_reservierung (reservierung_id, ort_kurzbz, studiengang_kz, uid, stunde, datum, titel, 
+			                                      beschreibung, semester, verband, gruppe, gruppe_kurzbz)
+			        VALUES('.$this->addslashes($this->reservierung_id).','.
+					$this->addslashes($this->ort_kurzbz).','.
+					$this->addslashes($this->studiengang_kz).','.
+					$this->addslashes($this->uid).','.
+					$this->addslashes($this->stunde).','.
+					$this->addslashes($this->datum).','.
+					$this->addslashes($this->titel).','.
+					$this->addslashes($this->beschreibung).','.
+					$this->addslashes($this->semester).','.
+					$this->addslashes($this->verband).','.
+					$this->addslashes($this->gruppe).','.
+					$this->addslashes($this->gruppe_kurzbz).');';
+		}
+		else
+		{
+			$qry = 'UPDATE campus.tbl_reservierung SET'.
+			       ' ort_kurzbz='.$this->addslashes($this->ort_kurzbz).','.
+			       ' studiengang_kz='.$this->addslashes($this->studiengang_kz).','.
+			       ' uid='.$this->addslashes($this->uid).','.
+			       ' stunde='.$this->addslashes($this->stunde).','.
+			       ' datum='.$this->addslashes($this->datum).','.
+			       ' titel='.$this->addslashes($this->titel).','.
+			       ' beschreibung='.$this->addslashes($this->beschreibung).','.
+			       ' semester='.$this->addslashes($this->semester).','.
+			       ' verband='.$this->addslashes($this->verband).','.
+			       ' gruppe='.$this->addslashes($this->gruppe).','.
+			       ' gruppe_kurzbz='.$this->addslashes($this->gruppe_kurzbz).
+			       " WHERE reservierung_id='".addslashes($this->reservierung_id)."'";
+		}
+
+		if(pg_query($this->conn,$qry))
+		{
+			//Log schreiben
+			$this->new = false;
 			return true;
 		}
-		$this->errormsg=pg_errormessage($this->conn);
-		return false;
-	}
-
-	/**
-	 * Alle mehrfach Reservierungen holen
-	 * @return array(datum,stunde,ort)
-	 */
-	function getAllMehrfach()
-	{
-		if (is_null($this->conn))
+		else
 		{
+			$this->errormsg = 'Fehler beim Speichern der Reservierung:'.$qry;
 			return false;
 		}
-		$sql_query="set datestyle to german;".
-				   "SELECT count(reservierung_id), datum, stunde, ort_kurzbz ".
-				   "FROM tbl_reservierung GROUP BY datum, stunde, ort_kurzbz ".
-				   "HAVING (count(reservierung_id)>1) ".
-				   "ORDER BY datum, stunde, ort_kurzbz";
-		if(!($erg=@pg_exec($this->conn, $sql_query))) {
-			$this->errormsg=pg_errormessage($this->conn);
-			return false;
-		}
-		$num_rows=pg_numrows($erg);
-		$result=array();
-		for($i=0;$i<$num_rows;$i++)
-		{
-   			$row=pg_fetch_object($erg,$i);
-			$result[]=array('datum'=>$this->unixDate($row->datum),
-							'stunde'=>$row->stunde,
-							'ort'=>$row->ort_kurzbz);
-
-		}
-		return $result;
 	}
-
-	/**
-	 * mehrfach vorkommende Reservierungen laden
-	 * @param string $datum
-	 * @param integer $stunde
-	 * @return array
-	 */
-	function getMehrfach($datum,$stunde,$ort_kurzbz) {
-		if (is_null($this->conn)) {
-			return false;
-		}
-		$sql_query="set datestyle to german;".
-				   "SELECT tbl_reservierung.*, tbl_ort.ort_kurzbz AS ortkurzbz, tbl_mitarbeiter.kurzbz AS lektorkurzbz ".
-				   "FROM tbl_reservierung, tbl_ort, tbl_person,tbl_mitarbeiter ".
-				   "WHERE datum='$datum' AND tbl_reservierung.stunde=$stunde ".
-				   "AND tbl_reservierung.ort_kurzbz='$ort_kurzbz' AND ".
-				   "tbl_reservierung.ort_kurzbz=tbl_ort.ort_kurzbz ".
-				   "AND tbl_person.uid=tbl_mitarbeiter.uid ".
-				   "and tbl_mitarbeiter.lektor=true;";
-		if(!($erg=@pg_exec($this->conn, $sql_query))) {
-			$this->errormsg=pg_errormessage($this->conn);
-			return false;
-		}
-		$num_rows=pg_numrows($erg);
-		$result=array();
-		for($i=0;$i<$num_rows;$i++)
-		{
-   			$row=pg_fetch_object($erg,$i);
-			$l=new reservierung();
-			$l->new=false;
-			$l->id=$row->reservierung_id;
-			$l->ort_kurzbz=$row->ort_kurzbz;
-			$l->studiengang_kz=$row->studiengang_kz;
-			$l->uid=$row->uid;
-			$l->stunde=$row->stunde;
-			$l->datum=$this->unixDate($row->datum);
-			$l->titel=$row->titel;
-			$l->beschreibung=$row->beschreibung;
-			$l->semester=$row->semester;
-			$l->verband=$row->verband;
-			$l->gruppe=$row->gruppe;
-			$l->einheit_kurzbz=$row->einheit_kurzbz;
-			$result[]=$l;
-		}
-		return $result;
-	}
-
-	function unixDate($date)
-	{
-		if (strlen($date)>0)
-		{
-			$_d1 = explode(".", $date);
-   			$d1 = $_d1[0];
-   			$m1 = $_d1[1];
-   			$y1 = $_d1[2];
-   			$unixDate=mktime(0,0,0,$d1,$m1,$y1);
-		} else
-		{
-			return null;
-		}
-		return $unixDate;
-	}
-
 }
-
 ?>
