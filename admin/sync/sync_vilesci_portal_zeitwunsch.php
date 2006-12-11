@@ -46,12 +46,12 @@ if($result = pg_query($conn_vilesci, $qry))
 	while($row=pg_fetch_object($result))
 	{
 		$zw = new zeitwunsch($conn);
-		$zw->uid = $row->uid;
+		$zw->mitarbeiter_uid = $row->uid;
 		$zw->stunde = $row->stunde;
 		$zw->tag = $row->tag;
 		$zw->gewicht = $row->gewicht;
 		
-		$qry ="SELECT count(*) as anz FROM campus.tbl_zeitwunsch where uid='".addslashes($row->uid)."' AND stunde='".addslashes($row->stunde)."' AND tag='".addslashes($row->tag)."';";
+		$qry ="SELECT count(*) as anz FROM campus.tbl_zeitwunsch where mitarbeiter_uid='".addslashes($row->uid)."' AND stunde='".addslashes($row->stunde)."' AND tag='".addslashes($row->tag)."';";
 		if($row = pg_fetch_object(pg_query($conn, $qry)))
 		{
 			$zw->new = ($row->anz>0?false:true);

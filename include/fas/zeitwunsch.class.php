@@ -28,10 +28,10 @@ class zeitwunsch
 	var $zeitwuensche = array(); // zeitwunsch Objekt
 	
 	//Tabellenspalten
-	var $stunde;	// smalint
-	var $uid;		// varchar(16)
-	var $tag;		// smalint
-	var $gewicht;	// smalint
+	var $stunde;			// smalint
+	var $mitarbeiter_uid;	// varchar(16)
+	var $tag;				// smalint
+	var $gewicht;			// smalint
 	
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
@@ -42,7 +42,7 @@ class zeitwunsch
 	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
-	function zeitwunsch($conn, $uid=null, $tag=null, $stunde=null, $unicode=false)
+	function zeitwunsch($conn, $mitarbeiter_uid=null, $tag=null, $stunde=null, $unicode=false)
 	{
 		$this->conn = $conn;
 		
@@ -57,15 +57,15 @@ class zeitwunsch
 			return false;
 		}
 		
-		if($uid != null && $tag!=null && $stunde!=null)
-			$this->load($uid, $tag, $stunde);
+		if($mitarbeiter_uid != null && $tag!=null && $stunde!=null)
+			$this->load($mitarbeiter_uid, $tag, $stunde);
 	}
 	
 	// *********************************************************
 	// * Laedt einen Zeitwunsch
 	// * @param 
 	// *********************************************************
-	function load($uid, $tag, $stunde)
+	function load($mitarbeiter_uid, $tag, $stunde)
 	{
 		return true;
 	}
@@ -77,12 +77,12 @@ class zeitwunsch
 	// *******************************************
 	function validate()
 	{
-		if(strlen($this->uid)>16)
+		if(strlen($this->mitarbeiter_uid)>16)
 		{
 			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein.';
 			return false;
 		}
-		if($this->uid == '')
+		if($this->mitarbeiter_uid == '')
 		{
 			$this->errormsg = 'UID muss angegeben werden';
 			return false;
@@ -131,15 +131,15 @@ class zeitwunsch
 
 		if($this->new)
 		{
-			$qry = "INSERT INTO campus.tbl_zeitwunsch (uid, tag, stunde, gewicht)
-			        VALUES('".addslashes($this->uid)."',".
+			$qry = "INSERT INTO campus.tbl_zeitwunsch (mitarbeiter_uid, tag, stunde, gewicht)
+			        VALUES('".addslashes($this->mitarbeiter_uid)."',".
 					$this->tag.','.$this->stunde.','.$this->gewicht.');';
 		}
 		else
 		{
 			$qry = 'UPDATE campus.tbl_zeitwunsch SET'.
 			       ' gewicht='.$this->gewicht.
-			       " WHERE uid='".addslashes($this->uid)."' AND 
+			       " WHERE mitarbeiter_uid='".addslashes($this->mitarbeiter_uid)."' AND 
 			         tag=".$this->tag.' AND stunde='.$this->stunde;
 		}
 

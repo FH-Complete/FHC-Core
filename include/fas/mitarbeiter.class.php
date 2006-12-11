@@ -135,7 +135,7 @@ class mitarbeiter extends benutzer
 		if($this->new)
 		{
 			//Neuen Datensatz anlegen							
-			$qry = "INSERT INTO tbl_mitarbeiter(uid, ausbildungcode, personalnummer, kurzbz, lektor, 
+			$qry = "INSERT INTO tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, 
 			                    fixangestellt, telefonklappe, updateamum, updatevon)
 			        VALUES('".addslashes($this->uid)."',".
 			 	 	$this->addslashes($this->ausbildungcode).",".
@@ -159,7 +159,7 @@ class mitarbeiter extends benutzer
 			       ' telefonklappe='.$this->addslashes($this->telefonklappe).','.
 			       ' updateamum='.$this->addslashes($this->updateamum).','.
 			       ' updatevon='.$this->addslashes($this->updatevon).
-			       " WHERE uid='".addslashes($this->uid)."';";
+			       " WHERE mitarbeiter_uid='".addslashes($this->uid)."';";
 		}
 		
 		if(pg_query($this->conn,$qry))

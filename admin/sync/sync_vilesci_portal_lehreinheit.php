@@ -79,7 +79,7 @@ function gruppezuweisen($id,$studiengang_kz, $semester, $verband, $gruppe, $einh
 	else 
 	{
 		$gruppe2 = new gruppe($conn);
-		if(!$gruppe2->exists($einheit_kurzbz))
+		if(!$gruppe2->exists(strtoupper($einheit_kurzbz)))
 		{
 			$gruppe2->studiengang_kz=$studiengang_kz;
 			$gruppe2->semester=$semester;
@@ -87,7 +87,7 @@ function gruppezuweisen($id,$studiengang_kz, $semester, $verband, $gruppe, $einh
 			$gruppe2->typ='';
 			$gruppe2->sichtbar=false;
 			$gruppe2->aktiv=false;
-			$gruppe2->gruppe_kurzbz=$einheit_kurzbz;
+			$gruppe2->gruppe_kurzbz=strtoupper($einheit_kurzbz);
 			$gruppe2->mailgrp=false;
 			if($gruppe2->save(true))
 				$error=false;
@@ -190,7 +190,7 @@ if($result = pg_query($conn_vilesci, $qry))
 						          raumtyp='$row->raumtyp' AND
 						          raumtypalternativ='$row->raumtypalternativ' AND
 						          unr ".($row->unr!=''?"='$row->unr'":'is null')." AND
-						          uid='$row->lektor'";
+						          mitarbeiter_uid='$row->lektor'";
 						if($result2 = pg_query($conn,$qry))
 						{
 							if(pg_num_rows($result2)>0)
@@ -259,7 +259,7 @@ if($result = pg_query($conn_vilesci, $qry))
 												//Lektor Zuweisen
 												$lektor = new lehreinheitmitarbeiter($conn);
 												$lektor->lehreinheit_id = $row_val->id;
-												$lektor->uid = $row->lektor;
+												$lektor->mitarbeiter_uid = $row->lektor;
 												$lektor->semesterstunden = $row->semesterstunden;
 												$lektor->planstunden = $row->semesterstunden;
 												$lektor->stundensatz = '';

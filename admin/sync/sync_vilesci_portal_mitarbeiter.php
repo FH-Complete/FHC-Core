@@ -41,7 +41,7 @@ $anzahl_fehler=0;
 // ***********************************
 
 //Mitarbeiter
-$qry = "SELECT * FROM tbl_person JOIN tbl_mitarbeiter USING(uid) WHERE uid NOT LIKE '\_dummy%' AND uid NOT LIKE '\_Dummy%'";
+$qry = "SELECT * FROM tbl_person JOIN tbl_mitarbeiter USING(uid) WHERE uid NOT LIKE '\_dummy%'";
 
 if($result = pg_query($conn_vilesci, $qry))
 {

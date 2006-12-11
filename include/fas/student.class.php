@@ -138,7 +138,7 @@ class student extends benutzer
 		if($this->new)
 		{
 			//Neuen Datensatz anlegen							
-			$qry = "INSERT INTO tbl_student(uid, matrikelnr, updateamum, updatevon, prestudent_id, 
+			$qry = "INSERT INTO tbl_student(student_uid, matrikelnr, updateamum, updatevon, prestudent_id, 
 			                    studiengang_kz, semester, verband, gruppe)
 			        VALUES('".addslashes($this->uid)."',".
 			 	 	$this->addslashes($this->matrikelnr).",".
@@ -162,7 +162,7 @@ class student extends benutzer
 			       ' semester='.$this->semester.','.
 			       ' verband='.$this->addslashes($this->verband).','.
 			       ' gruppe='.$this->addslashes($this->gruppe).
-			       " WHERE uid='".addslashes($this->uid)."';";
+			       " WHERE student_uid='".addslashes($this->uid)."';";
 		}
 		
 		if(pg_query($this->conn,$qry))

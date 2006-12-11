@@ -54,7 +54,7 @@ if($result = pg_query($conn_vilesci, $qry))
 	while($row = pg_fetch_object($result))
 	{
 		$gruppe = new gruppe($conn);
-		$gruppe->gruppe_kurzbz = $row->gruppe_kurzbz;
+		$gruppe->gruppe_kurzbz = strtoupper($row->gruppe_kurzbz);
 		$gruppe->studiengang_kz = $row->studiengang_kz;
 		$gruppe->bezeichnung = substr($row->bezeichnung,0,32);
 		$gruppe->semester = $row->semester;

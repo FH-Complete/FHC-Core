@@ -38,10 +38,10 @@ $anzahl_fehler=0;
 // * VILESCI->PORTAL - Synchronisation
 // ***********************************
 
-$qry = 'SELECT uid, mailgrp_kurzbz as gruppe_kurzbz, updateamum, updatevon 
+$qry = 'SELECT uid, UPPER(mailgrp_kurzbz) as gruppe_kurzbz, updateamum, updatevon 
         FROM tbl_personmailgrp 
         UNION 
-        SELECT uid, einheit_kurzbz as gruppe_kurzbz, updateamum, updatevon 
+        SELECT uid, UPPER(einheit_kurzbz) as gruppe_kurzbz, updateamum, updatevon 
         FROM tbl_einheitstudent';
 
 if($result = pg_query($conn_vilesci, $qry))

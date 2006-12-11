@@ -32,7 +32,10 @@ $error_log='';
 $text = '';
 $anzahl_eingefuegt=0;
 $anzahl_fehler=0;
-
+function myaddslashes($var)
+{
+		return ($var!=''?"'".addslashes($var)."'":'null');
+}
 // ***********************************
 // * VILESCI->PORTAL - Synchronisation
 // ***********************************
@@ -60,7 +63,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		else
 			$qry = 'INSERT INTO campus.tbl_stundenplan(stundenplan_id,';
 			
-		$qry.='unr, uid, datum, stunde, ort_kurzbz, gruppe_kurzbz, titel, 
+		$qry.='unr, mitarbeiter_uid, datum, stunde, ort_kurzbz, gruppe_kurzbz, titel, 
 		       anmerkung, fix, updateamum, updatevon, lehreinheit_id, 
 		       studiengang_kz, semester, verband, gruppe) VALUES(';
 		
@@ -80,20 +83,20 @@ if($result = pg_query($conn_vilesci, $qry))
 			$lehreinheit_id='';
 		}
 		
-		$qry.=",'".addslashes($row->unr)."','".
-					addslashes($row->uid)."','".
-					addslashes($row->datum)."','".
-			      	addslashes($row->stunde)."','".
-			      	addslashes($row->ort_kurzbz)."',".
-			      	($row->einheit_kurzbz!=''?"'".addslashes($row->einheit_kurzbz)."'":'null').",".
-			      	($row->titel!=''?"'".addslashes($row->titel)."'":'null').",".
-			      	($row->anmerkung!=''?"'".addslashes($row->anmerkung)."'":'null').",".
+		$qry.=",".myaddslashes($row->unr).",".
+					myaddslashes($row->uid).",".
+					myaddslashes($row->datum).",".
+			      	myaddslashes($row->stunde).",".
+			      	myaddslashes($row->ort_kurzbz).",".
+			      	myaddslashes($row->einheit_kurzbz).",".
+			      	myaddslashes($row->titel).",".
+			      	myaddslashes($row->anmerkung).",".
 			      	($row->fix=='t'?'true':'false').",'".
 			      	addslashes($row->updateamum)."','".
 			      	addslashes($row->updatevon)."',".
-			      	($lehreinheit_id!=''?"'".addslashes($lehreinheit_id)."'":'null').",'".
-			      	addslashes($row->studiengang_kz)."','".
-			      	addslashes($row->semester)."','".
+			      	myaddslashes($lehreinheit_id).",".
+			      	myaddslashes($row->studiengang_kz).",".
+			      	myaddslashes($row->semester).",'".
 			      	($row->verband!=''?addslashes($row->verband):' ')."','".
 			      	(($row->gruppe!='' && $row->gruppe!=0)?addslashes($row->gruppe):' ')."');";
 			if(pg_query($conn,$qry))

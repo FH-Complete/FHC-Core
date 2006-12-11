@@ -29,7 +29,7 @@ class lehreinheitmitarbeiter
 	
 	//Tabellenspalten
 	var $lehreinheit_id;	// integer
-	var $uid;				// varchar(16)
+	var $mitarbeiter_uid;	// varchar(16)
 	var $semesterstunden;	// smalint
 	var $planstunden;		// smalint
 	var $stundensatz;		// numeric(6,2)
@@ -44,7 +44,7 @@ class lehreinheitmitarbeiter
 	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
-	function lehreinheitmitarbeiter($conn, $lehreinheit_id=null, $uid=null, $unicode=false)
+	function lehreinheitmitarbeiter($conn, $lehreinheit_id=null, $mitarbeiter_uid=null, $unicode=false)
 	{
 		$this->conn = $conn;
 		
@@ -59,15 +59,15 @@ class lehreinheitmitarbeiter
 			return false;
 		}
 		
-		if($lehreinheit_id!=null && $uid!=null)
-			$this->load($lehreinheit_id, $uid);
+		if($lehreinheit_id!=null && $mitarbeiter_uid!=null)
+			$this->load($lehreinheit_id, $mitarbeiter_uid);
 	}
 	
 	// *********************************************************
 	// * Laedt die LEMitarbeiter
 	// * @param lehreinheit_id
 	// *********************************************************
-	function load($lehreinheit_id, $uid)
+	function load($lehreinheit_id, $mitarbeiter_uid)
 	{
 		return false;
 	}
@@ -111,10 +111,10 @@ class lehreinheitmitarbeiter
 		if($new)
 		{
 			//ToDo ID entfernen
-			$qry = 'INSERT INTO lehre.tbl_lehreinheitmitarbeiter (lehreinheit_id, uid, semesterstunden, planstunden, 
+			$qry = 'INSERT INTO lehre.tbl_lehreinheitmitarbeiter (lehreinheit_id, mitarbeiter_uid, semesterstunden, planstunden, 
 			                                                stundensatz, faktor, anmerkung)
 			        VALUES('.$this->addslashes($this->lehreinheit_id).','.
-					$this->addslashes($this->uid).','.
+					$this->addslashes($this->mitarbeiter_uid).','.
 					$this->addslashes($this->semesterstunden).','.
 					$this->addslashes($this->planstunden).','.
 					$this->addslashes($this->stundensatz).','.
@@ -130,9 +130,9 @@ class lehreinheitmitarbeiter
 			       ' faktor='.$this->addslashes($this->faktor).','.
 			       ' anmerkung='.$this->addslashes($this->anmerkung).','.
 			       " WHERE lehreinheit_id=".$this->addslashes($this->lehreinheit_id)." AND
-			               uid=".$this->lehreinheit_id.";";
+			               mitarbeiter_uid=".$this->addslashes($this->mitarbeiter_uid).";";
 		}
-
+		
 		if(pg_query($this->conn,$qry))
 		{
 			//Log schreiben
