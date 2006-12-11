@@ -24,9 +24,9 @@
  *
  */
 require_once('../../vilesci/config.inc.php');
-require_once('../../include/fas/person.class.php');
-require_once('../../include/fas/benutzer.class.php');
-require_once('../../include/fas/student.class.php');
+require_once('../../include/person.class.php');
+require_once('../../include/benutzer.class.php');
+require_once('../../include/student.class.php');
 
 $conn=pg_connect(CONN_STRING) or die('Connection zur Portal Datenbank fehlgeschlagen');
 $conn_vilesci=pg_connect(CONN_STRING_VILESCI) or die('Connection zur Vilesci Datenbank fehlgeschlagen');

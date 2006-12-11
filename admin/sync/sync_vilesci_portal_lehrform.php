@@ -24,7 +24,7 @@
  *
  */
 require_once('../../vilesci/config.inc.php');
-require_once('../../include/fas/lehrform.class.php');
+require_once('../../include/lehrform.class.php');
 
 $conn=pg_connect(CONN_STRING) or die('Connection zur Portal Datenbank fehlgeschlagen');
 $conn_vilesci=pg_connect(CONN_STRING_VILESCI) or die('Connection zur Vilesci Datenbank fehlgeschlagen');

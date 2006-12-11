@@ -38,11 +38,11 @@
  				LEKTOR HINZUFUEGEN
  */
 require_once('../../vilesci/config.inc.php');
-require_once('../../include/fas/lehreinheit.class.php');
-require_once('../../include/fas/lehreinheitgruppe.class.php');
-require_once('../../include/fas/lehreinheitmitarbeiter.class.php');
-require_once('../../include/fas/lehrverband.class.php');
-require_once('../../include/fas/gruppe.class.php');
+require_once('../../include/lehreinheit.class.php');
+require_once('../../include/lehreinheitgruppe.class.php');
+require_once('../../include/lehreinheitmitarbeiter.class.php');
+require_once('../../include/lehrverband.class.php');
+require_once('../../include/gruppe.class.php');
 
 $conn=pg_connect(CONN_STRING) or die('Connection zur Portal Datenbank fehlgeschlagen');
 $conn_vilesci=pg_connect(CONN_STRING_VILESCI) or die('Connection zur Vilesci Datenbank fehlgeschlagen');
