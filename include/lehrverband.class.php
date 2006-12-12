@@ -25,7 +25,7 @@ class lehrverband
 	var $conn;     // resource DB-Handle
 	var $errormsg; // string
 	var $new;      // boolean
-	var $lehrverbaende = array(); // lehrverband Objekt
+	var $result = array(); // lehrverband Objekt
 	
 	//Tabellenspalten
 	var $studiengang_kz;	// integer
@@ -108,6 +108,39 @@ class lehrverband
 			$this->gruppe=' ';
 		}
 		return true;
+	}
+	
+	function getlehrverband($studiengang_kz=null, $semester=null, $verband=null)
+	{
+		$qry = 'SELECT * FROM tbl_lehrverband WHERE 1=1';
+		if(!is_null($studiengang_kz))
+			$qry .=' AND studiengang_kz='.$this->addslashes($studiengang_kz);
+		if(!is_null($semester))
+			$qry .=' AND semester='.$this->addslashes($semester);
+		if(!is_null($verband))
+			$qry .=' AND verband='.$this->addslashes($verband);
+			
+		$qry .= ' ORDER BY studiengang_kz, semester, verband, gruppe';
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row=pg_fetch_object($result))
+			{
+				$lv_obj = new lehrverband($this->conn);
+				
+				$lv_obj->studiengang_kz = $row->studiengang_kz;
+				$lv_obj->semester = $row->semester;
+				$lv_obj->verband = $row->verband;
+				$lv_obj->gruppe = $row->gruppe;
+				
+				$this->result[] = $lv_obj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim lesen der Lehrverbaende '.$qry;
+			return false;
+		}
 	}
 
 	// ************************************************

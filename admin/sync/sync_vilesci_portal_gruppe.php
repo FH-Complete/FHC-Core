@@ -61,7 +61,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		$gruppe->sort = $row->typ;
 		$gruppe->mailgrp = ($row->mailgrp_kurzbz!=''?true:false);
 		$gruppe->beschreibung = $row->mailgrp_beschreibung;
-		$gruppe->sichtbar = ($row->sichtbar=='f'?true:false);
+		$gruppe->sichtbar = ($row->sichtbar=='t'?true:false);
 		$gruppe->aktiv = ($row->aktiv=='t'?true:false);
 		$gruppe->updateamum = $row->updateamum;
 		$gruppe->updatevon = $row->updatevon;

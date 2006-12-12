@@ -25,7 +25,7 @@ class gruppe
 	var $conn;     // resource DB-Handle
 	var $errormsg; // string
 	var $new;      // boolean
-	var $gruppen = array(); // gruppen Objekt
+	var $result = array(); // gruppen Objekt
 	
 	//Tabellenspalten
 	var $gruppe_kurzbz;			// varchar(16)
@@ -98,6 +98,49 @@ class gruppe
 	function load($gruppe_kurzbz)
 	{
 		return false;
+	}
+	
+	function getgruppe($studiengang_kz=null, $semester=null, $mailgrp=null, $sichtbar=null)
+	{
+		$qry = 'SELECT * FROM tbl_gruppe WHERE 1=1';
+		if(!is_null($studiengang_kz))
+			$qry .= " AND studiengang_kz='$studiengang_kz'";
+		if(!is_null($semester))
+			$qry .= " AND semester='$semester'";
+		if(!is_null($mailgrp))
+			$qry .= " AND mailgrp=".($mailgrp?'true':'false');
+		if(!is_null($sichtbar))
+			$qry .= " AND sichtbar=".($sichtbar?'true':'false');
+		
+		if($result=pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$grp_obj = new gruppe($this->conn);
+				
+				$grp_obj->gruppe_kurzbz = $row->gruppe_kurzbz;
+				$grp_obj->studiengang_kz = $row->studiengang_kz;
+				$grp_obj->bezeichnung = $row->bezeichnung;
+				$grp_obj->semester = $row->semester;
+				$grp_obj->sort = $row->sort;
+				$grp_obj->mailgrp = ($row->mailgrp=='t'?true:false);
+				$grp_obj->beschreibung = $row->beschreibung;
+				$grp_obj->sichtbar = ($row->sichtbar=='t'?true:false);
+				$grp_obj->aktiv = ($row->aktiv=='t'?true:false);
+				$grp_obj->updateamum = $row->updateamum;
+				$grp_obj->updatevon = $row->updatevon;
+				$grp_obj->insertamum = $row->insertamum;
+				$grp_obj->insertvon = $row->insertvon;
+				
+				$this->result[] = $grp_obj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden der Gruppen'.$qry;
+			return false;
+		}
 	}
 	
 	// *******************************************
