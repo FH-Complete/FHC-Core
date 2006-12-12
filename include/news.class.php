@@ -92,9 +92,9 @@ class news
 	// * als $maxalter Tage sind
 	// * @param $maxalter
 	// **********************************
-	function getnews($maxalter)
+	function getnews($maxalter, $studiengang_kz, $semester)
 	{
-		$qry = "SELECT * FROM campus.tbl_news WHERE now()-updateamum>$maxalter order by updateamum DESC;";
+		$qry = "SELECT * FROM campus.tbl_news WHERE (now()-updateamum)<interval '$maxalter days' AND studiengang_kz=".$studiengang_kz." AND semester".($semester!=''?"='$semester'":' is null')." order by updateamum DESC;";
 		
 		if($result = pg_query($this->conn, $qry))
 		{
@@ -109,11 +109,11 @@ class news
 				$newsobj->text = $row->text;
 				$newsobj->verfasser = $row->verfasser;
 				$newsobj->updateamum = $row->updateamum;
-				$newsobj->updatevon = $row->updatevon;
+				$newsobj->updatevon = $row->updateamum;
 				$newsobj->insertamum = $row->insertamum;
 				$newsobj->insertvon = $row->insertvon;
 				
-				$this->result = $newsobj;
+				$this->result[] = $newsobj;
 			}
 			return true;
 		}

@@ -34,11 +34,11 @@ class student extends benutzer
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional einen Studenten
 	// * @param $conn        	Datenbank-Connection
-	// *        $student_id     Student der geladen werden soll (default=null)
+	// *        $uid			Student der geladen werden soll (default=null)
 	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
-	function student($conn, $student_id=null, $unicode=false)
+	function student($conn, $uid=null, $unicode=false)
 	{
 		$this->conn = $conn;
 		
@@ -54,8 +54,44 @@ class student extends benutzer
 		}
 		
 		//Student laden
-		if($student_id!=null)
-			$this->load($student_id);
+		if($uid!=null)
+			$this->load($uid);
+	}
+	
+	function load($uid)
+	{
+		$qry = "SELECT * FROM tbl_student WHERE student_uid='".addslashes($uid)."'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$this->uid = $row->student_uid;
+				$this->matrikelnr = $row->matrikelnummer;
+				$this->prestudent_id = $row->prestudent_id;
+				$this->studiengang_kz = $row->studiengang_kz;
+				$this->semester = $row->semester;
+				$this->verband = $row->verband;
+				$this->gruppe = $row->gruppe;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;	
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->ext_id = $row->ext_id;
+				
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = 'Kein Benutzer mit dieser UID vorhanden';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Auslesen des Studenten '.$qry;
+			return false;
+		}
 	}
 	
 	// *******************************************
