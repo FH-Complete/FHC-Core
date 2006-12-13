@@ -1,6 +1,6 @@
 <?php
-	include('../config.inc.php');
-	include('../../include/functions.inc.php');
+	include('../../config.inc.php');
+	include('../../../include/functions.inc.php');
 
 	if (isset($REMOTE_USER))
 		$uid=$REMOTE_USER;
@@ -9,29 +9,29 @@
 
 	// Verbindung aufbauen
 	$conn=pg_pconnect(CONN_STRING) or die ("Unable to connect to SQL-Server");
-	$sql_query="SELECT uid, nachname, vornamen FROM tbl_person WHERE uid LIKE '$uid'";
+	$sql_query="SET search_path TO campus;SELECT uid, nachname, vorname FROM vw_benutzer WHERE uid LIKE '$uid'";
 	unset($uid);
-	$result=@pg_exec($conn, $sql_query);
+	$result=pg_query($conn, $sql_query);
 	if(!$result)
 		echo "User not found!";
 	else
 	{
 		$uid=pg_result($result,0,'"uid"');
 		$nachname=pg_result($result,0,'"nachname"');
-		$vornamen=pg_result($result,0,'"vornamen"');
+		$vornamen=pg_result($result,0,'"vorname"');
 	}
-	$sql_query="SELECT studiengang_kz, kurzbz, kurzbzlang, bezeichnung FROM tbl_studiengang ORDER BY kurzbz";
-	$result_stg=pg_exec($conn, $sql_query);
+	$sql_query="SELECT studiengang_kz, kurzbz, kurzbzlang, bezeichnung FROM public.tbl_studiengang ORDER BY kurzbz";
+	$result_stg=pg_query($conn, $sql_query);
 	if(!$result_stg)
 		die ("Studiengang not found!");
 	$num_rows_stg=pg_numrows($result_stg);
-	$sql_query="SELECT ort_kurzbz FROM tbl_ort WHERE aktiv AND lehre ORDER BY ort_kurzbz";
-	$result_ort=pg_exec($conn, $sql_query);
+	$sql_query="SELECT ort_kurzbz FROM public.tbl_ort WHERE aktiv AND lehre ORDER BY ort_kurzbz";
+	$result_ort=pg_query($conn, $sql_query);
 	if(!$result_ort)
 		die("ort not found!");
 	$num_rows_ort=pg_numrows($result_ort);
 	$sql_query="SELECT uid, kurzbz FROM vw_lektor ORDER BY kurzbz";
-	$result_lektor=pg_exec($conn, $sql_query);
+	$result_lektor=pg_query($conn, $sql_query);
 	if(!$result_lektor)
 		die("lektor not found!");
 	$num_rows_lektor=pg_numrows($result_lektor);
@@ -47,7 +47,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 }
 //-->
 </script>
-<link href="../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
 </head>
 
 <BODY>
