@@ -18,7 +18,7 @@ $stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:'');
 $sem=(isset($_GET['sem'])?$_GET['sem']:'');
 $ver=(isset($_GET['ver'])?$_GET['ver']:'');
 $grp=(isset($_GET['grp'])?$_GET['grp']:'');
-$einheit_kurzbz=(isset($_GET['einheit'])?$_GET['einheit']:'');
+$gruppe_kurzbz=(isset($_GET['einheit'])?$_GET['einheit']:'');
 $begin=$_GET['begin'];
 $ende=$_GET['ende'];
 $format=$_GET['format'];
@@ -151,7 +151,7 @@ $stdplan=new stundenplan($type,$conn);
 $stdplan->crlf=$crlf;
 
 // Zusaetzliche Daten laden
-if (! $stdplan->load_data($type,$pers_uid,$ort_kurzbz,$stg_kz,$sem,$ver,$grp,$einheit_kurzbz) )
+if (! $stdplan->load_data($type,$pers_uid,$ort_kurzbz,$stg_kz,$sem,$ver,$grp,$gruppe_kurzbz) )
 {
 		writeCISlog('STOP');
 		die($stdplan->errormsg);
@@ -161,8 +161,8 @@ if (! $stdplan->load_data($type,$pers_uid,$ort_kurzbz,$stg_kz,$sem,$ver,$grp,$ei
 if ($format=='HTML')
 {
 	if ($type=='verband' || $type=='einheit')
-		if (count($einheit_kurzbz)>0)
-			echo '<H1>Lehrverband: '.$einheit_kurzbz.'</H1>';
+		if (count($gruppe_kurzbz)>0)
+			echo '<H1>Lehrverband: '.$gruppe_kurzbz.'</H1>';
 		else
 			echo '<H1>Lehrverband: '.$stdplan->stg_kurzbzlang.'-'.$sem.$ver.$grp.'</H1>';
 	if ($type=='ort')

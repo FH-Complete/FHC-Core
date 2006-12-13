@@ -42,9 +42,9 @@
 //$ort_kurzbz='EDV6.08';
 //$datum=1102260015;
 
-include_once('../config.inc.php');
-include_once('../../include/functions.inc.php');
-include_once('../../include/stundenplan.class.php');
+include_once('../../config.inc.php');
+include_once('../../../include/functions.inc.php');
+include_once('../../../include/stundenplan.class.php');
 
 // Test Einstellungen
 //if (!isset($REMOTE_USER))
@@ -53,7 +53,6 @@ include_once('../../include/stundenplan.class.php');
 $uid=get_uid();
 
 
-writeCISlog('START');
 // Deutsche Umgebung
 //$loc_de=setlocale(LC_ALL, 'de_AT@euro', 'de_AT','de_DE@euro', 'de_DE');
 //setlocale(LC_ALL, $loc_de);
@@ -106,12 +105,12 @@ else if (isset($_GET['grp']))
 else
 	$grp=null;
 
-if (isset($_POST['einheit_kurzbz']))
-	$einheit_kurzbz=$_POST['einheit_kurzbz'];
-else if (isset($_GET['einheit_kurzbz']))
-	$einheit_kurzbz=$_GET['einheit_kurzbz'];
+if (isset($_POST['gruppe_kurzbz']))
+	$gruppe_kurzbz=$_POST['gruppe_kurzbz'];
+else if (isset($_GET['gruppe_kurzbz']))
+	$gruppe_kurzbz=$_GET['gruppe_kurzbz'];
 else
-	$einheit_kurzbz=null;
+	$gruppe_kurzbz=null;
 
 if (isset($_POST['user_uid']))
 	$user_uid=$_POST['user_uid'];
@@ -125,14 +124,12 @@ if (isset($_POST['titel']))
 // Verbindungsaufbau
 if (!$conn = @pg_pconnect(CONN_STRING))
 {
-	writeCISlog('STOP');
-   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
+	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
 }
 
 // Datums Format
 if(!$erg_std=pg_query($conn, "SET datestyle TO ISO;"))
 {
-	writeCISlog('STOP');
 	die(pg_last_error($conn));
 }
 
@@ -143,8 +140,7 @@ elseif ($uid=check_lektor(get_uid(), $conn))
 	$user='lektor';
 else
 {
-	writeCISlog('STOP');
-    die("Cannot set usertype!");
+	die("Cannot set usertype!");
 }
 
     // User bestimmen
@@ -157,7 +153,6 @@ if (isset($reserve) && $uid==$user_uid)
 {
 	if(!$erg_std=pg_query($conn, "SELECT * FROM tbl_stunde ORDER BY stunde"))
 	{
-		writeCISlog('STOP');
 		die(pg_last_error($conn));
 	}
 	$num_rows_std=pg_numrows($erg_std);
@@ -177,7 +172,7 @@ if (isset($reserve) && $uid==$user_uid)
 				$query="INSERT INTO tbl_reservierung
 							(datum, uid, ort_kurzbz, stunde, beschreibung, titel, studiengang_kz )
 						VALUES
-							('$datum_res', '$user_uid', '$ort_kurzbz', $stunde, '$beschreibung', '$titel', 0)"; // semester, verband, gruppe, einheit_kurzbz,
+							('$datum_res', '$user_uid', '$ort_kurzbz', $stunde, '$beschreibung', '$titel', 0)"; // semester, verband, gruppe, gruppe_kurzbz,
 				//echo $query;
 				if(!($erg=pg_exec($conn, $query)))
 					echo pg_last_error($conn);
@@ -197,33 +192,29 @@ $stdplan->user=$user;
 $stdplan->user_uid=$uid;
 
 // Zusaetzliche Daten laden
-if (! $stdplan->load_data($type,$pers_uid,$ort_kurzbz,$stg_kz,$sem,$ver,$grp,$einheit_kurzbz) )
+if (! $stdplan->load_data($type,$pers_uid,$ort_kurzbz,$stg_kz,$sem,$ver,$grp,$gruppe_kurzbz) )
 {
-	writeCISlog('STOP');
 	die($stdplan->errormsg);
 }
 //echo 'Datum:'.$datum.'<BR>';
 // Stundenplan einer Woche laden
 if (! $stdplan->load_week($datum))
 {
-	writeCISlog('STOP');
 	die($stdplan->errormsg);
 }
 
 // Kopfbereich drucken
 if (! $stdplan->draw_header())
 {
-	writeCISlog('STOP');
 	die($stdplan->errormsg);
 }
 //echo '<P align="center" style="font-size:xx-large;text-decoration:blink;color:#FF0000;">
-//		Achtung! Stundenplan-Update l?uft!!!</P>';
+//		Achtung! Stundenplan-Update laeuft!!!</P>';
 // Stundenplan der Woche drucken
 $stdplan->draw_week($uid);
 
 if (isset($count))
 	echo "Es wurden $count Stunden reserviert!<BR>";
-writeCISlog('STOP');
 ?>
 <HR>
 <P>Fehler und Feedback bitte an <A href="mailto:lvplan@technikum-wien.at">LV-Koordinationsstelle</A>.</P>

@@ -30,8 +30,8 @@ if (isset($_GET[ver]))
 	$ver=$_GET[ver];
 if (isset($_GET[grp]))
 	$grp=$_GET[grp];
-if (isset($_GET[einheit_kurzbz]))
-	$einheit_kurzbz=$_GET[einheit_kurzbz];
+if (isset($_GET[gruppe_kurzbz]))
+	$gruppe_kurzbz=$_GET[gruppe_kurzbz];
 
 if (!$conn = @pg_pconnect(CONN_STRING))
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -54,7 +54,7 @@ else
     //if ($grp!='0')
 	//	$sql_query.=" AND (gruppe='$grp' OR gruppe IS NULL OR gruppe='0')";
 }
-$sql_query.=' ORDER BY unr ASC, stg_kurzbz, vw_stundenplan.semester, verband, gruppe, einheit_kurzbz, uid LIMIT 100';
+$sql_query.=' ORDER BY unr ASC, stg_kurzbz, vw_stundenplan.semester, verband, gruppe, gruppe_kurzbz, uid LIMIT 100';
 //echo $sql_query.'<BR>';
 $erg_stpl=pg_exec($conn, $sql_query);
 $num_rows_stpl=pg_numrows($erg_stpl);
@@ -104,7 +104,7 @@ for ($i=0; $i<$num_rows_stpl; $i++)
     $semester=pg_result($erg_stpl,$i,"semester");
     $verband=pg_result($erg_stpl,$i,"verband");
     $gruppe=pg_result($erg_stpl,$i,"gruppe");
-    $einheit_kurzbz=pg_result($erg_stpl,$i,"einheit_kurzbz");
+    $gruppe_kurzbz=pg_result($erg_stpl,$i,"gruppe_kurzbz");
     ?>
     <tr class="<?php echo 'liste'.$i%2; ?>">
         <td><?php echo $unr; ?></td>
@@ -114,8 +114,8 @@ for ($i=0; $i<$num_rows_stpl; $i++)
         <td><?php echo $bezeichnung; ?></td>
         <td><A href="mailto:<?php echo strtolower($stgkurzbz).$semester.strtolower($verband).$gruppe; ?>@technikum-wien.at">
         <?php echo $stgkurzbz.'-'.$semester.$verband.$gruppe; ?></A></td>
-        <td><A href="mailto:<?php echo strtolower($einheit_kurzbz); ?>@technikum-wien.at">
-        <?php echo $einheit_kurzbz; ?></A></td>
+        <td><A href="mailto:<?php echo strtolower($gruppe_kurzbz); ?>@technikum-wien.at">
+        <?php echo $gruppe_kurzbz; ?></A></td>
     </tr>
     <?php
 }
