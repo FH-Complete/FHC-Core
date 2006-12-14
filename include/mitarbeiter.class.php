@@ -30,6 +30,7 @@ class mitarbeiter extends benutzer
 	var $lektor;			//boolean
 	var $fixangestellt;		//boolean
 	var $telefonklappe;		//varchar(25)
+	var $ort_kurzbz;		//varchar(8)
 
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional einen Mitarbeiter
@@ -89,6 +90,11 @@ class mitarbeiter extends benutzer
 			$this->errormsg = 'kurzbz darf nicht laenger als 8 Zeichen sein';
 			return false;
 		}
+		if(strlen($this->ort_kurzbz)>8)
+		{
+			$this->errormsg = 'Ort_kurzbz darf nicht laenger als 8 Zeichen sein';
+			return false;
+		}
 		if(!is_bool($this->lektor))
 		{
 			$this->errormsg = 'lektor muss boolean sein'.$this->lektor;
@@ -135,7 +141,7 @@ class mitarbeiter extends benutzer
 		if($this->new)
 		{
 			//Neuen Datensatz anlegen							
-			$qry = "INSERT INTO tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, 
+			$qry = "INSERT INTO tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz
 			                    fixangestellt, telefonklappe, updateamum, updatevon)
 			        VALUES('".addslashes($this->uid)."',".
 			 	 	$this->addslashes($this->ausbildungcode).",".
@@ -157,6 +163,7 @@ class mitarbeiter extends benutzer
 			       ' lektor='.($this->lektor?'true':'false').','.
 			       ' fixangestellt='.($this->fixangestellt?'true':'false').','.
 			       ' telefonklappe='.$this->addslashes($this->telefonklappe).','.
+			       ' updateamum='.$this->addslashes($this->ort_kurzbz).','.
 			       ' updateamum='.$this->addslashes($this->updateamum).','.
 			       ' updatevon='.$this->addslashes($this->updatevon).
 			       " WHERE mitarbeiter_uid='".addslashes($this->uid)."';";

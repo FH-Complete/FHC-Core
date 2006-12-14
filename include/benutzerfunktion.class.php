@@ -72,7 +72,7 @@ class benutzerfunktion
 		
 		while($row = pg_fetch_object($res))
 		{
-			$pfunktion_obj = new personenfunktion($this->conn);
+			$pfunktion_obj = new benutzerfunktion($this->conn);
 			
 			$pfunktion_obj->benutzerfunktion_id 	= $row->benutzerfunktion_id;
 			$pfunktion_obj->fachbereich_kurzbz 		= $row->fachbereich_kurzbz;

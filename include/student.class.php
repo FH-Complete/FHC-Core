@@ -67,7 +67,7 @@ class student extends benutzer
 			if($row = pg_fetch_object($result))
 			{
 				$this->uid = $row->student_uid;
-				$this->matrikelnr = $row->matrikelnummer;
+				$this->matrikelnr = $row->matrikelnr;
 				$this->prestudent_id = $row->prestudent_id;
 				$this->studiengang_kz = $row->studiengang_kz;
 				$this->semester = $row->semester;

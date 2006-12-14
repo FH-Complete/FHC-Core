@@ -131,13 +131,14 @@ class news
 	 */
 	function load($news_id)
 	{
-		if($news_id == '' || !is_nan($news_id))
+		
+		if(!is_numeric($news_id))
 		{
 			$this->errormsg = 'news_id muß eine gültige Zahl sein';
 			return false;
 		}
 		
-		$qry = "SELECT * FROM campus.tbl_news WHERE news_id = '$this->news_id';";
+		$qry = "SELECT * FROM campus.tbl_news WHERE news_id = '$news_id';";
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -175,8 +176,21 @@ class news
 	 */
 	function delete($news_id)
 	{
-		$this->errormsg = 'Noch nicht implementiert';
-		return false;
+		if(!is_numeric($news_id))
+		{
+			$this->errormsg = 'News_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "DELETE FROM campus.tbl_news WHERE news_id='$news_id'";
+		
+		if(pg_query($this->conn, $qry))
+			return true;
+		else
+		{
+			$this->errormsg = 'Fehler beim L&ouml;schen';
+			return false;
+		}		
 	}
 	
 	function addslashes($var)
@@ -223,15 +237,9 @@ class news
 		if($this->new)
 		{
 			//Neuen Datensatz anlegen	
-			//Pruefen ob funktion_kurzbz befüllt ist
-			if($this->news_id == '' || !is_numeric($this->news_id))
-			{
-				$this->errormsg = 'News_id ungültig';
-				return false;
-			}
-			$qry = 'INSERT INTO campus.tbl_news (news_id, betreff, text, semester, uid, studiengang_kz, verfasser, insertamum, insertvon, 
+						
+			$qry = 'INSERT INTO campus.tbl_news (betreff, text, semester, uid, studiengang_kz, verfasser, insertamum, insertvon, 
 				updateamum, updatevon) VALUES ('.
-				$this->addslashes($this->news_id).', '.
 				$this->addslashes($this->betreff).', '.
 				$this->addslashes($this->text).', '.
 				$this->addslashes($this->semester).', '.
@@ -239,9 +247,10 @@ class news
 				$this->addslashes($this->studiengang_kz).', '.
 				$this->addslashes($this->verfasser).', '.
 				$this->addslashes($this->insertamum).', '.
-				$this->addslashes($this->insertvon).', '.
-				$this->addslashes($this->updateamum).', '.
+				$this->addslashes($this->insertvon).', now(),'.
+				//$this->addslashes($this->updateamum).', '.
 				$this->addslashes($this->updatevon).'); ';
+				
 		}
 		else 
 		{
@@ -263,11 +272,11 @@ class news
 				'verfasser='.$this->addslashes($this->verfasser).', '.
 				'insertamum='.$this->addslashes($this->insertamum).', '.
 				'insertvon='.$this->addslashes($this->insertvon).', '.
-				'updateamum='.$this->addslashes($this->updateamum).', '.
+				'updateamum=now(),'. //'.$this->addslashes($this->updateamum).', '.
 				'updatevon='.$this->addslashes($this->updatevon).'  '.
 				'WHERE news_id = '.$this->addslashes($this->news_id).';';
 		}
-		
+		echo $qry;
 		if(pg_query($this->conn, $qry))
 		{
 			/*//Log schreiben

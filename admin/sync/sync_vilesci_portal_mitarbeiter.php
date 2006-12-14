@@ -72,6 +72,7 @@ if($result = pg_query($conn_vilesci, $qry))
 			$mitarbeiter->gebdatum=$row->gebdatum;
 			$mitarbeiter->gebort=$row->gebort;
 			$mitarbeiter->gebzeit=$row->gebzeit;
+			$mitarbeiter->ort_kurzbz=$row->ort_kurzbz;
 			$mitarbeiter->foto='';
 			$mitarbeiter->anmerkungen=$row->anmerkungen;
 			$mitarbeiter->homepage=$row->homepage;

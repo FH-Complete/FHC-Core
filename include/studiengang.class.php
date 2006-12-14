@@ -77,7 +77,45 @@ class studiengang
 	// *****************************************************
 	function load($studiengang_kz)
 	{
-		return false;
+		if(!is_numeric($studiengang_kz))
+		{
+			$this->errormsg = 'Studiengang_kz muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM tbl_studiengang WHERE studiengang_kz='$studiengang_kz'";
+		
+		if($res = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($res))
+			{			
+				$this->studiengang_kz=$row->studiengang_kz;
+				$this->kurzbz=$row->kurzbz;
+				$this->kurzbzlang=$row->kurzbzlang;
+				$this->bezeichnung=$row->bezeichnung;
+				$this->english=$row->english;
+				$this->typ=$row->typ;
+				$this->farbe=$row->farbe;
+				$this->email=$row->email;
+				$this->max_semester=$row->max_semester;
+				$this->max_verband=$row->max_verband;
+				$this->max_semester=$row->max_semester;
+				$this->erhalter_kz=$row->erhalter_kz;
+				$this->bescheid=$row->bescheid;
+				$this->bescheidbgbl1=$row->bescheidbgbl1;
+				$this->bescheidbgbl2=$row->bescheidbgbl2;
+				$this->bescheidgz=$row->bescheidgz;
+				$this->bescheidvom=$row->bescheidvom;
+				$this->ext_id=$row->ext_id;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Datensatz konnte nicht geladen werden';
+			return false;
+		}
+		
+		return true;		
 	}
 		
 	// *******************************************
