@@ -24,6 +24,8 @@
  *
  */
 require_once('../../vilesci/config.inc.php');
+require_once('../../include/lehrverband.class.php');
+require_once('../../include/gruppe.class.php');
 
 $conn=pg_connect(CONN_STRING) or die('Connection zur Portal Datenbank fehlgeschlagen');
 $conn_vilesci=pg_connect(CONN_STRING_VILESCI) or die('Connection zur Vilesci Datenbank fehlgeschlagen');
@@ -32,6 +34,7 @@ $error_log='';
 $text = '';
 $anzahl_eingefuegt=0;
 $anzahl_fehler=0;
+
 function myaddslashes($var)
 {
 		return ($var!=''?"'".addslashes($var)."'":'null');
@@ -45,9 +48,9 @@ else
 	$dev=false;
 	
 if($dev)
-	$qry = "SELECT * FROM tbl_stundenplandev limit 200";
+	$qry = "SELECT * FROM tbl_stundenplandev";
 else
-	$qry = "SELECT * FROM tbl_stundenplan limit 200";
+	$qry = "SELECT * FROM tbl_stundenplan";
 
 if($result = pg_query($conn_vilesci, $qry))
 {
@@ -58,6 +61,71 @@ if($result = pg_query($conn_vilesci, $qry))
 		
 	while($row = pg_fetch_object($result))
 	{
+		if($row->verband==0)
+			$row->verband=' ';
+			
+		if($row->einheit_kurzbz=='')
+		{
+			//Lehrverbandsgruppe
+			$lvb_obj = new lehrverband($conn);
+			
+			if(!$lvb_obj->exists($row->studiengang_kz, $row->semester, $row->verband, $row->gruppe))
+			{				
+				$lvb_obj->studiengang_kz = $row->studiengang_kz;
+				$lvb_obj->semester = $row->semester;
+				$lvb_obj->verband = $row->verband;
+				$lvb_obj->gruppe = $row->gruppe;
+				$lvb_obj->aktiv = false;
+				if(!$lvb_obj->save())
+				{
+					$error_log .= $lvb_obj->errormsg."\n";
+					$anzahl_fehler++;
+				}
+			}
+		}
+		else
+		{
+			//Spezialgruppe
+			$grp_obj = new gruppe($conn);
+			
+			if(!$grp_obj->exists($row->einheit_kurzbz))
+			{
+				$grp_obj->gruppe_kurzbz = $row->einheit_kurzbz;
+				$grp_obj->studiengang_kz = $row->studiengang_kz;
+				$grp_obj->semester = $row->semester;
+				$grp_obj->mailgrp = false;
+				$grp_obj->sichtbar = false;
+				$grp_obj->aktiv = false;
+				$grp_obj->new = true;
+				
+				//Bei Spezialgruppen keinen Verband/Gruppe angeben
+				$row->verband=' ';
+				$row->gruppe=' ';
+				
+				if(!$grp_obj->save())
+				{
+					$error_log.=$grp_obj->errormsg;
+					$anzahl_fehler++;
+				}
+			}
+		}
+		
+		//Lehreinheit_id ermitteln
+		if($row->lehrveranstaltung_id!='')
+		{
+			$qry_le = "SELECT lehreinheit_id_portal FROM tbl_synclehreinheit WHERE lehrveranstaltung_id_vilesci='".addslashes($row->lehrveranstaltung_id)."'";
+			if($row_le=pg_fetch_object(pg_query($conn,$qry_le)))
+			{
+				$lehreinheit_id = $row_le->lehreinheit_id_portal;
+			}
+			else 
+			{			
+				$lehreinheit_id='';
+			}
+		}
+		else 
+			$lehreinheit_id='';
+			
 		if($dev)
 			$qry = "INSERT INTO lehre.tbl_stundenplandev(stundenplandev_id,";
 		else
@@ -70,18 +138,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		if($dev)
 			$qry.="'".$row->stundenplandev_id."'";
 		else 
-			$qry.="'".$row->stundenplan_id."'";
-		
-		//Lehreinheit_id ermitteln
-		$qry_le = "SELECT lehreinheit_id_portal FROM tbl_synclehreinheit WHERE lehrveranstaltung_id_vilesci='".addslashes($row->lehrveranstaltung_id)."'";
-		if($row_le=pg_fetch_object(pg_query($conn,$qry_le)))
-		{
-			$lehreinheit_id = $row_le->lehreinheit_id_portal;
-		}
-		else 
-		{			
-			$lehreinheit_id='';
-		}
+			$qry.="'".$row->stundenplan_id."'";		
 		
 		$qry.=",".myaddslashes($row->unr).",".
 					myaddslashes($row->uid).",".
@@ -112,6 +169,8 @@ if($result = pg_query($conn_vilesci, $qry))
 }
 else
 	$error_log .= "Stundenplan konnten nicht geladen werden\n";
+
+$text.="Anzahl Datensaetze Vilesci: ".pg_num_rows($result)."\n";	
 $text.="Anzahl aktualisierte Datensaetze: $anzahl_eingefuegt\n";
 $text.="Anzahl der Fehler: $anzahl_fehler\n";
 ?>

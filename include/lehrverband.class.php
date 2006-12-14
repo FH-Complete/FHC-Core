@@ -32,6 +32,8 @@ class lehrverband
 	var $semester;			// integer
 	var $verband;			// integer
 	var $gruppe;			// integer	
+	var $aktiv;				// boolean
+	var $bezeichnung;		// varchar(16)
 	
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional einen Lehrverband
@@ -61,8 +63,8 @@ class lehrverband
 		$qry = "SELECT count(*) as anzahl FROM tbl_lehrverband WHERE 
 		            studiengang_kz='".addslashes($studiengang_kz)."' AND
 		            semester='".addslashes($semester)."' AND
-		            verband='".addslashes($verband)."' AND
-		            gruppe='".addslashes($gruppe)."'";
+		            trim(verband)='".trim(addslashes($verband))."' AND
+		            trim(gruppe)='".trim(addslashes($gruppe))."'";
 		
 		if($row=pg_fetch_object(pg_query($this->conn, $qry)))
 		{
@@ -131,6 +133,8 @@ class lehrverband
 				$lv_obj->semester = $row->semester;
 				$lv_obj->verband = $row->verband;
 				$lv_obj->gruppe = $row->gruppe;
+				$lv_obj->aktiv = $row->aktiv;
+				$lv_obj->bezeichnung = $row->bezeichnung;
 				
 				$this->result[] = $lv_obj;
 			}
@@ -166,12 +170,15 @@ class lehrverband
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
 			return false;
-		
-		$qry = 'INSERT INTO tbl_lehrverband (studiengang_kz, semester, verband, gruppe)
+				
+		$qry = 'INSERT INTO tbl_lehrverband (studiengang_kz, semester, verband, gruppe, aktiv, bezeichnung)
 		        VALUES('.$this->addslashes($this->studiengang_kz).','.
 				$this->addslashes($this->semester).','.
 				$this->addslashes($this->verband).','.
-				$this->addslashes($this->gruppe).');';
+				$this->addslashes($this->gruppe).','.
+				($this->aktiv?'true':'false').','.
+				$this->addslashes($this->bezeichnung).');';
+		
 		if(pg_query($this->conn,$qry))
 		{
 			//Log schreiben

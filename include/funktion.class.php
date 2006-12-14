@@ -33,7 +33,7 @@ class funktion
 	
 	//Tabellenspalten
 	var $funktion_kurzbz;	// @var integer
-	var $bezeichnung;		// @var string
+	var $beschreibung;		// @var string
 	var $aktiv;			// @var boolean
 	var $ext_id;			// @var bigint
 	
@@ -69,7 +69,7 @@ class funktion
 			$funktion_obj = new funktion($this->conn);
 			
 			$funktion_obj->funktion_kurzbz 	= $row->funktion_kurzbz;
-			$funktion_obj->bezeichnung    	= $row->bezeichnung;
+			$funktion_obj->beschreibung    	= $row->beschreibung;
 			$funktion_obj->aktiv           		= $row->aktiv;
 			
 			$this->result[] = $funktion_obj;
@@ -101,7 +101,7 @@ class funktion
 		if($row=pg_fetch_object($res))
 		{
 			$this->funktion_kurzbz	= $row->funktion_kurzbz;
-			$this->bezeichnung		= $row->bezeichnung;
+			$this->beschreibung		= $row->beschreibung;
 			$this->aktiv			= $row->aktiv;
 		}
 		else 
@@ -137,12 +137,11 @@ class funktion
 	 */
 	function checkvars()
 	{	
-		$this->bezeichnung = str_replace("'",'´',$this->bezeichnung);
-		
+				
 		//Laenge Pruefen
-		if(strlen($this->bezeichnung)>64)           
+		if(strlen($this->beschreibung)>64)           
 		{
-			$this->errormsg = "Bezeichnung darf nicht laenger als 128 Zeichen sein bei <b>$this->funktion_kurzbz</b> - $this->bezeichnung";
+			$this->errormsg = "Bezeichnung darf nicht laenger als 128 Zeichen sein bei <b>$this->funktion_kurzbz</b> - $this->beschreibung";
 			return false;
 		}
 				
@@ -164,9 +163,9 @@ class funktion
 				return false;
 			}
 			//Neuen Datensatz anlegen		
-			$qry = 'INSERT INTO tbl_funktion (funktion_kurzbz, bezeichnung, aktiv) VALUES ('.
+			$qry = 'INSERT INTO tbl_funktion (funktion_kurzbz, beschreibung, aktiv) VALUES ('.
 				$this->addslashes($this->funktion_kurzbz).', '.
-				$this->addslashes($this->bezeichnung).', '.
+				$this->addslashes($this->beschreibung).', '.
 				($this->aktiv?'true':'false').'); ';
 		}
 		else 
@@ -181,7 +180,7 @@ class funktion
 			}
 			
 			$qry = 'UPDATE tbl_funktion SET '. 
-				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
+				'beschreibung='.$this->addslashes($this->beschreibung).', '.
 				'aktiv='.($this->aktiv?'true':'false') .' '.
 				'WHERE funktion_kurzbz = '.$this->addslashes($this->funktion_kurzbz).';';
 		}

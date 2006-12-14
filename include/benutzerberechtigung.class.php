@@ -25,7 +25,7 @@ class benutzerberechtigung
 	var $conn;     // resource DB-Handle
 	var $errormsg; // string
 	var $new;      // boolean
-	var $benutzerberechtigungen = array(); // benutzerberechtigung Objekt
+	var $berechtigungen = array(); // benutzerberechtigung Objekt
 	
 	//Tabellenspalten
 	var $benutzerberechtigung_id;	// int
@@ -37,6 +37,8 @@ class benutzerberechtigung
 	var $studiensemester_kurzbz;	// varchar(16)
 	var $start;						// date
 	var $ende;						// date
+	var $starttimestamp;
+	var $endetimestamp;
 	
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
@@ -180,6 +182,142 @@ class benutzerberechtigung
 			$this->errormsg = 'Fehler beim Speichern des Feedbacks:'.$qry;
 			return false;
 		}
+	}
+	
+	//****************************************************************************
+	// * Rueckgabewert ist ein Array mit den Ergebnissen. Bei Fehler false und die
+	// * Fehlermeldung liegt in errormsg.
+	// * Wenn der Parameter stg_kz NULL ist tritt einheit_kurzbzb in Kraft.
+	// * @param string $uid    UserID
+	// * @return variable Array mit LVA, false bei Fehler
+	// ***************************************************************************
+	function getBerechtigungen($uid)
+	{
+		// Berechtigungen holen
+		$sql_query="SELECT * FROM tbl_benutzerberechtigung WHERE uid='$uid' AND (start<now() OR start IS NULL) AND (ende>now() OR ende IS NULL)";
+
+		if(!$erg=pg_query($this->conn, $sql_query))
+		{
+			$this->errormsg='Fehler beim laden der Berechtigungen';
+			return false;
+		}
+		
+		while($row=pg_fetch_object($erg))
+		{
+   			$b=new benutzerberechtigung($this->conn);
+   			
+   			$b->benutzerberechtigung_id = $row->benutzerberechtigung_id;
+			$b->art=$row->art;
+			$b->fachbereich_kurzbz=$row->fachbereich_kurzbz;
+			$b->studiengang_kz=$row->studiengang_kz;
+			$b->berechtigung_kurzbz=$row->berechtigung_kurzbz;
+			$b->uid=$row->uid;
+			$b->studiensemester_kurzbz=$row->studiensemester_kurzbz;
+			$b->start=$row->start;
+			if ($row->start!=null)
+				$b->starttimestamp=mktime(0,0,0,substr($row->start,5,2),substr($row->start,8),substr($row->start,0,4));
+			else
+				$b->starttimestamp=null;
+			$b->ende=$row->ende;
+			if ($row->ende!=null)
+				$b->endetimestamp=mktime(23,59,59,substr($row->ende,5,2),substr($row->ende,8),substr($row->ende,0,4));
+
+			
+			$this->berechtigungen[]=$b;
+		}
+		return true;
+	}
+
+	function isBerechtigt($berechtigung,$studiengang_kz=null,$art=null, $fachbereich_id=null)
+	{
+		$timestamp=time();
+		foreach ($this->berechtigungen as $b)
+		{
+			//Fachbereichsberechtigung
+			if($fachbereich_id!=null)
+			{
+				//Wenn Fachbereichs oder Adminberechtigung
+				if(($berechtigung == $b->berechtigung_kurzbz || $b->berechtigung_kurzbz == 'admin') && ($b->fachbereich_id==$fachbereich_id || $b->fachbereich_id=='0'))
+				{
+					if ($b->starttimestamp!=null && $b->endetimestamp!=null)
+					{
+						if ($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp)
+							return true;
+					}
+					else
+						return true;
+				}
+			}
+			
+			//Wenn Berechtigung fuer Bestimmte Klasse vorhanden ist
+			if($berechtigung == $b->berechtigung_kurzbz && $studiengang_kz==null && $art==null && $fachbereich_id==null)
+			   if ($b->starttimestamp!=null && $b->endetimestamp!=null)
+				{
+					if ($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp)
+						return true;
+				}
+				else
+					return true;
+			//Wenn Berechtigung fuer Bestimmten Studiengang vorhanden ist
+			if	($berechtigung==$b->berechtigung_kurzbz 
+			     && ($studiengang_kz==$b->studiengang_kz || $b->studiengang_kz==0) && $art==null && $b->fachbereich_id==null)
+				if ($b->starttimestamp!=null && $b->endetimestamp!=null)
+				{
+					if ($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp)
+						return true;
+				}
+				else
+					return true;
+			//Wenn Berechtigung mit Studiengang und der richtigen BerechtigungsArt (suid) vorhanden ist		
+			if	($berechtigung==$b->berechtigung_kurzbz 
+			     && ($studiengang_kz==$b->studiengang_kz || $b->studiengang_kz==0) 
+			     && strstr($b->art,$art))
+				if ($b->starttimestamp!=null && $b->endetimestamp!=null)
+				{
+					if ($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp)
+						return true;
+				}
+				else
+					return true;
+		}
+		return false;
+	}
+
+	// ********************************************************************
+	// * Gibt Array mit Kennzahlen der Studiengaenge sortiert zurueck.
+	// * Optional wird auf Berechtigung eingeschraenkt.
+	// * Wenn Berechtigung ueber alle Studiengaenge steht im ersten Feld 0.
+	// ********************************************************************
+	function getStgKz($berechtigung=null)
+	{
+		$studiengang_kz=array();
+		$timestamp=time();
+		
+		foreach ($this->berechtigungen as $b)
+			if	($berechtigung==$b->berechtigung_kurzbz || $berechtigung==null)
+				if($b->fachbereich_id==null)
+					$studiengang_kz[]=$b->studiengang_kz;
+		$studiengang_kz=array_unique($studiengang_kz);
+		sort($studiengang_kz);
+		return $studiengang_kz;
+	}
+	
+	function getFbKz($berechtigung=null)
+	{
+		$fachbereichs_kz=array();
+		$timestamp=time();
+
+		foreach($this->berechtigungen as $b)
+		{
+			if(($berechtigung==$b->berechtigung_kurzbz || $berechtigung==null)
+			   && (($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp) || ($b->starttimestamp==null && $b->endetimestamp==null)))
+			{
+				if($b->fachbereich_id!='' && !in_array($b->fachbereich_id,$fachbereichs_kz))
+					$fachbereichs_kz[] = $b->fachbereich_id;
+			}
+		}
+		sort($fachbereichs_kz);
+		return $fachbereichs_kz;
 	}
 }
 ?>
