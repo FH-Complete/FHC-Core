@@ -37,6 +37,7 @@ class ort
 	var $planbezeichnung;	// @var string
 	var $max_person;		// @var integer
 	var $aktiv;			// @var boolean
+	var $lehre;			// @var boolean
 	var $lageplan;		// @var oid
 	var $dislozierung;		// @var smallint
 	var $kosten;			// @var numeric(8,2)
@@ -77,6 +78,7 @@ class ort
 			$ort_obj->planbezeichnung 	= $row->planbezeichnung;
 			$ort_obj->max_person 		= $row->max_person;
 			$ort_obj->aktiv 			= $row->aktiv;
+			$ort_obj->lehre 			= $row->lehre;
 			$ort_obj->lageplan 			= $row->lageplan;
 			$ort_obj->dislozierung 		= $row->dislozierung;
 			$ort_obj->kosten 			= $row->kosten;
@@ -114,6 +116,7 @@ class ort
 			$this->planbezeichnung 	= $row->planbezeichnung;
 			$this->max_person 		= $row->max_person;
 			$this->aktiv 			= $row->aktiv;
+			$ort_obj->lehre 		= $row->lehre;
 			$this->lageplan 		= $row->lageplan;
 			$this->dislozierung 		= $row->dislozierung;
 			$this->kosten 		= $row->kosten;
@@ -190,13 +193,14 @@ class ort
 				return false;
 			}
 			//Neuen Datensatz anlegen		
-			$qry = 'INSERT INTO tbl_ort (ort_kurzbz, bezeichnung, planbezeichnung, max_person, aktiv, lageplan, 
+			$qry = 'INSERT INTO tbl_ort (ort_kurzbz, bezeichnung, planbezeichnung, max_person, aktiv, lehre, lageplan, 
 				dislozierung, kosten) VALUES ('.
 				$this->addslashes($this->ort_kurzbz).', '.
 				$this->addslashes($this->bezeichnung).', '.
 				$this->addslashes($this->planbezeichnung).', '.
 				$this->addslashes($this->max_person).', '.
 				($this->aktiv?'true':'false').', '. 
+				($this->lehre?'true':'false').', '. 
 				$this->addslashes($this->lageplan).', '.
 				$this->addslashes($this->dislozierung).', '.
 				$this->addslashes($this->kosten).');';
@@ -217,6 +221,7 @@ class ort
 				'planbezeichnung='.$this->addslashes($this->planbezeichnung).', '.
 				'max_person='.$this->addslashes($this->max_person).', '.
 				'aktiv='.($this->aktiv?'true':'false') .', '.
+				'lehre='.($this->lehre?'true':'false') .', '.
 				'lageplan='.$this->addslashes($this->lageplan).', '.
 				'dislozierung='.$this->addslashes($this->dislozierung).', '.
 				'kosten='.$this->addslashes($this->kosten).' '.
