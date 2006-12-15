@@ -62,7 +62,8 @@ if($result = pg_query($conn_vilesci, $qry))
 		$ort->bezeichnung		=$row->bezeichnung;
 		$ort->planbezeichnung	=$row->planbezeichnung;
 		$ort->max_person		=$row->max_person;
-		$ort->aktiv			=($row->aktiv=='t'?true:false);																																					
+		$ort->aktiv			=($row->aktiv=='t'?true:false);
+		$ort->lehre			=($row->lehre=='t'?true:false);
 		$ort->lageplan		=$row->lageplan;
 		$ort->dislozierung		=$row->dislozierung;
 		$ort->kosten			=$row->kosten;	

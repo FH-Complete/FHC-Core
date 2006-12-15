@@ -51,6 +51,9 @@ class person
 	var $insertvon;         // varchar(16)
 	var $updateamum;        // timestamp
 	var $updatevon;         // varchar(16)
+	var $geschlecht;	// varchar(1)
+	var $staatsbuergerschaft;	// varchar(3)
+	var $geburtsnation;	// varchar(3);
 	var $ext_id;            // bigint
 	
 	// *************************************************************************
@@ -125,6 +128,9 @@ class person
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->ext_id = $row->ext_id;
+				$this->geschlecht = $row->geschlecht;
+				$this->staatsbuergerschaft = $row->staatsbuergerschaft;
+				$this->geburtsnation = $row->geburtsnation;
 			}
 			else
 			{
@@ -190,11 +196,11 @@ class person
 			return false;
 		}
 		//ToDo Gebdatum pruefen -> laut bis muss er aelter als 10 Jahre sein
-		if(strlen($this->gebdatum)==0 || is_null($this->gebdatum))
+		/*if(strlen($this->gebdatum)==0 || is_null($this->gebdatum))
 		{
 			$this->errormsg = 'Geburtsdatum muss eingegeben werden';
 			return false;
-		}
+		}*/
 		if(strlen($this->gebort)>128)
 		{
 			$this->errormsg = 'Geburtsort darf nicht laenger als 128 Zeichen sein';
@@ -255,15 +261,34 @@ class person
 			$this->errormsg = 'Ext_ID ist keine gueltige Zahl';
 			return false;
 		}
+		if(strlen($this->geschlecht)>1)
+		{
+			$this->errormsg = 'geschlecht darf nicht laenger als 1 Zeichen sein';
+			return false;
+		}
+		if(strlen($this->geburtsnation)>3)
+		{
+			$this->errormsg = 'Geburtsnation darf nicht laenger als 3 Zeichen sein';
+			return false;
+		}
+		if(strlen($this->staatsbuergerschaft)>3)
+		{
+			$this->errormsg = 'Staatsbuergerschaft darf nicht laenger als 3 Zeichen sein';
+			return false;
+		}
+		if($this->geschlecht!='m' && $this->geschlecht!='w')
+		{
+			$this->errormsg = 'Geschlecht muß entweder w oder m sein!';
+		}
 		
 		return true;		
 	}
 	
 	// ************************************************
 	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische 
-	// * zeichen mit backslash versehen und das ergbnis
-	// * unter hochkomma gesetzt.
+	// * wenn $var !='' ist werden datenbankkritische 
+	// * Zeichen mit backslash versehen und das Ergebnis
+	// * unter Hochkomma gesetzt.
 	// ************************************************
 	function addslashes($var)
 	{
@@ -286,30 +311,34 @@ class person
 		{
 			$qry = 'INSERT INTO tbl_person (sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen, 
 			                    gebdatum, gebort, gebzeit, foto, anmerkungen, homepage, svnr, ersatzkennzeichen, 
-			                    familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon , ext_id)
+			                    familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon,
+			                    geschlecht, geburtsnation, staatsbuergerschaft, ext_id)
 			        VALUES('.$this->addslashes($this->sprache).','.
 					$this->addslashes($this->anrede).','.
 					$this->addslashes($this->titelpost).','.
-			        $this->addslashes($this->titelpre).','.
-			        $this->addslashes($this->nachname).','.
-			        $this->addslashes($this->vorname).','.
-			        $this->addslashes($this->vornamen).','.
-			        $this->addslashes($this->gebdatum).','.
-			        $this->addslashes($this->gebort).','.
-			        $this->addslashes($this->gebzeit).','.
-			        $this->addslashes($this->foto).','.
-			        $this->addslashes($this->anmerkungen).','.
-			        $this->addslashes($this->homepage).','.
-			        $this->addslashes($this->svnr).','.
-			        $this->addslashes($this->ersatzkennzeichen).','.
-			        $this->addslashes($this->familienstand).','.
-			        $this->addslashes($this->anzahlkinder).','.
-			        ($this->aktiv?'true':'false').','.
-			        $this->addslashes($this->insertamum).','.
-			        $this->addslashes($this->insertvon).','.
-			        $this->addslashes($this->updateamum).','.
-			        $this->addslashes($this->updatevon).','.
-			        $this->addslashes($this->ext_id).');';
+				        $this->addslashes($this->titelpre).','.
+				        $this->addslashes($this->nachname).','.
+				        $this->addslashes($this->vorname).','.
+				        $this->addslashes($this->vornamen).','.
+				        $this->addslashes($this->gebdatum).','.
+				        $this->addslashes($this->gebort).','.
+				        $this->addslashes($this->gebzeit).','.
+				        $this->addslashes($this->foto).','.
+				        $this->addslashes($this->anmerkungen).','.
+				        $this->addslashes($this->homepage).','.
+				        $this->addslashes($this->svnr).','.
+				        $this->addslashes($this->ersatzkennzeichen).','.
+				        $this->addslashes($this->familienstand).','.
+				        $this->addslashes($this->anzahlkinder).','.
+				        ($this->aktiv?'true':'false').','.
+				        $this->addslashes($this->insertamum).','.
+				        $this->addslashes($this->insertvon).','.
+				        $this->addslashes($this->updateamum).','.
+				        $this->addslashes($this->updatevon).','.
+				        $this->addslashes($this->geschlecht).','.
+				        $this->addslashes($this->geburtsnation).','.
+				        $this->addslashes($this->staatsbuergerschaft).','.
+				        $this->addslashes($this->ext_id).');';
 		}
 		else
 		{
@@ -319,30 +348,68 @@ class person
 				$this->errormsg = 'person_id muss eine gueltige Zahl sein';
 				return false;
 			}
-
-			$qry = 'UPDATE tbl_person SET'.
-			       ' sprache='.$this->addslashes($this->sprache).','.
-			       ' anrede='.$this->addslashes($this->anrede).','.
-			       ' titelpost='.$this->addslashes($this->titelpost).','.
-			       ' titelpre='.$this->addslashes($this->titelpre).','.
-			       ' nachname='.$this->addslashes($this->nachname).','.
-			       ' vorname='.$this->addslashes($this->vorname).','.
-			       ' vornamen='.$this->addslashes($this->vornamen).','.
-			       ' gebdatum='.$this->addslashes($this->gebdatum).','.
-			       ' gebort='.$this->addslashes($this->gebort).','.
-			       ' gebzeit='.$this->addslashes($this->gebzeit).','.
-			       ' foto='.$this->addslashes($this->foto).','.
-			       ' anmerkungen='.$this->addslashes($this->anmerkungen).','.
-			       ' homepage='.$this->addslashes($this->homepage).','.
-			       ' svnr='.$this->addslashes($this->svnr).','.
-			       ' ersatzkennzeichen='.$this->addslashes($this->ersatzkennzeichen).','.
-			       ' familienstand='.$this->addslashes($this->familienstand).','.
-			       ' anzahlkinder='.$this->addslashes($this->anzahlkinder).','.
-			       ' aktiv='.($this->aktiv?'true':'false').','.
-			       ' updateamum='.$this->addslashes($this->updateamum).','.
-			       ' updatevon='.$this->addslashes($this->updatevon).','.
-			       ' ext_id='.$this->addslashes($this->ext_id).
-			       " WHERE person_id='$this->person_id'";
+			
+			//update nur wenn änderungen gemacht
+			$qry="SELECT * FROM tbl_person";
+			if($result = pg_query($conn, $qry))
+			{
+				while($row = pg_fetch_object($result))
+				{
+					$update=false;			
+					if($row->sprache!=$this->sprache) 		$update=true;
+					if($row->anrede!=$this->anrede) 					$update=true;
+					if($row->titelpost!=$this->titelpost) 					$update=true;
+					if($row->titelpre!=$this->titelpre) 					$update=true;
+					if($row->nachname!=$this->nachname) 				$update=true;
+					if($row->vorname!=$this->vorname) 				$update=true;
+					if($row->vornamen!=$this->vornamen) 				$update=true;
+					if($row->gebdatum!=$this->gebdatum) 				$update=true;
+					if($row->gebort!=$this->gebort) 					$update=true;
+					if($row->gebzeit!=$this->gebzeit) 					$update=true;
+					if($row->foto!=$this->foto) 						$update=true;
+					if($row->anmerkungen!=$this->anmerkungen) 			$update=true;
+					if($row->homepage!=$this->homepage) 				$update=true;
+					if($row->svnr!=$this->svnr) 						$update=true;
+					if($row->ersatzkennzeichen!=$this->ersatzkennzeichen) 	$update=true;
+					if($row->familienstand!=$this->familienstand) $update=true;
+					if($row->anzahlkinder!=$this->anzahlkinder) $update=true;
+					if($row->aktiv!=$this->aktiv) $update=true;
+					if($row->geburtsnation!=$this->geburtsnation) $update=true;
+					if($row->geschlecht!=$this->geschlecht) $update=true;
+					if($row->staatsbuergerschaft!=$this->staatsbuergerschaft) $update=true;
+					
+					
+					if($update)
+					{
+						$qry = 'UPDATE tbl_person SET'.
+						       ' sprache='.$this->addslashes($this->sprache).','.
+						       ' anrede='.$this->addslashes($this->anrede).','.
+						       ' titelpost='.$this->addslashes($this->titelpost).','.
+						       ' titelpre='.$this->addslashes($this->titelpre).','.
+						       ' nachname='.$this->addslashes($this->nachname).','.
+						       ' vorname='.$this->addslashes($this->vorname).','.
+						       ' vornamen='.$this->addslashes($this->vornamen).','.
+						       ' gebdatum='.$this->addslashes($this->gebdatum).','.
+						       ' gebort='.$this->addslashes($this->gebort).','.
+						       ' gebzeit='.$this->addslashes($this->gebzeit).','.
+						       ' foto='.$this->addslashes($this->foto).','.
+						       ' anmerkungen='.$this->addslashes($this->anmerkungen).','.
+						       ' homepage='.$this->addslashes($this->homepage).','.
+						       ' svnr='.$this->addslashes($this->svnr).','.
+						       ' ersatzkennzeichen='.$this->addslashes($this->ersatzkennzeichen).','.
+						       ' familienstand='.$this->addslashes($this->familienstand).','.
+						       ' anzahlkinder='.$this->addslashes($this->anzahlkinder).','.
+						       ' aktiv='.($this->aktiv?'true':'false').','.
+						       ' updateamum='.$this->addslashes($this->updateamum).','.
+						       ' updatevon='.$this->addslashes($this->updatevon).','.
+						       ' geschlecht='.$this->addslashes($this->geschlecht).','.
+						       ' geburtsnation='.$this->addslashes($this->geburtsnation).','.
+						       ' staatsbuergerschaft='.$this->addslashes($this->staatsbuergerschaft).','.
+						       ' ext_id='.$this->addslashes($this->ext_id).
+						       " WHERE person_id='$this->person_id'";
+					}
+				}
+			}
 		}
 
 		if(pg_query($this->conn,$qry))

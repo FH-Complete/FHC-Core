@@ -1,4 +1,25 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
+
 /**
  * Klasse Nation (FAS-Online)
  * @create 06-04-2006
@@ -6,17 +27,18 @@
 
 class nation
 {
-	var $conn;     
-	var $errormsg;  
-	var $result = array();
+	var $conn;     // resource DB-Handle
+	var $errormsg; // string
+	var $new;      // boolean
+	var $nation = array(); // nation Objekt
 	
 	//Tabellenspalten
 	var $code;   
 	var $sperre; 
 	var $kontinent;
-	var $entwland;
-	var $euflag;
-	var $ewrflag;
+	var $entwicklungsstand;
+	var $eu;
+	var $ewr;
 	var $kurztext;
 	var $langtext;
 	var $engltext;
@@ -26,18 +48,25 @@ class nation
 	 * @param $conn      Connection
 	 *        $code      Zu ladende Nation
 	 */
-	function nation($conn,$code=null)
+	function nation($conn, $code=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+		
+		if($unicode)
+			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+		else 
+			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+			
 		if(!pg_query($conn,$qry))
 		{
-			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
+			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-		if($code != null)
-			$this->load($code);
+		
+		//if($person_id != null)
+		//	$this->load($person_id);
 	}
+	
 	
 	/**
 	 * Laedt die Funktion mit der ID $adress_id
@@ -72,21 +101,55 @@ class nation
 		
 		while($row = pg_fetch_object($res))
 		{
-			$nation_obj = new nation($this->conn);
+			$nation = new nation($this->conn);
 		
-			$nation_obj->code = $row->code;
-			$nation_obj->sperre = $row->sperre; 
-	        $nation_obj->kontinent = $row->sperre;
-	  		$nation_obj->entwland = $row->entwland;
-	        $nation_obj->euflag = $row->euflag;
-	 		$nation_obj->ewrflag = $row->ewrflag;
-			$nation_obj->kurztext = $row->kurztext;
-			$nation_obj->langtext = $row->langtext;
-			$nation_obj->engltext = $row->engltext;
+			$nation->code = $row->code;
+			$nation->sperre = $row->sperre; 
+	        		$nation->kontinent = $row->sperre;
+	  		$nation->entwland = $row->entwland;
+	        		$nation->euflag = $row->euflag;
+	 		$nation->ewrflag = $row->ewrflag;
+			$nation->kurztext = $row->kurztext;
+			$nation->langtext = $row->langtext;
+			$nation->engltext = $row->engltext;
 			
-			$this->result[] = $nation_obj;
+			$this->nation[] = $nation;
 		}
 		return true;
+	}
+	function addslashes($var)
+	{
+		return ($var!=''?"'".addslashes($var)."'":'null');
+	}
+	// ************************************************************
+	// * Speichert die Personendaten in die Datenbank
+	// * @return true wenn erfolgreich, false im Fehlerfall
+	// ************************************************************
+	function save()
+	{		
+		
+		
+		$qry='INSERT INTO bis.tbl_nation (code, entwicklungsstand, eu, ewr, kontinent, kurztext, langtext, engltext, sperre) VALUES('.
+			$this->addslashes($this->code).', '.
+			$this->addslashes($this->entwicklungsstand).', '.
+			$this->addslashes($this->eu).', '.
+			$this->addslashes($this->ewr).', '.
+			$this->addslashes($this->kontinent).', '.
+			$this->addslashes($this->kurztext).', '.
+			$this->addslashes($this->langtext).', '.
+			$this->addslashes($this->engltext).', '.
+			$this->addslashes($this->sperre).');';
+		
+
+		if(pg_query($this->conn,$qry))
+		{
+			return true;	
+		}
+		else
+		{			
+			$this->errormsg = 'Fehler beim Speichern des Nationen-Datensatzes:'.$this->code.' '.$qry;
+			return false;
+		}
 	}
 }
 ?>

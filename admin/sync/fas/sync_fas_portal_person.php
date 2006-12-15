@@ -53,6 +53,9 @@ $anzahl_fehler=0;
 <body>
 <?php
 //person
+flush();
+?>
+<?php
 $qry = "SELECT * FROM person";
 if($result = pg_query($conn_fas, $qry))
 {
@@ -61,6 +64,7 @@ if($result = pg_query($conn_fas, $qry))
 	while($row = pg_fetch_object($result))
 	{
 		$person=new person($conn);
+		
 		$person->geburtsnation=$row->gebnation;
 		$person->anrede=$row->anrede;
 		$person->titelpost=$row->postnomentitel;
@@ -99,39 +103,106 @@ if($result = pg_query($conn_fas, $qry))
 		{
 			$person->familienstand=='w';
 		}
+		
 		$error=false;
-		$qry="SELECT ext_id FROM public.tbl_person WHERE ext_id='$row->person_pk'";
-		if($result1 = pg_query($conn, $qry))
+		$qry="SELECT person_id FROM public.tbl_benutzer WHERE uid='$row->uid'";
+		if($resultu = pg_query($conn, $qry))
 		{
-			if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist
+			if(pg_num_rows($resultu)>0) //wenn dieser eintrag schon vorhanden ist
 			{
-				if($row1=pg_fetch_object($result1))
+				if($rowu=pg_fetch_object($resultu))
 				{
 					//update
-					$person->new=false;					
+					$person->person_id=$rowu->person_id;
+					$person->new=false;
+					//echo nl2br("update1 von ".$row->uid.", ".$row->familienname."\n");
 				}
 				else 
 				{
 					$error=true;
-					$error_log.="person von $row->person_pk konnte nicht ermittelt werden\n";
+					$error_log.="benutzer von $row->uid konnte nicht ermittelt werden\n";
 				}
 			}	
-			else
+			else 
 			{
-				//insert
-				$person->new=true;
-
-			}
+				$qry="SELECT person_fas, person_portal FROM public.tbl_syncperson WHERE person_fas='$row->person_pk'";
+				if($result1 = pg_query($conn, $qry))
+				{
+					if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist
+					{
+						if($row1=pg_fetch_object($result1))
+						{ 
+							//update
+							$person->person_id=$row1->person_portal;
+							$person->new=false;
+							//echo nl2br("update2 von ".$row->uid.", ".$row->familienname."\n");					
+						}
+						else 
+						{
+							$error=true;
+							$error_log.="person von $row->person_pk konnte nicht ermittelt werden\n";
+						}
+					}
+					else
+					{
+						//vergleich svnr und ersatzkennzeichen
+						$qry="SELECT person_id FROM public.tbl_person 
+							WHERE ('$row->svnr' is not null AND svnr = '$row->svnr') 
+								OR ('$row->ersatzkennzeichen' is not null AND ersatzkennzeichen = '$row->ersatzkennzeichen')";
+						if($resultz = pg_query($conn, $qry))
+						{
+							if(pg_num_rows($resultz)>0) //wenn dieser eintrag schon vorhanden ist
+							{
+								if($rowz=pg_fetch_object($resultz))
+								{
+									$person->new=false;
+									$person->person_id=$rowz->person_id;
+									//echo nl2br("update3 von ".$row->uid.", ".$row->familienname."\n");
+								}
+								else 
+								{
+									$error=true;
+									$error_log.="person mit svnr: $row->svnr bzw. ersatzkennzeichen: $row->ersatzkennzeichen konnte nicht ermittelt werden (".pg_num_rows($resultz).")\n";
+								}
+							}
+							else 
+							{
+								//insert
+								$person->new=true;
+								//echo nl2br("insert von ".$row->uid.", ".$row->familienname."\n");
+							}
+						}		
+					}
+				}					
+			}	
+			
 			if(!$error)
+			{
 				if(!$person->save())
 				{
 					$error_log.=$person->errormsg."\n";
 					$anzahl_fehler++;
 				}
 				else 
+				{
+					//überprüfen, ob eintrag schon vorhanden
+					$qry="SELECT person_fas FROM tbl_syncperson WHERE person_fas='$row->person_pk' AND person_portal='$person->person_id'";
+					if($resultz = pg_query($conn, $qry))
+					{
+						if(pg_num_rows($resultz)==0) //wenn dieser eintrag noch nicht vorhanden ist
+						{
+							$qry='INSERT INTO tbl_syncperson (person_fas, person_portal)'.
+								'VALUES ('.$row->person_pk.', '.$person->person_id.');';
+							$resulti = pg_query($conn, $qry);
+						}
+					}
 					$anzahl_eingefuegt++;
+				}
+			}
 			else 
+			{
 				$anzahl_fehler++;
+			}
 		}
 	}
 	echo nl2br("abgeschlossen\n\n");
