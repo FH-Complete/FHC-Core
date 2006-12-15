@@ -122,9 +122,12 @@ class studiengang
 	// * Liefert alle Studiengaenge
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
-	function getAll($order)
+	function getAll($order=null)
 	{
-		$qry = "SELECT * FROM tbl_studiengang order by $order;";
+		$qry = "SELECT * FROM tbl_studiengang";
+		
+		if($order!=null)
+		 	$qry .=" ORDER BY $order";
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{

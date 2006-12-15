@@ -156,5 +156,61 @@ class studiensemester
 			return false;
 		}
 	}
+	
+	// ******************************************************************
+	// * Liefert das Aktuelle Studiensemester
+	// * @return aktuelles Studiensemester oder false wenn es keines gibt
+	// ******************************************************************
+	function getakt()
+	{
+		$qry = "SELECT studiensemester_kurzbz FROM tbl_studiensemester WHERE start <= now() AND ende >= now()";
+		if(!$res=pg_exec($this->conn,$qry))
+		{
+			$this->errormsg = pg_errormessage($this->conn);
+			return false;
+		}
+		
+		if(pg_num_rows($res)>0)
+		{
+		   $erg = pg_fetch_object($res);
+		   return $erg->studiensemester_kurzbz;
+		}
+		else 
+		{
+			$this->errormsg = "Kein aktuelles Studiensemester vorhanden";
+			return false;
+		}
+	}
+	
+	/**
+	 * Liefert das Aktuelle Studiensemester oder das darauffolgende
+	 * @return Studiensemester oder false wenn es keines gibt
+	 */
+	function getaktorNext()
+	{
+		if($stsem=$this->getakt())
+		   return $stsem;
+		else 
+		{
+			$qry = "SELECT studiensemester_kurzbz FROM tbl_studiensemester WHERE ende >= now() ORDER BY ende";
+			if(!$res=pg_exec($this->conn,$qry))
+		    {
+				$this->errormsg = pg_errormessage($this->conn);
+				return false;
+		    }
+		
+			if(pg_num_rows($res)>0)
+			{
+			   $erg = pg_fetch_object($res);
+			   return $erg->studiensemester_kurzbz;
+			}
+			else 
+			{
+				$this->errormsg = "Kein aktuelles Studiensemester vorhanden";
+				return false;
+			}
+		}
+	}
+
 }
 ?>

@@ -1,0 +1,316 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+div.tip 
+{ 
+
+	position: absolute;
+	display: none;
+	width: 300px;
+	background-color: #f7f7ee; 
+	padding: 3px 7px 4px 6px; 
+	border: 1px solid #336; 
+	background-color: #f7f7ee; 
+	font-family: arial, helvetica, sans-serif; 
+	font-size: 12px; 
+	font-weight: normal; 
+	color: #000; 
+	text-align: left;
+} 
+-->
+</style>
+<script>
+<!--
+wmtt = null;
+
+document.onmousemove = updateWMTT;
+
+function updateWMTT(e) 
+{
+	x = (document.all) ? window.event.x : e.pageX;
+	y = (document.all) ? window.event.y : e.pageY; 
+	
+	/* Damit der Tooltip nicht ausserhalb des Fensters rutscht*/
+	if((document.body.clientWidth && x>document.body.clientWidth-300) || (window.innerWidth && x>window.innerWidth-300))
+		x = x-300;
+	
+	if (wmtt != null) {
+		wmtt.style.left = (x + 20) + "px";
+		wmtt.style.top 	= (y + 20) + "px";
+	}
+}
+
+function showWMTT(id) {
+	wmtt = document.getElementById(id);
+	wmtt.style.display = "block"
+}
+
+function hideWMTT() {
+	wmtt.style.display = "none";
+}
+//-->
+</script>
+</head>
+
+<body>
+<a name='top' ></a>
+<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="10">&nbsp;</td>
+    <td><table width="100%"  border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td class="ContentHeader"><font class="ContentHeader">&nbsp;Jahresplan SS2007</font></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+      </tr>
+	  <tr>
+        <td>&nbsp;</td>
+      </tr>
+	  <tr>
+	  	<td>
+		  <table width="100%"  border="1" cellspacing="0" cellpadding="1">
+			<tr style="background-color: #FFFF99;">
+			  <td width="100px">&nbsp;</td>
+			  <td align="center"><font class='tool' onMouseOver="showWMTT('1')" onMouseOut="hideWMTT()"><b><u>Diplompr&uuml;fungen/<br />Bachelorpr&uuml;fungen</u></b></font>
+			  <div class='tip' id='1'>
+			  BP = Bachelorprüfung<br />
+			  DP = Diplomprüfung<br />
+			  B vor Studiengangsk&uuml;rzel = Bachelorstudiengang<br />
+			  M vor Studiengangsk&uuml;rzel = Masterstudiengang<br />
+			  D vor Studiengangsk&uuml;rzel = Diplomstudiengang
+			  </div></td>
+			  <td align="center"><b>Sponsionen</b></td>
+			  <td align="center"><b>Reihungstest</b></td>
+			  <td align="center"><font class='tool' onMouseOver="showWMTT('2')" onMouseOut="hideWMTT()"><b><u>Interne Termine</u></b></font>
+			  <div class='tip' id='2'>
+			  Senate, Kollegiumssitzungen, Wartungswochen, Semester-Kick-Off etc.
+			  </div></td>
+			  <td align="center"><font class='tool' onMouseOver="showWMTT('3')" onMouseOut="hideWMTT()"><b><u>Veranstaltungen</u></b></font>
+			  <div class='tip' id='3'>
+			  Veranstaltungen der Unternehmenskommunikation, Infoabende, BEST, 
+			  Tag der offenen T&uuml;r, Messen im Haus und extern, Weiterbildungsveranstaltungen, etc.
+			  </div></td>
+			</tr>			
+			<tr>
+			  <td style="background-color: #CCFFCC;"><b>&nbsp;<a href='#februar07' style="color: #000000;"><u>Februar 07</u></a></b><br /><br /></td>
+			  <td>&nbsp;</td>
+			  <td>&nbsp;</td>
+			  <td>
+			    22.02. BMR<br />
+				28.02. BEL
+			  </td>
+			  <td>
+			    14.02. Senat<br />
+                28.02. Senat
+			  </td>
+			  <td>&nbsp;</td>
+			</tr>
+			<tr>
+			  <td style="background-color: #CCFFCC;"><b>&nbsp;<a href='#maerz07' style="color: #000000;"><u>M&auml;rz 07</u></a></b><br /><br /></td>
+			  <td valign="top">
+			  	05.03. DP MWI<br />
+				06.03. DP MWI<br />
+				07.03. DP MWI<br />
+				07.03. DP EID<br />
+			  </td>
+			  <td valign="top">
+
+			  </td>
+			  <td valign="top">22.03. BMR</td>
+			  <td valign="top">
+			  	14.03. Senat<br />
+				28.03. Senat
+			  </td>
+			  <td valign="top">&nbsp;01.03. - 04.03. BEST Wien</td>
+			</tr>
+			<tr>
+			  <td style="background-color: #CCFFCC;"><b>&nbsp;<a href='#april07' style="color: #000000"><u>April 07</u></a></b><br /><br /></td>
+			  <td valign="top">&nbsp;</td>
+			  <td valign="top">&nbsp;</td>
+			  <td valign="top">25.04. BEL</td>
+			  <td valign="top">
+			  	11.04. Senat<br />
+				25.04. Senat
+			  </td>
+			  <td valign="top">&nbsp;26.04.T&ouml;chtertag</td>
+			</tr>
+			<tr>
+			  <td style="background-color: #CCFFCC;"><b>&nbsp;<a href='#mai07' style="color: #000000"><u>Mai 07</u></a></b><br /><br /></td>
+			  <td>&nbsp;</td>
+			  <td>&nbsp;</td>
+			  <td>
+			  	23.05. BEL<br />
+				24.05. BMR
+			  </td>
+			  <td>
+			  	09.05. Senat<br />
+				23.05. Senat
+			  </td>
+			  <td>&nbsp;</td>
+			</tr>			
+			<tr>
+			  <td style="background-color: #CCFFCC;"><b>&nbsp;<a href='#juni07' style="color: #000000"><u>Juni 07</u></a></b><br /><br /></td>
+			  <td valign="top">
+				12.06. BEL<br />
+				13.06 BEL<br />
+				18.06. DP MSE<br />
+				19.06. DP MSE<br />
+				21.06. BP BEW <br />
+			  </td>
+			  <td valign="top">
+			  	22.06. BST, DST<br />
+				28.06. MSE
+			  </td>
+			  <td valign="top">
+			  	16.06. BEW (9-13 Uhr)<br />
+				25.06. BEL<br />
+				26.06. BEL<br />
+				28.06. BMR<br />
+			  </td>
+			  <td valign="top">
+			  	06.06. Senat<br />
+				20.06. Senat<br />
+				27.06. Senat<br />
+			  </td>
+			  <td>&nbsp;</td>
+			</tr>			
+			<tr>
+			  <td style="background-color: #CCFFCC;"><b>&nbsp;<a href='#juli07' style="color: #000000;"><u>Juli 07</u></a></b><br /><br /></td>
+			  <td valign="top">
+			  &nbsp;04.07. DP DMR<br />
+			  &nbsp;05.07. DP DMR
+			  </td>
+			  <td valign="top">&nbsp;11.07. DMR</td>
+			  <td>&nbsp;</td>
+			  <td>&nbsp;</td>
+			  <td>&nbsp;</td>
+			</tr>			
+			<tr>
+			  <td style="background-color: #CCFFCC;"><b>&nbsp;<a href='#juli07' style="color: #000000;"><u>August 07</u></a></b><br /><br /></td>
+			  <td>&nbsp;</td>
+			  <td>&nbsp;</td>
+			  <td valign="top">
+			  	27.08. BEL<br />
+				28.08. BEW (18-21 Uhr)
+			  </td>
+			  <td>&nbsp;</td>
+			  <td>&nbsp;</td>
+			</tr>
+			<tr>
+			  <td style="background-color: #CCFFCC;"><b>&nbsp;September 07</b><br /><br /></td>
+			  <td>&nbsp;</td>
+			  <td>&nbsp;</td>
+			  <td>&nbsp;</td>
+			  <td>&nbsp;</td>
+			  <td>&nbsp;</td>
+			</tr>
+		  </table>
+		</td>
+	  </tr>
+	  </table>
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <a name='februar07' ></a>
+	  <a href='#top' class='Item'>Zur&uuml;ck</a>
+	  <table border="1" cellspacing="0">
+	  <tr><th width="50">&nbsp;</th><th>Februar 07</th></tr>
+	  <tr><td>KW 7</td><td>14.02. Senat</td></tr>
+	  <tr><td>KW 8</td><td>22.02. Reihungstest BMR</td></tr>
+	  <tr><td>KW 9</td><td>28.02. Reihungstest BEL</td></tr>
+	  <tr><td>&nbsp;</td><td>28.02. Senat</td></tr>
+	  </table>
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <a name='maerz07' ></a>
+	  <a href='#top' class='Item'>Zur&uuml;ck</a>
+	  <table border="1" cellspacing="0">
+	  <tr><th width="50">&nbsp;</th><th>M&auml;rz 07</th></tr>
+	  <tr><td>KW 9</td><td>01.03. - 04.03. BeSt WIEN</td></tr>
+	  <tr><td>KW 10</td><td>05.03. Diplompr&uuml;fung MWI</td></tr>
+	  <tr><td>&nbsp;</td><td>06.03. Diplompr&uuml;fung MWI</td></tr>
+	  <tr><td>&nbsp;</td><td>07.03. Diplompr&uuml;fung MWI</td></tr>
+	  <tr><td>&nbsp;</td><td>07.03. Diplompr&uuml;fung EID</td></tr>
+	  <tr><td>KW 11</td><td>14.03. Senat</td></tr>
+	  <tr><td>KW 12</td><td>22.03. Reihungstest BMR</td></tr>
+	  <tr><td>KW 13</td><td>28.03. Senat</td></tr>
+	  </table>
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <a name='april07' ></a>
+	  <a href='#top' class='Item'>Zur&uuml;ck</a>
+	  <table border="1" cellspacing="0">
+	  <tr><th width="50">&nbsp;</th><th>April 07</th></tr>
+	  <tr><td>KW 15</td><td>11.04. Senat</td></tr>
+	  <tr><td>KW 17</td><td>25.04. Reihungstest BEL</td></tr>
+	  <tr><td>&nbsp;</td><td>25.04. Senat</td></tr>
+	  <tr><td>&nbsp;</td><td>26.04. T&ouml;chtertag</td></tr>
+	  </table>
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <a name='mai07' ></a>
+	  <a href='#top' class='Item'>Zur&uuml;ck</a>
+	  <table border="1" cellspacing="0">
+	  <tr><th width="50">&nbsp;</th><th>Mai 07</th></tr>
+	  <tr><td>KW 19</td><td>09.05. Senat</td></tr>
+	  <tr><td>KW 21</td><td>23.05. Senat</td></tr>
+	  <tr><td>&nbsp;</td><td>23.05. Reihungstest BEL</td></tr>
+	  <tr><td>&nbsp;</td><td>24.04. Reihungstest BMR</td></tr>
+	  </table>
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <a name='juni07' ></a>
+	  <a href='#top' class='Item'>Zur&uuml;ck</a>
+	  <table border="1" cellspacing="0">
+	  <tr><th width="50">&nbsp;</th><th>Juni 07</th></tr>
+	  <tr><td>KW 23</td><td>06.06. Senat</td></tr>
+	  <tr><td>KW 24</td><td>12.06. Bachelorpr&uuml;fung BEL</td></tr>
+	  <tr><td>&nbsp;</td><td>13.06. Bachelorpr&uuml;fung BEL</td></tr>
+	  <tr><td>&nbsp;</td><td>16.06. Reihungstest BEW (9-13 Uhr)</td></tr>
+	  <tr><td>KW 25</td><td>18.06. Diplompr&uuml;fung MSE</td></tr>
+	  <tr><td>&nbsp;</td><td>19.06. Diplompr&uuml;fung MSE</td></tr>
+	  <tr><td>&nbsp;</td><td>20.06. Senat</td></tr>
+	  <tr><td>&nbsp;</td><td>21.06. Bachelorpr&uuml;fung BEW</td></tr>
+	  <tr><td>&nbsp;</td><td>22.06. Sponsion BST, DST</td></tr>
+	  <tr><td>KW 26</td><td>25.06. Reihungstest BEL</td></tr>
+	  <tr><td>&nbsp;</td><td>26.06. Reihungstest BEL</td></tr>
+	  <tr><td>&nbsp;</td><td>27.06. Senat</td></tr>
+	  <tr><td>&nbsp;</td><td>28.06. Reihungstest BMR</td></tr>
+	  <tr><td>&nbsp;</td><td>28.06. Sponsion MSE</td></tr>
+	  </table>
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <a name='juli07' ></a>
+	  <a href='#top' class='Item'>Zur&uuml;ck</a>
+	  <table border="1" cellspacing="0">
+	  <tr><th width="50">&nbsp;</th><th>Juli 07</th></tr>
+	  <tr><td>KW 27</td><td>04.07. Diplompr&uuml;fung DMR</td></tr>
+	  <tr><td>&nbsp;</td><td>05.07. Diplompr&uuml;fung DMR</td></tr>
+	  <tr><td>KW 28</td><td>11.07. Sponsion DMR</td></tr>
+	  </table>
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <a name='august07' ></a>
+	  <a href='#top' class='Item'>Zur&uuml;ck</a>
+	  <table border="1" cellspacing="0">
+	  <tr><th width="50">&nbsp;</th><th>August 07</th></tr>
+	  <tr><td>KW 35</td><td>27.08. Reihungstest BEL</td></tr>
+	  <tr><td>&nbsp;</td><td>28.08. Reihungstest BEW (18-21 Uhr)</td></tr>
+	  </table>
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	 </td>
+  </tr>
+</table>
+</body>
+</html>

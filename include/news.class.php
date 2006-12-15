@@ -94,8 +94,18 @@ class news
 	// **********************************
 	function getnews($maxalter, $studiengang_kz, $semester)
 	{
-		$qry = "SELECT * FROM campus.tbl_news WHERE (now()-updateamum)<interval '$maxalter days' AND studiengang_kz=".$studiengang_kz." AND semester".($semester!=''?"='$semester'":' is null')." order by updateamum DESC;";
-		
+		if($maxalter!=0)
+		{
+			$interval = "(now()-updateamum)<interval '$maxalter days' AND";
+		}
+		else 
+			$interval = '';
+			
+		if($studiengang_kz==0)
+			$qry = "SELECT * FROM campus.tbl_news WHERE $interval studiengang_kz=".$studiengang_kz." AND semester".($semester!=''?"='$semester'":' is null')." order by updateamum DESC;";
+		else 
+			$qry = "SELECT * FROM campus.tbl_news WHERE $interval ((studiengang_kz=$studiengang_kz AND semester=$semester) OR (studiengang_kz=$studiengang_kz AND semester=0) OR (studiengang_kz=0 AND semester=$semester) OR (studiengang_kz=0 and semester is null)) ORDER BY updateamum DESC";
+
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
