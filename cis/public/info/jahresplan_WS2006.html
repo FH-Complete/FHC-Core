@@ -1,0 +1,386 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+div.tip 
+{ 
+
+	position: absolute;
+	display: none;
+	width: 300px;
+	background-color: #f7f7ee; 
+	padding: 3px 7px 4px 6px; 
+	border: 1px solid #336; 
+	background-color: #f7f7ee; 
+	font-family: arial, helvetica, sans-serif; 
+	font-size: 12px; 
+	font-weight: normal; 
+	color: #000; 
+	text-align: left;
+} 
+-->
+</style>
+
+<script>
+<!--
+wmtt = null;
+
+document.onmousemove = updateWMTT;
+
+function updateWMTT(e) 
+{
+	x = (document.all) ? window.event.x : e.pageX;
+	y = (document.all) ? window.event.y : e.pageY; 
+	
+	/* Damit der Tooltip nicht ausserhalb des Fensters rutscht*/
+	if((document.body.clientWidth && x>document.body.clientWidth-300) || (window.innerWidth && x>window.innerWidth-300))
+		x = x-300;
+	
+	if (wmtt != null) {
+		wmtt.style.left = (x + 20) + "px";
+		wmtt.style.top 	= (y + 20) + "px";
+	}
+}
+
+function showWMTT(id) {
+	wmtt = document.getElementById(id);
+	wmtt.style.display = "block"
+}
+
+function hideWMTT() {
+	wmtt.style.display = "none";
+}
+//-->
+</script>
+
+</head>
+
+<body>
+<a name='top' ></a>
+<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="10">&nbsp;</td>
+    <td><table width="100%"  border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td class="ContentHeader"><font class="ContentHeader">&nbsp;Jahresplan WS2006</font></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+      </tr>
+	  <tr>
+        <td>&nbsp;</td>
+      </tr>
+	  <tr>
+	  	<td>
+		  <table width="100%" border="1" cellspacing="0" cellpadding="1">
+			<tr style="background-color: #FFFF99;">
+			  <td width="100px">&nbsp;</td>
+			  <td align="center"><font class='tool' onMouseOver="showWMTT('1')" onMouseOut="hideWMTT()"><b><u>Diplompr&uuml;fungen/<br />Bachelorpr&uuml;fungen</u></b>
+			  </font>
+			  <div class='tip' id='1'>
+			  BP = Bachelorprüfung<br />
+			  DP = Diplomprüfung<br />
+			  B vor Studiengangsk&uuml;rzel = Bachelorstudiengang<br />
+			  M vor Studiengangsk&uuml;rzel = Masterstudiengang<br />
+			  D vor Studiengangsk&uuml;rzel = Diplomstudiengang
+			  </div></td>
+			  <td align="center"><b>Sponsionen</b></td>
+			  <td align="center"><b>Reihungstest</b></td>
+			  <td align="center"><font class='tool' onMouseOver="showWMTT('2')" onMouseOut="hideWMTT()"><b><u>Interne Termine</u></b>
+			  </font>
+			  <div class='tip' id='2'>
+			  Senate, Kollegiumssitzungen, Wartungswochen, Semester-Kick-Off etc.
+			  </div></td>
+			  <td align="center"><font class='tool' onMouseOver="showWMTT('3')" onMouseOut="hideWMTT()"><b><u>Veranstaltungen</u></b>
+			  </font>
+			  <div class='tip' id='3'>
+			  Veranstaltungen der Unternehmenskommunikation, Infoabende, BEST, 
+			  Tag der offenen T&uuml;r, Messen im Haus und extern, Weiterbildungsveranstaltungen, etc.
+			 </div></td>
+			</tr>
+			<tr>
+			  <td style="background-color: #CCFFCC;" nowrap><b>&nbsp;<a href='#august06' style='color: #000000;'><u>August 06</u></a></b><br /><br /></td>
+			  <td>&nbsp;</td>
+			  <td>&nbsp;</td>
+			  <td>02.08. BINF<br />02.08. BWIN<br />28.08. BEL<br />29.08. BEW</td>
+			  <td>&nbsp;</td>
+			  <td>&nbsp;</td>
+			</tr>
+			<tr>
+			  <td style="background-color: #CCFFCC;" nowrap><b>&nbsp;<a href='#september06' style='color: #000000;'><u>September 06</u></a></b><br /><br /></td>
+			  <td valign="top">04.09. BP BWIN</td>
+			  <td valign="top">&nbsp;</td>
+			  <td valign="top" nowrap>04.09. MITM<br />06.09. BINF/BWIN<br />12.09. BITS</td>
+			  <td valign="top" nowrap>20.09. Senat<br />28.09. Semester-Kick-Off<br />
+			  14 Uhr, HS 1.04B</td>
+			  <td valign="top">			  
+			  14.09. Pressekonferenz Maintain<br />
+			  22.09. Tag der Mechatronik, <br />09:00 - 19:00 Uhr, FH TW HS 1.04A<br />
+			  28.09. Informationsveranstaltung für neue Lehrende, 16.45 Uhr, FH TW, HS 1.04A
+			  </td>
+			</tr>
+			<tr>
+			  <td style="background-color: #CCFFCC;" nowrap><b>&nbsp;<a href='#oktober06' style="color: #000000;"><u>Oktober 06</u></a></b><br /><br /></td>
+			  <td valign="top">
+			  04.10. DP EID<br />
+			  04.10. BP BINF<br />
+			  09.10. DP PW<br />
+			  10.10. DP PW<br />
+			  18.10. DP DEL<br />
+			  24.10. BP BEW<br />
+			  25.10. BP BEL<br />
+			  19.10. DP DEW<br />
+			  20.10. DP DEW<br />
+			  </td>
+			  <td valign="top">
+			  19.10. DEL<br />
+			  25.10. BEL<br />
+			  </td>
+			  <td>&nbsp;</td>
+			  <td valign="top">
+			  03.10. Kollegiumssitzung<br />
+			  17 Uhr, UEB. 1.06<br />
+			  04.10. Senat<br />
+			  24.10. Assistenzmeeting,<br />
+			  14 Uhr, SEM 4.17<br />
+			  25.10. Senat<br />
+			  </td>
+			  <td valign="top">
+			  <!--&nbsp;11.10. Austrochip<br /> Mikroelektroniktagung 2006-->
+			  05.10. - 07.10. BeSt in Klagenfurt<br />
+			  10.10.-13.10. Externe Messe "Vienna Tec" Messezentrum Wien<br />
+			  11.10. Austrochip Mikroelektroniktagung 2006, Messezentrum Wien<br />
+			  17.10. Amazone Preisverleihung, FH TW<br />
+			  18.10. Alumni Club Veranstaltung<br />
+			  20.10. Weiterbildung: Dynamic Power Trainer 8.30 - 13.30 Uhr FH TW, Raum B2.05<br />
+			  23.10. + 24.10. Weiterbildung: Gruppenprozesse steuern, 9-16 Uhr, FH TW, Raum B2.03<br />
+			  30.10. - 31.01.07 Vernissage "Der Geist kennt keine Zeit", FH TW<br />
+			  30.10. + 31.10. Weiterbildung: Workshop "Einführung in das Textsatzprogramm LaTex" 9 - 16 Uhr, FH TW<br />
+			  </td>
+			</tr>
+			<tr>
+			  <td style="background-color: #CCFFCC;" nowrap><b>&nbsp;<a href='#november06' style="color: #000000;"><u>November 06</u></a></b><br /><br /></td>
+			  <td valign="top">
+			  22.11. DP DICSS (Nebentermin)<br />
+			  </td>
+			  <td valign="top">
+			  17.11. DPW<br />
+			  17.11. DEW<br />			  
+			  </td>
+			  <td valign="top">&nbsp;</td>
+			  <td valign="top">
+			  08.11. Senat<br />
+			  22.11. Senat<br />
+			  28.11. Assistenzmeeting,<br />
+			  14 Uhr SEM 4.17
+			  </td>
+			  <td valign="top">
+			  02. - 05.11. Winteropening 2006/07, Kaprun/Kitzsteinhorn<br />
+			  07.11. Firmenmesse, 10:00 - 15:30, Uhr Aula FH TW
+			  08.11.-10.11. Daaam Konferenz<br />
+			  09.11.-12.11. Externe Messe "My Future", Messezentrum Wien<br />
+			  09.11. Buchpräsentation M. Lehner,<br /> 18 Uhr, FH TW<br />
+			  10.11. Abschluss Event Daaam FH TW<br />			  
+			  21.11. Leidenschaftlich Unternehmer sein, 18 Uhr, FH TW, Hs. 1.04A<br />
+			  22.11.-23.11. Messe "Personal Austria", Austria Center Vienna<br />
+			  23.11. Masterday, FH TW<br />
+			  23.11. - 26.11. Externe Messe "BIM Salzburg"<br />
+			  24.11. Tag der offenen T&uuml;r, <br />
+			  10:30 - 20:30 Uhr, FH TW
+			  27.11. Podiumsdiskussion "Nearshore Software Entwicklung in Rumänien", 18.30 Uhr, FH TW, HS 1.04A<br/>
+			  30.11. Vortrag "Antarctica - 90° South", 19 Uhr, FH TW, HS 1.04A<br/>
+			  </td>
+			</tr>			
+			<tr>
+			  <td style="background-color: #CCFFCC;" nowrap><b>&nbsp;<a href='#dezember06' style="color: #000000;"><u>Dezember 06</u></a></b><br /><br /></td>
+			  <td>&nbsp;</td>
+			  <td>&nbsp;</td>
+			  <td valign="top">
+			  22.12. BITS
+			  </td>
+			  <td valign="top">
+			  12.12. Kollegiumssitzung, 16:30 Uhr, Ueb. 1.07<br />
+			  13.12. Senat<br/>
+			  20.12. Senat
+			  </td>
+			  <td valign="top">
+			  05.12.-09.12. Rob&ouml;xotica, Museumsquartier<br />
+			  13.12. Infoabend<br /> "Berufsbegleitend Studieren",<br /> 18 Uhr, FH TW
+			  </td>
+			</tr>			
+			<tr>
+			  <td style="background-color: #CCFFCC;" nowrap><b>&nbsp;<a href='#jaenner07' style="color: #000000;"><u>J&auml;nner 07</u></a></b><br /><br /></td>
+			  <td valign="top">
+			  16.01. DP MIWI
+			  </td>
+			  <td>&nbsp;</td>
+			  <td>&nbsp;</td>
+			  <td valign="top">
+			  17.01. Senat<br />
+			  23.01. Assistenzmeeting,<br />
+			  14 Uhr, SEM 4.17<br />
+			  23.01. Kollegiumssitzung<br />
+			  31.01. Senat
+			  </td>
+			  <td valign="top">
+			  18.01. Infoabend<br /> 
+			  "Berufsbegleitend Studieren", 18 Uhr, FH TW<br />
+			  25. 01. Informationsveranstaltung Bachelorstudium Mechatronik/ Robotik, 17 Uhr, FH TW, Roboter Labor Erdgeschoß<br />
+			  29.01. - 01.02. FIT Tage, (29.01. FH TW)<br />
+			  </td>
+			</tr>			
+			<tr>
+			  <td style="background-color: #CCFFCC;" nowrap><b>&nbsp;<a href='#februar07' style="color: #000000;"><u>Februar 07</u></a></b><br /><br /></td>
+			  <td>&nbsp;</td>
+			  <td>&nbsp;</td>
+			  <td>&nbsp;</td>
+			  <td valign="top">20.02. Assistenzmeeting, 14 Uhr SEM 4.17</td>
+			  <td valign="top">
+			  29.01. - 01.02. FIT Tage<br />
+			  13.02. Infoabend<br /> "Berufsbegleitend Studieren",<br />
+			  18 Uhr, FH TW
+			  </td>
+			</tr>
+		  </table>
+		</td>
+	  </tr>
+	  </table>
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <a name='august06' ></a>
+	  <a href='#top' class='Item'>Zur&uuml;ck</a>
+	  <table border="1" cellspacing="0">
+	  <tr><th width="50">&nbsp;</th><th>August 06</th></tr>
+	  <tr><td>KW 31</td><td>02.08. Reihungstest BINF</td></tr>
+	  <tr><td>&nbsp;</td><td>02.08. Reihungstest BWIN</td></tr>
+	  <tr><td>KW 35</td><td>02.08. Reihungstest BEL</td></tr>
+	  <tr><td>&nbsp;</td><td>02.08. Reihungstest BEW</td></tr>
+	  </table>
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <a name='september06' ></a>
+	  <a href='#top' class='Item'>Zur&uuml;ck</a>
+	  <table border="1" cellspacing="0">
+	  <tr><th width="50">&nbsp;</th><th>September 06</th></tr>
+	  <tr><td>KW 36</td><td>04.09. Bachelorprüfung BWIN</td></tr>
+	  <tr><td>&nbsp;</td><td>04.09. Reihungstest MITM</td></tr>
+	  <tr><td>&nbsp;</td><td>06.09. Reihungstest BINF / BWIN</td></tr>
+	  <tr><td>KW 37</td><td>12.09. Reihungstest BITS</td></tr>
+	  <tr><td>&nbsp;</td><td>14.09. Pressekonferenz Maintain</td></tr>
+	  <tr><td>KW 38</td><td>20.09. Senat</td></tr>
+	  <tr><td>&nbsp;</td><td>22.09. Tag der Mechatronik, 09:00 - 19:00 Uhr, FH TW HS. 1.04A</td></tr>
+	  <tr><td>KW 39</td><td>28.09. Semester-Kick-Off 14 Uhr, HS 1.04B</td></tr>
+	  <tr><td>&nbsp;</td><td>28.09. Informationsveranstaltung für neue Lehrende, 16.45 Uhr, FH TW, HS 1.04A</td></tr>
+	  </table>
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <a name='oktober06' ></a>
+	  <a href='#top' class='Item'>Zur&uuml;ck</a>
+	  <table border="1" cellspacing="0">
+	  <tr><th width="50">&nbsp;</th><th>Oktober 06</th></tr>
+	  <tr><td>KW 40</td><td>03.10. Kollegiumssitzung 17 Uhr, UEB 1.06</td></tr>
+	  <tr><td>&nbsp;</td><td>04.10. Senat</td></tr>
+	  <tr><td>&nbsp;</td><td>04.10. Diplompr&uuml;fung EID</td></tr>
+	  <tr><td>&nbsp;</td><td>04.10. Bachelorpr&uuml;fung BINF</td></tr>
+	  <tr><td>&nbsp;</td><td>05.10. - 07.10. BeSt in Klagenfurt</td></tr>
+	  <tr><td>KW 41</td><td>09.10. Diplompr&uuml;fung PW</td></tr>
+	  <tr><td>&nbsp;</td><td>10.10. Diplompr&uuml;fung PW</td></tr>
+	  <tr><td>&nbsp;</td><td>10.10. - 13.10. Externe Messe "Vienna Tec", Messezentrum Wien</td></tr>
+	  <tr><td>&nbsp;</td><td>11.10. Austrochip Mikroelektroniktagung 2006, Messezentrum Wien</td></tr>
+	  <tr><td>KW 42</td><td>18.10. Diplompr&uuml;fung DEL</td></tr>	  
+	  <tr><td>&nbsp;</td><td>18.10. Alumni Club Veranstaltung</td></tr>
+	  <tr><td>&nbsp;</td><td>19.10. Sponsion DEL</td></tr>
+	  <tr><td>&nbsp;</td><td>19.10. Diplompr&uuml;fung DEW</td></tr>
+	  <tr><td>&nbsp;</td><td>20.10. Diplompr&uuml;fung DEW</td></tr>
+	  <tr><td>&nbsp;</td><td>20.10. Weiterbildung: Dynamic Power Trainer, 8.30 - 13.30 Uhr FH TW, Raum B2.05</td></tr>
+	  <tr><td>KW 43</td><td>23.+24.10. Weiterbildung: Gruppenprozesse steuern, FH TW, 9-16 Uhr Raum B2.03</td></tr>
+	  <tr><td>&nbsp;</td><td>24.10. Bachelorpr&uuml;fung BEW</td></tr>
+	  <tr><td>&nbsp;</td><td>24.10. Assistenzmeeting, 14 Uhr, SEM 4.17</td></tr>
+	  <tr><td>&nbsp;</td><td>25.10. Bachelorpr&uuml;fung BEL</td></tr>
+	  <tr><td>&nbsp;</td><td>25.10. Sponsion BEL</td></tr>
+	  <tr><td>&nbsp;</td><td>25.10. Senat</td></tr>
+	  <tr><td>KW 43</td><td>30.10. - 31.01.07 Vernissage "Der Geist kennt keine Zeit", FH TW</td></tr>
+	  <tr><td>&nbsp;</td><td>30.10. + 31.10 Weiterbildung: Workshop "Einführung in das Textsatzprogramm LaTex" 9-16 Uhr, FH TW</td></tr>
+	  </table>
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <a name='november06' ></a>
+	  <a href='#top' class='Item'>Zur&uuml;ck</a>
+	  <table border="1" cellspacing="0">
+	  <tr><th width="50">&nbsp;</th><th>November 06</th></tr>
+	  <tr><td>KW 44</td><td>02. - 05.11 Winteropening 2006/07, Kaprun/Kitzsteinhorn</td></tr>
+	  <tr><td>KW 45</td><td>07.11. Firmenmesse, 10:00 - 15:30 Uhr, Aula FH TW</td></tr>
+	  <tr><td>&nbsp;</td><td>08.11. Senat</td></tr>
+	  <tr><td>&nbsp;</td><td>08.11. - 10.11. Daaam Konferenz an der FH TW</td></tr>
+	  <tr><td>&nbsp;</td><td>09.11. - 12.11. Externe Messe "My Future", Messezentrum Wien</td></tr>
+	  <tr><td>&nbsp;</td><td>09.11. Buchpräsentation M. Lehner, 18 Uhr, FH TW</td></tr>
+	  <tr><td>&nbsp;</td><td>10.11. Abschluss Event Daaam FH TW</td></tr>
+	  <tr><td>KW 46</td><td>17.11. Sponsion DPW</td></tr>
+	  <tr><td>&nbsp;</td><td>17.11. Sponsion DEW</td></tr>
+	  <tr><td>KW 47</td><td>21.11. Leidenschaftlich Unternehmer sein, 18 Uhr, FH TW, Hs. 1.04A</td></tr>
+	  <tr><td>&nbsp;</td><td>22.11. Senat</td></tr>
+	  <tr><td>&nbsp;</td><td>22.11. - 23.11. Messe "Personal Austria", Austria Center Vienna </td></tr>
+	  <tr><td>&nbsp;</td><td>23.11. Masterday, FH TW</td></tr>
+	  <tr><td>&nbsp;</td><td>23. - 26.11. Externe Messe "BIM Salzburg"</td></tr>
+	  <tr><td>&nbsp;</td><td>24.11. Tag der offenen T&uuml;r, 10:30 - 20:30 Uhr, FH TW</td></tr>
+	  <tr><td>&nbsp;</td><td>27.11. Podiumsdiskussion "Nearshore Software Entwicklung in Rumänien", 18.30 Uhr, FH TW, HS 1.04A</td></tr>
+	  <tr><td>KW 48</td><td>28.11. Assistenzmeeting, 14 Uhr, SEM 4.17</td></tr>
+	  <tr><td>&nbsp;</td><td>30.11. Vortrag "Antarctica - 90° South", 19 Uhr, FH TW, HS 1.04A</td></tr>
+	  </table>
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <a name='dezember06' ></a>
+	  <a href='#top' class='Item'>Zur&uuml;ck</a>
+	  <table border="1" cellspacing="0">
+	  <tr><th width="50">&nbsp;</th><th>Dezember 06</th></tr>
+	  <tr><td>KW 49</td><td>13.12. Senat</td></tr>
+	  <tr><td>&nbsp;</td><td>05.12. - 19.12. Rob&ouml;xotica, Museumsquartier</td></tr>
+	  <tr><td>KW 50</td><td> 12.12. Kollegiumssitzung, 16:30 Uhr, Ueb. 1.07</td></tr>
+	  <tr><td>&nbsp;</td><td>13.12. Infoabend "Berufsbegleitend Studieren", 18 Uhr, FH TW</td></tr>
+      <tr><td>&nbsp;</td><td>13.12. Senat</td></tr>
+	  <tr><td>KW 51</td><td>20.12. Senat</td></tr>
+	  <tr><td>&nbsp;</td><td>22.12. Reihungstest BITS</td></tr>
+	  </table>
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <a name='jaenner07' ></a>
+	  <a href='#top' class='Item'>Zur&uuml;ck</a>
+	  <table border="1" cellspacing="0">
+	  <tr><th width="50">&nbsp;</th><th>J&auml;nner 07</th></tr>
+	  <tr><td>KW 3</td><td>16.01. Diplompr&uuml;fung MIWI</td></tr>
+	  <tr><td>&nbsp;</td><td>17.01. Senat</td></tr>
+	  <tr><td>&nbsp;</td><td>18.01. Infoabend "Berufsbegleitend Studieren", 18 Uhr, FH TW</td></tr>
+	  <tr><td>KW 4</td><td>23.01. Assistenzmeeting, 14 Uhr, SEM 4.17</td></tr>
+	  <tr><td>&nbsp;</td><td>23.01. Kollegiumssitzung</td></tr>
+	  <tr><td>&nbsp;</td><td>25. 01. Informationsveranstaltung Bachelorstudium Mechatronik/ Robotik, 17 Uhr, FH TW, Roboter Labor Erdgeschoß</td></tr>
+	  <tr><td>KW 5</td><td>29.01. - 01.02 FIT Tage (29.01. FH TW)</td></tr>
+	  <tr><td>&nbsp;</td><td>31.01. Senat</td></tr>
+	  </table>
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <a name='februar07' ></a>
+	  <a href='#top' class='Item'>Zur&uuml;ck</a>
+	  <table border="1" cellspacing="0">
+	  <tr><th width="50">&nbsp;</th><th>Februar 07</th></tr>
+	  <tr><td>KW 5</td><td>29.01. - 01.02. FIT Tage</td></tr>
+	  <tr><td>KW 7</td><td>13.02. Infoabend "Berufsbegleitend Studieren", 18 Uhr, FH TW</td></tr>
+	  <tr><td>KW 8</td><td>20.02. Assistenzmeeting, 14 Uhr, SEM 4.17</td></tr>
+	  </table>
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	  
+	 </td>
+  </tr>
+</table>
+</body>
+</html>

@@ -71,47 +71,6 @@ class lehrveranstaltung
 	 */
 	function load($lehrveranstaltung_id)
 	{
-		//gueltigkeit von lehrveranstaltung_id pruefen
-		if(!is_numeric($lehrveranstaltung_id) || $lehrveranstaltung_id == '')
-		{
-			$this->errormsg = 'lehrveranstaltung_id muss eine gueltige Zahl sein';
-			return false;
-		}
-		
-		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_pk = '$lehrveranstaltung_id';";
-		
-		if(!$res = pg_query($this->conn, $qry))
-		{
-			$this->errormsg = 'Datensatz konnte nicht geladen werden';
-			return false;
-		}
-		
-		if($row = pg_fetch_object($res))
-		{
-			$this->lehrveranstaltung_id   	= $row->lehrveranstaltung_pk;
-			$this->art                    		= $row->art;
-			$this->ausbildungssemester_id 	= $row->ausbildungssemester_fk;
-			$this->beschreibung           		= $row->beschreibung;
-			$this->ectspunkte             		= $row->ectspunkte;
-			$this->fachbereich_id         		= $row->fachbereich_fk;
-			$this->kategorie              		= $row->kategorie;
-			$this->kurzbezeichnung        	= $row->kurzbezeichnung;
-			$this->name                   		= $row->name;
-			$this->notenlektor_id         		= $row->notenlektor_fk;
-			$this->nummer                 		= $row->nummer;
-			$this->nummerintern           		= $row->nummerintern;
-			$this->sortierung             		= $row->sortierung;
-			$this->studentenwochenstunden 	= $row->studentenwochenstunden;
-			$this->studiengang_id         	= $row->studiengang_fk;
-			$this->studiensemester_id     	= $row->studiensemester_fk;
-			$this->updateamum             	= $row->creationdate;
-			$this->updatevon              		= $row->creationuser;
-		}
-		else 
-		{
-			$this->errormsg = 'Datensatz konnte nicht geladen werden';
-			return false;
-		}
 		
 		return true;		
 	}
@@ -134,26 +93,27 @@ class lehrveranstaltung
 		{
 			$lv_obj = new lehrveranstaltung($this->conn);
 			
-			$lv_obj->lehrveranstaltung_id   		= $row->lehrveranstaltung_pk;
-			$lv_obj->art                    			= $row->art;
-			$lv_obj->ausbildungssemester_id 		= $row->ausbildungssemester_fk;
-			$lv_obj->beschreibung           		= $row->beschreibung;
-			$lv_obj->ectspunkte             		= $row->ectspunkte;
-			$lv_obj->fachbereich_id         		= $row->fachbereich_fk;
-			$lv_obj->kategorie              			= $row->kategorie;
-			$lv_obj->kurzbezeichnung        		= $row->kurzbezeichnung;
-			$lv_obj->name                   			= $row->name;
-			$lv_obj->notenlektor_id         		= $row->notenlektor_fk;
-			$lv_obj->nummer                 		= $row->nummer;
-			$lv_obj->nummerintern           		= $row->nummerintern;
-			$lv_obj->sortierung             			= $row->sortierung;
-			$lv_obj->studentenwochenstunden 	= $row->studentenwochenstunden;
-			$lv_obj->studiengang_id         		= $row->studiengang_fk;
-			$lv_obj->studiensemester_id     		= $row->studiensemester_fk;
-			$lv_obj->updateamum             		= $row->creationdate;
-			$lv_obj->updatevon              		= $row->creationuser;
+			$lv_obj->lehrveranstaltung_id=$row->lehrveranstaltung_id;
+			$lv_obj->studiengang_kz=$row->studiengang_kz;
+			$lv_obj->bezeichnung=$row->bezeichnung;
+			$lv_obj->kurzbz=$row->kurzbz;
+			$lv_obj->semester=$row->semester;
+			$lv_obj->ects=$row->ects;
+			$lv_obj->semesterstunden=$row->semesterstunden;
+			$lv_obj->anmerkung=$row->anmerkung;
+			$lv_obj->lehre=($row->lehre=='t'?true:false);
+			$lv_obj->lehreverzeichnis=$row->lehreverzeichnis;
+			$lv_obj->aktiv=($row->aktiv=='t'?true:false);
+			$lv_obj->ext_id=$row->ext_id;
+			$lv_obj->insertamum=$row->insertamum;
+			$lv_obj->insertvon=$row->insertvon;
+			$lv_obj->planfaktor=$row->planfaktor;
+			$lv_obj->planlektoren=$row->planlektoren;
+			$lv_obj->planpersonalkosten=$row->planpersonalkosten;
+			$lv_obj->updateamum=$row->updateamum;
+			$lv_obj->updatevon=$row->updatevon;
 			
-			$this->result[] = $lv_obj;
+			$this->lehrveranstaltungen[] = $lv_obj;
 		}		
 		
 		return true;		
@@ -166,7 +126,7 @@ class lehrveranstaltung
 	 *        $ausbildungssemester_id ID des ausbildungssemesters (optional)
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load_lva($studiengang_id, $studiensemester_id=null, $ausbildungssemester_id=null)
+	function load_lva($studiengang_id, $ausbildungssemester_id=null, $lehre=null)
 	{						
 		//Variablen pruefen
 		if(!is_numeric($studiengang_id) || $studiengang_id =='')
@@ -174,26 +134,27 @@ class lehrveranstaltung
 			$this->errormsg = 'studiengang_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		if($studiensemester_id != null && (!is_numeric($studiensemester_id) || $studiensemester_id == ''))
-		{
-			$this->errormsg = 'studiensemester_id muss eine gueltige Zahl sein';
-			return false;
-		}
 		if($ausbildungssemester_id != null && (!is_numeric($ausbildungssemester_id) || $ausbildungssemester_id == ''))
 		{
 			$this->errormsg = 'ausbildungssemester_id muss eine gueltige Zahl sein';
 			return false;
 		}
+		if($lehre!=null && !is_bool($lehre))
+		{
+			$this->errormsg = 'Lehre muss ein boolscher Wert sein';
+			return false;
+		}
 		
 		//Select Befehl zusammenbauen
-		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung WHERE studiengang_fk = '$studiengang_id'";
-		
-		if($studiensemester_id != null)
-			$qry .= " AND studiensemester_fk = '$studiensemester_id'";
+		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung WHERE studiengang_kz = '$studiengang_id'";
 		
 		if($ausbildungssemester_id != null)
-			$qry .= " AND ausbildungssemester_fk = '$ausbildungssemester_id'";
-		$qry .= " ORDER BY name";
+			$qry .= " AND semester = '$ausbildungssemester_id'";
+		if($lehre!=null)
+			$qry .= " AND lehre=".($lehre?'true':'false');
+			
+		$qry .= " ORDER BY bezeichnung";
+		
 		//Datensaetze laden
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -205,26 +166,27 @@ class lehrveranstaltung
 		{
 			$lv_obj = new lehrveranstaltung($this->conn);
 			
-			$lv_obj->lehrveranstaltung_id   		= $row->lehrveranstaltung_pk;
-			$lv_obj->art                    			= $row->art;
-			$lv_obj->ausbildungssemester_id 		= $row->ausbildungssemester_fk;
-			$lv_obj->beschreibung           		= $row->beschreibung;
-			$lv_obj->ectspunkte             		= $row->ectspunkte;
-			$lv_obj->fachbereich_id         		= $row->fachbereich_fk;
-			$lv_obj->kategorie              			= $row->kategorie;
-			$lv_obj->kurzbezeichnung       		= $row->kurzbezeichnung;
-			$lv_obj->name                   			= $row->name;
-			$lv_obj->notenlektor_id         		= $row->notenlektor_fk;
-			$lv_obj->nummer                 		= $row->nummer;
-			$lv_obj->nummerintern           		= $row->nummerintern;
-			$lv_obj->sortierung             			= $row->sortierung;
-			$lv_obj->studentenwochenstunden 	= $row->studentenwochenstunden;
-			$lv_obj->studiengang_id         		= $row->studiengang_fk;
-			$lv_obj->studiensemester_id     		= $row->studiensemester_fk;
-			$lv_obj->updateamum             		= $row->creationdate;
-			$lv_obj->updatevon              		= $row->creationuser;
+			$lv_obj->lehrveranstaltung_id=$row->lehrveranstaltung_id;
+			$lv_obj->studiengang_kz=$row->studiengang_kz;
+			$lv_obj->bezeichnung=$row->bezeichnung;
+			$lv_obj->kurzbz=$row->kurzbz;
+			$lv_obj->semester=$row->semester;
+			$lv_obj->ects=$row->ects;
+			$lv_obj->semesterstunden=$row->semesterstunden;
+			$lv_obj->anmerkung=$row->anmerkung;
+			$lv_obj->lehre=($row->lehre=='t'?true:false);
+			$lv_obj->lehreverzeichnis=$row->lehreverzeichnis;
+			$lv_obj->aktiv=($row->aktiv=='t'?true:false);
+			$lv_obj->ext_id=$row->ext_id;
+			$lv_obj->insertamum=$row->insertamum;
+			$lv_obj->insertvon=$row->insertvon;
+			$lv_obj->planfaktor=$row->planfaktor;
+			$lv_obj->planlektoren=$row->planlektoren;
+			$lv_obj->planpersonalkosten=$row->planpersonalkosten;
+			$lv_obj->updateamum=$row->updateamum;
+			$lv_obj->updatevon=$row->updatevon;
 			
-			$this->result[] = $lv_obj;
+			$this->lehrveranstaltungen[] = $lv_obj;
 		}	
 		
 		return true;		

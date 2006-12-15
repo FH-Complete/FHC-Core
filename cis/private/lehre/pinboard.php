@@ -1,0 +1,438 @@
+<?php
+/**
+ * Pinboard
+ * Zeigt alle Pinboardeintraege an. Am rechten Rand werden
+ * Studiengangsleiter, Studiengangsleiter Stellvertreter, Assistentin 
+ * und Studentenvertreter dieses Studienganges angezeigt.
+ *
+ * Aufruf pinboard.php?course_id=254&term_id=1[&showall]
+ * course_id: Studiengang
+ * term_id: Semester
+ * showall: Zeigt alle Pinboardeintraege an
+ */
+	require_once('../../config.inc.php');
+	require_once('../../../include/functions.inc.php');
+	require_once('../../../include/studiengang.class.php');
+	require_once('../../../include/news.class.php');
+    
+    //Connection Herstellen
+    if(!$sql_conn = pg_pconnect(CONN_STRING))
+       die('Fehler beim öffnen der Datenbankverbindung');
+
+    $short='';
+	if(isset($_GET['course_id']) && is_numeric($_GET['course_id']))
+	{
+		$stg_obj = new studiengang($sql_conn, $course_id);
+		$short = $stg_obj->kurzbzlang;
+		$course_id = $_GET['course_id'];
+	}
+	else 
+		die('Fehler bei der Parameter&uuml;bergabe');
+	
+	if(isset($_GET['showall']))
+	{
+		$showall=true;
+	}
+	else 
+	{
+		$showall=false;
+	}
+	
+	function print_news($stg_id, $semester, $sql_conn, $showall=false)
+	{		
+		$alter = ($showall?0:MAXNEWSALTER);
+		$news_obj = new news($sql_conn);
+		$zaehler=0;
+		if($news_obj->getnews($alter, $stg_id, $semester))
+		{
+			foreach ($news_obj->result as $row)
+			{
+				$zaehler++;
+				if($row->updateamum!='')
+					$datum = date('d.m.Y - h:i',strtotime(strftime($row->updateamum)));
+				else 	
+					$datum='';
+				
+				if($semester == 0)
+				{
+					echo '<p><small>'.$datum.' - '.$row->verfasser.' - [Allgemein]</small><br><b>'.$row->betreff.'</b><br>';
+				}
+				else
+				{
+					echo '<p><small>'.$datum.' - '.$row->verfasser.' - [Semester '.$semester.']</small><br><b>'.$row->betreff.'</b><br>';
+				}
+				
+				echo "$row->text</p>";
+			}
+		}
+		if($zaehler==0)
+		   echo '<p>Zur Zeit gibt es keine aktuellen News!</p>';
+	}
+?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="10">&nbsp;</td>
+    <td><table width="100%"  border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td class="ContentHeader" width="70%"><font class="ContentHeader">&nbsp;Pinboard <?php if(isset($short)) echo $short; ?></font></td>
+		<td>&nbsp;</td>
+		<td class="ContentHeader3" width="25%"><font class="HyperItem">&nbsp;Studiengangsmanagement</font></td>
+      </tr>
+	  <?php
+	  	if(!isset($short))
+			exit;
+	  ?>
+	  <tr>
+	  	<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+	  </tr>
+	  <tr>
+	  	<td valign="top"><?php print_news($course_id, (int)$term_id, $sql_conn, $showall); ?><a href='<?php echo $_SERVER['REQUEST_URI']."&showall"; ?>' class='Item'>Archiv</a></td>
+		<td>&nbsp;</td>
+		<td valign="top">
+          <p>Studiengangsleiter:<br>
+                <?php
+                //Studiengangsleiter auslesen
+				$qry = "SELECT * FROM campus.vw_mitarbeiter JOIN tbl_benutzerfunktion using(uid) WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stgl'";
+				if($result_course_leader = pg_query($sql_conn, $qry))
+				{
+					$num_rows_course_leader = pg_numrows($result_course_leader);					
+					if($num_rows_course_leader > 0)
+					{
+						$row_course_leader = pg_fetch_object($result_course_leader, 0);
+					}
+				}
+				
+                echo "<b>";
+                
+                if(isset($row_course_leader) && $row_course_leader != "")
+				{
+					if(!($row_course_leader->vorname == "" && $row_course_leader->nachname == ""))
+					{
+						echo $row_course_leader->titelpre.' '.$row_course_leader->vorname.' '.$row_course_leader->nachname.' '.$row_course_leader->titelpost;
+					}
+					else
+					{
+						echo "Nicht definiert";
+					}
+				}
+				else
+				{
+					echo "Nicht definiert";
+				}
+				
+                echo "</b><br>";
+                
+				if(isset($row_course_leader) && $row_course_leader != "")
+				{
+					if($row_course_leader->uid != "")
+					{
+						echo "<a href=\"mailto:$row_course_leader->uid@technikum-wien.at\" class=\"Item\">$row_course_leader->uid@technikum-wien.at</a>";
+					}
+					else
+					{
+						echo "E-Mail nicht definiert";
+					}
+				}
+				else
+				{
+					echo "E-Mail nicht definiert";
+				}
+				
+                echo "<br>";
+			  	echo "Tel.:";
+			  	
+			  	if(isset($row_course_leader) && $row_course_leader != "")
+				{
+					if($row_course_leader->telefonklappe != "")
+					{	
+						echo '01 333 40 77 - '.$row_course_leader->telefonklappe;
+					}
+					else
+					{
+						echo "Nicht vorhanden";
+					}
+				}
+				else
+				{
+					echo "Nicht vorhanden";
+				}
+				
+			  	echo "</p>";
+			  	echo "<p></p>";
+			  	echo "<p>Stellvertreter:<br>";
+                
+			  	//Studiengangsleiter Stellvertreter auselesen
+				$sql_query = "SELECT * FROM campus.vw_mitarbeiter JOIN tbl_benutzerfunktion using(uid) WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stglstv'";
+				
+				if($result_course_leader_deputy = pg_query($sql_conn, $sql_query))
+				{
+					$num_rows_course_leader_deputy = pg_numrows($result_course_leader_deputy);
+						
+					if($num_rows_course_leader_deputy > 0)
+					{
+						$row_course_leader_deputy = pg_fetch_object($result_course_leader_deputy, 0);
+					}
+				}
+				
+                echo "<b>";
+                
+                if(isset($row_course_leader_deputy) && $row_course_leader_deputy != "")
+				{
+					if(!($row_course_leader_deputy->vorname == "" && $row_course_leader_deputy->nachname == ""))
+					{
+						echo $row_course_leader_deputy->titelpre.' '.$row_course_leader_deputy->vorname.' '.$row_course_leader_deputy->nachname.' '.$row_course_leader_deputy->titelpost;
+					}
+					else
+					{
+						echo "Nicht definiert";
+					}
+				}
+				else
+				{
+					echo "Nicht definiert";
+				}
+				
+                echo "</b><br>";
+                
+				if(isset($row_course_leader_deputy) && $row_course_leader_deputy != "")
+				{
+					if($row_course_leader_deputy->uid != "")
+					{
+						echo "<a href=\"mailto:$row_course_leader_deputy->uid@technikum-wien.at\" class=\"Item\">$row_course_leader_deputy->uid@technikum-wien.at</a>";
+					}
+					else
+					{
+						echo "E-Mail nicht definiert";
+					}
+				}
+				else
+				{
+					echo "E-Mail nicht definiert";
+				}
+				
+                echo "<br>";
+  				echo "Tel.:";
+  				
+  				if(isset($row_course_leader_deputy) && $row_course_leader_deputy != "")
+				{
+					if($row_course_leader_deputy->telefonklappe != "")
+					{	
+						echo '01 333 40 77 - '.$row_course_leader_deputy->telefonklappe;
+					}
+					else
+					{
+						echo "Nicht vorhanden";
+					}
+				}
+				else
+				{
+					echo "Nicht vorhanden";
+				}
+				
+			  	echo "</p>";
+			  	echo "<p>Sekretariat:</font><font face='Arial, Helvetica, sans-serif' size='2'><br>";
+                //Sektritariat auslesen
+                
+				$sql_query = "SELECT * FROM campus.vw_mitarbeiter JOIN tbl_benutzerfunktion using(uid) WHERE studiengang_kz='$course_id' AND funktion_kurzbz='ass'";
+					
+				if($result_course_secretary = pg_query($sql_conn, $sql_query))
+				{
+					$num_rows_course_secretary = pg_numrows($result_course_secretary);
+					
+					if($num_rows_course_secretary > 0)
+					{
+						$row_course_secretary = pg_fetch_object($result_course_secretary, 0);
+					}
+				}
+				
+                echo "<b>";
+                
+                if(isset($row_course_secretary) && $row_course_secretary != "")
+				{
+					if(!($row_course_secretary->vorname == "" && $row_course_secretary->nachname == ""))
+					{
+						echo $row_course_secretary->titelpre.' '.$row_course_secretary->vorname.' '.$row_course_secretary->nachname.' '.$row_course_secretary->titelpost;
+					}
+					else
+					{
+						echo "Nicht definiert";
+					}
+				}
+				else
+				{
+					echo "Nicht definiert";
+				}
+				
+                echo "</b><br>";
+                
+				if(isset($row_course_secretary) && $row_course_secretary != "")
+				{
+					if($row_course_secretary->uid != "")
+					{
+						echo "<a href=\"mailto:$row_course_secretary->uid@technikum-wien.at\" class=\"Item\">$row_course_secretary->uid@technikum-wien.at</a>";
+					}
+					else
+					{
+						echo "E-Mail nicht definiert";
+					}
+				}
+				else
+				{
+					echo "E-Mail nicht definiert";
+				}
+				
+                echo "<br>";
+  				echo "Tel.:";
+  				
+  				if(isset($row_course_secretary) && $row_course_secretary != "")
+				{
+					if($row_course_secretary->telefonklappe != "")
+					{	
+						echo '01 333 40 77 - '.$row_course_secretary->telefonklappe;
+					}
+					else
+					{
+						echo "Nicht vorhanden";
+					}
+				}
+				else
+				{
+					echo "Nicht vorhanden";
+				}
+				
+				echo "<p>Studentenvertreter:</font><font face='Arial, Helvetica, sans-serif' size='2'><br>";
+                
+				$sql_query = "SELECT * FROM campus.vw_benutzer JOIN tbl_benutzerfunktion using(uid) WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stdv'";
+					
+				if($result_course_stdv = pg_query($sql_conn, $sql_query))
+				{
+					$num_rows_course_stdv = pg_numrows($result_course_stdv);
+					
+					if($num_rows_course_stdv > 0)
+					{
+						while($row_stdv = pg_fetch_object($result_course_stdv))
+						{						
+							echo "<a href='mailto:".$row_stdv->uid."@technikum-wien.at'>$row_stdv->titelpre $row_stdv->vorname $row_stdv->nachname $row->titelpost</a><br>";
+						}
+					}
+					else
+					{
+						echo "<b>Nicht vorhanden</b>";
+					}
+				}
+				?>
+				
+            	<table border="0" width="100%" cellpadding="0" cellspacing="0">
+				<tr>
+				  <td>&nbsp;</td>
+				</tr>
+				<tr>
+				  <td>&nbsp;</td>
+				</tr>
+				<tr>
+				  <td nowrap>
+				  <?php
+					$dest_dir = dir('../../../documents/'.strtolower($short).'/lehrziele');
+					
+					if(!is_dir($dest_dir->path))
+					{
+						if(!is_dir('../../../documents/'.strtolower($short)))
+							exec('mkdir -m 775 "../../../documents/'.strtolower($short).'"');
+						exec('mkdir -m 775 "../../../documents/'.strtolower($short).'/lehrziele"');
+						chgrp('../../../documents/'.strtolower($short).'/lehrziele', teacher);
+					}
+					
+					if($dest_dir)
+					{
+						$dir_empty = true;
+						
+						while($entry = $dest_dir->read())
+						{
+							if($entry != "." && $entry != "..")
+							{
+								$dir_empty = false;
+								
+								break;
+							}
+						}
+					}
+											
+					if(isset($dir_empty) && $dir_empty == false)
+					{
+						echo '<img src="../../../skin/images/seperator.gif">&nbsp;<a href="'.$dest_dir->path.'/" class="Item" target="_blank">Lehrziele</a>';
+					}
+					else
+					{						
+						echo '<img src="../../../skin/images/seperator.gif">&nbsp;Lehrziele';
+					}
+				  ?>
+              </td>
+            </tr>
+            <tr>
+              <td nowrap>
+                <?php											
+					$dest_dir = dir('../../../documents/'.strtolower($short).'/allgemeiner_download');
+					
+					if(!is_dir($dest_dir->path))
+					{
+						if(!is_dir('../../../documents/'.strtolower($short)))
+							exec('mkdir -m 775 "../../../documents/'.strtolower($short).'"');
+						exec('mkdir -m 775 "../../../documents/'.strtolower($short).'/allgemeiner_download"');
+						chgrp('../../../documents/'.strtolower($short).'/allgemeiner_download', teacher);
+					}
+					
+					if($dest_dir)
+					{
+						$dir_empty = true;
+						
+						while($entry = $dest_dir->read())
+						{
+							if($entry != "." && $entry != "..")
+							{
+								$dir_empty = false;
+								
+								break;
+							}
+						}
+					}
+										
+					if(isset($dir_empty) && $dir_empty == false)
+					{
+						echo '<img src="../../../skin/images/seperator.gif">&nbsp;<a href="'.$dest_dir->path.'/" class="Item" target="_blank">Allgemeiner Download</a>';
+					}
+					else
+					{						
+						echo '<img src="../../../skin/images/seperator.gif">&nbsp;Allgemeiner Download';
+					}
+				?>
+				
+              </td>
+            </tr>
+            <tr>
+              <td nowrap>
+                <?php
+					echo '<img src="../../../skin/images/seperator.gif">&nbsp;<a href="news://cis.technikum-wien.at/'.strtolower($short).'" class="Item" target="_blank">Newsgroups</a>';
+
+				?>
+              </td>
+            </tr>
+          </table>          
+          </td>
+	  </tr>
+    </table></td>
+	<td width="30">&nbsp;</td>
+  </tr>
+</table>
+</body>
+</html>
