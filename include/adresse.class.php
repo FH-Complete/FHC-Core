@@ -1,4 +1,24 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
 /**
  * Klasse Adresse (FAS-Online)
  * @create 13-03-2006
@@ -12,36 +32,46 @@ class adresse
 	var $result = array(); // @var adresse Objekt
 	
 	//Tabellenspalten
-	var $adresse_id;      // @var integer
-	var $bismeldeadresse; // @var boolean
-	var $gemeinde;        // @var string
-	var $name;            // @var string
-	var $nation;          // @var string
-	var $ort;             // @var string
-	var $person_id;       // @var integer
-	var $plz;             // @var string
-	var $strasse;         // @var string
-	var $typ;             // @var integer
-	var $updateamum;      // @var timestamp
-	var $updatevon=0;      // @var string
-	var $zustelladresse;  // @var boolean
+	var $adresse_id;	// @var integer
+	var $person_id;	// @var integer
+	var $name; 		// @var string
+	var $strasse;		// @var string
+	var $plz;		// @var string
+	var $ort;            	// @var string
+	var $gemeinde;	// @var string
+	var $nation;          	// @var string
+	var $typ;		// @var integer
+	var $heimatadresse;	// @var boolean
+	var $zustelladresse;	// @var boolean
+	var $firma_id;		// @var integer
+	var $updateamum;	// @var timestamp
+	var $updatevon=0;	// @var string
+	var $insertamum;      // @var timestamp
+	var $insertvon=0;      // @var string
+	var $ext_id;		// @var integer
 	
 	/**
 	 * Konstruktor
 	 * @param $conn      Connection
 	 *        $adress_id ID der Adresse die geladen werden soll (Default=null)
 	 */
-	function adresse($conn,$adress_id=null)
+	function adresse($conn,$adress_id=null,$unicode=false)
 	{
 		$this->conn = $conn;
-		$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+		if ($unicode)
+		{
+			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+		}
+		else 
+		{
+			$qry="SET CLIENT_ENCODING TO 'LATIN9';";
+		}
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
 			return false;
 		}
-		if($adress_id != null)
-			$this->load($adress_id);
+		//if($adress_id != null) 	$this->load($adress_id);
 	}
 	
 	/**
@@ -60,7 +90,7 @@ class adresse
 		}
 		
 		//Daten aus der Datenbank lesen
-		$qry = "SELECT * FROM adresse WHERE adresse_pk=$adress_id";
+		$qry = "SELECT * FROM tbl_adresse WHERE adresse_id=$adress_id";
 		
 		if(!$res = pg_query($this->conn,$qry))
 		{
@@ -71,18 +101,21 @@ class adresse
 		if($row = pg_fetch_object($res))
 		{
 			$this->adresse_id      = $row->adresse_pk;
-			$this->bismeldeadresse = ($row->bismeldeadresse=='J'?true:false);
+			$this->heimatadresse = ($row->heimatadresse=='J'?true:false);
+			$this->zustelladresse = ($row->zustelladresse=='J'?true:false);
 			$this->gemeinde        = $row->gemeinde;
 			$this->name            = $row->name;
 			$this->nation          = $row->nation;
 			$this->ort             = $row->ort;
-			$this->person_id       = $row->person_fk;
+			$this->person_id       = $row->person_id;
 			$this->plz             = $row->plz;
 			$this->strasse         = $row->strasse;
 			$this->typ             = $row->typ;
-			$this->updateamum      = $row->creationdate;
-			$this->updatevon       = $row->creationuser;
-			$this->zustelladresse  = ($row->zustelladresse=='J'?true:false);
+			$this->updateamum      = $row->updateamum;
+			$this->updatevon       = $row->updatevon;
+			$this->updateamum      = $row->insertamum;
+			$this->updatevon       = $row->inservon;
+			$this->firma_id=$row->firma_id;
 		}
 		else
 		{
@@ -184,53 +217,62 @@ class adresse
 	function checkvars()
 	{		
 		//Zahlenfelder pruefen
-		$this->errormsg='Ein Zahlenfeld enthaelt ungueltige Zeichen';
 		if(!is_numeric($this->person_id))
 		{
-			$this->errormsg='Person_id enthaelt ungueltige Zeichen:'.$this->person_id;
+			$this->errormsg='person_id enthaelt ungueltige Zeichen:'.$this->person_id.' - person: '.$row->adresse_id;
 			return false;
 		}
 		if(!is_numeric($this->typ))   
 		{
-			$this->errormsg='Typ enthaelt ungueltige Zeichen';
+			$this->errormsg='Typ enthaelt ungueltige Zeichen - person: '.$row->adresse_id;
 			return false;
 		}		
 		
 		//Gesamtlaenge pruefen
-		$this->errormsg='Eine der Gesamtlaengen wurde ueberschritten';
+		//$this->errormsg='Eine der Gesamtlaengen wurde ueberschritten';
 		if(strlen($this->name)>255)
 		{
-			$this->errormsg = 'Name darf nicht länger als 255 Zeichen sein';
+			$this->errormsg = 'Name darf nicht länger als 255 Zeichen sein  - person: '.$row->adresse_id;
 			return false;
 		}
 		if(strlen($this->strasse)>255)
 		{
-			$this->errormsg = 'Strasse darf nicht länger als 255 Zeichen sein';
+			$this->errormsg = 'Strasse darf nicht länger als 255 Zeichen sein - person: '.$row->adresse_id;
 			return false;
 		}
 		if(strlen($this->plz)>10)
 		{
-			$this->errormsg = 'Plz darf nicht länger als 10 Zeichen sein';
+			$this->errormsg = 'Plz darf nicht länger als 10 Zeichen sein - person: '.$row->adresse_id;
 			return false;
 		}
 		if(strlen($this->ort)>255)           
 		{
-			$this->errormsg = 'Ort darf nicht länger als 255 Zeichen sein';
+			$this->errormsg = 'Ort darf nicht länger als 255 Zeichen sein - person: '.$row->adresse_id;
 			return false;
 		}
 		if(strlen($this->nation)>3)          
 		{
-			$this->errormsg = 'Nation darf nicht länger als 3 Zeichen sein';
+			$this->errormsg = 'Nation darf nicht länger als 3 Zeichen sein - person: '.$row->adresse_id;
 			return false;
 		}
 		if(strlen($this->gemeinde)>255)
 		{
-			$this->errormsg = 'Gemeinde darf nicht länger als 255 Zeichen sein';
+			$this->errormsg = 'Gemeinde darf nicht länger als 255 Zeichen sein - person: '.$row->adresse_id;
 			return false;
 		}
 				
 		$this->errormsg = '';
 		return true;		
+	}
+	// ************************************************
+	// * wenn $var '' ist wird "null" zurueckgegeben
+	// * wenn $var !='' ist werden datenbankkritische 
+	// * Zeichen mit backslash versehen und das Ergebnis
+	// * unter Hochkomma gesetzt.
+	// ************************************************
+	function addslashes($var)
+	{
+		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
 	
 	/**
@@ -250,7 +292,7 @@ class adresse
 			//Neuen Datensatz einfuegen
 			
 			//naechste ID aus der Sequence holen
-			$qry="SELECT nextval('adresse_seq') as id;";
+			$qry="SELECT nextval('tbl_adresse_adresse_id_seq') as id;";
 			if(!$row = pg_fetch_object(pg_query($this->conn,$qry)))
 			{
 				$this->errormsg = 'Fehler beim auslesen der Sequence';
@@ -258,11 +300,23 @@ class adresse
 			}
 			$this->adresse_id = $row->id;
 			
-			$qry="INSERT INTO adresse (adresse_pk, person_fk, name, strasse, plz, typ, ort, nation, creationdate, creationuser,".
-			     " gemeinde, bismeldeadresse, zustelladresse) VALUES(".
-			     " $this->adresse_id, $this->person_id, '$this->name', '$this->strasse', '$this->plz', $this->typ, '$this->ort',".
-			     " '$this->nation', now(), $this->updatevon, '$this->gemeinde', '".($this->bismeldeadresse?'J':'N')."',".
-			     " '".($this->zustelladresse?'J':'N')."');";			
+			$qry='INSERT INTO tbl_adresse (adresse_id, person_id, name, strasse, plz, typ, ort, nation, insertamum, insertvon,
+			     gemeinde, heimatadresse, zustelladresse, firma_id, updateamum, updatevon, ext_id) VALUES('.
+			      $this->addslashes($this->adresse_id).', '.
+			      $this->addslashes($this->person_id).', '.
+			      $this->addslashes($this->name).', '.
+			      $this->addslashes($this->strasse).', '.
+			      $this->addslashes($this->plz).', '.
+			      $this->addslashes($this->typ).', '.
+			      $this->addslashes($this->ort).', '.
+			      $this->addslashes($this->nation).', now(), '.
+			      $this->addslashes($this->insertvon).', '.
+			      $this->addslashes($this->gemeinde).', '.
+			      ($this->heimatadresse?'true':'false').', '.
+			      ($this->zustelladresse?'true':'false').', '.
+			      ($this->firma_id!=null?$this->addslashes($this->firma_id):'null').', now(), '.
+			      $this->addslashes($this->updatevon).', '.
+			      $this->addslashes($this->ext_id).');';			
 		}
 		else
 		{
@@ -275,16 +329,24 @@ class adresse
 				return false;
 			}
 			
-			$qry="UPDATE adresse SET person_fk='$this->person_id', name='$this->name', strasse='$this->strasse', plz='$this->plz',".
-			     " typ='$this->typ', ort='$this->ort', nation='$this->nation', gemeinde='$this->gemeinde',".
-			     " bismeldeadresse='".($this->bismeldeadresse?'J':'N')."', zustelladresse='".($this->zustelladresse?'J':'N')."'".
-			     " WHERE adresse_pk='$this->adresse_id'";
+			$qry='UPDATE tbl_adresse SET'.
+				' person_fk='.$this->addslashes($this->person_id).', '.
+				' name='.$this->addslashes($this->name).', '.
+				' strasse='.$this->addslashes($this->strasse).', '.
+				' plz='.$this->addslashes($this->plz).', '.
+			      	' typ='.$this->addslashes($this->typ).', '.
+			      	' ort='.$this->addslashes($this->ort).', '.
+			      	' nation='.$this->addslashes($this->nation).', '.
+			      	' gemeinde='.$this->addslashes($this->gemeinde).', '. 
+			      	' heimatadresse='.($this->heimatadresse?'true':'false').', '.
+			      	' zustelladresse='.($this->zustelladresse?'true':'false').', '.
+			      'WHERE adresse_pk='.$this->adresse_id.';';
 		}
-		
+		//echo $qry;
 		if(pg_query($this->conn,$qry))
 		{
 			//Log schreiben
-			$sql = $qry;
+			/*$sql = $qry;
 			$qry = "SELECT nextval('log_seq') as id;";
 			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
 			{
@@ -299,7 +361,8 @@ class adresse
 			{
 				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
 				return false;
-			}			
+			}	*/
+			return true;		
 		}
 		else 
 		{
