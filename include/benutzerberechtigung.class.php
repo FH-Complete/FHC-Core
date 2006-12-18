@@ -90,7 +90,7 @@ class benutzerberechtigung
 		
 		if(strlen($this->fachbereich_kurzbz)>16)
 		{
-			$this->errormsg = 'Fachbereich_id darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg = 'fachbereich_kurzbz darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
 		if($this->studiengang_kz!='' && !is_numeric($this->studiengang_kz))
@@ -228,16 +228,16 @@ class benutzerberechtigung
 		return true;
 	}
 
-	function isBerechtigt($berechtigung,$studiengang_kz=null,$art=null, $fachbereich_id=null)
+	function isBerechtigt($berechtigung,$studiengang_kz=null,$art=null, $fachbereich_kurzbz=null)
 	{
 		$timestamp=time();
 		foreach ($this->berechtigungen as $b)
 		{
 			//Fachbereichsberechtigung
-			if($fachbereich_id!=null)
+			if($fachbereich_kurzbz!=null)
 			{
 				//Wenn Fachbereichs oder Adminberechtigung
-				if(($berechtigung == $b->berechtigung_kurzbz || $b->berechtigung_kurzbz == 'admin') && ($b->fachbereich_id==$fachbereich_id || $b->fachbereich_id=='0'))
+				if(($berechtigung == $b->berechtigung_kurzbz || $b->berechtigung_kurzbz == 'admin') && ($b->fachbereich_kurzbz==$fachbereich_kurzbz || $b->fachbereich_kurzbz=='0'))
 				{
 					if ($b->starttimestamp!=null && $b->endetimestamp!=null)
 					{
@@ -250,7 +250,7 @@ class benutzerberechtigung
 			}
 			
 			//Wenn Berechtigung fuer Bestimmte Klasse vorhanden ist
-			if($berechtigung == $b->berechtigung_kurzbz && $studiengang_kz==null && $art==null && $fachbereich_id==null)
+			if($berechtigung == $b->berechtigung_kurzbz && $studiengang_kz==null && $art==null && $fachbereich_kurzbz==null)
 			   if ($b->starttimestamp!=null && $b->endetimestamp!=null)
 				{
 					if ($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp)
@@ -260,7 +260,7 @@ class benutzerberechtigung
 					return true;
 			//Wenn Berechtigung fuer Bestimmten Studiengang vorhanden ist
 			if	($berechtigung==$b->berechtigung_kurzbz 
-			     && ($studiengang_kz==$b->studiengang_kz || $b->studiengang_kz==0) && $art==null && $b->fachbereich_id==null)
+			     && ($studiengang_kz==$b->studiengang_kz || $b->studiengang_kz==0) && $art==null && $b->fachbereich_kurzbz==null)
 				if ($b->starttimestamp!=null && $b->endetimestamp!=null)
 				{
 					if ($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp)
@@ -295,7 +295,7 @@ class benutzerberechtigung
 		
 		foreach ($this->berechtigungen as $b)
 			if	($berechtigung==$b->berechtigung_kurzbz || $berechtigung==null)
-				if($b->fachbereich_id==null)
+				if($b->fachbereich_kurzbz==null)
 					$studiengang_kz[]=$b->studiengang_kz;
 		$studiengang_kz=array_unique($studiengang_kz);
 		sort($studiengang_kz);
@@ -312,8 +312,8 @@ class benutzerberechtigung
 			if(($berechtigung==$b->berechtigung_kurzbz || $berechtigung==null)
 			   && (($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp) || ($b->starttimestamp==null && $b->endetimestamp==null)))
 			{
-				if($b->fachbereich_id!='' && !in_array($b->fachbereich_id,$fachbereichs_kz))
-					$fachbereichs_kz[] = $b->fachbereich_id;
+				if($b->fachbereich_kurzbz!='' && !in_array($b->fachbereich_kurzbz,$fachbereichs_kz))
+					$fachbereichs_kz[] = $b->fachbereich_kurzbz;
 			}
 		}
 		sort($fachbereichs_kz);

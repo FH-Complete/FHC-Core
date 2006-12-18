@@ -89,6 +89,28 @@ class benutzerfunktion
 		return true;
 	}
 	
+	// *********************************
+	// * Prueft ob der Benutzer $uid die
+	// * Funktion $benutzerfunktion hat
+	// *********************************
+	function benutzerfunktion_exists($uid, $benutzerfunktion)
+	{
+		$qry = "SELECT count(*) as anzahl FROM tbl_benutzerfunktion WHERE uid='".addslashes($uid)."' AND funktion_kurzbz='".addslashes($benutzerfunktion)."'";
+		
+		if($row = pg_fetch_object(pg_query($this->conn, $qry)))
+		{
+			if($row->anzahl>0)
+				return true;
+			else 
+				return false;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden der Bentuzerfunktionen';
+			return false;
+		}
+	}
+	
 	/**
 	 * Laedt eine Benutzerfunktion
 	 * @param $bnutzerfunktion_id ID der zu ladenden Funktion

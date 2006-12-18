@@ -126,17 +126,17 @@ class lehrveranstaltung
 	 *        $ausbildungssemester_id ID des ausbildungssemesters (optional)
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load_lva($studiengang_id, $ausbildungssemester_id=null, $lehre=null)
+	function load_lva($studiengang_kz, $semester=null, $lehreverzeichnis=null, $lehre=null)
 	{						
 		//Variablen pruefen
-		if(!is_numeric($studiengang_id) || $studiengang_id =='')
+		if(!is_numeric($studiengang_kz) || $studiengang_kz =='')
 		{
 			$this->errormsg = 'studiengang_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		if($ausbildungssemester_id != null && (!is_numeric($ausbildungssemester_id) || $ausbildungssemester_id == ''))
+		if($semester!=null && (!is_numeric($semester) || $semester==''))
 		{
-			$this->errormsg = 'ausbildungssemester_id muss eine gueltige Zahl sein';
+			$this->errormsg = 'Semester muss eine gueltige Zahl sein';
 			return false;
 		}
 		if($lehre!=null && !is_bool($lehre))
@@ -146,10 +146,12 @@ class lehrveranstaltung
 		}
 		
 		//Select Befehl zusammenbauen
-		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung WHERE studiengang_kz = '$studiengang_id'";
+		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung WHERE studiengang_kz = '$studiengang_kz'";
 		
-		if($ausbildungssemester_id != null)
-			$qry .= " AND semester = '$ausbildungssemester_id'";
+		if($lehreverzeichnis!=null)
+			$qry .= " AND lehreverzeichnis='$lehreverzeichnis'";
+		if($semester != null)
+			$qry .= " AND semester='$semester'";
 		if($lehre!=null)
 			$qry .= " AND lehre=".($lehre?'true':'false');
 			
