@@ -161,7 +161,7 @@ function js_toggle_container(conid)
 			  	<select name="course" onChange="MM_jumpMenu('self',this,0)" class="TextBox">
 				<?php
 					$stg_obj = new studiengang($sql_conn);
-					$stg_obj->getAll('kurzbzlang');
+					$stg_obj->getAll('kurzbz, kurzbzlang');
 					//$sql_query = "SELECT DISTINCT studiengang_kz AS id, kurzbzlang FROM public.tbl_studiengang WHERE NOT(studiengang_kz='0') ORDER BY kurzbzlang";
 					
 					//$result = pg_exec($sql_conn, $sql_query);
@@ -174,12 +174,12 @@ function js_toggle_container(conid)
 						{							
 							if(isset($course_id) AND $course_id == $row->studiengang_kz)
 							{
-								echo '<option value="menu.php?course_id='.$row->studiengang_kz.'&term_id='.$term_id.'" selected>'.$row->kurzbzlang.'</option>';
+								echo '<option value="menu.php?course_id='.$row->studiengang_kz.'&term_id='.$term_id.'" selected>'.$row->kurzbz .'('.$row->kurbzlang.')</option>';
 								$sel_kurzbzlang=$row->kurzbzlang;
 							}
 							else
 							{
-								echo '<option value="menu.php?course_id='.$row->studiengang_kz.'&term_id='.$term_id.'">'.$row->kurzbzlang.'</option>';
+								echo '<option value="menu.php?course_id='.$row->studiengang_kz.'&term_id='.$term_id.'">'.$row->kurzbz .'('.$row->kurzbzlang.')</option>';
 							}
 						}
 					}
@@ -227,13 +227,13 @@ function js_toggle_container(conid)
 		<?php
 			$lv_obj = new lehrveranstaltung($sql_conn);
 			
-			$lv_obj->load_lva($course_id,$term_id, true);
+			$lv_obj->load_lva($course_id,$term_id, null, true);
 						
 			foreach($lv_obj->lehrveranstaltungen as $row)
 			{
 				echo '<tr>';
 				echo '	<td nowrap><ul style="margin: 0px; padding: 0px; padding-left: 20px;">';
-				echo "<li><a class=\"Item2\" title=\"".$row->bezeichnung."\" href=\"lesson.php?course_id=$course_id&term_id=$term_id&short=$row->kurzbz\" target=\"content\">".CutString($row->bezeichnung, 21)."</a></li>";
+				echo "<li><a class=\"Item2\" title=\"".$row->bezeichnung."\" href=\"lesson.php?course_id=$course_id&term_id=$term_id&short=$row->lehreverzeichnis\" target=\"content\">".CutString($row->bezeichnung, 21)."</a></li>";
 				echo '	</ul></td>';
 				echo '</tr>';
 			}

@@ -4,6 +4,8 @@
  */
 	include('../../config.inc.php');
 	include('../../../include/functions.inc.php');
+	include('../../../include/globals.inc.php');
+	
 	if (!$conn = @pg_pconnect(CONN_STRING))
 	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
 	if(!($result_stg=pg_exec($conn, "SELECT studiengang_kz, bezeichnung, kurzbz FROM tbl_studiengang ORDER BY kurzbz ASC")))
@@ -65,7 +67,20 @@
 		}
 	}
 	
-	$qry = "SELECT vornamen, nachname, uid, alias FROM tbl_person where alias<>'' ORDER BY nachname, vornamen";
+	//Zusammenbauen der Studiengaenge die keine Alias Adressen bekommen
+	$noalias_kz='';
+	foreach($noalias as $var)
+	{
+		if($noalias_kz!='')
+			$noalias_kz.=',';
+		$noalias_kz.=$var;
+	}
+	
+	//$qry = "SELECT vornamen, nachname, uid, alias FROM tbl_person where alias<>'' ORDER BY nachname, vornamen";
+	$qry = "SELECT vornamen, nachname, uid, alias FROM tbl_person LEFT JOIN tbl_student using(uid) 
+	        WHERE alias<>'' AND (studiengang_kz NOT IN($noalias_kz) OR studiengang_kz is null) 
+	        ORDER BY nachname, vornamen";
+	
 	if($result = pg_query($conn, $qry))
 	{
 		$fp=fopen('../../../../mlists/tw_alias.txt',"w");

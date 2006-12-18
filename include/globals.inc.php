@@ -19,7 +19,10 @@
 	$tagbez[4]="Donnerstag";
 	$tagbez[5]="Freitag";
 	$tagbez[6]="Samstag";
-
-	// Ausgenommene Studiengaenge (Kennzahl) bei denen die Studenten keinen Alias fuer Mail bekommen
-	$noalias[0]='';
+	
+	// Studiengaenge die keine Alias Email Adressen erhalten
+	$noalias=array();
+	$noalias[0]='330';
+	$noalias[1]='331';
+	$noalias[2]='204';
 ?>

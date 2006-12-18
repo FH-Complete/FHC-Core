@@ -7,17 +7,22 @@
    require_once('../../include/benutzer.class.php');
    require_once('../../include/student.class.php');
    require_once('../../include/lehrverband.class.php');
+   require_once('../../include/benutzerfunktion.class.php');
    
-   writeCISlog('START');
    if(!$conn=pg_pconnect(CONN_STRING))
-   {
-   	  writeCISlog('STOP');
-      die("Fehler beim Herstellen der DB Connection");
-   }
+      die('Fehler beim Herstellen der DB Connection');
       
    $user=get_uid();
    
    $is_lector=check_lektor($user,$conn);
+
+   //Studentenvertreter duerfen die Verteiler genauso wie Lektoren verwenden
+   if(!$is_lector)
+   {
+   		$fkt = new benutzerfunktion($conn);
+   		if($fkt->benutzerfunktion_exists($user, 'stdv'))
+   			$is_lector=true;
+   }
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -112,7 +117,7 @@
 					if($is_lector)
 					{
 						/* open a popup containing the final dispatcher address */
-						echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row1->gruppe_kurzbz).'&desc='.$row1->beschreibung.'\',\'_blank\',\'width=500,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes\');return false;" class="Item"><img src="../../../skin/images/open.gif" title="Verteiler &ouml;ffnen"></a>';
+						echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row1->gruppe_kurzbz).'&desc='.$row1->beschreibung.'\',\'_blank\',\'width=500,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes\');return false;" class="Item"><img src="../../skin/images/open.gif" title="Verteiler &ouml;ffnen"></a>';
 				    	echo "</td>";
 					 	echo " <td width='200'>";	
 					 	echo "<a href='mailto:".$row1->gruppe_kurzbz."@technikum-wien.at' class='Item'>".strtolower($row1->gruppe_kurzbz)."@technikum-wien.at</a></td>";						
@@ -189,7 +194,7 @@
 			  		echo "\n";
 			  		foreach($lv_obj->result as $row1)
 			  		{
-			  			if((!is_null($row1->semester)) AND ($row1->semester != "") AND ($row1->semester<'10'))
+			  			if((!is_null($row1->semester)) AND ($row1->semester != "") AND ($row1->semester<=$row->max_semester)) //($row1->semester<'10'))
 			  			{
 			  				$qry_cnt = "SELECT count(*) as anzahl FROM campus.vw_student WHERE studiengang_kz='$row1->studiengang_kz' AND semester='$row1->semester'";
 			  				if(trim($row1->verband)!='')
@@ -256,6 +261,5 @@
   	              js_toggle_container('".$_GET['kbzl']."');  	              
   	         </script>";
     }
-    writeCISlog('STOP');
     ?>
 </body></html>
