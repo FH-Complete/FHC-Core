@@ -42,7 +42,7 @@ class person
 	var $foto;              // oid
 	var $anmerkungen;       // varchar(256)
 	var $homepage;          // varchar(256)
-	var $svnr;              // char(10)
+	var $svnr;			// char(10)
 	var $ersatzkennzeichen; // char(10)
 	var $familienstand;     // char(1)
 	var $anzahlkinder;      // smalint
@@ -356,7 +356,7 @@ class person
 				while($row = pg_fetch_object($result))
 				{
 					$update=false;			
-					if($row->sprache!=$this->sprache) 		$update=true;
+					if($row->sprache!=$this->sprache) 				$update=true;
 					if($row->anrede!=$this->anrede) 					$update=true;
 					if($row->titelpost!=$this->titelpost) 					$update=true;
 					if($row->titelpre!=$this->titelpre) 					$update=true;
@@ -371,12 +371,12 @@ class person
 					if($row->homepage!=$this->homepage) 				$update=true;
 					if($row->svnr!=$this->svnr) 						$update=true;
 					if($row->ersatzkennzeichen!=$this->ersatzkennzeichen) 	$update=true;
-					if($row->familienstand!=$this->familienstand) $update=true;
-					if($row->anzahlkinder!=$this->anzahlkinder) $update=true;
-					if($row->aktiv!=$this->aktiv) $update=true;
-					if($row->geburtsnation!=$this->geburtsnation) $update=true;
-					if($row->geschlecht!=$this->geschlecht) $update=true;
-					if($row->staatsbuergerschaft!=$this->staatsbuergerschaft) $update=true;
+					if($row->familienstand!=$this->familienstand) 			$update=true;
+					if($row->anzahlkinder!=$this->anzahlkinder) 			$update=true;
+					if($row->aktiv!=$this->aktiv) 					$update=true;
+					if($row->geburtsnation!=$this->geburtsnation) 			$update=true;
+					if($row->geschlecht!=$this->geschlecht) 				$update=true;
+					if($row->staatsbuergerschaft!=$this->staatsbuergerschaft) 	$update=true;
 					
 					
 					if($update)
