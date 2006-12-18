@@ -15,7 +15,7 @@ function get_uid()
 function check_lektor($uid, $conn)
 {
 	// uid von View 'Lektor' holen
-	$sql_query="SELECT mitarbeiter_uid FROM tbl_mitarbeiter WHERE mitarbeiter_uid='$uid'";
+	$sql_query="SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='$uid'";
 	//echo $sql_query;
 	$result=pg_query($conn, $sql_query) or die(pg_last_error($conn));
 	$num_rows=pg_numrows($result);
@@ -32,13 +32,13 @@ function check_lektor($uid, $conn)
 function check_student($uid, $conn)
 {
 	// uid von Tabelle 'Student' holen
-	$sql_query="SELECT uid FROM tbl_student WHERE uid='$uid'";
+	$sql_query="SELECT student_uid FROM public.tbl_student WHERE student_uid='$uid'";
 	//echo $sql_query;
 	$result=pg_query($conn, $sql_query) or die(pg_last_error($conn));
 	$num_rows=pg_numrows($result);
 	// Wenn kein ergebnis return 0 sonst ID
 	if ($num_rows>0)
-		return pg_result($result,0,'uid');
+		return pg_result($result,0,'student_uid');
 	else
 		return 0;
 }
@@ -99,7 +99,7 @@ function jahreskalenderjump($link)
 	for ($anz=1;$anz<26;$anz++)
 	{
 		$linknew=$link.'&datum='.$datum;
-		if ($woche==54)
+		if ($woche==53)
 			$woche=1;
 		echo ' <A HREF="'.$linknew.'">'.$woche.'</A> ';
 		if ($anz%5==0)
@@ -117,7 +117,7 @@ function loadVariables($conn, $user)
 		$error_msg.=pg_errormessage($conn).'<BR>'.$sql_query;
 	else
 		$num_rows=@pg_numrows($result);
-	
+
 	for ($i=0;$i<$num_rows;$i++)
 	{
 		$row=pg_fetch_object($result,$i);
@@ -144,12 +144,12 @@ function loadVariables($conn, $user)
 }
 
 function writeCISlog($stat, $rm = '')
-{	
+{
 	if($stat=='STOP')
 		$stat = 'STOP ';
 	$handle = fopen(CIS_LOG_PATH,'a');
-	fwrite($handle, date('Y-m-d H:i:s').' '. $stat .' '. getmypid() .' '. $_SERVER['REMOTE_USER'] .' '. $_SERVER['REQUEST_URI'] .' '.$rm.' 
+	fwrite($handle, date('Y-m-d H:i:s').' '. $stat .' '. getmypid() .' '. $_SERVER['REMOTE_USER'] .' '. $_SERVER['REQUEST_URI'] .' '.$rm.'
 ');
-}	
+}
 
 ?>
