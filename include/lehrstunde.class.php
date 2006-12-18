@@ -339,7 +339,7 @@ class lehrstunde
 			$stunde->ort_kurzbz=$row->ort_kurzbz;
 			$stunde->lehrfach=$row->lehrfach;
 			$stunde->lehrfach_bez=$row->lehrfach_bez;
-			$stunde->lehrfach_nr=$row->lehrfach_nr;
+			$stunde->lehrfach_id=$row->lehrfach_id;
 			$stunde->lehrform=$row->lehrform;
 			if ($row->farbe!='      ' && $row->farbe!=null)
 				$stunde->farbe=$row->farbe;
