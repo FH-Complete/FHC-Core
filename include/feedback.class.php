@@ -25,7 +25,7 @@ class feedback
 	var $conn;     // resource DB-Handle
 	var $errormsg; // string
 	var $new;      // boolean
-	var $feedback = array(); // feedback Objekt
+	var $result = array(); // feedback Objekt
 	
 	//Tabellenspalten
 	var $feedback_id;	// integer
@@ -67,7 +67,28 @@ class feedback
 	// *********************************************************
 	function load($feedback_id)
 	{
-		return true;
+		if(!is_numeric($feedback_id))
+		{
+			$this->errormsg = 'feedback_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM campus.tbl_feedback WHERE feedback_id='$feedback_id'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			$this->feedback_id=$row->feedback_id;
+			$this->betreff=$row->betreff;
+			$this->text=$row->text;
+			$this->datum=$row->datum;
+			$this->uid=$row->uid;
+			$this->lehrveranstaltung_id=$row->lehrveranstaltung_id;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden der Lehrveranstaltungen';
+			return false;
+		}	
 	}
 	
 	// *******************************************
@@ -87,12 +108,7 @@ class feedback
 			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
-		if(!is_numeric($this->lehrveranstaltung_id))
-		{
-			$this->errormsg = 'Lehrveranstaltung_id muss eine gueltige Zahl sein';
-			return false;
-		}
-	
+			
 		return true;
 	}
 
@@ -107,6 +123,40 @@ class feedback
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
 
+	function load_feedback($lehrveranstaltung_id)
+	{
+		if(!is_numeric($lehrveranstaltung_id))
+		{
+			$this->errormsg = 'Lehrveranstaltung_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM campus.tbl_feedback WHERE lehrveranstaltung_id='$lehrveranstaltung_id'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row=pg_fetch_object($result))
+			{				
+				$fb_obj = new feedback($this->conn);
+				
+				$fb_obj->feedback_id=$row->feedback_id;
+				$fb_obj->betreff=$row->betreff;
+				$fb_obj->text=$row->text;
+				$fb_obj->datum=$row->datum;
+				$fb_obj->uid=$row->uid;
+				$fb_obj->lehrveranstaltung_id=$row->lehrveranstaltung_id;
+				
+				$this->result[] = $fb_obj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden der Lehrveranstaltungen';
+			return false;
+		}	
+	}
+	
 	// ************************************************************
 	// * Speichert Feedback in die Datenbank
 	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
@@ -122,9 +172,8 @@ class feedback
 		if($this->new)
 		{
 			//ToDo: Feedback_ID wieder entfernen und per Seq fuellen
-			$qry = 'INSERT INTO campus.tbl_feedback (feedback_id, betreff, text, datum, uid, lehrveranstaltung_id)
-			        VALUES('.$this->addslashes($this->feedback_id).','.
-					$this->addslashes($this->betreff).','.
+			$qry = 'INSERT INTO campus.tbl_feedback (betreff, text, datum, uid, lehrveranstaltung_id)
+			        VALUES('.$this->addslashes($this->betreff).','.
 					$this->addslashes($this->text).','.
 					$this->addslashes($this->datum).','.
 					$this->addslashes($this->uid).','.

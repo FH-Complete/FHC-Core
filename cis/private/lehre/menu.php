@@ -233,7 +233,7 @@ function js_toggle_container(conid)
 			{
 				echo '<tr>';
 				echo '	<td nowrap><ul style="margin: 0px; padding: 0px; padding-left: 20px;">';
-				echo "<li><a class=\"Item2\" title=\"".$row->bezeichnung."\" href=\"lesson.php?course_id=$course_id&term_id=$term_id&short=$row->lehreverzeichnis\" target=\"content\">".CutString($row->bezeichnung, 21)."</a></li>";
+				echo "<li><a class=\"Item2\" title=\"".$row->bezeichnung."\" href=\"lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".CutString($row->bezeichnung, 21)."</a></li>";
 				echo '	</ul></td>';
 				echo '</tr>';
 			}
@@ -280,7 +280,7 @@ function js_toggle_container(conid)
 				if($result = pg_query($sql_conn,$qry))
 				{
 						while($row = pg_fetch_object($result))
-							echo "<li><a class=\"Item2\" title=\"".$row->bezeichnung."\" href=\"lesson.php?course_id=$row->studiengang_kz&term_id=$row->semester&short=$row->lehreverzeichnis\" target=\"content\">".$stg[$row->studiengang_kz].' '.$row->semester.' '.$row->lehreverzeichnis."</a></li>";
+							echo "<li><a class=\"Item2\" title=\"".$row->bezeichnung."\" href=\"lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".$stg[$row->studiengang_kz].' '.$row->semester.' '.$row->lehreverzeichnis."</a></li>";
 				}
 				else 
 					echo "Fehler beim Auslesen des Lehrfaches";
