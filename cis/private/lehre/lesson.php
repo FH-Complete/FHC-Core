@@ -20,18 +20,25 @@
 	else 
 	   $is_lector=false;
 	
-	if(!isset($course_id) || !isset($term_id) || !isset($short))
-		exit();
-	
+	//if(!isset($course_id) || !isset($term_id) || !isset($short))
+	//	exit();
+	if(!isset($_GET['lvid']))
+		die('Fehlerhafte Parameteruebergabe');
+	else 
+		$lvid = addslashes($_GET['lvid']);
+		
 	$lv_obj = new lehrveranstaltung($sql_conn);
-	$lv_obj->load_lva($course_id, $term_id, $short, true);
-	$lv=$lv_obj->lehrveranstaltungen[0];
+	$lv_obj->load($lvid);
+	$lv=$lv_obj;
+	
+	$course_id = $lv->studiengang_kz;
+	$term_id = $lv->semester;
+	$short = $lv->lehreverzeichnis;
 	
 	$stg_obj = new studiengang($sql_conn);
 	$stg_obj->load($lv->studiengang_kz);
 	
 	$kurzbz = $stg_obj->kurzbz;
-	$lvnr = $lv->lehrveranstaltung_id;
 	
 	$short_name = $lv->bezeichnung;
 	//$fachbereich_id = $row->fachbereich_id;
@@ -53,14 +60,9 @@
 		<td width="10">&nbsp;</td>
 		<td class="ContentHeader"><font class="ContentHeader">&nbsp;
 		<?php
-		if(isset($short))
-		{
-			echo $lv->bezeichnung;
-		}
-		else
-			exit;
-
-		$qry = "SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN tbl_studiensemester USING(studiensemester_kurzbz) WHERE lehrveranstaltung_id='$lv->lehrveranstaltung_id' ORDER BY ende DESC LIMIT 1";
+		echo $lv_obj->bezeichnung;
+		
+		$qry = "SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN tbl_studiensemester USING(studiensemester_kurzbz) WHERE lehrveranstaltung_id='$lvid' ORDER BY ende DESC LIMIT 1";
 
 		if($result_stsem=pg_query($sql_conn, $qry))
 		{
@@ -85,7 +87,7 @@
 		              <td valign="top">&nbsp;</td>
 		              <td>';
 				
-			    $qry = "SELECT vorname, nachname, tbl_benutzer.uid as uid FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, tbl_benutzer, tbl_person WHERE tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND tbl_person.person_id=tbl_benutzer.person_id AND lehrveranstaltung_id='$lv->lehrveranstaltung_id' AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid NOT like '_Dummy%' AND tbl_person.aktiv=true ORDER BY nachname, vorname";
+			    $qry = "SELECT vorname, nachname, tbl_benutzer.uid as uid FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, tbl_benutzer, tbl_person WHERE tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND tbl_person.person_id=tbl_benutzer.person_id AND lehrveranstaltung_id='$lvid' AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid NOT like '_Dummy%' AND tbl_person.aktiv=true ORDER BY nachname, vorname";
 								
 				$result = pg_exec($sql_conn, $qry);
 				$num_rows_result = pg_num_rows($result);
@@ -106,8 +108,8 @@
 						if($user==$row_lector->uid)
 							$user_is_allowed_to_upload=true;
 							
-						echo '<a class="Item2" href="mailto:'.$row_lector->uid.'@technikum-wien.at">'.$row_lector->vorname.' '.$row_lector->nachname.'</a>, ';
-						if($i!=($num_rows_result - 1))
+						echo '<a class="Item2" href="mailto:'.$row_lector->uid.'@technikum-wien.at">'.$row_lector->vorname.' '.$row_lector->nachname.'</a>';
+						if($i!=$num_rows_result)
 							echo ', ';
 					}
 				}
@@ -183,7 +185,7 @@
 																
 					if($user_is_allowed_to_upload || $rechte->isBerechtigt('admin',$course_id) || $rechte->isBerechtigt('lehre',$course_id))// || $rechte->isBerechtigt('lehre',null,null,$fachbereich_id))
 					{
-						echo '<br><a class="Item" href="#" onClick="javascript:window.open(\'semupload.php?course_id='.$course_id.'&term_id='.$term_id.'&short='.$short.'\',\'_blank\',\'width=400,height=300,location=no,menubar=no,status=no,toolbar=no\');return false;">';
+						echo '<br><a class="Item" href="#" onClick="javascript:window.open(\'semupload.php?lvid='.$lvid.'\',\'_blank\',\'width=400,height=300,location=no,menubar=no,status=no,toolbar=no\');return false;">';
 						echo "Upload</a>";
 																
 						echo '&nbsp;&nbsp;&nbsp;<a class="Item" href="semdownhlp.php" >';
@@ -280,7 +282,7 @@
           	{
 				//Anwesenheitsliste	
 				echo '<img border="0" src="../../../skin/images/button_lb.jpg" width="67" height="45"><br>';
-				echo "<br /><b><a href='anwesenheitsliste.php?stg_kz=$course_id&sem=$term_id&lvnr=$lvnr' class='Item'>Anwesenheits- und Notenlisten</a></b>";
+				echo "<b><a href='anwesenheitsliste.php?stg_kz=$course_id&sem=$term_id&lvnr=$lvid' class='Item'>Anwesenheits- und Notenlisten</a></b>";
           	}
 
 		   ?>
@@ -389,7 +391,7 @@
 				<td valign="top" align="center">
 				<?php
 				//FEEDBACK				    
-				echo '<a href="../feedback.php?lvnr='.$lvnr.'" target="_blank"><img border="0" src="../../../skin/images/button_fb.jpg" width="67" height="45"><br><strong>Feedback</strong></a>';
+				echo '<a href="feedback.php?lvid='.$lvid.'" target="_blank"><img border="0" src="../../../skin/images/button_fb.jpg" width="67" height="45"><br><strong>Feedback</strong></a>';
 				?>
 				
 				<p>&nbsp;</p>

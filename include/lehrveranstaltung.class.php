@@ -71,6 +71,41 @@ class lehrveranstaltung
 	 */
 	function load($lehrveranstaltung_id)
 	{
+		if(!is_numeric($lehrveranstaltung_id))
+		{
+			$this->errormsg = 'Lehrveranstaltung_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='$lehrveranstaltung_id';";
+		
+		if(!$res = pg_query($this->conn, $qry))
+		{
+			$this->errormsg = 'Datensatz konnte nicht geladen werden';
+			return false;
+		}
+		
+		if($row = pg_fetch_object($res))
+		{
+			$this->lehrveranstaltung_id=$row->lehrveranstaltung_id;
+			$this->studiengang_kz=$row->studiengang_kz;
+			$this->bezeichnung=$row->bezeichnung;
+			$this->kurzbz=$row->kurzbz;
+			$this->semester=$row->semester;
+			$this->ects=$row->ects;
+			$this->semesterstunden=$row->semesterstunden;
+			$this->anmerkung=$row->anmerkung;
+			$this->lehre=($row->lehre=='t'?true:false);
+			$this->lehreverzeichnis=$row->lehreverzeichnis;
+			$this->aktiv=($row->aktiv=='t'?true:false);
+			$this->ext_id=$row->ext_id;
+			$this->insertamum=$row->insertamum;
+			$this->insertvon=$row->insertvon;
+			$this->planfaktor=$row->planfaktor;
+			$this->planlektoren=$row->planlektoren;
+			$this->planpersonalkosten=$row->planpersonalkosten;
+			$this->updateamum=$row->updateamum;
+			$this->updatevon=$row->updatevon;
+		}		
 		
 		return true;		
 	}
