@@ -1,340 +1,272 @@
 <?php
-/**
- * Klasse bankverbindung (FAS-Online)
- * @create 07-03-2006
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+/**
+ * Klasse bankverbindung 
+ * @create 20-12-2006
+ */
+
 class bankverbindung
 {
-	var $conn;    // @var resource DB-Handle
-	var $new;      // @var boolean
-	var $errormsg; // @var string
-	var $result = array(); // @var bankverbindung Objekt
+	var $conn;     // @var resource DB-Handle
+	var $new;       // @var boolean
+	var $errormsg;  // @var string
+	var $result = array(); // @var adresse Objekt
+	var $done=false;	// @var boolean
 	
 	//Tabellenspalten
-	var $bankverbindung_id; // @var integer
-	var $person_id;         // @var integer
-	var $name;              // @var string
-	var $anschrift;         // @var string
-	var $blz;               // @var string
-	var $bic;               // @var string
-	var $kontonr;           // @var string
-	var $iban;              // @var string
-	var $typ;               // @var integer
-	var $updateamum;        // @var timestamp
-	var $updatevon=0;       // @var string
+	Var $bankverbindung_id;	// @var integer
+	var $person_id;		// @var integer
+	var $name;			// @var string
+	var $anschrift;		// @var string
+	var $bic;			// @var string
+	var $blz;			// @var string
+	var $iban;			// @var string
+	var $kontonr;			// @var string
+	var $typ;			// @var p=Privatkonto, f=Firmenkonto
+	var $verrechnung;		// @var boolean
+	var $ext_id;			// @var integer
+	var $insertamum;		// @var timestamp
+	var $insertvon;		// @var bigint
+	var $updateamum;		// @var timestamp
+	var $updatevon;		// @var bigint
 	
 	/**
 	 * Konstruktor
-	 * @param $conn    Connection zur Datenbank
-	 *        $bank_id Zu ladende ID (Default=null)
+	 * @param $conn      Connection
+	 *        $kontakt_id ID der Adresse die geladen werden soll (Default=null)
 	 */
-	function bankverbindung($conn, $bank_id=null)
+	function bankverbindung($conn,$bankverbindung_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+		if ($unicode)
+		{
+			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+		}
+		else 
+		{
+			$qry="SET CLIENT_ENCODING TO 'LATIN9';";
+		}
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
 			return false;
 		}
-		if($bank_id != null)
-			$this->load($bank_id);
+		
 	}
 	
 	/**
-	 * Prueft die gueltigkeit der Variablen
+	 * Laedt die Bankverbindung mit der ID $bankverbindung_id
+	 * @param  $bankverbindung_id ID der zu ladenden  Email
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	function load($bankverbindung_id)
+	{
+		//noch nicht implementiert
+	}
+			
+	/**
+	 * Prueft die Variablen auf gueltigkeit
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	function checkvars()
 	{		
 		//Gesamtlaenge pruefen
-		$this->errormsg = 'Eine der Maximiallaengen wurde ueberschritten';
-		if(strlen($this->name)>255)
+		//$this->errormsg = 'Eine der Maximiallaengen wurde ueberschritten';
+		if(strlen($this->name)>64)
 		{
-			$this->errormsg = 'Name darf nicht länger als 255 Zeichen sein';
+			$this->errormsg = 'Name darf nicht länger als 64 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->anschrift)>255) 
+		if(strlen($this->anschrift)>128) 
 		{
-			$this->errormsg = 'Anschrift darf nicht länger als 255 Zeichen sein';
+			$this->errormsg = 'Anschrift darf nicht länger als 128 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->blz)>15)
+		if(strlen($this->blz)>16)
 		{
-			$this->errormsg = 'BLZ darf nicht länger als 15 Zeichen sein';
+			$this->errormsg = 'BLZ darf nicht länger als 16 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->bic)>15)
+		if(strlen($this->bic)>16)
 		{
-			$this->errormsg = 'BIC darf nicht länger als 15 Zeichen sein';
+			$this->errormsg = 'BIC darf nicht länger als 16 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->kontonr)>25)
+		if(strlen($this->kontonr)>16)
 		{
-			$this->errormsg = 'KontoNr darf nicht länger als 25 Zeichen sein';
+			$this->errormsg = 'KontoNr darf nicht länger als 16 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->iban)>25)
+		if(strlen($this->iban)>32)
 		{
-			$this->errormsg = 'IBAN darf nicht länger als 25 Zeichen sein';
+			$this->errormsg = 'IBAN darf nicht länger als 32 Zeichen sein';
 			return false;
 		}
 		
 		//Zahlenwerte ueberpruefen
 		$this->errormsg = 'Ein Zahlenfeld enthaelt ungueltige Zeichen';
 		if(!is_numeric($this->person_id))         return false;
-		if(!is_numeric($this->typ))               return false;
 		
 		$this->errormsg = '';
 		return true;
 	}
-	
-	
+	// ************************************************
+	// * wenn $var '' ist wird "null" zurueckgegeben
+	// * wenn $var !='' ist werden datenbankkritische 
+	// * Zeichen mit backslash versehen und das Ergebnis
+	// * unter Hochkomma gesetzt.
+	// ************************************************
+	function addslashes($var)
+	{
+		return ($var!=''?"'".addslashes($var)."'":'null');
+	}
 	/**
-	 * Speichert den aktuellen Datensatz
+	 * Speichert den aktuellen Datensatz in die Datenbank	 
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
 	 * andernfalls wird der Datensatz mit der ID in $bankverbindung_id aktualisiert
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	function save()
 	{
-		//Gueltigkeit der Variablen pruefen
+		$this->done=false;
+		//Variablen pruefen
 		if(!$this->checkvars())
 			return false;
 			
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-			
-			//Naechste ID aus der Sequence holen
-			$qry = "SELECT nextval('bankverbindung_seq') as id;";
-			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
-			{
-				$this->errormsg = 'Fehler beim auslesen der Sequence';
-				return false;
-			}
-			$this->bankverbindung_id = $row->id;
-			
-			$qry = "INSERT INTO bankverbindung (bankverbindung_pk, person_fk, name, anschrift, blz, bic,".
-			       " kontonr, iban, typ, creationdate, creationuser) VALUES(".
-			       " '$this->bankverbindung_id', '$this->person_id', '$this->name', '$this->anschrift',".
-			       " '$this->blz', '$this->bic', '$this->kontonr', '$this->iban', '$this->typ', now(), $this->updatevon);";
+					
+			$qry = 'INSERT INTO tbl_bankverbindung  (person_id, name, anschrift, blz, bic,
+			       kontonr, iban, typ, ext_id, verrechnung, insertamum, insertvon, updateamum, updatevon) VALUES('.
+			       $this->addslashes($this->person_id).', '.
+			       $this->addslashes($this->name).', '.
+			       $this->addslashes($this->anschrift).', '.
+			       $this->addslashes($this->blz).', '.
+			       $this->addslashes($this->bic).', '. 
+			       $this->addslashes($this->kontonr).', '.
+			       $this->addslashes($this->iban).', '.
+			       $this->addslashes($this->typ).', '.
+			       $this->addslashes($this->ext_id).', '.
+			      ($this->verrechnung?'true':'false').',  now(), '.
+			       $this->addslashes($this->insertvon).', now(), '.
+			       $this->addslashes($this->updatevon).');';	
+			$this->done=true;		
 		}
-		else 
+		else
 		{
-			//Datensatz Updaten
+			//Updaten des bestehenden Datensatzes
 			
-			//ID pruefen
+			//Pruefen ob bankverbindung_id eine gueltige Zahl ist
 			if(!is_numeric($this->bankverbindung_id))
 			{
-				$this->errormsg = 'bankverbindung_id muss eine Zahl sein';
+				$this->errormsg = 'bankverbindung_id muss eine gueltige Zahl sein: '.$this->bankverbindung_id.' ('.$this->person_id.')';
 				return false;
 			}
-			
-			$qry="UPDATE bankverbindung SET person_fk='$this->person_id', name='$this->name',".
-			     " anschrift='$this->anschrift', blz='$this->blz', bic='$this->bic',".
-			     " kontonr='$this->kontonr', iban='$this->iban', typ='$this->typ'".
-			     " WHERE bankverbindung_pk=$this->bankverbindung_id";
-		}
-		
-		if(pg_query($this->conn, $qry))
-		{
-			//Log schreiben
-			$sql = $qry;
-			$qry = "SELECT nextval('log_seq') as id;";
-			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
+			if(!is_numeric($this->person_id))
 			{
-				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
+				$this->errormsg = 'person_id muss eine gueltige Zahl sein: '.$this->person_id.'';
 				return false;
 			}
-						
-			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
+			$qry="SELECT * FROM tbl_bankverbindung WHERE bankverbindung_id='$this->bankverbindung_id';";
+			if($resultz = pg_query($this->conn, $qry))
+			{
+				while($rowz = pg_fetch_object($resultz))
+				{
+					$update=false;			
+					if($rowz->person_id!=$this->person_id) 				$update=true;
+					if($rowz->name!=$this->name)	 				$update=true;
+					if($rowz->anschrift!=$this->anschrift)				$update=true;
+					if($rowz->bic!=$this->bic)						$update=true;
+					if($rowz->blz!=$this->blz)	 					$update=true;
+					if($rowz->iban!=$this->iban) 					$update=true;
+					if($rowz->kontonr!=$this->kontonr)					$update=true;
+					if($rowz->typ!=$this->typ)	 					$update=true;
+					if($rowz->verrechnung!=$this->verrechnung)			$update=true;
+					if($rowz->ext_id!=$this->ext_id) 					$update=true;
+				
+					if($update)
+					{
+						$qry='UPDATE bankverbindung SET '.
+						'person_id='.$this->addslashes($this->person_id).', '. 
+						'name='.$this->addslashes($this->name).', '.
+			     			'anschrift='.$this->addslashes($this->anschrift).', '.
+			     			'blz='.$this->addslashes($this->blz).', '. 
+			     			'bic='.$this->addslashes($this->bic).', '.
+			     			'kontonr='.$this->addslashes($this->kontonr).', '.
+			     			'iban='.$this->addslashes($this->iban).', '.
+			     			'typ='.$this->addslashes($this->typ).', '.
+			     			'zustellung='.($this->zustellung?'true':'false').', '.
+			     			'ext_id='.$this->addslashes($this->ext_id).' '.
+			     			'WHERE bankverbindung_id='.$this->addslashes($this->bankverbindung_id).';';
+						$this->done=true;
+					}
+				}
+			}
+		}
+		//echo $qry;
+		if ($this->done)
+		{
 			if(pg_query($this->conn, $qry))
-				return true;
+			{
+				//Log schreiben
+				/*$sql = $qry;
+				$qry = "SELECT nextval('log_seq') as id;";
+				if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
+				{
+					$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
+					return false;
+				}
+							
+				$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
+				if(pg_query($this->conn, $qry))
+					return true;
+				else 
+				{
+					$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
+					return false;
+				}	*/
+				return true;		
+			}
 			else 
 			{
-				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
+				$this->errormsg = 'Fehler beim Speichern der Daten';
 				return false;
 			}
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim Speichern der Daten';
-			return false;
-		}	
+			return true;
+		}
 	}
 	
 	/**
-	 * Loescht den Datensatz mit der uebergebenen ID
-	 * @param $bank_id ID des zu loeschenden Datensatzes
+	 * Loescht den Datenensatz mit der ID die uebergeben wird
+	 * @param $bankverbindung_id ID die geloescht werden soll
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function delete($bank_id)
+	function delete($bankverbindung_id)
 	{
-		if(!is_numeric($bank_id) || $bank_id == '')
-		{
-			$this->errormsg = 'bank_id muss eine Zahl sein';
-			return false;
-		}
-		
-		$qry="DELETE FROM bankverbindung WHERE bankverbindung_pk=$bank_id";
-		
-		if(!pg_query($this->conn, $qry))
-		{
-			$this->errormsg = 'Fehler beim loeschen der Daten';
-			return false;
-		}
-		else 
-		{
-			//Log schreiben
-			$sql = $qry;
-			$qry = "SELECT nextval('log_seq') as id;";
-			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
-			{
-				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
-				return false;
-			}
-						
-			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
-			if(pg_query($this->conn, $qry))
-				return true;
-			else 
-			{
-				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
-				return false;
-			}
-		}		
-	}
-	
-	/**
-	 * Liefert die Bankverbindung mit der uebergebenen ID
-	 * @param $bank_id ID der bankverbindung
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	function load($bank_id)
-	{
-		if(!is_numeric($bank_id) || $bank_id == '')
-		{
-			$this->errormsg = 'bank_id muss eine gueltige Zahl sein';
-			return false;
-		}
-		
-		$qry = "SELECT * FROM bankverbindung WHERE bankverbindung_pk=$bank_id";
-		
-		if(!$res = pg_query($this->conn, $qry))
-		{
-			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
-			return false;
-		}
-		
-		if($row = pg_fetch_object($res))
-		{						
-			$this->bankverbindung_id = $row->bankverbindung_pk;
-			$this->person_id         = $row->person_fk;
-			$this->name              = $row->name;
-			$this->anschrift         = $row->anschrift;
-			$this->blz               = $row->blz;
-			$this->bic               = $row->bic;
-			$this->kontonr           = $row->kontonr;
-			$this->iban              = $row->iban;
-			$this->typ               = $row->typ;
-			$this->updateamum        = $row->creationdate;
-			$this->updatevon         = $row->creationuser;
-		}
-		else 
-		{
-			$this->errormsg = 'Es ist kein Datensatz mit dieser ID vorhanden';
-			return false;
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * Liefert alle Bankverbindungen der Person die uebergeben wird
-	 * @param $pers_id ID der Person
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	function load_pers($pers_id)
-	{
-		if(!is_numeric($pers_id) || $pers_id == '')
-		{
-			$this->errormsg = 'pers_id muss eine gueltige Zahl sein';
-			return false;
-		}
-		
-		$qry = "SELECT * FROM bankverbindung WHERE person_fk=$pers_id";
-		
-		if(!$res = pg_query($this->conn, $qry))
-		{
-			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
-			return false;
-		}
-		
-		while($row = pg_fetch_object($res))
-		{
-			$bank_obj = new bankverbindung($this->conn);
-			
-			$bank_obj->bankverbindung_id = $row->bankverbindung_pk;
-			$bank_obj->person_id         = $row->person_fk;
-			$bank_obj->name              = $row->name;
-			$bank_obj->anschrift         = $row->anschrift;
-			$bank_obj->blz               = $row->blz;
-			$bank_obj->bic               = $row->bic;
-			$bank_obj->kontonr           = $row->kontonr;
-			$bank_obj->iban              = $row->iban;
-			$bank_obj->typ               = $row->typ;
-			$bank_obj->updateamum        = $row->creationdate;
-			$bank_obj->updatevon         = $row->creationuser;
-			
-			$this->result[] = $bank_obj;
-		}
-		return true;
-	}
-	
-	/**
-	 * Liefert alle Bankverbindungen
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	function getAll()
-	{
-		$qry = "SELECT * FROM bankverbindung";
-		
-		if(!$res = pg_query($this->conn,$qry))
-		{
-			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
-			return false;
-		}
-		
-		while($row = pg_fetch_object($res))
-		{
-			$bank_obj = new bankverbindung($this->conn);
-			
-			$bank_obj->bankverbindung_id = $row->bankverbindung_pk;
-			$bank_obj->person_id         = $row->person_fk;
-			$bank_obj->name              = $row->name;
-			$bank_obj->anschrift         = $row->anschrift;
-			$bank_obj->blz               = $row->blz;
-			$bank_obj->bic               = $row->bic;
-			$bank_obj->kontonr           = $row->kontonr;
-			$bank_obj->iban              = $row->iban;
-			$bank_obj->typ               = $row->typ;
-			$bank_obj->updateamum        = $row->creationdate;
-			$bank_obj->updatevon         = $row->creationuser;
-			
-			$this->result[] = $bank_obj;
-		}
-		return true;
-	}
-	
-	function getTypBezeichnung($id)
-	{
-		switch($id)
-		{
-			case 1: return 'Privatkonto';
-			case 2: return 'Firmenkonto';
-			default: return '';
-		}
+		//noch nicht implementiert!	
 	}
 }
 ?>
