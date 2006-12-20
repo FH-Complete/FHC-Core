@@ -158,7 +158,7 @@ class firma
 				'anmerkung='.$this->addslashes($this->anmerkung).', '.  
 			     	'updateamum= now(), '.
 			     	'updatevon='.$this->addslashes($this->updatevon).' '.
-				'WHERE ext_id='.$this->addslashes($this->ext_id).';';
+				'WHERE firma_id='.$this->addslashes($this->firma_id).';';
 		}
 		//echo $qry;
 		if(pg_query($this->conn,$qry))

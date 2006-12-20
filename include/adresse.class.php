@@ -30,6 +30,7 @@ class adresse
 	var $new;       // @var boolean
 	var $errormsg;  // @var string
 	var $result = array(); // @var adresse Objekt
+	var $done=false; //@ boolean
 	
 	//Tabellenspalten
 	var $adresse_id;	// @var integer
@@ -316,7 +317,8 @@ class adresse
 			      ($this->zustelladresse?'true':'false').', '.
 			      ($this->firma_id!=null?$this->addslashes($this->firma_id):'null').', now(), '.
 			      $this->addslashes($this->updatevon).', '.
-			      $this->addslashes($this->ext_id).');';			
+			      $this->addslashes($this->ext_id).');';	
+			      $this->done=true;		
 		}
 		else
 		{
@@ -325,49 +327,80 @@ class adresse
 			//Pruefen ob adresse_id eine gueltige Zahl ist
 			if(!is_numeric($this->adresse_id))
 			{
-				$this->errormsg = 'adresse_id muss eine gueltige Zahl sein';
+				$this->errormsg = 'adresse_id muss eine gueltige Zahl sein: '.$this->adresse_id;
 				return false;
 			}
-			
-			$qry='UPDATE tbl_adresse SET'.
-				' person_fk='.$this->addslashes($this->person_id).', '.
-				' name='.$this->addslashes($this->name).', '.
-				' strasse='.$this->addslashes($this->strasse).', '.
-				' plz='.$this->addslashes($this->plz).', '.
-			      	' typ='.$this->addslashes($this->typ).', '.
-			      	' ort='.$this->addslashes($this->ort).', '.
-			      	' nation='.$this->addslashes($this->nation).', '.
-			      	' gemeinde='.$this->addslashes($this->gemeinde).', '. 
-			      	' heimatadresse='.($this->heimatadresse?'true':'false').', '.
-			      	' zustelladresse='.($this->zustelladresse?'true':'false').', '.
-			      'WHERE adresse_pk='.$this->adresse_id.';';
+			$qryz="SELECT * FROM tbl_adresse WHERE adresse_id='$this->adresse_id';";
+			if($resultz = pg_query($this->conn, $qryz))
+			{
+				while($rowz = pg_fetch_object($resultz))
+				{
+					$update=false;			
+					if($rowz->person_id!=$this->person_id) 				$update=true;
+					if($rowz->name!=$this->name) 					$update=true;
+					if($rowz->strasse!=$this->strasse) 					$update=true;
+					if($rowz->plz!=$this->plz)	 					$update=true;
+					if($rowz->typ!=$this->typ)		 				$update=true;
+					if($rowz->ort!=$this->ort)		 				$update=true;
+					if($rowz->nation!=$this->nation)	 				$update=true;
+					if($rowz->gemeinde!=$this->gemeinde) 				$update=true;
+					if($rowz->heimatadresse!=$this->heimatadresse?'true':'false')	$update=true;
+					if($rowz->zustelladresse!=$this->zustelladresse?'true':'false') 	$update=true;
+								
+					if($update)
+					{
+						$qry='UPDATE tbl_adresse SET'.
+							' person_id='.$this->addslashes($this->person_id).', '.
+							' name='.$this->addslashes($this->name).', '.
+							' strasse='.$this->addslashes($this->strasse).', '.
+							' plz='.$this->addslashes($this->plz).', '.
+						      	' typ='.$this->addslashes($this->typ).', '.
+						      	' ort='.$this->addslashes($this->ort).', '.
+						      	' nation='.$this->addslashes($this->nation).', '.
+						      	' gemeinde='.$this->addslashes($this->gemeinde).', '. 
+						      	' updateamum= now(), '.
+						      	' updatevon='.$this->addslashes($this->updatevon).', '. 
+						      	' heimatadresse='.($this->heimatadresse?'true':'false').', '.
+						      	' zustelladresse='.($this->zustelladresse?'true':'false').' '.
+						      	'WHERE adresse_id='.$this->adresse_id.';';
+						      	$this->done=true;
+					}
+				}
+			}
 		}
 		//echo $qry;
-		if(pg_query($this->conn,$qry))
+		if ($this->done)
 		{
-			//Log schreiben
-			/*$sql = $qry;
-			$qry = "SELECT nextval('log_seq') as id;";
-			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
+			if(pg_query($this->conn,$qry))
 			{
-				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
-				return false;
+				//Log schreiben
+				/*$sql = $qry;
+				$qry = "SELECT nextval('log_seq') as id;";
+				if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
+				{
+					$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
+					return false;
+				}
+							
+				$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
+				if(pg_query($this->conn, $qry))
+					return true;
+				else 
+				{
+					$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
+					return false;
+				}	*/
+				return true;		
 			}
-						
-			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
-			if(pg_query($this->conn, $qry))
-				return true;
 			else 
 			{
-				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
+				$this->errormsg = 'Fehler beim Speichern der Daten';
 				return false;
-			}	*/
-			return true;		
+			}
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim Speichern der Daten';
-			return false;
+			return true;
 		}
 	}
 	
