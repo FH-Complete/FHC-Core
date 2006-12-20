@@ -94,13 +94,19 @@ class news
 	// **********************************
 	function getnews($maxalter, $studiengang_kz, $semester)
 	{
+		if(!is_numeric($maxalter) || !is_numeric($studiengang_kz) || ($semester!='' && !is_numeric($semester)))
+		{
+			$this->errormsg = 'Maxalter, Studiengang und Semester muessen gueltige Zahlen sein';
+			return false;
+		}
+		
 		if($maxalter!=0)
 		{
 			$interval = "(now()-updateamum)<interval '$maxalter days' AND";
 		}
 		else 
 			$interval = '';
-			
+		
 		if($studiengang_kz==0)
 			$qry = "SELECT * FROM campus.tbl_news WHERE $interval studiengang_kz=".$studiengang_kz." AND semester".($semester!=''?"='$semester'":' is null')." order by updateamum DESC;";
 		else 
@@ -127,7 +133,7 @@ class news
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der News';
 			return false;

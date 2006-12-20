@@ -1,5 +1,5 @@
 <?php
-    $filename = "muster_semesterplan_index.html";
+    $filename = "../../cisdocs/muster_semesterplan_index.html";
     $fp = fopen($filename, "rb");
     if ($fp)
     {

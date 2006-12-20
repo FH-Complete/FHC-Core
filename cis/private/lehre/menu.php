@@ -272,7 +272,7 @@ function js_toggle_container(conid)
 					echo "Fehler beim Auslesen der Studiengaenge";		
 				
 				//$qry = "SELECT * FROM tbl_lehrfach WHERE lehrfach_nr IN (SELECT distinct lehrfach_nr FROM tbl_lehrveranstaltung WHERE lektor='$user' AND studiensemester_kurzbz='$stsem') AND studiengang_kz!=0";
-				$qry = "SELECT bezeichnung, studiengang_kz, semester, lehreverzeichnis  FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter 
+				$qry = "SELECT bezeichnung, studiengang_kz, semester, lehreverzeichnis, tbl_lehrveranstaltung.lehrveranstaltung_id  FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter 
 				        WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND 
 				        tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND 
 				        mitarbeiter_uid='$user' AND tbl_lehreinheit.studiensemester_kurzbz='$stsem'";
@@ -306,7 +306,7 @@ function js_toggle_container(conid)
 		  	<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Info &amp; Kommunikation" style="display: none;">
 			  <tr>
 			  	<td width="10" nowrap>&nbsp;</td>
-				<td nowrap><a class="Item" href="../../lvplan/" target="_blank"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Stundenplan</a></td>
+				<td nowrap><a class="Item" href="../lvplan/" target="_blank"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Stundenplan</a></td>
 			  </tr>
 	    	  <tr>
 			  	<td width="10" nowrap>&nbsp;</td>
