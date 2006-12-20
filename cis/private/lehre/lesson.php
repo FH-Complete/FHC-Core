@@ -282,7 +282,7 @@
           	{
 				//Anwesenheitsliste	
 				echo '<img border="0" src="../../../skin/images/button_lb.jpg" width="67" height="45"><br>';
-				echo "<b><a href='anwesenheitsliste.php?stg_kz=$course_id&sem=$term_id&lvnr=$lvid' class='Item'>Anwesenheits- und Notenlisten</a></b>";
+				echo "<b><a href='anwesenheitsliste.php?stg_kz=$course_id&sem=$term_id&lvid=$lvid' class='Item'>Anwesenheits- und Notenlisten</a></b>";
           	}
 
 		   ?>
@@ -457,8 +457,7 @@
 				</td>
 				<td valign="top" align="center">
 				<a href="<?php
-				  			echo 'news://cis.technikum-wien.at/'.strtolower($kurzbzlang).'.'.$term_id.'sem.'.strtolower($short_short_name);
-				  			writeCISlog('STOP');
+				  			echo 'news://cis.technikum-wien.at/'.strtolower($kurzbz).'.'.$term_id.'sem.'.strtolower($short_short_name);
 				  		   ?>">
 				<img border="0" src="../../../skin/images/button_ng.jpg" width="67" height="45"><br>
 				<strong>Newsgroups</strong>

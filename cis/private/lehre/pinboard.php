@@ -343,18 +343,16 @@
 				<tr>
 				  <td nowrap>
 				  <?php
-					$dest_dir = dir('../../../documents/'.strtolower($short).'/lehrziele');
-					
-					if(!is_dir($dest_dir->path))
+					if($dest_dir = @dir('../../../documents/'.strtolower($short).'/lehrziele'))
 					{
-						if(!is_dir('../../../documents/'.strtolower($short)))
-							exec('mkdir -m 775 "../../../documents/'.strtolower($short).'"');
-						exec('mkdir -m 775 "../../../documents/'.strtolower($short).'/lehrziele"');
-						chgrp('../../../documents/'.strtolower($short).'/lehrziele', teacher);
-					}
+						if(!is_dir($dest_dir->path))
+						{
+							if(!is_dir('../../../documents/'.strtolower($short)))
+								exec('mkdir -m 775 "../../../documents/'.strtolower($short).'"');
+							exec('mkdir -m 775 "../../../documents/'.strtolower($short).'/lehrziele"');
+							chgrp('../../../documents/'.strtolower($short).'/lehrziele', teacher);
+						}
 					
-					if($dest_dir)
-					{
 						$dir_empty = true;
 						
 						while($entry = $dest_dir->read())
@@ -382,18 +380,17 @@
             <tr>
               <td nowrap>
                 <?php											
-					$dest_dir = dir('../../../documents/'.strtolower($short).'/allgemeiner_download');
-					
-					if(!is_dir($dest_dir->path))
+					if($dest_dir = @dir('../../../documents/'.strtolower($short).'/allgemeiner_download'))
 					{
-						if(!is_dir('../../../documents/'.strtolower($short)))
-							exec('mkdir -m 775 "../../../documents/'.strtolower($short).'"');
-						exec('mkdir -m 775 "../../../documents/'.strtolower($short).'/allgemeiner_download"');
-						chgrp('../../../documents/'.strtolower($short).'/allgemeiner_download', teacher);
-					}
 					
-					if($dest_dir)
-					{
+						if(!is_dir($dest_dir->path))
+						{
+							if(!is_dir('../../../documents/'.strtolower($short)))
+								exec('mkdir -m 775 "../../../documents/'.strtolower($short).'"');
+							exec('mkdir -m 775 "../../../documents/'.strtolower($short).'/allgemeiner_download"');
+							chgrp('../../../documents/'.strtolower($short).'/allgemeiner_download', teacher);
+						}
+					
 						$dir_empty = true;
 						
 						while($entry = $dest_dir->read())
