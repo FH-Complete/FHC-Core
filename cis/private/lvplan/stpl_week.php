@@ -13,7 +13,7 @@
 		}
 		-->
 	</script>
-	<LINK rel="stylesheet" href="../../skin/cis.css" type="text/css">
+	<LINK rel="stylesheet" href="../../../skin/cis.css" type="text/css">
 </HEAD>
 
 <BODY>
@@ -42,9 +42,9 @@
 //$ort_kurzbz='EDV6.08';
 //$datum=1102260015;
 
-include_once('../../config.inc.php');
-include_once('../../../include/functions.inc.php');
-include_once('../../../include/stundenplan.class.php');
+require_once('../../config.inc.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/wochenplan.class.php');
 
 // Test Einstellungen
 //if (!isset($REMOTE_USER))
@@ -122,13 +122,13 @@ if (isset($_POST['titel']))
 	$titel=$_POST['titel'];
 
 // Verbindungsaufbau
-if (!$conn = @pg_pconnect(CONN_STRING))
+if (!$conn = pg_pconnect(CONN_STRING))
 {
 	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
 }
 
 // Datums Format
-if(!$erg_std=pg_query($conn, "SET datestyle TO ISO;"))
+if(!$erg_std=pg_query($conn, "SET datestyle TO ISO; SET search_path TO campus;"))
 {
 	die(pg_last_error($conn));
 }
@@ -182,7 +182,7 @@ if (isset($reserve) && $uid==$user_uid)
 }
 
 // Stundenplan erstellen
-$stdplan=new stundenplan($type,$conn);
+$stdplan=new wochenplan($type,$conn);
 if (!isset($datum))
 	$datum=mktime();
 
