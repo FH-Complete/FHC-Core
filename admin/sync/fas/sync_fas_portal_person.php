@@ -32,6 +32,8 @@ $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschl
 //$conn_vilesci=pg_connect(CONN_STRING_VILESCI) or die("Connection zur Vilesci Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
+//set_time_limit(60);
+
 $adress='ruhan@technikum-wien.at';
 //$adress='fas_sync@technikum-wien.at';
 
@@ -40,6 +42,7 @@ $text = '';
 $anzahl_quelle=0;
 $anzahl_eingefuegt=0;
 $anzahl_fehler=0;
+
 
 /*************************
  * FAS-PORTAL - Synchronisation
@@ -53,7 +56,6 @@ $anzahl_fehler=0;
 <body>
 <?php
 //person
-flush();
 ?>
 <?php
 $qry = "SELECT * FROM person";
@@ -186,8 +188,8 @@ if($result = pg_query($conn_fas, $qry))
 				else 
 				{
 					//überprüfen, ob eintrag schon vorhanden
-					$qry="SELECT person_fas FROM tbl_syncperson WHERE person_fas='$row->person_pk' AND person_portal='$person->person_id'";
-					if($resultz = pg_query($conn, $qry))
+					$qryz="SELECT person_fas FROM tbl_syncperson WHERE person_fas='$row->person_pk' AND person_portal='$person->person_id'";
+					if($resultz = pg_query($conn, $qryz))
 					{
 						if(pg_num_rows($resultz)==0) //wenn dieser eintrag noch nicht vorhanden ist
 						{
@@ -197,6 +199,9 @@ if($result = pg_query($conn_fas, $qry))
 						}
 					}
 					$anzahl_eingefuegt++;
+					echo "- ";
+					ob_flush();
+					flush();
 				}
 			}
 			else 

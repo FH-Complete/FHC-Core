@@ -51,9 +51,17 @@ function validate($row)
 /*************************
  * FAS-PORTAL - Synchronisation
  */
+?>
 
+<html>
+<head>
+<title>Synchro - Vilesci -> Portal - Adresse</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body>
+<?php
 //nation
-$qry = "SELECT * FROM adresse";
+$qry = "SELECT * FROM adresse ORDER BY person_fk;";
 
 if($result = pg_query($conn_fas, $qry))
 {
@@ -79,8 +87,9 @@ if($result = pg_query($conn_fas, $qry))
 		$adresse->insertvon			="SYNC";
 		$adresse->ext_id			=$row->adresse_pk;
 
+		//echo nl2br ($adresse->ext_id."\n");
 		//person_id herausfinden
-		$qry1="SELECT person_portal FROM public.tbl_syncperson WHERE person_fas=".$row->adresse_pk.";";
+		$qry1="SELECT person_portal FROM public.tbl_syncperson WHERE person_fas=".$row->person_fk.";";
 		if($result1 = pg_query($conn, $qry1))
 		{
 			if(pg_num_rows($result1)>0) //eintrag gefunden
@@ -88,49 +97,67 @@ if($result = pg_query($conn_fas, $qry))
 				if($row1=pg_fetch_object($result1))
 				{ 
 					$adresse->person_id=$row1->person_portal;
-					$adresse->new=true;
-					
-					//firma eintragen
-					if ($row->typ==1)
+
+					$qry2="SELECT adresse_id, ext_id FROM tbl_adresse WHERE ext_id=".$row->adresse_pk.";";
+					if($result2 = pg_query($conn, $qry2))
 					{
-						$anzahl_quelle2++;
-						$firma=new firma($conn);
-						$firma->name=$row->bezeichnung;
-						$firma->anmerkung=null;
-						$firma->ext_id=$row->adresse_pk;
-						$qry2="SELECT firma_id, ext_id FROM tbl_firma WHERE ext_id=".$row->adresse_pk.";";
-						if($result2 = pg_query($conn, $qry2))
+						if(pg_num_rows($result2)>0) //eintrag gefunden
 						{
-							if(pg_num_rows($result2)>0) //eintrag gefunden
-							{
-								if($row2=pg_fetch_object($result2))
-								{
-									$firma->new=false;	
-									$firma->firma_id=$row2->firma_id;	
-								}
-								else 
-								{
-									$error=true;
-									$error_log.="firma mit adresse_pk: $row->adresse_pk konnte nicht ermittelt werden!\n";
-								}
+							if($row2=pg_fetch_object($result2))
+							{ 
+								// update adresse, wenn datensatz bereits vorhanden
+								$adresse->new=false;
+								$adresse->adresse_id=$row2->adresse_id;
 							}
-							else
-							{
-								$firma->new=true;
-							}
-						} 
-						if(!$error)
+						}
+						else 
 						{
-							if(!$firma->save())
+							// insert, wenn datensatz noch nicht vorhanden
+							$adresse->new=true;
+							
+							//firma eintragen, wenn firmenadresse
+							if ($row->typ==1)
 							{
-								$error_log.=$firma->errormsg."\n";
-								$anzahl_fehler2++;
-							}
-							else 
-							{
-								$anzahl_eingefuegt2++;
-							}											
-							$adresse->firma_id=$firma->firma_id;
+								$anzahl_quelle2++;
+								$firma=new firma($conn);
+								$firma->name=$row->bezeichnung;
+								$firma->anmerkung=null;
+								$firma->ext_id=$row->adresse_pk;
+								$qry3="SELECT firma_id, ext_id FROM tbl_firma WHERE ext_id=".$row->adresse_pk.";";
+								if($result3 = pg_query($conn, $qry3))
+								{
+									if(pg_num_rows($result3)>0) //eintrag gefunden
+									{
+										if($row3=pg_fetch_object($result3))
+										{
+											$firma->new=false;	
+											$firma->firma_id=$row3->firma_id;	
+										}
+										else 
+										{
+											$error=true;
+											$error_log.="firma mit adresse_pk: $row->adresse_pk konnte nicht ermittelt werden!\n";
+										}
+									}
+									else
+									{
+										$firma->new=true;
+									}
+								} 
+								if(!$error)
+								{
+									if(!$firma->save())
+									{
+										$error_log.=$firma->errormsg."\n";
+										$anzahl_fehler2++;
+									}
+									else 
+									{
+										$anzahl_eingefuegt2++;
+									}											
+									$adresse->firma_id=$firma->firma_id;
+								}
+							}	
 						}
 					}
 				}
@@ -144,7 +171,7 @@ if($result = pg_query($conn_fas, $qry))
 			else 
 			{
 				$error=true;
-				$error_log.="adresse mit adresse_pk: $row->adresse_pk konnte nicht gefunden werden! (".pg_num_rows($result1).")\n";
+				$error_log.="adresse mit adresse_pk: $row->adresse_pk ($row->person_fk) konnte in tbl_syncperson nicht gefunden werden! (".pg_num_rows($result1).")\n";
 				$anzahl_fehler++;
 			}
 		}
@@ -159,20 +186,15 @@ if($result = pg_query($conn_fas, $qry))
 			else 
 			{
 				$anzahl_eingefuegt++;
+				echo "- ";
+				ob_flush();
+				flush();
 			}
 		}
-	}		
+		flush();	
+	}	
 }
 
-?>
-
-<html>
-<head>
-<title>Synchro - Vilesci -> Portal - Adresse</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-</head>
-<body>
-<?php
 
 //echo nl2br($text);
 echo nl2br($error_log);

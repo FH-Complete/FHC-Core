@@ -26,6 +26,7 @@ class person
 	var $errormsg; // string
 	var $new;      // boolean
 	var $personen = array(); // person Objekt
+	var $done=false;	// boolean
 	
 	//Tabellenspalten
 	var $person_id;        	// integer
@@ -339,6 +340,7 @@ class person
 				        $this->addslashes($this->geburtsnation).','.
 				        $this->addslashes($this->staatsbuergerschaft).','.
 				        $this->addslashes($this->ext_id).');';
+				        $this->done=true;
 		}
 		else
 		{
@@ -350,8 +352,8 @@ class person
 			}
 			
 			//update nur wenn änderungen gemacht
-			$qry="SELECT * FROM tbl_person";
-			if($result = pg_query($conn, $qry))
+			$qry="SELECT * FROM tbl_person WHERE person_id='$this->person_id';";
+			if($result = pg_query($this->conn, $qry))
 			{
 				while($row = pg_fetch_object($result))
 				{
@@ -376,7 +378,7 @@ class person
 					if($row->aktiv!=$this->aktiv) 					$update=true;
 					if($row->geburtsnation!=$this->geburtsnation) 			$update=true;
 					if($row->geschlecht!=$this->geschlecht) 				$update=true;
-					if($row->staatsbuergerschaft!=$this->staatsbuergerschaft) 	$update=true;
+					if($row->staatsbuergerschaft!=$this->staatsbuergerschaft)	$update=true;
 					
 					
 					if($update)
@@ -406,34 +408,41 @@ class person
 						       ' geburtsnation='.$this->addslashes($this->geburtsnation).','.
 						       ' staatsbuergerschaft='.$this->addslashes($this->staatsbuergerschaft).','.
 						       ' ext_id='.$this->addslashes($this->ext_id).
-						       " WHERE person_id='$this->person_id'";
+						       ' WHERE person_id='.$this->person_id.';';
+						       $this->done=true;
 					}
 				}
 			}
 		}
-
-		if(pg_query($this->conn,$qry))
+		if ($this->done)
 		{
-			if($this->new)
+			if(pg_query($this->conn,$qry))
 			{
-				$qry = "SELECT currval('tbl_person_person_id_seq') AS id;";
-				if($row=pg_fetch_object(pg_query($this->conn,$qry)))
-					$this->person_id=$row->id;
-				else
-				{					
-					$this->errormsg = 'Sequence konnte nicht ausgelesen werden';
-					return false;
+				if($this->new)
+				{
+					$qry = "SELECT currval('tbl_person_person_id_seq') AS id;";
+					if($row=pg_fetch_object(pg_query($this->conn,$qry)))
+						$this->person_id=$row->id;
+					else
+					{					
+						$this->errormsg = 'Sequence konnte nicht ausgelesen werden';
+						return false;
+					}
 				}
+				//Log schreiben
+				return true;
+				
 			}
-			//Log schreiben
+			else
+			{			
+				$this->errormsg = 'Fehler beim Speichern des Person-Datensatzes:'.$this->nachname.' '.$qry;
+				return false;
+			}
+		}
+		else 
+		{
 			return true;
-			
-		}
-		else
-		{			
-			$this->errormsg = 'Fehler beim Speichern des Person-Datensatzes:'.$this->nachname.' '.$qry;
-			return false;
-		}
+		}	
 	}
 }
 ?>
