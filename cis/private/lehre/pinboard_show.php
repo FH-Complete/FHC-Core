@@ -1,11 +1,31 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
 	require_once('../../config.inc.php');	
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/news.class.php');
     
     //Connection Herstellen
     if(!$conn = pg_pconnect(CONN_STRING))
-       die("Fehler beim oeffnen der Datenbankverbindung");
+       die('Fehler beim oeffnen der Datenbankverbindung');
         
 	$user = get_uid();
 	
@@ -70,7 +90,7 @@
 			<?php
 
 			$news_obj = new news($conn);
-			$news_obj->getnews(MAXNEWSALTER,$course_id, $term_id);
+			$news_obj->getnews(MAXNEWSALTER,$course_id, $term_id, true);
 			  
 			$i=0;
 			foreach($news_obj->result as $row)
@@ -83,8 +103,8 @@
 				else
 					echo '<td>';
 				
-				if($row->updateamum!='')
-					$datum = date('d.m.Y - h:i',strtotime(strftime($row->updateamum)));
+				if($row->datum!='')
+					$datum = date('d.m.Y',strtotime(strftime($row->datum)));
 				else 	
 					$datum='';
 						

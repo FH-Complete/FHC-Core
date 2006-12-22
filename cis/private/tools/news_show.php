@@ -1,3 +1,25 @@
+<?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
+?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -26,7 +48,7 @@
 	require_once('../../../include/functions.inc.php');
     require_once('../../../include/benutzerberechtigung.class.php');
     require_once('../../../include/news.class.php');
-		
+	
     //Connection Herstellen
     if(!$sql_conn = pg_pconnect(CONN_STRING))
        die('Fehler beim öffnen der Datenbankverbindung');
@@ -78,9 +100,9 @@
           <td>
 		  	<table width="100%"  border="0" cellspacing="0" cellpadding="0">
 			  <?php
-						  
+				
 				$news = new news($sql_conn);			
-				$news->getnews(MAXNEWSALTER,0,null);
+				$news->getnews(MAXNEWSALTER,0,null, true);
 				
 				$zaehler=0;
 				$i=0;
@@ -88,7 +110,7 @@
 				{	
 					$i++;					
 					$zaehler++;
-					$datum = date('d.m.Y - h:i',strtotime(strftime($row->updateamum)));
+					$datum = date('d.m.Y',strtotime(strftime($row->datum)));
 									
 					echo "<tr>";
 					
@@ -104,7 +126,7 @@
 					echo '  <table width="100%"  border="0" cellspacing="0" cellpadding="0">';
 					echo '    <tr>';
 					echo '      <td nowarp>';
-					echo         $datum.'&nbsp;'.$row->verfasser;
+					echo $datum.'&nbsp;'.$row->verfasser;
 					echo '      </td>';
 					echo '		<td align="right" nowrap>';
 					echo '		  <a onClick="editEntry('.$row->news_id.');">Editieren</a>, <a onClick="deleteEntry('.$row->news_id.');">L&ouml;schen</a>';
@@ -115,7 +137,7 @@
 					echo '	  </tr>';
 					echo '  </table>';
 					echo '  <strong>'.$row->betreff.'</strong><br>'.$row->text.'</td>';
-					echo "</tr>";
+					echo '</tr>';
 					echo '<tr>';
 					echo '  <td>&nbsp;</td>';
 					echo '</tr>';

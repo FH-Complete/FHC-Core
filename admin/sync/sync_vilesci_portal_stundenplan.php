@@ -139,7 +139,18 @@ if($result = pg_query($conn_vilesci, $qry))
 			$qry.="'".$row->stundenplandev_id."'";
 		else 
 			$qry.="'".$row->stundenplan_id."'";		
+			
+		//fix fuer fehlerhafte Lehrverbaende
 		
+		if(trim($row->semester)!='')
+			$verb=$row->verband;
+		else 
+			$verb=' ';
+		if(trim($verb)!='')
+			$gruppe=$row->gruppe;
+		else 
+			$gruppe=' ';
+			
 		$qry.=",".myaddslashes($row->unr).",".
 					myaddslashes($row->uid).",".
 					myaddslashes($row->datum).",".
@@ -154,8 +165,8 @@ if($result = pg_query($conn_vilesci, $qry))
 			      	myaddslashes($lehreinheit_id).",".
 			      	myaddslashes($row->studiengang_kz).",".
 			      	myaddslashes($row->semester).",'".
-			      	($row->verband!=''?addslashes($row->verband):' ')."','".
-			      	(($row->gruppe!='' && $row->gruppe!=0)?addslashes($row->gruppe):' ')."');";
+			      	($verb!=''?addslashes($verb):' ')."','".
+			      	(($gruppe!='' && $gruppe!=0)?addslashes($gruppe):' ')."');";
 			if(pg_query($conn,$qry))
 			{
 				$anzahl_eingefuegt++;
