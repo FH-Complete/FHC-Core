@@ -141,13 +141,14 @@ class mitarbeiter extends benutzer
 		if($this->new)
 		{
 			//Neuen Datensatz anlegen							
-			$qry = "INSERT INTO tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz
+			$qry = "INSERT INTO tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz,
 			                    fixangestellt, telefonklappe, updateamum, updatevon)
 			        VALUES('".addslashes($this->uid)."',".
 			 	 	$this->addslashes($this->ausbildungcode).",".
 			 	 	$this->addslashes($this->personalnummer).",". //TODO: in Produktivversion nicht angeben
 			 	 	$this->addslashes($this->kurzbz).','.
 			 	 	($this->lektor?'true':'false').','.
+			 	 	$this->addslashes($this->ort_kurzbz).','.
 					($this->fixangestellt?'true':'false').','.
 					$this->addslashes($this->telefonklappe).','.
 					$this->addslashes($this->updateamum).','.
@@ -163,7 +164,7 @@ class mitarbeiter extends benutzer
 			       ' lektor='.($this->lektor?'true':'false').','.
 			       ' fixangestellt='.($this->fixangestellt?'true':'false').','.
 			       ' telefonklappe='.$this->addslashes($this->telefonklappe).','.
-			       ' updateamum='.$this->addslashes($this->ort_kurzbz).','.
+			       ' ort_kurzbz='.$this->addslashes($this->ort_kurzbz).','.
 			       ' updateamum='.$this->addslashes($this->updateamum).','.
 			       ' updatevon='.$this->addslashes($this->updatevon).
 			       " WHERE mitarbeiter_uid='".addslashes($this->uid)."';";
