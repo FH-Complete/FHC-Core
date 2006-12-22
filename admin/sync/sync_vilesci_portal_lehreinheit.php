@@ -110,7 +110,7 @@ function gruppezuweisen($id,$studiengang_kz, $semester, $verband, $gruppe, $einh
 		$gruppe1->semester = $semester;
 		$gruppe1->verband = $verband;
 		$gruppe1->gruppe = $gruppe;
-		$gruppe1->gruppe_kurzbz = $einheit_kurzbz;
+		$gruppe1->gruppe_kurzbz = strtoupper($einheit_kurzbz);
 		if($gruppe1->save(true))
 			return true;
 		else 

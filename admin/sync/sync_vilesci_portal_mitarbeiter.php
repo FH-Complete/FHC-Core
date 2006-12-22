@@ -77,6 +77,7 @@ if($result = pg_query($conn_vilesci, $qry))
 			$mitarbeiter->anmerkungen=$row->anmerkungen;
 			$mitarbeiter->homepage=$row->homepage;
 			$mitarbeiter->svnr='';
+			$mitarbeiter->geschlecht='m';
 			$mitarbeiter->ersatzkennzeichen='';
 			$mitarbeiter->familienstand='';
 			$mitarbeiter->anzahlkinder='';

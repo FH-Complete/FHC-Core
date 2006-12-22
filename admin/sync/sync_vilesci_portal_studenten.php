@@ -83,6 +83,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		$student->updateamum=$row->updateamum;
 		$student->updatevon=$row->updatevon;
 		$student->ext_id='';
+		$student->geschlecht='m';
 		
 		$student->uid=$row->uid;
 		$student->bnaktiv=$row->aktiv;
