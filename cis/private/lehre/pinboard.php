@@ -1,4 +1,24 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
 /**
  * Pinboard
  * Zeigt alle Pinboardeintraege an. Am rechten Rand werden
@@ -48,8 +68,8 @@
 			foreach ($news_obj->result as $row)
 			{
 				$zaehler++;
-				if($row->updateamum!='')
-					$datum = date('d.m.Y - h:i',strtotime(strftime($row->updateamum)));
+				if($row->datum!='')
+					$datum = date('d.m.Y',strtotime(strftime($row->datum)));
 				else 	
 					$datum='';
 				
@@ -323,7 +343,7 @@
 					{
 						while($row_stdv = pg_fetch_object($result_course_stdv))
 						{						
-							echo "<a href='mailto:".$row_stdv->uid."@technikum-wien.at'>$row_stdv->titelpre $row_stdv->vorname $row_stdv->nachname $row->titelpost</a><br>";
+							echo "<a href='mailto:".$row_stdv->uid."@technikum-wien.at'>$row_stdv->titelpre $row_stdv->vorname $row_stdv->nachname $row_stdv->titelpost</a><br>";
 						}
 					}
 					else

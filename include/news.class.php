@@ -35,6 +35,7 @@ class news
 	var $uid;				// @var varchar(16)
 	var $studiengang_kz;	// @var integer
 	var $verfasser;			// @var varchar(64)
+	var $datum;				// @date
 	var $updateamum;		// @var timestamp
 	var $updatevon=0;		// @var string
 	var $insertamum;		// @var timestamp
@@ -77,6 +78,7 @@ class news
 			$news_obj->uid = $row->uid;
 			$news_obj->studiengang_kz=$row->studiengang_kz;
 			$news_obj->verfasser = $row->verfasser;
+			$news_obj->datum = $row->datum;
 			$news_obj->insertamum=$row->insertamum;
 			$news_obj->insertvon=$row->insertvon;
 			$news_obj->updateamum=$row->updateamum;
@@ -92,7 +94,7 @@ class news
 	// * als $maxalter Tage sind
 	// * @param $maxalter
 	// **********************************
-	function getnews($maxalter, $studiengang_kz, $semester)
+	function getnews($maxalter, $studiengang_kz, $semester, $all=false)
 	{
 		if(!is_numeric($maxalter) || !is_numeric($studiengang_kz) || ($semester!='' && !is_numeric($semester)))
 		{
@@ -102,16 +104,21 @@ class news
 		
 		if($maxalter!=0)
 		{
-			$interval = "(now()-updateamum)<interval '$maxalter days' AND";
+			$interval = "(now()-datum)<interval '$maxalter days' AND";
 		}
 		else 
 			$interval = '';
 		
+		if($all)
+			$datum = '';
+		else
+			$datum = 'AND datum<=now()';
+			
 		if($studiengang_kz==0)
-			$qry = "SELECT * FROM campus.tbl_news WHERE $interval studiengang_kz=".$studiengang_kz." AND semester".($semester!=''?"='$semester'":' is null')." order by updateamum DESC;";
+			$qry = "SELECT * FROM campus.tbl_news WHERE $interval studiengang_kz=".$studiengang_kz." AND semester".($semester!=''?"='$semester'":' is null')." $datum ORDER BY datum DESC, updateamum DESC;";
 		else 
-			$qry = "SELECT * FROM campus.tbl_news WHERE $interval ((studiengang_kz=$studiengang_kz AND semester=$semester) OR (studiengang_kz=$studiengang_kz AND semester=0) OR (studiengang_kz=0 AND semester=$semester) OR (studiengang_kz=0 and semester is null)) ORDER BY updateamum DESC";
-
+			$qry = "SELECT * FROM campus.tbl_news WHERE $interval ((studiengang_kz=$studiengang_kz AND semester=$semester) OR (studiengang_kz=$studiengang_kz AND semester=0) OR (studiengang_kz=0 AND semester=$semester) OR (studiengang_kz=0 and semester is null)) $datum ORDER BY datum DESC, updateamum DESC";
+		
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
@@ -124,6 +131,7 @@ class news
 				$newsobj->betreff = $row->betreff;
 				$newsobj->text = $row->text;
 				$newsobj->verfasser = $row->verfasser;
+				$newsobj->datum		= $row->datum;
 				$newsobj->updateamum = $row->updateamum;
 				$newsobj->updatevon = $row->updateamum;
 				$newsobj->insertamum = $row->insertamum;
@@ -171,6 +179,7 @@ class news
 			$this->uid			= $row->uid;
 			$this->studiengang_kz	= $row->studiengang_kz;
 			$this->verfasser		= $row->verfasser;
+			$this->datum			= $row->datum;
 			$this->insertamum		= $row->insertamum;
 			$this->insertvon		= $row->insertvon;
 			$this->updateamum		= $row->updateamum;
@@ -254,7 +263,7 @@ class news
 		{
 			//Neuen Datensatz anlegen	
 						
-			$qry = 'INSERT INTO campus.tbl_news (betreff, text, semester, uid, studiengang_kz, verfasser, insertamum, insertvon, 
+			$qry = 'INSERT INTO campus.tbl_news (betreff, text, semester, uid, studiengang_kz, verfasser,datum, insertamum, insertvon, 
 				updateamum, updatevon) VALUES ('.
 				$this->addslashes($this->betreff).', '.
 				$this->addslashes($this->text).', '.
@@ -262,9 +271,10 @@ class news
 				$this->addslashes($this->uid).', '.
 				$this->addslashes($this->studiengang_kz).', '.
 				$this->addslashes($this->verfasser).', '.
+				$this->addslashes($this->datum).', '.
 				$this->addslashes($this->insertamum).', '.
-				$this->addslashes($this->insertvon).', now(),'.
-				//$this->addslashes($this->updateamum).', '.
+				$this->addslashes($this->insertvon).', '.
+				$this->addslashes($this->updateamum).', '.
 				$this->addslashes($this->updatevon).'); ';
 				
 		}
@@ -286,13 +296,14 @@ class news
 				'uid='.$this->addslashes($this->uid).', '.
 				'studiengang_kz='.$this->addslashes($this->studiengang_kz).', '.
 				'verfasser='.$this->addslashes($this->verfasser).', '.
+				'datum='.$this->addslashes($this->datum).', '.
 				'insertamum='.$this->addslashes($this->insertamum).', '.
 				'insertvon='.$this->addslashes($this->insertvon).', '.
-				'updateamum=now(),'. //'.$this->addslashes($this->updateamum).', '.
+				'updateamum='.$this->addslashes($this->updateamum).', '.
 				'updatevon='.$this->addslashes($this->updatevon).'  '.
 				'WHERE news_id = '.$this->addslashes($this->news_id).';';
 		}
-		echo $qry;
+		
 		if(pg_query($this->conn, $qry))
 		{
 			/*//Log schreiben

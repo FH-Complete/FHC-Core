@@ -65,7 +65,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		$lehrveranstaltung->ects			=$row->ects;
 		$lehrveranstaltung->semesterstunden	=0;
 		$lehrveranstaltung->anmerkung		='';
-		$lehrveranstaltung->lehre			=($row->aktiv=='t'?true:false);
+		$lehrveranstaltung->lehre			=($row->lehre=='t'?true:false);
 		$lehrveranstaltung->lehreverzeichnis	=$row->lehrevz;
 		$lehrveranstaltung->aktiv			=($row->aktiv=='t'?true:false);
 		$lehrveranstaltung->planfaktor		='1.0';

@@ -179,7 +179,7 @@ class benutzerberechtigung
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern des Feedbacks:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern der Benutzerberechtigung:'.$qry;
 			return false;
 		}
 	}

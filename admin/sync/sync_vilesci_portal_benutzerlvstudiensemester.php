@@ -77,7 +77,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		}
 		else 
 		{
-			$error_log .= 'Fehler beim auslesen der Lehrveranstaltung_nr\n';
+			$error_log .= "Fehler beim Auslesen der Lehrveranstaltung_nr\n.$qry\n";
 			$anzahl_fehler++;
 		}
 	}

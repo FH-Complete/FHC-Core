@@ -67,9 +67,10 @@ if($result = pg_query($conn_vilesci, $qry))
 		$news->studiengang_kz	=$row->studiengang_kz;
 		$news->verfasser		=$row->verfasser;
 		//$news->insertamum	='';
-		$news->insertvon		='SYNC';
+		$news->insertvon		=$row->uid;
+		$news->datum = $row->updateamum;
 		$news->updateamum	=$row->updateamum;
-		//$news->updatevon		=$row->updatevon;
+		$news->updatevon		=$row->uid;
 		
 		$qry = "SELECT news_id FROM campus.tbl_news WHERE news_id='$row->news_id'";
 			if($result1 = pg_query($conn, $qry))

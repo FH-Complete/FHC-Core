@@ -39,7 +39,7 @@ $anzahl_fehler=0;
 // ***********************************
 
 //Mitarbeiter
-$qry = 'Select * FROM tbl_userberechtigung left join tbl_fachbereich using(fachbereich_id)';
+$qry = 'Select art, kurzbz, tbl_userberechtigung.studiengang_kz, berechtigung_kurzbz, uid, studiensemester_kurzbz, start, ende FROM tbl_userberechtigung left join tbl_fachbereich using(fachbereich_id)';
 
 if($result = pg_query($conn_vilesci, $qry))
 {
