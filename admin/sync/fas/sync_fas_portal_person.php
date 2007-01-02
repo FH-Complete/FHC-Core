@@ -81,7 +81,7 @@ if($result = pg_query($conn_fas, $qry))
 		$person->ersatzkennzeichen=$row->ersatzkennzeichen;
 		$person->familienstand=$row->familienstand;
 		$person->staatsbuergerschaft=$row->staatsbuergerschaft;
-		$person->geschlecht=$row->geschlecht;
+		$person->geschlecht=strtolower($row->geschlecht);
 		$person->ext_id=$row->person_pk;
 		$person->aktiv=true;
 					
@@ -105,7 +105,10 @@ if($result = pg_query($conn_fas, $qry))
 		{
 			$person->familienstand=='w';
 		}
-		
+		if ($person->geschlecht=='') 
+		{
+			$person->geschlecht='m';
+		}
 		$error=false;
 		$qry="SELECT person_id FROM public.tbl_benutzer WHERE uid='$row->uid'";
 		if($resultu = pg_query($conn, $qry))

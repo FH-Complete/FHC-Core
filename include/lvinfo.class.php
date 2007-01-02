@@ -232,7 +232,6 @@ class lvinfo
 			}
 			
 			$qry = 'BEGIN; UPDATE campus.tbl_lvinfo SET '. 
-				//'lvinfo_id='.$this->addslashes($this->lvinfo_id).', '.
 				'lehrziele='.$this->addslashes($this->lehrziele).', '.
 				'lehrinhalte='.$this->addslashes($this->lehrinhalte).', '.
 				'voraussetzungen='.$this->addslashes($this->voraussetzungen).', '.

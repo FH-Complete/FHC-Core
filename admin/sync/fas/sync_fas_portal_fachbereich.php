@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2007 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -21,15 +21,15 @@
  */
 
 //*
-//* Synchronisiert LVInfodatensaetze von Vilesci DB nach PORTAL DB
+//* Synchronisiert Fachbereichsdatensaetze von FAS DB in PORTAL DB
 //*
 //*
 
-include('../../vilesci/config.inc.php');
-include('../../include/lvinfo.class.php');
+include('../../../vilesci/config.inc.php');
+include('../../../include/fachbereich.class.php');
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
-$conn_vilesci=pg_connect(CONN_STRING_VILESCI) or die("Connection zur Vilesci Datenbank fehlgeschlagen");
+$conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur Vilesci Datenbank fehlgeschlagen");
 
 $adress='ruhan@technikum-wien.at';
 //$adress='fas_sync@technikum-wien.at';
@@ -48,75 +48,56 @@ function validate($row)
  * VILESCI-PORTAL - Synchronisation
  */
 
-//lvinfo
-$qry = "SELECT * FROM tbl_lvinfo";
+//fachbereich
+$qry = "SELECT * FROM fachbereich";
 
-if($result = pg_query($conn_vilesci, $qry))
+if($result = pg_query($conn_fas, $qry))
 {
-	echo nl2br("LVInfo Sync\n-------------\n");
+	echo nl2br("Fachbereich Sync\n-----------------\n");
 	$anzahl_quelle=pg_num_rows($result);
 	while($row = pg_fetch_object($result))
 	{
 		$error=false;
-		$lvinfo = new lvinfo($conn);
-		$lvinfo->lvinfo_id			=$row->lvinfo_id;
-		$lvinfo->lehrziele			=$row->lehrziele;
-		$lvinfo->lehrinhalte			=$row->lehrinhalte;
-		$lvinfo->voraussetzungen		=$row->voraussetzungen;
-		$lvinfo->unterlagen			=$row->unterlagen;
-		$lvinfo->pruefungsordnung		=$row->pruefungsordnung;
-		$lvinfo->anmerkungen		=$row->anmerkungen;
-		$lvinfo->kurzbeschreibung		=$row->niveau;
-		//$lvinfo->lehrformen			=$row->lehrformen;
-		$lvinfo->genehmigt			=($row->genehmigt=='t'?true:false);
-		$lvinfo->aktiv				=($row->aktiv=='t'?true:false);
-		$lvinfo->sprache			=$row->sprache;
-		$lvinfo->lehrveranstaltung_id	=$row->lehrfach_nr;
-		//$funktion->insertamum		='';
-		$funktion->insertvon			='SYNC';
-		//$funktion->updateamum		='';
-		//$funktion->updatevon		=$row->updatevon;
+		$fachbereich = new fachbereich($conn);
+		$fachbereich->fachbereich_kurzbz	='';
+		$fachbereich->studiengang_kz	='';
+		$fachbereich->bezeichnung		=$row->name;
+		$fachbereich->farbe			='';
+		$fachbereich->ext_id		=$row->fachbereich_pk;
 		
-		//schon da?
-		$qry = "SELECT lvinfo_id FROM campus.tbl_lvinfo WHERE lvinfo_id='$lvinfo->lvinfo_id'";
+		$qry = "SELECT * FROM tbl_fachbereich WHERE ext_id='$fachbereich->ext_id'";
 			if($result1 = pg_query($conn, $qry))
 			{		
 				if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist
 				{
 					if($row1=pg_fetch_object($result1))
 					{
-						//Funktionsdaten updaten
-						$lvinfo->new=false;
-						$lvinfo->lvinfo_id=$row->lvinfo_id;
+						//Fachbereichsdaten updaten
+						$fachbereich->fachbereich_kurzbz	=$row1->fachbereich_kurzbz;
+						$fachbereich->studiengang_kz	=$row1->studiengang_kz;
+						$fachbereich->farbe			=$row1->farbe;
+						$fachbereich->new=false;
 					}
 					else 
 					{
-						$error_log.="lvinfo_id von <b>$row->lvinfo_id</b> konnte nicht ermittelt werden\n";
+						$error_log.="fachbereich_id von $row->fachbereich_id konnte nicht ermittelt werden\n";
 						$error=true;
 					}
 				}
 				else 
 				{
-					//LVInfo neu anlegen
-					$lvinfo->new=true;
+					//Fachbereich neu anlegen
+					$fachbereich->new=true;
 				}
 				
 				if(!$error)
-					if(!$lvinfo->save())
+					if(!$fachbereich->save())
 					{
-						$error_log.=$lvinfo->errormsg."\n";
+						$error_log.=$fachbereich->errormsg."\n";
 						$anzahl_fehler++;
 					}
 					else 
-					{
-						$qry = "UPDATE lehre.tbl_lehrveranstaltung SET lvinfo_id='$lvinfo->lvinfo_id' WHERE ext_id = '$row->lehrfach_nr';";
-						if (!$result2 = pg_query($conn, $qry))
-						{
-							$error_log.= "Lehrveranstaltung <b>".$row->lehrfach_nr."</b> nicht gefunden\n";
-							$error=true;
-						}
 						$anzahl_eingefuegt++;
-					}
 				else 
 					$anzahl_fehler++;
 			}	
@@ -124,13 +105,13 @@ if($result = pg_query($conn_vilesci, $qry))
 	echo nl2br("abgeschlossen\n\n");
 }
 else
-	$error_log .= 'Funktiondatensaetze konnten nicht geladen werden';
+	$error_log .= 'Fachbereichsdatensaetze konnten nicht geladen werden';
 	
 ?>
 
 <html>
 <head>
-<title>Synchro - Vilesci -> Portal - LVInfo</title>
+<title>Synchro - Vilesci -> Portal - Fachbereiche</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
 <body>
