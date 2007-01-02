@@ -187,8 +187,8 @@ class bankverbindung
 				$this->errormsg = 'person_id muss eine gueltige Zahl sein: '.$this->person_id.'';
 				return false;
 			}
-			$qry="SELECT * FROM tbl_bankverbindung WHERE bankverbindung_id='$this->bankverbindung_id';";
-			if($resultz = pg_query($this->conn, $qry))
+			$qryz="SELECT * FROM tbl_bankverbindung WHERE bankverbindung_id='$this->bankverbindung_id';";
+			if($resultz = pg_query($this->conn, $qryz))
 			{
 				while($rowz = pg_fetch_object($resultz))
 				{
@@ -206,7 +206,7 @@ class bankverbindung
 				
 					if($update)
 					{
-						$qry='UPDATE bankverbindung SET '.
+						$qry='UPDATE tbl_bankverbindung SET '.
 						'person_id='.$this->addslashes($this->person_id).', '. 
 						'name='.$this->addslashes($this->name).', '.
 			     			'anschrift='.$this->addslashes($this->anschrift).', '.
@@ -215,7 +215,7 @@ class bankverbindung
 			     			'kontonr='.$this->addslashes($this->kontonr).', '.
 			     			'iban='.$this->addslashes($this->iban).', '.
 			     			'typ='.$this->addslashes($this->typ).', '.
-			     			'zustellung='.($this->zustellung?'true':'false').', '.
+			     			'verrechnung='.($this->verrechnung?'true':'false').', '.
 			     			'ext_id='.$this->addslashes($this->ext_id).' '.
 			     			'WHERE bankverbindung_id='.$this->addslashes($this->bankverbindung_id).';';
 						$this->done=true;
@@ -223,9 +223,10 @@ class bankverbindung
 				}
 			}
 		}
-		//echo $qry;
+		
 		if ($this->done)
 		{
+			//echo $qry."\n";
 			if(pg_query($this->conn, $qry))
 			{
 				//Log schreiben

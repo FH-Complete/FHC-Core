@@ -80,21 +80,25 @@ if($result = pg_query($conn_fas, $qry))
 		$bankverbindung->updatevon		="SYNC";
 		$bankverbindung->insertvon		="SYNC";
 		$bankverbindung->ext_id			=$row->bankverbindung_pk;
-		if($row->typ='1')
+		if($row->typ=='1')
 		{
 			$bankverbindung->typ		='p'; //Privatkonto
+			$bankverbindung->verrechnung	=false;
 		}
-		if($row->typ='2')
+		if($row->typ=='2')
 		{
 			$bankverbindung->typ		='f'; //Firmenkonto
+			$bankverbindung->verrechnung	=false;
 		}
-		if($row->typ='11')
+		if($row->typ=='11')
 		{
-			$bankverbindung->typ		='v'; //Privatverrechnungskonto
+			$bankverbindung->typ		='p'; //Privatverrechnungskonto
+			$bankverbindung->verrechnung	=true;
 		}
-		if($row->typ='12')
+		if($row->typ=='12')
 		{
-			$bankverbindung->typ		='k'; //Firmenverrechnungskonto
+			$bankverbindung->typ		='f'; //Firmenverrechnungskonto
+			$bankverbindung->verrechnung	=true;
 		}
 		//Person_id feststellen
 		if($row->kontonr!='')

@@ -48,7 +48,9 @@ class fachbereich
 	{
 		$this->conn = $conn;
 		if($fachbereich_kurzbz != null)
+		{
 			$this->load($fachbereich_kurzbz);
+		}
 	}
 	
 	/**
@@ -167,7 +169,7 @@ class fachbereich
 			//Pruefen ob fachbereich_kurzbz gueltig ist
 			if($this->fachbereich_kurzbz == '')
 			{
-				$this->errormsg = 'fachbereich_id ungueltig!';
+				$this->errormsg = 'fachbereich_id ungueltig! ('.$this->fachbereich_kurzbz.'/'.$this->ext_id.')';
 				return false;
 			}
 			//Neuen Datensatz anlegen		

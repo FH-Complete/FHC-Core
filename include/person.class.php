@@ -212,11 +212,11 @@ class person
 			$this->errormsg = 'FotoOID ist ungueltig';
 			return false;
 		}
-		if(strlen($this->anmerkungen)>256)
+		/*if(strlen($this->anmerkungen)>256)
 		{
 			$this->errormsg = 'Anmerkungen darf nicht laenger als 256 Zeichen sein';
 			return false;
-		}
+		}*/
 		if(strlen($this->homepage)>256)
 		{
 			$this->errormsg = 'Homepage darf nicht laenger als 256 Zeichen sein';
