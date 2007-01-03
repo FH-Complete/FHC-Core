@@ -25,8 +25,8 @@
 //*
 //*
 
-include('../../vilesci/config.inc.php');
-include('../../include/benutzerfunktion.class.php');
+require_once('../../vilesci/config.inc.php');
+require_once('../../include/benutzerfunktion.class.php');
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_vilesci=pg_connect(CONN_STRING_VILESCI) or die("Connection zur Vilesci Datenbank fehlgeschlagen");
@@ -49,7 +49,7 @@ function validate($row)
  */
 
 //benutzerfunktion
-$qry = "SELECT * FROM tbl_personfunktion";
+$qry = 'SELECT * FROM tbl_personfunktion';
 
 if($result = pg_query($conn_vilesci, $qry))
 {
@@ -59,7 +59,7 @@ if($result = pg_query($conn_vilesci, $qry))
 	{
 		$error=false;
 		$benutzerfunktion = new benutzerfunktion($conn);
-		$benutzerfunktion->fachbereich_id		=$row->fachbereich_id;
+		$benutzerfunktion->fachbereich_kurzbz		=$row->fachbereich_kurzbz;
 		$benutzerfunktion->uid			=$row->uid;
 		$benutzerfunktion->studiengang_kz	=$row->studiengang_kz;
 		$benutzerfunktion->funktion_kurzbz	=$row->funktion_kurzbz;

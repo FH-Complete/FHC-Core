@@ -19,10 +19,6 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-/**
- * Klasse lehrveranstaltung (FAS-Online)
- * @create 06-12-2006
- */
 class lehrveranstaltung
 {
 	var $conn;					// @var resource DB-Handle
@@ -30,28 +26,28 @@ class lehrveranstaltung
 	var $new;					// @var boolean
 	var $lehrveranstaltungen = array();	// @var lehrveranstaltung Objekt	
 	
-	var $lehrveranstaltung_id;			// @var serial
-	var $studiengang_kz;		  	//@var integer
-	var $bezeichnung;   				//@var string
+	var $lehrveranstaltung_id;	// @var serial
+	var $studiengang_kz;		//@var integer
+	var $bezeichnung;   		//@var string
 	var $kurzbz;   				//@var string
-	var $semester;  		 		//@var smallint
-	var $ects;   					//@var numeric(5,2)
-	var $semesterstunden;   			//@var smallint
+	var $semester;  		 	//@var smallint
+	var $ects;   				//@var numeric(5,2)
+	var $semesterstunden;   	//@var smallint
 
-	var $anmerkung;   				//@var string
-	var $lehre;  					//@var boolean
-	var $lehreverzeichnis;   			//@var string
-	var $aktiv;   					//@var boolean
-	var $ext_id;   					//@var bigint
-	var $insertamum;   				//@var timestamp
-	var $insertvon;   				//@var string
-	var $planfaktor;   				//@var numeric(3,2)
-	var $planlektoren;   				//@var integer
-	var $planpersonalkosten;  			//@var numeric(7,2)
-	var $updateamum;   				//@var timestamp
-	var $updatevon;   				//@var string
-	
-	
+	var $anmerkung;				//@var string
+	var $lehre;					//@var boolean
+	var $lehreverzeichnis;		//@var string
+	var $aktiv;					//@var boolean
+	var $ext_id;				//@var bigint
+	var $insertamum;			//@var timestamp
+	var $insertvon;				//@var string
+	var $planfaktor;			//@var numeric(3,2)
+	var $planlektoren;			//@var integer
+	var $planpersonalkosten;	//@var numeric(7,2)
+	var $updateamum;			//@var timestamp
+	var $updatevon;				//@var string
+	var $sprache;				//@var varchar(16)
+
 	/**
 	 * Konstruktor
 	 * @param $conn Connection zur Datenbank
@@ -105,9 +101,10 @@ class lehrveranstaltung
 			$this->planpersonalkosten=$row->planpersonalkosten;
 			$this->updateamum=$row->updateamum;
 			$this->updatevon=$row->updatevon;
-		}		
+			$this->sprache=$row->sprache;
+		}
 		
-		return true;		
+		return true;
 	}
 	
 	/**
@@ -147,18 +144,18 @@ class lehrveranstaltung
 			$lv_obj->planpersonalkosten=$row->planpersonalkosten;
 			$lv_obj->updateamum=$row->updateamum;
 			$lv_obj->updatevon=$row->updatevon;
+			$lv_obj->sprache=$row->sprache;
 			
 			$this->lehrveranstaltungen[] = $lv_obj;
 		}		
 		
-		return true;		
+		return true;
 	}
 	
 	/**
-	 * Liefert alle Lehrveranstaltungen zu einem Studiengang/Studiensemester/Ausbildungssemester
-	 * @param $studiengang_id ID des Studienganges
-	 *        $studiensemester_id ID des Studiensemesters (optional)
-	 *        $ausbildungssemester_id ID des ausbildungssemesters (optional)
+	 * Liefert alle Lehrveranstaltungen zu einem Studiengang/Semester
+	 * @param $studiengang_kz
+	 *        $semester
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	function load_lva($studiengang_kz, $semester=null, $lehreverzeichnis=null, $lehre=null)
@@ -222,6 +219,7 @@ class lehrveranstaltung
 			$lv_obj->planpersonalkosten=$row->planpersonalkosten;
 			$lv_obj->updateamum=$row->updateamum;
 			$lv_obj->updatevon=$row->updatevon;
+			$lv_obj->sprache=$row->sprache;
 			
 			$this->lehrveranstaltungen[] = $lv_obj;
 		}	
@@ -238,12 +236,7 @@ class lehrveranstaltung
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	function checkvars()
-	{	
-		//$this->name = str_replace("'",'´',$this->name);
-		$this->bezeichnung = str_replace("'",'´',$this->bezeichnung);
-		$this->kurzbz = str_replace("'",'´',$this->kurzbz);
-		$this->anmerkung = str_replace("'",'´',$this->anmerkung);
-		
+	{			
 		//Laenge Pruefen
 		if(strlen($this->bezeichnung)>128)           
 		{
@@ -319,7 +312,7 @@ class lehrveranstaltung
 			//Neuen Datensatz anlegen
 			$qry = 'INSERT INTO lehre.tbl_lehrveranstaltung (studiengang_kz, bezeichnung, kurzbz, 
 				semester, ects, semesterstunden,  anmerkung, lehre, lehreverzeichnis, aktiv, ext_id, insertamum, 
-				insertvon, planfaktor, planlektoren, planpersonalkosten, updateamum, updatevon) VALUES ('.
+				insertvon, planfaktor, planlektoren, planpersonalkosten, updateamum, updatevon, sprache) VALUES ('.
 				$this->addslashes($this->studiengang_kz).', '.
 				$this->addslashes($this->bezeichnung).', '.
 				$this->addslashes($this->kurzbz).', '. 
@@ -337,7 +330,8 @@ class lehrveranstaltung
 				$this->addslashes($this->planlektoren).', '.
 				$this->addslashes($this->planpersonalkosten).', '.
 				$this->addslashes($this->updateamum).', '.
-				$this->addslashes($this->updatevon).');';
+				$this->addslashes($this->updatevon).','.
+				$this->addslashes($this->sprache).');';
 		}
 		else 
 		{
@@ -349,6 +343,7 @@ class lehrveranstaltung
 				$this->errormsg = 'lehrveranstaltung_id muss eine gueltige Zahl sein';
 				return false;
 			}
+			
 			$qry = 'UPDATE lehre.tbl_lehrveranstaltung SET '. 
 				//'lehrveranstaltung_id= '.$this->addslashes($this->lehrveranstaltung_id) .', '.
 				'studiengang_kz='.$this->addslashes($this->studiengang_kz) .', '.
@@ -368,29 +363,13 @@ class lehrveranstaltung
 				'planlektoren='.$this->addslashes($this->planlektoren) .', '.
 				'planpersonalkosten='.$this->addslashes($this->planpersonalkosten) .', '.
 				'updateamum='.$this->addslashes($this->updateamum) .','.
-				'updatevon='.$this->addslashes($this->updatevon) .' '.
-				'WHERE ext_id = '.$this->addslashes($this->lehrveranstaltung_id).';';
+				'updatevon='.$this->addslashes($this->updatevon) .','.
+				'sprache='.$this->addslashes($this->sprache).' '.
+				'WHERE lehrveranstaltung_id = '.$this->addslashes($this->lehrveranstaltung_id).';';
 		}
 		
 		if(pg_query($this->conn, $qry))
 		{
-			//Log schreiben
-			/*$sql = $qry;
-			$qry = "SELECT nextval('log_seq') as id;";
-			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
-			{
-				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
-				return false;
-			}
-						
-			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".$this->addslashes($sql)."')";
-			if(pg_query($this->conn, $qry))
-				return true;
-			else 
-			{
-				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
-				return false;
-			}*/
 			return true;
 		}
 		else
@@ -407,41 +386,7 @@ class lehrveranstaltung
 	 */
 	function delete($lehrveranstaltung_id)
 	{
-		//lehrveranstaltung_id auf gueltigkeit pruefen
-		if(!is_numeric($lehrveranstaltung_id) || $lehrveranstaltung_id == '')
-		{
-			$this->errormsg = 'lehrveranstaltung_id muss eine gueltige Zahl sein';
-			return false;
-		}
-		
-		//Loeschen des Datensatzes
-		$qry = "DELETE FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_pk = '$lehrveranstaltung_id';";
-		
-		if(pg_query($this->conn, $qry))
-		{
-			//Log schreiben
-			$sql = $qry;
-			$qry = "SELECT nextval('log_seq') as id;";
-			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
-			{
-				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
-				return false;
-			}
-						
-			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".$this->addslashes($sql)."')";
-			if(pg_query($this->conn, $qry))
-				return true;
-			else 
-			{
-				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
-				return false;
-			}
-		}
-		else 
-		{
-			$this->errormsg = 'Fehler beim loeschen des Datensatzes';
-			return false;
-		}
+		return false;
 	}
 }
 ?>

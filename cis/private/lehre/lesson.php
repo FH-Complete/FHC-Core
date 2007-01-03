@@ -39,9 +39,7 @@
        $is_lector=true;
 	else 
 	   $is_lector=false;
-	
-	//if(!isset($course_id) || !isset($term_id) || !isset($short))
-	//	exit();
+		
 	if(!isset($_GET['lvid']))
 		die('Fehlerhafte Parameteruebergabe');
 	else 
@@ -66,7 +64,6 @@
 	
 	$rechte = new benutzerberechtigung($sql_conn);
 	$rechte->getBerechtigungen($user);
-
 ?>
 <html>
 <head>
@@ -148,6 +145,20 @@
 			<tr>
 			    <td valign="top" align="center">
 				  <?php
+				  //Berechtigungen auf Fachbereichsebene
+				  $qry = "SELECT distinct fachbereich_kurzbz FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrfach USING (lehrfach_id) WHERE lehrveranstaltung_id='$lvid'";
+				  if(isset($angezeigtes_stsem) && $angezeigtes_stsem!='')
+				  	$qry .= " AND studiensemester_kurzbz='$angezeigtes_stsem'";
+				  	
+				  if($result = pg_query($sql_conn, $qry))
+				  {
+				  	while($row = pg_fetch_object($result))
+				  	{
+				  		if($rechte->isBerechtigt('lehre',null,null,$row->fachbereich_kurzbz))
+				  			$user_is_allowed_to_upload=true;
+				  	}
+				  }
+				  
 				  //SEMESTERPLAN
 				  	$dest_dir = @dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/semesterplan');
 					
@@ -439,38 +450,35 @@
 				//Lehrveranstaltungsinformation
 				
 				   echo "<img border=\"0\" src=\"../../../skin/images/button_i.jpg\" width=\"67\" height=\"45\"><br><strong>Lehrveranstaltungsinformation</strong><br>";
-/*				   $need_br=false;
-			   	   $aktstsem=(isset($angezeigtes_stsem)?$angezeigtes_stsem:'');
 				   
-				   $qry="SELECT * FROM lehre.tbl_lvinfo WHERE ";
-				   if($result=pg_exec($sql_conn,$qry))
+				   $qry = "SELECT * FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$lvid' AND genehmigt=true AND sprache='German' AND aktiv=true";
+				   $need_br=false;
+				   
+				   if($result=pg_query($sql_conn,$qry))
+				   { 
+				      if(pg_num_rows($result)>0)
+				      {				      	 
+					     echo "<a href=\"#\" class='Item' onClick=\"javascript:window.open('ects/preview.php?lv=$lvid&language=de','Lehrveranstaltungsinformation','width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes');\">Deutsch&nbsp;</a>";
+					     $need_br=true;
+				      }
+				   }
+				   $qry = "SELECT * FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$lvid' AND genehmigt=true AND sprache='English' AND aktiv=true";
+				   if($result=pg_query($sql_conn,$qry))
 				   { 
 				      if(pg_num_rows($result)>0)
 				      {
 				      	 $row1=pg_fetch_object($result);
-					     echo "<a href=\"#\" class='Item' onClick=\"javascript:window.open('ects/preview.php?lf=$row1->lehrfach_nr&language=de','Lehrveranstaltungsinformation','width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes');\">Deutsch&nbsp;</a>";
-					     $need_br=true;
-				      }
-				   }
-				   //$qry="SELECT * from tbl_lvinfo Join tbl_lehrfach using(lehrfach_nr) where studiensemester_kurzbz='$aktstsem' AND studiengang_kz=$course_id AND semester=$term_id AND lehrevz='$short' AND tbl_lvinfo.aktiv=true AND tbl_lvinfo.sprache='".ATTR_SPRACHE_EN."' AND tbl_lvinfo.genehmigt=true";
-				   $qry="SELECT * from tbl_lvinfo Join tbl_lehrfach using(lehrfach_nr) where studiengang_kz='$course_id' AND semester='$term_id' AND lehrevz='$short' AND tbl_lvinfo.aktiv=true AND tbl_lvinfo.sprache='".ATTR_SPRACHE_EN."' AND tbl_lvinfo.genehmigt=true AND studiensemester_kurzbz='WS2007' ORDER BY updateamum DESC";
-				   if($result=pg_exec($sql_conn,$qry))
-				   { 
-				      if(pg_num_rows($result)>0)
-				      {
-				      	 $row1=pg_fetch_object($result);
-					     echo "<a href=\"#\" class='Item' onClick=\"javascript:window.open('ects/preview.php?lf=$row1->lehrfach_nr&language=en','Lehrveranstaltungsinformation','width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes');\">Englisch</a>";
+					     echo "<a href=\"#\" class='Item' onClick=\"javascript:window.open('ects/preview.php?lv=$lvid&language=en','Lehrveranstaltungsinformation','width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes');\">Englisch</a>";
 					     $need_br=true;
 				      }
 				   }
 				   
-				   if($user_is_allowed_to_upload || $rechte->isBerechtigt('admin',$course_id) || $rechte->isBerechtigt('lehre',$course_id) || $rechte->isBerechtigt('lehre',null,null,$fachbereich_id))
+				   if($user_is_allowed_to_upload || $rechte->isBerechtigt('admin',$course_id) || $rechte->isBerechtigt('lehre',$course_id))
 				   {
 				   		if($need_br)
 				   			echo "<br>";
-				   		echo "<a href='ects/index.php?stg=$course_id&sem=$term_id&lf=$lfnr' target='_blank' class='Item'>Bearbeiten</a>";
+				   		echo "<a href='ects/index.php?lvid=$lvid' target='_blank' class='Item'>Bearbeiten</a>";
 				   }
-	*/			   
 				?>
 								
             <p>&nbsp;</p>

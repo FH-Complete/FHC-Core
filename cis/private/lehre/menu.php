@@ -356,7 +356,6 @@ function js_toggle_container(conid)
 				echo '  </td>';
 				echo '</tr>';
 			}
-			writeCISlog('STOP');
 		?>
 		<tr>
           <td nowrap><a class="MenuItem" href="../mailverteiler.php?kbzl=<?php echo $sel_kurzbzlang.'#'.$course_id; ?>" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Mailverteiler</a></td>
