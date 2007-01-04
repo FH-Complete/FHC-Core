@@ -20,11 +20,6 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-//*
-//* Synchronisiert Funktiondatensaetze von Vilesci DB in PORTAL DB
-//*
-//*
-
 require_once('../../vilesci/config.inc.php');
 require_once('../../include/benutzerfunktion.class.php');
 
@@ -59,16 +54,41 @@ if($result = pg_query($conn_vilesci, $qry))
 	{
 		$error=false;
 		$benutzerfunktion = new benutzerfunktion($conn);
-		$benutzerfunktion->fachbereich_kurzbz		=$row->fachbereich_kurzbz;
-		$benutzerfunktion->uid			=$row->uid;
-		$benutzerfunktion->studiengang_kz	=$row->studiengang_kz;
-		$benutzerfunktion->funktion_kurzbz	=$row->funktion_kurzbz;
-		//$benutzerfunktion->insertamum		='';
-		$benutzerfunktion->insertvon		='SYNC';
-		//$benutzerfunktion->updateamum		='';
-		//$benutzerfunktion->updatevon		=$row->updatevon;
-		
-		$qry = "SELECT benutzerfunktion_id FROM tbl_benutzerfunktion WHERE benutzerfunktion_id='$row->personfunktion_id'";
+
+		if($row->fachbereich_id!='')
+		{
+			$qry_fb = "SELECT fachbereich_kurzbz FROM tbl_fachbereich WHERE ext_id='$row->fachbereich_id'";
+
+			if($result_fb = pg_query($conn,$qry_fb))
+			{
+				if($row_fb=pg_fetch_object($result_fb))
+					$fachbereich = $row_fb->fachbereich_kurzbz;
+				else 
+				{
+					$anzahl_fehler++;
+					$error_log = "Fachbereich wurde nicht gefunden: $row->fachbereich_id";
+				}
+			}
+			else
+			{	
+				$anzahl_fehler++;
+				$error_log = "Fachbereich wurde nicht gefunden: $row->fachbereich_id";
+			}
+		}
+		else 
+			$fachbereich='';
+		if(isset($fachbereich))
+		{
+			$benutzerfunktion->fachbereich_kurzbz	=$fachbereich;
+			$benutzerfunktion->uid					=$row->uid;
+			$benutzerfunktion->studiengang_kz		=$row->studiengang_kz;
+			$benutzerfunktion->funktion_kurzbz		=$row->funktion_kurzbz;
+			//$benutzerfunktion->insertamum			='';
+			//$benutzerfunktion->insertvon			='SYNC';
+			//$benutzerfunktion->updateamum			='';
+			//$benutzerfunktion->updatevon			=$row->updatevon;
+			
+			$qry = "SELECT benutzerfunktion_id FROM tbl_benutzerfunktion WHERE benutzerfunktion_id='$row->personfunktion_id'";
 			if($result1 = pg_query($conn, $qry))
 			{		
 				if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist
@@ -101,7 +121,8 @@ if($result = pg_query($conn_vilesci, $qry))
 						$anzahl_eingefuegt++;
 				else 
 					$anzahl_fehler++;
-			}	
+			}
+		}
 	}
 	echo nl2br("abgeschlossen\n\n");
 }

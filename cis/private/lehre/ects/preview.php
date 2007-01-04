@@ -99,7 +99,7 @@ font-size:10pt;
 		$pruefungsordnung_en = str_replace("\r\n","<br>",stripslashes($_POST['pruefungsordnung_en']));
 		$anmerkungen_en = str_replace("\r\n","<br>",stripslashes($_POST['anmerkungen_en']));
 	}
-	elseif(isset($_GET['lv'])) //Lehrfach wird uebergeben (zB bei Ansicht fuer alle von lesson.php)
+	elseif(isset($_GET['lv'])) //LV Id wird uebergeben (zB bei Ansicht fuer alle von lesson.php)
 	{
 		$lehrveranstaltung_id=$_GET['lv'];
   	  
@@ -151,18 +151,22 @@ font-size:10pt;
 	$lang = $lv_obj->sprache;
 
 	//Zugeteilte Fachbereiche auslesen
-	$qry = "SELECT distinct tbl_fachbereich.bezeichnung as bezeichnung, tbl_fachbereich.fachbereich_kurzbz as fachbereich_kurzbz FROM tbl_fachbereich, lehre.tbl_lehreinheit, lehre.tbl_lehrfach 
-	      	WHERE tbl_lehreinheit.studiensemester_kurzbz='$stsem' AND 
-	      	tbl_lehreinheit.lehrveranstaltung_id='$lv' AND
+	$qry = "SELECT distinct tbl_fachbereich.bezeichnung as bezeichnung, tbl_fachbereich.fachbereich_kurzbz as fachbereich_kurzbz 
+			FROM tbl_fachbereich, lehre.tbl_lehreinheit, lehre.tbl_lehrfach 
+	      	WHERE tbl_lehreinheit.studiensemester_kurzbz=(
+	      		SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN tbl_studiensemester USING(studiensemester_kurzbz) 
+	      		WHERE tbl_lehreinheit.lehrveranstaltung_id='$lv' ORDER BY ende DESC LIMIT 1)
+	      	AND tbl_lehreinheit.lehrveranstaltung_id='$lv' AND
 	      	tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
 	      	tbl_fachbereich.fachbereich_kurzbz=tbl_lehrfach.fachbereich_kurzbz";
 	
 	if(!$result=pg_query($conn, $qry))
 		die('Fehler beim Lesen aus der Datenbank');
-		
+	
 	$fachbereiche='1';
 	$fachbereich['kurzbz']=array();
 	$fachbereich['bezeichnung']=array();
+	
 	while($row=pg_fetch_object($result))
 	{
 		$fachbereiche .= ", '$row->fachbereich_kurzbz'";
@@ -180,22 +184,23 @@ font-size:10pt;
 
 	$stg_kurzbz = $row->kurzbz;
 	$stg_kurzbzlang = $row->kurzbzlang;
-	        
+	//Lehrform auslesen        
 	$qry = "Select distinct lehrform_kurzbz FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lv' AND studiensemester_kurzbz='$stsem'";
 	if(!$res = pg_query($conn,$qry))
 		die('Fehler beim Lesen aus der Datenbank');
 
 	while($row = pg_fetch_object($res))
 		$lehrform_kurzbz[] = $row->lehrform_kurzbz;
-	
+	//Fachbereichsleiter fuer alle FB ermitteln
 	$qry="SELECT * FROM tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbl' AND fachbereich_kurzbz in($fachbereiche)";
 	if(!$res=pg_query($conn,$qry))
 		die('Fehler beim herstellen der DB Connection');
 	  
 	$fachbereichsleiter=array();
 	while($row=pg_fetch_object($res))
-		$fachbereichsleiter[] = $row->vorname."&nbsp;".$row->nachname;
+		$fachbereichsleiter[$row->fachbereich_kurzbz] = $row->vorname."&nbsp;".$row->nachname;
 
+	//Fachbereichskoordinatoren fuer alle FB ermitteln
 	$qry="SELECT * FROM tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbk' AND studiengang_kz='$stg' AND fachbereich_kurzbz in($fachbereiche)";
 
 	if(!$res=pg_exec($conn,$qry))
@@ -203,8 +208,16 @@ font-size:10pt;
 	  
 	$fachbereichskoordinator=array();
 	while($row=pg_fetch_object($res))
-		$fachbereichskoordinator[] = $row->vornamen."&nbsp;".$row->nachname;
- 
+	{
+		$name = $row->vorname."&nbsp;".$row->nachname;
+				
+		if(!isset($fachbereichskoordinator[$row->fachbereich_kurzbz]) || 
+		   !in_array($name, $fachbereichskoordinator[$row->fachbereich_kurzbz]))
+		{
+			$fachbereichskoordinator[$row->fachbereich_kurzbz][] = $name;
+		}
+	}
+
 	//Namen der Lehrenden Auslesen
 	$qry = "SELECT distinct vorname, nachname FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter 
 			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lehrveranstaltung_id' 
@@ -269,32 +282,44 @@ font-size:10pt;
 			echo '<tr><td>ECTS:&nbsp;</td><td>'.number_format(stripslashes($ects_points),1,'.','').'</td></tr>';
 		
 		echo '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
-		
+		//Fachbereiche und Leiter/Koordinatoren anzeigen
 		if (count($fachbereich['bezeichnung'])>0)
 		{
 			echo '<tr><td>Fachbereich:&nbsp;</td><td>';
-			foreach($fachbereich['bezeichnung'] as $bezeichnung)
-				echo stripslashes($bezeichnung)."<br>";
+			//Fachbereiche durchlaufen
+			for($i=0;$i<count($fachbereich['kurzbz']);$i++)
+			{
+				$help='';
+				echo stripslashes($fachbereich['bezeichnung'][$i]);
+				//zugehoerigen Leiter ausgeben
+				if(isset($fachbereichsleiter[$fachbereich['kurzbz'][$i]]))
+					$help.='Leitung: '.$fachbereichsleiter[$fachbereich['kurzbz'][$i]];
+				if(isset($fachbereichskoordinator[$fachbereich['kurzbz'][$i]]))
+				{
+					$first=true;
+					//zugehoerige Koordinatoren ausgeben
+					foreach($fachbereichskoordinator[$fachbereich['kurzbz'][$i]] as $fbk)
+					{
+						if($help!='')
+						{
+							if($first)
+							{
+								$help.=' Koordination:';
+								$first=false;
+							}
+							else 
+								$help.=',';
+						}
+						$help.=" $fbk";
+					}
+				}
+				if($help!='')
+					echo " ($help)";
+			}
+					
 			echo '</td></tr>';
 		}
-	     
-		if (count($fachbereichsleiter)>0)
-		{
-			echo "<tr><td>Fachbereichsleitung:&nbsp;</td><td>";
-			foreach($fachbereichsleiter as $fbl)
-				echo stripslashes($fbl).'<br>';
-			echo '</td></tr>';
-		}
-		
-		if (count($fachbereichskoordinator)>0)
-		{
-			echo '<tr><td>Fachbereichskoordination:&nbsp;</td><td>';
-			foreach($fachbereichskoordinator as $fbk)
-				echo stripslashes($fbk).'<br>';
-			echo '</td></tr>';
-		}
-
-		echo "</table>";
+	    echo "</table>";
 		echo "<br /><br /></td></tr>";
 		
 	    if ($kurzbeschreibung_de)
@@ -397,30 +422,44 @@ font-size:10pt;
 		
 		echo "<tr><td>&nbsp;</td><td>&nbsp;</td></tr>";
 	
+		//Fachbereiche und Leiter/Koordinatoren anzeigen
 		if (count($fachbereich['bezeichnung'])>0)
 		{
-			echo "<tr><td>Department:&nbsp;</td><td>";
-			foreach ($fachbereich['bezeichnung'] as $bezeichnung)
-				echo stripslashes($bezeichnung).'<br>';
-			echo "</td></tr>";
-		}
-
-		if (count($fachbereichsleiter)>0)
-		{
-			echo '<tr><td>Head of Department:&nbsp;</td><td>';
-			foreach ($fachbereichsleiter as $fbl)
-				echo stripslashes($fbl).'<br>';
+			echo '<tr><td>Department:&nbsp;</td><td>';
+			//Fachbereiche durchlaufen
+			for($i=0;$i<count($fachbereich['kurzbz']);$i++)
+			{
+				$help='';
+				echo stripslashes($fachbereich['bezeichnung'][$i]);
+				//zugehoerigen Leiter ausgeben
+				if(isset($fachbereichsleiter[$fachbereich['kurzbz'][$i]]))
+					$help.='Head: '.$fachbereichsleiter[$fachbereich['kurzbz'][$i]];
+				if(isset($fachbereichskoordinator[$fachbereich['kurzbz'][$i]]))
+				{
+					$first=true;
+					//zugehoerige koordinatoren ausgeben
+					foreach($fachbereichskoordinator[$fachbereich['kurzbz'][$i]] as $fbk)
+					{
+						if($help!='')
+						{
+							if($first)
+							{
+								$help.=' Coordination:';
+								$first=false;
+							}
+							else 
+								$help.=',';
+						}
+						$help.=" $fbk";
+					}
+				}
+				if($help!='')
+					echo " ($help)";
+			}
+					
 			echo '</td></tr>';
 		}
 		
-		if (count($fachbereichskoordinator)>0)
-		{
-			echo '<tr><td>Department coordinator:&nbsp;</td><td>';
-			foreach ($fachbereichskoordinator as $fbk)
-				echo stripslashes($fachbereichskoordinator).'<br>';
-			echo '</td></tr>';
-		}
-
 		echo '</table>';
 		echo '<br /><br /></td></tr>';
 		

@@ -25,8 +25,8 @@
 //*
 //*
 
-include('../../vilesci/config.inc.php');
-include('../../include/lvinfo.class.php');
+require_once('../../vilesci/config.inc.php');
+require_once('../../include/lvinfo.class.php');
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_vilesci=pg_connect(CONN_STRING_VILESCI) or die("Connection zur Vilesci Datenbank fehlgeschlagen");
@@ -49,7 +49,7 @@ function validate($row)
  */
 
 //lvinfo
-$qry = "SELECT * FROM tbl_lvinfo";
+$qry = "SELECT * FROM tbl_lvinfo WHERE studiensemester_kurzbz='WS2007'";
 
 if($result = pg_query($conn_vilesci, $qry))
 {
@@ -59,67 +59,79 @@ if($result = pg_query($conn_vilesci, $qry))
 	{
 		$error=false;
 		$lvinfo = new lvinfo($conn);
-		$lvinfo->lvinfo_id			=$row->lvinfo_id;
-		$lvinfo->lehrziele			=$row->lehrziele;
-		$lvinfo->lehrinhalte			=$row->lehrinhalte;
-		$lvinfo->voraussetzungen		=$row->voraussetzungen;
-		$lvinfo->unterlagen			=$row->unterlagen;
-		$lvinfo->pruefungsordnung		=$row->pruefungsordnung;
-		$lvinfo->anmerkungen		=$row->anmerkungen;
-		$lvinfo->kurzbeschreibung		=$row->niveau;
-		//$lvinfo->lehrformen			=$row->lehrformen;
-		$lvinfo->genehmigt			=($row->genehmigt=='t'?true:false);
-		$lvinfo->aktiv				=($row->aktiv=='t'?true:false);
-		$lvinfo->sprache			=$row->sprache;
-		$lvinfo->lehrveranstaltung_id	=$row->lehrfach_nr;
-		//$funktion->insertamum		='';
-		$funktion->insertvon			='SYNC';
-		//$funktion->updateamum		='';
-		//$funktion->updatevon		=$row->updatevon;
 		
-		//schon da?
-		$qry = "SELECT lvinfo_id FROM campus.tbl_lvinfo WHERE lvinfo_id='$lvinfo->lvinfo_id'";
-			if($result1 = pg_query($conn, $qry))
-			{		
-				if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist
-				{
-					if($row1=pg_fetch_object($result1))
-					{
-						//Funktionsdaten updaten
-						$lvinfo->new=false;
-						$lvinfo->lvinfo_id=$row->lvinfo_id;
-					}
-					else 
-					{
-						$error_log.="lvinfo_id von <b>$row->lvinfo_id</b> konnte nicht ermittelt werden\n";
-						$error=true;
-					}
-				}
-				else 
-				{
-					//LVInfo neu anlegen
-					$lvinfo->new=true;
-				}
+		$qry_lv = "SELECT lehrveranstaltung_id FROM lehre.tbl_lehrveranstaltung where ext_id='$row->lehrfach_nr'";
+		if($result_lv = pg_query($conn, $qry_lv))
+		{
+			if($row_lv = pg_fetch_object($result_lv))
+			{
 				
-				if(!$error)
-					if(!$lvinfo->save())
-					{
-						$error_log.=$lvinfo->errormsg."\n";
-						$anzahl_fehler++;
-					}
-					else 
-					{
-						$qry = "UPDATE lehre.tbl_lehrveranstaltung SET lvinfo_id='$lvinfo->lvinfo_id' WHERE ext_id = '$row->lehrfach_nr';";
-						if (!$result2 = pg_query($conn, $qry))
+				$lvinfo->lehrveranstaltung_id = $row_lv->lehrveranstaltung_id;
+				$lvinfo->titel				=$row->lehrfach;
+				$lvinfo->lehrziele			=$row->lehrziele;
+				$lvinfo->lehrinhalte		=$row->lehrinhalte;
+				$lvinfo->voraussetzungen	=$row->voraussetzungen;
+				$lvinfo->unterlagen			=$row->unterlagen;
+				$lvinfo->pruefungsordnung	=$row->pruefungsordnung;
+				$lvinfo->anmerkungen		=$row->anmerkungen;
+				$lvinfo->kurzbeschreibung	=$row->niveau;
+				$lvinfo->methodik			=$row->lehrformen;
+				$lvinfo->genehmigt			=($row->genehmigt=='t'?true:false);
+				$lvinfo->aktiv				=($row->aktiv=='t'?true:false);
+				$lvinfo->sprache			=$row->sprache;
+				$lvinfo->insertamum		='';
+				$lvinfo->insertvon		='';
+				$lvinfo->updateamum		=$row->updateamum;
+				$lvinfo->updatevon		=$row->updatevon;
+				
+				//schon da?
+				$qry = "SELECT * FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$row_lv->lehrveranstaltung_id' AND sprache='$row->sprache'";
+					if($result1 = pg_query($conn, $qry))
+					{		
+						if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist
 						{
-							$error_log.= "Lehrveranstaltung <b>".$row->lehrfach_nr."</b> nicht gefunden\n";
-							$error=true;
+							if($row1=pg_fetch_object($result1))
+							{
+								//Funktionsdaten updaten
+								$lvinfo->new=false;
+							}
+							else 
+							{
+								$error_log.="lvinfo_id von <b>$row->lvinfo_id</b> konnte nicht ermittelt werden\n";
+								$error=true;
+							}
 						}
-						$anzahl_eingefuegt++;
-					}
-				else 
-					$anzahl_fehler++;
-			}	
+						else 
+						{
+							//LVInfo neu anlegen
+							$lvinfo->new=true;
+						}
+						
+						if(!$error)
+							if(!$lvinfo->save())
+							{
+								$error_log.=$lvinfo->errormsg."\n";
+								$anzahl_fehler++;
+							}
+							else 
+							{
+								$anzahl_eingefuegt++;
+							}
+						else 
+							$anzahl_fehler++;
+					}	
+			}
+			else 
+			{
+				$error_log.="lehrveranstaltung_id fuer das Lehrfach $row->lehrfach_nr konnte nicht ermittelt werden\n";
+				$anzahl_fehler++;
+			}
+		}
+		else 
+		{
+			$error_log.="lehrveranstaltung_id fuer das Lehrfach $row->lehrfach_nr konnte nicht ermittelt werden\n";
+			$anzahl_fehler++;
+		}
 	}
 	echo nl2br("abgeschlossen\n\n");
 }

@@ -377,7 +377,7 @@
 						
 						if($islector == true)
 						{
-							echo "<a href=\"lector_choice.php?course_id=$course_id&term_id=$term_id&short=$short\" target=\"_blank\">";
+							echo "<a href=\"lector_choice.php?lvid=$lvid\" target=\"_blank\">";
 							echo "<img border=\"0\" src=\"../../../skin/images/button_ul.jpg\" width=\"67\" height=\"45\"><br>
 								  <strong>Studenten Abgabe</strong>
 								  </a>";

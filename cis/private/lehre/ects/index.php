@@ -492,7 +492,7 @@ border:1px dashed #000000;
 		echo "</td></tr>";
 	   
 	   //FB Leiter auslesen
-	   $qry = "SELECT vorname, nachname FROM tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbl' AND fachbereich_kurzbz in (SELECT distinct fachbereich_kurzbz FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach WHERE lehrveranstaltung_id='5575' AND studiensemester_kurzbz='WS2006' AND tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id)";
+	   $qry = "SELECT distinct vorname, nachname FROM tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbl' AND fachbereich_kurzbz in (SELECT distinct fachbereich_kurzbz FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach WHERE lehrveranstaltung_id='$lv' AND studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN tbl_studiensemester USING(studiensemester_kurzbz) WHERE tbl_lehreinheit.lehrveranstaltung_id='$lv' ORDER BY ende DESC LIMIT 1) AND tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id)";
 	   echo "<tr><td valign='top'><b>FB Leiter</b></td><td>";
 	   if($result=pg_query($conn,$qry))
 	   {
@@ -501,10 +501,11 @@ border:1px dashed #000000;
 	   	   	   echo "$row->vorname $row->nachname<br>";
 	   	   }
 	   }
+
 	   echo "</td></tr>";
 	   
 	   //FB Koordinator auslesen
-		$qry = "SELECT vorname, nachname FROM tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbk' AND fachbereich_kurzbz in (SELECT fachbereich_kurzbz FROM lehre.tbl_lehrfach, lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lv' AND tbl_lehreinheit.lehrfach_id=tbl_lehreinheit.lehrfach_id AND tbl_lehreinheit.studiensemester_kurzbz='$stsem')";
+		$qry = "SELECT distinct vorname, nachname FROM tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbk' AND studiengang_kz='$stg' AND fachbereich_kurzbz in (SELECT fachbereich_kurzbz FROM lehre.tbl_lehrfach, lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lv' AND tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND tbl_lehreinheit.studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN tbl_studiensemester USING(studiensemester_kurzbz) WHERE tbl_lehreinheit.lehrveranstaltung_id='$lv' ORDER BY ende DESC LIMIT 1))";
 	   echo "<tr><td valign='top'><b>FB Koordinator</b></td><td>";
 	   if($result=pg_query($conn,$qry))
 	   {
@@ -513,6 +514,7 @@ border:1px dashed #000000;
 	   	   	   echo "$row->vorname $row->nachname<br>";
 	   	   }
 	   }
+	   
 	   echo "</td></tr>";
 	   
 	   //echo "</table>";
