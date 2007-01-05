@@ -80,6 +80,7 @@ if($result = pg_query($conn_fas, $qry))
 		$person->svnr=$row->svnr;
 		$person->ersatzkennzeichen=$row->ersatzkennzeichen;
 		$person->familienstand=$row->familienstand;
+		$person->anzahlkinder=$row->anzahlderkinder;
 		$person->staatsbuergerschaft=$row->staatsbuergerschaft;
 		$person->geschlecht=strtolower($row->geschlecht);
 		$person->ext_id=$row->person_pk;

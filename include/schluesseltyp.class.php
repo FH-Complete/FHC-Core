@@ -22,7 +22,7 @@
 
 /**
  * Klasse schluesseltyp (FAS-Online)
- * @create 22-12-2006
+ * @create 03-01-2006
  */
 
 class schluesseltyp
@@ -37,9 +37,6 @@ class schluesseltyp
 	var $beschreibung;   		//string
 	var $anzahl; 				//smallint
 	var $kaution;				//numeric(5,2)
-	var $nummer;				//string
-	var $ext_id;				//bigint
-
 	
 	/**
 	 * Konstruktor
@@ -93,23 +90,39 @@ class schluesseltyp
 	function save()
 	{		
 		
-		
-		$qry='INSERT INTO tbl_schluesseltyp (schluesseltyp, beschreibung, anzahl, kaution, nummer, ext_id) VALUES('.
-			$this->addslashes($this->schluesseltyp).', '.
-			$this->addslashes($this->beschreibung).', '.
-			$this->addslashes($this->anzahl).', '.
-			$this->addslashes($this->kaution).', '.
-			$this->addslashes($this->nummer).', '.
-			$this->addslashes($this->ext_id).');';
-		
-
-		if(pg_query($this->conn,$qry))
+		$qry1='SELECT * FROM tbl_schluesseltyp WHERE beschreibung='.$this->addslashes($this->beschreibung).';';
+		if($result1=pg_query($this->conn,$qry1))
 		{
-			return true;	
+			if(pg_num_rows($result1)>0) //eintrag gefunden
+			{
+				if($row1 = pg_fetch_object($result1))
+				{
+					$qry='UPDATE tbl_schluesseltyp SET '.
+					'anzahl =anzahl+'.$this->anzahl.' '.
+					'WHERE beschreibung='.$this->addslashes($this->beschreibung).';';
+				}
+			}
+			else 
+			{
+				$qry='INSERT INTO tbl_schluesseltyp (schluesseltyp, beschreibung, anzahl, kaution) VALUES('.
+					$this->addslashes($this->schluesseltyp).', '.
+					$this->addslashes($this->beschreibung).', '.
+					$this->addslashes($this->anzahl).', '.
+					$this->addslashes($this->kaution).');';
+			}	
+			if(pg_query($this->conn,$qry))
+			{
+				return true;	
+			}
+			else
+			{			
+				$this->errormsg = 'Fehler beim Speichern des Schluesseltypen-Datensatzes: '.$this->schluesseltyp.' '.$qry;
+				return false;
+			}	
 		}
 		else
 		{			
-			$this->errormsg = 'Fehler beim Speichern des Schluesseltypen-Datensatzes:'.$this->schluesseltyp.' '.$qry;
+			$this->errormsg = 'Fehler beim Zugriff auf den Schluesseltypen-Datensatz: '.$this->schluesseltyp.' '.$qry;
 			return false;
 		}
 	}
