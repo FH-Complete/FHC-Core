@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2007 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -72,18 +72,12 @@ if($result = pg_query($conn_fas, $qry))
 		$error=false;
 		$schluesseltyp				=new schluesseltyp($conn);
 		$schluesseltyp->beschreibung		=$row->name;
-		$schluesseltyp->nummer			=$row->nummer;
-		$schluesseltyp->anzahl			=$row->anzahl;
-		$schluesseltyp->kaution			=$row->betrag;
-		$schluesseltyp->ext_id			=$row->schluessel_pk;
+		$schluesseltyp->anzahl			=$row->anzahl==''?'0':$row->anzahl;
+		$schluesseltyp->kaution			=$row->betrag==''?'0':$row->betrag;
 
 		if($row->name=='Gaderobenschlüssel')
 		{
 			$schluesseltyp->schluesseltyp='Gaderobe';
-		}
-		elseif($row->name=='Zutrittskarte')
-		{
-			$schluesseltyp->schluesseltyp='Zutritt'.$row->nummer;
 		}
 		else
 		{
@@ -99,6 +93,19 @@ if($result = pg_query($conn_fas, $qry))
 		}
 		else 
 		{
+			
+			//überprüfen, ob sync-eintrag schon vorhanden
+			$qryz="SELECT * FROM tbl_syncschluesseltyp WHERE fas_typ='$row->schluesseltyp_pk' AND portal_typ='$schluesseltyp->schluesseltyp'";
+			if($resultz = pg_query($conn, $qryz))
+			{
+				if(pg_num_rows($resultz)==0) //wenn dieser eintrag noch nicht vorhanden ist
+				{
+					$qry='INSERT INTO tbl_syncschluesseltyp (fas_typ, portal_typ)'.
+						'VALUES ('.$row->schluesseltyp_pk.', '.$person->schluesseltyp.');';
+					$resulti = pg_query($conn, $qry);
+				}
+					}
+			
 			$anzahl_eingefuegt++;
 		}		
 	}

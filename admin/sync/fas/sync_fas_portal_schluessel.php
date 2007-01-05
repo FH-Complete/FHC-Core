@@ -90,7 +90,7 @@ if($result = pg_query($conn_fas, $qry))
 				{ 
 					$schluessel->person_id=$row1->person_portal;
 					//Schlüsseltyp feststellen
-					$qry2="SELECT schluesseltyp FROM tbl_schluesseltyp WHERE ext_id=".$row->schluessel_fk.";";
+					$qry2="SELECT schluesseltyp FROM tbl_schluesseltyp WHERE schluesseltyp=".$row->name.";";
 					if($result2 = pg_query($conn, $qry2))
 					{
 						if(pg_num_rows($result2)>0) //eintrag gefunden
@@ -99,7 +99,7 @@ if($result = pg_query($conn_fas, $qry))
 							{ 
 								$schluessel->schluesseltyp=$row2->schluesseltyp;
 								//Insert oder Update
-								$qry3="SELECT schluessel_id FROM tbl_schluessel WHERE ext_id=".$row->schluessel_fk.";";
+								$qry3="SELECT schluessel_id FROM tbl_schluessel WHERE beschreibung=".$row->name.";";
 								if($result3 = pg_query($conn, $qry3))
 								{
 									if(pg_num_rows($result3)>0) //eintrag gefunden
