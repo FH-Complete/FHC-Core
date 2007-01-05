@@ -71,6 +71,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		$lehrveranstaltung->planfaktor		='1.0';
 		$lehrveranstaltung->planlektoren		='1';
 		$lehrveranstaltung->planpersonalkosten	='80';
+		$lehrveranstaltung->sprache = $row->sprache;
 		//$lehrveranstaltung->insertamum		='';
 		$lehrveranstaltung->insertvon		='SYNC';
 		//$lehrveranstaltung->updateamum	='';

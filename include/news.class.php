@@ -115,7 +115,7 @@ class news
 			$datum = 'AND datum<=now()';
 			
 		if($studiengang_kz==0)
-			$qry = "SELECT * FROM campus.tbl_news WHERE $interval studiengang_kz=".$studiengang_kz." AND semester".($semester!=''?"='$semester'":' is null')." $datum ORDER BY datum DESC, updateamum DESC;";
+			$qry = "SELECT * FROM campus.tbl_news WHERE $interval studiengang_kz=".$studiengang_kz." ".($semester!=''?"":'AND semester is null')." $datum ORDER BY datum DESC, updateamum DESC;";
 		else 
 			$qry = "SELECT * FROM campus.tbl_news WHERE $interval ((studiengang_kz=$studiengang_kz AND semester=$semester) OR (studiengang_kz=$studiengang_kz AND semester=0) OR (studiengang_kz=0 AND semester=$semester) OR (studiengang_kz=0 and semester is null)) $datum ORDER BY datum DESC, updateamum DESC";
 		

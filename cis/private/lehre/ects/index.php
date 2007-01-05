@@ -149,7 +149,7 @@ border:1px dashed #000000;
 	* @param $qry Query anweisung
 	*        $uid Username
 	* @return true wenn ok false wenn fehler beim oeffnen
-	*/    
+	*/
 	function WriteLog($qry,$uid)
 	{
 	
@@ -166,25 +166,6 @@ border:1px dashed #000000;
 
 	if(isset($status))
 	{
-		/*Sprachaenderungen nur noch von Assistenz
-		if($status=='sprachechange' && isset($lv) && $lv!='' && isset($sprache) && $sprache!='') //Aenderung des DropDown Menues Sprache
-		{
-			//Bei der aenderung dieses DropDown Menues wird die Sprache in der 
-			//Tabelle LV geaendert
-			
-			$qry = "UPDATE tbl_lehrveranstaltung SET sprache = '".addslashes($sprache)."' WHERE lehrveranstaltung_id = '".addslashes($lv)."'";
-			if(!pg_query($conn,$qry))
-			{
-				   $errormsg.= "Fehler beim schreiben der Sprache in die Tabelle Lehrfach";
-			}   	   	   
-			else 
-			{
-				   //Schreiben des Log Files
-				   if(!WriteLog($qry,$user))
-				      $errormsg.= "Fehler beim Schreiben des Log Files.";
-			}
-		}
-		*/
    	    
 		if($status=='save') // Beim druecken auf "Speichern"
 		{
@@ -526,10 +507,7 @@ border:1px dashed #000000;
 	   echo "<input type='hidden' name='lv' value='$lv'>";
 	   echo "<input type='hidden' name='status' value=''>";
 
-	   echo "<input type='hidden' name='lehrende' size='30' value=\"".(isset($lehrende)?str_replace("\"","&quot;",stripslashes($lehrende)):'')."\">";
-	   //echo "<table width='30%'  border='0' cellspacing='0' cellpadding='0'>";
-		//echo "<tr><td><b>Lehrende</b></td><td><input type='text' name='lehrende' size='30' value=\"".str_replace("\"","&quot;",stripslashes($lehrende))."\"></td></tr>";
-		echo "</td></tr>";
+	   echo "</td></tr>";
 	   //Sprache ausgeben   
 	   echo "<tr><td><b>Unterrichtssprache</b></td><td>$lv_obj->sprache";	   
 	   echo "</td></tr></table><br><br>";

@@ -1,4 +1,24 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
 	require_once('../../config.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/studiengang.class.php');
@@ -35,8 +55,7 @@
 		$news_message = chop(str_replace("\r\n", "<br>", $_POST['txtNewsMessage']));
 		
 		if($author != "" && $title != "" && $news_message != "" && isset($course_id) && isset($term_id))
-		{
-			//Einfache Hochkomma Konvertieren
+		{	
 			if(isset($news_id) && $news_id != "")
 			{
 				$news_obj = new news($conn);
@@ -47,6 +66,7 @@
 				
 				$news_obj->semester = $term_id;
 				$news_obj->betreff = $title;
+				$news_obj->datum = $datum;
 				$news_obj->text = $news_message;
 				$news_obj->updatevon = $user;
 				$news_obj->news_id = $news_id;
@@ -74,6 +94,7 @@
 				$news_obj->studiengang_kz = $course_id;
 				$news_obj->semester = $term_id;
 				$news_obj->betreff = $title;
+				$news_obj->datum = $datum;
 				$news_obj->text = $news_message;
 				$news_obj->updatevon = $user;
 				$news_obj->new=true;
@@ -246,6 +267,7 @@
 			$verfasser = '';
 			$betreff = '';
 			$text = '';
+			$datum = '';
 				
 			if(isset($news_id) && $news_id != "")
 			{
@@ -253,6 +275,7 @@
 				$verfasser = $news_obj->verfasser;
 				$betreff = $news_obj->betreff;
 				$text = $news_obj->text;
+				$datum = $news_obj->datum;
 				echo 'Eintrag &auml;ndern';
 			}
 			else
@@ -299,22 +322,14 @@
 						{
 							if($course_id == $row_course->studiengang_kz)
 							{
-								if($row_course->studiengang_kz == 0)
-								{
-									echo '<option value="pinboard_entry.php?course_id='.$row_course->studiengang_kz.'&term_id='.$term_id.'" selected>Alle Studieng&auml;nge</option>';
-								}
-								else
+								if($row_course->studiengang_kz != 0)
 								{
 									echo '<option value="pinboard_entry.php?course_id='.$row_course->studiengang_kz.'&term_id='.$term_id.'" selected>'.$row_course->kurzbz.' ('.$row_course->kurzbzlang.')</option>';
 								}
 							}
 							else
 							{
-								if($row_course->studiengang_kz == 0)
-								{
-									echo '<option value="pinboard_entry.php?course_id='.$row_course->studiengang_kz.'&term_id='.$term_id.'">Alle Studieng&auml;nge</option>';
-								}
-								else
+								if($row_course->studiengang_kz != 0)
 								{
 									echo '<option value="pinboard_entry.php?course_id='.$row_course->studiengang_kz.'&term_id='.$term_id.'">'.$row_course->kurzbz.' ('.$row_course->kurzbzlang.')</option>';
 								}
@@ -334,6 +349,7 @@
 					}
 				?>
 			  	</select>
+			  	Sichtbar ab <input type="text" class="TextBox" name="datum" size="10" value="<?php if(isset($news_id) && $news_id != "") echo date('d.m.Y',strtotime(strftime($datum))); else echo date('d.m.Y'); ?>"></td> 
 			  </td>
 		    </tr>
 			<tr>

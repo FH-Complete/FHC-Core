@@ -21,54 +21,69 @@
  */
 	require_once('../../config.inc.php');
 	require_once('../../../include/functions.inc.php');
-    
+	require_once('../../../include/news.class.php');
+        
     //Connection Herstellen
     if(!$sql_conn = pg_pconnect(CONN_STRING))
-       die('Fehler beim oeffnen der Datenbankverbindung');
-        
-	$user = get_uid();
+       die("Fehler beim oeffnen der Datenbankverbindung");
+
 	
-	if(check_lektor($user,$sql_conn))
-       $is_lector=true;
-	
-	$sql_query = "SELECT DISTINCT kurzbzlang FROM public.tbl_studiengang WHERE studiengang_kz='$course_id'";
-					
-	$result = pg_query($sql_conn, $sql_query);
-	$row_stg_short = pg_fetch_object($result, 0);
+	function print_news($sql_conn)
+	{
+		$news_obj = new news($sql_conn);
+		$news_obj->getnews(MAXNEWSALTER,'0','0');
+		
+		$zaehler=0;
+		
+		foreach ($news_obj->result as $row)
+		{
+			$zaehler++;
+			if($row->datum!='')
+				$datum = date('d.m.Y',strtotime(strftime($row->datum)));
+			else 	
+				$datum='';
+			
+			if($row->semester == 0)
+			{
+				echo '<p><small>'.$datum.' - '.$row->verfasser.' - [Allgemein]</small><br><b>'.$row->betreff.'</b><br>';
+			}
+			else
+			{
+				echo '<p><small>'.$datum.' - '.$row->verfasser.' - </small><br><b>'.$row->betreff.'</b><br>';
+			}
+				
+			echo "$row->text</p>";
+		}
+		
+		if($zaehler==0)
+			echo '<p>Zur Zeit gibt es keine aktuellen News!</p>';
+	}
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
 </head>
 
-<frameset rows="375,*" cols="*" framespacing="0"" frameborder="NO" border="0">
-  <frame src="pinboard_entry.php?course_id=<?php echo $course_id; ?>&term_id=<?php echo $term_id; ?>" name="news_entry">
-  <frame src="pinboard_show.php" name="news_window">
-</frameset>
-<noframes><body>
+<body>
 <table width="100%"  border="0" cellspacing="0" cellpadding="0">
   <tr>
     <td width="10">&nbsp;</td>
     <td><table width="100%"  border="0" cellspacing="0" cellpadding="0">
       <tr>
-        <td class="ContentHeader"><font class="ContentHeader">&nbsp;Lektorenbereich - Pinboardverwaltung <?php echo $row_stg_short->kurzbzlang.', '.$term_id.'. Semester'; ?></td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
+        <td class="ContentHeader" width="70%"><font class="ContentHeader">&nbsp;Pinboard</font></td>
       </tr>
 	  <tr>
-	  	<td>
-		<?php	
-			if(!$is_lector)
-				die('Sie haben leider keine Berechtigung f&uuml;r diese Seite.');
-		?>
-		&nbsp;</td>
+	  	<td>&nbsp;</td>
+	  </tr>
+	  <tr>
+	  	<td valign="top"><?php print_news($sql_conn); ?></td>
 	  </tr>
     </table></td>
 	<td width="30">&nbsp;</td>
   </tr>
 </table>
-</body></noframes>
+</body>
 </html>

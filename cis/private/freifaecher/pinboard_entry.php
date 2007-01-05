@@ -21,110 +21,69 @@
  */
 	require_once('../../config.inc.php');
 	require_once('../../../include/functions.inc.php');
-	require_once('../../../include/benutzerberechtigung.class.php');
 	require_once('../../../include/news.class.php');
-    
+        
     //Connection Herstellen
     if(!$sql_conn = pg_pconnect(CONN_STRING))
-       die("Fehler beim öffnen der Datenbankverbindung");
-    
+       die('Fehler beim oeffnen der Datenbankverbindung');
+        
 	$user = get_uid();
 	
-	$rechte = new benutzerberechtigung($sql_conn);
-    $rechte->getBerechtigungen($user);
-    
 	if(check_lektor($user,$sql_conn))
        $is_lector=true;
-	
-	$sql_query = "SELECT count(*) as anzahl FROM tbl_benutzerfunktion WHERE uid='$user' AND funktion_kurzbz='infr'";
-				
-	if(!$row=pg_fetch_object(pg_query($sql_conn, $sql_query)))
-		die('Fehler beim lesen aus der Datenbank');
-	
-	if($row->anzahl>0 || $rechte->isBerechtigt('admin'))
-		$berechtigt=true;
-	else 
-		$berechtigt=false;
-		
-	if(isset($_GET['news_id']))
-		$news_id=$_GET['news_id'];
-	else 
-		unset($news_id);
+    else 
+    	die('Sie haben keine Berechtigung fuer diesen Bereich');
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <?php
-	if($berechtigt && isset($news_submit) && (!isset($message_sent) || $message_sent == "no"))
+	if(isset($news_submit) && (!isset($message_sent) || $message_sent == "no"))
 	{		
-		$author = chop($txtAuthor);
-		$title = chop($txtTitle);
+		$author = chop($_POST['txtAuthor']);
+		$title = chop($_POST['txtTitle']);
+		$datum = $_POST['datum'];
 		$news_message = chop(str_replace("\r\n", "<br>", $txtNewsMessage));
 		
 		if($author != "" && $title != "" && $news_message != "")
 		{
+			$news_obj = new news($sql_conn);
+				
+			$news_obj->verfasser = $author;
+			$news_obj->uid = $user;
+			$news_obj->studiengang_kz = '0';
+			
+			$news_obj->semester = '0';
+			$news_obj->betreff = $title;
+			$news_obj->text = $news_message;
+			$news_obj->datum = $datum;
+			$news_obj->updatevon = $user;
+			
 			if(isset($news_id) && $news_id != "")
 			{
-				$news = new news($sql_conn);
-				
-				$news->news_id = $news_id;
-				$news->betreff = $title;
-				$news->verfasser = $author;
-				$news->text = $news_message;
-				$news->studiengang_kz = '0';
-				$news->semester = null;
-				$news->datum = $datum;
-				$news->uid=$user;
-				$news->updatevon=$user;
-				$news->updateamum=date('Y-m-d');
-				$news->new=false;
-				
-				if($news->save())
-				{				
-					echo "<script language=\"JavaScript\">";
-					echo "	document.location.href = 'news_entry.php' + \"?message_sent=yes&changed=yes\";";
-					echo "</script>";
-				}
-				else 
-				{					
-					echo "<script language=\"JavaScript\">";
-					echo "	document.location.href = 'news_entry.php' + \"?message_sent=no\";";
-					echo "</script>";
-				}
+				$news_obj->new=false;
+				$news_obj->news_id = $news_id;
 			}
 			else
+				$news_obj->new=true;
+
+			if($news_obj->save())
 			{
-				$news = new news($sql_conn);
-				
-				$news->betreff = $title;
-				$news->verfasser = $author;
-				$news->text = $news_message;
-				$news->studiengang_kz = '0';
-				$news->updatevon=$user;
-				$news->semester = null;
-				$news->uid = $user;
-				$news->updateamum=date('Y-m-d');
-				$news->datum=$datum;
-				$news->new=true;
-				
-				if($news->save())
-				{				
-					echo "<script language=\"JavaScript\">";
-					echo "	document.location.href = 'news_entry.php' + \"?message_sent=yes&changed=yes\";";
-					echo "</script>";
-				}
-				else 
-				{
-					//echo "test:".$news->errormsg;
-					echo "<script language=\"JavaScript\">";
-					echo "	document.location.href = 'news_entry.php' + \"?message_sent=no\";";
-					echo "</script>";
-				}
+				echo '<script language="JavaScript">';
+				echo "	document.location.href = 'pinboard_entry.php?&message_sent=yes';";
+				echo '</script>';
+			}
+			else 
+			{
+				echo $news_obj->errormsg;
+				//echo "<script language=\"JavaScript\">";
+				//echo "	document.location.href = 'pinboard_entry.php?&message_sent=no';";
+				//echo "</script>";
 			}
 		}
 		else
 		{
 			echo "<script language=\"JavaScript\">";
-			echo "	document.location.href = 'news_entry.php' + \"?message_sent=no\";";
+			echo "	document.location.href = 'pinboard_entry.php?message_sent=no';";
 			echo "</script>";
 		}
 		
@@ -146,6 +105,12 @@
 	}
 
 </script>
+
+<?php
+	echo "<script language=\"JavaScript\">";
+	echo "	parent.news_window.location.href = 'pinboard_show.php'";
+	echo "</script>";
+?>
 </head>
 
 <body onLoad="focusFirstElement();">
@@ -155,17 +120,13 @@
     <td><form method="post" name="NewsEntry">
 	<table width="100%"  border="0" cellspacing="0" cellpadding="0">
       <tr>
-        <td class="ContentHeader"><font class="ContentHeader">&nbsp;Verwaltungstools - Newsverwaltung</font></td>
+        <td class="ContentHeader"><font class="ContentHeader">&nbsp;Lektorenbereich - Pinboardverwaltung</font></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
       </tr>
 	  <tr>
-	  	<?php	
-			if(!$berechtigt)
-			{
-				die("<td>Sie haben keine Berechtigung f&uuml;r diese Seite.</td>");
-			}
+	  	<?php		
 			
 			if(isset($message_sent) && $message_sent == "yes")
 			{
@@ -173,7 +134,7 @@
 				{
 					echo "  <td>";
 					echo "<script language=\"JavaScript\">";
-					echo "	parent.news_window.location.href = 'news_show.php'";
+					echo "	parent.news_window.location.href = 'pinboard_show.php'";
 					echo "</script>";
 					echo "</td>";
 					echo "</tr>";
@@ -187,7 +148,7 @@
 				{
 					echo "  <td>";
 					echo "<script language=\"JavaScript\">";
-					echo "	parent.news_window.location.href = 'news_show.php'";
+					echo "	parent.news_window.location.href = 'pinboard_show.php'";
 					echo "</script>";
 					echo "</td>";
 					echo "</tr>";
@@ -204,8 +165,8 @@
 			{
 				echo "<td>&nbsp;</td>";
 				echo "</tr>";
-				echo "  <td><font class=\"headline\">Die Neuigkeit wurde NICHT eingetragen!</font><br>";
-				echo "<font class=\"subline\">Bitte versuchen Sie es erneut</font></td>";
+				echo "  <td><font class=\"headline\">Die Neuigkeit wurde nicht eingetragen!</font><br>";
+				echo "<font class=\"subline\">Es wurden nicht alle erforderlichen Felder ausgef&uuml;llt.</font></td>";
 				echo "</tr>";
 				
 				exit;
@@ -215,7 +176,13 @@
 			
 			if(isset($news_id) && $news_id != "")
 			{
-				$news = new news($sql_conn, $news_id);
+				$news_obj = new news($sql_conn, $news_id);
+				
+				$verfasser = $news_obj->verfasser;
+				$betreff = $news_obj->betreff;
+				$text = $news_obj->text;
+				$datum = $news_obj->datum;
+				
 				echo 'Eintrag &auml;ndern';
 			}
 			else
@@ -234,12 +201,16 @@
 		  <table width="100%"  border="0" cellspacing="0" cellpadding="0">
 		    <tr>
 			  <td width="65">Verfasser:</td>
-			  <td><input type="text" class="TextBox" name="txtAuthor" size="30"<?php if(isset($news_id) && $news_id != "") echo ' value="'.$news->verfasser.'"'; ?>></td>
-			  <td>Sichtbar ab: <input type="text" class="TextBox" name="datum" size="10" value="<?php if(isset($news_id) && $news_id != "") echo date('d.m.Y',strtotime(strftime($news->datum))); else echo date('d.m.Y'); ?>"></td>
+			  <td width="218"><input type="text" class="TextBox" name="txtAuthor" size="30"<?php if(isset($news_id) && $news_id != "") echo ' value="'.$verfasser.'"'; ?>>
+			  </td>
+			  <td width="60">&nbsp;</td>
+			  <td>&nbsp;Sichtbar ab <input type="text" class="TextBox" name="datum" size="10" value="<?php if(isset($news_id) && $news_id != "") echo date('d.m.Y',strtotime(strftime($datum))); else echo date('d.m.Y'); ?>"></td>
 		    </tr>
 			<tr>
 			  <td>Titel:</td>
-			  <td><input type="text" class="TextBox" name="txtTitle" size="30"<?php if(isset($news_id) && $news_id != "") echo ' value="'.$news->betreff.'"'; ?>></td>
+			  <td><input type="text" class="TextBox" name="txtTitle" size="30"<?php if(isset($news_id) && $news_id != "") echo ' value="'.$betreff.'"'; ?>></td>
+			  <td><strong><font color="#ff0000">Hinweis:</font></strong></td>
+			  <td>Bitte beachten Sie, dass im Titel auch das jeweilige Freifach genannt wird. </td>
 		    </tr>
 		</table>
 		</td>
@@ -249,7 +220,7 @@
 	  </tr>
 	  <tr>
 	  	<td>Bitte geben Sie hier Ihre Nachricht ein:<br>
-			<textarea class="TextBox" style="width: 99%; heigth: 166px" name="txtNewsMessage" rows="10" cols="70" maxlength="2000"><?php if(isset($news_id) && $news_id != "") echo str_replace("<br>", "\r\n", $news->text); ?></textarea></td>
+			<textarea class="TextBox" style="width: 99%; heigth: 166px" name="txtNewsMessage" rows="10" cols="70" maxlength="2000"><?php if(isset($news_id) && $news_id != "") echo str_replace("<br>", "\r\n", $text); ?></textarea></td>
 	  </tr>
 	  <tr>
 	  	<td nowrap>
@@ -258,7 +229,7 @@
 		  <?php
 		  if(isset($news_id) && $news_id != "")
 		  {
-		  	echo "<input type=\"reset\" name=\"btnCancel\" value=\"Abbrechen\" onClick=\"document.location.href='news_entry.php';\"></td>";
+		  	echo "<input type=\"reset\" name=\"btnCancel\" value=\"Abbrechen\" onClick=\"document.location.href='pinboard_entry.php';\"></td>";
 		  }
 		  else
 		  {

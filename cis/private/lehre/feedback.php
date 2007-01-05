@@ -32,8 +32,8 @@
 	if(isset($POST["feedback_message"]))
 	   $feedback_message=$POST["feedback_message"];
 	   
-	if(isset($feedback_message))	
-		echo $feedback_message;  
+//	if(isset($feedback_message))	
+//		echo $feedback_message;  
 
 ?>
 
