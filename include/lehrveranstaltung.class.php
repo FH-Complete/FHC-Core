@@ -161,9 +161,10 @@ class lehrveranstaltung
 	function load_lva($studiengang_kz, $semester=null, $lehreverzeichnis=null, $lehre=null)
 	{						
 		//Variablen pruefen
-		if(!is_numeric($studiengang_kz) || $studiengang_kz =='')
+		
+		if(!is_numeric($studiengang_kz) || $studiengang_kz=='')
 		{
-			$this->errormsg = 'studiengang_id muss eine gueltige Zahl sein';
+			$this->errormsg = 'studiengang_kz muss eine gueltige Zahl sein';
 			return false;
 		}
 		if($semester!=null && (!is_numeric($semester) || $semester==''))
@@ -187,7 +188,7 @@ class lehrveranstaltung
 		if($lehre!=null)
 			$qry .= " AND lehre=".($lehre?'true':'false');
 			
-		$qry .= " ORDER BY bezeichnung";
+		$qry .= " AND lehreverzeichnis<>'' ORDER BY bezeichnung";
 		
 		//Datensaetze laden
 		if(!$res = pg_query($this->conn, $qry))

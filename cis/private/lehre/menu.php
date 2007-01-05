@@ -247,7 +247,8 @@ function js_toggle_container(conid)
 		<?php
 			$lv_obj = new lehrveranstaltung($sql_conn);
 			
-			$lv_obj->load_lva($course_id,$term_id, null, true);
+			if(!$lv_obj->load_lva($course_id,$term_id, null, true))
+				echo "<tr><td>$lv_obj->errormsg</td></tr>";
 						
 			foreach($lv_obj->lehrveranstaltungen as $row)
 			{

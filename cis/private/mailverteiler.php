@@ -77,7 +77,7 @@
 	      </table><br><br>
 		   	<strong><font color="#ff0000">Hinweis: </font></strong>Diese Verteiler d&uuml;rfen nur f&uuml;r Fachhochschul-relevante Zwecke verwendet werden!
 		   		<br>
-            <strong><font color="#ff0000">Info: </font></strong>Infos bez&uuml;glich  <a href="Mailverteiler.pdf" target="_blank">Berechtigungskonzept</a> Mailverteiler, <a href="bedienung_mailverteiler.pdf" target="_blank">Bedienungsanleitung</a> Mailverteiler
+            <strong><font color="#ff0000">Info: </font></strong>Infos bez&uuml;glich  <a href="../cisdocs/Mailverteiler.pdf" target="_blank">Berechtigungskonzept</a> Mailverteiler, <a href="../cisdocs/bedienung_mailverteiler.pdf" target="_blank">Bedienungsanleitung</a> Mailverteiler
             <br>
 <?php
 		$stg_obj = new studiengang($conn);

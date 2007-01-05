@@ -25,16 +25,11 @@
     //Connection Herstellen
     if(!$sql_conn = pg_pconnect(CONN_STRING))
        die('Fehler beim oeffnen der Datenbankverbindung');
-        
+    
 	$user = get_uid();
 	
 	if(check_lektor($user,$sql_conn))
        $is_lector=true;
-	
-	$sql_query = "SELECT DISTINCT kurzbzlang FROM public.tbl_studiengang WHERE studiengang_kz='$course_id'";
-					
-	$result = pg_query($sql_conn, $sql_query);
-	$row_stg_short = pg_fetch_object($result, 0);
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html>
@@ -44,7 +39,7 @@
 </head>
 
 <frameset rows="375,*" cols="*" framespacing="0"" frameborder="NO" border="0">
-  <frame src="pinboard_entry.php?course_id=<?php echo $course_id; ?>&term_id=<?php echo $term_id; ?>" name="news_entry">
+  <frame src="pinboard_entry.php" name="news_entry" scrolling="NO">
   <frame src="pinboard_show.php" name="news_window">
 </frameset>
 <noframes><body>
@@ -53,7 +48,7 @@
     <td width="10">&nbsp;</td>
     <td><table width="100%"  border="0" cellspacing="0" cellpadding="0">
       <tr>
-        <td class="ContentHeader"><font class="ContentHeader">&nbsp;Lektorenbereich - Pinboardverwaltung <?php echo $row_stg_short->kurzbzlang.', '.$term_id.'. Semester'; ?></td>
+        <td class="ContentHeader"><font class="ContentHeader">&nbsp;Lektorenbereich - Pinboardverwaltung</td>
       </tr>
       <tr>
         <td>&nbsp;</td>
@@ -62,7 +57,9 @@
 	  	<td>
 		<?php	
 			if(!$is_lector)
+			{
 				die('Sie haben leider keine Berechtigung f&uuml;r diese Seite.');
+			}
 		?>
 		&nbsp;</td>
 	  </tr>
