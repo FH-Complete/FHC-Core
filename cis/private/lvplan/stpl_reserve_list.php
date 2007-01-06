@@ -1,15 +1,20 @@
 <?php
-	include('../config.inc.php');
+	require_once('../../config.inc.php');
+
 	$uid=$REMOTE_USER;
 	//$uid='pam';
 
-	if (isset($_GET[id]))
-		$id=$_GET[id];
+	if (isset($_GET['id']))
+		$id=$_GET['id'];
 
-	if (!$conn = @pg_pconnect(CONN_STRING))
-	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
+	// Datenbankverbindung
+	if (!$conn = pg_pconnect(CONN_STRING))
+		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+	// Datums Format und search_path
+	if(!$erg_std=pg_query($conn, "SET datestyle TO ISO; SET search_path TO campus;"))
+		die(pg_last_error($conn));
 
-	   	if (isset($id))
+	if (isset($id))
 	{
 		$sql_query="DELETE FROM tbl_reservierung WHERE reservierung_id=$id";
 		$erg=pg_exec($conn, $sql_query);
@@ -27,7 +32,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<title>Reservierungsliste</title>
-	<link rel="stylesheet" href="../../skin/cis.css" type="text/css">
+	<link rel="stylesheet" href="../../../skin/cis.css" type="text/css">
 </head>
 <body>
 	<H2><table width="100%" border="0" cellpadding="0" cellspacing="0">

@@ -271,3 +271,9 @@ h4
 	cursor: hand; 
 	text-decoration: none; 
 }
+
+#GlobalMenu
+{
+	margin-top: 3px;
+	text-align: right;
+}
