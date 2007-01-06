@@ -9,6 +9,18 @@
  * Update: 			10.9.2005 von Christian Paminger
  *****************************************************************************/
 
+require_once('../../config.inc.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/wochenplan.class.php');
+
+// Datenbankverbindung
+if (!$conn = pg_pconnect(CONN_STRING))
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+// Datums Format und search_path
+if(!$erg_std=pg_query($conn, "SET datestyle TO ISO; SET search_path TO campus;"))
+	die(pg_last_error($conn));
+
+
 //Startwerte setzen
 $db_stpl_table='stundenplan';
 $type=$_GET['type'];
@@ -23,6 +35,7 @@ $begin=$_GET['begin'];
 $ende=$_GET['ende'];
 $format=$_GET['format'];
 $version=(isset($_GET['version'])?$_GET['version']:2);
+$target=(isset($_GET['target'])?$_GET['target']:null);
 
 // UID bestimmen
 if (!isset($REMOTE_USER))
@@ -77,24 +90,12 @@ else
 	echo '<head>';
 	echo '<title>Kalender</title>';
 	echo '<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">';
-	echo '<link rel="stylesheet" href="../../skin/cis.css" type="text/css">';
+	echo '<link rel="stylesheet" href="../../../skin/cis.css" type="text/css">';
 	echo '</head>';
 	echo '<body>';
 }
 
 
-// Jetzt gehts los
-include('../config.inc.php');
-include('../../include/functions.inc.php');
-require('../../include/stundenplan.class.php');
-
-writeCISlog('START');
-
-if (!$conn = @pg_pconnect(CONN_STRING))
-{
-	writeCISlog('STOP');
-   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
-}
 if (!isset($begin) || !isset($ende))
 	// datum holen falls nicht gesetzt
 	if (!isset($_GET['semesterplan']))
@@ -147,7 +148,7 @@ if (!isset($pers_uid))
 		$pers_uid=check_lektor($uid, $conn);
 
 // Stundenplanobjekt erzeugen
-$stdplan=new stundenplan($type,$conn);
+$stdplan=new wochenplan($type,$conn);
 $stdplan->crlf=$crlf;
 
 // Zusaetzliche Daten laden
@@ -214,5 +215,4 @@ else
 	echo '<P>Fehler und Feedback bitte an <A href="mailto:stpl@technikum-wien.at">Stundenplan</A></P>';
 	echo '</body></html>';
 }
-writeCISlog('STOP');
 ?>
