@@ -13,13 +13,13 @@ if (!isset($REMOTE_USER))
 
 $uid=$REMOTE_USER;
 
-if (!$conn = @pg_pconnect(CONN_STRING))
+if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Fehler: Es konnte keine Verbindung zum Server aufgebaut werden!';
 //$error_msg.=loadVariables($conn,$REMOTE_USER);
 // Stundentafel abfragen
-$sql_query="SET datestyle TO ISO;SELECT * FROM tbl_stunde ORDER BY stunde";
-if(!$result_stunde=pg_exec($conn, $sql_query))
-	die(pg_last_error($this->conn));
+$sql_query="SET datestyle TO ISO; SELECT * FROM lehre.tbl_stunde ORDER BY stunde;";
+if(!$result_stunde=pg_query($conn, $sql_query))
+	die(pg_last_error($conn));
 $num_rows_stunde=pg_numrows($result_stunde);
 ?>
 
@@ -54,7 +54,7 @@ $num_rows_stunde=pg_numrows($result_stunde);
 			tooltiptext="1 Woche zur??ck"
 			image="../skin/images/left.png"
 			oncommand="onJumpDate(-1);"
-		/>		
+		/>
 		<toolbarbutton id="toolbarbuttonJumpWeekNow"
 			tooltiptext="zur aktuellen KW"
 			label="KW"

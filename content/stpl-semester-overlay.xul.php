@@ -16,7 +16,7 @@ if (!$conn = @pg_pconnect(CONN_STRING))
    	$error_msg='Fehler: Es konnte keine Verbindung zum Server aufgebaut werden!';
 //$error_msg.=loadVariables($conn,$REMOTE_USER);
 // Stundentafel abfragen
-$sql_query="SET datestyle TO ISO;SELECT * FROM tbl_stunde ORDER BY stunde";
+$sql_query="SET datestyle TO ISO; SELECT * FROM lehre.tbl_stunde ORDER BY stunde";
 if(!$result_stunde=pg_exec($conn, $sql_query))
 	die(pg_last_error($this->conn));
 $num_rows_stunde=pg_numrows($result_stunde);

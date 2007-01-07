@@ -8,7 +8,7 @@ include('../include/functions.inc.php');
 include('../include/berechtigung.class.php');
 include('../include/lehrveranstaltung.class.php');
 include('../include/zeitwunsch.class.php');
-include('../include/stundenplan.class.php');
+include('../include/wochenplan.class.php');
 
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 //echo $_SERVER[REQUEST_URI];
@@ -35,40 +35,55 @@ $lva_stpl_view=VIEW_BEGIN.'lva_'.$db_stpl_table;
 
 
 // Variablen uebernehmen
-if (isset($_GET[aktion]))
-	$aktion=$_GET[aktion];
-if (isset($_GET[semesterplan]))
-	$semesterplan=$_GET[semesterplan];
+if (isset($_GET['aktion']))
+	$aktion=$_GET['aktion'];
+else
+	$aktion=null;
+
+if (isset($_GET['semesterplan']))
+	$semesterplan=$_GET['semesterplan'];
 else
 	$semesterplan=false;
-if (isset($_GET[new_stunde]))
-	$new_stunde=$_GET[new_stunde];
-if (isset($_GET[new_datum]))
-	$new_datum=$_GET[new_datum];
-if (isset($_GET[old_ort]))
-	$old_ort=$_GET[old_ort];
-if (isset($_GET[new_ort]))
-	$new_ort=$_GET[new_ort];
-if (isset($_GET[ort]))
-	$ort=$_GET[ort];
-if (isset($_GET[datum]))
-	$datum=$_GET[datum];
-if (isset($_GET[type]))
-	$type=$_GET[type];
-if (isset($_GET[stg_kz]))
-	$stg_kz=$_GET[stg_kz];
-if (isset($_GET[sem]))
-	$sem=$_GET[sem];
-if (isset($_GET[ver]))
-	$ver=$_GET[ver];
-if (isset($_GET[grp]))
-	$grp=$_GET[grp];
-if (isset($_GET[pers_uid]))
-	$pers_uid=$_GET[pers_uid];
-if (isset($_GET[einheit]))
-	$einheit_kurzbz=$_GET[einheit];
-if (isset($_GET[semester_aktuell]))
-	$semester_aktuell=$_GET[semester_aktuell];
+if (isset($_GET['new_stunde']))
+	$new_stunde=$_GET['new_stunde'];
+if (isset($_GET['new_datum']))
+	$new_datum=$_GET['new_datum'];
+if (isset($_GET['old_ort']))
+	$old_ort=$_GET['old_ort'];
+if (isset($_GET['new_ort']))
+	$new_ort=$_GET['new_ort'];
+if (isset($_GET['ort']))
+	$ort=$_GET['ort'];
+else
+	$ort=null;
+if (isset($_GET['datum']))
+	$datum=$_GET['datum'];
+if (isset($_GET['type']))
+	$type=$_GET['type'];
+if (isset($_GET['stg_kz']))
+	$stg_kz=$_GET['stg_kz'];
+else
+	$stg_kz=null;
+if (isset($_GET['sem']))
+	$sem=$_GET['sem'];
+else
+	$sem=null;
+if (isset($_GET['ver']))
+	$ver=$_GET['ver'];
+else
+	$ver=null;
+if (isset($_GET['grp']))
+	$grp=$_GET['grp'];
+else
+	$grp=null;
+if (isset($_GET['pers_uid']))
+	$pers_uid=$_GET['pers_uid'];
+if (isset($_GET['gruppe']))
+	$einheit_kurzbz=$_GET['gruppe'];
+else
+	$gruppe=null;
+if (isset($_GET['semester_aktuell']))
+	$semester_aktuell=$_GET['semester_aktuell'];
 
 if (!isset($semester_aktuell) && $semesterplan)
 	$error_msg.='Studien-Semester ist nicht gesetzt!';
@@ -99,6 +114,7 @@ elseif ($uid=check_lektor($REMOTE_USER, $conn))
 	$user='lektor';
 else
     die("Cannot set usertype!");*/
+$user=NULL;
 
     // User bestimmen
 if (!isset($type))
@@ -381,7 +397,7 @@ else
 	$error_msg.=@db_query($conn,'ROLLBACK;');
 
 // Stundenplan erstellen
-$stdplan=new stundenplan($type,$conn);
+$stdplan=new wochenplan($type,$conn);
 if (!isset($datum))
 	$datum=mktime();
 if (!isset($semesterplan) || !$semesterplan)
@@ -397,6 +413,7 @@ else
 	else
 		$error_msg.='Studiensemester '.$semester_aktuell.' konnte nicht gefunden werden!';
 }
+
 // Benutzergruppe
 $stdplan->user=$user;
 // aktueller Benutzer
@@ -416,7 +433,7 @@ if ($type=='lektor' || $aktion=='lva_single_search'	|| $aktion=='lva_multi_searc
 }
 
 // Zusaetzliche Daten laden
-if (! $stdplan->load_data($type,$pers_uid,$ort,$stg_kz,$sem,$ver,$grp,$einheit_kurzbz) && $error_msg!='')
+if (! $stdplan->load_data($type,$pers_uid,$ort,$stg_kz,$sem,$ver,$grp,$gruppe) && $error_msg!='')
 	$error_msg.=$stdplan->errormsg;
 //echo 'load_data'.$error_msg;
 // Stundenplan einer Woche laden

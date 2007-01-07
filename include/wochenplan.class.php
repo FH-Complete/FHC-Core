@@ -99,7 +99,7 @@ class wochenplan
 	 * @return gruppe_kurzbz
 	 *
 	 */
-	function load_data($type, $uid, $ort_kurzbz=NULL, $studiengang_kz=NULL, $sem=NULL, $ver=NULL, $grp=NULL, $gruppe_kurzbz=NULL)
+	function load_data($type, $uid, $ort_kurzbz=NULL, $studiengang_kz=NULL, $sem=NULL, $ver=NULL, $grp=NULL, $gruppe=NULL)
 	{
 		///////////////////////////////////////////////////////////////////////
 		// Parameter Checken
@@ -164,7 +164,7 @@ class wochenplan
 			if ($this->type=='student')
 				$sql_query="SELECT uid, titelpre, nachname, vornamen, studiengang_kz, semester, verband, gruppe FROM vw_student WHERE uid='$this->pers_uid'";
 			else
-				$sql_query="SELECT uid, titelpre, nachname, vornamen FROM vw_mitarbeiter WHERE uid='$this->pers_uid'";
+				$sql_query="SELECT uid, titelpre, nachname, vornamen FROM campus.vw_mitarbeiter WHERE uid='$this->pers_uid'";
 			//echo $sql_query;
 			if (!($result=pg_exec($this->conn, $sql_query)))
 			{

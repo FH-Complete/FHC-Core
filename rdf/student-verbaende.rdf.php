@@ -18,12 +18,13 @@ $berechtigung=new berechtigung($conn);
 $berechtigung->getBerechtigungen($uid);
 $berechtigt_studiengang=$berechtigung->getStgKz();
 $stg_kz_query='';
-if ($berechtigt_studiengang[0]!=0 && count($berechtigt_studiengang)>0)
-{
-	foreach ($berechtigt_studiengang as $b_stg)
-		$stg_kz_query.=' OR studiengang_kz='.$b_stg;
-	$stg_kz_query='AND ('.substr($stg_kz_query,3).')';
-}
+if (count($berechtigt_studiengang)>0)
+	if ($berechtigt_studiengang[0]!=0)
+	{
+		foreach ($berechtigt_studiengang as $b_stg)
+			$stg_kz_query.=' OR studiengang_kz='.$b_stg;
+		$stg_kz_query='AND ('.substr($stg_kz_query,3).')';
+	}
 
 $sql_query="SELECT studiengang_kz, bezeichnung, kurzbz FROM tbl_studiengang WHERE studiengang_kz>=0 $stg_kz_query ORDER BY bezeichnung";
 //echo $sql_query;
@@ -98,7 +99,7 @@ for ($i=0;$i<$num_rows_stg;$i++)
 				<?php
 			}
 		}
-		$sql_query="SELECT bezeichnung, einheit_kurzbz FROM tbl_einheit WHERE studiengang_kz=$row_stg->studiengang_kz AND semester=$row_sem->semester ORDER BY bezeichnung";
+		$sql_query="SELECT bezeichnung, gruppe_kurzbz FROM tbl_gruppe WHERE studiengang_kz=$row_stg->studiengang_kz AND semester=$row_sem->semester ORDER BY bezeichnung";
 		//echo $sql_query;
 		if(!($result_einh=pg_exec($conn, $sql_query)))
 			die(pg_errormessage($conn));
@@ -107,12 +108,12 @@ for ($i=0;$i<$num_rows_stg;$i++)
 		{
 			$row_einh=pg_fetch_object($result_einh, $m);
 			?>
-			<RDF:Description RDF:about="<?php echo $rdf_url.$row_stg->kurzbz.'/'.$row_sem->semester.'/'.$row_einh->einheit_kurzbz; ?>">
-		   		<VERBAND:name><?php echo $row_einh->einheit_kurzbz.'-'.$row_einh->bezeichnung; ?></VERBAND:name>
+			<RDF:Description RDF:about="<?php echo $rdf_url.$row_stg->kurzbz.'/'.$row_sem->semester.'/'.$row_einh->gruppe_kurzbz; ?>">
+		   		<VERBAND:name><?php echo $row_einh->gruppe_kurzbz.'-'.$row_einh->bezeichnung; ?></VERBAND:name>
     			<VERBAND:stg><?php echo $row_stg->kurzbz; ?></VERBAND:stg>
     			<VERBAND:stg_kz><?php echo $row_stg->studiengang_kz; ?></VERBAND:stg_kz>
 		   		<VERBAND:sem><?php echo $row_sem->semester; ?></VERBAND:sem>
-		   		<VERBAND:einheit><?php echo $row_einh->einheit_kurzbz; ?></VERBAND:einheit>
+		   		<VERBAND:einheit><?php echo $row_einh->gruppe_kurzbz; ?></VERBAND:einheit>
    			</RDF:Description>
 			<?php
 		}
@@ -171,7 +172,7 @@ for ($i=0;$i<$num_rows_stg;$i++)
 					<?php
 				}
 
-			$sql_query="SELECT bezeichnung, einheit_kurzbz FROM tbl_einheit WHERE studiengang_kz=$row_stg->studiengang_kz AND semester=$row_sem->semester ORDER BY bezeichnung";
+			$sql_query="SELECT bezeichnung, gruppe_kurzbz FROM tbl_gruppe WHERE studiengang_kz=$row_stg->studiengang_kz AND semester=$row_sem->semester ORDER BY bezeichnung";
 			//echo $sql_query;
 			if(!($result_einh=pg_exec($conn, $sql_query)))
 				die(pg_errormessage($conn));
@@ -180,7 +181,7 @@ for ($i=0;$i<$num_rows_stg;$i++)
 			{
 				$row_einh=pg_fetch_object($result_einh, $m);
 				?>
-					<RDF:li RDF:resource="<?php echo $rdf_url.$row_stg->kurzbz.'/'.$row_sem->semester.'/'.$row_einh->einheit_kurzbz; ?>" />
+					<RDF:li RDF:resource="<?php echo $rdf_url.$row_stg->kurzbz.'/'.$row_sem->semester.'/'.$row_einh->gruppe_kurzbz; ?>" />
 				<?php
 			}
 			?>
