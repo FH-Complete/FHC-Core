@@ -17,6 +17,7 @@ echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
 // DAO
 include('../vilesci/config.inc.php');
 include_once('../include/person.class.php');
+include_once('../include/benutzer.class.php');
 include_once('../include/mitarbeiter.class.php');
 
 if (!$conn = @pg_pconnect(CONN_STRING))
@@ -36,9 +37,21 @@ if (isset($_GET['lektor']))
 	$lektor=$_GET['lektor'];
 else
 	$lektor=true;
-$fixangestellt=$_GET['fixangestellt'];
-$stg_kz=$_GET['stg_kz'];
-$fachbereich_id=$_GET['fachbereich_id'];
+
+if (isset($_GET['fixangestellt']))
+	$fixangestellt=$_GET['fixangestellt'];
+else
+	$fixangestellt=null;
+
+if (isset($_GET['stg_kz']))
+	$stg_kz=$_GET['stg_kz'];
+else
+	$stg_kz=null;
+
+if (isset($_GET['fachbereich_id']))
+	$fachbereich_id=$_GET['fachbereich_id'];
+else
+	$fachbereich_id=null;
 
 // Mitarbeiter holen
 $mitarbeiter=new mitarbeiter($conn);
@@ -62,7 +75,8 @@ foreach ($ma as $mitarbeiter)
 	  <RDF:li>
       	<RDF:Description about="<?php echo $rdf_url.$mitarbeiter->uid; ?>" >
         	<MITARBEITER:uid><?php echo $mitarbeiter->uid; ?></MITARBEITER:uid>
-    		<MITARBEITER:titel><?php echo $mitarbeiter->titel; ?></MITARBEITER:titel>
+    		<MITARBEITER:titelpre><?php echo $mitarbeiter->titelpre; ?></MITARBEITER:titelpre>
+    		<MITARBEITER:titelpost><?php echo $mitarbeiter->titelpost; ?></MITARBEITER:titelpost>
     		<MITARBEITER:vornamen><?php echo $mitarbeiter->vornamen; ?></MITARBEITER:vornamen>
     		<MITARBEITER:nachname><?php echo $mitarbeiter->nachname; ?></MITARBEITER:nachname>
     		<MITARBEITER:kurzbz><?php echo $mitarbeiter->kurzbz; ?></MITARBEITER:kurzbz>

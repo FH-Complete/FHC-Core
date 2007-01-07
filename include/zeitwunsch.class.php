@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -26,52 +26,52 @@ class zeitwunsch
 	var $errormsg; // string
 	var $new;      // boolean
 	var $zeitwuensche = array(); // zeitwunsch Objekt
-	
+
 	//Tabellenspalten
 	var $stunde;			// smalint
 	var $mitarbeiter_uid;	// varchar(16)
 	var $tag;				// smalint
 	var $gewicht;			// smalint
-	
+
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
 	// * @param $conn        	Datenbank-Connection
 	// *        $uid			Uid des Mitarbeiters
 	// *        $tag            Tag des Zeitwunsches
 	// *        $stunde         Stunde des Zeitwunsches
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
+	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
 	function zeitwunsch($conn, $mitarbeiter_uid=null, $tag=null, $stunde=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
+		else
 			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
+
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-		
+
 		if($mitarbeiter_uid != null && $tag!=null && $stunde!=null)
 			$this->load($mitarbeiter_uid, $tag, $stunde);
 	}
-	
+
 	// *********************************************************
 	// * Laedt einen Zeitwunsch
-	// * @param 
+	// * @param
 	// *********************************************************
 	function load($mitarbeiter_uid, $tag, $stunde)
 	{
 		return true;
 	}
-	
+
 	// *******************************************
-	// * Prueft die Variablen vor dem Speichern 
+	// * Prueft die Variablen vor dem Speichern
 	// * auf Gueltigkeit.
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
@@ -101,14 +101,14 @@ class zeitwunsch
 		{
 			$this->errormsg = 'Tag muss eine gueltige Zahl sein';
 			return false;
-		}			
+		}
 
 		return true;
 	}
 
 	// ************************************************
 	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische 
+	// * wenn $var !='' ist werden Datenbankkritische
 	// * Zeichen mit Backslash versehen und das Ergbnis
 	// * unter Hochkomma gesetzt.
 	// ************************************************
@@ -139,7 +139,7 @@ class zeitwunsch
 		{
 			$qry = 'UPDATE campus.tbl_zeitwunsch SET'.
 			       ' gewicht='.$this->gewicht.
-			       " WHERE mitarbeiter_uid='".addslashes($this->mitarbeiter_uid)."' AND 
+			       " WHERE mitarbeiter_uid='".addslashes($this->mitarbeiter_uid)."' AND
 			         tag=".$this->tag.' AND stunde='.$this->stunde;
 		}
 
@@ -154,5 +154,58 @@ class zeitwunsch
 			return false;
 		}
 	}
+
+	/**
+	 * Zeitwunsch einer Person laden
+	 * @return boolean Ergebnis steht in Array $zeitwunsch wenn true
+	 */
+	function loadPerson($uid)
+	{
+		// Zeitwuensche abfragen
+		if(!$result=@pg_query($this->conn, "SELECT * FROM lehre.tbl_zeitwunsch WHERE uid='$uid'"))
+		{
+			$this->errormsg=pg_last_error($this->conn);
+			return false;
+		}
+		else
+		{
+			while ($row=@pg_fetch_object($result))
+				$this->zeitwunsch[$row->tag][$row->stunde]=$row->gewicht;
+			return true;
+		}
+	}
+
+
+	/**
+	 * Zeitwunsch der Personen in Lehrveranstaltungen laden
+	 * @return array mit Fachbereichen oder false=fehler
+	 */
+	function loadLVA($lva_id)
+	{
+		// SUB-Select fuer LVAs
+		$sql_query_lva='SELECT DISTINCT lektor FROM tbl_lehrveranstaltung WHERE ';
+		for ($i=0;$i<count($lva_id);$i++)
+			$sql_query_lvaid.=' OR lehrveranstaltung_id='.$lva_id[$i];
+		$sql_query_lvaid=substr($sql_query_lvaid,3);
+		$sql_query_lva.=$sql_query_lvaid;
+
+		// Schlechteste Zeitwuensche holen
+		$sql_query='SELECT tag,stunde,min(gewicht) AS gewicht
+				FROM tbl_zeitwunsch WHERE uid IN ('.$sql_query_lva.') GROUP BY tag,stunde';
+
+		// Zeitwuensche abfragen
+		if(!$result=@pg_query($this->conn, $sql_query))
+		{
+			$this->errormsg=pg_last_error($this->conn);
+			return false;
+		}
+		else
+		{
+			while ($row=@pg_fetch_object($result))
+				$this->zeitwunsch[$row->tag][$row->stunde]=$row->gewicht;
+			return true;
+		}
+	}
+
 }
 ?>
