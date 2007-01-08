@@ -398,6 +398,7 @@ class lehrstunde
 			$stunde->gruppe_kurzbz=$row->gruppe_kurzbz;
 			$stunde->titel=$row->titel;
 			$stunde->anmerkung=$row->beschreibung;
+			$stunde->farbe='';
 			$this->lehrstunden[]=$stunde;
 			//var_dump($stunde);
 		}
