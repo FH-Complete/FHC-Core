@@ -4,7 +4,7 @@ echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
 include('../vilesci/config.inc.php');
 include('../include/berechtigung.class.php');
 
-$rdf_url='http://www.tempus-student-verbaende.at/';
+$rdf_url='http://www.technikum-wien.at/student-verband/';
 
 if (!isset($REMOTE_USER))
 	$REMOTE_USER='pam';

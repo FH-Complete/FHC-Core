@@ -90,7 +90,7 @@ if (!isset($semester_aktuell) && $semesterplan)
 
 ?>
 
-<!DOCTYPE page SYSTEM "chrome://tempus/locale/tempus.dtd">
+<!DOCTYPE page SYSTEM "chrome://tempus/locale/de-AT/tempus.dtd">
 <window id="windowTimeTableWeek"
 	xmlns:html="http://www.w3.org/1999/xhtml"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
@@ -404,7 +404,7 @@ if (!isset($semesterplan) || !$semesterplan)
 	$begin=$ende=$datum;
 else
 {
-	$result_semester=@pg_query($conn,"SELECT start,ende FROM tbl_studiensemester WHERE studiensemester_kurzbz='$semester_aktuell';");
+	$result_semester=@pg_query($conn,"SELECT start,ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='$semester_aktuell';");
 	if (pg_numrows($result_semester)>0)
 	{
 		$begin=strtotime(pg_result($result_semester,0,'start'));

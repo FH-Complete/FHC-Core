@@ -18,19 +18,19 @@ include('../vilesci/config.inc.php');
 if (!$conn = @pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 // Orte holen
-$sql_query="SELECT * FROM (tbl_ort NATURAL JOIN tbl_ortraumtyp) JOIN tbl_raumtyp USING (raumtyp_kurzbz)
+$sql_query="SELECT * FROM (public.tbl_ort JOIN public.tbl_ortraumtyp USING (ort_kurzbz)) JOIN public.tbl_raumtyp USING (raumtyp_kurzbz)
 				WHERE aktiv	AND raumtyp_kurzbz!='LM' ORDER BY raumtyp_kurzbz, hierarchie,ort_kurzbz";
 if(!$result=pg_query($conn, $sql_query))
 	$error_msg.=pg_errormessage($conn);
 else
 	$num_rows=@pg_numrows($result);
 
-$rdf_url='http://www.technikum-wien.at/tempus/ort';
+$rdf_url='http://www.technikum-wien.at/ort/';
 ?>
 
 <RDF:RDF
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:ORT="<?php echo $rdf_url; ?>/rdf#"
+	xmlns:ORT="<?php echo $rdf_url; ?>rdf#"
 >
 
 <?php
@@ -43,18 +43,18 @@ for ($i=0;$i<$num_rows;$i++)
 	$ort=pg_fetch_object($result,$i);
 	$ortNEXT=(($i<$num_rows-1)?pg_fetch_object($result,$i+1):null);
 	$currentTYP=$ort->raumtyp_kurzbz;
-	$lastTYP=$ortLAST->raumtyp_kurzbz;
-	$nextTYP=$ortNEXT->raumtyp_kurzbz;
+	$lastTYP=($i>0?$ortLAST->raumtyp_kurzbz:null);
+	$nextTYP=(($i<$num_rows-1)?$ortNEXT->raumtyp_kurzbz:null);
 	//echo "current:$currentTYP last:$lastTYP next:$nextTYP";
 	if ($lastTYP!=$currentTYP || $i==0)
-		$descr.='<RDF:Description RDF:about="'.$rdf_url.'/'.$ort->raumtyp_kurzbz.'" >
+		$descr.='<RDF:Description RDF:about="'.$rdf_url.$ort->raumtyp_kurzbz.'" >
         			<ORT:raumtyp>'.$ort->raumtyp_kurzbz.'</ORT:raumtyp>
     				<ORT:hierarchie></ORT:hierarchie>
     				<ORT:ort_kurzbz></ORT:ort_kurzbz>
     				<ORT:ort_bezeichnung></ORT:ort_bezeichnung>
     				<ORT:max_person></ORT:max_person>
       			</RDF:Description>';
-	$descr.='<RDF:Description RDF:about="'.$rdf_url.'/'.$ort->raumtyp_kurzbz.'/'.$ort->ort_kurzbz.'" >
+	$descr.='<RDF:Description RDF:about="'.$rdf_url.$ort->raumtyp_kurzbz.'/'.$ort->ort_kurzbz.'" >
         			<ORT:raumtyp>'.$ort->ort_kurzbz."</ORT:raumtyp>
     				<ORT:hierarchie>".$ort->hierarchie."</ORT:hierarchie>
     				<ORT:ort_kurzbz>".$ort->ort_kurzbz."</ORT:ort_kurzbz>
@@ -63,17 +63,17 @@ for ($i=0;$i<$num_rows;$i++)
       			</RDF:Description>'."\n";
 
 	if ($lastTYP!=$currentTYP)
-		$sequenz.='<RDF:li RDF:resource="'.$rdf_url.'/'.$ort->raumtyp_kurzbz.'" />
+		$sequenz.='<RDF:li RDF:resource="'.$rdf_url.$ort->raumtyp_kurzbz.'" />
 					<RDF:li>
-      					<RDF:Seq RDF:about="'.$rdf_url.'/'.$ort->raumtyp_kurzbz.'" >'."\n";
+      					<RDF:Seq RDF:about="'.$rdf_url.$ort->raumtyp_kurzbz.'" >'."\n";
 	if ($nextTYP!=$currentTYP || $i==$num_rows-1)
-		$sequenz.='<RDF:li RDF:resource="'.$rdf_url.'/'.$ort->raumtyp_kurzbz.'/'.$ort->ort_kurzbz.'" />
+		$sequenz.='<RDF:li RDF:resource="'.$rdf_url.$ort->raumtyp_kurzbz.'/'.$ort->ort_kurzbz.'" />
 					</RDF:Seq>
       			</RDF:li>'."\n";
 	elseif ($lastTYP==$currentTYP || $nextTYP==$currentTYP || $num_rows==1)
-		$sequenz.='<RDF:li RDF:resource="'.$rdf_url.'/'.$ort->raumtyp_kurzbz.'/'.$ort->ort_kurzbz.'" />'."\n";
+		$sequenz.='<RDF:li RDF:resource="'.$rdf_url.$ort->raumtyp_kurzbz.'/'.$ort->ort_kurzbz.'" />'."\n";
 }
-$sequenz='<RDF:Seq about="'.$rdf_url.'/alle-orte">'."\n".$sequenz.'
+$sequenz='<RDF:Seq about="'.$rdf_url.'alle-orte">'."\n".$sequenz.'
   	</RDF:Seq>';
 echo $descr;
 echo $sequenz;
