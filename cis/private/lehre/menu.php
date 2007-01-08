@@ -167,7 +167,7 @@ function js_toggle_container(conid)
 	  <table width="100%"  cellspacing="0" cellpadding="0" frame="rhs" style="border-color:#BCBCBC;">
 	    <form method="post" action="menu.php">
 		<tr>
-          <td nowrap><a class="MenuItem" href="../../index.html" target="_top"><img src="../../../skin/images/menu_item.gif" width="7" height="9"> HOME</a></td>
+          <td nowrap><a class="HyperItem" href="../../index.html" target="_top">&lt;&lt; HOME</a></td>
   		</tr>
 		<tr>
           <td nowrap>&nbsp;</td>

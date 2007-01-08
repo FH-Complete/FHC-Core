@@ -230,7 +230,7 @@ function ask() {
           die ('<center>Fehler bei einer Datenbankabfrage</center>');
        
        echo "Studiengang   <SELECT name='stg' onChange='javascript:window.document.auswFrm.status.value=\"changestg\";window.document.auswFrm.submit();'>";
-       $firststg;
+       //$firststg;
        $vorhanden=false;
        
        while($row=pg_fetch_object($result))
@@ -265,7 +265,7 @@ function ask() {
        
        echo " Semester   <SELECT name='sem' onChange='javascript:window.document.auswFrm.submit();'>";
 
-       $firstsem;
+       //$firstsem;
        $vorhanden=false;
        
        while($row=pg_fetch_object($result))
