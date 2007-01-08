@@ -153,7 +153,7 @@ border:1px dashed #000000;
 	function WriteLog($qry,$uid)
 	{
 	
-		if($fp=fopen(LVINFO_LOG_PATH,"a"))
+		if($fp=fopen(LOG_PATH.'lvinfo.log',"a"))
 		{
 			fwrite($fp,"\n");
 			fwrite($fp,$uid." ". date("d.m.Y - H:i:s") . " ". $qry);

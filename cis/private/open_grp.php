@@ -77,7 +77,7 @@ if(!check_lektor($_SERVER["REMOTE_USER"],$conn))
 		/* ffe, 20051020 - do a little logging */
 		$message= date("F j G:i:s") . " mailgroup: [" . $_REQUEST['grp'] . "] (using " . $mail_id . ") requested by [" . $_SERVER['PHP_AUTH_USER'] . "]\n";
 		
-		$filet = fopen("../../../system/.htmlistopen.log", "a");
+		$filet = fopen(LOG_PATH.'.htmlistopen.log', "a");
 	   	fwrite($filet, $message, strlen($message));
 	    fclose($filet);
 	

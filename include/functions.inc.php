@@ -147,7 +147,7 @@ function writeCISlog($stat, $rm = '')
 {
 	if($stat=='STOP')
 		$stat = 'STOP ';
-	$handle = fopen(CIS_LOG_PATH,'a');
+	$handle = fopen(LOG_PATH.'cis.log','a');
 	fwrite($handle, date('Y-m-d H:i:s').' '. $stat .' '. getmypid() .' '. $_SERVER['REMOTE_USER'] .' '. $_SERVER['REQUEST_URI'] .' '.$rm.'
 ');
 }
