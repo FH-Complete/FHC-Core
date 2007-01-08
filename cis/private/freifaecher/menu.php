@@ -103,7 +103,7 @@
     <td width="159" valign="top" nowrap>
 	  <table width="100%" cellspacing="0" cellpadding="0" frame="rhs" style="border-color:#BCBCBC;">
 	    <tr>
-          <td nowrap><a class="MenuItem" href="../../index.html" target="_top"><img src="../../../skin/images/menu_item.gif" width="7" height="9"> HOME</a> </a></td>
+          <td nowrap><a class="HyperItem" href="../../index.html" target="_top">&lt;&lt; HOME</a> </a></td>
   		</tr>
 		<tr>
 		  <td nowrap>&nbsp;</td>
