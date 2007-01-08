@@ -99,7 +99,7 @@ if(isset($_POST['lvid']))
 			FROM 
 				campus.vw_benutzer
 				LEFT JOIN 
-				(tbl_student LEFT JOIN tbl_studiengang using (studiengang_kz)) ON (student_uid = uid) 
+				(public.tbl_student LEFT JOIN public.tbl_studiengang using (studiengang_kz)) ON (student_uid = uid) 
 			WHERE
 				uid IN (SELECT uid FROM campus.tbl_benutzerlvstudiensemester 
 				        WHERE lehrveranstaltung_id='$lvid' AND studiensemester_kurzbz='$stsem')

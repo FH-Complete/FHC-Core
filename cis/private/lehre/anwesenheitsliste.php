@@ -80,14 +80,14 @@
 	  	$nt_content='';
 	  	
 	  	//Content fuer Anwesenheitslisten erstellen
-	  	$qry = "SELECT kurzbzlang FROM tbl_studiengang WHERE studiengang_kz='$stg_kz'";
+	  	$qry = "SELECT kurzbzlang FROM public.tbl_studiengang WHERE studiengang_kz='$stg_kz'";
 	  	if($row=pg_fetch_object(pg_query($conn,$qry)))
 	  		$kurzbzlang = $row->kurzbzlang;
 	  	else 
 	  		echo "Fehler beim Auslesen der Daten";
 	  	
 	  	//"normale" Gruppen auslesen
-	  	$qry = "SELECT verband, gruppe, count(*) FROM tbl_lehrverband JOIN tbl_student USING(studiengang_kz, semester, verband, gruppe) WHERE studiengang_kz='$stg_kz' AND semester='$sem' AND student_uid not like '%Dummy%' GROUP BY verband, gruppe;";
+	  	$qry = "SELECT verband, gruppe, count(*) FROM public.tbl_lehrverband JOIN public.tbl_student USING(studiengang_kz, semester, verband, gruppe) WHERE studiengang_kz='$stg_kz' AND semester='$sem' AND student_uid not like '%Dummy%' GROUP BY verband, gruppe;";
 	  	if($result = pg_query($conn,$qry))
 	  	{
 	  		if(pg_num_rows($result)>0)
@@ -115,7 +115,7 @@
 	  	
 	  	echo "<br />";
 	  	//Spezialgruppen Auslesen	  	
-	  	$qry = "SELECT distinct gruppe_kurzbz, bezeichnung FROM tbl_gruppe JOIN tbl_benutzergruppe USING(gruppe_kurzbz) WHERE studiengang_kz='$stg_kz' AND semester='$sem';";
+	  	$qry = "SELECT distinct gruppe_kurzbz, bezeichnung FROM public.tbl_gruppe JOIN public.tbl_benutzergruppe USING(gruppe_kurzbz) WHERE studiengang_kz='$stg_kz' AND semester='$sem';";
 	  	if($result = pg_query($conn,$qry))
 	  	{
 	  		while($row = pg_fetch_object($result))

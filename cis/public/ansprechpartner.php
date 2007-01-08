@@ -9,12 +9,10 @@
 <?php
 if(isset($_SERVER["REMOTE_USER"]))
 {
-	echo "jo";
 	$visible=true;
 }
 else 
 {
-	echo "nein";
 	$visible=false;
 }
 ?>

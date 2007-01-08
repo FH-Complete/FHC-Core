@@ -152,9 +152,9 @@ font-size:10pt;
 
 	//Zugeteilte Fachbereiche auslesen
 	$qry = "SELECT distinct tbl_fachbereich.bezeichnung as bezeichnung, tbl_fachbereich.fachbereich_kurzbz as fachbereich_kurzbz 
-			FROM tbl_fachbereich, lehre.tbl_lehreinheit, lehre.tbl_lehrfach 
+			FROM public.tbl_fachbereich, lehre.tbl_lehreinheit, lehre.tbl_lehrfach 
 	      	WHERE tbl_lehreinheit.studiensemester_kurzbz=(
-	      		SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN tbl_studiensemester USING(studiensemester_kurzbz) 
+	      		SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
 	      		WHERE tbl_lehreinheit.lehrveranstaltung_id='$lv' ORDER BY ende DESC LIMIT 1)
 	      	AND tbl_lehreinheit.lehrveranstaltung_id='$lv' AND
 	      	tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
@@ -175,7 +175,7 @@ font-size:10pt;
 	}	  
 	  
 	//Studiengangsbezeichnung auslesen
-	$qry="SELECT kurzbz, kurzbzlang FROM tbl_studiengang WHERE studiengang_kz='$stg'";
+	$qry="SELECT kurzbz, kurzbzlang FROM public.tbl_studiengang WHERE studiengang_kz='$stg'";
 	if(!$res=pg_query($conn,$qry))
 		die('Fehler beim Lesen aus der Datenbank');
 	  
@@ -192,7 +192,7 @@ font-size:10pt;
 	while($row = pg_fetch_object($res))
 		$lehrform_kurzbz[] = $row->lehrform_kurzbz;
 	//Fachbereichsleiter fuer alle FB ermitteln
-	$qry="SELECT * FROM tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbl' AND fachbereich_kurzbz in($fachbereiche)";
+	$qry="SELECT * FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbl' AND fachbereich_kurzbz in($fachbereiche)";
 	if(!$res=pg_query($conn,$qry))
 		die('Fehler beim herstellen der DB Connection');
 	  
@@ -201,7 +201,7 @@ font-size:10pt;
 		$fachbereichsleiter[$row->fachbereich_kurzbz] = $row->vorname."&nbsp;".$row->nachname;
 
 	//Fachbereichskoordinatoren fuer alle FB ermitteln
-	$qry="SELECT * FROM tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbk' AND studiengang_kz='$stg' AND fachbereich_kurzbz in($fachbereiche)";
+	$qry="SELECT * FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbk' AND studiengang_kz='$stg' AND fachbereich_kurzbz in($fachbereiche)";
 
 	if(!$res=pg_exec($conn,$qry))
 		die('Fehler beim herstellen der DB Connection');

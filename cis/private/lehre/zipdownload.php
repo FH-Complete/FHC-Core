@@ -32,26 +32,22 @@
    //Connection zur DB herstellen
    if(!$conn = pg_pconnect(CONN_STRING))
    {
-   		writeCISlog('STOP');
-   		die("Fehler beim herstellen der DB Verbindung");
+   		die('Fehler beim herstellen der DB Verbindung');
    }
    
    //Gueltigkeit der Parameter pruefen		
    if(!isset($_GET['stg']) || !is_numeric($_GET['stg']))
    {
-   		writeCISlog('STOP');
-   		die("Fehler bei der Parameteruebergabe");
+   		die('Fehler bei der Parameteruebergabe');
    }
    
    if(!isset($_GET['sem']) || !is_numeric($_GET['sem']))
    {
-   		writeCISlog('STOP');
-   		die("Fehler bei der Parameteruebergabe");
+   		die('Fehler bei der Parameteruebergabe');
    }
    		
    if(!isset($_GET['short']) || strstr("..",$_GET['short']))
    {
-   		writeCISlog('STOP');
    		die("Fehler bei der Parameteruebergabe");
    }
    

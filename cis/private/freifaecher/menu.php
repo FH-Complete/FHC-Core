@@ -103,7 +103,7 @@
     <td width="159" valign="top" nowrap>
 	  <table width="100%" cellspacing="0" cellpadding="0" frame="rhs" style="border-color:#BCBCBC;">
 	    <tr>
-          <td nowrap><a class="HyperItem" href="../../index.html" target="_top">&lt;&lt; Zum Campus wechseln </a></td>
+          <td nowrap><a class="MenuItem" href="../../index.html" target="_top"><img src="../../../skin/images/menu_item.gif" width="7" height="9"> HOME</a> </a></td>
   		</tr>
 		<tr>
 		  <td nowrap>&nbsp;</td>
@@ -156,7 +156,7 @@
 			  </tr>
 			  <tr>
 			  	<td width="10" nowrap>&nbsp;</td>
-				<td nowrap><a class="Item" href="../info/faq_upload.html" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;FAQ</a></td>
+				<td nowrap><a class="Item" href="../../public/faq_upload.html" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;FAQ</a></td>
 			  </tr>
 			</table>
 		  </td>

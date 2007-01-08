@@ -147,7 +147,7 @@ class benutzerberechtigung
 
 		if($this->new)
 		{			
-			$qry = 'INSERT INTO tbl_benutzerberechtigung (art, fachbereich_kurzbz, studiengang_kz, berechtigung_kurzbz, 
+			$qry = 'INSERT INTO public.tbl_benutzerberechtigung (art, fachbereich_kurzbz, studiengang_kz, berechtigung_kurzbz, 
 			                                              uid, studiensemester_kurzbz, start, ende)
 			        VALUES('.$this->addslashes($this->art).','.
 					$this->addslashes($this->fachbereich_kurzbz).','.
@@ -160,7 +160,7 @@ class benutzerberechtigung
 		}
 		else
 		{
-			$qry = 'UPDATE tbl_benutzerberechtigung SET'.
+			$qry = 'UPDATE public.tbl_benutzerberechtigung SET'.
 			       ' art='.$this->addslashes($this->art).','.
 			       ' fachbereich_kurzbz='.$this->addslashes($this->fachbereich_kurzbz).','.
 			       ' studiengang_kz='.$this->addslashes($this->studiengang_kz).','.
@@ -194,7 +194,7 @@ class benutzerberechtigung
 	function getBerechtigungen($uid)
 	{
 		// Berechtigungen holen
-		$sql_query="SELECT * FROM tbl_benutzerberechtigung WHERE uid='$uid' AND (start<now() OR start IS NULL) AND (ende>now() OR ende IS NULL)";
+		$sql_query="SELECT * FROM public.tbl_benutzerberechtigung WHERE uid='$uid' AND (start<now() OR start IS NULL) AND (ende>now() OR ende IS NULL)";
 
 		if(!$erg=pg_query($this->conn, $sql_query))
 		{
