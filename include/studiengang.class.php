@@ -83,7 +83,7 @@ class studiengang
 			return false;
 		}
 		
-		$qry = "SELECT * FROM tbl_studiengang WHERE studiengang_kz='$studiengang_kz'";
+		$qry = "SELECT * FROM public.tbl_studiengang WHERE studiengang_kz='$studiengang_kz'";
 		
 		if($res = pg_query($this->conn, $qry))
 		{
@@ -124,7 +124,7 @@ class studiengang
 	// *******************************************
 	function getAll($order=null)
 	{
-		$qry = "SELECT * FROM tbl_studiengang";
+		$qry = "SELECT * FROM public.tbl_studiengang";
 		
 		if($order!=null)
 		 	$qry .=" ORDER BY $order";

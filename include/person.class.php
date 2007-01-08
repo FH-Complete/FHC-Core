@@ -95,7 +95,7 @@ class person
 			$qry = "SELECT person_id, sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen,
                            gebdatum, gebort, gebzeit, foto, anmerkungen, homepage, svnr, ersatzkennzeichen, 
                            familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon, ext_id 
-			        FROM tbl_person WHERE person_id='$person_id'";
+			        FROM public.tbl_person WHERE person_id='$person_id'";
 			
 			if(!$result=pg_query($this->conn,$qry))
 			{
@@ -310,7 +310,7 @@ class person
 		
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = 'INSERT INTO tbl_person (sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen, 
+			$qry = 'INSERT INTO public.tbl_person (sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen, 
 			                    gebdatum, gebort, gebzeit, foto, anmerkungen, homepage, svnr, ersatzkennzeichen, 
 			                    familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon,
 			                    geschlecht, geburtsnation, staatsbuergerschaft, ext_id)
@@ -352,7 +352,7 @@ class person
 			}
 			
 			//update nur wenn änderungen gemacht
-			$qry="SELECT * FROM tbl_person WHERE person_id='$this->person_id';";
+			$qry="SELECT * FROM public.tbl_person WHERE person_id='$this->person_id';";
 			if($result = pg_query($this->conn, $qry))
 			{
 				while($row = pg_fetch_object($result))
@@ -383,7 +383,7 @@ class person
 					
 					if($update)
 					{
-						$qry = 'UPDATE tbl_person SET'.
+						$qry = 'UPDATE public.tbl_person SET'.
 						       ' sprache='.$this->addslashes($this->sprache).','.
 						       ' anrede='.$this->addslashes($this->anrede).','.
 						       ' titelpost='.$this->addslashes($this->titelpost).','.

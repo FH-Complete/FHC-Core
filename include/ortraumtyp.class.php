@@ -54,7 +54,7 @@ class ortraumtyp
 	 */
 	function getAll()
 	{
-		$qry = 'SELECT * FROM tbl_ortraumtyp order by ort_kurzbz, hierarchie;';
+		$qry = 'SELECT * FROM public.tbl_ortraumtyp order by ort_kurzbz, hierarchie;';
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -88,7 +88,7 @@ class ortraumtyp
 			return false;
 		}
 		
-		$qry = "SELECT * FROM tbl_ortraumtyp WHERE ort_kurzbz = '$ort_kurzbz' AND hierarchie = '$hierarchie';";
+		$qry = "SELECT * FROM public.tbl_ortraumtyp WHERE ort_kurzbz = '$ort_kurzbz' AND hierarchie = '$hierarchie';";
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -168,7 +168,7 @@ class ortraumtyp
 				return false;
 			}
 			//Neuen Datensatz anlegen		
-			$qry = 'INSERT INTO tbl_ortraumtyp (ort_kurzbz, hierarchie, raumtyp_kurzbz) VALUES ('.
+			$qry = 'INSERT INTO public.tbl_ortraumtyp (ort_kurzbz, hierarchie, raumtyp_kurzbz) VALUES ('.
 				$this->addslashes($this->ort_kurzbz).', '.
 				$this->addslashes($this->hierarchie).', '.
 				$this->addslashes($this->raumtyp_kurzbz).');';
@@ -185,7 +185,7 @@ class ortraumtyp
 				return false;
 			}
 			
-			$qry = 'UPDATE tbl_ortraumtyp SET '. 
+			$qry = 'UPDATE public.tbl_ortraumtyp SET '. 
 				'raumtyp_kurzbz='.$this->addslashes($this->raumtyp_kurzbz).' '.
 				'WHERE ort_kurzbz = '.$this->addslashes($this->ort_kurzbz).' AND hierarchie = '.$this->addslashes($this->hierarchie).';';
 		}

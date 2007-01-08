@@ -90,21 +90,21 @@ class schluesseltyp
 	function save()
 	{		
 		
-		$qry1='SELECT * FROM tbl_schluesseltyp WHERE beschreibung='.$this->addslashes($this->beschreibung).';';
+		$qry1='SELECT * FROM public.tbl_schluesseltyp WHERE beschreibung='.$this->addslashes($this->beschreibung).';';
 		if($result1=pg_query($this->conn,$qry1))
 		{
 			if(pg_num_rows($result1)>0) //eintrag gefunden
 			{
 				if($row1 = pg_fetch_object($result1))
 				{
-					$qry='UPDATE tbl_schluesseltyp SET '.
+					$qry='UPDATE public.tbl_schluesseltyp SET '.
 					'anzahl =anzahl+'.$this->anzahl.' '.
 					'WHERE beschreibung='.$this->addslashes($this->beschreibung).';';
 				}
 			}
 			else 
 			{
-				$qry='INSERT INTO tbl_schluesseltyp (schluesseltyp, beschreibung, anzahl, kaution) VALUES('.
+				$qry='INSERT INTO public.tbl_schluesseltyp (schluesseltyp, beschreibung, anzahl, kaution) VALUES('.
 					$this->addslashes($this->schluesseltyp).', '.
 					$this->addslashes($this->beschreibung).', '.
 					$this->addslashes($this->anzahl).', '.

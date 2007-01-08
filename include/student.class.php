@@ -60,7 +60,7 @@ class student extends benutzer
 	
 	function load($uid)
 	{
-		$qry = "SELECT * FROM tbl_student WHERE student_uid='".addslashes($uid)."'";
+		$qry = "SELECT * FROM public.tbl_student WHERE student_uid='".addslashes($uid)."'";
 		
 		if($result = pg_query($this->conn, $qry))
 		{
@@ -174,7 +174,7 @@ class student extends benutzer
 		if($this->new)
 		{
 			//Neuen Datensatz anlegen							
-			$qry = "INSERT INTO tbl_student(student_uid, matrikelnr, updateamum, updatevon, prestudent_id, 
+			$qry = "INSERT INTO public.tbl_student(student_uid, matrikelnr, updateamum, updatevon, prestudent_id, 
 			                    studiengang_kz, semester, verband, gruppe)
 			        VALUES('".addslashes($this->uid)."',".
 			 	 	$this->addslashes($this->matrikelnr).",".
@@ -189,7 +189,7 @@ class student extends benutzer
 		else 
 		{
 			//Bestehenden Datensatz updaten
-			$qry = 'UPDATE tbl_student SET'.
+			$qry = 'UPDATE public.tbl_student SET'.
 			       ' matrikelnr='.$this->addslashes($this->matrikelnr).','.
 			       ' updateamum='.$this->addslashes($this->updateamum).','.
 			       ' updatevon='.$this->addslashes($this->updatevon).','.

@@ -59,7 +59,7 @@ class fachbereich
 	 */
 	function getAll()
 	{
-		$qry = 'SELECT * FROM tbl_fachbereich order by fachbereich_kurzbz;';
+		$qry = 'SELECT * FROM public.tbl_fachbereich order by fachbereich_kurzbz;';
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -93,7 +93,7 @@ class fachbereich
 			return false;
 		}
 		
-		$qry = "SELECT * FROM tbl_fachbereich WHERE fachbereich_kurzbz = '$fachbereich_kurzbz';";
+		$qry = "SELECT * FROM public.tbl_fachbereich WHERE fachbereich_kurzbz = '$fachbereich_kurzbz';";
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -173,7 +173,7 @@ class fachbereich
 				return false;
 			}
 			//Neuen Datensatz anlegen		
-			$qry = 'INSERT INTO tbl_fachbereich (fachbereich_kurzbz, bezeichnung, farbe, ext_id, studiengang_kz) VALUES ('.
+			$qry = 'INSERT INTO public.tbl_fachbereich (fachbereich_kurzbz, bezeichnung, farbe, ext_id, studiengang_kz) VALUES ('.
 				$this->addslashes($this->fachbereich_kurzbz).', '.
 				$this->addslashes($this->bezeichnung).', '.
 				$this->addslashes($this->farbe).', '.
@@ -191,7 +191,7 @@ class fachbereich
 				return false;
 			}
 			
-			$qry = 'UPDATE tbl_fachbereich SET '. 
+			$qry = 'UPDATE public.tbl_fachbereich SET '. 
 				'fachbereich_kurzbz='.$this->addslashes($this->fachbereich_kurzbz).', '.
 				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
 				'farbe='.$this->addslashes($this->farbe).', '.

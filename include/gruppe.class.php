@@ -75,7 +75,7 @@ class gruppe
 	// ****************************************
 	function exists($gruppe_kurzbz)
 	{
-		$qry = "SELECT count(*) as anzahl FROM tbl_gruppe WHERE gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_gruppe WHERE gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
 		
 		if($row = pg_fetch_object(pg_query($this->conn,$qry)))
 		{
@@ -102,7 +102,7 @@ class gruppe
 	
 	function getgruppe($studiengang_kz=null, $semester=null, $mailgrp=null, $sichtbar=null)
 	{
-		$qry = 'SELECT * FROM tbl_gruppe WHERE 1=1';
+		$qry = 'SELECT * FROM public.tbl_gruppe WHERE 1=1';
 		if(!is_null($studiengang_kz))
 			$qry .= " AND studiengang_kz='$studiengang_kz'";
 		if(!is_null($semester))
@@ -242,7 +242,7 @@ class gruppe
 
 		if($new)
 		{		
-			$qry = 'INSERT INTO tbl_gruppe (gruppe_kurzbz, studiengang_kz, bezeichnung, semester, sort, 
+			$qry = 'INSERT INTO public.tbl_gruppe (gruppe_kurzbz, studiengang_kz, bezeichnung, semester, sort, 
 			                                mailgrp, beschreibung, sichtbar, aktiv, 
 			                                updateamum, updatevon, insertamum, insertvon)
 			        VALUES('.$this->addslashes($this->gruppe_kurzbz).','.
@@ -261,7 +261,7 @@ class gruppe
 		}
 		else
 		{
-			$qry = 'UPDATE tbl_gruppe SET'.
+			$qry = 'UPDATE public.tbl_gruppe SET'.
 			       ' studiengang_kz='.$this->addslashes($this->studiengang_kz).','.
 			       ' bezeichnung='.$this->addslashes($this->bezeichnung).','.
 			       ' semester='.$this->addslashes($this->semester).','.

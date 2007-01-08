@@ -87,7 +87,7 @@ class nation
 	function getAll($ohnesperre=false)
 	{
 		//Lesen der Daten aus der Datenbank
-		$qry = "SELECT * FROM nation";
+		$qry = "SELECT * FROM bis.tbl_nation";
 		if($ohnesperre)
 			$qry .= " where sperre='N'";
 			

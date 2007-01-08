@@ -62,7 +62,7 @@ class benutzerfunktion
 	 */
 	function getAll()
 	{
-		$qry = 'SELECT * FROM tbl_benutzerfunktion ORDER BY benutzerfunktion_id;';
+		$qry = 'SELECT * FROM public.tbl_benutzerfunktion ORDER BY benutzerfunktion_id;';
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -95,7 +95,7 @@ class benutzerfunktion
 	// *********************************
 	function benutzerfunktion_exists($uid, $benutzerfunktion)
 	{
-		$qry = "SELECT count(*) as anzahl FROM tbl_benutzerfunktion WHERE uid='".addslashes($uid)."' AND funktion_kurzbz='".addslashes($benutzerfunktion)."'";
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_benutzerfunktion WHERE uid='".addslashes($uid)."' AND funktion_kurzbz='".addslashes($benutzerfunktion)."'";
 		
 		if($row = pg_fetch_object(pg_query($this->conn, $qry)))
 		{
@@ -124,7 +124,7 @@ class benutzerfunktion
 			return false;
 		}
 		
-		$qry = "SELECT * FROM tbl_benutzerfunktion WHERE benutzerfunktion_id = '$this->benutzerfunktion_id';";
+		$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE benutzerfunktion_id = '$this->benutzerfunktion_id';";
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -186,7 +186,7 @@ class benutzerfunktion
 		{
 			//Neuen Datensatz anlegen	
 			//Pruefen ob uid vorhanden
-			$qry = "SELECT uid FROM tbl_benutzer WHERE uid = '$this->uid';";
+			$qry = "SELECT uid FROM public.tbl_benutzer WHERE uid = '$this->uid';";
 			if(!$resx = pg_query($this->conn, $qry))
 			{
 				$this->errormsg = 'Fehler beim Laden des Datensatzes';
@@ -200,7 +200,7 @@ class benutzerfunktion
 					return false;
 				}	
 			}
-			$qry = 'INSERT INTO tbl_benutzerfunktion (fachbereich_kurzbz, uid, studiengang_kz, funktion_kurzbz, insertamum, insertvon, 
+			$qry = 'INSERT INTO public.tbl_benutzerfunktion (fachbereich_kurzbz, uid, studiengang_kz, funktion_kurzbz, insertamum, insertvon, 
 				updateamum, updatevon) VALUES ('.
 				$this->addslashes($this->fachbereich_kurzbz).', '.
 				$this->addslashes($this->uid).', '.
@@ -222,7 +222,7 @@ class benutzerfunktion
 				return false;
 			}
 			
-			$qry = 'UPDATE tbl_benutzerfunktion SET '. 
+			$qry = 'UPDATE public.tbl_benutzerfunktion SET '. 
 				'benutzerfunktion_id='.$this->addslashes($this->benutzerfunktion_id).', '.
 				'fachbereich_kurzbz='.$this->addslashes($this->fachbereich_kurzbz).', '.
 				'uid='.$this->addslashes($this->uid).', '.

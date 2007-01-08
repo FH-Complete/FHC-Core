@@ -194,7 +194,7 @@ function js_toggle_container(conid)
 						{							
 							if(isset($course_id) AND $course_id == $row->studiengang_kz)
 							{
-								echo '<option value="menu.php?course_id='.$row->studiengang_kz.'&term_id='.$term_id.'" selected>'.$row->kurzbz .'('.$row->kurbzlang.')</option>';
+								echo '<option value="menu.php?course_id='.$row->studiengang_kz.'&term_id='.$term_id.'" selected>'.$row->kurzbz .'('.$row->kurzbzlang.')</option>';
 								$sel_kurzbzlang=$row->kurzbzlang;
 							}
 							else

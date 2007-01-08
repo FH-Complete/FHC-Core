@@ -54,7 +54,7 @@ class raumtyp
 	 */
 	function getAll()
 	{
-		$qry = 'SELECT * FROM tbl_raumtyp order by raumtyp_kurzbz;';
+		$qry = 'SELECT * FROM public.tbl_raumtyp order by raumtyp_kurzbz;';
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -88,7 +88,7 @@ class raumtyp
 			return false;
 		}
 		
-		$qry = "SELECT * FROM tbl_raumtyp WHERE raumtyp_kurzbz = '$raumtyp_kurzbz';";
+		$qry = "SELECT * FROM public.tbl_raumtyp WHERE raumtyp_kurzbz = '$raumtyp_kurzbz';";
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -168,7 +168,7 @@ class raumtyp
 				return false;
 			}
 			//Neuen Datensatz anlegen		
-			$qry = 'INSERT INTO tbl_raumtyp (beschreibung, raumtyp_kurzbz) VALUES ('.
+			$qry = 'INSERT INTO public.tbl_raumtyp (beschreibung, raumtyp_kurzbz) VALUES ('.
 				$this->addslashes($this->beschreibung).', '.
 				$this->addslashes($this->raumtyp_kurzbz).');';
 
@@ -184,7 +184,7 @@ class raumtyp
 				return false;
 			}
 			
-			$qry = 'UPDATE tbl_raumtyp SET '. 
+			$qry = 'UPDATE public.tbl_raumtyp SET '. 
 				'beschreibung='.$this->addslashes($this->beschreibung).' '.
 				'WHERE raumtyp_kurzbz = '.$this->addslashes($this->ort_kurzbz).';';
 		}

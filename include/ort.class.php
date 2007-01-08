@@ -61,7 +61,7 @@ class ort
 	 */
 	function getAll()
 	{
-		$qry = 'SELECT * FROM tbl_ort order by ort_kurzbz;';
+		$qry = 'SELECT * FROM public.tbl_ort order by ort_kurzbz;';
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -101,7 +101,7 @@ class ort
 			return false;
 		}
 		
-		$qry = "SELECT * FROM tbl_ort WHERE ort_kurzbz = '$ort_kurzbz';";
+		$qry = "SELECT * FROM public.tbl_ort WHERE ort_kurzbz = '$ort_kurzbz';";
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -193,7 +193,7 @@ class ort
 				return false;
 			}
 			//Neuen Datensatz anlegen		
-			$qry = 'INSERT INTO tbl_ort (ort_kurzbz, bezeichnung, planbezeichnung, max_person, aktiv, lehre, lageplan, 
+			$qry = 'INSERT INTO public.tbl_ort (ort_kurzbz, bezeichnung, planbezeichnung, max_person, aktiv, lehre, lageplan, 
 				dislozierung, kosten) VALUES ('.
 				$this->addslashes($this->ort_kurzbz).', '.
 				$this->addslashes($this->bezeichnung).', '.
@@ -216,7 +216,7 @@ class ort
 				return false;
 			}
 			
-			$qry = 'UPDATE tbl_ort SET '. 
+			$qry = 'UPDATE public.tbl_ort SET '. 
 				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
 				'planbezeichnung='.$this->addslashes($this->planbezeichnung).', '.
 				'max_person='.$this->addslashes($this->max_person).', '.
