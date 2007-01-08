@@ -30,7 +30,7 @@
 	if(!$result_ort)
 		die("ort not found!");
 	$num_rows_ort=pg_numrows($result_ort);
-	$sql_query="SELECT uid, kurzbz FROM vw_lektor ORDER BY kurzbz";
+	$sql_query="SELECT uid, kurzbz FROM vw_mitarbeiter ORDER BY kurzbz";
 	$result_lektor=pg_query($conn, $sql_query);
 	if(!$result_lektor)
 		die("lektor not found!");

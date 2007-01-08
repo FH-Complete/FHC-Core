@@ -24,7 +24,7 @@ $num_rows_stunde=pg_numrows($result_stunde);
 ?>
 
 <!DOCTYPE overlay [
-	<?php require("../locale/tempus.dtd"); ?>
+	<?php require("../locale/de-AT/tempus.dtd"); ?>
 ]>
 
 <overlay id="TempusOverlaySTPLWeek"
@@ -108,7 +108,7 @@ $num_rows_stunde=pg_numrows($result_stunde);
 		</toolbar>
 </toolbox>
 <vbox id="vboxLehrveranstalungPlanung" style="overflow:auto;margin:0px;" flex="1"
-	datasources="lehrveranstaltung.rdf.php"
+	datasources="../rdf/lehrveranstaltung.rdf.php"
 	ref="http://www.technikum-wien.at/tempus/lehrveranstaltung/alle">
 	<template>
 	    <rule>

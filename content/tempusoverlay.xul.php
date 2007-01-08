@@ -13,7 +13,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 ?>
 
 <!DOCTYPE overlay [
-	<?php require("../locale/tempus.dtd"); ?>
+	<?php require("../locale/de-AT/tempus.dtd"); ?>
 ]>
 
 <overlay id="TempusOverlay"
@@ -28,7 +28,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 
 <tree id="tree-verband" onselect="onVerbandSelect();"
 	seltype="single" hidecolumnpicker="false" flex="1"
-	datasources="student-verbaende.rdf.php" ref="http://www.tempus-student-verbaende.at/alle-verbaende"
+	datasources="../rdf/student-verband.rdf.php" ref="http://www.technikum-wien.at/student-verband/alle-verbaende"
 	>
 	<treecols>
 	    <treecol id="bez" label="Bezeichnung" flex="15" primary="true" />
@@ -51,13 +51,13 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 	      <treechildren>
 	       <treeitem uri="rdf:*">
 	         <treerow>
-	           <treecell label="rdf:http://www.tempus-student-verbaende.at/rdf#name"/>
-	           <treecell label="rdf:http://www.tempus-student-verbaende.at/rdf#stg"/>
-	           <treecell label="rdf:http://www.tempus-student-verbaende.at/rdf#stg_kz"/>
-	           <treecell label="rdf:http://www.tempus-student-verbaende.at/rdf#sem"/>
-	           <treecell label="rdf:http://www.tempus-student-verbaende.at/rdf#ver"/>
-	           <treecell label="rdf:http://www.tempus-student-verbaende.at/rdf#grp"/>
-	           <treecell label="rdf:http://www.tempus-student-verbaende.at/rdf#einheit"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/student-verband/rdf#name"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/student-verband/rdf#stg"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/student-verband/rdf#stg_kz"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/student-verband/rdf#sem"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/student-verband/rdf#ver"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/student-verband/rdf#grp"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/student-verband/rdf#einheit"/>
 	         </treerow>
 	       </treeitem>
 	      </treechildren>
@@ -67,7 +67,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 
 <tree id="tree-ort" onselect="onOrtSelect();"
 	seltype="single" hidecolumnpicker="false" flex="1"
-	datasources="../rdf/ort.rdf.php" ref="http://www.technikum-wien.at/tempus/ort/alle-orte">
+	datasources="../rdf/ort.rdf.php" ref="http://www.technikum-wien.at/ort/alle-orte">
 	<treecols>
 	    <treecol id="raumtyp" label="Raumtyp" flex="2" primary="true" />
 	    <splitter class="tree-splitter"/>
@@ -85,11 +85,11 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 	      <treechildren>
 	       <treeitem uri="rdf:*">
 	         <treerow>
-	           <treecell label="rdf:http://www.technikum-wien.at/tempus/ort/rdf#raumtyp"/>
-	           <treecell label="rdf:http://www.technikum-wien.at/tempus/ort/rdf#ort_kurzbz"/>
-	           <treecell label="rdf:http://www.technikum-wien.at/tempus/ort/rdf#hierarchie"/>
-	           <treecell label="rdf:http://www.technikum-wien.at/tempus/ort/rdf#ort_bezeichnung"/>
-	           <treecell label="rdf:http://www.technikum-wien.at/tempus/ort/rdf#max_person"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#raumtyp"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#ort_kurzbz"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#hierarchie"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#ort_bezeichnung"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#max_person"/>
 	         </treerow>
 	       </treeitem>
 	      </treechildren>
@@ -99,7 +99,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 
 <tree id="tree-lektor" onselect="onLektorSelect();"
 	seltype="single" hidecolumnpicker="false" flex="1"
-	datasources="mitarbeiter.rdf.php" ref="http://www.technikum-wien.at/tempus/mitarbeiter/alle">
+	datasources="../rdf/mitarbeiter.rdf.php" ref="http://www.technikum-wien.at/tempus/mitarbeiter/alle">
 	<treecols>
 	    <treecol id="kurzbz" label="Kuerzel" flex="2" primary="true" />
 	    <splitter class="tree-splitter"/>
@@ -120,7 +120,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 	           		<treecell label="rdf:http://www.technikum-wien.at/tempus/mitarbeiter/rdf#kurzbz"/>
 	           		<treecell label="rdf:http://www.technikum-wien.at/tempus/mitarbeiter/rdf#nachname"/>
 	           		<treecell label="rdf:http://www.technikum-wien.at/tempus/mitarbeiter/rdf#vornamen"/>
-	           		<treecell label="rdf:http://www.technikum-wien.at/tempus/mitarbeiter/rdf#titel"/>
+	           		<treecell label="rdf:http://www.technikum-wien.at/tempus/mitarbeiter/rdf#titelpre"/>
 	           		<treecell label="rdf:http://www.technikum-wien.at/tempus/mitarbeiter/rdf#uid"/>
 	         	</treerow>
 	    	</treeitem>

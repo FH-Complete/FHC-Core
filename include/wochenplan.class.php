@@ -72,6 +72,9 @@ class wochenplan
 	{
 		$this->type=$type;
 		$this->conn=$conn;
+		// Suchpfad einstellen
+		if (!$result=pg_query($this->conn, 'SET search_path TO lehre;'))
+			$this->errormsg=pg_last_error($this->conn);
 		$this->link='stpl_week.php?type='.$type;
 		$this->kal_link='stpl_kalender.php?type='.$type;
 		$this->datum=mktime();
@@ -192,7 +195,7 @@ class wochenplan
 		//ortdaten ermitteln
 		if ($this->type=='ort')
 		{
-			$sql_query="SELECT bezeichnung, ort_kurzbz FROM tbl_ort WHERE ort_kurzbz='$this->ort_kurzbz'";
+			$sql_query="SELECT bezeichnung, ort_kurzbz FROM public.tbl_ort WHERE ort_kurzbz='$this->ort_kurzbz'";
 			//echo $sql_query;
 			if (!$result=pg_query($this->conn, $sql_query))
 				$this->errormsg=pg_last_error($this->conn);
@@ -388,7 +391,7 @@ class wochenplan
 		if ($this->type=='ort')
 		{
 			// Orte abfragen
-			$sql_query="SELECT * FROM tbl_ort WHERE aktiv AND lehre ORDER BY ort_kurzbz";
+			$sql_query="SELECT * FROM public.tbl_ort WHERE aktiv AND lehre ORDER BY ort_kurzbz";
 			if(!$result_ort=pg_exec($this->conn, $sql_query))
 				die(pg_last_error($this->conn));
 			$num_rows_ort=pg_numrows($result_ort);
@@ -409,7 +412,7 @@ class wochenplan
 			{
 				echo '<a href="stpl_week.php?type='.$this->type;
 				echo '&datum='.$this->datum.'&ort_kurzbz='.$prev_ort->ort_kurzbz;
-				echo '" alt="$prev_ort->kurzbz"><img src="../../skin/images/left.gif" border="0"></a>';
+				echo '" alt="$prev_ort->kurzbz"><img src="../../../skin/images/left.gif" border="0"></a>';
 			}
 			echo "<SELECT name=\"select\" onChange=\"MM_jumpMenu('self',this,0)\" class=\"xxxs_black\">";
 			for ($i=0;$i<$num_rows_ort;$i++)
@@ -425,7 +428,7 @@ class wochenplan
 			{
 				echo '<a href="stpl_week.php?type='.$this->type;
 				echo '&datum='.$this->datum.'&ort_kurzbz='.$next_ort->ort_kurzbz;
-				echo '" alt="$next_ort->kurzbz"><img src="../../skin/images/right.gif" border="0"></a>';
+				echo '" alt="$next_ort->kurzbz"><img src="../../../skin/images/right.gif" border="0"></a>';
 			}
 			echo '</p>';
 			$link_parameter='&ort_kurzbz='.$this->ort_kurzbz;
