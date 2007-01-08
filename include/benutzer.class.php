@@ -115,7 +115,7 @@ class benutzer extends person
 		
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = 'INSERT INTO tbl_benutzer (uid, aktiv, alias, person_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
+			$qry = 'INSERT INTO public.tbl_benutzer (uid, aktiv, alias, person_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
 			       "'".addslashes($this->uid)."',".
 			       ($this->aktiv?'true':'false').','.
 			       $this->addslashes($this->alias).",'".
@@ -127,7 +127,7 @@ class benutzer extends person
 		}
 		else
 		{			
-			$qry = 'UPDATE tbl_benutzer SET'.
+			$qry = 'UPDATE public.tbl_benutzer SET'.
 			       ' aktiv='.($this->aktiv?'true':'false').','.
 			       ' alias='.$this->addslashes($this->alias).','.
 			       " person_id='".$this->person_id."',".

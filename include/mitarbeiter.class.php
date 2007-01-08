@@ -141,7 +141,7 @@ class mitarbeiter extends benutzer
 		if($this->new)
 		{
 			//Neuen Datensatz anlegen
-			$qry = "INSERT INTO tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz,
+			$qry = "INSERT INTO public.tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz,
 			                    fixangestellt, telefonklappe, updateamum, updatevon)
 			        VALUES('".addslashes($this->uid)."',".
 			 	 	$this->addslashes($this->ausbildungcode).",".
@@ -157,7 +157,7 @@ class mitarbeiter extends benutzer
 		else
 		{
 			//Bestehenden Datensatz updaten
-			$qry = 'UPDATE tbl_mitarbeiter SET'.
+			$qry = 'UPDATE public.tbl_mitarbeiter SET'.
 			       ' ausbildungcode='.$this->addslashes($this->ausbildungcode).','.
 			       " personalnummer=".$this->addslashes($this->personalnummer).",". //TODO: in Produktivversion nicht angeben
 			       ' kurzbz='.$this->addslashes($this->kurzbz).','.
@@ -189,7 +189,7 @@ class mitarbeiter extends benutzer
 	 */
 	function getMitarbeiter($lektor=true,$fixangestellt=null,$stg_kz=null,$fachbereich_id=null)
 	{
-		$sql_query='SELECT DISTINCT vw_mitarbeiter.* FROM campus.vw_mitarbeiter
+		$sql_query='SELECT DISTINCT campus.vw_mitarbeiter.* FROM campus.vw_mitarbeiter
 					LEFT OUTER JOIN public.tbl_benutzerfunktion USING (uid)
 					WHERE';
 		if (!$lektor)

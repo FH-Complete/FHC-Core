@@ -64,7 +64,7 @@ class studiensemester
 	// **************************************************************
 	function load($studiensemester_kurzbz)
 	{
-		$qry = "SELECT * FROM tbl_studiensemester WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+		$qry = "SELECT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 
 		if(!$result=pg_query($this->conn,$qry))
 		{
@@ -132,14 +132,14 @@ class studiensemester
 
 		if($this->new)
 		{
-			$qry = "INSERT INTO tbl_studiensemester (studiensemester_kurzbz, start, ende)
+			$qry = "INSERT INTO public.tbl_studiensemester (studiensemester_kurzbz, start, ende)
 			        VALUES('".addslashes($this->studiensemester_kurzbz)."',".
 					$this->addslashes($this->start).','.
 					$this->addslashes($this->ende).');';
 		}
 		else
 		{			
-			$qry = 'UPDATE tbl_studiensemester SET'.
+			$qry = 'UPDATE public.tbl_studiensemester SET'.
 			       ' start='.$this->addslashes($this->start).','.
 			       ' ende='.$this->addslashes($this->ende).
 			       " WHERE studiensemester_kurzbz='$this->studiensemester_kurzbz'";
@@ -163,7 +163,7 @@ class studiensemester
 	// ******************************************************************
 	function getakt()
 	{
-		$qry = "SELECT studiensemester_kurzbz FROM tbl_studiensemester WHERE start <= now() AND ende >= now()";
+		$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE start <= now() AND ende >= now()";
 		if(!$res=pg_exec($this->conn,$qry))
 		{
 			$this->errormsg = pg_errormessage($this->conn);
@@ -192,7 +192,7 @@ class studiensemester
 		   return $stsem;
 		else 
 		{
-			$qry = "SELECT studiensemester_kurzbz FROM tbl_studiensemester WHERE ende >= now() ORDER BY ende";
+			$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ende >= now() ORDER BY ende";
 			if(!$res=pg_exec($this->conn,$qry))
 		    {
 				$this->errormsg = pg_errormessage($this->conn);

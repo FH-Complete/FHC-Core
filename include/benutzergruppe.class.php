@@ -131,7 +131,7 @@ class benutzergruppe
 
 		if($new)
 		{		
-			$qry = 'INSERT INTO tbl_benutzergruppe (uid, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon)
+			$qry = 'INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon)
 			        VALUES('.$this->addslashes($this->uid).','.
 					$this->addslashes($this->gruppe_kurzbz).','.
 					$this->addslashes($this->updateamum).','.

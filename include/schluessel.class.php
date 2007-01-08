@@ -101,7 +101,7 @@ class schluessel
 		{
 			//Neuen Datensatz einfuegen
 					
-			$qry='INSERT INTO tbl_schluessel (person_id, schluesseltyp, nummer, kaution, ausgegebenam, 
+			$qry='INSERT INTO public.tbl_schluessel (person_id, schluesseltyp, nummer, kaution, ausgegebenam, 
 				ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
 			     $this->addslashes($this->person_id).', '.
 			     $this->addslashes($this->schluesseltyp).', '.
@@ -115,7 +115,7 @@ class schluessel
 		}
 		else
 		{			
-			$qryz="SELECT * FROM tbl_schluessel WHERE schluessel_id='$this->schluessel_id';";
+			$qryz="SELECT * FROM public.tbl_schluessel WHERE schluessel_id='$this->schluessel_id';";
 			if($resultz = pg_query($this->conn, $qryz))
 			{
 				while($rowz = pg_fetch_object($resultz))
@@ -130,7 +130,7 @@ class schluessel
 				
 					if($update)
 					{
-						$qry='UPDATE tbl_schluessel SET '.
+						$qry='UPDATE public.tbl_schluessel SET '.
 							'person_id='.$this->addslashes($this->person_id).', '. 
 							'schluesseltyp='.$this->addslashes($this->schluesseltyp).', '. 
 							'nummer='.$this->addslashes($this->nummer).', '.  

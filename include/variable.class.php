@@ -122,14 +122,14 @@ class variable
 
 		if($new)
 		{		
-			$qry = 'INSERT INTO tbl_variable (uid, name, wert)
+			$qry = 'INSERT INTO public.tbl_variable (uid, name, wert)
 			        VALUES('.$this->addslashes($this->uid).','.
 					$this->addslashes($this->name).','.
 					$this->addslashes($this->wert).');';
 		}
 		else
 		{
-			$qry = 'UPDATE tbl_variable SET'.
+			$qry = 'UPDATE public.tbl_variable SET'.
 			       ' wert='.$this->addslashes($this->wert).
 			       " WHERE uid='".addslashes($this->uid)."' AND name='".addslashes($this->name)."';";
 		}

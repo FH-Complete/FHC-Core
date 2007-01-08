@@ -60,7 +60,7 @@ class lehrverband
 		
 	function exists($studiengang_kz, $semester, $verband, $gruppe)
 	{
-		$qry = "SELECT count(*) as anzahl FROM tbl_lehrverband WHERE 
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_lehrverband WHERE 
 		            studiengang_kz='".addslashes($studiengang_kz)."' AND
 		            semester='".addslashes($semester)."' AND
 		            trim(verband)='".trim(addslashes($verband))."' AND
@@ -114,7 +114,7 @@ class lehrverband
 	
 	function getlehrverband($studiengang_kz=null, $semester=null, $verband=null)
 	{
-		$qry = 'SELECT * FROM tbl_lehrverband WHERE 1=1';
+		$qry = 'SELECT * FROM public.tbl_lehrverband WHERE 1=1';
 		if(!is_null($studiengang_kz))
 			$qry .=' AND studiengang_kz='.$this->addslashes($studiengang_kz);
 		if(!is_null($semester))
@@ -171,7 +171,7 @@ class lehrverband
 		if(!$this->validate())
 			return false;
 				
-		$qry = 'INSERT INTO tbl_lehrverband (studiengang_kz, semester, verband, gruppe, aktiv, bezeichnung)
+		$qry = 'INSERT INTO public.tbl_lehrverband (studiengang_kz, semester, verband, gruppe, aktiv, bezeichnung)
 		        VALUES('.$this->addslashes($this->studiengang_kz).','.
 				$this->addslashes($this->semester).','.
 				$this->addslashes($this->verband).','.
