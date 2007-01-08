@@ -10,11 +10,10 @@
 	require_once('../../../include/functions.inc.php');
     require_once('../../../include/studiengang.class.php');
     require_once('../../../include/lehrveranstaltung.class.php');
-    writeCISlog('START');
+
     //Connection Herstellen
     if(!$conn = pg_pconnect(CONN_STRING))
     {
-       writeCISlog('STOP');	
        die('Fehler beim oeffnen der Datenbankverbindung');
     }
         
@@ -25,7 +24,6 @@
     
 	 if(!isset($_GET['lvid']) || !is_numeric($_GET['lvid']))
 	 {
-	 	writeCISlog('STOP');
     	die("Fehler bei der Parameteruebergabe");
 	 }
 	 else 
@@ -156,7 +154,6 @@ function ConfirmFile(handle)
 	echo ' <input type="file" name="userfile" size="30">';
 	echo ' <input type="submit" name="upload" value="Upload">';
 	echo '</form></td><td>';
-	writeCISlog('STOP');
 ?>
 </body>
 </html>

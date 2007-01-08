@@ -123,7 +123,7 @@
           <p>Studiengangsleiter:<br>
                 <?php
                 //Studiengangsleiter auslesen
-				$qry = "SELECT * FROM campus.vw_mitarbeiter JOIN tbl_benutzerfunktion using(uid) WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stgl'";
+				$qry = "SELECT * FROM campus.vw_mitarbeiter JOIN public.tbl_benutzerfunktion using(uid) WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stgl'";
 				if($result_course_leader = pg_query($sql_conn, $qry))
 				{
 					$num_rows_course_leader = pg_numrows($result_course_leader);					
@@ -193,7 +193,7 @@
 			  	echo "<p>Stellvertreter:<br>";
                 
 			  	//Studiengangsleiter Stellvertreter auselesen
-				$sql_query = "SELECT * FROM campus.vw_mitarbeiter JOIN tbl_benutzerfunktion using(uid) WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stglstv'";
+				$sql_query = "SELECT * FROM campus.vw_mitarbeiter JOIN public.tbl_benutzerfunktion using(uid) WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stglstv'";
 				
 				if($result_course_leader_deputy = pg_query($sql_conn, $sql_query))
 				{
@@ -264,7 +264,7 @@
 			  	echo "<p>Sekretariat:</font><font face='Arial, Helvetica, sans-serif' size='2'><br>";
                 //Sektritariat auslesen
                 
-				$sql_query = "SELECT * FROM campus.vw_mitarbeiter JOIN tbl_benutzerfunktion using(uid) WHERE studiengang_kz='$course_id' AND funktion_kurzbz='ass'";
+				$sql_query = "SELECT * FROM campus.vw_mitarbeiter JOIN public.tbl_benutzerfunktion using(uid) WHERE studiengang_kz='$course_id' AND funktion_kurzbz='ass'";
 					
 				if($result_course_secretary = pg_query($sql_conn, $sql_query))
 				{
@@ -333,7 +333,7 @@
 				
 				echo "<p>Studentenvertreter:</font><font face='Arial, Helvetica, sans-serif' size='2'><br>";
                 
-				$sql_query = "SELECT * FROM campus.vw_benutzer JOIN tbl_benutzerfunktion using(uid) WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stdv'";
+				$sql_query = "SELECT * FROM campus.vw_benutzer JOIN public.tbl_benutzerfunktion using(uid) WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stdv'";
 					
 				if($result_course_stdv = pg_query($sql_conn, $sql_query))
 				{

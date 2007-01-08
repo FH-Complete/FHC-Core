@@ -58,7 +58,7 @@
           <td bgcolor="#008381"><font color="#FFFFFF"><strong>&nbsp;<?php echo $short_name; ?> - Feedback 
             an: </strong>
 			<?php
-			$qry = "SELECT vorname, nachname, uid FROM campus.vw_mitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter WHERE uid=mitarbeiter_uid AND tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND lehrveranstaltung_id='$lvid' AND studiensemester_kurzbz='$stsem'";
+			$qry = "SELECT distinct vorname, nachname, uid FROM campus.vw_mitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter WHERE uid=mitarbeiter_uid AND tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND lehrveranstaltung_id='$lvid' AND studiensemester_kurzbz='$stsem'";
 			if(!$result=pg_query($conn, $qry))
 				die('Fehler beim Auslesen der Lektoren');
 			$rows = pg_num_rows($result);
