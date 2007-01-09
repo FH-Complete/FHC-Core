@@ -71,7 +71,7 @@ font-size:10pt;
 		echo "<li><a href=\"#en\">Englische Version</a></li>";
 	}
 
-	if(isset($_POST['lehrende'])) //Alle Variablen werden per POST Methode uebergeben (zB bei Voransicht)
+	if(isset($_POST['titel_de'])) //Alle Variablen werden per POST Methode uebergeben (zB bei Voransicht)
 	{
 		//$sprache = stripslashes($_POST['sprache']);
 		//$semstunden = stripslashes($_POST["semstunden"]);

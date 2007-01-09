@@ -45,7 +45,7 @@ class PDF extends FPDF
 	function Footer() 
 	{
 	    // Check if Footer for this page already exists (do the same for Header())
-	    if(!$this->footerset[$this->page]) {
+	    if(!isset($this->footerset[$this->page]) || !$this->footerset[$this->page]) {
 	        $this->SetY(-30);
 	        //Page number
 	        $this->Cell(0,10,'Seite '.$this->PageNo().'/{nb}',0,0,'C');
@@ -61,7 +61,7 @@ class PDF extends FPDF
 	function Header() 
 	{
 	    // Check if Header for this page already exists (do the same for Footer())
-	    if(!$this->headerset[$this->page]) {
+	    if(!isset($this->headerset[$this->page]) || !$this->headerset[$this->page]) {
 	    $this->SetFont('Arial','B',10);
 	        $this->SetY(25);
 	        //Page number

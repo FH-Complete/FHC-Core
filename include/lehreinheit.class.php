@@ -41,6 +41,11 @@ class lehreinheit
 	var $lehre;						// boolean
 	var $anmerkung;					// varchar(255)
 	var $unr;						// integer
+	var $lvnr;						// bigint
+	var $insertamum;				// timestamp
+	var $insertvon;					// varchar(16)
+	var $updateamum;				// timestamp
+	var $updatevon;					// varchar(16)
 	var $ext_id;					// bigint
 	
 	// *************************************************************************
@@ -76,6 +81,46 @@ class lehreinheit
 	function load($lehreinheit_id)
 	{
 		return false;
+	}
+	
+	function load_lehreinheiten($lehrveranstaltung_id, $studiensemester_kurzbz)
+	{
+		$qry = "SELECT * FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lehrveranstaltung_id' AND studiensemester_kurzbz='$studiensemester_kurzbz'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$le_obj = new lehreinheit($this->conn);
+				
+				$le_obj->lehreinheit_id = $row->lehreinheit_id;
+				$le_obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$le_obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$le_obj->lehrfach_id = $row->lehrfach_id;
+				$le_obj->lehrform_kurzbz = $row->lehrform_kurzbz;
+				$le_obj->stundenblockung = $row->stundenblockung;
+				$le_obj->wochenrythmus = $row->wochenrythmus;
+				$le_obj->start_kw = $row->start_kw;
+				$le_obj->raumtyp = $row->raumtyp;
+				$le_obj->raumtypalternativ = $row->raumtypalternativ;
+				$le_obj->lehre = ($row->lehre=='t'?true:false);
+				$le_obj->anmerkung = $row->anmerkung;
+				$le_obj->unr = $row->unr;
+				$le_obj->lvnr = $row->lvnr;
+				$le_obj->insertamum = $row->insertamum;
+				$le_obj->insertvon = $row->insertvon;
+				$le_obj->updateamum = $row->updateamum;
+				$le_obj->updatevon = $row->updatevon;
+				$le_obj->ext_id = $row->ext_id;
+				
+				$this->lehreinheiten[] = $le_obj;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Lehreinheiten';
+			return false;
+		}
 	}
 	
 	// *******************************************
@@ -225,6 +270,11 @@ class lehreinheit
 					($this->lehre?'true':'false').','.
 					$this->addslashes($this->anmerkung).','.
 					$this->addslashes($this->unr).','.
+					$this->addslashes($this->lvnr).','.
+					$this->addslashes($this->insertamum).','.
+					$this->addslashes($this->insertvon).','.
+					$this->addslashes($this->updateamum).','.
+					$this->addslashes($this->updatevon).','.
 					$this->addslashes($this->ext_id).');';
 		}
 		else
@@ -242,6 +292,9 @@ class lehreinheit
 			       ' lehre='.($this->lehre?'true':'false').','.
 			       ' anmerkung='.$this->addslashes($this->anmerkung).','.
 			       ' unr='.$this->addslashes($this->unr).','.
+			       ' lvnr='.$this->addslashes($this->lvnr).','.
+				   ' updateamum='.$this->addslashes($this->updateamum).','.
+				   ' updatevon='.$this->addslashes($this->updatevon).','.
 			       ' ext_id='.$this->addslashes($this->ext_id).
 			       " WHERE lehreinheit_id=".$this->addslashes($this->lehreinheit_id).";";
 		}

@@ -12,8 +12,6 @@
     * anwesenheitsliste.pdf.php?stg=222&sem=1&einheit=DVT-1xyz1&lfvt=1234 //alle Studenten vom Studiengang 222, Semester 1,  Einheit DVT-1xyz1 Lehrfach 1234
     */
 
-   //error_reporting(E_ALL);
-   //ini_set('display_errors','1');
    setlocale(LC_ALL, "de");
    // Pfad zu fpdf
    define('FPDF_FONTPATH','../../../include/pdf/font/');
@@ -26,6 +24,8 @@
    require_once('../../../include/studiensemester.class.php');
    require_once('../../../include/lehrveranstaltung.class.php');
    require_once('../../../include/pdf.inc.php');
+   error_reporting(E_ALL);
+   ini_set('display_errors','1');
    
    if(!$conn=pg_pconnect(CONN_STRING))
       die('Fehler beim Herstellen der Datenbankverbindung');
