@@ -80,9 +80,9 @@
 	  	$nt_content='';
 	  	
 	  	//Content fuer Anwesenheitslisten erstellen
-	  	$qry = "SELECT kurzbzlang FROM public.tbl_studiengang WHERE studiengang_kz='$stg_kz'";
+	  	$qry = "SELECT kurzbz FROM public.tbl_studiengang WHERE studiengang_kz='$stg_kz'";
 	  	if($row=pg_fetch_object(pg_query($conn,$qry)))
-	  		$kurzbzlang = $row->kurzbzlang;
+	  		$kurzbzlang = $row->kurzbz;
 	  	else 
 	  		echo "Fehler beim Auslesen der Daten";
 	  	

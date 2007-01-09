@@ -212,5 +212,28 @@ class studiensemester
 		}
 	}
 
+	function getAll()
+	{
+		$qry = "SELECT * FROM public.tbl_studiensemester ORDER BY ende";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$stsem_obj = new studiensemester($this->conn);
+				
+				$stsem_obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$stsem_obj->start = $row->start;
+				$stsem_obj->ende = $row->ende;
+				
+				$this->studiensemester[] = $stsem_obj;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Studiensemester';
+			return false;
+		}
+	}
 }
 ?>
