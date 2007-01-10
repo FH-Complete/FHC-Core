@@ -433,11 +433,11 @@
 				
           <td valign="top" align="center"> 
 	  <?php if($is_lector) { ?>
-	  <a href="kreuzerltool/verwaltung.php?<?php echo "lvid=$lvid"?>" target="_blank"> 
+	  <a href="kreuzerltool/verwaltung.php?<?php echo "lvid=$lvid"?>" > 
             <img src="../../../skin/images/button_kt.jpg" border="0" width="67" height="45"><br>
             <strong>"Kreuzerl"-Tool</strong></a>
 	    <?php } else { ?>
-	  <a href="kreuzerltool/result_student.php?<?php echo "course_id=$course_id&term_id=$term_id&short=$short"?>" target="_blank"> 
+	  <a href="kreuzerltool/result_student.php?<?php echo "course_id=$course_id&term_id=$term_id&short=$short"?>" > 
             <img src="../../../skin/images/button_kt.jpg" border="0" width="67" height="45"><br>
             <strong>"Kreuzerl"-Tool</strong></a>
 

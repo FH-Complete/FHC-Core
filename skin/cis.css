@@ -277,3 +277,8 @@ h4
 	margin-top: 3px;
 	text-align: right;
 }
+
+.error
+{
+	color: #ff0000;
+}

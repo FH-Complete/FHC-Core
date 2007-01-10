@@ -20,39 +20,31 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-class uebung
+class beispiel
 {
 	var $conn;     // resource DB-Handle
 	var $errormsg; // string
 	var $new;      // boolean
-	var $uebungen = array(); // lehreinheit Objekt
+	var $beispiele = array(); // lehreinheit Objekt
 	
 	//Tabellenspalten
-	var $uebung_id;		// serial
-	var $gewicht;		// smalint
-	var $punkte;		// Real
-	var $angabedatei;	// oid
-	var $freigabevon;	// timestamp
-	var $freigabebis;	// timestamp
-	var $abgabe;		// boolean
-	var $beispiele;		// boolean
+	var $beispiel_id;	// Serial
+	var $uebung_id;		// integer
 	var $bezeichnung;	// varchar(32)
-	var $positiv;		// boolean
-	var $defaultbemerkung;	// text
-	var $lehreinheit_id;	// integer
-	var $updateamum;		// timestamp
-	var $updatevon;			// varchar(16)
-	var $insertamum;		// timestamp
-	var $insertvon;			// varchar(16)
+	var $punkte;		// real
+	var $updateamum;	// timestamp
+	var $updatevon;		// varchar(16)
+	var $insertamum;	// timestamp
+	var $insertvon;		// varchar(16)
 	
 	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Uebung
+	// * Konstruktor - Uebergibt die Connection und laedt optional ein beispiel
 	// * @param $conn        	Datenbank-Connection
-	// * 		$uebung_id
+	// * 		$beispiel_id
 	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
-	function uebung($conn, $uebung_id=null, $unicode=false)
+	function beispiel($conn, $beispiel_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
 		
@@ -61,45 +53,37 @@ class uebung
 		else 
 			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
 			
-		if(!pg_query($this->conn,$qry))
+		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
 		
-		if($uebung_id!=null)
-			$this->load($uebung_id);
+		if($beispiel_id!=null)
+			$this->load($beispiel_id);
 	}
 	
 	// *********************************************************
-	// * Laedt die Uebung
+	// * Laedt ein Beispiel
 	// * @param uebung_id
 	// *********************************************************
-	function load($uebung_id)
+	function load($beispiel_id)
 	{
-		if(!is_numeric($uebung_id))
+		if(!is_numeric($beispiel_id))
 		{
-			$this->errormsg='Uebung_id muss eine gueltige Zahl sein';
+			$this->errormsg='Beispiel_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		$qry = "SELECT * FROM campus.tbl_uebung WHERE uebung_id='$uebung_id'";
+		$qry = "SELECT * FROM campus.tbl_beispiel WHERE beispiel_id='$beispiel_id'";
 		
 		if($result=pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
 			{
+				$this->beispiel_id = $row->beispiel_id;
 				$this->uebung_id = $row->uebung_id;
-				$this->gewicht = $row->gewicht;
 				$this->punkte = $row->punkte;
-				$this->angabedatei = $row->angabedatei;
-				$this->freigabevon = $row->freigabevon;
-				$this->freigabebis = $row->freigabebis;
-				$this->abgabe = ($row->abgabe=='t'?true:false);
-				$this->beispiele = ($row->beispiele=='t'?true:false);
 				$this->bezeichnung = $row->bezeichnung;
-				$this->positiv = ($row->positiv=='t'?true:false);
-				$this->defaultbemerkung = $row->defaultbemerkung;
-				$this->lehreinheit_id = $row->lehreinheit_id;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->insertamum = $row->insertamum;
@@ -108,57 +92,49 @@ class uebung
 			}
 			else 
 			{
-				$this->errormsg = "Es ist keine Uebung mit der ID $uebung_id vorhanden";
+				$this->errormsg = "Es ist kein Beispiel mit der ID $beispiel_id vorhanden";
 				return false;
 			}
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim laden der Uebung';
+			$this->errormsg = 'Fehler beim laden des Beispiels';
 			return false;
 		}
 	}
 	
-	function load_uebung($lehreinheit_id)
+	function load_beispiel($uebung_id)
 	{
-		if(!is_numeric($lehreinheit_id))
+		if(!is_numeric($uebung_id))
 		{
-			$this->errormsg = 'Lehreinheit_id muss eine gueltige Zahl sein';
+			$this->errormsg = 'Uebung_id muss eine gueltige Zahl sein';
 			return false;
 		}
 		
-		$qry = "SELECT * FROM campus.tbl_uebung WHERE lehreinheit_id='$lehreinheit_id'";
+		$qry = "SELECT * FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id'";
 				
 		if($result=pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
 			{
-				$uebung_obj = new uebung($this->conn);
+				$beispiel_obj = new beispiel($this->conn);
+
+				$beispiel_obj->beispiel_id = $row->beispiel_id;
+				$beispiel_obj->uebung_id = $row->uebung_id;
+				$beispiel_obj->punkte = $row->punkte;
+				$beispiel_obj->bezeichnung = $row->bezeichnung;
+				$beispiel_obj->updateamum = $row->updateamum;
+				$beispiel_obj->updatevon = $row->updatevon;
+				$beispiel_obj->insertamum = $row->insertamum;
+				$beispiel_obj->insertvon = $row->insertvon;
 				
-				$uebung_obj->uebung_id = $row->uebung_id;
-				$uebung_obj->gewicht = $row->gewicht;
-				$uebung_obj->punkte = $row->punkte;
-				$uebung_obj->angabedatei = $row->angabedatei;
-				$uebung_obj->freigabevon = $row->freigabevon;
-				$uebung_obj->freigabebis = $row->freigabebis;
-				$uebung_obj->abgabe = ($row->abgabe=='t'?true:false);
-				$uebung_obj->beispiele = ($row->beispiele=='t'?true:false);
-				$uebung_obj->bezeichnung = $row->bezeichnung;
-				$uebung_obj->positiv = ($row->positiv=='t'?true:false);
-				$uebung_obj->defaultbemerkung = $row->defaultbemerkung;
-				$uebung_obj->lehreinheit_id = $row->lehreinheit_id;
-				$uebung_obj->updateamum = $row->updateamum;
-				$uebung_obj->updatevon = $row->updatevon;
-				$uebung_obj->insertamum = $row->insertamum;
-				$uebung_obj->insertvon = $row->insertvon;
-				
-				$this->uebungen[] = $uebung_obj;
+				$this->beispiele[] = $beispiel_obj;
 			}
 			return true;
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim laden der Uebung';
+			$this->errormsg = 'Fehler beim laden der Beispiele';
 			return false;
 		}
 	}
@@ -170,9 +146,9 @@ class uebung
 	// *******************************************
 	function validate()
 	{
-		if(!is_numeric($this->lehreinheit_id))
+		if(!is_numeric($this->uebung_id))
 		{
-			$this->errormsg = 'Lehreinheit_id muss eine gueltige Zahl sein';
+			$this->errormsg = 'uebung_id muss eine gueltige Zahl sein';
 			return false;
 		}
 		return true;
@@ -190,7 +166,7 @@ class uebung
 	}
 
 	// ************************************************************
-	// * Speichert Uebung in die Datenbank
+	// * Speichert ein Beispiel in die Datenbank
 	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
 	// * angelegt, ansonsten der Datensatz upgedated
 	// * @return true wenn erfolgreich, false im Fehlerfall
@@ -206,20 +182,11 @@ class uebung
 
 		if($new)
 		{
-			$qry = 'BEGIN; INSERT INTO campus.tbl_uebung(gewicht, punkte, angabedatei, freigabevon, freigabebis, 
-			        abgabe, beispiele, bezeichnung, positiv, defaultbemerkung, lehreinheit_id, updateamum, 
+			$qry = 'BEGIN; INSERT INTO campus.tbl_beispiel(uebung_id, punkte, bezeichnung, updateamum, 
 			        updatevon, insertamum, insertvon) VALUES('.
-			        $this->addslashes($this->gewicht).','.
+			        $this->addslashes($this->uebung_id).','.
 			        $this->addslashes($this->punkte).','.
-			        $this->addslashes($this->angabedatei).','.
-			        $this->addslashes($this->freigabevon).','.
-			        $this->addslashes($this->freigabebis).','.
-			        ($this->abgabe?'true':'false').','.
-			        ($this->beispiele?'true':'false').','.
 			        $this->addslashes($this->bezeichnung).','.
-			        ($this->positiv?'true':'false').','.
-			        $this->addslashes($this->defaultbemerkung).','.
-			        $this->addslashes($this->lehreinheit_id).','.
 			        $this->addslashes($this->updateamum).','.
 			        $this->addslashes($this->updatevon).','.
 			        $this->addslashes($this->insertamum).','.
@@ -227,28 +194,20 @@ class uebung
 		}
 		else
 		{
-			$qry = 'UPDATE campus.tbl_uebung SET'.
-			       ' gewicht='.$this->addslashes($this->gewicht).','.
-			       ' punkte='.$this->addslashes($this->punkte).','.
-			       ' angabedatei='.$this->addslashes($this->angabedatei).','.
-			       ' freigabevon='.$this->addslashes($this->freigabevon).','.
-			       ' freigabebis='.$this->addslashes($this->freigabebis).','.
-			       ' abgabe='.($this->abgabe?'true':'false').','.
-			       ' beispiele='.($this->beispiele?'true':'false').','.
-			       ' bezeichnung='.$this->addslashes($this->bezeichnung).','.
-			       ' positiv='.($this->positiv?'true':'false').','.
-			       ' defaultbemerkung='.$this->addslashes($this->defaultbemerkung).','.
-			       ' lehreinheit_id='.$this->addslashes($this->lehreinheit_id).','.
-			       ' updateamum='.$this->addslashes($this->updateamum).','.
+			$qry = 'UPDATE campus.tbl_beispiel SET'.
+			       ' uebung_id='.$this->addslashes($this->uebung_id).
+			       ' punkte='.$this->addslashes($this->punkte).
+			       ' bezeichnung='.$this->addslashes($this->bezeichnung).
+			       ' updateamum='.$this->addslashes($this->updateamum).
 			       ' updatevon='.$this->addslashes($this->updatevon).
-			       " WHERE uebung_id=".$this->addslashes($this->uebung_id).";";
+			       " WHERE beispiel_id=".$this->addslashes($this->beispiel_id).";";
 		}
 
 		if(pg_query($this->conn,$qry))
 		{
 			if($new)
 			{
-				$qry = "SELECT currval('campus.tbl_uebung_uebung_id_seq') as id;";
+				$qry = "SELECT currval('campus.tbl_beispiel_beispiel_id_seq') as id;";
 				if($result = pg_query($this->conn, $qry))
 				{
 					if($row=pg_fetch_object($result))
@@ -276,7 +235,26 @@ class uebung
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der Uebung:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern des Beispiels';
+			return false;
+		}
+	}
+	
+	function delete($beispiel_id)
+	{
+		if(!is_numeric($beispiel_id))
+		{
+			$this->errormsg = 'Beispiel_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "DELETE FROM campus.tbl_beispiel WHERE beispiel_id='$beispiel_id'";
+		
+		if(pg_query($this->conn, $qry))
+			return true;
+		else 	
+		{
+			$this->errormsg = 'Fehler beim loeschen des Beispiels';
 			return false;
 		}
 	}

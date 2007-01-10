@@ -257,7 +257,7 @@ class lehreinheit
 			//ToDo ID entfernen
 			$qry = 'INSERT INTO lehre.tbl_lehreinheit (lehrveranstaltung_id, studiensemester_kurzbz, 
 			                                     lehrfach_id, lehrform_kurzbz, stundenblockung, wochenrythmus, 
-			                                     start_kw, raumtyp, raumtypalternativ, lehre, anmerkung, unr, ext_id)
+			                                     start_kw, raumtyp, raumtypalternativ, lehre, anmerkung, unr, lvnr, insertamum, insertvon, updateamum, updatevon,  ext_id)
 			        VALUES('.$this->addslashes($this->lehrveranstaltung_id).','.
 					$this->addslashes($this->studiensemester_kurzbz).','.
 					$this->addslashes($this->lehrfach_id).','.
