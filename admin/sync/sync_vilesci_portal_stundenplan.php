@@ -129,7 +129,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		if($dev)
 			$qry = "INSERT INTO lehre.tbl_stundenplandev(stundenplandev_id,";
 		else
-			$qry = 'INSERT INTO campus.tbl_stundenplan(stundenplan_id,';
+			$qry = 'INSERT INTO lehre.tbl_stundenplan(stundenplan_id,';
 			
 		$qry.='unr, mitarbeiter_uid, datum, stunde, ort_kurzbz, gruppe_kurzbz, titel, 
 		       anmerkung, fix, updateamum, updatevon, lehreinheit_id, 

@@ -24,7 +24,7 @@ $result=pg_exec($conn,  "INSERT INTO tbl_erhalter VALUES(5,'TW','Technikum Wien'
 $sql_query='SELECT * FROM tbl_studiengang';
 //echo $sql_query.'<br>';
 $stg_vilesci=pg_exec($conn_vilesci, $sql_query);
-
+pg_query($conn, "SET CLIENT_ENCODING TO 'LATIN9';");
 while ($stg=pg_fetch_object($stg_vilesci))
 {
 	$sql_query="INSERT INTO tbl_studiengang(studiengang_kz, kurzbz, kurzbzlang, bezeichnung, typ, farbe, email, max_semester, max_verband, max_gruppe, erhalter_kz) 
