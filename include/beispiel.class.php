@@ -151,6 +151,11 @@ class beispiel
 			$this->errormsg = 'uebung_id muss eine gueltige Zahl sein';
 			return false;
 		}
+		if(strlen($this->bezeichnung)>32)
+		{
+			$this->errormsg = 'Bezeichnung darf nicht laenger als 32 Zeichen sein';
+			return false;
+		}
 		return true;
 	}
 
@@ -182,6 +187,11 @@ class beispiel
 
 		if($new)
 		{
+			if($this->exists($this->uebung_id, $this->bezeichnung))
+			{
+				$this->errormsg = 'Fehler beim Speichern! Es existiert bereits ein Beispiel mit diesem Namen';
+				return false;
+			}
 			$qry = 'BEGIN; INSERT INTO campus.tbl_beispiel(uebung_id, punkte, bezeichnung, updateamum, 
 			        updatevon, insertamum, insertvon) VALUES('.
 			        $this->addslashes($this->uebung_id).','.
@@ -195,14 +205,14 @@ class beispiel
 		else
 		{
 			$qry = 'UPDATE campus.tbl_beispiel SET'.
-			       ' uebung_id='.$this->addslashes($this->uebung_id).
-			       ' punkte='.$this->addslashes($this->punkte).
-			       ' bezeichnung='.$this->addslashes($this->bezeichnung).
-			       ' updateamum='.$this->addslashes($this->updateamum).
+			       ' uebung_id='.$this->addslashes($this->uebung_id).','.
+			       ' punkte='.$this->addslashes($this->punkte).','.
+			       ' bezeichnung='.$this->addslashes($this->bezeichnung).','.
+			       ' updateamum='.$this->addslashes($this->updateamum).','.
 			       ' updatevon='.$this->addslashes($this->updatevon).
 			       " WHERE beispiel_id=".$this->addslashes($this->beispiel_id).";";
 		}
-
+		
 		if(pg_query($this->conn,$qry))
 		{
 			if($new)
@@ -236,6 +246,30 @@ class beispiel
 		else
 		{
 			$this->errormsg = 'Fehler beim Speichern des Beispiels';
+			return false;
+		}
+	}
+	
+	function exists($uebung_id, $bezeichnung)
+	{
+		if(!is_numeric($uebung_id))
+		{
+			$this->errormsg = 'Uebung_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "SELECT beispiel_id FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id' AND bezeichnung=".$this->addslashes($bezeichnung);
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if(pg_num_rows($result)>0)
+				return true;
+			else 
+				return false;
+		}
+		else 
+		{
+			$this->errormsg ='Fehler beim lesen der Beispiele';
 			return false;
 		}
 	}

@@ -80,7 +80,43 @@ class lehreinheit
 	// *********************************************************
 	function load($lehreinheit_id)
 	{
-		return false;
+		if(!is_numeric($lehreinheit_id))
+		{
+			$this->errormsg = 'Lehreinheit_id muss eine gueltige Zahl sein';
+		}
+		
+		$qry = "SELECT * FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$lehreinheit_id'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{				
+				$this->lehreinheit_id = $row->lehreinheit_id;
+				$this->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$this->lehrfach_id = $row->lehrfach_id;
+				$this->lehrform_kurzbz = $row->lehrform_kurzbz;
+				$this->stundenblockung = $row->stundenblockung;
+				$this->wochenrythmus = $row->wochenrythmus;
+				$this->start_kw = $row->start_kw;
+				$this->raumtyp = $row->raumtyp;
+				$this->raumtypalternativ = $row->raumtypalternativ;
+				$this->lehre = ($row->lehre=='t'?true:false);
+				$this->anmerkung = $row->anmerkung;
+				$this->unr = $row->unr;
+				$this->lvnr = $row->lvnr;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->ext_id = $row->ext_id;				
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Lehreinheit';
+			return false;
+		}
 	}
 	
 	function load_lehreinheiten($lehrveranstaltung_id, $studiensemester_kurzbz)
