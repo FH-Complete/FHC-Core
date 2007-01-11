@@ -1,6 +1,6 @@
 <?php
-	require_once('../../../config.inc.php');
-	require_once('../../../../include/functions.inc.php');
+	require_once('../../config.inc.php');
+	require_once('../../../include/functions.inc.php');
 
 	//if (!isset($REMOTE_USER))
 	//	$REMOTE_USER='pam';
@@ -64,15 +64,15 @@
 <head>
 <title>Profil</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link rel="stylesheet" href="../../../../skin/cis.css" type="text/css">
+<link rel="stylesheet" href="../../../skin/cis.css" type="text/css">
 </head>
 
 <body>
 <H2>
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
-		<td>&nbsp;<a href="../index.php">Lehrveranstaltungsplan</a> &gt;&gt; Userprofil</td>
-		<td align="right"><A href="../help/index.html" class="hilfe" target="_blank">HELP&nbsp;</A></td>
+		<td>&nbsp;Userprofil</td>
+		<td align="right"><A href="../lvplan/help/index.html" class="hilfe" target="_blank">HELP&nbsp;</A></td>
 	</tr>
 	</table>
 </H2>
@@ -232,7 +232,7 @@ Results: <?php echo $num_rows; ?><br>
 			<BR><HR>
 			Sollten ihre Daten nicht stimmen, wenden sie sich bitte an die <a href="mailto:<?php echo $mail ?>?subject=Datenkorrektur&body=Die%20Profildaten%20fuer%20User%20'<?php echo $uid; ?>'%20sind%20nicht%20korrekt.%0D
 				Hier die richtigen Daten:%0DNachname:%20<?php echo $nachname;?>%0DVornamen:%20<?php echo $vornamen;?>%0DGeburtsdatum:%20<?php echo $gebdatum;?>
-				%0DGeburtsort:%20<?php echo $gebort;?>%0DTitel:%20<?php echo $titel;?>
+				%0DGeburtsort:%20<?php echo $gebort;?>%0DTitelPre:%20<?php echo $titelpre;?>%0DTitelPost:%20<?php echo $titelpost;?>
 				%0D%0D***%0DPlatz fuer weitere (nicht angefuehrte Daten)%0D***">zuständige Assistentin</a>
 			<?php
 	}

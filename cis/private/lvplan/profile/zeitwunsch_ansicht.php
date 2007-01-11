@@ -1,13 +1,13 @@
 <?php
 	include('../../config.inc.php');
 	include('../../../include/functions.inc.php');
-	
+
 if (isset($REMOTE_USER))
 	$uid=$REMOTE_USER;
 else
 	$uid='pam';
-	
-	if (!$conn = @pg_pconnect(CONN_STRING)) 
+
+	if (!$conn = @pg_pconnect(CONN_STRING))
 	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
 	if(!($erg=pg_exec($conn, "SELECT * FROM zeitwunsch WHERE zeitwunsch.lektor_id=$lkid")))
 		die(pg_last_error($conn));
@@ -27,14 +27,14 @@ else
 		$beginn[$i]=pg_result($erg_std,$i,"beginn");
 		$ende[$i]=pg_result($erg_std,$i,"ende");
 	}
-	
+
 ?>
 
 <html>
 <head>
 <title>Profil</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link rel="stylesheet" href="../../../skin/cis.css" type="text/css">
+<link rel="stylesheet" href="../../skin/cis.css" type="text/css">
 </head>
 
 <body class="background_main">
@@ -56,7 +56,7 @@ Username: <?php echo $uid; ?><br>
 	  	for ($i=0;$i<$num_rows_std;$i++)
 		{
 			$index=$wunsch[$j][$i+1];
-			if ($index=="") 
+			if ($index=="")
 				$index=1;
 			$bgcolor=$cfgStdBgcolor[$index+3];
 			echo '<TD align="center" bgcolor="'.$bgcolor.'">'.$index.'</TD>';
@@ -72,43 +72,43 @@ Username: <?php echo $uid; ?><br>
 <br>
 <hr>
 <H3>Ekl&auml;rung:</H3>
-<P>Bitte kontrollieren Sie Ihre Zeitw&uuml;nsche, &auml;nderungen per Mail bitte 
+<P>Bitte kontrollieren Sie Ihre Zeitw&uuml;nsche, &auml;nderungen per Mail bitte
   an <A href="mailto:stpl@technikum-wien.at">Stundenplan</A>!<BR>
   <BR>
 </P>
 <TABLE width="35%" border="1" cellspacing="0" name="Zeitwerte">
-  <TR> 
+  <TR>
     <TD><B>Wert</B></TD>
     <TD>
       <DIV align="center"><B>Bedeutung</B></DIV>
     </TD>
   </TR>
-  <TR> 
-    <TD> 
+  <TR>
+    <TD>
       <DIV align="right">2</DIV>
     </TD>
     <TD>Hier m&ouml;chte ich Unterrichen</TD>
   </TR>
-  <TR> 
-    <TD> 
+  <TR>
+    <TD>
       <DIV align="right">1</DIV>
     </TD>
     <TD>Hier kann ich Unterrichten</TD>
   </TR>
-  <TR> 
-    <TD> 
+  <TR>
+    <TD>
       <DIV align="right">0</DIV>
     </TD>
     <TD>keine Bedeutung</TD>
   </TR>
-  <TR> 
-    <TD> 
+  <TR>
+    <TD>
       <DIV align="right">-1</DIV>
     </TD>
     <TD>Hier m&ouml;chte ich eher nicht</TD>
   </TR>
-  <TR> 
-    <TD> 
+  <TR>
+    <TD>
       <DIV align="right">-2</DIV>
     </TD>
     <TD>Hier nur in extremen Notf&auml;llen</TD>
@@ -123,11 +123,11 @@ Username: <?php echo $uid; ?><br>
 <P>&nbsp;</P>
 <H3>Folgende Punkte sind zu beachten:</H3>
 <OL>
-  <LI> Verwenden Sie den Wert -3 nur wenn Sie zu dieser Stunde wirklich nicht 
+  <LI> Verwenden Sie den Wert -3 nur wenn Sie zu dieser Stunde wirklich nicht
     k&ouml;nnen, um eine bessere Optimierung zu erm&ouml;glichen.</LI>
-  <LI>Es m&uuml;ssen f&uuml;r jede Stunde die tats&auml;chlich unterrichtet wird, 
+  <LI>Es m&uuml;ssen f&uuml;r jede Stunde die tats&auml;chlich unterrichtet wird,
     mindestens das 1,5 fache an positiven Zeitw&uuml;nschen angegeben werden.<BR>
-    Beispiel: Sie unterrichten 4Stunden/Woche, dann m&uuml;ssen Sie mindesten 
+    Beispiel: Sie unterrichten 4Stunden/Woche, dann m&uuml;ssen Sie mindesten
     6 Stunden im Raster mit positiven Werten ausf&uuml;llen.</LI>
 </OL>
 <P>Bei Problemen wenden Sie sich bitte an die <A href="mailto:stpl@technikum-wien.at">Stundenplanstelle</A>.</P>
