@@ -151,7 +151,7 @@ if (!isset($pers_uid))
 // Reservieren
 if (isset($reserve) && $uid==$user_uid)
 {
-	if(!$erg_std=pg_query($conn, "SELECT * FROM tbl_stunde ORDER BY stunde"))
+	if(!$erg_std=pg_query($conn, "SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
 	{
 		die(pg_last_error($conn));
 	}
@@ -165,7 +165,7 @@ if (isset($reserve) && $uid==$user_uid)
 			//echo $$var;
 			if (isset($_POST[$var]))
 				$$var=$_POST[$var];
-			if ($$var)
+			if (isset($$var))
 			{
 				$datum_res=$$var;
 				//echo $datum_res;
