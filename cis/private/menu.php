@@ -87,6 +87,9 @@ else
 	<td width="159" valign="top" nowrap>
 		<table width="100%"  border="0" cellspacing="0" cellpadding="0" style="border-right-width:1px;border-right-color:#BCBCBC;">
 		<tr>
+          <td nowrap><a class="HyperItem" href="../../index.html" target="_top">&lt;&lt; HOME</a></td>
+  		</tr>
+  		<tr>
 			<td>&nbsp;</td>
 		</tr>
 		<!-- ************* Meine CIS ******************* -->
@@ -99,7 +102,7 @@ else
 		  	<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="MeineCIS" style="display: visible;">
 		  	<tr>
 			  	<td width="10" nowrap>&nbsp;</td>
-				<td nowrap><a class="Item" href="lvplan/profile/index.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Profil</a></td>
+				<td nowrap><a class="Item" href="profile/index.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Profil</a></td>
 			</tr>
 		  	<tr>
 				<td width="10" nowrap>&nbsp;</td>
