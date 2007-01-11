@@ -9,15 +9,15 @@
 		$uid='pam';
 	*/
 	$uid = get_uid();
-	
+
 	if(isset($_GET['type']))
 		$type=$_GET['type'];
-	
+
 	if (!$conn = @pg_pconnect(CONN_STRING))
 	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
 
 	//Stundentabelleholen
-	if(! $result_stunde=pg_exec($conn, "SELECT * FROM tbl_stunde ORDER BY stunde"))
+	if(! $result_stunde=pg_exec($conn, "SET search_path TO campus; SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
 		die(pg_last_error($conn));
 	$num_rows_stunde=pg_numrows($result_stunde);
 
@@ -31,8 +31,8 @@
 				//echo $$var;
 				$gewicht=$_POST[$var];
 				$stunde=$i+1;
-				$query="SELECT * FROM tbl_zeitwunsch WHERE uid='$uid' AND stunde=$stunde AND tag=$t";
-				if(! $erg_wunsch=pg_exec($conn, $query))
+				$query="SELECT * FROM tbl_zeitwunsch WHERE mitarbeiter_uid='$uid' AND stunde=$stunde AND tag=$t";
+				if(! $erg_wunsch=pg_query($conn, $query))
 					die(pg_last_error($conn));
 				$num_rows_wunsch=pg_num_rows($erg_wunsch);
 				if ($num_rows_wunsch==0)
@@ -43,7 +43,7 @@
 				}
 				elseif ($num_rows_wunsch==1)
 				{
-					$query="UPDATE tbl_zeitwunsch SET gewicht=$gewicht WHERE uid='$uid' AND stunde=$stunde AND tag=$t";
+					$query="UPDATE tbl_zeitwunsch SET gewicht=$gewicht WHERE mitarbeiter_uid='$uid' AND stunde=$stunde AND tag=$t";
 					//echo $query;
 					if(!($erg=pg_exec($conn, $query)))
 						die(pg_last_error($conn));
@@ -53,7 +53,7 @@
 			}
 	}
 
-	if(!($erg=pg_exec($conn, "SELECT * FROM tbl_zeitwunsch WHERE uid='$uid'")))
+	if(!($erg=pg_query($conn, "SELECT * FROM tbl_zeitwunsch WHERE mitarbeiter_uid='$uid'")))
 		die(pg_last_error($conn));
 	$num_rows=pg_numrows($erg);
 	for ($i=0;$i<$num_rows;$i++)
@@ -67,7 +67,7 @@
 
 
 	// Personendaten
-	if(! $result=pg_exec($conn, "SELECT * FROM tbl_person WHERE uid='$uid'"))
+	if(! $result=pg_exec($conn, "SELECT * FROM vw_benutzer WHERE uid='$uid'"))
 		die(pg_last_error($conn));
 	if (pg_numrows($result)==1)
 		$person=pg_fetch_object($result);
@@ -85,19 +85,17 @@
 <H2><table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
 	<td>
-		&nbsp;<a href="../index.php">Lehrveranstaltungsplan</a> &gt;&gt;
 		&nbsp;<a href="index.php">Userprofil</a> &gt;&gt;
 		&nbsp;Zeitw&uuml;nsche
 	</td>
-	<td align="right"><A href="../help/index.html" class="hilfe" target="_blank">HELP&nbsp;</A></td>
+	<td align="right"><A href="../lvplan/help/index.html" class="hilfe" target="_blank">HELP&nbsp;</A></td>
 	</tr>
 	</table>
 </H2>
+<div align="right">Results: <?php echo $num_rows; ?> - <?php echo $uid; ?></div>
 <H3>
-	Zeitw&uuml;nsche von <?php echo $person->titel.' '.$person->vornamen.' '.$person->nachname; ?>
+	Zeitw&uuml;nsche von <?php echo $person->titelpre.' '.$person->vorname.' '.$person->nachname; ?>
 </H3>
-Results: <?php echo $num_rows; ?><br>
-Username: <?php echo $uid; ?><br>
 <FORM name="zeitwunsch" method="post" action="zeitwunsch.php?type=save">
   <TABLE>
     <TR>

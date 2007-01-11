@@ -18,7 +18,7 @@
 		die("Keine Berechtigung!");
 	}
 
-	if (!$conn = @pg_pconnect(CONN_STRING))
+	if (!$conn = pg_pconnect(CONN_STRING))
 	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
 
 	//Studiensemester abfragen.
@@ -30,8 +30,8 @@
 
 
 	//Lehrveranstaltungen abfragen.
-	$sql_query="SELECT * FROM vw_lehrveranstaltung
-		WHERE studiensemester_kurzbz='$stdsem' AND lektor_uid='$uid'";
+	$sql_query="SELECT * FROM campus.vw_lehreinheit
+		WHERE studiensemester_kurzbz='$stdsem' AND mitarbeiter_uid='$uid'";
 	$sql_query.=" ORDER BY stg_kurzbz,semester,verband,gruppe";
 	$result=pg_exec($conn, $sql_query);
 	$num_rows=pg_numrows($result);
@@ -64,7 +64,7 @@
 	if ($num_rows>0)
 	{
 		echo '<BR><BR><table border="0">';
-		echo '<tr class="liste"><th>LVNR</th><th>Lehrfach</th><th>Lehrform</th><th>Bezeichnung</th><th>Lektor</th><th>STG</th><th>S</th><th>V</th><th>G</th><th>Einheit</th><th>Raumtyp</th><th>Alternativ</th><th>Block</th><th>WR</th><th>Std</th><th>KW</th><th>Anmerkung</th></tr>';
+		echo '<tr class="liste"><th>LVNR</th><th>Lehrfach</th><th>Lehrform</th><th>Bezeichnung</th><th>Lektor</th><th>STG</th><th>S</th><th>V</th><th>G</th><th>Gruppe</th><th>Raumtyp</th><th>Alternativ</th><th>Block</th><th>WR</th><th>Std</th><th>KW</th><th>Anmerkung</th></tr>';
 		for ($i=0; $i<$num_rows; $i++)
 		{
 			$zeile=$i % 2;
@@ -73,14 +73,14 @@
 			echo '<tr class="liste'.$zeile.'">';
 			echo '<td>'.$row->lvnr.'</td>';
 			echo '<td>'.$row->lehrfach.'</td>';
-			echo '<td>'.$row->lehrform.'</td>';
+			echo '<td>'.$row->lehrform_kurzbz.'</td>';
 			echo '<td>'.$row->lehrfach_bez.'</td>';
 			echo '<td>'.$row->lektor.'</td>';
 			echo '<td>'.$row->stg_kurzbz.'</td>';
 			echo '<td>'.$row->semester.'</td>';
 			echo '<td>'.$row->verband.'</td>';
 			echo '<td>'.$row->gruppe.'</td>';
-			echo '<td>'.$row->einheit.'</td>';
+			echo '<td>'.$row->gruppe_kurzbz.'</td>';
 			echo '<td>'.$row->raumtyp.'</td>';
 			echo '<td>'.$row->raumtypalternativ.'</td>';
 			echo '<td>'.$row->stundenblockung.'</td>';
