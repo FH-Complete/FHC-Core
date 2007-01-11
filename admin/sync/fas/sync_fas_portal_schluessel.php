@@ -39,6 +39,7 @@ $text = '';
 $anzahl_quelle=0;
 $anzahl_eingefuegt=0;
 $anzahl_fehler=0;
+$krit='';
 
 function validate($row)
 {
@@ -90,16 +91,16 @@ if($result = pg_query($conn_fas, $qry))
 				{ 
 					$schluessel->person_id=$row1->person_portal;
 					//Schlüsseltyp feststellen
-					$qry2="SELECT schluesseltyp FROM tbl_schluesseltyp WHERE schluesseltyp=".$row->name.";";
+					$qry2="SELECT * FROM tbl_syncschluesseltyp WHERE fas_typ='".$row->schluessel_fk."';";
 					if($result2 = pg_query($conn, $qry2))
 					{
 						if(pg_num_rows($result2)>0) //eintrag gefunden
 						{
 							if($row2=pg_fetch_object($result2))
 							{ 
-								$schluessel->schluesseltyp=$row2->schluesseltyp;
+								$schluessel->schluesseltyp=$row2->portal_typ;
 								//Insert oder Update
-								$qry3="SELECT schluessel_id FROM tbl_schluessel WHERE beschreibung=".$row->name.";";
+								$qry3="SELECT schluessel_id FROM tbl_schluessel WHERE ext_id=".$row->schluessel_fk.";";
 								if($result3 = pg_query($conn, $qry3))
 								{
 									if(pg_num_rows($result3)>0) //eintrag gefunden

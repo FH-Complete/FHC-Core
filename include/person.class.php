@@ -196,7 +196,7 @@ class person
 			$this->errormsg = 'Vornamen darf nicht laenger als 128 Zeichen sein';
 			return false;
 		}
-		//ToDo Gebdatum pruefen -> laut bis muss er aelter als 10 Jahre sein
+		//ToDo Gebdatum pruefen -> laut bis muss student aelter als 10 Jahre sein
 		/*if(strlen($this->gebdatum)==0 || is_null($this->gebdatum))
 		{
 			$this->errormsg = 'Geburtsdatum muss eingegeben werden';

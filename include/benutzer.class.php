@@ -76,7 +76,7 @@ class benutzer extends person
 		}
 		if($this->uid == '')
 		{
-			$this->errormsg = 'UID muss eingegeben werden';
+			$this->errormsg = 'UID muss eingegeben werden '.$this->uid;
 			return false;
 		}
 		if(strlen($this->alias)>256)

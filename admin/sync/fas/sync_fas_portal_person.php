@@ -121,7 +121,6 @@ if($result = pg_query($conn_fas, $qry))
 					//update
 					$person->person_id=$rowu->person_id;
 					$person->new=false;
-					//echo nl2br("update1 von ".$row->uid.", ".$row->familienname."\n");
 				}
 				else 
 				{
@@ -141,7 +140,6 @@ if($result = pg_query($conn_fas, $qry))
 							//update
 							$person->person_id=$row1->person_portal;
 							$person->new=false;
-							//echo nl2br("update2 von ".$row->uid.", ".$row->familienname."\n");					
 						}
 						else 
 						{

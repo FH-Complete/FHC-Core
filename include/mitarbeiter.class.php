@@ -31,6 +31,7 @@ class mitarbeiter extends benutzer
 	var $fixangestellt;		//boolean
 	var $telefonklappe;		//varchar(25)
 	var $ort_kurzbz;		//varchar(8)
+	var $ext_id_mitarbeiter;	//bigint
 
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional einen Mitarbeiter
@@ -55,8 +56,8 @@ class mitarbeiter extends benutzer
 		}
 
 		//Mitarbeiter laden
-		//if($uid!=null)
-		//	$this->load($uid);
+		if($uid!=null)
+			$this->load($uid);
 	}
 
 	// ************************************************
@@ -72,7 +73,7 @@ class mitarbeiter extends benutzer
 		}
 		if($this->uid=='')
 		{
-			$this->errormsg = 'UID muss eingegeben werden';
+			$this->errormsg = 'UID muss eingegeben werden '.$this->uid;
 			return false;
 		}
 		if($this->ausbildungcode!='' && !is_numeric($this->ausbildungcode))
@@ -97,7 +98,7 @@ class mitarbeiter extends benutzer
 		}
 		if(!is_bool($this->lektor))
 		{
-			$this->errormsg = 'lektor muss boolean sein'.$this->lektor;
+			$this->errormsg = 'lektor muss boolean sein '.$this->lektor;
 			return false;
 		}
 		if(!is_bool($this->fixangestellt))
@@ -140,9 +141,11 @@ class mitarbeiter extends benutzer
 
 		if($this->new)
 		{
-			//Neuen Datensatz anlegen
+
+			//Neuen Datensatz anlegen							
 			$qry = "INSERT INTO public.tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz,
-			                    fixangestellt, telefonklappe, updateamum, updatevon)
+			                    fixangestellt, telefonklappe, updateamum, updatevon, ext_id)
+
 			        VALUES('".addslashes($this->uid)."',".
 			 	 	$this->addslashes($this->ausbildungcode).",".
 			 	 	$this->addslashes($this->personalnummer).",". //TODO: in Produktivversion nicht angeben
@@ -152,7 +155,8 @@ class mitarbeiter extends benutzer
 					($this->fixangestellt?'true':'false').','.
 					$this->addslashes($this->telefonklappe).','.
 					$this->addslashes($this->updateamum).','.
-					$this->addslashes($this->updatevon).');';
+					$this->addslashes($this->updatevon).', '.
+					$this->addslashes($this->ext_id_mitarbeiter).');';
 		}
 		else
 		{
@@ -166,7 +170,8 @@ class mitarbeiter extends benutzer
 			       ' telefonklappe='.$this->addslashes($this->telefonklappe).','.
 			       ' ort_kurzbz='.$this->addslashes($this->ort_kurzbz).','.
 			       ' updateamum='.$this->addslashes($this->updateamum).','.
-			       ' updatevon='.$this->addslashes($this->updatevon).
+			       ' updatevon='.$this->addslashes($this->updatevon).','.
+			       ' ext_id='.$this->addslashes($this->ext_id_mitarbeiter).
 			       " WHERE mitarbeiter_uid='".addslashes($this->uid)."';";
 		}
 

@@ -21,7 +21,7 @@
  */
 
 //*
-//* Synchronisiert Adressendatensaetze von Vilesci DB in PORTAL DB
+//* Synchronisiert Adressendatensaetze von FAS DB in PORTAL DB
 //*
 //*
 
@@ -55,7 +55,7 @@ function validate($row)
 
 <html>
 <head>
-<title>Synchro - Vilesci -> Portal - Adresse</title>
+<title>Synchro - FAS -> Portal - Adresse</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
 <body>
