@@ -175,6 +175,11 @@ class uebung
 			$this->errormsg = 'Lehreinheit_id muss eine gueltige Zahl sein';
 			return false;
 		}
+		if(strlen($this->bezeichnung)>32)
+		{
+			$this->errormsg = 'Bezeichnung darf nicht laenger als 32 Zeichen sein';
+			return false;
+		}
 		return true;
 	}
 
