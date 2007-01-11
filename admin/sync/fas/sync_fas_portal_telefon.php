@@ -72,7 +72,22 @@ if($result = pg_query($conn_fas, $qry))
 		$error=false;
 		$kontakt				=new kontakt($conn);
 		$kontakt->firma_id			='';
-		$kontakt->kontakttyp		='telefon';
+		If($row->typ<'20')
+		{
+			$kontakt->kontakttyp		='telefon';
+		}
+		elseif($row->typ>='20' && $row->typ<'30')
+		{
+			$kontakt->kontakttyp		='mobil';
+		}
+		elseif($row->typ>='30' && $row->typ<'40')
+		{
+			$kontakt->kontakttyp		='fax';
+		}
+		else
+		{
+			$kontakt->kontakttyp		='so.tel';
+		}		
 		$kontakt->anmerkung		=$row->name;
 		$kontakt->kontakt			=$row->nummer;
 		$kontakt->zustellung			=false;

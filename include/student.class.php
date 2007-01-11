@@ -30,6 +30,7 @@ class student extends benutzer
 	var $semester;
 	var $verband;
 	var $gruppe;
+	var $ext_id_student;
 
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional einen Studenten
@@ -175,7 +176,7 @@ class student extends benutzer
 		{
 			//Neuen Datensatz anlegen							
 			$qry = "INSERT INTO public.tbl_student(student_uid, matrikelnr, updateamum, updatevon, prestudent_id, 
-			                    studiengang_kz, semester, verband, gruppe)
+			                    studiengang_kz, semester, ext_id, verband, gruppe)
 			        VALUES('".addslashes($this->uid)."',".
 			 	 	$this->addslashes($this->matrikelnr).",".
 			 	 	$this->addslashes($this->updateamum).','.
@@ -183,6 +184,7 @@ class student extends benutzer
 			 	 	$this->addslashes($this->prestudent_id).','.
 					$this->studiengang_kz.','.
 					$this->semester.','.
+					$this->ext_id_student.','.
 					($this->verband!=''?"'".addslashes($this->verband)."'":' ').','.
 					($this->gruppe!=''?"'".addslashes($this->gruppe)."'":' ').');';
 		}
@@ -196,6 +198,7 @@ class student extends benutzer
 			       ' prestudent_id='.$this->addslashes($this->prestudent_id).','.
 			       ' studiengang_kz='.$this->studiengang_kz.','.
 			       ' semester='.$this->semester.','.
+			       ' ext_id='.$this->ext_id_student;
 			       ' verband='.$this->addslashes($this->verband).','.
 			       ' gruppe='.$this->addslashes($this->gruppe).
 			       " WHERE student_uid='".addslashes($this->uid)."';";

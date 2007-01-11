@@ -21,12 +21,13 @@
  */
 
 //*
-//* Synchronisiert schluesseltypdatensaetze von FAS DB in PORTAL DB
+//* Synchronisiert Reihungstestdatensaetze von FAS DB in PORTAL DB
 //*
 //*
 
-include('../../../vilesci/config.inc.php');
-include('../../../include/schluesseltyp.class.php');
+require_once('../../../vilesci/config.inc.php');
+require_once('../../../include/reihungstest.class.php');
+
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
@@ -39,77 +40,89 @@ $text = '';
 $anzahl_quelle=0;
 $anzahl_eingefuegt=0;
 $anzahl_fehler=0;
+$anzahl_quelle2=0;
+$anzahl_eingefuegt2=0;
+$anzahl_fehler2=0;
 
 function validate($row)
 {
 }
+
+/*************************
+ * FAS-PORTAL - Synchronisation
+ */
 ?>
 
 <html>
 <head>
-<title>Synchro - FAS -> Portal - Schlüsseltyp</title>
+<title>Synchro - FAS -> Portal - Reihungstest</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
 <body>
 <?php
-/*************************
- * FAS-PORTAL - Synchronisation
- */
-
-
-$qry = "SELECT * FROM schluessel;";
+//nation
+$qry = "SELECT * FROM reihungstest ORDER BY datum;";
 
 if($result = pg_query($conn_fas, $qry))
 {
-	echo nl2br("Schlüsseltyp Sync\n---------------------\n");
+	echo nl2br("Reihungstest Sync\n-------------------\n");
 	$anzahl_quelle=pg_num_rows($result);
 	while($row = pg_fetch_object($result))
 	{
-		echo "- ";
-		ob_flush();
-		flush();	
-			
 		$error=false;
-		$schluesseltyp				=new schluesseltyp($conn);
-		$schluesseltyp->beschreibung		=$row->name;
-		$schluesseltyp->anzahl			=$row->anzahl==''?'0':$row->anzahl;
-		$schluesseltyp->kaution			=$row->betrag==''?'0':$row->betrag;
-
-		if($row->name=='Gaderobenschlüssel')
-		{
-			$schluesseltyp->schluesseltyp='Gaderobe';
-		}
-		else
-		{
-			$schluesseltyp->schluesseltyp=$row->name;
-		}
-
+		$reihungstest				=new reihungstest($conn);
+		$studiengang_kz			='';
+		$reihungstest->ort_kurzbz		='';
+		$reihungstest->anmerkung		=$row->raum;
+		$reihungstest->datum		=$row->datum;
+		$reihungstest->uhrzeit		=$row->uhrzeit;
+		//$reihungstest->updateamum	=$row->;
+		$reihungstest->updatevon		="SYNC";
+		//$reihungstest->insertamum	=$row->;
+		$reihungstest->insertvon		="SYNC";
+		$reihungstest->ext_id		=$row->reihungstest_pk;
+	
 		
-		$schluesseltyp->new=true;
-		if(!$schluesseltyp->save())
+		//echo nl2br ($reihungstest->ext_id."\n");
+
+		$qry2="SELECT reihungstest_id, ext_id FROM tbl_reihungstest WHERE ext_id=".$row->reihungstest_pk.";";
+		if($result2 = pg_query($conn, $qry2))
 		{
-			$error_log.=$schluesseltyp->errormsg."\n";
-			$anzahl_fehler++;
-		}
-		else 
-		{
-			
-			//überprüfen, ob sync-eintrag schon vorhanden
-			$qryz="SELECT * FROM tbl_syncschluesseltyp WHERE fas_typ='$row->schluessel_pk' AND portal_typ='$schluesseltyp->schluesseltyp'";
-			if($resultz = pg_query($conn, $qryz))
+			if(pg_num_rows($result2)>0) //eintrag gefunden
 			{
-				if(pg_num_rows($resultz)==0) //wenn dieser eintrag noch nicht vorhanden ist
-				{
-					$qry="INSERT INTO tbl_syncschluesseltyp (fas_typ, portal_typ)".
-						"VALUES ('".$row->schluessel_pk."', '".$schluesseltyp->schluesseltyp."');";
-					$resulti = pg_query($conn, $qry);
+				if($row2=pg_fetch_object($result2))
+				{ 
+					// update adresse, wenn datensatz bereits vorhanden
+					$reihungstest->new=false;
+					$reihungstest->reihungstest_id=$row2->reihungstest_id;
 				}
-					}
-			
-			$anzahl_eingefuegt++;
-		}		
-	}
-}	
+			}
+			else 
+			{
+				// insert, wenn datensatz noch nicht vorhanden
+				$reihungstest->new=true;	
+			}
+		}
+				
+		
+		if(!$error)
+		{
+			if(!$reihungstest->save())
+			{
+				$error_log.=$reihungstest->errormsg."\n";
+				$anzahl_fehler++;
+			}
+			else 
+			{
+				$anzahl_eingefuegt++;
+				echo "- ";
+				ob_flush();
+				flush();
+			}
+		}
+		flush();	
+	}	
+}
 
 
 //echo nl2br($text);
