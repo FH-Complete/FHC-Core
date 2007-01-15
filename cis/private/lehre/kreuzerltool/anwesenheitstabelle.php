@@ -119,7 +119,7 @@ $stsem_content = "Studiensemester: <SELECT name='stsem' onChange=\"MM_jumpMenu('
 foreach($stsem_obj->studiensemester as $studiensemester)
 {
 	$selected = ($stsem == $studiensemester->studiensemester_kurzbz?'selected':'');
-	$stsem_content.= "<OPTION value='statistik.php?lvid=$lvid&stsem=$studiensemester->studiensemester_kurzbz' $selected>$studiensemester->studiensemester_kurzbz</OPTION>\n";
+	$stsem_content.= "<OPTION value='anwesenheitstabelle.php?lvid=$lvid&stsem=$studiensemester->studiensemester_kurzbz' $selected>$studiensemester->studiensemester_kurzbz</OPTION>\n";
 }
 $stsem_content.= "</SELECT>\n";
 
@@ -161,7 +161,7 @@ if($result = pg_query($conn, $qry))
 					$lektoren .= $row_lektoren->kurzbz.' ';
 				$lektoren .=')';
 			}
-			echo "<OPTION value='statistik.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$row->lehreinheit_id' $selected>$row->lfbez $lektoren</OPTION>\n";
+			echo "<OPTION value='anwesenheitstabelle.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$row->lehreinheit_id' $selected>$row->lfbez $lektoren</OPTION>\n";
 		}
 		echo '</SELECT> ';
 	}
@@ -195,7 +195,8 @@ echo "<br>
 <!--Menue Ende-->\n";
 
 
-echo "<h3>Statistik</h3>";
+echo "<h3>Anwesenheits- und &Uuml;bersichtstabelle</h3>";
+
 
 $uebung_obj = new uebung($conn);
 $uebung_obj->load_uebung($lehreinheit_id);
@@ -204,14 +205,14 @@ if(count($uebung_obj->uebungen)>0)
 	echo "Wählen Sie bitte eine Kreuzerlliste aus: <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
 	foreach ($uebung_obj->uebungen as $row)
 	{
-		if($uebung_id =='')
-			$uebung_id = $row->uebung_id;
-		
+		if($uebung_id=='')
+			$uebung_id=$row->uebung_id;
+			
 		if($uebung_id == $row->uebung_id)
 			$selected = 'selected';
 		else 
 			$selected = '';
-		echo "<OPTION value='statistik.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id' $selected>";
+		echo "<OPTION value='anwesenheitstabelle.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id' $selected>";
 		//Freigegeben = +
 		//Nicht Freigegeben = -
 		if($datum_obj->mktime_fromtimestamp($row->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($row->freigabebis)>time())
@@ -224,92 +225,31 @@ if(count($uebung_obj->uebungen)>0)
 	echo '</SELECT>';
 }
 else 
-	echo "Derzeit gibt es keine Uebungen";
+	die("Derzeit gibt es keine Uebungen");
 
-echo "<br><br><br>";
-if(isset($uebung_id) && $uebung_id!='')
+$uebung_obj = new uebung($conn);
+$uebung_obj->load($uebung_id);
+echo "<br><br><h3><u>$uebung_obj->bezeichnung</u></h3>";
+
+
+echo "<ul><li><a href='anwesenheitsliste.php?output=html&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id'>Alle Studierende</a>&nbsp;<a href='anwesenheitsliste.php?output=xls&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id'><img src='../../../../skin/images/excel.gif' width=16 height=16></a></li>";
+
+$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id' ORDER BY semester, verband, gruppe, gruppe_kurzbz";
+if($result = pg_query($conn, $qry))
 {
-	$beispiel_obj = new beispiel($conn);
-	if($beispiel_obj->load_beispiel($uebung_id))
+	while($row = pg_fetch_object($result))
 	{
-		if(count($beispiel_obj->beispiele)>0)
-		{
-			echo '<table border="0" cellpadding="0" cellspacing="0" width="600">
-         		 <tr> 
-	           		 <td>&nbsp;</td>
-	           		 <td height="19" width="339" valign="bottom"> 
-		           		 <table border="0" cellpadding="0" cellspacing="0" width="339" background="../../../../skin/images/bg.gif">
-		                	<tr>
-		                  		<td>&nbsp;</td>
-		                	</tr>
-		              	</table>
-		             </td>
-          		</tr>';
-			$i=0;
-			$qry_cnt = "SELECT distinct student_uid FROM campus.tbl_studentbeispiel JOIN campus.tbl_beispiel USING(beispiel_id) WHERE uebung_id='$uebung_id' GROUP BY student_uid";
-				if($result_cnt = pg_query($conn,$qry_cnt))					
-						$gesamt=pg_num_rows($result_cnt);
+		echo "<li><a href='anwesenheitsliste.php?output=html&uebung_id=$uebung_id&gruppe=$row->lehreinheitgruppe_id'>";
+		
+		if($row->gruppe_kurzbz=='')
+			echo "Gruppe $row->verband$row->gruppe";
+		else
+			echo "$row->gruppe_kurzbz";
 			
-			foreach ($beispiel_obj->beispiele as $row)
-			{
-				$i++;
-				$solved = 0;
-				$psolved = 0;
-				$qry_cnt = "SELECT count(*) as anzahl FROM campus.tbl_studentbeispiel WHERE beispiel_id=$row->beispiel_id AND vorbereitet=true";
-				if($result_cnt = pg_query($conn,$qry_cnt))
-					if($row_cnt = pg_fetch_object($result_cnt))
-						$solved = $row_cnt->anzahl;
-				
-				
-						
-				if($solved>0)
-					$psolved = $solved/$gesamt*100;
-				
-				echo '<tr> 
-	            		<td '.($i%2?'class="MarkLine"':'').' valign="top" height="10" width="200"><font size="2" face="Arial, Helvetica, sans-serif"> 
-	              			'.$row->bezeichnung.'
-	              		</font></td>
-						<td '.($i%2?'class="MarkLine"':'').'>
-	            			<table width="339" border="0" cellpadding="0" cellspacing="0" background="../../../../skin/images/bg_.gif">
-	                		<tr> 
-	                  			<td valign="top"> 
-	                  				<table width="100%" border="0" cellspacing="0" cellpadding="0">
-	                      			<tr> 
-	                        			<td nowrap><font size="2" face="Arial, Helvetica, sans-serif">
-	                        			<img src="../../../../skin/images/entry.gif" width="'.($psolved*3).'" height="5" alt="" border="1" />
-	                        			<span class="smallb"><b>&nbsp;'.$solved.'</b> ['.number_format($psolved,1,'.','').'%]</span></font>
-	                        			</td>
-									</tr>
-									</table>
-								</td>
-	                		</tr>
-	              			</table>
-						</td>
-	          		</tr>';
-			}
-			echo "</table>";
-			echo "<br><br>Es haben insgesamt <u>$gesamt Studenten</u> eingetragen.";
-		}
+		echo "</a>&nbsp;<a href='anwesenheitsliste.php?output=xls&uebung_id=$uebung_id&gruppe=$row->lehreinheitgruppe_id'><img src='../../../../skin/images/excel.gif' width=16 height=16></a></li>";
 	}
-	else 
-		echo "<span class='error'>$beispiel_obj->errormsg</span>";
 }
-
-/*
-           for ($i = 0; $i < $rs->num; $i++) {
-                            $text = $rs->arr[$i]["text"];
-                            $id  = $rs->arr[$i]["id"];
-                            $psolved =
-                                 round((($solved[$id]/$count_students)*100),1);
-                            $pnsolved =
-                                 round((($nsolved[$id]/$count_students)*100),1);
-			    $pproblems = 
-				 round((($problems[$id]/$count_students)*100),1);
-            
-          
-          } 
-*/
-
+echo '</ul>';
 ?>
 </td></tr>
 </table>

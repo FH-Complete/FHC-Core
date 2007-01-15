@@ -37,6 +37,10 @@ class beispiel
 	var $insertamum;	// timestamp
 	var $insertvon;		// varchar(16)
 	
+	var $student_uid;
+	var $vorbereitet;
+	var $probleme;
+	
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional ein beispiel
 	// * @param $conn        	Datenbank-Connection
@@ -274,6 +278,30 @@ class beispiel
 		}
 	}
 	
+	function studentbeispiel_exists($uid,$beispiel_id)
+	{
+		if(!is_numeric($beispiel_id))
+		{
+			$this->errormsg = 'Beispiel_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "SELECT vorbereitet FROM campus.tbl_studentbeispiel WHERE beispiel_id='$beispiel_id' AND student_uid='".addslashes($uid)."'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if(pg_num_rows($result)>0)
+				return true;
+			else 
+				return false;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim lesen der aus der DB';
+			return false;
+		}
+	}
+	
 	function delete($beispiel_id)
 	{
 		if(!is_numeric($beispiel_id))
@@ -289,6 +317,102 @@ class beispiel
 		else 	
 		{
 			$this->errormsg = 'Fehler beim loeschen des Beispiels';
+			return false;
+		}
+	}
+	
+	function load_studentbeispiel($uid, $beispiel_id)
+	{
+		if(!is_numeric($beispiel_id))
+		{
+			$this->errormsg = 'Beispiel_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		$qry = "SELECT * FROM campus.tbl_studentbeispiel WHERE student_uid='$uid' AND beispiel_id='$beispiel_id'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$this->beispiel_id = $row->beispiel_id;
+				$this->student_uid = $row->student_uid;
+				$this->vorbereitet = ($row->vorbereitet=='t'?true:false);
+				$this->probleme = ($row->probleme=='t'?true:false);
+				$this->updateamum = $row->updateamum;
+				$this->udpatevon = $row->updatevon;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = 'Fehler beim laden des Student_Beispiels';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden des Student_Beispiels';
+			return false;
+		}		
+	}
+	
+	// **
+	// * Prueft die studentbeispiel Daten auf gueltigkeit
+	// *
+	function studentbeispiel_validate()
+	{
+		if(!is_numeric($this->beispiel_id))
+		{
+			$this->errormsg = 'Beispiel_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		return true;
+	}
+	
+	// **
+	// * Speichert einen Studentbeispiel Datensatz in die DB
+	// *
+	// *
+	function studentbeispiel_save($new=null)
+	{
+		if(is_null($new))
+			$new = $this->new;
+					
+		//Variablen auf Gueltigkeit pruefen
+		if(!$this->studentbeispiel_validate())
+			return false;
+
+		if($new)
+		{			
+			$qry = 'INSERT INTO campus.tbl_studentbeispiel(student_uid, beispiel_id, vorbereitet, probleme, 
+					updateamum, updatevon, insertamum, insertvon) VALUES('.
+			        $this->addslashes($this->student_uid).','.
+			        $this->addslashes($this->beispiel_id).','.
+			        $this->addslashes($this->vorbereitet).','.
+			        $this->addslashes($this->probleme).','.
+			        $this->addslashes($this->updateamum).','.
+			        $this->addslashes($this->updatevon).','.
+			        $this->addslashes($this->insertamum).','.
+			        $this->addslashes($this->insertvon).');';
+		}
+		else
+		{
+			$qry = 'UPDATE campus.tbl_studentbeispiel SET'.
+			       ' vorbereitet='.$this->addslashes($this->vorbereitet).','.
+			       ' probleme='.$this->addslashes($this->probleme).','.
+			       ' updateamum='.$this->addslashes($this->updateamum).','.
+			       ' updatevon='.$this->addslashes($this->updatevon).
+			       " WHERE beispiel_id=".$this->beispiel_id." AND student_uid=".$this->addslashes($this->student_uid).';';
+		}
+		
+		if(pg_query($this->conn,$qry))
+		{			
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern des Beispiels';
 			return false;
 		}
 	}

@@ -35,6 +35,7 @@ class lehreinheitmitarbeiter
 	var $stundensatz;		// numeric(6,2)
 	var $faktor;			// numeric(2,1)
 	var $anmerkung;			// varchar(256)	
+	var $lehrfunktion_kurzbz; // varchar(16)
 	
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine LE
@@ -112,14 +113,15 @@ class lehreinheitmitarbeiter
 		{
 			//ToDo ID entfernen
 			$qry = 'INSERT INTO lehre.tbl_lehreinheitmitarbeiter (lehreinheit_id, mitarbeiter_uid, semesterstunden, planstunden, 
-			                                                stundensatz, faktor, anmerkung)
+			                                                stundensatz, faktor, anmerkung, lehrfunktion_kurzbz)
 			        VALUES('.$this->addslashes($this->lehreinheit_id).','.
 					$this->addslashes($this->mitarbeiter_uid).','.
 					$this->addslashes($this->semesterstunden).','.
 					$this->addslashes($this->planstunden).','.
 					$this->addslashes($this->stundensatz).','.
 					$this->addslashes($this->faktor).','.
-					$this->addslashes($this->anmerkung).');';
+					$this->addslashes($this->anmerkung).','.
+					$this->addslashes($this->lehrfunktion_kurzbz).');';
 		}
 		else
 		{
@@ -129,6 +131,7 @@ class lehreinheitmitarbeiter
 			       ' stundensatz='.$this->addslashes($this->stundensatz).','.
 			       ' faktor='.$this->addslashes($this->faktor).','.
 			       ' anmerkung='.$this->addslashes($this->anmerkung).','.
+			       ' lehrfunktion_kurzbz='.$this->addslashes($this->lehrfunktion_kurzbz).
 			       " WHERE lehreinheit_id=".$this->addslashes($this->lehreinheit_id)." AND
 			               mitarbeiter_uid=".$this->addslashes($this->mitarbeiter_uid).";";
 		}

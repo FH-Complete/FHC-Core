@@ -46,6 +46,7 @@ class lehreinheit
 	var $insertvon;					// varchar(16)
 	var $updateamum;				// timestamp
 	var $updatevon;					// varchar(16)
+	var $sprache;					// varchar(16)
 	var $ext_id;					// bigint
 	
 	// *************************************************************************
@@ -105,6 +106,7 @@ class lehreinheit
 				$this->anmerkung = $row->anmerkung;
 				$this->unr = $row->unr;
 				$this->lvnr = $row->lvnr;
+				$this->sprache = $row->sprache;
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
@@ -143,6 +145,7 @@ class lehreinheit
 				$le_obj->anmerkung = $row->anmerkung;
 				$le_obj->unr = $row->unr;
 				$le_obj->lvnr = $row->lvnr;
+				$le_obj->sprache = $row->sprache;
 				$le_obj->insertamum = $row->insertamum;
 				$le_obj->insertvon = $row->insertvon;
 				$le_obj->updateamum = $row->updateamum;
@@ -293,7 +296,7 @@ class lehreinheit
 			//ToDo ID entfernen
 			$qry = 'INSERT INTO lehre.tbl_lehreinheit (lehrveranstaltung_id, studiensemester_kurzbz, 
 			                                     lehrfach_id, lehrform_kurzbz, stundenblockung, wochenrythmus, 
-			                                     start_kw, raumtyp, raumtypalternativ, lehre, anmerkung, unr, lvnr, insertamum, insertvon, updateamum, updatevon,  ext_id)
+			                                     start_kw, raumtyp, raumtypalternativ, lehre, anmerkung, unr, lvnr, insertamum, insertvon, updateamum, updatevon,  ext_id, sprache)
 			        VALUES('.$this->addslashes($this->lehrveranstaltung_id).','.
 					$this->addslashes($this->studiensemester_kurzbz).','.
 					$this->addslashes($this->lehrfach_id).','.
@@ -311,7 +314,8 @@ class lehreinheit
 					$this->addslashes($this->insertvon).','.
 					$this->addslashes($this->updateamum).','.
 					$this->addslashes($this->updatevon).','.
-					$this->addslashes($this->ext_id).');';
+					$this->addslashes($this->ext_id).','.
+					$this->addslashes($this->sprache).');';
 		}
 		else
 		{
@@ -331,6 +335,7 @@ class lehreinheit
 			       ' lvnr='.$this->addslashes($this->lvnr).','.
 				   ' updateamum='.$this->addslashes($this->updateamum).','.
 				   ' updatevon='.$this->addslashes($this->updatevon).','.
+				   ' sprache='.$this->addslashes($this->sprache).','.
 			       ' ext_id='.$this->addslashes($this->ext_id).
 			       " WHERE lehreinheit_id=".$this->addslashes($this->lehreinheit_id).";";
 		}
