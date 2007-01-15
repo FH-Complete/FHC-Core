@@ -129,7 +129,7 @@ class nation
 	{		
 		
 		
-		$qry='INSERT INTO bis.tbl_nation (code, entwicklungsstand, eu, ewr, kontinent, kurztext, langtext, engltext, sperre) VALUES('.
+		$qry='INSERT INTO bis.tbl_nation (nation_code, entwicklungsstand, eu, ewr, kontinent, kurztext, langtext, engltext, sperre) VALUES('.
 			$this->addslashes($this->code).', '.
 			$this->addslashes($this->entwicklungsstand).', '.
 			$this->addslashes($this->eu).', '.
