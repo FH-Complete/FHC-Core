@@ -78,6 +78,7 @@
 			$news = new news($sql_conn);
 			if($news->delete($remove_id))
 			{
+				writeCISlog("DELETE","NEWS");
 				echo '<script language="JavaScript">';
 				echo '	document.location.href = "news_show.php"';
 				echo '</script>';
