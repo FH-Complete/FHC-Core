@@ -46,7 +46,7 @@
 	$stg_obj=new studiengang($sql_conn);
 	$stg_obj->load($lv_obj->studiengang_kz);
 	
-	$openpath="../../../documents/".strtolower($stg_obj->kurzbz)."/".$lv_obj->semester."/".strtolower($lv_obj->lehreverzeichnis)."/upload/";
+	$openpath="../../../documents/".strtolower($stg_obj->kuerzel)."/".$lv_obj->semester."/".strtolower($lv_obj->lehreverzeichnis)."/upload/";
 
 	$stsem_obj = new studiensemester($sql_conn);
 	$stsem = $stsem_obj->getaktorNext();

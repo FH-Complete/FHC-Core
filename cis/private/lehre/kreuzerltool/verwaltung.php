@@ -115,7 +115,7 @@ echo '<table border="0" cellspacing="0" cellpadding="0" height="100%" width="100
 echo ' <tr>';
 echo '<td width="10">&nbsp;</td>';
 echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;"Kreuzerl"-Tool - ';
-echo $lv_obj->bezeichnung.' - '.$stg_obj->kurzbz;
+echo $lv_obj->bezeichnung.' - '.$stg_obj->kuerzel;
 echo '</font></td><td  class="ContentHeader" align="right">'."\n";
 
 //Studiensemester laden

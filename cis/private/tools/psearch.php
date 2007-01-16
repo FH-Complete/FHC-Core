@@ -301,13 +301,13 @@
 								
 								if($i % 2 == 0)
 								{
-									echo "<td align=\"left\" nowrap>&nbsp;$stg_obj->kurzbz</td>";
-									$kurzbz=$stg_obj->kurzbz;
+									echo "<td align=\"left\" nowrap>&nbsp;$stg_obj->kuerzel</td>";
+									$kurzbz=$stg_obj->kuerzel;
 								}
 								else
 								{
-									echo "<td align=\"left\" class =\"MarkLine\" nowrap>&nbsp;$stg_obj->kurzbz</td>";
-									      $kurzbz=$stg_obj->kurzbz;
+									echo "<td align=\"left\" class =\"MarkLine\" nowrap>&nbsp;$stg_obj->kuerzel</td>";
+									      $kurzbz=$stg_obj->kuerzel;
 								}
 							}
 							else

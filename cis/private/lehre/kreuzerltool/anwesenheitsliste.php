@@ -91,22 +91,24 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 	// let's merge
 	$format_title->setAlign('merge');
 
+	$worksheet->write(0,0,$uebung_obj->bezeichnung.' am '.date('d.m.Y'), $format_bold);
+	
 	//Ueberschrift
 	$i=0;
-	$worksheet->write(0,$i,"Vorname", $format_bold);
-	$worksheet->write(0,++$i,"Nachname", $format_bold);
-	$worksheet->write(0,++$i,"Matrikelnr", $format_bold);
+	$worksheet->write(1,$i,"Vorname", $format_title);
+	$worksheet->write(1,++$i,"Nachname", $format_title);
+	$worksheet->write(1,++$i,"Matrikelnr", $format_title);
 	$beispiel_obj = new beispiel($conn);
 	$beispiel_obj->load_beispiel($uebung_id);
 	foreach($beispiel_obj->beispiele as $row_bsp)
 	{
-		$worksheet->write(0,++$i,$row_bsp->bezeichnung, $format_bold);
+		$worksheet->write(1,++$i,$row_bsp->bezeichnung, $format_title);
 	}
-	$worksheet->write(0,++$i,"Punkte heute", $format_bold);
-	$worksheet->write(0,++$i,"Mitarbeit heute", $format_bold);
-	$worksheet->write(0,++$i,"Punkte insgesamt", $format_bold);
-	$worksheet->write(0,++$i,"Mitarbeit insgesamt", $format_bold);
-	$worksheet->write(0,++$i,"Unterschrift", $format_bold);
+	$worksheet->write(1,++$i,"Punkte heute", $format_title);
+	$worksheet->write(1,++$i,"Mitarbeit heute", $format_title);
+	$worksheet->write(1,++$i,"Punkte insgesamt", $format_title);
+	$worksheet->write(1,++$i,"Mitarbeit insgesamt", $format_title);
+	$worksheet->write(1,++$i,"Unterschrift", $format_title);
 	
 	if(isset($_GET['gruppe']) && $_GET['gruppe']!='')
 	{
@@ -168,11 +170,11 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 			$spalte=0;
 			$punkte_heute=0;
 			//vorname
-			$worksheet->write($zeile,$spalte,$row_stud->vorname, $format_bold);
+			$worksheet->write($zeile,$spalte,$row_stud->vorname);
 			//nachname
-			$worksheet->write($zeile,++$spalte,$row_stud->nachname, $format_bold);
+			$worksheet->write($zeile,++$spalte,$row_stud->nachname);
 			//matrikelnr
-			$worksheet->write($zeile,++$spalte,$row_stud->matrikelnr, $format_bold);
+			$worksheet->write($zeile,++$spalte,$row_stud->matrikelnr);
 			
 			foreach($beispiel_obj->beispiele as $row_bsp)
 			{
@@ -184,21 +186,21 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 					$punkte = 0;
 				$punkte_heute +=$punkte;
 				//punkte auf uebung
-				$worksheet->write($zeile,++$spalte,$punkte, $format_bold);
+				$worksheet->write($zeile,++$spalte,$punkte);
 			}
 			
 			//punkte heute
-			$worksheet->write($zeile,++$spalte,$punkte_heute, $format_bold);
+			$worksheet->write($zeile,++$spalte,$punkte_heute);
 			
 			//mitarbeit heute
 			$qry = "SELECT sum(mitarbeitspunkte) as mitarbeit_heute FROM campus.tbl_studentuebung WHERE uebung_id='$uebung_id' AND student_uid='$row_stud->uid'";
 			if($result = pg_query($conn, $qry))
 				if($row = pg_fetch_object($result))
-					$worksheet->write($zeile,++$spalte,$row->mitarbeit_heute, $format_bold);
+					$worksheet->write($zeile,++$spalte,($row->mitarbeit_heute!=''?$row->mitarbeit_heute:'0'));
 				else 
-					$worksheet->write($zeile,++$spalte,'failed', $format_bold);
+					$worksheet->write($zeile,++$spalte,'failed');
 			else 
-				$worksheet->write($zeile,++$spalte,'failed', $format_bold);
+				$worksheet->write($zeile,++$spalte,'failed');
 			
 			//punkte insgesamt
 			$qry = "SELECT sum(tbl_beispiel.punkte) AS gesamt_ohne_mitarbeit FROM campus.tbl_uebung, campus.tbl_beispiel, campus.tbl_studentbeispiel WHERE
@@ -210,21 +212,21 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 					";
 			if($result = pg_query($conn, $qry))
 				if($row = pg_fetch_object($result))
-					$worksheet->write($zeile,++$spalte,$row->gesamt_ohne_mitarbeit, $format_bold);
+					$worksheet->write($zeile,++$spalte,($row->gesamt_ohne_mitarbeit!=''?$row->gesamt_ohne_mitarbeit:'0'));
 				else 
-					$worksheet->write($zeile,++$spalte,'failed', $format_bold);
+					$worksheet->write($zeile,++$spalte,'failed');
 			else 
-				$worksheet->write($zeile,++$spalte,'failed', $format_bold);
+				$worksheet->write($zeile,++$spalte,'failed');
 			
 			//mitarbeit insgesamt
-			$qry = "SELECT sum(mitarbeitspunkte) as mitarbeit_heute FROM campus.tbl_studentuebung WHERE student_uid='$row_stud->uid'";
+			$qry = "SELECT sum(mitarbeitspunkte) as mitarbeit_heute FROM campus.tbl_studentuebung JOIN campus.tbl_uebung USING(uebung_id) WHERE student_uid='$row_stud->uid' AND lehreinheit_id='$lehreinheit_id'";
 			if($result = pg_query($conn, $qry))
 				if($row = pg_fetch_object($result))
-					$worksheet->write($zeile,++$spalte,$row->mitarbeit_heute, $format_bold);
+					$worksheet->write($zeile,++$spalte,($row->mitarbeit_heute!=''?$row->mitarbeit_heute:'0'));
 				else 
-					$worksheet->write($zeile,++$spalte,'failed', $format_bold);
+					$worksheet->write($zeile,++$spalte,'failed');
 			else 
-				$worksheet->write($zeile,++$spalte,'failed', $format_bold);
+				$worksheet->write($zeile,++$spalte,'failed');
 			
 			$zeile++;		
 		}

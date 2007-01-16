@@ -1,4 +1,6 @@
 <?php
+// Dieses Script verhindert, dass das Dokument inline geoeffnet wird.
+// Es erschein automatisch das Download/Speichern Fenster
     $filename = "../../cisdocs/muster_semesterplan_index.html";
     $fp = fopen($filename, "rb");
     if ($fp)

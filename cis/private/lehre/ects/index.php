@@ -249,7 +249,7 @@ border:1px dashed #000000;
 	$stg_obj = new studiengang($conn);
    
 	//Anzeigen des DropDown Menues mit Stg
-	if($stg_obj->getAll('kurzbz'))
+	if($stg_obj->getAll('typ, kurzbz'))
 	{
 		$output .= "Studiengang <SELECT name='stg' onChange='javascript:window.document.auswahlFrm.changed.value=\"stg\";window.document.auswahlFrm.submit();'>";
 
@@ -258,15 +258,10 @@ border:1px dashed #000000;
 		//DropDown Menue mit den Stg fuellen
 		foreach($stg_obj->result as $elem)
 		{
-			$stg_anz_qry="SELECT count(*) as anzahl FROM lehre.tbl_lehrveranstaltung WHERE studiengang_kz=$elem->studiengang_kz";
-			
-			if(!$result_stg_anz=pg_query($conn,$stg_anz_qry))
-				die('Fehler bei einer Datenbankabfrage, bitte erneut versuchen');
-
-			if(!$row_stg_anz=pg_fetch_object($result_stg_anz))
-				die('Fehler bei einer Datenbankabfrage, bitte erneut versuchen');
-   	   	  
-			if($row_stg_anz->anzahl>0)
+			$lv_help_obj = new lehrveranstaltung($conn);
+			$lv_help_obj->load_lva($elem->studiengang_kz, null,null,true);
+			   	   	  
+			if(count($lv_help_obj->lehrveranstaltungen)>0)
 			{
 				if(!isset($firststg))
 					$firststg = $elem->studiengang_kz;
@@ -276,11 +271,11 @@ border:1px dashed #000000;
 
 				if($elem->studiengang_kz == $stg)
 				{
-					$output .= "<option value='$elem->studiengang_kz' selected>$elem->kurzbzlang</option>";
+					$output .= "<option value='$elem->studiengang_kz' selected>$elem->kuerzel</option>";
 					$stgselected=true;
 				}
 				else 
-					$output .= "<option value='$elem->studiengang_kz'>$elem->kurzbzlang</option>";
+					$output .= "<option value='$elem->studiengang_kz'>$elem->kuerzel</option>";
 			}
 		}
 		$output .= "</SELECT>";
@@ -308,15 +303,12 @@ border:1px dashed #000000;
 
 		for($i=1;$i<=$stg_obj->max_semester;$i++)
 		{
-			$stg_anz_qry="SELECT count(*) as anzahl FROM lehre.tbl_lehrveranstaltung WHERE studiengang_kz='$stg' AND semester='$i'";
-			if(!$result_stg_anz=pg_query($conn,$stg_anz_qry))
-				die('Fehler bei einer Datenbankabfrage, bitte erneut versuchen');
+			$lv_help_obj = new lehrveranstaltung($conn);
+			$lv_help_obj->load_lva($stg, $i, null,true);
 			
-			if(!$row_stg_anz=pg_fetch_object($result_stg_anz))
-				die('Fehler bei einer Datenbankabfrage, bitte erneut versuchen');
-
-			if($row_stg_anz->anzahl>0)
+			if(count($lv_help_obj->lehrveranstaltungen)>0)
 			{
+				
 				if(!isset($firstsem))
 					$firstsem=$i;
 
@@ -396,7 +388,7 @@ border:1px dashed #000000;
 	//Kopfzeile hinausschreiben und $output ausgeben
 	echo "<table witdh='100%'  border='0' cellspacing='0' cellpadding='0'><tr><td width='3%'>&nbsp;</td><td>";
 	echo "<table width='100%'  border='0' cellspacing='0' cellpadding='0'><tr>";
-	echo "<td class='ContentHeader'><font class='ContentHeader'>&nbsp;LV-INFO - ". $stg_obj->kurzbzlang ."- ".$sem.". Semester</font></td></tr></table>"; 
+	echo "<td class='ContentHeader'><font class='ContentHeader'>&nbsp;LV-INFO - ". $stg_obj->kuerzel ."- ".$sem.". Semester</font></td></tr></table>"; 
 	echo $output;
 	     
 	if(isset($lv) && isset($stg) && isset($sem)) // Wenn oben alles Ausgewaehlt wurde

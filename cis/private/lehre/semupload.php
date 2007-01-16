@@ -37,7 +37,7 @@
     if(!$stg_obj->load($lv_obj->studiengang_kz))
     	die('Fehler beim Laden des Studienganges');
     
-    $openpath = '../../../documents/'.strtolower($stg_obj->kurzbz).'/'.$lv_obj->semester.'/'.strtolower($lv_obj->lehreverzeichnis).'/semesterplan/';
+    $openpath = '../../../documents/'.strtolower($stg_obj->kuerzel).'/'.$lv_obj->semester.'/'.strtolower($lv_obj->lehreverzeichnis).'/semesterplan/';
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>

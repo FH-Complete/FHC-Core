@@ -59,7 +59,7 @@
    $stg_obj = new studiengang($conn);
    $stg_obj->load($stg);
 
-   $kurzbz = strtolower($stg_obj->kurzbz);
+   $kurzbz = strtolower($stg_obj->kuerzel);
 
    //Pfade bauen
    $pfad = '../../../documents/'.$kurzbz.'/'.$sem.'/'.$short.'/download/';

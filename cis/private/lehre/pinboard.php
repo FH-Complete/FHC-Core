@@ -43,7 +43,7 @@
 	if(isset($_GET['course_id']) && is_numeric($_GET['course_id']))
 	{
 		$stg_obj = new studiengang($sql_conn, $course_id);
-		$short = $stg_obj->kurzbz;
+		$short = $stg_obj->kuerzel;
 		$course_id = $_GET['course_id'];
 	}
 	else 
