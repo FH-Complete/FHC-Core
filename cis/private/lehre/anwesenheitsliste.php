@@ -29,6 +29,7 @@
  */
 	require_once('../../config.inc.php');
 	require_once('../../../include/functions.inc.php');
+	require_once('../../../include/studiengang.class.php');
         
     $error=0;
     //Connection Herstellen
@@ -80,11 +81,8 @@
 	  	$nt_content='';
 	  	
 	  	//Content fuer Anwesenheitslisten erstellen
-	  	$qry = "SELECT kurzbz FROM public.tbl_studiengang WHERE studiengang_kz='$stg_kz'";
-	  	if($row=pg_fetch_object(pg_query($conn,$qry)))
-	  		$kurzbzlang = $row->kurzbz;
-	  	else 
-	  		echo "Fehler beim Auslesen der Daten";
+	  	$stg_obj = new studiengang($conn, $stg_kz);
+	  	$kurzbzlang = $stg_obj->kuerzel;
 	  	
 	  	//"normale" Gruppen auslesen
 	  	$qry = "SELECT verband, gruppe, count(*) FROM public.tbl_lehrverband JOIN public.tbl_student USING(studiengang_kz, semester, verband, gruppe) WHERE studiengang_kz='$stg_kz' AND semester='$sem' AND student_uid not like '%Dummy%' GROUP BY verband, gruppe;";

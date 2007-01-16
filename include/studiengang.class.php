@@ -46,6 +46,8 @@ class studiengang
 	var $bescheidvom;		// Date
 	var $ext_id;			// bigint
 	
+	var $kuerzel;			// = typ + kurzbz (Bsp: BBE)
+	
 	// **************************************************************
 	// * Konstruktor
 	// * @param conn Connection zur Datenbank
@@ -107,6 +109,7 @@ class studiengang
 				$this->bescheidgz=$row->bescheidgz;
 				$this->bescheidvom=$row->bescheidvom;
 				$this->ext_id=$row->ext_id;
+				$this->kuerzel = strtoupper($row->typ.$row->kurzbz);
 			}
 		}
 		else 
@@ -157,11 +160,12 @@ class studiengang
 			$stg_obj->bescheidgz=$row->bescheidgz;
 			$stg_obj->bescheidvom=$row->bescheidvom;
 			$stg_obj->ext_id=$row->ext_id;
+			$stg_obj->kuerzel = strtoupper($row->typ.$row->kurzbz);
 			
 			$this->result[] = $stg_obj;
 		}
 		
-		return true;		
+		return true;
 	}
 	
 	/**

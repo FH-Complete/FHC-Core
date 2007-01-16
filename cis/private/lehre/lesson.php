@@ -56,7 +56,7 @@
 	$stg_obj = new studiengang($sql_conn);
 	$stg_obj->load($lv->studiengang_kz);
 	
-	$kurzbz = $stg_obj->kurzbz;
+	$kurzbz = $stg_obj->kuerzel;
 	
 	$short_name = $lv->bezeichnung;
 	//$fachbereich_id = $row->fachbereich_id;

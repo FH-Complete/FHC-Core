@@ -45,6 +45,15 @@ class uebung
 	var $insertamum;		// timestamp
 	var $insertvon;			// varchar(16)
 	
+	//Studentuebung
+	var $student_uid;		// varchar(16)
+	var $mitarbeiter_uid;	// varchar(16)
+	var $abgabe_id;			// integer
+	var $note;				// smalint
+	var $mitarbeitspunkte;	// smalint
+	var $anmerkung;			// text
+	var $benotungsdatum;	// timestamp
+	
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine Uebung
 	// * @param $conn        	Datenbank-Connection
@@ -115,6 +124,41 @@ class uebung
 		else 
 		{
 			$this->errormsg = 'Fehler beim laden der Uebung';
+			return false;
+		}
+	}
+	function load_studentuebung($student_uid, $uebung_id)
+	{
+		$qry = "SELECT * FROM campus.tbl_studentuebung WHERE student_uid='$student_uid' AND uebung_id='$uebung_id'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$this->student_uid = $row->student_uid;
+				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$this->abgabe_id = $row->abgabe_id;
+				$this->uebung_id = $row->uebung_id;
+				$this->note = $row->note;
+				$this->mitarbeitspunkte = $row->mitarbeitspunkte;
+				$this->punkte = $row->punkte;
+				$this->anmerkung = $row->anmerkung;
+				$this->benotungsdatum = $row->benotungsdatum;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = 'Es gibt keinen passenden Eintrag';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden des eintrages';
 			return false;
 		}
 	}

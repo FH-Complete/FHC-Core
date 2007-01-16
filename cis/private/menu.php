@@ -109,7 +109,7 @@ else
 				<td nowrap><a class="Item" href="lvplan/stpl_week.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;LV-Plan</a></td>
 			</tr>
 			<?php
-			//Eigenen LV des eingeloggten Lektors anzeigen
+			//Eigene LVs des eingeloggten Lektors anzeigen
 			if($is_lector)
 			{
 				?>

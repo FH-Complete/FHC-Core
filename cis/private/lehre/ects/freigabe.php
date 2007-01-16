@@ -221,7 +221,7 @@ function ask() {
        echo "<input type='hidden' name='status' value='a'>";
        echo "<input type='hidden' name='lv' value='$lv'>";
        //stg Drop Down
-       $qry = "SELECT distinct tbl_studiengang.studiengang_kz, kurzbzlang FROM campus.tbl_lvinfo, lehre.tbl_lehrveranstaltung, public.tbl_studiengang 
+       $qry = "SELECT distinct tbl_studiengang.studiengang_kz, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbzlang FROM campus.tbl_lvinfo, lehre.tbl_lehrveranstaltung, public.tbl_studiengang 
        			WHERE tbl_lvinfo.aktiv=true 
        			AND tbl_lvinfo.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
        			AND tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz

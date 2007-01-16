@@ -30,6 +30,7 @@
 	require_once('../../../../include/studiensemester.class.php');
 	require_once('../../../../include/lehrveranstaltung.class.php');
 	require_once('../../../../include/lvinfo.class.php');
+	require_once('../../../../include/studiengang.class.php');
 
 	if(!$conn=pg_pconnect(CONN_STRING))
 		die('Fehler beim Connecten zur Datenbank');
@@ -175,15 +176,12 @@ font-size:10pt;
 	}	  
 	  
 	//Studiengangsbezeichnung auslesen
-	$qry="SELECT kurzbz, kurzbzlang FROM public.tbl_studiengang WHERE studiengang_kz='$stg'";
-	if(!$res=pg_query($conn,$qry))
-		die('Fehler beim Lesen aus der Datenbank');
-	  
-	if(!$row=pg_fetch_object($res))
-		die('Studiengang konnte nicht aufgeloest werden');
+	$stg_hlp_obj = new studiengang($conn);
+	$stg_hlp_obj->load($stg);
 
-	$stg_kurzbz = $row->kurzbz;
-	$stg_kurzbzlang = $row->kurzbzlang;
+	$stg_kurzbz = $stg_hlp_obj->kuerzel;
+	$stg_kurzbzlang = $stg_hlp_obj->kurzbzlang;
+	
 	//Lehrform auslesen        
 	$qry = "Select distinct lehrform_kurzbz FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lv' AND studiensemester_kurzbz='$stsem'";
 	if(!$res = pg_query($conn,$qry))

@@ -199,11 +199,11 @@
 				}
 				else if($term_id == 0)
 				{
-					echo $stg_obj->kurzbz.', Alle Semester';
+					echo $stg_obj->kuerzel.', Alle Semester';
 				}
 				else
 				{
-					echo $stg_obj->kurzbz.', '.$term_id.'. Semester';
+					echo $stg_obj->kuerzel.', '.$term_id.'. Semester';
 				}
 			}
 		  ?></font></td>
@@ -314,7 +314,7 @@
 			  	<?php
 			  		$studiengaenge = new studiengang($conn);
 				
-			  		$studiengaenge->getAll('kurzbz, kurzbzlang');
+			  		$studiengaenge->getAll('typ, kurzbz');
 			  		
 					foreach($studiengaenge->result AS $row_course)
 					{						
@@ -324,14 +324,14 @@
 							{
 								if($row_course->studiengang_kz != 0)
 								{
-									echo '<option value="pinboard_entry.php?course_id='.$row_course->studiengang_kz.'&term_id='.$term_id.'" selected>'.$row_course->kurzbz.' ('.$row_course->kurzbzlang.')</option>';
+									echo '<option value="pinboard_entry.php?course_id='.$row_course->studiengang_kz.'&term_id='.$term_id.'" selected>'.$row_course->kuerzel.' ('.$row_course->kurzbzlang.')</option>';
 								}
 							}
 							else
 							{
 								if($row_course->studiengang_kz != 0)
 								{
-									echo '<option value="pinboard_entry.php?course_id='.$row_course->studiengang_kz.'&term_id='.$term_id.'">'.$row_course->kurzbz.' ('.$row_course->kurzbzlang.')</option>';
+									echo '<option value="pinboard_entry.php?course_id='.$row_course->studiengang_kz.'&term_id='.$term_id.'">'.$row_course->kuerzel.' ('.$row_course->kurzbzlang.')</option>';
 								}
 							}
 						}
@@ -343,7 +343,7 @@
 							}
 							else
 							{
-								echo '<option value="pinboard_entry.php?course_id='.$row_course->studiengang_kz.'&term_id='.$term_id.'">'.$row_course->kurzbz.' ('.$row_course->kurzbzlang.')</option>';
+								echo '<option value="pinboard_entry.php?course_id='.$row_course->studiengang_kz.'&term_id='.$term_id.'">'.$row_course->kuerzel.' ('.$row_course->kurzbzlang.')</option>';
 							}
 						}
 					}

@@ -165,11 +165,9 @@
 						if($is_lector || $std_obj->studiengang_kz==$row->studiengang_kz)
 						{
 							echo " <td width=\"20\">";
-							echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row->kurzbz).'_std&desc=Alle Studenten von '.strtolower($row->kurzbz).'\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes\');return false;" class="Item"><img src="../../skin/images/open.gif" title="Verteiler &ouml;ffnen"></a></td>';								
+							echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row->kuerzel).'_std&desc=Alle Studenten von '.strtolower($row->kuerzel).'\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes\');return false;" class="Item"><img src="../../skin/images/open.gif" title="Verteiler &ouml;ffnen"></a></td>';
 							/* open a popup containing the final dispatcher address */						    
-						    echo " <td width=\"200\" ><a href=\"mailto:".strtolower($row->kurzbz)."_std@technikum-wien.at\" class=\"Item\">".strtolower($row->kurzbz)."_std@technikum-wien.at</a></td>";
-						  
-							
+						    echo " <td width=\"200\" ><a href=\"mailto:".strtolower($row->kuerzel)."_std@technikum-wien.at\" class=\"Item\">".strtolower($row->kuerzel)."_std@technikum-wien.at</a></td>";
 						}
 						else
 						{
@@ -182,9 +180,9 @@
 						echo "</tr>\n";
 			  		}
 		  			echo "\n";
-		  			echo '<tr><td><a href="#" onClick="return(js_toggle_container(\''.$row->kurzbzlang.'\'));" class="Item">&#8226; Studentenverteiler</a>';
+		  			echo '<tr><td><a href="#" onClick="return(js_toggle_container(\''.$row->kuerzel.'\'));" class="Item">&#8226; Studentenverteiler</a>';
 					echo '</td></tr></table>';
-					echo '<table border="0" cellspacing="0" cellpadding="0" id="'.$row->kurzbzlang.'" style="display: none">';
+					echo '<table border="0" cellspacing="0" cellpadding="0" id="'.$row->kuerzel.'" style="display: none">';
 					
 			  		//$sql_query1 = "SELECT DISTINCT semester FROM public.tbl_student where studiengang_kz ='$row->studiengang_kz' AND uid NOT LIKE '_dummy%' ORDER BY semester";
 					$lv_obj = new lehrverband($conn);
@@ -207,7 +205,7 @@
 				  				if($row_cnt->anzahl>0)
 				  				{
 				  					$param = "kz=".$row->studiengang_kz."&sem=".$row1->semester;
-				  					$strhelp = strtolower($row->kurzbz.$row1->semester.$row1->verband.$row1->gruppe);
+				  					$strhelp = strtolower($row->kuerzel.$row1->semester.$row1->verband.$row1->gruppe);
 						  			echo "<tr>\n";
 						  			echo "  <td width=\"390\">&nbsp;&nbsp;&nbsp;&#8226; Semester $row1->semester";
 						  			if(trim($row1->verband)!='')

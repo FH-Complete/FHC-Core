@@ -181,7 +181,7 @@ function js_toggle_container(conid)
 			  	<select name="course" onChange="MM_jumpMenu('self',this,0)" class="TextBox">
 				<?php
 					$stg_obj = new studiengang($sql_conn);
-					$stg_obj->getAll('kurzbz, kurzbzlang');
+					$stg_obj->getAll('typ, kurzbz');
 					//$sql_query = "SELECT DISTINCT studiengang_kz AS id, kurzbzlang FROM public.tbl_studiengang WHERE NOT(studiengang_kz='0') ORDER BY kurzbzlang";
 					
 					//$result = pg_exec($sql_conn, $sql_query);
@@ -194,12 +194,12 @@ function js_toggle_container(conid)
 						{							
 							if(isset($course_id) AND $course_id == $row->studiengang_kz)
 							{
-								echo '<option value="menu.php?course_id='.$row->studiengang_kz.'&term_id='.$term_id.'" selected>'.$row->kurzbz .'('.$row->kurzbzlang.')</option>';
+								echo '<option value="menu.php?course_id='.$row->studiengang_kz.'&term_id='.$term_id.'" selected>'.$row->kuerzel .'('.$row->kurzbzlang.')</option>';
 								$sel_kurzbzlang=$row->kurzbzlang;
 							}
 							else
 							{
-								echo '<option value="menu.php?course_id='.$row->studiengang_kz.'&term_id='.$term_id.'">'.$row->kurzbz .'('.$row->kurzbzlang.')</option>';
+								echo '<option value="menu.php?course_id='.$row->studiengang_kz.'&term_id='.$term_id.'">'.$row->kuerzel .'('.$row->kurzbzlang.')</option>';
 							}
 						}
 					}
