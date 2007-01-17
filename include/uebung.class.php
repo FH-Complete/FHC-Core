@@ -44,6 +44,7 @@ class uebung
 	var $updatevon;			// varchar(16)
 	var $insertamum;		// timestamp
 	var $insertvon;			// varchar(16)
+	var $statistik;			// boolean
 	
 	//Studentuebung
 	var $student_uid;		// varchar(16)
@@ -113,6 +114,7 @@ class uebung
 				$this->updatevon = $row->updatevon;
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
+				$this->statistik = ($row->statistik=='t'?true:false);
 				return true;
 			}
 			else 
@@ -171,7 +173,7 @@ class uebung
 			return false;
 		}
 		
-		$qry = "SELECT * FROM campus.tbl_uebung WHERE lehreinheit_id='$lehreinheit_id'";
+		$qry = "SELECT * FROM campus.tbl_uebung WHERE lehreinheit_id='$lehreinheit_id' ORDER BY bezeichnung";
 				
 		if($result=pg_query($this->conn, $qry))
 		{
@@ -195,6 +197,7 @@ class uebung
 				$uebung_obj->updatevon = $row->updatevon;
 				$uebung_obj->insertamum = $row->insertamum;
 				$uebung_obj->insertvon = $row->insertvon;
+				$uebung_obj->statistik = ($row->statistik=='t'?true:false);
 				
 				$this->uebungen[] = $uebung_obj;
 			}
@@ -257,7 +260,7 @@ class uebung
 		{
 			$qry = 'BEGIN; INSERT INTO campus.tbl_uebung(gewicht, punkte, angabedatei, freigabevon, freigabebis, 
 			        abgabe, beispiele, bezeichnung, positiv, defaultbemerkung, lehreinheit_id, updateamum, 
-			        updatevon, insertamum, insertvon) VALUES('.
+			        updatevon, insertamum, insertvon, statistik) VALUES('.
 			        $this->addslashes($this->gewicht).','.
 			        $this->addslashes($this->punkte).','.
 			        $this->addslashes($this->angabedatei).','.
@@ -272,7 +275,8 @@ class uebung
 			        $this->addslashes($this->updateamum).','.
 			        $this->addslashes($this->updatevon).','.
 			        $this->addslashes($this->insertamum).','.
-			        $this->addslashes($this->insertvon).');';
+			        $this->addslashes($this->insertvon).','.
+			        ($this->statistik?'true':'false').');';
 		}
 		else
 		{
@@ -289,7 +293,8 @@ class uebung
 			       ' defaultbemerkung='.$this->addslashes($this->defaultbemerkung).','.
 			       ' lehreinheit_id='.$this->addslashes($this->lehreinheit_id).','.
 			       ' updateamum='.$this->addslashes($this->updateamum).','.
-			       ' updatevon='.$this->addslashes($this->updatevon).
+			       ' updatevon='.$this->addslashes($this->updatevon).','.
+			       ' statistik='.($this->statistik?'true':'false').
 			       " WHERE uebung_id=".$this->addslashes($this->uebung_id).";";
 		}
 
@@ -326,6 +331,113 @@ class uebung
 		else
 		{
 			$this->errormsg = 'Fehler beim Speichern der Uebung:'.$qry;
+			return false;
+		}
+	}
+	
+	// *******************************************
+	// * Prueft die Variablen vor dem Speichern 
+	// * auf Gueltigkeit.
+	// * @return true wenn ok, false im Fehlerfall
+	// *******************************************
+	function validate_studentuebung()
+	{
+		if(!is_numeric($this->uebung_id))
+		{
+			$this->errormsg = 'Uebung_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		if($this->student_uid=='')
+		{
+			$this->errormsg = 'Student_uid muss eingetragen werden';
+			return false;
+		}
+		return true;
+	}
+	
+	// ************************************************************
+	// * Speichert StudentUebung in die Datenbank
+	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	// * angelegt, ansonsten der Datensatz upgedated
+	// * @return true wenn erfolgreich, false im Fehlerfall
+	// ************************************************************
+	function studentuebung_save($new=null)
+	{
+		if(is_null($new))
+			$new = $this->new;
+					
+		//Variablen auf Gueltigkeit pruefen
+		if(!$this->validate_studentuebung())
+			return false;
+
+		if($new)
+		{
+			$qry = 'INSERT INTO campus.tbl_studentuebung(student_uid, mitarbeiter_uid, abgabe_id, uebung_id, 
+					note, mitarbeitspunkte, punkte, anmerkung, benotungsdatum, updateamum, 
+			        updatevon, insertamum, insertvon) VALUES('.
+			        $this->addslashes($this->student_uid).','.
+			        $this->addslashes($this->mitarbeiter_uid).','.
+			        $this->addslashes($this->abgabe_id).','.
+			        $this->addslashes($this->uebung_id).','.
+			        $this->addslashes($this->note).','.
+			        $this->addslashes($this->mitarbeitspunkte).','.
+			        $this->addslashes($this->punkte).','.
+			        $this->addslashes($this->anmerkung).','.
+			        $this->addslashes($this->benotungsdatum).','.
+			        $this->addslashes($this->updateamum).','.
+			        $this->addslashes($this->updatevon).','.
+			        $this->addslashes($this->insertamum).','.
+			        $this->addslashes($this->insertvon).');';
+		}
+		else
+		{
+			$qry = 'UPDATE campus.tbl_studentuebung SET'.
+			       ' mitarbeiter_uid='.$this->addslashes($this->mitarbeiter_uid).','.
+			       ' abgabe_id='.$this->addslashes($this->abgabe_id).','.
+			       ' uebung_id='.$this->addslashes($this->uebung_id).','.
+			       ' note='.$this->addslashes($this->note).','.
+			       ' mitarbeitspunkte='.$this->addslashes($this->mitarbeitspunkte).','.
+			       ' punkte='.$this->addslashes($this->punkte).','.
+			       ' anmerkung='.$this->addslashes($this->anmerkung).','.
+			       ' benotungsdatum='.$this->addslashes($this->benotungsdatum).','.
+			       ' updateamum='.$this->addslashes($this->updateamum).','.
+			       ' updatevon='.$this->addslashes($this->updatevon).
+			       " WHERE uebung_id=".$this->addslashes($this->uebung_id)." AND student_uid=".$this->addslashes($this->student_uid).";";
+		}
+
+		if(pg_query($this->conn,$qry))
+		{
+				return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern der StudentUebung';
+			return false;
+		}
+	}
+	
+	// ************************************************************
+	// * Loescht eine Uebung plus die abhaengigen eintraege in den 
+	// * Tabellen studentuebung, studentbeispiel, und beispiel
+	// ************************************************************
+	function delete($uebung_id)
+	{
+		if(!is_numeric($uebung_id))
+		{
+			$this->errormsg = 'Uebung_id ist ungueltig';
+			return false;
+		}
+		
+		$qry = "DELETE FROM campus.tbl_studentuebung WHERE uebung_id='$uebung_id';
+				DELETE FROM campus.tbl_studentbeispiel WHERE beispiel_id IN(SELECT beispiel_id FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id');
+				DELETE FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id';
+				DELETE FROM campus.tbl_uebung WHERE uebung_id='$uebung_id'";
+	
+		if(pg_query($qry))
+			return true;
+		else 
+		{
+			$this->errormsg = 'Fehler beim Loeschen der Daten';
 			return false;
 		}
 	}

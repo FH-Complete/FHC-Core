@@ -288,6 +288,7 @@ if(isset($_POST['uebung_neu']))
 			$uebung_obj->updatevon = $user;
 			$uebung_obj->insertamum = date('Y-m-d H:i:s');
 			$uebung_obj->insertvon = $user;
+			$uebung_obj->statistik = isset($_POST['statistik']);
 						
 			if($uebung_obj->save(true))
 			{
@@ -298,7 +299,7 @@ if(isset($_POST['uebung_neu']))
 				{
 					$beispiel_obj = new beispiel($conn);
 					$beispiel_obj->uebung_id = $uebung_id;
-					$beispiel_obj->bezeichnung = "Beispiel ".($i+1);
+					$beispiel_obj->bezeichnung = "Beispiel ".($i<10?'0'.($i+1):($i+1));
 					$beispiel_obj->punkte = $punkteprobeispiel;
 					$beispiel_obj->updateamum = date('Y-m-d H:i:s');
 					$beispiel_obj->updatevon = $user;
@@ -334,6 +335,25 @@ if(isset($_POST['beispiel_delete']))
 			//Beispiel loeschen
 			if(!$beispiel_obj->delete($id))
 				$error_msg=$beispiel_obj->errormsg;
+		}
+		if($error_msg!='')
+			echo "<span class='error'>$error_msg</span>";
+	}
+}
+
+if(isset($_POST['delete_uebung']))
+{
+	if(isset($_POST['uebung']))
+	{
+		$ueb_obj = new uebung($conn);
+		$error_msg='';
+		//Ausgewaehlte Beispiele holen
+		$delete_ids = $_POST['uebung'];
+		foreach($delete_ids as $id)
+		{
+			//Beispiel loeschen
+			if(!$ueb_obj->delete($id))
+				$error_msg=$ueb_obj->errormsg;
 		}
 		if($error_msg!='')
 			echo "<span class='error'>$error_msg</span>";
@@ -387,6 +407,7 @@ if(isset($_POST['uebung_edit']))
 		$uebung_obj->updateamum = date('Y-m-d H:i:s');
 		$uebung_obj->updatevon = $user;
 		$uebung_obj->uebung_id = $uebung_id;
+		$uebung_obj->statistik = isset($_POST['statistik']);
 		
 		if($uebung_obj->save(false))
 			echo "Die &Auml;nderung wurde gespeichert!";
@@ -463,6 +484,7 @@ if(isset($uebung_id) && $uebung_id!='')
 	<tr><td>Thema</td><td align='right'><input type='text' name='thema' value='$uebung_obj->bezeichnung'></td><td>$error_thema</td></tr>
 	<tr><td>Freigabe</td><td align='right'>von <input type='text' size='16' name='freigabevon' value='".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon))."'></td></tr>
 	<tr><td>(Format: 31.12.2007 14:30)</td><td align='right'>bis <input type='text' size='16' name='freigabebis' value='".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis))."'></td></tr>
+	<tr><td>Statistik f&uuml;r Studenten anzeigen <input type='checkbox' name='statistik' ".($uebung_obj->statistik?'checked':'')."></td><td></td></tr>
 	<tr><td colspan=2 align='right'><input type='submit' name='uebung_edit' value='Ändern'></td></tr>
 	</table>
 	</form>";
@@ -478,7 +500,7 @@ if(isset($uebung_id) && $uebung_id!='')
 	echo "<table width='340'><tr><td colspan='3' class='ContentHeader3'>Neues Beispiel anlegen</td></tr>\n";	
 	echo "<tr><td>&nbsp;</td><td></td></tr>\n\n";	
 	
-	echo "<tr><td>Bezeichnung <input type='text' name='bezeichnung' value='Beispiel ".($anzahl+1)."'>";
+	echo "<tr><td>Bezeichnung <input type='text' name='bezeichnung' value='Beispiel ".($anzahl<10?'0'.($anzahl+1):($anzahl+1))."'>";
 	echo "&nbsp;Punkte <input type='text' size='2' name='punkte' value='1'></td></tr>";
 	echo "<tr><td align='right'><input type='submit' name='beispiel_neu' value='Anlegen'></td></tr>";
 		
@@ -548,7 +570,7 @@ else
 		echo "<tr><td></td><td></td><td>&nbsp;</td></tr><tr><th>Thema</th><th>Freigeschalten</th><th>Auswahl</th></tr>";
 		foreach ($uebung_obj->uebungen as $row) 
 		{
-			echo "<tr><td align='center'><a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id' class='Item'><u>".htmlentities($row->bezeichnung)."</u></a></td><td align='center'>";
+			echo "<tr><td align='left'><a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id' class='Item'><u>".htmlentities($row->bezeichnung)."</u></a></td><td align='center'>";
 			
 			if((strtotime(strftime($row->freigabevon))<=time()) && (strtotime(strftime($row->freigabebis))>=time()))
 				echo 'Ja';
@@ -556,7 +578,7 @@ else
 				echo 'Nein';
 			echo "</td><td align='center'><input type='Checkbox' name='uebung[]' value='$row->uebung_id'></td>";
 		}
-		echo "<tr><td></td><td></td><td><input type='Submit' value='Auswahl löschen' name='delete_uebung'></td></tr>";
+		echo "<tr><td></td><td></td><td><input type='Submit' value='Auswahl löschen' name='delete_uebung' onclick='return confirmdelete();'></td></tr>";
 	}
 	else 
 		echo "<tr><td colspan='3'>Derzeit sind keine Kreuzerllisten angelegt</td><td></td></tr>";
@@ -565,7 +587,7 @@ else
 	</form><br><br>";
 	if(!isset($_POST['uebung_neu']))
 	{
-		$thema = "Uebung ".($anzahl+1);
+		$thema = "Uebung ".($anzahl<10?'0'.($anzahl+1):($anzahl+1));
 		$anzahlderbeispiele = 10;
 		$punkteprobeispiel = 1;
 		$freigabevon = date('d.m.Y H:i');
@@ -580,6 +602,7 @@ else
 	<tr><td>Anzahl Punkte pro Beispiel</td><td align='right'><input type='text' name='punkteprobeispiel' value='$punkteprobeispiel'></td><td>$error_punkteprobeispiel</td></tr>
 	<tr><td>Freigabe</td><td align='right'>von <input type='text' size='16' name='freigabevon' value='$freigabevon'></td><td>$error_freigabevon</td></tr>
 	<tr><td>(Format: 31.12.2007 14:30)</td><td align='right'>bis <input type='text' size='16' name='freigabebis' value='$freigabebis'></td><td>$error_freigabebis</td></tr>
+	<tr><td>Statistik f&uuml;r Studenten anzeigen <input type='checkbox' name='statistik'></td><td></td></tr>
 	<tr><td colspan=2 align='right'><input type='submit' name='uebung_neu' value='Anlegen'></td></tr>
 	</table>	
 	</form>
