@@ -201,6 +201,7 @@ $uebung_obj = new uebung($conn);
 $uebung_obj->load_uebung($lehreinheit_id);
 if(count($uebung_obj->uebungen)>0)
 {
+	echo "<table width='100%'><tr><td valign='top'>";
 	echo "Wählen Sie bitte eine Kreuzerlliste aus: <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
 	foreach ($uebung_obj->uebungen as $row)
 	{
@@ -222,6 +223,20 @@ if(count($uebung_obj->uebungen)>0)
 		echo '</OPTION>';
 	}
 	echo '</SELECT>';
+	echo "</td>
+		<td>
+			<table>
+			<tr>
+				<td><b>+</b>...</td>
+				<td>Kreuzerlliste ist <u>freigeschalten</u>.</td>
+			</tr>
+			<tr>
+				<td><b>-</b>...</td>
+				<td>Kreuzerlliste ist <u>nicht freigeschalten</u>.</td>
+			</tr>
+			</table>
+		</td>
+	</tr></table>";
 }
 else 
 	echo "Derzeit gibt es keine Uebungen";
@@ -294,21 +309,6 @@ if(isset($uebung_id) && $uebung_id!='')
 	else 
 		echo "<span class='error'>$beispiel_obj->errormsg</span>";
 }
-
-/*
-           for ($i = 0; $i < $rs->num; $i++) {
-                            $text = $rs->arr[$i]["text"];
-                            $id  = $rs->arr[$i]["id"];
-                            $psolved =
-                                 round((($solved[$id]/$count_students)*100),1);
-                            $pnsolved =
-                                 round((($nsolved[$id]/$count_students)*100),1);
-			    $pproblems = 
-				 round((($problems[$id]/$count_students)*100),1);
-            
-          
-          } 
-*/
 
 ?>
 </td></tr>

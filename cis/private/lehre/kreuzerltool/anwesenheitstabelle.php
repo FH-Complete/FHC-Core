@@ -202,6 +202,7 @@ $uebung_obj = new uebung($conn);
 $uebung_obj->load_uebung($lehreinheit_id);
 if(count($uebung_obj->uebungen)>0)
 {
+	echo "<table width='100%'><tr><td valign='top'>";
 	echo "Wählen Sie bitte eine Kreuzerlliste aus: <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
 	foreach ($uebung_obj->uebungen as $row)
 	{
@@ -223,13 +224,27 @@ if(count($uebung_obj->uebungen)>0)
 		echo '</OPTION>';
 	}
 	echo '</SELECT>';
+	echo "</td>
+		<td>
+			<table>
+			<tr>
+				<td><b>+</b>...</td>
+				<td>Kreuzerlliste ist <u>freigeschalten</u>.</td>
+			</tr>
+			<tr>
+				<td><b>-</b>...</td>
+				<td>Kreuzerlliste ist <u>nicht freigeschalten</u>.</td>
+			</tr>
+			</table>
+		</td>
+	</tr></table>";
 }
 else 
 	die("Derzeit gibt es keine Uebungen");
 
 $uebung_obj = new uebung($conn);
 $uebung_obj->load($uebung_id);
-echo "<br><br><h3><u>$uebung_obj->bezeichnung</u></h3>";
+echo "<h3><u>$uebung_obj->bezeichnung</u></h3>";
 
 
 echo "<ul><li><a href='anwesenheitsliste.php?output=html&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id'>Alle Studierende</a>&nbsp;<a href='anwesenheitsliste.php?output=xls&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id'><img src='../../../../skin/images/excel.gif' width=16 height=16></a></li>";

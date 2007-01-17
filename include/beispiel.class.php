@@ -115,7 +115,7 @@ class beispiel
 			return false;
 		}
 		
-		$qry = "SELECT * FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id'";
+		$qry = "SELECT * FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id' ORDER BY bezeichnung";
 				
 		if($result=pg_query($this->conn, $qry))
 		{
@@ -310,7 +310,8 @@ class beispiel
 			return false;
 		}
 		
-		$qry = "DELETE FROM campus.tbl_beispiel WHERE beispiel_id='$beispiel_id'";
+		$qry = "DELETE FROM campus.tbl_studentbeispiel WHERE beispiel_id='$beispiel_id';
+				DELETE FROM campus.tbl_beispiel WHERE beispiel_id='$beispiel_id';";
 		
 		if(pg_query($this->conn, $qry))
 			return true;
