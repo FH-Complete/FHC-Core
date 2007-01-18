@@ -22,7 +22,7 @@
 /**
  * Synchronisiert Studentendatensaetze von FAS DB in PORTAL DB
  *
- */
+*/
 require_once('../../../vilesci/config.inc.php');
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
@@ -38,6 +38,16 @@ $new_prestudent=false;
 $new_student=false;
 $new_benutzer=false;
 $new_rolle=false;
+$i=0;
+$notest=0;
+$anzahl_person=0;
+$anzahl_fehler_person=0;
+$anzahl_student=0;
+$anzahl_fehler_student=0;
+$anzahl_pre=0;
+$anzahl_fehler_pre=0;
+$anzahl_benutzer=0;
+$anzahl_fehler_benutzer=0;
 
 function myaddslashes($var)
 {
@@ -58,11 +68,11 @@ function myaddslashes($var)
 <?php
 
 //Mitarbeiter
-$qry = "SELECT * FROM person JOIN student ON person_fk=person_pk WHERE uid NOT LIKE '\_dummy%'";
+$qry = "SELECT * FROM person JOIN student ON person_fk=person_pk WHERE uid NOT LIKE '\_dummy%' ";
 
 if($result = pg_query($conn_fas, $qry))
 {
-	$text.="\n Sync Student\n\n";
+	echo nl2br("\n Sync Student\n-------------\n\n");
 	while($row = pg_fetch_object($result))
 	{
 		echo "- ";
@@ -88,7 +98,26 @@ if($result = pg_query($conn_fas, $qry))
 		$homepage='';
 		$svnr=$row->svnr;
 		$ersatzkennzeichen=$row->ersatzkennzeichen;
-		$familienstand=$row->familienstand;
+		if ($row->familienstand<='0')
+		{
+			$familienstand=null;
+		}
+		if ($row->familienstand=='1')
+		{
+			$familienstand='l';
+		}
+		if ($row->familienstand=='2')
+		{
+			$familienstand='v';
+		}
+		if ($row->familienstand=='3')
+		{
+			$familienstand='g';
+		}
+		if ($row->familienstand=='4')
+		{
+			$familienstand='w';
+		}
 		$geschlecht=strtolower($row->geschlecht);
 		$anzahlkinder=$row->anzahlderkinder;
 		//$aktiv=($row->aktiv=='t'?true:false);
@@ -103,12 +132,17 @@ if($result = pg_query($conn_fas, $qry))
 		$person_id='';
 		$aktiv='';
 		$alias='';
+		$ext_id_benutzer=$row->student_pk;
 		
 		//Attribute Prestudent
 		$aufmerksamdurch_kurzbz='';
 		$person_id='';
 		$studiengang_kz='';
 		$berufstaetigkeit_code=$row->berufstaetigkeit;
+		if($berufstaetigkeit_code<0)
+		{
+			$berufstaetigkeit_code=null;
+		}
 		$ausbildungcode='';
 		$zgv_code=$row->zgv;
 		$zgvort=$row->zgvort;
@@ -137,14 +171,24 @@ if($result = pg_query($conn_fas, $qry))
 		//Attribut Prestudentrolle
 		$rolle_kurzbz='';
 
+		
+		if($zgv_code<=0 or $zgv_code=='')
+		{
+			$zgv_code=null;
+		}
+		if($zgvmas_code<=0 or $zgvmas_code=='')
+		{
+			$zgvmas_code=null;
+		}
+				
 		//Ermittlung der Daten des Reihungstests
-		$qry_rt1="SELECT student_fk, reihungstest_fk, anmeldedatum FROM student_reihungstest WHERE student_fk=".$row->student_pk.";";
-		if($result_rt1 = pg_query($conn_fas, $qry_rt1))
+		$qry="SELECT student_fk, reihungstest_fk, anmeldedatum FROM student_reihungstest WHERE student_fk='".$row->student_pk."';";
+		if($result_rt1 = pg_query($conn_fas, $qry))
 		{		
 			if($row_rt1=pg_fetch_object($result_rt1))
 			{
-				$qry_rt2="SELECT reihungstest_id FROM public.tbl_reihungstest WHERE ext_id=".$row_rt1->reihungstest_fk.";";
-				if($result_rt2 = pg_query($conn, $qry_rt2))
+				$qry="SELECT reihungstest_id FROM public.tbl_reihungstest WHERE ext_id='".$row_rt1->reihungstest_fk."';";
+				if($result_rt2 = pg_query($conn, $qry))
 				{		
 					if($row_rt2=pg_fetch_object($result_rt2))
 					{
@@ -165,17 +209,18 @@ if($result = pg_query($conn_fas, $qry))
 			}
 			else 
 			{
-				$error_log.="Kein Reihungstests von Student $row->familienname, $row->vorname gefunden!\n";	
+				$text.="Kein Reihungstests von Student $row->familienname, $row->vorname gefunden!\n";	
 				$reihungstest_id='';
 				$anmeldungreihungstest='';
+				$notest++;
 			}
 		}
 		
 		//Student aktiv?
-		$qry="SELECT * FROM (SELECT status, creationdate FROM student_ausbildungssemester WHERE student_fk= ".$row->student_pk."  AND
+		$qry="SELECT * FROM (SELECT status, creationdate FROM student_ausbildungssemester WHERE student_fk= '".$row->student_pk."'  AND
 		studiensemester_fk=(SELECT studiensemester_pk FROM studiensemester WHERE aktuell='J') ORDER BY 2 DESC LIMIT 1) as abc
 		WHERE status IN ('3', '10', '11', '12', '13');";
-		
+
 		if($resultu = pg_query($conn_fas, $qry))
 		{
 			if(pg_num_rows($resultu)>0)
@@ -192,7 +237,7 @@ if($result = pg_query($conn_fas, $qry))
 			$error=true;
 			$error_log.='Fehler beim Holen des aktuellen Status bei student_pk: '.$row->student_pk;	
 		}
-		
+
 		//Start der Transaktion
 		pg_query($conn,'BEGIN;');
 		
@@ -200,6 +245,7 @@ if($result = pg_query($conn_fas, $qry))
 		
 		//insert oder update bei person?
 		$qry="SELECT person_id FROM public.tbl_benutzer WHERE uid='$row->uid'";
+
 		if($resultu = pg_query($conn, $qry))
 		{
 			if(pg_num_rows($resultu)>0) //wenn dieser eintrag schon vorhanden ist
@@ -218,15 +264,15 @@ if($result = pg_query($conn_fas, $qry))
 			}	
 			else 
 			{
-				$qry1="SELECT person_fas, person_portal FROM public.tbl_syncperson WHERE person_fas='$row->person_pk'";
-				if($result1 = pg_query($conn, $qry1))
+				$qry="SELECT person_fas, person_portal FROM public.tbl_syncperson WHERE person_fas='$row->person_pk'";
+				if($result_sync = pg_query($conn, $qry))
 				{
-					if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist
+					if(pg_num_rows($result_sync)>0) //wenn dieser eintrag schon vorhanden ist
 					{
-						if($row1=pg_fetch_object($result1))
+						if($row_sync1=pg_fetch_object($result_sync))
 						{ 
 							//update
-							$person_id=$row1->person_portal;
+							$person_id=$row_sync->person_portal;
 							$new_person=false;
 						}
 						else 
@@ -238,10 +284,10 @@ if($result = pg_query($conn_fas, $qry))
 					else
 					{
 						//vergleich svnr und ersatzkennzeichen
-						$qryz="SELECT person_id FROM public.tbl_person 
+						$qry="SELECT person_id FROM public.tbl_person 
 							WHERE ('$row->svnr' is not null AND svnr = '$row->svnr') 
 								OR ('$row->ersatzkennzeichen' is not null AND ersatzkennzeichen = '$row->ersatzkennzeichen')";
-						if($resultz = pg_query($conn, $qryz))
+						if($resultz = pg_query($conn, $qry))
 						{
 							if(pg_num_rows($resultz)>0) //wenn dieser eintrag schon vorhanden ist
 							{
@@ -369,7 +415,7 @@ if($result = pg_query($conn_fas, $qry))
 				        		       " updateamum=now()".','.
 				        		       " updatevon=".myaddslashes($updatevon).','.
 						       ' ext_id='.myaddslashes($ext_id_person).
-						       ' WHERE person_id='.$person_id.';';
+						       ' WHERE person_id='.myaddslashes($person_id).';';
 					}
 				}
 			}
@@ -396,10 +442,11 @@ if($result = pg_query($conn_fas, $qry))
 		
 		if(!$error)
 		{
+			$anzahl_person++;
 			//Weitere Reihenfolge: prestudent - student - benutzer
 			
 			//Prestudent schon vorhanden?
-			$qry="SELECT prestudent_id FROM public.tbl_prestudent WHERE ext_id=".$row->student_pk.";";
+			$qry="SELECT prestudent_id FROM public.tbl_prestudent WHERE ext_id='".$row->student_pk."';";
 			if($resultu = pg_query($conn, $qry))
 			{
 				if(pg_num_rows($resultu)>0) //wenn dieser eintrag schon vorhanden ist
@@ -423,16 +470,19 @@ if($result = pg_query($conn_fas, $qry))
 			$qry="SELECT studiengang_kz FROM public.tbl_studiengang WHERE ext_id='".$row->studiengang_fk."';";
 			if($resultu = pg_query($conn, $qry))
 			{
-				if(pg_num_rows($resultu)>0) //wenn dieser eintrag schon vorhanden ist
+				if(pg_num_rows($resultu)>0) 
 				{
 					if($rowu=pg_fetch_object($resultu))
 					{
 						$studiengang_kz=$rowu->studiengang_kz;
 					}
 				}
+				else 
+				{
+					echo nl2br($qry." STUDIENGANG NICHT GEFUNDEN!!! ");
+				}
 			}
-			echo $row->studiengang_fk."/".$studiengang_kz;
-			if($row->aufmerksamdurch=='1')	$aufmerksamdurch_kurzbz='k.A.';
+			if($row->aufmerksamdurch=='1')		$aufmerksamdurch_kurzbz='k.A.';
 			else if($row->aufmerksamdurch=='2')	$aufmerksamdurch_kurzbz='Internet';
 			else if($row->aufmerksamdurch=='3')	$aufmerksamdurch_kurzbz='Zeitungen';
 			else if($row->aufmerksamdurch=='4')	$aufmerksamdurch_kurzbz='Werbung';
@@ -448,6 +498,7 @@ if($result = pg_query($conn_fas, $qry))
 			else if($row->aufmerksamdurch=='14')	$aufmerksamdurch_kurzbz='Aussendungen';
 			else if($row->aufmerksamdurch=='15')	$aufmerksamdurch_kurzbz='offene Tür';
 			else $aufmerksamdurch_kurzbz='k.A.';
+			
 			
 			if($new_prestudent)
 			{
@@ -491,26 +542,26 @@ if($result = pg_query($conn_fas, $qry))
 				
 				//update nur wenn änderungen gemacht
 				$qry="SELECT * FROM public.tbl_prestudent WHERE prestudent_id='$prestudent_id';";
-				if($result = pg_query($conn, $qry))
+				if($results = pg_query($conn, $qry))
 				{
-					while($row = pg_fetch_object($result))
+					while($rows = pg_fetch_object($results))
 					{
 						$update=false;			
-						if($row->aufmerksam_durch_kurzbz!=$aufmerksamdurch_kurzbz) 	$update=true;
-						if($row->person_id!=$person_id)						$update=true;
-						if($row->studiengang_kz!=$studiengang_kz)				$update=true;
-						if($row->berufstaetigkeit_code!=$berufstaetigkeit_code)		$update=true;
-						if($row->zgv_code!=$zgv_code)		 				$update=true;
-						if($row->zgvort!=$zgvort)			 				$update=true;
-						if($row->zgvdatum!=$zgvdatum)		 				$update=true;
-						if($row->zgvmas_code!=$zgvmas_code)					$update=true;
-						if($row->zgvmaort!=$zgvmaort)						$update=true;
-						if($row->zgvmadatum!=$zgvmadatum) 					$update=true;
-						if($row->facheinschlberuf!=$facheinschlberuf) 				$update=true;
-						if($row->reihungstest_id!=$reihungstest_id)				$update=true;
-						if($row->punkte!=$punkte)				 			$update=true;
-						if($row->anmeldungreihungstest!=$anmeldungreihungstest)		$update=true;						
-						if($row->reihungstestangetreten!=$reihungstestangetreten)		$update=true;
+						if($rows->aufmerksamdurch_kurzbz!=$aufmerksamdurch_kurzbz) 	$update=true;
+						if($rows->person_id!=$person_id)						$update=true;
+						if($rows->studiengang_kz!=$studiengang_kz)				$update=true;
+						if($rows->berufstaetigkeit_code!=$berufstaetigkeit_code)		$update=true;
+						if($rows->zgv_code!=$zgv_code)		 				$update=true;
+						if($rows->zgvort!=$zgvort)			 				$update=true;
+						if($rows->zgvdatum!=$zgvdatum)		 				$update=true;
+						if($rows->zgvmas_code!=$zgvmas_code)					$update=true;
+						if($rows->zgvmaort!=$zgvmaort)						$update=true;
+						if($rows->zgvmadatum!=$zgvmadatum) 					$update=true;
+						if($rows->facheinschlberuf!=$facheinschlberuf) 				$update=true;
+						if($rows->reihungstest_id!=$reihungstest_id)				$update=true;
+						if($rows->punkte!=$punkte)				 			$update=true;
+						if($rows->anmeldungreihungstest!=$anmeldungreihungstest)		$update=true;						
+						if($rows->reihungstestangetreten!=$reihungstestangetreten)		$update=true;
 						
 						if($update)
 						{
@@ -524,7 +575,7 @@ if($result = pg_query($conn_fas, $qry))
 							       ' zgvdatum='.myaddslashes($zgvdatum).','.
 							       ' zgvmas_code='.myaddslashes($zgvmas_code).','.
 							       ' zgvmaort='.myaddslashes($zgvmaort).','.
-							       ' zgvmadatum='.myaddslashes($person_id).','.
+							       ' zgvmadatum='.myaddslashes($zgvmadatum).','.
 							       ' facheinschlberuf='.($facheinschlberuf?'true':'false').','.
 							       ' reihungstest_id='.myaddslashes($reihungstest_id).','.
 							       ' punkte='.myaddslashes($punkte).','.
@@ -535,20 +586,20 @@ if($result = pg_query($conn_fas, $qry))
 					        		       " updateamum=now()".','.
 					        		       " updatevon=".myaddslashes($updatevon).','.
 							       ' ext_id='.myaddslashes($ext_id_pre).
-							       ' WHERE prestudent_id='.$prestudent_id.';';
+							       ' WHERE prestudent_id='.myaddslashes($prestudent_id).';';
 						}
 					}
 				}
 			}
-
+			
 			if(pg_query($conn,$qry))
 			{
-				if($new_pre)
+				if($new_prestudent)
 				{
 					$qry = "SELECT currval('public.tbl_prestudent_prestudent_id_seq') AS id;";
-					if($row=pg_fetch_object(pg_query($conn,$qry)))
+					if($rowu=pg_fetch_object(pg_query($conn,$qry)))
 					{
-						$prestudent_id=$row->id;
+						$prestudent_id=$rowu->id;
 					}
 					else
 					{					
@@ -565,17 +616,18 @@ if($result = pg_query($conn_fas, $qry))
 									
 			if(!$error)
 			{
+				$anzahl_pre++;
 				//Weitere Reihenfolge: student, benutzer
 				
 				//Student schon vorhanden?
-				$qry="SELECT student_id FROM public.tbl_student WHERE ext_id='$row->student_pk'";
+				$qry="SELECT student_uid FROM public.tbl_student WHERE student_uid='$student_uid'";
 				if($resultu = pg_query($conn, $qry))
 				{
 					if(pg_num_rows($resultu)>0) //wenn dieser eintrag schon vorhanden ist
 					{
 						if($rowu=pg_fetch_object($resultu))
 						{
-							$student_id=$rowu->student_id;
+							$student_uid=$rowu->student_uid;
 							$new_student=false;		
 						}
 						else $new_student=true;
@@ -585,320 +637,302 @@ if($result = pg_query($conn_fas, $qry))
 				else
 				{
 					$error=true;
-					$error_log.='Fehler beim Zugriff auf Tabelle tbl_student bei student_pk: '.$row->student_pk;	
+					echo nl2br('Fehler beim Zugriff auf Tabelle tbl_student bei student_pk: '.$ext_id_student);	
+					$error_log.='Fehler beim Zugriff auf Tabelle tbl_student bei student_pk: '.$ext_id_student;	
 				}
-				
+
 				//Gruppenverband ermitteln
-				$qry="SELECT fas_function_find_verband_from_student(".$row->student_pk.") as verband
-					fas_function_find_jahrgang_from_student(".$row->student_pk.") as jahrgang
-					fas_function_find_gruppe_from_student(".$row->student_pk.") as gruppe;";
-				if($resultu = pg_query($conn, $qry))
+				$qry="SELECT fas_function_find_verband_from_student(".$ext_id_student.") as verband,
+					fas_function_find_jahrgang_from_student(".$ext_id_student.") as jahrgang,
+					fas_function_find_gruppe_from_student(".$ext_id_student.") as gruppe;";
+				if($resultu = pg_query($conn_fas, $qry))
 				{
 					if(pg_num_rows($resultu)>0) //wenn dieser eintrag schon vorhanden ist
 					{
 						if($rowu=pg_fetch_object($resultu))
 						{
-							$semester=$rowu->$rowu->jahrgang;
-							$verband=$rowu->$rowu->verband;
+							$semester=$rowu->jahrgang;
+							$verband=$rowu->verband;
 							$gruppe=$rowu->gruppe;
-						}
-					}
-				}
-				
-				if($new_student)
-				{
-					//insert student
-					
-					$qry = 'INSERT INTO public.tbl_student (matrikelnr, prestudent_id, studiengang_kz, semester, verband, gruppe, 
-						insertamum, insertvon, updateamum, updatevon, ext_id)
-				        		VALUES('.myaddslashes($matrikelnr).', '.
-						myaddslashes($prestudent_id).', '.
-						myaddslashes($studiengang_kz).', '.
-						myaddslashes($semester).', '.
-						myaddslashes($verband).', '.
-						myaddslashes($gruppe).', '.
-						"now()".', '.
-						"'SYNC'".', '.
-						"now()".', '.
-						"'SYNC'".', '.
-						myaddslashes($ext_id_student).', ';
-				}
-				else 
-				{
-					//update student
-					
-					//student_uid auf gueltigkeit pruefen
-					if(!is_numeric($student_uid))
-					{				
-						$error=true;
-						$error_log.= 'student_id muss eine gueltige Zahl sein';
-					}
-					
-					//update nur wenn änderungen gemacht
-					$qry="SELECT * FROM public.tbl_student WHERE student_id='$student_id';";
-					if($result = pg_query($conn, $qry))
-					{
-						while($row = pg_fetch_object($result))
-						{
-							$update=false;			
-							if($row->matrikelnr!=$matrikelnr)					 	$update=true;
-							if($row->prestudent_id!=$prestudent_id)					$update=true;
-							if($row->studiengang_kz!=$studiengang_kz)				$update=true;
-							if($row->semester!=$semester)						$update=true;
-							if($row->verband!=$verband)						$update=true;
-							if($row->gruppe!=$gruppe)			 				$update=true;						
-							
-							if($update)
+							if($semester!=null AND $verband!=null AND $gruppe!=null)
 							{
-								$qry = 'UPDATE public.tbl_student SET'.
-								       ' matrikelnr='.myaddslashes($matrikelnr).','.
-								       ' prestudent_id='.myaddslashes($prestudent_id).','.
-								       ' studiengang_kz='.myaddslashes($studiengang_kz).','.
-								       ' semester='.myaddslashes($semester).','.
-								       ' verband='.myaddslashes($verband).','.
-								       ' gruppe='.myaddslashes($gruppe).','.
-								       " insertamum=now()".','.
-						        		       ' insertvon='.myaddslashes($insertvon).','.
-						        		       " updateamum=now()".','.
-						        		       " updatevon=".myaddslashes($updatevon).','.
-								       ' ext_id='.myaddslashes($ext_id_student).
-								       ' WHERE student_id='.$student_id.';';
-							}
-						}
-					}
-				}
-				if(pg_query($conn,$qry))
-				{
-					if($new_student)
-					{
-						$qry = "SELECT currval('public.tbl_student_student_id_seq') AS id;";
-						if($row=pg_fetch_object(pg_query($conn,$qry)))
-							$student_id=$row->id;
-						else
-						{					
-							$error=true;
-							$error_log.='Student-Sequence konnte nicht ausgelesen werden';
-						}
-					}			
-				}
-				else
-				{			
-					$error=true;
-					$error_log.='Fehler beim Speichern des Student-Datensatzes:'.$nachname.' '.$qry;
-				}
-										
-				if(!$error)
-				{
-					//Weitere Reihenfolge: benutzer
-					
-					//Benutzer schon vorhanden?
-					$qry="SELECT uid, person_id FROM public.tbl_benutzer WHERE ext_id='$row->student_pk'";
-					if($resultu = pg_query($conn, $qry))
-					{
-						if(pg_num_rows($resultu)>0) //wenn dieser eintrag schon vorhanden ist
-						{
-							if($rowu=pg_fetch_object($resultu))
-							{
-								$new_beutzer=false;		
-							}
-							else $new_benutzer=true;
-						}
-						else $new_benutzer=true;
-					}
-					else
-					{
-						$error=true;
-						$error_log.='Fehler beim Zugriff auf Tabelle tbl_benutzer bei student_pk: '.$row->student_pk;	
-					}
-					
-										
-					if($new_benutzer)
-					{
-						//insert benutzer
-						$qry = 'INSERT INTO public.tbl_benutzer (uid, person_id, aktiv, alias, 
-						insertamum, insertvon, updateamum, updatevon, ext_id)
-				        		VALUES('.myaddslashes($student_uid).', '.
-						myaddslashes($person_id).', '.
-						myaddslashes($aktiv).', '.
-						myaddslashes($alias).', '.
-						"now()".', '.
-						"'SYNC'".', '.
-						"now()".', '.
-						"'SYNC'".', '.
-						myaddslashes($ext_id_benutzer).', ';
-						
-					}
-					else 
-					{
-						//update benutzer
-						//uid auf gueltigkeit pruefen
-						if(!is_numeric($uid))
-						{				
-							$error=true;
-							$error_log.= 'uid muss eine gueltige Zahl sein';
-						}
-						if(!is_numeric($person_id))
-						{				
-							$error=true;
-							$error_log.= 'person_id muss eine gueltige Zahl sein';
-						}
-						
-						
-						//update nur wenn änderungen gemacht
-						$qry="SELECT * FROM public.tbl_benutzer WHERE ext_id='$ext_id_benutzer';";
-						if($result = pg_query($conn, $qry))
-						{
-							while($row = pg_fetch_object($result))
-							{
-								$update=false;			
-								if($row->aktiv!=$aktiv)		 	$update=true;						
-								
-								if($update)
+								$qry="SELECT * from public.tbl_lehrverband WHERE studiengang_kz=".myaddslashes($studiengang_kz)." AND semester=".myaddslashes($semester)." AND verband=".myaddslashes($verband)." AND gruppe=".myaddslashes($gruppe).";";
+								if($resultg = pg_query($conn, $qry))
 								{
-									$qry = 'UPDATE public.tbl_benutzer SET'.
-									       ' uid='.myaddslashes($student_id).','.
-									       ' person_id='.myaddslashes($person_id).','.
-									       ' aktiv='.myaddslashes($aktiv).','.
-									       " insertamum=now()".','.
-							        		       ' insertvon='.myaddslashes($insertvon).','.
-							        		       " updateamum=now()".','.
-							        		       " updatevon=".myaddslashes($updatevon).
-									       ' WHERE ext_id='.$ext_id_benutzer.';';
+									if(pg_num_rows($resultg)<1)
+									{
+										$qry='INSERT INTO public.tbl_lehrverband (studiengang_kz, semester, verband, gruppe, aktiv, bezeichnung, ext_id) 
+										VALUES('.myaddslashes($studiengang_kz).', '.
+										myaddslashes($semester).', '.
+										myaddslashes($verband).', '.
+										myaddslashes($gruppe).', '.
+										'true, null , null );';
+										
+										pg_query($conn, $qry);
+									}
+								}
+								$qry="SELECT * from public.tbl_lehrverband WHERE studiengang_kz=".myaddslashes($studiengang_kz)." AND semester=".myaddslashes($semester)." AND verband=".myaddslashes($verband)." AND (gruppe=null OR gruppe='');";
+								if($resultg = pg_query($conn, $qry))
+								{
+									if(pg_num_rows($resultg)<1)
+									{
+										$qry='INSERT INTO public.tbl_lehrverband (studiengang_kz, semester, verband, gruppe, aktiv, bezeichnung, ext_id) 
+										VALUES('.myaddslashes($studiengang_kz).', '.
+										myaddslashes($semester).', '.
+										myaddslashes($verband).', '.
+										"'', true, null, null);";
+										
+										pg_query($conn, $qry);
+									}
+								}
+								$qry="SELECT * from public.tbl_lehrverband WHERE studiengang_kz=".myaddslashes($studiengang_kz)." AND semester=".myaddslashes($semester)." AND (verband=null OR verband='') AND (gruppe=null OR gruppe='');";
+								if($resultg = pg_query($conn, $qry))
+								{
+									if(pg_num_rows($resultg)<1)
+									{
+										$qry='INSERT INTO public.tbl_lehrverband (studiengang_kz, semester, verband, gruppe, aktiv, bezeichnung, ext_id) 
+										VALUES('.myaddslashes($studiengang_kz).', '.
+										myaddslashes($semester).', '.
+										"'', '', true, null, null);";
+										
+										pg_query($conn, $qry);
+									}
 								}
 							}
 						}
 					}
+				}
+				if ($semester!=null and $semester!='' and is_numeric($semester) 
+				    and $verband!=null and $verband!='' 
+				    and $gruppe!=null and $gruppe!='' and is_numeric($gruppe))
+				{
+					
+					if($new_student)
+					{
+						//insert student
+						
+						$qry = 'INSERT INTO public.tbl_student (student_uid, matrikelnr, prestudent_id, studiengang_kz, semester, verband, gruppe, 
+							insertamum, insertvon, updateamum, updatevon, ext_id)
+					        		VALUES('.myaddslashes($student_uid).', '.
+							myaddslashes($matrikelnr).', '.
+							myaddslashes($prestudent_id).', '.
+							myaddslashes($studiengang_kz).', '.
+							myaddslashes($semester).', '.
+							myaddslashes($verband).', '.
+							myaddslashes($gruppe).', '.
+							"now()".', '.
+							"'SYNC'".', '.
+							"now()".', '.
+							"'SYNC'".', '.
+							myaddslashes($ext_id_student).'); ';
+					}
+					else 
+					{
+						//update student
+																								
+						//update nur wenn änderungen gemacht
+						$qry="SELECT * FROM public.tbl_student WHERE student_uid='$student_uid';";
+						if($results = pg_query($conn, $qry))
+						{
+							while($rows = pg_fetch_object($results))
+							{
+								$update=false;			
+								if($rows->matrikelnr!=$matrikelnr)					 	$update=true;
+								if($rows->prestudent_id!=$prestudent_id)					$update=true;
+								if($rows->studiengang_kz!=$studiengang_kz)				$update=true;
+								if($rows->semester!=$semester)						$update=true;
+								if($rows->verband!=$verband)						$update=true;
+								if($rows->gruppe!=$gruppe)			 			$update=true;						
+								
+								if($update)
+								{
+									$qry = 'UPDATE public.tbl_student SET'.
+									       ' matrikelnr='.myaddslashes($matrikelnr).','.
+									       ' prestudent_id='.myaddslashes($prestudent_id).','.
+									       ' studiengang_kz='.myaddslashes($studiengang_kz).','.
+									       ' semester='.myaddslashes($semester).','.
+									       ' verband='.myaddslashes($verband).','.
+									       ' gruppe='.myaddslashes($gruppe).','.
+									       " insertamum=now()".','.
+							        		       ' insertvon='.myaddslashes($insertvon).','.
+							        		       " updateamum=now()".','.
+							        		       " updatevon=".myaddslashes($updatevon).','.
+									       ' ext_id='.myaddslashes($ext_id_student).
+									       ' WHERE student_uid='.myaddslashes($student_uid).';';
+								}
+							}
+						}
+					}
+					$anzahl_student++;
 					if(pg_query($conn,$qry))
 					{
 						if($new_student)
 						{
 							$qry = "SELECT currval('public.tbl_student_student_id_seq') AS id;";
-							if($row=pg_fetch_object(pg_query($conn,$qry)))
-								$benutzer_id=$row->id;
+							if($rowz=pg_fetch_object(pg_query($conn,$qry)))
+								$student_id=$rowz->id;
 							else
 							{					
 								$error=true;
-								$error_log.='Benutzer-Sequence konnte nicht ausgelesen werden';
+								echo nl2br('Student-Sequence konnte nicht ausgelesen werden');
+								$error_log.='Student-Sequence konnte nicht ausgelesen werden';
 							}
 						}			
 					}
 					else
 					{			
 						$error=true;
-						$error_log.='Fehler beim Speichern des Student-Datensatzes:'.$nachname.' '.$qry;
+						echo nl2br('Fehler beim Speichern des Student-Datensatzes:'.$nachname.' / '.$qry);
+						$error_log.='Fehler beim Speichern des Student-Datensatzes:'.$nachname.' / '.$qry;
 					}
 											
 					if(!$error)
 					{
-						//Prestudentrolle anlegen
 						
-						//Status auslesen aus FAS
-						$qry1="SELECT status, creationdate FROM student_ausbildungssemester WHERE student_fk= ".$row->student_pk.";";
-						if($result1 = pg_query($conn, $qry1))
+						//Weitere Reihenfolge: benutzer
+						
+						//Benutzer schon vorhanden?
+						$qry="SELECT uid, person_id FROM public.tbl_benutzer WHERE person_id='$person_id'";
+						if($resultu = pg_query($conn, $qry))
 						{
-							while($row1= pg_fetch_object($result1))
+							if(pg_num_rows($resultu)>0) //wenn dieser eintrag schon vorhanden ist
 							{
-								If(status=='1') 	$rolle_kurzbz='Interessent';
-								If(status=='2') 	$rolle_kurzbz='Bewerber';
-								If(status=='3') 	$rolle_kurzbz='Student';
-								If(status=='4') 	$rolle_kurzbz='Ausserordentlicher';
-								If(status=='5') 	$rolle_kurzbz='Abgewiesener';
-								If(status=='6') 	$rolle_kurzbz='Aufgenommener';
-								If(status=='7') 	$rolle_kurzbz='Wartender';
-								If(status=='8') 	$rolle_kurzbz='Abbrecher';
-								If(status=='9') 	$rolle_kurzbz='Unterbrecher';
-								If(status=='10') 	$rolle_kurzbz='Outgoing';
-								If(status=='11') 	$rolle_kurzbz='Incoming';
-								If(status=='12') 	$rolle_kurzbz='Praktikant';
-								If(status=='13') 	$rolle_kurzbz='Diplomant';
-								If(status=='14') 	$rolle_kurzbz='Absolvent';
-																
-								//Prestudentrolle schon vorhanden?	
-								$qry2="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='$prestudent_id' 
-									AND rolle_kurzbez='$rolle_kurzbez' AND studiensemester_kurzbz='$studiensemester_kurzbz';";
-								if($resultu = pg_query($conn, $qry2))
+								if($rowu=pg_fetch_object($resultu))
 								{
-									if(pg_num_rows($resultu)>0) //wenn dieser eintrag schon vorhanden ist
+									$new_beutzer=false;	
+									$uid=$rowu->uid;	
+								}
+								else $new_benutzer=true;
+							}
+							else $new_benutzer=true;
+						}
+						else
+						{
+							$error=true;
+							$error_log.='Fehler beim Zugriff auf Tabelle tbl_benutzer bei student_pk: '.$row->student_pk;	
+						}
+						
+											
+						if($new_benutzer)
+						{
+							//insert benutzer
+							$qry = 'INSERT INTO public.tbl_benutzer (uid, person_id, aktiv, alias, 
+							insertamum, insertvon, updateamum, updatevon, ext_id)
+					        		VALUES('.myaddslashes($student_uid).', '.
+							myaddslashes($person_id).', '.
+							myaddslashes($aktiv).', '.
+							myaddslashes($alias).', '.
+							"now()".', '.
+							"'SYNC'".', '.
+							"now()".', '.
+							"'SYNC'".', '.
+							myaddslashes($ext_id_benutzer).'); ';
+							
+						}
+						else 
+						{
+							//update benutzer
+							//person_id auf gueltigkeit pruefen
+							
+							if(!is_numeric($person_id))
+							{				
+								$error=true;
+								echo nl2br('person_id muss eine gueltige Zahl sein');
+								$error_log.= 'person_id muss eine gueltige Zahl sein';
+							}
+							
+							
+							//update nur wenn änderungen gemacht
+							$qry="SELECT * FROM public.tbl_benutzer WHERE ext_id='$ext_id_benutzer';";
+							if($results = pg_query($conn, $qry))
+							{
+								while($rows = pg_fetch_object($results))
+								{
+									$update=false;			
+									if($rows->aktiv!=$aktiv)		 	$update=true;						
+									
+									if($update)
 									{
-										if($rowu=pg_fetch_object($resultu))
-										{
-											//insert	
-											$qry3 = 'INSERT INTO public.tbl_prestudentrolle (prestudent_id, rolle_kurzbz,
-												studiensemester_kurzbz, ausbildungssemester, datum, 
-												insertamum, insertvon, updateamum, updatevon, ext_id)
-									        		VALUES('.myaddslashes($prestudent_uid).', '.
-											myaddslashes($rolle_kurzbz).', '.
-											myaddslashes($studiensemester_kurzbz).', '.
-											myaddslashes($semester).', '.
-											myaddslashes($$row1->creationdate).', '.
-											"now()".', '.
-											"'SYNC'".', '.
-											"now()".', '.
-											"'SYNC'".', '.
-											myaddslashes($ext_id_student).', ';
-										}
-										else 
-										{
-											//update
-											$qry3 = 'UPDATE public.tbl_prestudentrolle SET'.
-											       ' ausbildungssemester='.myaddslashes($semester).','.
-											       ' datum='.myaddslashes($row1->creationdate).','.
-											       " insertamum=now()".','.
-									        		       ' insertvon='.myaddslashes($insertvon).','.
-									        		       " updateamum=now()".','.
-									        		       " updatevon=".myaddslashes($updatevon).
-											       ' WHERE prestudent_id='.$prestudent_id.' AND rolle_kurzbez='.$rolle_kurzbez.' AND studiensemester_kurzbz='.$studiensemester_kurzbz.';';
-										}	
-									}
-									else 
-									{
-										//update
-										$qry3 = 'UPDATE public.tbl_prestudentrolle SET'.
-										       ' ausbildungssemester='.myaddslashes($semester).','.
-										       ' datum='.myaddslashes($row1->creationdate).','.
+										$qry = 'UPDATE public.tbl_benutzer SET'.
+										       ' uid='.myaddslashes($student_id).','.
+										       ' person_id='.myaddslashes($person_id).','.
+										       ' aktiv='.myaddslashes($aktiv).','.
 										       " insertamum=now()".','.
 								        		       ' insertvon='.myaddslashes($insertvon).','.
 								        		       " updateamum=now()".','.
 								        		       " updatevon=".myaddslashes($updatevon).
-										       ' WHERE prestudent_id='.$prestudent_id.' AND rolle_kurzbez='.$rolle_kurzbez.' AND studiensemester_kurzbz='.$studiensemester_kurzbz.';';									
+										       ' WHERE ext_id='.myaddslashes($ext_id_benutzer).';';
 									}
-									
-								}
-								else
-								{
-									$error=true;
-									$error_log.='Fehler beim Zugriff auf Tabelle tbl_prestudentrolle bei student_pk: '.$row->student_pk;	
 								}
 							}
 						}
-						if(pg_query($conn,$qry3))
+						if(pg_query($conn,$qry))
 						{
-							pg_query($conn,'COMMIT;');				
+							if($new_student)
+							{
+								$qry = "SELECT currval('public.tbl_student_student_id_seq') AS id;";
+								if($rows=pg_fetch_object(pg_query($conn,$qry)))
+									$benutzer_id=$rows->id;
+								else
+								{					
+									$error=true;
+									echo nl2br('Benutzer-Sequence konnte nicht ausgelesen werden');
+									$error_log.='Benutzer-Sequence konnte nicht ausgelesen werden';
+								}
+							}			
 						}
 						else
 						{			
 							$error=true;
-							$error_log.='Fehler beim Speichern des Prestudentrolle-Datensatzes:'.$nachname.' '.$qry;
-							pg_query($conn,'ROLLBACK;');
+							echo nl2br('Fehler beim Speichern des Benutzer-Datensatzes:'.$nachname.' '.$qry);
+							$error_log.='Fehler beim Speichern des Benutzer-Datensatzes:'.$nachname.' '.$qry;
 						}
+						$anzahl_benutzer++;					
+						if(!$error)
+						{
+							if(pg_query($conn,$qry))
+							{
+								pg_query($conn,'COMMIT;');				
+							}
+							else
+							{			
+								$anzahl_fehler_benutzer++;
+								$error=true;
+								$error_log.='Fehler beim Speichern des Prestudentrolle-Datensatzes:'.$nachname.' '.$qry;
+								echo nl2br($qry."\n");
+								pg_query($conn,'ROLLBACK;');
+							}
+						}
+						else
+						{
+							$anzahl_fehler_benutzer++;
+							echo nl2br($qry."\n");
+							pg_query($conn,'ROLLBACK;');
+						}									
 					}
 					else
 					{
+						$anzahl_fehler_student++;
+						echo nl2br($qry."\n");
 						pg_query($conn,'ROLLBACK;');
-					}									
+					}
 				}
-				else
+				else 
 				{
-					pg_query($conn,'ROLLBACK;');
+					pg_query($conn,'COMMIT;'); //Commit, wenn kein Gruppeneintrag gefunden (Interessent, Bewerber) => nur Person und Prestudent werden angelegt
 				}
 			}
 			else
 			{
+				$anzahl_fehler_pre++;
+				echo nl2br($qry."\n");
 				pg_query($conn,'ROLLBACK;');
 			}						
 		}
 		else
 		{
+			$anzahl_fehler_person++;
+			echo nl2br($qry."\n");
 			pg_query($conn,'ROLLBACK;');
 		}
 
@@ -906,8 +940,13 @@ if($result = pg_query($conn_fas, $qry))
 }		
 
 
-echo nl2br($text);
+echo nl2br("\n".$text);
 echo nl2br($error_log);
+Echo nl2br("\n\nPersonen ohne Reihungstest: ".$notest." \n");
+Echo nl2br("Personen: Übertragen: ".$anzahl_person." Fehler: ".$anzahl_fehler_person."\n");
+Echo nl2br("Prestudenten: Übertragen: ".$anzahl_pre." Fehler: ".$anzahl_fehler_pre."\n");
+Echo nl2br("Studenten: Übertragen: ".$anzahl_student." Fehler: ".$anzahl_fehler_student."\n");
+Echo nl2br("Benutzer: Übertragen: ".$anzahl_benutzer." Fehler: ".$anzahl_fehler_benutzer."\n");
 
 ?>
 </body>
