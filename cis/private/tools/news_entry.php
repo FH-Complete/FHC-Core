@@ -85,7 +85,8 @@
 					echo "</script>";
 				}
 				else 
-				{					
+				{		
+					//echo $news->errormsg;			
 					echo "<script language=\"JavaScript\">";
 					echo "	document.location.href = 'news_entry.php' + \"?message_sent=no\";";
 					echo "</script>";

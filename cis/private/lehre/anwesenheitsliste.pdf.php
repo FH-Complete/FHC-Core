@@ -115,7 +115,7 @@ $stsem = $stsem_obj->getaktorNext();
 if($gruppe_kurzbz!='')
 	$pdf->MultiCell(0,20,'Gruppe: '.$gruppe_kurzbz.' Studiensemester: '.$stsem);
 else 
-	$pdf->MultiCell(0,20,'Gruppe: '.$stgobj->kurzbz.' '.$sem.$verband.$gruppe.' Studiensemester: '.$stsem);
+	$pdf->MultiCell(0,20,'Gruppe: '.strtoupper($stgobj->typ.$stgobj->kurzbz).' '.$sem.$verband.$gruppe.' Studiensemester: '.$stsem);
 	
 $maxY=$pdf->GetY();
 $maxY=getmax($maxY,$pdf->GetY());
