@@ -69,7 +69,26 @@ if($result = pg_query($conn_fas, $qry))
 			$mitarbeiter->svnr=$row->svnr;
 			$mitarbeiter->geschlecht=strtolower($row->geschlecht);
 			$mitarbeiter->ersatzkennzeichen=$row->ersatzkennzeichen;
-			$mitarbeiter->familienstand=$row->familienstand;
+			if ($row->familienstand=='0')
+			{
+				$mitarbeiter->familienstand=null;
+			}
+			if ($row->familienstand=='1')
+			{
+				$mitarbeiter->familienstand='l';
+			}
+			if ($row->familienstand=='2')
+			{
+				$mitarbeiter->familienstand='v';
+			}
+			if ($row->familienstand=='3')
+			{
+				$mitarbeiter->familienstand='g';
+			}
+			if ($row->familienstand=='4')
+			{
+				$mitarbeiter->familienstand='w';
+			}
 			$mitarbeiter->anzahlkinder=$row->anzahlderkinder;
 			$mitarbeiter->aktiv=($row->aktiv=='t'?true:false);
 			$mitarbeiter->insertvon='SYNC';
