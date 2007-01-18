@@ -195,7 +195,7 @@ echo '<td width="10">&nbsp;</td>';
 echo "<td>\n";
 
 if($lehreinheit_id=='')
-	die('Es wurde keine passende Lehreinheit in diesem Studiensemester gefunden');
+	die('Sie haben keine Berechtigung f&uuml;r diesen Bereich');
 
 //Menue
 echo "\n<!--Menue-->\n";
@@ -485,7 +485,7 @@ if(isset($uebung_id) && $uebung_id!='')
 	<tr><td>Freigabe</td><td align='right'>von <input type='text' size='16' name='freigabevon' value='".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon))."'></td></tr>
 	<tr><td>(Format: 31.12.2007 14:30)</td><td align='right'>bis <input type='text' size='16' name='freigabebis' value='".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis))."'></td></tr>
 	<tr><td>Statistik f&uuml;r Studenten anzeigen <input type='checkbox' name='statistik' ".($uebung_obj->statistik?'checked':'')."></td><td></td></tr>
-	<tr><td colspan=2 align='right'><input type='submit' name='uebung_edit' value='Ändern'></td></tr>
+	<tr><td colspan=2 align='right'><input type='submit' name='uebung_edit' value='Speichern'></td></tr>
 	</table>
 	</form>";
 	

@@ -508,6 +508,11 @@ else
 		while($row_grp = pg_fetch_object($result_grp))
 		{
 			echo "<tr>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
 					<td class='ContentHeader2'>UID</td>
 					<td class='ContentHeader2'>Nachname</td>
 					<td class='ContentHeader2'>Vorname</td>
@@ -529,9 +534,14 @@ else
 			{
 				echo "
 					<tr>
-						<td colspan='3' align='center'><b>Verband $row_grp->verband</b></td>
+						<td colspan='3' align='center'><b>Verband $row_grp->verband ".($row_grp->gruppe!=''?"Gruppe $row_grp->gruppe":'')."</b></td>
 					</tr>";
-					$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student WHERE studiengang_kz='$row_grp->studiengang_kz' AND semester='$row_grp->semester' AND verband='$row_grp->verband' AND gruppe='$row_grp->gruppe' ORDER BY nachname, vorname";
+					$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student 
+					             WHERE studiengang_kz='$row_grp->studiengang_kz' AND 
+					             semester='$row_grp->semester' ".
+								 ($row_grp->verband!=''?" AND trim(verband)=trim('$row_grp->verband')":'').
+								 ($row_grp->gruppe!=''?" AND trim(gruppe)=trim('$row_grp->gruppe')":'').
+					            " ORDER BY nachname, vorname";
 			}
 			
 			if($result_stud = pg_query($conn, $qry_stud))
