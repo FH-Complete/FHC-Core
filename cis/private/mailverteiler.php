@@ -17,12 +17,14 @@
    $is_lector=check_lektor($user,$conn);
 
    //Studentenvertreter duerfen die Verteiler genauso wie Lektoren verwenden
+   /*doch nicht
    if(!$is_lector)
    {
    		$fkt = new benutzerfunktion($conn);
    		if($fkt->benutzerfunktion_exists($user, 'stdv'))
    			$is_lector=true;
    }
+   */
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
