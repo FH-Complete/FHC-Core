@@ -159,8 +159,24 @@ class lvinfo
 	 */
 	function delete($lvinfo_id)
 	{
-		$this->errormsg = 'Noch nicht implementiert';
-		return false;
+		if(!is_numeric($lvinfo_id))
+		{
+			$this->errormsg = 'Lvinfo_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "DELETE FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$lvinfo_id'";
+		
+		if(pg_query($this->conn, $qry))
+		{
+			$this->lastqry = $qry;
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Löschen der Daten';
+			return false;
+		}
 	}
 	function addslashes($var)
 	{

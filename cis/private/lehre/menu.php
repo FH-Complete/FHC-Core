@@ -301,7 +301,12 @@ function js_toggle_container(conid)
 				if($result = pg_query($sql_conn,$qry))
 				{
 						while($row = pg_fetch_object($result))
-							echo "<li><a class=\"Item2\" title=\"".$row->bezeichnung."\" href=\"lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".$stg[$row->studiengang_kz].' '.$row->semester.' '.$row->lehreverzeichnis."</a></li>";
+						{
+							if($row->studiengang_kz==0 AND $row->semester==0)
+								echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="../freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">FF '.$row->lehreverzeichnis.'</a></li>';
+							else
+								echo "<li><a class=\"Item2\" title=\"".$row->bezeichnung."\" href=\"lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".$stg[$row->studiengang_kz].' '.$row->semester.' '.$row->lehreverzeichnis."</a></li>";
+						}
 				}
 				else 
 					echo "Fehler beim Auslesen des Lehrfaches";

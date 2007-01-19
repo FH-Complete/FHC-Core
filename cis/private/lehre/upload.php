@@ -140,7 +140,7 @@ A:hover {
 			  <?php
 				if($islector)
 				{
-				   $sql_query = "SELECT DISTINCT tbl_studiengang.typ,UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz, tbl_studiengang.kurzbzlang, tbl_studiengang.studiengang_kz FROM public.tbl_studiengang, lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter WHERE tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz AND tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND tbl_lehrveranstaltung.studiengang_kz!=0 AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid='$user' ORDER BY typ, kurzbz";
+				   $sql_query = "SELECT DISTINCT tbl_studiengang.typ,UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz, tbl_studiengang.kurzbzlang, tbl_studiengang.studiengang_kz FROM public.tbl_studiengang, lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter WHERE tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz AND tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND tbl_lehrveranstaltung.studiengang_kz!=0 AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid='$user' AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>'' ORDER BY typ, kurzbz";
 				   
 				   if(!$result_lector_dispatch = pg_query($sql_conn, $sql_query))
 				   		die('Fehler beim Lesen aus der Datenbank');
@@ -251,7 +251,7 @@ A:hover {
 								foreach ($arr as $elem)
 									$ids.=",'$elem'";
 								
-								$sql_query = "SELECT distinct tbl_lehrveranstaltung.studiengang_kz, tbl_studiengang.kurzbzlang, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM lehre.tbl_lehrfach, public.tbl_studiengang, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung WHERE fachbereich_kurzbz in(".$ids.") AND tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND tbl_studiengang.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz AND tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND tbl_lehrveranstaltung.lehre=true";
+								$sql_query = "SELECT distinct tbl_lehrveranstaltung.studiengang_kz, tbl_studiengang.kurzbzlang, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM lehre.tbl_lehrfach, public.tbl_studiengang, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung WHERE fachbereich_kurzbz in(".$ids.") AND tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND tbl_studiengang.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz AND tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>''";
 								$result_stg_kurzbzlang=pg_exec($sql_conn, $sql_query);
 								while($row = pg_fetch_object($result_stg_kurzbzlang))
 									if(!array_key_exists($row->studiengang_kz,$stg_arr))
@@ -296,7 +296,7 @@ A:hover {
 					   }
 					   
 					   //$sql_query = "SELECT DISTINCT ON(semester) semester FROM lehre.tbl_lehrfachzuteilung WHERE lektor_uid='$user' AND NOT(lehrfachzuteilung_kurzbz='') AND studiengang_kz='$course_id' ORDER BY semester";
-					   $sql_query = "SELECT DISTINCT semester FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehrveranstaltung WHERE tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND mitarbeiter_uid='$user' AND studiengang_kz='$course_id' ORDER BY semester";
+					   $sql_query = "SELECT DISTINCT semester FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehrveranstaltung WHERE tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND mitarbeiter_uid='$user' AND studiengang_kz='$course_id' AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>'' ORDER BY semester";
 					   if(!$result_lector_dispatch = pg_query($sql_conn, $sql_query))
 					   		die('Fehler beim Lesen aus der Datenbank');
 					   		
@@ -353,7 +353,7 @@ A:hover {
 								foreach ($arr as $elem)
 									$ids.=",'$elem'";
 								
-								$sql_query = "SELECT distinct tbl_lehrveranstaltung.semester FROM lehre.tbl_lehrfach, lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit WHERE fachbereich_kurzbz in(".$ids.") AND tbl_lehrveranstaltung.studiengang_kz=$course_id AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id";
+								$sql_query = "SELECT distinct tbl_lehrveranstaltung.semester FROM lehre.tbl_lehrfach, lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit WHERE fachbereich_kurzbz in(".$ids.") AND tbl_lehrveranstaltung.studiengang_kz=$course_id AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>'' AND tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id";
 								//echo $sql_query;
 								$result=pg_query($sql_conn, $sql_query);
 								while($row = pg_fetch_object($result))
@@ -394,7 +394,7 @@ A:hover {
 						//Admin und Lehreberechtigung
 						if($rechte->isBerechtigt('admin',$course_id) || $rechte->isBerechtigt('lehre',$course_id) || $rechte->isBerechtigt('lehre',null,null,'0'))
 						{							
-							$sql_query = "SELECT DISTINCT lehreverzeichnis AS kuerzel, bezeichnung FROM lehre.tbl_lehrveranstaltung WHERE studiengang_kz='$course_id' AND semester='$term_id' AND tbl_lehrveranstaltung.lehre=true";
+							$sql_query = "SELECT DISTINCT lehreverzeichnis AS kuerzel, bezeichnung FROM lehre.tbl_lehrveranstaltung WHERE studiengang_kz='$course_id' AND semester='$term_id' AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>''";
 						}
 						//Fachbereichsberechtigung
 						if($rechte->isBerechtigt('lehre') || $rechte->isBerechtigt('admin'))
@@ -407,7 +407,7 @@ A:hover {
 							                           FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach 
 							                           WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 							                           tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
-							                           tbl_lehrveranstaltung.studiengang_kz='$course_id' AND tbl_lehrveranstaltung.semester='$term_id' AND fachbereich_kurzbz in ($ids) AND tbl_lehrveranstaltung.lehre=true";
+							                           tbl_lehrveranstaltung.studiengang_kz='$course_id' AND tbl_lehrveranstaltung.semester='$term_id' AND fachbereich_kurzbz in ($ids) AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>''";
 						}	
 						$sql_query .= ' ORDER BY bezeichnung, kuerzel';
 						//LEHRFAECHER
