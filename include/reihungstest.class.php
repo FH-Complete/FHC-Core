@@ -130,7 +130,7 @@ class reihungstest
 		{
 			//Neuen Datensatz einfuegen
 					
-			$qry='INSERT INTO tbl_reihungstest (studiengang_kz, ort_kurzbz, anmerkung, datum, uhrzeit, 
+			$qry='INSERT INTO public.tbl_reihungstest (studiengang_kz, ort_kurzbz, anmerkung, datum, uhrzeit, 
 				ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
 			     $this->addslashes($this->studiengang_kz).', '.
 			     $this->addslashes($this->ort_kurzbz).', '.
@@ -144,14 +144,14 @@ class reihungstest
 		}
 		else
 		{			
-			$qryz="SELECT * FROM tbl_reihungstest WHERE reihungstest_id='$this->reihungstest_id';";
-			if($resultz = pg_query($this->conn, $qryz))
+			$qry="SELECT * FROM public.tbl_reihungstest WHERE reihungstest_id='$this->reihungstest_id';";
+			if($resultz = pg_query($this->conn, $qry))
 			{
 				while($rowz = pg_fetch_object($resultz))
 				{
 					$update=false;			
 					if($rowz->studiengang_kz!=$this->studiengang_kz)		$update=true;
-					if($rowz->ort_kurzbz!=$this->kurzbz)				$update=true;
+					if($rowz->ort_kurzbz!=$this->ort_kurzbz)				$update=true;
 					if($rowz->anmerkung!=$this->anmerkung)			$update=true;
 					if($rowz->datum!=$this->datum)					$update=true;
 					if($rowz->uhrzeit!=$this->uhrzeit)					$update=true;
@@ -159,7 +159,7 @@ class reihungstest
 				
 					if($update)
 					{
-						$qry='UPDATE tbl_schluessel SET '.
+						$qry='UPDATE public.tbl_reihungstest SET '.
 							'studiengang_kz='.$this->addslashes($this->studiengang_kz).', '. 
 							'ort_kurzbz='.$this->addslashes($this->ort_kurzbz).', '. 
 							'anmerkung='.$this->addslashes($this->anmerkung).', '.  
@@ -203,7 +203,7 @@ class reihungstest
 			}
 			else 
 			{
-				$this->errormsg = 'Fehler beim Speichern der Daten';
+				$this->errormsg = 'Fehler beim Speichern der Daten: '.$this->reihungstest_id.'/'.$qry;
 				return false;
 			}
 		}
