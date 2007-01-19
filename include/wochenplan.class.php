@@ -207,12 +207,12 @@ class wochenplan
 		// Studiengangsdaten ermitteln
 		if ($this->type=='student' || $this->type=='verband')
 		{
-			$sql_query="SELECT bezeichnung, kurzbz, kurzbzlang FROM tbl_studiengang WHERE studiengang_kz=$this->stg_kz";
+			$sql_query="SELECT bezeichnung, kurzbz, kurzbzlang, typ FROM public.tbl_studiengang WHERE studiengang_kz=$this->stg_kz";
 			//echo $sql_query;
 			if(!($result=pg_exec($this->conn, $sql_query)))
 				die(pg_last_error($this->conn));
 			$this->stg_bez=pg_result($result,0,'"bezeichnung"');
-			$this->stg_kurzbz=pg_result($result,0,'"kurzbz"');
+			$this->stg_kurzbz=pg_result($result,0,'"typ"').pg_result($result,0,'"kurzbz"');
 			$this->stg_kurzbzlang=pg_result($result,0,'"kurzbzlang"');
 		}
 
