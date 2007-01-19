@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -26,7 +26,7 @@ class lehreinheit
 	var $errormsg; // string
 	var $new;      // boolean
 	var $lehreinheiten = array(); // lehreinheit Objekt
-	
+
 	//Tabellenspalten
 	var $lehreinheit_id;			// integer
 	var $lehrveranstaltung_id;		// integer
@@ -48,33 +48,33 @@ class lehreinheit
 	var $updatevon;					// varchar(16)
 	var $sprache;					// varchar(16)
 	var $ext_id;					// bigint
-	
+
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine LE
 	// * @param $conn        	Datenbank-Connection
 	// *        $gruppe_kurzbz
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
+	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
 	function lehreinheit($conn, $lehreinheit_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
+		else
 			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
+
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-		
+
 		if($lehreinheit_id!=null)
 			$this->load($lehreinheit_id);
 	}
-	
+
 	// *********************************************************
 	// * Laedt die LE
 	// * @param lehreinheit_id
@@ -85,13 +85,13 @@ class lehreinheit
 		{
 			$this->errormsg = 'Lehreinheit_id muss eine gueltige Zahl sein';
 		}
-		
+
 		$qry = "SELECT * FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$lehreinheit_id'";
-		
+
 		if($result = pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
-			{				
+			{
 				$this->lehreinheit_id = $row->lehreinheit_id;
 				$this->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
@@ -111,26 +111,26 @@ class lehreinheit
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
-				$this->ext_id = $row->ext_id;				
+				$this->ext_id = $row->ext_id;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Lehreinheit';
 			return false;
 		}
 	}
-	
+
 	function load_lehreinheiten($lehrveranstaltung_id, $studiensemester_kurzbz)
 	{
 		$qry = "SELECT * FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lehrveranstaltung_id' AND studiensemester_kurzbz='$studiensemester_kurzbz'";
-		
+
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
 			{
 				$le_obj = new lehreinheit($this->conn);
-				
+
 				$le_obj->lehreinheit_id = $row->lehreinheit_id;
 				$le_obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 				$le_obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
@@ -151,19 +151,19 @@ class lehreinheit
 				$le_obj->updateamum = $row->updateamum;
 				$le_obj->updatevon = $row->updatevon;
 				$le_obj->ext_id = $row->ext_id;
-				
+
 				$this->lehreinheiten[] = $le_obj;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Lehreinheiten';
 			return false;
 		}
 	}
-	
+
 	// *******************************************
-	// * Prueft die Variablen vor dem Speichern 
+	// * Prueft die Variablen vor dem Speichern
 	// * auf Gueltigkeit.
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
@@ -267,7 +267,7 @@ class lehreinheit
 
 	// ************************************************
 	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische 
+	// * wenn $var !='' ist werden Datenbankkritische
 	// * Zeichen mit Backslash versehen und das Ergbnis
 	// * unter Hochkomma gesetzt.
 	// ************************************************
@@ -286,7 +286,7 @@ class lehreinheit
 	{
 		if(is_null($new))
 			$new = $this->new;
-					
+
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
 			return false;
@@ -294,8 +294,8 @@ class lehreinheit
 		if($new)
 		{
 			//ToDo ID entfernen
-			$qry = 'INSERT INTO lehre.tbl_lehreinheit (lehrveranstaltung_id, studiensemester_kurzbz, 
-			                                     lehrfach_id, lehrform_kurzbz, stundenblockung, wochenrythmus, 
+			$qry = 'INSERT INTO lehre.tbl_lehreinheit (lehrveranstaltung_id, studiensemester_kurzbz,
+			                                     lehrfach_id, lehrform_kurzbz, stundenblockung, wochenrythmus,
 			                                     start_kw, raumtyp, raumtypalternativ, lehre, anmerkung, unr, lvnr, insertamum, insertvon, updateamum, updatevon,  ext_id, sprache)
 			        VALUES('.$this->addslashes($this->lehrveranstaltung_id).','.
 					$this->addslashes($this->studiensemester_kurzbz).','.
@@ -350,6 +350,189 @@ class lehreinheit
 			$this->errormsg = 'Fehler beim Speichern der LE:'.$qry;
 			return false;
 		}
+	}
+
+	/*************************************************************************
+	 * Prueft die geladene Lehrveranstaltung auf Kollisionen im Stundenplan.
+	 * Rueckgabewert 'false' und die Fehlermeldung steht in '$this->errormsg'.
+	 * @param string	datum	gewuenschtes Datum YYYY-MM-TT
+	 * @param integer	stunde	gewuenschte Stunde
+	 * @param string	ort		gewuenschter Ort
+	 * @param string	db_stpl_table	Tabllenname des Stundenplans im DBMS
+	 * @return boolean true=ok, false=fehler
+	 *************************************************************************/
+	function check_lva($datum,$stunde,$ort,$stpl_table)
+	{
+		// Parameter Checken
+		// Bezeichnung der Stundenplan-Tabelle und des Keys
+		$stpl_id=$stpl_table.TABLE_ID;
+		$stpl_table=TABLE_BEGIN.$stpl_table;
+
+		/*// Connection holen
+		if (is_null($conn=$this->getConnection()))
+		{
+			return false;
+		}*/
+
+		// Datenbank abfragen
+		$sql_query="SELECT $stpl_id FROM $stpl_table
+					WHERE datum='$datum' AND stunde=$stunde
+					AND ((ort_kurzbz='$ort' OR (uid='$this->lektor' AND uid!='_DummyLektor'))
+					AND unr!=$this->unr)"; //AND lehrveranstaltung_id!=$this->lehrveranstaltung_id
+		//$this->errormsg=$sql_query;
+		if (! $erg_stpl=pg_query($this->conn, $sql_query))
+		{
+			$this->errormsg=pg_last_error($this->conn);
+			//echo $this->errormsg;
+			return false;
+		}
+		$anzahl=pg_numrows($erg_stpl);
+		//Check
+		if ($anzahl==0)
+			return true;
+		else
+		{
+			$row=pg_fetch_row($erg_stpl);
+			$this->errormsg="Kollision mit StundenplanID($stpl_table.$stpl_id): $row[0]";
+			return false;
+		}
+	}
+
+	/*************************************************************************
+	 * Speichert die geladene Lehrveranstaltung im Stundenplan.
+	 * Rueckgabewert 'false' und die Fehlermeldung steht in '$this->errormsg'.
+	 * @param string	datum	gewuenschtes Datum YYYY-MM-TT
+	 * @param integer	stunde	gewuenschte Stunde
+	 * @param string	ort		gewuenschter Ort
+	 * @param string	db_stpl_table	Tabllenname des Stundenplans im DBMS
+	 * @param string	user	UID des aktuellen Bentzers
+	 * @return boolean true=ok, false=fehler
+	 *************************************************************************/
+	function save_stpl($datum,$stunde,$ort,$stpl_table, $user)
+	{
+		// Parameter Checken
+		// Bezeichnung der Stundenplan-Tabelle und des Keys
+		$stpl_id=$stpl_table.TABLE_ID;
+		$stpl_table=TABLE_BEGIN.$stpl_table;
+
+		// Datenbank abfragen
+		$sql_query="INSERT INTO $stpl_table
+			(unr,uid,datum,	stunde,	ort_kurzbz,lehrfach_nr,lehrform_kurzbz,studiengang_kz,semester,verband,
+			gruppe,	einheit_kurzbz,	titel, anmerkung, updatevon, lehrveranstaltung_id)
+			VALUES ($this->unr,'$this->lektor','$datum',$stunde,
+			'$ort',$this->lehrfach_nr, '$this->lehrform', $this->studiengang_kz,$this->semester,
+			'$this->verband','$this->gruppe'";
+		if ($this->einheit_kurzbz==null)
+			$sql_query.=',NULL';
+		else
+			$sql_query.=",'$this->einheit_kurzbz'";
+		$sql_query.=",'$this->titel','$this->anmerkung','$user',$this->lehrveranstaltung_id)";
+		//$this->errormsg=$sql_query.'<br>';
+		//return false;
+		if (! $erg_stpl=pg_query($this->conn, $sql_query))
+		{
+			$this->errormsg=pg_last_error($this->conn);
+			//echo $this->errormsg;
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Rueckgabewert ist ein Array mit den Ergebnissen. Bei Fehler false und die
+	 * Fehlermeldung liegt in errormsg.
+	 * Wenn der Parameter stg_kz NULL ist tritt einheit_kurzbzb in Kraft.
+	 * @param string $einheit_kurzbz    Einheit
+	 * @param string grp    Gruppe
+	 * @param string ver    Verband
+	 * @param integer sem    Semester
+	 * @param integer stg_kz    Kennzahl des Studiengangs
+	 * @return variabel Array mit LVA; <b>false</b> bei Fehler
+	 */
+	function getLehreinheitLVPL($db_stpl_table,$studiensemester, $type, $stg_kz, $sem, $lektor, $ver=null, $grp=null, $gruppe=null)
+	{
+		$lva_stpl_view=VIEW_BEGIN.'lva_'.$db_stpl_table;
+
+		if (strlen($studiensemester)<=0)
+		{
+			$this->errormsg='Ausbildungssemester ist nicht gesetzt!';
+			return false;
+		}
+		else $where=" studiensemester_kurzbz='$studiensemester'";
+
+		if ($type=='lektor')
+			$where.=" AND lektor_uid='$lektor'";
+		elseif ($type=='einheit')
+			$where.=" AND einheit='$einheit'";
+		elseif ($type=='verband')
+		{
+			$where.=" AND studiengang_kz='$stg_kz'";
+			if ($sem>0)
+				$where.=" AND semester=$sem";
+			if (strlen($ver)>0 && $ver!=' ')
+				$where.=" AND verband='$ver'";
+			if (strlen($grp)>0 && $grp!=' ')
+				$where.=" AND gruppe='$grp' ";
+		}
+		$sql_query='SELECT *, semesterstunden-verplant::smallint AS offenestunden
+			FROM lehre.'.$lva_stpl_view.' JOIN lehre.tbl_lehrform ON '.$lva_stpl_view.'.lehrform=tbl_lehrform.lehrform_kurzbz
+			WHERE '.$where.' AND verplanen ORDER BY offenestunden DESC, lehrfach, lehrform, semester, verband, gruppe, gruppe_kurzbz;';
+	    //$this->errormsg=$sql_query;
+	    //return false;
+		if(!($erg=@pg_exec($this->conn, $sql_query)))
+		{
+			$this->errormsg=pg_errormessage($this->conn);
+			return false;
+		}
+		$num_rows=pg_numrows($erg);
+		$l=array();
+		for($i=0;$i<$num_rows;$i++)
+		{
+   			$row=pg_fetch_object($erg,$i);
+			//$l[$row->unr]=new lehrveranstaltung();
+			$l[$row->unr]->lehreinheit_id[]=$row->lehreinheit_id;
+			$l[$row->unr]->lvnr[]=$row->lvnr;
+			$l[$row->unr]->unr=$row->unr;
+			$l[$row->unr]->fachbereich=$row->fachbereich_kurzbz;
+			$l[$row->unr]->lehrfach_id=$row->lehrfach_id;
+			$l[$row->unr]->lehrfach[]=$row->lehrfach;
+			$l[$row->unr]->lehrfach_bez[]=$row->lehrfach_bez;
+			$l[$row->unr]->lehrfach_farbe[]=$row->lehrfach_farbe;
+			$l[$row->unr]->lehrform[]=$row->lehrform;
+			$l[$row->unr]->lektor_uid[]=$row->lektor_uid;
+			$l[$row->unr]->lektor[]=trim($row->lektor);
+			$l[$row->unr]->stg_kz[]=$row->studiengang_kz;
+			$l[$row->unr]->stg[]=$row->studiengang;
+			$l[$row->unr]->gruppe_kurzbz[]=$row->gruppe_kurzbz;
+			$l[$row->unr]->semester[]=$row->semester;
+			$l[$row->unr]->verband[]=$row->verband;
+			$l[$row->unr]->gruppe[]=$row->gruppe;
+			$l[$row->unr]->gruppe_kurzbz[]=$row->gruppe_kurzbz;
+			$l[$row->unr]->raumtyp=$row->raumtyp;
+			$l[$row->unr]->raumtypalternativ=$row->raumtypalternativ;
+			$l[$row->unr]->stundenblockung[]=$row->stundenblockung;
+			$l[$row->unr]->wochenrythmus[]=$row->wochenrythmus;
+			$l[$row->unr]->semesterstunden[]=$row->semesterstunden;
+			$l[$row->unr]->start_kw[]=$row->start_kw;
+			$l[$row->unr]->anmerkung[]=$row->anmerkung;
+			$l[$row->unr]->studiensemester_kurzbz=$row->studiensemester_kurzbz;
+			$l[$row->unr]->verplant[]=$row->verplant;
+			$l[$row->unr]->offenestunden[]=$row->offenestunden;
+			if (isset($l[$row->unr]->verplant_gesamt))
+				$l[$row->unr]->verplant_gesamt+=$row->verplant;
+			else
+				$l[$row->unr]->verplant_gesamt=$row->verplant;
+			$lvb=$row->studiengang.'-'.$row->semester;
+			if ($row->verband!='' && $row->verband!=' ' && $row->verband!='0' && $row->verband!=null)
+				$lvb.=$row->verband;
+			if ($row->gruppe!='' && $row->gruppe!=' ' && $row->gruppe!='0' && $row->gruppe!=null)
+				$lvb.=$row->gruppe;
+			if ($row->gruppe_kurzbz!='' && $row->gruppe_kurzbz!=null)
+				$l[$row->unr]->lehrverband[]=$row->gruppe_kurzbz;
+			else
+				$l[$row->unr]->lehrverband[]=$lvb;
+		}
+		return $l;
 	}
 }
 ?>
