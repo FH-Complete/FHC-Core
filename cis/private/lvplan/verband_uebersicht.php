@@ -1,6 +1,6 @@
 <?php
-	include('../config.inc.php');
-	include('../../include/functions.inc.php');
+	include('../../config.inc.php');
+	include('../../../include/functions.inc.php');
 	if (!$conn = @pg_pconnect(CONN_STRING))
 	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
 	if(!($erg=pg_exec($conn, "SELECT * FROM tbl_studiengang WHERE studiengang_kz>0 ORDER BY kurzbz")))
@@ -11,7 +11,7 @@
 <head>
 	<title>&Uuml;bersicht der Lehrverb&auml;nde</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-	<link rel="stylesheet" href="../../skin/cis.css" type="text/css">
+	<link rel="stylesheet" href="../../../skin/cis.css" type="text/css">
 </head>
 
 <body>
@@ -40,8 +40,8 @@
 		echo '<td nowrap valign="top">';
 		$row=pg_fetch_object($erg, $i);
      	$stg_kz=$row->studiengang_kz;
-		$stg_kzbz=$row->kurzbz;
-		$sql_query="SELECT DISTINCT semester FROM tbl_student WHERE studiengang_kz=$stg_kz ORDER BY semester";
+		$stg_kzbz=$row->typ.$row->kurzbz;
+		$sql_query="SELECT DISTINCT semester FROM tbl_student WHERE studiengang_kz=$stg_kz AND semester<10 ORDER BY semester";
 		//echo $sql_query;
 		if(!($result_sem=pg_exec($conn, $sql_query)))
 			die(pg_last_error($conn));
