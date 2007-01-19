@@ -426,16 +426,6 @@ if($result = pg_query($conn_fas, $qry))
 		}
 		if(pg_query($conn,$qry))
 		{
-			$qryz="SELECT person_fas FROM tbl_syncperson WHERE person_fas='$row->person_pk' AND person_portal='$person->person_id'";
-			if($resultz = pg_query($conn, $qryz))
-			{
-				if(pg_num_rows($resultz)==0) //wenn dieser eintrag noch nicht vorhanden ist
-				{
-					$qry='INSERT INTO tbl_syncperson (person_fas, person_portal)'.
-						'VALUES ('.$row->person_pk.', '.$person->person_id.');';
-					$resulti = pg_query($conn, $qry);
-				}
-			}
 			if($new_person)
 			{
 				$qry = "SELECT currval('public.tbl_person_person_id_seq') AS id;";
@@ -447,6 +437,17 @@ if($result = pg_query($conn_fas, $qry))
 					$error_log.='Person-Sequence konnte nicht ausgelesen werden';
 				}
 			}			
+			//Eintrag Synctabelle
+			$qryz="SELECT person_fas FROM tbl_syncperson WHERE person_fas='$row->person_pk' AND person_portal='$person->person_id'";
+			if($resultz = pg_query($conn, $qryz))
+			{
+				if(pg_num_rows($resultz)==0) //wenn dieser eintrag noch nicht vorhanden ist
+				{
+					$qry='INSERT INTO tbl_syncperson (person_fas, person_portal)'.
+						'VALUES ('.$row->person_pk.', '.$person->person_id.');';
+					$resulti = pg_query($conn, $qry);
+				}
+			}
 		}
 		else
 		{			
@@ -736,7 +737,7 @@ if($result = pg_query($conn_fas, $qry))
 				{
 					while($rowru=pg_fetch_object($resultru))
 					{
-						$datum=strftime ("%Y-%m-%d" ,$rowru->creationdate);
+						$date = date('Y-m-d',mktime_fromtimestamp($rowru->creationdate));
 						$status=$rowru->status;
 						$qry="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='$prestudent_id' AND rolle_kurzbz='$rolle_kurzbz[$status]' AND ausbildungssemsester='$rowru->ausbildungssemester';";
 						if($resultu = pg_query($conn, $qry))
