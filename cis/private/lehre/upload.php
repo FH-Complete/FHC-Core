@@ -477,9 +477,8 @@ A:hover {
 					
 					if(!($num_rows_path_elements > 0))
 					{
-						echo "<font face=\"Arial, Helvetica, sans-serif\" size=\"2\">";
-						die('<p align="center"><strong<font size="2" face="Arial, Helvetica, sans-serif">Es konnten keine Pfadeintr&auml;ge gefunden werden.</font></p>');
-						echo "</font>";
+						echo "<tr><td><font face=\"Arial, Helvetica, sans-serif\" size=\"2\">";
+						die('<p align="center"><strong<font size="2" face="Arial, Helvetica, sans-serif">Sie haben keine Berechtigung für diesen Bereich</font></td></tr></table>');
 					}
 					
 					$row = pg_fetch_object($result_path_elements, 0);
