@@ -5,7 +5,7 @@ include('../include/functions.inc.php');
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-details-overlay.xul.php"?>';
 /*echo '<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>';
-	echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
+echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 
 // Testumgebung
 if (!isset($REMOTE_USER))
@@ -24,7 +24,7 @@ $num_rows_stunde=pg_numrows($result_stunde);
 ?>
 
 <!DOCTYPE overlay [
-	<?php require("../locale/de-AT/tempus.dtd"); ?>
+	<?php require_once("../locale/de-AT/tempus.dtd"); ?>
 ]>
 
 <overlay id="TempusOverlaySTPLWeek"
@@ -41,17 +41,17 @@ $num_rows_stunde=pg_numrows($result_stunde);
 <toolbox>
 	<toolbar id="toolbarTimeTableJumpWeek" tbautostretch="always" persist="collapsed">
 		<toolbarbutton id="toolbarbuttonJumpWeekMoreLeft"
-			tooltiptext="16 Wochen zur??ck"
+			tooltiptext="16 Wochen zurueck"
 			image="../skin/images/moremoreleft.png"
 			oncommand="onJumpDate(-16);"
 		/>
 		<toolbarbutton id="toolbarbuttonJumpWeekMoreLeft"
-			tooltiptext="4 Wochen zur??ck"
+			tooltiptext="4 Wochen zurueck"
 			image="../skin/images/moreleft.png"
 			oncommand="onJumpDate(-4);"
 		/>
 		<toolbarbutton id="toolbarbuttonJumpWeekLeft"
-			tooltiptext="1 Woche zur??ck"
+			tooltiptext="1 Woche zurueck"
 			image="../skin/images/left.png"
 			oncommand="onJumpDate(-1);"
 		/>
@@ -108,8 +108,8 @@ $num_rows_stunde=pg_numrows($result_stunde);
 		</toolbar>
 </toolbox>
 <vbox id="vboxLehrveranstalungPlanung" style="overflow:auto;margin:0px;" flex="1"
-	datasources="../rdf/lehrveranstaltung.rdf.php"
-	ref="http://www.technikum-wien.at/tempus/lehrveranstaltung/alle">
+	datasources="../rdf/lehreinheit-lvplan.rdf.php"
+	ref="http://www.technikum-wien.at/lehreinheit-lvplan/alle">
 	<template>
 	    <rule>
 	    	<grid uri="rdf:*" class="lvaStundenplan">
@@ -124,14 +124,14 @@ $num_rows_stunde=pg_numrows($result_stunde);
 	        					image="../skin/images/lvaSingle.png"
 	        					ondraggesture="nsDragAndDrop.startDrag(event,lvaObserver);"
 	       						oncommand="onLVAdoStpl(event);"
-	       						idList="rdf:http://www.technikum-wien.at/tempus/lehrveranstaltung/rdf#lva_ids"
+	       						idList="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lva_ids"
 	       						aktion="lva_single"
 	       						tooltiptext="Vorschlag/Setzen Block"
 	        				/>
 	        				<toolbarbutton
 			        			image="../skin/images/lvaMulti.png"
 	        					onclick="onLVAdoStpl(event);"
-		       					idList="rdf:http://www.technikum-wien.at/tempus/lehrveranstaltung/rdf#lva_ids"
+		       					idList="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lva_ids"
 	        					aktion="lva_multi"
 	        					ondraggesture="nsDragAndDrop.startDrag(event,lvaObserver)"
 	        					tooltiptext="Vorschlag/Setzen MultiWeek"
@@ -141,44 +141,44 @@ $num_rows_stunde=pg_numrows($result_stunde);
 	        				<toolbarbutton
 		        				image="../skin/images/lvaSingleDel.png"
 	        					onclick="onLVAdoStpl(event);"
-	       						idList="rdf:http://www.technikum-wien.at/tempus/lehrveranstaltung/rdf#lva_ids"
+	       						idList="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lva_ids"
 	       						aktion="lva_stpl_del_single"
 	       						tooltiptext="Löschen SingleWeek"
 	        				/>
 	        				<toolbarbutton
 		        				image="../skin/images/lvaMultiDel.png"
 	        					onclick="onLVAdoStpl(event);"
-	       						idList="rdf:http://www.technikum-wien.at/tempus/lehrveranstaltung/rdf#lva_ids"
+	       						idList="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lva_ids"
 	       						aktion="lva_stpl_del_multi"
 	       						tooltiptext="Löschen MultiWeek"
 	        				/>
 	        			</hbox>
 	        		</row>
-	    			<row style="background-color^: rdf:http://www.technikum-wien.at/tempus/lehrveranstaltung/rdf#lehrfach_farbe^;">
-	    				<label value="rdf:http://www.technikum-wien.at/tempus/lehrveranstaltung/rdf#lehrfach rdf:http://www.technikum-wien.at/tempus/lehrveranstaltung/rdf#lehrform"
-	    					tooltiptext="rdf:http://www.technikum-wien.at/tempus/lehrveranstaltung/rdf#lehrfach_bez" />
-	       				<label align="right" value="rdf:http://www.technikum-wien.at/tempus/lehrveranstaltung/rdf#raumtyp"
-	       					tooltiptext="rdf:http://www.technikum-wien.at/tempus/lehrveranstaltung/rdf#raumtypalternativ" />
+	    			<row style="background-color^: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrfach_farbe^;">
+	    				<label value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrfach rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrform"
+	    					tooltiptext="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrfach_bez" />
+	       				<label align="right" value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#raumtyp"
+	       					tooltiptext="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#raumtypalternativ" />
 	    			</row>
 	    			<row>
-	    				<label value="rdf:http://www.technikum-wien.at/tempus/lehrveranstaltung/rdf#lehrverband"
-	    					tooltiptext="rdf:http://www.technikum-wien.at/tempus/lehrveranstaltung/rdf#anmerkung" />
+	    				<label value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrverband"
+	    					tooltiptext="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#anmerkung" />
 	    				<toolbarbutton
-		        			label="KW: rdf:http://www.technikum-wien.at/tempus/lehrveranstaltung/rdf#start_kw      "
-	        				tooltiptext="Zu KW rdf:http://www.technikum-wien.at/tempus/lehrveranstaltung/rdf#start_kw springen"
+		        			label="KW: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#start_kw      "
+	        				tooltiptext="Zu KW rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#start_kw springen"
 	        				onclick="onJumpDateRel(event);"
-	        				kw="rdf:http://www.technikum-wien.at/tempus/lehrveranstaltung/rdf#start_kw"
+	        				kw="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#start_kw"
 	       				/>
 	    			</row>
 	    			<row>
-	    				<label value="rdf:http://www.technikum-wien.at/tempus/lehrveranstaltung/rdf#lektor" />
-	    				<label value="WR: rdf:http://www.technikum-wien.at/tempus/lehrveranstaltung/rdf#wochenrythmus"
+	    				<label value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lektor" />
+	    				<label value="WR: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#wochenrythmus"
 	    					tooltiptext="Wochenrythmus"/>
 	    			</row>
 	    			<row>
-	    				<label value="Offen: rdf:http://www.technikum-wien.at/tempus/lehrveranstaltung/rdf#offenestunden h"
-	    					tooltiptext="Stunden: rdf:http://www.technikum-wien.at/tempus/lehrveranstaltung/rdf#verplant / rdf:http://www.technikum-wien.at/tempus/lehrveranstaltung/rdf#semesterstunden" />
-	    				<label value="Block: rdf:http://www.technikum-wien.at/tempus/lehrveranstaltung/rdf#stundenblockung"
+	    				<label value="Offen: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#offenestunden h"
+	    					tooltiptext="Stunden: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#verplant / rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#semesterstunden" />
+	    				<label value="Block: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#stundenblockung"
 	    					tooltiptext="Stundenblockung" />
 	    			</row>
 	    		</rows>
