@@ -20,7 +20,7 @@
 		$nachname=pg_result($result,0,'"nachname"');
 		$vornamen=pg_result($result,0,'"vorname"');
 	}
-	$sql_query="SELECT studiengang_kz, kurzbz, kurzbzlang, bezeichnung FROM public.tbl_studiengang ORDER BY kurzbz";
+	$sql_query="SELECT studiengang_kz, kurzbz, kurzbzlang, bezeichnung, typ FROM public.tbl_studiengang ORDER BY kurzbz";
 	$result_stg=pg_query($conn, $sql_query);
 	if(!$result_stg)
 		die ("Studiengang not found!");
@@ -70,7 +70,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
   	<DIV align="left">
   		<a href="stpl_week.php?pers_uid=<?php echo $uid; ?>"><?php echo $vornamen." ".$nachname;?></a>
 		&nbsp; -> Ihr pers&ouml;nlicher Lehrveranstaltungsplan<BR>
-		<a href="profile/index.php">PROFIL</a>
+		<a href="../profile/index.php">PROFIL</a>
 		&nbsp; -> Hier k&ouml;nnen Sie Ihre Stammdaten kontrollieren.<BR>
 	</DIV>
 	<BR>
@@ -129,7 +129,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 				for ($i=0;$i<$num_rows;$i++)
 				{
 					$row=pg_fetch_object ($result_stg, $i);
-					echo "<option value=\"$row->studiengang_kz\">$row->kurzbz ( $row->kurzbzlang - $row->bezeichnung )</option>";
+					echo '<option value="'.$row->studiengang_kz.'">'.strtoupper($row->typ.$row->kurzbz)." ( $row->kurzbzlang - $row->bezeichnung )</option>";
 				}
 				?>
 			</select>

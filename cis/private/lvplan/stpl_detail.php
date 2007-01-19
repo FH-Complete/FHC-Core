@@ -42,12 +42,12 @@ if(!$erg_std=pg_query($conn, "SET datestyle TO ISO; SET search_path TO campus;")
 
 //Stundenplan
 $sql_query='SELECT vw_stundenplan.*, tbl_lehrfach.bezeichnung, vw_mitarbeiter.titelpre, vw_mitarbeiter.nachname, vw_mitarbeiter.vorname';
-$sql_query.=' FROM vw_stundenplan, lehre.tbl_lehrfach, vw_mitarbeiter';
-$sql_query.=" WHERE datum='$datum' AND stunde=$stunde AND vw_mitarbeiter.uid=vw_stundenplan.uid AND tbl_lehrfach.lehrfach_id=vw_stundenplan.lehrfach_id";
+$sql_query.=' FROM (vw_stundenplan JOIN lehre.tbl_lehrfach USING (lehrfach_id)) JOIN vw_mitarbeiter USING (uid)';
+$sql_query.=" WHERE datum='$datum' AND stunde=$stunde";
 if ($type=='lektor')
     $sql_query.=" AND vw_stundenplan.uid='$pers_uid' ";
 elseif ($type=='ort')
-    $sql_query.=" AND ort_kurzbz='$ort_kurzbz' ";
+    $sql_query.=" AND vw_stundenplan.ort_kurzbz='$ort_kurzbz' ";
 else
 {
     $sql_query.=' AND vw_stundenplan.studiengang_kz='.$stg_kz.' AND (vw_stundenplan.semester='.$sem;
@@ -105,11 +105,11 @@ for ($i=0; $i<$num_rows_stpl; $i++)
     $pers_vorname=pg_result($erg_stpl,$i,"vorname");
     $pers_nachname=pg_result($erg_stpl,$i,"nachname");
     $pers_email=pg_result($erg_stpl,$i,"uid").'@technikum-wien.at';
-    $stgkurzbz=pg_result($erg_stpl,$i,"stg_kurzbz");
-    $semester=pg_result($erg_stpl,$i,"semester");
-    $verband=pg_result($erg_stpl,$i,"verband");
-    $gruppe=pg_result($erg_stpl,$i,"gruppe");
-    $gruppe_kurzbz=pg_result($erg_stpl,$i,"gruppe_kurzbz");
+    $stgkurzbz=trim(pg_result($erg_stpl,$i,"stg_typ").pg_result($erg_stpl,$i,"stg_kurzbz"));
+    $semester=trim(pg_result($erg_stpl,$i,"semester"));
+    $verband=trim(pg_result($erg_stpl,$i,"verband"));
+    $gruppe=trim(pg_result($erg_stpl,$i,"gruppe"));
+    $gruppe_kurzbz=trim(pg_result($erg_stpl,$i,"gruppe_kurzbz"));
     ?>
     <tr class="<?php echo 'liste'.$i%2; ?>">
         <td><?php echo $unr; ?></td>
@@ -117,7 +117,7 @@ for ($i=0; $i<$num_rows_stpl; $i++)
         <td><?php echo $ortkurzbz; ?></td>
         <td><?php echo $lehrfachkurzbz; ?></td>
         <td><?php echo $bezeichnung; ?></td>
-        <td><A href="mailto:<?php echo strtolower($stgkurzbz).$semester.strtolower($verband).$gruppe; ?>@technikum-wien.at">
+        <td><A href="mailto:<?php echo $stgkurzbz.$semester.strtolower($verband).$gruppe; ?>@technikum-wien.at">
         <?php echo $stgkurzbz.'-'.$semester.$verband.$gruppe; ?></A></td>
         <td><A href="mailto:<?php echo strtolower($gruppe_kurzbz); ?>@technikum-wien.at">
         <?php echo $gruppe_kurzbz; ?></A></td>

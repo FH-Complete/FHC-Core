@@ -118,8 +118,9 @@
 		echo '<TR><TD>'.$tagbez[$j].'</TD>';
 	  	for ($i=0;$i<$num_rows_stunde;$i++)
 		{
-			$index=$wunsch[$j][$i+1];
-			if ($index=="")
+			if (isset($wunsch[$j][$i+1]))
+				$index=$wunsch[$j][$i+1];
+			else
 				$index=1;
 			$id='bgcolor';
 			$id.=$index+3;
