@@ -105,6 +105,7 @@ $error_freigabevon='';
 $thema = (isset($_POST['thema'])?$_POST['thema']:'');
 $anzahlderbeispiele = (isset($_POST['anzahlderbeispiele'])?$_POST['anzahlderbeispiele']:'');
 $punkteprobeispiel = (isset($_POST['punkteprobeispiel'])?$_POST['punkteprobeispiel']:'');
+$punkteprobeispiel = str_replace(',','.',$punkteprobeispiel);
 $freigabebis = (isset($_POST['freigabebis'])?$_POST['freigabebis']:'');
 $freigabevon = (isset($_POST['freigabevon'])?$_POST['freigabevon']:'');
 
@@ -299,7 +300,7 @@ if(isset($_POST['uebung_neu']))
 				{
 					$beispiel_obj = new beispiel($conn);
 					$beispiel_obj->uebung_id = $uebung_id;
-					$beispiel_obj->bezeichnung = "Beispiel ".($i<10?'0'.($i+1):($i+1));
+					$beispiel_obj->bezeichnung = "Beispiel ".($i<9?'0'.($i+1):($i+1));
 					$beispiel_obj->punkte = $punkteprobeispiel;
 					$beispiel_obj->updateamum = date('Y-m-d H:i:s');
 					$beispiel_obj->updatevon = $user;
@@ -427,7 +428,9 @@ if(isset($_POST['beispiel_neu']) || isset($_POST['beispiel_edit']))
 	else 
 	{
 		if(isset($uebung_id) && $uebung_id!='' && is_numeric($uebung_id))
-		{
+		{			
+			$punkte = (isset($_POST['punkte'])?$_POST['punkte']:'');
+			$punkte = str_replace(',','.',$punkte);
 			if(is_numeric($punkte) && $punkte!='')
 			{
 				if($bezeichnung!='')
@@ -500,7 +503,7 @@ if(isset($uebung_id) && $uebung_id!='')
 	echo "<table width='340'><tr><td colspan='3' class='ContentHeader3'>Neues Beispiel anlegen</td></tr>\n";	
 	echo "<tr><td>&nbsp;</td><td></td></tr>\n\n";	
 	
-	echo "<tr><td>Bezeichnung <input type='text' name='bezeichnung' value='Beispiel ".($anzahl<10?'0'.($anzahl+1):($anzahl+1))."'>";
+	echo "<tr><td>Bezeichnung <input type='text' name='bezeichnung' value='Beispiel ".($anzahl<9?'0'.($anzahl+1):($anzahl+1))."'>";
 	echo "&nbsp;Punkte <input type='text' size='2' name='punkte' value='1'></td></tr>";
 	echo "<tr><td align='right'><input type='submit' name='beispiel_neu' value='Anlegen'></td></tr>";
 		
@@ -587,7 +590,7 @@ else
 	</form><br><br>";
 	if(!isset($_POST['uebung_neu']))
 	{
-		$thema = "Uebung ".($anzahl<10?'0'.($anzahl+1):($anzahl+1));
+		$thema = "Uebung ".($anzahl<9?'0'.($anzahl+1):($anzahl+1));
 		$anzahlderbeispiele = 10;
 		$punkteprobeispiel = 1;
 		$freigabevon = date('d.m.Y H:i');

@@ -91,27 +91,19 @@
 	if(isset($_POST["status"]) && $_POST["status"] =='changestg')
 		unset($sem);
 
-	if(isset($del) && isset($id))
+	if(isset($del) && isset($lv))
 	{
 		//Loeschen der beiden Datensaetze
    	  
 		$lvinfo_obj = new lvinfo($conn);
 		pg_query('BEGIN');
-		if($lvinfo_obj->delete($lv,ATTR_SPRACHE_DE))
-		{
-			if($lvinfo_obj->delete($lv, ATTR_SPRACHE_EN))
+		if($lvinfo_obj->delete($lv))
+		{			
+			if(!WriteLog($lvinfo_obj->lastqry,$user))
 			{
-				if(!WriteLog($lvinfo_obj->lastqry,$user) || !WriteLog($lvinfo_obj,$user))
-				{
-					echo "<br>Fehler beim Schreiben des Log-files<br>";
-				}
-				pg_query('COMMIT');				
+				echo "<br>Fehler beim Schreiben des Log-files<br>";
 			}
-			else 
-			{
-				pg_query('ROLLBACK');
-				echo "<br>Fehler beim loeschen<br>";				
-			}
+			pg_query('COMMIT');				
 		}
 		else 
 		{
@@ -177,10 +169,7 @@ border:1px dashed #000000;
 </style>
 <script language="JavaScript">
 function ask() {
-	if(confirm("Wollen sie diese LV-Information wirklich loeschen ?"))
-	  return true;
-	else
-	  return false;
+	return confirm("Wollen sie diese LV-Information wirklich loeschen ?")	  
 }
 </script>
 </head>

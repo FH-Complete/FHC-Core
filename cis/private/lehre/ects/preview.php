@@ -385,7 +385,7 @@ font-size:10pt;
 				</tr>
 				<tr><td><br />";
 
-		echo '<table border=\"0\" cellpadding="0">';
+		echo '<table border="0" cellpadding="0">';
 	    echo "<tr><td>degree programme:</td><td>$stg_kurzbz</td></tr>";
 	    echo "<tr><td>semester:</td><td>$sem</td></tr>";
 	    echo "<tr><td>&nbsp;</td><td>&nbsp;</td></tr>";

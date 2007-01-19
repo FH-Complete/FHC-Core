@@ -190,8 +190,7 @@ if($result = pg_query($conn_vilesci, $qry))
 						          raumtyp='$row->raumtyp' AND
 						          raumtypalternativ='$row->raumtypalternativ' AND
 						          unr ".($row->unr!=''?"='$row->unr'":'is null')." AND
-						          lvnr ".($row->lvnr!=''?"='$row->lvnr'":'is null')." AND
-						          mitarbeiter_uid='$row->lektor'";
+						          lvnr ".($row->lvnr!=''?"='$row->lvnr'":'is null');
 						if($result2 = pg_query($conn,$qry))
 						{
 							if(pg_num_rows($result2)>0)
@@ -240,7 +239,7 @@ if($result = pg_query($conn_vilesci, $qry))
 								$lehreinheit->updatevon = '';
 								$lehreinheit->insertamum = '';
 								$lehreinheit->insertvon = '';
-								$lehreinheit->ext_id = $row->lehrveranstaltung_id;
+								$lehreinheit->ext_id = $row->fas_id;
 								
 								//Datensatz Speichern
 								pg_query($conn,'BEGIN');
