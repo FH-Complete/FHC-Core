@@ -210,6 +210,7 @@ class lehrstunde
 		// Bezeichnung der Stundenplan-Tabelle und des Keys
 		$stpl_id=$stpl_view.TABLE_ID;
 		$stpl_view=VIEW_BEGIN.$stpl_view;
+		$num_rows_einheit=0;
 		// Datum im Format YYYY-MM-TT ?
 		if (!ereg("([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})",$datum_von) )
 		{
@@ -246,9 +247,9 @@ class lehrstunde
 		if ($type=='student')
 		{
 			// Lehrverband ermitteln
-			$sql_query="SELECT studiengang_kz, semester, verband, gruppe FROM tbl_student WHERE uid='$uid'";
+			$sql_query="SELECT studiengang_kz, semester, verband, gruppe FROM public.tbl_student WHERE student_uid='$uid'";
 			//echo $sql_query;
-			if (! $result=@pg_query($this->conn, $sql_query) )
+			if (! $result=pg_query($this->conn, $sql_query) )
 			{
 				$this->errormsg=pg_last_error($this->conn);
 				return -2;
@@ -267,14 +268,15 @@ class lehrstunde
 			$grp=$row->gruppe;
 
 			// Einheiten ermitteln
-			$sql_query="SELECT gruppe_kurzbz FROM tbl_einheitstudent WHERE uid='$uid'";
+			$sql_query="SELECT gruppe_kurzbz FROM public.tbl_benutzergruppe WHERE uid='$uid'";
 			//echo $sql_query;
-			if (! $result_einheit=@pg_query($this->conn, $sql_query) )
+			if (! $result_einheit=pg_query($this->conn, $sql_query) )
 			{
 				$this->errormsg=pg_last_error($this->conn);
-				return -2;
+				return false;
 			}
-			$num_rows_einheit=pg_num_rows($result_einheit);
+			else
+				$num_rows_einheit=pg_num_rows($result_einheit);
 		}
 
 		///////////////////////////////////////////////////////////////////////
