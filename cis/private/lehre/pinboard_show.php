@@ -41,7 +41,7 @@
 			$news_obj = new news($conn);
 			if($news_obj->delete($remove_id))
 			{			
-				writeCISlog('DELETE','PINBOARD');
+				writeCISlog('DELETE PINBOARD','');
 				echo '<script language="JavaScript">';
 				echo "	document.location.href = 'pinboard_show.php?course_id=$course_id&term_id=$term_id'";
 				echo '</script>';

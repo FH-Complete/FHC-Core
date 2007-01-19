@@ -37,8 +37,9 @@
 		if(isset($remove_id) && $remove_id != "")
 		{
 			$news_obj = new news($sql_conn);
-			if($news_obj->delete($remote_id))
+			if($news_obj->delete($remove_id))
 			{			
+				writeCISlog('DELETE PINBOARD','');
 				echo "<script language=\"JavaScript\">";
 				echo "	document.location.href = 'pinboard_show.php'";
 				echo "</script>";

@@ -85,7 +85,7 @@
 		$stg_obj = new studiengang($conn);
 		if(!$stg_obj->getAll('studiengang_kz'))
 			echo $stg_obj->errormsg;
-		
+
 		foreach($stg_obj->result as $row)
 		{
 		    // Kopfzeile hinausschreiben
@@ -154,7 +154,7 @@
 				// ffe, 20060508: Display the opening link for department dispatchers only for students of the particular department
 				$std_obj = new student($conn, $user);
 				
-		  		$qry_stud = "SELECT count(*) as anzahl FROM campus.vw_student WHERE studiengang_kz='$row->studiengang_kz'";
+		  		$qry_stud = "SELECT count(*) as anzahl FROM public.tbl_student WHERE studiengang_kz='$row->studiengang_kz' AND student_uid NOT LIKE '_Dummy%'";
 
 			  		if(!$row_stud=pg_fetch_object(pg_query($conn, $qry_stud)))
 			  			echo 'Fehler beim laden der Studenten';
@@ -196,7 +196,7 @@
 			  		{
 			  			if((!is_null($row1->semester)) AND ($row1->semester != "") AND ($row1->semester<=$row->max_semester)) //($row1->semester<'10'))
 			  			{
-			  				$qry_cnt = "SELECT count(*) as anzahl FROM campus.vw_student WHERE studiengang_kz='$row1->studiengang_kz' AND semester='$row1->semester'";
+			  				$qry_cnt = "SELECT count(*) as anzahl FROM public.tbl_student WHERE studiengang_kz='$row1->studiengang_kz' AND semester='$row1->semester' AND student_uid NOT LIKE '_Dummy%'";
 			  				if(trim($row1->verband)!='')
 				  				$qry_cnt .= " AND verband='$row1->verband'";
 				  			if(trim($row1->gruppe)!='')

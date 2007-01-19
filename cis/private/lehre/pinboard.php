@@ -122,8 +122,9 @@
 		<td valign="top">
           <p>Studiengangsleiter:<br>
                 <?php
+
                 //Studiengangsleiter auslesen
-				$qry = "SELECT * FROM campus.vw_mitarbeiter JOIN public.tbl_benutzerfunktion using(uid) WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stgl'";
+				$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stgl')";
 				if($result_course_leader = pg_query($sql_conn, $qry))
 				{
 					$num_rows_course_leader = pg_numrows($result_course_leader);					
@@ -132,7 +133,7 @@
 						$row_course_leader = pg_fetch_object($result_course_leader, 0);
 					}
 				}
-				
+
                 echo "<b>";
                 
                 if(isset($row_course_leader) && $row_course_leader != "")
@@ -193,7 +194,7 @@
 			  	echo "<p>Stellvertreter:<br>";
                 
 			  	//Studiengangsleiter Stellvertreter auselesen
-				$sql_query = "SELECT * FROM campus.vw_mitarbeiter JOIN public.tbl_benutzerfunktion using(uid) WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stglstv'";
+				$sql_query = "SELECT * FROM campus.vw_mitarbeiter WHERE uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stglstv')";
 				
 				if($result_course_leader_deputy = pg_query($sql_conn, $sql_query))
 				{
@@ -264,7 +265,7 @@
 			  	echo "<p>Sekretariat:</font><font face='Arial, Helvetica, sans-serif' size='2'><br>";
                 //Sektritariat auslesen
                 
-				$sql_query = "SELECT * FROM campus.vw_mitarbeiter JOIN public.tbl_benutzerfunktion using(uid) WHERE studiengang_kz='$course_id' AND funktion_kurzbz='ass'";
+				$sql_query = "SELECT * FROM campus.vw_mitarbeiter WHERE uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$course_id' AND funktion_kurzbz='ass' LIMIT 1)";
 					
 				if($result_course_secretary = pg_query($sql_conn, $sql_query))
 				{
@@ -332,9 +333,9 @@
 				}
 				
 				echo "<p>Studentenvertreter:</font><font face='Arial, Helvetica, sans-serif' size='2'><br>";
-                
-				$sql_query = "SELECT * FROM campus.vw_benutzer JOIN public.tbl_benutzerfunktion using(uid) WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stdv'";
-					
+				
+				$sql_query = "SELECT tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre, tbl_person.titelpost, tbl_benutzer.uid FROM public.tbl_person, public.tbl_benutzer,public.tbl_benutzerfunktion WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stdv' AND tbl_person.person_id=public.tbl_benutzer.person_id AND tbl_benutzerfunktion.uid=tbl_benutzer.uid";
+				
 				if($result_course_stdv = pg_query($sql_conn, $sql_query))
 				{
 					$num_rows_course_stdv = pg_numrows($result_course_stdv);
@@ -351,7 +352,7 @@
 						echo "<b>Nicht vorhanden</b>";
 					}
 				}
-				?>
+?>
 				
             	<table border="0" width="100%" cellpadding="0" cellspacing="0">
 				<tr>
@@ -432,6 +433,7 @@
 					{						
 						echo '<img src="../../../skin/images/seperator.gif">&nbsp;Allgemeiner Download';
 					}
+
 				?>
 				
               </td>
