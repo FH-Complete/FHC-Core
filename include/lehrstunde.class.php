@@ -144,7 +144,7 @@ class lehrstunde
 			// update
 			$sql_query='UPDATE '.$stpl_table;
 			$sql_query.=" SET datum='$this->datum', stunde=$this->stunde";
-			$sql_query.=", ort_kurzbz='$this->ort_kurzbz', uid='$this->lektor_uid'";
+			$sql_query.=", ort_kurzbz='$this->ort_kurzbz', mitarbeiter_uid='$this->lektor_uid'";
 			$sql_query.=", updateamum=now(), updatevon='$uid'";
 			$sql_query.=" WHERE $stpl_id=$this->stundenplan_id";
 			//echo $sql_query."<br>";
