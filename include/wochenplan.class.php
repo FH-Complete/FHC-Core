@@ -1171,11 +1171,11 @@ class wochenplan
 		$min_stunde=pg_result($result_stunde,0,'min');
 		$max_stunde=pg_result($result_stunde,0,'max');
 
-		// LVAs holen
+		// LEs holen
 		$sql_query='SELECT *, (semesterstunden-verplant::smallint) AS offenestunden FROM '.$lva_stpl_view.' WHERE';
 		$lvas='';
 		foreach ($lva_id as $id)
-			$lvas.=' OR lehrveranstaltung_id='.$id;
+			$lvas.=' OR lehreinheit_id='.$id;
 		$lvas=substr($lvas,3);
 		$sql_query.=$lvas;
 		//$this->errormsg.=$sql_query;
@@ -1279,16 +1279,19 @@ class wochenplan
 		$lektor=array_unique($lektor);
 		$lkt='';
 		foreach ($lektor as $l)
-			$lkt.=" OR uid='$l'";
+			$lkt.=" OR mitarbeiter_uid='$l'";
 		$lkt=substr($lkt,3);
 		//Dummy Lektor kollidiert nicht
-		$lkt='(('.$lkt.") AND uid!='_DummyLektor')";
+		$lkt='(('.$lkt.") AND mitarbeiter_uid!='_DummyLektor')";
 		// Einheiten
-		$einheit=array_unique($einheit);
 		$einheiten='';
-		foreach ($einheit as $e)
-			$einheiten.=" OR gruppe_kurzbz='$e'";
-		//$einheiten=substr($einheiten,3);
+		if (isset($einheit))
+		{
+			$einheit=array_unique($einheit);
+			foreach ($einheit as $e)
+				$einheiten.=" OR gruppe_kurzbz='$e'";
+			//$einheiten=substr($einheiten,3);
+		}
 		//Lehrverband
 		//$lehrverband=array_unique($lehrverband);
 		$lvb='';
@@ -1308,11 +1311,14 @@ class wochenplan
 		$lvb=substr($lvb,3);
 
 		// Raeume die in Frage kommen aufgrund der Raumtypen
-		$sql_query="SELECT DISTINCT ort_kurzbz, hierarchie FROM tbl_ort
-			NATURAL JOIN tbl_ortraumtyp WHERE ($rtype) AND aktiv AND ort_kurzbz NOT LIKE '\\\\_%' ORDER BY hierarchie,ort_kurzbz"; //
+		$sql_query="SELECT DISTINCT ort_kurzbz, hierarchie FROM public.tbl_ort
+			JOIN public.tbl_ortraumtyp USING (ort_kurzbz) WHERE ($rtype) AND aktiv AND ort_kurzbz NOT LIKE '\\\\_%' ORDER BY hierarchie,ort_kurzbz"; //
 		//echo $sql_query;
-		if(!$result=pg_exec($this->conn, $sql_query))
-			die(pg_last_error($this->conn));
+		if(!$result=pg_query($this->conn, $sql_query))
+		{
+			$this->errormsg=pg_last_error($this->conn);
+			return false;
+		}
 		$num_orte=pg_numrows($result);
 		for ($i=0;$i<$num_orte;$i++)
 			$orte[]=pg_fetch_result($result,$i,"ort_kurzbz");
@@ -1328,6 +1334,13 @@ class wochenplan
 		$datum=$this->datum;
 		$datum_begin=$this->datum_begin;
 		$datum_end=$this->datum_end;
+		// Raster vorbereiten
+		for ($t=1;$t<7;$t++)
+			for ($s=$min_stunde;$s<=$max_stunde;$s++)
+			{
+				$raster[$t][$s]->ort=array();
+				$raster[$t][$s]->kollision=false;
+			}
 		do
 		{
 			// Raster vorbereiten
@@ -1345,8 +1358,9 @@ class wochenplan
 				($lkt $einheiten OR ($lvb) ) AND unr!=$unr";
 			//$this->errormsg.=htmlspecialchars($sql_query);
 			//return false;
-			if(!$result_kollision=pg_exec($this->conn, $sql_query))
+			if(!$result_kollision=pg_query($this->conn, $sql_query))
 			{
+				//die(pg_last_error($this->conn));
 				$this->errormsg=pg_last_error($this->conn);
 				return false;
 			}
@@ -1364,7 +1378,7 @@ class wochenplan
 
 			// Stundenplanabfrage bauen (Wo ist besetzt?)
 			$sql_query="SELECT DISTINCT datum, stunde, ort_kurzbz FROM $stpl_view
-				NATURAL JOIN tbl_ortraumtyp
+				JOIN public.tbl_ortraumtyp USING (ort_kurzbz)
 				WHERE datum>='$datum_begin' AND datum<'$datum_end' AND
 				($rtype) AND unr!=$unr"; //
 			//echo $sql_query;

@@ -32,6 +32,8 @@ class zeitwunsch
 	var $mitarbeiter_uid;	// varchar(16)
 	var $tag;				// smalint
 	var $gewicht;			// smalint
+	var $min_stunde;
+	var $max_stunde;
 
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
@@ -59,6 +61,15 @@ class zeitwunsch
 
 		if($mitarbeiter_uid != null && $tag!=null && $stunde!=null)
 			$this->load($mitarbeiter_uid, $tag, $stunde);
+	}
+
+	function init()
+	{
+		$sql_query='SELECT min(stunde),max(stunde) FROM lehre.tbl_stunde';
+		if(!$result_stunde=pg_query($this->conn, $sql_query))
+			die(pg_last_error($this->conn));
+		$this->min_stunde=pg_result($result_stunde,0,'min');
+		$this->max_stunde=pg_result($result_stunde,0,'max');
 	}
 
 	// *********************************************************
@@ -159,17 +170,17 @@ class zeitwunsch
 	 * Zeitwunsch einer Person laden
 	 * @return boolean Ergebnis steht in Array $zeitwunsch wenn true
 	 */
-	function loadPerson($uid)
+	function loadPerson($uid,$datum=null)
 	{
 		// Zeitwuensche abfragen
-		if(!$result=@pg_query($this->conn, "SELECT * FROM lehre.tbl_zeitwunsch WHERE uid='$uid'"))
+		if(!$result=pg_query($this->conn, "SELECT * FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid='$uid'"))
 		{
 			$this->errormsg=pg_last_error($this->conn);
 			return false;
 		}
 		else
 		{
-			while ($row=@pg_fetch_object($result))
+			while ($row=pg_fetch_object($result))
 				$this->zeitwunsch[$row->tag][$row->stunde]=$row->gewicht;
 			return true;
 		}
@@ -177,34 +188,90 @@ class zeitwunsch
 
 
 	/**
-	 * Zeitwunsch der Personen in Lehrveranstaltungen laden
+	 * Zeitwunsch der Personen in Lehreinheiten laden
 	 * @return array mit Fachbereichen oder false=fehler
 	 */
-	function loadLVA($lva_id)
+	function loadZwLE($le_id,$datum=null)
 	{
+		$this->init();
 		// SUB-Select fuer LVAs
-		$sql_query_lva='SELECT DISTINCT lektor FROM tbl_lehrveranstaltung WHERE ';
-		for ($i=0;$i<count($lva_id);$i++)
-			$sql_query_lvaid.=' OR lehrveranstaltung_id='.$lva_id[$i];
-		$sql_query_lvaid=substr($sql_query_lvaid,3);
-		$sql_query_lva.=$sql_query_lvaid;
+		$sql_query_leid='';
+		$sql_query_le='SELECT DISTINCT mitarbeiter_uid FROM campus.vw_lehreinheit WHERE ';
+		for ($i=0;$i<count($le_id);$i++)
+			$sql_query_leid.=' OR lehreinheit_id='.$le_id[$i];
+		$sql_query_leid=substr($sql_query_leid,3);
+		$sql_query_le.=$sql_query_leid;
 
 		// Schlechteste Zeitwuensche holen
 		$sql_query='SELECT tag,stunde,min(gewicht) AS gewicht
-				FROM tbl_zeitwunsch WHERE uid IN ('.$sql_query_lva.') GROUP BY tag,stunde';
+				FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid IN ('.$sql_query_le.') GROUP BY tag,stunde';
 
 		// Zeitwuensche abfragen
-		if(!$result=@pg_query($this->conn, $sql_query))
+		if(!$result=pg_query($this->conn, $sql_query))
 		{
 			$this->errormsg=pg_last_error($this->conn);
 			return false;
 		}
 		else
-		{
-			while ($row=@pg_fetch_object($result))
+			while ($row=pg_fetch_object($result))
 				$this->zeitwunsch[$row->tag][$row->stunde]=$row->gewicht;
-			return true;
+
+		// Zeitsperren fuer die aktuelle Woche holen
+		if ($datum!=null)
+		{
+			$beginn=montag($datum);
+			$ende=jump_day($beginn,6);
+			$beginniso=date("Y-m-d",$beginn);
+			$endeiso=date("Y-m-d",$ende);
+			$sql_query="SELECT min(vondatum) AS vondatum,min(vonstunde) AS vonstunde,
+							min(bisdatum) AS bisdatum,min(bisstunde) AS bisstunde
+						FROM campus.tbl_zeitsperre
+						WHERE mitarbeiter_uid IN ($sql_query_le)
+							AND vondatum<'$endeiso' AND bisdatum>'$beginniso'";
+			// Zeitwuensche abfragen
+			if(!$result=pg_query($this->conn, $sql_query))
+			{
+				$this->errormsg=pg_last_error($this->conn);
+				return false;
+			}
+			else if (!$row=pg_fetch_object($result));
+			{
+				if ($row->vonstunde==null || $row->vondatum==null)
+					return true;
+				$stundebeginn=$row->vonstunde;
+				$stundeende=$row->bisstunde;
+				$beginnDB=mktime(0,0,0,substr($row->vondatum,6,2),substr($row->vondatum,9,2),substr($row->vondatum,0,4));
+				$endeDB=mktime(0,0,0,substr($row->bisdatum,6,2),substr($row->bisdatum,9,2),substr($row->bisdatum,0,4));
+				if ($beginn<$beginnDB)
+					$beginn=$beginnDB;
+				else
+					$stundebeginn=$this->min_stunde;
+				if ($ende>$endeDB)
+					$ende=$endeDB;
+				else
+					$stundeende=$this->max_stunde;
+				$tagbeginn=date("w",$beginn);
+				$tagende=date("w",$ende);
+				if ($tagende==0)
+				{
+					$tagende=6;
+					$stundeende=$this->max_stunde;
+				}
+				$first=true;
+				for ($t=$tagbeginn;$t<=$tagende;$t++)
+					for ($h=$this->min_stunde;$h<=$this->max_stunde;$h++)
+					{
+						if ($first)
+						{
+							$h=$stundebeginn;
+							$first=false;
+						}
+						if (!($t==$tagende && $h>$stundeende))
+							$this->zeitwunsch[$t][$h]=-3;
+					}
+			}
 		}
+		return true;
 	}
 
 }
