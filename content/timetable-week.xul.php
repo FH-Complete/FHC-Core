@@ -6,7 +6,7 @@ include('../vilesci/config.inc.php');
 include('../include/globals.inc.php');
 include('../include/functions.inc.php');
 include('../include/berechtigung.class.php');
-include('../include/lehrveranstaltung.class.php');
+include('../include/lehreinheit.class.php');
 include('../include/zeitwunsch.class.php');
 include('../include/wochenplan.class.php');
 
@@ -231,7 +231,8 @@ elseif ($aktion=='lva_single_set')
 	$anz_lvas=count($lva_id);
 	for ($i=0;$i<$anz_lvas;$i++)
 	{
-		$lva[$i]=new lehrveranstaltung($conn,$lva_id[$i]);
+		$lva[$i]=new lehreinheit($conn);
+		$lva[$i]->loadLE($lva_id[$i]);
 		//$error_msg.='test'.$lva_id[$i].($lva[$i]->errormsg).($lva[$i]->stundenblockung);
 		for ($j=0;$j<$lva[$i]->stundenblockung && $error_msg=='';$j++)
 			if (!$lva[$i]->check_lva($new_datum,$new_stunde+$j,$new_ort,$db_stpl_table) && !$ignore_kollision)
@@ -245,8 +246,7 @@ elseif ($aktion=='lva_single_set')
 		for ($j=0;$j<$lva[$i]->stundenblockung;$j++)
 			if (!$lva[$i]->save_stpl($new_datum,$new_stunde+$j,$new_ort,$db_stpl_table,$uid))
 				$error_msg.='fehler'.$lva[$i]->errormsg;
-			//else
-			//	$error_msg.='test'.$anz_lvas;
+			//else die('test');
 	}
 	//$error_msg.='test';
 }
@@ -425,10 +425,10 @@ if ($type=='lektor' || $aktion=='lva_single_search'	|| $aktion=='lva_multi_searc
 {
 	$wunsch=new zeitwunsch($conn);
 	if ($type=='lektor')
-		if ($wunsch->loadPerson($pers_uid))
+		if ($wunsch->loadPerson($pers_uid,$datum))
 			$zeitwunsch=$wunsch->zeitwunsch;
 	if ($aktion=='lva_single_search' || $aktion=='lva_multi_search')
-		if ($wunsch->loadLVA($lva_id))
+		if ($wunsch->loadZwLE($lva_id,$datum))
 			$zeitwunsch=$wunsch->zeitwunsch;
 }
 
