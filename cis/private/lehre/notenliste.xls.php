@@ -125,7 +125,7 @@ if (!$conn = pg_pconnect(CONN_STRING))
 	
 	$qry = 'SELECT distinct vorname, nachname, uid, matrikelnr, verband, gruppe, semester FROM ';
 	if($gruppe_kurzbz!='')
-		$qry .= "campus.vw_student JOIN tbl_benutzergruppe WHERE gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
+		$qry .= "campus.vw_student JOIN public.tbl_benutzergruppe WHERE gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
 	else 
 	{
 		$qry .= "campus.vw_student WHERE studiengang_kz='$stg' AND semester='$sem'";

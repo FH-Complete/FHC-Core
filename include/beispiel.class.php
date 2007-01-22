@@ -390,8 +390,8 @@ class beispiel
 					updateamum, updatevon, insertamum, insertvon) VALUES('.
 			        $this->addslashes($this->student_uid).','.
 			        $this->addslashes($this->beispiel_id).','.
-			        $this->addslashes($this->vorbereitet).','.
-			        $this->addslashes($this->probleme).','.
+			        ($this->vorbereitet?'true':'false').','.
+			        ($this->probleme?'true':'false').','.
 			        $this->addslashes($this->updateamum).','.
 			        $this->addslashes($this->updatevon).','.
 			        $this->addslashes($this->insertamum).','.
@@ -400,8 +400,8 @@ class beispiel
 		else
 		{
 			$qry = 'UPDATE campus.tbl_studentbeispiel SET'.
-			       ' vorbereitet='.$this->addslashes($this->vorbereitet).','.
-			       ' probleme='.$this->addslashes($this->probleme).','.
+			       ' vorbereitet='.($this->vorbereitet?'true':'false').','.
+			       ' probleme='.($this->probleme?'true':'false').','.
 			       ' updateamum='.$this->addslashes($this->updateamum).','.
 			       ' updatevon='.$this->addslashes($this->updatevon).
 			       " WHERE beispiel_id=".$this->beispiel_id." AND student_uid=".$this->addslashes($this->student_uid).';';

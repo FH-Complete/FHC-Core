@@ -25,7 +25,7 @@
  
  LEHREINHEIT IST BEREITS EINGEFUEGT (IN SYNCTAB)?
  	JA
- 		//WORKING
+ 		//update ist nicht implementiert
  	NEIN
  		GLEICHE LEHREINHEIT MIT ANDERER GRUPPE (ABER GLEICHER LEKTOR) BEREITS VORHANDEN?
  			JA
@@ -134,7 +134,7 @@ if($result = pg_query($conn_vilesci, $qry))
 	$text.="\n Sync Lehreinheiten\n\n";
 	
 	//Schauen ob Sync table vorhanden ist
-	$qry = "SELECT 1 FROM tbl_synclehreinheit;";
+	$qry = "SELECT 1 FROM public.tbl_synclehreinheit;";
 	if(!pg_query($conn,$qry))
 	{
 		//Die synctabelle wird benoetigt um die Verbindung der LehrveranstaltungsID(Vilesci) und der
@@ -142,7 +142,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		//-> kann nicht ueber ext_id vorgenommen werden da manche Lehrveranstaltungen keinen eigenen
 		//   Lehreinheiteneintrag haben sondern nur die Gruppe zu einer anderen Lehreinheit hinzugefuegt wird.
 		//Sync Table anlegen
-		$qry = "CREATE TABLE tbl_synclehreinheit(
+		$qry = "CREATE TABLE public.tbl_synclehreinheit(
 		          lehrveranstaltung_id_vilesci integer,
 		          lehreinheit_id_portal integer,
 		          PRIMARY KEY(lehrveranstaltung_id_vilesci, lehreinheit_id_portal)
@@ -162,7 +162,7 @@ if($result = pg_query($conn_vilesci, $qry))
 			$error=false;
 			$lehreinheit = new lehreinheit($conn);
 			//Nachschauen ob diese Lehreinheit bereits synchronisiert wurde
-			$qry = "SELECT lehreinheit_id_portal FROM tbl_synclehreinheit WHERE lehrveranstaltung_id_vilesci='".addslashes($row->lehrveranstaltung_id)."'";
+			$qry = "SELECT lehreinheit_id_portal FROM public.tbl_synclehreinheit WHERE lehrveranstaltung_id_vilesci='".addslashes($row->lehrveranstaltung_id)."'";
 			
 			if($result1=pg_query($conn, $qry))
 			{
@@ -200,7 +200,7 @@ if($result = pg_query($conn_vilesci, $qry))
 								{	
 									if(gruppezuweisen($row_val->lehreinheit_id, $row->studiengang_kz, $row->semester,$row->verband, $row->gruppe, $row->einheit_kurzbz))
 									{
-										$qry = "INSERT INTO tbl_synclehreinheit(lehrveranstaltung_id_vilesci, lehreinheit_id_portal) 
+										$qry = "INSERT INTO public.tbl_synclehreinheit(lehrveranstaltung_id_vilesci, lehreinheit_id_portal) 
 										        VALUES('".$row->lehrveranstaltung_id."','".$row_val->lehreinheit_id."');";
 										if(pg_query($conn,$qry))
 										{
@@ -239,7 +239,7 @@ if($result = pg_query($conn_vilesci, $qry))
 								$lehreinheit->updatevon = '';
 								$lehreinheit->insertamum = '';
 								$lehreinheit->insertvon = '';
-								$lehreinheit->ext_id = $row->fas_id;
+								$lehreinheit->ext_id = '';
 								
 								//Datensatz Speichern
 								pg_query($conn,'BEGIN');
@@ -256,7 +256,7 @@ if($result = pg_query($conn_vilesci, $qry))
 									if($row_val = pg_fetch_object(pg_query($conn, $qry)))
 									{
 										//Beide IDS in die SyncTab einfuegen
-										$qry = "INSERT INTO tbl_synclehreinheit(lehrveranstaltung_id_vilesci, lehreinheit_id_portal) 
+										$qry = "INSERT INTO public.tbl_synclehreinheit(lehrveranstaltung_id_vilesci, lehreinheit_id_portal) 
 										        VALUES('".$row->lehrveranstaltung_id."','".$row_val->id."');";
 										if(pg_query($conn,$qry))
 										{
@@ -272,6 +272,7 @@ if($result = pg_query($conn_vilesci, $qry))
 												$lektor->stundensatz = '';
 												$lektor->faktor = 1;
 												$lektor->anmerkung = '';
+												$lektor->ext_id = $row->fas_id;
 													
 												if($lektor->save(true))
 												{

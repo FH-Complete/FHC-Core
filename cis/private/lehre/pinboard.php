@@ -364,18 +364,19 @@
 				<tr>
 				  <td nowrap>
 				  <?php
-					if($dest_dir = @dir('../../../documents/'.strtolower($short).'/lehrziele'))
-					{
-						if(!is_dir($dest_dir->path))
+				    $path = '../../../documents/'.strtolower($short).'/lehrziele';
+					if(!$dest_dir = @dir($path))
+					{						
+						if(!is_dir($path))
 						{
 							if(!is_dir('../../../documents/'.strtolower($short)))
 								exec('mkdir -m 775 "../../../documents/'.strtolower($short).'"');
 							exec('mkdir -m 775 "../../../documents/'.strtolower($short).'/lehrziele"');
-							chgrp('../../../documents/'.strtolower($short).'/lehrziele', teacher);
+							exec('sudo chgrp teacher ../../../documents/'.strtolower($short).'/lehrziele');
 						}
 					
 						$dir_empty = true;
-						
+						$dest_dir = @dir($path);
 						while($entry = $dest_dir->read())
 						{
 							if($entry != "." && $entry != "..")
@@ -400,20 +401,21 @@
             </tr>
             <tr>
               <td nowrap>
-                <?php											
-					if($dest_dir = @dir('../../../documents/'.strtolower($short).'/allgemeiner_download'))
+                <?php						
+                	$path = '../../../documents/'.strtolower($short).'/allgemeiner_download';
+					if(!$dest_dir = @dir($path))
 					{
 					
-						if(!is_dir($dest_dir->path))
+						if(!is_dir($path))
 						{
 							if(!is_dir('../../../documents/'.strtolower($short)))
 								exec('mkdir -m 775 "../../../documents/'.strtolower($short).'"');
 							exec('mkdir -m 775 "../../../documents/'.strtolower($short).'/allgemeiner_download"');
-							chgrp('../../../documents/'.strtolower($short).'/allgemeiner_download', teacher);
+							exec('sudo chgrp teacher ../../../documents/'.strtolower($short).'/allgemeiner_download');
 						}
 					
 						$dir_empty = true;
-						
+						$dest_dir = @dir($path);
 						while($entry = $dest_dir->read())
 						{
 							if($entry != "." && $entry != "..")

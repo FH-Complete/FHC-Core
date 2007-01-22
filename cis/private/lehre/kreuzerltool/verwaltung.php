@@ -408,7 +408,7 @@ if(isset($_POST['uebung_edit']))
 		$uebung_obj->updateamum = date('Y-m-d H:i:s');
 		$uebung_obj->updatevon = $user;
 		$uebung_obj->uebung_id = $uebung_id;
-		$uebung_obj->statistik = isset($_POST['statistik']);
+		$uebung_obj->statistik = (isset($_POST['statistik'])?true:false);
 		
 		if($uebung_obj->save(false))
 			echo "Die &Auml;nderung wurde gespeichert!";

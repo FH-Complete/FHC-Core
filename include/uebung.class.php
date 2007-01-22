@@ -404,7 +404,7 @@ class uebung
 			       ' updatevon='.$this->addslashes($this->updatevon).
 			       " WHERE uebung_id=".$this->addslashes($this->uebung_id)." AND student_uid=".$this->addslashes($this->student_uid).";";
 		}
-
+		
 		if(pg_query($this->conn,$qry))
 		{
 				return true;
