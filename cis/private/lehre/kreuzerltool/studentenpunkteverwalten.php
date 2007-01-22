@@ -199,7 +199,8 @@ echo "<h3>Studentenpunkte verwalten</h3>";
 if(isset($_POST['submit']))
 {
 	$error=false;
-	if(isset($_POST['punkte']) && is_numeric($_POST['punkte']))
+	$punkte = (isset($_POST['punkte'])?str_replace(',','.',$_POST['punkte']):'');
+	if(isset($punkte) && is_numeric($punkte))
 	{
 		$ueb_obj = new uebung($conn);
 		if($ueb_obj->load_studentuebung($uid, $uebung_id))
@@ -210,7 +211,8 @@ if(isset($_POST['submit']))
 			$ueb_obj->insertamum = date('Y-m-d H:i:s');
 			$ueb_obj->insertvon = $user;
 		}
-		$ueb_obj->mitarbeitspunkte = $_POST['punkte'];
+		
+		$ueb_obj->mitarbeitspunkte = $punkte;
 		$ueb_obj->anmerkung = $_POST['anmerkung'];
 		$ueb_obj->updateamum = date('Y-m-d H:i:s');
 		$ueb_obj->updatevon = $user;

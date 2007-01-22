@@ -70,8 +70,8 @@
    chdir($pfad);
    
    //File loeschen falls es existiert
-   if(file_exists($filename))
-   		exec("rm $filename");
+   if(file_exists('../'.$filename))
+   		exec("rm ../$filename");
    		
    //Zip File erstellen
    exec("zip -r ../".$filename." ./*");

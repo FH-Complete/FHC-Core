@@ -225,7 +225,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				
 				foreach($ueb_obj->uebungen as $row_ueb)
 				{
-					$qry = "SELECT count(*) as punkte FROM campus.tbl_studentbeispiel JOIN campus.tbl_beispiel USING(beispiel_id) WHERE uebung_id='$row_ueb->uebung_id' AND student_uid='$row_stud->uid' AND vorbereitet=true";
+					$qry = "SELECT sum(punkte) as punkte FROM campus.tbl_studentbeispiel JOIN campus.tbl_beispiel USING(beispiel_id) WHERE uebung_id='$row_ueb->uebung_id' AND student_uid='$row_stud->uid' AND vorbereitet=true";
 					if($result = pg_query($conn, $qry))
 					{
 						if($row = pg_fetch_object($result))
@@ -239,7 +239,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 					else 
 						$punkte='failed';
 					//punkte auf uebung
-					$worksheet->write($zeile,++$spalte,$punkte);
+					$worksheet->write($zeile,++$spalte,($punkte!=''?$punkte:'0'));
 				}
 				
 				//summe

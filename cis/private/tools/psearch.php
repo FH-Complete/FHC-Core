@@ -206,11 +206,11 @@
 							{
 								if($i % 2 == 0)
 								{
-									echo "	<td align=\"left\" nowrap>&nbsp;<a href='../lvplan/profile/index.php?uid=$row->uid' title='Profil anzeigen'>$row->nachname $row->titelpost</a></td>";
+									echo "	<td align=\"left\" nowrap>&nbsp;<a href='../profile/index.php?uid=$row->uid' title='Profil anzeigen'>$row->nachname $row->titelpost</a></td>";
 								}
 								else
 								{
-									echo "	<td align=\"left\" class=\"MarkLine\" nowrap>&nbsp;<a href='../lvplan/profile/index.php?uid=$row->uid'  title='Profil anzeigen'>$row->nachname $row->titelpost</a></td>";
+									echo "	<td align=\"left\" class=\"MarkLine\" nowrap>&nbsp;<a href='../profile/index.php?uid=$row->uid'  title='Profil anzeigen'>$row->nachname $row->titelpost</a></td>";
 								}
 							}
 							else

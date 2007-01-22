@@ -194,12 +194,12 @@ function js_toggle_container(conid)
 						{							
 							if(isset($course_id) AND $course_id == $row->studiengang_kz)
 							{
-								echo '<option value="menu.php?course_id='.$row->studiengang_kz.'&term_id='.$term_id.'" selected>'.$row->kuerzel .'('.$row->kurzbzlang.')</option>';
+								echo '<option value="menu.php?course_id='.$row->studiengang_kz.'&term_id='.$term_id.'" selected>'.$row->kuerzel .' ('.$row->kurzbzlang.')</option>';
 								$sel_kurzbzlang=$row->kurzbzlang;
 							}
 							else
 							{
-								echo '<option value="menu.php?course_id='.$row->studiengang_kz.'&term_id='.$term_id.'">'.$row->kuerzel .'('.$row->kurzbzlang.')</option>';
+								echo '<option value="menu.php?course_id='.$row->studiengang_kz.'&term_id='.$term_id.'">'.$row->kuerzel .' ('.$row->kurzbzlang.')</option>';
 							}
 						}
 					}

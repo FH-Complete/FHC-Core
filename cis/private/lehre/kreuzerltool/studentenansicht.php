@@ -118,9 +118,28 @@ $qry = "SELECT distinct lehreinheit_id, bezeichnung FROM lehre.tbl_lehreinheit J
 		SELECT lehreinheit_id FROM public.tbl_student, lehre.tbl_lehreinheitgruppe 
 		WHERE tbl_student.student_uid='$user' AND 
 		tbl_student.studiengang_kz=tbl_lehreinheitgruppe.studiengang_kz AND
-		trim(tbl_student.semester)=trim(tbl_lehreinheitgruppe.semester) AND
-		trim(tbl_student.verband)=trim(tbl_lehreinheitgruppe.verband) AND
-		trim(tbl_student.gruppe)=trim(tbl_lehreinheitgruppe.gruppe) AND
+		trim(tbl_student.semester)=trim(tbl_lehreinheitgruppe.semester) AND 
+		(
+			(
+			  (
+			  tbl_lehreinheitgruppe.verband<>'' AND 
+			  tbl_lehreinheitgruppe.gruppe<>'' AND 
+			  trim(tbl_lehreinheitgruppe.verband) = trim(tbl_student.verband) AND
+			  trim(tbl_lehreinheitgruppe.gruppe) = trim(tbl_student.gruppe)
+			  )
+			  OR
+			  (
+			    tbl_lehreinheitgruppe.verband<>'' AND 
+			  	(
+			  	trim(tbl_lehreinheitgruppe.gruppe)='' OR 
+			  	tbl_lehreinheitgruppe.gruppe is null
+			  	) 
+			  	AND 
+			  	trim(tbl_lehreinheitgruppe.verband) = trim(tbl_student.verband)
+			  )
+			)
+		) 
+		AND
 		tbl_lehreinheitgruppe.lehreinheit_id IN(SELECT lehreinheit_id FROM lehre.tbl_lehreinheit JOIN campus.tbl_uebung USING(lehreinheit_id) 
 			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND tbl_lehreinheit.studiensemester_kurzbz='$stsem'))";
 
@@ -144,7 +163,7 @@ if($result = pg_query($conn, $qry))
 					$lektoren .= $row_lektoren->kurzbz.' ';
 				$lektoren .=')';
 			}
-			echo "<OPTION value='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$row->lehreinheit_id' $selected>$row->lfbez $lektoren</OPTION>\n";
+			echo "<OPTION value='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$row->lehreinheit_id' $selected>$row->bezeichnung $lektoren</OPTION>\n";
 		}
 		echo '</SELECT> ';
 	}
