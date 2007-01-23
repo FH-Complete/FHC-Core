@@ -15,7 +15,7 @@ if(!pg_query($conn_vilesci,$qry))
 }
 
 // Erhalter anlegen
-$result=pg_exec($conn,  "INSERT INTO tbl_erhalter VALUES(5,'TW','Technikum Wien')");
+//$result=pg_exec($conn,  "INSERT INTO tbl_erhalter VALUES(5,'TW','Technikum Wien')");
 
 /*************************
  * VileSci-Synchronisation
@@ -24,11 +24,11 @@ $result=pg_exec($conn,  "INSERT INTO tbl_erhalter VALUES(5,'TW','Technikum Wien'
 $sql_query='SELECT * FROM tbl_studiengang';
 //echo $sql_query.'<br>';
 $stg_vilesci=pg_exec($conn_vilesci, $sql_query);
-pg_query($conn, "SET CLIENT_ENCODING TO 'LATIN1';");
+//pg_query($conn, "SET CLIENT_ENCODING TO 'LATIN1';");
 while ($stg=pg_fetch_object($stg_vilesci))
 {
 	$sql_query="INSERT INTO tbl_studiengang(studiengang_kz, kurzbz, kurzbzlang, bezeichnung, typ, farbe, email, max_semester, max_verband, max_gruppe, erhalter_kz) 
-	            VALUES ($stg->studiengang_kz,'$stg->kurzbz','$stg->kurzbzlang','$stg->bezeichnung',
+	            VALUES ($stg->studiengang_kz,'$stg->kurzbz', '$stg->kurzbzlang','$stg->bezeichnung',
 					'$stg->typ','$stg->farbe','$stg->email',$stg->max_semester,'$stg->max_verband','$stg->max_gruppe',5)";
 	if (!$result=@pg_exec($conn, $sql_query))
 		echo pg_last_error($conn).'<br>--'.$sql_query.'<br>';
