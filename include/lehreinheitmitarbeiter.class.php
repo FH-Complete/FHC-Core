@@ -150,5 +150,28 @@ class lehreinheitmitarbeiter
 			return false;
 		}
 	}
+
+	function exists($lehreinheit_id, $uid)
+	{
+		if(!is_numeric($lehreinheit_id))
+		{
+			$this->errormsg = 'lehreinheit_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$lehreinheit_id' AND mitarbeiter_uid='".addslashes($uid)."'";
+		if($result=pg_query($this->conn, $qry))
+		{
+			if(pg_num_rows($result)>0)
+				return true;
+			else
+				return false;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim lesen der Lehreinheitmitarbeiter zuteilung';
+			return false;
+		}
+	}
 }
 ?>

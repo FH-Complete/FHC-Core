@@ -171,5 +171,36 @@ class lehreinheitgruppe
 			return false;
 		}
 	}
+	
+	function exists($lehreinheit_id, $studiengang_kz, $semester, $verband, $gruppe, $gruppe_kurzbz)
+	{
+		$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id'";
+		
+		if($gruppe_kurzbz!='')
+		{
+			$qry .= " AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
+		}
+		else 
+		{
+			$qry .= " AND semester='$semester'";
+			if($verband!='')
+				$qry .= " AND verband='$verband'";
+			if($gruppe!='')
+				$qry .= " AND gruppe='$gruppe'";
+		}
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if(pg_num_rows($result)>0)
+				return true;
+			else 
+				return false;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim lesen der Lehreinheitgruppen';
+			return false;
+		}
+	}
 }
 ?>

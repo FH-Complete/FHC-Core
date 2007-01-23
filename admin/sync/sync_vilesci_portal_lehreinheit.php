@@ -27,10 +27,11 @@
  	JA
  		//update ist nicht implementiert
  	NEIN
- 		GLEICHE LEHREINHEIT MIT ANDERER GRUPPE (ABER GLEICHER LEKTOR) BEREITS VORHANDEN?
+ 		GLEICHE LEHREINHEIT MIT ANDERER GRUPPE/LEKTOR BEREITS VORHANDEN?
  			JA
  				ZU SYNCTAB HINZUFUEGEN
  				GRUPPE HINZUFUEGEN
+ 				LEKTOR HINZUFUEGEN
  			NEIN
  				LEHREINHEIT ANLEGEN
  				ZU SYNCTAB HINZUFUEGEN
@@ -51,6 +52,37 @@ $error_log='';
 $text = '';
 $anzahl_eingefuegt=0;
 $anzahl_fehler=0;
+
+function lektorzuweisen($lehreinheit_id, $uid, $semesterstunden, $fas_id)
+{
+	global $error_log, $conn;
+	//Lektor Zuweisen
+	$lektor = new lehreinheitmitarbeiter($conn);
+	if(!$lektor->exists($lehreinheit_id, $uid))
+	{
+		$lektor->lehreinheit_id = $lehreinheit_id;
+		$lektor->mitarbeiter_uid = $uid;
+		$lektor->semesterstunden = $semesterstunden;
+		$lektor->planstunden = $semesterstunden;
+		$lektor->lehrfunktion_kurzbz ='lektor';
+		$lektor->stundensatz = '';
+		$lektor->faktor = 1;
+		$lektor->anmerkung = '';
+		$lektor->ext_id = $fas_id;
+			
+		if($lektor->save(true))
+		{
+			return true;
+		}
+		else 
+		{
+			$error_log.=$lektor->errormsg;
+			return false;
+		}
+	}
+	else 
+		return true;
+}
 
 function gruppezuweisen($id,$studiengang_kz, $semester, $verband, $gruppe, $einheit_kurzbz)
 {
@@ -105,19 +137,25 @@ function gruppezuweisen($id,$studiengang_kz, $semester, $verband, $gruppe, $einh
 	{
 		//Gruppe Zuweisen
 		$gruppe1 = new lehreinheitgruppe($conn);
-		$gruppe1->lehreinheit_id = $id;
-		$gruppe1->studiengang_kz = $studiengang_kz;
-		$gruppe1->semester = $semester;
-		$gruppe1->verband = $verband;
-		$gruppe1->gruppe = $gruppe;
-		$gruppe1->gruppe_kurzbz = strtoupper($einheit_kurzbz);
-		if($gruppe1->save(true))
-			return true;
-		else 
+		//Wenn diese Gruppenzuteilung noch nicht vorhanden ist
+		if(!$gruppe1->exists($id, $studiengang_kz, $semester, $verband, $gruppe, $einheit_kurzbz))
 		{
-			$error_log .= $gruppe1->errormsg."\n";
-			return false;
+			$gruppe1->lehreinheit_id = $id;
+			$gruppe1->studiengang_kz = $studiengang_kz;
+			$gruppe1->semester = $semester;
+			$gruppe1->verband = $verband;
+			$gruppe1->gruppe = $gruppe;
+			$gruppe1->gruppe_kurzbz = strtoupper($einheit_kurzbz);
+			if($gruppe1->save(true))
+				return true;
+			else 
+			{
+				$error_log .= $gruppe1->errormsg."\n";
+				return false;
+			}
 		}
+		else 
+			return true;
 	}
 	else 
 		return false;
@@ -135,7 +173,7 @@ if($result = pg_query($conn_vilesci, $qry))
 	
 	//Schauen ob Sync table vorhanden ist
 	$qry = "SELECT 1 FROM public.tbl_synclehreinheit;";
-	if(!pg_query($conn,$qry))
+	if(!@pg_query($conn,$qry))
 	{
 		//Die synctabelle wird benoetigt um die Verbindung der LehrveranstaltungsID(Vilesci) und der
 		//LehreinheitID(Portal) Festzuhalten um beim Syncro vom Stundenplan die richitge Zuordnung zu haben.
@@ -147,6 +185,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		          lehreinheit_id_portal integer,
 		          PRIMARY KEY(lehrveranstaltung_id_vilesci, lehreinheit_id_portal)
 		        );";
+		
 		if(!pg_query($conn,$qry))
 		{
 			$error=true;
@@ -178,7 +217,7 @@ if($result = pg_query($conn_vilesci, $qry))
 					$qry = "SELECT lehrveranstaltung_id FROM lehre.tbl_lehrveranstaltung WHERE ext_id='".addslashes($row->lehrfach_nr)."'";
 					if($row1 = pg_fetch_object(pg_query($conn, $qry)))
 					{
-						//Wenn alles gleich ist ausser die Gruppe dann wird nur die gruppe zur LE hinzugefuegt
+						//Wenn alles gleich ist ausser die Gruppe dann wird nur die gruppe bzw Lektor zur LE hinzugefuegt
 						$qry = "SELECT * FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter using(lehreinheit_id) WHERE 
 						          lehrveranstaltung_id='$row1->lehrveranstaltung_id' AND
 						          studiensemester_kurzbz='$row->studiensemester_kurzbz' AND
@@ -195,21 +234,41 @@ if($result = pg_query($conn_vilesci, $qry))
 						{
 							if(pg_num_rows($result2)>0)
 							{
-								//Lehreinheit vorhanden. Es muss nur noch der Gruppeneintrag eingetragen werden
+								//Lehreinheit vorhanden. Es muss nur noch Gruppe bzw Lektor eingetragen werden
 								if($row_val = pg_fetch_object($result2))
 								{	
-									if(gruppezuweisen($row_val->lehreinheit_id, $row->studiengang_kz, $row->semester,$row->verband, $row->gruppe, $row->einheit_kurzbz))
+									pg_query($conn, 'BEGIN');
+									if(lektorzuweisen($row_val->lehreinheit_id, $row->lektor, $row->semesterstunden, $row->fas_id))
 									{
-										$qry = "INSERT INTO public.tbl_synclehreinheit(lehrveranstaltung_id_vilesci, lehreinheit_id_portal) 
-										        VALUES('".$row->lehrveranstaltung_id."','".$row_val->lehreinheit_id."');";
-										if(pg_query($conn,$qry))
+										if(gruppezuweisen($row_val->lehreinheit_id, $row->studiengang_kz, $row->semester,$row->verband, $row->gruppe, $row->einheit_kurzbz))
 										{
-											$anzahl_eingefuegt++;
+											$qry = "INSERT INTO public.tbl_synclehreinheit(lehrveranstaltung_id_vilesci, lehreinheit_id_portal) 
+											        VALUES('".$row->lehrveranstaltung_id."','".$row_val->lehreinheit_id."');";
+											
+											if(pg_query($conn,$qry))
+											{
+												$anzahl_eingefuegt++;
+												pg_query($conn,'COMMIT');
+											}
+											else 
+											{
+												$error_log.="Fehler beim Schreiben des Logs\n";
+												$anzahl_fehler++;
+												pg_query($conn, 'ROLLBACK');
+											}
+										}
+										else 
+										{
+											$error_log.="Fehler beim zuteilen der Gruppe: $row->lehrveranstaltung_id\n";	
+											$anzahl_fehler++;
+											pg_query($conn, 'ROLLBACK');
 										}
 									}
 									else 
-									{										
+									{
+										$error_log.="Fehler beim zuteilen des Lektors: $row->lehrveranstaltung_id\n";
 										$anzahl_fehler++;
+										pg_query($conn, 'ROLLBACK');
 									}
 								}
 								else 
@@ -262,27 +321,14 @@ if($result = pg_query($conn_vilesci, $qry))
 										{
 											if(gruppezuweisen($row_val->id, $row->studiengang_kz, $row->semester, $row->verband, $row->gruppe, $row->einheit_kurzbz))
 											{
-												//Lektor Zuweisen
-												$lektor = new lehreinheitmitarbeiter($conn);
-												$lektor->lehreinheit_id = $row_val->id;
-												$lektor->mitarbeiter_uid = $row->lektor;
-												$lektor->semesterstunden = $row->semesterstunden;
-												$lektor->planstunden = $row->semesterstunden;
-												$lektor->lehrfunktion_kurzbz ='lektor';
-												$lektor->stundensatz = '';
-												$lektor->faktor = 1;
-												$lektor->anmerkung = '';
-												$lektor->ext_id = $row->fas_id;
-													
-												if($lektor->save(true))
+												if(lektorzuweisen($row_val->id, $row->lektor, $row->semesterstunden, $row->fas_id))
 												{
 													pg_query($conn,'COMMIT');
 													$anzahl_eingefuegt++;
 												}
 												else 
 												{
-													pg_query($conn,'ROLLBACK');
-													$error_log .= $lektor->errormsg."\n";
+													pg_query($conn,'ROLLBACK');													
 													$anzahl_fehler++;
 												}
 											}

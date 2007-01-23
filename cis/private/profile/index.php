@@ -118,7 +118,7 @@ Results: <?php echo $num_rows; ?><br>
         		<!--<FONT class="beschriftung"><small>(fr&uuml;hestens ab Sommer in Verwendung)</small></FONT><BR>-->
         		<?php
         	    if($email!='')
-        	       	echo "<FONT class='beschriftung'>Extern:</FONT>$email";
+        	       	echo "<br><FONT class='beschriftung'>Extern:</FONT>$email";
         	    ?>
 
         	</P>

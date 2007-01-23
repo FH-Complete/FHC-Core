@@ -140,7 +140,7 @@ $stsem_content.= "</SELECT>\n";
 //Lehreinheiten laden
 if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lv_obj->studiengang_kz))
 {
-	$qry = "SELECT tbl_lehrfach.bezeichnung as lfbez, * FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehreinheitmitarbeiter
+	$qry = "SELECT distinct tbl_lehrfach.bezeichnung as lfbez, tbl_lehreinheit.lehreinheit_id FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehreinheitmitarbeiter
 			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND
 			tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
 			tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
@@ -148,7 +148,7 @@ if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lv_obj->st
 }
 else 
 {
-	$qry = "SELECT tbl_lehrfach.bezeichnung as lfbez, * FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehreinheitmitarbeiter
+	$qry = "SELECT distinct tbl_lehrfach.bezeichnung as lfbez, tbl_lehreinheit.lehreinheit_id FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehreinheitmitarbeiter
 			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND
 			tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
 			tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
@@ -171,8 +171,16 @@ if($result = pg_query($conn, $qry))
 			if($result_lektoren = pg_query($conn, $qry_lektoren))
 			{
 				$lektoren = '( ';
+				$i=0;
 				while($row_lektoren = pg_fetch_object($result_lektoren))
-					$lektoren .= $row_lektoren->kurzbz.' ';
+				{
+					$lektoren .= $row_lektoren->kurzbz;
+					$i++;
+					if($i<pg_num_rows($result_lektoren))
+						$lektoren.=', ';
+					else
+						$lektoren.=' ';
+				}
 				$lektoren .=')';
 			}
 			echo "<OPTION value='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$row->lehreinheit_id' $selected>$row->lfbez $lektoren</OPTION>\n";

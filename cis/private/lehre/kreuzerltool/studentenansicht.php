@@ -159,8 +159,16 @@ if($result = pg_query($conn, $qry))
 			if($result_lektoren = pg_query($conn, $qry_lektoren))
 			{
 				$lektoren = '( ';
+				$i=0;
 				while($row_lektoren = pg_fetch_object($result_lektoren))
-					$lektoren .= $row_lektoren->kurzbz.' ';
+				{
+					$lektoren .= $row_lektoren->kurzbz;
+					$i++;
+					if($i<pg_num_rows($result_lektoren))
+						$lektoren.=', ';
+					else
+						$lektoren.=' ';
+				}
 				$lektoren .=')';
 			}
 			echo "<OPTION value='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$row->lehreinheit_id' $selected>$row->bezeichnung $lektoren</OPTION>\n";
