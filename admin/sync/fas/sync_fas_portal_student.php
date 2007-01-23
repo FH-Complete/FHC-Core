@@ -77,9 +77,9 @@ if($result = pg_query($conn_fas, $qry))
 	echo nl2br("\n Sync Student\n--------------\n\n");
 	while($row = pg_fetch_object($result))
 	{
-		/*echo "- ";
+		echo "- ";
 		ob_flush();
-		flush();*/
+		flush();
 		
 		$error_log='';
 		$text='';
@@ -172,8 +172,7 @@ if($result = pg_query($conn_fas, $qry))
 		$gruppe='';
 		$ext_id_student=$row->student_pk;
 		
-		//Attribut Prestudentrolle
-		$rolle_kurzbz='';
+
 
 		
 		if($zgv_code<=0 or $zgv_code=='')
