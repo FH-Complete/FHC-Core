@@ -131,7 +131,7 @@ if($result = pg_query($conn_vilesci, $qry))
 				$anzahl_fehler++;
 		}
 		else 
-			$error_log .= "$row->nachname ($row->uid) hat keine Personalnummer\n";
+			$error_log .= "$row->nachname ($row->uid) wurde nicht in tbl_benutzer gefunden\n";
 		
 	}
 }

@@ -93,7 +93,7 @@
 		    echo "<tr><td>&nbsp;</td></tr>";
 		    echo "<tr>";
 		  	echo "   <td width=\"390\" class=\"ContentHeader2\">";
-		    echo "   $row->kurzbzlang - $row->bezeichnung<a name=\"$row->studiengang_kz\">&nbsp;</a></td>";
+		    echo "   $row->kuerzel - $row->bezeichnung<a name=\"$row->studiengang_kz\">&nbsp;</a></td>";
 		    echo "   <td width=\"20\"class=\"ContentHeader2\">&nbsp;</td>";
 		    echo "   <td width=\"200\"class=\"ContentHeader2\">&nbsp;</td>";
 			echo "   <td width=\"100\"class=\"ContentHeader2\" align=\"right\"><a class=\"Item2\" href=\"mailverteiler.php#\">top&nbsp;</a></td>";
@@ -186,7 +186,7 @@
 					echo '</td></tr></table>';
 					echo '<table border="0" cellspacing="0" cellpadding="0" id="'.$row->kuerzel.'" style="display: none">';
 					
-			  		//$sql_query1 = "SELECT DISTINCT semester FROM public.tbl_student where studiengang_kz ='$row->studiengang_kz' AND uid NOT LIKE '_dummy%' ORDER BY semester";
+			  		//$sql_query1 = "SELECT DISTINCT studiengang_kz, semester, verband, gruppe FROM public.tbl_student where studiengang_kz ='$row->studiengang_kz' AND student_uid NOT LIKE '_dummy%' ORDER BY semester";
 					$lv_obj = new lehrverband($conn);
 					$lv_obj->getlehrverband($row->studiengang_kz);
 					
@@ -198,9 +198,13 @@
 			  			{
 			  				$qry_cnt = "SELECT count(*) as anzahl FROM public.tbl_student WHERE studiengang_kz='$row1->studiengang_kz' AND semester='$row1->semester' AND student_uid NOT LIKE '_Dummy%'";
 			  				if(trim($row1->verband)!='')
-				  				$qry_cnt .= " AND verband='$row1->verband'";
-				  			if(trim($row1->gruppe)!='')
-				  				$qry_cnt .= " AND gruppe='$row1->gruppe'";
+			  				{
+				  				$qry_cnt .= " AND verband='$row1->verband'";			  				
+			  					
+				  				if(trim($row1->gruppe)!='')
+				  					$qry_cnt .= " AND gruppe='$row1->gruppe'";
+			  				}
+			  				
 				  				
 				  			if($row_cnt = pg_fetch_object(pg_query($conn, $qry_cnt)))
 				  			{
@@ -217,9 +221,10 @@
 						  			}
 						  			if(trim($row1->gruppe)!='')
 						  			{
-						  				$param .="&grp=$row1->gruppe";
-						  				echo " Gruppe $row1->gruppe";
-						  			}
+							  			$param .="&grp=$row1->gruppe";
+							  			echo " Gruppe $row1->gruppe";
+							  		}
+						  			
 						  			echo "</td>";
 						  			echo "  <td width='20'></td>";
 						  			echo "  <td width=\"200\"><a href='mailto:$strhelp@technikum-wien.at' class=\"Item\">$strhelp@technikum-wien.at</a></td>";

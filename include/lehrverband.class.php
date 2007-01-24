@@ -114,7 +114,7 @@ class lehrverband
 	
 	function getlehrverband($studiengang_kz=null, $semester=null, $verband=null)
 	{
-		$qry = 'SELECT * FROM public.tbl_lehrverband WHERE 1=1';
+		$qry = 'SELECT * FROM public.tbl_lehrverband WHERE aktiv=true';
 		if(!is_null($studiengang_kz))
 			$qry .=' AND studiengang_kz='.$this->addslashes($studiengang_kz);
 		if(!is_null($semester))

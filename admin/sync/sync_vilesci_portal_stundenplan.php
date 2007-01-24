@@ -30,6 +30,8 @@ require_once('../../include/gruppe.class.php');
 $conn=pg_connect(CONN_STRING) or die('Connection zur Portal Datenbank fehlgeschlagen');
 $conn_vilesci=pg_connect(CONN_STRING_VILESCI) or die('Connection zur Vilesci Datenbank fehlgeschlagen');
 
+ini_set('max_execution_time','600');
+
 $error_log='';
 $text = '';
 $anzahl_eingefuegt=0;
@@ -61,21 +63,38 @@ if($result = pg_query($conn_vilesci, $qry))
 		
 	while($row = pg_fetch_object($result))
 	{
-		if($row->verband==0)
+		if($row->verband=='0')
 			$row->verband=' ';
-			
+		if($row->gruppe=='0')
+			$row->gruppe=' ';
+		
+		//fix fuer fehlerhafte Lehrverbaende		
+		if(trim($row->semester)!='')
+		{
+			$verband=$row->verband;
+			if(trim($verband)!='')
+				$gruppe=$row->gruppe;
+			else 
+				$gruppe=' ';
+		}
+		else 
+		{
+			$verband=' ';
+			$gruppe=' ';
+		}
+
 		if($row->einheit_kurzbz=='')
 		{
 			//Lehrverbandsgruppe
 			$lvb_obj = new lehrverband($conn);
 			
-			if(!$lvb_obj->exists($row->studiengang_kz, $row->semester, $row->verband, $row->gruppe))
+			if(!$lvb_obj->exists($row->studiengang_kz, $row->semester, $verband, $gruppe))
 			{				
 				$lvb_obj->studiengang_kz = $row->studiengang_kz;
 				$lvb_obj->semester = $row->semester;
-				$lvb_obj->verband = $row->verband;
-				$lvb_obj->gruppe = $row->gruppe;
-				$lvb_obj->aktiv = false;
+				$lvb_obj->verband = $verband;
+				$lvb_obj->gruppe = $gruppe;
+				$lvb_obj->aktiv = false;				
 				if(!$lvb_obj->save())
 				{
 					$error_log .= $lvb_obj->errormsg."\n";
@@ -99,8 +118,8 @@ if($result = pg_query($conn_vilesci, $qry))
 				$grp_obj->new = true;
 				
 				//Bei Spezialgruppen keinen Verband/Gruppe angeben
-				$row->verband=' ';
-				$row->gruppe=' ';
+				$verband=' ';
+				$gruppe=' ';
 				
 				if(!$grp_obj->save())
 				{
@@ -139,18 +158,7 @@ if($result = pg_query($conn_vilesci, $qry))
 			$qry.="'".$row->stundenplandev_id."'";
 		else 
 			$qry.="'".$row->stundenplan_id."'";		
-			
-		//fix fuer fehlerhafte Lehrverbaende
-		
-		if(trim($row->semester)!='')
-			$verb=$row->verband;
-		else 
-			$verb=' ';
-		if(trim($verb)!='')
-			$gruppe=$row->gruppe;
-		else 
-			$gruppe=' ';
-			
+							
 		$qry.=",".myaddslashes($row->unr).",".
 					myaddslashes($row->uid).",".
 					myaddslashes($row->datum).",".
@@ -165,17 +173,18 @@ if($result = pg_query($conn_vilesci, $qry))
 			      	myaddslashes($lehreinheit_id).",".
 			      	myaddslashes($row->studiengang_kz).",".
 			      	myaddslashes($row->semester).",'".
-			      	($verb!=''?addslashes($verb):' ')."','".
-			      	(($gruppe!='' && $gruppe!=0)?addslashes($gruppe):' ')."');";
-			if(pg_query($conn,$qry))
-			{
-				$anzahl_eingefuegt++;
-			}
-			else 
-			{
-				$anzahl_fehler++;
-				$error_log.= 'Fehler beim Einfuegen: '.$qry;
-			}
+			      	$verband."','".
+			      	$gruppe."');";
+		echo $qry.'<br>';
+		if(pg_query($conn,$qry))
+		{
+			$anzahl_eingefuegt++;
+		}
+		else 
+		{
+			$anzahl_fehler++;
+			$error_log.= 'Fehler beim Einfuegen: '.$qry;
+		}
 	}
 }
 else
