@@ -108,7 +108,7 @@ if($stsem=='')
 	$stsem = $stsem_obj->getaktorNext();
 
 //Lehreinheiten laden zu denen der eingeloggte Student zugeteilt ist	
-$qry = "SELECT distinct lehreinheit_id, bezeichnung FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE lehreinheit_id IN(
+$qry = "SELECT distinct lehreinheit_id, kurzbz FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE lehreinheit_id IN(
 		SELECT lehreinheit_id FROM public.tbl_benutzergruppe JOIN lehre.tbl_lehreinheitgruppe USING (gruppe_kurzbz) 
 		WHERE tbl_benutzergruppe.uid='$user' AND 
 		tbl_lehreinheitgruppe.lehreinheit_id IN(
@@ -169,9 +169,29 @@ if($result = pg_query($conn, $qry))
 					else
 						$lektoren.=' ';
 				}
+				
 				$lektoren .=')';
 			}
-			echo "<OPTION value='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$row->lehreinheit_id' $selected>$row->bezeichnung $lektoren</OPTION>\n";
+			$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
+			if($result_gruppen = pg_query($conn, $qry_gruppen))
+			{
+				$gruppen = '( ';
+				$i=0;
+				while($row_gruppen = pg_fetch_object($result_gruppen))
+				{
+					if($row_gruppen->gruppe_kurzbz=='')
+						$gruppen.=$row_gruppen->semester.$row_gruppen->verband.$row_gruppen->gruppe;
+					else 
+						$gruppen.=$row_gruppen->gruppe_kurzbz;
+					$i++;
+					if($i<pg_num_rows($result_gruppen))
+						$gruppen.=', ';
+					else 
+						$gruppen.=' ';
+				}
+				$gruppen.=')';
+			}
+			echo "<OPTION value='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$row->lehreinheit_id' $selected>$row->kurzbz $lektoren $gruppen</OPTION>\n";
 		}
 		echo '</SELECT> ';
 	}

@@ -126,7 +126,7 @@ $stsem_content.= "</SELECT>\n";
 //Lehreinheiten laden
 if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lv_obj->studiengang_kz))
 {
-	$qry = "SELECT distinct tbl_lehrfach.bezeichnung as lfbez, tbl_lehreinheit.lehreinheit_id FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehreinheitmitarbeiter
+	$qry = "SELECT distinct tbl_lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehreinheitmitarbeiter
 			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND
 			tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
 			tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
@@ -134,7 +134,7 @@ if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lv_obj->st
 }
 else 
 {
-	$qry = "SELECT distinct tbl_lehrfach.bezeichnung as lfbez, tbl_lehreinheit.lehreinheit_id FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehreinheitmitarbeiter
+	$qry = "SELECT distinct tbl_lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehreinheitmitarbeiter
 			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND
 			tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
 			tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
@@ -169,7 +169,26 @@ if($result = pg_query($conn, $qry))
 				}
 				$lektoren .=')';
 			}
-			echo "<OPTION value='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$row->lehreinheit_id' $selected>$row->lfbez $lektoren</OPTION>\n";
+			$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
+			if($result_gruppen = pg_query($conn, $qry_gruppen))
+			{
+				$gruppen = '( ';
+				$i=0;
+				while($row_gruppen = pg_fetch_object($result_gruppen))
+				{
+					if($row_gruppen->gruppe_kurzbz=='')
+						$gruppen.=$row_gruppen->semester.$row_gruppen->verband.$row_gruppen->gruppe;
+					else 
+						$gruppen.=$row_gruppen->gruppe_kurzbz;
+					$i++;
+					if($i<pg_num_rows($result_gruppen))
+						$gruppen.=', ';
+					else 
+						$gruppen.=' ';
+				}
+				$gruppen.=')';
+			}
+			echo "<OPTION value='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$row->lehreinheit_id' $selected>$row->lfbez $lektoren $gruppen</OPTION>\n";
 		}
 		echo '</SELECT> ';
 	}
