@@ -348,7 +348,7 @@ class lehrstunde
 			else
 				$stunde->farbe='FFFFFF';
 			$stunde->studiengang_kz=$row->studiengang_kz;
-			$stunde->studiengang=$row->stg_kurzbz;
+			$stunde->studiengang=strtoupper($row->stg_typ.$row->stg_kurzbz);
 			$stunde->sem=$row->semester;
 			$stunde->ver=$row->verband;
 			$stunde->grp=$row->gruppe;
