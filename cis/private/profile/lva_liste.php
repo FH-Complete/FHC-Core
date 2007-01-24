@@ -22,7 +22,7 @@
 	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
 
 	//Studiensemester abfragen.
-	$sql_query='SELECT * FROM tbl_studiensemester WHERE ende>=now() ORDER BY start';
+	$sql_query='SELECT * FROM public.tbl_studiensemester WHERE ende>=now() ORDER BY start';
 	$result_stdsem=pg_exec($conn, $sql_query);
 	$num_rows_stdsem=pg_numrows($result_stdsem);
 	if (!isset($stdsem))
@@ -47,7 +47,6 @@
 		<table width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr>
 			<td>
-				&nbsp;<a href="../index.php">Lehrveranstaltungsplan</a> &gt;&gt;
 				&nbsp;<a href="index.php">Userprofil</a> &gt;&gt;
 				&nbsp;Lehrveranstaltungen (<?php echo $stdsem;?>)
 			</td>
