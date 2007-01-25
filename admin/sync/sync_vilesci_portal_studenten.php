@@ -115,14 +115,14 @@ if($result = pg_query($conn_vilesci, $qry))
 			}
 			else 
 			{
-				//Mitarbeiter neu anlegen
+				//Student neu anlegen
 				$student->new=true;
 			}
 			
 			if(!$error)
 				if(!$student->save())
 				{
-					$error_log.=$student->errormsg."\n";
+					$error_log.="Fehler beim Speicher ($row->uid):".$student->errormsg."\n";
 					$anzahl_fehler++;
 				}
 				else 
@@ -131,7 +131,10 @@ if($result = pg_query($conn_vilesci, $qry))
 				$anzahl_fehler++;
 		}
 		else 
+		{
 			$error_log .= "$row->nachname ($row->uid) wurde nicht in tbl_benutzer gefunden\n";
+			$anzahl_fehler++;
+		}
 		
 	}
 }
