@@ -102,8 +102,7 @@ $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 echo '<table border="0" cellspacing="0" cellpadding="0" height="100%" width="100%">';
 echo ' <tr>';
 echo '<td width="10">&nbsp;</td>';
-echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;"Kreuzerl"-Tool - ';
-echo $lv_obj->bezeichnung.' - '.$stg_obj->kuerzel;
+echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;"Kreuzerl"-Tool';
 echo '</font></td><td  class="ContentHeader" align="right">'."\n";
 
 //Studiensemester laden
@@ -173,7 +172,7 @@ if($result = pg_query($conn, $qry))
 			$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
 			if($result_gruppen = pg_query($conn, $qry_gruppen))
 			{
-				$gruppen = '( ';
+				$gruppen = '';
 				$i=0;
 				while($row_gruppen = pg_fetch_object($result_gruppen))
 				{
@@ -186,10 +185,9 @@ if($result = pg_query($conn, $qry))
 						$gruppen.=', ';
 					else 
 						$gruppen.=' ';
-				}
-				$gruppen.=')';
+				}				
 			}
-			echo "<OPTION value='statistik.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$row->lehreinheit_id' $selected>$row->lfbez $lektoren $gruppen</OPTION>\n";
+			echo "<OPTION value='statistik.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$row->lehreinheit_id' $selected>$row->lfbez - $gruppen $lektoren</OPTION>\n";
 		}
 		echo '</SELECT> ';
 	}
@@ -208,6 +206,7 @@ echo '</td><tr></table>';
 echo '<table><tr>';
 echo '<td width="10">&nbsp;</td>';
 echo "<td>\n";
+echo "<b>$lv_obj->bezeichnung</b><br>";
 
 if($lehreinheit_id=='')
 	die('Es wurde keine passende Lehreinheit in diesem Studiensemester gefunden');

@@ -127,9 +127,9 @@ class studiengang
 	// * Liefert alle Studiengaenge
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
-	function getAll($order=null)
+	function getAll($order=null, $aktiv=true)
 	{
-		$qry = "SELECT * FROM public.tbl_studiengang";
+		$qry = "SELECT * FROM public.tbl_studiengang WHERE aktiv=".($aktiv?'true':'false');
 		
 		if($order!=null)
 		 	$qry .=" ORDER BY $order";

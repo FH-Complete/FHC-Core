@@ -20,7 +20,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
 </head>
 <body>
 <?php	
@@ -55,8 +55,8 @@
 				else 
 					die($lv_obj->errormsg);
 			?>
-          <td bgcolor="#008381"><font color="#FFFFFF"><strong>&nbsp;<?php echo $short_name; ?> - Feedback 
-            an: </strong>
+          <td class='ContentHeader'><font class='ContentHeader'>&nbsp;<?php echo $short_name; ?> - Feedback 
+            an: 
 			<?php
 			$qry = "SELECT distinct vorname, nachname, uid FROM campus.vw_mitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter WHERE uid=mitarbeiter_uid AND tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND lehrveranstaltung_id='$lvid' AND studiensemester_kurzbz='$stsem'";
 			if(!$result=pg_query($conn, $qry))
@@ -77,7 +77,7 @@
 		</table>
 				
 	<br>
-      <p><b>Betreff:&nbsp; 
+      <p><b>Betreff:&nbsp;</b> 
 	    <?php
 			if(isset($edit_id) && $edit_id != "" && !isset($edit_break))
 			{
@@ -159,19 +159,18 @@
 					{
 				
 						echo '<tr>';
-						echo '	<td bgcolor="#008381"><font color="#FFFFFF"><strong>&nbsp;'.$row->betreff.'</font></td>';
-						echo '	<td bgcolor="#008381" width="30%"><font color="#FFFFFF">'.$row_pers->vorname.' '.$row_pers->nachname.'</font></td>';
-						echo '	<td bgcolor="#008381" width="20%"><font color="#FFFFFF">'.$row->datum.'</font></td>';
-						echo '	<td bgcolor="#008381" width="20%"><font color="#FFFFFF">&nbsp;</font></td>';
-						
-						echo '  <td bgcolor="#008381" align="right"><font color="#FFFFFF">&nbsp;</font></td>';
+						echo '	<td class="ContentHeader"><font class="ContentHeader"><strong>&nbsp;'.$row->betreff.'</font></td>';
+						echo '	<td class="ContentHeader" width="30%"><font class="ContentHeader">'.$row_pers->vorname.' '.$row_pers->nachname.'</font></td>';
+						echo '	<td class="ContentHeader" width="20%"><font class="ContentHeader">'.$row->datum.'</font></td>';
+						echo '	<td class="ContentHeader" width="20%"><font class="ContentHeader">&nbsp;</font></td>';						
+						echo '  <td class="ContentHeader" align="right"><font class="ContentHeader">&nbsp;</font></td>';
 						
 						echo '</tr>';
 						echo '<tr>';
-						echo '	<td bgcolor="#F2F2F2"><font color="#000000">'.nl2br($row->text).'</font></td>';
-						echo '	<td bgcolor="#F2F2F2"><font color="#000000">&nbsp;</font></td>';
-						echo '	<td bgcolor="#F2F2F2" colspan=2><font color="#000000">&nbsp;</font></td>';
-						echo '	<td bgcolor="#F2F2F2"><font color="#000000">&nbsp;</font></td>';
+						echo '	<td bgcolor="#F2F2F2" colspan=5><font color="#000000">'.nl2br($row->text).'</font></td>';
+						//echo '	<td bgcolor="#F2F2F2"><font color="#000000">&nbsp;</font></td>';
+						//echo '	<td bgcolor="#F2F2F2" colspan=2><font color="#000000">&nbsp;</font></td>';
+						//echo '	<td bgcolor="#F2F2F2"><font color="#000000">&nbsp;</font></td>';
 						echo '</tr>';
 						echo '<tr>';
 						echo '	<td><font color="#FFFFFF">&nbsp;</font></td>';

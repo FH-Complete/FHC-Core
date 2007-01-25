@@ -73,13 +73,13 @@
 				else 	
 					$datum='';
 				
-				if($semester == 0)
+				if($row->semester == '')
 				{
 					echo '<p><small>'.$datum.' - '.$row->verfasser.' - [Allgemein]</small><br><b>'.$row->betreff.'</b><br>';
 				}
 				else
 				{
-					echo '<p><small>'.$datum.' - '.$row->verfasser.' - [Semester '.$semester.']</small><br><b>'.$row->betreff.'</b><br>';
+					echo '<p><small>'.$datum.' - '.$row->verfasser.' - [Semester '.$row->semester.']</small><br><b>'.$row->betreff.'</b><br>';
 				}
 				
 				echo "$row->text</p>";
@@ -124,7 +124,7 @@
                 <?php
 
                 //Studiengangsleiter auslesen
-				$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stgl')";
+				$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stgl' LIMIT 1)";
 				if($result_course_leader = pg_query($sql_conn, $qry))
 				{
 					$num_rows_course_leader = pg_numrows($result_course_leader);					
@@ -194,7 +194,7 @@
 			  	echo "<p>Stellvertreter:<br>";
                 
 			  	//Studiengangsleiter Stellvertreter auselesen
-				$sql_query = "SELECT * FROM campus.vw_mitarbeiter WHERE uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stglstv')";
+				$sql_query = "SELECT * FROM campus.vw_mitarbeiter WHERE uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stglstv' LIMIT 1)";
 				
 				if($result_course_leader_deputy = pg_query($sql_conn, $sql_query))
 				{

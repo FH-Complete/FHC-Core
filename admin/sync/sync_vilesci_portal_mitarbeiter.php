@@ -128,7 +128,7 @@ if($result = pg_query($conn_vilesci, $qry))
 				if(!$error)
 					if(!$mitarbeiter->save())
 					{
-						$error_log.=$mitarbeiter->errormsg."\n";
+						$error_log.="Fehler beim Speichern des Mitarbeits ($row->uid):".$mitarbeiter->errormsg."\n";
 						$anzahl_fehler++;
 					}
 					else 
