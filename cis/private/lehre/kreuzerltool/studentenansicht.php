@@ -107,6 +107,7 @@ if($stsem=='')
 	$stsem = $stsem_obj->getaktorNext();
 
 //Lehreinheiten laden zu denen der eingeloggte Student zugeteilt ist	
+//Bei Lehrverbaenden werden auch die uebergeordneten geladen
 $qry = "SELECT distinct lehreinheit_id, kurzbz FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE lehreinheit_id IN(
 		SELECT lehreinheit_id FROM public.tbl_benutzergruppe JOIN lehre.tbl_lehreinheitgruppe USING (gruppe_kurzbz) 
 		WHERE tbl_benutzergruppe.uid='$user' AND 
@@ -136,12 +137,18 @@ $qry = "SELECT distinct lehreinheit_id, kurzbz FROM lehre.tbl_lehreinheit JOIN l
 			  	AND 
 			  	trim(tbl_lehreinheitgruppe.verband) = trim(tbl_student.verband)
 			  )
+			  OR
+			  (
+				(trim(tbl_lehreinheitgruppe.verband)='' OR tbl_lehreinheitgruppe.verband is null)
+				 AND 
+				 (trim(tbl_lehreinheitgruppe.gruppe)='' OR tbl_lehreinheitgruppe.gruppe is null)
+			  )
 			)
 		) 
 		AND
 		tbl_lehreinheitgruppe.lehreinheit_id IN(SELECT lehreinheit_id FROM lehre.tbl_lehreinheit JOIN campus.tbl_uebung USING(lehreinheit_id) 
 			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND tbl_lehreinheit.studiensemester_kurzbz='$stsem'))";
-
+//echo $qry;
 if($result = pg_query($conn, $qry))
 {
 	if(pg_num_rows($result)>1)
