@@ -35,6 +35,7 @@ class lehreinheitgruppe
 	var $verband;				// char(1)
 	var $gruppe;				// char(1)
 	var $gruppe_kurzbz;			// varchar(16)
+	var $ext_id;				// bigint
 	
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine LE
@@ -140,13 +141,14 @@ class lehreinheitgruppe
 		if($new)
 		{
 			//ToDo ID entfernen
-			$qry = 'INSERT INTO lehre.tbl_lehreinheitgruppe (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz)
+			$qry = 'INSERT INTO lehre.tbl_lehreinheitgruppe (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, ext_id)
 			        VALUES('.$this->addslashes($this->lehreinheit_id).','.
 					$this->addslashes($this->studiengang_kz).','.
 					$this->addslashes($this->semester).','.
 					$this->addslashes($this->verband).','.
 					$this->addslashes($this->gruppe).','.
-					$this->addslashes($this->gruppe_kurzbz).');';
+					$this->addslashes($this->gruppe_kurzbz).','.
+					$this->addslashes($this->ext_id).');';
 		}
 		else
 		{
@@ -157,6 +159,7 @@ class lehreinheitgruppe
 			       ' verband='.$this->addslashes($this->verband).','.
 			       ' gruppe='.$this->addslashes($this->gruppe).','.
 			       ' gruppe_kurzbz='.$this->addslashes($this->gruppe_kurzbz).','.
+			       ' ext_id='.$this->addslashes($this->ext_id).','.
 			       " WHERE lehreinheitgruppe_id=".$this->addslashes($this->lehreinheitgruppe_id).";";
 		}
 

@@ -18,7 +18,7 @@ function check_lektor($uid, $conn)
 	$sql_query="SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='$uid'";
 	//echo $sql_query;
 	$result=pg_query($conn, $sql_query) or die(pg_last_error($conn));
-	$num_rows=pg_numrows($result);
+	$num_rows=pg_num_rows($result);
 	// Wenn kein ergebnis return 0 sonst ID
 	if ($num_rows>0)
 	{

@@ -84,7 +84,7 @@ function lektorzuweisen($lehreinheit_id, $uid, $semesterstunden, $fas_id)
 		return true;
 }
 
-function gruppezuweisen($id,$studiengang_kz, $semester, $verband, $gruppe, $einheit_kurzbz)
+function gruppezuweisen($id,$studiengang_kz, $semester, $verband, $gruppe, $einheit_kurzbz, $fas_id)
 {
 	global $error_log,$conn;
 	
@@ -146,6 +146,7 @@ function gruppezuweisen($id,$studiengang_kz, $semester, $verband, $gruppe, $einh
 			$gruppe1->verband = $verband;
 			$gruppe1->gruppe = $gruppe;
 			$gruppe1->gruppe_kurzbz = strtoupper($einheit_kurzbz);
+			$gruppe1->ext_id=$fas_id;
 			if($gruppe1->save(true))
 				return true;
 			else 
@@ -240,7 +241,7 @@ if($result = pg_query($conn_vilesci, $qry))
 									pg_query($conn, 'BEGIN');
 									if(lektorzuweisen($row_val->lehreinheit_id, $row->lektor, $row->semesterstunden, $row->fas_id))
 									{
-										if(gruppezuweisen($row_val->lehreinheit_id, $row->studiengang_kz, $row->semester,$row->verband, $row->gruppe, $row->einheit_kurzbz))
+										if(gruppezuweisen($row_val->lehreinheit_id, $row->studiengang_kz, $row->semester,$row->verband, $row->gruppe, $row->einheit_kurzbz, $row->fas_id))
 										{
 											$qry = "INSERT INTO public.tbl_synclehreinheit(lehrveranstaltung_id_vilesci, lehreinheit_id_portal) 
 											        VALUES('".$row->lehrveranstaltung_id."','".$row_val->lehreinheit_id."');";
@@ -319,7 +320,7 @@ if($result = pg_query($conn_vilesci, $qry))
 										        VALUES('".$row->lehrveranstaltung_id."','".$row_val->id."');";
 										if(pg_query($conn,$qry))
 										{
-											if(gruppezuweisen($row_val->id, $row->studiengang_kz, $row->semester, $row->verband, $row->gruppe, $row->einheit_kurzbz))
+											if(gruppezuweisen($row_val->id, $row->studiengang_kz, $row->semester, $row->verband, $row->gruppe, $row->einheit_kurzbz, $row->fas_id))
 											{
 												if(lektorzuweisen($row_val->id, $row->lektor, $row->semesterstunden, $row->fas_id))
 												{

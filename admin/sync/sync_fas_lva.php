@@ -5,10 +5,11 @@ include('../../include/lehrstunde.class.php');
 
 $conn=pg_connect(CONN_STRING);
 $conn_fas=pg_connect(CONN_STRING_FAS);
-$adress='fas_sync@technikum-wien.at';
-//$adress='pam@technikum-wien.at';
-$adress_stpl='stpl@technikum-wien.at';
-$adress_fas='pam@technikum-wien.at';
+//$adress='fas_sync@technikum-wien.at';
+$adress='oesi@technikum-wien.at';
+//$adress_stpl='stpl@technikum-wien.at';
+$adress_stpl='oesi@technikum-wien.at';
+$adress_fas='oesi@technikum-wien.at';
 
 
 // error log für jeden Studiengang
@@ -20,14 +21,14 @@ $missing_lehrform=array();
 
 function printLVA($row)
 {
-	return 'lvnr='.$row->lvnr.' '.$row->bezeichnung;
+	return 'lvnr='.$row->lvnr.' '.$row->lv_bezeichnung;
 }
 
 function getSemesterWhereClause()
 {
 	global $conn;
-	$qry="select * from tbl_studiensemester where ende>now()";
-	$result=pg_exec($conn, $qry);
+	$qry="SELECT * FROM public.tbl_studiensemester WHERE ende>now()";
+	$result=pg_query($conn, $qry);
 	$where='';
 	while ($row=pg_fetch_object($result))
 	{
@@ -121,12 +122,12 @@ function validate($row)
 /**
  * FAS-Lehrfach auf interne Lehrfach-Nr übersetzen
  */
-function getLehrfachNr($kurzbz,$studiengang_kz,$semester,$lehrfach_bezeichnung, $fachbereich_id, $ects, $conn)
+function getLehrfachId($kurzbz,$studiengang_kz,$semester,$lehrfach_bezeichnung, $fachbereich_id, $conn)
 {
 	global $lehrfach;
 	global $text;
 
-	if (isset($lehrfach[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['lehrfach_nr']))
+	if (isset($lehrfach[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['lehrfach_id']))
 	{
 		//echo 'Nummer:'.$lehrfach[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['lehrfach_nr'].'Bez: '.$lehrfach_bezeichnung.'<BR>';
 
@@ -134,47 +135,22 @@ function getLehrfachNr($kurzbz,$studiengang_kz,$semester,$lehrfach_bezeichnung, 
 		if ($lehrfach[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['lehrfach_bezeichnung']!=$lehrfach_bezeichnung)
 		{
 			// Update
-			$qry="UPDATE tbl_lehrfach SET bezeichnung='$lehrfach_bezeichnung' WHERE lehrfach_nr=".$lehrfach[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['lehrfach_nr'];
+			$qry="UPDATE lehre.tbl_lehrfach SET bezeichnung='$lehrfach_bezeichnung' WHERE lehrfach_id=".$lehrfach[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['lehrfach_id'];
 			if (!$result=pg_query($conn, $qry))
 				echo $qry.' fehlgeschlagen!<BR>';
 			else
 			{
 				echo 'Lehrfach '.$kurzbz.'/'.$studiengang_kz.'/'.$semester.' wurde von '.$lehrfach[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['lehrfach_bezeichnung'].' auf '.$lehrfach_bezeichnung.' geaendert!<BR>';
-				$text.='Lehrfach '.$kurzbz.'/'.$studiengang_kz.'/'.$semester.' wurde von '.$lehrfach[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['lehrfach_bezeichnung'].' auf '.$lehrfach_bezeichnung.' geaendert!\n';
+				$text.='Lehrfach '.$kurzbz.'/'.$studiengang_kz.'/'.$semester.' wurde von '.$lehrfach[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['lehrfach_bezeichnung'].' auf '.$lehrfach_bezeichnung." geaendert!\n";
 				$lehrfach[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['lehrfach_bezeichnung']=$lehrfach_bezeichnung;
 			}
-		}
-
-		// Nebenbei die ECTS Punkte kontrollieren
-		if ($lehrfach[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['ects']!=$ects)
-		{
-			if ($ects!='') //ereg("[0-9]{1,4}[\.|,][0-9]{0,2}$",$ects)
-			{
-				// Update
-				$qry="UPDATE tbl_lehrfach SET ects='$ects' WHERE lehrfach_nr=".$lehrfach[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['lehrfach_nr'];
-				//echo $qry.'<BR>';
-				if (!$result=pg_query($conn, $qry))
-					echo $qry.' fehlgeschlagen!<BR>';
-				else
-				{
-					echo ' Bei Lehrfach '.$kurzbz.'/'.$studiengang_kz.'/'.$semester.' wurden die ECTS-Punkte von '.$lehrfach[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['ects'].' auf '.$ects.' geaendert!<BR>';
-					$text.='Bei Lehrfach '.$kurzbz.'/'.$studiengang_kz.'/'.$semester.' wurden die ECTS-Punkte von '.$lehrfach[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['ects'].' auf '.$ects.' geaendert!\n';
-					$lehrfach[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['ects']=$ects;
-				}
-			}
-			else
-			{
-				echo 'Bei Lehrfach '.$kurzbz.'/'.$studiengang_kz.'/'.$semester.' sind die ECTS-Punkte von '.$ects.' nicht Plausibel!<BR>';
-				$text.='Bei Lehrfach '.$kurzbz.'/'.$studiengang_kz.'/'.$semester.' sind die ECTS-Punkte von '.$ects.' nicht Plausibel!\n';
-			}
-
 		}
 
 		// Nebenbei die FachbereichID kontrollieren
 		if ($lehrfach[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['fachbereich_id']!=$fachbereich_id)
 		{
 			// Update
-			$qry="UPDATE tbl_lehrfach SET fachbereich_id=$fachbereich_id WHERE lehrfach_nr=".$lehrfach[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['lehrfach_nr'];
+			$qry="UPDATE lehre.tbl_lehrfach SET fachbereich_kurzbz=(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich where ext_id=$fachbereich_id LIMIT 1) WHERE lehrfach_id=".$lehrfach[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['lehrfach_id'];
 			if (!$result=@pg_query($conn, $qry))
 				echo $qry.' fehlgeschlagen!<BR>';
 			else
@@ -184,12 +160,70 @@ function getLehrfachNr($kurzbz,$studiengang_kz,$semester,$lehrfach_bezeichnung, 
 				$lehrfach[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['fachbereich_id']=$fachbereich_id;
 			}
 		}
-		return $lehrfach[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['lehrfach_nr'];
+		return $lehrfach[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['lehrfach_id'];
 	}
 	//echo 'missing getLehrfachNr: '.$kurzbz.'/'.$studiengang_kz.'/'.$semester.'<br>';
 	return -1;
 }
 
+/**
+ * FAS-LV auf interne LV-id übersetzen
+ */
+function getLvId($kurzbz,$studiengang_kz,$semester,$lv_bezeichnung, $ects, $conn)
+{
+	global $lehrveranstaltung;
+	global $text;
+
+	if (isset($lehrveranstaltung[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['lehrveranstaltung_id']))
+	{
+		//echo 'Nummer:'.$lehrfach[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['lehrfach_nr'].'Bez: '.$lehrfach_bezeichnung.'<BR>';
+
+		// Nebenbei die LVbezeichnung kontrollieren
+		if ($lehrveranstaltung[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['bezeichnung']!=$lv_bezeichnung)
+		{
+			// Update
+			$qry="UPDATE lehre.tbl_lehrveranstaltung SET bezeichnung='$lv_bezeichnung' WHERE lehrveranstaltung_id=".$lehrveranstaltung[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['lehrveranstaltung_id'];
+			if (!$result=pg_query($conn, $qry))
+				echo $qry.' fehlgeschlagen!<BR>';
+			else
+			{
+				echo 'Lehrfach '.$kurzbz.'/'.$studiengang_kz.'/'.$semester.' wurde von '.$lehrveranstaltung[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['bezeichnung'].' auf '.$lv_bezeichnung.' geaendert!<BR>';
+				$text.='Lehrfach '.$kurzbz.'/'.$studiengang_kz.'/'.$semester.' wurde von '.$lehrveranstaltung[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['bezeichnung'].' auf '.$lv_bezeichnung." geaendert!\n";
+				$lehrveranstaltung[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['bezeichnung']=$lv_bezeichnung;
+			}
+		}
+
+		// Nebenbei die ECTS Punkte kontrollieren
+		
+		if ($lehrveranstaltung[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['ects']!=$ects)
+		{
+			if ($ects!='') //ereg("[0-9]{1,4}[\.|,][0-9]{0,2}$",$ects)
+			{
+				// Update
+				$qry="UPDATE lehre.tbl_lehrveranstaltung SET ects='$ects' WHERE lehrveranstaltung_id=".$lehrveranstaltung[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['lehrveranstaltung_id'];
+				//echo $qry.'<BR>';
+				if (!$result=pg_query($conn, $qry))
+					echo $qry.' fehlgeschlagen!<BR>';
+				else
+				{
+					echo ' Bei Lehrfach '.$kurzbz.'/'.$studiengang_kz.'/'.$semester.' wurden die ECTS-Punkte von '.$lehrveranstaltung[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['ects'].' auf '.$ects.' geaendert!<BR>';
+					$text.='Bei Lehrfach '.$kurzbz.'/'.$studiengang_kz.'/'.$semester.' wurden die ECTS-Punkte von '.$lehrveranstaltung[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['ects'].' auf '.$ects." geaendert!\n";
+					$lehrveranstaltung[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['ects']=$ects;
+				}
+			}
+			else
+			{
+				echo 'Bei Lehrfach '.$kurzbz.'/'.$studiengang_kz.'/'.$semester.' sind die ECTS-Punkte von '.$ects.' nicht Plausibel!<BR>';
+				$text.='Bei Lehrfach '.$kurzbz.'/'.$studiengang_kz.'/'.$semester.' sind die ECTS-Punkte von '.$ects." nicht Plausibel!\n";
+			}
+
+		}
+
+		return $lehrveranstaltung[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['lehrveranstaltung_id'];
+	}
+	//echo 'missing getLehrfachNr: '.$kurzbz.'/'.$studiengang_kz.'/'.$semester.'<br>';
+	return -1;
+}
 
 /*************************
  * FAS-Synchronisation
@@ -197,44 +231,56 @@ function getLehrfachNr($kurzbz,$studiengang_kz,$semester,$lehrfach_bezeichnung, 
 
 // E-Mails der Studiengänge
 $stg_mail=array();
-$qry="select studiengang_kz,email,kurzbz from tbl_studiengang";
-$result=pg_exec($conn, $qry);
+$qry="select studiengang_kz,email,upper(typ::varchar(1) || kurzbz) as kurzbz FROM public.tbl_studiengang";
+$result=pg_query($conn, $qry);
 while ($row=pg_fetch_object($result))
 {
-	$stg_mail[$row->studiengang_kz] = $row->email;
+	$stg_mail[$row->studiengang_kz] = 'oesi@technikum-wien.at';//$row->email;
 	$stg_kurzbz[$row->studiengang_kz]=$row->kurzbz;
 }
 
 // Anzahl der LVA in VileSci
-$sql_query="SELECT count(*) AS anz FROM tbl_lehrveranstaltung";
+$sql_query="SELECT count(*) AS anz FROM lehre.tbl_lehrveranstaltung";
 //echo $sql_query."<br>";
-$result=pg_exec($conn, $sql_query);
-$vil_anz_lva=pg_fetch_result($result,0,'anz');
+$result=pg_query($conn, $sql_query);
+$row=pg_fetch_object($result);
+$vil_anz_lva = $row->anz;
 
 // Lehrfächer holen und in Array speichern (Key ist kurzbz + '/' + lehform_kurzbz)
-$sql_query="SELECT lehrfach_nr,kurzbz,studiengang_kz,semester, bezeichnung, fachbereich_id, ects FROM tbl_lehrfach";
-$result=pg_exec($conn, $sql_query);
+$sql_query="SELECT lehrfach_id, tbl_lehrfach.kurzbz, tbl_lehrfach.studiengang_kz, tbl_lehrfach.semester, tbl_lehrfach.bezeichnung, tbl_fachbereich.ext_id as fachbereich_id, tbl_fachbereich.fachbereich_kurzbz FROM lehre.tbl_lehrfach JOIN public.tbl_fachbereich using(fachbereich_kurzbz)";
+$result=pg_query($conn, $sql_query);
 while ($row=pg_fetch_object($result))
 {
-	$lehrfach[$row->kurzbz.'/'.$row->studiengang_kz.'/'.$row->semester]['lehrfach_nr'] = $row->lehrfach_nr;
+	$lehrfach[$row->kurzbz.'/'.$row->studiengang_kz.'/'.$row->semester]['lehrfach_id'] = $row->lehrfach_id;
 	$lehrfach[$row->kurzbz.'/'.$row->studiengang_kz.'/'.$row->semester]['fachbereich_id'] = $row->fachbereich_id;
 	$lehrfach[$row->kurzbz.'/'.$row->studiengang_kz.'/'.$row->semester]['lehrfach_bezeichnung'] = $row->bezeichnung;
-	$lehrfach[$row->kurzbz.'/'.$row->studiengang_kz.'/'.$row->semester]['ects'] = $row->ects;
+	//$lehrfach[$row->kurzbz.'/'.$row->studiengang_kz.'/'.$row->semester]['ects'] = $row->ects;
 }
-//print_r($lehrfach);
-// Einheiten holen
-$sql_query="SELECT einheit_kurzbz,bezeichnung FROM tbl_einheit";
-$result=pg_exec($conn, $sql_query);
+//LVA holen und in Array speichern (Key ist kurzbz + '/' + lehform_kurzbz)
+$sql_query="SELECT lehrveranstaltung_id,kurzbz,studiengang_kz,semester, bezeichnung, ects FROM lehre.tbl_lehrveranstaltung";
+$result=pg_query($conn, $sql_query);
 while ($row=pg_fetch_object($result))
-	$einheit[$row->einheit_kurzbz] = $row->bezeichnung;
+{
+	$lehrveranstaltung[$row->kurzbz.'/'.$row->studiengang_kz.'/'.$row->semester]['lehrveranstaltung_id'] = $row->lehrveranstaltung_id;
+	//$lehrveranstaltung[$row->kurzbz.'/'.$row->studiengang_kz.'/'.$row->semester]['lehrfach_id'] = $row->lehrfach_id;
+	$lehrveranstaltung[$row->kurzbz.'/'.$row->studiengang_kz.'/'.$row->semester]['bezeichnung'] = $row->bezeichnung;
+	$lehrveranstaltung[$row->kurzbz.'/'.$row->studiengang_kz.'/'.$row->semester]['ects'] = $row->ects;
+}
+
+//print_r($lehrfach);
+// Gruppen holen
+$sql_query="SELECT gruppe_kurzbz,bezeichnung FROM public.tbl_gruppe";
+$result=pg_query($conn, $sql_query);
+while ($row=pg_fetch_object($result))
+	$einheit[$row->gruppe_kurzbz] = $row->bezeichnung;
 // Raumtypen holen
-$sql_query="SELECT raumtyp_kurzbz,beschreibung FROM tbl_raumtyp";
-$result=pg_exec($conn, $sql_query);
+$sql_query="SELECT raumtyp_kurzbz,beschreibung FROM public.tbl_raumtyp";
+$result=pg_query($conn, $sql_query);
 while ($row=pg_fetch_object($result))
 	$raumtyp[$row->raumtyp_kurzbz] = $row->beschreibung;
 // Lehformen holen
-$sql_query="SELECT lehrform_kurzbz,bezeichnung FROM tbl_lehrform";
-$result=pg_exec($conn, $sql_query);
+$sql_query="SELECT lehrform_kurzbz,bezeichnung FROM lehre.tbl_lehrform";
+$result=pg_query($conn, $sql_query);
 while ($row=pg_fetch_object($result))
 	$lehrform[$row->lehrform_kurzbz] = $row->bezeichnung;
 //print_r($lehrfach);
@@ -243,14 +289,14 @@ flush();
 
 // Start Lehrveranstaltungen Synchro
 $sql_query="SELECT DISTINCT fas_id,trim(lvnr) AS lvnr,trim(unr)::int8 AS unr,einheit_kurzbz,lektor,trim(upper(lehrfach_kurzbz)) AS lehrfach_kurzbz,
-			trim(upper(lehrform)) AS lehrform, lehrfach_bezeichnung,
+			trim(upper(lehrform)) AS lehrform, lehrfach_bezeichnung, trim(upper(lv_kurzbz)) AS lv_kurzbz, lv_bezeichnung, 
 			studiengang_kz,fachbereich_id,semester,verband,gruppe,raumtyp,raumtypalternativ,
 			round(semesterstunden) AS semesterstunden,stundenblockung,wochenrythmus,start_kw,anmerkung,studiensemester_kurzbz, ects
 			FROM fas_view_alle_lehreinheiten_vilesci ".
 		   "where ".getSemesterWhereClause();
 //echo $sql_query."</i><br>";
-$result=pg_exec($conn_fas, $sql_query);
-$num_rows=pg_numrows($result);
+$result=pg_query($conn_fas, $sql_query);
+$num_rows=pg_num_rows($result);
 $text="Dies ist eine automatische eMail!\r\r";
 $text.="Es wurde eine Synchronisation mit FAS durchgeführt.\r";
 $text.="Anzahl der LVA vom FAS-Import: $num_rows \r";
@@ -264,17 +310,19 @@ $anz_insert=0;
 echo $num_rows.' Datensaetze<BR>';
 for ($i=0;$i<$num_rows;$i++)
 {
-	if ($i%100==0)
-	{
-		echo '-';
-		flush();
-	}
+	
+	//if ($i%100==0)
+	//{
+	//	echo '-';
+	//	flush();
+	//}
 	$row=pg_fetch_object($result,$i);
 	// Kennzahl der Studiengangs bei ehemaligen bTec auf TW aendern.
 	if ($row->studiengang_kz==203)
 		$row->studiengang_kz=0;
 	// Lehrfach-Nr übersetzen (-1 wenn nicht vorhanden)
-	$row->lehrfach_nr=getLehrfachNr($row->lehrfach_kurzbz,$row->studiengang_kz,$row->semester, $row->lehrfach_bezeichnung, $row->fachbereich_id, $row->ects, $conn);
+	$row->lehrfach_id=getLehrfachid($row->lehrfach_kurzbz,$row->studiengang_kz,$row->semester, $row->lehrfach_bezeichnung, $row->fachbereich_id, $conn);
+	$row->lehrveranstaltung_id=getLvId($row->lv_kurzbz,$row->studiengang_kz,$row->semester, $row->lv_bezeichnung, $row->ects, $conn);
 	// Einheit vollstaendiger Name
 	if (count($row->einheit_kurzbz)>0)
 		$row->einheit_kurzbz=$stg_kurzbz[$row->studiengang_kz].'-'.$row->einheit_kurzbz;
@@ -291,204 +339,378 @@ for ($i=0;$i<$num_rows;$i++)
 	if (!$row->wochenrythmus>0)
 		$row->wochenrythmus=1;
 
-	if ($row->lehrfach_nr==-1)
+	if ($row->lehrfach_id==-1)
 	{
 		//$error_log[$row->studiengang_kz][]=printLVA($row).': Lehrfach (Kurzbz='".$row->lehrfach_kurzbz."',Lehrform".$row->lehrform) existiert noch nicht. Stundenplanabteilung wurde benachrichtigt.';
 		if (!isset($missing_lehrfaecher[$row->lehrfach_kurzbz.'/'.$row->studiengang_kz.'/'.$row->semester])) $missing_lehrfaecher[$row->lehrfach_kurzbz.'/'.$row->studiengang_kz.'/'.$row->semester]=1;
 			$valid=false;
 	}
+	if ($row->lehrveranstaltung_id==-1)
+	{
+		if (!isset($missing_lehrveranstaltungen[$row->lv_kurzbz.'/'.$row->studiengang_kz.'/'.$row->semester])) $missing_lehrveranstaltungen[$row->lv_kurzbz.'/'.$row->studiengang_kz.'/'.$row->semester]=1;
+			$valid=false;
+	}
 
-	if (validate($row) && $row->lehrfach_nr>-1)
+	if (validate($row) && $row->lehrfach_id>-1 && $row->lehrveranstaltung_id>-1)
 	{
 		// SQL vorbereiten (jede LVA vom FAS im VileSci suchen)
-		$sql_query="SELECT * from tbl_lehrveranstaltung where fas_id=".$row->fas_id;
+		$sql_query="SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE tbl_lehreinheitmitarbeiter.ext_id=".$row->fas_id;
 		//echo $sql_query;
 		$res_lva=pg_query($conn, $sql_query);
-		$num_rows_lva=pg_numrows($res_lva);
+		$num_rows_lva=pg_num_rows($res_lva);
 
-		// neue LVA
+		// neue Lehreinheit
 		if ($num_rows_lva==0)
 		{
-			$text.="Die LVA fas-id=$row->fas_id lvnr=$row->lvnr unr=$row->unr wird neu angelegt.\r";
-			$sql_query="INSERT INTO tbl_lehrveranstaltung (lvnr,unr,einheit_kurzbz,lektor,lehrfach_nr,lehrform_kurzbz,";
-			$sql_query.="studiengang_kz,fachbereich_id,semester,verband,gruppe,raumtyp,".
-                        "raumtypalternativ,semesterstunden,stundenblockung,".
-                        "wochenrythmus,start_kw,studiensemester_kurzbz,fas_id,anmerkung) ".
-                        "VALUES('$row->lvnr'".
-						",$row->unr,".
-						(strlen($row->einheit_kurzbz)>0?"'".$row->einheit_kurzbz."'":'NULL').",".
-						"'$row->lektor',".
-						"'$row->lehrfach_nr',".
-						"'$row->lehrform',".
-						"'$row->studiengang_kz',".
-						"$row->fachbereich_id,".
-						"$row->semester,";
-			if ($row->verband==null)
-				$sql_query.='NULL,';
-			else
-				$sql_query.="'$row->verband',";
-			if ($row->gruppe==null)
-				$sql_query.='NULL,';
-			else
-				$sql_query.="'$row->gruppe',";
-			$sql_query.="'$row->raumtyp',".
-						"'$row->raumtypalternativ',".
-						"$row->semesterstunden,".
-						"$row->stundenblockung,".
-						"$row->wochenrythmus,".
-						"$row->start_kw,".
-						"'$row->studiensemester_kurzbz'," .
-						"$row->fas_id,'$row->anmerkung')";
-			//echo $sql_query.'<BR>';
-			if(!$res_insert=@pg_exec($conn, $sql_query))
+			$text.="Die Lehreinheit fas-id=$row->fas_id lvnr=$row->lvnr unr=$row->unr wird neu angelegt.\r";
+			pg_query($conn, 'BEGIN');
+			//Neue Lehreinheit anlegen
+			$sql_query='INSERT INTO lehre.tbl_lehreinheit (lehrveranstaltung_id, studiensemester_kurzbz, lehrfach_id,'.
+						 'lehrform_kurzbz, stundenblockung, wochenrythmus, start_kw, raumtyp, raumtypalternativ, sprache,'.
+						 'lehre, anmerkung, unr, lvnr, updateamum, updatevon, insertamum, insertvon) '.
+                        "VALUES('$row->lehrveranstaltung_id','$row->studiensemester_kurzbz','$row->lehrfach_id',".
+                        "'$row->lehrform',".
+                        "'$row->stundenblockung',".
+                        "'$row->wochenrythmus',".
+                        "'$row->start_kw',".
+                        "'$row->raumtyp',".
+                        "'$row->raumtypalternativ',".
+                        "'German',".
+                        "true,".
+                        "'$row->anmerkung',".
+                        "'$row->unr',".
+                        "'$row->lvnr',".
+                        "now(),'auto', now(),'auto');";
+			echo $sql_query.'<BR>';
+			if(!$res_insert=@pg_query($conn, $sql_query))
 			{
 				$text.=$sql_query;
 				$text.="\nFehler: ".pg_errormessage($conn)."\n";
 				$insert_error++;
+				pg_query($conn, 'ROLLBACK');
 			}
 			else
-				$anz_insert++;
-		}
-		// bestehende LVA
-		elseif ($num_rows_lva==1)
-		{
-			$update_sql='';
-			$row_lva=pg_fetch_object($res_lva,0);
-			//var_dump($row_lva);
-			//if ($row->gruppe==NULL)
-			//	$row->gruppe=1;
-			//echo '-'.$row->lvnr.'-'.$row_lva->lvnr.'-<BR>';
-			if ($row->lvnr!=$row_lva->lvnr)
-				$update_sql.="lvnr='".$row->lvnr."'";
-			elseif ($row->unr!=$row_lva->unr)
-				$update_sql.="unr=".$row->unr;
-			elseif ($row->einheit_kurzbz!=$row_lva->einheit_kurzbz)
-				$update_sql.=(strlen($update_sql)>0?',':'').'einheit_kurzbz='.(strlen($row->einheit_kurzbz)>0?"'".$row->einheit_kurzbz."'":'NULL');
-			elseif ($row->lektor!=$row_lva->lektor)
-				$update_sql.=(strlen($update_sql)>0?',':'')."lektor='".$row->lektor."'";
-			elseif ($row->lehrfach_nr!=$row_lva->lehrfach_nr)
-				$update_sql.=(strlen($update_sql)>0?',':'')."lehrfach_nr=".$row->lehrfach_nr;
-			elseif ($row->lehrform!=$row_lva->lehrform_kurzbz)
-				$update_sql.=(strlen($update_sql)>0?',':'')."lehrform_kurzbz='".$row->lehrform."'";
-			elseif ($row->studiengang_kz!=$row_lva->studiengang_kz)
-				$update_sql.=(strlen($update_sql)>0?',':'')."studiengang_kz=".$row->studiengang_kz;
-			elseif ($row->fachbereich_id!=$row_lva->fachbereich_id)
-				$update_sql.=(strlen($update_sql)>0?',':'')."fachbereich_id=".$row->fachbereich_id;
-			elseif ($row->semester!=$row_lva->semester)
-				$update_sql.=(strlen($update_sql)>0?',':'')."semester=".$row->semester;
-			elseif ($row->verband!=$row_lva->verband)
-				$update_sql.=(strlen($update_sql)>0?',':'')."verband=".(strlen($row->verband)>0?"'".$row->verband."'":'NULL');
-			elseif ($row->gruppe!=$row_lva->gruppe)
-				$update_sql.=(strlen($update_sql)>0?',':'')."gruppe=".(strlen($row->gruppe)>0?"'".$row->gruppe."'":'NULL');
-			elseif ($row->raumtyp!=$row_lva->raumtyp)
-				$update_sql.=(strlen($update_sql)>0?',':'')."raumtyp='".$row->raumtyp."'";
-			elseif ($row->raumtypalternativ!=$row_lva->raumtypalternativ)
-				$update_sql.=(strlen($update_sql)>0?',':'')."raumtypalternativ='".$row->raumtypalternativ."'";
-			elseif ($row->semesterstunden!=$row_lva->semesterstunden)
-				$update_sql.=(strlen($update_sql)>0?',':'')."semesterstunden=".$row->semesterstunden;
-			elseif ($row->stundenblockung!=$row_lva->stundenblockung)
-				$update_sql.=(strlen($update_sql)>0?',':'')."stundenblockung=".$row->stundenblockung;
-			elseif ($row->wochenrythmus!=$row_lva->wochenrythmus)
-				$update_sql.=(strlen($update_sql)>0?',':'')."wochenrythmus=".$row->wochenrythmus;
-			elseif ($row->start_kw!=$row_lva->start_kw)
-				$update_sql.=(strlen($update_sql)>0?',':'')."start_kw=".(strlen($row->start_kw)>0?$row->start_kw:'NULL');
-			elseif ($row->studiensemester_kurzbz!=$row_lva->studiensemester_kurzbz)
-				$update_sql.=(strlen($update_sql)>0?',':'')."studiensemester_kurzbz='".$row->studiensemester_kurzbz."'";
-			elseif ($row->anmerkung!=$row_lva->anmerkung)
-				$update_sql.=(strlen($update_sql)>0?',':'')."anmerkung='".$row->anmerkung."'";
-
-			if (strlen($update_sql)>0)
 			{
-				$text.="Die LVA fas-id=$row->fas_id lvnr=$row->lvnr unr=$row->unr wird upgedatet.\r";
-				$sql_query="UPDATE tbl_lehrveranstaltung SET ".
-						$update_sql.
-						" where fas_id=".$row->fas_id;
-
-				//echo $sql_query.'<BR>';
-				if(!$res_update=@pg_query($conn, $sql_query))
+				//Lehreinheit_id auslesen
+				$sql_query = "SELECT currval('lehre.tbl_lehreinheit_lehreinheit_id_seq') as id";
+				echo $sql_query.'<br>';
+				if(!$row_seq = pg_fetch_object(pg_query($conn, $sql_query)))
 				{
 					$text.=$sql_query;
-                    $text.="\rFehler: ".pg_errormessage($conn)."\r";
-					$update_error++;
+					$text.="\nFehler: Sequence konnte nicht ausgelesen werden\n";
+					$insert_error++;
+					pg_query($conn,'ROLLBACK');
 				}
-				else
-					$anz_update++;
-
-				// ****************
-				// Auch in tbl_stundenplandev updaten
-				$sql_query="SELECT * FROM tbl_stundenplandev WHERE
-					lehrveranstaltung_id=$row_lva->lehrveranstaltung_id AND datum>=now()";
-				//echo $sql_query.'<BR>';
-				if(!$res_upd_stpl=@pg_query($conn, $sql_query))
+				else 
 				{
-					$text.=$sql_query;
-                    $text.="\rFehler: ".pg_errormessage($conn)."\r";
-				}
-				else
-				{
-					if (!pg_query($conn,"BEGIN;"))
-						$text.="\rFehler: ".pg_errormessage($conn)."\r";
-					$kollision=false;
-					while ($row_upd_stpl=pg_fetch_object($res_upd_stpl))
-					{
-						// Lehrstunde auf Kollisionen checken
-						$lehrstunde=new lehrstunde($conn);
-						//echo '<BR>STPL-ID:'.$row_upd_stpl->stundenplandev_id.'<BR>';
-						if (!$lehrstunde->load($row_upd_stpl->stundenplandev_id))
-							echo $lehrstunde->errormsg;
-						$lehrstunde->lektor_uid=$row->lektor;
-						if (!$lehrstunde->kollision())
-						{
-							if (!$lehrstunde->save('sync_fas_lva'))
-								echo $lehrstunde->errormsg;
-						}
-						else
-						{
-							$error_log[$row->studiengang_kz][]=$lehrstunde->errormsg;
-							$text.="\rKollision: ".$lehrstunde->errormsg."\r";
-							$kollision=true;
-							echo "Kollision: ".$lehrstunde->errormsg."<BR>";
-						}
-					}
-					if ($kollision)
-					{
-						if (!pg_query($conn,"ROLLBACK;"))
-							$text.="\rFehler: ".pg_errormessage($conn)."\r";
-					}
+					//Gruppe zuteilen
+					$sql_query = 'INSERT INTO lehre.tbl_lehreinheitgruppe(lehreinheit_id, studiengang_kz,'.
+					             ' semester, verband, gruppe, gruppe_kurzbz, updateamum, updatevon ,insertamum, insertvon)'.
+					             " VALUES('$row_seq->id','$row->studiengang_kz', '$row->semester',";
+					if ($row->verband==null)
+						$sql_query.='NULL,';
 					else
-						if (!pg_query($conn,"COMMIT;"))
-							$text.="\rFehler: ".pg_errormessage($conn)."\r";
+						$sql_query.="'$row->verband',";
+					if ($row->gruppe==null)
+						$sql_query.='NULL,';
+					else
+						$sql_query.="'$row->gruppe',";
+					$sql_query.=(strlen($row->einheit_kurzbz)>0?"'".$row->einheit_kurzbz."'":'NULL').",now(),'auto',now(),'auto');";
+					echo $sql_query.'<br>';
+					if(!pg_query($conn, $sql_query))
+					{
+						$text.=$sql_query;
+						$text.="\nFehler: ".pg_errormessage($conn)."\n";
+						$insert_error++;
+						pg_query($conn, 'ROLLBACK');
+					}
+					else 
+					{
+						//Lektor zuteilen
+						$sql_query = 'INSERT INTO lehre.tbl_lehreinheitmitarbeiter(lehreinheit_id, mitarbeiter_uid,'.
+									 'lehrfunktion_kurzbz, semesterstunden, planstunden, stundensatz, faktor, anmerkung,'.
+									 'bismelden, updateamum, updatevon, insertamum, insertvon, ext_id)'.
+									 " VALUES('$row_seq->id','$row->lektor','lektor','$row->semesterstunden',".
+									 " NULL, NULL, 1, NULL, true, now(), 'auto',now(),'auto', '$row->fas_id');";
+						echo $sql_query.'<br>';
+						if(!pg_query($conn, $sql_query))
+						{
+							$text.=$sql_query;
+							$text.="\nFehler: ".pg_errormessage($conn)."\n";
+							$insert_error++;
+							pg_query($conn, 'ROLLBACK');
+						}
+						else 
+						{
+							pg_query($conn, 'COMMIT');
+							$anz_insert++;
+						}
+					}
 				}
 			}
-		}
+			
+		}		
+		elseif ($num_rows_lva>0)// bestehende Lehreinheit
+		{	
+			$update_sql='';
+			$row_lva=pg_fetch_object($res_lva);
+			
+			$sql_query = "SELECT * FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$row_lva->lehreinheit_id'";
+			if(!$result_le = pg_query($conn, $sql_query))
+			{
+				$update_error++;
+				$text.="\nLehreinheit konnte nicht geladen werden: $sql_query\n";
+			}
+			else 
+			{
+				$row_le = pg_fetch_object($result_le);
+				$update=false;
+				$update_sql='';
+				if ($row->lvnr!=$row_le->lvnr)
+					$update_sql.=(strlen($update_sql)>0?',':'')."lvnr='".$row->lvnr."'";
+				if ($row->unr!=$row_le->unr)
+					$update_sql.=(strlen($update_sql)>0?',':'')."unr=".$row->unr;
+				//if ($row->lehrfach_nr!=$row_le->lehrfach_id)
+				//	$update_sql.=(strlen($update_sql)>0?',':'')."lehrfach_nr=".$row->lehrfach_nr;
+				if ($row->lehrform!=$row_le->lehrform_kurzbz)
+					$update_sql.=(strlen($update_sql)>0?',':'')."lehrform_kurzbz='".$row->lehrform."'";	
+				//if ($row->studiengang_kz!=$row_le->studiengang_kz)
+				//	$update_sql.=(strlen($update_sql)>0?',':'')."studiengang_kz=".$row->studiengang_kz;
+				//if ($row->semester!=$row_le->semester)
+				//	$update_sql.=(strlen($update_sql)>0?',':'')."semester=".$row->semester;
+				if ($row->raumtyp!=$row_le->raumtyp)
+					$update_sql.=(strlen($update_sql)>0?',':'')."raumtyp='".$row->raumtyp."'";
+				if ($row->raumtypalternativ!=$row_le->raumtypalternativ)
+					$update_sql.=(strlen($update_sql)>0?',':'')."raumtypalternativ='".$row->raumtypalternativ."'";	
+				if ($row->stundenblockung!=$row_le->stundenblockung)
+					$update_sql.=(strlen($update_sql)>0?',':'')."stundenblockung=".$row->stundenblockung;
+				if ($row->wochenrythmus!=$row_le->wochenrythmus)
+					$update_sql.=(strlen($update_sql)>0?',':'')."wochenrythmus=".$row->wochenrythmus;
+				if ($row->start_kw!=$row_le->start_kw)
+					$update_sql.=(strlen($update_sql)>0?',':'')."start_kw=".(strlen($row->start_kw)>0?$row->start_kw:'NULL');
+				if ($row->studiensemester_kurzbz!=$row_le->studiensemester_kurzbz)
+					$update_sql.=(strlen($update_sql)>0?',':'')."studiensemester_kurzbz='".$row->studiensemester_kurzbz."'";
+				if ($row->anmerkung!=$row_le->anmerkung)
+					$update_sql.=(strlen($update_sql)>0?',':'')."anmerkung='".$row->anmerkung."'";	
+				
+				if (strlen($update_sql)>0)
+				{				
+					$sql_query="UPDATE lehre.tbl_lehreinheit SET ".
+							$update_sql.
+							" where lehreinheit_id=".$row_le->lehreinheit_id;
+					if(!$res_update=@pg_query($conn, $sql_query))
+					{
+						$text.=$sql_query;
+	                    $text.="\rFehler: ".pg_errormessage($conn)."\r";
+						$update_error++;
+					}
+					else
+						$update=true;
+				}
+				
+				$sql_query = 'SELECT * FROM lehre.tbl_lehreinheitmitarbeiter'.
+				             " WHERE lehreinheit_id='$row_lva->lehreinheit_id' AND mitarbeiter_uid='$row->lektor'";
+				//echo $sql_query.'<br>';
+				if($result_lektor = pg_query($conn, $sql_query))
+				{
+					if(pg_num_rows($result_lektor)>0)
+					{
+						//Update Lehreinheitmitarbeiter
+						$row_lektor = pg_fetch_object($result_lektor);
+						$update_sql='';
+						if ($row->semesterstunden!=$row_lektor->semesterstunden)
+							$update_sql.=(strlen($update_sql)>0?',':'')."semesterstunden=".$row->semesterstunden;
+						
+						if($update_sql!='')
+						{
+							$sql_query = "UPDATE lehre.tbl_lehreinheitmitarbeiter SET $update_sql".
+										" WHERE lehreinheit_id='$row_lva->lehreinheit_id' AND mitarbeiter_uid='$row->lektor'";
+							echo $sql_query.'<br>';
+							if(!pg_query($conn, $sql_query))
+							{
+								$update_error++;
+								$text .=$sql_query;
+								$text.="\nFehler:".pg_errormessage($conn);
+							}
+							else 
+								$update=true;
+						}
+					}
+					else 
+					{
+						//Lehreinheitmitarbeiter Eintrag hinzufuegen
+						$sql_query = 'INSERT INTO lehre.tbl_lehreinheitmitarbeiter(lehreinheit_id, mitarbeiter_uid,'.
+						              'lehrfunktion_kurzbz, semesterstunden, planstunden,'.
+						              'bismelden, updateamum, updatevon, insertamum, insertvon, ext_id)'.
+						              " VALUES('$row_lva->lehreinheit_id', '$row->lektor', 'lektor', '$row->semesterstunden','".
+						              " $row->semesterstunden',true,now(),'auto',now(),'auto','$row->fas_id');";
+						echo $sql_query.'<br>';
+						if(!pg_query($conn, $sql_query))
+						{
+							$text.=$sql_query;
+							$text.="\nFehler:".pg_errormessage($conn);
+							$update_error++;
+						}
+						else 
+							$update=true;
+					}
+				}
+				
+				$sql_query = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row_lva->lehreinheit_id'";
+				if($row->einheit_kurzbz!='')
+				{
+					$sql_query.=" AND gruppe_kurzbz='$row->einheit_kurzbz'";
+				}
+				else 
+				{
+					$sql_query.=" AND studiengang_kz='$row->studiengang_kz' AND semester='$row->semester'";
+					if($row->verband!='')
+						$sql_query.=" AND verband='$row->verband'";
+					if($row->gruppe!='')
+						$sql_query.=" AND gruppe='$row->gruppe'";
+				}
+
+				if($result_gruppen = pg_query($conn, $sql_query))
+				{
+					if(pg_num_rows($result_gruppen)==0)
+					{
+						if($row->einheit_kurzbz!='' && isset($einheit[$row->einheit_kurzbz]))
+						{
+							//Gruppeneintrag hinzuguegen
+							$sql_query = 'INSERT INTO lehre.tbl_lehreinheitgruppe(lehreinheit_id, studiengang_kz, semester,'.
+							             ' verband, gruppe, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon)'.
+							             " VALUES ('$row_lva->lehreinheit_id','$row->studiengang_kz', '$row->semester',".
+							             (strlen($row->verband)>0?"'$row->verband'":'NULL').','.
+							             (strlen($row->gruppe)>0?"'$row->gruppe'":'NULL').','.
+							             (strlen($row->einheit_kurzbz)>0?"'$row->einheit_kurzbz'":'NULL').','.
+							             "now(),'auto', now(),'auto');";
+							echo $sql_query.'<br>';
+							if(pg_query($conn, $sql_query))
+							{
+								$update=true;
+							}
+							else 
+							{
+								$text.=$sql_query;
+								$text.="\nFehler:".pg_errormessage($conn);
+								$update_error++;
+							}							
+						}
+						else 
+						{
+							if(!isset($missing_einheit[$row->einheit_kurzbz]))
+								$missing_einheit[$row->einheit_kurzbz]=1;
+						}
+					}
+				}
+				else 
+				{	
+					$text.=$sql_query;
+					$text.="\nFehler:".pg_errormessage($conn);
+					$update_error++;
+				}
+				
+			
+				if($update)
+				{
+					$text.="Die Lehreinheit fas-id=$row->fas_id lvnr=$row->lvnr unr=$row->unr wurde upgedatet.\r";
+					$anz_update++;
+				}
+				
+					/*
+					// ****************
+					// Auch in tbl_stundenplandev updaten
+					$sql_query="SELECT * FROM tbl_stundenplandev WHERE
+						lehrveranstaltung_id=$row_lva->lehrveranstaltung_id AND datum>=now()";
+					//echo $sql_query.'<BR>';
+					if(!$res_upd_stpl=@pg_query($conn, $sql_query))
+					{
+						$text.=$sql_query;
+	                    $text.="\rFehler: ".pg_errormessage($conn)."\r";
+					}
+					else
+					{
+						if (!pg_query($conn,"BEGIN;"))
+							$text.="\rFehler: ".pg_errormessage($conn)."\r";
+						$kollision=false;
+						while ($row_upd_stpl=pg_fetch_object($res_upd_stpl))
+						{
+							// Lehrstunde auf Kollisionen checken
+							$lehrstunde=new lehrstunde($conn);
+							//echo '<BR>STPL-ID:'.$row_upd_stpl->stundenplandev_id.'<BR>';
+							if (!$lehrstunde->load($row_upd_stpl->stundenplandev_id))
+								echo $lehrstunde->errormsg;
+							$lehrstunde->lektor_uid=$row->lektor;
+							if (!$lehrstunde->kollision())
+							{
+								if (!$lehrstunde->save('sync_fas_lva'))
+									echo $lehrstunde->errormsg;
+							}
+							else
+							{
+								$error_log[$row->studiengang_kz][]=$lehrstunde->errormsg;
+								$text.="\rKollision: ".$lehrstunde->errormsg."\r";
+								$kollision=true;
+								echo "Kollision: ".$lehrstunde->errormsg."<BR>";
+							}
+						}
+						if ($kollision)
+						{
+							if (!pg_query($conn,"ROLLBACK;"))
+								$text.="\rFehler: ".pg_errormessage($conn)."\r";
+						}
+						else
+							if (!pg_query($conn,"COMMIT;"))
+								$text.="\rFehler: ".pg_errormessage($conn)."\r";
+					}*/
+				}			
+			}
 		// LVA kommt mehrmals vor ->Warnung
-		elseif ($num_rows_lva>1)
-		{
-			$text.="\r!!! Die LVA fas_id=$row->fas_id kommt mehrfach vor!\r";
-			$double_error++;
-		}
+		//elseif ($num_rows_lva>1)
+		//{
+		//	$text.="\r!!! Die LVA fas_id=$row->fas_id kommt mehrfach vor!\r";
+		//	$double_error++;
+		//}
 	}
 	else
 		$plausi_error++;
 }
 
 
+
 // ****************
 // Ueberfluessige Datensaetze loeschen
 $whereClause=getSemesterWhereClause();
-$sql_query="DELETE FROM tbl_lehrveranstaltung WHERE fas_id NOT IN
-	(SELECT fas_id FROM vw_fas_lehrveranstaltung WHERE $whereClause) AND (fas_id!=0 OR fas_id IS NOT NULL) AND ($whereClause)";
+$sql_query="SELECT tbl_lehreinheitmitarbeiter.ext_id FROM lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit WHERE tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND $whereClause AND tbl_lehreinheitmitarbeiter.ext_id NOT IN (SELECT fas_id FROM lehre.vw_fas_lehrveranstaltung WHERE ($whereClause) AND (fas_id!=0 OR fas_id IS NOT NULL) AND ($whereClause))";
 echo $sql_query.'<BR>';
-if(!$res_delete=@pg_query($conn, $sql_query))
+$anz_delete=0;
+if($res_delete=pg_query($conn, $sql_query))
 {
-	$text.='\n'.$sql_query;
-    $text.="\rFehler: ".pg_errormessage($conn)."\r";
-    $text.="\rSolution: DELETE FROM tbl_stundenplandev WHERE lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM tbl_lehrveranstaltung WHERE fas_id NOT IN (SELECT fas_id FROM vw_fas_lehrveranstaltung WHERE $whereClause) AND (fas_id!=0 OR fas_id IS NOT NULL) AND ($whereClause))\r";
+	while($row = pg_fetch_object($res_delete))
+	{		
+		$qry = "DELETE FROM lehre.tbl_lehreinheitgruppe WHERE ext_id='$row->ext_id';
+				DELETE FROM lehre.tbl_lehreinheitmitarbeiter WHERE ext_id='$row->ext_id';";
+		$text.="Lehreinheitengruppe und Lehreinheitmitarbeiter mit FAS_ID '$row->ext_id' wird geloescht\n";
+				
+		if(pg_query($conn, $qry))
+		{
+			$anz_delete++;
+			$text.="Lehreinheitengruppe und Lehreinheitmitarbeiter mit FAS_ID '$row->ext_id' wurde geloescht\n";
+		}
+		else 
+		{
+			$text.=$qry;
+			$text.="\nFehler beim loeschen:".pg_errormessage($conn);"\n";
+		}
+	}
 }
 else
-{
-	$anz_delete=pg_numrows($res_delete);
+{	
+	$text.="\n".$sql_query;
+    $text.="\nFehler: ".pg_errormessage($conn)."\n";
 }
+
+
 
 //Ausgabe Zusammenfassung
 $text.="\n$anz_delete Lehrveranstaltungen wurden geloescht!\n";
@@ -496,8 +718,8 @@ $text.="$plausi_error Fehler beim Plausibilitaetscheck!\n";
 $text.="$update_error Fehler bei LVA-Update!\n";
 $text.="$insert_error Fehler bei LVA-Insert!\n";
 $text.="$double_error LVA kommen in VileSci doppelt vor!\n\n";
-$text.="$anz_update LVA wurden upgedatet.\n";
-$text.="$anz_insert LVA wurden neu angelegt.\n\n";
+$text.="$anz_update LE wurden upgedatet.\n";
+$text.="$anz_insert LE wurden neu angelegt.\n\n";
 $text.="\nEND OF SYNCHRONISATION\n";
 
 // Validation error hinzufügen
@@ -510,6 +732,11 @@ while(list($k,$v)=each($error_log))
 // fehlende lehrfächer
 $text.="\n\nFehlende Lehrfächer: \n";
 while(list($k,$v)=each($missing_lehrfaecher))
+{
+	$text.="  $k\n";
+}
+$text.="\n\nFehlende Lehrveranstaltungen: \n";
+while(list($k,$v)=each($missing_lehrveranstaltungen))
 {
 	$text.="  $k\n";
 }
@@ -531,6 +758,7 @@ while(list($k,$v)=each($missing_lehrform))
 {
 	$text.="  $k\n";
 }
+
 if (mail($adress,"FAS Synchro mit VileSci (Lehrveranstaltungen)",$text,"From: vilesci@technikum-wien.at"))
 	$sendmail=true;
 else
@@ -548,11 +776,11 @@ while(list($k,$v)=each($error_log))
 		$stg_text.="$txt\n";
 	echo $stg_text.'<br>';
 	// Studiengang
-	if (!mail($stg_mail[$k],"FAS Synchro mit VileSci (Lehrveranstaltungen) $k",$stg_text,"From: vilesci@technikum-wien.at"))
+	if (!mail($stg_mail[$k],"FAS Synchro mit Portal (Lehrveranstaltungen) $k",$stg_text,"From: vilesci@technikum-wien.at"))
 		echo "Mail an '".$stg_mail[$k]."' konnte nicht verschickt werden!<br>";
 	// Stundenplanstelle
 	echo "<br>Mail an Studiengang $k ($adress_stpl)<br>";
-	if (!mail($adress_stpl,"FAS Synchro mit VileSci (Lehrveranstaltungen) $k",$stg_text,"From: vilesci@technikum-wien.at"))
+	if (!mail($adress_stpl,"FAS Synchro mit Portal (Lehrveranstaltungen) $k",$stg_text,"From: vilesci@technikum-wien.at"))
 		echo 'Mail an "'.$adress_stpl.'" konnte nicht verschickt werden!<br>';
 
 }
@@ -570,15 +798,16 @@ if ($num_rows>0)
 		$mail_text_false.=$row->fas_id.'->'.$row->anzahl."x\n";
 $mail_text.=$mail_text_false."\n\nBitte überprüfen die Daten im FAS!!!";
 if ($mail_text_false!='')
-	if (!mail($adress_fas,"FAS Synchro mit VileSci (Lehrveranstaltungen)",$mail_text,"From: vilesci@technikum-wien.at"))
+	if (!mail($adress_fas,"FAS Synchro mit Portal (Lehrveranstaltungen)",$mail_text,"From: vilesci@technikum-wien.at"))
 		echo "Mail an '".$adress_fas."' konnte nicht verschickt werden!<br>";
 	else
 		echo 'Mail wurde verschickt an '.$adress_fas.'!<br>';
+		
 ?>
 
 <html>
 <head>
-<title>FAS-Synchro mit VileSci</title>
+<title>FAS-Synchro mit PORTAL</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
 <body>
