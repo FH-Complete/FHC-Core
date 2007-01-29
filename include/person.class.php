@@ -355,7 +355,7 @@ class person
 			$qry="SELECT * FROM public.tbl_person WHERE person_id='$this->person_id';";
 			if($result = pg_query($this->conn, $qry))
 			{
-				while($row = pg_fetch_object($result))
+				if($row = pg_fetch_object($result))
 				{
 					$update=false;			
 					if($row->sprache!=$this->sprache) 				$update=true;

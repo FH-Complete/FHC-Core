@@ -123,6 +123,7 @@ if($result = pg_query($conn_fas, $qry))
 								$firma->name=$row->bezeichnung;
 								$firma->anmerkung=null;
 								$firma->ext_id=$row->adresse_pk;
+								$firma->firmentyp_kurzbz='Partnerfirma';
 								$qry3="SELECT firma_id, ext_id FROM tbl_firma WHERE ext_id=".$row->adresse_pk.";";
 								if($result3 = pg_query($conn, $qry3))
 								{

@@ -111,10 +111,11 @@ if($result = pg_query($conn_fas, $qry))
 			$person->geschlecht='m';
 		}
 		$error=false;
+		
 		$qry="SELECT person_id FROM public.tbl_benutzer WHERE uid='$row->uid'";
 		if($resultu = pg_query($conn, $qry))
 		{
-			if(pg_num_rows($resultu)>0) //wenn dieser eintrag schon vorhanden ist
+			if(pg_num_rows($resultu)>0 && $row->uid!='') //wenn dieser eintrag schon vorhanden ist
 			{
 				if($rowu=pg_fetch_object($resultu))
 				{
@@ -151,8 +152,8 @@ if($result = pg_query($conn_fas, $qry))
 					{
 						//vergleich svnr und ersatzkennzeichen
 						$qry="SELECT person_id FROM public.tbl_person 
-							WHERE ('$row->svnr' is not null AND svnr = '$row->svnr') 
-								OR ('$row->ersatzkennzeichen' is not null AND ersatzkennzeichen = '$row->ersatzkennzeichen')";
+							WHERE ('$row->svnr' is not null AND '$row->svnr' <> '' AND svnr = '$row->svnr') 
+								OR ('$row->ersatzkennzeichen' is not null AND '$row->ersatzkennzeichen' <> '' AND ersatzkennzeichen = '$row->ersatzkennzeichen')";
 						if($resultz = pg_query($conn, $qry))
 						{
 							if(pg_num_rows($resultz)>0) //wenn dieser eintrag schon vorhanden ist
@@ -197,7 +198,7 @@ if($result = pg_query($conn_fas, $qry))
 						{
 							$qry='INSERT INTO tbl_syncperson (person_fas, person_portal)'.
 								'VALUES ('.$row->person_pk.', '.$person->person_id.');';
-							$resulti = pg_query($conn, $qry);
+							pg_query($conn, $qry);
 						}
 					}
 					$anzahl_eingefuegt++;
@@ -220,7 +221,7 @@ else
 
 
 //echo nl2br($text);
-echo nl2br($error_log);
+echo nl2br("\n".$error_log);
 echo nl2br("\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
 
 ?>

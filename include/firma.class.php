@@ -26,20 +26,21 @@
 
 class firma
 {
-	var $conn;     // @var resource DB-Handle
-	var $new;       // @var boolean
-	var $errormsg;  // @var string
-	var $result = array(); // @var adresse Objekt
+	var $conn;     			// @var resource DB-Handle
+	var $new;       		// @var boolean
+	var $errormsg;  		// @var string
+	var $result = array(); 	// @var adresse Objekt
 	
 	//Tabellenspalten
-	var $firma_id;		// @var integer
-	var $name;		// @var string
-	var $anmerkung;	// @var string
-	var $ext_id;		// @var integer
-	var $insertamum;	// @var timestamp
-	var $insertvon;	// @var bigint
-	var $updateamum;	// @var timestamp
-	var $updatevon;	// @var bigint
+	var $firma_id;			// @var integer
+	var $name;			// @var string
+	var $anmerkung;		// @var string
+	var $ext_id;			// @var integer
+	var $insertamum;		// @var timestamp
+	var $insertvon;		// @var bigint
+	var $updateamum;		// @var timestamp
+	var $updatevon;		// @var bigint
+	var $firmentyp_kurzbz;	// @var
 	
 	/**
 	 * Konstruktor
@@ -84,14 +85,14 @@ class firma
 				
 		//Gesamtlaenge pruefen
 		//$this->errormsg='Eine der Gesamtlaengen wurde ueberschritten';
-		if(strlen($this->name)>64)
+		if(strlen($this->name)>128)
 		{
-			$this->errormsg = 'Name darf nicht länger als 64 Zeichen sein  - firma_id: '.$row->firma_id;
+			$this->errormsg = 'Name darf nicht länger als 128 Zeichen sein  - firma_id: '.$this->firma_id.'/'.$this->name;
 			return false;
 		}
 		if(strlen($this->anmerkung)>256)
 		{
-			$this->errormsg = 'anmerkung darf nicht länger als 256 Zeichen sein - firma_id: '.$row->firma_id;
+			$this->errormsg = 'Anmerkung darf nicht länger als 256 Zeichen sein - firma_id: '.$this->firma_id.'/'.$this->name;
 			return false;
 		}
 				
@@ -133,13 +134,14 @@ class firma
 			}
 			$this->firma_id = $row->id;
 			
-			$qry='INSERT INTO tbl_firma (firma_id, name, anmerkung, ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
+			$qry='INSERT INTO tbl_firma (firma_id, name, anmerkung, ext_id, insertamum, insertvon, updateamum, updatevon, firmentyp_kurzbz) VALUES('.
 			     $this->addslashes($this->firma_id).', '.
 			     $this->addslashes($this->name).', '.
 			     $this->addslashes($this->anmerkung).', '.
 			     $this->addslashes($this->ext_id).',  now(), '.
 			     $this->addslashes($this->insertvon).', now(), '.
-			     $this->addslashes($this->updatevon).');';			
+			     $this->addslashes($this->updatevon).', '.
+			     $this->addslashes($this->firmentyp_kurzbz).');';			
 		}
 		else
 		{
@@ -158,6 +160,7 @@ class firma
 				'anmerkung='.$this->addslashes($this->anmerkung).', '.  
 			     	'updateamum= now(), '.
 			     	'updatevon='.$this->addslashes($this->updatevon).' '.
+			     	'firmentyp='.$this->addslashes($this->firmentyp_kurzbz).' '.
 				'WHERE firma_id='.$this->addslashes($this->firma_id).';';
 		}
 		//echo $qry;
