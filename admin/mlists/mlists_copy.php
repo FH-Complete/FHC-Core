@@ -2,7 +2,6 @@
 <HEAD>
 <TITLE>Copy mLists</TITLE>
 <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<LINK rel="stylesheet" href="../../../include/styles.css" type="text/css">
 </HEAD>
 
 <BODY class="background_main">
@@ -23,7 +22,7 @@
         pclose($p);
         return $out; 
     }
-	$var="../../../../mlists/copymlists.sh";
+	$var="../../../mlists/copymlists.sh";
     echo mysystem($var);
 ?>
 Verarbeitung erledigt!

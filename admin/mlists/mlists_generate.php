@@ -10,8 +10,9 @@
  * Update: 			14.9.2005 von Christian Paminger
  *****************************************************************************/
 
-include('../../config.inc.php');
-include('../../../include/functions.inc.php');
+include('../../vilesci/config.inc.php');
+include('../../include/functions.inc.php');
+$error_msg='';
 ?>
 
 <HTML>
@@ -27,7 +28,7 @@ include('../../../include/functions.inc.php');
    		$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden.\n';
 
    	// aktuelles Studiensemester ermitteln
-	$sql_query="SELECT studiensemester_kurzbz FROM tbl_studiensemester WHERE start<=now() ORDER BY start DESC LIMIT 1";
+	$sql_query="SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE start<=now() ORDER BY start DESC LIMIT 1";
 	if(!($result=pg_query($conn, $sql_query)))
 		$error_msg.=pg_errormessage($conn);
 	if($row=pg_fetch_object($result))
@@ -41,12 +42,12 @@ include('../../../include/functions.inc.php');
 	// Lektoren holen die nicht mehr in den Verteiler gehoeren
 	echo $mlist_name.' wird abgeglichen!<BR>';
 	flush();
-	$sql_query="SELECT uid FROM tbl_personmailgrp WHERE mailgrp_kurzbz='$mlist_name' AND uid NOT IN (SELECT uid FROM tbl_mitarbeiter WHERE lektor)";
+	$sql_query="SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE lektor)";
 	if(!($result=pg_query($conn, $sql_query)))
 		$error_msg.=pg_errormessage($conn);
 	while($row=pg_fetch_object($result))
 	{
-     	$sql_query="DELETE FROM tbl_personmailgrp WHERE mailgrp_kurzbz='$mlist_name' AND uid='$row->uid'";
+     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
 		if(!pg_query($conn, $sql_query))
 			$error_msg.=pg_errormessage($conn).$sql_query;
 		echo '-';
@@ -54,12 +55,12 @@ include('../../../include/functions.inc.php');
 	}
 	// Lektoren holen die nicht im Verteiler sind
 	echo '<BR>';
-	$sql_query="SELECT uid FROM tbl_mitarbeiter WHERE lektor AND uid NOT LIKE '\\\\_%' AND uid NOT IN (SELECT uid FROM tbl_personmailgrp WHERE mailgrp_kurzbz='$mlist_name')";
+	$sql_query="SELECT mitarbeiter_uid AS uid FROM public.tbl_mitarbeiter WHERE lektor AND mitarbeiter_uid NOT LIKE '\\\\_%' AND mitarbeiter_uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name'))";
 	if(!($result=pg_query($conn, $sql_query)))
 		$error_msg.=pg_errormessage($conn);
 	while($row=pg_fetch_object($result))
 	{
-     	$sql_query="INSERT INTO tbl_personmailgrp VALUES ('$row->uid','$mlist_name', now(), 'mlists_generate.php')";
+     	$sql_query="INSERT INTO public.tbl_benutzergruppe VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
 		if(!pg_query($conn, $sql_query))
 			$error_msg.=pg_errormessage($conn).$sql_query;
 		echo '-';
@@ -72,12 +73,12 @@ include('../../../include/functions.inc.php');
 	// Lektoren holen die nicht mehr in den Verteiler gehoeren
 	echo '<BR>'.$mlist_name.' wird abgeglichen!<BR>';
 	flush();
-	$sql_query="SELECT uid FROM tbl_personmailgrp WHERE mailgrp_kurzbz='$mlist_name' AND uid NOT IN (SELECT uid FROM tbl_mitarbeiter WHERE fixangestellt)";
+	$sql_query="SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE fixangestellt)";
 	if(!($result=pg_query($conn, $sql_query)))
 		$error_msg.=pg_errormessage($conn);
 	while($row=pg_fetch_object($result))
 	{
-     	$sql_query="DELETE FROM tbl_personmailgrp WHERE mailgrp_kurzbz='$mlist_name' AND uid='$row->uid'";
+     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
 		if(!pg_query($conn, $sql_query))
 			$error_msg.=pg_errormessage($conn).$sql_query;
 		echo '-';
@@ -85,12 +86,12 @@ include('../../../include/functions.inc.php');
 	}
 	// Lektoren holen die nicht im Verteiler sind
 	echo '<BR>';
-	$sql_query="SELECT uid FROM tbl_mitarbeiter WHERE fixangestellt AND uid NOT LIKE '\\\\_%' AND uid NOT IN (SELECT uid FROM tbl_personmailgrp WHERE mailgrp_kurzbz='$mlist_name')";
+	$sql_query="SELECT mitarbeiter_uid AS uid FROM public.tbl_mitarbeiter WHERE fixangestellt AND mitarbeiter_uid NOT LIKE '\\\\_%' AND mitarbeiter_uid NOT IN (SELECT uid FROM tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name'))";
 	if(!($result=pg_query($conn, $sql_query)))
 		$error_msg.=pg_errormessage($conn);
 	while($row=pg_fetch_object($result))
 	{
-     	$sql_query="INSERT INTO tbl_personmailgrp VALUES ('$row->uid','$mlist_name', now(), 'mlists_generate.php')";
+     	$sql_query="INSERT INTO public.tbl_benutzergruppe VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
 		if(!pg_query($conn, $sql_query))
 			$error_msg.=pg_errormessage($conn).$sql_query;
 		echo '-';
@@ -103,12 +104,12 @@ include('../../../include/functions.inc.php');
 	// Lektoren holen die nicht mehr in den Verteiler gehoeren
 	echo '<BR>'.$mlist_name.' wird abgeglichen!<BR>';
 	flush();
-	$sql_query="SELECT uid FROM tbl_personmailgrp WHERE mailgrp_kurzbz='$mlist_name' AND uid NOT IN (SELECT uid FROM tbl_mitarbeiter WHERE fixangestellt AND lektor)";
+	$sql_query="SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE fixangestellt AND lektor)";
 	if(!($result=pg_query($conn, $sql_query)))
 		$error_msg.=pg_errormessage($conn);
 	while($row=pg_fetch_object($result))
 	{
-     	$sql_query="DELETE FROM tbl_personmailgrp WHERE mailgrp_kurzbz='$mlist_name' AND uid='$row->uid'";
+     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(mailgrp_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
 		if(!pg_query($conn, $sql_query))
 			$error_msg.=pg_errormessage($conn).$sql_query;
 		echo '-';
@@ -116,12 +117,12 @@ include('../../../include/functions.inc.php');
 	}
 	// Lektoren holen die nicht im Verteiler sind
 	echo '<BR>';
-	$sql_query="SELECT uid FROM tbl_mitarbeiter WHERE fixangestellt AND lektor AND uid NOT LIKE '\\\\_%' AND uid NOT IN (SELECT uid FROM tbl_personmailgrp WHERE mailgrp_kurzbz='$mlist_name')";
+	$sql_query="SELECT mitarbeiter_uid AS uid FROM public.tbl_mitarbeiter WHERE fixangestellt AND lektor AND mitarbeiter_uid NOT LIKE '\\\\_%' AND mitarbeiter_uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name'))";
 	if(!($result=pg_query($conn, $sql_query)))
 		$error_msg.=pg_errormessage($conn);
 	while($row=pg_fetch_object($result))
 	{
-     	$sql_query="INSERT INTO tbl_personmailgrp VALUES ('$row->uid','$mlist_name', now(), 'mlists_generate.php')";
+     	$sql_query="INSERT INTO public.tbl_benutzergruppe VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
 		if(!pg_query($conn, $sql_query))
 			$error_msg.=pg_errormessage($conn).$sql_query;
 		echo '-';
@@ -134,18 +135,22 @@ include('../../../include/functions.inc.php');
 	// Lektoren holen die nicht mehr in den Verteiler gehoeren
 	echo '<BR>Lektoren-Verteiler der Studiengaenge werden abgeglichen!<BR>';
 	flush();
-	$sql_query="SELECT uid,mailgrp_kurzbz FROM tbl_personmailgrp
-		WHERE mailgrp_kurzbz LIKE '%\\\\_lkt' AND mailgrp_kurzbz!='tw_lkt' AND mailgrp_kurzbz!='tw_fix_lkt'
-		AND (uid,mailgrp_kurzbz) NOT IN
-		(SELECT lektor,lower(kurzbz || '_lkt')
-			FROM tbl_lehrveranstaltung NATURAL JOIN tbl_studiengang
-			WHERE studiensemester_kurzbz='$studiensemester' AND lektor NOT LIKE '\\\\_%')";
+	$sql_query="SELECT uid, gruppe_kurzbz FROM public.tbl_benutzergruppe
+		WHERE gruppe_kurzbz LIKE '%\\\\_LKT' AND UPPER(gruppe_kurzbz)!=UPPER('tw_lkt') AND UPPER(gruppe_kurzbz)!=UPPER('tw_fix_lkt')
+		AND (uid,UPPER(gruppe_kurzbz)) NOT IN
+		(SELECT mitarbeiter_uid,UPPER(typ::varchar(1) || tbl_studiengang.kurzbz || '_lkt')
+			FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, tbl_studiengang
+			WHERE 
+			tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
+			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
+			tbl_studiengang.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz AND
+			studiensemester_kurzbz='$studiensemester' AND mitarbeiter_uid NOT LIKE '\\\\_%')";
 	//echo $sql_query;
-	if(!($result=@pg_query($conn, $sql_query)))
+	if(!($result=pg_query($conn, $sql_query)))
 		$error_msg.=pg_errormessage($conn).$sql_query;
 	while($row=pg_fetch_object($result))
 	{
-     	$sql_query="DELETE FROM tbl_personmailgrp WHERE mailgrp_kurzbz='$row->mailgrp_kurzbz' AND uid='$row->uid'";
+     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$row->mailgrp_kurzbz') AND uid='$row->mitarbeiter_uid'";
 		if(!@pg_query($conn, $sql_query))
 			$error_msg.=pg_errormessage($conn).$sql_query;
 		echo '-';
@@ -153,17 +158,40 @@ include('../../../include/functions.inc.php');
 	}
 	// Lektoren holen die noch nicht im Verteiler sind
 	echo '<BR>';
-	$sql_query="SELECT lektor,lower(kurzbz || '_lkt') AS mlist_name FROM tbl_lehrveranstaltung NATURAL JOIN tbl_studiengang
-		WHERE studiensemester_kurzbz='$studiensemester'
-		AND lektor NOT LIKE '\\\\_%' AND kurzbz!='TW' AND (lektor,lower(kurzbz || '_lkt')) NOT IN
-		(SELECT uid,mailgrp_kurzbz FROM tbl_personmailgrp
-			WHERE mailgrp_kurzbz LIKE '%\\\\_lkt' AND mailgrp_kurzbz!='tw_lkt' AND mailgrp_kurzbz!='tw_fix_lkt')";
+	$sql_query="SELECT mitarbeiter_uid, UPPER(typ::varchar(1) || tbl_studiengang.kurzbz || '_lkt') AS mlist_name, tbl_studiengang.studiengang_kz
+		FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_studiengang
+		WHERE 
+		tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
+		tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
+		tbl_studiengang.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz AND	
+		studiensemester_kurzbz='$studiensemester' AND
+		mitarbeiter_uid NOT LIKE '\\\\_%' AND tbl_studiengang.studiengang_kz!=0 AND 
+		(mitarbeiter_uid,UPPER(typ::varchar(1) || tbl_studiengang.kurzbz || '_lkt')) NOT IN
+		(SELECT uid, UPPER(gruppe_kurzbz) FROM public.tbl_benutzergruppe
+			WHERE gruppe_kurzbz LIKE '%\\\\_LKT' AND UPPER(gruppe_kurzbz)!=UPPER('tw_lkt') AND UPPER(gruppe_kurzbz)!=UPPER('tw_fix_lkt'))";
 	//echo $sql_query;
 	if(!($result=pg_query($conn, $sql_query)))
 		$error_msg.=pg_errormessage($conn).$sql_query;
 	while($row=pg_fetch_object($result))
 	{
-     	$sql_query="INSERT INTO tbl_personmailgrp VALUES ('$row->lektor','$row->mlist_name', now(), 'mlists_generate.php')";
+		$sql_query="SELECT * FROM public.tbl_gruppe WHERE gruppe_kurzbz='".strtoupper($row->mlist_name)."'";
+		if($res = pg_query($conn, $sql_query))
+		{
+			if(pg_num_rows($res)<=0)
+			{
+				$sql_query="INSERT INTO public.tbl_gruppe(gruppe_kurzbz, studiengang_kz, semester, bezeichnung, 
+							beschreibung, mailgrp, sichtbar, generiert, aktiv, updateamum, updatevon, 
+							insertamum, insertvon)
+							VALUES('".strtoupper($row->mlist_name)."',$row->studiengang_kz, 0,'$row->mlist_name',".
+							"'$row->mlist_name', true, true, true, true, now(),'mlists_generate',now(), 'mlists_generate');";
+				if(!pg_query($conn, $sql_query))
+					echo "<br>Fehler beim Anlegen der Gruppe: $sql_query<br>";
+			}
+		}
+		else 
+			echo "<br>Fehler:$sql_query";
+		
+     	$sql_query="INSERT INTO public.tbl_benutzergruppe VALUES ('$row->mitarbeiter_uid','".strtoupper($row->mlist_name)."', now(), 'mlists_generate')";
 		if(!pg_query($conn, $sql_query))
 			$error_msg.=pg_errormessage($conn).$sql_query;
 		echo '-';
@@ -174,9 +202,13 @@ include('../../../include/functions.inc.php');
 	// **************************************************************
 	// Studentenverteiler abgleichen
 	// Studenten holen die nicht mehr in den Verteiler gehoeren
+	/*
 	echo '<BR>Studenten-Verteiler werden abgeglichen!<BR>';
 	flush();
-	$sql_query="SELECT mailgrp_kurzbz,uid FROM tbl_personmailgrp NATURAL JOIN tbl_einheit WHERE (uid, mailgrp_kurzbz) NOT IN (SELECT uid, mailgrp_kurzbz FROM tbl_einheitstudent NATURAL JOIN tbl_einheit WHERE mailgrp_kurzbz IS NOT NULL)";
+	$sql_query="SELECT gruppe_kurzbz, uid FROM public.tbl_benutzergruppe NATURAL JOIN tbl_einheit 
+	            WHERE (uid, mailgrp_kurzbz) NOT IN 
+	            (SELECT uid, mailgrp_kurzbz FROM tbl_einheitstudent NATURAL JOIN tbl_einheit 
+	            	WHERE mailgrp_kurzbz IS NOT NULL)";
 
 
 	//echo $sql_query;
@@ -205,7 +237,7 @@ include('../../../include/functions.inc.php');
 		echo '-';
 		flush();
 	}
-
+	*/
 
 	echo $error_msg;
 	?>

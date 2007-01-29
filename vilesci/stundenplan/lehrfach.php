@@ -1,8 +1,7 @@
 <?php
-include('../config.inc.php');
-include('../../include/fachbereich.class.php');
-include('../../include/studiengang.class.php');
-
+require_once('../config.inc.php');
+require_once('../../include/fachbereich.class.php');
+require_once('../../include/studiengang.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
    die("Konnte Verbindung zur Datenbank nicht herstellen");

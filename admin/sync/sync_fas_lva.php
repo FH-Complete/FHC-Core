@@ -682,7 +682,7 @@ for ($i=0;$i<$num_rows;$i++)
 // Ueberfluessige Datensaetze loeschen
 $whereClause=getSemesterWhereClause();
 $sql_query="SELECT tbl_lehreinheitmitarbeiter.ext_id FROM lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit WHERE tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND $whereClause AND tbl_lehreinheitmitarbeiter.ext_id NOT IN (SELECT fas_id FROM lehre.vw_fas_lehrveranstaltung WHERE ($whereClause) AND (fas_id!=0 OR fas_id IS NOT NULL) AND ($whereClause))";
-echo $sql_query.'<BR>';
+//echo $sql_query.'<BR>';
 $anz_delete=0;
 if($res_delete=pg_query($conn, $sql_query))
 {
