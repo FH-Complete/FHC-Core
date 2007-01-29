@@ -104,7 +104,7 @@ if($result = pg_query($conn_fas, $qry))
 						"VALUES ('".$row->schluessel_pk."', '".$schluesseltyp->schluesseltyp."');";
 					$resulti = pg_query($conn, $qry);
 				}
-					}
+			}
 			
 			$anzahl_eingefuegt++;
 		}		

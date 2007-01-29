@@ -93,7 +93,7 @@ class aufmerksamdurch
 		{
 			//Neuen Datensatz einfuegen
 					
-			$qry='INSERT INTO tbl_aufmerksamdurch (aufmerksamdurch_kurzbz, beschreibung) VALUES('.
+			$qry='INSERT INTO tbl_aufmerksamdurch (aufmerksamdurch_kurzbz, beschreibung, ext_id) VALUES('.
 			     $this->addslashes($this->aufmerksamdurch_kurzbz).', '.
 			     $this->addslashes($this->beschreibung).', '.
 			     $this->addslashes($this->ext_id).');';

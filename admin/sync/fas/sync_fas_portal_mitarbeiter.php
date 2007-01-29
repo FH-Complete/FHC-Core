@@ -99,7 +99,14 @@ if($result = pg_query($conn_fas, $qry))
 			$mitarbeiter->ext_id_mitarbeiter=$row->mitarbeiter_pk;
 			$mitarbeiter->kurzbz=$row->kurzbez;
 			$mitarbeiter->uid=$row->uid;
-			$mitarbeiter->ausbildungcode=$row->ausbildung;
+			if($row->ausbildung>0)
+			{
+				$mitarbeiter->ausbildungcode=$row->ausbildung;
+			}
+			else 
+			{
+				$mitarbeiter->ausbildungscode=null;
+			}
 			$mitarbeiter->personalnummer=$row->persnr;
 			
 			$mitarbeiter->gebzeit='';

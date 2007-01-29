@@ -1,20 +1,5 @@
 <?php
-/* Copyright (C) 2007 Technikum-Wien
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
- *
+/* Copyright (C) 2007 
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
@@ -24,6 +9,7 @@
  *
 */
 require_once('../../../vilesci/config.inc.php');
+require_once('../../../include/datum.class.php');
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
@@ -50,6 +36,7 @@ $anzahl_benutzer=0;
 $anzahl_fehler_benutzer=0;
 $anzahl_nichtstudenten=0;
 $rolle_kurzbz=array(1=>"Interessent", 2=>"Bewerber", 3=>"Student", 4=>"Ausserordentlicher", 5=>"Abgewiesener", 6=>"Aufgenommener", 7=>"Wartender", 8=>"Abbrecher", 9=>"Unterbrecher", 10=>"Outgoing", 11=>"Incoming", 12=>"Praktikant", 13=>"Diplomant", 14=>"Absolvent");
+$studiensemester_kurzbz=array(2=>"wS2002",3=>"SS2003",4=>"WS2003",5=>"SS2004",6=>"WS2004",7=>"SS2005",8=>"WS2005",9=>"SS2006",10=>"WS2006",11=>"SS2007",12=>"WS2007",13=>"SS2008",14=>"WS2008");
 
 function myaddslashes($var)
 {
@@ -71,7 +58,7 @@ function myaddslashes($var)
 
 //Mitarbeiter
 $qry = "SELECT * FROM person JOIN student ON person_fk=person_pk WHERE uid NOT LIKE '\_dummy%' ORDER BY uid desc";
-
+$datum_obj=new datum();
 if($result = pg_query($conn_fas, $qry))
 {
 	echo nl2br("\n Sync Student\n--------------\n\n");
@@ -82,7 +69,7 @@ if($result = pg_query($conn_fas, $qry))
 		flush();
 		
 		$error_log='';
-		$text='';
+		//$text='';
 		$error=false;
 		//Attribute Person
 		$staatsbuergerschaft=$row->staatsbuergerschaft;
@@ -247,11 +234,11 @@ if($result = pg_query($conn_fas, $qry))
 		//Reihenfolge: person - prestudent - student - benutzer
 		
 		//insert oder update bei person?
-		$qry="SELECT person_id FROM public.tbl_person WHERE uid='$row->uid'";
+		$qry="SELECT person_id FROM public.tbl_benutzer WHERE uid='$row->uid'";
 
 		if($resultu = pg_query($conn, $qry))
 		{
-			if(pg_num_rows($resultu)>0) //wenn dieser eintrag schon vorhanden ist
+			if(pg_num_rows($resultu)>0 && $row->uid!='') //wenn dieser eintrag schon vorhanden ist
 			{
 				if($rowu=pg_fetch_object($resultu))
 				{
@@ -268,14 +255,14 @@ if($result = pg_query($conn_fas, $qry))
 			else 
 			{
 				$qry="SELECT person_fas, person_portal FROM public.tbl_syncperson WHERE person_fas='$row->person_pk'";
-				if($result_sync = pg_query($conn, $qry))
+				if($result_sync1 = pg_query($conn, $qry))
 				{
-					if(pg_num_rows($result_sync)>0) //wenn dieser eintrag schon vorhanden ist
+					if(pg_num_rows($result_sync1)>0) //wenn dieser eintrag schon vorhanden ist
 					{
-						if($row_sync1=pg_fetch_object($result_sync))
+						if($row_sync1=pg_fetch_object($result_sync1))
 						{ 
 							//update
-							$person_id=$row_sync->person_portal;
+							$person_id=$row_sync1->person_portal;
 							$new_person=false;
 						}
 						else 
@@ -288,8 +275,8 @@ if($result = pg_query($conn_fas, $qry))
 					{
 						//vergleich svnr und ersatzkennzeichen
 						$qry="SELECT person_id FROM public.tbl_person 
-							WHERE ('$row->svnr' is not null AND svnr = '$row->svnr') 
-								OR ('$row->ersatzkennzeichen' is not null AND ersatzkennzeichen = '$row->ersatzkennzeichen')";
+							WHERE ('$row->svnr' is not null AND '$row->svnr'<> '' AND svnr = '$row->svnr') 
+								OR ('$row->ersatzkennzeichen' is not null AND '$row->ersatzkennzeichen' <> '' AND ersatzkennzeichen = '$row->ersatzkennzeichen')";
 						if($resultz = pg_query($conn, $qry))
 						{
 							if(pg_num_rows($resultz)>0) //wenn dieser eintrag schon vorhanden ist
@@ -437,13 +424,13 @@ if($result = pg_query($conn_fas, $qry))
 				}
 			}			
 			//Eintrag Synctabelle
-			$qryz="SELECT person_fas FROM tbl_syncperson WHERE person_fas='$row->person_pk' AND person_portal='$person->person_id'";
+			$qryz="SELECT person_fas FROM tbl_syncperson WHERE person_fas='$row->person_pk' AND person_portal='$person_id'";
 			if($resultz = pg_query($conn, $qryz))
 			{
 				if(pg_num_rows($resultz)==0) //wenn dieser eintrag noch nicht vorhanden ist
 				{
 					$qry='INSERT INTO tbl_syncperson (person_fas, person_portal)'.
-						'VALUES ('.$row->person_pk.', '.$person->person_id.');';
+						'VALUES ('.$row->person_pk.', '.$person_id.');';
 					$resulti = pg_query($conn, $qry);
 				}
 			}
@@ -731,26 +718,35 @@ if($result = pg_query($conn_fas, $qry))
 				}
 				//presetudentrolle
 				
-				$qry="SELECT * FROM student_ausbildungssemester where student='$student_uid';";
+				$qry="SELECT * FROM student_ausbildungssemester where student_fk='$ext_id_student';";
 				if($resultru = pg_query($conn_fas, $qry))
 				{
 					while($rowru=pg_fetch_object($resultru))
 					{
-						$date = date('Y-m-d',mktime_fromtimestamp($rowru->creationdate));
-						$status=$rowru->status;
-						$qry="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='$prestudent_id' AND rolle_kurzbz='$rolle_kurzbz[$status]' AND ausbildungssemsester='$rowru->ausbildungssemester';";
-						if($resultu = pg_query($conn, $qry))
+						$qry="SELECT semester FROM ausbildungssemester WHERE ausbildungssemester_pk='$rowru->ausbildungssemester_fk'";
+						if($resultr = pg_query($conn_fas, $qry))
 						{
-							if(!pg_num_rows($resultu)>0) //wenn dieser eintrag noch nicht vorhanden ist
+							while($rowr=pg_fetch_object($resultr))
 							{
-								if($rowu=pg_fetch_object($resultu))
+								$ausbildungssemester=$rowr->semester;
+								$date = date('Y-m-d', $datum_obj->mktime_fromtimestamp($rowru->creationdate));
+								$status=$rowru->status;
+								$stm=$rowru->studiensemester_fk;
+								$qry="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='$prestudent_id' AND rolle_kurzbz='$rolle_kurzbz[$status]' AND studiensemester_kurzbz='$studiensemester_kurzbz[$stm]' AND ausbildungssemester='$ausbildungssemester';";
+								if($resultu = pg_query($conn, $qry))
 								{
-									$qry="INSERT INTO public_tbl_prestudentenrolle (prestudent_id, rolle_kurzbz, studiensemester_kurzbz, 
-										ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id)
-										SET('$prestudent_id', '$rolle_kurzbz[$status]', '$rowru->studiensemester_kurzbz', '$rowru->ausbildungssemester', '$datum',
-										now(),'SYNC',now(),'SYNC', '$rowru->student_ausbildungssemester_pk')";
-									pg_query($conn, $qry);
-									echo "rolle: ".$qry;
+									if(!pg_num_rows($resultu)>0) //wenn dieser eintrag noch nicht vorhanden ist
+									{
+										if($rowu=pg_fetch_object($resultu))
+										{
+											$qry="INSERT INTO public_tbl_prestudentenrolle (prestudent_id, rolle_kurzbz, studiensemester_kurzbz, 
+												ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id)
+												SET('$prestudent_id', '$rolle_kurzbz[$status]', '$studiensemester_kurzbz[$stm]', '$ausbildungssemester', '$datum',
+												now(),'SYNC',now(),'SYNC', '$rowru->student_ausbildungssemester_pk')";
+											pg_query($conn, $qry);
+											echo "rolle: ".$qry;
+										}
+									}
 								}
 							}
 						}
