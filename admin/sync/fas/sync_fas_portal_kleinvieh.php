@@ -1,20 +1,6 @@
 <?php
 /* Copyright (C) 2007 Technikum-Wien
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
- *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
@@ -143,8 +129,8 @@ pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz,
 pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','145','Diplomingenieurin (FH) für technisch-wissenschaftliche Berufe','w');");
 pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','182','Diplomingenieur (FH) für technisch-wissenschaftliche Berufe','m');");
 pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','182','Diplomingenieurin (FH) für technisch-wissenschaftliche Berufe','w');");
-pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','203','Diplomingenieur (FH) für technisch-wissenschaftliche Berufe','m');");
-pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','203','Diplomingenieurin (FH) für technisch-wissenschaftliche Berufe','w');");
+//pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','203','Diplomingenieur (FH) für technisch-wissenschaftliche Berufe','m');");
+//pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','203','Diplomingenieurin (FH) für technisch-wissenschaftliche Berufe','w');");
 pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','204','Diplomingenieur (FH) für technisch-wissenschaftliche Berufe','m');");
 pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','204','Diplomingenieurin (FH) für technisch-wissenschaftliche Berufe','w');");
 pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','222','Diplomingenieur (FH) für technisch-wissenschaftliche Berufe','m');");
@@ -259,7 +245,7 @@ pg_query($conn,"INSERT INTO bis.tbl_verwendung(verwendung_code, verwendungbez) V
 pg_query($conn,"INSERT INTO bis.tbl_verwendung(verwendung_code, verwendungbez) VALUES ('7','Management (Scool Level Management');");
 pg_query($conn,"INSERT INTO bis.tbl_verwendung(verwendung_code, verwendungbez) VALUES ('8','Verwaltung (Scool Level Administrative Personnel');");
 pg_query($conn,"INSERT INTO bis.tbl_verwendung(verwendung_code, verwendungbez) VALUES ('9','Hauspersonal, Gebäude-/Hautechnik (Maintainance and Operations Personnel');");
-ECHO NL2BR ( "\verwendung synchronisiert");
+ECHO NL2BR ( "\nverwendung synchronisiert");
 
 pg_query($conn,"INSERT INTO bis.tbl_besqual(besqualcode, besqualbez) VALUES ('0','Keine');");
 pg_query($conn,"INSERT INTO bis.tbl_besqual(besqualcode, besqualbez) VALUES ('1','Habilitation');");

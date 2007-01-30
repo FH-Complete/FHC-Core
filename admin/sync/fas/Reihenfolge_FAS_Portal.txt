@@ -1,0 +1,16 @@
+kleinvieh
+nation
+syncperson und syncschluesseltyp anlegen
+person
+mitarbeiter
+adresse
+email
+telefon
+schluesseltyp
+schluessel
+fachbereich
+reihungstest
+aufmerksamdurch
+studiengang
+akadgrad
+student
