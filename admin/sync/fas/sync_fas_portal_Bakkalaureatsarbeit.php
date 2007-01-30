@@ -1,20 +1,6 @@
 <?php
 /* Copyright (C) 2007 Technikum-Wien
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
- *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
@@ -81,38 +67,45 @@ if($result = pg_query($conn_fas, $qry))
 		$projektarbeit->punkte		=$row->punkte;
 		$projektarbeit->beginn		='';
 		$projektarbeit->ende		=$row->datum;
-		$projektarbeit->faktor		='';
-		$projektarbeit->freigegeben	='';
+		$projektarbeit->faktor		='1.0';
+		$projektarbeit->freigegeben	=$row->gesperrtbis==null?true:false;
 		$projektarbeit->gesperrtbis		=$row->gesperrtbis;
 		$projektarbeit->stundensatz	=$row->betreuerstundenhonorar;
 		$projektarbeit->gesamtstunden	='';
-		$projektarbeit->themenbereich	='';
+		$projektarbeit->themenbereich	=$row->themenbereich;
 		$projektarbeit->anmerkung		='';		
-		//$reihungstest->updateamum	=$row->;
-		$reihungstest->updatevon		="SYNC";
-		//$reihungstest->insertamum	=$row->;
-		$reihungstest->insertvon		="SYNC";
-		$reihungstest->ext_id		=$row->bakkalaureatsarbeit_pk;
+		//$projektarbeit->updateamum	=$row->;
+		$projektarbeit->updatevon		="SYNC";
+		//$projektarbeit->insertamum	=$row->;
+		$projektarbeit->insertvon		="SYNC";
+		$projektarbeit->ext_id		=$row->bakkalaureatsarbeit_pk;
 		
-		//lehreinheit_id, student_uid, firma_id ermitteln
+		//lehreinheit_id ermitteln
 		//projektbetreuer = betreuer, begutachter
-
-		$qry2="SELECT projektarbeit_id, ext_id FROM tbl_reihungstest WHERE ext_id=".$row->bakkalaureatsareit_pk.";";
-		if($result2 = pg_query($conn, $qry2))
+		$qry="SELECT uid FROM student WHERE student_pk=".$row->student_fk.";";
+		if($resultu = pg_query($conn_fas, $qry))
 		{
-			if(pg_num_rows($result2)>0) //eintrag gefunden
-			{
-				if($row2=pg_fetch_object($result2))
-				{ 
-					// update, wenn datensatz bereits vorhanden
-					$projektarbeit->new=false;
-					$projektarbeit->projektarbeit_id=$row2->projektarbeit_id;
+			if($rowu=pg_fetch_object($resultu))
+			{ 
+				$projektarbeit->student_uid=$rowu->uid;
+				$qry2="SELECT projektarbeit_id, ext_id FROM tbl_reihungstest WHERE ext_id=".$row->bakkalaureatsareit_pk.";";
+				if($result2 = pg_query($conn, $qry2))
+				{
+					if(pg_num_rows($result2)>0) //eintrag gefunden
+					{
+						if($row2=pg_fetch_object($result2))
+						{ 
+							// update, wenn datensatz bereits vorhanden
+							$projektarbeit->new=false;
+							$projektarbeit->projektarbeit_id=$row2->projektarbeit_id;
+						}
+					}
+					else 
+					{
+						// insert, wenn datensatz noch nicht vorhanden
+						$projektarbeit->new=true;	
+					}
 				}
-			}
-			else 
-			{
-				// insert, wenn datensatz noch nicht vorhanden
-				$projektarbeit->new=true;	
 			}
 		}
 				
