@@ -72,8 +72,10 @@ class fachbereich
 			$fachb_obj = new fachbereich($this->conn);
 			
 			$fachb_obj->fachbereich_kurzbz 	= $row->fachbereich_kurzbz;
-			$fachb_obj->erhalter_id   		= $row->erhalter_fk;
-			$fachb_obj->name           		= $row->name;
+			$fachb_obj->bezeichnung = $row->bezeichnung;
+			$fachb_obj->farbe = $row->farbe;
+			$fachb_obj->studiengang_kz = $row->studiengang_kz;
+			$fachb_obj->ext_id = $row->ext_id;
 			
 			$this->result[] = $fachb_obj;
 		}
@@ -93,7 +95,7 @@ class fachbereich
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_fachbereich WHERE fachbereich_kurzbz = '$fachbereich_kurzbz';";
+		$qry = "SELECT * FROM public.tbl_fachbereich WHERE fachbereich_kurzbz = '".addslashes($fachbereich_kurzbz)."';";
 		
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -104,8 +106,10 @@ class fachbereich
 		if($row=pg_fetch_object($res))
 		{
 			$this->fachbereich_kurzbz 	= $row->fachbereich_kurzbz;
-			$this->erhalter_id    		= $row->erhalter_fk;
-			$this->name           		= $row->name;
+			$this->bezeichnung = $row->bezeichnung;
+			$this->farbe = $row->farbe;
+			$this->studiengang_kz = $row->studiengang_kz;
+			$this->ext_id = $row->ext_id;
 		}
 		else 
 		{

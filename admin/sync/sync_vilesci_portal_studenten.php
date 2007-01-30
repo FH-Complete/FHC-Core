@@ -93,8 +93,8 @@ if($result = pg_query($conn_vilesci, $qry))
 		$student->prestudent_id='';
 		$student->studiengang_kz=$row->studiengang_kz;
 		$student->semester=$row->semester;
-		$student->verband=$row->verband;
-		$student->gruppe=$row->gruppe;
+		$student->verband=($row->verband!=''?$row->verband:' ');
+		$student->gruppe=($row->gruppe!=''?$row->gruppe:' ');
 		
 		$qry = "SELECT person_id FROM tbl_benutzer WHERE uid='$row->uid'";
 		if($result1 = pg_query($conn, $qry))
