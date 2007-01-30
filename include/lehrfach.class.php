@@ -186,7 +186,8 @@ class lehrfach
 		{
 			$qry = 'INSERT INTO lehre.tbl_lehrfach (lehrfach_id, studiengang_kz, fachbereich_kurzbz, kurzbz, 
 			                                  bezeichnung, farbe, aktiv, semester, sprache)
-			        VALUES('.$this->addslashes($this->lehrfach_id).','.
+			        VALUES('.
+					($this->lehrfach_id!=''?$this->addslashes($this->lehrfach_id):"nextval('lehre.tbl_lehrfach_lehrfach_id_seq')").','. // HuschPfusch 4 Syncro
 					$this->addslashes($this->studiengang_kz).','.
 					$this->addslashes($this->fachbereich_kurzbz).','.
 					$this->addslashes($this->kurzbz).','.
@@ -199,9 +200,9 @@ class lehrfach
 		else
 		{
 			//lehrfach_nr auf Gueltigkeit pruefen
-			if(!is_numeric($this->lehrfach_nr))
+			if(!is_numeric($this->lehrfach_id))
 			{
-				$this->errormsg = 'Lehrfach_nr muss eine gueltige Zahl sein';
+				$this->errormsg = 'Lehrfach_id muss eine gueltige Zahl sein';
 				return false;
 			}
 
