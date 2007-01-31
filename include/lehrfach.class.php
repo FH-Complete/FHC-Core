@@ -229,5 +229,64 @@ class lehrfach
 			return false;
 		}
 	}
+	
+	/**
+	 * Liefert die Tabellenelemente die den Kriterien der Parameter entsprechen
+	 * @param 	$stg Studiengangs_kz
+	 *			$sem Semester
+	 *			$order Sortierkriterium
+	 *			$fachb fachbereichs_id
+	 * @return array mit Fachbereichen oder false=fehler
+	 */
+	function getTab($stg='-1',$sem='-1', $order='lehrfach_id', $fachb='-1',$lehre='')
+	{
+
+		$sql_query = "SELECT * FROM lehre.tbl_lehrfach";
+
+		if($stg!=-1 || $sem!=-1 || $fachb!=-1)
+		   $sql_query .= " WHERE true";
+
+		if($stg!=-1)
+		   $sql_query .= " AND studiengang_kz='$stg'";
+
+		if($sem!=-1)
+			$sql_query .= " AND semester='$sem'";
+
+		if($fachb!=-1)
+			$sql_query .= " AND fachbereich_kurzbz='$fachb'";
+		
+		if($lehre!='')
+			$sql_query .= " AND lehre=$lehre";
+		
+		$sql_query .= " ORDER BY $order";
+		
+		if($result=pg_query($this->conn,$sql_query))
+		{
+			while($row=pg_fetch_object($result))
+			{
+				$l = new lehrfach($this->conn);
+				$l->lehrfach_id = $row->lehrfach_id;
+				$l->fachbereich_kurzbz = $row->fachbereich_kurzbz;
+				$l->kurzbz = $row->kurzbz;
+				$l->bezeichnung = $row->bezeichnung;
+				$l->farbe = $row->farbe;				
+				$l->aktiv = $row->aktiv;				
+				$l->studiengang_kz = $row->studiengang_kz;
+				$l->semester = $row->semester;
+				$l->sprache = $row->sprache;
+				$l->updateamum = $row->updateamum;
+				$l->updatevon = $row->updatevon;
+				$l->insertamum = $row->insertamum;
+				$l->insertvon = $row->insertvon;	
+				$this->lehrfaecher[]=$l;
+			}
+		}
+		else
+		{
+			$this->errormsg = pg_errormessage($this->conn);
+			return false;
+		}
+		return true;
+	}
 }
 ?>

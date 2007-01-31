@@ -73,8 +73,8 @@ class lehrform
 		
 		if($row = pg_fetch_object($result))
 		{
-			$this->lehrform_kurbz = $row->lehrform_kurzbz;
-			$this->bezeichnung = $row->bezeichung;
+			$this->lehrform_kurzbz = $row->lehrform_kurzbz;
+			$this->bezeichnung = $row->bezeichnung;
 			$this->verplanen = ($row->verplanen?true:false);
 		}
 		else
@@ -85,6 +85,32 @@ class lehrform
 		
 		return true;
 		
+	}
+	
+	// ***************************
+	// * Liefert alle Lehrformen
+	// ***************************
+	function getAll()
+	{
+		$qry = "SELECT * FROM lehre.tbl_lehrform ORDER BY lehrform_kurzbz";
+		if(!$result=pg_query($this->conn,$qry))
+		{
+			$this->errormsg = 'Fehler beim lesen der Lehrform';
+			return false;
+		}
+		
+		while($row = pg_fetch_object($result))
+		{
+			$lf = new lehrform($this->conn);
+				
+			$lf->lehrform_kurzbz = $row->lehrform_kurzbz;
+			$lf->bezeichnung = $row->bezeichnung;
+			$lf->verplanen = ($row->verplanen?true:false);
+		
+			$this->lehrform[] = $lf;
+		}
+		
+		return true;
 	}
 	
 	// *******************************************

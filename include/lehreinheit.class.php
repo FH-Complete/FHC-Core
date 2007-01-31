@@ -382,7 +382,7 @@ class lehreinheit
 		else
 		{
 			$qry = 'UPDATE lehre.tbl_lehreinheit SET'.
-			       ' lehrveranstaltung_nr='.$this->addslashes($this->lehrveranstaltung_id).','.
+			       ' lehrveranstaltung_id='.$this->addslashes($this->lehrveranstaltung_id).','.
 			       ' studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).','.
 			       ' lehrfach_id='.$this->addslashes($this->lehrfach_id).','.
 			       ' lehrform_kurzbz='.$this->addslashes($this->lehrform_kurzbz).','.
@@ -593,5 +593,26 @@ class lehreinheit
 		}
 		return $l;
 	}
+	
+	// ***************************
+	// * Loescht eine Lehreinheit
+	// ***************************
+	function delete($lehreinheit_id)
+	{
+		if(!is_numeric($lehreinheit_id))
+		{
+			$this->errormsg = 'Lehreinheit_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		$qry = "DELETE FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$lehreinheit_id'";
+		if(pg_query($this->conn, $qry))
+			return true;
+		else 
+		{
+			$this->errormsg = pg_last_error($conn);
+			return false;
+		}
+	}
+	
 }
 ?>
