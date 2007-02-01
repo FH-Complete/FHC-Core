@@ -1,10 +1,9 @@
 <?php
-	include('../config.inc.php');
-	include('../../include/functions.inc.php');
-	include('../../include/person.class.php');
-	include('../../include/mitarbeiter.class.php');
-
-    
+	require_once('../config.inc.php');
+	require_once('../../include/functions.inc.php');
+	require_once('../../include/person.class.php');
+	require_once('../../include/benutzer.class.php');
+	require_once('../../include/mitarbeiter.class.php');
 ?>
 <html>
 <head>
@@ -15,7 +14,7 @@
 <body class="background_main">
 <?php
 if(!$conn = pg_pconnect(CONN_STRING))
-       die ("Fehler beim Herstellen der DB Connection");
+       die ('Fehler beim Herstellen der DB Connection');
 
 	if (isset($_POST['Save']))
 	{
@@ -45,8 +44,10 @@ function doSAVE($conn)
 	if ($_POST['new']==1)
 	{
 		$lektor->new=true;
-	} else
+	} 
+	else
 	{
+		$lektor->load($_POST['uid']);
 		$lektor->new=false;
 	}
 	// person
@@ -93,15 +94,18 @@ function doEDIT($conn,$id='',$new=false,$msg='')
 {
 	// Mitarbeiterdaten holen
 	$lektor = new mitarbeiter($conn);
+	$status_ok=false;
 	if (!$new)
 	{
 		$status_ok=$lektor->load(addslashes($id));
 	}
+	
 	if (!$status_ok && !$new)
 	{
 		// Laden fehlgeschlagen
 		echo $lektor->errormsg;
-	} else
+	} 
+	else
 	{
 ?>
 
@@ -113,27 +117,26 @@ if (strlen($msg)>0) echo $msg."<br/>";
 <table border="0">
 <tr><td>UID</td><td><input type="text" name="uid" value="<?php echo $lektor->uid; ?>"></td></tr>
 <tr><td>Personalnummer</td><td><input type="text" name="personalnummer" value="<?php echo $lektor->personalnummer; ?>"></td></tr>
-<tr><td>Titel</td><td><input type="text" name="titel" value="<?php echo $lektor->titel; ?>"></td></tr>
-<tr><td>Vornamen</td><td><input type="text" name="vornamen" value="<?php echo $lektor->vornamen; ?>"></td></tr>
+<tr><td>Titel</td><td><input type="text" name="titel" value="<?php echo $lektor->titelpre; ?>"></td></tr>
+<tr><td>Vornamen</td><td><input type="text" name="vornamen" value="<?php echo $lektor->vorname; ?>"></td></tr>
 <tr><td>Nachname</td><td><input type="text" name="nachname" value="<?php echo $lektor->nachname; ?>"></td></tr>
 <tr><td>Lektor</td><td><input type="checkbox" name="lektor" value="1" <?php   echo ($lektor->lektor?'checked':'') ?> ></td></tr>
 <tr><td>Aktiv</td><td><input type="checkbox" name="aktiv" value="1" <?php   echo ($lektor->aktiv?'checked':'') ?> ></td></tr>
 <tr><td>Geburtsdatum</td><td><input type="text" name="gebdatum" value="<?php echo $lektor->gebdatum; ?>"> (TT.MM.JJJJ)</td></tr>
 <tr><td>Geburtsort</td><td><input type="text" name="gebort" value="<?php echo $lektor->gebort; ?>"></td></tr>
 <tr><td>eMail Alias</td><td><input type="text" name="alias" value="<?php echo $lektor->alias; ?>"></td></tr>
-<tr><td>eMail Privat</td><td><input type="text" name="email" value="<?php echo $lektor->email; ?>"></td></tr>
 <tr><td>Homepage</td><td><input type="text" name="homepage" value="<?php echo $lektor->homepage; ?>"></td></tr>
 <tr><td>Kurzbezeichnung</td><td><input type="text" name="kurzbz" value="<?php echo $lektor->kurzbz; ?>"></td></tr>
 <tr><td>Telefon Technikum</td><td><input type="text" name="telefonklappe" value="<?php echo $lektor->telefonklappe; ?>"></td></tr>
-<tr><td>Fix angestellt</td><td><SELECT name="fixangestellt" value="<?php echo $fixangestellt; ?>">
-	<OPTION value="t" <?php if($lektor->fixangestellt) echo selected; ?>>Ja</OPTION>
-    <OPTION value="f" <?php if(!$lektor->fixangestellt) echo selected; ?>>Nein</OPTION>
+<tr><td>Fix angestellt</td><td><SELECT name="fixangestellt">
+	<OPTION value="t" <?php if($lektor->fixangestellt) echo 'selected'; ?>>Ja</OPTION>
+    <OPTION value="f" <?php if(!$lektor->fixangestellt) echo 'selected'; ?>>Nein</OPTION>
     </SELECT></td></tr>
 <tr><td>Raum Nr:</td><td>
 <SELECT name="raumnr">
 <OPTION value="0" selected>--Kein Raum--</OPTION>
 <?php
-	$qry = "Select ort_kurzbz from tbl_ort where aktiv=true order by ort_kurzbz";
+	$qry = "SELECT ort_kurzbz FROM public.tbl_ort WHERE aktiv=true ORDER BY ort_kurzbz";
 	if($result=pg_query($conn,$qry))
 	{
 		while($row=pg_fetch_object($result))

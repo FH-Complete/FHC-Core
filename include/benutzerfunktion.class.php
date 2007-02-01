@@ -160,8 +160,14 @@ class benutzerfunktion
 	 */
 	function delete($benutzerfunktion_id)
 	{
-		$this->errormsg = 'Noch nicht implementiert';
-		return false;
+		$qry = "DELETE FROM public.tbl_benutzerfunktion WHERE benutzerfunktion_id='$benutzerfunktion_id'";
+		if(!pg_query($this->conn, $qry))
+		{
+			$this->errormsg = pg_errormessage($this->conn);
+			return false;
+		}
+		else 
+			return true;
 	}
 	function addslashes($var)
 	{

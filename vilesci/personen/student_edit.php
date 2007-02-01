@@ -4,11 +4,12 @@
  *                      'student'-Klasse; Datei ersetzt student_edit_save.php
  *                      (WM)
  */
-include ('../config.inc.php');
-include ('../../include/functions.inc.php');
-include ('../../include/person.class.php');
-include ('../../include/student.class.php');
-include ('../../include/studiengang.class.php');
+require_once('../config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/person.class.php');
+require_once('../../include/benutzer.class.php');
+require_once('../../include/student.class.php');
+require_once('../../include/studiengang.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
 	die("Fehler beim Connecten zur Datenbank");
@@ -22,6 +23,8 @@ if(!$conn=pg_pconnect(CONN_STRING))
 
 <body class="background_main">
 <?php
+$user = get_uid();
+
 echo '<h4>Student ';
 if (isset($_GET['new']))
 	echo 'Neu</h4>';
@@ -51,22 +54,30 @@ else
  */
 function doSAVE($conn)
 {
-
 	$student = new student($conn);
-	$student->new=$_POST['new'];
+	if($_POST['new'])
+	{
+		$student->new=true;
+		$student->insertamum=date('Y-m-d H:i:s');
+		$student->insertvon=$user;
+	}
+	else 
+	{
+		$student->load($_POST['uid']);
+		$student->new=false;
+	}
 	// person
 	$student->uid=$_POST['uid'];
 	if (isset($_POST['new_uid']))
 		$student->uid=$_POST['new_uid'];
-	$student->titel=$_POST['titel'];
-	$student->vornamen=$_POST['vornamen'];
+	$student->titelpre=$_POST['titelpre'];
+	$student->vorname=$_POST['vorname'];
 	$student->nachname=$_POST['nachname'];
 	$student->gebdatum=$_POST['gebdatum'];
 	$student->gebort=$_POST['gebort'];
-	$student->gebzeit=$_POST['gebzeit'];
-	$student->anmerkungen=$_POST['anmerkungen'];
+	//$student->gebzeit=$_POST['gebzeit'];
+	//$student->anmerkungen=$_POST['anmerkungen'];
 	$student->aktiv=($_POST['aktiv']=='1'?true:false);
-	$student->email=$_POST['email'];
 	$student->alias=$_POST['alias'];
 	$student->homepage=$_POST['homepage'];
 	//echo "<br><h2>aktiv=".($student->aktiv?'true':'false').'</h2>';
@@ -113,9 +124,10 @@ function doEDIT($conn,$id,$new=false)
 
 	// Studentendaten holen
 	$student = new student($conn);
+	$status_ok=false;
 	if (!$new)
 	{
-		$status_ok=$student->load(addslashes($id));
+		$status_ok=$student->load($id);
 	}
 	if (!$status_ok && !$new)
 	{
@@ -135,9 +147,9 @@ function doEDIT($conn,$id,$new=false)
 			      		<input type="hidden" name="uid" value="<?php echo $student->uid ?>" >
 			      </td>
 			</tr>
-			<tr><td>Titel</td><td><input type="text" name="titel" value="<?php   echo $student->titel;
+			<tr><td>Titel</td><td><input type="text" name="titelpre" value="<?php   echo $student->titelpre;
 		?>"></td></tr>
-			<tr><td>Vornamen</td><td><input type="text" name="vornamen" value="<?php   echo $student->vornamen;
+			<tr><td>Vornamen</td><td><input type="text" name="vorname" value="<?php   echo $student->vorname;
 		?>"></td></tr>
 			<tr><td>Nachname</td><td><input type="text" name="nachname" value="<?php   echo $student->nachname;
 		?>"></td></tr>
@@ -149,7 +161,7 @@ function doEDIT($conn,$id,$new=false)
 		?>"></td></tr>
 			<tr><td>eMail Alias</td><td><input type="text" name="alias" value="<?php   echo $student->alias;
 		?>"></td></tr>
-			<tr><td>eMail Technikum</td><td><input type="text" name="email" value="<?php echo $student->email; ?>"></td></tr>
+	
 			<tr><td>Homepage</td><td><input type="text" name="homepage" value="<?php echo $student->homepage;	?>"></td></tr>
 			<tr>
 			      <td>Matrikelnr*</td>
@@ -161,13 +173,13 @@ function doEDIT($conn,$id,$new=false)
 <?php
 			// Auswahl des Studiengangs
 			$stg=new studiengang($conn);
-			$stg_alle=$stg->getAll();
-			foreach($stg_alle as $studiengang)
+			$stg->getAll();
+			foreach($stg->result as $studiengang)
 			{
 				echo "<option value=\"$studiengang->studiengang_kz\" ";
 				if ($studiengang->studiengang_kz==$student->studiengang_kz)
 					echo "selected";
-				echo " >$studiengang->kurzbz ($studiengang->bezeichnung)</option>\n";
+				echo " >$studiengang->kuerzel ($studiengang->bezeichnung)</option>\n";
 			}
 ?>
 		    </SELECT>
@@ -193,9 +205,6 @@ function doEDIT($conn,$id,$new=false)
 				}
 
 } // ENDE doEDIT()
-
-
-
 
 ?>
 

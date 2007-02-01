@@ -94,7 +94,8 @@ class person
 		{
 			$qry = "SELECT person_id, sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen,
                            gebdatum, gebort, gebzeit, foto, anmerkungen, homepage, svnr, ersatzkennzeichen, 
-                           familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon, ext_id 
+                           familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon, ext_id,
+                           geschlecht, staatsbuergerschaft, geburtsnation 
 			        FROM public.tbl_person WHERE person_id='$person_id'";
 			
 			if(!$result=pg_query($this->conn,$qry))

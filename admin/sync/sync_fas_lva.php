@@ -6,10 +6,10 @@ include('../../include/lehrstunde.class.php');
 $conn=pg_connect(CONN_STRING);
 $conn_fas=pg_connect(CONN_STRING_FAS);
 //$adress='fas_sync@technikum-wien.at';
-$adress='oesi@technikum-wien.at';
+$adress='fas_sync@technikum-wien.at';
 //$adress_stpl='stpl@technikum-wien.at';
-$adress_stpl='oesi@technikum-wien.at';
-$adress_fas='oesi@technikum-wien.at';
+$adress_stpl='stpl@technikum-wien.at';
+$adress_fas='fas_sync@technikum-wien.at';
 
 
 // error log für jeden Studiengang
@@ -235,7 +235,7 @@ $qry="select studiengang_kz,email,upper(typ::varchar(1) || kurzbz) as kurzbz FRO
 $result=pg_query($conn, $qry);
 while ($row=pg_fetch_object($result))
 {
-	$stg_mail[$row->studiengang_kz] = 'oesi@technikum-wien.at';//$row->email;
+	$stg_mail[$row->studiengang_kz] = $row->email;//'oesi@technikum-wien.at';
 	$stg_kurzbz[$row->studiengang_kz]=$row->kurzbz;
 }
 
