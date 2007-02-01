@@ -60,6 +60,39 @@ class mitarbeiter extends benutzer
 			$this->load($uid);
 	}
 
+	function load($uid)
+	{
+		if(!benutzer::load($uid))
+			return false;
+		
+		$qry = "SELECT * FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='$uid'";
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$this->ausbildungcode = $row->ausbildungcode;
+				$this->personalnummer = $row->personalnummer;
+				$this->kurzbz = $row->kurzbz;
+				$this->lektor = $row->lektor;
+				$this->fixangestellt = $row->fixangestellt;
+				$this->telefonklappe = $row->telefonklappe;
+				$this->ort_kurzbz = $row->ort_kurzbz;
+				$this->ext_id_mitarbeiter = $row->ext_id;
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = "Kein Eintrag gefunden fuer $uid";
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = "Fehler beim Laden: $qry";
+			return false;
+		}
+	}
+	
 	// ************************************************
 	// * ueberprueft die Variablen auf Gueltigkeit
 	// * @return true wenn gueltig, false im Fehlerfall

@@ -61,6 +61,9 @@ class student extends benutzer
 	
 	function load($uid)
 	{
+		if(!benutzer::load($uid))
+			return false;
+		
 		$qry = "SELECT * FROM public.tbl_student WHERE student_uid='".addslashes($uid)."'";
 		
 		if($result = pg_query($this->conn, $qry))

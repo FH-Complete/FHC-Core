@@ -1,6 +1,6 @@
 <?php
 	require_once('../../vilesci/config.inc.php');
-	$adress='tw_tester@technikum-wien.at';
+	$adress='fas_sync@technikum-wien.at';
 	
 	//mail($adress,"FAS Synchro mit PORTAL","BEGIN OF SYNCHRONISATION","From: vilesci@technikum-wien.at");
 	$conn=pg_connect(CONN_STRING);

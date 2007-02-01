@@ -28,8 +28,8 @@
     	return $string;
  	}
 
-	//$adress='fas_sync@technikum-wien.at';
-	$adress='tw_tester@technikum-wien.at';
+	$adress='fas_sync@technikum-wien.at';
+	//$adress='oesi@technikum-wien.at';
 	
 	//mail($adress,"FAS Synchro mit VILESCI (Lektoren)","BEGIN OF SYNCHRONISATION","From: vilesci@technikum-wien.at");
 	$conn=pg_connect(CONN_STRING);
@@ -105,7 +105,7 @@
 				{
 					$qry = "SELECT currval('tbl_person_person_id_seq') AS id;";
 					
-					if(!$row_seq=pg_fetch_object(pg_query($this->conn,$qry)))
+					if(!$row_seq=pg_fetch_object(pg_query($conn,$qry)))
 					{
 						pg_query($conn, 'ROLLBACK');
 						$text = 'Sequence konnte nicht ausgelesen werden\n';
@@ -134,14 +134,23 @@
 							$nn = split('[- .,]',strtolower($row->nachname));
 							$nn = clean_string($nn[0]);
 							$alias = $vn.".".$nn;
-							$qry = "UPDATE public.tbl_benutzer set alias='$alias' WHERE uid='$uid'";
-							if(!$res_insert=pg_exec($conn, $qry))
+							$qry = "SELECT * FROM public.tbl_benutzer WHERE alias='$alias'";
+							$result_alias = pg_query($conn, $qry);
+							if(pg_num_rows($result_alias)==0)
 							{
-								$text.=$qry;
-								$text.="\rFehler: Alias existiert bereits: $alias";
-								$insert_error++;
+								$qry = "UPDATE public.tbl_benutzer set alias='$alias' WHERE uid='$uid'";
+								if(!$res_insert=pg_exec($conn, $qry))
+								{
+									$text.=$qry;
+									$text.="\rFehler: ".pg_errormessage($conn);
+									$insert_error++;
+								}
 							}
-							
+							else 
+							{
+								$text.="UPDATE public.tbl_benutzer set alias='$alias' WHERE uid='$uid'";
+								$text.="\rFehler: Alias existiert bereits: $alias";
+							}
 							// Mitarbeiterdatensatz
 							$sql_query="INSERT INTO tbl_mitarbeiter (mitarbeiter_uid,personalnummer,telefonklappe,kurzbz,lektor,fixangestellt, insertamum, insertvon, updateamum, updatevon) ".
 										"VALUES('$row->uid','$row->persnr','$row->teltw','$row->kurzbez',true,".($row->fixangestellt?'true':'false').",now(),'auto',now(),'auto')";

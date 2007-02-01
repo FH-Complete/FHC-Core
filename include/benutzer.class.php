@@ -59,7 +59,30 @@ class benutzer extends person
 	// ***********************************************************
 	function load($uid)
 	{
-		
+		$qry = "SELECT * FROM public.tbl_benutzer WHERE uid='$uid'";
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$this->uid = $row->uid;
+				$this->bnaktiv = $row->aktiv;
+				$this->alias = $row->alias;
+				if(!person::load($row->person_id))
+					return false;
+				else 
+					return true;
+			}
+			else 
+			{
+				$this->errormsg = "Kein Eintrag gefunden fuer $uid";
+				return false;
+			}				
+		}
+		else 
+		{
+			$this->errormsg = "Fehler beim laden: $qry";
+			return false;
+		}		
 	}
 	
 	// *******************************************

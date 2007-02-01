@@ -2,19 +2,19 @@
 /**
  * Changes:	23.10.2004: Anpassung an neues DB-Schema (WM)
  */
-include('../config.inc.php');
+require_once('../config.inc.php');
 
 $conn=pg_connect(CONN_STRING);
-if ($type=="save")
+if (isset($_POST['type']) && $_POST['type']=='save')
 {
 	//Einfügen in die Datenbank
-	$sql_query="INSERT INTO tbl_funktion (bezeichnung, funktion_kurzbz) VALUES ('".$_POST['bezeichnung']."', '".$_POST['kurzbz']."')";
-	$result=pg_exec($conn, $sql_query);
+	$sql_query="INSERT INTO public.tbl_funktion (beschreibung, funktion_kurzbz) VALUES ('".$_POST['bezeichnung']."', '".$_POST['kurzbz']."')";
+	$result=pg_query($conn, $sql_query);
 	if(!$result)
 		echo pg_errormessage()."<br>";
 }
-$sql_query="SELECT funktion_kurzbz, bezeichnung FROM tbl_funktion ORDER BY funktion_kurzbz";
-$result_funktion=pg_exec($conn, $sql_query);
+$sql_query="SELECT funktion_kurzbz, beschreibung FROM public.tbl_funktion ORDER BY funktion_kurzbz";
+$result_funktion=pg_query($conn, $sql_query);
 if(!$result_funktion)
 	error("funktion not found!");
 ?>
@@ -34,8 +34,8 @@ if(!$result_funktion)
 <?php
 if ($result_funktion!=0)
 {
-	$num_rows=pg_numrows($result_funktion);
-	$num_fields=pg_numfields($result_funktion);
+	$num_rows=pg_num_rows($result_funktion);
+	$num_fields=pg_num_fields($result_funktion);
 	
 	echo '<th></th>';
 	for ($i=0;$i<$num_fields; $i++)
@@ -48,11 +48,10 @@ if ($result_funktion!=0)
 		echo "<tr class='liste".($j%2)."'>";
 		echo "<td><a href=\"funktion_det.php?kurzbz=$row[0]\">Details</a></td>";
 	    for ($i=0; $i<$num_fields; $i++)
-			echo "<td bgcolor=$bgcolor>$row[$i]</td>";
+			echo "<td>$row[$i]</td>";
 		//echo "<td><a href=\"lehrfach_menu.php?lehrfach_id=$row[0]&type=edit&lehrfach_bz=$row[1]&lehrfach_kzbz=$row[2]&lehrfach_lehrevz=$row[3]\">Edit</a><td>";
 	    //echo "<td><a href=\"einheit_menu.php?einheit_id=$row[0]&type=delete\">Delete</a><td>";
 	    echo "</tr>\n";
-		$foo++;
 	}
 }
 else

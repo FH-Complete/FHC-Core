@@ -93,12 +93,7 @@
 	  	<td nowrap>
 			<?php
 				if(isset($do_search))
-				{
-					//To prevent SQL Injection
-					$txtSearchQuery=str_replace(')','',$txtSearchQuery);
-					$txtSearchQuery=str_replace('\'','',$txtSearchQuery);
-					$txtSearchQuery=str_replace('--','',$txtSearchQuery);
-					
+				{					
 					if($txtSearchQuery == "" || $txtSearchQuery == "*" || $txtSearchQuery == "*.*")
 					{
 						if($cmbChoice == "all")
@@ -114,6 +109,7 @@
 					}
 					else
 					{
+						$txtSearchQuery = addslashes($txtSearchQuery);
 						if($cmbChoice == "all")
 						{
 							//$sql_query = "SELECT DISTINCT tbl_person.uid, titel, nachname, vornamen, telefonklappe AS teltw, (tbl_person.uid || '@technikum-wien.at') AS emailtw, foto, -1 AS studiengang_kz, -1 AS semester, ort_kurzbz as ort FROM public.tbl_person, public.tbl_mitarbeiter WHERE tbl_mitarbeiter.uid=tbl_person.uid AND (LOWER(nachname) LIKE LOWER('%$txtSearchQuery%') OR tbl_person.uid LIKE LOWER('%$txtSearchQuery%') OR LOWER(vornamen) LIKE LOWER('%$txtSearchQuery%') OR LOWER(nachname || ' ' || vornamen) LIKE LOWER('%$txtSearchQuery%') OR LOWER(vornamen || ' ' || nachname) LIKE LOWER('%$txtSearchQuery%')) AND aktiv=TRUE UNION SELECT DISTINCT tbl_person.uid, (''::varchar) AS titel, nachname, vornamen, (''::varchar) AS teltw, (tbl_person.uid || '@technikum-wien.at') AS emailtw, foto, studiengang_kz, semester, ''::varchar as ort FROM public.tbl_person, public.tbl_student WHERE semester<10 AND tbl_person.uid=tbl_student.uid AND (LOWER(nachname) LIKE LOWER('%$txtSearchQuery%') OR tbl_person.uid LIKE LOWER('%$txtSearchQuery%') OR LOWER(vornamen) LIKE LOWER('%$txtSearchQuery%') OR LOWER(nachname || ' ' || vornamen) LIKE LOWER('%$txtSearchQuery%') OR LOWER(vornamen || ' ' || nachname) LIKE LOWER('%$txtSearchQuery%')) AND aktiv=TRUE ORDER BY nachname, vornamen";
@@ -126,7 +122,7 @@
 						}
 					}
 					
-					$result = pg_exec($conn, $sql_query);
+					$result = pg_query($conn, $sql_query);
 					$num_rows = pg_num_rows($result);
 				
 					if($num_rows > 0)
