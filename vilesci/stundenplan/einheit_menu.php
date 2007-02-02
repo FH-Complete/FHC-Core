@@ -3,23 +3,30 @@
 <title>Einheiten Verwaltung</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+<script language="JavaScript">
+function conf_del()
+{
+	return confirm('Diese Gruppe wirklich löschen?');
+}
+</script>
 </head>
 <body>
-<H1>Einheiten Verwaltung</H1>
-<hr>
+<H1>Gruppen Verwaltung</H1>
+
 
 <?php
-include('../config.inc.php');
-include('../../include/studiengang.class.php');
-include('../../include/einheit.class.php');
-include('../../include/person.class.php');
-include('../../include/student.class.php');
-include('../../include/mailgrp.class.php');
+require_once('../config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/studiengang.class.php');
+require_once('../../include/gruppe.class.php');
+require_once('../../include/person.class.php');
+require_once('../../include/benutzer.class.php');
+require_once('../../include/student.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
-   die("Verbindung zur Datenbank konnte nicht hergestellt werden");
+   die('Verbindung zur Datenbank konnte nicht hergestellt werden');
 
-if (isset($_POST['newFrm']))
+if (isset($_POST['newFrm']) || isset($_GET['newFrm']))
 {
 	doEdit($conn,null,true);
 }
@@ -32,13 +39,12 @@ else if (isset($_POST['type']) && $_POST['type']=='save')
 	doSave();
 	getUebersicht();
 }
-else if (isset($_POST['type']) && $_GET['type']=='delete')
+else if (isset($_GET['type']) && $_GET['type']=='delete')
 {
-	$e=new einheit($conn);
-	$e->kurzbz=addslashes($_GET['einheit_id']);
-	$e->delete();
+	$e=new gruppe($conn);
+	if(!$e->delete($_GET['einheit_id']))
+		echo $e->errormsg;
 	getUebersicht();
-
 }
 else
 {
@@ -49,31 +55,34 @@ else
 function doSave()
 {
 	global $conn;
-	$e=new einheit($conn);
-	if ($_POST['new'])
+	$e=new gruppe($conn);
+	
+	if ($_POST['new']=='true')
 	{
-		$e->kurzbz=$_POST['kurzbz'];
-		$e->bezeichnung=$_POST['bezeichnung'];
-		$e->stg_kz=$_POST['studiengang_kz'];
-		$e->semester=$_POST['semester'];
-		$e->typ=$_POST['typ'];
-		$e->mailgrp_kurzbz=$_POST['mailgrp_kurzbz'];
-		$e->new=true;
-		$e->save();
+		$e->new = true;
+		$e->gruppe_kurzbz=$_POST['kurzbz'];
+		$e->insertamum = date('Y-m-d H:i:s');
+		$e->insertvon = get_uid();	
 	}
-	else
+	else 
 	{
-		$e->kurzbz=$_POST['pk'];
-		$e->bezeichnung=$_POST['bezeichnung'];
-		$e->stg_kz=$_POST['studiengang_kz'];
-		$e->semester=$_POST['semester'];
-		$e->typ=$_POST['typ'];
-		$e->mailgrp_kurzbz=$_POST['mailgrp_kurzbz'];
+		$e->load($_POST['kurzbz']);
 		$e->new=false;
-		if (!$e->save($_POST['kurzbz']))
-		echo $e->errormsg;
 	}
 
+	$e->updateamum = date('Y-m-d H:i:s');
+	$e->updatevon = get_uid();
+	$e->bezeichnung=$_POST['bezeichnung'];
+	$e->beschreibung=$_POST['beschreibung'];
+	$e->studiengang_kz=$_POST['studiengang_kz'];
+	$e->semester=$_POST['semester'];
+	$e->mailgrp=isset($_POST['mailgrp']);
+	$e->sichtbar=isset($_POST['sichtbar']);
+	$e->generiert=isset($_POST['generiert']);
+	$e->aktiv=isset($_POST['aktiv']);
+	$e->sort=$_POST['sort'];
+	if(!$e->save())
+		echo $e->errormsg;
 }
 
 
@@ -81,20 +90,24 @@ function doSave()
 function doEdit($conn,$kurzbz,$new=false)
 {
     if (!$new)
-	{
-		$e=new einheit($conn,$kurzbz);
-	}
+		$e=new gruppe($conn,$kurzbz);
+	else 
+		$e = new gruppe($conn);
 	?>
 	<form name="stdplan" method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>">
-  <p><b>Einheit <?php echo ($new?'hinzufügen':'bearbeiten'); ?></b>:
+  <p><b>Gruppe <?php echo ($new?'hinzufügen':'bearbeiten'); ?></b>:
   	<table border="0">
-  	<tr>
-  		<td><i>Name</i></td><td>
-    	<input type="text" name="bezeichnung" size="20" maxlength="20" value="<?php echo $e->bezeichnung; ?>"></td>
-    </tr>
-    <tr><td><i>Kurzbezeichnung</i></td>
-      <td><input type="text" name="kurzbz" size="10" maxlength="10" value="<?php echo $e->kurzbz; ?>">
+  	<tr><td><i>Kurzbezeichnung</i></td>
+      <td><input type="text" name="kurzbz" size="10" maxlength="10" value="<?php echo $e->gruppe_kurzbz; ?>">
 	</td></tr>
+  	<tr>
+  		<td><i>Bezeichnung</i></td><td>
+    	<input type="text" name="bezeichnung" size="20" maxlength="32" value="<?php echo $e->bezeichnung; ?>"></td>
+    </tr>
+    <tr>
+  		<td><i>Beschreibung</i></td><td>
+    	<input type="text" name="beschreibung" size="20" maxlength="128" value="<?php echo $e->beschreibung; ?>"></td>
+    </tr>
 	<tr><td><i>Studiengang</i><t/td><td>
 
 	<SELECT name="studiengang_kz">
@@ -102,42 +115,29 @@ function doEdit($conn,$kurzbz,$new=false)
 <?php
 			// Auswahl des Studiengangs
 			$stg=new studiengang($conn);
-			$stg_alle=$stg->getAll();
-			foreach($stg_alle as $studiengang)
+			$stg->getAll();
+			foreach($stg->result as $studiengang)
 			{
 				echo "<option value=\"$studiengang->studiengang_kz\" ";
-				if ($studiengang->studiengang_kz==$e->stg_kz)
+				if ($studiengang->studiengang_kz==$e->studiengang_kz)
 					echo "selected";
-				echo " >$studiengang->kurzbz ($studiengang->bezeichnung)</option>\n";
+				echo " >$studiengang->kuerzel ($studiengang->bezeichnung)</option>\n";
 			}
 ?>
 		    </SELECT>
 
 	</td></tr>
 	<tr><td><i>Semester</i><t/td><td><input type="text" name="semester" size="2" maxlength="1" value="<?php echo $e->semester ?>"></td></tr>
-	<tr><td><i>Typ</i><t/td><td><input type="text" name="typ" size="2" maxlength="1" value="<?php echo $e->typ ?>"></td></tr>
-	<tr><td><i>Mailgrp Kurzbz</i><t/td><td><select name="mailgrp_kurzbz">
-	<option value="">--keine--</option>
-<?php
-    $x = new mailgrp($conn);
-    $erg=$x->getAll();
-    
-    
-	    foreach($erg as $mgrp)
-	    {	    	
-	    	echo "<option value=\"$mgrp->mailgrp_kurzbz\" ";
-			if ($mgrp->mailgrp_kurzbz==$e->mailgrp_kurzbz)
-				echo "selected";
-			echo " >$mgrp->mailgrp_kurzbz - $mgrp->beschreibung</option>\n";
-		}
-    
-?>
-     </SELECT>
-	
+	<tr><td><i>Mailgrp</i><t/td><td><input type='checkbox' name='mailgrp' <?php echo ($e->mailgrp?'checked':'');?>>
+	<tr><td><i>Sichtbar</i><t/td><td><input type='checkbox' name='sichtbar' <?php echo ($e->sichtbar?'checked':'');?>>
+	<tr><td><i>Generiert</i><t/td><td><input type='checkbox' name='generiert' <?php echo ($e->generiert?'checked':'');?>>
+	<tr><td><i>Aktiv</i><t/td><td><input type='checkbox' name='aktiv' <?php echo ($e->aktiv?'checked':'');?>>
+	<tr><td><i>Sort</i><t/td><td><input type='text' name='sort' maxlength="4" value="<?php echo $e->sort;?>">
 	</td></tr>
 	</table>
 
-	<input type="hidden" name="pk" value="<?php echo $e->kurzbz ?>" />
+	<input type="hidden" name="pk" value="<?php echo $e->gruppe_kurzbz ?>" />
+	<input type="hidden" name="new" value="<?php echo ($new?'true':'false') ?>" />
     <input type="hidden" name="type" value="save">
 <?php
 	if ($new)
@@ -159,23 +159,17 @@ function doEdit($conn,$kurzbz,$new=false)
 function getUebersicht()
 {
     global $conn;
-	$einheit=new einheit($conn);
+	$einheit=new gruppe($conn);
 	// Array mit allen Einheiten holen
 	$einheiten=$einheit->getAll();
 	//print_r($einheiten);
 	?>
-	<form name="import" method="post" action="einheit_import.php" enctype="multipart/form-data">
-  <p><b>Import von Untis </b>(Kurswahl der Studenten)
-    <input type="file" name="userfile" size="20" maxlength="30">
-    <input type="submit" name="save" value="Go">
-  </p>
-  <hr>
+	<!--
 </form>
-
 <form name="stdplan" method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>">
 <input type="submit" name="newFrm" value="Neue Einheit anlegen"> <br/>
 </form>
-
+-->
 <h3>&Uuml;bersicht</h3>
 
 <table class='liste'>
@@ -184,26 +178,32 @@ function getUebersicht()
 
 	$num_rows=count($einheiten);
 	$foo = 0;
-	echo "<tr class='liste'><th>Kurzbz.</th><th>Bezeichnung</th><th>Stg.</th><th>Sem.</th><th>Typ</th><th>Mailgrp</th><th>Anzahl</th><th colspan=\"3\">Aktion</th></tr>";
+	echo "<tr class='liste'><th>Kurzbz.</th><th>Bezeichnung</th><th>Stg.</th><th>Sem.</th><th>Mailgrp</th><th>Anzahl</th><th colspan=\"3\">Aktion</th></tr>";
 
-	for ($i=0; $i<$num_rows; $i++)
+	$i=0;
+	$qry = "SELECT studiengang_kz, UPPER(typ::varchar(1) || kurzbz) as kuerzel FROM public.tbl_studiengang";
+	$stg = array();
+	if(!$result = pg_query($conn, $qry))
+		die('Fehler beim laden der Studiengaenge');
+	while($row = pg_fetch_object($result))
+		$stg[$row->studiengang_kz] = $row->kuerzel;
+	
+	foreach ($einheit->result as $e)
 	{
-		$e=$einheiten[$i];
+		$i++;
 		$c=$i%2;
 
 		echo '<tr class="liste'.$c.'">';
-		echo "<td>$e->kurzbz </td>";
+		echo "<td>$e->gruppe_kurzbz </td>";
 		echo "<td>$e->bezeichnung </td>";
-		echo "<td>$e->stg_kurzbz </td>";
+		echo "<td>".$stg[$e->studiengang_kz]."</td>";
 		echo "<td>$e->semester </td>";
-		echo "<td>$e->typ </td>";
-		echo "<td>$e->mailgrp_kurzbz</td>";
-		
-		
-		echo "<td>".$einheit->countStudenten($e->kurzbz)."</td>";
-		echo "<td><a href=\"einheit_det.php?kurzbz=$e->kurzbz\">Details</a></td>";
-		echo "<td><a href=\"einheit_menu.php?edit=1&kurzbz=$e->kurzbz\">Edit</a></td>";
-	   	echo "<td><a href=\"einheit_menu.php?einheit_id=$e->kurzbz&type=delete\">Delete</a></td>";
+		echo "<td>".($e->mailgrp?'Ja':'Nein')."</td>";
+
+		echo "<td>".$einheit->countStudenten($e->gruppe_kurzbz)."</td>";
+		echo "<td><a href=\"einheit_det.php?kurzbz=$e->gruppe_kurzbz\">Details</a></td>";
+		echo "<td><a href=\"einheit_menu.php?edit=1&kurzbz=$e->gruppe_kurzbz\">Edit</a></td>";
+	   	echo "<td><a href=\"einheit_menu.php?einheit_id=$e->gruppe_kurzbz&type=delete\" onclick='return conf_del()'>Delete</a></td>";
 	   	echo "</tr>\n";
 	}
 ?>

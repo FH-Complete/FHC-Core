@@ -35,6 +35,7 @@ class gruppe
 	var $sort;					// smallint
 	var $mailgrp;				// boolean
 	var $beschreibung;			// varchar(128)
+	var $generiert;				// boolean
 	var $sichtbar;				// boolean
 	var $aktiv;					// boolean
 	var $updateamum;			// timestamp
@@ -68,6 +69,21 @@ class gruppe
 			$this->load($gruppe_kurzbz);
 	}
 	
+	// *************************
+	// * Loescht eine Gruppe
+	// *************************
+	function delete($gruppe_kurzbz)
+	{
+		$qry ="DELETE FROM public.tbl_gruppe WHERE gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
+		if(pg_query($this->conn, $qry))
+			return true;
+		else 
+		{
+			$this->errormsg = 'Fehler beim loeschen der Gruppe';
+			return false;
+		}
+	}
+	
 	// ****************************************
 	// * Prueft ob bereits eine Gruppe mit der
 	// * uebergebenen Kurzbezeichnung existiert
@@ -75,7 +91,7 @@ class gruppe
 	// ****************************************
 	function exists($gruppe_kurzbz)
 	{
-		$qry = "SELECT count(*) as anzahl FROM public.tbl_gruppe WHERE gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_gruppe WHERE gruppe_kurzbz='".addslashes(strtoupper($gruppe_kurzbz))."'";
 		
 		if($row = pg_fetch_object(pg_query($this->conn,$qry)))
 		{
@@ -97,7 +113,93 @@ class gruppe
 	// *********************************************************
 	function load($gruppe_kurzbz)
 	{
-		return false;
+		$qry = "SELECT * FROM public.tbl_gruppe where gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$this->gruppe_kurzbz = $row->gruppe_kurzbz;
+				$this->studiengang_kz = $row->studiengang_kz;
+				$this->bezeichnung = $row->bezeichnung;
+				$this->semester = $row->semester;
+				$this->sort = $row->sort;
+				$this->mailgrp = ($row->mailgrp=='t'?true:false);
+				$this->beschreibung = $row->beschreibung;
+				$this->sichtbar = ($row->sichtbar=='t'?true:false);
+				$this->aktiv = ($row->aktiv=='t'?true:false);
+				$this->generiert = ($row->generiert=='t'?true:false);
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = 'Fehler beim laden der Daten';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden der Daten';
+			return false;
+		}
+	}
+	
+	function getAll()
+	{
+		$qry = "SELECT * FROM public.tbl_gruppe ORDER BY gruppe_kurzbz";
+		
+		if( $result = pg_query($this->conn, $qry))
+		{
+			while($row=pg_fetch_object($result))
+			{
+				$grp_obj = new gruppe($this->conn);
+				$grp_obj->gruppe_kurzbz = $row->gruppe_kurzbz;
+				$grp_obj->studiengang_kz = $row->studiengang_kz;
+				$grp_obj->bezeichnung = $row->bezeichnung;
+				$grp_obj->semester = $row->semester;
+				$grp_obj->sort = $row->sort;
+				$grp_obj->mailgrp = ($row->mailgrp=='t'?true:false);
+				$grp_obj->beschreibung = $row->beschreibung;
+				$grp_obj->sichtbar = ($row->sichtbar=='t'?true:false);
+				$grp_obj->aktiv = ($row->aktiv=='t'?true:false);
+				$grp_obj->generiert = ($row->generiert=='t'?true:false);
+				$grp_obj->updateamum = $row->updateamum;
+				$grp_obj->updatevon = $row->updatevon;
+				$grp_obj->insertamum = $row->insertamum;
+				$grp_obj->insertvon = $row->insertvon;
+				
+				$this->result[] = $grp_obj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden der Gruppen';
+			return false;
+		}
+	}
+	
+	function countStudenten($gruppe_kurzbz)
+	{
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+				return $row->anzahl;
+			else 
+			{
+				$this->errormsg = 'Fehler beim lesen der benutzergruppe';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim lesen der benutzergruppe';
+			return false;
+		}
 	}
 	
 	function getgruppe($studiengang_kz=null, $semester=null, $mailgrp=null, $sichtbar=null)
@@ -117,7 +219,6 @@ class gruppe
 			while($row = pg_fetch_object($result))
 			{
 				$grp_obj = new gruppe($this->conn);
-				
 				$grp_obj->gruppe_kurzbz = $row->gruppe_kurzbz;
 				$grp_obj->studiengang_kz = $row->studiengang_kz;
 				$grp_obj->bezeichnung = $row->bezeichnung;
@@ -127,6 +228,7 @@ class gruppe
 				$grp_obj->beschreibung = $row->beschreibung;
 				$grp_obj->sichtbar = ($row->sichtbar=='t'?true:false);
 				$grp_obj->aktiv = ($row->aktiv=='t'?true:false);
+				$grp_obj->generiert = ($row->generiert=='t'?true:false);
 				$grp_obj->updateamum = $row->updateamum;
 				$grp_obj->updatevon = $row->updatevon;
 				$grp_obj->insertamum = $row->insertamum;
@@ -243,9 +345,9 @@ class gruppe
 		if($new)
 		{		
 			$qry = 'INSERT INTO public.tbl_gruppe (gruppe_kurzbz, studiengang_kz, bezeichnung, semester, sort, 
-			                                mailgrp, beschreibung, sichtbar, aktiv, 
+			                                mailgrp, beschreibung, sichtbar, generiert, aktiv, 
 			                                updateamum, updatevon, insertamum, insertvon)
-			        VALUES('.$this->addslashes($this->gruppe_kurzbz).','.
+			        VALUES('.$this->addslashes(strtoupper($this->gruppe_kurzbz)).','.
 					$this->addslashes($this->studiengang_kz).','.
 					$this->addslashes($this->bezeichnung).','.
 					$this->addslashes($this->semester).','.
@@ -253,6 +355,7 @@ class gruppe
 					($this->mailgrp?'true':'false').','.
 					$this->addslashes($this->beschreibung).','.
 					($this->sichtbar?'true':'false').','.
+					($this->generiert?'true':'false').','.
 					($this->aktiv?'true':'false').','.
 					$this->addslashes($this->updateamum).','.
 					$this->addslashes($this->updatevon).','.
@@ -269,10 +372,11 @@ class gruppe
 			       ' mailgrp='.($this->mailgrp?'true':'false').','.
 			       ' beschreibung='.$this->addslashes($this->beschreibung).','.
 			       ' sichtbar='.($this->sichtbar?'true':'false').','.
+			       ' generiert='.($this->generiert?'true':'false').','.
 			       ' aktiv='.($this->aktiv?'true':'false').','.
 			       ' updateamum='.$this->addslashes($this->updateamum).','.
 			       ' updatevon='.$this->addslashes($this->updatevon).
-			       " WHERE gruppe_kurzbz=".$this->addslashes($this->gruppe_kurzbz).";";
+			       " WHERE gruppe_kurzbz=".$this->addslashes(strtoupper($this->gruppe_kurzbz)).";";
 		}
 
 		if(pg_query($this->conn,$qry))

@@ -19,25 +19,26 @@
 		// this looks better under WinX
 		if (eregi("Win",$os)) $crlf="\r\n";
 	}
-	include('../config.inc.php');
+	require_once('../config.inc.php');
 	//include('../include/functions.inc.php');
 	if (!$conn = @pg_pconnect(CONN_STRING))
 	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
 
-	$sql_query='SELECT uid, nachname, vornamen FROM tbl_person as p join tbl_student using(uid) '.
+	if(isset($stgid))
+	$sql_query='SELECT uid, nachname, vorname FROM campus.vw_student '.
 	           'WHERE studiengang_kz='.$stgid.' AND semester='.$sem.
                ' AND verband=\''.strtoupper($ver).'\' AND gruppe='.$grp.
                ' ORDER BY nachname';
 	if (isset($einheitid))
-		$sql_query='SELECT tbl_student.uid, p.nachname, p.vornamen FROM tbl_person as p join tbl_student using(uid),tbl_einheitstudent WHERE tbl_einheitstudent.einheit_kurzbz=\''.$einheitid.'\' AND tbl_einheitstudent.uid=tbl_student.uid ORDER BY nachname';
+		$sql_query='SELECT uid, nachname, vorname FROM campus.vw_benutzer JOIN tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz=\''.$einheitid.'\' ORDER BY nachname';
 	//echo $sql_query;
-	if(!($result=pg_exec($conn, $sql_query)))
+	if(!($result=pg_query($conn, $sql_query)))
 		die(pg_errormessage($conn));
 
-	$anz=pg_numrows($result);
+	$anz=pg_num_rows($result);
 	for  ($j=0; $j<$anz; $j++)
 	{
 		$row=pg_fetch_object($result, $j);
-		echo '#'.$row->nachname.' '.$row->vornamen.$crlf.$row->uid.$crlf;
+		echo '#'.$row->nachname.' '.$row->vorname.$crlf.$row->uid.$crlf;
 	}
 ?>
