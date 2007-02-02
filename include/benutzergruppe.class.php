@@ -156,5 +156,18 @@ class benutzergruppe
 			return false;
 		}
 	}
+	
+	function delete($uid, $gruppe_kurzbz)
+	{
+		$qry = "DELETE FROM public.tbl_benutzergruppe WHERE uid='".addslashes($uid)."' AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
+		
+		if(pg_query($this->conn, $qry))
+			return true;
+		else 
+		{
+			$this->errormsg = 'Fehler beim Loeschen der Zuteilung';
+			return false;
+		}
+	}
 }
 ?>

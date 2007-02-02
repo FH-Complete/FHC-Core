@@ -87,12 +87,9 @@
 				</tr>
 				<!--Menu Eintrag Personen->Lektoren -->
 				<tr>
-						<td width="10" nowrap>&nbsp;</td>
-          				<td nowrap><a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Lektoren'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Lektoren</a></td>
-        		</tr>
-				<tr>
 					<td width="10" nowrap>&nbsp;</td>
 					<td nowrap>
+						<a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Lektoren'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Lektoren</a>
 						<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Lektoren" style="display: none">
 						<tr>
 							<td width="10" nowrap>&nbsp;</td>
@@ -105,9 +102,28 @@
 						</table>
 					</td>
 				</tr>
+				<!--Menu Eintrag Gruppen -->
+				
+				<tr>
+					<td width="10" nowrap>&nbsp;</td>
+					<td nowrap>
+						<a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Gruppen'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Gruppen</a>
+						<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Gruppen" style="display: none">
+						<tr>
+							<td width="10" nowrap>&nbsp;</td>
+					    	<td nowrap><a class="MenuItem2" href="stundenplan/einheit_menu.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;&Uuml;bersicht</a></td>
+						</tr>						
+						<tr>
+							<td width="10" nowrap>&nbsp;</td>
+					    	<td nowrap><a class="MenuItem2" href="stundenplan/einheit_menu.php?newFrm=true" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Neu</a></td>
+						</tr>
+						</table>
+					</td>
+				</tr>
 			  	</table>
 			</td>
 		</tr>
+		<tr><td>&nbsp;</td></tr>
 		<!--Menu Eintrag Kommunikation-->
 		<tr>
           	<td nowrap><a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Kommunikation'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Kommunikation</a></td>
@@ -144,42 +160,48 @@
 			  	</tr>
 			  	<tr>
 			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="stundenplan/lv_verteilung/lv_verteilung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;LV-Verteilung</a></td>
+					<td nowrap><a class="MenuItem2" href="stundenplan/lv_verteilung/lv_verteilung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Lehreinheiten</a></td>
 			  	</tr>
 			  	<tr>
 			  		<td width="10" nowrap>&nbsp;</td>
 					<td nowrap><a class="MenuItem2" href="stundenplan/stdplan_insert.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Stundenplan</a></td>
 			  	</tr>
-			  	<td width="10" nowrap>&nbsp;</td>
+			  	<tr>
+			  		<td width="10" nowrap>&nbsp;</td>
 					<td nowrap><a class="MenuItem2" href="stundenplan/stdplan_delete.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Delete</a></td>
 			  	</tr>
+			  	<!--
 			  	<td width="10" nowrap>&nbsp;</td>
 					<td nowrap><a class="MenuItem2" href="stundenplan/einheit_menu.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Einheiten</a></td>
-			  	</tr>
+			  	</tr>-->
 			  	<!--Menu Eintrag Lehrfach-->
-			  	<td width="10" nowrap>&nbsp;</td>
-			  	<td nowrap>
-			  		<a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Lehrfach'));">
-			  			<img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Lehrfach
-			  		</a>
-			  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Lehrfach" style="display: none;">
-					  	<tr>
-					  		<td width="10" nowrap>&nbsp;</td>
-							<td nowrap><a class="MenuItem2" href="stundenplan/lehrfach.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Verwaltung</a></td>
-					  	</tr>
-					  	<tr>
-					  		<td width="10" nowrap>&nbsp;</td>
-							<td nowrap><a class="MenuItem2" href="stundenplan/lehrfach/wartung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Wartung</a></td>
-					  	</tr>
-				  	</table>
-				</td>
+			  	<tr>
+				  	<td width="10" nowrap>&nbsp;</td>
+				  	<td nowrap>
+				  		<a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Lehrfach'));">
+				  			<img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Lehrfach
+				  		</a>
+				  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Lehrfach" style="display: none;">
+						  	<tr>
+						  		<td width="10" nowrap>&nbsp;</td>
+								<td nowrap><a class="MenuItem2" href="stundenplan/lehrfach.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Verwaltung</a></td>
+						  	</tr>
+						  	<tr>
+						  		<td width="10" nowrap>&nbsp;</td>
+								<td nowrap><a class="MenuItem2" href="stundenplan/lehrfach/wartung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Wartung</a></td>
+						  	</tr>
+					  	</table>
+					</td>
 				</tr>
+				<tr>
 			  		<td width="10" nowrap>&nbsp;</td>
 					<td nowrap><a class="MenuItem2" href="stundenplan/check/index.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Checken</a></td>
 			  	</tr>
+			  	<tr>
 			  		<td width="10" nowrap>&nbsp;</td>
 					<td nowrap><a class="MenuItem2" href="stundenplan/import/index.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Import</a></td>
 			  	</tr>
+			  	<tr>
 			  		<td width="10" nowrap>&nbsp;</td>
 					<td nowrap><a class="MenuItem2" href="stundenplan/export/index.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Export</a></td>
 			  	</tr>

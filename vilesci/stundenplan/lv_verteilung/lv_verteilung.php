@@ -30,11 +30,11 @@ function conf_del()
 	return confirm('Wollen Sie diesen Datensatz wirklich loeschen?');
 }
 </script>
-<title>LV-Verteilung</title>
+<title>Lehreinheiten-Uebersicht</title>
 </head>
 <body>
 
-<H1>LV Verteilung</h1>
+<H1>Lehreinheiten Uebersicht</h1>
 <?php
 //Daten Speichern
 if(isset($_GET['edit']) && (isset($_POST['btn_submit']) || (isset($_POST['status']) && $_POST['status']==3)))

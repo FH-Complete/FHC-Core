@@ -109,7 +109,7 @@ function doEDIT($conn,$id='',$new=false,$msg='')
 	{
 ?>
 
-<h2>Lektor/Mitarbeiter <?php echo $new?'Neu':'Edit' ?></h2>
+<h1>Lektor/Mitarbeiter <?php echo $new?'Neu':'Edit' ?></h1>
 <?php
 if (strlen($msg)>0) echo $msg."<br/>";
 ?>

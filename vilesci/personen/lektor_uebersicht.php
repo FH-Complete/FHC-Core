@@ -43,7 +43,7 @@ function confdel()
 </head>
 
 <body class="background_main">
-<h2>Mitarbeiter &Uuml;bersicht</h2><br>
+<h1>Mitarbeiter &Uuml;bersicht</h1><br>
 
 
 <?php

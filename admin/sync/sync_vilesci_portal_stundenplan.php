@@ -107,9 +107,9 @@ if($result = pg_query($conn_vilesci, $qry))
 			//Spezialgruppe
 			$grp_obj = new gruppe($conn);
 			
-			if(!$grp_obj->exists($row->einheit_kurzbz))
+			if(!$grp_obj->exists(strtoupper($row->einheit_kurzbz)))
 			{
-				$grp_obj->gruppe_kurzbz = $row->einheit_kurzbz;
+				$grp_obj->gruppe_kurzbz = strtoupper($row->einheit_kurzbz);
 				$grp_obj->studiengang_kz = $row->studiengang_kz;
 				$grp_obj->semester = $row->semester;
 				$grp_obj->mailgrp = false;
@@ -164,7 +164,7 @@ if($result = pg_query($conn_vilesci, $qry))
 					myaddslashes($row->datum).",".
 			      	myaddslashes($row->stunde).",".
 			      	myaddslashes($row->ort_kurzbz).",".
-			      	myaddslashes($row->einheit_kurzbz).",".
+			      	myaddslashes(strtoupper($row->einheit_kurzbz)).",".
 			      	myaddslashes($row->titel).",".
 			      	myaddslashes($row->anmerkung).",".
 			      	($row->fix=='t'?'true':'false').",'".
