@@ -28,7 +28,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 
 <tree id="tree-verband" onselect="onVerbandSelect();"
 	seltype="single" hidecolumnpicker="false" flex="1"
-	datasources="../rdf/student-verband.rdf.php" ref="http://www.technikum-wien.at/student-verband/alle-verbaende"
+	datasources="../rdf/lehrverbandsgruppe.rdf.php" ref="http://www.technikum-wien.at/lehrverbandsgruppe/alle-verbaende"
 	>
 	<treecols>
 	    <treecol id="bez" label="Bezeichnung" flex="15" primary="true" />
@@ -43,7 +43,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 	    <splitter class="tree-splitter"/>
 	    <treecol id="grp" label="Grp" flex="1" hidden="true"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="einheit" label="Einheit" flex="1" hidden="true"/>
+	    <treecol id="einheit" label="SpzGruppe" flex="1" hidden="true"/>
 	</treecols>
 
 	<template>
@@ -57,7 +57,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 	           <treecell label="rdf:http://www.technikum-wien.at/student-verband/rdf#sem"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/student-verband/rdf#ver"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/student-verband/rdf#grp"/>
-	           <treecell label="rdf:http://www.technikum-wien.at/student-verband/rdf#einheit"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/student-verband/rdf#gruppe"/>
 	         </treerow>
 	       </treeitem>
 	      </treechildren>

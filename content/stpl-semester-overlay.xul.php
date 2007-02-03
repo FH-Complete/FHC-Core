@@ -12,7 +12,7 @@ if (!isset($REMOTE_USER))
 
 $uid=$REMOTE_USER;
 
-if (!$conn = @pg_pconnect(CONN_STRING))
+if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Fehler: Es konnte keine Verbindung zum Server aufgebaut werden!';
 //$error_msg.=loadVariables($conn,$REMOTE_USER);
 // Stundentafel abfragen
@@ -23,7 +23,7 @@ $num_rows_stunde=pg_numrows($result_stunde);
 ?>
 
 <!DOCTYPE overlay [
-	<?php require("../locale/tempus.dtd"); ?>
+	<?php require("../locale/de-AT/tempus.dtd"); ?>
 ]>
 
 <overlay id="TempusOverlay"
