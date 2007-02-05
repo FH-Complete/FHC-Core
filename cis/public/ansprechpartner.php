@@ -29,7 +29,7 @@ else
       </tr>
 	  <tr>
 	  	<td>
-		  <table width="100%"  border="0" cellspacing="0" cellpadding="0">
+		  <table  border="0" cellspacing="0" cellpadding="0">
 		  	<tr>
 		  	  <td width="280" colspan="2" nowrap class="ContentHeader2">&nbsp;Leitung</td>
 		  	  <td class="ContentHeader2" nowrap>&nbsp;</td>

@@ -19,7 +19,7 @@
 	include("../../include/fas/functions.inc.php");
 	include("../../include/fas/lehreinheit.class.php");
 	include("../../include/fas/lehrveranstaltung.class.php");
-	include("../../include/berechtigung.class.php");
+	include("../../include/benutzerberechtigung.class.php");
 	include("../../include/functions.inc.php");
 	include("../../vilesci/config.inc.php");
 
@@ -70,7 +70,7 @@
 		$return = 'false';
 		$errormsg = 'Verbindung zur Datenbank fehlgeschlagen';
 	}
-	$rechte = new berechtigung($conn);
+	$rechte = new benutzerberechtigung($conn);
 	$rechte->getBerechtigungen($user);
 	$benutzer = new benutzer($conn);
 	$benutzer->loadVariables($user);

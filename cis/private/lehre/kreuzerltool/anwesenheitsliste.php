@@ -194,7 +194,9 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 							OR
 							(tbl_lehreinheitgruppe.verband<>'' AND 
 							  (trim(tbl_lehreinheitgruppe.gruppe)='' OR tbl_lehreinheitgruppe.gruppe is null) AND
-							  trim(tbl_lehreinheitgruppe.verband) = trim(vw_student.verband)))
+							  trim(tbl_lehreinheitgruppe.verband) = trim(vw_student.verband))
+							  OR (tbl_lehreinheitgruppe.verband is null AND tbl_lehreinheitgruppe.gruppe is null)
+							  )
 							 ORDER BY nachname, vorname";
 			}
 			else 
@@ -376,7 +378,9 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 							OR
 							(tbl_lehreinheitgruppe.verband<>'' AND 
 							  (trim(tbl_lehreinheitgruppe.gruppe)='' OR tbl_lehreinheitgruppe.gruppe is null) AND
-							  trim(tbl_lehreinheitgruppe.verband) = trim(vw_student.verband)))
+							  trim(tbl_lehreinheitgruppe.verband) = trim(vw_student.verband))
+							  OR (tbl_lehreinheitgruppe.verband is null AND tbl_lehreinheitgruppe.gruppe is null)
+							  )
 							 ORDER BY nachname, vorname";
 			}
 			else 
@@ -603,12 +607,16 @@ function addUser(student_uid)
 						tbl_lehreinheitgruppe.semester = vw_student.semester AND
 						((tbl_lehreinheitgruppe.verband<>'' AND 
 						  tbl_lehreinheitgruppe.gruppe<>'' AND 
+						  tbl_lehreinheitgruppe.verband is not null AND
+						  tbl_lehreinheitgruppe.gruppe is not null AND
 						  trim(tbl_lehreinheitgruppe.verband) = trim(vw_student.verband) AND
 						  trim(tbl_lehreinheitgruppe.gruppe) = trim(vw_student.gruppe))
 						OR
-						(tbl_lehreinheitgruppe.verband<>'' AND 
+						(tbl_lehreinheitgruppe.verband<>'' AND tbl_lehreinheitgruppe.verband is not null AND
 						  (trim(tbl_lehreinheitgruppe.gruppe)='' OR tbl_lehreinheitgruppe.gruppe is null) AND
-						  trim(tbl_lehreinheitgruppe.verband) = trim(vw_student.verband)))
+						  trim(tbl_lehreinheitgruppe.verband) = trim(vw_student.verband))
+						  OR (tbl_lehreinheitgruppe.verband is null AND tbl_lehreinheitgruppe.gruppe is null)
+						  )
 						 ORDER BY nachname, vorname";
 		}
 		else 

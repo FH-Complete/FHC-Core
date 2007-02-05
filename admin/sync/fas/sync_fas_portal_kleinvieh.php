@@ -68,9 +68,9 @@ for ($i=0; $i<=14; $i++)
 }
 ECHO NL2BR ( "aufmerksamdurch synchronisiert");
 
-$qry="INSERT INTO public.tbl_erhalter (erhalter_kz, kurzbz, bezeichnung, dvr, logo, zvr) VALUES('5', 'TW','Technikum Wien', '0928381',null,'074476426');";
-$result=pg_query($conn,$qry);
-ECHO NL2BR ( "\nerhalter synchronisiert");
+//$qry="INSERT INTO public.tbl_erhalter (erhalter_kz, kurzbz, bezeichnung, dvr, logo, zvr) VALUES('5', 'TW','Technikum Wien', '0928381',null,'074476426');";
+//$result=pg_query($conn,$qry);
+//ECHO NL2BR ( "\nerhalter synchronisiert");
 
 $rolle_kurzbz=array('Interessent','Bewerber','Student','Ausserordentlicher','Abgewiesener','Aufgenommener','Wartender',
 		'Abbrecher','Unterbrecher','Outgoing','Incoming','Praktikant','Diplomant','Absolvent');		

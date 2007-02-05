@@ -99,20 +99,20 @@ if(isset($_GET['mitarbeiter_id']))
 		
 		if($leerzeichencodierung)
 		{
-			if ($funktion->studiensemester_id=='') $funktion->studiensemester_id='&#xA0;';
-			if ($funktion->studiengang_id=='') $funktion->studiengang_id='&#xA0;';
-			if ($funktion->studiengang_id=='') $funktion->studiengang_id='&#xA0;';
-			if ($funktion->fachbereich_id=='') $funktion->fachbereich_id='&#xA0;';
-			if ($funktion->name=='') $funktion->name='&#xA0;';
-			if ($funktion->funktion=='') $funktion->funktion='&#xA0;';
-			if ($funktion->beschart1=='') $funktion->beschart1='&#xA0;';
-			if ($funktion->beschart2='') $funktion->beschart2='&#xA0;';
-			if ($funktion->verwendung='') $funktion->verwendung='&#xA0;';
-			if ($funktion->hauptberuf='') $funktion->hauptberuf='&#xA0;';
-			if ($funktion->hauptberuflich='') $funktion->hauptberuflich='&#xA0;';
-			if ($funktion->entwicklungsteam='') $funktion->entwicklungsteam='&#xA0;';
-			if ($funktion->besonderequalifikation='') $funktion->besonderequalifikation='&#xA0;';
-			if ($funktion->ausmass='') $funktion->ausmass='&#xA0;';
+			if ($funktionen->studiensemester_id=='') $funktionen->studiensemester_id='&#xA0;';
+			if ($funktionen->studiengang_id=='') $funktionen->studiengang_id='&#xA0;';
+			if ($funktionen->studiengang_id=='') $funktionen->studiengang_id='&#xA0;';
+			if ($funktionen->fachbereich_id=='') $funktionen->fachbereich_id='&#xA0;';
+			if ($funktionen->name=='') $funktionen->name='&#xA0;';
+			if ($funktionen->funktion=='') $funktionen->funktion='&#xA0;';
+			if ($funktionen->beschart1=='') $funktionen->beschart1='&#xA0;';
+			if ($funktionen->beschart2='') $funktionen->beschart2='&#xA0;';
+			if ($funktionen->verwendung='') $funktionen->verwendung='&#xA0;';
+			if ($funktionen->hauptberuf='') $funktionen->hauptberuf='&#xA0;';
+			if ($funktionen->hauptberuflich='') $funktionen->hauptberuflich='&#xA0;';
+			if ($funktionen->entwicklungsteam='') $funktionen->entwicklungsteam='&#xA0;';
+			if ($funktionen->besonderequalifikation='') $funktionen->besonderequalifikation='&#xA0;';
+			if ($funktionen->ausmass='') $funktionen->ausmass='&#xA0;';
 			
 		}
 ?>
