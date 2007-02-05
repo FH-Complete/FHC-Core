@@ -402,7 +402,7 @@
             <tr>
               <td nowrap>
                 <?php						
-                	$path = '../../../documents/'.strtolower($short).'/allgemeiner_download';
+                	$path = '../../../documents/'.strtolower($short).'/download';
 					if(!$dest_dir = @dir($path))
 					{
 					
@@ -410,8 +410,8 @@
 						{
 							if(!is_dir('../../../documents/'.strtolower($short)))
 								exec('mkdir -m 775 "../../../documents/'.strtolower($short).'"');
-							exec('mkdir -m 775 "../../../documents/'.strtolower($short).'/allgemeiner_download"');
-							exec('sudo chgrp teacher ../../../documents/'.strtolower($short).'/allgemeiner_download');
+							exec('mkdir -m 775 "../../../documents/'.strtolower($short).'/download"');
+							exec('sudo chgrp teacher ../../../documents/'.strtolower($short).'/download');
 						}
 					
 						$dir_empty = true;
