@@ -165,7 +165,7 @@ class wochenplan
 		{
 			$this->link.='&pers_uid='.$this->pers_uid;	//Link erweitern
 			if ($this->type=='student')
-				$sql_query="SELECT uid, titelpre, nachname, vornamen, studiengang_kz, semester, verband, gruppe FROM vw_student WHERE uid='$this->pers_uid'";
+				$sql_query="SELECT uid, titelpre, nachname, vornamen, studiengang_kz, semester, verband, gruppe FROM campus.vw_student WHERE uid='$this->pers_uid'";
 			else
 				$sql_query="SELECT uid, titelpre, nachname, vornamen FROM campus.vw_mitarbeiter WHERE uid='$this->pers_uid'";
 			//echo $sql_query;

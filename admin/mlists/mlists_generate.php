@@ -24,7 +24,7 @@ $error_msg='';
 <BODY>
 	<H3>MailingListen abgleich</H3>
 	<?php
-	if (!$conn = @pg_pconnect(CONN_STRING))
+	if (!$conn = pg_pconnect(CONN_STRING))
    		$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden.\n';
 
    	// aktuelles Studiensemester ermitteln
@@ -140,7 +140,7 @@ $error_msg='';
 		AND (uid,UPPER(gruppe_kurzbz)) NOT IN
 		(SELECT mitarbeiter_uid,UPPER(typ::varchar(1) || tbl_studiengang.kurzbz || '_lkt')
 			FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, tbl_studiengang
-			WHERE 
+			WHERE
 			tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
 			tbl_studiengang.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz AND
@@ -150,8 +150,8 @@ $error_msg='';
 		$error_msg.=pg_errormessage($conn).$sql_query;
 	while($row=pg_fetch_object($result))
 	{
-     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$row->mailgrp_kurzbz') AND uid='$row->mitarbeiter_uid'";
-		if(!@pg_query($conn, $sql_query))
+     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$row->gruppe_kurzbz') AND uid='$row->uid'";
+		if(!pg_query($conn, $sql_query))
 			$error_msg.=pg_errormessage($conn).$sql_query;
 		echo '-';
 		flush();
@@ -160,12 +160,12 @@ $error_msg='';
 	echo '<BR>';
 	$sql_query="SELECT mitarbeiter_uid, UPPER(typ::varchar(1) || tbl_studiengang.kurzbz || '_lkt') AS mlist_name, tbl_studiengang.studiengang_kz
 		FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_studiengang
-		WHERE 
+		WHERE
 		tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 		tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-		tbl_studiengang.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz AND	
+		tbl_studiengang.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz AND
 		studiensemester_kurzbz='$studiensemester' AND
-		mitarbeiter_uid NOT LIKE '\\\\_%' AND tbl_studiengang.studiengang_kz!=0 AND 
+		mitarbeiter_uid NOT LIKE '\\\\_%' AND tbl_studiengang.studiengang_kz!=0 AND
 		(mitarbeiter_uid,UPPER(typ::varchar(1) || tbl_studiengang.kurzbz || '_lkt')) NOT IN
 		(SELECT uid, UPPER(gruppe_kurzbz) FROM public.tbl_benutzergruppe
 			WHERE gruppe_kurzbz LIKE '%\\\\_LKT' AND UPPER(gruppe_kurzbz)!=UPPER('tw_lkt') AND UPPER(gruppe_kurzbz)!=UPPER('tw_fix_lkt'))";
@@ -179,8 +179,8 @@ $error_msg='';
 		{
 			if(pg_num_rows($res)<=0)
 			{
-				$sql_query="INSERT INTO public.tbl_gruppe(gruppe_kurzbz, studiengang_kz, semester, bezeichnung, 
-							beschreibung, mailgrp, sichtbar, generiert, aktiv, updateamum, updatevon, 
+				$sql_query="INSERT INTO public.tbl_gruppe(gruppe_kurzbz, studiengang_kz, semester, bezeichnung,
+							beschreibung, mailgrp, sichtbar, generiert, aktiv, updateamum, updatevon,
 							insertamum, insertvon)
 							VALUES('".strtoupper($row->mlist_name)."',$row->studiengang_kz, 0,'$row->mlist_name',".
 							"'$row->mlist_name', true, true, true, true, now(),'mlists_generate',now(), 'mlists_generate');";
@@ -188,9 +188,9 @@ $error_msg='';
 					echo "<br>Fehler beim Anlegen der Gruppe: $sql_query<br>";
 			}
 		}
-		else 
+		else
 			echo "<br>Fehler:$sql_query";
-		
+
      	$sql_query="INSERT INTO public.tbl_benutzergruppe VALUES ('$row->mitarbeiter_uid','".strtoupper($row->mlist_name)."', now(), 'mlists_generate')";
 		if(!pg_query($conn, $sql_query))
 			$error_msg.=pg_errormessage($conn).$sql_query;
@@ -205,9 +205,9 @@ $error_msg='';
 	/*
 	echo '<BR>Studenten-Verteiler werden abgeglichen!<BR>';
 	flush();
-	$sql_query="SELECT gruppe_kurzbz, uid FROM public.tbl_benutzergruppe NATURAL JOIN tbl_einheit 
-	            WHERE (uid, mailgrp_kurzbz) NOT IN 
-	            (SELECT uid, mailgrp_kurzbz FROM tbl_einheitstudent NATURAL JOIN tbl_einheit 
+	$sql_query="SELECT gruppe_kurzbz, uid FROM public.tbl_benutzergruppe NATURAL JOIN tbl_einheit
+	            WHERE (uid, mailgrp_kurzbz) NOT IN
+	            (SELECT uid, mailgrp_kurzbz FROM tbl_einheitstudent NATURAL JOIN tbl_einheit
 	            	WHERE mailgrp_kurzbz IS NOT NULL)";
 
 

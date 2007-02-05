@@ -12,9 +12,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 
 ?>
 
-<!DOCTYPE overlay [
-	<?php require("../locale/de-AT/tempus.dtd"); ?>
-]>
+<!DOCTYPE overlay >
+<!-- [<?php require_once("../locale/de-AT/tempus.dtd"); ?>] -->
 
 <overlay id="TempusOverlay"
 	xmlns:html="http://www.w3.org/1999/xhtml"
@@ -142,10 +141,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 			<hbox id="hboxTimeTableWeek" />
 			<!--  Semesterplan  -->
 			<vbox id="vboxTimeTableSemester" />
-			<!--  Studenten  -->
-			<vbox id="studentenEditor" />
-			<!-- Lehrfachverteilung -->
-            <vbox id="lfvtEditor" />
+			<!--  Studenten
+			<vbox id="studentenEditor" /> -->
+			<!-- Lehrfachverteilung
+            <vbox id="lfvtEditor" /> -->
 		</tabpanels>
 	</tabbox>
 </vbox>

@@ -23,9 +23,8 @@ if(!$result_stunde=pg_query($conn, $sql_query))
 $num_rows_stunde=pg_numrows($result_stunde);
 ?>
 
-<!DOCTYPE overlay [
-	<?php require_once("../locale/de-AT/tempus.dtd"); ?>
-]>
+<!DOCTYPE overlay >
+<!-- [<?php require_once("../locale/de-AT/tempus.dtd"); ?>] -->
 
 <overlay id="TempusOverlaySTPLWeek"
 	xmlns:html="http://www.w3.org/1999/xhtml"
@@ -89,7 +88,7 @@ $num_rows_stunde=pg_numrows($result_stunde);
 	<grippy />
 </splitter>
 
-<vbox id="vboxSTPLDetailsListe" flex="2" />
+<!-- <vbox id="vboxSTPLDetailsListe" flex="2" /> -->
 
 </vbox>
 
