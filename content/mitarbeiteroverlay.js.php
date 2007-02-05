@@ -190,6 +190,7 @@ function TreeListeMitarbeiterAuswahl()
 		//Funktionen Tree fuellen
 		var treeFunktionen=document.getElementById('tree-liste-funktionen');
 		var treeFunktionenURL = "<?php echo APP_ROOT; ?>rdf/fas/funktionen.rdf.php?mitarbeiter_id="+mitarbeiter_id+"&leerzeichencodierung=true&"+gettimestamp();
+		
 		//treeFunktionen.setAttribute('datasources',treeFunktionenURL);
 		
 		//Alte Datasources loeschen

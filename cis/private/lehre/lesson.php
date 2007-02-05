@@ -488,7 +488,7 @@
 				</td>
 				<td valign="top" align="center">
 				<a href="<?php
-				  			echo 'news://cis.technikum-wien.at/'.strtolower($kurzbz).'.'.$term_id.'sem.'.strtolower($short_short_name);
+				  			echo 'news://cis.technikum-wien.at/'.strtolower($stg_obj->kurzbzlang).'.'.$term_id.'sem.'.strtolower($short_short_name);
 				  		   ?>">
 				<img border="0" src="../../../skin/images/button_ng.jpg" width="67" height="45"><br>
 				<strong>Newsgroups</strong>

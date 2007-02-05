@@ -44,6 +44,7 @@
 	{
 		$stg_obj = new studiengang($sql_conn, $course_id);
 		$short = $stg_obj->kuerzel;
+		$short_long = $stg_obj->kurzbzlang;
 		$course_id = $_GET['course_id'];
 	}
 	else 
@@ -443,7 +444,7 @@
             <tr>
               <td nowrap>
                 <?php
-					echo '<img src="../../../skin/images/seperator.gif">&nbsp;<a href="news://cis.technikum-wien.at/'.strtolower($short).'" class="Item" target="_blank">Newsgroups</a>';
+					echo '<img src="../../../skin/images/seperator.gif">&nbsp;<a href="news://cis.technikum-wien.at/'.strtolower($short_long).'" class="Item" target="_blank">Newsgroups</a>';
 
 				?>
               </td>

@@ -14,8 +14,8 @@ if(!pg_query($conn_vilesci,$qry))
 	return false;
 }
 
-// Erhalter anlegen
-//$result=pg_exec($conn,  "INSERT INTO tbl_erhalter VALUES(5,'TW','Technikum Wien')");
+//Erhalter anlegen
+$result=pg_query($conn,  "INSERT INTO public.tbl_erhalter (erhalter_kz, kurzbz, bezeichnung, dvr, logo, zvr) VALUES('5', 'TW','Technikum Wien', '0928381',null,'074476426');");
 
 /*************************
  * VileSci-Synchronisation

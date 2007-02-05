@@ -86,14 +86,14 @@ class benutzer
 	function load($id)
 	{
 		// Berechtigung holen
-		$sql_query="SELECT * FROM tbl_userberechtigung WHERE userberechtigung_id=$id";
+		$sql_query="SELECT * FROM public.tbl_benutzerberechtigung WHERE benutzerberechtigung_id=$id";
 	    //echo $sql_query;
-		if(!($erg=pg_exec($this->conn, $sql_query)))
+		if(!($erg=pg_query($this->conn, $sql_query)))
 		{
 			$this->errormsg=pg_errormessage($this->conn);
 			return false;
 		}
-		$num_rows=pg_numrows($erg);
+		$num_rows=pg_num_rows($erg);
 		if($num_rows!=1)
 		{
 			$this->errormsg="Zuwenige oder zuviele Ergebnisse (Anzahl: $num_rows)!";
@@ -101,9 +101,9 @@ class benutzer
 		}
    		$row=pg_fetch_object($erg,0);
 
-		$this->userberechtigung_id=$row->userberechtigung_id;
+		$this->userberechtigung_id=$row->benutzerberechtigung_id;
 		$this->studiengang_kz=$row->studiengang_kz;
-		$this->fachbereich_id=$row->fachbereich_id;
+		$this->fachbereich_id=$row->fachbereich_kurzbz;
 		$this->berechtigung_kurzbz=$row->berechtigung_kurzbz;
 		$this->uid=$row->uid;
 		$this->studiensemester_kurzbz=$row->studiensemester_kurzbz;
@@ -199,7 +199,7 @@ class benutzer
 	function getBerechtigungen($uid)
 	{
 		// Berechtigungen holen
-		$sql_query="SELECT * FROM tbl_userberechtigung WHERE uid='$uid' AND (start<now() OR start IS NULL) AND (ende>now() OR ende IS NULL)";
+		$sql_query="SELECT * FROM public.tbl_benutzerberechtigung WHERE uid='$uid' AND (start<now() OR start IS NULL) AND (ende>now() OR ende IS NULL)";
 	    //echo $sql_query;
 		if(!$erg=@pg_query($this->conn, $sql_query))
 		{
@@ -209,10 +209,10 @@ class benutzer
 		//$num_rows=pg_numrows($erg);
 		while($row=pg_fetch_object($erg))
 		{
-   			$b=new berechtigung($this->conn);
-			$b->userberechtigung_id=$row->userberechtigung_id;
+   			$b=new benutzer($this->conn);
+			$b->userberechtigung_id=$row->benutzerberechtigung_id;
 			$b->studiengang_kz=$row->studiengang_kz;
-			$b->fachbereich_id=$row->fachbereich_id;
+			$b->fachbereich_id=$row->fachbereich_kurzbz;
 			$b->berechtigung_kurzbz=$row->berechtigung_kurzbz;
 			$b->uid=$row->uid;
 			$b->studiensemester_kurzbz=$row->studiensemester_kurzbz;
@@ -295,13 +295,13 @@ class benutzer
 	function setVariableStudiensemester($user,$stsem)
 	{
 		//Vorhandende Variable aendern
-		$qry = "Update tbl_variable SET wert='$stsem' WHERE uid='$user' AND name='semester_aktuell'";
+		$qry = "Update public.tbl_variable SET wert='$stsem' WHERE uid='$user' AND name='semester_aktuell'";
 		if($result = pg_query($this->conn,$qry))
 		{
 			if(pg_affected_rows($result)==0)
 			{
 				//Falls Variable nicht vorhanden ist eine neue anlegen
-				$qry = "INSERT INTO tbl_variable(uid, name, wert) values('$user', 'semester_aktuell', '$stsem')";
+				$qry = "INSERT INTO public.tbl_variable(uid, name, wert) values('$user', 'semester_aktuell', '$stsem')";
 				if(pg_query($this->conn,$qry))
 					return true;
 				else 
@@ -327,7 +327,7 @@ class benutzer
 		switch($variable)
 		{
 			case 'semester_aktuell':
-				$qry = "Select * from tbl_studiensemester order by start";
+				$qry = "Select * from public.tbl_studiensemester order by start";
 				if($result = pg_query($this->conn,$qry))
 				{
 					while($row=pg_fetch_object($result))
@@ -340,7 +340,7 @@ class benutzer
 	
 	function loadVariables($user)
 	{			
-		if(!($result=@pg_query($this->conn, "SELECT * FROM tbl_variable WHERE uid='$user'")))
+		if(!($result=pg_query($this->conn, "SELECT * FROM public.tbl_variable WHERE uid='$user'")))
 		{
 			$this->errormsg.=pg_errormessage($this->conn);
 			return false;
@@ -355,7 +355,7 @@ class benutzer
 		
 		if (!isset($this->variable->semester_aktuell))
 		{
-			if(!($result=@pg_query($this->conn, 'SELECT * FROM tbl_studiensemester WHERE ende>now() ORDER BY start LIMIT 1')))
+			if(!($result=pg_query($this->conn, 'SELECT * FROM public.tbl_studiensemester WHERE ende>now() ORDER BY start LIMIT 1')))
 			{
 				$this->errormsg.=pg_errormessage($this->conn);
 				return false;

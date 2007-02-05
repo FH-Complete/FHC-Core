@@ -58,7 +58,10 @@
           <td class='ContentHeader'><font class='ContentHeader'>&nbsp;<?php echo $short_name; ?> - Feedback 
             an: 
 			<?php
-			$qry = "SELECT distinct vorname, nachname, uid FROM campus.vw_mitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter WHERE uid=mitarbeiter_uid AND tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND lehrveranstaltung_id='$lvid' AND studiensemester_kurzbz='$stsem'";
+			$qry = "SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE lehrveranstaltung_id='$lvid' ORDER BY ende DESC LIMIT 1";
+			$result = pg_query($conn, $qry);
+			$row = pg_fetch_object($result);
+			$qry = "SELECT distinct vorname, nachname, uid FROM campus.vw_mitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter WHERE uid=mitarbeiter_uid AND tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND lehrveranstaltung_id='$lvid' AND studiensemester_kurzbz='$row->studiensemester_kurzbz'";
 			if(!$result=pg_query($conn, $qry))
 				die('Fehler beim Auslesen der Lektoren');
 			$rows = pg_num_rows($result);
