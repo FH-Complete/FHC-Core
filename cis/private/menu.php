@@ -113,6 +113,22 @@ else
 			if($is_lector)
 			{
 				?>
+			<tr>
+					<td width="10" nowrap>&nbsp;</td>
+				    <td nowrap>
+				    	<a href="profile/zeitwunsch.php?uid=<?php echo $REMOTE_USER; ?>" class="Item" target="content">
+				    		<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Zeitw&uuml;nsche
+				    	</a>
+				    </td>
+				</tr>
+				<tr>
+					<td width="10" nowrap>&nbsp;</td>
+				    <td nowrap>
+				    	<a href="profile/lva_liste.php?uid=<?php echo $REMOTE_USER; ?>" class="Item" target="content">
+				    		<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;LV-&Uuml;bersicht
+				    	</a>
+				    </td>
+				</tr>
 				<tr>
 					<td width="10" nowrap>&nbsp;</td>
 				    <td nowrap>
@@ -166,7 +182,7 @@ else
 					</table>
 		  			</td>
 				</tr>
-				<?php
+					<?php
 			}
 			?>
 			</table>
