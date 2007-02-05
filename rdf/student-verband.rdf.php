@@ -10,7 +10,7 @@ if (!isset($REMOTE_USER))
 	$REMOTE_USER='pam';
 $uid=$REMOTE_USER;
 
-if (!$conn = @pg_pconnect(CONN_STRING))
+if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 // Berechtigungen ermitteln
@@ -26,7 +26,7 @@ if (count($berechtigt_studiengang)>0)
 		$stg_kz_query='AND ('.substr($stg_kz_query,3).')';
 	}
 
-$sql_query="SELECT studiengang_kz, bezeichnung, kurzbz FROM tbl_studiengang WHERE studiengang_kz>=0 $stg_kz_query ORDER BY bezeichnung";
+$sql_query="SELECT studiengang_kz, bezeichnung, kurzbz, typ FROM tbl_studiengang WHERE studiengang_kz>=0 $stg_kz_query ORDER BY erhalter_kz,typ, kurzbz";
 //echo $sql_query;
 if(!$result_stg=pg_query($conn, $sql_query))
 	$error_msg.=pg_errormessage($conn);
@@ -42,11 +42,12 @@ else
 <?php
 for ($i=0;$i<$num_rows_stg;$i++)
 {
-	$row_stg=@pg_fetch_object($result_stg, $i);
+	$row_stg=pg_fetch_object($result_stg, $i);
+	$stg_kurzbz=strtoupper($row_stg->typ.$row_stg->kurzbz);
 	?>
-	<RDF:Description RDF:about="<?php echo $rdf_url.$row_stg->kurzbz; ?>" >
-		<VERBAND:name><?php echo $row_stg->kurzbz.' - '.$row_stg->bezeichnung; ?></VERBAND:name>
-    	<VERBAND:stg><?php echo $row_stg->kurzbz; ?></VERBAND:stg>
+	<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz; ?>" >
+		<VERBAND:name><?php echo $stg_kurzbz.' - '.$row_stg->bezeichnung; ?></VERBAND:name>
+    	<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
     	<VERBAND:stg_kz><?php echo $row_stg->studiengang_kz; ?></VERBAND:stg_kz>
    </RDF:Description>
    <?php
@@ -58,9 +59,9 @@ for ($i=0;$i<$num_rows_stg;$i++)
 	{
 		$row_sem=pg_fetch_object($result_sem, $j);
 		?>
-	   	<RDF:Description RDF:about="<?php echo $rdf_url.$row_stg->kurzbz.'/'.$row_sem->semester; ?>">
-		   	<VERBAND:name><?php echo $row_stg->kurzbz.'-'.$row_sem->semester; ?></VERBAND:name>
-    		<VERBAND:stg><?php echo $row_stg->kurzbz; ?></VERBAND:stg>
+	   	<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$row_sem->semester; ?>">
+		   	<VERBAND:name><?php echo $stg_kurzbz.'-'.$row_sem->semester; ?></VERBAND:name>
+    		<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
     		<VERBAND:stg_kz><?php echo $row_stg->studiengang_kz; ?></VERBAND:stg_kz>
 		   	<VERBAND:sem><?php echo $row_sem->semester; ?></VERBAND:sem>
    		</RDF:Description>
@@ -73,9 +74,9 @@ for ($i=0;$i<$num_rows_stg;$i++)
 		{
 			$row_ver=pg_fetch_object($result_ver, $k);
 			?>
-			<RDF:Description RDF:about="<?php echo $rdf_url.$row_stg->kurzbz.'/'.$row_sem->semester.'/'.$row_ver->verband; ?>">
-		   		<VERBAND:name><?php echo $row_stg->kurzbz.'-'.$row_sem->semester.$row_ver->verband; ?></VERBAND:name>
-    			<VERBAND:stg><?php echo $row_stg->kurzbz; ?></VERBAND:stg>
+			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$row_sem->semester.'/'.$row_ver->verband; ?>">
+		   		<VERBAND:name><?php echo $stg_kurzbz.'-'.$row_sem->semester.$row_ver->verband; ?></VERBAND:name>
+    			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
     			<VERBAND:stg_kz><?php echo $row_stg->studiengang_kz; ?></VERBAND:stg_kz>
 		   		<VERBAND:sem><?php echo $row_sem->semester; ?></VERBAND:sem>
 		   		<VERBAND:ver><?php echo $row_ver->verband; ?></VERBAND:ver>
@@ -88,9 +89,9 @@ for ($i=0;$i<$num_rows_stg;$i++)
 			{
 				$row_grp=pg_fetch_object($result_grp, $l);
 				?>
-				<RDF:Description RDF:about="<?php echo $rdf_url.$row_stg->kurzbz.'/'.$row_sem->semester.'/'.$row_ver->verband.'/'.$row_grp->gruppe; ?>">
-					<VERBAND:name><?php echo $row_stg->kurzbz.'-'.$row_sem->semester.$row_ver->verband.$row_grp->gruppe; ?></VERBAND:name>
-					<VERBAND:stg><?php echo $row_stg->kurzbz; ?></VERBAND:stg>
+				<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$row_sem->semester.'/'.$row_ver->verband.'/'.$row_grp->gruppe; ?>">
+					<VERBAND:name><?php echo $stg_kurzbz.'-'.$row_sem->semester.$row_ver->verband.$row_grp->gruppe; ?></VERBAND:name>
+					<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
 					<VERBAND:stg_kz><?php echo $row_stg->studiengang_kz; ?></VERBAND:stg_kz>
 					<VERBAND:sem><?php echo $row_sem->semester; ?></VERBAND:sem>
 					<VERBAND:ver><?php echo $row_ver->verband; ?></VERBAND:ver>
@@ -108,9 +109,9 @@ for ($i=0;$i<$num_rows_stg;$i++)
 		{
 			$row_einh=pg_fetch_object($result_einh, $m);
 			?>
-			<RDF:Description RDF:about="<?php echo $rdf_url.$row_stg->kurzbz.'/'.$row_sem->semester.'/'.$row_einh->gruppe_kurzbz; ?>">
+			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$row_sem->semester.'/'.$row_einh->gruppe_kurzbz; ?>">
 		   		<VERBAND:name><?php echo $row_einh->gruppe_kurzbz.'-'.$row_einh->bezeichnung; ?></VERBAND:name>
-    			<VERBAND:stg><?php echo $row_stg->kurzbz; ?></VERBAND:stg>
+    			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
     			<VERBAND:stg_kz><?php echo $row_stg->studiengang_kz; ?></VERBAND:stg_kz>
 		   		<VERBAND:sem><?php echo $row_sem->semester; ?></VERBAND:sem>
 		   		<VERBAND:einheit><?php echo $row_einh->gruppe_kurzbz; ?></VERBAND:einheit>
@@ -121,15 +122,18 @@ for ($i=0;$i<$num_rows_stg;$i++)
 }
 ?>
 
+<!-- Sequences -->
+
 <RDF:Seq RDF:about="<?php echo $rdf_url.'alle-verbaende'; ?>">
 <?php
 for ($i=0;$i<$num_rows_stg;$i++)
 {
-	$row_stg=@pg_fetch_object($result_stg, $i);
+	$row_stg=pg_fetch_object($result_stg, $i);
+	$stg_kurzbz=strtoupper($row_stg->typ.$row_stg->kurzbz);
 	?>
-	<RDF:li RDF:resource="<?php echo $rdf_url.$row_stg->kurzbz; ?>" />
+	<RDF:li RDF:resource="<?php echo $rdf_url.$stg_kurzbz; ?>" />
 	<RDF:li>
-    	<RDF:Seq RDF:about="<?php echo $rdf_url.$row_stg->kurzbz; ?>">
+    	<RDF:Seq RDF:about="<?php echo $rdf_url.$stg_kurzbz; ?>">
 		<?php
 		$sql_query="SELECT DISTINCT semester FROM tbl_student WHERE studiengang_kz=$row_stg->studiengang_kz ORDER BY semester";
 		if(!($result_sem=pg_query($conn, $sql_query)))
@@ -139,9 +143,9 @@ for ($i=0;$i<$num_rows_stg;$i++)
 		{
 			$row_sem=pg_fetch_object($result_sem, $j);
 			?>
-			<RDF:li RDF:resource="<?php echo $rdf_url.$row_stg->kurzbz.'/'.$row_sem->semester; ?>" />
+			<RDF:li RDF:resource="<?php echo $rdf_url.$stg_kurzbz.'/'.$row_sem->semester; ?>" />
 			<RDF:li>
-	  			<RDF:Seq RDF:about="<?php echo $rdf_url.$row_stg->kurzbz.'/'.$row_sem->semester; ?>">
+	  			<RDF:Seq RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$row_sem->semester; ?>">
 				<?php
 				$sql_query="SELECT DISTINCT verband FROM tbl_student WHERE verband!=' ' AND studiengang_kz=$row_stg->studiengang_kz AND semester=$row_sem->semester ORDER BY verband";
 				if(!($result_ver=pg_exec($conn, $sql_query)))
@@ -151,9 +155,9 @@ for ($i=0;$i<$num_rows_stg;$i++)
 				{
 					$row_ver=pg_fetch_object($result_ver, $k);
 					?>
-					<RDF:li RDF:resource="<?php echo $rdf_url.$row_stg->kurzbz.'/'.$row_sem->semester.'/'.$row_ver->verband; ?>" />
+					<RDF:li RDF:resource="<?php echo $rdf_url.$stg_kurzbz.'/'.$row_sem->semester.'/'.$row_ver->verband; ?>" />
 					<RDF:li>
-						<RDF:Seq RDF:about="<?php echo $rdf_url.$row_stg->kurzbz.'/'.$row_sem->semester.'/'.$row_ver->verband; ?>">
+						<RDF:Seq RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$row_sem->semester.'/'.$row_ver->verband; ?>">
 							<?php
 							$sql_query="SELECT DISTINCT gruppe FROM tbl_student WHERE studiengang_kz=$row_stg->studiengang_kz AND semester=$row_sem->semester AND verband='$row_ver->verband' ORDER BY gruppe";
 							if(!($result_grp=pg_exec($conn, $sql_query)))
@@ -163,7 +167,7 @@ for ($i=0;$i<$num_rows_stg;$i++)
 							{
 								$row_grp=pg_fetch_object($result_grp, $l);
 								?>
-								<RDF:li RDF:resource="<?php echo $rdf_url.$row_stg->kurzbz.'/'.$row_sem->semester.'/'.$row_ver->verband.'/'.$row_grp->gruppe; ?>" />
+								<RDF:li RDF:resource="<?php echo $rdf_url.$stg_kurzbz.'/'.$row_sem->semester.'/'.$row_ver->verband.'/'.$row_grp->gruppe; ?>" />
 								<?php
 							}
 							?>
@@ -181,7 +185,7 @@ for ($i=0;$i<$num_rows_stg;$i++)
 			{
 				$row_einh=pg_fetch_object($result_einh, $m);
 				?>
-					<RDF:li RDF:resource="<?php echo $rdf_url.$row_stg->kurzbz.'/'.$row_sem->semester.'/'.$row_einh->gruppe_kurzbz; ?>" />
+					<RDF:li RDF:resource="<?php echo $rdf_url.$stg_kurzbz.'/'.$row_sem->semester.'/'.$row_einh->gruppe_kurzbz; ?>" />
 				<?php
 			}
 			?>

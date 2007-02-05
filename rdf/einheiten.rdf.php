@@ -19,7 +19,7 @@ include('../vilesci/config.inc.php');
 include_once('../include/einheit.class.php');
 
 // Datenbank Verbindung
-if (!$conn = @pg_pconnect(CONN_STRING))
+if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 

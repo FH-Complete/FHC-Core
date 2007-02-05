@@ -10,7 +10,7 @@ if (!isset($REMOTE_USER))
 	$REMOTE_USER='pam';
 $uid=$REMOTE_USER;
 
-if (!$conn = @pg_pconnect(CONN_STRING))
+if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 // Berechtigungen ermitteln
@@ -38,7 +38,7 @@ else
 ?>
 
 <RDF:RDF	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-			xmlns:VERBAND="<?php echo $rdf_url; ?>rdf#" >
+		xmlns:VERBAND="<?php echo $rdf_url; ?>rdf#" >
 
 <?php
 $stg_kz=null;
@@ -137,10 +137,10 @@ while ($row=pg_fetch_object($result))
 			echo "\t<RDF:li>\n\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz\">\n";
 		}
 
-	   	if ($sem!=$row->semester && ($row->verband!='' || $row->verband!=' '))
+/*	   	if ($sem!=$row->semester && ($row->verband!='' || $row->verband!=' '))
 	   	{
    			if ($ver!=null)
-				echo "\t\t\t\t\t</RDF:Seq>\n\t\t\t\t</RDF:li>\n";
+				echo "\t\t\t\t\t\t</RDF:Seq>\n\t\t\t\t\t</RDF:li>\n";
 			$ver=null;
 			if ($sem!=null)
 				echo "\t\t\t\t</RDF:Seq>\n\t\t\t</RDF:li>\n";
@@ -162,11 +162,12 @@ while ($row=pg_fetch_object($result))
 		}
 	   	else if  ($row->gruppe!='' && $row->gruppe!=' ')
 			echo "\t\t\t\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$row->semester/$row->verband/$row->gruppe\" />\n";
-	}
+	*/}
+
 	if ($num_rows>0)
 	{
-		echo "\t\t\t\t\t\t</RDF:Seq>\n\t\t\t\t\t</RDF:li>\n";
-		echo "\t\t\t\t</RDF:Seq>\n\t\t\t</RDF:li>\n";
+		//echo "\t\t\t\t\t\t</RDF:Seq>\n\t\t\t\t\t</RDF:li>\n";
+		//echo "\t\t\t\t</RDF:Seq>\n\t\t\t</RDF:li>\n";
 		echo "\t\t</RDF:Seq>\n\t</RDF:li>\n";
 	}
 ?>

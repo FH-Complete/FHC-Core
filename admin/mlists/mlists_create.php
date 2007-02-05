@@ -5,13 +5,13 @@
 	require_once('../../vilesci/config.inc.php');
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/globals.inc.php');
-	
+
 	if (!$conn = @pg_pconnect(CONN_STRING))
 	   	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 	if(!($result_stg=pg_query($conn, "SELECT studiengang_kz, bezeichnung, lower(typ::varchar(1) || kurzbz) as kurzbz FROM public.tbl_studiengang ORDER BY kurzbz ASC")))
 		die(pg_errormessage($conn));
 	$num_rows=pg_num_rows($result_stg);
-	
+
 ?>
 <HTML>
 <HEAD>
@@ -56,7 +56,7 @@
 			$name=strtolower($name);
 			$fp=fopen('../../../mlists/'.$name,"w");
 			//$fp=fopen('../../../../mlists/'.$name,"w");
-			
+
 			$nr_person=pg_num_rows($result_person);
 			for  ($p=0; $p<$nr_person; $p++)
 			{
@@ -68,7 +68,7 @@
 			flush();
 		}
 	}
-	
+
 	//Zusammenbauen der Studiengaenge die keine Alias Adressen bekommen
 	$noalias_kz='';
 	foreach($noalias as $var)
@@ -77,19 +77,19 @@
 			$noalias_kz.=',';
 		$noalias_kz.=$var;
 	}
-	
+
 	//$qry = "SELECT vornamen, nachname, uid, alias FROM tbl_person where alias<>'' ORDER BY nachname, vornamen";
-	$qry = "SELECT vorname, nachname, uid, alias FROM (public.tbl_person JOIN public.tbl_benutzer USING(person_id)) LEFT JOIN tbl_student on(uid=student_uid) 
-	        WHERE alias<>'' AND (studiengang_kz NOT IN($noalias_kz) OR studiengang_kz is null) 
+	$qry = "SELECT vorname, nachname, uid, alias FROM (public.tbl_person JOIN public.tbl_benutzer USING(person_id)) LEFT JOIN tbl_student on(uid=student_uid)
+	        WHERE alias<>'' AND (studiengang_kz NOT IN($noalias_kz) OR studiengang_kz is null)
 	        ORDER BY nachname, vorname";
-	
+
 	if($result = pg_query($conn, $qry))
 	{
-		$fp=fopen('../../../../mlists/tw_alias.txt',"w");
+		$fp=fopen('../../../mlists/tw_alias.txt',"w");
 		while($row=pg_fetch_object($result))
 		{
 			fwrite($fp,"# ".$row->nachname." ".$row->vorname.$crlf);
-			fwrite($fp,$row->alias.": ".$row->uid.$crlf);			
+			fwrite($fp,$row->alias.": ".$row->uid.$crlf);
 		}
 		fclose($fp);
 		echo 'tw_alias.txt created<br>';
@@ -98,7 +98,7 @@
 	{
 		echo 'tw_alias.txt failed<br>';
 	}
-    
+
 ?>
 <P><BR>
   Die Mailinglisten wurden erstellt. <BR>
