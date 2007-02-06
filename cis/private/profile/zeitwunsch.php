@@ -37,8 +37,8 @@
 				$num_rows_wunsch=pg_num_rows($erg_wunsch);
 				if ($num_rows_wunsch==0)
 				{
-					$query="INSERT INTO tbl_zeitwunsch (uid, stunde, tag, gewicht) VALUES ('$uid', $stunde, $t, $gewicht)";
-					if(!($erg=pg_exec($conn, $query)))
+					$query="INSERT INTO tbl_zeitwunsch (mitarbeiter_uid, stunde, tag, gewicht) VALUES ('$uid', $stunde, $t, $gewicht)";
+					if(!($erg=pg_query($conn, $query)))
 						die(pg_last_error($conn));
 				}
 				elseif ($num_rows_wunsch==1)
