@@ -294,7 +294,7 @@ function ask() {
 	              </tr>
 	              
 		             <?php 
-						$qry="SELECT tbl_lehrveranstaltung.bezeichnung as bezeichnung, to_char(tbl_lvinfo.updateamum,'DD-MM-YYYY HH24:MI') as amum,tbl_lvinfo.updateamum as updateamum, tbl_lvinfo.updatevon as updatevon, 	* FROM campus.tbl_lvinfo JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) WHERE studiengang_kz=$stg AND semester=$sem AND tbl_lvinfo.aktiv=true AND tbl_lvinfo.sprache='".ATTR_SPRACHE_DE."' ORDER BY tbl_lehrveranstaltung.bezeichnung ASC";
+						$qry="SELECT *, tbl_lehrveranstaltung.bezeichnung as bezeichnung, to_char(tbl_lvinfo.updateamum,'DD-MM-YYYY HH24:MI') as amum,tbl_lvinfo.updateamum as updateamum, tbl_lvinfo.updatevon as updatevon FROM campus.tbl_lvinfo JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) WHERE studiengang_kz=$stg AND semester=$sem AND tbl_lvinfo.aktiv=true AND tbl_lvinfo.sprache='".ATTR_SPRACHE_DE."' ORDER BY tbl_lehrveranstaltung.bezeichnung ASC";
 
 		                if(!$result=pg_query($conn,$qry))
 		                    die("<center>Fehler bei einer Datenbankabfrage</center>");
@@ -303,7 +303,7 @@ function ask() {
 		                while($row=pg_fetch_object($result))
 		                {
 							$i++;
-							$qry1="SELECT tbl_lehrveranstaltung.bezeichnung as bezeichnung, tbl_lvinfo.updatevon as updatevon, * FROM campus.tbl_lvinfo JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) WHERE tbl_lvinfo.sprache='".ATTR_SPRACHE_EN."' AND lehrveranstaltung_id='$row->lehrveranstaltung_id'";
+							$qry1="SELECT *, tbl_lehrveranstaltung.bezeichnung as bezeichnung, tbl_lvinfo.updatevon as updatevon FROM campus.tbl_lvinfo JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) WHERE tbl_lvinfo.sprache='".ATTR_SPRACHE_EN."' AND lehrveranstaltung_id='$row->lehrveranstaltung_id'";
 	
 		                	if(!$result1=pg_query($conn,$qry1))
 			                    die("<center>Fehler bei einer Datenbankabfrage</center>");
@@ -312,7 +312,7 @@ function ask() {
 								die("<center>Fehler bei einer Datenbankabfrage</center>");
                                
                             $qry2="SELECT vorname, nachname FROM campus.vw_mitarbeiter WHERE uid='$row->updatevon'";
-	
+							
                             $bearbeitet=$row->updatevon;
 		                	if($result2=pg_query($conn,$qry2))
 			                   if($row2=pg_fetch_object($result2))

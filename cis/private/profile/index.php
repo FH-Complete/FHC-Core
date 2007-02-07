@@ -31,9 +31,10 @@
 		$email_alias=pg_result($erg,0,"alias");
 		$hp=pg_result($erg,0,"homepage");
 	}
-	if(!($erg_stud=pg_exec($conn, "SELECT studiengang_kz, semester, verband, gruppe, matrikelnr, kurzbz AS stgkz, tbl_studiengang.bezeichnung AS stgbz FROM public.tbl_student NATURAL JOIN public.tbl_studiengang WHERE student_uid='$uid'")))
+	if(!($erg_stud=pg_exec($conn, "SELECT studiengang_kz, semester, verband, gruppe, matrikelnr, typ::varchar(1) || kurzbz AS stgkz, tbl_studiengang.bezeichnung AS stgbz FROM public.tbl_student JOIN public.tbl_studiengang USING(studiengang_kz) WHERE student_uid='$uid'")))
 		die(pg_last_error($conn));
-	$stud_num_rows=pg_numrows($erg_stud);
+	$stud_num_rows=pg_num_rows($erg_stud);
+
 	if ($stud_num_rows==1)
 	{
 		$stg=pg_result($erg_stud,0,"studiengang_kz");
@@ -194,7 +195,7 @@ Results: <?php echo $num_rows; ?><br>
   		for($i=0;$i<$nr_mg;$i++)
 		{
 			$row=pg_fetch_object($erg_mg,$i);
-			echo '<TR><TD><A href="mailto:'.$row->gruppe_kurzbz.'@technikum-wien.at">'.$row->gruppe_kurzbz.'&nbsp;</TD>';
+			echo '<TR><TD><A href="mailto:'.strtolower($row->gruppe_kurzbz).'@technikum-wien.at">'.strtolower($row->gruppe_kurzbz).'&nbsp;</TD>';
     		echo "<TD>&nbsp;$row->beschreibung</TD><TD></TD></TR>";
 		}
 		if (isset($matrikelnr))
