@@ -404,7 +404,7 @@
               <td nowrap>
                 <?php						
                 	$path = '../../../documents/'.strtolower($short).'/download';
-					if(!$dest_dir = @dir($path))
+					if(!$dest_dir = is_dir($path))
 					{
 					
 						if(!is_dir($path))
@@ -414,17 +414,15 @@
 							exec('mkdir -m 775 "../../../documents/'.strtolower($short).'/download"');
 							exec('sudo chgrp teacher ../../../documents/'.strtolower($short).'/download');
 						}
-					
-						$dir_empty = true;
-						$dest_dir = @dir($path);
-						while($entry = $dest_dir->read())
+						
+					}
+					$dest_dir = @dir($path);
+					while($entry = $dest_dir->read())
+					{
+						if($entry != "." && $entry != "..")
 						{
-							if($entry != "." && $entry != "..")
-							{
-								$dir_empty = false;
-								
-								break;
-							}
+							$dir_empty = false;
+							break;
 						}
 					}
 										

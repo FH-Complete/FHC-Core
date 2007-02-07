@@ -576,7 +576,7 @@ class person
 			if(pg_query($qry))
 			{
 				//Log schreiben
-				$sql .= $qry;
+				$sql = $qry;
 				$qry = "SELECT nextval('log_seq') as id;";
 				if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
 				{

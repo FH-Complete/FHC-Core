@@ -312,13 +312,66 @@
           <td valign="top" align="center">
           
           <?php
+            echo '<img border="0" src="../../../skin/images/button_lb.jpg" width="67" height="45"><br>';
           	if($is_lector)
           	{
 				//Anwesenheitsliste	
-				echo '<img border="0" src="../../../skin/images/button_lb.jpg" width="67" height="45"><br>';
-				echo "<b><a href='anwesenheitsliste.php?stg_kz=$course_id&sem=$term_id&lvid=$lvid' class='Item'>Anwesenheits- und Notenlisten</a></b>";
+				
+				echo "<b><a href='anwesenheitsliste.php?stg_kz=$course_id&sem=$term_id&lvid=$lvid' class='Item'>Anwesenheits- und Notenlisten</a></b><br>";
           	}
-
+			
+          	//Leistungsuebersicht
+          	$dest_dir = @dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/leistung');
+					
+			if(!@is_dir($dest_dir->path))
+			{
+				if(!is_dir('../../../documents/'.strtolower($kurzbz)))
+				{
+					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'"');
+					exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'"');
+				}
+				if(!is_dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id))
+				{
+					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'/'.$term_id.'"');
+					exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'/'.$term_id.'"');
+				}
+				if(!is_dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name)))
+				{
+					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'"');
+					exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'"');
+				}
+				if(!is_dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/leistung'))
+				{
+					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/leistung"');
+					exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/leistung"');
+				}
+			}
+			
+			if($dest_dir)
+			{
+				$dir_empty = true;
+				
+				while($entry = $dest_dir->read())
+				{
+					if($entry != "." && $entry != "..")
+					{
+						$dir_empty = false;
+						
+						break;
+					}
+				}
+			}
+								
+			if(isset($dest_dir) && isset($dir_empty) && $dir_empty == false)
+			{
+				echo '<a href="'.$dest_dir->path.'" target="_blank">';
+				echo '<strong>Leistungs&uuml;bersicht</strong>';
+				echo '</a>';
+			}
+			else
+			{				
+				echo '<strong>Leistungs&uuml;bersicht</strong>';
+			}
 		   ?>
           
           <p>&nbsp;</p>
