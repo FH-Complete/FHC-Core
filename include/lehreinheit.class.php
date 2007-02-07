@@ -22,32 +22,32 @@
 
 class lehreinheit
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $lehreinheiten = array(); // lehreinheit Objekt
+	var $conn;     				// resource DB-Handle
+	var $errormsg; 			// string
+	var $new;      				// boolean
+	var $lehreinheiten = array();	// lehreinheit Objekt
 
 	//Tabellenspalten
 	var $lehreinheit_id;			// integer
 	var $lehrveranstaltung_id;		// integer
 	var $studiensemester_kurzbz; 	// varchar(16)
-	var $lehrfach_id;				// integer
-	var $lehrform_kurzbz;			// varchar(8)
-	var $stundenblockung;			// smalint
-	var $wochenrythmus;				// smalint
-	var $start_kw;					// smalint
-	var $raumtyp;					// varchar(8)
-	var $raumtypalternativ;			// varchar(8)
-	var $lehre;						// boolean
-	var $anmerkung;					// varchar(255)
-	var $unr;						// integer
-	var $lvnr;						// bigint
-	var $insertamum;				// timestamp
-	var $insertvon;					// varchar(16)
-	var $updateamum;				// timestamp
-	var $updatevon;					// varchar(16)
-	var $sprache;					// varchar(16)
-	var $ext_id;					// bigint
+	var $lehrfach_id;			// integer
+	var $lehrform_kurzbz;		// varchar(8)
+	var $stundenblockung;		// smalint
+	var $wochenrythmus;		// smalint
+	var $start_kw;			// smalint
+	var $raumtyp;				// varchar(8)
+	var $raumtypalternativ;		// varchar(8)
+	var $lehre;				// boolean
+	var $anmerkung;			// varchar(255)
+	var $unr;				// integer
+	var $lvnr;				// bigint
+	var $insertamum;			// timestamp
+	var $insertvon;			// varchar(16)
+	var $updateamum;			// timestamp
+	var $updatevon;			// varchar(16)
+	var $sprache;				// varchar(16)
+	var $ext_id;				// bigint
 	var $mitarbeiter_uid;
 	var $studiengang_kz;
 	var $semester;
@@ -409,7 +409,7 @@ class lehreinheit
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der LE:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern der LE: '.$qry;
 			return false;
 		}
 	}
