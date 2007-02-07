@@ -9,6 +9,7 @@
 
 
 include('../vilesci/config.inc.php');
+include_once('../include/functions.inc.php');
 include_once('../include/fas/functions.inc.php');
 include_once('../include/fas/person.class.php');
 include_once('../include/fas/mitarbeiter.class.php');
@@ -23,11 +24,17 @@ include_once('../include/Excel/PPS.php');
 include_once('../include/Excel/Root.php');
 include_once('../include/Excel/File.php');
 include_once('../include/Excel/Writer.php');
+include_once('../include/fas/benutzer.class.php');
 
 
 // Datenbank Verbindung
 if (!$conn = @pg_pconnect(CONN_STRING_FAS))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
+
+if (!$conn_vilesci = @pg_pconnect(CONN_STRING))
+   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
+
+$user = get_uid();
 
 //Parameter holen
 if (isset($_GET['mitarbeiter_id']))
@@ -81,7 +88,8 @@ while (isset($_GET[$varname]))
 	$varname='spalte'.(string)$anzSpalten;
 }
 $zustelladresse=true;
-
+$benutzer = new benutzer($conn_vilesci);
+$benutzer->loadVariables($user);
 // Mitarbeiter holen
 $mitarbeiterDAO=new mitarbeiter($conn);
 $mitarbeiterDAO->getMitarbeiter($mitarbeiter_id, $fix, $stgl, $fbl, $aktiv, $karenziert, $ausgeschieden, $zustelladresse,getStudiensemesterIdFromName($conn, $benutzer->variable->semester_aktuell));
