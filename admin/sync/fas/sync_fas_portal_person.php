@@ -223,7 +223,7 @@ else
 //echo nl2br($text);
 echo nl2br("\n".$error_log);
 echo nl2br("\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
-
+mail($adress, 'SYNC Personen', $error_log);
 ?>
 </body>
 </html>

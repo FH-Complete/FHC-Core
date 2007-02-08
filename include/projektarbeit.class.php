@@ -152,7 +152,11 @@ class projektarbeit
 			$this->errormsg = 'Gesamtstunden muß ein numerischer Wert sein - student_uid: '.$this->student_uid;
 			return false;
 		}
-		
+		if(!is_bool($this->freigegeben))
+		{
+			$this->errormsg = 'freigegeben ist ungueltig - student_uid: '.$this->student_uid;
+			return false;
+		}
 				
 		$this->errormsg = '';
 		return true;		

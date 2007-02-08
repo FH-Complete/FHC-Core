@@ -22,40 +22,40 @@
 
 class person
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $personen = array(); // person Objekt
-	var $done=false;	// boolean
+	var $conn;     			// resource DB-Handle
+	var $errormsg; 		// string
+	var $new;      			// boolean
+	var $personen = array(); 	// person Objekt
+	var $done=false;		// boolean
 	
 	//Tabellenspalten
-	var $person_id;        	// integer
+	var $person_id;        		// integer
 	var $sprache;			// varchar(16)
 	var $anrede;			// varchar(16)
-	var $titelpost;         // varchar(32)
-	var $titelpre;          // varchar(64)
-	var $nachname;          // varchar(64)
-	var $vorname;           // varchar(32)
-	var $vornamen;          // varchar(128)
-	var $gebdatum;          // date
-	var $gebort;            // varchar(128)
-	var $gebzeit;           // time
-	var $foto;              // oid
-	var $anmerkungen;       // varchar(256)
-	var $homepage;          // varchar(256)
+	var $titelpost;         		// varchar(32)
+	var $titelpre;          		// varchar(64)
+	var $nachname;          	// varchar(64)
+	var $vorname;           	// varchar(32)
+	var $vornamen;          	// varchar(128)
+	var $gebdatum;          	// date
+	var $gebort;            		// varchar(128)
+	var $gebzeit;           		// time
+	var $foto;              		// oid
+	var $anmerkungen;       	// varchar(256)
+	var $homepage;          	// varchar(256)
 	var $svnr;			// char(10)
-	var $ersatzkennzeichen; // char(10)
-	var $familienstand;     // char(1)
-	var $anzahlkinder;      // smalint
-	var $aktiv;             // boolean
-	var $insertamum;        // timestamp
-	var $insertvon;         // varchar(16)
-	var $updateamum;        // timestamp
-	var $updatevon;         // varchar(16)
-	var $geschlecht;	// varchar(1)
+	var $ersatzkennzeichen; 	// char(10)
+	var $familienstand;     	// char(1)
+	var $anzahlkinder;      	// smalint
+	var $aktiv;             		// boolean
+	var $insertamum;        	// timestamp
+	var $insertvon;         		// varchar(16)
+	var $updateamum;        	// timestamp
+	var $updatevon;         	// varchar(16)
+	var $geschlecht;		// varchar(1)
 	var $staatsbuergerschaft;	// varchar(3)
-	var $geburtsnation;	// varchar(3);
-	var $ext_id;            // bigint
+	var $geburtsnation;		// varchar(3);
+	var $ext_id;            		// bigint
 	
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine Person
@@ -93,10 +93,10 @@ class person
 		if(is_numeric($person_id) && $person_id!='')
 		{
 			$qry = "SELECT person_id, sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen,
-                           gebdatum, gebort, gebzeit, foto, anmerkungen, homepage, svnr, ersatzkennzeichen, 
-                           familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon, ext_id,
-                           geschlecht, staatsbuergerschaft, geburtsnation 
-			        FROM public.tbl_person WHERE person_id='$person_id'";
+				gebdatum, gebort, gebzeit, foto, anmerkungen, homepage, svnr, ersatzkennzeichen, 
+				familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon, ext_id,
+				geschlecht, staatsbuergerschaft, geburtsnation 
+				FROM public.tbl_person WHERE person_id='$person_id'";
 			
 			if(!$result=pg_query($this->conn,$qry))
 			{
@@ -213,11 +213,6 @@ class person
 			$this->errormsg = 'FotoOID ist ungueltig';
 			return false;
 		}
-		/*if(strlen($this->anmerkungen)>256)
-		{
-			$this->errormsg = 'Anmerkungen darf nicht laenger als 256 Zeichen sein';
-			return false;
-		}*/
 		if(strlen($this->homepage)>256)
 		{
 			$this->errormsg = 'Homepage darf nicht laenger als 256 Zeichen sein';
