@@ -9,7 +9,7 @@
 
 	// Verbindung aufbauen
 	$conn=pg_pconnect(CONN_STRING) or die ("Unable to connect to SQL-Server");
-	$sql_query="SET search_path TO campus;SELECT uid, nachname, vorname FROM vw_benutzer WHERE uid LIKE '$uid'";
+	$sql_query="SET search_path TO campus; SELECT uid, nachname, vorname FROM vw_benutzer WHERE uid LIKE '$uid'";
 	unset($uid);
 	$result=pg_query($conn, $sql_query);
 	if(!$result)
@@ -20,7 +20,7 @@
 		$nachname=pg_result($result,0,'"nachname"');
 		$vornamen=pg_result($result,0,'"vorname"');
 	}
-	$sql_query="SELECT studiengang_kz, kurzbz, kurzbzlang, bezeichnung, typ FROM public.tbl_studiengang ORDER BY kurzbz";
+	$sql_query="SELECT studiengang_kz, kurzbz, kurzbzlang, bezeichnung, typ FROM public.tbl_studiengang WHERE aktiv ORDER BY typ, kurzbz";
 	$result_stg=pg_query($conn, $sql_query);
 	if(!$result_stg)
 		die ("Studiengang not found!");

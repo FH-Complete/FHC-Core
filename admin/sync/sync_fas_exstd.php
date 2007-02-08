@@ -1,8 +1,8 @@
 <?php
 	require_once('../../vilesci/config.inc.php');
 	$adress='fas_sync@technikum-wien.at';
-	
-	//mail($adress,"FAS Synchro mit PORTAL","BEGIN OF SYNCHRONISATION","From: vilesci@technikum-wien.at");
+
+	//mail($adress,"FAS Synchro mit VileSci","BEGIN OF SYNCHRONISATION","From: vilesci@technikum-wien.at");
 	$conn=pg_connect(CONN_STRING);
 	$conn_fas=pg_connect(CONN_STRING_FAS);
 
@@ -21,7 +21,7 @@
 	$text="Dies ist eine automatische eMail!\r\r";
 	$text.="Es wurde eine Synchronisation mit FAS durchgeführt.\r";
 	$text.="Anzahl der Ex-Studenten vom FAS-Import: $num_rows \r";
-	$text.="Anzahl der Studenten in PORTAL: $vilesci_anz_std \r\r";
+	$text.="Anzahl der Studenten in VileSci: $vilesci_anz_std \r\r";
 	echo $text.'<BR>';
 	flush();
 	$update_error=0;
@@ -43,15 +43,15 @@
 			{
 				//Wenn dieser Lehrverband noch nicht existiert wird er eingefuegt
 				$sql_query = "SELECT * FROM public.tbl_lehrverband WHERE studiengang_kz='$row_std->studiengang_kz' AND semester='10' AND verband=' ' AND gruppe=' '";
-				
+
 				$result_grp = pg_query($conn, $sql_query);
 				if(pg_num_rows($result_grp)==0)
 				{
 					$sql_query = "INSERT INTO public.tbl_lehrverband(studiengang_kz, semester, verband, gruppe, aktiv, bezeichnung) VALUES('$row_std->studiengang_kz','10',' ',' ', false, 'Ex Studenten');";
 					pg_query($conn, $sql_query);
-						$text.="Neuer Lehrverband wird erzeugt:$row_std->studiengang_kz 10\r";					
+						$text.="Neuer Lehrverband wird erzeugt:$row_std->studiengang_kz 10\r";
 				}
-					
+
 				$text.="Der Student $row_std->vorname $row_std->nachname ($row_std->uid) wird verschoben.\r";
 				$sql_query="UPDATE public.tbl_student SET semester=10, verband=' ', gruppe=' ', updateamum=now(), updatevon='auto' WHERE student_uid LIKE '$uid'";
 				echo $sql_query.'<BR>';
@@ -69,7 +69,7 @@
 	$text.="$update_error Fehler bei Student-Update!\r";
 	$text.="$anz_update Studenten wurden ins 10te Semester verschoben.\r";
 	$text.="\rEND OF SYNCHRONISATION\r";
-	if (mail($adress,"FAS Synchro mit PORTAL (Ex-Studenten)",$text,"From: vilesci@technikum-wien.at"))
+	if (mail($adress,"FAS Synchro mit VileSci (Ex-Studenten)",$text,"From: vilesci@technikum-wien.at"))
 		$sendmail=true;
 	else
 		$sendmail=false;
@@ -77,7 +77,7 @@
 
 <html>
 <head>
-	<title>FAS-Synchro mit PORTAL (Ex-Studenten)</title>
+	<title>FAS-Synchro mit VileSci (Ex-Studenten)</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<LINK rel="stylesheet" href="../../include/styles.css" type="text/css">
 </head>

@@ -118,6 +118,7 @@ while ($row=pg_fetch_object($result))
 <RDF:Seq RDF:about="<?php echo $rdf_url.'alle-verbaende'; ?>">
 
 <?php
+	$lastout='';
 	$stg_kz=null;
 	$sem=null;
 	$ver=null;
@@ -126,7 +127,10 @@ while ($row=pg_fetch_object($result))
 		$row=pg_fetch_object($result,$i);
 		if ($stg_kz!=$row->studiengang_kz)
 		{
-  			if ($sem!=null)
+  			if ($ver!=null)
+				echo "\t\t\t\t\t\t</RDF:Seq>\n\t\t\t\t\t</RDF:li>\n";
+			$ver=null;
+			if ($sem!=null)
 				echo "\t\t\t\t</RDF:Seq>\n\t\t\t</RDF:li>\n";
 			$sem=null;
 			if ($stg_kz!=null)
@@ -135,9 +139,10 @@ while ($row=pg_fetch_object($result))
 			$stg_kurzbz=strtoupper($row->typ.$row->kurzbz);
 			echo "\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz\" />\n";
 			echo "\t<RDF:li>\n\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz\">\n";
+			$lastout='stg_kz';
 		}
 
-/*	   	if ($sem!=$row->semester && ($row->verband!='' || $row->verband!=' '))
+	   	if ($sem!=$row->semester && ($row->verband!='' || $row->verband!=' '))
 	   	{
    			if ($ver!=null)
 				echo "\t\t\t\t\t\t</RDF:Seq>\n\t\t\t\t\t</RDF:li>\n";
@@ -147,10 +152,12 @@ while ($row=pg_fetch_object($result))
 			$sem=$row->semester;
 			echo "\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$row->semester\" />\n";
 			echo "\t\t\t<RDF:li>\n\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$row->semester\">\n";
+			$lastout='semester';
 		}
 		if ($row->gruppe_kurzbz!=null)
 		{
 			echo "\t\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$row->semester/$row->gruppe_kurzbz\" />\n";
+			$lastout='gruppe_kurzbz';
 		}
 		else if ($row->verband!='' && $row->verband!=' ' && ($row->gruppe=='' || $row->gruppe==' '))
 		{
@@ -159,15 +166,19 @@ while ($row=pg_fetch_object($result))
 			$ver=$row->verband;
 			echo "\t\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$row->semester/$row->verband\" />\n";
 			echo "\t\t\t\t\t<RDF:li>\n\t\t\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$row->semester/$row->verband\">\n";
+			$lastout='verband';
 		}
 	   	else if  ($row->gruppe!='' && $row->gruppe!=' ')
+	   	{
 			echo "\t\t\t\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$row->semester/$row->verband/$row->gruppe\" />\n";
-	*/}
+	   		$lastout='gruppe';
+		}
+	}
 
 	if ($num_rows>0)
 	{
-		//echo "\t\t\t\t\t\t</RDF:Seq>\n\t\t\t\t\t</RDF:li>\n";
-		//echo "\t\t\t\t</RDF:Seq>\n\t\t\t</RDF:li>\n";
+		echo "\t\t\t\t\t\t</RDF:Seq>\n\t\t\t\t\t</RDF:li>\n";
+		echo "\t\t\t\t</RDF:Seq>\n\t\t\t</RDF:li>\n";
 		echo "\t\t</RDF:Seq>\n\t</RDF:li>\n";
 	}
 ?>

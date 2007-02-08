@@ -42,6 +42,7 @@ class wochenplan
 	var $pers_uid;		// @brief Account Name der Person (PK)
 	var $pers_titelpre;	// @brief Titel der Person
 	var $pers_nachname;	// @brief Personendaten
+	var $pers_vorname;	// @brief Personendaten
 	var $pers_vornamen;	// @brief Personendaten
 
 	var $ort_kurzbz;	// @brief Ort PK
@@ -165,9 +166,9 @@ class wochenplan
 		{
 			$this->link.='&pers_uid='.$this->pers_uid;	//Link erweitern
 			if ($this->type=='student')
-				$sql_query="SELECT uid, titelpre, nachname, vornamen, studiengang_kz, semester, verband, gruppe FROM campus.vw_student WHERE uid='$this->pers_uid'";
+				$sql_query="SELECT uid, titelpre, nachname, vorname, vornamen, studiengang_kz, semester, verband, gruppe FROM campus.vw_student WHERE uid='$this->pers_uid'";
 			else
-				$sql_query="SELECT uid, titelpre, nachname, vornamen FROM campus.vw_mitarbeiter WHERE uid='$this->pers_uid'";
+				$sql_query="SELECT uid, titelpre, nachname, vorname, vornamen FROM campus.vw_mitarbeiter WHERE uid='$this->pers_uid'";
 			//echo $sql_query;
 			if (!($result=pg_exec($this->conn, $sql_query)))
 			{
@@ -182,6 +183,7 @@ class wochenplan
 			$this->pers_uid=pg_result($result,0,'"uid"');
 			$this->pers_titelpre=pg_result($result,0,'"titelpre"');
 			$this->pers_nachname=pg_result($result,0,'"nachname"');
+			$this->pers_vorname=pg_result($result,0,'"vorname"');
 			$this->pers_vornamen=pg_result($result,0,'"vornamen"');
 			if ($this->type=='student')
 			{
@@ -329,7 +331,7 @@ class wochenplan
 		echo '<TR>';
 		echo '<TD valign="bottom"><P valign="top">';
 		if ($this->type=='student' || $this->type=='lektor')
-			echo '<strong>Person: </strong>'.$this->pers_titelpre.' '.$this->pers_vornamen.' '.$this->pers_nachname.' - '.$this->pers_uid.'<br>';
+			echo '<strong>Person: </strong>'.$this->pers_titelpre.' '.$this->pers_vorname.' '.$this->pers_nachname.' - '.$this->pers_uid.'<br>';
 		if ($this->type=='student' || $this->type=='verband')
 		{
 			echo '<strong>Studiengang: </strong>'.$this->stg_kurzbzlang.' - '.$this->stg_bez.'<br>';
