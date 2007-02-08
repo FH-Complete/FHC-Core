@@ -45,7 +45,7 @@ $headers.="Content-Type: text/html; charset=iso-8859-1\r\n";
 // Anfangsdatum festlegen
 $datum_begin=date("Y-m-d");
 // Endedatum festlegen
-$sql_query="SELECT * FROM tbl_studiensemester WHERE ende>=now() ORDER BY start;";
+$sql_query="SET search_path TO lehre; SELECT * FROM public.tbl_studiensemester WHERE ende>=now() ORDER BY start;";
 //echo $sql_query.'<BR>';
 if (!$result=pg_query($conn, $sql_query))
 {
@@ -84,10 +84,10 @@ else
 	while ($row=pg_fetch_object($result))
 	{
 		$sql_query='INSERT INTO tbl_stundenplan
-			(stundenplan_id,unr,uid,datum,stunde,ort_kurzbz,lehrfach_nr,lehrform_kurzbz,studiengang_kz,semester,verband,gruppe,
-			einheit_kurzbz,titel,anmerkung,fix,updateamum,updatevon,lehrveranstaltung_id) VALUES';
+			(stundenplan_id,unr,uid,datum,stunde,ort_kurzbz,lehrform_kurzbz,studiengang_kz,semester,verband,gruppe,
+			einheit_kurzbz,titel,anmerkung,fix,updateamum,updatevon,lehreinheit_id) VALUES';
 		$sql_query.="($row->stundenplandev_id,$row->unr,'$row->uid','$row->datum',$row->stunde,'$row->ort_kurzbz',
-			$row->lehrfach_nr,'$row->lehrform',$row->studiengang_kz,$row->semester";
+			'$row->lehrform',$row->studiengang_kz,$row->semester";
 		if ($row->verband==null)
 			$sql_query.=',NULL';
 		else
@@ -251,7 +251,6 @@ $sql_query="SELECT vw_stundenplandev.*, vw_stundenplan.datum AS old_datum, vw_st
 		 		vw_stundenplandev.datum!=vw_stundenplan.datum OR
 				vw_stundenplandev.stunde!=vw_stundenplan.stunde OR
 				vw_stundenplandev.ort_kurzbz!=vw_stundenplan.ort_kurzbz OR
-				vw_stundenplandev.lehrfach_nr!=vw_stundenplan.lehrfach_nr OR
 				vw_stundenplandev.lehrform!=vw_stundenplan.lehrform OR
 				vw_stundenplandev.studiengang_kz!=vw_stundenplan.studiengang_kz OR
 				vw_stundenplandev.semester!=vw_stundenplan.semester OR
@@ -261,7 +260,7 @@ $sql_query="SELECT vw_stundenplandev.*, vw_stundenplan.datum AS old_datum, vw_st
 				vw_stundenplandev.titel!=vw_stundenplan.titel OR
 				vw_stundenplandev.anmerkung!=vw_stundenplan.anmerkung OR
 				vw_stundenplandev.fix!=vw_stundenplan.fix OR
-				vw_stundenplandev.lehrveranstaltung_id!=vw_stundenplan.lehrveranstaltung_id )
+				vw_stundenplandev.lehreinheit_id!=vw_stundenplan.lehreinheit_id )
 				AND vw_stundenplandev.datum>='$datum_begin';";
 //echo $sql_query.'<BR>';
 if (!$result=pg_query($conn, $sql_query))
@@ -284,7 +283,7 @@ while ($row=pg_fetch_object($result))
 	// Datensaetze aendern
 	$sql_query="UPDATE tbl_stundenplan SET
 		unr=$row->unr,uid='$row->uid',datum='$row->datum',stunde=$row->stunde,
-		ort_kurzbz='$row->ort_kurzbz',lehrfach_nr=$row->lehrfach_nr, lehrform_kurzbz='$row->lehrform',
+		ort_kurzbz='$row->ort_kurzbz', lehrform_kurzbz='$row->lehrform',
 		studiengang_kz=$row->studiengang_kz,semester=$row->semester";
 	if ($row->verband==null)
 		$sql_query.=',verband=NULL';
@@ -304,10 +303,10 @@ while ($row=pg_fetch_object($result))
 	else
 		$sql_query.=',fix=FALSE';
 	$sql_query.=",updateamum='$row->updateamum',updatevon='$row->updatevon'";
-	if ($row->lehrveranstaltung_id==null)
-		$sql_query.=',lehrveranstaltung_id=NULL';
+	if ($row->lehreinheit_id==null)
+		$sql_query.=',lehreinheit_id=NULL';
 	else
-		$sql_query.=",lehrveranstaltung_id=$row->lehrveranstaltung_id";
+		$sql_query.=",lehreinheit_id=$row->lehreinheit_id";
 	$sql_query.=" WHERE stundenplan_id=$row->stundenplandev_id;";
 	echo $sql_query.'<BR>';
 	if (!$result_update=pg_query($conn, $sql_query))

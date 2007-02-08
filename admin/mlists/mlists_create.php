@@ -6,7 +6,7 @@
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/globals.inc.php');
 
-	if (!$conn = @pg_pconnect(CONN_STRING))
+	if (!$conn = pg_pconnect(CONN_STRING))
 	   	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 	if(!($result_stg=pg_query($conn, "SELECT studiengang_kz, bezeichnung, lower(typ::varchar(1) || kurzbz) as kurzbz FROM public.tbl_studiengang ORDER BY kurzbz ASC")))
 		die(pg_errormessage($conn));
