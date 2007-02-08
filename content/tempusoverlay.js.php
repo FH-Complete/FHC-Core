@@ -10,7 +10,7 @@ function auswahlValues()
 	this.sem=null;
 	this.ver=null;
 	this.grp=null;
-	this.einheit=null;
+	this.gruppe=null;
 	this.lektor_uid=null;
 }
 
@@ -22,24 +22,27 @@ function onVerbandSelect()
 	var sem=tree.view.getCellText(tree.currentIndex,"sem");
 	var ver=tree.view.getCellText(tree.currentIndex,"ver");
 	var grp=tree.view.getCellText(tree.currentIndex,"grp");
-	var einheit=tree.view.getCellText(tree.currentIndex,"einheit");
+	var gruppe=tree.view.getCellText(tree.currentIndex,"gruppe");
 	var daten=window.TimeTableWeek.document.getElementById('TimeTableWeekData');
 	var datum=parseInt(daten.getAttribute("datum"));
-	var attributes="&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&einheit="+einheit;
+	var attributes="&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
 	var url = "<?php echo APP_ROOT; ?>content/timetable-week.xul.php";
-	if (einheit!=null && einheit!=0 &einheit!='')
-		var type="?type=einheit";
+	if (gruppe!=null && gruppe!=0 &gruppe!='')
+		var type="?type=gruppe";
 	else
 		var type="?type=verband";
 	url+=type+attributes+"&datum="+datum;
 	if (url)
+	{
+		//alert(url);
 		contentFrame.setAttribute('src', url);
+	}
 
 	currentAuswahl.stg_kz=stg_kz;
 	currentAuswahl.sem=sem;
 	currentAuswahl.ver=ver;
 	currentAuswahl.grp=grp;
-	currentAuswahl.einheit=einheit;
+	currentAuswahl.gruppe=gruppe;
 
 	// Semesterplan
 	var semesterplan=document.getElementById('tabpanels-main');
@@ -49,8 +52,8 @@ function onVerbandSelect()
 		alert (url);
 		var contentFrame=document.getElementById('iframeTimeTableSemester');
 		var url = "<?php echo APP_ROOT; ?>content/timetable-week.xul.php";
-		if (einheit!=null && einheit!=0 &einheit!='')
-			var type="?type=einheit";
+		if (gruppe!=null && gruppe!=0 &gruppe!='')
+			var type="?type=gruppe";
 		else
 			var type="?type=verband";
 		url+=type+attributes+"&semesterplan=true";
@@ -61,13 +64,13 @@ function onVerbandSelect()
 
 	// LVAs
 	var vboxLehrveranstalungPlanung=document.getElementById('vboxLehrveranstalungPlanung');
-	var attribute='../rdf/lehreinheit-lvplan.rdf.php'+type+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&einheit="+einheit;
+	var attribute='../rdf/lehreinheit-lvplan.rdf.php'+type+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
 	vboxLehrveranstalungPlanung.setAttribute('datasources',attribute);
 
 	/*
 	// Studenten
 	var treeStudenten=document.getElementById('treeStudenten');
-	attribute="<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&einheit="+einheit;
+	attribute="<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
 	treeStudenten.setAttribute('datasources',attribute);
 
 	// LFVT
@@ -76,7 +79,7 @@ function onVerbandSelect()
 	req.add('sem',sem);
 	req.add('ver',ver);
 	req.add('grp',grp);
-	req.add('einheit',einheit);
+	req.add('gruppe',gruppe);
 
 	var response = req.execute();
 
@@ -107,8 +110,8 @@ function onVerbandSelect()
 	treeLFVT.database.AddDataSource(dsource);
 	treeLFVT.builder.rebuild();
 
-	//treeLFVT.setAttribute('datasources','lfvt.rdf.php?'+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&einheit="+einheit);
-	//alert('lfvt.rdf.php?'+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&einheit="+einheit);
+	//treeLFVT.setAttribute('datasources','lfvt.rdf.php?'+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe);
+	//alert('lfvt.rdf.php?'+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe);
 	*/
 }
 

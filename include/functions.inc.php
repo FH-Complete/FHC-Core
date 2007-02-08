@@ -113,10 +113,12 @@ function jahreskalenderjump($link)
 function loadVariables($conn, $user)
 {
 	$error_msg='';
-	if(!($result=@pg_query($conn, "SELECT * FROM tbl_variable WHERE uid='$user'")))
+	$num_rows=0;
+	$sql_query="SELECT * FROM public.tbl_variable WHERE uid='$user'";
+	if(!($result=pg_query($conn, $sql_query)))
 		$error_msg.=pg_errormessage($conn).'<BR>'.$sql_query;
 	else
-		$num_rows=@pg_numrows($result);
+		$num_rows=pg_numrows($result);
 
 	for ($i=0;$i<$num_rows;$i++)
 	{
@@ -125,11 +127,11 @@ function loadVariables($conn, $user)
 		${$row->name}=$row->wert;
 	}
 	if (!isset($semester_aktuell))
-		if(!($result=@pg_query($conn, 'SELECT * FROM tbl_studiensemester WHERE ende>now() ORDER BY start LIMIT 1')))
+		if(!($result=pg_query($conn, 'SELECT * FROM public.tbl_studiensemester WHERE ende>now() ORDER BY start LIMIT 1')))
 			$error_msg.=pg_errormessage($conn).'<BR>'.$sql_query;
 		else
 		{
-			$num_rows=@pg_numrows($result);
+			$num_rows=pg_numrows($result);
 			if ($num_rows>0)
 			{
 				$row=pg_fetch_object($result,$i);

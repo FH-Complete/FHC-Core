@@ -20,19 +20,10 @@ include_once('../include/person.class.php');
 include_once('../include/benutzer.class.php');
 include_once('../include/mitarbeiter.class.php');
 
-if (!$conn = @pg_pconnect(CONN_STRING))
+if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
-// test
-/*
-$einheit_kurzbz='';
-$grp='1';
-$ver='A';
-$sem=3;
-$stg_kz=145;
-*/
 
-$einheit_kurzbz='';
 if (isset($_GET['lektor']))
 	$lektor=$_GET['lektor'];
 else
@@ -57,7 +48,7 @@ else
 $mitarbeiter=new mitarbeiter($conn);
 $ma=$mitarbeiter->getMitarbeiter($lektor,$fixangestellt,$stg_kz,$fachbereich_id);
 
-$rdf_url='http://www.technikum-wien.at/tempus/mitarbeiter/';
+$rdf_url='http://www.technikum-wien.at/mitarbeiter/';
 ?>
 
 <RDF:RDF

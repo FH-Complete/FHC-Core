@@ -26,10 +26,12 @@ if (count($berechtigt_studiengang)>0)
 		$stg_kz_query='AND ('.substr($stg_kz_query,3).')';
 	}
 
-$sql_query="SELECT tbl_lehrverband.studiengang_kz, tbl_studiengang.bezeichnung, kurzbz, typ, tbl_lehrverband.semester, verband, gruppe, gruppe_kurzbz, tbl_lehrverband.bezeichnung AS lvb_bezeichnung, tbl_gruppe.bezeichnung AS grp_bezeichnung
+$sql_query="SET search_path TO public;
+			SELECT tbl_lehrverband.studiengang_kz, tbl_studiengang.bezeichnung, kurzbz, typ, tbl_lehrverband.semester, verband, gruppe, gruppe_kurzbz, tbl_lehrverband.bezeichnung AS lvb_bezeichnung, tbl_gruppe.bezeichnung AS grp_bezeichnung
 			FROM (tbl_studiengang JOIN tbl_lehrverband USING (studiengang_kz))
 				LEFT OUTER JOIN tbl_gruppe  ON (tbl_lehrverband.studiengang_kz=tbl_gruppe.studiengang_kz AND tbl_lehrverband.semester=tbl_gruppe.semester AND (tbl_lehrverband.verband=''))
-			WHERE tbl_lehrverband.studiengang_kz>=0 $stg_kz_query ORDER BY erhalter_kz,typ, kurzbz, semester,verband,gruppe, gruppe_kurzbz;";
+			WHERE tbl_lehrverband.studiengang_kz>=0 $stg_kz_query AND tbl_lehrverband.aktiv
+			ORDER BY erhalter_kz,typ, kurzbz, semester,verband,gruppe, gruppe_kurzbz;";
 //echo $sql_query;
 if(!$result=pg_query($conn, $sql_query))
 	$error_msg.=pg_errormessage($conn);
