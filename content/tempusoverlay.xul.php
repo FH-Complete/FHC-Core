@@ -42,7 +42,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 	    <splitter class="tree-splitter"/>
 	    <treecol id="grp" label="Grp" flex="1" hidden="true"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="einheit" label="SpzGruppe" flex="1" hidden="true"/>
+	    <treecol id="gruppe" label="SpzGruppe" flex="1" hidden="true"/>
 	</treecols>
 
 	<template>
@@ -98,7 +98,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 
 <tree id="tree-lektor" onselect="onLektorSelect();"
 	seltype="single" hidecolumnpicker="false" flex="1"
-	datasources="../rdf/mitarbeiter.rdf.php" ref="http://www.technikum-wien.at/tempus/mitarbeiter/alle">
+	datasources="../rdf/mitarbeiter.rdf.php" ref="http://www.technikum-wien.at/mitarbeiter/alle">
 	<treecols>
 	    <treecol id="kurzbz" label="Kuerzel" flex="2" primary="true" />
 	    <splitter class="tree-splitter"/>
@@ -116,11 +116,11 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 		<treechildren>
 	       	<treeitem uri="rdf:*">
 	         	<treerow>
-	           		<treecell label="rdf:http://www.technikum-wien.at/tempus/mitarbeiter/rdf#kurzbz"/>
-	           		<treecell label="rdf:http://www.technikum-wien.at/tempus/mitarbeiter/rdf#nachname"/>
-	           		<treecell label="rdf:http://www.technikum-wien.at/tempus/mitarbeiter/rdf#vornamen"/>
-	           		<treecell label="rdf:http://www.technikum-wien.at/tempus/mitarbeiter/rdf#titelpre"/>
-	           		<treecell label="rdf:http://www.technikum-wien.at/tempus/mitarbeiter/rdf#uid"/>
+	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#kurzbz"/>
+	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname"/>
+	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vornamen"/>
+	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpre"/>
+	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"/>
 	         	</treerow>
 	    	</treeitem>
 	    </treechildren>

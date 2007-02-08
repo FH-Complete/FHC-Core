@@ -28,14 +28,16 @@ class ferien
 {
 	var $conn;   			// @var resource DB-Handle
 	var $new;     			// @var boolean
-	var $errormsg; 		// @var string
-	var $result = array(); 	// @var ferien Objekt
+	var $errormsg; 			// @var string
+	var $ferien = array(); 	// @var ferien Objekt
 
 	//Tabellenspalten
 	var $bezeichnung;		// @var varchar(64)
 	var $studiengang_kz;	// @var integer
-	var $vondatum;		// @var date
-	var $bisdatum;		// @var date
+	var $vondatum;			// @var date
+	var $bisdatum;			// @var date
+	var $vontimestamp;
+	var $bistimestamp;
 
 	/**
 	 * Konstruktor
@@ -45,7 +47,7 @@ class ferien
 	function ferien($conn, $bezeichnung=null, $studiengang_kz=null)
 	{
 		$this->conn = $conn;
-		if($bezeichnung != null && $studiengang_kz != null && !is_numeric($studiengang_kz))
+		if($bezeichnung!=null && $studiengang_kz!=null && is_numeric($studiengang_kz))
 			$this->load($bezeichnung, studiengang_kz);
 	}
 
@@ -70,8 +72,10 @@ class ferien
 			$ferien_obj->studiengang_kz	= $row->studiengang_kz;
 			$ferien_obj->vondatum 		= $row->vondatum;
 			$ferien_obj->bisdatum 		= $row->bisdatum;
+			$ferien_obj->vontimestamp=mktime(0,0,0,substr($row->vondatum,5,2),substr($row->vondatum,8),substr($row->vondatum,0,4));;
+			$ferien_obj->bistimestamp=mktime(23,59,59,substr($row->bisdatum,5,2),substr($row->bisdatum,8),substr($row->bisdatum,0,4));;
 
-			$this->result[] = $ferien_obj;
+			$this->ferien[] = $ferien_obj;
 		}
 		return true;
 	}

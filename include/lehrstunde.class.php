@@ -191,7 +191,7 @@ class lehrstunde
 	}
 
 	/**
-	 * @param type (student, lektor, lehrverband, einheit, ort, ....)
+	 * @param type (student, lektor, lehrverband, gruppe, ort, ....)
 	 * @param datum_von (inklusive) Startdatum der Abfrage
 	 * @param datum_bis (exklusive) Enddatum der Abfrage
 	 * @param uid (des Lektors oder Studenten) kann auch NULL sein
@@ -235,9 +235,15 @@ class lehrstunde
 			return -1;
 		}
 		// Einheit
-		if ($type=='einheit' && $gruppe_kurzbz==NULL)
+		if ($type=='gruppe' && $gruppe_kurzbz==NULL)
 		{
 			$this->errormsg='Fehler: Kurzbezeichnung der Einheit ist nicht gesetzt';
+			return -1;
+		}
+		// Verband
+		if ($type=='verband' && ($studiengang_kz==NULL || !is_numeric($studiengang_kz)))
+		{
+			$this->errormsg='Fehler: Studiengang ist nicht gesetzt';
 			return -1;
 		}
 
@@ -288,7 +294,7 @@ class lehrstunde
 			$sql_query.=" AND uid='$uid'";
 		elseif ($type=='ort')
 			$sql_query.=" AND ort_kurzbz='$ort_kurzbz'";
-		elseif ($type=='einheit')
+		elseif ($type=='gruppe')
 			$sql_query.=" AND gruppe_kurzbz='$gruppe_kurzbz'";
 		else
 		{

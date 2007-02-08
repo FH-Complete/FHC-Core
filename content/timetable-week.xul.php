@@ -10,6 +10,9 @@ include('../include/lehreinheit.class.php');
 include('../include/zeitwunsch.class.php');
 include('../include/wochenplan.class.php');
 
+// Startwerte setzen
+$db_stpl_table=null;
+
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 //echo $_SERVER[REQUEST_URI];
 
@@ -18,7 +21,7 @@ if (!isset($REMOTE_USER))
 $uid=$REMOTE_USER;
 
 $error_msg='';
-if (!$conn = @pg_pconnect(CONN_STRING))
+if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg.='Es konnte keine Verbindung zum Server aufgebaut werden!';
 // Benutzerdefinierte Variablen laden
 $error_msg.=loadVariables($conn,$uid);
@@ -79,7 +82,7 @@ else
 if (isset($_GET['pers_uid']))
 	$pers_uid=$_GET['pers_uid'];
 if (isset($_GET['gruppe']))
-	$einheit_kurzbz=$_GET['gruppe'];
+	$gruppe_kurzbz=$_GET['gruppe'];
 else
 	$gruppe=null;
 if (isset($_GET['semester_aktuell']))
