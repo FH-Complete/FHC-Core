@@ -30,7 +30,12 @@ require_once('../../../../include/benutzerberechtigung.class.php');
 require_once('../../../../include/uebung.class.php');
 require_once('../../../../include/beispiel.class.php');
 require_once('../../../../include/datum.class.php');
-
+function microtime_float()
+{
+    list($usec, $sec) = explode(" ", microtime());
+    return ((float)$usec + (float)$sec);
+} 
+$time = microtime_float();
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -167,7 +172,8 @@ if($result = pg_query($conn, $qry))
 			if($lehreinheit_id=='')
 				$lehreinheit_id=$row->lehreinheit_id;				
 			$selected = ($row->lehreinheit_id == $lehreinheit_id?'selected':'');
-			$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN campus.vw_mitarbeiter ON(mitarbeiter_uid=uid) WHERE lehreinheit_id='$row->lehreinheit_id'";
+			//Zugeteilte Lektoren
+			$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter using(mitarbeiter_uid) WHERE lehreinheit_id='$row->lehreinheit_id'";
 			if($result_lektoren = pg_query($conn, $qry_lektoren))
 			{
 				$lektoren = '( ';
@@ -183,6 +189,9 @@ if($result = pg_query($conn, $qry))
 				}
 				$lektoren .=')';
 			}
+			
+
+			//Zugeteilte Gruppen
 			$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
 			if($result_gruppen = pg_query($conn, $qry_gruppen))
 			{
@@ -272,6 +281,11 @@ if(isset($_POST['uebung_neu']))
 		elseif($anzahlderbeispiele<0)
 		{
 			$error_anzahlderbeispiele = "<span class='error'>Anzahl der Beispiele darf nicht negativ sein</span>";
+			$error=true;
+		}
+		elseif($anzahlderbeispiele>99)
+		{
+			$error_anzahlderbeispiele = "<span class='error'>Anzahl der Beispiele muss kleiner 100 sein</span>";
 			$error=true;
 		}
 		
@@ -513,7 +527,7 @@ if(isset($_GET['kopieren']) && $_GET['kopieren']=='true')
 				//Berechtigung Checken
 				$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='".$_POST['lehreinheit_copy_id']."' AND mitarbeiter_uid='$user'";
 				if($row_berechtigt = pg_query($conn, $qry))
-				{
+				{					
 					if(pg_num_rows($row_berechtigt)>0 || 
 					   $rechte->isBerechtigt('admin',0) || 
 					   $rechte->isBerechtigt('admin',$lv_obj->studiengang_kz))
@@ -547,7 +561,7 @@ if(isset($_GET['kopieren']) && $_GET['kopieren']=='true')
 								//Beispiel laden
 								$qry = "SELECT * FROM campus.tbl_beispiel WHERE uebung_id='".$_GET['uebung_copy_id']."'";
 								if($result_bsp_source = pg_query($conn, $qry))
-								{
+								{									
 									$error_bsp_save=false;
 									while($row_bsp_source = pg_fetch_object($result_bsp_source))
 									{
@@ -618,7 +632,6 @@ if(isset($uebung_id) && $uebung_id!='')
 	$beispiel_obj = new beispiel($conn);
 	$beispiel_obj->load_beispiel($uebung_id);
 	$anzahl = count($beispiel_obj->beispiele);
-	
 	echo "</td><td valign='top'>";
 	
 	//Beispiel neu Anlegen
@@ -696,6 +709,53 @@ else
 	if($anzahl>0)
 	{
 		echo "<tr><td></td><td></td><td>&nbsp;</td></tr><tr><th>Thema</th><th>Freigeschalten</th><th>Auswahl</th><th>&nbsp;</th></tr>";
+		
+		//Option Content fuer UebungsKopie
+		$copy_option_content='';
+		for($i=0;$i<pg_num_rows($result_alle_lehreinheiten);$i++)
+		{
+			$row_alle_lehreinheiten = pg_fetch_object($result_alle_lehreinheiten,$i);
+			if($lehreinheit_id!=$row_alle_lehreinheiten->lehreinheit_id)
+			{
+				$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter using(mitarbeiter_uid) WHERE lehreinheit_id='$row_alle_lehreinheiten->lehreinheit_id'";
+				if($result_lektoren = pg_query($conn, $qry_lektoren))
+				{					
+					$lektoren = '( ';
+					$j=0;
+					while($row_lektoren = pg_fetch_object($result_lektoren))
+					{
+						$lektoren .= $row_lektoren->kurzbz;
+						$j++;
+						if($j<pg_num_rows($result_lektoren))
+							$lektoren.=', ';
+						else
+							$lektoren.=' ';
+					}
+					$lektoren .=')';
+				}
+				$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row_alle_lehreinheiten->lehreinheit_id'";
+				if($result_gruppen = pg_query($conn, $qry_gruppen))
+				{
+					$gruppen = '';
+					$j=0;
+					while($row_gruppen = pg_fetch_object($result_gruppen))
+					{
+						if($row_gruppen->gruppe_kurzbz=='')
+							$gruppen.=$row_gruppen->semester.$row_gruppen->verband.$row_gruppen->gruppe;
+						else 
+							$gruppen.=$row_gruppen->gruppe_kurzbz;
+						$j++;
+						if($j<pg_num_rows($result_gruppen))
+							$gruppen.=', ';
+						else 
+							$gruppen.=' ';
+					}
+				}
+				$copy_option_content.= "<OPTION value='$row_alle_lehreinheiten->lehreinheit_id'>$row_alle_lehreinheiten->lfbez - $gruppen $lektoren</OPTION>\n";
+			}
+		}
+		
+		//Uebungen durchlaufen
 		foreach ($uebung_obj->uebungen as $row) 
 		{
 			echo "<tr height=23><td align='left'><a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id' class='Item'><u>".htmlentities($row->bezeichnung)."</u></a></td><td align='center'>";
@@ -708,56 +768,13 @@ else
 			if(isset($result_alle_lehreinheiten) && pg_num_rows($result_alle_lehreinheiten)>1)
 			{
 				$copy_content.= '<tr>';
-				$copy_content.= '<td>';
-				$copy_content.= "<form  style='margin:1px;' action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&kopieren=true&uebung_copy_id=$row->uebung_id' method='POST'>";
+				$copy_content.= '<td nowrap>';
+				$copy_content.= "\n<form  style='margin:1px;' action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&kopieren=true&uebung_copy_id=$row->uebung_id' method='POST'>";
 				$copy_content.= "\n<SELECT name='lehreinheit_copy_id'>\n";
-				
-				for($i=0;$i<pg_num_rows($result_alle_lehreinheiten);$i++)
-				{
-					$row_alle_lehreinheiten = pg_fetch_object($result_alle_lehreinheiten,$i);
-					if($lehreinheit_id!=$row_alle_lehreinheiten->lehreinheit_id)
-					{
-						$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN campus.vw_mitarbeiter ON(mitarbeiter_uid=uid) WHERE lehreinheit_id='$row_alle_lehreinheiten->lehreinheit_id'";
-						if($result_lektoren = pg_query($conn, $qry_lektoren))
-						{
-							$lektoren = '( ';
-							$j=0;
-							while($row_lektoren = pg_fetch_object($result_lektoren))
-							{
-								$lektoren .= $row_lektoren->kurzbz;
-								$j++;
-								if($j<pg_num_rows($result_lektoren))
-									$lektoren.=', ';
-								else
-									$lektoren.=' ';
-							}
-							$lektoren .=')';
-						}
-						$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row_alle_lehreinheiten->lehreinheit_id'";
-						if($result_gruppen = pg_query($conn, $qry_gruppen))
-						{
-							$gruppen = '';
-							$j=0;
-							while($row_gruppen = pg_fetch_object($result_gruppen))
-							{
-								if($row_gruppen->gruppe_kurzbz=='')
-									$gruppen.=$row_gruppen->semester.$row_gruppen->verband.$row_gruppen->gruppe;
-								else 
-									$gruppen.=$row_gruppen->gruppe_kurzbz;
-								$j++;
-								if($j<pg_num_rows($result_gruppen))
-									$gruppen.=', ';
-								else 
-									$gruppen.=' ';
-							}
-						}
-						$copy_content.= "<OPTION value='$row_alle_lehreinheiten->lehreinheit_id'>$row_alle_lehreinheiten->lfbez - $gruppen $lektoren</OPTION>\n";
-					}
-				}
-				$copy_content.= '</SELECT> ';
-				
+				$copy_content.= $copy_option_content;				
+				$copy_content.= '</SELECT> ';				
 				$copy_content.= "&nbsp;&nbsp;&nbsp;<input type='submit' value='COPY'>";
-				$copy_content.= "</form>";
+				$copy_content.= "</form>\n";
 				$copy_content.= "</td></tr>";
 				
 			}
@@ -790,7 +807,7 @@ else
 	<table >
 	<tr><td width='440' colspan=2 class='ContentHeader3'>Neue Kreuzerlliste anlegen</td><td></td></tr>
 	<tr><td>Thema</td><td align='right'><input type='text' name='thema' value='$thema'></td><td><span class='error'>$error_thema</td></tr>
-	<tr><td>Anzahl der Beispiele</td><td align='right'><input type='text' name='anzahlderbeispiele' value='$anzahlderbeispiele'></td><td>$error_anzahlderbeispiele</td></tr>
+	<tr><td>Anzahl der Beispiele</td><td align='right'><input type='text' name='anzahlderbeispiele' maxlength='2' size='2' value='$anzahlderbeispiele'></td><td>$error_anzahlderbeispiele</td></tr>
 	<tr><td>Anzahl Punkte pro Beispiel</td><td align='right'><input type='text' name='punkteprobeispiel' value='$punkteprobeispiel'></td><td>$error_punkteprobeispiel</td></tr>
 	<tr><td>Freigabe</td><td align='right'>von <input type='text' size='16' name='freigabevon' value='$freigabevon'></td><td>$error_freigabevon</td></tr>
 	<tr><td>(Format: 31.12.2007 14:30)</td><td align='right'>bis <input type='text' size='16' name='freigabebis' value='$freigabebis'></td><td>$error_freigabebis</td></tr>
@@ -798,9 +815,7 @@ else
 	<tr><td colspan=2 align='right'><input type='submit' name='uebung_neu' value='Anlegen'></td></tr>
 	</table>	
 	</form>
-	";
-	
-	echo "</form>";
+	";	
 }
 ?>
 </td></tr>
