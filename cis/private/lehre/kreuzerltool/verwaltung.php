@@ -157,6 +157,7 @@ else
 
 if($result = pg_query($conn, $qry))
 {
+	$result_alle_lehreinheiten = $result;
 	if(pg_num_rows($result)>1)
 	{
 		//Lehreinheiten DropDown
@@ -222,7 +223,7 @@ echo "<td>\n";
 echo "<b>$lv_obj->bezeichnung</b><br>";
 
 if($lehreinheit_id=='')
-	die('Sie haben keine Berechtigung f&uuml;r diesen Bereich');
+	die('Es gibt keine Lehreinheiten in diesem Studiensemester f&uuml;r die Sie eine Berechtigung besitzen');
 
 //Menue
 echo "\n<!--Menue-->\n";
@@ -497,6 +498,102 @@ if(isset($_POST['beispiel_neu']) || isset($_POST['beispiel_edit']))
 	}
 }
 
+if(isset($_GET['kopieren']) && $_GET['kopieren']=='true')
+{
+	//echo "Kopiere Uebung ".$_GET['uebung_copy_id']." to ".$_POST['lehreinheit_copy_id'];
+	//Laden der zu kopierenden Uebung
+	if(is_numeric($_GET['uebung_copy_id']) && is_numeric($_POST['lehreinheit_copy_id']))
+	{		
+		//Source Uebung Laden
+		$qry = "SELECT * FROM campus.tbl_uebung WHERE uebung_id='".$_GET['uebung_copy_id']."'";
+		if($result_source = pg_query($conn, $qry))
+		{
+			if($row_source = pg_fetch_object($result_source))
+			{
+				//Berechtigung Checken
+				$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='".$_POST['lehreinheit_copy_id']."' AND mitarbeiter_uid='$user'";
+				if($row_berechtigt = pg_query($conn, $qry))
+				{
+					if(pg_num_rows($row_berechtigt)>0 || 
+					   $rechte->isBerechtigt('admin',0) || 
+					   $rechte->isBerechtigt('admin',$lv_obj->studiengang_kz))
+					{
+						//Schauen ob bereits eine uebung mit diesem Namen vorhanden ist
+						$qry = "SELECT * FROM campus.tbl_uebung WHERE lehreinheit_id='".$_POST['lehreinheit_copy_id']."' AND bezeichnung='".addslashes($row_source->bezeichnung)."'";
+						$result_bezeichnung_exists = pg_query($conn, $qry);
+						if(pg_num_rows($result_bezeichnung_exists)==0)
+						{
+							//Uebung einfuegen
+							$uebung_dest = new uebung($conn);
+							$uebung_dest->gewicht = $row_source->punkte;
+							$uebung_dest->punkte = $row_source->punkte;
+							$uebung_dest->angabedatei = $row_source->angabedatei;
+							$uebung_dest->freigabevon = $row_source->freigabevon;
+							$uebung_dest->freigabebis = $row_source->freigabebis;
+							$uebung_dest->abgabe = ($row_source->abgabe=='t'?true:false);
+							$uebung_dest->beispiele = ($row_source->beispiele=='t'?true:false);
+							$uebung_dest->bezeichnung = $row_source->bezeichnung;
+							$uebung_dest->positiv = ($row_source->positiv=='t'?true:false);
+							$uebung_dest->statistik = ($row_source->statistik=='t'?true:false);
+							$uebung_dest->defaultbemerkung = $row_source->defaultbemerkung;
+							$uebung_dest->lehreinheit_id = $_POST['lehreinheit_copy_id'];
+							$ubeung_dest->updateamum = date('Y-m-d H:i:s');
+							$uebung_dest->updatevon = $user;
+							$uebung_dest->insertamum = date('Y-m-d H:i:s');
+							$uebung_dest->insertvon = $user;
+							
+							if($uebung_dest->save(true))
+							{
+								//Beispiel laden
+								$qry = "SELECT * FROM campus.tbl_beispiel WHERE uebung_id='".$_GET['uebung_copy_id']."'";
+								if($result_bsp_source = pg_query($conn, $qry))
+								{
+									$error_bsp_save=false;
+									while($row_bsp_source = pg_fetch_object($result_bsp_source))
+									{
+										//Beispiel speichern
+										$beispiel_dest = new beispiel($conn);
+										$beispiel_dest->uebung_id = $uebung_dest->uebung_id;
+										$beispiel_dest->bezeichnung = $row_bsp_source->bezeichnung;
+										$beispiel_dest->punkte = $row_bsp_source->punkte;
+										$beispiel_dest->updateamum = date('Y-m-d H:i:s');
+										$beispiel_dest->updatevon = $user;
+										$beispiel_dest->insertamum = date('Y-m-d H:i:s');
+										$beispiel_dest->insertvon = $user;
+										
+										if(!$beispiel_dest->save(true))
+											$error_bsp_save=true;
+									}
+									
+									if($error_bsp_save)
+										echo "<span class='error'>Fehler: Es konnten nicht alle Beispiel kopiert werden</span>";
+									else 
+										echo "Daten wurden erfolgreich kopiert";
+								}
+							}
+							else 
+							{
+							
+								echo "<span class='error'>Fehler beim kopieren der Daten: $uebung_dest->errormsg</span>";
+							}
+						}
+						else 
+							echo "<span class='error'>Fehler beim Kopieren: In der Ziel-Lehreinheit existiert bereits eine Kreuzerlliste mit diesem Namen!</span>";
+					}
+					else 
+						echo "<span class='error'>Sie haben keine Berechtigung f&uuml;r diese Aktion</span>";
+				}
+			}
+			else
+				echo "<span class='error'>Uebung ".$_GET['uebung_copy_id']." wurde nicht gefunden</span>";
+		}
+		else 
+			echo "<span class='error'>Uebung ".$_GET['uebung_copy_id']." wurde nicht gefunden</span>";
+	}
+	else 
+		echo "<span class='error'>Fehler bei der Parameteruebergabe</span>";
+}
+
 //Uebersichtstabelle
 if(isset($uebung_id) && $uebung_id!='')
 {
@@ -588,24 +685,82 @@ if(isset($uebung_id) && $uebung_id!='')
 else 
 {
 	//Gesamtuebersicht ueber alle Uebungen
-	echo "<form action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method=POST>";
+	echo "<table><tr><td valign='top'>";
+	echo "<form action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method=POST>";	
 	echo "<table width='440'><tr><td colspan='3' class='ContentHeader3'>Vorhandene Kreuzerllisten bearbeiten</td></tr>";	
 	
 	$uebung_obj = new uebung($conn);
 	$uebung_obj->load_uebung($lehreinheit_id);
 	$anzahl = count($uebung_obj->uebungen);
+	$copy_content="<table cellpadding=0><tr><td class='ContentHeader3'>&Uuml;bung in andere LE kopieren</td></tr><tr><td></td><td></td><td>&nbsp;</td></tr><tr><th>&nbsp;</th></tr>";
 	if($anzahl>0)
 	{
-		echo "<tr><td></td><td></td><td>&nbsp;</td></tr><tr><th>Thema</th><th>Freigeschalten</th><th>Auswahl</th></tr>";
+		echo "<tr><td></td><td></td><td>&nbsp;</td></tr><tr><th>Thema</th><th>Freigeschalten</th><th>Auswahl</th><th>&nbsp;</th></tr>";
 		foreach ($uebung_obj->uebungen as $row) 
 		{
-			echo "<tr><td align='left'><a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id' class='Item'><u>".htmlentities($row->bezeichnung)."</u></a></td><td align='center'>";
+			echo "<tr height=23><td align='left'><a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id' class='Item'><u>".htmlentities($row->bezeichnung)."</u></a></td><td align='center'>";
 			
 			if((strtotime(strftime($row->freigabevon))<=time()) && (strtotime(strftime($row->freigabebis))>=time()))
 				echo 'Ja';
 			else 
 				echo 'Nein';
 			echo "</td><td align='center'><input type='Checkbox' name='uebung[]' value='$row->uebung_id'></td>";
+			if(isset($result_alle_lehreinheiten) && pg_num_rows($result_alle_lehreinheiten)>1)
+			{
+				$copy_content.= '<tr>';
+				$copy_content.= '<td>';
+				$copy_content.= "<form  style='margin:1px;' action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&kopieren=true&uebung_copy_id=$row->uebung_id' method='POST'>";
+				$copy_content.= "\n<SELECT name='lehreinheit_copy_id'>\n";
+				
+				for($i=0;$i<pg_num_rows($result_alle_lehreinheiten);$i++)
+				{
+					$row_alle_lehreinheiten = pg_fetch_object($result_alle_lehreinheiten,$i);
+					if($lehreinheit_id!=$row_alle_lehreinheiten->lehreinheit_id)
+					{
+						$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN campus.vw_mitarbeiter ON(mitarbeiter_uid=uid) WHERE lehreinheit_id='$row_alle_lehreinheiten->lehreinheit_id'";
+						if($result_lektoren = pg_query($conn, $qry_lektoren))
+						{
+							$lektoren = '( ';
+							$j=0;
+							while($row_lektoren = pg_fetch_object($result_lektoren))
+							{
+								$lektoren .= $row_lektoren->kurzbz;
+								$j++;
+								if($j<pg_num_rows($result_lektoren))
+									$lektoren.=', ';
+								else
+									$lektoren.=' ';
+							}
+							$lektoren .=')';
+						}
+						$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row_alle_lehreinheiten->lehreinheit_id'";
+						if($result_gruppen = pg_query($conn, $qry_gruppen))
+						{
+							$gruppen = '';
+							$j=0;
+							while($row_gruppen = pg_fetch_object($result_gruppen))
+							{
+								if($row_gruppen->gruppe_kurzbz=='')
+									$gruppen.=$row_gruppen->semester.$row_gruppen->verband.$row_gruppen->gruppe;
+								else 
+									$gruppen.=$row_gruppen->gruppe_kurzbz;
+								$j++;
+								if($j<pg_num_rows($result_gruppen))
+									$gruppen.=', ';
+								else 
+									$gruppen.=' ';
+							}
+						}
+						$copy_content.= "<OPTION value='$row_alle_lehreinheiten->lehreinheit_id'>$row_alle_lehreinheiten->lfbez - $gruppen $lektoren</OPTION>\n";
+					}
+				}
+				$copy_content.= '</SELECT> ';
+				
+				$copy_content.= "&nbsp;&nbsp;&nbsp;<input type='submit' value='COPY'>";
+				$copy_content.= "</form>";
+				$copy_content.= "</td></tr>";
+				
+			}
 		}
 		echo "<tr><td></td><td></td><td><input type='Submit' value='Auswahl löschen' name='delete_uebung' onclick='return confirmdelete();'></td></tr>";
 	}
@@ -614,6 +769,14 @@ else
 	
 	echo "</table>
 	</form><br><br>";
+	
+	//Kopier-Button anzeigen
+	$copy_content.='</table>';
+	echo "</td><td valign='top'>";
+	if(isset($result_alle_lehreinheiten) && pg_num_rows($result_alle_lehreinheiten)>1 && $anzahl>0)
+		echo $copy_content;
+	echo "</td></tr></table>";
+	
 	if(!isset($_POST['uebung_neu']))
 	{
 		$thema = "Uebung ".($anzahl<9?'0'.($anzahl+1):($anzahl+1));
