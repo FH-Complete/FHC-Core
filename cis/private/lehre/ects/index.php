@@ -447,11 +447,8 @@ border:1px dashed #000000;
 
 		$stsem_obj = new studiensemester($conn);
 		$stsem = $stsem_obj->getaktorNext();
-		$qry = "SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE lehrveranstaltung_id='$lv' ORDER BY ende DESC LIMIT 1";
-		$result = pg_query($conn, $qry);
-		$row = pg_fetch_object($result);
 		//Namen der Lehrenden Auslesen
-		$qry = "SELECT * FROM campus.vw_mitarbeiter, lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lv' AND tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND studiensemester_kurzbz='$row->studiensemester_kurzbz' AND mitarbeiter_uid=uid";
+		$qry = "SELECT * FROM campus.vw_mitarbeiter, lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lv' AND tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE lehrveranstaltung_id='$lv' ORDER BY ende DESC LIMIT 1) AND mitarbeiter_uid=uid";
 		echo "<tr><td valign='top' nowrap><b>Lehrende laut Lehrauftrag</b></td><td nowrap>";
 		$helparray = array();
 		if($result=pg_query($conn,$qry))

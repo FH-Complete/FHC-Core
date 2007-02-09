@@ -134,6 +134,7 @@ if (!$conn = pg_pconnect(CONN_STRING))
 		if($gruppe!='')
 			$qry.=" AND gruppe='$gruppe'";
 	}	
+	$qry.= " ORDER BY nachname, vorname";
 	if($result = pg_query($conn, $qry))
 	{
 		$i=1;

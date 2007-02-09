@@ -211,7 +211,7 @@
 				  				if($row_cnt->anzahl>0)
 				  				{
 				  					$param = "kz=".$row->studiengang_kz."&sem=".$row1->semester;
-				  					$strhelp = strtolower($row->kuerzel.$row1->semester.$row1->verband.$row1->gruppe);
+				  					$strhelp = strtolower($row->kuerzel.trim($row1->semester).trim($row1->verband).trim($row1->gruppe));
 						  			echo "<tr>\n";
 						  			echo "  <td width=\"390\">&nbsp;&nbsp;&nbsp;&#8226; Semester $row1->semester";
 						  			if(trim($row1->verband)!='')

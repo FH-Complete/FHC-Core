@@ -285,6 +285,7 @@ else
 	if($gruppe!='')
 		$qry.=" AND gruppe='$gruppe'";
 }	
+$qry.= " ORDER BY nachname, vorname";
 
 if($result = pg_query($conn, $qry))
 {

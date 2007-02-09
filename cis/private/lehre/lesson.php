@@ -485,8 +485,14 @@
 				</td>
 				
           <td valign="top" align="center"> 
-	  <?php if($is_lector) { ?>
-	  <a href="kreuzerltool/verwaltung.php?<?php echo "lvid=$lvid"?>" > 
+	  <?php if($is_lector) 
+	  		{ 
+	  			if(isset($angezeigtes_stsem))
+	  				$studiensem = '&stsem='.$angezeigtes_stsem;
+	  			else 
+	  				$studiensem = '';
+	  	?>	  
+	  <a href="kreuzerltool/verwaltung.php?<?php echo "lvid=$lvid$studiensem"?>" > 
             <img src="../../../skin/images/button_kt.jpg" border="0" width="67" height="45"><br>
             <strong>"Kreuzerl"-Tool</strong></a>
 	    <?php } else { ?>
