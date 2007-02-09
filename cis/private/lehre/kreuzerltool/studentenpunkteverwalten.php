@@ -152,7 +152,7 @@ if($result = pg_query($conn, $qry))
 			if($lehreinheit_id=='')
 				$lehreinheit_id=$row->lehreinheit_id;				
 			$selected = ($row->lehreinheit_id == $lehreinheit_id?'selected':'');
-			$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN campus.vw_mitarbeiter ON(mitarbeiter_uid=uid) WHERE lehreinheit_id='$row->lehreinheit_id'";
+			$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE lehreinheit_id='$row->lehreinheit_id'";
 			if($result_lektoren = pg_query($conn, $qry_lektoren))
 			{
 				$lektoren = '( ';
