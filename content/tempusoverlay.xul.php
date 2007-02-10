@@ -51,9 +51,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 	       <treeitem uri="rdf:*">
 	         <treerow>
 	           <treecell label="rdf:http://www.technikum-wien.at/lehrverbandsgruppe/rdf#name"/>
-	           <treecell label="rdf:http://www.technikum-wien.at/lehrverbandsgrupperdf#stg"/>
-	           <treecell label="rdf:http://www.technikum-wien.at/lehrverbandsgrupperdf#stg_kz"/>
-	           <treecell label="rdf:http://www.technikum-wien.at/lehrverbandsgrupperdf#sem"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/lehrverbandsgruppe/rdf#stg"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/lehrverbandsgruppe/rdf#stg_kz"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/lehrverbandsgruppe/rdf#sem"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/lehrverbandsgruppe/rdf#ver"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/lehrverbandsgruppe/rdf#grp"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/lehrverbandsgruppe/rdf#gruppe"/>

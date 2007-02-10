@@ -20,6 +20,7 @@
 
 require_once('lehrstunde.class.php');
 require_once('ferien.class.php');
+require_once('benutzerberechtigung.class.php');
 
 class wochenplan
 {
@@ -664,7 +665,7 @@ class wochenplan
 		echo $wunsch;
 		global $cfgStdBgcolor;
 		$count=0;
-		$berechtigung=new berechtigung($this->conn);
+		$berechtigung=new benutzerberechtigung($this->conn);
 		$berechtigung->getBerechtigungen($uid);
 		// Stundentafel abfragen
 		$sql_query="SELECT * FROM lehre.tbl_stunde ORDER BY stunde";
@@ -761,6 +762,8 @@ class wochenplan
 				if (isset($this->std_plan[$i][$j][0]->lehrfach))
 				{
 					// Daten aufbereiten
+					unset($lvb);
+					//$lvb=array();
 					$kollision=-1;
 					unset($a_unr);
 					foreach ($this->std_plan[$i][$j] as $lehrstunde)
@@ -1076,7 +1079,7 @@ class wochenplan
 		$lvb=substr($lvb,3);
 
 		// Raeume die in Frage kommen, aufgrund der Raumtypen
-		$sql_query="SELECT DISTINCT ort_kurzbz FROM tbl_ort
+		$sql_query="SELECT DISTINCT ort_kurzbz FROM public.tbl_ort
 			 WHERE aktiv AND ort_kurzbz NOT LIKE '\\\\_%' ORDER BY ort_kurzbz"; // NATURAL JOIN tbl_ortraumtyp WHERE $rtype  hierarchie
 		//echo $sql_query;
 		if(!$result=pg_exec($this->conn, $sql_query))

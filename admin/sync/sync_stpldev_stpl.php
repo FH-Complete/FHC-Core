@@ -7,11 +7,12 @@
 <?php
 include('../../vilesci/config.inc.php');
 include('../../include/functions.inc.php');
-include('../../include/lehrstunde.class.php');
+//include('../../include/lehrstunde.class.php');
 $conn=pg_connect(CONN_STRING);
 
 // Startvariablen setzen
 $adress='pam@technikum-wien.at';
+//$adress_stpl='pam@technikum-wien.at';
 $adress_stpl='stpl@technikum-wien.at';
 if (isset($_GET['sendmail']))
 {
@@ -60,6 +61,11 @@ else
 		$message_sync.='Kein aktuelles Studiensemester gefunden! '.$sql_query.'<BR>';
 }
 
+// Testumgebung
+//$datum_begin='2007-01-12';
+//$datum_ende='2007-02-10';
+
+
 
 
 $message_begin='Dies ist eine automatische Mail!<BR>Es haben sich folgende Aenderungen in Ihrem Stundenplan ergeben:<BR>';
@@ -71,7 +77,7 @@ $message_begin='Dies ist eine automatische Mail!<BR>Es haben sich folgende Aende
 echo 'Neue Datens&auml;tze werden angelegt.<BR>';flush();
 $sql_query="SELECT * FROM vw_stundenplandev WHERE datum>='$datum_begin' AND datum<='$datum_ende' AND
 	stundenplandev_id NOT IN
-	(SELECT stundenplan_id FROM tbl_stundenplan WHERE datum>='$datum_begin');";
+	(SELECT stundenplan_id FROM tbl_stundenplan WHERE datum>='$datum_begin' AND datum<='$datum_ende');";
 //echo $sql_query.'<BR>';
 if (!$result=pg_query($conn, $sql_query))
 {
@@ -84,10 +90,10 @@ else
 	while ($row=pg_fetch_object($result))
 	{
 		$sql_query='INSERT INTO tbl_stundenplan
-			(stundenplan_id,unr,uid,datum,stunde,ort_kurzbz,lehrform_kurzbz,studiengang_kz,semester,verband,gruppe,
-			einheit_kurzbz,titel,anmerkung,fix,updateamum,updatevon,lehreinheit_id) VALUES';
+			(stundenplan_id,unr,mitarbeiter_uid,datum,stunde,ort_kurzbz,studiengang_kz,semester,verband,gruppe,
+			gruppe_kurzbz,titel,anmerkung,fix,updateamum,updatevon,insertamum,insertvon,lehreinheit_id) VALUES';
 		$sql_query.="($row->stundenplandev_id,$row->unr,'$row->uid','$row->datum',$row->stunde,'$row->ort_kurzbz',
-			'$row->lehrform',$row->studiengang_kz,$row->semester";
+			$row->studiengang_kz,$row->semester";
 		if ($row->verband==null)
 			$sql_query.=',NULL';
 		else
@@ -96,20 +102,20 @@ else
 			$sql_query.=',NULL';
 		else
 			$sql_query.=",'$row->gruppe'";
-		if ($row->einheit_kurzbz==null)
+		if ($row->gruppe_kurzbz==null)
 			$sql_query.=',NULL';
 		else
-			$sql_query.=",'$row->einheit_kurzbz'";
+			$sql_query.=",'$row->gruppe_kurzbz'";
 		$sql_query.=",'$row->titel','$row->anmerkung'";
 		if ($row->fix=='t')
 			$sql_query.=',TRUE';
 		else
 			$sql_query.=',FALSE';
-		$sql_query.=",'$row->updateamum','$row->updatevon'";
-		if ($row->lehrveranstaltung_id==null)
+		$sql_query.=",'$row->updateamum','$row->updatevon','$row->insertamum','$row->insertvon'";
+		if ($row->lehreinheit_id==null)
 			$sql_query.=',NULL';
 		else
-			$sql_query.=",$row->lehrveranstaltung_id";
+			$sql_query.=",$row->lehreinheit_id";
 		$sql_query.=');';
 		//echo $sql_query;
 		if (!$result_insert=pg_query($conn, $sql_query))
@@ -138,13 +144,13 @@ else
 						<TABLE><TR><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
 				}
 				$message[$row->uid]->message.='<TR><TH>'.$row->ort_kurzbz.'</TH>';
-				$message[$row->uid]->message.='<TH>'.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->einheit_kurzbz.'</TH>';
+				$message[$row->uid]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
 				$message[$row->uid]->message.='<TH>'.$row->lektor.'</TH>';
 				$message[$row->uid]->message.='<TH>'.$row->datum.'/'.$row->stunde.'</TH>';
 				$message[$row->uid]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
 			}
 			// Verband
-			$verband=$row->stg_kurzbz.$row->semester.$row->verband.$row->gruppe;
+			$verband=$row->stg_typ.$row->stg_kurzbz.$row->semester.$row->verband.$row->gruppe;
 			$verband=trim($verband);
 			$verband=strtolower($verband);
 			if (!isset($message[$verband]->isneu));
@@ -155,7 +161,7 @@ else
 						<TABLE><TR><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
 			}
 			$message[$verband]->message.='<TR><TH>'.$row->ort_kurzbz.'</TH>';
-			$message[$verband]->message.='<TH>'.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->einheit_kurzbz.'</TH>';
+			$message[$verband]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
 			$message[$verband]->message.='<TH>'.$row->lektor.'</TH>';
 			$message[$verband]->message.='<TH>'.$row->datum.'/'.$row->stunde.'</TH>';
 			$message[$verband]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
@@ -171,9 +177,9 @@ else
 */
 
 echo '<BR>Alte Datens&auml;tze werden gel&ouml;scht.<BR>';flush();
-$sql_query="SELECT * FROM vw_stundenplan WHERE stundenplan_id NOT IN
-		(SELECT stundenplandev_id FROM tbl_stundenplandev WHERE datum>='$datum_begin')
-		AND datum>='$datum_begin';";
+$sql_query="SELECT * FROM vw_stundenplan WHERE datum>='$datum_begin' AND datum<='$datum_ende'
+				AND stundenplan_id NOT IN
+				(SELECT stundenplandev_id FROM tbl_stundenplandev WHERE datum>='$datum_begin' AND datum<='$datum_ende');";
 if (!$result=pg_query($conn, $sql_query))
 {
 	echo $sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
@@ -209,13 +215,13 @@ while ($row=pg_fetch_object($result))
 					<TABLE><TR><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
 			}
 			$message[$row->uid]->message.='<TR><TH>'.$row->ort_kurzbz.'</TH>';
-			$message[$row->uid]->message.='<TH>'.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->einheit_kurzbz.'</TH>';
+			$message[$row->uid]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
 			$message[$row->uid]->message.='<TH>'.$row->lektor.'</TH>';
 			$message[$row->uid]->message.='<TH>'.$row->datum.'/'.$row->stunde.'</TH>';
 			$message[$row->uid]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
 		}
 		// Verband
-		$verband=$row->stg_kurzbz.$row->semester.$row->verband.$row->gruppe;
+		$verband=$row->stg_typ.$row->stg_kurzbz.$row->semester.$row->verband.$row->gruppe;
 		$verband=trim($verband);
 		$verband=strtolower($verband);
 		if (!isset($message[$verband]->isalt));
@@ -226,7 +232,7 @@ while ($row=pg_fetch_object($result))
 					<TABLE><TR><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
 		}
 		$message[$verband]->message.='<TR><TH>'.$row->ort_kurzbz.'</TH>';
-		$message[$verband]->message.='<TH>'.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->einheit_kurzbz.'</TH>';
+		$message[$verband]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
 		$message[$verband]->message.='<TH>'.$row->lektor.'</TH>';
 		$message[$verband]->message.='<TH>'.$row->datum.'/'.$row->stunde.'</TH>';
 		$message[$verband]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
@@ -251,12 +257,11 @@ $sql_query="SELECT vw_stundenplandev.*, vw_stundenplan.datum AS old_datum, vw_st
 		 		vw_stundenplandev.datum!=vw_stundenplan.datum OR
 				vw_stundenplandev.stunde!=vw_stundenplan.stunde OR
 				vw_stundenplandev.ort_kurzbz!=vw_stundenplan.ort_kurzbz OR
-				vw_stundenplandev.lehrform!=vw_stundenplan.lehrform OR
 				vw_stundenplandev.studiengang_kz!=vw_stundenplan.studiengang_kz OR
 				vw_stundenplandev.semester!=vw_stundenplan.semester OR
 				vw_stundenplandev.verband!=vw_stundenplan.verband OR
 				vw_stundenplandev.gruppe!=vw_stundenplan.gruppe OR
-				vw_stundenplandev.einheit_kurzbz!=vw_stundenplan.einheit_kurzbz OR
+				vw_stundenplandev.gruppe_kurzbz!=vw_stundenplan.gruppe_kurzbz OR
 				vw_stundenplandev.titel!=vw_stundenplan.titel OR
 				vw_stundenplandev.anmerkung!=vw_stundenplan.anmerkung OR
 				vw_stundenplandev.fix!=vw_stundenplan.fix OR
@@ -282,7 +287,7 @@ while ($row=pg_fetch_object($result))
 
 	// Datensaetze aendern
 	$sql_query="UPDATE tbl_stundenplan SET
-		unr=$row->unr,uid='$row->uid',datum='$row->datum',stunde=$row->stunde,
+		unr=$row->unr,mitarbeiter_uid='$row->uid',datum='$row->datum',stunde=$row->stunde,
 		ort_kurzbz='$row->ort_kurzbz', lehrform_kurzbz='$row->lehrform',
 		studiengang_kz=$row->studiengang_kz,semester=$row->semester";
 	if ($row->verband==null)
@@ -293,10 +298,10 @@ while ($row=pg_fetch_object($result))
 		$sql_query.=',gruppe=NULL';
 	else
 		$sql_query.=",gruppe='$row->gruppe'";
-	if ($row->einheit_kurzbz==null)
-		$sql_query.=',einheit_kurzbz=NULL';
+	if ($row->gruppe_kurzbz==null)
+		$sql_query.=',gruppe_kurzbz=NULL';
 	else
-		$sql_query.=",einheit_kurzbz='$row->einheit_kurzbz'";
+		$sql_query.=",gruppe_kurzbz='$row->gruppe_kurzbz'";
 	$sql_query.=",titel='$row->titel',anmerkung='$row->anmerkung'";
 	if ($row->fix=='t')
 		$sql_query.=',fix=TRUE';
@@ -335,19 +340,19 @@ while ($row=pg_fetch_object($result))
 					<TABLE><TR><TD>Status</TD><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
 			}
 			$message[$row->uid]->message.='<TR><TH>Vorher: </TH><TH>'.$row->old_ort_kurzbz.'</TH>';
-			$message[$row->uid]->message.='<TH>'.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->einheit_kurzbz.'</TH>';
+			$message[$row->uid]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
 			$message[$row->uid]->message.='<TH>'.$row->old_lektor.'</TH>';
 			$message[$row->uid]->message.='<TH>'.$row->old_datum.'/'.$row->old_stunde.'</TH>';
 			$message[$row->uid]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
 
 			$message[$row->uid]->message.='<TR><TH>Jetzt: </TH><TH>'.$row->ort_kurzbz.'</TH>';
-			$message[$row->uid]->message.='<TH>'.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->einheit_kurzbz.'</TH>';
+			$message[$row->uid]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
 			$message[$row->uid]->message.='<TH>'.$row->lektor.'</TH>';
 			$message[$row->uid]->message.='<TH>'.$row->datum.'/'.$row->stunde.'</TH>';
 			$message[$row->uid]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
 		}
 		// Verband
-		$verband=$row->stg_kurzbz.$row->semester.$row->verband.$row->gruppe;
+		$verband=$row->stg_typ.$row->stg_kurzbz.$row->semester.$row->verband.$row->gruppe;
 		$verband=trim($verband);
 		$verband=strtolower($verband);
 		if (!isset($message[$verband]->isset));
@@ -358,13 +363,13 @@ while ($row=pg_fetch_object($result))
 					<TABLE><TR><TD>Status</TD><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
 		}
 		$message[$verband]->message.='<TR><TH>Vorher: </TH><TH>'.$row->old_ort_kurzbz.'</TH>';
-		$message[$verband]->message.='<TH>'.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->einheit_kurzbz.'</TH>';
+		$message[$verband]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
 		$message[$verband]->message.='<TH>'.$row->old_lektor.'</TH>';
 		$message[$verband]->message.='<TH>'.$row->old_datum.'/'.$row->old_stunde.'</TH>';
 		$message[$verband]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
 
 		$message[$verband]->message.='<TR><TH>Jetzt: </TH><TH>'.$row->ort_kurzbz.'</TH>';
-		$message[$verband]->message.='<TH>'.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->einheit_kurzbz.'</TH>';
+		$message[$verband]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
 		$message[$verband]->message.='<TH>'.$row->lektor.'</TH>';
 		$message[$verband]->message.='<TH>'.$row->datum.'/'.$row->stunde.'</TH>';
 		$message[$verband]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
