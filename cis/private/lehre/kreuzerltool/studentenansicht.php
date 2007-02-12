@@ -66,12 +66,12 @@ $user = get_uid();
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
 
-if(isset($_GET['lvid'])) //Lehrveranstaltung_id
+if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id
 	$lvid = $_GET['lvid'];
 else 
 	die('Fehlerhafte Parameteruebergabe');
 
-if(isset($_GET['lehreinheit_id'])) //Lehreinheit_id
+if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id'])) //Lehreinheit_id
 	$lehreinheit_id = $_GET['lehreinheit_id'];
 else 
 	$lehreinheit_id = '';
@@ -220,7 +220,7 @@ echo "<td width='100%'>\n";
 echo "<b>$lv_obj->bezeichnung</b><br>";
 
 if($lehreinheit_id=='')
-	die('Derzeit gibt es keine Kreuzerllisten fuer diese Lehrveranstaltung');
+	die('Derzeit gibt es keine Kreuzerllisten f&uuml;r diese Lehrveranstaltung');
 $qry = "SELECT vorname, nachname FROM campus.vw_student WHERE uid='$user'";
 $name='';
 if($result = pg_query($conn, $qry))

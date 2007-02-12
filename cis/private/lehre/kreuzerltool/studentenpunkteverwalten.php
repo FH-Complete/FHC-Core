@@ -70,12 +70,12 @@ if(!check_lektor($user, $conn))
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
 
-if(isset($_GET['lvid'])) //Lehrveranstaltung_id
+if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id
 	$lvid = $_GET['lvid'];
 else 
 	die('Fehlerhafte Parameteruebergabe');
 
-if(isset($_GET['lehreinheit_id'])) //Lehreinheit_id
+if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id'])) //Lehreinheit_id
 	$lehreinheit_id = $_GET['lehreinheit_id'];
 else 
 	$lehreinheit_id = '';
