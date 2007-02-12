@@ -6,7 +6,7 @@
 	include('../../include/functions.inc.php');
 	if (!$conn = @pg_pconnect(CONN_STRING))
 	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
-	if(!($erg=pg_query($conn, "SELECT studiengang_kz, UPPER(typ::varchar(1) || kurzbz) as kurzbz, bezeichnung FROM tbl_studiengang ORDER BY kurzbz ASC")))
+	if(!($erg=pg_query($conn, "SELECT studiengang_kz, UPPER(typ::varchar(1) || kurzbz) as kurzbz, bezeichnung FROM public.tbl_studiengang ORDER BY kurzbz ASC")))
 		die(pg_errormessage($conn));
 	$num_rows=pg_numrows($erg);
 ?>

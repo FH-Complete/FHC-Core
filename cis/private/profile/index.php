@@ -147,7 +147,7 @@ Results: <?php echo $num_rows; ?><br>
 	        		{
 	        			?>
 	        		<br />
-	        		<A href='../../campus/notenliste.php'>Leistungsbeurteilung</a><br />
+	        		<A href='../lehre/notenliste.php'>Leistungsbeurteilung</a><br />
 
       				<?php
 	        		}
