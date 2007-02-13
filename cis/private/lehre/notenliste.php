@@ -4,6 +4,18 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
 	<title>Leistungsbeurteilung</title>
+	
+	<script language="JavaScript">
+	function MM_jumpMenu(targ, selObj, restore)
+	{
+	  eval(targ + ".location='" + selObj.options[selObj.selectedIndex].value + "'");
+	  
+	  if(restore) 
+	  {
+	  	selObj.selectedIndex = 0;
+	  }
+	}
+	</script>
 	</head>
 	
 	<body>
@@ -29,6 +41,8 @@ require('../../config.inc.php');
 if(!$conn=pg_connect(CONN_STRING_FAS))
 	die("Die Datenbankverbindung konnte nicht hergestellt werden.");
 
+if(isset($stsem) && (!is_numeric($stsem) || strlen($stsem)>2))
+	die('Fehler');
 $user = get_uid();
 
 $error = '';
@@ -63,30 +77,37 @@ else
 	//Aktuelles Studiensemester ermitteln
 	$qry = "SELECT 
 				CASE studiensemester.art 
-					WHEN 1 THEN 'WS' || studiensemester.jahr || '/' || studiensemester.jahr+1
+					WHEN 1 THEN 'WS' || studiensemester.jahr
 					WHEN 2 THEN 'SS' || studiensemester.jahr 					
 				END as stsem_name,
-				studiensemester_pk
-			FROM 
-				studiensemester
-			WHERE
-				studiensemester.aktuell='J'";
+				studiensemester_pk, aktuell
+			FROM studiensemester order by jahr, art DESC";
 	
 	if(!$result = pg_query($conn, $qry))
 		die("Fehler beim lesen aus der Datenbank");
 		
-	if($row = pg_fetch_object($result))
+	/*if($row = pg_fetch_object($result))
 	{
 		$stsem = $row->studiensemester_pk;
 		$stsem_name = $row->stsem_name;
 	}
 	else 
 		die("Derzeit kann keine Notenliste erstellt werden");
-		
+		*/
 	echo "<br />";
 	echo "<b>Name:</b> $vorname $nachname<br />";
 	echo "<b>Studiengang:</b>  $stg_name<br />";
-	echo "<b>Studiensemester:</b> $stsem_name<br />";
+	echo "<b>Studiensemester:</b> <SELECT name='stsem' onChange=\"MM_jumpMenu('self',this,0)\">";
+	while($row = pg_fetch_object($result))
+	{
+		if(!isset($stsem) && $row->aktuell=='J')
+			$stsem=$row->studiensemester_pk;
+		if($stsem==$row->studiensemester_pk)
+			echo "<OPTION value='notenliste.php?stsem=$row->studiensemester_pk' selected>$row->stsem_name</OPTION>";
+		else
+			echo "<OPTION value='notenliste.php?stsem=$row->studiensemester_pk'>$row->stsem_name</OPTION>";
+	}
+	echo "</SELECT><br />";
 	
 	//echo "Datum: ".date('d.m.Y')."<br />";
 	echo "<br />";

@@ -60,24 +60,28 @@
 		die(pg_last_error($conn));
 	$nr_mg=pg_numrows($erg_mg);
 ?>
-
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <title>Profil</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link rel="stylesheet" href="../../../skin/cis.css" type="text/css">
+<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
-<H2>
-	<table width="100%" border="0" cellpadding="0" cellspacing="0">
-	<tr>
-		<td>&nbsp;Userprofil</td>
-		<td align="right"><A href="../lvplan/help/index.html" class="hilfe" target="_blank">HELP&nbsp;</A></td>
-	</tr>
+<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="10">&nbsp;</td>
+    <td>
+    <table width="100%"  border="0" cellspacing="0" cellpadding="0">
+      <tr>
+		<td class='ContentHeader'><font class='ContentHeader'>&nbsp;Userprofil</font></td>
+		<!--<td align="right"><A href="../lvplan/help/index.html" class="hilfe" target="_blank">HELP&nbsp;</A></td>-->
+	  </tr>
 	</table>
-</H2>
-Results: <?php echo $num_rows; ?><br>
+
+	Results: <?php echo $num_rows; ?><br>
 	Username: <?php echo $uid; ?><br><br>
 	<HR>
 	<?php
@@ -106,13 +110,13 @@ Results: <?php echo $num_rows; ?><br>
       		</P>
       		<P>
       			<b>eMail</b><br>
-        		<FONT class="beschriftung">Technikum:</FONT><a href='mailto:<?php echo $uid; ?>@technikum-wien.at'> <?php echo $uid; ?>@technikum-wien.at</a><br>
+        		<FONT class="beschriftung">Technikum:</FONT><a class='Item' href='mailto:<?php echo $uid; ?>@technikum-wien.at'> <?php echo $uid; ?>@technikum-wien.at</a><br>
 
         		<?php
         		if($email_alias!='')
         		{
         		?>
-        			<FONT class="beschriftung">Alias:</FONT> <a href='mailto:<?php echo $email_alias; ?>@technikum-wien.at'><?php echo $email_alias; ?>@technikum-wien.at</a>
+        			<FONT class="beschriftung">Alias:</FONT> <a class='Item' href='mailto:<?php echo $email_alias; ?>@technikum-wien.at'><?php echo $email_alias; ?>@technikum-wien.at</a>
         		<?php
 				}
 				?>
@@ -147,7 +151,7 @@ Results: <?php echo $num_rows; ?><br>
 	        		{
 	        			?>
 	        		<br />
-	        		<A href='../lehre/notenliste.php'>Leistungsbeurteilung</a><br />
+	        		<A class='Item' href='../lehre/notenliste.php'>Leistungsbeurteilung</a><br />
 
       				<?php
 	        		}
@@ -164,10 +168,27 @@ Results: <?php echo $num_rows; ?><br>
 
         			if(!$ansicht)
         			{?>
-        			<A href="zeitwunsch.php?uid=<?php echo $uid; ?>">Zeitw&uuml;nsche</A><BR>
-        			<A href="lva_liste.php?uid=<?php echo $uid; ?>">Lehrveranstaltungen</A>
+        			<A class="Item" href="zeitwunsch.php?uid=<?php echo $uid; ?>">Zeitw&uuml;nsche</A><BR>
+        			<A class="Item" href="lva_liste.php?uid=<?php echo $uid; ?>">Lehrveranstaltungen</A>
         			<?php
         			}
+				}
+				if(!$ansicht)
+				{
+					$qry = "SELECT tbl_betriebsmittel.beschreibung as beschreibung, tbl_betriebsmittel.nummer as nummer, tbl_betriebsmittelperson.ausgegebenam as ausgegebenam FROM public.tbl_betriebsmittelperson JOIN public.tbl_betriebsmittel USING(betriebsmittel_id) WHERE person_id=(SELECT person_id FROM public.tbl_benutzer WHERE uid='$uid' LIMIT 1)";
+					if($result_betriebsmittel = pg_query($conn, $qry))
+					{
+						if(pg_num_rows($result_betriebsmittel)>0)
+						{
+							echo '<br><br><b>Entlehnte Betriebsmittel</b><table><tr class="liste"><th>Beschreibung</th><th>Nummer</th><th>Ausgegeben am</th></tr>';
+							
+							while($row_bm = pg_fetch_object($result_betriebsmittel))
+							{
+								echo "<tr class='liste1'><td>$row_bm->beschreibung</td><td>$row_bm->nummer</td><td>$row_bm->ausgegebenam</td></tr>";
+							}
+							echo '</table>';
+						}
+					}
 				}
 				if(!$ansicht)
 				{
@@ -195,18 +216,18 @@ Results: <?php echo $num_rows; ?><br>
   		for($i=0;$i<$nr_mg;$i++)
 		{
 			$row=pg_fetch_object($erg_mg,$i);
-			echo '<TR><TD><A href="mailto:'.strtolower($row->gruppe_kurzbz).'@technikum-wien.at">'.strtolower($row->gruppe_kurzbz).'&nbsp;</TD>';
+			echo '<TR><TD><A class="Item" href="mailto:'.strtolower($row->gruppe_kurzbz).'@technikum-wien.at">'.strtolower($row->gruppe_kurzbz).'&nbsp;</TD>';
     		echo "<TD>&nbsp;$row->beschreibung</TD><TD></TD></TR>";
 		}
 		if (isset($matrikelnr))
 		{
-			echo '<TR><TD><A href="mailto:'.strtolower($stgkz).'_std@technikum-wien.at">'.strtolower($stgkz).'_std&nbsp;</TD>';
+			echo '<TR><TD><A class="Item" href="mailto:'.strtolower($stgkz).'_std@technikum-wien.at">'.strtolower($stgkz).'_std&nbsp;</TD>';
     		echo "<TD>&nbsp;Alle Studenten von $stgbez</TD><TD></TD></TR>";
-			echo '<TR><TD><A href="mailto:'.strtolower($stgkz).$semester.'@technikum-wien.at">'.strtolower($stgkz).$semester.'&nbsp;</TD>';
+			echo '<TR><TD><A class="Item" href="mailto:'.strtolower($stgkz).$semester.'@technikum-wien.at">'.strtolower($stgkz).$semester.'&nbsp;</TD>';
     		echo "<TD>&nbsp;Alle Studenten von $stgkz $semester</TD><TD></TD></TR>";
-			echo '<TR><TD><A href="mailto:'.strtolower($stgkz).$semester.strtolower($verband).'@technikum-wien.at">'.strtolower($stgkz).$semester.strtolower($verband).'&nbsp;</TD>';
+			echo '<TR><TD><A class="Item" href="mailto:'.strtolower($stgkz).$semester.strtolower($verband).'@technikum-wien.at">'.strtolower($stgkz).$semester.strtolower($verband).'&nbsp;</TD>';
     		echo "<TD>&nbsp;Alle Studenten von $stgkz $semester$verband</TD><TD></TD></TR>";
-			echo '<TR><TD><A href="mailto:'.strtolower($stgkz).$semester.strtolower($verband).$gruppe.'@technikum-wien.at">'.strtolower($stgkz).$semester.strtolower($verband).$gruppe.'&nbsp;</TD>';
+			echo '<TR><TD><A class="Item" href="mailto:'.strtolower($stgkz).$semester.strtolower($verband).$gruppe.'@technikum-wien.at">'.strtolower($stgkz).$semester.strtolower($verband).$gruppe.'&nbsp;</TD>';
     		echo "<TD>&nbsp;Alle Studenten von $stgkz $semester$verband$gruppe</TD><TD></TD></TR>";
 		}
 
@@ -231,7 +252,7 @@ Results: <?php echo $num_rows; ?><br>
 			?>
 			</table>
 			<BR><HR>
-			Sollten ihre Daten nicht stimmen, wenden sie sich bitte an die <a href="mailto:<?php echo $mail ?>?subject=Datenkorrektur&body=Die%20Profildaten%20fuer%20User%20'<?php echo $uid; ?>'%20sind%20nicht%20korrekt.%0D
+			Sollten ihre Daten nicht stimmen, wenden sie sich bitte an die <a class='Item' href="mailto:<?php echo $mail ?>?subject=Datenkorrektur&body=Die%20Profildaten%20fuer%20User%20'<?php echo $uid; ?>'%20sind%20nicht%20korrekt.%0D
 				Hier die richtigen Daten:%0DNachname:%20<?php echo $nachname;?>%0DVorname:%20<?php echo $vorname;?>%0DGeburtsdatum:%20<?php echo $gebdatum;?>
 				%0DGeburtsort:%20<?php echo $gebort;?>%0DTitelPre:%20<?php echo $titelpre;?>%0DTitelPost:%20<?php echo $titelpost;?>
 				%0D%0D***%0DPlatz fuer weitere (nicht angefuehrte Daten)%0D***">zuständige Assistentin</a>
@@ -243,7 +264,7 @@ Results: <?php echo $num_rows; ?><br>
 		<br><br>
 		Es wurden keine oder mehrere Profile f&uuml;r ihren Useraccount gefunden.
 		<br>
-		Bitte wenden sie sich an die <a href="mailto:vilesci@technikum-wien.at?subject=Profilfehler&body=Es wurden zuviele oder zuwenige Profile fuer User <?php echo $uid; ?> gefunden. %0DBitte kontrollieren sie die Datenbank!%0D%0DMeine Daten sind:%0DNachname:%0DVornamen:%0D...">Administration</a>
+		Bitte wenden sie sich an die <a class='Item' href="mailto:vilesci@technikum-wien.at?subject=Profilfehler&body=Es wurden zuviele oder zuwenige Profile fuer User <?php echo $uid; ?> gefunden. %0DBitte kontrollieren sie die Datenbank!%0D%0DMeine Daten sind:%0DNachname:%0DVornamen:%0D...">Administration</a>
 		<?php
 	}
 	?>

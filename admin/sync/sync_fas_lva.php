@@ -67,8 +67,8 @@ function validate($row)
 		$error_log[$row->studiengang_kz][]=printLVA($row).': Stundenblockung ist nicht größer 0';
 		$valid=false;
 	}
-	if (!$row->semesterstunden>0) {
-		$error_log[$row->studiengang_kz][]=printLVA($row).': Semesterstunden sind nicht größer 0';
+	if (!$row->semesterstunden>=0) {
+		$error_log[$row->studiengang_kz][]=printLVA($row).': Semesterstunden sind nicht >= 0';
 		$valid=false;
 	}
 	if (!$row->wochenrythmus>0)
