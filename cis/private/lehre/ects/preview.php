@@ -219,7 +219,7 @@ font-size:10pt;
 	//Namen der Lehrenden Auslesen
 	$qry = "SELECT distinct vorname, nachname FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter 
 			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lehrveranstaltung_id' 
-			AND studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM public.tbl_studiensemester JOIN lehre.tbl_lehreinheit USING(studiensemester_kurzbz) WHERE tbl_lehreinheit.lehrveranstaltung_id='$lehrveranstaltung_id' ORDER BY ende LIMIT 1)
+			AND studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM public.tbl_studiensemester JOIN lehre.tbl_lehreinheit USING(studiensemester_kurzbz) WHERE tbl_lehreinheit.lehrveranstaltung_id='$lehrveranstaltung_id' ORDER BY ende DESC LIMIT 1)
 			AND tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id
 			AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid=uid";
 	   
