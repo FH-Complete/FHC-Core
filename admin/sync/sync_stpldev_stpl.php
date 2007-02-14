@@ -7,7 +7,6 @@
 <?php
 include('../../vilesci/config.inc.php');
 include('../../include/functions.inc.php');
-//include('../../include/lehrstunde.class.php');
 $conn=pg_connect(CONN_STRING);
 
 // Startvariablen setzen
@@ -288,8 +287,7 @@ while ($row=pg_fetch_object($result))
 	// Datensaetze aendern
 	$sql_query="UPDATE tbl_stundenplan SET
 		unr=$row->unr,mitarbeiter_uid='$row->uid',datum='$row->datum',stunde=$row->stunde,
-		ort_kurzbz='$row->ort_kurzbz', lehrform_kurzbz='$row->lehrform',
-		studiengang_kz=$row->studiengang_kz,semester=$row->semester";
+		ort_kurzbz='$row->ort_kurzbz',studiengang_kz=$row->studiengang_kz,semester=$row->semester";
 	if ($row->verband==null)
 		$sql_query.=',verband=NULL';
 	else

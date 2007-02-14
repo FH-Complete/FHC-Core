@@ -23,8 +23,10 @@ $uid=$REMOTE_USER;
 $error_msg='';
 if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg.='Es konnte keine Verbindung zum Server aufgebaut werden!';
+
 // Benutzerdefinierte Variablen laden
 $error_msg.=loadVariables($conn,$uid);
+
 if (!isset($ignore_kollision))
 	$ignore_kollision=(boolean)false;
 elseif ($ignore_kollision=='false')
@@ -264,11 +266,12 @@ elseif ($aktion=='lva_multi_set')
 		$ferien->getAll(0);
 
 	// Ende holen
-	$result_semester=@pg_query($conn,"SELECT start,ende FROM tbl_studiensemester WHERE studiensemester_kurzbz='$semester_aktuell';");
+	if (!$result_semester=pg_query($conn,"SELECT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='$semester_aktuell';"))
+		die (pg_last_error($conn));
 	if (pg_numrows($result_semester)>0)
 		$ende=pg_result($result_semester,0,'ende');
 	else
-		$error_msg.='Fatal Error: Ende Datum ist nicht gesetzt!';
+		$error_msg.="Fatal Error: Ende Datum ist nicht gesetzt ($semester_aktuell)!";
 	//echo '<label>'.$ende.'</label>';
 	$ende=mktime(0,0,1,substr($ende,5,2),substr($ende,8,2),substr($ende,0,4));
 	$anz_lvas=count($lva_id);
@@ -280,13 +283,13 @@ elseif ($aktion=='lva_multi_set')
 	$semesterstunden=array();
 	$offenestunden=array();
 	// LVAs holen
-	$sql_query='SELECT * FROM '.$lva_stpl_view.' WHERE';
+	$sql_query='SELECT * FROM lehre.'.$lva_stpl_view.' WHERE';
 	$lvas='';
 	foreach ($lva_id as $id)
-		$lvas.=' OR lehrveranstaltung_id='.$id;
+		$lvas.=' OR lehreinheit_id='.$id;
 	$lvas=substr($lvas,3);
 	$sql_query.=$lvas;
-	if(!$result_lva=pg_exec($conn, $sql_query))
+	if(!$result_lva=pg_query($conn, $sql_query))
 		$error_msg.=pg_last_error($conn);
 	$num_rows_lva=pg_numrows($result_lva);
 	// Daten aufbereiten
@@ -348,7 +351,8 @@ elseif ($aktion=='lva_multi_set')
 			//LVAs holen und pruefen ob moeglich
 			for ($i=0;$i<$anz_lvas;$i++)
 			{
-				$lva[$i]=new lehrveranstaltung($conn,$lva_id[$i]);
+				$lva[$i]=new lehreinheit($conn);
+				$lva[$i]->loadLE($lva_id[$i]);
 				for ($j=0;$j<$block;$j++)
 					if (!$lva[$i]->check_lva($new_datum,$new_stunde+$j,$new_ort,$db_stpl_table) && !$ignore_kollision)
 						$error_msg.=$lva[$i]->errormsg;
@@ -371,7 +375,7 @@ elseif ($aktion=='lva_multi_set')
 // Lehrveranstaltungen aus dem Stundenplan loeschen
 elseif ($aktion=='lva_stpl_del_multi' || $aktion=='lva_stpl_del_single')
 {
-	$result_semester=@pg_query($conn,"SELECT start,ende FROM tbl_studiensemester WHERE studiensemester_kurzbz='$semester_aktuell';");
+	$result_semester=pg_query($conn,"SELECT start,ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='$semester_aktuell';");
 	if (pg_numrows($result_semester)>0)
 	{
 		$start=date('Y-m-d',$datum);
@@ -381,9 +385,9 @@ elseif ($aktion=='lva_stpl_del_multi' || $aktion=='lva_stpl_del_single')
 			$ende=date('Y-m-d',jump_week($datum,1));
 		$anz_lvas=count($lva_id);
 		$sql_query_lvaid='';
-		$sql_query='DELETE FROM '.TABLE_BEGIN.$db_stpl_table.' WHERE (';
+		$sql_query='DELETE FROM lehre.'.TABLE_BEGIN.$db_stpl_table.' WHERE (';
 		for ($i=0;$i<$anz_lvas;$i++)
-			$sql_query_lvaid.=' OR lehrveranstaltung_id='.$lva_id[$i];
+			$sql_query_lvaid.=' OR lehreinheit_id='.$lva_id[$i];
 		$sql_query_lvaid=substr($sql_query_lvaid,3);
 		$sql_query.=$sql_query_lvaid;
 		$sql_query.=") AND datum>='$start' AND datum<'$ende'";
@@ -407,7 +411,7 @@ if (!isset($semesterplan) || !$semesterplan)
 	$begin=$ende=$datum;
 else
 {
-	$result_semester=@pg_query($conn,"SELECT start,ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='$semester_aktuell';");
+	$result_semester=pg_query($conn,"SELECT start,ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='$semester_aktuell';");
 	if (pg_numrows($result_semester)>0)
 	{
 		$begin=strtotime(pg_result($result_semester,0,'start'));

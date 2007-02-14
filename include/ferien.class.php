@@ -55,27 +55,29 @@ class ferien
 	 * Laedt alle verfuegbaren Feriendaten
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function getAll()
+	function getAll($stg_kz=0)
 	{
-		$qry = 'SELECT * FROM lehre.tbl_ferien order by bezeichnung, studiengang_kz;';
-
-		if(!$res = pg_query($this->conn, $qry))
+		$sql_query="SELECT * FROM lehre.tbl_ferien WHERE studiengang_kz=0 OR studiengang_kz=$stg_kz ORDER BY vondatum";
+		if (!$result=pg_query($this->conn, $sql_query))
 		{
-			$this->errormsg = 'Fehler beim Laden der Datensaetze';
+			$this->errormsg = pg_errormessage($this->conn);
 			return false;
 		}
-
-		while($row = pg_fetch_object($res))
+		//$num_rows=pg_numrows($result);
+		//for ($i=0; $i<$num_rows; $i++)
+		while ($row=pg_fetch_object($result))
 		{
-			$ferien_obj = new ferien($this->conn);
-			$ferien_obj->bezeichnung 		= $row->bezeichnung;
-			$ferien_obj->studiengang_kz	= $row->studiengang_kz;
-			$ferien_obj->vondatum 		= $row->vondatum;
-			$ferien_obj->bisdatum 		= $row->bisdatum;
-			$ferien_obj->vontimestamp=mktime(0,0,0,substr($row->vondatum,5,2),substr($row->vondatum,8),substr($row->vondatum,0,4));;
-			$ferien_obj->bistimestamp=mktime(23,59,59,substr($row->bisdatum,5,2),substr($row->bisdatum,8),substr($row->bisdatum,0,4));;
-
-			$this->ferien[] = $ferien_obj;
+			// Record holen
+			// Instanz erzeugen
+			$f = new ferien($this->conn);
+			$f->bezeichnung=$row->bezeichnung;
+			$f->studiengang_kz = $row->studiengang_kz;
+			$f->vondatum=$row->vondatum;
+			$f->bisdatum=$row->bisdatum;
+			$f->vontimestamp=mktime(0,0,0,substr($row->vondatum,5,2),substr($row->vondatum,8),substr($row->vondatum,0,4));;
+			$f->bistimestamp=mktime(23,59,59,substr($row->bisdatum,5,2),substr($row->bisdatum,8),substr($row->bisdatum,0,4));;
+			// in array speichern
+			$this->ferien[]=$f;
 		}
 		return true;
 	}

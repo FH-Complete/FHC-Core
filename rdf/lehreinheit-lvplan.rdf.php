@@ -32,6 +32,7 @@ $berechtigung=new benutzerberechtigung($conn);
 $berechtigung->getBerechtigungen($uid);
 $error_msg.=loadVariables($conn,$uid);
 
+//$semester_aktuell='SS2007';
 if (isset($semester_aktuell))
 	$studiensemester=$semester_aktuell;
 else
@@ -60,8 +61,8 @@ if (isset($_GET['grp']))
 	$grp=$_GET['grp'];
 else
 	$grp=null;
-if (isset($_GET['gruppe_kurzbz']))
-	$gruppe_kurzbz=$_GET['gruppe_kurzbz'];
+if (isset($_GET['gruppe']))
+	$gruppe_kurzbz=$_GET['gruppe'];
 else
 	$gruppe_kurzbz=null;
 
@@ -69,9 +70,9 @@ else
 $lva=array();
 $lehreinheit=new lehreinheit($conn);
 if (!$error_msg)
-	$lva=$lehreinheit->getLehreinheitLVPL($db_stpl_table,$studiensemester,$type,$stg_kz,$sem,$lektor,$ver,$grp,$gruppe_kurzbz);
-if (!$lva)
-	die ('Fehler bei Methode getLehreinheitLVPL(): '.$lehreinheit->errormsg);
+	if (!$lehreinheit->getLehreinheitLVPL($db_stpl_table,$studiensemester,$type,$stg_kz,$sem,$lektor,$ver,$grp,$gruppe_kurzbz))
+		die ('Fehler bei Methode getLehreinheitLVPL(): '.$lehreinheit->errormsg);
+$lva=$lehreinheit->lehreinheiten;
 $rdf_url='http://www.technikum-wien.at/lehreinheit-lvplan/';
 ?>
 
@@ -183,28 +184,27 @@ foreach ($lva as $l)
 	if ($berechtigung->isBerechtigt('lvaVerplanung',$l->stg_kz[0]) || $berechtigung->isBerechtigt('admin',0) || $berechtigung->isBerechtigt('admin',$l->stg_kz[0]))
 		echo'<RDF:li>
       		<RDF:Description  id="lva'.($anz--).'" about="'.$rdf_url.$l->unr.'">
-        		<LVA:lvnr>'.$lvnr.'</LVA:lvnr>
-    			<LVA:unr>'.$l->unr.'</LVA:unr>
-    			<LVA:gruppe_kurzbz>'.$gruppe_kurzbz.'</LVA:gruppe_kurzbz>
-    			<LVA:lektor>'.$lektor.'</LVA:lektor>
-    			<LVA:lehrfach_id>'.$l->lehrfach_id.'</LVA:lehrfach_id>
-    			<LVA:studiengang_kz>'.$l->stg_kz[0].'</LVA:studiengang_kz>
-    			<LVA:fachbereich_kurzbz>'.$l->fachbereich.'</LVA:fachbereich_kurzbz>
-    			<LVA:semester>'.$l->semester[0].'</LVA:semester>
-    			<LVA:verband>'.$l->verband[0].'</LVA:verband>
-    			<LVA:gruppe>'.$l->gruppe[0].'</LVA:gruppe>
-    			<LVA:gruppe_kurzbz>'.$l->gruppe_kurzbz[0].'</LVA:gruppe_kurzbz>
-    			<LVA:raumtyp>'.$l->raumtyp.'</LVA:raumtyp>
-    			<LVA:raumtypalternativ>'.$l->raumtypalternativ.'</LVA:raumtypalternativ>
-    			<LVA:semesterstunden>'.$semesterstunden.'</LVA:semesterstunden>
-    			<LVA:stundenblockung>'.$stundenblockung.'</LVA:stundenblockung>
-    			<LVA:wochenrythmus>'.$wochenrythmus.'</LVA:wochenrythmus>
-    			<LVA:verplant>'.$verplant.'</LVA:verplant>
-    			<LVA:offenestunden>'.$offenestunden.'</LVA:offenestunden>
-    			<LVA:start_kw>'.$start_kw.'</LVA:start_kw>
-    			<LVA:anmerkung>'.$l->anmerkung[0].'</LVA:anmerkung>
-    			<LVA:studiensemester_kurzbz>'.$l->studiensemester_kurzbz.'</LVA:studiensemester_kurzbz>
-    			<LVA:lehrfach>'.$lehrfach.'</LVA:lehrfach>
+		   		<LVA:lvnr>'.$lvnr.'</LVA:lvnr>
+				<LVA:unr>'.$l->unr.'</LVA:unr>
+				<LVA:lektor>'.$lektor.'</LVA:lektor>
+				<LVA:lehrfach_id>'.$l->lehrfach_id.'</LVA:lehrfach_id>
+				<LVA:studiengang_kz>'.$l->stg_kz[0].'</LVA:studiengang_kz>
+				<LVA:fachbereich_kurzbz>'.$l->fachbereich.'</LVA:fachbereich_kurzbz>
+				<LVA:semester>'.$l->semester[0].'</LVA:semester>
+				<LVA:verband>'.$l->verband[0].'</LVA:verband>
+				<LVA:gruppe>'.$l->gruppe[0].'</LVA:gruppe>
+				<LVA:gruppe_kurzbz>'.$l->gruppe_kurzbz[0].'</LVA:gruppe_kurzbz>
+				<LVA:raumtyp>'.$l->raumtyp.'</LVA:raumtyp>
+				<LVA:raumtypalternativ>'.$l->raumtypalternativ.'</LVA:raumtypalternativ>
+				<LVA:semesterstunden>'.$semesterstunden.'</LVA:semesterstunden>
+				<LVA:stundenblockung>'.$stundenblockung.'</LVA:stundenblockung>
+				<LVA:wochenrythmus>'.$wochenrythmus.'</LVA:wochenrythmus>
+				<LVA:verplant>'.$verplant.'</LVA:verplant>
+				<LVA:offenestunden>'.$offenestunden.'</LVA:offenestunden>
+				<LVA:start_kw>'.$start_kw.'</LVA:start_kw>
+				<LVA:anmerkung>'.$l->anmerkung[0].'</LVA:anmerkung>
+				<LVA:studiensemester_kurzbz>'.$l->studiensemester_kurzbz.'</LVA:studiensemester_kurzbz>
+				<LVA:lehrfach>'.$lehrfach.'</LVA:lehrfach>
 				<LVA:lehrform>'.$lehrform.'</LVA:lehrform>
 				<LVA:lehrfach_bez><![CDATA['.$l->lehrfach_bez[0].']]></LVA:lehrfach_bez>
 				<LVA:lehrfach_farbe>#'.$l->lehrfach_farbe[0].'</LVA:lehrfach_farbe>

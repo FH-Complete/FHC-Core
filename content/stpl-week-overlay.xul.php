@@ -142,14 +142,14 @@ $num_rows_stunde=pg_numrows($result_stunde);
 	        					onclick="onLVAdoStpl(event);"
 	       						idList="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lva_ids"
 	       						aktion="lva_stpl_del_single"
-	       						tooltiptext="LÃ¶schen SingleWeek"
+	       						tooltiptext="Löschen SingleWeek"
 	        				/>
 	        				<toolbarbutton
 		        				image="../skin/images/lvaMultiDel.png"
 	        					onclick="onLVAdoStpl(event);"
 	       						idList="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lva_ids"
 	       						aktion="lva_stpl_del_multi"
-	       						tooltiptext="LÃ¶schen MultiWeek"
+	       						tooltiptext="Löschen MultiWeek"
 	        				/>
 	        			</hbox>
 	        		</row>

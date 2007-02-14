@@ -22,40 +22,45 @@
 
 class lehreinheit
 {
-	var $conn;     				// resource DB-Handle
-	var $errormsg; 			// string
-	var $new;      				// boolean
+	var $conn;     					// resource DB-Handle
+	var $errormsg; 					// string
+	var $new;      					// boolean
 	var $lehreinheiten = array();	// lehreinheit Objekt
 
 	//Tabellenspalten
 	var $lehreinheit_id;			// integer
 	var $lehrveranstaltung_id;		// integer
 	var $studiensemester_kurzbz; 	// varchar(16)
-	var $lehrfach_id;			// integer
-	var $lehrform_kurzbz;		// varchar(8)
-	var $stundenblockung;		// smalint
-	var $wochenrythmus;		// smalint
-	var $start_kw;			// smalint
-	var $raumtyp;				// varchar(8)
-	var $raumtypalternativ;		// varchar(8)
-	var $lehre;				// boolean
-	var $anmerkung;			// varchar(255)
-	var $unr;				// integer
-	var $lvnr;				// bigint
-	var $insertamum;			// timestamp
-	var $insertvon;			// varchar(16)
-	var $updateamum;			// timestamp
-	var $updatevon;			// varchar(16)
-	var $sprache;				// varchar(16)
-	var $ext_id;				// bigint
-	var $mitarbeiter_uid;
-	var $studiengang_kz;
-	var $semester;
-	var $verband;
-	var $gruppe;
-	var $gruppe_kurzbz;
-	var $titel;
-	var $lehrform;
+	var $lehrfach_id;				// integer
+	var $lf_kurzbz;
+	var $lf_bez;
+	var $lf_aktiv;
+	var $lehrform_kurzbz;			// varchar(8)
+	var $stundenblockung;			// smalint
+	var $wochenrythmus;				// smalint
+	var $start_kw;					// smalint
+	var $raumtyp;					// varchar(8)
+	var $raumtypalternativ;			// varchar(8)
+	var $lehre;						// boolean
+	var $anmerkung;					// varchar(255)
+	var $unr;						// integer
+	var $lvnr;						// bigint
+	var $insertamum;				// timestamp
+	var $insertvon;					// varchar(16)
+	var $updateamum;				// timestamp
+	var $updatevon;					// varchar(16)
+	var $sprache;					// varchar(16)
+	var $ext_id;					// bigint
+
+	var $anz=0;						//Zahler fuer erweiterte Attribute
+	var $mitarbeiter_uid=array();
+	var $studiengang_kz=array();
+	var $semester=array();
+	var $verband=array();
+	var $gruppe=array();
+	var $gruppe_kurzbz=array();
+	var $titel=array();
+	var $lehrform=array();
 
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine LE
@@ -143,8 +148,9 @@ class lehreinheit
 
 		if($result = pg_query($this->conn, $qry))
 		{
-			if($row = pg_fetch_object($result))
-			{
+			$this->anz=0;
+			while($row = pg_fetch_object($result))
+			{	// lehrfunktion_kurzbz 	fachbereich_kurzbz 	semesterstunden 	lv_semesterstunden 	planstunden 	stundensatz 	faktor 	lektor 	stg_kurzbz 	stg_kurzbzlang 	stg_bez 	stg_typ 	anmerkunglektor
 				$this->lehreinheit_id = $row->lehreinheit_id;
 				$this->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
@@ -155,24 +161,30 @@ class lehreinheit
 				$this->start_kw = $row->start_kw;
 				$this->raumtyp = $row->raumtyp;
 				$this->raumtypalternativ = $row->raumtypalternativ;
+				$this->sprache = $row->sprache;
 				$this->lehre = ($row->lehre=='t'?true:false);
 				$this->anmerkung = $row->anmerkung;
 				$this->unr = $row->unr;
 				$this->lvnr = $row->lvnr;
-				$this->sprache = $row->sprache;
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
-				$this->ext_id = $row->ext_id;
-				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
-				$this->studiengang_kz = $row->studiengang_kz;
-				$this->semester = $row->semester;
-				$this->verband = $row->verband;
-				$this->gruppe = $row->gruppe;
-				$this->gruppe_kurzbz = $row->gruppe_kurzbz;
-				$this->titel = $row->titel;
-				$this->lehrform = $row->lehrform;
+				//$this->ext_id = $row->ext_id;
+				$this->farbe = $row->farbe;
+				$this->lf_kurzbz= $row->lehrfach;
+				$this->lf_bez= $row->lehrfach_bez;
+				$this->lf_aktiv= $row->aktiv;
+
+				$this->mitarbeiter_uid[$this->anz]	= $row->mitarbeiter_uid;
+				$this->studiengang_kz[$this->anz] 	= $row->studiengang_kz;
+				$this->semester[$this->anz] 			= $row->semester;
+				$this->verband[$this->anz] 			= $row->verband;
+				$this->gruppe[$this->anz] 			= $row->gruppe;
+				$this->gruppe_kurzbz[$this->anz] 		= $row->gruppe_kurzbz;
+				$this->titel[$this->anz] 			= '';
+				//$this->lehrform[$this->anz] 		= $row->lehrform;
+				$this->anz++;
 			}
 		}
 		else
@@ -435,15 +447,21 @@ class lehreinheit
 		{
 			return false;
 		}*/
+		//Lektoren SQL
+		$sql_lkt='';
+		foreach ($this->mitarbeiter_uid as $lkt)
+			$sql_lkt.="OR mitarbeiter_uid='$lkt' ";
+		$sql_lkt=substr($sql_lkt,3);
+		$sql_lkt="(($sql_lkt) AND mitarbeiter_uid!='_DummyLektor')";
 
 		// Datenbank abfragen
 		$sql_query="SELECT $stpl_id FROM $stpl_table
 					WHERE datum='$datum' AND stunde=$stunde
-					AND ((ort_kurzbz='$ort' OR (mitarbeiter_uid='$this->lektor' AND mitarbeiter_uid!='_DummyLektor'))
+					AND ((ort_kurzbz='$ort' OR $sql_lkt)
 					AND unr!=$this->unr)"; //AND lehrveranstaltung_id!=$this->lehrveranstaltung_id
 		if (! $erg_stpl=pg_query($this->conn, $sql_query))
 		{
-			//die(pg_last_error($this->conn));
+			die($sql_query.pg_last_error($this->conn));
 			$this->errormsg=pg_last_error($this->conn);
 			return false;
 		}
@@ -460,7 +478,7 @@ class lehreinheit
 	}
 
 	/*************************************************************************
-	 * Speichert die geladene Lehrveranstaltung im Stundenplan.
+	 * Speichert die geladene Lehreinheit im Stundenplan.
 	 * Rueckgabewert 'false' und die Fehlermeldung steht in '$this->errormsg'.
 	 * @param string	datum	gewuenschtes Datum YYYY-MM-TT
 	 * @param integer	stunde	gewuenschte Stunde
@@ -476,23 +494,26 @@ class lehreinheit
 		$stpl_id=$stpl_table.TABLE_ID;
 		$stpl_table='lehre.'.TABLE_BEGIN.$stpl_table;
 
-		// Datenbank abfragen
-		$sql_query="INSERT INTO $stpl_table
-			(unr,mitarbeiter_uid,datum,	stunde,	ort_kurzbz,lehreinheit_id,studiengang_kz,semester,verband,
-			gruppe,	gruppe_kurzbz,	titel, anmerkung, updatevon)
-			VALUES ($this->unr,'$this->mitarbeiter_uid','$datum',$stunde,
-			'$ort',$this->lehreinheit_id, $this->studiengang_kz,$this->semester,
-			'$this->verband','$this->gruppe'";
-		if ($this->gruppe_kurzbz==null)
-			$sql_query.=',NULL';
-		else
-			$sql_query.=",'$this->gruppe_kurzbz'";
-		$sql_query.=",'$this->titel','$this->anmerkung','$user')";
-		if (! $erg_stpl=pg_query($this->conn, $sql_query))
+		for ($i=0;$i<$this->anz;$i++)
 		{
-			//die(pg_last_error($this->conn).$sql_query);
-			$this->errormsg=pg_last_error($this->conn);
-			return false;
+			// Datenbank INSERT
+			$sql_query="INSERT INTO $stpl_table
+				(unr,mitarbeiter_uid,datum,	stunde,	ort_kurzbz,lehreinheit_id,studiengang_kz,semester,verband,
+				gruppe,	gruppe_kurzbz,	titel, anmerkung, updatevon)
+				VALUES ($this->unr,'".$this->mitarbeiter_uid[$i]."','$datum',$stunde,
+				'$ort',$this->lehreinheit_id, ".$this->studiengang_kz[$i].",".$this->semester[$i].",
+				'".$this->verband[$i]."','".$this->gruppe[$i]."'";
+			if ($this->gruppe_kurzbz[$i]==null)
+				$sql_query.=',NULL';
+			else
+				$sql_query.=",'".$this->gruppe_kurzbz[$i]."'";
+			$sql_query.=",'".$this->titel[$i]."','$this->anmerkung','$user')";
+			if (! $erg_stpl=pg_query($this->conn, $sql_query))
+			{
+				die(pg_last_error($this->conn).$sql_query);
+				$this->errormsg=pg_last_error($this->conn);
+				return false;
+			}
 		}
 		return true;
 	}
@@ -514,15 +535,15 @@ class lehreinheit
 
 		if (strlen($studiensemester)<=0)
 		{
-			$this->errormsg='Ausbildungssemester ist nicht gesetzt!';
+			$this->errormsg='Studiensemester ist nicht gesetzt!(lehreinheit.getLehreinheitLVPL)';
 			return false;
 		}
 		else $where=" studiensemester_kurzbz='$studiensemester'";
 
 		if ($type=='lektor')
 			$where.=" AND lektor_uid='$lektor'";
-		elseif ($type=='einheit')
-			$where.=" AND einheit='$einheit'";
+		elseif ($type=='gruppe')
+			$where.=" AND gruppe_kurzbz='$gruppe'";
 		elseif ($type=='verband')
 		{
 			$where.=" AND studiengang_kz='$stg_kz'";
@@ -538,62 +559,62 @@ class lehreinheit
 			WHERE '.$where.' AND verplanen ORDER BY offenestunden DESC, lehrfach, lehrform, semester, verband, gruppe, gruppe_kurzbz;';
 	    //$this->errormsg=$sql_query;
 	    //return false;
-		if(!($erg=@pg_exec($this->conn, $sql_query)))
+		if(!($erg=pg_query($this->conn, $sql_query)))
 		{
 			$this->errormsg=pg_errormessage($this->conn);
 			return false;
 		}
 		$num_rows=pg_numrows($erg);
-		$l=array();
+		//$l=array();
 		for($i=0;$i<$num_rows;$i++)
 		{
    			$row=pg_fetch_object($erg,$i);
 			//$l[$row->unr]=new lehrveranstaltung();
-			$l[$row->unr]->lehreinheit_id[]=$row->lehreinheit_id;
-			$l[$row->unr]->lvnr[]=$row->lvnr;
-			$l[$row->unr]->unr=$row->unr;
-			$l[$row->unr]->fachbereich=$row->fachbereich_kurzbz;
-			$l[$row->unr]->lehrfach_id=$row->lehrfach_id;
-			$l[$row->unr]->lehrfach[]=$row->lehrfach;
-			$l[$row->unr]->lehrfach_bez[]=$row->lehrfach_bez;
-			$l[$row->unr]->lehrfach_farbe[]=$row->lehrfach_farbe;
-			$l[$row->unr]->lehrform[]=$row->lehrform;
-			$l[$row->unr]->lektor_uid[]=$row->lektor_uid;
-			$l[$row->unr]->lektor[]=trim($row->lektor);
-			$l[$row->unr]->stg_kz[]=$row->studiengang_kz;
-			$l[$row->unr]->stg[]=$row->studiengang;
-			$l[$row->unr]->gruppe_kurzbz[]=$row->gruppe_kurzbz;
-			$l[$row->unr]->semester[]=$row->semester;
-			$l[$row->unr]->verband[]=$row->verband;
-			$l[$row->unr]->gruppe[]=$row->gruppe;
-			$l[$row->unr]->gruppe_kurzbz[]=$row->gruppe_kurzbz;
-			$l[$row->unr]->raumtyp=$row->raumtyp;
-			$l[$row->unr]->raumtypalternativ=$row->raumtypalternativ;
-			$l[$row->unr]->stundenblockung[]=$row->stundenblockung;
-			$l[$row->unr]->wochenrythmus[]=$row->wochenrythmus;
-			$l[$row->unr]->semesterstunden[]=$row->semesterstunden;
-			$l[$row->unr]->start_kw[]=$row->start_kw;
-			$l[$row->unr]->anmerkung[]=$row->anmerkung;
-			$l[$row->unr]->studiensemester_kurzbz=$row->studiensemester_kurzbz;
-			$l[$row->unr]->verplant[]=$row->verplant;
-			$l[$row->unr]->offenestunden[]=$row->offenestunden;
-			if (isset($l[$row->unr]->verplant_gesamt))
-				$l[$row->unr]->verplant_gesamt+=$row->verplant;
+			$this->lehreinheiten[$row->unr]->lehreinheit_id[]=$row->lehreinheit_id;
+			$this->lehreinheiten[$row->unr]->lvnr[]=$row->lvnr;
+			$this->lehreinheiten[$row->unr]->unr=$row->unr;
+			$this->lehreinheiten[$row->unr]->fachbereich=$row->fachbereich_kurzbz;
+			$this->lehreinheiten[$row->unr]->lehrfach_id=$row->lehrfach_id;
+			$this->lehreinheiten[$row->unr]->lehrfach[]=$row->lehrfach;
+			$this->lehreinheiten[$row->unr]->lehrfach_bez[]=$row->lehrfach_bez;
+			$this->lehreinheiten[$row->unr]->lehrfach_farbe[]=$row->lehrfach_farbe;
+			$this->lehreinheiten[$row->unr]->lehrform[]=$row->lehrform;
+			$this->lehreinheiten[$row->unr]->lektor_uid[]=$row->lektor_uid;
+			$this->lehreinheiten[$row->unr]->lektor[]=trim($row->lektor);
+			$this->lehreinheiten[$row->unr]->stg_kz[]=$row->studiengang_kz;
+			$this->lehreinheiten[$row->unr]->stg[]=$row->studiengang;
+			$this->lehreinheiten[$row->unr]->gruppe_kurzbz[]=$row->gruppe_kurzbz;
+			$this->lehreinheiten[$row->unr]->semester[]=$row->semester;
+			$this->lehreinheiten[$row->unr]->verband[]=$row->verband;
+			$this->lehreinheiten[$row->unr]->gruppe[]=$row->gruppe;
+			$this->lehreinheiten[$row->unr]->gruppe_kurzbz[]=$row->gruppe_kurzbz;
+			$this->lehreinheiten[$row->unr]->raumtyp=$row->raumtyp;
+			$this->lehreinheiten[$row->unr]->raumtypalternativ=$row->raumtypalternativ;
+			$this->lehreinheiten[$row->unr]->stundenblockung[]=$row->stundenblockung;
+			$this->lehreinheiten[$row->unr]->wochenrythmus[]=$row->wochenrythmus;
+			$this->lehreinheiten[$row->unr]->semesterstunden[]=$row->semesterstunden;
+			$this->lehreinheiten[$row->unr]->start_kw[]=$row->start_kw;
+			$this->lehreinheiten[$row->unr]->anmerkung[]=$row->anmerkung;
+			$this->lehreinheiten[$row->unr]->studiensemester_kurzbz=$row->studiensemester_kurzbz;
+			$this->lehreinheiten[$row->unr]->verplant[]=$row->verplant;
+			$this->lehreinheiten[$row->unr]->offenestunden[]=$row->offenestunden;
+			if (isset($this->lehreinheiten[$row->unr]->verplant_gesamt))
+				$this->lehreinheiten[$row->unr]->verplant_gesamt+=$row->verplant;
 			else
-				$l[$row->unr]->verplant_gesamt=$row->verplant;
+				$this->lehreinheiten[$row->unr]->verplant_gesamt=$row->verplant;
 			$lvb=$row->studiengang.'-'.$row->semester;
 			if ($row->verband!='' && $row->verband!=' ' && $row->verband!='0' && $row->verband!=null)
 				$lvb.=$row->verband;
 			if ($row->gruppe!='' && $row->gruppe!=' ' && $row->gruppe!='0' && $row->gruppe!=null)
 				$lvb.=$row->gruppe;
 			if ($row->gruppe_kurzbz!='' && $row->gruppe_kurzbz!=null)
-				$l[$row->unr]->lehrverband[]=$row->gruppe_kurzbz;
+				$this->lehreinheiten[$row->unr]->lehrverband[]=$row->gruppe_kurzbz;
 			else
-				$l[$row->unr]->lehrverband[]=$lvb;
+				$this->lehreinheiten[$row->unr]->lehrverband[]=$lvb;
 		}
-		return $l;
+		return true;
 	}
-	
+
 	// ***************************
 	// * Loescht eine Lehreinheit
 	// ***************************
@@ -607,12 +628,12 @@ class lehreinheit
 		$qry = "DELETE FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$lehreinheit_id'";
 		if(pg_query($this->conn, $qry))
 			return true;
-		else 
+		else
 		{
 			$this->errormsg = pg_last_error($conn);
 			return false;
 		}
 	}
-	
+
 }
 ?>
