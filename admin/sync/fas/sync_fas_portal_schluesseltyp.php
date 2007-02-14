@@ -17,7 +17,7 @@ include('../../../include/betriebsmitteltyp.class.php');
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
-$adress='ruhan@technikum-wien.at; oesi@technikum-wien.at; pam@technikum-wien.at';
+$adress='ruhan@technikum-wien.at';
 //$adress='fas_sync@technikum-wien.at';
 
 $error_log='';
@@ -102,7 +102,7 @@ if($result = pg_query($conn_fas, $qry))
 echo nl2br($error_log);
 echo nl2br("\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
 $error_log.="\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler";
-mail($adress, 'SYNC Schluesseltyp', $error_log);
+mail($adress, 'SYNC Schluesseltyp', $error_log,"From: vilesci@technikum-wien.at");
 ?>
 </body>
 </html>
