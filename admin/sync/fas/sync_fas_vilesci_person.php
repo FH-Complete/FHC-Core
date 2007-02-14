@@ -23,8 +23,8 @@ $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlg
 
 //set_time_limit(60);
 
-$adress='ruhan@technikum-wien.at; pam@technikum-wien.at';
-//$adress='fas_sync@technikum-wien.at';
+//$adress='ruhan@technikum-wien.at; pam@technikum-wien.at';
+$adress='fas_sync@technikum-wien.at';
 
 $error_log='';
 $text = '';
@@ -221,7 +221,7 @@ else
 echo nl2br("\n".$error_log);
 echo nl2br("\n\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
 $error_log="Person Sync\n-------------\n\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler\n\n".$error_log;
-mail($adress, 'SYNC Personen', $error_log);
+mail($adress, 'SYNC Personen', $error_log,"From: vilesci@technikum-wien.at");
 ?>
 </body>
 </html>

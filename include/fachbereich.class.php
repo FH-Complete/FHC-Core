@@ -36,6 +36,7 @@ class fachbereich
 	var $bezeichnung;		// @var string
 	var $farbe;			// @var string
 	var $studiengang_kz;	// @var integer
+	var $aktiv;			// @var boolean
 	var $ext_id;			// @var bigint
 	
 	
@@ -177,10 +178,11 @@ class fachbereich
 				return false;
 			}
 			//Neuen Datensatz anlegen		
-			$qry = 'INSERT INTO public.tbl_fachbereich (fachbereich_kurzbz, bezeichnung, farbe, ext_id, studiengang_kz) VALUES ('.
+			$qry = 'INSERT INTO public.tbl_fachbereich (fachbereich_kurzbz, bezeichnung, farbe, aktiv, ext_id, studiengang_kz) VALUES ('.
 				$this->addslashes($this->fachbereich_kurzbz).', '.
 				$this->addslashes($this->bezeichnung).', '.
 				$this->addslashes($this->farbe).', '.
+				($this->aktiv?'true':'false').', '. 
 				$this->addslashes($this->ext_id).', '.
 				$this->addslashes($this->studiengang_kz).');';
 		}
@@ -199,6 +201,7 @@ class fachbereich
 				'fachbereich_kurzbz='.$this->addslashes($this->fachbereich_kurzbz).', '.
 				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
 				'farbe='.$this->addslashes($this->farbe).', '.
+				'aktiv='.($this->aktiv?'true':'false').', '.
 				'ext_id='.$this->addslashes($this->ext_id).', '.
 				'studiengang_kz='.$this->addslashes($this->studiengang_kz).' '.
 				'WHERE fachbereich_kurzbz = '.$this->addslashes($this->fachbereich_kurzbz).';';
