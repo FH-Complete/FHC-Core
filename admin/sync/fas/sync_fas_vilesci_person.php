@@ -23,7 +23,7 @@ $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlg
 
 //set_time_limit(60);
 
-$adress='ruhan@technikum-wien.at; oesi@technikum-wien.at; pam@technikum-wien.at';
+$adress='ruhan@technikum-wien.at; pam@technikum-wien.at';
 //$adress='fas_sync@technikum-wien.at';
 
 $error_log='';
