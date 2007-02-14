@@ -187,7 +187,9 @@ if($result = pg_query($conn_fas, $qry))
 echo nl2br($error_log);
 echo nl2br("\nAdresse\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
 echo nl2br("\nFirma\nGesamt: $anzahl_quelle2 / Eingefügt: $anzahl_eingefuegt2 / Fehler: $anzahl_fehler2");
-
+$error_log.="\nAdresse\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler";
+$error_log.="\nFirma\nGesamt: $anzahl_quelle2 / Eingefügt: $anzahl_eingefuegt2 / Fehler: $anzahl_fehler2";
+mail($adress, 'SYNC Adresse', $error_log);
 ?>
 </body>
 </html>

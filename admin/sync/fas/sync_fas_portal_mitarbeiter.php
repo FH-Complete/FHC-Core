@@ -31,21 +31,34 @@ require_once('../../../include/mitarbeiter.class.php');
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
+$adress='ruhan@technikum-wien.at';
+//$adress='fas_sync@technikum-wien.at';
+
 $error_log='';
 $text = '';
+$anzahl_quelle=0;
 $anzahl_eingefuegt=0;
 $anzahl_fehler=0;
 
 // ***********************************
 // * VILESCI->PORTAL - Synchronisation
 // ***********************************
+?>
 
+<html>
+<head>
+<title>Synchro - Vilesci -> Portal - Mitarbeiter</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body>
+<?php
 //Mitarbeiter
 $qry = "SELECT * FROM person JOIN mitarbeiter ON person_fk=person_pk WHERE uid NOT LIKE '\_dummy%'";
 
 if($result = pg_query($conn_fas, $qry))
 {
-	$text.="\n Sync Mitarbeiter\n\n";
+	echo nl2br("\n Sync Mitarbeiter\n\n");
+	$anzahl_quelle=pg_num_rows($result);
 	while($row = pg_fetch_object($result))
 	{
 		$error=false;
@@ -175,7 +188,12 @@ if($result = pg_query($conn_fas, $qry))
 						$anzahl_fehler++;
 					}
 					else 
+					{
 						$anzahl_eingefuegt++;
+						echo "- ";
+						ob_flush();
+						flush();
+					}
 				else 
 					$anzahl_fehler++;
 			}
@@ -190,20 +208,13 @@ else
 {
 	$error_log .= 'Mitarbeiterdatensaetze konnten nicht geladen werden\n';
 }
-$text.="Anzahl aktualisierte Datensaetze: $anzahl_eingefuegt\n";
-$text.="Anzahl der Fehler: $anzahl_fehler\n";
-?>
 
-<html>
-<head>
-<title>Synchro - Vilesci -> Portal - Mitarbeiter</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-</head>
-<body>
-<?php
 
-echo nl2br($text);
-echo nl2br($error_log);
+
+echo nl2br("\n".$error_log);
+echo nl2br("\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
+$error_log.="\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler";
+mail($adress, 'SYNC Mitarbeiter', $error_log);
 
 ?>
 </body>

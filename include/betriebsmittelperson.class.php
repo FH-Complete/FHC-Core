@@ -20,24 +20,24 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 /**
- * Klasse Schlüssel 
- * @create 22-12-2006
+ * Klasse Betriebsmittelperson 
+ * @create 13-01-2007
  */
 
-class schluessel
+class betriebsmittelperson
 {
-	var $conn;     // @var resource DB-Handle
-	var $new;       // @var boolean
-	var $errormsg;  // @var string
-	var $done=false;	// @var boolean
+	var $conn;     			// @var resource DB-Handle
+	var $new;       		// @var boolean
+	var $errormsg;  		// @var string
+	var $done=false;		// @var boolean
 	
 	//Tabellenspalten
-	Var $schluessel_id;		// @var integer
+	Var $betriebsmittel_id;	// @var integer
 	var $person_id;		// @var integer
-	var $schluesseltyp;		// @var string
-	var $nummer;			// @var string
+	var $anmerkung;		// @var string
 	var $kaution;			// @var numeric(5,2)
 	var $ausgegebenam;	// @var date
+	var $retouram;		// @var date
 	var $ext_id;			// @var integer
 	var $insertamum;		// @var timestamp
 	var $insertvon;		// @var bigint
@@ -47,9 +47,9 @@ class schluessel
 	/**
 	 * Konstruktor
 	 * @param $conn      Connection
-	 *        $kontakt_id ID der Adresse die geladen werden soll (Default=null)
+	 *       
 	 */
-	function schluessel($conn,$schluessel_id=null, $unicode=false)
+	function betriebsmittelperson($conn,$betriebsmittel_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
 		if ($unicode)
@@ -68,11 +68,12 @@ class schluessel
 	}
 	
 	/**
-	 * Laedt den Schlüssel mit der ID $schluessel_id
-	 * @param  $schluessel_id ID dem zu ladenden Schlüssel
+	 * Laedt das Betriebsmittel mit der ID $betriebsmittel_id, person_id
+	 * @param  $betriebsmittel_id ID des zu ladenden Betriebsmittels
+	 * @param  $person_id ID der zu ladenden Person
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load($schluessel_id)
+	function load($betriebsmittel_id, $person_id)
 	{
 		//noch nicht implementiert
 	}
@@ -90,7 +91,7 @@ class schluessel
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank	 
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
-	 * andernfalls wird der Datensatz mit der ID in $schluessel_id aktualisiert
+	 * andernfalls wird der Datensatz mit der ID in $betriebsmittel_id, $person_id aktualisiert
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	function save()
@@ -101,45 +102,57 @@ class schluessel
 		{
 			//Neuen Datensatz einfuegen
 					
-			$qry='INSERT INTO public.tbl_schluessel (person_id, schluesseltyp, nummer, kaution, ausgegebenam, 
-				ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
+			$qry='INSERT INTO public.tbl_betriebsmittelperson (betriebsmittel_id, person_id, anmerkung, kaution, 
+			ausgegebenam, retouram, ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
+			     $this->addslashes($this->betriebsmittel_id).', '.
 			     $this->addslashes($this->person_id).', '.
-			     $this->addslashes($this->schluesseltyp).', '.
-			     $this->addslashes($this->nummer).', '.
+			     $this->addslashes($this->anmerkung).', '.
 			     $this->addslashes($this->kaution).', '.
 			     $this->addslashes($this->ausgegebenam).', '.
+			     $this->addslashes($this->retouram).', '.
 			     $this->addslashes($this->ext_id).',  now(), '.
 			     $this->addslashes($this->insertvon).', now(), '.
 			     $this->addslashes($this->updatevon).');';
 			 $this->done=true;			
 		}
 		else
-		{			
-			$qryz="SELECT * FROM public.tbl_schluessel WHERE schluessel_id='$this->schluessel_id';";
+		{	
+			//Pruefen ob betriebsmittel_id eine gueltige Zahl ist
+			if(!is_numeric($this->betriebsmittel_id))
+			{
+				$this->errormsg = 'betriebsmittel_id muss eine gueltige Zahl sein: '.$this->betriebsmittel_id.' ('.$this->person_id.')';
+				return false;
+			}
+					
+			$qryz="SELECT * FROM public.tbl_betriebsmittelperson WHERE betriebsmittel_id='$this->betriebsmittel_id' AND person_id='$this->person_id';";
 			if($resultz = pg_query($this->conn, $qryz))
 			{
 				while($rowz = pg_fetch_object($resultz))
 				{
-					$update=false;			
+					$update=false;	
+					if($rowz->betriebsmittel_id!=$this->betriebsmittel_id)		$update=true;		
 					if($rowz->person_id!=$this->person_id) 				$update=true;
-					if($rowz->schluesseltyp!=$this->schluesseltyp)			$update=true;
-					if($rowz->nummer!=$this->nummer)				$update=true;
+					if($rowz->anmerkung!=$this->anmerkung)			$update=true;
 					if($rowz->kaution!=$this->kaution)					$update=true;
 					if($rowz->ausgegebenam!=$this->ausgegebenam)		$update=true;
+					if($rowz->retouram!=$this->retouram)				$update=true;
 					if($rowz->ext_id!=$this->ext_id)	 				$update=true;
 				
 					if($update)
 					{
 						$qry='UPDATE public.tbl_schluessel SET '.
+							'betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).', '. 
 							'person_id='.$this->addslashes($this->person_id).', '. 
 							'schluesseltyp='.$this->addslashes($this->schluesseltyp).', '. 
 							'nummer='.$this->addslashes($this->nummer).', '.  
 							'kaution='.$this->addslashes($this->kaution).', '. 
 							'ausgegebenam='.$this->addslashes($this->ausgegebenam).', '.
+							'retouram='.$this->addslashes($this->retouram).', '.
 							'ext_id='.$this->addslashes($this->ext_id).', '. 
 						     	'updateamum= now(), '.
 						     	'updatevon='.$this->addslashes($this->updatevon).' '.
-							'WHERE schluessel_id='.$this->addslashes($this->schluessel_id).';';
+							'WHERE betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).'
+							AND person_id='.$this->addslashes($this->person_id).';';
 							$this->done=true;
 					}
 				}
@@ -174,7 +187,7 @@ class schluessel
 			}
 			else 
 			{
-				$this->errormsg = "*****\nFehler beim Speichern des Schluessel-Datensatzes: ID:".$this->person_id." Schlüsseltyp: ".$this->schluesseltyp."\n".$qry."\n".pg_errormessage($this->conn)."\n*****\n";
+				$this->errormsg = "*****\nFehler beim Speichern des Betriebsmittelperson-Datensatzes: ID:".$this->person_id." Betriebsmittel-ID: ".$this->betriebsmittel_id."\n".$qry."\n".pg_errormessage($this->conn)."\n*****\n";
 				
 				return false;
 			}
@@ -187,10 +200,11 @@ class schluessel
 	
 	/**
 	 * Loescht den Datenensatz mit der ID die uebergeben wird
-	 * @param $schluessel_id ID die geloescht werden soll
+	 * @param $betriebsmittel_id ID die geloescht werden soll
+	 * @param $person_id ID die geloescht werden soll
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function delete($schluessel_id)
+	function delete($betriebsmittel_id, $person_id)
 	{
 		//noch nicht implementiert!	
 	}
