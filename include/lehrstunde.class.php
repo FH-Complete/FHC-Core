@@ -39,7 +39,7 @@ class lehrstunde
 	var $sem;			// @brief Semester
 	var $ver;			// @brief Verband
 	var $grp;			// @brief Gruppe
-	var $gruppe_kurzbz;	// @brief Kurzbezeichnung der Einheit
+	var $gruppe_kurzbz;	// @brief Kurzbezeichnung der Gruppe
 	var $titel;			// @brief Titel der Unterrichtsstunde
 	var $anmerkung;		// @brief Anmerkungen zur Unterrichtsstunde
 	var $fix;			// @brief true wenn diese Stunde nicht mehr verschoben wird
@@ -173,7 +173,7 @@ class lehrstunde
 		// Parameter Checken
 		// Bezeichnung der Stundenplan-Tabelle und des Keys
 		$stpl_id=$stpl_table.TABLE_ID;
-		$stpl_table=TABLE_BEGIN.$stpl_table;
+		$stpl_table='lehre.'.TABLE_BEGIN.$stpl_table;
 		// Delete SQL vorbereiten
 		$sql_query='DELETE FROM '.$stpl_table;
 		$sql_query.=" WHERE $stpl_id=$id";
@@ -234,10 +234,10 @@ class lehrstunde
 			$this->errormsg='Fehler: Kurzbezeichnung des Orts ist nicht gesetzt';
 			return -1;
 		}
-		// Einheit
+		// Gruppe
 		if ($type=='gruppe' && $gruppe_kurzbz==NULL)
 		{
-			$this->errormsg='Fehler: Kurzbezeichnung der Einheit ist nicht gesetzt';
+			$this->errormsg='Fehler: Kurzbezeichnung der Gruppe ist nicht gesetzt';
 			return -1;
 		}
 		// Verband
@@ -273,7 +273,7 @@ class lehrstunde
 			$ver=$row->verband;
 			$grp=$row->gruppe;
 
-			// Einheiten ermitteln
+			// Gruppen ermitteln
 			$sql_query="SELECT gruppe_kurzbz FROM public.tbl_benutzergruppe WHERE uid='$uid'";
 			//echo $sql_query;
 			if (! $result_einheit=pg_query($this->conn, $sql_query) )

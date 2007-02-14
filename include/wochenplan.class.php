@@ -50,7 +50,7 @@ class wochenplan
 	var $ort_bezeichnung;
 
 	var $gruppe_kurzbz;
-	var $einheit_bezeichnung;
+	var $gruppe_bezeichnung;
 
 	var $datum;			// @brief Datum des Montags der zu zeichnenden Woche
 	var $datum_nextweek;
@@ -109,7 +109,7 @@ class wochenplan
 		///////////////////////////////////////////////////////////////////////
 		// Parameter Checken
 		// Typ des Stundenplans
-		if ($type=='student' || $type=='lektor' || $type=='verband' || $type=='einheit' || $type=='ort')
+		if ($type=='student' || $type=='lektor' || $type=='verband' || $type=='gruppe' || $type=='ort')
 			$this->type=$type;
 		else
 		{
@@ -151,13 +151,13 @@ class wochenplan
 		}
 
 		// Einheit
-		if ($type=='einheit' && $gruppe_kurzbz==NULL)
+		if ($type=='gruppe' && $gruppe==NULL)
 		{
-			$this->errormsg='Fehler: Kurzbezeichnung der Einheit ist nicht gesetzt';
+			$this->errormsg='Fehler: Kurzbezeichnung der Gruppe ist nicht gesetzt';
 			return false;
 		}
-		elseif ($type=='einheit')
-			$this->gruppe_kurzbz=$gruppe_kurzbz;
+		elseif ($type=='gruppe')
+			$this->gruppe_kurzbz=$gruppe;
 
 
 		///////////////////////////////////////////////////////////////////////
@@ -701,7 +701,7 @@ class wochenplan
 				sem="'.$this->sem.'"
 				ver="'.$this->ver.'"
 				grp="'.$this->grp.'"
-				einheit="'.$this->gruppe_kurzbz.'"
+				gruppe="'.$this->gruppe_kurzbz.'"
 				ort="'.$this->ort_kurzbz.'"
 				pers_uid="'.$this->pers_uid.'"
 				kw="'.$this->kalenderwoche.'"
@@ -730,7 +730,7 @@ class wochenplan
 		if ($this->type=='verband')
 			$ferien->getAll($this->stg_kz);
 		else
-			$ferien->getAll(0);
+			$ferien->getAll();
 		for ($i=1; $i<7; $i++)
 		{
 			$isferien=$ferien->isferien($datum);
@@ -756,7 +756,7 @@ class wochenplan
 					ondragexit="nsDragAndDrop.dragExit(event,boardObserver)"
 		  			datum="'.date("Y-m-d",$datum).'" stunde="'.$j.'"
 					stg_kz="'.$this->stg_kz.'" sem="'.$this->sem.'" ver="'.$this->ver.'"
-					grp="'.$this->grp.'" einheit="'.$this->gruppe_kurzbz.'"
+					grp="'.$this->grp.'" gruppe="'.$this->gruppe_kurzbz.'"
 					pers_uid="'.$this->pers_uid.'" stpltype="'.$this->type.'">';
 
 				if (isset($this->std_plan[$i][$j][0]->lehrfach))
@@ -921,7 +921,7 @@ class wochenplan
 							elem="stundenplan'.$i.$j.'"
 							idList="'.$paramList.'" stpltype="'.$this->type.'"
 							stg_kz="'.$this->stg_kz.'" sem="'.$this->sem.'" ver="'.$this->ver.'"
-							grp="'.$this->grp.'" einheit="'.$this->gruppe_kurzbz.'"
+							grp="'.$this->grp.'" gruppe="'.$this->gruppe_kurzbz.'"
 							datum="'.date("Y-m-d",$datum).'" stunde="'.$j.'"
 							pers_uid="'.$this->pers_uid.'" ort_kurzbz="'.utf8_encode($this->ort_kurzbz).'">';
 						echo '<label align="center">'.$blink_ein;
@@ -944,7 +944,7 @@ class wochenplan
 		  					ondragdrop="nsDragAndDrop.drop(event,boardObserver)"
 							datum="'.date("Y-m-d",$datum).'" stunde="'.$j.'"
 							stg_kz="'.$this->stg_kz.'" sem="'.$this->sem.'" ver="'.$this->ver.'"
-							grp="'.$this->grp.'" einheit="'.$this->gruppe_kurzbz.'"
+							grp="'.$this->grp.'" gruppe="'.$this->gruppe_kurzbz.'"
 							stpltype="'.$this->type.'"
 							/>';
 					}
@@ -1028,9 +1028,9 @@ class wochenplan
 			//$raumtyp[$i]=$row->raumtyp;
 			//$raumtypalt[$i]=$row->raumtypalternativ;
 			if ($row->gruppe_kurzbz!=null)
-				$einheit[]=$row->gruppe_kurzbz;
+				$gruppe[]=$row->gruppe_kurzbz;
 			else
-				$einheit[]='';
+				$gruppe[]='';
 			$lehrverband[$i]->stg_kz=$row->studiengang_kz;
 			$lehrverband[$i]->sem=$row->semester;
 			$lehrverband[$i]->ver=$row->verband;
@@ -1054,12 +1054,12 @@ class wochenplan
 			$lkt.=" OR uid='$l'";
 		$lkt=substr($lkt,3);
 		// Einheiten
-		$einheit=array_unique($einheit);
-		$einheiten='';
-		foreach ($einheit as $e)
-			if ($e!='')
-				$einheiten.=" OR gruppe_kurzbz='$e'";
-		//$einheiten=substr($einheiten,3);
+		$gruppe=array_unique($gruppe);
+		$gruppen='';
+		foreach ($gruppe as $g)
+			if ($g!='')
+				$gruppen.=" OR gruppe_kurzbz='$g'";
+		//$gruppen=substr($gruppen,3);
 		//Lehrverband
 		//$lehrverband=array_unique($lehrverband);
 		$lvb='';
@@ -1072,7 +1072,7 @@ class wochenplan
 				if ($l->grp!='' && $l->grp!=' ' && $l->grp!=null)
 					$lvb.=" AND (gruppe='$l->grp' OR gruppe IS NULL OR gruppe='')";
 			}
-			//if ($einheiten=='')
+			//if ($gruppen=='')
 			//	$lvb.=' AND gruppe_kurzbz IS NULL';
 			$lvb.=')';
 		}
@@ -1099,7 +1099,7 @@ class wochenplan
 		// Stundenplanabfrage bauen (Wo ist Kollision?)
 		$sql_query="SELECT DISTINCT datum, stunde FROM $stpl_view
 			WHERE datum>='$this->datum_begin' AND datum<'$this->datum_end' AND
-			($lkt $einheiten OR ($lvb) ) AND unr!=$unr"; //AND unr!=$unr"
+			($lkt $gruppen OR ($lvb) ) AND unr!=$unr"; //AND unr!=$unr"
 		//echo $sql_query;
 		if(!$result_kollision=pg_exec($this->conn, $sql_query))
 			die(pg_last_error($this->conn));
@@ -1201,7 +1201,7 @@ class wochenplan
 			$raumtyp[$i]=$row->raumtyp;
 			$raumtypalt[$i]=$row->raumtypalternativ;
 			if ($row->gruppe_kurzbz!=null && $row->gruppe_kurzbz!='')
-				$einheit[$i]=$row->gruppe_kurzbz;
+				$gruppe[$i]=$row->gruppe_kurzbz;
 			$lehrverband[$i]->stg_kz=$row->studiengang_kz;
 			$lehrverband[$i]->sem=$row->semester;
 			$lehrverband[$i]->ver=$row->verband;
@@ -1288,14 +1288,14 @@ class wochenplan
 		$lkt=substr($lkt,3);
 		//Dummy Lektor kollidiert nicht
 		$lkt='(('.$lkt.") AND mitarbeiter_uid!='_DummyLektor')";
-		// Einheiten
-		$einheiten='';
-		if (isset($einheit))
+		// Gruppen
+		$gruppen='';
+		if (isset($gruppe))
 		{
-			$einheit=array_unique($einheit);
-			foreach ($einheit as $e)
-				$einheiten.=" OR gruppe_kurzbz='$e'";
-			//$einheiten=substr($einheiten,3);
+			$gruppe=array_unique($gruppe);
+			foreach ($gruppe as $g)
+				$gruppen.=" OR gruppe_kurzbz='$g'";
+			//$gruppen=substr($gruppen,3);
 		}
 		//Lehrverband
 		//$lehrverband=array_unique($lehrverband);
@@ -1309,7 +1309,7 @@ class wochenplan
 				if ($l->grp!='' && $l->grp!=' ' && $l->grp!=null)
 					$lvb.=" AND (gruppe='$l->grp' OR gruppe IS NULL OR gruppe='' OR gruppe=' ')";
 			}
-			if ($einheiten=='')
+			if ($gruppen=='')
 				$lvb.=' AND gruppe_kurzbz IS NULL';
 			$lvb.=')';
 		}
@@ -1360,7 +1360,7 @@ class wochenplan
 			// Stundenplanabfrage bauen (Wo ist Kollision?)
 			$sql_query="SELECT DISTINCT datum, stunde FROM $stpl_table
 				WHERE datum>='$datum_begin' AND datum<'$datum_end' AND
-				($lkt $einheiten OR ($lvb) ) AND unr!=$unr";
+				($lkt $gruppen OR ($lvb) ) AND unr!=$unr";
 			//$this->errormsg.=htmlspecialchars($sql_query);
 			//return false;
 			if(!$result_kollision=pg_query($this->conn, $sql_query))
