@@ -122,7 +122,7 @@ if($result = pg_query($conn_fas, $qry))
 			}	
 			else 
 			{
-				$qry="SELECT person_fas, person_portal FROM public.tbl_syncperson WHERE person_fas='$row->person_pk'";
+				$qry="SELECT person_fas, person_portal FROM sync.tbl_syncperson WHERE person_fas='$row->person_pk'";
 				if($result1 = pg_query($conn, $qry))
 				{
 					if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist
@@ -188,12 +188,12 @@ if($result = pg_query($conn_fas, $qry))
 				else 
 				{
 					//überprüfen, ob eintrag schon vorhanden
-					$qryz="SELECT person_fas FROM tbl_syncperson WHERE person_fas='$row->person_pk' AND person_portal='$person->person_id'";
+					$qryz="SELECT person_fas FROM sync.tbl_syncperson WHERE person_fas='$row->person_pk' AND person_portal='$person->person_id'";
 					if($resultz = pg_query($conn, $qryz))
 					{
 						if(pg_num_rows($resultz)==0) //wenn dieser eintrag noch nicht vorhanden ist
 						{
-							$qry='INSERT INTO tbl_syncperson (person_fas, person_portal)'.
+							$qry='INSERT INTO sync.tbl_syncperson (person_fas, person_portal)'.
 								'VALUES ('.$row->person_pk.', '.$person->person_id.');';
 							pg_query($conn, $qry);
 						}
