@@ -187,7 +187,7 @@ class firma
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim Speichern der Daten';
+			$this->errormsg = "*****\nFehler beim Speichern des Firma-Datensatzes.\n".$qry."\n".pg_errormessage($this->conn)."\n*****\n";
 			return false;
 		}
 	}

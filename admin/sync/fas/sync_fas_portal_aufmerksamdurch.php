@@ -114,7 +114,8 @@ if($result = pg_query($conn_fas, $qry))
 //echo nl2br($text);
 echo nl2br($error_log);
 echo nl2br("\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
-
+$error_log.="\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler";
+mail($adress, 'SYNC Aufmerksamdurch', $error_log);
 ?>
 </body>
 </html>

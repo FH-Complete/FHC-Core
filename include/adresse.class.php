@@ -220,12 +220,12 @@ class adresse
 		//Zahlenfelder pruefen
 		if(!is_numeric($this->person_id))
 		{
-			$this->errormsg='person_id enthaelt ungueltige Zeichen:'.$this->person_id.' - person: '.$row->adresse_id;
+			$this->errormsg='person_id enthaelt ungueltige Zeichen:'.$this->person_id.' - adresse: '.$row->adresse_id."\n";
 			return false;
 		}
 		if(!is_numeric($this->typ))   
 		{
-			$this->errormsg='Typ enthaelt ungueltige Zeichen - person: '.$row->adresse_id;
+			$this->errormsg='Typ enthaelt ungueltige Zeichen - adresse: '.$row->adresse_id."\n";
 			return false;
 		}		
 		
@@ -233,32 +233,32 @@ class adresse
 		//$this->errormsg='Eine der Gesamtlaengen wurde ueberschritten';
 		if(strlen($this->name)>255)
 		{
-			$this->errormsg = 'Name darf nicht länger als 255 Zeichen sein  - person: '.$row->adresse_id;
+			$this->errormsg = 'Name darf nicht länger als 255 Zeichen sein  - adresse: '.$row->adresse_id."\n";
 			return false;
 		}
 		if(strlen($this->strasse)>255)
 		{
-			$this->errormsg = 'Strasse darf nicht länger als 255 Zeichen sein - person: '.$row->adresse_id;
+			$this->errormsg = 'Strasse darf nicht länger als 255 Zeichen sein - adresse: '.$row->adresse_id."\n";
 			return false;
 		}
 		if(strlen($this->plz)>10)
 		{
-			$this->errormsg = 'Plz darf nicht länger als 10 Zeichen sein - person: '.$row->adresse_id;
+			$this->errormsg = 'Plz darf nicht länger als 10 Zeichen sein - adresse: '.$row->adresse_id."\n";
 			return false;
 		}
 		if(strlen($this->ort)>255)           
 		{
-			$this->errormsg = 'Ort darf nicht länger als 255 Zeichen sein - person: '.$row->adresse_id;
+			$this->errormsg = 'Ort darf nicht länger als 255 Zeichen sein - adresse: '.$row->adresse_id."\n";
 			return false;
 		}
 		if(strlen($this->nation)>3)          
 		{
-			$this->errormsg = 'Nation darf nicht länger als 3 Zeichen sein - person: '.$row->adresse_id;
+			$this->errormsg = 'Nation darf nicht länger als 3 Zeichen sein - adresse: '.$row->adresse_id."\n";
 			return false;
 		}
 		if(strlen($this->gemeinde)>255)
 		{
-			$this->errormsg = 'Gemeinde darf nicht länger als 255 Zeichen sein - person: '.$row->adresse_id;
+			$this->errormsg = 'Gemeinde darf nicht länger als 255 Zeichen sein - adresse: '.$row->adresse_id."\n";
 			return false;
 		}
 				
@@ -296,7 +296,7 @@ class adresse
 			$qry="SELECT nextval('tbl_adresse_adresse_id_seq') as id;";
 			if(!$row = pg_fetch_object(pg_query($this->conn,$qry)))
 			{
-				$this->errormsg = 'Fehler beim auslesen der Sequence';
+				$this->errormsg = 'Fehler beim auslesen der Sequence'."\n";
 				return false;
 			}
 			$this->adresse_id = $row->id;
@@ -327,7 +327,7 @@ class adresse
 			//Pruefen ob adresse_id eine gueltige Zahl ist
 			if(!is_numeric($this->adresse_id))
 			{
-				$this->errormsg = 'adresse_id muss eine gueltige Zahl sein: '.$this->adresse_id;
+				$this->errormsg = 'adresse_id muss eine gueltige Zahl sein: '.$this->adresse_id."\n";
 				return false;
 			}
 			$qryz="SELECT * FROM tbl_adresse WHERE adresse_id='$this->adresse_id';";
@@ -394,7 +394,7 @@ class adresse
 			}
 			else 
 			{
-				$this->errormsg = 'Fehler beim Speichern der Daten';
+				$this->errormsg = "*****\nFehler beim Speichern des Adress-Datensatzes: ".$this->person_id."\n".$qry."\n".pg_errormessage($this->conn)."\n*****\n";
 				return false;
 			}
 		}
@@ -414,7 +414,7 @@ class adresse
 		//Pruefen ob adresse_id eine gueltige Zahl ist
 		if(!is_numeric($adress_id) || $adress_id == '')
 		{
-			$this->errormsg = 'adresse_id muss eine gueltige Zahl sein';
+			$this->errormsg = 'adresse_id muss eine gueltige Zahl sein'."\n";
 			return false;
 		}
 		
@@ -437,13 +437,13 @@ class adresse
 				return true;
 			else 
 			{
-				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
+				$this->errormsg = "Fehler beim Speichern des Log-Eintrages\n";
 				return false;
 			}		
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim loeschen der Daten';
+			$this->errormsg = 'Fehler beim loeschen der Daten'."\n";
 			return false;
 		}		
 	}

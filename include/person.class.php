@@ -75,7 +75,7 @@ class person
 			
 		if(!pg_query($conn,$qry))
 		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
+			$this->errormsg	 = "Encoding konnte nicht gesetzt werden\n";
 			return false;
 		}
 		
@@ -100,7 +100,7 @@ class person
 			
 			if(!$result=pg_query($this->conn,$qry))
 			{
-				$this->errormsg = 'Fehler beim lesen der Personendaten';
+				$this->errormsg = "Fehler beim lesen der Personendaten\n";
 				return false;
 			}
 			
@@ -136,7 +136,7 @@ class person
 			}
 			else
 			{
-				$this->errormsg = 'Es ist kein Personendatensatz mit der ID '.$person_id.' vorhanden';
+				$this->errormsg = "Es ist kein Personendatensatz mit der ID ".$person_id." vorhanden\n";
 				return false;
 			}
 			
@@ -144,7 +144,7 @@ class person
 		}
 		else
 		{
-			$this->errormsg = 'Die person_id muss eine gueltige Zahl sein';
+			$this->errormsg = "Die person_id muss eine gueltige Zahl sein\n";
 			return false;
 		}
 	}
@@ -158,124 +158,125 @@ class person
 	{
 		if(strlen($this->sprache)>16)
 		{
-			$this->errormsg = 'Sprache darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg = "*****\nSprache darf nicht laenger als 16 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
 		if(strlen($this->anrede)>16)
 		{
-			$this->errormsg = 'Anrede darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg = "*****\nAnrede darf nicht laenger als 16 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
 		if(strlen($this->titelpost)>32)
 		{
-			$this->errormsg = 'Titelpost darf nicht laenger als 32 Zeichen sein';
+			$this->errormsg = "*****\nTitelpost darf nicht laenger als 32 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		} 
 		if(strlen($this->titelpre)>64)
 		{
-			$this->errormsg = 'Titelpre darf nicht laenger als 64 Zeichen sein';
+			$this->errormsg = "*****\nTitelpre darf nicht laenger als 64 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
 		if(strlen($this->nachname)>64)
 		{
-			$this->errormsg = 'Nachname darf nicht laenger als 64 Zeichen sein';
+			$this->errormsg = "*****\nNachname darf nicht laenger als 64 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
 		if($this->nachname=='' || is_null($this->nachname))
 		{
-			$this->errormsg = 'Nachname muss eingegeben werden';
+			$this->errormsg = "*****\nNachname muss eingegeben werden: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}		
 		
 		if(strlen($this->vorname)>32)
 		{
-			$this->errormsg = 'Vorname darf nicht laenger als 32 Zeichen sein';
+			$this->errormsg = "*****\nVorname darf nicht laenger als 32 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
 		if(strlen($this->vornamen)>128)
 		{
-			$this->errormsg = 'Vornamen darf nicht laenger als 128 Zeichen sein';
+			$this->errormsg = "*****\nVornamen darf nicht laenger als 128 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
 		//ToDo Gebdatum pruefen -> laut bis muss student aelter als 10 Jahre sein
 		/*if(strlen($this->gebdatum)==0 || is_null($this->gebdatum))
 		{
-			$this->errormsg = 'Geburtsdatum muss eingegeben werden';
+			$this->errormsg = "Geburtsdatum muss eingegeben werden\n";
 			return false;
 		}*/
 		if(strlen($this->gebort)>128)
 		{
-			$this->errormsg = 'Geburtsort darf nicht laenger als 128 Zeichen sein';
+			$this->errormsg = "*****\nGeburtsort darf nicht laenger als 128 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
 		if($this->foto!='' && !is_numeric($this->foto))
 		{
-			$this->errormsg = 'FotoOID ist ungueltig';
+			$this->errormsg = "FotoOID ist ungueltig\n";
 			return false;
 		}
 		if(strlen($this->homepage)>256)
 		{
-			$this->errormsg = 'Homepage darf nicht laenger als 256 Zeichen sein';
+			$this->errormsg = "*****\nHomepage darf nicht laenger als 256 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
 		if(strlen($this->svnr)>10)
 		{
-			$this->errormsg = 'SVNR darf nicht laenger als 10 Zeichen sein';
+			$this->errormsg = "*****\nSVNR darf nicht laenger als 10 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
 		if(strlen($this->ersatzkennzeichen)>10)
 		{
-			$this->errormsg = 'Ersatzkennzeichen darf nicht laenger als 10 Zeichen sein';
+			$this->errormsg = "*****\nErsatzkennzeichen darf nicht laenger als 10 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
 		if(strlen($this->familienstand)>1)
 		{
-			$this->errormsg = 'Familienstand ist ungueltig';
+			$this->errormsg = "*****\nFamilienstand ist ungueltig: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
 		if($this->anzahlkinder!='' && !is_numeric($this->anzahlkinder))
 		{
-			$this->errormsg = 'Anzahl der Kinder ist ungueltig';
+			$this->errormsg = "*****\nAnzahl der Kinder ist ungueltig: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
 		if(!is_bool($this->aktiv))
 		{
-			$this->errormsg = 'Aktiv ist ungueltig';
+			$this->errormsg = "*****\nAktiv ist ungueltig: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
 		if(strlen($this->insertvon)>16)
 		{
-			$this->errormsg = 'Insertvon darf nicht laenger als 16 Zeichen sien';
+			$this->errormsg = "*****\nInsertvon darf nicht laenger als 16 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
 		if(strlen($this->updatevon)>16)
 		{
-			$this->errormsg = 'Updatevon darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg = "*****\nUpdatevon darf nicht laenger als 16 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
 		if($this->ext_id!='' && !is_numeric($this->ext_id))
 		{
-			$this->errormsg = 'Ext_ID ist keine gueltige Zahl';
+			$this->errormsg = "*****\nExt_ID ist keine gueltige Zahl: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
 		if(strlen($this->geschlecht)>1)
 		{
-			$this->errormsg = 'geschlecht darf nicht laenger als 1 Zeichen sein';
+			$this->errormsg = "*****\ngeschlecht darf nicht laenger als 1 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
 		if(strlen($this->geburtsnation)>3)
 		{
-			$this->errormsg = 'Geburtsnation darf nicht laenger als 3 Zeichen sein';
+			$this->errormsg = "*****\nGeburtsnation darf nicht laenger als 3 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
 		if(strlen($this->staatsbuergerschaft)>3)
 		{
-			$this->errormsg = 'Staatsbuergerschaft darf nicht laenger als 3 Zeichen sein';
+			$this->errormsg = "*****\nStaatsbuergerschaft darf nicht laenger als 3 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
 		if($this->geschlecht!='m' && $this->geschlecht!='w')
 		{
-			$this->errormsg = 'Geschlecht muß entweder w oder m sein!';
+			$this->errormsg = "*****\nGeschlecht muß entweder w oder m sein!: ".$this->nachname.", ".$this->vorname."\n*****\n";
+			return false;
 		}
 		
 		return true;		
@@ -328,9 +329,9 @@ class person
 				        $this->addslashes($this->familienstand).','.
 				        $this->addslashes($this->anzahlkinder).','.
 				        ($this->aktiv?'true':'false').','.
-				        $this->addslashes($this->insertamum).','.
+				        'now(),'.
 				        $this->addslashes($this->insertvon).','.
-				        $this->addslashes($this->updateamum).','.
+				        'now(),'.
 				        $this->addslashes($this->updatevon).','.
 				        $this->addslashes($this->geschlecht).','.
 				        $this->addslashes($this->geburtsnation).','.
@@ -343,7 +344,7 @@ class person
 			//person_id auf gueltigkeit pruefen
 			if(!is_numeric($this->person_id))
 			{				
-				$this->errormsg = 'person_id muss eine gueltige Zahl sein';
+				$this->errormsg = "person_id muss eine gueltige Zahl sein\n";
 				return false;
 			}
 			
@@ -398,7 +399,9 @@ class person
 						       ' familienstand='.$this->addslashes($this->familienstand).','.
 						       ' anzahlkinder='.$this->addslashes($this->anzahlkinder).','.
 						       ' aktiv='.($this->aktiv?'true':'false').','.
-						       ' updateamum='.$this->addslashes($this->updateamum).','.
+						       ' insertamum=now(),'.
+						       ' insertvon='.$this->addslashes($this->insertvon).','.
+						       ' updateamum=now(),'.
 						       ' updatevon='.$this->addslashes($this->updatevon).','.
 						       ' geschlecht='.$this->addslashes($this->geschlecht).','.
 						       ' geburtsnation='.$this->addslashes($this->geburtsnation).','.
@@ -421,7 +424,7 @@ class person
 						$this->person_id=$row->id;
 					else
 					{					
-						$this->errormsg = 'Sequence konnte nicht ausgelesen werden';
+						$this->errormsg = "Sequence konnte nicht ausgelesen werden\n";
 						return false;
 					}
 				}
@@ -431,7 +434,7 @@ class person
 			}
 			else
 			{			
-				$this->errormsg = 'Fehler beim Speichern des Person-Datensatzes:'.$this->nachname.' '.$qry;
+				$this->errormsg = "*****\nFehler beim Speichern des Person-Datensatzes: ".$this->nachname."\n".$qry."\n".pg_errormessage($this->conn)."\n*****\n";
 				return false;
 			}
 		}

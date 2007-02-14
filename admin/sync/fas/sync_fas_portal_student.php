@@ -38,6 +38,10 @@ $anzahl_nichtstudenten=0;
 $rolle_kurzbz=array(1=>"Interessent", 2=>"Bewerber", 3=>"Student", 4=>"Ausserordentlicher", 5=>"Abgewiesener", 6=>"Aufgenommener", 7=>"Wartender", 8=>"Abbrecher", 9=>"Unterbrecher", 10=>"Outgoing", 11=>"Incoming", 12=>"Praktikant", 13=>"Diplomant", 14=>"Absolvent");
 $studiensemester_kurzbz=array(2=>"wS2002",3=>"SS2003",4=>"WS2003",5=>"SS2004",6=>"WS2004",7=>"SS2005",8=>"WS2005",9=>"SS2006",10=>"WS2006",11=>"SS2007",12=>"WS2007",13=>"SS2008",14=>"WS2008");
 
+
+$adress='ruhan@technikum-wien.at';
+//$adress='fas_sync@technikum-wien.at';
+
 function myaddslashes($var)
 {
 	return ($var!=''?"'".addslashes($var)."'":'null');
@@ -199,7 +203,7 @@ if($result = pg_query($conn_fas, $qry))
 			}
 			else 
 			{
-				$text.="Kein Reihungstest von Student $row->familienname, $row->vorname gefunden!\n";	
+				$error_log.="Kein Reihungstest von Student $row->familienname, $row->vorname gefunden!\n";	
 				$reihungstest_id='';
 				$anmeldungreihungstest='';
 				$notest++;
@@ -438,7 +442,7 @@ if($result = pg_query($conn_fas, $qry))
 		else
 		{			
 			$error=true;
-			$error_log.='Fehler beim Speichern des Person-Datensatzes:'.$nachname.' '.$qry;
+			$error_log.='Fehler beim Speichern des Person-Datensatzes:'.$nachname.' '.$qry."\n".pg_errormessage($conn)."\n";
 		}
 		
 		if(!$error)
@@ -612,7 +616,7 @@ if($result = pg_query($conn_fas, $qry))
 			else
 			{			
 				$error=true;
-				$error_log.='Fehler beim Speichern des Prestudent-Datensatzes:'.$nachname.' '.$qry;
+				$error_log.='Fehler beim Speichern des Prestudent-Datensatzes:'.$nachname.' '.$qry."\n".pg_errormessage($conn)."\n";
 			}
 									
 			if(!$error)
@@ -817,7 +821,7 @@ if($result = pg_query($conn_fas, $qry))
 					$anzahl_student++;
 					if(pg_query($conn,$qry))
 					{
-						if($new_student)
+						/*if($new_student)
 						{
 							$qry = "SELECT currval('public.tbl_student_student_id_seq') AS id;";
 							if($rowz=pg_fetch_object(pg_query($conn,$qry)))
@@ -827,12 +831,12 @@ if($result = pg_query($conn_fas, $qry))
 								$error=true;
 								$error_log.='Student-Sequence konnte nicht ausgelesen werden';
 							}
-						}			
+						}*/			
 					}
 					else
 					{			
 						$error=true;
-						$error_log.='Fehler beim Speichern des Student-Datensatzes:'.$nachname.' / '.$qry;
+						$error_log.='Fehler beim Speichern des Student-Datensatzes:'.$nachname.' / '.$qry."\n".pg_errormessage($conn)."\n";
 					}
 											
 					if(!$error)
@@ -886,8 +890,8 @@ if($result = pg_query($conn_fas, $qry))
 							if(!is_numeric($person_id))
 							{				
 								$error=true;
-								echo nl2br('person_id muss eine gueltige Zahl sein');
-								$error_log.= 'person_id muss eine gueltige Zahl sein';
+								$text.='person_id muss eine gueltige Zahl sein\n';
+								$error_log.= 'person_id muss eine gueltige Zahl sein\n';
 							}
 							
 							
@@ -915,24 +919,10 @@ if($result = pg_query($conn_fas, $qry))
 								}
 							}
 						}
-						if(pg_query($conn,$qry))
-						{
-							if($new_student)
-							{
-								$qry = "SELECT currval('public.tbl_student_student_id_seq') AS id;";
-								if($rows=pg_fetch_object(pg_query($conn,$qry)))
-									$benutzer_id=$rows->id;
-								else
-								{					
-									$error=true;
-									$error_log.='Benutzer-Sequence konnte nicht ausgelesen werden';
-								}
-							}			
-						}
-						else
+						if(!pg_query($conn,$qry))
 						{			
 							$error=true;
-							$error_log.='Fehler beim Speichern des Benutzer-Datensatzes:'.$nachname.' '.$qry;
+							$error_log.='Fehler beim Speichern des Benutzer-Datensatzes:'.$nachname.' '.$qry."\n".pg_errormessage($conn)."\n";
 						}
 						$anzahl_benutzer++;					
 						if(!$error)
@@ -944,67 +934,61 @@ if($result = pg_query($conn_fas, $qry))
 							else
 							{			
 								$anzahl_fehler_benutzer++;
-								/*echo nl2br("\n***********".$student_uid."/".$nachname.", ".$vorname."/".$matrikelnr."\n");
-								echo nl2br($text."\n");
-								echo nl2br($error_log);
-								echo nl2br("\n".$qry." R1\n");
-								echo nl2br("**********\n\n");*/
+								$text.="\n***********".$student_uid."/".$nachname.", ".$vorname."/".$matrikelnr."\n";
+								$text.=$error_log;
+								$text.="\n".$qry." R1\n";
+								$text.="**********\n\n";
 								pg_query($conn,'ROLLBACK;');
 							}
 						}
 						else
 						{
 							$anzahl_fehler_benutzer++;
-							/*echo nl2br("\n***********".$student_uid."/".$nachname.", ".$vorname."/".$matrikelnr."\n");
-							echo nl2br($text."\n");
-							echo nl2br($error_log);
-							echo nl2br("\n".$qry." R2\n");
-							echo nl2br("**********\n\n");*/
+							$text.="\n***********".$student_uid."/".$nachname.", ".$vorname."/".$matrikelnr."\n";
+							$text.=$error_log;
+							$text.="\n".$qry." R2\n";
+							$text.="**********\n\n";
 							pg_query($conn,'ROLLBACK;');
 						}									
 					}
 					else
 					{
 						$anzahl_fehler_student++;
-						/*echo nl2br("\n***********".$student_uid."/".$nachname.", ".$vorname."/".$matrikelnr."\n");
-						echo nl2br($text."\n");
-						echo nl2br($error_log);
-						echo nl2br("\n".$qry." R3\n");
-						echo nl2br("**********\n\n");*/
+						$text.="\n***********".$student_uid."/".$nachname.", ".$vorname."/".$matrikelnr."\n";
+						$text.=$error_log;
+						$text.="\n".$qry." R3\n";
+						$text.="**********\n\n";
 						pg_query($conn,'ROLLBACK;');
 					}
 				}
 				else 
 				{
 					$anzahl_nichtstudenten++;
-					/*echo nl2br("\n***********".$student_uid."/".$nachname.", ".$vorname."/".$matrikelnr."\n");
-					echo nl2br("Semester: <b>".$semester."</b>/Verband: <b>".$verband."</b>/Gruppe: <b>".$gruppe."</b>/ Stg:<b>".$studiengang_kz."</b>\n");
-					echo nl2br($text."\n");
-					echo nl2br($error_log);
-					echo nl2br("\n".$qry." C1\n");
-					echo nl2br("**********\n\n");*/
+					/*$text.="\n***********".$student_uid."/".$nachname.", ".$vorname."/".$matrikelnr."\n";
+					$text.="Semester: ".$semester."/Verband: ".$verband." /Gruppe: ".$gruppe." / Stg:".$studiengang_kz."\n";
+					$text.=$error_log;
+					$text.="\n".$qry." C1\n";
+					$text.="**********\n\n";*/
 					pg_query($conn,'COMMIT;'); //Commit, wenn kein Gruppeneintrag gefunden (Interessent, Bewerber) => nur Person und Prestudent werden angelegt
 				}
 			}
 			else
 			{
 				$anzahl_fehler_pre++;
-				/*echo nl2br("\n***********".$student_uid."/".$nachname.", ".$vorname."/".$matrikelnr."\n");
-				echo nl2br($text."\n");
-				echo nl2br($error_log);
-				echo nl2br("\n".$qry." R4\n");
-				echo nl2br("**********\n\n");*/
+				$text.="\n***********".$student_uid."/".$nachname.", ".$vorname."/".$matrikelnr."\n";
+				$text.=$error_log;
+				$text.="\n".$qry." R4\n";
+				$text.="**********\n\n";
 				pg_query($conn,'ROLLBACK;');
 			}						
 		}
 		else
 		{
 			$anzahl_fehler_person++;
-			/*echo nl2br("\n***********".$student_uid."/".$nachname.", ".$vorname."/".$matrikelnr."\n");
-			echo nl2br($text."\n");
-			echo nl2br($error_log);
-			echo nl2br("\n".$qry." R5\n");
-			echo nl2br("**********\n\n");*/
+			$text.="\n***********".$student_uid."/".$nachname.", ".$vorname."/".$matrikelnr."\n";
+			$text.=$error_log;
+			$text.=" R5\n";
+			$text.="**********\n\n";
 			pg_query($conn,'ROLLBACK;');
 		}
 
@@ -1012,15 +996,23 @@ if($result = pg_query($conn_fas, $qry))
 }		
 
 
-echo nl2br("\n".$text);
-echo nl2br($error_log);
+//echo nl2br("\n".$text);
+echo nl2br("\n".$error_log);
 Echo nl2br("\n\nPersonen ohne Reihungstest: ".$notest." \n");
 Echo nl2br("Personen: Übertragen: ".$anzahl_person." Fehler: ".$anzahl_fehler_person."\n");
 Echo nl2br("Prestudenten: Übertragen: ".$anzahl_pre." Fehler: ".$anzahl_fehler_pre."\n");
 Echo nl2br("Nicht-Studenten: ".$anzahl_nichtstudenten."\n");
 Echo nl2br("Studenten: Übertragen: ".$anzahl_student." Fehler: ".$anzahl_fehler_student."\n");
 Echo nl2br("Benutzer: Übertragen: ".$anzahl_benutzer." Fehler: ".$anzahl_fehler_benutzer."\n");
+$error_log=$text;
+$error_log.="\n\nPersonen ohne Reihungstest: ".$notest." \n";
+$error_log.="Personen: Übertragen: ".$anzahl_person." Fehler: ".$anzahl_fehler_person."\n";
+$error_log.="Prestudenten: Übertragen: ".$anzahl_pre." Fehler: ".$anzahl_fehler_pre."\n";
+$error_log.="Nicht-Studenten: ".$anzahl_nichtstudenten."\n";
+$error_log.="Studenten: Übertragen: ".$anzahl_student." Fehler: ".$anzahl_fehler_student."\n";
+$error_log.="Benutzer: Übertragen: ".$anzahl_benutzer." Fehler: ".$anzahl_fehler_benutzer."\n";
 
+mail($adress, 'SYNC Student', $error_log);
 ?>
 </body>
 </html>

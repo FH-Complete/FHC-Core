@@ -51,7 +51,7 @@ class mitarbeiter extends benutzer
 
 		if(!pg_query($conn,$qry))
 		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
+			$this->errormsg= "Encoding konnte nicht gesetzt werden\n";
 			return false;
 		}
 
@@ -82,13 +82,13 @@ class mitarbeiter extends benutzer
 			}
 			else 
 			{
-				$this->errormsg = "Kein Eintrag gefunden fuer $uid";
+				$this->errormsg = "Kein Eintrag gefunden fuer $uid\n";
 				return false;
 			}
 		}
 		else 
 		{
-			$this->errormsg = "Fehler beim Laden: $qry";
+			$this->errormsg = "Fehler beim Laden: $qry\n";
 			return false;
 		}
 	}
@@ -101,52 +101,52 @@ class mitarbeiter extends benutzer
 	{
 		if(strlen($this->uid)>16)
 		{
-			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg = "ID darf nicht laenger als 16 Zeichen sein\n";
 			return false;
 		}
 		if($this->uid=='')
 		{
-			$this->errormsg = 'UID muss eingegeben werden '.$this->uid;
+			$this->errormsg = "UID muss eingegeben werden ".$this->personalnummer."\n";
 			return false;
 		}
 		if($this->ausbildungcode!='' && !is_numeric($this->ausbildungcode))
 		{
-			$this->errormsg = 'Ausbildungscode ist ungueltig';
+			$this->errormsg = "Ausbildungscode ist ungueltig\n";
 			return false;
 		}
 		if($this->personalnummer!='' && !is_numeric($this->personalnummer))
 		{
-			$this->errormsg = 'Personalnummer muss eine gueltige Zahl sein';
+			$this->errormsg = "Personalnummer muss eine gueltige Zahl sein\n";
 			return false;
 		}
 		if(strlen($this->kurzbz)>8)
 		{
-			$this->errormsg = 'kurzbz darf nicht laenger als 8 Zeichen sein';
+			$this->errormsg = "kurzbz darf nicht laenger als 8 Zeichen sein\n";
 			return false;
 		}
 		if(strlen($this->ort_kurzbz)>8)
 		{
-			$this->errormsg = 'Ort_kurzbz darf nicht laenger als 8 Zeichen sein';
+			$this->errormsg = "Ort_kurzbz darf nicht laenger als 8 Zeichen sein\n";
 			return false;
 		}
 		if(!is_bool($this->lektor))
 		{
-			$this->errormsg = 'lektor muss boolean sein '.$this->lektor;
+			$this->errormsg = "Lektor muss boolean sein ".$this->lektor."\n";
 			return false;
 		}
 		if(!is_bool($this->fixangestellt))
 		{
-			$this->errormsg = 'fixangestellt muss boolean sein';
+			$this->errormsg = "fixangestellt muss boolean sein\n";
 			return false;
 		}
 		if(strlen($this->telefonklappe)>25)
 		{
-			$this->errormsg = 'telefonklappe darf nicht laenger als 25 Zeichen sein';
+			$this->errormsg = "telefonklappe darf nicht laenger als 25 Zeichen sein\n";
 			return false;
 		}
 		if(strlen($this->updatevon)>32)
 		{
-			$this->errormsg = 'updatevon darf nicht laenger als 32 Zeichen sein';
+			$this->errormsg = "updatevon darf nicht laenger als 32 Zeichen sein\n";
 			return false;
 		}
 
@@ -217,7 +217,7 @@ class mitarbeiter extends benutzer
 		else
 		{
 			pg_query($this->conn,'ROLLBACK;');
-			$this->errormsg = 'Fehler beim Speichern des Mitarbeiter-Datensatzes'.$qry;
+			$this->errormsg = "*****\nFehler beim Speichern des Mitarbeiter-Datensatzes: ".$this->uid."\n".$qry."\n".pg_errormessage($this->conn)."\n*****\n";
 			return false;
 		}
 	}
@@ -244,8 +244,8 @@ class mitarbeiter extends benutzer
 			$sql_query.=' AND studiengang_kz='.$stg_kz;
 		if ($fachbereich_id!=null)
 			$sql_query.=' AND fachbereich_id='.$fachbereich_id;
-	    $sql_query.=' ORDER BY nachname, vornamen, kurzbz';
-	    //echo $sql_query;
+	    	$sql_query.=' ORDER BY nachname, vornamen, kurzbz';
+	    	//echo $sql_query;
 		if(!($erg=pg_query($this->conn, $sql_query)))
 		{
 			$this->errormsg=pg_errormessage($conn);
