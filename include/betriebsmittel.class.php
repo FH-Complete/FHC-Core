@@ -38,6 +38,7 @@ class betriebsmittel
 	var $reservieren;		// @var boolean
 	var $ort_kurzbz;		// @var string
 	var $ext_id;			// @var integer
+	var $ext_id2;			// @var integer
 	var $insertamum;		// @var timestamp
 	var $insertvon;		// @var bigint
 	var $updateamum;		// @var timestamp
@@ -101,7 +102,7 @@ class betriebsmittel
 			//Neuen Datensatz einfuegen
 					
 			$qry='INSERT INTO public.tbl_betriebsmittel (betriebsmittel_id, beschreibung, betriebsmitteltyp, nummer, reservieren, ort_kurzbz,
-				ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
+				ext_id, insertamum, insertvon, updateamum, ext_id2, updatevon) VALUES('.
 			     $this->addslashes($this->betriebsmittel_id).', '.
 			     $this->addslashes($this->beschreibung).', '.
 			     $this->addslashes($this->betriebsmitteltyp).', '.
@@ -110,6 +111,7 @@ class betriebsmittel
 			     $this->addslashes($this->ort_kurzbz).', '.
 			     $this->addslashes($this->ext_id).',  now(), '.
 			     $this->addslashes($this->insertvon).', now(), '.
+			     $this->addslashes($this->ext_id2).', '.
 			     $this->addslashes($this->updatevon).');';
 			 $this->done=true;			
 		}
@@ -126,7 +128,6 @@ class betriebsmittel
 					if($rowz->nummer!=$this->nummer)				$update=true;
 					if($rowz->reservieren!=$this->reservieren)			$update=true;
 					if($rowz->ort_kurzbz!=$this->ort_kurzbz)				$update=true;
-					if($rowz->ext_id!=$this->ext_id)	 				$update=true;
 				
 					if($update)
 					{
@@ -136,6 +137,7 @@ class betriebsmittel
 							'reservieren='.($this->reservieren?'true':'false').', '.
 							'ort_kurzbz='.$this->addslashes($this->ort_kurzbz).', '.
 							'ext_id='.$this->addslashes($this->ext_id).', '. 
+							'ext_id2='.$this->addslashes($this->ext_id2).', '. 
 						     	'updateamum= now(), '.
 						     	'updatevon='.$this->addslashes($this->updatevon).' '.
 							'WHERE betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).';';

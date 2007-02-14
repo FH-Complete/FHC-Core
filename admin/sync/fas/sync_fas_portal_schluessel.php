@@ -71,6 +71,7 @@ if($result = pg_query($conn_fas, $qry))
 		$betriebsmittel->insertvon			="SYNC";
 		$betriebsmittel->ext_id			=$row->schluessel_fk;
 
+
 		$betriebsmittelperson			=new betriebsmittelperson($conn);
 		//$betriebsmittelperson->betriebsmittel_id	='';
 		//$betriebsmittelperson->person_id	='';
@@ -83,7 +84,7 @@ if($result = pg_query($conn_fas, $qry))
 		$betriebsmittelperson->ext_id		=$row->schluessel_fk;
 		
 		//Person_id feststellen
-		$qry1="SELECT person_portal FROM public.tbl_syncperson WHERE person_fas=".$row->person_fk.";";
+		$qry1="SELECT person_portal FROM sync.tbl_syncperson WHERE person_fas=".$row->person_fk.";";
 		if($result1 = pg_query($conn, $qry1))
 		{
 			if(pg_num_rows($result1)>0) //eintrag gefunden
@@ -101,7 +102,7 @@ if($result = pg_query($conn_fas, $qry))
 							{ 
 								$betriebsmittel->betriebsmitteltyp=$row2->portal_typ;
 								//Insert oder Update
-								$qry3="SELECT betriebsmittel_id FROM public.tbl_betriebsmittel WHERE ext_id=".$row->schluessel_fk.";";
+								$qry3="SELECT betriebsmittel_id FROM public.tbl_betriebsmittel WHERE ext_id=".$row->schluessel_fk." AND ext_id2=".$row->person_fk.";";
 								if($result3 = pg_query($conn, $qry3))
 								{
 									if(pg_num_rows($result3)>0) //eintrag gefunden
@@ -216,9 +217,9 @@ echo nl2br("\n\n".$error_log);
 echo nl2br("\n"."Betriebsmittel:");
 echo nl2br("\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
 echo nl2br("\n"."Betriebsmittelperson:");
-echo nl2br("\nGesamt: $anzahl_eingefügt / Eingefügt: $anzahl_eingefuegt2 / Fehler: $anzahl_fehler2");
-$error_log="\nBetriebsmittel: \nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler\nBetriebsmittelperson: \nGesamt: $anzahl_eingefügt / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler\n".$error_log;
-mail($adress, 'SYNC Schluessel', $error_log);
+echo nl2br("\nGesamt: $anzahl_eingefuegt / Eingefügt: $anzahl_eingefuegt2 / Fehler: $anzahl_fehler2");
+$error_log="\nBetriebsmittel: \nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler\nBetriebsmittelperson: \nGesamt: $anzahl_eingefuegt / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler\n".$error_log;
+mail($adress, 'SYNC Schluessel', $error_log,"From: vilesci@technikum-wien.at");
 ?>
 </body>
 </html>
