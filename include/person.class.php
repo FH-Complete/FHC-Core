@@ -183,7 +183,7 @@ class person
 		}
 		if($this->nachname=='' || is_null($this->nachname))
 		{
-			$this->errormsg = "*****\nNachname muss eingegeben werden: ".$this->nachname.", ".$this->vorname."\n*****\n";
+			$this->errormsg = "*****\nNachname muss eingegeben werden: ".$this->ext_id.", ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}		
 		
