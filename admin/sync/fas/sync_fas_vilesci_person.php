@@ -491,10 +491,10 @@ if($result = pg_query($conn_fas, $qry))
 			}
 		}
 	}
-	echo nl2br("abgeschlossen\n\n");
+	echo nl2br("\nabgeschlossen\n\n");
 }
 else
-	$error_log .= 'Personendatensaetze konnten nicht geladen werden';
+	$error_log .= '\nPersonendatensaetze konnten nicht geladen werden\n';
 
 
 
@@ -502,7 +502,8 @@ else
 echo nl2br("\nLog:\n".$error_log);
 echo nl2br("\nLog FAS:\n".$error_log_fas);
 echo nl2br("\n\nGesamt FAS: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler");
-$error_log="Person Sync\n-------------\n\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n\n".$error_log;
+$error_log="Person Sync\n-------------\n\nGesamt FAS: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n\n".$error_log;
+$error_log="Person Sync\n-------------\n\nGesamt FAS: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n\n".$error_log_fas;
 mail($adress, 'SYNC Personen', $error_log,"From: vilesci@technikum-wien.at");
 mail($adress, 'SYNC Personen FAS-Daten', $error_log_fas,"From: vilesci@technikum-wien.at");
 ?>
