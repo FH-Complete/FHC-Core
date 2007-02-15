@@ -82,15 +82,15 @@ if($result = pg_query($conn_fas, $qry))
 		}
 		elseif($row->familienstand==2)
 		{
-			$person->familienstand=='v';
+			$person->familienstand='v';
 		}
 		elseif($row->familienstand==3)
 		{
-			$person->familienstand=='g';
+			$person->familienstand='g';
 		}
 		elseif($row->familienstand==4)
 		{
-			$person->familienstand=='w';
+			$person->familienstand='w';
 		}
 		else 
 		{
@@ -153,11 +153,11 @@ if($result = pg_query($conn_fas, $qry))
 								{
 									$person->new=false;
 									$person->person_id=$rowz->person_id;
-									if($rowz->nachname!=$row->nachname || $rowz->vorname!=$row-vorname)
+									if($rowz->nachname!=$row->familienname || $rowz->vorname!=$row-vorname)
 									{
 										$error=true;
-										$error_log.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." heißt ".$row->vorname." ".$row->nachname.".";
-										$error_log.="\nPerson in der Datenbank heißt aber: ".$rowz->vorname." ".$rowz->nachname.".";
+										$error_log.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." heißt ".$row->vorname." ".$row->familienname.".";
+										$error_log.="\nPerson in der Datenbank heißt aber: ".$rowz->vorname." ".$rowz->nachname.".\n";
 									}
 									
 								}

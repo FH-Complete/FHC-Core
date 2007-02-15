@@ -69,7 +69,7 @@ if($result = pg_query($conn_fas, $qry))
 		$betriebsmittel->ort_kurzbz			=null;
 		$betriebsmittel->updatevon			="SYNC";
 		$betriebsmittel->insertvon			="SYNC";
-		$betriebsmittel->ext_id			=$row->schluessel_fk;
+		$betriebsmittel->ext_id			=$row->person_fk+($row->schluessel_fk*100000);
 
 
 		$betriebsmittelperson			=new betriebsmittelperson($conn);
@@ -81,7 +81,7 @@ if($result = pg_query($conn_fas, $qry))
 		$betriebsmittelperson->retouram		='';
 		$betriebsmittelperson->updatevon		="SYNC";
 		$betriebsmittelperson->insertvon		="SYNC";
-		$betriebsmittelperson->ext_id		=$row->schluessel_fk;
+		$betriebsmittelperson->ext_id		=$row->person_fk+($row->schluessel_fk*100000);
 		
 		//Person_id feststellen
 		$qry1="SELECT person_portal FROM sync.tbl_syncperson WHERE person_fas=".$row->person_fk.";";
@@ -102,7 +102,7 @@ if($result = pg_query($conn_fas, $qry))
 							{ 
 								$betriebsmittel->betriebsmitteltyp=$row2->portal_typ;
 								//Insert oder Update
-								$qry3="SELECT betriebsmittel_id FROM public.tbl_betriebsmittel WHERE ext_id=".$row->schluessel_fk." AND ext_id2=".$row->person_fk.";";
+								$qry3="SELECT betriebsmittel_id FROM public.tbl_betriebsmittel WHERE ext_id=".($row->person_fk+($row->schluessel_fk*100000)).";";
 								if($result3 = pg_query($conn, $qry3))
 								{
 									if(pg_num_rows($result3)>0) //eintrag gefunden
