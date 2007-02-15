@@ -68,14 +68,7 @@ else
 		  	  <td nowrap>&nbsp;</td>
 		  	</tr>
 			<tr>
-			  <td width="260" nowrap>Braunstorfer Michael (Leitung)</td>
-			  <td width="50" nowrap>240</td>
-			  <td nowrap><?php echo ($visible?'<a class="Item" href="mailto:michael.braunstorfer@technikum-wien.at">michael.braunstorfer@technikum-wien.at</a>':'')?></td>
-			  <td width="56" nowrap>&nbsp;</td>
-			  <td nowrap>Termin nach Vereinbarung</td>
-			</tr>
-			<tr>
-			  <td width="260" nowrap>Ing. Esberger Franz </td>
+			  <td width="260" nowrap>Ing. Esberger Franz (Leitung interimistisch)</td>
 			  <td width="50" nowrap>243</td>
 			  <td nowrap><?php echo ($visible?'<a class="Item" href="mailto:franz.esberger@technikum-wien.at">franz.esberger@technikum-wien.at</a>':'')?></td>
 			  <td width="56" nowrap>&nbsp;</td>
@@ -95,6 +88,20 @@ else
 			  <td width="56" nowrap>&nbsp;</td>
 			  <td nowrap>Termin nach Vereinbarung</td>
 			</tr>	
+			<tr>
+			  <td width="260" nowrap>Lechner Martin</td>
+			  <td width="50" nowrap>240</td>
+			  <td nowrap><?php echo ($visible?'<a class="Item" href="mailto:lechner@technikum-wien.at">lechner@technikum-wien.at</a>':'')?></td>
+			  <td width="56" nowrap>&nbsp;</td>
+			  <td nowrap>Termin nach Vereinbarung</td>
+			</tr>
+			<tr>
+			  <td width="260" nowrap>Braunstorfer Michael</td>
+			  <td width="50" nowrap>240</td>
+			  <td nowrap><?php echo ($visible?'<a class="Item" href="mailto:michael.braunstorfer@technikum-wien.at">michael.braunstorfer@technikum-wien.at</a>':'')?></td>
+			  <td width="56" nowrap>&nbsp;</td>
+			  <td nowrap>Termin nach Vereinbarung</td>
+			</tr>
 			<tr>
 		  	  <td colspan="2" nowrap>&nbsp;</td>
 		  	  <td nowrap>&nbsp;</td>

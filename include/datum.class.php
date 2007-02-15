@@ -48,7 +48,41 @@ class datum
 	
 	/**
 	 * Liefert einen UNIX Timestamp von einem String im
-	 * Format "31.12.2007 14:30"
+	 * Format "31.12.2007"
+	 */
+	function mktime_datum($datum)
+	{		
+		if(ereg("([0-9]{2}).([0-9]{2}).([0-9]{4})",$datum, $regs))
+		{
+			return mktime(0,0,0,$regs[2],$regs[1],$regs[3]);
+		}
+		else 
+		{
+			$this->errormsg = 'Falsches Datumsformat';
+			return false;
+		}
+	}
+	
+	/**
+	 * Liefert einen UNIX Timestamp von einem Datum im
+	 * Format "2007-01-31"
+	 */
+	function mktime_fromdate($datum)
+	{		
+		if(ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$datum, $regs))
+		{
+			return mktime(0,0,0,$regs[2],$regs[3],$regs[1]);
+		}
+		else 
+		{
+			$this->errormsg = 'Falsches Datumsformat';
+			return false;
+		}
+	}
+	
+	/**
+	 * Liefert einen UNIX Timestamp von einem String im
+	 * Format "2007-01-31 14:30:12"
 	 */
 	function mktime_fromtimestamp($timestamp)
 	{		

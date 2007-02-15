@@ -108,9 +108,9 @@
 				
 				$sql_query = "SELECT DISTINCT vorname, nachname, uid FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter 
 								WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND
-								studiensemester_kurzbz='$stsem' AND
 								tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-								mitarbeiter_uid=uid ORDER BY nachname, vorname, uid";
+								mitarbeiter_uid=uid AND uid='$user' ORDER BY nachname, vorname, uid";
+								//studiensemester_kurzbz='$stsem' AND
 			
 				if($result = pg_query($sql_conn, $sql_query))
 				{

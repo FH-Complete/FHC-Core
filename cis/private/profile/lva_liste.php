@@ -63,7 +63,7 @@
 	if ($num_rows>0)
 	{
 		echo '<BR><BR><table border="0">';
-		echo '<tr class="liste"><th>LVNR</th><th>Lehrfach</th><th>Lehrform</th><th>Bezeichnung</th><th>Lektor</th><th>STG</th><th>S</th><th>V</th><th>G</th><th>Gruppe</th><th>Raumtyp</th><th>Alternativ</th><th>Block</th><th>WR</th><th>Std</th><th>KW</th><th>Anmerkung</th></tr>';
+		echo '<tr class="liste"><th>LVNR</th><th>Lehrfach</th><th>Lehrform</th><th>LV Bezeichnung</th><th>Lehrfach Bezeichnung</th><th>Lektor</th><th>STG</th><th>S</th><th>V</th><th>G</th><th>Gruppe</th><th>Raumtyp</th><th>Alternativ</th><th>Block</th><th>WR</th><th>Std</th><th>KW</th><th>Anmerkung</th></tr>';
 		for ($i=0; $i<$num_rows; $i++)
 		{
 			$zeile=$i % 2;
@@ -73,6 +73,10 @@
 			echo '<td>'.$row->lvnr.'</td>';
 			echo '<td>'.$row->lehrfach.'</td>';
 			echo '<td>'.$row->lehrform_kurzbz.'</td>';
+			$qry = "SELECT bezeichnung FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='$row->lehrveranstaltung_id'";
+			$result_lv = pg_query($conn, $qry);			
+			$row_lv = pg_fetch_object($result_lv);
+			echo '<td>'.$row_lv->bezeichnung.'</td>';
 			echo '<td>'.$row->lehrfach_bez.'</td>';
 			echo '<td>'.$row->lektor.'</td>';
 			echo '<td>'.$row->stg_kurzbz.'</td>';
