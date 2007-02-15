@@ -157,7 +157,7 @@ if($result = pg_query($conn_fas, $qry))
 									{
 										$error=true;
 										$error_log.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." heißt ".$row->vorname." ".$row->familienname.".";
-										$error_log.="\nPerson in der Datenbank heißt aber: ".$rowz->vorname." ".$rowz->nachname.".\n";
+										$error_log.="\nPerson in der Datenbank heißt aber: ".$rowz->vorname." ".$rowz->nachname.".\n\n";
 									}
 									
 								}
