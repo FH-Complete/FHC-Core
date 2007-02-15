@@ -61,7 +61,8 @@ $qry = "SELECT
 		WHERE 
 			person.uid='$user' AND 
 			person.person_pk=student.person_fk AND
-			studiengang.studiengang_pk=student.studiengang_fk			
+			studiengang.studiengang_pk=student.studiengang_fk 
+		ORDER BY aufgenommenam DESC LIMIT 1
 			";
 
 if(!$row=pg_fetch_object(pg_query($conn,$qry)))
