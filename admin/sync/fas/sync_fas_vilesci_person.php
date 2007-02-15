@@ -153,7 +153,7 @@ if($result = pg_query($conn_fas, $qry))
 								{
 									$person->new=false;
 									$person->person_id=$rowz->person_id;
-									if($rowz->nachname!=$row->familienname OR $rowz->vorname!=$row-vorname)
+									if($rowz->nachname!=$row->familienname || $rowz->vorname!=$row-vorname)
 									{
 										$error=true;
 										$error_log.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." heißt ".$row->vorname." ".$row->familienname.".";
