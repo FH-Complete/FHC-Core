@@ -119,13 +119,13 @@ if($result = pg_query($conn_fas, $qry))
 					{
 						if($rowp=pg_fetch_object($resultp))
 						{
-							if (trim($rowp->titelpre)!=$person->titelpre)
+							if (trim($rowp->titelpre)!=$person->titelpre && trim($person->titelpre)!='')
 							{
 								$error=true;
 								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Titel ".$person->titelpre.".";
 								$text.="\nPerson in der Datenbank hat aber: ".$rowp->titelpre.".\n";	
 							}
-							if (trim($rowp->titelpost)!=$person->titelpost)
+							if (trim($rowp->titelpost)!=$person->titelpost&& trim($person->titelpost)!='')
 							{
 								$error=true;
 								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Postnomentitel ".$person->titelpost.".";
@@ -143,19 +143,19 @@ if($result = pg_query($conn_fas, $qry))
 								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Ersatzkennzeichen ".$person->ersatzkennzeichen.".";
 								$text.="\nPerson in der Datenbank hat aber: ".$rowp->ersatzkennzeichen.".\n";	
 							}
-							if (trim($rowp->nachname)!=$person->nachname)
+							if (trim($rowp->nachname)!=$person->nachname && trim($person->nachname)!='')
 							{
 								$error=true;
 								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Nachname ".$person->nachname.".";
 								$text.="\nPerson in der Datenbank hat aber: ".$rowp->nachname.".\n";	
 							}
-							if (trim($rowp->vorname)!=$person->vorname)
+							if (trim($rowp->vorname)!=$person->vorname && trim($person->vorname)!='')
 							{
 								$error=true;
 								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Vorname ".$person->vorname.".";
 								$text.="\nPerson in der Datenbank hat aber: ".$rowp->vorname.".\n";	
 							}
-							if (trim($rowp->vornamen)!=$person->vornamen)
+							if (trim($rowp->vornamen)!=$person->vornamen && trim($person->vornamen)!='')
 							{
 								$error=true;
 								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Vornamen ".$person->vornamen.".";
@@ -199,13 +199,13 @@ if($result = pg_query($conn_fas, $qry))
 								{
 									if($rowp=pg_fetch_object($resultp))
 									{
-										if (trim($rowp->titelpre)!=$person->titelpre)
+										if (trim($rowp->titelpre)!=$person->titelpre && trim($person->titelpre)!='')
 										{
 											$error=true;
 											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Titel ".$person->titelpre.".";
 											$text.="\nPerson in der Datenbank hat aber: ".$rowp->titelpre.".\n";	
 										}
-										if (trim($rowp->titelpost)!=$person->titelpost)
+										if (trim($rowp->titelpost)!=$person->titelpost && trim($person->titelpost)!='')
 										{
 											$error=true;
 											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Postnomentitel ".$person->titelpost.".";
@@ -223,19 +223,19 @@ if($result = pg_query($conn_fas, $qry))
 											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Ersatzkennzeichen ".$person->ersatzkennzeichen.".";
 											$text.="\nPerson in der Datenbank hat aber: ".$rowp->ersatzkennzeichen.".\n";	
 										}
-										if (trim($rowp->nachname)!=$person->nachname)
+										if (trim($rowp->nachname)!=$person->nachname && trim($person->nachname)!='')
 										{
 											$error=true;
 											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Nachname ".$person->nachname.".";
 											$text.="\nPerson in der Datenbank hat aber: ".$rowp->nachname.".\n";	
 										}
-										if (trim($rowp->vorname)!=$person->vorname)
+										if (trim($rowp->vorname)!=$person->vorname && trim($person->vorname)!='')
 										{
 											$error=true;
 											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Vorname ".$person->vorname.".";
 											$text.="\nPerson in der Datenbank hat aber: ".$rowp->vorname.".\n";	
 										}
-										if (trim($rowp->vornamen)!=$person->vornamen)
+										if (trim($rowp->vornamen)!=$person->vornamen && trim($person->vornamen)!='')
 										{
 											$error=true;
 											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Vornamen ".$person->vornamen.".";
@@ -283,25 +283,25 @@ if($result = pg_query($conn_fas, $qry))
 									$person->person_id=$rowz->person_id;
 
 									//Plausi-Checks
-									if($rowz->titelpre!=$person->titelpre)
+									if($rowz->titelpre!=$person->titelpre && trim($person->titelpre)!='')
 									{
 										$error=true;
 										$text.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." hat Titel ".$person->titelpre.".";
 										$text.="\nPerson in der Datenbank hat aber: ".$rowz->titelpre.".\n\n";
 									}
-									if($rowz->titelpost!=$person->titelpost)
+									if($rowz->titelpost!=$person->titelpost && trim($person->titelpost)!='')
 									{
 										$error=true;
 										$text.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." hat Postnomentitel ".$person->titelpost.".";
 										$text.="\nPerson in der Datenbank hat aber: ".$rowz->titelpost.".\n\n";
 									}
-									if(($rowz->nachname!=$row->familienname) || ($rowz->vorname!=$row->vorname))
+									if(($rowz->nachname!=$row->familienname && trim($person->nachname)!='') || ($rowz->vorname!=$row->vorname && trim($person->vorname)!=''))
 									{
 										$error=true;
 										$text.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." heißt ".$row->vorname." ".$row->familienname.".";
 										$text.="\nPerson in der Datenbank heißt aber: ".$rowz->vorname." ".$rowz->nachname.".\n\n";
 									}
-									if(trim($rowz->vornamen)!=$person->vornamen)
+									if(trim($rowz->vornamen)!=$person->vornamen && trim($person->vornamen)!='')
 									{
 										$error=true;
 										$text.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." hat Vornamen ".$person->vornamen.".";
