@@ -23,8 +23,8 @@ $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlg
 
 //set_time_limit(60);
 
-//$adress='ruhan@technikum-wien.at; pam@technikum-wien.at';
-$adress='fas_sync@technikum-wien.at';
+$adress='ruhan@technikum-wien.at';
+//$adress='fas_sync@technikum-wien.at';
 
 $error_log='';
 $text = '';
@@ -64,8 +64,8 @@ if($result = pg_query($conn_fas, $qry))
 		$person->gebdatum=$row->gebdat;
 		$person->gebort=$row->gebort;
 		$person->anmerkungen=$row->bemerkung;
-		$person->svnr=$row->svnr;
-		$person->ersatzkennzeichen=$row->ersatzkennzeichen;
+		$person->svnr=trim($row->svnr);
+		$person->ersatzkennzeichen=trim($row->ersatzkennzeichen);
 		$person->familienstand=$row->familienstand;
 		$person->anzahlkinder=$row->anzahlderkinder;
 		$person->staatsbuergerschaft=$row->staatsbuergerschaft;
@@ -113,6 +113,66 @@ if($result = pg_query($conn_fas, $qry))
 					//update
 					$person->person_id=$rowu->person_id;
 					$person->new=false;
+					//Plausi-Checks
+					$qry="SELECT * FROM public.tbl_person WHERE person_id='$rowu->person_id'";
+					if($resultp = pg_query($conn, $qry))
+					{
+						if($rowp=pg_fetch_object($resultp))
+						{
+							if (trim($rowp->titelpre)!=$person->titelpre)
+							{
+								$error=true;
+								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Titel ".$person->titelpre.".";
+								$text.="\nPerson in der Datenbank hat aber: ".$rowp->titelpre.".\n";	
+							}
+							if (trim($rowp->titelpost)!=$person->titelpost)
+							{
+								$error=true;
+								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Postnomentitel ".$person->titelpost.".";
+								$text.="\nPerson in der Datenbank hat aber: ".$rowp->titelpost.".\n";	
+							}
+							if (trim($rowp->svnr)!=$person->svnr && trim($rowp->svnr)!='' && $rowp->svnr!=null )
+							{
+								$error=true;
+								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat SVNr ".$person->svnr.".";
+								$text.="\nPerson in der Datenbank hat aber: ".$rowp->svnr.".\n";	
+							}
+							if (trim($rowp->ersatzkennzeichen)!=$person->ersatzkennzeichen && trim($rowp->ersatzkennzeichen)!='' && $rowp->ersatzkennzeichen!=null )
+							{
+								$error=true;
+								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Ersatzkennzeichen ".$person->ersatzkennzeichen.".";
+								$text.="\nPerson in der Datenbank hat aber: ".$rowp->ersatzkennzeichen.".\n";	
+							}
+							if (trim($rowp->nachname)!=$person->nachname)
+							{
+								$error=true;
+								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Nachname ".$person->nachname.".";
+								$text.="\nPerson in der Datenbank hat aber: ".$rowp->nachname.".\n";	
+							}
+							if (trim($rowp->vorname)!=$person->vorname)
+							{
+								$error=true;
+								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Vorname ".$person->vorname.".";
+								$text.="\nPerson in der Datenbank hat aber: ".$rowp->vorname.".\n";	
+							}
+							if (trim($rowp->vornamen)!=$person->vornamen)
+							{
+								$error=true;
+								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Vornamen ".$person->vornamen.".";
+								$text.="\nPerson in der Datenbank hat aber: ".$rowp->vornamen.".\n";	
+							}
+							if ($error)
+							{
+								$error_log.="*****\n".$text."*****\n";
+								$text="";
+							}
+						}
+					}
+					else 
+					{
+						$error=true;
+						$error_log.="person von $row->uid konnte nicht gefunden werden\n";
+					}
 				}
 				else
 				{
@@ -132,6 +192,74 @@ if($result = pg_query($conn_fas, $qry))
 							//update
 							$person->person_id=$row1->person_portal;
 							$person->new=false;
+							$qry="SELECT * FROM public.tbl_person WHERE person_id='$person->person_id'";
+							if($resultp = pg_query($conn, $qry))
+							{
+								if(pg_num_rows($result1)>0) //eintrag überhaupt vorhanden?
+								{
+									if($rowp=pg_fetch_object($resultp))
+									{
+										if (trim($rowp->titelpre)!=$person->titelpre)
+										{
+											$error=true;
+											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Titel ".$person->titelpre.".";
+											$text.="\nPerson in der Datenbank hat aber: ".$rowp->titelpre.".\n";	
+										}
+										if (trim($rowp->titelpost)!=$person->titelpost)
+										{
+											$error=true;
+											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Postnomentitel ".$person->titelpost.".";
+											$text.="\nPerson in der Datenbank hat aber: ".$rowp->titelpost.".\n";	
+										}
+										if (trim($rowp->svnr)!=$person->svnr && trim($rowp->svnr)!='' && $rowp->svnr!=null )
+										{
+											$error=true;
+											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat SVNr ".$person->svnr.".";
+											$text.="\nPerson in der Datenbank hat aber: ".$rowp->svnr.".\n";	
+										}
+										if (trim($rowp->ersatzkennzeichen)!=$person->ersatzkennzeichen && trim($rowp->ersatzkennzeichen)!='' && $rowp->ersatzkennzeichen!=null )
+										{
+											$error=true;
+											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Ersatzkennzeichen ".$person->ersatzkennzeichen.".";
+											$text.="\nPerson in der Datenbank hat aber: ".$rowp->ersatzkennzeichen.".\n";	
+										}
+										if (trim($rowp->nachname)!=$person->nachname)
+										{
+											$error=true;
+											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Nachname ".$person->nachname.".";
+											$text.="\nPerson in der Datenbank hat aber: ".$rowp->nachname.".\n";	
+										}
+										if (trim($rowp->vorname)!=$person->vorname)
+										{
+											$error=true;
+											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Vorname ".$person->vorname.".";
+											$text.="\nPerson in der Datenbank hat aber: ".$rowp->vorname.".\n";	
+										}
+										if (trim($rowp->vornamen)!=$person->vornamen)
+										{
+											$error=true;
+											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Vornamen ".$person->vornamen.".";
+											$text.="\nPerson in der Datenbank hat aber: ".$rowp->vornamen.".\n";	
+										}
+										if ($error)
+										{
+											$error_log.="*****\n".$text."*****\n";
+											$text="";
+										}
+									}
+								}
+								else 
+								{
+									$error=true;
+									$error_log.="syncperson-eintrag mit person_id='$row1->person_id' nicht in tbl_person gefunden\n";
+								}
+								
+							}
+							else 
+							{
+								$error=true;
+								$error_log.="person von $row->uid konnte nicht gefunden werden\n";
+							}
 						}
 						else
 						{
@@ -142,9 +270,9 @@ if($result = pg_query($conn_fas, $qry))
 					else
 					{
 						//vergleich svnr und ersatzkennzeichen
-						$qry="SELECT person_id, nachname, vorname FROM public.tbl_person
-							WHERE ('$row->svnr' is not null AND '$row->svnr' <> '' AND svnr = '$row->svnr')
-								OR ('$row->ersatzkennzeichen' is not null AND '$row->ersatzkennzeichen' <> '' AND ersatzkennzeichen = '$row->ersatzkennzeichen')";
+						$qry="SELECT * FROM public.tbl_person 
+							WHERE ('$row->svnr' is not null AND '$row->svnr' <> '' AND svnr = '$row->svnr') 
+							OR ('$row->ersatzkennzeichen' is not null AND '$row->ersatzkennzeichen' <> '' AND ersatzkennzeichen = '$row->ersatzkennzeichen')";
 						if($resultz = pg_query($conn, $qry))
 						{
 							if(pg_num_rows($resultz)>0) //wenn dieser eintrag schon vorhanden ist
@@ -153,13 +281,37 @@ if($result = pg_query($conn_fas, $qry))
 								{
 									$person->new=false;
 									$person->person_id=$rowz->person_id;
+
+									//Plausi-Checks
+									if($rowz->titelpre!=$person->titelpre)
+									{
+										$error=true;
+										$text.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." hat Titel ".$person->titelpre.".";
+										$text.="\nPerson in der Datenbank hat aber: ".$rowz->titelpre.".\n\n";
+									}
+									if($rowz->titelpost!=$person->titelpost)
+									{
+										$error=true;
+										$text.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." hat Postnomentitel ".$person->titelpost.".";
+										$text.="\nPerson in der Datenbank hat aber: ".$rowz->titelpost.".\n\n";
+									}
 									if(($rowz->nachname!=$row->familienname) || ($rowz->vorname!=$row->vorname))
 									{
 										$error=true;
-										$error_log.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." heißt ".$row->vorname." ".$row->familienname.".";
-										$error_log.="\nPerson in der Datenbank heißt aber: ".$rowz->vorname." ".$rowz->nachname.".\n\n";
+										$text.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." heißt ".$row->vorname." ".$row->familienname.".";
+										$text.="\nPerson in der Datenbank heißt aber: ".$rowz->vorname." ".$rowz->nachname.".\n\n";
 									}
-
+									if(trim($rowz->vornamen)!=$person->vornamen)
+									{
+										$error=true;
+										$text.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." hat Vornamen ".$person->vornamen.".";
+										$text.="\nPerson in der Datenbank hat aber: ".$rowz->vornamen.".\n\n";
+									}
+									if ($error)
+									{
+										$error_log.="*****\n".$text."*****\n";
+										$text="";
+									}
 								}
 								else
 								{
