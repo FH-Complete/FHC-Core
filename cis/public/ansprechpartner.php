@@ -167,6 +167,33 @@ else
 		  	  <td nowrap>&nbsp;</td>
 		  	  <td nowrap>&nbsp;</td>
 		  	</tr>
+		  	<tr>
+		      <td width="260" nowrap><strong>Empfang</strong></td>
+			  <td width="50" nowrap>&nbsp;</td>
+			  <td  nowrap>&nbsp;</td>
+			  <td width="56" nowrap>&nbsp;</td>
+			  <td nowrap>&nbsp;</td>
+			</tr>
+			<tr>
+		  	  <td width="260" nowrap>Schantl Ingrid</td>
+		  	  <td width="50" nowrap>100</td>
+		  	  <td nowrap><?php echo ($visible?'<a class="Item" href="mailto:schantl@technikum-wien.at">schantl@technikum-wien.at</a>':'')?></td>
+		  	  <td width="56" nowrap>&nbsp;</td>
+			  <td nowrap>Termin nach Vereinbarung</td>
+		  	</tr>
+		  	<tr>
+		  	  <td width="260" nowrap>Isailovic Zivka</td>
+		  	  <td width="50" nowrap>224</td>
+		  	  <td nowrap><?php echo ($visible?'<a class="Item" href="mailto:isailovic@technikum-wien.at">isailovic@technikum-wien.at</a>':'')?></td>
+		  	  <td width="56" nowrap>&nbsp;</td>
+			  <td nowrap>Termin nach Vereinbarung</td>
+		  	</tr>
+		  	<tr>
+		  	  <td colspan="2" nowrap>&nbsp;</td>
+		  	  <td nowrap>&nbsp;</td>
+		  	  <td nowrap>&nbsp;</td>
+		  	  <td nowrap>&nbsp;</td>
+		  	</tr>
 			<tr>
 			  <td width="280" colspan="2" nowrap class="ContentHeader2">&nbsp;Systementwicklung</td>
 			  <td  class="ContentHeader2" nowrap>&nbsp;</td>
