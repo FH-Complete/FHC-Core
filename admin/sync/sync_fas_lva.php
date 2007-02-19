@@ -8,7 +8,7 @@ $conn_fas=pg_connect(CONN_STRING_FAS);
 //$adress='fas_sync@technikum-wien.at';
 $adress='fas_sync@technikum-wien.at';
 //$adress_stpl='stpl@technikum-wien.at';
-$adress_stpl='stpl@technikum-wien.at';
+$adress_stpl='lv-plan@technikum-wien.at';
 $adress_fas='fas_sync@technikum-wien.at';
 
 
@@ -235,7 +235,7 @@ $qry="select studiengang_kz,email,upper(typ::varchar(1) || kurzbz) as kurzbz FRO
 $result=pg_query($conn, $qry);
 while ($row=pg_fetch_object($result))
 {
-	$stg_mail[$row->studiengang_kz] = $row->email;//'oesi@technikum-wien.at';
+	$stg_mail[$row->studiengang_kz] = $row->email; //'oesi@technikum-wien.at';
 	$stg_kurzbz[$row->studiengang_kz]=$row->kurzbz;
 }
 
@@ -574,7 +574,7 @@ for ($i=0;$i<$num_rows;$i++)
 				{
 					if(pg_num_rows($result_gruppen)==0)
 					{
-						if($row->einheit_kurzbz!='' && isset($einheit[$row->einheit_kurzbz]))
+						if($row->einheit_kurzbz=='' || isset($einheit[$row->einheit_kurzbz]))
 						{
 							//Gruppeneintrag hinzuguegen
 							$sql_query = 'INSERT INTO lehre.tbl_lehreinheitgruppe(lehreinheit_id, studiengang_kz, semester,'.
