@@ -33,6 +33,7 @@ $anzahl_quelle=0;
 $anzahl_eingefuegt=0;
 $anzahl_update=0;
 $anzahl_fehler=0;
+$plausi='';
 
 
 /*************************
@@ -47,6 +48,134 @@ $anzahl_fehler=0;
 <body>
 
 <?php
+
+$qry="
+SELECT 
+p1.person_pk as person1, p1.familienname as familienname1, p1.vorname as vorname1, p1.vornamen as vornamen1, p1.geschlecht as geschlecht1, 
+p1.gebdat as gebdat1, p1.gebort as gebort1, p1.staatsbuergerschaft as staatsbuergerschaft1, p1.familienstand as familienstand1, 
+p1.svnr as svnr1, p1. ersatzkennzeichen  as ersatzkennzeichen1, p1.anrede as anrede1, p1.anzahlderkinder as anzahlderkinder1, 
+p1.bismelden as bismelden1, p1.titel as titel1,  p1.uid as uid1, p1.gebnation as gebnation1, p1.postnomentitel as postnomentitel1, 
+p2.person_pk as person2, p2.familienname as familienname2, p2.vorname as vorname2, p2.vornamen as vornamen2, p2.geschlecht as geschlecht2, 
+p2.gebdat as gebdat2, p2.gebort as gebort2, p2.staatsbuergerschaft as staatsbuergerschaft2, p2.familienstand as familienstand2, 
+p2.svnr as svnr2, p2. ersatzkennzeichen  as ersatzkennzeichen2, p2.anrede as anrede2, p2.anzahlderkinder as anzahlderkinder2, 
+p2.bismelden as bismelden2, p2.titel as titel2,  p2.uid as uid2, p2.gebnation as gebnation2, p2.postnomentitel as postnomentitel2
+FROM person AS p1, person AS p2 WHERE 
+((p1.gebdat=p2.gebdat AND p1.familienname=p2.familienname AND p1.svnr='' AND p1.ersatzkennzeichen='') 
+OR ((p1.ersatzkennzeichen=p2.ersatzkennzeichen AND p1.ersatzkennzeichen<>'') OR (p1.svnr=p2.svnr AND p1.svnr<>'')))
+AND (p1.person_pk <> p2.person_pk)
+AND (p1.familienname<>p2.familienname OR p1.vorname<>p2.vorname OR p1.vornamen<>p2.vornamen OR p1.geschlecht<>p2.geschlecht OR p1.gebdat<>p2.gebdat OR p1.staatsbuergerschaft<> p2.staatsbuergerschaft OR p1.familienstand<>p2.familienstAND OR p1.svnr<>p2.svnr OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.anrede<>p2.anrede OR p1.anzahlderkinder<>p2.anzahlderkinder OR p1.bismelden<>p2.bismelden OR p1.titel<>p2.titel OR p1.uid<>p2.uid OR p1.gebnation<>p2.gebnation OR p1.postnomentitel<> p2.postnomentitel) 
+order by p1.familienname limit 10;
+";
+//AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400')
+
+$error_log_fas="Überprüfung Personendaten im FAS\n\n";
+echo nl2br($error_log_fas);
+
+if($resultp = pg_query($conn_fas, $qry))
+{
+	while($rowp=pg_fetch_object($resultp))
+	{
+		$plausi='';
+		if ($rowp->geschlecht1<>$rowp->geschlecht2)
+		{
+			$plausi="Geschlecht der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->geschlecht1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->geschlecht2."'.\n";
+			$error=true;
+		}
+		if ($rowp->familienname1<>$rowp->familienname2)
+		{
+			$plausi.="Familienname der Person ".$rowp->uid1." (".$rowp->person1.") ist '".$rowp->familienname1."' bei ".$rowp->uid2." (".$rowp->person2.")  aber '".$rowp->familienname2."'.\n";
+			$error=true;
+		}
+		if ($rowp->vorname1<>$rowp->vorname2)
+		{
+			$plausi.="Vorname der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->vorname1."' bei ".$rowp->person2." aber '".$rowp->vorname2."'.\n";
+			$error=true;
+		}
+		if ($rowp->vornamen1<>$rowp->vornamen2)
+		{
+			$plausi.="Vornamen der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->vornamen1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->vornamen2."'.\n";
+			$error=true;
+		}
+		if ($rowp->gebdat1<>$rowp->gebdat2)
+		{
+			$plausi.="Geburtsdatum der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->gebdat1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->gebdat2."'.\n";
+			$error=true;
+		}
+		if ($rowp->gebort1<>$rowp->gebort2)
+		{
+			$plausi.="Geburtsort der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->gebort1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->gebort2."'.\n";
+			$error=true;
+		}
+		if ($rowp->staatsbuergerschaft1<>$rowp->staatsbuergerschaft2)
+		{
+			$plausi.="Staatsbürgerschaft der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->staatsbuergerschaft1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->staatsbuergerschaft2."'.\n";
+			$error=true;
+		}
+		if ($rowp->familienstand1<>$rowp->familienstand2)
+		{
+			$plausi.="Familienstand der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->familienstand1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->familienstand2."'.\n";
+			$error=true;
+		}
+		if ($rowp->svnr1<>$rowp->svnr2)
+		{
+			$plausi.="Sozialversicherung der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->svnr1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->svnr2."'.\n";
+			$error=true;
+		}
+		if ($rowp->ersatzkennzeichen1<>$rowp->ersatzkennzeichen2)
+		{
+			$plausi.="Ersatzkennzeichen der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->ersatzkennzeichen1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->ersatzkennzeichen2."'.\n";
+			$error=true;
+		}
+		if ($rowp->anrede1<>$rowp->anrede2)
+		{
+			$plausi.="Anrede der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->anrede1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->anrede2."'.\n";
+			$error=true;
+		}
+		if ($rowp->anzahlderkinder1<>$rowp->anzahlderkinder2)
+		{
+			$plausi.="Anzahl der Kinder der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->anzahlderkinder1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->anzahlderkinder2."'.\n";
+			$error=true;
+		}
+		if ($rowp->bismelden1<>$rowp->bismelden2)
+		{
+			$plausi.="Bismelden der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->bismelden1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->bismelden2."'.\n";
+			$error=true;
+		}
+		if ($rowp->titel1<>$rowp->titel2)
+		{
+			$plausi.="Titel der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->titel1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->titel2."'.\n";
+			$error=true;
+		}
+		if ($rowp->uid1<>$rowp->uid2)
+		{
+			$plausi.="UID der Person ".$rowp->person1." / ".$rowp->familienname1." ist '".$rowp->uid1."' bei ".$rowp->person2." / ".$rowp->familienname2." aber '".$rowp->uid2."'.\n";
+			$error=true;
+		}
+		if ($rowp->gebnation1<>$rowp->gebnation2)
+		{
+			$plausi.="Geburtsnation der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->gebnation1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->gebnation2."'.\n";
+			$error=true;
+		}
+		if ($rowp->postnomentitel1<>$rowp->postnomentitel2)
+		{
+			$plausi.="Postnomentitel der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->postnomentitel1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->postnomentitel2."'.\n";
+			$error=true;
+		}
+		if ($error)
+		{
+			$plausi="*****\n".$plausi."*****\n";
+			echo nl2br ($plausi);
+			$error_log_fas.=$plausi;
+			ob_flush();
+			flush();
+			$error=false;
+		}
+	}
+}
+mail($adress, 'SYNC Personen (Plausicheck)', $error_log_fas,"From: vilesci@technikum-wien.at");
+$error_log_fas='';
+exit;
+
 $qry = "SELECT * FROM person";
 if($result = pg_query($conn_fas, $qry))
 {
@@ -102,7 +231,7 @@ if($result = pg_query($conn_fas, $qry))
 		{
 			$person->geschlecht='m';
 		}
-
+	
 		$error=false;
 
 		$qry="SELECT person_id FROM public.tbl_benutzer WHERE uid='$row->uid'";
@@ -115,96 +244,6 @@ if($result = pg_query($conn_fas, $qry))
 					//update
 					$person->person_id=$rowu->person_id;
 					$person->new=false;
-					//Plausi-Checks
-					$qry="SELECT * FROM public.tbl_person WHERE person_id='$rowu->person_id'";
-					if($resultp = pg_query($conn, $qry))
-					{
-						if($rowp=pg_fetch_object($resultp))
-						{
-							if (trim($rowp->titelpre)!=$person->titelpre)
-							{
-								$error=true;
-								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Titel ".$person->titelpre.".";
-								$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->titelpre.".\n";	
-							}
-							if (trim($rowp->titelpost)!=$person->titelpost)
-							{
-								$error=true;
-								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Postnomentitel ".$person->titelpost.".";
-								$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->titelpost.".\n";	
-							}
-							if (trim($rowp->svnr)!=$person->svnr && trim($rowp->svnr)!='' && $rowp->svnr!=null )
-							{
-								$error=true;
-								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat SVNr ".$person->svnr.".";
-								$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->svnr.".\n";	
-							}
-							if (trim($rowp->ersatzkennzeichen)!=$person->ersatzkennzeichen && trim($rowp->ersatzkennzeichen)!='' && $rowp->ersatzkennzeichen!=null )
-							{
-								$error=true;
-								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Ersatzkennzeichen ".$person->ersatzkennzeichen.".";
-								$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->ersatzkennzeichen.".\n";	
-							}
-							if (trim($rowp->nachname)!=$person->nachname)
-							{
-								$error=true;
-								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Nachname ".$person->nachname.".";
-								$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->nachname.".\n";	
-							}
-							if (trim($rowp->vorname)!=$person->vorname)
-							{
-								$error=true;
-								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Vorname ".$person->vorname.".";
-								$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->vorname.".\n";	
-							}
-							if (trim($rowp->vornamen)!=$person->vornamen)
-							{
-								$error=true;
-								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Vornamen ".$person->vornamen.".";
-								$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->vornamen.".\n";	
-							}
-							if (trim($rowp->anrede)!=$person->anrede)
-							{
-								$error=true;
-								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Anrede ".$person->anrede.".";
-								$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->anrede.".\n";	
-							}
-							if (trim($rowp->gebdatum)!=$person->gebdatum)
-							{
-								$error=true;
-								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Geburtsdatum ".$person->gebdatum.".";
-								$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->gebdatum.".\n";	
-							}
-							if (trim($rowp->gebort)!=$person->gebort)
-							{
-								$error=true;
-								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Geburtsort ".$person->gebort.".";
-								$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->gebort.".\n";	
-							}
-							if (trim($rowp->familienstand)!=$person->familienstand)
-							{
-								$error=true;
-								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Familienstand ".$person->familienstand.".";
-								$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->familienstand.".\n";	
-							}
-							if (trim($rowp->anzahlkinder)!=$person->anzahlkinder)
-							{
-								$error=true;
-								$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Anzahl an Kinder ".$person->anzahlkinder.".";
-								$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->anzahlkinder.".\n";	
-							}
-							if ($error)
-							{
-								$error_log_fas.="*****\n".$text."*****\n";
-								$text="";
-							}
-						}
-					}
-					else 
-					{
-						$error=true;
-						$error_log.="person von $row->uid konnte nicht gefunden werden\n";
-					}
 				}
 				else
 				{
@@ -223,117 +262,7 @@ if($result = pg_query($conn_fas, $qry))
 						{
 							//update
 							$person->person_id=$row1->person_portal;
-							$person->new=false;
-							$qry="SELECT * FROM public.tbl_person WHERE person_id='$person->person_id'";
-							if($resultp = pg_query($conn, $qry))
-							{
-								if(pg_num_rows($result1)>0) //eintrag überhaupt vorhanden?
-								{
-									if($rowp=pg_fetch_object($resultp))
-									{
-										if (trim($rowp->titelpre)!=$person->titelpre)
-										{
-											$error=true;
-											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Titel ".$person->titelpre.".";
-											$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->titelpre.".\n";	
-										}
-										if (trim($rowp->titelpost)!=$person->titelpost)
-										{
-											$error=true;
-											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Postnomentitel ".$person->titelpost.".";
-											$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->titelpost.".\n";	
-										}
-										if (trim($rowp->svnr)!=$person->svnr && trim($rowp->svnr)!='' && $rowp->svnr!=null )
-										{
-											$error=true;
-											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat SVNr ".$person->svnr.".";
-											$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->svnr.".\n";	
-										}
-										if (trim($rowp->ersatzkennzeichen)!=$person->ersatzkennzeichen && trim($rowp->ersatzkennzeichen)!='' && $rowp->ersatzkennzeichen!=null )
-										{
-											$error=true;
-											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Ersatzkennzeichen ".$person->ersatzkennzeichen.".";
-											$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->ersatzkennzeichen.".\n";	
-										}
-										if (trim($rowp->nachname)!=$person->nachname)
-										{
-											$error=true;
-											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Nachname ".$person->nachname.".";
-											$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->nachname.".\n";	
-										}
-										if (trim($rowp->vorname)!=$person->vorname)
-										{
-											$error=true;
-											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Vorname ".$person->vorname.".";
-											$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->vorname.".\n";	
-										}
-										if (trim($rowp->vornamen)!=$person->vornamen)
-										{
-											$error=true;
-											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Vornamen ".$person->vornamen.".";
-											$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->vornamen.".\n";	
-										}
-										if (trim($rowp->anrede)!=$person->anrede)
-										{
-											$error=true;
-											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Anrede ".$person->anrede.".";
-											$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->anrede.".\n";	
-										}
-										if (trim($rowp->gebdatum)!=$person->gebdatum)
-										{
-											$error=true;
-											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Geburtsdatum ".$person->gebdatum.".";
-											$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->gebdatum.".\n";	
-										}
-										if (trim($rowp->gebort)!=$person->gebort)
-										{
-											$error=true;
-											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Geburtsort ".$person->gebort.".";
-											$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->gebort.".\n";	
-										}
-										if (trim($rowp->familienstand)!=$person->familienstand)
-										{
-											$error=true;
-											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Familienstand ".$person->familienstand.".";
-											$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->familienstand.".\n";	
-										}
-										if (trim($rowp->anzahlkinder)!=$person->anzahlkinder)
-										{
-											$error=true;
-											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Anzahl an Kinder ".$person->anzahlkinder.".";
-											$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->anzahlkinder.".\n";	
-										}
-										if (trim($rowp->staatsbuergerschaft)!=$person->staatsbuergerschaft)
-										{
-											$error=true;
-											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Staatsbürgerschaft ".$person->staatsbuergerschaft.".";
-											$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->staatsbuergerschaft.".\n";	
-										}
-										if (trim($rowp->geburtsnation)!=$person->geburtsnation)
-										{
-											$error=true;
-											$text.="Person ".$person->nachname.", ".$person->vorname." mit UID: ".$row->uid." hat Geburtsnation ".$person->geburtsnation.".";
-											$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowp->geburtsnation.".\n";	
-										}
-										if ($error)
-										{
-											$error_log_fas.="*****\n".$text."*****\n";
-											$text="";
-										}
-									}
-								}
-								else 
-								{
-									$error=true;
-									$error_log.="syncperson-eintrag mit person_id='$row1->person_id' nicht in tbl_person gefunden\n";
-								}
-								
-							}
-							else 
-							{
-								$error=true;
-								$error_log.="person von $row->uid konnte nicht gefunden werden\n";
-							}
+							$person->new=false;								
 						}
 						else
 						{
@@ -356,84 +285,6 @@ if($result = pg_query($conn_fas, $qry))
 									$person->new=false;
 									$person->person_id=$rowz->person_id;
 
-									//Plausi-Checks
-									if($rowz->titelpre!=$person->titelpre)
-									{
-										$error=true;
-										$text.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." hat Titel ".$person->titelpre.".";
-										$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowz->titelpre.".\n\n";
-									}
-									if($rowz->titelpost!=$person->titelpost)
-									{
-										$error=true;
-										$text.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." hat Postnomentitel ".$person->titelpost.".";
-										$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowz->titelpost.".\n\n";
-									}
-									if(($rowz->nachname!=$row->familienname) || ($rowz->vorname!=$row->vorname))
-									{
-										$error=true;
-										$text.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." heißt ".$row->vorname." ".$row->familienname.".";
-										$text.="\nPerson in der Vilesci-Datenbank heißt aber: ".$rowz->vorname." ".$rowz->nachname.".\n\n";
-									}
-									if(trim($rowz->vornamen)!=$person->vornamen)
-									{
-										$error=true;
-										$text.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." hat Vornamen ".$person->vornamen.".";
-										$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowz->vornamen.".\n\n";
-									}
-									if($rowz->anrede!=$person->anrede)
-									{
-										$error=true;
-										$text.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." hat Anrede ".$person->anrede.".";
-										$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowz->anrede.".\n\n";
-									}
-									if($rowz->gebdatum!=$person->gebdatum)
-									{
-										$error=true;
-										$text.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." hat Geburtsdatum ".$person->gebdatum.".";
-										$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowz->gebdatum.".\n\n";
-									}
-									if($rowz->gebort!=$person->gebort)
-									{
-										$error=true;
-										$text.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." hat Geburtsort ".$person->gebort.".";
-										$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowz->gebort.".\n\n";
-									}
-									if($rowz->geschlecht!=$person->geschlecht)
-									{
-										$error=true;
-										$text.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." hat Geschlecht ".$person->geschlecht.".";
-										$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowz->geschlecht.".\n\n";
-									}
-									if($rowz->familienstand!=$person->familienstand)
-									{
-										$error=true;
-										$text.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." hat Familienstand ".$person->familienstand.".";
-										$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowz->familienstand.".\n\n";
-									}
-									if($rowz->anzahlkinder!=$person->anzahlkinder)
-									{
-										$error=true;
-										$text.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." hat Anzahl an KInder ".$person->anzahlkinder.".";
-										$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowz->anzahlkinder.".\n\n";
-									}
-									if($rowz->staatsbuergerschaft!=$person->staatsbuergerschaft)
-									{
-										$error=true;
-										$text.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." hat Staatsbürgerschaft ".$person->staatsbuergerschaft.".";
-										$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowz->staatsbuergerschaft.".\n\n";
-									}
-									if($rowz->geburtsnation!=$person->geburtsnation)
-									{
-										$error=true;
-										$text.="Person mit SVNr: ".$row->svnr." oder Ersatzkennzeichen: ".$row->ersatzkennzeichen." hat Geburtsnation ".$person->geburtsnation.".";
-										$text.="\nPerson in der Vilesci-Datenbank hat aber: ".$rowz->geburtsnation.".\n\n";
-									}
-									if ($error)
-									{
-										$error_log_fas.="*****\n".$text."*****\n";
-										$text="";
-									}
 								}
 								else
 								{
@@ -500,12 +351,9 @@ else
 
 //echo nl2br($text);
 echo nl2br("\nLog:\n".$error_log);
-echo nl2br("\nLog FAS:\n".$error_log_fas);
 echo nl2br("\n\nGesamt FAS: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler");
 $error_log="Person Sync\n-------------\n\nGesamt FAS: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n\n".$error_log;
-$error_log_fas="Person Sync\n-------------\n\nGesamt FAS: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n\n".$error_log_fas;
 mail($adress, 'SYNC Personen', $error_log,"From: vilesci@technikum-wien.at");
-mail($adress, 'SYNC Personen FAS-Daten', $error_log_fas,"From: vilesci@technikum-wien.at");
 ?>
 </body>
 </html>
