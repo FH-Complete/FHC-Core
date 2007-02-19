@@ -68,7 +68,7 @@ order by p1.familienname;
 ";
 //AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400')
 
-$error_log_fas="Überprüfung Personendaten im FAS\n\n";
+$error_log_fas="Überprüfung Personendaten im FAS:\n\n";
 echo nl2br($error_log_fas);
 
 if($resultp = pg_query($conn_fas, $qry))
