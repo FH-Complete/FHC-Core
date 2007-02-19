@@ -302,16 +302,19 @@ class lehrveranstaltung
 	 * Speichert den aktuellen Datensatz
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function save()
+	function save($new=null)
 	{
+		if($new==null)
+			$new = $this->new;
+		
 		//Gueltigkeit der Variablen pruefen
 		if(!$this->checkvars())
 			return false;
 			
-		if($this->new)
+		if($new)
 		{
 			//Neuen Datensatz anlegen
-			$qry = 'INSERT INTO lehre.tbl_lehrveranstaltung (studiengang_kz, bezeichnung, kurzbz, 
+			$qry = 'BEGIN; INSERT INTO lehre.tbl_lehrveranstaltung (studiengang_kz, bezeichnung, kurzbz, 
 				semester, ects, semesterstunden,  anmerkung, lehre, lehreverzeichnis, aktiv, ext_id, insertamum, 
 				insertvon, planfaktor, planlektoren, planpersonalkosten, updateamum, updatevon, sprache) VALUES ('.
 				$this->addslashes($this->studiengang_kz).', '.
@@ -371,6 +374,31 @@ class lehrveranstaltung
 		
 		if(pg_query($this->conn, $qry))
 		{
+			if($new)
+			{
+				$qry = "SELECT currval('lehre.tbl_lehrveranstaltung_lehrveranstaltung_id_seq') as id";
+				if($result = pg_query($this->conn, $qry))
+				{
+					if($row = pg_fetch_object($result))
+					{
+						$this->lehrveranstaltung_id = $row->id;
+						pg_query($this->conn, 'COMMIT;');
+						return true;
+					}
+					else 
+					{
+						$this->errormsg = 'Fehler beim Auslesen der Sequence';
+						pg_query($this->conn, 'ROLLBACK');
+						return false;
+					}
+				}
+				else 
+				{
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+					pg_query($this->conn, 'ROLLBACK');
+					return false;
+				}
+			}
 			return true;
 		}
 		else
