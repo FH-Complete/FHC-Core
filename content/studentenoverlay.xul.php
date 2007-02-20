@@ -44,7 +44,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 				<!-- *  Auswahl  * -->
 				<!-- ************* -->
 				<tree id="treeStudenten" seltype="single" hidecolumnpicker="false" flex="1"
-						datasources="rdf:null" ref="http://www.technikum-wien.at/tempus/studenten/liste"
+						datasources="rdf:null" ref="http://www.technikum-wien.at/student/alle"
 						onselect="studentAuswahl();"
 						flags="dont-build-content"
 						enableColumnDrag="true"
@@ -55,43 +55,43 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 	    					class="sortDirectionIndicator"
 	    					sortActive="true"
 	    					sortDirection="ascending"
-	    					sort="rdf:http://www.technikum-wien.at/tempus/studenten/rdf#uid"  />
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#uid"  />
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="titel" label="Titel" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/tempus/studenten/rdf#titel"				/>
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#titel"				/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="vornamen" label="Vornamen" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/tempus/studenten/rdf#vornamen" />
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#vornamen" />
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="nachname" label="Nachname" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/tempus/studenten/rdf#nachname" />
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#nachname" />
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="geburtsdatum" label="Geburtsdatum" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/tempus/studenten/rdf#geburtsdatum" />
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#geburtsdatum" />
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="semester" label="Sem." flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/tempus/studenten/rdf#semester" />
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#semester" />
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="verband" label="Verb." flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/tempus/studenten/rdf#verband" />
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#verband" />
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="gruppe" label="Grp." flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/tempus/studenten/rdf#gruppe" />
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#gruppe" />
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="stg_bezeichnung" label="Studiengang" flex="1" hidden="true"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/tempus/studenten/rdf#stg_bezeichnung" />
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#studiengang_kz" />
 	    				<splitter class="tree-splitter"/>
 						<treecol id="matrikelnummer" label="Matrikelnummer" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/tempus/studenten/rdf#matrikelnummer" />
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#matrikelnummer" />
 					</treecols>
 
 					<template>
@@ -99,16 +99,16 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 	      					<treechildren>
 	       						<treeitem uri="rdf:*">
 	         						<treerow>
-	           							<treecell label="rdf:http://www.technikum-wien.at/tempus/studenten/rdf#uid"   />
-	           							<treecell label="rdf:http://www.technikum-wien.at/tempus/studenten/rdf#titel" />
-	           							<treecell label="rdf:http://www.technikum-wien.at/tempus/studenten/rdf#vornamen" />
-	           							<treecell label="rdf:http://www.technikum-wien.at/tempus/studenten/rdf#nachname" />
-	           							<treecell label="rdf:http://www.technikum-wien.at/tempus/studenten/rdf#geburtsdatum" />
-	           							<treecell label="rdf:http://www.technikum-wien.at/tempus/studenten/rdf#semester" />
-	           							<treecell label="rdf:http://www.technikum-wien.at/tempus/studenten/rdf#verband" />
-	           							<treecell label="rdf:http://www.technikum-wien.at/tempus/studenten/rdf#gruppe" />
-	           							<treecell label="rdf:http://www.technikum-wien.at/tempus/studenten/rdf#stg_bezeichnung" />
-	           							<treecell label="rdf:http://www.technikum-wien.at/tempus/studenten/rdf#matrikelnummer" />
+	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#uid"   />
+	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#titel" />
+	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#vornamen" />
+	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#nachname" />
+	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#geburtsdatum" />
+	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#semester" />
+	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#verband" />
+	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#gruppe" />
+	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#studiengang_kz" />
+	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#matrikelnummer" />
 	         						</treerow>
 	       						</treeitem>
 	      					</treechildren>
@@ -159,7 +159,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 				<!-- ************ -->
 				<vbox flex="1"  style="overflow:auto;margin:0px;">
 					<label value="Details" style="font-size:12pt;font-weight:bold;background:#eeeeee;margin:0px;padding:5px;" />
-					
+
 					<box class="studentDetail"  style="margin-top:10px;" />
 				</vbox>
 			</vbox>

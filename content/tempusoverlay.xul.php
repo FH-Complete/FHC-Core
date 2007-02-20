@@ -141,8 +141,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 			<hbox id="hboxTimeTableWeek" />
 			<!--  Semesterplan  -->
 			<vbox id="vboxTimeTableSemester" />
-			<!--  Studenten
-			<vbox id="studentenEditor" /> -->
+			<!--  Studenten  -->
+			<vbox id="studentenEditor" />
 			<!-- Lehrfachverteilung
             <vbox id="lfvtEditor" /> -->
 		</tabpanels>
