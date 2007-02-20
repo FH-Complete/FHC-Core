@@ -101,106 +101,125 @@
 				}
 				
 				// tbl_person
-				$sql_query="INSERT INTO public.tbl_person(titelpre,vorname,vornamen, nachname, gebdatum, gebort, aktiv) ".
-					 "VALUES('$row->titel','$vorname','$vornamen','$row->nachname','$row->gebdatum','$row->gebort', true)";
-				//echo $sql_query.'<BR>';
-				flush();
-				
-				if(!$res_insert=pg_query($conn, $sql_query))
+				$qry_sync = "SELECT * FROM sync.tbl_syncperson WHERE person_fas='$row->person_pk'";
+				if($result_sync = pg_query($conn, $qry_sync))
 				{
-					$text.=$sql_query;
-					$text.="\rFehler: ".pg_errormessage($conn)."\r";
-					$insert_error++;
-					pg_query($conn, 'ROLLBACK');
-				}
-				else 
-				{
-					$qry = "SELECT currval('tbl_person_person_id_seq') AS id;";
-					
-					if(!$row_seq=pg_fetch_object(pg_query($conn,$qry)))
+					if(pg_num_rows($result_sync)>0)
 					{
-						pg_query($conn, 'ROLLBACK');
-						$text = 'Sequence konnte nicht ausgelesen werden\n';
-						$insert_error++;
+						//Personen Datensatz ist bereits vorhanden
+						$row_sync = pg_fetch_object($result_sync);
+						$person_id=$row_sync->person_portal;
 					}
 					else 
 					{
-						$person_id = $row_seq->id;
-						
-						//Benutzer Datensatzt anlegen
-						$qry = "INSERT INTO public.tbl_benutzer(uid, person_id, aktiv, insertamum, insertvon, updateamum, updatevon)
-						        VALUES('$row->uid','$person_id','true',now(),'auto',now(),'auto');";
-	
-						if(!pg_query($conn, $qry))
-						{							
-							$test.=$qry;
+						//PesonenDatensatz noch nicht vorhanden
+						$sql_query="INSERT INTO public.tbl_person(titelpre,vorname,vornamen, nachname, gebdatum, gebort, aktiv) ".
+								 "VALUES('$row->titel','$vorname','$vornamen','$row->nachname','$row->gebdatum','$row->gebort', true)";
+						//echo $sql_query.'<BR>';
+						flush();
+				
+						if(!$res_insert=pg_query($conn, $sql_query))
+						{
+							$text.=$sql_query;
 							$text.="\rFehler: ".pg_errormessage($conn)."\r";
-							pg_query($conn, 'ROLLBACK');
 							$insert_error++;
+							pg_query($conn, 'ROLLBACK');
 						}
 						else 
-						{						
-							//Alias erstellen
-							$vn = split('[- .,]',strtolower($row->vornamen));
-							$vn = clean_string($vn[0]);
-			
-							$nn = split('[- .,]',strtolower($row->nachname));
-							$nn = clean_string($nn[0]);
-							$alias = $vn.".".$nn;
-							$qry = "SELECT * FROM public.tbl_benutzer WHERE alias='$alias'";
-							$res_alias = pg_query($conn, $qry);
-							if(pg_num_rows($res_alias)==0)
-							{
-								$qry = "UPDATE public.tbl_benutzer set alias='$alias' WHERE uid='$uid'";
-								if(!$res_insert=@pg_query($conn, $qry))
-								{
-									$text.=$qry;
-									$text.="\rFehler: ".pg_errormessage($conn);
-								}
-							}
-							else 
-							{
-								$text.="UPDATE public.tbl_benutzer set alias='$alias' WHERE uid='$uid'";
-								$text.="\nAlias existiert bereits: $alias\n";
-							}
+						{
+							$qry = "SELECT currval('tbl_person_person_id_seq') AS id;";
 							
-							//Lehrverband Check
-							$sql_query = "SELECT * FROM public.tbl_lehrverband WHERE studiengang_kz='$row->kennzahl' AND semester='$row->semester' AND
-										verband='$row->verband' AND gruppe='$row->gruppe'";
-							if($result_verb = pg_query($conn, $sql_query))
+							if(!$row_seq=pg_fetch_object(pg_query($conn,$qry)))
 							{
-								if(pg_num_rows($result_verb)==0)
-								{
-									//Lehrverband anlegen
-									$sql_query = "INSERT INTO public.tbl_lehrverband(studiengang_kz, semester, verband, gruppe, aktiv)
-									              VALUES('$row->kennzahl', '$row->semester', '$row->verband', '$row->gruppe', true);";
-									if(!pg_query($conn, $sql_query))
-									{
-										$text.= $sql_query;
-										$text.= "\nFehler:".pg_errormessage($conn)."\n";
-									}
-								}
+								pg_query($conn, 'ROLLBACK');
+								$text = 'Sequence konnte nicht ausgelesen werden\n';
+								$insert_error++;
 							}
 							else 
 							{
-								$text.= $sql_query;
-								$text.= "\nFehler:".pg_errormessage($conn)."\n";
+								pg_query($conn, "INSERT INTO sync.tbl_syncperson(person_fas, person_portal) VALUES($row->person_pk, $row_seq->id);");
+								$person_id = $row_seq->id;
 							}
-							// tbl_student
-							$sql_query="INSERT INTO public.tbl_student (student_uid,matrikelnr, studiengang_kz, semester, verband, gruppe) ".
-									   "VALUES('$row->uid','$row->perskz',$row->kennzahl,$row->semester,'$row->verband','$row->gruppe')";
-							echo $sql_query.'<BR>';
-							if(!$res_insert=pg_query($conn, $sql_query))
-							{
-								$text.=$sql_query;
+						}
+						
+						if(isset($person_id) && $person_id!='')
+						{
+							//Benutzer Datensatzt anlegen
+							$qry = "INSERT INTO public.tbl_benutzer(uid, person_id, aktiv, insertamum, insertvon, updateamum, updatevon)
+							        VALUES('$row->uid','$person_id','true',now(),'auto',now(),'auto');";
+		
+							if(!pg_query($conn, $qry))
+							{							
+								$test.=$qry;
 								$text.="\rFehler: ".pg_errormessage($conn)."\r";
-								$insert_error++;
 								pg_query($conn, 'ROLLBACK');
+								$insert_error++;
 							}
-							else
+							else 
 							{
 								$anz_insert++;
-								pg_query($conn, 'COMMIT');
+								//Alias erstellen
+								$vn = split('[- .,]',strtolower($row->vornamen));
+								$vn = clean_string($vn[0]);
+				
+								$nn = split('[- .,]',strtolower($row->nachname));
+								$nn = clean_string($nn[0]);
+								$alias = $vn.".".$nn;
+								$qry = "SELECT * FROM public.tbl_benutzer WHERE alias='$alias'";
+								$res_alias = pg_query($conn, $qry);
+								if(pg_num_rows($res_alias)==0)
+								{
+									$qry = "UPDATE public.tbl_benutzer set alias='$alias' WHERE uid='$uid'";
+									if(!$res_insert=@pg_query($conn, $qry))
+									{
+										$text.=$qry;
+										$text.="\rFehler: ".pg_errormessage($conn);
+									}
+								}
+								else 
+								{
+									$text.="UPDATE public.tbl_benutzer set alias='$alias' WHERE uid='$uid'";
+									$text.="\nAlias existiert bereits: $alias\n";
+								}
+								
+								//Lehrverband Check
+								$sql_query = "SELECT * FROM public.tbl_lehrverband WHERE studiengang_kz='$row->kennzahl' AND semester='$row->semester' AND
+											verband='$row->verband' AND gruppe='$row->gruppe'";
+								if($result_verb = pg_query($conn, $sql_query))
+								{
+									if(pg_num_rows($result_verb)==0)
+									{
+										//Lehrverband anlegen
+										$sql_query = "INSERT INTO public.tbl_lehrverband(studiengang_kz, semester, verband, gruppe, aktiv)
+										              VALUES('$row->kennzahl', '$row->semester', '$row->verband', '$row->gruppe', true);";
+										if(!pg_query($conn, $sql_query))
+										{
+											$text.= $sql_query;
+											$text.= "\nFehler:".pg_errormessage($conn)."\n";
+										}
+									}
+								}
+								else 
+								{
+									$text.= $sql_query;
+									$text.= "\nFehler:".pg_errormessage($conn)."\n";
+								}
+								// tbl_student
+								$sql_query="INSERT INTO public.tbl_student (student_uid,matrikelnr, studiengang_kz, semester, verband, gruppe) ".
+										   "VALUES('$row->uid','$row->perskz',$row->kennzahl,$row->semester,'$row->verband','$row->gruppe')";
+								echo $sql_query.'<BR>';
+								if(!$res_insert=pg_query($conn, $sql_query))
+								{
+									$text.=$sql_query;
+									$text.="\rFehler: ".pg_errormessage($conn)."\r";
+									$insert_error++;
+									pg_query($conn, 'ROLLBACK');
+								}
+								else
+								{
+									$anz_insert++;
+									pg_query($conn, 'COMMIT');
+								}
 							}
 						}
 					}

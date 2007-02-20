@@ -1,4 +1,10 @@
 <?php
+// **************************************
+// Syncronisiert alle Lehrveranstaltungen
+// FAS -> VILESCI
+// setzt vorraus: - tbl_sprache
+//                - tbl_studiengang
+// **************************************
 	require_once('../../../vilesci/config.inc.php');
 	require_once('../../../include/lehrveranstaltung.class.php');
 	//$adress='fas_sync@technikum-wien.at';
@@ -30,7 +36,7 @@
 		
 		if($row->studiensemester_fk==0)
 		{
-			$stg_data[$row->kennzahl]['text'] .= '   '.$stg_data[$row->kennzahl]['kuerzel'].' Semester '.$row->semester.' LVA '.$row->name." hat Studiensemester 0\n";
+			$stg_data[$row->kennzahl]['text'] .= '   '.$stg_data[$row->kennzahl]['kuerzel'].' Semester '.$row->semester.' '.$row->name." hat Studiensemester 0\n";
 			$plausi_error++;
 			return false;
 		}
@@ -38,31 +44,31 @@
 		if($row->kurzbezeichnung == '')
 		{
 			//$text.= 'LVA '.$stg_data[$row->kennzahl]['kuerzel'].' Semester '.$row->semester.' LVA '.$row->name." hat keine Kurzbezeichnung\n";
-			$stg_data[$row->kennzahl]['text'] .= '   '.$stg_data[$row->kennzahl]['kuerzel'].' Semester '.$row->semester.' ('.$studiensemester[$row->studiensemester_fk].') LVA '.$row->name." hat keine Kurzbezeichnung\n";
+			$stg_data[$row->kennzahl]['text'] .= '   '.$stg_data[$row->kennzahl]['kuerzel'].' Semester '.$row->semester.' ('.$studiensemester[$row->studiensemester_fk].') '.$row->name." hat keine Kurzbezeichnung\n";
 			$plausi_error++;
 			return false;
 		}
 		if(strlen($row->name)>128)
 		{
-			$stg_data[$row->kennzahl]['text'] .= '   '.$stg_data[$row->kennzahl]['kuerzel'].' Semester '.$row->semester.' ('.$studiensemester[$row->studiensemester_fk].') LVA '.$row->name." hat einen zu langen LV-Titel (maximal 128 Zeichen)\n";
+			$stg_data[$row->kennzahl]['text'] .= '   '.$stg_data[$row->kennzahl]['kuerzel'].' Semester '.$row->semester.' ('.$studiensemester[$row->studiensemester_fk].') '.$row->name." hat einen zu langen LV-Titel (maximal 128 Zeichen)\n";
 			$plausi_error++;
 			return false;
 		}
 		if(strlen($row->kurzbezeichnung)>16)
 		{
-			$stg_data[$row->kennzahl]['text'] .= '   '.$stg_data[$row->kennzahl]['kuerzel'].' Semester '.$row->semester.' ('.$studiensemester[$row->studiensemester_fk].') LVA '.$row->name." hat eine zu lange Kurzbezeichnung (maximal 16 Zeichen)\n";
+			$stg_data[$row->kennzahl]['text'] .= '   '.$stg_data[$row->kennzahl]['kuerzel'].' Semester '.$row->semester.' ('.$studiensemester[$row->studiensemester_fk].') '.$row->name." hat eine zu lange Kurzbezeichnung (2-4 Zeichen + 1 Ziffer)\n";
 			$plausi_error++;
 			return false;
 		}
 		if(strlen($row->beschreibung)>64)
 		{
-			$stg_data[$row->kennzahl]['text'] .= '   '.$stg_data[$row->kennzahl]['kuerzel'].' Semester '.$row->semester.' ('.$studiensemester[$row->studiensemester_fk].') LVA '.$row->name."  hat eine zu lange Beschreibung (maximal 64 Zeichen)\n";
+			$stg_data[$row->kennzahl]['text'] .= '   '.$stg_data[$row->kennzahl]['kuerzel'].' Semester '.$row->semester.' ('.$studiensemester[$row->studiensemester_fk].') '.$row->name."  hat eine zu lange Beschreibung (maximal 64 Zeichen)\n";
 			$plausi_error++;
 			return false;
 		}
 		if($row->ectspunkte>40)
 		{
-			$stg_data[$row->kennzahl]['text'] .= '   '.$stg_data[$row->kennzahl]['kuerzel'].' Semester '.$row->semester.' ('.$studiensemester[$row->studiensemester_fk].') LVA '.$row->name." hat mehr als 40 ECTS-Punkte\n";
+			$stg_data[$row->kennzahl]['text'] .= '   '.$stg_data[$row->kennzahl]['kuerzel'].' Semester '.$row->semester.' ('.$studiensemester[$row->studiensemester_fk].') '.$row->name." hat mehr als 40 ECTS-Punkte\n";
 			$plausi_error++;
 			return false;
 		}
@@ -165,7 +171,7 @@
 	$vilesci_anz_lva = $row->anz;
 	
 	// Start LVA Synchro
-	$sql_query="SELECT lehrveranstaltung.*, ausbildungssemester.semester, studiengang.kennzahl FROM lehrveranstaltung, ausbildungssemester, studiengang WHERE ausbildungssemester_fk=ausbildungssemester_pk AND lehrveranstaltung.studiengang_fk=studiengang_pk limit 50";
+	$sql_query="SELECT lehrveranstaltung.*, ausbildungssemester.semester, studiengang.kennzahl FROM lehrveranstaltung, ausbildungssemester, studiengang WHERE ausbildungssemester_fk=ausbildungssemester_pk AND lehrveranstaltung.studiengang_fk=studiengang_pk ORDER BY kennzahl, semester, studiensemester_fk";
 	flush();
 	$result_fas_alle=pg_query($conn_fas, $sql_query);
 	$num_rows=pg_num_rows($result_fas_alle);
@@ -175,7 +181,11 @@
 	$headtext.="Anzahl der Lehrveranstaltungen in Vilesci: $vilesci_anz_lva \n\n";
 		
 	for ($i=0;$row_fas_alle=pg_fetch_object($result_fas_alle);$i++)
-	{		
+	{
+		//btec auf 0 umlenken (Freifaecher)
+		if($row_fas_alle->kennzahl=203)
+			$row_fas_alle->kennzahl=0;
+		
 		// Plausibilitaetscheck
 		if(validate($row_fas_alle))
 		{
@@ -235,8 +245,33 @@
 					
 					if(pg_num_rows($result)==1)
 					{
-						$text.='FOUND on Name LVA '.getlvabez($row_fas_alle)." -> UPDATE & SYNCTAB-Insert\n";
-						$anz_update++;
+						if($row_found = pg_fetch_object($result))
+						{
+							//Gefunden->Update und Synctab-Eintrag
+							//$text.='FOUND on Name LVA '.getlvabez($row_fas_alle)." -> UPDATE & SYNCTAB-Insert\n";
+							$qry = getupdateqry($row_found, $row_fas_alle);
+							
+							if($qry!='')
+							{
+								if(pg_query($conn, $qry))
+								{
+									//Eintrag zur Synctabelle hinzufuegen
+									synctabentry($row_found->lehrveranstaltung_id, $row_fas_alle->lehrveranstaltung_pk);
+									$text.="LVA wurde aktualisiert: $qry\n";
+									$anz_update++;
+								}
+								else 
+								{
+									$text.="Fehler beim Update einer LVA: $qry\n";
+									$update_error++;
+								}
+							}					
+						}
+						else 
+						{
+							$text.='Fehler beim Lesen des Datensatzes:'.getlvabez($row_fas_alle)."\n";
+							$update_error++;
+						}		
 					}
 					elseif(pg_num_rows($result)==0)
 					{

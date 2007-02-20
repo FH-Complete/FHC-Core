@@ -175,16 +175,16 @@
 				}
 				if(!$ansicht)
 				{
-					$qry = "SELECT tbl_betriebsmittel.beschreibung as beschreibung, tbl_betriebsmittel.nummer as nummer, tbl_betriebsmittelperson.ausgegebenam as ausgegebenam FROM public.tbl_betriebsmittelperson JOIN public.tbl_betriebsmittel USING(betriebsmittel_id) WHERE person_id=(SELECT person_id FROM public.tbl_benutzer WHERE uid='$uid' LIMIT 1)";
+					$qry = "SELECT tbl_betriebsmittel.betriebsmitteltyp as betriebsmitteltyp, tbl_betriebsmittel.beschreibung as beschreibung, tbl_betriebsmittel.nummer as nummer, tbl_betriebsmittelperson.ausgegebenam as ausgegebenam FROM public.tbl_betriebsmittelperson JOIN public.tbl_betriebsmittel USING(betriebsmittel_id) WHERE person_id=(SELECT person_id FROM public.tbl_benutzer WHERE uid='$uid' LIMIT 1)";
 					if($result_betriebsmittel = pg_query($conn, $qry))
 					{
 						if(pg_num_rows($result_betriebsmittel)>0)
 						{
-							echo '<br><br><b>Entlehnte Betriebsmittel</b><table><tr class="liste"><th>Beschreibung</th><th>Nummer</th><th>Ausgegeben am</th></tr>';
+							echo '<br><br><b>Entlehnte Betriebsmittel</b><table><tr class="liste"><th>Betriebsmittel</th><th>Nummer</th><th>Ausgegeben am</th></tr>';
 							
 							while($row_bm = pg_fetch_object($result_betriebsmittel))
 							{
-								echo "<tr class='liste1'><td>$row_bm->beschreibung</td><td>$row_bm->nummer</td><td>$row_bm->ausgegebenam</td></tr>";
+								echo "<tr class='liste1'><td>$row_bm->betriebsmitteltyp</td><td>$row_bm->nummer</td><td>$row_bm->ausgegebenam</td></tr>";
 							}
 							echo '</table>';
 						}
