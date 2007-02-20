@@ -88,7 +88,7 @@ $num_rows_stunde=pg_numrows($result_stunde);
 	<grippy />
 </splitter>
 
-<!-- <vbox id="vboxSTPLDetailsListe" flex="2" /> -->
+<vbox id="vboxSTPLDetailsListe" flex="2" />
 
 </vbox>
 
