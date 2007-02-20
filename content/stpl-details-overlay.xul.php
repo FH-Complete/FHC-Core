@@ -32,9 +32,9 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 			style="margin:0px;"
 			>
 		<treecols>
-			<treecol id="stplUNR" label="UNR" flex="2" primary="false"
+			<treecol id="lehreinheit_id" label="LE_ID" flex="2" primary="false"
 				class="sortDirectionIndicator" sortActive="true" sortDirection="ascending"
-	    		sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#unr"  />
+	    		sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#lehreinheit_id"  />
 	    	<splitter class="tree-splitter"/>
 	    	<treecol id="stplLektor" label="Lektor" flex="2" hidden="false"
 	    		class="sortDirectionIndicator"
@@ -84,6 +84,11 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 	    		class="sortDirectionIndicator"
 	    		sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#stunde" />
 	    	<splitter class="tree-splitter"/>
+	    	<treecol id="stplUNR" label="UNR" flex="2" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#unr"  />
+			<splitter class="tree-splitter"/>
+
 		</treecols>
 
 		<template>
@@ -91,7 +96,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 				<treechildren>
 					<treeitem uri="rdf:*">
    						<treerow>
-   							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#unr"   />
+   							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#lehreinheit_id"   />
    							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#lektor" />
    							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#lehrfach" />
    							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#lehrform" />
@@ -104,6 +109,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#ort_kurzbz" />
    							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#datum" />
 							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#stunde" />
+							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#unr" />
    						</treerow>
 					</treeitem>
 				</treechildren>
