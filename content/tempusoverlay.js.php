@@ -67,12 +67,12 @@ function onVerbandSelect()
 	var attribute='../rdf/lehreinheit-lvplan.rdf.php'+type+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
 	vboxLehrveranstalungPlanung.setAttribute('datasources',attribute);
 
-	/*
 	// Studenten
 	var treeStudenten=document.getElementById('treeStudenten');
 	attribute="<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
 	treeStudenten.setAttribute('datasources',attribute);
 
+	/*
 	// LFVT
 	var req = new phpRequest('lfvt.rdf.php','pam','pam');
 	req.add('stg_kz',stg_kz);
