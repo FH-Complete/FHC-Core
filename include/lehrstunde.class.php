@@ -24,6 +24,7 @@ class lehrstunde
 	var $conn;			// @brief Connection zur Datenbank
 
 	var $stundenplan_id;// @brief id in der Datenbank
+	var $lehreinheit_id;// @brief id der Lehreinheit in der DB
 	var $unr;			// @brief Unterrichtsnummer
 	var $lektor_uid;	// @brief UID des Lektors
 	var $lektor_kurzbz; // @brief Kurzbezeichnung des Lektors
@@ -361,6 +362,7 @@ class lehrstunde
 			$row=pg_fetch_object ($stpl_tbl, $i);
 			$stunde=new lehrstunde($this->conn);
 			$stunde->stundenplan_id=$row->{$stpl_id};
+			$stunde->lehreinheit_id=$row->lehreinheit_id;
 			$stunde->unr=$row->unr;
 			$stunde->lektor_uid=$row->uid;
 			$stunde->lektor_kurzbz=$row->lektor;

@@ -129,6 +129,7 @@ if (is_array($lehrstunden->lehrstunden))
   			<RDF:li>
   	    	<RDF:Description  id="<?php echo $ls->stundenplan_id; ?>"  about="<?php echo $rdf_url.'/'. $ls->stundenplan_id; ?>" >
   		      	<LEHRSTUNDE:id><?php echo $ls->stundenplan_id  ?></LEHRSTUNDE:id>
+				<LEHRSTUNDE:lehreinheit_id><?php echo $ls->lehreinheit_id  ?></LEHRSTUNDE:lehreinheit_id>
 				<LEHRSTUNDE:datum><?php echo $ls->datum  ?></LEHRSTUNDE:datum>
 				<LEHRSTUNDE:stunde><?php echo $ls->stunde  ?></LEHRSTUNDE:stunde>
   		  		<LEHRSTUNDE:unr><?php echo $ls->unr  ?></LEHRSTUNDE:unr>
