@@ -33,7 +33,7 @@ function checkID($needle)
 $id_list=array();
 while(list($k,$v)=each($_GET))
 	if (strpos($k,'stundenplan_id')!==false)
-		$id_list[]=$v;
+		$idList[]=$v;
 
 //print_r($id_list);
 
@@ -41,40 +41,66 @@ if (!isset($REMOTE_USER))
 	$REMOTE_USER='pam';
 $uid=$REMOTE_USER;
 
-if (isset($_GET[datum]))
-	$datum=$_GET[datum];
-if (isset($_GET[datum_bis]))
-	$datum_bis=$_GET[datum_bis];
-if (isset($_GET[stunde]))
-	$stunde=$_GET[stunde];
-if (isset($_GET[type]))
-	$type=$_GET[type];
-if (isset($_GET[stg_kz]))
-	$stg_kz=$_GET[stg_kz];
-if (isset($_GET[sem]))
-	$sem=$_GET[sem];
-if (isset($_GET[ver]))
-	$ver=$_GET[ver];
-if (isset($_GET[grp]))
-	$grp=$_GET[grp];
-if (isset($_GET[einheit]))
-	$einheit=$_GET[einheit];
-if (isset($_GET[pers_uid]))
-	$pers_uid=$_GET[pers_uid];
-if (isset($_GET[ort_kurzbz]))
-	$ort_kurzbz=$_GET[ort_kurzbz];
+if (isset($_GET['datum']))
+	$datum=$_GET['datum'];
+else
+	$datum=date('Y-m-d',(mktime()));
+if (isset($_GET['datum_bis']))
+	$datum_bis=$_GET['datum_bis'];
+else
+	$datum_bis=null;
+if (isset($_GET['stunde']))
+	$stunde=$_GET['stunde'];
+else
+	$stunde=null;
+if (isset($_GET['type']))
+	$type=$_GET['type'];
+else
+	$type='lektor';
+if (isset($_GET['stg_kz']))
+	$stg_kz=$_GET['stg_kz'];
+else
+	$stg_kz=null;
+if (isset($_GET['sem']))
+	$sem=$_GET['sem'];
+else
+	$sem=null;
+if (isset($_GET['ver']))
+	$ver=$_GET['ver'];
+else
+	$ver=null;
+if (isset($_GET['grp']))
+	$grp=$_GET['grp'];
+else
+	$grp=null;
+if (isset($_GET['einheit']))
+	$einheit=$_GET['einheit'];
+else
+	$einheit=null;
+if (isset($_GET['pers_uid']))
+	$pers_uid=$_GET['pers_uid'];
+else
+	$pers_uid=$uid;
+if (isset($_GET['ort_kurzbz']))
+	$ort_kurzbz=$_GET['ort_kurzbz'];
+else
+	$ort_kurzbz=null;
 
+if (isset($idList))
+	$type='idList';
+else
+	$idList=null;
 
 $error_msg='';
-if (!$conn = @pg_pconnect(CONN_STRING))
+if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg.='Es konnte keine Verbindung zum Server aufgebaut werden!';
 $error_msg.=loadVariables($conn,$REMOTE_USER);
 
-if (!isset($datum_bis))
-	$datum_bis=date('Y-m-d',(mktime(0,0,1,substr($datum,5,2),substr($datum,8),substr($datum,0,4))+86400));
+//if (!isset($datum_bis))
+//	$datum_bis=date('Y-m-d',(mktime(0,0,1,substr($datum,5,2),substr($datum,8),substr($datum,0,4))+86400));
 
 $lehrstunden=new lehrstunde($conn);
-$anz=$lehrstunden->load_lehrstunden($type,$datum,$datum_bis,$pers_uid,$ort_kurzbz,$stg_kz,$sem,$ver,$grp,$einheit,$db_stpl_table);
+$anz=$lehrstunden->load_lehrstunden($type,$datum,$datum_bis,$pers_uid,$ort_kurzbz,$stg_kz,$sem,$ver,$grp,$einheit,$db_stpl_table,$idList);
 if ($anz<0)
 {
 	$errormsg=$lehrstunden->errormsg;
@@ -82,7 +108,7 @@ if ($anz<0)
 	exit();
 }
 
-$rdf_url='http://www.technikum-wien.at/tempus/lehrstunde';
+$rdf_url='http://www.technikum-wien.at/lehrstunde';
 ?>
 
 <RDF:RDF
@@ -111,10 +137,10 @@ if (is_array($lehrstunden->lehrstunden))
 				<LEHRSTUNDE:lehrfach_bez><?php echo $ls->lehrfach_bez  ?></LEHRSTUNDE:lehrfach_bez>
 				<LEHRSTUNDE:lehrform><?php echo $ls->lehrform  ?></LEHRSTUNDE:lehrform>
 				<LEHRSTUNDE:lektor><?php echo $ls->lektor_kurzbz  ?></LEHRSTUNDE:lektor>
-				<LEHRSTUNDE:semester><?php echo $ls->sem  ?></LEHRSTUNDE:semester>
-				<LEHRSTUNDE:verband><?php echo $ls->ver  ?></LEHRSTUNDE:verband>
-				<LEHRSTUNDE:gruppe><?php echo $ls->grp  ?></LEHRSTUNDE:gruppe>
-				<LEHRSTUNDE:einheit><?php echo $ls->einheit_kurzbz  ?></LEHRSTUNDE:einheit>
+				<LEHRSTUNDE:sem><?php echo $ls->sem  ?></LEHRSTUNDE:sem>
+				<LEHRSTUNDE:ver><?php echo $ls->ver  ?></LEHRSTUNDE:ver>
+				<LEHRSTUNDE:grp><?php echo $ls->grp  ?></LEHRSTUNDE:grp>
+				<LEHRSTUNDE:gruppe><?php echo $ls->gruppe_kurzbz  ?></LEHRSTUNDE:gruppe>
 				<LEHRSTUNDE:lehrform><?php echo $ls->lehrform  ?></LEHRSTUNDE:lehrform>
 				<LEHRSTUNDE:studiengang><?php echo $ls->studiengang  ?></LEHRSTUNDE:studiengang>
 				<LEHRSTUNDE:farbe><?php echo $ls->farbe  ?></LEHRSTUNDE:farbe>

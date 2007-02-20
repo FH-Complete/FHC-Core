@@ -194,8 +194,9 @@ function onStplDetail(event)
 	var ort_kurzbz=event.target.getAttribute("ort_kurzbz");
 
 	var attributes="?type="+type+"&datum="+datum+"&stunde="+stunde+"&ort_kurzbz="+ort_kurzbz+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe+"&ort_kurzbz="+ort_kurzbz;
+	//alert(attributes);
 	attributes+=idList;
-	var url = "<?php echo APP_ROOT; ?>content/lehrstunde.rdf.php";
+	var url = "<?php echo APP_ROOT; ?>rdf/lehrstunde.rdf.php";
 	url+=attributes;
 	//alert(url);
 	var treeStplDetails=parent.document.getElementById('treeStplDetails');
