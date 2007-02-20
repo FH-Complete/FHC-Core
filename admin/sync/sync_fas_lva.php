@@ -15,6 +15,7 @@ $adress_fas='fas_sync@technikum-wien.at';
 // error log für jeden Studiengang
 $error_log=array();
 $missing_lehrfaecher=array();
+$missing_lehrveranstaltungen=array();
 $missing_einheit=array();
 $missing_raumtyp=array();
 $missing_lehrform=array();
@@ -690,7 +691,7 @@ if($res_delete=pg_query($conn, $sql_query))
 	{		
 		$qry = "DELETE FROM lehre.tbl_lehreinheitgruppe WHERE ext_id='$row->ext_id';
 				DELETE FROM lehre.tbl_lehreinheitmitarbeiter WHERE ext_id='$row->ext_id';";
-		$text.="Lehreinheitengruppe und Lehreinheitmitarbeiter mit FAS_ID '$row->ext_id' wird geloescht\n";
+		//$text.="Lehreinheitengruppe und Lehreinheitmitarbeiter mit FAS_ID '$row->ext_id' wird geloescht\n";
 				
 		if(pg_query($conn, $qry))
 		{
@@ -713,7 +714,7 @@ else
 
 
 //Ausgabe Zusammenfassung
-$text.="\n$anz_delete Lehrveranstaltungen wurden geloescht!\n";
+$text.="\n$anz_delete Lehreinheiten(zuteilungen) wurden geloescht!\n";
 $text.="$plausi_error Fehler beim Plausibilitaetscheck!\n";
 $text.="$update_error Fehler bei LVA-Update!\n";
 $text.="$insert_error Fehler bei LVA-Insert!\n";

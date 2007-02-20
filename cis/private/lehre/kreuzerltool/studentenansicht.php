@@ -217,7 +217,7 @@ echo '</td><tr></table>';
 echo '<table><tr>';
 echo '<td width="10">&nbsp;</td>';
 echo "<td width='100%'>\n";
-echo "<b>$lv_obj->bezeichnung</b><br>";
+echo "<table width='100%'><tr><td><b>$lv_obj->bezeichnung</b></td><td align='right'><a href='../../../../documents/".strtolower($stg_obj->kuerzel)."/$lv_obj->semester/$lv_obj->lehreverzeichnis/download/' target='_blank' class='Item'>Downloadverzeichnis anzeigen</a></td></tr></table><br>";
 
 if($lehreinheit_id=='')
 	die('Derzeit gibt es keine Kreuzerllisten f&uuml;r diese Lehrveranstaltung');
@@ -330,6 +330,7 @@ if(isset($_POST['submit']))
 //********ANZEIGE DER EINGETRAGENEN KREUZERL***********
 $uebung_obj = new uebung($conn);
 $uebung_obj->load($uebung_id);
+echo "Freigegeben von ".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon))." bis ".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis));
 echo "<br><br><h3><u>$uebung_obj->bezeichnung</u></h3>";
 
 $ueb_obj = new uebung($conn);
