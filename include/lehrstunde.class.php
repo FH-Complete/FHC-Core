@@ -203,25 +203,31 @@ class lehrstunde
 	 * @param gruppe_kurzbz
 	 *
 	 */
-	function load_lehrstunden($type, $datum_von, $datum_bis, $uid, $ort_kurzbz=NULL, $studiengang_kz=NULL, $sem=NULL, $ver=NULL, $grp=NULL, $gruppe_kurzbz=NULL, $stpl_view='stundenplan')
+	function load_lehrstunden($type, $datum_von, $datum_bis, $uid, $ort_kurzbz=NULL, $studiengang_kz=NULL, $sem=NULL, $ver=NULL, $grp=NULL, $gruppe_kurzbz=NULL, $stpl_view='stundenplan', $idList=null)
 	{
 		///////////////////////////////////////////////////////////////////////
 		// Parameter Checken
 		// Bezeichnung der Stundenplan-Tabelle und des Keys
 		$stpl_id=$stpl_view.TABLE_ID;
-		$stpl_view=VIEW_BEGIN.$stpl_view;
+		$stpl_view='lehre.'.VIEW_BEGIN.$stpl_view;
 		$num_rows_einheit=0;
+
 		// Datum im Format YYYY-MM-TT ?
 		if (!ereg("([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})",$datum_von) )
 		{
 			$this->errormsg='Fehler: Startdatum hat falsches Format!';
 			return -1;
 		}
-		if (!ereg("([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})",$datum_bis) )
+		if ($datum_bis!=null)
 		{
-			$this->errormsg='Fehler: Enddatum hat falsches Format!';
-			return -1;
+			if (!ereg("([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})",$datum_bis) )
+			{
+				$this->errormsg='Fehler: Enddatum hat falsches Format!';
+				return -1;
+			}
 		}
+		else
+			$datum_bis=$datum_von;
 		// Person
 		if (($type=='student' || $type=='lektor') && $uid==NULL)
 		{
@@ -244,6 +250,12 @@ class lehrstunde
 		if ($type=='verband' && ($studiengang_kz==NULL || !is_numeric($studiengang_kz)))
 		{
 			$this->errormsg='Fehler: Studiengang ist nicht gesetzt';
+			return -1;
+		}
+		// Type
+		if ($type==null)
+		{
+			$this->errormsg='Fehler: Type in "lehrstunde->load_lehrstunde" ist nicht gesetzt!';
 			return -1;
 		}
 
@@ -289,41 +301,51 @@ class lehrstunde
 		// Stundenplandaten ermitteln
 		// Abfrage generieren
 		$sql_query_stdplan='SELECT * FROM '.$stpl_view;
-		$sql_query=" WHERE datum>='$datum_von' AND datum<'$datum_bis'";
-		if ($type=='lektor')
-			$sql_query.=" AND uid='$uid'";
-		elseif ($type=='ort')
-			$sql_query.=" AND ort_kurzbz='$ort_kurzbz'";
-		elseif ($type=='gruppe')
-			$sql_query.=" AND gruppe_kurzbz='$gruppe_kurzbz'";
-		else
+		if ($type!='idList')
 		{
-			$sql_query.=' AND ( (studiengang_kz='.$studiengang_kz;
-			if ($sem!='0' && $sem!=null && $sem!=0  && $sem!='')
+			$sql_query=" WHERE datum>='$datum_von' AND datum<'$datum_bis'";
+			if ($type=='lektor')
+				$sql_query.=" AND uid='$uid'";
+			elseif ($type=='ort')
+				$sql_query.=" AND ort_kurzbz='$ort_kurzbz'";
+			elseif ($type=='gruppe')
+				$sql_query.=" AND gruppe_kurzbz='$gruppe_kurzbz'";
+			else
 			{
-				$sql_query.=" AND (semester=$sem OR semester IS NULL";
+				$sql_query.=' AND ( (studiengang_kz='.$studiengang_kz;
+				if ($sem!='0' && $sem!=null && $sem!=0  && $sem!='')
+				{
+					$sql_query.=" AND (semester=$sem OR semester IS NULL";
+					if ($type=='student')
+						$sql_query.=' OR semester='.($sem+1);
+					$sql_query.=')';
+				}
+				if ($ver!='0' && $ver!=null && $ver!='')
+					$sql_query.=" AND (verband='$ver' OR verband IS NULL OR verband='0' OR verband='')";
+				if ($grp!='0' && $grp!=null && $grp!='')
+					$sql_query.=" AND (gruppe='$grp' OR gruppe IS NULL OR gruppe='0' OR gruppe='')";
 				if ($type=='student')
-					$sql_query.=' OR semester='.($sem+1);
+					$sql_query.=' AND gruppe_kurzbz IS NULL';
+				$sql_query.=' )';
+				for ($i=0;$i<$num_rows_einheit;$i++)
+				{
+					$row=pg_fetch_object($result_einheit,$i);
+					$sql_query.=" OR gruppe_kurzbz='$row->gruppe_kurzbz'";
+				}
 				$sql_query.=')';
 			}
-			if ($ver!='0' && $ver!=null && $ver!='')
-				$sql_query.=" AND (verband='$ver' OR verband IS NULL OR verband='0' OR verband='')";
-			if ($grp!='0' && $grp!=null && $grp!='')
-				$sql_query.=" AND (gruppe='$grp' OR gruppe IS NULL OR gruppe='0' OR gruppe='')";
-			if ($type=='student')
-				$sql_query.=' AND gruppe_kurzbz IS NULL';
-			$sql_query.=' )';
-			for ($i=0;$i<$num_rows_einheit;$i++)
-			{
-				$row=pg_fetch_object($result_einheit,$i);
-				$sql_query.=" OR gruppe_kurzbz='$row->gruppe_kurzbz'";
-			}
-			$sql_query.=')';
+			$sql_query.=' ORDER BY  datum, stunde, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, uid';
+			$sql_query_stdplan.=$sql_query;
+			//echo '<label>'.htmlspecialchars($sql_query_stdplan).'</label>';
 		}
-		$sql_query.=' ORDER BY  datum, stunde, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, uid';
-		$sql_query_stdplan.=$sql_query;
-		//echo '<label>'.htmlspecialchars($sql_query_stdplan).'</label>';
-
+		else
+		{
+			$sql_query='';
+			foreach ($idList as $id)
+				$sql_query.=' OR '.$stpl_id.'='.$id;
+			$sql_query=substr($sql_query,3);
+			$sql_query_stdplan.=' WHERE'.$sql_query;
+		}
 		//Datenbankabfrage
 		if (! $stpl_tbl=pg_query($this->conn, $sql_query_stdplan))
 		{
@@ -369,46 +391,49 @@ class lehrstunde
 
 		///////////////////////////////////////////////////////////////////////
 		// Reservierungsdaten ermitteln
-		// Datenbankabfrage generieren
-		$sql_query_reservierung='SELECT * FROM vw_reservierung';
-		$sql_query_reservierung.=$sql_query;
-		//echo $sql_query_reservierung;
-		//Datenbankabfrage
-		if (! $stpl_tbl=pg_query($this->conn, $sql_query_reservierung))
+		if ($type!='idList')
 		{
-			$this->errormsg=pg_last_error($this->conn);
-			return -2;
-		}
-		$num_rows=pg_numrows($stpl_tbl);
-		$this->anzahl+=$num_rows;
+			// Datenbankabfrage generieren
+			$sql_query_reservierung='SELECT * FROM campus.vw_reservierung';
+			$sql_query_reservierung.=$sql_query;
+			//echo $sql_query_reservierung;
+			//Datenbankabfrage
+			if (! $stpl_tbl=pg_query($this->conn, $sql_query_reservierung))
+			{
+				$this->errormsg=pg_last_error($this->conn);
+				return -2;
+			}
+			$num_rows=pg_numrows($stpl_tbl);
+			$this->anzahl+=$num_rows;
 
-		//Daten uebernehmen
-		for ($i=0;$i<$num_rows;$i++)
-		{
-			$row=pg_fetch_object ($stpl_tbl, $i);
-			$stunde=new lehrstunde($this->conn);
-			$stunde->reservierung=true;
-			$stunde->stundenplan_id=$row->reservierung_id;
-			$stunde->unr=0;
-			$stunde->lektor_uid=$row->uid;
-			$stunde->lektor_kurzbz=$row->uid;
-			$stunde->datum=$row->datum;
-			$stunde->stunde=$row->stunde;
-			$stunde->ort_kurzbz=$row->ort_kurzbz;
-			//$stunde->lehrfach_nr=$row->lehrfach_nr;
-			$stunde->lehrfach=$row->titel;
-			$stunde->lehrfach_bez=$row->beschreibung;
-			$stunde->studiengang_kz=$row->studiengang_kz;
-			$stunde->studiengang=$row->stg_kurzbz;
-			$stunde->sem=$row->semester;
-			$stunde->ver=$row->verband;
-			$stunde->grp=$row->gruppe;
-			$stunde->gruppe_kurzbz=$row->gruppe_kurzbz;
-			$stunde->titel=$row->titel;
-			$stunde->anmerkung=$row->beschreibung;
-			$stunde->farbe='';
-			$this->lehrstunden[]=$stunde;
-			//var_dump($stunde);
+			//Daten uebernehmen
+			for ($i=0;$i<$num_rows;$i++)
+			{
+				$row=pg_fetch_object ($stpl_tbl, $i);
+				$stunde=new lehrstunde($this->conn);
+				$stunde->reservierung=true;
+				$stunde->stundenplan_id=$row->reservierung_id;
+				$stunde->unr=0;
+				$stunde->lektor_uid=$row->uid;
+				$stunde->lektor_kurzbz=$row->uid;
+				$stunde->datum=$row->datum;
+				$stunde->stunde=$row->stunde;
+				$stunde->ort_kurzbz=$row->ort_kurzbz;
+				//$stunde->lehrfach_nr=$row->lehrfach_nr;
+				$stunde->lehrfach=$row->titel;
+				$stunde->lehrfach_bez=$row->beschreibung;
+				$stunde->studiengang_kz=$row->studiengang_kz;
+				$stunde->studiengang=$row->stg_kurzbz;
+				$stunde->sem=$row->semester;
+				$stunde->ver=$row->verband;
+				$stunde->grp=$row->gruppe;
+				$stunde->gruppe_kurzbz=$row->gruppe_kurzbz;
+				$stunde->titel=$row->titel;
+				$stunde->anmerkung=$row->beschreibung;
+				$stunde->farbe='';
+				$this->lehrstunden[]=$stunde;
+				//var_dump($stunde);
+			}
 		}
 		//echo $this->anzahl;
 		return $this->anzahl;
