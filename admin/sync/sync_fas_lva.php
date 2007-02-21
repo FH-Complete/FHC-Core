@@ -8,7 +8,7 @@ $conn_fas=pg_connect(CONN_STRING_FAS);
 //$adress='fas_sync@technikum-wien.at';
 $adress='fas_sync@technikum-wien.at';
 //$adress_stpl='stpl@technikum-wien.at';
-$adress_stpl='lv-plan@technikum-wien.at';
+$adress_stpl='lvplan@technikum-wien.at';
 $adress_fas='fas_sync@technikum-wien.at';
 
 
