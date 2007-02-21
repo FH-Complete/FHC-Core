@@ -1,6 +1,6 @@
 <?php
 	require_once('../../vilesci/config.inc.php');
-	$adress='fas_sync@technikum-wien.at';
+	$adress='oesi@technikum-wien.at';
 	
 	function clean_string($string)
  	{
@@ -46,10 +46,10 @@
 	flush();
 	$result=pg_query($conn_fas, $sql_query);
 	$num_rows=pg_num_rows($result);
-	$text="Dies ist eine automatische eMail!\r\r";
-	$text.="Es wurde eine Synchronisation mit FAS durchgeführt.\r";
-	$text.="Anzahl der Studenten vom FAS-Import: $num_rows \r";
-	$text.="Anzahl der Studenten in Portal: $vilesci_anz_std \r\r";
+	$text="Dies ist eine automatische eMail!\n\n";
+	$text.="Es wurde eine Synchronisation mit FAS durchgeführt.\n";
+	$text.="Anzahl der Studenten vom FAS-Import: $num_rows \n";
+	$text.="Anzahl der Studenten in Portal: $vilesci_anz_std \n\n";
 	echo $text.'<BR>';
 	flush();
 	$plausi_error=0;
@@ -84,7 +84,7 @@
 			if ($num_rows_std==0)
 			{
 				
-				$text.="Der Student $row->vornamen $row->nachname ($row->uid) wird neu angelegt.\r";
+				$text.="Der Student $row->vornamen $row->nachname ($row->uid) wird neu angelegt.\n";
 				
 				pg_query($conn, "BEGIN");
 				
@@ -121,7 +121,7 @@
 						if(!$res_insert=pg_query($conn, $sql_query))
 						{
 							$text.=$sql_query;
-							$text.="\rFehler: ".pg_errormessage($conn)."\r";
+							$text.="\nFehler: ".pg_errormessage($conn)."\n";
 							$insert_error++;
 							pg_query($conn, 'ROLLBACK');
 						}
@@ -141,47 +141,59 @@
 								$person_id = $row_seq->id;
 							}
 						}
+					}
 						
-						if(isset($person_id) && $person_id!='')
+					if(isset($person_id) && $person_id!='')
+					{
+						//Schauen ob Benutzerdatensatz mit dieser UID schon vorhanden ist
+						$qry = "SELECT * FROM public.tbl_benutzer WHERE uid='$row->uid'";
+						if($result_bn = pg_query($conn, $qry))
 						{
-							//Benutzer Datensatzt anlegen
-							$qry = "INSERT INTO public.tbl_benutzer(uid, person_id, aktiv, insertamum, insertvon, updateamum, updatevon)
-							        VALUES('$row->uid','$person_id','true',now(),'auto',now(),'auto');";
+							$benutzer_insert_error=false;
+							if(pg_num_rows($result_bn)==0)
+							{	
+								//Benutzer Datensatz anlegen
+								$qry = "INSERT INTO public.tbl_benutzer(uid, person_id, aktiv, insertamum, insertvon, updateamum, updatevon)
+							    	    VALUES('$row->uid','$person_id','true',now(),'auto',now(),'auto');";
 		
-							if(!pg_query($conn, $qry))
-							{							
-								$test.=$qry;
-								$text.="\rFehler: ".pg_errormessage($conn)."\r";
-								pg_query($conn, 'ROLLBACK');
-								$insert_error++;
-							}
-							else 
-							{
-								$anz_insert++;
-								//Alias erstellen
-								$vn = split('[- .,]',strtolower($row->vornamen));
-								$vn = clean_string($vn[0]);
-				
-								$nn = split('[- .,]',strtolower($row->nachname));
-								$nn = clean_string($nn[0]);
-								$alias = $vn.".".$nn;
-								$qry = "SELECT * FROM public.tbl_benutzer WHERE alias='$alias'";
-								$res_alias = pg_query($conn, $qry);
-								if(pg_num_rows($res_alias)==0)
-								{
-									$qry = "UPDATE public.tbl_benutzer set alias='$alias' WHERE uid='$uid'";
-									if(!$res_insert=@pg_query($conn, $qry))
-									{
-										$text.=$qry;
-										$text.="\rFehler: ".pg_errormessage($conn);
-									}
+								if(!pg_query($conn, $qry))
+								{							
+									$test.=$qry;
+									$text.="\nFehler: ".pg_errormessage($conn)."\n";
+									pg_query($conn, 'ROLLBACK');
+									$insert_error++;
+									$benutzer_insert_error=true;
 								}
 								else 
-								{
-									$text.="UPDATE public.tbl_benutzer set alias='$alias' WHERE uid='$uid'";
-									$text.="\nAlias existiert bereits: $alias\n";
+								{								
+									//Alias erstellen
+									$vn = split('[- .,]',strtolower($row->vornamen));
+									$vn = clean_string($vn[0]);
+					
+									$nn = split('[- .,]',strtolower($row->nachname));
+									$nn = clean_string($nn[0]);
+									$alias = $vn.".".$nn;
+									$qry = "SELECT * FROM public.tbl_benutzer WHERE alias='$alias'";
+									$res_alias = pg_query($conn, $qry);
+									if(pg_num_rows($res_alias)==0)
+									{
+										$qry = "UPDATE public.tbl_benutzer set alias='$alias' WHERE uid='$uid'";
+										if(!$res_insert=@pg_query($conn, $qry))
+										{
+											$text.=$qry;
+											$text.="\nFehler: ".pg_errormessage($conn);
+										}
+									}
+									else 
+									{
+										$text.="UPDATE public.tbl_benutzer set alias='$alias' WHERE uid='$uid'";
+										$text.="\nAlias existiert bereits: $alias\n";
+									}
 								}
-								
+							}
+													
+							if(!$benutzer_insert_error)
+							{								
 								//Lehrverband Check
 								$sql_query = "SELECT * FROM public.tbl_lehrverband WHERE studiengang_kz='$row->kennzahl' AND semester='$row->semester' AND
 											verband='$row->verband' AND gruppe='$row->gruppe'";
@@ -211,7 +223,7 @@
 								if(!$res_insert=pg_query($conn, $sql_query))
 								{
 									$text.=$sql_query;
-									$text.="\rFehler: ".pg_errormessage($conn)."\r";
+									$text.="\nFehler: ".pg_errormessage($conn)."\n";
 									$insert_error++;
 									pg_query($conn, 'ROLLBACK');
 								}
@@ -221,6 +233,12 @@
 									pg_query($conn, 'COMMIT');
 								}
 							}
+						}
+						else 
+						{
+							$text.="\nFehler:".pg_errormessage($conn);
+							pg_query($conn, 'ROLLBACK');
+							$insert_error++;
 						}
 					}
 				}
@@ -264,7 +282,7 @@
 					$update=10;
 				if ($update)
 				{
-					$text.="Der Student $row->vornamen $row->nachname ($row->uid) [$update] wird upgedatet.\r";
+					$text.="Der Student $row->vornamen $row->nachname ($row->uid) [$update] wird upgedatet.\n";
 					
 					// person
 					$sql_query="UPDATE public.tbl_person SET titelpre='$row->titel', vornamen='$vornamen', vorname='$vorname', ".
@@ -274,7 +292,7 @@
 					if(!$res_update=pg_query($conn, $sql_query))
 					{
 						$text.=$sql_query;
-	                    $text.="\rFehler: ".pg_errormessage($conn)."\r";
+	                    $text.="\nFehler: ".pg_errormessage($conn)."\n";
 						$update_error++;
 					}
 					//Lehrverband Check
@@ -315,7 +333,7 @@
 					if(!$res_update=pg_query($conn, $sql_query))
 					{
 						$text.=$sql_query;
-	                    $text.="\rFehler: ".pg_errormessage($conn)."\r";
+	                    $text.="\nFehler: ".pg_errormessage($conn)."\n";
 						$update_error++;
 					}
 					else
@@ -326,23 +344,23 @@
 			// Student kommt mehrmals vor ->Warnung
 			elseif ($num_rows_std>1)
 			{
-				$text.="\r!!! Der Student $row->vornamen $row->nachname ($row->uid) kommt mehrfach vor!\r";
+				$text.="\n!!! Der Student $row->vornamen $row->nachname ($row->uid) kommt mehrfach vor!\n";
 				$double_error++;
 			}
 		}
 		else
 		{
 			$plausi_error++;
-			$text.="\r!!! Der Student $row->vornamen $row->nachname ($row->uid) STG:$row->kennzahl S:$row->semester V:$row->verband G:$row->gruppe hat nicht plausible Daten!";
+			$text.="\n!!! Der Student $row->vornamen $row->nachname ($row->uid) STG:$row->kennzahl S:$row->semester V:$row->verband G:$row->gruppe hat nicht plausible Daten!";
 		}
 	}
-	$text.="\r$plausi_error Fehler beim Plausibilitaetscheck!\r";
-	$text.="$update_error Fehler bei Student-Update!\r";
-	$text.="$insert_error Fehler bei Student-Insert!\r";
-	$text.="$double_error Studenten kommen in VileSci doppelt vor!\r\r";
-	$text.="$anz_update Studenten wurden upgedatet.\r";
-	$text.="$anz_insert Studenten wurden neu angelegt.\r\r";
-	$text.="\rEND OF SYNCHRONISATION\r";
+	$text.="\n$plausi_error Fehler beim Plausibilitaetscheck!\n";
+	$text.="$update_error Fehler bei Student-Update!\n";
+	$text.="$insert_error Fehler bei Student-Insert!\n";
+	$text.="$double_error Studenten kommen in VileSci doppelt vor!\n\n";
+	$text.="$anz_update Studenten wurden upgedatet.\n";
+	$text.="$anz_insert Studenten wurden neu angelegt.\n\n";
+	$text.="\nEND OF SYNCHRONISATION\n";
 	if (mail($adress,"FAS Synchro mit PORTAL (Studenten)",$text,"From: vilesci@technikum-wien.at"))
 		$sendmail=true;
 	else
