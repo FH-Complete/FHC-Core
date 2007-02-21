@@ -187,8 +187,8 @@ class lehrveranstaltung
 			$qry .= " AND semester='$semester'";
 		if($lehre!=null)
 			$qry .= " AND lehre=".($lehre?'true':'false');
-			
-		$qry .= " AND lehreverzeichnis<>'' ORDER BY bezeichnung";
+		
+		$qry .= " AND semester is not null AND lehreverzeichnis<>'' ORDER BY bezeichnung";
 		
 		//Datensaetze laden
 		if(!$res = pg_query($this->conn, $qry))
