@@ -14,9 +14,10 @@ require_once('../../../vilesci/config.inc.php');
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
-$adress='ruhan@technikum-wien.at';
-$adress_plausi='ruhan@technikum-wien.at';
-//$adress='fas_sync@technikum-wien.at';
+//$adress='ruhan@technikum-wien.at';
+//$adress_plausi='ruhan@technikum-wien.at';
+$adress='fas_sync@technikum-wien.at';
+$adress_plausi='fas_sync@technikum-wien.at';
 
 $error_log='';
 $error_log_fas='';
@@ -282,7 +283,7 @@ if($resultp = pg_query($conn_fas, $qry))
 	}
 }
 $error_log_fas=$plausisvnr."\n".$error_log_fas;
-//mail($adress_plausi, 'Plausicheck von Mitarbeiter', $error_log_fas,"From: vilesci@technikum-wien.at");
+mail($adress_plausi, 'Plausicheck von Mitarbeiter', $error_log_fas,"From: vilesci@technikum-wien.at");
 $error_log_fas='';
 
 
@@ -825,7 +826,7 @@ echo nl2br("\nLog:\n".$error_log);
 $error_log="Person Sync\n-------------\n\nPerson: Gesamt FAS: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt_person / geaendert: $anzahl_geaendert_person / Fehler: $anzahl_fehler_person";
 $error_log="\nBenutzer:     Eingefügt: $anzahl_eingefuegt_benutzer / geaendert: $anzahl_geaendert_benutzer / Fehler: $anzahl_fehler_benutzer\n\n".$error_log;
 $error_log.="\nMitarbeiter: Eingefügt: $anzahl_eingefuegt_mitarbeiter / geaendert: $anzahl_geaendert_mitarbeiter / Fehler: $anzahl_fehler_mitarbeiter";
-//mail($adress, 'SYNC Mitarbeiter (Plausichecked)', $error_log,"From: vilesci@technikum-wien.at");
+mail($adress, 'SYNC Mitarbeiter (Plausichecked)', $error_log,"From: vilesci@technikum-wien.at");
 ?>
 </body>
 </html>
