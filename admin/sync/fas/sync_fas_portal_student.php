@@ -60,7 +60,7 @@ function myaddslashes($var)
 <body>
 <?php
 
-//Mitarbeiter
+
 $qry = "SELECT * FROM person JOIN student ON person_fk=person_pk WHERE uid NOT LIKE '\_dummy%' ORDER BY uid desc";
 $datum_obj=new datum();
 if($result = pg_query($conn_fas, $qry))
@@ -852,7 +852,7 @@ if($result = pg_query($conn_fas, $qry))
 							{
 								if($rowu=pg_fetch_object($resultu))
 								{
-									$new_beutzer=false;	
+									$new_benutzer=false;	
 									$uid=$rowu->uid;	
 								}
 								else $new_benutzer=true;
