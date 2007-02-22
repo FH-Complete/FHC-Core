@@ -406,7 +406,7 @@ for ($i=0;$i<$num_rows;$i++)
 				{
 					//Gruppe zuteilen
 					$sql_query = 'INSERT INTO lehre.tbl_lehreinheitgruppe(lehreinheit_id, studiengang_kz,'.
-					             ' semester, verband, gruppe, gruppe_kurzbz, updateamum, updatevon ,insertamum, insertvon)'.
+					             ' semester, verband, gruppe, gruppe_kurzbz, updateamum, updatevon ,insertamum, insertvon, ext_id)'.
 					             " VALUES('$row_seq->id','$row->studiengang_kz', '$row->semester',";
 					if ($row->verband==null)
 						$sql_query.='NULL,';
@@ -416,7 +416,7 @@ for ($i=0;$i<$num_rows;$i++)
 						$sql_query.='NULL,';
 					else
 						$sql_query.="'$row->gruppe',";
-					$sql_query.=(strlen($row->einheit_kurzbz)>0?"'".$row->einheit_kurzbz."'":'NULL').",now(),'auto',now(),'auto');";
+					$sql_query.=(strlen($row->einheit_kurzbz)>0?"'".$row->einheit_kurzbz."'":'NULL').",now(),'auto',now(),'auto', '$row->fas_id');";
 					echo $sql_query.'<br>';
 					if(!pg_query($conn, $sql_query))
 					{
@@ -579,12 +579,12 @@ for ($i=0;$i<$num_rows;$i++)
 						{
 							//Gruppeneintrag hinzuguegen
 							$sql_query = 'INSERT INTO lehre.tbl_lehreinheitgruppe(lehreinheit_id, studiengang_kz, semester,'.
-							             ' verband, gruppe, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon)'.
+							             ' verband, gruppe, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id)'.
 							             " VALUES ('$row_lva->lehreinheit_id','$row->studiengang_kz', '$row->semester',".
 							             (strlen($row->verband)>0?"'$row->verband'":'NULL').','.
 							             (strlen($row->gruppe)>0?"'$row->gruppe'":'NULL').','.
 							             (strlen($row->einheit_kurzbz)>0?"'$row->einheit_kurzbz'":'NULL').','.
-							             "now(),'auto', now(),'auto');";
+							             "now(),'auto', now(),'auto', '$row->fas_id');";
 							echo $sql_query.'<br>';
 							if(pg_query($conn, $sql_query))
 							{
