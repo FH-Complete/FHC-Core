@@ -19,6 +19,10 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+// **
+// * @brief bietet die Moeglichkeit zur Anzeige und 
+// * Aenderung der Zeitwuensche und Zeitsperren
+
 	require_once('../../config.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/zeitsperre.class.php');
@@ -94,7 +98,7 @@
 
 <html>
 <head>
-<title>Profil</title>
+<title>Zeitwunsch/Zeitsperre</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link rel="stylesheet" href="../../../skin/cis.css" type="text/css">
 <script language="Javascript">
@@ -167,13 +171,13 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 {
 	$error=false;
 	$error_msg='';
-	//Von-Datum pruefen
+	//von-datum pruefen
 	if(!ereg("([0-9]{2}).([0-9]{2}).([0-9]{4})",$_POST['vondatum']))
 	{
 		$error=true;
 		$errormsg .= 'Von-Datum ist ung&uuml;ltig ';
 	}
-	//Bis-Datum pruefen
+	//bis-datum pruefen
 	if(!ereg("([0-9]{2}).([0-9]{2}).([0-9]{4})",$_POST['bisdatum']))
 	{
 		$error=true;
@@ -191,11 +195,12 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		}
 		else
 		{
+			//wenn die zeitsperre bereits existiert, dann wird sie geladen
 			$zeitsperre->load($_GET['id']);
 			$zeitsperre->new=false;
 			$zeitsperre->zeitsperre_id = $_GET['id'];
 			
-			//pruefen ob die geladene ID auch von der Person ist die angemeldet ist
+			//pruefen ob die geladene id auch von der person ist die angemeldet ist
 			if($zeitsperre->mitarbeiter_uid!=$uid)
 				die('Sie haben keine Berechtigung fuer diese Zeitsperre');
 		}
@@ -232,10 +237,13 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		echo "<span class='error'>$error_msg</span>";
 }
 
+//loeschen einer zeitsperre
 if(isset($_GET['type']) && $_GET['type']=='delete_sperre')
 {
 	$zeit = new zeitsperre($conn);
 	$zeit->load($_GET['id']);
+	//pruefen ob die person die den datensatz loeschen will auch der
+	//besitzer dieses datensatzes ist
 	if($zeit->mitarbeiter_uid==$uid)
 	{
 		if($zeit->delete($_GET['id']))
@@ -249,11 +257,11 @@ if(isset($_GET['type']) && $_GET['type']=='delete_sperre')
 		echo "<span class='error'>Sie haben keine Berechtigung diesen Datensatz zu loeschen</span>";			
 }
 
-//zeitsperren des Users laden
+//zeitsperren des users laden
 $zeit = new zeitsperre($conn);
 $zeit->getzeitsperren($uid);
 $content_table='';
-//Liste aller zeitsperren ausgeben
+//liste aller zeitsperren ausgeben
 if(count($zeit->result)>0)
 {
 	$content_table.= '<table><tr class="liste"><th>Bezeichnung</th><th>Grund</th><th>Von</th><th>Bis</th><th>Vertretung</th><th>Erreichbarkeit</th></tr>';
@@ -261,6 +269,7 @@ if(count($zeit->result)>0)
 	foreach ($zeit->result as $row)
 	{
 		$i++;
+		//name der vertretung holen
 		$qry = "SELECT vorname || ' ' || nachname as kurzbz FROM public.tbl_mitarbeiter, public.tbl_benutzer, public.tbl_person WHERE tbl_benutzer.uid=tbl_mitarbeiter.mitarbeiter_uid AND tbl_benutzer.person_id=tbl_person.person_id AND mitarbeiter_uid='$row->vertretung_uid'";
 		$result_vertretung = pg_query($conn, $qry);
 		$row_vertretung = pg_fetch_object($result_vertretung);
@@ -273,11 +282,13 @@ else
 	
 $zeitsperre = new zeitsperre($conn);
 $action = "$PHP_SELF?type=new_sperre";
+//wenn ein datensatz editiert werden soll, dann diesen laden
 if(isset($_GET['type']) && $_GET['type']=='edit')
 {
 	if(isset($_GET['id']) && is_numeric($_GET['id']))
 	{
 		$zeitsperre->load($_GET['id']);
+		//pruefen ob dieser datensatz auch dem angemeldeten user gehoert
 		if($zeitsperre->mitarbeiter_uid!=$uid)
 		{
 			die("<span class='error'>Sie haben keine Berechtigung diese Zeitsperre zu aendern</span>");
@@ -289,10 +300,12 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 		die("<span class='error'>Fehlerhafte Parameteruebergabe</span>");
 	}
 }
+//formular zum editieren und neu anlegen der zeitsperren
 $content_form='';
 $content_form.= '<form method="POST" action="'.$action.'">';
 $content_form.= "<table>\n";
 $content_form.= '<tr><td>Grund</td><td><SELECT name="zeitsperretyp_kurzbz">';
+//dropdown fuer zeitsperretyp
 $qry = "SELECT * FROM campus.tbl_zeitsperretyp ORDER BY zeitsperretyp_kurzbz";
 if($result = pg_query($conn, $qry))
 {
@@ -307,8 +320,7 @@ if($result = pg_query($conn, $qry))
 $content_form.= '</SELECT>';
 $content_form.= '<tr><td>Bezeichnung</td><td><input type="text" name="bezeichnung" maxlength="32" value="'.$zeitsperre->bezeichnung.'"></td></tr>';
 $content_form.= '<tr><td>von</td><td><input type="text" size="10" maxlength="10" name="vondatum" value="'.($zeitsperre->vondatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->vondatum)):date('d.m.Y')).'"> ';
-
-$qry = "SELECT stunde FROM lehre.tbl_stunde ORDER BY stunde";
+//dropdown fuer vonstunde
 $content_form.= "Stunde (inklusive)";
 
 $content_form.= "<SELECT name='vonstunde'>\n";
@@ -316,21 +328,21 @@ if($zeitsperre->vonstunde=='')
 	$content_form.= "<OPTION value='' selectd>*</OPTION>\n";
 else
 	$content_form.= "<OPTION value=''>*</OPTION>\n";
-if($result = pg_query($conn, $qry))
+
+for($i=0;$i<$num_rows_stunde;$i++)
 {
-	while($row = pg_fetch_object($result))
-	{
-		if($zeitsperre->vonstunde==$row->stunde)
-			$content_form.= "<OPTION value='$row->stunde' selected>$row->stunde</OPTION>\n";
-		else
-			$content_form.= "<OPTION value='$row->stunde'>$row->stunde</OPTION>\n";
-	}
+	$row = pg_fetch_object($result_stunde, $i);
+	
+	if($zeitsperre->vonstunde==$row->stunde)
+		$content_form.= "<OPTION value='$row->stunde' selected>$row->stunde</OPTION>\n";
+	else
+		$content_form.= "<OPTION value='$row->stunde'>$row->stunde</OPTION>\n";
 }
+
 $content_form.= "</SELECT></td></tr>";
 
 $content_form.= '<tr><td>bis</td><td><input type="text" size="10" maxlength="10" name="bisdatum" value="'.($zeitsperre->bisdatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->bisdatum)):date('d.m.Y')).'"> ';
-
-$qry = "SELECT stunde FROM lehre.tbl_stunde ORDER BY stunde";
+//dropdown fuer bisstunde
 $content_form.= "Stunde (inklusive)";
 $content_form.= "<SELECT name='bisstunde'>\n";
 
@@ -338,21 +350,21 @@ if($zeitsperre->bisstunde=='')
 	$content_form.= "<OPTION value='' selectd>*</OPTION>\n";
 else
 	$content_form.= "<OPTION value=''>*</OPTION>\n";
-if($result = pg_query($conn, $qry))
+
+for($i=0;$i<$num_rows_stunde;$i++)
 {
-	while($row = pg_fetch_object($result))
-	{
-		if($zeitsperre->bisstunde==$row->stunde)
-			$content_form.= "<OPTION value='$row->stunde' selected>$row->stunde</OPTION>\n";
-		else
-			$content_form.= "<OPTION value='$row->stunde'>$row->stunde</OPTION>\n";
-	}
+	$row = pg_fetch_object($result_stunde, $i);
+	if($zeitsperre->bisstunde==$row->stunde)
+		$content_form.= "<OPTION value='$row->stunde' selected>$row->stunde</OPTION>\n";
+	else
+		$content_form.= "<OPTION value='$row->stunde'>$row->stunde</OPTION>\n";
 }
+
 $content_form.= "</SELECT></td></tr>";
 
 $content_form.= '<tr><td>Erreichbarkeit</td><td><input type="text" name="erreichbarkeit" value="'.$zeitsperre->erreichbarkeit.'" maxlength="5" size="5"> e..Email, t..Telefon</td></tr>';
 $content_form.= "<tr><td>Vertretung</td><td><SELECT name='vertretung_uid'>";
-
+//dropdown fuer vertretung
 $qry = "SELECT * FROM campus.vw_mitarbeiter WHERE uid not LIKE '\\\_%' ORDER BY nachname, vorname";
 
 if($result = pg_query($conn, $qry))
