@@ -370,7 +370,7 @@ foreach ($studiengangfk as $stg)
 			if($rowass = pg_fetch_object($resultass))
 			{
 				//mail(trim($rowass->email), 'Plausicheck von Studenten / Studiengang: '.$stg, $error_log_fas[$stg],"From: vilesci@technikum-wien.at");
-				//mail($adress, 'Plausicheck von Studenten / Studiengang: '.$stg, $error_log_fas[$stg],"From: vilesci@technikum-wien.at");
+				mail($adress, 'Plausicheck von Studenten / Studiengang: '.$stg, $error_log_fas[$stg],"From: vilesci@technikum-wien.at");
 			}
 		}
 		else 
