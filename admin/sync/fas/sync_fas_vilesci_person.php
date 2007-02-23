@@ -78,87 +78,87 @@ if($resultp = pg_query($conn_fas, $qry))
 		$plausi='';
 		if ($rowp->geschlecht1<>$rowp->geschlecht2)
 		{
-			$plausi="Geschlecht der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->geschlecht1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->geschlecht2."'.\n";
+			$plausi="Geschlecht der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->geschlecht1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->geschlecht2."'.\n";
 			$error=true;
 		}
 		if ($rowp->familienname1<>$rowp->familienname2)
 		{
-			$plausi.="Familienname der Person ".$rowp->uid1." (".$rowp->person1.") ist '".$rowp->familienname1."' bei ".$rowp->uid2." (".$rowp->person2.")  aber '".$rowp->familienname2."'.\n";
+			$plausi.="Familienname der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->familienname1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.")  aber '".$rowp->familienname2."'.\n";
 			$error=true;
 		}
 		if ($rowp->vorname1<>$rowp->vorname2)
 		{
-			$plausi.="Vorname der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->vorname1."' bei ".$rowp->person2." aber '".$rowp->vorname2."'.\n";
+			$plausi.="Vorname der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->vorname2."'.\n";
 			$error=true;
 		}
 		if ($rowp->vornamen1<>$rowp->vornamen2)
 		{
-			$plausi.="Vornamen der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->vornamen1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->vornamen2."'.\n";
+			$plausi.="Vornamen der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->vornamen1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->vornamen2."'.\n";
 			$error=true;
 		}
 		if ($rowp->gebdat1<>$rowp->gebdat2)
 		{
-			$plausi.="Geburtsdatum der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->gebdat1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->gebdat2."'.\n";
+			$plausi.="Geburtsdatum der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->gebdat1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->gebdat2."'.\n";
 			$error=true;
 		}
 		if ($rowp->gebort1<>$rowp->gebort2)
 		{
-			$plausi.="Geburtsort der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->gebort1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->gebort2."'.\n";
+			$plausi.="Geburtsort der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->gebort1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->gebort2."'.\n";
 			$error=true;
 		}
 		if ($rowp->staatsbuergerschaft1<>$rowp->staatsbuergerschaft2)
 		{
-			$plausi.="Staatsbürgerschaft der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->staatsbuergerschaft1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->staatsbuergerschaft2."'.\n";
+			$plausi.="Staatsbürgerschaft der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->staatsbuergerschaft1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->staatsbuergerschaft2."'.\n";
 			$error=true;
 		}
 		if ($rowp->familienstand1<>$rowp->familienstand2)
 		{
-			$plausi.="Familienstand der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->familienstand1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->familienstand2."'.\n";
+			$plausi.="Familienstand der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->familienstand1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->familienstand2."'.\n";
 			$error=true;
 		}
 		if ($rowp->svnr1<>$rowp->svnr2)
 		{
-			$plausi.="Sozialversicherung der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->svnr1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->svnr2."'.\n";
+			$plausi.="Sozialversicherung der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->svnr1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->svnr2."'.\n";
 			$error=true;
 		}
 		if ($rowp->ersatzkennzeichen1<>$rowp->ersatzkennzeichen2)
 		{
-			$plausi.="Ersatzkennzeichen der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->ersatzkennzeichen1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->ersatzkennzeichen2."'.\n";
+			$plausi.="Ersatzkennzeichen der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->ersatzkennzeichen1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->ersatzkennzeichen2."'.\n";
 			$error=true;
 		}
 		if ($rowp->anrede1<>$rowp->anrede2)
 		{
-			$plausi.="Anrede der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->anrede1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->anrede2."'.\n";
+			$plausi.="Anrede der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->anrede1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->anrede2."'.\n";
 			$error=true;
 		}
 		if ($rowp->anzahlderkinder1<>$rowp->anzahlderkinder2)
 		{
-			$plausi.="Anzahl der Kinder der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->anzahlderkinder1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->anzahlderkinder2."'.\n";
+			$plausi.="Anzahl der Kinder der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->anzahlderkinder1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->anzahlderkinder2."'.\n";
 			$error=true;
 		}
 		if ($rowp->bismelden1<>$rowp->bismelden2)
 		{
-			$plausi.="Bismelden der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->bismelden1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->bismelden2."'.\n";
+			$plausi.="Bismelden der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->bismelden1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->bismelden2."'.\n";
 			$error=true;
 		}
 		if ($rowp->titel1<>$rowp->titel2)
 		{
-			$plausi.="Titel der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->titel1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->titel2."'.\n";
+			$plausi.="Titel der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->titel1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->titel2."'.\n";
 			$error=true;
 		}
 		if ($rowp->uid1<>$rowp->uid2)
 		{
-			$plausi.="UID der Person ".$rowp->person1." / ".$rowp->familienname1." ist '".$rowp->uid1."' bei ".$rowp->person2." / ".$rowp->familienname2." aber '".$rowp->uid2."'.\n";
+			$plausi.="UID der Person ".$rowp->familienname1." (person_pk=".$rowp->person1.") ist '".$rowp->uid1."' bei ".$rowp->familienname2." (person_pk=".$rowp->person2.") aber '".$rowp->uid2."'.\n";
 			$error=true;
 		}
 		if ($rowp->gebnation1<>$rowp->gebnation2)
 		{
-			$plausi.="Geburtsnation der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->gebnation1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->gebnation2."'.\n";
+			$plausi.="Geburtsnation der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->gebnation1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->gebnation2."'.\n";
 			$error=true;
 		}
 		if ($rowp->postnomentitel1<>$rowp->postnomentitel2)
 		{
-			$plausi.="Postnomentitel der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->postnomentitel1."' bei ".$rowp->uid2." (".$rowp->person2.") / ".$rowp->familienname2." aber '".$rowp->postnomentitel2."'.\n";
+			$plausi.="Postnomentitel der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->postnomentitel1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->postnomentitel2."'.\n";
 			$error=true;
 		}
 		if ($error)
@@ -166,8 +166,8 @@ if($resultp = pg_query($conn_fas, $qry))
 			$plausi="*****\n".$plausi."*****\n";
 			echo nl2br ($plausi);
 			$error_log_fas.=$plausi;
-			ob_flush();
-			flush();
+			//ob_flush();
+			//flush();
 			$error=false;
 		}
 	}
@@ -346,9 +346,9 @@ if($result = pg_query($conn_fas, $qry))
 					{
 						$anzahl_update++;
 					}
-					echo "- ";
-					ob_flush();
-					flush();
+					//echo "- ";
+					//ob_flush();
+					//flush();
 				}
 			}
 			else
