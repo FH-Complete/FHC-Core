@@ -42,7 +42,7 @@ $anzahl_fehler_benutzer=0;
 $anzahl_nichtstudenten=0;
 $rolle_kurzbz=array(1=>"Interessent", 2=>"Bewerber", 3=>"Student", 4=>"Ausserordentlicher", 5=>"Abgewiesener", 6=>"Aufgenommener", 7=>"Wartender", 8=>"Abbrecher", 9=>"Unterbrecher", 10=>"Outgoing", 11=>"Incoming", 12=>"Praktikant", 13=>"Diplomant", 14=>"Absolvent");
 $studiensemester_kurzbz=array(2=>"wS2002",3=>"SS2003",4=>"WS2003",5=>"SS2004",6=>"WS2004",7=>"SS2005",8=>"WS2005",9=>"SS2006",10=>"WS2006",11=>"SS2007",12=>"WS2007",13=>"SS2008",14=>"WS2008");
-$studiengangfk=array(2=>11,2=>91,4=>94,5=>145,6=>227,7=>182,8=>222,9=>203,10=>204,11=>92,12=>258,13=>308,14=>254,15=>256,16=>257,18=>302,19=>336,20=>330,21=>333, 22=>327,23=>335,24=>228,25=>303,26=>299,27=>298,28=>300,29=>297,30=>329,31=>301,32=>332,33=>331,34=>328,35=>1,36=>1,37=>334);
+$studiengangfk=array(2=>11,2=>91,4=>94,5=>145,6=>227,7=>182,8=>222,9=>203,10=>204,11=>92,12=>258,13=>308,14=>254,15=>256,16=>257,17=>255,18=>302,19=>336,20=>330,21=>333, 22=>327,23=>335,24=>228,25=>303,26=>299,27=>298,28=>300,29=>297,30=>329,31=>301,32=>332,33=>331,34=>328,35=>1,36=>1,37=>334);
 //Kennzahlen für EUE im Array studiengangfk NACHTRAGEN
 
 $error_log_fas=array();
@@ -144,7 +144,7 @@ if($resultp = pg_query($conn_fas, $qry))
 			{
 				if($rowstg = pg_fetch_object($resultstg))
 				{
-					$studstg1=strtoupper(trim($rowstg->typ)).trim($rowstg->kurzbz);
+					$studstg1=strtoupper(trim($rowstg->typ)).strtoupper(trim($rowstg->kurzbz));
 				}
 			}
 			else 
@@ -165,7 +165,7 @@ if($resultp = pg_query($conn_fas, $qry))
 			{
 				if($rowstg = pg_fetch_object($resultstg))
 				{
-					$studstg2=strtoupper(trim($rowstg->typ)).trim($row->kurzbz);
+					$studstg2=strtoupper(trim($rowstg->typ)).strtoupper(trim($rowstg->kurzbz));
 				}
 			}
 			else 
