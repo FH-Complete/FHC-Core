@@ -106,6 +106,8 @@ if($result = pg_query($conn_fas, $qry))
 					$studiengang->max_semester		=$row1->max_semester;
 					$studiengang->max_gruppe		=$row1->max_gruppe;
 					$studiengang->kurzbzlang			=$row1->kurzbzlang;
+					$studiengang->kurzbz			=$row1->kurzbz;
+					$studiengang->typ				=$row1->typ;
 					$studiengang->new=false;
 				}
 				else 
@@ -141,7 +143,7 @@ else
 
 <html>
 <head>
-<title>Synchro - Vilesci -> Portal - Studiengang</title>
+<title>Synchro - FAS -> Portal - Studiengang</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
 <body>
@@ -151,7 +153,7 @@ else
 echo nl2br($error_log);
 echo nl2br("\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
 $error_log.="\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler";
-mail($adress, 'SYNC Studiengang', $error_log);
+mail($adress, 'SYNC Studiengang', $error_log,"From: vilesci@technikum-wien.at");
 ?>
 </body>
 </html>

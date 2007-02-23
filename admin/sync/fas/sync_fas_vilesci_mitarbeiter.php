@@ -7,7 +7,7 @@
  */
 /**
  * Synchronisiert Mitarbeiterdatensaetze von FAS DB in PORTAL DB
- *
+ * benötigt tbl_nation, tbl_sprache, tbl_ort
  */
 require_once('../../../vilesci/config.inc.php');
 
@@ -123,7 +123,7 @@ if($resultp = pg_query($conn_fas, $qry))
 		}
 		if ($rowp->vorname1<>$rowp->vorname2)
 		{
-			$plausi.="Vorname der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->vorname1."' bei ".$rowp->person2." aber '".$rowp->vorname2."'.\n";
+			$plausi.="Vorname der Person ".$rowp->uid1." (".$rowp->person1.") / ".$rowp->familienname1." ist '".$rowp->vorname1."' bei ".$rowp->uid2." (".$rowp->person2.") aber '".$rowp->vorname2."'.\n";
 			$error=true;
 		}
 		if ($rowp->vornamen1<>$rowp->vornamen2)
