@@ -366,7 +366,7 @@ AND (p1.familienname<>p2.familienname OR p1.vorname<>p2.vorname OR p1.vornamen<>
 	OR p1.aufnahmeschluessel<>p2.aufnahmeschluessel OR p1.aufnahmeschluessel_fk<>p2.aufnahmeschluessel_fk 
 	OR p1.angetreten<>p2.angetreten)
 )
-order by familienname Limit 10
+order by familienname
 ";
 $datum_obj=new datum();
 if($result = pg_query($conn_fas, $qry))
