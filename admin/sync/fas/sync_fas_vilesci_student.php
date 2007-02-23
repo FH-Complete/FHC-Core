@@ -6,7 +6,7 @@
  */
 /**
  * Synchronisiert Studentendatensaetze von FAS DB in PORTAL DB
- *benötigt: tbl_nation, tbl_sprache, tbl_studiengang
+ * benötigt: tbl_nation, tbl_sprache, tbl_studiengang
  * benötigt: tbl_syncperson
 */
 require_once('../../../vilesci/config.inc.php');
@@ -144,7 +144,7 @@ if($resultp = pg_query($conn_fas, $qry))
 			{
 				if($rowstg = pg_fetch_object($resultstg))
 				{
-					$studstg1=strtoupper((trim($rowstg->typ)).trim($rowstg->kurzbz);
+					$studstg1=strtoupper(trim($rowstg->typ)).trim($rowstg->kurzbz);
 				}
 			}
 			else 
