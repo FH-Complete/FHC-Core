@@ -144,7 +144,7 @@ if($resultp = pg_query($conn_fas, $qry))
 			{
 				if($rowstg = pg_fetch_object($resultstg))
 				{
-					$studstg1=upper(trim($rowstg->typ)).trim($rowstg->kurzbz);
+					$studstg1=strtoupper((trim($rowstg->typ)).trim($rowstg->kurzbz);
 				}
 			}
 			else 
@@ -165,7 +165,7 @@ if($resultp = pg_query($conn_fas, $qry))
 			{
 				if($rowstg = pg_fetch_object($resultstg))
 				{
-					$studstg2=upper(trim($rowstg->typ)).trim($row->kurzbz);
+					$studstg2=strtoupper(trim($rowstg->typ)).trim($row->kurzbz);
 				}
 			}
 			else 
