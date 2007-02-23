@@ -7,7 +7,8 @@
  */
 /**
  * Synchronisiert Mitarbeiterdatensaetze von FAS DB in PORTAL DB
- * benötigt tbl_nation, tbl_sprache, tbl_ort
+ * setzt voraus: tbl_nation, tbl_sprache, tbl_ort
+ * benötigt: tbl_syncperson
  */
 require_once('../../../vilesci/config.inc.php');
 

@@ -7,6 +7,7 @@
 /**
  * Synchronisiert Studentendatensaetze von FAS DB in PORTAL DB
  *benötigt: tbl_nation, tbl_sprache, tbl_studiengang
+ * benötigt: tbl_syncperson
 */
 require_once('../../../vilesci/config.inc.php');
 require_once('../../../include/datum.class.php');
@@ -365,7 +366,7 @@ AND (p1.familienname<>p2.familienname OR p1.vorname<>p2.vorname OR p1.vornamen<>
 	OR p1.aufnahmeschluessel<>p2.aufnahmeschluessel OR p1.aufnahmeschluessel_fk<>p2.aufnahmeschluessel_fk 
 	OR p1.angetreten<>p2.angetreten)
 )
-order by p1.familienname
+order by familienname Limit 10
 ";
 $datum_obj=new datum();
 if($result = pg_query($conn_fas, $qry))
@@ -1314,7 +1315,7 @@ Echo nl2br("Benutzer: Eingefügt: ".$anzahl_benutzer_insert." / Geändert: ".$anza
 Echo nl2br("Nicht-Studenten: ".$anzahl_nichtstudenten."\n");
 Echo nl2br("Studenten: Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student."\n");
 
-$error_log="Synch Student:\n";
+$error_log="Sync Student:\n";
 $error_log.="\nPersonen ohne Reihungstest: ".$notest." \n\n";
 $error_log.="Personen: Eingefügt: ".$anzahl_person_insert." / Geändert: ".$anzahl_person_update." / Fehler: ".$anzahl_fehler_person."\n";
 $error_log.="Prestudenten: Eingefügt: ".$anzahl_pre_insert." / Geändert: ".$anzahl_pre_update." / Fehler: ".$anzahl_fehler_pre."\n";
@@ -1322,7 +1323,7 @@ $error_log.="Benutzer: Eingefügt: ".$anzahl_benutzer_insert." / Geändert: ".$anz
 $error_log.="Nicht-Studenten: ".$anzahl_nichtstudenten."\n";
 $error_log.="Studenten: Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student."\n";
 $error_log.=$text;
-mail($adress, 'SYNC Student', $error_log, $error_log,"From: vilesci@technikum-wien.at");
+mail($adress, 'SYNC Student', $error_log,"From: vilesci@technikum-wien.at");
 ?>
 </body>
 </html>
