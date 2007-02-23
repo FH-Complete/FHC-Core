@@ -200,7 +200,7 @@ class lehreinheit
 		$qry = "SELECT * FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lehrveranstaltung_id' AND studiensemester_kurzbz='$studiensemester_kurzbz'";
 
 		if($result = pg_query($this->conn, $qry))
-		{
+		{			
 			while($row = pg_fetch_object($result))
 			{
 				$le_obj = new lehreinheit($this->conn);
@@ -228,6 +228,7 @@ class lehreinheit
 
 				$this->lehreinheiten[] = $le_obj;
 			}
+			return true;
 		}
 		else
 		{

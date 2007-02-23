@@ -229,99 +229,59 @@ function lvaNeuPart() {
 	details.reset();
 }
 
-function lvaAuswahl() {
+/**
+ * Gibt eine Message auf die Javascript Console aus
+ */
+function debug(msg)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	 var consoleService = Components.classes["@mozilla.org/consoleservice;1"]
+                                 .getService(Components.interfaces.nsIConsoleService);
+    consoleService.logStringMessage(msg);
+}
+
+function lvaAuswahl() 
+{
 	var tree = document.getElementById('treeLFVT');
 
 	if (tree.currentIndex==-1) return;
-	try {
-		//alert('currentIndex'+tree.currentIndex);
-        var selected = tree.treeBoxObject.view.getItemAtIndex(tree.currentIndex);
-		var cells = selected.getElementsByTagName( "treerow" );
-		var id = cells[ 0 ].getAttribute( "dbID" );
-		//alert(id);
-        //var parent = tree.view.getItemAtIndex(c).parentNode;
-        //parent.removeChild(selected);
+	try 
+	{
+        var col = tree.columns ? tree.columns["lva_lehreinheit_id"] : "lva_lehreinheit_id";
+		var lehreinheit_id=tree.view.getCellText(tree.currentIndex,col);
+		if(lehreinheit_id=='')
+			return false;
+		var col = tree.columns ? tree.columns["lva_lehrveranstaltung_id"] : "lva_lehrveranstaltung_id";
+		var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
 
-	} catch(e) {
+		if(lehrveranstaltung_id=='')
+			return false;
+
+	}
+	catch(e) 
+	{
 		alert(e);
 		return false;
 	}
 
-
 	// Datasource holen
 	var dsource;
+	
 	// Trick 17	(sonst gibt's ein Permission denied)
-	try {
-		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	} catch(e) {
-		alert(e);
-		return;
-	}
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	
 	var sources=tree.database.GetDataSources();
-	if (sources.hasMoreElements()){
+	if (sources.hasMoreElements())
+	{
     	dsource=sources.getNext();
 	}
-
-
-	/*
-	// RDF/XML Datasources are all nsIRDFXMLSinks
-var sink = dsource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-// Attach the observer to the datasource-as-sink
-sink.addXMLSinkObserver(
-  {
-     onBeginLoad: function(aSink) { },
-     onInterrupt: function(aSink) { },
-     onResume: function(aSink) { }, */
-//     onEndLoad: function(aSink) { /*tree.builder.rebuild();*/ alert('Refresh done'); },
-//     onError: function(aSink, aStatus, aErrorMsg) { alert('Error! ' + aErrorMsg); }
-//  }
-//);
-
-
-
-
-
-
+	
 	dsource=dsource.QueryInterface(Components.interfaces.nsIRDFDataSource);
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                    getService(Components.interfaces.nsIRDFService);
-	var subject = rdfService.GetResource("http://www.technikum-wien.at/tempus/lva/" + id);
+	var subject = rdfService.GetResource("http://www.technikum-wien.at/tempus/lva/"+lehrveranstaltung_id+"/" + lehreinheit_id);
 
-
-
-	// zum debuggen; zeigt predicates an, die in resource zu finden sind
-
-	//var karen = rdfService.GetResource("http://www.technikum-wien.at/tempus/lva/176355");
-
-	/*
-	var targets = dsource.ArcLabelsOut(subject);
-	while (targets.hasMoreElements()){
-		var predicate = targets.getNext();
-		if (predicate instanceof Components.interfaces.nsIRDFResource){
-			var newPredicate = rdfService.GetResource( predicate.Value );
-			alert(predicate.Value);
-		}
-	}*/
-
-
-	/*
-	var targets = dsource.ArcLabelsOut(karen);
-	while (targets.hasMoreElements()){
-
-	  var predicate = targets.getNext();
-	  if (predicate instanceof Components.interfaces.nsIRDFResource){
-		  	alert(predicate.Value);
-		    var target = dsource.GetTarget(subject, predicate, true);
-
-		    if (target instanceof Components.interfaces.nsIRDFResource){
-		      alert("Resource is: " + target.Value);
-		    }
-		    else if (target instanceof Components.interfaces.nsIRDFLiteral){
-		      alert("Literal is: " + target.Value + " predi="+ predicate.Value+ "subject="+subject.Value);
-		    }
-	  }
-	}*/
 
 	//
 	var predicateNS = "http://www.technikum-wien.at/tempus/lva/rdf";
@@ -333,46 +293,27 @@ sink.addXMLSinkObserver(
 	//
 	var lva = new Lehrveranstaltung();
 
-	lva.id = getTargetHelper(dsource,subject,rdfService.GetResource( "id" ));
+	//lva.id = getTargetHelper(dsource,subject,rdfService.GetResource( "lehrveranstaltung_id" ));
 	lva.unr = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#unr" ));
 	lva.lvnr=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lvnr" ));
-	lva.einheit=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#einheit_kurzbz" ));
-	lva.lektor=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lektor" ));
-	lva.lehrfach=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehrfach_nr" ));
-	lva.studiengang=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiengang_kz" ));
-	lva.fachbereich=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#fachbereich_id" ));
-	lva.semester=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#semester" ));
-	lva.verband=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#verband" ));
-	lva.gruppe=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#gruppe" ));
+	lva.sprache=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#sprache" ));
+	lva.lehrveranstaltung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehrveranstaltung_id" ));
+	lva.lehrfach=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehrfach_id" ));
 	lva.raumtyp=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#raumtyp" ));
 	lva.raumtyp_alt=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#raumtypalternativ" ));
-	lva.semesterstunden=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#semesterstunden" ));
+	lva.lehre=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehre" ));
 	lva.stundenblockung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#stundenblockung" ));
 	lva.wochenrythmus=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#wochenrythmus" ));
-	lva.start_kw=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#start_kw" ));
+	lva.start_kw=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#startkw" ));
+	lva.anmerkung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
 	lva.studiensemester=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiensemester_kurzbz" ));
-	lva.lehrform=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehrform" ));
-	
-	// ist jetzt beim lehrfach:
-	//lva.ects=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ects" ));
+	lva.lehrform=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehrform_kurzbz" ));
 
-    //student.show();
 	currentLVA = lva;
-
-	//alert("lva.studiengang="+lva.studiengang);
-
+	
 	var lvaDetail=document.getElementById('lvaDetail');
 	lvaDetail.setLVA(lva);
 	lvaDetail.isNew=false;
-
-	/*
-	if (dsource.hasArcOut(subject, predicate))  {
-		if (target instanceof Components.interfaces.nsIRDFLiteral) {
-		      alert("Literal is: " + target.Value + " predi="+ predicate.Value+ "subject="+subject.Value);
-		      student.vornamen = target.Value;
-		      student.show();
-		}
-	} */
 }
 
 function getTargetHelper(dsource,subj,predi) {

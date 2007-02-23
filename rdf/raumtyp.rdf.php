@@ -27,7 +27,7 @@ if (!$conn = @pg_pconnect(CONN_STRING))
 $raumtypDAO=new raumtyp($conn);
 $raumtypen=$raumtypDAO->getAll();
 
-$rdf_url='http://www.technikum-wien.at/tempus/raumtyp';
+$rdf_url='http://www.technikum-wien.at/raumtyp';
 
 ?>
 
@@ -39,21 +39,19 @@ $rdf_url='http://www.technikum-wien.at/tempus/raumtyp';
   <RDF:Seq about="<?php echo $rdf_url ?>/liste">
 
 <?php
-if (is_array($raumtypen)) {
 
-	foreach ($raumtypen as $rt)
-	{
+foreach ($raumtypDAO->result as $rt)
+{
 	?>
   <RDF:li>
-      	<RDF:Description  id="<?php echo $rt->kurzbz; ?>"  about="<?php echo $rdf_url.'/'.$rt->kurzbz; ?>" >
-        	<RAUMTYP:kurzbz><?php echo $rt->kurzbz  ?></RAUMTYP:kurzbz>
+      	<RDF:Description  id="<?php echo $rt->raumtyp_kurzbz; ?>"  about="<?php echo $rdf_url.'/'.$rt->raumtyp_kurzbz; ?>" >
+        	<RAUMTYP:kurzbz><?php echo $rt->raumtyp_kurzbz  ?></RAUMTYP:kurzbz>
     		<RAUMTYP:beschreibung><?php echo $rt->beschreibung  ?></RAUMTYP:beschreibung>
       	</RDF:Description>
   </RDF:li>
 	  <?php
-	}
-
 }
+
 ?>
 
 
