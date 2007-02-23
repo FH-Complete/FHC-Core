@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2007 Technikum-Wien
  *
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,

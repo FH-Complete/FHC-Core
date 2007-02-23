@@ -42,14 +42,13 @@ $anzahl_nichtstudenten=0;
 $rolle_kurzbz=array(1=>"Interessent", 2=>"Bewerber", 3=>"Student", 4=>"Ausserordentlicher", 5=>"Abgewiesener", 6=>"Aufgenommener", 7=>"Wartender", 8=>"Abbrecher", 9=>"Unterbrecher", 10=>"Outgoing", 11=>"Incoming", 12=>"Praktikant", 13=>"Diplomant", 14=>"Absolvent");
 $studiensemester_kurzbz=array(2=>"wS2002",3=>"SS2003",4=>"WS2003",5=>"SS2004",6=>"WS2004",7=>"SS2005",8=>"WS2005",9=>"SS2006",10=>"WS2006",11=>"SS2007",12=>"WS2007",13=>"SS2008",14=>"WS2008");
 $studiengangfk=array(2=>11,2=>91,4=>94,5=>145,6=>227,7=>182,8=>222,9=>203,10=>204,11=>92,12=>258,13=>308,14=>254,15=>256,16=>257,18=>302,19=>336,20=>330,21=>333, 22=>327,23=>335,24=>228,25=>303,26=>299,27=>298,28=>300,29=>297,30=>329,31=>301,32=>332,33=>331,34=>328,35=>1,36=>1,37=>334);
-//Kennzahlen für EUE im Array studienganfk NACHTRAGEN
-$error_log_fas=array();
+//Kennzahlen für EUE im Array studiengangfk NACHTRAGEN
 
+$error_log_fas=array();
 foreach ($studiengangfk as $stg)
 {
 	$error_log_fas[$stg]='';
 }
-
 
 
 $adress='ruhan@technikum-wien.at';
@@ -320,12 +319,27 @@ if($resultp = pg_query($conn_fas, $qry))
 foreach ($studiengangfk as $stg)
 {
 	$error_log_fas[$stg]=$plausisvnr."\n".$error_log_fas[$stg];
-	mail($adress_plausi[$stg], 'Plausicheck von Studenten / Studiengang: '.$stg, $error_log_fas[$stg],"From: vilesci@technikum-wien.at");
-
+	$qryass="SELECT email FROM tbl_studiengang WHERE studiengang_kz='$stg';";
+	if($resultass = pg_query($conn, $qryass))
+	{
+		if(pg_num_rows($restulass)>0)
+		{
+			if($rowass = pg_fetch_object($resultass))
+			{
+				mail(trim($rowass->email), 'Plausicheck von Studenten / Studiengang: '.$stg, $error_log_fas[$stg],"From: vilesci@technikum-wien.at");
+			}
+		}
+		else 
+		{
+			echo nl2br("Studiengang ".$stg." nicht gefunden. Es wird kein E-Mail geschickt mit folgenden Inhalt:\n".$error_log_fas[$stg]);
+		}
+	}
+	else 
+	{
+		echo nl2br("Kein Zugriff auf tbl_studiengang => Studiengang ".$stg." nicht gefunden. Es wird kein E-Mail geschickt mit Inhalt:\n".$error_log_fas[$stg]);
+	}
 }
 
-
-exit;
 
 
 $qry = "SELECT * FROM person JOIN student ON person_fk=person_pk WHERE uid NOT LIKE '\_dummy%' 
@@ -1293,8 +1307,6 @@ if($result = pg_query($conn_fas, $qry))
 }		
 
 
-//echo nl2br("\n".$text);
-//echo nl2br("\n".$error_log);
 Echo nl2br("\n\nPersonen ohne Reihungstest: ".$notest." \n");
 Echo nl2br("Personen: Eingefügt: ".$anzahl_person_insert." / Geändert: ".$anzahl_person_update." / Fehler: ".$anzahl_fehler_person."\n");
 Echo nl2br("Prestudenten: Eingefügt: ".$anzahl_pre_insert." / Geändert: ".$anzahl_pre_update." / Fehler: ".$anzahl_fehler_pre."\n");
@@ -1310,7 +1322,7 @@ $error_log.="Benutzer: Eingefügt: ".$anzahl_benutzer_insert." / Geändert: ".$anz
 $error_log.="Nicht-Studenten: ".$anzahl_nichtstudenten."\n";
 $error_log.="Studenten: Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student."\n";
 $error_log.=$text;
-//mail($adress, 'SYNC Student (Plausichecked)', $error_log, $error_log,"From: vilesci@technikum-wien.at");
+mail($adress, 'SYNC Student', $error_log, $error_log,"From: vilesci@technikum-wien.at");
 ?>
 </body>
 </html>
