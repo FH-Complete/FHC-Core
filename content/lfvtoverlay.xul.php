@@ -47,78 +47,94 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 
 				>
 					<treecols>
-	    				<treecol id="lvaUnr" label="UNR" flex="2" primary="true"
+	    				<treecol id="lva_lehrveranstaltung_id" label="Lehrveranstaltung_id" flex="2" primary="true"
 							class="sortDirectionIndicator"
 							sortActive="true"
 	    					sortDirection="ascending"
-	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#unr"
+	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lehrveranstaltung_id"
 						/>
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="lvaLvnr" label="LVNR" flex="1" hidden="false"
+	    				<treecol id="lva_kurzbz" label="Kurzbezeichnung" flex="10" hidden="false"
 							class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lvnr" />
+	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#kurzbz"/>
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="lvaLehrfach" label="Lehrfach" flex="10" hidden="false"
-							class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lehrfach"/>
-	    				<splitter class="tree-splitter"/>
-	    				<treecol id="lvaLektor" label="Lektor" flex="5" hidden="false"
+	    				<treecol id="lva_bezeichnung" label="Bezeichnung" flex="5" hidden="false"
 						   class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lektorPrettyPrint"/>
+	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#bezeichnung"/>
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="lvaSemester" label="S" flex="2" hidden="false"
+	    				<treecol id="lva_sprache" label="Sprache" flex="2" hidden="false"
 							class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#semester" />
+	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#sprache" />
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="lvaVerband" label="V" flex="2" hidden="false"
+	    				<treecol id="lva_ects" label="ECTS" flex="2" hidden="false"
 							class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#verband" />
+	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#ects" />
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="lvaGruppe" label="G" flex="2" hidden="false"
+	    				<treecol id="lva_semesterstunden" label="Semesterstunden" flex="2" hidden="false"
 							class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#gruppe"/>
+	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#semesterstunden"/>
 						<splitter class="tree-splitter"/>
-						<treecol id="lvaEinheit" label="Einheit" flex="2" hidden="false"
+						<treecol id="lva_lehre" label="Lehre" flex="2" hidden="false"
 							class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#einheit_kurzbz"/>
+	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lehre"/>
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="lvaRaumtyp" label="R.Typ." flex="5" hidden="true"  />
+	    				<treecol id="lva_lehrform" label="Lehrform" flex="5" hidden="true"  
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lehrform_kurzbz"/>
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="lvaRaumtypalternativ" label="R.Typ.alt." flex="5" hidden="true"  />
+	    				<treecol id="lva_stundenblockung" label="Blockung" flex="5" hidden="true"  
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#stundenblockung"/>
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="lvaSemesterstunden" label="Semesterstunden" flex="1" hidden="true"  />
+	    				<treecol id="lva_wochenrythmus" label="WR" flex="5" hidden="true"  
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#wochenrythmus"/>
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="lvaStundenblockung" label="Stundenblockung" flex="5" hidden="true"  />
+	    				<treecol id="lva_startkw" label="StartKW" flex="5" hidden="true"  
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#startkw"/>
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="lvaWochenrythmus" label="Wochenrythmus" flex="5" hidden="true"  />
+	    				<treecol id="lva_raumtyp" label="Raumtyp" flex="5" hidden="true"  
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#raumtyp"/>
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="lvaStart_kw" label="Start KW" flex="5" hidden="true"  />
+	    				<treecol id="lva_raumtypalternativ" label="RaumtypAlt" flex="5" hidden="true"  
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#raumtypalternativ"/>
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="lvaStudiensemester_kurzbz" label="Studiensemester" flex="5" hidden="true"  />
-						<splitter class="tree-splitter"/>
-	    				<treecol id="lvaLehrform" label="Lehrform" flex="5" hidden="true"  />
+	    				<treecol id="lva_gruppen" label="Gruppen" flex="5" hidden="true"  
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#gruppen"/>
+	    				<splitter class="tree-splitter"/>
+	    				<treecol id="lva_lektoren" label="Lektoren" flex="5" hidden="true"  
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lektoren"/>
+	    				<splitter class="tree-splitter"/>
+	    				<treecol id="lva_lehreinheit_id" label="Lehreinheit_id" flex="10" hidden="false"
+							class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lehreinheit_id"/>
 					</treecols>
 
 					<template>
 						<treechildren flex="1" >
 	       					<treeitem uri="rdf:*">
-								<treerow dbID="rdf:http://www.technikum-wien.at/tempus/lva/rdf#dbID">
-	         						<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#unr"  />
-									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lvnr"/>
-									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lehrfach"/>
-									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lektorPrettyPrint"/>
-									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#semester"/>
-									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#verband"/>
-									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#gruppe"/>
-									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#einheit_kurzbz"/>
+								<treerow dbID="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lehrveranstaltung_id">
+	         						<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lehrveranstaltung_id"  />
+									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#kurzbz"/>
+									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#bezeichnung"/>
+									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#sprache"/>
+									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#ects"/>
+									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#semesterstunden"/>
+									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lehre"/>
+									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lehrform_kurzbz"/>
+									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#stundenblockung"/>									
+									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#wochenrythmus"/>									
+									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#startkw"/>
 									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#raumtyp"/>
 									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#raumtypalternativ"/>
-									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#semesterstunden"/>
-									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#stundenblockung"/>
-									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#wochenrythmus"/>
-									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#start_kw"/>
-									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#studiensemester_kurzbz"/>
-									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lehrform"/>
+									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#gruppen"/>
+									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lektoren"/>
+									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lehreinheit_id"/>
 								</treerow>
 							</treeitem>
 						</treechildren>

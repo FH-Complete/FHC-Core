@@ -44,6 +44,7 @@ class lehrveranstaltung
 	var $planfaktor;			//@var numeric(3,2)
 	var $planlektoren;			//@var integer
 	var $planpersonalkosten;	//@var numeric(7,2)
+	var $plankostenprolektor;	//@var numeric(6,2)
 	var $updateamum;			//@var timestamp
 	var $updatevon;				//@var string
 	var $sprache;				//@var varchar(16)
@@ -99,6 +100,7 @@ class lehrveranstaltung
 			$this->planfaktor=$row->planfaktor;
 			$this->planlektoren=$row->planlektoren;
 			$this->planpersonalkosten=$row->planpersonalkosten;
+			$this->plankostenprolektor=$row->plankostenprolektor;
 			$this->updateamum=$row->updateamum;
 			$this->updatevon=$row->updatevon;
 			$this->sprache=$row->sprache;
@@ -142,6 +144,7 @@ class lehrveranstaltung
 			$lv_obj->planfaktor=$row->planfaktor;
 			$lv_obj->planlektoren=$row->planlektoren;
 			$lv_obj->planpersonalkosten=$row->planpersonalkosten;
+			$lv_obj->plankostenprolektor=$row->plankostenprolektor;
 			$lv_obj->updateamum=$row->updateamum;
 			$lv_obj->updatevon=$row->updatevon;
 			$lv_obj->sprache=$row->sprache;
@@ -218,6 +221,7 @@ class lehrveranstaltung
 			$lv_obj->planfaktor=$row->planfaktor;
 			$lv_obj->planlektoren=$row->planlektoren;
 			$lv_obj->planpersonalkosten=$row->planpersonalkosten;
+			$lv_obj->plankostenprolektor=$row->plankostenprolektor;
 			$lv_obj->updateamum=$row->updateamum;
 			$lv_obj->updatevon=$row->updatevon;
 			$lv_obj->sprache=$row->sprache;
@@ -316,7 +320,7 @@ class lehrveranstaltung
 			//Neuen Datensatz anlegen
 			$qry = 'BEGIN; INSERT INTO lehre.tbl_lehrveranstaltung (studiengang_kz, bezeichnung, kurzbz, 
 				semester, ects, semesterstunden,  anmerkung, lehre, lehreverzeichnis, aktiv, ext_id, insertamum, 
-				insertvon, planfaktor, planlektoren, planpersonalkosten, updateamum, updatevon, sprache) VALUES ('.
+				insertvon, planfaktor, planlektoren, planpersonalkosten, plankostenprolektor, updateamum, updatevon, sprache) VALUES ('.
 				$this->addslashes($this->studiengang_kz).', '.
 				$this->addslashes($this->bezeichnung).', '.
 				$this->addslashes($this->kurzbz).', '. 
@@ -333,6 +337,7 @@ class lehrveranstaltung
 				$this->addslashes($this->planfaktor).', '.
 				$this->addslashes($this->planlektoren).', '.
 				$this->addslashes($this->planpersonalkosten).', '.
+				$this->addslashes($this->plankostenprolektor).', '.
 				$this->addslashes($this->updateamum).', '.
 				$this->addslashes($this->updatevon).','.
 				$this->addslashes($this->sprache).');';
@@ -366,6 +371,7 @@ class lehrveranstaltung
 				'planfaktor='.$this->addslashes($this->planfaktor) .', '.
 				'planlektoren='.$this->addslashes($this->planlektoren) .', '.
 				'planpersonalkosten='.$this->addslashes($this->planpersonalkosten) .', '.
+				'plankostenprolektor='.$this->addslashes($this->plankostenprolektor) .', '.
 				'updateamum='.$this->addslashes($this->updateamum) .','.
 				'updatevon='.$this->addslashes($this->updatevon) .','.
 				'sprache='.$this->addslashes($this->sprache).' '.

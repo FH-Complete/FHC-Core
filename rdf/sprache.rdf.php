@@ -1,7 +1,9 @@
 <?php
 /*
  * Created on 02.12.2004
- * Erstellt ein RDF mit den Lehrformen
+ *
+ * To change the template for this generated file go to
+ * Window - Preferences - PHPeclipse - PHP - Code Templates
  */
 // header für no cache
 header("Cache-Control: no-cache");
@@ -14,41 +16,36 @@ header("Content-type: application/vnd.mozilla.xul+xml");
 echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
 // DAO
 include('../vilesci/config.inc.php');
-include_once('../include/lehrform.class.php');
 
 // Datenbank Verbindung
 if (!$conn = @pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
-// Lehrformen holen
-$lehrformDAO=new lehrform($conn);
-$lehrformDAO->getAll();
-
-$rdf_url='http://www.technikum-wien.at/lehrform';
+// sprachen holen
+$qry = "SELECT * FROM public.tbl_sprache order by sprache";
+$result = pg_query($conn, $qry);
+$rdf_url='http://www.technikum-wien.at/sprachen';
 
 ?>
 
 <RDF:RDF
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:LEHRFORM="<?php echo $rdf_url; ?>/rdf#"
+	xmlns:SPRACHE="<?php echo $rdf_url; ?>/rdf#"
 >
 
   <RDF:Seq about="<?php echo $rdf_url ?>/liste">
 
 <?php
-
-foreach ($lehrformDAO->lehrform as $lf)
+while($row=pg_fetch_object($result))
 {
 	?>
   <RDF:li>
-      	<RDF:Description  id="<?php echo $lf->lehrform_kurzbz; ?>"  about="<?php echo $rdf_url.'/'.$lf->lehrform_kurzbz; ?>" >
-        	<LEHRFORM:kurzbz><?php echo $lf->lehrform_kurzbz  ?></LEHRFORM:kurzbz>
-    		<LEHRFORM:bezeichnung><?php echo $lf->bezeichnung  ?></LEHRFORM:bezeichnung>
+      	<RDF:Description id="<?php echo $row->sprache; ?>"  about="<?php echo $rdf_url.'/'.$row->sprache; ?>" >
+        	<SPRACHE:bezeichnung><![CDATA[<?php echo $row->sprache  ?>]]></SPRACHE:bezeichnung>
       	</RDF:Description>
   </RDF:li>
 	  <?php
 }
-
 ?>
   </RDF:Seq>
 </RDF:RDF>

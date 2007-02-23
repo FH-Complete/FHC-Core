@@ -72,9 +72,9 @@ function onVerbandSelect()
 	attribute="<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
 	treeStudenten.setAttribute('datasources',attribute);
 
-	/*
+	
 	// LFVT
-	var req = new phpRequest('lfvt.rdf.php','pam','pam');
+	var req = new phpRequest('../rdf/lehrveranstaltung_einheiten.rdf.php','pam','pam');
 	req.add('stg_kz',stg_kz);
 	req.add('sem',sem);
 	req.add('ver',ver);
@@ -112,7 +112,7 @@ function onVerbandSelect()
 
 	//treeLFVT.setAttribute('datasources','lfvt.rdf.php?'+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe);
 	//alert('lfvt.rdf.php?'+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe);
-	*/
+	
 }
 
 function onOrtSelect()

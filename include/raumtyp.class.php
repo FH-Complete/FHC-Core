@@ -64,7 +64,7 @@ class raumtyp
 		
 		while($row = pg_fetch_object($res))
 		{
-			$raumtyp_obj = new ort($this->conn);
+			$raumtyp_obj = new raumtyp($this->conn);
 			
 			$raumtyp_obj->beschreibung 	= $row->beschreibung;
 			$raumtyp_obj->raumtyp_kurzbz 	= $row->raumtyp_kurzbz;

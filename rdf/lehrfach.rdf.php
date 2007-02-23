@@ -24,7 +24,7 @@ if (!$conn = @pg_pconnect(CONN_STRING))
 
 // Einheiten holen
 $lehrfachDAO=new lehrfach($conn);
-$lehrfaecher=$lehrfachDAO->getAll();
+$lehrfachDAO->getAll();
 
 
 
@@ -42,7 +42,7 @@ $rdf_url='http://www.technikum-wien.at/tempus/lehrfach';
 
 
 <?php
-foreach ($lehrfaecher as $lehrfach)
+foreach ($lehrfachDAO->lehrfach as $lehrfach)
 {
 	?>
 	  <RDF:li>
