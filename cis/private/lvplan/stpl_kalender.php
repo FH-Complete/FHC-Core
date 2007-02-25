@@ -23,17 +23,22 @@ if(!$erg_std=pg_query($conn, "SET datestyle TO ISO; SET search_path TO campus;")
 
 //Startwerte setzen
 $db_stpl_table='stundenplan';
-$type=$_GET['type'];
-$pers_uid=$_GET['pers_uid'];
+if (isset($_GET['type']))
+	$type=$_GET['type'];
+if (isset($_GET['pers_uid']))
+	$pers_uid=$_GET['pers_uid'];
 $ort_kurzbz=(isset($_GET['ort_kurzbz'])?$_GET['ort_kurzbz']:'');
 $stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:'');
 $sem=(isset($_GET['sem'])?$_GET['sem']:'');
 $ver=(isset($_GET['ver'])?$_GET['ver']:'');
 $grp=(isset($_GET['grp'])?$_GET['grp']:'');
 $gruppe_kurzbz=(isset($_GET['einheit'])?$_GET['einheit']:'');
-$begin=$_GET['begin'];
-$ende=$_GET['ende'];
-$format=$_GET['format'];
+if (isset($_GET['begin']))
+	$begin=$_GET['begin'];
+if (isset($_GET['ende']))
+	$ende=$_GET['ende'];
+if (isset($_GET['format']))
+	$format=$_GET['format'];
 $version=(isset($_GET['version'])?$_GET['version']:2);
 $target=(isset($_GET['target'])?$_GET['target']:null);
 
@@ -42,6 +47,16 @@ if (!isset($REMOTE_USER))
 	$REMOTE_USER='pam';
 $uid=$REMOTE_USER;
 
+// for spezial friends
+if ($uid=='maderdon')
+	if (!isset($_GET['format']))
+	{
+		$format='ical';
+		$version=2;
+		$target='ical';
+		$begin=1171234800;
+		$ende=1183068000;
+	}
 
 $jahr=date("Y",$begin);
 $mon=date("m",$begin);
