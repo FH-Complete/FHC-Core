@@ -1,8 +1,10 @@
 <?php
  require("config.inc.php");
  	if (!isset($REMOTE_USER))
-		$REMOTE_USER='pam';
+ 		die ('REMOTE_USER ist nicht gesetzt!');
+		//$REMOTE_USER='pam';
 	$uid=$REMOTE_USER;
+
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
@@ -103,7 +105,7 @@
 					</td>
 				</tr>
 				<!--Menu Eintrag Gruppen -->
-				
+
 				<tr>
 					<td width="10" nowrap>&nbsp;</td>
 					<td nowrap>
@@ -112,7 +114,7 @@
 						<tr>
 							<td width="10" nowrap>&nbsp;</td>
 					    	<td nowrap><a class="MenuItem2" href="stundenplan/einheit_menu.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;&Uuml;bersicht</a></td>
-						</tr>						
+						</tr>
 						<tr>
 							<td width="10" nowrap>&nbsp;</td>
 					    	<td nowrap><a class="MenuItem2" href="stundenplan/einheit_menu.php?newFrm=true" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Neu</a></td>
@@ -152,7 +154,7 @@
 		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Stundenplan" style="display: visible;">
 			  	<tr>
 			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="http://cis.technikum-wien.at/stdplan/index.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Cis Stundenplan</a></td>
+					<td nowrap><a class="MenuItem2" href="../cis/private/lvplan/index.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Stundenplan</a></td>
 			  	</tr>
 			  	<tr>
 			  		<td width="10" nowrap>&nbsp;</td>
