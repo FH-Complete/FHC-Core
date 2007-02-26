@@ -57,20 +57,25 @@ if($result = pg_query($conn_fas, $qry))
 			
 		$error=false;
 		$betriebsmitteltyp				=new betriebsmitteltyp($conn);
-		$betriebsmitteltyp->beschreibung		=$row->name;
 		$betriebsmitteltyp->anzahl			=$row->anzahl==''?'0':$row->anzahl;
 		$betriebsmitteltyp->kaution			=$row->betrag==''?'0':$row->betrag;
 
 		if($row->name=='Gaderobenschlüssel')
 		{
 			$betriebsmitteltyp->betriebsmitteltyp='Gaderobe';
+		}elseif($row->name=='Generalschlüssel')
+		{
+			$betriebsmitteltyp->betriebsmitteltyp='Schluessel';
+		}elseif($row->name=='Schlüssel')
+		{
+			$betriebsmitteltyp->betriebsmitteltyp='Schluessel';
 		}
 		else
 		{
 			$betriebsmitteltyp->betriebsmitteltyp=$row->name;
 		}
 
-		
+		$betriebsmitteltyp->beschreibung		=$betriebsmitteltyp->betriebsmitteltyp;
 		$betriebsmitteltyp->new=true;
 		if(!$betriebsmitteltyp->save())
 		{
@@ -81,18 +86,17 @@ if($result = pg_query($conn_fas, $qry))
 		{
 			
 			//überprüfen, ob sync-eintrag schon vorhanden
-			$qryz="SELECT * FROM tbl_syncschluesseltyp WHERE fas_typ='$row->schluessel_pk' AND portal_typ='$betriebsmitteltyp->betriebsmitteltyp'";
+			$qryz="SELECT * FROM sync.tbl_syncschluesseltyp WHERE fas_typ='$row->schluessel_pk' AND portal_typ='$betriebsmitteltyp->betriebsmitteltyp'";
 			if($resultz = pg_query($conn, $qryz))
 			{
 				if(pg_num_rows($resultz)==0) //wenn dieser eintrag noch nicht vorhanden ist
 				{
-					$qry="INSERT INTO tbl_syncschluesseltyp (fas_typ, portal_typ)".
+					$qry="INSERT INTO sync.tbl_syncschluesseltyp (fas_typ, portal_typ)".
 						"VALUES ('".$row->schluessel_pk."', '".$betriebsmitteltyp->betriebsmitteltyp."');";
 					$resulti = pg_query($conn, $qry);
 				}
 			}
-			
-			$anzahl_eingefuegt++;
+			$anzahl_eingefuegt++;			
 		}		
 	}
 }	
