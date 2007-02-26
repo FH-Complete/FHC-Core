@@ -1,12 +1,14 @@
 
-function getDropDownValue(obj) {
+function getDropDownValue(obj) 
+{
 	//var list = document.getElementById(obj.name);
 	//var selectedText = list.selectedItem.label;
 	//alert(selectedText);
 	return obj.name;
 }
 
-function listElementHandlers(aObj) {
+function listElementHandlers(aObj) 
+{
 	if(!aObj)
        return null;
     for(var list in aObj)
@@ -17,153 +19,51 @@ function listElementHandlers(aObj) {
 /**
  * neue LVA anlegen
  */
-function lvaNeu() {
+function lvaNeu() 
+{
+
+	var tree = document.getElementById('treeLFVT');
 	var lvaDetail=document.getElementById('lvaDetail');
 	lvaDetail.reset();
+	var col = tree.columns ? tree.columns["lva_lehrveranstaltung_id"] : "lva_lehrveranstaltung_id";
+	var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
+	
 	var lva = new Lehrveranstaltung();
-	lva.studiengang=currentAuswahl.stg_kz;
-	lva.semester=currentAuswahl.sem;
-	lva.verband=currentAuswahl.ver;
-	lva.gruppe=currentAuswahl.grp;
-	lva.einheit=currentAuswahl.einheit;
+	lva.lehrveranstaltung=lehrveranstaltung_id;
 	lvaDetail.setLVA(lva);
 	lvaDetail.isNew=true;
-	//alert('stg_kz='+lva.stg_kz);
+	alert('lva='+lva.lehrveranstaltung);
 }
 
 /**
  * neue LVA löschen
  */
-function lvaDelete() {
-
+function lvaDelete() 
+{
 	// id holen
 	var lvaDetail=document.getElementById('lvaDetail');
-	var id=lvaDetail.currentLVA.id;
-	var lvnr=lvaDetail.currentLVA.lvnr;
+	var id=lvaDetail.currentLVA.lehreinheit_id;
+	var bezeichnung= lvaDetail.currentLVA.lvnr+ "(" + id +")";
 
-	if (confirm('LVA '+lvnr+' wirklich löschen?')) {
+	if (confirm('LVA '+bezeichnung+' wirklich löschen?')) 
+	{
 
 		var details = document.getElementById('lvaDetail');
 		details.reset();
-		var req = new phpRequest('lfvtCUD.php','pam','pam');
+		var req = new phpRequest('lfvtCUD.php','','');
 		req.add('do','delete');
-		req.add('lehrveranstaltung_id',id);
+		req.add('lehreinheit_id',id);
 		var response = req.execute();
-		if (response!='ok') alert(response);
+		if (response!='ok') 
+			alert(response);
 
 		currentLVA_id=id;
 
 		// RDF aktualisieren (=Datensatz aus Tree entfernen)
 		var tree=document.getElementById('treeLFVT');
 
-		if (tree.currentIndex==-1) return;
-
-
-		/*
-		// aus dem RDF loeschen
-
-		// Datasource holen
-		var dsource;
-		// Trick 17	(sonst gibt's ein Permission denied)
-		try {
-			netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-		} catch(e) {
-			alert(e);
+		if (tree.currentIndex==-1) 
 			return;
-		}
-
-
-		var sources=tree.database.GetDataSources();
-		if (sources.hasMoreElements()){
-    		dsource=sources.getNext();
-		}
-
-		*/
-
-		// refresh
-		/* funktioniert zwar, ist aber unpraktisch, weil langsam und außerdem werden die Aeste vom Tree geschlossen
-		dsource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource).Refresh(true);
-		tree.builder.rebuild( );
-		return;
-		*/
-
-		/*
-		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
-                   getService(Components.interfaces.nsIRDFService);
-
-		var subRes = rdfService.GetResource("http://www.technikum-wien.at/tempus/lva/" + id);
-
-		var rootSubject = rdfService.GetResource("http://www.technikum-wien.at/tempus/lva/liste");
-
-
-		var container = Components.classes["@mozilla.org/rdf/container;1"].
-                  createInstance(Components.interfaces.nsIRDFContainer);
-		try {
-			container.Init(dsource, rootSubject);
-			//alert(container);
-			//container.AppendElement(christaRes);
-		}
-		catch (ex){}
-
-		var rdfContainerUtils = Components.classes["@mozilla.org/rdf/container-utils;1"].
-                          getService(Components.interfaces.nsIRDFContainerUtils);
-
-
-		if (rdfContainerUtils.IsContainer(dsource,subRes)) {
-			alert(' is container');
-		} else {
-
-			// -> partizipierende LVA
-			// parent suchen
-
-			var parent = null;
-
-			var arcsIn = dsource.ArcLabelsIn(subRes);
-			while (arcsIn.hasMoreElements()){
-				var arc = arcsIn.getNext();
-				if (arc instanceof Components.interfaces.nsIRDFResource){
-					if (rdfContainerUtils.IsOrdinalProperty(arc)){
-						parent = dsource.GetSource(arc, subRes, true);
-						break;
-					}
-				}
-			}
-
-			if (rdfContainerUtils.IsContainer(dsource,parent)) {
-				alert('parent is container '+parent.Value);
-
-				var idx = rdfContainerUtils.indexOf(dsource,parent,subRes);
-				alert('index='+idx);
-
-				var container = Components.classes["@mozilla.org/rdf/container;1"].
-                  createInstance(Components.interfaces.nsIRDFContainer);
-
-				try {
-					container.Init(dsource, parent);
-					var twoRes = rdfContainerUtils.IndexToOrdinalResource(2);
-					alert("count="+container.GetCount()+"; twoRes="+twoRes.Value);
-					// geht nicht bei remote RDF
-					//container.RemoveElementAt(2,true);
-				} catch(ex) {alert(ex);}
-
-
-			}
-
-		}
-
-
-
-
-		//predicate = rdfService.GetResource( "id" ); // RDF.GetResource('http://books.mozdev.org/rdf#chapters');
-		//object = dsource.GetTarget(rootSubject,predicate,true);
-
-
-
-
-		//datasource.Mark(rootSubject,predicate,object,true);
-		//datasource.Sweep( );
-
-		*/
 
 		// löscht nur aus dem view!
 		try {
@@ -172,61 +72,32 @@ function lvaDelete() {
 			var cells = selected.getElementsByTagName( "treerow" );
 			var id = cells[ 0 ].getAttribute( "dbID" );
 			// ids müssten identisch sein (ist nur ein Sicherheitscheck)
-			if (id==currentLVA_id) {
+			if (id==currentLVA_id) 
+			{
 				var parent = tree.view.getItemAtIndex(tree.currentIndex).parentNode;
 				parent.removeChild(selected);
 			}
 
-		} catch(e) {
+		} 
+		catch(e) 
+		{
 			alert(e);
 			return false;
 		}
 
-
-
 		// Datasource holen
 		var dsource;
 		// Trick 17	(sonst gibt's ein Permission denied)
-		try {
+		try 
+		{
 			netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-		} catch(e) {
+		} 
+		catch(e) 
+		{
 			alert(e);
 			return;
 		}
-
 	}
-}
-
-/**
- * neue LVA als Partizipierung anlegen
- */
-function lvaNeuPart() {
-	// ausgewählte LVA holen
-	var tree = document.getElementById('treeLFVT');
-
-	if (tree.currentIndex==-1) return;
-	try {
-		var unr = tree.view.getCellText(tree.currentIndex, "lvaUnr")
-		//alert('currentIndex'+tree.currentIndex);
-		// level (0 oder 1?)
-        var level=tree.view.getLevel(tree.currentIndex);
-		//alert("unr="+unr+"; level="+tree.view.getLevel(tree.currentIndex));
-		if (level==1) {
-			var parent = tree.view.getItemAtIndex(c).parentNode;
-			parent.addChild();
-		}
-		tree.builder.rebuild( );
-        //parent.removeChild(selected);
-
-	} catch(e) {
-		alert(e);
-		return false;
-	}
-	// unr holen
-
-	// Datensatz anlegen
-	var details = document.getElementById('lvaDetail');
-	details.reset();
 }
 
 /**
@@ -250,7 +121,17 @@ function lvaAuswahl()
         var col = tree.columns ? tree.columns["lva_lehreinheit_id"] : "lva_lehreinheit_id";
 		var lehreinheit_id=tree.view.getCellText(tree.currentIndex,col);
 		if(lehreinheit_id=='')
+		{
+			document.getElementById('lfvt_toolbar_neu').disabled=false;
+			document.getElementById('lfvt_toolbar_del').disabled=true;
 			return false;
+		}
+		else
+		{		
+			document.getElementById('lfvt_toolbar_neu').disabled=true;
+			document.getElementById('lfvt_toolbar_del').disabled=false;
+		}
+			
 		var col = tree.columns ? tree.columns["lva_lehrveranstaltung_id"] : "lva_lehrveranstaltung_id";
 		var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
 
@@ -264,36 +145,29 @@ function lvaAuswahl()
 		return false;
 	}
 
-	// Datasource holen
-	var dsource;
-	
 	// Trick 17	(sonst gibt's ein Permission denied)
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	
-	var sources=tree.database.GetDataSources();
-	if (sources.hasMoreElements())
-	{
-    	dsource=sources.getNext();
-	}
-	
+	var req = new phpRequest('../rdf/lehreinheit.rdf.php','','');
+	req.add('lehreinheit_id',lehreinheit_id);
+
+	var response = req.execute();
+	// Datasource holen
+	var dsource=parseRDFString(response, 'http://www.technikum-wien.at/lehreinheit/liste');
+		
 	dsource=dsource.QueryInterface(Components.interfaces.nsIRDFDataSource);
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                    getService(Components.interfaces.nsIRDFService);
-	var subject = rdfService.GetResource("http://www.technikum-wien.at/tempus/lva/"+lehrveranstaltung_id+"/" + lehreinheit_id);
+	var subject = rdfService.GetResource("http://www.technikum-wien.at/lehreinheit/" + lehreinheit_id);
 
 
 	//
-	var predicateNS = "http://www.technikum-wien.at/tempus/lva/rdf";
+	var predicateNS = "http://www.technikum-wien.at/lehreinheit/rdf";
 
-	// debug
-
-	var predicate = rdfService.GetResource( predicateNS + "#lvnr" );
-
-	//
 	var lva = new Lehrveranstaltung();
 
-	//lva.id = getTargetHelper(dsource,subject,rdfService.GetResource( "lehrveranstaltung_id" ));
+	lva.lehreinheit_id = lehreinheit_id;
 	lva.unr = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#unr" ));
 	lva.lvnr=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lvnr" ));
 	lva.sprache=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#sprache" ));
@@ -304,7 +178,7 @@ function lvaAuswahl()
 	lva.lehre=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehre" ));
 	lva.stundenblockung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#stundenblockung" ));
 	lva.wochenrythmus=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#wochenrythmus" ));
-	lva.start_kw=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#startkw" ));
+	lva.start_kw=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#start_kw" ));
 	lva.anmerkung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
 	lva.studiensemester=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiensemester_kurzbz" ));
 	lva.lehrform=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehrform_kurzbz" ));
@@ -316,10 +190,13 @@ function lvaAuswahl()
 	lvaDetail.isNew=false;
 }
 
-function getTargetHelper(dsource,subj,predi) {
-	if (dsource.hasArcOut(subj, predi))  {
+function getTargetHelper(dsource,subj,predi) 
+{
+	if (dsource.hasArcOut(subj, predi))  
+	{
 		var target = dsource.GetTarget(subj, predi, true);
-		if (target instanceof Components.interfaces.nsIRDFLiteral) {
+		if (target instanceof Components.interfaces.nsIRDFLiteral) 
+		{
 			return target.Value;
 		}
 	}
@@ -332,7 +209,8 @@ function getTargetHelper(dsource,subj,predi) {
 /**
  * Lehrveranstaltung Value Object
  */
-function Lehrveranstaltung() {
+function Lehrveranstaltung() 
+{
 	this.id=null;   // =lehrveranstaltung_id
 	this.lvnr=null;
 	this.unr=null;

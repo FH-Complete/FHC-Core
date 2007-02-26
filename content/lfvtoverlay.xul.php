@@ -28,9 +28,9 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 			<vbox id="lfvtEditor" flex="1">
 				<toolbox>
   				<toolbar id="nav-toolbar">
-    				<toolbarbutton label="Neue LVA" oncommand="lvaNeu();" />
-					<toolbarbutton label="Neue LVA-Partizipierung" oncommand="lvaNeuPart();"/>
-    				<toolbarbutton label="Löschen" oncommand="lvaDelete();" />
+    				<toolbarbutton id="lfvt_toolbar_neu" label="Neue Lehreinheit" oncommand="lvaNeu();" disabled="true"/>
+					<!--<toolbarbutton label="Neue LVA-Partizipierung" oncommand="lvaNeuPart();"/>-->
+    				<toolbarbutton id="lfvt_toolbar_del" label="Löschen" oncommand="lvaDelete();" disabled="true"/>
   				</toolbar>
 				</toolbox>
 
@@ -47,17 +47,18 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 
 				>
 					<treecols>
-	    				<treecol id="lva_lehrveranstaltung_id" label="Lehrveranstaltung_id" flex="2" primary="true"
+						<treecol id="lva_kurzbz" label="Kurzbz" flex="2" hidden="false" primary="true"
 							class="sortDirectionIndicator"
 							sortActive="true"
 	    					sortDirection="ascending"
-	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lehrveranstaltung_id"
-						/>
-	    				<splitter class="tree-splitter"/>
-	    				<treecol id="lva_kurzbz" label="Kurzbezeichnung" flex="10" hidden="false"
-							class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#kurzbz"/>
 	    				<splitter class="tree-splitter"/>
+	    				<treecol id="lva_lehrveranstaltung_id" label="Lehrveranstaltung_id" flex="2" hidden="true"
+							class="sortDirectionIndicator"
+							sortActive="true"
+	    					sortDirection="ascending"
+	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lehrveranstaltung_id"	/>
+	    				<splitter class="tree-splitter"/>	    				
 	    				<treecol id="lva_bezeichnung" label="Bezeichnung" flex="5" hidden="false"
 						   class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#bezeichnung"/>
@@ -70,7 +71,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 							class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#ects" />
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="lva_semesterstunden" label="Semesterstunden" flex="2" hidden="false"
+	    				<treecol id="lva_semesterstunden" label="Semesterstunden" flex="1" hidden="false"
 							class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#semesterstunden"/>
 						<splitter class="tree-splitter"/>
@@ -110,17 +111,22 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lektoren"/>
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="lva_lehreinheit_id" label="Lehreinheit_id" flex="10" hidden="false"
+	    				<treecol id="lva_lehreinheit_id" label="Lehreinheit_id" flex="10" hidden="true"
 							class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lehreinheit_id"/>
+	    				<splitter class="tree-splitter"/>
+	    				<treecol id="lva_anmerkung" label="Anmerkung" flex="5" hidden="false"
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#anmerkung"/>
+	    				<splitter class="tree-splitter"/>
 					</treecols>
 
 					<template>
 						<treechildren flex="1" >
 	       					<treeitem uri="rdf:*">
-								<treerow dbID="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lehrveranstaltung_id">
-	         						<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lehrveranstaltung_id"  />
+								<treerow dbID="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lehrveranstaltung_id">	         						
 									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#kurzbz"/>
+									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lehrveranstaltung_id"  />
 									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#bezeichnung"/>
 									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#sprache"/>
 									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#ects"/>
@@ -135,6 +141,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#gruppen"/>
 									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lektoren"/>
 									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lehreinheit_id"/>
+									<treecell label="rdf:http://www.technikum-wien.at/tempus/lva/rdf#anmerkung"/>
 								</treerow>
 							</treeitem>
 						</treechildren>

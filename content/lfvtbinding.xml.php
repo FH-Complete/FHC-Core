@@ -136,7 +136,7 @@
 
 		<xul:hbox style="background:#eeeeee;margin:0px;padding:2px" flex="1">
 			<xul:label value="Details" style="font-size:12pt;font-weight:bold;margin-top:5px;"  flex="1" />
-			<xul:button id="btnLFVTSave" label="speichern" disabled="true" oncommand="parentNode.parentNode.parentNode.saveData();"/>
+			<xul:button id="btnLFVTSave" label="speichern" oncommand="parentNode.parentNode.parentNode.saveData();"/>
 		</xul:hbox>
 
 		<xul:grid id="gridLFVT" flex="1" datasources="rdf:null"
@@ -163,12 +163,12 @@
 						<xul:customMenulist id="gridLFVTSprache" class="sprache" oncommand="document.getBindingParent(this).sprache=document.getAnonymousNodes(this)[0].value" />
 
   						<xul:label value="Lehrveranstaltung" />
-  						<xul:textbox id="gridLFVTLehrveranstaltung" maxlength="20"  onchange="document.getBindingParent(this).lehrveranstaltung=this.value"/>
+  						<xul:textbox id="gridLFVTLehrveranstaltung" maxlength="20" disabled="true"  onchange="document.getBindingParent(this).lehrveranstaltung=this.value"/>
 						<!--<xul:customMenulist id="gridLFVTLehrveranstaltung" class="lehrveranstaltung" flex="1" oncommand="document.getBindingParent(this).lehrveranstaltung=document.getAnonymousNodes(this)[0].value" />-->
 				</xul:row>
 				<xul:row>
   						<xul:label value="Lehrfach" />
-  						<xul:textbox id="gridLFVTLehrfach" maxlength="20"  onchange="document.getBindingParent(this).lehrfach=this.value"/>
+  						<xul:textbox id="gridLFVTLehrfach" maxlength="20" disabled="true" onchange="document.getBindingParent(this).lehrfach=this.value"/>
 						<!--<xul:customMenulist id="gridLFVTLehrfach" class="lehrfach" oncommand="document.getBindingParent(this).lehrfach=document.getAnonymousNodes(this)[0].value" />-->
 						<xul:label value="Lehrform" />
   						<xul:customMenulist id="gridLFVTLehrform" class="lehrform" flex="1" oncommand="document.getBindingParent(this).lehrform=document.getAnonymousNodes(this)[0].value" />
@@ -201,8 +201,9 @@
 				<xul:row>
 
    	   					<xul:label value="Lehre" />
-  						<xul:textbox id="gridLFVTLehre" onchange="document.getBindingParent(this).Lehre=this.value"/>
-
+  						<!--<xul:textbox id="gridLFVTLehre" onchange="document.getBindingParent(this).Lehre=this.value"/>-->
+						<xul:checkbox id="gridLFVTLehre" oncommand="document.getBindingParent(this).lehre=this.checked" />
+						
   						<xul:label value="Stundenblockung" />
   						<xul:textbox id="gridLFVTStundenblockung" onchange="document.getBindingParent(this).stundenblockung=this.value" />
   				</xul:row>
@@ -325,7 +326,7 @@
 			<setter>
 				//alert('property-setter: val='+val);
 				if (this.currentLVA!=null)
-						this.currentLVA.lektor=val;
+						this.currentLVA.lehrveranstaltung=val;
 				//this.showCurrentLVA();
 
 				return val;
@@ -425,16 +426,8 @@
 			</setter>
 		</property>-->
 		<property name="lehre" onget="return this.currentLVA.lehre;" >
-			<setter>
-				/*if (isNaN(val)) {
-					alert('Semesterstunden muss eine Zahl sein!');
-					if (this.currentLVA!=null)
-						this.currentLVA.semesterstunden=null;
-				} else {
-					if (this.currentLVA!=null)
-						this.currentLVA.semesterstunden=val;
-				}*/
-
+			<setter>				
+				this.currentLVA.lehre=val;				
 				return val;
 			</setter>
 		</property>
@@ -520,14 +513,7 @@
 				if (this.currentLVA.lvnr!=null) req.add('lvnr',this.currentLVA.lvnr);
 				if (this.currentLVA.sprache!=null) req.add('sprache',this.currentLVA.sprache);
 				if (this.currentLVA.lehrveranstaltung!=null) req.add('lehrveranstaltung',this.currentLVA.lehrveranstaltung);
-				if (this.currentLVA.lehrfach!=null) req.add('lehrfach_nr',this.currentLVA.lehrfach);
-				/*
-				if (this.currentLVA.studiengang!=null) req.add('studiengang_kz',this.currentLVA.studiengang);
-				if (this.currentLVA.fachbereich!=null) req.add('fachbereich_id',this.currentLVA.fachbereich);
-				if (this.currentLVA.semester!=null) req.add('semester',this.currentLVA.semester);
-				if (this.currentLVA.verband!=null) req.add('verband',this.currentLVA.verband);
-				if (this.currentLVA.gruppe!=null) req.add('gruppe',this.currentLVA.gruppe);
-				*/
+				if (this.currentLVA.lehrfach!=null) req.add('lehrfach_id',this.currentLVA.lehrfach);
 				if (this.currentLVA.raumtyp!=null) req.add('raumtyp',this.currentLVA.raumtyp);
 				if (this.currentLVA.raumtyp_alt!=null) req.add('raumtypalternativ',this.currentLVA.raumtyp_alt);
 				if (this.currentLVA.lehre!=null) req.add('lehre',this.currentLVA.lehre);
@@ -536,6 +522,7 @@
 				if (this.currentLVA.start_kw!=null) req.add('start_kw',this.currentLVA.start_kw);
 				if (this.currentLVA.studiensemester!=null) req.add('studiensemester_kurzbz',this.currentLVA.studiensemester);
 				if (this.currentLVA.lehrform!=null) req.add('lehrform',this.currentLVA.lehrform);
+				if (this.currentLVA.anmerkung!=null) req.add('anmerkung',this.currentLVA.anmerkung);
 				
 				var response = req.execute();
 				if (response!='ok') {
@@ -568,7 +555,7 @@
 				*/
 				this.gridLFVTRaumtyp.currentValue=null;
 				this.gridLFVTRaumtypAlt.currentValue=null;
-				this.gridLFVTLehre.value=null;
+				this.gridLFVTLehre.checked=true;
 				this.gridLFVTStundenblockung.value=null;
 				this.gridLFVTWochenrythmus.value=null;
 				this.gridLFVTStart_kw.value=null;
@@ -596,7 +583,10 @@
 				// Raumtyp alternativ				
 				this.gridLFVTRaumtypAlt.currentValue=this.currentLVA.raumtyp_alt;
 				// Lehre
-				this.gridLFVTLehre.value=this.currentLVA.lehre;				
+				if(this.currentLVA.lehre=='true')
+					this.gridLFVTLehre.checked=true;
+				else
+					this.gridLFVTLehre.checked=false;				
 				// stundenblockung
 				this.gridLFVTStundenblockung.value=this.currentLVA.stundenblockung;
 				// Wochenrythmus
