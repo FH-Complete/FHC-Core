@@ -234,17 +234,19 @@ elseif ($aktion=='stpl_delete_single' || $aktion=='stpl_delete_block')
 // ******************** Lehrveranstaltung setzen ******************************
 elseif ($aktion=='lva_single_set')
 {
-	$anz_lvas=count($lva_id);
-	for ($i=0;$i<$anz_lvas;$i++)
+	//$anz_lvas=count($lva_id);
+	$z=0;
+	foreach ($lva_id AS $le_id)
 	{
-		$lva[$i]=new lehreinheit($conn);
-		$lva[$i]->loadLE($lva_id[$i]);
-		//$error_msg.='test'.$lva_id[$i].($lva[$i]->errormsg).($lva[$i]->stundenblockung);
-		for ($j=0;$j<$lva[$i]->stundenblockung && $error_msg=='';$j++)
-			if (!$lva[$i]->check_lva($new_datum,$new_stunde+$j,$new_ort,$db_stpl_table) && !$ignore_kollision)
-				$error_msg.=$lva[$i]->errormsg;
+		$lva[$z]=new lehreinheit($conn);
+		$lva[$z]->loadLE($le_id);
+		//$error_msg.='test'.$le_id.($lva[$i]->errormsg).($lva[$i]->stundenblockung);
+		for ($j=0;$j<$lva[$z]->stundenblockung && $error_msg=='';$j++)
+			if (!$lva[$z]->check_lva($new_datum,$new_stunde+$j,$new_ort,$db_stpl_table) && !$ignore_kollision)
+				$error_msg.=$lva[$z]->errormsg;
+		$z++;
 	}
-	for ($i=0;$i<$anz_lvas && $error_msg=='';$i++)
+	for ($i=0;$i<$z && $error_msg=='';$i++)
 	{
 		//$lva[$i]=new lehrveranstaltung($lva_id[$i]);
 		//$error_msg.='Blockung'.$lva[$i]->stundenblockung.var_dump($lva);
