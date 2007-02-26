@@ -89,7 +89,6 @@ class schluesseltyp
 	// ************************************************************
 	function save()
 	{		
-		
 		$qry1='SELECT * FROM public.tbl_schluesseltyp WHERE beschreibung='.$this->addslashes($this->beschreibung).';';
 		if($result1=pg_query($this->conn,$qry1))
 		{
@@ -97,9 +96,18 @@ class schluesseltyp
 			{
 				if($row1 = pg_fetch_object($result1))
 				{
+					if($row1->anzahl=null)
+					{
+						$dbanzahl=0;
+					}
+					else 
+					{
+						$dbanzahl=$row1->anzahl;
+					}
 					$qry='UPDATE public.tbl_schluesseltyp SET '.
-					'anzahl =anzahl+'.$this->anzahl.' '.
+					'anzahl ='.$dbanzahl."+".$this->anzahl.' '.
 					'WHERE beschreibung='.$this->addslashes($this->beschreibung).';';
+					echo nl2br($qry."\n");
 				}
 			}
 			else 
@@ -109,6 +117,7 @@ class schluesseltyp
 					$this->addslashes($this->beschreibung).', '.
 					$this->addslashes($this->anzahl).', '.
 					$this->addslashes($this->kaution).');';
+					echo nl2br($qry."\n");
 			}	
 			if(pg_query($this->conn,$qry))
 			{

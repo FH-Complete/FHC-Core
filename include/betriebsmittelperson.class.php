@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2007 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -120,7 +120,7 @@ class betriebsmittelperson
 			//Pruefen ob betriebsmittel_id eine gueltige Zahl ist
 			if(!is_numeric($this->betriebsmittel_id))
 			{
-				$this->errormsg = 'betriebsmittel_id muss eine gueltige Zahl sein: '.$this->betriebsmittel_id.' ('.$this->person_id.')';
+				$this->errormsg = "betriebsmittel_id muss eine gueltige Zahl sein: ".$this->betriebsmittel_id." (".$this->person_id.")\n";
 				return false;
 			}
 					
@@ -140,19 +140,18 @@ class betriebsmittelperson
 				
 					if($update)
 					{
-						$qry='UPDATE public.tbl_schluessel SET '.
+						$qry='UPDATE public.tbl_betriebsmittelperson SET '.
 							'betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).', '. 
 							'person_id='.$this->addslashes($this->person_id).', '. 
-							'schluesseltyp='.$this->addslashes($this->schluesseltyp).', '. 
-							'nummer='.$this->addslashes($this->nummer).', '.  
+							'anmerkung='.$this->addslashes($this->anmerkung).', '. 
 							'kaution='.$this->addslashes($this->kaution).', '. 
 							'ausgegebenam='.$this->addslashes($this->ausgegebenam).', '.
 							'retouram='.$this->addslashes($this->retouram).', '.
 							'ext_id='.$this->addslashes($this->ext_id).', '. 
 						     	'updateamum= now(), '.
 						     	'updatevon='.$this->addslashes($this->updatevon).' '.
-							'WHERE betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).'
-							AND person_id='.$this->addslashes($this->person_id).';';
+							'WHERE betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).
+							' AND person_id='.$this->addslashes($this->person_id).';';
 							$this->done=true;
 					}
 				}

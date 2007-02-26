@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2007 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -21,7 +21,7 @@
  */
 /**
  * Klasse Betriebsmittel 
- * @create 22-12-2006
+ * @create 22-01-2007
  */
 
 class betriebsmittel
@@ -38,7 +38,6 @@ class betriebsmittel
 	var $reservieren;		// @var boolean
 	var $ort_kurzbz;		// @var string
 	var $ext_id;			// @var integer
-	var $ext_id2;			// @var integer
 	var $insertamum;		// @var timestamp
 	var $insertvon;		// @var bigint
 	var $updateamum;		// @var timestamp
@@ -102,7 +101,7 @@ class betriebsmittel
 			//Neuen Datensatz einfuegen
 					
 			$qry='INSERT INTO public.tbl_betriebsmittel (betriebsmittel_id, beschreibung, betriebsmitteltyp, nummer, reservieren, ort_kurzbz,
-				ext_id, insertamum, insertvon, updateamum, ext_id2, updatevon) VALUES('.
+				ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
 			     $this->addslashes($this->betriebsmittel_id).', '.
 			     $this->addslashes($this->beschreibung).', '.
 			     $this->addslashes($this->betriebsmitteltyp).', '.
@@ -111,7 +110,6 @@ class betriebsmittel
 			     $this->addslashes($this->ort_kurzbz).', '.
 			     $this->addslashes($this->ext_id).',  now(), '.
 			     $this->addslashes($this->insertvon).', now(), '.
-			     $this->addslashes($this->ext_id2).', '.
 			     $this->addslashes($this->updatevon).');';
 			 $this->done=true;			
 		}
@@ -125,7 +123,7 @@ class betriebsmittel
 					$update=false;			
 					if($rowz->beschreibung!=$this->beschreibung) 			$update=true;
 					if($rowz->betriebsmitteltyp!=$this->betriebsmitteltyp)		$update=true;
-					if($rowz->nummer!=$this->nummer)				$update=true;
+					//if($rowz->nummer!=$this->nummer)				$update=true;
 					if($rowz->reservieren!=$this->reservieren)			$update=true;
 					if($rowz->ort_kurzbz!=$this->ort_kurzbz)				$update=true;
 				
@@ -133,11 +131,11 @@ class betriebsmittel
 					{
 						$qry='UPDATE public.tbl_betriebsmittel SET '.
 							'betriebsmitteltyp='.$this->addslashes($this->betriebsmitteltyp).', '. 
-							'nummer='.$this->addslashes($this->nummer).', '.  
+							'beschreibung='.$this->addslashes($this->beschreibung).', '. 
+							//'nummer='.$this->addslashes($this->nummer).', '.  
 							'reservieren='.($this->reservieren?'true':'false').', '.
 							'ort_kurzbz='.$this->addslashes($this->ort_kurzbz).', '.
 							'ext_id='.$this->addslashes($this->ext_id).', '. 
-							'ext_id2='.$this->addslashes($this->ext_id2).', '. 
 						     	'updateamum= now(), '.
 						     	'updatevon='.$this->addslashes($this->updatevon).' '.
 							'WHERE betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).';';
