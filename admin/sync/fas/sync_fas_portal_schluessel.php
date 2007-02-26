@@ -93,7 +93,7 @@ if($result = pg_query($conn_fas, $qry))
 				{ 
 					$betriebsmittelperson->person_id=$row1->person_portal;
 					//Schlüsseltyp feststellen
-					$qry2="SELECT * FROM public.tbl_syncschluesseltyp WHERE fas_typ='".$row->schluessel_fk."';";
+					$qry2="SELECT * FROM sync.tbl_syncschluesseltyp WHERE fas_typ='".$row->schluessel_fk."';";
 					if($result2 = pg_query($conn, $qry2))
 					{
 						if(pg_num_rows($result2)>0) //eintrag gefunden
@@ -102,7 +102,7 @@ if($result = pg_query($conn_fas, $qry))
 							{ 
 								$betriebsmittel->betriebsmitteltyp=$row2->portal_typ;
 								//Insert oder Update
-								$qry3="SELECT betriebsmittel_id FROM public.tbl_betriebsmittel WHERE ext_id=".($row->person_fk+($row->schluessel_fk*100000)).";";
+								$qry3="SELECT betriebsmittel_id FROM public.tbl_betriebsmittel WHERE ext_id=".($row->person_fk+($row->schluessel_fk*100000))." OR nummer='".$row->nummer."';";
 								if($result3 = pg_query($conn, $qry3))
 								{
 									if(pg_num_rows($result3)>0) //eintrag gefunden
@@ -122,7 +122,7 @@ if($result = pg_query($conn_fas, $qry))
 										$qry = "SELECT nextval('public.tbl_betriebsmittel_betriebsmittel_id_seq') as id;";
 										if(!$row = pg_fetch_object(pg_query($conn, $qry)))
 										{
-											$error_log.= '\nFehler beim Auslesen der Betriebsmittel-Sequence';
+											$error_log.= 'Fehler beim Auslesen der Betriebsmittel-Sequence\n';
 											$error=true;
 										}
 										$betriebsmittel->betriebsmittel_id=$row->id;
@@ -140,7 +140,7 @@ if($result = pg_query($conn_fas, $qry))
 					else 
 					{
 						$error=true;
-						$error_log.="betriebsmitteltyp mit schluessel_fk: $row->schluessel_fk konnte in tbl_betriebsmitteltyp nicht gefunden werden! \n";
+						$error_log.="Betriebsmitteltyp mit schluessel_fk: $row->schluessel_fk konnte in tbl_betriebsmitteltyp nicht gefunden werden! \n";
 						$anzahl_fehler++;
 					}
 				}
@@ -148,7 +148,7 @@ if($result = pg_query($conn_fas, $qry))
 			else 
 			{
 				$error=true;
-				$error_log.="\nperson mit person_fk: $row->person_fk konnte in tbl_syncperson nicht gefunden werden! ";
+				$error_log.="Person mit person_fk: $row->person_fk konnte in tbl_syncperson nicht gefunden werden!\n";
 				$anzahl_fehler++;
 			}
 		}
@@ -185,7 +185,7 @@ if($result = pg_query($conn_fas, $qry))
 				else 
 				{
 					$error=true;
-					$error_log.="\nFehler beim Zugriff auf tbl_betreibsmittelperson.";
+					$error_log.="Fehler beim Zugriff auf tbl_betreibsmittelperson.\n";
 				}
 				if (!$error)
 				{
