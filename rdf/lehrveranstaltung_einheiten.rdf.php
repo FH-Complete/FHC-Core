@@ -138,7 +138,7 @@ $rdf_url='http://www.technikum-wien.at/tempus/lva';
     			<LVA:sprache><![CDATA[".$row_le->sprache."]]></LVA:sprache>
 				<LVA:ects></LVA:ects>
 				<LVA:semesterstunden></LVA:semesterstunden>
-				<LVA:anmerkung></LVA:anmerkung>
+				<LVA:anmerkung><![CDATA[".$row_le->anmerkung."]]></LVA:anmerkung>
 				<LVA:lehre>".($row_le->lehre?'Ja':'Nein')."</LVA:lehre>
 				<LVA:lehreverzeichnis></LVA:lehreverzeichnis>
 				<LVA:aktiv></LVA:aktiv>

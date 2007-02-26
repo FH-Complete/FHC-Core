@@ -125,6 +125,7 @@ class lehreinheit
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->ext_id = $row->ext_id;
+				return true;
 			}
 		}
 		else
@@ -414,7 +415,7 @@ class lehreinheit
 			       ' ext_id='.$this->addslashes($this->ext_id).
 			       " WHERE lehreinheit_id=".$this->addslashes($this->lehreinheit_id).";";
 		}
-
+		//echo $qry;
 		if(pg_query($this->conn,$qry))
 		{
 			//Log schreiben
@@ -631,7 +632,7 @@ class lehreinheit
 			return true;
 		else
 		{
-			$this->errormsg = pg_last_error($conn);
+			$this->errormsg = pg_last_error($this->conn);
 			return false;
 		}
 	}

@@ -409,6 +409,7 @@ class lehrveranstaltung
 		}
 		else
 		{
+			pg_query($this->conn, 'ROLLBACK');
 			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
 			return false;
 		}		

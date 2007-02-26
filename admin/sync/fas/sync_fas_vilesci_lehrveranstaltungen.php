@@ -153,6 +153,8 @@
 		$stg_data[$row->studiengang_kz]['kuerzel']=$row->kuerzel;
 		$stg_data[$row->studiengang_kz]['text']='';
 	}
+	//Fehler fuer die Freifaecher an Augustin schicken
+	$stg_data[0]['mail']='caugust@technikum-wien.at';
 	
 	//Studiensemester holen
 	$sql_query="SELECT studiensemester_pk,
@@ -171,7 +173,20 @@
 	$vilesci_anz_lva = $row->anz;
 	
 	// Start LVA Synchro
-	$sql_query="SELECT lehrveranstaltung.*, ausbildungssemester.semester, studiengang.kennzahl FROM lehrveranstaltung, ausbildungssemester, studiengang WHERE ausbildungssemester_fk=ausbildungssemester_pk AND lehrveranstaltung.studiengang_fk=studiengang_pk ORDER BY kennzahl, semester, studiensemester_fk";
+	$sql_query="SELECT lehrveranstaltung.*, ausbildungssemester.semester, studiengang.kennzahl 
+	            FROM lehrveranstaltung, ausbildungssemester, studiengang 
+	            WHERE ausbildungssemester_fk=ausbildungssemester_pk AND 
+	                  lehrveranstaltung.studiengang_fk=studiengang_pk AND 
+	                  studiensemester_fk<>0 AND
+	                  lehrveranstaltung.lehrveranstaltung_pk NOT IN(
+	                  	SELECT lv1.lehrveranstaltung_pk 
+	                  	FROM lehrveranstaltung lv1, lehrveranstaltung lv2 
+	                  	WHERE lv1.lehrveranstaltung_pk<>lv2.lehrveranstaltung_pk AND 
+	                  	      lv1.ausbildungssemester_fk=lv2.ausbildungssemester_fk AND 
+	                  	      lv1.kurzbezeichnung=lv2.kurzbezeichnung AND 
+	                  	      lv1.name<>lv2.name AND lv1.kurzbezeichnung is not null AND 
+	                  	      lv1.kurzbezeichnung<>'' AND lv2.kurzbezeichnung is not null AND lv2.kurzbezeichnung<>'') 
+	            ORDER BY kennzahl, semester, studiensemester_fk";
 	flush();
 	$result_fas_alle=pg_query($conn_fas, $sql_query);
 	$num_rows=pg_num_rows($result_fas_alle);
@@ -183,8 +198,8 @@
 	for ($i=0;$row_fas_alle=pg_fetch_object($result_fas_alle);$i++)
 	{
 		//btec auf 0 umlenken (Freifaecher)
-		if($row_fas_alle->kennzahl=203)
-			$row_fas_alle->kennzahl=0;
+		if($row_fas_alle->kennzahl==203 && $row_fas_alle->studiensemester_fk>5)
+			$row_fas_alle->kennzahl='0';
 		
 		// Plausibilitaetscheck
 		if(validate($row_fas_alle))
@@ -366,14 +381,29 @@
 			//$text.="\nLVA ".getlvabez($row_fas_alle)." hat nicht plausible Daten\n";
 		}
 	}		
-
+			
 	$headtext.="\n$plausi_error Fehler beim Plausibilitaetscheck!\n";
 	$headtext.="$update_error Fehler bei LVA-Update!\n";
 	$headtext.="$insert_error Fehler bei LVA-Insert!\n";
 	$headtext.="$double_error Fas_id's kommen in Synctab mehrmals vor!\n";
 	$headtext.="$double_lva_error Lehrveranstaltungen kommen in VileSci mehrmals vor!\n";
 	$headtext.="$anz_update LVAs wurden aktualisiert.\n";
-	$headtext.="$anz_insert LVAs wurden neu angelegt.\n\n";
+	$headtext.="$anz_insert LVAs wurden neu angelegt.\n";
+	
+	$qry = "Select count(*) as anzahl FROM (SELECT distinct lv1.lehrveranstaltung_pk 
+	                  	FROM lehrveranstaltung lv1, lehrveranstaltung lv2 
+	                  	WHERE lv1.lehrveranstaltung_pk<>lv2.lehrveranstaltung_pk AND 
+	                  	      lv1.ausbildungssemester_fk=lv2.ausbildungssemester_fk AND 
+	                  	      lv1.kurzbezeichnung=lv2.kurzbezeichnung AND 
+	                  	      lv1.name<>lv2.name AND lv1.kurzbezeichnung is not null AND 
+	                  	      lv1.kurzbezeichnung<>'' AND lv2.kurzbezeichnung is not null AND lv2.kurzbezeichnung<>'') as a";
+	$result = pg_query($conn_fas, $qry);
+	$row = pg_fetch_object($result);
+	if($row->anzahl>0)
+	{		
+		$headtext.="$row->anzahl LVAs haben verschiedene Bezeichnungen";
+		$text.="Gleiche LVAs mit unterschiedlicher Bezeichnung vorhanden: \n\nSELECT distinct lv1.lehrveranstaltung_pk FROM lehrveranstaltung lv1, lehrveranstaltung lv2 WHERE lv1.lehrveranstaltung_pk<>lv2.lehrveranstaltung_pk AND lv1.ausbildungssemester_fk=lv2.ausbildungssemester_fk AND lv1.kurzbezeichnung=lv2.kurzbezeichnung AND lv1.name<>lv2.name AND lv1.kurzbezeichnung is not null AND lv1.kurzbezeichnung<>'' AND lv2.kurzbezeichnung is not null AND lv2.kurzbezeichnung<>''\n";
+	}
 	
 	if(count($double_lva)>0)
 	{
