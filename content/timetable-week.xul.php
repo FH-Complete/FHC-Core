@@ -145,6 +145,7 @@ if ($aktion=='lva_single_search' || $aktion=='lva_single_set'
 		//$error_msg.=$lva_id[$i];
 		$name_lva_id='lva_id'.++$i;
 	}
+	$lva_id=array_unique($lva_id);
 }
 if ($aktion=='stpl_move' || $aktion=='stpl_single_search' || $aktion=='stpl_set' || $aktion=='stpl_delete_single')
 {
