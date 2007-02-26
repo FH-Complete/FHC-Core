@@ -347,6 +347,7 @@ class lehrstunde
 			$sql_query=substr($sql_query,3);
 			$sql_query_stdplan.=' WHERE'.$sql_query;
 		}
+		//echo $sql_query_stdplan;
 		//Datenbankabfrage
 		if (! $stpl_tbl=pg_query($this->conn, $sql_query_stdplan))
 		{

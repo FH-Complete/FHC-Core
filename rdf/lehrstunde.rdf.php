@@ -30,12 +30,15 @@ function checkID($needle)
 	return false;
 }
 
-$id_list=array();
-while(list($k,$v)=each($_GET))
-	if (strpos($k,'stundenplan_id')!==false)
-		$idList[]=$v;
+if (isset($stundenplan_id0))
+{
+	$idList=array();
+	while(list($k,$v)=each($_GET))
+		if (strpos($k,'stundenplan_id')!==false)
+			$idList[]=$v;
+}
 
-//print_r($id_list);
+//print_r($idList);
 
 if (!isset($REMOTE_USER))
 	$REMOTE_USER='pam';
