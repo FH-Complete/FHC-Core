@@ -113,32 +113,23 @@
 				<xul:row>
   	    				<xul:label value="Raum" />
   						<xul:customMenulist id="gridSTPLRaum" class="raum" flex="1" oncommand="document.getBindingParent(this).raumtyp=document.getAnonymousNodes(this)[0].value" />
-
-
   				</xul:row>
 
   			</xul:rows>
 		</xul:grid>
-
-
-
     </content>
   </binding>
-
-
-
-
 
   <binding id="lfvtDetail">
     <content>
 
 	<xul:vbox style="margin:0px;padding:0px;" flex="1">
-
+		
 		<xul:hbox style="background:#eeeeee;margin:0px;padding:2px" flex="1">
 			<xul:label value="Details" style="font-size:12pt;font-weight:bold;margin-top:5px;"  flex="1" />
 			<xul:button id="btnLFVTSave" label="speichern" oncommand="parentNode.parentNode.parentNode.saveData();"/>
 		</xul:hbox>
-
+					
 		<xul:grid id="gridLFVT" flex="1" datasources="rdf:null"
 			ref="http://www.technikum-wien.at/tempus/lva/liste"
 			style="padding:5px;"
@@ -164,44 +155,24 @@
 
   						<xul:label value="Lehrveranstaltung" />
   						<xul:textbox id="gridLFVTLehrveranstaltung" maxlength="20" disabled="true"  onchange="document.getBindingParent(this).lehrveranstaltung=this.value"/>
-						<!--<xul:customMenulist id="gridLFVTLehrveranstaltung" class="lehrveranstaltung" flex="1" oncommand="document.getBindingParent(this).lehrveranstaltung=document.getAnonymousNodes(this)[0].value" />-->
 				</xul:row>
 				<xul:row>
   						<xul:label value="Lehrfach" />
-  						<xul:textbox id="gridLFVTLehrfach" maxlength="20" disabled="true" onchange="document.getBindingParent(this).lehrfach=this.value"/>
-						<!--<xul:customMenulist id="gridLFVTLehrfach" class="lehrfach" oncommand="document.getBindingParent(this).lehrfach=document.getAnonymousNodes(this)[0].value" />-->
+  						<xul:customMenulist id="gridLFVTLehrfach" class="lehrfach" flex="1" oncommand="document.getBindingParent(this).lehrfach=document.getAnonymousNodes(this)[0].value" />
+  						<!--<xul:textbox id="gridLFVTLehrfach" maxlength="20" onchange="document.getBindingParent(this).lehrfach=this.value"/>-->
+
 						<xul:label value="Lehrform" />
   						<xul:customMenulist id="gridLFVTLehrform" class="lehrform" flex="1" oncommand="document.getBindingParent(this).lehrform=document.getAnonymousNodes(this)[0].value" />
-  						<!--<xul:label value="Studiengang" />-->
-  						<!-- <xul:menulist id="gridLFVTStudiengang" name="stgListe" class="studiengang" maxwidth="100px"  /> -->
-						<!-- <xul:customMenulist id="gridLFVTStudiengang" class="studiengang" oncommand="document.getBindingParent(this).studiengang=document.getAnonymousNodes(this)[0].value" />-->
   	  			</xul:row>
-				<!--<xul:row>
-  						<xul:label value="Fachbereich" />
-						<xul:customMenulist id="gridLFVTFachbereich" class="fachbereich" oncommand="document.getBindingParent(this).fachbereich=document.getAnonymousNodes(this)[0].value" />
-
-  						<xul:label value="Semester" />
-  						<xul:textbox id="gridLFVTSemester" flex="1" onchange="document.getBindingParent(this).semester=this.value" />
-				</xul:row>
-				<xul:row>
-  						<xul:label value="Verband" />
-  	    				<xul:textbox id="gridLFVTVerband" flex="1" onchange="document.getBindingParent(this).verband=this.value" />
-
-  						<xul:label value="Gruppe" />
-  						<xul:textbox id="gridLFVTGruppe" flex="1" onchange="document.getBindingParent(this).gruppe=this.value" />
-    			</xul:row>-->
 				<xul:row>
   	    				<xul:label value="Raumtyp" />
   						<xul:customMenulist id="gridLFVTRaumtyp" class="raumtyp" flex="1" oncommand="document.getBindingParent(this).raumtyp=document.getAnonymousNodes(this)[0].value" />
 
   						<xul:label value="Raumtyp alternativ" />
   						<xul:customMenulist id="gridLFVTRaumtypAlt" class="raumtyp" flex="1" oncommand="document.getBindingParent(this).raumtyp_alt=document.getAnonymousNodes(this)[0].value" />
-
   				</xul:row>
 				<xul:row>
-
    	   					<xul:label value="Lehre" />
-  						<!--<xul:textbox id="gridLFVTLehre" onchange="document.getBindingParent(this).Lehre=this.value"/>-->
 						<xul:checkbox id="gridLFVTLehre" oncommand="document.getBindingParent(this).lehre=this.checked" />
 						
   						<xul:label value="Stundenblockung" />
@@ -216,18 +187,13 @@
   				</xul:row>
 				<xul:row>
   						<xul:label value="Studiensemester" />
-  						<xul:textbox id="gridLFVTStudiensemester" onchange="document.getBindingParent(this).studiensemester=this.value" />
+						<xul:customMenulist id="gridLFVTStudiensemester" class="studiensemester" flex="1" oncommand="document.getBindingParent(this).studiensemester=document.getAnonymousNodes(this)[0].value" />
 
 						<xul:label value="Anmerkung" />
   						<xul:textbox id="gridLFVTAnmerkung" onchange="document.getBindingParent(this).anmerkung=this.value" />
-  						<!--
-  						<xul:label value="ECTS" />
-  						<xul:textbox id="gridLFVTECTS" onchange="parentNode.parentNode.parentNode.parentNode.ects=this.value" />
-  						-->
 				</xul:row>
  			</xul:rows>
-		</xul:grid>
-
+		</xul:grid>				
 	</xul:vbox>
 
 	</content>
@@ -238,11 +204,6 @@
 			this.gridLFVTSprache=document.getElementById('gridLFVTSprache');
 			this.gridLFVTLehrveranstaltung=document.getElementById('gridLFVTLehrveranstaltung');
 			this.gridLFVTLehrfach=document.getElementById('gridLFVTLehrfach');
-			<!--this.gridLFVTStudiengang=document.getElementById('gridLFVTStudiengang');
-			this.gridLFVTFachbereich=document.getElementById('gridLFVTFachbereich');
-			this.gridLFVTSemester=document.getElementById('gridLFVTSemester');
-			this.gridLFVTVerband=document.getElementById('gridLFVTVerband');
-			this.gridLFVTGruppe=document.getElementById('gridLFVTGruppe');-->
 			this.gridLFVTRaumtyp=document.getElementById('gridLFVTRaumtyp');
 			this.gridLFVTRaumtypAlt=document.getElementById('gridLFVTRaumtypAlt');
 			this.gridLFVTLehre=document.getElementById('gridLFVTLehre');
@@ -252,7 +213,6 @@
 			this.gridLFVTAnmerkung=document.getElementById('gridLFVTAnmerkung');
 			this.gridLFVTStudiensemester=document.getElementById('gridLFVTStudiensemester');
 			this.gridLFVTLehrform=document.getElementById('gridLFVTLehrform');
-			<!-- this.gridLFVTECTS=document.getElementById('gridLFVTECTS'); -->
 		</constructor>
 		<!-- Grid-Felder -->
 		<field name="gridLFVTLVNR">null</field>
@@ -260,11 +220,6 @@
 		<field name="gridLFVTSprache">null</field>
 		<field name="gridLFVTLehrveranstaltung">null</field>
 		<field name="gridLFVTLehrfach">null</field>
-		<!--<field name="gridLFVTStudiengang">null</field>
-		<field name="gridLFVTFachbereich">null</field>
-		<field name="gridLFVTSemester">null</field>
-		<field name="gridLFVTVerband">null</field>
-		<field name="gridLFVTGruppe">null</field>-->
 		<field name="gridLFVTRaumtyp">null</field>
 		<field name="gridLFVTRaumtypAlt">null</field>
 		<field name="gridLFVTLehre">null</field>
@@ -284,11 +239,14 @@
 		<!-- LVA-Felder -->
 		<property name="lvnr" onget="return this.currentLVA.lvnr;" >
 			<setter>
-				if (isNaN(val)) {
+				if (isNaN(val)) 
+				{
 					alert('LVNR muss eine Zahl sein!');
 					if (this.currentLVA!=null)
 						this.currentLVA.lvnr=null;
-				} else {
+				}
+				else 
+				{
 					if (this.currentLVA!=null)
 						this.currentLVA.lvnr=val;
 				}
@@ -298,25 +256,25 @@
 		</property>
 		<property name="unr" onget="return this.currentLVA.unr;" >
 			<setter>
-				if (isNaN(val)) {
+				if (isNaN(val)) 
+				{
 					alert('UNR muss eine Zahl sein!');
 					if (this.currentLVA!=null)
 						this.currentLVA.unr=null;
-				} else {
+				} 
+				else 
+				{
 					if (this.currentLVA!=null)
 						this.currentLVA.unr=val;
 				}
-					alert('unr:'+val);
 				return val;
 			</setter>
 		</property>
 		<!-- einheit -->
 		<property name="sprache" onget="return this.currentLVA.sprache;" >
 			<setter>
-				//alert('property-setter: val='+val);
 				if (this.currentLVA!=null)
 						this.currentLVA.sprache=val;
-				//this.showCurrentLVA();
 
 				return val;
 			</setter>
@@ -324,10 +282,8 @@
 		<!-- lektor -->
 		<property name="lehrveranstaltung" onget="return this.currentLVA.lehrveranstaltung;" >
 			<setter>
-				//alert('property-setter: val='+val);
 				if (this.currentLVA!=null)
 						this.currentLVA.lehrveranstaltung=val;
-				//this.showCurrentLVA();
 
 				return val;
 			</setter>
@@ -335,43 +291,17 @@
 		<!-- lehrfach -->
 		<property name="lehrfach" onget="return this.currentLVA.lehrfach;" >
 			<setter>
-				//alert('property-setter: val='+val);
 				if (this.currentLVA!=null)
 						this.currentLVA.lehrfach=val;
-				//this.showCurrentLVA();
 
 				return val;
 			</setter>
 		</property>
-		<!-- studiengang -->
-		<!--<property name="studiengang" onget="return this.currentLVA.studiengang;" >
-			<setter>
-				//alert('property-setter: val='+val);
-				if (this.currentLVA!=null)
-						this.currentLVA.studiengang=val;
-				//this.showCurrentLVA();
-
-				return val;
-			</setter>
-		</property>-->
-		<!-- fachbereich -->
-		<!--<property name="fachbereich" onget="return this.currentLVA.fachbereich;" >
-			<setter>
-				//alert('fachbereich-setter: val='+val);
-				if (this.currentLVA!=null)
-						this.currentLVA.fachbereich=val;
-				//this.showCurrentLVA();
-
-				return val;
-			</setter>
-		</property>-->
 		<!-- raumtyp -->
 		<property name="raumtyp" onget="return this.currentLVA.raumtyp;" >
 			<setter>
-				//alert('property-setter: val='+val);
 				if (this.currentLVA!=null)
 						this.currentLVA.raumtyp=val;
-				//this.showCurrentLVA();
 				
 				return val;
 			</setter>
@@ -387,44 +317,6 @@
 				return val;
 			</setter>
 		</property>
-<!--
-		<property name="semester" onget="return this.currentLVA.semester;" >
-			<setter>
-				if (isNaN(val)) {
-					alert('Semester muss eine Zahl sein!');
-					if (this.currentLVA!=null)
-						this.currentLVA.unr=null;
-				} else {
-					if (this.currentLVA!=null)
-						this.currentLVA.semester=val;
-				}
-
-				return val;
-			</setter>
-		</property>
-		<property name="verband" onget="return this.currentLVA.verband;" >
-			<setter>
-				if (this.currentLVA!=null)
-						this.currentLVA.verband=val;
-				}
-
-				return val;
-			</setter>
-		</property>
-		<property name="gruppe" onget="return this.currentLVA.gruppe;" >
-			<setter>
-				if (isNaN(val)) {
-					alert('Gruppe muss eine Zahl sein!');
-					if (this.currentLVA!=null)
-						this.currentLVA.gruppe=null;
-				} else {
-					if (this.currentLVA!=null)
-						this.currentLVA.gruppe=val;
-				}
-
-				return val;
-			</setter>
-		</property>-->
 		<property name="lehre" onget="return this.currentLVA.lehre;" >
 			<setter>				
 				this.currentLVA.lehre=val;				
@@ -543,25 +435,18 @@
 			<body><![CDATA[
 				this.gridLFVTLVNR.value=null;
 				this.gridLFVTUNR.value=null;
-				this.gridLFVTSprache.currentValue=null;
+				this.gridLFVTSprache.currentValue='German';
 				this.gridLFVTLehrveranstaltung.currentValue=null;
 				this.gridLFVTLehrfach.currentValue=null;
-				/*
-				this.gridLFVTStudiengang.currentValue=null;
-				this.gridLFVTFachbereich.currentValue=null;
-				this.gridLFVTSemester.value=null;
-				this.gridLFVTVerband.value=null;
-				this.gridLFVTGruppe.value=null;
-				*/
-				this.gridLFVTRaumtyp.currentValue=null;
-				this.gridLFVTRaumtypAlt.currentValue=null;
+				this.gridLFVTRaumtyp.currentValue='Dummy';
+				this.gridLFVTRaumtypAlt.currentValue='Dummy';
 				this.gridLFVTLehre.checked=true;
 				this.gridLFVTStundenblockung.value=null;
 				this.gridLFVTWochenrythmus.value=null;
 				this.gridLFVTStart_kw.value=null;
 				this.gridLFVTAnmerkung.value=null;
 				this.gridLFVTStudiensemester.value=null;
-				this.gridLFVTLehrform.value=null;
+				this.gridLFVTLehrform.value=' ';
 				this.currentLVA=null;
 				]]>
 			</body>
@@ -594,15 +479,15 @@
 				// Start KW
 				this.gridLFVTStart_kw.value=this.currentLVA.start_kw;
 				// Studiensemester
-				this.gridLFVTStudiensemester.value=this.currentLVA.studiensemester;
+				this.gridLFVTStudiensemester.currentValue=this.currentLVA.studiensemester;
 				// Anmerkung
 				this.gridLFVTAnmerkung.value=this.currentLVA.anmerkung;
 				// Lehrveranstaltung setzen
 				//this.gridLFVTLehrveranstaltung.currentValue=this.currentLVA.lehrveranstaltung;
 				this.gridLFVTLehrveranstaltung.value=this.currentLVA.lehrveranstaltung;
 				// Lehrfach
-				//this.gridLFVTLehrfach.currentValue=this.currentLVA.lehrfach;
-				this.gridLFVTLehrfach.value=this.currentLVA.lehrfach;
+				this.gridLFVTLehrfach.currentValue=this.currentLVA.lehrfach;
+				//this.gridLFVTLehrfach.value=this.currentLVA.lehrfach;
 				// Lehrform
 				this.gridLFVTLehrform.currentValue=this.currentLVA.lehrform;
 				]]>
@@ -742,6 +627,27 @@
 		<handler event="command" action="this.currentValue=document.getAnonymousNodes(this)[0].value;" />
 	</handlers>
   </binding>
+  
+   <!-- DropDownList fuer Studiensemester -->
+
+  <binding id="studiensemesterListe"  extends="lfvtbinding.xml.php#customMenulist-base" >
+  	<content>
+		<xul:menulist datasources="<?php echo APP_ROOT ?>rdf/studiensemester.rdf.php" flex="1"
+		              ref="http://www.technikum-wien.at/studiensemester/liste" >
+				<xul:template>
+					<xul:menupopup>
+							<xul:menuitem value="rdf:http://www.technikum-wien.at/studiensemester/rdf#kurzbz"
+							              label="rdf:http://www.technikum-wien.at/studiensemester/rdf#kurzbz"
+										  uri="rdf:*"/>
+					</xul:menupopup>
+				</xul:template>
+		</xul:menulist>
+	</content>
+	<handlers>
+		<handler event="command" action="this.currentValue=document.getAnonymousNodes(this)[0].value;" />
+	</handlers>
+  </binding>
+  
    <!-- DropDownList fuer Raumtyp -->
 
   <binding id="raumtypListe"  extends="lfvtbinding.xml.php#customMenulist-base" >
@@ -803,33 +709,6 @@
 	<handlers>
 		<handler event="command" action="this.currentValue=document.getAnonymousNodes(this)[0].value;" />
 	</handlers>
-	<!--
-	<implementation>
-		<property name="currentValue" onget="return this.getAttribute('currentValue');">
-		   <setter><![CDATA[
-		   	 this.setAttribute('currentValue',val);
-			 var menulist=document.getAnonymousNodes(this)[0];
-			 // auszuwaehlenden Datensatz suchen (stammt aus original Source Code)
-			 var arr=menulist.menupopup.getElementsByAttribute('value',val);
-			 //alert('anzahl arr='+arr.length+'; val='+val);
-			 if (arr.item(0)) {
-			 	menulist.selectedItem=arr[0];
-			 } else {
-			 	menulist.selectedIndex=0;
-			 }
-			 return val;
-			 ]]>
-		   </setter>
-		 </property>
-		<property name="selectedIndex"
-		  onget="return document.getAnonymousNodes(this)[0].selectedIndex;"
-		  onset="alert('val='+val);return document.getAnonymousNodes(this)[0].selectedIndex=val;"
-		  />
-	</implementation>
-	<handlers>
-		<handler event="command" action="this.currentValue=document.getAnonymousNodes(this)[0].getAttribute('value');" />
-	</handlers>
-	-->
   </binding>
   
 <!-- DropDownList fuer Lehrveranstaltungen -->
@@ -855,35 +734,12 @@
 	</handlers>
   </binding>
 
-<!-- DropDownList fuer Einheiten -->
-<!--
-  <binding id="einheitenListe" extends="lfvtbinding.xml.php#customMenulist-base" >
-  	<content>
-
-		<xul:menulist datasources="<?php echo APP_ROOT; ?>rdf/einheiten.rdf.php" flex="1"
-		              ref="http://www.technikum-wien.at/tempus/einheiten/liste"
-					   >
-  			<xul:template>
-					<xul:menupopup>
-							
-							<xul:menuitem value="rdf:http://www.technikum-wien.at/tempus/einheiten/rdf#kurzbz"
-							              label="rdf:http://www.technikum-wien.at/tempus/einheiten/rdf#kurzbz"
-										  uri="rdf:*"/>
-					</xul:menupopup>
-				</xul:template>
-		</xul:menulist>
-	</content>
-	<handlers>
-		<handler event="command" action="this.currentValue=document.getAnonymousNodes(this)[0].value;" />
-	</handlers>
-  </binding>
--->
 <!-- DropDownList fuer Sprache -->
 
   <binding id="spracheListe" extends="lfvtbinding.xml.php#customMenulist-base" >
   	<content>
 
-		<xul:menulist datasources="<?php echo APP_ROOT; ?>rdf/sprache.rdf.php?ohnedemgehtsned" flex="1"
+		<xul:menulist datasources="<?php echo APP_ROOT; ?>rdf/sprache.rdf.php" flex="1"
 		              ref="http://www.technikum-wien.at/sprachen/liste"
 					   >
   			<xul:template>
@@ -904,16 +760,16 @@
 
   <binding id="lehrfaecherListe" extends="lfvtbinding.xml.php#customMenulist-base" >
   	<content>
-<!--		<xul:menulist datasources="lehrfach.rdf.php" flex="1"
-		              ref="http://www.technikum-wien.at/tempus/lehrfach/liste"  >
+		<xul:menulist datasources="<?php echo APP_ROOT;?>rdf/lehrfach.rdf.php" flex="1"
+		              ref="http://www.technikum-wien.at/lehrfach/liste"  >
   			<xul:template>
 					<xul:menupopup>
-							<xul:menuitem value="rdf:http://www.technikum-wien.at/tempus/lehrfach/rdf#lehrfach_nr"
-							              label="rdf:http://www.technikum-wien.at/tempus/lehrfach/rdf#bezeichnung"
+							<xul:menuitem value="rdf:http://www.technikum-wien.at/lehrfach/rdf#lehrfach_id"
+							              label="rdf:http://www.technikum-wien.at/lehrfach/rdf#bezeichnung"
 										  uri="rdf:*"/>
 					</xul:menupopup>
 				</xul:template>
-		</xul:menulist>-->
+		</xul:menulist>
 	</content>
 	<handlers>
 		<handler event="command" action="this.currentValue=document.getAnonymousNodes(this)[0].value;" />
@@ -947,10 +803,10 @@
 
   <!-- ************************************************************************* -->
   <!-- customMenulist-base                                                       -->
-  <!-- 		- f�gt property currentValue hinzu, welcher dem value der internen   -->
-  <!--	      Menulist entspricht, au�erdem wird durch setzen von currentValue   -->
+  <!-- 		- fuegt property currentValue hinzu, welcher dem value der internen   -->
+  <!--	      Menulist entspricht, ausserdem wird durch setzen von currentValue   -->
   <!--        auch der entsprechende Datensatz selektiert                        -->
-  <!--		- forward f�r selectedIndex   	                                     -->
+  <!--		- forward fuer selectedIndex   	                                     -->
   <!-- ************************************************************************* -->
   <binding id="customMenulist-base" >
   	<content />

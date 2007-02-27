@@ -69,11 +69,50 @@ class lehreinheitmitarbeiter
 	// * Laedt die LEMitarbeiter
 	// * @param lehreinheit_id
 	// *********************************************************
-	function load($lehreinheit_id, $mitarbeiter_uid)
+	function load($lehreinheit_id, $mitarbeiter_uid=null)
 	{
 		return false;
 	}
 	
+	// *********************************************************
+	// * Laedt die Lektoren einer Lehreinheit
+	// * @param lehreinheit_id
+	// * @return array + true wenn ok / false im Fehlerfall
+	// *********************************************************
+	function getLehreinheitmitarbeiter($lehreinheit_id, $mitarbeiter_uid=null)
+	{
+		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$lehreinheit_id'";
+		if($mitarbeiter_uid!=null)
+			$qry.=" AND mitarbeiter_uid='".addslashes($mitarbeiter_uid)."'";
+		$qry .=" ORDER BY mitarbeiter_uid";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$obj = new lehreinheitmitarbeiter($this->conn);
+				$obj->lehreinheit_id = $row->lehreinheit_id;
+				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$obj->lehrfunktion_kurzbz = $row->lehrfunktion_kurzbz;
+				$obj->semesterstunden = $row->semesterstunden;
+				$obj->planstunden = $row->planstunden;
+				$obj->stundensatz = $row->stundensatz;
+				$obj->faktor = $row->faktor;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->bismelden = $row->bismelden;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				
+				$this->lehreinheitmitarbeiter[] = $obj;
+			}
+			return true;
+		}
+		
+		return false;
+	}
+
 	// *******************************************
 	// * Prueft die Variablen vor dem Speichern 
 	// * auf Gueltigkeit.

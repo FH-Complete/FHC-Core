@@ -15,8 +15,8 @@ header("Content-type: application/vnd.mozilla.xul+xml");
 // xml
 echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
 // DAO
-include('../vilesci/config.inc.php');
-include_once('../include/studiensemester.class.php');
+require_once('../vilesci/config.inc.php');
+require_once('../include/studiensemester.class.php');
 
 // Datenbank Verbindung
 if (!$conn = @pg_pconnect(CONN_STRING))
@@ -24,9 +24,9 @@ if (!$conn = @pg_pconnect(CONN_STRING))
 
 // studiensemester holen
 $studiensemesterDAO=new studiensemester($conn);
-$studiensemesterAll=$studiensemesterDAO->getAll();
+$studiensemesterDAO->getAll();
 
-$rdf_url='http://www.technikum-wien.at/tempus/studiensemester';
+$rdf_url='http://www.technikum-wien.at/studiensemester';
 
 ?>
 
@@ -34,27 +34,20 @@ $rdf_url='http://www.technikum-wien.at/tempus/studiensemester';
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	xmlns:STUDIENSEMESTER="<?php echo $rdf_url; ?>/rdf#"
 >
-
-
-  <RDF:Seq about="<?php echo $rdf_url ?>/liste">
-
-
+   <RDF:Seq about="<?php echo $rdf_url ?>/liste">
 <?php
-foreach ($studiensemesterAll as $ss)
+foreach ($studiensemesterDAO->studiensemester as $ss)
 {
 	?>
-	  <RDF:li>
-      	<RDF:Description  id="<?php echo $ss->kurzbz; ?>"  about="<?php echo $rdf_url.'/'.$ss->kurzbz; ?>" >
-        	<STUDIENSEMESTER:kurzbz><?php echo $ss->kurzbz  ?></STUDIENSEMESTER:kurzbz>
-		<STUDIENSEMESTER:start><![CDATA[ <?php echo $ss->start  ?> ]]></STUDIENSEMESTER:start>
-    		<STUDIENSEMESTER:ende><?php echo $ss->ende  ?></STUDIENSEMESTER:ende>
-      	</RDF:Description>
+      <RDF:li>
+         <RDF:Description  id="<?php echo $ss->studiensemester_kurzbz; ?>"  about="<?php echo $rdf_url.'/'.$ss->studiensemester_kurzbz; ?>" >
+            <STUDIENSEMESTER:kurzbz><![CDATA[<?php echo $ss->studiensemester_kurzbz ?>]]></STUDIENSEMESTER:kurzbz>
+            <STUDIENSEMESTER:start><![CDATA[<?php echo $ss->start ?>]]></STUDIENSEMESTER:start>
+            <STUDIENSEMESTER:ende><![CDATA[<?php echo $ss->ende ?>]]></STUDIENSEMESTER:ende>
+         </RDF:Description>
       </RDF:li>
 <?php
 }
 ?>
-
-  </RDF:Seq>
-
-
+   </RDF:Seq>
 </RDF:RDF>

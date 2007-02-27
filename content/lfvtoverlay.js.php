@@ -188,6 +188,10 @@ function lvaAuswahl()
 	var lvaDetail=document.getElementById('lvaDetail');
 	lvaDetail.setLVA(lva);
 	lvaDetail.isNew=false;
+	
+	//***Lehreinheitmitarbeiter tree setzen
+	url='../rdf/lehreinheitmitarbeiter.rdf.php?lehreinheit_id='+lehreinheit_id;
+	document.getElementById('lfvt_detail_tree_lehreinheitmitarbeiter').setAttribute('datasources',url);
 }
 
 function getTargetHelper(dsource,subj,predi) 
@@ -211,25 +215,28 @@ function getTargetHelper(dsource,subj,predi)
  */
 function Lehrveranstaltung() 
 {
-	this.id=null;   // =lehrveranstaltung_id
+	this.id=null;
 	this.lvnr=null;
 	this.unr=null;
-	this.einheit=null;
-	this.lektor=null;
+	this.anmerkung=null;
+	this.lehrveranstaltung=null;
 	this.lehrfach=null;
-	this.studiengang=null;
-	this.fachbereich=null;
-	this.semester=null;
-	this.verband=null;
-	this.gruppe=null;
-	this.raumtyp=null;
-	this.raumtyp_alt=null;
+	this.sprache='German';
+	this.lehrform='';
+	this.lehre='true';
+	//this.studiengang=null;
+	//this.fachbereich=null;
+	//this.semester=null;
+	//this.verband=null;
+	//this.gruppe=null;
+	this.raumtyp='Dummy';
+	this.raumtyp_alt='Dummy';
 	this.semesterstunden=null;
 	this.stundenblockung=null;
 	this.wochenrythmus=null;
 	this.start_kw=null;
 	this.studiensemester=null;
-	this.lehrform=null;
+	this.lehrform=' ';
 	this.ects=null;
 	// flag, welches angibt, ob Daten verändert wurden
 	this.dataChanged=false;

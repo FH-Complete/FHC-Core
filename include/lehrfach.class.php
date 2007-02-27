@@ -235,29 +235,35 @@ class lehrfach
 	 * @param 	$stg Studiengangs_kz
 	 *			$sem Semester
 	 *			$order Sortierkriterium
-	 *			$fachb fachbereichs_id
-	 * @return array mit Fachbereichen oder false=fehler
+	 *			$fachb fachbereich_kurzbz
+	 * @return array mit Lehrfaechern oder false=fehler
 	 */
-	function getTab($stg='-1',$sem='-1', $order='lehrfach_id', $fachb='-1',$lehre='')
+	function getTab($stg=null,$sem=null, $order='lehrfach_id', $fachb=null)
 	{
-
+		if($stg!=null && !is_numeric($stg))
+		{
+			$this->errormsg = 'Studiengang_kz muss eine gueltige Zahl sein';
+			return false;
+		}
+		if($sem!=null && !is_numeric($sem))
+		{
+			$this->errormsg = 'Semester muss eine gueltige Zahl sein';
+			return false;
+		}
 		$sql_query = "SELECT * FROM lehre.tbl_lehrfach";
 
-		if($stg!=-1 || $sem!=-1 || $fachb!=-1)
+		if($stg!=null || $sem!=null || $fachb!=null)
 		   $sql_query .= " WHERE true";
 
-		if($stg!=-1)
+		if($stg!=null)
 		   $sql_query .= " AND studiengang_kz='$stg'";
 
-		if($sem!=-1)
+		if($sem!=null)
 			$sql_query .= " AND semester='$sem'";
 
-		if($fachb!=-1)
-			$sql_query .= " AND fachbereich_kurzbz='$fachb'";
-		
-		if($lehre!='')
-			$sql_query .= " AND lehre=$lehre";
-		
+		if($fachb!=null)
+			$sql_query .= " AND fachbereich_kurzbz='".addslashes($fachb)."'";
+				
 		$sql_query .= " ORDER BY $order";
 		
 		if($result=pg_query($this->conn,$sql_query))
@@ -270,7 +276,7 @@ class lehrfach
 				$l->kurzbz = $row->kurzbz;
 				$l->bezeichnung = $row->bezeichnung;
 				$l->farbe = $row->farbe;				
-				$l->aktiv = $row->aktiv;				
+				$l->aktiv = $row->aktiv;
 				$l->studiengang_kz = $row->studiengang_kz;
 				$l->semester = $row->semester;
 				$l->sprache = $row->sprache;
