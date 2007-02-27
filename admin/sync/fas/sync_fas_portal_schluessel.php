@@ -52,12 +52,13 @@ $qry = "SELECT * FROM person_schluessel ORDER BY person_fk;";
 if($result = pg_query($conn_fas, $qry))
 {
 	echo nl2br("Schlüssel Sync\n--------------\n");
+	echo nl2br("=====Hinweis: Es werden keine bestehenden Datensätze verändert (update).=====");
 	$anzahl_quelle=pg_num_rows($result);
 	while($row = pg_fetch_object($result))
 	{
-		echo "- ";
-		ob_flush();
-		flush();	
+		//echo "- ";
+		//ob_flush();
+		//flush();	
 			
 		$error=false;
 		$betriebsmittel				=new betriebsmittel($conn);
@@ -155,56 +156,72 @@ if($result = pg_query($conn_fas, $qry))
 		If (!$error)
 		{
 			pg_query($conn,"BEGIN");
-			if(!$betriebsmittel->save())
+			if($betriebsmittel->new)
 			{
-				$error_log.=$betriebsmittel->errormsg."\n";
-				$anzahl_fehler++;
-				pg_query($conn,"ROLLBACK");
-			}
-			else 
-			{
-				$anzahl_eingefuegt++;
-				//insert oder update?
-				$qry3="SELECT betriebsmittel_id, person_id FROM public.tbl_betriebsmittelperson WHERE betriebsmittel_id=".$betriebsmittel->betriebsmittel_id." AND person_id=".$betriebsmittelperson->person_id.";";
-				if($result3 = pg_query($conn, $qry3))
+				if(!$betriebsmittel->save())
 				{
-					if(pg_num_rows($result3)>0) //eintrag gefunden
+					$error_log.=$betriebsmittel->errormsg."\n";
+					$anzahl_fehler++;
+					pg_query($conn,"ROLLBACK");
+				}
+				else 
+				{
+					$anzahl_eingefuegt++;
+					//insert oder update?
+					$qry3="SELECT betriebsmittel_id, person_id FROM public.tbl_betriebsmittelperson WHERE betriebsmittel_id=".$betriebsmittel->betriebsmittel_id." AND person_id=".$betriebsmittelperson->person_id.";";
+					if($result3 = pg_query($conn, $qry3))
 					{
-						if($row3=pg_fetch_object($result3))
-						{ 
-							// update , wenn datensatz bereits vorhanden
-							$betriebsmittelperson->new=false;
+						if(pg_num_rows($result3)>0) //eintrag gefunden
+						{
+							if($row3=pg_fetch_object($result3))
+							{ 
+								// update , wenn datensatz bereits vorhanden
+								$betriebsmittelperson->new=false;
+							}
+						}
+						else 
+						{
+							// insert, wenn datensatz noch nicht vorhanden
+							$betriebsmittelperson->new=true;					
 						}
 					}
 					else 
 					{
-						// insert, wenn datensatz noch nicht vorhanden
-						$betriebsmittelperson->new=true;					
+						$error=true;
+						$error_log.="Fehler beim Zugriff auf tbl_betreibsmittelperson.\n";
 					}
-				}
-				else 
-				{
-					$error=true;
-					$error_log.="Fehler beim Zugriff auf tbl_betreibsmittelperson.\n";
-				}
-				if (!$error)
-				{
-					if(!$betriebsmittelperson->save())
+					if (!$error)
 					{
-						$error_log.=$betriebsmittel->errormsg."\n";
-						$anzahl_fehler2++;
-						pg_query($conn,"ROLLBACK");
+						if($betriebsmittelperson->new)
+						{
+							if(!$betriebsmittelperson->save())
+							{
+								$error_log.=$betriebsmittel->errormsg."\n";
+								$anzahl_fehler2++;
+								pg_query($conn,"ROLLBACK");
+							}
+							else 
+							{
+								$anzahl_eingefuegt2++;
+								pg_query($conn,"COMMIT");
+							}
+						}
+						else 
+						{
+							//es werden keine Datensätze über das Synchro verändert !
+							pg_query($conn, "ROLLBACK");
+						}
 					}
 					else 
 					{
-						$anzahl_eingefuegt2++;
-						pg_query($conn,"COMMIT");
+						pg_query($conn, "ROLLBACK");
 					}
 				}
-				else 
-				{
-					pg_query($conn, "ROLLBACK");
-				}
+			}
+			else 
+			{
+				//es werden keine Datensätze über das Synchro verändert !
+				pg_query($conn, "ROLLBACK");
 			}
 		}
 	}		
