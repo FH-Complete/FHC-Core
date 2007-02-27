@@ -373,8 +373,11 @@ foreach ($studiengangfk AS $stg)
 		{
 			if($rowass = pg_fetch_object($resultass))
 			{
-				//mail(trim($rowass->email), 'Plausicheck von Studenten / Studiengang: '.$stg, $error_log_fas[$stg],"From: vilesci@technikum-wien.at");
-				mail($adress, 'Plausicheck von Studenten / Studiengang: '.$stg, $error_log_fas[$stg],"From: vilesci@technikum-wien.at");
+				if(strlen(trim($error_log_fas[$stg]))>0)
+				{
+					//mail(trim($rowass->email), 'Plausicheck von Studenten / Studiengang: '.$stg, $error_log_fas[$stg],"From: vilesci@technikum-wien.at");
+					mail($adress, 'Plausicheck von Studenten / Studiengang: '.$stg, $error_log_fas[$stg],"From: vilesci@technikum-wien.at");
+				}
 			}
 		}
 		else 
@@ -413,7 +416,7 @@ AND (p1.familienname<>p2.familienname OR p1.vorname<>p2.vorname OR p1.vornamen<>
 	OR p1.aufnahmeschluessel<>p2.aufnahmeschluessel OR p1.aufnahmeschluessel_fk<>p2.aufnahmeschluessel_fk 
 	OR p1.angetreten<>p2.angetreten)
 )
-order by familienname LIMIT 10;
+order by familienname;
 ";
 $datum_obj=new datum();
 if($result = pg_query($conn_fas, $qry))
