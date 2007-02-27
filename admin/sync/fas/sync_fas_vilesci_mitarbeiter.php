@@ -15,10 +15,10 @@ require_once('../../../vilesci/config.inc.php');
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
-//$adress='ruhan@technikum-wien.at';
-//$adress_plausi='ruhan@technikum-wien.at';
-$adress='fas_sync@technikum-wien.at';
-$adress_plausi='fas_sync@technikum-wien.at';
+$adress='ruhan@technikum-wien.at';
+$adress_plausi='ruhan@technikum-wien.at';
+//$adress='fas_sync@technikum-wien.at';
+//$adress_plausi='fas_sync@technikum-wien.at';
 
 $error_log='';
 $error_log_fas='';
@@ -35,6 +35,10 @@ $plausisvnr='';
 $anzahl_fehler_person=0;
 $anzahl_fehler_benutzer=0;
 $anzahl_fehler_mitarbeiter=0;
+$ausgabe_person='';
+$ausgabe_mitarbeiter='';
+$ausgabe_benutzer='';
+$ausgabe='';
 
 function myaddslashes($var)
 {
@@ -311,6 +315,9 @@ if($resultall = pg_query($conn_fas, $qryall))
 	$anzahl_quelle=pg_num_rows($resultall);
 	while($rowall = pg_fetch_object($resultall))
 	{
+		$ausgabe_person='';
+		$ausgabe_benutzer='';
+		$ausgabe_mitarbeiter='';
 		//echo "- ";
 		//ob_flush();
 		//flush();
@@ -379,7 +386,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 		}
 		else 
 		{
-			$mitarbeiterausbildungscode=null;
+			$mitarbeiterausbildungcode=null;
 		}
 		$mitarbeiterort_kurzbz=null;
 		$mitarbeiterinsertvon='SYNC';
@@ -510,6 +517,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 						        myaddslashes($personstaatsbuergerschaft).", ".
 						        myaddslashes($personext_id).";";
 						        $persondone=true;
+						        $ausgabe_person="Person ".$personnachname." ".$personvorname." eingefügt.";
 				}
 				else
 				{
@@ -526,31 +534,260 @@ if($resultall = pg_query($conn_fas, $qryall))
 					{
 						if($rowu = pg_fetch_object($resultu))
 						{
-							$update=false;			
-							if($rowu->sprache!=$personsprache) 				$update=true;
-							if($rowu->anrede!=$personanrede) 				$update=true;
-							if($rowu->titelpost!=$persontitelpost) 				$update=true;
-							if($rowu->titelpre!=$persontitelpre) 				$update=true;
-							if($rowu->nachname!=$personnachname) 			$update=true;
-							if($rowu->vorname!=$personvorname) 				$update=true;
-							if($rowu->vornamen!=$personvornamen) 				$update=true;
-							if($rowu->gebdatum!=$persongebdatum) 				$update=true;
-							if($rowu->gebort!=$persongebort) 					$update=true;
-							if($rowu->gebzeit!=$persongebzeit) 				$update=true;
-							if($rowu->foto!=$personfoto) 					$update=true;
-							if($rowu->anmerkungen!=$personanmerkungen) 		$update=true;
-							if($rowu->homepage!=$personhomepage) 			$update=true;
-							if($rowu->svnr!=$personsvnr) 					$update=true;
-							if($rowu->ersatzkennzeichen!=$personersatzkennzeichen) 	$update=true;
-							if($rowu->familienstand!=$personfamilienstand) 			$update=true;
-							if($rowu->anzahlkinder!=$personanzahlkinder) 			$update=true;
-							if($rowu->aktiv!=$personaktiv) 					$update=true;
-							if($rowu->geburtsnation!=$persongeburtsnation) 		$update=true;
-							if($rowu->geschlecht!=$persongeschlecht) 			$update=true;
-							if($rowu->staatsbuergerschaft!=$personstaatsbuergerschaft)	$update=true;
+							$updatep=false;			
+							if($rowu->sprache!=$personsprache) 
+							{
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Sprache: '".$personsprache."'";
+								}
+								else
+								{
+									$ausgabe_person="Sprache: '".$personsprache."'";
+								}
+							}
+							if($rowu->anrede!=$personanrede)
+							{
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Anrede: '".$personanrede."'";
+								}
+								else
+								{
+									$ausgabe_person="Anrede: '".$personanrede."'";
+								}
+							}
+							if($rowu->titelpost!=$persontitelpost)
+							{
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Postnomentitel: '".$persontitelpost."'";
+								}
+								else
+								{
+									$ausgabe_person="Postnomentitel: '".$persontitelpost."'";
+								}
+							}
+							if($rowu->titelpre!=$persontitelpre)
+							{
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Prenomentitel: '".$persontitelpre."'";
+								}
+								else
+								{
+									$ausgabe_person="Prenomentitel: '".$persontitelpre."'";
+								}
+							}
+							if($rowu->nachname!=$personnachname)
+							{
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Nachname: '".$personnachname."'";
+								}
+								else
+								{
+									$ausgabe_person=" Nachname: '".$personnachname."'";
+								}
+							}
+							if($rowu->vorname!=$personvorname)
+							{
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Vorname: '".$personvorname."'";
+								}
+								else
+								{
+									$ausgabe_person="Vorname: '".$personvorname."'";
+								}
+							}
+							if($rowu->vornamen!=$personvornamen)
+							{
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Vornamen: '".$personvornamen."'";
+								}
+								else
+								{
+									$ausgabe_person="Vornamen: '".$personvornamen."'";
+								}
+							}
+							if($rowu->gebdatum!=$persongebdatum)
+							{
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Geburtsdatum: '".$persongebdatum."'";
+								}
+								else
+								{
+									$ausgabe_person="Geburtsdatum: '".$persongebdatum."'";
+								}
+							}
+							if($rowu->gebort!=$persongebort)
+							{
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Geburtsort: '".$persongebort."'";
+								}
+								else
+								{
+									$ausgabe_person="Geburtsort: '".$persongebort."'";
+								}
+							}
+							if($rowu->gebzeit!=$persongebzeit)
+							{
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Geburtszeit: '".$persongebzeit."'";
+								}
+								else
+								{
+									$ausgabe_person="Geburtszeit: '".$persongebzeit."'";
+								}
+							}
+							if($rowu->foto!=$personfoto)
+							{
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Foto: '".$personfoto."'";
+								}
+								else
+								{
+									$ausgabe_person="Foto: '".$personfoto."'";
+								}
+							}
+							if($rowu->anmerkungen!=$personanmerkungen)
+							{
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Anmerkungen: '".$personanmerkungen."'";
+								}
+								else
+								{
+									$ausgabe_person="Anmerkungen: '".$personanmerkungen."'";
+								}
+							}
+							if($rowu->homepage!=$personhomepage){
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Homepage: '".$personhomepage."'";
+								}
+								else
+								{
+									$ausgabe_person="Homepage: '".$personhomepage."'";
+								}
+							}
+							if($rowu->svnr!=$personsvnr)
+							{
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Sozialversicherungsnummer: '".$personsvnr."'";
+								}
+								else
+								{
+									$ausgabe_person="Sozialversicherungsnummer: '".$personsvnr."'";
+								}
+							}
+							if($rowu->ersatzkennzeichen!=$personersatzkennzeichen)
+							{
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Ersatzkennzeichen: '".$personersatzkennzeichen."'";
+								}
+								else
+								{
+									$ausgabe_person="Ersatzkennzeichen: '".$personersatzkennzeichen."'";
+								}
+							}
+							if($rowu->familienstand!=$personfamilienstand)
+							{
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Familienstand: '".$personfamilienstand."'";
+								}
+								else
+								{
+									$ausgabe_person="Familienstand: '".$personfamilienstand."'";
+								}
+							}
+							if($rowu->anzahlkinder!=$personanzahlkinder){
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Anzahl der Kinder: '".$personanzahlkinder."'";
+								}
+								else
+								{
+									$ausgabe_person="Anzahl der Kinder: '".$personanzahlkinder."'";
+								}
+							}
+							if($rowu->aktiv!=$personaktiv)
+							{
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Aktiv: '".$personaktiv."'";
+								}
+								else
+								{
+									$ausgabe_person="Aktiv: '".$personaktiv."'";
+								}
+							}
+							if($rowu->geburtsnation!=$persongeburtsnation)
+							{
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Geburtsnation: '".$persongeburtsnation."'";
+								}
+								else
+								{
+									$ausgabe_person="Geburtsnation: '".$persongeburtsnation."'";
+								}
+							}
+							if($rowu->geschlecht!=$persongeschlecht)
+							{
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Geschlecht: '".$persongeschlecht."'";
+								}
+								else
+								{
+									$ausgabe_person="Sprache: '".$persongeschlecht."'";
+								}
+							}
+							if($rowu->staatsbuergerschaft!=$personstaatsbuergerschaft)
+							{
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Staatsbürgerschaft: '".$personstaatsbuergerschaft."'";
+								}
+								else
+								{
+									$ausgabe_person="Staatsbürgerschaft: '".$personstaatsbuergerschaft."'";
+								}
+							}
 							
 							
-							if($update)
+							if($updatep)
 							{
 								$qry = "UPDATE public.tbl_person SET
 								       sprache=".myaddslashes($personsprache).", 
@@ -580,7 +817,8 @@ if($resultall = pg_query($conn_fas, $qryall))
 								       staatsbuergerschaft=".myaddslashes($personstaatsbuergerschaft).", 
 								       ext_id=".myaddslashes($personext_id)." 
 								       WHERE person_id=".myaddslashes($personperson_id).";";
-								$persondone=true;	
+								$persondone=true;
+								$ausgabe_person="Änderungen bei Person ".$personnachname." ".$personvorname.": ".$ausgabe_person."\n";
 							}
 						}
 					}
@@ -605,6 +843,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 					{			
 						$error_log.= "*****\nFehler beim Speichern des Person-Datensatzes: ".$personnachname."\n".$qry."\n".pg_errormessage($conn)."\n*****\n";
 						$error=true;
+						$ausgabe_person="";
 					}
 				}
 				$mitarbeiterdone=false;
@@ -642,23 +881,73 @@ if($resultall = pg_query($conn_fas, $qryall))
 							myaddslashes($benutzerinsertvon).", 
 							now(), ".
 							myaddslashes($benutzerupdatevon).");";
+							$ausgabe_benutzer="Benutzer ".$benutzeruid." ".$benutzeralias." eingefügt.";
 					}
 					else
-					{			
-						$qry = "UPDATE public.tbl_benutzer SET
-						       aktiv=".myaddslashes($benutzeraktiv?'true':'false').", 
-						       alias=".myaddslashes($benutzeralias).", 
-						       person_id=".myaddslashes($personperson_id).", 
-						       updateamum=now(), 
-						       updatevon=".myaddslashes($benutzerupdatevon).",
-						       insertamum=now(), 
-						       insertvon=".myaddslashes($benutzerinsertvon)." 
-						       WHERE uid='$benutzeruid';";
+					{	
+						$qryu="SELECT * FROM public.tbl_benutzer WHERE uid='$benutzeruid';";
+						$updateb=false;
+						if($resultu = pg_query($conn, $qryu))
+						{
+							if($rowu = pg_fetch_object($resultu))
+							{
+								if($rowu->aktiv!=($benutzeraktiv?'t':'f'))
+								{
+									$updateb=true;
+									if(strlen(trim($ausgabe_benutzer))>0)
+									{
+										$ausgabe_benutzer.=", Aktiv: '".($benutzeraktiv?'true':'false')."'";
+									}
+									else
+									{
+										$ausgabe_benutzer="Aktiv: '".($benutzeraktiv?'true':'false')."'";
+									}
+								}		
+								if($rowu->alias!=$benutzeralias)
+								{
+									$updateb=true;
+									if(strlen(trim($ausgabe_benutzer))>0)
+									{
+										$ausgabe_benutzer.=", Alias: ,".$benutzeralias."'";
+									}
+									else
+									{
+										$ausgabe_benutzer="Alias: '".$benutzeralias."'";
+									}
+								}
+								if($rowu->person_id!=$personperson_id)
+								{
+									$updateb=true;
+									if(strlen(trim($ausgabe_benutzer))>0)
+									{
+										$ausgabe_benutzer.=", PersonID: '".$personperson_id."'";
+									}
+									else
+									{
+										$ausgabe_benutzer="PersonID: '".$personperson_id."'";
+									}
+								}
+							}
+						}
+						if($updateb)
+						{
+							$qry = "UPDATE public.tbl_benutzer SET
+							       aktiv=".myaddslashes($benutzeraktiv?'true':'false').", 
+							       alias=".myaddslashes($benutzeralias).", 
+							       person_id=".myaddslashes($personperson_id).", 
+							       updateamum=now(), 
+							       updatevon=".myaddslashes($benutzerupdatevon).",
+							       insertamum=now(), 
+							       insertvon=".myaddslashes($benutzerinsertvon)." 
+							       WHERE uid='$benutzeruid';";
+							$ausgabe_benutzer="Änderungen bei Benutzer ".$benutzeruid." ".$benutzeralias.": ".$ausgabe_benutzer."\n";
+						}
 					}
 					if(!pg_query($conn,$qry))
 					{		
 						$error_log.= "*****\nFehler beim Speichern des Benutzer-Datensatzes: ".$personnachname."\n".$qry."\n".pg_errormessage($conn)."\n*****\n";
 						$error=true;
+						$ausgabe_benutzer='';
 					}
 					if(!$error)
 					{								
@@ -721,29 +1010,127 @@ if($resultall = pg_query($conn_fas, $qryall))
 								now(), ".
 								myaddslashes($mitarbeiterinsertvon)." , ".
 								myaddslashes($mitarbeiterext_id).");";
+								$ausgabe_mitarbeiter="Mitarbeiter ".$mitarbeiterpersonalnummer." ".$mitarbeiterkurzbz." eingefügt.";
 							}
 							else
 							{
 								//Bestehenden Datensatz updaten
-								$qry ="UPDATE public.tbl_mitarbeiter SET 
-								ausbildungcode=".myaddslashes($mitarbeiterausbildungcode).", 
-								personalnummer=".myaddslashes($mitarbeiterpersonalnummer).", 
-								kurzbz=".myaddslashes($mitarbeiterkurzbz).", 
-								lektor=".myaddslashes($mitarbeiterlektor?'true':'false').", 
-								fixangestellt=".myaddslashes($mitarbeiterfixangestellt?'true':'false').", 
-								telefonklappe=".myaddslashes($mitarbeitertelefonklappe).", 
-								ort_kurzbz=".myaddslashes($mitarbeiterort_kurzbz).", 
-								updateamum=now(), 
-								updatevon=".myaddslashes($mitarbeiterupdatevon).", 
-								insertamum=now(), 
-								insertvon=".myaddslashes($mitarbeiterinsertvon).", 
-								ext_id=".myaddslashes($mitarbeiterext_id)." 
-								WHERE mitarbeiter_uid='$mitarbeiteruid';";
+								$qry="SELECT * FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='$mitarbeiteruid'";
+								$updatem=false;
+								if($resultu = pg_query($conn, $qry))
+								{
+									if($rowu = pg_fetch_object($resultu))
+									{
+										if($rowu->ausbildungcode!=$mitarbeiterausbildungcode)
+										{
+											$updatem=true;
+											if(strlen(trim($ausgabe_mitarbeiter))>0)
+											{
+												$ausgabe_mitarbeiter.=", Ausbildungscode: '".$mitarbeiterausbildungcode."'";
+											}
+											else
+											{
+												$ausgabe_mitarbeiter="Ausbildungscode: '".$mitarbeiterausbildungcode."'";
+											}
+										}
+										if($rowu->personalnummer!=$mitarbeiterpersonalnummer)
+										{
+											$updatem=true;
+											if(strlen(trim($ausgabe_mitarbeiter))>0)
+											{
+												$ausgabe_mitarbeiter.=", Personalnummer: '".$mitarbeiterpersonalnummer."'";
+											}
+											else
+											{
+												$ausgabe_mitarbeiter="Personalnummer: '".$mitarbeiterpersonalnummer."'";
+											}
+										}
+										if($rowu->kurzbz!=$mitarbeiterkurzbz)
+										{
+											$updatem=true;
+											if(strlen(trim($ausgabe_mitarbeiter))>0)
+											{
+												$ausgabe_mitarbeiter.=", Kurzbezeichnung: '".$mitarbeiterkurzbz."'";
+											}
+											else
+											{
+												$ausgabe_mitarbeiter="Kurzbezeichnung: '".$mitarbeiterkurzbz."'";
+											}
+										}
+										if($rowu->lektor!=($mitarbeiterlektor?'t':'f'))
+										{
+											$updatem=true;
+											if(strlen(trim($ausgabe_mitarbeiter))>0)
+											{
+												$ausgabe_mitarbeiter.=", Lektor: '".($mitarbeiterlektor?'true':'false')."'";
+											}
+											else
+											{
+												$ausgabe_mitarbeiter="Lektor: '".($mitarbeiterlektor?'true':'false')."'";
+											}
+										}
+										if($rowu->fixangestellt!=($mitarbeiterfixangestellt?'t':'f'))
+										{
+											$updatem=true;
+											if(strlen(trim($ausgabe_mitarbeiter))>0)
+											{
+												$ausgabe_mitarbeiter.=", Fixangestellt: '".($mitarbeiterfixangestellt?'true':'false')."'";
+											}
+											else
+											{
+												$ausgabe_mitarbeiter="Fixangestellt: '".($mitarbeiterfixangestellt?'true':'false')."'";
+											}
+										}
+										if($rowu->telefonklappe!=$mitarbeitertelefonklappe)
+										{
+											$updatem=true;
+											if(strlen(trim($ausgabe_mitarbeiter))>0)
+											{
+												$ausgabe_mitarbeiter.=", Telefonklappe: '".$mitarbeitertelefonklappe."'";
+											}
+											else
+											{
+												$ausgabe_mitarbeiter="Telefonklappe: '".$mitarbeitertelefonklappe."'";
+											}
+										}
+										if($rowu->ort_kurzbz!=$mitarbeiterort_kurzbz)
+										{
+											$updatem=true;
+											if(strlen(trim($ausgabe_mitarbeiter))>0)
+											{
+												$ausgabe_mitarbeiter.=", Ortkurzbezeichnung: '".$mitarbeiterort_kurzbz."'";
+											}
+											else
+											{
+												$ausgabe_mitarbeiter="Ortkurzbezeichnung: '".$mitarbeiterort_kurzbz."'";
+											}
+										}
+									}
+								}
+								if($updatem)
+								{
+									$qry ="UPDATE public.tbl_mitarbeiter SET 
+									ausbildungcode=".myaddslashes($mitarbeiterausbildungcode).", 
+									personalnummer=".myaddslashes($mitarbeiterpersonalnummer).", 
+									kurzbz=".myaddslashes($mitarbeiterkurzbz).", 
+									lektor=".myaddslashes($mitarbeiterlektor?'true':'false').", 
+									fixangestellt=".myaddslashes($mitarbeiterfixangestellt?'true':'false').", 
+									telefonklappe=".myaddslashes($mitarbeitertelefonklappe).", 
+									ort_kurzbz=".myaddslashes($mitarbeiterort_kurzbz).", 
+									updateamum=now(), 
+									updatevon=".myaddslashes($mitarbeiterupdatevon).", 
+									insertamum=now(), 
+									insertvon=".myaddslashes($mitarbeiterinsertvon).", 
+									ext_id=".myaddslashes($mitarbeiterext_id)." 
+									WHERE mitarbeiter_uid='$mitarbeiteruid';";
+									$ausgabe_mitarbeiter="Änderungen bei Mitarbeiter ".$mitarbeiteruid.": ".$ausgabe_mitarbeiter."\n";
+								}
 							}
 							if(!pg_query($conn,$qry))
 							{		
 								$error_log.= "*****\nFehler beim Speichern des Mitarbeiter-Datensatzes: ".$personnachname."\n".$qry."\n".pg_errormessage($conn)."\n*****\n";
 								$error=true;
+								$ausgabe_mitarbeiter='';
 							}
 							//Benutzer anlegen
 							if(!$error)
@@ -755,15 +1142,22 @@ if($resultall = pg_query($conn_fas, $qryall))
 								}
 								else 
 								{
-									$anzahl_geaendert_person++;
+									if($updatep) 
+									{
+										$anzahl_geaendert_person++;
+									}
 								}
+								
 								if ($mitarbeiternew)
 								{
 									$anzahl_eingefuegt_mitarbeiter++;	
 								}
 								else 
 								{
-									$anzahl_geaendert_mitarbeiter++;
+									if($updatem) 
+									{
+										$anzahl_geaendert_mitarbeiter++;
+									}
 								}
 								if ($benutzernew)
 								{
@@ -771,8 +1165,14 @@ if($resultall = pg_query($conn_fas, $qryall))
 								}
 								else 
 								{
-									$anzahl_geaendert_benutzer++;
+									if($updateb) 
+									{
+										$anzahl_geaendert_benutzer++;
+									}
 								}
+								$ausgabe.=$ausgabe_person;
+								$ausgabe.=$ausgabe_benutzer;
+								$ausgabe.=$ausgabe_mitarbeiter;
 								pg_query($conn, "COMMIT");								
 							}
 							else
@@ -799,9 +1199,6 @@ if($resultall = pg_query($conn_fas, $qryall))
 					$anzahl_fehler_person++;
 					pg_query($conn, "ROLLBACK");
 				}
-				
-				
-
 			}
 			else
 			{
@@ -820,13 +1217,14 @@ else
 
 
 //echo nl2br($text);
-echo nl2br("\n\nPerson:  Gesamt FAS: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt_person / geaendert: $anzahl_geaendert_person / Fehler: $anzahl_fehler_person");
+echo nl2br("\n\nGesamt FAS: $anzahl_quelle\nPerson:     Eingefügt: $anzahl_eingefuegt_person / geaendert: $anzahl_geaendert_person / Fehler: $anzahl_fehler_person");
 echo nl2br("\nBenutzer:     Eingefügt: $anzahl_eingefuegt_benutzer / geaendert: $anzahl_geaendert_benutzer / Fehler: $anzahl_fehler_benutzer");
 echo nl2br("\nMitarbeiter:  Eingefügt: $anzahl_eingefuegt_mitarbeiter / geaendert: $anzahl_geaendert_mitarbeiter / Fehler: $anzahl_fehler_mitarbeiter");
 echo nl2br("\nLog:\n".$error_log);
-$error_log="Person Sync\n-------------\n\nPerson: Gesamt FAS: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt_person / geaendert: $anzahl_geaendert_person / Fehler: $anzahl_fehler_person"
+echo nl2br("\n=====\n".$ausgabe);
+$error_log="Person Sync\n-------------\n\nGesamt FAS: $anzahl_quelle\nPerson:        Eingefügt: $anzahl_eingefuegt_person / geaendert: $anzahl_geaendert_person / Fehler: $anzahl_fehler_person"
 ."\nBenutzer:     Eingefügt: $anzahl_eingefuegt_benutzer / geaendert: $anzahl_geaendert_benutzer / Fehler: $anzahl_fehler_benutzer"
-."\nMitarbeiter: Eingefügt: $anzahl_eingefuegt_mitarbeiter / geaendert: $anzahl_geaendert_mitarbeiter / Fehler: $anzahl_fehler_mitarbeiter\nLog:\n$error_log";
+."\nMitarbeiter: Eingefügt: $anzahl_eingefuegt_mitarbeiter / geaendert: $anzahl_geaendert_mitarbeiter / Fehler: $anzahl_fehler_mitarbeiter\n\nLOG:\nFehler:\n$error_log\n=====\n$ausgabe";
 mail($adress, 'SYNC Mitarbeiter (Plausichecked)', $error_log,"From: vilesci@technikum-wien.at");
 ?>
 </body>
