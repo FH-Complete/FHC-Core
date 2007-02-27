@@ -71,7 +71,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 							class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#ects" />
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="lva_semesterstunden" label="Semesterstunden" flex="1" hidden="false"
+	    				<treecol id="lva_semesterstunden" label="Semesterstunden" flex="1" hidden="true"
 							class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#semesterstunden"/>
 						<splitter class="tree-splitter"/>
@@ -103,11 +103,11 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#raumtypalternativ"/>
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="lva_gruppen" label="Gruppen" flex="5" hidden="true"  
+	    				<treecol id="lva_gruppen" label="Gruppen" flex="5" hidden="false"  
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#gruppen"/>
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="lva_lektoren" label="Lektoren" flex="5" hidden="true"  
+	    				<treecol id="lva_lektoren" label="Lektoren" flex="5" hidden="false"  
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/tempus/lva/rdf#lektoren"/>
 	    				<splitter class="tree-splitter"/>
@@ -156,9 +156,138 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 				<!-- *  Detail  * -->
 				<!-- ************ -->
 				<vbox flex="1"  style="overflow:auto;margin:0px;">
-
-				  	<box id="lvaDetail" class="lvaDetail"  style="margin:0px;" />
-
+					<tabbox id="lfvt_detail_tabbox" flex="3" orient="vertical">
+						<tabs orient="horizontal">
+							<tab id="lfvt_detail_tab_detail" label="Details" />
+							<tab id="lfvt_detail_tab_lektor" label="Lektorenzuteilung" />
+						</tabs>
+						<tabpanels id="lfvt_detail_tabpanels-main" flex="1">	
+							<vbox>
+							<box id="lvaDetail" class="lvaDetail"  style="margin:0px;" />
+							</vbox>
+							<vbox>
+								<description>Lektorenzuteilung</description>
+								<hbox flex="1" style="padding: 10px">
+									<vbox width="250">
+										<hbox flex="1">
+											<tree id="lfvt_detail_tree_lehreinheitmitarbeiter" seltype="single" hidecolumnpicker="false" flex="1"
+													datasources="rdf:null"
+													ref="http://www.technikum-wien.at/lehreinheitmitarbeiter/liste"
+													onselect="MitarbeiterLehreinheitenTreeAuswahl();" flags="dont-build-content"
+													style="border: 1px solid black;"
+											>
+												<treecols>
+													<treecol id="lfvt_detail_tree_lehreinheitmitarbeiter-col-nachname" label="Nachname" flex="2" hidden="false"
+												    	class="sortDirectionIndicator"
+												    	sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#nachname" onclick="LehreinheitenTreeSort()"/>
+												    <splitter class="tree-splitter"/>
+													<treecol id="lfvt_detail_tree_lehreinheitmitarbeiter-col-vorname" label="Vorname" flex="2" hidden="false"
+												    	class="sortDirectionIndicator"
+												    	sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#vorname" onclick="LehreinheitenTreeSort()"/>
+												    <splitter class="tree-splitter"/>		
+												    <treecol id="lfvt_detail_tree_lehreinheitmitarbeiter-col-mitarbeiter_lehreinheit_id" label="MitarbeiterLehreinheitID" flex="2" hidden="true"
+												    	class="sortDirectionIndicator"
+												    	sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#mitarbeiter_uid" onclick="LehreinheitenTreeSort()"/>
+												    <splitter class="tree-splitter"/>						
+												</treecols>
+												<template>
+													<rule>
+														<treechildren>
+															<treeitem uri="rdf:*">
+																<treerow>
+																	<treecell label="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#nachname"   />
+																	<treecell label="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#vorname"   />
+																	<treecell label="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#mitarbeiter_uid"   />
+												 				</treerow>
+												 			</treeitem>
+												 		</treechildren>
+												 	</rule>
+											  	</template>							
+											</tree>
+											<spacer />
+										</hbox>
+										<!--
+										<hbox>
+											<button label="+" oncommand="MitarbeiterLehreinheitenAdd()" style="max-width: 30px;"/>
+											<button label="-" oncommand="MitarbeiterLehreinheitenDel()" style="max-width: 30px;"/>
+										</hbox>
+										-->
+									</vbox>
+									<!--
+									<vbox>
+									<hbox>
+									<groupbox>
+										<caption label="Lektorendaten" />
+										<vbox flex="1">
+										<textbox id="textbox-lehreinheiten-detail-lektoren-lehreinheit_id" hidden="true"/>
+										<textbox id="textbox-lehreinheiten-detail-lektoren-mitarbeiter_lehreinheit_id" hidden="true"/>
+										<grid align="end" flex="1"
+												 flags="dont-build-content"
+												enableColumnDrag="true"
+												>
+											<columns>
+												<column />
+												<column flex="1"/>
+												<column />
+												<column flex="1"/>								
+											</columns>
+							
+											<rows>
+												<row>
+													<label align="end" control="menulist-lehreinheiten-detail-funktion" value="Funktion:"/>
+													<menulist id="menulist-lehreinheiten-detail-funktion" disabled="true" oncommand="LehreinheitenDetailLektorValueChanged();"
+									    		          datasources="<?php echo APP_ROOT; ?>rdf/fas/mitarbeiterlehreinheitenfunktionen.rdf.php"
+											              ref="http://www.technikum-wien.at/mitarbeiterlehreinheitenfunktionen/alle" flex="1">
+												         <template>
+												            <menupopup>
+												               <menuitem uri="rdf:*" label="rdf:http://www.technikum-wien.at/mitarbeiterlehreinheitenfunktionen/rdf#bezeichnung"
+												                         value="rdf:http://www.technikum-wien.at/mitarbeiterlehreinheitenfunktionen/rdf#funktion_id"/>
+												            </menupopup>
+												         </template>
+											   		 </menulist>
+											   		 <label align="end" control="menulist-lehreinheiten-detail-mitarbeiterauswahl" value="Lektor:"/>
+											   		 <hbox flex="1">
+														<menulist id="menulist-lehreinheiten-detail-mitarbeiterauswahl" disabled="true" oncommand="LehreinheitenDetailLektorValueChanged();"
+									    		          datasources="rdf:*"
+											              ref="http://www.technikum-wien.at/mitarbeiterlehreinheitenauswahl/alle" flex="1">
+												         <template>
+												            <menupopup>
+												               <menuitem uri="rdf:*" label="rdf:http://www.technikum-wien.at/mitarbeiterlehreinheitenauswahl/rdf#nachname rdf:http://www.technikum-wien.at/mitarbeiterlehreinheitenauswahl/rdf#vorname"
+												                         value="rdf:http://www.technikum-wien.at/mitarbeiterlehreinheitenauswahl/rdf#mitarbeiter_id"/>
+												            </menupopup>
+												         </template>
+											   		 	</menulist>
+											   		 	<button label='+' id="button-lehreinheiten-detail-lektoren-auswahladd" disabled="true" oncommand='OpenMitarbeiterAuswahlDialog()' style="max-width: 30px;"/>
+											   		 </hbox>
+												</row>
+											
+										    	<row>						    	
+							    					<label control="textbox-lehreinheiten-detail-lektoren-kosten" value="Kosten: "/>
+							    					<textbox id="textbox-lehreinheiten-detail-lektoren-kosten" disabled="true" maxlength="255" flex="1" oninput="LehreinheitenDetailLektorValueChanged()"/>		  
+													<label control="textbox-lehreinheiten-detail-lektoren-gesamtstunden" value="Gesamtstunden: "/>
+							    					<textbox id="textbox-lehreinheiten-detail-lektoren-gesamtstunden" disabled="true" maxlength="255" flex="1" oninput="LehreinheitenDetailLektorValueChanged()"/>		  
+							    				</row>
+										    	<row>						    	
+							    					<label control="textbox-lehreinheiten-detail-lektoren-faktor" value="Faktor: "/>
+							    					<textbox id="textbox-lehreinheiten-detail-lektoren-faktor" disabled="true" maxlength="255" flex="1" oninput="LehreinheitenDetailLektorValueChanged()"/>		  
+													<label control="textbox-lehreinheiten-detail-lektoren-differenz" value="Differenz: "/>
+							    					<textbox id="textbox-lehreinheiten-detail-lektoren-differenz" maxlength="255" flex="1" oninput="LehreinheitenDetailLektorValueChanged()" disabled="true"/>
+							    				</row>
+							    			</rows>
+							    			</grid>
+							    			<hbox flex="1">
+							    				<spacer flex="1" />
+												<button label="Speichern" disabled="true" id="button-lehreinheiten-detail-lektoren-save" oncommand="MitarbeiterLehreinheitenZuteilungSave();"/>
+											</hbox>
+										</vbox>
+									</groupbox>
+									</hbox>
+									</vbox>-->
+									<spacer flex="1" />
+								</hbox>		
+							</vbox>
+						</tabpanels>
+					</tabbox>
 				</vbox>
 
 			</vbox>

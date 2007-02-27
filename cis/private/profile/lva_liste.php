@@ -79,7 +79,7 @@
 			echo '<td>'.$row_lv->bezeichnung.'</td>';
 			echo '<td>'.$row->lehrfach_bez.'</td>';
 			echo '<td>'.$row->lektor.'</td>';
-			echo '<td>'.$row->stg_kurzbz.'</td>';
+			echo '<td>'.strtoupper($row->stg_typ.$row->stg_kurzbz).'</td>';
 			echo '<td>'.$row->semester.'</td>';
 			echo '<td>'.$row->verband.'</td>';
 			echo '<td>'.$row->gruppe.'</td>';

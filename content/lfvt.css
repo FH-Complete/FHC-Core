@@ -46,6 +46,10 @@ customMenulist.sprache {
 	-moz-binding: url('lfvtbinding.xml.php#spracheListe');
 }
 
+customMenulist.studiensemester {
+	-moz-binding: url('lfvtbinding.xml.php#studiensemesterListe');
+}
+
 customMenulist.lehrveranstaltung {
 	-moz-binding: url('lfvtbinding.xml.php#lehrveranstaltungenListe');
 }

@@ -54,7 +54,7 @@ if ($_GET['do']=='create' || ($_GET['do']=='update'))
 		if ($leDAO->save()) 
 			echo 'ok';
 		else 
-			echo $lvaDAO->errormsg;
+			echo $leDAO->errormsg;
 	} 
 	else if ($_GET['do']=='update') 
 	{
