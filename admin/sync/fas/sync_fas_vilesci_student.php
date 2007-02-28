@@ -252,11 +252,11 @@ if($resultp = pg_query($conn_fas, $qry))
 			$plausi.="Titel der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->titel1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->titel2."'.\n";
 			$error=true;
 		}
-		if ($rowp->uid1<>$rowp->uid2)
+		/*if ($rowp->uid1<>$rowp->uid2)
 		{
 			$plausi.="UID der Person ".$rowp->familienname1." (stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->uid1."' bei ".$rowp->familienname2." (stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->uid2."'.\n";
 			$error=true;
-		}
+		}*/
 		if ($rowp->gebnation1<>$rowp->gebnation2)
 		{
 			$plausi.="Geburtsnation der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->gebnation1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->gebnation2."'.\n";
