@@ -4128,22 +4128,22 @@ for($x=3346;$x<4083;$x++)
 	{
 		if($result = @pg_query($conn, $qry2[$x]))
 		{
-			//$ausgabe1.="*\nBetriebsmittel eingefügt: ".$qry[$x];
-			//$ausgabe2.="*\nBetriebsmittelperson eingefügt: ".$qry2[$x];
-			echo nl2br("\n*Betriebsmittel eingefügt: ".$qry[$x]."\n*Betriebsmittelperson eingefügt: ".$qry2[$x]);
+			$ausgabe1.="*\nBetriebsmittel eingefügt: ".$qry[$x];
+			$ausgabe2.="*\nBetriebsmittelperson eingefügt: ".$qry2[$x];
+			echo nl2br("\n*Betriebsmittel eingefügt: ".$qry[$x]."\n*Betriebsmittelperson eingefügt: ".$qry2[$x]."\n");
 			pg_query($conn, "COMMIT");				
 		}
 		else 
 		{
-			//$error_log2.="\nFehler bei: ".$qry2[$x]."\n";
+			$error_log2.="\nFehler bei: ".$qry2[$x]."\n";
 			echo nl2br("\n###Fehler bei: ".$qry2[$x]."\n");
 			pg_query($conn, "ROLLBACK");
 		}	
 	}
 	else 
 	{
-		//$error_log1.="\nFehler bei: ".$qry[$x]."\n".pg_errormessage($conn)."\n";
-		echo nl2br("\nFehler bei: ".$qry[$x]."\n".pg_errormessage($conn)."\n");
+		$error_log1.="\nFehler bei: ".$qry[$x]."\n".pg_errormessage($conn)."\n";
+		echo nl2br("\n###Fehler bei: ".$qry[$x]."\n".pg_errormessage($conn)."\n");
 		pg_query($conn, "ROLLBACK");
 	}
 	
@@ -4156,7 +4156,8 @@ for($x=3346;$x<4083;$x++)
 //echo nl2br($error_log2);
 //echo nl2br($ausgabe1);
 //echo nl2br($ausgabe2);
-//mail($adress, 'SYNC Zutrittskarten (EXCEL)', $error_log,"From: vilesci@technikum-wien.at");
+mail($adress, 'SYNC Zutrittskarten (EXCEL)', $ausgabe1.$ausgabe2,"From: vilesci@technikum-wien.at");
+mail($adress, 'SYNC-FEHLER Zutrittskarten (EXCEL)', $error_log1.$error_log2,"From: vilesci@technikum-wien.at");
 ?>
 </body>
 </html>
