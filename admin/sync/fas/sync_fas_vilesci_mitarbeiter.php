@@ -695,11 +695,11 @@ if($resultall = pg_query($conn_fas, $qryall))
 								$updatep=true;
 								if(strlen(trim($ausgabe_person))>0)
 								{
-									$ausgabe_person.=", Sozialversicherungsnummer: '".$personsvnr."'";
+									$ausgabe_person.=", SVNr: '".$personsvnr."'";
 								}
 								else
 								{
-									$ausgabe_person="Sozialversicherungsnummer: '".$personsvnr."'";
+									$ausgabe_person="SVNr: '".$personsvnr."'";
 								}
 							}
 							if($rowu->ersatzkennzeichen!=$personersatzkennzeichen)
