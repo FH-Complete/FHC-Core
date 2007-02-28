@@ -1609,7 +1609,7 @@ if($result = pg_query($conn_fas, $qry))
 						}
 						else 
 						{
-							if($update)
+							if($updateb)
 							{
 								$anzahl_benutzer_update++;
 							}
@@ -1840,8 +1840,8 @@ $error_log.="Prestudenten:   Gesamt: ".$anzahl_pre_gesamt." / Eingefügt: ".$anza
 $error_log.="Benutzer:       Gesamt: ".$anzahl_benutzer_gesamt." / Eingefügt: ".$anzahl_benutzer_insert." / Geändert: ".$anzahl_benutzer_update." / Fehler: ".$anzahl_fehler_benutzer."\n";
 $error_log.="Nicht-Studenten: ".$anzahl_nichtstudenten."\n";
 $error_log.="Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student."\n";
-$error_log.=$text."\n".$ausgabe;
-mail($adress, 'SYNC Student', $error_log,"From: vilesci@technikum-wien.at");
+$error_log.=$text;
+mail($adress, 'SYNC Student', $error_log."\n".$ausgabe,"From: vilesci@technikum-wien.at");
 ?>
 </body>
 </html>
