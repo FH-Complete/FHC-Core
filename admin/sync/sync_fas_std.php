@@ -1,6 +1,6 @@
 <?php
 	require_once('../../vilesci/config.inc.php');
-	$adress='oesi@technikum-wien.at';
+	$adress='fas_sync@technikum-wien.at';
 	
 	function clean_string($string)
  	{

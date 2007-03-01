@@ -39,11 +39,16 @@ if (!$conn = @pg_pconnect(CONN_STRING))
 if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id']))
 	$lehreinheit_id = $_GET['lehreinheit_id'];
 else 
-	$lehreinheit_id = '';
+	$lehreinheit_id = null;
+	
+if(isset($_GET['mitarbeiter_uid']))
+	$mitarbeiter_uid = $_GET['mitarbeiter_uid'];
+else
+	$mitarbeiter_uid = null;
 
 //Mitarbeiter holen
 $DAO_obj = new lehreinheitmitarbeiter($conn);
-$DAO_obj->getLehreinheitmitarbeiter($lehreinheit_id);
+$DAO_obj->getLehreinheitmitarbeiter($lehreinheit_id, $mitarbeiter_uid);
 
 $rdf_url='http://www.technikum-wien.at/lehreinheitmitarbeiter';
 ?>

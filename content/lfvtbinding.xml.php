@@ -120,7 +120,7 @@
     </content>
   </binding>
 
-  <binding id="lfvtDetail">
+  <binding id="lfvtDetailold">
     <content>
 
 	<xul:vbox style="margin:0px;padding:0px;" flex="1">
@@ -187,10 +187,13 @@
   				</xul:row>
 				<xul:row>
   						<xul:label value="Studiensemester" />
-						<xul:customMenulist id="gridLFVTStudiensemester" class="studiensemester" flex="1" oncommand="document.getBindingParent(this).studiensemester=document.getAnonymousNodes(this)[0].value" />
+  						<xul:vbox>
+							<xul:customMenulist id="gridLFVTStudiensemester" class="studiensemester" flex="0" oncommand="document.getBindingParent(this).studiensemester=document.getAnonymousNodes(this)[0].value" />
+							<xul:spacer flex="1"/>
+						</xul:vbox>
 
 						<xul:label value="Anmerkung" />
-  						<xul:textbox id="gridLFVTAnmerkung" onchange="document.getBindingParent(this).anmerkung=this.value" />
+  						<xul:textbox id="gridLFVTAnmerkung" rows="2" multiline="true" onchange="document.getBindingParent(this).anmerkung=this.value" />
 				</xul:row>
  			</xul:rows>
 		</xul:grid>				
@@ -759,8 +762,8 @@
 <!-- DropDownList fuer Lehrfaecher -->
 
   <binding id="lehrfaecherListe" extends="lfvtbinding.xml.php#customMenulist-base" >
-  	<content>
-		<xul:menulist datasources="<?php echo APP_ROOT;?>rdf/lehrfach.rdf.php" flex="1"
+  	<content><!-- <?php echo APP_ROOT;?>rdf/lehrfach.rdf.php -->
+		<xul:menulist datasources="rdf:null" flex="1"
 		              ref="http://www.technikum-wien.at/lehrfach/liste"  >
   			<xul:template>
 					<xul:menupopup>

@@ -48,7 +48,7 @@ loadVariables($conn, $user);
 $lvaDAO=new lehrveranstaltung($conn);
 $lvaDAO->load_lva($stg_kz, $sem);
 
-$rdf_url='http://www.technikum-wien.at/tempus/lva';
+$rdf_url='http://www.technikum-wien.at/lehrveranstaltung_einheiten';
 
 ?>
 
@@ -126,15 +126,15 @@ $rdf_url='http://www.technikum-wien.at/tempus/lva';
 			$result_lkt = pg_query($conn, $qry);
 			$lkt='';
 			while($row_lkt = pg_fetch_object($result_lkt))
-				$lkt.=$row_lkt->kurzbz;
+				$lkt.=$row_lkt->kurzbz.' ';
 			
 			echo "
       		<RDF:Description  id=\"".$row_le->lehreinheit_id."\"  about=\"".$rdf_url.'/'.$row_lva->lehrveranstaltung_id."/$row_le->lehreinheit_id\" >
 				<LVA:lehrveranstaltung_id>".$row_lva->lehrveranstaltung_id."</LVA:lehrveranstaltung_id>
 				<LVA:kurzbz><![CDATA[".$row_lf->kurzbz."]]></LVA:kurzbz>
 				<LVA:bezeichnung><![CDATA[".utf8_encode($row_lf->bezeichnung)."]]></LVA:bezeichnung>
-				<LVA:studiengang_kz></LVA:studiengang_kz>
-				<LVA:semester></LVA:semester>
+				<LVA:studiengang_kz>".$row_lva->studiengang_kz."</LVA:studiengang_kz>
+				<LVA:semester>".$row_lva->semester."</LVA:semester>
     			<LVA:sprache><![CDATA[".$row_le->sprache."]]></LVA:sprache>
 				<LVA:ects></LVA:ects>
 				<LVA:semesterstunden></LVA:semesterstunden>

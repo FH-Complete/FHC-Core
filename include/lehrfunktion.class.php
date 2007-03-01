@@ -1,69 +1,81 @@
 <?php
-/**
- * Klasse lehrfunktion (FAS-Online)
- * @create 14-03-2006
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 class lehrfunktion
 {
-	var $conn;    // @var resource DB-Connection
+	var $conn;     // @var resource DB-Connection
 	var $new;      // @var boolean
 	var $errormsg; // @var string
-	var $result = array(); // @var lehrfunktion Objekt
+	var $lehrfunktionen = array(); // @var lehrfunktion Objekt
 		
-	var $lehrfunktion_id; // @var integer
-	var $bezeichnung;     // @var string
-	var $standardfaktor;  // @var float
-	var $updateamum;      // @var timestamp
-	var $updatevon=0;       // @var string
-	
-	/**
-	 * Konstruktor
-	 * @param conn Connection zur DB
-	 *        lehrfkt_id ID der zu ladenden lehrfunktion
-	 */
-	function lehrfunktion($conn, $lehrfkt_id=null)
+	var $lehrfunktion_kurzbz; // @var varchar(16)
+	var $beschreibung;        // @var varchar(256)
+	var $standardfaktor;      // @var numeric(3,2)
+		
+	// **
+	// * Konstruktor
+	// * @param conn Connection zur DB
+	// *        lehrfunktion_kurzbz kurzbezeichnung der zu ladenden Funktion
+	// *
+	function lehrfunktion($conn, $lehrfunktion_kurzbz=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+		
+		if($unicode)
+			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+		else 
+			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+			
 		if(!pg_query($conn,$qry))
 		{
-			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
+			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-		if($lehrfkt_id != null)
-			$this->load($lehrfkt_id);
+		
+		if($lehrfunktion_kurzbz!=null)
+			$this->load($lehrfunktion_kurzbz);
 	}
 	
 	/**
 	 * Laedt eine Lehrfunktion
-	 * @param lehrfkt_id ID des Datensatzes der zu laden ist
+	 * @param lehrfunktion_kurzbz ID des Datensatzes der zu laden ist
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load($lehrfkt_id)
+	function load($lehrfunktion_kurzbz)
 	{
-		if(!is_numeric($lehrfkt_id) || $lehrfkt_id == '')
-		{
-			$this->errormsg = 'lehrfunktion_id muss eine gueltige Zahl sein';
-			return false;
-		}
+		$qry = "SELECT * FROM lehre.tbl_lehrfunktion WHERE lehrfunktion_kurzbz = '".addslashes($lehrfunktion_kurzbz)."';";
 		
-		$qry = "SELECT * FROM lehrfunktion WHERE lehrfunktion_pk = '$lehrfkt_id';";
-		
-		if(!$res = pg_query($this->conn, $qry))
+		if(!$result = pg_query($this->conn, $qry))
 		{
 			$this->errormsg = 'Fehler beim laden des Datensatzes';
 			return false;
 		}
 		
-		if($row = pg_fetch_object($res))
+		if($row = pg_fetch_object($result))
 		{
-			$this->lehrfunktion_id = $row->lehrfunktion_pk;
-			$this->bezeichnung     = $row->bezeichnung;
-			$this->standardfaktor  = $row->standardfaktor;
-			$this->updateamum      = $row->creationdate;
-			$this->updatevon       = $row->creationuser;
+			$this->lehrfunktion_kurzbz = $row->lehrfunktion_kurzbz;
+			$this->beschreibung = $row->beschreibung;
+			$this->standardfaktor = $row->standardfaktor;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Es ist kein Datensatz mit dieser ID vorhanden';
 			return false;
@@ -77,25 +89,23 @@ class lehrfunktion
 	 */
 	function getAll()
 	{
-		$qry = "SELECT * FROM lehrfunktion;";
+		$qry = "SELECT * FROM lehre.tbl_lehrfunktion ORDER BY lehrfunktion_kurzbz;";
 		
-		if(!$res = pg_query($this->conn, $qry))
+		if(!$result = pg_query($this->conn, $qry))
 		{
 			$this->errormsg = 'Fehler beim laden der Datensaetze';
 			return false;
 		}
 		
-		while($row = pg_fetch_object($res))
+		while($row = pg_fetch_object($result))
 		{
 			$lehrfkt_obj = new lehrfunktion($this->conn);
 			
-			$lehrfkt_obj->lehrfunktion_id = $row->lehrfunktion_id;
-			$lehrfkt_obj->bezeichnung     = $row->bezeichnung;
-			$lehrfkt_obj->standardfaktor  = $row->standardfaktor;
-			$lehrfkt_obj->updateamum      = $row->creationdate;
-			$lehrfkt_obj->updatevon       = $row->creationuser;
-			
-			$this->result[] = $lehrfkt_obj;
+			$lehrfkt_obj->lehrfunktion_kurzbz = $row->lehrfunktion_kurzbz;
+			$lehrfkt_obj->beschreibung = $row->beschreibung;
+			$lehrfkt_obj->standardfaktor = $row->standardfaktor;
+						
+			$this->lehrfunktionen[] = $lehrfkt_obj;
 		}
 		return true;
 	}
@@ -112,10 +122,10 @@ class lehrfunktion
 	
 	/**
 	 * Loescht den Datensatz mit der ID die uebergeben wird
-	 * @param lehrfkt_id ID des zu loeschenden Datensatzes
+	 * @param lehrfunktion_kurzbz ID des zu loeschenden Datensatzes
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function delete($lehrfkt_id)
+	function delete($lehrfunktion_kurzbz)
 	{
 		$this->errormsg = 'Noch nicht implementiert';
 		return false;
