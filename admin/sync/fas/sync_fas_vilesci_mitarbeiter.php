@@ -1225,7 +1225,8 @@ echo nl2br("\n=====\n".$ausgabe);
 $error_log="Person Sync\n-------------\n\nGesamt FAS: $anzahl_quelle\nPerson:        Eingefügt: $anzahl_eingefuegt_person / geaendert: $anzahl_geaendert_person / Fehler: $anzahl_fehler_person"
 ."\nBenutzer:     Eingefügt: $anzahl_eingefuegt_benutzer / geaendert: $anzahl_geaendert_benutzer / Fehler: $anzahl_fehler_benutzer"
 ."\nMitarbeiter: Eingefügt: $anzahl_eingefuegt_mitarbeiter / geaendert: $anzahl_geaendert_mitarbeiter / Fehler: $anzahl_fehler_mitarbeiter\n\nLOG:\nFehler:\n$error_log\n=====\n$ausgabe";
-mail($adress, 'SYNC Mitarbeiter (Plausichecked)', $error_log,"From: vilesci@technikum-wien.at");
+mail($adress, 'SYNC-Fehler Mitarbeiter', $error_log,"From: vilesci@technikum-wien.at");
+mail($adress, 'SYNC Mitarbeiter', $ausgabe,"From: vilesci@technikum-wien.at");
 ?>
 </body>
 </html>
