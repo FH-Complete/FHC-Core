@@ -71,7 +71,7 @@ function myaddslashes($var)
 
 <html>
 <head>
-<title>Synchro - Vilesci -> Portal - Student</title>
+<title>Synchro - Vilesci -> Vilesci - Student</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
 <body>
