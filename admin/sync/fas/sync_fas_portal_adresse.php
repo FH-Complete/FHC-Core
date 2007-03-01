@@ -29,6 +29,7 @@ $anzahl_fehler=0;
 $anzahl_quelle2=0;
 $anzahl_eingefuegt2=0;
 $anzahl_fehler2=0;
+$ausgabe='';
 
 function validate($row)
 {
@@ -41,7 +42,7 @@ function validate($row)
 
 <html>
 <head>
-<title>Synchro - FAS -> Portal - Adresse</title>
+<title>Synchro - FAS -> Vilesci - Adresse</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
 <body>
@@ -75,7 +76,7 @@ if($result = pg_query($conn_fas, $qry))
 
 		//echo nl2br ($adresse->ext_id."\n");
 		//person_id herausfinden
-		$qry1="SELECT person_portal FROM public.tbl_syncperson WHERE person_fas=".$row->person_fk.";";
+		$qry1="SELECT person_portal FROM sync.tbl_syncperson WHERE person_fas=".$row->person_fk.";";
 		if($result1 = pg_query($conn, $qry1))
 		{
 			if(pg_num_rows($result1)>0) //eintrag gefunden
@@ -140,6 +141,14 @@ if($result = pg_query($conn_fas, $qry))
 									}
 									else 
 									{
+										if($firma->new)
+										{
+											$ausgabe.="Firma ".$firma->name." eingefügt.\n";
+										}
+										else 
+										{
+											$ausgabe.="Firma ".$firma->name." geändert.\n";
+										}
 										$anzahl_eingefuegt2++;
 									}											
 									$adresse->firma_id=$firma->firma_id;
@@ -151,14 +160,14 @@ if($result = pg_query($conn_fas, $qry))
 				else 
 				{
 					$error=true;
-					$error_log.="adresse mit adresse_pk: ".$row->adresse_pk." konnte nicht ermittelt werden! (".pg_num_rows($result1).")\n";
+					$error_log.="adresse mit adresse_pk: ".$row->adresse_pk." konnte nicht ermittelt werden!\n";
 					$anzahl_fehler++;
 				}
 			}
 			else 
 			{
 				$error=true;
-				$error_log.="adresse mit adresse_pk: $row->adresse_pk ($row->person_fk) konnte in tbl_syncperson nicht gefunden werden! (".pg_num_rows($result1).")\n";
+				$error_log.="adresse mit adresse_pk: $row->adresse_pk ($row->person_fk) konnte in tbl_syncperson nicht gefunden werden!\n";
 				$anzahl_fehler++;
 			}
 		}
@@ -172,13 +181,21 @@ if($result = pg_query($conn_fas, $qry))
 			}
 			else 
 			{
+				if($adresse->new)
+				{
+					$ausgabe.="Adresse '".$adresse->plz."',  '".$adresse->strasse."' eingefügt.\n";
+				}
+				else 
+				{
+					$ausgabe.="Adresse '".$adresse->plz."', '".$adresse->strasse."' geändert.\n";
+				}
 				$anzahl_eingefuegt++;
-				echo "- ";
-				ob_flush();
-				flush();
+				//echo "- ";
+				//ob_flush();
+				//flush();
 			}
 		}
-		flush();	
+		//flush();	
 	}	
 }
 
@@ -189,7 +206,8 @@ echo nl2br("\nAdresse\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / 
 echo nl2br("\nFirma\nGesamt: $anzahl_quelle2 / Eingefügt: $anzahl_eingefuegt2 / Fehler: $anzahl_fehler2");
 $error_log.="\nAdresse\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler";
 $error_log.="\nFirma\nGesamt: $anzahl_quelle2 / Eingefügt: $anzahl_eingefuegt2 / Fehler: $anzahl_fehler2";
-mail($adress, 'SYNC Adresse', $error_log);
+mail($adress, 'SYNC-Fehler Adresse', $error_log,"From: vilesci@technikum-wien.at");
+mail($adress, 'SYNC Adresse', $ausgabe,"From: vilesci@technikum-wien.at");
 ?>
 </body>
 </html>

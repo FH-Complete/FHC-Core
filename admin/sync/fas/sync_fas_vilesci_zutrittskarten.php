@@ -4143,7 +4143,7 @@ for($x=3346;$x<4083;$x++)
 	else 
 	{
 		$error_log1.="\n###Fehler bei: ".$qry[$x]."\n".pg_errormessage($conn)."\n";
-		echo nl2br("\n?Fehler bei: ".$qry[$x]."\n".pg_errormessage($conn)."\n");
+		echo nl2br("\nFehler bei: ".$qry[$x]."\n".pg_errormessage($conn)."\n");
 		pg_query($conn, "ROLLBACK");
 	}
 	
