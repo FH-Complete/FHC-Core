@@ -1484,7 +1484,7 @@ if($result = pg_query($conn_fas, $qry))
 										$qry="INSERT INTO public.tbl_prestudentrolle (prestudent_id, rolle_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id) VALUES (".
 										"'$prestudent_id', '$rolle_kurzbz[$status]', '$studiensemester_kurzbz[$stm]', '$ausbildungssemester', '$date',now(),'SYNC',now(),'SYNC', '$rowru->student_ausbildungssemester_pk')";
 										pg_query($conn, $qry);
-										$ausgabe_prerolle.="     Prestudentrolle für ID ".$prestudent_id.", ".$nachname." angelegt: '".$rolle_kurzbz[$status]."' in Studiensemester '".$studiensemester_kurzbz[$stm]."'.\n";
+										$ausgabe_prerolle.="    Prestudentrolle für ID ".$prestudent_id.", ".$nachname." angelegt: '".$rolle_kurzbz[$status]."' in Studiensemester '".$studiensemester_kurzbz[$stm]."' mit Ausbildungssemester '".$ausbildungssemester."'.\n";
 									}
 								}
 							}
@@ -1841,7 +1841,8 @@ $error_log.="Benutzer:       Gesamt: ".$anzahl_benutzer_gesamt." / Eingefügt: ".
 $error_log.="Nicht-Studenten: ".$anzahl_nichtstudenten."\n";
 $error_log.="Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student."\n";
 $error_log.=$text;
-mail($adress, 'SYNC Student', $error_log."\n".$ausgabe,"From: vilesci@technikum-wien.at");
+mail($adress, 'SYNC-Fehler Student', $error_log,"From: vilesci@technikum-wien.at");
+mail($adress, 'SYNC Student', $ausgabe,"From: vilesci@technikum-wien.at");
 ?>
 </body>
 </html>

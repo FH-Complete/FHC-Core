@@ -16,8 +16,8 @@ include('../../../vilesci/config.inc.php');
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
-//$adress='ruhan@technikum-wien.at';
-$adress='fas_sync@technikum-wien.at';
+$adress='ruhan@technikum-wien.at';
+//$adress='fas_sync@technikum-wien.at';
 
 $error_log1='';
 $error_log2='';
@@ -4143,7 +4143,7 @@ for($x=3346;$x<4083;$x++)
 	else 
 	{
 		$error_log1.="\n###Fehler bei: ".$qry[$x]."\n".pg_errormessage($conn)."\n";
-		echo nl2br("\n###Fehler bei: ".$qry[$x]."\n".pg_errormessage($conn)."\n");
+		echo nl2br("\n?Fehler bei: ".$qry[$x]."\n".pg_errormessage($conn)."\n");
 		pg_query($conn, "ROLLBACK");
 	}
 	
