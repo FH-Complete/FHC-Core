@@ -69,6 +69,7 @@ foreach ($ma as $mitarbeiter)
     		<MITARBEITER:titelpre><?php echo $mitarbeiter->titelpre; ?></MITARBEITER:titelpre>
     		<MITARBEITER:titelpost><?php echo $mitarbeiter->titelpost; ?></MITARBEITER:titelpost>
     		<MITARBEITER:vornamen><?php echo $mitarbeiter->vornamen; ?></MITARBEITER:vornamen>
+    		<MITARBEITER:vorname><?php echo $mitarbeiter->vorname; ?></MITARBEITER:vorname>
     		<MITARBEITER:nachname><?php echo $mitarbeiter->nachname; ?></MITARBEITER:nachname>
     		<MITARBEITER:kurzbz><?php echo $mitarbeiter->kurzbz; ?></MITARBEITER:kurzbz>
       	</RDF:Description>

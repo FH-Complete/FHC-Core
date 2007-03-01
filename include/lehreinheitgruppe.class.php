@@ -69,7 +69,36 @@ class lehreinheitgruppe
 	// *********************************************************
 	function load($lehreinheitgruppe_id)
 	{
-		return false;
+		if(!is_numeric($lehreinheitgruppe_id))
+		{
+			$this->errormsg = 'Lehreinheitgruppe_id ist ungueltig';
+			return false;
+		}
+		$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id='$lehreinheitgruppe_id'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$this->lehreinheitgruppe_id = $row->lehreinheitgruppe_id;
+				$this->lehreinheit_id = $row->lehreinheit_id;
+				$this->studiengang_kz = $row->studiengang_kz;
+				$this->semester = $row->semester;
+				$this->verband = $row->verband;
+				$this->gruppe = $row->gruppe;
+				$this->gruppe_kurzbz = $row->gruppe_kurzbz;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->ext_id = $row->ext_id;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden der Daten';
+			return false;
+		}				
 	}
 	
 	// *******************************************
@@ -202,6 +231,45 @@ class lehreinheitgruppe
 		else 
 		{
 			$this->errormsg = 'Fehler beim lesen der Lehreinheitgruppen';
+			return false;
+		}
+	}
+	
+	function getLehreinheitgruppe($lehreinheit_id)
+	{
+		if(!is_numeric($lehreinheit_id))
+		{
+			$this->errormsg = 'Lehreinheit_id ist ungueltig';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id'";
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$leg_obj = new lehreinheitgruppe($this->conn);
+				
+				$leg_obj->lehreinheitgruppe_id = $row->lehreinheitgruppe_id;
+				$leg_obj->lehreinheit_id = $row->lehreinheit_id;
+				$leg_obj->studiengang_kz = $row->studiengang_kz;
+				$leg_obj->semester = $row->semester;
+				$leg_obj->verband = $row->verband;
+				$leg_obj->gruppe = $row->gruppe;
+				$leg_obj->gruppe_kurzbz = $row->gruppe_kurzbz;
+				$leg_obj->updateamum = $row->updateamum;
+				$leg_obj->updatevon = $row->updatevon;
+				$leg_obj->insertamum = $row->insertamum;
+				$leg_obj->insertvon = $row->insertvon;
+				$leg_obj->ext_id = $row->ext_id;
+				
+				$this->lehreinheitgruppe[] = $leg_obj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}

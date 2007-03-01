@@ -45,6 +45,23 @@ if(isset($_GET['semester']))
 	$sem = $_GET['semester'];
 else 
 	$sem = '';
+	
+if(isset($_GET['lehrveranstaltung_id']) && is_numeric($_GET['lehrveranstaltung_id']))
+{
+	$lvid = $_GET['lehrveranstaltung_id'];
+	
+	$qry = "SELECT studiengang_kz, semester FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='$lvid'";
+	
+	$result = pg_query($conn, $qry);
+	if($row = pg_fetch_object($result))
+	{
+		$stg = $row->studiengang_kz;
+		$sem = $row->semester;
+	}
+	else 
+		die('Fehler beim laden der Daten');
+}
+	
 
 // Einheiten holen
 $lehrfachDAO=new lehrfach($conn);
