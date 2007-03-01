@@ -9,7 +9,7 @@
 //*
 //* Synchronisiert Schlüsseldatensaetze von FAS DB in PORTAL DB
 //*
-//*
+//*benötigt: tbl_betriebsmitteltyp, tbl_ort
 
 include('../../../vilesci/config.inc.php');
 include('../../../include/betriebsmittel.class.php');
