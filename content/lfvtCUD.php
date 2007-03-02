@@ -8,6 +8,7 @@ require_once('../vilesci/config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/lehreinheit.class.php');
 require_once('../include/lehreinheitmitarbeiter.class.php');
+require_once('../include/lehreinheitgruppe.class.php');
 require_once('../include/benutzerberechtigung.class.php');
 
 $user = get_uid();
@@ -66,6 +67,17 @@ if(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_add')
 		echo 'ok';
 	else 
 		echo $lem->errormsg;		
+}
+elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_gruppe_del')
+{
+	if(isset($_POST['lehreinheitgruppe_id']) && is_numeric($_POST['lehreinheitgruppe_id']))
+	{
+		$leg = new lehreinheitgruppe($conn);
+		if($leg->delete($_POST['lehreinheitgruppe_id']))
+			echo 'ok';
+		else
+			echo $leg->errormsg;
+	}
 }
 else 
 {

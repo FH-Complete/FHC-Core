@@ -18,6 +18,7 @@
 	$insert_error=0;
 	$double_error=0;
 	$double_lva_error=0;
+	$missing_lva=0;
 	$anz_update=0;
 	$anz_insert=0;
 	$headtext='';
@@ -166,6 +167,16 @@
 	{
 		$studiensemester[$row->studiensemester_pk]=$row->stsem;
 	}
+	
+	// Lehreinheiten ohne Lehrveranstaltung suchen
+	$qry = "SELECT bezeichnung, semester, kennzahl, studiensemester_fk FROM lehreinheit, studiengang, ausbildungssemester WHERE ausbildungssemester_fk=ausbildungssemester_pk AND lehreinheit.studiengang_fk=studiengang_pk AND lehrveranstaltung_fk NOT IN(SELECT lehrveranstaltung_pk FROM lehrveranstaltung)";
+	$result = pg_query($conn_fas, $qry);
+	while($row = pg_fetch_object($result))
+	{
+		$stg_data[$row->kennzahl]['text'] .= '   Lehreinheit '.$stg_data[$row->kennzahl]['kuerzel'].' '.$row->semester.' ('.$studiensemester[$row->studiensemester_fk].') '.$row->bezeichnung." hat keine zugehoerige Lehrveranstaltung\n";
+		$missing_lva++;
+	}
+	
  	// Anzahl der Lehrveranstaltungen in VileSci
 	$sql_query="SELECT count(*) AS anz FROM lehre.tbl_lehrveranstaltung";
 	$result=pg_query($conn, $sql_query);
@@ -389,6 +400,7 @@
 	$headtext.="$double_lva_error Lehrveranstaltungen kommen in VileSci mehrmals vor!\n";
 	$headtext.="$anz_update LVAs wurden aktualisiert.\n";
 	$headtext.="$anz_insert LVAs wurden neu angelegt.\n";
+	$headtext.="$missing_lva Lehreinheiten haben keine LV.\n";
 	
 	$qry = "Select count(*) as anzahl FROM (SELECT distinct lv1.lehrveranstaltung_pk 
 	                  	FROM lehrveranstaltung lv1, lehrveranstaltung lv2 
@@ -407,7 +419,7 @@
 	
 	if(count($double_lva)>0)
 	{
-		$headtext.="Doppelte Lehrveranstaltungen:\n\n";
+		$headtext.="\nDoppelte Lehrveranstaltungen:\n\n";
 		foreach ($double_lva as $bez)
 			$headtext.=$bez."\n";
 	}
