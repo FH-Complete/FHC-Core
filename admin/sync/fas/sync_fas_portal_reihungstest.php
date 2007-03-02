@@ -1,19 +1,6 @@
 <?php
 /* Copyright (C) 2007 Technikum-Wien
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
@@ -39,10 +26,11 @@ $error_log='';
 $text = '';
 $anzahl_quelle=0;
 $anzahl_eingefuegt=0;
+$anzahl_update=0;
 $anzahl_fehler=0;
-$anzahl_quelle2=0;
-$anzahl_eingefuegt2=0;
-$anzahl_fehler2=0;
+$ausgabe='';
+$ausgabe_test='';
+
 
 function validate($row)
 {
@@ -55,7 +43,7 @@ function validate($row)
 
 <html>
 <head>
-<title>Synchro - FAS -> Portal - Reihungstest</title>
+<title>Synchro - FAS -> Vilesci - Reihungstest</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
 <body>
@@ -82,10 +70,11 @@ if($result = pg_query($conn_fas, $qry))
 		$reihungstest->insertvon		="SYNC";
 		$reihungstest->ext_id		=$row->reihungstest_pk;
 	
-		
+		$update=false;
+		$ausgabe_test='';
 		//echo nl2br ($reihungstest->ext_id."\n");
 
-		$qry2="SELECT reihungstest_id, ext_id FROM tbl_reihungstest WHERE ext_id=".$row->reihungstest_pk.";";
+		$qry2="SELECT * FROM tbl_reihungstest WHERE ext_id=".$row->reihungstest_pk.";";
 		if($result2 = pg_query($conn, $qry2))
 		{
 			if(pg_num_rows($result2)>0) //eintrag gefunden
@@ -93,6 +82,44 @@ if($result = pg_query($conn_fas, $qry))
 				if($row2=pg_fetch_object($result2))
 				{ 
 					// update adresse, wenn datensatz bereits vorhanden
+					
+					if($row2->anmerkung!=$row->raum)
+					{
+						$update=true;
+						if(strlen(trim($ausgabe_test))>0)
+						{
+							$ausgabe_test.=", Raum: '".$row->raum."'";
+						}
+						else
+						{
+							$ausgabe_test="Raum: '".$row->raum."'";
+						}
+					}
+					if($row2->datum!=$row->datum)
+					{
+						$update=true;
+						if(strlen(trim($ausgabe_test))>0)
+						{
+							$ausgabe_test.=", Datum: '".$row->datum."'";
+						}
+						else
+						{
+							$ausgabe_test="Datum: '".$row->datum."'";
+						}
+					}
+					if($row2->uhrzeit!=$row->uhrzeit)
+					{
+						$update=true;
+						if(strlen(trim($ausgabe_test))>0)
+						{
+							$ausgabe_test.=", Uhrzeit: '".$row->uhrzeit."'";
+						}
+						else
+						{
+							$ausgabe_test="Uhrzeit: '".$row->uhrzeit."'";
+						}
+					}
+					
 					$reihungstest->new=false;
 					$reihungstest->reihungstest_id=$row2->reihungstest_id;
 				}
@@ -103,33 +130,53 @@ if($result = pg_query($conn_fas, $qry))
 				$reihungstest->new=true;	
 			}
 		}
-				
-		
 		if(!$error)
 		{
-			if(!$reihungstest->save())
+			if($reihungstest->new || $update)
 			{
-				$error_log.=$reihungstest->errormsg."\n";
-				$anzahl_fehler++;
-			}
-			else 
-			{
-				$anzahl_eingefuegt++;
-				echo "- ";
-				ob_flush();
-				flush();
+				if(!$reihungstest->save())
+				{
+					$error_log.=$reihungstest->errormsg."\n";
+					$anzahl_fehler++;
+					$ausgabe_test='';
+				}
+				else 
+				{
+					if($reihungstest->new)
+					{
+						$ausgabe.="Reihungstest '$row->raum', '$row->datum' eingefügt!\n";
+						$anzahl_eingefuegt++;
+					}
+					else 
+					{
+						if($update)
+						{
+							$ausgabe.="Reihungstest geändert: ".$ausgabe_test." !\n";
+							$anzahl_update++;
+						}
+					}
+					//echo "- ";
+					//ob_flush();
+					//flush();
+				}
 			}
 		}
-		flush();	
+		//flush();	
 	}	
 }
 
 
 //echo nl2br($text);
-echo nl2br($error_log);
-echo nl2br("\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
-$error_log.="\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler";
-mail($adress, 'SYNC Reihungstest', $error_log);
+echo nl2br("\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler");
+echo nl2br("\n\n".$error_log);
+echo nl2br("\n\n".$ausgabe);
+$ausgabe="\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n".$ausgabe;
+$ausgabe="Telefonsync:\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n\n".$ausgabe;
+if(strlen(trim($error_log))>0)
+{
+	mail($adress, 'SYNC-Fehler Reihungstest', $error_log,"From: vilesci@technikum-wien.at");
+}
+mail($adress, 'SYNC Reihungstest', $ausgabe,"From: vilesci@technikum-wien.at");
 ?>
 </body>
 </html>

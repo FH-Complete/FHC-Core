@@ -1222,10 +1222,14 @@ echo nl2br("\nBenutzer:     Eingefügt: $anzahl_eingefuegt_benutzer / geaendert: 
 echo nl2br("\nMitarbeiter:  Eingefügt: $anzahl_eingefuegt_mitarbeiter / geaendert: $anzahl_geaendert_mitarbeiter / Fehler: $anzahl_fehler_mitarbeiter");
 echo nl2br("\nLog:\n".$error_log);
 echo nl2br("\n=====\n".$ausgabe);
-$error_log="Person Sync\n-------------\n\nGesamt FAS: $anzahl_quelle\nPerson:        Eingefügt: $anzahl_eingefuegt_person / geaendert: $anzahl_geaendert_person / Fehler: $anzahl_fehler_person"
+$ausgabe="Person Sync\n-------------\n\nGesamt FAS: $anzahl_quelle\nPerson:        Eingefügt: $anzahl_eingefuegt_person / geaendert: $anzahl_geaendert_person / Fehler: $anzahl_fehler_person"
 ."\nBenutzer:     Eingefügt: $anzahl_eingefuegt_benutzer / geaendert: $anzahl_geaendert_benutzer / Fehler: $anzahl_fehler_benutzer"
-."\nMitarbeiter: Eingefügt: $anzahl_eingefuegt_mitarbeiter / geaendert: $anzahl_geaendert_mitarbeiter / Fehler: $anzahl_fehler_mitarbeiter\n\nLOG:\nFehler:\n$error_log\n=====\n$ausgabe";
-mail($adress, 'SYNC-Fehler Mitarbeiter', $error_log,"From: vilesci@technikum-wien.at");
+."\nMitarbeiter: Eingefügt: $anzahl_eingefuegt_mitarbeiter / geaendert: $anzahl_geaendert_mitarbeiter / Fehler: $anzahl_fehler_mitarbeiter.".$ausgabe;
+$error_log="\n\n\nFehler:\n$error_log";
+if(strlen(trim($error_log))>0)
+{
+	mail($adress, 'SYNC-Fehler Mitarbeiter', $error_log,"From: vilesci@technikum-wien.at");
+}
 mail($adress, 'SYNC Mitarbeiter', $ausgabe,"From: vilesci@technikum-wien.at");
 ?>
 </body>

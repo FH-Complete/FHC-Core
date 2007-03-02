@@ -45,7 +45,7 @@ $anzahl_benutzer_update=0;
 $anzahl_fehler_benutzer=0;
 $anzahl_nichtstudenten=0;
 $rolle_kurzbz=array(1=>"Interessent", 2=>"Bewerber", 3=>"Student", 4=>"Ausserordentlicher", 5=>"Abgewiesener", 6=>"Aufgenommener", 7=>"Wartender", 8=>"Abbrecher", 9=>"Unterbrecher", 10=>"Outgoing", 11=>"Incoming", 12=>"Praktikant", 13=>"Diplomant", 14=>"Absolvent");
-$studiensemester_kurzbz=array(2=>"wS2002",3=>"SS2003",4=>"WS2003",5=>"SS2004",6=>"WS2004",7=>"SS2005",8=>"WS2005",9=>"SS2006",10=>"WS2006",11=>"SS2007",12=>"WS2007",13=>"SS2008",14=>"WS2008");
+$studiensemester_kurzbz=array(2=>"WS2002",3=>"SS2003",4=>"WS2003",5=>"SS2004",6=>"WS2004",7=>"SS2005",8=>"WS2005",9=>"SS2006",10=>"WS2006",11=>"SS2007",12=>"WS2007",13=>"SS2008",14=>"WS2008");
 $studiengangfk=array(2=>11,3=>91,4=>94,5=>145,6=>227,7=>182,8=>222,9=>203,10=>204,11=>92,12=>258,13=>308,14=>254,15=>256,16=>257,17=>255,18=>302,19=>336,20=>330,21=>333, 22=>327,23=>335,24=>228,25=>303,26=>299,27=>298,28=>300,29=>297,30=>329,31=>301,32=>332,33=>331,34=>328,35=>1,36=>1,37=>334);
 //Kennzahlen für EUE im Array studiengangfk NACHTRAGEN
 
@@ -56,8 +56,8 @@ foreach ($studiengangfk AS $stg)
 }
 
 
-//$adress='ruhan@technikum-wien.at';
-$adress='fas_sync@technikum-wien.at';
+$adress='ruhan@technikum-wien.at';
+//$adress='fas_sync@technikum-wien.at';
 
 function myaddslashes($var)
 {
@@ -630,7 +630,7 @@ if($result = pg_query($conn_fas, $qry))
 						else 
 						{
 							$error=true;
-							$error_log.="person von $row->person_pk konnte nicht ermittelt werden\n";
+							$error_log.="Person von $row->person_pk konnte nicht ermittelt werden\n";
 						}
 					}
 					else
@@ -651,7 +651,7 @@ if($result = pg_query($conn_fas, $qry))
 								else 
 								{
 									$error=true;
-									$error_log.="person mit svnr: $row->svnr bzw. ersatzkennzeichen: $row->ersatzkennzeichen konnte nicht ermittelt werden (".pg_num_rows($resultz).")\n";
+									$error_log.="Person mit SVNR: $row->svnr bzw. Ersatzkennzeichen: $row->ersatzkennzeichen konnte nicht ermittelt werden (".pg_num_rows($resultz).")\n";
 								}
 							}
 							else 
@@ -1027,7 +1027,7 @@ if($result = pg_query($conn_fas, $qry))
 			else
 			{
 				$error=true;
-				$error_log.='Fehler beim Zugriff auf Tabelle tbl_prestudent bei student_pk: '.$row->student_pk;	
+				$error_log.='Fehler beim Zugriff auf Tabelle tbl_prestudent bei student_pk: '.$row->student_pk.pg_errormessage($conn)."\n";	
 			}
 			
 			//Studiengang ermitteln
@@ -1050,8 +1050,8 @@ if($result = pg_query($conn_fas, $qry))
 			}
 			else 
 			{
-				echo nl2br("\n".$qry."\nFehler beim Zugriff auf tbl_studiengang\n");
-				$error_log.="\n".$qry."\nFehler beim Zugriff auf tbl_studiengang\n";
+				echo nl2br("\n".$qry."\nFehler beim Zugriff auf tbl_studiengang\n".pg_errormessage($conn)."\n");
+				$error_log.="\n".$qry."\nFehler beim Zugriff auf tbl_studiengang\n".pg_errormessage($conn)."\n";
 				$error=true;
 			}
 			if($row->aufmerksamdurch=='1')		$aufmerksamdurch_kurzbz='k.A.';
@@ -1382,7 +1382,7 @@ if($result = pg_query($conn_fas, $qry))
 				else
 				{
 					$error=true;
-					$error_log.='Fehler beim Zugriff auf Tabelle tbl_student bei student_pk: '.$ext_id_student;	
+					$error_log.='Fehler beim Zugriff auf Tabelle tbl_student bei student_pk: '.$ext_id_student."\n".pg_errormessage($conn)."\n";	
 				}
 
 				//Gruppenverband ermitteln
@@ -1483,7 +1483,10 @@ if($result = pg_query($conn_fas, $qry))
 									{
 										$qry="INSERT INTO public.tbl_prestudentrolle (prestudent_id, rolle_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id) VALUES (".
 										"'$prestudent_id', '$rolle_kurzbz[$status]', '$studiensemester_kurzbz[$stm]', '$ausbildungssemester', '$date',now(),'SYNC',now(),'SYNC', '$rowru->student_ausbildungssemester_pk')";
-										pg_query($conn, $qry);
+										if(!pg_query($conn, $qry))
+										{
+											$error_log.="FEHLER bei Eintrag in tbl_prestudentrolle: '$prestudent_id', '$rolle_kurzbz[$status]', '$studiensemester_kurzbz[$stm]', '$ausbildungssemester'.\n".pg_errormessage($conn)."\n";
+										}
 										$ausgabe_prerolle.="    Prestudentrolle für ID ".$prestudent_id.", ".$nachname." angelegt: '".$rolle_kurzbz[$status]."' in Studiensemester '".$studiensemester_kurzbz[$stm]."' mit Ausbildungssemester '".$ausbildungssemester."'.\n";
 									}
 								}
@@ -1515,7 +1518,7 @@ if($result = pg_query($conn_fas, $qry))
 					else
 					{
 						$error=true;
-						$error_log.='Fehler beim Zugriff auf Tabelle tbl_benutzer bei student_pk: '.$row->student_pk."\n";	
+						$error_log.='Fehler beim Zugriff auf Tabelle tbl_benutzer bei student_pk: '.$row->student_pk."\n".pg_errormessage($conn)."\n";	
 					}
 					if($new_benutzer)
 					{
@@ -1834,14 +1837,17 @@ Echo nl2br("Nicht-Studenten: ".$anzahl_nichtstudenten."\n");
 Echo nl2br("Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student."\n");
 
 $error_log="Sync Student\n--------------\n";
-$error_log.="\nPersonen ohne Reihungstest: ".$notest." \n\n";
-$error_log.="Personen:       Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$anzahl_person_insert." / Geändert: ".$anzahl_person_update." / Fehler: ".$anzahl_fehler_person."\n";
-$error_log.="Prestudenten:   Gesamt: ".$anzahl_pre_gesamt." / Eingefügt: ".$anzahl_pre_insert." / Geändert: ".$anzahl_pre_update." / Fehler: ".$anzahl_fehler_pre."\n";
-$error_log.="Benutzer:       Gesamt: ".$anzahl_benutzer_gesamt." / Eingefügt: ".$anzahl_benutzer_insert." / Geändert: ".$anzahl_benutzer_update." / Fehler: ".$anzahl_fehler_benutzer."\n";
-$error_log.="Nicht-Studenten: ".$anzahl_nichtstudenten."\n";
-$error_log.="Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student."\n";
+$ausgabe="Sync Student\n--------------\n\nPersonen ohne Reihungstest: ".$notest." \n\n"
+."Personen:       Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$anzahl_person_insert." / Geändert: ".$anzahl_person_update." / Fehler: ".$anzahl_fehler_person."\n"
+."Prestudenten:   Gesamt: ".$anzahl_pre_gesamt." / Eingefügt: ".$anzahl_pre_insert." / Geändert: ".$anzahl_pre_update." / Fehler: ".$anzahl_fehler_pre."\n"
+."Benutzer:       Gesamt: ".$anzahl_benutzer_gesamt." / Eingefügt: ".$anzahl_benutzer_insert." / Geändert: ".$anzahl_benutzer_update." / Fehler: ".$anzahl_fehler_benutzer."\n"
+."Nicht-Studenten: ".$anzahl_nichtstudenten."\n"
+."Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student."\n\n".$ausgabe;
 $error_log.=$text;
-mail($adress, 'SYNC-Fehler Student', $error_log,"From: vilesci@technikum-wien.at");
+if(strlen(trim($error_log))>0)
+{
+	mail($adress, 'SYNC-Fehler Student', $error_log,"From: vilesci@technikum-wien.at");
+}
 mail($adress, 'SYNC Student', $ausgabe,"From: vilesci@technikum-wien.at");
 ?>
 </body>
