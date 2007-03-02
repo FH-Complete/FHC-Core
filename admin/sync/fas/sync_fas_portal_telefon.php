@@ -1,19 +1,6 @@
 <?php
 /* Copyright (C) 2006 Technikum-Wien
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
@@ -23,7 +10,7 @@
 //*
 //* Synchronisiert Telefondatensaetze von FAS DB in PORTAL DB
 //*
-//*
+//* benötigt: tbl_syncperson, tbl_kontakttyp
 
 include('../../../vilesci/config.inc.php');
 include('../../../include/kontakt.class.php');
@@ -31,14 +18,18 @@ include('../../../include/kontakt.class.php');
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
-$adress='ruhan@technikum-wien.at';
-//$adress='fas_sync@technikum-wien.at';
+//$adress='ruhan@technikum-wien.at';
+$adress='fas_sync@technikum-wien.at';
 
 $error_log='';
 $text = '';
 $anzahl_quelle=0;
 $anzahl_eingefuegt=0;
+$anzahl_update=0;
 $anzahl_fehler=0;
+$update=false;
+$ausgabe='';
+$ausgabe_telefon='';
 
 function validate($row)
 {
@@ -47,7 +38,7 @@ function validate($row)
 
 <html>
 <head>
-<title>Synchro - FAS -> Portal - Telefon</title>
+<title>Synchro - FAS -> Vilesci - Telefon</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
 <body>
@@ -65,10 +56,11 @@ if($result = pg_query($conn_fas, $qry))
 	$anzahl_quelle=pg_num_rows($result);
 	while($row = pg_fetch_object($result))
 	{
-		echo "- ";
-		ob_flush();
-		flush();	
-			
+		//echo "- ";
+		//ob_flush();
+		//flush();	
+		$update=false;
+		$ausgabe_telefon='';	
 		$error=false;
 		$kontakt				=new kontakt($conn);
 		$kontakt->firma_id			='';
@@ -98,20 +90,56 @@ if($result = pg_query($conn_fas, $qry))
 		//Person_id feststellen
 		if($row->nummer!='')
 		{
-			$qry1="SELECT person_portal FROM public.tbl_syncperson WHERE person_fas=".$row->person_fk.";";
+			$qry1="SELECT person_portal FROM sync.tbl_syncperson WHERE person_fas=".$row->person_fk.";";
 			if($result1 = pg_query($conn, $qry1))
 			{
 				if(pg_num_rows($result1)>0) //eintrag gefunden
 				{
 					if($row1=pg_fetch_object($result1))
 					{ 
-						$qry2="SELECT kontakt_id, ext_id FROM tbl_kontakt WHERE ext_id=".$row->telefonnummer_pk." AND kontakttyp='telefon';";
+						$qry2="SELECT * FROM tbl_kontakt WHERE ext_id=".$row->telefonnummer_pk." AND (kontakttyp='telefon' OR kontakttyp='mobil' OR kontakttyp='fax' OR kontakttyp='so.tel');";
 						if($result2 = pg_query($conn, $qry2))
 						{
 							if(pg_num_rows($result2)>0) //eintrag gefunden
 							{
 								if($row2=pg_fetch_object($result2))
 								{ 
+									if($row2->kontakttyp!=$kontakt->kontakttyp)
+									{
+										$update=true;
+										if(strlen(trim($ausgabe_telefon))>0)
+										{
+											$ausgabe_telefon.=", Kontakttyp: '".$kontakt->kontakttyp."'";
+										}
+										else
+										{
+											$ausgabe_telefon="Kontakttyp: '".$kontakt->kontakttyp."'";
+										}
+									}
+									if($row2->anmerkung!=$row->name)
+									{
+										$update=true;
+										if(strlen(trim($ausgabe_telefon))>0)
+										{
+											$ausgabe_telefon.=", Anmerkung: '".$row->name."'";
+										}
+										else
+										{
+											$ausgabe_telefon="Anmerkung: '".$row->name."'";
+										}
+									}
+									if($row2->kontakt!=$row->nummer)
+									{
+										$update=true;
+										if(strlen(trim($ausgabe_telefon))>0)
+										{
+											$ausgabe_telefon.=", Kontakt: '".$row->nummer."'";
+										}
+										else
+										{
+											$ausgabe_telefon="Kontakt: '".$row->nummer."'";
+										}
+									}									
 									// update , wenn datensatz bereits vorhanden
 									$kontakt->person_id=$row1->person_portal;
 									$kontakt->kontakt_id=$row2->kontakt_id;
@@ -129,21 +157,37 @@ if($result = pg_query($conn_fas, $qry))
 				}
 				else 
 				{
+					$ausgabe_telefon='';
 					$error=true;
-					$error_log.="person mit person_fk: $row->person_fk konnte in tbl_syncperson nicht gefunden werden! (".pg_num_rows($result1).")\n";
+					$error_log.="Person mit person_fk: $row->person_fk konnte in tbl_syncperson nicht gefunden werden!\n";
 					$anzahl_fehler++;
 				}
 			}
 			If (!$error)
 			{
-				if(!$kontakt->save())
+				if($kontakt->new || $update)
 				{
-					$error_log.=$kontakt->errormsg."\n";
-					$anzahl_fehler++;
-				}
-				else 
-				{
-					$anzahl_eingefuegt++;
+					if(!$kontakt->save())
+					{
+						$error_log.=$kontakt->errormsg."\n";
+						$anzahl_fehler++;
+					}
+					else 
+					{
+						if($kontakt->new)
+						{
+							$ausgabe.="Telefonnummer '$kontakt->kontakt' eingefügt!\n";
+							$anzahl_eingefuegt++;
+						}
+						else 
+						{
+							if($update)
+							{
+								$ausgabe.="Telefonnummer '$kontakt->kontakt' geändert: ".$ausgabe_telefon." !\n";
+								$anzahl_update++;
+							}
+						}
+					}
 				}
 			}
 		}
@@ -154,9 +198,13 @@ if($result = pg_query($conn_fas, $qry))
 
 //echo nl2br($text);
 echo nl2br("\n".$error_log);
-echo nl2br("\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
-$error_log.="\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler";
-mail($adress, 'SYNC Telefon', $error_log);
+echo nl2br("\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler \n\n $ausgabe");
+$ausgabe="Telefonsync:\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n\n".$ausgabe;
+if(strlen(trim($error_log))>0)
+{
+	mail($adress, 'SYNC-Fehler Telefon', $error_log,"From: vilesci@technikum-wien.at");
+}
+mail($adress, 'SYNC Telefon', $ausgabe,"From: vilesci@technikum-wien.at");
 ?>
 </body>
 </html>

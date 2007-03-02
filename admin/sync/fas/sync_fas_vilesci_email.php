@@ -142,6 +142,7 @@ if($result = pg_query($conn_fas, $qry))
 			}
 			else 
 			{
+				$ausgabe_email='';
 				$error=true;
 				$error_log.="Person mit person_fk: $row->person_fk konnte in tbl_syncperson nicht gefunden werden!\n";
 				$anzahl_fehler++;
