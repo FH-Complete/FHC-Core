@@ -204,6 +204,17 @@ class lehreinheitgruppe
 		}
 	}
 	
+	// ****************************************************
+	// * Sieht nach ob Gruppe schon zu dieser Lehreinheit
+	// * zugeordnet ist.
+	// * @param lehreinheit_id
+	// *        studiengang_kz
+	// *        semester
+	// *        verband
+	// *        gruppe
+	// *        gruppe_kurzbz
+	// * @return true wenn vorhanden, false wenn nicht
+	// ****************************************************
 	function exists($lehreinheit_id, $studiengang_kz, $semester, $verband, $gruppe, $gruppe_kurzbz)
 	{
 		$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id'";
@@ -235,6 +246,13 @@ class lehreinheitgruppe
 		}
 	}
 	
+	// *******************************************
+	// * Liefert alle Gruppenzuordnungen zu einer 
+	// * Lehreinheit.
+	// * @param lehreinheit_id Lehreinheit zu der 
+	// *        die Gruppen geladen werden sollen
+	// * @return true wenn ok, false im fehlerfall
+	// *******************************************
 	function getLehreinheitgruppe($lehreinheit_id)
 	{
 		if(!is_numeric($lehreinheit_id))
@@ -270,6 +288,30 @@ class lehreinheitgruppe
 		else 
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	// ***************************************************************
+	// * Loescht die Zuornung Gruppe-Lehreinheit
+	// * @param lehreinheigruppe_id ID des zu loeschenden Datensatzes
+	// * @return true wenn ok, false im fehlerfall
+	// ***************************************************************
+	function delete($lehreinheitgruppe_id)
+	{
+		if(!is_numeric($lehreinheitgruppe_id))
+		{
+			$this->errormsg = 'Lehreinheitgruppe_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "DELETE FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id='$lehreinheitgruppe_id'";
+		
+		if(pg_query($this->conn, $qry))
+			return true;
+		else 
+		{
+			$this->errormsg = 'Fehler beim Loeschen';
 			return false;
 		}
 	}

@@ -14,13 +14,17 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 	xmlns:html="http://www.w3.org/1999/xhtml"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	>
-
+<popupset>
+	<popup id="lfvt_detail_gruppe_tree_popup">
+		<menuitem label="Entfernen" oncommand="lfvt_LehreinheitGruppeDel();" />
+	</popup>
+</popupset>
 <!-- *************************** LEHREINHEIT DETAILS ************************* -->
 <vbox id="lfvt-detail" class="lvaDetail"  style="margin:0px;" >
 <hbox style="background:#eeeeee;margin:0px;padding:2px">
 			<label value="Details" style="font-size:12pt;font-weight:bold;margin-top:5px;"  flex="1" />
 			<spacer flex="1" />
-			<button id="btnLFVTSave" label="speichern" oncommand="lfvtDetailSave();"/>
+			<button id="lfvt_detail_button_save" label="speichern" oncommand="lfvtDetailSave();" disabled="true"/>
 		</hbox>
 		<checkbox id="lfvt_detail_checkbox_new" hidden="true"/>
 		<textbox id="lfvt_detail_textbox_lehreinheit_id" hidden="true"/>
@@ -38,16 +42,16 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 			<!-- fehlt hier die eindeutige ID ? -->
 				<row >
   						<label value="LVNR" />
-  						<textbox id="lfvt_detail_textbox_lvnr" maxlength="20" />
+  						<textbox id="lfvt_detail_textbox_lvnr" maxlength="20" disabled="true" />
 
   						<label value="UNR" />
-  	    				<textbox id="lfvt_detail_textbox_unr"/>
+  	    				<textbox id="lfvt_detail_textbox_unr" disabled="true"/>
 				</row>
 				<row>
   						<label value="Sprache" />
 						<menulist id="lfvt_detail_menulist_sprache" 
 						          datasources="<?php echo APP_ROOT; ?>rdf/sprache.rdf.php" flex="1"
-								  ref="http://www.technikum-wien.at/sprachen/liste">
+								  ref="http://www.technikum-wien.at/sprachen/liste" disabled="true">
 							<template>
 								<menupopup>
 									<menuitem value="rdf:http://www.technikum-wien.at/sprachen/rdf#bezeichnung"
@@ -61,7 +65,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 				</row>
 				<row>
   						<label value="Lehrfach" />
-						<menulist id="lfvt_detail_menulist_lehrfach"
+						<menulist id="lfvt_detail_menulist_lehrfach" disabled="true"
 						          datasources="rdf:null" flex="1"
 						          ref="http://www.technikum-wien.at/lehrfach/liste"  >
 				  			<template>
@@ -74,7 +78,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 						</menulist>
 
 						<label value="Lehrform" />
-						<menulist id="lfvt_detail_menulist_lehrform"
+						<menulist id="lfvt_detail_menulist_lehrform" disabled="true"
 						          datasources="<?php echo APP_ROOT ?>rdf/lehrform.rdf.php" flex="1"
 		                          ref="http://www.technikum-wien.at/lehrform/liste" >
 							<template>
@@ -88,7 +92,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
   	  			</row>
 				<row>
   	    				<label value="Raumtyp" />
-  						<menulist id="lfvt_detail_menulist_raumtyp" 
+  						<menulist id="lfvt_detail_menulist_raumtyp" disabled="true"
   						          datasources="<?php echo APP_ROOT ?>rdf/raumtyp.rdf.php" flex="1"
 					              ref="http://www.technikum-wien.at/raumtyp/liste" >
 			  				<template>
@@ -101,7 +105,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 						</menulist>
 
   						<label value="Raumtyp alternativ" />
-  						<menulist id="lfvt_detail_menulist_raumtypalternativ"
+  						<menulist id="lfvt_detail_menulist_raumtypalternativ" disabled="true"
   								  datasources="<?php echo APP_ROOT ?>rdf/raumtyp.rdf.php" flex="1"
 					              ref="http://www.technikum-wien.at/raumtyp/liste" >
 			  				<template>
@@ -115,22 +119,22 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
   				</row>
 				<row>
    	   					<label value="Lehre" />
-						<checkbox id="lfvt_detail_checkbox_lehre" />
+						<checkbox id="lfvt_detail_checkbox_lehre" disabled="true"/>
 						
   						<label value="Stundenblockung" />
-  						<textbox id="lfvt_detail_textbox_stundenblockung" />
+  						<textbox id="lfvt_detail_textbox_stundenblockung" disabled="true" />
   				</row>
 				<row>
   						<label value="Wochenrythmus" />
-  						<textbox id="lfvt_detail_textbox_wochenrythmus" />
+  						<textbox id="lfvt_detail_textbox_wochenrythmus" disabled="true"/>
 
   						<label value="Start KW" />
-  						<textbox id="lfvt_detail_textbox_startkw" />
+  						<textbox id="lfvt_detail_textbox_startkw" disabled="true"/>
   				</row>
 				<row>
   						<label value="Studiensemester" />
   						<vbox>							
-							<menulist id="lfvt_detail_menulist_studiensemester" 
+							<menulist id="lfvt_detail_menulist_studiensemester" disabled="true"
 									  datasources="<?php echo APP_ROOT ?>rdf/studiensemester.rdf.php" flex="0"
 							          ref="http://www.technikum-wien.at/studiensemester/liste" >
 								<template>
@@ -144,18 +148,19 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 							<spacer flex="1"/>
 						</vbox>
 						<label value="Anmerkung" />
-  						<textbox id="lfvt_detail_textbox_anmerkung" rows="2" multiline="true" />
+  						<textbox id="lfvt_detail_textbox_anmerkung" rows="2" multiline="true" disabled="true"/>
 				</row>
 				<row>					
 					<!-- ************* GRUPPEN ************** -->
 					<label value="Gruppen" />
 					<vbox height="150" flex="1">
 						<hbox flex="1">
-							<tree id="lfvt_detail_tree_lehreinheitgruppe" seltype="single" hidecolumnpicker="false" flex="1"
+							<tree id="lfvt_detail_tree_lehreinheitgruppe" seltype="single" hidecolumnpicker="false" flex="1" disabled="true"
 									datasources="rdf:null"
 									ref="http://www.technikum-wien.at/lehreinheitgruppe/liste"
-									onselect="lfvt_LehreinheitGruppeAuswahl();" flags="dont-build-content"
+									flags="dont-build-content"
 									style="border: 1px solid black;"
+									contextmenu="lfvt_detail_gruppe_tree_popup"
 							>
 								<treecols>
 									<treecol id="lfvt_detail_tree_lehreinheitgruppe-col-bezeichnung" label="Bezeichnung" flex="2" hidden="false"
@@ -183,8 +188,8 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 						</hbox>
 						
 						<hbox>
-							<button label="+" oncommand="lfvt_LehreinheitGruppeAdd()" style="max-width: 30px;"/>
-							<button label="-" oncommand="lfvt_LehreinheitGruppeDel()" style="max-width: 30px;"/>
+							<button label="+" id="lfvt_detail_gruppe_button_add" oncommand="lfvt_LehreinheitGruppeAdd()" style="max-width: 30px;" disabled="true"/>
+							<!--<button label="-" id="lfvt_detail_gruppe_button_del" oncommand="lfvt_LehreinheitGruppeDel()" style="max-width: 30px;" disabled="true"/>-->
 						</hbox>
 						
 					</vbox>
@@ -242,8 +247,8 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 			</hbox>
 			
 			<hbox>
-				<button label="+" oncommand="lfvt_LehreinheitMitarbeiterAdd()" style="max-width: 30px;"/>
-				<button label="-" oncommand="lfvt_LehreinheitMitarbeiterDel()" style="max-width: 30px;"/>
+				<button label="+" id="lfvt_lehreinheitmitarbeiter_button_add" oncommand="lfvt_LehreinheitMitarbeiterAdd()" style="max-width: 30px;" disabled="true"/>
+				<button label="-" id="lfvt_lehreinheitmitarbeiter_button_del" oncommand="lfvt_LehreinheitMitarbeiterDel()" style="max-width: 30px;" disabled="true"/>
 			</hbox>
 			
 		</vbox>

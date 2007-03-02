@@ -1,5 +1,11 @@
 <?php
 require_once('../vilesci/config.inc.php');
+require_once('../include/functions.inc.php');
+
+$conn = pg_pconnect(CONN_STRING);
+
+$user = get_uid();
+loadVariables($conn, $user);
 ?>
 var lfvt_detail_lehrfach_id;
 
@@ -20,11 +26,22 @@ function listElementHandlers(aObj)
          dump(list+'\n');
 }
 
+function lfvt_tree_refresh()
+{
+	var tree = document.getElementById('treeLFVT');
+	tree.builder.refresh();
+}
+
 // ****
 // * neue Lehreinheit anlegen
 // ****
 function lvaNeu() 
 {
+	lfvtDetailDisableFields(false);
+	
+	// Trick 17	(sonst gibt's ein Permission denied)
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	
 	var tree = document.getElementById('treeLFVT');
 	var lvaDetail=document.getElementById('lvaDetail');
 	//Details zuruecksetzen
@@ -32,6 +49,34 @@ function lvaNeu()
 	//Lehrveranstaltungs_id holen
 	var col = tree.columns ? tree.columns["lva_lehrveranstaltung_id"] : "lva_lehrveranstaltung_id";
 	var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
+	
+	//Lehrfach drop down setzen
+
+	//ID in globale Variable speichern
+	lfvt_detail_lehrfach_id='';
+		
+	lehrfachmenulist = document.getElementById('lfvt_detail_menulist_lehrfach');
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	
+	//Entfernen der alten Datasources
+	var oldDatasources = lehrfachmenulist.database.GetDataSources();	
+	while(oldDatasources.hasMoreElements())
+	{
+		lehrfachmenulist.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	lehrfachmenulist.builder.refresh();
+	
+	//Url zusammenbauen
+	var url = '<?php echo APP_ROOT;?>rdf/lehrfach.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+'&'+gettimestamp();
+
+	//RDF holen
+	var newDs  = rdfService.GetDataSource(url);
+	lehrfachmenulist.database.AddDataSource(newDs);
+	
+	//SinkObserver hinzufuegen
+	var sink = newDs.QueryInterface(Components.interfaces.nsIRDFXMLSink);  
+	sink.addXMLSinkObserver(lfvt_detail_lehrfach_observer);
 	
 	document.getElementById('lfvt_detail_textbox_lehrveranstaltung').value=lehrveranstaltung_id;
 	document.getElementById('lfvt_detail_checkbox_new').checked=true;
@@ -70,7 +115,7 @@ function lvaDelete()
 		if (response!='ok') 
 			alert(response);
 			
-		tree.builder.rebuild();
+		lfvt_tree_refresh();
 		lfvtDetailReset();
 	}
 }
@@ -111,11 +156,34 @@ function lfvtDetailReset()
 	document.getElementById('lfvt_detail_textbox_startkw').value='';
 	document.getElementById('lfvt_detail_textbox_anmerkung').value='';
 	document.getElementById('lfvt_detail_menulist_sprache').value='German';
-	document.getElementById('lfvt_detail_menulist_lehrfach').value='';
+	//document.getElementById('lfvt_detail_menulist_lehrfach').value='';
 	document.getElementById('lfvt_detail_menulist_raumtyp').value='Dummy';
 	document.getElementById('lfvt_detail_menulist_raumtypalternativ').value='Dummy';
-	document.getElementById('lfvt_detail_menulist_studiensemester').value='';
+	document.getElementById('lfvt_detail_menulist_studiensemester').value='<?php echo $semester_aktuell; ?>';
 	document.getElementById('lfvt_detail_menulist_lehrform').value='UE';
+}
+
+// ****
+// * Deaktiviert alle Eingabe- und Auswahlfelder
+// ****
+function lfvtDetailDisableFields(val)
+{
+	document.getElementById('lfvt_detail_textbox_lvnr').disabled=val;
+	document.getElementById('lfvt_detail_textbox_unr').disabled=val;
+	document.getElementById('lfvt_detail_textbox_lehrveranstaltung').disabled=val;
+	document.getElementById('lfvt_detail_checkbox_lehre').disabled=val;
+	document.getElementById('lfvt_detail_textbox_stundenblockung').disabled=val;
+	document.getElementById('lfvt_detail_textbox_wochenrythmus').disabled=val;
+	document.getElementById('lfvt_detail_textbox_startkw').disabled=val;
+	document.getElementById('lfvt_detail_textbox_anmerkung').disabled=val;
+	document.getElementById('lfvt_detail_menulist_sprache').disabled=val;
+	document.getElementById('lfvt_detail_menulist_lehrfach').disabled=val;
+	document.getElementById('lfvt_detail_menulist_raumtyp').disabled=val;
+	document.getElementById('lfvt_detail_menulist_raumtypalternativ').disabled=val;
+	document.getElementById('lfvt_detail_menulist_studiensemester').disabled=val;
+	document.getElementById('lfvt_detail_menulist_lehrform').disabled=val;
+	document.getElementById('lfvt_detail_tree_lehreinheitgruppe').disabled=val;
+	document.getElementById('lfvt_detail_button_save').disabled=val;
 }
 
 function lfvtDetailSave()
@@ -175,6 +243,7 @@ function lfvtDetailSave()
 	else 
 	{
 		document.getElementById('lfvt_detail_checkbox_new').checked=false;
+		lfvt_tree_refresh();
 		alert('Daten wurden gespeichert');
 	}
 }
@@ -207,15 +276,21 @@ function lvaAuswahl()
 			//Lehreinheitmitarbeiter tree deaktivieren
 			document.getElementById('lfvt_detail_tree_lehreinheitmitarbeiter').datasources='';
 			document.getElementById('lfvt_detail_tree_lehreinheitgruppe').datasources='';
+			document.getElementById('lfvt_lehreinheitmitarbeiter_button_add').disabled=true;
+			document.getElementById('lfvt_lehreinheitmitarbeiter_button_del').disabled=true;
 			
+			lfvtDetailDisableFields(true);
 			//Details zuruecksetzen
 			lfvtDetailReset();
 			return false;
 		}
 		else
 		{	
+			lfvtDetailDisableFields(false);
 			document.getElementById('lfvt_toolbar_neu').disabled=true;
-			document.getElementById('lfvt_toolbar_del').disabled=false;			
+			document.getElementById('lfvt_toolbar_del').disabled=false;
+			document.getElementById('lfvt_lehreinheitmitarbeiter_button_add').disabled=false;
+			document.getElementById('lfvt_lehreinheitmitarbeiter_button_del').disabled=false;
 		}
 			
 		var col = tree.columns ? tree.columns["lva_lehrveranstaltung_id"] : "lva_lehrveranstaltung_id";
@@ -264,7 +339,7 @@ function lvaAuswahl()
 	anmerkung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
 	studiensemester=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiensemester_kurzbz" ));
 	lehrform=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehrform_kurzbz" ));
-		
+	
 	//Lehrfach drop down setzen
 	//document.getElementById('gridLFVTLehrfach').setAttribute('datasources',"<?php echo APP_ROOT;?>rdf/lehrfach.rdf.php");
 	//debug("datasource="+document.getElementById('gridLFVTLehrfach').datasources);
@@ -316,7 +391,7 @@ function lvaAuswahl()
 	document.getElementById('lfvt_detail_menulist_lehrform').value=lehrform;
 	document.getElementById('lfvt_detail_checkbox_new').checked=false;
 	document.getElementById('lfvt_detail_textbox_lehreinheit_id').value=lehreinheit_id;
-			
+	
 	//Lehreinheitmitarbeiter tree setzen
 	url='../rdf/lehreinheitmitarbeiter.rdf.php?lehreinheit_id='+lehreinheit_id;
 	document.getElementById('lfvt_detail_tree_lehreinheitmitarbeiter').setAttribute('datasources',url);
@@ -606,4 +681,64 @@ function lfvt_LehreinheitMitarbeiterAuswahl()
 		document.getElementById('lfvt_lehreinheitmitarbeiter_checkbox_bismelden').checked=true;
 	else
 		document.getElementById('lfvt_lehreinheitmitarbeiter_checkbox_bismelden').checked=false;
+}
+
+// ************* GRUPPEN ******************** //
+
+// ****
+// * Loescht die Zuordnung einer Gruppe zu einer
+// * Lehreinheit
+// ****
+function lfvt_LehreinheitGruppeDel()
+{
+	alert('del');
+	return false;
+	tree = document.getElementById('lfvt_detail_tree_lehreinheitgruppe');
+	
+	//Falls kein Eintrag gewaehlt wurde, den ersten auswaehlen
+	var idx;
+	if(tree.currentIndex>=0)
+		idx = tree.currentIndex;
+	else
+	{
+		alert('Bitte zuerst eine Gruppe markieren');
+		return false;
+	}
+
+	try
+	{
+		//Lehreinheit_id holen
+		var col = tree.columns ? tree.columns["lfvt_detail_tree_lehreinheitgruppe-col-lehreinheitgruppe_id"] : "lfvt_detail_tree_lehreinheitgruppe-col-lehreinheitgruppe_id";
+		var lehreinheitgruppe_id=tree.view.getCellText(idx,col);
+	}
+	catch(e)
+	{
+		alert(e);
+		return false;
+	}
+	
+	var req = new phpRequest('lfvtCUD.php','','');
+	neu = document.getElementById('lfvt_detail_checkbox_new').checked;
+
+	req.add('type', 'lehreinheit_gruppe_del');
+	req.add('lehreinheitgruppe_id', lehreinheitgruppe_id);
+	
+	var response = req.executePOST();
+	if (response!='ok') 
+	{
+		alert(response);
+	} 
+	else 
+	{
+		//refresh des Trees
+	}		
+}
+
+// ****
+// * Fuegt eine Gruppe zu einer
+// * Lehreinheit hinzu
+// ****
+function lfvt_LehreinheitGruppeAdd()
+{
+
 }
