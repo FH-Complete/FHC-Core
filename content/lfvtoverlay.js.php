@@ -393,11 +393,11 @@ function lvaAuswahl()
 	document.getElementById('lfvt_detail_textbox_lehreinheit_id').value=lehreinheit_id;
 	
 	//Lehreinheitmitarbeiter tree setzen
-	url='../rdf/lehreinheitmitarbeiter.rdf.php?lehreinheit_id='+lehreinheit_id;
+	url='../rdf/lehreinheitmitarbeiter.rdf.php?lehreinheit_id='+lehreinheit_id+"&"+gettimestamp();
 	document.getElementById('lfvt_detail_tree_lehreinheitmitarbeiter').setAttribute('datasources',url);
 	
 	//Lehreinheitgruppe tree setzen
-	url='../rdf/lehreinheitgruppe.rdf.php?lehreinheit_id='+lehreinheit_id;
+	url='../rdf/lehreinheitgruppe.rdf.php?lehreinheit_id='+lehreinheit_id+"&"+gettimestamp();
 	document.getElementById('lfvt_detail_tree_lehreinheitgruppe').setAttribute('datasources',url);
 }
 
@@ -686,16 +686,28 @@ function lfvt_LehreinheitMitarbeiterAuswahl()
 // ************* GRUPPEN ******************** //
 
 // ****
+// * Observer fuer GruppenTree (testing)
+// ****
+var lfvt_detail_gruppe_observer = {
+	     onBeginLoad: function(aSink) { },
+	     onInterrupt: function(aSink) { },
+	     onResume:    function(aSink) { },
+	     onEndLoad:   function(aSink) { 	    
+	     	tree = document.getElementById('lfvt_detail_tree_lehreinheitgruppe');
+	     	tree.builder.rebuild();
+	     },
+	     onError: function(aSink, aStatus, aErrorMsg) { }
+	  };
+	  
+// ****
 // * Loescht die Zuordnung einer Gruppe zu einer
 // * Lehreinheit
 // ****
 function lfvt_LehreinheitGruppeDel()
 {
-	alert('del');
-	return false;
 	tree = document.getElementById('lfvt_detail_tree_lehreinheitgruppe');
-	
-	//Falls kein Eintrag gewaehlt wurde, den ersten auswaehlen
+
+	//Nachsehen ob Gruppe markiert wurde
 	var idx;
 	if(tree.currentIndex>=0)
 		idx = tree.currentIndex;
@@ -741,4 +753,137 @@ function lfvt_LehreinheitGruppeDel()
 function lfvt_LehreinheitGruppeAdd()
 {
 
+}
+
+
+/**
+ * (Wenn gedroppt wird)
+ * Speichert die Zuteilung einer Gruppe zu einer Lehreinheit
+ */
+function lfvt_detail_gruppe_dragdrop(event)
+{   
+    event.stopPropagation();
+    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect")   
+    try {
+        dragservice_ds = Components.classes["@mozilla.org/widget/dragservice;1"].getService(Components.interfaces.nsIDragService);
+    }
+    catch (e)
+    {
+    	debug('treeDragDrop: e');
+    }
+    
+    var ds = dragservice_ds;
+    var ses = ds.getCurrentSession()
+    var sourceNode = ses.sourceNode
+    var lehreinheit_id = document.getElementById('lfvt_detail_textbox_lehreinheit_id').value;
+    var row = { }
+    var col = { }
+    var child = { }
+   
+    if(lehreinheit_id=='')
+    	return false;
+    	
+	//Quelle holen (Gruppe)
+	var flavourset = new FlavourSet();
+    flavourset.appendFlavour("gruppe");
+
+    var transferData = nsTransferable.get(flavourset, getDragData, true);
+
+    quell_gruppe=transferData.first.first.data;
+    var arr = quell_gruppe.split("&");
+    var stg_kz = arr[0];
+    var sem = arr[1];
+    var ver = arr[2];
+    var grp = arr[3];
+    var gruppe = arr[4];
+    //alert("stg: "+stg_kz+" sem: "+sem+" ver: "+ver+" grp: "+grp+" gruppe: "+gruppe+" TO Lehreinheit:"+lehreinheit_id);
+    
+    var req = new phpRequest('lfvtCUD.php','','');
+	neu = document.getElementById('lfvt_detail_checkbox_new').checked;
+	
+	req.add('type','lehreinheit_gruppe_add');
+			
+	req.add('lehreinheit_id', lehreinheit_id);
+	req.add('studiengang_kz', stg_kz);
+	req.add('semester', sem);
+	req.add('verband', ver);
+	req.add('gruppe', grp);
+	req.add('gruppe_kurzbz', gruppe);
+			
+	var response = req.executePOST();
+	if (response!='ok') 
+	{
+		alert(response);
+	} 
+	else 
+	{
+		//GruppenTree Refreshen
+		tree = document.getElementById('lfvt_detail_tree_lehreinheitgruppe');
+		tree.builder.addListener(lfvt_detail_gruppe_observer);
+		tree.builder.refresh();
+	}
+}
+
+var dragservice_ds;
+/**
+ * Holt die Daten aus der DragSession
+ */
+function getDragData(aFlavourSet)
+{
+	var ds = dragservice_ds;
+	var ses = ds.getCurrentSession()
+	
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	
+	var supportsArray = Components.classes["@mozilla.org/supports-array;1"]
+    	.createInstance(Components.interfaces.nsISupportsArray);
+
+  	for (var i = 0; i < ses.numDropItems; ++i)
+    {
+      	var trans = nsTransferable.createTransferable();
+      	for (var j = 0; j < aFlavourSet.flavours.length; ++j)
+        	trans.addDataFlavor(aFlavourSet.flavours[j].contentType);
+      	ses.getData(trans, i);
+      	supportsArray.AppendElement(trans);
+    }
+  	return supportsArray;
+}
+
+/**
+ * Drag ueber den Tree
+ */
+function lfvt_detail_gruppe_dragover( event )
+{
+  var validFlavor = false;
+  var dragSession = null;
+
+  var targetNode = event.target 
+  	  	
+  netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	
+  var dragService = Components.classes["@mozilla.org/widget/dragservice;1"].
+                    getService().QueryInterface(Components.interfaces.nsIDragService);
+  
+  if( dragService ) 
+  {
+    dragSession = dragService.getCurrentSession();
+    
+    if( dragSession ) 
+    {
+		if( dragSession.isDataFlavorSupported("gruppe") )
+    		validFlavor = true;
+    	else if ( dragSession.isDataFlavorSupported("gruppe") )
+        	validFlavor = true;
+      
+		if ( validFlavor ) 
+		{
+	        //Style action	        
+			//targetNode.style.backgroundColor = "red";
+		 	//targetNode.style.color = "red";
+		  	//event.originalTarget.style.color = "red";
+	        dragSession.canDrop = true;
+	        event.stopPropagation();
+      	}
+    }
+  }
 }

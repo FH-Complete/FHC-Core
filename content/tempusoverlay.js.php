@@ -15,7 +15,7 @@ function auswahlValues()
 }
 
 function onVerbandSelect()
-{
+{	
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
 	var tree=document.getElementById('tree-verband');
 	var stg_kz=tree.view.getCellText(tree.currentIndex,"stg_kz");
@@ -212,4 +212,58 @@ function parseRDFString(str, url)
   parser.parseString(memoryDS,baseUri,str);
 
   return memoryDS;
+}
+
+/**
+ * Wird zu Beginn einer DragnDrop Session aufgerufen.
+ * Hier werden die Flayvour und die zu uebertragenden Daten
+ * festgelegt.
+ */
+function treeVerbandDragGesture(event)
+{
+    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect")
+    var tree = document.getElementById('tree-verband')
+    var row = { }
+    var col = { }
+    var child = { }
+    debug('treeVerbandDragGesture');
+    //Index der Quell-Row ermitteln
+    tree.treeBoxObject.getCellAt(event.pageX, event.pageY, row, col, child)
+    
+    //Wenn es keine Row ist sondern ein Header oder Scrollbar dann das DnD abbrechen
+    if (!col.value) 
+       	return false;
+       	
+    //Daten holen
+    col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+	stg_kz=tree.view.getCellText(row.value,col);
+	
+	col = tree.columns ? tree.columns["sem"] : "sem";
+	sem=tree.view.getCellText(row.value,col);
+           
+	col = tree.columns ? tree.columns["ver"] : "ver";
+	ver=tree.view.getCellText(row.value,col);
+	
+	col = tree.columns ? tree.columns["grp"] : "grp";
+	grp=tree.view.getCellText(row.value,col);
+	
+	col = tree.columns ? tree.columns["gruppe"] : "gruppe";
+	gruppe=tree.view.getCellText(row.value,col);
+	
+    var ds = Components.classes["@mozilla.org/widget/dragservice;1"].getService(Components.interfaces.nsIDragService);
+    var trans = Components.classes["@mozilla.org/widget/transferable;1"].createInstance(Components.interfaces.nsITransferable);
+    
+    //Flavour anhaengen
+    trans.addDataFlavor("gruppe");
+    var textWrapper = Components.classes["@mozilla.org/supports-string;1"].createInstance(Components.interfaces.nsISupportsString);
+    
+    //Daten anhaengen
+    textWrapper.data = stg_kz+'&'+sem+'&'+ver+'&'+grp+'&'+gruppe;
+    trans.setTransferData("gruppe", textWrapper, textWrapper.data.length*2);
+    var transArray = Components.classes["@mozilla.org/supports-array;1"].createInstance(Components.interfaces.nsISupportsArray);
+    transArray.AppendElement(trans);
+    
+    // Actually start dragging
+    ds.invokeDragSession(event.target, transArray, null, ds.DRAGDROP_ACTION_COPY + ds.DRAGDROP_ACTION_MOVE);
+    event.stopPropagation();
 }
