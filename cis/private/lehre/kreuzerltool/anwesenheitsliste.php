@@ -68,10 +68,14 @@ else
 		$lehreinheit_id = $_GET['lehreinheit_id'];
 		$lehreinheit_obj = new lehreinheit($conn, $lehreinheit_id);
 	}
-}	
+}
 
 $qry = "SELECT * FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) WHERE 
 		tbl_lehreinheit.lehreinheit_id='$lehreinheit_obj->lehreinheit_id' AND
+		mitarbeiter_uid='$user'";
+
+$qry = "SELECT * FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) WHERE 
+		tbl_lehreinheit.lehrveranstaltung_id in(Select lehrveranstaltung_id from lehre.tbl_lehreinheit where lehreinheit_id='$lehreinheit_obj->lehreinheit_id') AND
 		mitarbeiter_uid='$user'";
 
 if(!$result = pg_query($conn, $qry))
