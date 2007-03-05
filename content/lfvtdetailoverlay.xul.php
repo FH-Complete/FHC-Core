@@ -14,13 +14,14 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 	xmlns:html="http://www.w3.org/1999/xhtml"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	>
+<!-- *************************** LEHREINHEIT DETAILS ************************* -->
+<!--<script src="chrome://global/content/nsTransferable.js"/>-->
+<vbox id="lfvt-detail" class="lvaDetail"  style="margin:0px;" >
 <popupset>
 	<popup id="lfvt_detail_gruppe_tree_popup">
 		<menuitem label="Entfernen" oncommand="lfvt_LehreinheitGruppeDel();" />
 	</popup>
 </popupset>
-<!-- *************************** LEHREINHEIT DETAILS ************************* -->
-<vbox id="lfvt-detail" class="lvaDetail"  style="margin:0px;" >
 <hbox style="background:#eeeeee;margin:0px;padding:2px">
 			<label value="Details" style="font-size:12pt;font-weight:bold;margin-top:5px;"  flex="1" />
 			<spacer flex="1" />
@@ -160,7 +161,10 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 									ref="http://www.technikum-wien.at/lehreinheitgruppe/liste"
 									flags="dont-build-content"
 									style="border: 1px solid black;"
+        							ondragdrop="lfvt_detail_gruppe_dragdrop(event);"
+							        ondragover="return lfvt_detail_gruppe_dragover(event);" 
 									contextmenu="lfvt_detail_gruppe_tree_popup"
+									ondragexit="debug('ondragexit');" 
 							>
 								<treecols>
 									<treecol id="lfvt_detail_tree_lehreinheitgruppe-col-bezeichnung" label="Bezeichnung" flex="2" hidden="false"
@@ -188,7 +192,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 						</hbox>
 						
 						<hbox>
-							<button label="+" id="lfvt_detail_gruppe_button_add" oncommand="lfvt_LehreinheitGruppeAdd()" style="max-width: 30px;" disabled="true"/>
+							<!--<button label="+" id="lfvt_detail_gruppe_button_add" oncommand="lfvt_LehreinheitGruppeAdd()" style="max-width: 30px;" disabled="true"/>-->
 							<!--<button label="-" id="lfvt_detail_gruppe_button_del" oncommand="lfvt_LehreinheitGruppeDel()" style="max-width: 30px;" disabled="true"/>-->
 						</hbox>
 						

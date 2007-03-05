@@ -79,6 +79,28 @@ elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_gruppe_del')
 			echo $leg->errormsg;
 	}
 }
+elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_gruppe_add')
+{
+	if(isset($_POST['lehreinheit_id']) && is_numeric($_POST['lehreinheit_id']))
+	{
+		$leg = new lehreinheitgruppe($conn);
+		$leg->lehreinheit_id = $_POST['lehreinheit_id'];
+		$leg->studiengang_kz = $_POST['studiengang_kz'];
+		$leg->semester = $_POST['semester'];
+		$leg->verband = $_POST['verband'];
+		$leg->gruppe = $_POST['gruppe'];
+		$leg->gruppe_kurzbz = $_POST['gruppe_kurzbz'];
+		
+		if($leg->save(true))
+		{
+			echo 'ok';
+		}
+		else 
+			echo $leg->errormsg;
+	}
+	else 
+		echo "Lehreinheit_id ist ungueltig";
+}
 else 
 {
 	if ($_POST['do']=='create' || ($_POST['do']=='update')) 

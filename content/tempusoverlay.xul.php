@@ -26,7 +26,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/dragboard.js"/>
 
 <tree id="tree-verband" onselect="onVerbandSelect();"
-	seltype="single" hidecolumnpicker="false" flex="1"
+	seltype="single" hidecolumnpicker="false" flex="1" 
+	enableColumnDrag="true"	
+    ondraggesture="treeVerbandDragGesture(event);" 
 	datasources="../rdf/lehrverbandsgruppe.rdf.php" ref="http://www.technikum-wien.at/lehrverbandsgruppe/alle-verbaende"
 	>
 	<treecols>
