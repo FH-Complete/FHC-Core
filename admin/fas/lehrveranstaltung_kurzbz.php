@@ -12,7 +12,7 @@
 
 <title>FAS - Lehrveranstaltung</title>
 </head>
-<body>
+<body onload="document.getElementsByTagName('input')[0].focus()">
 
 <H1>FAS - Lehrveranstaltung</h1>
 <?php
@@ -91,7 +91,7 @@
 		echo "<td>$row->lehrveranstaltungname</td>";
 		echo "<td>$kuerzel</td>";
 		//Textfeld zum eingeben der Kurzbezeichnung
-		echo "<td><form action='$PHP_SELF?studiengang=$stg&lehrveranstaltung_id=$row->lehrveranstaltung_pk' method='POST'><input type='text' size='5' maxlength='5' name='kurzbz'><input type='submit' value='Speichern'></form></td>";
+		echo "<td><form action='$PHP_SELF?studiengang=$stg&lehrveranstaltung_id=$row->lehrveranstaltung_pk' method='POST'><input type='text' size='5' maxlength='5' tabindex='$i' name='kurzbz'><input type='submit' value='Speichern'></form></td>";
 		echo '</tr>';		
 	}
 	echo '</table>';
