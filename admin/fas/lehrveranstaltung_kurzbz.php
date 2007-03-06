@@ -59,7 +59,7 @@
 			echo "<OPTION value='$row->studiengang_pk'>($art) $row->kuerzel</OPTION>";
 	}
 	echo "</SELECT>";
-	echo '</form';
+	echo '</form>';
 	
 	//Lehrveranstaltungen ohne kurzbezeichnung holen
 	if($stg=='')
