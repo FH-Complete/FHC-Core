@@ -1,8 +1,13 @@
+<?php
+/**
+ * ermoeglicht das Eintragen der Kurzbezeichnung bei Lehrveranstaltungen ohne kurzbz
+ */
+?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-9">
 <link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 
 <title>FAS - Lehrveranstaltung</title>
@@ -17,7 +22,7 @@
 	if (!$conn = @pg_pconnect(CONN_STRING_FAS))
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 		
-	$qry = 'SELECT * FROM studiengang';
+	$qry = "SET CLIENT_ENCODING TO 'LATIN9';SELECT * FROM studiengang order by studiengangsart, kuerzel";
 	
 	if(!$result = pg_query($conn, $qry))
 		die('Fehler beim lesen aus der DB');
@@ -56,6 +61,7 @@
 	echo "</SELECT>";
 	echo '</form';
 	
+	//Lehrveranstaltungen ohne kurzbezeichnung holen
 	if($stg=='')
 		die('Bitte einen Studiengang auswaehlen');
 	$qry = "SELECT *, ausbildungssemester.name as ausbildungssemestername, lehrveranstaltung.name as lehrveranstaltungname FROM lehrveranstaltung, ausbildungssemester, studiensemester WHERE lehrveranstaltung.ausbildungssemester_fk=ausbildungssemester.ausbildungssemester_pk AND lehrveranstaltung.studiensemester_fk=studiensemester.studiensemester_pk AND (lehrveranstaltung.kurzbezeichnung is null OR lehrveranstaltung.kurzbezeichnung='') AND lehrveranstaltung.studiengang_fk='".addslashes($stg)."' ORDER BY lehrveranstaltung_pk";
@@ -63,11 +69,13 @@
 	if(!$result = pg_query($conn, $qry))
 		die('Fehler beim lesen aus der Datenbank');
 		
+	//Tabelle ausgeben
 	echo '<table>';
 	echo '<tr class="liste"><td>ID</td><td>Semester</td><td>StSem</td><td>Bezeichnung</td><td>Vorschlag</td><td>Kurzbezeichnung</td>';
 	$i=0;
 	while($row = pg_fetch_object($result))
 	{
+		//Vorschlag suchen
 		$kuerzel='';
 		$qry = "SELECT kurzbezeichnung FROM lehrveranstaltung WHERE studiengang_fk='$row->studiengang_fk' AND ausbildungssemester_fk='$row->ausbildungssemester_fk' AND name='$row->lehrveranstaltungname' AND kurzbezeichnung is not null AND kurzbezeichnung<>''";
 		$result_kurzbz = pg_query($conn, $qry);
@@ -81,6 +89,7 @@
 		echo "<td>".($row->art=='1'?'WS':'SS')."$row->jahr </td>";
 		echo "<td>$row->lehrveranstaltungname</td>";
 		echo "<td>$kuerzel</td>";
+		//Textfeld zum eingeben der Kurzbezeichnung
 		echo "<td><form action='$PHP_SELF?studiengang=$stg&lehrveranstaltung_id=$row->lehrveranstaltung_pk' method='POST'><input type='text' size='5' maxlength='5' name='kurzbz'><input type='submit' value='Speichern'></form></td>";
 		echo '</tr>';		
 	}
