@@ -68,7 +68,8 @@
 	
 	if(!$result = pg_query($conn, $qry))
 		die('Fehler beim lesen aus der Datenbank');
-		
+	$anz = pg_num_rows($result);
+	echo " $anz Datensaetze gefunden";
 	//Tabelle ausgeben
 	echo '<table>';
 	echo '<tr class="liste"><td>ID</td><td>Semester</td><td>StSem</td><td>Bezeichnung</td><td>Vorschlag</td><td>Kurzbezeichnung</td>';
