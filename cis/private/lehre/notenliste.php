@@ -61,6 +61,7 @@ $qry = "SELECT
 		WHERE 
 			person.uid='$user' AND 
 			person.person_pk=student.person_fk AND
+			aufgenommenam is not null AND
 			studiengang.studiengang_pk=student.studiengang_fk 
 		ORDER BY aufgenommenam DESC LIMIT 1
 			";

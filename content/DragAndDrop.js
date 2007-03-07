@@ -86,6 +86,7 @@ var nsDragAndDrop =
    **/  
   	startDrag: function (aEvent, aDragDropObserver)
     	{
+
     	try 
     	{
     		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -111,11 +112,10 @@ var nsDragAndDrop =
         {
           	return;  // not a draggable item, bail!
         }
-
       	if (!transferData.data) 
       		return;
       	transferData = transferData.data;
-      
+
       	var transArray = Components.classes["@mozilla.org/supports-array;1"]
         	.createInstance(Components.interfaces.nsISupportsArray);
 

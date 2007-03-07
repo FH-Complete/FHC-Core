@@ -1,4 +1,25 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
+
 require_once('../vilesci/config.inc.php');
 require_once('../include/functions.inc.php');
 
@@ -8,28 +29,35 @@ $user = get_uid();
 loadVariables($conn, $user);
 ?>
 var lfvt_detail_lehrfach_id;
+var lfvt_detail_gruppe_datasource;
+var lfvt_detail_lektor_datasource;
 
-function getDropDownValue(obj) 
+// ****
+// * Observer fuer LFVT Tree
+// * startet Rebuild nachdem das Refresh
+// * der datasource fertig ist
+// ****
+var lfvt_tree_observer = 
 {
-	//var list = document.getElementById(obj.name);
-	//var selectedText = list.selectedItem.label;
-	//alert(selectedText);
-	return obj.name;
-}
+	onBeginLoad : function(pSink) {},
+	onInterrupt : function(pSink) {},
+	onResume : function(pSink) {},
+	onError : function(pSink, pStatus, pError) {},
+	onEndLoad : function(pSink) 
+	{	
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		document.getElementById('treeLFVT').builder.rebuild();
+	}
+}	
 
-function listElementHandlers(aObj) 
-{
-	if(!aObj)
-       return null;
-    for(var list in aObj)
-       if(list.match(/^on/))
-         dump(list+'\n');
-}
-
+// ****
+// * Asynchroner (Nicht blockierender) Refresh des LFVT Trees
+// ****
 function lfvt_tree_refresh()
 {
-	var tree = document.getElementById('treeLFVT');
-	tree.builder.refresh();
+	
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	lfvt_tree_datasource.Refresh(false); //non blocking
 }
 
 // ****
@@ -87,6 +115,8 @@ function lvaNeu()
 // ****
 function lvaDelete() 
 {
+
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('treeLFVT');
 	
 	if (tree.currentIndex==-1) return;
@@ -109,6 +139,7 @@ function lvaDelete()
 	{		
 		//Script zum loeschen der Lehreinheit aufrufen
 		var req = new phpRequest('lfvtCUD.php','','');
+		req.add('type','lehreinheit');
 		req.add('do','delete');
 		req.add('lehreinheit_id',lehreinheit_id);
 		var response = req.executePOST();
@@ -128,7 +159,7 @@ var lfvt_detail_lehrfach_observer = {
 	     onInterrupt: function(aSink) { },
 	     onResume:    function(aSink) { },
 	     onEndLoad:   function(aSink) { 	    
-	     	//Die richtige Gruppe markieren	
+	     	//Das richtige Lehrfach markieren	
 	     	if(lfvt_detail_lehrfach_id!='')
 		 		document.getElementById('lfvt_detail_menulist_lehrfach').value=lfvt_detail_lehrfach_id;
 		 	else
@@ -156,11 +187,34 @@ function lfvtDetailReset()
 	document.getElementById('lfvt_detail_textbox_startkw').value='';
 	document.getElementById('lfvt_detail_textbox_anmerkung').value='';
 	document.getElementById('lfvt_detail_menulist_sprache').value='German';
-	//document.getElementById('lfvt_detail_menulist_lehrfach').value='';
 	document.getElementById('lfvt_detail_menulist_raumtyp').value='Dummy';
 	document.getElementById('lfvt_detail_menulist_raumtypalternativ').value='Dummy';
 	document.getElementById('lfvt_detail_menulist_studiensemester').value='<?php echo $semester_aktuell; ?>';
 	document.getElementById('lfvt_detail_menulist_lehrform').value='UE';
+	
+	//mitarbeiterlehreinheit tree leeren
+	lektortree = document.getElementById('lfvt_detail_tree_lehreinheitmitarbeiter');
+	
+	//Alte DS entfernen
+	var oldDatasources = lektortree.database.GetDataSources();	
+	while(oldDatasources.hasMoreElements())
+	{
+		lektortree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	lektortree.builder.refresh();
+		
+	//Gruppentree leeren
+	gruppentree = document.getElementById('lfvt_detail_tree_lehreinheitgruppe');
+	
+	//Alte DS entfernen
+	var oldDatasources = gruppentree.database.GetDataSources();	
+	while(oldDatasources.hasMoreElements())
+	{
+		gruppentree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	gruppentree.builder.refresh();
 }
 
 // ****
@@ -186,8 +240,12 @@ function lfvtDetailDisableFields(val)
 	document.getElementById('lfvt_detail_button_save').disabled=val;
 }
 
+// ****
+// * Speichert die Details
+// ****
 function lfvtDetailSave()
 {
+	//Werte holen
 	lvnr = document.getElementById('lfvt_detail_textbox_lvnr').value;
 	unr = document.getElementById('lfvt_detail_textbox_unr').value;
 	lehrveranstaltung = document.getElementById('lfvt_detail_textbox_lehrveranstaltung').value;
@@ -220,6 +278,7 @@ function lfvtDetailSave()
 		req.add('lehreinheit_id',lehreinheit_id);
 	}
 	//alert(lehreinheit_id);
+	req.add('type', 'lehreinheit');
 	req.add('unr', unr);
 	req.add('lvnr', lvnr);
 	req.add('sprache', sprache);
@@ -255,6 +314,9 @@ function lfvtDetailSave()
 // ****
 function lvaAuswahl() 
 {
+
+	// Trick 17	(sonst gibt's ein Permission denied)
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('treeLFVT');
 	
 	//Felder bei Lektorenzuordnung deaktivieren
@@ -272,13 +334,7 @@ function lvaAuswahl()
 			//Neu Button aktivieren
 			document.getElementById('lfvt_toolbar_neu').disabled=false;
 			document.getElementById('lfvt_toolbar_del').disabled=true;
-			
-			//Lehreinheitmitarbeiter tree deaktivieren
-			document.getElementById('lfvt_detail_tree_lehreinheitmitarbeiter').datasources='';
-			document.getElementById('lfvt_detail_tree_lehreinheitgruppe').datasources='';
-			document.getElementById('lfvt_lehreinheitmitarbeiter_button_add').disabled=true;
-			document.getElementById('lfvt_lehreinheitmitarbeiter_button_del').disabled=true;
-			
+									
 			lfvtDetailDisableFields(true);
 			//Details zuruecksetzen
 			lfvtDetailReset();
@@ -289,8 +345,6 @@ function lvaAuswahl()
 			lfvtDetailDisableFields(false);
 			document.getElementById('lfvt_toolbar_neu').disabled=true;
 			document.getElementById('lfvt_toolbar_del').disabled=false;
-			document.getElementById('lfvt_lehreinheitmitarbeiter_button_add').disabled=false;
-			document.getElementById('lfvt_lehreinheitmitarbeiter_button_del').disabled=false;
 		}
 			
 		var col = tree.columns ? tree.columns["lva_lehrveranstaltung_id"] : "lva_lehrveranstaltung_id";
@@ -304,9 +358,6 @@ function lvaAuswahl()
 		alert(e);
 		return false;
 	}
-
-	// Trick 17	(sonst gibt's ein Permission denied)
-	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	
 	var req = new phpRequest('../rdf/lehreinheit.rdf.php','','');
 	req.add('lehreinheit_id',lehreinheit_id);
@@ -393,105 +444,58 @@ function lvaAuswahl()
 	document.getElementById('lfvt_detail_textbox_lehreinheit_id').value=lehreinheit_id;
 	
 	//Lehreinheitmitarbeiter tree setzen
-	url='../rdf/lehreinheitmitarbeiter.rdf.php?lehreinheit_id='+lehreinheit_id+"&"+gettimestamp();
-	document.getElementById('lfvt_detail_tree_lehreinheitmitarbeiter').setAttribute('datasources',url);
+	url='<?php echo APP_ROOT;?>rdf/lehreinheitmitarbeiter.rdf.php?lehreinheit_id='+lehreinheit_id+"&"+gettimestamp();
+	try
+	{	
+		lektortree = document.getElementById('lfvt_detail_tree_lehreinheitmitarbeiter');
+		
+		//Alte DS entfernen
+		var oldDatasources = lektortree.database.GetDataSources();	
+		while(oldDatasources.hasMoreElements())
+		{
+			lektortree.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		lektortree.builder.refresh();
+				
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		lfvt_detail_lektor_datasource = rdfService.GetDataSource(url);
+		lfvt_detail_lektor_datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		lfvt_detail_lektor_datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		lektortree.database.AddDataSource(lfvt_detail_lektor_datasource);
+	}
+	catch(e)
+	{
+		debug(e);
+	}
 	
 	//Lehreinheitgruppe tree setzen
-	url='../rdf/lehreinheitgruppe.rdf.php?lehreinheit_id='+lehreinheit_id+"&"+gettimestamp();
-	document.getElementById('lfvt_detail_tree_lehreinheitgruppe').setAttribute('datasources',url);
+	url='<?php echo APP_ROOT; ?>rdf/lehreinheitgruppe.rdf.php?lehreinheit_id='+lehreinheit_id+"&"+gettimestamp();
+			
+	try
+	{	
+		gruppentree = document.getElementById('lfvt_detail_tree_lehreinheitgruppe');
+		
+		//Alte DS entfernen
+		var oldDatasources = gruppentree.database.GetDataSources();	
+		while(oldDatasources.hasMoreElements())
+		{
+			gruppentree.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		gruppentree.builder.refresh();
+				
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		lfvt_detail_gruppe_datasource = rdfService.GetDataSource(url);
+		lfvt_detail_gruppe_datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		lfvt_detail_gruppe_datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		gruppentree.database.AddDataSource(lfvt_detail_gruppe_datasource);
+	}
+	catch(e)
+	{
+		debug(e);
+	}
 }
-
-/**
- * Daten aus Formular holen und evt. speichern
-
-Lehrveranstaltung.prototype.updateData = function() {
-	if (document.getElementById('gridStudentenUID').value!=this.uid) {
-		this.uid = document.getElementById('gridStudentenUID').value;
-		this.dataChanged = true;
-	};
-	if (document.getElementById('gridStudentenTitel').value!=this.titel) {
-		this.titel = document.getElementById('gridStudentenTitel').value;
-		this.dataChanged = true;
-	}
-	if (document.getElementById('gridStudentenVornamen').value!=this.vornamen) {
-		this.vornamen = document.getElementById('gridStudentenVornamen').value;
-		this.dataChanged = true;
-	}
-	if (document.getElementById('gridStudentenNachname').value!=this.nachname) {
-		this.nachname = document.getElementById('gridStudentenNachname').value;
-		this.dataChanged = true;
-	}
-	if (document.getElementById('gridStudentenMatrikelnummer').value!=this.matrikelnummer)  {
-		this.matrikelnummer = document.getElementById('gridStudentenMatrikelnummer').value;
-		this.dataChanged = true;
-	}
-	//alert(document.getElementById('gridStudentenMatrikelnummer').value);
-	if (document.getElementById('gridStudentenGeburtsdatum').value!=this.geburtsdatum) {
-		// todo validation
-		this.geburtsdatum = document.getElementById('gridStudentenGeburtsdatum').value;
-		this.dataChanged = true;
-	}
-	if (document.getElementById('gridStudentenGeburtsort').value!=this.geburtsort) {
-		this.geburtsort = document.getElementById('gridStudentenGeburtsort').value;
-		this.dataChanged = true;
-	}
-	if (document.getElementById('gridStudentenGeburtszeit').value!=this.geburtszeit) {
-		// todo validation
-		this.geburtszeit = document.getElementById('gridStudentenGeburtszeit').value;
-		this.dataChanged = true;
-	}
-	if (document.getElementById('gridStudentenHomepage').value!=this.homepage) {
-		this.homepage = document.getElementById('gridStudentenHomepage').value;
-		this.dataChanged = true;
-	}
-	if (document.getElementById('gridStudentenEmail').value!=this.email) {
-		this.email = document.getElementById('gridStudentenEmail').value;
-		this.dataChanged = true;
-	}
-	if (document.getElementById('gridStudentenSemester').value!=this.semester) {
-		this.semester = document.getElementById('gridStudentenSemester').value;
-		this.dataChanged = true;
-	}
-	if (document.getElementById('gridStudentenVerband').value!=this.verband) {
-		this.verband = document.getElementById('gridStudentenVerband').value;
-		this.dataChanged = true;
-	}
-	if (document.getElementById('gridStudentenGruppe').value!=this.gruppe) {
-		this.gruppe = document.getElementById('gridStudentenGruppe').value;
-		this.dataChanged = true;
-	}
-	if (document.getElementById('gridLehrform').value!=this.lehrform) {
-		this.lehrform = document.getElementById('gridLehrform').value;
-		this.dataChanged = true;
-	}
-	if (!((document.getElementById('gridStudentenAktiv').checked && this.aktiv=='True') ||
-		(!document.getElementById('gridStudentenAktiv').checked && this.aktiv=='False'))) {
-		this.aktiv = document.getElementById('gridStudentenAktiv').checked?'True':'False';
-		this.dataChanged = true;
-	}
-	alert(this.dataChanged?'dataChanged':'nix changed');
-} */
-
-/**
- * Student anzeigen
-
-Lehrveranstaltung.prototype.show = function() {
-	document.getElementById('gridStudentenUID').value = this.uid;
-	document.getElementById('gridStudentenTitel').value = this.titel;
-	document.getElementById('gridStudentenVornamen').value = this.vornamen;
-	document.getElementById('gridStudentenNachname').value = this.nachname;
-	document.getElementById('gridStudentenMatrikelnummer').value = this.matrikelnummer;
-	document.getElementById('gridStudentenGeburtsdatum').value = this.geburtsdatum;
-	document.getElementById('gridStudentenGeburtsort').value = this.geburtsort;
-	document.getElementById('gridStudentenGeburtszeit').value = this.geburtszeit;
-	document.getElementById('gridStudentenHomepage').value = this.homepage;
-	document.getElementById('gridStudentenEmail').value = this.email;
-	document.getElementById('gridStudentenSemester').value = this.semester;
-	document.getElementById('gridStudentenVerband').value = this.verband;
-	document.getElementById('gridStudentenGruppe').value = this.gruppe;
-	document.getElementById('gridStudentenStgBezeichnung').value = this.stg_bezeichnung;
-	document.getElementById('gridStudentenAktiv').checked = (this.aktiv=='True'?true:false);
-} */
 
 //******** LehreinheitMitarbeiter **********//
 
@@ -501,6 +505,7 @@ Lehrveranstaltung.prototype.show = function() {
 // ****
 function lfvt_LehreinheitMitarbeiterSave()
 {
+	//Daten holen
 	lehrfunktion = document.getElementById('lfvt_lehreinheitmitarbeiter_menulist_lehrfunktion_kurzbz').value;
 	lektor = document.getElementById('lfvt_lehreinheitmitarbeiter_menulist_lektor').value;
 	semesterstunden = document.getElementById('lfvt_lehreinheitmitarbeiter_textbox_semesterstunden').value;
@@ -509,26 +514,19 @@ function lfvt_LehreinheitMitarbeiterSave()
 	faktor = document.getElementById('lfvt_lehreinheitmitarbeiter_textbox_faktor').value;
 	anmerkung = document.getElementById('lfvt_lehreinheitmitarbeiter_textbox_anmerkung').value;
 	bismelden = document.getElementById('lfvt_lehreinheitmitarbeiter_checkbox_bismelden').checked;
-	lehreinheit_id = document.getElementById('lfvt_lehreinheitmitarbeiter_textbox_lehreinheit_id').value;
-	neu = document.getElementById('lfvt_lehreinheitmitarbeiter_checkbox_new').checked;
 	
+	//Request absetzen
 	var req = new phpRequest('lfvtCUD.php','','');
-	neu = document.getElementById('lfvt_detail_checkbox_new').checked;
 	
 	req.add('type','lehreinheit_mitarbeiter_add');
-	if (neu) 
-	{
-		req.add('do','create');
-	} 
-	else  
-	{
-		req.add('do','update');
-		lehreinheit_id = document.getElementById('lfvt_detail_textbox_lehreinheit_id').value;
-		req.add('lehreinheit_id',lehreinheit_id);
-	}
+	req.add('do','update');
+	lehreinheit_id = document.getElementById('lfvt_lehreinheitmitarbeiter_textbox_lehreinheit_id').value;
+	mitarbeiter_uid = document.getElementById('lfvt_lehreinheitmitarbeiter_textbox_mitarbeiter_uid').value;
+	req.add('lehreinheit_id',lehreinheit_id);
 		
 	req.add('lehrfunktion_kurzbz', lehrfunktion);
 	req.add('mitarbeiter_uid', lektor);
+	req.add('mitarbeiter_uid_old', mitarbeiter_uid);
 	req.add('semesterstunden', semesterstunden);
 	req.add('planstunden', planstunden);
 	req.add('stundensatz', stundensatz);
@@ -544,18 +542,8 @@ function lfvt_LehreinheitMitarbeiterSave()
 	} 
 	else 
 	{
-		document.getElementById('lfvt_lehreinheitmitarbeiter_checkbox_new').checked=false;
-		alert('Daten wurden gespeichert');
+		lfvt_lektor_treerefresh()
 	}
-}
-
-// ****
-// * Legt eine neue Zuordnung von Lektor zu 
-// * einer Lehreinheit an.
-// ****
-function lfvt_LehreinheitMitarbeiterAdd()
-{
-	alert('geht noch nicht');
 }
 
 // ****
@@ -563,7 +551,49 @@ function lfvt_LehreinheitMitarbeiterAdd()
 // ****
 function lfvt_LehreinheitMitarbeiterDel()
 {
-	alert('geht noch nicht');
+	tree = document.getElementById('lfvt_detail_tree_lehreinheitmitarbeiter');
+
+	//Nachsehen ob Mitarbeiter markiert wurde
+	var idx;
+	if(tree.currentIndex>=0)
+		idx = tree.currentIndex;
+	else
+	{
+		alert('Bitte zuerst einen Mitarbeiter markieren');
+		return false;
+	}
+
+	try
+	{
+		//UID holen
+		var col = tree.columns ? tree.columns["lfvt_detail_tree_lehreinheitmitarbeiter-col-mitarbeiter_uid"] : "lfvt_detail_tree_lehreinheitmitarbeiter-col-mitarbeiter_uid";
+		var uid=tree.view.getCellText(idx,col);
+		//Lehreinheit_id holen
+		var col = tree.columns ? tree.columns["lfvt_detail_tree_lehreinheitmitarbeiter-col-lehreinheit_id"] : "lfvt_detail_tree_lehreinheitmitarbeiter-col-lehreinheit_id";
+		var lehreinheit_id=tree.view.getCellText(idx,col);
+	}
+	catch(e)
+	{
+		alert(e);
+		return false;
+	}
+	
+	var req = new phpRequest('lfvtCUD.php','','');
+
+	req.add('type', 'lehreinheit_mitarbeiter_del');
+	req.add('lehreinheit_id', lehreinheit_id);
+	req.add('mitarbeiter_uid', uid);
+	
+	var response = req.executePOST();
+	if (response!='ok') 
+	{
+		alert(response);
+	} 
+	else 
+	{
+		//refresh des Trees
+		lfvt_lektor_treerefresh();
+	}
 }
 
 // ****
@@ -584,8 +614,8 @@ function lfvt_LehreinheitMitarbeiterValueChanged()
 function lfvt_LehreinheitMitarbeiterDisableFields(val)
 {
 	//Felder Leeren
-	document.getElementById('lfvt_lehreinheitmitarbeiter_menulist_lehrfunktion_kurzbz').value='';
-	document.getElementById('lfvt_lehreinheitmitarbeiter_menulist_lektor').value='';
+	document.getElementById('lfvt_lehreinheitmitarbeiter_menulist_lehrfunktion_kurzbz').value='lektor';
+	//document.getElementById('lfvt_lehreinheitmitarbeiter_menulist_lektor').value='';
 	document.getElementById('lfvt_lehreinheitmitarbeiter_textbox_semesterstunden').value='';
 	document.getElementById('lfvt_lehreinheitmitarbeiter_textbox_planstunden').value='';
 	document.getElementById('lfvt_lehreinheitmitarbeiter_textbox_stundensatz').value='';
@@ -635,7 +665,7 @@ function lfvt_LehreinheitMitarbeiterAuswahl()
 	}
 		
 	// Url zum RDF
-	var url="<?php echo APP_ROOT; ?>rdf/lehreinheitmitarbeiter.rdf.php";
+	var url="<?php echo APP_ROOT; ?>rdf/lehreinheitmitarbeiter.rdf.php?"+gettimestamp();
 	
 	//RDF laden
 	var req = new phpRequest(url,'','');
@@ -677,28 +707,35 @@ function lfvt_LehreinheitMitarbeiterAuswahl()
 	document.getElementById('lfvt_lehreinheitmitarbeiter_textbox_stundensatz').value=stundensatz;
 	document.getElementById('lfvt_lehreinheitmitarbeiter_textbox_faktor').value=faktor;
 	document.getElementById('lfvt_lehreinheitmitarbeiter_textbox_anmerkung').value=anmerkung;
+	document.getElementById('lfvt_lehreinheitmitarbeiter_textbox_lehreinheit_id').value=lehreinheit_id;
+	document.getElementById('lfvt_lehreinheitmitarbeiter_textbox_mitarbeiter_uid').value=mitarbeiter_uid;
+	
 	if(bismelden='Ja')
 		document.getElementById('lfvt_lehreinheitmitarbeiter_checkbox_bismelden').checked=true;
 	else
 		document.getElementById('lfvt_lehreinheitmitarbeiter_checkbox_bismelden').checked=false;
 }
 
-// ************* GRUPPEN ******************** //
+// ****
+// * Refresht den Lehreinheitmitarbeiter Tree
+// ****
+function lfvt_lektor_treerefresh()
+{	
+    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+    try
+    {
+    	lfvt_detail_lektor_datasource.Refresh(true); //Blocking
+    	lektortree = document.getElementById('lfvt_detail_tree_lehreinheitmitarbeiter');
+    	lektortree.builder.rebuild();
+    }
+    catch(e)
+    {
+    	debug(e);
+    }
+}
 
-// ****
-// * Observer fuer GruppenTree (testing)
-// ****
-var lfvt_detail_gruppe_observer = {
-	     onBeginLoad: function(aSink) { },
-	     onInterrupt: function(aSink) { },
-	     onResume:    function(aSink) { },
-	     onEndLoad:   function(aSink) { 	    
-	     	tree = document.getElementById('lfvt_detail_tree_lehreinheitgruppe');
-	     	tree.builder.rebuild();
-	     },
-	     onError: function(aSink, aStatus, aErrorMsg) { }
-	  };
-	  
+// ************* GRUPPEN ******************** //
+  
 // ****
 // * Loescht die Zuordnung einer Gruppe zu einer
 // * Lehreinheit
@@ -743,147 +780,24 @@ function lfvt_LehreinheitGruppeDel()
 	else 
 	{
 		//refresh des Trees
+		lfvt_detail_gruppe_treerefresh();
 	}		
 }
 
 // ****
-// * Fuegt eine Gruppe zu einer
-// * Lehreinheit hinzu
+// * Gruppen Tree Refreshen
 // ****
-function lfvt_LehreinheitGruppeAdd()
+function lfvt_detail_gruppe_treerefresh()
 {
-
-}
-
-
-/**
- * (Wenn gedroppt wird)
- * Speichert die Zuteilung einer Gruppe zu einer Lehreinheit
- */
-function lfvt_detail_gruppe_dragdrop(event)
-{   
-    event.stopPropagation();
-    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect")   
-    try {
-        dragservice_ds = Components.classes["@mozilla.org/widget/dragservice;1"].getService(Components.interfaces.nsIDragService);
-    }
-    catch (e)
+    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+    try
     {
-    	debug('treeDragDrop: e');
+    	lfvt_detail_gruppe_datasource.Refresh(true); //Blocking
+    	gruppentree = document.getElementById('lfvt_detail_tree_lehreinheitgruppe');
+    	gruppentree.builder.rebuild();
     }
-    
-    var ds = dragservice_ds;
-    var ses = ds.getCurrentSession()
-    var sourceNode = ses.sourceNode
-    var lehreinheit_id = document.getElementById('lfvt_detail_textbox_lehreinheit_id').value;
-    var row = { }
-    var col = { }
-    var child = { }
-   
-    if(lehreinheit_id=='')
-    	return false;
-    	
-	//Quelle holen (Gruppe)
-	var flavourset = new FlavourSet();
-    flavourset.appendFlavour("gruppe");
-
-    var transferData = nsTransferable.get(flavourset, getDragData, true);
-
-    quell_gruppe=transferData.first.first.data;
-    var arr = quell_gruppe.split("&");
-    var stg_kz = arr[0];
-    var sem = arr[1];
-    var ver = arr[2];
-    var grp = arr[3];
-    var gruppe = arr[4];
-    //alert("stg: "+stg_kz+" sem: "+sem+" ver: "+ver+" grp: "+grp+" gruppe: "+gruppe+" TO Lehreinheit:"+lehreinheit_id);
-    
-    var req = new phpRequest('lfvtCUD.php','','');
-	neu = document.getElementById('lfvt_detail_checkbox_new').checked;
-	
-	req.add('type','lehreinheit_gruppe_add');
-			
-	req.add('lehreinheit_id', lehreinheit_id);
-	req.add('studiengang_kz', stg_kz);
-	req.add('semester', sem);
-	req.add('verband', ver);
-	req.add('gruppe', grp);
-	req.add('gruppe_kurzbz', gruppe);
-			
-	var response = req.executePOST();
-	if (response!='ok') 
-	{
-		alert(response);
-	} 
-	else 
-	{
-		//GruppenTree Refreshen
-		tree = document.getElementById('lfvt_detail_tree_lehreinheitgruppe');
-		tree.builder.addListener(lfvt_detail_gruppe_observer);
-		tree.builder.refresh();
-	}
-}
-
-var dragservice_ds;
-/**
- * Holt die Daten aus der DragSession
- */
-function getDragData(aFlavourSet)
-{
-	var ds = dragservice_ds;
-	var ses = ds.getCurrentSession()
-	
-	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
-	var supportsArray = Components.classes["@mozilla.org/supports-array;1"]
-    	.createInstance(Components.interfaces.nsISupportsArray);
-
-  	for (var i = 0; i < ses.numDropItems; ++i)
+    catch(e)
     {
-      	var trans = nsTransferable.createTransferable();
-      	for (var j = 0; j < aFlavourSet.flavours.length; ++j)
-        	trans.addDataFlavor(aFlavourSet.flavours[j].contentType);
-      	ses.getData(trans, i);
-      	supportsArray.AppendElement(trans);
+    	debug(e);
     }
-  	return supportsArray;
-}
-
-/**
- * Drag ueber den Tree
- */
-function lfvt_detail_gruppe_dragover( event )
-{
-  var validFlavor = false;
-  var dragSession = null;
-
-  var targetNode = event.target 
-  	  	
-  netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
-  var dragService = Components.classes["@mozilla.org/widget/dragservice;1"].
-                    getService().QueryInterface(Components.interfaces.nsIDragService);
-  
-  if( dragService ) 
-  {
-    dragSession = dragService.getCurrentSession();
-    
-    if( dragSession ) 
-    {
-		if( dragSession.isDataFlavorSupported("gruppe") )
-    		validFlavor = true;
-    	else if ( dragSession.isDataFlavorSupported("gruppe") )
-        	validFlavor = true;
-      
-		if ( validFlavor ) 
-		{
-	        //Style action	        
-			//targetNode.style.backgroundColor = "red";
-		 	//targetNode.style.color = "red";
-		  	//event.originalTarget.style.color = "red";
-	        dragSession.canDrop = true;
-	        event.stopPropagation();
-      	}
-    }
-  }
 }

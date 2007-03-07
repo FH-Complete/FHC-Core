@@ -1,4 +1,24 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
 include('../vilesci/config.inc.php');
 ?>
 function lehrstunde(id,idList)
@@ -8,7 +28,8 @@ function lehrstunde(id,idList)
 }
 var lehrstunden=new Array();
 
-/***** Drag Observer fuer Lehrveranstaltungen *****/
+/***** Drag Observer fuer Lehrveranstaltungen ****
+may not be used?!?
 var lvaObserver=
 {
 	onDragStart: function (evt,transferData,action)
@@ -22,7 +43,224 @@ var lvaObserver=
     	//alert("test");
   	}
 };
+*/
 
+/***** Drag Observer fuer Gruppen *****/
+var grpObserver=
+{
+	onDragStart: function (evt,transferData,action)
+	{
+		var tree = document.getElementById('tree-verband')
+	    var row = { }
+	    var col = { }
+	    var child = { }
+	    
+	    //Index der Quell-Row ermitteln
+	    tree.treeBoxObject.getCellAt(evt.pageX, evt.pageY, row, col, child)
+	    	       	
+	    //Daten ermitteln    
+	    col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+		stg_kz=tree.view.getCellText(row.value,col);
+		
+		col = tree.columns ? tree.columns["sem"] : "sem";
+		sem=tree.view.getCellText(row.value,col);
+		
+		col = tree.columns ? tree.columns["ver"] : "ver";
+		ver=tree.view.getCellText(row.value,col);
+		
+		col = tree.columns ? tree.columns["grp"] : "grp";
+		grp=tree.view.getCellText(row.value,col);
+		
+		col = tree.columns ? tree.columns["gruppe"] : "gruppe";
+		gruppe=tree.view.getCellText(row.value,col);
+		
+		var paramList= stg_kz+'&'+sem+'&'+ver+'&'+grp+'&'+gruppe;
+		//debug('param:'+paramList);
+		transferData.data=new TransferData();
+		transferData.data.addDataForFlavour("gruppe",paramList);
+  	}
+};
+
+// ****
+// * Observer fuer den Gruppen Tree im Lehreinheiten-Modul
+// ****
+var lfvt_grp_Observer=
+{
+	getSupportedFlavours : function ()
+	{
+  	  	var flavours = new FlavourSet();
+  	  	flavours.appendFlavour("gruppe");
+  	  	return flavours;
+  	},
+  	onDragEnter: function (evt,flavour,session)
+	{
+	},
+	onDragExit: function (evt,flavour,session)
+	{
+  	},
+  	onDragOver: function(evt,flavour,session)
+  	{  		
+  	},
+  	onDrop: function (evt,dropdata,session)
+  	{
+	    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");   
+	    try 
+	    {
+	        dragservice_ds = Components.classes["@mozilla.org/widget/dragservice;1"].getService(Components.interfaces.nsIDragService);
+	    }
+	    catch (e)
+	    {
+	    	debug('treeDragDrop: e');
+	    }
+	    
+	    var ds = dragservice_ds;
+
+	    var ses = ds.getCurrentSession()
+	    var sourceNode = ses.sourceNode
+	    var lehreinheit_id = document.getElementById('lfvt_detail_textbox_lehreinheit_id').value;
+	    var row = { }
+	    var col = { }
+	    var child = { }
+	   
+	    if(lehreinheit_id=='')
+	    	return false;
+
+	    quell_gruppe=dropdata.data;
+	    var arr = quell_gruppe.split("&");
+	    
+	    var stg_kz = arr[0];
+	    var sem = arr[1];
+	    var ver = arr[2];
+	    var grp = arr[3];
+	    var gruppe = arr[4];
+	    //alert("stg: "+stg_kz+" sem: "+sem+" ver: "+ver+" grp: "+grp+" gruppe: "+gruppe+" TO Lehreinheit:"+lehreinheit_id);
+	    
+	    var req = new phpRequest('lfvtCUD.php','','');
+		neu = document.getElementById('lfvt_detail_checkbox_new').checked;
+		
+		req.add('type','lehreinheit_gruppe_add');
+				
+		req.add('lehreinheit_id', lehreinheit_id);
+		req.add('studiengang_kz', stg_kz);
+		req.add('semester', sem);
+		req.add('verband', ver);
+		req.add('gruppe', grp);
+		req.add('gruppe_kurzbz', gruppe);
+				
+		var response = req.executePOST();
+		if (response!='ok') 
+		{
+			alert(response);
+		}
+		else
+		{
+			//GruppenTree Refreshen
+			lfvt_detail_gruppe_treerefresh();
+		}
+  	}
+};
+
+/***** Drag Observer fuer Lektoren *****/
+var tree_lektor_drag_Observer=
+{
+	onDragStart: function (evt,transferData,action)
+	{		
+		var tree = document.getElementById('tree-lektor')
+	    var row = { }
+	    var col = { }
+	    var child = { }
+	    
+	    //Index der Quell-Row ermitteln
+	    tree.treeBoxObject.getCellAt(evt.pageX, evt.pageY, row, col, child)
+	    	       	
+	    //Daten ermitteln    
+	    col = tree.columns ? tree.columns["uid"] : "uid";
+		uid=tree.view.getCellText(row.value,col);
+		
+		var paramList= uid;
+		transferData.data=new TransferData();
+		transferData.data.addDataForFlavour("mitarbeiter",paramList);
+  	}
+};
+
+// ****
+// * Observer fuer Lektor-Tree bei Lehreinheit-Modul
+// * Bei OnDrop eines mitarbeiters wird dieser der
+// * Lehreinheit zugeordnet
+// ****
+var lfvt_lektor_Observer=
+{
+	getSupportedFlavours : function ()
+	{
+  	  	var flavours = new FlavourSet();
+  	  	flavours.appendFlavour("mitarbeiter");
+  	  	return flavours;
+  	},
+  	onDragEnter: function (evt,flavour,session)
+	{
+
+	},
+	onDragExit: function (evt,flavour,session)
+	{
+  	},
+  	onDragOver: function(evt,flavour,session)
+  	{
+  	},
+  	onDrop: function (evt,dropdata,session)
+  	{
+	    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");   
+	    try 
+	    {
+	        dragservice_ds = Components.classes["@mozilla.org/widget/dragservice;1"].getService(Components.interfaces.nsIDragService);
+	    }
+	    catch (e)
+	    {
+	    	debug('treeDragDrop: e');
+	    }
+	    
+	    var ds = dragservice_ds;
+
+	    var ses = ds.getCurrentSession()
+	    var sourceNode = ses.sourceNode
+	    var lehreinheit_id = document.getElementById('lfvt_detail_textbox_lehreinheit_id').value;
+	    var row = { }
+	    var col = { }
+	    var child = { }
+	   
+	    if(lehreinheit_id=='')
+	    	return false;
+
+	    uid=dropdata.data;
+	    //alert("uid: "+uid);
+	    
+	    var req = new phpRequest('lfvtCUD.php','','');
+		neu = document.getElementById('lfvt_detail_checkbox_new').checked;
+		
+		req.add('type','lehreinheit_mitarbeiter_add');
+
+		req.add('do', 'create');	
+		req.add('lehreinheit_id', lehreinheit_id);
+		req.add('mitarbeiter_uid', uid);
+		req.add('lehrfunktion_kurzbz', 'lektor');
+		req.add('semesterstunden', '0');
+		req.add('planstunden', '0');
+		req.add('stundensatz', '0');
+		req.add('faktor', '1');
+		req.add('anmerkung', '');
+		req.add('bismelden', 'true');
+		
+		var response = req.executePOST();
+		if (response!='ok') 
+		{
+			alert(response);
+		} 
+		else 
+		{
+			//LektorTree Refreshen
+			lfvt_lektor_treerefresh();
+		}
+  	}
+};
 /***** Drag Observer fuer STPL-Verschiebung *****/
 var listObserver=
 {

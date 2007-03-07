@@ -3,6 +3,7 @@ include('../vilesci/config.inc.php');
 ?>
 
 var currentAuswahl=new auswahlValues();
+var lfvt_tree_datasource;
 
 function auswahlValues()
 {
@@ -74,7 +75,7 @@ function onVerbandSelect()
 
 	
 	// LFVT
-	var req = new phpRequest('../rdf/lehrveranstaltung_einheiten.rdf.php','pam','pam');
+/*	var req = new phpRequest('../rdf/lehrveranstaltung_einheiten.rdf.php','','');
 	req.add('stg_kz',stg_kz);
 	req.add('sem',sem);
 	req.add('ver',ver);
@@ -109,7 +110,35 @@ function onVerbandSelect()
 	// neue Datenquelle setzen
 	treeLFVT.database.AddDataSource(dsource);
 	treeLFVT.builder.rebuild();
+*/
 
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	try
+	{	
+		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?stg_kz='+stg_kz+'&sem='+sem+'&ver='+ver+'&grp='+grp+'&gruppe='+gruppe;
+		var treeLFVT=document.getElementById('treeLFVT');
+		
+		//Alte DS entfernen
+		var oldDatasources = treeLFVT.database.GetDataSources();	
+		while(oldDatasources.hasMoreElements())
+		{
+			treeLFVT.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		//treeLFVT.builder.refresh();
+				
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		lfvt_tree_datasource = rdfService.GetDataSource(url);
+		lfvt_tree_datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		lfvt_tree_datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		treeLFVT.database.AddDataSource(lfvt_tree_datasource);
+		lfvt_tree_datasource.addXMLSinkObserver(lfvt_tree_observer);
+	}
+	catch(e)
+	{
+		debug(e);
+	}
+	
 	//treeLFVT.setAttribute('datasources','lfvt.rdf.php?'+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe);
 	//alert('lfvt.rdf.php?'+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe);
 	
@@ -132,6 +161,7 @@ function onOrtSelect()
 
 function onLektorSelect()
 {
+
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
 	var treeLektor=document.getElementById('tree-lektor');
 	var uid=treeLektor.view.getCellText(treeLektor.currentIndex,"uid");
