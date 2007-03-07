@@ -20,6 +20,22 @@ var listObserver=
   	}
 };
 
+/***** Drag Observer fuer Gruppen *****/
+var grpObserver=
+{
+	onDragStart: function (evt,transferData,action)
+	{    		
+    		var stg_kz=evt.target.getAttribute("stg_kz");
+    		var sem=evt.target.getAttribute("sem");
+    		var ver=evt.target.getAttribute("ver");
+    		var grp=evt.target.getAttribute("grp");
+    		var einheit=evt.target.getAttribute("gruppe");
+    		var paramList= stg_kz+'&'+sem+'&'+ver+'&'+grp+'&'+gruppe;
+    		transferData.data=new TransferData();
+    		transferData.data.addDataForFlavour("gruppe",paramList);
+  	}
+};
+
 var boardObserver= 
 {
 	/*canHandleMultipleItems : function()

@@ -1,8 +1,37 @@
 <?php
-// *****************************
-// Create/Update/Delete
-// der Lehrfachverteilung
-// *****************************
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
+
+// ****************************************
+// * Create/Update/Delete
+// * der Lehreinheiten
+// * 
+// * Script sorgt fuer den Datenbanzugriff
+// * fuer das XUL - Lehreinheiten-Modul
+// *
+// * Derzeitige Funktionen:
+// * - Lehreinheitmitarbeiter Zuteilung hinzufuegen/bearbeiten/loeschen
+// * - Lehreinheitgruppe Zutelung hinzufuegen/loeschen
+// * - Lehreinheit anlegen/bearbeiten/loeschen
+// ****************************************
 
 require_once('../vilesci/config.inc.php');
 require_once('../include/functions.inc.php');
@@ -17,6 +46,7 @@ $user = get_uid();
 if (!$conn = @pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
+//Berechtigungen laden
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
 if(!$rechte->isBerechtigt('admin'))
@@ -26,6 +56,9 @@ $leDAO=new lehreinheit($conn);
 
 if(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_add')
 {
+	//Lehreinheitmitarbeiter Zuteilung
+	//wenn do=update dann wird aktualisiert
+	//wenn do=create wird ein neuer datensatz angelegt
 	
 	if (!isset($_POST['do']))
 		die('Fehlerhafte Parameteruebergabe');
@@ -33,12 +66,14 @@ if(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_add')
 	$lem = new lehreinheitmitarbeiter($conn);
 	
 	if($_POST['do']=='update')
-		if(!$lem->load($_POST['lehreinheit_id'],$_POST['mitarbeiter_uid']))
+		if(!$lem->load($_POST['lehreinheit_id'],$_POST['mitarbeiter_uid_old']))
 			die('Fehler beim laden:'.$lem->errormsg);
 	
 	$lem->lehreinheit_id = $_POST['lehreinheit_id'];
 	$lem->lehrfunktion_kurzbz = $_POST['lehrfunktion_kurzbz'];
 	$lem->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
+	if($_POST['do']=='update')
+		$lem->mitarbeiter_uid_old = $_POST['mitarbeiter_uid_old'];
 	$lem->semesterstunden = $_POST['semesterstunden'];
 	$lem->planstunden = $_POST['planstunden'];
 	$lem->stundensatz = $_POST['stundensatz'];
@@ -68,8 +103,21 @@ if(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_add')
 	else 
 		echo $lem->errormsg;		
 }
+elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_del')
+{
+	//Lehreinheitmitarbeiterzuteilung loeschen
+	if(isset($_POST['lehreinheit_id']) && is_numeric($_POST['lehreinheit_id']) && isset($_POST['mitarbeiter_uid']))
+	{
+		$leg = new lehreinheitmitarbeiter($conn);
+		if($leg->delete($_POST['lehreinheit_id'], $_POST['mitarbeiter_uid']))
+			echo 'ok';
+		else
+			echo $leg->errormsg;
+	}
+}
 elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_gruppe_del')
 {
+	//Lehreinheitgruppezuteilung loeschen
 	if(isset($_POST['lehreinheitgruppe_id']) && is_numeric($_POST['lehreinheitgruppe_id']))
 	{
 		$leg = new lehreinheitgruppe($conn);
@@ -81,6 +129,7 @@ elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_gruppe_del')
 }
 elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_gruppe_add')
 {
+	//Lehreinheitgruppezuteilung anlegen
 	if(isset($_POST['lehreinheit_id']) && is_numeric($_POST['lehreinheit_id']))
 	{
 		$leg = new lehreinheitgruppe($conn);
@@ -101,8 +150,9 @@ elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_gruppe_add')
 	else 
 		echo "Lehreinheit_id ist ungueltig";
 }
-else 
+elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit')
 {
+	//Lehreinheit anlegen/aktualisieren
 	if ($_POST['do']=='create' || ($_POST['do']=='update')) 
 	{	
 		if($_POST['do']=='update')
@@ -148,14 +198,15 @@ else
 		}
 	
 	} 
-	else if ($_POST['do']=='delete') 
+	else if ($_POST['do']=='delete') //Lehreinheit loeschen
 	{	
 		// LE loeschen
-	
 		if ($leDAO->delete($_POST['lehreinheit_id']))
 			echo 'ok';
 		else 
 			echo $leDAO->errormsg;	
 	}
 }
+else 
+	echo "Unkown type";
 ?>

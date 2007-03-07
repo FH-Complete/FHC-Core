@@ -23,12 +23,12 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/tempusoverlay.js.php" />
 <script type="application/x-javascript" src="chrome://global/content/nsTransferable.js"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/DragAndDrop.js"/>
-<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/dragboard.js"/>
+<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/dragboard.js.php"/>
 
 <tree id="tree-verband" onselect="onVerbandSelect();"
 	seltype="single" hidecolumnpicker="false" flex="1" 
 	enableColumnDrag="true"	
-    ondraggesture="treeVerbandDragGesture(event);" 
+    ondraggesture="nsDragAndDrop.startDrag(event,grpObserver);" 
 	datasources="../rdf/lehrverbandsgruppe.rdf.php" ref="http://www.technikum-wien.at/lehrverbandsgruppe/alle-verbaende"
 	>
 	<treecols>
@@ -100,6 +100,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 
 <tree id="tree-lektor" onselect="onLektorSelect();"
 	seltype="single" hidecolumnpicker="false" flex="1"
+	enableColumnDrag="true"	
+    ondraggesture="nsDragAndDrop.startDrag(event,tree_lektor_drag_Observer);" 
 	datasources="../rdf/mitarbeiter.rdf.php" ref="http://www.technikum-wien.at/mitarbeiter/alle">
 	<treecols>
 	    <treecol id="kurzbz" label="Kuerzel" flex="2" primary="true" />

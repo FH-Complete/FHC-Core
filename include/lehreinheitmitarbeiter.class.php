@@ -30,6 +30,7 @@ class lehreinheitmitarbeiter
 	//Tabellenspalten
 	var $lehreinheit_id;	// integer
 	var $mitarbeiter_uid;	// varchar(16)
+	var $mitarbeiter_uid_old;	// verwendet bei Update der UID 
 	var $semesterstunden;	// smalint
 	var $planstunden;		// smalint
 	var $stundensatz;		// numeric(6,2)
@@ -71,7 +72,44 @@ class lehreinheitmitarbeiter
 	// *********************************************************
 	function load($lehreinheit_id, $mitarbeiter_uid=null)
 	{
-		return false;
+		if(!is_numeric($lehreinheit_id))
+		{
+			$this->errormsg = 'Lehreinheit_id ist ungueltig';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$lehreinheit_id' AND mitarbeiter_uid='".addslashes($mitarbeiter_uid)."'";
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{				
+				$this->lehreinheit_id = $row->lehreinheit_id;
+				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$this->lehrfunktion_kurzbz = $row->lehrfunktion_kurzbz;
+				$this->semesterstunden = $row->semesterstunden;
+				$this->planstunden = $row->planstunden;
+				$this->stundensatz = $row->stundensatz;
+				$this->faktor = $row->faktor;
+				$this->anmerkung = $row->anmerkung;
+				$this->bismelden = $row->bismelden;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->ext_id = $row->ext_id;
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = 'Fehler beim laden der Daten';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler  beim laden der Daten';
+			return false;
+		}
 	}
 	
 	// *********************************************************
@@ -104,6 +142,7 @@ class lehreinheitmitarbeiter
 				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
+				$obj->ext_id = $row->ext_id;
 				
 				$this->lehreinheitmitarbeiter[] = $obj;
 			}
@@ -166,6 +205,9 @@ class lehreinheitmitarbeiter
 		}
 		else
 		{
+			if($this->mitarbeiter_uid_old=='')
+				$this->mitarbeiter_uid_old = $this->mitarbeiter_uid;
+				
 			$qry = 'UPDATE lehre.tbl_lehreinheitmitarbeiter SET'.
 			       ' semesterstunden='.$this->addslashes($this->semesterstunden).','.
 			       ' planstunden='.$this->addslashes($this->planstunden).','.
@@ -173,9 +215,10 @@ class lehreinheitmitarbeiter
 			       ' faktor='.$this->addslashes($this->faktor).','.
 			       ' anmerkung='.$this->addslashes($this->anmerkung).','.
 			       ' lehrfunktion_kurzbz='.$this->addslashes($this->lehrfunktion_kurzbz).','.
+			       ' mitarbeiter_uid='.$this->addslashes($this->mitarbeiter_uid).','.
 			       ' ext_id = '.$this->addslashes($this->ext_id).
 			       " WHERE lehreinheit_id=".$this->addslashes($this->lehreinheit_id)." AND
-			               mitarbeiter_uid=".$this->addslashes($this->mitarbeiter_uid).";";
+			               mitarbeiter_uid=".$this->addslashes($this->mitarbeiter_uid_old).";";
 		}
 		
 		if(pg_query($this->conn,$qry))
@@ -190,6 +233,13 @@ class lehreinheitmitarbeiter
 		}
 	}
 
+	// *******************************************************
+	// * Prueft ob die Kombination Lehreinheit-Mitarbeiter
+	// * bereits existiert
+	// * @param $lehreinheit_id
+	// *        $uid
+	// * @return true wenn die zuteilung existiert sonst false
+	// *******************************************************
 	function exists($lehreinheit_id, $uid)
 	{
 		if(!is_numeric($lehreinheit_id))
@@ -209,6 +259,31 @@ class lehreinheitmitarbeiter
 		else 
 		{
 			$this->errormsg = 'Fehler beim lesen der Lehreinheitmitarbeiter zuteilung';
+			return false;
+		}
+	}
+	
+	// *******************************************
+	// * Loescht die Zuteilung eines Mitarbeiters
+	// * zu einer Lehreinheit
+	// * @param $lehreinheit_id
+	// *        $mitarbeiter_uid
+	// * @return true wenn ok, false im fehlerfall
+	// *******************************************
+	function delete($lehreinheit_id, $mitarbeiter_uid)
+	{
+		if(!is_numeric($lehreinheit_id))
+		{
+			$this->errormsg = 'Lehreinheit_id ist ungueltig';
+			return false;
+		}
+		
+		$qry = "DELETE FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$lehreinheit_id' AND mitarbeiter_uid='".addslashes($mitarbeiter_uid)."'";
+		if(pg_query($this->conn, $qry))
+			return true;
+		else 
+		{
+			$this->errormsg = 'Fehler beim Loeschen der Zuteilung';
 			return false;
 		}
 	}
