@@ -44,9 +44,14 @@ $anzahl_benutzer_insert=0;
 $anzahl_benutzer_update=0;
 $anzahl_fehler_benutzer=0;
 $anzahl_nichtstudenten=0;
+$updateb=false;
+$updatem=false;
+$updatep=false;
+$updater=false;
+$updates=false;
 $rolle_kurzbz=array(1=>"Interessent", 2=>"Bewerber", 3=>"Student", 4=>"Ausserordentlicher", 5=>"Abgewiesener", 6=>"Aufgenommener", 7=>"Wartender", 8=>"Abbrecher", 9=>"Unterbrecher", 10=>"Outgoing", 11=>"Incoming", 12=>"Praktikant", 13=>"Diplomant", 14=>"Absolvent");
 $studiensemester_kurzbz=array(2=>"WS2002",3=>"SS2003",4=>"WS2003",5=>"SS2004",6=>"WS2004",7=>"SS2005",8=>"WS2005",9=>"SS2006",10=>"WS2006",11=>"SS2007",12=>"WS2007",13=>"SS2008",14=>"WS2008");
-$studiengangfk=array(2=>11,3=>91,4=>94,5=>145,6=>227,7=>182,8=>222,9=>203,10=>204,11=>92,12=>258,13=>308,14=>254,15=>256,16=>257,17=>255,18=>302,19=>336,20=>330,21=>333, 22=>327,23=>335,24=>228,25=>303,26=>299,27=>298,28=>300,29=>297,30=>329,31=>301,32=>332,33=>331,34=>328,35=>1,36=>1,37=>334);
+$studiengangfk=array(2=>11,3=>91,4=>94,5=>145,6=>227,7=>182,8=>222,9=>203,10=>204,11=>92,12=>258,13=>308,14=>254,15=>256,16=>257,17=>255,18=>302,19=>336,20=>330,21=>333, 22=>327,23=>335,24=>228,25=>303,26=>299,27=>298,28=>300,29=>297,30=>329,31=>301,32=>332,33=>331,34=>328,35=>2,36=>1,37=>334);
 //Kennzahlen für EUE im Array studiengangfk NACHTRAGEN
 
 $error_log_fas=array();
@@ -71,7 +76,7 @@ function myaddslashes($var)
 
 <html>
 <head>
-<title>Synchro - Vilesci -> Vilesci - Student</title>
+<title>Synchro - FAS -> Vilesci - Student</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
 <body>
@@ -117,20 +122,22 @@ FROM (person JOIN student ON person_pk=student.person_fk ) AS p1
 CROSS JOIN (person JOIN student ON person_pk=student.person_fk) AS p2 WHERE 
 ((p1.gebdat=p2.gebdat AND p1.familienname=p2.familienname AND p1.svnr='' AND p1.ersatzkennzeichen='') 
 OR ((p1.ersatzkennzeichen=p2.ersatzkennzeichen AND p1.ersatzkennzeichen<>'') OR (p1.svnr=p2.svnr AND p1.svnr<>'')))
-AND (p1.person_pk <> p2.person_pk)
+AND (p1.person_pk < p2.person_pk)
 AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400')
-AND (p1.familienname<>p2.familienname OR p1.vorname<>p2.vorname OR p1.vornamen<>p2.vornamen OR p1.geschlecht<>p2.geschlecht 
+AND (trim(p1.familienname)<>trim(p2.familienname) OR trim(p1.vorname)<>trim(p2.vorname) OR trim(p1.vornamen)<>trim(p2.vornamen)
+	OR p1.geschlecht<>p2.geschlecht 
 	OR p1.gebdat<>p2.gebdat OR p1.staatsbuergerschaft<> p2.staatsbuergerschaft OR p1.familienstand<>p2.familienstand 
 	OR p1.svnr<>p2.svnr OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.anrede<>p2.anrede 
 	OR p1.anzahlderkinder<>p2.anzahlderkinder OR p1.bismelden<>p2.bismelden OR p1.titel<>p2.titel OR p1.gebnation<>p2.gebnation
-	OR p1.postnomentitel<> p2.postnomentitel 
-	OR p1.zgv<>p2.zgv OR p1.studiengang_fk<>p2.studiengang_fk OR p1.zgvdatum<>p2.zgvdatum OR p1.zgvort<>p2.zgvort 
+	OR p1.postnomentitel<> p2.postnomentitel
+	
+	OR ((p1.zgv<>p2.zgv OR p1.zgvdatum<>p2.zgvdatum OR p1.zgvort<>p2.zgvort 
 	OR p1.zgvmagister<>p2.zgvmagister OR p1.zgvmagisterort<>p2.zgvmagisterort OR p1.zgvmagisterdatum<>p2.zgvmagisterdatum 
 	OR p1.punkte<>p2.punkte OR p1.perskz<>p2.perskz OR p1.aufgenommenam<>p2.aufgenommenam 
-	OR p1.aufmerksamdurch<>p2.aufmerksamdurch OR p1.beendigungsdatum<>p2.beendigungsdatum 
-	OR p1.berufstaetigkeit<>p2.berufstaetigkeit OR p1.aufmerksamdurch_fk<>p2.aufmerksamdurch_fk 
+	OR p1.beendigungsdatum<>p2.beendigungsdatum OR p1.aufmerksamdurch<>p2.aufmerksamdurch
 	OR p1.aufnahmeschluessel<>p2.aufnahmeschluessel OR p1.aufnahmeschluessel_fk<>p2.aufnahmeschluessel_fk 
-	OR p1.angetreten<>p2.angetreten) 
+	OR p1.berufstaetigkeit<>p2.berufstaetigkeit OR p1.aufmerksamdurch_fk<>p2.aufmerksamdurch_fk 
+	OR p1.angetreten<>p2.angetreten)AND p1.studiengang_fk=p2.studiengang_fk))
 order by p1.familienname;
 ";
 //
@@ -154,6 +161,7 @@ if($resultp = pg_query($conn_fas, $qry))
 			else 
 			{
 				echo nl2br("Studiengang ".$studiengangfk[$rowp->studiengang1]." nicht gefunden.");
+				
 			}
 		}
 		else 
@@ -182,22 +190,27 @@ if($resultp = pg_query($conn_fas, $qry))
 			echo nl2br("Kein Zugriff auf tbl_studiengang => Studiengang ".$studiengangfk[$rowp->studiengang2]." nicht gefunden.");
 		}
 		$plausi='';
+		/*if ($rowp->studiengang1<>$rowp->studiengang2)
+		{
+			$plausi.="Studiengang der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->studiengang1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->studiengang2."'.\n";
+			$error=true;
+		}*/
 		if ($rowp->geschlecht1<>$rowp->geschlecht2)
 		{
 			$plausi.="Geschlecht der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->geschlecht1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->geschlecht2."'.\n";
 			$error=true;
 		}
-		if ($rowp->familienname1<>$rowp->familienname2)
+		if (trim($rowp->familienname1)<>trim($rowp->familienname2))
 		{
 			$plausi.="Familienname der Person ".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->familienname1."' bei ".$rowp->uid2." (stg=(".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.")  aber '".$rowp->familienname2."'.\n";
 			$error=true;
 		}
-		if ($rowp->vorname1<>$rowp->vorname2)
+		if (trim($rowp->vorname1)<>trim($rowp->vorname2))
 		{
 			$plausi.="Vorname der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->vorname1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->vorname2."'.\n";
 			$error=true;
 		}
-		if ($rowp->vornamen1<>$rowp->vornamen2)
+		if (trim($rowp->vornamen1)<>trim($rowp->vornamen2))
 		{
 			$plausi.="Vornamen der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->vornamen1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->vornamen2."'.\n";
 			$error=true;
@@ -242,16 +255,6 @@ if($resultp = pg_query($conn_fas, $qry))
 			$plausi.="Anzahl der Kinder der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->anzahlderkinder1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->anzahlderkinder2."'.\n";
 			$error=true;
 		}
-		if ($rowp->bismelden1<>$rowp->bismelden2)
-		{
-			$plausi.="Bismelden der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->bismelden1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->bismelden2."'.\n";
-			$error=true;
-		}
-		if ($rowp->titel1<>$rowp->titel2)
-		{
-			$plausi.="Titel der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->titel1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->titel2."'.\n";
-			$error=true;
-		}
 		/*if ($rowp->uid1<>$rowp->uid2)
 		{
 			$plausi.="UID der Person ".$rowp->familienname1." (stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->uid1."' bei ".$rowp->familienname2." (stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->uid2."'.\n";
@@ -262,96 +265,105 @@ if($resultp = pg_query($conn_fas, $qry))
 			$plausi.="Geburtsnation der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->gebnation1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->gebnation2."'.\n";
 			$error=true;
 		}
+		if ($rowp->titel1<>$rowp->titel2)
+		{
+			$plausi.="Titel der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->titel1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->titel2."'.\n";
+			$error=true;
+		}
 		if ($rowp->postnomentitel1<>$rowp->postnomentitel2)
 		{
 			$plausi.="Postnomentitel der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->postnomentitel1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->postnomentitel2."'.\n";
 			$error=true;
 		}
-		if ($rowp->zgv1<>$rowp->zgv2)
+		if($studstg1==$studstg2)
 		{
-			$plausi.="Zugangsvoraussetzung der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->zgv1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->zgv2."'.\n";
-			$error=true;
+			if ($rowp->perskz1<>$rowp->perskz2)
+			{
+				$plausi.="Personenkennzeichen der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->perskz1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->perskz2."'.\n";
+				$error=true;
+			}
+			if ($rowp->bismelden1<>$rowp->bismelden2)
+			{
+				$plausi.="Bismelden der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->bismelden1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->bismelden2."'.\n";
+				$error=true;
+			}
+			if ($rowp->zgv1<>$rowp->zgv2)
+			{
+				$plausi.="Zugangsvoraussetzung der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->zgv1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->zgv2."'.\n";
+				$error=true;
+			}
+			if ($rowp->zgvdatum1<>$rowp->zgvdatum2)
+			{
+				$plausi.="Zugangsvoraussetzungsdatum der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->zgvdatum1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->zgvdatum2."'.\n";
+				$error=true;
+			}
+			if ($rowp->zgvort1<>$rowp->zgvort2)
+			{
+				$plausi.="Zugangsvoraussetzungsort der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->zgvort1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->zgvort2."'.\n";
+				$error=true;
+			}
+			if ($rowp->zgvmagister1<>$rowp->zgvmagister2)
+			{
+				$plausi.="Magister-Zugangsvoraussetzung der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->zgvmagister1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->zgvmagister2."'.\n";
+				$error=true;
+			}
+			if ($rowp->zgvmagisterdatum1<>$rowp->zgvmagisterdatum2)
+			{
+				$plausi.="Magister-Zugangsvoraussetzungsdatum der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->zgvmagisterdatum1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->zgvmagisterdatum2."'.\n";
+				$error=true;
+			}
+			if ($rowp->zgvmagisterort1<>$rowp->zgvmagisterort2)
+			{
+				$plausi.="Magister-Zugangsvoraussetzungort der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->zgvmagisterort1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->zgvmagisterort2."'.\n";
+				$error=true;
+			}
+			if ($rowp->punkte1<>$rowp->punkte2)
+			{
+				$plausi.="Reihungstestpunkte der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->punkte1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->punkte2."'.\n";
+				$error=true;
+			}
+			if ($rowp->aufgenommenam1<>$rowp->aufgenommenam2)
+			{
+				$plausi.="Aufnahmedatum der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->aufgenommenam1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->aufgenommenam2."'.\n";
+				$error=true;
+			}
+			if ($rowp->beendigungsdatum1<>$rowp->beendigungsdatum2)
+			{
+				$plausi.="Beendigungsdatum der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->beendigungsdatum1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->beendigungsdatum2."'.\n";
+				$error=true;
+			}
+			if ($rowp->aufmerksamdurch1<>$rowp->aufmerksamdurch2)
+			{
+				$plausi.="Aufmerksamdurch der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->aufmerksamdurch1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->aufmerksamdurch2."'.\n";
+				$error=true;
+			}
+			if ($rowp->berufstaetigkeit1<>$rowp->berufstaetigkeit2)
+			{
+				$plausi.="Berufstätigkeit der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->berufstaetigkeit1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->berufstaetigkeit2."'.\n";
+				$error=true;
+			}
+			if ($rowp->aufmerksamdurchfk1<>$rowp->aufmerksamdurchfk2)
+			{
+				$plausi.="Aufmerksamdurch(fk) der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->aufmerksamdurchfk1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->aufmerksamdurchfk2."'.\n";
+				$error=true;
+			}
+			if ($rowp->aufnahmeschluessel1<>$rowp->aufnahmeschluessel2)
+			{
+				$plausi.="Ausnahmeschluessel der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->aufnahmeschluessel1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->aufnahmeschluessel2."'.\n";
+				$error=true;
+			}
+			if ($rowp->aufnahmeschluesselfk1<>$rowp->aufnahmeschluesselfk2)
+			{
+				$plausi.="Ausnahmeschluessel(fk) der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->aufnahmeschluesselfk1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->aufnahmeschluesselfk2."'.\n";
+				$error=true;
+			}
+			if ($rowp->angetreten1<>$rowp->angetreten2)
+			{
+				$plausi.="Angetreten der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->angetreten1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->angetreten2."'.\n";
+				$error=true;
+			}
 		}
-		if ($rowp->studiengang1<>$rowp->studiengang2)
-		{
-			$plausi.="Studiengang der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->studiengang1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->studiengang2."'.\n";
-			$error=true;
-		}
-		if ($rowp->zgvdatum1<>$rowp->zgvdatum2)
-		{
-			$plausi.="Zugangsvoraussetzungsdatum der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->zgvdatum1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->zgvdatum2."'.\n";
-			$error=true;
-		}
-		if ($rowp->zgvort1<>$rowp->zgvort2)
-		{
-			$plausi.="Zugangsvoraussetzungsort der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->zgvort1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->zgvort2."'.\n";
-			$error=true;
-		}
-		if ($rowp->zgvmagister1<>$rowp->zgvmagister2)
-		{
-			$plausi.="Magister-Zugangsvoraussetzung der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->zgvmagister1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->zgvmagister2."'.\n";
-			$error=true;
-		}
-		if ($rowp->zgvmagisterdatum1<>$rowp->zgvmagisterdatum2)
-		{
-			$plausi.="Magister-Zugangsvoraussetzungsdatum der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->zgvmagisterdatum1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->zgvmagisterdatum2."'.\n";
-			$error=true;
-		}
-		if ($rowp->zgvmagisterort1<>$rowp->zgvmagisterort2)
-		{
-			$plausi.="Magister-Zugangsvoraussetzungort der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->zgvmagisterort1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->zgvmagisterort2."'.\n";
-			$error=true;
-		}
-		if ($rowp->punkte1<>$rowp->punkte2)
-		{
-			$plausi.="Punkte der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->punkte1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->punkte2."'.\n";
-			$error=true;
-		}
-		if ($rowp->perskz1<>$rowp->perskz2)
-		{
-			$plausi.="Personenkennzeichen der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->perskz1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->perskz2."'.\n";
-			$error=true;
-		}
-		if ($rowp->aufgenommenam1<>$rowp->aufgenommenam2)
-		{
-			$plausi.="Aufnahmedatum der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->aufgenommenam1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->aufgenommenam2."'.\n";
-			$error=true;
-		}
-		if ($rowp->aufmerksamdurch1<>$rowp->aufmerksamdurch2)
-		{
-			$plausi.="Aufmerksamdurch der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->aufmerksamdurch1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->aufmerksamdurch2."'.\n";
-			$error=true;
-		}
-		if ($rowp->beendigungsdatum1<>$rowp->beendigungsdatum2)
-		{
-			$plausi.="Beendigungsdatum der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->beendigungsdatum1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->beendigungsdatum2."'.\n";
-			$error=true;
-		}
-		if ($rowp->berufstaetigkeit1<>$rowp->berufstaetigkeit2)
-		{
-			$plausi.="Berufstätigkeit der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->berufstaetigkeit1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->berufstaetigkeit2."'.\n";
-			$error=true;
-		}
-		if ($rowp->aufmerksamdurchfk1<>$rowp->aufmerksamdurchfk2)
-		{
-			$plausi.="Aufmerksamdurch(fk) der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->aufmerksamdurchfk1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->aufmerksamdurchfk2."'.\n";
-			$error=true;
-		}
-		if ($rowp->aufnahmeschluessel1<>$rowp->aufnahmeschluessel2)
-		{
-			$plausi.="Ausnahmeschluessel der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->aufnahmeschluessel1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->aufnahmeschluessel2."'.\n";
-			$error=true;
-		}
-		if ($rowp->aufnahmeschluesselfk1<>$rowp->aufnahmeschluesselfk2)
-		{
-			$plausi.="Ausnahmeschluessel(fk) der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->aufnahmeschluesselfk1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->aufnahmeschluesselfk2."'.\n";
-			$error=true;
-		}
-		if ($rowp->angetreten1<>$rowp->angetreten2)
-		{
-			$plausi.="Angetreten der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->angetreten1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->angetreten2."'.\n";
-			$error=true;
-		}
+		
 		if ($error)
 		{
 			
@@ -401,20 +413,22 @@ FROM (person JOIN student ON person_pk=student.person_fk ) AS p1
 CROSS JOIN (person JOIN student ON person_pk=student.person_fk) AS p2 WHERE 
 ((p1.gebdat=p2.gebdat AND p1.familienname=p2.familienname AND p1.svnr='' AND p1.ersatzkennzeichen='') 
 OR ((p1.ersatzkennzeichen=p2.ersatzkennzeichen AND p1.ersatzkennzeichen<>'') OR (p1.svnr=p2.svnr AND p1.svnr<>'')))
-AND (p1.person_pk <> p2.person_pk)
+AND (p1.person_pk < p2.person_pk)
 AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400')
-AND (p1.familienname<>p2.familienname OR p1.vorname<>p2.vorname OR p1.vornamen<>p2.vornamen OR p1.geschlecht<>p2.geschlecht 
+AND (trim(p1.familienname)<>trim(p2.familienname) OR trim(p1.vorname)<>trim(p2.vorname) OR trim(p1.vornamen)<>trim(p2.vornamen)
+	OR p1.geschlecht<>p2.geschlecht 
 	OR p1.gebdat<>p2.gebdat OR p1.staatsbuergerschaft<> p2.staatsbuergerschaft OR p1.familienstand<>p2.familienstand 
 	OR p1.svnr<>p2.svnr OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.anrede<>p2.anrede 
-	OR p1.anzahlderkinder<>p2.anzahlderkinder OR p1.bismelden<>p2.bismelden OR p1.titel<>p2.titel OR p1.gebnation<>p2.gebnation 
-	OR p1.postnomentitel<> p2.postnomentitel 
-	OR p1.zgv<>p2.zgv OR p1.studiengang_fk<>p2.studiengang_fk OR p1.zgvdatum<>p2.zgvdatum OR p1.zgvort<>p2.zgvort 
+	OR p1.anzahlderkinder<>p2.anzahlderkinder OR p1.bismelden<>p2.bismelden OR p1.titel<>p2.titel OR p1.gebnation<>p2.gebnation
+	OR p1.postnomentitel<> p2.postnomentitel
+	
+	OR ((p1.zgv<>p2.zgv OR p1.zgvdatum<>p2.zgvdatum OR p1.zgvort<>p2.zgvort 
 	OR p1.zgvmagister<>p2.zgvmagister OR p1.zgvmagisterort<>p2.zgvmagisterort OR p1.zgvmagisterdatum<>p2.zgvmagisterdatum 
 	OR p1.punkte<>p2.punkte OR p1.perskz<>p2.perskz OR p1.aufgenommenam<>p2.aufgenommenam 
-	OR p1.aufmerksamdurch<>p2.aufmerksamdurch OR p1.beendigungsdatum<>p2.beendigungsdatum 
-	OR p1.berufstaetigkeit<>p2.berufstaetigkeit OR p1.aufmerksamdurch_fk<>p2.aufmerksamdurch_fk 
+	OR p1.beendigungsdatum<>p2.beendigungsdatum OR p1.aufmerksamdurch<>p2.aufmerksamdurch
 	OR p1.aufnahmeschluessel<>p2.aufnahmeschluessel OR p1.aufnahmeschluessel_fk<>p2.aufnahmeschluessel_fk 
-	OR p1.angetreten<>p2.angetreten)
+	OR p1.berufstaetigkeit<>p2.berufstaetigkeit OR p1.aufmerksamdurch_fk<>p2.aufmerksamdurch_fk 
+	OR p1.angetreten<>p2.angetreten)AND p1.studiengang_fk=p2.studiengang_fk))
 )
 order by familienname;
 ";
@@ -435,6 +449,7 @@ if($result = pg_query($conn_fas, $qry))
 		$error_log='';
 		//$text='';
 		$error=false;
+		
 		//Attribute Person
 		$staatsbuergerschaft=$row->staatsbuergerschaft;
 		$geburtsnation=$row->gebnation;
@@ -442,9 +457,9 @@ if($result = pg_query($conn_fas, $qry))
 		$anrede=$row->anrede;
 		$titelpost=$row->postnomentitel;
 		$titelpre=$row->titel;
-		$nachname=$row->familienname;			
-		$vorname=$row->vorname;
-		$vornamen=$row->vornamen;
+		$nachname=trim($row->familienname);
+		$vorname=trim($row->vorname);
+		$vornamen=trim($row->vornamen);
 		$gebdatum=$row->gebdat;
 		$gebort=$row->gebort;
 		$gebzeit=''; //bei insert auslassen
@@ -521,10 +536,7 @@ if($result = pg_query($conn_fas, $qry))
 		$verband='';
 		$gruppe='';
 		$ext_id_student=$row->student_pk;
-		
-
-
-		
+			
 		if($zgv_code<=0 or $zgv_code=='')
 		{
 			$zgv_code=null;
@@ -533,7 +545,132 @@ if($result = pg_query($conn_fas, $qry))
 		{
 			$zgvmas_code=null;
 		}
-				
+		
+		//Attribute überprüfen!!!	
+		if(strlen($sprache)>16)
+		{
+			$error_log = "Sprache darf nicht laenger als 16 Zeichen sein: ".$nachname.", ".$vorname."\n";
+		}
+		if(strlen($anrede)>16)
+		{
+			$error_log = "Anrede darf nicht laenger als 16 Zeichen sein: ".$nachname.", ".$vorname."\n";
+		}
+		if(strlen($titelpost)>32)
+		{
+			$error_log = "Titelpost darf nicht laenger als 32 Zeichen sein: ".$nachname.", ".$vorname."\n";
+		} 
+		if(strlen($titelpre)>64)
+		{
+			$error_log = "Titelpre darf nicht laenger als 64 Zeichen sein: ".$nachname.", ".$vorname."\n";
+		}
+		if(strlen($nachname)>64)
+		{
+			$error_log = "Nachname darf nicht laenger als 64 Zeichen sein: ".$nachname.", ".$vorname."\n";
+		}
+		if($nachname=='' || is_null($nachname))
+		{
+			$error_log = "Nachname muss eingegeben werden: ".$this->ext_id.", ".$nachname.", ".$vorname."\n";
+		}		
+		if(strlen($vorname)>32)
+		{
+			$error_log = "Vorname darf nicht laenger als 32 Zeichen sein: ".$nachname.", ".$vorname."\n";
+		}
+		if(strlen($vornamen)>128)
+		{
+			$error_log = "Vornamen darf nicht laenger als 128 Zeichen sein: ".$nachname.", ".$vorname."\n";
+		}
+		if(strlen($gebort)>128)
+		{
+			$error_log = "Geburtsort darf nicht laenger als 128 Zeichen sein: ".$nachname.", ".$vorname."\n";
+		}
+		if($foto!='' && !is_numeric($foto))
+		{
+			$error_log = "FotoOID ist ungueltig.\n";
+		}
+		if(strlen($homepage)>256)
+		{
+			$error_log = "Homepage darf nicht laenger als 256 Zeichen sein: ".$nachname.", ".$vorname."\n";
+		}
+		if(strlen($svnr)>10)
+		{
+			$error_log = "SVNR darf nicht laenger als 10 Zeichen sein: ".$nachname.", ".$vorname."\n";
+		}
+		if(strlen($ersatzkennzeichen)>10)
+		{
+			$error_log = "Ersatzkennzeichen darf nicht laenger als 10 Zeichen sein: ".$nachname.", ".$vorname."\n";
+		}
+		if(strlen($familienstand)>1)
+		{
+			$error_log = "Familienstand ist ungueltig: ".$nachname.", ".$vorname."\n";
+		}
+		if($anzahlkinder!='' && !is_numeric($anzahlkinder))
+		{
+			$error_log = "Anzahl der Kinder ist ungueltig: ".$nachname.", ".$vorname."\n";
+		}
+		if($ext_id_person!='' && !is_numeric($ext_id_person))
+		{
+			$error_log = "Ext_ID_Person ist keine gueltige Zahl: ".$nachname.", ".$vorname."\n";
+		}
+		if(strlen($geschlecht)>1)
+		{
+			$error_log = "Geschlechtsangabe ungültig: ".$nachname.", ".$vorname."\n";
+		}
+		if(strlen($geburtsnation)>3)
+		{
+			$error_log = "Geburtsnation darf nicht laenger als 3 Zeichen sein: ".$nachname.", ".$vorname."\n";
+		}
+		if(strlen($staatsbuergerschaft)>3)
+		{
+			$error_log = "Staatsbuergerschaft darf nicht laenger als 3 Zeichen sein: ".$nachname.", ".$vorname."\n";
+		}
+		if($geschlecht!='m' && $geschlecht!='w')
+		{
+			$error_log = "Geschlecht muß entweder w oder m sein!: ".$nachname.", ".$vorname."\n";
+		}		
+		if(strlen($uid)>16)
+		{
+			$error_log = 'UID darf nicht laenger als 16 Zeichen sein. : '.$nachname.", ".$vorname."\n";
+		}
+		if($uid == '')
+		{
+			$error_log = 'UID muss eingegeben werden '.$nachname.", ".$vorname."\n";
+		}
+		if(strlen($alias)>256)
+		{
+			$error_log = 'Alias darf nicht laenger als 256 Zeichen sein '.$nachname.", ".$vorname."\n";
+		}
+		if(!is_numeric($person_id))
+		{
+			$error_log = 'person_id muss eine gueltige Zahl sein '.$nachname.", ".$vorname."\n";
+		}
+		if(strlen($matrikelnr)>15)
+		{
+			$error_log = 'Matrikelnummer darf nicht laenger als 15 Zeichen sein '.$nachname.", ".$vorname."\n";
+		}		
+		if(!is_numeric($berufstaetigkeit_code))
+		{
+			$error_log = 'berufstaetigkeit_code muss eine gueltige Zahl sein '.$nachname.", ".$vorname."\n";
+		}
+		if(!is_numeric($zgv_code) && $zgv_code!='')
+		{
+			$error_log = 'zgv_code muss eine gueltige Zahl sein '.$nachname.", ".$vorname."\n";
+		}
+		if(strlen($zgvort)>64)
+		{
+			$error_log = 'zgvort darf nicht laenger als 64 Zeichen sein:'.$zgvort." bei ".$nachname.", ".$vorname."\n";
+		}
+		if(!is_numeric($zgvmas_code) && $zgvmas_code!='')
+		{
+			$error_log='zgvmas_code muss eine gueltige Zahl sein. '.$nachname.", ".$vorname."\n";
+		}
+		if(strlen($zgvmaort)>64)
+		{
+			$error_log = 'zgvmaort darf nicht laenger als 64 Zeichen sein:'.$zgvmaort." bei ".$nachname.", ".$vorname."\n";
+		}
+		if(!is_numeric($punkte))
+		{
+			$error_log='Punkte muss eine gueltige Zahl sein. '.$nachname.", ".$vorname."\n";
+		}
 		//Ermittlung der Daten des Reihungstests
 		$qry="SELECT student_fk, reihungstest_fk, anmeldedatum FROM student_reihungstest WHERE student_fk='".$row->student_pk."';";
 		if($result_rt1 = pg_query($conn_fas, $qry))
@@ -1020,9 +1157,15 @@ if($result = pg_query($conn_fas, $qry))
 						$prestudent_id=$rowu->prestudent_id;
 						$new_prestudent=false;		
 					}
-					else $new_prestudent=true;
+					else 
+					{
+						$new_prestudent=true;
+					}
 				}
-				else $new_prestudent=true;
+				else 
+				{
+					$new_prestudent=true;
+				}
 			}
 			else
 			{
@@ -1097,7 +1240,7 @@ if($result = pg_query($conn_fas, $qry))
 					"now()".', '.
 					"'SYNC', ".
 					myaddslashes($ext_id_pre).');';
-					$ausgabe_person="Prestudent:  ID:".$person_id.", ".$nachname." eingefügt.";
+					$ausgabe_person="Prestudent:  ID:".$person_id.", ".$nachname." eingefügt.\n";
 			}
 			else 
 			{
@@ -1356,7 +1499,7 @@ if($result = pg_query($conn_fas, $qry))
 			else
 			{			
 				$error=true;
-				$error_log.='Fehler beim Speichern des Prestudent-Datensatzes:'.$nachname.' \n'.$qry."\n".pg_errormessage($conn)."\n";
+				$error_log.='Fehler beim Speichern des Prestudent-Datensatzes:'.$nachname." \n".$qry."\n".pg_errormessage($conn)."\n";
 				$ausgabe_pre='';
 			}
 									
@@ -1486,17 +1629,24 @@ if($result = pg_query($conn_fas, $qry))
 										if(!pg_query($conn, $qry))
 										{
 											$error_log.="FEHLER bei Eintrag in tbl_prestudentrolle: '$prestudent_id', '$rolle_kurzbz[$status]', '$studiensemester_kurzbz[$stm]', '$ausbildungssemester'.\n".pg_errormessage($conn)."\n";
+											$error=true;
 										}
-										$ausgabe_prerolle.="    Prestudentrolle für ID ".$prestudent_id.", ".$nachname." angelegt: '".$rolle_kurzbz[$status]."' in Studiensemester '".$studiensemester_kurzbz[$stm]."' mit Ausbildungssemester '".$ausbildungssemester."'.\n";
+										else 
+										{
+											$ausgabe_prerolle="    Prestudentrolle für ID ".$prestudent_id.", ".$nachname." angelegt: '".$rolle_kurzbz[$status]."' in Studiensemester '".$studiensemester_kurzbz[$stm]."' mit Ausbildungssemester '".$ausbildungssemester."'.\n";
+										}
 									}
 								}
 							}
 						}
 					}
 				}
-				$ausgabe_pre.=$ausgabe_prerolle;
-				$ausgabe.=$ausgabe_person;
-				$ausgabe.=$ausgabe_pre;
+				if(!$error)
+				{
+					$ausgabe_pre.=$ausgabe_prerolle;
+					$ausgabe.=$ausgabe_person;
+					$ausgabe.=$ausgabe_pre;
+				}
 				if ($semester!=null and $semester!='' and is_numeric($semester) 
 				    and $verband!=null and $gruppe!=null)
 				{
@@ -1651,7 +1801,7 @@ if($result = pg_query($conn_fas, $qry))
 							{
 								while($rows = pg_fetch_object($results))
 								{
-									$update=false;			
+									$updates=false;			
 									if($rows->matrikelnr!=$matrikelnr)
 									{
 										$updates=true;
@@ -1770,6 +1920,9 @@ if($result = pg_query($conn_fas, $qry))
 						{
 							$ausgabe.=$ausgabe_benutzer;
 							$ausgabe.=$ausgabe_student;
+							//echo nl2br($ausgabe);
+							//ob_flush();
+							//flush();
 							pg_query($conn,'COMMIT;');
 						}
 						else
@@ -1782,7 +1935,6 @@ if($result = pg_query($conn_fas, $qry))
 							pg_query($conn,'ROLLBACK;');
 						}									
 					}
-					
 					else 
 					{
 						$anzahl_fehler_benutzer++;
@@ -1796,11 +1948,15 @@ if($result = pg_query($conn_fas, $qry))
 				else 
 				{
 					$anzahl_nichtstudenten++;
-					/*$text.="\n***********".$student_uid."/".$nachname.", ".$vorname."/".$matrikelnr."\n";
-					$text.="Semester: ".$semester."/Verband: ".$verband." /Gruppe: ".$gruppe." / Stg:".$studiengang_kz."\n";
-					$text.=$error_log;
-					$text.="\n".$qry." C1\n";
-					$text.="**********\n\n";*/
+					if($error)
+					{
+						$anzahl_fehler_pre++;
+						$text.="\n***********".$student_uid."/".$nachname.", ".$vorname."/".$matrikelnr."\n";
+						$text.="Semester: ".$semester."/Verband: ".$verband." /Gruppe: ".$gruppe." / Stg:".$studiengang_kz."\n";
+						$text.=$error_log;
+						$text.="\n".$qry." C1\n";
+						$text.="**********\n\n";
+					}
 					pg_query($conn,'COMMIT;'); //Commit, wenn kein Gruppeneintrag gefunden (Interessent, Bewerber) => nur Person und Prestudent werden angelegt	
 				}
 				
@@ -1820,7 +1976,7 @@ if($result = pg_query($conn_fas, $qry))
 			$anzahl_fehler_person++;
 			$text.="\n***********".$student_uid."/".$nachname.", ".$vorname."/".$matrikelnr."\n";
 			$text.=$error_log;
-			$text.=" R4\n";
+			$text.="\n".$qry." R4\n";
 			$text.="**********\n\n";
 			pg_query($conn,'ROLLBACK;');
 		}
@@ -1836,19 +1992,15 @@ Echo nl2br("Benutzer:       Gesamt: ".$anzahl_benutzer_gesamt." / Eingefügt: ".$
 Echo nl2br("Nicht-Studenten: ".$anzahl_nichtstudenten."\n");
 Echo nl2br("Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student."\n");
 
-$error_log="Sync Student\n--------------\n";
-$ausgabe="Sync Student\n--------------\n\nPersonen ohne Reihungstest: ".$notest." \n\n"
+$error_log="Sync Student\n--------------\n\n".$text;
+Echo nl2br($error_log);
+mail($adress, 'SYNC-Fehler Student', $error_log,"From: vilesci@technikum-wien.at");
+mail($adress, 'SYNC Student', "Sync Student\n--------------\n\nPersonen ohne Reihungstest: ".$notest." \n\n"
 ."Personen:       Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$anzahl_person_insert." / Geändert: ".$anzahl_person_update." / Fehler: ".$anzahl_fehler_person."\n"
 ."Prestudenten:   Gesamt: ".$anzahl_pre_gesamt." / Eingefügt: ".$anzahl_pre_insert." / Geändert: ".$anzahl_pre_update." / Fehler: ".$anzahl_fehler_pre."\n"
 ."Benutzer:       Gesamt: ".$anzahl_benutzer_gesamt." / Eingefügt: ".$anzahl_benutzer_insert." / Geändert: ".$anzahl_benutzer_update." / Fehler: ".$anzahl_fehler_benutzer."\n"
 ."Nicht-Studenten: ".$anzahl_nichtstudenten."\n"
-."Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student."\n\n".$ausgabe;
-$error_log.=$text;
-if(strlen(trim($error_log))>0)
-{
-	mail($adress, 'SYNC-Fehler Student', $error_log,"From: vilesci@technikum-wien.at");
-}
-mail($adress, 'SYNC Student', $ausgabe,"From: vilesci@technikum-wien.at");
+."Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student."\n\n".$ausgabe, "From: vilesci@technikum-wien.at");
 ?>
 </body>
 </html>
