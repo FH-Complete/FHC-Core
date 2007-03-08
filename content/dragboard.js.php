@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -46,7 +46,7 @@ var lvaObserver=
 */
 
 /***** Drag Observer fuer Gruppen *****/
-var grpObserver=
+var lvbgrpObserver=
 {
 	onDragStart: function (evt,transferData,action)
 	{
@@ -54,37 +54,37 @@ var grpObserver=
 	    var row = { }
 	    var col = { }
 	    var child = { }
-	    
+
 	    //Index der Quell-Row ermitteln
 	    tree.treeBoxObject.getCellAt(evt.pageX, evt.pageY, row, col, child)
-	    	       	
-	    //Daten ermitteln    
+
+	    //Daten ermitteln
 	    col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
 		stg_kz=tree.view.getCellText(row.value,col);
-		
+
 		col = tree.columns ? tree.columns["sem"] : "sem";
 		sem=tree.view.getCellText(row.value,col);
-		
+
 		col = tree.columns ? tree.columns["ver"] : "ver";
 		ver=tree.view.getCellText(row.value,col);
-		
+
 		col = tree.columns ? tree.columns["grp"] : "grp";
 		grp=tree.view.getCellText(row.value,col);
-		
+
 		col = tree.columns ? tree.columns["gruppe"] : "gruppe";
 		gruppe=tree.view.getCellText(row.value,col);
-		
+
 		var paramList= stg_kz+'&'+sem+'&'+ver+'&'+grp+'&'+gruppe;
 		//debug('param:'+paramList);
 		transferData.data=new TransferData();
-		transferData.data.addDataForFlavour("gruppe",paramList);
+		transferData.data.addDataForFlavour("application/tempus-lvbgruppe",paramList);
   	}
 };
 
 // ****
 // * Observer fuer den Gruppen Tree im Lehreinheiten-Modul
 // ****
-var lfvt_grp_Observer=
+var LeLvbgrpDDObserver=
 {
 	getSupportedFlavours : function ()
 	{
@@ -99,12 +99,12 @@ var lfvt_grp_Observer=
 	{
   	},
   	onDragOver: function(evt,flavour,session)
-  	{  		
+  	{
   	},
   	onDrop: function (evt,dropdata,session)
   	{
-	    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");   
-	    try 
+	    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	    try
 	    {
 	        dragservice_ds = Components.classes["@mozilla.org/widget/dragservice;1"].getService(Components.interfaces.nsIDragService);
 	    }
@@ -112,7 +112,7 @@ var lfvt_grp_Observer=
 	    {
 	    	debug('treeDragDrop: e');
 	    }
-	    
+
 	    var ds = dragservice_ds;
 
 	    var ses = ds.getCurrentSession()
@@ -121,34 +121,34 @@ var lfvt_grp_Observer=
 	    var row = { }
 	    var col = { }
 	    var child = { }
-	   
+
 	    if(lehreinheit_id=='')
 	    	return false;
 
 	    quell_gruppe=dropdata.data;
 	    var arr = quell_gruppe.split("&");
-	    
+
 	    var stg_kz = arr[0];
 	    var sem = arr[1];
 	    var ver = arr[2];
 	    var grp = arr[3];
 	    var gruppe = arr[4];
 	    //alert("stg: "+stg_kz+" sem: "+sem+" ver: "+ver+" grp: "+grp+" gruppe: "+gruppe+" TO Lehreinheit:"+lehreinheit_id);
-	    
+
 	    var req = new phpRequest('lfvtCUD.php','','');
 		neu = document.getElementById('lfvt_detail_checkbox_new').checked;
-		
+
 		req.add('type','lehreinheit_gruppe_add');
-				
+
 		req.add('lehreinheit_id', lehreinheit_id);
 		req.add('studiengang_kz', stg_kz);
 		req.add('semester', sem);
 		req.add('verband', ver);
 		req.add('gruppe', grp);
 		req.add('gruppe_kurzbz', gruppe);
-				
+
 		var response = req.executePOST();
-		if (response!='ok') 
+		if (response!='ok')
 		{
 			alert(response);
 		}
@@ -164,19 +164,19 @@ var lfvt_grp_Observer=
 var tree_lektor_drag_Observer=
 {
 	onDragStart: function (evt,transferData,action)
-	{		
+	{
 		var tree = document.getElementById('tree-lektor')
 	    var row = { }
 	    var col = { }
 	    var child = { }
-	    
+
 	    //Index der Quell-Row ermitteln
 	    tree.treeBoxObject.getCellAt(evt.pageX, evt.pageY, row, col, child)
-	    	       	
-	    //Daten ermitteln    
+
+	    //Daten ermitteln
 	    col = tree.columns ? tree.columns["uid"] : "uid";
 		uid=tree.view.getCellText(row.value,col);
-		
+
 		var paramList= uid;
 		transferData.data=new TransferData();
 		transferData.data.addDataForFlavour("mitarbeiter",paramList);
@@ -208,8 +208,8 @@ var lfvt_lektor_Observer=
   	},
   	onDrop: function (evt,dropdata,session)
   	{
-	    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");   
-	    try 
+	    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	    try
 	    {
 	        dragservice_ds = Components.classes["@mozilla.org/widget/dragservice;1"].getService(Components.interfaces.nsIDragService);
 	    }
@@ -217,7 +217,7 @@ var lfvt_lektor_Observer=
 	    {
 	    	debug('treeDragDrop: e');
 	    }
-	    
+
 	    var ds = dragservice_ds;
 
 	    var ses = ds.getCurrentSession()
@@ -226,19 +226,19 @@ var lfvt_lektor_Observer=
 	    var row = { }
 	    var col = { }
 	    var child = { }
-	   
+
 	    if(lehreinheit_id=='')
 	    	return false;
 
 	    uid=dropdata.data;
 	    //alert("uid: "+uid);
-	    
+
 	    var req = new phpRequest('lfvtCUD.php','','');
 		neu = document.getElementById('lfvt_detail_checkbox_new').checked;
-		
+
 		req.add('type','lehreinheit_mitarbeiter_add');
 
-		req.add('do', 'create');	
+		req.add('do', 'create');
 		req.add('lehreinheit_id', lehreinheit_id);
 		req.add('mitarbeiter_uid', uid);
 		req.add('lehrfunktion_kurzbz', 'lektor');
@@ -248,13 +248,13 @@ var lfvt_lektor_Observer=
 		req.add('faktor', '1');
 		req.add('anmerkung', '');
 		req.add('bismelden', 'true');
-		
+
 		var response = req.executePOST();
-		if (response!='ok') 
+		if (response!='ok')
 		{
 			alert(response);
-		} 
-		else 
+		}
+		else
 		{
 			//LektorTree Refreshen
 			lfvt_lektor_treerefresh();
