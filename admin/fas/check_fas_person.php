@@ -274,22 +274,17 @@ p2.vornamen as vornamen2, p2.geschlecht as geschlecht2, p2.gebdat as gebdat2, p2
 p2.staatsbuergerschaft as staatsbuergerschaft2, p2.familienstand as familienstand2, p2.svnr as svnr2, 
 p2.anzahlderkinder as anzahlderkinder2, p2.ersatzkennzeichen as ersatzkennzeichen2, p2.bemerkung as bemerkung2, p2.titel as titel2, 
 p2.uid as uid2, p2.gebnation as gebnation2, p2.postnomentitel as postnomentitel2, p2.bismelden as bismelden2
-FROM person p1, person p2 WHERE 
-((p1.gebdat=p2.gebdat AND p1.familienname=p2.familienname) 
-OR (p1.ersatzkennzeichen=p2.ersatzkennzeichen AND p1.ersatzkennzeichen<>'' AND p1.ersatzkennzeichen IS NOT NULL) 
-OR (p1.svnr=p2.svnr AND p1.svnr<>'' AND p1.svnr IS NOT NULL))
-AND (p1.person_pk < p2.person_pk)
-AND p1.svnr<>'0005010400'
-AND (p1.familienname<>p2.familienname OR p1.vorname<>p2.vorname OR p1.vornamen<>p2.vornamen OR p1.geschlecht<>p2.geschlecht 
-	OR p1.gebdat<>p2.gebdat OR p1.staatsbuergerschaft<> p2.staatsbuergerschaft OR p1.familienstand<>p2.familienstand 
-	OR p1.svnr<>p2.svnr OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.anrede<>p2.anrede 
-	OR p1.anzahlderkinder<>p2.anzahlderkinder OR p1.bismelden<>p2.bismelden OR p1.titel<>p2.titel OR p1.gebnation<>p2.gebnation 
-	OR p1.postnomentitel<> p2.postnomentitel) 
-ORDER BY p1.familienname, p1.person_pk;";
+FROM person p1, person p2 WHERE p1.person_pk<p2.person_pk AND p1.svnr=p2.svnr AND p1.svnr IS NOT NULL
+AND p1.svnr!='0005010400' AND p1.svnr!=''
+AND (p1.familienname!=p2.familienname OR p1.vorname!=p2.vorname OR p1.anrede!=p2.anrede  OR p1.vornamen!=p2.vornamen 
+OR p1.geschlecht!=p2.geschlecht  OR p1.gebdat!=p2.gebdat  OR p1.gebort!=p2.gebort  OR p1.staatsbuergerschaft!=p2.staatsbuergerschaft
+OR p1.familienstand!=p2.familienstand  OR p1.svnr!=p2.svnr  OR p1.anzahlderkinder!=p2.anzahlderkinder
+OR p1.ersatzkennzeichen!=p2.ersatzkennzeichen OR p1.titel!=p2.titel  OR p1.gebnation!=p2.gebnation 
+OR p1.postnomentitel!=p2.postnomentitel) ORDER BY p1.familienname, p1.person_pk;";
 
 if($result = pg_query($conn_fas, $qry))
 {
-	echo "<table class='liste'><tr><th>person_pk</th><th>familienname</th><th>vorname</th><th>anrede</th><th>vornamen</th><th>geschlecht</th><th>gebdat</th><th>gebort</th><th>gebnation</th><th>staatsbürgerschaft</th><th>familienstand</th><th>svnr</th><th>anzahlderkinder</th><th>ersatzkennzeichen</th><th>bemerkung</th><th>bismelden</th><th>titel</th><th>uid</th><th>postnomentitel</th></tr>";
+	echo "<table class='liste'><tr><th>person_pk</th><th>familienname</th><th>vorname</th><th>anrede</th><th>vornamen</th><th>geschlecht</th><th>gebdat</th><th>gebort</th><th>gebnation</th><th>staatsbürgerschaft</th><th>familienstand</th><th>svnr</th><th>anzahlderkinder</th><th>ersatzkennzeichen</th><th>titel</th><th>postnomentitel</th></tr>";
 	while($row = pg_fetch_object($result))
 	{
 		$i++;
@@ -350,21 +345,9 @@ if($result = pg_query($conn_fas, $qry))
 		if($row->ersatzkennzeichen1<>$row->ersatzkennzeichen2)
 			echo"<input type='text' size='10' maxlength='10' name='ersatzkennzeichen'  value='".$row->ersatzkennzeichen1."'>";
 		echo "</td>";
-		echo "<td>'".$row->bemerkung1."'";
-		if($row->bemerkung1<>$row->bemerkung2)
-			echo"<textarea cols='50' rows='3' name='bemerkung'>".$row->bemerkung1."</textarea>";
-		echo "</td>";
-		echo "<td>'".$row->bismelden1."'";
-		if($row->bismelden1<>$row->bismelden2)
-			echo"<input type='text' size='1' maxlength='1' name='bismelden'  value='".$row->bismelden1."'>";
-		echo "</td>";
 		echo "<td>'".$row->titel1."'";
 		if($row->titel1<>$row->titel2)
 			echo"<input type='text' size='20' maxlength='30' name='titel'  value='".$row->titel1."'>";
-		echo "</td>";
-		echo "<td>'".$row->uid1."'";
-		if($row->uid1<>$row->uid2)
-			echo"<input type='text' size='16' maxlength='16' name='uid'  value='".$row->uid1."'>";
 		echo "</td>";
 		echo "<td>'".$row->postnomentitel1."'";
 		if($row->postnomentitel1<>$row->postnomentitel2)
@@ -430,21 +413,9 @@ if($result = pg_query($conn_fas, $qry))
 		if($row->ersatzkennzeichen1<>$row->ersatzkennzeichen2)
 			echo"<input type='text' size='10' maxlength='10' name='ersatzkennzeichen'  value='".$row->ersatzkennzeichen2."'>";
 		echo "</td>";
-		echo "<td>'".$row->bemerkung2."'";
-		if($row->bemerkung1<>$row->bemerkung2)
-			echo"<textarea cols='50' rows='3' name='bemerkung'>".$row->bemerkung2."</textarea>";
-		echo "</td>";
-		echo "<td>'".$row->bismelden2."'";
-		if($row->bismelden1<>$row->bismelden2)
-			echo"<input type='text' size='1' maxlength='1' name='bismelden'  value='".$row->bismelden2."'>";
-		echo "</td>";
 		echo "<td>'".$row->titel2."'";
 		if($row->titel1<>$row->titel2)
 			echo"<input type='text' size='20' maxlength='30' name='titel'  value='".$row->titel2."'>";
-		echo "</td>";
-		echo "<td>'".$row->uid2."'";
-		if($row->uid1<>$row->uid2)
-			echo"<input type='text' size='16' maxlength='16' name='uid'  value='".$row->uid2."'>";
 		echo "</td>";
 		echo "<td>'".$row->postnomentitel2."'";
 		if($row->postnomentitel1<>$row->postnomentitel2)
