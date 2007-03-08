@@ -7,7 +7,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-include('../vilesci/config.inc.php');
+include('../../vilesci/config.inc.php');
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
@@ -181,28 +181,6 @@ if(isset($_POST['person_pk']))
 			$qry1= "ersatzkennzeichen='".$_POST['ersatzkennzeichen']."'";
 		}
 	}
-	if(isset($_POST['bemerkung']) )
-	{
-		if(strlen(trim($qry1))>0)
-		{
-			$qry1.= ", bemerkung='".$_POST['bemerkung']."'";
-		}
-		else 
-		{
-			$qry1= "bemerkung='".$_POST['bemerkung']."'";
-		}
-	}
-	if(isset($_POST['bismelden']) )
-	{
-		if(strlen(trim($qry1))>0)
-		{
-			$qry1.= ", bismelden='".$_POST['bismelden']."'";
-		}
-		else 
-		{
-			$qry1= "bismelden='".$_POST['bismelden']."'";
-		}
-	}
 	if(isset($_POST['titel']) )
 	{
 		if(strlen(trim($qry1))>0)
@@ -212,17 +190,6 @@ if(isset($_POST['person_pk']))
 		else 
 		{
 			$qry1= "titel='".$_POST['titel']."'";
-		}
-	}
-	if(isset($_POST['uid']) )
-	{
-		if(strlen(trim($qry1))>0)
-		{
-			$qry1.= ", uid='".$_POST['uid']."'";
-		}
-		else 
-		{
-			$qry1= "uid='".$_POST['uid']."'";
 		}
 	}
 	if(isset($_POST['gebnation']) )
