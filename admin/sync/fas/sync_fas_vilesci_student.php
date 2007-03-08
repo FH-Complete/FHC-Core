@@ -413,7 +413,7 @@ FROM (person JOIN student ON person_pk=student.person_fk ) AS p1
 CROSS JOIN (person JOIN student ON person_pk=student.person_fk) AS p2 WHERE 
 ((p1.gebdat=p2.gebdat AND p1.familienname=p2.familienname AND p1.vorname=p2.vorname) 
 OR ((p1.ersatzkennzeichen=p2.ersatzkennzeichen AND p1.ersatzkennzeichen<>'') OR (p1.svnr=p2.svnr AND p1.svnr<>'')))
-AND (p1.person_pk < p2.person_pk)
+AND (p1.person_pk <> p2.person_pk)
 AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400')
 AND (trim(p1.familienname)<>trim(p2.familienname) OR trim(p1.vorname)<>trim(p2.vorname) OR trim(p1.vornamen)<>trim(p2.vornamen)
 	OR p1.geschlecht<>p2.geschlecht 

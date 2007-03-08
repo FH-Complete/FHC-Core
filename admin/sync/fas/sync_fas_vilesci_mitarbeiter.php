@@ -302,7 +302,7 @@ FROM (person JOIN mitarbeiter ON person_pk=mitarbeiter.person_fk ) AS p1
 CROSS JOIN (person JOIN mitarbeiter ON person_pk=mitarbeiter.person_fk) AS p2 WHERE 
 ((p1.gebdat=p2.gebdat AND p1.familienname=p2.familienname AND p1.svnr='' AND p1.ersatzkennzeichen='') 
 OR ((p1.ersatzkennzeichen=p2.ersatzkennzeichen AND p1.ersatzkennzeichen<>'') OR (p1.svnr=p2.svnr AND p1.svnr<>'')))
-AND (p1.person_pk < p2.person_pk)
+AND (p1.person_pk <> p2.person_pk)
 AND (p1.familienname<>p2.familienname OR p1.vorname<>p2.vorname OR p1.vornamen<>p2.vornamen OR p1.geschlecht<>p2.geschlecht OR p1.gebdat<>p2.gebdat OR p1.staatsbuergerschaft<> p2.staatsbuergerschaft OR p1.familienstand<>p2.familienstAND OR p1.svnr<>p2.svnr OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.anrede<>p2.anrede OR p1.anzahlderkinder<>p2.anzahlderkinder OR p1.bismelden<>p2.bismelden OR p1.titel<>p2.titel OR p1.gebnation<>p2.gebnation OR p1.postnomentitel<> p2.postnomentitel 
 	OR p1.beginndatum<>p2.beginndatum OR p1.akadgrad<>p2.akadgrad OR p1.habilitation<>p2.habilitation OR p1.mitgliedentwicklungsteam<>p2.mitgliedentwicklungsteam OR p1.qualifikation<>p2.qualifikation OR p1.hauptberuflich<>p2.hauptberuflich OR p1.hauptberuf<>p2.hauptberuf OR p1.semesterwochenstunden<>p2.semesterwochenstunden OR p1.persnr<>p2.persnr OR p1.beendigungsdatum<>p2.beendigungsdatum OR p1.ausgeschieden<>p2.ausgeschieden OR p1.kurzbez<>p2.kurzbez OR p1.stundensatz<>p2.stundensatz OR p1.ausbildung<>p2.ausbildung OR p1.aktiv<>p2.aktiv) 
 );";
