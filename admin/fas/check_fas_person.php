@@ -317,8 +317,8 @@ if($result = pg_query($conn_fas, $qry))
 			echo"<input type='text' size='20' maxlength='30' name='titel'  value='".$row->titel1."'>";
 		echo "</td>";
 		echo "<td>'".$row->postnomentitel1."'";
-		if($row->postnomentitel1<>$row->postnomentitel2)
-			echo"<input type='text' size='20' maxlength='30' name='postnomentitel'  value='".$row->postnomentitel1."'>";
+		//if($row->postnomentitel1<>$row->postnomentitel2)
+		echo"<input type='text' size='20' maxlength='30' name='postnomentitel'  value='".$row->postnomentitel1."'>";
 		echo "</td>";
 		echo "<td><input type='submit' value='Speichern'></td>";
 		echo "</tr>";
@@ -385,7 +385,7 @@ if($result = pg_query($conn_fas, $qry))
 			echo"<input type='text' size='20' maxlength='30' name='titel'  value='".$row->titel2."'>";
 		echo "</td>";
 		echo "<td>'".$row->postnomentitel2."'";
-		if($row->postnomentitel1<>$row->postnomentitel2)
+		//if($row->postnomentitel1<>$row->postnomentitel2)
 			echo"<input type='text' size='20' maxlength='30' name='postnomentitel'  value='".$row->postnomentitel2."'>";
 		echo "</td>";
 		echo "<td><input type='submit' value='Speichern'></td>";
