@@ -21,7 +21,7 @@
  */
 
 // ****************************************
-// * Create/Update/Delete
+// * Insert/Update/Delete
 // * der Lehreinheiten
 // * 
 // * Script sorgt fuer den Datenbanzugriff
@@ -171,8 +171,8 @@ elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit')
 		$leDAO->sprache=$_POST['sprache'];
 		if (isset($_POST['lehre'])) $leDAO->lehre=($_POST['lehre']=='true'?true:false);
 		if (isset($_POST['anmerkung'])) $leDAO->anmerkung=$_POST['anmerkung'];
-		if (isset($_POST['lvnr'])) $leDAO->lvnr=$_POST['lvnr'];
-		if (isset($_POST['unr'])) $leDAO->unr=$_POST['unr'];
+		$leDAO->lvnr=(isset($_POST['lvnr'])?$_POST['lvnr']:'');
+		$leDAO->unr=(isset($_POST['unr'])?$_POST['unr']:'');
 		$leDAO->updateamum=date('Y-m-d H:i:s');
 		$leDAO->updatevon=$user;
 		
