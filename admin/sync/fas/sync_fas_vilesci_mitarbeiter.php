@@ -105,7 +105,7 @@ CROSS JOIN (person JOIN mitarbeiter ON person_pk=mitarbeiter.person_fk) AS p2 WH
 OR ((p1.ersatzkennzeichen=p2.ersatzkennzeichen AND p1.ersatzkennzeichen<>'') OR (p1.svnr=p2.svnr AND p1.svnr<>'')))
 AND (p1.person_pk < p2.person_pk)
 AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400')
-AND (p1.familienname<>p2.familienname OR p1.vorname<>p2.vorname OR p1.vornamen<>p2.vornamen OR p1.geschlecht<>p2.geschlecht OR p1.gebdat<>p2.gebdat OR p1.staatsbuergerschaft<> p2.staatsbuergerschaft OR p1.familienstand<>p2.familienstand OR p1.svnr<>p2.svnr OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.anrede<>p2.anrede OR p1.anzahlderkinder<>p2.anzahlderkinder OR p1.bismelden<>p2.bismelden OR p1.titel<>p2.titel OR p1.gebnation<>p2.gebnation OR p1.postnomentitel<> p2.postnomentitel 
+AND (p1.familienname<>p2.familienname OR p1.vorname<>p2.vorname OR p1.vornamen<>p2.vornamen OR p1.geschlecht<>p2.geschlecht OR p1.gebdat<>p2.gebdat OR p1.staatsbuergerschaft<> p2.staatsbuergerschaft OR p1.familienstand<>p2.familienstand OR p1.svnr<>p2.svnr OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.anrede<>p2.anrede OR p1.anzahlderkinder<>p2.anzahlderkinder OR p1.titel<>p2.titel OR p1.gebnation<>p2.gebnation OR p1.postnomentitel<> p2.postnomentitel 
 	OR p1.beginndatum<>p2.beginndatum OR p1.akadgrad<>p2.akadgrad OR p1.habilitation<>p2.habilitation OR p1.mitgliedentwicklungsteam<>p2.mitgliedentwicklungsteam OR p1.qualifikation<>p2.qualifikation OR p1.hauptberuflich<>p2.hauptberuflich OR p1.hauptberuf<>p2.hauptberuf OR p1.semesterwochenstunden<>p2.semesterwochenstunden OR p1.persnr<>p2.persnr OR p1.beendigungsdatum<>p2.beendigungsdatum OR p1.ausgeschieden<>p2.ausgeschieden OR p1.kurzbez<>p2.kurzbez OR p1.stundensatz<>p2.stundensatz OR p1.ausbildung<>p2.ausbildung OR p1.aktiv<>p2.aktiv) 
 order by p1.familienname;
 ";
@@ -176,21 +176,11 @@ if($resultp = pg_query($conn_fas, $qry))
 			$plausi.="Anzahl der Kinder der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->anzahlderkinder1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->anzahlderkinder2."'.\n";
 			$error=true;
 		}
-		if ($rowp->bismelden1<>$rowp->bismelden2)
-		{
-			$plausi.="Bismelden der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->bismelden1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->bismelden2."'.\n";
-			$error=true;
-		}
 		if ($rowp->titel1<>$rowp->titel2)
 		{
 			$plausi.="Titel der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->titel1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->titel2."'.\n";
 			$error=true;
 		}
-		/*if ($rowp->uid1<>$rowp->uid2)
-		{
-			$plausi.="UID der Person ".$rowp->familienname1." (person_pk=".$rowp->person1.") ist '".$rowp->uid1."' bei ".$rowp->familienname2." (person_pk=".$rowp->person2.") aber '".$rowp->uid2."'.\n";
-			$error=true;
-		}*/
 		if ($rowp->gebnation1<>$rowp->gebnation2)
 		{
 			$plausi.="Geburtsnation der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->gebnation1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->gebnation2."'.\n";
@@ -335,7 +325,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 		$personvornamen=trim($rowall->vornamen);
 		$persongebdatum=$rowall->gebdat;
 		$persongebort=$rowall->gebort;
-		$personanmerkungen=$rowall->bemerkung;
+		$personanmerkungen='';
 		$personsvnr=trim($rowall->svnr);
 		$personersatzkennzeichen=trim($rowall->ersatzkennzeichen);
 		$personfamilienstand=$rowall->familienstand;
@@ -389,6 +379,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 			$mitarbeiterausbildungcode=null;
 		}
 		$mitarbeiterort_kurzbz=null;
+		$mitarbeiteranmerkung=$rowall->bemerkung;
 		$mitarbeiterinsertvon='SYNC';
 		$mitarbeiterinsertamum='';
 		$mitarbeiterupdateamum='';
@@ -996,7 +987,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 							{
 					
 								//Neuen Datensatz anlegen							
-								$qry = "INSERT INTO public.tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz, fixangestellt, telefonklappe, updateamum, updatevon, insertamum, insertvon, ext_id) VALUES(".
+								$qry = "INSERT INTO public.tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz, fixangestellt, telefonklappe, anmerkung, updateamum, updatevon, insertamum, insertvon, ext_id) VALUES(".
 								myaddslashes($mitarbeiteruid).", ".
 								myaddslashes($mitarbeiterausbildungcode).", ".
 								myaddslashes($mitarbeiterpersonalnummer)." , ".
@@ -1004,7 +995,8 @@ if($resultall = pg_query($conn_fas, $qryall))
 								myaddslashes($mitarbeiterlektor?'true':'false').", ".
 								myaddslashes($mitarbeiterort_kurzbz).", ".
 								myaddslashes($mitarbeiterfixangestellt?'true':'false').", ".
-								myaddslashes($mitarbeitertelefonklappe)." , 
+								myaddslashes($mitarbeitertelefonklappe)." , ".
+								myaddslashes($mitarbeiteranmerkung).", 
 								now(), ".
 								myaddslashes($mitarbeiterupdatevon)." , 
 								now(), ".
@@ -1105,6 +1097,18 @@ if($resultall = pg_query($conn_fas, $qryall))
 												$ausgabe_mitarbeiter="Ortkurzbezeichnung: '".$mitarbeiterort_kurzbz."'";
 											}
 										}
+										if($row->anmerkung!=$mitarbeiteranmerkung)
+										{
+											$updatem=true;
+											if(strlen(trim($ausgabe_mitarbeiter))>0)
+											{
+												$ausgabe_person.=", Anmerkung: '".$mitarbeiteranmerkung."'";
+											}
+											else
+											{
+												$ausgabe_person="Anmerkung: '".$mitarbeiteranmerkung."'";
+											}
+										}
 									}
 								}
 								if($updatem)
@@ -1117,6 +1121,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 									fixangestellt=".myaddslashes($mitarbeiterfixangestellt?'true':'false').", 
 									telefonklappe=".myaddslashes($mitarbeitertelefonklappe).", 
 									ort_kurzbz=".myaddslashes($mitarbeiterort_kurzbz).", 
+									anmerkung=".myaddslashes($mitarbeiteranmerkung).", 
 									updateamum=now(), 
 									updatevon=".myaddslashes($mitarbeiterupdatevon).", 
 									insertamum=now(), 

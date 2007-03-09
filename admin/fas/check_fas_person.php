@@ -313,7 +313,7 @@ if($result = pg_query($conn_fas, $qry))
 			echo"<input type='text' size='10' maxlength='10' name='ersatzkennzeichen'  value='".$row->ersatzkennzeichen1."'>";
 		echo "</td>";
 		echo "<td>'".$row->titel1."'";
-		if($row->titel1<>$row->titel2)
+		//if($row->titel1<>$row->titel2)
 			echo"<input type='text' size='20' maxlength='30' name='titel'  value='".$row->titel1."'>";
 		echo "</td>";
 		echo "<td>'".$row->postnomentitel1."'";
@@ -381,7 +381,7 @@ if($result = pg_query($conn_fas, $qry))
 			echo"<input type='text' size='10' maxlength='10' name='ersatzkennzeichen'  value='".$row->ersatzkennzeichen2."'>";
 		echo "</td>";
 		echo "<td>'".$row->titel2."'";
-		if($row->titel1<>$row->titel2)
+		//if($row->titel1<>$row->titel2)
 			echo"<input type='text' size='20' maxlength='30' name='titel'  value='".$row->titel2."'>";
 		echo "</td>";
 		echo "<td>'".$row->postnomentitel2."'";
