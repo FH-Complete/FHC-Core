@@ -103,7 +103,7 @@ SELECT
 p1.person_pk AS person1, p1.familienname AS familienname1, p1.vorname AS vorname1, p1.vornamen AS vornamen1, p1.geschlecht AS geschlecht1, 
 p1.gebdat AS gebdat1, p1.gebort AS gebort1, p1.staatsbuergerschaft AS staatsbuergerschaft1, p1.familienstand AS familienstand1, 
 p1.svnr AS svnr1, p1. ersatzkennzeichen  AS ersatzkennzeichen1, p1.anrede AS anrede1, p1.anzahlderkinder AS anzahlderkinder1, 
-p1.bismelden AS bismelden1, p1.titel AS titel1,  p1.uid AS uid1, p1.gebnation AS gebnation1, p1.postnomentitel AS postnomentitel1,
+p1.titel AS titel1,  p1.gebnation AS gebnation1, p1.postnomentitel AS postnomentitel1,
 p1.student_pk AS student1, p1.zgv AS zgv1, p1.studiengang_fk AS studiengang1, p1.zgvdatum AS zgvdatum1, p1.zgvort AS zgvort1,
 p1.zgvmagister AS zgvmagister1, p1.zgvmagisterort AS zgvmagisterort1, p1.zgvmagisterdatum AS zgvmagisterdatum1, p1.punkte AS punkte1,
 p1.perskz AS perskz1, p1.aufgenommenam AS aufgenommenam1, p1.aufmerksamdurch AS aufmerksamdurch1, p1.berufstaetigkeit AS berufstaetigkeit1,
@@ -112,29 +112,28 @@ p1.aufnahmeschluessel AS aufnahmeschluessel1, p1.aufnahmeschluessel_fk AS aufnah
 p2.person_pk AS person2, p2.familienname AS familienname2, p2.vorname AS vorname2, p2.vornamen AS vornamen2, p2.geschlecht AS geschlecht2, 
 p2.gebdat AS gebdat2, p2.gebort AS gebort2, p2.staatsbuergerschaft AS staatsbuergerschaft2, p2.familienstand AS familienstand2, 
 p2.svnr AS svnr2, p2. ersatzkennzeichen  AS ersatzkennzeichen2, p2.anrede AS anrede2, p2.anzahlderkinder AS anzahlderkinder2, 
-p2.bismelden AS bismelden2, p2.titel AS titel2,  p2.uid AS uid2, p2.gebnation AS gebnation2, p2.postnomentitel AS postnomentitel2,
+p2.titel AS titel2,  p2.gebnation AS gebnation2, p2.postnomentitel AS postnomentitel2,
 p2.student_pk AS student2, p2.zgv AS zgv2, p2.studiengang_fk AS studiengang2, p2.zgvdatum AS zgvdatum2, p2.zgvort AS zgvort2,
 p2.zgvmagister AS zgvmagister2, p2.zgvmagisterort AS zgvmagisterort2, p2.zgvmagisterdatum AS zgvmagisterdatum2, p2.punkte AS punkte2,
 p2.perskz AS perskz2, p2.aufgenommenam AS aufgenommenam2, p2.aufmerksamdurch AS aufmerksamdurch2, p2.berufstaetigkeit AS berufstaetigkeit2,
 p2.beendigungsdatum AS beendigungsdatum2, p2.berufstaetigkeit AS berufstaetigkeit2, p2.aufmerksamdurch_fk AS aufmerksamdurchfk2,
 p2.aufnahmeschluessel AS aufnahmeschluessel2, p2.aufnahmeschluessel_fk AS aufnahmeschluesselfk2, p2.angetreten AS angetreten2
-FROM (person JOIN student ON person_pk=student.person_fk ) AS p1
+FROM (person JOIN student ON person_pk=student.person_fk ) AS p1 
 CROSS JOIN (person JOIN student ON person_pk=student.person_fk) AS p2 WHERE 
-((p1.gebdat=p2.gebdat AND p1.familienname=p2.familienname AND p1.svnr='' AND p1.ersatzkennzeichen='') 
-OR ((p1.ersatzkennzeichen=p2.ersatzkennzeichen AND p1.ersatzkennzeichen<>'') OR (p1.svnr=p2.svnr AND p1.svnr<>'')))
-AND (p1.person_pk < p2.person_pk)
-AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400')
+((p1.gebdat=p2.gebdat AND p1.familienname=p2.familienname AND p1.svnr='' AND p1.ersatzkennzeichen='')  
+OR ((p1.ersatzkennzeichen=p2.ersatzkennzeichen AND p1.ersatzkennzeichen<>'') OR (p1.svnr=p2.svnr AND p1.svnr<>''))) 
+AND (p1.person_pk < p2.person_pk) 
+AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400') 
 AND (trim(p1.familienname)<>trim(p2.familienname) OR trim(p1.vorname)<>trim(p2.vorname) OR trim(p1.vornamen)<>trim(p2.vornamen)
 	OR p1.geschlecht<>p2.geschlecht 
 	OR p1.gebdat<>p2.gebdat OR p1.staatsbuergerschaft<> p2.staatsbuergerschaft OR p1.familienstand<>p2.familienstand 
-	OR p1.svnr<>p2.svnr OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.anrede<>p2.anrede 
-	OR p1.anzahlderkinder<>p2.anzahlderkinder OR p1.bismelden<>p2.bismelden OR p1.titel<>p2.titel OR p1.gebnation<>p2.gebnation
-	OR p1.postnomentitel<> p2.postnomentitel
+	OR p1.svnr<>p2.svnr OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.anrede<>p2.anrede OR p1.titel<>p2.titel 
+	OR p1.anzahlderkinder<>p2.anzahlderkinder OR p1.gebnation<>p2.gebnation OR p1.postnomentitel<> p2.postnomentitel 
 	
 	OR ((p1.zgv<>p2.zgv OR p1.zgvdatum<>p2.zgvdatum OR p1.zgvort<>p2.zgvort 
 	OR p1.zgvmagister<>p2.zgvmagister OR p1.zgvmagisterort<>p2.zgvmagisterort OR p1.zgvmagisterdatum<>p2.zgvmagisterdatum 
-	OR p1.punkte<>p2.punkte OR p1.perskz<>p2.perskz OR p1.aufgenommenam<>p2.aufgenommenam 
-	OR p1.beendigungsdatum<>p2.beendigungsdatum OR p1.aufmerksamdurch<>p2.aufmerksamdurch
+	OR p1.punkte<>p2.punkte OR p1.perskz<>p2.perskz OR p1.aufgenommenam<>p2.aufgenommenam  
+	OR p1.beendigungsdatum<>p2.beendigungsdatum OR p1.aufmerksamdurch<>p2.aufmerksamdurch 
 	OR p1.aufnahmeschluessel<>p2.aufnahmeschluessel OR p1.aufnahmeschluessel_fk<>p2.aufnahmeschluessel_fk 
 	OR p1.berufstaetigkeit<>p2.berufstaetigkeit OR p1.aufmerksamdurch_fk<>p2.aufmerksamdurch_fk 
 	OR p1.angetreten<>p2.angetreten)AND p1.studiengang_fk=p2.studiengang_fk))
@@ -255,11 +254,6 @@ if($resultp = pg_query($conn_fas, $qry))
 			$plausi.="Anzahl der Kinder der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->anzahlderkinder1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->anzahlderkinder2."'.\n";
 			$error=true;
 		}
-		/*if ($rowp->uid1<>$rowp->uid2)
-		{
-			$plausi.="UID der Person ".$rowp->familienname1." (stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->uid1."' bei ".$rowp->familienname2." (stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->uid2."'.\n";
-			$error=true;
-		}*/
 		if ($rowp->gebnation1<>$rowp->gebnation2)
 		{
 			$plausi.="Geburtsnation der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->gebnation1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->gebnation2."'.\n";
@@ -280,11 +274,6 @@ if($resultp = pg_query($conn_fas, $qry))
 			if ($rowp->perskz1<>$rowp->perskz2)
 			{
 				$plausi.="Personenkennzeichen der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->perskz1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->perskz2."'.\n";
-				$error=true;
-			}
-			if ($rowp->bismelden1<>$rowp->bismelden2)
-			{
-				$plausi.="Bismelden der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->bismelden1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->bismelden2."'.\n";
 				$error=true;
 			}
 			if ($rowp->zgv1<>$rowp->zgv2)
@@ -419,7 +408,7 @@ AND (trim(p1.familienname)<>trim(p2.familienname) OR trim(p1.vorname)<>trim(p2.v
 	OR p1.geschlecht<>p2.geschlecht 
 	OR p1.gebdat<>p2.gebdat OR p1.staatsbuergerschaft<> p2.staatsbuergerschaft OR p1.familienstand<>p2.familienstand 
 	OR p1.svnr<>p2.svnr OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.anrede<>p2.anrede 
-	OR p1.anzahlderkinder<>p2.anzahlderkinder OR p1.bismelden<>p2.bismelden OR p1.titel<>p2.titel OR p1.gebnation<>p2.gebnation
+	OR p1.anzahlderkinder<>p2.anzahlderkinder OR p1.titel<>p2.titel OR p1.gebnation<>p2.gebnation
 	OR p1.postnomentitel<> p2.postnomentitel
 	
 	OR ((p1.zgv<>p2.zgv OR p1.zgvdatum<>p2.zgvdatum OR p1.zgvort<>p2.zgvort 
@@ -464,7 +453,7 @@ if($result = pg_query($conn_fas, $qry))
 		$gebort=$row->gebort;
 		$gebzeit=''; //bei insert auslassen
 		$foto=''; //bei insert auslassen
-		$anmerkungen=$row->bemerkung;
+		$anmerkungen='';
 		$homepage='';
 		$svnr=$row->svnr;
 		$ersatzkennzeichen=$row->ersatzkennzeichen;
@@ -525,6 +514,7 @@ if($result = pg_query($conn_fas, $qry))
 		$ext_id_pre=$row->person_pk;
 		$anmeldungreihungstest='';
 		$reihungstestangetreten=($row->angetreten=='J'?true:false);
+		$anmerkung=$row->bemerkung;
 		//bismelden		
 
 		//Attribute Student
@@ -1219,7 +1209,7 @@ if($result = pg_query($conn_fas, $qry))
 			{
 				//insert prestudent
 				
-				$qry = 'INSERT INTO public.tbl_prestudent (aufmerksamdurch_kurzbz, person_id, studiengang_kz, berufstaetigkeit_code, zgv_code, zgvort, zgvdatum, zgvmas_code, zgvmaort, zgvmadatum, facheinschlberuf, reihungstest_id, punkte, anmeldungreihungstest, reihungstestangetreten, insertamum, insertvon, updateamum, updatevon, ext_id) VALUES('.
+				$qry = 'INSERT INTO public.tbl_prestudent (aufmerksamdurch_kurzbz, person_id, studiengang_kz, berufstaetigkeit_code, zgv_code, zgvort, zgvdatum, zgvmas_code, zgvmaort, zgvmadatum, facheinschlberuf, reihungstest_id, punkte, anmeldungreihungstest, reihungstestangetreten, anmerkung, insertamum, insertvon, updateamum, updatevon, ext_id) VALUES('.
 					myaddslashes($aufmerksamdurch_kurzbz).', '.
 					myaddslashes($person_id).', '.
 					myaddslashes($studiengang_kz).', '.
@@ -1235,6 +1225,7 @@ if($result = pg_query($conn_fas, $qry))
 					myaddslashes($punkte).', '.
 					myaddslashes($anmeldungreihungstest).', '.
 					($reihungstestangetreten?'true':'false').', '.
+					myaddslashes($anmerkung).', '.
 					"now()".', '.
 					"'SYNC', ".
 					"now()".', '.
@@ -1440,6 +1431,18 @@ if($result = pg_query($conn_fas, $qry))
 								$ausgabe_pre="Angetreten zum Reihungstest: '".($reihungstestangetreten?'true':'false')."'";
 							}
 						}
+						if($row1->anmerkung!=$anmerkung)
+						{
+							$updater=true;
+							if(strlen(trim($ausgabe_pre))>0)
+							{
+								$ausgabe_pre.=", Anmerkung: '".$anmerkung."'";
+							}
+							else
+							{
+								$ausgabe_pre="Anmerkung: '".$anmerkung."'";
+							}
+						}
 						
 						if($updater)
 						{
@@ -1459,13 +1462,14 @@ if($result = pg_query($conn_fas, $qry))
 							       ' punkte='.myaddslashes($punkte).','.
 							       ' anmeldungreihungstest='.myaddslashes($anmeldungreihungstest).','.
 							       ' reihungstestangetreten='.($reihungstestangetreten?'true':'false').','.
+							       ' anmerkung='.myaddslashes($anmerkung).','.
 							       " insertamum=now()".','.
 					        		       ' insertvon='.myaddslashes($insertvon).','.
 					        		       " updateamum=now()".','.
 					        		       " updatevon=".myaddslashes($updatevon).','.
 							       ' ext_id='.myaddslashes($ext_id_pre).
 							       ' WHERE prestudent_id='.myaddslashes($prestudent_id).';';
-							       $ausgabe_pre="Änderungen bei Prestudent ".$person_id.", ".$nachname.": ".$ausgabe_pre."\n";
+							       $ausgabe_pre="Änderungen bei Prestudent mit person_id '".$person_id."', ".$nachname.": ".$ausgabe_pre."\n";
 						}
 					}
 				}
