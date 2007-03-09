@@ -369,6 +369,10 @@ class lehreinheit
 
 		if($new)
 		{
+			if($this->unr=='')
+				$unr="currval('lehre.tbl_lehreinheit_lehreinheit_id_seq')";
+			else 
+				$unr = $this->addslashes($this->unr);
 			//ToDo ID entfernen
 			$qry = 'INSERT INTO lehre.tbl_lehreinheit (lehrveranstaltung_id, studiensemester_kurzbz,
 			                                     lehrfach_id, lehrform_kurzbz, stundenblockung, wochenrythmus,
@@ -384,7 +388,7 @@ class lehreinheit
 					$this->addslashes($this->raumtypalternativ).','.
 					($this->lehre?'true':'false').','.
 					$this->addslashes($this->anmerkung).','.
-					$this->addslashes($this->unr).','.
+					$unr.','.
 					$this->addslashes($this->lvnr).','.
 					$this->addslashes($this->insertamum).','.
 					$this->addslashes($this->insertvon).','.

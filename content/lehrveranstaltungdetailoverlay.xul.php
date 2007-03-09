@@ -27,37 +27,34 @@ header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../vilesci/config.inc.php');
 echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes" ?>';
-echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?>";
+echo "<?xml-stylesheet href=\"".APP_ROOT."content/lehrveranstaltung.css\" type=\"text/css\" ?>";
 
 ?>
 
-<overlay id="LFVTDetailOverlay"
+<overlay id="LehrveranstaltungDetailOverlay"
 	xmlns:html="http://www.w3.org/1999/xhtml"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	>
 <!-- *************************** LEHREINHEIT DETAILS ************************* -->
-<vbox id="lfvt-detail" class="lvaDetail"  style="margin:0px;" >
+<vbox id="lehrveranstaltung-detail" style="margin:0px;" >
 	<popupset>
-		<popup id="lfvt_detail_gruppe_tree_popup">
-			<menuitem label="Entfernen" oncommand="lfvt_LehreinheitGruppeDel();" />
+		<popup id="lehrveranstaltung-detail-gruppe-tree-popup">
+			<menuitem label="Entfernen" oncommand="LeGruppeDel();" />
 		</popup>
 	</popupset>
 	<popupset>
-		<popup id="lfvt_lektor_tree_popup">
-			<menuitem label="Entfernen" oncommand="lfvt_LehreinheitMitarbeiterDel();" />
+		<popup id="lehrveranstaltung-lektor-tree-popup">
+			<menuitem label="Entfernen" oncommand="LeMitarbeiterDel();" />
 		</popup>
 	</popupset>
 	<hbox style="background:#eeeeee;margin:0px;padding:2px">
 		<label value="Details" style="font-size:12pt;font-weight:bold;margin-top:5px;"  flex="1" />
 		<spacer flex="1" />
-		<button id="lfvt_detail_button_save" label="speichern" oncommand="lfvtDetailSave();" disabled="true"/>
+		<button id="lehrveranstaltung-detail-button-save" label="speichern" oncommand="LeDetailSave();" disabled="true"/>
 	</hbox>
-	
-	<checkbox id="lfvt_detail_checkbox_new" hidden="true"/>
-	<textbox id="lfvt_detail_textbox_lehreinheit_id" hidden="true"/>
-	<grid id="gridLFVT" flex="1" datasources="rdf:null"
-	      ref="http://www.technikum-wien.at/tempus/lva/liste"
-		  style="padding:5px;">
+	<!-- Hidden Fields -->
+	<vbox hidden="true">
+		<grid flex="1" style="padding:5px;">
 		<columns  >
 			<column  />
 			<column style="min-width:240px" />
@@ -66,15 +63,35 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 	  	</columns>
 	  	<rows>
 			<row >
+	  			<label value="NEW" />
+				<checkbox id="lehrveranstaltung-detail-checkbox-new" hidden="false"/>
+				<label value="Lehreinheit_id" />
+				<textbox id="lehrveranstaltung-detail-textbox-lehreinheit_id" hidden="false"/>
+			</row>
+			<row >
 	  			<label value="LVNR" />
-	  			<textbox id="lfvt_detail_textbox_lvnr" maxlength="20" disabled="true" />
+	  			<textbox id="lehrveranstaltung-detail-textbox-lvnr" maxlength="20" disabled="true" />
 	
 	  			<label value="UNR" />
-	  	    	<textbox id="lfvt_detail_textbox_unr" disabled="true"/>
+	  	    	<textbox id="lehrveranstaltung-detail-textbox-unr" disabled="true"/>
 			</row>
+		</rows>
+		</grid>
+	</vbox>
+	<!--Details-->
+	<grid flex="1" datasources="rdf:null"
+	      ref="http://www.technikum-wien.at/tempus/lva/liste"
+		  style="padding:5px;">
+		<columns  >
+			<column  />
+			<column style="min-width:240px" />
+			<column />
+			<column style="min-width:240px" />
+	  	</columns>
+	  	<rows>			
 			<row>
 	  			<label value="Sprache" />
-				<menulist id="lfvt_detail_menulist_sprache" 
+				<menulist id="lehrveranstaltung-detail-menulist-sprache" 
 				          datasources="<?php echo APP_ROOT; ?>rdf/sprache.rdf.php" flex="1"
 						  ref="http://www.technikum-wien.at/sprachen/liste" disabled="true">
 					<template>
@@ -86,11 +103,11 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 					</template>
 				</menulist>
 	  			<label value="Lehrveranstaltung" />
-	  			<textbox id="lfvt_detail_textbox_lehrveranstaltung" maxlength="20" disabled="true"/>
+	  			<textbox id="lehrveranstaltung-detail-textbox-lehrveranstaltung" maxlength="20" disabled="true"/>
 			</row>
 			<row>
 	  			<label value="Lehrfach" />
-				<menulist id="lfvt_detail_menulist_lehrfach" disabled="true"
+				<menulist id="lehrveranstaltung-detail-menulist-lehrfach" disabled="true"
 				          datasources="rdf:null" flex="1"
 				          ref="http://www.technikum-wien.at/lehrfach/liste"  >
 					<template>
@@ -103,7 +120,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 				</menulist>
 	
 				<label value="Lehrform" />
-				<menulist id="lfvt_detail_menulist_lehrform" disabled="true"
+				<menulist id="lehrveranstaltung-detail-menulist-lehrform" disabled="true"
 				          datasources="<?php echo APP_ROOT ?>rdf/lehrform.rdf.php" flex="1"
 			              ref="http://www.technikum-wien.at/lehrform/liste" >
 					<template>
@@ -117,7 +134,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 	  	  	</row>
 			<row>
 	  	    	<label value="Raumtyp" />
-	  			<menulist id="lfvt_detail_menulist_raumtyp" disabled="true"
+	  			<menulist id="lehrveranstaltung-detail-menulist-raumtyp" disabled="true"
 	  			          datasources="<?php echo APP_ROOT ?>rdf/raumtyp.rdf.php" flex="1"
 			              ref="http://www.technikum-wien.at/raumtyp/liste" >
 					<template>
@@ -130,7 +147,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 				</menulist>
 	
 	  			<label value="Raumtyp alternativ" />
-	  			<menulist id="lfvt_detail_menulist_raumtypalternativ" disabled="true"
+	  			<menulist id="lehrveranstaltung-detail-menulist-raumtypalternativ" disabled="true"
 	  					  datasources="<?php echo APP_ROOT ?>rdf/raumtyp.rdf.php" flex="1"
 			              ref="http://www.technikum-wien.at/raumtyp/liste" >
 					<template>
@@ -144,22 +161,22 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 	  		</row>
 			<row>
 	   	   		<label value="Lehre" />
-				<checkbox id="lfvt_detail_checkbox_lehre" disabled="true"/>
+				<checkbox id="lehrveranstaltung-detail-checkbox-lehre" disabled="true"/>
 	
 				<label value="Stundenblockung" />
-				<textbox id="lfvt_detail_textbox_stundenblockung" disabled="true" />
+				<textbox id="lehrveranstaltung-detail-textbox-stundenblockung" disabled="true" />
 			</row>
 			<row>
 				<label value="Wochenrythmus" />
-				<textbox id="lfvt_detail_textbox_wochenrythmus" disabled="true"/>
+				<textbox id="lehrveranstaltung-detail-textbox-wochenrythmus" disabled="true"/>
 	
 				<label value="Start KW" />
-				<textbox id="lfvt_detail_textbox_startkw" disabled="true"/>
+				<textbox id="lehrveranstaltung-detail-textbox-startkw" disabled="true"/>
 			</row>
 			<row>
 	  			<label value="Studiensemester" />
 	  			<vbox>							
-					<menulist id="lfvt_detail_menulist_studiensemester" disabled="true"
+					<menulist id="lehrveranstaltung-detail-menulist-studiensemester" disabled="true"
 							  datasources="<?php echo APP_ROOT ?>rdf/studiensemester.rdf.php" flex="0"
 					          ref="http://www.technikum-wien.at/studiensemester/liste" >
 						<template>
@@ -173,30 +190,30 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 					<spacer flex="1"/>
 				</vbox>
 				<label value="Anmerkung" />
-	  			<textbox id="lfvt_detail_textbox_anmerkung" rows="2" multiline="true" disabled="true"/>
+	  			<textbox id="lehrveranstaltung-detail-textbox-anmerkung" rows="2" multiline="true" disabled="true"/>
 			</row>
 			<row>					
 				<!-- ************* GRUPPEN ************** -->
 				<label value="Gruppen" />
 				<vbox height="150" flex="1">
 					<hbox flex="1">
-						<tree id="lfvt_detail_tree_lehreinheitgruppe" seltype="single" hidecolumnpicker="false" flex="1" disabled="true"
+						<tree id="lehrveranstaltung-detail-tree-lehreinheitgruppe" seltype="single" hidecolumnpicker="false" flex="1" disabled="true"
 							  datasources="rdf:null"
 							  ref="http://www.technikum-wien.at/lehreinheitgruppe/liste"
 							  flags="dont-build-content"
 							  style="border: 1px solid black;"
-	        				  ondragdrop="nsDragAndDrop.drop(event,lfvt_grp_Observer)"
-							  ondragover="nsDragAndDrop.dragOver(event,lfvt_grp_Observer)"
-			  				  ondragenter="nsDragAndDrop.dragEnter(event,lfvt_grp_Observer)"
-							  ondragexit="nsDragAndDrop.dragExit(event,lfvt_grp_Observer)"
-							  context="lfvt_detail_gruppe_tree_popup"
+	        				  ondragdrop="nsDragAndDrop.drop(event,LeLvbgrpDDObserver)"
+							  ondragover="nsDragAndDrop.dragOver(event,LeLvbgrpDDObserver)"
+			  				  ondragenter="nsDragAndDrop.dragEnter(event,LeLvbgrpDDObserver)"
+							  ondragexit="nsDragAndDrop.dragExit(event,LeLvbgrpDDObserver)"
+							  context="lehrveranstaltung-detail-gruppe-tree-popup"
 						>
 							<treecols>
-								<treecol id="lfvt_detail_tree_lehreinheitgruppe-col-bezeichnung" label="Bezeichnung" flex="2" hidden="false"
+								<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-bezeichnung" label="Bezeichnung" flex="2" hidden="false"
 										 class="sortDirectionIndicator"
 										 sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#bezeichnung" />
 								<splitter class="tree-splitter"/>
-								<treecol id="lfvt_detail_tree_lehreinheitgruppe-col-lehreinheitgruppe_id" label="ID" flex="2" hidden="true"
+								<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-lehreinheitgruppe_id" label="ID" flex="2" hidden="true"
 										 class="sortDirectionIndicator"
 										 sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#lehreinheitgruppe_id" />
 							</treecols>
@@ -222,35 +239,35 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 </vbox>
 
 <!-- ************************** LEKTORZUTEILUNG ********************** -->
-<vbox id="lfvt-lektorzuteilung">								
+<vbox id="lehrveranstaltung-lektorzuteilung">								
 	<hbox flex="1" style="padding: 10px">
 		<vbox width="250">
 			<hbox flex="1">
-				<tree id="lfvt_detail_tree_lehreinheitmitarbeiter" seltype="single" hidecolumnpicker="false" flex="1"
+				<tree id="lehrveranstaltung-detail-tree-lehreinheitmitarbeiter" seltype="single" hidecolumnpicker="false" flex="1"
 						datasources="rdf:null"
 						ref="http://www.technikum-wien.at/lehreinheitmitarbeiter/liste"
-						onselect="lfvt_LehreinheitMitarbeiterAuswahl();" flags="dont-build-content"
+						onselect="LeMitarbeiterAuswahl();" flags="dont-build-content"
 						style="border: 1px solid black;"
-						ondragdrop="nsDragAndDrop.drop(event,lfvt_lektor_Observer)"
-						ondragover="nsDragAndDrop.dragOver(event,lfvt_lektor_Observer)"
-						ondragenter="nsDragAndDrop.dragEnter(event,lfvt_lektor_Observer)"
-						ondragexit="nsDragAndDrop.dragExit(event,lfvt_lektor_Observer)"
-						context="lfvt_lektor_tree_popup"
+						ondragdrop="nsDragAndDrop.drop(event,LeLektorDDObserver)"
+						ondragover="nsDragAndDrop.dragOver(event,LeLektorDDObserver)"
+						ondragenter="nsDragAndDrop.dragEnter(event,LeLektorDDObserver)"
+						ondragexit="nsDragAndDrop.dragExit(event,LeLektorDDObserver)"
+						context="lehrveranstaltung-lektor-tree-popup"
 				>
 					<treecols>
-						<treecol id="lfvt_detail_tree_lehreinheitmitarbeiter-col-nachname" label="Nachname" flex="2" hidden="false"
+						<treecol id="lehrveranstaltung-lehreinheitmitarbeiter-treecol-nachname" label="Nachname" flex="2" hidden="false"
 					    	class="sortDirectionIndicator"
 					    	sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#nachname" onclick="LehreinheitenTreeSort()"/>
 					    <splitter class="tree-splitter"/>
-						<treecol id="lfvt_detail_tree_lehreinheitmitarbeiter-col-vorname" label="Vorname" flex="2" hidden="false"
+						<treecol id="lehrveranstaltung-lehreinheitmitarbeiter-treecol-vorname" label="Vorname" flex="2" hidden="false"
 					    	class="sortDirectionIndicator"
 					    	sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#vorname" onclick="LehreinheitenTreeSort()"/>
 					    <splitter class="tree-splitter"/>		
-					    <treecol id="lfvt_detail_tree_lehreinheitmitarbeiter-col-mitarbeiter_uid" label="UID" flex="2" hidden="true"
+					    <treecol id="lehrveranstaltung-lehreinheitmitarbeiter-treecol-mitarbeiter_uid" label="UID" flex="2" hidden="true"
 					    	class="sortDirectionIndicator"
 					    	sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#mitarbeiter_uid" onclick="LehreinheitenTreeSort()"/>
 					    <splitter class="tree-splitter"/>	
-					    <treecol id="lfvt_detail_tree_lehreinheitmitarbeiter-col-lehreinheit_id" label="LehreinheitID" flex="2" hidden="true"
+					    <treecol id="lehrveranstaltung-lehreinheitmitarbeiter-treecol-lehreinheit_id" label="LehreinheitID" flex="2" hidden="true"
 					    	class="sortDirectionIndicator"
 					    	sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#lehreinheit_id" onclick="LehreinheitenTreeSort()"/>
 					    <splitter class="tree-splitter"/>					
@@ -279,8 +296,8 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 		<groupbox>
 			<caption label="Lektorendaten" />
 			<vbox flex="1">
-			<textbox id="lfvt_lehreinheitmitarbeiter_textbox_lehreinheit_id" hidden="true"/>
-			<textbox id="lfvt_lehreinheitmitarbeiter_textbox_mitarbeiter_uid" hidden="true"/>
+			<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-lehreinheit_id" hidden="true"/>
+			<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-mitarbeiter_uid" hidden="true"/>
 			<grid align="end" flex="1"
 			      flags="dont-build-content"
 				  enableColumnDrag="true">
@@ -293,8 +310,8 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 
 				<rows>
 					<row>
-						<label align="end" control="lfvt_lehreinheitmitarbeiter_menulist_lehrfunktion_kurzbz" value="Lehrfunktion:"/>
-						<menulist id="lfvt_lehreinheitmitarbeiter_menulist_lehrfunktion_kurzbz" disabled="true" oncommand="lfvt_LehreinheitMitarbeiterValueChanged();"
+						<label align="end" control="lehrveranstaltung-lehreinheitmitarbeiter-menulist-lehrfunktion_kurzbz" value="Lehrfunktion:"/>
+						<menulist id="lehrveranstaltung-lehreinheitmitarbeiter-menulist-lehrfunktion_kurzbz" disabled="true" oncommand="LeMitarbeiterValueChanged();"
 		    		              datasources="<?php echo APP_ROOT; ?>rdf/lehrfunktion.rdf.php"
 				                  ref="http://www.technikum-wien.at/lehrfunktion/liste" flex="1">
 					         <template>
@@ -304,8 +321,8 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 					            </menupopup>
 					         </template>
 				   		 </menulist>
-				   		 <label align="end" control="lfvt_lehreinheitmitarbeiter_menulist_lektor" value="Lektor:"/>
-						 <menulist id="lfvt_lehreinheitmitarbeiter_menulist_lektor" disabled="true" oncommand="lfvt_LehreinheitMitarbeiterValueChanged();"
+				   		 <label align="end" control="lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor" value="Lektor:"/>
+						 <menulist id="lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor" disabled="true" oncommand="LeMitarbeiterValueChanged();"
 	    		                   datasources="<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php"
 			                       ref="http://www.technikum-wien.at/mitarbeiter/alle" flex="1">
 				         <template>
@@ -317,28 +334,28 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 			   		 	</menulist>
 					</row>											
 			    	<row>
-    					<label control="lfvt_lehreinheitmitarbeiter_textbox_semesterstunden" value="Semesterstunden: "/>
-    					<textbox id="lfvt_lehreinheitmitarbeiter_textbox_semesterstunden" disabled="true" maxlength="3" flex="1" oninput="lfvt_LehreinheitMitarbeiterValueChanged();"/>
-    					<label control="lfvt_lehreinheitmitarbeiter_textbox_planstunden" value="Planstunden: "/>
-    					<textbox id="lfvt_lehreinheitmitarbeiter_textbox_planstunden" disabled="true" maxlength="3" flex="1" oninput="lfvt_LehreinheitMitarbeiterValueChanged();"/>
+    					<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden" value="Semesterstunden: "/>
+    					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden" disabled="true" maxlength="3" flex="1" oninput="LeMitarbeiterValueChanged();"/>
+    					<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-planstunden" value="Planstunden: "/>
+    					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-planstunden" disabled="true" maxlength="3" flex="1" oninput="LeMitarbeiterValueChanged();"/>
     				</row>
 			    	<row>
-			    		<label control="lfvt_lehreinheitmitarbeiter_textbox_stundensatz" value="Stundensatz: "/>
-    					<textbox id="lfvt_lehreinheitmitarbeiter_textbox_stundensatz" disabled="true" maxlength="6" flex="1" oninput="lfvt_LehreinheitMitarbeiterValueChanged();"/>
-    					<label control="lfvt_lehreinheitmitarbeiter_textbox_faktor" value="Faktor: "/>
-    					<textbox id="lfvt_lehreinheitmitarbeiter_textbox_faktor" disabled="true" maxlength="3" flex="1" oninput="lfvt_LehreinheitMitarbeiterValueChanged();"/>
+			    		<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz" value="Stundensatz: "/>
+    					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz" disabled="true" maxlength="6" flex="1" oninput="LeMitarbeiterValueChanged();"/>
+    					<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-faktor" value="Faktor: "/>
+    					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-faktor" disabled="true" maxlength="3" flex="1" oninput="LeMitarbeiterValueChanged();"/>
 					</row>
 					<row>
-			    		<label control="lfvt_lehreinheitmitarbeiter_textbox_anmerkung" value="Anmerkung: "/>
-    					<textbox id="lfvt_lehreinheitmitarbeiter_textbox_anmerkung" disabled="true" maxlength="256" flex="1" oninput="lfvt_LehreinheitMitarbeiterValueChanged();"/>
-    					<label control="lfvt_lehreinheitmitarbeiter_checkbox_bismelden" value="BIS-Melden: "/>
-    					<checkbox id="lfvt_lehreinheitmitarbeiter_checkbox_bismelden" disabled="true" flex="1" oninput="lfvt_LehreinheitMitarbeiterValueChanged();"/>
+			    		<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-anmerkung" value="Anmerkung: "/>
+    					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-anmerkung" disabled="true" maxlength="256" flex="1" oninput="LeMitarbeiterValueChanged();"/>
+    					<label control="lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden" value="BIS-Melden: "/>
+    					<checkbox id="lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden" disabled="true" flex="1" oninput="LeMitarbeiterValueChanged();"/>
 					</row>
     			</rows>
     			</grid>
     			<hbox flex="1">
     				<spacer flex="1" />
-					<button label="Speichern" disabled="true" id="lfvt_lehreinheitmitarbeiter_save" oncommand="lfvt_LehreinheitMitarbeiterSave();"/>
+					<button label="Speichern" disabled="true" id="lehrveranstaltung-lehreinheitmitarbeiter-button-save" oncommand="LeMitarbeiterSave();"/>
 				</hbox>
 			</vbox>
 		</groupbox>

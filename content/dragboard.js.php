@@ -46,7 +46,7 @@ var lvaObserver=
 */
 
 /***** Drag Observer fuer Gruppen *****/
-var lvbgrpObserver=
+var lvbgrpDDObserver=
 {
 	onDragStart: function (evt,transferData,action)
 	{
@@ -57,7 +57,11 @@ var lvbgrpObserver=
 
 	    //Index der Quell-Row ermitteln
 	    tree.treeBoxObject.getCellAt(evt.pageX, evt.pageY, row, col, child)
-
+ 		
+	    //Beim Scrollen soll kein DnD gemacht werden
+	    if(col.value==null)
+	    	return false;
+	    	
 	    //Daten ermitteln
 	    col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
 		stg_kz=tree.view.getCellText(row.value,col);
@@ -89,7 +93,7 @@ var LeLvbgrpDDObserver=
 	getSupportedFlavours : function ()
 	{
   	  	var flavours = new FlavourSet();
-  	  	flavours.appendFlavour("gruppe");
+  	  	flavours.appendFlavour("application/tempus-lvbgruppe");
   	  	return flavours;
   	},
   	onDragEnter: function (evt,flavour,session)
@@ -117,7 +121,7 @@ var LeLvbgrpDDObserver=
 
 	    var ses = ds.getCurrentSession()
 	    var sourceNode = ses.sourceNode
-	    var lehreinheit_id = document.getElementById('lfvt_detail_textbox_lehreinheit_id').value;
+	    var lehreinheit_id = document.getElementById('lehrveranstaltung-detail-textbox-lehreinheit_id').value;
 	    var row = { }
 	    var col = { }
 	    var child = { }
@@ -135,8 +139,8 @@ var LeLvbgrpDDObserver=
 	    var gruppe = arr[4];
 	    //alert("stg: "+stg_kz+" sem: "+sem+" ver: "+ver+" grp: "+grp+" gruppe: "+gruppe+" TO Lehreinheit:"+lehreinheit_id);
 
-	    var req = new phpRequest('lfvtCUD.php','','');
-		neu = document.getElementById('lfvt_detail_checkbox_new').checked;
+	    var req = new phpRequest('lehrveranstaltungDBDML.php','','');
+		neu = document.getElementById('lehrveranstaltung-detail-checkbox-new').checked;
 
 		req.add('type','lehreinheit_gruppe_add');
 
@@ -155,13 +159,13 @@ var LeLvbgrpDDObserver=
 		else
 		{
 			//GruppenTree Refreshen
-			lfvt_detail_gruppe_treerefresh();
+			LeDetailGruppeTreeRefresh();
 		}
   	}
 };
 
 /***** Drag Observer fuer Lektoren *****/
-var tree_lektor_drag_Observer=
+var mitarbeiterDDObserver=
 {
 	onDragStart: function (evt,transferData,action)
 	{
@@ -173,13 +177,17 @@ var tree_lektor_drag_Observer=
 	    //Index der Quell-Row ermitteln
 	    tree.treeBoxObject.getCellAt(evt.pageX, evt.pageY, row, col, child)
 
+	    //Beim Scrollen soll kein DnD gemacht werden
+	    if(col.value==null)
+	    	return false;
+	    
 	    //Daten ermitteln
 	    col = tree.columns ? tree.columns["uid"] : "uid";
 		uid=tree.view.getCellText(row.value,col);
-
+			
 		var paramList= uid;
 		transferData.data=new TransferData();
-		transferData.data.addDataForFlavour("mitarbeiter",paramList);
+		transferData.data.addDataForFlavour("application/tempus-mitarbeiter",paramList);
   	}
 };
 
@@ -188,12 +196,12 @@ var tree_lektor_drag_Observer=
 // * Bei OnDrop eines mitarbeiters wird dieser der
 // * Lehreinheit zugeordnet
 // ****
-var lfvt_lektor_Observer=
+var LeLektorDDObserver=
 {
 	getSupportedFlavours : function ()
 	{
   	  	var flavours = new FlavourSet();
-  	  	flavours.appendFlavour("mitarbeiter");
+  	  	flavours.appendFlavour("application/tempus-mitarbeiter");
   	  	return flavours;
   	},
   	onDragEnter: function (evt,flavour,session)
@@ -222,7 +230,7 @@ var lfvt_lektor_Observer=
 
 	    var ses = ds.getCurrentSession()
 	    var sourceNode = ses.sourceNode
-	    var lehreinheit_id = document.getElementById('lfvt_detail_textbox_lehreinheit_id').value;
+	    var lehreinheit_id = document.getElementById('lehrveranstaltung-detail-textbox-lehreinheit_id').value;
 	    var row = { }
 	    var col = { }
 	    var child = { }
@@ -233,8 +241,8 @@ var lfvt_lektor_Observer=
 	    uid=dropdata.data;
 	    //alert("uid: "+uid);
 
-	    var req = new phpRequest('lfvtCUD.php','','');
-		neu = document.getElementById('lfvt_detail_checkbox_new').checked;
+	    var req = new phpRequest('lehrveranstaltungDBDML.php','','');
+		neu = document.getElementById('lehrveranstaltung-detail-checkbox-new').checked;
 
 		req.add('type','lehreinheit_mitarbeiter_add');
 
@@ -257,7 +265,7 @@ var lfvt_lektor_Observer=
 		else
 		{
 			//LektorTree Refreshen
-			lfvt_lektor_treerefresh();
+			LeLektorTreeRefresh();
 		}
   	}
 };

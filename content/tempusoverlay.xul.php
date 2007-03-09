@@ -5,7 +5,7 @@ echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
 include('../vilesci/config.inc.php');
 
 echo '<?xul-overlay href="'.APP_ROOT.'content/studentenoverlay.xul.php"?>';
-echo '<?xul-overlay href="'.APP_ROOT.'content/lfvtoverlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/lehrveranstaltungoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-week-overlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 /*echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
@@ -28,7 +28,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 <tree id="tree-verband" onselect="onVerbandSelect();"
 	seltype="single" hidecolumnpicker="false" flex="1" 
 	enableColumnDrag="true"	
-    ondraggesture="nsDragAndDrop.startDrag(event,grpObserver);" 
+    ondraggesture="nsDragAndDrop.startDrag(event,lvbgrpDDObserver);" 
 	datasources="../rdf/lehrverbandsgruppe.rdf.php" ref="http://www.technikum-wien.at/lehrverbandsgruppe/alle-verbaende"
 	>
 	<treecols>
@@ -101,7 +101,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 <tree id="tree-lektor" onselect="onLektorSelect();"
 	seltype="single" hidecolumnpicker="false" flex="1"
 	enableColumnDrag="true"	
-    ondraggesture="nsDragAndDrop.startDrag(event,tree_lektor_drag_Observer);" 
+    ondraggesture="nsDragAndDrop.startDrag(event,mitarbeiterDDObserver);" 
 	datasources="../rdf/mitarbeiter.rdf.php" ref="http://www.technikum-wien.at/mitarbeiter/alle">
 	<treecols>
 	    <treecol id="kurzbz" label="Kuerzel" flex="2" primary="true" />
@@ -148,7 +148,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 			<!--  Studenten  -->
 			<vbox id="studentenEditor" />
 			<!-- Lehrfachverteilung -->
-            <vbox id="lfvtEditor" />
+            <vbox id="LehrveranstaltungEditor" />
 		</tabpanels>
 	</tabbox>
 </vbox>

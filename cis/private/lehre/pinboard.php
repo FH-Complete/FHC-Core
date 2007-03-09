@@ -366,8 +366,9 @@
 				  <td nowrap>
 				  <?php
 				    $path = '../../../documents/'.strtolower($short).'/lehrziele';
+				    
 					if(!$dest_dir = @dir($path))
-					{						
+					{	
 						if(!is_dir($path))
 						{
 							if(!is_dir('../../../documents/'.strtolower($short)))
@@ -375,20 +376,20 @@
 							exec('mkdir -m 775 "../../../documents/'.strtolower($short).'/lehrziele"');
 							exec('sudo chgrp teacher ../../../documents/'.strtolower($short).'/lehrziele');
 						}
+					}
 					
-						$dir_empty = true;
-						$dest_dir = @dir($path);
-						while($entry = $dest_dir->read())
+					$dir_empty = true;			
+					$dest_dir = @dir($path);
+					while($entry = $dest_dir->read())
+					{
+						if($entry != "." && $entry != "..")
 						{
-							if($entry != "." && $entry != "..")
-							{
-								$dir_empty = false;
-								
-								break;
-							}
+							$dir_empty = false;
+							
+							break;
 						}
 					}
-											
+										
 					if(isset($dir_empty) && $dir_empty == false)
 					{
 						echo '<img src="../../../skin/images/seperator.gif">&nbsp;<a href="'.$dest_dir->path.'/" class="Item" target="_blank">Lehrziele</a>';
