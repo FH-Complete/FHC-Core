@@ -194,7 +194,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lehrveranstaltung.css\" type=\
 			</row>
 			<row>					
 				<!-- ************* GRUPPEN ************** -->
-				<label value="Gruppen" />
+				<label id="lehrveranstaltung-detail-label-lehreinheitgruppe" value="Gruppen" />
 				<vbox height="150" flex="1">
 					<hbox flex="1">
 						<tree id="lehrveranstaltung-detail-tree-lehreinheitgruppe" seltype="single" hidecolumnpicker="false" flex="1" disabled="true"

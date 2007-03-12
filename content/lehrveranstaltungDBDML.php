@@ -42,171 +42,279 @@ require_once('../include/benutzerberechtigung.class.php');
 
 $user = get_uid();
 
+error_reporting(0);
+
 // Datenbank Verbindung
 if (!$conn = @pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
+
+$return = false;
+$errormsg = 'Unknown Error';
+$data = '';
+$error = false;
 
 //Berechtigungen laden
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
 if(!$rechte->isBerechtigt('admin'))
-	die('Keine Berechtigung');
-	
-$leDAO=new lehreinheit($conn);
+{
+	$return = false;
+	$errormsg = 'Keine Berechtigung';
+	$data = '';
+	$error = true;
+}
 
-if(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_add')
+if(!$error)
 {
-	//Lehreinheitmitarbeiter Zuteilung
-	//wenn do=update dann wird aktualisiert
-	//wenn do=create wird ein neuer datensatz angelegt
-	
-	if (!isset($_POST['do']))
-		die('Fehlerhafte Parameteruebergabe');
+	if(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_add')
+	{
+		//Lehreinheitmitarbeiter Zuteilung
+		//wenn do=update dann wird aktualisiert
+		//wenn do=create wird ein neuer datensatz angelegt
+		
+		if (!isset($_POST['do']))
+		{
+			$return = false;
+			$errormsg = 'Fehlerhafte Parameteruebergabe';
+			$data = '';
+			$error = true;
+		}
+		
+		if(!$error)
+		{
+			$lem = new lehreinheitmitarbeiter($conn);
 			
-	$lem = new lehreinheitmitarbeiter($conn);
-	
-	if($_POST['do']=='update')
-		if(!$lem->load($_POST['lehreinheit_id'],$_POST['mitarbeiter_uid_old']))
-			die('Fehler beim laden:'.$lem->errormsg);
-	
-	$lem->lehreinheit_id = $_POST['lehreinheit_id'];
-	$lem->lehrfunktion_kurzbz = $_POST['lehrfunktion_kurzbz'];
-	$lem->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
-	if($_POST['do']=='update')
-		$lem->mitarbeiter_uid_old = $_POST['mitarbeiter_uid_old'];
-	$lem->semesterstunden = $_POST['semesterstunden'];
-	$lem->planstunden = $_POST['planstunden'];
-	$lem->stundensatz = $_POST['stundensatz'];
-	$lem->faktor = $_POST['faktor'];
-	$lem->anmerkung = $_POST['anmerkung'];
-	$lem->bismelden = $_POST['bismelden'];
-	$lem->updateamum = date('Y-m-d H:i:s');
-	$lem->updatevon = $user;
-	
-	if($_POST['do']=='update')
-	{
-		$lem->new=false;
+			if($_POST['do']=='update')
+			{
+				if(!$lem->load($_POST['lehreinheit_id'],$_POST['mitarbeiter_uid_old']))
+				{
+					$return = false;
+					$errormsg = 'Fehler beim laden:'.$lem->errormsg;
+					$error = true;
+				}
+			}
+			
+			if(!$error)
+			{
+				$lem->lehreinheit_id = $_POST['lehreinheit_id'];
+				$lem->lehrfunktion_kurzbz = $_POST['lehrfunktion_kurzbz'];
+				$lem->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
+				if($_POST['do']=='update')
+					$lem->mitarbeiter_uid_old = $_POST['mitarbeiter_uid_old'];
+				$lem->semesterstunden = $_POST['semesterstunden'];
+				$lem->planstunden = $_POST['planstunden'];
+				$lem->stundensatz = $_POST['stundensatz'];
+				$lem->faktor = $_POST['faktor'];
+				$lem->anmerkung = $_POST['anmerkung'];
+				$lem->bismelden = $_POST['bismelden'];
+				$lem->updateamum = date('Y-m-d H:i:s');
+				$lem->updatevon = $user;
+				
+				if($_POST['do']=='update')
+				{
+					$lem->new=false;
+				}
+				elseif($_POST['do']=='create')
+				{
+					$lem->new=true;
+					$lem->updateamum = date('Y-m-d H:i:s');
+					$lem->updatevon = $user;
+					$lem->insertamum = date('Y-m-d H:i:s');
+					$lem->insertvon = $user;
+				}
+				else
+				{
+					$return = false;
+					$errormsg = 'Fehlerhafte Parameteruebergabe';
+					$error = true;
+				}
+					
+				if(!$error)
+				{
+					if($lem->save())
+					{
+						$return = true;
+						$error=false;
+					}					
+					else 
+					{
+						$return = false;
+						$errormsg  = $lem->errormsg;
+						$error = true;
+					}
+				}
+			}
+		}
 	}
-	elseif($_POST['do']=='create')
+	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_del')
 	{
-		$lem->new=true;
-		$lem->updateamum = date('Y-m-d H:i:s');
-		$lem->updatevon = $user;
-		$lem->insertamum = date('Y-m-d H:i:s');
-		$lem->insertvon = $user;
-	}
-	else 
-		die('Fehlerhafte Parameteruebergabe');
-	
-	if($lem->save())
-		echo 'ok';
-	else 
-		echo $lem->errormsg;		
-}
-elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_del')
-{
-	//Lehreinheitmitarbeiterzuteilung loeschen
-	if(isset($_POST['lehreinheit_id']) && is_numeric($_POST['lehreinheit_id']) && isset($_POST['mitarbeiter_uid']))
-	{
-		$leg = new lehreinheitmitarbeiter($conn);
-		if($leg->delete($_POST['lehreinheit_id'], $_POST['mitarbeiter_uid']))
-			echo 'ok';
-		else
-			echo $leg->errormsg;
-	}
-}
-elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_gruppe_del')
-{
-	//Lehreinheitgruppezuteilung loeschen
-	if(isset($_POST['lehreinheitgruppe_id']) && is_numeric($_POST['lehreinheitgruppe_id']))
-	{
-		$leg = new lehreinheitgruppe($conn);
-		if($leg->delete($_POST['lehreinheitgruppe_id']))
-			echo 'ok';
-		else
-			echo $leg->errormsg;
-	}
-}
-elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_gruppe_add')
-{
-	//Lehreinheitgruppezuteilung anlegen
-	if(isset($_POST['lehreinheit_id']) && is_numeric($_POST['lehreinheit_id']))
-	{
-		$leg = new lehreinheitgruppe($conn);
-		$leg->lehreinheit_id = $_POST['lehreinheit_id'];
-		$leg->studiengang_kz = $_POST['studiengang_kz'];
-		$leg->semester = $_POST['semester'];
-		$leg->verband = $_POST['verband'];
-		$leg->gruppe = $_POST['gruppe'];
-		$leg->gruppe_kurzbz = $_POST['gruppe_kurzbz'];
-		
-		if($leg->save(true))
+		//Lehreinheitmitarbeiterzuteilung loeschen
+		if(isset($_POST['lehreinheit_id']) && is_numeric($_POST['lehreinheit_id']) && isset($_POST['mitarbeiter_uid']))
 		{
-			echo 'ok';
+			$leg = new lehreinheitmitarbeiter($conn);
+			if($leg->delete($_POST['lehreinheit_id'], $_POST['mitarbeiter_uid']))
+			{
+				$return = true;
+			}
+			else
+			{
+				$return = false;
+				$errormsg = $leg->errormsg;
+			}
 		}
 		else 
-			echo $leg->errormsg;
-	}
-	else 
-		echo "Lehreinheit_id ist ungueltig";
-}
-elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit')
-{
-	//Lehreinheit anlegen/aktualisieren
-	if ($_POST['do']=='create' || ($_POST['do']=='update')) 
-	{	
-		if($_POST['do']=='update')
-			if(!$leDAO->load($_POST['lehreinheit_id']))
-				die('Fehler beim laden');
-	
-		$leDAO->lehrveranstaltung_id=$_POST['lehrveranstaltung'];
-		$leDAO->studiensemester_kurzbz=$_POST['studiensemester_kurzbz'];
-		$leDAO->lehrfach_id=$_POST['lehrfach_id'];
-		$leDAO->lehrform_kurzbz=$_POST['lehrform'];
-		$leDAO->stundenblockung=$_POST['stundenblockung'];
-		$leDAO->wochenrythmus=$_POST['wochenrythmus'];
-		if (isset($_POST['start_kw'])) $leDAO->start_kw=$_POST['start_kw'];
-		$leDAO->raumtyp=$_POST['raumtyp'];
-		$leDAO->raumtypalternativ=$_POST['raumtypalternativ'];
-		$leDAO->sprache=$_POST['sprache'];
-		if (isset($_POST['lehre'])) $leDAO->lehre=($_POST['lehre']=='true'?true:false);
-		if (isset($_POST['anmerkung'])) $leDAO->anmerkung=$_POST['anmerkung'];
-		$leDAO->lvnr=(isset($_POST['lvnr'])?$_POST['lvnr']:'');
-		$leDAO->unr=(isset($_POST['unr'])?$_POST['unr']:'');
-		$leDAO->updateamum=date('Y-m-d H:i:s');
-		$leDAO->updatevon=$user;
-		
-		if ($_POST['do']=='create') 
 		{
-			// LE neu anlegen
-			$leDAO->new=true;
-			$leDAO->insertamum=date('Y-m-d H:i:s');
-			$leDAO->insertvon=$user;
-			if ($leDAO->save()) 
-				echo 'ok';
+			$return = false;
+			$errormsg = 'Fehler beim loeschen der Zuordnung';
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_gruppe_del')
+	{
+		//Lehreinheitgruppezuteilung loeschen
+		if(isset($_POST['lehreinheitgruppe_id']) && is_numeric($_POST['lehreinheitgruppe_id']))
+		{
+			$leg = new lehreinheitgruppe($conn);
+			if($leg->delete($_POST['lehreinheitgruppe_id']))
+			{
+				$return = true;
+			}
+			else
+			{
+				$return = false;
+				$errormsg = $leg->errormsg;
+			}
+		}
+		else 
+		{
+			$return = false;
+			$errormsg = 'Fehler beim loeschen der Zuordnung';
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_gruppe_add')
+	{
+		//Lehreinheitgruppezuteilung anlegen
+		if(isset($_POST['lehreinheit_id']) && is_numeric($_POST['lehreinheit_id']))
+		{
+			$leg = new lehreinheitgruppe($conn);
+			$leg->lehreinheit_id = $_POST['lehreinheit_id'];
+			$leg->studiengang_kz = $_POST['studiengang_kz'];
+			$leg->semester = $_POST['semester'];
+			$leg->verband = $_POST['verband'];
+			$leg->gruppe = $_POST['gruppe'];
+			$leg->gruppe_kurzbz = $_POST['gruppe_kurzbz'];
+			
+			if($leg->save(true))
+			{
+				$return = true;
+			}
 			else 
-				echo $leDAO->errormsg;
+			{
+				$return = false;
+				$errormsg = $leg->errormsg;
+			}
+		}
+		else 
+		{
+			$return = false;
+			$errormsg = 'Bitte zuerst eine Lehreinheit auswaehlen';
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit')
+	{
+		//Lehreinheit anlegen/aktualisieren
+		$leDAO=new lehreinheit($conn);
+		if ($_POST['do']=='create' || ($_POST['do']=='update')) 
+		{	
+			if($_POST['do']=='update')
+			{
+				if(!$leDAO->load($_POST['lehreinheit_id']))
+				{
+					$return = false;
+					$error = true;
+					$errormsg = 'Fehler beim laden der lehreinheit';
+				}
+			}
+		
+			if(!$error)
+			{
+				$leDAO->lehrveranstaltung_id=$_POST['lehrveranstaltung'];
+				$leDAO->studiensemester_kurzbz=$_POST['studiensemester_kurzbz'];
+				$leDAO->lehrfach_id=$_POST['lehrfach_id'];
+				$leDAO->lehrform_kurzbz=$_POST['lehrform'];
+				$leDAO->stundenblockung=$_POST['stundenblockung'];
+				$leDAO->wochenrythmus=$_POST['wochenrythmus'];
+				if (isset($_POST['start_kw'])) $leDAO->start_kw=$_POST['start_kw'];
+				$leDAO->raumtyp=$_POST['raumtyp'];
+				$leDAO->raumtypalternativ=$_POST['raumtypalternativ'];
+				$leDAO->sprache=$_POST['sprache'];
+				if (isset($_POST['lehre'])) $leDAO->lehre=($_POST['lehre']=='true'?true:false);
+				if (isset($_POST['anmerkung'])) $leDAO->anmerkung=$_POST['anmerkung'];
+				$leDAO->lvnr=(isset($_POST['lvnr'])?$_POST['lvnr']:'');
+				$leDAO->unr=(isset($_POST['unr'])?$_POST['unr']:'');
+				$leDAO->updateamum=date('Y-m-d H:i:s');
+				$leDAO->updatevon=$user;
+				
+				if ($_POST['do']=='create') 
+				{
+					// LE neu anlegen
+					$leDAO->new=true;
+					$leDAO->insertamum=date('Y-m-d H:i:s');
+					$leDAO->insertvon=$user;
+				} 
+				else if ($_POST['do']=='update') 
+				{
+					// LE aktualisieren
+					$leDAO->new=false;					
+				}
+				if ($leDAO->save()) 
+				{
+					$return = true;
+				}
+				else 
+				{
+					$return = false;
+					$errormsg = $leDAO->errormsg;
+				}
+			}		
 		} 
-		else if ($_POST['do']=='update') 
-		{
-			// LE aktualisieren
-			$leDAO->new=false;
-			if ($leDAO->save()) 
-				echo 'ok';
+		else if ($_POST['do']=='delete') //Lehreinheit loeschen
+		{	
+			// LE loeschen
+			if ($leDAO->delete($_POST['lehreinheit_id']))
+			{
+				$return = true;
+			}
 			else 
-				echo $leDAO->errormsg;
+			{
+				$return = false;
+				$errormsg = $leDAO->errormsg;
+			}
 		}
-	
-	} 
-	else if ($_POST['do']=='delete') //Lehreinheit loeschen
-	{	
-		// LE loeschen
-		if ($leDAO->delete($_POST['lehreinheit_id']))
-			echo 'ok';
-		else 
-			echo $leDAO->errormsg;	
+	}
+	else 
+	{
+		$return = false;
+		$errormsg = 'Unkown type';
+		$data = '';
 	}
 }
-else 
-	echo "Unkown type";
 ?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RDF:RDF
+	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:NC="http://home.netscape.com/NC-rdf#"
+	xmlns:DBDML="http://www.technikum-wien.at/dbdml/rdf#"
+>
+
+
+  <RDF:Seq RDF:about="http://www.technikum-wien.at/dbdml/msg">
+	<RDF:li>
+    	<RDF:Description RDF:about="http://www.technikum-wien.at/dbdml/0" >
+    		<DBDML:return><?php echo ($return?'true':'false'); ?></DBDML:return>
+        	<DBDML:errormsg><![CDATA[<?php echo $errormsg; ?>]]></DBDML:errormsg>
+        	<DBDML:data><!CDATA[<?php echo $data ?>]]></DBDML:data>
+        </RDF:Description>
+	</RDF:li>
+
+  </RDF:Seq>
+</RDF:RDF>

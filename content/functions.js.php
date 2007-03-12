@@ -32,7 +32,8 @@ function getTargetHelper(dsource,subj,predi)
 	if (dsource.hasArcOut(subj, predi))  
 	{
 		var target = dsource.GetTarget(subj, predi, true);
-		if (target instanceof Components.interfaces.nsIRDFLiteral) 
+		if (target instanceof Components.interfaces.nsIRDFLiteral ||
+			target instanceof Components.interfaces.nsIRDFInt) 
 		{
 			return target.Value;
 		}
@@ -63,4 +64,33 @@ function gettimestamp()
 	ret = ret + now.getSeconds()*60;
 	ret = ret + now.getMilliseconds();
 	return ret;
+}
+
+// ****
+// * Parst die Returnwerte der DBDML Scripte
+// * @param response ... RDF Response des DBDML Scripts
+// * 
+// * obj.dbdml_return ... Returnwert des Scripts
+// * obj.dbdml_errormsg ... Errormessage
+// * obj.dbdml_data ... zusaetzliche Daten vom Script. zB ID des angelegten Datansatzes
+// ****
+function ParseReturnValue(response)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	// Returnwerte aus RDF abfragen
+	var dsource=parseRDFString(response, 'http://www.technikum-wien.at/dbdml');
+	
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
+	               getService(Components.interfaces.nsIRDFService);
+	var subject = rdfService.GetResource("http://www.technikum-wien.at/dbdml/0");
+	
+	var predicateNS = "http://www.technikum-wien.at/dbdml/rdf";
+	
+	retval = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#return" ));
+	if(retval=='true')
+		this.dbdml_return = true;
+	else
+		this.dbdml_return = false;
+	this.dbdml_errormsg = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#errormsg" ));
+	this.dbdml_data = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#data" ));
 }

@@ -156,6 +156,12 @@ if (!$conn = pg_pconnect(CONN_STRING))
 		}
 	}
 	
+	//Notenschluessel
+	$worksheet->write(++$lines,0,'Notenschlüssel: 1-Sehr Gut, 2-Gut, 3-Befriedigend, 4-Genügend,');
+	$worksheet->write(++$lines,0,'5-Nicht Genügend, 6-Angerechnet, 7-nicht beurteilt,');
+	$worksheet->write(++$lines,0,'8-teilgenommen, 9-noch nicht eingetragen, 10-bestanden,');
+	$worksheet->write(++$lines,0,'11-approbiert, 12-erfolgreich absolviert, 13-nicht erfolgreich absolviert');	
+	
 	$worksheet->setColumn(0, 0, 5);
 	$worksheet->setColumn(1, 1, 25);
 	$worksheet->setColumn(2, 2, 25);
