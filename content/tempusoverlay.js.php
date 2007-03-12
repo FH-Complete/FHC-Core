@@ -78,7 +78,7 @@ function onVerbandSelect()
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	try
 	{	
-		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?stg_kz='+stg_kz+'&sem='+sem+'&ver='+ver+'&grp='+grp+'&gruppe='+gruppe;
+		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?stg_kz='+stg_kz+'&sem='+sem+'&ver='+ver+'&grp='+grp+'&gruppe='+gruppe+'&'+gettimestamp();
 		var treeLFVT=document.getElementById('lehrveranstaltung-tree');
 		
 		//Alte DS entfernen
@@ -94,6 +94,7 @@ function onVerbandSelect()
 		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 		treeLFVT.database.AddDataSource(LvTreeDatasource);
 		LvTreeDatasource.addXMLSinkObserver(LvTreeSinkObserver);
+		treeLFVT.builder.addListener(LvTreeListener);
 	}
 	catch(e)
 	{

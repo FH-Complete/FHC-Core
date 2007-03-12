@@ -152,9 +152,12 @@ var LeLvbgrpDDObserver=
 		req.add('gruppe_kurzbz', gruppe);
 
 		var response = req.executePOST();
-		if (response!='ok')
+		
+		var val =  new ParseReturnValue(response)
+
+		if (!val.dbdml_return) 
 		{
-			alert(response);
+			alert(val.dbdml_errormsg)
 		}
 		else
 		{
@@ -258,9 +261,12 @@ var LeLektorDDObserver=
 		req.add('bismelden', 'true');
 
 		var response = req.executePOST();
-		if (response!='ok')
+		
+		var val =  new ParseReturnValue(response)
+
+		if (!val.dbdml_return) 
 		{
-			alert(response);
+			alert(val.dbdml_errormsg)
 		}
 		else
 		{

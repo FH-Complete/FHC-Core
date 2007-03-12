@@ -28,9 +28,10 @@ $conn = pg_pconnect(CONN_STRING);
 $user = get_uid();
 loadVariables($conn, $user);
 ?>
-var LeDetailLehrfach_id;
-var LeDetailGruppeDatasource;
-var LeDetailLektorDatasource;
+var LeDetailLehrfach_id; //Lehrfach_id die nach dem Laden markiert werden soll
+var LeDetailGruppeDatasource; //Datasource fuer Gruppen DropDown
+var LeDetailLektorDatasource; //Datasource fuer Lektren DropDown
+var LvSelectLehreinheit_id; //Lehreinheit_id die nach dem Rebuild des Trees markiert werden soll
 
 // ****
 // * Observer fuer LV Tree
@@ -48,7 +49,23 @@ var LvTreeSinkObserver =
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 		document.getElementById('lehrveranstaltung-tree').builder.rebuild();
 	}
-}	
+};	
+
+// ****
+// * Nach dem Rebuild wird die Lehreinheit wieder
+// * markiert
+// ****
+var LvTreeListener = 
+{
+  willRebuild : function(builder) {  },
+  didRebuild : function(builder) 
+  {
+  	  //timeout nur bei Mozilla notwendig da sonst die rows
+  	  //noch keine values haben. Ab Seamonkey funktionierts auch 
+  	  //ohne dem setTimeout
+      window.setTimeout(LvTreeSelectLehreinheit,10);
+  }
+};
 
 // ****
 // * Asynchroner (Nicht blockierender) Refresh des LV Trees
@@ -56,6 +73,12 @@ var LvTreeSinkObserver =
 function LvTreeRefresh()
 {	
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	
+	//markierte Lehreinheit global speichern damit diese LE nach dem
+	//refresh wieder markiert werden kann.
+	var tree = document.getElementById('lehrveranstaltung-tree');	
+	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehreinheit_id"] : "lehrveranstaltung-treecol-lehreinheit_id";
+	LvSelectLehreinheit_id=tree.view.getCellText(tree.currentIndex,col);
 	LvTreeDatasource.Refresh(false); //non blocking
 }
 
@@ -73,6 +96,10 @@ function LeNeu()
 	
 	//Details zuruecksetzen
 	LeDetailReset();
+	
+	document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe').hidden=true;
+	document.getElementById('lehrveranstaltung-detail-label-lehreinheitgruppe').hidden=true;
+	document.getElementById('lehrveranstaltung-tab-lektor').hidden=true;
 	
 	//Lehrveranstaltungs_id holen
 	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung_id";
@@ -111,6 +138,48 @@ function LeNeu()
 }
 
 // ****
+// * Selectiert die Lehreinheit nachdem der Tree 
+// * rebuildet wurde.
+// ****
+function LvTreeSelectLehreinheit()
+{
+	var tree=document.getElementById('lehrveranstaltung-tree');
+	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+	
+	//In der globalen Variable ist die zu selektierende Lehreinheit gespeichert
+	if(LvSelectLehreinheit_id!=null)
+	{
+		//Alle subtrees oeffnen weil rowCount nur die Anzahl der sichtbaren
+		//Zeilen zurueckliefert
+	   	for(var i=items-1;i>=0;i--)
+	   	{	   		
+	   		tree.view.toggleOpenState(i);
+	   	}
+	   	
+	   	//Jetzt die wirkliche Anzahl (aller) Zeilen holen
+	   	items = tree.view.rowCount;
+	   	for(var i=0;i<items;i++)
+	   	{
+	   		//Lehreinheit_id der row holen
+			col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehreinheit_id"] : "lehrveranstaltung-treecol-lehreinheit_id";
+			lehreinheit_id=tree.view.getCellText(i,col);
+			//Wenn Lehreinheit_id leer ist, dann kann es sein, dass der Tree noch nicht fertig geladen ist
+			//dann muss beim Listener das Timeout erhoeht werden
+			
+			//wenn dies die zu selektierende Zeile
+			if(lehreinheit_id == LvSelectLehreinheit_id)
+			{
+				//Zeile markieren
+				tree.view.selection.select(i);
+				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
+				tree.treeBoxObject.ensureRowIsVisible(i);
+				return true;
+			}
+	   	}
+	}
+}
+
+// ****
 // * Lehreinheit loeschen
 // ****
 function LeDelete() 
@@ -144,8 +213,10 @@ function LeDelete()
 		req.add('do','delete');
 		req.add('lehreinheit_id',lehreinheit_id);
 		var response = req.executePOST();
-		if (response!='ok') 
-			alert(response);
+		
+		var val =  new ParseReturnValue(response)
+		if(!val.dbdml_return)
+			alert(val.dbdml_errormsg)
 		
 		LvTreeRefresh();
 		LeDetailReset();
@@ -292,9 +363,12 @@ function LeDetailSave()
 	req.add('anmerkung', anmerkung);
 	
 	var response = req.executePOST();
-	if (response!='ok') 
+	
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return) 
 	{
-		alert(response);
+		alert(val.dbdml_errormsg)
 	} 
 	else 
 	{
@@ -318,6 +392,16 @@ function LeAuswahl()
 	
 	//Felder bei Lektorenzuordnung deaktivieren
 	LeMitarbeiterDisableFields(true);
+	
+	document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe').hidden=false;
+	document.getElementById('lehrveranstaltung-detail-label-lehreinheitgruppe').hidden=false;
+	document.getElementById('lehrveranstaltung-tab-lektor').hidden=false;
+	
+	//Hack damit der DetailTab als erstes angezeigt wird (sonst wird nach aus- und wieder einblenden
+	//der LektorenTab vor dem DetailTab angezeigt)
+	document.getElementById('lehrveranstaltung-tab-detail').hidden=true;
+	document.getElementById('lehrveranstaltung-tab-detail').hidden=false;
+	//endHack
 	
 	if (tree.currentIndex==-1) return;
 	try 
@@ -532,9 +616,11 @@ function LeMitarbeiterSave()
 	req.add('lehreinheit_id', lehreinheit_id);
 	
 	var response = req.executePOST();
-	if (response!='ok') 
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return) 
 	{
-		alert(response);
+		alert(val.dbdml_errormsg)
 	} 
 	else 
 	{
@@ -581,9 +667,11 @@ function LeMitarbeiterDel()
 	req.add('mitarbeiter_uid', uid);
 	
 	var response = req.executePOST();
-	if (response!='ok') 
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return) 
 	{
-		alert(response);
+		alert(val.dbdml_errormsg)
 	} 
 	else 
 	{
@@ -769,9 +857,11 @@ function LeGruppeDel()
 	req.add('lehreinheitgruppe_id', lehreinheitgruppe_id);
 	
 	var response = req.executePOST();
-	if (response!='ok') 
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return) 
 	{
-		alert(response);
+		alert(val.dbdml_errormsg)
 	} 
 	else 
 	{

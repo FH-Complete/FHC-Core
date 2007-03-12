@@ -48,9 +48,11 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lehrveranstaltungdetailoverlay.xul
 	<vbox id="LehrveranstaltungEditor" flex="1">
 		<toolbox>
 			<toolbar id="nav-toolbar">
-			<toolbarbutton id="lehrveranstaltung-toolbar-neu" label="Neue Lehreinheit" oncommand="LeNeu();" disabled="true"/>
-			<toolbarbutton id="lehrveranstaltung-toolbar-del" label="Löschen" oncommand="LeDelete();" disabled="true"/>
-			<toolbarbutton id="lehrveranstaltung-toolbar-refresh" label="Neu laden" oncommand="LvTreeRefresh()" disabled="false"/>
+			<toolbarbutton id="lehrveranstaltung-toolbar-neu" label="Neue Lehreinheit" oncommand="LeNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Neue Lehreinheit anlegen" />
+			<toolbarbutton id="lehrveranstaltung-toolbar-del" label="Löschen" oncommand="LeDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Lehreinheiten löschen"/>
+			<toolbarbutton id="lehrveranstaltung-toolbar-refresh" label="Neu laden" oncommand="LvTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
+			<!--<toolbarbutton id="lehrveranstaltung-toolbar-refresh" label="Load" oncommand="debugload()" disabled="false"/>-->
+			
 			</toolbar>
 		</toolbox>
 
@@ -179,9 +181,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lehrveranstaltungdetailoverlay.xul
 					<tab id="lehrveranstaltung-tab-detail" label="Details" />
 					<tab id="lehrveranstaltung-tab-lektor" label="Lektorenzuteilung" />
 				</tabs>
-				<tabpanels id="lehrveranstaltung-tabpanels-main" flex="1">	
+				<tabpanels id="lehrveranstaltung-tabpanels-main" flex="1">
 					<vbox id="lehrveranstaltung-detail" />
-					<vbox id="lehrveranstaltung-lektorzuteilung" />							
+					<vbox id="lehrveranstaltung-lektorzuteilung" />
 				</tabpanels>
 			</tabbox>
 		</vbox>
