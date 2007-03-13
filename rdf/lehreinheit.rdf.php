@@ -13,7 +13,7 @@ header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/vnd.mozilla.xul+xml");
 // xml
-echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
+echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
 require_once('../vilesci/config.inc.php');
 require_once('../include/lehreinheit.class.php');
@@ -29,7 +29,7 @@ $lehreinheit_id = (isset($_GET['lehreinheit_id'])?$_GET['lehreinheit_id']:'');
 
 if($lehreinheit_id!='')
 {
-	$lehreinheit=new lehreinheit($conn);
+	$lehreinheit=new lehreinheit($conn, null, true);
 	$lehreinheit->load($lehreinheit_id);
 }
 else 
@@ -60,7 +60,7 @@ $rdf_url='http://www.technikum-wien.at/lehreinheit';
             <LEHREINHEIT:raumtyp><![CDATA[<?php echo $lehreinheit->raumtyp ?>]]></LEHREINHEIT:raumtyp>
             <LEHREINHEIT:raumtypalternativ><![CDATA[<?php echo $lehreinheit->raumtypalternativ ?>]]></LEHREINHEIT:raumtypalternativ>
             <LEHREINHEIT:sprache><![CDATA[<?php echo $lehreinheit->sprache ?>]]></LEHREINHEIT:sprache>
-            <LEHREINHEIT:lehre><?php echo ($lehreinheit->lehre?'true':'false') ?></LEHREINHEIT:lehre>
+            <LEHREINHEIT:lehre><?php echo ($lehreinheit->lehre?'Ja':'Nein') ?></LEHREINHEIT:lehre>
             <LEHREINHEIT:anmerkung><![CDATA[<?php echo $lehreinheit->anmerkung ?>]]></LEHREINHEIT:anmerkung>
             <LEHREINHEIT:unr><?php echo $lehreinheit->unr ?></LEHREINHEIT:unr>
             <LEHREINHEIT:lvnr><?php echo $lehreinheit->lvnr ?></LEHREINHEIT:lvnr>

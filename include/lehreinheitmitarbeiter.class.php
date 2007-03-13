@@ -28,16 +28,21 @@ class lehreinheitmitarbeiter
 	var $lehreinheitmitarbeiter = array(); // lehreinheitmitarbeiter Objekt
 	
 	//Tabellenspalten
-	var $lehreinheit_id;	// integer
-	var $mitarbeiter_uid;	// varchar(16)
+	var $lehreinheit_id;		// integer
+	var $mitarbeiter_uid;		// varchar(16)
 	var $mitarbeiter_uid_old;	// verwendet bei Update der UID 
-	var $semesterstunden;	// smalint
-	var $planstunden;		// smalint
-	var $stundensatz;		// numeric(6,2)
-	var $faktor;			// numeric(2,1)
-	var $anmerkung;			// varchar(256)	
-	var $lehrfunktion_kurzbz; // varchar(16)
-	var $ext_id; 			// bigint
+	var $semesterstunden;		// smalint
+	var $planstunden;			// smalint
+	var $stundensatz;			// numeric(6,2)
+	var $faktor;				// numeric(2,1)
+	var $anmerkung;				// varchar(256)	
+	var $lehrfunktion_kurzbz; 	// varchar(16)
+	var $bismelden;				// boolean
+	var $insertamum;			// timestamp
+	var $insertvon;				// varchar(16)
+	var $updateamum;			// timestamp
+	var $updatevon;				// varchar(16)
+	var $ext_id; 				// bigint
 	
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine LE
@@ -51,15 +56,18 @@ class lehreinheitmitarbeiter
 	{
 		$this->conn = $conn;
 		
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
-		if(!pg_query($conn,$qry))
+		if($unicode!=null)
 		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
+			if($unicode)
+				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			else 
+				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+				
+			if(!pg_query($conn,$qry))
+			{
+				$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
+				return false;
+			}
 		}
 		
 		if($lehreinheit_id!=null && $mitarbeiter_uid!=null)
@@ -91,7 +99,7 @@ class lehreinheitmitarbeiter
 				$this->stundensatz = $row->stundensatz;
 				$this->faktor = $row->faktor;
 				$this->anmerkung = $row->anmerkung;
-				$this->bismelden = $row->bismelden;
+				$this->bismelden = ($row->bismelden=='t'?true:false);
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->insertamum = $row->insertamum;
@@ -128,7 +136,7 @@ class lehreinheitmitarbeiter
 		{
 			while($row = pg_fetch_object($result))
 			{
-				$obj = new lehreinheitmitarbeiter($this->conn);
+				$obj = new lehreinheitmitarbeiter($this->conn, null, null, null);
 				$obj->lehreinheit_id = $row->lehreinheit_id;
 				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$obj->lehrfunktion_kurzbz = $row->lehrfunktion_kurzbz;
@@ -137,7 +145,7 @@ class lehreinheitmitarbeiter
 				$obj->stundensatz = $row->stundensatz;
 				$obj->faktor = $row->faktor;
 				$obj->anmerkung = $row->anmerkung;
-				$obj->bismelden = $row->bismelden;
+				$obj->bismelden = ($row->bismelden=='t'?true:false);
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
@@ -192,7 +200,7 @@ class lehreinheitmitarbeiter
 		{
 			//ToDo ID entfernen
 			$qry = 'INSERT INTO lehre.tbl_lehreinheitmitarbeiter (lehreinheit_id, mitarbeiter_uid, semesterstunden, planstunden, 
-			                                                stundensatz, faktor, anmerkung, lehrfunktion_kurzbz, ext_id)
+			                                                stundensatz, faktor, anmerkung, lehrfunktion_kurzbz, ext_id, insertamum, insertvon)
 			        VALUES('.$this->addslashes($this->lehreinheit_id).','.
 					$this->addslashes($this->mitarbeiter_uid).','.
 					$this->addslashes($this->semesterstunden).','.
@@ -201,7 +209,9 @@ class lehreinheitmitarbeiter
 					$this->addslashes($this->faktor).','.
 					$this->addslashes($this->anmerkung).','.
 					$this->addslashes($this->lehrfunktion_kurzbz).','.
-					$this->addslashes($this->ext_id).');';
+					$this->addslashes($this->ext_id).','.
+					$this->addslashes($this->insertamum).','.
+					$this->addslashes($this->insertvon).');';
 		}
 		else
 		{
@@ -216,14 +226,16 @@ class lehreinheitmitarbeiter
 			       ' anmerkung='.$this->addslashes($this->anmerkung).','.
 			       ' lehrfunktion_kurzbz='.$this->addslashes($this->lehrfunktion_kurzbz).','.
 			       ' mitarbeiter_uid='.$this->addslashes($this->mitarbeiter_uid).','.
+			       ' bismelden='.($this->bismelden?'true':'false').','.
+			       ' updateamum='.$this->addslashes($this->updateamum).','.
+			       ' updatevon='.$this->addslashes($this->updatevon).','.
 			       ' ext_id = '.$this->addslashes($this->ext_id).
 			       " WHERE lehreinheit_id=".$this->addslashes($this->lehreinheit_id)." AND
 			               mitarbeiter_uid=".$this->addslashes($this->mitarbeiter_uid_old).";";
 		}
 		
 		if(pg_query($this->conn,$qry))
-		{
-			//Log schreiben
+		{			
 			return true;
 		}
 		else
