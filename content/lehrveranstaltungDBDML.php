@@ -49,7 +49,7 @@ if (!$conn = @pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 $return = false;
-$errormsg = 'Unknown Error';
+$errormsg = 'unknown';
 $data = '';
 $error = false;
 
@@ -82,7 +82,7 @@ if(!$error)
 		
 		if(!$error)
 		{
-			$lem = new lehreinheitmitarbeiter($conn);
+			$lem = new lehreinheitmitarbeiter($conn, null, null, true);
 			
 			if($_POST['do']=='update')
 			{
@@ -106,7 +106,7 @@ if(!$error)
 				$lem->stundensatz = $_POST['stundensatz'];
 				$lem->faktor = $_POST['faktor'];
 				$lem->anmerkung = $_POST['anmerkung'];
-				$lem->bismelden = $_POST['bismelden'];
+				$lem->bismelden = ($_POST['bismelden']=='true'?true:false);
 				$lem->updateamum = date('Y-m-d H:i:s');
 				$lem->updatevon = $user;
 				
@@ -222,7 +222,7 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit')
 	{
 		//Lehreinheit anlegen/aktualisieren
-		$leDAO=new lehreinheit($conn);
+		$leDAO=new lehreinheit($conn, null, true);
 		if ($_POST['do']=='create' || ($_POST['do']=='update')) 
 		{	
 			if($_POST['do']=='update')
@@ -268,6 +268,7 @@ if(!$error)
 				}
 				if ($leDAO->save()) 
 				{
+					$data = $leDAO->lehreinheit_id;
 					$return = true;
 				}
 				else 
@@ -305,16 +306,13 @@ if(!$error)
 	xmlns:NC="http://home.netscape.com/NC-rdf#"
 	xmlns:DBDML="http://www.technikum-wien.at/dbdml/rdf#"
 >
-
-
   <RDF:Seq RDF:about="http://www.technikum-wien.at/dbdml/msg">
 	<RDF:li>
     	<RDF:Description RDF:about="http://www.technikum-wien.at/dbdml/0" >
     		<DBDML:return><?php echo ($return?'true':'false'); ?></DBDML:return>
         	<DBDML:errormsg><![CDATA[<?php echo $errormsg; ?>]]></DBDML:errormsg>
-        	<DBDML:data><!CDATA[<?php echo $data ?>]]></DBDML:data>
+        	<DBDML:data><![CDATA[<?php echo $data ?>]]></DBDML:data>
         </RDF:Description>
 	</RDF:li>
-
   </RDF:Seq>
 </RDF:RDF>

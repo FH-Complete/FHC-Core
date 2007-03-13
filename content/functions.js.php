@@ -93,4 +93,13 @@ function ParseReturnValue(response)
 		this.dbdml_return = false;
 	this.dbdml_errormsg = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#errormsg" ));
 	this.dbdml_data = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#data" ));
+	//debug('data:'+this.dbdml_data+' errormsg:'+this.dbdml_errormsg+' return:'+this.dbdml_return );
+}
+
+// ****
+// * Zeigt einen Text in der Statusbar an
+// ****
+function SetStatusBarText(text)
+{
+	document.getElementById('statusbarpanel-text').label=text;
 }

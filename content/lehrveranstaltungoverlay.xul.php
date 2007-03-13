@@ -27,12 +27,9 @@ header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../vilesci/config.inc.php');
 echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes" ?>';
-echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?>";
 
 echo '<?xul-overlay href="'.APP_ROOT.'content/lehrveranstaltungdetailoverlay.xul.php"?>';
-
 ?>
-
 <overlay id="LehrveranstaltungOverlay"
 	xmlns:html="http://www.w3.org/1999/xhtml"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
@@ -65,19 +62,12 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lehrveranstaltungdetailoverlay.xul
 				style="margin:0px;"
 				onselect="LeAuswahl(this);"
  				persist="height"
+ 				onkeypress="LvTreeKeyPress(event)"
 		>
 			<treecols>
 				<treecol id="lehrveranstaltung-treecol-kurzbz" label="Kurzbz" flex="2" hidden="false" primary="true"
 					class="sortDirectionIndicator"
-					sortActive="true"
-					sortDirection="ascending"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#kurzbz"/>
-				<splitter class="tree-splitter"/>
-				<treecol id="lehrveranstaltung-treecol-lehrveranstaltung_id" label="Lehrveranstaltung_id" flex="2" hidden="true"
-					class="sortDirectionIndicator"
-					sortActive="true"
-					sortDirection="ascending"
-					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrveranstaltung_id"	/>
 				<splitter class="tree-splitter"/>	    				
 				<treecol id="lehrveranstaltung-treecol-bezeichnung" label="Bezeichnung" flex="5" hidden="false"
 				   class="sortDirectionIndicator"
@@ -131,22 +121,25 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lehrveranstaltungdetailoverlay.xul
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lektoren"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="lehrveranstaltung-treecol-lehreinheit_id" label="Lehreinheit_id" flex="10" hidden="true"
-					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehreinheit_id"/>
-				<splitter class="tree-splitter"/>
 				<treecol id="lehrveranstaltung-treecol-anmerkung" label="Anmerkung" flex="5" hidden="false"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#anmerkung"/>
+					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#anmerkung"/>				
+				<splitter class="tree-splitter"/>
+				<treecol id="lehrveranstaltung-treecol-lehrveranstaltung_id" label="Lehrveranstaltung_id" flex="1" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrveranstaltung_id"	/>
+				<splitter class="tree-splitter"/>
+				<treecol id="lehrveranstaltung-treecol-lehreinheit_id" label="Lehreinheit_id" flex="1" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehreinheit_id"/>
 				<splitter class="tree-splitter"/>
 			</treecols>
 
 			<template>
 				<treechildren flex="1" >
    					<treeitem uri="rdf:*">
-						<treerow dbID="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrveranstaltung_id">	         						
-							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#kurzbz"/>
-							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrveranstaltung_id"  />
+						<treerow dbID="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrveranstaltung_id" >
+							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#kurzbz"/>							
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#bezeichnung"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#sprache"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#ects"/>
@@ -160,8 +153,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lehrveranstaltungdetailoverlay.xul
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#raumtypalternativ"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#gruppen"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lektoren"/>
-							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehreinheit_id"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#anmerkung"/>
+							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrveranstaltung_id"  />
+							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehreinheit_id"/>
 						</treerow>
 					</treeitem>
 				</treechildren>

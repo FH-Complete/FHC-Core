@@ -26,7 +26,7 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../vilesci/config.inc.php');
-echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes" ?>';
+echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 echo "<?xml-stylesheet href=\"".APP_ROOT."content/lehrveranstaltung.css\" type=\"text/css\" ?>";
 
 ?>
@@ -75,6 +75,10 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lehrveranstaltung.css\" type=\
 	  			<label value="UNR" />
 	  	    	<textbox id="lehrveranstaltung-detail-textbox-unr" disabled="true"/>
 			</row>
+			<row>
+				<label value="Lehrveranstaltung" />
+	  			<textbox id="lehrveranstaltung-detail-textbox-lehrveranstaltung" maxlength="20" disabled="true"/>
+			</row>
 		</rows>
 		</grid>
 	</vbox>
@@ -102,8 +106,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lehrveranstaltung.css\" type=\
 							</menupopup>
 					</template>
 				</menulist>
-	  			<label value="Lehrveranstaltung" />
-	  			<textbox id="lehrveranstaltung-detail-textbox-lehrveranstaltung" maxlength="20" disabled="true"/>
+	  			
 			</row>
 			<row>
 	  			<label value="Lehrfach" />
@@ -197,7 +200,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lehrveranstaltung.css\" type=\
 				<label id="lehrveranstaltung-detail-label-lehreinheitgruppe" value="Gruppen" />
 				<vbox height="150" flex="1">
 					<hbox flex="1">
-						<tree id="lehrveranstaltung-detail-tree-lehreinheitgruppe" seltype="single" hidecolumnpicker="false" flex="1" disabled="true"
+						<tree id="lehrveranstaltung-detail-tree-lehreinheitgruppe" seltype="single" hidecolumnpicker="false" flex="1" disabled="false"
 							  datasources="rdf:null"
 							  ref="http://www.technikum-wien.at/lehreinheitgruppe/liste"
 							  flags="dont-build-content"
@@ -207,6 +210,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lehrveranstaltung.css\" type=\
 			  				  ondragenter="nsDragAndDrop.dragEnter(event,LeLvbgrpDDObserver)"
 							  ondragexit="nsDragAndDrop.dragExit(event,LeLvbgrpDDObserver)"
 							  context="lehrveranstaltung-detail-gruppe-tree-popup"
+							  onkeypress="LvDetailGruppenTreeKeyPress(event)"
 						>
 							<treecols>
 								<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-bezeichnung" label="Bezeichnung" flex="2" hidden="false"
@@ -253,6 +257,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lehrveranstaltung.css\" type=\
 						ondragenter="nsDragAndDrop.dragEnter(event,LeLektorDDObserver)"
 						ondragexit="nsDragAndDrop.dragExit(event,LeLektorDDObserver)"
 						context="lehrveranstaltung-lektor-tree-popup"
+						onkeypress="LvDetailMitarbeiterTreeKeyPress(event)"
 				>
 					<treecols>
 						<treecol id="lehrveranstaltung-lehreinheitmitarbeiter-treecol-nachname" label="Nachname" flex="2" hidden="false"
@@ -347,9 +352,9 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lehrveranstaltung.css\" type=\
 					</row>
 					<row>
 			    		<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-anmerkung" value="Anmerkung: "/>
-    					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-anmerkung" disabled="true" maxlength="256" flex="1" oninput="LeMitarbeiterValueChanged();"/>
+    					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-anmerkung" disabled="true" maxlength="256" flex="1" oncommand="LeMitarbeiterValueChanged();"/>
     					<label control="lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden" value="BIS-Melden: "/>
-    					<checkbox id="lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden" disabled="true" flex="1" oninput="LeMitarbeiterValueChanged();"/>
+    					<checkbox id="lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden" disabled="true" flex="1" oncommand="LeMitarbeiterValueChanged();"/>
 					</row>
     			</rows>
     			</grid>

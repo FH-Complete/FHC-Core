@@ -54,9 +54,24 @@ class lehrveranstaltung
 	 * @param $conn Connection zur Datenbank
 	 *        $lehrveranstaltung_id ID der zu ladenden Lehrveranstaltung
 	 */
-	function lehrveranstaltung($conn, $lehrveranstaltung_id=null)
+	function lehrveranstaltung($conn, $lehrveranstaltung_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
+		
+		if($unicode!=null)
+		{
+			if($unicode)
+				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			else
+				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+		
+			if(!pg_query($conn,$qry))
+			{
+				$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
+				return false;
+			}
+		}
+				
 		if($lehrveranstaltung_id != null)
 			$this->load($lehrveranstaltung_id);
 	}
@@ -125,7 +140,7 @@ class lehrveranstaltung
 		
 		while($row = pg_fetch_object($res))
 		{
-			$lv_obj = new lehrveranstaltung($this->conn);
+			$lv_obj = new lehrveranstaltung($this->conn, null, null);
 			
 			$lv_obj->lehrveranstaltung_id=$row->lehrveranstaltung_id;
 			$lv_obj->studiengang_kz=$row->studiengang_kz;
@@ -202,7 +217,7 @@ class lehrveranstaltung
 		
 		while($row = pg_fetch_object($res))
 		{
-			$lv_obj = new lehrveranstaltung($this->conn);
+			$lv_obj = new lehrveranstaltung($this->conn, null, null);
 			
 			$lv_obj->lehrveranstaltung_id=$row->lehrveranstaltung_id;
 			$lv_obj->studiengang_kz=$row->studiengang_kz;

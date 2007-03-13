@@ -73,21 +73,24 @@ class lehreinheit
 	{
 		$this->conn = $conn;
 
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-		if(!pg_query($conn,$qry))
+		if($unicode!=null)
 		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
+			if($unicode)
+				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			else
+				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+		
+			if(!pg_query($conn,$qry))
+			{
+				$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
+				return false;
+			}
 		}
 
 		if($lehreinheit_id!=null)
 			$this->load($lehreinheit_id);
 	}
-
+	
 	// *********************************************************
 	// * Laedt die LE
 	// * @param lehreinheit_id
@@ -198,13 +201,13 @@ class lehreinheit
 
 	function load_lehreinheiten($lehrveranstaltung_id, $studiensemester_kurzbz)
 	{
-		$qry = "SELECT * FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lehrveranstaltung_id' AND studiensemester_kurzbz='$studiensemester_kurzbz'";
+		$qry = "SELECT * FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lehrveranstaltung_id' AND studiensemester_kurzbz='$studiensemester_kurzbz' ORDER BY lehreinheit_id";
 
 		if($result = pg_query($this->conn, $qry))
 		{			
 			while($row = pg_fetch_object($result))
 			{
-				$le_obj = new lehreinheit($this->conn);
+				$le_obj = new lehreinheit($this->conn, null, null);
 
 				$le_obj->lehreinheit_id = $row->lehreinheit_id;
 				$le_obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
@@ -374,7 +377,7 @@ class lehreinheit
 			else 
 				$unr = $this->addslashes($this->unr);
 			//ToDo ID entfernen
-			$qry = 'INSERT INTO lehre.tbl_lehreinheit (lehrveranstaltung_id, studiensemester_kurzbz,
+			$qry = 'BEGIN; INSERT INTO lehre.tbl_lehreinheit (lehrveranstaltung_id, studiensemester_kurzbz,
 			                                     lehrfach_id, lehrform_kurzbz, stundenblockung, wochenrythmus,
 			                                     start_kw, raumtyp, raumtypalternativ, lehre, anmerkung, unr, lvnr, insertamum, insertvon, updateamum, updatevon,  ext_id, sprache)
 			        VALUES('.$this->addslashes($this->lehrveranstaltung_id).','.
@@ -422,6 +425,31 @@ class lehreinheit
 		//echo $qry;
 		if(pg_query($this->conn,$qry))
 		{
+			if($new)
+			{
+				//Sequence auslesen
+				$qry ="SELECT currval('lehre.tbl_lehreinheit_lehreinheit_id_seq') AS lehreinheit_id";
+				if($result = pg_query($this->conn, $qry))
+				{
+					if($row = pg_fetch_object($result))
+					{
+						$this->lehreinheit_id = $row->lehreinheit_id;
+						pg_query($this->conn, 'COMMIT;');
+					}
+					else 
+					{
+						$this->errormsg = 'Fehler beim auslesen der Sequence';
+						pg_query($this->conn, 'ROLLBACK;');
+						return false;
+					}
+				}
+				else 
+				{
+					$this->errormsg = 'Fehler beim auslesen der Sequence';
+					pg_query($this->conn, 'ROLLBACK;');
+					return false;
+				}
+			}
 			//Log schreiben
 			return true;
 		}

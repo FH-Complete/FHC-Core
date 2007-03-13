@@ -32,7 +32,10 @@ var LeDetailLehrfach_id; //Lehrfach_id die nach dem Laden markiert werden soll
 var LeDetailGruppeDatasource; //Datasource fuer Gruppen DropDown
 var LeDetailLektorDatasource; //Datasource fuer Lektren DropDown
 var LvSelectLehreinheit_id; //Lehreinheit_id die nach dem Rebuild des Trees markiert werden soll
+var leDetailLektorUid; // UID der Lektorzuordnung die nach dem Rebuild markiert werden soll
+var leDetailLektorLehreinheit_id; // Lehreinheit_id der Lektorzuordnung die nach dem Rebuild markiert werden soll
 
+// ********** Observer und Listener ************* //
 // ****
 // * Observer fuer LV Tree
 // * startet Rebuild nachdem das Refresh
@@ -67,6 +70,40 @@ var LvTreeListener =
   }
 };
 
+// ****
+// * Nach dem Rebuild wird die Lektorzuordnung
+// * wieder markiert
+// ****
+var LvLektorTreeListener = 
+{
+  willRebuild : function(builder) {  },
+  didRebuild : function(builder) 
+  {
+      window.setTimeout(LeLektorTreeSelectLektor,10);
+  }
+};
+
+// ***************** KEY Events ************************* //
+function LvTreeKeyPress(event)
+{
+	if(event.keyCode==46) // Entf
+		LeDelete();
+	else if(event.keyCode==116) // F5
+		LvTreeRefresh();
+}
+
+function LvDetailGruppenTreeKeyPress(event)
+{	
+	if(event.keyCode==46) //Entf
+		LeGruppeDel();
+}
+
+function LvDetailMitarbeiterTreeKeyPress(event)
+{	
+	if(event.keyCode==46) //Entf
+		LeMitarbeiterDel();
+}
+// ****************** FUNCTIONS ************************** //
 // ****
 // * Asynchroner (Nicht blockierender) Refresh des LV Trees
 // ****
@@ -136,6 +173,39 @@ function LeNeu()
 	document.getElementById('lehrveranstaltung-detail-textbox-lehrveranstaltung').value=lehrveranstaltung_id;
 	document.getElementById('lehrveranstaltung-detail-checkbox-new').checked=true;
 }
+// ****
+// * Selectiert die Lektorzuordnung nachdem der Tree 
+// * rebuildet wurde.
+// ****
+function LeLektorTreeSelectLektor()
+{
+	var tree=document.getElementById('lehrveranstaltung-detail-tree-lehreinheitmitarbeiter');
+	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+	
+	//In der globalen Variable ist die zu selektierende Lehreinheit gespeichert
+	if(leDetailLektorUid!=null && leDetailLektorLehreinheit_id!=null)
+	{
+	   	for(var i=0;i<items;i++)
+	   	{
+	   		//Lehreinheit_id der row holen
+			col = tree.columns ? tree.columns["lehrveranstaltung-lehreinheitmitarbeiter-treecol-lehreinheit_id"] : "lehrveranstaltung-lehreinheitmitarbeiter-treecol-lehreinheit_id";
+			lehreinheit_id=tree.view.getCellText(i,col);
+			//Uid der row holen
+			col = tree.columns ? tree.columns["lehrveranstaltung-lehreinheitmitarbeiter-treecol-mitarbeiter_uid"] : "lehrveranstaltung-lehreinheitmitarbeiter-treecol-mitarbeiter_uid";
+			uid=tree.view.getCellText(i,col);
+			
+			//wenn dies die zu selektierende Zeile
+			if(leDetailLektorUid==uid && leDetailLektorLehreinheit_id==lehreinheit_id)
+			{
+				//Zeile markieren
+				tree.view.selection.select(i);
+				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
+				tree.treeBoxObject.ensureRowIsVisible(i);
+				return true;
+			}
+	   	}
+	}
+}
 
 // ****
 // * Selectiert die Lehreinheit nachdem der Tree 
@@ -153,7 +223,8 @@ function LvTreeSelectLehreinheit()
 		//Zeilen zurueckliefert
 	   	for(var i=items-1;i>=0;i--)
 	   	{	   		
-	   		tree.view.toggleOpenState(i);
+	   		if(!tree.view.isContainerOpen(i))
+	   			tree.view.toggleOpenState(i);
 	   	}
 	   	
 	   	//Jetzt die wirkliche Anzahl (aller) Zeilen holen
@@ -371,10 +442,13 @@ function LeDetailSave()
 		alert(val.dbdml_errormsg)
 	} 
 	else 
-	{
+	{	
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 		document.getElementById('lehrveranstaltung-detail-checkbox-new').checked=false;
-		LvTreeRefresh();
-		alert('Daten wurden gespeichert');
+		//LvTreeRefresh();
+		LvSelectLehreinheit_id=val.dbdml_data;
+		LvTreeDatasource.Refresh(false); //non blocking
+		SetStatusBarText('Daten wurden gespeichert');
 	}
 }
 
@@ -506,7 +580,7 @@ function LeAuswahl()
 	document.getElementById('lehrveranstaltung-detail-textbox-unr').value=unr;
 	document.getElementById('lehrveranstaltung-detail-textbox-lvnr').value=lvnr;	
 	document.getElementById('lehrveranstaltung-detail-textbox-lehrveranstaltung').value=lehrveranstaltung;
-	if(lehre='Ja')
+	if(lehre=='Ja')
 		document.getElementById('lehrveranstaltung-detail-checkbox-lehre').checked=true;
 	else
 		document.getElementById('lehrveranstaltung-detail-checkbox-lehre').checked=false;
@@ -543,6 +617,7 @@ function LeAuswahl()
 		LeDetailLektorDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 		LeDetailLektorDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 		lektortree.database.AddDataSource(LeDetailLektorDatasource);
+		lektortree.builder.addListener(LvLektorTreeListener);
 	}
 	catch(e)
 	{
@@ -624,7 +699,9 @@ function LeMitarbeiterSave()
 	} 
 	else 
 	{
-		LeLektorTreeRefresh()
+		leDetailLektorUid = lektor;
+		leDetailLektorLehreinheit_id = lehreinheit_id;
+		LeLektorTreeRefresh();
 	}
 }
 
@@ -725,7 +802,7 @@ function LeMitarbeiterDisableFields(val)
 function LeMitarbeiterAuswahl()
 {
 	tree = document.getElementById('lehrveranstaltung-detail-tree-lehreinheitmitarbeiter');
-	
+	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-button-save').disabled=true;
 	//Falls kein Eintrag gewaehlt wurde, den ersten auswaehlen
 	var idx;
 	if(tree.currentIndex>=0)
@@ -794,7 +871,7 @@ function LeMitarbeiterAuswahl()
 	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-lehreinheit_id').value=lehreinheit_id;
 	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-mitarbeiter_uid').value=mitarbeiter_uid;
 	
-	if(bismelden='Ja')
+	if(bismelden=='Ja')
 		document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden').checked=true;
 	else
 		document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden').checked=false;

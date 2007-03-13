@@ -24,6 +24,7 @@ require_once('../include/functions.inc.php');
 if (!$conn = @pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
+//pg_query($conn, "SET CLIENT_ENCODING to 'UNICODE'");
 $user = get_uid();
 /*
 // test
@@ -45,7 +46,7 @@ $lektor=(isset($_GET['lektor'])?$_GET['lektor']:'');
 
 loadVariables($conn, $user);
 // LVAs holen
-$lvaDAO=new lehrveranstaltung($conn);
+$lvaDAO=new lehrveranstaltung($conn, null, true);
 $lvaDAO->load_lva($stg_kz, $sem);
 
 $rdf_url='http://www.technikum-wien.at/lehrveranstaltung_einheiten';
@@ -60,13 +61,13 @@ $rdf_url='http://www.technikum-wien.at/lehrveranstaltung_einheiten';
 <?php
 
 	foreach ($lvaDAO->lehrveranstaltungen as $row_lva)
-	{
+	{		
 		//Lehrveranstaltung
 		echo "
       		<RDF:Description  id=\"".$row_lva->lehrveranstaltung_id."\"  about=\"".$rdf_url.'/'.$row_lva->lehrveranstaltung_id."\" >
 				<LVA:lehrveranstaltung_id>".$row_lva->lehrveranstaltung_id."</LVA:lehrveranstaltung_id>
 				<LVA:kurzbz><![CDATA[".$row_lva->kurzbz."]]></LVA:kurzbz>
-				<LVA:bezeichnung><![CDATA[".utf8_encode($row_lva->bezeichnung)."]]></LVA:bezeichnung>
+				<LVA:bezeichnung><![CDATA[".$row_lva->bezeichnung."]]></LVA:bezeichnung>
 				<LVA:studiengang_kz>".$row_lva->studiengang_kz."</LVA:studiengang_kz>
 				<LVA:semester>".$row_lva->semester."</LVA:semester>
     			<LVA:sprache><![CDATA[".$row_lva->sprache."]]></LVA:sprache>
@@ -77,7 +78,7 @@ $rdf_url='http://www.technikum-wien.at/lehrveranstaltung_einheiten';
 				<LVA:lehreverzeichnis><![CDATA[".$row_lva->lehreverzeichnis."]]></LVA:lehreverzeichnis>
 				<LVA:aktiv>".($row_lva->aktiv?'Ja':'Nein')."</LVA:aktiv>
 				<LVA:planfaktor>".$row_lva->planfaktor."</LVA:planfaktor>
-				<LVA:planlektoren>".utf8_encode($row_lva->planlektoren)."</LVA:planlektoren>
+				<LVA:planlektoren>".$row_lva->planlektoren."</LVA:planlektoren>
 				<LVA:planpersonalkosten>".$row_lva->planpersonalkosten."</LVA:planpersonalkosten>
 				<LVA:plankostenprolektor>".$row_lva->plankostenprolektor."</LVA:plankostenprolektor>
 				
@@ -97,13 +98,13 @@ $rdf_url='http://www.technikum-wien.at/lehrveranstaltung_einheiten';
       		<RDF:Seq about=\"".$rdf_url.'/'.$row_lva->lehrveranstaltung_id."\" >";
 		
 		//zugehoerige LE holen
-		$le = new lehreinheit($conn);
-		
+		$le = new lehreinheit($conn, null, true);
+				
 		if(!$le->load_lehreinheiten($row_lva->lehrveranstaltung_id, $semester_aktuell))
 			echo "Fehler: $le->errormsg";
 		
 		foreach ($le->lehreinheiten as $row_le)
-		{
+		{			
 			//Lehrfach holen
 			$qry = "SELECT kurzbz, bezeichnung FROM lehre.tbl_lehrfach WHERE lehrfach_id='$row_le->lehrfach_id'";
 			$result_lf = pg_query($conn, $qry);
@@ -120,7 +121,6 @@ $rdf_url='http://www.technikum-wien.at/lehrveranstaltung_einheiten';
 				else 
 					$grp.=' '.$row_grp->gruppe_kurzbz;					
 			}
-			
 			//Lektoren holen
 			$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE lehreinheit_id='$row_le->lehreinheit_id'";
 			$result_lkt = pg_query($conn, $qry);
@@ -132,7 +132,7 @@ $rdf_url='http://www.technikum-wien.at/lehrveranstaltung_einheiten';
       		<RDF:Description  id=\"".$row_le->lehreinheit_id."\"  about=\"".$rdf_url.'/'.$row_lva->lehrveranstaltung_id."/$row_le->lehreinheit_id\" >
 				<LVA:lehrveranstaltung_id>".$row_lva->lehrveranstaltung_id."</LVA:lehrveranstaltung_id>
 				<LVA:kurzbz><![CDATA[".$row_lf->kurzbz."]]></LVA:kurzbz>
-				<LVA:bezeichnung><![CDATA[".utf8_encode($row_lf->bezeichnung)."]]></LVA:bezeichnung>
+				<LVA:bezeichnung><![CDATA[".$row_lf->bezeichnung."]]></LVA:bezeichnung>
 				<LVA:studiengang_kz>".$row_lva->studiengang_kz."</LVA:studiengang_kz>
 				<LVA:semester>".$row_lva->semester."</LVA:semester>
     			<LVA:sprache><![CDATA[".$row_le->sprache."]]></LVA:sprache>
@@ -160,7 +160,7 @@ $rdf_url='http://www.technikum-wien.at/lehrveranstaltung_einheiten';
 				<LVA:unr>$row_le->unr</LVA:unr>
 				<LVA:lvnr>$row_le->lvnr</LVA:lvnr>				
 				<LVA:gruppen><![CDATA[$grp]]></LVA:gruppen>
-				<LVA:lektoren><![CDATA[".utf8_encode($lkt)."]]></LVA:lektoren>
+				<LVA:lektoren><![CDATA[".$lkt."]]></LVA:lektoren>
       		</RDF:Description>";
 			
 			$hier.="
