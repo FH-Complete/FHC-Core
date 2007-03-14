@@ -132,6 +132,38 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
   	</template>
 </tree>
 
+<!-- testing - Verschachtelte Mitarbeiter Ansicht-->
+<tree id="tree-lektor_verschachtelt" onselect="onLektorSelect();"
+	seltype="single" hidecolumnpicker="false" flex="1"
+	enableColumnDrag="true"	
+    ondraggesture="nsDragAndDrop.startDrag(event,mitarbeiterDDObserver);" 
+	datasources="../rdf/mitarbeiter_verschachtelt.rdf.php" ref="http://www.technikum-wien.at/ma/liste">
+	<treecols>
+	    <treecol id="bezeichnung" label="Kuerzel" flex="2" primary="true" />
+	    <splitter class="tree-splitter"/>
+	    <treecol id="nachname" label="Nachname" flex="2" hidden="true"/>
+	    <splitter class="tree-splitter"/>
+	    <treecol id="vorname" label="Vornamen" flex="2" hidden="true"/>
+	    <splitter class="tree-splitter"/>
+	    <treecol id="uid" label="UID" flex="1" hidden="true"/>
+	</treecols>
+
+	<template>
+		<rule>
+		<treechildren>
+	       	<treeitem uri="rdf:*">
+	         	<treerow>
+	           		<treecell label="rdf:http://www.technikum-wien.at/ma/rdf#bezeichnung"/>
+	           		<treecell label="rdf:http://www.technikum-wien.at/ma/rdf#nachname"/>
+	           		<treecell label="rdf:http://www.technikum-wien.at/ma/rdf#vorname"/>
+	           		<treecell label="rdf:http://www.technikum-wien.at/ma/rdf#uid"/>
+	         	</treerow>
+	    	</treeitem>
+	    </treechildren>
+	    </rule>
+  	</template>
+</tree>
+
 <vbox id="vbox-main">
 	<tabbox id="tabbox-main" flex="3" orient="vertical">
 		<tabs orient="horizontal">

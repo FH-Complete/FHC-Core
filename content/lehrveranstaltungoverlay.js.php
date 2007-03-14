@@ -84,6 +84,12 @@ var LvLektorTreeListener =
 };
 
 // ***************** KEY Events ************************* //
+// ****
+// * Wird ausgefuehrt wenn eine Taste gedrueckt wird und der Focus
+// * im Lehrveranstaltungs-tree ist
+// * Beim Druecken von ENTF wird die markierte Lehreinheit geloescht
+// * Beim Druecken von F5 wird der Lehrveranstaltungstree aktualisiert
+// ****
 function LvTreeKeyPress(event)
 {
 	if(event.keyCode==46) // Entf
@@ -92,17 +98,28 @@ function LvTreeKeyPress(event)
 		LvTreeRefresh();
 }
 
+// ****
+// * Wird ausgefuehrt wenn eine Taste gedrueckt wird und der Focus
+// * im Gruppen-tree ist
+// * Beim Druecken von ENTF wird die markierte Gruppenzuordnung geloescht
+// ****
 function LvDetailGruppenTreeKeyPress(event)
 {	
 	if(event.keyCode==46) //Entf
 		LeGruppeDel();
 }
 
+// ****
+// * Wird ausgefuehrt wenn eine Taste gedrueckt wird und der Focus
+// * im Mitarbeiter-tree ist
+// * Beim Druecken von ENTF wird die markierte Mitarbeiterzuordnung geloescht
+// ****
 function LvDetailMitarbeiterTreeKeyPress(event)
 {	
 	if(event.keyCode==46) //Entf
 		LeMitarbeiterDel();
 }
+
 // ****************** FUNCTIONS ************************** //
 // ****
 // * Asynchroner (Nicht blockierender) Refresh des LV Trees
@@ -320,7 +337,7 @@ function LeDetailReset()
 	document.getElementById('lehrveranstaltung-detail-textbox-lvnr').value='';
 	document.getElementById('lehrveranstaltung-detail-textbox-unr').value='';
 	document.getElementById('lehrveranstaltung-detail-textbox-lehrveranstaltung').value='';
-	document.getElementById('lehrveranstaltung-detail-checkbox-lehre').checked=false;
+	document.getElementById('lehrveranstaltung-detail-checkbox-lehre').checked=true;
 	document.getElementById('lehrveranstaltung-detail-textbox-stundenblockung').value='';
 	document.getElementById('lehrveranstaltung-detail-textbox-wochenrythmus').value='';
 	document.getElementById('lehrveranstaltung-detail-textbox-startkw').value='';

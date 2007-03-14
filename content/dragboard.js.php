@@ -28,8 +28,8 @@ function lehrstunde(id,idList)
 }
 var lehrstunden=new Array();
 
-/***** Drag Observer fuer Lehrveranstaltungen ****
-may not be used?!?
+/***** Drag Observer fuer Lehrveranstaltungen *****/
+//zum verplanen der LVAs im Stundenplan
 var lvaObserver=
 {
 	onDragStart: function (evt,transferData,action)
@@ -43,7 +43,6 @@ var lvaObserver=
     	//alert("test");
   	}
 };
-*/
 
 /***** Drag Observer fuer Gruppen *****/
 var lvbgrpDDObserver=

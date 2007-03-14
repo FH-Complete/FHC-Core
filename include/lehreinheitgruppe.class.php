@@ -36,6 +36,10 @@ class lehreinheitgruppe
 	var $gruppe;				// char(1)
 	var $gruppe_kurzbz;			// varchar(16)
 	var $ext_id;				// bigint
+	var $updateamum;			// timestamp
+	var $updatevon;				// varchar(16)
+	var $insertamum;			// timestamp
+	var $insertvon;				// varchar(16)
 	
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine LE
@@ -170,14 +174,16 @@ class lehreinheitgruppe
 		if($new)
 		{
 			//ToDo ID entfernen
-			$qry = 'INSERT INTO lehre.tbl_lehreinheitgruppe (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, ext_id)
+			$qry = 'INSERT INTO lehre.tbl_lehreinheitgruppe (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, ext_id, insertamum, insertvon)
 			        VALUES('.$this->addslashes($this->lehreinheit_id).','.
 					$this->addslashes($this->studiengang_kz).','.
 					$this->addslashes($this->semester).','.
 					$this->addslashes($this->verband).','.
 					$this->addslashes($this->gruppe).','.
 					$this->addslashes($this->gruppe_kurzbz).','.
-					$this->addslashes($this->ext_id).');';
+					$this->addslashes($this->ext_id).','.
+					$this->addslashes($this->insertamum).','.
+					$this->addslashes($this->insertvon).');';
 		}
 		else
 		{
@@ -189,6 +195,8 @@ class lehreinheitgruppe
 			       ' gruppe='.$this->addslashes($this->gruppe).','.
 			       ' gruppe_kurzbz='.$this->addslashes($this->gruppe_kurzbz).','.
 			       ' ext_id='.$this->addslashes($this->ext_id).','.
+			       ' updateamum='.$this->addslashes($this->updateamum).','.
+			       ' updatevon='.$this->addslashes($this->updatevon).
 			       " WHERE lehreinheitgruppe_id=".$this->addslashes($this->lehreinheitgruppe_id).";";
 		}
 

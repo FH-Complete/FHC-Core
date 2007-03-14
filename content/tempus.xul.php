@@ -44,8 +44,6 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/tempusoverlay.xul.php"?>';
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/tempus.js.php" />
 <script type="application/x-javascript" src="chrome://global/content/nsTransferable.js"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/DragAndDrop.js"/>
-<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/dragboard.js"/>
-
 
 <commandset id="maincommands">
   <command id="menu-file-close:command" oncommand="closeWindow();"/>
