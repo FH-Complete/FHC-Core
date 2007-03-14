@@ -1049,7 +1049,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 												$ausgabe_mitarbeiter="Kurzbezeichnung: '".$mitarbeiterkurzbz."'";
 											}
 										}
-										if($rowu->lektor!=($mitarbeiterlektor?'t':'f'))
+										/*if($rowu->lektor!=($mitarbeiterlektor?'t':'f'))
 										{
 											$updatem=true;
 											if(strlen(trim($ausgabe_mitarbeiter))>0)
@@ -1060,8 +1060,8 @@ if($resultall = pg_query($conn_fas, $qryall))
 											{
 												$ausgabe_mitarbeiter="Lektor: '".($mitarbeiterlektor?'true':'false')."'";
 											}
-										}
-										if($rowu->fixangestellt!=($mitarbeiterfixangestellt?'t':'f'))
+										}*/
+										/*if($rowu->fixangestellt!=($mitarbeiterfixangestellt?'t':'f'))
 										{
 											$updatem=true;
 											if(strlen(trim($ausgabe_mitarbeiter))>0)
@@ -1072,7 +1072,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 											{
 												$ausgabe_mitarbeiter="Fixangestellt: '".($mitarbeiterfixangestellt?'true':'false')."'";
 											}
-										}
+										}*/
 										if($rowu->telefonklappe!=$mitarbeitertelefonklappe)
 										{
 											$updatem=true;
@@ -1117,8 +1117,8 @@ if($resultall = pg_query($conn_fas, $qryall))
 									ausbildungcode=".myaddslashes($mitarbeiterausbildungcode).", 
 									personalnummer=".myaddslashes($mitarbeiterpersonalnummer).", 
 									kurzbz=".myaddslashes($mitarbeiterkurzbz).", 
-									lektor=".myaddslashes($mitarbeiterlektor?'true':'false').", 
-									fixangestellt=".myaddslashes($mitarbeiterfixangestellt?'true':'false').", 
+									lektor=".myaddslashes($rowu->lektor).", 
+									fixangestellt=".myaddslashes($rowu->fixangestellt).", 
 									telefonklappe=".myaddslashes($mitarbeitertelefonklappe).", 
 									ort_kurzbz=".myaddslashes($mitarbeiterort_kurzbz).", 
 									anmerkung=".myaddslashes($mitarbeiteranmerkung).", 

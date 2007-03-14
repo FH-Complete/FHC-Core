@@ -701,7 +701,7 @@ if($result = pg_query($conn_fas, $qry))
 		$qry="SELECT * FROM (SELECT status, creationdate FROM student_ausbildungssemester WHERE student_fk= '".$row->student_pk."'  AND
 		studiensemester_fk=(SELECT studiensemester_pk FROM studiensemester WHERE aktuell='J') ORDER BY 2 DESC LIMIT 1) AS abc
 		WHERE status IN ('3', '10', '11', '12', '13');";
-
+		$aktiv=false;
 		if($resultu = pg_query($conn_fas, $qry))
 		{
 			if(pg_num_rows($resultu)>0)
@@ -848,11 +848,11 @@ if($result = pg_query($conn_fas, $qry))
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
 						{
-							$ausgabe_person.=", Sprache: '".$sprache."'";
+							$ausgabe_person.=", Sprache: '".$sprache."' (statt '".$row1->sprache."')";
 						}
 						else
 						{
-							$ausgabe_person="Sprache: '".$sprache."'";
+							$ausgabe_person="Sprache: '".$sprache."' (statt '".$row1->sprache."')";
 						}
 					}
 					if($row1->anrede!=$anrede)
@@ -860,11 +860,11 @@ if($result = pg_query($conn_fas, $qry))
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
 						{
-							$ausgabe_person.=", Anrede: '".$anrede."'";
+							$ausgabe_person.=", Anrede: '".$anrede."' (statt '".$row1->anrede."')";
 						}
 						else
 						{
-							$ausgabe_person="Anrede: '".$anrede."'";
+							$ausgabe_person="Anrede: '".$anrede."' (statt '".$row1->anrede."')";
 						}
 					}
 					if($row1->titelpost!=$titelpost)
@@ -872,11 +872,11 @@ if($result = pg_query($conn_fas, $qry))
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
 						{
-							$ausgabe_person.=", Postnomentitel: '".$titelpost."'";
+							$ausgabe_person.=", Postnomentitel: '".$titelpost."' (statt '".$row1->titelpost."')";
 						}
 						else
 						{
-							$ausgabe_person="Postnomentitel: '".$titelpost."'";
+							$ausgabe_person="Postnomentitel: '".$titelpost."' (statt '".$row1->titelpost."')";
 						}
 					}
 					if($row1->titelpre!=$titelpre)
@@ -884,11 +884,11 @@ if($result = pg_query($conn_fas, $qry))
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
 						{
-							$ausgabe_person.=", Prenomentitel: '".$titelpre."'";
+							$ausgabe_person.=", Prenomentitel: '".$titelpre."' (statt '".$row1->titelpre."')";
 						}
 						else
 						{
-							$ausgabe_person="Prenomentitel: '".$titelpre."'";
+							$ausgabe_person="Prenomentitel: '".$titelpre."' (statt '".$row1->titelpre."')";
 						}
 					}
 					if($row1->nachname!=$nachname)
@@ -896,11 +896,11 @@ if($result = pg_query($conn_fas, $qry))
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
 						{
-							$ausgabe_person.=", Nachname: '".$nachname."'";
+							$ausgabe_person.=", Nachname: '".$nachname."' (statt '".$row1->nachname."')";
 						}
 						else
 						{
-							$ausgabe_person=" Nachname: '".$nachname."'";
+							$ausgabe_person=" Nachname: '".$nachname."' (statt '".$row1->nachname."')";
 						}
 					}
 					if($row1->vorname!=$vorname)
@@ -908,11 +908,11 @@ if($result = pg_query($conn_fas, $qry))
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
 						{
-							$ausgabe_person.=", Vorname: '".$vorname."'";
+							$ausgabe_person.=", Vorname: '".$vorname."' (statt '".$row1->vorname."')";
 						}
 						else
 						{
-							$ausgabe_person="Vorname: '".$vorname."'";
+							$ausgabe_person="Vorname: '".$vorname."' (statt '".$row1->vorname."')";
 						}
 					}
 					if($row1->vornamen!=$vornamen)
@@ -920,11 +920,11 @@ if($result = pg_query($conn_fas, $qry))
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
 						{
-							$ausgabe_person.=", Vornamen: '".$vornamen."'";
+							$ausgabe_person.=", Vornamen: '".$vornamen."' (statt '".$row1->vornamen."')";
 						}
 						else
 						{
-							$ausgabe_person="Vornamen: '".$vornamen."'";
+							$ausgabe_person="Vornamen: '".$vornamen."' (statt '".$row1->vornamen."')";
 						}
 					}
 					if($row1->gebdatum!=$gebdatum)
@@ -932,11 +932,11 @@ if($result = pg_query($conn_fas, $qry))
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
 						{
-							$ausgabe_person.=", Geburtsdatum: '".$gebdatum."'";
+							$ausgabe_person.=", Geburtsdatum: '".$gebdatum."' (statt '".$row1->gebdatum."')";
 						}
 						else
 						{
-							$ausgabe_person="Geburtsdatum: '".$gebdatum."'";
+							$ausgabe_person="Geburtsdatum: '".$gebdatum."' (statt '".$row1->gebdatum."')";
 						}
 					}
 					if($row1->gebort!=$gebort)
@@ -944,11 +944,11 @@ if($result = pg_query($conn_fas, $qry))
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
 						{
-							$ausgabe_person.=", Geburtsort: '".$gebort."'";
+							$ausgabe_person.=", Geburtsort: '".$gebort."' (statt '".$row1->gebort."')";
 						}
 						else
 						{
-							$ausgabe_person="Geburtsort: '".$gebort."'";
+							$ausgabe_person="Geburtsort: '".$gebort."' (statt '".$row1->gebort."')";
 						}
 					}
 					if($row1->anmerkungen!=$anmerkungen)
@@ -968,11 +968,11 @@ if($result = pg_query($conn_fas, $qry))
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
 						{
-							$ausgabe_person.=", Sozialversicherungsnummer: '".$svnr."'";
+							$ausgabe_person.=", Sozialversicherungsnummer: '".$svnr."' (statt '".$row1->svnr."')";
 						}
 						else
 						{
-							$ausgabe_person="Sozialversicherungsnummer: '".$svnr."'";
+							$ausgabe_person="Sozialversicherungsnummer: '".$svnr."' (statt '".$row1->svnr."')";
 						}
 					}
 					if($row1->ersatzkennzeichen!=$ersatzkennzeichen)
@@ -980,11 +980,11 @@ if($result = pg_query($conn_fas, $qry))
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
 						{
-							$ausgabe_person.=", Ersatzkennzeichen: '".$ersatzkennzeichen."'";
+							$ausgabe_person.=", Ersatzkennzeichen: '".$ersatzkennzeichen."' (statt '".$row1->ersatzkennzeichen."')";
 						}
 						else
 						{
-							$ausgabe_person="Ersatzkennzeichen: '".$ersatzkennzeichen."'";
+							$ausgabe_person="Ersatzkennzeichen: '".$ersatzkennzeichen."' (statt '".$row1->ersatzkennzeichen."')";
 						}
 					}
 					if($row1->familienstand!=$familienstand)
@@ -992,11 +992,11 @@ if($result = pg_query($conn_fas, $qry))
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
 						{
-							$ausgabe_person.=", Familienstand: '".$familienstand."'";
+							$ausgabe_person.=", Familienstand: '".$familienstand."' (statt '".$row1->familienstand."')";
 						}
 						else
 						{
-							$ausgabe_person="Familienstand: '".$familienstand."'";
+							$ausgabe_person="Familienstand: '".$familienstand."' (statt '".$row1->familienstand."')";
 						}
 					}
 					if($row1->anzahlkinder!=$anzahlkinder)
@@ -1004,11 +1004,11 @@ if($result = pg_query($conn_fas, $qry))
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
 						{
-							$ausgabe_person.=", Anzahl der Kinder: '".$anzahlkinder."'";
+							$ausgabe_person.=", Anzahl der Kinder: '".$anzahlkinder."' (statt '".$row1->anzahlkinder."')";
 						}
 						else
 						{
-							$ausgabe_person="Anzahl der Kinder: '".$anzahlkinder."'";
+							$ausgabe_person="Anzahl der Kinder: '".$anzahlkinder."' (statt '".$row1->anzahlkinder."')";
 						}
 					}
 					if($row1->aktiv!=($aktiv?'t':'f') && $aktiv!='')
@@ -1016,11 +1016,11 @@ if($result = pg_query($conn_fas, $qry))
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
 						{
-							$ausgabe_person.=", Aktiv: '".$aktiv."'";
+							$ausgabe_person.=", Aktiv: '".($aktiv?'true':'false')."' (statt '".$row1->aktiv."')";
 						}
 						else
 						{
-							$ausgabe_person="Aktiv: '".$aktiv."'";
+							$ausgabe_person="Aktiv: '".($aktiv?'true':'false')."' (statt '".$row1->aktiv."')";
 						}
 					}
 					if($row1->geburtsnation!=$geburtsnation)
@@ -1028,11 +1028,11 @@ if($result = pg_query($conn_fas, $qry))
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
 						{
-							$ausgabe_person.=", Geburtsnation: '".$geburtsnation."'";
+							$ausgabe_person.=", Geburtsnation: '".$geburtsnation."' (statt '".$row1->geburtsnation."')";
 						}
 						else
 						{
-							$ausgabe_person="Geburtsnation: '".$geburtsnation."'";
+							$ausgabe_person="Geburtsnation: '".$geburtsnation."' (statt '".$row1->geburtsnation."')";
 						}
 					}
 					if($row1->geschlecht!=$geschlecht)
@@ -1040,11 +1040,11 @@ if($result = pg_query($conn_fas, $qry))
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
 						{
-							$ausgabe_person.=", Geschlecht: '".$geschlecht."'";
+							$ausgabe_person.=", Geschlecht: '".$geschlecht."' (statt '".$row1->geschlecht."')";
 						}
 						else
 						{
-							$ausgabe_person="Sprache: '".$geschlecht."'";
+							$ausgabe_person="Sprache: '".$geschlecht."' (statt '".$row1->geschlecht."')";
 						}
 					}
 					if($row1->staatsbuergerschaft!=$staatsbuergerschaft)
@@ -1052,11 +1052,11 @@ if($result = pg_query($conn_fas, $qry))
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
 						{
-							$ausgabe_person.=", Staatsbürgerschaft: '".$staatsbuergerschaft."'";
+							$ausgabe_person.=", Staatsbürgerschaft: '".$staatsbuergerschaft."' (statt '".$row1->staatsbuergerschaft."')";
 						}
 						else
 						{
-							$ausgabe_person="Staatsbürgerschaft: '".$staatsbuergerschaft."'";
+							$ausgabe_person="Staatsbürgerschaft: '".$staatsbuergerschaft."' (statt '".$row1->staatsbuergerschaft."')";
 						}
 					}
 					if($updatep)
@@ -1743,7 +1743,7 @@ if($result = pg_query($conn_fas, $qry))
 									$qry = 'UPDATE public.tbl_benutzer SET'.
 									       ' uid='.myaddslashes($student_uid).','.
 									       ' person_id='.myaddslashes($person_id).','.
-									       ' aktiv='.myaddslashes($aktiv).','.
+									       ' aktiv='.($aktiv?'true':'false').','.
 									       ' alias='.myaddslashes($alias).','.
 									       " insertamum=now()".','.
 							        		       ' insertvon='.myaddslashes($insertvon).','.
