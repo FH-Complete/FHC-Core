@@ -337,7 +337,7 @@ if($result = pg_query($conn_fas, $qry))
 			echo"<input type='text' size='20' maxlength='255' name='vorname' value='".$row->vorname2."'>";
 		echo "</td>";
 		echo "<td>'".$row->vornamen2."'";
-		if($row->vornamen1<>$row->vornamen2 || $row->vornamen1<>$row->vornamen2)
+		if($row->vorname1<>$row->vorname2 || $row->vornamen1<>$row->vornamen2)
 			echo"<input type='text' size='20' maxlength='255' name='vornamen' value='".$row->vornamen2."'>";
 		echo "</td>";
 		echo "<td>'".$row->anrede2."'";
