@@ -123,6 +123,8 @@ function onLektorSelect()
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
 	var treeLektor=document.getElementById('tree-lektor');
 	var uid=treeLektor.view.getCellText(treeLektor.currentIndex,"uid");
+	if(uid=='')
+		return;
 	//var treeVerband=document.getElementById('tree-verband');
 	//var stg_kz=treeVerband.view.getCellText(treeVerband.currentIndex,"stg_kz");
 	var daten=window.TimeTableWeek.document.getElementById('TimeTableWeekData');

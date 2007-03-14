@@ -202,6 +202,8 @@ if(!$error)
 			$leg->verband = $_POST['verband'];
 			$leg->gruppe = $_POST['gruppe'];
 			$leg->gruppe_kurzbz = $_POST['gruppe_kurzbz'];
+			$leg->insertamum = date('Y-m-d H:i:s');
+			$leg->insertvon = $user;
 			
 			if($leg->save(true))
 			{

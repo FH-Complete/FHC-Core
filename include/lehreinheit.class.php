@@ -659,14 +659,47 @@ class lehreinheit
 			$this->errormsg = 'Lehreinheit_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		$qry = "DELETE FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$lehreinheit_id'";
-		if(pg_query($this->conn, $qry))
-			return true;
-		else
+		//Pruefen ob schon eine Kreuzerlliste fuer diese Lehreinheit angelegt wurde.
+		//Falls ja dann wird das loeschen verweigert
+		$qry = "SELECT count(*) as anzahl FROM campus.tbl_uebung WHERE lehreinheit_id='$lehreinheit_id'";
+		if($result = pg_query($this->conn, $qry))
 		{
-			$this->errormsg = pg_last_error($this->conn);
+			if($row = pg_fetch_object($result))
+			{
+				if($row->anzahl>0)
+				{
+					$this->errormsg = 'Zu dieser Lehreinheit wurde bereits eine Kreuzerlliste angelegt. Solange fuer eine Lehreinheit Kreuzerllisten vorhanden sind, kann diese nicht geloescht werden.';
+					return false;
+				}
+				else 
+				{
+					//Gruppenzuteilung, Mitarbeiterzuteilung und Lehreinheit loeschen
+					$qry = "BEGIN;
+							DELETE FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$lehreinheit_id';
+							DELETE FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id';
+							DELETE FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$lehreinheit_id';
+							COMMIT;";
+					if(pg_query($this->conn, $qry))
+						return true;
+					else
+					{
+						$this->errormsg = pg_last_error($this->conn);
+						return false;
+					}
+				}
+			}
+			else 
+			{
+				$this->errormsg = 'Fehler beim loeschen';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim loeschen';
 			return false;
 		}
+		
 	}
 
 }
