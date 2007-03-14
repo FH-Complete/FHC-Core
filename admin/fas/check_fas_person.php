@@ -241,13 +241,18 @@ p2.vornamen as vornamen2, p2.geschlecht as geschlecht2, p2.gebdat as gebdat2, p2
 p2.staatsbuergerschaft as staatsbuergerschaft2, p2.familienstand as familienstand2, p2.svnr as svnr2, 
 p2.anzahlderkinder as anzahlderkinder2, p2.ersatzkennzeichen as ersatzkennzeichen2, p2.bemerkung as bemerkung2, p2.titel as titel2, 
 p2.uid as uid2, p2.gebnation as gebnation2, p2.postnomentitel as postnomentitel2, p2.bismelden as bismelden2
-FROM person p1, person p2 WHERE p1.person_pk<p2.person_pk AND p1.svnr=p2.svnr AND p1.svnr IS NOT NULL
-AND p1.svnr<>'0005010400' AND p1.svnr<>''
+FROM person p1, person p2 
+WHERE p1.person_pk<p2.person_pk 
+AND ((p1.svnr=p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'') 
+	OR (p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!='' 
+	AND p1.gebdat=p2.gebdat AND p1.gebdat IS NOT NULL AND p1.gebdat>'1935-01-01' AND p1.gebdat<'2000-01-01'))
+AND p1.svnr<>'0005010400' 
 AND (p1.familienname<>p2.familienname OR p1.vorname<>p2.vorname OR p1.anrede<>p2.anrede  OR p1.vornamen<>p2.vornamen 
 OR p1.geschlecht<>p2.geschlecht  OR p1.gebdat<>p2.gebdat  OR p1.gebort<>p2.gebort  OR p1.staatsbuergerschaft<>p2.staatsbuergerschaft
 OR p1.familienstand<>p2.familienstand  OR p1.svnr<>p2.svnr  OR p1.anzahlderkinder<>p2.anzahlderkinder
 OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.titel<>p2.titel  OR p1.gebnation<>p2.gebnation 
-OR p1.postnomentitel<>p2.postnomentitel) ORDER BY p1.familienname, p1.person_pk LIMIT 10;";
+OR p1.postnomentitel<>p2.postnomentitel) LIMIT 10;";
+//ORDER BY p1.familienname, p1.person_pk;";
 
 if($result = pg_query($conn_fas, $qry))
 {
