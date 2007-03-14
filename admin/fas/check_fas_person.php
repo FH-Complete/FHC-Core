@@ -247,11 +247,11 @@ AND (p1.familienname<>p2.familienname OR p1.vorname<>p2.vorname OR p1.anrede<>p2
 OR p1.geschlecht<>p2.geschlecht  OR p1.gebdat<>p2.gebdat  OR p1.gebort<>p2.gebort  OR p1.staatsbuergerschaft<>p2.staatsbuergerschaft
 OR p1.familienstand<>p2.familienstand  OR p1.svnr<>p2.svnr  OR p1.anzahlderkinder<>p2.anzahlderkinder
 OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.titel<>p2.titel  OR p1.gebnation<>p2.gebnation 
-OR p1.postnomentitel<>p2.postnomentitel) ORDER BY p1.familienname, p1.person_pk;";
+OR p1.postnomentitel<>p2.postnomentitel) ORDER BY p1.familienname, p1.person_pk LIMIT 10;";
 
 if($result = pg_query($conn_fas, $qry))
 {
-	echo "<table class='liste'><tr><th>person_pk</th><th>familienname</th><th>vorname</th><th>anrede</th><th>vornamen</th><th>geschlecht</th><th>gebdat</th><th>gebort</th><th>gebnation</th><th>staatsbürgerschaft</th><th>familienstand</th><th>svnr</th><th>anzahlderkinder</th><th>ersatzkennzeichen</th><th>titel</th><th>postnomentitel</th></tr>";
+	echo "<table class='liste'><tr><th>person_pk</th><th>familienname</th><th>vorname</th><th>vornamen</th><th>anrede</th><th>geschlecht</th><th>gebdat</th><th>gebort</th><th>gebnation</th><th>staatsbürgerschaft</th><th>familienstand</th><th>svnr</th><th>anzahlderkinder</th><th>ersatzkennzeichen</th><th>titel</th><th>postnomentitel</th></tr>";
 	while($row = pg_fetch_object($result))
 	{
 		$i++;
@@ -265,16 +265,16 @@ if($result = pg_query($conn_fas, $qry))
 			echo"<input type='text' size='20' maxlength='255' name='familienname' value='".$row->familienname1."'>";
 		echo "</td>";
 		echo "<td>'".$row->vorname1."'";
-		if($row->vorname1<>$row->vorname2)
+		if($row->vorname1<>$row->vorname2 || $row->vornamen1<>$row->vornamen2) 
 			echo"<input type='text' size='20' maxlength='255' name='vorname' value='".$row->vorname1."'>";
+		echo "</td>";
+		echo "<td>'".$row->vornamen1."'";
+		if($row->vorname1<>$row->vorname2 || $row->vornamen1<>$row->vornamen2)
+			echo"<input type='text' size='20' maxlength='255' name='vornamen' value='".$row->vornamen1."'>";
 		echo "</td>";
 		echo "<td>'".$row->anrede1."'";
 		if($row->anrede1<>$row->anrede2)
 			echo"<input type='text' size='10' maxlength='20' name='anrede' value='".$row->anrede1."'>";
-		echo "</td>";
-		echo "<td>'".$row->vornamen1."'";
-		if($row->vornamen1<>$row->vornamen2)
-			echo"<input type='text' size='20' maxlength='255' name='vornamen' value='".$row->vornamen1."'>";
 		echo "</td>";
 		echo "<td>'".$row->geschlecht1."'";
 		if($row->geschlecht1<>$row->geschlecht2)
@@ -306,18 +306,18 @@ if($result = pg_query($conn_fas, $qry))
 		echo "</td>";
 		echo "<td>'".$row->anzahlderkinder1."'";
 		if($row->anzahlderkinder1<>$row->anzahlderkinder2)
-			echo"<input type='text' size='1' maxlength='1' name='geschlecht'  value='".$row->anzahlderkinder1."'>";
+			echo"<input type='text' size='1' maxlength='1' name='anzahlderkinder'  value='".$row->anzahlderkinder1."'>";
 		echo "</td>";
 		echo "<td>'".$row->ersatzkennzeichen1."'";
 		if($row->ersatzkennzeichen1<>$row->ersatzkennzeichen2)
 			echo"<input type='text' size='10' maxlength='10' name='ersatzkennzeichen'  value='".$row->ersatzkennzeichen1."'>";
 		echo "</td>";
 		echo "<td>'".$row->titel1."'";
-		//if($row->titel1<>$row->titel2)
+		if($row->titel1<>$row->titel2 || $row->postnomentitel1<>$row->postnomentitel2)
 			echo"<input type='text' size='20' maxlength='30' name='titel'  value='".$row->titel1."'>";
 		echo "</td>";
 		echo "<td>'".$row->postnomentitel1."'";
-		//if($row->postnomentitel1<>$row->postnomentitel2)
+		if($row->titel1<>$row->titel2 || $row->postnomentitel1<>$row->postnomentitel2)
 		echo"<input type='text' size='20' maxlength='30' name='postnomentitel'  value='".$row->postnomentitel1."'>";
 		echo "</td>";
 		echo "<td><input type='submit' value='Speichern'></td>";
@@ -333,16 +333,16 @@ if($result = pg_query($conn_fas, $qry))
 			echo"<input type='text' size='20' maxlength='255' name='familienname' value='".$row->familienname2."'>";
 		echo "</td>";
 		echo "<td>'".$row->vorname2."'";
-		if($row->vorname1<>$row->vorname2)
+		if($row->vorname1<>$row->vorname2 || $row->vornamen1<>$row->vornamen2)
 			echo"<input type='text' size='20' maxlength='255' name='vorname' value='".$row->vorname2."'>";
+		echo "</td>";
+		echo "<td>'".$row->vornamen2."'";
+		if($row->vornamen1<>$row->vornamen2 || $row->vornamen1<>$row->vornamen2)
+			echo"<input type='text' size='20' maxlength='255' name='vornamen' value='".$row->vornamen2."'>";
 		echo "</td>";
 		echo "<td>'".$row->anrede2."'";
 		if($row->anrede1<>$row->anrede2)
 			echo"<input type='text' size='10' maxlength='20' name='anrede' value='".$row->anrede2."'>";
-		echo "</td>";
-		echo "<td>'".$row->vornamen2."'";
-		if($row->vornamen1<>$row->vornamen2)
-			echo"<input type='text' size='20' maxlength='255' name='vornamen' value='".$row->vornamen2."'>";
 		echo "</td>";
 		echo "<td>'".$row->geschlecht2."'";
 		if($row->geschlecht1<>$row->geschlecht2)
@@ -374,18 +374,18 @@ if($result = pg_query($conn_fas, $qry))
 		echo "</td>";
 		echo "<td>'".$row->anzahlderkinder2."'";
 		if($row->anzahlderkinder1<>$row->anzahlderkinder2)
-			echo"<input type='text' size='1' maxlength='1' name='geschlecht'  value='".$row->anzahlderkinder2."'>";
+			echo"<input type='text' size='1' maxlength='1' name='anzahlderkinder'  value='".$row->anzahlderkinder2."'>";
 		echo "</td>";
 		echo "<td>'".$row->ersatzkennzeichen2."'";
 		if($row->ersatzkennzeichen1<>$row->ersatzkennzeichen2)
 			echo"<input type='text' size='10' maxlength='10' name='ersatzkennzeichen'  value='".$row->ersatzkennzeichen2."'>";
 		echo "</td>";
 		echo "<td>'".$row->titel2."'";
-		//if($row->titel1<>$row->titel2)
+		if($row->titel1<>$row->titel2 || $row->postnomentitel1<>$row->postnomentitel2)
 			echo"<input type='text' size='20' maxlength='30' name='titel'  value='".$row->titel2."'>";
 		echo "</td>";
 		echo "<td>'".$row->postnomentitel2."'";
-		//if($row->postnomentitel1<>$row->postnomentitel2)
+		if($row->titel1<>$row->titel2 || $row->postnomentitel1<>$row->postnomentitel2)
 			echo"<input type='text' size='20' maxlength='30' name='postnomentitel'  value='".$row->postnomentitel2."'>";
 		echo "</td>";
 		echo "<td><input type='submit' value='Speichern'></td>";
