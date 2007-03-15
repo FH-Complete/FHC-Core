@@ -123,8 +123,9 @@ p2.beendigungsdatum AS beendigungsdatum2, p2.berufstaetigkeit AS berufstaetigkei
 p2.aufnahmeschluessel AS aufnahmeschluessel2, p2.aufnahmeschluessel_fk AS aufnahmeschluesselfk2, p2.angetreten AS angetreten2
 FROM (person JOIN student ON person_pk=student.person_fk ) AS p1 
 CROSS JOIN (person JOIN student ON person_pk=student.person_fk) AS p2 WHERE 
-((p1.gebdat=p2.gebdat AND p1.familienname=p2.familienname AND p1.svnr='' AND p1.ersatzkennzeichen='')  
-OR ((p1.ersatzkennzeichen=p2.ersatzkennzeichen AND p1.ersatzkennzeichen<>'') OR (p1.svnr=p2.svnr AND p1.svnr<>''))) 
+((p1.svnr=p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'') 
+	OR (p1.svnr<>p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'' AND p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!='' 
+	AND p1.gebdat=p2.gebdat AND p1.gebdat IS NOT NULL AND p1.gebdat>'1935-01-01' AND p1.gebdat<'2000-01-01'))
 AND (p1.person_pk < p2.person_pk) 
 AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400') 
 AND (trim(p1.familienname)<>trim(p2.familienname) OR trim(p1.vorname)<>trim(p2.vorname) OR trim(p1.vornamen)<>trim(p2.vornamen)
@@ -406,7 +407,9 @@ CROSS JOIN (person JOIN student ON person_pk=student.person_fk) AS p2 WHERE
 ((p1.gebdat=p2.gebdat AND p1.familienname=p2.familienname AND p1.vorname=p2.vorname) 
 OR ((p1.ersatzkennzeichen=p2.ersatzkennzeichen AND p1.ersatzkennzeichen<>'') OR (p1.svnr=p2.svnr AND p1.svnr<>'')))
 AND (p1.person_pk <> p2.person_pk)
-AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400')
+AND ((p1.svnr=p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'') 
+	OR (p1.svnr<>p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'' AND p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!='' 
+	AND p1.gebdat=p2.gebdat AND p1.gebdat IS NOT NULL AND p1.gebdat>'1935-01-01' AND p1.gebdat<'2000-01-01'))
 AND (trim(p1.familienname)<>trim(p2.familienname) OR trim(p1.vorname)<>trim(p2.vorname) OR trim(p1.vornamen)<>trim(p2.vornamen)
 	OR p1.geschlecht<>p2.geschlecht 
 	OR p1.gebdat<>p2.gebdat OR p1.staatsbuergerschaft<> p2.staatsbuergerschaft OR p1.familienstand<>p2.familienstand 
