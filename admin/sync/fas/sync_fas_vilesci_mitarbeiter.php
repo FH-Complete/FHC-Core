@@ -15,10 +15,10 @@ require_once('../../../vilesci/config.inc.php');
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
-//$adress='ruhan@technikum-wien.at';
-//$adress_plausi='ruhan@technikum-wien.at';
-$adress='fas_sync@technikum-wien.at';
-$adress_plausi='fas_sync@technikum-wien.at';
+$adress='ruhan@technikum-wien.at';
+$adress_plausi='ruhan@technikum-wien.at';
+//$adress='fas_sync@technikum-wien.at';
+//$adress_plausi='fas_sync@technikum-wien.at';
 
 $error_log='';
 $error_log_fas='';
@@ -101,8 +101,9 @@ p2.persnr as persnr2, p2.beendigungsdatum AS beendigungsdatum2, p2.ausgeschieden
 p2.stundensatz AS stundensatz2, p2.ausbildung AS ausbildung2, p2.aktiv AS aktiv2
 FROM (person JOIN mitarbeiter ON person_pk=mitarbeiter.person_fk ) AS p1
 CROSS JOIN (person JOIN mitarbeiter ON person_pk=mitarbeiter.person_fk) AS p2 WHERE 
-((p1.gebdat=p2.gebdat AND p1.familienname=p2.familienname AND p1.vorname=p2.vorname) 
-OR ((p1.ersatzkennzeichen=p2.ersatzkennzeichen AND p1.ersatzkennzeichen<>'') OR (p1.svnr=p2.svnr AND p1.svnr<>'')))
+((p1.svnr=p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'') 
+	OR (p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!='' 
+	AND p1.gebdat=p2.gebdat AND p1.gebdat IS NOT NULL AND p1.gebdat>'1935-01-01' AND p1.gebdat<'2000-01-01'))
 AND (p1.person_pk < p2.person_pk)
 AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400')
 AND (p1.familienname<>p2.familienname OR p1.vorname<>p2.vorname OR p1.vornamen<>p2.vornamen OR p1.geschlecht<>p2.geschlecht OR p1.gebdat<>p2.gebdat OR p1.gebort<>p2.gebort OR p1.staatsbuergerschaft<> p2.staatsbuergerschaft OR p1.familienstand<>p2.familienstand OR p1.svnr<>p2.svnr OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.anrede<>p2.anrede OR p1.anzahlderkinder<>p2.anzahlderkinder OR p1.titel<>p2.titel OR p1.gebnation<>p2.gebnation OR p1.postnomentitel<> p2.postnomentitel 
@@ -290,10 +291,12 @@ AND person_pk NOT IN (
 SELECT p1.person_pk
 FROM (person JOIN mitarbeiter ON person_pk=mitarbeiter.person_fk ) AS p1
 CROSS JOIN (person JOIN mitarbeiter ON person_pk=mitarbeiter.person_fk) AS p2 WHERE 
-((p1.gebdat=p2.gebdat AND p1.familienname=p2.familienname AND p1.svnr='' AND p1.ersatzkennzeichen='') 
-OR ((p1.ersatzkennzeichen=p2.ersatzkennzeichen AND p1.ersatzkennzeichen<>'') OR (p1.svnr=p2.svnr AND p1.svnr<>'')))
+((p1.svnr=p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'') 
+	OR (p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!='' 
+	AND p1.gebdat=p2.gebdat AND p1.gebdat IS NOT NULL AND p1.gebdat>'1935-01-01' AND p1.gebdat<'2000-01-01'))
 AND (p1.person_pk <> p2.person_pk)
-AND (p1.familienname<>p2.familienname OR p1.vorname<>p2.vorname OR p1.vornamen<>p2.vornamen OR p1.geschlecht<>p2.geschlecht OR p1.gebdat<>p2.gebdat OR p1.staatsbuergerschaft<> p2.staatsbuergerschaft OR p1.familienstand<>p2.familienstAND OR p1.svnr<>p2.svnr OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.anrede<>p2.anrede OR p1.anzahlderkinder<>p2.anzahlderkinder OR p1.bismelden<>p2.bismelden OR p1.titel<>p2.titel OR p1.gebnation<>p2.gebnation OR p1.postnomentitel<> p2.postnomentitel 
+AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400')
+AND (p1.familienname<>p2.familienname OR p1.vorname<>p2.vorname OR p1.vornamen<>p2.vornamen OR p1.geschlecht<>p2.geschlecht OR p1.gebdat<>p2.gebdat OR p1.gebort<>p2.gebort OR p1.staatsbuergerschaft<> p2.staatsbuergerschaft OR p1.familienstand<>p2.familienstand OR p1.svnr<>p2.svnr OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.anrede<>p2.anrede OR p1.anzahlderkinder<>p2.anzahlderkinder OR p1.titel<>p2.titel OR p1.gebnation<>p2.gebnation OR p1.postnomentitel<> p2.postnomentitel 
 	OR p1.beginndatum<>p2.beginndatum OR p1.akadgrad<>p2.akadgrad OR p1.habilitation<>p2.habilitation OR p1.mitgliedentwicklungsteam<>p2.mitgliedentwicklungsteam OR p1.qualifikation<>p2.qualifikation OR p1.hauptberuflich<>p2.hauptberuflich OR p1.hauptberuf<>p2.hauptberuf OR p1.semesterwochenstunden<>p2.semesterwochenstunden OR p1.persnr<>p2.persnr OR p1.beendigungsdatum<>p2.beendigungsdatum OR p1.ausgeschieden<>p2.ausgeschieden OR p1.kurzbez<>p2.kurzbez OR p1.stundensatz<>p2.stundensatz OR p1.ausbildung<>p2.ausbildung OR p1.aktiv<>p2.aktiv) 
 );";
 
@@ -472,12 +475,11 @@ if($resultall = pg_query($conn_fas, $qryall))
 					}
 				}
 			}
-			$persondone=false;
 			if(!$error)
 			{
 				if($personnew) 
 				{
-					$qryi = "INSERT INTO public.tbl_person (sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen, 
+					$qry = "INSERT INTO public.tbl_person (sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen, 
 					                    gebdatum, gebort, gebzeit, foto, anmerkungen, homepage, svnr, ersatzkennzeichen, 
 					                    familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon,
 					                    geschlecht, geburtsnation, staatsbuergerschaft, ext_id)
@@ -506,8 +508,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 						        myaddslashes($persongeschlecht).", ".
 						        myaddslashes($persongeburtsnation).", ".
 						        myaddslashes($personstaatsbuergerschaft).", ".
-						        myaddslashes($personext_id).";";
-						        $persondone=true;
+						        myaddslashes($personext_id).");";
 						        $ausgabe_person="Person ".$personnachname." ".$personvorname." eingefügt.";
 				}
 				else
@@ -523,142 +524,118 @@ if($resultall = pg_query($conn_fas, $qryall))
 					$qryu="SELECT * FROM public.tbl_person WHERE person_id='$personperson_id';";
 					if($resultu = pg_query($conn, $qryu))
 					{
-						if($rowu = pg_fetch_object($resultu))
+						while($row1 = pg_fetch_object($resultu))
 						{
 							$updatep=false;			
-							if($rowu->sprache!=$personsprache) 
+							if($row1->sprache!=$personsprache) 
 							{
 								$updatep=true;
 								if(strlen(trim($ausgabe_person))>0)
 								{
-									$ausgabe_person.=", Sprache: '".$personsprache."'";
+									$ausgabe_person.=", Sprache: '".$personsprache."' (statt '".$row1->sprache."')";
 								}
 								else
 								{
-									$ausgabe_person="Sprache: '".$personsprache."'";
+									$ausgabe_person="Sprache: '".$personsprache."' (statt '".$row1->sprache."')";
 								}
 							}
-							if($rowu->anrede!=$personanrede)
+							if($row1->anrede!=$personanrede)
 							{
 								$updatep=true;
 								if(strlen(trim($ausgabe_person))>0)
 								{
-									$ausgabe_person.=", Anrede: '".$personanrede."'";
+									$ausgabe_person.=", Anrede: '".$personanrede."' (statt '".$row1->anrede."')";
 								}
 								else
 								{
-									$ausgabe_person="Anrede: '".$personanrede."'";
+									$ausgabe_person="Anrede: '".$personanrede."' (statt '".$row1->anrede."')";
 								}
 							}
-							if($rowu->titelpost!=$persontitelpost)
+							if($row1->titelpost!=$persontitelpost)
 							{
 								$updatep=true;
 								if(strlen(trim($ausgabe_person))>0)
 								{
-									$ausgabe_person.=", Postnomentitel: '".$persontitelpost."'";
+									$ausgabe_person.=", Postnomentitel: '".$persontitelpost."' (statt '".$row1->titelpost."')";
 								}
 								else
 								{
-									$ausgabe_person="Postnomentitel: '".$persontitelpost."'";
+									$ausgabe_person="Postnomentitel: '".$persontitelpost."' (statt '".$row1->titelpost."')";
 								}
 							}
-							if($rowu->titelpre!=$persontitelpre)
+							if($row1->titelpre!=$persontitelpre)
 							{
 								$updatep=true;
 								if(strlen(trim($ausgabe_person))>0)
 								{
-									$ausgabe_person.=", Prenomentitel: '".$persontitelpre."'";
+									$ausgabe_person.=", Prenomentitel: '".$persontitelpre."' (statt '".$row1->titelpre."')";
 								}
 								else
 								{
-									$ausgabe_person="Prenomentitel: '".$persontitelpre."'";
+									$ausgabe_person="Prenomentitel: '".$persontitelpre."' (statt '".$row1->titelpre."')";
 								}
 							}
-							if($rowu->nachname!=$personnachname)
+							if($row1->nachname!=$personnachname)
 							{
 								$updatep=true;
 								if(strlen(trim($ausgabe_person))>0)
 								{
-									$ausgabe_person.=", Nachname: '".$personnachname."'";
+									$ausgabe_person.=", Nachname: '".$personnachname."' (statt '".$row1->nachname."')";
 								}
 								else
 								{
-									$ausgabe_person=" Nachname: '".$personnachname."'";
+									$ausgabe_person=" Nachname: '".$personnachname."' (statt '".$row1->nachname."')";
 								}
 							}
-							if($rowu->vorname!=$personvorname)
+							if($row1->vorname!=$personvorname)
 							{
 								$updatep=true;
 								if(strlen(trim($ausgabe_person))>0)
 								{
-									$ausgabe_person.=", Vorname: '".$personvorname."'";
+									$ausgabe_person.=", Vorname: '".$personvorname."' (statt '".$row1->vorname."')";
 								}
 								else
 								{
-									$ausgabe_person="Vorname: '".$personvorname."'";
+									$ausgabe_person="Vorname: '".$personvorname."' (statt '".$row1->vorname."')";
 								}
 							}
-							if($rowu->vornamen!=$personvornamen)
+							if($row1->vornamen!=$personvornamen)
 							{
 								$updatep=true;
 								if(strlen(trim($ausgabe_person))>0)
 								{
-									$ausgabe_person.=", Vornamen: '".$personvornamen."'";
+									$ausgabe_person.=", Vornamen: '".$personvornamen."' (statt '".$row1->vornamen."')";
 								}
 								else
 								{
-									$ausgabe_person="Vornamen: '".$personvornamen."'";
+									$ausgabe_person="Vornamen: '".$personvornamen."' (statt '".$row1->vornamen."')";
 								}
 							}
-							if($rowu->gebdatum!=$persongebdatum)
+							if($row1->gebdatum!=$persongebdatum)
 							{
 								$updatep=true;
 								if(strlen(trim($ausgabe_person))>0)
 								{
-									$ausgabe_person.=", Geburtsdatum: '".$persongebdatum."'";
+									$ausgabe_person.=", Geburtsdatum: '".$persongebdatum."' (statt '".$row1->gebdatum."')";
 								}
 								else
 								{
-									$ausgabe_person="Geburtsdatum: '".$persongebdatum."'";
+									$ausgabe_person="Geburtsdatum: '".$persongebdatum."' (statt '".$row1->gebdatum."')";
 								}
 							}
-							if($rowu->gebort!=$persongebort)
+							if($row1->gebort!=$persongebort)
 							{
 								$updatep=true;
 								if(strlen(trim($ausgabe_person))>0)
 								{
-									$ausgabe_person.=", Geburtsort: '".$persongebort."'";
+									$ausgabe_person.=", Geburtsort: '".$persongebort."' (statt '".$row1->gebort."')";
 								}
 								else
 								{
-									$ausgabe_person="Geburtsort: '".$persongebort."'";
+									$ausgabe_person="Geburtsort: '".$persongebort."' (statt '".$row1->gebort."')";
 								}
 							}
-							if($rowu->gebzeit!=$persongebzeit)
-							{
-								$updatep=true;
-								if(strlen(trim($ausgabe_person))>0)
-								{
-									$ausgabe_person.=", Geburtszeit: '".$persongebzeit."'";
-								}
-								else
-								{
-									$ausgabe_person="Geburtszeit: '".$persongebzeit."'";
-								}
-							}
-							if($rowu->foto!=$personfoto)
-							{
-								$updatep=true;
-								if(strlen(trim($ausgabe_person))>0)
-								{
-									$ausgabe_person.=", Foto: '".$personfoto."'";
-								}
-								else
-								{
-									$ausgabe_person="Foto: '".$personfoto."'";
-								}
-							}
-							if($rowu->anmerkungen!=$personanmerkungen)
+							if($row1->anmerkungen!=$personanmerkungen)
 							{
 								$updatep=true;
 								if(strlen(trim($ausgabe_person))>0)
@@ -670,110 +647,100 @@ if($resultall = pg_query($conn_fas, $qryall))
 									$ausgabe_person="Anmerkungen: '".$personanmerkungen."'";
 								}
 							}
-							if($rowu->homepage!=$personhomepage){
-								$updatep=true;
-								if(strlen(trim($ausgabe_person))>0)
-								{
-									$ausgabe_person.=", Homepage: '".$personhomepage."'";
-								}
-								else
-								{
-									$ausgabe_person="Homepage: '".$personhomepage."'";
-								}
-							}
-							if($rowu->svnr!=$personsvnr)
+							if($row1->svnr!=$personsvnr)
 							{
 								$updatep=true;
 								if(strlen(trim($ausgabe_person))>0)
 								{
-									$ausgabe_person.=", SVNr: '".$personsvnr."'";
+									$ausgabe_person.=", Sozialversicherungsnummer: '".$personsvnr."' (statt '".$row1->svnr."')";
 								}
 								else
 								{
-									$ausgabe_person="SVNr: '".$personsvnr."'";
+									$ausgabe_person="Sozialversicherungsnummer: '".$personsvnr."' (statt '".$row1->svnr."')";
 								}
 							}
-							if($rowu->ersatzkennzeichen!=$personersatzkennzeichen)
+							if($row1->ersatzkennzeichen!=$personersatzkennzeichen)
 							{
 								$updatep=true;
 								if(strlen(trim($ausgabe_person))>0)
 								{
-									$ausgabe_person.=", Ersatzkennzeichen: '".$personersatzkennzeichen."'";
+									$ausgabe_person.=", Ersatzkennzeichen: '".$personersatzkennzeichen."' (statt '".$row1->ersatzkennzeichen."')";
 								}
 								else
 								{
-									$ausgabe_person="Ersatzkennzeichen: '".$personersatzkennzeichen."'";
+									$ausgabe_person="Ersatzkennzeichen: '".$personersatzkennzeichen."' (statt '".$row1->ersatzkennzeichen."')";
 								}
 							}
-							if($rowu->familienstand!=$personfamilienstand)
+							if($row1->familienstand!=$personfamilienstand)
 							{
 								$updatep=true;
 								if(strlen(trim($ausgabe_person))>0)
 								{
-									$ausgabe_person.=", Familienstand: '".$personfamilienstand."'";
+									$ausgabe_person.=", Familienstand: '".$personfamilienstand."' (statt '".$row1->familienstand."')";
 								}
 								else
 								{
-									$ausgabe_person="Familienstand: '".$personfamilienstand."'";
+									$ausgabe_person="Familienstand: '".$personfamilienstand."' (statt '".$row1->familienstand."')";
 								}
 							}
-							if($rowu->anzahlkinder!=$personanzahlkinder){
-								$updatep=true;
-								if(strlen(trim($ausgabe_person))>0)
-								{
-									$ausgabe_person.=", Anzahl der Kinder: '".$personanzahlkinder."'";
-								}
-								else
-								{
-									$ausgabe_person="Anzahl der Kinder: '".$personanzahlkinder."'";
-								}
-							}
-							if($rowu->aktiv!=$personaktiv)
+							if($row1->anzahlkinder!=$personanzahlkinder)
 							{
 								$updatep=true;
 								if(strlen(trim($ausgabe_person))>0)
 								{
-									$ausgabe_person.=", Aktiv: '".$personaktiv."'";
+									$ausgabe_person.=", Anzahl der Kinder: '".$personanzahlkinder."' (statt '".$row1->anzahlkinder."')";
 								}
 								else
 								{
-									$ausgabe_person="Aktiv: '".$personaktiv."'";
+									$ausgabe_person="Anzahl der Kinder: '".$personanzahlkinder."' (statt '".$row1->anzahlkinder."')";
 								}
 							}
-							if($rowu->geburtsnation!=$persongeburtsnation)
+							if($row1->aktiv!=($personaktiv?'t':'f') && $personaktiv!='')
 							{
 								$updatep=true;
 								if(strlen(trim($ausgabe_person))>0)
 								{
-									$ausgabe_person.=", Geburtsnation: '".$persongeburtsnation."'";
+									$ausgabe_person.=", Aktiv: '".($personaktiv?'true':'false')."' (statt '".$row1->aktiv."')";
 								}
 								else
 								{
-									$ausgabe_person="Geburtsnation: '".$persongeburtsnation."'";
+									$ausgabe_person="Aktiv: '".($personaktiv?'true':'false')."' (statt '".$row1->aktiv."')";
 								}
 							}
-							if($rowu->geschlecht!=$persongeschlecht)
+							if($row1->geburtsnation!=$persongeburtsnation)
 							{
 								$updatep=true;
 								if(strlen(trim($ausgabe_person))>0)
 								{
-									$ausgabe_person.=", Geschlecht: '".$persongeschlecht."'";
+									$ausgabe_person.=", Geburtsnation: '".$persongeburtsnation."' (statt '".$row1->geburtsnation."')";
 								}
 								else
 								{
-									$ausgabe_person="Sprache: '".$persongeschlecht."'";
+									$ausgabe_person="Geburtsnation: '".$persongeburtsnation."' (statt '".$row1->geburtsnation."')";
 								}
 							}
-							if($rowu->staatsbuergerschaft!=$personstaatsbuergerschaft)
+							if($row1->geschlecht!=$persongeschlecht)
 							{
 								$updatep=true;
 								if(strlen(trim($ausgabe_person))>0)
 								{
-									$ausgabe_person.=", Staatsbürgerschaft: '".$personstaatsbuergerschaft."'";
+									$ausgabe_person.=", Geschlecht: '".$persongeschlecht."' (statt '".$row1->geschlecht."')";
 								}
 								else
 								{
-									$ausgabe_person="Staatsbürgerschaft: '".$personstaatsbuergerschaft."'";
+									$ausgabe_person="Sprache: '".$persongeschlecht."' (statt '".$row1->geschlecht."')";
+								}
+							}
+							if($row1->staatsbuergerschaft!=$personstaatsbuergerschaft)
+							{
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Staatsbürgerschaft: '".$personstaatsbuergerschaft."' (statt '".$row1->staatsbuergerschaft."')";
+								}
+								else
+								{
+									$ausgabe_person="Staatsbürgerschaft: '".$personstaatsbuergerschaft."' (statt '".$row1->staatsbuergerschaft."')";
 								}
 							}
 							
@@ -808,35 +775,33 @@ if($resultall = pg_query($conn_fas, $qryall))
 								       staatsbuergerschaft=".myaddslashes($personstaatsbuergerschaft).", 
 								       ext_id=".myaddslashes($personext_id)." 
 								       WHERE person_id=".myaddslashes($personperson_id).";";
-								$persondone=true;
 								$ausgabe_person="Änderungen bei Person ".$personnachname." ".$personvorname.": ".$ausgabe_person."\n";
 							}
 						}
 					}
 				}
-				if ($persondone)
+
+				if(pg_query($conn,$qry))
 				{
-					if(pg_query($conn,$qry))
+					if($personnew)
 					{
-						if($personnew)
-						{
-							$qryseq = "SELECT currval('tbl_person_person_id_seq') AS id;";
-							if($rowseq=pg_fetch_object(pg_query($conn,$qryseq)))
-								$personperson_id=$rowseq->id;
-							else
-							{					
-								$error_log.= "Sequence konnte nicht ausgelesen werden\n";
-								$error=true;
-							}
-						}				
-					}
-					else
-					{			
-						$error_log.= "*****\nFehler beim Speichern des Person-Datensatzes: ".$personnachname."\n".$qry."\n".pg_errormessage($conn)."\n*****\n";
-						$error=true;
-						$ausgabe_person="";
-					}
+						$qry= "SELECT currval('public.tbl_person_person_id_seq') AS id;";
+						if($rowseq=pg_fetch_object(pg_query($conn,$qry)))
+							$personperson_id=$rowseq->id;
+						else
+						{					
+							$error_log.= "Sequence von ".$personnachname.", ".$personvorname." konnte nicht ausgelesen werden\n".$qry."\n";
+							$error=true;
+						}
+					}				
 				}
+				else
+				{			
+					$error_log.= "*****\nFehler beim Speichern des Person-Datensatzes: ".$personnachname."\n".$qry."\n".pg_errormessage($conn)."\n*****\n";
+					$error=true;
+					$ausgabe_person="";
+				}
+				
 				$mitarbeiterdone=false;
 				if(!$error)
 				{
@@ -1097,7 +1062,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 												$ausgabe_mitarbeiter="Ortkurzbezeichnung: '".$mitarbeiterort_kurzbz."'";
 											}
 										}
-										if($row->anmerkung!=$mitarbeiteranmerkung)
+										if($rowu->anmerkung!=$mitarbeiteranmerkung)
 										{
 											$updatem=true;
 											if(strlen(trim($ausgabe_mitarbeiter))>0)
@@ -1131,7 +1096,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 									$ausgabe_mitarbeiter="Änderungen bei Mitarbeiter ".$mitarbeiteruid.": ".$ausgabe_mitarbeiter."\n";
 								}
 							}
-							if(!pg_query($conn,$qry))
+							if(!@pg_query($conn,$qry))
 							{		
 								$error_log.= "*****\nFehler beim Speichern des Mitarbeiter-Datensatzes: ".$personnachname."\n".$qry."\n".pg_errormessage($conn)."\n*****\n";
 								$error=true;

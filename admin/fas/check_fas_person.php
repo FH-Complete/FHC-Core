@@ -244,7 +244,7 @@ p2.uid as uid2, p2.gebnation as gebnation2, p2.postnomentitel as postnomentitel2
 FROM person p1, person p2 
 WHERE p1.person_pk<p2.person_pk 
 AND ((p1.svnr=p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'') 
-	OR (p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!='' 
+	OR (p1.svnr<>p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'' AND p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!='' 
 	AND p1.gebdat=p2.gebdat AND p1.gebdat IS NOT NULL AND p1.gebdat>'1935-01-01' AND p1.gebdat<'2000-01-01'))
 AND p1.svnr<>'0005010400' 
 AND (p1.familienname<>p2.familienname OR p1.vorname<>p2.vorname OR p1.anrede<>p2.anrede  OR p1.vornamen<>p2.vornamen 
