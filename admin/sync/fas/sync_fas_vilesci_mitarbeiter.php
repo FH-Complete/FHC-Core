@@ -15,10 +15,10 @@ require_once('../../../vilesci/config.inc.php');
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
-$adress='ruhan@technikum-wien.at';
-$adress_plausi='ruhan@technikum-wien.at';
-//$adress='fas_sync@technikum-wien.at';
-//$adress_plausi='fas_sync@technikum-wien.at';
+//$adress='ruhan@technikum-wien.at';
+//$adress_plausi='ruhan@technikum-wien.at';
+$adress='fas_sync@technikum-wien.at';
+$adress_plausi='fas_sync@technikum-wien.at';
 
 $error_log='';
 $error_log_fas='';
@@ -102,7 +102,7 @@ p2.stundensatz AS stundensatz2, p2.ausbildung AS ausbildung2, p2.aktiv AS aktiv2
 FROM (person JOIN mitarbeiter ON person_pk=mitarbeiter.person_fk ) AS p1
 CROSS JOIN (person JOIN mitarbeiter ON person_pk=mitarbeiter.person_fk) AS p2 WHERE 
 ((p1.svnr=p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'') 
-	OR (p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!='' 
+	OR (p1.svnr<>p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'' AND p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!='' 
 	AND p1.gebdat=p2.gebdat AND p1.gebdat IS NOT NULL AND p1.gebdat>'1935-01-01' AND p1.gebdat<'2000-01-01'))
 AND (p1.person_pk < p2.person_pk)
 AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400')
@@ -292,7 +292,7 @@ SELECT p1.person_pk
 FROM (person JOIN mitarbeiter ON person_pk=mitarbeiter.person_fk ) AS p1
 CROSS JOIN (person JOIN mitarbeiter ON person_pk=mitarbeiter.person_fk) AS p2 WHERE 
 ((p1.svnr=p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'') 
-	OR (p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!='' 
+	OR (p1.svnr<>p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'' AND p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!='' 
 	AND p1.gebdat=p2.gebdat AND p1.gebdat IS NOT NULL AND p1.gebdat>'1935-01-01' AND p1.gebdat<'2000-01-01'))
 AND (p1.person_pk <> p2.person_pk)
 AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400')
