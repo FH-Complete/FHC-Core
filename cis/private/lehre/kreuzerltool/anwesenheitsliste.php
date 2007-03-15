@@ -128,6 +128,8 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 		$maxlength[$i]=strlen('Nachname');
 		$worksheet->write(1,++$i,"Matrikelnr", $format_title);
 		$maxlength[$i]=strlen('Matrikelnr');
+		$worksheet->write(1,++$i,"Gruppe", $format_title);
+		$maxlength[$i]=strlen('Gruppe');
 		$ueb_obj = new uebung($conn);
 		$ueb_obj->load_uebung($lehreinheit_id);
 		foreach($ueb_obj->uebungen as $row_ueb)
@@ -182,12 +184,12 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				$lehreinheit_id = $_GET['lehreinheit_id'];
 				$gruppe_bez = 'Alle Studienrende';
 				//Alle Studenten die dieser Lehreinheit zugeordnet sind
-				$qry_stud = "SELECT vw_student.uid, vorname, nachname, matrikelnr FROM campus.vw_student, public.tbl_benutzergruppe, lehre.tbl_lehreinheitgruppe 
+				$qry_stud = "SELECT vw_student.uid, vorname, nachname, matrikelnr, vw_student.semester, vw_student.verband, vw_student.gruppe FROM campus.vw_student, public.tbl_benutzergruppe, lehre.tbl_lehreinheitgruppe 
 							WHERE tbl_lehreinheitgruppe.lehreinheit_id='$lehreinheit_id' AND 
 							vw_student.uid = tbl_benutzergruppe.uid AND
 							tbl_benutzergruppe.gruppe_kurzbz = tbl_lehreinheitgruppe.gruppe_kurzbz
 							UNION
-							SELECT vw_student.uid, vorname, nachname, matrikelnr FROM campus.vw_student, lehre.tbl_lehreinheitgruppe WHERE
+							SELECT vw_student.uid, vorname, nachname, matrikelnr, vw_student.semester, vw_student.verband, vw_student.gruppe FROM campus.vw_student, lehre.tbl_lehreinheitgruppe WHERE
 							tbl_lehreinheitgruppe.lehreinheit_id='$lehreinheit_id' AND
 							tbl_lehreinheitgruppe.studiengang_kz=vw_student.studiengang_kz AND
 							tbl_lehreinheitgruppe.semester = vw_student.semester AND
@@ -227,8 +229,12 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				//matrikelnr
 				$worksheet->write($zeile,++$spalte,'="'.$row_stud->matrikelnr.'"');
 				if(strlen($row_stud->matrikelnr)>$maxlength[$spalte])
-					$maxlength[$spalte]=strlen($row_stud->matrikelnr);
-				
+					$maxlength[$spalte]=strlen($row_stud->matrikelnr);					
+				//Gruppe
+				$worksheet->write($zeile,++$spalte,$row_stud->semester.$row_stud->verband.$row_stud->gruppe);
+				if(strlen($row_stud->semester.$row_stud->verband.$row_stud->gruppe)>$maxlength[$spalte])
+					$maxlength[$spalte]=strlen($row_stud->semester.$row_stud->verband.$row_stud->gruppe);
+					
 				foreach($ueb_obj->uebungen as $row_ueb)
 				{
 					$qry = "SELECT sum(punkte) as punkte FROM campus.tbl_studentbeispiel JOIN campus.tbl_beispiel USING(beispiel_id) WHERE uebung_id='$row_ueb->uebung_id' AND student_uid='$row_stud->uid' AND vorbereitet=true";
@@ -307,6 +313,8 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 		$maxlength[$i]=strlen('Nachname');
 		$worksheet->write(1,++$i,"Matrikelnr", $format_title);
 		$maxlength[$i]=strlen('Matrikelnr');
+		$worksheet->write(1,++$i,"Gruppe", $format_title);
+		$maxlength[$i]=strlen('Gruppe');
 		$beispiel_obj = new beispiel($conn);
 		$beispiel_obj->load_beispiel($uebung_id);
 		foreach($beispiel_obj->beispiele as $row_bsp)
@@ -336,12 +344,12 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 					if($row->gruppe_kurzbz!='')
 					{
 						$gruppe_bez = 'Gruppe '.$row->gruppe_kurzbz;
-						$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row->gruppe_kurzbz)."' ORDER BY nachname, vorname";
+						$qry_stud = "SELECT uid, vorname, nachname, matrikelnr, vw_student.semester, vw_student.verband, vw_student.gruppe FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row->gruppe_kurzbz)."' ORDER BY nachname, vorname";
 					}
 					else 
 					{
 						$gruppe_bez = 'Gruppe '.$row->verband.$row->gruppe;
-						$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student 
+						$qry_stud = "SELECT uid, vorname, nachname, matrikelnr, vw_student.semester, vw_student.verband, vw_student.gruppe FROM campus.vw_student 
 									 WHERE studiengang_kz='$row->studiengang_kz' 
 									 AND semester='$row->semester' ".
 									 ($row->verband!=''?" AND verband='$row->verband'":'').
@@ -366,12 +374,12 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				$lehreinheit_id = $_GET['lehreinheit_id'];
 				$gruppe_bez = 'Alle Studienrende';
 				//Alle Studenten die dieser Lehreinheit zugeordnet sind
-				$qry_stud = "SELECT vw_student.uid, vorname, nachname, matrikelnr FROM campus.vw_student, public.tbl_benutzergruppe, lehre.tbl_lehreinheitgruppe 
+				$qry_stud = "SELECT vw_student.uid, vorname, nachname, matrikelnr, vw_student.semester, vw_student.verband, vw_student.gruppe FROM campus.vw_student, public.tbl_benutzergruppe, lehre.tbl_lehreinheitgruppe 
 							WHERE tbl_lehreinheitgruppe.lehreinheit_id='$lehreinheit_id' AND 
 							vw_student.uid = tbl_benutzergruppe.uid AND
 							tbl_benutzergruppe.gruppe_kurzbz = tbl_lehreinheitgruppe.gruppe_kurzbz
 							UNION
-							SELECT vw_student.uid, vorname, nachname, matrikelnr FROM campus.vw_student, lehre.tbl_lehreinheitgruppe WHERE
+							SELECT vw_student.uid, vorname, nachname, matrikelnr, vw_student.semester, vw_student.verband, vw_student.gruppe FROM campus.vw_student, lehre.tbl_lehreinheitgruppe WHERE
 							tbl_lehreinheitgruppe.lehreinheit_id='$lehreinheit_id' AND
 							tbl_lehreinheitgruppe.studiengang_kz=vw_student.studiengang_kz AND
 							tbl_lehreinheitgruppe.semester = vw_student.semester AND
@@ -412,6 +420,11 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				$worksheet->write($zeile,++$spalte,'="'.$row_stud->matrikelnr.'"');
 				if(strlen($row_stud->matrikelnr)>$maxlength[$spalte])
 					$maxlength[$spalte]=strlen($row_stud->matrikelnr);
+				
+				//Gruppe
+				$worksheet->write($zeile,++$spalte,$row_stud->semester.$row_stud->verband.$row_stud->gruppe);
+				if(strlen($row_stud->semester.$row_stud->verband.$row_stud->gruppe)>$maxlength[$spalte])
+					$maxlength[$spalte]=strlen($row_stud->semester.$row_stud->verband.$row_stud->gruppe);
 				
 				foreach($beispiel_obj->beispiele as $row_bsp)
 				{
