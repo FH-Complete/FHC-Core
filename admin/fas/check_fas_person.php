@@ -2,7 +2,7 @@
 /* Copyright (C) 2007 Technikum-Wien
  *
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -55,7 +55,7 @@ if(isset($_POST['person_pk']))
 		{
 			$qry1.= ", familienname='".$_POST['familienname']."'";
 		}
-		else 
+		else
 		{
 			$qry1= "familienname='".$_POST['familienname']."'";
 		}
@@ -66,7 +66,7 @@ if(isset($_POST['person_pk']))
 		{
 			$qry1.= ", vorname='".$_POST['vorname']."'";
 		}
-		else 
+		else
 		{
 			$qry1= "vorname='".$_POST['vorname']."'";
 		}
@@ -77,7 +77,7 @@ if(isset($_POST['person_pk']))
 		{
 			$qry1.= ", anrede='".$_POST['anrede']."'";
 		}
-		else 
+		else
 		{
 			$qry1= "anrede='".$_POST['anrede']."'";
 		}
@@ -88,7 +88,7 @@ if(isset($_POST['person_pk']))
 		{
 			$qry1.= ", vornamen='".$_POST['vornamen']."'";
 		}
-		else 
+		else
 		{
 			$qry1= "vornamen='".$_POST['vornamen']."'";
 		}
@@ -99,7 +99,7 @@ if(isset($_POST['person_pk']))
 		{
 			$qry1.= ", geschlecht='".$_POST['geschlecht']."'";
 		}
-		else 
+		else
 		{
 			$qry1= "geschlecht='".$_POST['geschlecht']."'";
 		}
@@ -110,7 +110,7 @@ if(isset($_POST['person_pk']))
 		{
 			$qry1.= ", gebdat='".$_POST['gebdat']."'";
 		}
-		else 
+		else
 		{
 			$qry1= "gebdat='".$_POST['gebdat']."'";
 		}
@@ -121,7 +121,7 @@ if(isset($_POST['person_pk']))
 		{
 			$qry1.= ", gebort='".$_POST['gebort']."'";
 		}
-		else 
+		else
 		{
 			$qry1= "gebort='".$_POST['gebort']."'";
 		}
@@ -132,7 +132,7 @@ if(isset($_POST['person_pk']))
 		{
 			$qry1.= ", staatsbuergerschaft='".$_POST['staatsbuergerschaft']."'";
 		}
-		else 
+		else
 		{
 			$qry1= "staatsbuergerschaft='".$_POST['staatsbuergerschaft']."'";
 		}
@@ -143,7 +143,7 @@ if(isset($_POST['person_pk']))
 		{
 			$qry1.= ", familienstand='".$_POST['familienstand']."'";
 		}
-		else 
+		else
 		{
 			$qry1= "familienstand='".$_POST['familienstand']."'";
 		}
@@ -154,7 +154,7 @@ if(isset($_POST['person_pk']))
 		{
 			$qry1.= ", svnr='".$_POST['svnr']."'";
 		}
-		else 
+		else
 		{
 			$qry1= "svnr='".$_POST['svnr']."'";
 		}
@@ -165,7 +165,7 @@ if(isset($_POST['person_pk']))
 		{
 			$qry1.= ", anzahlderkinder='".$_POST['anzahlderkinder']."'";
 		}
-		else 
+		else
 		{
 			$qry1= "anzahlderkinder='".$_POST['anzahlderkinder']."'";
 		}
@@ -176,7 +176,7 @@ if(isset($_POST['person_pk']))
 		{
 			$qry1.= ", ersatzkennzeichen='".$_POST['ersatzkennzeichen']."'";
 		}
-		else 
+		else
 		{
 			$qry1= "ersatzkennzeichen='".$_POST['ersatzkennzeichen']."'";
 		}
@@ -187,7 +187,7 @@ if(isset($_POST['person_pk']))
 		{
 			$qry1.= ", titel='".$_POST['titel']."'";
 		}
-		else 
+		else
 		{
 			$qry1= "titel='".$_POST['titel']."'";
 		}
@@ -198,7 +198,7 @@ if(isset($_POST['person_pk']))
 		{
 			$qry1.= ", gebnation='".$_POST['gebnation']."'";
 		}
-		else 
+		else
 		{
 			$qry1= "gebnation='".$_POST['gebnation']."'";
 		}
@@ -209,7 +209,7 @@ if(isset($_POST['person_pk']))
 		{
 			$qry1.= ", postnomentitel='".$_POST['postnomentitel']."'";
 		}
-		else 
+		else
 		{
 			$qry1= "postnomentitel='".$_POST['postnomentitel']."'";
 		}
@@ -217,12 +217,12 @@ if(isset($_POST['person_pk']))
 	if(strlen(trim($qry1))>0)
 	{
 		$qry = "UPDATE person SET ".$qry1. " WHERE person_pk=".$_POST['person_pk'];
-	
+
 		if(pg_query($conn_fas, $qry))
 		{
 			echo "Erfolgreich gespeichert: ".$qry;
 		}
-		else 
+		else
 		{
 			echo "<span style='font-color: Red;'>Fehler beim Speichern</span>";
 		}
@@ -230,28 +230,28 @@ if(isset($_POST['person_pk']))
 }
 $qry1='';
 
+// OR (p1.ersatzkennzeichen=p2.ersatzkennzeichen AND p1.ersatzkennzeichen IS NOT NULL AND p1.ersatzkennzeichen<>'')
+
 $qry = "SET CLIENT_ENCODING TO 'LATIN9';
 SELECT p1.person_pk as personpk1, p1.familienname as familienname1, p1.vorname as vorname1, p1. anrede as anrede1,
-p1.vornamen as vornamen1, p1.geschlecht as geschlecht1, p1.gebdat as gebdat1, p1.gebort as gebort1, 
-p1.staatsbuergerschaft as staatsbuergerschaft1, p1.familienstand as familienstand1, p1.svnr as svnr1, 
-p1.anzahlderkinder as anzahlderkinder1, p1.ersatzkennzeichen as ersatzkennzeichen1, p1.bemerkung as bemerkung1, p1.titel as titel1, 
+p1.vornamen as vornamen1, p1.geschlecht as geschlecht1, p1.gebdat as gebdat1, p1.gebort as gebort1,
+p1.staatsbuergerschaft as staatsbuergerschaft1, p1.familienstand as familienstand1, p1.svnr as svnr1,
+p1.anzahlderkinder as anzahlderkinder1, p1.ersatzkennzeichen as ersatzkennzeichen1, p1.bemerkung as bemerkung1, p1.titel as titel1,
 p1.uid as uid1, p1.gebnation as gebnation1, p1.postnomentitel as postnomentitel1, p1.bismelden as bismelden1,
 p2.person_pk as personpk2, p2.familienname as familienname2, p2.vorname as vorname2, p2. anrede as anrede2,
-p2.vornamen as vornamen2, p2.geschlecht as geschlecht2, p2.gebdat as gebdat2, p2.gebort as gebort2, 
-p2.staatsbuergerschaft as staatsbuergerschaft2, p2.familienstand as familienstand2, p2.svnr as svnr2, 
-p2.anzahlderkinder as anzahlderkinder2, p2.ersatzkennzeichen as ersatzkennzeichen2, p2.bemerkung as bemerkung2, p2.titel as titel2, 
+p2.vornamen as vornamen2, p2.geschlecht as geschlecht2, p2.gebdat as gebdat2, p2.gebort as gebort2,
+p2.staatsbuergerschaft as staatsbuergerschaft2, p2.familienstand as familienstand2, p2.svnr as svnr2,
+p2.anzahlderkinder as anzahlderkinder2, p2.ersatzkennzeichen as ersatzkennzeichen2, p2.bemerkung as bemerkung2, p2.titel as titel2,
 p2.uid as uid2, p2.gebnation as gebnation2, p2.postnomentitel as postnomentitel2, p2.bismelden as bismelden2
-FROM person p1, person p2 
-WHERE p1.person_pk<p2.person_pk 
-AND ((p1.svnr=p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'') 
-	OR (p1.svnr<>p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'' AND p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!='' 
-	AND p1.gebdat=p2.gebdat AND p1.gebdat IS NOT NULL AND p1.gebdat>'1935-01-01' AND p1.gebdat<'2000-01-01'))
-AND p1.svnr<>'0005010400' 
-AND (p1.familienname<>p2.familienname OR p1.vorname<>p2.vorname OR p1.anrede<>p2.anrede  OR p1.vornamen<>p2.vornamen 
+FROM person p1, person p2
+WHERE p1.person_pk<p2.person_pk
+AND (	(p1.svnr=p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'')
+		)
+AND (p1.familienname<>p2.familienname OR p1.vorname<>p2.vorname OR p1.anrede<>p2.anrede  OR p1.vornamen<>p2.vornamen
 OR p1.geschlecht<>p2.geschlecht  OR p1.gebdat<>p2.gebdat  OR p1.gebort<>p2.gebort  OR p1.staatsbuergerschaft<>p2.staatsbuergerschaft
 OR p1.familienstand<>p2.familienstand  OR p1.svnr<>p2.svnr  OR p1.anzahlderkinder<>p2.anzahlderkinder
-OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.titel<>p2.titel  OR p1.gebnation<>p2.gebnation 
-OR p1.postnomentitel<>p2.postnomentitel) LIMIT 10;";
+OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.titel<>p2.titel  OR p1.gebnation<>p2.gebnation
+OR p1.postnomentitel<>p2.postnomentitel) LIMIT 20;";
 //ORDER BY p1.familienname, p1.person_pk;";
 
 if($result = pg_query($conn_fas, $qry))
@@ -270,7 +270,7 @@ if($result = pg_query($conn_fas, $qry))
 			echo"<input type='text' size='20' maxlength='255' name='familienname' value='".$row->familienname1."'>";
 		echo "</td>";
 		echo "<td>'".$row->vorname1."'";
-		if($row->vorname1<>$row->vorname2 || $row->vornamen1<>$row->vornamen2) 
+		if($row->vorname1<>$row->vorname2 || $row->vornamen1<>$row->vornamen2)
 			echo"<input type='text' size='20' maxlength='255' name='vorname' value='".$row->vorname1."'>";
 		echo "</td>";
 		echo "<td>'".$row->vornamen1."'";
