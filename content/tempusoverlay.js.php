@@ -19,6 +19,8 @@ function onVerbandSelect()
 {	
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
 	var tree=document.getElementById('tree-verband');
+	if(tree.currentIndex==-1)
+		return;
 	var stg_kz=tree.view.getCellText(tree.currentIndex,"stg_kz");
 	var sem=tree.view.getCellText(tree.currentIndex,"sem");
 	var ver=tree.view.getCellText(tree.currentIndex,"ver");

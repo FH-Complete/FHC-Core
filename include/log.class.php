@@ -111,7 +111,7 @@ class log
 	// ********************************************
 	function load_undo($uid)
 	{		
-		$qry = "SELECT * FROM public.tbl_log WHERE mitarbeiter_uid='".addslashes($uid)."' AND sqlundo is not null LIMIT 10";
+		$qry = "SELECT * FROM public.tbl_log WHERE mitarbeiter_uid='".addslashes($uid)."' AND sqlundo is not null ORDER BY executetime DESC LIMIT 10";
 		
 		if($result=pg_query($this->conn, $qry))
 		{
@@ -224,6 +224,71 @@ class log
 		else 
 		{
 			$this->errormsg = 'Fehler beim loeschen des LOG Eintrages';
+			return false;
+		}
+	}
+	
+	// ************************************
+	// * Fuehrt einen UnDo Befehl aus und
+	// * loescht anschliessend den Eintrag
+	// * aus dem Log
+	// * @param $log_id
+	// * @return true wenn ok, sonst false
+	// ************************************
+	function undo($log_id)
+	{
+		if(!is_numeric($log_id))
+		{
+			$this->errormsg = 'Log_id ist ungueltig';
+			return false;
+		}
+		pg_query($this->conn, 'BEGIN;');
+		//Undo Befehl aus Log holen
+		$qry = "SELECT * FROM public.tbl_log WHERE log_id='$log_id'";
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				if($row->sqlundo!='')
+				{
+					//UnDo Befehl ausfuehren
+					if(pg_query($this->conn, $row->sqlundo))
+					{
+						//Log Eintrag aus Log entfernen
+						$qry = "DELETE FROM public.tbl_log WHERE log_id='$log_id';";
+						if(pg_query($this->conn, $qry))
+						{
+							pg_query($this->conn, 'COMMIT;');
+							return true;
+						}
+						else 
+						{
+							pg_query($this->conn, 'ROLLBACK;');
+							$this->errormsg = 'UnDo Eintrag konnte nicht entfernt werden';
+							return false;
+						}
+					}
+					else 
+					{
+						$this->errormsg ='UnDo Befehl konnte nicht durchgefuehrt werden';
+						return false;
+					}
+				}
+				else 
+				{
+					$this->errormsg = 'Ungueltiger UnDo Befehl';
+					return false;
+				}
+			}
+			else 
+			{
+				$this->errormsg = 'UnDo Befehl konnte nicht durchgefuehrt werden';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'UnDo Befehl konnte nicht durchgefuehrt werden';
 			return false;
 		}
 	}

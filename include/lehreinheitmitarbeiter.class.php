@@ -167,6 +167,32 @@ class lehreinheitmitarbeiter
 	// *******************************************
 	function validate()
 	{
+		if($this->stundensatz!='' && !is_numeric($this->stundensatz))
+		{
+			$this->errormsg = 'Stundensatz muss eine gueltige Zahl sein';
+			return false;
+		}
+		if($this->planstunden!='' && !is_numeric($this->planstunden))
+		{
+			$this->errormsg = 'Planstunden muss eine gueltige Zahl sein';
+			return false;
+		}
+		if($this->semesterstunden!='' && !is_numeric($this->semesterstunden))
+		{
+			$this->errormsg = 'Semesterstunden muss eine gueltige Zahl sein';
+			return false;
+		}
+		if($this->faktor!='' && !is_numeric($this->faktor))
+		{
+			$this->errormsg = 'Faktor muss eine gueltige Zahl sein';
+			return false;
+		}
+		if(strlen($this->anmerkung)>255)
+		{
+			$this->errormsg = 'Anmerkung darf nicht laenger als 255 Zeichen sein.';
+			return false;
+		}
+			 
 		return true;
 	}
 
@@ -289,13 +315,56 @@ class lehreinheitmitarbeiter
 			$this->errormsg = 'Lehreinheit_id ist ungueltig';
 			return false;
 		}
-		
-		$qry = "DELETE FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$lehreinheit_id' AND mitarbeiter_uid='".addslashes($mitarbeiter_uid)."'";
-		if(pg_query($this->conn, $qry))
-			return true;
+		$qry_del = "DELETE FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$lehreinheit_id' AND mitarbeiter_uid='".addslashes($mitarbeiter_uid)."'";
+		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$lehreinheit_id' AND mitarbeiter_uid='".addslashes($mitarbeiter_uid)."'";
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$undo = 'INSERT INTO lehre.tbl_lehreinheitmitarbeiter (lehreinheit_id, mitarbeiter_uid, semesterstunden, planstunden, '.
+			            ' stundensatz, faktor, anmerkung, lehrfunktion_kurzbz, ext_id, insertamum, insertvon)'.
+				       	' VALUES('.$this->addslashes($row->lehreinheit_id).','.
+						$this->addslashes($row->mitarbeiter_uid).','.
+						$this->addslashes($row->semesterstunden).','.
+						$this->addslashes($row->planstunden).','.
+						$this->addslashes($row->stundensatz).','.
+						$this->addslashes($row->faktor).','.
+						$this->addslashes($row->anmerkung).','.
+						$this->addslashes($row->lehrfunktion_kurzbz).','.
+						$this->addslashes($row->ext_id).','.
+						$this->addslashes($row->insertamum).','.
+						$this->addslashes($row->insertvon).');';
+				
+				$log = new log($this->conn, null, null);
+				$log->sqlundo = $undo;
+				$log->sql = $qry_del;
+				$log->mitarbeiter_uid = get_uid();
+				$log->beschreibung = "Lektorzuteilung loeschen $mitarbeiter_uid - $lehreinheit_id";
+				if($log->save(true))
+				{
+					if(pg_query($this->conn, $qry_del))
+						return true;
+					else 
+					{
+						$this->errormsg = 'Fehler beim Loeschen der Zuteilung';
+						return false;
+					}
+				}
+				else 
+				{
+					$this->errormsg = 'UNDO Eintrag konnte nicht erstellt werden';
+					return false;
+				}
+			}
+			else 
+			{
+				$this->errormsg = 'Datensatz wurde nicht gefunden';
+				return false;
+			}
+		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim Loeschen der Zuteilung';
+			$this->errormsg = 'Fehler beim lesen der Daten';
 			return false;
 		}
 	}

@@ -98,3 +98,37 @@ function studiensemesterChange()
 	return true;
 }
 
+function loadUndoList()
+{
+	menu = document.getElementById('menu-edit-undo');
+	
+	var url = '<?php echo APP_ROOT; ?>rdf/undo.rdf.php?'+gettimestamp();	
+	menu.setAttribute('datasources', url);
+	debug('load:'+url);
+
+	return true;
+}
+
+function UnDo(log_id, bezeichnung)
+{
+	if(confirm('Wollen Sie folgenden Befehl wirklich Rueckgaengig machen: '+bezeichnung))
+	{
+		//Request absetzen
+		var req = new phpRequest('tempusDBDML.php','','');
+		
+		req.add('type','undo');
+		req.add('log_id',log_id);
+			
+		var response = req.executePOST();
+		var val =  new ParseReturnValue(response)
+	
+		if (!val.dbdml_return) 
+		{
+			alert(val.dbdml_errormsg)
+		} 
+		else 
+		{
+			LvTreeRefresh();
+		}
+	}
+}
