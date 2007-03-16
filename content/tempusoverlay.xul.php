@@ -25,7 +25,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/DragAndDrop.js"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/dragboard.js.php"/>
 
-<tree id="tree-verband" onselect="onVerbandSelect();"
+<tree id="tree-verband" onmouseup="onVerbandSelect();"
 	seltype="single" hidecolumnpicker="false" flex="1" 
 	enableColumnDrag="true"	
     ondraggesture="nsDragAndDrop.startDrag(event,lvbgrpDDObserver);" 

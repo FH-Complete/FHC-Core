@@ -39,6 +39,7 @@ require_once('../include/lehreinheit.class.php');
 require_once('../include/lehreinheitmitarbeiter.class.php');
 require_once('../include/lehreinheitgruppe.class.php');
 require_once('../include/benutzerberechtigung.class.php');
+require_once('../include/log.class.php');
 
 $user = get_uid();
 

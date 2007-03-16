@@ -17,6 +17,12 @@
 <!ENTITY menu-help-close:label        	"Ueber">
 <!ENTITY menu-help-close:accesskey    	"U">
 
+<!ENTITY menu-edit:label              	"Bearbeiten">
+<!ENTITY menu-edit:accesskey          	"B">
+
+<!ENTITY menu-edit-undo:key           	"">
+<!ENTITY menu-edit-undo:label         	"Undo">
+<!ENTITY menu-edit-undo:accesskey     	"">
 
 <!ENTITY menu-prefs:label              	"Einstellungen">
 <!ENTITY menu-prefs:accesskey          	"E">
