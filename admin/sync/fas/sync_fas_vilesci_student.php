@@ -1728,18 +1728,6 @@ if($result = pg_query($conn_fas, $qry))
 										$ausgabe_benutzer="Aktiv: '".($aktiv?'true':'false')."'";
 									}
 								}		
-								if($rows->alias!=$alias)
-								{
-									$updateb=true;
-									if(strlen(trim($ausgabe_benutzer))>0)
-									{
-										$ausgabe_benutzer.=", Alias: '".$alias."'";
-									}
-									else
-									{
-										$ausgabe_benutzer="Alias: '".$alias."'";
-									}
-								}
 								
 								if($updateb)
 								{
@@ -1747,7 +1735,6 @@ if($result = pg_query($conn_fas, $qry))
 									       ' uid='.myaddslashes($student_uid).','.
 									       ' person_id='.myaddslashes($person_id).','.
 									       ' aktiv='.($aktiv?'true':'false').','.
-									       ' alias='.myaddslashes($alias).','.
 									       " insertamum=now()".','.
 							        		       ' insertvon='.myaddslashes($insertvon).','.
 							        		       " updateamum=now()".','.
