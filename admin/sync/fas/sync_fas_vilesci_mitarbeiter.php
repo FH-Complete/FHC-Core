@@ -509,7 +509,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 						        myaddslashes($persongeburtsnation).", ".
 						        myaddslashes($personstaatsbuergerschaft).", ".
 						        myaddslashes($personext_id).");";
-						        $ausgabe_person="Person ".$personnachname." ".$personvorname." eingefügt.";
+						        $ausgabe_person="Person ".$personnachname." ".$personvorname." eingefügt.\n";
 				}
 				else
 				{
@@ -728,7 +728,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 								}
 								else
 								{
-									$ausgabe_person="Sprache: '".$persongeschlecht."' (statt '".$row1->geschlecht."')";
+									$ausgabe_person="Geschlecht: '".$persongeschlecht."' (statt '".$row1->geschlecht."')";
 								}
 							}
 							if($row1->staatsbuergerschaft!=$personstaatsbuergerschaft)
@@ -837,7 +837,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 							myaddslashes($benutzerinsertvon).", 
 							now(), ".
 							myaddslashes($benutzerupdatevon).");";
-							$ausgabe_benutzer="Benutzer ".$benutzeruid." ".$benutzeralias." eingefügt.";
+							$ausgabe_benutzer="Benutzer ".$benutzeruid." ".$benutzeralias." eingefügt.\n";
 					}
 					else
 					{	
@@ -954,7 +954,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 								now(), ".
 								myaddslashes($mitarbeiterinsertvon)." , ".
 								myaddslashes($mitarbeiterext_id).");";
-								$ausgabe_mitarbeiter="Mitarbeiter ".$mitarbeiterpersonalnummer." ".$mitarbeiterkurzbz." eingefügt.";
+								$ausgabe_mitarbeiter="Mitarbeiter ".$mitarbeiterpersonalnummer." ".$mitarbeiterkurzbz." eingefügt.\n";
 							}
 							else
 							{
@@ -1054,11 +1054,11 @@ if($resultall = pg_query($conn_fas, $qryall))
 											$updatem=true;
 											if(strlen(trim($ausgabe_mitarbeiter))>0)
 											{
-												$ausgabe_person.=", Anmerkung: '".$mitarbeiteranmerkung."'";
+												$ausgabe_mitarbeiter.=", Anmerkung: '".$mitarbeiteranmerkung."'";
 											}
 											else
 											{
-												$ausgabe_person="Anmerkung: '".$mitarbeiteranmerkung."'";
+												$ausgabe_mitarbeiter="Anmerkung: '".$mitarbeiteranmerkung."'";
 											}
 										}
 									}
