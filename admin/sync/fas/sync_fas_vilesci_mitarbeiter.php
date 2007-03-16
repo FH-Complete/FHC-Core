@@ -859,18 +859,6 @@ if($resultall = pg_query($conn_fas, $qryall))
 										$ausgabe_benutzer="Aktiv: '".($benutzeraktiv?'true':'false')."'";
 									}
 								}		
-								if($rowu->alias!=$benutzeralias)
-								{
-									$updateb=true;
-									if(strlen(trim($ausgabe_benutzer))>0)
-									{
-										$ausgabe_benutzer.=", Alias: ,".$benutzeralias."'";
-									}
-									else
-									{
-										$ausgabe_benutzer="Alias: '".$benutzeralias."'";
-									}
-								}
 								if($rowu->person_id!=$personperson_id)
 								{
 									$updateb=true;
@@ -889,7 +877,6 @@ if($resultall = pg_query($conn_fas, $qryall))
 						{
 							$qry = "UPDATE public.tbl_benutzer SET
 							       aktiv=".myaddslashes($benutzeraktiv?'true':'false').", 
-							       alias=".myaddslashes($benutzeralias).", 
 							       person_id=".myaddslashes($personperson_id).", 
 							       updateamum=now(), 
 							       updatevon=".myaddslashes($benutzerupdatevon).",
@@ -1194,7 +1181,7 @@ echo nl2br("\nLog:\n".$error_log);
 echo nl2br("\n=====\n".$ausgabe);
 $ausgabe="Person Sync\n-------------\n\nGesamt FAS: $anzahl_quelle\nPerson:        Eingefügt: $anzahl_eingefuegt_person / geaendert: $anzahl_geaendert_person / Fehler: $anzahl_fehler_person"
 ."\nBenutzer:     Eingefügt: $anzahl_eingefuegt_benutzer / geaendert: $anzahl_geaendert_benutzer / Fehler: $anzahl_fehler_benutzer"
-."\nMitarbeiter: Eingefügt: $anzahl_eingefuegt_mitarbeiter / geaendert: $anzahl_geaendert_mitarbeiter / Fehler: $anzahl_fehler_mitarbeiter.".$ausgabe;
+."\nMitarbeiter: Eingefügt: $anzahl_eingefuegt_mitarbeiter / geaendert: $anzahl_geaendert_mitarbeiter / Fehler: $anzahl_fehler_mitarbeiter.\n\n".$ausgabe;
 $error_log="\n\n\nFehler:\n$error_log";
 if(strlen(trim($error_log))>0)
 {
