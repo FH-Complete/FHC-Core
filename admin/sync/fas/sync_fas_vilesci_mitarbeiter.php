@@ -371,7 +371,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 		$mitarbeiteruid=$rowall->uid;
 		$mitarbeiterpersonalnummer=$rowall->persnr;
 		$mitarbeitertelefonklappe='';
-		$mitarbeiterkurzbz=$rowall->kurzbez;
+		$mitarbeiterkurzbz=trim($rowall->kurzbez);
 		$mitarbeiterlektor=true;
 		$mitarbeiterfixangestellt=($rowall->hauptberuflich=='J'?true:false);
 		$mitarbeiterstundensatz=0;
