@@ -1,5 +1,5 @@
 <?php
-include("../vilesci/config.inc.php");
+include("../../vilesci/config.inc.php");
 ?>
 
 /**
@@ -16,7 +16,7 @@ function tabchange(select)
 		document.getElementById('tab-verband').selected=true;
 		document.getElementById('tabpanels-main').selectedIndex=1;
 		document.getElementById('tabpanels-left').selectedIndex=1;
-		
+
 	}
 	else if(select=='mitarbeiter') //Auswahl des Mitarbeiter Tabs
 	{
@@ -35,7 +35,7 @@ function tabchange(select)
  */
 function closeWindow()
 {
-  //Wenn Daten geaendert wurden  
+  //Wenn Daten geaendert wurden
   if(treeMitarbeiterDetailChanged)
   {
      if(confirm("Wollen Sie die geänderten Daten speichern?"))
@@ -60,7 +60,7 @@ function onLoad()
 {
 	//rebuild Listener setzen
 	document.getElementById('tree-liste-mitarbeiter').builder.addListener(treemenurebuildobserve);
-	
+
 	//Eingabefelder deaktivieren
 	SetMitarbeiterDetailAktiv(false);
 
@@ -81,9 +81,9 @@ function studiensemesterChange()
 		if(items[i].id=='menu-properies-studiensemester-name' && items[i].getAttribute("checked")=='true')
 			stsem = items[i].label;
 	}
-	
+
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 	// Request absetzen
 	var httpRequest = new XMLHttpRequest();
 	var url = "<?php echo APP_ROOT; ?>rdf/fas/db_dml.rdf.php";
@@ -93,10 +93,10 @@ function studiensemesterChange()
 
 	var param = "type=variablechange";
 	param = param + "&stsem="+stsem;
-	
+
 	//Parameter schicken
 	httpRequest.send(param);
-	
+
 	// Bei status 4 ist sendung Ok
 	switch(httpRequest.readyState)
 	{
@@ -127,13 +127,13 @@ function studiensemesterChange()
 
    	var dbdml_return = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#return" ));
    	var dbdml_errormsg = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#errormsg" ));
-	
+
    	if(dbdml_return=='true')
-   	{   	 		
+   	{
    		//Statusbar setzen
    		setStatusBarText("Studiensemester erfolgreich geändert");
    		document.getElementById("tree-liste-funktionen").builder.refresh();
-   		document.getElementById("statusbarpanel-semester").label = stsem;   		
+   		document.getElementById("statusbarpanel-semester").label = stsem;
    		MitarbeiterDetailStudiensemester_id = dbdml_errormsg;
    	}
    	else
