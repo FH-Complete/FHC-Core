@@ -7,7 +7,7 @@
 /**
  * Synchronisiert Studentendatensaetze von FAS DB in PORTAL DB
  * benötigt: tbl_nation, tbl_sprache, tbl_studiengang
- * benötigt: tbl_syncperson
+ * benötigt: tbl_syncperson, tbl_studiensemester
 */
 require_once('../../../vilesci/config.inc.php');
 require_once('../../../include/datum.class.php');
