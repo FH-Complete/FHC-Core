@@ -18,8 +18,8 @@ if(!$conn = pg_pconnect(CONN_STRING))
 
 	if (isset($_POST['Save']))
 	{
-		doSAVE($conn);
-		echo "<script language='Javascript'>window.location.href='lektor_uebersicht.php';</script>";
+		if(doSAVE($conn))
+			echo "<script language='Javascript'>window.location.href='lektor_uebersicht.php';</script>";
 	}
 	else if (isset($_GET['new']))
 	{
@@ -57,10 +57,10 @@ function doSAVE($conn)
 	$lektor->nachname=$_POST['nachname'];
 	$lektor->gebdatum=$_POST['gebdatum'];
 	$lektor->gebort=$_POST['gebort'];
-	$lektor->gebzeit=$_POST['gebzeit'];
-	$lektor->anmerkungen=$_POST['anmerkungen'];
+	//$lektor->gebzeit=$_POST['gebzeit'];
+	//$lektor->anmerkungen=$_POST['anmerkungen'];
 	$lektor->aktiv=($_POST['aktiv']=='1'?true:false);
-	$lektor->email=$_POST['email'];
+	//$lektor->email=$_POST['email'];
 	$lektor->alias=$_POST['alias'];
 	$lektor->kurzbz=$_POST['kurzbz'];
 	$lektor->homepage=$_POST['homepage'];
@@ -68,6 +68,7 @@ function doSAVE($conn)
 	$lektor->personalnummer=$_POST['personalnummer'];
 	$lektor->lektor=($_POST['lektor']=='1'?true:false);
 	$lektor->fixangestellt=($_POST['fixangestellt']=='t'?true:false);
+	$lektor->standort_kurzbz=$_POST['standort_kurzbz'];
 	$lektor->telefonklappe=$_POST['telefonklappe'];
 	$lektor->ort_kurzbz=$_POST['raumnr'];
 	//print_r($_POST);
@@ -75,13 +76,16 @@ function doSAVE($conn)
 
 	if ($lektor->save())
 	{
-		$msg="<p>Datensatz gespeichert.</p>";
-	} else
+		echo "<p>Datensatz gespeichert.</p>";
+		return true;
+	} 
+	else
 	{
-		$msg="<p>".$lektor->errormsg."</p>";
+		echo "<p>".$lektor->errormsg."</p>";
+		return false;
 	}
 
-	doEDIT($lektor->uid,false,$msg);
+//	doEDIT($lektor->uid,false,$msg);
 }
 
 
@@ -127,14 +131,27 @@ if (strlen($msg)>0) echo $msg."<br/>";
 <tr><td>eMail Alias</td><td><input type="text" name="alias" value="<?php echo $lektor->alias; ?>"></td></tr>
 <tr><td>Homepage</td><td><input type="text" name="homepage" value="<?php echo $lektor->homepage; ?>"></td></tr>
 <tr><td>Kurzbezeichnung</td><td><input type="text" name="kurzbz" value="<?php echo $lektor->kurzbz; ?>"></td></tr>
-<tr><td>Telefon Technikum</td><td><input type="text" name="telefonklappe" value="<?php echo $lektor->telefonklappe; ?>"></td></tr>
+<tr><td>Standort</td><td>
+<SELECT name="standort_kurzbz">
+<OPTION value="" selected>--Kein Standort--</OPTION>
+<?php
+	$qry = "SELECT standort_kurzbz FROM public.tbl_standort ORDER BY standort_kurzbz";
+	if($result=pg_query($conn,$qry))
+	{
+		while($row=pg_fetch_object($result))
+			echo "<OPTION value='$row->standort_kurzbz' ". ($lektor->standort_kurzbz==$row->standort_kurzbz?'selected':'').">$row->standort_kurzbz</OPTION>";
+	}
+?>
+</SELECT>
+</td></tr>
+<tr><td>Telefonklappe</td><td><input type="text" name="telefonklappe" value="<?php echo $lektor->telefonklappe; ?>"></td></tr>
 <tr><td>Fix angestellt</td><td><SELECT name="fixangestellt">
 	<OPTION value="t" <?php if($lektor->fixangestellt) echo 'selected'; ?>>Ja</OPTION>
     <OPTION value="f" <?php if(!$lektor->fixangestellt) echo 'selected'; ?>>Nein</OPTION>
     </SELECT></td></tr>
 <tr><td>Raum Nr:</td><td>
 <SELECT name="raumnr">
-<OPTION value="0" selected>--Kein Raum--</OPTION>
+<OPTION value="" selected>--Kein Raum--</OPTION>
 <?php
 	$qry = "SELECT ort_kurzbz FROM public.tbl_ort WHERE aktiv=true ORDER BY ort_kurzbz";
 	if($result=pg_query($conn,$qry))

@@ -72,15 +72,15 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/tempusoverlay.xul.php"?>';
            accesskey = "&menu-file-close:accesskey;"/>
       </menupopup>
     </menu>
-    <menu id="menu-edit" label="&menu-edit:label;" accesskey="&menu-edit:accesskey;" onclick="loadUndoList();">
-      <menupopup id="menu-edit-popup" onpopupshowing="debug('wooosaar');">
+    <menu id="menu-edit" label="&menu-edit:label;" accesskey="&menu-edit:accesskey;" onclick="">
+      <menupopup id="menu-edit-popup" onpopupshowing="loadUndoList();">
         <menu id="menu-edit-undo" label="&menu-edit-undo:label;" 
            datasources="rdf:null"
            ref="http://www.technikum-wien.at/undo/liste"
         >
            	<template>
 	        		<rule>
-	     	 			<menupopup>   				 			
+	     	 			<menupopup id="menu-edit-undo-popup">   				 			
 				        		<menuitem uri="rdf:*" label="rdf:http://www.technikum-wien.at/undo/rdf#beschreibung" 
 		            					  value="rdf:http://www.technikum-wien.at/undo/rdf#log_id" 
 		            					  onclick="UnDo(this.value, this.label);"/>
@@ -127,7 +127,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/tempusoverlay.xul.php"?>';
 				checked = ".($benutzer->variable->semester_aktuell==$stsem?"'true' ":"'false'")." />";
        		}
        ?>
-           
+           	
       		</menupopup>
         </menu>   
 	    </menupopup>

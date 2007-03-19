@@ -29,6 +29,7 @@ class mitarbeiter extends benutzer
 	var $kurzbz;			//varchar(8)
 	var $lektor;			//boolean
 	var $fixangestellt;		//boolean
+	var $standort_kurzbz;   //varchar(16)
 	var $telefonklappe;		//varchar(25)
 	var $ort_kurzbz;		//varchar(8)
 	var $ext_id_mitarbeiter;	//bigint
@@ -75,6 +76,7 @@ class mitarbeiter extends benutzer
 				$this->kurzbz = $row->kurzbz;
 				$this->lektor = $row->lektor;
 				$this->fixangestellt = $row->fixangestellt;
+				$this->standort_kurzbz = $row->standort_kurzbz;
 				$this->telefonklappe = $row->telefonklappe;
 				$this->ort_kurzbz = $row->ort_kurzbz;
 				$this->ext_id_mitarbeiter = $row->ext_id;
@@ -177,7 +179,7 @@ class mitarbeiter extends benutzer
 
 			//Neuen Datensatz anlegen							
 			$qry = "INSERT INTO public.tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz,
-			                    fixangestellt, telefonklappe, updateamum, updatevon, ext_id)
+			                    fixangestellt, standort_kurzbz, telefonklappe, updateamum, updatevon, ext_id)
 
 			        VALUES('".addslashes($this->uid)."',".
 			 	 	$this->addslashes($this->ausbildungcode).",".
@@ -186,6 +188,7 @@ class mitarbeiter extends benutzer
 			 	 	($this->lektor?'true':'false').','.
 			 	 	$this->addslashes($this->ort_kurzbz).','.
 					($this->fixangestellt?'true':'false').','.
+					$this->addslashes($this->standort_kurzbz).','.
 					$this->addslashes($this->telefonklappe).','.
 					$this->addslashes($this->updateamum).','.
 					$this->addslashes($this->updatevon).', '.
@@ -200,6 +203,7 @@ class mitarbeiter extends benutzer
 			       ' kurzbz='.$this->addslashes($this->kurzbz).','.
 			       ' lektor='.($this->lektor?'true':'false').','.
 			       ' fixangestellt='.($this->fixangestellt?'true':'false').','.
+			       ' standort_kurzbz='.$this->addslashes($this->standort_kurzbz).','.
 			       ' telefonklappe='.$this->addslashes($this->telefonklappe).','.
 			       ' ort_kurzbz='.$this->addslashes($this->ort_kurzbz).','.
 			       ' updateamum='.$this->addslashes($this->updateamum).','.
@@ -278,6 +282,7 @@ class mitarbeiter extends benutzer
 			$l->kurzbz=$row->kurzbz;
 			$l->lektor=$row->lektor=='t'?true:false;
 			$l->fixangestellt=$row->fixangestellt=='t'?true:false;
+			$l->standort_kurzbz = $row->standort_kurzbz;
 			$l->telefonklappe=$row->telefonklappe;
 			//$l->ort_kurzbz=$row->ort_kurzbz;
 			// Lektor in Array speichern

@@ -81,22 +81,22 @@ function onVerbandSelect()
 	try
 	{	
 		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?stg_kz='+stg_kz+'&sem='+sem+'&ver='+ver+'&grp='+grp+'&gruppe='+gruppe+'&'+gettimestamp();
-		var treeLFVT=document.getElementById('lehrveranstaltung-tree');
+		var treeLV=document.getElementById('lehrveranstaltung-tree');
 		
 		//Alte DS entfernen
-		var oldDatasources = treeLFVT.database.GetDataSources();	
+		var oldDatasources = treeLV.database.GetDataSources();	
 		while(oldDatasources.hasMoreElements())
 		{
-			treeLFVT.database.RemoveDataSource(oldDatasources.getNext());
+			treeLV.database.RemoveDataSource(oldDatasources.getNext());
 		}
 				
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		LvTreeDatasource = rdfService.GetDataSource(url);
 		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-		treeLFVT.database.AddDataSource(LvTreeDatasource);
+		treeLV.database.AddDataSource(LvTreeDatasource);
 		LvTreeDatasource.addXMLSinkObserver(LvTreeSinkObserver);
-		treeLFVT.builder.addListener(LvTreeListener);
+		treeLV.builder.addListener(LvTreeListener);
 	}
 	catch(e)
 	{
