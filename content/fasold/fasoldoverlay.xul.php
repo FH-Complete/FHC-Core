@@ -2,7 +2,7 @@
 header("Content-type: application/vnd.mozilla.xul+xml");
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
-include('../vilesci/config.inc.php');
+include('../../vilesci/config.inc.php');
 
 echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiteroverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/lehreinheitenoverlay.xul.php"?>';
@@ -124,9 +124,9 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/fas.css" type="text/css"?>';*/
 	    <treecol id="tree-verband-studiengang_id" label="StudiengangID" flex="15"  hidden="true"/>
 	    <splitter class="tree-splitter"/>
 	    <treecol id="tree-verband-gruppe_id" label="GruppenID" flex="15"  hidden="true"/>
-	    <splitter class="tree-splitter"/>	    
+	    <splitter class="tree-splitter"/>
 	    <treecol id="tree-verband-ausbildungssemester_id" label="AusbildungssemesterID" flex="15"  hidden="true"/>
-	    <splitter class="tree-splitter"/>	    
+	    <splitter class="tree-splitter"/>
 	</treecols>
 
 	<template>
