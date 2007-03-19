@@ -55,7 +55,7 @@ $updates=false;
 $rolle_kurzbz=array(1=>"Interessent", 2=>"Bewerber", 3=>"Student", 4=>"Ausserordentlicher", 5=>"Abgewiesener", 6=>"Aufgenommener", 7=>"Wartender", 8=>"Abbrecher", 9=>"Unterbrecher", 10=>"Outgoing", 11=>"Incoming", 12=>"Praktikant", 13=>"Diplomant", 14=>"Absolvent");
 $studiensemester_kurzbz=array(2=>"WS2002",3=>"SS2003",4=>"WS2003",5=>"SS2004",6=>"WS2004",7=>"SS2005",8=>"WS2005",9=>"SS2006",10=>"WS2006",11=>"SS2007",12=>"WS2007",13=>"SS2008",14=>"WS2008");
 $studiengangfk=array(2=>11,3=>91,4=>94,5=>145,6=>227,7=>182,8=>222,9=>203,10=>204,11=>92,12=>258,13=>308,14=>254,15=>256,16=>257,17=>255,18=>302,19=>336,20=>330,21=>333, 22=>327,23=>335,24=>228,25=>303,26=>299,27=>298,28=>300,29=>297,30=>329,31=>301,32=>332,33=>331,34=>328,35=>476,36=>1,37=>334);
-//Kennzahlen für EUE im Array studiengangfk NACHTRAGEN
+//Kennzahlen für MEUE im Array studiengangfk NACHTRAGEN
 
 $error_log_fas=array();
 foreach ($studiengangfk AS $stg)
@@ -457,8 +457,8 @@ if($result = pg_query($conn_fas, $qry))
 		$vornamen=trim($row->vornamen);
 		$gebdatum=$row->gebdat;
 		$gebort=$row->gebort;
-		$gebzeit=''; //bei insert auslassen
-		$foto=''; //bei insert auslassen
+		$gebzeit=''; //bei update auslassen
+		$foto=''; //bei update auslassen
 		$anmerkungen='';
 		$homepage='';
 		$svnr=$row->svnr;
@@ -487,8 +487,8 @@ if($result = pg_query($conn_fas, $qry))
 		$anzahlkinder=$row->anzahlderkinder;
 		//$aktiv=($row->aktiv=='t'?true:false);
 		$insertvon='SYNC';
-		$insertamum='';
-		$updateamum='';
+		$insertamum=$row->creationdate;
+		$updateamum=$row->creationdate;
 		$updatevon='SYNC';
 		$ext_id_person=$row->person_pk;
 				
@@ -819,9 +819,9 @@ if($result = pg_query($conn_fas, $qry))
 				        myaddslashes($familienstand).','.
 				        myaddslashes($anzahlkinder).','.
 				        ($aktiv?'true':'false').','.
-				        "now()".','.
+				        myaddslashes($insertamum).','.
 				        myaddslashes($insertvon).','.
-				        "now()".','.
+				        myaddslashes($updateamum).','.
 				        myaddslashes($updatevon).','.
 				        myaddslashes($geschlecht).','.
 				        myaddslashes($geburtsnation).','.
@@ -1086,8 +1086,6 @@ if($result = pg_query($conn_fas, $qry))
 						       ' geschlecht='.myaddslashes($geschlecht).','.
 						       ' geburtsnation='.myaddslashes($geburtsnation).','.
 						       ' staatsbuergerschaft='.myaddslashes($staatsbuergerschaft).','.
-						       " insertamum=now()".','.
-				        		       ' insertvon='.myaddslashes($insertvon).','.
 				        		       " updateamum=now()".','.
 				        		       " updatevon=".myaddslashes($updatevon).','.
 						       ' ext_id='.myaddslashes($ext_id_person).
@@ -1232,9 +1230,9 @@ if($result = pg_query($conn_fas, $qry))
 					myaddslashes($anmeldungreihungstest).', '.
 					($reihungstestangetreten?'true':'false').', '.
 					myaddslashes($anmerkung).', '.
-					"now()".', '.
+					myaddslashes($insertamum).','.
 					"'SYNC', ".
-					"now()".', '.
+					myaddslashes($updateamum).','.
 					"'SYNC', ".
 					myaddslashes($ext_id_pre).');';
 					$ausgabe_pre="Prestudent:  ID:".$person_id.", ".$nachname." eingefügt.\n";
@@ -1469,8 +1467,6 @@ if($result = pg_query($conn_fas, $qry))
 							       ' anmeldungreihungstest='.myaddslashes($anmeldungreihungstest).','.
 							       ' reihungstestangetreten='.($reihungstestangetreten?'true':'false').','.
 							       ' anmerkung='.myaddslashes($anmerkung).','.
-							       " insertamum=now()".','.
-					        		       ' insertvon='.myaddslashes($insertvon).','.
 					        		       " updateamum=now()".','.
 					        		       " updatevon=".myaddslashes($updatevon).','.
 							       ' ext_id='.myaddslashes($ext_id_pre).
@@ -1688,9 +1684,9 @@ if($result = pg_query($conn_fas, $qry))
 						myaddslashes($person_id).', '.
 						($aktiv?'true':'false').', '.
 						myaddslashes($alias).', '.
-						"now()".', '.
+						myaddslashes($insertamum).','.
 						"'SYNC'".', '.
-						"now()".', '.
+						myaddslashes($updateamum).','.
 						"'SYNC'".', '.
 						myaddslashes($ext_id_benutzer).'); ';
 						$ausgabe_benutzer="Benutzer ".$benutzeruid." ".$benutzeralias." eingefügt.\n";
@@ -1735,8 +1731,6 @@ if($result = pg_query($conn_fas, $qry))
 									       ' uid='.myaddslashes($student_uid).','.
 									       ' person_id='.myaddslashes($person_id).','.
 									       ' aktiv='.($aktiv?'true':'false').','.
-									       " insertamum=now()".','.
-							        		       ' insertvon='.myaddslashes($insertvon).','.
 							        		       " updateamum=now()".','.
 							        		       " updatevon=".myaddslashes($updatevon).
 									       ' WHERE ext_id='.myaddslashes($ext_id_benutzer).';';
@@ -1781,9 +1775,9 @@ if($result = pg_query($conn_fas, $qry))
 								myaddslashes($semester).', '.
 								myaddslashes($verband).', '.
 								myaddslashes($gruppe).', '.
-								"now()".', '.
+								myaddslashes($insertamum).','.
 								"'SYNC'".', '.
-								"now()".', '.
+								myaddslashes($updateamum).','.
 								"'SYNC'".', '.
 								myaddslashes($ext_id_student).'); ';
 								$ausgabe_student="Student mit ID ".$student_uid.", ".$nachname.", Matrikelnummer:'".$matrikelnr."' eingefügt.\n";
@@ -1881,8 +1875,6 @@ if($result = pg_query($conn_fas, $qry))
 										       ' semester='.myaddslashes($semester).','.
 										       ' verband='.myaddslashes($verband).','.
 										       ' gruppe='.myaddslashes($gruppe).','.
-										       " insertamum=now()".','.
-								        		       ' insertvon='.myaddslashes($insertvon).','.
 								        		       " updateamum=now()".','.
 								        		       " updatevon=".myaddslashes($updatevon).','.
 										       ' ext_id='.myaddslashes($ext_id_student).
