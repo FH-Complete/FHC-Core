@@ -21,7 +21,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/fas.css" type="text/css"?>';*/
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	>
 
-<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/fasoverlay.js.php" />
+<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/fasold/fasoldoverlay.js.php" />
 <!--
 <script type="application/x-javascript" src="chrome://global/content/nsTransferable.js"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/DragAndDrop.js"/>

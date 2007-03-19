@@ -1,14 +1,14 @@
 <?php
-	include('../vilesci/config.inc.php');
+	include('../../vilesci/config.inc.php');
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/fas/functions.inc.php');
 	require_once('../../include/fas/benutzer.class.php');
 
 	// Datenbank Verbindung
-	if (!$conn = @pg_pconnect(CONN_STRING_FAS))
+	if (!$conn = pg_pconnect(CONN_STRING_FAS))
 	   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
-	if (!$conn_vilesci = @pg_pconnect(CONN_STRING))
+	if (!$conn_vilesci = pg_pconnect(CONN_STRING))
 	   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 	$user = get_uid();
