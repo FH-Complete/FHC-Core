@@ -86,7 +86,7 @@ function myaddslashes($var)
 <?php
 $plausisvnr="Überprüfung Studentendaten im FAS:\n\n";
 
-/*
+
 $qry="SELECT * FROM person JOIN student ON person_pk=student.person_fk WHERE svnr='0005010400';";
 if($resultp = pg_query($conn_fas, $qry))
 {
@@ -395,7 +395,7 @@ foreach ($studiengangfk AS $stg)
 		echo nl2br("Kein Zugriff auf tbl_studiengang => Studiengang ".$stg." nicht gefunden. E-Mail mit folgendem Inhalt wird nicht verschickt:\n".$error_log_fas[$stg]);
 	}
 }
-*/
+
 
 
 $qry = "SELECT * FROM person JOIN student ON person_fk=person_pk WHERE uid NOT LIKE '\_dummy%' 
@@ -954,18 +954,6 @@ if($result = pg_query($conn_fas, $qry))
 							$ausgabe_person="Geburtsort: '".$gebort."' (statt '".$row1->gebort."')";
 						}
 					}
-					if($row1->anmerkungen!=$anmerkungen)
-					{
-						$updatep=true;
-						if(strlen(trim($ausgabe_person))>0)
-						{
-							$ausgabe_person.=", Anmerkungen: '".$anmerkungen."'";
-						}
-						else
-						{
-							$ausgabe_person="Anmerkungen: '".$anmerkungen."'";
-						}
-					}
 					if($row1->svnr!=$svnr)
 					{
 						$updatep=true;
@@ -1019,11 +1007,11 @@ if($result = pg_query($conn_fas, $qry))
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
 						{
-							$ausgabe_person.=", Aktiv: '".($aktiv?'true':'false')."' (statt '".$row1->aktiv."')";
+							$ausgabe_person.=", Aktiv: '".($aktiv?'true':'false')."' (statt '".($row1->aktiv?'true':'false')."')";
 						}
 						else
 						{
-							$ausgabe_person="Aktiv: '".($aktiv?'true':'false')."' (statt '".$row1->aktiv."')";
+							$ausgabe_person="Aktiv: '".($aktiv?'true':'false')."' (statt '".($row1->aktiv?'true':'false')."')";
 						}
 					}
 					if($row1->geburtsnation!=$geburtsnation)
@@ -1076,7 +1064,6 @@ if($result = pg_query($conn_fas, $qry))
 						       ' gebort='.myaddslashes($gebort).','.
 						       //' gebzeit='.myaddslashes($gebzeit).','.
 						       //' foto='.myaddslashes($foto).','.
-						       ' anmerkungen='.myaddslashes($anmerkungen).','.
 						       //' homepage='.myaddslashes($homepage).','.
 						       ' svnr='.myaddslashes($svnr).','.
 						       ' ersatzkennzeichen='.myaddslashes($ersatzkennzeichen).','.
@@ -1095,7 +1082,7 @@ if($result = pg_query($conn_fas, $qry))
 				}
 			}
 		}
-		if(pg_query($conn,$qry))
+		if(@pg_query($conn,$qry))
 		{
 			if($new_person)
 			{
@@ -1260,11 +1247,11 @@ if($result = pg_query($conn_fas, $qry))
 							$updater=true;
 							if(strlen(trim($ausgabe_pre))>0)
 							{
-								$ausgabe_pre.=", Aufmerksamdurch: '".$svnr."'";
+								$ausgabe_pre.=", Aufmerksamdurch: '".$aufmerksamdurch_kurzbz."'";
 							}
 							else
 							{
-								$ausgabe_pre="Aufmerksamdurch: '".$svnr."'";
+								$ausgabe_pre="Aufmerksamdurch: '".$aufmerksamdurch_kurzbz."'";
 							}
 						}
 						if($rows->person_id!=$person_id)
@@ -1312,7 +1299,7 @@ if($result = pg_query($conn_fas, $qry))
 							}
 							else
 							{
-								$ausgabe_pre="ZGV_Code: '".$zgv_code."'";
+								$ausgabe_pre="ZGV-Code: '".$zgv_code."'";
 							}
 						}
 						if($rows->zgvort!=$zgvort)
@@ -1649,8 +1636,8 @@ if($result = pg_query($conn_fas, $qry))
 				}
 				if(!$error)
 				{
-					$ausgabe_pre.=$ausgabe_prerolle;
 					$ausgabe.=$ausgabe_person;
+					$ausgabe_pre.=$ausgabe_prerolle;
 					$ausgabe.=$ausgabe_pre;
 				}
 				if ($semester!=null and $semester!='' and is_numeric($semester) 
@@ -1810,11 +1797,11 @@ if($result = pg_query($conn_fas, $qry))
 										$updates=true;
 										if(strlen(trim($ausgabe_student))>0)
 										{
-											$ausgabe_student.=", PrestudentID: '".$prestudent_id."'";
+											$ausgabe_student.=", PrestudentID: '".$prestudent_id."' (statt '".$rows->prestudent_id."')";
 										}
 										else
 										{
-											$ausgabe_student="PrestudentID: '".$prestudent_id."'";
+											$ausgabe_student="PrestudentID: '".$prestudent_id."' (statt '".$rows->prestudent_id."')";
 										}
 									}
 									if($rows->studiengang_kz!=$studiengang_kz)
@@ -1822,11 +1809,11 @@ if($result = pg_query($conn_fas, $qry))
 										$updates=true;
 										if(strlen(trim($ausgabe_student))>0)
 										{
-											$ausgabe_student.=", Studiengang: '".$studiengang_kz."'";
+											$ausgabe_student.=", Studiengang: '".$studiengang_kz."' (statt '".$rows->studiengang_kz."')";
 										}
 										else
 										{
-											$ausgabe_student="Studiengang: '".$studiengang_kz."'";
+											$ausgabe_student="Studiengang: '".$studiengang_kz."' (statt '".$rows->studiengang_kz."')";
 										}
 									}
 									if($rows->semester!=$semester)
@@ -1834,11 +1821,11 @@ if($result = pg_query($conn_fas, $qry))
 										$updates=true;
 										if(strlen(trim($ausgabe_student))>0)
 										{
-											$ausgabe_student.=", Semester: '".$semester."'";
+											$ausgabe_student.=", Semester: '".$semester."' (statt '".$rows->semester."')";
 										}
 										else
 										{
-											$ausgabe_student="Semester: '".$semester."'";
+											$ausgabe_student="Semester: '".$semester."' (statt '".$rows->semester."')";
 										}
 									}
 									if($rows->verband!=$verband)
@@ -1846,11 +1833,11 @@ if($result = pg_query($conn_fas, $qry))
 										$updates=true;
 										if(strlen(trim($ausgabe_student))>0)
 										{
-											$ausgabe_student.=", Verband: '".$verband."'";
+											$ausgabe_student.=", Verband: '".$verband."' (statt '".$rows->verband."')";
 										}
 										else
 										{
-											$ausgabe_student="Verband: '".$verband."'";
+											$ausgabe_student="Verband: '".$verband."' (statt '".$rows->verband."')";
 										}
 									}
 									if($rows->gruppe!=$gruppe)
@@ -1858,11 +1845,11 @@ if($result = pg_query($conn_fas, $qry))
 										$updates=true;
 										if(strlen(trim($ausgabe_student))>0)
 										{
-											$ausgabe_student.=", Gruppe: '".$gruppe."'";
+											$ausgabe_student.=", Gruppe: '".$gruppe."' (statt '".$rows->gruppe."')";
 										}
 										else
 										{
-											$ausgabe_student="Gruppe: '".$gruppe."'";
+											$ausgabe_student="Gruppe: '".$gruppe."' (statt '".$rows->gruppe."')";
 										}
 									}						
 									
@@ -1919,7 +1906,7 @@ if($result = pg_query($conn_fas, $qry))
 							$text.="\n***********".$student_uid." / ".$nachname.", ".$vorname." / ".$matrikelnr."\n";
 							$text.=$error_log;
 							$text.="\n".$qry." R1\n";
-							$text.="**********\n\n";
+							$text.="***********\n\n";
 							pg_query($conn,'ROLLBACK;');
 						}									
 					}
@@ -1929,7 +1916,7 @@ if($result = pg_query($conn_fas, $qry))
 						$text.="\n***********".$student_uid." / ".$nachname.", ".$vorname." / ".$matrikelnr."\n";
 						$text.=$error_log;
 						$text.="\n".$qry." R2\n";
-						$text.="**********\n\n";
+						$text.="***********\n\n";
 						pg_query($conn,'ROLLBACK;');
 					}
 				}
@@ -1943,9 +1930,9 @@ if($result = pg_query($conn_fas, $qry))
 						$text.="Semester: ".$semester."/ Verband: ".$verband." / Gruppe: ".$gruppe." / Stg:".$studiengang_kz."\n";
 						$text.=$error_log;
 						$text.="\n".$qry." C1\n";
-						$text.="**********\n\n";
+						$text.="***********\n\n";
 					}
-					$ausgabe.=$ausgabe_person;
+					//$ausgabe.=$ausgabe_person;
 					fwrite($dateiausgabe,$ausgabe);
 					$ausgabe='';
 					pg_query($conn,'COMMIT;'); //Commit, wenn kein Gruppeneintrag gefunden (Interessent, Bewerber) => nur Person und Prestudent werden angelegt	
@@ -1958,7 +1945,7 @@ if($result = pg_query($conn_fas, $qry))
 				$text.="\n***********".$student_uid." / ".$nachname.", ".$vorname." / ".$matrikelnr."\n";
 				$text.=$error_log;
 				$text.="\n".$qry." R3\n";
-				$text.="**********\n\n";
+				$text.="***********\n\n";
 				pg_query($conn,'ROLLBACK;');
 			}						
 		}
@@ -1968,7 +1955,7 @@ if($result = pg_query($conn_fas, $qry))
 			$text.="\n***********".$student_uid." / ".$nachname.", ".$vorname." / ".$matrikelnr."\n";
 			$text.=$error_log;
 			$text.="\n".$qry." R4\n";
-			$text.="**********\n\n";
+			$text.="***********\n\n";
 			pg_query($conn,'ROLLBACK;');
 		}
 
@@ -1985,7 +1972,7 @@ Echo nl2br("Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$a
 
 $error_log="Sync Student\n--------------\n\n".$text;
 Echo nl2br($error_log);
-//mail($adress, 'SYNC-Fehler Student', $error_log,"From: vilesci@technikum-wien.at");
+mail($adress, 'SYNC-Fehler Student', $error_log,"From: vilesci@technikum-wien.at");
 fwrite($dateiausgabe,"\n\nPersonen ohne Reihungstest: ".$notest." \n\n"
 ."Personen:       Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$anzahl_person_insert." / Geändert: ".$anzahl_person_update." / Fehler: ".$anzahl_fehler_person."\n"
 ."Prestudenten:   Gesamt: ".$anzahl_pre_gesamt." / Eingefügt: ".$anzahl_pre_insert." / Geändert: ".$anzahl_pre_update." / Fehler: ".$anzahl_fehler_pre."\n"
