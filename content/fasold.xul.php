@@ -16,7 +16,7 @@ $error_msg='';
 //Variablen laden
 if (!$conn = @pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-   	
+
 $benutzer = new benutzer($conn);
 if(!$benutzer->loadVariables($user))
 	$error_msg = $benutzer->errormsg;
@@ -41,7 +41,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
   	onload="onLoad()" onclose="return closeWindow()"
   	>
 
-<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/fas.js.php" />
+<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/fasold/fasold.js.php" />
 <script type="application/x-javascript" src="chrome://global/content/nsTransferable.js"/>
 <!--
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/DragAndDrop.js"/>
@@ -92,10 +92,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
 				checked = ".($benutzer->variable->semester_aktuell==$stsem?"'true' ":"'false'")." />";
        		}
        ?>
-           
+
       		</menupopup>
-        </menu>   
-      
+        </menu>
+
       </menupopup>
     </menu>
     <!-- <menu id="menu-prefs" label="&menu-prefs:label;" accesskey="&menu-prefs:accesskey;">
@@ -136,7 +136,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
 <hbox flex="1">
 	<tabbox id="tabbox-left" orient="vertical" flex="1">
 		<tabs orient="horizontal">
-			
+
 			<tab id="tab-mitarbeiter1" label="Mitarbeiter" oncommand="tabchange('mitarbeiter');"/>
 			<tab id="tab-verband" label="Verband" oncommand="tabchange('lehreinheiten');"/>
 			<tab id="tab-ort" label="Ort" />
@@ -145,7 +145,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
 		<tabpanels id="tabpanels-left" flex="1" >
 			<tree id="tree-menu-mitarbeiter1" />
 			<tree id="tree-verband" />
-			
+
 			<!--<tree id="tree-ort" />
 			<tree id="tree-lektor" />-->
 		</tabpanels>
