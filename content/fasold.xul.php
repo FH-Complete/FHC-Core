@@ -24,7 +24,7 @@ if(!$benutzer->loadVariables($user))
 
 /*echo '<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>';*/
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/fas.css" type="text/css"?>';
-echo '<?xul-overlay href="'.APP_ROOT.'content/fasoldoverlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/fasold/fasoldoverlay.xul.php"?>';
 ?>
 
 <!DOCTYPE window >
