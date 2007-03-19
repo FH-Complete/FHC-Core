@@ -56,7 +56,7 @@ function confdel()
 	if($result = pg_query($conn, $qry))
 	{
 		echo "<table class='liste'>";
-		echo "<tr class='liste'><th><a href='lektor_uebersicht.php?order=uid'>UID</a></th><th>Titel</th><th>Vorname</th><th><a href='lektor_uebersicht.php?order=nachname'>Nachname</a></th><th><a href='lektor_uebersicht.php?order=fixangestellt DESC, nachname'>Fix</a></th><th>Lkt</th><th>Raum</th><th>Tel</th><th>eMail</th><th colspan='3'>Aktion</th></tr>";
+		echo "<tr class='liste'><th><a href='lektor_uebersicht.php?order=uid'>UID</a></th><th>Titel</th><th>Vorname</th><th><a href='lektor_uebersicht.php?order=nachname'>Nachname</a></th><th><a href='lektor_uebersicht.php?order=fixangestellt DESC, nachname'>Fix</a></th><th>Lkt</th><th>Raum</th><th>Standort</th><th>Tel</th><th>eMail</th><th colspan='3'>Aktion</th></tr>";
 
 		for ($i=0; $row=pg_fetch_object($result); $i++)
 		{
@@ -73,6 +73,7 @@ function confdel()
 			echo "<td nowrap><a href='lektor_uebersicht.php?uid=".$row->uid."&lek=".$row->lektor . (isset($order)?'&order='.$order:'') ."'><img src='../../skin/images/".($row->lektor=='t'?'true':'false').".gif'></a></td>";
 			
 			echo "<td nowrap>".$row->ort_kurzbz."</td>";
+			echo "<td nowrap>".$row->standort_kurzbz."</td>";
 			echo "<td nowrap>".$row->telefonklappe."</td>";
 			//echo "<td nowrap><a href='#' onClick='javascript:document.form1.uid=".$lektoren[$i]->uid.";document.form1.fix=".$lektoren[$i]->fixangestellt .";document.form1.order=". (isset($order)?$order:'') .";'><img src='../../skin/images/".$lektoren[$i]->fixangestellt.".gif'></a></td>";
 			//echo "<td nowrap><a href='#' onClick='javascript:document.form1.uid=".$lektoren[$i]->uid.";document.form1.fix=".$lektoren[$i]->fixangestellt .";document.form1.order=". (isset($order)?$order:'') .";'lek=".$lektoren[$i]->lektor . (isset($order)?'&order='.$order:'') ."'><img src='../../skin/images/".$lektoren[$i]->lektor.".gif'></a></td>";

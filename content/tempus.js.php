@@ -1,6 +1,7 @@
 <?php
 include('../vilesci/config.inc.php');
 ?>
+var menuUndoDatasource=0;
 
 function closeWindow()
 {
@@ -98,17 +99,44 @@ function studiensemesterChange()
 	return true;
 }
 
+// ****
+// * Laedt das Undo Menue Neu
+// ****
 function loadUndoList()
 {
 	menu = document.getElementById('menu-edit-undo');
-	
-	var url = '<?php echo APP_ROOT; ?>rdf/undo.rdf.php?'+gettimestamp();	
-	menu.setAttribute('datasources', url);
-	debug('load:'+url);
+		
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	if(menuUndoDatasource==0)
+	{
+		//Wenn noch keine Datasource angegeben ist, dann wird eine neue hinzugefuegt
+		var url = '<?php echo APP_ROOT; ?>rdf/undo.rdf.php?'+gettimestamp();	
 
+		//Alte DS entfernen
+		var oldDatasources = menu.database.GetDataSources();	
+		while(oldDatasources.hasMoreElements())
+		{
+			menu.database.RemoveDataSource(oldDatasources.getNext());
+		}
+			
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		menuUndoDatasource = rdfService.GetDataSource(url);
+		menuUndoDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		menu.database.AddDataSource(menuUndoDatasource);
+	}
+	else
+	{
+		//Wenn die Datasource bereits geladen wurde dann nur neu laden
+		menuUndoDatasource.Refresh(true); //blocking
+		menu.builder.rebuild();
+	}
+		
 	return true;
 }
 
+// ****
+// * Fuehrt den Undo Befehl aus
+// ****
 function UnDo(log_id, bezeichnung)
 {
 	if(confirm('Wollen Sie folgenden Befehl wirklich Rueckgaengig machen: '+bezeichnung))

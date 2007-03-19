@@ -132,8 +132,13 @@ function LvTreeRefresh()
 	//refresh wieder markiert werden kann.
 	var tree = document.getElementById('lehrveranstaltung-tree');	
 	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehreinheit_id"] : "lehrveranstaltung-treecol-lehreinheit_id";
-	LvSelectLehreinheit_id=tree.view.getCellText(tree.currentIndex,col);
-	LvTreeDatasource.Refresh(false); //non blocking
+	try 
+	{
+		LvSelectLehreinheit_id=tree.view.getCellText(tree.currentIndex,col);
+		LvTreeDatasource.Refresh(false); //non blocking
+	}
+	catch(e)
+	{}	
 }
 
 // ****
