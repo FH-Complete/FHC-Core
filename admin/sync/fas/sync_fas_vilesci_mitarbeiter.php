@@ -879,7 +879,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 							       aktiv=".myaddslashes($benutzeraktiv?'true':'false').", 
 							       person_id=".myaddslashes($personperson_id).", 
 							       updateamum=now(), 
-							       updatevon=".myaddslashes($benutzerupdatevon).", 
+							       updatevon=".myaddslashes($benutzerupdatevon)."
 							       WHERE uid='$benutzeruid';";
 							$ausgabe_benutzer="Änderungen bei Benutzer ".$benutzeruid." ".$benutzeralias.": ".$ausgabe_benutzer."\n";
 						}
