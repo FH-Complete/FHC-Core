@@ -182,13 +182,15 @@ class benutzerfunktion
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	
-	function save()
+	function save($new=null)
 	{
 		//Gueltigkeit der Variablen pruefen
 		//if(!$this->checkvars())
 		//	return false;
+		if($new==null)
+			$new = $this->new;
 			
-		if($this->new)
+		if($new)
 		{
 			//Neuen Datensatz anlegen	
 			//Pruefen ob uid vorhanden
@@ -264,7 +266,7 @@ class benutzerfunktion
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern des Datensatzes - '.$this->uid;
+			$this->errormsg = 'Fehler beim Speichern des Datensatzes - '.pg_errormessage($this->conn);
 			return false;
 		}		
 	}

@@ -290,5 +290,84 @@ class mitarbeiter extends benutzer
 		}
 		return $result;
 	}
+	
+	function getMitarbeiterStg($lektor,$fixangestellt,$stge, $fkt_kurzbz)
+	{
+		$sql_query='SELECT DISTINCT campus.vw_mitarbeiter.*, tbl_benutzerfunktion.studiengang_kz FROM campus.vw_mitarbeiter
+					JOIN public.tbl_benutzerfunktion USING (uid)
+					WHERE';
+		if (!$lektor)
+			$sql_query.=' NOT';
+		$sql_query.=' lektor';
+		if ($fixangestellt!=null)
+		{
+			$sql_query.=' AND';
+			if (!$fixangestellt)
+				$sql_query.=' NOT';
+			$sql_query.=' fixangestellt';
+		}
+		if($fkt_kurzbz!='')
+		{
+			$sql_query.=" AND funktion_kurzbz='$fkt_kurzbz'";
+		}
+		if ($stge!=null)
+		{
+			$in='';
+			foreach ($stge as $stg)
+			{
+				$in.=','.$stg;
+				if($stg==0)
+				{
+					$in='';
+					break;
+				}
+			}
+			if($in!='')
+				$sql_query.=' AND studiengang_kz in (-1'.$in.')';
+		}
+	    	$sql_query.=' ORDER BY studiengang_kz, nachname, vornamen, kurzbz';
+	    //echo $sql_query;
+
+		if(!($erg=pg_query($this->conn, $sql_query)))
+		{
+			$this->errormsg=pg_errormessage($conn);
+			return false;
+		}
+		$num_rows=pg_numrows($erg);
+		$result=array();
+		for($i=0;$i<$num_rows;$i++)
+		{
+   			$row=pg_fetch_object($erg,$i);
+			$l=new mitarbeiter($this->conn);
+			// Personendaten
+			$l->uid=$row->uid;
+			$l->titelpre=$row->titelpre;
+			$l->titelpost=$row->titelpost;
+			$l->vorname=$row->vorname;
+			$l->vornamen=$row->vornamen;
+			$l->nachname=$row->nachname;
+			$l->gebdatum=$row->gebdatum;
+			$l->gebort=$row->gebort;
+			$l->gebzeit=$row->gebzeit;
+			$l->foto=$row->foto;
+			$l->anmerkungen=$row->anmerkungen;
+			$l->aktiv=$row->aktiv=='t'?true:false;
+			$l->homepage=$row->homepage;
+			$l->updateamum=$row->updateamum;
+			$l->updatevon=$row->updatevon;
+			// Lektorendaten
+			$l->personalnummer=$row->personalnummer;
+			$l->kurzbz=$row->kurzbz;
+			$l->lektor=$row->lektor=='t'?true:false;
+			$l->fixangestellt=$row->fixangestellt=='t'?true:false;
+			$l->standort_kurzbz = $row->standort_kurzbz;
+			$l->telefonklappe=$row->telefonklappe;
+			$l->studiengang_kz = $row->studiengang_kz;
+			//$l->ort_kurzbz=$row->ort_kurzbz;
+			// Lektor in Array speichern
+			$result[]=$l;
+		}
+		return $result;
+	}
 }
 ?>

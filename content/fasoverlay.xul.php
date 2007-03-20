@@ -98,11 +98,15 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
   </template>
 </tree>
 
-<tree id="tree-lektor" onselect="onLektorSelect();"
+<tree id="tree-lektor" onmouseup="onLektorSelect();"
 	seltype="single" hidecolumnpicker="false" flex="1"
 	enableColumnDrag="true"
     ondraggesture="nsDragAndDrop.startDrag(event,mitarbeiterDDObserver);"
-	datasources="../rdf/mitarbeiter.rdf.php" ref="http://www.technikum-wien.at/mitarbeiter/alle">
+	ondragdrop="nsDragAndDrop.drop(event,LektorFunktionDDObserver)"
+	ondragover="nsDragAndDrop.dragOver(event,LektorFunktionDDObserver)"
+	ondragenter="nsDragAndDrop.dragEnter(event,LektorFunktionDDObserver)"
+	ondragexit="nsDragAndDrop.dragExit(event,LektorFunktionDDObserver)"
+	datasources="rdf:null" ref="http://www.technikum-wien.at/mitarbeiter/liste">
 	<treecols>
 	    <treecol id="kurzbz" label="Kuerzel" flex="2" primary="true" />
 	    <splitter class="tree-splitter"/>
@@ -113,6 +117,8 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 	    <treecol id="titel" label="Titel" flex="1" hidden="true"/>
 	    <splitter class="tree-splitter"/>
 	    <treecol id="uid" label="UID" flex="1" hidden="true"/>
+	    <splitter class="tree-splitter"/>
+	    <treecol id="studiengang_kz" label="Studiengangkz" flex="1" hidden="true"/>
 	</treecols>
 
 	<template>
@@ -125,38 +131,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vornamen"/>
 	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpre"/>
 	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"/>
-	         	</treerow>
-	    	</treeitem>
-	    </treechildren>
-	    </rule>
-  	</template>
-</tree>
-
-<!-- testing - Verschachtelte Mitarbeiter Ansicht-->
-<tree id="tree-lektor_verschachtelt" onselect="onLektorSelect();"
-	seltype="single" hidecolumnpicker="false" flex="1"
-	enableColumnDrag="true"
-    ondraggesture="nsDragAndDrop.startDrag(event,mitarbeiterDDObserver);"
-	datasources="../rdf/mitarbeiter_verschachtelt.rdf.php" ref="http://www.technikum-wien.at/ma/liste">
-	<treecols>
-	    <treecol id="bezeichnung" label="Kuerzel" flex="2" primary="true" />
-	    <splitter class="tree-splitter"/>
-	    <treecol id="nachname" label="Nachname" flex="2" hidden="true"/>
-	    <splitter class="tree-splitter"/>
-	    <treecol id="vorname" label="Vornamen" flex="2" hidden="true"/>
-	    <splitter class="tree-splitter"/>
-	    <treecol id="uid" label="UID" flex="1" hidden="true"/>
-	</treecols>
-
-	<template>
-		<rule>
-		<treechildren>
-	       	<treeitem uri="rdf:*">
-	         	<treerow>
-	           		<treecell label="rdf:http://www.technikum-wien.at/ma/rdf#bezeichnung"/>
-	           		<treecell label="rdf:http://www.technikum-wien.at/ma/rdf#nachname"/>
-	           		<treecell label="rdf:http://www.technikum-wien.at/ma/rdf#vorname"/>
-	           		<treecell label="rdf:http://www.technikum-wien.at/ma/rdf#uid"/>
+	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#studiengang_kz"/>
 	         	</treerow>
 	    	</treeitem>
 	    </treechildren>

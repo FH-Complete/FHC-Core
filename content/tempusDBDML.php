@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -23,7 +23,7 @@
 // ****************************************
 // * Insert/Update/Delete
 // * der Lehreinheiten
-// *
+// * 
 // * Script sorgt fuer den Datenbanzugriff
 // * fuer das XUL - Lehreinheiten-Modul
 // *
@@ -37,13 +37,14 @@ require_once('../vilesci/config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/log.class.php');
+require_once('../include/benutzerfunktion.class.php');
 
 $user = get_uid();
 
 error_reporting(0);
 
 // Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
+if (!$conn = @pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 $return = false;
@@ -67,7 +68,7 @@ if(!$error)
 	if(isset($_POST['type']) && $_POST['type']=='undo')
 	{
 		//UNDO Befehl ausfuehren
-
+		
 		if (!isset($_POST['log_id']))
 		{
 			$return = false;
@@ -75,23 +76,52 @@ if(!$error)
 			$data = '';
 			$error = true;
 		}
-
+		
 		if(!$error)
 		{
 			$log = new log($conn, null, null, true);
-
+			
 			if($log->undo($log_id))
 			{
 				$return = true;
 			}
-			else
+			else 
 			{
 				$return = false;
 				$errormsg = 'Fehler bei UnDo:'.$log->errormsg;
 			}
 		}
 	}
-	else
+	elseif (isset($_POST['type']) && $_POST['type']=='addFunktionToMitarbeiter')
+	{
+		if(isset($_POST['uid']))
+		{
+			$obj = new benutzerfunktion($conn);
+			$obj->uid = $_POST['uid'];
+			$obj->studiengang_kz = $_POST['studiengang_kz'];
+			$obj->funktion_kurzbz = 'lkt';
+			$obj->updateamum = date('Y-m-d H:i:s');
+			$obj->updatevon = $user;
+			$obj->insertamum = date('Y-m-d H:i:s');
+			$obj->insertvon = $user;
+			
+			if($obj->save(true))
+			{
+				$return = true;
+			}
+			else 
+			{
+				$return = false;
+				$errormsg = $obj->errormsg;
+			}
+		}
+		else 
+		{
+			$return = false;
+			$errormsg = 'Uid wurde nicht angegeben';
+		}
+	}
+	else 
 	{
 		$return = false;
 		$errormsg = 'Unkown type';
