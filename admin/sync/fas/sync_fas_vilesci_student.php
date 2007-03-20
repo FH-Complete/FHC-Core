@@ -64,8 +64,8 @@ foreach ($studiengangfk AS $stg)
 }
 
 set_time_limit(60);
-$adress='ruhan@technikum-wien.at';
-//$adress='fas_sync@technikum-wien.at';
+//$adress='ruhan@technikum-wien.at';
+$adress='fas_sync@technikum-wien.at';
 
 function myaddslashes($var)
 {
@@ -86,7 +86,7 @@ function myaddslashes($var)
 <?php
 $plausisvnr="Überprüfung Studentendaten im FAS:\n\n";
 
-/*
+
 $qry="SELECT * FROM person JOIN student ON person_pk=student.person_fk WHERE svnr='0005010400';";
 if($resultp = pg_query($conn_fas, $qry))
 {
@@ -381,7 +381,7 @@ foreach ($studiengangfk AS $stg)
 				if(strlen(trim($error_log_fas[$stg]))>0)
 				{
 					//mail(trim($rowass->email), 'Plausicheck von Studenten / Studiengang: '.$stg, $error_log_fas[$stg],"From: vilesci@technikum-wien.at");
-					mail($adress, 'Plausicheck von Studenten / Studiengang: '.$stg, $error_log_fas[$stg].", von '.$_SERVER['HTTP_HOST'],"From: vilesci@technikum-wien.at");
+					mail($adress, 'Plausicheck von Studenten / Studiengang: '.$stg.", von ".$_SERVER['HTTP_HOST'], $error_log_fas[$stg],"From: vilesci@technikum-wien.at");
 				}
 			}
 		}
@@ -396,7 +396,7 @@ foreach ($studiengangfk AS $stg)
 	}
 }
 
-*/
+
 
 $qry = "SELECT * FROM person JOIN student ON person_fk=person_pk WHERE uid NOT LIKE '\_dummy%' 
 AND person_pk NOT IN(
@@ -818,7 +818,7 @@ if($result = pg_query($conn_fas, $qry))
 				        myaddslashes($ersatzkennzeichen).','.
 				        myaddslashes($familienstand).','.
 				        myaddslashes($anzahlkinder).','.
-				        ($aktiv?'true':'false').','.
+				        'true, '.
 				        myaddslashes($insertamum).','.
 				        myaddslashes($insertvon).','.
 				        myaddslashes($updateamum).','.
@@ -1002,9 +1002,7 @@ if($result = pg_query($conn_fas, $qry))
 							$ausgabe_person="Anzahl der Kinder: '".$anzahlkinder."' (statt '".$row1->anzahlkinder."')";
 						}
 					}
-					if($row1->aktiv!=($aktiv?'t':'f'))
-						$ausgabe_person.="// Aktiv: '".($aktiv?'true':'false')."' (statt '".$row1->aktiv."')";
-					if($row1->aktiv!=($aktiv?'t':'f') && $aktiv!='')
+					/*if($row1->aktiv!=($aktiv?'t':'f'))
 					{
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
@@ -1015,7 +1013,7 @@ if($result = pg_query($conn_fas, $qry))
 						{
 							$ausgabe_person="Aktiv: '".($aktiv?'true':'false')."' (statt '".$row1->aktiv."')";
 						}
-					}
+					}*/
 					if($row1->geburtsnation!=$geburtsnation)
 					{
 						$updatep=true;
@@ -1071,7 +1069,7 @@ if($result = pg_query($conn_fas, $qry))
 						       ' ersatzkennzeichen='.myaddslashes($ersatzkennzeichen).','.
 						       ' familienstand='.myaddslashes($familienstand).','.
 						       ' anzahlkinder='.myaddslashes($anzahlkinder).','.
-						       ' aktiv='.($aktiv?'true':'false').','.
+						       ' aktiv=true, '.
 						       ' geschlecht='.myaddslashes($geschlecht).','.
 						       ' geburtsnation='.myaddslashes($geburtsnation).','.
 						       ' staatsbuergerschaft='.myaddslashes($staatsbuergerschaft).','.
