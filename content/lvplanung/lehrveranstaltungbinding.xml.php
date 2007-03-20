@@ -1,5 +1,5 @@
 <?php
-	include('../vilesci/config.inc.php');
+	include('../../vilesci/config.inc.php');
 	header("Content-type: application/vnd.mozilla.xul+xml");
 	echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
 ?>
@@ -124,12 +124,12 @@
     <content>
 
 	<xul:vbox style="margin:0px;padding:0px;" flex="1">
-		
+
 		<xul:hbox style="background:#eeeeee;margin:0px;padding:2px" flex="1">
 			<xul:label value="Details" style="font-size:12pt;font-weight:bold;margin-top:5px;"  flex="1" />
 			<xul:button id="btnLFVTSave" label="speichern" oncommand="parentNode.parentNode.parentNode.saveData();"/>
 		</xul:hbox>
-					
+
 		<xul:grid id="gridLFVT" flex="1" datasources="rdf:null"
 			ref="http://www.technikum-wien.at/tempus/lva/liste"
 			style="padding:5px;"
@@ -174,7 +174,7 @@
 				<xul:row>
    	   					<xul:label value="Lehre" />
 						<xul:checkbox id="gridLFVTLehre" oncommand="document.getBindingParent(this).lehre=this.checked" />
-						
+
   						<xul:label value="Stundenblockung" />
   						<xul:textbox id="gridLFVTStundenblockung" onchange="document.getBindingParent(this).stundenblockung=this.value" />
   				</xul:row>
@@ -196,7 +196,7 @@
   						<xul:textbox id="gridLFVTAnmerkung" rows="2" multiline="true" onchange="document.getBindingParent(this).anmerkung=this.value" />
 				</xul:row>
  			</xul:rows>
-		</xul:grid>				
+		</xul:grid>
 	</xul:vbox>
 
 	</content>
@@ -242,13 +242,13 @@
 		<!-- LVA-Felder -->
 		<property name="lvnr" onget="return this.currentLVA.lvnr;" >
 			<setter>
-				if (isNaN(val)) 
+				if (isNaN(val))
 				{
 					alert('LVNR muss eine Zahl sein!');
 					if (this.currentLVA!=null)
 						this.currentLVA.lvnr=null;
 				}
-				else 
+				else
 				{
 					if (this.currentLVA!=null)
 						this.currentLVA.lvnr=val;
@@ -259,13 +259,13 @@
 		</property>
 		<property name="unr" onget="return this.currentLVA.unr;" >
 			<setter>
-				if (isNaN(val)) 
+				if (isNaN(val))
 				{
 					alert('UNR muss eine Zahl sein!');
 					if (this.currentLVA!=null)
 						this.currentLVA.unr=null;
-				} 
-				else 
+				}
+				else
 				{
 					if (this.currentLVA!=null)
 						this.currentLVA.unr=val;
@@ -305,7 +305,7 @@
 			<setter>
 				if (this.currentLVA!=null)
 						this.currentLVA.raumtyp=val;
-				
+
 				return val;
 			</setter>
 		</property>
@@ -321,8 +321,8 @@
 			</setter>
 		</property>
 		<property name="lehre" onget="return this.currentLVA.lehre;" >
-			<setter>				
-				this.currentLVA.lehre=val;				
+			<setter>
+				this.currentLVA.lehre=val;
 				return val;
 			</setter>
 		</property>
@@ -369,7 +369,7 @@
 		<property name="studiensemester" onget="return this.currentLVA.studiensemester;" >
 			<setter>
 				// todo: Validation Check
-				
+
 				if (this.currentLVA!=null)
 						this.currentLVA.studiensemester=val;
 				//this.showCurrentLVA();
@@ -380,7 +380,7 @@
 		<property name="lehrform" onget="return this.currentLVA.lehrform;" >
 			<setter>
 				// todo: Validation Check
-				
+
 				if (this.currentLVA!=null)
 						this.currentLVA.lehrform=val;
 				return val;
@@ -418,7 +418,7 @@
 				if (this.currentLVA.studiensemester!=null) req.add('studiensemester_kurzbz',this.currentLVA.studiensemester);
 				if (this.currentLVA.lehrform!=null) req.add('lehrform',this.currentLVA.lehrform);
 				if (this.currentLVA.anmerkung!=null) req.add('anmerkung',this.currentLVA.anmerkung);
-				
+
 				var response = req.execute();
 				if (response!='ok') {
 					alert(response);
@@ -459,22 +459,22 @@
 			<parameter name="lva"/>
 			<body><![CDATA[
 				// Value Object
-				this.currentLVA=lva;				
+				this.currentLVA=lva;
 				// LVNR
 				this.gridLFVTLVNR.value=this.currentLVA.lvnr;
 				// UNR
 				this.gridLFVTUNR.value=this.currentLVA.unr;
 				// Sprache
-				this.gridLFVTSprache.currentValue=this.currentLVA.sprache;				
+				this.gridLFVTSprache.currentValue=this.currentLVA.sprache;
 				// Raumtyp
 				this.gridLFVTRaumtyp.currentValue=this.currentLVA.raumtyp;
-				// Raumtyp alternativ				
+				// Raumtyp alternativ
 				this.gridLFVTRaumtypAlt.currentValue=this.currentLVA.raumtyp_alt;
 				// Lehre
 				if(this.currentLVA.lehre=='true')
 					this.gridLFVTLehre.checked=true;
 				else
-					this.gridLFVTLehre.checked=false;				
+					this.gridLFVTLehre.checked=false;
 				// stundenblockung
 				this.gridLFVTStundenblockung.value=this.currentLVA.stundenblockung;
 				// Wochenrythmus
@@ -630,7 +630,7 @@
 		<handler event="command" action="this.currentValue=document.getAnonymousNodes(this)[0].value;" />
 	</handlers>
   </binding>
-  
+
    <!-- DropDownList fuer Studiensemester -->
 
   <binding id="studiensemesterListe"  extends="lfvtbinding.xml.php#customMenulist-base" >
@@ -650,7 +650,7 @@
 		<handler event="command" action="this.currentValue=document.getAnonymousNodes(this)[0].value;" />
 	</handlers>
   </binding>
-  
+
    <!-- DropDownList fuer Raumtyp -->
 
   <binding id="raumtypListe"  extends="lfvtbinding.xml.php#customMenulist-base" >
@@ -659,7 +659,7 @@
 		              ref="http://www.technikum-wien.at/raumtyp/liste" >
   			<xul:template>
 					<xul:menupopup>
-							
+
 							<xul:menuitem value="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
 							              label="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
 										  uri="rdf:*"/>
@@ -680,7 +680,7 @@
 		              ref="http://www.technikum-wien.at/ort/alle-orte" >
   			<xul:template>
 					<xul:menupopup>
-							
+
 							<xul:menuitem value="rdf:http://www.technikum-wien.at/ort/rdf#raumtyp"
 							              label="rdf:http://www.technikum-wien.at/ort/rdf#raumtyp"
 					  					  uri="rdf:*"/>
@@ -701,7 +701,7 @@
 		              ref="http://www.technikum-wien.at/tempus/mitarbeiter/alle" >
   			<xul:template>
 					<xul:menupopup>
-							
+
 							<xul:menuitem value="rdf:http://www.technikum-wien.at/tempus/mitarbeiter/rdf#uid"
 							              label="rdf:http://www.technikum-wien.at/tempus/mitarbeiter/rdf#kurzbz"
 										  uri="rdf:*"/>
@@ -713,7 +713,7 @@
 		<handler event="command" action="this.currentValue=document.getAnonymousNodes(this)[0].value;" />
 	</handlers>
   </binding>
-  
+
 <!-- DropDownList fuer Lehrveranstaltungen -->
 
   <binding id="lehrveranstaltungenListe" extends="lfvtbinding.xml.php#customMenulist-base" >
@@ -758,7 +758,7 @@
 		<handler event="command" action="this.currentValue=document.getAnonymousNodes(this)[0].value;" />
 	</handlers>
   </binding>
-  
+
 <!-- DropDownList fuer Lehrfaecher -->
 
   <binding id="lehrfaecherListe" extends="lfvtbinding.xml.php#customMenulist-base" >
@@ -816,7 +816,7 @@
 
 	<implementation>
 		<property name="currentValue" onget="return this.getAttribute('currentValue');">
-		   <setter><![CDATA[		     
+		   <setter><![CDATA[
 		   	 this.setAttribute('currentValue',val);
 			 var menulist=document.getAnonymousNodes(this)[0];
 			 // auszuwaehlenden Datensatz suchen (stammt aus original Source Code)

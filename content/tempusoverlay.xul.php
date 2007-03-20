@@ -5,9 +5,9 @@ echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
 include('../vilesci/config.inc.php');
 
 echo '<?xul-overlay href="'.APP_ROOT.'content/studentenoverlay.xul.php"?>';
-echo '<?xul-overlay href="'.APP_ROOT.'content/lehrveranstaltungoverlay.xul.php"?>';
-echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-week-overlay.xul.php"?>';
-echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungoverlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-week-overlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-semester-overlay.xul.php"?>';
 /*echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 
 ?>
@@ -26,9 +26,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/dragboard.js.php"/>
 
 <tree id="tree-verband" onmouseup="onVerbandSelect();"
-	seltype="single" hidecolumnpicker="false" flex="1" 
-	enableColumnDrag="true"	
-    ondraggesture="nsDragAndDrop.startDrag(event,lvbgrpDDObserver);" 
+	seltype="single" hidecolumnpicker="false" flex="1"
+	enableColumnDrag="true"
+    ondraggesture="nsDragAndDrop.startDrag(event,lvbgrpDDObserver);"
 	datasources="../rdf/lehrverbandsgruppe.rdf.php" ref="http://www.technikum-wien.at/lehrverbandsgruppe/alle-verbaende"
 	>
 	<treecols>
@@ -100,8 +100,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 
 <tree id="tree-lektor" onselect="onLektorSelect();"
 	seltype="single" hidecolumnpicker="false" flex="1"
-	enableColumnDrag="true"	
-    ondraggesture="nsDragAndDrop.startDrag(event,mitarbeiterDDObserver);" 
+	enableColumnDrag="true"
+    ondraggesture="nsDragAndDrop.startDrag(event,mitarbeiterDDObserver);"
 	datasources="../rdf/mitarbeiter.rdf.php" ref="http://www.technikum-wien.at/mitarbeiter/alle">
 	<treecols>
 	    <treecol id="kurzbz" label="Kuerzel" flex="2" primary="true" />
@@ -135,8 +135,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
 <!-- testing - Verschachtelte Mitarbeiter Ansicht-->
 <tree id="tree-lektor_verschachtelt" onselect="onLektorSelect();"
 	seltype="single" hidecolumnpicker="false" flex="1"
-	enableColumnDrag="true"	
-    ondraggesture="nsDragAndDrop.startDrag(event,mitarbeiterDDObserver);" 
+	enableColumnDrag="true"
+    ondraggesture="nsDragAndDrop.startDrag(event,mitarbeiterDDObserver);"
 	datasources="../rdf/mitarbeiter_verschachtelt.rdf.php" ref="http://www.technikum-wien.at/ma/liste">
 	<treecols>
 	    <treecol id="bezeichnung" label="Kuerzel" flex="2" primary="true" />

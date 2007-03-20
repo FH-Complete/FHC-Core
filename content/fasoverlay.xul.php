@@ -5,9 +5,9 @@ echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
 include('../vilesci/config.inc.php');
 
 echo '<?xul-overlay href="'.APP_ROOT.'content/studentenoverlay.xul.php"?>';
-echo '<?xul-overlay href="'.APP_ROOT.'content/lehrveranstaltungoverlay.xul.php"?>';
-/*echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-week-overlay.xul.php"?>';
-echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-semester-overlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungoverlay.xul.php"?>';
+/*echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-week-overlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-semester-overlay.xul.php"?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 
 ?>

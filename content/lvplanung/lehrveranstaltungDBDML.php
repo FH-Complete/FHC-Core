@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -23,7 +23,7 @@
 // ****************************************
 // * Insert/Update/Delete
 // * der Lehreinheiten
-// * 
+// *
 // * Script sorgt fuer den Datenbanzugriff
 // * fuer das XUL - Lehreinheiten-Modul
 // *
@@ -33,13 +33,13 @@
 // * - Lehreinheit anlegen/bearbeiten/loeschen
 // ****************************************
 
-require_once('../vilesci/config.inc.php');
-require_once('../include/functions.inc.php');
-require_once('../include/lehreinheit.class.php');
-require_once('../include/lehreinheitmitarbeiter.class.php');
-require_once('../include/lehreinheitgruppe.class.php');
-require_once('../include/benutzerberechtigung.class.php');
-require_once('../include/log.class.php');
+require_once('../../vilesci/config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/lehreinheit.class.php');
+require_once('../../include/lehreinheitmitarbeiter.class.php');
+require_once('../../include/lehreinheitgruppe.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/log.class.php');
 
 $user = get_uid();
 
@@ -72,7 +72,7 @@ if(!$error)
 		//Lehreinheitmitarbeiter Zuteilung
 		//wenn do=update dann wird aktualisiert
 		//wenn do=create wird ein neuer datensatz angelegt
-		
+
 		if (!isset($_POST['do']))
 		{
 			$return = false;
@@ -80,11 +80,11 @@ if(!$error)
 			$data = '';
 			$error = true;
 		}
-		
+
 		if(!$error)
 		{
 			$lem = new lehreinheitmitarbeiter($conn, null, null, true);
-			
+
 			if($_POST['do']=='update')
 			{
 				if(!$lem->load($_POST['lehreinheit_id'],$_POST['mitarbeiter_uid_old']))
@@ -94,7 +94,7 @@ if(!$error)
 					$error = true;
 				}
 			}
-			
+
 			if(!$error)
 			{
 				$lem->lehreinheit_id = $_POST['lehreinheit_id'];
@@ -110,7 +110,7 @@ if(!$error)
 				$lem->bismelden = ($_POST['bismelden']=='true'?true:false);
 				$lem->updateamum = date('Y-m-d H:i:s');
 				$lem->updatevon = $user;
-				
+
 				if($_POST['do']=='update')
 				{
 					$lem->new=false;
@@ -129,15 +129,15 @@ if(!$error)
 					$errormsg = 'Fehlerhafte Parameteruebergabe';
 					$error = true;
 				}
-					
+
 				if(!$error)
 				{
 					if($lem->save())
 					{
 						$return = true;
 						$error=false;
-					}					
-					else 
+					}
+					else
 					{
 						$return = false;
 						$errormsg  = $lem->errormsg;
@@ -163,7 +163,7 @@ if(!$error)
 				$errormsg = $leg->errormsg;
 			}
 		}
-		else 
+		else
 		{
 			$return = false;
 			$errormsg = 'Fehler beim loeschen der Zuordnung';
@@ -185,7 +185,7 @@ if(!$error)
 				$errormsg = $leg->errormsg;
 			}
 		}
-		else 
+		else
 		{
 			$return = false;
 			$errormsg = 'Fehler beim loeschen der Zuordnung';
@@ -205,18 +205,18 @@ if(!$error)
 			$leg->gruppe_kurzbz = $_POST['gruppe_kurzbz'];
 			$leg->insertamum = date('Y-m-d H:i:s');
 			$leg->insertvon = $user;
-			
+
 			if($leg->save(true))
 			{
 				$return = true;
 			}
-			else 
+			else
 			{
 				$return = false;
 				$errormsg = $leg->errormsg;
 			}
 		}
-		else 
+		else
 		{
 			$return = false;
 			$errormsg = 'Bitte zuerst eine Lehreinheit auswaehlen';
@@ -226,8 +226,8 @@ if(!$error)
 	{
 		//Lehreinheit anlegen/aktualisieren
 		$leDAO=new lehreinheit($conn, null, true);
-		if ($_POST['do']=='create' || ($_POST['do']=='update')) 
-		{	
+		if ($_POST['do']=='create' || ($_POST['do']=='update'))
+		{
 			if($_POST['do']=='update')
 			{
 				if(!$leDAO->load($_POST['lehreinheit_id']))
@@ -237,7 +237,7 @@ if(!$error)
 					$errormsg = 'Fehler beim laden der lehreinheit';
 				}
 			}
-		
+
 			if(!$error)
 			{
 				$leDAO->lehrveranstaltung_id=$_POST['lehrveranstaltung'];
@@ -256,46 +256,46 @@ if(!$error)
 				$leDAO->unr=(isset($_POST['unr'])?$_POST['unr']:'');
 				$leDAO->updateamum=date('Y-m-d H:i:s');
 				$leDAO->updatevon=$user;
-				
-				if ($_POST['do']=='create') 
+
+				if ($_POST['do']=='create')
 				{
 					// LE neu anlegen
 					$leDAO->new=true;
 					$leDAO->insertamum=date('Y-m-d H:i:s');
 					$leDAO->insertvon=$user;
-				} 
-				else if ($_POST['do']=='update') 
+				}
+				else if ($_POST['do']=='update')
 				{
 					// LE aktualisieren
-					$leDAO->new=false;					
+					$leDAO->new=false;
 				}
-				if ($leDAO->save()) 
+				if ($leDAO->save())
 				{
 					$data = $leDAO->lehreinheit_id;
 					$return = true;
 				}
-				else 
+				else
 				{
 					$return = false;
 					$errormsg = $leDAO->errormsg;
 				}
-			}		
-		} 
+			}
+		}
 		else if ($_POST['do']=='delete') //Lehreinheit loeschen
-		{	
+		{
 			// LE loeschen
 			if ($leDAO->delete($_POST['lehreinheit_id']))
 			{
 				$return = true;
 			}
-			else 
+			else
 			{
 				$return = false;
 				$errormsg = $leDAO->errormsg;
 			}
 		}
 	}
-	else 
+	else
 	{
 		$return = false;
 		$errormsg = 'Unkown type';

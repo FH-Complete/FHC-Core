@@ -29,7 +29,7 @@ function onVerbandSelect()
 	//var daten=window.TimeTableWeek.document.getElementById('TimeTableWeekData');
 	//var datum=parseInt(daten.getAttribute("datum"));
 	//var attributes="&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
-	//var url = "<?php echo APP_ROOT; ?>content/timetable-week.xul.php";
+	//var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 	//if (gruppe!=null && gruppe!=0 &gruppe!='')
 	//	var type="?type=gruppe";
 	//else
@@ -54,7 +54,7 @@ function onVerbandSelect()
 	//{
 	//	alert (url);
 	//	var contentFrame=document.getElementById('iframeTimeTableSemester');
-	//	var url = "<?php echo APP_ROOT; ?>content/timetable-week.xul.php";
+	//	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 	//	if (gruppe!=null && gruppe!=0 &gruppe!='')
 	//		var type="?type=gruppe";
 	//	else

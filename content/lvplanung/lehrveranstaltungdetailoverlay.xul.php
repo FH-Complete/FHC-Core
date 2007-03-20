@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -25,9 +25,9 @@ header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
-require_once('../vilesci/config.inc.php');
+require_once('../../vilesci/config.inc.php');
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
-echo "<?xml-stylesheet href=\"".APP_ROOT."content/lehrveranstaltung.css\" type=\"text/css\" ?>";
+echo "<?xml-stylesheet href=\"".APP_ROOT."content/lvplanung/lehrveranstaltung.css\" type=\"text/css\" ?>";
 
 ?>
 
@@ -71,7 +71,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lehrveranstaltung.css\" type=\
 			<row >
 	  			<label value="LVNR" />
 	  			<textbox id="lehrveranstaltung-detail-textbox-lvnr" maxlength="20" disabled="true" />
-	
+
 	  			<label value="UNR" />
 	  	    	<textbox id="lehrveranstaltung-detail-textbox-unr" disabled="true"/>
 			</row>
@@ -92,10 +92,10 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lehrveranstaltung.css\" type=\
 			<column />
 			<column style="min-width:240px" />
 	  	</columns>
-	  	<rows>			
+	  	<rows>
 			<row>
 	  			<label value="Sprache" />
-				<menulist id="lehrveranstaltung-detail-menulist-sprache" 
+				<menulist id="lehrveranstaltung-detail-menulist-sprache"
 				          datasources="<?php echo APP_ROOT; ?>rdf/sprache.rdf.php" flex="1"
 						  ref="http://www.technikum-wien.at/sprachen/liste" disabled="true">
 					<template>
@@ -106,7 +106,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lehrveranstaltung.css\" type=\
 							</menupopup>
 					</template>
 				</menulist>
-	  			
+
 			</row>
 			<row>
 	  			<label value="Lehrfach" />
@@ -121,7 +121,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lehrveranstaltung.css\" type=\
 						</menupopup>
 					</template>
 				</menulist>
-	
+
 				<label value="Lehrform" />
 				<menulist id="lehrveranstaltung-detail-menulist-lehrform" disabled="true"
 				          datasources="<?php echo APP_ROOT ?>rdf/lehrform.rdf.php" flex="1"
@@ -141,20 +141,20 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lehrveranstaltung.css\" type=\
 	  			          datasources="<?php echo APP_ROOT ?>rdf/raumtyp.rdf.php" flex="1"
 			              ref="http://www.technikum-wien.at/raumtyp/liste" >
 					<template>
-						<menupopup>										
+						<menupopup>
 							<menuitem value="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
 							          label="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
 									  uri="rdf:*"/>
 						</menupopup>
 					</template>
 				</menulist>
-	
+
 	  			<label value="Raumtyp alternativ" />
 	  			<menulist id="lehrveranstaltung-detail-menulist-raumtypalternativ" disabled="true"
 	  					  datasources="<?php echo APP_ROOT ?>rdf/raumtyp.rdf.php" flex="1"
 			              ref="http://www.technikum-wien.at/raumtyp/liste" >
 					<template>
-						<menupopup>										
+						<menupopup>
 							<menuitem value="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
 							          label="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
 									  uri="rdf:*"/>
@@ -165,20 +165,20 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lehrveranstaltung.css\" type=\
 			<row>
 	   	   		<label value="Lehre" />
 				<checkbox id="lehrveranstaltung-detail-checkbox-lehre" disabled="true"/>
-	
+
 				<label value="Stundenblockung" />
 				<textbox id="lehrveranstaltung-detail-textbox-stundenblockung" disabled="true" />
 			</row>
 			<row>
 				<label value="Wochenrythmus" />
 				<textbox id="lehrveranstaltung-detail-textbox-wochenrythmus" disabled="true"/>
-	
+
 				<label value="Start KW" />
 				<textbox id="lehrveranstaltung-detail-textbox-startkw" disabled="true"/>
 			</row>
 			<row>
 	  			<label value="Studiensemester" />
-	  			<vbox>							
+	  			<vbox>
 					<menulist id="lehrveranstaltung-detail-menulist-studiensemester" disabled="true"
 							  datasources="<?php echo APP_ROOT ?>rdf/studiensemester.rdf.php" flex="0"
 					          ref="http://www.technikum-wien.at/studiensemester/liste" >
@@ -195,7 +195,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lehrveranstaltung.css\" type=\
 				<label value="Anmerkung" />
 	  			<textbox id="lehrveranstaltung-detail-textbox-anmerkung" rows="2" multiline="true" disabled="true"/>
 			</row>
-			<row>					
+			<row>
 				<!-- ************* GRUPPEN ************** -->
 				<label id="lehrveranstaltung-detail-label-lehreinheitgruppe" value="Gruppen" />
 				<vbox height="150" flex="1">
@@ -232,18 +232,18 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lehrveranstaltung.css\" type=\
 							 			</treeitem>
 							 		</treechildren>
 							 	</rule>
-							</template>							
+							</template>
 						</tree>
 						<spacer />
 					</hbox>
 				</vbox>
 			</row>
 		</rows>
-	</grid>	
+	</grid>
 </vbox>
 
 <!-- ************************** LEKTORZUTEILUNG ********************** -->
-<vbox id="lehrveranstaltung-lektorzuteilung">								
+<vbox id="lehrveranstaltung-lektorzuteilung">
 	<hbox flex="1" style="padding: 10px">
 		<vbox width="250">
 			<hbox flex="1">
@@ -267,15 +267,15 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lehrveranstaltung.css\" type=\
 						<treecol id="lehrveranstaltung-lehreinheitmitarbeiter-treecol-vorname" label="Vorname" flex="2" hidden="false"
 					    	class="sortDirectionIndicator"
 					    	sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#vorname" onclick="LehreinheitenTreeSort()"/>
-					    <splitter class="tree-splitter"/>		
+					    <splitter class="tree-splitter"/>
 					    <treecol id="lehrveranstaltung-lehreinheitmitarbeiter-treecol-mitarbeiter_uid" label="UID" flex="2" hidden="true"
 					    	class="sortDirectionIndicator"
 					    	sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#mitarbeiter_uid" onclick="LehreinheitenTreeSort()"/>
-					    <splitter class="tree-splitter"/>	
+					    <splitter class="tree-splitter"/>
 					    <treecol id="lehrveranstaltung-lehreinheitmitarbeiter-treecol-lehreinheit_id" label="LehreinheitID" flex="2" hidden="true"
 					    	class="sortDirectionIndicator"
 					    	sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#lehreinheit_id" onclick="LehreinheitenTreeSort()"/>
-					    <splitter class="tree-splitter"/>					
+					    <splitter class="tree-splitter"/>
 					</treecols>
 					<template>
 						<rule>
@@ -290,12 +290,12 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lehrveranstaltung.css\" type=\
 					 			</treeitem>
 					 		</treechildren>
 					 	</rule>
-				  	</template>							
+				  	</template>
 				</tree>
 				<spacer />
 			</hbox>
 		</vbox>
-		
+
 		<vbox>
 		<hbox>
 		<groupbox>
@@ -337,7 +337,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lehrveranstaltung.css\" type=\
 				            </menupopup>
 				         </template>
 			   		 	</menulist>
-					</row>											
+					</row>
 			    	<row>
     					<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden" value="Semesterstunden: "/>
     					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden" disabled="true" maxlength="3" flex="1" oninput="LeMitarbeiterValueChanged();"/>
@@ -367,6 +367,6 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lehrveranstaltung.css\" type=\
 		</hbox>
 		</vbox>
 		<spacer flex="1" />
-	</hbox>		
+	</hbox>
 </vbox>
 </overlay>

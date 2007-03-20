@@ -1,5 +1,5 @@
 <?php
-include('../vilesci/config.inc.php');
+include('../../vilesci/config.inc.php');
 ?>
 
 // LVA-Panel aktualisieren
@@ -32,7 +32,7 @@ function onJumpNow()
     datum = ((d.getDate()+3)*60*60*24)+((d.getMonth())*31*24*60*60)+((d.getFullYear()-1970)*365*24*60*60);
 	//alert(datum);
 	var attributes="?type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
-	var url = "<?php echo APP_ROOT; ?>content/timetable-week.xul.php";
+	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 	url+=attributes;
 	if (url)
 		contentFrame.setAttribute('src', url);
@@ -56,7 +56,7 @@ function onJumpDate(wochen)
 	datum+=(604800*wochen)+1;
 
 	var attributes="?type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
-	var url = "<?php echo APP_ROOT; ?>content/timetable-week.xul.php";
+	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 	url+=attributes;
 	if (url)
 		contentFrame.setAttribute('src', url);
@@ -83,7 +83,7 @@ function onJumpDateRel(evt)
 	datum+=(604800*wochen)+1;
 
 	var attributes="?type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
-	var url = "<?php echo APP_ROOT; ?>content/timetable-week.xul.php";
+	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 	url+=attributes;
 	if (url)
 		contentFrame.setAttribute('src', url);
@@ -116,7 +116,7 @@ function onLVAdoStpl(evt)
 
 	var attributes="?type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
 	attributes+=idList+"&aktion="+aktion+"&time="+oneDate.getTime();
-	var url = "<?php echo APP_ROOT; ?>content/timetable-week.xul.php";
+	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 	url+=attributes+"&bla=";
 	//dump(url);
 	if (url && doIt)
@@ -145,7 +145,7 @@ function onStplSearchRoom(event)
 
 		var attributes="\n?type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid+"\n&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"\n&gruppe="+gruppe;
 		attributes+=idList+"&aktion="+aktion;
-		var url = "<?php echo APP_ROOT; ?>content/timetable-week.xul.php";
+		var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 		url+=attributes;
 		//alert(url);
 		if (url)
@@ -172,7 +172,7 @@ function onStplDelete(aktion)
 
 	var attributes="\n?type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid+"\n&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"\n&gruppe="+gruppe;
 	attributes+=idList+"&aktion="+aktion;
-	var url = "<?php echo APP_ROOT; ?>content/timetable-week.xul.php";
+	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 	url+=attributes;
 	//alert(url);
 	if (url && doIt)

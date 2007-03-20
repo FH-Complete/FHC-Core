@@ -1,5 +1,5 @@
 <?php
-include('../vilesci/config.inc.php');
+include('../../vilesci/config.inc.php');
 ?>
 
 // SemesterPlan aktualisieren
