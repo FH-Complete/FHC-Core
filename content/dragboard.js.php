@@ -84,6 +84,7 @@ var lvbgrpDDObserver=
   	}
 };
 
+
 // ****
 // * Observer fuer den Gruppen Tree im Lehreinheiten-Modul
 // ****
@@ -190,6 +191,86 @@ var mitarbeiterDDObserver=
 		var paramList= uid;
 		transferData.data=new TransferData();
 		transferData.data.addDataForFlavour("application/tempus-mitarbeiter",paramList);
+  	}
+};
+
+// ****
+// * Observer fuer Drop eines Lektors auf einen Studiengang
+// ****
+var LektorFunktionDDObserver=
+{
+	getSupportedFlavours : function ()
+	{
+  	  	var flavours = new FlavourSet();
+  	  	flavours.appendFlavour("application/tempus-mitarbeiter");
+  	  	return flavours;
+  	},
+  	onDragEnter: function (evt,flavour,session)
+	{
+	},
+	onDragExit: function (evt,flavour,session)
+	{
+  	},
+  	onDragOver: function(evt,flavour,session)
+  	{
+  	},
+  	onDrop: function (evt,dropdata,session)
+  	{
+	    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	    try
+	    {
+	        dragservice_ds = Components.classes["@mozilla.org/widget/dragservice;1"].getService(Components.interfaces.nsIDragService);
+	    }
+	    catch (e)
+	    {
+	    	debug('treeDragDrop: e');
+	    }
+
+	    var ds = dragservice_ds;
+	    
+		var tree = document.getElementById('tree-lektor')
+	    var row = { }
+	    var col = { }
+	    var child = { }
+
+	    //Index der Quell-Row ermitteln
+	    tree.treeBoxObject.getCellAt(evt.pageX, evt.pageY, row, col, child)
+
+	    //Beim Scrollen soll kein DnD gemacht werden
+	    if(col.value==null)
+	    	return false;
+	    
+	    //Daten ermitteln
+	    col = tree.columns ? tree.columns["studiengang_kz"] : "studiengang_kz";
+		var stg=tree.view.getCellText(row.value,col);
+				
+		if(stg!=0)
+		{  
+		    uid=dropdata.data;
+		    
+		    var req = new phpRequest('tempusDBDML.php','','');
+	
+		    req.add('type', 'addFunktionToMitarbeiter');
+			req.add('uid', uid);
+			req.add('studiengang_kz', stg);
+	
+			var response = req.executePOST();
+			
+			var val =  new ParseReturnValue(response)
+	
+			if (!val.dbdml_return) 
+			{
+				alert(val.dbdml_errormsg)
+			}
+			else
+			{
+				//Tree Refreshen
+				//keine Ahnung warum ich da ein setTimeout brauche
+				//aber wenns nicht da ist dann stuerzt Mozilla ab?!
+				//mit seamonkey funktionierts auch ohne!
+				window.setTimeout(RefreshLektorTree,10);
+			}
+		}
   	}
 };
 

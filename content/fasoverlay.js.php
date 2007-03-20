@@ -4,6 +4,60 @@ include('../vilesci/config.inc.php');
 
 var currentAuswahl=new auswahlValues();
 var LvTreeDatasource;
+var LektorTreeDatasource;
+
+//Lektor-Tree initialisieren
+//window.setTimeout(initLektorTree,300);
+
+// ****
+// * initialisiert den Lektor Tree
+// ****
+function initLektorTree()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	try
+	{
+		url = '<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php?user=true&'+gettimestamp();
+		var LektorTree=document.getElementById('tree-lektor');
+		
+		//Alte DS entfernen
+		var oldDatasources = LektorTree.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			LektorTree.database.RemoveDataSource(oldDatasources.getNext());
+		}
+	
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		LektorTreeDatasource = rdfService.GetDataSource(url);
+		LektorTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		LektorTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		LektorTree.database.AddDataSource(LektorTreeDatasource);
+		//LektorTreeDatasource.addXMLSinkObserver(LektorTreeSinkObserver);
+		//LektorTree.builder.addListener(LektorTreeListener);
+	}
+	catch(e)
+	{
+		debug(e);
+	}
+}
+
+// ****
+// * Refresht den Lektor Tree
+// ****
+function RefreshLektorTree()
+{
+	try
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		LektorTreeDatasource.Refresh(true);
+		//Crash on Mozilla
+		document.getElementById('tree-lektor').builder.rebuild();
+	}
+	catch(e)
+	{
+		alert(e);
+	}
+}
 
 function auswahlValues()
 {
@@ -121,9 +175,12 @@ function onOrtSelect()
 
 function onLektorSelect()
 {
-
+/*
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
 	var treeLektor=document.getElementById('tree-lektor');
+	if(treeLektor.currentIndex==-1)
+		return;
+	
 	var uid=treeLektor.view.getCellText(treeLektor.currentIndex,"uid");
 	if(uid=='')
 		return;
@@ -140,6 +197,7 @@ function onLektorSelect()
 	// LVAs
 	var vboxLehrveranstalungPlanung=document.getElementById('vboxLehrveranstalungPlanung');
 	vboxLehrveranstalungPlanung.setAttribute('datasources','../rdf/lehreinheit-lvplan.rdf.php?'+"type=lektor&lektor="+uid);
+*/
 }
 
 function loadURL(event)

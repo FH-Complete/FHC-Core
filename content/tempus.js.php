@@ -10,7 +10,7 @@ function closeWindow()
 
 function onLoad()
 {
-  //window.close();
+  initLektorTree();
 }
 
 function loadRightFrame()

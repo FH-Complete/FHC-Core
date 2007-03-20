@@ -351,7 +351,9 @@ var nsDragAndDrop =
         this.mDragSession = this.mDragService.getCurrentSession();
       if (!this.mDragSession) 
         return false;
-      this.mDragSession.canDrop = this.mDragSession.sourceNode != aEvent.target;
+      //oesi - Auskommentiert um das DragnDrop innerhalb des selben Trees zu ermoeglichen
+      //this.mDragSession.canDrop = this.mDragSession.sourceNode != aEvent.target;
+      this.mDragSession.canDrop = true;
       if ("canDrop" in aDragDropObserver)
         this.mDragSession.canDrop &= aDragDropObserver.canDrop(aEvent, this.mDragSession);
       return true;

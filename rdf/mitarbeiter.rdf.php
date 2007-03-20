@@ -34,6 +34,7 @@ require_once('../include/person.class.php');
 require_once('../include/benutzer.class.php');
 require_once('../include/mitarbeiter.class.php');
 require_once('../include/benutzerberechtigung.class.php');
+require_once('../include/studiengang.class.php');
 
 if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
@@ -66,17 +67,13 @@ else
 
 // Mitarbeiter holen
 $mitarbeiter=new mitarbeiter($conn);
-if ($user)
-{
-	$bb=new benutzerberechtigung($conn);
-	if($bb->getBerechtigungen($REMOTE_USER))
-	{
-		$stge=$bb->getStgKz();
-		$ma=$mitarbeiter->getMitarbeiterStg($lektor,$fixangestellt,$stge);
-	}
-}
-else
-	$ma=$mitarbeiter->getMitarbeiter($lektor,$fixangestellt,$stg_kz,$fachbereich_id);
+
+$ma=$mitarbeiter->getMitarbeiter($lektor,$fixangestellt,$stg_kz,$fachbereich_id);
+
+$stg_obj = new studiengang($conn);
+$stg_obj->getAll();
+foreach ($stg_obj->result as $stg) 
+	$stg_arr[$stg->studiengang_kz]=$stg->kuerzel;	
 
 $rdf_url='http://www.technikum-wien.at/mitarbeiter/';
 ?>
@@ -86,14 +83,12 @@ $rdf_url='http://www.technikum-wien.at/mitarbeiter/';
 	xmlns:MITARBEITER="<?php echo $rdf_url; ?>rdf#"
 >
 
-
-  <RDF:Seq about="<?php echo $rdf_url ?>alle">
-
 <?php
+$alle='';
 foreach ($ma as $mitarbeiter)
 {
 	?>
-	  <RDF:li>
+	 
       	<RDF:Description about="<?php echo $rdf_url.$mitarbeiter->uid; ?>" >
         	<MITARBEITER:uid><?php echo $mitarbeiter->uid; ?></MITARBEITER:uid>
     		<MITARBEITER:titelpre><?php echo $mitarbeiter->titelpre; ?></MITARBEITER:titelpre>
@@ -102,10 +97,72 @@ foreach ($ma as $mitarbeiter)
     		<MITARBEITER:vorname><?php echo $mitarbeiter->vorname; ?></MITARBEITER:vorname>
     		<MITARBEITER:nachname><?php echo $mitarbeiter->nachname; ?></MITARBEITER:nachname>
     		<MITARBEITER:kurzbz><?php echo $mitarbeiter->kurzbz; ?></MITARBEITER:kurzbz>
+    		<MITARBEITER:studiengang_kz></MITARBEITER:studiengang_kz>
       	</RDF:Description>
-      </RDF:li>
+
 <?php
+	$alle.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$mitarbeiter->uid."\" />";
 }
+$desc= '
+		<RDF:Description about="'.$rdf_url.'_alle" >
+			<MITARBEITER:uid></MITARBEITER:uid>
+			<MITARBEITER:titelpre></MITARBEITER:titelpre>
+			<MITARBEITER:titelpost></MITARBEITER:titelpost>
+			<MITARBEITER:vornamen></MITARBEITER:vornamen>
+			<MITARBEITER:vorname></MITARBEITER:vorname>
+			<MITARBEITER:nachname></MITARBEITER:nachname>
+			<MITARBEITER:kurzbz>Alle</MITARBEITER:kurzbz>
+			<MITARBEITER:studiengang_kz>0</MITARBEITER:studiengang_kz>
+		</RDF:Description>
+';
+
+$seq= "
+<RDF:Seq about=\"".$rdf_url."liste\" >
+	<RDF:li>
+		<RDF:Seq about=\"".$rdf_url."_alle\" >$alle
+		</RDF:Seq>
+	</RDF:li>
+	";
+
+if ($user)
+{
+	$bb=new benutzerberechtigung($conn);
+	if($bb->getBerechtigungen($REMOTE_USER))
+	{
+		$stge=$bb->getStgKz();
+		$ma=$mitarbeiter->getMitarbeiterStg($lektor,$fixangestellt,$stge, 'lkt');
+		$laststg=-1;
+		foreach ($ma as $mitarbeiter)
+		{
+			if($mitarbeiter->studiengang_kz!=$laststg)
+			{
+				if($laststg!=-1)
+				{
+					$seq.="\n\t\t</RDF:Seq>\n\t</RDF:li>\n";
+				}
+				$desc.="\n\t\t<RDF:Description about=\"".$rdf_url.$mitarbeiter->studiengang_kz."\" >".
+						"\n\t\t\t<MITARBEITER:uid></MITARBEITER:uid>".
+						"\n\t\t\t<MITARBEITER:titelpre></MITARBEITER:titelpre>".
+						"\n\t\t\t<MITARBEITER:titelpost></MITARBEITER:titelpost>".
+						"\n\t\t\t<MITARBEITER:vornamen></MITARBEITER:vornamen>".
+						"\n\t\t\t<MITARBEITER:vorname></MITARBEITER:vorname>".
+						"\n\t\t\t<MITARBEITER:nachname></MITARBEITER:nachname>".
+						"\n\t\t\t<MITARBEITER:kurzbz>".$stg_arr[$mitarbeiter->studiengang_kz]."</MITARBEITER:kurzbz>".
+						"\n\t\t\t<MITARBEITER:studiengang_kz>$mitarbeiter->studiengang_kz</MITARBEITER:studiengang_kz>".
+						"\n\t\t</RDF:Description>\n";
+				
+				$seq.="\n\t<RDF:li>\n\t\t<RDF:Seq about=\"".$rdf_url.$mitarbeiter->studiengang_kz."\" >";
+			
+				$laststg = $mitarbeiter->studiengang_kz;
+			}
+			$seq.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$mitarbeiter->uid."\" />";
+		}
+		$seq.="\n\t\t</RDF:Seq>\n\t</RDF:li>";
+	}
+}
+echo $desc;
+echo $seq;
 ?>
-  </RDF:Seq>
+
+</RDF:Seq>
 </RDF:RDF>
