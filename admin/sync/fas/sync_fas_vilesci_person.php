@@ -165,7 +165,7 @@ if($resultp = pg_query($conn_fas, $qry))
 		}
 	}
 }
-mail($adress, 'Plausicheck von Personen', $error_log_fas,"From: vilesci@technikum-wien.at");
+mail($adress, 'Plausicheck von Personen von '.$_SERVER['HTTP_HOST'], $error_log_fas,"From: vilesci@technikum-wien.at");
 $error_log_fas='';
 exit;
 
