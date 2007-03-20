@@ -5,7 +5,8 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
-include('../vilesci/config.inc.php');
+include('../../vilesci/config.inc.php');
+
 echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes" ?>';
 echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?>";
 

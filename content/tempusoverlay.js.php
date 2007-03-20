@@ -16,7 +16,7 @@ function auswahlValues()
 }
 
 function onVerbandSelect()
-{	
+{
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
 	var tree=document.getElementById('tree-verband');
 	if(tree.currentIndex==-1)
@@ -29,7 +29,7 @@ function onVerbandSelect()
 	var daten=window.TimeTableWeek.document.getElementById('TimeTableWeekData');
 	var datum=parseInt(daten.getAttribute("datum"));
 	var attributes="&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
-	var url = "<?php echo APP_ROOT; ?>content/timetable-week.xul.php";
+	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 	if (gruppe!=null && gruppe!=0 &gruppe!='')
 		var type="?type=gruppe";
 	else
@@ -54,7 +54,7 @@ function onVerbandSelect()
 	{
 		alert (url);
 		var contentFrame=document.getElementById('iframeTimeTableSemester');
-		var url = "<?php echo APP_ROOT; ?>content/timetable-week.xul.php";
+		var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 		if (gruppe!=null && gruppe!=0 &gruppe!='')
 			var type="?type=gruppe";
 		else
@@ -75,21 +75,21 @@ function onVerbandSelect()
 	attribute="<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
 	treeStudenten.setAttribute('datasources',attribute);
 
-	
+
 	// Lehrveranstaltung
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	try
-	{	
+	{
 		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?stg_kz='+stg_kz+'&sem='+sem+'&ver='+ver+'&grp='+grp+'&gruppe='+gruppe+'&'+gettimestamp();
 		var treeLV=document.getElementById('lehrveranstaltung-tree');
-		
+
 		//Alte DS entfernen
-		var oldDatasources = treeLV.database.GetDataSources();	
+		var oldDatasources = treeLV.database.GetDataSources();
 		while(oldDatasources.hasMoreElements())
 		{
 			treeLV.database.RemoveDataSource(oldDatasources.getNext());
 		}
-				
+
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		LvTreeDatasource = rdfService.GetDataSource(url);
 		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -101,7 +101,7 @@ function onVerbandSelect()
 	catch(e)
 	{
 		debug(e);
-	}	
+	}
 }
 
 function onOrtSelect()
@@ -113,7 +113,7 @@ function onOrtSelect()
 	var datum=parseInt(daten.getAttribute("datum"));
 
 	var attributes="?type=ort&ort="+ort+"&datum="+datum;
-	var url = "<?php echo APP_ROOT; ?>content/timetable-week.xul.php";
+	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 	url+=attributes;
 	if (url)
 		contentFrame.setAttribute('src', url);
@@ -133,7 +133,7 @@ function onLektorSelect()
 	var datum=parseInt(daten.getAttribute("datum"));
 
 	var attributes="?type=lektor&pers_uid="+uid+"&datum="+datum;
-	var url = "<?php echo APP_ROOT; ?>content/timetable-week.xul.php";
+	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 	url+=attributes;
 	if (url)
 		contentFrame.setAttribute('src', url);

@@ -1,7 +1,9 @@
 <?php
 header("Content-type: application/vnd.mozilla.xul+xml");
-include('../vilesci/config.inc.php');
-include('../include/functions.inc.php');
+
+include('../../vilesci/config.inc.php');
+include('../../include/functions.inc.php');
+
 echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
 /*echo '<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
@@ -32,7 +34,7 @@ $num_rows_stunde=pg_numrows($result_stunde);
 <script type="application/x-javascript" src="chrome://global/content/nsTransferable.js"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/DragAndDrop.js"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/dragboard.js.php"/>
-<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/stpl-semester-overlay.js.php"/>
+<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/lvplanung/stpl-semester-overlay.js.php"/>
 
 <vbox id="vboxTimeTableSemester" flex="1">
 <toolbox>

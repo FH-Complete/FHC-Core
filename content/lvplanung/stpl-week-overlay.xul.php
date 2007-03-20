@@ -1,9 +1,11 @@
 <?php
 header("Content-type: application/vnd.mozilla.xul+xml");
-include('../vilesci/config.inc.php');
-include('../include/functions.inc.php');
+
+include('../../vilesci/config.inc.php');
+include('../../include/functions.inc.php');
+
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-echo '<?xul-overlay href="'.APP_ROOT.'content/stpl-details-overlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul.php"?>';
 /*echo '<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 
@@ -24,7 +26,7 @@ $num_rows_stunde=pg_numrows($result_stunde);
 ?>
 
 <!DOCTYPE overlay >
-<!-- [<?php require_once("../locale/de-AT/tempus.dtd"); ?>] -->
+<!-- [<?php require_once("../../locale/de-AT/tempus.dtd"); ?>] -->
 
 <overlay id="TempusOverlaySTPLWeek"
 	xmlns:html="http://www.w3.org/1999/xhtml"
@@ -33,7 +35,7 @@ $num_rows_stunde=pg_numrows($result_stunde);
 <script type="application/x-javascript" src="chrome://global/content/nsTransferable.js"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/DragAndDrop.js"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/dragboard.js.php"/>
-<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/stpl-week-overlay.js.php"/>
+<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/lvplanung/stpl-week-overlay.js.php"/>
 
 <hbox id="hboxTimeTableWeek">
 <vbox id="vboxTimeTableWeek" flex="30">
@@ -83,7 +85,7 @@ $num_rows_stunde=pg_numrows($result_stunde);
 	</toolbar>
 </toolbox>
 <iframe id="iframeTimeTableWeek" name="TimeTableWeek" flex="5"
-	src="<?php echo APP_ROOT; ?>content/timetable-week.xul.php" />
+	src="<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php" />
 <splitter collapse="after" persist="state">
 	<grippy />
 </splitter>

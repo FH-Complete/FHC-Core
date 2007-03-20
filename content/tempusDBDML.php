@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -23,7 +23,7 @@
 // ****************************************
 // * Insert/Update/Delete
 // * der Lehreinheiten
-// * 
+// *
 // * Script sorgt fuer den Datenbanzugriff
 // * fuer das XUL - Lehreinheiten-Modul
 // *
@@ -43,7 +43,7 @@ $user = get_uid();
 error_reporting(0);
 
 // Datenbank Verbindung
-if (!$conn = @pg_pconnect(CONN_STRING))
+if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 $return = false;
@@ -67,7 +67,7 @@ if(!$error)
 	if(isset($_POST['type']) && $_POST['type']=='undo')
 	{
 		//UNDO Befehl ausfuehren
-		
+
 		if (!isset($_POST['log_id']))
 		{
 			$return = false;
@@ -75,23 +75,23 @@ if(!$error)
 			$data = '';
 			$error = true;
 		}
-		
+
 		if(!$error)
 		{
 			$log = new log($conn, null, null, true);
-			
+
 			if($log->undo($log_id))
 			{
 				$return = true;
 			}
-			else 
+			else
 			{
 				$return = false;
 				$errormsg = 'Fehler bei UnDo:'.$log->errormsg;
 			}
 		}
 	}
-	else 
+	else
 	{
 		$return = false;
 		$errormsg = 'Unkown type';

@@ -4,9 +4,9 @@
 // Vorschlag fuer UNR liefern
 // *****************************
 
-include('../vilesci/config.inc.php');
+include('../../vilesci/config.inc.php');
 
-$conn = @pg_pconnect(CONN_STRING))
+$conn = pg_pconnect(CONN_STRING))
 if ($conn) {
 	$sql="select max(unr) as max_unr from tbl_lehrveranstaltung";
 

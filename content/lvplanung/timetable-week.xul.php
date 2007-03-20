@@ -1,14 +1,16 @@
 <?php
 header("Content-type: application/vnd.mozilla.xul+xml");
+
+include('../../vilesci/config.inc.php');
+include('../../include/globals.inc.php');
+include('../../include/functions.inc.php');
+include('../../include/berechtigung.class.php');
+include('../../include/lehreinheit.class.php');
+include('../../include/zeitwunsch.class.php');
+include('../../include/wochenplan.class.php');
+
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 echo '<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>';
-include('../vilesci/config.inc.php');
-include('../include/globals.inc.php');
-include('../include/functions.inc.php');
-include('../include/berechtigung.class.php');
-include('../include/lehreinheit.class.php');
-include('../include/zeitwunsch.class.php');
-include('../include/wochenplan.class.php');
 
 // Startwerte setzen
 $db_stpl_table=null;
@@ -106,9 +108,9 @@ if (!isset($semester_aktuell) && $semesterplan)
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/dragboard.js.php"/>
 <?php
 if (isset($semesterplan) && $semesterplan)
-	echo '<script type="application/x-javascript" src="'.APP_ROOT.'content/stpl-semester-overlay.js.php"/>';
+	echo '<script type="application/x-javascript" src="'.APP_ROOT.'content/lvplanung/stpl-semester-overlay.js.php"/>';
 else
-	echo '<script type="application/x-javascript" src="'.APP_ROOT.'content/stpl-week-overlay.js.php"/>';
+	echo '<script type="application/x-javascript" src="'.APP_ROOT.'content/lvplanung/stpl-week-overlay.js.php"/>';
 ?>
 <vbox id="boxTimeTableWeek" flex="5" style="overflow:auto;">
 <?php
