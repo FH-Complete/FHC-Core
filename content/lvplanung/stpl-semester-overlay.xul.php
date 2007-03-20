@@ -25,7 +25,7 @@ $num_rows_stunde=pg_numrows($result_stunde);
 ?>
 
 <!DOCTYPE overlay>
-<!-- [<?php require_once("../locale/de-AT/tempus.dtd"); ?>] -->
+<!-- [<?php require_once("../../locale/de-AT/tempus.dtd"); ?>] -->
 
 <overlay id="TempusOverlay"
 	xmlns:html="http://www.w3.org/1999/xhtml"
@@ -54,6 +54,6 @@ $num_rows_stunde=pg_numrows($result_stunde);
 </toolbox>
 
 <iframe id="iframeTimeTableSemester" name="TimeTableSemester" flex="1"
-	src="<?php echo APP_ROOT; ?>content/timetable-week.xul.php?semesterplan=true" />
+	src="<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php?semesterplan=true" />
 </vbox>
 </overlay>
