@@ -334,9 +334,9 @@ $ausgabe="\nAdresse\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Ge
 ."\nFirma\nGesamt: $anzahl_quelle2 / Eingefügt: $anzahl_eingefuegt2 / Geändert: $anzahl_update2 / Fehler: $anzahl_fehler2\n\n".$ausgabe;
 if(strlen(trim($error_log))>0)
 {
-	mail($adress, 'SYNC-Fehler Adresse', $error_log,"From: vilesci@technikum-wien.at");
+	mail($adress, 'SYNC-Fehler Adresse von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");
 }
-mail($adress, 'SYNC Adresse', $ausgabe,"From: vilesci@technikum-wien.at");
+mail($adress, 'SYNC Adresse von '.$_SERVER['HTTP_HOST'], $ausgabe,"From: vilesci@technikum-wien.at");
 ?>
 </body>
 </html>
