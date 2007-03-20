@@ -56,11 +56,11 @@ var lvbgrpDDObserver=
 
 	    //Index der Quell-Row ermitteln
 	    tree.treeBoxObject.getCellAt(evt.pageX, evt.pageY, row, col, child)
- 		
+
 	    //Beim Scrollen soll kein DnD gemacht werden
 	    if(col.value==null)
 	    	return false;
-	    	
+
 	    //Daten ermitteln
 	    col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
 		stg_kz=tree.view.getCellText(row.value,col);
@@ -152,10 +152,10 @@ var LeLvbgrpDDObserver=
 		req.add('gruppe_kurzbz', gruppe);
 
 		var response = req.executePOST();
-		
+
 		var val =  new ParseReturnValue(response)
 
-		if (!val.dbdml_return) 
+		if (!val.dbdml_return)
 		{
 			alert(val.dbdml_errormsg)
 		}
@@ -183,11 +183,11 @@ var mitarbeiterDDObserver=
 	    //Beim Scrollen soll kein DnD gemacht werden
 	    if(col.value==null)
 	    	return false;
-	    
+
 	    //Daten ermitteln
 	    col = tree.columns ? tree.columns["uid"] : "uid";
 		uid=tree.view.getCellText(row.value,col);
-			
+
 		var paramList= uid;
 		transferData.data=new TransferData();
 		transferData.data.addDataForFlavour("application/tempus-mitarbeiter",paramList);
@@ -341,10 +341,10 @@ var LeLektorDDObserver=
 		req.add('bismelden', 'true');
 
 		var response = req.executePOST();
-		
+
 		var val =  new ParseReturnValue(response)
 
-		if (!val.dbdml_return) 
+		if (!val.dbdml_return)
 		{
 			alert(val.dbdml_errormsg)
 		}
@@ -478,7 +478,7 @@ var boardObserver=
     				if (dropdata.flavour.contentType=="application/tempus-lehrveranstaltung")
     					var new_ort=ort;
 
-    			var url="<?php echo APP_ROOT; ?>content/timetable-week.xul.php";
+    			var url="<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 				url+=dropdata.data+"&new_stunde="+stunde+"&new_datum="+new_datum;
 				url+="&type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid;
 				url+="&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&einheit="+einheit;
