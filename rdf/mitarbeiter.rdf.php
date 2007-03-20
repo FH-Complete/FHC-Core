@@ -1,11 +1,25 @@
 <?php
-/*
- * Created on 02.12.2004
+/* Copyright (C) 2004 Technikum-Wien
  *
- * To change the template for this generated file go to
- * Window - Preferences - PHPeclipse - PHP - Code Templates
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-// header f?r no cache
+// header for no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
@@ -16,9 +30,10 @@ header("Content-type: application/vnd.mozilla.xul+xml");
 echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
 // DAO
 include('../vilesci/config.inc.php');
-include_once('../include/person.class.php');
-include_once('../include/benutzer.class.php');
-include_once('../include/mitarbeiter.class.php');
+require_once('../include/person.class.php');
+require_once('../include/benutzer.class.php');
+require_once('../include/mitarbeiter.class.php');
+require_once('../include/benutzerberechtigung.class.php');
 
 if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
@@ -44,9 +59,24 @@ if (isset($_GET['fachbereich_id']))
 else
 	$fachbereich_id=null;
 
+if (isset($_GET['user']))
+	$user=$_GET['user'];
+else
+	$user=false;
+
 // Mitarbeiter holen
 $mitarbeiter=new mitarbeiter($conn);
-$ma=$mitarbeiter->getMitarbeiter($lektor,$fixangestellt,$stg_kz,$fachbereich_id);
+if ($user)
+{
+	$bb=new benutzerberechtigung($conn);
+	if($bb->getBerechtigungen($REMOTE_USER))
+	{
+		$stge=$bb->getStgKz();
+		$ma=$mitarbeiter->getMitarbeiterStg($lektor,$fixangestellt,$stge);
+	}
+}
+else
+	$ma=$mitarbeiter->getMitarbeiter($lektor,$fixangestellt,$stg_kz,$fachbereich_id);
 
 $rdf_url='http://www.technikum-wien.at/mitarbeiter/';
 ?>
