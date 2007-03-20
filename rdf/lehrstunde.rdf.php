@@ -138,7 +138,7 @@ if (is_array($lehrstunden->lehrstunden))
   		  		<LEHRSTUNDE:unr><?php echo $ls->unr  ?></LEHRSTUNDE:unr>
 				<LEHRSTUNDE:ort_kurzbz><?php echo $ls->ort_kurzbz  ?></LEHRSTUNDE:ort_kurzbz>
 				<LEHRSTUNDE:lehrfach><?php echo $ls->lehrfach  ?></LEHRSTUNDE:lehrfach>
-				<LEHRSTUNDE:lehrfach_bez><?php echo $ls->lehrfach_bez  ?></LEHRSTUNDE:lehrfach_bez>
+				<LEHRSTUNDE:lehrfach_bez><![CDATA[<?php echo $ls->lehrfach_bez  ?>]]></LEHRSTUNDE:lehrfach_bez>
 				<LEHRSTUNDE:lehrform><?php echo $ls->lehrform  ?></LEHRSTUNDE:lehrform>
 				<LEHRSTUNDE:lektor><?php echo $ls->lektor_kurzbz  ?></LEHRSTUNDE:lektor>
 				<LEHRSTUNDE:sem><?php echo $ls->sem  ?></LEHRSTUNDE:sem>
@@ -148,7 +148,7 @@ if (is_array($lehrstunden->lehrstunden))
 				<LEHRSTUNDE:lehrform><?php echo $ls->lehrform  ?></LEHRSTUNDE:lehrform>
 				<LEHRSTUNDE:studiengang><?php echo $ls->studiengang  ?></LEHRSTUNDE:studiengang>
 				<LEHRSTUNDE:farbe><?php echo $ls->farbe  ?></LEHRSTUNDE:farbe>
-				<LEHRSTUNDE:anmerkung><![CDATA[<?php echo $ls->anmerkung  ?>]]></LEHRSTUNDE:anmerkung>
+				<LEHRSTUNDE:anmerkung><![CDATA[<?php echo $ls->anmerkung;  ?>]]></LEHRSTUNDE:anmerkung>
   	    	</RDF:Description>
   			</RDF:li>
 			<?php
