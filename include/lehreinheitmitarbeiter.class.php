@@ -226,7 +226,7 @@ class lehreinheitmitarbeiter
 		{
 			//ToDo ID entfernen
 			$qry = 'INSERT INTO lehre.tbl_lehreinheitmitarbeiter (lehreinheit_id, mitarbeiter_uid, semesterstunden, planstunden, 
-			                                                stundensatz, faktor, anmerkung, lehrfunktion_kurzbz, ext_id, insertamum, insertvon)
+			                                                stundensatz, faktor, anmerkung, lehrfunktion_kurzbz, bismelden, ext_id, insertamum, insertvon)
 			        VALUES('.$this->addslashes($this->lehreinheit_id).','.
 					$this->addslashes($this->mitarbeiter_uid).','.
 					$this->addslashes($this->semesterstunden).','.
@@ -235,6 +235,7 @@ class lehreinheitmitarbeiter
 					$this->addslashes($this->faktor).','.
 					$this->addslashes($this->anmerkung).','.
 					$this->addslashes($this->lehrfunktion_kurzbz).','.
+					($this->bismelden?'true':'false').','.
 					$this->addslashes($this->ext_id).','.
 					$this->addslashes($this->insertamum).','.
 					$this->addslashes($this->insertvon).');';
@@ -322,7 +323,7 @@ class lehreinheitmitarbeiter
 			if($row = pg_fetch_object($result))
 			{
 				$undo = 'INSERT INTO lehre.tbl_lehreinheitmitarbeiter (lehreinheit_id, mitarbeiter_uid, semesterstunden, planstunden, '.
-			            ' stundensatz, faktor, anmerkung, lehrfunktion_kurzbz, ext_id, insertamum, insertvon)'.
+			            ' stundensatz, faktor, anmerkung, lehrfunktion_kurzbz, bismelden, ext_id, insertamum, insertvon, updateamum, updatevon)'.
 				       	' VALUES('.$this->addslashes($row->lehreinheit_id).','.
 						$this->addslashes($row->mitarbeiter_uid).','.
 						$this->addslashes($row->semesterstunden).','.
@@ -331,27 +332,36 @@ class lehreinheitmitarbeiter
 						$this->addslashes($row->faktor).','.
 						$this->addslashes($row->anmerkung).','.
 						$this->addslashes($row->lehrfunktion_kurzbz).','.
+						($row->bismelden=='t'?'true':'false').','.
 						$this->addslashes($row->ext_id).','.
 						$this->addslashes($row->insertamum).','.
-						$this->addslashes($row->insertvon).');';
+						$this->addslashes($row->insertvon).','.
+						$this->addslashes($row->updateamum).','.
+						$this->addslashes($row->updatevon).');';
 				
 				$log = new log($this->conn, null, null);
 				$log->sqlundo = $undo;
 				$log->sql = $qry_del;
 				$log->mitarbeiter_uid = get_uid();
 				$log->beschreibung = "Lektorzuteilung loeschen $mitarbeiter_uid - $lehreinheit_id";
+				pg_query($this->conn, 'BEGIN;');
 				if($log->save(true))
 				{
 					if(pg_query($this->conn, $qry_del))
+					{
+						pg_query($this->conn, 'COMMIT;');
 						return true;
+					}
 					else 
 					{
+						pg_query($this->conn, 'ROLLBACK;');
 						$this->errormsg = 'Fehler beim Loeschen der Zuteilung';
 						return false;
 					}
 				}
 				else 
 				{
+					pg_query($this->conn, 'ROLLBACK;');
 					$this->errormsg = 'UNDO Eintrag konnte nicht erstellt werden';
 					return false;
 				}

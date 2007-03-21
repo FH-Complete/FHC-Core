@@ -111,6 +111,44 @@ class benutzerfunktion
 		}
 	}
 	
+	// *********************************
+	// * Laedt eine BenutzerFunktion
+	// * @param uid, funktion_kurzbz, studiengang_kz
+	// * @return false wenn nicht vorhanden oder fehler
+	// *         sonst true
+	// *********************************
+	function getBentuzerFunktion($uid, $funktion_kurzbz, $studiengang_kz)
+	{
+		$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE uid='".addslashes($uid)."' AND funktion_kurzbz='".addslashes($funktion_kurzbz)."' AND studiengang_kz='".addslashes($studiengang_kz)."'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$this->benutzerfunktion_id	= $row->benutzerfunktion_id;
+				$this->fachbereich_kurzbz	= $row->fachbereich_kurzbz;
+				$this->uid			= $row->uid;
+				$this->studiengang_kz	= $row->studiengang_kz;
+				$this->funktion_kurzbz	= $row->funktion_kurzbz;
+				$this->insertamum		= $row->insertamum;
+				$this->insertvon		= $row->insertvon;
+				$this->updateamum		= $row->updateamum;
+				$this->updatevon		= $row->updatevon;
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = "Benutzerfunktion wurde nicht gefunden";
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden der Bentuzerfunktionen';
+			return false;
+		}
+	}
+	
 	/**
 	 * Laedt eine Benutzerfunktion
 	 * @param $bnutzerfunktion_id ID der zu ladenden Funktion

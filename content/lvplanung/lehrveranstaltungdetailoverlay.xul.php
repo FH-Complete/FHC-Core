@@ -329,7 +329,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lvplanung/lehrveranstaltung.cs
 				   		 <label align="end" control="lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor" value="Lektor:"/>
 						 <menulist id="lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor" disabled="true" oncommand="LeMitarbeiterValueChanged();"
 	    		                   datasources="<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php"
-			                       ref="http://www.technikum-wien.at/mitarbeiter/alle" flex="1">
+			                       ref="http://www.technikum-wien.at/mitarbeiter/_alle" flex="1">
 				         <template>
 				            <menupopup>
 				               <menuitem uri="rdf:*" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname"
