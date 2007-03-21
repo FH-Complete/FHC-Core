@@ -121,7 +121,7 @@ else
 echo nl2br($error_log);
 echo nl2br("\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
 $error_log.="\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler";
-mail($adress, 'SYNC Fachbereich', $error_log);
+mail($adress, 'SYNC Fachbereich von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");
 ?>
 </body>
 </html>

@@ -202,9 +202,9 @@ echo nl2br("\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert:
 $ausgabe="Telefonsync:\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n\n".$ausgabe;
 if(strlen(trim($error_log))>0)
 {
-	mail($adress, 'SYNC-Fehler Telefon', $error_log,"From: vilesci@technikum-wien.at");
+	mail($adress, 'SYNC-Fehler Telefon von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");
 }
-mail($adress, 'SYNC Telefon', $ausgabe,"From: vilesci@technikum-wien.at");
+mail($adress, 'SYNC Telefon von '.$_SERVER['HTTP_HOST'], $ausgabe,"From: vilesci@technikum-wien.at");
 ?>
 </body>
 </html>
