@@ -139,7 +139,7 @@ var LeLvbgrpDDObserver=
 	    var gruppe = arr[4];
 	    //alert("stg: "+stg_kz+" sem: "+sem+" ver: "+ver+" grp: "+grp+" gruppe: "+gruppe+" TO Lehreinheit:"+lehreinheit_id);
 
-	    var req = new phpRequest('lehrveranstaltungDBDML.php','','');
+	    var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
 		neu = document.getElementById('lehrveranstaltung-detail-checkbox-new').checked;
 
 		req.add('type','lehreinheit_gruppe_add');
@@ -227,7 +227,7 @@ var LektorFunktionDDObserver=
 	    }
 
 	    var ds = dragservice_ds;
-	    
+
 		var tree = document.getElementById('tree-lektor')
 	    var row = { }
 	    var col = { }
@@ -239,26 +239,26 @@ var LektorFunktionDDObserver=
 	    //Beim Scrollen soll kein DnD gemacht werden
 	    if(col.value==null)
 	    	return false;
-	    
+
 	    //Daten ermitteln
 	    col = tree.columns ? tree.columns["studiengang_kz"] : "studiengang_kz";
 		var stg=tree.view.getCellText(row.value,col);
-				
+
 		if(stg!=0)
-		{  
+		{
 		    uid=dropdata.data;
-		    
+
 		    var req = new phpRequest('tempusDBDML.php','','');
-	
+
 		    req.add('type', 'addFunktionToMitarbeiter');
 			req.add('uid', uid);
 			req.add('studiengang_kz', stg);
-	
+
 			var response = req.executePOST();
-			
+
 			var val =  new ParseReturnValue(response)
-	
-			if (!val.dbdml_return) 
+
+			if (!val.dbdml_return)
 			{
 				alert(val.dbdml_errormsg)
 			}
@@ -324,7 +324,7 @@ var LeLektorDDObserver=
 	    uid=dropdata.data;
 	    //alert("uid: "+uid);
 
-	    var req = new phpRequest('lehrveranstaltungDBDML.php','','');
+	    var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
 		neu = document.getElementById('lehrveranstaltung-detail-checkbox-new').checked;
 
 		req.add('type','lehreinheit_mitarbeiter_add');

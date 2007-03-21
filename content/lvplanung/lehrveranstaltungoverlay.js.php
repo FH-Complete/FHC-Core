@@ -301,7 +301,7 @@ function LeDelete()
 	if (confirm('Wollen Sie diese Lehreinheit wirklich löschen?'))
 	{
 		//Script zum loeschen der Lehreinheit aufrufen
-		var req = new phpRequest('lehrveranstaltungDBDML.php','','');
+		var req = new phpRequest('lvplanunglehrveranstaltungDBDML.php','','');
 		req.add('type','lehreinheit');
 		req.add('do','delete');
 		req.add('lehreinheit_id',lehreinheit_id);
@@ -425,7 +425,7 @@ function LeDetailSave()
 	if(lehrveranstaltung=='')
 		return false;
 
-	var req = new phpRequest('lehrveranstaltungDBDML.php','','');
+	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
 	neu = document.getElementById('lehrveranstaltung-detail-checkbox-new').checked;
 
 	if (neu)
@@ -693,7 +693,7 @@ function LeMitarbeiterSave()
 	bismelden = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden').checked;
 
 	//Request absetzen
-	var req = new phpRequest('lehrveranstaltungDBDML.php','','');
+	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
 
 	req.add('type','lehreinheit_mitarbeiter_add');
 	req.add('do','update');
@@ -759,7 +759,7 @@ function LeMitarbeiterDel()
 		return false;
 	}
 
-	var req = new phpRequest('lehrveranstaltungDBDML.php','','');
+	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
 
 	req.add('type', 'lehreinheit_mitarbeiter_del');
 	req.add('lehreinheit_id', lehreinheit_id);
@@ -949,7 +949,7 @@ function LeGruppeDel()
 		return false;
 	}
 
-	var req = new phpRequest('lehrveranstaltungDBDML.php','','');
+	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
 	neu = document.getElementById('lehrveranstaltung-detail-checkbox-new').checked;
 
 	req.add('type', 'lehreinheit_gruppe_del');
