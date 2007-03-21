@@ -257,12 +257,13 @@ OR p1.postnomentitel<>p2.postnomentitel) LIMIT 20;";
 
 if($result = pg_query($conn_fas, $qry))
 {
-	echo "<table class='liste'><tr><th>person_pk</th><th>familienname</th><th>vorname</th><th>vornamen</th><th>anrede</th><th>geschlecht</th><th>gebdat</th><th>gebort</th><th>gebnation</th><th>staatsbürgerschaft</th><th>familienstand</th><th>svnr</th><th>anzahlderkinder</th><th>ersatzkennzeichen</th><th>titel</th><th>postnomentitel</th></tr>";
+	echo "<table class='liste'><tr><th></th><th>person_pk</th><th>familienname</th><th>vorname</th><th>vornamen</th><th>anrede</th><th>geschlecht</th><th>gebdat</th><th>gebort</th><th>gebnation</th><th>staatsbürgerschaft</th><th>familienstand</th><th>svnr</th><th>anzahlderkinder</th><th>ersatzkennzeichen</th><th>titel</th><th>postnomentitel</th><th></th></tr>";
 	while($row = pg_fetch_object($result))
 	{
 		$i++;
 		echo "<tr class='liste".($i%2)."'>";
 		echo "<form action='$PHP_SELF'  method='POST'>";
+		echo "<td><input type='submit' value='Speichern'></td>";
 		echo "<td>'".$row->personpk1."'";
 		echo "<input type='hidden' name='person_pk' value='".$row->personpk1."'>";
 		echo "</td>";
@@ -331,6 +332,7 @@ if($result = pg_query($conn_fas, $qry))
 		echo "</form>";
 		echo "<tr class='liste".($i%2)."'>";
 		echo "<form action='$PHP_SELF'  method='POST'>";
+		echo "<td><input type='submit' value='Speichern'></td>";
 		echo "<td>'".$row->personpk2."'";
 		echo "<input type='hidden' name='person_pk' value='".$row->personpk2."'>";
 		echo "</td>";
