@@ -94,7 +94,8 @@ if(!$error)
 	}
 	elseif (isset($_POST['type']) && $_POST['type']=='addFunktionToMitarbeiter')
 	{
-		if(isset($_POST['uid']))
+		//Fuegt eine Lkt Funktion zu einem Studiengang/Mitarbeiter hinzu
+		if(isset($_POST['uid']) && isset($_POST['studiengang_kz']))
 		{
 			$obj = new benutzerfunktion($conn);
 			$obj->uid = $_POST['uid'];
@@ -118,7 +119,39 @@ if(!$error)
 		else 
 		{
 			$return = false;
-			$errormsg = 'Uid wurde nicht angegeben';
+			$errormsg = 'Fehlerhafte Parameteruebergabe';
+		}
+	}
+	elseif (isset($_POST['type']) && $_POST['type']=='delFunktionFromMitarbeiter')
+	{
+		//Loescht eine Lektorfunktion
+		if(isset($_POST['uid']) && isset($_POST['studiengang_kz']))
+		{			
+			$obj = new benutzerfunktion($conn);
+			//Benutzerfunktion suchen
+			if($obj->getBentuzerFunktion($_POST['uid'], 'lkt', $_POST['studiengang_kz']))
+			{
+				//Benutzerfunktion loeschen
+				if($obj->delete($obj->benutzerfunktion_id))
+				{
+					$return = true;
+				}
+				else 
+				{
+					$return = false;
+					$errormsg = $obj->errormsg;
+				}
+			}
+			else 
+			{
+				$return = false;
+				$errormsg = $obj->errormsg;
+			}
+		}
+		else 
+		{
+			$return = false;
+			$errormsg = 'Fehler bei Parameteruebergabe';
 		}
 	}
 	else 

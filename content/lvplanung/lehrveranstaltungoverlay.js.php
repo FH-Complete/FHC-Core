@@ -156,9 +156,14 @@ function LeNeu()
 	//Details zuruecksetzen
 	LeDetailReset();
 
+	//Detail Tab als aktiv setzen
+	document.getElementById('lehrveranstaltung-tab-detail').selected=true;	
+	document.getElementById('lehrveranstaltung-tabpanels-main').selectedIndex=0;
+	
+	//Lektor-Tab und GruppenTree ausblenden
 	document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe').hidden=true;
 	document.getElementById('lehrveranstaltung-detail-label-lehreinheitgruppe').hidden=true;
-	document.getElementById('lehrveranstaltung-tab-lektor').hidden=true;
+	document.getElementById('lehrveranstaltung-tab-lektor').hidden=true;	
 
 	//Lehrveranstaltungs_id holen
 	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung_id";
@@ -301,7 +306,8 @@ function LeDelete()
 	if (confirm('Wollen Sie diese Lehreinheit wirklich löschen?'))
 	{
 		//Script zum loeschen der Lehreinheit aufrufen
-		var req = new phpRequest('lvplanunglehrveranstaltungDBDML.php','','');
+		var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
+
 		req.add('type','lehreinheit');
 		req.add('do','delete');
 		req.add('lehreinheit_id',lehreinheit_id);
@@ -497,6 +503,12 @@ function LeAuswahl()
 	//der LektorenTab vor dem DetailTab angezeigt)
 	document.getElementById('lehrveranstaltung-tab-detail').hidden=true;
 	document.getElementById('lehrveranstaltung-tab-detail').hidden=false;
+	
+	//Wenn jemand neu drueckt und dann ohne speichern auf eine Lehreinheit wechselt, dann 
+	//sind beide tabs aktiv. darum wird der lektor-tab auf inaktiv gesetzt
+	if(document.getElementById('lehrveranstaltung-tab-detail').selected &&
+	   document.getElementById('lehrveranstaltung-tab-lektor').selected)
+	   document.getElementById('lehrveranstaltung-tab-lektor').selected=false;
 	//endHack
 
 	if (tree.currentIndex==-1) return;
@@ -632,8 +644,8 @@ function LeAuswahl()
 			lektortree.database.RemoveDataSource(oldDatasources.getNext());
 		}
 		//Refresh damit die entfernten DS auch wirklich entfernt werden
-		lektortree.builder.refresh();
-
+		lektortree.builder.rebuild();
+		
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		LeDetailLektorDatasource = rdfService.GetDataSource(url);
 		LeDetailLektorDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -660,7 +672,7 @@ function LeAuswahl()
 			gruppentree.database.RemoveDataSource(oldDatasources.getNext());
 		}
 		//Refresh damit die entfernten DS auch wirklich entfernt werden
-		gruppentree.builder.refresh();
+		gruppentree.builder.rebuild();
 
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		LeDetailGruppeDatasource = rdfService.GetDataSource(url);

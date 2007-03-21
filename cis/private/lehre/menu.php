@@ -54,14 +54,14 @@
 	
 	if(!isset($course_id) && !isset($term_id))
 	{
-		$course_id = 254;
+		$course_id = 227;
 		$term_id = 1;
 		
 		if(!$is_lector)
 		{
 			$sql_query = "SELECT studiengang_kz, semester FROM campus.vw_student WHERE uid='$user' LIMIT 1";
 				
-			$result_student = pg_exec($sql_conn, $sql_query);
+			$result_student = pg_query($sql_conn, $sql_query);
 			$num_rows_student = pg_numrows($result_student);
 			
 			if($num_rows_student > 0)
@@ -73,7 +73,7 @@
 			}
 			
 			if($course_id==0)
-				$course_id=254;
+				$course_id=227;
 			if($term_id==0)
 				$term_id=1;
 		}
@@ -82,7 +82,7 @@
 	{			
 		if(!isset($course_id) || $course_id==0)
 		{
-			$course_id = 254;
+			$course_id = 227;
 		}
 	
 		if(!isset($term_id) || $term_id==0)

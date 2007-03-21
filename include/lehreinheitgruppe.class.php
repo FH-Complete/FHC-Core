@@ -312,14 +312,73 @@ class lehreinheitgruppe
 			$this->errormsg = 'Lehreinheitgruppe_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
-		$qry = "DELETE FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id='$lehreinheitgruppe_id'";
-		
-		if(pg_query($this->conn, $qry))
-			return true;
+		$qry_del = "DELETE FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id='$lehreinheitgruppe_id'";
+		$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id='$lehreinheitgruppe_id'";
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$sql_undo = "INSERT INTO lehre.tbl_lehreinheitgruppe ".
+							"(lehreinheitgruppe_id, lehreinheit_id, studiengang_kz, semester, ".
+							"verband, gruppe, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon) ".
+							"VALUES(".$this->addslashes($row->lehreinheitgruppe_id).','.
+							$this->addslashes($row->lehreinheit_id).','.
+							$this->addslashes($row->studiengang_kz).','.
+							$this->addslashes($row->semester).','.
+							$this->addslashes($row->verband).','.
+							$this->addslashes($row->gruppe).','.
+							$this->addslashes($row->gruppe_kurzbz).','.
+							$this->addslashes($row->updateamum).','.
+							$this->addslashes($row->updatevon).','.
+							$this->addslashes($row->insertamum).','.
+							$this->addslashes($row->insertvon).');';
+							
+				$log = new log($this->conn, null, null);
+				$log->sql = $qry_del;
+				$log->sqlundo = $sql_undo;
+				$log->mitarbeiter_uid = get_uid();
+				if($row->gruppe_kurzbz!='')
+					$grp = $row->gruppe_kurzbz;
+				else 
+				{
+					$qry_stg = "SELECT UPPER(typ::varchar(1) || kurzbz) as kuerzel FROM tbl_studiengang WHERE studiengang_kz='$row->studiengang_kz'";
+					$result_stg = pg_query($this->conn, $qry_stg);
+					$row_stg = pg_fetch_object($result_stg);
+					$grp = $row_stg->kuerzel.$row->semester.$row->verband.$row->gruppe;
+				}
+				$log->beschreibung = "Gruppenzuteilung loeschen $grp - $row->lehreinheit_id";
+				pg_query($this->conn, 'BEGIN;');
+				
+				if($log->save(true))
+				{
+					if(pg_query($this->conn, $qry_del))
+					{
+						pg_query($this->conn, 'COMMIT;');
+						return true;
+					}
+					else 
+					{
+						pg_query($this->conn, 'ROLLBACK;');
+						$this->errormsg = 'Fehler beim Loeschen';
+						return false;
+					}
+				}
+				else 
+				{
+					pg_query($this->conn, 'ROLLBACK;');
+					$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
+					return false;
+				}
+			}
+			else 
+			{
+				$this->errormsg = 'Datensatz wurde nicht gefunden';
+				return false;
+			}
+		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim Loeschen';
+			$this->errormsg = 'Fehler beim lesen aus der Datenbank';
 			return false;
 		}
 	}

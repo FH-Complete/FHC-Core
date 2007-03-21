@@ -268,6 +268,7 @@ var LektorFunktionDDObserver=
 				//keine Ahnung warum ich da ein setTimeout brauche
 				//aber wenns nicht da ist dann stuerzt Mozilla ab?!
 				//mit seamonkey funktionierts auch ohne!
+				LektorTreeOpenStudiengang = stg;
 				window.setTimeout(RefreshLektorTree,10);
 			}
 		}

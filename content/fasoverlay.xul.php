@@ -106,7 +106,9 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 	ondragover="nsDragAndDrop.dragOver(event,LektorFunktionDDObserver)"
 	ondragenter="nsDragAndDrop.dragEnter(event,LektorFunktionDDObserver)"
 	ondragexit="nsDragAndDrop.dragExit(event,LektorFunktionDDObserver)"
-	datasources="rdf:null" ref="http://www.technikum-wien.at/mitarbeiter/liste">
+	datasources="rdf:null" ref="http://www.technikum-wien.at/mitarbeiter/liste"
+	context="fasoverlay-lektor-tree-popup"
+	>
 	<treecols>
 	    <treecol id="kurzbz" label="Kuerzel" flex="2" primary="true" />
 	    <splitter class="tree-splitter"/>
@@ -140,6 +142,11 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 </tree>
 
 <vbox id="vbox-main">
+<popupset>
+		<popup id="fasoverlay-lektor-tree-popup">
+			<menuitem label="Entfernen" oncommand="LektorFunktionDel();" />
+		</popup>
+</popupset>
 	<tabbox id="tabbox-main" flex="3" orient="vertical">
 		<tabs orient="horizontal">
 			<!-- <tab id="tab-week" label="Wochenplan" />  -->

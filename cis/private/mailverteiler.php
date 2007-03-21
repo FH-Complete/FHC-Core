@@ -83,7 +83,7 @@
             <br>
 <?php
 		$stg_obj = new studiengang($conn);
-		if(!$stg_obj->getAll('studiengang_kz'))
+		if(!$stg_obj->getAll('ascii(bezeichnung), bezeichnung, typ', true))
 			echo $stg_obj->errormsg;
 
 		foreach($stg_obj->result as $row)
