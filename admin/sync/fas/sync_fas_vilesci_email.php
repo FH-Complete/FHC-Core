@@ -186,9 +186,9 @@ echo nl2br("\n\nE-Mailsync:\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefu
 $ausgabe="E-Mailsync:\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n\n".$ausgabe;
 if(strlen(trim($error_log))>0)
 {
-	mail($adress, 'SYNC-Fehler Email', $error_log,"From: vilesci@technikum-wien.at");
+	mail($adress, 'SYNC-Fehler Email von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");
 }
-mail($adress, 'SYNC Email', $ausgabe,"From: vilesci@technikum-wien.at");
+mail($adress, 'SYNC Email von '.$_SERVER['HTTP_HOST'], $ausgabe,"From: vilesci@technikum-wien.at");
 ?>
 </body>
 </html>
