@@ -18,8 +18,8 @@ $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlg
 $error_log='';
 $text = '';
 $dateiausgabe='';
-$dateiausgabe=fopen('sync_fas_vilesci_student_ausgabe.txt','w');
-fwrite($dateiausgabe,"Ausgabe der Studentensynchro vom ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
+//$dateiausgabe=fopen('sync_fas_vilesci_student_ausgabe.txt','w');
+//fwrite($dateiausgabe,"Ausgabe der Studentensynchro vom ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
 $anzahl_eingefuegt=0;
 $anzahl_fehler=0;
 $ausgabe='';
@@ -701,8 +701,8 @@ if($result = pg_query($conn_fas, $qry))
 		}
 		
 		//Student aktiv?
-		$qry="SELECT * FROM (SELECT status, creationdate FROM student_ausbildungssemester WHERE student_fk= '".$row->student_pk."'  AND
-		studiensemester_fk=(SELECT studiensemester_pk FROM studiensemester WHERE aktuell='J') ORDER BY 2 DESC LIMIT 1) AS abc
+		$qry="SELECT * FROM (SELECT status, creationdate FROM student_ausbildungssemester WHERE student_fk= '".$ext_id_student."'  AND
+		studiensemester_fk=(SELECT studiensemester_pk FROM studiensemester WHERE aktuell='J') ORDER BY creationdate DESC LIMIT 1) AS abc
 		WHERE status IN ('3', '10', '11', '12', '13');";
 		$aktiv=false;
 		if($resultu = pg_query($conn_fas, $qry))
@@ -1002,18 +1002,6 @@ if($result = pg_query($conn_fas, $qry))
 							$ausgabe_person="Anzahl der Kinder: '".$anzahlkinder."' (statt '".$row1->anzahlkinder."')";
 						}
 					}
-					/*if($row1->aktiv!=($aktiv?'t':'f'))
-					{
-						$updatep=true;
-						if(strlen(trim($ausgabe_person))>0)
-						{
-							$ausgabe_person.=", Aktiv: '".($aktiv?'true':'false')."' (statt '".$row1->aktiv."')";
-						}
-						else
-						{
-							$ausgabe_person="Aktiv: '".($aktiv?'true':'false')."' (statt '".$row1->aktiv."')";
-						}
-					}*/
 					if($row1->geburtsnation!=$geburtsnation)
 					{
 						$updatep=true;
@@ -1548,6 +1536,10 @@ if($result = pg_query($conn_fas, $qry))
 							{
 								$gruppe=$rowu->gruppe;
 							}
+							if($aktiv==false)
+							{
+								$semester='10';
+							}
 							if($semester!=null AND $verband!=null AND $gruppe!=null)
 							{
 								$qry="SELECT * from public.tbl_lehrverband WHERE studiengang_kz=".myaddslashes($studiengang_kz)." AND semester=".myaddslashes($semester)." AND verband=".myaddslashes($verband)." AND gruppe=".myaddslashes($gruppe).";";
@@ -1897,7 +1889,7 @@ if($result = pg_query($conn_fas, $qry))
 						{
 							$ausgabe.=$ausgabe_benutzer;
 							$ausgabe.=$ausgabe_student;
-							fwrite($dateiausgabe,$ausgabe);
+							//fwrite($dateiausgabe,$ausgabe);
 							$ausgabe='';
 							pg_query($conn,'COMMIT;');
 						}
@@ -1934,7 +1926,7 @@ if($result = pg_query($conn_fas, $qry))
 						$text.="***********\n\n";
 					}
 					//$ausgabe.=$ausgabe_person;
-					fwrite($dateiausgabe,$ausgabe);
+					//fwrite($dateiausgabe,$ausgabe);
 					$ausgabe='';
 					pg_query($conn,'COMMIT;'); //Commit, wenn kein Gruppeneintrag gefunden (Interessent, Bewerber) => nur Person und Prestudent werden angelegt	
 				}
@@ -1974,21 +1966,21 @@ Echo nl2br("Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$a
 $error_log="Sync Student\n------------\n\n".$text;
 Echo nl2br($error_log);
 mail($adress, 'SYNC-Fehler Student von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");
-fwrite($dateiausgabe,"\n\nPersonen ohne Reihungstest: ".$notest." \n\n"
+/*fwrite($dateiausgabe,"\n\nPersonen ohne Reihungstest: ".$notest." \n\n"
 ."Personen:       Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$anzahl_person_insert." / Geändert: ".$anzahl_person_update." / Fehler: ".$anzahl_fehler_person."\n"
 ."Prestudenten:   Gesamt: ".$anzahl_pre_gesamt." / Eingefügt: ".$anzahl_pre_insert." / Geändert: ".$anzahl_pre_update." / Fehler: ".$anzahl_fehler_pre."\n"
 ."Benutzer:       Gesamt: ".$anzahl_benutzer_gesamt." / Eingefügt: ".$anzahl_benutzer_insert." / Geändert: ".$anzahl_benutzer_update." / Fehler: ".$anzahl_fehler_benutzer."\n"
 ."Nicht-Studenten: ".$anzahl_nichtstudenten."\n"
 ."Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student);
-fclose($dateiausgabe);
+fclose($dateiausgabe);*/
 
-/*mail($adress, 'SYNC Student', "Sync Student\n------------\n\nPersonen ohne Reihungstest: ".$notest." \n\n"
+mail($adress, 'SYNC Student  von '.$_SERVER['HTTP_HOST'], "Sync Student\n------------\n\nPersonen ohne Reihungstest: ".$notest." \n\n"
 ."Personen:       Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$anzahl_person_insert." / Geändert: ".$anzahl_person_update." / Fehler: ".$anzahl_fehler_person."\n"
 ."Prestudenten:   Gesamt: ".$anzahl_pre_gesamt." / Eingefügt: ".$anzahl_pre_insert." / Geändert: ".$anzahl_pre_update." / Fehler: ".$anzahl_fehler_pre."\n"
 ."Benutzer:       Gesamt: ".$anzahl_benutzer_gesamt." / Eingefügt: ".$anzahl_benutzer_insert." / Geändert: ".$anzahl_benutzer_update." / Fehler: ".$anzahl_fehler_benutzer."\n"
 ."Nicht-Studenten: ".$anzahl_nichtstudenten."\n"
 ."Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student."\n\n".$ausgabe, "From: vilesci@technikum-wien.at");
-*/
+
 ?>
 </body>
 </html>
