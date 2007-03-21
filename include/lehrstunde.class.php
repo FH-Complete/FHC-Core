@@ -76,8 +76,8 @@ class lehrstunde
 		// Parameter Checken
 		// Bezeichnung der Stundenplan-Tabelle und des Keys
 		$stpl_id=$stpl_table.TABLE_ID;
-		$stpl_view=VIEW_BEGIN.$stpl_table;
-		$stpl_table=TABLE_BEGIN.$stpl_table;
+		$stpl_view='lehre.'.VIEW_BEGIN.$stpl_table;
+		$stpl_table='lehre.'.TABLE_BEGIN.$stpl_table;
 
 		$sql_query="SELECT * FROM $stpl_view WHERE $stpl_id=$stundenplan_id;";
 		//echo $sql_query.'<br>';
@@ -86,7 +86,7 @@ class lehrstunde
 		//Datenbankabfrage
 		if (! $stpl_tbl=pg_query($this->conn, $sql_query))
 		{
-			$this->errormsg=pg_last_error($this->conn);
+			$this->errormsg=$sql_query.pg_last_error($this->conn);
 			//echo $this->errormsg;
 			return false;
 		}
@@ -135,7 +135,7 @@ class lehrstunde
 		// Parameter Checken
 		// Bezeichnung der Stundenplan-Tabelle und des Keys
 		$stpl_id=$stpl_table.TABLE_ID;
-		$stpl_table=TABLE_BEGIN.$stpl_table;
+		$stpl_table='lehre.'.TABLE_BEGIN.$stpl_table;
 		if ($this->new)
 		{
 			// insert
@@ -151,7 +151,7 @@ class lehrstunde
 			//echo $sql_query."<br>";
 
 			//Datenbankabfrage
-			if (! @pg_query($this->conn, $sql_query))
+			if (! pg_query($this->conn, $sql_query))
 			{
 				$this->errormsg=$sql_query.pg_last_error($this->conn);
 				//echo $this->errormsg;
@@ -456,7 +456,7 @@ class lehrstunde
 		// Parameter Checken
 		// Bezeichnung der Stundenplan-Tabelle und des Keys
 		$stpl_id=$stpl_table.TABLE_ID;
-		$stpl_table=VIEW_BEGIN.$stpl_table;
+		$stpl_table='lehre.'.VIEW_BEGIN.$stpl_table;
 
 		// Datenbank abfragen
 		$sql_query="SELECT $stpl_id AS id, lektor, stg_kurzbz, ort_kurzbz, semester, verband, gruppe, gruppe_kurzbz, datum, stunde FROM $stpl_table
@@ -475,7 +475,7 @@ class lehrstunde
 		//echo $sql_query.'<br>';
 		if (! $erg_stpl=pg_query($this->conn, $sql_query))
 		{
-			$this->errormsg=pg_last_error($this->conn);
+			$this->errormsg=$sql_query.pg_last_error($this->conn);
 			return true;
 		}
 		$anz=pg_numrows($erg_stpl);
