@@ -1,6 +1,5 @@
-<!ENTITY window.title			"Tempus"> 
-<!ENTITY window.version			"2.0alpha vom 8.Januar 2007"> 
-
+<!ENTITY window.title			"FASo"> 
+<!ENTITY window.version			"0.5 vom 21.Maerz 2007"> 
 
 <!ENTITY menu-file:label              	"Datei">
 <!ENTITY menu-file:accesskey           	"D">
@@ -20,10 +19,18 @@
 <!ENTITY menu-edit:label              	"Bearbeiten">
 <!ENTITY menu-edit:accesskey          	"B">
 
+<<<<<<< .mine
 <!ENTITY menu-edit-undo:key           	"">
 <!ENTITY menu-edit-undo:label         	"Undo">
 <!ENTITY menu-edit-undo:accesskey     	"">
 
+
+=======
+<!ENTITY menu-edit-undo:key           	"">
+<!ENTITY menu-edit-undo:label         	"Undo">
+<!ENTITY menu-edit-undo:accesskey     	"">
+
+>>>>>>> .r298
 <!ENTITY menu-prefs:label              	"Einstellungen">
 <!ENTITY menu-prefs:accesskey          	"E">
 
