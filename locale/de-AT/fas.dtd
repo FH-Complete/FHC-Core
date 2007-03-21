@@ -19,18 +19,10 @@
 <!ENTITY menu-edit:label              	"Bearbeiten">
 <!ENTITY menu-edit:accesskey          	"B">
 
-<<<<<<< .mine
 <!ENTITY menu-edit-undo:key           	"">
 <!ENTITY menu-edit-undo:label         	"Undo">
 <!ENTITY menu-edit-undo:accesskey     	"">
 
-
-=======
-<!ENTITY menu-edit-undo:key           	"">
-<!ENTITY menu-edit-undo:label         	"Undo">
-<!ENTITY menu-edit-undo:accesskey     	"">
-
->>>>>>> .r298
 <!ENTITY menu-prefs:label              	"Einstellungen">
 <!ENTITY menu-prefs:accesskey          	"E">
 
