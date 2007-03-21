@@ -86,7 +86,7 @@ $error_msg='';
 	}
 	// Lektoren holen die nicht im Verteiler sind
 	echo '<BR>';
-	$sql_query="SELECT mitarbeiter_uid AS uid FROM public.tbl_mitarbeiter WHERE fixangestellt AND mitarbeiter_uid NOT LIKE '\\\\_%' AND mitarbeiter_uid NOT IN (SELECT uid FROM tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name'))";
+	$sql_query="SELECT mitarbeiter_uid AS uid FROM public.tbl_mitarbeiter WHERE fixangestellt AND mitarbeiter_uid NOT LIKE '\\\\_%' AND mitarbeiter_uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name'))";
 	if(!($result=pg_query($conn, $sql_query)))
 		$error_msg.=pg_errormessage($conn);
 	while($row=pg_fetch_object($result))
@@ -109,7 +109,7 @@ $error_msg='';
 		$error_msg.=pg_errormessage($conn);
 	while($row=pg_fetch_object($result))
 	{
-     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(mailgrp_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
+     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
 		if(!pg_query($conn, $sql_query))
 			$error_msg.=pg_errormessage($conn).$sql_query;
 		echo '-';
@@ -139,7 +139,7 @@ $error_msg='';
 		WHERE gruppe_kurzbz LIKE '%\\\\_LKT' AND UPPER(gruppe_kurzbz)!=UPPER('tw_lkt') AND UPPER(gruppe_kurzbz)!=UPPER('tw_fix_lkt')
 		AND (uid,UPPER(gruppe_kurzbz)) NOT IN
 		(SELECT mitarbeiter_uid,UPPER(typ::varchar(1) || tbl_studiengang.kurzbz || '_lkt')
-			FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, tbl_studiengang
+			FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_studiengang
 			WHERE
 			tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
