@@ -1536,7 +1536,7 @@ if($result = pg_query($conn_fas, $qry))
 							{
 								$gruppe=$rowu->gruppe;
 							}
-							if($aktiv==false)
+							if($aktiv==false && $student_uid<>'' && $student_uid!=null && isset($student_uid))
 							{
 								$semester='10';
 							}
