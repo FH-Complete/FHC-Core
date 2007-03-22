@@ -36,6 +36,17 @@ $user = get_uid();
 $rechte=new benutzerberechtigung($db_conn);
 $rechte->getBerechtigungen($user);
 
+$stg_obj = new studiengang($db_conn);
+if($stg_obj->getAll('kurzbzlang'))
+{
+	$stg = array();
+	foreach($stg_obj->result as $row)
+		$stg[$row->studiengang_kz] = $row->kurzbzlang;
+}
+else
+	die('Fehler beim Auslesen der Studiengaenge');
+
+
 if(check_lektor($user,$db_conn))
    $is_lector=true;
 else
@@ -113,7 +124,7 @@ else
 			if($is_lector)
 			{
 				?>
-			<tr>
+				<tr>
 					<td width="10" nowrap>&nbsp;</td>
 				    <td nowrap>
 				    	<a href="profile/zeitwunsch.php?uid=<?php echo $REMOTE_USER; ?>" class="Item" target="content">
@@ -147,16 +158,6 @@ else
 							<?php
 							$stsemobj = new studiensemester($db_conn);
 							$stsem = $stsemobj->getAktorNext();
-							$stg_obj = new studiengang($db_conn);
-							if($stg_obj->getAll())
-							{
-								$stg = array();
-								foreach($stg_obj->result as $row)
-									$stg[$row->studiengang_kz] = $row->kurzbzlang;
-							}
-							else
-								echo "Fehler beim Auslesen der Studiengaenge";
-
 							$qry = "SELECT distinct bezeichnung, studiengang_kz, semester, lehreverzeichnis, tbl_lehrveranstaltung.lehrveranstaltung_id
 										FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter
 								        WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
@@ -182,7 +183,40 @@ else
 					</table>
 		  			</td>
 				</tr>
-					<?php
+			<?php
+			}
+			if ($rechte->isBerechtigt('admin'))
+			{
+				?>
+				<tr>
+					<td width="10" nowrap>&nbsp;</td>
+				    <td nowrap>
+				    	<a href="?Location" class="MenuItem" onClick="return(js_toggle_container('Zeitsperren'));">
+				    		<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Zeitsperren
+				    	</a>
+				    </td>
+				</tr>
+				<tr>
+          			<td width="10" nowrap>&nbsp;</td>
+					<td nowrap>
+		  			<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Zeitsperren" style="display: none;">
+					<tr>
+					  	<td nowrap>
+							<ul style="margin-top: 0px; margin-bottom: 0px;">
+							<?php
+							$stge=$rechte->getStgKz('admin');
+							foreach($stg_obj->result as $row)
+								if (in_array($row->studiengang_kz,$stge))
+									echo '<li><a class="Item2" href="profile/zeitsperre.php?funktion=lkt&stg_kz='.$row->studiengang_kz.'" target="content">Lektoren '.$row->kurzbzlang.'</a></li>';
+							?>
+							</ul>
+						</td>
+					</tr>
+					</table>
+		  			</td>
+				</tr>
+
+			<?php
 			}
 			?>
 			</table>
