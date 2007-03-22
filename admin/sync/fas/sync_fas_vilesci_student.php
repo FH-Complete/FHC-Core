@@ -17,6 +17,7 @@ $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlg
 
 $error_log='';
 $text = '';
+$plausiueb='';
 $dateiausgabe='';
 //$dateiausgabe=fopen('sync_fas_vilesci_student_ausgabe.txt','w');
 //fwrite($dateiausgabe,"Ausgabe der Studentensynchro vom ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
@@ -64,8 +65,8 @@ foreach ($studiengangfk AS $stg)
 }
 
 set_time_limit(60);
-//$adress='ruhan@technikum-wien.at';
-$adress='fas_sync@technikum-wien.at';
+$adress='ruhan@technikum-wien.at';
+//$adress='fas_sync@technikum-wien.at';
 
 function myaddslashes($var)
 {
@@ -84,9 +85,9 @@ function myaddslashes($var)
 </head>
 <body>
 <?php
-$plausisvnr="Überprüfung Studentendaten im FAS:\n\n";
+echo nl2br("Studentensynchro vom ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
 
-
+$plausiueb="Überprüfung Studentendaten im FAS:\n\n";
 $qry="SELECT * FROM person JOIN student ON person_pk=student.person_fk WHERE svnr='0005010400';";
 if($resultp = pg_query($conn_fas, $qry))
 {
@@ -99,6 +100,10 @@ if($resultp = pg_query($conn_fas, $qry))
 			$error=true;
 		}
 	}
+}
+if(pg_numrows($resultp)==0)
+{
+	$plausisvnr='';
 }
 echo nl2br($plausisvnr."\n");
 $qry="
@@ -126,7 +131,7 @@ CROSS JOIN (person JOIN student ON person_pk=student.person_fk) AS p2 WHERE
 ((p1.svnr=p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'') 
 	OR ((p1.svnr<>p2.svnr OR p1.svnr IS NOT NULL OR p1.svnr<>'') AND p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!='' 
 	AND p1.gebdat=p2.gebdat AND p1.gebdat IS NOT NULL AND p1.gebdat>'1935-01-01' AND p1.gebdat<'2000-01-01'))
-AND (p1.person_pk < p2.person_pk) AND (p1.studiengang_fk=p2.studiengang_fk)
+AND (p1.person_pk < p2.person_pk) 
 AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400') 
 AND (trim(p1.familienname)<>trim(p2.familienname) OR trim(p1.vorname)<>trim(p2.vorname) OR trim(p1.vornamen)<>trim(p2.vornamen)
 	OR p1.geschlecht<>p2.geschlecht OR p1.gebort<>p2.gebort 
@@ -380,6 +385,7 @@ foreach ($studiengangfk AS $stg)
 			{
 				if(strlen(trim($error_log_fas[$stg]))>0)
 				{
+					$errro_log_fas[$stg]=$plausiueb.$error_log_fas[$stg];
 					//mail(trim($rowass->email), 'Plausicheck von Studenten / Studiengang: '.$stg, $error_log_fas[$stg],"From: vilesci@technikum-wien.at");
 					mail($adress, 'Plausicheck von Studenten / Studiengang: '.$stg.", von ".$_SERVER['HTTP_HOST'], $error_log_fas[$stg],"From: vilesci@technikum-wien.at");
 				}
@@ -406,7 +412,7 @@ FROM (person JOIN student ON person_pk=student.person_fk ) AS p1
 CROSS JOIN (person JOIN student ON person_pk=student.person_fk) AS p2 WHERE 
 ((p1.gebdat=p2.gebdat AND p1.familienname=p2.familienname AND p1.vorname=p2.vorname) 
 OR ((p1.ersatzkennzeichen=p2.ersatzkennzeichen AND p1.ersatzkennzeichen<>'') OR (p1.svnr=p2.svnr AND p1.svnr<>'')))
-AND (p1.person_pk <> p2.person_pk) AND (p1.studiengang_fk=p2.studiengang_fk)
+AND (p1.person_pk <> p2.person_pk)
 AND ((p1.svnr=p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'') 
 	OR (p1.svnr<>p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'' AND p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!='' 
 	AND p1.gebdat=p2.gebdat AND p1.gebdat IS NOT NULL AND p1.gebdat>'1935-01-01' AND p1.gebdat<'2000-01-01'))
@@ -623,14 +629,14 @@ if($result = pg_query($conn_fas, $qry))
 		{
 			$error_log = "Geschlecht muß entweder w oder m sein!: ".$nachname.", ".$vorname."\n";
 		}		
-		if(strlen($uid)>16)
+		if(strlen($student_uid)>16)
 		{
 			$error_log = 'UID darf nicht laenger als 16 Zeichen sein. : '.$nachname.", ".$vorname."\n";
 		}
-		if($uid == '')
+		/*if($student_uid == '')
 		{
 			$error_log = 'UID muss eingegeben werden '.$nachname.", ".$vorname."\n";
-		}
+		}*/
 		if(strlen($alias)>256)
 		{
 			$error_log = 'Alias darf nicht laenger als 256 Zeichen sein '.$nachname.", ".$vorname."\n";
@@ -722,7 +728,6 @@ if($result = pg_query($conn_fas, $qry))
 			$error_log.='Fehler beim Abfragen des aktuellen Status bei student_pk: '.$row->student_pk;
 			echo nl2br('Fehler beim Abfragen des aktuellen Status bei student_pk: '.$row->student_pk);	
 		}
-
 		//Start der Transaktion
 		pg_query($conn,'BEGIN;');
 		
@@ -1488,26 +1493,7 @@ if($result = pg_query($conn_fas, $qry))
 			{
 				//Weitere Reihenfolge: benutzer, student
 				
-				//Student schon vorhanden?
-				$qry="SELECT student_uid FROM public.tbl_student WHERE student_uid='$student_uid'";
-				if($resultu = pg_query($conn, $qry))
-				{
-					if(pg_num_rows($resultu)>0) //wenn dieser eintrag schon vorhanden ist
-					{
-						if($rowu=pg_fetch_object($resultu))
-						{
-							$student_uid=$rowu->student_uid;
-							$new_student=false;		
-						}
-						else $new_student=true;
-					}
-					else $new_student=true;
-				}
-				else
-				{
-					$error=true;
-					$error_log.='Fehler beim Zugriff auf Tabelle tbl_student bei student_pk: '.$ext_id_student."\n".pg_errormessage($conn)."\n";	
-				}
+				
 
 				//Gruppenverband ermitteln
 				$qry="SELECT fas_function_find_verband_from_student(".$ext_id_student.") AS verband,
@@ -1536,7 +1522,7 @@ if($result = pg_query($conn_fas, $qry))
 							{
 								$gruppe=$rowu->gruppe;
 							}
-							if($aktiv==false && $student_uid<>'' && $student_uid!=null && isset($student_uid))
+							if(!$aktiv && $student_uid<>'' && $student_uid!=null && isset($student_uid) && $matrikelnr<>'' && $matrikelnr!=null && isset($matrikelnr))
 							{
 								$semester='10';
 							}
@@ -1553,7 +1539,6 @@ if($result = pg_query($conn_fas, $qry))
 										myaddslashes($verband).', '.
 										myaddslashes($gruppe).', '.
 										'true, null , null );';
-										$ausgabe_pre.="Semester: ".$semester.", Verband: ".$verband.", Gruppe: ".$gruppe."\n";
 										pg_query($conn, $qry);
 										
 									}
@@ -1568,7 +1553,6 @@ if($result = pg_query($conn_fas, $qry))
 										myaddslashes($semester).', '.
 										myaddslashes($verband).', '.
 										"'', true, null, null);";
-										//$ausgabe_pre.="Semester: ".$semester.", Verband: ".$verband.", Gruppe: ".$gruppe."\n";
 										pg_query($conn, $qry);
 									}
 								}
@@ -1581,7 +1565,6 @@ if($result = pg_query($conn_fas, $qry))
 										VALUES('.myaddslashes($studiengang_kz).', '.
 										myaddslashes($semester).', '.
 										"'', '', true, null, null);";
-										//$ausgabe_pre.="Semester: ".$semester.", Verband: ".$verband.", Gruppe: ".$gruppe."\n";
 										pg_query($conn, $qry);
 									}
 								}
@@ -1637,15 +1620,15 @@ if($result = pg_query($conn_fas, $qry))
 				    and $verband!=null and $gruppe!=null)
 				{
 					//Benutzer schon vorhanden?
-					$qry="SELECT uid, person_id FROM public.tbl_benutzer WHERE person_id='$person_id'";
+					$qry="SELECT uid, person_id, ext_id FROM public.tbl_benutzer WHERE person_id='$person_id' AND uid='$student_uid'";
 					if($resultu = pg_query($conn, $qry))
 					{
 						if(pg_num_rows($resultu)>0) //wenn dieser eintrag schon vorhanden ist
 						{
 							if($rowu=pg_fetch_object($resultu))
 							{
-								$new_benutzer=false;	
-								$uid=$rowu->uid;	
+								$new_benutzer=false;
+								//$ext_id_benutzer=$rowu->ext_id;
 							}
 							else $new_benutzer=true;
 						}
@@ -1656,6 +1639,28 @@ if($result = pg_query($conn_fas, $qry))
 						$error=true;
 						$error_log.='Fehler beim Zugriff auf Tabelle tbl_benutzer bei person_id: '.$person_id."\n".pg_errormessage($conn)."\n";	
 					}
+					//Student schon vorhanden?
+					$qry="SELECT student_uid FROM public.tbl_student WHERE student_uid='$student_uid'";
+					if($resultu = pg_query($conn, $qry))
+					{
+						if(pg_num_rows($resultu)>0) //wenn dieser eintrag schon vorhanden ist
+						{
+							if($rowu=pg_fetch_object($resultu))
+							{
+								//$student_uid=$rowu->student_uid;
+								$new_student=false;		
+							}
+							else $new_student=true;
+						}
+						else $new_student=true;
+					}
+					else
+					{
+						$error=true;
+						$error_log.='Fehler beim Zugriff auf Tabelle tbl_student bei student_pk: '.$ext_id_student."\n".pg_errormessage($conn)."\n";	
+					}
+					
+					
 					if($new_benutzer)
 					{
 						//insert benutzer
@@ -1669,7 +1674,7 @@ if($result = pg_query($conn_fas, $qry))
 						myaddslashes($updateamum).','.
 						"'SYNC'".', '.
 						myaddslashes($ext_id_benutzer).'); ';
-						$ausgabe_benutzer="Benutzer ".$benutzeruid." ".$benutzeralias." eingefügt.\n";
+						$ausgabe_benutzer="Benutzer ".$student_uid." ".$alias." eingefügt.\n";
 						
 					}
 					else 
@@ -1686,25 +1691,60 @@ if($result = pg_query($conn_fas, $qry))
 						
 						
 						//update nur wenn änderungen gemacht
-						$qry="SELECT * FROM public.tbl_benutzer WHERE ext_id='$ext_id_benutzer';";
+						$qry="SELECT * FROM public.tbl_benutzer WHERE person_id='$person_id' AND uid='$student_uid'";
 						if($results = pg_query($conn, $qry))
 						{
 							while($rows = pg_fetch_object($results))
 							{
-								$updateb=false;			
+								$updateb=false;
+								if($rows->uid!=$student_uid)
+								{
+									$updateb=true;
+									if(strlen(trim($ausgabe_benutzer))>0)
+									{
+										$ausgabe_benutzer.=", UID: '".$student_uid."' statt('".$rows->uid."')";
+									}
+									else
+									{
+										$ausgabe_benutzer="UID: '".$student_uid."' statt('".$rows->uid."')";
+									}
+								}	
+								if($rows->person_id!=$person_id)
+								{
+									$updateb=true;
+									if(strlen(trim($ausgabe_benutzer))>0)
+									{
+										$ausgabe_benutzer.=", Person_ID: '".$person_id."' statt('".$rows->person_id."')";
+									}
+									else
+									{
+										$ausgabe_benutzer="Person_ID: '".$person_id."' statt('".$rows->person_id."')";
+									}
+								}			
 								if($rows->aktiv!=($aktiv?'t':'f'))
 								{
 									$updateb=true;
 									if(strlen(trim($ausgabe_benutzer))>0)
 									{
-										$ausgabe_benutzer.=", Aktiv: '".($aktiv?'true':'false')."'";
+										$ausgabe_benutzer.=", Aktiv: '".($aktiv?'true':'false')."' statt ('".($rows->aktiv?'true':'false')."')";
 									}
 									else
 									{
-										$ausgabe_benutzer="Aktiv: '".($aktiv?'true':'false')."'";
+										$ausgabe_benutzer="Aktiv: '".($aktiv?'true':'false')."' statt ('".($rows->aktiv?'true':'false')."')";
 									}
 								}		
-								
+								if($rows->ext_id!=$ext_id_benutzer)
+								{
+									$updateb=true;
+									if(strlen(trim($ausgabe_benutzer))>0)
+									{
+										$ausgabe_benutzer.=", Ext_ID: '".$ext_id_benutzer."' statt('".$rows->ext_id."')";
+									}
+									else
+									{
+										$ausgabe_benutzer="Ext_ID: '".$ext_id_benutzer."' statt('".$rows->ext_id."')";
+									}
+								}
 								if($updateb)
 								{
 									$qry = 'UPDATE public.tbl_benutzer SET'.
@@ -1712,9 +1752,10 @@ if($result = pg_query($conn_fas, $qry))
 									       ' person_id='.myaddslashes($person_id).','.
 									       ' aktiv='.($aktiv?'true':'false').','.
 							        		       " updateamum=now()".','.
-							        		       " updatevon=".myaddslashes($updatevon).
-									       ' WHERE ext_id='.myaddslashes($ext_id_benutzer).';';
-									       $ausgabe_benutzer="Änderungen bei Benutzer ".$benutzeruid." ".$benutzeralias.": ".$ausgabe_benutzer.".\n";
+							        		       " updatevon=".myaddslashes($updatevon).', '.
+							        		       " ext_id=".myaddslashes($ext_id_benutzer).
+									       " WHERE person_id='$person_id' AND uid='$student_uid'";
+									       $ausgabe_benutzer="Änderungen bei Benutzer ".$student_uid." ".$alias.": ".$ausgabe_benutzer.".\n";
 								}
 							}
 						}
@@ -1864,7 +1905,7 @@ if($result = pg_query($conn_fas, $qry))
 								}
 							}
 						}
-						if(!pg_query($conn,$qry))
+						if(!@pg_query($conn,$qry))
 						{			
 							$error=true;
 							$error_log.='Fehler beim Speichern des Student-Datensatzes:'.$nachname.' / '.$qry."\n".pg_errormessage($conn)."\n";
@@ -1890,7 +1931,7 @@ if($result = pg_query($conn_fas, $qry))
 							$ausgabe.=$ausgabe_benutzer;
 							$ausgabe.=$ausgabe_student;
 							//fwrite($dateiausgabe,$ausgabe);
-							$ausgabe='';
+							//$ausgabe='';
 							pg_query($conn,'COMMIT;');
 						}
 						else
@@ -1925,9 +1966,9 @@ if($result = pg_query($conn_fas, $qry))
 						$text.="\n".$qry." C1\n";
 						$text.="***********\n\n";
 					}
-					//$ausgabe.=$ausgabe_person;
+					$ausgabe.=$ausgabe_person;
 					//fwrite($dateiausgabe,$ausgabe);
-					$ausgabe='';
+					//$ausgabe='';
 					pg_query($conn,'COMMIT;'); //Commit, wenn kein Gruppeneintrag gefunden (Interessent, Bewerber) => nur Person und Prestudent werden angelegt	
 				}
 				
@@ -1972,6 +2013,7 @@ mail($adress, 'SYNC-Fehler Student von '.$_SERVER['HTTP_HOST'], $error_log,"From
 ."Benutzer:       Gesamt: ".$anzahl_benutzer_gesamt." / Eingefügt: ".$anzahl_benutzer_insert." / Geändert: ".$anzahl_benutzer_update." / Fehler: ".$anzahl_fehler_benutzer."\n"
 ."Nicht-Studenten: ".$anzahl_nichtstudenten."\n"
 ."Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student);
+fwrite($dateiausgabe,"Fertig: ".date("d.m.Y H:i:s")."\n\n");
 fclose($dateiausgabe);*/
 
 mail($adress, 'SYNC Student  von '.$_SERVER['HTTP_HOST'], "Sync Student\n------------\n\nPersonen ohne Reihungstest: ".$notest." \n\n"
