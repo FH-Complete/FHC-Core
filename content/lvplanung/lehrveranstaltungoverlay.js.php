@@ -28,7 +28,10 @@ $conn = pg_pconnect(CONN_STRING);
 $user = get_uid();
 loadVariables($conn, $user);
 ?>
+// *********** Globale Variablen *****************//
+
 var LeDetailLehrfach_id; //Lehrfach_id die nach dem Laden markiert werden soll
+var LeDetailLehrfach_label; //Bezeichnung des Lehrfachs das markiert werden soll
 var LeDetailGruppeDatasource; //Datasource fuer Gruppen DropDown
 var LeDetailLektorDatasource; //Datasource fuer Lektren DropDown
 var LvSelectLehreinheit_id; //Lehreinheit_id die nach dem Rebuild des Trees markiert werden soll
@@ -36,6 +39,7 @@ var leDetailLektorUid; // UID der Lektorzuordnung die nach dem Rebuild markiert 
 var leDetailLektorLehreinheit_id; // Lehreinheit_id der Lektorzuordnung die nach dem Rebuild markiert werden soll
 
 // ********** Observer und Listener ************* //
+
 // ****
 // * Observer fuer LV Tree
 // * startet Rebuild nachdem das Refresh
@@ -83,7 +87,53 @@ var LvLektorTreeListener =
   }
 };
 
+
+// ****
+// * Observer fuer Lehrfachdropdown
+// ****
+var LeDetailLehrfachSinkObserver =
+{
+	onBeginLoad: function(aSink) { },
+	onInterrupt: function(aSink) { },
+	onResume:    function(aSink) { },
+	onEndLoad:   function(aSink) {
+		//Das richtige Lehrfach markieren
+		if(LeDetailLehrfach_id!='') //Wenn die Lehrfach_id bekannt ist, dann einfach markieren
+			document.getElementById('lehrveranstaltung-detail-menulist-lehrfach').value=LeDetailLehrfach_id;
+		else 
+		{
+			if(LeDetailLehrfach_label!='') //Wenn Name bekannt ist
+			{
+				
+				menulist = document.getElementById('lehrveranstaltung-detail-menulist-lehrfach');
+
+				//Alle eintraege aus menulist holen			
+				var items = menulist.childNodes[1].childNodes //Anzahl der Zeilen ermitteln
+				found=false;
+			   	for(i in items)
+				{
+					//Richtigen eintrag suchen
+					if(items[i].label==LeDetailLehrfach_label)
+					{
+						//Eintrag markieren
+						menulist.selectedIndex=i;
+						found=true;
+						break;
+					}
+		   		}
+		   		//Wenn nichts gefunden wurde, wird der erste Eintrag markiert
+		   		if(!found)
+		   			menulist.selectedIndex=0;
+			}
+		}
+	},
+	onError: function(aSink, aStatus, aErrorMsg) {
+		alert('Bei der Datenuebertragung ist ein Fehler Aufgetreten. Bitte Versuchen Sie es erneut.');
+	}
+};
+
 // ***************** KEY Events ************************* //
+
 // ****
 // * Wird ausgefuehrt wenn eine Taste gedrueckt wird und der Focus
 // * im Lehrveranstaltungs-tree ist
@@ -120,7 +170,8 @@ function LvDetailMitarbeiterTreeKeyPress(event)
 		LeMitarbeiterDel();
 }
 
-// ****************** FUNCTIONS ************************** //
+// ****************** FUNKTIONEN ************************** //
+
 // ****
 // * Asynchroner (Nicht blockierender) Refresh des LV Trees
 // ****
@@ -157,13 +208,12 @@ function LeNeu()
 	LeDetailReset();
 
 	//Detail Tab als aktiv setzen
-	document.getElementById('lehrveranstaltung-tab-detail').selected=true;	
-	document.getElementById('lehrveranstaltung-tabpanels-main').selectedIndex=0;
+	document.getElementById('lehrveranstaltung-tabs').selectedItem = document.getElementById('lehrveranstaltung-tab-detail');
 	
 	//Lektor-Tab und GruppenTree ausblenden
 	document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe').hidden=true;
 	document.getElementById('lehrveranstaltung-detail-label-lehreinheitgruppe').hidden=true;
-	document.getElementById('lehrveranstaltung-tab-lektor').hidden=true;	
+	document.getElementById('lehrveranstaltung-tab-lektor').collapsed=true;	
 
 	//Lehrveranstaltungs_id holen
 	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung_id";
@@ -172,8 +222,10 @@ function LeNeu()
 	//Lehrfach drop down setzen
 
 	//ID in globale Variable speichern
-	LvDetailLehrfach_id='';
-
+	LeDetailLehrfach_id='';
+	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-bezeichnung"] : "lehrveranstaltung-treecol-bezeichnung";
+	LeDetailLehrfach_label=tree.view.getCellText(tree.currentIndex,col);
+	
 	lehrfachmenulist = document.getElementById('lehrveranstaltung-detail-menulist-lehrfach');
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 
@@ -321,24 +373,6 @@ function LeDelete()
 		LeDetailReset();
 	}
 }
-
-// ****
-// * Observer fuer lehrfachdropdown
-// ****
-var LeDetailLehrfachSinkObserver =
-{
-	onBeginLoad: function(aSink) { },
-	onInterrupt: function(aSink) { },
-	onResume:    function(aSink) { },
-	onEndLoad:   function(aSink) {
-		//Das richtige Lehrfach markieren
-		if(LeDetailLehrfach_id!='')
-			document.getElementById('lehrveranstaltung-detail-menulist-lehrfach').value=LeDetailLehrfach_id;
-	},
-	onError: function(aSink, aStatus, aErrorMsg) {
-		alert('Bei der Datenuebertragung ist ein Fehler Aufgetreten. Bitte Versuchen Sie es erneut.');
-	}
-};
 
 // ****
 // * Leert alle Eingabe- und Auswahlfelder
@@ -497,19 +531,7 @@ function LeAuswahl()
 
 	document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe').hidden=false;
 	document.getElementById('lehrveranstaltung-detail-label-lehreinheitgruppe').hidden=false;
-	document.getElementById('lehrveranstaltung-tab-lektor').hidden=false;
-
-	//Hack damit der DetailTab als erstes angezeigt wird (sonst wird nach aus- und wieder einblenden
-	//der LektorenTab vor dem DetailTab angezeigt)
-	document.getElementById('lehrveranstaltung-tab-detail').hidden=true;
-	document.getElementById('lehrveranstaltung-tab-detail').hidden=false;
-	
-	//Wenn jemand neu drueckt und dann ohne speichern auf eine Lehreinheit wechselt, dann 
-	//sind beide tabs aktiv. darum wird der lektor-tab auf inaktiv gesetzt
-	if(document.getElementById('lehrveranstaltung-tab-detail').selected &&
-	   document.getElementById('lehrveranstaltung-tab-lektor').selected)
-	   document.getElementById('lehrveranstaltung-tab-lektor').selected=false;
-	//endHack
+	document.getElementById('lehrveranstaltung-tab-lektor').collapsed=false;	
 
 	if (tree.currentIndex==-1) return;
 	try
@@ -584,7 +606,7 @@ function LeAuswahl()
 
 	//ID in globale Variable speichern
 	LeDetailLehrfach_id=lehrfach;
-
+	
 	lehrfachmenulist = document.getElementById('lehrveranstaltung-detail-menulist-lehrfach');
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 
@@ -596,7 +618,7 @@ function LeAuswahl()
 	}
 
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	lehrfachmenulist.builder.refresh();
+	lehrfachmenulist.builder.rebuild();
 
 	//Url zusammenbauen
 	var url = '<?php echo APP_ROOT;?>rdf/lehrfach.rdf.php?lehrveranstaltung_id='+lehrveranstaltung+'&'+gettimestamp();
@@ -604,11 +626,11 @@ function LeAuswahl()
 	//RDF holen
 	var newDs  = rdfService.GetDataSource(url);
 	lehrfachmenulist.database.AddDataSource(newDs);
-
+	
 	//SinkObserver hinzufuegen
 	var sink = newDs.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	sink.addXMLSinkObserver(LeDetailLehrfachSinkObserver);
-
+	
 	//Daten den Feldern zuweisen
 
 	document.getElementById('lehrveranstaltung-detail-textbox-unr').value=unr;
@@ -707,8 +729,7 @@ function LeMitarbeiterSave()
 	//Request absetzen
 	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
 
-	req.add('type','lehreinheit_mitarbeiter_add');
-	req.add('do','update');
+	req.add('type','lehreinheit_mitarbeiter_save');
 	lehreinheit_id = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-lehreinheit_id').value;
 	mitarbeiter_uid = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-mitarbeiter_uid').value;
 	req.add('lehreinheit_id',lehreinheit_id);

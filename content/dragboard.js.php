@@ -330,16 +330,8 @@ var LeLektorDDObserver=
 
 		req.add('type','lehreinheit_mitarbeiter_add');
 
-		req.add('do', 'create');
 		req.add('lehreinheit_id', lehreinheit_id);
 		req.add('mitarbeiter_uid', uid);
-		req.add('lehrfunktion_kurzbz', 'lektor');
-		req.add('semesterstunden', '0');
-		req.add('planstunden', '0');
-		req.add('stundensatz', '0');
-		req.add('faktor', '1');
-		req.add('anmerkung', '');
-		req.add('bismelden', 'true');
 
 		var response = req.executePOST();
 

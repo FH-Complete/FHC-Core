@@ -215,11 +215,11 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lvplanung/lehrveranstaltung.cs
 							<treecols>
 								<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-bezeichnung" label="Bezeichnung" flex="2" hidden="false"
 										 class="sortDirectionIndicator"
-										 sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#bezeichnung" />
+										 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#bezeichnung" />
 								<splitter class="tree-splitter"/>
 								<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-lehreinheitgruppe_id" label="ID" flex="2" hidden="true"
 										 class="sortDirectionIndicator"
-										 sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#lehreinheitgruppe_id" />
+										 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#lehreinheitgruppe_id" />
 							</treecols>
 							<template>
 								<rule>
@@ -262,19 +262,19 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lvplanung/lehrveranstaltung.cs
 					<treecols>
 						<treecol id="lehrveranstaltung-lehreinheitmitarbeiter-treecol-nachname" label="Nachname" flex="2" hidden="false"
 					    	class="sortDirectionIndicator"
-					    	sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#nachname" onclick="LehreinheitenTreeSort()"/>
+					    	sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#nachname"/>
 					    <splitter class="tree-splitter"/>
 						<treecol id="lehrveranstaltung-lehreinheitmitarbeiter-treecol-vorname" label="Vorname" flex="2" hidden="false"
 					    	class="sortDirectionIndicator"
-					    	sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#vorname" onclick="LehreinheitenTreeSort()"/>
+					    	sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#vorname"/>
 					    <splitter class="tree-splitter"/>
 					    <treecol id="lehrveranstaltung-lehreinheitmitarbeiter-treecol-mitarbeiter_uid" label="UID" flex="2" hidden="true"
 					    	class="sortDirectionIndicator"
-					    	sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#mitarbeiter_uid" onclick="LehreinheitenTreeSort()"/>
+					    	sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#mitarbeiter_uid"/>
 					    <splitter class="tree-splitter"/>
 					    <treecol id="lehrveranstaltung-lehreinheitmitarbeiter-treecol-lehreinheit_id" label="LehreinheitID" flex="2" hidden="true"
 					    	class="sortDirectionIndicator"
-					    	sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#lehreinheit_id" onclick="LehreinheitenTreeSort()"/>
+					    	sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#lehreinheit_id"/>
 					    <splitter class="tree-splitter"/>
 					</treecols>
 					<template>
