@@ -56,26 +56,26 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
 <keyset id="mainkeys">
   <key
      id        =  "menu-file-close:key"
-     key       = "&menu-file-close:key;"
+     key       = "&menu-file-close.key;"
      observes  =  "menu-file-close:command"
      modifiers =  "accel" />
 </keyset>
 
 <toolbox id="main-toolbox">
   <menubar id="menu" >
-    <menu id="menu-file" label="&menu-file:label;" accesskey="&menu-file:accesskey;">
+    <menu id="menu-file" label="&menu-file.label;" accesskey="&menu-file.accesskey;">
       <menupopup id="menu-file-popup">
         <menuitem
            id        =  "menu-file-close"
            key       =  "menu-file-close:key"
-           label     = "&menu-file-close:label;"
+           label     = "&menu-file-close.label;"
            command   =  "menu-file-close:command"
-           accesskey = "&menu-file-close:accesskey;"/>
+           accesskey = "&menu-file-close.accesskey;"/>
       </menupopup>
     </menu>
-    <menu id="menu-edit" label="&menu-edit:label;" accesskey="&menu-edit:accesskey;" onclick="loadUndoList();">
-      <menupopup id="menu-edit-popup" onpopupshowing="debug('wooosaar');">
-        <menu id="menu-edit-undo" label="&menu-edit-undo:label;"
+    <menu id="menu-edit" label="&menu-edit.label;" accesskey="&menu-edit.accesskey;" onclick="loadUndoList();">
+      <menupopup id="menu-edit-popup">
+        <menu id="menu-edit-undo" label="&menu-edit-undo.label;"
            datasources="rdf:null"
            ref="http://www.technikum-wien.at/undo/liste"
         >
@@ -91,24 +91,24 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
         </menu>
       </menupopup>
     </menu>
-    <menu id="menu-prefs" label="&menu-prefs:label;" accesskey="&menu-prefs:accesskey;">
+    <menu id="menu-prefs" label="&menu-prefs.label;" accesskey="&menu-prefs.accesskey;">
 		<menupopup id="menu-prefs-popup">
-			<menu id="menu-prefs-stpltable" label="&menu-prefs-stpltable:label;" accesskey="&menu-prefs-stpltable:accesskey;">
+			<menu id="menu-prefs-stpltable" label="&menu-prefs-stpltable.label;" accesskey="&menu-prefs-stpltable.accesskey;">
 				<menupopup id="menu-prefs-stpltable-popup">
 	        		<menuitem
 	          			 id     	="menu-prefs-stpltable-stundenplan"
 	          			 type		="radio"
 	          			 key       	="menu-prefs-stpltable-stundenplan:key"
-	         			 label     	="&menu-prefs-stpltable-stundenplan:label;"
+	         			 label     	="&menu-prefs-stpltable-stundenplan.label;"
 	         			 command   	="menu-prefs-stpltable-stundenplan:command"
-	           			 accesskey 	="&menu-prefs-stpltable-stundenplan:accesskey;"/>
+	           			 accesskey 	="&menu-prefs-stpltable-stundenplan.accesskey;"/>
 	           		<menuitem
 						 id        	="menu-prefs-stpltable-stundenplandev"
 						 type		="radio"
 	          			 key       	="menu-prefs-stpltable-stundenplandev:key"
-						 label     	="&menu-prefs-stpltable-stundenplandev:label;"
+						 label     	="&menu-prefs-stpltable-stundenplandev.label;"
 						 command   	="menu-prefs-stpltable-stundenplandev:command"
-	           			 accesskey 	="&menu-prefs-stpltable-stundenplandev:accesskey;"/>
+	           			 accesskey 	="&menu-prefs-stpltable-stundenplandev.accesskey;"/>
 	      		</menupopup>
 	      	</menu>
 	      	<menu
@@ -133,14 +133,14 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
         </menu>
 	    </menupopup>
     </menu>
-    <menu id="menu-help" label="&menu-help:label;" accesskey="&menu-help:accesskey;">
+    <menu id="menu-help" label="&menu-help.label;" accesskey="&menu-help.accesskey;">
           <menupopup id="menu-about-popup">
             <menuitem
                id        =  "menu-help-close"
                key       =  "menu-help-close:key"
-               label     = "&menu-help-close:label;"
+               label     = "&menu-help-close.label;"
                command   =  "menu-help-close:command"
-               accesskey = "&menu-help-close:accesskey;"/>
+               accesskey = "&menu-help-close.accesskey;"/>
           </menupopup>
     </menu>
   </menubar>
