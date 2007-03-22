@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -25,8 +25,8 @@ class zeitsperre
 	var $conn;   			// @var resource DB-Handle
 	var $new;     			// @var boolean
 	var $errormsg; 			// @var string
-	var $result = array(); 	// @var news Objekt 
-	
+	var $result = array(); 	// @var news Objekt
+
 	//Tabellenspalten
 	var $zeitsperre_id;			// serial
 	var $zeitsperretyp_kurzbz;	// varchar(8)
@@ -42,8 +42,8 @@ class zeitsperre
 	var $updatevon;				// string
 	var $insertamum;			// timestamp
 	var $insertvon;				// string
-	
-	
+
+
 	/**
 	 * Konstruktor
 	 * @param $conn Connection zur DB
@@ -55,25 +55,29 @@ class zeitsperre
 		if($zeitsperre_id != null)
 			$this->load($zeitsperre_id);
 	}
-		
+
 	// **********************************
 	// * Laedt alle Zeitsperren bei denen
 	// * ende>=now() ist und uid=$uid
 	// **********************************
 	function getzeitsperren($uid)
 	{
-		$qry = "SELECT * FROM campus.tbl_zeitsperre WHERE mitarbeiter_uid='".addslashes($uid)."' AND bisdatum>=now() ORDER BY vondatum";
-		
+		unset($this->result);
+		$this->result=array();
+		$qry = "SELECT * FROM campus.tbl_zeitsperre JOIN campus.tbl_zeitsperretyp USING (zeitsperretyp_kurzbz)
+				WHERE mitarbeiter_uid='".addslashes($uid)."' AND bisdatum>=now() ORDER BY vondatum";
 		if($result = pg_query($this->conn, $qry))
 		{
-		
+
 			while($row = pg_fetch_object($result))
 			{
-		
+
 				$obj = new zeitsperre($this->conn);
-				
+
 				$obj->zeitsperre_id = $row->zeitsperre_id;
 				$obj->zeitsperretyp_kurzbz = $row->zeitsperretyp_kurzbz;
+				$obj->zeitsperretyp_beschreibung = $row->beschreibung;
+				$obj->zeitsperretyp_farbe = $row->farbe;
 				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->vondatum = $row->vondatum;
@@ -86,18 +90,19 @@ class zeitsperre
 				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
-				
+
 				$this->result[] = $obj;
+
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim laden der Zeitsperren';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt eine Zeitsperre
 	 * @param $zeitsperre_id ID der zu laden ist
@@ -105,21 +110,21 @@ class zeitsperre
 	 */
 	function load($zeitsperre_id)
 	{
-		
+
 		if(!is_numeric($zeitsperre_id))
 		{
 			$this->errormsg = 'zeitsperre_id muß eine gültige Zahl sein';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM campus.tbl_zeitsperre WHERE zeitsperre_id = '$zeitsperre_id';";
-		
+
 		if(!$res = pg_query($this->conn, $qry))
 		{
 			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
-		
+
 		if($row=pg_fetch_object($res))
 		{
 			$this->zeitsperre_id = $row->zeitsperre_id;
@@ -137,15 +142,15 @@ class zeitsperre
 			$this->insertamum = $row->insertamum;
 			$this->insertvon = $row->insertvon;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Es ist kein Datensatz mit dieser ID vorhanden';
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Loescht einen Datensatz
 	 * @param $zeitsperre_id id des Datensatzes der geloescht werden soll
@@ -158,23 +163,23 @@ class zeitsperre
 			$this->errormsg = 'Zeitsperre_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		$qry = "DELETE FROM campus.tbl_zeitsperre WHERE zeitsperre_id='$zeitsperre_id'";
-		
+
 		if(pg_query($this->conn, $qry))
 			return true;
 		else
 		{
 			$this->errormsg = 'Fehler beim L&ouml;schen';
 			return false;
-		}		
+		}
 	}
-	
+
 	function addslashes($var)
 	{
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
-	
+
 	/**
 	 * Prueft die Gueltigkeit der Variablen
 	 * @return true wenn ok, false im Fehlerfall
@@ -201,27 +206,27 @@ class zeitsperre
 			$this->errormsg = "Erreichbarkeit darf nicht laenger als 8 Zeichen sein";
 			return false;
 		}
-		
+
 		$this->errormsg = '';
-		return true;		
+		return true;
 	}
-	
+
 	/**
 	 * Speichert den aktuellen Datensatz
 	 * @return true wenn ok, false im Fehlerfall
-	 */	
+	 */
 	function save()
 	{
 		//Gueltigkeit der Variablen pruefen
 		if(!$this->checkvars())
 			return false;
-			
+
 		if($this->new)
 		{
-			//Neuen Datensatz anlegen	
-						
+			//Neuen Datensatz anlegen
+
 			$qry = 'INSERT INTO campus.tbl_zeitsperre (zeitsperretyp_kurzbz, mitarbeiter_uid, bezeichnung,'.
-			       ' vondatum ,vonstunde, bisdatum, bisstunde, erreichbarkeit, vertretung_uid, insertamum,'. 
+			       ' vondatum ,vonstunde, bisdatum, bisstunde, erreichbarkeit, vertretung_uid, insertamum,'.
 			       ' insertvon, updateamum, updatevon) VALUES ('.
 					$this->addslashes($this->zeitsperretyp_kurzbz).', '.
 					$this->addslashes($this->mitarbeiter_uid).', '.
@@ -237,18 +242,18 @@ class zeitsperre
 					$this->addslashes($this->updateamum).', '.
 					$this->addslashes($this->updatevon).'); ';
 		}
-		else 
+		else
 		{
 			//bestehenden Datensatz akualisieren
-			
+
 			//Pruefen ob zeitsperre_id eine gueltige Zahl ist
 			if(!is_numeric($this->zeitsperre_id) || $this->zeitsperre_id == '')
 			{
 				$this->errormsg = 'Zeitsperre_id muss eine gueltige Zahl sein';
 				return false;
 			}
-			
-			$qry = 'UPDATE campus.tbl_zeitsperre SET '. 
+
+			$qry = 'UPDATE campus.tbl_zeitsperre SET '.
 				'zeitsperretyp_kurzbz='.$this->addslashes($this->zeitsperretyp_kurzbz).', '.
 				'mitarbeiter_uid='.$this->addslashes($this->mitarbeiter_uid).', '.
 				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
@@ -264,7 +269,7 @@ class zeitsperre
 				'updatevon='.$this->addslashes($this->updatevon).'  '.
 				'WHERE zeitsperre_id = '.$this->addslashes($this->zeitsperre_id).';';
 		}
-		
+
 		if(pg_query($this->conn, $qry))
 		{
 			return true;
@@ -273,7 +278,26 @@ class zeitsperre
 		{
 			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
 			return false;
-		}		
+		}
 	}
+
+	/**
+	 * Liefert ZeitsperreTypen eines Tages
+	 * @return string wenn ok, false im Fehlerfall
+	 */
+	function getTyp($datum)
+	{
+		$datum_obj=new datum();
+		$typ='';
+		foreach ($this->result as $zs)
+		{
+			$beginn=$datum_obj->mktime_fromdate($zs->vondatum);
+			$ende=$datum_obj->mktime_fromdate($zs->bisdatum);
+			if ($datum>$beginn && $datum<$ende)
+				$typ.=$zs->zeitsperretyp_kurzbz;
+		}
+		return $typ;
+	}
+
 }
 ?>

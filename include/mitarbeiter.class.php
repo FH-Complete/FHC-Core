@@ -65,7 +65,7 @@ class mitarbeiter extends benutzer
 	{
 		if(!benutzer::load($uid))
 			return false;
-		
+
 		$qry = "SELECT * FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='$uid'";
 		if($result = pg_query($this->conn, $qry))
 		{
@@ -82,19 +82,19 @@ class mitarbeiter extends benutzer
 				$this->ext_id_mitarbeiter = $row->ext_id;
 				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = "Kein Eintrag gefunden fuer $uid\n";
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = "Fehler beim Laden: $qry\n";
 			return false;
 		}
 	}
-	
+
 	// ************************************************
 	// * ueberprueft die Variablen auf Gueltigkeit
 	// * @return true wenn gueltig, false im Fehlerfall
@@ -177,7 +177,7 @@ class mitarbeiter extends benutzer
 		if($this->new)
 		{
 
-			//Neuen Datensatz anlegen							
+			//Neuen Datensatz anlegen
 			$qry = "INSERT INTO public.tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz,
 			                    fixangestellt, standort_kurzbz, telefonklappe, updateamum, updatevon, ext_id)
 
@@ -290,8 +290,8 @@ class mitarbeiter extends benutzer
 		}
 		return $result;
 	}
-	
-	function getMitarbeiterStg($lektor,$fixangestellt,$stge, $fkt_kurzbz)
+
+	function getMitarbeiterStg($lektor,$fixangestellt, $stge, $fkt_kurzbz)
 	{
 		$sql_query='SELECT DISTINCT campus.vw_mitarbeiter.*, tbl_benutzerfunktion.studiengang_kz FROM campus.vw_mitarbeiter
 					JOIN public.tbl_benutzerfunktion USING (uid)
@@ -325,7 +325,7 @@ class mitarbeiter extends benutzer
 			if($in!='')
 				$sql_query.=' AND studiengang_kz in (-1'.$in.')';
 		}
-	    	$sql_query.=' ORDER BY studiengang_kz, nachname, vornamen, kurzbz';
+	    	$sql_query.=' ORDER BY studiengang_kz, nachname, vorname, kurzbz';
 	    //echo $sql_query;
 
 		if(!($erg=pg_query($this->conn, $sql_query)))
