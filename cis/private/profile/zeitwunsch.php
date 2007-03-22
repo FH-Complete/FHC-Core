@@ -15,29 +15,29 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 // **
-// * @brief bietet die Moeglichkeit zur Anzeige und 
+// * @brief bietet die Moeglichkeit zur Anzeige und
 // * Aenderung der Zeitwuensche und Zeitsperren
 
 	require_once('../../config.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/zeitsperre.class.php');
 	require_once('../../../include/datum.class.php');
-	
+
 	$uid = get_uid();
 
 	if(isset($_GET['type']))
 		$type=$_GET['type'];
-	
+
 	if (!$conn = @pg_pconnect(CONN_STRING))
 	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
-	   	
+
 	$datum_obj = new datum();
-	
+
 	//Stundentabelleholen
 	if(! $result_stunde=pg_query($conn, "SET search_path TO campus; SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
 		die(pg_last_error($conn));
@@ -183,9 +183,9 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		$error=true;
 		$errormsg .= 'Bis-Datum ist ung&uuml;ltig ';
 	}
-	
+
 	$zeitsperre = new zeitsperre($conn);
-	
+
 	if($_GET['type']=='edit_sperre')
 	{
 		if(!is_numeric($_GET['id']))
@@ -199,19 +199,19 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 			$zeitsperre->load($_GET['id']);
 			$zeitsperre->new=false;
 			$zeitsperre->zeitsperre_id = $_GET['id'];
-			
+
 			//pruefen ob die geladene id auch von der person ist die angemeldet ist
 			if($zeitsperre->mitarbeiter_uid!=$uid)
 				die('Sie haben keine Berechtigung fuer diese Zeitsperre');
 		}
 	}
-	else 
-	{		
+	else
+	{
 		$zeitsperre->new=true;
 		$zeitsperre->insertamum = date('Y-m-d H:i:s');
 		$zeitsperre->insertvon = $uid;
 	}
-		
+
 	if(!$error)
 	{
 		$zeitsperre->zeitsperretyp_kurzbz = $_POST['zeitsperretyp_kurzbz'];
@@ -225,7 +225,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		$zeitsperre->vertretung_uid = $_POST['vertretung_uid'];
 		$zeitsperre->updateamum = date('Y-m-d H:i:s');
 		$zeitsperre->updatevon = $uid;
-		
+
 		if($zeitsperre->save())
 		{
 			echo "Daten wurden erfolgreich gespeichert";
@@ -233,7 +233,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		else
 			echo "<span class='error'>Fehler beim Speichern der Daten</span>";
 	}
-	else 
+	else
 		echo "<span class='error'>$error_msg</span>";
 }
 
@@ -250,11 +250,11 @@ if(isset($_GET['type']) && $_GET['type']=='delete_sperre')
 		{
 			echo "Eintrag wurde geloescht";
 		}
-		else 
+		else
 			echo "<span class='error'>Fehler beim loeschen des Eintrages</span>";
 	}
-	else 
-		echo "<span class='error'>Sie haben keine Berechtigung diesen Datensatz zu loeschen</span>";			
+	else
+		echo "<span class='error'>Sie haben keine Berechtigung diesen Datensatz zu loeschen</span>";
 }
 
 //zeitsperren des users laden
@@ -277,9 +277,9 @@ if(count($zeit->result)>0)
 	}
 	$content_table.= '</table>';
 }
-else 
+else
 	$content_table.= "Derzeit sind keine Zeitsperren eingetragen!";
-	
+
 $zeitsperre = new zeitsperre($conn);
 $action = "$PHP_SELF?type=new_sperre";
 //wenn ein datensatz editiert werden soll, dann diesen laden
@@ -295,7 +295,7 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 		}
 		$action = "$PHP_SELF?type=edit_sperre&id=".$_GET['id'];
 	}
-	else 
+	else
 	{
 		die("<span class='error'>Fehlerhafte Parameteruebergabe</span>");
 	}
@@ -312,9 +312,9 @@ if($result = pg_query($conn, $qry))
 	while($row=pg_fetch_object($result))
 	{
 		if($zeitsperre->zeitsperretyp_kurzbz == $row->zeitsperretyp_kurzbz)
-			$content_form.= "<OPTION value='$row->zeitsperretyp_kurzbz' selected>$row->zeitsperretyp_kurzbz</OPTION>";
+			$content_form.= "<OPTION value='$row->zeitsperretyp_kurzbz' selected>$row->zeitsperretyp_kurzbz - $row->beschreibung</OPTION>";
 		else
-			$content_form.= "<OPTION value='$row->zeitsperretyp_kurzbz'>$row->zeitsperretyp_kurzbz</OPTION>";
+			$content_form.= "<OPTION value='$row->zeitsperretyp_kurzbz'>$row->zeitsperretyp_kurzbz - $row->beschreibung</OPTION>";
 	}
 }
 $content_form.= '</SELECT>';
@@ -332,7 +332,7 @@ else
 for($i=0;$i<$num_rows_stunde;$i++)
 {
 	$row = pg_fetch_object($result_stunde, $i);
-	
+
 	if($zeitsperre->vonstunde==$row->stunde)
 		$content_form.= "<OPTION value='$row->stunde' selected>$row->stunde</OPTION>\n";
 	else
@@ -373,7 +373,7 @@ if($result = pg_query($conn, $qry))
 	{
 		if($zeitsperre->vertretung_uid == $row->uid)
 			$content_form.= "<OPTION value='$row->uid' selected>$row->nachname $row->vorname ($row->uid)</OPTION>\n";
-		else 
+		else
 			$content_form.= "<OPTION value='$row->uid'>$row->nachname $row->vorname ($row->uid)</OPTION>\n";
 	}
 }
@@ -382,7 +382,7 @@ $content_form.= '<tr><td>&nbsp;</td><td>';
 
 if(isset($_GET['type']) && $_GET['type']=='edit')
 	$content_form.= "<input type='submit' name='submit_zeitsperre' value='Speichern'>";
-else 
+else
 	$content_form.= "<input type='submit' name='submit_zeitsperre' value='Hinzufügen'>";
 $content_form.= '</td></tr>';
 $content_form.= '</table>';
