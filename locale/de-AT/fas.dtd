@@ -1,38 +1,38 @@
 <!ENTITY window.title			"FASo"> 
 <!ENTITY window.version			"0.5 vom 21.Maerz 2007"> 
 
-<!ENTITY menu-file:label              	"Datei">
-<!ENTITY menu-file:accesskey           	"D">
+<!ENTITY menu-file.label              	"Datei">
+<!ENTITY menu-file.accesskey           	"D">
 
-<!ENTITY menu-file-close:key           	"D">
-<!ENTITY menu-file-close:label         	"Beenden">
-<!ENTITY menu-file-close:accesskey     	"B">
+<!ENTITY menu-file-close.key           	"D">
+<!ENTITY menu-file-close.label         	"Beenden">
+<!ENTITY menu-file-close.accesskey     	"B">
 
 
-<!ENTITY menu-help:label              	"Hilfe">
-<!ENTITY menu-help:accesskey          	"H">
+<!ENTITY menu-help.label              	"Hilfe">
+<!ENTITY menu-help.accesskey          	"H">
 
-<!ENTITY menu-help-close:key          	"H">
-<!ENTITY menu-help-close:label        	"Ueber">
-<!ENTITY menu-help-close:accesskey    	"U">
+<!ENTITY menu-help-close.key          	"H">
+<!ENTITY menu-help-close.label        	"Ueber">
+<!ENTITY menu-help-close.accesskey    	"U">
 
-<!ENTITY menu-edit:label              	"Bearbeiten">
-<!ENTITY menu-edit:accesskey          	"B">
+<!ENTITY menu-edit.label              	"Bearbeiten">
+<!ENTITY menu-edit.accesskey          	"B">
 
-<!ENTITY menu-edit-undo:key           	"">
-<!ENTITY menu-edit-undo:label         	"Undo">
-<!ENTITY menu-edit-undo:accesskey     	"">
+<!ENTITY menu-edit-undo.key           	"">
+<!ENTITY menu-edit-undo.label         	"Undo">
+<!ENTITY menu-edit-undo.accesskey     	"">
 
-<!ENTITY menu-prefs:label              	"Einstellungen">
-<!ENTITY menu-prefs:accesskey          	"E">
+<!ENTITY menu-prefs.label              	"Einstellungen">
+<!ENTITY menu-prefs.accesskey          	"E">
 
-<!ENTITY menu-prefs-stpltable:label    	"Stpl-Tabelle">
-<!ENTITY menu-prefs-stpltable:accesskey	"T">
+<!ENTITY menu-prefs-stpltable.label    	"Stpl-Tabelle">
+<!ENTITY menu-prefs-stpltable.accesskey	"T">
 
-<!ENTITY menu-prefs-stpltable-stundenplan:key      	"s">
-<!ENTITY menu-prefs-stpltable-stundenplan:label    	"stundenplan">
-<!ENTITY menu-prefs-stpltable-stundenplan:accesskey	"s">
+<!ENTITY menu-prefs-stpltable-stundenplan.key      	"s">
+<!ENTITY menu-prefs-stpltable-stundenplan.label    	"stundenplan">
+<!ENTITY menu-prefs-stpltable-stundenplan.accesskey	"s">
 
-<!ENTITY menu-prefs-stpltable-stundenplandev:key      	"d">
-<!ENTITY menu-prefs-stpltable-stundenplandev:label    	"stundenplandev">
-<!ENTITY menu-prefs-stpltable-stundenplandev:accesskey	"d">
+<!ENTITY menu-prefs-stpltable-stundenplandev.key      	"d">
+<!ENTITY menu-prefs-stpltable-stundenplandev.label    	"stundenplandev">
+<!ENTITY menu-prefs-stpltable-stundenplandev.accesskey	"d">
