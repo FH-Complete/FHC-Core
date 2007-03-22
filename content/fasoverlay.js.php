@@ -152,11 +152,16 @@ function auswahlValues()
 	this.lektor_uid=null;
 }
 
-function onVerbandSelect()
+function onVerbandSelect(evt)
 {
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
 	var tree=document.getElementById('tree-verband');
+	//Wenn nichts markiert wurde -> beenden
 	if(tree.currentIndex==-1)
+		return;
+		
+	//Wenn nicht auf eine der Zeilen gedrueckt wurde (zb Scrollbar) -> beenden
+	if(evt.target.nodeName!='treechildren')
 		return;
 		
 	var col;

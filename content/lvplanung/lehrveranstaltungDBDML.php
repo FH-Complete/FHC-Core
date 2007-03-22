@@ -67,7 +67,7 @@ if(!$rechte->isBerechtigt('admin'))
 
 if(!$error)
 {
-	if(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_add')
+	if(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_save')
 	{
 		//Lehreinheitmitarbeiter Zuteilung
 		//wenn do=update dann wird aktualisiert
@@ -145,6 +145,75 @@ if(!$error)
 					}
 				}
 			}
+		}
+	}
+	if(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_add')
+	{
+		//neue Lehreinheitmitarbeiterzuteilung anlegen
+		
+		if(isset($_POST['lehreinheit_id']) && isset($_POST['mitarbeiter_uid']))
+		{
+			$lem = new lehreinheitmitarbeiter($conn, null, null, true);
+			
+			$lem->lehreinheit_id = $_POST['lehreinheit_id'];
+			$lem->lehrfunktion_kurzbz = 'lektor';
+			$lem->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
+			
+			$lem->semesterstunden = '0';
+			$lem->planstunden = '0';
+			$lem->faktor = '1';
+			$lem->anmerkung = '';
+			$lem->bismelden = true;
+			$lem->updateamum = date('Y-m-d H:i:s');
+			$lem->updatevon = $user;
+			$lem->insertamum = date('Y-m-d H:i:s');
+			$lem->insertvon = $user;
+			$lem->new=true;
+			
+			
+			$qry = "SELECT stundensatz FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='".addslashes($_POST['mitarbeiter_uid'])."'";
+			if($result = pg_query($conn, $qry))
+			{
+				if($row = pg_fetch_object($result))
+				{
+					if($row->stundensatz!='')
+						$lem->stundensatz = $row->stundensatz;
+					else 
+						$lem->stundensatz = '0';
+				}
+				else 
+				{
+					$error=true;
+					$return=false;
+					$errormsg='Mitarbeiter '.addslashes($_POST['mitarbeiter_uid']).' wurde nicht gefunden';
+				}
+			}
+			else 
+			{
+				$error=true;
+				$return=false;
+				$errormsg='Fehler bei einer Datenbankabfrage:'.pg_errormessage($conn);
+			}
+									
+			if(!$error)
+			{
+				if($lem->save())
+				{
+					$return = true;
+					$error = false;
+				}
+				else
+				{
+					$return = false;
+					$errormsg = $lem->errormsg;
+					$error = true;
+				}
+			}
+		}
+		else 
+		{
+			$return = false;
+			$errormsg = 'Fehlerhafte Parameteruebergabe';
 		}
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_del')

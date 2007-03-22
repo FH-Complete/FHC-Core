@@ -173,7 +173,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungdetailo
 		<!-- ************ -->
 		<vbox flex="1"  style="overflow:auto;margin:0px;" persist="height">
 			<tabbox id="lehrveranstaltung-tabbox" flex="3" orient="vertical">
-				<tabs orient="horizontal">
+				<tabs orient="horizontal" id="lehrveranstaltung-tabs">
 					<tab id="lehrveranstaltung-tab-detail" label="Details" />
 					<tab id="lehrveranstaltung-tab-lektor" label="Lektorenzuteilung" />
 				</tabs>
