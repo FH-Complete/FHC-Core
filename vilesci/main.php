@@ -13,7 +13,9 @@
   <ul>
 	<li><a href="http://cis.technikum-wien.at" target="_top" >FH-Interne Homepage</a>
     <li><a href="http://wawi.technikum-wien.at" target="_top" >Warenwirtschaft</a>
-    
+    <hr />
+    <li><a href="mozilla-win32-1.7.12-installer.exe" target="_top" >Mozilla Installer</a>
+
   </ul>
 </div>
 
