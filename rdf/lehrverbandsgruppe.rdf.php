@@ -2,7 +2,7 @@
 header("Content-type: application/vnd.mozilla.xul+xml");
 echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
 include('../vilesci/config.inc.php');
-include('../include/berechtigung.class.php');
+include('../include/benutzerberechtigung.class.php');
 
 $rdf_url='http://www.technikum-wien.at/lehrverbandsgruppe/';
 
@@ -14,9 +14,10 @@ if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 // Berechtigungen ermitteln
-$berechtigung=new berechtigung($conn);
+$berechtigung=new benutzerberechtigung($conn);
 $berechtigung->getBerechtigungen($uid);
 $berechtigt_studiengang=$berechtigung->getStgKz();
+//var_dump($berechtigung);
 $stg_kz_query='';
 if (count($berechtigt_studiengang)>0)
 	if ($berechtigt_studiengang[0]!=0)
@@ -30,7 +31,7 @@ $sql_query="SET search_path TO public;
 			SELECT tbl_lehrverband.studiengang_kz, tbl_studiengang.bezeichnung, kurzbz, typ, tbl_lehrverband.semester, verband, gruppe, gruppe_kurzbz, tbl_lehrverband.bezeichnung AS lvb_bezeichnung, tbl_gruppe.bezeichnung AS grp_bezeichnung
 			FROM (tbl_studiengang JOIN tbl_lehrverband USING (studiengang_kz))
 				LEFT OUTER JOIN tbl_gruppe  ON (tbl_lehrverband.studiengang_kz=tbl_gruppe.studiengang_kz AND tbl_lehrverband.semester=tbl_gruppe.semester AND (tbl_lehrverband.verband=''))
-			WHERE tbl_lehrverband.studiengang_kz>=0 $stg_kz_query AND tbl_lehrverband.aktiv
+			WHERE tbl_lehrverband.aktiv $stg_kz_query
 			ORDER BY erhalter_kz,typ, kurzbz, semester,verband,gruppe, gruppe_kurzbz;";
 //echo $sql_query;
 if(!$result=pg_query($conn, $sql_query))
@@ -65,7 +66,11 @@ while ($row=pg_fetch_object($result))
 		?>
 
 		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$sem; ?>">
-			<VERBAND:name><?php echo $stg_kurzbz.'-'.$sem.'-'.$row->lvb_bezeichnung; ?></VERBAND:name>
+			<VERBAND:name><?php echo $stg_kurzbz.'-'.$sem;
+								if ($row->lvb_bezeichnung!='' && $row->lvb_bezeichnung!=null)
+									echo '  ('.$row->lvb_bezeichnung.')';
+							?>
+			</VERBAND:name>
 			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
 			<VERBAND:stg_kz><?php echo $stg_kz; ?></VERBAND:stg_kz>
 			<VERBAND:sem><?php echo $sem; ?></VERBAND:sem>
