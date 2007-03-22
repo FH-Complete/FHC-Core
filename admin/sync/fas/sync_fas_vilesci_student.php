@@ -1726,11 +1726,11 @@ if($result = pg_query($conn_fas, $qry))
 									$updateb=true;
 									if(strlen(trim($ausgabe_benutzer))>0)
 									{
-										$ausgabe_benutzer.=", Aktiv: '".($aktiv?'true':'false')."' statt ('".($rows->aktiv?'true':'false')."')";
+										$ausgabe_benutzer.=", Aktiv: '".($aktiv?'true':'false')."' statt('".($rows->aktiv?'true':'false')."')";
 									}
 									else
 									{
-										$ausgabe_benutzer="Aktiv: '".($aktiv?'true':'false')."' statt ('".($rows->aktiv?'true':'false')."')";
+										$ausgabe_benutzer="Aktiv: '".($aktiv?'true':'false')."' statt('".($rows->aktiv?'true':'false')."')";
 									}
 								}		
 								if($rows->ext_id!=$ext_id_benutzer)
@@ -1819,11 +1819,11 @@ if($result = pg_query($conn_fas, $qry))
 										$updates=true;
 										if(strlen(trim($ausgabe_student))>0)
 										{
-											$ausgabe_student.=", Matrikelnummer: '".$matrikelnr."' (statt '".$rows->matrikelnr."')";
+											$ausgabe_student.=", Matrikelnummer: '".$matrikelnr."' (statt '".trim($rows->matrikelnr)."')";
 										}
 										else
 										{
-											$ausgabe_student="Matrikelnummer: '".$matrikelnr."' (statt '".$rows->matrikelnr."')";
+											$ausgabe_student="Matrikelnummer: '".$matrikelnr."' (statt '".trim($rows->matrikelnr)."')";
 										}
 									}
 									if($rows->prestudent_id!=$prestudent_id)
