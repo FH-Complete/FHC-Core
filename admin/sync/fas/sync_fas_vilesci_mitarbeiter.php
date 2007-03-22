@@ -298,7 +298,7 @@ AND (p1.person_pk <> p2.person_pk)
 AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400')
 AND (p1.familienname<>p2.familienname OR p1.vorname<>p2.vorname OR p1.vornamen<>p2.vornamen OR p1.geschlecht<>p2.geschlecht OR p1.gebdat<>p2.gebdat OR p1.gebort<>p2.gebort OR p1.staatsbuergerschaft<> p2.staatsbuergerschaft OR p1.familienstand<>p2.familienstand OR p1.svnr<>p2.svnr OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.anrede<>p2.anrede OR p1.anzahlderkinder<>p2.anzahlderkinder OR p1.titel<>p2.titel OR p1.gebnation<>p2.gebnation OR p1.postnomentitel<> p2.postnomentitel 
 	OR p1.beginndatum<>p2.beginndatum OR p1.akadgrad<>p2.akadgrad OR p1.habilitation<>p2.habilitation OR p1.mitgliedentwicklungsteam<>p2.mitgliedentwicklungsteam OR p1.qualifikation<>p2.qualifikation OR p1.hauptberuflich<>p2.hauptberuflich OR p1.hauptberuf<>p2.hauptberuf OR p1.semesterwochenstunden<>p2.semesterwochenstunden OR p1.persnr<>p2.persnr OR p1.beendigungsdatum<>p2.beendigungsdatum OR p1.ausgeschieden<>p2.ausgeschieden OR p1.kurzbez<>p2.kurzbez OR p1.stundensatz<>p2.stundensatz OR p1.ausbildung<>p2.ausbildung OR p1.aktiv<>p2.aktiv) 
-);";
+) ORDER BY p1.familienname;";
 
 if($resultall = pg_query($conn_fas, $qryall))
 {
@@ -337,7 +337,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 		$persongeschlecht=strtolower($rowall->geschlecht);
 		$personext_id=$rowall->person_pk;
 		$personaktiv=true;
-		$personupdatevon='SYNC';
+		$personupdatevon=$rowall->creationuser;
 		$personinsertvon='SYNC';
 		$personupdateamum=$rowall->creationdate;
 		$personinsertvon=$rowall->creationdate;
@@ -374,7 +374,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 		$mitarbeiterkurzbz=trim($rowall->kurzbez);
 		$mitarbeiterlektor=true;
 		$mitarbeiterfixangestellt=($rowall->hauptberuflich=='J'?true:false);
-		$mitarbeiterstundensatz=0;
+		$mitarbeiterstundensatz=$rowall->stundensatz;
 		if($rowall->ausbildung>0)
 		{
 			$mitarbeiterausbildungcode=$rowall->ausbildung;
@@ -385,7 +385,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 		}
 		$mitarbeiterort_kurzbz=null;
 		$mitarbeiteranmerkung=$rowall->bemerkung;
-		$mitarbeiterinsertvon='SYNC';
+		$mitarbeiterinsertvon=$rowall->creationuser;
 		$mitarbeiterinsertamum=$rowall->creationdate;
 		$mitarbeiterupdateamum=$rowall->creationdate;
 		$mitarbeiterupdatevon='SYNC';
@@ -398,7 +398,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 		$benutzerperson_id='';
 		$benutzeraktiv=($rowall->aktiv=='t'?true:false);
 		$benutzeralias='';
-		$benutzerinsertvon='SYNC';
+		$benutzerinsertvon=$rowall->creationuser;
 		$benutzerinsertamum=$rowall->creationdate;
 		$benutzerupdateamum=$rowall->creationdate;
 		$benutzerupdatevon='SYNC';
@@ -504,9 +504,9 @@ if($resultall = pg_query($conn_fas, $qryall))
 						        myaddslashes($personanzahlkinder).", ".
 						        myaddslashes($personaktiv?'true':'false').", ".
 						        myaddslashes($personinsertamum).", ".
-						        myaddslashes($personinsertvon).", ".
-						        myaddslashes($personupdateamum).", ".
-						        myaddslashes($personupdatevon).", ".
+						        myaddslashes($personinsertvon).", 
+						        now(), 
+						        'SYNC', ".
 						        myaddslashes($persongeschlecht).", ".
 						        myaddslashes($persongeburtsnation).", ".
 						        myaddslashes($personstaatsbuergerschaft).", ".
@@ -769,7 +769,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 								       anzahlkinder=".myaddslashes($personanzahlkinder).", 
 								       aktiv=".myaddslashes($personaktiv?'true':'false').", 
 								       updateamum=now(),
-								       updatevon=".myaddslashes($personupdatevon).", 
+								       updatevon='SYNC', 
 								       geschlecht=".myaddslashes($persongeschlecht).", 
 								       geburtsnation=".myaddslashes($persongeburtsnation).", 
 								       staatsbuergerschaft=".myaddslashes($personstaatsbuergerschaft).", 
@@ -834,9 +834,9 @@ if($resultall = pg_query($conn_fas, $qryall))
 							myaddslashes($benutzeralias).", ".
 							myaddslashes($personperson_id).", ".
 							myaddslashes($benutzerinsertamum).", ".
-							myaddslashes($benutzerinsertvon).", ".
-							myaddslashes($benutzerupdateamum).", ".
-							myaddslashes($benutzerupdatevon).");";
+							myaddslashes($benutzerinsertvon).", 
+							now() , 
+							'SYNC');";
 							$ausgabe_benutzer="Benutzer ".$benutzeruid." ".$benutzeralias." eingefügt.\n";
 					}
 					else
@@ -879,7 +879,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 							       aktiv=".myaddslashes($benutzeraktiv?'true':'false').", 
 							       person_id=".myaddslashes($personperson_id).", 
 							       updateamum=now(), 
-							       updatevon=".myaddslashes($benutzerupdatevon)."
+							       updatevon='SYNC' 
 							       WHERE uid='$benutzeruid';";
 							$ausgabe_benutzer="Änderungen bei Benutzer ".$benutzeruid." ".$benutzeralias.": ".$ausgabe_benutzer."\n";
 						}
@@ -937,7 +937,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 							{
 					
 								//Neuen Datensatz anlegen							
-								$qry = "INSERT INTO public.tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz, fixangestellt, telefonklappe, anmerkung, updateamum, updatevon, insertamum, insertvon, ext_id) VALUES(".
+								$qry = "INSERT INTO public.tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz, fixangestellt, telefonklappe,stundensatz, anmerkung, updateamum, updatevon, insertamum, insertvon, ext_id) VALUES(".
 								myaddslashes($mitarbeiteruid).", ".
 								myaddslashes($mitarbeiterausbildungcode).", ".
 								myaddslashes($mitarbeiterpersonalnummer)." , ".
@@ -946,10 +946,11 @@ if($resultall = pg_query($conn_fas, $qryall))
 								myaddslashes($mitarbeiterort_kurzbz).", ".
 								myaddslashes($mitarbeiterfixangestellt?'true':'false').", ".
 								myaddslashes($mitarbeitertelefonklappe)." , ".
-								myaddslashes($mitarbeiteranmerkung).", ".
+								myaddslashes($mitarbeiterstundensatz)." , ".
+								myaddslashes($mitarbeiteranmerkung).", 
+								now(), 
+								'SYNC' ,". 
 								myaddslashes($mitarbeiterinsertamum).", ".
-								myaddslashes($mitarbeiterupdatevon)." , ".
-								myaddslashes($mitarbeiterupdateamum).", ".
 								myaddslashes($mitarbeiterinsertvon)." , ".
 								myaddslashes($mitarbeiterext_id).");";
 								$ausgabe_mitarbeiter="Mitarbeiter ".$mitarbeiterpersonalnummer." ".$mitarbeiterkurzbz." eingefügt.\n";
@@ -999,6 +1000,18 @@ if($resultall = pg_query($conn_fas, $qryall))
 												$ausgabe_mitarbeiter="Kurzbezeichnung: '".$mitarbeiterkurzbz."'";
 											}
 										}
+										if($rowu->stundensatz!=$mitarbeiterstundensatz)
+										{
+											$updatem=true;
+											if(strlen(trim($ausgabe_mitarbeiter))>0)
+											{
+												$ausgabe_mitarbeiter.=", Stundensatz: '".$mitarbeiterstundensatz."'";
+											}
+											else
+											{
+												$ausgabe_mitarbeiter="Stundensatz: '".$mitarbeiterstundensatz."'";
+											}
+										}
 										if($rowu->telefonklappe!=$mitarbeitertelefonklappe)
 										{
 											$updatem=true;
@@ -1043,11 +1056,12 @@ if($resultall = pg_query($conn_fas, $qryall))
 									ausbildungcode=".myaddslashes($mitarbeiterausbildungcode).", 
 									personalnummer=".myaddslashes($mitarbeiterpersonalnummer).", 
 									kurzbz=".myaddslashes($mitarbeiterkurzbz).", 
-									telefonklappe=".myaddslashes($mitarbeitertelefonklappe).", 
+									telefonklappe=".myaddslashes($mitarbeitertelefonklappe).",
+									stundensatz=".myaddslashes($mitarbeiterstundensatz).",  
 									ort_kurzbz=".myaddslashes($mitarbeiterort_kurzbz).", 
 									anmerkung=".myaddslashes($mitarbeiteranmerkung).", 
 									updateamum=now(), 
-									updatevon=".myaddslashes($mitarbeiterupdatevon).", 
+									updatevon='SYNC', 
 									ext_id=".myaddslashes($mitarbeiterext_id)." 
 									WHERE mitarbeiter_uid='$mitarbeiteruid';";
 									$ausgabe_mitarbeiter="Änderungen bei Mitarbeiter ".$mitarbeiteruid.": ".$ausgabe_mitarbeiter."\n";
@@ -1152,9 +1166,10 @@ echo nl2br("\n=====\n".$ausgabe);
 $ausgabe="Mitarbeiter Sync\n----------------\n\nGesamt FAS: $anzahl_quelle\nPerson:        Eingefügt: $anzahl_eingefuegt_person / geaendert: $anzahl_geaendert_person / Fehler: $anzahl_fehler_person"
 ."\nBenutzer:     Eingefügt: $anzahl_eingefuegt_benutzer / geaendert: $anzahl_geaendert_benutzer / Fehler: $anzahl_fehler_benutzer"
 ."\nMitarbeiter: Eingefügt: $anzahl_eingefuegt_mitarbeiter / geaendert: $anzahl_geaendert_mitarbeiter / Fehler: $anzahl_fehler_mitarbeiter.\n\n".$ausgabe;
-$error_log="\n\n\nFehler:\n$error_log";
+
 if(strlen(trim($error_log))>0)
 {
+	$error_log="\n\n\nFehler:\n$error_log";
 	mail($adress, 'SYNC-Fehler Mitarbeiter von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");
 }
 mail($adress, 'SYNC Mitarbeiter von '.$_SERVER['HTTP_HOST'], $ausgabe,"From: vilesci@technikum-wien.at");
