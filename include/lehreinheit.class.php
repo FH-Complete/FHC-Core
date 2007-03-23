@@ -199,9 +199,14 @@ class lehreinheit
 	}
 
 
-	function load_lehreinheiten($lehrveranstaltung_id, $studiensemester_kurzbz)
+	function load_lehreinheiten($lehrveranstaltung_id, $studiensemester_kurzbz, $uid='')
 	{
-		$qry = "SELECT * FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lehrveranstaltung_id' AND studiensemester_kurzbz='$studiensemester_kurzbz' ORDER BY lehreinheit_id";
+		$qry = "SELECT * FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lehrveranstaltung_id' AND studiensemester_kurzbz='$studiensemester_kurzbz' ";
+		
+		if($uid!='')		
+			$qry .= " AND lehreinheit_id IN ( SELECT lehreinheit_id FROM lehre.tbl_lehreinheitmitarbeiter WHERE mitarbeiter_uid='".addslashes($uid)."')";
+		
+		$qry.= "ORDER BY lehreinheit_id";
 
 		if($result = pg_query($this->conn, $qry))
 		{			

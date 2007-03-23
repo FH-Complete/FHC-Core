@@ -60,13 +60,20 @@ $grp=(isset($_GET['grp'])?$_GET['grp']:'');
 $ver=(isset($_GET['ver'])?$_GET['ver']:'');
 $sem=(isset($_GET['sem'])?$_GET['sem']:'');
 $stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:'');
-$lektor=(isset($_GET['lektor'])?$_GET['lektor']:'');
-
+$uid=(isset($_GET['uid'])?$_GET['uid']:'');
 
 loadVariables($conn, $user);
+
 // LVAs holen
 $lvaDAO=new lehrveranstaltung($conn, null, true);
-$lvaDAO->load_lva($stg_kz, $sem);
+if($uid!='')
+{	
+	$lvaDAO->loadLVAfromMitarbeiter($stg_kz, $uid, $semester_aktuell);
+}
+else 
+{	
+	$lvaDAO->load_lva($stg_kz, $sem);
+}
 
 $rdf_url='http://www.technikum-wien.at/lehrveranstaltung_einheiten';
 
@@ -119,7 +126,7 @@ $rdf_url='http://www.technikum-wien.at/lehrveranstaltung_einheiten';
 		//zugehoerige LE holen
 		$le = new lehreinheit($conn, null, true);
 				
-		if(!$le->load_lehreinheiten($row_lva->lehrveranstaltung_id, $semester_aktuell))
+		if(!$le->load_lehreinheiten($row_lva->lehrveranstaltung_id, $semester_aktuell, $uid))
 			echo "Fehler: $le->errormsg";
 		
 		foreach ($le->lehreinheiten as $row_le)
