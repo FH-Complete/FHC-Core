@@ -161,7 +161,6 @@ if(!$error)
 			
 			$lem->semesterstunden = '0';
 			$lem->planstunden = '0';
-			$lem->faktor = '1';
 			$lem->anmerkung = '';
 			$lem->bismelden = true;
 			$lem->updateamum = date('Y-m-d H:i:s');
@@ -170,7 +169,7 @@ if(!$error)
 			$lem->insertvon = $user;
 			$lem->new=true;
 			
-			
+			//Stundensatz aus tbl_mitarbeiter holen
 			$qry = "SELECT stundensatz FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='".addslashes($_POST['mitarbeiter_uid'])."'";
 			if($result = pg_query($conn, $qry))
 			{
@@ -194,7 +193,32 @@ if(!$error)
 				$return=false;
 				$errormsg='Fehler bei einer Datenbankabfrage:'.pg_errormessage($conn);
 			}
-									
+
+			//Faktor aus tbl_lehrveranstaltung holen
+			$qry = "SELECT planfaktor FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE lehreinheit_id='".$_POST['lehreinheit_id']."';";
+			if($result = pg_query($conn, $qry))
+			{
+				if($row = pg_fetch_object($result))
+				{
+					if($row->planfaktor!='')
+						$lem->faktor = $row->planfaktor;
+					else 
+						$lem->faktor = '0';
+				}
+				else 
+				{
+					$error = true;
+					$return = false;
+					$errormsg = 'Lehrveranstaltung wurde nicht gefunden';
+				}
+			}
+			else 
+			{
+				$error = true;
+				$return = false;
+				$errormsg = 'Fehler in einer Datenbankabfrage:'.pg_errormessage($conn);
+			}
+			
 			if(!$error)
 			{
 				if($lem->save())

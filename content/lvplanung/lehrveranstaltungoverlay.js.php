@@ -170,6 +170,17 @@ function LvDetailMitarbeiterTreeKeyPress(event)
 		LeMitarbeiterDel();
 }
 
+// ****
+// * Erstellt den Lehrauftrag fuer
+// * einen Mitarbeiter
+// ****
+function LvCreateLehrauftrag()
+{
+	stg = document.getElementById('LehrveranstaltungEditor').getAttribute('stg_kz');
+	uid = document.getElementById('LehrveranstaltungEditor').getAttribute('uid');
+	alert('stg:'+stg+' uid:'+uid);
+}
+
 // ****************** FUNKTIONEN ************************** //
 
 // ****

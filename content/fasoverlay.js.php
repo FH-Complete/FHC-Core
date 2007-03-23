@@ -152,7 +152,7 @@ function auswahlValues()
 	this.lektor_uid=null;
 }
 
-function onVerbandSelect(evt)
+function onVerbandSelect(event)
 {
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
 	var tree=document.getElementById('tree-verband');
@@ -160,10 +160,21 @@ function onVerbandSelect(evt)
 	if(tree.currentIndex==-1)
 		return;
 		
-	//Wenn nicht auf eine der Zeilen gedrueckt wurde (zb Scrollbar) -> beenden
-	if(evt.target.nodeName!='treechildren')
+	var row = { };
+    var col = { };
+    var child = { };
+	
+    tree.treeBoxObject.getCellAt(event.pageX, event.pageY, row, col, child)
+    
+    //Wenn es keine Row ist sondern ein Header oder Scrollbar dann abbrechen
+    if (!col.value) 
+       	return false;
+    
+    //Wenn eine andere row markiert ist als angeklickt wurde -> beenden.
+	//Dies kommt vor wenn ein Subtree geoeffnet wird
+	if(row.value!=tree.currentIndex)
 		return;
-		
+			
 	var col;
 	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
 	var stg_kz=tree.view.getCellText(tree.currentIndex,col);
@@ -246,6 +257,7 @@ function onVerbandSelect(evt)
 		treeLV.database.AddDataSource(LvTreeDatasource);
 		LvTreeDatasource.addXMLSinkObserver(LvTreeSinkObserver);
 		treeLV.builder.addListener(LvTreeListener);
+		document.getElementById('lehrveranstaltung-toolbar-lehrauftrag').hidden=true;
 	}
 	catch(e)
 	{
@@ -268,31 +280,65 @@ function onOrtSelect()
 		contentFrame.setAttribute('src', url);
 }
 
-function onLektorSelect()
+function onLektorSelect(event)
 {
-/*
-	var contentFrame=document.getElementById('iframeTimeTableWeek');
-	var treeLektor=document.getElementById('tree-lektor');
-	if(treeLektor.currentIndex==-1)
+	var tree=document.getElementById('tree-lektor');
+	//Wenn nichts markiert wurde -> beenden
+	if(tree.currentIndex==-1)
 		return;
+		
+	var row = { };
+    var col = { };
+    var child = { };
 	
-	var uid=treeLektor.view.getCellText(treeLektor.currentIndex,"uid");
-	if(uid=='')
+    tree.treeBoxObject.getCellAt(event.pageX, event.pageY, row, col, child)
+    
+    //Wenn es keine Row ist sondern ein Header oder Scrollbar dann abbrechen
+    if (!col.value) 
+       	return false;
+    
+    //Wenn eine andere row markiert ist als angeklickt wurde -> beenden.
+	//Dies kommt vor wenn ein Subtree geoeffnet wird
+	if(row.value!=tree.currentIndex)
 		return;
-	//var treeVerband=document.getElementById('tree-verband');
-	//var stg_kz=treeVerband.view.getCellText(treeVerband.currentIndex,"stg_kz");
-	var daten=window.TimeTableWeek.document.getElementById('TimeTableWeekData');
-	var datum=parseInt(daten.getAttribute("datum"));
 
-	var attributes="?type=lektor&pers_uid="+uid+"&datum="+datum;
-	var url = "<?php echo APP_ROOT; ?>content/timetable-week.xul.php";
-	url+=attributes;
-	if (url)
-		contentFrame.setAttribute('src', url);
-	// LVAs
-	var vboxLehrveranstalungPlanung=document.getElementById('vboxLehrveranstalungPlanung');
-	vboxLehrveranstalungPlanung.setAttribute('datasources','../rdf/lehreinheit-lvplan.rdf.php?'+"type=lektor&lektor="+uid);
-*/
+	col = tree.columns ? tree.columns["uid"] : "uid";
+	var uid=tree.view.getCellText(tree.currentIndex,col);
+	
+	var stg_idx = tree.view.getParentIndex(tree.currentIndex);
+	var col = tree.columns ? tree.columns["studiengang_kz"] : "studiengang_kz";
+	var stg_kz=tree.view.getCellText(stg_idx,col);
+	
+	document.getElementById('LehrveranstaltungEditor').setAttribute('stg_kz',stg_kz);
+	document.getElementById('LehrveranstaltungEditor').setAttribute('uid',uid);
+	
+	// Lehrveranstaltung des Lektors laden
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	try
+	{
+		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?stg_kz='+stg_kz+'&uid='+uid+'&'+gettimestamp();
+		var treeLV=document.getElementById('lehrveranstaltung-tree');
+
+		//Alte DS entfernen
+		var oldDatasources = treeLV.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			treeLV.database.RemoveDataSource(oldDatasources.getNext());
+		}
+
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		LvTreeDatasource = rdfService.GetDataSource(url);
+		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		treeLV.database.AddDataSource(LvTreeDatasource);
+		LvTreeDatasource.addXMLSinkObserver(LvTreeSinkObserver);
+		treeLV.builder.addListener(LvTreeListener);
+		document.getElementById('lehrveranstaltung-toolbar-lehrauftrag').hidden=false;
+	}
+	catch(e)
+	{
+		debug(e);
+	}
 }
 
 function loadURL(event)

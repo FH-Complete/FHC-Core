@@ -98,7 +98,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
   </template>
 </tree>
 
-<tree id="tree-lektor" onmouseup="onLektorSelect();"
+<tree id="tree-lektor" onmouseup="onLektorSelect(event);"
 	seltype="single" hidecolumnpicker="false" flex="1"
 	enableColumnDrag="true"
     ondraggesture="nsDragAndDrop.startDrag(event,mitarbeiterDDObserver);"

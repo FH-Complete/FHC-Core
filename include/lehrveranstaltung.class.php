@@ -439,5 +439,66 @@ class lehrveranstaltung
 	{
 		return false;
 	}
+	
+	// ****************************************************
+	// * Laedt die Lehrveranstaltung zu der ein Mitarbeiter 
+	// * in einem Studiensemester zugeordnet ist
+	// * @param studiengang_kz, uid, studiensemester_kurzbz
+	// * @return true wenn ok, false wenn Fehler
+	// ****************************************************
+	function loadLVAfromMitarbeiter($studiengang_kz, $uid, $studiensemester_kurzbz)
+	{
+		if(!is_numeric($studiengang_kz))
+		{
+			$this->errormsg = 'Studiengang_kz ist ungueltig';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter WHERE ";
+		if($studiengang_kz!=0)
+			$qry.="tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND ";
+					
+		$qry.= "tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id AND
+				tbl_lehreinheitmitarbeiter.lehreinheit_id = tbl_lehreinheit.lehreinheit_id AND
+				tbl_lehreinheit.studiensemester_kurzbz = '".addslashes($studiensemester_kurzbz)."' AND
+				tbl_lehreinheitmitarbeiter.mitarbeiter_uid='".addslashes($uid)."';";
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$lv_obj = new lehrveranstaltung($this->conn, null, null);
+			
+				$lv_obj->lehrveranstaltung_id=$row->lehrveranstaltung_id;
+				$lv_obj->studiengang_kz=$row->studiengang_kz;
+				$lv_obj->bezeichnung=$row->bezeichnung;
+				$lv_obj->kurzbz=$row->kurzbz;
+				$lv_obj->semester=$row->semester;
+				$lv_obj->ects=$row->ects;
+				$lv_obj->semesterstunden=$row->semesterstunden;
+				$lv_obj->anmerkung=$row->anmerkung;
+				$lv_obj->lehre=($row->lehre=='t'?true:false);
+				$lv_obj->lehreverzeichnis=$row->lehreverzeichnis;
+				$lv_obj->aktiv=($row->aktiv=='t'?true:false);
+				$lv_obj->ext_id=$row->ext_id;
+				$lv_obj->insertamum=$row->insertamum;
+				$lv_obj->insertvon=$row->insertvon;
+				$lv_obj->planfaktor=$row->planfaktor;
+				$lv_obj->planlektoren=$row->planlektoren;
+				$lv_obj->planpersonalkosten=$row->planpersonalkosten;
+				$lv_obj->plankostenprolektor=$row->plankostenprolektor;
+				$lv_obj->updateamum=$row->updateamum;
+				$lv_obj->updatevon=$row->updatevon;
+				$lv_obj->sprache=$row->sprache;
+				
+				$this->lehrveranstaltungen[] = $lv_obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Lesen aus der Datenbank';
+			return false;
+		}
+	}
 }
 ?>
