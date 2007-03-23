@@ -33,14 +33,29 @@
 
 	$uid = get_uid();
 
-	if(isset($_GET['funktion']))
-		$funktione=$_GET['funktion'];
+	if(isset($_GET['lektor']))
+		$lektor=$_GET['lektor'];
 	else
-		$funktione='lkt';
-	if(isset($_GET['stg_kz']))
-		$stg_kz=$_GET['stg_kz'];
+		$lektor=null;
+
+	if(isset($_GET['fix']))
+		$fix=$_GET['fix'];
+	else
+		$fix=null;
+	if ($fix=='false') $fix=false;
+	if ($fix=='true') $fix=true;
+
+	if(isset($_GET['funktion']))
+		$funktion=$_GET['funktion'];
+	else
+		$funktion=null;
+
 	$stge=array();
-	$stge[]=$stg_kz;
+	if(isset($_GET['stg_kz']))
+	{
+		$stg_kz=$_GET['stg_kz'];
+		$stge[]=$stg_kz;
+	}
 
 	if(isset($_GET['studiensemester']))
 		$studiensemester=$_GET['studiensemester'];
@@ -67,7 +82,10 @@
 
 	// Lektoren holen
 	$ma=new mitarbeiter($conn);
-	$mitarbeiter=$ma->getMitarbeiterStg(true,null,$stge,$funktion);
+	if (is_null($funktion))
+		$mitarbeiter=$ma->getMitarbeiter($lektor,$fix);
+	else
+		$mitarbeiter=$ma->getMitarbeiterStg(true,null,$stge,$funktion);
 
 
 ?>
@@ -122,7 +140,8 @@
 			$tag=date('d',$ts);
 			$monat=date('M',$ts);
 			$grund=$zs->getTyp($ts);
-			echo "<td>$grund</td>";
+			$erbk=$zs->getErreichbarkeit($ts);
+			echo "<td>$grund<br>$erbk</td>";
 		}
 		echo '</TR>';
 	}

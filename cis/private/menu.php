@@ -204,6 +204,8 @@ else
 					  	<td nowrap>
 							<ul style="margin-top: 0px; margin-bottom: 0px;">
 							<?php
+							if ($rechte->isBerechtigt('admin',0))
+								echo '<li><a class="Item2" href="profile/zeitsperre.php?fix=true" target="content">Fix-Angestellte</a></li>';
 							$stge=$rechte->getStgKz('admin');
 							foreach($stg_obj->result as $row)
 								if (in_array($row->studiengang_kz,$stge))
