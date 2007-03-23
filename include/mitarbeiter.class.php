@@ -233,23 +233,29 @@ class mitarbeiter extends benutzer
 	{
 		$sql_query='SELECT DISTINCT campus.vw_mitarbeiter.* FROM campus.vw_mitarbeiter
 					LEFT OUTER JOIN public.tbl_benutzerfunktion USING (uid)
-					WHERE';
-		if (!$lektor)
-			$sql_query.=' NOT';
-		$sql_query.=' lektor';
-		if ($fixangestellt!=null)
+					WHERE TRUE';
+		if (!is_null($lektor))
+		{
+			$sql_query.=' AND';
+			if (!$lektor)
+				$sql_query.=' NOT';
+			$sql_query.=' lektor';
+		}
+
+		if (!is_null($fixangestellt))
 		{
 			$sql_query.=' AND';
 			if (!$fixangestellt)
 				$sql_query.=' NOT';
 			$sql_query.=' fixangestellt';
 		}
-		if ($stg_kz!=null)
+
+		if (!is_null($stg_kz))
 			$sql_query.=' AND studiengang_kz='.$stg_kz;
 		if ($fachbereich_id!=null)
 			$sql_query.=' AND fachbereich_id='.$fachbereich_id;
-	    	$sql_query.=' ORDER BY nachname, vornamen, kurzbz';
-	    	//echo $sql_query;
+	    $sql_query.=' ORDER BY nachname, vornamen, kurzbz';
+	    //echo $sql_query;
 		if(!($erg=pg_query($this->conn, $sql_query)))
 		{
 			$this->errormsg=pg_errormessage($conn);
@@ -325,7 +331,7 @@ class mitarbeiter extends benutzer
 			if($in!='')
 				$sql_query.=' AND studiengang_kz in (-1'.$in.')';
 		}
-	    	$sql_query.=' ORDER BY studiengang_kz, nachname, vorname, kurzbz';
+	    $sql_query.=' ORDER BY studiengang_kz, nachname, vorname, kurzbz';
 	    //echo $sql_query;
 
 		if(!($erg=pg_query($this->conn, $sql_query)))

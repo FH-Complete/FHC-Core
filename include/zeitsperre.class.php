@@ -299,5 +299,23 @@ class zeitsperre
 		return $typ;
 	}
 
+	/**
+	 * Liefert Erreichbarkeit der Zeitsperre eines Tages
+	 * @return string wenn ok, false im Fehlerfall
+	 */
+	function getErreichbarkeit($datum)
+	{
+		$datum_obj=new datum();
+		$erbk='';
+		foreach ($this->result as $zs)
+		{
+			$beginn=$datum_obj->mktime_fromdate($zs->vondatum);
+			$ende=$datum_obj->mktime_fromdate($zs->bisdatum);
+			if ($datum>$beginn && $datum<$ende)
+				$erbk.=$zs->erreichbarkeit;
+		}
+		return $erbk;
+	}
+
 }
 ?>
