@@ -102,6 +102,30 @@ TR.liste1
 {
 	background-color: #EEEEEE;
 }
+
+TABLE#zeitsperren
+{  
+	border: 1;
+	cellspacing: 0;
+	cellpadding: 0;
+	font-size: small;
+}
+
+TABLE#zeitsperren TH
+{
+	background-color: #DDDDDD;
+}
+TABLE#zeitsperren TH.feiertag
+{
+	background-color: #FFFF00;
+}
+
+TABLE#zeitsperren TD
+{
+	background-color: #EEEEEE
+}
+
+
 TABLE.stdplan
 {  
 	border: 1;
