@@ -149,12 +149,12 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
 	<tabbox id="tabbox-left" orient="vertical" flex="1">
 		<tabs orient="horizontal">
 			<tab id="tab-verband" label="Verband" />
-			<!-- <tab id="tab-ort" label="Ort" /> -->
+			<tab id="tab-fachbereich" label="Fachbereich" />
 			<tab id="tab-lektor" label="Lektor" />
 		</tabs>
 		<tabpanels id="tabpanels-left" flex="1">
 			<tree id="tree-verband" />
-			<!-- <tree id="tree-ort" /> -->
+			<tree id="tree-fachbereich" />
 			<tree id="tree-lektor" />
 		</tabpanels>
 	</tabbox>

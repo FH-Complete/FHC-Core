@@ -43,7 +43,7 @@ require_once('../include/functions.inc.php');
 // Datenbank Verbindung
 if (!$conn = @pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-
+ini_set('display_errors','0');   
 $user = get_uid();
 /*
 // test
@@ -61,22 +61,42 @@ $ver=(isset($_GET['ver'])?$_GET['ver']:'');
 $sem=(isset($_GET['sem'])?$_GET['sem']:'');
 $stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:'');
 $uid=(isset($_GET['uid'])?$_GET['uid']:'');
+$fachbereich_kurzbz=(isset($_GET['fachbereich_kurzbz'])?$_GET['fachbereich_kurzbz']:'');
 
 loadVariables($conn, $user);
 
 // LVAs holen
 $lvaDAO=new lehrveranstaltung($conn, null, true);
-if($uid!='')
+if($uid!='') // Alle LVs eines Mitarbeiters
 {	
-	$lvaDAO->loadLVAfromMitarbeiter($stg_kz, $uid, $semester_aktuell);
+	//$lvaDAO->loadLVAfromMitarbeiter($stg_kz, $uid, $semester_aktuell);
+	$qry = "SELECT distinct on(lehrveranstaltung_id) * FROM campus.vw_lehreinheit WHERE 
+	        studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND 
+	        mitarbeiter_uid='".addslashes($uid)."'";
+	if($stg_kz!='0')
+		$qry .=" AND studiengang_kz='".addslashes($stg_kz)."'";
+	
+}
+elseif($fachbereich_kurzbz!='') // Alle LVs eines Fachbereiches
+{
+	$qry = "SELECT distinct on(lehrveranstaltung_id) * FROM campus.vw_lehreinheit WHERE 
+	        studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND 
+	        fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."'";
 }
 else 
 {	
-	$lvaDAO->load_lva($stg_kz, $sem);
+	$qry = "SELECT distinct on(lehrveranstaltung_id) * FROM campus.vw_lehreinheit WHERE 
+	        studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND 
+			studiengang_kz='".addslashes($stg_kz)."'";
+	if($semester!='')
+		$qry.=" AND semester='".addslashes($semester)."'";
+	
+	//$lvaDAO->load_lva($stg_kz, $sem);
 }
 
 $rdf_url='http://www.technikum-wien.at/lehrveranstaltung_einheiten';
-
+if(!$result = pg_query($conn, $qry))
+	echo $qry;
 ?>
 
 <RDF:RDF
@@ -86,7 +106,8 @@ $rdf_url='http://www.technikum-wien.at/lehrveranstaltung_einheiten';
 
 <?php
 
-	foreach ($lvaDAO->lehrveranstaltungen as $row_lva)
+	//foreach ($lvaDAO->lehrveranstaltungen as $row_lva)
+	while($row_lva = pg_fetch_object($result))
 	{		
 		//Lehrveranstaltung
 		echo "
@@ -116,8 +137,9 @@ $rdf_url='http://www.technikum-wien.at/lehrveranstaltung_einheiten';
 				<LVA:raumtyp></LVA:raumtyp>
 				<LVA:raumtypalternativ></LVA:raumtypalternativ>
 				<LVA:gruppen></LVA:gruppen>
-				<LVA:lektoren></LVA:lektoren>				
-      		</RDF:Description>";
+				<LVA:lektoren></LVA:lektoren>
+				<LVA:fachbereich></LVA:fachbereich>
+				</RDF:Description>";
 
 		$hier.="      	
       	<RDF:li>
@@ -126,7 +148,7 @@ $rdf_url='http://www.technikum-wien.at/lehrveranstaltung_einheiten';
 		//zugehoerige LE holen
 		$le = new lehreinheit($conn, null, true);
 				
-		if(!$le->load_lehreinheiten($row_lva->lehrveranstaltung_id, $semester_aktuell, $uid))
+		if(!$le->load_lehreinheiten($row_lva->lehrveranstaltung_id, $semester_aktuell, $uid, $fachbereich_kurzbz))
 			echo "Fehler: $le->errormsg";
 		
 		foreach ($le->lehreinheiten as $row_le)
@@ -153,6 +175,11 @@ $rdf_url='http://www.technikum-wien.at/lehrveranstaltung_einheiten';
 			$lkt='';
 			while($row_lkt = pg_fetch_object($result_lkt))
 				$lkt.=$row_lkt->kurzbz.' ';
+			$qry = "SELECT tbl_fachbereich.bezeichnung FROM public.tbl_fachbereich, lehre.tbl_lehrfach, lehre.tbl_lehreinheit WHERE tbl_fachbereich.fachbereich_kurzbz=tbl_lehrfach.fachbereich_kurzbz AND tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND tbl_lehreinheit.lehreinheit_id='$row_le->lehreinheit_id'";
+			$fachbereich='';
+			if($result_fb = pg_query($conn, $qry))
+				if($row_fb = pg_fetch_object($result_fb))
+					$fachbereich = $row_fb->bezeichnung;
 			
 			echo "
       		<RDF:Description  id=\"".$row_le->lehreinheit_id."\"  about=\"".$rdf_url.'/'.$row_lva->lehrveranstaltung_id."/$row_le->lehreinheit_id\" >
@@ -187,6 +214,7 @@ $rdf_url='http://www.technikum-wien.at/lehrveranstaltung_einheiten';
 				<LVA:lvnr>$row_le->lvnr</LVA:lvnr>				
 				<LVA:gruppen><![CDATA[$grp]]></LVA:gruppen>
 				<LVA:lektoren><![CDATA[".$lkt."]]></LVA:lektoren>
+				<LVA:fachbereich><![CDATA[".$fachbereich."]]></LVA:fachbereich>
       		</RDF:Description>";
 			
 			$hier.="
