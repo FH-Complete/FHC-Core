@@ -1,11 +1,25 @@
 <?php
-/*
- * Created on 02.12.2004
+/* Copyright (C) 2006 Technikum-Wien
  *
- * To change the template for this generated file go to
- * Window - Preferences - PHPeclipse - PHP - Code Templates
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-// header für no cache
+// header fuer no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
@@ -15,37 +29,38 @@ header("Content-type: application/vnd.mozilla.xul+xml");
 // xml
 echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
 // DAO
-include('../vilesci/config.inc.php');
-include_once('../include/fachbereich.class.php');
+require_once('../vilesci/config.inc.php');
+require_once('../include/fachbereich.class.php');
+require_once('../include/functions.inc.php');
+require_once('../include/benutzerberechtigung.class.php');
 
 // Datenbank Verbindung
 if (!$conn = @pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
+$user = get_uid();
 
-// test
-
-$einheit_kurzbz='';
-$grp='1';
-//$ver='A';
-$sem=5;
-$stg_kz=145;
-
-
-/*
-$einheit_kurzbz='';
-$grp=$_GET['grp'];
-$ver=$_GET['ver'];
-$sem=$_GET['sem'];
-$stg_kz=$_GET['stg_kz']; */
+$rechte = new benutzerberechtigung($conn);
+$rechte->getBerechtigungen($user);
+$fb = $rechte->getFbKz();
 
 // fachbereiche holen
-$fachbereichDAO=new fachbereich($conn);
-$fachbereiche=$fachbereichDAO->getAll();
+//$fachbereichDAO=new fachbereich($conn);
+//$fb = $fachbereiche=$fachbereichDAO->getAll();
 
+$qry = "SELECT * FROM public.tbl_fachbereich";
 
+if(count($fb)>0 && !in_array('0',$fb))
+{
+	foreach($fb as $fbbz)
+		$in = ", '".addslashes($fbbz)."'";
+	$qry.=" WHERE fachbereich_kurzbz in (1$in)";
+}
 
-$rdf_url='http://www.technikum-wien.at/tempus/fachbereich';
+$qry.=" ORDER BY bezeichnung";
+$result = pg_query($conn, $qry);
+
+$rdf_url='http://www.technikum-wien.at/fachbereich';
 
 ?>
 
@@ -57,27 +72,20 @@ $rdf_url='http://www.technikum-wien.at/tempus/fachbereich';
   <RDF:Seq about="<?php echo $rdf_url ?>/liste">
 
 <?php
-if (is_array($fachbereiche)) {
 
-	foreach ($fachbereiche as $fb)
-	{
+while ($row = pg_fetch_object($result))
+{
 	?>
   <RDF:li>
-      	<RDF:Description  id="<?php echo $fb->id; ?>"  about="<?php echo $rdf_url.'/'.$fb->id; ?>" >
-        	<FACHBEREICH:id><?php echo $fb->id  ?></FACHBEREICH:id>
-    		<FACHBEREICH:kurzbz><?php echo $fb->kurzbz  ?></FACHBEREICH:kurzbz>
-    		<FACHBEREICH:bezeichnung><?php echo $fb->bezeichnung  ?></FACHBEREICH:bezeichnung>
-    		<FACHBEREICH:farbe><?php echo $fb->farbe  ?></FACHBEREICH:farbe>
-    		<FACHBEREICH:studiengang_kz><?php echo $fb->studiengang_kz  ?></FACHBEREICH:studiengang_kz>
-    		<FACHBEREICH:studiengang_kurzbz><?php echo $fb->studiengang_kurzbz  ?></FACHBEREICH:studiengang_kurzbz>
+      	<RDF:Description  id="<?php echo $row->fachbereich_kurzbz; ?>"  about="<?php echo $rdf_url.'/'.$row->fachbereich_kurzbz; ?>" >
+    		<FACHBEREICH:kurzbz><?php echo $row->fachbereich_kurzbz  ?></FACHBEREICH:kurzbz>
+    		<FACHBEREICH:bezeichnung><?php echo $row->bezeichnung  ?></FACHBEREICH:bezeichnung>
+    		<FACHBEREICH:farbe><?php echo $row->farbe  ?></FACHBEREICH:farbe>
+    		<FACHBEREICH:studiengang_kz><?php echo $row->studiengang_kz  ?></FACHBEREICH:studiengang_kz>
       	</RDF:Description>
   </RDF:li>
 	  <?php
-	}
-
 }
 ?>
-
-
   </RDF:Seq>
 </RDF:RDF>

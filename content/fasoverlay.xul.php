@@ -66,19 +66,17 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
   </template>
 </tree>
 
-<tree id="tree-ort" onselect="onOrtSelect();"
+<tree id="tree-fachbereich" onmouseup="onFachbereichSelect(event);"
 	seltype="single" hidecolumnpicker="false" flex="1"
-	datasources="../rdf/ort.rdf.php" ref="http://www.technikum-wien.at/ort/alle-orte">
+	datasources="../rdf/fachbereich.rdf.php" ref="http://www.technikum-wien.at/fachbereich/liste">
 	<treecols>
-	    <treecol id="raumtyp" label="Raumtyp" flex="2" primary="true" />
+	    <treecol id="bezeichnung" label="Bezeichnung" flex="3" primary="true" />
 	    <splitter class="tree-splitter"/>
-	    <treecol id="ort_kurzbz" label="Raum" flex="4" hidden="true"/>
+	    <treecol id="kurzbz" label="Kurzbz" flex="2" hidden="true"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="hierarchie" label="HI" flex="1" hidden="true"/>
+	    <treecol id="farbe" label="Farbe" flex="1" hidden="true"/>
 	    <splitter class="tree-splitter"/>
-	     <treecol id="ort_bezeichnung" label="Bezeichnung" flex="3" hidden="true"/>
-	    <splitter class="tree-splitter"/>
-	    <treecol id="max_person" label="MaxP" flex="1" hidden="true"/>
+	     <treecol id="stg_kz" label="Stg_kz" flex="1" hidden="true"/>
 	</treecols>
 
 	<template>
@@ -86,11 +84,10 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 	      <treechildren>
 	       <treeitem uri="rdf:*">
 	         <treerow>
-	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#raumtyp"/>
-	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#ort_kurzbz"/>
-	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#hierarchie"/>
-	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#ort_bezeichnung"/>
-	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#max_person"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/fachbereich/rdf#bezeichnung"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/fachbereich/rdf#kurzbz"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/fachbereich/rdf#farbe"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/fachbereich/rdf#studiengang_kz"/>
 	         </treerow>
 	       </treeitem>
 	      </treechildren>

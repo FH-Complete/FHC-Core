@@ -265,6 +265,60 @@ function onVerbandSelect(event)
 	}
 }
 
+function onFachbereichSelect(event)
+{
+	var tree=document.getElementById('tree-fachbereich');
+	//Wenn nichts markiert wurde -> beenden
+	if(tree.currentIndex==-1)
+		return;
+		
+	var row = { };
+    var col = { };
+    var child = { };
+	
+    tree.treeBoxObject.getCellAt(event.pageX, event.pageY, row, col, child)
+    
+    //Wenn es keine Row ist sondern ein Header oder Scrollbar dann abbrechen
+    if (!col.value) 
+       	return false;
+    
+    //Wenn eine andere row markiert ist als angeklickt wurde -> beenden.
+	//Dies kommt vor wenn ein Subtree geoeffnet wird
+	if(row.value!=tree.currentIndex)
+		return;
+
+	col = tree.columns ? tree.columns["kurzbz"] : "kurzbz";
+	var kurzbz=tree.view.getCellText(tree.currentIndex,col);
+	
+	// Lehrveranstaltung
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	try
+	{
+		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?fachbereich_kurzbz='+kurzbz+'&'+gettimestamp();
+		var treeLV=document.getElementById('lehrveranstaltung-tree');
+
+		//Alte DS entfernen
+		var oldDatasources = treeLV.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			treeLV.database.RemoveDataSource(oldDatasources.getNext());
+		}
+
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		LvTreeDatasource = rdfService.GetDataSource(url);
+		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		treeLV.database.AddDataSource(LvTreeDatasource);
+		LvTreeDatasource.addXMLSinkObserver(LvTreeSinkObserver);
+		treeLV.builder.addListener(LvTreeListener);
+		document.getElementById('lehrveranstaltung-toolbar-lehrauftrag').hidden=true;
+	}
+	catch(e)
+	{
+		debug(e);
+	}
+}
+
 function onOrtSelect()
 {
 	var contentFrame=document.getElementById('iframeTimeTableWeek');

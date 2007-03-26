@@ -61,7 +61,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungdetailo
 		<!-- Bem.: style="visibility:collapse" versteckt eine Spalte -->
 		<tree id="lehrveranstaltung-tree" seltype="single" hidecolumnpicker="false" flex="1"
 				datasources="rdf:null" ref="http://www.technikum-wien.at/lehrveranstaltung_einheiten/liste"
-				style="margin:0px;"
+				style="margin:0px;" enableColumnDrag="true"
 				onselect="LeAuswahl(this);"
  				persist="height"
  				onkeypress="LvTreeKeyPress(event)"
@@ -127,6 +127,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungdetailo
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#anmerkung"/>
 				<splitter class="tree-splitter"/>
+				<treecol id="lehrveranstaltung-treecol-fachbereich" label="Fachbereich" flex="1" hidden="false"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#fachbereich"/>
+				<splitter class="tree-splitter"/>
 				<treecol id="lehrveranstaltung-treecol-lehrveranstaltung_id" label="Lehrveranstaltung_id" flex="1" hidden="true"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrveranstaltung_id"	/>
@@ -156,8 +160,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungdetailo
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#gruppen"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lektoren"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#anmerkung"/>
+							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#fachbereich"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrveranstaltung_id"  />
-							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehreinheit_id"/>
+							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehreinheit_id"/>							
 						</treerow>
 					</treeitem>
 				</treechildren>

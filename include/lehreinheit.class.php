@@ -199,12 +199,15 @@ class lehreinheit
 	}
 
 
-	function load_lehreinheiten($lehrveranstaltung_id, $studiensemester_kurzbz, $uid='')
+	function load_lehreinheiten($lehrveranstaltung_id, $studiensemester_kurzbz, $uid='', $fachbereich_kurzbz='')
 	{
 		$qry = "SELECT * FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lehrveranstaltung_id' AND studiensemester_kurzbz='$studiensemester_kurzbz' ";
 		
-		if($uid!='')		
+		if($uid!='')
 			$qry .= " AND lehreinheit_id IN ( SELECT lehreinheit_id FROM lehre.tbl_lehreinheitmitarbeiter WHERE mitarbeiter_uid='".addslashes($uid)."')";
+		
+		if($fachbereich_kurzbz!='')
+			$qry .= " AND lehrfach_id IN ( SELECT lehrfach_id FROM lehre.tbl_lehrfach WHERE fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."')";
 		
 		$qry.= "ORDER BY lehreinheit_id";
 
