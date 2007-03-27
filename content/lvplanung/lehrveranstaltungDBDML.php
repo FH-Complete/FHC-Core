@@ -64,35 +64,23 @@ if(!$rechte->isBerechtigt('admin'))
 	$data = '';
 	$error = true;
 }
-
+	
 if(!$error)
 {
+	
 	if(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_save')
 	{
 		//Lehreinheitmitarbeiter Zuteilung
-		//wenn do=update dann wird aktualisiert
-		//wenn do=create wird ein neuer datensatz angelegt
-
-		if (!isset($_POST['do']))
-		{
-			$return = false;
-			$errormsg = 'Fehlerhafte Parameteruebergabe';
-			$data = '';
-			$error = true;
-		}
 
 		if(!$error)
 		{
 			$lem = new lehreinheitmitarbeiter($conn, null, null, true);
-
-			if($_POST['do']=='update')
+			
+			if(!$lem->load($_POST['lehreinheit_id'],$_POST['mitarbeiter_uid_old']))
 			{
-				if(!$lem->load($_POST['lehreinheit_id'],$_POST['mitarbeiter_uid_old']))
-				{
-					$return = false;
-					$errormsg = 'Fehler beim laden:'.$lem->errormsg;
-					$error = true;
-				}
+				$return = false;
+				$errormsg = 'Fehler beim laden:'.$lem->errormsg;
+				$error = true;
 			}
 
 			if(!$error)
@@ -100,8 +88,7 @@ if(!$error)
 				$lem->lehreinheit_id = $_POST['lehreinheit_id'];
 				$lem->lehrfunktion_kurzbz = $_POST['lehrfunktion_kurzbz'];
 				$lem->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
-				if($_POST['do']=='update')
-					$lem->mitarbeiter_uid_old = $_POST['mitarbeiter_uid_old'];
+				$lem->mitarbeiter_uid_old = $_POST['mitarbeiter_uid_old'];
 				$lem->semesterstunden = $_POST['semesterstunden'];
 				$lem->planstunden = $_POST['planstunden'];
 				$lem->stundensatz = $_POST['stundensatz'];
@@ -110,25 +97,9 @@ if(!$error)
 				$lem->bismelden = ($_POST['bismelden']=='true'?true:false);
 				$lem->updateamum = date('Y-m-d H:i:s');
 				$lem->updatevon = $user;
-
-				if($_POST['do']=='update')
-				{
-					$lem->new=false;
-				}
-				elseif($_POST['do']=='create')
-				{
-					$lem->new=true;
-					$lem->updateamum = date('Y-m-d H:i:s');
-					$lem->updatevon = $user;
-					$lem->insertamum = date('Y-m-d H:i:s');
-					$lem->insertvon = $user;
-				}
-				else
-				{
-					$return = false;
-					$errormsg = 'Fehlerhafte Parameteruebergabe';
-					$error = true;
-				}
+			
+				$lem->new=false;
+				
 
 				if(!$error)
 				{
@@ -147,7 +118,7 @@ if(!$error)
 			}
 		}
 	}
-	if(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_add')
+	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_add')
 	{
 		//neue Lehreinheitmitarbeiterzuteilung anlegen
 		
@@ -391,7 +362,7 @@ if(!$error)
 	else
 	{
 		$return = false;
-		$errormsg = 'Unkown type';
+		$errormsg = 'Unkown type: '.$_POST['type'];
 		$data = '';
 	}
 }
