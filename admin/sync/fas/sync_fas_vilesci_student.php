@@ -17,6 +17,11 @@ $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlg
 
 $error_log='';
 $text = '';
+$text1 = '';
+$text2 = '';
+$text3 = '';
+$text4 = '';
+$text5 = '';
 $plausiueb='';
 $dateiausgabe='';
 //$dateiausgabe=fopen('sync_fas_vilesci_student_ausgabe.txt','w');
@@ -86,7 +91,7 @@ function myaddslashes($var)
 <body>
 <?php
 echo nl2br("Studentensynchro vom ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
-
+/*
 $plausiueb="Überprüfung Studentendaten im FAS:\n\n";
 $qry="SELECT * FROM person JOIN student ON person_pk=student.person_fk WHERE svnr='0005010400';";
 if($resultp = pg_query($conn_fas, $qry))
@@ -401,9 +406,9 @@ foreach ($studiengangfk AS $stg)
 		echo nl2br("Kein Zugriff auf tbl_studiengang => Studiengang ".$stg." nicht gefunden. E-Mail mit folgendem Inhalt wird nicht verschickt:\n".$error_log_fas[$stg]);
 	}
 }
+*/
 
-
-
+/*
 $qry = "SELECT * FROM person JOIN student ON person_fk=person_pk WHERE uid NOT LIKE '\_dummy%' 
 AND person_pk NOT IN(
 SELECT 
@@ -433,6 +438,8 @@ AND (trim(p1.familienname)<>trim(p2.familienname) OR trim(p1.vorname)<>trim(p2.v
 )
 order by familienname;
 ";
+*/
+$qry="SELECT * FROM person JOIN student ON person_fk=person_pk WHERE uid='tw05p102';";
 $datum_obj=new datum();
 if($result = pg_query($conn_fas, $qry))
 {
@@ -492,7 +499,7 @@ if($result = pg_query($conn_fas, $qry))
 		$geschlecht=strtolower($row->geschlecht);
 		$anzahlkinder=$row->anzahlderkinder;
 		//$aktiv=($row->aktiv=='t'?true:false);
-		$insertvon='SYNC';
+		$insertvon=$row->creationuser;
 		$insertamum=$row->creationdate;
 		$updateamum=$row->creationdate;
 		$updatevon='SYNC';
@@ -641,10 +648,10 @@ if($result = pg_query($conn_fas, $qry))
 		{
 			$error_log = 'Alias darf nicht laenger als 256 Zeichen sein '.$nachname.", ".$vorname."\n";
 		}
-		if(!is_numeric($person_id))
+		/*if(!is_numeric($person_id))
 		{
 			$error_log = 'person_id muss eine gueltige Zahl sein '.$nachname.", ".$vorname."\n";
-		}
+		}*/
 		if(strlen($matrikelnr)>15)
 		{
 			$error_log = 'Matrikelnummer darf nicht laenger als 15 Zeichen sein '.$nachname.", ".$vorname."\n";
@@ -673,6 +680,7 @@ if($result = pg_query($conn_fas, $qry))
 		{
 			$error_log='Punkte muss eine gueltige Zahl sein. '.$nachname.", ".$vorname."\n";
 		}
+echo nl2br("\nFAS:".$nachname.", ".$vorname.": UID=".$student_uid.", Matrikelnr=".$matrikelnr."\n");
 		//Ermittlung der Daten des Reihungstests
 		$qry="SELECT student_fk, reihungstest_fk, anmeldedatum FROM student_reihungstest WHERE student_fk='".$row->student_pk."';";
 		if($result_rt1 = pg_query($conn_fas, $qry))
@@ -1041,6 +1049,18 @@ if($result = pg_query($conn_fas, $qry))
 						else
 						{
 							$ausgabe_person="Staatsbürgerschaft: '".$staatsbuergerschaft."' (statt '".$row1->staatsbuergerschaft."')";
+						}
+					}
+					if($row1->ext_id!=$ext_id_person)
+					{
+						$updatep=true;
+						if(strlen(trim($ausgabe_person))>0)
+						{
+							$ausgabe_person.=", Ext_ID: '".$ext_id_person."' (statt '".$row1->ext_id."')";
+						}
+						else
+						{
+							$ausgabe_person="Ext_ID: '".$ext_id_person."' (statt '".$row1->ext_id."')";
 						}
 					}
 					if($updatep)
@@ -1427,7 +1447,18 @@ if($result = pg_query($conn_fas, $qry))
 								$ausgabe_pre="Anmerkung: '".$anmerkung."'";
 							}
 						}
-						
+						if($rows->ext_id!=$ext_id_pre)
+						{
+							$updater=true;
+							if(strlen(trim($ausgabe_pre))>0)
+							{
+								$ausgabe_pre.=", EXT_ID: '".$ext_id."'";
+							}
+							else
+							{
+								$ausgabe_pre="EXT_ID: '".$ext_id."'";
+							}
+						}
 						if($updater)
 						{
 							$qry = 'UPDATE public.tbl_prestudent SET'.
@@ -1459,6 +1490,7 @@ if($result = pg_query($conn_fas, $qry))
 			
 			if(pg_query($conn,$qry))
 			{
+echo nl2br("Prestudent: ".$qry."\n");
 				if($new_prestudent)
 				{
 					$qry = "SELECT currval('public.tbl_prestudent_prestudent_id_seq') AS id;";
@@ -1573,7 +1605,7 @@ if($result = pg_query($conn_fas, $qry))
 					}
 				}
 				//prestudentrolle
-				
+echo nl2br("Aktiv=".($aktiv?'true':'false').", Semester=".$semester.", Verband=".$verband.", Gruppe=".$gruppe."\n");				
 				$qry="SELECT * FROM student_ausbildungssemester where student_fk='$ext_id_student';";
 				if($resultru = pg_query($conn_fas, $qry))
 				{
@@ -1620,27 +1652,100 @@ if($result = pg_query($conn_fas, $qry))
 				    and $verband!=null and $gruppe!=null)
 				{
 					//Benutzer schon vorhanden?
-					$qry="SELECT uid, person_id, ext_id FROM public.tbl_benutzer WHERE person_id='$person_id' AND uid='$student_uid'";
+					$qry="SELECT uid, person_id, ext_id FROM public.tbl_benutzer WHERE person_id='".$person_id."' AND uid='".$matrikelnr."';";
 					if($resultu = pg_query($conn, $qry))
 					{
 						if(pg_num_rows($resultu)>0) //wenn dieser eintrag schon vorhanden ist
 						{
+							$student_uid=$matrikelnr;
+						}
+					}
+					$qry="SELECT uid, person_id, ext_id FROM public.tbl_benutzer WHERE person_id='".$person_id."' AND uid='".$student_uid."';";
+					if($resultu = pg_query($conn, $qry))
+					{
+						if(pg_num_rows($resultu)>0) //wenn dieser eintrag schon vorhanden ist
+						{	
 							if($rowu=pg_fetch_object($resultu))
 							{
-								$new_benutzer=false;
-								//$ext_id_benutzer=$rowu->ext_id;
+								$qryfas="SELECT * FROM person, student WHERE person_pk=person_fk AND uid='".$student_uid."' AND perskz<>'';";
+								if($resultfas = pg_query($conn_fas, $qryfas)) 
+								{
+									if(pg_num_rows($resultfas)>1) //person mit mehreren studentendatensätzen?
+									{
+										$qry="SELECT * FROM (SELECT status, creationdate FROM student_ausbildungssemester WHERE student_fk= '".$ext_id_student."'  AND
+										studiensemester_fk=(SELECT studiensemester_pk FROM studiensemester WHERE aktuell='J') ORDER BY creationdate DESC LIMIT 1) AS abc
+										WHERE status='9';";
+										$aktiv9=false;
+										if($resulta = pg_query($conn_fas, $qry))
+										{
+											if(pg_num_rows($resulta)>0)
+											{
+												$aktiv9=true;
+											}
+											else 
+											{
+												$aktiv9=false;
+											}
+										}
+										else
+										{
+											$error=true;
+											$error_log.='Fehler beim Abfragen des aktuellen Status auf Unterbrecher bei student_pk: '.$row->student_pk;
+											echo nl2br('Fehler beim Abfragen des aktuellen Status auf Unterbrecher bei student_pk: '.$row->student_pk);	
+										}
+										
+										if(!$aktiv && !$aktiv9) 
+										{
+											if($rowu->uid==$matrikelnr)
+											{
+												$new_benutzer=false;
+											}
+											else 
+											{
+												$qrychk="SELECT * FROM public.tbl_benutzer WHERE person_id=person_id AND uid='".$matrikelnr."';";
+												if($resultchk = pg_query($conn, $qrychk)) 
+												{
+													if(pg_num_rows($resultchk)>0)
+													{
+														$new_benutzer=false;
+													}
+													else 
+													{
+														$new_benutzer=true;
+														$student_uid=$matrikelnr;
+													}
+												}
+											}
+										}
+										else 
+										{
+											$new_benutzer=false;
+										}
+									}
+									else 
+									{
+										$new_benutzer=false;
+									}
+								}
 							}
-							else $new_benutzer=true;
+							else 
+							{
+								$new_benutzer=true;
+							}
 						}
-						else $new_benutzer=true;
+						else 
+						{
+							$new_benutzer=true;
+						}
 					}
 					else
 					{
 						$error=true;
 						$error_log.='Fehler beim Zugriff auf Tabelle tbl_benutzer bei person_id: '.$person_id."\n".pg_errormessage($conn)."\n";	
 					}
+echo nl2br("Neu=".$new_benutzer.", UID=".$student_uid."\n");
 					//Student schon vorhanden?
-					$qry="SELECT student_uid FROM public.tbl_student WHERE student_uid='$student_uid'";
+					$qry="SELECT student_uid FROM public.tbl_student WHERE student_uid='".$student_uid."';";
 					if($resultu = pg_query($conn, $qry))
 					{
 						if(pg_num_rows($resultu)>0) //wenn dieser eintrag schon vorhanden ist
@@ -1674,8 +1779,7 @@ if($result = pg_query($conn_fas, $qry))
 						myaddslashes($updateamum).','.
 						"'SYNC'".', '.
 						myaddslashes($ext_id_benutzer).'); ';
-						$ausgabe_benutzer="Benutzer ".$student_uid." ".$alias." eingefügt.\n";
-						
+						$ausgabe_benutzer="Benutzer ".$student_uid." ".$alias." eingefügt.\n";	
 					}
 					else 
 					{
@@ -1886,7 +1990,18 @@ if($result = pg_query($conn_fas, $qry))
 											$ausgabe_student="Gruppe: '".$gruppe."' (statt '".$rows->gruppe."')";
 										}
 									}						
-									
+									if($rows->ext_id!=$ext_id_student)
+									{
+										$updates=true;
+										if(strlen(trim($ausgabe_student))>0)
+										{
+											$ausgabe_student.=", EXT_ID: '".$ext_id_student."' (statt '".$rows->ext_id."')";
+										}
+										else
+										{
+											$ausgabe_student="EXT_ID: '".$ext_id_student."' (statt '".$rows->ext_id."')";
+										}
+									}	
 									if($updates)
 									{
 										$qry = 'UPDATE public.tbl_student SET'.
@@ -1937,20 +2052,20 @@ if($result = pg_query($conn_fas, $qry))
 						else
 						{
 							$anzahl_fehler_student++;
-							$text.="\n***********".$student_uid." / ".$nachname.", ".$vorname." / ".$matrikelnr."\n";
-							$text.=$error_log;
-							$text.="\n".$qry." R1\n";
-							$text.="***********\n\n";
+							$text1.="\n***********".$student_uid." / ".$nachname.", ".$vorname." / ".$matrikelnr."\n";
+							$text1.=$error_log;
+							$text1.="\n".$qry." R1\n";
+							$text1.="***********\n\n";
 							pg_query($conn,'ROLLBACK;');
 						}									
 					}
 					else 
 					{
 						$anzahl_fehler_benutzer++;
-						$text.="\n***********".$student_uid." / ".$nachname.", ".$vorname." / ".$matrikelnr."\n";
-						$text.=$error_log;
-						$text.="\n".$qry." R2\n";
-						$text.="***********\n\n";
+						$text2.="\n***********".$student_uid." / ".$nachname.", ".$vorname." / ".$matrikelnr."\n";
+						$text2.=$error_log;
+						$text2.="\n".$qry." R2\n";
+						$text2.="***********\n\n";
 						pg_query($conn,'ROLLBACK;');
 					}
 				}
@@ -1960,11 +2075,11 @@ if($result = pg_query($conn_fas, $qry))
 					if($error)
 					{
 						$anzahl_fehler_pre++;
-						$text.="\n***********".$student_uid." / ".$nachname.", ".$vorname." / ".$matrikelnr."\n";
-						$text.="Semester: ".$semester."/ Verband: ".$verband." / Gruppe: ".$gruppe." / Stg:".$studiengang_kz."\n";
-						$text.=$error_log;
-						$text.="\n".$qry." C1\n";
-						$text.="***********\n\n";
+						$text5.="\n***********".$student_uid." / ".$nachname.", ".$vorname." / ".$matrikelnr."\n";
+						$text5.="Semester: ".$semester."/ Verband: ".$verband." / Gruppe: ".$gruppe." / Stg:".$studiengang_kz."\n";
+						$text5.=$error_log;
+						$text5.="\n".$qry." C1\n";
+						$text5.="***********\n\n";
 					}
 					$ausgabe.=$ausgabe_person;
 					//fwrite($dateiausgabe,$ausgabe);
@@ -1976,20 +2091,20 @@ if($result = pg_query($conn_fas, $qry))
 			else
 			{
 				$anzahl_fehler_pre++;
-				$text.="\n***********".$student_uid." / ".$nachname.", ".$vorname." / ".$matrikelnr."\n";
-				$text.=$error_log;
-				$text.="\n".$qry." R3\n";
-				$text.="***********\n\n";
+				$text3.="\n***********".$student_uid." / ".$nachname.", ".$vorname." / ".$matrikelnr."\n";
+				$text3.=$error_log;
+				$text3.="\n".$qry." R3\n";
+				$text3.="***********\n\n";
 				pg_query($conn,'ROLLBACK;');
 			}						
 		}
 		else
 		{
 			$anzahl_fehler_person++;
-			$text.="\n***********".$student_uid." / ".$nachname.", ".$vorname." / ".$matrikelnr."\n";
-			$text.=$error_log;
-			$text.="\n".$qry." R4\n";
-			$text.="***********\n\n";
+			$text4.="\n***********".$student_uid." / ".$nachname.", ".$vorname." / ".$matrikelnr."\n";
+			$text4.=$error_log;
+			$text4.="\n".$qry." R4\n";
+			$text4.="***********\n\n";
 			pg_query($conn,'ROLLBACK;');
 		}
 
@@ -2004,9 +2119,11 @@ Echo nl2br("Benutzer:       Gesamt: ".$anzahl_benutzer_gesamt." / Eingefügt: ".$
 Echo nl2br("Nicht-Studenten: ".$anzahl_nichtstudenten."\n");
 Echo nl2br("Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student."\n");
 
-$error_log="Sync Student\n------------\n\n".$text;
+$error_log="Sync Student\n------------\n\n".$text4."\n".$text3."\n".$text5."\n".$text2."\n".$text1;
 Echo nl2br($error_log);
-mail($adress, 'SYNC-Fehler Student von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");
+
+
+//mail($adress, 'SYNC-Fehler Student von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");
 /*fwrite($dateiausgabe,"\n\nPersonen ohne Reihungstest: ".$notest." \n\n"
 ."Personen:       Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$anzahl_person_insert." / Geändert: ".$anzahl_person_update." / Fehler: ".$anzahl_fehler_person."\n"
 ."Prestudenten:   Gesamt: ".$anzahl_pre_gesamt." / Eingefügt: ".$anzahl_pre_insert." / Geändert: ".$anzahl_pre_update." / Fehler: ".$anzahl_fehler_pre."\n"
@@ -2016,13 +2133,14 @@ mail($adress, 'SYNC-Fehler Student von '.$_SERVER['HTTP_HOST'], $error_log,"From
 fwrite($dateiausgabe,"Fertig: ".date("d.m.Y H:i:s")."\n\n");
 fclose($dateiausgabe);*/
 
+/*
 mail($adress, 'SYNC Student  von '.$_SERVER['HTTP_HOST'], "Sync Student\n------------\n\nPersonen ohne Reihungstest: ".$notest." \n\n"
 ."Personen:       Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$anzahl_person_insert." / Geändert: ".$anzahl_person_update." / Fehler: ".$anzahl_fehler_person."\n"
 ."Prestudenten:   Gesamt: ".$anzahl_pre_gesamt." / Eingefügt: ".$anzahl_pre_insert." / Geändert: ".$anzahl_pre_update." / Fehler: ".$anzahl_fehler_pre."\n"
 ."Benutzer:       Gesamt: ".$anzahl_benutzer_gesamt." / Eingefügt: ".$anzahl_benutzer_insert." / Geändert: ".$anzahl_benutzer_update." / Fehler: ".$anzahl_fehler_benutzer."\n"
 ."Nicht-Studenten: ".$anzahl_nichtstudenten."\n"
-."Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student."\n\n".$ausgabe, "From: vilesci@technikum-wien.at");
-
+."Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student."\n\n".$dateiausgabe."Fertig: ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: vilesci@technikum-wien.at");
+*/
 ?>
 </body>
 </html>
