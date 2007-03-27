@@ -111,7 +111,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 	    <splitter class="tree-splitter"/>
 	    <treecol id="nachname" label="Nachname" flex="2" hidden="true"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="vornamen" label="Vornamen" flex="2" hidden="true"/>
+	    <treecol id="vorname" label="Vorname" flex="2" hidden="true"/>
 	    <splitter class="tree-splitter"/>
 	    <treecol id="titel" label="Titel" flex="1" hidden="true"/>
 	    <splitter class="tree-splitter"/>
@@ -127,7 +127,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 	         	<treerow>
 	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#kurzbz"/>
 	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname"/>
-	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vornamen"/>
+	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname"/>
 	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpre"/>
 	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"/>
 	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#studiengang_kz"/>
