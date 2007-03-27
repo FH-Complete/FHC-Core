@@ -1152,7 +1152,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 }
 else
 {
-	$error_log.= '\nPersonendatensaetze konnten nicht geladen werden\n';
+	$error_log.= "\nPersonendatensaetze konnten nicht geladen werden\n";
 }
 
 
