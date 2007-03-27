@@ -43,7 +43,7 @@ require_once('../include/functions.inc.php');
 // Datenbank Verbindung
 if (!$conn = @pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-ini_set('display_errors','0');   
+//ini_set('display_errors','0');   
 $user = get_uid();
 /*
 // test
@@ -85,11 +85,12 @@ elseif($fachbereich_kurzbz!='') // Alle LVs eines Fachbereiches
 }
 else 
 {	
-	$qry = "SELECT distinct on(lehrveranstaltung_id) * FROM campus.vw_lehreinheit WHERE 
-	        studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND 
+	$qry = "SELECT lehrveranstaltung_id, kurzbz as lv_kurzbz, bezeichnung as lv_bezeichnung, studiengang_kz, semester, sprache, ects as lv_ects,
+			semesterstunden, anmerkung, lehre, lehreverzeichnis as lv_lehreverzeichnis, aktiv, planfaktor as lv_planfaktor, planlektoren as lv_planlektoren, planpersonalkosten as lv_planpersonalkosten, plankostenprolektor as lv_plankostenprolektor
+			 FROM lehre.tbl_lehrveranstaltung WHERE 
 			studiengang_kz='".addslashes($stg_kz)."'";
-	if($semester!='')
-		$qry.=" AND semester='".addslashes($semester)."'";
+	if($sem!='')
+		$qry.=" AND semester='".addslashes($sem)."'";
 	
 	//$lvaDAO->load_lva($stg_kz, $sem);
 }
@@ -113,21 +114,21 @@ if(!$result = pg_query($conn, $qry))
 		echo "
       		<RDF:Description  id=\"".$row_lva->lehrveranstaltung_id."\"  about=\"".$rdf_url.'/'.$row_lva->lehrveranstaltung_id."\" >
 				<LVA:lehrveranstaltung_id>".$row_lva->lehrveranstaltung_id."</LVA:lehrveranstaltung_id>
-				<LVA:kurzbz><![CDATA[".$row_lva->kurzbz."]]></LVA:kurzbz>
-				<LVA:bezeichnung><![CDATA[".$row_lva->bezeichnung."]]></LVA:bezeichnung>
+				<LVA:kurzbz><![CDATA[".$row_lva->lv_kurzbz."]]></LVA:kurzbz>
+				<LVA:bezeichnung><![CDATA[".$row_lva->lv_bezeichnung."]]></LVA:bezeichnung>
 				<LVA:studiengang_kz>".$row_lva->studiengang_kz."</LVA:studiengang_kz>
 				<LVA:semester>".$row_lva->semester."</LVA:semester>
     			<LVA:sprache><![CDATA[".$row_lva->sprache."]]></LVA:sprache>
-				<LVA:ects>".$row_lva->ects."</LVA:ects>
+				<LVA:ects>".$row_lva->lv_ects."</LVA:ects>
 				<LVA:semesterstunden>".$row_lva->semesterstunden."</LVA:semesterstunden>
 				<LVA:anmerkung><![CDATA[".$row_lva->anmerkung."]]></LVA:anmerkung>
 				<LVA:lehre>".($row_lva->lehre?'Ja':'Nein')."</LVA:lehre>
-				<LVA:lehreverzeichnis><![CDATA[".$row_lva->lehreverzeichnis."]]></LVA:lehreverzeichnis>
+				<LVA:lehreverzeichnis><![CDATA[".$row_lva->lv_lehreverzeichnis."]]></LVA:lehreverzeichnis>
 				<LVA:aktiv>".($row_lva->aktiv?'Ja':'Nein')."</LVA:aktiv>
-				<LVA:planfaktor>".$row_lva->planfaktor."</LVA:planfaktor>
-				<LVA:planlektoren>".$row_lva->planlektoren."</LVA:planlektoren>
-				<LVA:planpersonalkosten>".$row_lva->planpersonalkosten."</LVA:planpersonalkosten>
-				<LVA:plankostenprolektor>".$row_lva->plankostenprolektor."</LVA:plankostenprolektor>
+				<LVA:planfaktor>".$row_lva->lv_planfaktor."</LVA:planfaktor>
+				<LVA:planlektoren>".$row_lva->lv_planlektoren."</LVA:planlektoren>
+				<LVA:planpersonalkosten>".$row_lva->lv_planpersonalkosten."</LVA:planpersonalkosten>
+				<LVA:plankostenprolektor>".$row_lva->lv_plankostenprolektor."</LVA:plankostenprolektor>
 				
 				<LVA:lehreinheit_id></LVA:lehreinheit_id>
 				<LVA:lehrform_kurzbz></LVA:lehrform_kurzbz>
