@@ -70,8 +70,8 @@ foreach ($studiengangfk AS $stg)
 }
 
 set_time_limit(60);
-$adress='ruhan@technikum-wien.at';
-//$adress='fas_sync@technikum-wien.at';
+//$adress='ruhan@technikum-wien.at';
+$adress='fas_sync@technikum-wien.at';
 
 function myaddslashes($var)
 {
@@ -91,7 +91,7 @@ function myaddslashes($var)
 <body>
 <?php
 echo nl2br("Studentensynchro vom ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
-/*
+
 $plausiueb="Überprüfung Studentendaten im FAS:\n\n";
 $qry="SELECT * FROM person JOIN student ON person_pk=student.person_fk WHERE svnr='0005010400';";
 if($resultp = pg_query($conn_fas, $qry))
@@ -406,7 +406,7 @@ foreach ($studiengangfk AS $stg)
 		echo nl2br("Kein Zugriff auf tbl_studiengang => Studiengang ".$stg." nicht gefunden. E-Mail mit folgendem Inhalt wird nicht verschickt:\n".$error_log_fas[$stg]);
 	}
 }
-*/
+
 
 
 $qry = "SELECT * FROM person JOIN student ON person_fk=person_pk WHERE uid NOT LIKE '\_dummy%' 
