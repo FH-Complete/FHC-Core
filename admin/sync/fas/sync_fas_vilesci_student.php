@@ -70,8 +70,8 @@ foreach ($studiengangfk AS $stg)
 }
 
 set_time_limit(60);
-//$adress='ruhan@technikum-wien.at';
-$adress='fas_sync@technikum-wien.at';
+$adress='ruhan@technikum-wien.at';
+//$adress='fas_sync@technikum-wien.at';
 
 function myaddslashes($var)
 {
@@ -134,7 +134,8 @@ p2.aufnahmeschluessel AS aufnahmeschluessel2, p2.aufnahmeschluessel_fk AS aufnah
 FROM (person JOIN student ON person_pk=student.person_fk ) AS p1 
 CROSS JOIN (person JOIN student ON person_pk=student.person_fk) AS p2 WHERE 
 ((p1.svnr=p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'') 
-	OR ((p1.svnr<>p2.svnr OR p1.svnr IS NOT NULL OR p1.svnr<>'') AND p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!='' 
+	OR ((p1.svnr<>p2.svnr AND (p1.svnr IS NULL OR p1.svnr='' OR p2.svnr IS NULL OR p2.svnr='')) 
+	AND p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!='' 
 	AND p1.gebdat=p2.gebdat AND p1.gebdat IS NOT NULL AND p1.gebdat>'1935-01-01' AND p1.gebdat<'2000-01-01'))
 AND (p1.person_pk < p2.person_pk) 
 AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400') 
@@ -419,7 +420,8 @@ CROSS JOIN (person JOIN student ON person_pk=student.person_fk) AS p2 WHERE
 OR ((p1.ersatzkennzeichen=p2.ersatzkennzeichen AND p1.ersatzkennzeichen<>'') OR (p1.svnr=p2.svnr AND p1.svnr<>'')))
 AND (p1.person_pk <> p2.person_pk)
 AND ((p1.svnr=p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'') 
-	OR (p1.svnr<>p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'' AND p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!='' 
+	OR ((p1.svnr<>p2.svnr AND (p1.svnr IS NULL OR p1.svnr='' OR p2.svnr IS NULL OR p2.svnr='')) 
+	AND p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!='' 
 	AND p1.gebdat=p2.gebdat AND p1.gebdat IS NOT NULL AND p1.gebdat>'1935-01-01' AND p1.gebdat<'2000-01-01'))
 AND (trim(p1.familienname)<>trim(p2.familienname) OR trim(p1.vorname)<>trim(p2.vorname) OR trim(p1.vornamen)<>trim(p2.vornamen)
 	OR p1.geschlecht<>p2.geschlecht 
