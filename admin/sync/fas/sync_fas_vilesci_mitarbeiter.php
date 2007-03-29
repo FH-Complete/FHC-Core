@@ -529,7 +529,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 						while($row1 = pg_fetch_object($resultu))
 						{
 							$updatep=false;			
-							if($row1->sprache!=$personsprache) 
+							/*if($row1->sprache!=$personsprache) 
 							{
 								$updatep=true;
 								if(strlen(trim($ausgabe_person))>0)
@@ -540,7 +540,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 								{
 									$ausgabe_person="Sprache: '".$personsprache."' (statt '".$row1->sprache."')";
 								}
-							}
+							}*/
 							if($row1->anrede!=$personanrede)
 							{
 								$updatep=true;
@@ -750,7 +750,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 							if($updatep)
 							{
 								$qry = "UPDATE public.tbl_person SET
-								       sprache=".myaddslashes($personsprache).", 
+								      
 								       anrede=".myaddslashes($personanrede).", 
 								       titelpost=".myaddslashes($persontitelpost).", 
 								       titelpre=".myaddslashes($persontitelpre).", 
@@ -806,7 +806,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 				if(!$error)
 				{
 					//Benutzer schon vorhanden?
-					$qry="SELECT uid, person_id FROM public.tbl_benutzer WHERE person_id='$personperson_id'";
+					$qry="SELECT uid, person_id FROM public.tbl_benutzer WHERE person_id='$personperson_id' AND uid='".$benutzeruid."';";
 					if($resultu = pg_query($conn, $qry))
 					{
 						if(pg_num_rows($resultu)>0) //wenn dieser eintrag schon vorhanden ist
@@ -828,7 +828,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 					//echo nl2br("\n".$benutzeruid." / ".$personnachname."\n");
 					if($benutzernew)
 					{
-						$qry = "INSERT INTO public.tbl_benutzer (uid, aktiv, alias, person_id, insertamum, insertvon, updateamum, updatevon) VALUES(".
+						$qry = "INSERT INTO public.tbl_benutzer (uid, aktiv, alias, person_id, insertamum, insertvon, updateamum, updatevon, ext_id) VALUES(".
 							myaddslashes($benutzeruid).", ".
 							myaddslashes($benutzeraktiv?'true':'false').", ".
 							myaddslashes($benutzeralias).", ".
@@ -836,7 +836,8 @@ if($resultall = pg_query($conn_fas, $qryall))
 							myaddslashes($benutzerinsertamum).", ".
 							myaddslashes($benutzerinsertvon).", 
 							now() , 
-							'SYNC');";
+							'SYNC', 
+							null);";
 							$ausgabe_benutzer="Benutzer ".$benutzeruid." ".$benutzeralias." eingefügt.\n";
 					}
 					else
@@ -880,7 +881,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 							       person_id=".myaddslashes($personperson_id).", 
 							       updateamum=now(), 
 							       updatevon='SYNC' 
-							       WHERE uid='$benutzeruid';";
+							       WHERE person_id='$personperson_id' AND uid='".$benutzeruid."';";
 							$ausgabe_benutzer="Änderungen bei Benutzer ".$benutzeruid." ".$benutzeralias.": ".$ausgabe_benutzer."\n";
 						}
 					}
