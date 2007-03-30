@@ -25,7 +25,7 @@ require_once("fo_svg.php");
 class FO_InstreamForeignObject extends FO_Object {
 
   private static $CHILDNODES = array(
-				     FO_SVG
+				     'FO_SVG'
 				     );
 
   public function parse(DOMNode $node) {

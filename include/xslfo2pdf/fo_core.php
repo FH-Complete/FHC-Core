@@ -29,7 +29,7 @@ class FO_Container {
   }
 
   public function resolveReference($category, $name) {
-    return $_refs[$category][$name];
+  	return (isset($_refs)?$_refs[$category][$name]:'');
   }
 }
 
@@ -41,7 +41,10 @@ class FO_Context {
   }
 
   public function get($key) {
-    return $this->_context[$key];
+  	if(isset($this->_context[$key]))
+    	return $this->_context[$key];
+    else 
+    	return false;
   }
 
   public function set($key, $val) {
@@ -189,12 +192,18 @@ abstract class FO_Object {
   }
 	
   protected function getAttribute(DOMNode $node, $key) {
-    return $node->attributes->getNamedItem($key)->nodeValue;
+  	if($node->attributes->getNamedItem($key)!=null)
+    	return $node->attributes->getNamedItem($key)->nodeValue;
+    else 
+    	return false;
   }
 
   protected function getSizeAttribute(DOMNode $node, $key, $to="mm", $from="mm") {
-    $val = $node->attributes->getNamedItem($key)->nodeValue;
-    return $this->calcInternalValue($val, $to, $from);
+  	if($node->attributes->getNamedItem($key)!=null)
+  		$val = $node->attributes->getNamedItem($key)->nodeValue;
+  	else 
+  		$val=false;
+   	return $this->calcInternalValue($val, $to, $from);
   }
 
   protected function initSizeAttribute(DOMNode $node, $key, $to="mm", $from="mm") {
@@ -346,8 +355,8 @@ class FO_Root extends FO_Object{
   }
 	
   private static $CHILDNODES = array (
-				      FO_LayoutMasterSet,
-				      FO_PageSequence
+				      'FO_LayoutMasterSet',
+				      'FO_PageSequence'
 				      );
 	
   public function parse(DOMNode $node) {

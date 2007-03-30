@@ -68,6 +68,7 @@ class XslFo2PDF {
       $name = $name.".pdf";
     }
     $pdf->Output($name, $dest);
+    return true;
   }
 
   private function initDefaults(FPDF $pdf, FO_Root $root) {
@@ -114,12 +115,16 @@ class FO_Factory {
 
   public static function createFOObject(DOMNode $node, FO_Container $container,
 					FPDF $pdf, FO_Context &$context, 
-					$filter) {
-    $obj = self::$factory[$node->nodeName];
-    if (!$obj) {
+					$filter) 
+  {
+	if(isset(self::$factory[$node->nodeName]))
+    	$obj = self::$factory[$node->nodeName];
+    if (!isset($obj) || !$obj) 
+    {
       return NULL;
     }
-    if (!$filter || !in_array($obj, $filter)) {
+    if (!$filter || !in_array($obj, $filter)) 
+    {
       echo "ignore due to filter:$obj<br>";
       return NULL;
     }

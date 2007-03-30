@@ -25,20 +25,20 @@ class FO_Block extends FO_LayoutObject{
   private static $CHILDNODES = array(
 	  //FO_BidiOverride,
 	  //FO_Character,
-	  FO_ExternalGraphic, /*oesi - uncomment for ExternalGraphic Support*/
-	  FO_InstreamForeignObject,
-	  FO_Inline,
+	  'FO_ExternalGraphic', /*oesi - uncomment for ExternalGraphic Support*/
+	  'FO_InstreamForeignObject',
+	  'FO_Inline',
 	  //FO_InlineContainer,
 	  //FO_Leader,
 	  //FO_PageNumber,
 	  //FO_PageNumberCitation,
-	  FO_BasicLink,
+	  'FO_BasicLink',
 	  //FO_MultiToggle,
-	  FO_Block,
-	  FO_BlockContainer,
-	  FO_TableAndCaption,
-	  FO_Table,
-	  FO_ListBlock
+	  'FO_Block',
+	  'FO_BlockContainer',
+	  'FO_TableAndCaption',
+	  'FO_Table',
+	  'FO_ListBlock'
 	  );
 		
   protected function getChildNodes() {
@@ -64,6 +64,7 @@ class FO_Block extends FO_LayoutObject{
     case "left":
       $align = "L";
     default:
+      $align = '';
     }
 	
     $text = $this->escape($text);
