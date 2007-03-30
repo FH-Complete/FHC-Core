@@ -67,8 +67,8 @@ http://xslf2pdf.tegonal.com
 class FO_TableAndCaption extends FO_Object {
 
   private static $CHILDNODES = array(
-				     FO_Table,
-				     FO_TableCaption
+				     'FO_Table',
+				     'FO_TableCaption'
 				     );
 
   public function parse(DOMNode $node) {
@@ -80,10 +80,10 @@ class FO_Table extends FO_LayoutObject {
   private $colCount = 0;
 
   private static $CHILDNODES = array(
-				     FO_TableColumn,
-				     FO_TableHeader,
-				     FO_TableFooter,
-				     FO_TableBody
+				     'FO_TableColumn',
+				     'FO_TableHeader',
+				     'FO_TableFooter',
+				     'FO_TableBody'
 				     );
 
   protected function getChildNodes() {
@@ -122,9 +122,9 @@ class FO_Table extends FO_LayoutObject {
 class FO_TableCaption extends FO_Object {
 
   private static $CHILDNODES = array(
-				     FO_Block,
-				     FO_BlockContainer,
-				     FO_ListBlock
+				     'FO_Block',
+				     'FO_BlockContainer',
+				     'FO_ListBlock'
 				     );
 
   public function parse(DOMNode $node) {
@@ -149,7 +149,7 @@ class FO_TableRow extends FO_LayoutObject {
   private $colIndex = 0;
 
   private static $CHILDNODES = array(
-				     FO_TableCell
+				     'FO_TableCell'
 				     );
 
   protected function getChildNodes() {
@@ -186,8 +186,8 @@ class FO_TableRow extends FO_LayoutObject {
 class FO_TableHeader extends FO_TableRow {
 
   private static $CHILDNODES = array(
-				     FO_TableCell,
-				     FO_TableRow
+				     'FO_TableCell',
+				     'FO_TableRow'
 				     );
 
   protected function getChildNodes() {
@@ -198,8 +198,8 @@ class FO_TableHeader extends FO_TableRow {
 class FO_TableFooter extends FO_LayoutObject {
 
   private static $CHILDNODES = array(
-				     FO_TableCell,
-				     FO_TableRow
+				     'FO_TableCell',
+				     'FO_TableRow'
 				     );
 
   protected function getChildNodes() {
@@ -210,8 +210,8 @@ class FO_TableFooter extends FO_LayoutObject {
 class FO_TableBody extends FO_LayoutObject {
 
   private static $CHILDNODES = array(
-				     FO_TableCell,
-				     FO_TableRow
+				     'FO_TableCell',
+				     'FO_TableRow'
 				     );
 
   protected function getChildNodes() {
@@ -232,11 +232,11 @@ class FO_TableBody extends FO_LayoutObject {
 class FO_TableCell extends FO_LayoutObject {
 
   private static $CHILDNODES = array(
-				     FO_Block,
-				     FO_BlockContainer,
-				     FO_ListBlock,
-				     FO_Table,
-				     FO_TableAndCaption
+				     'FO_Block',
+				     'FO_BlockContainer',
+				     'FO_ListBlock',
+				     'FO_Table',
+				     'FO_TableAndCaption'
 				     );
   
 

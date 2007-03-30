@@ -19,6 +19,12 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+/* Erstellt einen Lehrauftrag im PDF Format
+ *
+ * Erstellt ein XML File Transformiert dieses mit
+ * Hilfe der XSL-FO Vorlage aus der DB und generiert
+ * daraus ein PDF (xslfo2pdf)
+ */
 require_once('../../vilesci/config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
@@ -27,20 +33,15 @@ require_once('../../include/studiengang.class.php');
 require_once('../../include/lehreinheit.class.php');
 require_once('../../include/fachbereich.class.php');
 
+//String der laenger als limit ist wird
+//abgeschnitten und '...' angehaengt
 function CutString($strVal, $limit)
 {
 	if(strlen($strVal) > $limit+3)
-	{
 		return substr($strVal, 0, $limit) . "...";
-	}
 	else
-	{
 		return $strVal;
-	}
 }
-	
-ini_set('display_errors','0');
-//error_reporting(E_ALL);
 
 // Datenbank Verbindung
 if (!$conn = @pg_pconnect(CONN_STRING))
@@ -57,11 +58,6 @@ if(isset($_GET['stg_kz']))
 	$studiengang_kz = $_GET['stg_kz'];
 else 
 	die('Fehlerhafte Parameteruebergabe');
-	
-if(isset($_GET['output']))
-	$output = $_GET['output'];
-else 
-	$output = 'pdf';
 
 //Berechtigung pruefen
 $rechte = new benutzerberechtigung($conn);
@@ -125,7 +121,7 @@ foreach ($fachbereich_obj->result as $fb)
 	$fb_arr[$fb->fachbereich_kurzbz] = $fb->bezeichnung;
 
 $lehreinheit = new lehreinheit($conn);
-$qry = "SELECT * FROM campus.vw_lehreinheit WHERE lv_studiengang_kz='".addslashes($studiengang_kz)."' AND mitarbeiter_uid='".addslashes($uid)."' AND studiensemester_kurzbz='$semester_aktuell'";
+$qry = "SELECT * FROM campus.vw_lehreinheit WHERE lv_studiengang_kz='".addslashes($studiengang_kz)."' AND mitarbeiter_uid='".addslashes($uid)."' AND studiensemester_kurzbz='$semester_aktuell' ORDER BY lehreinheit_id";
 
 if($result = pg_query($conn, $qry))
 {
@@ -261,7 +257,7 @@ $buffer = html_entity_decode($buffer);
 $fo2pdf = new XslFo2Pdf(); 
 if (!$fo2pdf->generatePdf($buffer, 'filename', "D")) 
 {
-    echo "Failed parsing file:".'filename'."<br>";
+    echo('Failed to generate PDF');
 }
 
 ?>

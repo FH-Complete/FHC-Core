@@ -65,6 +65,7 @@ abstract class FO_LayoutObject extends FO_FlowContainer {
     //$this->initLocalSizeAttribute($node, "padding-right");
   }
 
+  //oesi - convertiert die daten von utf8 nach latin1 und ersetzt 'EURO' durch das eurosymbol
   public function convert($str)
   {
   	//echo str_replace('EURO',chr(128),utf8_decode($str));
@@ -116,7 +117,7 @@ abstract class FO_LayoutObject extends FO_FlowContainer {
     
     //oesi - hack for ExternalGraphic Tag to show without content
     if($this instanceof FO_ExternalGraphic)
-       $this->processContent($child->textContent);
+       $this->processContent('');
     //endhack
 
     $contentBuffer = $this->endCapture();	
@@ -498,13 +499,13 @@ class FO_LayoutMasterSet extends FO_Object {
 
 class FO_PageSequence extends FO_Object {
   private static $CHILDNODES = array(
-				     FO_Flow
+				     'FO_Flow'
 				     );
   
   public function parse(DOMNode $node) {
     $masterRef = $node->attributes->getNamedItem("master-reference");
     if ($masterRef) {
-      $master = $this->resolveReference(FO_LayoutMasterSet, $masterRef);
+      $master = $this->resolveReference('FO_LayoutMasterSet', $masterRef);
       //TODO: do something with this master
     }
     $pdf = $this->getPdf();
@@ -541,11 +542,11 @@ abstract class FO_FlowContainer extends FO_Object {
 
 class FO_Flow extends FO_FlowContainer {
   private static $CHILDNODES = array(
-				     FO_Block,
-				     FO_Table,
-				     FO_BlockContainer,
-				     FO_TableAndCaption,
-				     FO_ListBlock
+				     'FO_Block',
+				     'FO_Table',
+				     'FO_BlockContainer',
+				     'FO_TableAndCaption',
+				     'FO_ListBlock'
 				     );
 
   public function parse(DOMNode $node) {
@@ -556,11 +557,11 @@ class FO_Flow extends FO_FlowContainer {
 
 class FO_BlockContainer extends FO_LayoutObject {
   private static $CHILDNODES = array(
-				     FO_Block,
-				     FO_BlockContainer,
-				     FO_TableAndCaption,
-				     FO_Table,
-				     FO_ListBlock);
+				     'FO_Block',
+				     'FO_BlockContainer',
+				     'FO_TableAndCaption',
+				     'FO_Table',
+				     'FO_ListBlock');
 
   protected function initAttributes(DOMNode $node) {
     $this->initLocalSizeAttribute($node, "position");
