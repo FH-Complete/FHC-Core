@@ -178,7 +178,7 @@ function LvCreateLehrauftrag()
 {
 	stg = document.getElementById('LehrveranstaltungEditor').getAttribute('stg_kz');
 	uid = document.getElementById('LehrveranstaltungEditor').getAttribute('uid');
-	alert('stg:'+stg+' uid:'+uid);
+	window.location.href = '<?php echo APP_ROOT; ?>content/lvplanung/lehrauftrag.php?stg_kz='+stg+'&uid='+uid+'&'+gettimestamp();
 }
 
 // ****************** FUNKTIONEN ************************** //
