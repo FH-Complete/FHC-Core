@@ -362,7 +362,22 @@ for($i=0;$i<$num_rows_stunde;$i++)
 
 $content_form.= "</SELECT></td></tr>";
 
-$content_form.= '<tr><td>Erreichbarkeit</td><td><input type="text" name="erreichbarkeit" value="'.$zeitsperre->erreichbarkeit.'" maxlength="5" size="5"> e..Email, t..Telefon</td></tr>';
+$content_form.= "<tr><td>Erreichbarkeit</td><td><SELECT name='erreichbarkeit'>";
+//dropdown fuer vertretung
+$qry = "SELECT * FROM campus.tbl_erreichbarkeit";
+
+if($result = pg_query($conn, $qry))
+{
+	while($row = pg_fetch_object($result))
+	{
+		if($zeitsperre->erreichbarkeit == $row->erreichbarkeit_kurzbz)
+			$content_form.= "<OPTION value='$row->erreichbarkeit_kurzbz' selected>$row->beschreibung</OPTION>\n";
+		else
+			$content_form.= "<OPTION value='$row->erreichbarkeit_kurzbz'>$row->beschreibung</OPTION>\n";
+	}
+}
+$content_form.= '</SELECT></td></tr>';
+
 $content_form.= "<tr><td>Vertretung</td><td><SELECT name='vertretung_uid'>";
 //dropdown fuer vertretung
 $qry = "SELECT * FROM campus.vw_mitarbeiter WHERE uid not LIKE '\\\_%' ORDER BY nachname, vorname";
