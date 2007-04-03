@@ -43,6 +43,10 @@ if(isset($_GET['src']) && $_GET['src']=='frage' && isset($_GET['frage_id']))
 {
 	$qry = "SELECT bild FROM testtool.tbl_frage WHERE frage_id='".addslashes($_GET['frage_id'])."'";
 }
+elseif(isset($_GET['src']) && $_GET['src']=='vorschlag' && isset($_GET['vorschlag_id']))
+{
+	$qry = "SELECT bild FROM testtool.tbl_vorschlag WHERE vorschlag_id='".addslashes($_GET['vorschlag_id'])."'";
+}
 else 
 	echo 'Unkown type';
 
