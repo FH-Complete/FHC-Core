@@ -380,7 +380,7 @@ class mitarbeiter extends benutzer
 	{
 		$sql_query="SELECT DISTINCT *
 				FROM campus.vw_mitarbeiter JOIN campus.tbl_zeitsperre ON (uid=mitarbeiter_uid)
-				WHERE ('$von'>=vondatum AND '$von'<=bisdatum) OR ('$bis'>=vondatum AND '$bis'<=bisdatum) ORDER BY nachname";
+				WHERE '$von'<=bisdatum OR '$bis'>=vondatum ORDER BY nachname";
 	    //echo $sql_query;
 
 		if(!($erg=pg_query($this->conn, $sql_query)))
