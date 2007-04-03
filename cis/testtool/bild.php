@@ -22,7 +22,7 @@
 // Holt den Hexcode eines Bildes aus der DB wandelt es in Zeichen
 // um und gibt das ein Bild zurueck.
 // Aufruf mit <img src='bild.php?src=frage&frage_id=1
-require_once('../../config.inc.php');
+require_once('../config.inc.php');
 
 //Hexcode in String umwandeln
 function hexstr($hex)

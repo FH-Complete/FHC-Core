@@ -286,7 +286,7 @@ if($frage->frage_id!='')
 	//Wenn ein Bild vorhanden ist, dann anzeigen
 	if($frage->bild!='')
 	{
-		echo "\n<tr><td width=400 height=300><img src='bild.php?src=frage&frage_id=$frage->frage_id' width=400 height=300></td>";
+		echo "\n<tr><td width=400 height=300><img src='../bild.php?src=frage&frage_id=$frage->frage_id' width=400 height=300></td>";
 	}
 	else 
 	{
@@ -324,7 +324,7 @@ if($frage->frage_id!='')
 		$vorschlag->bild = '';
 	}
 	//Vorschlag
-	echo '<b>Vorschlag</b><br><br>';
+	echo '<b>Vorschlag'.($vorschlag_id!=''?' Edit':'').'</b><br><br>';
 	echo "<form method=POST ENCTYPE='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_id=$gruppe_id&frage_id=$frage->frage_id'>";
 	echo "<input type='hidden' name='vorschlag_id' value='$vorschlag->vorschlag_id'>";
 	echo '<table>';
@@ -338,7 +338,7 @@ if($frage->frage_id!='')
 	echo "<td>Bild:</td><td><input type='file' name='bild'></td>";
 	echo "</tr>";
 	echo "<tr><td>Nummer:</td><td><input type='text' name='nummer' size=3 value='$vorschlag->nummer'></td></tr>";
-	echo "<tr><td colspan='2' align='right'><input type='submit' name='submitvorschlag' value=Speichern	></td></tr>";
+	echo "<tr><td colspan='2' align='right'><input type='submit' name='submitvorschlag' value='Speichern'>".($vorschlag_id!=''?"<input type='button' value='Abbrechen' onclick=\"document.location.href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_id=$gruppe_id&frage_id=$frage->frage_id'\">":'')."</td></tr>";
 	echo "</table>";
 	echo "</form>";
 		
@@ -354,7 +354,7 @@ if($frage->frage_id!='')
 		foreach ($vorschlag->result as $vs)
 		{
 			$i++;
-			echo "<tr class='liste".($i%2)."'><td>$vs->nummer</td><td>$vs->antwort</td><td>$vs->text</td><td><img src='bild.php?src=vorschlag&vorschlag_id=$vs->vorschlag_id'></td><td><a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_id=$gruppe_id&frage_id=$frage->frage_id&vorschlag_id=$vs->vorschlag_id'>edit</a></td><td><a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_id=$gruppe_id&frage_id=$frage->frage_id&vorschlag_id=$vs->vorschlag_id&type=delete' onclick=\"return confirm('Wollen Sie diesen Eintrag wirklich loeschen?')\">delete</a></td></tr>";
+			echo "<tr class='liste".($i%2)."'><td>$vs->nummer</td><td>$vs->antwort</td><td>$vs->text</td><td><img src='../bild.php?src=vorschlag&vorschlag_id=$vs->vorschlag_id'></td><td><a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_id=$gruppe_id&frage_id=$frage->frage_id&vorschlag_id=$vs->vorschlag_id'>edit</a></td><td><a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_id=$gruppe_id&frage_id=$frage->frage_id&vorschlag_id=$vs->vorschlag_id&type=delete' onclick=\"return confirm('Wollen Sie diesen Eintrag wirklich loeschen?')\">delete</a></td></tr>";
 		}
 		echo '</table>';
 	}
