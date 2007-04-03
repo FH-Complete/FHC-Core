@@ -375,5 +375,52 @@ class mitarbeiter extends benutzer
 		}
 		return $result;
 	}
+
+	function getMitarbeiterZeitsperre($von,$bis)
+	{
+		$sql_query="SELECT DISTINCT *
+				FROM campus.vw_mitarbeiter JOIN campus.tbl_zeitsperre ON (uid=mitarbeiter_uid)
+				WHERE ('$von'>=vondatum AND '$von'<=bisdatum) OR ('$bis'>=vondatum AND '$bis'<=bisdatum) ORDER BY nachname";
+	    //echo $sql_query;
+
+		if(!($erg=pg_query($this->conn, $sql_query)))
+		{
+			$this->errormsg=pg_errormessage($conn);
+			return false;
+		}
+		$num_rows=pg_numrows($erg);
+		$result=array();
+		for($i=0;$i<$num_rows;$i++)
+		{
+   			$row=pg_fetch_object($erg,$i);
+			$l=new mitarbeiter($this->conn);
+			// Personendaten
+			$l->uid=$row->uid;
+			$l->titelpre=$row->titelpre;
+			$l->titelpost=$row->titelpost;
+			$l->vorname=$row->vorname;
+			$l->vornamen=$row->vornamen;
+			$l->nachname=$row->nachname;
+			$l->gebdatum=$row->gebdatum;
+			$l->gebort=$row->gebort;
+			$l->gebzeit=$row->gebzeit;
+			$l->foto=$row->foto;
+			$l->anmerkungen=$row->anmerkungen;
+			$l->aktiv=$row->aktiv=='t'?true:false;
+			$l->homepage=$row->homepage;
+			$l->updateamum=$row->updateamum;
+			$l->updatevon=$row->updatevon;
+			// Lektorendaten
+			$l->personalnummer=$row->personalnummer;
+			$l->kurzbz=$row->kurzbz;
+			$l->lektor=$row->lektor=='t'?true:false;
+			$l->fixangestellt=$row->fixangestellt=='t'?true:false;
+			$l->standort_kurzbz = $row->standort_kurzbz;
+			$l->telefonklappe=$row->telefonklappe;
+			// Lektor in Array speichern
+			$result[]=$l;
+		}
+		return $result;
+	}
 }
 ?>

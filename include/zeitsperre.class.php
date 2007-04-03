@@ -64,7 +64,9 @@ class zeitsperre
 	{
 		unset($this->result);
 		$this->result=array();
-		$qry = "SELECT * FROM campus.tbl_zeitsperre JOIN campus.tbl_zeitsperretyp USING (zeitsperretyp_kurzbz)
+		$qry = "SELECT tbl_zeitsperre.*, tbl_zeitsperretyp.*, tbl_erreichbarkeit.farbe  AS erreichbarkeit_farbe
+				FROM (campus.tbl_zeitsperre JOIN campus.tbl_zeitsperretyp USING (zeitsperretyp_kurzbz))
+					JOIN campus.tbl_erreichbarkeit USING (erreichbarkeit_kurzbz)
 				WHERE mitarbeiter_uid='".addslashes($uid)."' AND bisdatum>=now() ORDER BY vondatum";
 		if($result = pg_query($this->conn, $qry))
 		{
@@ -84,7 +86,9 @@ class zeitsperre
 				$obj->vonstunde = $row->vonstunde;
 				$obj->bisdatum = $row->bisdatum;
 				$obj->bisstunde = $row->bisstunde;
-				$obj->erreichbarkeit = $row->erreichbarkeit;
+				$obj->erreichbarkeit = $row->erreichbarkeit_kurzbz;
+				$obj->erreichbarkeit_farbe = $row->erreichbarkeit_farbe;
+				$obj->erreichbarkeit = $row->erreichbarkeit_kurzbz;
 				$obj->vertretung_uid = $row->vertretung_uid;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
@@ -226,7 +230,7 @@ class zeitsperre
 			//Neuen Datensatz anlegen
 
 			$qry = 'INSERT INTO campus.tbl_zeitsperre (zeitsperretyp_kurzbz, mitarbeiter_uid, bezeichnung,'.
-			       ' vondatum ,vonstunde, bisdatum, bisstunde, erreichbarkeit, vertretung_uid, insertamum,'.
+			       ' vondatum ,vonstunde, bisdatum, bisstunde, erreichbarkeit_kurzbz, vertretung_uid, insertamum,'.
 			       ' insertvon, updateamum, updatevon) VALUES ('.
 					$this->addslashes($this->zeitsperretyp_kurzbz).', '.
 					$this->addslashes($this->mitarbeiter_uid).', '.
