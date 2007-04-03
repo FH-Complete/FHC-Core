@@ -139,7 +139,7 @@ class zeitsperre
 			$this->vonstunde = $row->vonstunde;
 			$this->bisdatum = $row->bisdatum;
 			$this->bisstunde = $row->bisstunde;
-			$this->erreichbarkeit = $row->erreichbarkeit;
+			$this->erreichbarkeit = $row->erreichbarkeit_kurzbz;
 			$this->vertretung_uid = $row->vertretung_uid;
 			$this->updateamum = $row->updateamum;
 			$this->updatevon = $row->updatevon;
@@ -205,7 +205,7 @@ class zeitsperre
 			$this->errormsg = "Mitarbeiter_uid darf nicht laenger als 8 Zeichen sein";
 			return false;
 		}
-		if(strlen($this->erreichbarkeit)>5)
+		if(strlen($this->erreichbarkeit)>8)
 		{
 			$this->errormsg = "Erreichbarkeit darf nicht laenger als 8 Zeichen sein";
 			return false;
@@ -265,7 +265,7 @@ class zeitsperre
 				'vonstunde='.$this->addslashes($this->vonstunde).', '.
 				'bisdatum='.$this->addslashes($this->bisdatum).', '.
 				'bisstunde='.$this->addslashes($this->bisstunde).', '.
-				'erreichbarkeit='.$this->addslashes($this->erreichbarkeit).', '.
+				'erreichbarkeit_kurzbz='.$this->addslashes($this->erreichbarkeit).', '.
 				'vertretung_uid='.$this->addslashes($this->vertretung_uid).', '.
 				'insertamum='.$this->addslashes($this->insertamum).', '.
 				'insertvon='.$this->addslashes($this->insertvon).', '.
