@@ -17,8 +17,8 @@ include('../../../vilesci/config.inc.php');
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
-$adress='ruhan@technikum-wien.at';
-//$adress='fas_sync@technikum-wien.at';
+//$adress='ruhan@technikum-wien.at';
+$adress='fas_sync@technikum-wien.at';
 
 $error_log='';
 $error_log_fas='';
@@ -55,7 +55,9 @@ function myaddslashes($var)
 <body>
 <?php
 //nation
-$qry="SELECT * FROM person, student WHERE person_pk=person_fk AND uid IS NOT null AND uid<>'' AND perskz IS NOT null AND perskz<>'' ORDER BY Familienname, Vorname ;";
+$qry="SELECT * FROM person, student 
+WHERE person_pk=person_fk AND uid IS NOT null AND uid<>'' AND perskz IS NOT null AND perskz<>'' 
+ORDER BY Familienname, Vorname;";
 
 if($result = pg_query($conn_fas, $qry))
 {
@@ -76,8 +78,6 @@ if($result = pg_query($conn_fas, $qry))
 		$insertvon				="SYNC";
 		$ext_id				="";
 		
-
-		$update=false;
 		$qry="SELECT * FROM student_gruppe WHERE student_fk='".$row->student_pk."';";
 		if($result1 = pg_query($conn_fas, $qry))
 		{
@@ -213,7 +213,7 @@ if($result = pg_query($conn_fas, $qry))
 						}
 						else
 						{
-							$error_log="Gruppentyp nicht 1, 2 oder 3.\n";
+							$error_log="Gruppentyp nicht 1, 2, 3 oder 10.\n";
 							$error=true;
 						}
 					}
@@ -235,7 +235,7 @@ if($result = pg_query($conn_fas, $qry))
 						}
 						else 
 						{
-							$error_log.="Studiengang mit studiengang_pk='".$row2->studiengang_fk."' nicht gefunden.";
+							$error_log.="Studiengang mit studiengang_pk='".$row2->studiengang_fk."' nicht gefunden.\n";
 							$error=true;
 						}
 					}
@@ -249,7 +249,7 @@ if($result = pg_query($conn_fas, $qry))
 						}
 						else 
 						{
-							$error_log.="Studiensemester '".$row2->studiensemester_fk."' nicht gefunden.";
+							$error_log.="Studiensemester '".$row2->studiensemester_fk."' nicht gefunden.\n";
 							$error=true;
 						}
 					}
@@ -271,7 +271,7 @@ if($result = pg_query($conn_fas, $qry))
 						else 
 						{
 							$error=true;
-							$error_log.="Student mit matrikelnr=".$row->perskz." in tbl_student nicht gefunden";
+							$error_log.="Student mit matrikelnr=".$row->perskz." in tbl_student nicht gefunden.\n";
 						}
 					}
 					else 
@@ -416,11 +416,11 @@ if($result = pg_query($conn_fas, $qry))
 						$error_log_fas.="### Student ".$student_uid.", ".$row->familienname.", (".$row->perskz.") gruppe_pk='".$row1->gruppe_fk."' : ".$error_log;			
 					}
 				}
-				else 
+				/*else 
 				{
 					$anzahl_fehler++;
 					$error_log_fas.="### Student mit UID/Name/Perskz ".$student_uid.", ".$row->familienname.", (".$row->perskz.") gruppe_pk='".$row1->gruppe_fk."' : ".$error_log;					
-				}
+				}*/
 			}
 		}
 		else 
