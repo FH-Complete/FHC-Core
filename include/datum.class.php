@@ -97,5 +97,19 @@ class datum
 			return false;
 		}
 	}
+
+	/**
+	 * Springt von einen UNIX Timestamp ($datum) $wochen nach vor bzw. hinten
+	 */
+	function jump_week($datum, $wochen)
+	{
+		$stunde_vor=date("G",$datum);
+		// Eine Woche sind 604800 Sekunden
+		$datum+=604800*$wochen;
+		$stunde_nach=date("G",$datum);
+		if ($stunde_nach!=$stunde_vor)
+			$datum+=3600;
+		return $datum;
+	}
 }
 ?>

@@ -191,7 +191,7 @@ else
 				<tr>
 					<td width="10" nowrap>&nbsp;</td>
 				    <td nowrap>
-				    	<a href="?Location" class="MenuItem" onClick="return(js_toggle_container('Zeitsperren'));">
+				    	<a href="profile/zeitsperre_days.php?days=7" target="content" class="MenuItem" onClick="js_toggle_container('Zeitsperren');">
 				    		<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Zeitsperren
 				    	</a>
 				    </td>
@@ -205,7 +205,10 @@ else
 							<ul style="margin-top: 0px; margin-bottom: 0px;">
 							<?php
 							if ($rechte->isBerechtigt('admin',0))
+							{
 								echo '<li><a class="Item2" href="profile/zeitsperre.php?fix=true" target="content">Fix-Angestellte</a></li>';
+								echo '<li><a class="Item2" href="profile/zeitsperre.php?fix=true&lektor=true" target="content">Fixe Lektoren</a></li>';
+							}
 							$stge=$rechte->getStgKz('admin');
 							foreach($stg_obj->result as $row)
 								if (in_array($row->studiengang_kz,$stge))
