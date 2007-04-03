@@ -297,7 +297,7 @@ class zeitsperre
 		{
 			$beginn=$datum_obj->mktime_fromdate($zs->vondatum);
 			$ende=$datum_obj->mktime_fromdate($zs->bisdatum);
-			if ($datum>$beginn && $datum<$ende)
+			if ($datum>=$beginn && $datum<=$ende)
 				$typ.=$zs->zeitsperretyp_kurzbz;
 		}
 		return $typ;
@@ -315,7 +315,7 @@ class zeitsperre
 		{
 			$beginn=$datum_obj->mktime_fromdate($zs->vondatum);
 			$ende=$datum_obj->mktime_fromdate($zs->bisdatum);
-			if ($datum>$beginn && $datum<$ende)
+			if ($datum>=$beginn && $datum<=$ende)
 				$erbk.=$zs->erreichbarkeit;
 		}
 		return $erbk;
