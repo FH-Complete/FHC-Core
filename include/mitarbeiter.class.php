@@ -378,9 +378,9 @@ class mitarbeiter extends benutzer
 
 	function getMitarbeiterZeitsperre($von,$bis)
 	{
-		$sql_query="SELECT DISTINCT *
+		$sql_query="SELECT DISTINCT nachname, vorname, uid,titelpre, titelpost, vornamen
 				FROM campus.vw_mitarbeiter JOIN campus.tbl_zeitsperre ON (uid=mitarbeiter_uid)
-				WHERE '$von'<=bisdatum OR '$bis'>=vondatum ORDER BY nachname";
+				WHERE ('$von'<=bisdatum AND '$bis'>=bisdatum) OR ('$bis'>=vondatum AND '$von'<=vondatum) ORDER BY nachname";
 	    //echo $sql_query;
 
 		if(!($erg=pg_query($this->conn, $sql_query)))
@@ -401,22 +401,22 @@ class mitarbeiter extends benutzer
 			$l->vorname=$row->vorname;
 			$l->vornamen=$row->vornamen;
 			$l->nachname=$row->nachname;
-			$l->gebdatum=$row->gebdatum;
-			$l->gebort=$row->gebort;
-			$l->gebzeit=$row->gebzeit;
-			$l->foto=$row->foto;
-			$l->anmerkungen=$row->anmerkungen;
-			$l->aktiv=$row->aktiv=='t'?true:false;
-			$l->homepage=$row->homepage;
-			$l->updateamum=$row->updateamum;
-			$l->updatevon=$row->updatevon;
+			//$l->gebdatum=$row->gebdatum;
+			//$l->gebort=$row->gebort;
+			//$l->gebzeit=$row->gebzeit;
+			//$l->foto=$row->foto;
+			//$l->anmerkungen=$row->anmerkungen;
+			//$l->aktiv=$row->aktiv=='t'?true:false;
+			//$l->homepage=$row->homepage;
+			//$l->updateamum=$row->updateamum;
+			//$l->updatevon=$row->updatevon;
 			// Lektorendaten
-			$l->personalnummer=$row->personalnummer;
-			$l->kurzbz=$row->kurzbz;
-			$l->lektor=$row->lektor=='t'?true:false;
-			$l->fixangestellt=$row->fixangestellt=='t'?true:false;
-			$l->standort_kurzbz = $row->standort_kurzbz;
-			$l->telefonklappe=$row->telefonklappe;
+			//$l->personalnummer=$row->personalnummer;
+			//$l->kurzbz=$row->kurzbz;
+			//$l->lektor=$row->lektor=='t'?true:false;
+			//$l->fixangestellt=$row->fixangestellt=='t'?true:false;
+			//$l->standort_kurzbz = $row->standort_kurzbz;
+			//$l->telefonklappe=$row->telefonklappe;
 			// Lektor in Array speichern
 			$result[]=$l;
 		}
