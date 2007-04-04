@@ -20,17 +20,15 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-class frage
+class antwort
 {
 	//Tabellenspalten
+	var $antwort_id;
 	var $frage_id;
-	var $gebiet_id;
-	var $gruppe_id;
-	var $loesung;
-	var $nummer;
-	var $demo;
-	var $text;
-	var $bild;
+	var $antwort;
+	var $begintime;
+	var $endtime;
+	var $pruefling_id;
 		
 	// ErgebnisArray
 	var $result=array();
@@ -39,13 +37,13 @@ class frage
 	var $new;
 		
 	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine frage
+	// * Konstruktor - Uebergibt die Connection und laedt optional eine Antwort
 	// * @param $conn        	Datenbank-Connection
 	// *        $frage_id       Frage die geladen werden soll (default=null)
 	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
-	function frage($conn, $frage_id=null, $unicode=false)
+	function antwort($conn, $antwort_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
 		
@@ -60,35 +58,33 @@ class frage
 			return false;
 		}
 		
-		if($frage_id != null)
-			$this->load($frage_id);
+		if($antwort_id != null)
+			$this->load($antwort_id);
 	}
 	
 	// ***********************************************************
-	// * Laedt Frage mit der uebergebenen ID
-	// * @param $frage_id ID der Frage die geladen werden soll
+	// * Laedt antwort mit der uebergebenen ID
+	// * @param $antwort_id ID der Frage die geladen werden soll
 	// ***********************************************************
-	function load($frage_id)
+	function load($antwort_id)
 	{
-		$qry = "SELECT * FROM testtool.tbl_frage WHERE frage_id='".addslashes($frage_id)."'";
+		$qry = "SELECT * FROM testtool.tbl_antwort WHERE antwort_id='".addslashes($antwort_id)."'";
 		
 		if($result = pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
 			{
+				$this->antwort_id = $row->antwort_id;
 				$this->frage_id = $row->frage_id;
-				$this->gebiet_id = $row->gebiet_id;
-				$this->gruppe_id = $row->gruppe_id;
-				$this->loesung = $row->loesung;
-				$this->nummer = $row->nummer;
-				$this->demo = ($row->demo=='t'?true:false);
-				$this->text = $row->text;
-				$this->bild = $row->bild;
+				$this->antwort = $row->antwort;
+				$this->begintime = $row->begintime;
+				$this->endtime = $row->endtime;
+				$this->pruefling_id = $row->pruefling_id;
 				return true;
 			}
 			else 
 			{
-				$this->errormsg = "Kein Eintrag gefunden fuer $frage_id";
+				$this->errormsg = "Kein Eintrag gefunden fuer $antwort_id";
 				return false;
 			}				
 		}
@@ -121,9 +117,9 @@ class frage
 	}
 	
 	// ******************************************************************
-	// * Speichert die Benutzerdaten in die Datenbank
+	// * Speichert die Daten in die Datenbank
 	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * ansonsten der Datensatz mit $uid upgedated
+	// * ansonsten upgedated
 	// * @return true wenn erfolgreich, false im Fehlerfall
 	// ******************************************************************
 	function save()
@@ -134,28 +130,19 @@ class frage
 		
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = 'INSERT INTO testtool.tbl_frage (frage_id, gebiet_id, gruppe_id, loesung, nummer, demo, text, bild) VALUES('.
+			$qry = 'INSERT INTO testtool.tbl_antwort (frage_id, antwort, begintime, endtime, pruefling_id) VALUES('.
 			       "'".addslashes($this->frage_id)."',".
-			       $this->addslashes($this->gebiet_id).",'".
-			       $this->addslashes($this->gruppe_id).",'".
-			       $this->addslashes($this->loesung).",".
-			       $this->addslashes($this->nummer).",".
-			       ($this->demo?'true':'false').','.
-			       $this->addslashes($this->text).",".
-			       $this->addslashes($this->bild).");";
+			       $this->addslashes($this->antwort).",".
+			       $this->addslashes($this->begintime).",".
+			       $this->addslashes($this->endtime).",".
+			       $this->addslashes($this->pruefling_id).");";
 		}
 		else
 		{			
-			$qry = 'UPDATE testtool.tbl_frage SET'.
-			       ' frage_id='.$this->addslashes($this->frage_id).','.
-			       ' gebiet_id='.$this->addslashes($this->gebiet_id).','.
-			       " gruppe_id='".$this->gruppe_id."',".
-			       ' loesung='.$this->addslashes($this->loesung).','.
-			       ' nummer='.$this->addslashes($this->nummer).','.
-			       ' demo='.($this->demo?'true':'false').','.
-			       ' text='.$this->addslashes($this->text).','.
-			       ' bild='.$this->addslashes($this->bild).
-			       " WHERE frage_id='".addslashes($this->frage_id)."';";
+			$qry = 'UPDATE testtool.tbl_antwort SET'.
+			       ' antwort='.$this->addslashes($this->antwort).','.
+			       " endtime='".$this->endtime."'".
+			       " WHERE frage_id='".addslashes($this->frage_id)."' AND pruefling_id='".addslashes($this->pruefling_id)."'";
 		}
 		
 		if(pg_query($this->conn,$qry))
@@ -165,59 +152,37 @@ class frage
 		}
 		else 
 		{	
-			$this->errormsg = 'Fehler beim Speichern der Frage:'.$qry;
-			return false;
-		}
-	}
-
-	function getFrage($gebiet_id, $nummer, $gruppe_id)
-	{
-		$qry = "SELECT * FROM testtool.tbl_frage WHERE gebiet_id='$gebiet_id' AND nummer='$nummer' AND gruppe_id='$gruppe_id'";
-		
-		if($result = pg_query($this->conn, $qry))
-		{
-			if($row = pg_fetch_object($result))
-			{				
-				$this->frage_id = $row->frage_id;
-				$this->gebiet_id = $row->gebiet_id;
-				$this->gruppe_id = $row->gruppe_id;
-				$this->loesung = $row->loesung;
-				$this->nummer = $row->nummer;
-				$this->demo = ($row->demo=='t'?true:false);
-				$this->text = $row->text;
-				$this->bild = $row->bild;
-				
-				return true;
-			}
-			else 
-			{
-				$this->errormsg = 'Fehler beim laden';
-				return false;
-			}			
-		}
-		else 
-		{
-			$this->errormsg = 'Fehler beim laden der Daten';
+			$this->errormsg = 'Fehler beim Speichern der Antwort:'.$qry;
 			return false;
 		}
 	}
 	
-	function getNextFrage($gebiet_id, $gruppe_kurzbz, $frage_id, $demo=false)
+	function getAntwort($pruefling_id, $frage_id)
 	{
-		$qry = "SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id='".addslashes($gebiet_id)."' AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."' AND nummer>(SELECT nummer FROM testtool.tbl_frage WHERE frage_id='".addslashes($frage_id)."') ";
-		if($demo)
-			$qry.=" AND demo=true";
-		$qry.=" ORDER BY nummer ASC LIMIT 1";
-		
+		$qry = "SELECT * FROM testtool.tbl_antwort WHERE pruefling_id='".addslashes($pruefling_id)."' AND frage_id='".addslashes($frage_id)."'";
 		if($result = pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
-				return $row->frage_id;
+			{
+				$this->antwort_id = $row->antwort_id;
+				$this->frage_id = $row->frage_id;
+				$this->antwort = $row->antwort;
+				$this->begintime = $row->begintime;
+				$this->endtime = $row->endtime;
+				$this->pruefling_id = $row->pruefling_id;
+				return true;
+			}
 			else 
+			{
+				$this->errormsg = 'Antwort wurde nicht gefunden';
 				return false;
+			}				
 		}
 		else 
+		{
+			$this->errormsg = 'Antwort konnte nicht geladen werden';
 			return false;
+		}
 	}
 }
 ?>
