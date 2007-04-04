@@ -298,6 +298,7 @@ echo nl2br($error_log_fas."\n\n");
 echo nl2br ($ausgabe_all);
 $ausgabe="\nGruppe\nGruppe: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Nicht eingefügt: $anzahl_update / Fehler: $anzahl_fehler."
 ."\n\n".$ausgabe_all;
+ 
 
 if(strlen(trim($error_log_fas))>0)
 {
