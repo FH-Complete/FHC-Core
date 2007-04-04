@@ -38,13 +38,18 @@ if(!$db_conn = pg_pconnect(CONN_STRING))
 
 <body>
 <?php
-if (isset($_SESSION['prestudent_id']))
+if (isset($_SESSION['pruefling_id']))
 {
 	echo '<table width="100%"  border="0" cellspacing="0" cellpadding="0" style="border-right-width:1px;border-right-color:#BCBCBC;">';
+	echo '<tr><td nowrap>
+			<a class="MenuItem" href="index.html" target="_top">
+				<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Home
+			</a>
+		</td></tr>';
 	echo '<tr><td nowrap><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Gebiet</td></tr>';
 	echo '<tr><td nowrap>';
-	echo '<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="MeineCIS" style="display: visible;">';
-		  	
+	echo '<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible;">';
+	  	
 	$qry = 'SELECT * FROM testtool.vw_ablauf WHERE studiengang_kz='.$_SESSION['studiengang_kz'].' ORDER BY reihung';
 	//echo $qry;
 	if($result = pg_query($db_conn, $qry))
@@ -52,7 +57,7 @@ if (isset($_SESSION['prestudent_id']))
 			echo '<tr>
 						<td width="10" nowrap>&nbsp;</td>
 				   		<td nowrap>
-				   			<a class="Item" href="profile/index.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;'.$row->gebiet_bez.'</a>
+				   			<a class="Item" href="frage.php?gebiet_id='.$row->gebiet_id.'" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;'.$row->gebiet_bez.'</a>
 				   		</td>
 				   	</tr>';
 	echo '</table>';
@@ -62,7 +67,7 @@ else
 {
 	echo '<table width="100%"  border="0" cellspacing="0" cellpadding="0" style="border-right-width:1px;border-right-color:#BCBCBC;">';
 	echo '<tr><td nowrap>
-				<a class="HyperItem" href="../index.html" target="_top">
+				<a class="HyperItem" href="index.html" target="_top">
 					<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Login
 				</a>
 			</td></tr>';
