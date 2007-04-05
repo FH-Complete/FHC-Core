@@ -108,7 +108,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 	if (isset($prestudent_id))
 	{	
 		echo '<form method="post">';	
-		echo '<br>Sie sind eingelogt als '.$_SESSION['vorname'].' '.$_SESSION['nachname'];
+		echo '<br>Sie sind angemeldet als '.$_SESSION['vorname'].' '.$_SESSION['nachname'];
 		echo ' ('.$_SESSION['gebdatum'].') ID: '.$_SESSION['prestudent_id'];		
 		echo '&nbsp; <INPUT type="submit" value="Logout" name="logout" />';
 		echo '</form>';
