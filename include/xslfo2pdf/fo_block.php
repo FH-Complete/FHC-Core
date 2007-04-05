@@ -22,7 +22,7 @@ http://xslf2pdf.tegonal.com
 */ ?>
 <?PHP
 class FO_Block extends FO_LayoutObject{
-  private static $CHILDNODES = array(
+  static $CHILDNODES = array(
 	  //FO_BidiOverride,
 	  //FO_Character,
 	  'FO_ExternalGraphic', /*oesi - uncomment for ExternalGraphic Support*/
@@ -41,16 +41,16 @@ class FO_Block extends FO_LayoutObject{
 	  'FO_ListBlock'
 	  );
 		
-  protected function getChildNodes() {
+  function getChildNodes() {
     return self::$CHILDNODES;
   }
 
-  protected function initAttributes($node) {
+  function initAttributes($node) {
     $this->initAttribute($node, "text-align");
     $this->initAttribute($node, "content-width");
   }
 
-  protected function processContent($text) {
+  function processContent($text) {
     $talign = $this->getContext("text-align");
     //oesi - add attribute content-width
     $colwidth = $this->getContext("content-width");
@@ -90,7 +90,7 @@ class FO_Block extends FO_LayoutObject{
     $this->setLocalContext("sy", $sy);
   }
 
-  protected function postParseContent($content) {
+  function postParseContent($content) {
         $this->setContext("startx", $this->getContext("lx"));
 	$this->setContext("y", $this->getContext("ly"));	
 	$pdf = $this->getPdf();
@@ -102,7 +102,7 @@ class FO_Block extends FO_LayoutObject{
 	}
   }
 
-  protected function postParse(FO_Object $obj) {
+  function postParse(FO_Object $obj) {
 	if (!$obj instanceof FO_Inline) {
 		return parent::postParse($obj);
 	}
@@ -116,14 +116,14 @@ class FO_Block extends FO_LayoutObject{
 	}
   }
 
-  private function escape($text) {
+  function escape($text) {
     return str_replace('\t', '', preg_replace('/\s+/', ' ', $text));
   }
 }
 
 class FO_Inline extends FO_Block {
 
-  protected function processContent($text) {
+  function processContent($text) {
     //	echo "show inline content:$text<br>";
     return parent::processContent($text);
   }
@@ -131,12 +131,12 @@ class FO_Inline extends FO_Block {
 }
 
 class FO_BasicLink extends FO_Block {
-  protected function initAttributes($node) {
+  function initAttributes($node) {
     $this->initLocalAttribute($node, "internal-destination");
     $this->initLocalAttribute($node, "external-destination");
   }
 
-  protected function processContent($text) {
+  function processContent($text) {
     parent::processContent($text);
     $width = $this->getContext("content_width");
     $height = $this->getContext("content_height");
@@ -166,7 +166,7 @@ class FO_BasicLink extends FO_Block {
 //oesi - add ExternalGraphics
 class FO_ExternalGraphic extends FO_Block
 {
-  protected function initAttributes($node) 
+  function initAttributes($node) 
   {
     $this->initLocalAttribute($node, "src");
     $this->initLocalAttribute($node, "width");
@@ -175,7 +175,7 @@ class FO_ExternalGraphic extends FO_Block
     $this->initLocalAttribute($node, "posy");
   }
 
-  protected function processContent($text) 
+  function processContent($text) 
   {
     parent::processContent($text);
                 

@@ -182,6 +182,7 @@ class pruefling
 		}
 		else 
 		{	
+			pg_query($this->conn, 'ROLLBACK');
 			$this->errormsg = 'Fehler beim Speichern der Frage:'.$qry;
 			return false;
 		}

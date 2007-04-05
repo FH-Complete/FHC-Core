@@ -22,13 +22,13 @@ http://xslf2pdf.tegonal.com
 */ ?>
 <?PHP
 
-abstract class FO_LayoutObject extends FO_FlowContainer {
-  private $_oldFont;
-  private $_oldFontStyle;
-  private $_oldColor;
-  private $_buffer;
+class FO_LayoutObject extends FO_FlowContainer {
+  var $_oldFont;
+  var $_oldFontStyle;
+  var $_oldColor;
+  var $_buffer;
   
-  private function initDefaultAttributes($node) {
+  function initDefaultAttributes($node) {
     //read attributes
     $this->initLocalAttribute($node, "border-top-style");
     $this->initLocalAttribute($node, "border-right-style");
@@ -66,13 +66,13 @@ abstract class FO_LayoutObject extends FO_FlowContainer {
   }
 
   //oesi - convertiert die daten von utf8 nach latin1 und ersetzt 'EURO' durch das eurosymbol
-  public function convert($str)
+  function convert($str)
   {
   	//echo str_replace('EURO',chr(128),utf8_decode($str));
   	return str_replace('EURO',chr(128),utf8_decode($str));
   }
 	
-  public function parse(DOMNode $node) {
+  function parse(DOMNode $node) {
     //set default attributes
     $this->initDefaultAttributes($node);
     $this->initAttributes($node);
@@ -160,37 +160,37 @@ abstract class FO_LayoutObject extends FO_FlowContainer {
   /**
    * Initialize additional attributes
    **/
-  protected function initAttributes(DOMNode $node) {
+  function initAttributes(DOMNode $node) {
     //do nothing
   }
 
-  protected function preParseContent($content) {
+  function preParseContent($content) {
   }
   
-  protected function postParseContent($textcontent) {
+  function postParseContent($textcontent) {
   }
   
   /**
    * Draw borders and backgrounds according to the positions
    * May be overwritten to specify behaviour
    */
-  protected function drawBordersAndBackground($pos) {
+  function drawBordersAndBackground($pos) {
     list($x, $y, $width, $height) = $pos[1];
     $this->drawBackground($x, $y, $width, $height);
     $this->drawBorders($x, $y, $width, $height);    
   }
 
-  protected function getChildNodes() {
+  function getChildNodes() {
     //no child nodes per default
     return array();
   }
 
-  protected function initialize() {
+  function initialize() {
     $break_before = $this->getContext("break-before");
     $this->handleBreak($break_before);
   }  
 
-  protected function closeDown() {
+  function closeDown() {
      $pdf = $this->getPdf();
      if ($this->_oldFont) {
        $pdf->SetFont($this->_oldFont, $this->_oldFontStyle, 
@@ -214,7 +214,7 @@ abstract class FO_LayoutObject extends FO_FlowContainer {
      $this->handleBreak($break_after);
   }
 
-  protected function startCapture() {
+  function startCapture() {
     if ($this->_buffer) {
       echo "Already captureing<br>";
       return;
@@ -222,7 +222,7 @@ abstract class FO_LayoutObject extends FO_FlowContainer {
     $this->_buffer = $this->getPdf()->startCapture();
   }
 
-  protected function endCapture() {
+  function endCapture() {
     if (!$this->_buffer) {      
       return;
     }    
@@ -231,7 +231,7 @@ abstract class FO_LayoutObject extends FO_FlowContainer {
     return $partBuffer;
   }
 
-  protected function appendBuffer($buffer) {
+  function appendBuffer($buffer) {
     if (!$buffer) {
       //echo "Nothing to append<br>";
       return;
@@ -239,7 +239,7 @@ abstract class FO_LayoutObject extends FO_FlowContainer {
     $this->getPdf()->appendBuffer($buffer);
   }
 
-  protected function getPosition() {
+  function getPosition() {
     $space_before = $this->getContext("space-before.optimum");    
     $height = $this->getContext("line-height");
     $pdf = $this->getPdf();    
@@ -294,7 +294,7 @@ abstract class FO_LayoutObject extends FO_FlowContainer {
 	    array($xx-$wl, $yy-$wr, $width, $height));     
   }
   
-  protected function setColor() {
+  function setColor() {
     $pdf = $this->getPdf();
     $this->_oldColor = $pdf->GetTextColor();
     $color = $this->getContext("color");    
@@ -303,7 +303,7 @@ abstract class FO_LayoutObject extends FO_FlowContainer {
     }
   }
 
-  protected function setFont() {
+  function setFont() {
     $pdf = $this->getPdf();      
     $this->_oldFont = $pdf->GetFontFamily();
     $this->_oldFontStyle = $pdf->GetFontStyle();      
@@ -347,7 +347,7 @@ abstract class FO_LayoutObject extends FO_FlowContainer {
     }
   }
 
-  protected function drawBorders($x, $y, $width, $height) {
+  function drawBorders($x, $y, $width, $height) {
     $bs_top = $this->getContext("border-top-style");
     $bs_left = $this->getContext("border-left-style");
     $bs_right = $this->getContext("border-right-style");
@@ -401,7 +401,7 @@ abstract class FO_LayoutObject extends FO_FlowContainer {
 		    $bs_right, $bc_right,$bw_right, $pdf);
   }
 
-  protected function drawBackground($x, $y, $width, $height) {
+  function drawBackground($x, $y, $width, $height) {
     $pdf = $this->GetPdf();
     $bg_c = $this->getContext("background-color");
     $bg_img = $this->getContext("background-image");
@@ -418,7 +418,7 @@ abstract class FO_LayoutObject extends FO_FlowContainer {
     }
   }
    
-  private function drawLine($x, $y, $x2, $y2, $style, $color, $width, &$pdf) {
+  function drawLine($x, $y, $x2, $y2, $style, $color, $width, &$pdf) {
      $oldColor = $pdf->GetDrawColor();
      $oldLineWidth = $pdf->GetLineWidth();
      if ($width) {
@@ -456,7 +456,7 @@ abstract class FO_LayoutObject extends FO_FlowContainer {
      $this->setLineWidth($oldLineWidth);
    }
 
-   private function setDrawColor($color, &$pdf) {
+   function setDrawColor($color, &$pdf) {
      if ($color == '') {
        return;
      }     
@@ -464,7 +464,7 @@ abstract class FO_LayoutObject extends FO_FlowContainer {
      $pdf->SetDrawColor($r, $g, $b);
    }
 
-   private function setTextColor($color, &$pdf) {
+   function setTextColor($color, &$pdf) {
      if ($color == '') {
        return;
      }     
@@ -472,7 +472,7 @@ abstract class FO_LayoutObject extends FO_FlowContainer {
      $pdf->SetTextColor($r, $g, $b);
    }   
 
-   protected function handleBreak($break) {     
+   function handleBreak($break) {     
      if (!$break) {
        return;
      }
@@ -489,20 +489,20 @@ abstract class FO_LayoutObject extends FO_FlowContainer {
 }
 
 class FO_LayoutMasterSet extends FO_Object {
-	private $name;
+	var $name;
 
-	public function parse(DOMNode $node) {
+	function parse(DOMNode $node) {
 	  $this->name = $node->attributes->getNamedItem("master-name");
 	  $this->addReference($this, $this->name);
 	}
 }
 
 class FO_PageSequence extends FO_Object {
-  private static $CHILDNODES = array(
+  static $CHILDNODES = array(
 				     'FO_Flow'
 				     );
   
-  public function parse(DOMNode $node) {
+  function parse(DOMNode $node) {
     $masterRef = $node->attributes->getNamedItem("master-reference");
     if ($masterRef) {
       $master = $this->resolveReference('FO_LayoutMasterSet', $masterRef);
@@ -515,9 +515,9 @@ class FO_PageSequence extends FO_Object {
   }  
 }
 
-abstract class FO_FlowContainer extends FO_Object {
+class FO_FlowContainer extends FO_Object {
 
-  protected function postParse(FO_Object $obj) {
+  function postParse(FO_Object $obj) {
     $acceptPageBreak = $this->getContext("acceptPageBreak");
     $this->setLocalContext("width", $obj->getContext("width"));
     $height =  $this->getContext("height")+$obj->getContext("height");
@@ -541,7 +541,7 @@ abstract class FO_FlowContainer extends FO_Object {
 }
 
 class FO_Flow extends FO_FlowContainer {
-  private static $CHILDNODES = array(
+  static $CHILDNODES = array(
 				     'FO_Block',
 				     'FO_Table',
 				     'FO_BlockContainer',
@@ -549,21 +549,21 @@ class FO_Flow extends FO_FlowContainer {
 				     'FO_ListBlock'
 				     );
 
-  public function parse(DOMNode $node) {
+  function parse(DOMNode $node) {
     //TODO: use attributes
     $this->processChildNodes($node, self::$CHILDNODES);
   }  
 }
 
 class FO_BlockContainer extends FO_LayoutObject {
-  private static $CHILDNODES = array(
+  static $CHILDNODES = array(
 				     'FO_Block',
 				     'FO_BlockContainer',
 				     'FO_TableAndCaption',
 				     'FO_Table',
 				     'FO_ListBlock');
 
-  protected function initAttributes(DOMNode $node) {
+  function initAttributes(DOMNode $node) {
     $this->initLocalSizeAttribute($node, "position");
     $this->initLocalSizeAttribute($node, "top");
     $this->initLocalSizeAttribute($node, "left");
@@ -571,11 +571,11 @@ class FO_BlockContainer extends FO_LayoutObject {
     $this->initLocalSizeAttribute($node, "width");
   }
   
-  protected function getChildNodes() {
+  function getChildNodes() {
     return self::$CHILDNODES;
   }
 
-  public function parse(DOMNode $node) {
+  function parse(DOMNode $node) {
     $this->initAttributes($node);
     $position = $this->getContext("position");
     if ($position == "absolute"){

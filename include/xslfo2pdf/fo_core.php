@@ -22,43 +22,43 @@ http://xslf2pdf.tegonal.com
 */ ?>
 <?PHP
 class FO_Container {
-  private $_refs = array();
+  var $_refs = array();
 
-  public function addReference($category, $name, $ref) {
+  function addReference($category, $name, $ref) {
     $_refs[$category][$name] = $ref;
   }
 
-  public function resolveReference($category, $name) {
+  function resolveReference($category, $name) {
   	return (isset($_refs)?$_refs[$category][$name]:'');
   }
 }
 
 class FO_Context {
-  public $_context;
+  var $_context;
 
   function __contruct() {
     $this->_context = array();
   }
 
-  public function get($key) {
+  function get($key) {
   	if(isset($this->_context[$key]))
     	return $this->_context[$key];
     else 
     	return false;
   }
 
-  public function set($key, $val) {
+  function set($key, $val) {
     $this->_context[$key] = $val;
   }
 }
 
 abstract class FO_Object {		
-  private $_children;
-  private $_container;	
-  private $_context;
-  private $_localContext;
-  private $_pdf;
-  private $_parent;
+  var $_children;
+  var $_container;	
+  var $_context;
+  var $_localContext;
+  var $_pdf;
+  var $_parent;
 
   const NODE_TYPE_ELEMENT = 1;
   const NODE_TYPE_TEXT = 3;
@@ -76,7 +76,7 @@ abstract class FO_Object {
    * Check unit of value and scale to internal value, if needed
    * Internal values are stored in mm
    **/
-  protected function calcInternalValue($value, $to = "mm", $from="mm") {
+  function calcInternalValue($value, $to = "mm", $from="mm") {
     sscanf($value, "%f%s", $value, $unit);
     if (!$unit) {
       $unit = $from;
@@ -144,21 +144,21 @@ abstract class FO_Object {
     }
   }
 
-  public function addReference($category, $name) {
+  function addReference($category, $name) {
     if ($category && $name) {
       $this->_container->addReference($category, $name, $this);
     }
   }
 
-  public function resolveReference($category, $name) {
+  function resolveReference($category, $name) {
     return $this->_container->resolveReference($category, $name);
   }
 
-  protected function setParent($parent) {
+  function setParent($parent) {
     $this->_parent = $parent;
   }
 
-  protected function handleEvent($event) {   
+  function handleEvent($event) {   
     if ($event == "sync-position") {
       $pdf = $this->getPdf();
       $this->setContext("y", $pdf->GetY());
@@ -172,7 +172,7 @@ abstract class FO_Object {
   /**
    * Get from current context informations
    */
-  protected function getContext($key) {
+  function getContext($key) {
     $val = $this->_localContext->get($key);
     if (!$val) {
       $val = $this->_context->get($key);
@@ -183,22 +183,22 @@ abstract class FO_Object {
   /**
    * Set a context information for child nodes and current node as well
    */
-  protected function setContext($key, $value) {
+  function setContext($key, $value) {
     $this->_context->set($key, $value);
   }
 
-  protected function setLocalContext($key, $value) {
+  function setLocalContext($key, $value) {
     $this->_localContext->set($key, $value);
   }
 	
-  protected function getAttribute(DOMNode $node, $key) {
+  function getAttribute(DOMNode $node, $key) {
   	if($node->attributes->getNamedItem($key)!=null)
     	return $node->attributes->getNamedItem($key)->nodeValue;
     else 
     	return false;
   }
 
-  protected function getSizeAttribute(DOMNode $node, $key, $to="mm", $from="mm") {
+  function getSizeAttribute(DOMNode $node, $key, $to="mm", $from="mm") {
   	if($node->attributes->getNamedItem($key)!=null)
   		$val = $node->attributes->getNamedItem($key)->nodeValue;
   	else 
@@ -206,41 +206,41 @@ abstract class FO_Object {
    	return $this->calcInternalValue($val, $to, $from);
   }
 
-  protected function initSizeAttribute(DOMNode $node, $key, $to="mm", $from="mm") {
+  function initSizeAttribute(DOMNode $node, $key, $to="mm", $from="mm") {
     $val = $this->getSizeAttribute($node, $key, $to, $from);
     if ($val) {
       $this->setContext($key, $val);
     }
   }
 
-  protected function initAttribute(DOMNode $node, $key) {
+  function initAttribute(DOMNode $node, $key) {
     $val = $this->getAttribute($node, $key);
     if ($val) {
       $this->setContext($key, $val);
     }
   }
 
-  protected function initLocalSizeAttribute(DOMNode $node, $key, $to="mm", $from="mm"){
+  function initLocalSizeAttribute(DOMNode $node, $key, $to="mm", $from="mm"){
     $val = $this->getSizeAttribute($node, $key, $to, $from);
     if ($val) {
       $this->_localContext->set($key, $val);
     }
   }
 
-  protected function initLocalAttribute(DOMNode $node, $key) {
+  function initLocalAttribute(DOMNode $node, $key) {
     $val = $this->getAttribute($node, $key);    
     if ($val) {
       $this->_localContext->set($key, $val);
     }
   }
 
-  protected function processChildNodes(DOMNode $node, $filter) {
+  function processChildNodes(DOMNode $node, $filter) {
     foreach($node->childNodes as $child) {
       $this->processChildNode($child, $filter);
     }
   }
 
-  protected function processChildNode(DOMNode $node, $filter) {   
+  function processChildNode(DOMNode $node, $filter) {   
     $subcontext = clone $this->_context;
     $next = 
       FO_Factory::createFOObject($node, $this->_container, 
@@ -255,16 +255,16 @@ abstract class FO_Object {
     }				
   }
 
-  protected function initFOObject(FO_Object $obj) {
+  function initFOObject(FO_Object $obj) {
   }
 
-  protected function preParse(FO_Object $obj) {
+  function preParse(FO_Object $obj) {
   }
   
-  protected function postParse(FO_Object $obj) {    
+  function postParse(FO_Object $obj) {    
   }
 
-  protected function processContents(DOMNode $node) {
+  function processContents(DOMNode $node) {
     foreach($node->childNodes as $child) {
       if ($child->nodeType == self::NODE_TYPE_TEXT) {
 	$this->processContent($child->textContent);
@@ -272,19 +272,19 @@ abstract class FO_Object {
     }
   }
 
-  protected function processContent($content) {
+  function processContent($content) {
     //do nothing per default
   }
 
-  protected function getPdf() {
+  function getPdf() {
     return $this->_pdf;
   }
 
-  protected function NotYetSupported($msg=0) {
+  function NotYetSupported($msg=0) {
     echo "Not Yet Supported[".get_class($this)."]:$msg<br>";
   }
 
-  protected function children() {
+  function children() {
     return $this->_children;
   }
 
@@ -292,7 +292,7 @@ abstract class FO_Object {
    * Parse the color from either xml attribute value or FPDF
    * internal representation
    **/
-  protected function parseColor($color) {
+  function parseColor($color) {
      if (sscanf($color, "#%2x%2x%2x", $r, $g, $b) == 3) {
        //parse RGB color
        $r = sprintf("%d", $r);
@@ -338,7 +338,9 @@ abstract class FO_Object {
      return array($r, $g, $b);
    }   
 
-  public abstract function parse(DOMNode $node);	
+  function parse(DOMNode $node)
+  {
+  }
 }
 
 /**
@@ -354,18 +356,18 @@ class FO_Root extends FO_Object{
     $this->setContext("acceptPageBreak", true);
   }
 	
-  private static $CHILDNODES = array (
+  static $CHILDNODES = array (
 				      'FO_LayoutMasterSet',
 				      'FO_PageSequence'
 				      );
 	
-  public function parse(DOMNode $node) {
+  function parse(DOMNode $node) {
     //no attrbutes which concerns us
     $_children[$node->nodeName] = 
       $this->processChildNodes($node, self::$CHILDNODES);
   }
 
-  public function setContext($key, $value) {
+  function setContext($key, $value) {
     parent::setContext($key, $value);
   }
 }

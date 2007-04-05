@@ -236,7 +236,7 @@ else
 {
 	if($demo) //Demofrage wird angezeigt
 	{
-		$qry = "SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id='".addslashes($gebiet_id)."' AND gruppe_kurzbz='$gruppe' AND demo=true ORDER BY nummer ASC LIMIT 1";
+		$qry = "SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id='".addslashes($gebiet_id)."' AND gruppe_kurzbz='$gruppe' AND demo=true ORDER BY nummer DESC LIMIT 1";
 		$result = pg_query($conn, $qry);
 		if($row = pg_fetch_object($result))
 			$frage->load($row->frage_id);
@@ -305,11 +305,13 @@ if($frage->frage_id!='')
 	//Antwort laden falls bereits vorhanden
 	$antwort = new antwort($conn);
 	$antwort->getAntwort($_SESSION['pruefling_id'],$frage->frage_id);
+	if(!$demo)
+	{
 	echo "<form action=\"$PHP_SELF?gebiet_id=$gebiet_id&frage_id=$frage->frage_id\" method=\"POST\">";
 	echo "<input type=\"hidden\" name=\"antwort_id\" value=\"$antwort->antwort_id\">";
-	echo "Antwort: <input type=\"text\" size=\"1\" id=\"antwort\" name=\"antwort\" value=\"".htmlentities(addslashes($antwort->antwort))."\">&nbsp;&nbsp;&nbsp;<input ".($demo?'type="button"':'type="submit"')." name=\"submitantwort\" onclick=\"return checkantwort()\" value=\"Speichern\">";
+	echo "Antwort: <input type=\"text\" size=\"1\" id=\"antwort\" name=\"antwort\" value=\"".htmlentities(addslashes($antwort->antwort))."\">&nbsp;&nbsp;&nbsp;<input type=\"submit\" name=\"submitantwort\" onclick=\"return checkantwort()\" value=\"Speichern\">";
 	echo "</form>";
-
+	}
 	echo '<br><br><br>';
 	//Fusszeile mit Weiter Button und Sprung direkt zu einer Frage
 	if(!$demo)
