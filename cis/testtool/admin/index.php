@@ -94,9 +94,17 @@ if(isset($_POST['submitbild']))
 {
 	if(isset($_FILES['bild']['tmp_name']))
 	{
-		//Wenn File ein Bild ist
-		if (($_FILES['bild']['type']=="image/gif") || ($_FILES['bild']['type']=="image/jpeg") || ($_FILES['bild']['type']=="image/png")) 
-		{
+		//Extension herausfiltern
+    	$ext = explode('.',$_FILES['bild']['name']);
+        $ext = strtolower($ext[count($ext)-1]);
+        
+        //--check that it's a jpeg or gif or png
+        if ($ext=='gif' || $ext=='png' || $ext=='jpg' || $ext=='jpeg') 
+        {
+			//Funktioniert nur mit Mozilla
+			//Wenn File ein Bild ist
+			//if (($_FILES['bild']['type']=="image/gif") || ($_FILES['bild']['type']=="image/jpeg") || ($_FILES['bild']['type']=="image/png")) 
+			//{
 			$filename = $_FILES['bild']['tmp_name'];
 			//File oeffnen
 			$fp = fopen($filename,'r');
@@ -227,7 +235,7 @@ while($row = pg_fetch_object($result))
 	if($gebiet_id=='')	
 		$gebiet_id = $row->gebiet_id;
 	if($gebiet_id==$row->gebiet_id)
-		echo "<u><a href='$PHP_SELF?gebiet_id=$row->gebiet_id' class='Item'>$row->bezeichnung</a></u> -";
+		echo "<a href='$PHP_SELF?gebiet_id=$row->gebiet_id' class='Item'><u>$row->bezeichnung</u></a> -";
 	else
 		echo "<a href='$PHP_SELF?gebiet_id=$row->gebiet_id' class='Item'>$row->bezeichnung</a> -";
 }
@@ -244,7 +252,7 @@ if($result = pg_query($conn, $qry))
 			$nummer = $row->nummer;
 			
 		if($nummer==$row->nummer)
-			echo "<u><a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$row->nummer' class='Item'>$row->nummer</a></u> -";
+			echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$row->nummer' class='Item'><u>$row->nummer</u></a> -";
 		else
 			echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$row->nummer' class='Item'>$row->nummer</a> -";
 	}
@@ -261,7 +269,7 @@ if($result = pg_query($conn, $qry))
 		if($gruppe_kurzbz=='')
 			$gruppe_kurzbz = $row->gruppe_kurzbz;
 		if($gruppe_kurzbz==$row->gruppe_kurzbz)
-			echo "<u><a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_kurzbz=$row->gruppe_kurzbz' class='Item'>$row->gruppe_kurzbz</a></u> -";
+			echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_kurzbz=$row->gruppe_kurzbz' class='Item'><u>$row->gruppe_kurzbz</u></a> -";
 		else
 			echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_kurzbz=$row->gruppe_kurzbz' class='Item'>$row->gruppe_kurzbz</a> -";
 	}
