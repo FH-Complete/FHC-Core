@@ -55,10 +55,10 @@ if(isset($_GET['nummer']))
 else 
 	$nummer = '';
 	
-if(isset($_GET['gruppe_id']))
-	$gruppe_id = $_GET['gruppe_id'];
+if(isset($_GET['gruppe_kurzbz']))
+	$gruppe_kurzbz = $_GET['gruppe_kurzbz'];
 else 
-	$gruppe_id = '';
+	$gruppe_kurzbz = '';
 
 if(isset($_GET['frage_id']))
 	$frage_id = $_GET['frage_id'];
@@ -252,24 +252,24 @@ if($result = pg_query($conn, $qry))
 
 echo '<br><br>';
 //Liste der Gruppen
-$qry = "SELECT gruppe_id, gruppe_kurzbz FROM testtool.tbl_frage WHERE gebiet_id='".addslashes($gebiet_id)."' AND nummer='".addslashes($nummer)."' ORDER BY gruppe_kurzbz";
+$qry = "SELECT gruppe_kurzbz FROM testtool.tbl_frage WHERE gebiet_id='".addslashes($gebiet_id)."' AND nummer='".addslashes($nummer)."' ORDER BY gruppe_kurzbz";
 
 if($result = pg_query($conn, $qry))
 {
 	while($row = pg_fetch_object($result))
 	{
-		if($gruppe_id=='')
-			$gruppe_id = $row->gruppe_id;
-		if($gruppe_id==$row->gruppe_id)
-			echo "<u><a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_id=$row->gruppe_id' class='Item'>$row->gruppe_kurzbz</a></u> -";
+		if($gruppe_kurzbz=='')
+			$gruppe_kurzbz = $row->gruppe_kurzbz;
+		if($gruppe_kurzbz==$row->gruppe_kurzbz)
+			echo "<u><a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_kurzbz=$row->gruppe_kurzbz' class='Item'>$row->gruppe_kurzbz</a></u> -";
 		else
-			echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_id=$row->gruppe_id' class='Item'>$row->gruppe_kurzbz</a> -";
+			echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_kurzbz=$row->gruppe_kurzbz' class='Item'>$row->gruppe_kurzbz</a> -";
 	}
 }
 
 echo "\n\n<br>";
 $frage = new frage($conn);
-$frage->getFrage($gebiet_id, $nummer, $gruppe_id);
+$frage->getFrage($gebiet_id, $nummer, $gruppe_kurzbz);
 if($frage->frage_id!='')
 {		
 	echo "<table><tr><td>";
@@ -278,7 +278,7 @@ if($frage->frage_id!='')
 	echo "<tr>";
 	//Upload Feld fuer Bild
 	echo "<td valign='bottom'>
-			<form method=POST ENCTYPE='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_id=$gruppe_id&frage_id=$frage->frage_id'>
+			<form method=POST ENCTYPE='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_kurzbz=$gruppe_kurzbz&frage_id=$frage->frage_id'>
 			Bild: <input type='file' name='bild'>
 			<input type='submit' name='submitbild' value='Upload'>
 			</form>
@@ -294,7 +294,7 @@ if($frage->frage_id!='')
 	}
 	//Zusaetzliche EingabeFelder anzeigen
 	echo "<td>";
-	echo "<form method=POST action='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_id=$gruppe_id&frage_id=$frage->frage_id'>";
+	echo "<form method=POST action='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_kurzbz=$gruppe_kurzbz&frage_id=$frage->frage_id'>";
 	echo "<table>";
 	//Bei Aenderungen im Textfeld werden diese sofort in der Vorschau angezeigt
 	echo "<tr><td colspan=2><textarea name='text' id='text' cols=30 rows=8 oninput='preview()'>$frage->text</textarea></td></tr>";
@@ -325,7 +325,7 @@ if($frage->frage_id!='')
 	}
 	//Vorschlag
 	echo '<b>Vorschlag'.($vorschlag_id!=''?' Edit':'').'</b><br><br>';
-	echo "<form method=POST ENCTYPE='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_id=$gruppe_id&frage_id=$frage->frage_id'>";
+	echo "<form method=POST ENCTYPE='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_kurzbz=$gruppe_kurzbz&frage_id=$frage->frage_id'>";
 	echo "<input type='hidden' name='vorschlag_id' value='$vorschlag->vorschlag_id'>";
 	echo '<table>';
 	echo '<tr>';
@@ -338,7 +338,7 @@ if($frage->frage_id!='')
 	echo "<td>Bild:</td><td><input type='file' name='bild'></td>";
 	echo "</tr>";
 	echo "<tr><td>Nummer:</td><td><input type='text' name='nummer' size=3 value='$vorschlag->nummer'></td></tr>";
-	echo "<tr><td colspan='2' align='right'><input type='submit' name='submitvorschlag' value='Speichern'>".($vorschlag_id!=''?"<input type='button' value='Abbrechen' onclick=\"document.location.href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_id=$gruppe_id&frage_id=$frage->frage_id'\">":'')."</td></tr>";
+	echo "<tr><td colspan='2' align='right'><input type='submit' name='submitvorschlag' value='Speichern'>".($vorschlag_id!=''?"<input type='button' value='Abbrechen' onclick=\"document.location.href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_kurzbz=$gruppe_kurzbz&frage_id=$frage->frage_id'\">":'')."</td></tr>";
 	echo "</table>";
 	echo "</form>";
 		
@@ -354,7 +354,7 @@ if($frage->frage_id!='')
 		foreach ($vorschlag->result as $vs)
 		{
 			$i++;
-			echo "<tr class='liste".($i%2)."'><td>$vs->nummer</td><td>$vs->antwort</td><td>$vs->text</td><td><img src='../bild.php?src=vorschlag&vorschlag_id=$vs->vorschlag_id'></td><td><a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_id=$gruppe_id&frage_id=$frage->frage_id&vorschlag_id=$vs->vorschlag_id'>edit</a></td><td><a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_id=$gruppe_id&frage_id=$frage->frage_id&vorschlag_id=$vs->vorschlag_id&type=delete' onclick=\"return confirm('Wollen Sie diesen Eintrag wirklich loeschen?')\">delete</a></td></tr>";
+			echo "<tr class='liste".($i%2)."'><td>$vs->nummer</td><td>$vs->antwort</td><td>$vs->text</td><td><img src='../bild.php?src=vorschlag&vorschlag_id=$vs->vorschlag_id'></td><td><a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_kurzbz=$gruppe_kurzbz&frage_id=$frage->frage_id&vorschlag_id=$vs->vorschlag_id'>edit</a></td><td><a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_kurzbz=$gruppe_kurzbz&frage_id=$frage->frage_id&vorschlag_id=$vs->vorschlag_id&type=delete' onclick=\"return confirm('Wollen Sie diesen Eintrag wirklich loeschen?')\">delete</a></td></tr>";
 		}
 		echo '</table>';
 	}
