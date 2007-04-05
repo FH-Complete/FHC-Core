@@ -25,7 +25,7 @@ class frage
 	//Tabellenspalten
 	var $frage_id;
 	var $gebiet_id;
-	var $gruppe_id;
+	var $gruppe_kurzbz;
 	var $loesung;
 	var $nummer;
 	var $demo;
@@ -78,7 +78,7 @@ class frage
 			{
 				$this->frage_id = $row->frage_id;
 				$this->gebiet_id = $row->gebiet_id;
-				$this->gruppe_id = $row->gruppe_id;
+				$this->gruppe_kurzbz = $row->gruppe_kurzbz;
 				$this->loesung = $row->loesung;
 				$this->nummer = $row->nummer;
 				$this->demo = ($row->demo=='t'?true:false);
@@ -134,10 +134,10 @@ class frage
 		
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = 'INSERT INTO testtool.tbl_frage (frage_id, gebiet_id, gruppe_id, loesung, nummer, demo, text, bild) VALUES('.
+			$qry = 'INSERT INTO testtool.tbl_frage (frage_id, gebiet_id, gruppe_kurzbz, loesung, nummer, demo, text, bild) VALUES('.
 			       "'".addslashes($this->frage_id)."',".
 			       $this->addslashes($this->gebiet_id).",'".
-			       $this->addslashes($this->gruppe_id).",'".
+			       $this->addslashes($this->gruppe_kurzbz).",'".
 			       $this->addslashes($this->loesung).",".
 			       $this->addslashes($this->nummer).",".
 			       ($this->demo?'true':'false').','.
@@ -149,7 +149,7 @@ class frage
 			$qry = 'UPDATE testtool.tbl_frage SET'.
 			       ' frage_id='.$this->addslashes($this->frage_id).','.
 			       ' gebiet_id='.$this->addslashes($this->gebiet_id).','.
-			       " gruppe_id='".$this->gruppe_id."',".
+			       " gruppe_kurzbz='".$this->gruppe_kurzbz."',".
 			       ' loesung='.$this->addslashes($this->loesung).','.
 			       ' nummer='.$this->addslashes($this->nummer).','.
 			       ' demo='.($this->demo?'true':'false').','.
@@ -170,9 +170,9 @@ class frage
 		}
 	}
 
-	function getFrage($gebiet_id, $nummer, $gruppe_id)
+	function getFrage($gebiet_id, $nummer, $gruppe_kurzbz)
 	{
-		$qry = "SELECT * FROM testtool.tbl_frage WHERE gebiet_id='$gebiet_id' AND nummer='$nummer' AND gruppe_id='$gruppe_id'";
+		$qry = "SELECT * FROM testtool.tbl_frage WHERE gebiet_id='$gebiet_id' AND nummer='$nummer' AND gruppe_kurzbz='$gruppe_kurzbz'";
 		
 		if($result = pg_query($this->conn, $qry))
 		{
@@ -180,7 +180,7 @@ class frage
 			{				
 				$this->frage_id = $row->frage_id;
 				$this->gebiet_id = $row->gebiet_id;
-				$this->gruppe_id = $row->gruppe_id;
+				$this->gruppe_kurzbz = $row->gruppe_kurzbz;
 				$this->loesung = $row->loesung;
 				$this->nummer = $row->nummer;
 				$this->demo = ($row->demo=='t'?true:false);
