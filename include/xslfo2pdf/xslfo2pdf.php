@@ -38,7 +38,7 @@ require_once("svg_text.php");
 require_once("svg_path.php");
 
 class XslFo2PDF {
-  public function generatePdf($xml, $name="out.pdf", $dest='') {
+  function generatePdf($xml, $name="out.pdf", $dest='') {
     $doc = DOMDocument::loadXML($xml);
     if ($doc === false) {		  
       echo "failed loading dom<br>";
@@ -71,7 +71,7 @@ class XslFo2PDF {
     return true;
   }
 
-  private function initDefaults(FPDF $pdf, FO_Root $root) {
+  function initDefaults(FPDF $pdf, FO_Root $root) {
     $pdf->SetFont('Arial','',14);	  
     $pdf->SetAutoPageBreak(true);
     $root->setContext("page-width", "21");
@@ -79,7 +79,7 @@ class XslFo2PDF {
 }
 
 class FO_Factory {
-  private static $factory = array("fo:layout-master-set" => 'FO_LayoutMasterSet',
+  static $factory = array("fo:layout-master-set" => 'FO_LayoutMasterSet',
 				  "fo:block" => 'FO_Block',
 				  "fo:page-sequence" => 'FO_PageSequence',
 				  "fo:flow" => 'FO_Flow',
@@ -111,9 +111,9 @@ class FO_Factory {
 				  "svg:path" => 'SVG_Path'
 				  );
 
-  private static $names = NULL;
+  static $names = NULL;
 
-  public static function createFOObject(DOMNode $node, FO_Container $container,
+  static function createFOObject(DOMNode $node, FO_Container $container,
 					FPDF $pdf, FO_Context &$context, 
 					$filter) 
   {

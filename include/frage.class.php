@@ -204,10 +204,16 @@ class frage
 	
 	function getNextFrage($gebiet_id, $gruppe_kurzbz, $frage_id, $demo=false)
 	{
-		$qry = "SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id='".addslashes($gebiet_id)."' AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."' AND nummer>(SELECT nummer FROM testtool.tbl_frage WHERE frage_id='".addslashes($frage_id)."') ";
+		$qry = "SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id='".addslashes($gebiet_id)."' AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."' AND nummer".($demo?'<':'>')."(SELECT nummer FROM testtool.tbl_frage WHERE frage_id='".addslashes($frage_id)."') ";
 		if($demo)
+		{
 			$qry.=" AND demo=true";
-		$qry.=" ORDER BY nummer ASC LIMIT 1";
+			$order = 'DESC';
+		}
+		else 
+			$order = 'ASC';
+			
+		$qry.=" ORDER BY nummer $order LIMIT 1";
 		
 		if($result = pg_query($this->conn, $qry))
 		{

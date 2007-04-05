@@ -21,8 +21,8 @@ mike.toggweiler@tegonal.com
 http://xslf2pdf.tegonal.com
 */ ?>
 <?PHP
-abstract class SVG_Object extends FO_Object {
-  protected function initLocalStyleAttribute(DOMNode $node) {
+class SVG_Object extends FO_Object {
+  function initLocalStyleAttribute(DOMNode $node) {
     $st = $this->getAttribute($node, "style");	
     
     $styles = explode(";", $st);
@@ -32,7 +32,7 @@ abstract class SVG_Object extends FO_Object {
     }
   }
 
-  protected function initStyleAttribute(DOMNode $node) {
+  function initStyleAttribute(DOMNode $node) {
     $st = $this->getAttribute($node, "style");	
     
     $styles = explode(";", $st);
@@ -43,29 +43,29 @@ abstract class SVG_Object extends FO_Object {
   }
 }
 
-abstract class SVG_StyleObject extends SVG_Object {
+class SVG_StyleObject extends SVG_Object {
 
-  protected function initLocalSizeAttribute(DOMNode $node, $key, $to="mm", $from="pt"){
+  function initLocalSizeAttribute(DOMNode $node, $key, $to="mm", $from="pt"){
     parent::initLocalSizeAttribute($node, $key, $to, $from);
   }
 
-  protected function initSizeAttribute(DOMNode $node, $key, $to="mm", $from="pt"){
+  function initSizeAttribute(DOMNode $node, $key, $to="mm", $from="pt"){
     parent::initSizeAttribute($node, $key, $to, $from);
   }
 
-  protected function getLocalSizeAttribute(DOMNode $node, $key, $to="mm", $from="pt"){
+  function getLocalSizeAttribute(DOMNode $node, $key, $to="mm", $from="pt"){
     return parent::getLocalSizeAttribute($node, $key, $to, $from);
   }
 
-  protected function getSizeAttribute(DOMNode $node, $key, $to="mm", $from="pt"){
+  function getSizeAttribute(DOMNode $node, $key, $to="mm", $from="pt"){
     return parent::getSizeAttribute($node, $key, $to, $from);
   }
 
-  protected function calcInternalValue($value, $to = "mm", $from="pt") {
+  function calcInternalValue($value, $to = "mm", $from="pt") {
     return parent::calcInternalValue($value, $to, $from);
   }
 
-  public function parse(DOMNode $node) {
+  function parse(DOMNode $node) {
     $pdf = $this->getPdf();
     $buf = $pdf->startCapture();
     $this->initStyleAttribute($node);
@@ -121,12 +121,14 @@ abstract class SVG_StyleObject extends SVG_Object {
     //echo get_class($this).":$buf<br>";
     $pdf->appendBuffer($buf);
   }
-  protected abstract function process(DOMNode $node, $sargs="");
+  function process(DOMNode $node, $sargs="")
+  {
+  }
 }
 
 class FO_SVG extends SVG_Object {
 
-  public static $CHILDNODES = array(
+  static $CHILDNODES = array(
 				     SVG_Circle,
 				     SVG_Rect,
 				     SVG_Ellipse,
@@ -137,7 +139,7 @@ class FO_SVG extends SVG_Object {
 				     SVG_Path
 				     );
   
-  public function parse(DOMNode $node) {
+  function parse(DOMNode $node) {
     $this->initLocalSizeAttribute($node, "width", "mm", "pt");
     $this->initLocalSizeAttribute($node, "height", "mm", "pt");    
     $this->setContext("xOrig", $this->getContext("x"));

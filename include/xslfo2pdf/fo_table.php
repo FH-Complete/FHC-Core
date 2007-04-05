@@ -66,38 +66,38 @@ http://xslf2pdf.tegonal.com
 
 class FO_TableAndCaption extends FO_Object {
 
-  private static $CHILDNODES = array(
+  static $CHILDNODES = array(
 				     'FO_Table',
 				     'FO_TableCaption'
 				     );
 
-  public function parse(DOMNode $node) {
+  function parse(DOMNode $node) {
     $this->processChildNodes($node, self::$CHILDNODES);
   }
 }
 
 class FO_Table extends FO_LayoutObject {
-  private $colCount = 0;
+  var $colCount = 0;
 
-  private static $CHILDNODES = array(
+  static $CHILDNODES = array(
 				     'FO_TableColumn',
 				     'FO_TableHeader',
 				     'FO_TableFooter',
 				     'FO_TableBody'
 				     );
 
-  protected function getChildNodes() {
+  function getChildNodes() {
     return self::$CHILDNODES;
   }
 
-  protected function initFOObject(FO_Object $col) {
+  function initFOObject(FO_Object $col) {
     if (!$col instanceof FO_TableColumn) {
       return;
     }
     $col->setContext("column", $this->colCount++);
   }
 
-  protected function postParse(FO_Object $obj) {
+  function postParse(FO_Object $obj) {
     if ($obj instanceof FO_TableHeader) {
       $this->setLocalContext("width", $obj->getContext("width"));
       $this->setLocalContext("height", $this->getContext("height")+
@@ -121,22 +121,22 @@ class FO_Table extends FO_LayoutObject {
 
 class FO_TableCaption extends FO_Object {
 
-  private static $CHILDNODES = array(
+  static $CHILDNODES = array(
 				     'FO_Block',
 				     'FO_BlockContainer',
 				     'FO_ListBlock'
 				     );
 
-  public function parse(DOMNode $node) {
+  function parse(DOMNode $node) {
     $this->processChildNodes($node, self::$CHILDNODES);
   }
 }
 
 class FO_TableColumn extends FO_Object {
 
-  private static $CHILDNODES = array();
+  static $CHILDNODES = array();
 
-  public function parse(DOMNode $node) {
+  function parse(DOMNode $node) {
     $width = $this->getSizeAttribute($node, "column-width");
     //calc internal width    
     $this->setContext("width", $width);    
@@ -146,24 +146,24 @@ class FO_TableColumn extends FO_Object {
 
 class FO_TableRow extends FO_LayoutObject {
 
-  private $colIndex = 0;
+  var $colIndex = 0;
 
-  private static $CHILDNODES = array(
+  static $CHILDNODES = array(
 				     'FO_TableCell'
 				     );
 
-  protected function getChildNodes() {
+  function getChildNodes() {
     return self::$CHILDNODES;
   }
 
-  protected function initFOObject(FO_Object $col) {
+  function initFOObject(FO_Object $col) {
     if (!$col instanceof FO_TableCell) {
       return;
     }
     $col->setContext("column", $this->colIndex++);
   }
 
-  protected function postParse(FO_Object $obj) {    
+  function postParse(FO_Object $obj) {    
     if ($obj instanceof FO_TableCell) {
       $this->setContext("x", $this->getContext("x")+
 			$obj->getContext("width"));
@@ -184,41 +184,41 @@ class FO_TableRow extends FO_LayoutObject {
 }
 
 class FO_TableHeader extends FO_TableRow {
-
-  private static $CHILDNODES = array(
+  //oesi - set to _1 to work with php4
+  static $CHILDNODES_1 = array(
 				     'FO_TableCell',
 				     'FO_TableRow'
 				     );
 
-  protected function getChildNodes() {
-    return self::$CHILDNODES;
+  function getChildNodes() {
+    return self::$CHILDNODES_1;
   }
 }
 
 class FO_TableFooter extends FO_LayoutObject {
 
-  private static $CHILDNODES = array(
+  static $CHILDNODES = array(
 				     'FO_TableCell',
 				     'FO_TableRow'
 				     );
 
-  protected function getChildNodes() {
+  function getChildNodes() {
     return self::$CHILDNODES;
   }
 }
 
 class FO_TableBody extends FO_LayoutObject {
 
-  private static $CHILDNODES = array(
+  static $CHILDNODES = array(
 				     'FO_TableCell',
 				     'FO_TableRow'
 				     );
 
-  protected function getChildNodes() {
+  function getChildNodes() {
     return self::$CHILDNODES;
   }
 
-  protected function postParse(FO_Object $obj) {
+  function postParse(FO_Object $obj) {
     if ($obj instanceof FO_TableRow) {
 	 $this->setLocalContext("width", $obj->getContext("width"));
 	 $this->setLocalContext("height", $this->getContext("height")+
@@ -231,7 +231,7 @@ class FO_TableBody extends FO_LayoutObject {
 
 class FO_TableCell extends FO_LayoutObject {
 
-  private static $CHILDNODES = array(
+  static $CHILDNODES = array(
 				     'FO_Block',
 				     'FO_BlockContainer',
 				     'FO_ListBlock',
@@ -240,11 +240,11 @@ class FO_TableCell extends FO_LayoutObject {
 				     );
   
 
-  protected function getChildNodes() {
+  function getChildNodes() {
     return self::$CHILDNODES;
   }
 
-  public function parse(DOMNode $node) {
+  function parse(DOMNode $node) {
     $col = $this->getContext("column");
     $width = $this->getContext("column-$col-width");
     $this->setLocalContext("width", $width);
@@ -256,7 +256,7 @@ class FO_TableCell extends FO_LayoutObject {
    * Overlap borders that the total width isn't larger than the 
    * specified
    */
-  protected function drawBordersAndBackground($pos) {
+  function drawBordersAndBackground($pos) {
     list($x1, $y1, $width1, $height1) = $pos[0];
     list($x2, $y2, $width2, $height2) = $pos[1];
     $xd = ($x1-$x2)/2;
@@ -267,7 +267,7 @@ class FO_TableCell extends FO_LayoutObject {
     $this->drawBorders($x2, $y2, $width2+$wd, $height2+$hd);    
   }
 
-  protected function postParse(FO_Object $obj) {
+  function postParse(FO_Object $obj) {
     $this->setLocalContext("height", $this->getContext("height")+
 		      $obj->getContext("height")+0.5); // oesi - add +0.5 for tablespace
   }

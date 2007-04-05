@@ -24,15 +24,15 @@ http://xslf2pdf.tegonal.com
 require_once("fo_svg.php");
 class FO_InstreamForeignObject extends FO_Object {
 
-  private static $CHILDNODES = array(
+  static $CHILDNODES = array(
 				     'FO_SVG'
 				     );
 
-  public function parse(DOMNode $node) {
+  function parse(DOMNode $node) {
    $this->processChildNodes($node, self::$CHILDNODES);
   }
 
-  protected function postParse(FO_Object $obj) {
+  function postParse(FO_Object $obj) {
     $this->setLocalContext("width", $obj->getContext("width"));
     $this->setLocalContext("height", $this->getContext("height")+
 			   $obj->getContext("height"));
