@@ -24,7 +24,7 @@
  * @create 08-02-2007
  */
 
-class projektarbeit
+class projektbetreuer
 {
 	var $conn;     			// @var resource DB-Handle
 	var $new;       		// @var boolean
