@@ -89,9 +89,9 @@ class nation
 		//Lesen der Daten aus der Datenbank
 		$qry = "SELECT * FROM bis.tbl_nation";
 		if($ohnesperre)
-			$qry .= " where sperre='N'";
+			$qry .= " WHERE sperre is null";
 			
-		$qry .=" order by kurztext";
+		$qry .=" ORDER BY kurztext";
 		
 		if(!$res = pg_query($this->conn,$qry))
 		{
@@ -103,12 +103,12 @@ class nation
 		{
 			$nation = new nation($this->conn);
 		
-			$nation->code = $row->code;
-			$nation->sperre = $row->sperre; 
-	        		$nation->kontinent = $row->sperre;
-	  		$nation->entwland = $row->entwland;
-	        		$nation->euflag = $row->euflag;
-	 		$nation->ewrflag = $row->ewrflag;
+			$nation->code = $row->nation_code;
+			$nation->sperre = ($row->sperre=='t'?true:false); 
+			$nation->kontinent = $row->kontinent;
+			$nation->entwicklungsstand = $row->entwicklungsstand;
+			$nation->eu = ($row->eu=='t'?true:false);
+			$nation->ewr = ($row->ewr=='t'?true:false);
 			$nation->kurztext = $row->kurztext;
 			$nation->langtext = $row->langtext;
 			$nation->engltext = $row->engltext;

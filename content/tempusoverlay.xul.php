@@ -4,7 +4,7 @@ echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
 
 include('../vilesci/config.inc.php');
 
-echo '<?xul-overlay href="'.APP_ROOT.'content/studentenoverlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentenoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-week-overlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-semester-overlay.xul.php"?>';
@@ -102,7 +102,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-semester-overlay.xu
 	seltype="single" hidecolumnpicker="false" flex="1"
 	enableColumnDrag="true"
     ondraggesture="nsDragAndDrop.startDrag(event,mitarbeiterDDObserver);"
-	datasources="../rdf/mitarbeiter.rdf.php" ref="http://www.technikum-wien.at/mitarbeiter/alle">
+	datasources="../rdf/mitarbeiter.rdf.php" ref="http://www.technikum-wien.at/mitarbeiter/_alle">
 	<treecols>
 	    <treecol id="kurzbz" label="Kuerzel" flex="2" primary="true" />
 	    <splitter class="tree-splitter"/>
@@ -125,38 +125,6 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-semester-overlay.xu
 	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vornamen"/>
 	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpre"/>
 	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"/>
-	         	</treerow>
-	    	</treeitem>
-	    </treechildren>
-	    </rule>
-  	</template>
-</tree>
-
-<!-- testing - Verschachtelte Mitarbeiter Ansicht-->
-<tree id="tree-lektor_verschachtelt" onselect="onLektorSelect();"
-	seltype="single" hidecolumnpicker="false" flex="1"
-	enableColumnDrag="true"
-    ondraggesture="nsDragAndDrop.startDrag(event,mitarbeiterDDObserver);"
-	datasources="../rdf/mitarbeiter_verschachtelt.rdf.php" ref="http://www.technikum-wien.at/ma/liste">
-	<treecols>
-	    <treecol id="bezeichnung" label="Kuerzel" flex="2" primary="true" />
-	    <splitter class="tree-splitter"/>
-	    <treecol id="nachname" label="Nachname" flex="2" hidden="true"/>
-	    <splitter class="tree-splitter"/>
-	    <treecol id="vorname" label="Vornamen" flex="2" hidden="true"/>
-	    <splitter class="tree-splitter"/>
-	    <treecol id="uid" label="UID" flex="1" hidden="true"/>
-	</treecols>
-
-	<template>
-		<rule>
-		<treechildren>
-	       	<treeitem uri="rdf:*">
-	         	<treerow>
-	           		<treecell label="rdf:http://www.technikum-wien.at/ma/rdf#bezeichnung"/>
-	           		<treecell label="rdf:http://www.technikum-wien.at/ma/rdf#nachname"/>
-	           		<treecell label="rdf:http://www.technikum-wien.at/ma/rdf#vorname"/>
-	           		<treecell label="rdf:http://www.technikum-wien.at/ma/rdf#uid"/>
 	         	</treerow>
 	    	</treeitem>
 	    </treechildren>
