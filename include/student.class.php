@@ -260,7 +260,7 @@ class student extends benutzer
 			$this->errormsg=pg_errormessage($this->conn);
 			return false;
 		}
-		$num_rows=pg_numrows($erg);
+		$num_rows=pg_num_rows($erg);
 		$result=array();
 		for($i=0;$i<$num_rows;$i++)
 		{
@@ -271,6 +271,7 @@ class student extends benutzer
 			$l->titelpre=$row->titelpre;
 			$l->titelpost=$row->titelpost;
 			$l->vornamen=$row->vornamen;
+			$l->vorname=$row->vorname;
 			$l->nachname=$row->nachname;
 			$l->gebdatum=$row->gebdatum;
 			$l->gebort=$row->gebort;

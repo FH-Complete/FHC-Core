@@ -6,6 +6,7 @@ var currentAuswahl=new auswahlValues();
 var LvTreeDatasource;
 var LektorTreeDatasource;
 var LektorTreeOpenStudiengang;
+var StudentTreeDatasource;
 
 // ****
 // * initialisiert den Lektor Tree
@@ -154,6 +155,8 @@ function auswahlValues()
 
 function onVerbandSelect(event)
 {
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
 	var tree=document.getElementById('tree-verband');
 	//Wenn nichts markiert wurde -> beenden
@@ -186,58 +189,40 @@ function onVerbandSelect(event)
 	var grp=tree.view.getCellText(tree.currentIndex,col);
 	col = tree.columns ? tree.columns["gruppe"] : "gruppe";
 	var gruppe=tree.view.getCellText(tree.currentIndex,col);
-	//var daten=window.TimeTableWeek.document.getElementById('TimeTableWeekData');
-	//var datum=parseInt(daten.getAttribute("datum"));
-	//var attributes="&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
-	//var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
-	//if (gruppe!=null && gruppe!=0 &gruppe!='')
-	//	var type="?type=gruppe";
-	//else
-	//	var type="?type=verband";
-	//url+=type+attributes+"&datum="+datum;
-	//if (url)
-	//{
-	//	//alert(url);
-	//	contentFrame.setAttribute('src', url);
-	//}
-
+	
 	currentAuswahl.stg_kz=stg_kz;
 	currentAuswahl.sem=sem;
 	currentAuswahl.ver=ver;
 	currentAuswahl.grp=grp;
 	currentAuswahl.gruppe=gruppe;
 
-	// Semesterplan
-	//var semesterplan=document.getElementById('tabpanels-main');
-	//var panelIndex=semesterplan.getAttribute("selectedIndex");
-	//if (panelIndex==1)
-	//{
-	//	alert (url);
-	//	var contentFrame=document.getElementById('iframeTimeTableSemester');
-	//	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
-	//	if (gruppe!=null && gruppe!=0 &gruppe!='')
-	//		var type="?type=gruppe";
-	//	else
-	//		var type="?type=verband";
-	//	url+=type+attributes+"&semesterplan=true";
-	//	if (url)
-	//		contentFrame.setAttribute('src', url);
-	//}
-
-
-	// LVAs
-	//var vboxLehrveranstalungPlanung=document.getElementById('vboxLehrveranstalungPlanung');
-	//var attribute='../rdf/lehreinheit-lvplan.rdf.php'+type+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
-	//vboxLehrveranstalungPlanung.setAttribute('datasources',attribute);
-
 	// Studenten
-	var treeStudenten=document.getElementById('treeStudenten');
-	attribute="<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
-	treeStudenten.setAttribute('datasources',attribute);
+	try
+	{
+		url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe+"&"+gettimestamp();
+		var treeStudent=document.getElementById('student-tree');
 
+		//Alte DS entfernen
+		var oldDatasources = treeStudent.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			treeStudent.database.RemoveDataSource(oldDatasources.getNext());
+		}
+
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		StudentTreeDatasource = rdfService.GetDataSource(url);
+		StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		treeStudent.database.AddDataSource(StudentTreeDatasource);
+		StudentTreeDatasource.addXMLSinkObserver(StudentTreeSinkObserver);
+		treeStudent.builder.addListener(StudentTreeListener);
+	}
+	catch(e)
+	{
+		debug(e);
+	}
 
 	// Lehrveranstaltung
-	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	try
 	{
 		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?stg_kz='+stg_kz+'&sem='+sem+'&ver='+ver+'&grp='+grp+'&gruppe='+gruppe+'&'+gettimestamp();

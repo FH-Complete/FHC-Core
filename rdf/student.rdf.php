@@ -45,7 +45,7 @@ if(isset($_GET['uid']))
 // Studenten holen
 $student=new student($conn);
 if (isset($uid))
-	$studenten=$student->load($uid);
+	$student->load($uid);
 else
 	$studenten=$student->getStudents($stg_kz,$sem,$ver,$grp,$gruppe);
 
@@ -62,32 +62,40 @@ $rdf_url='http://www.technikum-wien.at/student';
   <RDF:Seq about="<?php echo $rdf_url ?>/alle">
 
 <?php
-foreach ($studenten as $student)
+if(isset($uid))
+	drawStudent($student);
+else 
+	foreach ($studenten as $student)
+		drawStudent($student);
+
+function drawStudent($student)
 {
+	global $rdf_url;
 	?>
 	  <RDF:li>
       	<RDF:Description  id="<?php echo $student->uid; ?>"  about="<?php echo $rdf_url.'/'.$student->uid; ?>" >
-        	<STUDENT:uid><?php echo $student->uid;  ?></STUDENT:uid>
-    		<STUDENT:titelpre><?php echo $student->titelpre; ?></STUDENT:titelpre>
-    		<STUDENT:titelpost><?php echo $student->titelpost; ?></STUDENT:titelpost>
-    		<STUDENT:vornamen><?php echo $student->vornamen  ?></STUDENT:vornamen>
-    		<STUDENT:nachname><?php echo $student->nachname  ?></STUDENT:nachname>
-    		<STUDENT:matrikelnummer><?php echo $student->matrikelnr  ?></STUDENT:matrikelnummer>
-    		<STUDENT:geburtsdatum><?php echo $student->gebdatum  ?></STUDENT:geburtsdatum>
-    		<STUDENT:geburtsdatum_iso><?php echo $student->gebdatum;  ?></STUDENT:geburtsdatum_iso>
-    		<STUDENT:alias><?php echo $student->alias  ?></STUDENT:alias>
-    		<STUDENT:homepage><?php echo $student->homepage  ?></STUDENT:homepage>
-    		<STUDENT:aktiv><?php echo ($student->aktiv?'True':'False')  ?></STUDENT:aktiv>
-    		<STUDENT:gebort><?php echo $student->gebort;  ?></STUDENT:gebort>
-    		<STUDENT:gebzeit><?php echo $student->gebzeit;  ?></STUDENT:gebzeit>
-    		<STUDENT:foto><?php echo $student->foto;  ?></STUDENT:foto>
-    		<STUDENT:anmerkungen><?php echo $student->anmerkungen;  ?></STUDENT:anmerkungen>
-    		<STUDENT:updateamum><?php echo $student->updateamum;  ?></STUDENT:updateamum>
-    		<STUDENT:updatevon><?php echo $student->updatevon;  ?></STUDENT:updatevon>
-    		<STUDENT:semester><?php echo $student->semester;  ?></STUDENT:semester>
-    		<STUDENT:verband><?php echo $student->verband;  ?></STUDENT:verband>
-    		<STUDENT:gruppe><?php echo $student->gruppe;  ?></STUDENT:gruppe>
-    		<STUDENT:studiengang_kz><?php echo $student->studiengang_kz; ?></STUDENT:studiengang_kz>
+        	<STUDENT:uid><![CDATA[<?php echo $student->uid;  ?>]]></STUDENT:uid>
+    		<STUDENT:titelpre><![CDATA[<?php echo $student->titelpre; ?>]]></STUDENT:titelpre>
+    		<STUDENT:titelpost><![CDATA[<?php echo $student->titelpost; ?>]]></STUDENT:titelpost>
+    		<STUDENT:vornamen><![CDATA[<?php echo $student->vornamen  ?>]]></STUDENT:vornamen>
+    		<STUDENT:vorname><![CDATA[<?php echo $student->vorname  ?>]]></STUDENT:vorname>
+    		<STUDENT:nachname><![CDATA[<?php echo $student->nachname  ?>]]></STUDENT:nachname>
+    		<STUDENT:matrikelnummer><![CDATA[<?php echo $student->matrikelnr  ?>]]></STUDENT:matrikelnummer>
+    		<STUDENT:geburtsdatum><![CDATA[<?php echo $student->gebdatum  ?>]]></STUDENT:geburtsdatum>
+    		<STUDENT:geburtsdatum_iso><![CDATA[<?php echo $student->gebdatum;  ?>]]></STUDENT:geburtsdatum_iso>
+    		<STUDENT:alias><![CDATA[<?php echo $student->alias  ?>]]></STUDENT:alias>
+    		<STUDENT:homepage><![CDATA[<?php echo $student->homepage  ?>]]></STUDENT:homepage>
+    		<STUDENT:aktiv><![CDATA[<?php echo ($student->aktiv?'True':'False')  ?>]]></STUDENT:aktiv>
+    		<STUDENT:gebort><![CDATA[<?php echo $student->gebort;  ?>]]></STUDENT:gebort>
+    		<STUDENT:gebzeit><![CDATA[<?php echo $student->gebzeit;  ?>]]></STUDENT:gebzeit>
+    		<STUDENT:foto><![CDATA[<?php echo $student->foto;  ?>]]></STUDENT:foto>
+    		<STUDENT:anmerkungen><![CDATA[<?php echo $student->anmerkungen;  ?>]]></STUDENT:anmerkungen>
+    		<STUDENT:updateamum><![CDATA[<?php echo $student->updateamum;  ?>]]></STUDENT:updateamum>
+    		<STUDENT:updatevon><![CDATA[<?php echo $student->updatevon;  ?>]]></STUDENT:updatevon>
+    		<STUDENT:semester><![CDATA[<?php echo $student->semester;  ?>]]></STUDENT:semester>
+    		<STUDENT:verband><![CDATA[<?php echo $student->verband;  ?>]]></STUDENT:verband>
+    		<STUDENT:gruppe><![CDATA[<?php echo $student->gruppe;  ?>]]></STUDENT:gruppe>
+    		<STUDENT:studiengang_kz><![CDATA[<?php echo $student->studiengang_kz; ?>]]></STUDENT:studiengang_kz>
       	</RDF:Description>
       </RDF:li>
 <?php

@@ -4,6 +4,7 @@ include('../vilesci/config.inc.php');
 
 var currentAuswahl=new auswahlValues();
 var LvTreeDatasource;
+var StudentTreeDatasource;
 
 function auswahlValues()
 {
@@ -17,6 +18,7 @@ function auswahlValues()
 
 function onVerbandSelect()
 {
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
 	var tree=document.getElementById('tree-verband');
 	if(tree.currentIndex==-1)
@@ -71,13 +73,37 @@ function onVerbandSelect()
 	vboxLehrveranstalungPlanung.setAttribute('datasources',attribute);
 
 	// Studenten
-	var treeStudenten=document.getElementById('treeStudenten');
-	attribute="<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
-	treeStudenten.setAttribute('datasources',attribute);
+	//var treeStudenten=document.getElementById('treeStudenten');
+	//attribute="<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
+	//treeStudenten.setAttribute('datasources',attribute);
+	
+	// Studenten
+	try
+	{
+		url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe+"&"+gettimestamp();
+		var treeStudent=document.getElementById('student-tree');
 
+		//Alte DS entfernen
+		var oldDatasources = treeStudent.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			treeStudent.database.RemoveDataSource(oldDatasources.getNext());
+		}
+
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		StudentTreeDatasource = rdfService.GetDataSource(url);
+		StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		treeStudent.database.AddDataSource(StudentTreeDatasource);
+		StudentTreeDatasource.addXMLSinkObserver(StudentTreeSinkObserver);
+		treeStudent.builder.addListener(StudentTreeListener);
+	}
+	catch(e)
+	{
+		debug(e);
+	}
 
 	// Lehrveranstaltung
-	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	try
 	{
 		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?stg_kz='+stg_kz+'&sem='+sem+'&ver='+ver+'&grp='+grp+'&gruppe='+gruppe+'&'+gettimestamp();
