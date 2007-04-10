@@ -19,6 +19,9 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+
+header("Content-type: application/xhtml+xml");
+
 // Oberflaeche zur Aenderung von Beispielen und Upload von Bildern
 require_once('../../config.inc.php');
 require_once('../../../include/functions.inc.php');
@@ -47,36 +50,38 @@ if(!$conn = pg_pconnect(CONN_STRING))
 
 if(isset($_GET['gebiet_id']))
 	$gebiet_id = $_GET['gebiet_id'];
-else 
+else
 	$gebiet_id = '';
 
 if(isset($_GET['nummer']))
 	$nummer = $_GET['nummer'];
-else 
+else
 	$nummer = '';
-	
+
 if(isset($_GET['gruppe_kurzbz']))
 	$gruppe_kurzbz = $_GET['gruppe_kurzbz'];
-else 
+else
 	$gruppe_kurzbz = '';
 
 if(isset($_GET['frage_id']))
 	$frage_id = $_GET['frage_id'];
-else 
+else
 	$frage_id = '';
-	
+
 if(isset($_GET['vorschlag_id']))
 	$vorschlag_id = $_GET['vorschlag_id'];
-else 
+else
 	$vorschlag_id = '';
-	
+
 $save_vorschlag_error=false;
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="http://www.w3.org/Math/XSL/mathml.xsl"?>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<link href="../../../skin/cis.css" rel="stylesheet" type="text/css" />
 <script language="Javascript">
 //Vorschau anzeigen
 function preview()
@@ -97,13 +102,13 @@ if(isset($_POST['submitbild']))
 		//Extension herausfiltern
     	$ext = explode('.',$_FILES['bild']['name']);
         $ext = strtolower($ext[count($ext)-1]);
-        
+
         //--check that it's a jpeg or gif or png
-        if ($ext=='gif' || $ext=='png' || $ext=='jpg' || $ext=='jpeg') 
+        if ($ext=='gif' || $ext=='png' || $ext=='jpg' || $ext=='jpeg')
         {
 			//Funktioniert nur mit Mozilla
 			//Wenn File ein Bild ist
-			//if (($_FILES['bild']['type']=="image/gif") || ($_FILES['bild']['type']=="image/jpeg") || ($_FILES['bild']['type']=="image/png")) 
+			//if (($_FILES['bild']['type']=="image/gif") || ($_FILES['bild']['type']=="image/jpeg") || ($_FILES['bild']['type']=="image/png"))
 			//{
 			$filename = $_FILES['bild']['tmp_name'];
 			//File oeffnen
@@ -113,7 +118,7 @@ if(isset($_POST['submitbild']))
 			fclose($fp);
 			//in HEX-Werte umrechnen
 			$content = strhex($content);
-			
+
 			$frage = new frage($conn);
 			if($frage->load($_GET['frage_id']))
 			{
@@ -121,16 +126,16 @@ if(isset($_POST['submitbild']))
 				$frage->bild = $content;
 				$frage->new = false;
 				if($frage->save())
-					echo "<b>Bild gespeichert</b><br>";
-				else 
-					echo '<b>'.$frage->errormsg.'</b><br>';
+					echo "<b>Bild gespeichert</b><br />";
+				else
+					echo '<b>'.$frage->errormsg.'</b><br />';
 			}
-			else 
-				echo '<b>'.$frage->errormsg.'</b><br>';
+			else
+				echo '<b>'.$frage->errormsg.'</b><br />';
 		}
-		else 
-			echo "<b>File ist kein gueltiges Bild</b><br>";
-	}		
+		else
+			echo "<b>File ist kein gueltiges Bild</b><br />";
+	}
 }
 
 //Speichern der Frage-Daten
@@ -145,13 +150,13 @@ if(isset($_POST['submitdata']))
 		$frage->new = false;
 		if($frage->save())
 		{
-			echo "<b>Daten gespeichert</b><br>";
+			echo "<b>Daten gespeichert</b><br />";
 		}
-		else 
-			echo '<b>'.$frage->errormsg.'</b><br>';
+		else
+			echo '<b>'.$frage->errormsg.'</b><br />';
 	}
-	else 
-		echo '<b>'.$frage->errormsg.'</b><br>';
+	else
+		echo '<b>'.$frage->errormsg.'</b><br />';
 }
 
 //Speichern eines Vorschlages
@@ -161,7 +166,7 @@ if(isset($_POST['submitvorschlag']))
 	if(isset($_FILES['bild']['tmp_name']) && is_uploaded_file($_FILES['bild']['tmp_name']))
 	{
 		//Wenn File ein Bild ist
-		if (($_FILES['bild']['type']=="image/gif") || ($_FILES['bild']['type']=="image/jpeg") || ($_FILES['bild']['type']=="image/png")) 
+		if (($_FILES['bild']['type']=="image/gif") || ($_FILES['bild']['type']=="image/jpeg") || ($_FILES['bild']['type']=="image/png"))
 		{
 			$filename = $_FILES['bild']['tmp_name'];
 			//File oeffnen
@@ -172,21 +177,21 @@ if(isset($_POST['submitvorschlag']))
 			//in HEX-Werte umrechnen
 			$content = strhex($content);
 		}
-		else 
+		else
 			echo "<b>Datei ist kein Bild!</b><br>";
 	}
-	
+
 	$vorschlag = new vorschlag($conn);
 	$error=false;
 
 	if($_POST['vorschlag_id']!='')
 	{
 		if($vorschlag->load($_POST['vorschlag_id']))
-		{		
+		{
 			$vorschlag->new = false;
 			$vorschlag->vorschlag_id = $_POST['vorschlag_id'];
 		}
-		else 
+		else
 		{
 			echo '<b>Fehler beim Laden des Datensatzes</b><br>';
 			$error = true;
@@ -199,24 +204,24 @@ if(isset($_POST['submitvorschlag']))
 		$error = true;
 		echo '<b>Nummer ist ungueltig</b><br>';
 	}
-		
+
 	if(!$error)
-	{		
+	{
 		$vorschlag->bild = $content;
 		$vorschlag->frage_id = $_GET['frage_id'];
 		$vorschlag->nummer = $_POST['nummer'];
 		$vorschlag->antwort = strtoupper($_POST['antwort']);
 		$vorschlag->text = $_POST['text'];
-				
+
 		if($vorschlag->save())
 			echo "<b>Vorschlag gespeichert</b><br>";
-		else 
+		else
 		{
 			$save_vorschlag_error=true;
 			echo '<b>'.$vorschlag->errormsg.'</b><br>';
 		}
 	}
-	else 
+	else
 		$save_vorschlag_error=true;
 }
 //Vorschlag loeschen
@@ -232,7 +237,7 @@ $qry  = "SELECT * FROM testtool.tbl_gebiet ORDER BY bezeichnung";
 $result = pg_query($conn, $qry);
 while($row = pg_fetch_object($result))
 {
-	if($gebiet_id=='')	
+	if($gebiet_id=='')
 		$gebiet_id = $row->gebiet_id;
 	if($gebiet_id==$row->gebiet_id)
 		echo "<a href='$PHP_SELF?gebiet_id=$row->gebiet_id' class='Item'><u>$row->bezeichnung</u></a> -";
@@ -250,11 +255,11 @@ if($result = pg_query($conn, $qry))
 	{
 		if($nummer=='')
 			$nummer = $row->nummer;
-			
+
 		if($nummer==$row->nummer)
-			echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$row->nummer' class='Item'><u>$row->nummer</u></a> -";
+			echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$row->nummer' class='Item'><u>$row->nummer</u></a> -";
 		else
-			echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$row->nummer' class='Item'>$row->nummer</a> -";
+			echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$row->nummer' class='Item'>$row->nummer</a> -";
 	}
 }
 
@@ -269,9 +274,9 @@ if($result = pg_query($conn, $qry))
 		if($gruppe_kurzbz=='')
 			$gruppe_kurzbz = $row->gruppe_kurzbz;
 		if($gruppe_kurzbz==$row->gruppe_kurzbz)
-			echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_kurzbz=$row->gruppe_kurzbz' class='Item'><u>$row->gruppe_kurzbz</u></a> -";
+			echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;gruppe_kurzbz=$row->gruppe_kurzbz' class='Item'><u>$row->gruppe_kurzbz</u></a> -";
 		else
-			echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_kurzbz=$row->gruppe_kurzbz' class='Item'>$row->gruppe_kurzbz</a> -";
+			echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;gruppe_kurzbz=$row->gruppe_kurzbz' class='Item'>$row->gruppe_kurzbz</a> -";
 	}
 }
 
@@ -279,46 +284,46 @@ echo "\n\n<br>";
 $frage = new frage($conn);
 $frage->getFrage($gebiet_id, $nummer, $gruppe_kurzbz);
 if($frage->frage_id!='')
-{		
+{
 	echo "<table><tr><td>";
 	//Fragen
 	echo "<table>";
 	echo "<tr>";
 	//Upload Feld fuer Bild
 	echo "<td valign='bottom'>
-			<form method=POST ENCTYPE='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_kurzbz=$gruppe_kurzbz&frage_id=$frage->frage_id'>
-			Bild: <input type='file' name='bild'>
-			<input type='submit' name='submitbild' value='Upload'>
+			<form method='POST' ENCTYPE='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;gruppe_kurzbz=$gruppe_kurzbz&amp;frage_id=$frage->frage_id'>
+			Bild: <input type='file' name='bild' />
+			<input type='submit' name='submitbild' value='Upload' />
 			</form>
 		</td></tr>";
 	//Wenn ein Bild vorhanden ist, dann anzeigen
 	if($frage->bild!='')
 	{
-		echo "\n<tr><td width=400 height=300><img src='../bild.php?src=frage&frage_id=$frage->frage_id' width=400 height=300></td>";
+		echo "\n<tr><td width='400' height='300'><img src='../bild.php?src=frage&amp;frage_id=$frage->frage_id' width='400' height='300' /></td>";
 	}
-	else 
+	else
 	{
-		echo "\n<tr><td align=center width=400 height=300 style='background: #DDDDDD;'>Kein Bild vorhanden</td>\n";
+		echo "\n<tr><td align=center width='400' height='300' style='background: #DDDDDD;'>Kein Bild vorhanden</td>\n";
 	}
 	//Zusaetzliche EingabeFelder anzeigen
 	echo "<td>";
-	echo "<form method=POST action='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_kurzbz=$gruppe_kurzbz&frage_id=$frage->frage_id'>";
+	echo "<form method='POST' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;gruppe_kurzbz=$gruppe_kurzbz&amp;frage_id=$frage->frage_id'>";
 	echo "<table>";
 	//Bei Aenderungen im Textfeld werden diese sofort in der Vorschau angezeigt
-	echo "<tr><td colspan=2><textarea name='text' id='text' cols=30 rows=8 oninput='preview()'>$frage->text</textarea></td></tr>";
-	echo "<tr><td>Demo <input type='checkbox' name='demo' ".($frage->demo?'checked':'').">
-			Lösung <input type='text' name='loesung' value='$frage->loesung' size=1 /></td>
+	echo "<tr><td colspan='2'>\n<textarea name='text' id='text' cols='30' rows='8' oninput='preview()'>$frage->text</textarea>\n</td></tr>";
+	echo "<tr><td>Demo <input type='checkbox' name='demo' ".($frage->demo?'checked="true"':'')." />
+			Loesung <input type='text' name='loesung' value='$frage->loesung' size='1' /></td>
 		 <td align='right'><input type='submit' value='Speichern' name='submitdata' /></td>";
 	echo "</tr></table>";
 	echo "</form>";
 	echo "</td>";
 	//Vorschau fuer das Text-Feld
-	echo "<tr><td colspan=2>Vorschau:<br><div id='vorschau' style='border: 1px solid black'>$frage->text</div></td></tr>";
+	echo "<tr><td colspan='2'>Vorschau:<br /><div id='vorschau' style='border: 1px solid black'>$frage->text</div></td></tr>";
 	echo "</table>";
 	echo '</td><td style="border-left: 1px solid black" valign="top">';
-	
+
 	$vorschlag = new vorschlag($conn);
-	
+
 	if($vorschlag_id!='')
 		if(!$vorschlag->load($vorschlag_id))
 			die($vorschlag->errormsg);
@@ -332,37 +337,37 @@ if($frage->frage_id!='')
 		$vorschlag->bild = '';
 	}
 	//Vorschlag
-	echo '<b>Vorschlag'.($vorschlag_id!=''?' Edit':'').'</b><br><br>';
-	echo "<form method=POST ENCTYPE='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_kurzbz=$gruppe_kurzbz&frage_id=$frage->frage_id'>";
-	echo "<input type='hidden' name='vorschlag_id' value='$vorschlag->vorschlag_id'>";
+	echo '<b>Vorschlag'.($vorschlag_id!=''?' Edit':'').'</b><br /><br />';
+	echo "<form method='POST' ENCTYPE='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;gruppe_kurzbz=$gruppe_kurzbz&amp;frage_id=$frage->frage_id'>";
+	echo "<input type='hidden' name='vorschlag_id' value='$vorschlag->vorschlag_id' />";
 	echo '<table>';
 	echo '<tr>';
-	echo "<td>Antwort</td><td><input type='text' size='1' name='antwort' value='$vorschlag->antwort'></td>";
+	echo "<td>Antwort</td><td><input type='text' size='1' name='antwort' value='$vorschlag->antwort' /></td>";
 	echo '</tr>';
 	echo '<tr>';
-	echo '<td>Text:</td><td><textarea name="text" id="text" rows=5 cols=30 oninput="preview()">'.$vorschlag->text.'</textarea></td>';
+	echo '<td>Text:</td><td>\n<textarea name="text" id="text" rows=5 cols=30 oninput="preview()">'.$vorschlag->text."</textarea>\n</td>";
 	echo '</tr><tr valign="top">';
 	//Upload Feld fuer Bild
-	echo "<td>Bild:</td><td><input type='file' name='bild'></td>";
+	echo "<td>Bild:</td><td><input type='file' name='bild' /></td>";
 	echo "</tr>";
-	echo "<tr><td>Nummer:</td><td><input type='text' name='nummer' size=3 value='$vorschlag->nummer'></td></tr>";
-	echo "<tr><td colspan='2' align='right'><input type='submit' name='submitvorschlag' value='Speichern'>".($vorschlag_id!=''?"<input type='button' value='Abbrechen' onclick=\"document.location.href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_kurzbz=$gruppe_kurzbz&frage_id=$frage->frage_id'\">":'')."</td></tr>";
+	echo "<tr><td>Nummer:</td><td><input type='text' name='nummer' size=3 value='$vorschlag->nummer' /></td></tr>";
+	echo "<tr><td colspan='2' align='right'><input type='submit' name='submitvorschlag' value='Speichern' />".($vorschlag_id!=''?"<input type='button' value='Abbrechen' onclick=\"document.location.href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;gruppe_kurzbz=$gruppe_kurzbz&amp;frage_id=$frage->frage_id'\" />":'')."</td></tr>";
 	echo "</table>";
 	echo "</form>";
-		
+
 	echo '</td></tr></table>';
-	
+
 	$vorschlag = new vorschlag($conn);
 	$vorschlag->getVorschlag($frage->frage_id);
 	$i=0;
 	if(count($vorschlag->result)>0)
 	{
 		echo '<table><tr class="liste"><th>Nummer</th><th>Antwort</th><th>Text</th><th>Bild</th><th></th><th></th></tr>';
-		
+
 		foreach ($vorschlag->result as $vs)
 		{
 			$i++;
-			echo "<tr class='liste".($i%2)."'><td>$vs->nummer</td><td>$vs->antwort</td><td>$vs->text</td><td><img src='../bild.php?src=vorschlag&vorschlag_id=$vs->vorschlag_id'></td><td><a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_kurzbz=$gruppe_kurzbz&frage_id=$frage->frage_id&vorschlag_id=$vs->vorschlag_id'>edit</a></td><td><a href='$PHP_SELF?gebiet_id=$gebiet_id&nummer=$nummer&gruppe_kurzbz=$gruppe_kurzbz&frage_id=$frage->frage_id&vorschlag_id=$vs->vorschlag_id&type=delete' onclick=\"return confirm('Wollen Sie diesen Eintrag wirklich loeschen?')\">delete</a></td></tr>";
+			echo "<tr class='liste".($i%2)."'><td>$vs->nummer</td><td>$vs->antwort</td><td>$vs->text</td><td><img src='../bild.php?src=vorschlag&amp;vorschlag_id=$vs->vorschlag_id' /></td><td><a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;gruppe_kurzbz=$gruppe_kurzbz&amp;frage_id=$frage->frage_id&amp;vorschlag_id=$vs->vorschlag_id'>edit</a></td><td><a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;gruppe_kurzbz=$gruppe_kurzbz&amp;frage_id=$frage->frage_id&amp;vorschlag_id=$vs->vorschlag_id&amp;type=delete' onclick=\"return confirm('Wollen Sie diesen Eintrag wirklich loeschen?')\">delete</a></td></tr>";
 		}
 		echo '</table>';
 	}
