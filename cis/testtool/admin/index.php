@@ -20,7 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-header("Content-type: application/xhtml+xml");
+//header("Content-type: application/xhtml+xml");
 
 // Oberflaeche zur Aenderung von Beispielen und Upload von Bildern
 require_once('../../config.inc.php');
@@ -257,9 +257,9 @@ if($result = pg_query($conn, $qry))
 			$nummer = $row->nummer;
 
 		if($nummer==$row->nummer)
-			echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$row->nummer' class='Item'><u>$row->nummer</u></a> -";
+			echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$row->nummer&amp;gruppe_kurzbz=$gruppe_kurzbz' class='Item'><u>$row->nummer</u></a> -";
 		else
-			echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$row->nummer' class='Item'>$row->nummer</a> -";
+			echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$row->nummer&amp;gruppe_kurzbz=$gruppe_kurzbz' class='Item'>$row->nummer</a> -";
 	}
 }
 
@@ -303,7 +303,7 @@ if($frage->frage_id!='')
 	}
 	else
 	{
-		echo "\n<tr><td align=center width='400' height='300' style='background: #DDDDDD;'>Kein Bild vorhanden</td>\n";
+		echo "\n<tr><td align='center' width='400' height='300' style='background: #DDDDDD;'>Kein Bild vorhanden</td>\n";
 	}
 	//Zusaetzliche EingabeFelder anzeigen
 	echo "<td>";
@@ -316,7 +316,7 @@ if($frage->frage_id!='')
 		 <td align='right'><input type='submit' value='Speichern' name='submitdata' /></td>";
 	echo "</tr></table>";
 	echo "</form>";
-	echo "</td>";
+	echo "</td></tr>";
 	//Vorschau fuer das Text-Feld
 	echo "<tr><td colspan='2'>Vorschau:<br /><div id='vorschau' style='border: 1px solid black'>$frage->text</div></td></tr>";
 	echo "</table>";
