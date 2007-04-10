@@ -140,8 +140,8 @@ class frage
 			       $this->addslashes($this->gruppe_kurzbz).",'".
 			       $this->addslashes($this->loesung).",".
 			       $this->addslashes($this->nummer).",".
-			       ($this->demo?'true':'false').','.
-			       $this->addslashes($this->text).",".
+			       ($this->demo?'true':'false').",'".
+			       $this->text."',".
 			       $this->addslashes($this->bild).");";
 		}
 		else
