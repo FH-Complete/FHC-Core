@@ -20,7 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-//header("Content-type: application/xhtml+xml");
+header("Content-type: application/xhtml+xml");
 
 // Oberflaeche zur Aenderung von Beispielen und Upload von Bildern
 require_once('../../config.inc.php');
@@ -178,7 +178,7 @@ if(isset($_POST['submitvorschlag']))
 			$content = strhex($content);
 		}
 		else
-			echo "<b>Datei ist kein Bild!</b><br>";
+			echo "<b>Datei ist kein Bild!</b><br />";
 	}
 
 	$vorschlag = new vorschlag($conn);
@@ -193,7 +193,7 @@ if(isset($_POST['submitvorschlag']))
 		}
 		else
 		{
-			echo '<b>Fehler beim Laden des Datensatzes</b><br>';
+			echo '<b>Fehler beim Laden des Datensatzes</b><br />';
 			$error = true;
 		}
 	}
@@ -202,7 +202,7 @@ if(isset($_POST['submitvorschlag']))
 	if($_POST['nummer']=='' || !is_numeric($_POST['nummer']))
 	{
 		$error = true;
-		echo '<b>Nummer ist ungueltig</b><br>';
+		echo '<b>Nummer ist ungueltig</b><br />';
 	}
 
 	if(!$error)
@@ -214,11 +214,11 @@ if(isset($_POST['submitvorschlag']))
 		$vorschlag->text = $_POST['text'];
 
 		if($vorschlag->save())
-			echo "<b>Vorschlag gespeichert</b><br>";
+			echo "<b>Vorschlag gespeichert</b><br />";
 		else
 		{
 			$save_vorschlag_error=true;
-			echo '<b>'.$vorschlag->errormsg.'</b><br>';
+			echo '<b>'.$vorschlag->errormsg.'</b><br />';
 		}
 	}
 	else
@@ -229,7 +229,7 @@ if(isset($_GET['type']) && $_GET['type']=='delete' && isset($_GET['vorschlag_id'
 {
 	$vs = new vorschlag($conn);
 	if(!$vs->delete($_GET['vorschlag_id']))
-		echo '<b>'.$vs->errormsg.'</b><br>';
+		echo '<b>'.$vs->errormsg.'</b><br />';
 	$vorschlag_id='';
 }
 //Liste der Gebiete
@@ -244,7 +244,7 @@ while($row = pg_fetch_object($result))
 	else
 		echo "<a href='$PHP_SELF?gebiet_id=$row->gebiet_id' class='Item'>$row->bezeichnung</a> -";
 }
-echo '<br><br>';
+echo '<br /><br />';
 
 // Liste der Fragen
 $qry = "SELECT distinct nummer FROM testtool.tbl_frage WHERE gebiet_id='".addslashes($gebiet_id)."' ORDER BY nummer";
@@ -263,7 +263,7 @@ if($result = pg_query($conn, $qry))
 	}
 }
 
-echo '<br><br>';
+echo '<br /><br />';
 //Liste der Gruppen
 $qry = "SELECT gruppe_kurzbz FROM testtool.tbl_frage WHERE gebiet_id='".addslashes($gebiet_id)."' AND nummer='".addslashes($nummer)."' ORDER BY gruppe_kurzbz";
 
@@ -280,7 +280,7 @@ if($result = pg_query($conn, $qry))
 	}
 }
 
-echo "\n\n<br>";
+echo "\n\n<br />";
 $frage = new frage($conn);
 $frage->getFrage($gebiet_id, $nummer, $gruppe_kurzbz);
 if($frage->frage_id!='')
@@ -345,12 +345,12 @@ if($frage->frage_id!='')
 	echo "<td>Antwort</td><td><input type='text' size='1' name='antwort' value='$vorschlag->antwort' /></td>";
 	echo '</tr>';
 	echo '<tr>';
-	echo '<td>Text:</td><td>\n<textarea name="text" id="text" rows=5 cols=30 oninput="preview()">'.$vorschlag->text."</textarea>\n</td>";
+	echo '<td>Text:</td><td>\n<textarea name="text" id="text" rows="5" cols="30" oninput="preview()">'.$vorschlag->text."</textarea>\n</td>";
 	echo '</tr><tr valign="top">';
 	//Upload Feld fuer Bild
 	echo "<td>Bild:</td><td><input type='file' name='bild' /></td>";
 	echo "</tr>";
-	echo "<tr><td>Nummer:</td><td><input type='text' name='nummer' size=3 value='$vorschlag->nummer' /></td></tr>";
+	echo "<tr><td>Nummer:</td><td><input type='text' name='nummer' size='3' value='$vorschlag->nummer' /></td></tr>";
 	echo "<tr><td colspan='2' align='right'><input type='submit' name='submitvorschlag' value='Speichern' />".($vorschlag_id!=''?"<input type='button' value='Abbrechen' onclick=\"document.location.href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;gruppe_kurzbz=$gruppe_kurzbz&amp;frage_id=$frage->frage_id'\" />":'')."</td></tr>";
 	echo "</table>";
 	echo "</form>";
