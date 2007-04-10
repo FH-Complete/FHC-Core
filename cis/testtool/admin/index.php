@@ -310,7 +310,7 @@ if($frage->frage_id!='')
 	echo "<form method='POST' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;gruppe_kurzbz=$gruppe_kurzbz&amp;frage_id=$frage->frage_id'>";
 	echo "<table>";
 	//Bei Aenderungen im Textfeld werden diese sofort in der Vorschau angezeigt
-	echo "<tr><td colspan='2'>\n<textarea name='text' id='text' cols='30' rows='8' oninput='preview()'>$frage->text</textarea>\n</td></tr>";
+	echo "<tr><td colspan='2'>\n<textarea name='text' id='text' cols='30' rows='8' oninput='preview()'><![CDATA[$frage->text]]></textarea>\n</td></tr>";
 	echo "<tr><td>Demo <input type='checkbox' name='demo' ".($frage->demo?'checked="true"':'')." />
 			Loesung <input type='text' name='loesung' value='$frage->loesung' size='1' /></td>
 		 <td align='right'><input type='submit' value='Speichern' name='submitdata' /></td>";
