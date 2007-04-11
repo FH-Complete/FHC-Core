@@ -201,7 +201,7 @@ function onVerbandSelect(event)
 	{
 		url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe+"&"+gettimestamp();
 		var treeStudent=document.getElementById('student-tree');
-
+		
 		//Alte DS entfernen
 		var oldDatasources = treeStudent.database.GetDataSources();
 		while(oldDatasources.hasMoreElements())
@@ -216,6 +216,8 @@ function onVerbandSelect(event)
 		treeStudent.database.AddDataSource(StudentTreeDatasource);
 		StudentTreeDatasource.addXMLSinkObserver(StudentTreeSinkObserver);
 		treeStudent.builder.addListener(StudentTreeListener);
+		StudentDetailReset();
+		StudentDetailDisableFields(true);
 	}
 	catch(e)
 	{
@@ -235,8 +237,9 @@ function onVerbandSelect(event)
 			treeLV.database.RemoveDataSource(oldDatasources.getNext());
 		}
 
-		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-		LvTreeDatasource = rdfService.GetDataSource(url);
+		var rdfService1 = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+
+		LvTreeDatasource = rdfService1.GetDataSource(url);
 		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 		treeLV.database.AddDataSource(LvTreeDatasource);
