@@ -8,7 +8,7 @@ header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/vnd.mozilla.xul+xml");
 // xml
-echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
+echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
 require_once('../vilesci/config.inc.php');
 require_once('../include/person.class.php');
@@ -43,7 +43,7 @@ if(isset($_GET['uid']))
 	$uid=$_GET['uid'];
 
 // Studenten holen
-$student=new student($conn);
+$student=new student($conn,null,true);
 if (isset($uid))
 	$student->load($uid);
 else
@@ -75,6 +75,7 @@ function drawStudent($student)
 	  <RDF:li>
       	<RDF:Description  id="<?php echo $student->uid; ?>"  about="<?php echo $rdf_url.'/'.$student->uid; ?>" >
         	<STUDENT:uid><![CDATA[<?php echo $student->uid;  ?>]]></STUDENT:uid>
+        	<STUDENT:person_id><![CDATA[<?php echo $student->person_id; ?>]]></STUDENT:person_id>
     		<STUDENT:titelpre><![CDATA[<?php echo $student->titelpre; ?>]]></STUDENT:titelpre>
     		<STUDENT:titelpost><![CDATA[<?php echo $student->titelpost; ?>]]></STUDENT:titelpost>
     		<STUDENT:vornamen><![CDATA[<?php echo $student->vornamen  ?>]]></STUDENT:vornamen>
@@ -96,6 +97,16 @@ function drawStudent($student)
     		<STUDENT:verband><![CDATA[<?php echo $student->verband;  ?>]]></STUDENT:verband>
     		<STUDENT:gruppe><![CDATA[<?php echo $student->gruppe;  ?>]]></STUDENT:gruppe>
     		<STUDENT:studiengang_kz><![CDATA[<?php echo $student->studiengang_kz; ?>]]></STUDENT:studiengang_kz>
+    		
+    		<STUDENT:anrede><![CDATA[<?php echo $student->anrede; ?>]]></STUDENT:anrede>
+    		<STUDENT:svnr><![CDATA[<?php echo $student->svnr; ?>]]></STUDENT:svnr>
+    		<STUDENT:ersatzkennzeichen><![CDATA[<?php echo $student->ersatzkennzeichen; ?>]]></STUDENT:ersatzkennzeichen>
+    		<STUDENT:familienstand><![CDATA[<?php echo $student->familienstand; ?>]]></STUDENT:familienstand>
+    		<STUDENT:geschlecht><![CDATA[<?php echo $student->geschlecht; ?>]]></STUDENT:geschlecht>
+    		<STUDENT:anzahlkinder><![CDATA[<?php echo $student->anzahlkinder; ?>]]></STUDENT:anzahlkinder>
+    		<STUDENT:staatsbuergerschaft><![CDATA[<?php echo $student->staatsbuergerschaft; ?>]]></STUDENT:staatsbuergerschaft>
+    		<STUDENT:geburtsnation><![CDATA[<?php echo $student->geburtsnation; ?>]]></STUDENT:geburtsnation>
+    		<STUDENT:sprache><![CDATA[<?php echo $student->sprache; ?>]]></STUDENT:sprache>
       	</RDF:Description>
       </RDF:li>
 <?php

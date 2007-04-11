@@ -106,6 +106,17 @@ function conf_del()
 {
 	return confirm('Wollen Sie diesen Eintrag wirklich löschen?');
 }
+
+function checkval()
+{
+	if(document.getElementById('vertretung_uid').value=='')
+	{
+		alert('Bitte zuerst eine Vertretung auswählen');
+		return false;
+	}
+	else
+		return true;
+}
 </script>
 </head>
 
@@ -378,9 +389,11 @@ if($result = pg_query($conn, $qry))
 }
 $content_form.= '</SELECT></td></tr>';
 
-$content_form.= "<tr><td>Vertretung</td><td><SELECT name='vertretung_uid'>";
+$content_form.= "<tr><td>Vertretung</td><td><SELECT name='vertretung_uid' id='vertretung_uid'>";
 //dropdown fuer vertretung
 $qry = "SELECT * FROM campus.vw_mitarbeiter WHERE uid not LIKE '\\\_%' ORDER BY nachname, vorname";
+
+$content_form.= "<OPTION value=''>-- Auswahl --</OPTION>\n";
 
 if($result = pg_query($conn, $qry))
 {
@@ -396,9 +409,9 @@ $content_form.= '</SELECT></td></tr>';
 $content_form.= '<tr><td>&nbsp;</td><td>';
 
 if(isset($_GET['type']) && $_GET['type']=='edit')
-	$content_form.= "<input type='submit' name='submit_zeitsperre' value='Speichern'>";
+	$content_form.= "<input type='submit' name='submit_zeitsperre' onclick='return checkval()' value='Speichern'>";
 else
-	$content_form.= "<input type='submit' name='submit_zeitsperre' value='Hinzufügen'>";
+	$content_form.= "<input type='submit' name='submit_zeitsperre' onclick='return checkval()' value='Hinzufügen'>";
 $content_form.= '</td></tr>';
 $content_form.= '</table>';
 

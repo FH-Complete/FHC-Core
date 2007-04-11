@@ -49,68 +49,68 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
   					</columns>
   					<rows>
     					<row>
-      						<label value="UID" />
-      						<textbox id="student-detail-textbox-uid" />
+      						<label value="UID" control="student-detail-textbox-uid"/>
+      						<textbox id="student-detail-textbox-uid" disabled="true"/>
     					</row>    					
     					<row>
-      						<label value="Anrede" />
-      						<textbox id="student-detail-textbox-anrede" />
+      						<label value="Anrede" control="student-detail-textbox-anrede"/>
+      						<textbox id="student-detail-textbox-anrede" disabled="true"/>
     					</row>
     					<row>
-      						<label value="TitelPre" />
-      						<textbox id="student-detail-textbox-titelpre" />
+      						<label value="TitelPre" control="student-detail-textbox-titelpre"/>
+      						<textbox id="student-detail-textbox-titelpre" disabled="true"/>
     					</row>
     					<row>
-      						<label value="TitelPost" />
-      						<textbox id="student-detail-textbox-titelpost" />
+      						<label value="TitelPost" control="student-detail-textbox-titelpost"/>
+      						<textbox id="student-detail-textbox-titelpost" disabled="true"/>
     					</row>
     					<row>
-      						<label value="Vorname" />
-      						<textbox id="student-detail-textbox-vorname"  />
+      						<label value="Vorname" control="student-detail-textbox-vorname"/>
+      						<textbox id="student-detail-textbox-vorname" disabled="true"/>
     					</row>
     					<row>
-      						<label value="Vornamen" />
-      						<textbox id="student-detail-textbox-vornamen"  />
+      						<label value="Vornamen" control="student-detail-textbox-vornamen"/>
+      						<textbox id="student-detail-textbox-vornamen" disabled="true" />
     					</row>
     					<row>
-      						<label value="Nachname" />
-      						<textbox id="student-detail-textbox-nachname" />
+      						<label value="Nachname" control="student-detail-textbox-nachname"/>
+      						<textbox id="student-detail-textbox-nachname" disabled="true"/>
     					</row>
     					<row>
-      						<label value="Geburtsdatum" />
-      						<textbox id="student-detail-textbox-geburtsdatum" />
+      						<label value="Geburtsdatum" control="student-detail-textbox-geburtsdatum"/>
+      						<textbox id="student-detail-textbox-geburtsdatum" disabled="true"/>
     					</row>
     					<row>
-      						<label value="Geburtsort" />
-      						<textbox id="student-detail-textbox-geburtsort" />
+      						<label value="Geburtsort" control="student-detail-textbox-geburtsort"/>
+      						<textbox id="student-detail-textbox-geburtsort" disabled="true"/>
     					</row>
     					<row>
-      						<label value="Geburtszeit" />
-      						<textbox id="student-detail-textbox-geburtszeit" />
+      						<label value="Geburtszeit" control="student-detail-textbox-geburtszeit"/>
+      						<textbox id="student-detail-textbox-geburtszeit" disabled="true"/>
     					</row>
     					<row>
       						<label value="Foto" />
-      						<label value="????" />
+      						<hbox><image src='' id="student-detail-image" width='60' height='60'/><spacer flex="1" /></hbox>
     					</row>
     					<row>
-      						<label value="Anmerkung" />
-      						<textbox id="student-detail-textbox-anmerkung"/>
+      						<label value="Anmerkung" control="student-detail-textbox-anmerkung"/>
+      						<textbox id="student-detail-textbox-anmerkung" disabled="true"/>
     					</row>
     					<row>
-      						<label value="Homepage" />
-      						<textbox id="student-detail-textbox-homepage" />
+      						<label value="Homepage" control="student-detail-textbox-homepage"/>
+      						<textbox id="student-detail-textbox-homepage" disabled="true"/>
     					</row>
     					<row>
-      						<label value="SVNR" />
-      						<textbox id="student-detail-textbox-svnr" />
+      						<label value="SVNR" control="student-detail-textbox-svnr"/>
+      						<textbox id="student-detail-textbox-svnr" disabled="true"/>
     					</row>
     					<row>
-      						<label value="Ersatzkennzeichen" />
-      						<textbox id="student-detail-textbox-ersatzkennzeichen" />
+      						<label value="Ersatzkennzeichen" control="student-detail-textbox-ersatzkennzeichen"/>
+      						<textbox id="student-detail-textbox-ersatzkennzeichen" disabled="true"/>
     					</row>
     					<row>
-      						<label value="Familienstand" />
-      						<menulist id="student-detail-menulist-familienstand" disabled="false">
+      						<label value="Familienstand" control="student-detail-menulist-familienstand"/>
+      						<menulist id="student-detail-menulist-familienstand" disabled="true">
 								<menupopup>
 										<menuitem value="g" label="geschieden"/>
 										<menuitem value="l" label="ledig"/>
@@ -120,8 +120,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							</menulist>
     					</row>
     					<row>
-      						<label value="Geschlecht" />
-      						<menulist id="student-detail-menulist-geschlecht" disabled="false">
+      						<label value="Geschlecht" control="student-detail-menulist-geschlecht"/>
+      						<menulist id="student-detail-menulist-geschlecht" disabled="true">
 								<menupopup>
 										<menuitem value="m" label="maennlich"/>
 										<menuitem value="w" label="weiblich"/>
@@ -129,16 +129,16 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							</menulist>
     					</row>
     					<row>
-      						<label value="Aktiv" />
-      						<checkbox id="student-detail-checkbox-aktiv" checked="true" />
+      						<label value="Aktiv" control="student-detail-checkbox-aktiv"/>
+      						<checkbox id="student-detail-checkbox-aktiv" checked="true" disabled="true"/>
     					</row>
     					<row>
-      						<label value="Anzahl der Kinder" />
-      						<textbox id="student-detail-textbox-anzahlderkinder"/>
+      						<label value="Anzahl der Kinder" control="student-detail-textbox-anzahlderkinder"/>
+      						<textbox id="student-detail-textbox-anzahlderkinder" disabled="true"/>
     					</row>
   						<row>
-							<label value="Staatsbuergerschaft" />
-							<menulist id="student-detail-menulist-staatsbuergerschaft" disabled="false"
+							<label value="Staatsbuergerschaft" control="student-detail-menulist-staatsbuergerschaft"/>
+							<menulist id="student-detail-menulist-staatsbuergerschaft" disabled="true"
 							          datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php" flex="1"
 						              ref="http://www.technikum-wien.at/nation/liste" >
 								<template>
@@ -151,8 +151,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							</menulist>
 						</row>
 						<row>
-							<label value="Geburtsnation" />
-							<menulist id="student-detail-menulist-geburtsnation" disabled="false"
+							<label value="Geburtsnation" control="student-detail-menulist-geburtsnation"/>
+							<menulist id="student-detail-menulist-geburtsnation" disabled="true"
 							          datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php" flex="1"
 						              ref="http://www.technikum-wien.at/nation/liste" >
 								<template>
@@ -165,8 +165,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							</menulist>
 						</row>
 						<row>
-							<label value="Sprache" />
-							<menulist id="student-detail-menulist-sprache" disabled="false"
+							<label value="Sprache" control="student-detail-menulist-sprache" />
+							<menulist id="student-detail-menulist-sprache" disabled="true"
 							          datasources="<?php echo APP_ROOT ?>rdf/sprache.rdf.php" flex="1"
 						              ref="http://www.technikum-wien.at/sprachen/liste" >
 								<template>
@@ -179,8 +179,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							</menulist>
 						</row>
 						<row>
-      						<label value="Matrikelnummer" />
-      						<textbox id="student-detail-textbox-matrikelnummer" />
+      						<label value="Matrikelnummer" control="student-detail-textbox-matrikelnummer"/>
+      						<textbox id="student-detail-textbox-matrikelnummer" disabled="true"/>
     					</row>
 				</rows>
 			</grid>
