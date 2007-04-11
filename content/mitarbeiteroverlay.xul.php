@@ -147,7 +147,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiterdetailoverlay.xul.php"?
 	    <treecol id="tree-liste-mitarbeiter-col-mitgliedentwicklungsteam" label="MitgliedEntwicklungsteam" flex="1" hidden="true" persist="hidden"
 	    	class="sortDirectionIndicator"
 	    	sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#mitgliedentwicklungsteam" onclick="TreeMitarbeiterSort()"/>
-	    
+
 	    <splitter class="tree-splitter"/>
 	    <treecol id="tree-liste-mitarbeiter-col-qualifikation" label="Qualifikation" flex="1" hidden="true" persist="hidden"
 	    	class="sortDirectionIndicator"

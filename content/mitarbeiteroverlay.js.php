@@ -7,18 +7,18 @@
 	// Datenbank Verbindung
 	if (!$conn = @pg_pconnect(CONN_STRING_FAS))
 	   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-	
+
 	if (!$conn_vilesci = @pg_pconnect(CONN_STRING))
 	   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-	
+
 	$user = get_uid();
-				
+
 	//Studiensemester_id holen
 	$benutzer = new benutzer($conn_vilesci);
-	$benutzer->loadVariables($user);		
+	$benutzer->loadVariables($user);
 	$stsem = $benutzer->variable->semester_aktuell;
 	$stsem_id = getStudiensemesterIdFromName($conn, $stsem);
-				
+
 	echo "var MitarbeiterDetailStudiensemester_id = $stsem_id;\n";
 	echo "var sleep_time = ".$benutzer->variable->sleep_time.";\n"; // Zeit zwischen Refresh und Rebuild
 ?>
@@ -36,7 +36,7 @@ function TreeListeMitarbeiterAuswahl()
 {
 	if(treeMitarbeiterReload)
 	{
-		//Falls Daten veraendert wurden fragen ob gespeichert werden soll		
+		//Falls Daten veraendert wurden fragen ob gespeichert werden soll
 		if(treeMitarbeiterDetailChanged)
 		{
 			if(confirm("Wollen Sie die geaenderten Daten speichern?"))
@@ -47,25 +47,25 @@ function TreeListeMitarbeiterAuswahl()
 		}
 		//Eingabefelder aktivieren
 		SetMitarbeiterDetailAktiv(true);
-		
-		var tree=document.getElementById('tree-liste-mitarbeiter');		
+
+		var tree=document.getElementById('tree-liste-mitarbeiter');
 		setStatusBarText("");
-		
+
 		//Falls kein Eintrag gewaehlt wurde, den ersten auswaehlen
 		var idx;
 		if(tree.currentIndex>=0)
 			idx = tree.currentIndex;
 		else
 			idx = 0;
-			
+
 		try
-		{	
+		{
 			//Mitarbeiter_id holen
 			var col = tree.columns ? tree.columns["tree-liste-mitarbeiter-col-mitarbeiter_id"] : "tree-liste-mitarbeiter-col-mitarbeiter_id";
 			var mitarbeiter_id=tree.view.getCellText(idx,col);
 		}
 		catch(e)
-		{ 
+		{
 			return false;
 		}
 		// RDF mit den Mitarbeiterdaten vom Server holen
@@ -76,7 +76,7 @@ function TreeListeMitarbeiterAuswahl()
 		var httpRequest = new XMLHttpRequest();
 		httpRequest.open("GET", url, false, '','');
 		httpRequest.send('');
-		
+
 		switch(httpRequest.readyState)
 		{
 			case 1,2,3: alert('Bad Ready State: '+httpRequest.status); //404 ErrorCodes etc
@@ -133,13 +133,13 @@ function TreeListeMitarbeiterAuswahl()
 		staatsbuergerschaft = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#staatsbuergerschaft" ));
 		geburtsnation = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#geburtsnation" ));
 		deluser = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#deluser" ));
-		
+
 		//Wenn deluser = aktueller User dann darf der Datensatz geloescht werden
 		if(deluser==document.getElementById('statusbarpanel-user').label)
 			document.getElementById('toolbar-MitarbeiterEditor-loeschen').disabled=false;
 		else
 			document.getElementById('toolbar-MitarbeiterEditor-loeschen').disabled=true;
-		
+
 		document.getElementById('textbox-mitarbeiter-detail-person_id').value=person_id;
 		document.getElementById('textbox-mitarbeiter-detail-mitarbeiter_id').value=mitarbeiter_id;
 		document.getElementById('textbox-mitarbeiter-detail-aktstatus').value=aktstatus;
@@ -161,7 +161,7 @@ function TreeListeMitarbeiterAuswahl()
 		document.getElementById('menulist-mitarbeiter-detail-familienstand').value = familienstand;
 		document.getElementById('menulist-mitarbeiter-detail-staatsbuergerschaft').value = staatsbuergerschaft;
 		document.getElementById('menulist-mitarbeiter-detail-geburtsnation').value = geburtsnation;
-		
+
 		//Mitarbeiter Daten
 		personal_nr = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#personal_nr" ));
 		kurzbezeichnung = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#kurzbezeichnung" ));
@@ -190,23 +190,23 @@ function TreeListeMitarbeiterAuswahl()
 		//Funktionen Tree fuellen
 		var treeFunktionen=document.getElementById('tree-liste-funktionen');
 		var treeFunktionenURL = "<?php echo APP_ROOT; ?>rdf/fas/funktionen.rdf.php?mitarbeiter_id="+mitarbeiter_id+"&leerzeichencodierung=true&"+gettimestamp();
-		
+
 		//treeFunktionen.setAttribute('datasources',treeFunktionenURL);
-		
+
 		//Alte Datasources loeschen
 		var oldDatasources = treeFunktionen.database.GetDataSources();
 		while(oldDatasources.hasMoreElements())
 			treeFunktionen.database.RemoveDataSource(oldDatasources.getNext());
-	
+
 		//Neue Datasource setzen
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		var newDs  = rdfService.GetDataSource(treeFunktionenURL);
 		treeFunktionen.database.AddDataSource(newDs);
-		
+
 		//Sink Observer anhaengen
-		sinkfunktion = newDs.QueryInterface(Components.interfaces.nsIRDFXMLSink);  
-		sinkfunktion.addXMLSinkObserver(treefunktionenobserve);			
-		
+		sinkfunktion = newDs.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		sinkfunktion.addXMLSinkObserver(treefunktionenobserve);
+
 		document.getElementById('button-mitarbeiter-detail-funktionen-neu').disabled=false;
 		document.getElementById('button-mitarbeiter-detail-funktionen-bearbeiten').disabled=false;
 		document.getElementById('button-mitarbeiter-detail-funktionen-loeschen').disabled=false;
@@ -244,10 +244,10 @@ function TreeListeMitarbeiterAuswahl()
 		document.getElementById('button-mitarbeiter-detail-bankverbindungen-neu').disabled=false;
 		document.getElementById('button-mitarbeiter-detail-bankverbindungen-bearbeiten').disabled=false;
 		document.getElementById('button-mitarbeiter-detail-bankverbindungen-loeschen').disabled=false;
-		
+
 		treeMitarbeiterValueNoChange();
 	}
-	
+
 	return true;
 }
 /**
@@ -262,7 +262,7 @@ function TreeMitarbeiterSort()
 	if(treeMitarbeiter.currentIndex>=0)
 		i = treeMitarbeiter.currentIndex;
 	else
-		i = 0;		
+		i = 0;
 	col = treeMitarbeiter.columns ? treeMitarbeiter.columns["tree-liste-mitarbeiter-col-mitarbeiter_id"] : "tree-liste-mitarbeiter-col-mitarbeiter_id";
 	MitarbeiterSelectMitarbeiter_id = treeMitarbeiter.view.getCellText(i,col);
 	window.setTimeout("MitarbeiterSelectMitarbeiter()",10);
@@ -270,31 +270,31 @@ function TreeMitarbeiterSort()
 
 /**
  * Refresht den MitarbeiterTree
- * @param eintrag_merken Wenn true dann wird der aktuell markierte Eintrag nach dem 
+ * @param eintrag_merken Wenn true dann wird der aktuell markierte Eintrag nach dem
  * refresh wieder markiert
  */
 function refreshtree(eintrag_merken)
 {
 	var treeMitarbeiter=document.getElementById('tree-liste-mitarbeiter');
-	
+
 	if(eintrag_merken)
 	{
 		var i;
 		if(treeMitarbeiter.currentIndex>=0)
 			i = treeMitarbeiter.currentIndex;
 		else
-			i = 0;		
-		
+			i = 0;
+
 		col = treeMitarbeiter.columns ? treeMitarbeiter.columns["tree-liste-mitarbeiter-col-mitarbeiter_id"] : "tree-liste-mitarbeiter-col-mitarbeiter_id";
 		MitarbeiterSelectMitarbeiter_id = treeMitarbeiter.view.getCellText(i,col);
 	}
-	
+
 	treeMitarbeiterReload=false;
    	treeMitarbeiter.builder.refresh();
-   	
+
     //for (var i=0;i<30;i++)
 	//	treeMitarbeiter.builder.rebuild();
-	
+
    	//window.setTimeout("document.getElementById('tree-liste-mitarbeiter').builder.rebuild()",sleep_time);
    	treemenuobservedata='refresh';
    	if(eintrag_merken)
@@ -313,7 +313,7 @@ function MitarbeiterExcelExport()
 	var col = treeMitarbeiterMenu.columns ? treeMitarbeiterMenu.columns["tree-menu-mitarbeiter-col-filter"] : "tree-menu-mitarbeiter-col-filter";
 	var filter=treeMitarbeiterMenu.view.getCellText(treeMitarbeiterMenu.currentIndex,col);
 	cols = treeMitarbeiter.getElementsByTagName('treecol');
-	
+
 	var url = "excel.php";
 	var attributes="?type=mitarbeiter";
 	if (filter=="Studiengangsleiter")
@@ -338,11 +338,11 @@ function MitarbeiterExcelExport()
 			attributes+="&fix=false&aktiv=true";
 		if (filter=="FreiAngestellteAlle")
 			attributes+="&fix=false";
-    
+
 	url+=attributes;
 	spalte=0;
 	for(i in cols)
-	{		
+	{
 		if(cols[i].hidden==false)
 		{
 			url += "&spalte"+spalte+"="+MitarbeiterDetailgetSpaltenname(cols[i].id);
@@ -356,7 +356,7 @@ function MitarbeiterExcelExport()
 	window.location.href=url;
 }
 
-/** 
+/**
  * Liefert anhand der ID den Namen der Klassenvariable
  */
 function MitarbeiterDetailgetSpaltenname(id)
@@ -382,7 +382,7 @@ function MitarbeiterDetailgetSpaltenname(id)
 	if(id=='tree-liste-mitarbeiter-col-geburtsnation') return 'gebnation';
 	if(id=='tree-liste-mitarbeiter-col-habilitation') return 'habilitation_bezeichnung';
 	if(id=='tree-liste-mitarbeiter-col-beginndatum') return 'beginndatum';
-	if(id=='tree-liste-mitarbeiter-col-bemerkung') return 'bemerkung';	
+	if(id=='tree-liste-mitarbeiter-col-bemerkung') return 'bemerkung';
 	if(id=='tree-liste-mitarbeiter-col-ausgeschieden') return 'ausgeschieden';
 	if(id=='tree-liste-mitarbeiter-col-beendigungsdatum') return 'beendigungsdatum';
 	if(id=='tree-liste-mitarbeiter-col-ausbildung') return 'ausbildung_bezeichnung';
@@ -398,7 +398,7 @@ function MitarbeiterDetailgetSpaltenname(id)
 function MitarbeiterSVNRValueChange()
 {
 	svnr=document.getElementById('textbox-mitarbeiter-detail-svnr').value;
-		
+
 	if(svnr!='' && svnr.length==10)
 		document.getElementById('textbox-mitarbeiter-detail-geburtsdatum').value = svnr.charAt(4) + svnr.charAt(5) + "." + svnr.charAt(6) + svnr.charAt(7) + ".19" + svnr.charAt(8) + svnr.charAt(9);
 
@@ -411,7 +411,7 @@ function MitarbeiterAnredeValueChange()
 {
 	var geschlecht=document.getElementById('textbox-mitarbeiter-detail-anrede').value;
 	var button = document.getElementById('button-mitarbeiter-detail-geschlecht');
-	
+
 	if(geschlecht=='Frau')
     	button.label='weiblich';
     else
@@ -432,7 +432,7 @@ function MitarbeiterDetailKurzbzGenerate()
 		{
 			// Kuerzel generieren
 			var url="<?php echo APP_ROOT; ?>rdf/fas/generate_kuerzel.rdf.php?type=kurzbz&nachname="+nachname+"&vorname="+vorname;
-	
+
 			// Request absetzen
 			var httpRequest = new XMLHttpRequest();
 			httpRequest.open("GET", url, false, '','');
@@ -443,7 +443,7 @@ function MitarbeiterDetailKurzbzGenerate()
 				case 1,2,3: alert('Bad Ready State: '+httpRequest.status); //404 ErrorCodes etc
 					        return false;
 				            break;
-	
+
 				case 4:		if(httpRequest.status !=200)
 					        {
 						        alert('The server respond with a bad status code: '+httpRequest.status);
@@ -457,38 +457,38 @@ function MitarbeiterDetailKurzbzGenerate()
 				default: alert('Timing error');
 						 break;
 			}
-	
+
 			// XML in Datasource parsen
 			var dsource=parseRDFString(response, 'http://www.technikum-wien.at/generate_kurzbz/msg');
-			
+
 			netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 			// Daten aus RDF auslesen
 			dsource=dsource.QueryInterface(Components.interfaces.nsIRDFDataSource);
-	
+
 			var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
 		                   getService(Components.interfaces.nsIRDFService);
 			var subject = rdfService.GetResource("http://www.technikum-wien.at/generate_kurzbz/0");
-	
+
 		   	var predicateNS = "http://www.technikum-wien.at/generate_kurzbz/rdf";
-	
+
 	        var gen_return = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#return" ));
 			var gen_msg = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#msg" ));
-	
+
 			if(gen_return=='true')
 			{
 			   	document.getElementById('textbox-mitarbeiter-detail-kurzbezeichnung').value=gen_msg;
 			}
 			else
 				alert("Fehler beim Generieren der Daten: "+gen_msg);
-		}	
-			
-			
+		}
+
+
 		// UID generieren
 		if(document.getElementById('textbox-mitarbeiter-detail-uid').value=='')
 		{
 			var url="<?php echo APP_ROOT; ?>rdf/fas/generate_kuerzel.rdf.php?type=uid&nachname="+nachname+"&vorname="+vorname;
-	
+
 			// Request absetzen
 			var httpRequest = new XMLHttpRequest();
 			httpRequest.open("GET", url, false, '','');
@@ -499,7 +499,7 @@ function MitarbeiterDetailKurzbzGenerate()
 				case 1,2,3: alert('Bad Ready State: '+httpRequest.status); //404 ErrorCodes etc
 					        return false;
 				            break;
-	
+
 				case 4:		if(httpRequest.status !=200)
 					        {
 						        alert('The server respond with a bad status code: '+httpRequest.status);
@@ -511,24 +511,24 @@ function MitarbeiterDetailKurzbzGenerate()
 					        }
 				            break;
 			}
-	
+
 			// XML in Datasource parsen
 			var dsource=parseRDFString(response, 'http://www.technikum-wien.at/generate_kurzbz/msg');
-			
+
 			netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 			// Daten aus RDF auslesen
 			dsource=dsource.QueryInterface(Components.interfaces.nsIRDFDataSource);
-	
+
 			var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
 		                   getService(Components.interfaces.nsIRDFService);
 			var subject = rdfService.GetResource("http://www.technikum-wien.at/generate_kurzbz/0");
-	
+
 		   	var predicateNS = "http://www.technikum-wien.at/generate_kurzbz/rdf";
-	
+
 	        var gen_return = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#return" ));
 			var gen_msg = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#msg" ));
-	
+
 			if(gen_return=='true')
 			{
 			   	document.getElementById('textbox-mitarbeiter-detail-uid').value=gen_msg;
@@ -548,7 +548,7 @@ function MitarbeiterDetailKurzbzGenerate()
 function MitarbeiterNeu()
 {
     var treeMitarbeiter=document.getElementById('tree-liste-mitarbeiter');
-	
+
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var httpRequest = new XMLHttpRequest();
 	var url = "<?php echo APP_ROOT; ?>rdf/fas/db_dml.rdf.php";
@@ -556,7 +556,7 @@ function MitarbeiterNeu()
 	httpRequest.open("POST", url, false, '','');
 	httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 	param = "type=newmitarbeiter&studiensemester_id="+MitarbeiterDetailStudiensemester_id;
-	
+
 	switch(MenuMitarbeiterAuswahl)
    	{
    		case 2: //Alle
@@ -566,7 +566,7 @@ function MitarbeiterNeu()
    		case 4: //Fixangestellte
    				param = param + "&art=fix";
    				break;
-   		case 5: //FixangestellteAlle   			
+   		case 5: //FixangestellteAlle
    				param = param + "&art=fix";
    				break;
    		case 9: //FreiAngestellte
@@ -575,8 +575,8 @@ function MitarbeiterNeu()
    				break;
    		default: break;
    	}
-   	
-	
+
+
    	//Parameter schicken
 	httpRequest.send(param);
 
@@ -612,15 +612,15 @@ function MitarbeiterNeu()
    	var dbdml_errormsg = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#errormsg" ));
 
    	if(dbdml_return=='true')
-   	{   		
+   	{
    		//In dbdml_errormsg steht die person_id des neuen Datensatzes
 
    		//Statusbar sezten
    		setStatusBarText("Neuer Datensatz wurde angelegt");
-   		
+
    		//Tree Refreshen
    		refreshtree(false);
-   		
+
    		//Eintrag im Tree Selektieren
    		MitarbeiterSelectMitarbeiter_id = dbdml_errormsg;
 		treemenuobservedata='refresheintragmerken';
@@ -628,8 +628,8 @@ function MitarbeiterNeu()
    	}
    	else
 		alert("Fehler beim anlegen des Datensatzes: "+dbdml_errormsg);
-	
-	
+
+
 }
 
 /**
@@ -771,7 +771,7 @@ function SelectIndex(idx)
 function saveMitarbeiter()
 {
 	var treeMitarbeiter=document.getElementById('tree-liste-mitarbeiter');
-	
+
 	//Daten aus den Felder holen
 	person_id = document.getElementById('textbox-mitarbeiter-detail-person_id').value;
 	mitarbeiter_id = document.getElementById('textbox-mitarbeiter-detail-mitarbeiter_id').value;
@@ -808,11 +808,11 @@ function saveMitarbeiter()
 	if(vorname!='' && nachname!='' && kurzbezeichnung!='')
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-		
+
 		// Request absetzen
 		var httpRequest = new XMLHttpRequest();
 		var url = "<?php echo APP_ROOT; ?>rdf/fas/db_dml.rdf.php";
-		
+
 		httpRequest.open("POST", url, false, '','');
 		httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
@@ -841,7 +841,7 @@ function saveMitarbeiter()
 			param = param + "&geschlecht=W";
 		else
 			param = param + "&geschlecht=M";
-		
+
 		param = param + "&bismelden="+encodeURIComponent(bismelden);
 		param = param + "&familienstand=" + encodeURIComponent(familienstand);
 		param = param + "&staatsbuergerschaft=" + encodeURIComponent(staatsbuergerschaft);
@@ -855,17 +855,17 @@ function saveMitarbeiter()
 		param = param + "&beendigungsdatum=" + encodeURIComponent(beendigungsdatum);
 		param = param + "&ausbildung=" + encodeURIComponent(ausbildung);
 		param = param + "&aktiv=" + encodeURIComponent(aktiv);
-		
+
 		//Parameter schicken
 		httpRequest.send(param);
-		
+
 		// Bei status 4 ist sendung Ok
 		switch(httpRequest.readyState)
 		{
 			case 1,2,3: alert('Bad Ready State: '+httpRequest.status);
 				        return false;
 			            break;
-		
+
 			case 4:		if(httpRequest.status !=200)
 				        {
 					        alert('The server respond with a bad status code: '+httpRequest.status);
@@ -877,24 +877,24 @@ function saveMitarbeiter()
 				        }
 			            break;
 		}
-		
+
 		// Returnwerte aus RDF abfragen
 		var dsource=parseRDFString(response, 'http://www.technikum-wien.at/dbdml');
-		
+
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
 		               getService(Components.interfaces.nsIRDFService);
 		var subject = rdfService.GetResource("http://www.technikum-wien.at/dbdml/0");
-		
+
 			var predicateNS = "http://www.technikum-wien.at/dbdml/rdf";
-		
+
 			var dbdml_return = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#return" ));
 			var dbdml_errormsg = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#errormsg" ));
-		
+
 			if(dbdml_return=='true')
 			{
 				treeMitarbeiterValueNoChange();
 				refreshtree(true);
-									
+
 				//Statusbar Text setzen
 				window.setTimeout("setStatusBarText('Datensatz wurde erfolgreich gespeichert')",sleep_time);
 			}
@@ -1029,7 +1029,7 @@ function SetMitarbeiterDetailAktiv(enabled)
 	document.getElementById('button-mitarbeiter-detail-bankverbindungen-bearbeiten').disabled=!enabled;
 	document.getElementById('button-mitarbeiter-detail-bankverbindungen-loeschen').disabled=!enabled;
 	document.getElementById('button-mitarbeiter-detail-gen_kurzbez').disabled=!enabled;
-	
+
 	document.getElementById('tree-liste-funktionen').setAttribute('datasources',"rdf:null");
     document.getElementById('tree-liste-adressen').setAttribute('datasources',"rdf:null");
 	document.getElementById('tree-liste-email').setAttribute('datasources',"rdf:null");
@@ -1042,7 +1042,7 @@ function SetMitarbeiterDetailAktiv(enabled)
  * Beim auswaehlen eines Mitarbeiters
  */
 function MitarbeiterDetailRestore()
-{ 	
+{
 	treeMitarbeiterDetailChanged=false;
     document.getElementById('button-mitarbeiter-detail-speichern').disabled=true;
     document.getElementById('button-mitarbeiter-detail-zurueck').disabled=true;
@@ -1110,7 +1110,7 @@ function MitarbeiterDetailFunktionenBearbeiten()
 	}
 	var col = treeFunktionen.columns ? treeFunktionen.columns["tree-liste-funktionen-col-funktion_id"] : "tree-liste-funktionen-col-funktion_id";
 	var funktion_id=treeFunktionen.view.getCellText(treeFunktionen.currentIndex,col);
-	window.open("mitarbeiterfunktiondialog.xul.php?funktion_id="+funktion_id,"","chrome,status=no, modal, width=500, height=350, centerscreen, resizable");	
+	window.open("mitarbeiterfunktiondialog.xul.php?funktion_id="+funktion_id,"","chrome,status=no, modal, width=500, height=350, centerscreen, resizable");
 }
 
 /**
@@ -1218,31 +1218,31 @@ function MitarbeiterDetailFunktionenLoeschen()
  * Zeigt alle Funktionen dieses Mitarbeiters an die er jemals hatte
  */
 function MitarbeiterDetailFunktionenAlleAnzeigen()
-{	
+{
 
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
-	var tree=document.getElementById('tree-liste-mitarbeiter');		
+
+	var tree=document.getElementById('tree-liste-mitarbeiter');
 	setStatusBarText("");
-	
+
 	//Falls kein Eintrag gewaehlt wurde, den ersten auswaehlen
 	var idx;
 	if(tree.currentIndex>=0)
 		idx = tree.currentIndex;
 	else
 		idx = 0;
-		
+
 	try
-	{	
+	{
 		//Mitarbeiter_id holen
 		var col = tree.columns ? tree.columns["tree-liste-mitarbeiter-col-mitarbeiter_id"] : "tree-liste-mitarbeiter-col-mitarbeiter_id";
 		var mitarbeiter_id=tree.view.getCellText(idx,col);
 	}
 	catch(e)
-	{ 
+	{
 		return false;
 	}
-		
+
 	//Funktionen Tree fuellen
 	var treeFunktionen=document.getElementById('tree-liste-funktionen');
 	button = document.getElementById('button-mitarbeiter-detail-funktionen-alleanzeigen');
@@ -1256,21 +1256,21 @@ function MitarbeiterDetailFunktionenAlleAnzeigen()
 		var treeFunktionenURL = "<?php echo APP_ROOT; ?>rdf/fas/funktionen.rdf.php?mitarbeiter_id="+mitarbeiter_id+"&leerzeichencodierung=true&"+gettimestamp();
 		button.label='Alle Anzeigen';
 	}
-				
+
 	//Alte Datasources loeschen
 	var oldDatasources = treeFunktionen.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
 		treeFunktionen.database.RemoveDataSource(oldDatasources.getNext());
-	
+
 	//Neue Datasource setzen
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var newDs  = rdfService.GetDataSource(treeFunktionenURL);
 	treeFunktionen.database.AddDataSource(newDs);
-		
+
 	//Sink Observer anhaengen
-	sinkfunktion = newDs.QueryInterface(Components.interfaces.nsIRDFXMLSink);  
+	sinkfunktion = newDs.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	sinkfunktion.addXMLSinkObserver(treefunktionenobserve);
-	
+
 }
 
 /*****************************ADRESSEN*******************************/

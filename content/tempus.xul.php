@@ -48,7 +48,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/tempusoverlay.xul.php"?>';
 <commandset id="maincommands">
   <command id="menu-file-close:command" oncommand="closeWindow();"/>
   <command id="menu-properties-studiensemester:command" oncommand="studiensemesterChange();"/>
-  <command id="menu-prefs-stpltable-stundenplan:command" oncommand="stpltableChange('stundenplan');"/>  
+  <command id="menu-prefs-stpltable-stundenplan:command" oncommand="stpltableChange('stundenplan');"/>
   <command id="menu-prefs-stpltable-stundenplandev:command" oncommand="stpltableChange('stundenplandev');"/>
 </commandset>
 
@@ -74,17 +74,17 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/tempusoverlay.xul.php"?>';
     </menu>
     <menu id="menu-edit" label="&menu-edit:label;" accesskey="&menu-edit:accesskey;" onclick="">
       <menupopup id="menu-edit-popup" onpopupshowing="loadUndoList();">
-        <menu id="menu-edit-undo" label="&menu-edit-undo:label;" 
+        <menu id="menu-edit-undo" label="&menu-edit-undo:label;"
            datasources="rdf:null"
            ref="http://www.technikum-wien.at/undo/liste"
         >
            	<template>
 	        		<rule>
-	     	 			<menupopup id="menu-edit-undo-popup">   				 			
-				        		<menuitem uri="rdf:*" label="rdf:http://www.technikum-wien.at/undo/rdf#beschreibung" 
-		            					  value="rdf:http://www.technikum-wien.at/undo/rdf#log_id" 
+	     	 			<menupopup id="menu-edit-undo-popup">
+				        		<menuitem uri="rdf:*" label="rdf:http://www.technikum-wien.at/undo/rdf#beschreibung"
+		            					  value="rdf:http://www.technikum-wien.at/undo/rdf#log_id"
 		            					  onclick="UnDo(this.value, this.label);"/>
-						</menupopup>				      	
+						</menupopup>
 		          	</rule>
 	        </template>
         </menu>
@@ -127,9 +127,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/tempusoverlay.xul.php"?>';
 				checked = ".($benutzer->variable->semester_aktuell==$stsem?"'true' ":"'false'")." />";
        		}
        ?>
-           	
+
       		</menupopup>
-        </menu>   
+        </menu>
 	    </menupopup>
     </menu>
     <menu id="menu-help" label="&menu-help:label;" accesskey="&menu-help:accesskey;">

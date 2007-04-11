@@ -4,10 +4,10 @@
 	header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 	header("Pragma: no-cache");
 	include("../vilesci/config.inc.php");
-		
+
 	if(isset($_GET['funktion_id']) && $_GET['funktion_id']!='' && is_numeric($_GET['funktion_id']))
 		echo "var MitarbeiterDetailFunktion_id=".$_GET['funktion_id'].";";
-	else 
+	else
 		echo "var MitarbeiterDetailFunktion_id=null;";
 ?>
 
@@ -23,7 +23,7 @@ function Check()
  * Setzt die Defaultwerte
  */
 function MitarbeiterFunktionDefault()
-{	
+{
 	MitarbeiterDetailStudiensemester_id = document.getElementById('textbox-mitarbeiter-funktion-stsem_id').value;
 	document.getElementById('menulist-mitarbeiter-funktion-fachbereich').value = 2;
 	document.getElementById('textbox-mitarbeiter-funktion-beschreibung').value = '';
@@ -37,7 +37,7 @@ function MitarbeiterFunktionDefault()
 	document.getElementById('menulist-mitarbeiter-funktion-qualifikation').disabled = true;
 	document.getElementById('menulist-mitarbeiter-funktion-qualifikation').value = 0;
 	document.getElementById('menulist-mitarbeiter-funktion-ausmass').value = 1;
-	document.getElementById('menulist-mitarbeiter-funktion-studiensemester').value = MitarbeiterDetailStudiensemester_id;	
+	document.getElementById('menulist-mitarbeiter-funktion-studiensemester').value = MitarbeiterDetailStudiensemester_id;
 }
 
 /**
@@ -49,7 +49,7 @@ function MitarbeiterFunktionBearbeiten()
 
 		// Url zum RDF
 		var url="<?php echo APP_ROOT; ?>rdf/fas/funktionen.rdf.php?funktion_id="+MitarbeiterDetailFunktion_id+'&'+window.opener.gettimestamp();
-	
+
 		// Request absetzen
 		var httpRequest = new XMLHttpRequest();
 		httpRequest.open("GET", url, false, '','');
@@ -60,7 +60,7 @@ function MitarbeiterFunktionBearbeiten()
 			case 1,2,3: alert('Bad Ready State: '+httpRequest.status); //404 ErrorCodes etc
 				        return false;
 			            break;
-	
+
 			case 4:		if(httpRequest.status !=200)
 				        {
 					        alert('The server respond with a bad status code: '+httpRequest.status);
@@ -72,23 +72,23 @@ function MitarbeiterFunktionBearbeiten()
 				        }
 			            break;
 		}
-	
+
 		// XML in Datasource parsen
 		var dsource=parseRDFString(response, 'http://www.technikum-wien.at/funktionen/alle');
-		
+
 		// Trick 17	(sonst gibt's ein Permission denied)
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-			
+
 		// Daten aus RDF auslesen
 		dsource=dsource.QueryInterface(Components.interfaces.nsIRDFDataSource);
-	
+
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
 	                   getService(Components.interfaces.nsIRDFService);
 		var subject = rdfService.GetResource("http://www.technikum-wien.at/funktionen/" + MitarbeiterDetailFunktion_id);
 
 	   	var predicateNS = "http://www.technikum-wien.at/funktionen/rdf";
-	   	
-		//Felder befuellen		
+
+		//Felder befuellen
 		mitarbeiter_id = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#mitarbeiter_id" ));
 		studiensemester_id = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#studiensemester_id" ));
 		erhalter_id = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#erhalter_id" ));
@@ -104,7 +104,7 @@ function MitarbeiterFunktionBearbeiten()
 		entwicklungsteam = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#entwicklungsteam" ));
 		qualifikation = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#besonderequalifikation" ));
 		ausmass = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#ausmass" ));
-		
+
 		document.getElementById('textbox-mitarbeiter-funktion-mitarbeiter_id').value = mitarbeiter_id;
 		document.getElementById('menulist-mitarbeiter-funktion-studiensemester').value = studiensemester_id;
 		document.getElementById('menulist-mitarbeiter-funktion-erhalter').value = erhalter_id;
@@ -141,14 +141,14 @@ function MitarbeiterFunktionBearbeiten()
 }
 
 function MitarbeiterFunktionValueChange()
-{   
+{
 }
 
 /**
  * Speichert die eingegebene Funktion
  */
 function MitarbeiterFunktionSave()
-{		
+{
 	//Daten aus den Feldern holen
 	mitarbeiter_id = document.getElementById('textbox-mitarbeiter-funktion-mitarbeiter_id').value;
 	studiensemester_id = document.getElementById('menulist-mitarbeiter-funktion-studiensemester').value;
@@ -165,9 +165,9 @@ function MitarbeiterFunktionSave()
 	entwicklungsteam = 	document.getElementById('checkbox-mitarbeiter-funktion-entwicklungsteam').checked;
 	qualifikation = document.getElementById('menulist-mitarbeiter-funktion-qualifikation').value;
 	ausmass = document.getElementById('menulist-mitarbeiter-funktion-ausmass').value;
-			
+
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 	// Request absetzen
 	var httpRequest = new XMLHttpRequest();
 	var url = "<?php echo APP_ROOT; ?>rdf/fas/db_dml.rdf.php";
@@ -180,7 +180,7 @@ function MitarbeiterFunktionSave()
 		param = param + "&new=false";
 	else
 		param = param + "&new=true";
-	
+
 	param = param + "&funktion_id="+encodeURIComponent(MitarbeiterDetailFunktion_id);
 	param = param + "&mitarbeiter_id="+encodeURIComponent(mitarbeiter_id);
 	param = param + "&studiensemester_id="+encodeURIComponent(studiensemester_id);
@@ -197,7 +197,7 @@ function MitarbeiterFunktionSave()
 	param = param + "&entwicklungsteam="+encodeURIComponent(entwicklungsteam);
 	param = param + "&qualifikation="+encodeURIComponent(qualifikation);
 	param = param + "&ausmass="+encodeURIComponent(ausmass);
-	
+
 	 //Parameter schicken
 	httpRequest.send(param);
 
@@ -231,9 +231,9 @@ function MitarbeiterFunktionSave()
 
    	var dbdml_return = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#return" ));
    	var dbdml_errormsg = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#errormsg" ));
-	
+
    	if(dbdml_return=='true')
-   	{   	 		
+   	{
    		//Statusbar setzen
    		window.opener.setStatusBarText("Funktion erfolgreich gespeichert");
    		window.opener.document.getElementById("tree-liste-funktionen").builder.refresh();
@@ -264,7 +264,7 @@ function MitarbeiterFunktionHauptberuflichChange()
 		document.getElementById("menulist-mitarbeiter-funktion-hauptberuf").value='';
 		document.getElementById("menulist-mitarbeiter-funktion-hauptberuf").disabled=true;
 	}
-	
+
 }
 
 function MitarbeiterFunktionEntwicklungsteamChange()
@@ -280,6 +280,6 @@ function MitarbeiterFunktionEntwicklungsteamChange()
 		document.getElementById("menulist-mitarbeiter-funktion-qualifikation").value='';
 		document.getElementById("menulist-mitarbeiter-funktion-qualifikation").disabled=false;
 	}
-	
-	
+
+
 }

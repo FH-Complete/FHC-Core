@@ -12,24 +12,24 @@ if(isset($_GET['mitarbeiter_id']))
 	$mitarbeiter_id = $_GET['mitarbeiter_id'];
 else
 	$mitarbeiter_id=null;
-	
+
 if(isset($_GET['funktion_id']))
 	$funktion_id=$_GET['funktion_id'];
-else 
+else
 	$funktion_id=null;
 if(isset($_GET['MitarbeiterDetailStudiensemester_id']))
 	$stsem_id=$_GET['MitarbeiterDetailStudiensemester_id'];
-else 
+else
 	$stsem_id=null;
 // rdf:null
 ?>
 
 <?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
 
-<window id="mitarbeiter-funktion-dialog" title="Email"		
+<window id="mitarbeiter-funktion-dialog" title="Email"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         onload="Check()">
-<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/fasoverlay.js.php" />        
+<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/fasoverlay.js.php" />
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/mitarbeiterfunktiondialog.js.php?funktion_id=<?php echo $funktion_id;?>" />
 
 
@@ -43,7 +43,7 @@ else
 		<column />
 		<column flex="1"/>
 	</columns>
-	
+
 	<rows>
     	<row>
     		<label align="end" control="menulist-mitarbeiter-funktion-erhalter" value="Erhalter:"/>
@@ -65,7 +65,7 @@ else
 		                         value="rdf:http://www.technikum-wien.at/studiensemester/rdf#studiensemester_id"/>
 		            </menupopup>
 		         </template>
-		    </menulist>    		
+		    </menulist>
     	</row>
     	<row>
     		<label control="menulist-mitarbeiter-funktion-funktion" value="Funktion:"/>
@@ -79,7 +79,7 @@ else
 		            </menupopup>
 		         </template>
 		    </menulist>
-    	</row>    	
+    	</row>
     	<row>
     		<label control="menulist-mitarbeiter-funktion-studiengang" value="Studiengang:"/>
     		<menulist id="menulist-mitarbeiter-funktion-studiengang" oncommand="MitarbeiterFunktionValueChange();"
@@ -191,7 +191,7 @@ else
     		<label align="end" control="textbox-mitarbeiter-funktion-beschreibung" value="Beschreibung:"/>
     		<textbox id="textbox-mitarbeiter-funktion-beschreibung" maxlength="255" oninput="MitarbeiterFunktionValueChange()"/>
     	</row>
-    	
+
     </rows>
 </grid>
 <grid align="end" flex="1"
@@ -207,7 +207,7 @@ else
 		<row>
 			<spacer />
 			<button label="OK" oncommand="MitarbeiterFunktionSave()"/>
-			<button label="Abbrechen" oncommand="window.close()"/>			
+			<button label="Abbrechen" oncommand="window.close()"/>
 		</row>
 	</rows>
 </grid>

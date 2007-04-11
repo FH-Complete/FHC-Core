@@ -1,6 +1,6 @@
 /**
 *
-* HTTP Request Klasse 
+* HTTP Request Klasse
 * stammt aus Artikel von phpPatterns (http://www.phppatterns.com/index.php/article/articleview/82/1/2/)
 * leicht modifiziert
 */
@@ -10,7 +10,7 @@
 // wir uebergeben das als Parameter
 //End Configuration
 
-function doLogin() 
+function doLogin()
 {
 	var username = document.getElementById('loginUser').value;
 	var password = document.getElementById('loginPass').value;
@@ -24,7 +24,7 @@ function doLogin()
 }
 
 //Start phpRequest Object
-function phpRequest(server_url,uname,passw) 
+function phpRequest(server_url,uname,passw)
 {
 	this.parms = new Array();
 	this.parmsIndex = 0;
@@ -36,23 +36,23 @@ function phpRequest(server_url,uname,passw)
 	this.passw = passw;
 }
 
-function phpRequestAdd(name,value) 
+function phpRequestAdd(name,value)
 {
 	this.parms[this.parmsIndex] = new Pair(name,value);
 	this.parmsIndex++;
 }
 
-function phpRequestExecute() 
+function phpRequestExecute()
 {
 	var targetURL = this.server;
-	
+
 	try {
 		var httpRequest = new XMLHttpRequest();
 	}catch (e){
 		alert('Error creating the connection!');
 		return;
 	}
-	
+
 	try {
 		var txt = "?";
 		for(var i in this.parms) {
@@ -62,18 +62,18 @@ function phpRequestExecute()
 		//Two options here, only uncomment one of these
 		//GET REQUEST
 		httpRequest.open("GET", targetURL+txt, false, '','');
-		
+
 		//POST REQUEST EXAMPLE
 		/*
-		httpRequest.open("POST", targetURL+txt, false, null, null);	
+		httpRequest.open("POST", targetURL+txt, false, null, null);
 		httpRequest.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
 		*/
 		httpRequest.send('');
-		
+
 	}catch (e){
 		alert('An error has occured calling the external site: '+e);
 		return false;
-	} 
+	}
 
 	switch(httpRequest.readyState) {
 		case 1,2,3:
@@ -89,16 +89,16 @@ function phpRequestExecute()
 			}
 		break;
 	}
-	
+
 	return response;
 }
 
 
-function phpRequestExecutePOST() 
+function phpRequestExecutePOST()
 {
 	var targetURL = this.server;
-	
-	try 
+
+	try
 	{
 		var httpRequest = new XMLHttpRequest();
 	}
@@ -107,51 +107,51 @@ function phpRequestExecutePOST()
 		alert('Error creating the connection!');
 		return;
 	}
-	
-	try 
+
+	try
 	{
 		var txt = "";
-		for(var i in this.parms) 
+		for(var i in this.parms)
 		{
 			txt = txt+'&'+this.parms[i].name+'='+this.parms[i].value;
 		}
 		//alert('sende '+txt);
-				
+
 		//POST REQUEST
-		httpRequest.open("POST", targetURL, false, '', '');	
+		httpRequest.open("POST", targetURL, false, '', '');
 		httpRequest.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
 		httpRequest.send(txt);
-		
+
 	}
 	catch (e)
 	{
 		alert('An error has occured calling the external site: '+e);
 		return false;
-	} 
+	}
 
-	switch(httpRequest.readyState) 
+	switch(httpRequest.readyState)
 	{
 		case 1,2,3:
 			alert('Bad Ready State: '+httpRequest.status);
 			return false;
 		break;
 		case 4:
-			if(httpRequest.status !=200) 
+			if(httpRequest.status !=200)
 			{
 				alert('The server respond with a bad status code: '+httpRequest.status);
 				return false;
-			} 
-			else 
+			}
+			else
 			{
 				var response = httpRequest.responseText;
 			}
 		break;
 	}
-	
+
 	return response;
 }
 
-function Pair(name,value) 
+function Pair(name,value)
 {
 	this.name = name;
 	this.value = value;

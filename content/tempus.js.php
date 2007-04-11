@@ -15,10 +15,10 @@ function onLoad()
 
 function loadRightFrame()
 {
-	
+
 }
 
-function loadURL(event) 
+function loadURL(event)
 {
         var contentFrame = document.getElementById('contentFrame');
         var url = event.target.getAttribute('value');
@@ -38,9 +38,9 @@ function studiensemesterChange()
 		if(items[i].id=='menu-properies-studiensemester-name' && items[i].getAttribute("checked")=='true')
 			stsem = items[i].label;
 	}
-	
+
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 	// Request absetzen
 	var httpRequest = new XMLHttpRequest();
 	var url = "<?php echo APP_ROOT; ?>rdf/fas/db_dml.rdf.php";
@@ -50,10 +50,10 @@ function studiensemesterChange()
 
 	var param = "type=variablechange";
 	param = param + "&stsem="+stsem;
-	
+
 	//Parameter schicken
 	httpRequest.send(param);
-	
+
 	// Bei status 4 ist sendung Ok
 	switch(httpRequest.readyState)
 	{
@@ -84,12 +84,12 @@ function studiensemesterChange()
 
    	var dbdml_return = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#return" ));
    	var dbdml_errormsg = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#errormsg" ));
-	
+
    	if(dbdml_return=='true')
-   	{   	 		
+   	{
    		//Statusbar setzen
    		document.getElementById("statusbarpanel-text").label = "Studiensemester erfolgreich geändert";
-   		document.getElementById("statusbarpanel-semester").label = stsem;   		
+   		document.getElementById("statusbarpanel-semester").label = stsem;
    		//MitarbeiterDetailStudiensemester_id = dbdml_errormsg;
    	}
    	else
@@ -105,20 +105,20 @@ function studiensemesterChange()
 function loadUndoList()
 {
 	menu = document.getElementById('menu-edit-undo');
-		
+
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	if(menuUndoDatasource==0)
 	{
 		//Wenn noch keine Datasource angegeben ist, dann wird eine neue hinzugefuegt
-		var url = '<?php echo APP_ROOT; ?>rdf/undo.rdf.php?'+gettimestamp();	
+		var url = '<?php echo APP_ROOT; ?>rdf/undo.rdf.php?'+gettimestamp();
 
 		//Alte DS entfernen
-		var oldDatasources = menu.database.GetDataSources();	
+		var oldDatasources = menu.database.GetDataSources();
 		while(oldDatasources.hasMoreElements())
 		{
 			menu.database.RemoveDataSource(oldDatasources.getNext());
 		}
-			
+
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		menuUndoDatasource = rdfService.GetDataSource(url);
 		menuUndoDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -130,7 +130,7 @@ function loadUndoList()
 		menuUndoDatasource.Refresh(true); //blocking
 		menu.builder.rebuild();
 	}
-		
+
 	return true;
 }
 
@@ -143,18 +143,18 @@ function UnDo(log_id, bezeichnung)
 	{
 		//Request absetzen
 		var req = new phpRequest('tempusDBDML.php','','');
-		
+
 		req.add('type','undo');
 		req.add('log_id',log_id);
-			
+
 		var response = req.executePOST();
 		var val =  new ParseReturnValue(response)
-	
-		if (!val.dbdml_return) 
+
+		if (!val.dbdml_return)
 		{
 			alert(val.dbdml_errormsg)
-		} 
-		else 
+		}
+		else
 		{
 			LvTreeRefresh();
 		}

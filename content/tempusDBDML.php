@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -23,7 +23,7 @@
 // ****************************************
 // * Insert/Update/Delete
 // * der Lehreinheiten
-// * 
+// *
 // * Script sorgt fuer den Datenbanzugriff
 // * fuer das XUL - Lehreinheiten-Modul
 // *
@@ -68,7 +68,7 @@ if(!$error)
 	if(isset($_POST['type']) && $_POST['type']=='undo')
 	{
 		//UNDO Befehl ausfuehren
-		
+
 		if (!isset($_POST['log_id']))
 		{
 			$return = false;
@@ -76,16 +76,16 @@ if(!$error)
 			$data = '';
 			$error = true;
 		}
-		
+
 		if(!$error)
 		{
 			$log = new log($conn, null, null, true);
-			
+
 			if($log->undo($log_id))
 			{
 				$return = true;
 			}
-			else 
+			else
 			{
 				$return = false;
 				$errormsg = 'Fehler bei UnDo:'.$log->errormsg;
@@ -105,18 +105,18 @@ if(!$error)
 			$obj->updatevon = $user;
 			$obj->insertamum = date('Y-m-d H:i:s');
 			$obj->insertvon = $user;
-			
+
 			if($obj->save(true))
 			{
 				$return = true;
 			}
-			else 
+			else
 			{
 				$return = false;
 				$errormsg = $obj->errormsg;
 			}
 		}
-		else 
+		else
 		{
 			$return = false;
 			$errormsg = 'Fehlerhafte Parameteruebergabe';
@@ -126,7 +126,7 @@ if(!$error)
 	{
 		//Loescht eine Lektorfunktion
 		if(isset($_POST['uid']) && isset($_POST['studiengang_kz']))
-		{			
+		{
 			$obj = new benutzerfunktion($conn);
 			//Benutzerfunktion suchen
 			if($obj->getBentuzerFunktion($_POST['uid'], 'lkt', $_POST['studiengang_kz']))
@@ -136,25 +136,25 @@ if(!$error)
 				{
 					$return = true;
 				}
-				else 
+				else
 				{
 					$return = false;
 					$errormsg = $obj->errormsg;
 				}
 			}
-			else 
+			else
 			{
 				$return = false;
 				$errormsg = $obj->errormsg;
 			}
 		}
-		else 
+		else
 		{
 			$return = false;
 			$errormsg = 'Fehler bei Parameteruebergabe';
 		}
 	}
-	else 
+	else
 	{
 		$return = false;
 		$errormsg = 'Unkown type';
