@@ -50,7 +50,7 @@ else
 $MAX_VORSCHLAEGE_PRO_ZEILE=4;
 
 ?>
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="ISO-8859-15"?>
 <?xml-stylesheet type="text/xsl" href="mathml.xsl"?>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -59,6 +59,22 @@ $MAX_VORSCHLAEGE_PRO_ZEILE=4;
 	<link href="../../skin/cis.css" rel="stylesheet" type="text/css" />
 	<script language="Javascript" type="text/javascript">
 	//<![CDATA[
+	function killChildNodes(an_element) 
+	{
+		while (an_element.hasChildNodes()) 
+		{
+			if (!an_element.firstChild.hasChildNodes()) 
+			{
+				var k = an_element.firstChild;
+				an_element.removeChild(k);
+			}
+			else
+			{
+				killChildNodes(an_element.firstChild);
+			}
+		}
+	}
+
 	function count_down(zeit)
 	{
 		if(zeit<=0)
@@ -75,7 +91,15 @@ $MAX_VORSCHLAEGE_PRO_ZEILE=4;
 			sekunden = zeit-minuten*60;
 			if(sekunden<10)
 				sekunden = '0'+sekunden;
-			document.getElementById('counter').innerHTML = minuten+':'+sekunden;
+			//window.document.getElementById('counter').innerHTML = minuten+':'+sekunden;
+			var div = window.document.getElementById('counter');
+			killChildNodes(div);
+			var parser = new DOMParser();
+			var doc = parser.parseFromString('<div xmlns="http://www.w3.org/1999/xhtml">' + minuten+':'+sekunden + '<\/div>', 'application/xhtml+xml');
+			var root = doc.documentElement;
+			for (var i=0; i < root.childNodes.length; ++i)
+				div.appendChild(document.importNode(root.childNodes[i], true))
+			
 			window.setTimeout('count_down('+zeit+')',1000);
 		}
 	}
