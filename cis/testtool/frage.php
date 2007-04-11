@@ -19,6 +19,9 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+
+header("Content-type: application/xhtml+xml");
+
 // Formular zum beantworten der Fragen
 require_once('../config.inc.php');
 require_once('../../include/functions.inc.php');
@@ -36,65 +39,69 @@ if(!$conn = pg_pconnect(CONN_STRING))
 
 if(isset($_GET['gebiet_id']))
 	$gebiet_id = $_GET['gebiet_id'];
-else 
+else
 	die('Gebiet muss uebergeben werden');
 
 if(isset($_GET['frage_id']))
 	$frage_id = $_GET['frage_id'];
-else 
+else
 	$frage_id = '';
 
 $MAX_VORSCHLAEGE_PRO_ZEILE=4;
 
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../skin/cis.css" rel="stylesheet" type="text/css">
-<script language="Javascript">
-function count_down(zeit)
-{
-	if(zeit<=0)
-	{
-		document.location.href='gebietfertig.php';
-		//alert('finish');
-	}
-	else
-	{
-		zeit = zeit-1;
-		minuten = parseInt((zeit/60));
-		if(minuten<10)
-			minuten = '0'+minuten;
-		sekunden = zeit-minuten*60;
-		if(sekunden<10)
-			sekunden = '0'+sekunden;
-		document.getElementById('counter').innerHTML = minuten+':'+sekunden;
-		window.setTimeout('count_down('+zeit+')',1000);
-	}
-}
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="mathml.xsl"?>
 
-function checkantwort()
-{	
-	val = document.getElementById('antwort').value;
-	if(val.length>1)
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/xhtml; charset=iso-8859-1" />
+	<link href="../../skin/cis.css" rel="stylesheet" type="text/css" />
+	<script language="Javascript" type="text/javascript">
+	//<![CDATA[
+	function count_down(zeit)
 	{
-		alert('Antwort darf nur 1 Buchstabe sein');
-		return false;
+		if(zeit<=0)
+		{
+			document.location.href='gebietfertig.php';
+			//alert('finish');
+		}
+		else
+		{
+			zeit = zeit-1;
+			minuten = parseInt((zeit/60));
+			if(minuten<10)
+				minuten = '0'+minuten;
+			sekunden = zeit-minuten*60;
+			if(sekunden<10)
+				sekunden = '0'+sekunden;
+			document.getElementById('counter').innerHTML = minuten+':'+sekunden;
+			window.setTimeout('count_down('+zeit+')',1000);
+		}
 	}
-	if(val.length==0)
-		return true;
-	if(val.toUpperCase()<'A' || val.toUpperCase>'Z')
+
+	function checkantwort()
 	{
-		alert('Antwort darf nur ein Buchstabe von A-Z sein');
-		return false;
+		val = document.getElementById('antwort').value;
+		if(val.length>1)
+		{
+			alert('Antwort darf nur 1 Buchstabe sein');
+			return false;
+		}
+		if(val.length==0)
+			return true;
+		if(val.toUpperCase()<'A' || val.toUpperCase>'Z')
+		{
+			alert('Antwort darf nur ein Buchstabe von A-Z sein');
+			return false;
+		}
+		else
+		{
+			return true;
+		}
 	}
-	else
-	{
-		return true;
-	}
-}
-</script>
+	//]]>
+	</script>
 </head>
 
 <body>
@@ -111,12 +118,12 @@ if($result = pg_query($conn, $qry))
 	{
 		$gruppe = $row->gruppe_kurzbz;
 	}
-	else 
+	else
 		die('Pruefling wurde nicht gefunden');
 }
-else 	
+else
 	die('Pruefling wurde nicht gefunden');
-	
+
 //Start des Pruefungsvorganges
 if(isset($_GET['start']))
 {
@@ -141,22 +148,22 @@ if(isset($_POST['submitantwort']) && isset($_GET['frage_id']))
 	{
 		if(!$antwort->load($_POST['antwort_id']))
 			die('Antwort konnte nicht geladen werden');
-		else 
+		else
 		{
 			$antwort->new = false;
 			$antwort->antwort_id = $_POST['antwort_id'];
 		}
 	}
-	else 
+	else
 		$antwort->new = true;
-	
+
 	$antwort->frage_id = $_GET['frage_id'];
 	$antwort->pruefling_id = $_SESSION['pruefling_id'];
 	$antwort->antwort = trim(strtoupper($_POST['antwort']));
 	$antwort->endtime = date('Y-m-d H:i:s');
 	if(!$antwort->save())
 		die('Fehler beim Speichern');
-	else 
+	else
 	{
 		$frage = new frage($conn);
 		$frage_id = $frage->getNextFrage($gebiet_id, $gruppe, $frage_id);
@@ -175,16 +182,16 @@ if($result = pg_query($conn, $qry))
 			//Hat bereits Fragen beantwortet -> Frage anzeigen
 			$demo=false;
 		}
-		else 
-		{			
+		else
+		{
 			//Demo anzeigen
 			$demo=true;
 		}
 	}
-	else 
+	else
 		die('error');
 }
-else 	
+else
 	die('error');
 
 //Zeit des Gebietes holen
@@ -198,12 +205,12 @@ if(!$row = pg_fetch_object($result))
 list($stunde, $minute, $sekunde) = split(':',$row->zeit);
 
 if($demo)
-{	
+{
 	//Wenn es sich um ein Demobeispiel handelt, dann wird die Maximale Gesamtzeit angezeigt
 	echo $minute.':'.$sekunde.' Minuten ';
-	echo "<input type=\"button\" value=\"Start\" onclick=\"document.location.href='$PHP_SELF?gebiet_id=$gebiet_id&start=true'\">";
+	echo "<input type=\"button\" value=\"Start\" onclick=\"document.location.href='$PHP_SELF?gebiet_id=$gebiet_id&amp;start=true'\" />";
 }
-else 
+else
 {
 	//Wenn es sich um eine Testfrage handelt, dann wird die verbleibende Zeit angezeigt
 	$qry = "SELECT '$row->zeit'-(now()-min(begintime)) as time FROM testtool.tbl_antwort JOIN testtool.tbl_frage USING(frage_id) WHERE gebiet_id='".addslashes($gebiet_id)."' AND pruefling_id='".addslashes($_SESSION['pruefling_id'])."'";
@@ -219,7 +226,7 @@ else
 		$zeit = $zeit*-1;
 	}
 
-	echo '<span id="counter"></span>&nbsp;Minuten';
+	echo '<span id="counter"></span> Minuten';
 	echo "<script>count_down($zeit)</script>";
 }
 echo '</td></tr>';
@@ -232,7 +239,7 @@ if($frage_id!='') //Frage wurde uebergeben
 {
 	$frage->load($frage_id);
 }
-else 
+else
 {
 	if($demo) //Demofrage wird angezeigt
 	{
@@ -254,7 +261,7 @@ else
 if($frage->frage_id!='')
 {
 	$frage_id = $frage->frage_id;
-	
+
 	if(!$demo)
 	{
 		//Nachschauen ob diese Frage bereits angesehen wurde
@@ -271,12 +278,12 @@ if($frage->frage_id!='')
 				echo 'Fehler beim Speichern der Erstansicht';
 		}
 	}
-	echo '<br><br><center>';
+	echo '<br/><br/><center>';
 	//Bild und Text der Frage anzeigen
 	if($frage->bild!='')
-		echo "<img src='bild.php?src=frage&frage_id=$frage->frage_id'><br><br>\n";
-	echo "$frage->text<br><br>\n";
-	
+		echo "<img src='bild.php?src=frage&amp;frage_id=$frage->frage_id' /><br/><br/>\n";
+	echo "$frage->text<br/><br/>\n";
+
 	//Vorschlaege laden
 	$vs = new vorschlag($conn);
 	$vs->getVorschlag($frage->frage_id);
@@ -286,20 +293,20 @@ if($frage->frage_id!='')
 	//Vorschlaege anzeigen
 	foreach ($vs->result as $vorschlag)
 	{
-		echo "\n<td align=center>";
-		echo "$vorschlag->antwort<br>";
+		echo "\n<td align='center'>";
+		echo "$vorschlag->antwort<br/>";
 		if($vorschlag->bild!='')
-			echo "<img src='bild.php?src=vorschlag&vorschlag_id=$vorschlag->vorschlag_id'><br>";
+			echo "<img src='bild.php?src=vorschlag&amp;vorschlag_id=$vorschlag->vorschlag_id' /><br/>";
 		if($vorschlag->text!='')
-			echo $vorschlag->text.'<br>';	
+			echo $vorschlag->text.'<br/>';
 		echo "</td>";
 		$anzahl++;
-		
+
 		if($anzahl>$MAX_VORSCHLAEGE_PRO_ZEILE)
 		{
 			echo '</tr><tr>';
 			$anzahl=1;
-		}	
+		}
 	}
 	echo '</tr></table>';
 	//Antwort laden falls bereits vorhanden
@@ -307,12 +314,12 @@ if($frage->frage_id!='')
 	$antwort->getAntwort($_SESSION['pruefling_id'],$frage->frage_id);
 	if(!$demo)
 	{
-	echo "<form action=\"$PHP_SELF?gebiet_id=$gebiet_id&frage_id=$frage->frage_id\" method=\"POST\">";
-	echo "<input type=\"hidden\" name=\"antwort_id\" value=\"$antwort->antwort_id\">";
-	echo "Antwort: <input type=\"text\" size=\"1\" id=\"antwort\" name=\"antwort\" value=\"".htmlentities(addslashes($antwort->antwort))."\">&nbsp;&nbsp;&nbsp;<input type=\"submit\" name=\"submitantwort\" onclick=\"return checkantwort()\" value=\"Speichern\">";
+	echo "<form action=\"$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$frage->frage_id\" method=\"POST\">";
+	echo "<input type=\"hidden\" name=\"antwort_id\" value=\"$antwort->antwort_id\" />";
+	echo "Antwort: <input type=\"text\" size=\"1\" id=\"antwort\" name=\"antwort\" value=\"".htmlentities(addslashes($antwort->antwort))."\" />   <input type=\"submit\" name=\"submitantwort\" onclick=\"return checkantwort()\" value=\"Speichern\" />";
 	echo "</form>";
 	}
-	echo '<br><br><br>';
+	echo '<br/><br/><br/>';
 	//Fusszeile mit Weiter Button und Sprung direkt zu einer Frage
 	if(!$demo)
 	{
@@ -325,29 +332,29 @@ if($frage->frage_id!='')
 			if($row->frage_id==$frage_id)
 				echo " <u>$row->nummer</u> -";
 			else
-				echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&frage_id=$row->frage_id' class='Item'>$row->nummer</a> -";
+				echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$row->frage_id' class='Item'>$row->nummer</a> -";
 		}
 	}
-	
+
 	//Naechste Frage holen und Weiter-Button anzeigen
 	$frage = new frage($conn);
 	$nextfrage = $frage->getNextFrage($gebiet_id, $gruppe, $frage_id, $demo);
 	if($nextfrage)
 	{
-		echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&frage_id=$nextfrage' class='Item'>Weiter &gt;&gt;</a>";
+		echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$nextfrage' class='Item'>Weiter &gt;&gt;</a>";
 	}
-	else 
+	else
 	{
 		//Wenns der letzte Eintrag ist, wieder zum ersten springen
 		echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item'>Weiter &gt;&gt;</a>";
 	}
-	
+
 	echo '</center>';
 }
 else
 {
 	//Wenn kein Demo vorhanden ist
-	echo "<br><br><br><center><b>Start drücken um zu beginnen</b></center>";
+	echo "<br/><br/><br/><center><b>Start drücken um zu beginnen</b></center>";
 }
 ?>
 

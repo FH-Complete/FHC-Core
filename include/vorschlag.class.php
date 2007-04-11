@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -29,39 +29,39 @@ class vorschlag
 	var $antwort;
 	var $text;
 	var $bild;
-		
+
 	// ErgebnisArray
 	var $result=array();
 	var $num_rows=0;
 	var $errormsg;
 	var $new;
-		
+
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional einen vorschlag
 	// * @param $conn        	Datenbank-Connection
 	// *        $frage_id       Frage die geladen werden soll (default=null)
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
+	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
 	function vorschlag($conn, $vorschlag_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
+		else
 			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
+
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-		
+
 		if($vorschlag_id != null)
 			$this->load($vorschlag_id);
 	}
-	
+
 	// ***********************************************************
 	// * Laedt Vorschlag mit der uebergebenen ID
 	// * @param $vorschlag_id ID des Vorschlages der geladen werden soll
@@ -69,7 +69,7 @@ class vorschlag
 	function load($vorschlag_id)
 	{
 		$qry = "SELECT * FROM testtool.tbl_vorschlag WHERE vorschlag_id='".addslashes($vorschlag_id)."'";
-		
+
 		if($result = pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
@@ -82,22 +82,22 @@ class vorschlag
 				$this->bild = $row->bild;
 				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = "Kein Eintrag gefunden fuer $vorschlag_id";
 				return false;
-			}				
+			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = "Fehler beim laden: $qry";
 			return false;
-		}		
+		}
 	}
-	
+
 	// ************************************************
 	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische 
+	// * wenn $var !='' ist werden Datenbankkritische
 	// * Zeichen mit Backslash versehen und das Ergbnis
 	// * unter Hochkomma gesetzt.
 	// ************************************************
@@ -105,9 +105,9 @@ class vorschlag
 	{
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
-	
+
 	// *******************************************
-	// * Prueft die Variablen vor dem Speichern 
+	// * Prueft die Variablen vor dem Speichern
 	// * auf Gueltigkeit.
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
@@ -115,7 +115,7 @@ class vorschlag
 	{
 		return true;
 	}
-	
+
 	// ******************************************************************
 	// * Speichert die Benutzerdaten in die Datenbank
 	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -127,14 +127,14 @@ class vorschlag
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
 			return false;
-		
+
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
 			$qry = 'INSERT INTO testtool.tbl_vorschlag (frage_id, nummer, antwort, text, bild) VALUES('.
 			       "'".addslashes($this->frage_id)."',".
 			       $this->addslashes($this->nummer).",".
-				   $this->addslashes($this->antwort).",".
-			       $this->addslashes($this->text).",".
+				   $this->addslashes($this->antwort).",'".
+			       $this->text."',".
 			       $this->addslashes($this->bild).");";
 		}
 		else
@@ -143,19 +143,19 @@ class vorschlag
 			       ' frage_id='.$this->addslashes($this->frage_id).','.
 			       ' nummer='.$this->addslashes($this->nummer).','.
 			       ' antwort='.$this->addslashes($this->antwort).','.
-			       ' text='.$this->addslashes($this->text);
+			       " text='".$this->text."'";
 			if($this->bild!='')
 				$qry.=' , bild='.$this->addslashes($this->bild);
 			$qry.=" WHERE vorschlag_id='".addslashes($this->vorschlag_id)."';";
 		}
-		
+
 		if(pg_query($this->conn,$qry))
 		{
 			//Log schreiben
 			return true;
 		}
-		else 
-		{	
+		else
+		{
 			$this->errormsg = 'Fehler beim Speichern der Frage:'.$qry;
 			return false;
 		}
@@ -164,25 +164,25 @@ class vorschlag
 	function getVorschlag($frage_id)
 	{
 		$qry = "SELECT * FROM testtool.tbl_vorschlag WHERE frage_id='".addslashes($frage_id)."' ORDER BY nummer";
-		
+
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
-			{		
-				$vs = new vorschlag($this->conn);		
+			{
+				$vs = new vorschlag($this->conn);
 				$vs->vorschlag_id = $row->vorschlag_id;
 				$vs->frage_id = $row->frage_id;
 				$vs->nummer = $row->nummer;
 				$vs->antwort = $row->antwort;
 				$vs->text = $row->text;
 				$vs->bild = $row->bild;
-				
+
 				$this->result[] = $vs;
-				
+
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim laden der Daten';
 			return false;
@@ -193,7 +193,7 @@ class vorschlag
 		$qry = "DELETE FROM testtool.tbl_vorschlag WHERE vorschlag_id='".addslashes($vorschlag_id)."'";
 		if(pg_query($this->conn, $qry))
 			return true;
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim loeschen';
 			return false;

@@ -7,7 +7,7 @@
  header("content-type text/xml");
  if(!$conn=pg_connect(CONN_STRING_FAS))
  	die("Connection Problem");
- $error='<table><tr><th>Vorname</th><th>Nachname</th><th>PersNr</th><th>Fehlermeldung</th></tr>';	
+ $error='<table><tr><th>Vorname</th><th>Nachname</th><th>PersNr</th><th>Fehlermeldung</th></tr>';
  $funktionen='';
  $stgleitung='';
  $myausmass='<table><tr><th>Vorname</th><th>Nachname</th><th>Ausmass</th></tr>';
@@ -17,7 +17,7 @@
  $stsemwhere = "(funktion.studiensemester_fk=$stsem1 OR funktion.studiensemester_fk=$stsem2)";
  if(isset($_GET['printerror']) && $_GET['printerror']=='false')
  	$printerror=false;
- else 
+ else
  	$printerror=true;
  echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
  ?>
@@ -58,10 +58,10 @@
 		if(!in_array($row->habilitation,array('J','j','N','n')))
 			$error.= '<tr><td>'.$row->vorname.'</td><td>'.$row->familienname.'</td><td>'.$row->persnr.'</td><td>Habilitation ist ungueltig</td></tr>';
 		echo "      <Habilitation>".$row->habilitation."</Habilitation>\n";
-		
+
 		//VERWENDUNG
 		echo "      <Verwendung>\n";
-		
+
 		//Beschaeftigungsart1
 		$qry1 = "Select beschart1 from funktion where mitarbeiter_fk='$row->mitarbeiter_pk' and beschart1 in(1,2,3,4,5,6) AND $stsemwhere";
 		if(!$result1 = pg_query($conn,$qry1))
@@ -71,9 +71,9 @@
 				$error.= '<tr><td>'.$row->vorname.'</td><td>'.$row->familienname.'</td><td>'.$row->persnr.'</td><td>BeschaeftigungsArt1 ist ungueltig</td></tr>';
 			else
 				$beschart1 = $row1->beschart1;
-									
+
 		echo "         <BeschaeftigungsArt1>".$beschart1."</BeschaeftigungsArt1>\n";
-		
+
 		//Beschaeftingungsart2
 		$qry1 = "Select beschart2 from funktion where mitarbeiter_fk='$row->mitarbeiter_pk' and beschart2 in(1,2) AND $stsemwhere";
 		if(!$result1 = pg_query($conn,$qry1))
@@ -83,9 +83,9 @@
 				$error.= '<tr><td>'.$row->vorname.'</td><td>'.$row->familienname.'</td><td>'.$row->persnr.'</td><td>BeschaeftigungsArt2 ist ungueltig</td></tr>';
 			else
 				$beschart2 = $row1->beschart2;
-			
+
 		echo "         <BeschaeftigungsArt2>".$beschart2."</BeschaeftigungsArt2>\n";
-		
+
 		//Beschaeftigungsausmass
 		$qry1 = "Select ausmass from funktion where mitarbeiter_fk='$row->mitarbeiter_pk' and ausmass in(1,2,3,4,5) AND $stsemwhere";
 		if(!$result1 = pg_query($conn,$qry1))
@@ -95,7 +95,7 @@
 				$error.= '<tr><td>'.$row->vorname.'</td><td>'.$row->familienname.'</td><td>'.$row->persnr.'</td><td>Ausmass ist ungueltig</td></tr>';
 			else
 				$ausmass = $row1->ausmass;
-		
+
 		echo "         <BeschaeftigungsAusmass>".$ausmass."</BeschaeftigungsAusmass>\n";
 		$myausmass .= "<tr><td>$row->vorname</td><td>$row->familienname</td><td>$ausmass</td></tr>";
 		//Verwendung
@@ -107,9 +107,9 @@
 				$error.= '<tr><td>'.$row->vorname.'</td><td>'.$row->familienname.'</td><td>'.$row->persnr.'</td><td>Verwendung ist ungueltig</td></tr>';
 			else
 				$verwendung = $row1->verwendung;
-										
+
 		echo "         <VerwendungsCode>".$verwendung."</VerwendungsCode>\n";
-			
+
 		//Hauptberuflich / Hauptberuf
 		$qry1 = "Select hauptberuflich, hauptberuf from funktion where mitarbeiter_fk = '$row->mitarbeiter_pk' and hauptberuflich!='' AND $stsemwhere";
 		if(!$result1=pg_query($conn,$qry1))
@@ -135,8 +135,8 @@
 					$hauptberuf = $row1->hauptberuf;
 
 		}
-		
-						
+
+
 		//Studiengangsleiter Funktionen zusammenbauen
 		$qry1 = "Select distinct kennzahl FROM studiengang where studiengang_pk in(Select studiengang_fk from funktion where funktion.funktion=5 AND $stsemwhere AND mitarbeiter_fk='$row->mitarbeiter_pk')";
 		if(!$result1 = pg_query($conn,$qry1))
@@ -152,12 +152,12 @@
 
 		//FUNKTIONEN
 		$qry1 = "SELECT studiengang_pk, kennzahl, entwicklungsteam, besonderequalifikation FROM funktion, studiengang WHERE mitarbeiter_fk='$row->mitarbeiter_pk' AND $stsemwhere AND studiengang_fk=studiengang_pk";
-		
+
 		if($result1 = pg_query($conn,$qry1))
 		{
 			$stg = array();
 			while($row1 = pg_fetch_object($result1))
-			{				
+			{
 				//Wenn noch kein Funktionseintrag fuer diesen Studiengang vorhanden ist
 				if(!in_array($row1->studiengang_pk,$stg))
 				{
@@ -167,12 +167,12 @@
 					$x = sprintf("%04d",$row1->kennzahl);
 					$funktion.= "         <Funktion>\n";
 					$funktion.= "            <StgKz>".$x."</StgKz>\n";
-					
+
 					//$qry2 = "Select sum(sws) as sws from lehreinheit, mitarbeiterlehreinheit where lehreinheit_pk = lehreinheit_fk and (lehreinheit.studiensemester_fk=$stsem1 or lehreinheit.studiensemester_fk=$stsem2) and mitarbeiter_fk='$row->mitarbeiter_pk'";
 					$qry2 = "Select sum(semesterwochenstunden) as sws from lehreinheit, mitarbeiter_lehreinheit where studiengang_fk='$row1->studiengang_pk' AND lehreinheit_pk = mitarbeiter_lehreinheit.lehreinheit_fk and (lehreinheit.studiensemester_fk=$stsem1 or lehreinheit.studiensemester_fk=$stsem2) and mitarbeiter_fk='$row->mitarbeiter_pk'";
 					if(!$row2 = pg_fetch_object(pg_query($conn,$qry2)))
 						$error.="<br>qry failed: $qry2";
-					
+
 					//Semesterwochenstunden
 					if($row2->sws > 80 || $row2->sws < 0)
 						$error.= '<tr><td>'.$row->vorname.'</td><td>'.$row->familienname.'</td><td>'.$row->persnr.'</td><td>SWS ist ungueltig:'.$row2->sws.'</td></tr>';
@@ -185,7 +185,7 @@
 					$funktion.= "            <Hauptberuflich>".$hauptberuflich."</Hauptberuflich>\n";
 					//Hauptberuf
 					if($hauptberuflich=='n' || $hauptberuflich=='N')
-					{						
+					{
 						if(!in_array($hauptberuf, array(0,1,2,3,4,5,6,7,8,9,10,11,12)))
 							$error.= '<tr><td>'.$row->vorname.'</td><td>'.$row->familienname.'</td><td>'.$row->persnr.' HauptberufCode ist ungueltig</td></tr>';
 						$funktion.= "            <HauptberufCode>".$hauptberuf."</HauptberufCode>\n";
@@ -193,9 +193,9 @@
 					//Mitglied im Entwicklungsteam
 					if(!in_array($row1->entwicklungsteam, array('J','j','n','N')))
 						$funktion.= "            <Entwicklungsteam>N</Entwicklungsteam>\n";
-					else 
+					else
 						$funktion.= "            <Entwicklungsteam>".$row1->entwicklungsteam."</Entwicklungsteam>\n";
-						
+
 					//Besondere Qualifikation
 					if($row1->entwicklungsteam=='J' || $row1->entwicklungsteam=='j')
 					{
@@ -209,9 +209,9 @@
 				}
 			}
 		}
-		else 
+		else
 			$error.="<tr><td>qry failed: $qry1</td></tr>";
-			
+
 		if($aktpers!=0) //Ende einer Person erreicht
 			{
 				echo $stgleitung;
@@ -220,7 +220,7 @@
 				echo "   </Person>\n";
 			}
 	}
-	
+
 	if($printerror)
 	{
 		echo $error.'</table>';

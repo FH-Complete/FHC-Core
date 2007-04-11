@@ -205,14 +205,14 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/fas.css" type="text/css"?>';
 				<spacer flex="1"/>
 			</vbox>
 			<spacer flex="2" />
-			
+
 		</hbox>
 
 
-			
+
 			<groupbox hidden="false" flex="1">
 			<caption label="Funktionen" />
-			<hbox flex="1" class="hbox-tree">				
+			<hbox flex="1" class="hbox-tree">
 				<tree id="tree-liste-funktionen" seltype="multi" hidecolumnpicker="false" flex="1"
 						datasources="rdf:null"
 						ref="http://www.technikum-wien.at/funktionen/alle"
@@ -237,11 +237,11 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/fas.css" type="text/css"?>';
 					    <treecol id="tree-liste-funktionen-col-studiensemester_id" label="StudiensemesterID" flex="1" hidden="true" persist="hidden"
 					    	class="sortDirectionIndicator"
 					    	sort="rdf:http://www.technikum-wien.at/funktionen/rdf#studiensemester_id" />
-					    <splitter class="tree-splitter"/>					    
+					    <splitter class="tree-splitter"/>
 					    <treecol id="tree-liste-funktionen-col-erhalter_id" label="Erhalter" flex="1" hidden="true" persist="hidden"
 					    	class="sortDirectionIndicator"
 					    	sort="rdf:http://www.technikum-wien.at/funktionen/rdf#erhalter_bezeichnung" />
-						<splitter class="tree-splitter"/>					    	
+						<splitter class="tree-splitter"/>
 					    <treecol id="tree-liste-funktionen-col-studiengang_bezeichnung" label="Studiengang" flex="1" hidden="true" persist="hidden"
 					    	class="sortDirectionIndicator"
 					    	sort="rdf:http://www.technikum-wien.at/funktionen/rdf#studiengang_bezeichnung" />
@@ -289,7 +289,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/fas.css" type="text/css"?>';
 					    <treecol id="tree-liste-funktionen-col-ausmass" label="Ausmass" flex="1" hidden="false" persist="hidden"
 					    	class="sortDirectionIndicator"
 					    	sort="rdf:http://www.technikum-wien.at/funktionen/rdf#ausmass_bezeichnung" />
-					    
+
 					</treecols>
 
 					<template>
@@ -299,8 +299,8 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/fas.css" type="text/css"?>';
 									<treerow>
 										<treecell label="rdf:http://www.technikum-wien.at/funktionen/rdf#funktion_id"   />
 										<treecell label="rdf:http://www.technikum-wien.at/funktionen/rdf#mitarbeiter_id"   />
-										<treecell label="rdf:http://www.technikum-wien.at/funktionen/rdf#studiensemester_bezeichnung"   />										
-										<treecell label="rdf:http://www.technikum-wien.at/funktionen/rdf#studiensemester_id"   />										
+										<treecell label="rdf:http://www.technikum-wien.at/funktionen/rdf#studiensemester_bezeichnung"   />
+										<treecell label="rdf:http://www.technikum-wien.at/funktionen/rdf#studiensemester_id"   />
 										<treecell label="rdf:http://www.technikum-wien.at/funktionen/rdf#erhalter_bezeichnung"   />
 										<treecell label="rdf:http://www.technikum-wien.at/funktionen/rdf#studiengang_bezeichnung"   />
 										<treecell label="rdf:http://www.technikum-wien.at/funktionen/rdf#fachbereich_bezeichnung"   />
@@ -313,7 +313,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/fas.css" type="text/css"?>';
 										<treecell label="rdf:http://www.technikum-wien.at/funktionen/rdf#hauptberuf_bezeichnung"   />
 										<treecell label="rdf:http://www.technikum-wien.at/funktionen/rdf#entwicklungsteam"   />
 										<treecell label="rdf:http://www.technikum-wien.at/funktionen/rdf#besonderequalifikation_bezeichnung"   />
-										<treecell label="rdf:http://www.technikum-wien.at/funktionen/rdf#ausmass_bezeichnung"   />										
+										<treecell label="rdf:http://www.technikum-wien.at/funktionen/rdf#ausmass_bezeichnung"   />
 					 				</treerow>
 					 			</treeitem>
 					 		</treechildren>
