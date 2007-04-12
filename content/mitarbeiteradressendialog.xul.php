@@ -26,7 +26,7 @@ else
 <window id="mitarbeiter-adressen-dialog" title="Adressen"		
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         >
-<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/fasoverlay.js.php" />        
+<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/fasold/fasoldoverlay.js.php" />        
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/mitarbeiteradressendialog.js.php?adress_id=<?php echo $adress_id;?>" />
 
 

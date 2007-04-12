@@ -26,7 +26,7 @@ else
 <window id="mitarbeiter-bankverbindung-dialog" title="Email"		
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         >
-<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/fasoverlay.js.php" />        
+<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/fasold/fasoldoverlay.js.php" />        
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/mitarbeiterbankverbindungdialog.js.php?bankverbindung_id=<?php echo $bankverbindung_id;?>" />
 
 
