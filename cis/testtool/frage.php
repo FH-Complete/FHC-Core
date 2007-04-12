@@ -29,6 +29,8 @@ require_once('../../include/frage.class.php');
 require_once('../../include/vorschlag.class.php');
 require_once('../../include/antwort.class.php');
 
+$PHP_SELF=$_SERVER["PHP_SELF"];
+
 session_start();
 //testumgebung
 //$_SESSION['pruefling_id']=1;
@@ -48,10 +50,9 @@ else
 	$frage_id = '';
 
 $MAX_VORSCHLAEGE_PRO_ZEILE=4;
-
 ?>
-<?xml version="1.0" encoding="ISO-8859-15"?>
-<?xml-stylesheet type="text/xsl" href="mathml.xsl"?>
+<?xml version="1.0" encoding="ISO-8859-15" ?>
+<?xml-stylesheet type="text/xsl" href="mathml.xsl" ?>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -106,7 +107,8 @@ $MAX_VORSCHLAEGE_PRO_ZEILE=4;
 
 	function checkantwort()
 	{
-		val = document.getElementById('antwort').value;
+		antwort = document.getElementById('antwort');
+		val=antwort.getAttribut('value');
 		if(val.length>1)
 		{
 			alert('Antwort darf nur 1 Buchstabe sein');

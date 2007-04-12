@@ -26,24 +26,24 @@ if(!($result=pg_query($conn, $sql_query)))
     
 while ($row=pg_fetch_object($result))
 {
-	$ergebnis[$row->person_id]->person_id=$row->person_id;
-	$ergebnis[$row->person_id]->nachname=$row->nachname;
-	$ergebnis[$row->person_id]->vorname=$row->vornamen;
-	$ergebnis[$row->person_id]->gebdatum=$row->gebdatum;
-	$ergebnis[$row->person_id]->geschlecht=$row->geschlecht;
-	$ergebnis[$row->person_id]->idnachweis=$row->idnachweis;
-	$ergebnis[$row->person_id]->registriert=$row->registriert;
-	$ergebnis[$row->person_id]->stg_kurzbz=$row->stg_kurzbz;	
-	$ergebnis[$row->person_id]->stg_bez=$row->stg_bez;
-	$ergebnis[$row->person_id]->gruppe=$row->gruppe;
-	$ergebnis[$row->person_id]->gebiet[$row->gebiet_id]->name=$row->gebiet;
-	$ergebnis[$row->person_id]->gebiet[$row->gebiet_id]->anz_fragen=$row->anz_fragen;
-	$ergebnis[$row->person_id]->gebiet[$row->gebiet_id]->abzug=$row->abzug;
-	$ergebnis[$row->person_id]->gebiet[$row->gebiet_id]->anz_richtig=$row->anz_richtig;
-	$ergebnis[$row->person_id]->gebiet[$row->gebiet_id]->anz_antworten=$row->anz_antworten;
-	$ergebnis[$row->person_id]->gebiet[$row->gebiet_id]->anz_falsch=$row->anz_falsch;
-	$ergebnis[$row->person_id]->gebiet[$row->gebiet_id]->punkte=$row->punkte;
-	$ergebnis[$row->person_id]->gebiet[$row->gebiet_id]->prozent=$row->prozent;
+	$ergebnis[$row->pruefling_id]->pruefling_id=$row->pruefling_id;
+	$ergebnis[$row->pruefling_id]->nachname=$row->nachname;
+	$ergebnis[$row->pruefling_id]->vorname=$row->vorname;
+	$ergebnis[$row->pruefling_id]->gebdatum=$row->gebdatum;
+	$ergebnis[$row->pruefling_id]->geschlecht=$row->geschlecht;
+	$ergebnis[$row->pruefling_id]->idnachweis=$row->idnachweis;
+	$ergebnis[$row->pruefling_id]->registriert=$row->registriert;
+	$ergebnis[$row->pruefling_id]->stg_kurzbz=$row->stg_kurzbz;	
+	$ergebnis[$row->pruefling_id]->stg_bez=$row->stg_bez;
+	$ergebnis[$row->pruefling_id]->gruppe=$row->gruppe_kurzbz;
+	$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->name=$row->gebiet;
+	$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->anz_fragen=$row->anz_fragen;
+	$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->abzug=$row->abzug;
+	$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->anz_richtig=$row->anz_richtig;
+	$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->anz_antworten=$row->anz_antworten;
+	$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->anz_falsch=$row->anz_falsch;
+	$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->punkte=$row->punkte;
+	$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->prozent=$row->prozent;
 }
 
 ?>
@@ -81,7 +81,7 @@ while ($row=pg_fetch_object($result))
   <?php
   	foreach ($ergebnis AS $erg)
   	{
-  		echo "<tr><td>$erg->person_id</td><td>$erg->nachname</td><td>$erg->vorname</td><td>$erg->gebdatum</td><td>$erg->geschlecht</td>
+  		echo "<tr><td>$erg->pruefling_id</td><td>$erg->nachname</td><td>$erg->vorname</td><td>$erg->gebdatum</td><td>$erg->geschlecht</td>
   					<td>$erg->idnachweis</td><td>$erg->registriert</td><td>$erg->stg_kurzbz</td><td>$erg->stg_bez</td><td>$erg->gruppe</td>";
   		foreach ($gebiet AS $gbt)
 			echo '<td>'.$erg->gebiet[$gbt->gebiet_id]->punkte.'</td><td>'.$erg->gebiet[$gbt->gebiet_id]->prozent.' %</td>';

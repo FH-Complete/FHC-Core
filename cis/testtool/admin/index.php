@@ -29,6 +29,8 @@ require_once('../../../include/frage.class.php');
 require_once('../../../include/vorschlag.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 
+$PHP_SELF=$_SERVER["PHP_SELF"];
+
 //wandelt einen String in HEX-Werte um
 function strhex($string)
 {
