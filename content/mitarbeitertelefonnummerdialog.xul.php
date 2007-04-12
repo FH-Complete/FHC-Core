@@ -26,7 +26,7 @@ else
 <window id="mitarbeiter-email-dialog" title="Email"		
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         onload="Check()" >
-<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/fasoverlay.js.php" />        
+<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/fasold/fasoldoverlay.js.php" />        
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/mitarbeitertelefonnummerdialog.js.php?telefonnummer_id=<?php echo $telefonnummer_id;?>" />
 
 

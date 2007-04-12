@@ -29,7 +29,7 @@ else
 <window id="mitarbeiter-funktion-dialog" title="Email"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         onload="Check()">
-<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/fasoverlay.js.php" />
+<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/fasold/fasoldoverlay.js.php" />
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/mitarbeiterfunktiondialog.js.php?funktion_id=<?php echo $funktion_id;?>" />
 
 
