@@ -86,7 +86,7 @@ function drawStudent($student)
     		<STUDENT:geburtsdatum_iso><![CDATA[<?php echo $student->gebdatum;  ?>]]></STUDENT:geburtsdatum_iso>
     		<STUDENT:alias><![CDATA[<?php echo $student->alias  ?>]]></STUDENT:alias>
     		<STUDENT:homepage><![CDATA[<?php echo $student->homepage  ?>]]></STUDENT:homepage>
-    		<STUDENT:aktiv><![CDATA[<?php echo ($student->aktiv?'True':'False')  ?>]]></STUDENT:aktiv>
+    		<STUDENT:aktiv><![CDATA[<?php echo ($student->aktiv?'true':'false')  ?>]]></STUDENT:aktiv>
     		<STUDENT:gebort><![CDATA[<?php echo $student->gebort;  ?>]]></STUDENT:gebort>
     		<STUDENT:gebzeit><![CDATA[<?php echo $student->gebzeit;  ?>]]></STUDENT:gebzeit>
     		<STUDENT:foto><![CDATA[<?php echo $student->foto;  ?>]]></STUDENT:foto>

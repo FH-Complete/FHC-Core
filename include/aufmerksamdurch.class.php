@@ -30,6 +30,7 @@ class aufmerksamdurch
 	var $new;       // @var boolean
 	var $errormsg;  // @var string
 	var $done=false;	// @var boolean
+	var $result = array();
 	
 	//Tabellenspalten
 	Var $aufmerksamdurch_kurzbz;		// @var string
@@ -37,37 +38,68 @@ class aufmerksamdurch
 	var $ext_id;					// @var integer
 	
 	
-	/**
-	 * Konstruktor
-	 * @param $conn      Connection
-	 *        $aufmerksamdurch_kurzbz = ID (Default=null)
-	 */
+	// ****
+	// * Konstruktor
+	// * @param $conn      Connection
+	// *        $aufmerksamdurch_kurzbz = ID (Default=null)
+	// *		$unicode
+	// ****
 	function aufmerksamdurch($conn,$aufmerksamdurch_kurzbz=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		if ($unicode)
+		if($unicode!=null)
 		{
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		}
-		else 
-		{
-			$qry="SET CLIENT_ENCODING TO 'LATIN9';";
-		}
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-			return false;
-		}
+			if ($unicode)
+			{
+				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			}
+			else 
+			{
+				$qry="SET CLIENT_ENCODING TO 'LATIN9';";
+			}
+			if(!pg_query($conn,$qry))
+			{
+				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
+				return false;
+			}
+		}		
 	}
 	
-	/**
-	 * @param  $aufmerksam_kurzbz ID 
-	 * @return true wenn ok, false im Fehlerfall
-	 */
+	// *******************************************
+	// * @param  $aufmerksam_kurzbz ID 
+	// * @return true wenn ok, false im Fehlerfall
+	// *******************************************
 	function load($aufmerksam_kurzbz)
 	{
 		//noch nicht implementiert
 	}
+	
+	// *******************************************
+	// * Laedt alle Datansaetze
+	// * @return true wenn ok, false im Fehlerfall
+	// *******************************************
+	function getAll()
+	{
+		$qry = "SELECT * FROM public.tbl_aufmerksamdurch ORDER BY aufmerksamdurch_kurzbz";
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$obj = new aufmerksamdurch($this->conn, null, null);
+				
+				$obj->aufmerksamdurch_kurzbz = $row->aufmerksamdurch_kurzbz;
+				$obj->beschreibung = $row->beschreibung;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden';
+			return false;			
+		}
+	}	
 	
 	// ************************************************
 	// * wenn $var '' ist wird "null" zurueckgegeben
@@ -79,12 +111,13 @@ class aufmerksamdurch
 	{
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
-	/**
-	 * Speichert den aktuellen Datensatz in die Datenbank	 
-	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
-	 * andernfalls wird der Datensatz mit der ID in $schluessel_id aktualisiert
-	 * @return true wenn ok, false im Fehlerfall
-	 */
+	
+	// **************************************************************************
+	// * Speichert den aktuellen Datensatz in die Datenbank	 
+	// * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	// * andernfalls wird der Datensatz mit der ID in $schluessel_id aktualisiert
+	// * @return true wenn ok, false im Fehlerfall
+	// **************************************************************************
 	function save()
 	{
 		$this->done=false;
@@ -154,16 +187,6 @@ class aufmerksamdurch
 		{
 			return true;
 		}
-	}
-	
-	/**
-	 * Loescht den Datenensatz mit der ID die uebergeben wird
-	 * @param $aufmerksamdurch_kurzbz ID die geloescht werden soll
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	function delete($aufmerksamdurch_kurzbz)
-	{
-		//noch nicht implementiert!	
 	}
 }
 ?>
