@@ -224,7 +224,7 @@ function StudentDetailReset()
 // ****
 function StudentDetailDisableFields(val)
 {
-	document.getElementById('student-detail-textbox-uid').disabled=val;
+	//document.getElementById('student-detail-textbox-uid').disabled=val;
 	document.getElementById('student-detail-textbox-anrede').disabled=val;
 	document.getElementById('student-detail-textbox-titelpre').disabled=val;
 	document.getElementById('student-detail-textbox-titelpost').disabled=val;
@@ -246,6 +246,11 @@ function StudentDetailDisableFields(val)
 	document.getElementById('student-detail-menulist-geburtsnation').disabled=val;
 	document.getElementById('student-detail-menulist-sprache').disabled=val;
 	document.getElementById('student-detail-textbox-matrikelnummer').disabled=val;
+	document.getElementById('student-detail-button-image-upload').disabled=val;
+	document.getElementById('student-detail-textbox-studiengang_kz').disabled=val;
+	document.getElementById('student-detail-textbox-semester').disabled=val;
+	document.getElementById('student-detail-textbox-verband').disabled=val;
+	document.getElementById('student-detail-textbox-gruppe').disabled=val;
 }
 
 // ****
@@ -276,8 +281,13 @@ function StudentDetailSave()
 	geburtsnation = document.getElementById('student-detail-menulist-geburtsnation').value;
 	sprache = document.getElementById('student-detail-menulist-sprache').value;
 	matrikelnummer = document.getElementById('student-detail-textbox-matrikelnummer').value;
+	studiengang_kz = document.getElementById('student-detail-textbox-studiengang_kz').value;
+	semester = document.getElementById('student-detail-textbox-semester').value;
+	verband = document.getElementById('student-detail-textbox-verband').value;
+	gruppe = document.getElementById('student-detail-textbox-gruppe').value;
 		
-	var req = new phpRequest('student/studentDBDML.php','','');
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
 	neu = document.getElementById('student-detail-checkbox-new').checked;
 
 	if (neu)
@@ -313,11 +323,15 @@ function StudentDetailSave()
 	req.add('geburtsnation', geburtsnation);
 	req.add('sprache', sprache);
 	req.add('matrikelnummer', matrikelnummer);
+	req.add('studiengang_kz', studiengang_kz);
+	req.add('semester', semester);
+	req.add('verband', verband);
+	req.add('gruppe', gruppe);
 	
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-
+	
 	if (!val.dbdml_return)
 	{
 		alert(val.dbdml_errormsg)
@@ -331,6 +345,17 @@ function StudentDetailSave()
 		StudentTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 	}
+}
+
+function StudentImageUpload()
+{
+	person_id = document.getElementById('student-detail-textbox-person_id').value;
+	if(person_id!='')
+	{
+		window.open('<?php echo APP_ROOT; ?>content/bildupload.php?person_id='+person_id,'Bild Upload', 'height=10,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	}
+	else
+		alert('Es wurde keine Person ausgewaehlt');
 }
 
 // ****
@@ -356,8 +381,8 @@ function StudentAuswahl()
 		{
 			//Student wurde markiert
 			//loeschen button aktivieren
-			document.getElementById('student-toolbar-del').disabled=false;
 			StudentDetailDisableFields(false);
+			document.getElementById('student-detail-button-save').disabled=false;
 		}
 		else
 		{
@@ -370,7 +395,7 @@ function StudentAuswahl()
 		return false;
 	}
 
-	var url = '<?php echo APP_ROOT ?>rdf/student.rdf.php?uid='+uid;
+	var url = '<?php echo APP_ROOT ?>rdf/student.rdf.php?uid='+uid+'&'+gettimestamp();
 	
 	//hier wird GetDataSourceBlocking verwendet da sich
 	//bei der Methode mit phpRequest der Mozilla aufhaengt
@@ -417,6 +442,10 @@ function StudentAuswahl()
 	sprache=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#sprache" ));
 	matrikelnummer=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#matrikelnummer" ));
 	person_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#person_id" ));
+	studiengang_kz=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiengang_kz" ));
+	semester=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#semester" ));
+	verband=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#verband" ));
+	gruppe=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#gruppe" ));
 	
 	//Daten den Feldern zuweisen
 
@@ -436,7 +465,7 @@ function StudentAuswahl()
 	document.getElementById('student-detail-textbox-ersatzkennzeichen').value=ersatzkennzeichen;
 	document.getElementById('student-detail-menulist-familienstand').value=familienstand;
 	document.getElementById('student-detail-menulist-geschlecht').value=geschlecht;
-	if(aktiv=='Ja')
+	if(aktiv=='true')
 		document.getElementById('student-detail-checkbox-aktiv').checked=true;
 	else
 		document.getElementById('student-detail-checkbox-aktiv').checked=false;
@@ -445,5 +474,10 @@ function StudentAuswahl()
 	document.getElementById('student-detail-menulist-geburtsnation').value=geburtsnation;
 	document.getElementById('student-detail-menulist-sprache').value=sprache;
 	document.getElementById('student-detail-textbox-matrikelnummer').value=matrikelnummer;
-	document.getElementById('student-detail-image').src='<?php echo APP_ROOT?>content/bild.php?src=person&person_id='+person_id;
+	document.getElementById('student-detail-image').src='<?php echo APP_ROOT?>content/bild.php?src=person&person_id='+person_id+'&'+gettimestamp();
+	document.getElementById('student-detail-textbox-person_id').value=person_id;
+	document.getElementById('student-detail-textbox-studiengang_kz').value=studiengang_kz;
+	document.getElementById('student-detail-textbox-semester').value=semester;
+	document.getElementById('student-detail-textbox-verband').value=verband;
+	document.getElementById('student-detail-textbox-gruppe').value=gruppe;
 }

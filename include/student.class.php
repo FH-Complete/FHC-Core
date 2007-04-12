@@ -206,7 +206,7 @@ class student extends benutzer
 			       ' gruppe='.$this->addslashes($this->gruppe).
 			       " WHERE student_uid='".addslashes($this->uid)."';";
 		}
-
+		
 		if(pg_query($this->conn,$qry))
 		{
 			pg_query($this->conn,'COMMIT;');

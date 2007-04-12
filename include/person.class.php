@@ -40,7 +40,7 @@ class person
 	var $gebdatum;          	// date
 	var $gebort;            		// varchar(128)
 	var $gebzeit;           		// time
-	var $foto;              		// oid
+	var $foto;              		// text
 	var $anmerkungen;       	// varchar(256)
 	var $homepage;          	// varchar(256)
 	var $svnr;			// char(10)
@@ -208,11 +208,7 @@ class person
 			$this->errormsg = "*****\nGeburtsort darf nicht laenger als 128 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
-		if($this->foto!='' && !is_numeric($this->foto))
-		{
-			$this->errormsg = "FotoOID ist ungueltig\n";
-			return false;
-		}
+		
 		if(strlen($this->homepage)>256)
 		{
 			$this->errormsg = "*****\nHomepage darf nicht laenger als 256 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
@@ -376,8 +372,7 @@ class person
 					if($row->geburtsnation!=$this->geburtsnation) 			$update=true;
 					if($row->geschlecht!=$this->geschlecht) 				$update=true;
 					if($row->staatsbuergerschaft!=$this->staatsbuergerschaft)	$update=true;
-					
-					
+										
 					if($update)
 					{
 						$qry = 'UPDATE public.tbl_person SET'.
@@ -413,8 +408,10 @@ class person
 				}
 			}
 		}
+				
 		if ($this->done)
 		{
+			
 			if(pg_query($this->conn,$qry))
 			{
 				if($this->new)

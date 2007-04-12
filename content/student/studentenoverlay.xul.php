@@ -47,8 +47,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentdetailoverlay.xul.p
 				<hbox>
 					<toolbox flex="1">
 						<toolbar id="nav-toolbar">
-						<toolbarbutton id="student-toolbar-neu" label="Neue Lehreinheit" oncommand="StudentNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Student neu anlegen" />
-						<toolbarbutton id="student-toolbar-del" label="Löschen" oncommand="StudentDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Student löschen"/>
+						<!--<toolbarbutton id="student-toolbar-neu" label="Neuer Student" oncommand="StudentNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Student neu anlegen" />-->
+						<!--<toolbarbutton id="student-toolbar-del" label="Löschen" oncommand="StudentDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Student löschen"/>-->
 						<toolbarbutton id="student-toolbar-refresh" label="Neu laden" oncommand="StudentTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 						<spacer flex="1"/>
 						<label id="student-toolbar-label-anzahl"/>
@@ -162,9 +162,11 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentdetailoverlay.xul.p
 					<tabbox id="student-tabbox" flex="3" orient="vertical">
 						<tabs orient="horizontal" id="lehrveranstaltung-tabs">
 							<tab id="student-tab-detail" label="Details" />
+							<tab id="student-tab-prestudent" label="PreStudent" />
 						</tabs>
 						<tabpanels id="student-tabpanels-main" flex="1">
 							<vbox id="student-detail"  style="margin-top:10px;" />
+							<vbox id="student-prestudent"  style="margin-top:10px;" />
 						</tabpanels>
 					</tabbox>				
 				</vbox>
