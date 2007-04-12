@@ -291,7 +291,7 @@ if($frage->frage_id!='')
 	echo "<tr>";
 	//Upload Feld fuer Bild
 	echo "<td valign='bottom'>
-			<form method='POST' ENCTYPE='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;gruppe_kurzbz=$gruppe_kurzbz&amp;frage_id=$frage->frage_id'>
+			<form method='POST' enctype='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;gruppe_kurzbz=$gruppe_kurzbz&amp;frage_id=$frage->frage_id'>
 			Bild: <input type='file' name='bild' />
 			<input type='submit' name='submitbild' value='Upload' />
 			</form>
