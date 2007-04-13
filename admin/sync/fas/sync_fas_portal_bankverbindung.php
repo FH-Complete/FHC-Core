@@ -1,20 +1,6 @@
 <?php
 /* Copyright (C) 2006 Technikum-Wien
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
- *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
@@ -39,6 +25,8 @@ $text = '';
 $anzahl_quelle=0;
 $anzahl_eingefuegt=0;
 $anzahl_fehler=0;
+$ausgabe="";
+$ausgabe_all="";
 
 function validate($row)
 {
@@ -65,9 +53,9 @@ if($result = pg_query($conn_fas, $qry))
 	$anzahl_quelle=pg_num_rows($result);
 	while($row = pg_fetch_object($result))
 	{
-		echo "- ";
+		/*echo "- ";
 		ob_flush();
-		flush();	
+		flush();*/
 			
 		$error=false;
 		$bankverbindung				=new bankverbindung($conn);
@@ -103,7 +91,7 @@ if($result = pg_query($conn_fas, $qry))
 		//Person_id feststellen
 		if($row->kontonr!='')
 		{
-			$qry1="SELECT person_portal FROM public.tbl_syncperson WHERE person_fas=".$row->person_fk.";";
+			$qry1="SELECT person_portal FROM sync.tbl_syncperson WHERE person_fas=".$row->person_fk.";";
 			if($result1 = pg_query($conn, $qry1))
 			{
 				if(pg_num_rows($result1)>0) //eintrag gefunden
@@ -121,6 +109,7 @@ if($result = pg_query($conn_fas, $qry))
 									$bankverbindung->person_id=$row1->person_portal;
 									$bankverbindung->bankverbindung_id=$row2->bankverbindung_id;
 									$bankverbindung->new=false;
+									$ausgabe="Bankverbindung aktualisiert: Name '".$bankverbindung->name."', Typ '".$bankverbindung->typ."'.\n";
 								}
 							}
 							else 
@@ -128,6 +117,7 @@ if($result = pg_query($conn_fas, $qry))
 								// insert, wenn datensatz noch nicht vorhanden
 								$bankverbindung->new=true;
 								$bankverbindung->person_id=$row1->person_portal;
+								$ausgabe="Bankverbindung eingefügt: Name '".$bankverbindung->name."', Typ '".$bankverbindung->typ."'.\n";
 							}
 						}
 					}
@@ -152,15 +142,21 @@ if($result = pg_query($conn_fas, $qry))
 				}
 			}
 		}
+		$ausgabe_all.= $ausgabe;
+		$ausgabe="";
 	}		
 }
 
 
 
 //echo nl2br($text);
-echo nl2br("\n".$error_log);
 echo nl2br("\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
-
+echo nl2br("\n".$error_log);
+if(strlen(trim($error_log))>0)
+{
+	mail($adress, 'SYNC-Fehler Bankverbindung von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");
+}
+mail($adress, 'SYNC Bankverbindung von '.$_SERVER['HTTP_HOST'], $ausgabe_all,"From: vilesci@technikum-wien.at");
 ?>
 </body>
 </html>
