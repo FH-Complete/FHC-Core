@@ -340,7 +340,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 		$personupdatevon=$rowall->creationuser;
 		$personinsertvon='SYNC';
 		$personupdateamum=$rowall->creationdate;
-		$personinsertvon=$rowall->creationdate;
+		$personinsertamum=$rowall->creationdate;
 		if($rowall->familienstand==1)
 		{
 			$personfamilienstand='l';
@@ -938,7 +938,8 @@ if($resultall = pg_query($conn_fas, $qryall))
 							{
 					
 								//Neuen Datensatz anlegen							
-								$qry = "INSERT INTO public.tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz, fixangestellt, telefonklappe,stundensatz, anmerkung, updateamum, updatevon, insertamum, insertvon, ext_id) VALUES(".
+								$qry = "INSERT INTO public.tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz, 
+								fixangestellt, telefonklappe,stundensatz, anmerkung, updateamum, updatevon, insertamum, insertvon, ext_id) VALUES(".
 								myaddslashes($mitarbeiteruid).", ".
 								myaddslashes($mitarbeiterausbildungcode).", ".
 								myaddslashes($mitarbeiterpersonalnummer)." , ".
