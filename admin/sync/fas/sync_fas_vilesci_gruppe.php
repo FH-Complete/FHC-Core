@@ -208,22 +208,16 @@ if($result = pg_query($conn_fas, $qry))
 						$qryupd="UPDATE public.tbl_gruppe SET ext_id='".$ext_id."' WHERE gruppe_kurzbz='".$gruppe_kurzbz."' AND studiengang_kz='".$studiengang_kz."';";
 						if($resultupd = pg_query($conn, $qryupd))
 						{
-							if($rowsync=pg_fetch_object($resultsync))
-							{
-								//Sync-Eintrag bereits vorhanden
-								$qryinss="INSERT INTO sync.tbl_syncgruppe (fas_gruppe, vilesci_gruppe) VALUES ('".$ext_id."','".$rowsync->vilesci_gruppe."');";
-								$ausgabe.="---Sync-Eintrag 1: FAS-'".$ext_id."', Vilesci-'".$rowsync->vilesci_gruppe."'.\n";
-							}
-							else 
+							if(!$rowsync=pg_fetch_object($resultsync)) 
 							{
 								//Sync-Eintrag nicht vorhanden
 								$qryinss="INSERT INTO sync.tbl_syncgruppe (fas_gruppe, vilesci_gruppe) VALUES ('".$ext_id."','".$gruppe_kurzbz."');";
-								$ausgabe.="---Sync-Eintrag 2: FAS-'".$ext_id."', Vilesci-'".$gruppe_kurzbz."'.\n";
-							}
-							if(!(pg_query($conn, $qryinss)))
-							{
-								$error=true;
-								$error_log="Eintrag in Tabelle tbl_syncgruppe fehlgeschlagen: ".$qryinss."\n";
+								$ausgabe.="---Sync-Eintrag : FAS-'".$ext_id."', Vilesci-'".$gruppe_kurzbz."'.\n";
+								if(!(pg_query($conn, $qryinss)))
+								{
+									$error=true;
+									$error_log="Eintrag in Tabelle tbl_syncgruppe fehlgeschlagen: ".$qryinss."\n";
+								}
 							}
 						}
 						else 

@@ -103,8 +103,7 @@ if($result = pg_query($conn_fas, $qry))
 			}
 		}
 		
-		
-		//lehreinheit anlegen
+		//lehrveranstaltung ermitteln
 		$qry="SELECT lva_vilesci FROM sync.tbl_synclehrveranstaltung WHERE lva_fas='".$row->lehrveranstaltung_fk."';";
 		if($results = pg_query($conn, $qry))
 		{
@@ -199,6 +198,16 @@ if($result = pg_query($conn_fas, $qry))
 				$lehreinheit->insertvon			="SYNC";
 				$lehreinheit->ext_id				=$row->bakkalaureatsarbeit_pk;
 				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
 				//betreuer
 				$qry="SELECT person_portal FROM sync.tbl_syncperson WHERE person_fas='$row->betreuer_fk'"; //betreuer_fk -> person_id
 				if($resultu = pg_query($conn, $qry))
@@ -215,7 +224,7 @@ if($result = pg_query($conn_fas, $qry))
 				}
 				$projektbetreuer				=new projektbetreuer($conn);
 				//$projektbetreuer->person_id		='';
-				$projektbetreuer->projektarbeit_id		=$projektarbeit->projektarbeit_id;
+				//$projektbetreuer->projektarbeit_id	='';
 				$projektbetreuer->note			='';
 				$projektbetreuer->betreuerart		='b';  //b=Bachelorarbeitsbetreuer
 				$projektbetreuer->faktor			='1,0';
@@ -228,32 +237,32 @@ if($result = pg_query($conn_fas, $qry))
 				//$projektbetreuer->insertamum		=$row->creationdate;
 				$projektbetreuer->insertvon		="SYNC";
 				$projektbetreuer->ext_id			=$row->bakkalaureatsarbeit_pk;
-				$qry="SELECT student_uid FROM public.tbl_student WHERE ext_id='".$row->student_fk."';";
+				/*$qry="SELECT student_uid FROM public.tbl_student WHERE ext_id='".$row->student_fk."';";
 				if($resultu = pg_query($conn, $qry))
 				{
 					if($rowu=pg_fetch_object($resultu))
 					{ 
-						$projektarbeit->student_uid=$rowu->student_uid;
-						$qry2="SELECT projektarbeit_id, ext_id FROM lehre.tbl_projektarbeit WHERE projekttyp_kurzbz	='Bachelorarbeit' AND ext_id='".$row->bakkalaureatsarbeit_pk."';";
-						if($result2 = pg_query($conn, $qry2))
-						{
-							if(pg_num_rows($result2)>0) //eintrag gefunden
-							{
-								if($row2=pg_fetch_object($result2))
-								{ 
-									// update, wenn datensatz bereits vorhanden
-									$projektarbeit->new=false;
-									$projektarbeit->projektarbeit_id=$row2->projektarbeit_id;
-								}
-							}
-							else 
-							{
-								// insert, wenn datensatz noch nicht vorhanden
-								$projektarbeit->new=true;	
-							}
+						$projektarbeit->student_uid=$rowu->student_uid;*/
+				$qry2="SELECT projektarbeit_id, ext_id FROM lehre.tbl_projektarbeit WHERE projekttyp_kurzbz='Bachelorarbeit' AND ext_id='".$row->bakkalaureatsarbeit_pk."';";
+				if($result2 = pg_query($conn, $qry2))
+				{
+					if(pg_num_rows($result2)>0) //eintrag gefunden
+					{
+						if($row2=pg_fetch_object($result2))
+						{ 
+							// update, wenn datensatz bereits vorhanden
+							$projektarbeit->new=false;
+							$projektarbeit->projektarbeit_id=$row2->projektarbeit_id;
 						}
 					}
+					else 
+					{
+						// insert, wenn datensatz noch nicht vorhanden
+						$projektarbeit->new=true;	
+					}
 				}
+					/*}
+				}*/
 						
 				//le anlegen
 				$qry2="SELECT lehreinheit_id FROM lehre.tbl_lehreinheit WHERE lehrform_kurzbz	='BE' AND ext_id='".$row->bakkalaureatsarbeit_pk."';";
@@ -301,6 +310,25 @@ if($result = pg_query($conn_fas, $qry))
 							$ausgabe.="Lehreinheit aktualisiert: Lehrveranstaltung='".$lehreinheit->lehrveranstaltung_id."', Studiensemester='".$lehreinheit->studiensemester_kz."' und Lehrfach='".$lehreinheit->lehrfach_id."'.\n";
 						}
 					}
+					
+					if(!$projektarbeit->save())
+					{
+						$error_log.=$projektarbeit->errormsg."\n";
+						$anzahl_fehler++;
+					}
+					else 
+					{
+						if($projektarbeit->new=true)
+						{
+							$ausgabe.="Projektarbeit angelegt: Student='".$projektarbeit->student_uid."' und Lehreinheit='".$projektarbeit->lehreinheit_id."'.\n";
+						}
+						else 
+						{
+							$ausgabe="Projektarbeit aktualisiert: Student='".$projektarbeit->student_uid."' und Lehreinheit='".$projektarbeit->lehreinheit_id."'.\n";
+						}
+						$anzahl_eingefuegt++;
+					}
+					
 								
 					//betreuer und begutachter
 					echo nl2br("projektarbeit_id='".$projektarbeit->projektarbeit_id."' AND person_id='".$projektbetreuer->person_id."';");
@@ -413,31 +441,10 @@ if($result = pg_query($conn_fas, $qry))
 							
 						}	
 						
-						//projektarbeit
+						
 						if(!$error)
 						{
-							if(!$projektarbeit->save())
-							{
-								$error_log.=$projektarbeit->errormsg."\n";
-								$anzahl_fehler++;
-								pg_query($conn_fas, "ROLLBACK");
-							}
-							else 
-							{
-								if($projektarbeit->new=true)
-								{
-									$ausgabe.="Projektarbeit angelegt: Student='".$projektarbeit->student_uid."' und Lehreinheit='".$projektarbeit->lehreinheit_id."'.\n";
-								}
-								else 
-								{
-									$ausgabe="Projektarbeit aktualisiert: Student='".$projektarbeit->student_uid."' und Lehreinheit='".$projektarbeit->lehreinheit_id."'.\n";
-								}
-								$anzahl_eingefuegt++;
-								echo "- ";
-								ob_flush();
-								flush();
-								pg_query($conn_fas, "COMMIT");
-							}
+							
 						}
 						else 
 						{
