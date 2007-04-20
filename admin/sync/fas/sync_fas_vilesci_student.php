@@ -2202,14 +2202,7 @@ Echo nl2br($error_log);
 
 
 mail($adress, 'SYNC-Fehler Student von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");
-/*fwrite($dateiausgabe,"\n\nPersonen ohne Reihungstest: ".$notest." \n\n"
-."Personen:       Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$anzahl_person_insert." / Geändert: ".$anzahl_person_update." / Fehler: ".$anzahl_fehler_person."\n"
-."Prestudenten:   Gesamt: ".$anzahl_pre_gesamt." / Eingefügt: ".$anzahl_pre_insert." / Geändert: ".$anzahl_pre_update." / Fehler: ".$anzahl_fehler_pre."\n"
-."Benutzer:       Gesamt: ".$anzahl_benutzer_gesamt." / Eingefügt: ".$anzahl_benutzer_insert." / Geändert: ".$anzahl_benutzer_update." / Fehler: ".$anzahl_fehler_benutzer."\n"
-."Nicht-Studenten: ".$anzahl_nichtstudenten."\n"
-."Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student);
-fwrite($dateiausgabe,"Fertig: ".date("d.m.Y H:i:s")."\n\n");
-fclose($dateiausgabe);*/
+
 
 
 mail($adress, 'SYNC Student  von '.$_SERVER['HTTP_HOST'], "Sync Student\n------------\n\nPersonen ohne Reihungstest: ".$notest." \n\n"
