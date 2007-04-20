@@ -90,9 +90,10 @@ function myaddslashes($var)
 </head>
 <body>
 <?php
-echo nl2br("Studentensynchro vom ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
+echo nl2br("Studentensynchro Beginn ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
 
 $plausiueb="Überprüfung Studentendaten im FAS:\n\n";
+
 $qry="SELECT * FROM person JOIN student ON person_pk=student.person_fk WHERE svnr='0005010400';";
 if($resultp = pg_query($conn_fas, $qry))
 {
@@ -353,12 +354,12 @@ if($resultp = pg_query($conn_fas, $qry))
 			}
 			if ($rowp->aufnahmeschluessel1<>$rowp->aufnahmeschluessel2)
 			{
-				$plausi.="Ausnahmeschluessel der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->aufnahmeschluessel1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->aufnahmeschluessel2."'.\n";
+				$plausi.="Aufnahmeschluessel der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->aufnahmeschluessel1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->aufnahmeschluessel2."'.\n";
 				$error=true;
 			}
 			if ($rowp->aufnahmeschluesselfk1<>$rowp->aufnahmeschluesselfk2)
 			{
-				$plausi.="Ausnahmeschluessel(fk) der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->aufnahmeschluesselfk1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->aufnahmeschluesselfk2."'.\n";
+				$plausi.="Aufnahmeschluessel(fk) der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->aufnahmeschluesselfk1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->aufnahmeschluesselfk2."'.\n";
 				$error=true;
 			}
 			if ($rowp->angetreten1<>$rowp->angetreten2)
@@ -393,7 +394,11 @@ foreach ($studiengangfk AS $stg)
 				{
 					$errro_log_fas[$stg]=$plausiueb.$error_log_fas[$stg];
 					//mail(trim($rowass->email), 'Plausicheck von Studenten / Studiengang: '.$stg, $error_log_fas[$stg],"From: vilesci@technikum-wien.at");
-					mail($adress, 'Plausicheck von Studenten / Studiengang: '.$stg.", von ".$_SERVER['HTTP_HOST'], $error_log_fas[$stg],"From: vilesci@technikum-wien.at");
+					
+					if (!mail($adress, 'Plausicheck von Studenten / Studiengang: '.$stg.", von ".$_SERVER['HTTP_HOST'], $error_log_fas[$stg],"From: vilesci@technikum-wien.at"))
+					{
+						echo nl2br("Plausicheck-Mail('".$stg."') an '".$adress."' konnte nicht verschickt werden!\n");
+					}
 				}
 			}
 		}
@@ -406,41 +411,52 @@ foreach ($studiengangfk AS $stg)
 	{
 		echo nl2br("Kein Zugriff auf tbl_studiengang => Studiengang ".$stg." nicht gefunden. E-Mail mit folgendem Inhalt wird nicht verschickt:\n".$error_log_fas[$stg]);
 	}
+
 }
 
 
 
-$qry = "SELECT * FROM person JOIN student ON person_fk=person_pk WHERE uid NOT LIKE '\_dummy%' 
+$qry="
+SELECT * FROM person JOIN student ON person_fk=person_pk WHERE uid NOT LIKE '\_dummy%' 
 AND person_pk NOT IN(
-SELECT 
-p1.person_pk 
-FROM (person JOIN student ON person_pk=student.person_fk ) AS p1
-CROSS JOIN (person JOIN student ON person_pk=student.person_fk) AS p2 WHERE 
-((p1.gebdat=p2.gebdat AND p1.familienname=p2.familienname AND p1.vorname=p2.vorname) 
-OR ((p1.ersatzkennzeichen=p2.ersatzkennzeichen AND p1.ersatzkennzeichen<>'') OR (p1.svnr=p2.svnr AND p1.svnr<>'')))
-AND (p1.person_pk <> p2.person_pk)
-AND ((p1.svnr=p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'') 
-	OR ((p1.svnr<>p2.svnr AND (p1.svnr IS NULL OR p1.svnr='' OR p2.svnr IS NULL OR p2.svnr='')) 
-	AND p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!='' 
-	AND p1.gebdat=p2.gebdat AND p1.gebdat IS NOT NULL AND p1.gebdat>'1935-01-01' AND p1.gebdat<'2000-01-01'))
-AND (trim(p1.familienname)<>trim(p2.familienname) OR trim(p1.vorname)<>trim(p2.vorname) OR trim(p1.vornamen)<>trim(p2.vornamen)
-	OR p1.geschlecht<>p2.geschlecht 
-	OR p1.gebdat<>p2.gebdat OR p1.staatsbuergerschaft<> p2.staatsbuergerschaft OR p1.familienstand<>p2.familienstand 
-	OR p1.svnr<>p2.svnr OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.anrede<>p2.anrede 
-	OR p1.anzahlderkinder<>p2.anzahlderkinder OR p1.titel<>p2.titel OR p1.gebnation<>p2.gebnation
-	OR p1.postnomentitel<> p2.postnomentitel OR p1.gebort<>p2.gebort 
+	SELECT p1.person_pk
+	FROM (person JOIN student ON person_pk=student.person_fk ) AS p1 
+	CROSS JOIN (person JOIN student ON person_pk=student.person_fk) AS p2 WHERE 
+	(
+		(p1.svnr=p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'') 
+		OR (
+			(p1.svnr<>p2.svnr AND 
+				(p1.svnr IS NULL OR p1.svnr='' OR p2.svnr IS NULL OR p2.svnr='')
+			) 
+			AND p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!='' 
+			AND p1.gebdat=p2.gebdat AND p1.gebdat IS NOT NULL AND p1.gebdat>'1935-01-01' AND p1.gebdat<'2000-01-01'
+		)
+	)
+	AND (p1.person_pk < p2.person_pk) 
+	AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400') 
+	AND (trim(p1.familienname)<>trim(p2.familienname) OR trim(p1.vorname)<>trim(p2.vorname) OR trim(p1.vornamen)<>trim(p2.vornamen)
+		OR p1.geschlecht<>p2.geschlecht OR p1.gebort<>p2.gebort 
+		OR p1.gebdat<>p2.gebdat OR p1.staatsbuergerschaft<> p2.staatsbuergerschaft OR p1.familienstand<>p2.familienstand 
+		OR p1.svnr<>p2.svnr OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.anrede<>p2.anrede OR p1.titel<>p2.titel 
+		OR p1.anzahlderkinder<>p2.anzahlderkinder OR p1.gebnation<>p2.gebnation OR p1.postnomentitel<> p2.postnomentitel 
 	
-	OR ((p1.zgv<>p2.zgv OR p1.zgvdatum<>p2.zgvdatum OR p1.zgvort<>p2.zgvort 
-	OR p1.zgvmagister<>p2.zgvmagister OR p1.zgvmagisterort<>p2.zgvmagisterort OR p1.zgvmagisterdatum<>p2.zgvmagisterdatum 
-	OR p1.punkte<>p2.punkte OR p1.perskz<>p2.perskz OR p1.aufgenommenam<>p2.aufgenommenam 
-	OR p1.beendigungsdatum<>p2.beendigungsdatum OR p1.aufmerksamdurch<>p2.aufmerksamdurch
-	OR p1.aufnahmeschluessel<>p2.aufnahmeschluessel OR p1.aufnahmeschluessel_fk<>p2.aufnahmeschluessel_fk 
-	OR p1.berufstaetigkeit<>p2.berufstaetigkeit OR p1.aufmerksamdurch_fk<>p2.aufmerksamdurch_fk 
-	OR p1.angetreten<>p2.angetreten)AND p1.studiengang_fk=p2.studiengang_fk))
+		OR (
+			(
+				p1.zgv<>p2.zgv OR p1.zgvdatum<>p2.zgvdatum OR p1.zgvort<>p2.zgvort 
+				OR p1.zgvmagister<>p2.zgvmagister OR p1.zgvmagisterort<>p2.zgvmagisterort 
+				OR p1.zgvmagisterdatum<>p2.zgvmagisterdatum OR p1.punkte<>p2.punkte OR p1.perskz<>p2.perskz 
+				OR p1.aufgenommenam<>p2.aufgenommenam  	OR p1.beendigungsdatum<>p2.beendigungsdatum 
+				OR p1.aufmerksamdurch<>p2.aufmerksamdurch OR p1.aufnahmeschluessel<>p2.aufnahmeschluessel 
+				OR p1.aufnahmeschluessel_fk<>p2.aufnahmeschluessel_fk OR p1.berufstaetigkeit<>p2.berufstaetigkeit 
+				OR p1.aufmerksamdurch_fk<>p2.aufmerksamdurch_fk OR p1.angetreten<>p2.angetreten
+			)
+			AND p1.studiengang_fk=p2.studiengang_fk
+		)
+	)
 )
-order by familienname;
+;
 ";
-
+//order by familienname
 //$qry="SELECT * FROM person JOIN student ON person_fk=person_pk WHERE uid='iw05d203';";
 $datum_obj=new datum();
 if($result = pg_query($conn_fas, $qry))
@@ -2098,7 +2114,7 @@ if($result = pg_query($conn_fas, $qry))
 								}
 							}
 						}
-						if(!pg_query($conn,$qry))
+						if(!@pg_query($conn,$qry))
 						{			
 							$error=true;
 							$error_log.='Fehler beim Speichern des Student-Datensatzes:'.$nachname.' / '.$qry."\n".pg_errormessage($conn)."\n";
@@ -2188,29 +2204,43 @@ if($result = pg_query($conn_fas, $qry))
 
 	}
 }		
+echo nl2br("Studentensynchro Ende ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
 
-
-Echo nl2br("\n\nPersonen ohne Reihungstest: ".$notest." \n");
-Echo nl2br("Personen:       Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$anzahl_person_insert." / Geändert: ".$anzahl_person_update." / Fehler: ".$anzahl_fehler_person."\n");
-Echo nl2br("Prestudenten:   Gesamt: ".$anzahl_pre_gesamt." / Eingefügt: ".$anzahl_pre_insert." / Geändert: ".$anzahl_pre_update." / Fehler: ".$anzahl_fehler_pre."\n");
-Echo nl2br("Benutzer:       Gesamt: ".$anzahl_benutzer_gesamt." / Eingefügt: ".$anzahl_benutzer_insert." / Geändert: ".$anzahl_benutzer_update." / Fehler: ".$anzahl_fehler_benutzer."\n");
-Echo nl2br("Nicht-Studenten: ".$anzahl_nichtstudenten."\n");
-Echo nl2br("Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student."\n");
+echo nl2br("\n\nPersonen ohne Reihungstest: ".$notest." \n");
+echo nl2br("Personen:       Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$anzahl_person_insert." / Geändert: ".$anzahl_person_update." / Fehler: ".$anzahl_fehler_person."\n");
+echo nl2br("Prestudenten:   Gesamt: ".$anzahl_pre_gesamt." / Eingefügt: ".$anzahl_pre_insert." / Geändert: ".$anzahl_pre_update." / Fehler: ".$anzahl_fehler_pre."\n");
+echo nl2br("Benutzer:       Gesamt: ".$anzahl_benutzer_gesamt." / Eingefügt: ".$anzahl_benutzer_insert." / Geändert: ".$anzahl_benutzer_update." / Fehler: ".$anzahl_fehler_benutzer."\n");
+echo nl2br("Nicht-Studenten: ".$anzahl_nichtstudenten."\n");
+echo nl2br("Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student."\n");
 
 $error_log="Sync Student\n------------\n\n".$text4."\n".$text3."\n".$text5."\n".$text2."\n".$text1;
-Echo nl2br($error_log);
+echo nl2br($error_log);
 
 
-mail($adress, 'SYNC-Fehler Student von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");
+if(!mail($adress, 'SYNC-Fehler Student von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at"))
+{
+	echo "SYNC-Fehler-Mail an '".$adress."' konnte nicht verschickt werden!<br>";
+}
+else
+{
+	echo "SYNC-Fehler-Mail wurde verschickt an ".$adress."<br>";
+}
 
 
 
-mail($adress, 'SYNC Student  von '.$_SERVER['HTTP_HOST'], "Sync Student\n------------\n\nPersonen ohne Reihungstest: ".$notest." \n\n"
+if(!mail($adress, 'SYNC Student  von '.$_SERVER['HTTP_HOST'], "Sync Student\n------------\n\nPersonen ohne Reihungstest: ".$notest." \n\n"
 ."Personen:       Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$anzahl_person_insert." / Geändert: ".$anzahl_person_update." / Fehler: ".$anzahl_fehler_person."\n"
 ."Prestudenten:   Gesamt: ".$anzahl_pre_gesamt." / Eingefügt: ".$anzahl_pre_insert." / Geändert: ".$anzahl_pre_update." / Fehler: ".$anzahl_fehler_pre."\n"
 ."Benutzer:       Gesamt: ".$anzahl_benutzer_gesamt." / Eingefügt: ".$anzahl_benutzer_insert." / Geändert: ".$anzahl_benutzer_update." / Fehler: ".$anzahl_fehler_benutzer."\n"
 ."Nicht-Studenten: ".$anzahl_nichtstudenten."\n"
-."Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student."\n\n".$dateiausgabe."Fertig: ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: vilesci@technikum-wien.at");
+."Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student."\n\n".$dateiausgabe."Fertig: ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: vilesci@technikum-wien.at"))
+{
+	echo "SYNC-Mail an '".$adress."' konnte nicht verschickt werden!<br>";
+}
+else
+{
+	echo "SYNC-Mail wurde verschickt an ".$adress."<br>";
+}
 
 ?>
 </body>
