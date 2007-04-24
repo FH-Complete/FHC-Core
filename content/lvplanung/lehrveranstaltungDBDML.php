@@ -127,7 +127,7 @@ if(!$error)
 			$lem = new lehreinheitmitarbeiter($conn, null, null, true);
 			
 			$lem->lehreinheit_id = $_POST['lehreinheit_id'];
-			$lem->lehrfunktion_kurzbz = 'lektor';
+			$lem->lehrfunktion_kurzbz = 'Lektor';
 			$lem->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
 			
 			$lem->semesterstunden = '0';
