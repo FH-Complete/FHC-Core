@@ -29,7 +29,7 @@
 
 <?php
  		  //$sql_query = "SELECT vornamen AS vn,nachname AS nn,a.uid as uid FROM public.tbl_personmailgrp AS a, public.tbl_person AS b WHERE a.uid=b.uid AND a.mailgrp_kurzbz='$grp' ORDER BY nachname";
-	  $qry = "SELECT uid, vorname, nachname FROM campus.vw_benutzer WHERE uid IN(SELECT uid FROM public.tbl_benutzergruppe where gruppe_kurzbz='".addslashes($_GET['grp'])."') ORDER BY nachname, vorname";
+	  $qry = "SELECT uid, vorname, nachname FROM campus.vw_benutzer JOIN tbl_benutzergruppe USING (uid) WHERE gruppe_kurzbz='".addslashes($_GET['grp'])."' AND studiensemester_kurzbz IS NULL ORDER BY nachname, vorname";
 	  if($result=pg_query($conn, $qry))
 	  {
 	  	while($row = pg_fetch_object($result))
