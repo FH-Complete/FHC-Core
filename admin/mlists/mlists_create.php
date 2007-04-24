@@ -46,7 +46,7 @@
 				       'FROM campus.vw_benutzer, public.tbl_benutzergruppe '.
 				       'WHERE vw_benutzer.uid=tbl_benutzergruppe.uid AND '.
 				       "UPPER(gruppe_kurzbz)=UPPER('$mg_kurzbz') AND tbl_benutzergruppe.uid NOT LIKE '\\\\_%' ".
-					   'ORDER BY nachname';
+					   'AND studiensemester_kurzbz IS NULL ORDER BY nachname';
 			//echo $sql_query;
 			if(!($result_person=pg_query($conn, $sql_query)))
 				die(pg_errormessage($conn));
