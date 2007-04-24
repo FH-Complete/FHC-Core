@@ -192,7 +192,9 @@ class studiensemester
 		   return $stsem;
 		else 
 		{
-			$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ende >= now() ORDER BY ende";
+			//$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ende >= now() ORDER BY ende";
+			$qry = "SELECT studiensemester_kurzbz FROM vw_studiensemester ORDER BY delta LIMIT 1";
+			
 			if(!$res=pg_exec($this->conn,$qry))
 		    {
 				$this->errormsg = pg_errormessage($this->conn);

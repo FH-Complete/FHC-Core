@@ -63,7 +63,7 @@ $qry = "SELECT
 			person.person_pk=student.person_fk AND
 			aufgenommenam is not null AND
 			studiengang.studiengang_pk=student.studiengang_fk 
-		ORDER BY aufgenommenam DESC LIMIT 1
+		ORDER BY aufgenommenam DESC, student_id DESC LIMIT 1
 			";
 
 if(!$row=pg_fetch_object(pg_query($conn,$qry)))

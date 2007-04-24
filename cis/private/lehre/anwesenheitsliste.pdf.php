@@ -275,7 +275,7 @@ $pdf->SetFont('Arial','',8);
 //$result = $stud->getStudents($einheit,$gruppe,$verband,$sem,$stg);
 $qry = 'SELECT distinct vorname, nachname, uid, matrikelnr, verband, gruppe, semester FROM ';
 if($gruppe_kurzbz!='')
-	$qry .= "campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE studiensemester_kurzbz IS NULL AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
+	$qry .= "campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE (studiensemester_kurzbz IS NULL OR studiensemester_kurzbz='$stsem') AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
 else 
 {
 	$qry .= "campus.vw_student WHERE studiengang_kz='$stg' AND semester='$sem'";
