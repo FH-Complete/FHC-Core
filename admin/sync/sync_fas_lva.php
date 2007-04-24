@@ -431,7 +431,7 @@ for ($i=0;$i<$num_rows;$i++)
 						$sql_query = 'INSERT INTO lehre.tbl_lehreinheitmitarbeiter(lehreinheit_id, mitarbeiter_uid,'.
 									 'lehrfunktion_kurzbz, semesterstunden, planstunden, stundensatz, faktor, anmerkung,'.
 									 'bismelden, updateamum, updatevon, insertamum, insertvon, ext_id)'.
-									 " VALUES('$row_seq->id','$row->lektor','lektor','$row->semesterstunden',".
+									 " VALUES('$row_seq->id','$row->lektor','Lektor','$row->semesterstunden',".
 									 " NULL, NULL, 1, NULL, true, now(), 'auto',now(),'auto', '$row->fas_id');";
 						echo $sql_query.'<br>';
 						if(!pg_query($conn, $sql_query))
