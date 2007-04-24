@@ -323,3 +323,15 @@ h4
 {
 	color: #ff0000;
 }
+
+img.testtoolfrage
+{
+	max-width:300px;
+	max-height:200px;
+}
+
+img.testtoolvorschlag
+{
+	max-width:50px;
+	max-height:40px;
+}

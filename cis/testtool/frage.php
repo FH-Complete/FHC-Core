@@ -51,7 +51,7 @@ else
 
 $MAX_VORSCHLAEGE_PRO_ZEILE=4;
 ?>
-<?xml version="1.0" encoding="ISO-8859-15" ?>
+<?xml version="1.0" ?>
 <?xml-stylesheet type="text/xsl" href="mathml.xsl" ?>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -60,11 +60,11 @@ $MAX_VORSCHLAEGE_PRO_ZEILE=4;
 	<link href="../../skin/cis.css" rel="stylesheet" type="text/css" />
 	<script language="Javascript" type="text/javascript">
 	//<![CDATA[
-	function killChildNodes(an_element) 
+	function killChildNodes(an_element)
 	{
-		while (an_element.hasChildNodes()) 
+		while (an_element.hasChildNodes())
 		{
-			if (!an_element.firstChild.hasChildNodes()) 
+			if (!an_element.firstChild.hasChildNodes())
 			{
 				var k = an_element.firstChild;
 				an_element.removeChild(k);
@@ -100,7 +100,7 @@ $MAX_VORSCHLAEGE_PRO_ZEILE=4;
 			var root = doc.documentElement;
 			for (var i=0; i < root.childNodes.length; ++i)
 				div.appendChild(document.importNode(root.childNodes[i], true))
-			
+
 			window.setTimeout('count_down('+zeit+')',1000);
 		}
 	}
@@ -307,7 +307,7 @@ if($frage->frage_id!='')
 	echo '<br/><br/><center>';
 	//Bild und Text der Frage anzeigen
 	if($frage->bild!='')
-		echo "<img src='bild.php?src=frage&amp;frage_id=$frage->frage_id' /><br/><br/>\n";
+		echo "<img class='testtoolfrage' src='bild.php?src=frage&amp;frage_id=$frage->frage_id' /><br/><br/>\n";
 	echo "$frage->text<br/><br/>\n";
 
 	//Vorschlaege laden
@@ -322,7 +322,7 @@ if($frage->frage_id!='')
 		echo "\n<td align='center'>";
 		echo "$vorschlag->antwort<br/>";
 		if($vorschlag->bild!='')
-			echo "<img src='bild.php?src=vorschlag&amp;vorschlag_id=$vorschlag->vorschlag_id' /><br/>";
+			echo "<img class='testtoolvorschlag' src='bild.php?src=vorschlag&amp;vorschlag_id=$vorschlag->vorschlag_id' /><br/>";
 		if($vorschlag->text!='')
 			echo $vorschlag->text.'<br/>';
 		echo "</td>";
