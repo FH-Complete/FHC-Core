@@ -8,6 +8,7 @@
 <body>
 <?php
     require_once('../../include/functions.inc.php');
+	require_once('../../include/studiensemester.class.php');
     require_once('../config.inc.php');
     
     //Connection Herstellen
@@ -15,6 +16,9 @@
        die('Fehler beim öffnen der Datenbankverbindung');
     
     $user=get_uid();
+    
+	$stsem_obj = new studiensemester($conn);
+	$stsem = $stsem_obj->getaktorNext();
 	
 	if(check_lektor($user,$conn))
        $is_lector=true;
@@ -29,7 +33,7 @@
 
 <?php
  		  //$sql_query = "SELECT vornamen AS vn,nachname AS nn,a.uid as uid FROM public.tbl_personmailgrp AS a, public.tbl_person AS b WHERE a.uid=b.uid AND a.mailgrp_kurzbz='$grp' ORDER BY nachname";
-	  $qry = "SELECT uid, vorname, nachname FROM campus.vw_benutzer JOIN tbl_benutzergruppe USING (uid) WHERE gruppe_kurzbz='".addslashes($_GET['grp'])."' AND studiensemester_kurzbz IS NULL ORDER BY nachname, vorname";
+	  $qry = "SELECT uid, vorname, nachname FROM campus.vw_benutzer JOIN tbl_benutzergruppe USING (uid) WHERE gruppe_kurzbz='".addslashes($_GET['grp'])."' AND (studiensemester_kurzbz IS NULL OR studiensemester_kurzbz='$stsem') ORDER BY nachname, vorname";
 	  if($result=pg_query($conn, $qry))
 	  {
 	  	while($row = pg_fetch_object($result))

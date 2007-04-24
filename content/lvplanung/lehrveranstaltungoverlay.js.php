@@ -262,6 +262,8 @@ function LeNeu()
 
 	document.getElementById('lehrveranstaltung-detail-textbox-lehrveranstaltung').value=lehrveranstaltung_id;
 	document.getElementById('lehrveranstaltung-detail-checkbox-new').checked=true;
+	document.getElementById('lehrveranstaltung-detail-textbox-stundenblockung').value='2';
+	document.getElementById('lehrveranstaltung-detail-textbox-wochenrythmus').value='1';
 }
 // ****
 // * Selectiert die Lektorzuordnung nachdem der Tree
