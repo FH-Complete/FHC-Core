@@ -107,6 +107,7 @@ function drawStudent($student)
     		<STUDENT:staatsbuergerschaft><![CDATA[<?php echo $student->staatsbuergerschaft; ?>]]></STUDENT:staatsbuergerschaft>
     		<STUDENT:geburtsnation><![CDATA[<?php echo $student->geburtsnation; ?>]]></STUDENT:geburtsnation>
     		<STUDENT:sprache><![CDATA[<?php echo $student->sprache; ?>]]></STUDENT:sprache>
+    		<STUDENT:prestudent_id><![CDATA[<?php echo $student->prestudent_id; ?>]]></STUDENT:prestudent_id>
       	</RDF:Description>
       </RDF:li>
 <?php

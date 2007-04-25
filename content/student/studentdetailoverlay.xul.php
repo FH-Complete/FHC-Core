@@ -219,15 +219,19 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <!-- STUDENT PREStudent -->
 <vbox id="student-prestudent" style="margin:0px;">
 		<hbox style="background:#eeeeee;margin:0px;padding:2px">
-			<label value="Details" style="font-size:12pt;font-weight:bold;margin-top:5px;"  flex="1" />
+			<label value="PreStudent" style="font-size:12pt;font-weight:bold;margin-top:5px;"  flex="1" />
 			<spacer flex="1" />
-			<button id="student-prestudent-button-save" label="Speichern" oncommand="StudentPrestudentSave();" disabled="true"/>
+			<button id="student-prestudent-button-save" label="Speichern" oncommand="StudentPrestudentSave();" disabled="false"/>
 		</hbox>
 		<vbox hidden="true">
 			<label value="Neu"/>
-			<checkbox id="student-prestudent-checkbox-new" checked="true" />      	
+			<checkbox id="student-prestudent-checkbox-new" checked="false" />      	
 			<label value="Person_id"/>
-      		<textbox id="student-prestudent-textbox-person_id" disabled="true"/>					
+      		<textbox id="student-prestudent-textbox-person_id" disabled="true"/>
+      		<label value="Prestudent_id"/>
+      		<textbox id="student-prestudent-textbox-prestudent_id" disabled="true"/>
+      		<label value="studiengang_kz"/>
+      		<textbox id="student-prestudent-textbox-studiengang_kz" disabled="true"/>
 		</vbox>
 		<hbox flex="1">
 			<grid id="student-prestudent-grid" style="overflow:auto;margin:4px;" flex="1">
@@ -239,7 +243,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
   					<rows>
   						<row>
       						<label value="Aufmerksam durch" control="student-prestudent-menulist-aufmerksamdurch"/>
-      						<menulist id="student-prestudent-menulist-aufmerksamdurch" disabled="false"
+      						<menulist id="student-prestudent-menulist-aufmerksamdurch" disabled="true"
 							          datasources="<?php echo APP_ROOT ?>rdf/aufmerksamdurch.rdf.php" flex="1"
 						              ref="http://www.technikum-wien.at/aufmerksamdurch/alle" >
 								<template>
@@ -253,12 +257,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     					</row>
     					<row>
       						<label value="Berufstaetigkeit" control="student-prestudent-menulist-berufstaetigkeit"/>
-      						<menulist id="student-prestudent-menulist-berufstaetigkeit" disabled="false"
-							          datasources="<?php echo APP_ROOT ?>rdf/berufstaetigkeit.rdf.php" flex="1"
+      						<menulist id="student-prestudent-menulist-berufstaetigkeit" disabled="true"
+							          datasources="<?php echo APP_ROOT ?>rdf/berufstaetigkeit.rdf.php?optional=true" flex="1"
 						              ref="http://www.technikum-wien.at/berufstaetigkeit/alle" >
 								<template>
 									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/berufstaetigkeit/rdf#bezeichnung"
+										<menuitem value="rdf:http://www.technikum-wien.at/berufstaetigkeit/rdf#code"
 							        		      label="rdf:http://www.technikum-wien.at/berufstaetigkeit/rdf#bezeichnung"
 										  		  uri="rdf:*"/>
 										</menupopup>
@@ -267,17 +271,109 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     					</row>
 						<row>
       						<label value="Ausbildung" control="student-prestudent-menulist-ausbildung"/>
-      						<menulist id="student-prestudent-menulist-berufstaetigkeit" disabled="false"
-							          datasources="<?php echo APP_ROOT ?>rdf/berufstaetigkeit.rdf.php" flex="1"
-						              ref="http://www.technikum-wien.at/berufstaetigkeit/alle" >
+      						<menulist id="student-prestudent-menulist-ausbildung" disabled="true"
+							          datasources="<?php echo APP_ROOT ?>rdf/ausbildung.rdf.php?optional=true" flex="1"
+						              ref="http://www.technikum-wien.at/ausbildung/alle" >
 								<template>
 									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/berufstaetigkeit/rdf#bezeichnung"
-							        		      label="rdf:http://www.technikum-wien.at/berufstaetigkeit/rdf#bezeichnung"
+										<menuitem value="rdf:http://www.technikum-wien.at/ausbildung/rdf#code"
+							        		      label="rdf:http://www.technikum-wien.at/ausbildung/rdf#bezeichnung"
 										  		  uri="rdf:*"/>
 										</menupopup>
 								</template>
 							</menulist>
+    					</row>
+    					<row>
+      						<label value="ZGV" control="student-prestudent-menulist-zgvcode"/>
+      						<menulist id="student-prestudent-menulist-zgvcode" disabled="true"
+							          datasources="<?php echo APP_ROOT ?>rdf/zgv.rdf.php?optional=true" flex="1"
+						              ref="http://www.technikum-wien.at/zgv/alle" >
+								<template>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/zgv/rdf#code"
+							        		      label="rdf:http://www.technikum-wien.at/zgv/rdf#kurzbz"
+										  		  uri="rdf:*"/>
+										</menupopup>
+								</template>
+							</menulist>
+    					</row>
+    					<row>
+      						<label value="ZGV Ort" control="student-prestudent-textbox-zgvort"/>
+      						<textbox id="student-prestudent-textbox-zgvort" disabled="true" maxlength="64"/>
+    					</row>
+    					<row>
+      						<label value="ZGV Datum" control="student-prestudent-textbox-zgvdatum"/>
+      						<textbox id="student-prestudent-textbox-zgvdatum" disabled="true" maxlength="10"/>
+    					</row>
+    					<row>
+      						<label value="ZGV Master" control="student-prestudent-menulist-zgvmastercode"/>
+      						<menulist id="student-prestudent-menulist-zgvmastercode" disabled="true"
+							          datasources="<?php echo APP_ROOT ?>rdf/zgvmaster.rdf.php?optional=true" flex="1"
+						              ref="http://www.technikum-wien.at/zgvmaster/alle" >
+								<template>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/zgvmaster/rdf#code"
+							        		      label="rdf:http://www.technikum-wien.at/zgvmaster/rdf#kurzbz"
+										  		  uri="rdf:*"/>
+										</menupopup>
+								</template>
+							</menulist>
+    					</row>
+    					<row>
+      						<label value="ZGV Master Ort" control="student-prestudent-textbox-zgvmasterort"/>
+      						<textbox id="student-prestudent-textbox-zgvmasterort" disabled="true" maxlength="64"/>
+    					</row>
+    					<row>
+      						<label value="ZGV Master Datum" control="student-prestudent-textbox-zgvmasterdatum"/>
+      						<textbox id="student-prestudent-textbox-zgvmasterdatum" disabled="true" maxlength="10"/>
+    					</row>
+    					<row>
+      						<label value="Aufnahmeschluessel" control="student-prestudent-menulist-aufnahmeschluessel"/>
+      						<menulist id="student-prestudent-menulist-aufnahmeschluessel" disabled="true"
+							          datasources="<?php echo APP_ROOT ?>rdf/aufnahmeschluessel.rdf.php?optional=true" flex="1"
+						              ref="http://www.technikum-wien.at/aufnahmeschluessel/alle" >
+								<template>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/aufnahmeschluessel/rdf#aufnahmeschluessel"
+							        		      label="rdf:http://www.technikum-wien.at/aufnahmeschluessel/rdf#aufnahmeschluessel"
+										  		  uri="rdf:*"/>
+										</menupopup>
+								</template>
+							</menulist>
+    					</row>
+    					<row>
+      						<label value="Facheinschlaegig berufstaetig" control="student-prestudent-checkbox-facheinschlberuf"/>
+      						<checkbox id="student-prestudent-checkbox-facheinschlberuf" checked="true" disabled="true"/>
+    					</row>
+    					<row>
+      						<label value="Reihungstest" control="student-prestudent-menulist-reihungstest"/>
+      						<menulist id="student-prestudent-menulist-reihungstest" disabled="true"
+							          datasources="<?php echo APP_ROOT ?>rdf/reihungstest.rdf.php?optional=true" flex="1"
+						              ref="http://www.technikum-wien.at/reihungstest/alle" >
+								<template>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/reihungstest/rdf#reihungstest_id"
+							        		      label="rdf:http://www.technikum-wien.at/reihungstest/rdf#bezeichnung"
+										  		  uri="rdf:*"/>
+										</menupopup>
+								</template>
+							</menulist>
+    					</row>
+    					<row>
+      						<label value="Anmeldung zum Reihungstest am" control="student-prestudent-textbox-anmeldungreihungstest"/>
+      						<textbox id="student-prestudent-textbox-anmeldungreihungstest" disabled="true" maxlength="10"/>
+    					</row>
+    					<row>
+      						<label value="Zum Reihungstest angetreten" control="student-prestudent-checkbox-reihungstestangetreten"/>
+      						<checkbox id="student-prestudent-checkbox-reihungstestangetreten" checked="true" disabled="true"/>
+    					</row>
+    					<row>
+      						<label value="Reihungstestpunkte" control="student-prestudent-textbox-punkte"/>
+      						<textbox id="student-prestudent-textbox-punkte" disabled="true" maxlength="19"/>
+    					</row>
+    					<row>
+      						<label value="Bismelden" control="student-prestudent-checkbox-bismelden"/>
+      						<checkbox id="student-prestudent-checkbox-bismelden" checked="true" disabled="true"/>
     					</row>
 				</rows>
 			</grid>

@@ -334,7 +334,10 @@ function StudentDetailSave()
 	
 	if (!val.dbdml_return)
 	{
-		alert(val.dbdml_errormsg)
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
 	}
 	else
 	{
@@ -382,6 +385,7 @@ function StudentAuswahl()
 			//Student wurde markiert
 			//loeschen button aktivieren
 			StudentDetailDisableFields(false);
+			StudentPrestudentDisableFields(false);
 			document.getElementById('student-detail-button-save').disabled=false;
 		}
 		else
@@ -446,6 +450,7 @@ function StudentAuswahl()
 	semester=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#semester" ));
 	verband=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#verband" ));
 	gruppe=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#gruppe" ));
+	prestudent_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#prestudent_id" ));
 	
 	//Daten den Feldern zuweisen
 
@@ -480,4 +485,169 @@ function StudentAuswahl()
 	document.getElementById('student-detail-textbox-semester').value=semester;
 	document.getElementById('student-detail-textbox-verband').value=verband;
 	document.getElementById('student-detail-textbox-gruppe').value=gruppe;
+	
+	//PreStudent Daten holen
+	var url = '<?php echo APP_ROOT ?>rdf/prestudent.rdf.php?prestudent_id='+prestudent_id+'&'+gettimestamp();
+		
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
+                   getService(Components.interfaces.nsIRDFService);
+    
+    var dsource = rdfService.GetDataSourceBlocking(url);
+    
+	var subject = rdfService.GetResource("http://www.technikum-wien.at/prestudent/" + prestudent_id);
+
+	var predicateNS = "http://www.technikum-wien.at/prestudent/rdf";
+
+	//Daten holen
+
+	aufmerksamdurch_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aufmerksamdurch_kurzbz" ));
+	studiengang_kz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiengang_kz" ));
+	berufstaetigkeit_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#berufstaetigkeit_code" ));
+	ausbildungcode = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ausbildungcode" ));
+	zgv_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgv_code" ));
+	zgvort = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvort" ));
+	zgvdatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvdatum" ));
+	zgvmaster_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmas_code" ));
+	zgvmasterort = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmaort" ));
+	zgvmasterdatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmadatum" ));
+	aufnahmeschluessel = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aufnahmeschluessel" ));
+	facheinschlberuf = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#facheinschlberuf" ));
+	reihungstest_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#reihungstest_id" ));
+	anmeldungreihungstest = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmeldungreihungstest" ));
+	reihungstestangetreten = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#reihungstestangetreten" ));
+	punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
+	bismelden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bismelden" ));
+	
+	document.getElementById('student-prestudent-menulist-aufmerksamdurch').value=aufmerksamdurch_kurzbz;
+	document.getElementById('student-prestudent-menulist-berufstaetigkeit').value=berufstaetigkeit_code;
+	document.getElementById('student-prestudent-menulist-ausbildung').value=ausbildungcode;
+	document.getElementById('student-prestudent-menulist-zgvcode').value=zgv_code;
+	document.getElementById('student-prestudent-textbox-zgvort').value=zgvort;
+	document.getElementById('student-prestudent-textbox-zgvdatum').value=zgvdatum;
+	document.getElementById('student-prestudent-menulist-zgvmastercode').value=zgvmaster_code;
+	document.getElementById('student-prestudent-textbox-zgvmasterort').value=zgvmasterort;
+	document.getElementById('student-prestudent-textbox-zgvmasterdatum').value=zgvmasterdatum;
+	document.getElementById('student-prestudent-menulist-aufnahmeschluessel').value=aufnahmeschluessel;
+	if(facheinschlberuf=='true')
+		document.getElementById('student-prestudent-checkbox-facheinschlberuf').checked=true;
+	else
+		document.getElementById('student-prestudent-checkbox-facheinschlberuf').checked=false;
+	document.getElementById('student-prestudent-menulist-reihungstest').value=reihungstest_id;
+	document.getElementById('student-prestudent-textbox-anmeldungreihungstest').value=anmeldungreihungstest;
+	if(reihungstestangetreten=='true')
+		document.getElementById('student-prestudent-checkbox-reihungstestangetreten').checked=true;
+	else
+		document.getElementById('student-prestudent-checkbox-reihungstestangetreten').checked=false;
+	document.getElementById('student-prestudent-textbox-punkte').value=punkte;
+	
+	if(bismelden=='true')
+		document.getElementById('student-prestudent-checkbox-bismelden').checked=true;
+	else
+		document.getElementById('student-prestudent-checkbox-bismelden').checked=false;
+		
+	document.getElementById('student-prestudent-textbox-person_id').value=person_id;
+	document.getElementById('student-prestudent-textbox-prestudent_id').value=prestudent_id;
+	document.getElementById('student-prestudent-checkbox-new').checked=false;
+	document.getElementById('student-prestudent-textbox-studiengang_kz').value=studiengang_kz;
+}
+
+// ****
+// * De-/Aktiviert die Prestudent Felder
+// ****
+function StudentPrestudentDisableFields(val)
+{
+	document.getElementById('student-prestudent-menulist-aufmerksamdurch').disabled=val;
+	document.getElementById('student-prestudent-menulist-berufstaetigkeit').disabled=val;
+	document.getElementById('student-prestudent-menulist-ausbildung').disabled=val;
+	document.getElementById('student-prestudent-menulist-zgvcode').disabled=val;
+	document.getElementById('student-prestudent-textbox-zgvort').disabled=val;
+	document.getElementById('student-prestudent-textbox-zgvdatum').disabled=val;
+	document.getElementById('student-prestudent-menulist-zgvmastercode').disabled=val;
+	document.getElementById('student-prestudent-textbox-zgvmasterort').disabled=val;
+	document.getElementById('student-prestudent-textbox-zgvmasterdatum').disabled=val;
+	document.getElementById('student-prestudent-menulist-aufnahmeschluessel').disabled=val;
+	document.getElementById('student-prestudent-checkbox-facheinschlberuf').disabled=val;
+	document.getElementById('student-prestudent-menulist-reihungstest').disabled=val;
+	document.getElementById('student-prestudent-textbox-anmeldungreihungstest').disabled=val;
+	document.getElementById('student-prestudent-checkbox-reihungstestangetreten').disabled=val;
+	document.getElementById('student-prestudent-textbox-punkte').disabled=val;
+	document.getElementById('student-prestudent-checkbox-bismelden').disabled=val;
+}
+
+// ****
+// * Speichert die Prestudent Daten
+// ****
+function StudentPrestudentSave()
+{
+	aufmerksamdurch_kurzbz = document.getElementById('student-prestudent-menulist-aufmerksamdurch').value;
+	berufstaetigkeit_code = document.getElementById('student-prestudent-menulist-berufstaetigkeit').value;
+	ausbildungcode = document.getElementById('student-prestudent-menulist-ausbildung').value;
+	zgv_code = document.getElementById('student-prestudent-menulist-zgvcode').value;
+	zgvort = document.getElementById('student-prestudent-textbox-zgvort').value;
+	zgvdatum = document.getElementById('student-prestudent-textbox-zgvdatum').value;
+	zgvmaster_code = document.getElementById('student-prestudent-menulist-zgvmastercode').value;
+	zgvmasterort = document.getElementById('student-prestudent-textbox-zgvmasterort').value;
+	zgvmasterdatum = document.getElementById('student-prestudent-textbox-zgvmasterdatum').value;
+	aufnahmeschluessel = document.getElementById('student-prestudent-menulist-aufnahmeschluessel').value;
+	facheinschlberuf = document.getElementById('student-prestudent-checkbox-facheinschlberuf').checked;
+	reihungstest_id = document.getElementById('student-prestudent-menulist-reihungstest').value;
+	anmeldungreihungstest = document.getElementById('student-prestudent-textbox-anmeldungreihungstest').value;
+	reihungstestangetreten = document.getElementById('student-prestudent-checkbox-reihungstestangetreten').checked;
+	punkte = document.getElementById('student-prestudent-textbox-punkte').value;
+	bismelden = document.getElementById('student-prestudent-checkbox-bismelden').checked;
+	person_id = document.getElementById('student-prestudent-textbox-person_id').value;
+	prestudent_id = document.getElementById('student-prestudent-textbox-prestudent_id').value;
+	neu = document.getElementById('student-prestudent-checkbox-new').checked;
+	studiengang_kz = document.getElementById('student-prestudent-textbox-studiengang_kz').value;
+	
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+	
+	if (neu)
+	{
+		alert('Fehler! Es wurde versucht einen neuen Prestudenten anzulegen, dies ist aber hier nicht moeglich');
+		return false;
+	}
+	
+	req.add('type', 'saveprestudent');
+		
+	req.add('aufmerksamdurch_kurzbz', aufmerksamdurch_kurzbz);
+	req.add('berufstaetigkeit_code', berufstaetigkeit_code);
+	req.add('ausbildungcode', ausbildungcode);
+	req.add('zgv_code', zgv_code);
+	req.add('zgvort', zgvort);
+	req.add('zgvdatum', zgvdatum);
+	req.add('zgvmas_code', zgvmaster_code);
+	req.add('zgvmaort', zgvmasterort);
+	req.add('zgvmadatum', zgvmasterdatum);
+	req.add('aufnahmeschluessel', aufnahmeschluessel);
+	req.add('facheinschlberuf', facheinschlberuf);
+	req.add('reihungstest_id', reihungstest_id);
+	req.add('anmeldungreihungstest', anmeldungreihungstest);
+	req.add('reihungstestangetreten', reihungstestangetreten);
+	req.add('punkte', punkte);
+	req.add('bismelden', bismelden);
+	req.add('person_id', person_id);
+	req.add('prestudent_id', prestudent_id);
+	req.add('studiengang_kz', studiengang_kz);
+		
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+	
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+	}
+	else
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+				
+		StudentSelectUid=val.dbdml_data;
+		StudentTreeDatasource.Refresh(false); //non blocking
+		SetStatusBarText('Daten wurden gespeichert');
+	}
 }
