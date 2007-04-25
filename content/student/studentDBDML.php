@@ -36,6 +36,7 @@ require_once('../../include/log.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/student.class.php');
+require_once('../../include/prestudent.class.php');
 
 $user = get_uid();
 
@@ -103,8 +104,8 @@ if(!$error)
 				$student->matrikelnr = $_POST['matrikelnummer'];
 				$student->studiengang_kz = $_POST['studiengang_kz'];
 				$student->semester = $_POST['semester'];
-				$student->verband = $_POST['verband'];
-				$student->gruppe = $_POST['gruppe'];
+				$student->verband = ($_POST['verband']==''?' ':$_POST['verband']);
+				$student->gruppe = ($_POST['gruppe']==''?' ':$_POST['gruppe']);
 				
 				$student->new=false;				
 
@@ -120,6 +121,66 @@ if(!$error)
 					{
 						$return = false;
 						$errormsg  = $student->errormsg;
+						$error = true;
+					}
+				}
+			}
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='saveprestudent')
+	{
+		//Studentendaten Speichern
+
+		if(!$error)
+		{
+			$prestudent = new prestudent($conn, null, true);
+			
+			if(!$prestudent->load($_POST['prestudent_id']))
+			{
+				$return = false;
+				$errormsg = 'Fehler beim laden:'.$prestudent->errormsg;
+				$error = true;
+			}
+			
+			if(!$error)
+			{
+				$prestudent->prestudent_id = $_POST['prestudent_id'];
+				$prestudent->aufmerksamdurch_kurzbz = $_POST['aufmerksamdurch_kurzbz'];
+				$prestudent->person_id = $_POST['person_id'];
+				$prestudent->studiengang_kz = $_POST['studiengang_kz'];
+				$prestudent->berufstaetigkeit_code = $_POST['berufstaetigkeit_code'];
+				$prestudent->ausbildungcode = $_POST['ausbildungcode'];
+				$presutdent->zgv_code = $_POST['zgv_code'];
+				$presutdent->zgvort = $_POST['zgvort'];
+				$prestudent->zgvdatum = $_POST['zgvdatum'];
+				$prestudent->zgvmas_code = $_POST['zgvmas_code'];
+				$prestudent->zgvmaort = $_POST['zgvmaort'];
+				$prestudent->zgvmadatum = $_POST['zgvmadatum'];
+				$prestudent->aufnahmeschluessel = $_POST['aufnahmeschluessel'];
+				$prestudent->facheinschlberuf = ($_POST['facheinschlberuf']=='true'?true:false);
+				$prestudent->reihungstest_id = $_POST['reihungstest_id'];
+				$prestudent->anmeldungreihungstest = $_POST['anmeldungreihungstest'];
+				$prestudent->reihungstestangetreten = ($_POST['reihungstestangetreten']=='true'?true:false);
+				$prestudent->punkte = $_POST['punkte'];
+				$prestudent->bismelden = ($_POST['bismelden']=='true'?true:false);
+				//$prestudent->insertamum = date('Y-m-d H:i:s');
+				//$prestudent->insertvon = $user;
+				$prestudent->updateamum = date('Y-m-d H:i:s');
+				$prestudent->updatevon = $user;				
+				$prestudent->new=false;	
+				
+				if(!$error)
+				{
+					if($prestudent->save())
+					{
+						$return = true;
+						$error=false;
+						$data = $prestudent->prestudent_id;
+					}
+					else
+					{
+						$return = false;
+						$errormsg  = $prestudent->errormsg;
 						$error = true;
 					}
 				}

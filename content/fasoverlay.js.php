@@ -218,6 +218,7 @@ function onVerbandSelect(event)
 		treeStudent.builder.addListener(StudentTreeListener);
 		StudentDetailReset();
 		StudentDetailDisableFields(true);
+		StudentPrestudentDisableFields(true);
 	}
 	catch(e)
 	{

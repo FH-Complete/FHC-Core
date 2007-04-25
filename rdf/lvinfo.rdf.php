@@ -29,7 +29,7 @@ header("Content-type: application/vnd.mozilla.xul+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../cis/config.inc.php');
 
 // Datenbank Verbindung
 if (!$conn = pg_pconnect(CONN_STRING))

@@ -16,7 +16,7 @@ require_once('../vilesci/config.inc.php');
 if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
-$rdf_url='http://www.technikum-wien.at/berufstaetigkeit';
+$rdf_url='http://www.technikum-wien.at/ausbildung';
 
 ?>
 
@@ -31,27 +31,27 @@ $rdf_url='http://www.technikum-wien.at/berufstaetigkeit';
 <?php
 if(isset($_GET['optional']) && $_GET['optional']=='true')
 {
-echo '	
+	echo '
 	  <RDF:li>
-      	<RDF:Description  id=""  about="'.$rdf_url.'/'.'" >
+      	<RDF:Description  id=""  about="'.$rdf_url.'/" >
         	<BT:code></BT:code>
         	<BT:bezeichnung>-- keine Auswahl --</BT:bezeichnung>
-        	<BT:kurzbz>-- keine Auswahl --</BT:kurzbz>
+        	<BT:beschreibung>-- keine Auswahl --</BT:beschreibung>
       	</RDF:Description>
-      </RDF:li>
+      </RDF:li>	
 ';
 }
-$qry = "SET CLIENT_ENCODING to 'UNICODE'; SELECT * FROM bis.tbl_berufstaetigkeit ORDER BY berufstaetigkeit_bez";
+$qry = "SET CLIENT_ENCODING to 'UNICODE'; SELECT * FROM bis.tbl_ausbildung ORDER BY ausbildungbez";
 if($result = pg_query($conn, $qry))
 {
 	while($row = pg_fetch_object($result))
 	{
 ?>
 	  <RDF:li>
-      	<RDF:Description  id="<?php echo $row->berufstaetigkeit_code; ?>"  about="<?php echo $rdf_url.'/'.$row->berufstaetigkeit_code; ?>" >
-        	<BT:code><![CDATA[<?php echo $row->berufstaetigkeit_code;  ?>]]></BT:code>
-        	<BT:bezeichnung><![CDATA[<?php echo $row->berufstaetigkeit_bez; ?>]]></BT:bezeichnung>
-        	<BT:kurzbz><![CDATA[<?php echo $row->berufstaetigkeit_kurzbz; ?>]]></BT:kurzbz>
+      	<RDF:Description  id="<?php echo $row->ausbildungcode; ?>"  about="<?php echo $rdf_url.'/'.$row->ausbildungcode; ?>" >
+        	<BT:code><![CDATA[<?php echo $row->ausbildungcode;  ?>]]></BT:code>
+        	<BT:bezeichnung><![CDATA[<?php echo $row->ausbildungbez; ?>]]></BT:bezeichnung>
+        	<BT:beschreibung><![CDATA[<?php echo $row->ausbildungbeschreibung; ?>]]></BT:beschreibung>
       	</RDF:Description>
       </RDF:li>
 <?php

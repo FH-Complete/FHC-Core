@@ -30,6 +30,7 @@ class reihungstest
 	var $new;       // @var boolean
 	var $errormsg;  // @var string
 	var $done=false;	// @var boolean
+	var $result = array();
 	
 	//Tabellenspalten
 	Var $reihungstest_id;	// @var integer
@@ -52,18 +53,21 @@ class reihungstest
 	function reihungstest($conn,$reihungstest_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		if ($unicode)
+		if($unicode!=null)
 		{
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		}
-		else 
-		{
-			$qry="SET CLIENT_ENCODING TO 'LATIN9';";
-		}
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-			return false;
+			if ($unicode)
+			{
+				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			}
+			else 
+			{
+				$qry="SET CLIENT_ENCODING TO 'LATIN9';";
+			}
+			if(!pg_query($conn,$qry))
+			{
+				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
+				return false;
+			}
 		}
 	}
 	
@@ -75,6 +79,38 @@ class reihungstest
 	function load($reihungstest_id)
 	{
 		//noch nicht implementiert
+	}
+	
+	function getAll()
+	{
+		$qry = "SELECT * FROM public.tbl_reihungstest ORDER BY studiengang_kz, datum, uhrzeit";
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$obj = new reihungstest($this->conn, null, null);
+				
+				$obj->reihungstest_id = $row->reihungstest_id;
+				$obj->studiengang_kz = $row->studiengang_kz;
+				$obj->ort_kurzbz = $row->ort_kurzbz;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->datum = $row->datum;
+				$obj->uhrzeit = $row->uhrzeit;
+				$obj->ext_id = $row->ext_id;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Reihungstests';
+			return false;
+		}
 	}
 	
 	// ************************************************

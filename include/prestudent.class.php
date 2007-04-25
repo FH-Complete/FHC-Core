@@ -38,6 +38,7 @@ class prestudent extends person
 	var $facheinschlberuf;
 	var $anmeldungreihungstest;
 	var $reihungstestangetreten;
+	var $reihungstest_id;
 	var $punkte;
 	var $bismelden;
 	
@@ -52,7 +53,7 @@ class prestudent extends person
 	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
-	function benutzer($conn, $prestudent_id=null, $unicode=false)
+	function prestudent($conn, $prestudent_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
 		
@@ -94,11 +95,14 @@ class prestudent extends person
 				$this->zgvmaort = $row->zgvmaort;
 				$this->zgvmadatum = $row->zgvmadatum;
 				$this->aufnahmeschluessel = $row->aufnahmeschluessel;
-				$this->facheinschlberuf = $row->facheinschlberuf;
+				$this->facheinschlberuf = ($row->facheinschlberuf=='t'?true:false);
 				$this->anmeldungreihungstest = $row->anmeldungreihungstest;
-				$this->reihungstestangetreten = $row->reihungstestangetreten;
+				$this->reihungstestangetreten = ($row->reihungstestangetreten=='t'?true:false);
+				$this->reihungstest_id = $row->reihungstest_id;
 				$this->punkte = $row->punkte;
-				$this->bismelden = $row->bismelden;
+				$this->bismelden = ($row->bismelden=='t'?true:false);
+				$this->person_id = $row->person_id;
+				
 				if(!person::load($row->person_id))
 					return false;
 				else 
@@ -124,31 +128,6 @@ class prestudent extends person
 	// *******************************************
 	function validate()
 	{
-		if(strlen($this->uid)>16)
-		{
-			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein';
-			return false;
-		}
-		if($this->uid == '')
-		{
-			$this->errormsg = 'UID muss eingegeben werden '.$this->uid;
-			return false;
-		}
-		if(strlen($this->alias)>256)
-		{
-			$this->errormsg = 'Alias darf nicht laenger als 256 Zeichen sein';
-			return false;
-		}
-		if(!is_numeric($this->person_id))
-		{
-			$this->errormsg = 'person_id muss eine gueltige Zahl sein';
-			return false;
-		}
-		if(!is_bool($this->aktiv))
-		{
-			$this->errormsg = 'aktiv muss ein boolscher wert sein';
-			return false;
-		}
 		return true;
 	}
 	
@@ -161,34 +140,65 @@ class prestudent extends person
 	function save()
 	{
 		//Personen Datensatz speichern
-		if(!person::save())
-			return false;
+		//if(!person::save())
+		//	return false;
 			
 		//Variablen auf Gueltigkeit pruefen
-		if(!benutzer::validate())
+		if(!prestudent::validate())
 			return false;
 		
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = 'INSERT INTO public.tbl_benutzer (uid, aktiv, alias, person_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
-			       "'".addslashes($this->uid)."',".
-			       ($this->aktiv?'true':'false').','.
-			       $this->addslashes($this->alias).",'".
-			       $this->person_id."',".
+			$qry = 'INSERT INTO public.tbl_prestudent (aufmerksamdurch_kurzbz, person_id, studiengang_kz, berufstaetigkeit_code, ausbildungcode, zgv_code, zgvort, zgvdatum, zgvmas_code, zgvmaort, zgvmadatum, aufnahmeschluessel, facheinschlberuf, reihungstest_id, anmeldungreihungstest, reihungstestangetreten, punkte, bismelden, insertamum, insertvon, updateamum, updatevon, ext_id) VALUES('.
+			       $this->addslashes($this->aufmerksamdurch_kurzbz).",".
+			       $this->addslashes($this->person_id).",".
+			       $this->addslashes($this->studiengang_kz).",".
+			       $this->addslashes($this->berufstaetigkeit_code).",".
+			       $this->addslashes($this->ausbildungcode).",".
+			       $this->addslashes($this->zgv_code).",".
+			       $this->addslashes($this->zgvort).",".
+			       $this->addslashes($this->zgvdatum).",".
+			       $this->addslashes($this->zgvmas_code).",".
+			       $this->addslashes($this->zgvmaort).",".
+			       $this->addslashes($this->zgvmadatum).",".
+			       $this->addslashes($this->aufnahmeschluessel).",".
+			       ($this->facheinschlberuf?'true':'false').",".
+			       $this->addslashes($this->reihungstest_id).",".
+			       $this->addslashes($this->anmeldungreihungstest).",".
+			       ($this->reihungstestangetreten?'true':'false').",".
+			       $this->addslashes($this->punkte).",".
+			       ($this->bismelden?'true':'false').",".
 			       $this->addslashes($this->insertamum).",".
 			       $this->addslashes($this->insertvon).",".
 			       $this->addslashes($this->updateamum).",".
-			       $this->addslashes($this->updatevon).");";
+			       $this->addslashes($this->updatevon).",".
+			       $this->addslashes($this->ext_id).");";
 		}
 		else
 		{			
-			$qry = 'UPDATE public.tbl_benutzer SET'.
-			       ' aktiv='.($this->aktiv?'true':'false').','.
-			       ' alias='.$this->addslashes($this->alias).','.
-			       " person_id='".$this->person_id."',".
-			       ' updateamum='.$this->addslashes($this->updateamum).','.
-			       ' updatevon='.$this->addslashes($this->updatevon).
-			       " WHERE uid='".addslashes($this->uid)."';";
+			$qry = 'UPDATE public.tbl_prestudent SET'.
+			       ' aufmerksamdurch_kurzbz='.$this->addslashes($this->aufmerksamdurch_kurzbz).",".
+			       ' person_id='.$this->addslashes($this->person_id).",".
+			       ' studiengang_kz='.$this->addslashes($this->studiengang_kz).",".
+			       ' berufstaetigkeit_code='.$this->addslashes($this->berufstaetigkeit_code).",".
+			       ' ausbildungcode='.$this->addslashes($this->ausbildungcode).",".
+			       ' zgv_code='.$this->addslashes($this->zgv_code).",".
+			       ' zgvort='.$this->addslashes($this->zgvort).",".
+			       ' zgvdatum='.$this->addslashes($this->zgvdatum).",".
+			       ' zgvmas_code='.$this->addslashes($this->zgvmas_code).",".
+			       ' zgvmaort='.$this->addslashes($this->zgvmaort).",".
+			       ' zgvmadatum='.$this->addslashes($this->zgvmadatum).",".
+			       ' aufnahmeschluessel='.$this->addslashes($this->aufnahmeschluessel).",".
+			       ' facheinschlberuf='.($this->facheinschlberuf?'true':'false').",".
+			       ' reihungstest_id='.$this->addslashes($this->reihungstest_id).",".
+			       ' anmeldungreihungstest='.$this->addslashes($this->anmeldungreihungstest).",".
+			       ' reihungstestangetreten='.($this->reihungstestangetreten?'true':'false').",".
+			       ' punkte='.$this->addslashes($this->punkte).",".
+			       ' bismelden='.($this->bismelden?'true':'false').",".
+			       ' updateamum='.$this->addslashes($this->updateamum).",".
+			       ' updatevon='.$this->addslashes($this->updatevon).",".
+			       ' ext_id='.$this->addslashes($this->ext_id).
+			       " WHERE prestudent_id='".addslashes($this->prestudent_id)."';";
 		}
 		
 		if(pg_query($this->conn,$qry))
@@ -198,7 +208,7 @@ class prestudent extends person
 		}
 		else 
 		{	
-			$this->errormsg = 'Fehler beim Speichern des Benutzer-Datensatzes:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern des Prestudent-Datensatzes:'.$qry;
 			return false;
 		}
 	}
