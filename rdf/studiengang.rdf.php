@@ -11,12 +11,12 @@ header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
-header("Content-type: application/vnd.mozilla.xul+xml");
+header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
 // DAO
-include('../vilesci/config.inc.php');
-include_once('../include/studiengang.class.php');
+require_once('../vilesci/config.inc.php');
+require_once('../include/studiengang.class.php');
 
 // Datenbank Verbindung
 if (!$conn = @pg_pconnect(CONN_STRING))
@@ -24,9 +24,9 @@ if (!$conn = @pg_pconnect(CONN_STRING))
 
 // raumtypen holen
 $studiengangDAO=new studiengang($conn);
-$studiengaenge=$studiengangDAO->getAll();
+$studiengangDAO->getAll('typ, kurzbz');
 
-$rdf_url='http://www.technikum-wien.at/tempus/studiengang';
+$rdf_url='http://www.technikum-wien.at/studiengang';
 
 ?>
 
@@ -38,10 +38,8 @@ $rdf_url='http://www.technikum-wien.at/tempus/studiengang';
   <RDF:Seq about="<?php echo $rdf_url ?>/liste">
 
 <?php
-if (is_array($studiengaenge)) {
-
-	foreach ($studiengaenge as $sg)
-	{
+foreach ($studiengangDAO->result as $sg)
+{
 	?>
   <RDF:li>
       	<RDF:Description  id="<?php echo $sg->studiengang_kz; ?>"  about="<?php echo $rdf_url.'/'.$sg->studiengang_kz; ?>" >
@@ -53,11 +51,10 @@ if (is_array($studiengaenge)) {
 			<STUDIENGANG:typ><?php echo $sg->typ  ?></STUDIENGANG:typ>
 			<STUDIENGANG:farbe><?php echo $sg->farbe  ?></STUDIENGANG:farbe>
 			<STUDIENGANG:email><?php echo $sg->email  ?></STUDIENGANG:email>
+			<STUDIENGANG:kuerzel><?php echo $sg->kuerzel  ?></STUDIENGANG:kuerzel>
       	</RDF:Description>
   </RDF:li>
 	  <?php
-	}
-
 }
 ?>
 

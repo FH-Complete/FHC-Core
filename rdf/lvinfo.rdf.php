@@ -62,14 +62,16 @@ $qry = "SET CLIENT_ENCODING to 'UNICODE';
 SELECT 
 tbl_lehrveranstaltung.lehrveranstaltung_id as lv_lehrveranstaltung_id, 
 tbl_lehrveranstaltung.kurzbz as lv_kurzbz,
+tbl_lehrveranstaltung.lehreverzeichnis as lv_lehrevz,
 tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung,
 tbl_lehrveranstaltung.studiengang_kz as lv_studiengang_kz,
 tbl_lehrveranstaltung.semester as lv_semester,
 tbl_lehrveranstaltung.sprache as unterrichtssprache,
 tbl_lehrveranstaltung.ects as ects,
 tbl_lehrveranstaltung.semesterstunden as lv_semesterstunden,
+lower(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg_kuerzel,
 tbl_lvinfo.*
-FROM lehre.tbl_lehrveranstaltung JOIN campus.tbl_lvinfo USING(lehrveranstaltung_id) 
+FROM (lehre.tbl_lehrveranstaltung JOIN campus.tbl_lvinfo USING(lehrveranstaltung_id)) JOIN public.tbl_studiengang USING(studiengang_kz)
 WHERE 
 tbl_lehrveranstaltung.aktiv=true AND
 tbl_lehrveranstaltung.lehre=true AND
@@ -94,6 +96,7 @@ if($result = pg_query($conn, $qry))
 			<LVINFO:bezeichnung><![CDATA[<?php echo $row->lv_bezeichnung; ?>]]></LVINFO:bezeichnung>
 			<LVINFO:studiengang_kz><![CDATA[<?php echo $row->lv_studiengang_kz; ?>]]></LVINFO:studiengang_kz>
 			<LVINFO:semester><![CDATA[<?php echo $row->lv_semester; ?>]]></LVINFO:semester>
+			<LVINFO:lehreverzeichnis>cis.technikum-wien.at/documents/<?php echo $row->stg_kuerzel.'/'.$row->lv_semester.'/'.$row->lv_lehrevz;?></LVINFO:lehreverzeichnis>
 			<LVINFO:unterrichtssprache><![CDATA[<?php echo $row->unterrichtssprache; ?>]]></LVINFO:unterrichtssprache>
 			<LVINFO:ects><![CDATA[<?php echo $row->ects; ?>]]></LVINFO:ects>
 			<LVINFO:semesterstunden><![CDATA[<?php echo $row->lv_semesterstunden; ?>]]></LVINFO:semesterstunden>
