@@ -549,6 +549,23 @@ function StudentAuswahl()
 	document.getElementById('student-prestudent-textbox-prestudent_id').value=prestudent_id;
 	document.getElementById('student-prestudent-checkbox-new').checked=false;
 	document.getElementById('student-prestudent-textbox-studiengang_kz').value=studiengang_kz;
+	
+	
+	rollentree = document.getElementById('student-prestudent-tree-rolle');
+	url='<?php echo APP_ROOT;?>rdf/prestudentrolle.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
+	
+	//Alte DS entfernen
+	var oldDatasources = rollentree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		rollentree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	rollentree.builder.rebuild();
+	
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var datasource = rdfService.GetDataSource(url);
+	rollentree.database.AddDataSource(datasource);
 }
 
 // ****
