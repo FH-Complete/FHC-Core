@@ -42,6 +42,15 @@ class prestudent extends person
 	var $punkte;
 	var $bismelden;
 	
+	var $rolle_kurzbz;
+	var $studiensemester_kurzbz;
+	var $ausbildungssemester;
+	var $datum;
+	var $insertamum;
+	var $insertvon;
+	var $updateamum;
+	var $updatevon;
+	
 	// ErgebnisArray
 	var $result=array();
 	var $num_rows=0;
@@ -57,15 +66,18 @@ class prestudent extends person
 	{
 		$this->conn = $conn;
 		
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
-		if(!pg_query($conn,$qry))
+		if($unicode!=null)
 		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
+			if($unicode)
+				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			else 
+				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+				
+			if(!pg_query($conn,$qry))
+			{
+				$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
+				return false;
+			}
 		}
 		
 		if($prestudent_id != null)
@@ -292,6 +304,51 @@ class prestudent extends person
 			$this->num_rows++; 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	
 		}	
 		
+	}
+	
+	// ********
+	// * Laedt die Rolle(n) eines Prestudenten
+	// ********
+	function getPrestudentRolle($prestudent_id, $rolle_kurzbz=null, $studiensemester_kurzbz=null)
+	{
+		if(!is_numeric($prestudent_id))
+		{
+			$this->errormsg = 'Prestudent_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='$prestudent_id'";	
+		if($rolle_kurzbz!=null)
+			$qry.= " AND rolle_kurzbz='".addslashes($rolle_kurzbz)."'";
+		if($studiensemester_kurzbz!=null)
+			$qry.= " AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+		$qry.= " ORDER BY datum, insertamum";
+
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$rolle = new prestudent($this->conn, null, null);
+				
+				$rolle->prestudent_id = $row->prestudent_id;
+				$rolle->rolle_kurzbz = $row->rolle_kurzbz;
+				$rolle->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$rolle->ausbildungssemester = $row->ausbildungssemester;
+				$rolle->datum = $row->datum;
+				$rolle->insertamum = $row->insertamum;
+				$rolle->insertvon = $row->insertvon;
+				$rolle->updateamum = $row->updateamum;
+				$rolle->updatevon = $row->updatevon;
+				
+				$this->result[] = $rolle;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden der PrestudentDaten';
+			return false;
+		}
 	}
 }
 ?>

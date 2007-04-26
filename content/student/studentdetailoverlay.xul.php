@@ -335,7 +335,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<template>
 									<menupopup>
 										<menuitem value="rdf:http://www.technikum-wien.at/aufnahmeschluessel/rdf#aufnahmeschluessel"
-							        		      label="rdf:http://www.technikum-wien.at/aufnahmeschluessel/rdf#aufnahmeschluessel"
+							        		      label="rdf:http://www.technikum-wien.at/aufnahmeschluessel/rdf#bezeichnung"
 										  		  uri="rdf:*"/>
 										</menupopup>
 								</template>
@@ -374,6 +374,45 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     					<row>
       						<label value="Bismelden" control="student-prestudent-checkbox-bismelden"/>
       						<checkbox id="student-prestudent-checkbox-bismelden" checked="true" disabled="true"/>
+    					</row>
+    					<row>
+    						<label value="Rollen" control="student-prestudent-tree-rolle"/>
+    						<tree id="student-prestudent-tree-rolle" seltype="single" hidecolumnpicker="false" flex="1"
+									datasources="rdf:null" ref="http://www.technikum-wien.at/prestudentrolle/liste"
+									style="margin:0px;" enableColumnDrag="true" height="100px"
+							>
+								<treecols>
+									<treecol id="student-prestudent-tree-rolle-rolle_kurzbz" label="Kurzbz" flex="2" hidden="false" primary="true"
+										class="sortDirectionIndicator"
+										sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#rolle_kurzbz"/>
+									<splitter class="tree-splitter"/>
+									<treecol id="student-prestudent-tree-rolle-studiensemester_kurzbz" label="StSem" flex="5" hidden="false"
+									   class="sortDirectionIndicator"
+										sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studiensemester_kurzbz"/>
+									<splitter class="tree-splitter"/>
+									<treecol id="student-prestudent-tree-rolle-ausbildungssemester" label="Semester" flex="2" hidden="false"
+										class="sortDirectionIndicator"
+										sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#ausbildungssemester" />
+									<splitter class="tree-splitter"/>
+									<treecol id="student-prestudent-tree-rolle-datum" label="Datum" flex="2" hidden="false"
+										class="sortDirectionIndicator"
+										sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#datum" />									
+									<splitter class="tree-splitter"/>
+								</treecols>
+					
+								<template>
+									<treechildren flex="1" >
+					   					<treeitem uri="rdf:*">
+											<treerow>
+												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#rolle_kurzbz"/>
+												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studiensemester_kurzbz"/>
+												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#ausbildungssemester"/>
+												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#datum"/>
+											</treerow>
+										</treeitem>
+									</treechildren>
+								</template>
+							</tree>
     					</row>
 				</rows>
 			</grid>

@@ -25,7 +25,7 @@ header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
-header("Content-type: application/vnd.mozilla.xul+xml");
+header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
@@ -53,7 +53,8 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
 	echo '
 	  <RDF:li>
       	<RDF:Description  id=""  about="'.$rdf_url.'/" >
-        	<AS:aufnahmeschluessel>-- keine Auswahl --</AS:aufnahmeschluessel>
+        	<AS:aufnahmeschluessel></AS:aufnahmeschluessel>
+        	<AS:bezeichnung>-- keine Auswahl --</AS:bezeichnung>
       	</RDF:Description>
       </RDF:li>
 ';
@@ -67,6 +68,7 @@ if($result = pg_query($conn, $qry))
 	  <RDF:li>
       	<RDF:Description  id="<?php echo $row->aufnahmeschluessel; ?>"  about="<?php echo $rdf_url.'/'.$row->aufnahmeschluessel; ?>" >
         	<AS:aufnahmeschluessel><![CDATA[<?php echo $row->aufnahmeschluessel;  ?>]]></AS:aufnahmeschluessel>
+        	<AS:bezeichnung><![CDATA[<?php echo $row->aufnahmeschluessel;  ?>]]></AS:bezeichnung>
       	</RDF:Description>
       </RDF:li>
 <?php
