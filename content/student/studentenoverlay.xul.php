@@ -43,7 +43,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentdetailoverlay.xul.p
 			<!-- *************** -->
 			<!-- *  Studenten  * -->
 			<!-- *************** -->
-			<vbox id="studentenEditor">
+			<vbox id="studentenEditor" persist="height">
 				<hbox>
 					<toolbox flex="1">
 						<toolbar id="nav-toolbar">
@@ -65,7 +65,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentdetailoverlay.xul.p
 						flags="dont-build-content"
 						enableColumnDrag="true"
 						style="margin:0px;"
-						persist="hidden"
+						persist="hidden, height"
 				>
 					<treecols>
 	    				<treecol id="student-treecol-uid" label="UID" flex="1" primary="false"
@@ -158,7 +158,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentdetailoverlay.xul.p
 				<!-- ************ -->
 				<!-- *  Detail  * -->
 				<!-- ************ -->
-				<vbox flex="1"  style="overflow:auto;margin:0px;">
+				<vbox flex="1"  style="overflow:auto;margin:0px;" persist="height">
 					<tabbox id="student-tabbox" flex="3" orient="vertical">
 						<tabs orient="horizontal" id="lehrveranstaltung-tabs">
 							<tab id="student-tab-detail" label="Details" />

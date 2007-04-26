@@ -247,7 +247,7 @@ function StudentDetailDisableFields(val)
 	document.getElementById('student-detail-menulist-sprache').disabled=val;
 	document.getElementById('student-detail-textbox-matrikelnummer').disabled=val;
 	document.getElementById('student-detail-button-image-upload').disabled=val;
-	document.getElementById('student-detail-textbox-studiengang_kz').disabled=val;
+	document.getElementById('student-detail-menulist-studiengang_kz').disabled=val;
 	document.getElementById('student-detail-textbox-semester').disabled=val;
 	document.getElementById('student-detail-textbox-verband').disabled=val;
 	document.getElementById('student-detail-textbox-gruppe').disabled=val;
@@ -281,7 +281,7 @@ function StudentDetailSave()
 	geburtsnation = document.getElementById('student-detail-menulist-geburtsnation').value;
 	sprache = document.getElementById('student-detail-menulist-sprache').value;
 	matrikelnummer = document.getElementById('student-detail-textbox-matrikelnummer').value;
-	studiengang_kz = document.getElementById('student-detail-textbox-studiengang_kz').value;
+	studiengang_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 	semester = document.getElementById('student-detail-textbox-semester').value;
 	verband = document.getElementById('student-detail-textbox-verband').value;
 	gruppe = document.getElementById('student-detail-textbox-gruppe').value;
@@ -481,7 +481,7 @@ function StudentAuswahl()
 	document.getElementById('student-detail-textbox-matrikelnummer').value=matrikelnummer;
 	document.getElementById('student-detail-image').src='<?php echo APP_ROOT?>content/bild.php?src=person&person_id='+person_id+'&'+gettimestamp();
 	document.getElementById('student-detail-textbox-person_id').value=person_id;
-	document.getElementById('student-detail-textbox-studiengang_kz').value=studiengang_kz;
+	document.getElementById('student-detail-menulist-studiengang_kz').value=studiengang_kz;
 	document.getElementById('student-detail-textbox-semester').value=semester;
 	document.getElementById('student-detail-textbox-verband').value=verband;
 	document.getElementById('student-detail-textbox-gruppe').value=gruppe;
@@ -589,6 +589,8 @@ function StudentPrestudentDisableFields(val)
 	document.getElementById('student-prestudent-checkbox-reihungstestangetreten').disabled=val;
 	document.getElementById('student-prestudent-textbox-punkte').disabled=val;
 	document.getElementById('student-prestudent-checkbox-bismelden').disabled=val;
+	document.getElementById('student-prestudent-button-anmeldungreihungstest-heute').disabled=val;
+	document.getElementById('student-prestudent-button-save').disabled=val;
 }
 
 // ****
@@ -667,4 +669,17 @@ function StudentPrestudentSave()
 		StudentTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 	}
+}
+
+function StudentAnmeldungreihungstestHeute()
+{
+	var now = new Date();
+	var jahr = now.getFullYear();
+	
+	monat = now.getMonth();
+	if(monat<10) monat='0'+monat;
+	tag = now.getDate();
+	if(tag<10) tag='0'+tag;
+	
+	document.getElementById('student-prestudent-textbox-anmeldungreihungstest').value=jahr+'-'+monat+'-'+tag;
 }
