@@ -27,14 +27,27 @@ $error_log='';
 $error_log_fas='';
 $text = '';
 $anzahl_quelle=0;
-$anzahl_eingefuegt=0;
 $anzahl_fehler=0;
-$anzahl_quelle2=0;
-$anzahl_eingefuegt2=0;
-$anzahl_fehler2=0;
+$anzahl_fehler_le=0;
+$anzahl_fehler_pa=0;
+$anzahl_fehler_pbb=0;
+$anzahl_fehler_pbg=0;
+$anzahl_le_gesamt=0;
+$anzahl_le_insert=0;
+$anzahl_le_update=0;
+$anzahl_pa_gesamt=0;
+$anzahl_pa_insert=0;
+$anzahl_pa_update=0;
+$anzahl_pbb_gesamt=0;
+$anzahl_pbb_insert=0;
+$anzahl_pbb_update=0;
+$anzahl_pbg_gesamt=0;
+$anzahl_pbg_insert=0;
+$anzahl_pbg_update=0;
 $fachbereich_kurzbz='';
 $ausgabe='';
 $ausgabe_all='';
+$text1='';
 
 function myaddslashes($var)
 {
@@ -54,7 +67,7 @@ function myaddslashes($var)
 <body>
 <?php
 //nation
-$qry_mail = "SELECT * FROM bakkalaureatsarbeit;";
+$qry_main = "SELECT * FROM bakkalaureatsarbeit;";
 
 if($result = pg_query($conn_fas, $qry_main))
 {
@@ -97,7 +110,7 @@ if($result = pg_query($conn_fas, $qry_main))
 		$lehreinheitstart_kw				='';
 		$lehreinheitraumtyp				='DIV';
 		$lehreinheitraumtypalternativ		='DIV';
-		$lehreinheitsprache				=$row->englisch==true?'english':'german';
+		$lehreinheitsprache				=$row->englisch==true?'English':'German';
 		$lehreinheitlehre				=false;
 		$lehreinheitanmerkung			='Bachelorarbeit';
 		$lehreinheitunr				='';
@@ -111,6 +124,8 @@ if($result = pg_query($conn_fas, $qry_main))
 		$studiengang_kz='';
 		$semester='';
 		$lva='';
+		$text1='';
+		
 		
 		//student_id ermitteln
 		$qry="SELECT student_uid FROM public.tbl_student WHERE ext_id='".$row->student_fk."';";
@@ -184,7 +199,7 @@ if($result = pg_query($conn_fas, $qry_main))
 					else 
 					{
 						$error=true;
-						$error_log.="Lehrfach mit Fachbereich='".$fachbereich_kurzbz."', Semester='".$semester."' und Studiengang='".$studiengang."' nicht gefunden.\n";
+						$error_log.="Lehrfach mit Fachbereich='".$fachbereich_kurzbz."', Semester='".$semester."' und Studiengang='".$studiengang_kz."' nicht gefunden.\n";
 					}
 				}
 				$qry="SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ext_id='$row->studiensemester_fk'";
@@ -482,7 +497,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									$error=true;
 									$error_log.="Lehreinheit-Sequence konnte nicht ausgelesen werden.\n";
 								}
-								$ausgabe.="Lehreinheit angelegt: Lehrveranstaltung='".$lehreinheitlehrveranstaltung_id."', Studiensemester='".$lehreinheit->studiensemester_kz."' und Lehrfach='".$lehreinheitlehrfach_id."'.\n";
+								$ausgabe.="Lehreinheit angelegt: Lehrveranstaltung='".$lehreinheitlehrveranstaltung_id."', Studiensemester='".$lehreinheitstudiensemester_kurzbz."' und Lehrfach='".$lehreinheitlehrfach_id."'.\n";
 							}
 							else 
 							{
@@ -493,6 +508,7 @@ if($result = pg_query($conn_fas, $qry_main))
 						if(!$error)
 						{
 							//pa anlegen
+							if($projektarbeitnote=='0') $projektarbeitnote='9';
 							if($projektarbeitnew)
 							{
 								//Neuen Datensatz einfuegen
@@ -757,11 +773,19 @@ if($result = pg_query($conn_fas, $qry_main))
 								}
 							}
 							//echo $qry;
-							if(pg_query($this->conn,$qry))
+							if(pg_query($conn,$qry))
 							{
 								$ausgabe_pa='';
 								if($projektarbeitnew)
 								{
+									$qry = "SELECT currval('lehre.tbl_projektarbeit_projektarbeit_id_seq') AS id;";
+									if($rowu=pg_fetch_object(pg_query($conn,$qry)))
+										$projektarbeitprojektarbeit_id=$rowu->id;
+									else
+									{					
+										$error=true;
+										$error_log.="Projektarbeit-Sequence konnte nicht ausgelesen werden.\n";
+									}
 									$anzahl_pa_insert++;
 								}			
 								else 
@@ -800,7 +824,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								$projektbetreuerprojektarbeit_id		=$projektarbeitprojektarbeit_id;
 								$projektbetreuernote			='';
 								$projektbetreuerbetreuerart		='b';  //b=Bachelorarbeitsbetreuer
-								$projektbetreuerfaktor			='1,0';
+								$projektbetreuerfaktor			='1.0';
 								$projektbetreuername			='';
 								$projektbetreuerpunkte			='';
 								$projektbetreuerstunden			=$row->betreuerstunden;
@@ -832,15 +856,13 @@ if($result = pg_query($conn_fas, $qry_main))
 								}
 								if($projektbetreuernew)
 								{
-									$qry='INSERT INTO lehre.tbl_projektbetreuer (person_id, projektarbeit_id, note, betreuerart, faktor, name,
-										 punkte, stunden, stundensatz, ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
+									$qry='INSERT INTO lehre.tbl_projektbetreuer (person_id, projektarbeit_id, betreuerart, faktor, name,
+										  stunden, stundensatz, ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
 									     myaddslashes($projektbetreuerperson_id).', '.
 									     myaddslashes($projektbetreuerprojektarbeit_id).', '.
-									     myaddslashes($projektbetreuernote).', '.
 									     myaddslashes($projektbetreuerbetreuerart).', '.
 									     myaddslashes($projektbetreuerfaktor).', '.
 									     myaddslashes($projektbetreuername).', '.
-									     myaddslashes($projektbetreuerpunkte).', '.
 									     myaddslashes($projektbetreuerstunden).', '.
 									     myaddslashes($projektbetreuerstundensatz).', '.
 									     myaddslashes($projektbetreuerext_id).',  now(), '.
@@ -873,18 +895,6 @@ if($result = pg_query($conn_fas, $qry_main))
 										else
 										{
 											$ausgabe_pb="Projektarbeit: '".$projektbetreuerprojektarbeit_id."' (statt '".$row2->projektarbeit_id."')";
-										}
-									}
-									if($row2->note!=$projektbetreuernote) 
-									{
-										$updatep=true;
-										if(strlen(trim($ausgabe_pb))>0)
-										{
-											$ausgabe_pb.=", Note: '".$projektbetreuernote."' (statt '".$row2->note."')";
-										}
-										else
-										{
-											$ausgabe_pb="Note: '".$projektbetreuernote."' (statt '".$row2->note."')";
 										}
 									}
 									if($row2->betreuerart!=$projektbetreuerbetreuerart) 
@@ -923,18 +933,6 @@ if($result = pg_query($conn_fas, $qry_main))
 											$ausgabe_pb="Name: '".$projektbetreuername."' (statt '".$row2->name."')";
 										}
 									}
-									if($row2->punkte!=$projektbetreuerpunkte) 
-									{
-										$updatep=true;
-										if(strlen(trim($ausgabe_pb))>0)
-										{
-											$ausgabe_pb.=", Punkte: '".$projektbetreuerpunkte."' (statt '".$row2->punkte."')";
-										}
-										else
-										{
-											$ausgabe_pb="Punkte: '".$projektbetreuerpunkte."' (statt '".$row2->punkte."')";
-										}
-									}
 									if($row2->stunden!=$projektbetreuerstunden) 
 									{
 										$updatep=true;
@@ -964,11 +962,9 @@ if($result = pg_query($conn_fas, $qry_main))
 										$qry='UPDATE lehre.tbl_projektbetreuer SET '.
 										'person_id='.myaddslashes($projektbetreuerperson_id).', '. 
 										'projektarbeit_id='.myaddslashes($projektbetreuerprojektarbeit_id).', '.
-										'note='.myaddslashes($projektbetreuernote).', '.
 										'betreuerart='.myaddslashes($projektbetreuerbetreuerart).', '.
 										'faktor='.myaddslashes($projektbetreuerfaktor).', '.
 										'name='.myaddslashes($projektbetreuername).', '.
-										'punkte'.myaddslashes($projektbetreuerpunkte).', '.
 										'stunden='.myaddslashes($projektbetreuerstunden).', '.
 										'stundensatz='.myaddslashes($projektbetreuerstundensatz).', '.
 										'updateamum= now(), '.
@@ -977,6 +973,7 @@ if($result = pg_query($conn_fas, $qry_main))
 										$ausgabe.="Bachelorarbeitsbetreuer aktualisiert: UID='".$projektbetreuerperson_id."' und Projektarbeit='".$projektarbeitlehreinheit_id."':".$ausgabe_pb.".\n";
 									}
 								}
+								//echo $qry;
 								if(pg_query($conn,$qry))
 								{
 									if($projektbetreuernew)
@@ -1015,7 +1012,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								$projektbetreuerprojektarbeit_id		=$projektarbeitprojektarbeit_id;
 								$projektbetreuernote			=$row->note;
 								$projektbetreuerbetreuerart		='g';  //g=Bachelorarbeitsbegutachter
-								$projektbetreuerfaktor			='1,0';
+								$projektbetreuerfaktor			='1.0';
 								$projektbetreuername			='';
 								$projektbetreuerpunkte			=$row->punkte;
 								$projektbetreuerstunden			='';
@@ -1221,7 +1218,7 @@ if($result = pg_query($conn_fas, $qry_main))
 										//ROLLBACK
 										$anzahl_fehler_pbg++;
 										$ausgabe='';
-										$text1.="\n***********".$student_uid." / ".$nachname.", ".$vorname." / ".$matrikelnr."\n";
+										$text1.="\n***********Bachelorarbeit:".$row->bakkalaureatsarbeit_pk."\n";
 										$text1.=$error_log;
 										$text1.=" R1\n";
 										$text1.="***********\n\n";
@@ -1240,7 +1237,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									//ROLLBACK
 									$anzahl_fehler_pbb++;
 									$ausgabe='';
-									$text1.="\n***********".$student_uid." / ".$nachname.", ".$vorname." / ".$matrikelnr."\n";
+									$text1.="\n***********Bachelorarbeit:".$row->bakkalaureatsarbeit_pk."\n";
 									$text1.=$error_log;
 									$text1.=" R2\n";
 									$text1.="***********\n\n";
@@ -1252,7 +1249,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								//ROLLBACK
 								$anzahl_fehler_pa++;
 								$ausgabe='';
-								$text1.="\n***********".$student_uid." / ".$nachname.", ".$vorname." / ".$matrikelnr."\n";
+								$text1.="\n***********Bachelorarbeit:".$row->bakkalaureatsarbeit_pk."\n";
 								$text1.=$error_log;
 								$text1.=" R3\n";
 								$text1.="***********\n\n";
@@ -1264,7 +1261,7 @@ if($result = pg_query($conn_fas, $qry_main))
 							//ROLLBACK
 							$anzahl_fehler_le++;
 							$ausgabe='';
-							$text1.="\n***********".$student_uid." / ".$nachname.", ".$vorname." / ".$matrikelnr."\n";
+							$text1.="\n***********Bachelorarbeit:".$row->bakkalaureatsarbeit_pk."\n";
 							$text1.=$error_log;
 							$text1.=" R4\n";
 							$text1.="***********\n\n";
@@ -1276,7 +1273,7 @@ if($result = pg_query($conn_fas, $qry_main))
 						//ROLLBACK
 						$anzahl_fehler++;
 						$ausgabe='';
-						$text1.="\n***********".$student_uid." / ".$nachname.", ".$vorname." / ".$matrikelnr."\n";
+						$text1.="\n***********Bachelorarbeit:".$row->bakkalaureatsarbeit_pk."\n";
 						$text1.=$error_log;
 						$text1.=" R5\n";
 						$text1.="***********\n\n";
@@ -1288,7 +1285,7 @@ if($result = pg_query($conn_fas, $qry_main))
 					//ROLLBACK
 					$anzahl_fehler++;
 					$ausgabe='';
-					$text1.="\n***********".$student_uid." / ".$nachname.", ".$vorname." / ".$matrikelnr."\n";
+					$text1.="\n***********Bachelorarbeit:".$row->bakkalaureatsarbeit_pk."\n";
 					$text1.=$error_log;
 					$text1.=" R6\n";
 					$text1.="***********\n\n";
@@ -1300,7 +1297,7 @@ if($result = pg_query($conn_fas, $qry_main))
 				//ROLLBACK
 				$anzahl_fehler++;
 				$ausgabe='';
-				$text1.="\n***********".$student_uid." / ".$nachname.", ".$vorname." / ".$matrikelnr."\n";
+				$text1.="\n***********Bachelorarbeit:".$row->bakkalaureatsarbeit_pk."\n";
 				$text1.=$error_log;
 				$text1.=" R7\n";
 				$text1.="***********\n\n";
@@ -1312,7 +1309,7 @@ if($result = pg_query($conn_fas, $qry_main))
 			//ROLLBACK
 			$anzahl_fehler++;
 			$ausgabe='';
-			$text1.="\n***********".$student_uid." / ".$nachname.", ".$vorname." / ".$matrikelnr."\n";
+			$text1.="\n***********Bachelorarbeit:".$row->bakkalaureatsarbeit_pk."\n";
 			$text1.=$error_log;
 			$text1.=" R8\n";
 			$text1.="***********\n\n";
@@ -1327,7 +1324,7 @@ echo nl2br("Allgemeine Fehler: ".$anzahl_fehler.".\n");
 echo nl2br("Lehreinheiten:       Gesamt: ".$anzahl_le_gesamt." / Eingefügt: ".$anzahl_le_insert." / Geändert: ".$anzahl_le_update." / Fehler: ".$anzahl_fehler_le."\n");
 echo nl2br("Projektarbeiten:   Gesamt: ".$anzahl_pa_gesamt." / Eingefügt: ".$anzahl_pa_insert." / Geändert: ".$anzahl_pa_update." / Fehler: ".$anzahl_fehler_pa."\n");
 echo nl2br("Betreuer:       Gesamt: ".$anzahl_pbb_gesamt." / Eingefügt: ".$anzahl_pbb_insert." / Geändert: ".$anzahl_pbb_update." / Fehler: ".$anzahl_fehler_pbb."\n");
-echo nl2br("Begutachter:  Gesamt: ".$anzahl_pbg_gesamt." / Eingefügt: ".$anzahl_pbg_insert." / Geändert: ".$anzahl_pbg_update." / Fehler: ".$anzahl_fehler_pbg."\n");
+echo nl2br("Begutachter:  Gesamt: ".$anzahl_pbg_gesamt." / Eingefügt: ".$anzahl_pbg_insert." / Geändert: ".$anzahl_pbg_update." / Fehler: ".$anzahl_fehler_pbg."\n\n");
 echo nl2br($error_log."\n--------------------------------------------------------------------------------\n");
 echo nl2br($ausgabe_all);
 
