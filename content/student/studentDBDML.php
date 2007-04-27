@@ -90,14 +90,14 @@ if(!$error)
 				$student->gebdatum = $_POST['geburtsdatum'];
 				$student->gebort = $_POST['geburtsort'];
 				$student->gebzeit = $_POST['geburtszeit'];
-				$student->anmerkung = $_POST['anmerkung'];
+				$student->anmerkungen = $_POST['anmerkung'];
 				$student->homepage = $_POST['homepage'];
 				$student->svnr = $_POST['svnr'];
 				$student->ersatzkennzeichen = $_POST['ersatzkennzeichen'];
 				$student->familienstand = $_POST['familienstand'];
 				$student->geschlecht = $_POST['geschlecht'];
 				$student->aktiv = ($_POST['aktiv']=='true'?true:false);
-				$student->anzahlderkinder = $_POST['anzahlderkinder'];
+				$student->anzahlkinder = $_POST['anzahlderkinder'];
 				$student->staatsbuergerschaft = $_POST['staatsbuergerschaft'];
 				$student->geburtsnation = $_POST['geburtsnation'];
 				$student->sprache = $_POST['sprache'];

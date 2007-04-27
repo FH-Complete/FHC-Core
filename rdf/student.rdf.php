@@ -11,6 +11,7 @@ header("Content-type: application/vnd.mozilla.xul+xml");
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
 require_once('../vilesci/config.inc.php');
+require_once('../include/functions.inc.php');
 require_once('../include/person.class.php');
 require_once('../include/benutzer.class.php');
 require_once('../include/student.class.php');
@@ -33,6 +34,8 @@ function convdate($date)
 	list($d,$m,$y) = explode('.',$date);
 	return $y.'-'.$m.'-'.$d;
 }
+$user = get_uid();
+loadVariables($conn, $user);
 
 $gruppe=(isset($_GET['gruppe'])?$_GET['gruppe']:null);
 $grp=(isset($_GET['grp'])?$_GET['grp']:null);
@@ -42,12 +45,17 @@ $stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:null);
 if(isset($_GET['uid']))
 	$uid=$_GET['uid'];
 
+if(isset($_GET['stsem']) && $_GET['stsem']=='true')
+	$stsem = $semester_aktuell;
+else 
+	$stsem=null;	
+	
 // Studenten holen
 $student=new student($conn,null,true);
 if (isset($uid))
 	$student->load($uid);
 else
-	$studenten=$student->getStudents($stg_kz,$sem,$ver,$grp,$gruppe);
+	$studenten=$student->getStudents($stg_kz,$sem,$ver,$grp,$gruppe, $stsem);
 
 $rdf_url='http://www.technikum-wien.at/student';
 

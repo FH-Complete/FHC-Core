@@ -199,7 +199,7 @@ function onVerbandSelect(event)
 	// Studenten
 	try
 	{
-		url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe+"&"+gettimestamp();
+		url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe+"&stsem=true&"+gettimestamp();
 		var treeStudent=document.getElementById('student-tree');
 		
 		//Alte DS entfernen
