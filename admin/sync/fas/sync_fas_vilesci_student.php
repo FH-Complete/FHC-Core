@@ -517,7 +517,7 @@ if($result = pg_query($conn_fas, $qry))
 		$geschlecht=strtolower($row->geschlecht);
 		$anzahlkinder=$row->anzahlderkinder;
 		//$aktiv=($row->aktiv=='t'?true:false);
-		$insertvon=$row->creationuser;
+		//$insertvon=$row->creationuser;
 		$insertamum=$row->creationdate;
 		$updateamum=$row->creationdate;
 		$updatevon='SYNC';
@@ -573,6 +573,14 @@ if($result = pg_query($conn_fas, $qry))
 			$zgvmas_code=null;
 		}
 		
+		$qrycu="SELECT name FROM benutzer WHERE benutzer_pk='".$row->creationuser."';";
+		if($resultcu = pg_query($conn_fas, $qrycu))
+		{
+			if($rowcu=pg_fetch_object($resultcu))
+			{
+				$insertvon=$rowcu->name;
+			}
+		}
 		//Attribute überprüfen!!!	
 		if(strlen($sprache)>16)
 		{
@@ -1081,6 +1089,30 @@ if($result = pg_query($conn_fas, $qry))
 							$ausgabe_person="Staatsbürgerschaft: '".$staatsbuergerschaft."' (statt '".$row1->staatsbuergerschaft."')";
 						}
 					}
+					if($row1->insertamum!=$insertamum)
+					{
+						$updatep=true;
+						if(strlen(trim($ausgabe_person))>0)
+						{
+							$ausgabe_person.=", Insertamum: '".$insertamum."' (statt '".$row1->insertamum."')";
+						}
+						else
+						{
+							$ausgabe_person="Insertamum: '".$insertamum."' (statt '".$row1->insertamum."')";
+						}
+					}
+					if($row1->insertvon!=$insertvon)
+					{
+						$updatep=true;
+						if(strlen(trim($ausgabe_person))>0)
+						{
+							$ausgabe_person.=", Insertvon: '".$insertvon."' (statt '".$row1->insertvon."')";
+						}
+						else
+						{
+							$ausgabe_person="Insertvon: '".$insertvon."' (statt '".$row1->insertvon."')";
+						}
+					}
 					if($updatep)
 					{
 						$qry = 'UPDATE public.tbl_person SET'.
@@ -1104,6 +1136,8 @@ if($result = pg_query($conn_fas, $qry))
 						       ' geschlecht='.myaddslashes($geschlecht).','.
 						       ' geburtsnation='.myaddslashes($geburtsnation).','.
 						       ' staatsbuergerschaft='.myaddslashes($staatsbuergerschaft).','.
+						       ' insertamum='.myaddslashes($insertamum).','.
+						       ' insertvon='.myaddslashes($insertvon).','.
 				        		       " updateamum=now()".','.
 				        		       " updatevon=".myaddslashes($updatevon).','.
 						       ' ext_id='.myaddslashes($ext_id_person).
@@ -1249,8 +1283,8 @@ if($result = pg_query($conn_fas, $qry))
 					($reihungstestangetreten?'true':'false').', '.
 					myaddslashes($anmerkung).', '.
 					myaddslashes($insertamum).','.
-					"'SYNC', ".
-					myaddslashes($updateamum).','.
+					myaddslashes($insertvon).','.
+					"now(), ".
 					"'SYNC', ".
 					myaddslashes($ext_id_pre).');';
 					$ausgabe_pre="Prestudent:  ID:".$person_id.", ".$nachname." eingefügt.\n";
@@ -1477,6 +1511,30 @@ if($result = pg_query($conn_fas, $qry))
 								$ausgabe_pre="EXT_ID: '".$ext_id."'";
 							}
 						}
+						if($rows->insertamum!=$insertamum)
+						{
+							$updater=true;
+							if(strlen(trim($ausgabe_pre))>0)
+							{
+								$ausgabe_pre.=", Insertamum: '".$insertamum."'";
+							}
+							else
+							{
+								$ausgabe_pre="Insertamum: '".$insertamum."'";
+							}
+						}
+						if($rows->insertvon!=$insertvon)
+						{
+							$updater=true;
+							if(strlen(trim($ausgabe_pre))>0)
+							{
+								$ausgabe_pre.=", Insertvon: '".$insertvon."'";
+							}
+							else
+							{
+								$ausgabe_pre="Insertvon: '".$insertvon."'";
+							}
+						}
 						if($updater)
 						{
 							$qry = 'UPDATE public.tbl_prestudent SET'.
@@ -1496,6 +1554,8 @@ if($result = pg_query($conn_fas, $qry))
 							       ' anmeldungreihungstest='.myaddslashes($anmeldungreihungstest).','.
 							       ' reihungstestangetreten='.($reihungstestangetreten?'true':'false').','.
 							       ' anmerkung='.myaddslashes($anmerkung).','.
+							       ' insertamum='.myaddslashes($insertamum).','.
+							       ' insertvon='.myaddslashes($insertvon).','.
 					        		       " updateamum=now()".','.
 					        		       " updatevon=".myaddslashes($updatevon).','.
 							       ' ext_id='.myaddslashes($ext_id_pre).
@@ -1855,7 +1915,7 @@ if($result = pg_query($conn_fas, $qry))
 						($aktiv?'true':'false').', '.
 						myaddslashes($alias).', '.
 						myaddslashes($insertamum).','.
-						"'SYNC'".', '.
+						myaddslashes($insertvon).','.
 						myaddslashes($updateamum).','.
 						"'SYNC'".', '.
 						myaddslashes($ext_id_benutzer).'); ';
@@ -1929,12 +1989,38 @@ if($result = pg_query($conn_fas, $qry))
 										$ausgabe_benutzer="Ext_ID: '".$ext_id_benutzer."' statt('".$rows->ext_id."')";
 									}
 								}
+								if($rows->insertamum!=$insertamum)
+								{
+									$updateb=true;
+									if(strlen(trim($ausgabe_benutzer))>0)
+									{
+										$ausgabe_benutzer.=", Insertamum: '".$insertamum."' statt('".$rows->insertamum."')";
+									}
+									else
+									{
+										$ausgabe_benutzer="Insertamum: '".$insertamum."' statt('".$rows->insertamum."')";
+									}
+								}
+								if($rows->insertvon!=$insertvon)
+								{
+									$updateb=true;
+									if(strlen(trim($ausgabe_benutzer))>0)
+									{
+										$ausgabe_benutzer.=", Insertvon: '".$insertvon."' statt('".$rows->insertvon."')";
+									}
+									else
+									{
+										$ausgabe_benutzer="Insertvon: '".$insertvon."' statt('".$rows->insertvon."')";
+									}
+								}
 								if($updateb)
 								{
 									$qry = 'UPDATE public.tbl_benutzer SET'.
 									       ' uid='.myaddslashes($student_uid).','.
 									       ' person_id='.myaddslashes($person_id).','.
 									       ' aktiv='.($aktiv?'true':'false').','.
+									       ' insertamum='.myaddslashes($insertamum).','.
+									       ' insertvon='.myaddslashes($insertvon).','.
 							        		       " updateamum=now()".','.
 							        		       " updatevon=".myaddslashes($updatevon).', '.
 							        		       " ext_id=".myaddslashes($ext_id_benutzer).
@@ -1981,7 +2067,7 @@ if($result = pg_query($conn_fas, $qry))
 								myaddslashes($verband).', '.
 								myaddslashes($gruppe).', '.
 								myaddslashes($insertamum).','.
-								"'SYNC'".', '.
+								myaddslashes($insertavon).','.
 								myaddslashes($updateamum).','.
 								"'SYNC'".', '.
 								myaddslashes($ext_id_student).'); ';
@@ -2095,6 +2181,30 @@ if($result = pg_query($conn_fas, $qry))
 											$ausgabe_student="EXT_ID: '".$ext_id_student."' (statt '".$rows->ext_id."')";
 										}
 									}	
+									if($rows->insertamum!=$insertamum)
+									{
+										$updates=true;
+										if(strlen(trim($ausgabe_student))>0)
+										{
+											$ausgabe_student.=", Insertamum: '".$insertamum."' (statt '".$rows->insertamum."')";
+										}
+										else
+										{
+											$ausgabe_student="Insertamum: '".$insertamum."' (statt '".$rows->insertamum."')";
+										}
+									}
+									if($rows->insertvon!=$insertvon)
+									{
+										$updates=true;
+										if(strlen(trim($ausgabe_student))>0)
+										{
+											$ausgabe_student.=", Insertvon: '".$insertvon."' (statt '".$rows->insertvon."')";
+										}
+										else
+										{
+											$ausgabe_student="Insertvon: '".$insertvon."' (statt '".$rows->insertvon."')";
+										}
+									}
 									if($updates)
 									{
 										$qry = 'UPDATE public.tbl_student SET'.
@@ -2105,6 +2215,8 @@ if($result = pg_query($conn_fas, $qry))
 										       //' semester='.myaddslashes($semester).','.
 										       //' verband='.myaddslashes($verband).','.
 										       //' gruppe='.myaddslashes($gruppe).','.
+										       " insertamum=".myaddslashes($insertamum).",".
+										       " insertvon=".myaddslashes($insertvon).",".
 								        		       " updateamum=now()".','.
 								        		       " updatevon=".myaddslashes($updatevon).','.
 										       ' ext_id='.myaddslashes($ext_id_student).

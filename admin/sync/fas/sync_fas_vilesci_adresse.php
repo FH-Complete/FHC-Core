@@ -74,13 +74,21 @@ if($result = pg_query($conn_fas, $qry))
 		$adresse->firma_id			=null;
 		//$adresse->updateamum		=$row->;
 		$adresse->updatevon		="SYNC";
-		//$adresse->insertamum		=$row->;
-		$adresse->insertvon			="SYNC";
+		$adresse->insertamum		=$row->creationdate;
+		//$adresse->insertvon		="SYNC";
 		$adresse->ext_id			=$row->adresse_pk;
 		
 		$ausgabe_adresse='';
 		$update=false;
 		//echo nl2br ($adresse->ext_id."\n");
+		$qrycu="SELECT name FROM benutzer WHERE benutzer_pk='".$row->creationuser."';";
+		if($resultcu = pg_query($conn, $qrycu))
+		{
+			if($rowcu=pg_fetch_object($resultcu))
+			{
+				$insertvon=$rowcu->name;
+			}
+		}
 		//person_id herausfinden
 		$qry1="SELECT person_portal FROM sync.tbl_syncperson WHERE person_fas=".$row->person_fk.";";
 		if($result1 = pg_query($conn, $qry1))

@@ -337,8 +337,8 @@ if($resultall = pg_query($conn_fas, $qryall))
 		$persongeschlecht=strtolower($rowall->geschlecht);
 		$personext_id=$rowall->person_pk;
 		$personaktiv=true;
-		$personupdatevon=$rowall->creationuser;
-		$personinsertvon='SYNC';
+		//$personinsertvon=$rowall->creationuser;
+		$personupdatevon='SYNC';
 		$personupdateamum=$rowall->creationdate;
 		$personinsertamum=$rowall->creationdate;
 		if($rowall->familienstand==1)
@@ -385,7 +385,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 		}
 		$mitarbeiterort_kurzbz=null;
 		$mitarbeiteranmerkung=$rowall->bemerkung;
-		$mitarbeiterinsertvon=$rowall->creationuser;
+		//$mitarbeiterinsertvon=$rowall->creationuser;
 		$mitarbeiterinsertamum=$rowall->creationdate;
 		$mitarbeiterupdateamum=$rowall->creationdate;
 		$mitarbeiterupdatevon='SYNC';
@@ -398,7 +398,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 		$benutzerperson_id='';
 		$benutzeraktiv=($rowall->aktiv=='t'?true:false);
 		$benutzeralias='';
-		$benutzerinsertvon=$rowall->creationuser;
+		//$benutzerinsertvon=$rowall->creationuser;
 		$benutzerinsertamum=$rowall->creationdate;
 		$benutzerupdateamum=$rowall->creationdate;
 		$benutzerupdatevon='SYNC';
@@ -409,7 +409,17 @@ if($resultall = pg_query($conn_fas, $qryall))
 			
 		pg_query($conn, "BEGIN");
 		
-		$qry="SELECT person_id FROM public.tbl_benutzer WHERE uid='$rowall->uid'";
+		$qrycu="SELECT name FROM benutzer WHERE benutzer_pk='".$rowall->creationuser."';";
+		if($resultcu = pg_query($conn_fas, $qrycu))
+		{
+			if($rowcu=pg_fetch_object($resultcu))
+			{
+				$personinsertvon=$rowcu->name;
+				$mitarbeiterinsertvon=$rowcu->name;
+				$benutzerinsertvon=$rowcu->name;
+			}
+		}
+		$qry="SELECT person_id FROM public.tbl_benutzer WHERE uid='".$rowall->uid."';";
 		if($resultu = pg_query($conn, $qry))
 		{
 			if(pg_num_rows($resultu)>0 && $rowall->uid!='') //wenn dieser eintrag schon vorhanden ist
@@ -745,6 +755,30 @@ if($resultall = pg_query($conn_fas, $qryall))
 									$ausgabe_person="Staatsbürgerschaft: '".$personstaatsbuergerschaft."' (statt '".$row1->staatsbuergerschaft."')";
 								}
 							}
+							if($row1->insertamum!=$personinsertamum)
+							{
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Insertamum: '".$personinsertamum."' (statt '".$row1->insertamum."')";
+								}
+								else
+								{
+									$ausgabe_person="Insertamum: '".$personinsertamum."' (statt '".$row1->insertamum."')";
+								}
+							}
+							if($row1->insertvon!=$personinsertvon)
+							{
+								$updatep=true;
+								if(strlen(trim($ausgabe_person))>0)
+								{
+									$ausgabe_person.=", Insertvon: '".$personinsertvon."' (statt '".$row1->insertvon."')";
+								}
+								else
+								{
+									$ausgabe_person="Insertvon: '".$personinsertvon."' (statt '".$row1->insertvon."')";
+								}
+							}
 							
 							
 							if($updatep)
@@ -768,6 +802,8 @@ if($resultall = pg_query($conn_fas, $qryall))
 								       familienstand=".myaddslashes($personfamilienstand).", 
 								       anzahlkinder=".myaddslashes($personanzahlkinder).", 
 								       aktiv=".myaddslashes($personaktiv?'true':'false').", 
+								       insertamum=".myaddslashes($personinsertamum).", 
+								       insertvon=".myaddslashes($personinsertvon).", 
 								       updateamum=now(),
 								       updatevon='SYNC', 
 								       geschlecht=".myaddslashes($persongeschlecht).", 
@@ -872,6 +908,30 @@ if($resultall = pg_query($conn_fas, $qryall))
 										$ausgabe_benutzer="PersonID: '".$personperson_id."'";
 									}
 								}
+								if($rowu->insertamum!=$benutzerinsertamum)
+								{
+									$updateb=true;
+									if(strlen(trim($ausgabe_benutzer))>0)
+									{
+										$ausgabe_benutzer.=", Insertamum: '".$benutzerinsertamum."'";
+									}
+									else
+									{
+										$ausgabe_benutzer="Insertamum: '".$benutzerinsertamum."'";
+									}
+								}
+								if($rowu->insertvon!=$benutzerinsertvon)
+								{
+									$updateb=true;
+									if(strlen(trim($ausgabe_benutzer))>0)
+									{
+										$ausgabe_benutzer.=", Insertvon: '".$benutzerinsertvon."'";
+									}
+									else
+									{
+										$ausgabe_benutzer="Insertvon: '".$benutzerinsertvon."'";
+									}
+								}
 							}
 						}
 						if($updateb)
@@ -880,7 +940,9 @@ if($resultall = pg_query($conn_fas, $qryall))
 							       aktiv=".myaddslashes($benutzeraktiv?'true':'false').", 
 							       person_id=".myaddslashes($personperson_id).", 
 							       updateamum=now(), 
-							       updatevon='SYNC' 
+							       updatevon='SYNC', 
+							       insertamum=".myaddslashes($benutzerinsertamum).", 
+							       insertvon=".myaddslashes($benutzerinsertvon)." 
 							       WHERE person_id='$personperson_id' AND uid='".$benutzeruid."';";
 							$ausgabe_benutzer="Änderungen bei Benutzer ".$benutzeruid." ".$benutzeralias.": ".$ausgabe_benutzer."\n";
 						}
@@ -1050,6 +1112,30 @@ if($resultall = pg_query($conn_fas, $qryall))
 												$ausgabe_mitarbeiter="Anmerkung: '".$mitarbeiteranmerkung."'";
 											}
 										}
+										if($rowu->insertamum!=$mitarbeiterinsertamum)
+										{
+											$updatem=true;
+											if(strlen(trim($ausgabe_mitarbeiter))>0)
+											{
+												$ausgabe_mitarbeiter.=", Insertamum: '".$mitarbeiterinsertamum."'";
+											}
+											else
+											{
+												$ausgabe_mitarbeiter="Insertamum: '".$mitarbeiterinsertamum."'";
+											}
+										}
+										if($rowu->insertvon!=$mitarbeiterinsertvon)
+										{
+											$updatem=true;
+											if(strlen(trim($ausgabe_mitarbeiter))>0)
+											{
+												$ausgabe_mitarbeiter.=", Insertvon: '".$mitarbeiterinsertvon."'";
+											}
+											else
+											{
+												$ausgabe_mitarbeiter="Insertvon: '".$mitarbeiterinsertvon."'";
+											}
+										}
 									}
 								}
 								if($updatem)
@@ -1062,6 +1148,8 @@ if($resultall = pg_query($conn_fas, $qryall))
 									stundensatz=".myaddslashes($mitarbeiterstundensatz).",  
 									ort_kurzbz=".myaddslashes($mitarbeiterort_kurzbz).", 
 									anmerkung=".myaddslashes($mitarbeiteranmerkung).", 
+									insertamum=".myaddslashes($mitarbeiterinsertamum).", 
+									insertvon=".myaddslashes($mitarbeiterinsertvon).", 
 									updateamum=now(), 
 									updatevon='SYNC', 
 									ext_id=".myaddslashes($mitarbeiterext_id)." 
