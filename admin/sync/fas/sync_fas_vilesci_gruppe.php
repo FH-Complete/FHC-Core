@@ -204,14 +204,14 @@ if($result = pg_query($conn_fas, $qry))
 					$qrysync="SELECT * FROM sync.tbl_syncgruppe WHERE fas_gruppe='".$ext_id."' AND vilesci_gruppe='".$gruppe_kurzbz."';";
 					if($resultsync = pg_query($conn, $qrysync))
 					{
-						$ausgabe="Gruppe in Vilesci bereits vorhanden.\n";
 						$qryupd="UPDATE public.tbl_gruppe SET ext_id='".$ext_id."' WHERE gruppe_kurzbz='".$gruppe_kurzbz."' AND studiengang_kz='".$studiengang_kz."';";
 						if($resultupd = pg_query($conn, $qryupd))
 						{
-							if(!$rowsync=pg_fetch_object($resultsync)) 
+							if(pg_num_rows($resultsync)<1) 
 							{
 								//Sync-Eintrag nicht vorhanden
 								$qryinss="INSERT INTO sync.tbl_syncgruppe (fas_gruppe, vilesci_gruppe) VALUES ('".$ext_id."','".$gruppe_kurzbz."');";
+								$ausgabe="Gruppe in Vilesci bereits vorhanden.\n";
 								$ausgabe.="---Sync-Eintrag : FAS-'".$ext_id."', Vilesci-'".$gruppe_kurzbz."'.\n";
 								if(!(pg_query($conn, $qryinss)))
 								{
@@ -247,7 +247,7 @@ if($result = pg_query($conn_fas, $qry))
 						now(),
 						'SYNC', ".
 						$ext_id.");";
-						
+					//echo nl2br($qryinsg."\n");		
 					if($resultinsg = pg_query($conn, $qryinsg))
 					{
 						$anzahl_eingefuegt++;
