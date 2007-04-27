@@ -55,6 +55,9 @@ $anzahl_pbg_update=0;
 $fachbereich_kurzbz='';
 $ausgabe='';
 $ausgabe_all='';
+$ausgabe_le='';
+$ausgabe_pa='';
+$ausgabe_pb='';
 $text1='';
 $text2='';
 $text3='';
@@ -63,6 +66,10 @@ $text5='';
 $text6='';
 $text7='';
 $text8='';
+
+
+$ausgabe_pb1='';
+$projektbetreuerperson_id1="";
 
 function myaddslashes($var)
 {
@@ -86,7 +93,7 @@ $qry_main = "SELECT * FROM bakkalaureatsarbeit;";
 
 if($result = pg_query($conn_fas, $qry_main))
 {
-	echo nl2br("Bachelorarbeit Sync\n------------------------\n");
+	echo nl2br("Bachelorarbeit Sync\n---------------------\n");
 	echo nl2br("Beginn: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
 	$anzahl_quelle=pg_num_rows($result);
 	while($row = pg_fetch_object($result))
@@ -99,6 +106,7 @@ if($result = pg_query($conn_fas, $qry_main))
 		$text6='';
 		$text7='';
 		$text8='';
+		$person='';
 		if($row->lehrveranstaltung_fk<'1')
 		{
 			$anzahl_lv_fehler++;
@@ -131,7 +139,7 @@ if($result = pg_query($conn_fas, $qry_main))
 		//$projektarbeitupdateamum	='';
 		$projektarbeitupdatevon		="SYNC";
 		$projektarbeitinsertamum		=$row->creationdate;
-		$projektarbeitinsertvon		=$row->creationuser;
+		//$projektarbeitinsertvon		=$row->creationuser;
 		$projektarbeitext_id			=$row->bakkalaureatsarbeit_pk;	
 		
 		//$lehreinheitlehrveranstaltung_id	='';
@@ -151,13 +159,23 @@ if($result = pg_query($conn_fas, $qry_main))
 		//$lehreinheitupdateamum			='';
 		$lehreinheitupdatevon			="SYNC";
 		$lehreinheitinsertamum			=$row->creationdate;
-		$lehreinheitinsertvon			=$row->creationuser;
+		//$lehreinheitinsertvon			=$row->creationuser;
 		$lehreinheitext_id				=$row->bakkalaureatsarbeit_pk;
 			
 		$studiengang_kz='';
 		$semester='';
 		$lva='';
 		
+		$qrycu="SELECT name FROM benutzer WHERE benutzer_pk='".$row->creationuser."';";
+		if($resultcu = pg_query($conn_fas, $qrycu))
+		{
+			if($rowcu=pg_fetch_object($resultcu))
+			{
+				$lehreinheitinsertvon=$rowcu->name;
+				$projektarbeitinsertvon=$rowcu->name;
+				$projektbetreuerinsertvon=$rowcu->name;
+			}
+		}
 		
 		
 		//student_id ermitteln
@@ -249,7 +267,7 @@ if($result = pg_query($conn_fas, $qry_main))
 					}
 				}
 				
-				$qry3="SELECT projektarbeit_id, ext_id FROM lehre.tbl_projektarbeit WHERE projekttyp_kurzbz='Bachelorarbeit' AND ext_id='".$row->bakkalaureatsarbeit_pk."';";
+				$qry3="SELECT * FROM lehre.tbl_projektarbeit WHERE projekttyp_kurzbz='Bachelor' AND ext_id='".$row->bakkalaureatsarbeit_pk."';";
 				if($result3 = pg_query($conn, $qry3))
 				{
 					if(pg_num_rows($result3)>0) //eintrag gefunden
@@ -316,7 +334,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									myaddslashes($lehreinheitupdatevon).', '.
 									myaddslashes($lehreinheitext_id).', '.
 									myaddslashes($lehreinheitsprache).');';
-									 $ausgabe.="Lehreinheit angelegt: Lehrveranstaltung='".$lehreinheitlehrveranstaltung_id."', Studiensemester='".$lehreinheitstudiensemester_kz."' und Lehrfach='".$lehreinheitlehrfach_id."'.\n";			
+									 $ausgabe.="Lehreinheit angelegt: Lehrveranstaltung='".$lehreinheitlehrveranstaltung_id."', Studiensemester='".$lehreinheitstudiensemester_kurzbz."' und Lehrfach='".$lehreinheitlehrfach_id."'.\n";			
 						}
 						else
 						{
@@ -489,6 +507,30 @@ if($result = pg_query($conn_fas, $qry_main))
 									$ausgabe_le="Sprache: '".$lehreinheitsprache."' (statt '".$row2->sprache."')";
 								}
 							}
+							if($row2->insertvon!=$lehreinheitinsertvon) 
+							{
+								$updatele=true;
+								if(strlen(trim($ausgabe_le))>0)
+								{
+									$ausgabe_le.=", Insertvon: '".$lehreinheitinsertvon."' (statt '".$row2->insertvon."')";
+								}
+								else
+								{
+									$ausgabe_le="Insertvon: '".$lehreinheitinsertvon."' (statt '".$row2->insertvon."')";
+								}
+							}
+							if($row2->insertamum!=$lehreinheitinsertamum) 
+							{
+								$updatele=true;
+								if(strlen(trim($ausgabe_le))>0)
+								{
+									$ausgabe_le.=", Insertamum: '".$lehreinheitinsertamum."' (statt '".$row2->insertamum."')";
+								}
+								else
+								{
+									$ausgabe_le="Insertamum: '".$lehreinheitinsertamum."' (statt '".$row2->insertamum."')";
+								}
+							}
 							if($updatele)
 							{
 								$qry = 'UPDATE lehre.tbl_lehreinheit SET'.
@@ -505,12 +547,14 @@ if($result = pg_query($conn_fas, $qry_main))
 								       ' anmerkung='.myaddslashes($lehreinheitanmerkung).','.
 								       ' unr='.myaddslashes($lehreinheitunr).','.
 								       ' lvnr='.myaddslashes($lehreinheitlvnr).','.
-								       ' updateamum='.myaddslashes($lehreinheitupdateamum).','.
+								       ' insertvon='.myaddslashes($lehreinheitinsertvon).','.
+								       ' insertamum='.myaddslashes($lehreinheitinsertamum).','.
+								       ' updateamum=now(),'.
 								       ' updatevon='.myaddslashes($lehreinheitupdatevon).','.
 								       ' sprache='.myaddslashes($lehreinheitsprache).','.
 								       ' ext_id='.myaddslashes($lehreinheitext_id).
 								       " WHERE lehreinheit_id=".myaddslashes($lehreinheitlehreinheit_id).";";
-								       $ausgabe.="Lehreinheit aktualisiert bei Lehrveranstaltung='".$lehreinheitlehrveranstaltung_id."', Studiensemester='".$lehreinheitstudiensemester_kz."' und Lehrfach='".$lehreinheitlehrfach_id."':.$ausgabe_le.\n";
+								       $ausgabe.="Lehreinheit aktualisiert bei Lehrveranstaltung='".$lehreinheitlehrveranstaltung_id."', Studiensemester='".$lehreinheitstudiensemester_kurzbz."' und Lehrfach='".$lehreinheitlehrfach_id."':.$ausgabe_le.\n";
 							}
 						}
 						
@@ -697,7 +741,7 @@ if($result = pg_query($conn_fas, $qry_main))
 										$ausgabe_pa="Faktor: '".$projektarbeitfaktor."' (statt '".$row3->faktor."')";
 									}
 								}
-								if($row3->freigegeben!=($projektarbeitfreiggegeben?'t':'f'))
+								if($row3->freigegeben!=($projektarbeitfreigegeben?'t':'f'))
 								{
 									$updatep=true;
 									if(strlen(trim($ausgabe_pa))>0)
@@ -781,6 +825,30 @@ if($result = pg_query($conn_fas, $qry_main))
 										$ausgabe_pa="Anmerkung: '".$projektarbeitanmerkung."' (statt '".$row3->anmerkung."')";
 									}
 								}
+								if($row3->insertamum!=$projektarbeitinsertamum) 
+								{
+									$updatep=true;
+									if(strlen(trim($ausgabe_pa))>0)
+									{
+										$ausgabe_pa.=", Insertamum: '".$projektarbeitinsertamum."' (statt '".$row3->insertamum."')";
+									}
+									else
+									{
+										$ausgabe_pa="Insertamum: '".$projektarbeitinsertamum."' (statt '".$row3->insertamum."')";
+									}
+								}
+								if($row3->insertvon!=$projektarbeitinsertvon) 
+								{
+									$updatep=true;
+									if(strlen(trim($ausgabe_pa))>0)
+									{
+										$ausgabe_pa.=", Insertvon: '".$projektarbeitinsertvon."' (statt '".$row3->insertvon."')";
+									}
+									else
+									{
+										$ausgabe_pa="Insertvon: '".$projektarbeitinsertvon."' (statt '".$row3->insertvon."')";
+									}
+								}
 								if($updatep)
 								{
 								$qry='UPDATE lehre.tbl_projektarbeit SET '.
@@ -800,6 +868,8 @@ if($result = pg_query($conn_fas, $qry_main))
 									'gesamtstunden='.myaddslashes($projektarbeitgesamtstunden).', '.
 									'themenbereich='.myaddslashes($projektarbeitthemenbereich).', '.
 									'anmerkung='.myaddslashes($projektarbeitanmerkung).', '.  
+									'insertamum='.myaddslashes($projektarbeitinsertamum).', '.  
+									'insertvon='.myaddslashes($projektarbeitinsertvon).', '.  
 								     	'updateamum= now(), '.
 								     	'updatevon='.myaddslashes($projektarbeitupdatevon).' '.
 								     	//'firmentyp='.myaddslashes($projektarbeitfirmentyp_kurzbz).' '.
@@ -842,8 +912,20 @@ if($result = pg_query($conn_fas, $qry_main))
 							if(!$error)
 							{
 								//projektbetreuer 2x
-								
-								$qry="SELECT person_portal FROM sync.tbl_syncperson WHERE person_fas='$row->betreuer_fk'"; //betreuer_fk -> person_id
+								$qry="SELECT person_fk FROM mitarbeiter WHERE mitarbeiter_pk='".$row->betreuer_fk."';";
+								if($resultu = pg_query($conn_fas, $qry))
+								{
+									if($rowu=pg_fetch_object($resultu))
+									{ 
+										$person=$rowu->person_fk;	
+									}
+									else
+									{
+										$error=true;
+										$error_log.="Betreuer mit mitarbeiter_fk: ".$row->betreuer_fk."' konnte in Tabelle mitarbeiter nicht gefunden werden.\n";
+									}
+								}
+								$qry="SELECT person_portal FROM sync.tbl_syncperson WHERE person_fas='$person'"; //betreuer_fk -> person_id
 								if($resultu = pg_query($conn, $qry))
 								{
 									if($rowu=pg_fetch_object($resultu))
@@ -853,7 +935,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									else
 									{
 										$error=true;
-										$error_log.="Betreuer mit person_fk: ".$row->betreuer_fk." konnte in syncperson nicht gefunden werden.\n";
+										$error_log.="Betreuer mit person_fk: ".$person." konnte in syncperson nicht gefunden werden.\n";
 									}
 								}
 								$projektbetreuerprojektarbeit_id		=$projektarbeitprojektarbeit_id;
@@ -866,11 +948,11 @@ if($result = pg_query($conn_fas, $qry_main))
 								$projektbetreuerstundensatz		=$row->betreuerstundenhonorar;
 								//$projektbetreuerupdateamum		=$row->;
 								$projektbetreuerupdatevon			="SYNC";
-								//$projektbetreuerinsertamum		=$row->creationdate;
-								$projektbetreuerinsertvon	 		="SYNC";
+								$projektbetreuerinsertamum		=$row->creationdate;
+								//$projektbetreuerinsertvon	 		="SYNC";
 								$projektbetreuerext_id			=$row->bakkalaureatsarbeit_pk;
 								
-								$qry2="SELECT * FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id='".$projektarbeitprojektarbeit_id."' AND person_id='".$projektbetreuerperson_id."'AND betreuerart='".$projektbetreuerbetreuerart."';";
+								$qry2="SELECT * FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id='".$projektarbeitprojektarbeit_id."' AND person_id='".$projektbetreuerperson_id."' AND betreuerart='b';";
 								if($result2 = pg_query($conn, $qry2))
 								{
 									if(pg_num_rows($result2)>0) //wenn dieser eintrag schon vorhanden ist
@@ -878,18 +960,18 @@ if($result = pg_query($conn_fas, $qry_main))
 										if($row2=pg_fetch_object($result2))
 										{
 											$projektbetreuerperson_id=$row2->person_id;
-											$projektbetreuernew=false;		
+											$projektbetreuernew1=false;		
 										}
-										else $projektbetreuernew=true;
+										else $projektbetreuernew1=true;
 									}
-									else $projektbetreuernew=true;
+									else $projektbetreuernew1=true;
 								}
 								else
 								{
 									$error=true;
 									$error_log.="Fehler beim Zugriff auf Tabelle tbl_projektbetreuer bei betreuer_fk: ".$row->betreuer_fk."\n";	
 								}
-								if($projektbetreuernew)
+								if($projektbetreuernew1)
 								{
 									$qry='INSERT INTO lehre.tbl_projektbetreuer (person_id, projektarbeit_id, betreuerart, faktor, name,
 										  stunden, stundensatz, ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
@@ -900,17 +982,18 @@ if($result = pg_query($conn_fas, $qry_main))
 									     myaddslashes($projektbetreuername).', '.
 									     myaddslashes($projektbetreuerstunden).', '.
 									     myaddslashes($projektbetreuerstundensatz).', '.
-									     myaddslashes($projektbetreuerext_id).',  now(), '.
+									     myaddslashes($projektbetreuerext_id).', '.
+									     myaddslashes($projektbetreuerinsertamum).', '.
 									     myaddslashes($projektbetreuerinsertvon).', now(), '.
 									     myaddslashes($projektbetreuerupdatevon).');';
-									$ausgabe.="Bachelorarbeitsbetreuer eingefügt: UID='".$projektbetreuerperson_id."' und Projektarbeit='".$projektarbeitlehreinheit_id."'.\n";
+									
 								}
 								else 
 								{
-									$updatep=false;			
+									$updatep1=false;			
 									if($row2->person_id!=$projektbetreuerperson_id) 
 									{
-										$updatep=true;
+										$updatep1=true;
 										if(strlen(trim($ausgabe_pb))>0)
 										{
 											$ausgabe_pb.=", Betreuer: '".$projektbetreuerperson_id."' (statt '".$row2->person_id."')";
@@ -922,7 +1005,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									}
 									if($row2->projektarbeit_id!=$projektbetreuerprojektarbeit_id) 
 									{
-										$updatep=true;
+										$updatep1=true;
 										if(strlen(trim($ausgabe_pb))>0)
 										{
 											$ausgabe_pb.=", Projektarbeit: '".$projektbetreuerprojektarbeit_id."' (statt '".$row2->projektarbeit_id."')";
@@ -934,7 +1017,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									}
 									if($row2->betreuerart!=$projektbetreuerbetreuerart) 
 									{
-										$updatep=true;
+										$updatep1=true;
 										if(strlen(trim($ausgabe_pb))>0)
 										{
 											$ausgabe_pb.=", Betreuerart: '".$projektbetreuerbetreuerart."' (statt '".$row2->betreuerart."')";
@@ -946,7 +1029,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									}
 									if($row2->faktor!=$projektbetreuerfaktor) 
 									{
-										$updatep=true;
+										$updatep1=true;
 										if(strlen(trim($ausgabe_pb))>0)
 										{
 											$ausgabe_pb.=", Faktor: '".$projektbetreuerfaktor."' (statt '".$row2->faktor."')";
@@ -958,7 +1041,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									}
 									if($row2->name!=$projektbetreuername) 
 									{
-										$updatep=true;
+										$updatep1=true;
 										if(strlen(trim($ausgabe_pb))>0)
 										{
 											$ausgabe_pb.=", Name: '".$projektbetreuername."' (statt '".$row2->name."')";
@@ -970,7 +1053,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									}
 									if($row2->stunden!=$projektbetreuerstunden) 
 									{
-										$updatep=true;
+										$updatep1=true;
 										if(strlen(trim($ausgabe_pb))>0)
 										{
 											$ausgabe_pb.=", Betreuerstunden: '".$projektbetreuerstunden."' (statt '".$row2->stunden."')";
@@ -982,7 +1065,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									}
 									if($row2->stundensatz!=$projektbetreuerstundensatz) 
 									{
-										$updatep=true;
+										$updatep1=true;
 										if(strlen(trim($ausgabe_pb))>0)
 										{
 											$ausgabe_pb.=", Stundensatz: '".$projektbetreuerstundensatz."' (statt '".$row2->stundensatz."')";
@@ -992,7 +1075,31 @@ if($result = pg_query($conn_fas, $qry_main))
 											$ausgabe_pb="Stundensatz: '".$projektbetreuerstundensatz."' (statt '".$row2->stundensatz."')";
 										}
 									}
-									if($updatep)
+									if($row2->insertamum!=$projektbetreuerinsertamum) 
+									{
+										$updatep1=true;
+										if(strlen(trim($ausgabe_pb))>0)
+										{
+											$ausgabe_pb.=", Insertamum: '".$projektbetreuerinsertamum."' (statt '".$row2->insertamum."')";
+										}
+										else
+										{
+											$ausgabe_pb="Insertamum: '".$projektbetreuerinsertamum."' (statt '".$row2->insertamum."')";
+										}
+									}
+									if($row2->insertvon!=$projektbetreuerinsertvon) 
+									{
+										$updatep1=true;
+										if(strlen(trim($ausgabe_pb))>0)
+										{
+											$ausgabe_pb.=", Insertvon: '".$projektbetreuerinsertvon."' (statt '".$row2->insertvon."')";
+										}
+										else
+										{
+											$ausgabe_pb="Insertvon: '".$projektbetreuerinsertvon."' (statt '".$row2->insertvon."')";
+										}
+									}
+									if($updatep1)
 									{
 										$qry='UPDATE lehre.tbl_projektbetreuer SET '.
 										'person_id='.myaddslashes($projektbetreuerperson_id).', '. 
@@ -1002,27 +1109,22 @@ if($result = pg_query($conn_fas, $qry_main))
 										'name='.myaddslashes($projektbetreuername).', '.
 										'stunden='.myaddslashes($projektbetreuerstunden).', '.
 										'stundensatz='.myaddslashes($projektbetreuerstundensatz).', '.
+										'insertamum='.myaddslashes($projektbetreuerinsertamum).', '.
+										'insertvon='.myaddslashes($projektbetreuerinsertvon).', '.
 										'updateamum= now(), '.
 									     	'updatevon='.myaddslashes($projektbetreuerupdatevon).' '.
-										'WHERE projektarbeit_id='.myaddslashes($projektbetreuerprojektarbeit_id).';';
-										$ausgabe.="Bachelorarbeitsbetreuer aktualisiert: UID='".$projektbetreuerperson_id."' und Projektarbeit='".$projektarbeitlehreinheit_id."':".$ausgabe_pb.".\n";
+										"WHERE projektarbeit_id='".$projektbetreuerprojektarbeit_id."' AND person_id='".$projektbetreuerperson_id."'AND betreuerart='b';";
+										
+										
 									}
 								}
-								//echo $qry;
+								//echo nl2br ($qry."\n");
 								if(pg_query($conn,$qry))
 								{
-									if($projektbetreuernew)
-									{
-										$anzahl_pbb_insert++;
-									}			
-									else 
-									{
-										if($updatep)
-										{
-											$anzahl_pbb_update++;
-										}
-									}
 									$anzahl_pbb_gesamt++;
+									$ausgabe_pb1=$ausgabe_pb;
+									$ausgabe_pb='';
+									$projektbetreuerperson_id1=$projektbetreuerperson_id;
 								}
 								else
 								{			
@@ -1030,17 +1132,30 @@ if($result = pg_query($conn_fas, $qry_main))
 									$error_log.="Fehler beim Speichern des Bachelorarbeitsbetreuer-Datensatzes:".$projektbetreuerperson_id." \n".$qry."\n";
 									$ausgabe_pb='';
 								}
-															
-								$qry="SELECT person_portal FROM sync.tbl_syncperson WHERE person_fas='$row->begutachter_fk'";  //begutachter_fk -> person_id
+								$qry="SELECT person_fk FROM mitarbeiter WHERE mitarbeiter_pk='".$row->begutachter_fk."';";
+								if($resultu = pg_query($conn_fas, $qry))
+								{
+									if($rowu=pg_fetch_object($resultu))
+									{ 
+										$person=$rowu->person_fk;	
+									}
+									else
+									{
+										$error=true;
+										$error_log.="Begutachter mit mitarbeiter_fk: ".$row->begutachter_fk."' konnte in Tabelle mitarbeiter nicht gefunden werden.\n";
+									}
+								}						
+								$qry="SELECT person_portal FROM sync.tbl_syncperson WHERE person_fas='$person'";  //begutachter_fk -> person_id
 								if($resultu = pg_query($conn, $qry))
 								{
 									if($rowu=pg_fetch_object($resultu))
 									{ 
 										$projektbetreuerperson_id=$rowu->person_portal;	
 									}
-									else{
+									else
+									{
 										$error=true;
-										$error_log.="Begutachter mit person_fk: ".$row->betreuer_fk." konnte in syncperson nicht gefunden werden.\n";
+										$error_log.="Begutachter mit betreuer_fk: ".$person." konnte in syncperson nicht gefunden werden.\n";
 									}
 								}
 								//$projektbetreuer->person_id		='';
@@ -1055,17 +1170,18 @@ if($result = pg_query($conn_fas, $qry_main))
 								//$projektbetreuerupdateamum		=$row->;
 								$projektbetreuerupdatevon			="SYNC";
 								//$projektbetreuerinsertamum		=$row->;
-								$projektbetreuerinsertvon			="SYNC";
+								//$projektbetreuerinsertvon			="SYNC";
 								$projektbetreuerext_id			=$row->bakkalaureatsarbeit_pk;
 							
-								$qry2="SELECT person_id FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id='".$projektbetreuerprojektarbeit_id."' AND person_id='".$projektbetreuerperson_id."'AND betreuerart='".$projektbetreuerbetreuerart."';";
-								if($resultu = pg_query($conn, $qry2))
+								$qry2="SELECT * FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id='".$projektbetreuerprojektarbeit_id."' AND person_id='".$projektbetreuerperson_id."' AND betreuerart='g';";
+								//echo nl2br($qry2."\n");
+								if($result2 = pg_query($conn, $qry2))
 								{
-									if(pg_num_rows($resultu)>0) //wenn dieser eintrag schon vorhanden ist
+									if(pg_num_rows($result2)>0) //wenn dieser eintrag schon vorhanden ist
 									{
-										if($rowu=pg_fetch_object($resultu))
+										if($row2=pg_fetch_object($result2))
 										{
-											$projektbetreuerperson_id=$rowu->person_id;
+											$projektbetreuerperson_id=$row2->person_id;
 											$projektbetreuernew=false;		
 										}
 										else $projektbetreuernew=true;
@@ -1092,10 +1208,11 @@ if($result = pg_query($conn_fas, $qry_main))
 										     myaddslashes($projektbetreuerpunkte).', '.
 										     myaddslashes($projektbetreuerstunden).', '.
 										     myaddslashes($projektbetreuerstundensatz).', '.
-										     myaddslashes($projektbetreuerext_id).',  now(), '.
+										     myaddslashes($projektbetreuerext_id).', '.
+										     myaddslashes($projektbetreuerinsertamum).', '.
 										     myaddslashes($projektbetreuerinsertvon).', now(), '.
 										     myaddslashes($projektbetreuerupdatevon).');';	
-										$ausgabe.="Bachelorarbeitsbegutachter eingefügt: UID='".$projektbetreuerperson_id."' und Projektarbeit='".$projektarbeitlehreinheit_id."'.\n";
+										
 									}
 									else 
 									{
@@ -1209,6 +1326,30 @@ if($result = pg_query($conn_fas, $qry_main))
 												$ausgabe_pb="Stundensatz: '".$projektbetreuerstundensatz."' (statt '".$row2->stundensatz."')";
 											}
 										}
+										if($row2->insertamum!=$projektbetreuerinsertamum) 
+										{
+											$updatep=true;
+											if(strlen(trim($ausgabe_pb))>0)
+											{
+												$ausgabe_pb.=", Insertamum: '".$projektbetreuerinsertamum."' (statt '".$row2->insertamum."')";
+											}
+											else
+											{
+												$ausgabe_pb="Insertamum: '".$projektbetreuerinsertamum."' (statt '".$row2->insertamum."')";
+											}
+										}
+										if($row2->insertvon!=$projektbetreuerinsertvon) 
+										{
+											$updatep=true;
+											if(strlen(trim($ausgabe_pb))>0)
+											{
+												$ausgabe_pb.=", Insertvon: '".$projektbetreuerinsertvon."' (statt '".$row2->insertvon."')";
+											}
+											else
+											{
+												$ausgabe_pb="Insertvon: '".$projektbetreuerinsertvon."' (statt '".$row2->insertvon."')";
+											}
+										}
 										if($updatep)
 										{
 											$qry='UPDATE lehre.tbl_projektbetreuer SET '.
@@ -1218,35 +1359,27 @@ if($result = pg_query($conn_fas, $qry_main))
 											'betreuerart='.myaddslashes($projektbetreuerbetreuerart).', '.
 											'faktor='.myaddslashes($projektbetreuerfaktor).', '.
 											'name='.myaddslashes($projektbetreuername).', '.
-											'punkte'.myaddslashes($projektbetreuerpunkte).', '.
+											'punkte='.myaddslashes($projektbetreuerpunkte).', '.
 											'stunden='.myaddslashes($projektbetreuerstunden).', '.
 											'stundensatz='.myaddslashes($projektbetreuerstundensatz).', '.
+											'insertamum='.myaddslashes($projektbetreuerinsertamum).', '.
+											'insertvon='.myaddslashes($projektbetreuerinsertvon).', '.
 											'updateamum= now(), '.
 										     	'updatevon='.myaddslashes($projektbetreuerupdatevon).' '.
-											'WHERE projektarbeit_id='.myaddslashes($projektbetreuerprojektarbeit_id).';';
-											$ausgabe.="Bachelorarbeitsbegutachter aktualisiert: UID='".$projektbetreuerperson_id."' und Projektarbeit='".$projektarbeitlehreinheit_id."':".$ausgabe_pb.".\n";
+											"WHERE projektarbeit_id='".$projektbetreuerprojektarbeit_id."' AND person_id='".$projektbetreuerperson_id."' AND betreuerart='g';";
+											
 										}	
 									}
-									if(pg_query($conn,$qry))
-									{
-										if($projektbetreuernew)
-										{
-											$anzahl_pbg_insert++;
-										}			
-										else 
-										{
-											if($updatep)
-											{
-												$anzahl_pbg_update++;
-											}
-										}
-										$anzahl_pbg_gesamt++;
-									}
-									else
+									//echo nl2br($qry."\n");
+									if(!pg_query($conn,$qry))
 									{			
 										$error=true;
-										$error_log.='Fehler beim Speichern des Bachelorarbeitsbetreuer-Datensatzes:'.$projektbetreuerperson_id." \n".$qry."\n";
+										$error_log.='Fehler beim Speichern des Bachelorarbeitsbegutachter-Datensatzes:'.$projektbetreuerperson_id." \n".$qry."\n";
 										$ausgabe_pb='';
+									}
+									else 
+									{
+										$anzahl_pbg_gesamt++;
 									}
 									if($error)
 									{
@@ -1262,6 +1395,34 @@ if($result = pg_query($conn_fas, $qry_main))
 									else 
 									{
 										//COMMIT
+										if($projektbetreuernew1)
+										{
+											$anzahl_pbb_insert++;
+											$ausgabe.="Bachelorarbeitsbetreuer eingefügt: UID='".$projektbetreuerperson_id1."' und Projektarbeit='".$projektarbeitlehreinheit_id."'.\n";
+										}			
+										else 
+										{
+											if($updatep1)
+											{
+												$anzahl_pbb_update++;
+												$ausgabe.="Bachelorarbeitsbetreuer aktualisiert: UID='".$projektbetreuerperson_id1."' und Projektarbeit='".$projektarbeitlehreinheit_id."':".$ausgabe_pb1.".\n";
+											}
+										}
+										if($projektbetreuernew)
+										{
+											$anzahl_pbg_insert++;
+											$ausgabe.="Bachelorarbeitsbegutachter eingefügt: UID='".$projektbetreuerperson_id."' und Projektarbeit='".$projektarbeitlehreinheit_id."'.\n";
+										}			
+										else 
+										{
+											if($updatep)
+											{
+												$ausgabe.="Bachelorarbeitsbegutachter aktualisiert: UID='".$projektbetreuerperson_id."' und Projektarbeit='".$projektarbeitlehreinheit_id."':".$ausgabe_pb.".\n";
+												$anzahl_pbg_update++;
+											}
+										}
+										$ausgabe_pb1='';
+										$ausgabe_pb='';
 										pg_query($conn,'COMMIT;');
 										$ausgabe_all.=$ausgabe;
 										$ausgabe='';
@@ -1362,8 +1523,8 @@ if($result = pg_query($conn_fas, $qry_main))
 //echo und mail
 echo nl2br("Bachelorarbeitsynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
 
-$error_log_fas="Sync Bachelorarbeiten\n------------\n\n".$error_log_fas1."\n".$error_log_fas2."\n".$error_log_fas3."\n".$error_log_fas4."\n".$error_log_fas5."\n".$error_log_fas6."\n".$error_log_fas7."\n".$error_log_fas8;
-echo nl2br("Allgemeine Fehler: ".$anzahl_fehler.", lehrveranstaltung_fk<1: ".$anzahl_lv_fehler.", Anzahl Bachelorarbeiten; ".$anzahl_quelle.".\n");
+$error_log_fas="Sync Bachelorarbeiten\n------------------------\n\n".$error_log_fas1."\n".$error_log_fas2."\n".$error_log_fas3."\n".$error_log_fas4."\n".$error_log_fas5."\n".$error_log_fas6."\n".$error_log_fas7."\n".$error_log_fas8;
+echo nl2br("Allgemeine Fehler: ".$anzahl_fehler.", lehrveranstaltung_fk<1: ".$anzahl_lv_fehler.", Anzahl Bachelorarbeiten: ".$anzahl_quelle.".\n");
 echo nl2br("Lehreinheiten:       Gesamt: ".$anzahl_le_gesamt." / Eingefügt: ".$anzahl_le_insert." / Geändert: ".$anzahl_le_update." / Fehler: ".$anzahl_fehler_le."\n");
 echo nl2br("Projektarbeiten:   Gesamt: ".$anzahl_pa_gesamt." / Eingefügt: ".$anzahl_pa_insert." / Geändert: ".$anzahl_pa_update." / Fehler: ".$anzahl_fehler_pa."\n");
 echo nl2br("Betreuer:       Gesamt: ".$anzahl_pbb_gesamt." / Eingefügt: ".$anzahl_pbb_insert." / Geändert: ".$anzahl_pbb_update." / Fehler: ".$anzahl_fehler_pbb."\n");
