@@ -233,11 +233,15 @@ class student extends benutzer
 	 * @return integer Anzahl der gefundenen Einträge; <b>negativ</b> bei Fehler
 	 */
 
-	function getStudents($stg_kz,$sem=null,$ver=null,$grp=null,$gruppe=null)
+	function getStudents($stg_kz,$sem=null,$ver=null,$grp=null,$gruppe=null, $stsem=null)
 	{
 		$where = '';
 		if ($gruppe!=null)
+		{
 			$where=" gruppe_kurzbz='".$gruppe."'";
+			if($stsem!=null)
+				$where.=" AND studiensemester_kurzbz='$stsem'";
+		}
 		else
 		{
 			if ($stg_kz>=0)
@@ -253,7 +257,9 @@ class student extends benutzer
 		}
 
 
-		$sql_query="SELECT * FROM campus.vw_student WHERE $where ORDER by nachname,vorname";
+		//$sql_query="SELECT * FROM campus.vw_student WHERE $where ORDER by nachname,vorname";
+		$sql_query = "SELECT * FROM public.tbl_person, public.tbl_student, (public.tbl_benutzer LEFT JOIN tbl_benutzergruppe USING(uid)) 
+					  WHERE tbl_person.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid = tbl_student.student_uid AND $where ORDER BY nachname, vorname";
 	    //echo $sql_query;
 		if(!($erg=pg_query($this->conn, $sql_query)))
 		{
@@ -268,6 +274,8 @@ class student extends benutzer
 			$l=new student($this->conn);
 			// Personendaten
 			$l->uid=$row->uid;
+			$l->person_id=$row->person_id;
+			$l->prestudent_id=$row->prestudent_id;
 			$l->titelpre=$row->titelpre;
 			$l->titelpost=$row->titelpost;
 			$l->vornamen=$row->vornamen;

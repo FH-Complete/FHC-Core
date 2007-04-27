@@ -70,8 +70,6 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentdetailoverlay.xul.p
 					<treecols>
 	    				<treecol id="student-treecol-uid" label="UID" flex="1" primary="false"
 	    					class="sortDirectionIndicator"
-	    					sortActive="true"
-	    					sortDirection="ascending"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#uid"  />
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-titelpre" label="TitelPre" flex="1" hidden="false"
@@ -87,6 +85,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentdetailoverlay.xul.p
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#vornamen" />
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-nachname" label="Nachname" flex="1" hidden="false"
+	    					sortActive="true"
+	    					sortDirection="ascending"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#nachname" />
 	    				<splitter class="tree-splitter"/>

@@ -57,7 +57,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
   					<rows>
     					<row>
       						<label value="UID" control="student-detail-textbox-uid"/>
-      						<textbox id="student-detail-textbox-uid" disabled="true"/>
+      						<hbox><textbox id="student-detail-textbox-uid" disabled="true" maxlength="16" size="16"/></hbox>
       						<spacer />
       						<spacer />
       						<label value="Aktiv" control="student-detail-checkbox-aktiv"/>
@@ -65,7 +65,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     					</row>
     					<row>
       						<label value="Anrede" control="student-detail-textbox-anrede"/>
-      						<textbox id="student-detail-textbox-anrede" disabled="true" maxlength="16" size="16"/>
+      						<hbox><textbox id="student-detail-textbox-anrede" disabled="true" maxlength="16" size="16"/></hbox>
       						<label value="TitelPre" control="student-detail-textbox-titelpre"/>
       						<textbox id="student-detail-textbox-titelpre" disabled="true" maxlength="64"/>
       						<label value="TitelPost" control="student-detail-textbox-titelpost"/>
@@ -81,17 +81,17 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     					</row>
     					<row>
       						<label value="Geburtsdatum" control="student-detail-textbox-geburtsdatum"/>
-      						<textbox id="student-detail-textbox-geburtsdatum" disabled="true" maxlength="10"/>
+      						<hbox><textbox id="student-detail-textbox-geburtsdatum" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/></hbox>
       						<label value="Geburtsort" control="student-detail-textbox-geburtsort"/>
       						<textbox id="student-detail-textbox-geburtsort" disabled="true" maxlength="128"/>
       						<label value="Geburtszeit" control="student-detail-textbox-geburtszeit"/>
-      						<textbox id="student-detail-textbox-geburtszeit" disabled="true" maxlength="5"/>
+      						<hbox><textbox id="student-detail-textbox-geburtszeit" disabled="true" maxlength="5" size="5" tooltiptext="Format: hh:mm Beispiel: 10:30"/></hbox>
     					</row>
     					<row>
       						<label value="SVNR" control="student-detail-textbox-svnr"/>
-      						<textbox id="student-detail-textbox-svnr" disabled="true" maxlength="10"/>
+      						<hbox><textbox id="student-detail-textbox-svnr" disabled="true" maxlength="10" size="10"/></hbox>
       						<label value="Ersatzkennzeichen" control="student-detail-textbox-ersatzkennzeichen"/>
-      						<textbox id="student-detail-textbox-ersatzkennzeichen" disabled="true" maxlength="10"/>
+      						<hbox><textbox id="student-detail-textbox-ersatzkennzeichen" disabled="true" maxlength="10" size="10"/></hbox>
     					</row>
     					<row>
 							<label value="Staatsbuergerschaft" control="student-detail-menulist-staatsbuergerschaft"/>
@@ -185,7 +185,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
   					<rows>
     					<row>
     						<label value="Matrikelnummer" control="student-detail-textbox-matrikelnummer"/>
-      						<textbox id="student-detail-textbox-matrikelnummer" disabled="true" maxlength="15"/>
+      						<hbox><textbox id="student-detail-textbox-matrikelnummer" disabled="true" maxlength="15" size="15"/></hbox>
       						<label value="Studiengang" control="student-detail-textbox-studiengang_kz"/>
       						<menulist id="student-detail-menulist-studiengang_kz" disabled="true"
 							          datasources="<?php echo APP_ROOT ?>rdf/studiengang.rdf.php" flex="1"
@@ -201,11 +201,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     					</row>
     					<row>
 	    					<label value="Semester" control="student-detail-textbox-semester"/>
-      						<textbox id="student-detail-textbox-semester" disabled="true" maxlength="1"/>
+      						<hbox><textbox id="student-detail-textbox-semester" disabled="true" maxlength="1" size="1"/></hbox>
       						<label value="Verband" control="student-detail-textbox-verband"/>
-      						<textbox id="student-detail-textbox-verband" disabled="true" maxlength="1"/>
+      						<hbox><textbox id="student-detail-textbox-verband" disabled="true" maxlength="1" size="1"/></hbox>
       						<label value="Gruppe" control="student-detail-textbox-gruppe"/>
-      						<textbox id="student-detail-textbox-gruppe" disabled="true" maxlength="1"/>
+      						<hbox><textbox id="student-detail-textbox-gruppe" disabled="true" maxlength="1" size="1"/></hbox>
     					</row>
     				</rows>
     		</grid>
@@ -329,7 +329,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<label value="ZGV Ort" control="student-prestudent-textbox-zgvort"/>
       						<textbox id="student-prestudent-textbox-zgvort" disabled="true" maxlength="64"/>
       						<label value="ZGV Datum" control="student-prestudent-textbox-zgvdatum"/>
-      						<textbox id="student-prestudent-textbox-zgvdatum" disabled="true" maxlength="10"/>
+      						<hbox><textbox id="student-prestudent-textbox-zgvdatum" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/></hbox>
     					</row>
     					<row>
       						<label value="ZGV Master" control="student-prestudent-menulist-zgvmastercode"/>
@@ -347,7 +347,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<label value="ZGV Master Ort" control="student-prestudent-textbox-zgvmasterort"/>
       						<textbox id="student-prestudent-textbox-zgvmasterort" disabled="true" maxlength="64"/>
       						<label value="ZGV Master Datum" control="student-prestudent-textbox-zgvmasterdatum"/>
-      						<textbox id="student-prestudent-textbox-zgvmasterdatum" disabled="true" maxlength="10"/>
+      						<hbox><textbox id="student-prestudent-textbox-zgvmasterdatum" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/></hbox>
     					</row>
     				</rows>
     			</grid>
@@ -367,8 +367,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     					<row>
     						<label value="Anmeldung zum Reihungstest am" control="student-prestudent-textbox-anmeldungreihungstest"/>
       						<hbox>
-      							<textbox id="student-prestudent-textbox-anmeldungreihungstest" disabled="true" maxlength="10"/>
-      							<button id="student-prestudent-button-anmeldungreihungstest-heute" label="Heute" oncommand="StudentAnmeldungreihungstestHeute()" disabled="true"/>
+      							<textbox id="student-prestudent-textbox-anmeldungreihungstest" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/>
+      							<button id="student-prestudent-button-anmeldungreihungstest-heute" label="Heute" oncommand="StudentAnmeldungreihungstestHeute()" disabled="true" style="margin:0px;"/>
       						</hbox>
       						<label value="Reihungstest" control="student-prestudent-menulist-reihungstest"/>
       						<menulist id="student-prestudent-menulist-reihungstest" disabled="true"
@@ -387,7 +387,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       						<label value="Zum Reihungstest angetreten" control="student-prestudent-checkbox-reihungstestangetreten"/>
       						<checkbox id="student-prestudent-checkbox-reihungstestangetreten" checked="true" disabled="true"/>
       						<label value="Reihungstestpunkte" control="student-prestudent-textbox-punkte"/>
-      						<textbox id="student-prestudent-textbox-punkte" disabled="true" maxlength="19"/>
+      						<hbox><textbox id="student-prestudent-textbox-punkte" disabled="true" maxlength="9" size="9"/></hbox>
     					</row>
     				</rows>
     			</grid>
