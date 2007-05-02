@@ -148,11 +148,14 @@ AND (trim(p1.familienname)<>trim(p2.familienname) OR trim(p1.vorname)<>trim(p2.v
 
 	OR ((p1.zgv<>p2.zgv OR p1.zgvdatum<>p2.zgvdatum OR p1.zgvort<>p2.zgvort 
 	OR p1.zgvmagister<>p2.zgvmagister OR p1.zgvmagisterort<>p2.zgvmagisterort OR p1.zgvmagisterdatum<>p2.zgvmagisterdatum 
-	OR p1.punkte<>p2.punkte OR p1.perskz<>p2.perskz OR p1.aufgenommenam<>p2.aufgenommenam  
-	OR p1.beendigungsdatum<>p2.beendigungsdatum OR p1.aufmerksamdurch<>p2.aufmerksamdurch 
+	OR p1.punkte<>p2.punkte 
+	OR (p1.perskz<>p2.perskz AND p1.perskz='') OR (p1.perskz<>p2.perskz AND p2.perskz='')
+	OR (p1.aufgenommenam<>p2.aufgenommenam AND ((p1.perskz<>p2.perskz AND p1.perskz='') OR (p1.perskz<>p2.perskz AND p2.perskz='')))	
+	OR (p1.beendigungsdatum<>p2.beendigungsdatum AND ((p1.perskz<>p2.perskz AND p1.perskz='') OR (p1.perskz<>p2.perskz AND p2.perskz='')))	
+	OR p1.aufmerksamdurch<>p2.aufmerksamdurch 
 	OR p1.aufnahmeschluessel<>p2.aufnahmeschluessel OR p1.aufnahmeschluessel_fk<>p2.aufnahmeschluessel_fk 
 	OR p1.berufstaetigkeit<>p2.berufstaetigkeit OR p1.aufmerksamdurch_fk<>p2.aufmerksamdurch_fk 
-	OR p1.angetreten<>p2.angetreten)AND p1.studiengang_fk=p2.studiengang_fk))
+	OR p1.angetreten<>p2.angetreten) AND p1.studiengang_fk=p2.studiengang_fk))
 order by p1.familienname;
 ";
 //
@@ -287,7 +290,7 @@ if($resultp = pg_query($conn_fas, $qry))
 		}
 		if($studstg1==$studstg2)
 		{
-			if ($rowp->perskz1<>$rowp->perskz2)
+			if (($rowp->perskz1<>$rowp->perskz2 AND $rowp->perskz1=='') OR ($rowp->perskz1<>$rowp->perskz2 AND $rowp->perskz2==''))
 			{
 				$plausi.="Personenkennzeichen der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->perskz1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->perskz2."'.\n";
 				$error=true;
@@ -327,12 +330,12 @@ if($resultp = pg_query($conn_fas, $qry))
 				$plausi.="Reihungstestpunkte der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->punkte1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->punkte2."'.\n";
 				$error=true;
 			}
-			if ($rowp->aufgenommenam1<>$rowp->aufgenommenam2)
+			if (($rowp->aufgenommenam1<>$rowp->aufgenommenam2 AND (($rowp->perskz1<>$rowp->perskz2 AND $rowp->perskz1=='') OR ($rowp->perskz1<>$rowp->perskz2 AND $rowp->perskz2==''))))
 			{
 				$plausi.="Aufnahmedatum der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->aufgenommenam1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->aufgenommenam2."'.\n";
 				$error=true;
 			}
-			if ($rowp->beendigungsdatum1<>$rowp->beendigungsdatum2)
+			if (($rowp->beendigungsdatum1<>$rowp->beendigungsdatum2 AND (($rowp->perskz1<>$rowp->perskz2 AND $rowp->perskz1=='') OR ($rowp->perskz1<>$rowp->perskz2 AND $rowp->perskz2==''))))
 			{
 				$plausi.="Beendigungsdatum der Person ".$rowp->familienname1." (".$rowp->uid1.", stg=".$studstg1."(".$studiengangfk[$rowp->studiengang1]."), person_pk=".$rowp->person1.") ist '".$rowp->beendigungsdatum1."' bei ".$rowp->familienname2." (".$rowp->uid2.", stg=".$studstg2."(".$studiengangfk[$rowp->studiengang2]."), person_pk=".$rowp->person2.") aber '".$rowp->beendigungsdatum2."'.\n";
 				$error=true;
@@ -666,18 +669,18 @@ if($result = pg_query($conn_fas, $qry))
 		{
 			$error_log = 'UID darf nicht laenger als 16 Zeichen sein. : '.$nachname.", ".$vorname."\n";
 		}
-		/*if($student_uid == '')
+		//if($student_uid == '')
 		{
 			$error_log = 'UID muss eingegeben werden '.$nachname.", ".$vorname."\n";
-		}*/
+		}//
 		if(strlen($alias)>256)
 		{
 			$error_log = 'Alias darf nicht laenger als 256 Zeichen sein '.$nachname.", ".$vorname."\n";
 		}
-		/*if(!is_numeric($person_id))
+		//if(!is_numeric($person_id))
 		{
 			$error_log = 'person_id muss eine gueltige Zahl sein '.$nachname.", ".$vorname."\n";
-		}*/
+		}//
 		if(strlen($matrikelnr)>15)
 		{
 			$error_log = 'Matrikelnummer darf nicht laenger als 15 Zeichen sein '.$nachname.", ".$vorname."\n";
@@ -1089,7 +1092,7 @@ if($result = pg_query($conn_fas, $qry))
 							$ausgabe_person="Staatsbürgerschaft: '".$staatsbuergerschaft."' (statt '".$row1->staatsbuergerschaft."')";
 						}
 					}
-					if($row1->insertamum!=$insertamum)
+					if(date("d.m.Y", $row1->insertamum)!=date("d.m.Y", $insertamum))
 					{
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
@@ -1511,7 +1514,7 @@ if($result = pg_query($conn_fas, $qry))
 								$ausgabe_pre="EXT_ID: '".$ext_id."'";
 							}
 						}
-						if($rows->insertamum!=$insertamum)
+						if(date("d.m.Y", $rows->insertamum)!=date("d.m.Y", $insertamum))
 						{
 							$updater=true;
 							if(strlen(trim($ausgabe_pre))>0)
@@ -1989,7 +1992,7 @@ if($result = pg_query($conn_fas, $qry))
 										$ausgabe_benutzer="Ext_ID: '".$ext_id_benutzer."' statt('".$rows->ext_id."')";
 									}
 								}
-								if($rows->insertamum!=$insertamum)
+								if(date("d.m.Y", $rows->insertamum)!=date("d.m.Y", $insertamum))
 								{
 									$updateb=true;
 									if(strlen(trim($ausgabe_benutzer))>0)
@@ -2181,7 +2184,7 @@ if($result = pg_query($conn_fas, $qry))
 											$ausgabe_student="EXT_ID: '".$ext_id_student."' (statt '".$rows->ext_id."')";
 										}
 									}	
-									if($rows->insertamum!=$insertamum)
+									if(date("d.m.Y", $rows->insertamum)!=date("d.m.Y", $insertamum))
 									{
 										$updates=true;
 										if(strlen(trim($ausgabe_student))>0)
@@ -2313,9 +2316,11 @@ if($result = pg_query($conn_fas, $qry))
 			$text4.="***********\n\n";
 			pg_query($conn,'ROLLBACK;');
 		}
-
 	}
-}		
+}	
+
+
+
 echo nl2br("Studentensynchro Ende ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
 
 echo nl2br("\n\nPersonen ohne Reihungstest: ".$notest." \n");
