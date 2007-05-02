@@ -49,7 +49,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentdetailoverlay.xul.p
 						<toolbar id="nav-toolbar">
 						<!--<toolbarbutton id="student-toolbar-neu" label="Neuer Student" oncommand="StudentNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Student neu anlegen" />-->
 						<!--<toolbarbutton id="student-toolbar-del" label="Löschen" oncommand="StudentDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Student löschen"/>-->
-						<toolbarbutton id="student-toolbar-refresh" label="Neu laden" oncommand="StudentTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
+						<toolbarbutton id="student-toolbar-refresh" label="Aktualisieren" oncommand="StudentTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 						<spacer flex="1"/>
 						<label id="student-toolbar-label-anzahl"/>
 						</toolbar>
