@@ -755,7 +755,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 									$ausgabe_person="Staatsbürgerschaft: '".$personstaatsbuergerschaft."' (statt '".$row1->staatsbuergerschaft."')";
 								}
 							}
-							if($row1->insertamum!=$personinsertamum)
+							if(date("d.m.Y", $row1->insertamum)!=date("d.m.Y", $personinsertamum))
 							{
 								$updatep=true;
 								if(strlen(trim($ausgabe_person))>0)
@@ -908,7 +908,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 										$ausgabe_benutzer="PersonID: '".$personperson_id."'";
 									}
 								}
-								if($rowu->insertamum!=$benutzerinsertamum)
+								if(date("d.m.Y", $rowu->insertamum)!=date("d.m.Y", $benutzerinsertamum))
 								{
 									$updateb=true;
 									if(strlen(trim($ausgabe_benutzer))>0)
@@ -1112,7 +1112,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 												$ausgabe_mitarbeiter="Anmerkung: '".$mitarbeiteranmerkung."'";
 											}
 										}
-										if($rowu->insertamum!=$mitarbeiterinsertamum)
+										if(date("d.m.Y", $rowu->insertamum)!=date("d.m.Y", $mitarbeiterinsertamum))
 										{
 											$updatem=true;
 											if(strlen(trim($ausgabe_mitarbeiter))>0)

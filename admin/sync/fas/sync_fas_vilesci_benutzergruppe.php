@@ -69,11 +69,20 @@ if($result = pg_query($conn_fas, $qry))
 		$updateamum			="";
 		$updatevon				="SYNC";
 		$insertamum				=$row->creationdate;
-		$insertvon				=$row->creationuser;
+		//$insertvon				=$row->;
 		$ext_id				="";
 		
 		$error=false;
 		$error_log="";
+		
+		$qrycu="SELECT name FROM benutzer WHERE benutzer_pk='".$row->creationuser."';";
+		if($resultcu = pg_query($conn_fas, $qrycu))
+		{
+			if($rowcu=pg_fetch_object($resultcu))
+			{
+				$insertvon=$rowcu->name;
+			}
+		}
 		
 		$qry4="SELECT * from public.tbl_benutzer WHERE ext_id='".$row->student_pk."';";
 		if($result4 = pg_query($conn, $qry4))
@@ -165,12 +174,14 @@ if($result = pg_query($conn_fas, $qry))
 							{
 								//update
 								
-								if($rowchk2->uid!=$uid || $rowchk2->gruppe_kurzbz!=$gruppe_kurzbz || $rowchk2->studiensemester_kurzbz!=$studiensemester_kurzbz)
+								if($rowchk2->studiensemester_kurzbz<$studiensemester_kurzbz)
 								{
 									$qrybg="UPDATE public.tbl_benutzergruppe SET ".
 									"uid=".myaddslashes($uid).", ".
 									"gruppe_kurzbz=".myaddslashes($gruppe_kurzbz).", ".
 									"studiensemester_kurzbz=".myaddslashes($studiensemester_kurzbz).", ".
+									"insertamum=".myaddslashes($insertamum).", ".
+								       	"insertvon=".myaddslashes($insertvon).", ".
 									"updateamum=now(), ".
 									"updatevon='SYNC'".
 									"WHERE uid='".$uid."' AND gruppe_kurzbz='".$gruppe_kurzbz."';";
