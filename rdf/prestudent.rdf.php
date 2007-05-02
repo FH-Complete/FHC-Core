@@ -54,7 +54,7 @@ $rdf_url='http://www.technikum-wien.at/prestudent';
 if(isset($_GET['prestudent_id']) && is_numeric($_GET['prestudent_id']))
 {
 	$prestd = new prestudent($conn, null, true);
-	$prestd->load($_GET['prestudent_id']);
+	//$prestd->load($_GET['prestudent_id']);
 	if($prestd->load($_GET['prestudent_id']))
 	{
 ?>

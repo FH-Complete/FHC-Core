@@ -6,6 +6,7 @@ include('../vilesci/config.inc.php');
 
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentenoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungoverlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentenoverlay.xul.php"?>';
 /*echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-week-overlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-semester-overlay.xul.php"?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
@@ -146,16 +147,13 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 </popupset>
 	<tabbox id="tabbox-main" flex="3" orient="vertical">
 		<tabs orient="horizontal">
-			<!-- <tab id="tab-week" label="Wochenplan" />  -->
-			<!-- <tab id="tab-semester" label="Semesterplan" />  -->
-			<tab id="tab-studenten" label="Studenten" />
-			<tab id="tab-lfvt" label="Lehrveranstaltung" />
+			<tab id="tab-interessenten" label="Interessenten"/>
+			<tab id="tab-studenten" label="Studenten"/>
+			<tab id="tab-lfvt" label="Lehrveranstaltungen" />
 		</tabs>
 		<tabpanels id="tabpanels-main" flex="1">
-			<!--  Wochenplan
-			<hbox id="hboxTimeTableWeek" />  -->
-			<!--  Semesterplan
-			<vbox id="vboxTimeTableSemester" />  -->
+			<!--  Interessenten  -->
+			<vbox id="InteressentenEditor" />
 			<!--  Studenten  -->
 			<vbox id="studentenEditor" />
 			<!-- Lehrfachverteilung -->

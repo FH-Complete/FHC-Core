@@ -350,5 +350,86 @@ class prestudent extends person
 			return false;
 		}
 	}
+	
+	// *******************************************************************************
+	// * Laedt die Interessenten und Bewerber fuer ein bestimmtes Studiensemester
+	// * @param $studiensemester_kurzbz Studiensemester fuer das die Int. und Bewerber
+	// *                                geladen werden sollen
+	// *******************************************************************************
+	function loadIntessentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester=nulll)
+	{
+		$qry = "SELECT distinct on(tbl_prestudent.prestudent_id) * FROM public.tbl_person, public.tbl_prestudent, public.tbl_prestudentrolle WHERE 
+				tbl_person.person_id=tbl_prestudent.person_id AND 
+				tbl_prestudent.prestudent_id=tbl_prestudentrolle.prestudent_id AND 
+				tbl_prestudentrolle.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
+				(rolle_kurzbz='Interessent' OR rolle_kurzbz='Bewerber') AND
+				tbl_prestudent.studiengang_kz='$studiengang_kz'";
+		if($semester!=null)
+			$qry.=" AND tbl_prestudentrolle.ausbildungssemester='$semester'";
+
+		//echo $qry;
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$ps = new prestudent($this->conn, null, null);
+				
+				$ps->person_id = $row->person_id;
+				$ps->staatsbuergerschaft = $row->staatsbuergerschaft;
+				$ps->gebnation = $row->geburtsnation;
+				$ps->sprache = $row->sprache;
+				$ps->anrede = $row->anrede;
+				$ps->titelpost = $row->titelpost;
+				$ps->titelpre = $row->titelpre;
+				$ps->nachname = $row->nachname;
+				$ps->vorname = $row->vorname;
+				$ps->vornamen = $row->vornamen;
+				$ps->gebdatum = $row->gebdatum;
+				$ps->gebort = $row->gebort;
+				$ps->gebzeit = $row->gebzeit;
+				$ps->foto = $row->foto;
+				$ps->anmerkungen = $row->anmerkungen;
+				$ps->homepage = $row->homepage;
+				$ps->svnr = $row->svnr;
+				$ps->ersatzkennzeichen = $row->ersatzkennzeichen;
+				$ps->familienstand = $row->familienstand;
+				$ps->geschlecht = $row->geschlecht;
+				$ps->anzahlkinder = $row->anzahlkinder;
+				$ps->aktiv = ($row->aktiv=='t'?true:false);
+				
+				$ps->prestudent_id = $row->prestudent_id;
+				$ps->aufmerksamdurch_kurzbz = $row->aufmerksamdurch_kurzbz;
+				$ps->studiengang_kz = $row->studiengang_kz;
+				$ps->berufstaetigkeit_code = $row->berufstaetigkeit_code;
+				$ps->ausbildungcode = $row->ausbildungcode;
+				$ps->zgv_code = $row->zgv_code;
+				$ps->zgvort = $row->zgvort;
+				$ps->zgvdatum = $row->zgvdatum;
+				$ps->zgvmas_code = $row->zgvmas_code;
+				$ps->zgvmaort = $row->zgvmaort;
+				$ps->zgvmadatum = $row->zgvmadatum;
+				$ps->aufnahmeschluessel = $row->aufnahmeschluessel;
+				$ps->facheinschlberuf = ($row->facheinschlberuf=='t'?true:false);
+				$ps->anmeldungreihungstest = $row->anmeldungreihungstest;
+				$ps->reihungstestangetreten = ($row->reihungstestangetreten=='t'?true:false);
+				$ps->reihungstest_id = $row->reihungstest_id;
+				$ps->punkte = $row->punkte;
+				$ps->bismelden = ($row->bismelden=='t'?true:false);
+				
+				$ps->rolle_kurzbz = $row->rolle_kurzbz;
+				$ps->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$ps->ausbildungssemester = $row->ausbildungssemester;
+				$ps->datum = $row->datum;
+				
+				$this->result[] = $ps;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>

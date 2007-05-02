@@ -240,25 +240,26 @@ class student extends benutzer
 		{
 			$where=" gruppe_kurzbz='".$gruppe."'";
 			if($stsem!=null)
-				$where.=" AND studiensemester_kurzbz='$stsem'";
+				$where.=" AND tbl_benutzergruppe.studiensemester_kurzbz='$stsem'";
 		}
 		else
 		{
 			if ($stg_kz>=0)
 			{
-				$where.=" studiengang_kz=$stg_kz";
+				$where.=" tbl_studentlehrverband.studiengang_kz=$stg_kz";
 				if ($sem!=null)
-					$where.=" AND semester=$sem";
+					$where.=" AND tbl_studentlehrverband.semester=$sem";
 				if ($ver!=null)
-					$where.=" AND verband='".$ver."'";
+					$where.=" AND tbl_studentlehrverband.verband='".$ver."'";
 				if ($grp!=null)
-					$where.=" AND gruppe='".$grp."'";
+					$where.=" AND tbl_studentlehrverband.gruppe='".$grp."'";
 			}
-		}
-
+			if($stsem!=null)
+				$where.=" AND tbl_studentlehrverband.studiensemester_kurzbz='$stsem'";
+		}			
 
 		//$sql_query="SELECT * FROM campus.vw_student WHERE $where ORDER by nachname,vorname";
-		$sql_query = "SELECT * FROM public.tbl_person, public.tbl_student, (public.tbl_benutzer LEFT JOIN tbl_benutzergruppe USING(uid)) 
+		$sql_query = "SELECT *, tbl_student.semester as std_semester, tbl_student.verband as std_verband, tbl_student.gruppe as std_gruppe, tbl_student.studiengang_kz as std_studiengang_kz FROM public.tbl_person, public.tbl_student, ((public.tbl_benutzer LEFT JOIN public.tbl_benutzergruppe USING(uid)) LEFT JOIN public.tbl_studentlehrverband ON(uid = student_uid))
 					  WHERE tbl_person.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid = tbl_student.student_uid AND $where ORDER BY nachname, vorname";
 	    //echo $sql_query;
 		if(!($erg=pg_query($this->conn, $sql_query)))
@@ -293,10 +294,10 @@ class student extends benutzer
 			$l->updatevon=(isset($row->updatevon)?$row->updatevon:'');
 			// Studentendaten
 			$l->matrikelnr=$row->matrikelnr;
-			$l->gruppe=$row->gruppe;
-			$l->verband=$row->verband;
-			$l->semester=$row->semester;
-			$l->studiengang_kz=$row->studiengang_kz;
+			$l->gruppe=$row->std_gruppe;
+			$l->verband=$row->std_verband;
+			$l->semester=$row->std_semester;
+			$l->studiengang_kz=$row->std_studiengang_kz;
 			//$l->stg_bezeichnung=$row->bezeichnung;
 			// student in Array speichern
 			$result[]=$l;

@@ -127,6 +127,65 @@ if(!$error)
 			}
 		}
 	}
+	if(isset($_POST['type']) && $_POST['type']=='saveperson')
+	{
+		//Personendaten Speichern
+
+		if(!$error)
+		{
+			$person = new person($conn, null, true);
+			
+			if(!$person->load($_POST['person_id']))
+			{
+				$return = false;
+				$errormsg = 'Fehler beim laden:'.$person->errormsg;
+				$error = true;
+			}
+			
+			if(!$error)
+			{
+				$person->person_id = $_POST['person_id'];
+				$person->anrede = $_POST['anrede'];
+				$person->titelpre = $_POST['titelpre'];
+				$person->titelpost = $_POST['titelpost'];
+				$person->vorname = $_POST['vorname'];
+				$person->vornamen = $_POST['vornamen'];
+				$person->nachname = $_POST['nachname'];
+				$person->gebdatum = $_POST['geburtsdatum'];
+				$person->gebort = $_POST['geburtsort'];
+				$person->gebzeit = $_POST['geburtszeit'];
+				$person->anmerkungen = $_POST['anmerkung'];
+				$person->homepage = $_POST['homepage'];
+				$person->svnr = $_POST['svnr'];
+				$person->ersatzkennzeichen = $_POST['ersatzkennzeichen'];
+				$person->familienstand = $_POST['familienstand'];
+				$person->geschlecht = $_POST['geschlecht'];
+				$person->aktiv = ($_POST['aktiv']=='true'?true:false);
+				$person->anzahlkinder = $_POST['anzahlderkinder'];
+				$person->staatsbuergerschaft = $_POST['staatsbuergerschaft'];
+				$person->geburtsnation = $_POST['geburtsnation'];
+				$person->sprache = $_POST['sprache'];
+								
+				$person->new=false;				
+
+				if(!$error)
+				{
+					if($person->save())
+					{
+						$return = true;
+						$error=false;
+						$data = $person->person_id;
+					}
+					else
+					{
+						$return = false;
+						$errormsg  = $person->errormsg;
+						$error = true;
+					}
+				}
+			}
+		}
+	}
 	elseif(isset($_POST['type']) && $_POST['type']=='saveprestudent')
 	{
 		//Studentendaten Speichern

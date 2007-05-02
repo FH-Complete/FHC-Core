@@ -7,6 +7,7 @@ var LvTreeDatasource;
 var LektorTreeDatasource;
 var LektorTreeOpenStudiengang;
 var StudentTreeDatasource;
+var InteressentTreeDatasource;
 
 // ****
 // * initialisiert den Lektor Tree
@@ -219,6 +220,35 @@ function onVerbandSelect(event)
 		StudentDetailReset();
 		StudentDetailDisableFields(true);
 		StudentPrestudentDisableFields(true);
+	}
+	catch(e)
+	{
+		debug(e);
+	}
+	
+	// Interessenten / Bewerber
+	try
+	{
+		url = "<?php echo APP_ROOT; ?>rdf/interessentenbewerber.rdf.php?"+"studiengang_kz="+stg_kz+"&semester="+sem+"&"+gettimestamp();
+		var treeInt=document.getElementById('interessent-tree');
+		
+		//Alte DS entfernen
+		var oldDatasources = treeInt.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			treeInt.database.RemoveDataSource(oldDatasources.getNext());
+		}
+
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		InteressentTreeDatasource = rdfService.GetDataSource(url);
+		InteressentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		InteressentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		treeInt.database.AddDataSource(InteressentTreeDatasource);
+		InteressentTreeDatasource.addXMLSinkObserver(InteressentTreeSinkObserver);
+		treeInt.builder.addListener(InteressentTreeListener);
+		InteressentDetailReset();
+		InteressentDetailDisableFields(true);
+		InteressentPrestudentDisableFields(true);
 	}
 	catch(e)
 	{
