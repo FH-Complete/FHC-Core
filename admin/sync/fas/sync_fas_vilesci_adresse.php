@@ -99,7 +99,7 @@ if($result = pg_query($conn_fas, $qry))
 		$update=false;
 		//echo nl2br ($adresse->ext_id."\n");
 		$qrycu="SELECT name FROM benutzer WHERE benutzer_pk='".$row->creationuser."';";
-		if($resultcu = pg_query($conn, $qrycu))
+		if($resultcu = pg_query($conn_fas, $qrycu))
 		{
 			if($rowcu=pg_fetch_object($resultcu))
 			{
@@ -124,112 +124,112 @@ if($result = pg_query($conn_fas, $qry))
 							if($row2=pg_fetch_object($result2))
 							{ 
 								$update=false;
-								if(trim($row2->name)!=trim($row->name))
+								if(trim($row2->name)!=trim($adresse->name))
 								{
 									$update=true;
 									if(strlen(trim($ausgabe_adresse))>0)
 									{
-										$ausgabe_adresse.=", Name: '".trim($row->name)."'";
+										$ausgabe_adresse.=", Name: '".trim($adresse->name)."'";
 									}
 									else
 									{
-										$ausgabe_adresse="Name: '".trim($row->name)."'";
+										$ausgabe_adresse="Name: '".trim($adresse->name)."'";
 									}
 								}
-								if(trim($row2->strasse)!=trim($row->strasse))
+								if(trim($row2->strasse)!=trim($adresse->strasse))
 								{
 									$update=true;
 									if(strlen(trim($ausgabe_adresse))>0)
 									{
-										$ausgabe_adresse.=", Strasse: '".trim($row->strasse)."'";
+										$ausgabe_adresse.=", Strasse: '".trim($adresse->strasse)."'";
 									}
 									else
 									{
-										$ausgabe_adresse="Strasse: '".trim($row->strasse)."'";
+										$ausgabe_adresse="Strasse: '".trim($adresse->strasse)."'";
 									}
 								}
-								if(trim($row2->plz)!=trim($row->plz))
+								if(trim($row2->plz)!=trim($adresse->plz))
 								{
 									$update=true;
 									if(strlen(trim($ausgabe_plz))>0)
 									{
-										$ausgabe_adresse.=", Plz: '".trim($row->plz)."'";
+										$ausgabe_adresse.=", Plz: '".trim($adresse->plz)."'";
 									}
 									else
 									{
-										$ausgabe_adresse="Plz: '".trim($row->plz)."'";
+										$ausgabe_adresse="Plz: '".trim($adresse->plz)."'";
 									}
 								}
-								if(trim($row2->ort)!=trim($row->ort))
+								if(trim($row2->ort)!=trim($adresse->ort))
 								{
 									$update=true;
 									if(strlen(trim($ausgabe_adresse))>0)
 									{
-										$ausgabe_adresse.=", Ort: '".trim($row->ort)."'";
+										$ausgabe_adresse.=", Ort: '".trim($adresse->ort)."'";
 									}
 									else
 									{
-										$ausgabe_adresse="Ort: '".trim($row->ort)."'";
+										$ausgabe_adresse="Ort: '".trim($adresse->ort)."'";
 									}
 								}
-								if(trim($row2->gemeinde)!=trim($row->gemeinde))
+								if(trim($row2->gemeinde)!=trim($adresse->gemeinde))
 								{
 									$update=true;
 									if(strlen(trim($ausgabe_adresse))>0)
 									{
-										$ausgabe_adresse.=", Gemeinde: '".trim($row->gemeinde)."'";
+										$ausgabe_adresse.=", Gemeinde: '".trim($adresse->gemeinde)."'";
 									}
 									else
 									{
-										$ausgabe_adresse="Gemeinde: '".trim($row->gemeinde)."'";
+										$ausgabe_adresse="Gemeinde: '".trim($adresse->gemeinde)."'";
 									}
 								}
-								if(trim($row2->nation)!=trim($row->nation))
+								if(trim($row2->nation)!=trim($adresse->nation))
 								{
 									$update=true;
 									if(strlen(trim($ausgabe_adresse))>0)
 									{
-										$ausgabe_adresse.=", Nation: '".trim($row->nation)."'";
+										$ausgabe_adresse.=", Nation: '".trim($adresse->nation)."'";
 									}
 									else
 									{
-										$ausgabe_adresse="Nation: '".trim($row->nation)."'";
+										$ausgabe_adresse="Nation: '".trim($adresse->nation)."'";
 									}
 								}
-								if(trim($row2->typ)!=trim($row->typ))
+								if(trim($row2->typ)!=trim($adresse->typ))
 								{
 									$update=true;
 									if(strlen(trim($ausgabe_adresse))>0)
 									{
-										$ausgabe_adresse.=", Typ: '".trim($row->typ)."'";
+										$ausgabe_adresse.=", Typ: '".trim($adresse->typ)."'";
 									}
 									else
 									{
-										$ausgabe_adresse="Typ: '".trim($row->typ)."'";
+										$ausgabe_adresse="Typ: '".trim($adresse->typ)."'";
 									}
 								}
-								if($row2->heimatadresse!=($row->bismeldeadresse=='J'?'t':'f'))
+								if($row2->heimatadresse!=($adresse->heimatadresse=='J'?'t':'f'))
 								{
 									$update=true;
 									if(strlen(trim($ausgabe_adresse))>0)
 									{
-										$ausgabe_adresse.=", Heimatadresse: '".($row->bismeldeadresse=='J'?'true':'false')."'";
+										$ausgabe_adresse.=", Heimatadresse: '".($adresse->heimatadresse=='J'?'true':'false')."'";
 									}
 									else
 									{
-										$ausgabe_adresse="Heimatadresse: '".($row->bismeldeadresse=='J'?'true':'false')."'";
+										$ausgabe_adresse="Heimatadresse: '".($adresse->heimatadresse=='J'?'true':'false')."'";
 									}
 								}
-								if($row2->zustelladresse!=($row->zustelladresse=='J'?'t':'f'))
+								if($row2->zustelladresse!=($adresse->zustelladresse=='J'?'t':'f'))
 								{
 									$update=true;
 									if(strlen(trim($ausgabe_adresse))>0)
 									{
-										$ausgabe_adresse.=", Zustelladresse: '".($row->zustelladresse=='J'?'true':'false')."'";
+										$ausgabe_adresse.=", Zustelladresse: '".($adresse->zustelladresse=='J'?'true':'false')."'";
 									}
 									else
 									{
-										$ausgabe_adresse="Zustelladresse: '".($row->Zustelladresse=='J'?'true':'false')."'";
+										$ausgabe_adresse="Zustelladresse: '".($adresse->Zustelladresse=='J'?'true':'false')."'";
 									}
 								}
 								// update adresse, wenn datensatz bereits vorhanden
