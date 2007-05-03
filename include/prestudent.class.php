@@ -41,6 +41,7 @@ class prestudent extends person
 	var $reihungstest_id;
 	var $punkte;
 	var $bismelden;
+	var $anmerkung;
 	
 	var $rolle_kurzbz;
 	var $studiensemester_kurzbz;
@@ -114,6 +115,7 @@ class prestudent extends person
 				$this->punkte = $row->punkte;
 				$this->bismelden = ($row->bismelden=='t'?true:false);
 				$this->person_id = $row->person_id;
+				$this->anmerkung = $row->anmerkung;
 				
 				if(!person::load($row->person_id))
 					return false;
@@ -161,7 +163,7 @@ class prestudent extends person
 		
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = 'INSERT INTO public.tbl_prestudent (aufmerksamdurch_kurzbz, person_id, studiengang_kz, berufstaetigkeit_code, ausbildungcode, zgv_code, zgvort, zgvdatum, zgvmas_code, zgvmaort, zgvmadatum, aufnahmeschluessel, facheinschlberuf, reihungstest_id, anmeldungreihungstest, reihungstestangetreten, punkte, bismelden, insertamum, insertvon, updateamum, updatevon, ext_id) VALUES('.
+			$qry = 'BEGIN;INSERT INTO public.tbl_prestudent (aufmerksamdurch_kurzbz, person_id, studiengang_kz, berufstaetigkeit_code, ausbildungcode, zgv_code, zgvort, zgvdatum, zgvmas_code, zgvmaort, zgvmadatum, aufnahmeschluessel, facheinschlberuf, reihungstest_id, anmeldungreihungstest, reihungstestangetreten, punkte, bismelden, insertamum, insertvon, updateamum, updatevon, ext_id, anmerkung) VALUES('.
 			       $this->addslashes($this->aufmerksamdurch_kurzbz).",".
 			       $this->addslashes($this->person_id).",".
 			       $this->addslashes($this->studiengang_kz).",".
@@ -184,7 +186,8 @@ class prestudent extends person
 			       $this->addslashes($this->insertvon).",".
 			       $this->addslashes($this->updateamum).",".
 			       $this->addslashes($this->updatevon).",".
-			       $this->addslashes($this->ext_id).");";
+			       $this->addslashes($this->ext_id).",".
+			       $this->addslashes($this->anmerkung).");";
 		}
 		else
 		{			
@@ -209,12 +212,38 @@ class prestudent extends person
 			       ' bismelden='.($this->bismelden?'true':'false').",".
 			       ' updateamum='.$this->addslashes($this->updateamum).",".
 			       ' updatevon='.$this->addslashes($this->updatevon).",".
-			       ' ext_id='.$this->addslashes($this->ext_id).
+			       ' ext_id='.$this->addslashes($this->ext_id).",".
+			       ' anmerkung='.$this->addslashes($this->anmerkung).
 			       " WHERE prestudent_id='".addslashes($this->prestudent_id)."';";
 		}
 		
 		if(pg_query($this->conn,$qry))
 		{
+			if($this->new)
+			{
+				$qry = "SELECT currval('public.tbl_prestudent_prestudent_id_seq') as id;";
+				if($result = pg_query($this->conn, $qry))
+				{
+					if($row = pg_fetch_object($result))
+					{
+						$this->prestudent_id = $row->id;
+						pg_query($this->conn, 'COMMIT;');
+						return true;
+					}
+					else 
+					{
+						$this->errormsg = 'Fehler beim auslesen der Sequence';
+						pg_query($this->conn, 'ROLLBACK;');
+						return false;
+					}						
+				}
+				else 
+				{
+					$this->errormsg = 'Fehler beim auslesen der Sequence';
+					pg_query($this->conn, 'ROLLBACK;');
+					return false;
+				}
+			}
 			//Log schreiben
 			return true;
 		}
@@ -428,6 +457,98 @@ class prestudent extends person
 		else 
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	// ********************************************************
+	// * Prueft ob eine Person bereits einen PreStudenteintrag
+	// * fuer einen Studiengang besitzt
+	// * @param person_id
+	// *        studiengang_kz
+	// * @return true wenn vorhanden
+	// *		 false wenn nicht vorhanden
+	// *		 false und errormsg wenn Fehler aufgetreten ist
+	// *********************************************************         
+	function exists($person_id, $studiengang_kz)
+	{
+		if(!is_numeric($person_id))
+		{
+			$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		if(!is_numeric($studiengang_kz))
+		{
+			$this->errormsg = 'Studiengang_kz muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_prestudent WHERE person_id='$person_id' AND studiengang_kz='$studiengang_kz'";
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{	
+				if($row->anzahl>0)
+				{
+					$this->errormsg = '';
+					return true;
+				}
+				else 	
+				{
+					$this->errormsg = '';
+					return false;
+				}
+			}
+			else 
+			{
+				$this->errormsg = 'Fehler beim laden der Daten';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden der Daten';
+			return false;
+		}
+	}
+	
+	// *******************************************
+	// * Speichert die Prestudentrolle
+	// * @return true wenn ok, false im Fehlerfall
+	// *******************************************
+	function save_rolle()
+	{
+		if($this->new)
+		{
+			$qry = 'INSERT INTO public.tbl_prestudentrolle (prestudent_id, rolle_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id) VALUES('.
+			       $this->addslashes($this->prestudent_id).",".
+			       $this->addslashes($this->rolle_kurzbz).",".
+			       $this->addslashes($this->studiensemester_kurzbz).",".
+			       $this->addslashes($this->ausbildungssemester).",".
+			       $this->addslashes($this->datum).",".
+			       $this->addslashes($this->insertamum).",".
+			       $this->addslashes($this->insertvon).",".
+			       $this->addslashes($this->updateamum).",".
+			       $this->addslashes($this->updatevon).",".
+			       $this->addslashes($this->ext_id).");";
+		}
+		else
+		{			
+			$qry = 'UPDATE public.tbl_prestudentrolle SET'.
+			       ' ausbildungssemester='.$this->addslashes($this->ausbildungssemester).",".
+			       ' datum='.$this->addslashes($this->datum).",".
+			       " WHERE prestudent_id='".addslashes($this->prestudent_id)."' AND rolle_kurzbz='".addslashes($this->rolle_kurzbz)."' AND studiensemester_kurzbz='".addslashes($this->studiensemester_kurzbz)."';";
+		}
+		
+		if(pg_query($this->conn,$qry))
+		{
+			//Log schreiben
+			return true;
+		}
+		else 
+		{	
+			$this->errormsg = 'Fehler beim Speichern der Prestudentrolle:'.$qry;
 			return false;
 		}
 	}

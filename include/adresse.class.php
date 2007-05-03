@@ -101,9 +101,9 @@ class adresse
 		
 		if($row = pg_fetch_object($res))
 		{
-			$this->adresse_id      = $row->adresse_pk;
-			$this->heimatadresse = ($row->heimatadresse=='J'?true:false);
-			$this->zustelladresse = ($row->zustelladresse=='J'?true:false);
+			$this->adresse_id      = $row->adresse_id;
+			$this->heimatadresse = ($row->heimatadresse=='t'?true:false);
+			$this->zustelladresse = ($row->zustelladresse=='t'?true:false);
 			$this->gemeinde        = $row->gemeinde;
 			$this->name            = $row->name;
 			$this->nation          = $row->nation;
@@ -115,7 +115,7 @@ class adresse
 			$this->updateamum      = $row->updateamum;
 			$this->updatevon       = $row->updatevon;
 			$this->updateamum      = $row->insertamum;
-			$this->updatevon       = $row->inservon;
+			$this->updatevon       = $row->insertvon;
 			$this->firma_id=$row->firma_id;
 		}
 		else
@@ -142,7 +142,7 @@ class adresse
 		}
 		
 		//Lesen der Daten aus der Datenbank
-		$qry = "SELECT * FROM adresse WHERE person_fk=$pers_id";
+		$qry = "SELECT * FROM public.tbl_adresse WHERE person_id=$pers_id";
 		
 		if(!$res = pg_query($this->conn,$qry))
 		{
@@ -154,19 +154,21 @@ class adresse
 		{
 			$adr_obj = new adresse($this->conn);
 		
-			$adr_obj->adresse_id      = $row->adresse_pk;
-			$adr_obj->bismeldeadresse = ($row->bismeldeadresse=='J'?true:false);
+			$adr_obj->adresse_id      = $row->adresse_id;
+			$adr_obj->heimatdresse = ($row->heimatadresse=='t'?true:false);
 			$adr_obj->gemeinde        = $row->gemeinde;
 			$adr_obj->name            = $row->name;
 			$adr_obj->nation          = $row->nation;
 			$adr_obj->ort             = $row->ort;
-			$adr_obj->person_id       = $row->person_fk;
+			$adr_obj->person_id       = $row->person_id;
 			$adr_obj->plz             = $row->plz;
 			$adr_obj->strasse         = $row->strasse;
 			$adr_obj->typ             = $row->typ;
-			$adr_obj->updateamum      = $row->creationdate;
-			$adr_obj->updatevon       = $row->creationuser;
-			$adr_obj->zustelladresse  = ($row->zustelladresse=='J'?true:false);
+			$adr_obj->updateamum      = $row->updateamum;
+			$adr_obj->updatevon       = $row->updatevon;
+			$adr_obj->insertamum      = $row->insertamum;
+			$adr_obj->insertvon       = $row->insertvon;
+			$adr_obj->zustelladresse  = ($row->zustelladresse=='t'?true:false);
 			
 			$this->result[] = $adr_obj;
 		}
@@ -223,11 +225,6 @@ class adresse
 			$this->errormsg='person_id enthaelt ungueltige Zeichen:'.$this->person_id.' - adresse: '.$this->adresse_id."\n";
 			return false;
 		}
-		if(!is_numeric($this->typ))   
-		{
-			$this->errormsg='Typ enthaelt ungueltige Zeichen - adresse: '.$this->adresse_id."\n";
-			return false;
-		}		
 		
 		//Gesamtlaenge pruefen
 		//$this->errormsg='Eine der Gesamtlaengen wurde ueberschritten';
@@ -333,7 +330,7 @@ class adresse
 			$qryz="SELECT * FROM tbl_adresse WHERE adresse_id='$this->adresse_id';";
 			if($resultz = pg_query($this->conn, $qryz))
 			{
-				while($rowz = pg_fetch_object($resultz))
+				if($rowz = pg_fetch_object($resultz))
 				{
 					$update=false;			
 					if($rowz->person_id!=$this->person_id) 				$update=true;

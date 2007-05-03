@@ -107,7 +107,7 @@ function InteressentTreeRefresh()
 // ****
 function InteressentNeu()
 {
-	
+	window.open('<?php echo APP_ROOT; ?>vilesci/personen/import/interessentenimport.php','Interessent anlegen', 'height=768,width=1024,resizable=yes,status=yes,scrollbars=yes,toolbar=yes,location=yes,menubar=yes');
 }
 
 // ****
@@ -281,7 +281,10 @@ function InteressentDetailSave()
 	}
 }
 
-function InteressentImageUpload()
+// ****
+// * Ruft ein Script fuer den Upload des Bildes auf
+// ****
+function InteressentImageUpload(evt)
 {
 	person_id = document.getElementById('interessent-detail-textbox-person_id').value;
 	if(person_id!='')
@@ -567,6 +570,9 @@ function InteressentPrestudentSave()
 	}
 }
 
+// ****
+// * Aktuelles Datum in das Textfeld anmeldungreihungstest einfuegen
+// ****
 function InteressentAnmeldungreihungstestHeute()
 {
 	var now = new Date();

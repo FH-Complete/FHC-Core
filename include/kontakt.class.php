@@ -159,7 +159,7 @@ class kontakt
 			$qry="SELECT * FROM tbl_kontakt WHERE kontakt_id='$this->kontakt_id';";
 			if($resultz = pg_query($this->conn, $qry))
 			{
-				while($rowz = pg_fetch_object($resultz))
+				if($rowz = pg_fetch_object($resultz))
 				{
 					$update=false;			
 					if($rowz->person_id!=$this->person_id) 				$update=true;
