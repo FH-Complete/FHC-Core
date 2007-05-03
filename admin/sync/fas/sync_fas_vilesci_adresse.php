@@ -68,7 +68,7 @@ if($result = pg_query($conn_fas, $qry))
 		$adresse->ort			=$row->ort;
 		$adresse->gemeinde		=$row->gemeinde;
 		$adresse->nation			=$row->nation;
-		$adresse->typ			=$row->typ;
+		//$adresse->typ			=$row->typ; //h=Hauptws.(2), n=Nebenws.(3), f=Firma(1)
 		$adresse->heimatadresse		=$row->bismeldeadresse=='J'?true:false;
 		$adresse->zustelladresse		=$row->zustelladresse=='J'?true:false;
 		$adresse->firma_id			=null;
@@ -77,6 +77,23 @@ if($result = pg_query($conn_fas, $qry))
 		$adresse->insertamum		=$row->creationdate;
 		//$adresse->insertvon		="SYNC";
 		$adresse->ext_id			=$row->adresse_pk;
+		
+		if($row->typ=='1')
+		{
+			$adresse->typ='f';
+		}
+		elseif($row->typ=='2')
+		{
+			$adresse->typ='h';
+		}
+		if($row->typ=='3')
+		{
+			$adresse->typ='n';
+		}
+		else 
+		{
+			$adresse->typ='h';
+		}
 		
 		$ausgabe_adresse='';
 		$update=false;
