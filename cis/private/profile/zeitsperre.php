@@ -132,7 +132,7 @@
 	$zs=new zeitsperre($conn);
 	foreach ($mitarbeiter as $ma)
 	{
-		$zs->getzeitsperren($ma->uid);
+		$zs->getzeitsperren($ma->uid, false);
 		echo '<TR>';
 		echo "<td>$ma->nachname $ma->vorname</td>";
 		for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)

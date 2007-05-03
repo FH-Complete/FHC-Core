@@ -186,13 +186,13 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 	if(!ereg("([0-9]{2}).([0-9]{2}).([0-9]{4})",$_POST['vondatum']))
 	{
 		$error=true;
-		$errormsg .= 'Von-Datum ist ung&uuml;ltig ';
+		$error_msg .= 'Von-Datum ist ung&uuml;ltig ';
 	}
 	//bis-datum pruefen
 	if(!ereg("([0-9]{2}).([0-9]{2}).([0-9]{4})",$_POST['bisdatum']))
 	{
 		$error=true;
-		$errormsg .= 'Bis-Datum ist ung&uuml;ltig ';
+		$error_msg .= 'Bis-Datum ist ung&uuml;ltig ';
 	}
 
 	$zeitsperre = new zeitsperre($conn);

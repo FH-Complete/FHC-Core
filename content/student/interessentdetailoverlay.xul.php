@@ -151,7 +151,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       						<vbox>
       							<label value="Foto" />
       							<hbox>
-      								<button id="interessent-detail-button-image-upload" label="Upload" oncommand="InteressentImageUpload();" disabled="true"/>
+      								<button id="interessent-detail-button-image-upload" label="Upload" oncommand="InteressentImageUpload(event);" disabled="true"/>
       								<spacer flex="1" />
       							</hbox>
       						</vbox>
