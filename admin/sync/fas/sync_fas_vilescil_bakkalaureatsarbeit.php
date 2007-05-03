@@ -1391,7 +1391,7 @@ if($result = pg_query($conn_fas, $qry_main))
 										$text1.="\n***********Bachelorarbeit:".$row->bakkalaureatsarbeit_pk."\n";
 										$text1.=$error_log;
 										$text1.=" R1\n";
-										$text1.="***********\n\n";
+										$text1.="***********\n";
 										pg_query($conn, "ROLLBACK");
 									}
 									else 
@@ -1438,7 +1438,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									$text2.="\n***********Bachelorarbeit:".$row->bakkalaureatsarbeit_pk."\n";
 									$text2.=$error_log;
 									$text2.=" R2\n";
-									$text2.="***********\n\n";
+									$text2.="***********\n";
 									pg_query($conn, "ROLLBACK");
 								}
 							}	
@@ -1450,7 +1450,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								$text3.="\n***********Bachelorarbeit:".$row->bakkalaureatsarbeit_pk."\n";
 								$text3.=$error_log;
 								$text3.=" R3\n";
-								$text3.="***********\n\n";
+								$text3.="***********\n";
 								pg_query($conn, "ROLLBACK");
 							}
 						}	
@@ -1462,7 +1462,7 @@ if($result = pg_query($conn_fas, $qry_main))
 							$text4.="\n***********Bachelorarbeit:".$row->bakkalaureatsarbeit_pk."\n";
 							$text4.=$error_log;
 							$text4.=" R4\n";
-							$text4.="***********\n\n";
+							$text4.="***********\n";
 							pg_query($conn, "ROLLBACK");
 						}
 					}
@@ -1474,7 +1474,7 @@ if($result = pg_query($conn_fas, $qry_main))
 						$text5.="\n***********Bachelorarbeit:".$row->bakkalaureatsarbeit_pk."\n";
 						$text5.=$error_log;
 						$text5.=" R5\n";
-						$text5.="***********\n\n";
+						$text5.="***********\n";
 						pg_query($conn, "ROLLBACK");
 					}
 				}
@@ -1486,7 +1486,7 @@ if($result = pg_query($conn_fas, $qry_main))
 					$text6.="\n***********Bachelorarbeit:".$row->bakkalaureatsarbeit_pk."\n";
 					$text6.=$error_log;
 					$text6.=" R6\n";
-					$text6.="***********\n\n";
+					$text6.="***********\n";
 					pg_query($conn, "ROLLBACK");
 				}			
 			}
@@ -1498,7 +1498,7 @@ if($result = pg_query($conn_fas, $qry_main))
 				$text7.="\n***********Bachelorarbeit:".$row->bakkalaureatsarbeit_pk."\n";
 				$text7.=$error_log;
 				$text7.=" R7\n";
-				$text7.="***********\n\n";
+				$text7.="***********\n";
 				pg_query($conn, "ROLLBACK");
 			}
 		}
@@ -1510,7 +1510,7 @@ if($result = pg_query($conn_fas, $qry_main))
 			$text8.="\n***********Bachelorarbeit:".$row->bakkalaureatsarbeit_pk."\n";
 			$text8.=$error_log;
 			$text8.=" R8\n";
-			$text8.="***********\n\n";
+			$text8.="***********\n";
 			pg_query($conn, "ROLLBACK");
 		}
 		$error_log_fas1.=$text1;
@@ -1525,7 +1525,7 @@ if($result = pg_query($conn_fas, $qry_main))
 //echo und mail
 echo nl2br("Bachelorarbeitsynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
 
-$error_log_fas="Sync Bachelorarbeiten\n------------------------\n\n".$error_log_fas1."\n".$error_log_fas2."\n".$error_log_fas3."\n".$error_log_fas4."\n".$error_log_fas5."\n".$error_log_fas6."\n".$error_log_fas7."\n".$error_log_fas8;
+$error_log_fas="Sync Bachelorarbeit\n------------------------\n\n".$error_log_fas1."\n".$error_log_fas2."\n".$error_log_fas3."\n".$error_log_fas4."\n".$error_log_fas5."\n".$error_log_fas6."\n".$error_log_fas7."\n".$error_log_fas8;
 echo nl2br("Allgemeine Fehler: ".$anzahl_fehler.", lehrveranstaltung_fk<1: ".$anzahl_lv_fehler.", betreuer_fk oder begutachter_fk<1: ".$anzahl_betreuer_fehler.", Anzahl Bachelorarbeiten: ".$anzahl_quelle.".\n");
 echo nl2br("Lehreinheiten:       Gesamt: ".$anzahl_le_gesamt." / Eingefügt: ".$anzahl_le_insert." / Geändert: ".$anzahl_le_update." / Fehler: ".$anzahl_fehler_le."\n");
 echo nl2br("Projektarbeiten:   Gesamt: ".$anzahl_pa_gesamt." / Eingefügt: ".$anzahl_pa_insert." / Geändert: ".$anzahl_pa_update." / Fehler: ".$anzahl_fehler_pa."\n");
@@ -1534,12 +1534,13 @@ echo nl2br("Begutachter:  Gesamt: ".$anzahl_pbg_gesamt." / Eingefügt: ".$anzahl_
 echo nl2br($error_log_fas."\n--------------------------------------------------------------------------------\n");
 echo nl2br($ausgabe_all);
 
-//mail($adress, 'SYNC-Fehler Student von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");
-
-/*mail($adress, 'SYNC Bachelorarbeiten  von '.$_SERVER['HTTP_HOST'], "Allgemeine Fehler: ".$anzahl_fehler.".\n".
+mail($adress, 'SYNC Bachelorarbeit von '.$_SERVER['HTTP_HOST'], 
+"Allgemeine Fehler: ".$anzahl_fehler.", lehrveranstaltung_fk<1: ".$anzahl_lv_fehler.", betreuer_fk oder begutachter_fk<1: ".$anzahl_betreuer_fehler.", Anzahl Bachelorarbeiten: ".$anzahl_quelle.".\n".
 "Lehreinheiten:       Gesamt: ".$anzahl_le_gesamt." / Eingefügt: ".$anzahl_le_insert." / Geändert: ".$anzahl_le_update." / Fehler: ".$anzahl_fehler_le."\n".
 "Projektarbeiten:   Gesamt: ".$anzahl_pa_gesamt." / Eingefügt: ".$anzahl_pa_insert." / Geändert: ".$anzahl_pa_update." / Fehler: ".$anzahl_fehler_pa."\n".
 "Betreuer:       Gesamt: ".$anzahl_pbb_gesamt." / Eingefügt: ".$anzahl_pbb_insert." / Geändert: ".$anzahl_pbb_update." / Fehler: ".$anzahl_fehler_pbb."\n".
-"Begutachter:  Gesamt: ".$anzahl_pbg_gesamt." / Eingefügt: ".$anzahl_pbg_insert." / Geändert: ".$anzahl_pbg_update." / Fehler: ".$anzahl_fehler_pbg."\n".
-$ausgabe_all, "From: vilesci@technikum-wien.at");*/
+"Begutachter:  Gesamt: ".$anzahl_pbg_gesamt." / Eingefügt: ".$anzahl_pbg_insert." / Geändert: ".$anzahl_pbg_update." / Fehler: ".$anzahl_fehler_pbg."\n\n".
+$ausgabe_all,"From: vilesci@technikum-wien.at");
+
+mail($adress, 'SYNC-Fehler Bachelorarbeiten  von '.$_SERVER['HTTP_HOST'], $error_log_fas, "From: vilesci@technikum-wien.at");
 }
