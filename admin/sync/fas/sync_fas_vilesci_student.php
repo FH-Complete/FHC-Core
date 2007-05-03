@@ -447,8 +447,10 @@ AND person_pk NOT IN(
 			(
 				p1.zgv<>p2.zgv OR p1.zgvdatum<>p2.zgvdatum OR p1.zgvort<>p2.zgvort 
 				OR p1.zgvmagister<>p2.zgvmagister OR p1.zgvmagisterort<>p2.zgvmagisterort 
-				OR p1.zgvmagisterdatum<>p2.zgvmagisterdatum OR p1.punkte<>p2.punkte OR p1.perskz<>p2.perskz 
-				OR p1.aufgenommenam<>p2.aufgenommenam  	OR p1.beendigungsdatum<>p2.beendigungsdatum 
+				OR p1.zgvmagisterdatum<>p2.zgvmagisterdatum OR p1.punkte<>p2.punkte 
+				OR (p1.perskz<>p2.perskz AND p1.perskz='') OR (p1.perskz<>p2.perskz AND p2.perskz='')
+				OR (p1.aufgenommenam<>p2.aufgenommenam AND ((p1.perskz<>p2.perskz AND p1.perskz='') OR (p1.perskz<>p2.perskz AND p2.perskz='')))	
+				OR (p1.beendigungsdatum<>p2.beendigungsdatum AND ((p1.perskz<>p2.perskz AND p1.perskz='') OR (p1.perskz<>p2.perskz AND p2.perskz='')))
 				OR p1.aufmerksamdurch<>p2.aufmerksamdurch OR p1.aufnahmeschluessel<>p2.aufnahmeschluessel 
 				OR p1.aufnahmeschluessel_fk<>p2.aufnahmeschluessel_fk OR p1.berufstaetigkeit<>p2.berufstaetigkeit 
 				OR p1.aufmerksamdurch_fk<>p2.aufmerksamdurch_fk OR p1.angetreten<>p2.angetreten
