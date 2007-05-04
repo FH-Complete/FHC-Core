@@ -10,7 +10,15 @@ function closeWindow()
 
 function onLoad()
 {
-  initLektorTree();
+	try
+	{
+  		initLektorTree();
+  		//Studenten Tab beim starten markieren
+  		document.getElementById('tabbox-main').selectedIndex="1";
+	}
+	catch(e)
+	{
+	}
 }
 
 function loadRightFrame()

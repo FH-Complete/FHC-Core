@@ -102,7 +102,9 @@ else
 
 function DrawInteressent($row)
 {
-		global $rdf_url;
+		global $rdf_url, $conn;
+		$ps = new prestudent($conn);
+		$ps->getLastStatus($row->prestudent_id);
 ?>
 		  <RDF:li>
 	      	<RDF:Description  id="<?php echo $row->prestudent_id; ?>"  about="<?php echo $rdf_url.'/'.$row->prestudent_id; ?>" >
@@ -150,6 +152,8 @@ function DrawInteressent($row)
 				<PRESTD:reihungstestangetreten><![CDATA[<?php echo ($row->reihungstestangetreten?'true':'false');  ?>]]></PRESTD:reihungstestangetreten>
 				<PRESTD:punkte><![CDATA[<?php echo $row->punkte;  ?>]]></PRESTD:punkte>
 				<PRESTD:bismelden><![CDATA[<?php echo ($row->bismelden?'true':'false');  ?>]]></PRESTD:bismelden>
+				<PRESTD:anmerkung><![CDATA[<?php echo $row->anmerkung;  ?>]]></PRESTD:anmerkung>
+				<PRESTD:status><![CDATA[<?php echo $ps->rolle_kurzbz;  ?>]]></PRESTD:status>
 	      	</RDF:Description>
 	      </RDF:li>
 <?php

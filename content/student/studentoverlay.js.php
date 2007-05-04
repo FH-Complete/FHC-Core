@@ -517,6 +517,7 @@ function StudentAuswahl()
 	reihungstestangetreten = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#reihungstestangetreten" ));
 	punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
 	bismelden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bismelden" ));
+	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
 	
 	document.getElementById('student-prestudent-menulist-aufmerksamdurch').value=aufmerksamdurch_kurzbz;
 	document.getElementById('student-prestudent-menulist-berufstaetigkeit').value=berufstaetigkeit_code;
@@ -548,7 +549,8 @@ function StudentAuswahl()
 	document.getElementById('student-prestudent-textbox-person_id').value=person_id;
 	document.getElementById('student-prestudent-textbox-prestudent_id').value=prestudent_id;
 	document.getElementById('student-prestudent-checkbox-new').checked=false;
-	document.getElementById('student-prestudent-textbox-studiengang_kz').value=studiengang_kz;
+	document.getElementById('student-prestudent-menulist-studiengang_kz').value=studiengang_kz;
+	document.getElementById('student-prestudent-textbox-anmerkung').value=anmerkung;
 	
 	
 	rollentree = document.getElementById('student-prestudent-tree-rolle');
@@ -591,6 +593,8 @@ function StudentPrestudentDisableFields(val)
 	document.getElementById('student-prestudent-checkbox-bismelden').disabled=val;
 	document.getElementById('student-prestudent-button-anmeldungreihungstest-heute').disabled=val;
 	document.getElementById('student-prestudent-button-save').disabled=val;
+	document.getElementById('student-prestudent-menulist-studiengang_kz').disabled=val;
+	document.getElementById('student-prestudent-textbox-anmerkung').disabled=val;
 }
 
 // ****
@@ -617,7 +621,8 @@ function StudentPrestudentSave()
 	person_id = document.getElementById('student-prestudent-textbox-person_id').value;
 	prestudent_id = document.getElementById('student-prestudent-textbox-prestudent_id').value;
 	neu = document.getElementById('student-prestudent-checkbox-new').checked;
-	studiengang_kz = document.getElementById('student-prestudent-textbox-studiengang_kz').value;
+	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+	anmerkung = document.getElementById('student-prestudent-textbox-anmerkung').value;
 	
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
@@ -649,6 +654,7 @@ function StudentPrestudentSave()
 	req.add('person_id', person_id);
 	req.add('prestudent_id', prestudent_id);
 	req.add('studiengang_kz', studiengang_kz);
+	req.add('anmerkung', anmerkung);
 		
 	var response = req.executePOST();
 
@@ -665,7 +671,7 @@ function StudentPrestudentSave()
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 				
-		StudentSelectUid=val.dbdml_data;
+		StudentSelectUid=document.getElementById('student-detail-textbox-uid').value;
 		StudentTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 	}

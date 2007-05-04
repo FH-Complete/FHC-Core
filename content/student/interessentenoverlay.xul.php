@@ -111,6 +111,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdetailoverlay.x
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#geschlecht" />
 	    				<splitter class="tree-splitter"/>
+	    				<treecol id="interessent-treecol-status" label="Status" flex="1" hidden="true"
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#status" />
+	    				<splitter class="tree-splitter"/>
 	    				<treecol id="interessent-treecol-studiengang_kz" label="StudiengangKz" flex="1" hidden="true"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#studiengang_kz" />
@@ -118,6 +122,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdetailoverlay.x
 	    				<treecol id="interessent-treecol-prestudent_id" label="PreStudentID" flex="1" hidden="true"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#prestudent_id" />
+	    				<splitter class="tree-splitter"/>
 	    				<treecol id="interessent-treecol-person_id" label="PersonID" flex="1" hidden="true"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#person_id" />
@@ -138,6 +143,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdetailoverlay.x
 	           							<treecell label="rdf:http://www.technikum-wien.at/interessent/rdf#svnr" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/interessent/rdf#ersatzkennzeichen" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/interessent/rdf#geschlecht" />
+	           							<treecell label="rdf:http://www.technikum-wien.at/interessent/rdf#status" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/interessent/rdf#studiengang_kz" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/interessent/rdf#prestudent_id" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/interessent/rdf#person_id" />

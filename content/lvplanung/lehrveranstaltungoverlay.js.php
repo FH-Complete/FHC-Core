@@ -219,7 +219,7 @@ function LeNeu()
 	LeDetailReset();
 
 	//Detail Tab als aktiv setzen
-	document.getElementById('lehrveranstaltung-tabs').selectedItem = document.getElementById('lehrveranstaltung-tab-detail');
+	document.getElementById('lehrveranstaltung-tabbox').selectedIndex=0;
 	
 	//Lektor-Tab und GruppenTree ausblenden
 	document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe').hidden=true;

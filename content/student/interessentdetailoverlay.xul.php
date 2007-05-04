@@ -264,10 +264,21 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							</menulist>
 						</row>
 						<row>
+							<vbox>
+								<label value="Anmerkung" control="interessent-prestudent-textbox-anmerkung"/>
+								<spacer flex="1" />
+      						</vbox>
+							<textbox id="interessent-prestudent-textbox-anmerkung" multiline="true" disabled="true"/>
 							<label value="Facheinschlaegig berufstaetig" control="interessent-prestudent-checkbox-facheinschlberuf"/>
-      						<checkbox id="interessent-prestudent-checkbox-facheinschlberuf" checked="true" disabled="true"/>
+							<vbox>	
+      							<checkbox id="interessent-prestudent-checkbox-facheinschlberuf" checked="true" disabled="true"/>
+      							<spacer flex="1"/>
+							</vbox>
       						<label value="Bismelden" control="interessent-prestudent-checkbox-bismelden"/>
-      						<checkbox id="interessent-prestudent-checkbox-bismelden" checked="true" disabled="true"/>
+      						<vbox>	
+      							<checkbox id="interessent-prestudent-checkbox-bismelden" checked="true" disabled="true"/>
+      							<spacer flex="1"/>
+							</vbox>
     					</row>
     				</rows>
     			</grid>

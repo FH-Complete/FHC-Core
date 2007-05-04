@@ -109,7 +109,25 @@ if(!$result = pg_query($conn, $qry))
 
 	//foreach ($lvaDAO->lehrveranstaltungen as $row_lva)
 	while($row_lva = pg_fetch_object($result))
-	{		
+	{	
+		//Fachbereichskoordinatoren laden	
+		$qry_fbk = "SELECT distinct tbl_mitarbeiter.kurzbz as kurzbz FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, public.tbl_mitarbeiter, public.tbl_benutzerfunktion 
+		WHERE tbl_lehreinheit.lehrveranstaltung_id='$row_lva->lehrveranstaltung_id' AND
+		      tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
+		      tbl_lehrfach.fachbereich_kurzbz = tbl_benutzerfunktion.fachbereich_kurzbz AND
+		      tbl_mitarbeiter.mitarbeiter_uid = tbl_benutzerfunktion.uid AND
+		      tbl_benutzerfunktion.funktion_kurzbz='fbk' AND 
+		      tbl_benutzerfunktion.studiengang_kz='$row_lva->studiengang_kz'";
+		$result_fbk = pg_query($conn, $qry_fbk);
+		$fbk='';
+		while($row_fbk = pg_fetch_object($result_fbk))
+		{
+			$fbk.=$row_fbk->kurzbz.' ';
+		}
+		
+		if($fbk!='')
+			$fbk='FBK: '.$fbk;
+			
 		//Lehrveranstaltung
 		echo "
       		<RDF:Description  id=\"".$row_lva->lehrveranstaltung_id."\"  about=\"".$rdf_url.'/'.$row_lva->lehrveranstaltung_id."\" >
@@ -138,7 +156,7 @@ if(!$result = pg_query($conn, $qry))
 				<LVA:raumtyp></LVA:raumtyp>
 				<LVA:raumtypalternativ></LVA:raumtypalternativ>
 				<LVA:gruppen></LVA:gruppen>
-				<LVA:lektoren></LVA:lektoren>
+				<LVA:lektoren>$fbk</LVA:lektoren>
 				<LVA:fachbereich></LVA:fachbereich>
 				</RDF:Description>";
 
