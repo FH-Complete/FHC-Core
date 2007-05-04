@@ -165,11 +165,15 @@ if(isset($_POST['submitdata']))
 if(isset($_POST['submitvorschlag']))
 {
 	$content='';
-	if(isset($_FILES['bild']['tmp_name']) && is_uploaded_file($_FILES['bild']['tmp_name']))
+	if(isset($_FILES['bild']['tmp_name']))
 	{
-		//Wenn File ein Bild ist
-		if (($_FILES['bild']['type']=="image/gif") || ($_FILES['bild']['type']=="image/jpeg") || ($_FILES['bild']['type']=="image/png"))
-		{
+		//Extension herausfiltern
+    	$ext = explode('.',$_FILES['bild']['name']);
+        $ext = strtolower($ext[count($ext)-1]);
+
+        //--check that it's a jpeg or gif or png
+        if ($ext=='gif' || $ext=='png' || $ext=='jpg' || $ext=='jpeg')
+        {
 			$filename = $_FILES['bild']['tmp_name'];
 			//File oeffnen
 			$fp = fopen($filename,'r');
@@ -181,6 +185,10 @@ if(isset($_POST['submitvorschlag']))
 		}
 		else
 			echo "<b>Datei ist kein Bild!</b><br />";
+	}
+	else 
+	{
+		echo "kein Bild";
 	}
 
 	$vorschlag = new vorschlag($conn);
@@ -340,7 +348,7 @@ if($frage->frage_id!='')
 	}
 	//Vorschlag
 	echo '<b>Vorschlag'.($vorschlag_id!=''?' Edit':'').'</b><br /><br />';
-	echo "<form method='POST' ENCTYPE='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;gruppe_kurzbz=$gruppe_kurzbz&amp;frage_id=$frage->frage_id'>";
+	echo "<form method='POST' enctype='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;gruppe_kurzbz=$gruppe_kurzbz&amp;frage_id=$frage->frage_id'>";
 	echo "<input type='hidden' name='vorschlag_id' value='$vorschlag->vorschlag_id' />";
 	echo '<table>';
 	echo '<tr>';
