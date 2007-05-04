@@ -209,8 +209,8 @@ if(!$error)
 				$prestudent->studiengang_kz = $_POST['studiengang_kz'];
 				$prestudent->berufstaetigkeit_code = $_POST['berufstaetigkeit_code'];
 				$prestudent->ausbildungcode = $_POST['ausbildungcode'];
-				$presutdent->zgv_code = $_POST['zgv_code'];
-				$presutdent->zgvort = $_POST['zgvort'];
+				$prestudent->zgv_code = $_POST['zgv_code'];
+				$prestudent->zgvort = $_POST['zgvort'];
 				$prestudent->zgvdatum = $_POST['zgvdatum'];
 				$prestudent->zgvmas_code = $_POST['zgvmas_code'];
 				$prestudent->zgvmaort = $_POST['zgvmaort'];
@@ -222,6 +222,7 @@ if(!$error)
 				$prestudent->reihungstestangetreten = ($_POST['reihungstestangetreten']=='true'?true:false);
 				$prestudent->punkte = $_POST['punkte'];
 				$prestudent->bismelden = ($_POST['bismelden']=='true'?true:false);
+				$prestudent->anmerkung = $_POST['anmerkung'];
 				//$prestudent->insertamum = date('Y-m-d H:i:s');
 				//$prestudent->insertvon = $user;
 				$prestudent->updateamum = date('Y-m-d H:i:s');

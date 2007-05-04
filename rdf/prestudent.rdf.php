@@ -79,6 +79,7 @@ if(isset($_GET['prestudent_id']) && is_numeric($_GET['prestudent_id']))
 				<PRESTD:reihungstestangetreten><![CDATA[<?php echo ($prestd->reihungstestangetreten?'true':'false');  ?>]]></PRESTD:reihungstestangetreten>
 				<PRESTD:punkte><![CDATA[<?php echo $prestd->punkte;  ?>]]></PRESTD:punkte>
 				<PRESTD:bismelden><![CDATA[<?php echo ($prestd->bismelden?'true':'false');  ?>]]></PRESTD:bismelden>
+				<PRESTD:anmerkung><![CDATA[<?php echo $prestd->anmerkung;  ?>]]></PRESTD:anmerkung>
 	      	</RDF:Description>
 	      </RDF:li>
 <?php

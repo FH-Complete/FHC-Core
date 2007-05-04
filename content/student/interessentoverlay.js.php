@@ -416,6 +416,7 @@ function InteressentAuswahl()
 	reihungstestangetreten = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#reihungstestangetreten" ));
 	punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
 	bismelden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bismelden" ));
+	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
 	
 	document.getElementById('interessent-prestudent-menulist-aufmerksamdurch').value=aufmerksamdurch_kurzbz;
 	document.getElementById('interessent-prestudent-menulist-berufstaetigkeit').value=berufstaetigkeit_code;
@@ -448,6 +449,7 @@ function InteressentAuswahl()
 	document.getElementById('interessent-prestudent-textbox-prestudent_id').value=prestudent_id;
 	document.getElementById('interessent-prestudent-checkbox-new').checked=false;
 	document.getElementById('interessent-prestudent-menulist-studiengang_kz').value=studiengang_kz;
+	document.getElementById('interessent-prestudent-textbox-anmerkung').value=anmerkung;
 		
 	rollentree = document.getElementById('interessent-prestudent-tree-rolle');
 	url='<?php echo APP_ROOT;?>rdf/prestudentrolle.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
@@ -490,6 +492,7 @@ function InteressentPrestudentDisableFields(val)
 	document.getElementById('interessent-prestudent-checkbox-bismelden').disabled=val;
 	document.getElementById('interessent-prestudent-button-anmeldungreihungstest-heute').disabled=val;
 	document.getElementById('interessent-prestudent-button-save').disabled=val;
+	document.getElementById('interessent-prestudent-textbox-anmerkung').disabled=val;
 }
 
 // ****
@@ -517,6 +520,7 @@ function InteressentPrestudentSave()
 	prestudent_id = document.getElementById('interessent-prestudent-textbox-prestudent_id').value;
 	neu = document.getElementById('interessent-prestudent-checkbox-new').checked;
 	studiengang_kz = document.getElementById('interessent-prestudent-menulist-studiengang_kz').value;
+	anmerkung = document.getElementById('interessent-prestudent-textbox-anmerkung').value;
 	
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
@@ -548,6 +552,7 @@ function InteressentPrestudentSave()
 	req.add('person_id', person_id);
 	req.add('prestudent_id', prestudent_id);
 	req.add('studiengang_kz', studiengang_kz);
+	req.add('anmerkung', anmerkung);
 		
 	var response = req.executePOST();
 

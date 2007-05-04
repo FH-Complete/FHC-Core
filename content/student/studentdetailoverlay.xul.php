@@ -293,10 +293,35 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										</menupopup>
 								</template>
 							</menulist>
+							<label value="Studiengang" control="student-prestudent-menulist-studiengang_kz"/>
+							<menulist id="student-prestudent-menulist-studiengang_kz" disabled="true"
+							          datasources="<?php echo APP_ROOT ?>rdf/studiengang.rdf.php" flex="1"
+						              ref="http://www.technikum-wien.at/studiengang/liste" >
+								<template>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/studiengang/rdf#studiengang_kz"
+							        		      label="rdf:http://www.technikum-wien.at/studiengang/rdf#kuerzel - rdf:http://www.technikum-wien.at/studiengang/rdf#bezeichnung"
+										  		  uri="rdf:*"/>
+										</menupopup>
+								</template>
+							</menulist>
+    					</row>
+    					<row>
+    						<vbox>
+								<label value="Anmerkung" control="student-prestudent-textbox-anmerkung"/>
+								<spacer flex="1" />
+      						</vbox>
+							<textbox id="student-prestudent-textbox-anmerkung" multiline="true" disabled="true"/>
 							<label value="Facheinschlaegig berufstaetig" control="student-prestudent-checkbox-facheinschlberuf"/>
-      						<checkbox id="student-prestudent-checkbox-facheinschlberuf" checked="true" disabled="true"/>
+							<vbox>	
+      							<checkbox id="student-prestudent-checkbox-facheinschlberuf" checked="true" disabled="true"/>
+      							<spacer flex="1"/>
+							</vbox>
       						<label value="Bismelden" control="student-prestudent-checkbox-bismelden"/>
-      						<checkbox id="student-prestudent-checkbox-bismelden" checked="true" disabled="true"/>
+      						<vbox>	
+      							<checkbox id="student-prestudent-checkbox-bismelden" checked="true" disabled="true"/>
+      							<spacer flex="1"/>
+							</vbox>
     					</row>
     				</rows>
     			</grid>

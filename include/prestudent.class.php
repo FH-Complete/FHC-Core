@@ -444,6 +444,7 @@ class prestudent extends person
 				$ps->reihungstest_id = $row->reihungstest_id;
 				$ps->punkte = $row->punkte;
 				$ps->bismelden = ($row->bismelden=='t'?true:false);
+				$ps->anmerkung = $row->anmerkung;
 				
 				$ps->rolle_kurzbz = $row->rolle_kurzbz;
 				$ps->studiensemester_kurzbz = $row->studiensemester_kurzbz;
@@ -549,6 +550,37 @@ class prestudent extends person
 		else 
 		{	
 			$this->errormsg = 'Fehler beim Speichern der Prestudentrolle:'.$qry;
+			return false;
+		}
+	}
+	
+	function getLastStatus($prestudent_id)
+	{
+		$qry = "SELECT * FROM tbl_prestudentrolle WHERE prestudent_id='$prestudent_id' ORDER BY datum DESC LIMIT 1";
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{				
+				$this->prestudent_id = $row->prestudent_id;
+				$this->rolle_kurzbz = $row->rolle_kurzbz;
+				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$this->ausbildungssemester = $row->ausbildungssemester;
+				$this->datum = $row->datum;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				return true;	
+			}
+			else 
+			{
+				$this->errormsg = 'Keine Rolle vorhanden';
+				return false;
+			}			
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden der PrestudentDaten';
 			return false;
 		}
 	}
