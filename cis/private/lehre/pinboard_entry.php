@@ -69,6 +69,7 @@
 				$news_obj->datum = $datum;
 				$news_obj->text = $news_message;
 				$news_obj->updatevon = $user;
+				$news_obj->updateamum = date('Y-m-d H:i:s');
 				$news_obj->news_id = $news_id;
 				$news_obj->new=false;
 				
@@ -97,6 +98,7 @@
 				$news_obj->datum = $datum;
 				$news_obj->text = $news_message;
 				$news_obj->updatevon = $user;
+				$news_obj->updateamum = date('Y-m-d H:i:s');
 				$news_obj->new=true;
 				
 				if($news_obj->save())

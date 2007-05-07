@@ -160,7 +160,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
    								<spacer flex="1"/>
    							</hbox>
       						<label value="Anmerkung" control="interessent-detail-textbox-anmerkung"/>
-      						<textbox id="interessent-detail-textbox-anmerkung" disabled="true"/>
+      						<textbox id="interessent-detail-textbox-anmerkung" disabled="true" multiline="true"/>
       						<label value="Homepage" control="interessent-detail-textbox-homepage"/>
       						<vbox><textbox id="interessent-detail-textbox-homepage" disabled="true" maxlength="256"/></vbox>
     					</row>

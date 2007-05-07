@@ -34,22 +34,50 @@
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/studiengang.class.php');
 	require_once('../../../include/news.class.php');
+	require_once('../../../include/studiensemester.class.php');
     
     //Connection Herstellen
     if(!$sql_conn = pg_pconnect(CONN_STRING))
        die('Fehler beim öffnen der Datenbankverbindung');
 
+    $senat=false;
     $short='';
+    $course_id = '';
+    $term_id = '';
+    $fachbereich_kurzbz='';
+    $studiensemester_kurzbz = '';
+    $datum_content='';
+    $stsem_content='';
+    $datum = '';
+    $user = get_uid();
+    $stsemarr = array();
+    
+    if(isset($_GET['studiensemester_kurzbz']))
+    	$studiensemester_kurzbz = $_GET['studiensemester_kurzbz'];
+    else 
+    {
+    	$stsem_obj = new studiensemester($sql_conn);
+    	$studiensemester_kurzbz = $stsem_obj->getaktorNext();
+    }
+    
+    if(isset($_GET['datum']))
+    	$datum = $_GET['datum'];
+    	
 	if(isset($_GET['course_id']) && is_numeric($_GET['course_id']))
 	{
-		$stg_obj = new studiengang($sql_conn, $course_id);
+		$stg_obj = new studiengang($sql_conn, $_GET['course_id']);
 		$short = $stg_obj->kuerzel;
 		$short_long = $stg_obj->kurzbzlang;
 		$course_id = $_GET['course_id'];
 	}
-	else 
-		die('Fehler bei der Parameter&uuml;bergabe');
 	
+	if(isset($_GET['fachbereich_kurzbz']))
+	{
+		$fachbereich_kurzbz = $_GET['fachbereich_kurzbz'];
+		if($fachbereich_kurzbz=='Senat')
+			$senat = true;
+	}
+		
 	if(isset($_GET['showall']))
 	{
 		$showall=true;
@@ -59,35 +87,58 @@
 		$showall=false;
 	}
 	
-	function print_news($stg_id, $semester, $sql_conn, $showall=false)
+	function print_STGnews($stg_id, $semester, $sql_conn, $showall=false, $fachbereich_kurzbz)
 	{		
 		$alter = ($showall?0:MAXNEWSALTER);
 		$news_obj = new news($sql_conn);
-		$zaehler=0;
-		if($news_obj->getnews($alter, $stg_id, $semester))
+		
+		if($news_obj->getnews($alter, $stg_id, $semester, $showall, $fachbereich_kurzbz))
 		{
-			foreach ($news_obj->result as $row)
-			{
-				$zaehler++;
-				if($row->datum!='')
-					$datum = date('d.m.Y',strtotime(strftime($row->datum)));
-				else 	
-					$datum='';
-				
-				if($row->semester == '')
-				{
-					echo '<p><small>'.$datum.' - '.$row->verfasser.' - [Allgemein]</small><br><b>'.$row->betreff.'</b><br>';
-				}
-				else
-				{
-					echo '<p><small>'.$datum.' - '.$row->verfasser.' - [Semester '.$row->semester.']</small><br><b>'.$row->betreff.'</b><br>';
-				}
-				
-				echo "$row->text</p>";
-			}
+			$zaehler = print_news($news_obj);
 		}
+		else 
+			echo $news_obj->errormsg;
 		if($zaehler==0)
 		   echo '<p>Zur Zeit gibt es keine aktuellen News!</p>';
+	}
+	
+	function print_FBnews($sql_conn, $fachbereich_kurzbz, $datum)
+	{		
+		$news_obj = new news($sql_conn);
+		
+		if($news_obj->getFBNews($fachbereich_kurzbz, $datum))
+		{
+			$zaehler = print_news($news_obj);
+		}
+		else 
+			echo $news_obj->errormsg;
+		if($zaehler==0)
+		   echo '<p>Zur Zeit gibt es keine aktuellen News!</p>';
+	}
+	
+	function print_news($news_obj)
+	{
+		$zaehler=0;
+		foreach ($news_obj->result as $row)
+		{
+			$zaehler++;
+			if($row->datum!='')
+				$datum = date('d.m.Y',strtotime(strftime($row->datum)));
+			else 	
+				$datum='';
+			
+			if($row->semester == '')
+			{
+				echo '<p><small>'.$datum.' - '.$row->verfasser.' - [Allgemein]</small><br><b>'.$row->betreff.'</b><br>';
+			}
+			else
+			{
+				echo '<p><small>'.$datum.' - '.$row->verfasser.' - [Semester '.$row->semester.']</small><br><b>'.$row->betreff.'</b><br>';
+			}
+			
+			echo "$row->text</p>";
+		}
+		return $zaehler;
 	}
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -104,21 +155,96 @@
     <td width="10">&nbsp;</td>
     <td><table width="100%"  border="0" cellspacing="0" cellpadding="0">
       <tr>
-        <td class="ContentHeader" width="70%"><font class="ContentHeader">&nbsp;Pinboard <?php if(isset($short)) echo $short; ?></font></td>
-		<td>&nbsp;</td>
-		<td class="ContentHeader3" width="25%"><font class="HyperItem">&nbsp;Studiengangsmanagement</font></td>
-      </tr>
-	  <?php
-	  	if(!isset($short))
+        <td class="ContentHeader" width="70%"><font class="ContentHeader">&nbsp;
+<?php 
+
+	//Anzeigen der Senatsbeschluesse
+	if($senat)
+	{		
+		echo 'Senatsbeschl&uuml;sse '; 
+		echo '</font></td>';
+		echo ' </tr>';
+		
+		//Senatsbeschluesse duerfen nur die Mitarbeiter sehen
+		if(!check_lektor($user, $sql_conn))
+			die('<tr><td>Sie haben keine Berechtigung für diesen Bereich</td></tr>');
+		
+		echo '<tr><td>&nbsp;</td></tr>';
+		echo '<tr><td>';
+		//Datum aller Senatsbeschluesse holen
+		$qry = "SELECT distinct datum FROM campus.tbl_news WHERE fachbereich_kurzbz='Senat'";
+		if($result = pg_query($sql_conn, $qry));
+		{
+			while($row = pg_fetch_object($result))
+			{
+				//Studiensemester des Datums ermitteln
+				$stsem = getStudiensemesterFromDatum($sql_conn, $row->datum);
+				//Wenn dieses StSem noch nicht angezeigt wird, dann anzeigen
+				if(!in_array($stsem, $stsemarr))
+				{
+					if($stsem_content!='')
+						$stsem_content.=' - ';
+					$stsem_content .="<a href='$PHP_SELF?fachbereich_kurzbz=Senat&studiensemester_kurzbz=$stsem' class='Item'>";
+					
+					if(isset($studiensemester_kurzbz) && $studiensemester_kurzbz==$stsem)
+						$stsem_content .="<u>$stsem</u>";
+					else 
+						$stsem_content .=$stsem;
+						
+					$stsem_content .="</a>";
+					$stsemarr[] = $stsem;
+				}
+				//Datum ausgeben
+				if(isset($studiensemester_kurzbz) && $studiensemester_kurzbz==$stsem)
+				{
+					if($datum == '')
+						$datum = $row->datum;
+					if($datum_content!='')
+						$datum_content.=' - ';
+					$datum_content.="<a href='$PHP_SELF?fachbereich_kurzbz=Senat&studiensemester_kurzbz=$stsem&datum=$row->datum' class='Item'>";
+					//Wenn datum=ausgewaehltes Datum dann das Datum unterstreichen
+					if($datum == $row->datum)
+						$datum_content.='<u>'.date('d.m.Y',strtotime(strftime($row->datum))).'</u>';
+					else
+						$datum_content.=date('d.m.Y',strtotime(strftime($row->datum)));
+					$datum_content.="</a>";
+				}
+			}
+			echo "$stsem_content<br><br>$datum_content";
+		}
+		echo '</td></tr>';
+		echo '<tr><td valign="top">';
+		//News ausgeben
+		print_FBnews($sql_conn, $fachbereich_kurzbz, $datum);
+		echo '</td>';
+	
+	}
+	else 
+	{
+		echo 'Pinboard ';
+		
+		if(isset($short))
+			echo $short; 
+			
+		echo '</font></td>';
+
+		if(!isset($short))
 			exit;
-	  ?>
-	  <tr>
-	  	<td>&nbsp;</td>
+		
+		echo '
 		<td>&nbsp;</td>
-		<td>&nbsp;</td>
-	  </tr>
+		<td class="ContentHeader3" width="25%"><font class="HyperItem">&nbsp;Studiengangsmanagement</font></td>';
+	
+		echo ' </tr>';
+			
+		echo '<tr><td>&nbsp;</td>';
+
+	
+	?>
+	</tr>
 	  <tr>
-	  	<td valign="top"><?php print_news($course_id, (int)$term_id, $sql_conn, $showall); ?><a href='<?php echo $_SERVER['REQUEST_URI']."&showall"; ?>' class='Item'>Archiv</a></td>
+	  	<td valign="top"><?php print_STGnews($course_id, (int)$term_id, $sql_conn, $showall, $fachbereich_kurzbz); ?><a href='<?php echo $_SERVER['REQUEST_URI']."&showall"; ?>' class='Item'>Archiv</a></td>
+
 		<td>&nbsp;</td>
 		<td valign="top">
           <p>Studiengangsleiter:<br>
@@ -450,6 +576,9 @@
             </tr>
           </table>          
           </td>
+<?php
+	}
+	?>
 	  </tr>
     </table></td>
 	<td width="30">&nbsp;</td>

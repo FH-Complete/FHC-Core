@@ -3,6 +3,7 @@ header("Content-type: application/vnd.mozilla.xul+xml");
 echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
 include('../vilesci/config.inc.php');
 include('../include/benutzerberechtigung.class.php');
+include('../include/studiensemester.class.php');
 
 $rdf_url='http://www.technikum-wien.at/lehrverbandsgruppe/';
 
@@ -38,6 +39,9 @@ if(!$result=pg_query($conn, $sql_query))
 	$error_msg.=pg_errormessage($conn);
 else
 	$num_rows=pg_numrows($result);
+	
+$stsem_obj = new studiensemester($conn);
+$stsem_obj->getAll();
 ?>
 
 <RDF:RDF	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -58,7 +62,94 @@ while ($row=pg_fetch_object($result))
 			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
 			<VERBAND:stg_kz><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
 		</RDF:Description>
+		
+		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/interessenten'; ?>" >
+			<VERBAND:name>Interessenten</VERBAND:name>
+			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
+			<VERBAND:stg_kz><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
+			<VERBAND:typ>interessenten</VERBAND:typ>
+		</RDF:Description>
 		<?php
+		foreach ($stsem_obj->studiensemester as $stsem)
+		{
+		?>
+		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/interessenten/'.$stsem->studiensemester_kurzbz; ?>" >
+			<VERBAND:name><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:name>
+			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
+			<VERBAND:stg_kz><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
+			<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
+			<VERBAND:typ>interessenten</VERBAND:typ>
+		</RDF:Description>
+		
+		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/interessenten/'.$stsem->studiensemester_kurzbz.'/zgv'; ?>" >
+			<VERBAND:name>ZGV erfüllt</VERBAND:name>
+			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
+			<VERBAND:stg_kz><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
+			<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
+			<VERBAND:typ>zgv</VERBAND:typ>
+		</RDF:Description>
+		
+		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/interessenten/'.$stsem->studiensemester_kurzbz.'/reihungstestangemeldet'; ?>" >
+			<VERBAND:name>Reihungstest angemeldet</VERBAND:name>
+			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
+			<VERBAND:stg_kz><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
+			<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
+			<VERBAND:typ>reihungstestangemeldet</VERBAND:typ>
+		</RDF:Description>
+		
+		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/interessenten/'.$stsem->studiensemester_kurzbz.'/reihungstestnichtangemeldet'; ?>" >
+			<VERBAND:name>Nicht zum Reihungstest angemeldet</VERBAND:name>
+			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
+			<VERBAND:stg_kz><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
+			<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
+			<VERBAND:typ>reihungstestnichtangemeldet</VERBAND:typ>
+		</RDF:Description>
+		<?php 
+		} 
+		?>
+		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/bewerber'; ?>" >
+			<VERBAND:name>Bewerber</VERBAND:name>
+			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
+			<VERBAND:stg_kz><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
+			<VERBAND:typ>bewerber</VERBAND:typ>
+		</RDF:Description>
+				<?php
+		foreach ($stsem_obj->studiensemester as $stsem)
+		{
+		?>
+		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/bewerber/'.$stsem->studiensemester_kurzbz; ?>" >
+			<VERBAND:name><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:name>
+			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
+			<VERBAND:stg_kz><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
+			<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
+			<VERBAND:typ>bewerber</VERBAND:typ>
+		</RDF:Description>
+		
+		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/bewerber/'.$stsem->studiensemester_kurzbz.'/aufgenommen'; ?>" >
+			<VERBAND:name>Aufgenommen</VERBAND:name>
+			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
+			<VERBAND:stg_kz><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
+			<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
+			<VERBAND:typ>aufgenommen</VERBAND:typ>
+		</RDF:Description>
+		
+		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/bewerber/'.$stsem->studiensemester_kurzbz.'/warteliste'; ?>" >
+			<VERBAND:name>Warteliste</VERBAND:name>
+			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
+			<VERBAND:stg_kz><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
+			<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
+			<VERBAND:typ>warteliste</VERBAND:typ>
+		</RDF:Description>
+		
+		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/bewerber/'.$stsem->studiensemester_kurzbz.'/absage'; ?>" >
+			<VERBAND:name>Absage</VERBAND:name>
+			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
+			<VERBAND:stg_kz><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
+			<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
+			<VERBAND:typ>absage</VERBAND:typ>
+		</RDF:Description>
+		<?php
+		}
    	}
    	if ($sem!=$row->semester && ($row->verband!='' || $row->verband!=' '))
    	{
@@ -146,6 +237,33 @@ while ($row=pg_fetch_object($result))
 			$stg_kurzbz=strtoupper($row->typ.$row->kurzbz);
 			echo "\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz\" />\n";
 			echo "\t<RDF:li>\n\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz\">\n";
+			//Interessenten
+			echo "\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/interessenten\" />\n";
+			echo "\t\t\t<RDF:li>\n\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/interessenten\">\n";
+			foreach ($stsem_obj->studiensemester as $stsem) 
+			{
+				echo "\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/interessenten/$stsem->studiensemester_kurzbz\" />\n";
+				echo "\t\t\t<RDF:li>\n\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/interessenten/$stsem->studiensemester_kurzbz\">\n";
+				echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/interessenten/$stsem->studiensemester_kurzbz/zgv\" />\n";
+				echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/interessenten/$stsem->studiensemester_kurzbz/reihungstestangemeldet\" />\n";
+				echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/interessenten/$stsem->studiensemester_kurzbz/reihungstestnichtangemeldet\" />\n";
+				echo "\t\t\t\t</RDF:Seq>\n\t\t\t</RDF:li>\n";
+			}
+			echo "\t\t\t</RDF:Seq>\n\t\t\t</RDF:li>\n";
+			
+			//Bewerber
+			echo "\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/bewerber\" />\n";
+			echo "\t\t\t<RDF:li>\n\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/bewerber\">\n";
+			foreach ($stsem_obj->studiensemester as $stsem) 
+			{
+				echo "\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/bewerber/$stsem->studiensemester_kurzbz\" />\n";
+				echo "\t\t\t<RDF:li>\n\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/bewerber/$stsem->studiensemester_kurzbz\">\n";
+				echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/bewerber/$stsem->studiensemester_kurzbz/aufgenommen\" />\n";
+				echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/bewerber/$stsem->studiensemester_kurzbz/warteliste\" />\n";
+				echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/bewerber/$stsem->studiensemester_kurzbz/absage\" />\n";
+				echo "\t\t\t\t</RDF:Seq>\n\t\t\t</RDF:li>\n";
+			}
+			echo "\t\t\t\t</RDF:Seq>\n\t\t\t</RDF:li>\n";
 			$lastout='stg_kz';
 		}
 

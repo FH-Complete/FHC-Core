@@ -32,6 +32,7 @@ class news
 	var $betreff;			// @var varchar(128)
 	var $text;				// @var string
 	var $semester;			// @var smallint
+	var $fachbereich_kurzbz;// @var varchar(16)
 	var $uid;				// @var varchar(16)
 	var $studiengang_kz;	// @var integer
 	var $verfasser;			// @var varchar(64)
@@ -75,6 +76,7 @@ class news
 			$news_obj->betreff = $row->betreff;
 			$news_obj->text = $row->text;
 			$news_obj->semester = $row->semester;
+			$news_obj->fachbereich_kurzbz = $row->fachbereich_kurzbz;
 			$news_obj->uid = $row->uid;
 			$news_obj->studiengang_kz=$row->studiengang_kz;
 			$news_obj->verfasser = $row->verfasser;
@@ -94,31 +96,40 @@ class news
 	// * als $maxalter Tage sind
 	// * @param $maxalter
 	// **********************************
-	function getnews($maxalter, $studiengang_kz, $semester, $all=false)
+	function getnews($maxalter, $studiengang_kz, $semester, $all=false, $fachbereich_kurzbz=null)
 	{
-		if(!is_numeric($maxalter) || !is_numeric($studiengang_kz) || ($semester!='' && !is_numeric($semester)))
-		{
-			$this->errormsg = 'Maxalter, Studiengang und Semester muessen gueltige Zahlen sein';
-			return false;
-		}
+		//if(!is_numeric($maxalter) || !is_numeric($studiengang_kz) || ($semester!='' && !is_numeric($semester)))
+		//{
+		//	$this->errormsg = 'Maxalter, Studiengang und Semester muessen gueltige Zahlen sein';
+		//	return false;
+		//}
+		$qry = "SELECT * FROM campus.tbl_news WHERE true";
 		
 		if($maxalter!=0)
 		{
-			$interval = "(now()-datum)<interval '$maxalter days' AND";
+			$qry.= " AND (now()-datum)<interval '$maxalter days'";
 		}
-		else 
-			$interval = '';
-		
-		if($all)
-			$datum = '';
-		else
-			$datum = 'AND datum<=now()';
+				
+		if(!$all)
+			$qry.=' AND datum<=now()';
 			
-		if($studiengang_kz==0)
-			$qry = "SELECT * FROM campus.tbl_news WHERE $interval studiengang_kz=".$studiengang_kz." ".($semester!=''?"":'AND semester is null')." $datum ORDER BY datum DESC, updateamum DESC;";
-		else 
-			$qry = "SELECT * FROM campus.tbl_news WHERE $interval ((studiengang_kz=$studiengang_kz AND semester=$semester) OR (studiengang_kz=$studiengang_kz AND semester=0) OR (studiengang_kz=0 AND semester=$semester) OR (studiengang_kz=0 and semester is null)) $datum ORDER BY datum DESC, updateamum DESC";
-		
+		if($fachbereich_kurzbz!='*')
+		{
+			if(is_null($fachbereich_kurzbz) OR $fachbereich_kurzbz=='')
+				$qry.=' AND fachbereich_kurzbz is null';	
+			else 
+				$qry.=" AND fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."'";
+		}
+				
+		if($studiengang_kz=='0')
+			$qry.=" AND studiengang_kz='".$studiengang_kz."' ".($semester!=''?"":'AND semester is null');
+		else if($studiengang_kz=='')
+			$qry.='';
+		else
+			$qry.=" AND ((studiengang_kz='$studiengang_kz' AND semester='$semester') OR (studiengang_kz='$studiengang_kz' AND semester=0) OR (studiengang_kz=0 AND semester='$semester') OR (studiengang_kz=0 and semester is null))";
+			
+		$qry.=' ORDER BY datum DESC, updateamum DESC';
+		//echo $qry;
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
@@ -128,6 +139,44 @@ class news
 				$newsobj->uid = $row->uid;
 				$newsobj->studiengang_kz = $row->studiengang_kz;
 				$newsobj->semester = $row->semester;
+				$newsobj->fachbereich_kurzbz = $row->fachbereich_kurzbz;
+				$newsobj->betreff = $row->betreff;
+				$newsobj->text = $row->text;
+				$newsobj->verfasser = $row->verfasser;
+				$newsobj->datum		= $row->datum;
+				$newsobj->updateamum = $row->updateamum;
+				$newsobj->updatevon = $row->updateamum;
+				$newsobj->insertamum = $row->insertamum;
+				$newsobj->insertvon = $row->insertvon;
+				
+				$this->result[] = $newsobj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der News';
+			return false;
+		}
+	}
+	
+	function getFBNews($fachbereich_kurzbz, $datum)
+	{
+		$qry = "SELECT * FROM campus.tbl_news WHERE fachbereich_kurzbz='$fachbereich_kurzbz'";
+		if($datum!='')
+			$qry.=" AND datum='$datum'";
+		$qry.=" ORDER BY datum";
+		//echo $qry;
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$newsobj = new news($this->conn);
+				$newsobj->news_id = $row->news_id;
+				$newsobj->uid = $row->uid;
+				$newsobj->studiengang_kz = $row->studiengang_kz;
+				$newsobj->semester = $row->semester;
+				$newsobj->fachbereich_kurzbz = $row->fachbereich_kurzbz;
 				$newsobj->betreff = $row->betreff;
 				$newsobj->text = $row->text;
 				$newsobj->verfasser = $row->verfasser;
@@ -176,6 +225,7 @@ class news
 			$this->betreff			= $row->betreff;
 			$this->text			= $row->text;
 			$this->semester		= $row->semester;
+			$this->fachbereich_kurzbz = $row->fachbereich_kurzbz;
 			$this->uid			= $row->uid;
 			$this->studiengang_kz	= $row->studiengang_kz;
 			$this->verfasser		= $row->verfasser;
@@ -263,11 +313,12 @@ class news
 		{
 			//Neuen Datensatz anlegen	
 						
-			$qry = 'INSERT INTO campus.tbl_news (betreff, text, semester, uid, studiengang_kz, verfasser,datum, insertamum, insertvon, 
+			$qry = 'INSERT INTO campus.tbl_news (betreff, text, semester, fachbereich_kurzbz, uid, studiengang_kz, verfasser,datum, insertamum, insertvon, 
 				updateamum, updatevon) VALUES ('.
 				$this->addslashes($this->betreff).', '.
 				$this->addslashes($this->text).', '.
 				$this->addslashes($this->semester).', '.
+				$this->addslashes($this->fachbereich_kurzbz).', '.
 				$this->addslashes($this->uid).', '.
 				$this->addslashes($this->studiengang_kz).', '.
 				$this->addslashes($this->verfasser).', '.
@@ -293,6 +344,7 @@ class news
 				'betreff='.$this->addslashes($this->betreff).', '.
 				'text='.$this->addslashes($this->text).', '.
 				'semester='.$this->addslashes($this->semester).', '.
+				'fachbereich_kurzbz='.$this->addslashes($this->fachbereich_kurzbz).', '.
 				'uid='.$this->addslashes($this->uid).', '.
 				'studiengang_kz='.$this->addslashes($this->studiengang_kz).', '.
 				'verfasser='.$this->addslashes($this->verfasser).', '.
