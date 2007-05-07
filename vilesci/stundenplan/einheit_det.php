@@ -80,7 +80,7 @@ else if (isset($_GET['type']) && $_GET['type']=='delete')
 		    echo "<td>".$row->uid."</td>";
 			echo "<td>".$row->vorname."</td>";
 			echo "<td>".$row->nachname."</td>";
-			echo "<td><a href=\"einheit_det.php?uid=".$row->uid."&type=delete&kurzbz=$kurzbz\">Delete</a></td>";
+			echo '<td class="button"><a href="einheit_det.php?uid='.$row->uid.'&type=delete&kurzbz=$kurzbz">Delete</a></td>';
 		    echo "</tr>\n";
 		}
 	}
