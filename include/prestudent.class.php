@@ -385,18 +385,50 @@ class prestudent extends person
 	// * @param $studiensemester_kurzbz Studiensemester fuer das die Int. und Bewerber
 	// *                                geladen werden sollen
 	// *******************************************************************************
-	function loadIntessentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester=nulll)
+	function loadIntessentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester=nulll, $typ=null)
 	{
 		$qry = "SELECT distinct on(tbl_prestudent.prestudent_id) * FROM public.tbl_person, public.tbl_prestudent, public.tbl_prestudentrolle WHERE 
 				tbl_person.person_id=tbl_prestudent.person_id AND 
 				tbl_prestudent.prestudent_id=tbl_prestudentrolle.prestudent_id AND 
-				tbl_prestudentrolle.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
-				(rolle_kurzbz='Interessent' OR rolle_kurzbz='Bewerber') AND
 				tbl_prestudent.studiengang_kz='$studiengang_kz'";
+
+		if(!is_null($studiensemester_kurzbz) && $studiensemester_kurzbz!='')
+			$qry.=" AND tbl_prestudentrolle.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+		
+		switch ($typ)
+		{
+			case "interessenten": 	
+				$qry.=" AND rolle_kurzbz='Interessent'";
+				break;
+			case "zgv":	
+				$qry.=" AND rolle_kurzbz='Interessent' AND (tbl_prestudent.zgv_code is not null OR tbl_prestudent.zgvmas_code is not null)";
+				break;
+			case "reihungstestangemeldet":  
+				$qry.=" AND rolle_kurzbz='Interessent' AND tbl_prestudent.anmeldungreihungstest is not null";
+				break;
+			case "reihungstestnichtangemeldet":
+				$qry.=" AND rolle_kurzbz='Interessent' AND tbl_prestudent.anmeldungreihungstest is null";
+				break;
+			case "bewerber":
+				$qry.=" AND rolle_kurzbz='Bewerber'";
+				break;
+			case "aufgenommen":
+				$qry.=" AND rolle_kurzbz='Aufgenommener'";
+				break;
+			case "warteliste":
+				$qry.=" AND rolle_kurzbz='Wartender'";
+				break;
+			case "absage":
+				$qry.=" AND rolle_kurzbz='Abgewiesener'";
+				break;
+			default: 
+				$qry .=" AND (rolle_kurzbz='Interessent' OR rolle_kurzbz='Bewerber')";
+				break;		
+		}
 		if($semester!=null)
 			$qry.=" AND tbl_prestudentrolle.ausbildungssemester='$semester'";
 
-		//echo $qry;
+		echo $qry;
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))

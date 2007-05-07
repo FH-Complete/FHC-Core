@@ -154,4 +154,32 @@ function writeCISlog($stat, $rm = '')
 ');
 }
 
+// ***************************************************************
+// * Liefert das Studiensemester in dem sich
+// * das uebergebene Datum befindet
+// * wenn sich das Datum zwischen zwei Studiensemestern befindet
+// * und $naechstes=true dann wird das naechste StSem geliefert
+// * wenn $naechstes=false dann wird das vorherige StSem geliefert
+// ***************************************************************
+function getStudiensemesterFromDatum($conn, $datum, $naechstes=true)
+{
+	$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE";
+	
+	if($naechstes)
+		$qry.= " ende>'$datum' ORDER BY ende ASC ";
+	else 
+		$qry.= " start<'$datum' ORDER BY ende DESC ";
+		
+	$qry.= "LIMIT 1";
+	
+	if($result = pg_query($conn, $qry))
+	{
+		if($row = pg_fetch_object($result))
+			return $row->studiensemester_kurzbz;
+		else 
+			return false;			
+	}
+	else 
+		return false;
+}
 ?>

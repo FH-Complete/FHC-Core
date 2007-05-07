@@ -164,7 +164,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
    								<spacer flex="1"/>
    							</hbox>
       						<label value="Anmerkung" control="student-detail-textbox-anmerkung"/>
-      						<textbox id="student-detail-textbox-anmerkung" disabled="true"/>
+      						<textbox id="student-detail-textbox-anmerkung" disabled="true" multiline="true"/>
       						<label value="Homepage" control="student-detail-textbox-homepage"/>
       						<vbox><textbox id="student-detail-textbox-homepage" disabled="true" maxlength="256"/></vbox>
     					</row>

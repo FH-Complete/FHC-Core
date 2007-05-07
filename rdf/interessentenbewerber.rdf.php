@@ -58,7 +58,7 @@ if(isset($_GET['studiensemester_kurzbz']))
 else
 	$studiensemester_kurzbz = null;
 	
-if($studiensemester_kurzbz==null)
+if($studiensemester_kurzbz=='aktuelles')
 	$studiensemester_kurzbz = $semester_aktuell;
 
 if(isset($_GET['studiengang_kz']) && is_numeric($_GET['studiengang_kz']))
@@ -76,11 +76,16 @@ if(isset($_GET['prestudent_id']) && is_numeric($_GET['prestudent_id']))
 else 
 	$prestudent_id=null;
 
+if(isset($_GET['typ']))
+	$typ=$_GET['typ'];
+else 
+	$typ=null;
+
 $prestd = new prestudent($conn, null, true);
 
-if($studiensemester_kurzbz!=null && $studiengang_kz!=null)
+if($studiengang_kz!=null)
 {
-	if($prestd->loadIntessentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester))
+	if($prestd->loadIntessentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester, $typ))
 	{
 		foreach ($prestd->result as $row)
 		{

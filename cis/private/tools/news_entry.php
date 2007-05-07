@@ -72,10 +72,14 @@
 				$news->text = $news_message;
 				$news->studiengang_kz = '0';
 				$news->semester = null;
+				if(isset($chksenat))
+					$news->fachbereich_kurzbz = 'Senat';
+				else 
+					$news->fachbereich_kurzbz = '';
 				$news->datum = $datum;
 				$news->uid=$user;
 				$news->updatevon=$user;
-				$news->updateamum=date('Y-m-d');
+				$news->updateamum=date('Y-m-d H:i:s');
 				$news->new=false;
 				
 				if($news->save())
@@ -102,8 +106,12 @@
 				$news->studiengang_kz = '0';
 				$news->updatevon=$user;
 				$news->semester = null;
+				if(isset($chksenat))
+					$news->fachbereich_kurzbz = 'Senat';
+				else 
+					$news->fachbereich_kurzbz = '';
 				$news->uid = $user;
-				$news->updateamum=date('Y-m-d');
+				$news->updateamum=date('Y-m-d H:i:s');
 				$news->datum=$datum;
 				$news->new=true;
 				
@@ -236,11 +244,14 @@
 		    <tr>
 			  <td width="65">Verfasser:</td>
 			  <td><input type="text" class="TextBox" name="txtAuthor" size="30"<?php if(isset($news_id) && $news_id != "") echo ' value="'.$news->verfasser.'"'; ?>></td>
-			  <td>Sichtbar ab: <input type="text" class="TextBox" name="datum" size="10" value="<?php if(isset($news_id) && $news_id != "") echo date('d.m.Y',strtotime(strftime($news->datum))); else echo date('d.m.Y'); ?>"></td>
+			  <td>Sichtbar ab:</td>
+			  <td><input type="text" class="TextBox" name="datum" size="10" value="<?php if(isset($news_id) && $news_id != "") echo date('d.m.Y',strtotime(strftime($news->datum))); else echo date('d.m.Y'); ?>"></td>
 		    </tr>
 			<tr>
 			  <td>Titel:</td>
 			  <td><input type="text" class="TextBox" name="txtTitle" size="30"<?php if(isset($news_id) && $news_id != "") echo ' value="'.$news->betreff.'"'; ?>></td>
+			  <td>Senat:</td>
+			  <td><input type="checkbox" name="chksenat"<?php if(isset($news_id) && $news_id!="" && $news->fachbereich_kurzbz=='Senat') echo ' checked'?>></td>
 		    </tr>
 		</table>
 		</td>

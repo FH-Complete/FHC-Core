@@ -306,7 +306,10 @@ function LeLektorTreeSelectLektor()
 function LvTreeSelectLehreinheit()
 {
 	var tree=document.getElementById('lehrveranstaltung-tree');
-	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+	if(tree.view)
+		var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+	else
+		return false;
 
 	//In der globalen Variable ist die zu selektierende Lehreinheit gespeichert
 	if(LvSelectLehreinheit_id!=null)
