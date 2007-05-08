@@ -163,6 +163,7 @@ var LeLvbgrpDDObserver=
 		{
 			//GruppenTree Refreshen
 			LeDetailGruppeTreeRefresh();
+			LvTreeRefresh();
 		}
   	}
 };
