@@ -247,6 +247,62 @@ if(!$error)
 			}
 		}
 	}
+	elseif(isset($_POST['type']) && $_POST['type']=='addrolle')
+	{
+		//Prestudentrolle hinzufuegen
+
+		if(!$error)
+		{
+			if(isset($_POST['prestudent_id']))
+			{
+				$prestd = new prestudent($conn);
+				if($prestd->getLastStatus($_POST['prestudent_id']))
+				{
+					$hlp = new prestudent($conn);
+					if($hlp->getPrestudentRolle($_POST['prestudent_id'], $_POST['rolle_kurzbz'], $prestd->studiensemester_kurzbz))
+					{
+						$errormsg = 'Diese Rolle ist bereits vorhanden';
+						$return = false;
+					}
+					else 
+					{
+						$prestd_neu = new prestudent($conn);
+						$prestd_neu->prestudent_id = $_POST['prestudent_id'];
+						$prestd_neu->rolle_kurzbz = $_POST['rolle_kurzbz'];
+						$prestd_neu->studiensemester_kurzbz = $prestd->studiensemester_kurzbz;
+						$prestd_neu->datum = date('Y-m-d');
+						$prestd_neu->ausbildungssemester = $prestd->ausbildungssemester;
+						$prestd_neu->insertamum = date('Y-m-d H:i:s');
+						$prestd_neu->insertvon = $user;
+						$prestd_neu->new = true;
+						
+						if($prestd_neu->save_rolle())
+						{
+							$return = true;
+						}
+						else 
+						{
+							$return = false;
+							$errormsg = $prestd_neu->errormsg;
+							$error = true;
+						}
+					}
+				}
+				else 
+				{
+					$return = false;
+					$errormsg = 'Es ist keine Rolle fuer diesen Prestudent vorhanden';
+					$error = true;
+				}
+			}
+			else 
+			{
+				$return = false;
+				$errormsg = 'Prestudent_id muss angegeben werden';
+				$error = true;
+			}
+		}
+	}
 	else
 	{
 		$return = false;

@@ -220,8 +220,18 @@ if($result = pg_query($conn, $qry))
 else
 	die('error');
 
+$info='';
+$qry_pruefling = "SELECT vorname, nachname, stg_bez, gruppe_kurzbz FROM testtool.vw_pruefling WHERE pruefling_id='".$_SESSION['pruefling_id']."'";
+if($result_pruefling = pg_query($conn, $qry_pruefling))
+{
+	if($row_pruefling = pg_fetch_object($result_pruefling))
+	{
+		$info = "$row_pruefling->vorname $row_pruefling->nachname, $row_pruefling->stg_bez, Gruppe $row_pruefling->gruppe_kurzbz";
+	}
+}
+
 //Zeit des Gebietes holen
-echo '<table width="100%"><tr><td align="right">';
+echo '<table width="100%"><tr><td>'.$info.'</td><td align="right">';
 
 $qry = "SELECT zeit FROM testtool.tbl_gebiet WHERE gebiet_id='".addslashes($gebiet_id)."'";
 

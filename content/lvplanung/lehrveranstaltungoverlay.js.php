@@ -1015,6 +1015,7 @@ function LeGruppeDel()
 	{
 		//Refresh des Trees
 		LeDetailGruppeTreeRefresh();
+		LvTreeRefresh();
 	}
 }
 

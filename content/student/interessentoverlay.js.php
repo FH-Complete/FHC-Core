@@ -435,7 +435,7 @@ function InteressentAuswahl()
 	document.getElementById('interessent-prestudent-menulist-reihungstest').value=reihungstest_id;
 	document.getElementById('interessent-prestudent-textbox-anmeldungreihungstest').value=anmeldungreihungstest;
 	if(reihungstestangetreten=='true')
-		document.getElementById('student-prestudent-checkbox-reihungstestangetreten').checked=true;
+		document.getElementById('interessent-prestudent-checkbox-reihungstestangetreten').checked=true;
 	else
 		document.getElementById('interessent-prestudent-checkbox-reihungstestangetreten').checked=false;
 	document.getElementById('interessent-prestudent-textbox-punkte').value=punkte;
@@ -589,4 +589,68 @@ function InteressentAnmeldungreihungstestHeute()
 	if(tag<10) tag='0'+tag;
 	
 	document.getElementById('interessent-prestudent-textbox-anmeldungreihungstest').value=jahr+'-'+monat+'-'+tag;
+}
+
+// ****
+// * Macht aus einem Interessenten einen Bewerber
+// * Voraussetzungen: 
+// * 	- Datum fuer Anmeldung zum RT muss eingetragen sein
+// *	- Hakerl "zum Reihungstest angetreten" muss angekreuzt sein
+// * Wenn die Voraussetzungen erfuellt sind wird die Rolle Bewerber hinzugefuegt
+// ****
+function InteressentzuBewerber()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('interessent-tree');
+
+	//Wenn kein Interessent ausgewaehlt ist, dann abbrechen
+	if (tree.currentIndex==-1) return;
+	
+	//Voraussetzungen pruefen
+	anmeldungreihungstest = document.getElementById('interessent-prestudent-textbox-anmeldungreihungstest').value;
+	reihungstestangetreten = document.getElementById('interessent-prestudent-checkbox-reihungstestangetreten').checked;
+	
+	if(anmeldungreihungstest=='')
+	{
+		alert('Um einen Interessenten zum Bewerber zu machen, muss das Reihungstestdatum gesetzt sein');
+		return false;
+	}
+	
+	if(reihungstestangetreten==false)
+	{
+		alert('Um einen Interessenten zum Bewerber zu machen, muss das Feld "Zum Reihungstest angetreten" gesetzt sein');
+		return false;
+	}
+	
+	prestudent_id = document.getElementById('interessent-prestudent-textbox-prestudent_id').value;
+	
+	//Rolle Bewerber hinzufuegen
+	
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+		
+	req.add('type', 'addrolle');
+	
+	req.add('prestudent_id', prestudent_id);
+	req.add('rolle_kurzbz', 'Bewerber');	
+	
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+	
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+	}
+	else
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		
+		InteressentSelectId=prestudent_id;
+		InteressentTreeDatasource.Refresh(false); //non blocking
+		SetStatusBarText('Daten wurden gespeichert');
+	}
 }
