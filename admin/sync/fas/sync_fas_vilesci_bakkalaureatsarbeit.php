@@ -12,10 +12,6 @@
 //*
 
 require_once('../../../vilesci/config.inc.php');
-require_once('../../../include/projektarbeit.class.php');
-require_once('../../../include/projektbetreuer.class.php');
-require_once('../../../include/lehreinheit.class.php');
-
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
@@ -298,7 +294,7 @@ if($result = pg_query($conn_fas, $qry_main))
 				}
 				if(!$error)
 				{
-					$qry2="SELECT * FROM lehre.tbl_lehreinheit WHERE lehrform_kurzbz='BE' AND ext_id='".$row->bakkalaureatsarbeit_pk."';";
+					$qry2="SELECT * FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='".$lehreinheitlehrveranstaltung_id."' AND lehrform_kurzbz='BE' AND ext_id='".$row->bakkalaureatsarbeit_pk."';";
 					if($result2 = pg_query($conn, $qry2))
 					{
 						if(pg_num_rows($result2)>0) //eintrag gefunden
