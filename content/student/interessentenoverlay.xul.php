@@ -49,7 +49,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdetailoverlay.x
 						<toolbar id="nav-toolbar">
 						<toolbarbutton id="interessent-toolbar-neu" label="Neu" oncommand="InteressentNeu()" disabled="false" image="../skin/images/NeuDokument.png" tooltiptext="Interessent neu anlegen" />
 						<toolbarbutton id="interessent-toolbar-zubewerber" label="-> Bewerber" oncommand="InteressentzuBewerber()" disabled="false" tooltiptext="Interessent zum Bewerber machen" />
-						<toolbarbutton id="interessent-toolbar-zustudent" label="-> Student" oncommand="" disabled="true" tooltiptext="Bewerber zu Studenten machen" />
+						<toolbarbutton id="interessent-toolbar-zustudent" label="-> Student" oncommand="InteressentzuStudent()" disabled="false" tooltiptext="Bewerber zu Studenten machen" />
 						<toolbarbutton id="interessent-toolbar-refresh" label="Aktualisieren" oncommand="InteressentTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 						<spacer flex="1"/>
 						<label id="interessent-toolbar-label-anzahl"/>

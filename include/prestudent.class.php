@@ -352,7 +352,7 @@ class prestudent extends person
 		if($studiensemester_kurzbz!=null)
 			$qry.= " AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 		$qry.= " ORDER BY datum, insertamum";
-
+		
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))

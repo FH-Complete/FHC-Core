@@ -105,7 +105,7 @@ else
 		</tr>
 		<!-- ************* Meine CIS ******************* -->
   		<tr>
-			<td nowrap><a class="MenuItem" href="?MeineCIS" onClick="return(js_toggle_container('MeineCIS'));" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Meine CIS</a></td>
+			<td nowrap><a class="MenuItem" href="?MeineCIS" onClick="return(js_toggle_container('MeineCIS'));" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Mein CIS</a></td>
 		</tr>
 
 		<tr>
@@ -114,6 +114,10 @@ else
 		  	<tr>
 			  	<td width="10" nowrap>&nbsp;</td>
 				<td nowrap><a class="Item" href="profile/index.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Profil</a></td>
+			</tr>
+			<tr>
+			  	<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a class="Item" href="https://webmail.technikum-wien.at" target="_blank"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Webmail</a></td>
 			</tr>
 		  	<tr>
 				<td width="10" nowrap>&nbsp;</td>

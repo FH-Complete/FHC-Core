@@ -49,16 +49,18 @@
 		</tr>
 		<!-- Hauptmenue News -->
 		<tr>
-		    <td nowrap>
-				<a href="public/news.php"  target="content" class="MenuItem" onClick="js_toggle_container('NEWS');"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;News</a>
+          	<td nowrap><a href="public/news.php"  target="content" class="MenuItem" onClick="js_toggle_container('NEWS');"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;News</a></td>
+        </tr>
+		<tr>
+          	<td nowrap>
 				<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="NEWS" style="display: visible;">
 				<tr>
 		  			<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="Item" target="content" href="private/lehre/pinboard.php?fachbereich_kurzbz=Senat"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Senatsbeschl&uuml;sse</a></td>
+					<td nowrap><a class="Item" target="_blank" href="http://www.technikum-wien.at/service/intern"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Newsletter</a></td>
 		  		</tr>
-				<tr>
+		  		<tr>
 		  			<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="Item" target="_blank" href="http://www.technikum-wien.at/service/intern"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;INTERN</a></td>
+					<td nowrap><a class="Item" target="content" href="private/lehre/pinboard.php?fachbereich_kurzbz=Senat"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Senatsbeschl&uuml;sse</a></td>
 		  		</tr>
 		  		<tr>
 		  			<td width="10" nowrap>&nbsp;</td>
@@ -70,34 +72,7 @@
 		  		</tr>
 			  	</table>
 			</td>
-
-        	<!--<td nowrap>
-        		<a class="MenuItem" href="public/news.php" target="content">
-        			<img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;News
-        		</a>
-        	</td>-->
   		</tr>
-  		<tr>
-
-			<td nowrap>
-				<a href="?FAQ" class="MenuItem" onClick="return(js_toggle_container('FAQ'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;FAQ</a>
-				<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="FAQ" style="display: none">
-		  		<tr>
-		  			<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="Item" href="public/faq_lan.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;LAN FAQ</a></td>
-		  		</tr>
-				<tr>
-		  			<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="Item" href="public/faq_bug.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Bug Tracking FAQ</a></td>
-		  		</tr>
-		  		<tr>
-		  			<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="Item" href="public/faq_upload.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Upload Lehre FAQ</a></td>
-		  		</tr>
-			  	</table>
-			</td>
-		</tr>
-
 
 		<!-- Hauptmenue Lehre -->
 		<tr>
@@ -127,116 +102,62 @@
 					<td width="10" nowrap>&nbsp;</td>
 	          		<td nowrap><a class="Item" href="public/tw_international.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;TW International</a></td>
 	  			</tr>
-	  			<tr>
-			  	<td width="10" nowrap>&nbsp;</td>
-				<td nowrap><a href="private/info/weiterbildung/info.html" target="content" class="MenuItem" onClick="js_toggle_container('Weiterbildung');"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Weiterbildung</a>
-			  	<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Weiterbildung" style="display: none">
-					<!--<tr>
-						<td width="10" nowrap>&nbsp;</td>
-						<td nowrap><a class="Item" href="campus/weiterbildung/info.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Info und Kontakt</a></td>
-					</tr>-->
-					<tr>
-						<td width="10" nowrap>&nbsp;</td>
-						<td nowrap><a class="Item" href="private/info/weiterbildung/aktuelles/aktuelles.html" target="content" style="font-weight: bold;"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Aktuelles</a></td>
-					</tr>
-					<tr>
-						<td width="10" nowrap>&nbsp;</td>
-	          			<td nowrap><a target="content" href="private/info/weiterbildung/archiv/archiv.html" class="MenuItem" onClick="js_toggle_container('WeiterbildungArchiv');" style="font-weight: normal;"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Archiv</a>
-
-			  			<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="WeiterbildungArchiv" style="display: none;">
-							<tr>
-							  	<td width="10" nowrap>&nbsp;</td>
-								<td nowrap><a class="Item" href="private/info/weiterbildung/archiv/archiv_06-07.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;2006/07</a></td>
-							</tr>
-							<tr>
-							  	<td width="10" nowrap>&nbsp;</td>
-								<td nowrap><a class="Item" href="private/info/weiterbildung/archiv/archiv_05-06.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;2005/06</a></td>
-							</tr>
-							<tr>
-							  	<td width="10" nowrap>&nbsp;</td>
-								<td nowrap><a class="Item" href="private/info/weiterbildung/archiv/archiv_04-05.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;2004/05</a></td>
-							</tr>
-							<tr>
-							  	<td width="10" nowrap>&nbsp;</td>
-								<td nowrap><a class="Item" href="private/info/weiterbildung/archiv/archiv_03-04.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;2003/04</a></td>
-							</tr>
-						</table>
-						</td>
-					</tr>
-					<tr>
-						<td width="10" nowrap>&nbsp;</td>
-						<td nowrap><a class="Item" href="private/info/weiterbildung/links.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Links</a></td>
-					</tr>
-					<tr>
-						<td width="10" nowrap>&nbsp;</td>
-						<td nowrap><a class="Item" href="http://www.lllacademy.at/" target="_blank"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;LLL-Academy</a></td>
-					</tr>
-				</table>
-				</td>
-  			</tr>
+	  			
 				<tr>
 	          		<td width="10" nowrap>&nbsp;</td>
-	          		<td nowrap><a class="Item" href="public/library.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Bibliothek</a></td>
+	          		<td nowrap><a class="MenuItem" href="public/library.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Bibliothek</a></td>
   				</tr>
-  				<tr>
-  					<td width="10" nowrap>&nbsp;</td>
-				    <td nowrap><a href="?Medienaustattung" class="MenuItem" onClick="return(js_toggle_container('Medienaustattung'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Medienaustattung</a></td>
+				</table>
+				&nbsp;
+		  	</td>
+  		</tr>
+  		
+		<tr>
+			<td nowrap><a href="private/info/weiterbildung/info.html" target="content" class="MenuItem" onClick="js_toggle_container('Weiterbildung');"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Weiterbildung</a>
+		  	<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Weiterbildung" style="display: none">
+				<!--<tr>
+					<td width="10" nowrap>&nbsp;</td>
+					<td nowrap><a class="Item" href="campus/weiterbildung/info.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Info und Kontakt</a></td>
+				</tr>-->
+				<tr>
+					<td width="10" nowrap>&nbsp;</td>
+					<td nowrap><a class="Item" href="private/info/weiterbildung/aktuelles/aktuelles.html" target="content" style="font-weight: bold;"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Aktuelles</a></td>
 				</tr>
 				<tr>
 					<td width="10" nowrap>&nbsp;</td>
-					<td nowrap>
-						<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Medienaustattung" style="display: none">
+          			<td nowrap><a target="content" href="private/info/weiterbildung/archiv/archiv.html" class="MenuItem" onClick="js_toggle_container('WeiterbildungArchiv');" style="font-weight: normal;"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Archiv</a>
+
+		  			<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="WeiterbildungArchiv" style="display: none;">
 						<tr>
-							<td width="10" nowrap>&nbsp;</td>
-					    	<td nowrap><a class="Item" href="private/tools/inventar.php" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Inventar</a></td>
-						</tr>
-						<tr>
-							<td width="10" nowrap>&nbsp;</td>
-							<td nowrap><a class="Item" href="public/info/medien/medienausstattung_fixer_pc.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Fixer PC</a></td>
-						</tr>
-						<tr>
-						 	<td width="10" nowrap>&nbsp;</td>
-							<td nowrap><a class="Item" href="public/info/medien/medienausstattung_laptop.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Laptop</a></td>
+						  	<td width="10" nowrap>&nbsp;</td>
+							<td nowrap><a class="Item" href="private/info/weiterbildung/archiv/archiv_06-07.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;2006/07</a></td>
 						</tr>
 						<tr>
 						  	<td width="10" nowrap>&nbsp;</td>
-							<td nowrap><a class="Item" href="public/info/medien/medienausstattung_visualizer.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Visualizer</a></td>
+							<td nowrap><a class="Item" href="private/info/weiterbildung/archiv/archiv_05-06.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;2005/06</a></td>
 						</tr>
 						<tr>
 						  	<td width="10" nowrap>&nbsp;</td>
-							<td nowrap><a class="Item" href="public/info/medien/medienausstattung_video.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Video</a></td>
+							<td nowrap><a class="Item" href="private/info/weiterbildung/archiv/archiv_04-05.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;2004/05</a></td>
 						</tr>
 						<tr>
 						  	<td width="10" nowrap>&nbsp;</td>
-							<td nowrap><a class="Item" href="public/info/medien/medienausstattung_dvd.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;DVD</a></td>
+							<td nowrap><a class="Item" href="private/info/weiterbildung/archiv/archiv_03-04.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;2003/04</a></td>
 						</tr>
-						<tr>
-						  	<td width="10" nowrap>&nbsp;</td>
-							<td nowrap><a class="Item" href="public/info/medien/medienausstattung_minidisc.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Minidisc</a></td>
-						</tr>
-						<tr>
-						  	<td width="10" nowrap>&nbsp;</td>
-							<td nowrap><a class="Item" href="public/info/medien/medienausstattung_cd.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;CD</a></td>
-						</tr>
-						<tr>
-						  	<td width="10" nowrap>&nbsp;</td>
-							<td nowrap><a class="Item" href="public/info/medien/medienausstattung_externes_video.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Externes Video</a></td>
-						</tr>
-						<tr>
-						  	<td width="10" nowrap>&nbsp;</td>
-							<td nowrap><a class="Item" href="public/info/medien/medienausstattung_mikrofon.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Mikrofon</a></td>
-						</tr>
-						<tr>
-						  	<td width="10" nowrap>&nbsp;</td>
-							<td nowrap><a class="Item" href="public/info/medien/medienausstattung_faq.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;FAQ</a></td>
-						</tr>
-						</table>
+					</table>
 					</td>
 				</tr>
-				</table>
-		  	</td>
+				<tr>
+					<td width="10" nowrap>&nbsp;</td>
+					<td nowrap><a class="Item" href="private/info/weiterbildung/links.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Links</a></td>
+				</tr>
+				<tr>
+					<td width="10" nowrap>&nbsp;</td>
+					<td nowrap><a class="Item" href="http://www.lllacademy.at/" target="_blank"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;LLL-Academy</a></td>
+				</tr>
+			</table>
+			</td>
   		</tr>
-
 		<!-- Hauptmenue Kommunikation -->
 		<tr>
           <td nowrap><a href="?Kommunikation" class="MenuItem" onClick="return(js_toggle_container('Kommunikation'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Kommunikation</a></td>
@@ -270,25 +191,8 @@
 			</tr>
 			<tr>
 				<td width="10" nowrap>&nbsp;</td>
-			    <td nowrap><a href="?Unternehmenskommunikation" class="MenuItem" onClick="return(js_toggle_container('Unternehmenskommunikation'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Unternehmens-<br>&nbsp;&nbsp;&nbsp;kommunikation</a></td>
+			    <td nowrap><a href="../documents/management/" class="MenuItem" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Unternehmens-<br>&nbsp;&nbsp;&nbsp;kommunikation</a></td>
 			</tr>
-			<tr>
-				<td width="10" nowrap>&nbsp;</td>
-				<td nowrap>
-					<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Unternehmenskommunikation" style="display: none">
-
-					<tr>
-					<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a href="../documents/management/" class="Item" target="_blank"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Marketing</a></td>
-					</tr>
-
-					<tr>
-					  	<td width="10" nowrap>&nbsp;</td>
-						<td nowrap><a href="../documents/management/umgang_vielfalt" class="Item" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Umgang mit Vielfalt</a></td>
-					</tr>
-					</table>
-				</td>
-  			</tr>
 			</table>
 		  	</td>
   		</tr>
@@ -319,7 +223,7 @@
 			</tr>
 			<tr>
 			  	<td width="10" nowrap>&nbsp;</td>
-				<td nowrap><a class="Item" href="private/tools/wlan_registration.php" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;WLan-Registration</a></td>
+				<td nowrap><a class="Item" href="private/tools/wlan_registration.php" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;WLAN-Registration</a></td>
 			</tr>
 			<tr>
 			  	<td width="10" nowrap>&nbsp;</td>
@@ -330,8 +234,55 @@
 				<td nowrap><a class="Item" href="private/info/softgrid2.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;SoftGrid</a></td>
 			</tr>
 			<tr>
-			  	<td width="10" nowrap>&nbsp;</td>
-				<td nowrap><a class="Item" href="public/info/mail.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Mail</a></td>
+  					<td width="10" nowrap>&nbsp;</td>
+				    <td nowrap><a href="?Medienaustattung" class="MenuItem" onClick="return(js_toggle_container('Medienaustattung'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Medienaustattung</a>
+					<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Medienaustattung" style="display: none">
+					<tr>
+						<td width="10" nowrap>&nbsp;</td>
+				    	<td nowrap><a class="Item" href="private/tools/inventar.php" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Inventar</a></td>
+					</tr>
+					<tr>
+						<td width="10" nowrap>&nbsp;</td>
+						<td nowrap><a class="Item" href="public/info/medien/medienausstattung_fixer_pc.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Fixer PC</a></td>
+					</tr>
+					<tr>
+					 	<td width="10" nowrap>&nbsp;</td>
+						<td nowrap><a class="Item" href="public/info/medien/medienausstattung_laptop.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Laptop</a></td>
+					</tr>
+					<tr>
+					  	<td width="10" nowrap>&nbsp;</td>
+						<td nowrap><a class="Item" href="public/info/medien/medienausstattung_visualizer.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Visualizer</a></td>
+					</tr>
+					<tr>
+					  	<td width="10" nowrap>&nbsp;</td>
+						<td nowrap><a class="Item" href="public/info/medien/medienausstattung_video.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Video</a></td>
+					</tr>
+					<tr>
+					  	<td width="10" nowrap>&nbsp;</td>
+						<td nowrap><a class="Item" href="public/info/medien/medienausstattung_dvd.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;DVD</a></td>
+					</tr>
+					<tr>
+					  	<td width="10" nowrap>&nbsp;</td>
+						<td nowrap><a class="Item" href="public/info/medien/medienausstattung_minidisc.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Minidisc</a></td>
+					</tr>
+					<tr>
+					  	<td width="10" nowrap>&nbsp;</td>
+						<td nowrap><a class="Item" href="public/info/medien/medienausstattung_cd.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;CD</a></td>
+					</tr>
+					<tr>
+					  	<td width="10" nowrap>&nbsp;</td>
+						<td nowrap><a class="Item" href="public/info/medien/medienausstattung_externes_video.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Externes Video</a></td>
+					</tr>
+					<tr>
+					  	<td width="10" nowrap>&nbsp;</td>
+						<td nowrap><a class="Item" href="public/info/medien/medienausstattung_mikrofon.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Mikrofon</a></td>
+					</tr>
+					<tr>
+					  	<td width="10" nowrap>&nbsp;</td>
+						<td nowrap><a class="Item" href="public/info/medien/medienausstattung_faq.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;FAQ</a></td>
+					</tr>
+					</table>
+				</td>
 			</tr>
 			<!--<tr>
 			  	<td width="10" nowrap>&nbsp;</td>
@@ -340,11 +291,7 @@
 
 			<tr>
 				<td width="10" nowrap>&nbsp;</td>
-			  	<td nowrap><a href="?Verwaltungstools" class="MenuItem" onClick="return(js_toggle_container('Verwaltungstools'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Verwaltungstools</a></td>
-			</tr>
-			<tr>
-				<td width="10" nowrap>&nbsp;</td>
-			  	<td nowrap>
+			  	<td nowrap><a href="?Verwaltungstools" class="MenuItem" onClick="return(js_toggle_container('Verwaltungstools'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Verwaltungstools</a>
 			   	<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Verwaltungstools" style="display: none">
 			  	<tr>
 			  		<td width="10" nowrap>&nbsp;</td>
@@ -360,6 +307,52 @@
 			  	</tr>
 			  	</table>
 			  	</td>
+  			</tr>
+  			<tr>
+			    <td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a href="?Verordnungen" class="MenuItem" onClick="return(js_toggle_container('Verordnungen'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Verordnungen</a>
+				  	<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Verordnungen" style="display: none">
+					<tr>
+					  	<td width="10" nowrap>&nbsp;</td>
+						<td nowrap><a class="Item" href="public/info/verordnungen/hausordnung.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Hausordnung</a></td>
+					</tr>
+					<tr>
+					  	<td width="10" nowrap>&nbsp;</td>
+						<td nowrap><a class="Item" href="public/info/verordnungen/brandschutzordnung.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Brandschutzordnung</a></td>
+					</tr>
+					<tr>
+					  	<td width="10" nowrap>&nbsp;</td>
+						<td nowrap><a class="Item" href="public/info/verordnungen/benutzungsordnung_bibliothek.doc" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Bibliotheksordnung</a></td>
+					</tr>
+					<tr>
+					  	<td width="10" nowrap>&nbsp;</td>
+						<td nowrap><a class="Item" href="public/info/verordnungen/EDV_Richtlinien.doc" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;EDV Richtlinien</a></td>
+					</tr>
+					<tr>
+					  	<td width="10" nowrap>&nbsp;</td>
+						<td nowrap><a class="Item" href="public/info/verordnungen/laborordnung.doc" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Laborordnung</a></td>
+					</tr>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td width="10" nowrap>&nbsp;</td>
+		        <td nowrap><a href="?Location" class="MenuItem" onClick="return(js_toggle_container('Location'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Location</a></td>
+			</tr>
+			<tr>
+				<td width="10" nowrap>&nbsp;</td>
+		        <td nowrap>
+				  	<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Location" style="display: none">
+					<tr>
+						<td width="10" nowrap>&nbsp;</td>
+						<td nowrap><a class="Item" href="public/location.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Standort</a></td>
+					</tr>
+					<tr>
+					  	<td width="10" nowrap>&nbsp;</td>
+						<td nowrap><a class="Item" href="public/tw_building.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Geb&auml;udeplan</a></td>
+					</tr>
+					</table>
+				</td>
   			</tr>
 			</table>
 		  	</td>
@@ -392,57 +385,13 @@
 		  			<td width="10" nowrap>&nbsp;</td>
 					<td nowrap><a class="Item" href="private/info/qm/vorlagen/Ground_Rules.pdf" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Ground Rules</a></td>
 		  		</tr>
-
-		  		<tr>
-			    <td width="10" nowrap>&nbsp;</td>
-				<td nowrap><a href="?Jahresplan" class="MenuItem" onClick="return(js_toggle_container('Jahresplan'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Jahresplan</a>
-				  	<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Jahresplan" style="display: none">
-					<tr>
-					  	<td width="10" nowrap>&nbsp;</td>
-						<td nowrap><a class="Item" href="private/info/jahresplan_WS2006.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Wintersemester 2006</a></td>
-					</tr>
-					<tr>
-					  	<td width="10" nowrap>&nbsp;</td>
-						<td nowrap><a class="Item" href="private/info/jahresplan_SS2007.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Sommersemester 2007</a></td>
-					</tr>
-
-					</table>
-				</td>
-				</tr>
-				<tr>
-			    <td width="10" nowrap>&nbsp;</td>
-				<td nowrap><a href="?Verordnungen" class="MenuItem" onClick="return(js_toggle_container('Verordnungen'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Verordnungen</a>
-				  	<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Verordnungen" style="display: none">
-					<tr>
-					  	<td width="10" nowrap>&nbsp;</td>
-						<td nowrap><a class="Item" href="public/info/verordnungen/hausordnung.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Hausordnung</a></td>
-					</tr>
-					<tr>
-					  	<td width="10" nowrap>&nbsp;</td>
-						<td nowrap><a class="Item" href="public/info/verordnungen/brandschutzordnung.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Brandschutzordnung</a></td>
-					</tr>
-					<tr>
-					  	<td width="10" nowrap>&nbsp;</td>
-						<td nowrap><a class="Item" href="public/info/verordnungen/benutzungsordnung_bibliothek.doc" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Bibliotheksordnung</a></td>
-					</tr>
-					<tr>
-					  	<td width="10" nowrap>&nbsp;</td>
-						<td nowrap><a class="Item" href="public/info/verordnungen/EDV_Richtlinien.doc" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;EDV Richtlinien</a></td>
-					</tr>
-					<tr>
-					  	<td width="10" nowrap>&nbsp;</td>
-						<td nowrap><a class="Item" href="public/info/verordnungen/laborordnung.doc" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Laborordnung</a></td>
-					</tr>
-					</table>
-				</td>
-				</tr>
 				</table>
 			</td>
 		</tr>
 
 		<!-- Hauptmenue Infos -->
 		<tr>
-          <td nowrap><a href="?Infos" class="MenuItem" onClick="return(js_toggle_container('Infos'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Infos</a></td>
+          <td nowrap><a href="?Infos" class="MenuItem" onClick="return(js_toggle_container('Infos'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Rektorat</a></td>
   		</tr>
 		<tr>
         	<td nowrap>
@@ -467,38 +416,64 @@
 				</td>
 			</tr>
 			<tr>
-        		<td width="10" nowrap>&nbsp;</td>
-				<td nowrap><a class="Item" href="public/linkliste.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Links</a></td>
-  			</tr>
-
-			<tr>
-				<td width="10" nowrap>&nbsp;</td>
-		        <td nowrap><a href="?Location" class="MenuItem" onClick="return(js_toggle_container('Location'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Location</a></td>
-			</tr>
-			<tr>
-				<td width="10" nowrap>&nbsp;</td>
-		        <td nowrap>
-				  	<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Location" style="display: none">
+			    <td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a href="?Jahresplan" class="MenuItem" onClick="return(js_toggle_container('Jahresplan'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Jahresplan</a>
+				  	<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Jahresplan" style="display: none">
 					<tr>
-						<td width="10" nowrap>&nbsp;</td>
-						<td nowrap><a class="Item" href="public/location.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Standort</a></td>
+					  	<td width="10" nowrap>&nbsp;</td>
+						<td nowrap><a class="Item" href="private/info/jahresplan_WS2006.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;WS 2006</a></td>
 					</tr>
 					<tr>
 					  	<td width="10" nowrap>&nbsp;</td>
-						<td nowrap><a class="Item" href="public/tw_building.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Geb&auml;udeplan</a></td>
+						<td nowrap><a class="Item" href="private/info/jahresplan_SS2007.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;SS 2007</a></td>
 					</tr>
+
 					</table>
 				</td>
+			</tr>
+<!--			<tr>
+        		<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a class="Item" href="public/linkliste.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Links</a></td>
   			</tr>
+-->
+			<tr>
+			  	<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a href="../documents/management/umgang_vielfalt" class="Item" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Umgang mit Vielfalt</a></td>
+			</tr>
+
 			</table>
 		</td>
   		</tr>
-		<!-- ************* Meine CIS ******************* -->
-  		<tr>
-			<td nowrap><a class="MenuItem" href="private/menu.php" onClick="js_toggle_container('MeineCIS');" ><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Meine CIS</a></td>
+ 		<tr>
+			<td nowrap>
+				<a href="?FAQ" class="MenuItem" onClick="return(js_toggle_container('FAQ'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;FAQ</a>
+				<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="FAQ" style="display: none">
+		  		<tr>
+		  			<td width="10" nowrap>&nbsp;</td>
+					<td nowrap><a class="Item" href="public/faq_lan.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;LAN FAQ</a></td>
+		  		</tr>
+				<tr>
+		  			<td width="10" nowrap>&nbsp;</td>
+					<td nowrap><a class="Item" href="public/faq_bug.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Bug Tracking FAQ</a></td>
+		  		</tr>
+		  		<tr>
+		  			<td width="10" nowrap>&nbsp;</td>
+					<td nowrap><a class="Item" href="public/faq_upload.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Upload Lehre FAQ</a></td>
+		  		</tr>
+		  		<tr>
+			  		<td width="10" nowrap>&nbsp;</td>
+					<td nowrap><a class="Item" href="public/info/mail.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Einrichten des Mails</a></td>
+				</tr>
+			  	</table>
+			</td>
 		</tr>
 
-		<tr>
+		<!-- ************* Meine CIS ******************* -->
+  		<tr>
+			<td nowrap><a class="MenuItem" href="private/menu.php" ><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Mein CIS</a></td>
+		</tr>
+
+<!--		<tr>
 	       	<td nowrap>
 		  	<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="MeineCIS" style="display: visible;">
 		  	<tr>
@@ -509,7 +484,7 @@
 				<td width="10" nowrap>&nbsp;</td>
 				<td nowrap><a class="Item" href="private/lvplan/stpl_week.php" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;LV-Plan</a></td>
 			</tr>
-
+-->
 <!--			<tr>
 				<td width="10" nowrap>&nbsp;</td>
 		        <td nowrap><a href="?Location" class="MenuItem" onClick="return(js_toggle_container('MeineLVs'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Location</a></td>

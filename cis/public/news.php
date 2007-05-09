@@ -46,28 +46,47 @@
         <td>&nbsp;</td>
       </tr>
 	  	<td>
+	  	<div id="news">
 		  <?php
 		  
 		  	$news = new news($conn);
 
 		  	$news->getnews(MAXNEWSALTER,0,null);
 		  	$zaehler=0;
-		  	
+		  	$open=true;
 		  	foreach ($news->result as $row)
 		  	{		  		
 		  		$zaehler++;
 		  		//no comment
 		  		$datum = date('d.m.Y',strtotime(strftime($row->datum)));
 		  		
-				echo $datum.'&nbsp;'.$row->verfasser.'<br><br><strong>'.$row->betreff.'</strong><br>'.$row->text.'<br><br><br>
-				';
+				//echo $datum.'&nbsp;'.$row->verfasser.'<br><br><strong>'.$row->betreff.'</strong><br>'.$row->text.'<br><br><br>
+				echo '<div class="news">';
+				echo '
+					<div class="titel">
+					<table width="100%">
+						<tr>
+							<td width="30%" align="left">'.$row->betreff.'</td>
+							<td width="30%" align="center">'.$datum.'</td>
+							<td width="30%" align="right" style="display: '.($open?'none':'block').'" id="'.$zaehler.'Mehr" ><a href="#" class="Item" onclick="return show(\''.$zaehler.'\')">mehr &gt;&gt;</a></td>
+							<td width="30%" align="right" style="display: '.($open?'block':'none').'" id="'.$zaehler.'Verfasser">'.$row->verfasser.'</td>				
+						</tr>
+					</table>
+					</div>
+					<div class="text" style="display: '.($open?'block':'none').';" id="'.$zaehler.'Text">
+					'.$row->text.'
+					</div>
+					';
+				echo "</div><br />";
 			}
 				
 			
 			if($zaehler==0)
 				echo 'Zur Zeit gibt es keine aktuellen News!';
 		  ?>
+		  </div>
 		</td>
+		<td>&nbsp;</td>
 	  </tr>
     </table></td>
 	<td width="30">&nbsp;</td>
