@@ -37,6 +37,7 @@ require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/student.class.php');
 require_once('../../include/prestudent.class.php');
+require_once('../../include/studiengang.class.php');
 
 $user = get_uid();
 
@@ -60,6 +61,76 @@ if(!$rechte->isBerechtigt('admin'))
 	$error = true;
 }
 	
+// *** FUNKTIONEN ***
+
+// ****
+// * Generiert die Matrikelnummer
+// * FORMAT: 0710254001
+// * 07 = Jahr
+// * 1/2/0  = WS/SS/Incomming
+// * 0254 = Studiengangskennzahl vierstellig
+// * 001 = Laufende Nummer
+// ****
+function generateMatrikelnummer($conn, $studiengang_kz, $studiensemester_kurzbz)
+{
+	$jahr = substr($studiensemester_kurzbz, 4);	
+	$art = substr($studiensemester_kurzbz, 0, 2);
+	switch($art)
+	{
+		case 'WS': $art = '1'; break;
+		case 'SS': $art = '2'; break;
+		default: $art = '0'; break;
+	}
+	if($art=='2')
+		$jahr = $jahr-1;
+	$matrikelnummer = sprintf("%02d",$jahr).$art.sprintf("%04d",$studiengang_kz);
+	
+	$qry = "SELECT matrikelnr FROM public.tbl_student WHERE matrikelnr LIKE '$matrikelnummer%' ORDER BY matrikelnr DESC LIMIT 1";
+	
+	if($result = pg_query($conn, $qry))
+	{
+		if($row = pg_fetch_object($result))
+		{
+			$max = substr($row->matrikelnr,7);
+		}
+		else 
+			$max = 0;
+		
+		$max += 1;
+		return $matrikelnummer.sprintf("%03d",$max);
+	}
+	else 
+	{
+		return false;
+	}
+}
+
+// ****
+// * Generiert die UID
+// * FORMAT: el07b001
+// * el = studiengangskuerzel
+// * 07 = Jahr
+// * b/m/d/x = Bachelor/Master/Diplom/Incomming
+// * 001 = Laufende Nummer ( Wenn StSem==SS dann wird zur nummer 500 dazugezaehlt)
+// ****
+function generateUID($conn, $matrikelnummer)
+{
+	$jahr = substr($matrikelnummer,0, 2);
+	$art = substr($matrikelnummer, 2, 1);
+	$stg = substr($matrikelnummer, 3, 4);
+	$nr = substr($matrikelnummer, 7);
+	
+	if($art=='2')
+		$nr = $nr+500;
+	
+	$stg_obj = new studiengang($conn);
+	$stg_obj->load(ltrim($stg,'0'));
+	
+	return $stg_obj->kurzbz.$jahr.($art!='0'?$stg_obj->typ:'x').$nr;	
+}
+// ***
+
+
 if(!$error)
 {
 	
@@ -259,7 +330,8 @@ if(!$error)
 				if($prestd->getLastStatus($_POST['prestudent_id']))
 				{
 					$hlp = new prestudent($conn);
-					if($hlp->getPrestudentRolle($_POST['prestudent_id'], $_POST['rolle_kurzbz'], $prestd->studiensemester_kurzbz))
+					$hlp->getPrestudentRolle($_POST['prestudent_id'], $_POST['rolle_kurzbz'], $prestd->studiensemester_kurzbz);
+					if(count($hlp->result)>0)
 					{
 						$errormsg = 'Diese Rolle ist bereits vorhanden';
 						$return = false;
@@ -284,7 +356,6 @@ if(!$error)
 						{
 							$return = false;
 							$errormsg = $prestd_neu->errormsg;
-							$error = true;
 						}
 					}
 				}
@@ -292,14 +363,88 @@ if(!$error)
 				{
 					$return = false;
 					$errormsg = 'Es ist keine Rolle fuer diesen Prestudent vorhanden';
-					$error = true;
 				}
 			}
 			else 
 			{
 				$return = false;
 				$errormsg = 'Prestudent_id muss angegeben werden';
-				$error = true;
+			}
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='BewerberZuStudent')
+	{
+		// macht aus einem Bewerber einen Studenten
+		// Voraussetzungen:
+		// - ZGV muss ausgefuellt sein (bei Master beide)
+		// - Kaution muss bezahlt sein
+		// - Rolle Bewerber muss existieren
+		// Wenn die Voraussetzungen erfuellt sind, dann wird die Matrikelnr
+		// und UID generiert und der Studentendatensatz angelegt.
+
+		if(!$error)
+		{
+			if(isset($_POST['prestudent_id']))
+			{
+				$prestd = new prestudent($conn);
+				if($prestd->load($_POST['prestudent_id']))
+				{
+					if($prestd->zgv_code!='')
+					{
+						$stg = new studiengang($conn);
+						$stg->load($prestd->studiengang_kz);
+						
+						if($stg->typ=='m' && $prestd->zgvmas_code=='')
+						{
+							$return = false;
+							$errormsg = 'ZGV Master muss eingegeben werden';
+						}
+						else 
+						{
+							//Pruefen ob die Rolle Bewerber existiert
+							$hlp = new prestudent($conn);
+							$hlp->getPrestudentRolle($_POST['prestudent_id'], 'Bewerber');
+						
+							if(count($hlp->result)>0)
+							{
+								//pruefen ob die Kaution bezahlt wurde
+								//??
+																
+								//Matrikelnummer und UID generieren
+								$matrikelnr = generateMatrikelnummer($conn, $prestd->studiengang_kz, $hlp->result[0]->studiensemester_kurzbz);
+								$uid = generateUID($conn, $matrikelnr);
+								
+								$return = false;
+								$errormsg = "Matrikelnummer: $matrikelnr, UID: $uid";
+								
+								//Benutzerdatensatz anlegen
+								//Studentendatensatz anlegen
+								//Prestudentrolle hinzugfuegen
+								//Eintrag tbl_studentlehrverband??
+							}
+							else 
+							{
+								$return = false;
+								$errormsg = 'Die Person muss zuerst Bewerber sein bevor Sie zum Studenten gemacht werden kann';
+							}
+						}
+					}
+					else 
+					{
+						$return = false;
+						$errormsg = 'ZGV muss eingegeben werden';
+					}
+				}
+				else 
+				{
+					$return = false;
+					$errormsg = 'Prestudent wurde nicht gefunden';
+				}
+			}
+			else 
+			{
+				$return = false;
+				$errormsg = 'Prestudent_id muss angegeben werden';
 			}
 		}
 	}

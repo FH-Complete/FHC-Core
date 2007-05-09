@@ -313,13 +313,31 @@ h4
 	text-decoration: none; 
 }
 
-#News
+#news
 {
 }
 
-#News div
+#news .news
 {
+	//-moz-border-radius-topright: 20px;
+	-moz-border-radius-topleft: 10px;
+	width: 100%;
+	border: 1px solid #E0E0E0;
+	background-color: #F0F0F0;
 	
+}
+
+#news .news .titel
+{
+	font-weight: bold;
+	font-size: normal;
+	padding: 0px 10px 0px 10px;
+}
+
+#news .news .text
+{
+	background-color: #FCFCFC;
+	padding: 0px 10px 0px 10px;
 }
 
 #GlobalMenu

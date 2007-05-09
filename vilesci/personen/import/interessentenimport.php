@@ -105,6 +105,10 @@ $person_id = (isset($_POST['person_id'])?$_POST['person_id']:'');
 $ueberschreiben = (isset($_POST['ueberschreiben'])?$_POST['ueberschreiben']:'');
 //end Parameter
 
+//Testphase fix
+if($studiengang_kz!='' && $studiengang_kz!='257')
+	die('Keine Berechtigung zum Importieren');
+//end Testphase
 
 // *** Speichern der Daten ***
 if(isset($_POST['save']))

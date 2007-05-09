@@ -108,7 +108,11 @@
 		
 		if($news_obj->getFBNews($fachbereich_kurzbz, $datum))
 		{
-			$zaehler = print_news($news_obj);
+			if($fachbereich_kurzbz=='Senat')
+				$open=false;
+			else 
+				$open=true;
+			$zaehler = print_news($news_obj, $open);
 		}
 		else 
 			echo $news_obj->errormsg;
@@ -116,9 +120,10 @@
 		   echo '<p>Zur Zeit gibt es keine aktuellen News!</p>';
 	}
 	
-	function print_news($news_obj)
+	function print_news($news_obj, $open=true)
 	{
 		$zaehler=0;
+		echo '<br /><div id="news">';
 		foreach ($news_obj->result as $row)
 		{
 			$zaehler++;
@@ -127,17 +132,34 @@
 			else 	
 				$datum='';
 			
-			if($row->semester == '')
-			{
-				echo '<p><small>'.$datum.' - '.$row->verfasser.' - [Allgemein]</small><br><b>'.$row->betreff.'</b><br>';
-			}
-			else
-			{
-				echo '<p><small>'.$datum.' - '.$row->verfasser.' - [Semester '.$row->semester.']</small><br><b>'.$row->betreff.'</b><br>';
-			}
-			
-			echo "$row->text</p>";
+			echo '<div class="news">';
+			//if($row->semester == '')
+			//{
+			echo '
+			<div class="titel">
+			<table width="100%">
+				<tr>
+					<td width="30%" align="left">'.$row->betreff.'</td>
+					<td width="30%" align="center">'.$datum.'</td>
+					<td width="30%" align="right" style="display: '.($open?'none':'block').'" id="'.$zaehler.'Mehr" ><a href="#" class="Item" onclick="return show(\''.$zaehler.'\')">mehr &gt;&gt;</a></td>
+					<td width="30%" align="right" style="display: '.($open?'block':'none').'" id="'.$zaehler.'Verfasser">'.$row->verfasser.'</td>				
+				</tr>
+			</table>
+			</div>
+			<div class="text" style="display: '.($open?'block':'none').';" id="'.$zaehler.'Text">
+			'.$row->text.'
+			</div>
+			';
+				//echo '<div class="titel"><table style="width: 100%"><tr><td  width="30%" align="left">'.$row->betreff.' </td><td width="30%" align=center>'.$datum.'</td><td width="30%" align=right>'.$row->verfasser.'</td></tr></table></div>';
+			//}
+			//else
+			//{
+			//	echo '<div class="titel">'.$row->betreff.' [Semester '.$row->semester.'] '.$datum.' '.$row->verfasser.'</div>';
+			//}			
+			//echo '<div class="text">'.$row->text.'</div>';
+			echo "</div><br />";
 		}
+		echo '</div>';
 		return $zaehler;
 	}
 ?>
@@ -147,6 +169,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
+<script language="Javascript">
+function show(id)
+{
+	document.getElementById(id+'Text').style.display = 'block';
+	document.getElementById(id+'Verfasser').style.display = 'block';
+	document.getElementById(id+'Verfasser').style.width = '100%';
+	document.getElementById(id+'Mehr').style.display = 'none';
+	return false;
+}
+</script>
 </head>
 
 <body>
@@ -155,13 +187,13 @@
     <td width="10">&nbsp;</td>
     <td><table width="100%"  border="0" cellspacing="0" cellpadding="0">
       <tr>
-        <td class="ContentHeader" width="70%"><font class="ContentHeader">&nbsp;
+        
 <?php 
 
 	//Anzeigen der Senatsbeschluesse
 	if($senat)
 	{		
-		echo 'Senatsbeschl&uuml;sse '; 
+		echo '<td class="ContentHeader" width="100%"><font class="ContentHeader">&nbsp;Senatsbeschl&uuml;sse '; 
 		echo '</font></td>';
 		echo ' </tr>';
 		
@@ -212,7 +244,7 @@
 			}
 			echo "$stsem_content<br><br>$datum_content";
 		}
-		echo '</td></tr>';
+		echo '</td><td>&nbsp;</td></tr>';
 		echo '<tr><td valign="top">';
 		//News ausgeben
 		print_FBnews($sql_conn, $fachbereich_kurzbz, $datum);
@@ -221,7 +253,7 @@
 	}
 	else 
 	{
-		echo 'Pinboard ';
+		echo '<td class="ContentHeader" width="70%"><font class="ContentHeader">&nbsp;Pinboard ';
 		
 		if(isset($short))
 			echo $short; 

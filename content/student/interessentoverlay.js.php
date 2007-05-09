@@ -654,3 +654,50 @@ function InteressentzuBewerber()
 		SetStatusBarText('Daten wurden gespeichert');
 	}
 }
+
+// ****
+// * macht aus einem Bewerber einen Studenten
+// * Voraussetzungen:
+// *	- ZGV muss ausgefuellt sein (bei Master beide)
+// *	- Kaution muss bezahlt sein
+// *	- Rolle Bewerber muss existieren
+// * Wenn die Voraussetzungen erfuellt sind, dann wird die Matrikelnr
+// * und UID generiert und der Studentendatensatz angelegt.
+// ****
+function InteressentzuStudent()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('interessent-tree');
+
+	//Wenn kein Interessent ausgewaehlt ist, dann abbrechen
+	if (tree.currentIndex==-1) return;
+		
+	prestudent_id = document.getElementById('interessent-prestudent-textbox-prestudent_id').value;
+
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+		
+	req.add('type', 'BewerberZuStudent');
+	
+	req.add('prestudent_id', prestudent_id);
+	
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+	
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+	}
+	else
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		
+		InteressentSelectId=prestudent_id;
+		InteressentTreeDatasource.Refresh(false); //non blocking
+		SetStatusBarText('Daten wurden gespeichert');
+	}
+}
