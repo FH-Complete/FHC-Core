@@ -161,25 +161,32 @@ class student extends benutzer
 	// * angelegt, ansonsten der Datensatz mit $person_id upgedated
 	// * @return true wenn erfolgreich, false im Fehlerfall
 	// ************************************************************
-	function save()
+	function save($new=null, $savebenutzer=true)
 	{
 		//Variablen checken
 		if(!$this->validate())
 			return false;
 
 		pg_query($this->conn,'BEGIN;');
-		//Basisdaten speichern
-		if(!benutzer::save())
+		
+		if($new==null)
+			$new = $this->new;
+		
+		if($savebenutzer)
 		{
-			pg_query($this->conn,'ROLLBACK;');
-			return false;
+			//Basisdaten speichern
+			if(!benutzer::save())
+			{
+				pg_query($this->conn,'ROLLBACK;');
+				return false;
+			}
 		}
 
-		if($this->new)
+		if($new)
 		{
 			//Neuen Datensatz anlegen
 			$qry = "INSERT INTO public.tbl_student(student_uid, matrikelnr, updateamum, updatevon, prestudent_id,
-			                    studiengang_kz, semester, ext_id, verband, gruppe)
+			                    studiengang_kz, semester, ext_id, verband, gruppe, insertamum, insertvon)
 			        VALUES('".addslashes($this->uid)."',".
 			 	 	$this->addslashes($this->matrikelnr).",".
 			 	 	$this->addslashes($this->updateamum).','.
@@ -189,7 +196,9 @@ class student extends benutzer
 					$this->semester.','.
 					($this->ext_id_student!=''?$this->ext_id_student:'null').','.
 					($this->verband!=''?"'".addslashes($this->verband)."'":' ').','.
-					($this->gruppe!=''?"'".addslashes($this->gruppe)."'":' ').');';
+					($this->gruppe!=''?"'".addslashes($this->gruppe)."'":' ').','.
+					$this->addslashes($this->insertamum).','.
+					$this->addslashes($this->insertvon).');';
 		}
 		else
 		{
@@ -303,6 +312,48 @@ class student extends benutzer
 			$result[]=$l;
 		}
 		return $result;
+	}
+	
+	function save_studentlehrverband($new=null)
+	{
+		if($new==null)
+			$new = $this->new;
+			
+		if($new)
+		{
+			$qry = "INSERT INTO public.tbl_studentlehrverband (student_uid, studiensemester_kurzbz, studiengang_kz, semester, verband, gruppe, updateamum, updatevon, insertamum, insertvon)
+					VALUES(".$this->addslashes($this->uid).','.
+					$this->addslashes($this->studiensemester_kurzbz).','.
+					$this->addslashes($this->studiengang_kz).','.
+					$this->addslashes($this->semester).','.
+					$this->addslashes(($this->verband==''?' ':$this->verband)).','.
+					$this->addslashes(($this->gruppe==''?' ':$this->gruppe)).','.
+					$this->addslashes($this->updateamum).','.
+					$this->addslashes($this->updatevon).','.
+					$this->addslashes($this->insertamum).','.
+					$this->addslashes($this->insertvon).');';
+		}
+		else 
+		{
+			$qry = "UPDATE public.tbl_studentlehrverband SET".
+					" studiengang_kz=".$this->addslashes($this->studiengang_kz).",".
+					" semester=".$this->addslashes($this->semester).",".
+					" verband=".$this->addslashes(($this->verband==''?' ':$this->verband)).",".
+					" gruppe=".$this->addslashes(($this->gruppe==''?' ':$this->gruppe)).",".
+					" updateamum=".$this->addslashes($this->updateamum).",".
+					" updatevon=".$this->addslashes($this->updatevon).
+					"WHERE student_uid='".addslashes($this->uid)."' AND studiensemester_kurzbz='".addslashes($this->studiensemester_kurzbz)."'";
+		}
+		
+		if(pg_query($this->conn, $qry))
+		{
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Speichern der Studentlehrverband zuordnung';
+			return false;
+		}
 	}
 
 }

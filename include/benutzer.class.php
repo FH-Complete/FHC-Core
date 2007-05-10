@@ -126,17 +126,23 @@ class benutzer extends person
 	// * ansonsten der Datensatz mit $uid upgedated
 	// * @return true wenn erfolgreich, false im Fehlerfall
 	// ******************************************************************
-	function save()
+	function save($new=null, $saveperson=true)
 	{
-		//Personen Datensatz speichern
-		if(!person::save())
-			return false;
+		if($saveperson)
+		{
+			//Personen Datensatz speichern
+			if(!person::save())
+				return false;
+		}
+		
+		if($new==null)
+			$new = $this->new;
 			
 		//Variablen auf Gueltigkeit pruefen
 		if(!benutzer::validate())
 			return false;
 		
-		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
+		if($new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
 			$qry = 'INSERT INTO public.tbl_benutzer (uid, aktiv, alias, person_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
 			       "'".addslashes($this->uid)."',".
