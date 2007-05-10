@@ -338,7 +338,7 @@ class prestudent extends person
 	// ********
 	// * Laedt die Rolle(n) eines Prestudenten
 	// ********
-	function getPrestudentRolle($prestudent_id, $rolle_kurzbz=null, $studiensemester_kurzbz=null)
+	function getPrestudentRolle($prestudent_id, $rolle_kurzbz=null, $studiensemester_kurzbz=null, $order="datum, insertamum")
 	{
 		if(!is_numeric($prestudent_id))
 		{
@@ -351,7 +351,7 @@ class prestudent extends person
 			$qry.= " AND rolle_kurzbz='".addslashes($rolle_kurzbz)."'";
 		if($studiensemester_kurzbz!=null)
 			$qry.= " AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
-		$qry.= " ORDER BY datum, insertamum";
+		$qry.= ' ORDER BY '.$order;
 		
 		if($result = pg_query($this->conn, $qry))
 		{

@@ -403,24 +403,121 @@ if(!$error)
 						{
 							//Pruefen ob die Rolle Bewerber existiert
 							$hlp = new prestudent($conn);
-							$hlp->getPrestudentRolle($_POST['prestudent_id'], 'Bewerber');
+							$hlp->getPrestudentRolle($_POST['prestudent_id'], 'Bewerber',null,'datum DESC, insertamum DESC');
 						
 							if(count($hlp->result)>0)
 							{
-								//pruefen ob die Kaution bezahlt wurde
-								//??
-																
-								//Matrikelnummer und UID generieren
-								$matrikelnr = generateMatrikelnummer($conn, $prestd->studiengang_kz, $hlp->result[0]->studiensemester_kurzbz);
-								$uid = generateUID($conn, $matrikelnr);
-								
-								$return = false;
-								$errormsg = "Matrikelnummer: $matrikelnr, UID: $uid";
-								
-								//Benutzerdatensatz anlegen
-								//Studentendatensatz anlegen
-								//Prestudentrolle hinzugfuegen
-								//Eintrag tbl_studentlehrverband??
+								//pruefen ob schon eine Studentenrolle Existiert
+								$hlp1 = new prestudent($conn);
+								$hlp1->getPrestudentRolle($_POST['prestudent_id'], 'Student', $hlp->result[0]->studiensemester_kurzbz);
+								if(count($hlp1)>0)
+								{
+									$return = false;
+									$errormsg = 'Diese Person ist bereits Student';
+								}
+								else 
+								{
+									//pruefen ob die Kaution bezahlt wurde
+									//??
+									
+									pg_query($conn, 'BEGIN;');
+									
+									//Matrikelnummer und UID generieren
+									$matrikelnr = generateMatrikelnummer($conn, $prestd->studiengang_kz, $hlp->result[0]->studiensemester_kurzbz);
+									$uid = generateUID($conn, $matrikelnr);
+									
+									$return = false;
+									$errormsg = "Matrikelnummer: $matrikelnr, UID: $uid";
+									
+									//Benutzerdatensatz anlegen
+									$benutzer = new benutzer($conn);
+									$benutzer->uid = $uid;
+									$benutzer->person_id = $prestd->person_id;
+									$benutzer->aktiv = true;
+									
+									$qry_alias = "SELECT * FROM public.tbl_benutzer WHERE alias='$prestd->vorname.$prestd->nachname'";
+									$result_alias = pg_query($conn, $qry_alias);
+									if(pg_num_rows($result_alias)==0)								
+										$benutzer->alias = $prestd->vorname.'.'.$prestd->nachname;
+									else 
+										$benutzer->alias = '';
+									
+									$benutzer->insertamum = date('Y-m-d H:i:s');
+									$benutzer->insertvon = $user;
+																	
+									if($benutzer->save(true, false))
+									{
+										//Studentendatensatz anlegen
+										$student = new student($conn);
+										$student->uid = $uid;
+										$student->matrikelnr = $matrikelnr;
+										$student->prestudent_id = $prestd->prestudent_id;
+										$student->studiengang_kz = $prestd->studiengang_kz;
+										$student->semester = $hlp->result[0]->ausbildungssemester;
+										$student->verband = ' ';
+										$student->gruppe = ' ';
+										$student->insertamum = date('Y-m-d H:i:s');
+										$student->insertvon = $user;
+										
+										if($student->save(true, false))
+										{
+											//Prestudentrolle hinzugfuegen
+											$rolle = new prestudent($conn);
+											$rolle->prestudent_id = $prestd->prestudent_id;
+											$rolle->rolle_kurzbz = 'Student';
+											$rolle->studiensemester_kurzbz = $hlp->result[0]->studiensemester_kurzbz;
+											$rolle->ausbildungssemester = $hlp->result[0]->ausbildungssemester;
+											$rolle->datum = date('Y-m-d');
+											$rolle->insertamum = date('Y-m-d H:i:s');
+											$rolle->insertvon = $user;
+											$rolle->new = true;
+											
+											if($rolle->save_rolle())
+											{
+												//StudentLehrverband anlegen
+												$studentlehrverband = new student($conn);
+												$studentlehrverband->uid = $uid;
+												$studentlehrverband->studiensemester_kurzbz = $hlp->result[0]->studiensemester_kurzbz;
+												$studentlehrverband->studiengang_kz = $prestd->studiengang_kz;
+												$studentlehrverband->semester = $hlp->result[0]->ausbildungssemester;
+												$studentlehrverband->verband = ' ';
+												$studentlehrverband->gruppe = ' ';
+												$studentlehrverband->insertamum = date('Y-m-d H:i:s');
+												$studentlehrverband->insertvon = $user;
+												
+												if($studentlehrverband->save_studentlehrverband(true))
+												{
+													$return = true;
+													pg_query($conn, 'COMMIT;');
+												}
+												else 
+												{
+													$errormsg = 'Fehler beim Speichern des Studentlehrverbandes: '.$studentlehrverband->errormsg;
+													$return = false;
+													pg_query($conn, 'ROLLBACK;');
+												}
+											}
+											else 
+											{
+												$errormsg = 'Fehler beim Speichern des Rolle: '.$rolle->errormsg;
+												$return = false;
+												pg_query($conn, 'ROLLBACK;');
+											}
+										}
+										else 
+										{
+											$errormsg = 'Fehler beim Speichern des Studenten: '.$student->errormsg;
+											$return = false;
+											pg_query($conn, 'ROLLBACK;');
+										}
+									}
+									else 
+									{
+										$errormsg = 'Fehler beim Speichern des Benutzers: '.$benutzer->errormsg;
+										$return = false;
+										pg_query($conn, 'ROLLBACK;');
+									}
+								}
 							}
 							else 
 							{

@@ -69,6 +69,7 @@
 		$short = $stg_obj->kuerzel;
 		$short_long = $stg_obj->kurzbzlang;
 		$course_id = $_GET['course_id'];
+		$term_id = $_GET['term_id'];
 	}
 	
 	if(isset($_GET['fachbereich_kurzbz']))
