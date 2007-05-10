@@ -17,8 +17,8 @@ require_once('../../../vilesci/config.inc.php');
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
-$adress='ruhan@technikum-wien.at';
-//$adress='fas_sync@technikum-wien.at';
+//$adress='ruhan@technikum-wien.at';
+$adress='fas_sync@technikum-wien.at';
 
 $error_log='';
 $text = '';
@@ -29,7 +29,7 @@ $anzahl_geaendert=0;
 $anzahl_fehler=0;
 $anzahl_quelle=0;
 $studiengang_kz='';
-$abschlussbeurteilung_kurzbz=NULL;
+$abschlussbeurteilung_kurzbz='';
 
 function myaddslashes($var)
 {
@@ -166,7 +166,7 @@ if($result = pg_query($conn_fas, $qry_main))
 			$pruefer3=NULL;
 		}
 		//beurteilung ermitteln
-		if($row->beurteilung='0')
+		if($row->beurteilung=='0')
 		{
 			$abschlussbeurteilung_kurzbz=NULL;
 		}
