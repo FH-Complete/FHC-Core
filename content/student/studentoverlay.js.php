@@ -636,6 +636,23 @@ function StudentAuswahl()
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var datasource = rdfService.GetDataSource(url);
 	rollentree.database.AddDataSource(datasource);
+	
+	//Zeugnis
+	zeugnistree = document.getElementById('student-zeugnis-tree');
+	url='<?php echo APP_ROOT;?>rdf/akte.rdf.php?person_id='+person_id+"&dokument_kurzbz=Zeugnis&"+gettimestamp();
+	
+	//Alte DS entfernen
+	var oldDatasources = zeugnistree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		zeugnistree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	zeugnistree.builder.rebuild();
+	
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var datasource = rdfService.GetDataSource(url);
+	zeugnistree.database.AddDataSource(datasource);
 }
 
 // ****
@@ -745,6 +762,9 @@ function StudentPrestudentSave()
 	}
 }
 
+// ****
+// * Anmeldungsdatum fuer den RT wird auf das Aktuelle Datum gesetzt
+// ****
 function StudentAnmeldungreihungstestHeute()
 {
 	var now = new Date();
@@ -756,4 +776,79 @@ function StudentAnmeldungreihungstestHeute()
 	if(tag<10) tag='0'+tag;
 	
 	document.getElementById('student-prestudent-textbox-anmeldungreihungstest').value=jahr+'-'+monat+'-'+tag;
+}
+
+// ****
+// * Laedt ein Zeugnis dass in der DB gespeichert ist
+// ****
+function StudentZeugnisAnzeigen()
+{
+	var tree = document.getElementById('student-zeugnis-tree');
+
+	if (tree.currentIndex==-1) return;
+	
+	try
+	{
+		//Ausgewaehlte ID holen
+        var col = tree.columns ? tree.columns["student-zeugnis-tree-akte_id"] : "student-zeugnis-tree-akte_id";
+		var akte_id=tree.view.getCellText(tree.currentIndex,col);
+		if(akte_id!='')
+		{
+			window.open('<?php echo APP_ROOT;?>content/akte.php?id='+akte_id,'File');
+			//document.location.href='<?php echo APP_ROOT;?>content/akte.php?id='+akte_id;
+		}
+		else
+		{
+			return false;
+		}	
+	}
+	catch(e)
+	{
+		alert(e);
+		return false;
+	}
+}
+
+// ****
+// * Loescht ein Zeugnis
+// ****
+function StudentAkteDel()
+{
+
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-zeugnis-tree');
+	
+	if (tree.currentIndex==-1)
+		return;
+		
+	try
+	{
+		//Ausgewaehlte Akte holen
+        var col = tree.columns ? tree.columns["student-zeugnis-tree-akte_id"] : "student-zeugnis-tree-akte_id";
+		var akte_id=tree.view.getCellText(tree.currentIndex,col);
+	}
+	catch(e)
+	{
+		alert(e);
+		return false;
+	}
+
+	//Abfrage ob wirklich geloescht werden soll
+	if (confirm('Zeugnis wirklich entfernen?'))
+	{
+		//Script zum loeschen aufrufen
+		var req = new phpRequest('student/studentDBDML.php','','');
+
+		req.add('type','deleteAkte');
+		req.add('akte_id',akte_id);
+				
+		var response = req.executePOST();
+
+		var val =  new ParseReturnValue(response)
+		
+		if(!val.dbdml_return)
+			alert(val.dbdml_errormsg)
+
+		StudentTreeRefresh();
+	}
 }
