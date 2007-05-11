@@ -34,6 +34,7 @@ class benutzergruppe
 	var $updatevon;		// varchar(16)
 	var $insertamum;	// timestamp
 	var $insertvon;		// varchar(16)
+	var $studiensemester_kurzbz; // varchar(16)
 	
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine BenutzerGruppe
@@ -64,12 +65,39 @@ class benutzergruppe
 	
 	// *********************************************************
 	// * Laedt die BenutzerGruppe
-	// * @param gruppe_kurzbz
+	// * @param uid, gruppe_kurzbz, studiensemester_kurzbz
+	// * @return true wenn ok, false im Fehlerfall
 	// *********************************************************
-	function load($uid, $gruppe_kurzbz)
+	function load($uid, $gruppe_kurzbz, $studiensemester_kurzbz=null)
 	{
+		$qry = "SELECT * FROM public.tbl_benutzergruppe WHERE uid='".addslashes($uid)."' AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
+		if($studiensemester_kurzbz!=null)
+			$qry.=" AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 		
-		return false;
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$this->uid = $row->uid;
+				$this->gruppe_kurzbz = $row->gruppe_kurzbz;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = 'Es wurde keine Datensatz gefunden';
+				return false;				
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden des Datensatzes';
+			return false;
+		}
 	}
 	
 	// *******************************************
@@ -131,13 +159,14 @@ class benutzergruppe
 
 		if($new)
 		{		
-			$qry = 'INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon)
+			$qry = 'INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, studiensemester_kurzbz)
 			        VALUES('.$this->addslashes($this->uid).','.
 					$this->addslashes($this->gruppe_kurzbz).','.
 					$this->addslashes($this->updateamum).','.
 					$this->addslashes($this->updatevon).','.
 					$this->addslashes($this->insertamum).','.
-					$this->addslashes($this->insertvon).');';
+					$this->addslashes($this->insertvon).','.
+					$this->addslashes($this->studiensemester_kurzbz).');';
 		}
 		else
 		{

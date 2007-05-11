@@ -32,6 +32,7 @@
 require_once('../../vilesci/config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/benutzergruppe.class.php');
 require_once('../../include/log.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
@@ -50,6 +51,7 @@ $errormsg = 'unknown';
 $data = '';
 $error = false;
 
+loadVariables($conn, $user);
 //Berechtigungen laden
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
@@ -137,7 +139,7 @@ if(!$error)
 	if(isset($_POST['type']) && $_POST['type']=='savestudent')
 	{
 		//Studentendaten Speichern
-
+		
 		if(!$error)
 		{
 			$student = new student($conn, null, true);
@@ -184,9 +186,28 @@ if(!$error)
 				{
 					if($student->save())
 					{
-						$return = true;
-						$error=false;
-						$data = $student->uid;
+						$student_lvb = new student($conn);
+						$student_lvb->uid = $_POST['uid'];
+						$student_lvb->studiensemester_kurzbz = $semester_aktuell;
+						$student_lvb->studiengang_kz = $_POST['studiengang_kz'];
+						$student_lvb->semester = $_POST['semester'];
+						$student_lvb->verband = ($_POST['verband']==''?' ':$_POST['verband']);
+						$student_lvb->gruppe = ($_POST['gruppe']==''?' ':$_POST['gruppe']);
+						$student_lvb->updateamum = date('Y-m-d H:i:s');
+						$student_lvb->updatevon = $user;
+						
+						if($student_lvb->save_studentlehrverband(false))
+						{
+							$return = true;
+							$error=false;
+							$data = $student->uid;
+						}
+						else 
+						{
+							$error = true;
+							$errormsg = $student_lvb->errormsg;
+							$return = false;
+						}
 					}
 					else
 					{
@@ -198,7 +219,7 @@ if(!$error)
 			}
 		}
 	}
-	if(isset($_POST['type']) && $_POST['type']=='saveperson')
+	elseif(isset($_POST['type']) && $_POST['type']=='saveperson')
 	{
 		//Personendaten Speichern
 
@@ -545,10 +566,77 @@ if(!$error)
 			}
 		}
 	}
+	elseif(isset($_POST['type']) && $_POST['type']=='gruppenzuteilung')
+	{
+		if(isset($_POST['uid']) && isset($_POST['gruppe_kurzbz']))
+		{
+			$benutzergruppe = new benutzergruppe($conn);
+			
+			$uids = explode(';',$_POST['uid']);
+			$errormsg = '';
+			foreach ($uids as $uid)
+			{
+				if($uid!='')
+				{
+					if(!$benutzergruppe->load($uid, $_POST['gruppe_kurzbz']))
+					{
+						$benutzergruppe->uid = $uid;
+						$benutzergruppe->gruppe_kurzbz = $_POST['gruppe_kurzbz'];
+						$benutzergruppe->studiensemester_kurzbz = $semester_aktuell;
+						$benutzergruppe->insertamum = date('Y-m-d H:i:s');
+						$benutzergruppe->insertvon = $user;				
+						$benutzergruppe->new = true;
+						
+						if(!$benutzergruppe->save())
+						{
+							$errormsg .= "$uid konnte nicht hinzugefuegt werden\n";
+						}
+					}
+					else
+						$errormsg .= "Der Student $uid ist bereits in dieser Gruppe\n";
+				}
+			}
+			if($errormsg=='')
+				$return = true;
+			else 
+				$return = false;
+		}
+		else 
+		{
+			$return = false;
+			$errormsg  = 'Fehlerhafte Parameteruebergabe';
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='deleteGruppenzuteilung')
+	{
+		if(isset($_POST['uid']) && isset($_POST['gruppe_kurzbz']))
+		{
+			$uids = explode(';',$_POST['uid']);
+			$errormsg = '';
+			foreach ($uids as $uid)
+			{
+				$benutzergruppe = new benutzergruppe($conn);
+	
+				if(!$benutzergruppe->delete($uid, $_POST['gruppe_kurzbz']))
+				{
+					$errormsg .= "$uid konnte nicht aus der Gruppe geloescht werden\n";
+				}
+			}
+			if($errormsg=='')
+				$return = true;
+			else 
+				$return = false;
+		}
+		else 
+		{
+			$return = false;
+			$errormsg  = 'Fehlerhafte Parameteruebergabe';
+		}
+	}
 	else
 	{
 		$return = false;
-		$errormsg = 'Unkown type: '.$_POST['type'];
+		$errormsg = 'Unkown type: "'.$_POST['type'].'"';
 		$data = '';
 	}
 }

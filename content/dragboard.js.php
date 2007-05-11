@@ -84,6 +84,44 @@ var lvbgrpDDObserver=
   	}
 };
 
+/***** Drag Observer fuer Studenten *****/
+var studentDDObserver=
+{
+	onDragStart: function (evt,transferData,action)
+	{
+	
+		var tree = document.getElementById('student-tree')
+	    var row = { }
+	    var col = { }
+	    var child = { }
+
+	    //Index der Quell-Row ermitteln
+	    tree.treeBoxObject.getCellAt(evt.pageX, evt.pageY, row, col, child)
+
+	    //Beim Scrollen soll kein DnD gemacht werden
+	    if(col.value==null)
+	    	return false;
+
+		var start = new Object();
+		var end = new Object();
+		var numRanges = tree.view.selection.getRangeCount();
+		var paramList= '';
+		
+		for (var t = 0; t < numRanges; t++)
+		{
+	  		tree.view.selection.getRangeAt(t,start,end);
+  			for (var v = start.value; v <= end.value; v++)
+  			{
+    			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+				uid = tree.view.getCellText(v,col);
+				paramList += ';'+uid;
+  			}
+		}
+		
+		transferData.data=new TransferData();
+		transferData.data.addDataForFlavour("application/tempus-student",paramList);
+  	}
+};
 
 // ****
 // * Observer fuer den Gruppen Tree im Lehreinheiten-Modul
@@ -495,5 +533,86 @@ var boardObserver=
 				//BoxTimeTableWeek=document.getElementById('boxTimeTableWeek');
 				//BoxTimeTableWeek.scrollTo(ScrollX,ScrollY);
     		}
+  	}
+};
+
+
+// ****
+// * Observer fuer den Lehrverbandstree
+// ****
+var verbandtreeDDObserver=
+{
+	getSupportedFlavours : function ()
+	{
+  	  	var flavours = new FlavourSet();
+  	  	flavours.appendFlavour("application/tempus-student");
+  	  	return flavours;
+  	},
+  	onDragEnter: function (evt,flavour,session)
+	{
+	},
+	onDragExit: function (evt,flavour,session)
+	{
+  	},
+  	onDragOver: function(evt,flavour,session)
+  	{
+  	},
+  	onDrop: function (evt,dropdata,session)
+  	{
+	    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	    try
+	    {
+	        dragservice_ds = Components.classes["@mozilla.org/widget/dragservice;1"].getService(Components.interfaces.nsIDragService);
+	    }
+	    catch (e)
+	    {
+	    	debug('treeDragDrop: e');
+	    }
+
+	    var ds = dragservice_ds;
+
+		var tree = document.getElementById('tree-verband')
+	    var row = { }
+	    var col = { }
+	    var child = { }
+	   
+	    tree.treeBoxObject.getCellAt(evt.pageX, evt.pageY, row, col, child)
+	    
+	    if(row.value!=-1) //Drop on Row
+	    {
+		    //Ziel holen
+		    col = tree.columns ? tree.columns["gruppe"] : "gruppe";
+			gruppe_kurzbz=tree.view.getCellText(row.value,col);
+	    }
+	    else
+	    	return false;
+	    
+	    if(gruppe_kurzbz=='')
+	    {
+	    	alert('Zuteilung derzeit nur zu Spezialgruppen moeglich');
+	    	return false;
+	    }
+	    	
+	    uid=dropdata.data;
+	    
+	    var req = new phpRequest('student/studentDBDML.php','','');
+		
+		req.add('type','gruppenzuteilung');
+
+		req.add('uid', uid);
+		req.add('gruppe_kurzbz', gruppe_kurzbz);
+		
+		var response = req.executePOST();
+
+		var val =  new ParseReturnValue(response)
+
+		if (!val.dbdml_return)
+		{
+			alert(val.dbdml_errormsg)
+		}
+		else
+		{
+			StudentTreeRefresh();
+		}
   	}
 };

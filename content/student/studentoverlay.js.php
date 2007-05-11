@@ -157,7 +157,7 @@ function StudentDelete()
 
 	try
 	{
-		//Ausgewaehlte Lehreinheit holen
+		//Ausgewaehlte UID holen
         var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
 		var uid=tree.view.getCellText(tree.currentIndex,col);
 		if(uid=='')
@@ -181,6 +181,74 @@ function StudentDelete()
 		var response = req.executePOST();
 
 		var val =  new ParseReturnValue(response)
+		if(!val.dbdml_return)
+			alert(val.dbdml_errormsg)
+
+		StudentTreeRefresh();
+		StudentDetailReset();
+	}
+}
+
+// ****
+// * Loescht einen Studenten aus einer Spezialgruppe
+// ****
+function StudentGruppeDel()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-tree');
+	var tree_vb = document.getElementById('tree-verband');
+
+	if (tree.currentIndex==-1)
+		return;
+	
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
+	var anzahl=0;
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+			uid = ';'+tree.view.getCellText(v,col);
+			uids += uid;
+			anzahl++;
+		}
+	}
+	
+	try
+	{
+		//Ausgewaehlte Gruppe holen
+        var col = tree_vb.columns ? tree_vb.columns["gruppe"] : "gruppe";
+		var gruppe_kurzbz=tree_vb.view.getCellText(tree_vb.currentIndex,col);
+		if(gruppe_kurzbz=='')
+		{
+			alert('Studenten koennen nur aus Spezialgruppen entfernt werden');
+			return false
+		}
+	}
+	catch(e)
+	{
+		alert(e);
+		return false;
+	}
+
+	//Abfrage ob wirklich geloescht werden soll
+	if (confirm(anzahl+' Student(en) wirklich aus Gruppe '+gruppe_kurzbz+' entfernen?'))
+	{
+		//Script zum loeschen aufrufen
+		var req = new phpRequest('student/studentDBDML.php','','');
+
+		req.add('type','deleteGruppenzuteilung');
+		req.add('uid',uids);
+		req.add('gruppe_kurzbz', gruppe_kurzbz);
+		
+		var response = req.executePOST();
+
+		var val =  new ParseReturnValue(response)
+		
 		if(!val.dbdml_return)
 			alert(val.dbdml_errormsg)
 
