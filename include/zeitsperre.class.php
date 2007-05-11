@@ -70,9 +70,10 @@ class zeitsperre
 				WHERE mitarbeiter_uid='".addslashes($uid)."'";
 
 		if($bisgrenze)
-			$qry.=" AND bisdatum>=now()";
-		
+			$qry.=" AND bisdatum>=now()::date";
+
 		$qry.= " ORDER BY vondatum";
+		//echo $qry;
 		if($result = pg_query($this->conn, $qry))
 		{
 
