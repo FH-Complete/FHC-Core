@@ -39,6 +39,7 @@ require_once('../../include/benutzer.class.php');
 require_once('../../include/student.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/studiengang.class.php');
+require_once('../../include/akte.class.php');
 
 $user = get_uid();
 
@@ -631,6 +632,28 @@ if(!$error)
 		{
 			$return = false;
 			$errormsg  = 'Fehlerhafte Parameteruebergabe';
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='deleteAkte')
+	{
+		if(isset($_POST['akte_id']) && is_numeric($_POST['akte_id']))
+		{
+			$akte = new akte($conn);
+
+			if($akte->delete($_POST['akte_id']))
+			{
+				$return = true;
+			}
+			else 
+			{
+				$return = false;
+				$errormsg = $akte->errormsg;
+			}				
+		}
+		else 
+		{
+			$return = false;
+			$errormsg  = 'Fehlerhafte Parameteruebergabe'.$_POST['akte_id'];
 		}
 	}
 	else

@@ -30,6 +30,8 @@ require_once('../../vilesci/config.inc.php');
 echo '<?xml version="1.0" encoding="ISO-8859-15" standalone="yes" ?>';
 
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentdetailoverlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentzeugnisoverlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentkontooverlay.xul.php"?>';
 ?>
 <!DOCTYPE overlay >
 
@@ -170,10 +172,14 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentdetailoverlay.xul.p
 						<tabs orient="horizontal" id="lehrveranstaltung-tabs">
 							<tab id="student-tab-detail" label="Details" />
 							<tab id="student-tab-prestudent" label="PreStudent" />
+							<tab id="student-tab-konto" label="Konto" />
+							<tab id="student-tab-zeugnis" label="Zeugnis" />
 						</tabs>
 						<tabpanels id="student-tabpanels-main" flex="1">
 							<vbox id="student-detail"  style="margin-top:10px;" />
 							<vbox id="student-prestudent"  style="margin-top:10px;" />
+							<vbox id="student-konto"  style="margin-top:10px;" />
+							<vbox id="student-zeugnis"  style="margin-top:10px;" />
 						</tabpanels>
 					</tabbox>				
 				</vbox>
