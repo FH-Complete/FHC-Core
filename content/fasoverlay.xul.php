@@ -31,6 +31,10 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 	enableColumnDrag="true"
     ondraggesture="nsDragAndDrop.startDrag(event,lvbgrpDDObserver);"
 	datasources="../rdf/lehrverbandsgruppe.rdf.php" ref="http://www.technikum-wien.at/lehrverbandsgruppe/alle-verbaende"
+	ondragdrop="nsDragAndDrop.drop(event,verbandtreeDDObserver)"
+	ondragover="nsDragAndDrop.dragOver(event,verbandtreeDDObserver)"
+	ondragenter="nsDragAndDrop.dragEnter(event,verbandtreeDDObserver)"
+	ondragexit="nsDragAndDrop.dragExit(event,verbandtreeDDObserver)"
 	>
 	<treecols>
 	    <treecol id="bez" label="Bezeichnung" flex="15" primary="true" />

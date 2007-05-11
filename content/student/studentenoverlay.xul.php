@@ -44,6 +44,11 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentdetailoverlay.xul.p
 			<!-- *  Studenten  * -->
 			<!-- *************** -->
 			<vbox id="studentenEditor" persist="height">
+			<popupset>
+				<popup id="student-tree-popup">
+					<menuitem label="Student aus dieser Gruppe Entfernen" oncommand="StudentGruppeDel();" id="student-tree-popup-gruppedel" hidden="false"/>
+				</popup>
+			</popupset>
 				<hbox>
 					<toolbox flex="1">
 						<toolbar id="nav-toolbar">
@@ -59,13 +64,15 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentdetailoverlay.xul.p
 				<!-- ************* -->
 				<!-- *  Auswahl  * -->
 				<!-- ************* -->
-				<tree id="student-tree" seltype="single" hidecolumnpicker="false" flex="1"
+				<tree id="student-tree" seltype="multi" hidecolumnpicker="false" flex="1"
 						datasources="rdf:null" ref="http://www.technikum-wien.at/student/alle"
 						onselect="StudentAuswahl();"
 						flags="dont-build-content"
 						enableColumnDrag="true"
 						style="margin:0px;"
 						persist="hidden, height"
+						ondraggesture="nsDragAndDrop.startDrag(event,studentDDObserver);"
+						context="student-tree-popup"
 				>
 					<treecols>
 	    				<treecol id="student-treecol-uid" label="UID" flex="1" primary="false"
