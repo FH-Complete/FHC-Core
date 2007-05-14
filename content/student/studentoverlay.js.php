@@ -636,6 +636,23 @@ function StudentAuswahl()
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var datasource = rdfService.GetDataSource(url);
 	rollentree.database.AddDataSource(datasource);
+
+	//Zeugnis
+	kontotree = document.getElementById('student-konto-tree');
+	url='<?php echo APP_ROOT;?>rdf/konto.rdf.php?person_id='+person_id+"&"+gettimestamp();
+	
+	//Alte DS entfernen
+	var oldDatasources = kontotree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		kontotree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	kontotree.builder.rebuild();
+	
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var datasource = rdfService.GetDataSource(url);
+	kontotree.database.AddDataSource(datasource);
 	
 	//Zeugnis
 	zeugnistree = document.getElementById('student-zeugnis-tree');
@@ -851,4 +868,55 @@ function StudentAkteDel()
 
 		StudentTreeRefresh();
 	}
+}
+
+// ****
+// * Wenn eine buchung Ausgewaehlt wird, dann werden
+// * die Details geladen und angezeigt
+// ****
+function StudentKontoAuswahl()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-konto-tree');
+
+	if (tree.currentIndex==-1) return;
+	
+	//Ausgewaehlte Nr holen
+    var col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
+	var buchungsnr=tree.view.getCellText(tree.currentIndex,col);
+	
+	//Daten holen
+	var url = '<?php echo APP_ROOT ?>rdf/konto.rdf.php?buchungsnr='+buchungsnr+'&'+gettimestamp();
+		
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
+                   getService(Components.interfaces.nsIRDFService);
+    
+    var dsource = rdfService.GetDataSourceBlocking(url);
+    
+	var subject = rdfService.GetResource("http://www.technikum-wien.at/konto/" + buchungsnr);
+
+	var predicateNS = "http://www.technikum-wien.at/konto/rdf";
+
+	//Daten holen
+
+	person_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#person_id" ));
+	studiengang_kz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiengang_kz" ));
+	studiensemester_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiensemester_kurzbz" ));
+	buchungsnr_verweis = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#buchungsnr_verweis" ));
+	betrag = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#betrag" ));
+	buchungsdatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#buchungsdatum" ));
+	buchungstext = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#buchungstext" ));
+	mahnspanne = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#mahnspanne" ));
+	buchungstyp_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#buchungstyp_kurzbz" ));
+		
+	document.getElementById('student-konto-textbox-betrag').value=betrag;
+	document.getElementById('student-konto-textbox-buchungsdatum').value=buchungsdatum;
+	document.getElementById('student-konto-textbox-buchungstext').value=buchungstext;
+	document.getElementById('student-konto-textbox-mahnspanne').value=mahnspanne;
+	document.getElementById('student-konto-menulist-buchungstyp').value=buchungstyp_kurzbz;
+}
+
+function StudentKontoDisableFields(val)
+{
+
 }
