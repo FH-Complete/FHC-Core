@@ -229,8 +229,8 @@ if($result = pg_query($conn_fas, $qry))
 							}
 							else
 							{
-								$error_log="Gruppentyp nicht 1, 2, 3 oder 10.\n";
-								$error=true;
+								//$error_log="Gruppentyp nicht 1, 2, 3 oder 10.\n";
+								//$error=true;
 							}
 						}
 						else
@@ -283,7 +283,7 @@ if($result = pg_query($conn_fas, $qry))
 					{
 						if(!$error)
 						{
-							$qrylvb="SELECT * FROM public.tbl_lehrverband WHERE studiengang_kz='".$studiengang_kz."' AND semester='".$semester."' AND verband='".$verband."' AND gruppe='".$gruppe."';";
+							$qrylvb="SELECT * FROM public.tbl_lehrverband WHERE studiengang_kz='".$studiengang_kz."' AND semester='".$semester."' AND verband='".$verband."' AND (gruppe='".$gruppe."' AND $gruppe<>' ');";
 							if($resultlvb = pg_query($conn, $qrylvb))
 							{
 								if(pg_num_rows($resultlvb)<1)
