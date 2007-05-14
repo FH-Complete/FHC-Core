@@ -36,6 +36,138 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	>
 <!-- Zeugnis Overlay -->
 <vbox id="student-konto" style="margin:0px;" flex="1">
-
+<popupset>
+	<popup id="student-konto-tree-popup">
+		<menuitem label="Entfernen" oncommand="StudentKontoDel();" id="student-konto-tree-popup-kontodel" hidden="false"/>
+	</popup>
+</popupset>
+<hbox flex="1">
+<grid id="student-konto-grid-detail" style="overflow:auto;margin:4px;" flex="1">
+		  	<columns  >
+				<column flex="1"/>
+				<column flex="1"/>
+			</columns>
+			<rows>
+				<row>	
+					<hbox>
+						<spacer flex="1" />
+						<button id="student-konto-button-filter" label="offene" disabled="true"/>
+					</hbox>
+					<spacer />
+				</row>
+				
+				<row>
+					<tree id="student-konto-tree" seltype="single" hidecolumnpicker="false" flex="1"
+						datasources="rdf:null" ref="http://www.technikum-wien.at/konto/liste"
+						style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100px" enableColumnDrag="true"
+						onclick="StudentKontoAuswahl()"
+						context="student-konto-tree-popup"
+					>
+					
+						<treecols>
+							<treecol id="student-konto-tree-buchungsdatum" label="Buchungsdatum" flex="2" hidden="false" primary="true"
+								class="sortDirectionIndicator"
+								sortActive="true"
+								sortDirection="ascending"
+								sort="rdf:http://www.technikum-wien.at/konto/rdf#buchungsdatum"/>
+							<splitter class="tree-splitter"/>
+							<treecol id="student-konto-tree-buchungstext" label="Buchungstext" flex="5" hidden="false"
+							   class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/konto/rdf#buchungstext"/>
+							<splitter class="tree-splitter"/>
+							<treecol id="student-konto-tree-betrag" label="Betrag" flex="2" hidden="false"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/konto/rdf#betrag" />
+							<splitter class="tree-splitter"/>
+							<treecol id="student-konto-tree-studiensemester_kurzbz" label="StSem" flex="2" hidden="false"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/konto/rdf#studiensemester_kurzbz" />
+							<splitter class="tree-splitter"/>
+							<treecol id="student-konto-tree-buchungsnr" label="buchungs_nr" flex="2" hidden="true"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/konto/rdf#buchungsnr" />
+							<splitter class="tree-splitter"/>
+						</treecols>
+					
+						<template>
+							<treechildren flex="1" >
+									<treeitem uri="rdf:*">
+									<treerow>
+										<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#buchungsdatum"/>
+										<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#buchungstext"/>
+										<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#betrag"/>
+										<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#studiensemester_kurzbz"/>
+										<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#buchungsnr"/>
+									</treerow>
+								</treeitem>
+							</treechildren>
+						</template>
+					</tree>
+					<vbox>
+						<hbox>
+							<button id="student-konto-button-neu" label="Neu" disabled="true"/>
+							<button id="student-konto-button-gegenbuchung" label="Gegenbuchung" disabled="true"/>
+							<button id="student-konto-button-loeschen" label="Loeschen" disabled="true"/>
+						</hbox>
+						<groupbox id="student-konto-groupbox" flex="1">
+						<caption label="Details"/>
+							<grid id="student-konto-grid-detail" style="overflow:auto;margin:4px;" flex="1">
+							  	<columns  >
+									<column flex="1"/>
+									<column flex="5"/>
+								</columns>
+								<rows>
+									<row>
+										<label value="Betrag" control="student-konto-textbox-betrag"/>
+										<hbox>
+					      					<textbox id="student-konto-textbox-betrag" disabled="true" maxlength="9" size="9"/>
+					      					<spacer flex="1" />			
+					      				</hbox>
+									</row>
+									<row>
+										<label value="Buchungsdatum" control="student-konto-textbox-buchungsdatum"/>
+										<hbox>
+					      					<textbox id="student-konto-textbox-buchungsdatum" disabled="true" maxlength="10" size="10"/>
+					      					<spacer flex="1" />			
+					      				</hbox>
+					      			</row>
+					      			<row>
+					      				<label value="Buchungstext" control="student-konto-textbox-buchungstext"/>
+							      		<textbox id="student-konto-textbox-buchungstext" disabled="true" maxlength="256"/>
+									</row>
+									<row>
+										<label value="Mahnspanne" control="student-konto-textbox-mahnspanne"/>
+										<hbox>
+											<textbox id="student-konto-textbox-mahnspanne" disabled="true" maxlength="4" size="4"/>
+											<spacer flex="1" />			
+					      				</hbox>
+									</row>
+									<row>
+										<label value="Typ" control="student-konto-menulist-buchungstyp"/>
+										<menulist id="student-konto-menulist-buchungstyp" disabled="true"
+										          datasources="<?php echo APP_ROOT ?>rdf/buchungstyp.rdf.php" flex="1"
+										          ref="http://www.technikum-wien.at/buchungstyp/liste" >
+											<template>
+												<menupopup>
+													<menuitem value="rdf:http://www.technikum-wien.at/buchungstyp/rdf#buchungstyp_kurzbz"
+										        		      label="rdf:http://www.technikum-wien.at/buchungstyp/rdf#beschreibung"
+													  		  uri="rdf:*"/>
+													</menupopup>
+											</template>
+										</menulist>
+									</row>
+								</rows>
+							</grid>
+							<hbox>
+								<spacer flex="1" />
+								<button id="student-konto-button-speichern" label="Speichern" disabled="true"/>
+							</hbox>
+						</groupbox>
+					</vbox>
+				</row>
+		</rows>
+</grid>
+</hbox>
+<spacer flex="1" />
 </vbox>
 </overlay>
