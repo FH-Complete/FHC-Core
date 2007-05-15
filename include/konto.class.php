@@ -132,8 +132,39 @@ class konto
 	// * Prueft die Variablen auf gueltigkeit
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
-	function checkvars()
+	function validate()
 	{		
+		$this->betrag = str_replace(',','.',$this->betrag);
+		if(!is_numeric($this->betrag))
+		{
+			$this->errormsg = 'Betrag ist ungueltig';
+			return false;
+		}
+		
+		if(!is_numeric($this->studiengang_kz))
+		{
+			$this->errormsg = 'Studiengang_kz is ungueltig';
+			return false;
+		}
+		
+		if($this->buchungstyp_kurzbz=='')
+		{
+			$this->errormsg = 'Typ muss angegeben werden';
+			return false;
+		}
+		
+		if(!is_numeric($this->person_id))
+		{
+			$this->errormsg = 'Person_id ist ungueltig';
+			return false;
+		}
+		
+		if(!is_numeric($this->mahnspanne))
+		{
+			$this->errormsg = 'Mahnspanne muss eine gueltige Zahl sein';
+			return false;
+		}
+		
 		return true;		
 	}
 	
@@ -158,7 +189,7 @@ class konto
 	function save($new=null)
 	{
 		//Variablen pruefen
-		if(!$this->checkvars())
+		if(!$this->validate())
 			return false;
 			
 		if($new==null)
@@ -201,7 +232,8 @@ class konto
 				   ' updatevon='.$this->addslashes($this->updatevon).','.
 				   ' insertamum='.$this->addslashes($this->insertamum).','.
 				   ' insertvon='.$this->addslashes($this->insertvon).','.
-				   ' ext_id='.$this->addslashes($this->ext_id).';';
+				   ' ext_id='.$this->addslashes($this->ext_id).
+				   " WHERE buchungsnr='".addslashes($this->buchungsnr)."';";
 				
 		}
 		//echo $qry;
@@ -241,18 +273,18 @@ class konto
 		}
 	}
 	
-	/**
-	 * Loescht den Datenensatz mit der ID die uebergeben wird
-	 * @param buchungsnr ID die geloescht werden soll
-	 * @return true wenn ok, false im Fehlerfall
-	 */
+	// ********************************************************
+	// * Loescht den Datenensatz mit der ID die uebergeben wird
+	// * @param buchungsnr ID die geloescht werden soll
+	// * @return true wenn ok, false im Fehlerfall
+	// ********************************************************
 	function delete($buchungsnr)
 	{
 		//Pruefen ob Verweise auf diese Buchung Vorhanden sind
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_konto WHERE buchungsnr_verweis='".addslashes($buchungsnr)."'";
 		if($result = pg_query($this->conn, $qry))
 		{
-			if($row = pg_fetch_object($this->conn, $qry))
+			if($row = pg_fetch_object($result))
 			{
 				if($row->anzahl>0)
 				{
@@ -262,7 +294,7 @@ class konto
 				else 
 				{
 					//Wenn keine Verweise Vorhanden sind, dann die Buchung loeschen
-					$qry = "DELETE FROM public.tbl_konto WHERE buchungsnr_verweis='".addslashes($buchungsnr)."'";
+					$qry = "DELETE FROM public.tbl_konto WHERE buchungsnr='".addslashes($buchungsnr)."'";
 					if(pg_query($this->conn, $qry))
 						return true;
 					else 
@@ -288,10 +320,10 @@ class konto
 	// ******************************************
 	// * Laedt alle Buchungen einer Person
 	// * und legt diese geordnet in ein Array
-	// * @param person_id
+	// * @param person_id, filter
 	// * @return true wenn ok, false wenn fehler
 	// ******************************************
-	function getBuchungen($person_id)
+	function getBuchungen($person_id, $filter='alle')
 	{
 		if(!is_numeric($person_id))
 		{
@@ -299,7 +331,23 @@ class konto
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_konto WHERE person_id='".$person_id."' ORDER BY buchungsdatum";
+		if($filter=='offene')
+		{
+			//Alle Buchungen und 'darunterliegende' holen die noch offen sind
+			$qry = "SELECT * FROM public.tbl_konto 
+					WHERE buchungsnr in (SELECT buchungsnr FROM public.tbl_konto as konto_a WHERE 
+									betrag*(-1)>(SELECT CASE WHEN sum(betrag) is null THEN 0 
+											            ELSE sum(betrag) END 
+										         FROM public.tbl_konto WHERE buchungsnr_verweis=konto_a.buchungsnr) 
+									AND person_id='$person_id') OR 
+					buchungsnr_verweis in (SELECT buchungsnr FROM public.tbl_konto as konto_a WHERE 
+									betrag*(-1)>(SELECT CASE WHEN sum(betrag) is null THEN 0 
+														ELSE sum(betrag) END 
+												 FROM public.tbl_konto WHERE buchungsnr_verweis=konto_a.buchungsnr) 
+									AND person_id='$person_id') ORDER BY buchungsdatum";
+		}
+		else 
+			$qry = "SELECT * FROM public.tbl_konto WHERE person_id='".$person_id."' ORDER BY buchungsdatum";
 		
 		if($result = pg_query($this->conn, $qry))
 		{

@@ -226,6 +226,7 @@ function onVerbandSelect(event)
 			StudentDetailReset();
 			StudentDetailDisableFields(true);
 			StudentPrestudentDisableFields(true);
+			StudentKontoDisableFields(true);
 		}
 		catch(e)
 		{

@@ -53,6 +53,11 @@ if(isset($_GET['person_id']) && is_numeric($_GET['person_id']))
 else 
 	$person_id='';
 
+if(isset($_GET['filter']))
+	$filter=$_GET['filter'];
+else 
+	$filter='alle';
+
 if(isset($_GET['buchungsnr']) && is_numeric($_GET['buchungsnr']))
 {
 	$buchungsnr = $_GET['buchungsnr'];
@@ -64,7 +69,7 @@ $konto = new konto($conn, null, true);
 
 if($person_id!='')
 {
-	$konto->getBuchungen($person_id);
+	$konto->getBuchungen($person_id, $filter);
 }
 elseif($buchungsnr!='')
 {

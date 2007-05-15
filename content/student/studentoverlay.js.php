@@ -30,6 +30,8 @@ loadVariables($conn, $user);
 ?>
 // *********** Globale Variablen *****************//
 var StudentSelectUid=null; //Student der nach dem Refresh markiert werden soll
+var StudentKontoSelectBuchung=null; //Buchung die nach dem Refresh markiert werden soll
+var StudentKontoTreeDatasource;
 
 // ********** Observer und Listener ************* //
 
@@ -67,6 +69,39 @@ var StudentTreeListener =
   }
 };
 
+// ****
+// * Observer fuer Konto Tree
+// * startet Rebuild nachdem das Refresh
+// * der datasource fertig ist
+// ****
+var StudentKontoTreeSinkObserver =
+{
+	onBeginLoad : function(pSink) {},
+	onInterrupt : function(pSink) {},
+	onResume : function(pSink) {},
+	onError : function(pSink, pStatus, pError) {},
+	onEndLoad : function(pSink)
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		document.getElementById('student-konto-tree').builder.rebuild();
+	}
+};
+
+// ****
+// * Nach dem Rebuild wird die Buchung wieder
+// * markiert
+// ****
+var StudentKontoTreeListener =
+{
+  willRebuild : function(builder) {  },
+  didRebuild : function(builder)
+  {
+  	  //timeout nur bei Mozilla notwendig da sonst die rows
+  	  //noch keine values haben. Ab Seamonkey funktionierts auch
+  	  //ohne dem setTimeout
+      window.setTimeout(StudentKontoTreeSelectBuchung,10);
+  }
+};
 // ***************** KEY Events ************************* //
 
 // ****
@@ -142,6 +177,50 @@ function StudentTreeSelectStudent()
 	   	}
 	}
 	document.getElementById('student-toolbar-label-anzahl').value='Anzahl: '+items;
+}
+
+// ****
+// * Selectiert die Buchung nachdem der Tree
+// * rebuildet wurde.
+// ****
+function StudentKontoTreeSelectBuchung()
+{
+	var tree=document.getElementById('student-konto-tree');
+	if(tree.view)
+		var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+	else
+		return false;
+
+	//In der globalen Variable ist die zu selektierende Buchung gespeichert
+	if(StudentKontoTreeSelectBuchung!=null)
+	{
+		//Alle subtrees oeffnen weil rowCount nur die Anzahl der sichtbaren
+		//Zeilen zurueckliefert
+	   	for(var i=items-1;i>=0;i--)
+	   	{
+	   		if(!tree.view.isContainerOpen(i))
+	   			tree.view.toggleOpenState(i);
+	   	}
+
+	   	//Jetzt die wirkliche Anzahl (aller) Zeilen holen
+	   	items = tree.view.rowCount;
+	   	for(var i=0;i<items;i++)
+	   	{
+	   		//buchungsnr der row holen
+			col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
+			buchungsnr=tree.view.getCellText(i,col);
+
+			//wenn dies die zu selektierende Zeile
+			if(buchungsnr == StudentKontoTreeSelectBuchung)
+			{
+				//Zeile markieren
+				tree.view.selection.select(i);
+				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
+				tree.treeBoxObject.ensureRowIsVisible(i);
+				return true;
+			}
+	   	}
+	}
 }
 
 // ****
@@ -454,6 +533,7 @@ function StudentAuswahl()
 			//loeschen button aktivieren
 			StudentDetailDisableFields(false);
 			StudentPrestudentDisableFields(false);
+			StudentKontoDisableFields(false);
 			document.getElementById('student-detail-button-save').disabled=false;
 		}
 		else
@@ -637,9 +717,10 @@ function StudentAuswahl()
 	var datasource = rdfService.GetDataSource(url);
 	rollentree.database.AddDataSource(datasource);
 
-	//Zeugnis
+	//Konto
 	kontotree = document.getElementById('student-konto-tree');
-	url='<?php echo APP_ROOT;?>rdf/konto.rdf.php?person_id='+person_id+"&"+gettimestamp();
+	filter = document.getElementById('student-konto-button-filter').value;
+	url='<?php echo APP_ROOT;?>rdf/konto.rdf.php?person_id='+person_id+"&filter="+filter+"&"+gettimestamp();
 	
 	//Alte DS entfernen
 	var oldDatasources = kontotree.database.GetDataSources();
@@ -651,8 +732,12 @@ function StudentAuswahl()
 	kontotree.builder.rebuild();
 	
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-	var datasource = rdfService.GetDataSource(url);
-	kontotree.database.AddDataSource(datasource);
+	StudentKontoTreeDatasource = rdfService.GetDataSource(url);
+	StudentKontoTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	StudentKontoTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	kontotree.database.AddDataSource(StudentKontoTreeDatasource);
+	StudentKontoTreeDatasource.addXMLSinkObserver(StudentKontoTreeSinkObserver);
+	kontotree.builder.addListener(StudentKontoTreeListener);	
 	
 	//Zeugnis
 	zeugnistree = document.getElementById('student-zeugnis-tree');
@@ -880,6 +965,8 @@ function StudentKontoAuswahl()
 	var tree = document.getElementById('student-konto-tree');
 
 	if (tree.currentIndex==-1) return;
+
+	StudentKontoDetailDisableFields(false);
 	
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
@@ -914,9 +1001,259 @@ function StudentKontoAuswahl()
 	document.getElementById('student-konto-textbox-buchungstext').value=buchungstext;
 	document.getElementById('student-konto-textbox-mahnspanne').value=mahnspanne;
 	document.getElementById('student-konto-menulist-buchungstyp').value=buchungstyp_kurzbz;
+	document.getElementById('student-konto-textbox-buchungsnr').value=buchungsnr;
 }
 
-function StudentKontoDisableFields(val)
+// ****
+// * Aendert den Filter fuer den Konto Tree und Refresht ihn dann
+// ****
+function StudentKontoFilter()
 {
 
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	filter = document.getElementById('student-konto-button-filter');
+	
+	if(filter.value=='offene')
+	{
+		filter.value='alle';
+		filter.label='offene';
+	}
+	else
+	{
+		filter.value='offene';
+		filter.label='alle';
+	}
+	
+	//Konto Tree mit neuem Filter laden
+	kontotree = document.getElementById('student-konto-tree');
+	person_id = document.getElementById('student-prestudent-textbox-person_id').value
+	url='<?php echo APP_ROOT;?>rdf/konto.rdf.php?person_id='+person_id+"&filter="+filter.value+"&"+gettimestamp();
+	
+	//Alte DS entfernen
+	var oldDatasources = kontotree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		kontotree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	kontotree.builder.rebuild();
+	
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	StudentKontoTreeDatasource = rdfService.GetDataSource(url);
+	StudentKontoTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	StudentKontoTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	kontotree.database.AddDataSource(StudentKontoTreeDatasource);
+	StudentKontoTreeDatasource.addXMLSinkObserver(StudentKontoTreeSinkObserver);
+	kontotree.builder.addListener(StudentKontoTreeListener);	
+}
+
+// ****
+// * Aktiviert / Deaktiviert die Konto Felder
+// ****
+function StudentKontoDisableFields(val)
+{
+	document.getElementById('student-konto-button-filter').disabled=val;
+	document.getElementById('student-konto-button-neu').disabled=val;
+	document.getElementById('student-konto-button-gegenbuchung').disabled=val;
+	document.getElementById('student-konto-button-loeschen').disabled=val;
+	StudentKontoDetailDisableFields(true);
+}
+
+// ****
+// * Aktiviert / Deaktiviert die Kontodetail Felder
+// ****
+function StudentKontoDetailDisableFields(val)
+{
+	document.getElementById('student-konto-textbox-betrag').disabled=val;
+	document.getElementById('student-konto-textbox-buchungsdatum').disabled=val;
+	document.getElementById('student-konto-textbox-buchungstext').disabled=val;
+	document.getElementById('student-konto-textbox-mahnspanne').disabled=val;
+	document.getElementById('student-konto-menulist-buchungstyp').disabled=val;
+	document.getElementById('student-konto-button-speichern').disabled=val;
+}
+
+// ****
+// * Speichert die Buchung
+// ****
+function StudentKontoDetailSpeichern()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	
+	betrag = document.getElementById('student-konto-textbox-betrag').value;
+	buchungsdatum = document.getElementById('student-konto-textbox-buchungsdatum').value;
+	buchungstext = document.getElementById('student-konto-textbox-buchungstext').value;
+	mahnspanne = document.getElementById('student-konto-textbox-mahnspanne').value;
+	buchungstyp_kurzbz = document.getElementById('student-konto-menulist-buchungstyp').value;
+	buchungsnr = document.getElementById('student-konto-textbox-buchungsnr').value;
+	
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+	
+	req.add('type', 'savebuchung');
+	
+	req.add('betrag', betrag);
+	req.add('buchungsdatum', buchungsdatum);
+	req.add('buchungstext', buchungstext);
+	req.add('mahnspanne', mahnspanne);
+	req.add('buchungstyp_kurzbz', buchungstyp_kurzbz);
+	req.add('buchungsnr', buchungsnr);
+		
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+	
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+	}
+	else
+	{			
+		StudentSelectUid=document.getElementById('student-detail-textbox-uid').value;
+		StudentTreeDatasource.Refresh(false); //non blocking
+		SetStatusBarText('Daten wurden gespeichert');
+	}
+}
+
+// ****
+// * Legt eine Gegenbuchung zu einer Buchung an
+// ****
+function StudentKontoGegenbuchung()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-konto-tree');
+
+	if (tree.currentIndex==-1) return;
+
+	StudentKontoDetailDisableFields(false);
+	
+	//Ausgewaehlte Nr holen
+    var col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
+	var buchungsnr=tree.view.getCellText(tree.currentIndex,col);
+	
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+	
+	req.add('type', 'savegegenbuchung');
+	
+	req.add('buchungsnr', buchungsnr);
+		
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+	
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+	}
+	else
+	{			
+		StudentSelectUid=document.getElementById('student-detail-textbox-uid').value;
+		StudentTreeDatasource.Refresh(false); //non blocking
+		SetStatusBarText('Daten wurden gespeichert');
+	}
+}
+
+// ****
+// * Loescht eine Buchung
+// ****
+function StudentKontoDelete()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-konto-tree');
+
+	if (tree.currentIndex==-1) return;
+
+	StudentKontoDetailDisableFields(false);
+	
+	//Ausgewaehlte Nr holen
+    var col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
+	var buchungsnr=tree.view.getCellText(tree.currentIndex,col);
+	
+	if(confirm('Diese Buchung wirklich loeschen?'))
+	{
+		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+		var req = new phpRequest(url,'','');
+		
+		req.add('type', 'deletebuchung');
+		
+		req.add('buchungsnr', buchungsnr);
+			
+		var response = req.executePOST();
+	
+		var val =  new ParseReturnValue(response)
+		
+		if (!val.dbdml_return)
+		{
+			if(val.dbdml_errormsg=='')
+				alert(response)
+			else
+				alert(val.dbdml_errormsg)
+		}
+		else
+		{			
+			StudentSelectUid=document.getElementById('student-detail-textbox-uid').value;
+			StudentTreeDatasource.Refresh(false); //non blocking
+			SetStatusBarText('Daten wurden gespeichert');
+		}
+	}
+}
+
+// ****
+// * Ruft einen Dialog zum Anlegen von Buchungen auf
+// ****
+function StudentKontoNeu()
+{
+	window.open("<?php echo APP_ROOT; ?>content/student/studentkontoneudialog.xul.php","","chrome, status=no, width=500, height=350, centerscreen, resizable");
+}
+
+// ****
+// * Speichert die Daten aus dem BuchungenDialog
+// ****
+function StudentKontoNeuSpeichern(dialog, person_ids, studiengang_kz)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+	
+	//Daten aus dem Dialog holen
+	betrag = dialog.getElementById('student-konto-neu-textbox-betrag').value;
+	buchungsdatum = dialog.getElementById('student-konto-neu-textbox-buchungsdatum').value;
+	buchungstext = dialog.getElementById('student-konto-neu-textbox-buchungstext').value;
+	mahnspanne = dialog.getElementById('student-konto-neu-textbox-mahnspanne').value;
+	buchungstyp_kurzbz = dialog.getElementById('student-konto-neu-menulist-buchungstyp').value;
+	
+	req.add('type', 'neuebuchung');
+	
+	req.add('person_ids', person_ids);
+	req.add('studiengang_kz', studiengang_kz);
+	req.add('betrag', betrag);
+	req.add('buchungsdatum', buchungsdatum);
+	req.add('buchungstext', buchungstext);
+	req.add('mahnspanne', mahnspanne);
+	req.add('buchungstyp_kurzbz', buchungstyp_kurzbz);	
+		
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+	
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+		return false;
+	}
+	else
+	{
+		StudentKontoTreeDatasource.Refresh(false);
+		return true;
+	}
 }
