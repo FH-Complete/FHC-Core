@@ -40,6 +40,7 @@ require_once('../../include/student.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/akte.class.php');
+require_once('../../include/konto.class.php');
 
 $user = get_uid();
 
@@ -655,6 +656,156 @@ if(!$error)
 			$return = false;
 			$errormsg  = 'Fehlerhafte Parameteruebergabe'.$_POST['akte_id'];
 		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='savebuchung') // ***** KONTO *****
+	{
+		//Speichert eine Buchung
+		if(isset($_POST['buchungsnr']) && is_numeric($_POST['buchungsnr']))
+		{
+			$buchung = new konto($conn, null, true);
+
+			if($buchung->load($_POST['buchungsnr']))
+			{
+				$buchung->betrag = $_POST['betrag'];
+				$buchung->buchungsdatum = $_POST['buchungsdatum'];
+				$buchung->buchungstext = $_POST['buchungstext'];
+				$buchung->mahnspanne = $_POST['mahnspanne'];
+				$buchung->buchungstyp_kurzbz = $_POST['buchungstyp_kurzbz'];
+				$buchung->new = false;
+				$buchung->updateamum = date('Y-m-d H:i:s');
+				$buchung->updatevon = $user;
+				
+				if($buchung->save())
+				{
+					$return = true;
+				}
+				else 
+				{
+					$return = false;
+					$errormsg = 'Fehler beim Speicher:'.$buchung->errormsg;
+				}
+			}
+			else 
+			{
+				$errormsg = 'Buchung wurde nicht gefunden:'.$_POST['buchungsnr'];
+				$return = false;
+			}
+		}
+		else 
+		{
+			$return = false;
+			$errormsg  = 'Fehlerhafte Parameteruebergabe'.$_POST['buchungsnr'];
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='savegegenbuchung')
+	{
+		//Speichert eine Buchung
+		if(isset($_POST['buchungsnr']) && is_numeric($_POST['buchungsnr']))
+		{
+			$buchung = new konto($conn, null, true);
+
+			if($buchung->load($_POST['buchungsnr']))
+			{
+				if($buchung->buchungsnr_verweis=='')
+				{
+					$buchung->betrag = $buchung->betrag*(-1);
+					$buchung->buchungsdatum = date('Y-m-d');
+					$buchung->mahnspanne = '0';
+					$buchung->buchungsnr_verweis = $buchung->buchungsnr;
+					$buchung->new = true;
+					$buchung->insertamum = date('Y-m-d H:i:s');
+					$buchung->insertvon = $user;
+					
+					if($buchung->save())
+					{
+						$return = true;
+					}
+					else 
+					{
+						$return = false;
+						$errormsg = 'Fehler beim Speichern:'.$buchung->errormsg;
+					}
+				}
+				else 
+				{
+					$return = false;
+					$errormsg = 'Gegenbuchungen koennen nur auf die obersten Buchungen getaetigt werden';
+				}
+			}
+			else 
+			{
+				$errormsg = 'Buchung wurde nicht gefunden:'.$_POST['buchungsnr'];
+				$return = false;
+			}
+		}
+		else 
+		{
+			$return = false;
+			$errormsg  = 'Fehlerhafte Parameteruebergabe'.$_POST['buchungsnr'];
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='deletebuchung')
+	{
+		//Loescht eine Buchung
+		if(isset($_POST['buchungsnr']) && is_numeric($_POST['buchungsnr']))
+		{
+			$buchung = new konto($conn, null, true);
+
+			if($buchung->delete($_POST['buchungsnr']))
+			{
+				$return = true;
+			}
+			else 
+			{
+				$errormsg = $buchung->errormsg;
+				$return = false;
+			}
+		}
+		else 
+		{
+			$return = false;
+			$errormsg  = 'Fehlerhafte Parameteruebergabe'.$_POST['buchungsnr'];
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='neuebuchung')
+	{
+		//Speichert eine neue Buchung
+		//Gleichzeitiges speichern mehrerer Personen ist moeglich
+		//Personen werden durch ';' getrennt
+		$person_ids = explode(';',$_POST['person_ids']);
+		$errormsg = '';
+		foreach ($person_ids as $person_id)
+		{
+			if($person_id!='')
+			{
+				$buchung = new konto($conn, null, true);
+				$buchung->person_id = $person_id;
+				$buchung->studiengang_kz = $_POST['studiengang_kz'];
+				$buchung->studiensemester_kurzbz = $semester_aktuell;
+				$buchung->buchungsnr_verweis='';
+				$buchung->betrag = $_POST['betrag'];
+				$buchung->buchungsdatum = $_POST['buchungsdatum'];
+				$buchung->buchungstext = $_POST['buchungstext'];
+				$buchung->mahnspanne = $_POST['mahnspanne'];
+				$buchung->buchungstyp_kurzbz = $_POST['buchungstyp_kurzbz'];
+				$buchung->insertamum = date('Y-m-d H:i:s');
+				$buchung->insertvon = $user;
+				$buchung->new = true;
+				
+				if($buchung->save())
+				{
+					$data = $buchung->buchungsnr;
+				}
+				else 
+				{
+					$errormsg .= "Fehler bei $person_id: $buchung->errormsg\n";
+				}
+			}
+		}
+		if($errormsg=='')
+			$return = true;
+		else 
+			$return = false;			
 	}
 	else
 	{

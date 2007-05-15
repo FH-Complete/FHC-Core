@@ -57,6 +57,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentkontooverlay.xul.ph
 						<!--<toolbarbutton id="student-toolbar-neu" label="Neuer Student" oncommand="StudentNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Student neu anlegen" />-->
 						<!--<toolbarbutton id="student-toolbar-del" label="Löschen" oncommand="StudentDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Student löschen"/>-->
 						<toolbarbutton id="student-toolbar-refresh" label="Aktualisieren" oncommand="StudentTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
+						<toolbarbutton id="student-toolbar-buchung" label="Neue Buchung" oncommand="StudentKontoNeu()" disabled="false" tooltiptext="neue Buchung anlegen"/>
 						<spacer flex="1"/>
 						<label id="student-toolbar-label-anzahl"/>
 						</toolbar>

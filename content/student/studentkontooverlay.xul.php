@@ -38,7 +38,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <vbox id="student-konto" style="margin:0px;" flex="1">
 <popupset>
 	<popup id="student-konto-tree-popup">
-		<menuitem label="Entfernen" oncommand="StudentKontoDel();" id="student-konto-tree-popup-kontodel" hidden="false"/>
+		<menuitem label="Entfernen" oncommand="StudentKontoDelete();" id="student-konto-tree-popup-kontodel" hidden="false"/>
 	</popup>
 </popupset>
 <hbox flex="1">
@@ -51,7 +51,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<row>	
 					<hbox>
 						<spacer flex="1" />
-						<button id="student-konto-button-filter" label="offene" disabled="true"/>
+						<button id="student-konto-button-filter" value="alle" oncommand="StudentKontoFilter()" label="offene" disabled="true"/>
 					</hbox>
 					<spacer />
 				</row>
@@ -83,6 +83,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/konto/rdf#studiensemester_kurzbz" />
 							<splitter class="tree-splitter"/>
+							<treecol id="student-konto-tree-buchungstyp_kurzbz" label="Typ" flex="2" hidden="true"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/konto/rdf#buchungstyp_kurzbz" />
+							<splitter class="tree-splitter"/>
 							<treecol id="student-konto-tree-buchungsnr" label="buchungs_nr" flex="2" hidden="true"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/konto/rdf#buchungsnr" />
@@ -97,6 +101,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#buchungstext"/>
 										<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#betrag"/>
 										<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#studiensemester_kurzbz"/>
+										<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#buchungstyp_kurzbz"/>
 										<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#buchungsnr"/>
 									</treerow>
 								</treeitem>
@@ -105,10 +110,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					</tree>
 					<vbox>
 						<hbox>
-							<button id="student-konto-button-neu" label="Neu" disabled="true"/>
-							<button id="student-konto-button-gegenbuchung" label="Gegenbuchung" disabled="true"/>
-							<button id="student-konto-button-loeschen" label="Loeschen" disabled="true"/>
+							<button id="student-konto-button-neu" label="Neu" oncommand="StudentKontoNeu();" disabled="true"/>
+							<button id="student-konto-button-gegenbuchung" label="Gegenbuchung" oncommand="StudentKontoGegenbuchung();" disabled="true"/>
+							<button id="student-konto-button-loeschen" label="Loeschen" oncommand="StudentKontoDelete();" disabled="true"/>
 						</hbox>
+						<vbox hidden="true">
+							<label value="Buchungsnr" control="student-konto-textbox-buchungsnr"/>
+							<textbox id="student-konto-textbox-buchungsnr" disabled="true"/>
+						</vbox>
 						<groupbox id="student-konto-groupbox" flex="1">
 						<caption label="Details"/>
 							<grid id="student-konto-grid-detail" style="overflow:auto;margin:4px;" flex="1">
@@ -160,7 +169,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							</grid>
 							<hbox>
 								<spacer flex="1" />
-								<button id="student-konto-button-speichern" label="Speichern" disabled="true"/>
+								<button id="student-konto-button-speichern" oncommand="StudentKontoDetailSpeichern()" label="Speichern" disabled="true"/>
 							</hbox>
 						</groupbox>
 					</vbox>
