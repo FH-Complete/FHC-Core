@@ -95,7 +95,7 @@ if($resultvilesci = pg_query($conn, $qryvilesci))
 {
 	while($rowvilesci = pg_fetch_object($resultvilesci))
 	{
-		$combobox[$i]=trim($rowvilesci->nachname)." ".trim(trim($rowvilesci->titelpre).' '.trim($rowvilesci->vorname).' '.trim($rowvilesci->titelpost));
+		$combobox[$i]=trim($rowvilesci->nachname)." ".trim($rowvilesci->vorname).' '.trim(trim($rowvilesci->titelpre).' '.trim($rowvilesci->titelpost));
 		$nachname[$i]=trim($rowvilesci->nachname);
 		$valuebox[$i]=$rowvilesci->person_id;
 		$i++;
