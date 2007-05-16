@@ -76,8 +76,11 @@ if(isset($_POST['da']))
 	{
 		$qry1= "UPDATE diplomarbeit SET vilesci_pruefer1='".$_POST['top6']."' WHERE diplomarbeit_pk='".$_POST['da']."';";
 	}
-	pg_query($conn_fas, $qry1);
-	echo $qry1;
+	if(trim($qry1)!='')
+	{
+		pg_query($conn_fas, $qry1);
+		echo $qry1;
+	}
 }
 
 ob_flush();
@@ -255,7 +258,6 @@ if($result = pg_query($conn_fas, $qry))
 			echo"</select>";
 			echo "</td>";
 			echo "<td><input type='submit' value='Speichern'></td>";
-			echo "<td></td>";
 			echo "</form>";
 			echo "</tr>";
 		}
@@ -283,7 +285,6 @@ if($result = pg_query($conn_fas, $qry))
 			echo"</select>";
 			echo "</td>";
 			echo "<td><input type='submit' value='Speichern'></td>";
-			echo "<td></td>";
 			echo "</form>";
 			echo "</tr>";			
 		}
