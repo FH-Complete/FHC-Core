@@ -41,6 +41,7 @@ require_once('../../include/prestudent.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/akte.class.php');
 require_once('../../include/konto.class.php');
+require_once('../../include/dokument.class.php');
 
 $user = get_uid();
 
@@ -718,6 +719,7 @@ if(!$error)
 					
 					if($buchung->save())
 					{
+						$data = $buchung->buchungsnr;
 						$return = true;
 					}
 					else 
@@ -799,6 +801,74 @@ if(!$error)
 				else 
 				{
 					$errormsg .= "Fehler bei $person_id: $buchung->errormsg\n";
+				}
+			}
+		}
+		if($errormsg=='')
+			$return = true;
+		else 
+			$return = false;			
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='dokumentprestudentadd')
+	{
+		//Speichert die Zuordnung von Dokumenten zu einem Prestudent
+		//Gleichzeitiges zuteilen mehrerer Dokumente auf einmal ist moeglich
+		//Dokumente werden durch ';' getrennt uebergeben
+		$dokumente = explode(';',$_POST['dokumente']);
+		$errormsg = '';
+		foreach ($dokumente as $dokument_kurzbz)
+		{
+			if($dokument_kurzbz!='')
+			{
+				$dok = new dokument($conn, null, null, true);
+				$dok->dokument_kurzbz = $dokument_kurzbz;
+				$dok->prestudent_id = $_POST['prestudent_id'];
+				$dok->mitarbeiter_uid = $user;
+				$dok->datum = date('Y-m-d');
+				$dok->insertamum = date('Y-m-d H:i:s');
+				$dok->insertvon = $user;				
+				$dok->new = true;
+				
+				if(!$dok->save())
+				{
+					$errormsg .= "Fehler bei $dokument_kurzbz: $dok->errormsg\n";
+				}
+			}
+		}
+		if($errormsg=='')
+			$return = true;
+		else 
+			$return = false;			
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='dokumentprestudentdel')
+	{
+		//Loescht die Zuordnung von Dokumenten zu einem Prestudent
+		//Gleichzeitiges loeschen mehrerer Dokumente auf einmal ist moeglich
+		//Dokumente werden durch ';' getrennt uebergeben
+		$dokumente = explode(';',$_POST['dokumente']);
+		$errormsg = '';
+		foreach ($dokumente as $dokument_kurzbz)
+		{
+			if($dokument_kurzbz!='')
+			{
+				$dok = new dokument($conn, null, null, true);
+				if($dok->load($dokument_kurzbz, $prestudent_id))
+				{
+					if($dok->mitarbeiter_uid==$user)
+					{
+						if(!$dok->delete($dokument_kurzbz, $prestudent_id))
+						{
+							$errormsg .= "Fehler bei $dokument_kurzbz: $dok->errormsg\n";
+						}
+					}
+					else 
+					{
+						$errormsg.="Fehler bei $dokument_kurzbz: Loeschen nur durch $mitarbeiter_uid moeglich\n";
+					}
+				}
+				else 
+				{
+					$errormsg.="Dokumentenzuteilung existiert nicht: $dokument_kurzbz\n";
 				}
 			}
 		}
