@@ -31,7 +31,8 @@ loadVariables($conn, $user);
 // *********** Globale Variablen *****************//
 var StudentSelectUid=null; //Student der nach dem Refresh markiert werden soll
 var StudentKontoSelectBuchung=null; //Buchung die nach dem Refresh markiert werden soll
-var StudentKontoTreeDatasource;
+var StudentKontoTreeDatasource; //Datasource des KontoTrees
+var StudentTreeLoadDataOnSelect=true; //Gib an ob beim Selectieren im Tree die Daten geladen werden sollen
 
 // ********** Observer und Listener ************* //
 
@@ -141,14 +142,6 @@ function StudentTreeRefresh()
 }
 
 // ****
-// * neuen Studenten anlegen
-// ****
-function StudentNeu()
-{
-	
-}
-
-// ****
 // * Selectiert den Studenten nachdem der Tree
 // * rebuildet wurde.
 // ****
@@ -177,6 +170,24 @@ function StudentTreeSelectStudent()
 	   	}
 	}
 	document.getElementById('student-toolbar-label-anzahl').value='Anzahl: '+items;
+}
+
+// ****
+// * Beim Sortieren des Trees wird der markierte Eintrag gespeichert und nach dem sortieren
+// * wieder markiert. 
+// ****
+function StudentTreeSort()
+{
+	var i;
+	var tree=document.getElementById('student-tree');
+	if(tree.currentIndex>=0)
+		i = tree.currentIndex;
+	else
+		i = 0;
+	col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+	StudentSelectUid = tree.view.getCellText(i,col);
+	StudentTreeLoadDataOnSelect=false;
+	window.setTimeout("StudentTreeSelectStudent()",10);
 }
 
 // ****
@@ -516,6 +527,11 @@ function StudentImageUpload()
 // ****
 function StudentAuswahl()
 {
+	if(!StudentTreeLoadDataOnSelect)
+	{
+		StudentTreeLoadDataOnSelect=true;
+		return true;
+	}
 	
 	// Trick 17	(sonst gibt's ein Permission denied)
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -1272,4 +1288,30 @@ function StudentKontoNeuSpeichern(dialog, person_ids, studiengang_kz)
 		StudentKontoTreeDatasource.Refresh(false);
 		return true;
 	}
+}
+
+// *********** Zeugnis *****************
+
+function StudentCreateZeugnis()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	tree = document.getElementById('student-tree');
+	
+	if (tree.currentIndex==-1) return;
+	
+	//Ausgewaehlte UID holen
+    var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+	var uid=tree.view.getCellText(tree.currentIndex,col);
+	
+	//Studiengang holen
+	var tree_lvb = document.getElementById('tree-verband');
+	
+	col = tree_lvb.columns ? tree_lvb.columns["stg_kz"] : "stg_kz";
+	studiengang_kz=tree_lvb.view.getCellText(tree_lvb.currentIndex,col);
+	
+	col = tree_lvb.columns ? tree_lvb.columns["sem"] : "sem";
+	semester=tree_lvb.view.getCellText(tree_lvb.currentIndex,col);
+		
+	window.open('<?php echo APP_ROOT; ?>content/student/zeugnis.php?uid='+uid+'&studiengang_kz='+studiengang_kz+'&semester='+semester,'Zeugnis', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }

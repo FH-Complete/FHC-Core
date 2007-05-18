@@ -32,8 +32,9 @@ loadVariables($conn, $user);
 var InteressentSelectId=null; //Interessent der nach dem Refresh markiert werden soll
 var InteressentDokumentTreeNichtabgegebenDatasource=null; //Datasource fuer Dokumenten tree
 var InteressentDokumentTreeAbgegebenDatasource=null; //Datasource fuer Dokumenten tree
-var InteressentDokumentTreeAbgegebenDoubleRefresh=false;
-var InteressentDokumentTreeNichtabgegebenDoubleRefresh=false;
+var InteressentDokumentTreeAbgegebenDoubleRefresh=false; // Wenn true, dann wird der rechte Dokumententree das naechste mal 2 mal hintereinander Refresht
+var InteressentDokumentTreeNichtabgegebenDoubleRefresh=false; // Wenn true, dann wird der linke Dokumententree das naechste mal 2 mal hintereinander Refresht
+var InteressentTreeLoadDataOnSelect=true; //Gibt an ob beim naechsten Select des Interessenten Trees die Daten geladen werden sollen
 
 // ********** Observer und Listener ************* //
 
@@ -221,10 +222,21 @@ function InteressentTreeSelectInteressent()
 }
 
 // ****
-// * Interessent loeschen
+// * Beim Sortieren des Trees wird der markierte Eintrag gespeichert und nach dem sortieren
+// * wieder markiert. 
 // ****
-function InteressentDelete()
+function InteressentTreeSort()
 {
+	var i;
+	var tree=document.getElementById('interessent-tree');
+	if(tree.currentIndex>=0)
+		i = tree.currentIndex;
+	else
+		i = 0;
+	col = tree.columns ? tree.columns["interessent-treecol-prestudent_id"] : "interessent-treecol-prestudent_id";
+	InteressentSelectId = tree.view.getCellText(i,col);
+	InteressentTreeLoadDataOnSelect=false;
+	window.setTimeout("InteressentTreeSelectInteressent()",10);
 }
 
 // ****
@@ -381,6 +393,11 @@ function InteressentImageUpload(evt)
 // ****
 function InteressentAuswahl()
 {
+	if(!InteressentTreeLoadDataOnSelect)
+	{
+		InteressentTreeLoadDataOnSelect=true;
+		return true;
+	}
 	
 	// Trick 17	(sonst gibt's ein Permission denied)
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");

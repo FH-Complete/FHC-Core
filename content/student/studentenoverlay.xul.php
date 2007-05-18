@@ -58,6 +58,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentkontooverlay.xul.ph
 						<!--<toolbarbutton id="student-toolbar-del" label="Löschen" oncommand="StudentDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Student löschen"/>-->
 						<toolbarbutton id="student-toolbar-refresh" label="Aktualisieren" oncommand="StudentTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 						<toolbarbutton id="student-toolbar-buchung" label="Neue Buchung" oncommand="StudentKontoNeu()" disabled="false" tooltiptext="neue Buchung anlegen"/>
+						<toolbarbutton id="student-toolbar-zeugnis" label="Zeugnis erstellen" oncommand="StudentCreateZeugnis()" disabled="false" tooltiptext="Zeugnis erstellen"/>
 						<spacer flex="1"/>
 						<label id="student-toolbar-label-anzahl"/>
 						</toolbar>
@@ -80,59 +81,59 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentkontooverlay.xul.ph
 					<treecols>
 	    				<treecol id="student-treecol-uid" label="UID" flex="1" primary="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/student/rdf#uid"  />
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#uid"  onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-titelpre" label="TitelPre" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/student/rdf#titelpre"/>
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#titelpre" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-vorname" label="Vorname" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/student/rdf#vorname" />
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#vorname" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-vornamen" label="Vornamen" flex="1" hidden="true"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/student/rdf#vornamen" />
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#vornamen" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-nachname" label="Nachname" flex="1" hidden="false"
 	    					sortActive="true"
 	    					sortDirection="ascending"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/student/rdf#nachname" />
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#nachname" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-titelpost" label="TitelPost" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/student/rdf#titelpost"/>
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#titelpost" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-geburtsdatum" label="Geburtsdatum" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/student/rdf#geburtsdatum" />
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#geburtsdatum" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-semester" label="Sem." flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/student/rdf#semester" />
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#semester" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-verband" label="Verb." flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/student/rdf#verband" />
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#verband" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-gruppe" label="Grp." flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/student/rdf#gruppe" />
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#gruppe" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-studiengang_kz" label="StudiengangKz" flex="1" hidden="true"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/student/rdf#studiengang_kz" />
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#studiengang_kz" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 						<treecol id="student-treecol-matrikelnummer" label="Matrikelnummer" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/student/rdf#matrikelnummer" />
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#matrikelnummer" onclick="StudentTreeSort()"/>
 	    				<treecol id="student-treecol-prestudent_id" label="PreStudentID" flex="1" hidden="true"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/student/rdf#prestudent_id" />
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#prestudent_id" onclick="StudentTreeSort()"/>
 	    				<treecol id="student-treecol-person_id" label="PersonID" flex="1" hidden="true"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/student/rdf#person_id" />
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#person_id" onclick="StudentTreeSort()"/>
 					</treecols>
 
 					<template>
