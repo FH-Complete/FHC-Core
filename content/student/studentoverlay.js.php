@@ -192,7 +192,7 @@ function StudentKontoTreeSelectBuchung()
 		return false;
 
 	//In der globalen Variable ist die zu selektierende Buchung gespeichert
-	if(StudentKontoTreeSelectBuchung!=null)
+	if(StudentKontoSelectBuchung!=null)
 	{
 		//Alle subtrees oeffnen weil rowCount nur die Anzahl der sichtbaren
 		//Zeilen zurueckliefert
@@ -211,12 +211,13 @@ function StudentKontoTreeSelectBuchung()
 			buchungsnr=tree.view.getCellText(i,col);
 
 			//wenn dies die zu selektierende Zeile
-			if(buchungsnr == StudentKontoTreeSelectBuchung)
+			if(buchungsnr == StudentKontoSelectBuchung)
 			{
 				//Zeile markieren
 				tree.view.selection.select(i);
 				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
 				tree.treeBoxObject.ensureRowIsVisible(i);
+				StudentKontoSelectBuchung=null;
 				return true;
 			}
 	   	}
@@ -1023,11 +1024,24 @@ function StudentKontoFilter()
 		filter.value='offene';
 		filter.label='alle';
 	}
-	
+		
 	//Konto Tree mit neuem Filter laden
 	kontotree = document.getElementById('student-konto-tree');
 	person_id = document.getElementById('student-prestudent-textbox-person_id').value
 	url='<?php echo APP_ROOT;?>rdf/konto.rdf.php?person_id='+person_id+"&filter="+filter.value+"&"+gettimestamp();
+	
+	var buchungsnr=null;
+	try
+	{
+		if(kontotree.currentIndex!='-1')
+		{
+			//Ausgewaehlte Nr holen
+		    var col = kontotree.columns ? kontotree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
+			buchungsnr=kontotree.view.getCellText(kontotree.currentIndex,col);
+		}
+	}
+	catch(e)
+	{}
 	
 	//Alte DS entfernen
 	var oldDatasources = kontotree.database.GetDataSources();
@@ -1037,6 +1051,8 @@ function StudentKontoFilter()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	kontotree.builder.rebuild();
+	
+	StudentKontoSelectBuchung = buchungsnr;
 	
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	StudentKontoTreeDatasource = rdfService.GetDataSource(url);
@@ -1111,8 +1127,8 @@ function StudentKontoDetailSpeichern()
 	}
 	else
 	{			
-		StudentSelectUid=document.getElementById('student-detail-textbox-uid').value;
-		StudentTreeDatasource.Refresh(false); //non blocking
+		StudentKontoSelectBuchung=buchungsnr;
+		StudentKontoTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 	}
 }
@@ -1153,8 +1169,8 @@ function StudentKontoGegenbuchung()
 	}
 	else
 	{			
-		StudentSelectUid=document.getElementById('student-detail-textbox-uid').value;
-		StudentTreeDatasource.Refresh(false); //non blocking
+		StudentKontoSelectBuchung=val.dbdml_data;
+		StudentKontoTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 	}
 }

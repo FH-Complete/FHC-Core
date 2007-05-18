@@ -30,6 +30,10 @@ loadVariables($conn, $user);
 ?>
 // *********** Globale Variablen *****************//
 var InteressentSelectId=null; //Interessent der nach dem Refresh markiert werden soll
+var InteressentDokumentTreeNichtabgegebenDatasource=null; //Datasource fuer Dokumenten tree
+var InteressentDokumentTreeAbgegebenDatasource=null; //Datasource fuer Dokumenten tree
+var InteressentDokumentTreeAbgegebenDoubleRefresh=false;
+var InteressentDokumentTreeNichtabgegebenDoubleRefresh=false;
 
 // ********** Observer und Listener ************* //
 
@@ -64,6 +68,81 @@ var InteressentTreeListener =
   	  //noch keine values haben. Ab Seamonkey funktionierts auch
   	  //ohne dem setTimeout
       window.setTimeout(InteressentTreeSelectInteressent,10);
+  }
+};
+
+// ****
+// * Observer fuer linken Dokumententree
+// * startet Rebuild nachdem das Refresh
+// * der datasource fertig ist
+// ****
+var InteressentDokumentTreeNichtabgegebenSinkObserver =
+{
+	onBeginLoad : function(pSink) {},
+	onInterrupt : function(pSink) {},
+	onResume : function(pSink) {},
+	onError : function(pSink, pStatus, pError) {},
+	onEndLoad : function(pSink)
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		document.getElementById('interessent-dokumente-tree-nichtabgegeben').builder.rebuild();
+	}
+};
+
+
+// ****
+// * Nach dem Rebuild des Linken Dokumenten Trees
+// * Wenn die Variable InteressentDokumentTreeNichtabgegebenDoubleRefresh auf 'true' gesetzt wird, dann
+// * wird der Tree ein zweites mal Refresht. Dies wird benoetigt falls zuvor im Tree eine Datasource geladen
+// * wurde die keine Daten enthaelt. Die Daten werden erst angezeigt wenn der Tree ein zweites mal refresht wird.
+// ****
+var InteressentDokumentTreeNichtabgegebenListener =
+{
+  willRebuild : function(builder) {  },
+  didRebuild : function(builder)
+  {
+      if(InteressentDokumentTreeNichtabgegebenDoubleRefresh==true)
+      {
+      	window.setTimeout('InteressentDokumentTreeNichtabgegebenDatasourceRefresh()',10);
+      } 
+      InteressentDokumentTreeNichtabgegebenDoubleRefresh=false;  
+  }
+};
+
+// ****
+// * Observer fuer rechten Dokumententree
+// * startet Rebuild nachdem das Refresh
+// * der datasource fertig ist
+// ****
+var InteressentDokumentTreeAbgegebenSinkObserver =
+{
+	onBeginLoad : function(pSink) {},
+	onInterrupt : function(pSink) {},
+	onResume : function(pSink) {},
+	onError : function(pSink, pStatus, pError) {},
+	onEndLoad : function(pSink)
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		document.getElementById('interessent-dokumente-tree-abgegeben').builder.rebuild();
+	}
+};
+
+// ****
+// * Nach dem Rebuild des rechten Dokumenten Trees
+// * Wenn die Variable InteressentDokumentTreeAbgegebenDoubleRefresh auf 'true' gesetzt wird, dann
+// * wird der Tree ein zweites mal Refresht. Dies wird benoetigt falls zuvor im Tree eine Datasource geladen
+// * wurde die keine Daten enthaelt. Die Daten werden erst angezeigt wenn der Tree ein zweites mal refresht wird.
+// ****
+var InteressentDokumentTreeAbgegebenListener =
+{
+  willRebuild : function(builder) {  },
+  didRebuild : function(builder)
+  {
+      if(InteressentDokumentTreeAbgegebenDoubleRefresh==true)
+      {
+      	window.setTimeout('InteressentDokumentTreeAbgegebenDatasourceRefresh()',10);
+      }
+      InteressentDokumentTreeAbgegebenDoubleRefresh=false;
   }
 };
 
@@ -466,6 +545,49 @@ function InteressentAuswahl()
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var datasource = rdfService.GetDataSource(url);
 	rollentree.database.AddDataSource(datasource);
+	
+	//Dokumente
+	//linker Tree
+	doctree = document.getElementById('interessent-dokumente-tree-nichtabgegeben');
+	url='<?php echo APP_ROOT;?>rdf/dokument.rdf.php?studiengang_kz='+studiengang_kz+'&prestudent_id='+prestudent_id+"&"+gettimestamp();
+	
+	//Alte DS entfernen
+	var oldDatasources = doctree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		doctree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	doctree.builder.rebuild();
+	
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	InteressentDokumentTreeNichtabgegebenDatasource = rdfService.GetDataSource(url);	
+	InteressentDokumentTreeNichtabgegebenDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	InteressentDokumentTreeNichtabgegebenDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	doctree.database.AddDataSource(InteressentDokumentTreeNichtabgegebenDatasource);
+	InteressentDokumentTreeNichtabgegebenDatasource.addXMLSinkObserver(InteressentDokumentTreeNichtabgegebenSinkObserver);
+	doctree.builder.addListener(InteressentDokumentTreeNichtabgegebenListener);
+	
+	//rechter Tree
+	doctree = document.getElementById('interessent-dokumente-tree-abgegeben');
+	url='<?php echo APP_ROOT;?>rdf/dokumentprestudent.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
+	
+	//Alte DS entfernen
+	var oldDatasources = doctree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		doctree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	doctree.builder.rebuild();
+	
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	InteressentDokumentTreeAbgegebenDatasource = rdfService.GetDataSource(url);
+	InteressentDokumentTreeAbgegebenDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	InteressentDokumentTreeAbgegebenDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	doctree.database.AddDataSource(InteressentDokumentTreeAbgegebenDatasource);
+	InteressentDokumentTreeAbgegebenDatasource.addXMLSinkObserver(InteressentDokumentTreeAbgegebenSinkObserver);
+	doctree.builder.addListener(InteressentDokumentTreeAbgegebenListener);
 }
 
 // ****
@@ -700,4 +822,160 @@ function InteressentzuStudent()
 		InteressentTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 	}
+}
+
+// ***************DOKUMENTE*********************
+
+// ****
+// * Weisst dem Prestudenten Dokumente zu die er bereits abgegeben hat
+// ****
+function InteressentDokumenteAdd()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	//Alle markierten Dokumente holen
+	tree = document.getElementById('interessent-dokumente-tree-nichtabgegeben');
+	paramList='';
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			col = tree.columns ? tree.columns["interessent-dokumente-tree-nichtabgegeben-dokument_kurzbz"] : "interessent-dokumente-tree-nichtabgegeben-dokument_kurzbz";
+			dok = tree.view.getCellText(v,col);
+			paramList += ';'+dok;
+		}
+	}
+	
+	//Prestudent_id holen
+	prestudent_id = document.getElementById('interessent-detail-textbox-prestudent_id').value
+	
+	if(paramList!='')
+	{
+		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+		var req = new phpRequest(url,'','');
+			
+		req.add('type', 'dokumentprestudentadd');
+		
+		req.add('prestudent_id', prestudent_id);
+		req.add('dokumente', paramList);
+		
+		var response = req.executePOST();
+	
+		var val =  new ParseReturnValue(response)
+		
+		if (!val.dbdml_return)
+		{
+			if(val.dbdml_errormsg=='')
+				alert(response)
+			else
+				alert(val.dbdml_errormsg)
+		}
+		else
+		{
+			// Wenn im Tree mit den abgegebenen Dokumenten kein Eintrag vorhanden ist,
+			// dann muss der Tree zwei mal hintereinander Refresht werden weil sonst der neue Eintrag
+			// nicht angezeigt wird.
+			if(document.getElementById('interessent-dokumente-tree-abgegeben').view.rowCount==0)
+			{
+				InteressentDokumentTreeAbgegebenDoubleRefresh=true;
+			}
+			InteressentDokumentTreeNichtabgegebenDatasource.Refresh(false);
+			InteressentDokumentTreeAbgegebenDatasource.Refresh(false);
+			SetStatusBarText('Dokumente wurden hinzugefuegt');
+		}
+	}
+	else
+	{
+		alert('Bitte zuerst ein Dokument markieren');
+	}
+}
+
+// *****
+// * Loescht die Zuordnung Dokument-Prestudent
+// *****
+function InteressentDokumenteRemove()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	//Alle markierten Dokumente holen
+	tree = document.getElementById('interessent-dokumente-tree-abgegeben');
+	paramList='';
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			col = tree.columns ? tree.columns["interessent-dokumente-tree-abgegeben-dokument_kurzbz"] : "interessent-dokumente-tree-abgegeben-dokument_kurzbz";
+			dok = tree.view.getCellText(v,col);
+			paramList += ';'+dok;
+		}
+	}
+	
+	//Prestudent_id holen
+	prestudent_id = document.getElementById('interessent-detail-textbox-prestudent_id').value
+	
+	if(paramList!='')
+	{
+		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+		var req = new phpRequest(url,'','');
+			
+		req.add('type', 'dokumentprestudentdel');
+		
+		req.add('prestudent_id', prestudent_id);
+		req.add('dokumente', paramList);
+		
+		var response = req.executePOST();
+	
+		var val =  new ParseReturnValue(response)
+		
+		if (!val.dbdml_return)
+		{
+			if(val.dbdml_errormsg=='')
+				alert(response)
+			else
+				alert(val.dbdml_errormsg)
+		}
+		else
+		{
+			// Wenn im Tree mit den noch nicht abgegebenen Dokumenten kein Eintrag vorhanden ist,
+			// dann muss der Tree zwei mal hintereinander Refresht werden weil sonst der neue Eintrag
+			// nicht angezeigt wird.
+			if(document.getElementById('interessent-dokumente-tree-nichtabgegeben').view.rowCount==0)
+			{
+				InteressentDokumentTreeNichtabgegebenDoubleRefresh=true;
+			}
+			InteressentDokumentTreeNichtabgegebenDatasource.Refresh(false);
+			InteressentDokumentTreeAbgegebenDatasource.Refresh(false);
+			SetStatusBarText('Dokumente wurden entfernt');
+		}
+	}
+	else
+	{
+		alert('Bitte zuerst ein Dokument markieren');
+	}
+}
+
+// ****
+// * Refresht den Tree mit den Abgegeben Dokumenten
+// ****
+function InteressentDokumentTreeAbgegebenDatasourceRefresh()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	InteressentDokumentTreeAbgegebenDatasource.Refresh(false);
+}
+
+// ****
+// * Refresht den Tree mit den noch nicht Abgegebenen Dokumenten
+// ****
+function InteressentDokumentTreeNichtabgegebenDatasourceRefresh()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	InteressentDokumentTreeNichtabgegebenDatasource.Refresh(false);	
 }
