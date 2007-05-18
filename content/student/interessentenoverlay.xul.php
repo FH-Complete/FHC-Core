@@ -72,61 +72,61 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 					<treecols>
 	    				<treecol id="interessent-treecol-titelpre" label="TitelPre" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#titelpre"/>
+	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#titelpre" onclick="InteressentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="interessent-treecol-anrede" label="Anrede" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#anrede"/>
+	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#anrede" onclick="InteressentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="interessent-treecol-vorname" label="Vorname" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#vorname" />
+	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#vorname" onclick="InteressentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="interessent-treecol-vornamen" label="Vornamen" flex="1" hidden="true"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#vornamen" />
+	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#vornamen" onclick="InteressentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="interessent-treecol-nachname" label="Nachname" flex="2" hidden="false" primary="true"
 	    					sortActive="true"
 	    					sortDirection="ascending"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#nachname" />
+	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#nachname" onclick="InteressentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="interessent-treecol-titelpost" label="TitelPost" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#titelpost"/>
+	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#titelpost" onclick="InteressentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="interessent-treecol-geburtsdatum" label="Geburtsdatum" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#geburtsdatum" />
+	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#geburtsdatum" onclick="InteressentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="interessent-treecol-svnr" label="SVNR" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#svnr"/>
+	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#svnr" onclick="InteressentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="interessent-treecol-ersatzkennzeichen" label="ErsatzKz" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#ersazkennzeichen"/>
+	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#ersazkennzeichen" onclick="InteressentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="interessent-treecol-geschlecht" label="Geschlecht" flex="1" hidden="true"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#geschlecht" />
+	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#geschlecht"  onclick="InteressentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="interessent-treecol-status" label="Status" flex="1" hidden="true"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#status" />
+	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#status"  onclick="InteressentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="interessent-treecol-studiengang_kz" label="StudiengangKz" flex="1" hidden="true"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#studiengang_kz" />
+	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#studiengang_kz"  onclick="InteressentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="interessent-treecol-prestudent_id" label="PreStudentID" flex="1" hidden="true"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#prestudent_id" />
+	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#prestudent_id"  onclick="InteressentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="interessent-treecol-person_id" label="PersonID" flex="1" hidden="true"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#person_id" />
+	    					sort="rdf:http://www.technikum-wien.at/interessent/rdf#person_id"  onclick="InteressentTreeSort()"/>
 					</treecols>
 
 					<template>
