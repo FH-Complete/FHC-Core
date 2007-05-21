@@ -43,7 +43,7 @@ if (!$conn = pg_pconnect(CONN_STRING))
 if (isset($_GET['lektor']))
 	$lektor=$_GET['lektor'];
 else
-	$lektor=true;
+	$lektor=null;
 
 if (isset($_GET['fixangestellt']))
 	$fixangestellt=$_GET['fixangestellt'];
@@ -72,8 +72,8 @@ $ma=$mitarbeiter->getMitarbeiter($lektor,$fixangestellt,$stg_kz,$fachbereich_id)
 
 $stg_obj = new studiengang($conn);
 $stg_obj->getAll();
-foreach ($stg_obj->result as $stg) 
-	$stg_arr[$stg->studiengang_kz]=$stg->kuerzel;	
+foreach ($stg_obj->result as $stg)
+	$stg_arr[$stg->studiengang_kz]=$stg->kuerzel;
 
 $rdf_url='http://www.technikum-wien.at/mitarbeiter/';
 ?>
@@ -88,7 +88,7 @@ $alle='';
 foreach ($ma as $mitarbeiter)
 {
 	?>
-	 
+
       	<RDF:Description about="<?php echo $rdf_url.$mitarbeiter->uid; ?>" >
         	<MITARBEITER:uid><?php echo $mitarbeiter->uid; ?></MITARBEITER:uid>
     		<MITARBEITER:titelpre><?php echo $mitarbeiter->titelpre; ?></MITARBEITER:titelpre>
@@ -150,9 +150,9 @@ if ($user)
 						"\n\t\t\t<MITARBEITER:kurzbz>".$stg_arr[$mitarbeiter->studiengang_kz]."</MITARBEITER:kurzbz>".
 						"\n\t\t\t<MITARBEITER:studiengang_kz>$mitarbeiter->studiengang_kz</MITARBEITER:studiengang_kz>".
 						"\n\t\t</RDF:Description>\n";
-				
+
 				$seq.="\n\t<RDF:li>\n\t\t<RDF:Seq about=\"".$rdf_url.$mitarbeiter->studiengang_kz."\" >";
-			
+
 				$laststg = $mitarbeiter->studiengang_kz;
 			}
 			$seq.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$mitarbeiter->uid."\" />";
