@@ -41,7 +41,23 @@ function sortByField($multArray,$sortField,$desc=true)
 if (!$conn = pg_pconnect(CONN_STRING))
 	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
 
-// Vorkommende Gebiet laden
+// Reihungstests laden
+$sql_query="SELECT * FROM public.tbl_reihungstest WHERE date_part('year',datum)=date_part('year',now()) ORDER BY datum,uhrzeit";
+//echo $sql_query;
+if(!($result=pg_query($conn, $sql_query)))
+    die(pg_errormessage($conn));
+while ($row=pg_fetch_object($result))
+{
+	$rtest[$row->reihungstest_id]->reihungstest_id=$row->reihungstest_id;
+	$rtest[$row->reihungstest_id]->studiengang_kz=$row->studiengang_kz;
+	$rtest[$row->reihungstest_id]->ort_kurzbz=$row->ort_kurzbz;
+	$rtest[$row->reihungstest_id]->anmerkung=$row->anmerkung;
+	$rtest[$row->reihungstest_id]->datum=$row->datum;
+	$rtest[$row->reihungstest_id]->uhrzeit=$row->uhrzeit;
+}
+
+
+// Vorkommende Gebiete laden
 $sql_query="SELECT DISTINCT gebiet_id, gebiet FROM testtool.vw_auswertung";
 //echo $sql_query;
 if(!($result=pg_query($conn, $sql_query)))
@@ -137,6 +153,17 @@ while ($row=pg_fetch_object($result))
 
 <h1>Technischer Teil</h1>
 
+<form method="POST">
+	<SELECT name="reihungstest">';
+		<?php
+		foreach($rtest as $rt)
+				echo '<OPTION value="'.$rt->reihungstest_id.'">'.$rt->studiengang_kz.' '.$rt->ort_kurzbz.' '.$rt->anmerkung.' '.$rt->datum.' '.$prestd->rt."</OPTION>\n";
+		?>
+	</SELECT>
+	<INPUT type="submit" value="select" />
+</form>
+
+
 <table id="zeitsperren">
   <tr>
 		<th rowspan="2">ID</th><th rowspan="2">Nachname</th><th rowspan="2">Vornamen</th>
@@ -208,7 +235,5 @@ while ($row=pg_fetch_object($result))
   	}
   ?>
 </table>
-
-
 </body>
 </html>
