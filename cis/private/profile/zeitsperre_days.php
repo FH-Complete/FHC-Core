@@ -48,7 +48,7 @@
 
 <html>
 <head>
-	<title>Zeitsperren <?php echo $studiensemester; ?></title>
+	<title>Zeitsperren</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<link rel="stylesheet" href="../../../skin/cis.css" type="text/css">
 </head>
