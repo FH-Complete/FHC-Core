@@ -70,6 +70,9 @@ while ($row=pg_fetch_object($result))
 
 // Ergebnisse laden
 $sql_query="SELECT * FROM testtool.vw_auswertung";
+if (isset($_POST['reihungstest']))
+	$sql_query.==' WHERE ';
+
 //echo $sql_query;
 if(!($result=pg_query($conn, $sql_query)))
     die(pg_errormessage($conn));
