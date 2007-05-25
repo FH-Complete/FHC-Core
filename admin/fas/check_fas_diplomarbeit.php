@@ -127,7 +127,7 @@ $qry="SELECT *, trim(substring(trim(erstbegutachter) from ' [A-ü]*$')) as erst, 
 	(vilesci_vorsitzender IS  NULL AND trim(vorsitzender)!='') OR
 	(vilesci_pruefer1 IS NULL AND trim(pruefer1)!=''))
 	ORDER BY diplomarbeit_pk
-	LIMIT 5;";
+	LIMIT 10;";
 //ORDER BY diplomarbeit_pk
 if($result = pg_query($conn_fas, $qry))
 {

@@ -1,0 +1,373 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>ToDo FAS-Online</title></head>
+<body>
+<h1 style="text-align: center;">ToDo Fas-Online</h1>
+<b>Mitarbeiter-Modul</b><br>
+<ul>
+  <li style="color: rgb(0, 0, 0);">Login funktioniert nicht beim 1. mal
+wenn Mozilla bereits offen ist</li>
+  <li style="color: rgb(0, 0, 0);">BIS Meldung pr&uuml;fen und in
+Oberfl&auml;che integrieren</li>
+  <li style="color: rgb(0, 0, 0);">Zeitweise ist das Speichern nicht
+m&ouml;glich Error Code 500.<br>
+</li>
+  <li style="color: rgb(0, 0, 0);">Funktionen
+Tree nach dem Aendern eines Datensatzes in der mitte der Liste wird der
+untere Teil der Liste nicht mehr angezeigt ( refresh rebuild problem)</li><li style="color: rgb(0, 0, 0);">Ansicht von Bankverbindungen etc nur f&uuml;r Schaaf / Kazamias</li><li style="color: rgb(0, 0, 0);">Doppelklick auf Funktionen &ouml;ffnet den Bearbeiten Dialog</li>
+  <li style="color: rgb(0, 0, 0);">Beim FunktionenTree bei den Studiengaengen anzeigen ob es B/M/D ist</li><li style="color: rgb(0, 0, 0);">Excel Export soll zus&auml;tzlich die Nation anzeigen</li>
+  <li style="color: rgb(0, 0, 0);">Excel Export soll zus&auml;tzlich die Firma anzeigen wenn die betreffende Person die Zustelladresse in einer Firma hat<br>
+  </li>
+
+
+
+
+
+</ul>
+<b>LVA-Modul</b>
+<ul>
+  <li>Bei partizipierung von Lehreinheiten eines anderen Studienganges
+kommt es zu Problemen<br>
+  </li>
+</ul>
+<br>
+<b>FAS V2</b><br>
+<ul>
+  <li style="color: rgb(0, 0, 0);">Bei karrenzierten soll ein Feld
+angezeigt werden mit von bis Datum</li>
+  <li style="color: rgb(0, 0, 0);">Absolventen Beendigungsdatum bei
+allen auf einmal setzbar</li><li style="color: rgb(0, 0, 0);">import der Notenliste auch nach LVA moeglich nicht nur nach Lektor</li><li style="color: rgb(0, 0, 0);">Vorr&uuml;ckung sollte von Assistentinen gemacht werden k&ouml;nnen (Protokoll wer schon vorgerr&uuml;ckt ist)</li><li style="color: rgb(0, 0, 0);">Studenten die im 3. Semester sind sollten nicht in der Gruppe 5A1 sein<br>
+  </li>
+
+
+
+</ul>
+<span style="font-weight: bold;"></span><h2>Erledigte Anforderungen<br>
+</h2>
+<ul>
+  <li style="color: rgb(0, 0, 0);">Neben den Funktionen soll es einen Knopf geben zum anzeigen aller Funktionen (aus allen Studiensemestern)<br>
+13.10.2006 Andreas &Ouml;sterreicher<br>
+es wurde bei den funktionen ein Button "alle Anzeigen" hinzugef&uuml;gt.<br>
+    <br>
+</li><li style="color: rgb(0, 0, 0);">Mail versenden an markierte Lektoren<br>
+15.09.2006 Andreas &Ouml;sterreicher<br>
+Mitarbeiter markieren-&gt;rechte Maustaste-&gt;EMail versenden (Falls
+die Mail mit externem Mailclient verschickt werden soll muss die config
+ge&auml;ndert werden)<br>
+    <br>
+  </li>
+<li style="color: rgb(0, 0, 0);">Beim Speichern der Daten mit Sonderzeichen (+, &amp;, etc.) gehen diese verloren<br>
+12.09.2006 Andreas &Ouml;sterreicher<br>
+Vor dem Senden der Daten per XMLHTTPRequest werden die einzelnen Parameter mittels encodeURIComponents codiert.<br>
+    <br>
+  </li>
+<li style="color: rgb(0, 0, 0);">Beim
+Anlegen eines neuen Datensatzes Verschwinden bei Fr. Schaaf die anderen
+Mitarbeiter in der Liste<br>
+10.09.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Wenn nach dem &auml;ndern eines DS
+das Fenster geschlossen wird erscheint eine Abfrage zum Speichern.
+Tritt bei diesem Speichern ein Fehler auf, dann sollte das Fenster
+offen bleiben um die Eingabe korrigieren zu k&ouml;nnen. <br>
+06.07.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+
+  <li style="color: rgb(0, 0, 0);">Beim Speicher pruefen ob uid keine
+Umlaute oder Sonderzeichen enthaelt.<br>
+03.07.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Nach dem aendern der Email Adresse
+erscheint ein leeres Feld im Tree<br>
+03.07.2006 Andreas &Ouml;sterreicher<br>
+Rebuild nach Refresh eingef&uuml;gt<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Einfach Hochkomma durch &acute;
+(ohne Shift) ersetzen<br>
+09.06.2006 Andreas &Ouml;sterreicher<br>
+Wurde durch ` (mit Shift) ersetzt da das &acute; (ohne Shift) nicht
+richtig konvertiert wird (Zeichensatzproblem?)<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Beim loeschen eines Datensatzes der
+Ver&auml;ndert wurde wird nach dem loeschen gefragt ob der Datensatz
+gespeichert werden soll<br>
+06.06.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Pruefen der SVNR mittels Pruefziffer<br>
+06.06.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Speichern von SVNR mit weniger als
+10 Zeichen sollte nicht moeglich sein<br>
+06.06.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Erstellung der BIS-Meldung<br>
+31.05.2006 Andreas &Ouml;sterreicher<br>
+Erste Version erstellt<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Bei Eingabe von "Frau" ins Anrede
+Feld soll automatisch das geschlecht geaendert werden<br>
+29.05.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">L&ouml;schen von Mitarbeitern nur
+von dem der es erstellt hat m&ouml;glich und nur innerhalb von einer
+Woche<br>
+26.05.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Bei ausgeschiedenen soll aktiv
+status auf false gesetzt werden<br>
+18.05.2006 Andreas &Ouml;sterreicher<br>
+Beim anklicken von ausgeschieden wird aktiv status automatisch
+mitge&auml;ndert<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">mitspeichern der Aenderungen in
+Tabelle log<br>
+11.05.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">sleep_time als Variable fuer
+window.timeout anlegen<br>
+11.05.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">pruefen ob UID im LDAP existiert<br>
+11.05.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Personalnummer automatisch generieren<br>
+10.05.2006 Andreas &Ouml;sterreicher<br>
+hoechste Persnr+1<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Telefonnummern -&gt; Neu -&gt; Typ
+Auswahl IDs bereinigen<br>
+10.05.2006<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">creationuser richtig setzen<br>
+10.05.2006 Andreas &Ouml;sterreicher<br>
+Neue variable in tbl_variable mit namen fas_id angelegt welche die
+fas-benutzer_id enthaelt <br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Studiensemester Variable Umstellung
+mit Menuepunkt Einstellungen-&gt;Studiensemester<br>
+09.05.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Abfrage ob ge&auml;nderte Daten
+gespeichert werden sollen auch beim klicken aufs Xerl<br>
+08.05.2006 Andreas &Ouml;sterreicher<br>
+onclose Event im window Tag<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Refresh &amp; Rebuild nach loeschen
+einer Adresse/Email/Bankverbindung/Funktion<br>
+08.05.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Wenn nach aenderung der
+Mitarbeiterdaten ohne speichern ein Funktion geloescht/angelegt wird
+stimmt der Status (nach Speichern der Mitarbeiter Daten) nicht mehr<br>
+08.05.2006 Andreas &Ouml;sterreicher<br>
+Nach Speichern/Loeschen einer Funktion wird der Status in ein hidden
+Feld geschrieben<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Status setzen bei Person wenn die
+Funktionen angelegt werden<br>
+05.05.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Bei neuen Datensatz wird
+staatsbuergerschaft und Nation nicht richtig gesetzt<br>
+05.05.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Spaltenbreiten bei Excelfile anpassen<br>
+05.05.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">ExcelExport: Spalten mit ids oder
+boolean konvertieren (Familienstand, aktiv)<br>
+05.05.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Verrechnungskonto bei Bankverbindung
+einf&uuml;gen (typ +10) &amp; Typname in tree einfuegen<br>
+05.05.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Staatsb&uuml;rgerschaft: in Tabelle
+Nation befindet sich ein Feld
+Sperre wenn das auf J gesetzt ist d&uuml;rfen diese nicht bei uns
+studieren<br>
+04.05.2006 Andreas &Ouml;sterreicher<br>
+nation.rdf.php mit parameter ohnesperre=true aufrufen damit gesperrte
+nationen nicht mitgeliefert werden<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Wenn
+ein Datensatz ver&auml;ndert wird und ein ander Datensatz
+ausgew&auml;hlt wird (Speichern Dialog wird angezeigt-&gt;klick auf Ja)
+wird der gespeicherte Datensatz markiert und nicht der vorhin
+angeklickte.<br>
+04.05.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Umschalten der
+Studiensemester-Variable<br>
+04.05.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">StartIcon im Fenster-Titel<br>
+03.05.2006 Andreas &Ouml;sterreicher<br>
+Icon mit Dateinamen = window-id (fas.ico) im Ordner
+&lt;app-root&gt;\chrome\icons\default ablegen<br>
+    <br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Fenstergr&ouml;&szlig;e
+ver&auml;nderbar bei Detailfenstern.<br>
+03.05.2006 Andreas &Ouml;sterreicher<br>
+Verwendung von resizable statt resizeable<br>
+    <br>
+  </li>
+  <li>R&auml;nder bei den Trees<br>
+03.05.2006 Andreas &Ouml;sterreicher<br>
+Stylesheet angepasst<br>
+    <br>
+  </li>
+  <li>Excel-Export: ausgew&auml;hlte Spalten &uuml;bernehmen<br>
+03.05.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li>Beim &auml;ndern der Checkbox "ausgeschieden am" mit der Tastatur
+wird kein Event ausgel&ouml;st<br>
+02.05.2006 Andreas &Ouml;sterreicher<br>
+oncommand statt onclick verwendet<br>
+    <br>
+  </li>
+  <li>Beim Start kommen die aktiven FixAngestellten<br>
+02.05.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li>Beim FilterWechsel soll das Eingabeformular geleert werden
+&amp;&amp;<br>
+Speichern von leerem Formular (NeuStart oder Filterwechsel) darf
+nicht m&ouml;glich sein<br>
+02.05.2006 Andreas &Ouml;sterreicher<br>
+Formularfelder werden beim Start und Filterwechsel alle deaktiviert<br>
+    <br>
+  </li>
+  <li>Mitarbeiter Klasse Parameter f&uuml;rs laden der Adresse
+hinzuf&uuml;gen<br>
+02.05.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li>Beim loeschen auch das loeschen der zus&auml;tzlichen Daten
+einf&uuml;gen<br>
+02.05.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li>Adresse in Excelfile hinzuf&uuml;gen (Strasse, PLZ, Ort der
+Zustelladresse)<br>
+02.05.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li>Pflichtfelder: Vorname, Nachname, Kuerzel<br>
+02.05.2006 Andreas &Ouml;sterreicher<br>
+Farbliche Markierung der Pflichtfelder noch nicht durchgef&uuml;hrt<br>
+    <br>
+  </li>
+  <li>Nach dem l&ouml;schen den obersten Datensatz markieren<br>
+02.05.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li>Ausmass bei Funktionen sollte eine Combobox sein<br>
+02.05.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li>UID und K&uuml;rzel beim speichern auf Eindeutigkeit pr&uuml;fen<br>
+02.05.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li>K&uuml;rzel und UID automatisch generieren<br>
+28.4.2006 Andreas &Ouml;sterreicher<br>
+Werden jetzt beide auf einmal generiert<br>
+    <br>
+  </li>
+  <li>Filter f&uuml;r Freie Dienstnehmer hinzuf&uuml;gen<br>
+27.4.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li>Familienstand, Ausbildung in Mitarbeiter&Uuml;bersicht zeigt IDs
+statt Namen an<br>
+27.4.2006 Andreas &Ouml;sterreicher<br>
+&nbsp;<br>
+  </li>
+  <li>nicht verwendete Felder aus dem Mitarbeitertree entfernen (
+geh&ouml;ren zu den Funktionen )<br>
+27.4.2006 Andreas &Ouml;sterreicher<br>
+Folgende Felder wurden auskommentiert: entwicklungsteam, qualifikation,
+hauptberuflich, hauptberuf und sws<br>
+    <br>
+  </li>
+  <li>Beim Sortieren stimmt der ausgew&auml;hlte Datensatz nicht mehr.<br>
+27.4.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li>Datensatz nach dem Speichern und Aktualisieren wieder markieren<br>
+27.4.2006 Andreas &Ouml;sterreicher<br>
+Funktioniert nur wenn der Datensatz wirklich im tree vorhanden ist
+sonst wird nichts markiert (kann vorkommen wenn rdf nicht richtig
+geladen wird)<br>
+    <br>
+  </li>
+  <li>Bei Funktionen ist die Codierung des RDFs falsch<br>
+27.4.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li>beim L&ouml;schen eines Datensatzes verschwinden zweitweise
+andere Datens&auml;tze<br>
+27.4.2006 Andreas &Ouml;sterreicher<br>
+Bei &ouml;fteren Rebuild werden die Datens&auml;tze nicht richtig
+geladen<br>
+    <br>
+  </li>
+  <li>Aktiv Feld hinzuf&uuml;gen<br>
+27.4.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li>Leere Felder werden falsch sortiert<br>
+26.4.2006 Andreas &Ouml;sterreicher<br>
+Leerstrings werden jetzt nur beim fuellen des trees codiert (parameter
+leerstringcodierung=true)<br>
+    <br>
+  </li>
+  <li>Sonderzeichen im Excel-Export<br>
+27.4.2006 Christian Paminger<br>
+    <br>
+  </li>
+  <li>Neu
+Anlegen nur bei den Filtern Alle, Fixangestellte, Aktive und Aktive
+Fixangestellte m&ouml;glich. Sonst den Neu Button deaktivieren<br>
+26.4.2006 Andreas &Ouml;sterreicher<br>
+    <br>
+  </li>
+  <li>Execl-Export<br>
+24.4.2006 Christian Paminger<br>
+erste statische Version implementiert<br>
+  </li>
+</ul>
+<br>
+</body></html>
