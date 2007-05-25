@@ -1,8 +1,8 @@
 <?php
  require("config.inc.php");
  	if (!isset($REMOTE_USER))
- 		die ('REMOTE_USER ist nicht gesetzt!');
-		//$REMOTE_USER='pam';
+ 		//die ('REMOTE_USER ist nicht gesetzt!');
+		$REMOTE_USER='pam';
 	$uid=$REMOTE_USER;
 
 ?>
@@ -10,67 +10,84 @@
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../skin/vilesci.css" rel="stylesheet" type="text/css">
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>VileSci Men&uuml;</title>
+	<link href="../skin/vilesci.css" rel="stylesheet" type="text/css">
 
-<script language="JavaScript">
-<!--
-	__js_page_array = new Array();
+	<script language="JavaScript">
+	<!--
+		__js_page_array = new Array();
 
-    function js_toggle_container(conid)
-    {
-		if (document.getElementById)
-		{
-        	var block = "table-row";
-			if (navigator.appName.indexOf('Microsoft') > -1)
-				block = 'block';
-            var status = __js_page_array[conid];
-            if (status == null)
+   	function js_toggle_container(conid)
+   	{
+			if (document.getElementById)
+			{
+      	  	var block = "table-row";
+				if (navigator.appName.indexOf('Microsoft') > -1)
+					block = 'block';
+      	   var status = __js_page_array[conid];
+         	if (status == null)
             	status = "none";
-            if (status == "none")
-            {
-            	document.getElementById(conid).style.display = block;
+ 				if (status == "none")
+ 			   {
+         	  	document.getElementById(conid).style.display = block;
             	__js_page_array[conid] = "visible";
-            }
-            else
-            {
-            	document.getElementById(conid).style.display = 'none';
+         	}
+         	else
+           	{
+           		document.getElementById(conid).style.display = 'none';
             	__js_page_array[conid] = "none";
-            }
-            return false;
-     	}
-     	else
-     		return true;
-  	}
-//-->
-</script>
-<title>VileSci Men&uuml;</title>
+      		}
+      	   return false;
+     		}
+     		else
+     			return true;
+  		}
+	//-->
+	</script>
 </head>
 
-<body>
-<table width="100%"  border="0" cellspacing="0" cellpadding="0">
-<tr>
-	<td width="159" valign="top" nowrap>
-		<table width="100%"  border="0" cellspacing="0" cellpadding="0" style="border-right-width:1px;border-right-color:#BCBCBC;">
+<body class="browser">
+<div dir="ltr">
+	<div class="logo">
+		<a href="intro.php" target="detail">
+			<img src="../skin/images/logo.png" width="200" height="50" alt="VileSci (FASonline)" title="VileSci" />
+		</a>
+	</div>
+	<table class="tabs">
+		<tr>
+			<td width="50%" class="tab active"><a href="intro.php">Introduction</a></td>
+			<td width="50%" class="tab"><a href="servers.php">Servers</a></td>
+		</tr>
+	</table>
+	
+	<!--____________Menue Admin______________________________________________-->
+	<div id="menueadmin">
+		<table class="menue" style="border-right-width:1px;border-right-color:#BCBCBC;">
 		<tr>
 			<td>&nbsp;</td>
 		</tr>
-		<!--Menu Eintrag Personen-->
+		<!--______Menue Admin->Personen_______________________________________-->
 		<tr>
-          	<td nowrap><a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Personen'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Personen</a></td>
-        </tr>
+        	<td nowrap>
+				<a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Personen'));">
+      			<img src="../skin/images/menu_item.gif" width="7" height="9" />
+      			&nbsp;Personen
+        		</a>
+        	</td>
+      </tr>
 		<tr>
-          	<td nowrap>
-		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Personen" style="display: visible;">
-			  	<tr>
-			  		<td width="10" nowrap>&nbsp;</td>
+        	<td nowrap>
+				<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Personen" style="display: visible;">
+				<tr>
+					<td width="10" nowrap>&nbsp;</td>
 					<td nowrap><a class="MenuItem2" href="personen/index.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Suche</a></td>
-			  	</tr>
-			  	<tr>
-			  		<td width="10" nowrap>&nbsp;</td>
+				</tr>
+				<tr>
+					<td width="10" nowrap>&nbsp;</td>
 					<td nowrap><a class="MenuItem2" href="personen/funktion.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Funtionen</a></td>
-			  	</tr>
-			  	<!--Menu Eintrag Personen->Studenten -->
+				</tr>
+			  	<!--__Menue Admin->Personen->Studenten___________________________-->
 				<tr>
 					<td width="10" nowrap>&nbsp;</td>
 					<td nowrap>
@@ -87,7 +104,7 @@
 						</table>
 					</td>
 				</tr>
-				<!--Menu Eintrag Personen->Lektoren -->
+				<!--Menu Eintrag Personen - Lektoren -->
 				<tr>
 					<td width="10" nowrap>&nbsp;</td>
 					<td nowrap>
@@ -179,7 +196,7 @@
 			  	<!--
 			  	<td width="10" nowrap>&nbsp;</td>
 					<td nowrap><a class="MenuItem2" href="stundenplan/einheit_menu.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Einheiten</a></td>
-			  	</tr>-->
+			  	</tr> -->
 			  	<!--Menu Eintrag Lehrfach-->
 			  	<tr>
 				  	<td width="10" nowrap>&nbsp;</td>
@@ -216,8 +233,7 @@
 		</tr>
 		</table>
 
-  	</td>
- </tr>
- </table>
+ 	</div>
+ </div>
  </body>
  </html>

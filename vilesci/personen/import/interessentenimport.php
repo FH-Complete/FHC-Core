@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -31,7 +31,7 @@ require_once('../../../include/adresse.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
 	die('Fehler beim Herstellen der DB Connection');
-      
+
 $user=get_uid();
 
 loadVariables($conn, $user);
@@ -48,7 +48,7 @@ function disablefields(obj)
 		val=false;
 	else
 		val=true;
-		
+
 	document.getElementById('titel').disabled=val;
 	document.getElementById('nachname').disabled=val;
 	document.getElementById('vorname').disabled=val;
@@ -82,11 +82,11 @@ $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('admin'))
 	die('Sie haben keine Berechtigung fuer diese Seite');
-	
+
 $where = '';
 $error = false;
 //Parameter
-$titel = (isset($_POST['titel'])?$_POST['titel']:'');	
+$titel = (isset($_POST['titel'])?$_POST['titel']:'');
 $nachname = (isset($_POST['nachname'])?$_POST['nachname']:'');
 $vorname = (isset($_POST['vorname'])?$_POST['vorname']:'');
 $geschlecht = (isset($_POST['geschlecht'])?$_POST['geschlecht']:'');
@@ -106,15 +106,15 @@ $ueberschreiben = (isset($_POST['ueberschreiben'])?$_POST['ueberschreiben']:'');
 //end Parameter
 
 //Testphase fix
-if($studiengang_kz!='' && $studiengang_kz!='257')
+if($studiengang_kz!='' && $studiengang_kz!='299')
 	die('Keine Berechtigung zum Importieren');
 //end Testphase
 
 // *** Speichern der Daten ***
 if(isset($_POST['save']))
 {
-	//echo "Saving Data: Geburtsdatum: $geburtsdatum | Titel: $titel | Nachname: $nachname | Vorname: $vorname | 
-	//		Geschlecht: $geschlecht | Adresse: $adresse | Plz: $plz | Ort: $ort | 
+	//echo "Saving Data: Geburtsdatum: $geburtsdatum | Titel: $titel | Nachname: $nachname | Vorname: $vorname |
+	//		Geschlecht: $geschlecht | Adresse: $adresse | Plz: $plz | Ort: $ort |
 	//		Email: $email | Telefon: $telefon | Mobil: $mobil | Letzteausbildung: $letzteausbildung | ausbildungsart: $ausbildungsart |
 	//		anmerkungen: $anmerkungen | studiengang_kz: $studiengang_kz | person_id: $person_id<br><br>";
 	$person = new person($conn);
@@ -129,7 +129,7 @@ if(isset($_POST['save']))
 			$error=true;
 			$errormsg = 'Person konnte nicht geladen werden';
 		}
-		else 
+		else
 		{
 			$geburtsdatum = $person->gebdatum;
 			$vorname = $person->vorname;
@@ -141,7 +141,7 @@ if(isset($_POST['save']))
 			{
 				$error=true;
 				$errormsg = 'Prestudent existiert bereits!';
-			}			
+			}
 		}
 	}
 	else
@@ -157,31 +157,31 @@ if(isset($_POST['save']))
 		{
 			$error=false;
 		}
-		else 
+		else
 		{
 			$error=true;
 			$errormsg = "Person konnte nicht gespeichert werden: $person->errormsg";
 		}
 	}
-	
+
 	//Adresse anlegen
 	if($ueberschreiben!='' && !($plz=='' && $adresse=='' && $ort==''))
-	{		
+	{
 		if($person_id=='0')
 			$ueberschreiben='Nein';
-		
+
 		$adr = new adresse($conn);
 		//Adresse neu anlegen
 		if($ueberschreiben=='Nein')
-		{			
+		{
 			$adr->new = true;
 			$adr->insertamum = date('Y-m-d H:i:s');
 			$adr->insertvon = $user;
 		}
-		else 
+		else
 		{
 			//Bestehende Adresse Ueberschreiben
-			
+
 			//Adressen der Peron laden
 			$adr->load_pers($person->person_id);
 			if(isset($adr->result[0]))
@@ -193,19 +193,19 @@ if(isset($_POST['save']))
 					$adr->updateamum = date('Y-m-d H:i:s');
 					$adr->updatevon = $user;
 				}
-				else 
+				else
 				{
 					$error = true;
 					$errormsg = 'Fehler beim laden der Adresse';
 				}
 			}
-			else 
+			else
 			{
 				$error = true;
 				$errormsg = 'Kann die Adresse nicht ueberschreiben wenn keine da ist';
 			}
 		}
-		
+
 		if(!$error)
 		{
 			//Adressdaten zuweisen und speichern
@@ -222,8 +222,8 @@ if(isset($_POST['save']))
 				$errormsg = $adr->errormsg;
 			}
 		}
-	}		
-	
+	}
+
 	//Kontaktdaten anlegen
 	if(!$error)
 	{
@@ -238,7 +238,7 @@ if(isset($_POST['save']))
 			$kontakt->insertamum = date('Y-m-d H:i:s');
 			$kontakt->insertvon = $user;
 			$kontakt->new = true;
-			
+
 			if(!$kontakt->save())
 			{
 				$error = true;
@@ -256,7 +256,7 @@ if(isset($_POST['save']))
 			$kontakt->insertamum = date('Y-m-d H:i:s');
 			$kontakt->insertvon = $user;
 			$kontakt->new = true;
-			
+
 			if(!$kontakt->save())
 			{
 				$error = true;
@@ -274,7 +274,7 @@ if(isset($_POST['save']))
 			$kontakt->insertamum = date('Y-m-d H:i:s');
 			$kontakt->insertvon = $user;
 			$kontakt->new = true;
-			
+
 			if(!$kontakt->save())
 			{
 				$error = true;
@@ -282,7 +282,7 @@ if(isset($_POST['save']))
 			}
 		}
 	}
-		
+
 	//Prestudent Anlegen
 	if(!$error)
 	{
@@ -294,19 +294,19 @@ if(isset($_POST['save']))
 		$prestudent->anmerkung = $anmerkungen .($ausbildungsart!=''?' Ausbildungsart:'.$ausbildungsart:'');
 		$prestudent->reihungstestangetreten = false;
 		$prestudent->bismelden = true;
-		
+
 		if(!$prestudent->save())
 		{
 			$error=true;
 			$errormsg = $prestudent->errormsg;
 		}
 	}
-	
+
 	//Prestudent Rolle Anlegen
 	if(!$error)
 	{
 		$rolle = new prestudent($conn);
-		
+
 		$rolle->prestudent_id = $prestudent->prestudent_id;
 		$rolle->rolle_kurzbz = 'Interessent';
 		$rolle->studiensemester_kurzbz = $semester_aktuell;
@@ -314,25 +314,25 @@ if(isset($_POST['save']))
 		$rolle->datum = date('Y-m-d');
 		$rolle->insertamum = date('Y-m-d H:i:s');
 		$rolle->insertvon = $user;
-		
+
 		$rolle->new = true;
-		
+
 		if(!$rolle->save_rolle())
 		{
 			$error = true;
 			$errormsg = $rolle->errormsg;
 		}
-		else 
+		else
 			$error = false;
 	}
-	
+
 	if(!$error)
 	{
 		pg_query($conn, 'COMMIT');
 		die("<b>Interessent $vorname $nachname wurde erfolgreich angelegt</b><br>");
 	}
 	else
-	{ 
+	{
 		pg_query($conn, 'ROLLBACK');
 		echo '<span class="error">'.$errormsg.'</span>';
 	}
@@ -436,8 +436,8 @@ if($where!='')
 		echo '</table>';
 	}
 }
-//else 
-//	echo 'Zum Erstellen des Vorschlags bitte Geburtsdatum oder Vorname und Nachname eingeben';	
+//else
+//	echo 'Zum Erstellen des Vorschlags bitte Geburtsdatum oder Vorname und Nachname eingeben';
 
 ?>
 </td>

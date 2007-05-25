@@ -1,5 +1,5 @@
-
-.stplDetailRow {
+.stplDetailRow 
+{
         margin:0px;
 	padding:0px;
 	-moz-binding: url('lehrveranstaltungbinding.xml.php#stplDetailRow');

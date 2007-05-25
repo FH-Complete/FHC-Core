@@ -38,11 +38,12 @@ function sortByField($multArray,$sortField,$desc=true)
 
 
 // Verbindungsaufbau
-if (!$conn = pg_pconnect(CONN_STRING))
+if (!$conn = pg_connect(CONN_STRING))
 	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
 
 // Reihungstests laden
-$sql_query="SELECT * FROM public.tbl_reihungstest WHERE date_part('year',datum)=date_part('year',now()) ORDER BY datum,uhrzeit";
+$sql_query=";
+		SELECT * FROM public.tbl_reihungstest WHERE date_part('year',datum)=date_part('year',now()) ORDER BY datum,uhrzeit";
 //echo $sql_query;
 if(!($result=pg_query($conn, $sql_query)))
     die(pg_errormessage($conn));
@@ -56,7 +57,8 @@ while ($row=pg_fetch_object($result))
 	$rtest[$row->reihungstest_id]->uhrzeit=$row->uhrzeit;
 }
 
-
+if (isset($_POST['reihungstest']))
+{
 // Vorkommende Gebiete laden
 $sql_query="SELECT DISTINCT gebiet_id, gebiet FROM testtool.vw_auswertung";
 //echo $sql_query;
@@ -69,9 +71,9 @@ while ($row=pg_fetch_object($result))
 }
 
 // Ergebnisse laden
-$sql_query="SELECT * FROM testtool.vw_auswertung";
+$sql_query="SELECT vw_auswertung.* FROM testtool.vw_auswertung";
 if (isset($_POST['reihungstest']))
-	$sql_query.==' WHERE ';
+	$sql_query.=' JOIN public.tbl_prestudent USING (prestudent_id) WHERE reihungstest_id='.$_POST['reihungstest'];
 
 //echo $sql_query;
 if(!($result=pg_query($conn, $sql_query)))
@@ -107,6 +109,8 @@ while ($row=pg_fetch_object($result))
 
 // Vorkommende Kategorien laden
 $sql_query="SELECT DISTINCT kategorie_kurzbz FROM testtool.vw_auswertung_kategorie";
+if (isset($_POST['reihungstest']))
+	$sql_query.=' JOIN public.tbl_prestudent USING (prestudent_id) WHERE reihungstest_id='.$_POST['reihungstest'];
 //echo $sql_query;
 if(!($result=pg_query($conn, $sql_query)))
     die(pg_errormessage($conn));
@@ -114,9 +118,15 @@ while ($row=pg_fetch_object($result))
 	$kategorie[$row->kategorie_kurzbz]->name=$row->kategorie_kurzbz;
 
 // Ergebnisse laden
-$sql_query="SELECT vw_auswertung_kategorie.*, tbl_kriterien.typ FROM testtool.vw_auswertung_kategorie, testtool.tbl_kriterien
-WHERE tbl_kriterien.kategorie_kurzbz=vw_auswertung_kategorie.kategorie_kurzbz
-	AND vw_auswertung_kategorie.gebiet_id=tbl_kriterien.gebiet_id AND tbl_kriterien.punkte=vw_auswertung_kategorie.richtig ORDER BY pruefling_id, kategorie_kurzbz";
+$sql_query="SELECT vw_auswertung_kategorie.*, tbl_kriterien.typ
+	FROM (testtool.vw_auswertung_kategorie JOIN testtool.tbl_kriterien USING (kategorie_kurzbz))";
+if (isset($_POST['reihungstest']))
+	$sql_query.=' JOIN public.tbl_prestudent USING (prestudent_id)';
+$sql_query.=" WHERE vw_auswertung_kategorie.gebiet_id=tbl_kriterien.gebiet_id AND tbl_kriterien.punkte=vw_auswertung_kategorie.richtig";
+if (isset($_POST['reihungstest']))
+	$sql_query.=' AND reihungstest_id='.$_POST['reihungstest'];
+
+$sql_query.=" ORDER BY pruefling_id, kategorie_kurzbz";
 //echo $sql_query;
 if(!($result=pg_query($conn, $sql_query)))
     die(pg_errormessage($conn));
@@ -140,7 +150,7 @@ while ($row=pg_fetch_object($result))
 	$erg_kat[$row->pruefling_id]->kategorie[$row->kategorie_kurzbz]->typ=$row->typ;
 	$erg_kat[$row->pruefling_id]->kategorie[$row->kategorie_kurzbz]->punkte=$row->richtig.'/'.$row->gesamt;
 }
-
+}
 ?>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
@@ -154,8 +164,8 @@ while ($row=pg_fetch_object($result))
 
 <body>
 
-<h1>Technischer Teil</h1>
-
+<h1>Auswertung Reihungstest</h1>
+Reihungstest w&auml;hlen:&nbsp;
 <form method="POST">
 	<SELECT name="reihungstest">';
 		<?php
@@ -166,6 +176,11 @@ while ($row=pg_fetch_object($result))
 	<INPUT type="submit" value="select" />
 </form>
 
+<?php
+if (isset($_POST['reihungstest']))
+{
+	?>
+<h1>Technischer Teil</h1>
 
 <table id="zeitsperren">
   <tr>
@@ -196,10 +211,10 @@ while ($row=pg_fetch_object($result))
   					<td>$erg->idnachweis</td><td>$erg->registriert</td><td>$erg->stg_kurzbz</td><td>$erg->stg_bez</td><td>$erg->gruppe</td>";
   		foreach ($gebiet AS $gbt)
   			if (isset($erg->gebiet[$gbt->gebiet_id]))
-				echo '<td>'.$erg->gebiet[$gbt->gebiet_id]->punkte.'</td><td>'.$erg->gebiet[$gbt->gebiet_id]->prozent.' %</td>';
+				echo '<td>'.number_format($erg->gebiet[$gbt->gebiet_id]->punkte,2,',',' ').'</td><td nowrap>'.number_format($erg->gebiet[$gbt->gebiet_id]->prozent,2,',',' ').' %</td>';
 			else
 				echo '<td></td><td></td>';
-		echo '<td>'.$erg->gesamt.'</td>';
+		echo '<td>'.number_format($erg->gesamt,2,',',' ').'</td>';
   		echo '</tr>';
   	}
   ?>
@@ -238,5 +253,9 @@ while ($row=pg_fetch_object($result))
   	}
   ?>
 </table>
+
+<?php
+}
+?>
 </body>
 </html>
