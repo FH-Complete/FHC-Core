@@ -203,6 +203,10 @@ function onVerbandSelect(event)
 
 	if(typ=='')
 	{
+		//Wenn der Interessenten Tab markiert ist, dann den Studenten Tab markieren
+		if(document.getElementById('tabbox-main').selectedIndex=="0")
+			document.getElementById('tabbox-main').selectedIndex="1";
+
 		// Studenten
 		try
 		{
@@ -237,6 +241,10 @@ function onVerbandSelect(event)
 	// Interessenten / Bewerber
 	try
 	{
+		//Wenn ein anderer Tab markiert ist, dann den Interessenten Tab markieren
+		if(typ!='')
+			document.getElementById('tabbox-main').selectedIndex="0";
+
 		if(stsem=='' && typ=='')
 			stsem='aktuelles';
 		url = "<?php echo APP_ROOT; ?>rdf/interessentenbewerber.rdf.php?"+"studiengang_kz="+stg_kz+"&semester="+sem+"&typ="+typ+"&studiensemester_kurzbz="+stsem+"&"+gettimestamp();

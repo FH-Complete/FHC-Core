@@ -201,7 +201,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     					</row>
     					<row>
 	    					<label value="Semester" control="student-detail-textbox-semester"/>
-      						<hbox><textbox id="student-detail-textbox-semester" disabled="true" maxlength="1" size="1"/></hbox>
+      						<hbox><textbox id="student-detail-textbox-semester" disabled="true" maxlength="2" size="1"/></hbox>
       						<label value="Verband" control="student-detail-textbox-verband"/>
       						<hbox><textbox id="student-detail-textbox-verband" disabled="true" maxlength="1" size="1"/></hbox>
       						<label value="Gruppe" control="student-detail-textbox-gruppe"/>

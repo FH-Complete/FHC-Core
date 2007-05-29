@@ -59,13 +59,28 @@ class student extends benutzer
 			$this->load($uid);
 	}
 
-	function load($uid)
+	// **************************************************
+	// * Laedt die Daten eines Studenten
+	// * Wenn Studiensemester_kurzbz angegeben wird, dann werden
+	// * Studiengang, Semester, Verband und Gruppe aus der Tabelle 
+	// * Studentlehrverband geholt.
+	// * @param uid
+	// * 		studiensemester_kurzbz
+	// * @return true wenn ok, false im Fehlerfall
+	// **************************************************
+	function load($uid, $studiensemester_kurzbz=null)
 	{
 		if(!benutzer::load($uid))
 			return false;
 
-		$qry = "SELECT * FROM public.tbl_student WHERE student_uid='".addslashes($uid)."'";
-
+		if(is_null($studiensemester_kurzbz))
+			$qry = "SELECT * FROM public.tbl_student WHERE student_uid='".addslashes($uid)."'";
+		else
+			$qry = "SELECT *, tbl_studentlehrverband.studiengang_kz as studiengang_kz, tbl_studentlehrverband.semester as semester,
+					tbl_studentlehrverband.verband as verband, tbl_studentlehrverband.gruppe as gruppe  
+					FROM public.tbl_student JOIN public.tbl_studentlehrverband USING(student_uid) 
+					WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND student_uid='".addslashes($uid)."'";
+		
 		if($result = pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
@@ -268,7 +283,9 @@ class student extends benutzer
 		}			
 
 		//$sql_query="SELECT * FROM campus.vw_student WHERE $where ORDER by nachname,vorname";
-		$sql_query = "SELECT *, tbl_student.semester as std_semester, tbl_student.verband as std_verband, tbl_student.gruppe as std_gruppe, tbl_student.studiengang_kz as std_studiengang_kz FROM public.tbl_person, public.tbl_student, ((public.tbl_benutzer LEFT JOIN public.tbl_benutzergruppe USING(uid)) LEFT JOIN public.tbl_studentlehrverband ON(uid = student_uid))
+		$sql_query = "SELECT *, tbl_student.semester as std_semester, tbl_student.verband as std_verband, tbl_student.gruppe as std_gruppe, tbl_student.studiengang_kz as std_studiengang_kz,
+					  tbl_studentlehrverband.studiengang_kz as lvb_studiengang_kz, tbl_studentlehrverband.semester as lvb_semester, tbl_studentlehrverband.verband as lvb_verband, tbl_studentlehrverband.gruppe as lvb_gruppe 
+					  FROM public.tbl_person, public.tbl_student, ((public.tbl_benutzer LEFT JOIN public.tbl_benutzergruppe USING(uid)) LEFT JOIN public.tbl_studentlehrverband ON(uid = student_uid))
 					  WHERE tbl_person.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid = tbl_student.student_uid AND $where ORDER BY nachname, vorname";
 	    //echo $sql_query;
 		if(!($erg=pg_query($this->conn, $sql_query)))
@@ -303,10 +320,10 @@ class student extends benutzer
 			$l->updatevon=(isset($row->updatevon)?$row->updatevon:'');
 			// Studentendaten
 			$l->matrikelnr=$row->matrikelnr;
-			$l->gruppe=$row->std_gruppe;
-			$l->verband=$row->std_verband;
-			$l->semester=$row->std_semester;
-			$l->studiengang_kz=$row->std_studiengang_kz;
+			$l->gruppe=$row->lvb_gruppe;
+			$l->verband=$row->lvb_verband;
+			$l->semester=$row->lvb_semester;
+			$l->studiengang_kz=$row->lvb_studiengang_kz;
 			//$l->stg_bezeichnung=$row->bezeichnung;
 			// student in Array speichern
 			$result[]=$l;

@@ -140,7 +140,7 @@ if($result = pg_query($conn, $qry))
 $xml.='
 	<lehreinheit>
 		<lehreinheit_id>'.$lehreinheit_id.'</lehreinheit_id>
-		<lehrveranstaltung>'.$lehrveranstaltung.'</lehrveranstaltung>
+		<lehrveranstaltung><![CDATA['.$lehrveranstaltung.']]></lehrveranstaltung>
 		<fachbereich>'.$fb_arr[$fachbereich].'</fachbereich>
 		<gruppe>'.trim($grp).'</gruppe>
 		<stunden>'.$stunden.'</stunden>
@@ -184,7 +184,7 @@ $xml.='
 $xml.='
 	<lehreinheit>
 		<lehreinheit_id>'.(isset($lehreinheit_id)?$lehreinheit_id:'').'</lehreinheit_id>
-		<lehrveranstaltung>'.(isset($lehrveranstaltung)?$lehrveranstaltung:'').'</lehrveranstaltung>
+		<lehrveranstaltung><![CDATA['.(isset($lehrveranstaltung)?$lehrveranstaltung:'').']]></lehrveranstaltung>
 		<fachbereich>'.(isset($fachbereich)?$fb_arr[$fachbereich]:'').'</fachbereich>
 		<gruppe>'.trim($grp).'</gruppe>
 		<stunden>'.(isset($stunden)?$stunden:'').'</stunden>
@@ -252,7 +252,7 @@ $proc->importStyleSheet($xsl); // attach the xsl rules
 $buffer = $proc->transformToXml($xml_doc);
 //in $buffer steht nun das xsl-fo file mit den daten
 $buffer = '<?xml version="1.0" encoding="ISO-8859-15" ?>'.substr($buffer, strpos($buffer,"\n"),strlen($buffer));
-$buffer = html_entity_decode($buffer);
+//$buffer = html_entity_decode($buffer);
 //echo "buffer: $buffer";
 
 //Pdf erstellen
