@@ -178,23 +178,25 @@ $xml.='
 		$brutto = $row->semesterstunden*$row->stundensatz*$row->faktor;
 		$last_le=$row->lehreinheit_id;
 	}
-				array_unique($gruppen);
-			foreach ($gruppen as $gruppe)
-				$grp.=$gruppe.' ';
+	array_unique($gruppen);
+	foreach ($gruppen as $gruppe)
+		$grp.=$gruppe.' ';
 $xml.='
 	<lehreinheit>
-		<lehreinheit_id>'.$lehreinheit_id.'</lehreinheit_id>
-		<lehrveranstaltung>'.$lehrveranstaltung.'</lehrveranstaltung>
-		<fachbereich>'.$fb_arr[$fachbereich].'</fachbereich>
+		<lehreinheit_id>'.(isset($lehreinheit_id)?$lehreinheit_id:'').'</lehreinheit_id>
+		<lehrveranstaltung>'.(isset($lehrveranstaltung)?$lehrveranstaltung:'').'</lehrveranstaltung>
+		<fachbereich>'.(isset($fachbereich)?$fb_arr[$fachbereich]:'').'</fachbereich>
 		<gruppe>'.trim($grp).'</gruppe>
-		<stunden>'.$stunden.'</stunden>
-		<satz>'.$satz.'</satz>
-		<faktor>'.$faktor.'</faktor>
-		<brutto>'.number_format($brutto,2,',','.').'</brutto>
+		<stunden>'.(isset($stunden)?$stunden:'').'</stunden>
+		<satz>'.(isset($satz)?$satz:'').'</satz>
+		<faktor>'.(isset($faktor)?$faktor:'').'</faktor>
+		<brutto>'.(isset($brutto)?number_format($brutto,2,',','.'):'').'</brutto>
 	</lehreinheit>';
 
-	$gesamtkosten = $gesamtkosten + $brutto;
-	$gesamtstunden = $gesamtstunden + $stunden;
+	if(isset($brutto))
+		$gesamtkosten = $gesamtkosten + $brutto;
+	if(isset($stunden))
+		$gesamtstunden = $gesamtstunden + $stunden;
 }
 
 // Gesamtstunden und Gesamtkosten
