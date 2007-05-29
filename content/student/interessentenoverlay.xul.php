@@ -31,6 +31,7 @@ echo '<?xml version="1.0" encoding="ISO-8859-15" standalone="yes" ?>';
 
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdetailoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentkontooverlay.xul.php"?>';
 ?>
 <!DOCTYPE overlay >
 
@@ -51,6 +52,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 						<toolbarbutton id="interessent-toolbar-neu" label="Neu" oncommand="InteressentNeu()" disabled="false" image="../skin/images/NeuDokument.png" tooltiptext="Interessent neu anlegen" />
 						<toolbarbutton id="interessent-toolbar-zubewerber" label="-> Bewerber" oncommand="InteressentzuBewerber()" disabled="false" tooltiptext="Interessent zum Bewerber machen" />
 						<toolbarbutton id="interessent-toolbar-zustudent" label="-> Student" oncommand="InteressentzuStudent()" disabled="false" tooltiptext="Bewerber zu Studenten machen" />
+						<toolbarbutton id="interessent-toolbar-buchung" label="Neue Buchung" oncommand="InteressentKontoNeu()" disabled="false" tooltiptext="neue Buchung anlegen"/>
 						<toolbarbutton id="interessent-toolbar-refresh" label="Aktualisieren" oncommand="InteressentTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 						<spacer flex="1"/>
 						<label id="interessent-toolbar-label-anzahl"/>
@@ -61,7 +63,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 				<!-- ************* -->
 				<!-- *  Auswahl  * -->
 				<!-- ************* -->
-				<tree id="interessent-tree" seltype="single" hidecolumnpicker="false" flex="1"
+				<tree id="interessent-tree" seltype="multi" hidecolumnpicker="false" flex="1"
 						datasources="rdf:null" ref="http://www.technikum-wien.at/interessent/alle"
 						onselect="InteressentAuswahl();"
 						flags="dont-build-content"
@@ -168,11 +170,13 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 							<tab id="interessent-tab-detail" label="Details" />
 							<tab id="interessent-tab-prestudent" label="PreStudent" />
 							<tab id="interessent-tab-dokumente" label="Dokumente" />
+							<tab id="interessent-tab-konto" label="Konto" />
 						</tabs>
 						<tabpanels id="interessent-tabpanels-main" flex="1">
 							<vbox id="interessent-detail"  style="margin-top:10px;" />
 							<vbox id="interessent-prestudent"  style="margin-top:10px;" />
 							<vbox id="interessent-dokumente"  style="margin-top:10px;" />
+							<vbox id="interessent-konto"  style="margin-top:10px;" />
 						</tabpanels>
 					</tabbox>				
 				</vbox>

@@ -135,10 +135,12 @@ function StudentTreeRefresh()
 	try
 	{
 		StudentSelectUid=tree.view.getCellText(tree.currentIndex,col);
-		StudentTreeDatasource.Refresh(false); //non blocking
 	}
 	catch(e)
-	{}
+	{
+		StudentSelectUid=null;
+	}
+	StudentTreeDatasource.Refresh(false); //non blocking
 }
 
 // ****
@@ -564,7 +566,7 @@ function StudentAuswahl()
 		return false;
 	}
 
-	var url = '<?php echo APP_ROOT ?>rdf/student.rdf.php?uid='+uid+'&'+gettimestamp();
+	var url = '<?php echo APP_ROOT ?>rdf/student.rdf.php?uid='+uid+'&stsem=true&'+gettimestamp();
 	
 	//hier wird GetDataSourceBlocking verwendet da sich
 	//bei der Methode mit phpRequest der Mozilla aufhaengt

@@ -197,10 +197,12 @@ function LvTreeRefresh()
 	try
 	{
 		LvSelectLehreinheit_id=tree.view.getCellText(tree.currentIndex,col);
-		LvTreeDatasource.Refresh(false); //non blocking
 	}
 	catch(e)
-	{}
+	{
+		LvSelectLehreinheit_id=null;
+	}
+	LvTreeDatasource.Refresh(false); //non blocking
 }
 
 // ****

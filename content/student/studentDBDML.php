@@ -42,6 +42,7 @@ require_once('../../include/studiengang.class.php');
 require_once('../../include/akte.class.php');
 require_once('../../include/konto.class.php');
 require_once('../../include/dokument.class.php');
+require_once('../../include/studiensemester.class.php');
 
 $user = get_uid();
 
@@ -178,10 +179,19 @@ if(!$error)
 				$student->geburtsnation = $_POST['geburtsnation'];
 				$student->sprache = $_POST['sprache'];
 				$student->matrikelnr = $_POST['matrikelnummer'];
-				$student->studiengang_kz = $_POST['studiengang_kz'];
-				$student->semester = $_POST['semester'];
-				$student->verband = ($_POST['verband']==''?' ':$_POST['verband']);
-				$student->gruppe = ($_POST['gruppe']==''?' ':$_POST['gruppe']);
+				
+				$stsem = new studiensemester($conn);
+				$stsem_kurzbz = $stsem->getaktorNext();
+				//Wenn das ausgewaehlte Semester das aktuelle ist, dann wird auch in der
+				//Tabelle Student der Stg/Semester/Verband/Gruppe geaendert.
+				//Sonst nur in der Tabelle Studentlehrverband
+				if($semester_aktuell == $stsem_kurzbz)
+				{
+					$student->studiengang_kz = $_POST['studiengang_kz'];
+					$student->semester = $_POST['semester'];
+					$student->verband = ($_POST['verband']==''?' ':$_POST['verband']);
+					$student->gruppe = ($_POST['gruppe']==''?' ':$_POST['gruppe']);
+				}
 				
 				$student->new=false;				
 

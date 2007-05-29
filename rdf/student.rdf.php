@@ -53,7 +53,7 @@ else
 // Studenten holen
 $student=new student($conn,null,true);
 if (isset($uid))
-	$student->load($uid);
+	$student->load($uid, $stsem);
 else
 	$studenten=$student->getStudents($stg_kz,$sem,$ver,$grp,$gruppe, $stsem);
 

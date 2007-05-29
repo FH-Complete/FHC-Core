@@ -99,6 +99,17 @@ function studiensemesterChange()
    		document.getElementById("statusbarpanel-text").label = "Studiensemester erfolgreich geändert";
    		document.getElementById("statusbarpanel-semester").label = stsem;
    		//MitarbeiterDetailStudiensemester_id = dbdml_errormsg;
+   		//Ansichten Refreshen
+   		try
+   		{
+   			StudentTreeRefresh();
+   			InteressentTreeRefresh();
+   			LvTreeRefresh();
+   		}
+   		catch(e)
+   		{
+   			debug('catch: '+e);
+   		}
    	}
    	else
    	{
