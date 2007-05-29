@@ -17,7 +17,7 @@ function initLektorTree()
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	try
 	{
-		url = '<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php?user=true&'+gettimestamp();
+		url = '<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php?user=true&lektor=true&'+gettimestamp();
 		var LektorTree=document.getElementById('tree-lektor');
 		
 		//Alte DS entfernen
