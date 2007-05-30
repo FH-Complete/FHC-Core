@@ -29,53 +29,106 @@ class betriebsmittelperson
 	var $conn;     			// @var resource DB-Handle
 	var $new;       		// @var boolean
 	var $errormsg;  		// @var string
+	var $result = array();
 	var $done=false;		// @var boolean
 	
 	//Tabellenspalten
 	Var $betriebsmittel_id;	// @var integer
-	var $person_id;		// @var integer
-	var $anmerkung;		// @var string
+	var $person_id;			// @var integer
+	var $anmerkung;			// @var string
 	var $kaution;			// @var numeric(5,2)
-	var $ausgegebenam;	// @var date
-	var $retouram;		// @var date
+	var $ausgegebenam;		// @var date
+	var $retouram;			// @var date
 	var $ext_id;			// @var integer
 	var $insertamum;		// @var timestamp
-	var $insertvon;		// @var bigint
+	var $insertvon;			// @var bigint
 	var $updateamum;		// @var timestamp
-	var $updatevon;		// @var bigint
+	var $updatevon;			// @var bigint
 	
-	/**
-	 * Konstruktor
-	 * @param $conn      Connection
-	 *       
-	 */
-	function betriebsmittelperson($conn,$betriebsmittel_id=null, $unicode=false)
+	// ************************************
+	// * Konstruktor
+	// * @param $conn      Connection
+	// *        $betriebsmittel_id
+	// *        $person_id
+	// *        $unicode
+	// ************************************
+	function betriebsmittelperson($conn,$betriebsmittel_id=null,$person_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		if ($unicode)
+		if($unicode!=null)
 		{
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			if ($unicode)
+			{
+				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			}
+			else 
+			{
+				$qry="SET CLIENT_ENCODING TO 'LATIN9';";
+			}
+			if(!pg_query($conn,$qry))
+			{
+				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
+				return false;
+			}
 		}
-		else 
-		{
-			$qry="SET CLIENT_ENCODING TO 'LATIN9';";
-		}
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-			return false;
-		}
+		if($betriebsmittel_id!=null && $person_id!=null)
+			$this->load($betriebsmittel_id, $person_id);
 	}
 	
-	/**
-	 * Laedt das Betriebsmittel mit der ID $betriebsmittel_id, person_id
-	 * @param  $betriebsmittel_id ID des zu ladenden Betriebsmittels
-	 * @param  $person_id ID der zu ladenden Person
-	 * @return true wenn ok, false im Fehlerfall
-	 */
+	// *********************************************************************
+	// * Laedt das Betriebsmittel mit der ID $betriebsmittel_id, person_id
+	// * @param  $betriebsmittel_id ID des zu ladenden Betriebsmittels
+	// *         $person_id ID der zu ladenden Person
+	// * @return true wenn ok, false im Fehlerfall
+	// *********************************************************************
 	function load($betriebsmittel_id, $person_id)
 	{
-		//noch nicht implementiert
+		if(!is_numeric($betriebsmittel_id))
+		{
+			$this->errormsg = 'Betriebsmittel_id ist ungueltig';
+			return false;
+		}
+		if(!is_numeric($person_id))
+		{
+			$this->errormsg = 'Person_id ist ungueltig';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM public.tbl_betriebsmittel JOIN public.tbl_betriebsmittelperson USING(betriebsmittel_id) 
+				WHERE betriebsmittel_id='$betriebsmittel_id' AND person_id='$person_id'";
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$this->betriebsmittel_id = $row->betriebsmittel_id;
+				$this->beschreibung = $row->beschreibung;
+				$this->betriebsmitteltyp = $row->betriebsmitteltyp;
+				$this->nummer = $row->nummer;
+				$this->reservieren = ($row->reservieren=='t'?true:false);
+				$this->ort_kurzbz = $row->ort_kurzbz;
+				$this->person_id = $row->person_id;
+				$this->anmerkung = $row->anmerkung;
+				$this->kaution = $row->kaution;
+				$this->ausgegebenam = $row->ausgegebenam;
+				$this->retouram = $row->retouram;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->ext_id = $row->ext_id;
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = 'Es wurde kein passender Datensatz gefunden';
+				return false;
+			}
+		}	
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden der Daten';
+			return false;
+		}		
 	}
 	
 	// ************************************************
@@ -88,12 +141,13 @@ class betriebsmittelperson
 	{
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
-	/**
-	 * Speichert den aktuellen Datensatz in die Datenbank	 
-	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
-	 * andernfalls wird der Datensatz mit der ID in $betriebsmittel_id, $person_id aktualisiert
-	 * @return true wenn ok, false im Fehlerfall
-	 */
+	
+	// ******************************************************************************************
+	// * Speichert den aktuellen Datensatz in die Datenbank	 
+	// * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	// * andernfalls wird der Datensatz mit der ID in $betriebsmittel_id, $person_id aktualisiert
+	// * @return true wenn ok, false im Fehlerfall
+	// ******************************************************************************************
 	function save()
 	{
 		$this->done=false;
@@ -197,15 +251,87 @@ class betriebsmittelperson
 		}
 	}
 	
-	/**
-	 * Loescht den Datenensatz mit der ID die uebergeben wird
-	 * @param $betriebsmittel_id ID die geloescht werden soll
-	 * @param $person_id ID die geloescht werden soll
-	 * @return true wenn ok, false im Fehlerfall
-	 */
+	// ********************************************************
+	// * Loescht den Datenensatz mit der ID die uebergeben wird
+	// * @param $betriebsmittel_id ID die geloescht werden soll
+	// * @param $person_id ID die geloescht werden soll
+	// * @return true wenn ok, false im Fehlerfall
+	// ********************************************************
 	function delete($betriebsmittel_id, $person_id)
 	{
-		//noch nicht implementiert!	
+		if(!is_numeric($betriebsmittel_id))
+		{
+			$this->errormsg = 'Betriebsmittel_id ist ungueltig';
+			return false;
+		}
+		
+		if(!is_numeric($person_id))
+		{
+			$this->errormsg = 'Person_id ist ungueltig';
+			return false;
+		}
+		
+		$qry = "DELETE FROM public.tbl_betriebsmittelperson WHERE betriebsmittel_id='$betriebsmittel_id' AND person_id='$person_id'";
+		
+		if(pg_query($this->conn, $qry))
+			return true;
+		else 
+		{
+			$this->errormsg = 'Fehler beim loeschen der Daten';
+			return false;
+		}
+	}
+	
+	// *****************************************
+	// * Laedt alle Betriebsmittel einer Person
+	// * @param person_id, $betriebsmittel_id
+	// * @return true wenn ok, false wenn Fehler
+	// *****************************************
+	function getBetriebsmittelPerson($person_id, $betriebsmitteltyp=null)
+	{
+		if(!is_numeric($person_id))
+		{
+			$this->errormsg = 'Person_id ist ungueltig';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM public.tbl_betriebsmittel JOIN public.tbl_betriebsmittelperson USING(betriebsmittel_id) WHERE person_id='".addslashes($person_id)."'";
+		if(!is_null($betriebsmitteltyp))
+			$qry.=" AND betriebsmitteltyp='".addslashes($betriebsmitteltyp)."'";
+		$qry.=" ORDER BY betriebsmitteltyp, nummer";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$bm = new betriebsmittelperson($this->conn, null, null, null);
+				
+				$bm->betriebsmittel_id = $row->betriebsmittel_id;
+				$bm->beschreibung = $row->beschreibung;
+				$bm->betriebsmitteltyp = $row->betriebsmitteltyp;
+				$bm->nummer = $row->nummer;
+				$bm->reservieren = ($row->reservieren=='t'?true:false);
+				$bm->ort_kurzbz = $row->ort_kurzbz;
+				$bm->person_id = $row->person_id;
+				$bm->anmerkung = $row->anmerkung;
+				$bm->kaution = $row->kaution;
+				$bm->ausgegebenam = $row->ausgegebenam;
+				$bm->retouram = $row->retouram;
+				$bm->insertamum = $row->insertamum;
+				$bm->insertvon = $row->insertvon;
+				$bm->updateamum = $row->updateamum;
+				$bm->updatevon = $row->updatevon;
+				$bm->ext_id = $row->ext_id;
+				
+				$this->result[] = $bm;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden der Daten';
+			return false;
+		}
 	}
 }
 ?>

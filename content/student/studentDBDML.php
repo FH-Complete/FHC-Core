@@ -43,6 +43,7 @@ require_once('../../include/akte.class.php');
 require_once('../../include/konto.class.php');
 require_once('../../include/dokument.class.php');
 require_once('../../include/studiensemester.class.php');
+require_once('../../include/betriebsmittelperson.class.php');
 
 $user = get_uid();
 
@@ -886,6 +887,30 @@ if(!$error)
 			$return = true;
 		else 
 			$return = false;			
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='deletebetriebsmittel')
+	{
+		//Loescht eine Buchung
+		if(isset($_POST['betriebsmittel_id']) && is_numeric($_POST['betriebsmittel_id']) &&
+		   isset($_POST['person_id']) && is_numeric($_POST['person_id']))
+		{
+			$btm = new betriebsmittelperson($conn, null,null, true);
+
+			if($btm->delete($_POST['betriebsmittel_id'], $_POST['person_id']))
+			{
+				$return = true;
+			}
+			else 
+			{
+				$errormsg = $btm->errormsg;
+				$return = false;
+			}
+		}
+		else 
+		{
+			$return = false;
+			$errormsg  = 'Fehlerhafte Parameteruebergabe';
+		}
 	}
 	else
 	{
