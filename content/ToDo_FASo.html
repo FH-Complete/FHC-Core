@@ -1,11 +1,70 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head><title>ToDo FAS-Online</title></head>
+<html>
+<head>
+  <title>ToDo FAS-Online</title>
+</head>
 <body>
 <h1 style="text-align: center;">ToDo Fas-Online</h1>
+Die Liste ist in Module geteilt. Innerhalb eines Moduls erfolgt die
+Auflistung nach Priorit&auml;t (h&ouml;chste oben).
+<h2>Fehler</h2>
+<h3>Listen</h3>
+<ul>
+  <li> Anzahl: Anzahl stimmt nicht immer? </li>
+</ul>
+<h3>Konto</h3>
+<ul>
+  <li> Gegenbuchung: Nur die Differenz gegenbuchen, nicht den
+urspr&uuml;nglichen Betrag. </li>
+  <li> Filter offene Buchungen: Saldo!=0 </li>
+</ul>
+<hr>
+<h2>Dokumente</h2>
+<ul>
+  <li> Zahlungsbest&auml;tigung: Ein Button beim Konto liefert ein PDF
+f&uuml;r die Zahlungsbest&auml;tigung. </li>
+  <li> Inskriptionsbest&auml;tigung: Im Hauptmen&uuml; Dokumente
+w&auml;hlbar. Wenn mehrere Studenten gew&auml;hlt sind, werden mehrere
+Seiten im PDF produziert. </li>
+</ul>
+<hr />
+<h2>Statistik</h2>
+Als Hauptmen&uuml;
+<ul>
+  <li> Koordinatorstunden: Fachbereich muss gew&auml;hlt sein. <br>
+Geliefert wird eine HTML-Seite mit einer &Uuml;bersicht &uuml;ber die
+Stunden der Koordinatoren innerhalb des FB. </li>
+  <li> Lehrauftr&auml;ge: PDF mit allen Lektoren. Studiengang muss
+gew&auml;hlt sein. </li>
+  <li> LV-Planung: HTML mit &Uuml;bersicht der Lehrauftr&auml;ge.
+Studiengang und optional Semester muss gew&auml;hlt sein. </li>
+</ul>
+<hr />
 <h2>Studenten-Modul</h2>
 <ul>
-	<li></li>
+  <li> Import: Studiensemester ist ausw&auml;hlbar. Vorgew&auml;hlt ist
+das n&auml;chste. </li>
+  <li> -&gt;Student: Wenn Bewerber zum Studenten gemacht wird kommt er
+automatisch ins 1. Semester. </li>
+  <li> Lehrverband: In der Liste und in den Details wird die
+Lehrverbandsgruppe des aktiven Studiensemesters angezeigt, nicht die
+aktuelle. (tbl_student_lehrverband) <br>
+Wenn das Studiensemesert das aktuelle ist, wird bei &Auml;nderung auch
+die Tabelle tbl_student ge&auml;ndert. </li>
+  <li> Student/Interessent: Automatische Auswahl des Reiters
+"Studenten" wenn LV-Gruppe gew&auml;hlt wird und der Reiter
+"Interessenten" aktiv ist. Und umgekehrt. </li>
+  <li> Incoming/Outgoing: Zus&auml;tzliche Daten m&uuml;ssen
+gespeichert werden. Karteireiter beim Studenten? </li>
+  <li> Noten: Karteireiter (Tab) f&uuml;r die Notenverwaltung. </li>
+  <li> Betriebsmittel: Karteireiter (Tab) f&uuml;r die Verwaltung der
+Betriebsmittel. </li>
+  <li> Abbrecher/Unterbrecher: Buttons beim Studenten die eine neue
+Rolle anlegen (wie bei -&gt;Bewerber/Interessent). </li>
+  <li> Wunsch: SVNR 4stellig: gesamte Nummer wird dann aus dem
+Geburtsdatum konstruiert. </li>
 </ul>
+<hr />
 <h2>Mitarbeiter-Modul</h2>
 <ul>
   <li style="color: rgb(0, 0, 0);">Login funktioniert nicht beim 1. mal
@@ -14,61 +73,81 @@ wenn Mozilla bereits offen ist</li>
 Oberfl&auml;che integrieren</li>
   <li style="color: rgb(0, 0, 0);">Zeitweise ist das Speichern nicht
 m&ouml;glich Error Code 500.<br>
-</li>
+  </li>
   <li style="color: rgb(0, 0, 0);">Funktionen
 Tree nach dem Aendern eines Datensatzes in der mitte der Liste wird der
-untere Teil der Liste nicht mehr angezeigt ( refresh rebuild problem)</li><li style="color: rgb(0, 0, 0);">Ansicht von Bankverbindungen etc nur f&uuml;r Schaaf / Kazamias</li><li style="color: rgb(0, 0, 0);">Doppelklick auf Funktionen &ouml;ffnet den Bearbeiten Dialog</li>
-  <li style="color: rgb(0, 0, 0);">Beim FunktionenTree bei den Studiengaengen anzeigen ob es B/M/D ist</li><li style="color: rgb(0, 0, 0);">Excel Export soll zus&auml;tzlich die Nation anzeigen</li>
-  <li style="color: rgb(0, 0, 0);">Excel Export soll zus&auml;tzlich die Firma anzeigen wenn die betreffende Person die Zustelladresse in einer Firma hat<br>
+untere Teil der Liste nicht mehr angezeigt ( refresh rebuild problem)</li>
+  <li style="color: rgb(0, 0, 0);">Ansicht von Bankverbindungen etc nur
+f&uuml;r Schaaf / Kazamias</li>
+  <li style="color: rgb(0, 0, 0);">Doppelklick auf Funktionen
+&ouml;ffnet den Bearbeiten Dialog</li>
+  <li style="color: rgb(0, 0, 0);">Beim FunktionenTree bei den
+Studiengaengen anzeigen ob es B/M/D ist</li>
+  <li style="color: rgb(0, 0, 0);">Excel Export soll zus&auml;tzlich
+die Nation anzeigen</li>
+  <li style="color: rgb(0, 0, 0);">Excel Export soll zus&auml;tzlich
+die Firma anzeigen wenn die betreffende Person die Zustelladresse in
+einer Firma hat<br>
   </li>
-
-
-
-
-
 </ul>
-<h2>LV-Modul</h2>
+<b>LVA-Modul</b>
 <ul>
-  <li></li>
+  <li>Bei partizipierung von Lehreinheiten eines anderen Studienganges
+kommt es zu Problemen<br>
+  </li>
+</ul>
+<ul>
 </ul>
 <br>
 <b>FAS V2</b><br>
 <ul>
-	<li style="color: rgb(0, 0, 0);">Bei karrenzierten soll ein Feld
+  <li style="color: rgb(0, 0, 0);">Bei karrenzierten soll ein Feld
 angezeigt werden mit von bis Datum</li>
-	<li style="color: rgb(0, 0, 0);">Absolventen Beendigungsdatum bei
-allen auf einmal setzbar</li><li style="color: rgb(0, 0, 0);">import der Notenliste auch nach LVA moeglich nicht nur nach Lektor</li>
-	<li style="color: rgb(0, 0, 0);">Vorr&uuml;ckung sollte von Assistentinen gemacht werden k&ouml;nnen (Protokoll wer schon vorgerr&uuml;ckt ist)</li>
+  <li style="color: rgb(0, 0, 0);">Absolventen Beendigungsdatum bei
+allen auf einmal setzbar</li>
+  <li style="color: rgb(0, 0, 0);">import der Notenliste auch nach LVA
+moeglich nicht nur nach Lektor</li>
+  <li style="color: rgb(0, 0, 0);">Vorr&uuml;ckung sollte von
+Assistentinen gemacht werden k&ouml;nnen (Protokoll wer schon
+vorgerr&uuml;ckt ist)</li>
 </ul>
-<span style="font-weight: bold;"></span><h2>Erledigte Anforderungen<br>
+<span style="font-weight: bold;"></span>
+<h2>Erledigte Anforderungen<br>
 </h2>
 <ul>
-	<li>
-		Lehrverband: In der Liste und in den Details wird die Lehrverbandsgruppe des aktiven Studiensemesters angezeigt, nicht die aktuelle. (tbl_student_lehrverband)
-		<BR>Wenn das Studiensemesert das aktuelle ist, wird bei Änderung auch die Tabelle tbl_student geändert.<br>
-		29.5.2007 oesi<br>
-	</li>
-	<li>
-		Student/Interessent: Automatische Auswahl des Reiters "Studenten" wenn LV-Gruppe gewählt wird und der Reiter "Interessenten" aktiv ist. Und umgekehrt.<br>
-		29.05.2007 oesi<br>
-	</li>
-  <li style="color: rgb(0, 0, 0);">Neben den Funktionen soll es einen Knopf geben zum anzeigen aller Funktionen (aus allen Studiensemestern)<br>
+  <li> Lehrverband: In der Liste und in den Details wird die
+Lehrverbandsgruppe des aktiven Studiensemesters angezeigt, nicht die
+aktuelle. (tbl_student_lehrverband) <br>
+Wenn das Studiensemesert das aktuelle ist, wird bei &Auml;nderung auch
+die Tabelle tbl_student ge&auml;ndert.<br>
+29.5.2007 oesi<br>
+  </li>
+  <li> Student/Interessent: Automatische Auswahl des Reiters
+"Studenten" wenn LV-Gruppe gew&auml;hlt wird und der Reiter
+"Interessenten" aktiv ist. Und umgekehrt.<br>
+29.05.2007 oesi<br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Neben den Funktionen soll es einen
+Knopf geben zum anzeigen aller Funktionen (aus allen Studiensemestern)<br>
 13.10.2006 Andreas &Ouml;sterreicher<br>
 es wurde bei den funktionen ein Button "alle Anzeigen" hinzugef&uuml;gt.<br>
     <br>
-</li><li style="color: rgb(0, 0, 0);">Mail versenden an markierte Lektoren<br>
+  </li>
+  <li style="color: rgb(0, 0, 0);">Mail versenden an markierte Lektoren<br>
 15.09.2006 Andreas &Ouml;sterreicher<br>
 Mitarbeiter markieren-&gt;rechte Maustaste-&gt;EMail versenden (Falls
 die Mail mit externem Mailclient verschickt werden soll muss die config
 ge&auml;ndert werden)<br>
     <br>
   </li>
-<li style="color: rgb(0, 0, 0);">Beim Speichern der Daten mit Sonderzeichen (+, &amp;, etc.) gehen diese verloren<br>
+  <li style="color: rgb(0, 0, 0);">Beim Speichern der Daten mit
+Sonderzeichen (+, &amp;, etc.) gehen diese verloren<br>
 12.09.2006 Andreas &Ouml;sterreicher<br>
-Vor dem Senden der Daten per XMLHTTPRequest werden die einzelnen Parameter mittels encodeURIComponents codiert.<br>
+Vor dem Senden der Daten per XMLHTTPRequest werden die einzelnen
+Parameter mittels encodeURIComponents codiert.<br>
     <br>
   </li>
-<li style="color: rgb(0, 0, 0);">Beim
+  <li style="color: rgb(0, 0, 0);">Beim
 Anlegen eines neuen Datensatzes Verschwinden bei Fr. Schaaf die anderen
 Mitarbeiter in der Liste<br>
 10.09.2006 Andreas &Ouml;sterreicher<br>
@@ -81,7 +160,6 @@ offen bleiben um die Eingabe korrigieren zu k&ouml;nnen. <br>
 06.07.2006 Andreas &Ouml;sterreicher<br>
     <br>
   </li>
-
   <li style="color: rgb(0, 0, 0);">Beim Speicher pruefen ob uid keine
 Umlaute oder Sonderzeichen enthaelt.<br>
 03.07.2006 Andreas &Ouml;sterreicher<br>
@@ -377,5 +455,5 @@ Fixangestellte m&ouml;glich. Sonst den Neu Button deaktivieren<br>
 erste statische Version implementiert<br>
   </li>
 </ul>
-<br>
-</body></html>
+</body>
+</html>
