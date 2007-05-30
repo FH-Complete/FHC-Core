@@ -33,6 +33,9 @@ var StudentSelectUid=null; //Student der nach dem Refresh markiert werden soll
 var StudentKontoSelectBuchung=null; //Buchung die nach dem Refresh markiert werden soll
 var StudentKontoTreeDatasource; //Datasource des KontoTrees
 var StudentTreeLoadDataOnSelect=true; //Gib an ob beim Selectieren im Tree die Daten geladen werden sollen
+var StudentBetriebsmittelTreeDatasource; //Datasource des BetriebsmittelTrees
+var StudentBetriebsmittelSelectBetriebsmittel_id=null; //Betriebsmittelzurodnung die nach dem Refresh markiert werden soll
+var StudentBetriebsmittelSelectPerson_id=null; //Betriebsmittelzurodnung die nach dem Refresh markiert werden soll
 
 // ********** Observer und Listener ************* //
 
@@ -101,6 +104,41 @@ var StudentKontoTreeListener =
   	  //noch keine values haben. Ab Seamonkey funktionierts auch
   	  //ohne dem setTimeout
       window.setTimeout(StudentKontoTreeSelectBuchung,10);
+  }
+};
+
+
+// ****
+// * Observer fuer Betriebsmittel Tree
+// * startet Rebuild nachdem das Refresh
+// * der datasource fertig ist
+// ****
+var StudentBetriebsmittelTreeSinkObserver =
+{
+	onBeginLoad : function(pSink) {},
+	onInterrupt : function(pSink) {},
+	onResume : function(pSink) {},
+	onError : function(pSink, pStatus, pError) {},
+	onEndLoad : function(pSink)
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		document.getElementById('student-betriebsmittel-tree').builder.rebuild();
+	}
+};
+
+// ****
+// * Nach dem Rebuild wird die Betriebsmittelzuordnung wieder
+// * markiert
+// ****
+var StudentBetriebsmittelTreeListener =
+{
+  willRebuild : function(builder) {  },
+  didRebuild : function(builder)
+  {
+  	  //timeout nur bei Mozilla notwendig da sonst die rows
+  	  //noch keine values haben. Ab Seamonkey funktionierts auch
+  	  //ohne dem setTimeout
+      window.setTimeout(StudentBetriebsmittelTreeSelectZuordnung,10);
   }
 };
 // ***************** KEY Events ************************* //
@@ -553,6 +591,7 @@ function StudentAuswahl()
 			StudentDetailDisableFields(false);
 			StudentPrestudentDisableFields(false);
 			StudentKontoDisableFields(false);
+			StudentBetriebsmittelDisableFields(false);
 			document.getElementById('student-detail-button-save').disabled=false;
 		}
 		else
@@ -736,7 +775,7 @@ function StudentAuswahl()
 	var datasource = rdfService.GetDataSource(url);
 	rollentree.database.AddDataSource(datasource);
 
-	//Konto
+	// *** Konto ***
 	kontotree = document.getElementById('student-konto-tree');
 	filter = document.getElementById('student-konto-button-filter').value;
 	url='<?php echo APP_ROOT;?>rdf/konto.rdf.php?person_id='+person_id+"&filter="+filter+"&"+gettimestamp();
@@ -758,7 +797,7 @@ function StudentAuswahl()
 	StudentKontoTreeDatasource.addXMLSinkObserver(StudentKontoTreeSinkObserver);
 	kontotree.builder.addListener(StudentKontoTreeListener);	
 	
-	//Zeugnis
+	// *** Zeugnis ***
 	zeugnistree = document.getElementById('student-zeugnis-tree');
 	url='<?php echo APP_ROOT;?>rdf/akte.rdf.php?person_id='+person_id+"&dokument_kurzbz=Zeugnis&"+gettimestamp();
 	
@@ -774,6 +813,27 @@ function StudentAuswahl()
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var datasource = rdfService.GetDataSource(url);
 	zeugnistree.database.AddDataSource(datasource);
+	
+	// *** Betriebsmittel ***
+	betriebsmitteltree = document.getElementById('student-betriebsmittel-tree');
+	url='<?php echo APP_ROOT;?>rdf/betriebsmittelperson.rdf.php?person_id='+person_id+"&"+gettimestamp();
+	
+	//Alte DS entfernen
+	var oldDatasources = betriebsmitteltree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		betriebsmitteltree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	betriebsmitteltree.builder.rebuild();
+	
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	StudentBetriebsmittelTreeDatasource = rdfService.GetDataSource(url);
+	StudentBetriebsmittelTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	StudentBetriebsmittelTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	betriebsmitteltree.database.AddDataSource(StudentBetriebsmittelTreeDatasource);
+	StudentBetriebsmittelTreeDatasource.addXMLSinkObserver(StudentBetriebsmittelTreeSinkObserver);
+	betriebsmitteltree.builder.addListener(StudentBetriebsmittelTreeListener);	
 }
 
 // ****
@@ -1316,4 +1376,226 @@ function StudentCreateZeugnis()
 	semester=tree_lvb.view.getCellText(tree_lvb.currentIndex,col);
 		
 	window.open('<?php echo APP_ROOT; ?>content/student/zeugnis.php?uid='+uid+'&studiengang_kz='+studiengang_kz+'&semester='+semester,'Zeugnis', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+
+// ********** Betriebsmittel ******************
+
+// ****
+// * Selectiert die Betriebsmittelzuordnung nachdem der Tree
+// * rebuildet wurde.
+// ****
+function StudentBetriebsmittelTreeSelectZuordnung()
+{
+	var tree=document.getElementById('student-betriebsmittel-tree');
+	if(tree.view)
+		var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+	else
+		return false;
+
+	//In der globalen Variable ist die zu selektierende Buchung gespeichert
+	if(StudentBetriebsmittelSelectBetriebsmittel_id!=null && StudentBetriebsmittelSelectPerson_id!=null)
+	{		
+	   	for(var i=0;i<items;i++)
+	   	{
+	   		//ids der row holen
+			col = tree.columns ? tree.columns["student-betriebsmittel-tree-betriebsmittel_id"] : "student-betriebsmittel-tree-betriebsmittel_id";
+			betriebsmittel_id=tree.view.getCellText(i,col);
+			col = tree.columns ? tree.columns["student-betriebsmittel-tree-person_id"] : "student-betriebsmittel-tree-person_id";
+			person_id=tree.view.getCellText(i,col);
+
+			//wenn dies die zu selektierende Zeile ist
+			if(betriebsmittel_id == StudentBetriebsmittelSelectBetriebsmittel_id && 
+			   person_id == StudentBetriebsmittelSelectPerson_id)
+			{
+				//Zeile markieren
+				tree.view.selection.select(i);
+				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
+				tree.treeBoxObject.ensureRowIsVisible(i);
+				StudentBetriebsmittelSelectBetriebsmittel_id=null;
+				StudentBetriebsmittelSelectPerson_id=null;
+				return true;
+			}
+	   	}
+	}
+}
+
+// ****
+// * Wenn ein Betriebsmittel ausgewaehlt wird, dann
+// * werden die zugehoerigen Details geladen
+// ****
+function StudentBetriebsmittelAuswahl()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-betriebsmittel-tree');
+
+	if (tree.currentIndex==-1) return;
+
+	StudentBetriebsmittelDetailDisableFields(false);
+	
+	document.getElementById('student-betriebsmittel-checkbox-neu').checked=false;
+	
+	//Ausgewaehlte Nr holen
+    var col = tree.columns ? tree.columns["student-betriebsmittel-tree-betriebsmittel_id"] : "student-betriebsmittel-tree-betriebsmittel_id";
+	var betriebsmittel_id=tree.view.getCellText(tree.currentIndex,col);
+	var col = tree.columns ? tree.columns["student-betriebsmittel-tree-person_id"] : "student-betriebsmittel-tree-person_id";
+	var person_id=tree.view.getCellText(tree.currentIndex,col);
+	
+	//Daten holen
+	var url = '<?php echo APP_ROOT ?>rdf/betriebsmittelperson.rdf.php?betriebsmittel_id='+betriebsmittel_id+'&person_id='+person_id+'&'+gettimestamp();
+		
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
+                   getService(Components.interfaces.nsIRDFService);
+    
+    var dsource = rdfService.GetDataSourceBlocking(url);
+    
+	var subject = rdfService.GetResource("http://www.technikum-wien.at/betriebsmittel/"+person_id+'/'+betriebsmittel_id);
+
+	var predicateNS = "http://www.technikum-wien.at/betriebsmittel/rdf";
+
+	//Daten holen
+	person_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#person_id" ));
+	betriebsmittel_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#betriebsmittel_id" ));
+	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
+	kaution = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#kaution" ));
+	ausgegebenam = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ausgegebenam" ));
+	retouram = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#retouram" ));
+	betriebsmitteltyp = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#betriebsmitteltyp" ));
+	nummer = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#nummer" ));
+	beschreibung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#beschreibung" ));
+		
+	document.getElementById('student-betriebsmittel-textbox-person_id').value=person_id;
+	document.getElementById('student-betriebsmittel-textbox-betriebsmittel_id').value=betriebsmittel_id;
+	document.getElementById('student-betriebsmittel-textbox-anmerkung').value=anmerkung;
+	document.getElementById('student-betriebsmittel-textbox-kaution').value=kaution;
+	document.getElementById('student-betriebsmittel-textbox-ausgegebenam').value=ausgegebenam;
+	document.getElementById('student-betriebsmittel-textbox-retouram').value=retouram;
+	document.getElementById('student-betriebsmittel-menulist-betriebsmitteltyp').value=betriebsmitteltyp;
+	document.getElementById('student-betriebsmittel-textbox-nummer').value=nummer;
+	document.getElementById('student-betriebsmittel-textbox-beschreibung').value=beschreibung;
+}
+
+// ****
+// * Aktiviert / Deaktiviert die Betriebsmittel Felder
+// ****
+function StudentBetriebsmittelDisableFields(val)
+{
+	document.getElementById('student-betriebsmittel-button-neu').disabled=val;
+	document.getElementById('student-betriebsmittel-button-loeschen').disabled=val;
+	StudentBetriebsmittelDetailDisableFields(true);
+}
+
+// ****
+// * Aktiviert / Deaktiviert die Betriebsmitteldetail Felder
+// ****
+function StudentBetriebsmittelDetailDisableFields(val)
+{
+	document.getElementById('student-betriebsmittel-menulist-betriebsmitteltyp').disabled=val;
+	document.getElementById('student-betriebsmittel-textbox-nummer').disabled=val;
+	document.getElementById('student-betriebsmittel-textbox-beschreibung').disabled=val;
+	document.getElementById('student-betriebsmittel-textbox-kaution').disabled=val;
+	document.getElementById('student-betriebsmittel-textbox-anmerkung').disabled=val;
+	document.getElementById('student-betriebsmittel-textbox-ausgegebenam').disabled=val;
+	document.getElementById('student-betriebsmittel-textbox-retouram').disabled=val;	
+	document.getElementById('student-betriebsmittel-button-speichern').disabled=val;
+}
+
+// ****
+// * Loescht eine Betriebsmittelzuordnung
+// ****
+function StudentBetriebsmittelDelete()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-betriebsmittel-tree');
+
+	if (tree.currentIndex==-1) return;
+
+	StudentBetriebsmittelDetailDisableFields(false);
+	
+	//Ausgewaehlte Nr holen
+    var col = tree.columns ? tree.columns["student-betriebsmittel-tree-betriebsmittel_id"] : "student-betriebsmittel-tree-betriebsmittel_id";
+	var betriebsmittel_id=tree.view.getCellText(tree.currentIndex,col);
+	var col = tree.columns ? tree.columns["student-betriebsmittel-tree-person_id"] : "student-betriebsmittel-tree-person_id";
+	var person_id=tree.view.getCellText(tree.currentIndex,col);
+	
+	if(confirm('Diesen Eintrag wirklich loeschen?'))
+	{
+		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+		var req = new phpRequest(url,'','');
+		
+		req.add('type', 'deletebetriebsmittel');
+		
+		req.add('betriebsmittel_id', betriebsmittel_id);
+		req.add('person_id', person_id);
+		
+		var response = req.executePOST();
+	
+		var val =  new ParseReturnValue(response)
+		
+		if (!val.dbdml_return)
+		{
+			if(val.dbdml_errormsg=='')
+				alert(response)
+			else
+				alert(val.dbdml_errormsg)
+		}
+		else
+		{			
+			StudentBetriebsmittelTreeDatasource.Refresh(false);
+			SetStatusBarText('Daten wurden gespeichert');
+		}
+	}
+}
+
+// ****
+// * Speichert die Betriebsmittelzuordnung
+// ****
+function StudentBetriebsmittelDetailSpeichern()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	
+	person_id = document.getElementById('student-betriebsmittel-textbox-person_id').value;
+	betriebsmittel_id = document.getElementById('student-betriebsmittel-textbox-betriebsmittel_id').value;
+	anmerkung = document.getElementById('student-betriebsmittel-textbox-anmerkung').value;
+	kaution = document.getElementById('student-betriebsmittel-textbox-kaution').value;
+	ausgegebenam = document.getElementById('student-betriebsmittel-textbox-ausgegebenam').value;
+	retouram = document.getElementById('student-betriebsmittel-textbox-retouram').value;
+	betriebsmitteltyp = document.getElementById('student-betriebsmittel-menulist-betriebsmitteltyp').value;
+	nummer = document.getElementById('student-betriebsmittel-textbox-nummer').value;
+	beschreibung = document.getElementById('student-betriebsmittel-textbox-beschreibung').value;
+	neu = document.getElementById('student-betriebsmittel-checkbox-neu').checked;
+	
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+	
+	req.add('type', 'savebetriebsmittel');
+	
+	req.add('neu', neu);
+	req.add('person_id', person_id);
+	req.add('betriebsmittel_id', betriebsmittel_id);
+	req.add('anmerkung', anmerkung);
+	req.add('kaution', kaution);
+	req.add('ausgegebenam', ausgegebenam);
+	req.add('retouram', retouram);
+	req.add('betriebsmitteltyp', betriebsmitteltyp);
+	req.add('nummer', nummer);
+	req.add('beschreibung', beschreibung);
+	
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+	
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+	}
+	else
+	{			
+		StudentBetriebsmittelSelectBetriebsmittel_id=betriebsmittel_id;
+		StudentBetriebsmittelSelectPerson_id=person_id;
+		StudentBetriebsmittelTreeDatasource.Refresh(false); //non blocking
+		SetStatusBarText('Daten wurden gespeichert');
+	}
 }

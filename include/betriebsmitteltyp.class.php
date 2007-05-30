@@ -27,62 +27,91 @@
 
 class betriebsmitteltyp
 {
-	var $conn;     				// resource DB-Handle
+	var $conn;     			// resource DB-Handle
 	var $errormsg; 			// string
-	var $new;      				// boolean
-	//var $schluesseltyp = array(); 	// schluesseltyp Objekt
+	var $new;      			// boolean
+	var $result = array();
 	
 	//Tabellenspalten
-	var $betriebsmitteltyp;			//string
-	var $beschreibung;   		//string
-	var $anzahl; 				//smallint
-	var $kaution;				//numeric(5,2)
+	var $betriebsmitteltyp;	//string
+	var $beschreibung;   	//string
+	var $anzahl; 			//smallint
+	var $kaution;			//numeric(5,2)
 	
-	/**
-	 * Konstruktor
-	 * @param $conn      Connection
-	 *        $code      Zu ladende Betriebsmitteltyp
-	 */
-	function betriebsmitteltyp($conn, $code=null, $unicode=false)
+	// ************************************************
+	// * Konstruktor
+	// * @param $conn Connection zur DB
+	// *        $betriebsmitteltyp
+	// ************************************************
+	function betriebsmitteltyp($conn, $betriebsmitteltyp=null, $unicode=false)
 	{
 		$this->conn = $conn;
 		
-		if($unicode)
-			$qry 			= "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
-			$qry 			= "SET CLIENT_ENCODING TO 'LATIN9';";
-			
-		if(!pg_query($conn,$qry))
+		if($unicode!=null)
 		{
-			$this->errormsg	= 'Encoding konnte nicht gesetzt werden';
-			return false;
+			if($unicode)
+				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			else 
+				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+				
+			if(!pg_query($conn,$qry))
+			{
+				$this->errormsg	= 'Encoding konnte nicht gesetzt werden';
+				return false;
+			}
 		}
+		
+		if($betriebsmitteltyp!=null)
+			$this->load($betriebsmitteltyp);
 	}
-	
-	
-	/**
-	 * Laedt die Funktion mit der ID $betriebsmitteltyp
-	 * @param  $code code des zu ladenden  betriebsmitteltyps
-	 * @return true wenn ok, false im Fehlerfall
-	 */
+		
+	// *******************************************************
+	// * Laedt die Funktion mit der ID $betriebsmitteltyp
+	// * @param  $betriebsmitteltyp
+	// * @return true wenn ok, false im Fehlerfall
+	// ********************************************************
 	function load($code)
 	{			
 		$this->errormsg 		= 'Noch nicht implementiert';
 		return false;
 	}
 	
-	/**
-	 * Laedt alle betriebsmitteltypen
-	 */
+	// *****************************************
+	// * Laedt alle betriebsmitteltypen
+	// * @return true wenn ok, false wenn Fehler
+	// *****************************************
 	function getAll()
 	{
-		$this->errormsg 		= 'Noch nicht implementiert';
-		return false;
+		$qry = "SELECT * FROM public.tbl_betriebsmitteltyp ORDER BY betriebsmitteltyp";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$bmt = new betriebsmitteltyp($this->conn, null, null);
+				
+				$bmt->betriebsmitteltyp = $row->betriebsmitteltyp;
+				$bmt->beschreibung = $row->beschreibung;
+				$bmt->anzahl = $row->anzahl;
+				$bmt->kaution = $row->kaution;
+				
+				$this->result[] = $bmt;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden der Daten';
+			return false;
+		}
 	}
+	
+	
 	function addslashes($var)
 	{
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
+	
 	// ************************************************************
 	// * Speichert die Daten in die Datenbank
 	// * @return true wenn erfolgreich, false im Fehlerfall
