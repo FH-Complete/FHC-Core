@@ -8,7 +8,7 @@
 	require_once('../../../vilesci/config.inc.php');
 	require_once('../../../include/lehrveranstaltung.class.php');
 	//$adress='fas_sync@technikum-wien.at';
-	$adress='oesi@technikum-wien.at';
+	//$adress='oesi@technikum-wien.at';
 
 	$conn=pg_connect(CONN_STRING);
 	$conn_fas=pg_connect(CONN_STRING_FAS);
@@ -252,6 +252,11 @@
 								$update_error++;
 							}
 						}
+						else 
+						{
+							synctabentry($row_found->lehrveranstaltung_id, $row_fas_alle->lehrveranstaltung_pk);
+							$text.="SYNC-Eintrag wurde angelegt!\n";
+						}
 					}
 					else
 					{
@@ -291,6 +296,11 @@
 									$text.="Fehler beim Update einer LVA: $qry\n";
 									$update_error++;
 								}
+							}
+							else 
+							{
+								synctabentry($row_found->lehrveranstaltung_id, $row_fas_alle->lehrveranstaltung_pk);
+								$text.="SYNC-Eintrag wurde angelegt!\n";
 							}
 						}
 						else
@@ -440,10 +450,10 @@
 
 	$text.="\nEND OF SYNCHRONISATION\n";
 
-	if (mail($adress,"FAS - Vilesci (Lehrveranstaltungen)",$headtext."\n\n".$text,"From: vilesci@technikum-wien.at"))
+	/*if (mail($adress,"FAS - Vilesci (Lehrveranstaltungen)",$headtext."\n\n".$text,"From: vilesci@technikum-wien.at"))
 		$sendmail=true;
 	else
-		$sendmail=false;
+		$sendmail=false;*/
 ?>
 
 <html>
@@ -453,10 +463,11 @@
 </head>
 <body>
 <?php
-if ($sendmail)
+
+/* ($sendmail)
 	echo 'Mail wurde verschickt an '.$adress.'!<br>';
 else
-	echo "Mail konnte nicht verschickt werden!<br>";
+	echo "Mail konnte nicht verschickt werden!<br>";*/
 echo nl2br($headtext);
 echo "<br><br>";
 echo nl2br($text);

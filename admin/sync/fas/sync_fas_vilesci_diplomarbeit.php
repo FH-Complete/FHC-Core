@@ -72,6 +72,8 @@ $text6='';
 $text7='';
 $text8='';
 
+$noz=0;
+
 
 function myaddslashes($var)
 {
@@ -91,7 +93,7 @@ function myaddslashes($var)
 <body>
 <?php
 //nation
-$qry = "SELECT * FROM diplomarbeit WHERE mitarbeiter_fk IS NOT NULL AND diplomarbeitsdatum IS NOT NULL AND mitarbeiter_fk>0;";
+$qry = "SELECT * FROM diplomarbeit WHERE diplomarbeitsdatum IS NOT NULL;";
 
 if($result = pg_query($conn_fas, $qry))
 {
@@ -644,6 +646,10 @@ if($result = pg_query($conn_fas, $qry))
 								       " WHERE lehreinheit_id=".myaddslashes($lehreinheitlehreinheit_id).";";
 								       $ausgabe.="Lehreinheit aktualisiert bei Lehrveranstaltung='".$lehreinheitlehrveranstaltung_id."', Studiensemester='".$lehreinheitstudiensemester_kurzbz."' und Lehrfach='".$lehreinheitlehrfach_id."':.$ausgabe_le.\n";
 							}
+							else 
+							{
+								$qry="SELECT * FROM lehre.tbl_lehreinheit;";
+							}
 						}
 						
 						if(!pg_query($conn,$qry))
@@ -967,6 +973,10 @@ if($result = pg_query($conn_fas, $qry))
 									'WHERE projektarbeit_id='.myaddslashes($projektarbeitprojektarbeit_id).';';
 									$ausgabe.="Projektarbeit aktualisiert: Student='".$projektarbeitstudent_uid."' und Lehreinheit='".$projektarbeitlehreinheit_id."':".$ausgabe_pa.".\n";
 								}
+								else 
+								{
+									$qry="SELECT * FROM lehre.tbl_projektarbeit;";
+								}
 							}
 							//echo $qry;
 							if(pg_query($conn,$qry))
@@ -1002,7 +1012,7 @@ if($result = pg_query($conn_fas, $qry))
 							}
 							if(!$error)
 							{
-								$qry="SELECT person_fk FROM mitarbeiter WHERE mitarbeiter_pk='".$row->mitarbeiter_fk."';";
+								/*$qry="SELECT person_fk FROM mitarbeiter WHERE mitarbeiter_pk='".$row->mitarbeiter_fk."';";
 								if($resultu = pg_query($conn_fas, $qry))
 								{
 									if($rowu=pg_fetch_object($resultu))
@@ -1027,8 +1037,9 @@ if($result = pg_query($conn_fas, $qry))
 										$error=true;
 										$error_log.="Betreuer mit person_fk: ".$person." konnte in syncperson nicht gefunden werden.\n";
 									}
-								}
+								}*/
 								//ERSTBEGUTACHTER
+								$projektbetreuerperson_id			=$row->vilesci_erstbegutachter;
 								$projektbetreuerprojektarbeit_id		=$projektarbeitprojektarbeit_id;
 								//$projektbetreuernote			=$row->noteerstbegutachter;
 								$projektbetreuerbetreuerart		='Erstbegutachter';  
@@ -1230,6 +1241,10 @@ if($result = pg_query($conn_fas, $qry))
 										
 										
 									}
+									else 
+									{
+										$qry="SELECT * FROM lehre.tbl_projektbetreuer;";
+									}
 								}
 								//echo nl2br ($qry."\n");
 								if(pg_query($conn,$qry))
@@ -1249,7 +1264,7 @@ if($result = pg_query($conn_fas, $qry))
 								
 								if(!$error)
 								{
-									if(trim($row->vilesci_zweitbegutachter)!='' && trim($row->vilesci_zweitbegutachter)!=NULL)
+									if(trim($row->vilesci_zweitbegutachter)!='')
 									{
 										//ZWEITBEGUTACHTER
 										$projektbetreuerperson_id			=$row->vilesci_zweitbegutachter;
@@ -1450,9 +1465,11 @@ if($result = pg_query($conn_fas, $qry))
 												'insertvon='.myaddslashes($projektbetreuerinsertvon).', '.
 												'updateamum= now(), '.
 											     	'updatevon='.myaddslashes($projektbetreuerupdatevon).' '.
-												"WHERE projektarbeit_id='".$projektbetreuerprojektarbeit_id."' AND person_id='".$projektbetreuerperson_id."'AND betreuerart='Erstbegutachter';";
-												
-												
+												"WHERE projektarbeit_id='".$projektbetreuerprojektarbeit_id."' AND person_id='".$projektbetreuerperson_id."'AND betreuerart='Zweitbegutachter';";
+											}
+											else 
+											{
+												$qry="SELECT * FROM lehre.tbl_projektbetreuer;";
 											}
 										}
 										//echo nl2br ($qry."\n");
@@ -1503,6 +1520,10 @@ if($result = pg_query($conn_fas, $qry))
 											$ausgabe_all.=$ausgabe;
 											$ausgabe='';
 										}
+									}
+									else 
+									{
+										$noz++;
 									}
 								}
 								else 
@@ -1607,7 +1628,7 @@ echo nl2br("Lehrveranstaltungen:       Gesamt: ".$anzahl_lv_gesamt." / Eingefügt
 echo nl2br("Lehreinheiten:       Gesamt: ".$anzahl_le_gesamt." / Eingefügt: ".$anzahl_le_insert." / Geändert: ".$anzahl_le_update." / Fehler: ".$anzahl_fehler_le."\n");
 echo nl2br("Projektarbeiten:   Gesamt: ".$anzahl_pa_gesamt." / Eingefügt: ".$anzahl_pa_insert." / Geändert: ".$anzahl_pa_update." / Fehler: ".$anzahl_fehler_pa."\n");
 echo nl2br("Begutachter1:  Gesamt: ".$anzahl_pbg_gesamt." / Eingefügt: ".$anzahl_pbg_insert." / Geändert: ".$anzahl_pbg_update." / Fehler: ".$anzahl_fehler_pbg."\n");
-echo nl2br("Begutachter2:  Gesamt: ".$anzahl_pbg2_gesamt." / Eingefügt: ".$anzahl_pbg2_insert." / Geändert: ".$anzahl_pbg2_update." / Fehler: ".$anzahl_fehler_pbg2."\n\n");
+echo nl2br("Begutachter2:  Gesamt: ".$anzahl_pbg2_gesamt." / Eingefügt: ".$anzahl_pbg2_insert." / Geändert: ".$anzahl_pbg2_update." / Fehler: ".$anzahl_fehler_pbg2." / kein Zweitbetreuer: ".$noz."\n\n");
 echo nl2br($error_log_fas."\n--------------------------------------------------------------------------------\n");
 echo nl2br($ausgabe_all);
 

@@ -563,6 +563,10 @@ if($result = pg_query($conn_fas, $qry_main))
 								       " WHERE lehreinheit_id=".myaddslashes($lehreinheitlehreinheit_id).";";
 								       $ausgabe.="Lehreinheit aktualisiert bei Lehrveranstaltung='".$lehreinheitlehrveranstaltung_id."', Studiensemester='".$lehreinheitstudiensemester_kurzbz."' und Lehrfach='".$lehreinheitlehrfach_id."':.$ausgabe_le.\n";
 							}
+							else 
+							{
+								$qry="SELECT * FROM lehre.tbl_lehreinheit;";
+							}
 						}
 						
 						if(!pg_query($conn,$qry))
@@ -874,6 +878,10 @@ if($result = pg_query($conn_fas, $qry_main))
 									'WHERE projektarbeit_id='.myaddslashes($projektarbeitprojektarbeit_id).';';
 									$ausgabe.="Projektarbeit aktualisiert: Student='".$projektarbeitstudent_uid."' und Lehreinheit='".$projektarbeitlehreinheit_id."':".$ausgabe_pa.".\n";
 								}
+								else 
+								{
+									$qry="SELECT * FROM lehre.tbl_projektarbeit;";
+								}
 							}
 							//echo $qry;
 							if(pg_query($conn,$qry))
@@ -1114,6 +1122,10 @@ if($result = pg_query($conn_fas, $qry_main))
 										"WHERE projektarbeit_id='".$projektbetreuerprojektarbeit_id."' AND person_id='".$projektbetreuerperson_id."'AND betreuerart='Betreuer';";
 										
 										
+									}
+									else 
+									{
+										$qry="SELECT * FROM lehre.tbl_projektbetreuer;";
 									}
 								}
 								//echo nl2br ($qry."\n");
@@ -1366,6 +1378,10 @@ if($result = pg_query($conn_fas, $qry_main))
 										     	'updatevon='.myaddslashes($projektbetreuerupdatevon).' '.
 											"WHERE projektarbeit_id='".$projektbetreuerprojektarbeit_id."' AND person_id='".$projektbetreuerperson_id."' AND betreuerart_kurzbz='Begutachter';";
 											
+										}
+										else 
+										{
+											$qry="SELECT * FROM lehre.tbl_projektbetreuer;";
 										}	
 									}
 									//echo nl2br($qry."\n");

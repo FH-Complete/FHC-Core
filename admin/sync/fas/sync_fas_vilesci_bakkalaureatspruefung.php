@@ -384,6 +384,10 @@ if($result = pg_query($conn_fas, $qry_main))
 							$ausgabe.="Abschlussprüfung von Student mit UID '".$student_uid."' geändert: ".$ausgabe1."\n;";
 							$anzahl_geaendert++;
 					}
+					else 
+					{
+						$qry="SELECT * FROM lehre.tbl_abschlusspruefung;";
+					}
 				}
 				else 
 				{
