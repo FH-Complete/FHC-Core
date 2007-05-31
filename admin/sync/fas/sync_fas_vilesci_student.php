@@ -1149,6 +1149,10 @@ if($result = pg_query($conn_fas, $qry))
 						       ' WHERE person_id='.myaddslashes($person_id).';';
 						       $ausgabe_person="Änderungen bei Person ".$nachname." ".$vorname.": ".$ausgabe_person."\n";
 					}
+					else 
+					{
+						$qry="SELECT * FROM public.tbl_person;";
+					}
 				}
 			}
 		}
@@ -1566,6 +1570,10 @@ if($result = pg_query($conn_fas, $qry))
 							       ' ext_id='.myaddslashes($ext_id_pre).
 							       ' WHERE prestudent_id='.myaddslashes($prestudent_id).';';
 							       $ausgabe_pre="Änderungen bei Prestudent mit person_id '".$person_id."', ('".$prestudent_id."'), ".$nachname.": ".$ausgabe_pre."\n";
+						}
+						else 
+						{
+							$qry="SELECT * FROM public.tbl_prestudent;";
 						}
 					}
 				}
@@ -2032,6 +2040,10 @@ if($result = pg_query($conn_fas, $qry))
 									       " WHERE person_id='$person_id' AND uid='$student_uid'";
 									       $ausgabe_benutzer="Änderungen bei Benutzer ".$student_uid." ".$alias.": ".$ausgabe_benutzer.".\n";
 								}
+								else 
+								{
+									$qry="SELECT * FROM public.tbl_benutzer;";
+								}
 							}
 						}
 					}
@@ -2227,6 +2239,10 @@ if($result = pg_query($conn_fas, $qry))
 										       ' ext_id='.myaddslashes($ext_id_student).
 										       $student_where;
 										       $ausgabe_student="Änderungen bei Student ".$student_uid.", ".$nachname.", (".$matrikelnr."): ".$ausgabe_student.".\n";
+									}
+									else 
+									{
+										$qry="SELECT * FROM public.tbl_student;";
 									}
 								}
 							}

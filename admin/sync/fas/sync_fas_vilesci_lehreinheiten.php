@@ -17,8 +17,8 @@ require_once('../../../vilesci/config.inc.php');
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
-//$adress='ruhan@technikum-wien.at';
-$adress='fas_sync@technikum-wien.at';
+$adress='ruhan@technikum-wien.at';
+//$adress='fas_sync@technikum-wien.at';
 
 $error_log='';
 $text = '';
@@ -97,7 +97,7 @@ if($result = pg_query($conn_fas, $qry_main))
 			else 
 			{
 				$error=true;
-				$error_log.="LVA_FAS=".$row->lehrveranstaltung_fk." in Tabelle tbl_synclehrveranstaltung nicht gefunden:\n";
+				$error_log.="LVA_FAS=".$row->lehrveranstaltung_fk." in Tabelle tbl_synclehrveranstaltung nicht gefunden!\n";
 			}
 		}
 		if($error)
@@ -164,7 +164,7 @@ if($result = pg_query($conn_fas, $qry_main))
 			continue;
 		}
 		//lehrfach ermitteln
-		$qry="SELECT lehrfach_id FROM lehre.tbl_lehrfach WHERE fachbereich_kurzbz='".$row->fachbereich_kurzbz."' AND semester='".$row->semester."' AND studiengang_kz='".$studiengang_kz."';";
+		$qry="SELECT lehrfach_id FROM lehre.tbl_lehrfach WHERE fachbereich_kurzbz='".$fachbereich_kurzbz."' AND semester='".$semester."' AND studiengang_kz='".$studiengang_kz."';";
 		if($resulto = pg_query($conn, $qry))
 		{
 			if($rowo=pg_fetch_object($resulto))
