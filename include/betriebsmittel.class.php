@@ -29,6 +29,7 @@ class betriebsmittel
 	var $conn;     			// @var resource DB-Handle
 	var $new;       		// @var boolean
 	var $errormsg;  		// @var string
+	var $result;
 	var $done=false;		// @var boolean
 	
 	//Tabellenspalten
@@ -66,14 +67,58 @@ class betriebsmittel
 		}
 	}
 	
-	/**
-	 * Laedt das Betriebsmittel mit der ID $betriebsmittel_id
-	 * @param  $betriebsmittel_id ID des zu ladenden Betriebsmittel
-	 * @return true wenn ok, false im Fehlerfall
-	 */
+	// **************************************************************
+	// * Laedt das Betriebsmittel mit der ID $betriebsmittel_id
+	// * @param  $betriebsmittel_id ID des zu ladenden Betriebsmittel
+	// * @return true wenn ok, false im Fehlerfall
+	// ***************************************************************
 	function load($betriebsmittel_id)
 	{
-		//noch nicht implementiert
+		if(!is_numeric($betriebsmittel_id))
+		{
+			$this->errormsg = 'Betriebsmittel_id ist ungueltig';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM public.tbl_betriebsmittel WHERE betriebsmittel_id='$betriebsmittel_id'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$this->betriebsmittel_id = $row->betriebsmittel_id;
+				$this->beschreibung = $row->beschreibung;
+				$this->betriebsmitteltyp = $row->betriebsmitteltyp;
+				$this->nummer = $row->nummer;
+				$this->reservieren = ($row->reservieren=='t'?true:false);
+				$this->ort_kurzbz = $row->ort_kurzbz;
+				$this->updateamum = $row->updateamum;
+				$this->udpatevon = $row->updatevon;
+				$this->insertvon = $row->insertvon;
+				$this->insertamum = $row->insertamum;
+				$this->ext_id = $row->ext_id;
+				return true;				
+			}
+			else 
+			{
+				$this->errormsg = 'Betriebsmittel wurde nicht gefunden';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden der Daten';
+			return false;
+		}
+	}
+	
+	// *************************************
+	// * Prueft die Daten vor dem Speichern 
+	// * auf Gueltigkeit
+	// *************************************
+	function validate()
+	{
+		return true;
 	}
 	
 	// ************************************************
@@ -86,23 +131,26 @@ class betriebsmittel
 	{
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
-	/**
-	 * Speichert den aktuellen Datensatz in die Datenbank	 
-	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
-	 * andernfalls wird der Datensatz mit der ID in $betriebsmittel_id aktualisiert
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	function save()
+	
+	// *******************************************************************************
+	// * Speichert den aktuellen Datensatz in die Datenbank	 
+	// * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	// * andernfalls wird der Datensatz mit der ID in $betriebsmittel_id aktualisiert
+	// * @return true wenn ok, false im Fehlerfall
+	// *******************************************************************************
+	function save($new=null)
 	{
-		$this->done=false;
-			
-		if($this->new)
+		if($new==null)
+			$new=$this->new;
+		
+		if(!$this->validate())
+			return false;
+		
+		if($new)
 		{
-			//Neuen Datensatz einfuegen
-					
-			$qry='INSERT INTO public.tbl_betriebsmittel (betriebsmittel_id, beschreibung, betriebsmitteltyp, nummer, reservieren, ort_kurzbz,
+			//Neuen Datensatz einfuegen					
+			$qry='INSERT INTO public.tbl_betriebsmittel (beschreibung, betriebsmitteltyp, nummer, reservieren, ort_kurzbz,
 				ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
-			     $this->addslashes($this->betriebsmittel_id).', '.
 			     $this->addslashes($this->beschreibung).', '.
 			     $this->addslashes($this->betriebsmitteltyp).', '.
 			     $this->addslashes($this->nummer).', '.
@@ -115,71 +163,53 @@ class betriebsmittel
 		}
 		else
 		{			
-			$qryz="SELECT * FROM public.tbl_betriebsmittel WHERE betriebsmittel_id='$this->betriebsmittel_id';";
-			if($resultz = pg_query($this->conn, $qryz))
+			if(!is_numeric($this->betriebsmittel_id))
 			{
-				while($rowz = pg_fetch_object($resultz))
+				$this->errormsg = 'Betriebsmittel_id muss eine gueltige Zahl sein';
+				return false;
+			}
+			
+			$qry='UPDATE public.tbl_betriebsmittel SET '.
+				'betriebsmitteltyp='.$this->addslashes($this->betriebsmitteltyp).', '. 
+				'beschreibung='.$this->addslashes($this->beschreibung).', '. 
+				//'nummer='.$this->addslashes($this->nummer).', '.  
+				'reservieren='.($this->reservieren?'true':'false').', '.
+				'ort_kurzbz='.$this->addslashes($this->ort_kurzbz).', '.
+				'ext_id='.$this->addslashes($this->ext_id).', '. 
+			     	'updateamum= now(), '.
+			     	'updatevon='.$this->addslashes($this->updatevon).' '.
+				'WHERE betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).';';
+		}
+		
+		if(pg_query($this->conn, $qry))
+		{
+			if($new)
+			{
+				$qry = "SELECT currval('public.tbl_betriebsmittel_betriebsmittel_id_seq') as id;";
+				if($result = pg_query($this->conn, $qry))
 				{
-					$update=false;			
-					if($rowz->beschreibung!=$this->beschreibung) 			$update=true;
-					if($rowz->betriebsmitteltyp!=$this->betriebsmitteltyp)		$update=true;
-					//if($rowz->nummer!=$this->nummer)				$update=true;
-					if($rowz->reservieren!=$this->reservieren)			$update=true;
-					if($rowz->ort_kurzbz!=$this->ort_kurzbz)				$update=true;
-				
-					if($update)
+					if($row = pg_fetch_object($result))
 					{
-						$qry='UPDATE public.tbl_betriebsmittel SET '.
-							'betriebsmitteltyp='.$this->addslashes($this->betriebsmitteltyp).', '. 
-							'beschreibung='.$this->addslashes($this->beschreibung).', '. 
-							//'nummer='.$this->addslashes($this->nummer).', '.  
-							'reservieren='.($this->reservieren?'true':'false').', '.
-							'ort_kurzbz='.$this->addslashes($this->ort_kurzbz).', '.
-							'ext_id='.$this->addslashes($this->ext_id).', '. 
-						     	'updateamum= now(), '.
-						     	'updatevon='.$this->addslashes($this->updatevon).' '.
-							'WHERE betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).';';
-							$this->done=true;
+						$this->betriebsmittel_id = $row->id;
+					}
+					else 
+					{
+						$this->errormsg = 'Fehler beim lesen der Sequence';
+						return false;
 					}
 				}
-			}
-			else 
-			{
-				return false;
-			}
-		}
-		if ($this->done)
-		{
-			if(pg_query($this->conn, $qry))
-			{
-				//Log schreiben
-				/*$sql = $qry;
-				$qry = "SELECT nextval('log_seq') as id;";
-				if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
-				{
-					$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
-					return false;
-				}
-							
-				$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
-				if(pg_query($this->conn, $qry))
-					return true;
 				else 
 				{
-					$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
+					$this->errormsg = 'Fehler beim lesen der Sequence';
 					return false;
-				}	*/
-				return true;		
+				}
 			}
-			else 
-			{
-				$this->errormsg = "*****\nFehler beim Speichern des Betriebsmittel-Datensatzes: ID:".$this->betriebsmittel_id." Schlüsseltyp: ".$this->betriebsmitteltyp."\n".$qry."\n".pg_errormessage($this->conn)."\n*****\n";
-				return false;
-			}
+			return true;
 		}
 		else 
 		{
-			return true;
+			$this->errormsg = "Fehler beim Speichern des Betriebsmittel-Datensatzes";
+			return false;
 		}
 	}
 	
@@ -191,6 +221,38 @@ class betriebsmittel
 	function delete($betriebsmittel_id)
 	{
 		//noch nicht implementiert!	
+	}
+	
+	function getBetriebsmittel($betriebsmitteltyp, $nummer)
+	{
+		$qry = "SELECT * FROM public.tbl_betriebsmittel WHERE betriebsmitteltyp='".addslashes($betriebsmitteltyp)."' AND nummer='".addslashes($nummer)."' ORDER BY updateamum DESC";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$bm = new betriebsmittel($this->conn, null, null);
+				
+				$bm->betriebsmittel_id = $row->betriebsmittel_id;
+				$bm->beschreibung = $row->beschreibung;
+				$bm->betriebsmitteltyp = $row->betriebsmitteltyp;
+				$bm->nummer = $row->nummer;
+				$bm->reservieren = $row->reservieren;
+				$bm->ort_kurzbz = $row->ort_kurzbz;
+				$bm->updateamum = $row->updateamum;
+				$bm->updatevon = $row->updatevon;
+				$bm->insertamum = $row->insertamum;
+				$bm->insertvon = $row->insertvon;
+				
+				$this->result[] = $bm;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden der Daten';
+			return false;
+		}
 	}
 }
 ?>

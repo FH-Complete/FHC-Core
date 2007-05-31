@@ -951,7 +951,7 @@ function StudentAnmeldungreihungstestHeute()
 	var now = new Date();
 	var jahr = now.getFullYear();
 	
-	monat = now.getMonth();
+	monat = now.getMonth()+1;
 	if(monat<10) monat='0'+monat;
 	tag = now.getDate();
 	if(tag<10) tag='0'+tag;
@@ -1497,6 +1497,34 @@ function StudentBetriebsmittelDetailDisableFields(val)
 	document.getElementById('student-betriebsmittel-textbox-ausgegebenam').disabled=val;
 	document.getElementById('student-betriebsmittel-textbox-retouram').disabled=val;	
 	document.getElementById('student-betriebsmittel-button-speichern').disabled=val;
+	
+	if(val)
+		StudentBetriebsmittelDetailResetFields();
+}
+
+// ****
+// * Resetet die Betriebsmitteldetail Felder
+// ****
+function StudentBetriebsmittelDetailResetFields()
+{
+	var now = new Date();
+	var jahr = now.getFullYear();
+	
+	var monat = now.getMonth()+1;
+	
+	if(monat<10) 
+		monat='0'+monat;
+	var tag = now.getDate();
+	if(tag<10) 
+		tag='0'+tag;
+	
+	document.getElementById('student-betriebsmittel-menulist-betriebsmitteltyp').value='Zutrittskarte';
+	document.getElementById('student-betriebsmittel-textbox-nummer').value='';
+	document.getElementById('student-betriebsmittel-textbox-beschreibung').value='';
+	document.getElementById('student-betriebsmittel-textbox-kaution').value='';
+	document.getElementById('student-betriebsmittel-textbox-anmerkung').value='';
+	document.getElementById('student-betriebsmittel-textbox-ausgegebenam').value=jahr+'-'+monat+'-'+tag;
+	document.getElementById('student-betriebsmittel-textbox-retouram').value='';	
 }
 
 // ****
@@ -1593,9 +1621,63 @@ function StudentBetriebsmittelDetailSpeichern()
 	}
 	else
 	{			
-		StudentBetriebsmittelSelectBetriebsmittel_id=betriebsmittel_id;
+		StudentBetriebsmittelSelectBetriebsmittel_id=val.dbdml_data;
 		StudentBetriebsmittelSelectPerson_id=person_id;
 		StudentBetriebsmittelTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
+	}
+}
+
+// ****
+// * Neues Betriebsmittel anlegen
+// ****
+function StudentBetriebsmittelNeu()
+{
+	document.getElementById('student-betriebsmittel-checkbox-neu').checked=true;
+	StudentBetriebsmittelDetailDisableFields(false);
+	StudentBetriebsmittelDetailResetFields();
+	document.getElementById('student-betriebsmittel-textbox-person_id').value = document.getElementById('student-prestudent-textbox-person_id').value;
+}
+
+// ****
+// * Fuegt eine Rolle zu einem Studenten hinzu
+// ****
+function StudentAddRolle(rolle)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-tree');
+
+	if (tree.currentIndex==-1) return;
+		
+	//Ausgewaehlte ID holen
+    var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
+	var prestudent_id=tree.view.getCellText(tree.currentIndex,col);
+		
+	if(confirm('Diesen Studenten zum '+rolle+' machen?'))
+	{
+		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+		var req = new phpRequest(url,'','');
+		
+		req.add('type', 'addrolle');
+				
+		req.add('prestudent_id', prestudent_id);
+		req.add('rolle_kurzbz', rolle);
+		
+		var response = req.executePOST();
+	
+		var val =  new ParseReturnValue(response);
+		
+		if (!val.dbdml_return)
+		{
+			if(val.dbdml_errormsg=='')
+				alert(response)
+			else
+				alert(val.dbdml_errormsg)
+		}
+		else
+		{			
+			StudentTreeRefresh();
+			SetStatusBarText('Rolle hinzugefuegt');
+		}
 	}
 }

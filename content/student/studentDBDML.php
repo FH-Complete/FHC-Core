@@ -43,6 +43,7 @@ require_once('../../include/akte.class.php');
 require_once('../../include/konto.class.php');
 require_once('../../include/dokument.class.php');
 require_once('../../include/studiensemester.class.php');
+require_once('../../include/betriebsmittel.class.php');
 require_once('../../include/betriebsmittelperson.class.php');
 
 $user = get_uid();
@@ -720,7 +721,9 @@ if(!$error)
 			{
 				if($buchung->buchungsnr_verweis=='')
 				{
-					$buchung->betrag = $buchung->betrag*(-1);
+					$kto = new konto($conn, null, true);
+					//$buchung->betrag*(-1);					
+					$buchung->betrag = $kto->getDifferenz($_POST['buchungsnr']);
 					$buchung->buchungsdatum = date('Y-m-d');
 					$buchung->mahnspanne = '0';
 					$buchung->buchungsnr_verweis = $buchung->buchungsnr;
@@ -910,6 +913,112 @@ if(!$error)
 		{
 			$return = false;
 			$errormsg  = 'Fehlerhafte Parameteruebergabe';
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='savebetriebsmittel')
+	{
+		//Speichert eine Betriebsmittelzuordnung
+		$bm = new betriebsmittel($conn, null, true);
+		
+		//Nachschauen ob dieses Betriebsmittel schon existiert
+		if($bm->getBetriebsmittel($_POST['betriebsmitteltyp'],$_POST['nummer']))
+		{
+			if(count($bm->result)>0)
+			{
+				//Wenn ein Eintrag gefunden wurde, dann wird die Beschreibung aktualisiert
+				if($bm->load($bm->result[0]->betriebsmittel_id))
+				{
+					$bm->beschreibung = $_POST['beschreibung'];
+					if(!$bm->save(false))
+					{
+						$return = false;
+						$error = true;
+						$errormsg = 'Fehler beim Speichern des Betriebsmittels';
+					}
+					else 
+					{
+						$betriebsmittel_id = $bm->betriebsmittel_id;
+					}
+				}
+				else 
+				{
+					$return = false;
+					$error = true;
+					$errormsg = 'Gefundener Eintrag konnte nicht geladen werden!?!?';
+				}
+			}
+			else
+			{
+				//Wenn kein Eintrag gefunden wurde, dann wird ein neuer Eintrag angelegt
+				$bm->betriebsmitteltyp = $_POST['betriebsmitteltyp'];
+				$bm->nummer = $_POST['nummer'];
+				$bm->beschreibung = $_POST['beschreibung'];
+				$bm->reservieren = false;
+				$bm->ort_kurzbz = null;
+				$bm->insertamum = date('Y-m-d H:i:s');
+				$bm->insertvon = $user;
+			
+				if($bm->save(true))
+				{
+					$betriebsmittel_id = $bm->betriebsmittel_id;
+				}
+				else 
+				{
+					$error = true;
+					$return = false;
+					$errormsg = 'Fehler beim Anlegen des Betriebsmittels';
+				}
+			}
+						
+			//Zuordnung Betriebsmittel-Person anlgegen
+			$bmp = new betriebsmittelperson($conn, null, null, true);
+			if($_POST['neu']!='true')
+			{
+				if($bmp->load($betriebsmittel_id, $_POST['person_id']))
+				{
+					$bmp->updateamum = date('Y-m-d H:i:s');
+					$bmp->updatevon = $user;
+					$bmp->new = false;
+				}
+				else 
+				{
+					$error = true;
+					$return = false;
+					$errormsg = 'Fehler beim laden der Betriebmittelperson Zuordnung';
+				}
+			}
+			else 
+			{
+				$bmp->insertamum = date('Y-m-d H:i:s');
+				$bmp->insertvon = $user;
+				$bmp->new = true;
+			}
+
+			if(!$error)
+			{
+				$bmp->person_id = $_POST['person_id'];
+				$bmp->betriebsmittel_id=$betriebsmittel_id;
+				$bmp->anmerkung = $_POST['anmerkung'];
+				$bmp->kaution = str_replace(',','.',$_POST['kaution']);
+				$bmp->ausgegebenam = $_POST['ausgegebenam'];
+				$bmp->retouram = $_POST['retouram'];
+				
+				if($bmp->save())
+				{
+					$return = true;
+					$data = $betriebsmittel_id;
+				}
+				else 
+				{
+					$return = false;
+					$errormsg = $bmp->errormsg;
+				}
+			}
+		}
+		else 
+		{
+			$errormsg = 'Fehler:'.$bm->errormsg;
+			$return = false;
 		}
 	}
 	else
