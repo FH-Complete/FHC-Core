@@ -336,14 +336,14 @@ class konto
 			//Alle Buchungen und 'darunterliegende' holen die noch offen sind
 			$qry = "SELECT * FROM public.tbl_konto 
 					WHERE buchungsnr in (SELECT buchungsnr FROM public.tbl_konto as konto_a WHERE 
-									betrag*(-1)>(SELECT CASE WHEN sum(betrag) is null THEN 0 
+									(betrag + (SELECT CASE WHEN sum(betrag) is null THEN 0 
 											            ELSE sum(betrag) END 
-										         FROM public.tbl_konto WHERE buchungsnr_verweis=konto_a.buchungsnr) 
+										         FROM public.tbl_konto WHERE buchungsnr_verweis=konto_a.buchungsnr))<>0
 									AND person_id='$person_id') OR 
 					buchungsnr_verweis in (SELECT buchungsnr FROM public.tbl_konto as konto_a WHERE 
-									betrag*(-1)>(SELECT CASE WHEN sum(betrag) is null THEN 0 
+									(betrag + (SELECT CASE WHEN sum(betrag) is null THEN 0 
 														ELSE sum(betrag) END 
-												 FROM public.tbl_konto WHERE buchungsnr_verweis=konto_a.buchungsnr) 
+												 FROM public.tbl_konto WHERE buchungsnr_verweis=konto_a.buchungsnr))<>0
 									AND person_id='$person_id') ORDER BY buchungsdatum";
 		}
 		else 
@@ -413,6 +413,31 @@ class konto
 		else 
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	// ******************************
+	// * Berechnet den offenen Betrag
+	// * einer Buchung
+	// ******************************
+	function getDifferenz($buchungsnr)
+	{
+		$qry = "SELECT sum(betrag) as differenz FROM public.tbl_konto WHERE buchungsnr='$buchungsnr' OR buchungsnr_verweis='$buchungsnr'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+				return $row->differenz*(-1);
+			else 
+			{
+				$this->errormsg = 'Fehler beim ermitteln der Differenz';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim ermitteln der Differenz';
 			return false;
 		}
 	}

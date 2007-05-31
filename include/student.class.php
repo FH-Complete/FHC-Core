@@ -372,6 +372,33 @@ class student extends benutzer
 			return false;
 		}
 	}
-
+	
+	// ****************************************
+	// * Laedt die UID anhand der Prestudent_id
+	// * @param prestudent_id
+	// * @return uid wenn ok, false wenn Fehler
+	// ****************************************
+	function getUid($prestudent_id)
+	{
+		$qry = "SELECT student_uid FROM public.tbl_student WHERE prestudent_id='$prestudent_id'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				return $row->student_uid;
+			}
+			else 
+			{
+				$this->errormsg = 'Student nicht gefunden';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden der Daten';
+			return false;
+		}
+	}
 }
 ?>

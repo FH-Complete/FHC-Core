@@ -60,6 +60,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentbetriebsmitteloverl
 						<toolbarbutton id="student-toolbar-refresh" label="Aktualisieren" oncommand="StudentTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 						<toolbarbutton id="student-toolbar-buchung" label="Neue Buchung" oncommand="StudentKontoNeu()" disabled="false" tooltiptext="neue Buchung anlegen"/>
 						<toolbarbutton id="student-toolbar-zeugnis" label="Zeugnis erstellen" oncommand="StudentCreateZeugnis()" disabled="false" tooltiptext="Zeugnis erstellen"/>
+						<toolbarbutton id="student-toolbar-abbrecher" label="-> Abbrecher" oncommand="StudentAddRolle('Abbrecher')" disabled="false" tooltiptext="Student zum Abbrecher machen"/>
+						<toolbarbutton id="student-toolbar-unterbrecher" label="-> Unterbrecher" oncommand="StudentAddRolle('Unterbrecher')" disabled="false" tooltiptext="Student zum Unterbrecher machen"/>
 						<spacer flex="1"/>
 						<label id="student-toolbar-label-anzahl"/>
 						</toolbar>

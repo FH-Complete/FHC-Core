@@ -131,6 +131,35 @@ class betriebsmittelperson
 		}		
 	}
 	
+	function validate()
+	{
+		if(!is_numeric($this->kaution))
+		{
+			$this->errormsg = 'Kaution ist ungueltig';
+			return false;
+		}		
+		
+		if($this->ausgegebenam!='' && !ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->ausgegebenam))
+		{
+			$this->errormsg = 'Ausgegeben am Datum ist ungueltig';
+			return false;
+		}
+		
+		if($this->retouram!='' && !ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->retouram))
+		{
+			$this->errormsg = 'Ausgegeben am Datum ist ungueltig';
+			return false;
+		}
+		
+		if(strlen($this->anmerkung)>256)
+		{
+			$this->errormsg = 'Anmerkung darf nicht laenger als 256 Zeichen sein';
+			return false;
+		}
+		
+		return true;
+	}
+	
 	// ************************************************
 	// * wenn $var '' ist wird "null" zurueckgegeben
 	// * wenn $var !='' ist werden datenbankkritische 
@@ -146,13 +175,18 @@ class betriebsmittelperson
 	// * Speichert den aktuellen Datensatz in die Datenbank	 
 	// * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
 	// * andernfalls wird der Datensatz mit der ID in $betriebsmittel_id, $person_id aktualisiert
+	// * @param $new
 	// * @return true wenn ok, false im Fehlerfall
 	// ******************************************************************************************
-	function save()
+	function save($new=null)
 	{
-		$this->done=false;
+		if(!$this->validate())
+			return false;
 			
-		if($this->new)
+		if($new==null)
+			$new = $this->new;
+
+		if($new)
 		{
 			//Neuen Datensatz einfuegen
 					
@@ -167,87 +201,38 @@ class betriebsmittelperson
 			     $this->addslashes($this->ext_id).',  now(), '.
 			     $this->addslashes($this->insertvon).', now(), '.
 			     $this->addslashes($this->updatevon).');';
-			 $this->done=true;			
 		}
 		else
 		{	
 			//Pruefen ob betriebsmittel_id eine gueltige Zahl ist
-			if(!is_numeric($this->betriebsmittel_id))
+			if(!is_numeric($this->betriebsmittel_id) || !is_numeric($this->person_id))
 			{
-				$this->errormsg = "betriebsmittel_id muss eine gueltige Zahl sein: ".$this->betriebsmittel_id." (".$this->person_id.")\n";
+				$this->errormsg = "betriebsmittel_id und Person_id muessen gueltige Zahlen sein: ".$this->betriebsmittel_id." (".$this->person_id.")\n";
 				return false;
 			}
-					
-			$qryz="SELECT * FROM public.tbl_betriebsmittelperson WHERE betriebsmittel_id='$this->betriebsmittel_id' AND person_id='$this->person_id';";
-			if($resultz = pg_query($this->conn, $qryz))
-			{
-				while($rowz = pg_fetch_object($resultz))
-				{
-					$update=false;	
-					if($rowz->betriebsmittel_id!=$this->betriebsmittel_id)		$update=true;		
-					if($rowz->person_id!=$this->person_id) 				$update=true;
-					if($rowz->anmerkung!=$this->anmerkung)			$update=true;
-					if($rowz->kaution!=$this->kaution)					$update=true;
-					if($rowz->ausgegebenam!=$this->ausgegebenam)		$update=true;
-					if($rowz->retouram!=$this->retouram)				$update=true;
-					if($rowz->ext_id!=$this->ext_id)	 				$update=true;
-				
-					if($update)
-					{
-						$qry='UPDATE public.tbl_betriebsmittelperson SET '.
-							'betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).', '. 
-							'person_id='.$this->addslashes($this->person_id).', '. 
-							'anmerkung='.$this->addslashes($this->anmerkung).', '. 
-							'kaution='.$this->addslashes($this->kaution).', '. 
-							'ausgegebenam='.$this->addslashes($this->ausgegebenam).', '.
-							'retouram='.$this->addslashes($this->retouram).', '.
-							'ext_id='.$this->addslashes($this->ext_id).', '. 
-						     	'updateamum= now(), '.
-						     	'updatevon='.$this->addslashes($this->updatevon).' '.
-							'WHERE betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).
-							' AND person_id='.$this->addslashes($this->person_id).';';
-							$this->done=true;
-					}
-				}
-			}
-			else 
-			{
-				return false;
-			}
+			
+			$qry='UPDATE public.tbl_betriebsmittelperson SET '.
+				'betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).', '. 
+				'person_id='.$this->addslashes($this->person_id).', '. 
+				'anmerkung='.$this->addslashes($this->anmerkung).', '. 
+				'kaution='.$this->addslashes($this->kaution).', '. 
+				'ausgegebenam='.$this->addslashes($this->ausgegebenam).', '.
+				'retouram='.$this->addslashes($this->retouram).', '.
+				'ext_id='.$this->addslashes($this->ext_id).', '. 
+			    'updateamum= now(), '.
+			    'updatevon='.$this->addslashes($this->updatevon).' '.
+				'WHERE betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).
+				' AND person_id='.$this->addslashes($this->person_id).";";
 		}
-		if ($this->done)
-		{
-			if(pg_query($this->conn, $qry))
-			{
-				//Log schreiben
-				/*$sql = $qry;
-				$qry = "SELECT nextval('log_seq') as id;";
-				if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
-				{
-					$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
-					return false;
-				}
-							
-				$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
-				if(pg_query($this->conn, $qry))
-					return true;
-				else 
-				{
-					$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
-					return false;
-				}	*/
-				return true;		
-			}
-			else 
-			{
-				$this->errormsg = "*****\nFehler beim Speichern des Betriebsmittelperson-Datensatzes: ID:".$this->person_id." Betriebsmittel-ID: ".$this->betriebsmittel_id."\n".$qry."\n".pg_errormessage($this->conn)."\n*****\n";
-				
-				return false;
-			}
+		
+		if(pg_query($this->conn, $qry))
+		{			
+			return true;		
 		}
 		else 
 		{
-			return true;
+			$this->errormsg = "Fehler beim Speichern der Betriebsmittelperson";			
+			return false;
 		}
 	}
 	

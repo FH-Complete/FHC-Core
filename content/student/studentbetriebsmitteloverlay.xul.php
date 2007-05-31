@@ -120,7 +120,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<textbox id="student-betriebsmittel-textbox-betriebsmittel_id" disabled="true"/>
 							<label value="person_id" control="student-betriebsmittel-textbox-person_id"/>
 							<textbox id="student-betriebsmittel-textbox-person_id" disabled="true"/>
-							<label value="person_id" control="student-betriebsmittel-checkbox-neu"/>
+							<label value="Neu" control="student-betriebsmittel-checkbox-neu"/>
 							<checkbox id="student-betriebsmittel-checkbox-neu" disabled="true" checked="false"/>
 						</vbox>
 						<groupbox id="student-betriebsmittel-groupbox" flex="1">
