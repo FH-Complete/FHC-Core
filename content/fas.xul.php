@@ -1,4 +1,24 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
 header("Content-type: application/vnd.mozilla.xul+xml");
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 include('../vilesci/config.inc.php');
@@ -51,6 +71,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
   <command id="menu-properties-studiensemester:command" oncommand="studiensemesterChange();"/>
   <command id="menu-prefs-stpltable-stundenplan:command" oncommand="stpltableChange('stundenplan');"/>
   <command id="menu-prefs-stpltable-stundenplandev:command" oncommand="stpltableChange('stundenplandev');"/>
+  <command id="menu-statistic-koordinatorstunden:command" oncommand="StatistikPrintKoordinatorstunden();"/>
+  <command id="menu-statistic-lehrauftraege:command" oncommand="StatistikPrintLehrauftraege();"/>
+  <command id="menu-statistic-lvplanung:command" oncommand="StatistikPrintLVPlanung();"/>
+  <command id="menu-dokumente-inskriptionsbestaetigung:command" oncommand="StudentPrintInskriptionsbestaetigung();"/>
 </commandset>
 
 <keyset id="mainkeys">
@@ -132,6 +156,38 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
       		</menupopup>
         </menu>
 	    </menupopup>
+    </menu>
+    <menu id="menu-statistic" label="&menu-statistic.label;" accesskey="&menu-statistic.accesskey;">
+          <menupopup id="menu-statistic-popup">
+            <menuitem
+               id        =  "menu-statistic-koordinatorstunden"
+               key       =  "menu-statistic-koordinatorstunden:key"
+               label     = "&menu-statistic-koordinatorstunden.label;"
+               command   =  "menu-statistic-koordinatorstunden:command"
+               accesskey = "&menu-statistic-koordinatorstunden.accesskey;"/>
+             <menuitem
+               id        =  "menu-statistic-lehrauftraege"
+               key       =  "menu-statistic-lehrauftraege:key"
+               label     = "&menu-statistic-lehrauftraege.label;"
+               command   =  "menu-statistic-lehrauftraege:command"
+               accesskey = "&menu-statistic-lehrauftraege.accesskey;"/>
+            <menuitem
+               id        =  "menu-statistic-lvplanung"
+               key       =  "menu-statistic-lvplanung:key"
+               label     = "&menu-statistic-lvplanung.label;"
+               command   =  "menu-statistic-lvplanung:command"
+               accesskey = "&menu-statistic-lvplanung.accesskey;"/>
+          </menupopup>
+    </menu>
+    <menu id="menu-dokumente" label="&menu-dokumente.label;" accesskey="&menu-dokumente.accesskey;">
+          <menupopup id="menu-dokumente-popup">
+            <menuitem
+               id        =  "menu-dokumente-inskriptionsbestaetigung"
+               key       =  "menu-dokumente-inskriptionsbestaetigung:key"
+               label     = "&menu-dokumente-inskriptionsbestaetigung.label;"
+               command   =  "menu-dokumente-inskriptionsbestaetigung:command"
+               accesskey = "&menu-dokumente-inskriptionsbestaetigung.accesskey;"/>
+          </menupopup>
     </menu>
     <menu id="menu-help" label="&menu-help.label;" accesskey="&menu-help.accesskey;">
           <menupopup id="menu-about-popup">

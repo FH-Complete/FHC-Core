@@ -38,11 +38,16 @@ header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
 
+// Datenbank Verbindung
+if (!$conn = pg_pconnect(CONN_STRING))
+   	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
+
 //Parameter holen
 if(isset($_GET['uid']))
 	$uid = $_GET['uid'];
 else
-	die('Fehlerhafte Parameteruebergabe');
+	$uid=null;
+	
 if(isset($_GET['stg_kz']))
 	$studiengang_kz = $_GET['stg_kz'];
 else
@@ -51,11 +56,6 @@ if(isset($_GET['ss']))
 	$ss = $_GET['ss'];
 else
 	die('Fehlerhafte Parameteruebergabe');
-
-
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
 
 //String der laenger als limit ist wird
 //abgeschnitten und '...' angehaengt
@@ -68,162 +68,186 @@ function CutString($strVal, $limit)
 }
 
 // GENERATE XML
-$xml = '<?xml version="1.0" encoding="ISO-8859-15" ?>
-<lehrauftrag>
-	<studiengang>FH-';
-//Studiengang
-$studiengang = new studiengang($conn, $studiengang_kz);
+$xml = '<?xml version="1.0" encoding="ISO-8859-15" ?><lehrauftraege>';
 
-if($studiengang->typ=='d')
-	$xml.= 'Diplom-';
-elseif($studiengang->typ=='m')
-	$xml.= 'Master-';
-elseif($studiengang->typ=='b')
-	$xml.= 'Bachelor-';
-
-$xml.= 'Studiengang '.$studiengang->bezeichnung.'</studiengang>';
-
-//Studiensemester
-if(substr($ss,0,2)=='WS')
-	$studiensemester = 'Wintersemester '.substr($ss,2);
-else
-	$studiensemester = 'Sommersemester '.substr($ss,2);
-$xml.="
-	<studiensemester>$studiensemester</studiensemester>";
-
-//Lektor
-$qry = "SELECT * FROM campus.vw_mitarbeiter LEFT JOIN public.tbl_adresse USING(person_id) WHERE uid='".addslashes($uid)."' ORDER BY zustelladresse LIMIT 1";
-
-if($result = pg_query($conn, $qry))
+if($uid==null)
 {
-	if($row = pg_fetch_object($result))
+	$qry = "SELECT distinct tbl_lehreinheitmitarbeiter.mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung WHERE
+			tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
+			tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
+			tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND
+			tbl_lehreinheit.studiensemester_kurzbz='".addslashes($ss)."'";
+	
+	if($result = pg_query($conn, $qry))
 	{
-		$xml.='
-	<mitarbeiter>
-		<titelpre>'.$row->titelpre.'</titelpre>
-		<vorname>'.$row->vorname.'</vorname>
-		<familienname>'.$row->nachname.'</familienname>
-		<titelpost>'.$row->titelpost.'</titelpost>
-		<anschrift>'.$row->strasse.'</anschrift>
-		<plz>'.$row->plz.'</plz>
-		<ort>'.$row->ort.'</ort>
-		<svnr>'.$row->svnr.'</svnr>
-		<personalnummer>'.$row->personalnummer.'</personalnummer>
-	</mitarbeiter>';
-	}
-}
-
-//Lehreinheiten
-$fb_arr = array();
-$fachbereich_obj = new fachbereich($conn);
-$fachbereich_obj->getAll();
-foreach ($fachbereich_obj->result as $fb)
-	$fb_arr[$fb->fachbereich_kurzbz] = $fb->bezeichnung;
-
-$lehreinheit = new lehreinheit($conn);
-$qry = "SELECT * FROM campus.vw_lehreinheit WHERE lv_studiengang_kz='".addslashes($studiengang_kz)."' AND mitarbeiter_uid='".addslashes($uid)."' AND studiensemester_kurzbz='$ss' ORDER BY lehreinheit_id";
-
-if($result = pg_query($conn, $qry))
-{
-	$last_le='';
-	$gesamtkosten = 0;
-	$gesamtstunden = 0;
-	$gruppen = array();
-	$grp='';
-	while($row = pg_fetch_object($result))
-	{
-		if($last_le!=$row->lehreinheit_id && $last_le!='')
+		while($row = pg_fetch_object($result))
 		{
-			array_unique($gruppen);
-			foreach ($gruppen as $gruppe)
-				$grp.=$gruppe.' ';
-$xml.='
-	<lehreinheit>
-		<lehreinheit_id>'.$lehreinheit_id.'</lehreinheit_id>
-		<lehrveranstaltung>'.$lehrveranstaltung.'</lehrveranstaltung>
-		<fachbereich>'.$fb_arr[$fachbereich].'</fachbereich>
-		<gruppe>'.trim($grp).'</gruppe>
-		<stunden>'.$stunden.'</stunden>
-		<satz>'.$satz.'</satz>
-		<faktor>'.$faktor.'</faktor>
-		<brutto>'.number_format($brutto,2,',','.').'</brutto>
-	</lehreinheit>';
-
-			$gesamtkosten = $gesamtkosten + $brutto;
-			$gesamtstunden = $gesamtstunden + $stunden;
-
-			$lehreinheit_id='';
-			$lehrveranstaltung = '';
-			$fachbereich = '';
-			$gruppen= array();
-			$stunden = '';
-			$satz = '';
-			$faktor = '';
-			$brutto = '';
-			$grp='';
+			drawLehrauftrag($row->mitarbeiter_uid);
 		}
-
-		$lehreinheit_id=$row->lehreinheit_id;
-		$lehrveranstaltung = CutString($row->lv_bezeichnung,30).' '.$row->lehrform_kurzbz.' '.$row->semester.'. Semester';
-		$fachbereich = $row->fachbereich_kurzbz;
-
-		if($row->gruppe_kurzbz!='')
-			$gruppen[] = $row->gruppe_kurzbz;
-		else
-			$gruppen[] = $row->semester.$row->verband.$row->gruppe.' ';
-
-		$stunden = $row->semesterstunden;
-		$satz = $row->stundensatz;
-		$faktor = $row->faktor;
-		$brutto = $row->semesterstunden*$row->stundensatz*$row->faktor;
-		$last_le=$row->lehreinheit_id;
 	}
-	array_unique($gruppen);
-	foreach ($gruppen as $gruppe)
-		$grp.=$gruppe.' ';
-$xml.='
-	<lehreinheit>
-		<lehreinheit_id>'.(isset($lehreinheit_id)?$lehreinheit_id:'').'</lehreinheit_id>
-		<lehrveranstaltung>'.(isset($lehrveranstaltung)?$lehrveranstaltung:'').'</lehrveranstaltung>
-		<fachbereich>'.(isset($fachbereich)?$fb_arr[$fachbereich]:'').'</fachbereich>
-		<gruppe>'.trim($grp).'</gruppe>
-		<stunden>'.(isset($stunden)?$stunden:'').'</stunden>
-		<satz>'.(isset($satz)?$satz:'').'</satz>
-		<faktor>'.(isset($faktor)?$faktor:'').'</faktor>
-		<brutto>'.(isset($brutto)?number_format($brutto,2,',','.'):'').'</brutto>
-	</lehreinheit>';
-
-	if(isset($brutto))
-		$gesamtkosten = $gesamtkosten + $brutto;
-	if(isset($stunden))
-		$gesamtstunden = $gesamtstunden + $stunden;
 }
-
-// Gesamtstunden und Gesamtkosten
-$xml.="
-	<gesamtstunden>$gesamtstunden</gesamtstunden>
-	<gesamtbetrag>".number_format($gesamtkosten,2,',','.')."</gesamtbetrag>";
-
-//Studiengangsleiter
-$qry = "SELECT titelpre, vorname, nachname, titelpost FROM public.tbl_benutzerfunktion, public.tbl_person, public.tbl_benutzer WHERE
-		funktion_kurzbz='stgl' AND studiengang_kz='".addslashes($studiengang_kz)."'
-		AND tbl_benutzerfunktion.uid=tbl_benutzer.uid AND tbl_benutzer.person_id=tbl_person.person_id";
-if($result = pg_query($conn, $qry))
+else 
+	drawLehrauftrag($uid);
+function drawLehrauftrag($uid)
 {
-	if($row = pg_fetch_object($result))
+	global $studiengang_kz, $ss, $xml, $conn;
+	
+	$xml.='<lehrauftrag>
+		<studiengang>FH-';
+	//Studiengang
+	$studiengang = new studiengang($conn, $studiengang_kz);
+	
+	if($studiengang->typ=='d')
+		$xml.= 'Diplom-';
+	elseif($studiengang->typ=='m')
+		$xml.= 'Master-';
+	elseif($studiengang->typ=='b')
+		$xml.= 'Bachelor-';
+	
+	$xml.= 'Studiengang '.$studiengang->bezeichnung.'</studiengang>';
+	
+	//Studiensemester
+	if(substr($ss,0,2)=='WS')
+		$studiensemester = 'Wintersemester '.substr($ss,2);
+	else
+		$studiensemester = 'Sommersemester '.substr($ss,2);
+	$xml.="
+		<studiensemester>$studiensemester</studiensemester>";
+	
+	//Lektor
+	$qry = "SELECT * FROM campus.vw_mitarbeiter LEFT JOIN public.tbl_adresse USING(person_id) WHERE uid='".addslashes($uid)."' ORDER BY zustelladresse LIMIT 1";
+	
+	if($result = pg_query($conn, $qry))
 	{
-		$stgl = trim($row->titelpost.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost);
-$xml.="
-	<studiengangsleiter>$stgl</studiengangsleiter>";
+		if($row = pg_fetch_object($result))
+		{
+			$xml.='
+		<mitarbeiter>
+			<titelpre>'.$row->titelpre.'</titelpre>
+			<vorname>'.$row->vorname.'</vorname>
+			<familienname>'.$row->nachname.'</familienname>
+			<titelpost>'.$row->titelpost.'</titelpost>
+			<anschrift>'.$row->strasse.'</anschrift>
+			<plz>'.$row->plz.'</plz>
+			<ort>'.$row->ort.'</ort>
+			<svnr>'.$row->svnr.'</svnr>
+			<personalnummer>'.$row->personalnummer.'</personalnummer>
+		</mitarbeiter>';
+		}
 	}
+	
+	//Lehreinheiten
+	$fb_arr = array();
+	$fachbereich_obj = new fachbereich($conn);
+	$fachbereich_obj->getAll();
+	foreach ($fachbereich_obj->result as $fb)
+		$fb_arr[$fb->fachbereich_kurzbz] = $fb->bezeichnung;
+	
+	$lehreinheit = new lehreinheit($conn);
+	$qry = "SELECT * FROM campus.vw_lehreinheit WHERE lv_studiengang_kz='".addslashes($studiengang_kz)."' AND mitarbeiter_uid='".addslashes($uid)."' AND studiensemester_kurzbz='$ss' ORDER BY lehreinheit_id";
+	
+	if($result = pg_query($conn, $qry))
+	{
+		$last_le='';
+		$gesamtkosten = 0;
+		$gesamtstunden = 0;
+		$gruppen = array();
+		$grp='';
+		while($row = pg_fetch_object($result))
+		{
+			if($last_le!=$row->lehreinheit_id && $last_le!='')
+			{
+				array_unique($gruppen);
+				foreach ($gruppen as $gruppe)
+					$grp.=$gruppe.' ';
+	$xml.='
+		<lehreinheit>
+			<lehreinheit_id>'.$lehreinheit_id.'</lehreinheit_id>
+			<lehrveranstaltung><![CDATA['.$lehrveranstaltung.']]></lehrveranstaltung>
+			<fachbereich>'.$fb_arr[$fachbereich].'</fachbereich>
+			<gruppe>'.trim($grp).'</gruppe>
+			<stunden>'.$stunden.'</stunden>
+			<satz>'.$satz.'</satz>
+			<faktor>'.$faktor.'</faktor>
+			<brutto>'.number_format($brutto,2,',','.').'</brutto>
+		</lehreinheit>';
+	
+				$gesamtkosten = $gesamtkosten + $brutto;
+				$gesamtstunden = $gesamtstunden + $stunden;
+	
+				$lehreinheit_id='';
+				$lehrveranstaltung = '';
+				$fachbereich = '';
+				$gruppen= array();
+				$stunden = '';
+				$satz = '';
+				$faktor = '';
+				$brutto = '';
+				$grp='';
+			}
+	
+			$lehreinheit_id=$row->lehreinheit_id;
+			$lehrveranstaltung = CutString($row->lv_bezeichnung,30).' '.$row->lehrform_kurzbz.' '.$row->semester.'. Semester';
+			$fachbereich = $row->fachbereich_kurzbz;
+	
+			if($row->gruppe_kurzbz!='')
+				$gruppen[] = $row->gruppe_kurzbz;
+			else
+				$gruppen[] = $row->semester.$row->verband.$row->gruppe.' ';
+	
+			$stunden = $row->semesterstunden;
+			$satz = $row->stundensatz;
+			$faktor = $row->faktor;
+			$brutto = $row->semesterstunden*$row->stundensatz*$row->faktor;
+			$last_le=$row->lehreinheit_id;
+		}
+		array_unique($gruppen);
+		foreach ($gruppen as $gruppe)
+			$grp.=$gruppe.' ';
+	$xml.='
+		<lehreinheit>
+			<lehreinheit_id>'.(isset($lehreinheit_id)?$lehreinheit_id:'').'</lehreinheit_id>
+			<lehrveranstaltung><![CDATA['.(isset($lehrveranstaltung)?$lehrveranstaltung:'').']]></lehrveranstaltung>
+			<fachbereich>'.(isset($fachbereich)?$fb_arr[$fachbereich]:'').'</fachbereich>
+			<gruppe>'.trim($grp).'</gruppe>
+			<stunden>'.(isset($stunden)?$stunden:'').'</stunden>
+			<satz>'.(isset($satz)?$satz:'').'</satz>
+			<faktor>'.(isset($faktor)?$faktor:'').'</faktor>
+			<brutto>'.(isset($brutto)?number_format($brutto,2,',','.'):'').'</brutto>
+		</lehreinheit>';
+	
+		if(isset($brutto))
+			$gesamtkosten = $gesamtkosten + $brutto;
+		if(isset($stunden))
+			$gesamtstunden = $gesamtstunden + $stunden;
+	}
+	
+	// Gesamtstunden und Gesamtkosten
+	$xml.="
+		<gesamtstunden>$gesamtstunden</gesamtstunden>
+		<gesamtbetrag>".number_format($gesamtkosten,2,',','.')."</gesamtbetrag>";
+	
+	//Studiengangsleiter
+	$qry = "SELECT titelpre, vorname, nachname, titelpost FROM public.tbl_benutzerfunktion, public.tbl_person, public.tbl_benutzer WHERE
+			funktion_kurzbz='stgl' AND studiengang_kz='".addslashes($studiengang_kz)."'
+			AND tbl_benutzerfunktion.uid=tbl_benutzer.uid AND tbl_benutzer.person_id=tbl_person.person_id";
+	if($result = pg_query($conn, $qry))
+	{
+		if($row = pg_fetch_object($result))
+		{
+			$stgl = trim($row->titelpost.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost);
+	$xml.="
+		<studiengangsleiter>$stgl</studiengangsleiter>";
+		}
+	}
+	
+	$xml.= '
+		<datum>'.date('d.m.Y').'</datum>
+	</lehrauftrag>
+	';
 }
-
-$xml.= '
-	<datum>'.date('d.m.Y').'</datum>
-</lehrauftrag>
-';
 
 // END GENERATE XML
-echo $xml;
+echo $xml.'</lehrauftraege>';
 
 ?>

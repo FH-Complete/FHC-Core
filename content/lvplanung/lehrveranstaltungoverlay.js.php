@@ -178,7 +178,9 @@ function LvCreateLehrauftrag()
 {
 	stg = document.getElementById('LehrveranstaltungEditor').getAttribute('stg_kz');
 	uid = document.getElementById('LehrveranstaltungEditor').getAttribute('uid');
-	window.location.href = '<?php echo APP_ROOT; ?>content/lvplanung/lehrauftrag.php?stg_kz='+stg+'&uid='+uid+'&'+gettimestamp();
+	var ss = document.getElementById('statusbarpanel-semester').label;
+	//window.location.href = '<?php echo APP_ROOT; ?>content/lvplanung/lehrauftrag.php?stg_kz='+stg+'&uid='+uid+'&'+gettimestamp();
+	window.location.href = '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrauftrag.xml.php&xsl=Lehrauftrag&stg_kz='+stg+'&uid='+uid+'&ss='+ss+'&'+gettimestamp();
 }
 
 // ****************** FUNKTIONEN ************************** //
