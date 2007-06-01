@@ -37,32 +37,37 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
 require_once('../vilesci/config.inc.php');
 require_once('../include/konto.class.php');
-require_once('../include/functions.inc.php');
+//require_once('../include/functions.inc.php');
 
 // Datenbank Verbindung
-if (!$conn = @pg_pconnect(CONN_STRING))
+if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
-$user = get_uid();
-
 $hier='';
+if(isset($_GET['xmlformat']))
+{
+	$xmlformat=$_GET['xmlformat'];
+}
+else
+	$xmlformat='rdf';
+
 if(isset($_GET['person_id']) && is_numeric($_GET['person_id']))
 {
 	$person_id=$_GET['person_id'];
 }
-else 
+else
 	$person_id='';
 
 if(isset($_GET['filter']))
 	$filter=$_GET['filter'];
-else 
+else
 	$filter='alle';
 
 if(isset($_GET['buchungsnr']) && is_numeric($_GET['buchungsnr']))
 {
 	$buchungsnr = $_GET['buchungsnr'];
 }
-else 
+else
 	$buchungsnr = '';
 
 $konto = new konto($conn, null, true);
@@ -76,11 +81,13 @@ elseif($buchungsnr!='')
 	if(!$konto->load($buchungsnr))
 		die($konto->errormsg);
 }
-else 
+else
 	die('Falsche Parameteruebergabe');
 
+// ----------------------------------- RDF --------------------------------------
 $rdf_url='http://www.technikum-wien.at/konto';
-
+if ($xmlformat=='rdf')
+{
 ?>
 
 <RDF:RDF
@@ -119,32 +126,32 @@ if($person_id!='')
 		//1. Ebene
 		drawrow($buchung);
 
-		$hier.="      	
+		$hier.="
       	<RDF:li>
       		<RDF:Seq about=\"".$rdf_url.'/'.$buchung->buchungsnr."\" >";
-		
+
 		if(isset($konto->result[$buchung->buchungsnr]['childs']))
 		{
 			//2. Ebene
 			foreach ($konto->result[$buchung->buchungsnr]['childs'] as $row)
-			{	
+			{
 				if(is_object($row))
 				{
 					drawrow($row);
-					
+
 					$hier.="
 					<RDF:li resource=\"".$rdf_url.'/'.$row->buchungsnr.'" />';
 				}
 			}
 		}
 
-		$hier.="			
+		$hier.="
       		</RDF:Seq>
       	</RDF:li>";
-		
+
 	}
 }
-else 
+else
 {
 	$hier.="<RDF:li resource=\"".$rdf_url.'/'.$konto->buchungsnr.'" />';
 	drawrow($konto);
@@ -155,6 +162,55 @@ else
 
 	echo $hier;
 ?>
-
-
 </RDF:RDF>
+<?php
+} //endof xmlformat==rdf
+// ----------------------------------- XML --------------------------------------
+elseif ($xmlformat=='xml')
+{
+	echo "<konto>\n";
+	function drawrow_xml($row)
+	{
+		echo "
+  		<buchung>
+			<buchungsnr><![CDATA[".$row->buchungsnr."]]></buchungsnr>
+			<person_id><![CDATA[".$row->person_id."]]></person_id>
+			<studiengang_kz><![CDATA[".$row->studiengang_kz."]]></studiengang_kz>
+			<studiensemester_kurzbz><![CDATA[".$row->studiensemester_kurzbz."]]></studiensemester_kurzbz>
+			<buchungsnr_verweis><![CDATA[".$row->buchungsnr_verweis."]]></buchungsnr_verweis>
+			<betrag><![CDATA[".$row->betrag."]]></betrag>
+			<buchungsdatum><![CDATA[".$row->buchungsdatum."]]></buchungsdatum>
+			<buchungstext><![CDATA[".$row->buchungstext."]]></buchungstext>
+			<mahnspanne><![CDATA[".$row->mahnspanne."]]></mahnspanne>
+			<buchungstyp_kurzbz><![CDATA[".$row->buchungstyp_kurzbz."]]></buchungstyp_kurzbz>
+			<updateamum><![CDATA[".$row->updateamum."]]></updateamum>
+			<updatevon><![CDATA[".$row->updatevon."]]></updatevon>
+			<insertamum><![CDATA[".$row->insertamum."]]></insertamum>
+		</buchung>";
+	}
+	function drawperson_xml($row)
+	{
+		echo "
+  		<person>
+			<person_id><![CDATA[".$row->person_id."]]></person_id>
+			<anrede><![CDATA[".$row->anrede."]]></anrede>
+			<titelpost><![CDATA[".$row->titelpost."]]></titelpost>
+			<titelpre><![CDATA[".$row->titelpre."]]></titelpre>
+			<nachname><![CDATA[".$row->nachname."]]></nachname>
+			<vorname><![CDATA[".$row->vorname."]]></vorname>
+			<vornamen><![CDATA[".$row->vornamen."]]></vornamen>
+		</person>";
+	}
+
+	if($person_id!='')
+		foreach ($konto->result as $buchung)
+			drawrow_xml($buchung);
+	else
+	{
+		drawperson_xml($konto);
+		drawrow_xml($konto);
+	}
+
+	echo "\n</konto>";
+}
+?>
