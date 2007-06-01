@@ -43,27 +43,50 @@
      		else
      			return true;
   		}
+
+	function js_show_tab(tabid)
+   	{
+			if (document.getElementById)
+			{
+      	  	if (status == null)
+            	status = "none";
+ 				if (status == "none")
+ 			   {
+         	  	document.getElementById(conid).style.display = block;
+            	__js_page_array[conid] = "visible";
+         	}
+         	else
+           	{
+           		document.getElementById(conid).style.display = 'none';
+            	__js_page_array[conid] = "none";
+      		}
+      	   return false;
+     		}
+     		else
+     			return true;
+  		}
 	//-->
 	</script>
 </head>
 
-<body class="browser">
-<div dir="ltr">
-	<div class="logo">
-		<a href="intro.php" target="detail">
-			<img src="../skin/images/logo.png" width="200" height="50" alt="VileSci (FASonline)" title="VileSci" />
-		</a>
-	</div>
-	<table class="tabs">
-		<tr>
-			<td width="50%" class="tab active"><a href="intro.php">Introduction</a></td>
-			<td width="50%" class="tab"><a href="servers.php">Servers</a></td>
-		</tr>
-	</table>
-	
-	<!--____________Menue Admin______________________________________________-->
-	<div id="menueadmin">
-		<table class="menue" style="border-right-width:1px;border-right-color:#BCBCBC;">
+<body>
+<div class="logo">
+	<a href="intro.php" target="detail">
+		<img src="../skin/images/logo.png" width="200" height="50" alt="VileSci (FASonline)" title="VileSci" />
+	</a>
+</div>
+
+<table class="tabs">
+	<tr>
+		<td class="tab active" onClick="js_show_tab('menueStammdaten'));">Stammdaten</td>
+		<td class="tab" onClick="js_show_tab('MenueMitarbeiter'));">Mitarbeiter</a></td>
+		<td class="tab" onClick="js_show_tab('MenueStudenten'));">Studenten</td>
+	</tr>
+</table>
+
+<!--____________Menue Stammdaten______________________________________________-->
+<div id="menueStammdaten" style="display: visible;">
+	<table class="menue" style="border-right-width:1px;border-right-color:#BCBCBC;">
 		<tr>
 			<td>&nbsp;</td>
 		</tr>
@@ -232,8 +255,8 @@
 			</td>
 		</tr>
 		</table>
-
- 	</div>
+</div>
+<div id="menuemitarbeiter" style="display: none;">
  </div>
  </body>
  </html>
