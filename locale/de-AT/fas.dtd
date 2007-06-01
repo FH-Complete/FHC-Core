@@ -8,7 +8,6 @@
 <!ENTITY menu-file-close.label         	"Beenden">
 <!ENTITY menu-file-close.accesskey     	"B">
 
-
 <!ENTITY menu-help.label              	"Hilfe">
 <!ENTITY menu-help.accesskey          	"H">
 
@@ -36,3 +35,25 @@
 <!ENTITY menu-prefs-stpltable-stundenplandev.key      	"d">
 <!ENTITY menu-prefs-stpltable-stundenplandev.label    	"stundenplandev">
 <!ENTITY menu-prefs-stpltable-stundenplandev.accesskey	"d">
+
+<!ENTITY menu-statistic.label		"Statistik">
+<!ENTITY menu-statistic.accesskey	"S">
+
+<!ENTITY menu-statistic-koordinatorstunden.key			"K">
+<!ENTITY menu-statistic-koordinatorstunden.label		"Koordinatorstunden">
+<!ENTITY menu-statistic-koordinatorstunden.accesskey	"K">
+
+<!ENTITY menu-statistic-lehrauftraege.key		"L">
+<!ENTITY menu-statistic-lehrauftraege.label		"Lehrauftraege">
+<!ENTITY menu-statistic-lehrauftraege.accesskey	"L">
+
+<!ENTITY menu-statistic-lvplanung.key		"V">
+<!ENTITY menu-statistic-lvplanung.label		"LV-Planung">
+<!ENTITY menu-statistic-lvplanung.accesskey	"V">
+
+<!ENTITY menu-dokumente.label		"Dokumente">
+<!ENTITY menu-dokumente.accesskey	"D">
+
+<!ENTITY menu-dokumente-inskriptionsbestaetigung.key		"I">
+<!ENTITY menu-dokumente-inskriptionsbestaetigung.label		"Inskriptionsbestaetigung">
+<!ENTITY menu-dokumente-inskriptionsbestaetigung.accesskey	"I">

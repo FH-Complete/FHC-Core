@@ -463,3 +463,72 @@ function parseRDFString(str, url)
 
   return memoryDS;
 }
+
+// ****
+// * Liefert eine HTML Liste mit den Koordinatorstunden
+// * fuer einen Fachbereich
+// ****
+function StatistikPrintKoordinatorstunden()
+{
+	tree = document.getElementById('tree-fachbereich');
+	
+	if(tree.currentIndex==-1)
+	{
+		alert('Bitte zuerst einen Fachbereich auswaehlen');
+		return;
+	}
+	
+	//Fachbereich holen
+	var col;
+	col = tree.columns ? tree.columns["kurzbz"] : "kurzbz";
+	var fachbereich_kurzbz=tree.view.getCellText(tree.currentIndex,col);
+
+	window.open('<?php echo APP_ROOT ?>content/statistik/koordinatorstunden.php?fachbereich_kurzbz='+fachbereich_kurzbz,'Koordinatorstunden');
+}
+
+// ****
+// * Erstellt das PDF File fuer die Lehrauftraege
+// * Studiengang muss ausgewaehlt sein
+// ****
+function StatistikPrintLehrauftraege()
+{
+	tree = document.getElementById('tree-verband');
+	
+	if(tree.currentIndex==-1)
+	{
+		alert('Bitte zuerst einen Studiengang auswaehlen');
+		return;
+	}
+	
+	//Studiengang holen
+	var col;
+	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+	var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
+
+	var ss = document.getElementById('statusbarpanel-semester').label;
+	window.open('<?php echo APP_ROOT ?>content/pdfExport.php?xml=lehrauftrag.xml.php&xsl=Lehrauftrag&stg_kz='+studiengang_kz+'&ss='+ss,'Lehrauftrag');
+}
+
+// ****
+// * Liefert eine HTML Liste mit Uebersicht der Lehrauftraege. 
+// * Studiengang und optional Semester muss gewaehlt sein.
+// ****
+function StatistikPrintLVPlanung()
+{
+	tree = document.getElementById('tree-verband');
+	
+	if(tree.currentIndex==-1)
+	{
+		alert('Bitte zuerst einen Studiengang auswaehlen');
+		return;
+	}
+
+	//Studiengang und Semester holen
+	var col;
+	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+	var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["sem"] : "sem";
+	var semester=tree.view.getCellText(tree.currentIndex,col);
+	
+	window.open('<?php echo APP_ROOT ?>content/statistik/lvplanung.php?studiengang_kz='+studiengang_kz+'&semester='+semester,'LV-Planung');
+}

@@ -61,8 +61,9 @@ if(isset($_GET['person_id']))
 if(isset($_GET['buchungsnr']))
 	$params.='&buchungsnr='.$_GET['buchungsnr'];
 if(isset($_GET['stg_kz']))
-	$params.='stg_kz='.$_GET['stg_kz'];
-
+	$params.='&stg_kz='.$_GET['stg_kz'];
+if(isset($_GET['ss']))
+	$params.='&ss='.$_GET['ss'];
 //Berechtigung pruefen
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
@@ -98,7 +99,7 @@ $proc->importStyleSheet($xsl); // attach the xsl rules
 $buffer = $proc->transformToXml($xml_doc);
 //in $buffer steht nun das xsl-fo file mit den daten
 $buffer = '<?xml version="1.0" encoding="ISO-8859-15" ?>'.substr($buffer, strpos($buffer,"\n"),strlen($buffer));
-$buffer = html_entity_decode($buffer);
+//$buffer = html_entity_decode($buffer);
 //echo "buffer: $buffer";
 
 //Pdf erstellen

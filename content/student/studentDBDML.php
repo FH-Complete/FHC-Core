@@ -446,7 +446,7 @@ if(!$error)
 								//pruefen ob schon eine Studentenrolle Existiert
 								$hlp1 = new prestudent($conn);
 								$hlp1->getPrestudentRolle($_POST['prestudent_id'], 'Student', $hlp->result[0]->studiensemester_kurzbz);
-								if(count($hlp1)>0)
+								if(count($hlp1->result)>0)
 								{
 									$return = false;
 									$errormsg = 'Diese Person ist bereits Student';
@@ -489,7 +489,7 @@ if(!$error)
 										$student->matrikelnr = $matrikelnr;
 										$student->prestudent_id = $prestd->prestudent_id;
 										$student->studiengang_kz = $prestd->studiengang_kz;
-										$student->semester = $hlp->result[0]->ausbildungssemester;
+										$student->semester = 1; //$hlp->result[0]->ausbildungssemester
 										$student->verband = ' ';
 										$student->gruppe = ' ';
 										$student->insertamum = date('Y-m-d H:i:s');
@@ -501,8 +501,8 @@ if(!$error)
 											$rolle = new prestudent($conn);
 											$rolle->prestudent_id = $prestd->prestudent_id;
 											$rolle->rolle_kurzbz = 'Student';
-											$rolle->studiensemester_kurzbz = $hlp->result[0]->studiensemester_kurzbz;
-											$rolle->ausbildungssemester = $hlp->result[0]->ausbildungssemester;
+											$rolle->studiensemester_kurzbz = $semester_aktuell; //$hlp->result[0]->studiensemester_kurzbz;
+											$rolle->ausbildungssemester = 1; //$hlp->result[0]->ausbildungssemester
 											$rolle->datum = date('Y-m-d');
 											$rolle->insertamum = date('Y-m-d H:i:s');
 											$rolle->insertvon = $user;
@@ -513,9 +513,9 @@ if(!$error)
 												//StudentLehrverband anlegen
 												$studentlehrverband = new student($conn);
 												$studentlehrverband->uid = $uid;
-												$studentlehrverband->studiensemester_kurzbz = $hlp->result[0]->studiensemester_kurzbz;
+												$studentlehrverband->studiensemester_kurzbz = $semester_aktuell; //$hlp->result[0]->studiensemester_kurzbz;
 												$studentlehrverband->studiengang_kz = $prestd->studiengang_kz;
-												$studentlehrverband->semester = $hlp->result[0]->ausbildungssemester;
+												$studentlehrverband->semester = 1; //$hlp->result[0]->ausbildungssemester
 												$studentlehrverband->verband = ' ';
 												$studentlehrverband->gruppe = ' ';
 												$studentlehrverband->insertamum = date('Y-m-d H:i:s');

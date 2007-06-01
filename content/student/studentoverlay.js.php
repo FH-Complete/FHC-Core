@@ -1034,6 +1034,8 @@ function StudentAkteDel()
 	}
 }
 
+// **************** KONTO ******************
+
 // ****
 // * Wenn eine buchung Ausgewaehlt wird, dann werden
 // * die Details geladen und angezeigt
@@ -1150,6 +1152,7 @@ function StudentKontoDisableFields(val)
 	document.getElementById('student-konto-button-neu').disabled=val;
 	document.getElementById('student-konto-button-gegenbuchung').disabled=val;
 	document.getElementById('student-konto-button-loeschen').disabled=val;
+	document.getElementById('student-konto-button-zahlungsbestaetigung').disabled=val;
 	StudentKontoDetailDisableFields(true);
 }
 
@@ -1351,6 +1354,35 @@ function StudentKontoNeuSpeichern(dialog, person_ids, studiengang_kz)
 		return true;
 	}
 }
+
+// *****
+// * Druckt eine Zahlungsbestaetigung aus
+// *****
+function StudentKontoZahlungsbestaetigung()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-konto-tree');
+
+	if (tree.currentIndex==-1)
+	{
+		alert('Bitte zuerst eine Buchung auswaehlen');
+		return;
+	}
+	
+	if(!tree.view.getParentIndex(tree.currentIndex))
+	{
+		alert('Zum Drucken der bestaetigung bitte die oberste Buchung waehlen');
+		return false;
+	}
+	
+	//Ausgewaehlte Nr holen
+    var col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
+	var buchungsnr=tree.view.getCellText(tree.currentIndex,col);
+	var uid = document.getElementById('student-detail-textbox-uid').value;
+		
+	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=konto.rdf.php&xsl=Zahlung&uid='+uid+'&buchungsnr='+buchungsnr,'Zahlungsbestaetigung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+
 
 // *********** Zeugnis *****************
 
@@ -1680,4 +1712,35 @@ function StudentAddRolle(rolle)
 			SetStatusBarText('Rolle hinzugefuegt');
 		}
 	}
+}
+
+// ****
+// * Druckt die Instkriptionsbestaetigung
+// ****
+function StudentPrintInskriptionsbestaetigung()
+{
+	tree = document.getElementById('student-tree');
+	//Alle markierten Studenten holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
+	var anzahl=0;
+	
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+			for (var v = start.value; v <= end.value; v++)
+			{
+			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+			uid = tree.view.getCellText(v,col);
+			paramList += ';'+uid;
+			anzahl = anzahl+1;
+			}
+	}
+	
+	if(anzahl>0)	
+		window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=student.rdf.php&xsl=Inskription&uid='+paramList,'Inskriptionsbestaetigung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	else
+		alert('Bitte einen Studenten auswaehlen');
 }
