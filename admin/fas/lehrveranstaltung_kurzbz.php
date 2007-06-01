@@ -21,26 +21,26 @@
 	//DB Verbindung herstellen
 	if (!$conn = @pg_pconnect(CONN_STRING_FAS))
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-		
+
 	$qry = "SET CLIENT_ENCODING TO 'LATIN9';SELECT * FROM studiengang order by studiengangsart, kuerzel";
-	
+
 	if(!$result = pg_query($conn, $qry))
 		die('Fehler beim lesen aus der DB');
 
 	if(isset($_GET['studiengang']))
 		$stg = $_GET['studiengang'];
-	else 
+	else
 		$stg = '';
-		
+
 	if(isset($_POST['kurzbz']) && isset($_GET['lehrveranstaltung_id']) && is_numeric($_GET['lehrveranstaltung_id']))
 	{
 		$qry = "UPDATE lehrveranstaltung SET kurzbezeichnung='".addslashes(strtoupper($_POST['kurzbz']))."' WHERE lehrveranstaltung_pk='".$_GET['lehrveranstaltung_id']."';";
 		if(pg_query($conn, $qry))
 			echo "Erfolgreich gespeichert";
-		else 
+		else
 			echo "<span style='font-color: Red;'>Fehler beim Speichern</span>";
 	}
-	
+
 	echo "<form name='frm_stg' action='$PHP_SELF' method='GET'>";
 	//Drop Down fuer Studiengang
 	echo "<SELECT name='studiengang' onchange='javascript: document.frm_stg.submit();'>";
@@ -60,12 +60,12 @@
 	}
 	echo "</SELECT>";
 	echo '</form>';
-	
+
 	//Lehrveranstaltungen ohne kurzbezeichnung holen
 	if($stg=='')
 		die('Bitte einen Studiengang auswaehlen');
 	$qry = "SELECT *, ausbildungssemester.name as ausbildungssemestername, lehrveranstaltung.name as lehrveranstaltungname FROM lehrveranstaltung, ausbildungssemester, studiensemester WHERE lehrveranstaltung.ausbildungssemester_fk=ausbildungssemester.ausbildungssemester_pk AND lehrveranstaltung.studiensemester_fk=studiensemester.studiensemester_pk AND (lehrveranstaltung.kurzbezeichnung is null OR lehrveranstaltung.kurzbezeichnung='') AND lehrveranstaltung.studiengang_fk='".addslashes($stg)."' ORDER BY lehrveranstaltung_pk";
-	
+
 	if(!$result = pg_query($conn, $qry))
 		die('Fehler beim lesen aus der Datenbank');
 	$anz = pg_num_rows($result);
@@ -82,7 +82,7 @@
 		$result_kurzbz = pg_query($conn, $qry);
 		while($row_kurzbz = pg_fetch_object($result_kurzbz))
 			$kuerzel .= $row_kurzbz->kurzbezeichnung.',';
-		
+
 		$i++;
 		echo '<tr class="liste'.($i%2).'">';
 		echo "<td>$row->lehrveranstaltung_pk</td>";
@@ -92,7 +92,7 @@
 		echo "<td>$kuerzel</td>";
 		//Textfeld zum eingeben der Kurzbezeichnung
 		echo "<td><form action='$PHP_SELF?studiengang=$stg&lehrveranstaltung_id=$row->lehrveranstaltung_pk' method='POST'><input type='text' size='5' maxlength='5' tabindex='$i' name='kurzbz'><input type='submit' value='Speichern'></form></td>";
-		echo '</tr>';		
+		echo '</tr>';
 	}
 	echo '</table>';
 ?>
