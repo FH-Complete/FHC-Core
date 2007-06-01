@@ -18,7 +18,6 @@ $anzahl_quelle=0;
 $anzahl_eingefuegt=0;
 $anzahl_fehler=0;
 $i=0;
-$k=0;
 $qry1='';
 $zweitbetreuer='';
 $combobox[]="";
@@ -35,7 +34,13 @@ $nachname[]="";
 </head>
 <body>
 <?php
-
+if(isset($_POST['anlegen']))
+{
+	$qry="INSERT INTO public.tbl_person (titelpre,vorname,nachname,updatevon) VALUES
+		('".$_POST['titel']."','".$_POST['vorname']."','".$_POST['nachname']."','Administrator');";
+	if($result = pg_query($conn, $qry))
+		echo 'Person '.$_POST['nachname'].' wurde in VileSci angelegt!<BR>';
+}
 if(isset($_POST['da']))
 {
 	if(isset($_POST['erst']) AND trim($_POST['erst'])!='')
@@ -73,14 +78,6 @@ if(isset($_POST['da']))
 	}
 }
 
-//ob_flush();
-//flush();
-
-/*$qryvilesci="SELECT titelpre, nachname, vorname, titelpost, person_id FROM public.tbl_person WHERE
-	(person_id IN (SELECT person_id FROM public.tbl_benutzer, public.tbl_mitarbeiter WHERE public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid)
-	OR trim(updatevon)='Administrator')
-	AND trim(nachname)!='Account' AND trim(nachname)!='Lektor' AND trim(vorname)!='Lektor'
-	ORDER BY nachname;";*/
 $qryvilesci="SELECT titelpre, nachname, vorname, titelpost, person_id
 				FROM public.tbl_person WHERE trim(updatevon)='Administrator'";
 $qryvilesci.=" UNION SELECT titelpre, nachname, vorname, titelpost, person_id
@@ -112,7 +109,7 @@ if($result = pg_query($conn_fas, $qry))
 	echo '<BR>Verbleibend: '.$row->anz.' Diplomarbeiten<BR>';
 }
 
-echo "<table class='liste'><tr><th></th><th>FAS</th><th>Vilesci</th><th></th></tr>";
+echo "<table class='liste'><tr><th>FAS</th><th>Vilesci</th><th></th><th>Titel/Vorname/Nachname</th></tr>";
 
 
 $qry="SELECT *, trim(substring(trim(erstbegutachter) from ' [A-ü]*$')) as erst, trim(substring(trim(zweitbegutachter) from ' [A-ü]*$')) as zweit, trim(substring(trim(betreuer) from ' [A-ü]*$')) as dritt,
@@ -129,28 +126,19 @@ $qry="SELECT *, trim(substring(trim(erstbegutachter) from ' [A-ü]*$')) as erst, 
 	ORDER BY diplomarbeit_pk
 	LIMIT 10;";
 //ORDER BY diplomarbeit_pk
+
 if($result = pg_query($conn_fas, $qry))
 {
-	while($row = pg_fetch_object($result))
+	for($k=0;$row=pg_fetch_object($result);$k++)
 	{
-		/*$qryselect="SELECT trim(substring(trim(zweitbegutachter) from ' [A-ü]*$')) as zweit, trim(substring(trim(betreuer) from ' [A-ü]*$')) as dritt,
-		trim(substring(trim(firmenbetreuer) from ' [A-ü]*$')) as viert, trim(substring(trim(pruefer) from ' [A-ü]*$')) as fuenft,
-		trim(substring(trim(vorsitzender) from ' [A-ü]*$')) as sechst, trim(substring(trim(pruefer1) from ' [A-ü]*$')) as siebent
-		FROM diplomarbeit WHERE diplomarbeit_pk='".$row->diplomarbeit_pk."';";
-		$resultselect = pg_query($conn_fas, $qryselect);
-		$rowselect = pg_fetch_object($resultselect);*/
-
-		$k++;
 		if($row->vilesci_erstbegutachter=='' AND $row->erstbegutachter!='')
 		{
 			echo "<tr class='liste".($k%2)."'>";
 			echo "<form  method='POST'>";
-			echo "<td><input type='submit' value='Speichern'></td>";
-			echo "<td>'".$row->erstbegutachter."'";
 			echo "<input type='hidden' name='da' value='".$row->diplomarbeit_pk."'>";
-			echo "</td>";
+			echo "<td>'".$row->erstbegutachter."'</td>";
 			echo "<td><select name=\"erst\">";
-			echo"<option value=\"\"></option>";
+			echo "<option value=\"\"></option>";
 			for($j=0;$j<$i;$j++)
 			{
 				if($nachname[$j]==$row->erst)
@@ -170,18 +158,17 @@ if($result = pg_query($conn_fas, $qry))
 			echo "</td>";
 			echo "<td><input type='submit' value='Speichern'></td>";
 			echo "</form>";
+			echo "<form method='Post'><td><input type='text' name='titel'><input type='text' name='vorname'><input type='text' name='nachname' value='$row->erst'><input type='submit' name='anlegen' value='Anlegen'></td></form>";
 			echo "</tr>";
 		}
 		if($row->vilesci_zweitbegutachter=='' AND $row->zweitbegutachter!='')
 		{
 			echo "<tr class='liste".($k%2)."'>";
 			echo "<form  method='POST'>";
-			echo "<td><input type='submit' value='Speichern'></td>";
-			echo "<td>'".$row->zweitbegutachter."'";
 			echo "<input type='hidden' name='da' value='".$row->diplomarbeit_pk."'>";
-			echo "</td>";
+			echo "<td>'".$row->zweitbegutachter."'</td>";
 			echo "<td><select name=\"top1\">";
-			echo"<option value=\"\"></option>";
+			echo "<option value=\"\"></option>";
 			for($j=0;$j<$i;$j++)
 			{
 				if($nachname[$j]==$row->zweit)
@@ -201,16 +188,15 @@ if($result = pg_query($conn_fas, $qry))
 			echo "</td>";
 			echo "<td><input type='submit' value='Speichern'></td>";
 			echo "</form>";
+			echo "<form method='Post'><td><input type='text' name='titel'><input type='text' name='vorname'><input type='text' name='nachname' value='$row->zweit'><input type='submit' name='anlegen' value='Anlegen'></td></form>";
 			echo "</tr>";
 		}
 		if(($row->vilesci_betreuer=='' OR $row->vilesci_betreuer==NULL) AND trim($row->betreuer)!='')
 		{
 			echo "<tr class='liste".($k%2)."'>";
 			echo "<form  method='POST'>";
-			echo "<td><input type='submit' value='Speichern'></td>";
-			echo "<td>'".$row->betreuer."'";
 			echo "<input type='hidden' name='da' value='".$row->diplomarbeit_pk."'>";
-			echo "</td>";
+			echo "<td>'".$row->betreuer."'</td>";
 			echo "<td><select name=\"top2\">";
 			echo"<option value=\"\"></option>";
 			for($j=0;$j<$i;$j++)
@@ -232,16 +218,15 @@ if($result = pg_query($conn_fas, $qry))
 			echo "</td>";
 			echo "<td><input type='submit' value='Speichern'></td>";
 			echo "</form>";
+			echo "<form method='Post'><td><input type='text' name='titel'><input type='text' name='vorname'><input type='text' name='nachname' value='$row->dritt'><input type='submit' name='anlegen' value='Anlegen'></td></form>";
 			echo "</tr>";
 		}
 		if(($row->vilesci_firmenbetreuer=='' OR $row->vilesci_firmenbetreuer==NULL) AND trim($row->firmenbetreuer)!='')
 		{
 			echo "<tr class='liste".($k%2)."'>";
 			echo "<form  method='POST'>";
-			echo "<td><input type='submit' value='Speichern'></td>";
-			echo "<td>'".$row->firmenbetreuer."'";
 			echo "<input type='hidden' name='da' value='".$row->diplomarbeit_pk."'>";
-			echo "</td>";
+			echo "<td>'".$row->firmenbetreuer."'</td>";
 			echo "<td><select name=\"top3\">";
 			echo"<option value=\"\"></option>";
 			for($j=0;$j<$i;$j++)
@@ -263,16 +248,15 @@ if($result = pg_query($conn_fas, $qry))
 			echo "</td>";
 			echo "<td><input type='submit' value='Speichern'></td>";
 			echo "</form>";
+			echo "<form method='Post'><td><input type='text' name='titel'><input type='text' name='vorname'><input type='text' name='nachname' value='$row->viert'><input type='submit' name='anlegen' value='Anlegen'></td></form>";
 			echo "</tr>";
 		}
 		if(($row->vilesci_pruefer=='' OR $row->vilesci_pruefer==NULL) AND trim($row->pruefer)!='')
 		{
 			echo "<tr class='liste".($k%2)."'>";
-			echo "<form method='POST'>";
-			echo "<td><input type='submit' value='Speichern'></td>";
-			echo "<td>'".$row->pruefer."'";
+			echo "<form  method='POST'>";
 			echo "<input type='hidden' name='da' value='".$row->diplomarbeit_pk."'>";
-			echo "</td>";
+			echo "<td>'".$row->pruefer."'</td>";
 			echo "<td><select name=\"top4\">";
 			echo"<option value=\"\"></option>";
 			for($j=0;$j<$i;$j++)
@@ -294,16 +278,15 @@ if($result = pg_query($conn_fas, $qry))
 			echo "</td>";
 			echo "<td><input type='submit' value='Speichern'></td>";
 			echo "</form>";
+			echo "<form method='Post'><td><input type='text' name='titel'><input type='text' name='vorname'><input type='text' name='nachname' value='$row->fuenft'><input type='submit' name='anlegen' value='Anlegen'></td></form>";
 			echo "</tr>";
 		}
 		if(($row->vilesci_vorsitzender=='' OR $row->vilesci_vorsitzender==NULL) AND trim($row->vorsitzender)!='')
 		{
 			echo "<tr class='liste".($k%2)."'>";
-			echo "<form method='POST'>";
-			echo "<td><input type='submit' value='Speichern'></td>";
-			echo "<td>'".$row->vorsitzender."'";
+			echo "<form  method='POST'>";
 			echo "<input type='hidden' name='da' value='".$row->diplomarbeit_pk."'>";
-			echo "</td>";
+			echo "<td>'".$row->vorsitzender."'</td>";
 			echo "<td><select name=\"top5\">";
 			echo"<option value=\"\"></option>";
 			for($j=0;$j<$i;$j++)
@@ -325,16 +308,15 @@ if($result = pg_query($conn_fas, $qry))
 			echo "</td>";
 			echo "<td><input type='submit' value='Speichern'></td>";
 			echo "</form>";
+			echo "<form method='Post'><td><input type='text' name='titel'><input type='text' name='vorname'><input type='text' name='nachname' value='$row->sechst'><input type='submit' name='anlegen' value='Anlegen'></td></form>";
 			echo "</tr>";
 		}
 		if(($row->vilesci_pruefer1=='' OR $row->vilesci_pruefer1==NULL) AND trim($row->pruefer1)!='')
 		{
 			echo "<tr class='liste".($k%2)."'>";
-			echo "<form method='POST'>";
-			echo "<td><input type='submit' value='Speichern'></td>";
-			echo "<td>'".$row->pruefer1."'";
+			echo "<form  method='POST'>";
 			echo "<input type='hidden' name='da' value='".$row->diplomarbeit_pk."'>";
-			echo "</td>";
+			echo "<td>'".$row->pruefer1."'</td>";
 			echo "<td><select name=\"top6\">";
 			echo"<option value=\"\"></option>";
 			for($j=0;$j<$i;$j++)
@@ -356,8 +338,10 @@ if($result = pg_query($conn_fas, $qry))
 			echo "</td>";
 			echo "<td><input type='submit' value='Speichern'></td>";
 			echo "</form>";
+			echo "<form method='Post'><td><input type='text' name='titel'><input type='text' name='vorname'><input type='text' name='nachname' value='$row->siebent'><input type='submit' name='anlegen' value='Anlegen'></td></form>";
 			echo "</tr>";
 		}
+
 	}
 }
 echo "</table>";
