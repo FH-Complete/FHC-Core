@@ -324,7 +324,15 @@ h4
 	background-color: #00FF00;
 }
 
-body, td
+td
+{
+	margin:	4px;
+	font-family: arial, tahoma, verdana, helvetica, sans-serif, serif;
+	padding: 0px;
+	font-size: smaller; /*0.8em;*/
+}
+
+body
 {
 	background-color: #FFFFFF;
 	margin:	4px;
