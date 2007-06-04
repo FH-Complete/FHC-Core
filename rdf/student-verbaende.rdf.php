@@ -1,14 +1,13 @@
 <?php
 header("Content-type: application/vnd.mozilla.xul+xml");
 echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
-include('../vilesci/config.inc.php');
-include('../include/berechtigung.class.php');
+require_once('../vilesci/config.inc.php');
+require_once('../include/berechtigung.class.php');
+require_once('../include/functions.inc.php');
 
 $rdf_url='http://www.tempus-student-verbaende.at/';
 
-if (!isset($REMOTE_USER))
-	$REMOTE_USER='pam';
-$uid=$REMOTE_USER;
+$uid=get_uid();
 
 if (!$conn = @pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';

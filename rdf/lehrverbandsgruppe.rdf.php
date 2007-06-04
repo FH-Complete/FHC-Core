@@ -1,15 +1,14 @@
 <?php
 header("Content-type: application/vnd.mozilla.xul+xml");
 echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
-include('../vilesci/config.inc.php');
-include('../include/benutzerberechtigung.class.php');
-include('../include/studiensemester.class.php');
+require_once('../vilesci/config.inc.php');
+require_once('../include/functions.inc.php');
+require_once('../include/benutzerberechtigung.class.php');
+require_once('../include/studiensemester.class.php');
 
 $rdf_url='http://www.technikum-wien.at/lehrverbandsgruppe/';
 
-if (!isset($REMOTE_USER))
-	$REMOTE_USER='pam';
-$uid=$REMOTE_USER;
+$uid=get_uid();
 
 if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
@@ -34,7 +33,7 @@ $sql_query="SET search_path TO public;
 				LEFT OUTER JOIN tbl_gruppe  ON (tbl_lehrverband.studiengang_kz=tbl_gruppe.studiengang_kz AND tbl_lehrverband.semester=tbl_gruppe.semester AND (tbl_lehrverband.verband=''))
 			WHERE tbl_lehrverband.aktiv $stg_kz_query
 			ORDER BY erhalter_kz,typ, kurzbz, semester,verband,gruppe, gruppe_kurzbz;";
-//echo $sql_query;
+
 if(!$result=pg_query($conn, $sql_query))
 	$error_msg.=pg_errormessage($conn);
 else

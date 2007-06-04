@@ -26,19 +26,17 @@ include('../include/functions.inc.php');
 include('../include/fas/benutzer.class.php');
 
 // Testumgebung
-if (!isset($REMOTE_USER))
-	$REMOTE_USER='pam';
+$user=get_uid();
 
-$uid=$REMOTE_USER;
 $error_msg='';
 
 //Variablen laden
 if (!$conn = @pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-$error_msg.=loadVariables($conn,$REMOTE_USER);
+$error_msg.=loadVariables($conn,$user);
 
 $benutzer = new benutzer($conn);
-if(!$benutzer->loadVariables($uid))
+if(!$benutzer->loadVariables($user))
 	$error_msg = $benutzer->errormsg;
 /*echo '<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>';*/
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
