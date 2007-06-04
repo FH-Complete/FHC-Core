@@ -33,6 +33,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentdetailoverlay.xul.p
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentzeugnisoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentkontooverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentbetriebsmitteloverlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentiooverlay.xul.php"?>';
 ?>
 <!DOCTYPE overlay >
 
@@ -180,6 +181,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentbetriebsmitteloverl
 							<tab id="student-tab-konto" label="Konto" />
 							<tab id="student-tab-zeugnis" label="Zeugnis" />
 							<tab id="student-tab-betriebsmittel" label="Betriebsmittel" />
+							<tab id="student-tab-io" label="Incomming/Outgoing" />
 						</tabs>
 						<tabpanels id="student-tabpanels-main" flex="1">
 							<vbox id="student-detail"  style="margin-top:10px;" />
@@ -187,6 +189,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentbetriebsmitteloverl
 							<vbox id="student-konto"  style="margin-top:10px;" />
 							<vbox id="student-zeugnis"  style="margin-top:10px;" />
 							<vbox id="student-betriebsmittel"  style="margin-top:10px;" />
+							<vbox id="student-io"  style="margin-top:10px;" />
 						</tabpanels>
 					</tabbox>				
 				</vbox>

@@ -1744,3 +1744,197 @@ function StudentPrintInskriptionsbestaetigung()
 	else
 		alert('Bitte einen Studenten auswaehlen');
 }
+
+// **************** Incomming/Outgoing ******************
+
+// ****
+// * Wenn ein IO Eintrag Ausgewaehlt wird, dann werden
+// * die Details geladen und angezeigt
+// ****
+function StudentIOAuswahl()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-io-tree');
+
+	if (tree.currentIndex==-1) return;
+
+	StudentIODetailDisableFields(false);
+	document.getElementById('student-io-checkbox-neu').checked=false;
+	
+	//Ausgewaehlte Nr holen
+    var col = tree.columns ? tree.columns["student-io-tree-bisio_id"] : "student-io-tree-bisio_id";
+	var bisio_id=tree.view.getCellText(tree.currentIndex,col);
+	
+	//Daten holen
+	var url = '<?php echo APP_ROOT ?>rdf/bisio.rdf.php?bisio_id='+bisio_id+'&'+gettimestamp();
+		
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
+                   getService(Components.interfaces.nsIRDFService);
+    
+    var dsource = rdfService.GetDataSourceBlocking(url);
+    
+	var subject = rdfService.GetResource("http://www.technikum-wien.at/bisio/" + bisio_id);
+
+	var predicateNS = "http://www.technikum-wien.at/bisio/rdf";
+
+	//Daten holen
+
+	mobilitaetsprogramm_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#mobilitaetsprogramm_code" ));
+	nation_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#nation_code" ));
+	von = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#von" ));
+	bis = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bis" ));
+	zweck_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zweck_code" ));
+	student_uid = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#student_uid" ));
+			
+	document.getElementById('student-io-menulist-mobilitaetsprogramm').value=mobilitaetsprogramm_code;
+	document.getElementById('student-io-menulist-nation_code').value=nation_code;
+	document.getElementById('student-io-textbox-von').value=von;
+	document.getElementById('student-io-textbox-bis').value=bis;
+	document.getElementById('student-io-menulist-zweck').value=zweck_code;
+	document.getElementById('student-io-textbox-uid').value=uid;
+}
+
+// ****
+// * Aktiviert / Deaktiviert die IO Felder
+// ****
+function StudentIODisableFields(val)
+{
+	document.getElementById('student-io-button-neu').disabled=val;
+	document.getElementById('student-io-button-loeschen').disabled=val;
+	StudentIODetailDisableFields(true);
+}
+
+// ****
+// * Aktiviert / Deaktiviert die IO-Detail Felder
+// ****
+function StudentIODetailDisableFields(val)
+{
+	document.getElementById('student-io-textbox-von').disabled=val;
+	document.getElementById('student-io-textbox-bis').disabled=val;
+	document.getElementById('student-io-menulist-mobilitaetsprogramm').disabled=val;
+	document.getElementById('student-io-menulist-nation_code').disabled=val;
+	document.getElementById('student-io-menulist-zweck_code').disabled=val;
+	document.getElementById('student-io-button-speichern').disabled=val;
+}
+
+// *****
+// * Resettet die Werte in den Detailfeldern des Incomming/Outgoing Moduls
+// *****
+function StudentIOResetFileds()
+{
+	document.getElementByID('student-io-textbox-von').value='';
+	document.getElementById('student-io-textbox-bis').value='';
+	document.getElementById('student-io-menulist-mobilitaetsprogramm').value='6';
+	document.getElementById('student-io-menulist-zweck').value='1';
+	document.getElementById('student-io-menulist-nation').value='A';
+}
+
+// ****
+// * Speichert den IO Datensatz
+// ****
+function StudentIODetailSpeichern()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	
+	von = document.getElementById('student-io-textbox-von').value;
+	bis = document.getElementById('student-io-textbox-bis').value;
+	mobilitaetsprogramm = document.getElementById('student-io-menulist-mobilitaetsprogramm').value;
+	nation_code = document.getElementById('student-io-menulist-nation').value;
+	zweck_code = document.getElementById('student-io-menulist-zweck').value;
+	uid = document.getElementById('student-io-textbox-uid').value;
+	neu = document.getElementById('student-io-checkbox-neu').checked;
+	bisio_id = document.getElementById('student-io-textbox-bisio_id').value;
+	
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+	
+	req.add('type', 'saveio');
+	
+	if(neu)
+		req.add('bisio_id', bisio_id);
+	
+	req.add('neu', neu);
+	req.add('von', von);
+	req.add('bis', bis);
+	req.add('mobilitaetsprogramm', mobilitaetsprogramm);
+	req.add('nation_code', nation_code);
+	req.add('zweck_code', zweck_code);
+	req.add('uid', uid);
+		
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+	
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+	}
+	else
+	{			
+		StudentIOSelectID=bisio_id;
+		StudentIOTreeDatasource.Refresh(false); //non blocking
+		SetStatusBarText('Daten wurden gespeichert');
+	}
+}
+
+// ****
+// * Loescht eines IO Eintrages
+// ****
+function StudentIODelete()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-io-tree');
+
+	if (tree.currentIndex==-1) return;
+
+	StudentIODetailDisableFields(false);
+	
+	//Ausgewaehlte Nr holen
+    var col = tree.columns ? tree.columns["student-io-tree-bisio_id"] : "student-io-tree-bisio_id";
+	var bisio_id=tree.view.getCellText(tree.currentIndex,col);
+	
+	if(confirm('Diesen Eintrag wirklich loeschen?'))
+	{
+		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+		var req = new phpRequest(url,'','');
+		
+		req.add('type', 'deleteio');
+		
+		req.add('bisio_id', bisio_id);
+			
+		var response = req.executePOST();
+	
+		var val =  new ParseReturnValue(response)
+		
+		if (!val.dbdml_return)
+		{
+			if(val.dbdml_errormsg=='')
+				alert(response)
+			else
+				alert(val.dbdml_errormsg)
+		}
+		else
+		{			
+			StudentIOSelectID=bisio_id;
+			StudentIOTreeDatasource.Refresh(false); //non blocking
+			SetStatusBarText('Daten wurden geloescht');
+		}
+	}
+}
+
+// ****
+// * Aktiviert die Felder zum Anlegen eines neuen Eintrages
+// ****
+function StudentIONeu()
+{
+	//Felder Resetten und Aktivieren
+	StudentIOResetFileds();
+	StudentIODetailDisableFields(false);
+	
+	//UID ins Textfeld schreiben	
+	document.getElementById('student-io-textbox-uid').value=document.getElementById('student-detail-textbox-uid').value;	
+	document.getElementById('student-io-checkbox-neu').checked=true;
+}

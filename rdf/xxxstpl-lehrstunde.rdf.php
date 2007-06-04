@@ -13,11 +13,7 @@ include('../include/functions.inc.php');
 include('../include/lehrstunde.class.php');
 include('../include/stundenplan.class.php');
 
-// Testumgebung
-if (!isset($REMOTE_USER))
-	$REMOTE_USER='pam';
-
-$uid=$REMOTE_USER;
+$uid=get_uid();
 
 // Variablen uebernehmen
 if (isset($_GET[aktion]))

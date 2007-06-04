@@ -20,10 +20,7 @@ require_once('../include/functions.inc.php');
 require_once('../include/lehreinheit.class.php');
 require_once('../include/benutzerberechtigung.class.php');
 
-// Testumgebung
-if (!isset($REMOTE_USER))
-	$REMOTE_USER='pam';
-$uid=$REMOTE_USER;
+$uid=get_uid();
 $error_msg='';
 
 if (!$conn = pg_pconnect(CONN_STRING))

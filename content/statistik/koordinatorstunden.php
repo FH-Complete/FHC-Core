@@ -23,6 +23,13 @@ require_once('../../vilesci/config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
 
+echo '
+<html>
+<head>
+<title>Koordinatorstunden</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">';
+
 // Datenbank Verbindung
 if (!$conn = pg_pconnect(CONN_STRING))
    	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
@@ -30,24 +37,28 @@ if (!$conn = pg_pconnect(CONN_STRING))
 $user = get_uid();
 loadVariables($conn, $user);
 
-if(!isset($_GET['fachbereich_kurzbz']))
-	die('Falsche Parameteruebergabe');
-else 
+if(isset($_GET['fachbereich_kurzbz']))
 	$fachbereich_kurzbz = $_GET['fachbereich_kurzbz'];
+else 
+	die('Falsche Parameteruebergabe');
 	
-echo '<html><body>';
-echo '<b>Fachbereich: '.$fachbereich_kurzbz.'</b><br><br>';
+echo '<h1>Koordinatorstunden - Fachbereich '.$fachbereich_kurzbz.'</h1>';
 
+$stg_arr = array();
+$data = array();
+$name = array();
+
+//alle Studiengaenge holen
 $studiengang = new studiengang($conn);
 $studiengang->getAll();
-$stg_arr = array();
 
 foreach ($studiengang->result as $row)
 	$stg_arr[$row->studiengang_kz]=$row->kuerzel;
 	
 //Alle Fachbereichsleiter des uebergebenen Studienganges holen und
 //Die Anzahl der Stunden die dieser in den einzelnen Studiengaengen haelt ermitteln
-$qry = "SET CLIENT_ENCODING TO 'UNICODE';SELECT 
+$qry = "SET CLIENT_ENCODING TO 'UNICODE';
+		SELECT 
 			distinct on(tbl_lehreinheit.lehreinheit_id)
 			tbl_benutzerfunktion.uid, 
 			tbl_lehreinheitmitarbeiter.semesterstunden, 
@@ -62,19 +73,16 @@ $qry = "SET CLIENT_ENCODING TO 'UNICODE';SELECT
 			public.tbl_benutzer,
 			public.tbl_person
 		WHERE 
-		tbl_benutzerfunktion.uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid AND
-		tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-		tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-		tbl_benutzerfunktion.fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."' AND
-		tbl_benutzerfunktion.funktion_kurzbz='fbk' AND
-		tbl_benutzerfunktion.uid=tbl_benutzer.uid AND
-		tbl_benutzer.person_id=tbl_person.person_id AND
-		tbl_lehreinheit.studiensemester_kurzbz='$semester_aktuell'
+			tbl_benutzerfunktion.uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid AND
+			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
+			tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
+			tbl_benutzerfunktion.fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."' AND
+			tbl_benutzerfunktion.funktion_kurzbz='fbk' AND
+			tbl_benutzerfunktion.uid=tbl_benutzer.uid AND
+			tbl_benutzer.person_id=tbl_person.person_id AND
+			tbl_lehreinheit.studiensemester_kurzbz='$semester_aktuell'
 		ORDER BY tbl_lehreinheit.lehreinheit_id, nachname, vorname
 		";
-
-$data = array();
-$name = array();
 
 if($result = pg_query($conn, $qry))
 {
@@ -97,13 +105,16 @@ if($result = pg_query($conn, $qry))
 	}
 }
 
-echo '<table border="1"><tr><th>Name</th><th>Studiengang</th><th>Stunden</th></tr>';
+echo '<table class="liste"><tr class="liste"><th>Name</th><th>Studiengang</th><th>Stunden</th></tr>';
 
+$i=0;
 foreach ($name as $uid=>$row) 
 {		
 	foreach ($data[$uid] as $stg=>$row2)	
 	{
-		echo '<tr><td>'.$name[$uid]['vorname'].' '.$name[$uid]['nachname'].'</td><td>'.$stg_arr[$stg].'</td><td>'.$row2.'</td></tr>';
+		echo '<tr class="liste'.($i%2).'"><td>'.$name[$uid]['vorname'].' '.$name[$uid]['nachname'].
+			 '</td><td>'.$stg_arr[$stg].'</td><td>'.$row2.'</td></tr>';
+		$i++;
 	}
 }
 echo '</table>';

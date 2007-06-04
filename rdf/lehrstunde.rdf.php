@@ -15,9 +15,9 @@ header("Content-type: application/vnd.mozilla.xul+xml");
 // xml
 echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
 
-include('../cis/config.inc.php');
-include('../include/functions.inc.php');
-include('../include/lehrstunde.class.php');
+require_once('../cis/config.inc.php');
+require_once('../include/functions.inc.php');
+require_once('../include/lehrstunde.class.php');
 
 function checkID($needle)
 {
@@ -40,9 +40,7 @@ if (isset($stundenplan_id0))
 
 //print_r($idList);
 
-if (!isset($REMOTE_USER))
-	$REMOTE_USER='pam';
-$uid=$REMOTE_USER;
+$uid=get_uid();
 
 if (isset($_GET['datum']))
 	$datum=$_GET['datum'];
