@@ -70,6 +70,29 @@ function CutString($strVal, $limit)
 // GENERATE XML
 $xml = '<?xml version="1.0" encoding="ISO-8859-15" ?><lehrauftraege>';
 
+//Studiengang laden
+$studiengang = new studiengang($conn, $studiengang_kz);
+
+//Fachbereiche laden
+$fb_arr = array();
+	$fachbereich_obj = new fachbereich($conn);
+	$fachbereich_obj->getAll();
+	foreach ($fachbereich_obj->result as $fb)
+		$fb_arr[$fb->fachbereich_kurzbz] = $fb->bezeichnung;
+		
+//Studiengangsleiter holen
+$stgl='';
+$qry = "SELECT titelpre, vorname, nachname, titelpost FROM public.tbl_benutzerfunktion, public.tbl_person, public.tbl_benutzer WHERE
+		funktion_kurzbz='stgl' AND studiengang_kz='".addslashes($studiengang_kz)."'
+		AND tbl_benutzerfunktion.uid=tbl_benutzer.uid AND tbl_benutzer.person_id=tbl_person.person_id";
+if($result = pg_query($conn, $qry))
+{
+	if($row = pg_fetch_object($result))
+	{
+		$stgl = trim($row->titelpost.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost);
+	}
+}
+
 if($uid==null)
 {
 	$qry = "SELECT distinct tbl_lehreinheitmitarbeiter.mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung WHERE
@@ -90,13 +113,18 @@ else
 	drawLehrauftrag($uid);
 function drawLehrauftrag($uid)
 {
-	global $studiengang_kz, $ss, $xml, $conn;
+	global $studiengang;
+	global $studiengang_kz;
+	global $fb_arr;
+	global $ss;
+	global $xml;
+	global $conn;
+	global $stgl;
 	
 	$xml.='<lehrauftrag>
 		<studiengang>FH-';
 	//Studiengang
-	$studiengang = new studiengang($conn, $studiengang_kz);
-	
+		
 	if($studiengang->typ=='d')
 		$xml.= 'Diplom-';
 	elseif($studiengang->typ=='m')
@@ -137,13 +165,6 @@ function drawLehrauftrag($uid)
 	}
 	
 	//Lehreinheiten
-	$fb_arr = array();
-	$fachbereich_obj = new fachbereich($conn);
-	$fachbereich_obj->getAll();
-	foreach ($fachbereich_obj->result as $fb)
-		$fb_arr[$fb->fachbereich_kurzbz] = $fb->bezeichnung;
-	
-	$lehreinheit = new lehreinheit($conn);
 	$qry = "SELECT * FROM campus.vw_lehreinheit WHERE lv_studiengang_kz='".addslashes($studiengang_kz)."' AND mitarbeiter_uid='".addslashes($uid)."' AND studiensemester_kurzbz='$ss' ORDER BY lehreinheit_id";
 	
 	if($result = pg_query($conn, $qry))
@@ -227,19 +248,9 @@ function drawLehrauftrag($uid)
 		<gesamtstunden>$gesamtstunden</gesamtstunden>
 		<gesamtbetrag>".number_format($gesamtkosten,2,',','.')."</gesamtbetrag>";
 	
-	//Studiengangsleiter
-	$qry = "SELECT titelpre, vorname, nachname, titelpost FROM public.tbl_benutzerfunktion, public.tbl_person, public.tbl_benutzer WHERE
-			funktion_kurzbz='stgl' AND studiengang_kz='".addslashes($studiengang_kz)."'
-			AND tbl_benutzerfunktion.uid=tbl_benutzer.uid AND tbl_benutzer.person_id=tbl_person.person_id";
-	if($result = pg_query($conn, $qry))
-	{
-		if($row = pg_fetch_object($result))
-		{
-			$stgl = trim($row->titelpost.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost);
+	
 	$xml.="
 		<studiengangsleiter>$stgl</studiengangsleiter>";
-		}
-	}
 	
 	$xml.= '
 		<datum>'.date('d.m.Y').'</datum>
