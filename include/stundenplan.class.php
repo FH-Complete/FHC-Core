@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -26,7 +26,7 @@ class stundenplan
 	var $errormsg; // string
 	var $new;      // boolean
 	var $stundenplan = array(); // stundenplan Objekt
-	
+
 	//Tabellenspalten
 	var $lehreinheit_id;			// integer
 	var $lehrveranstaltung_nr;		// integer
@@ -42,33 +42,33 @@ class stundenplan
 	var $anmerkung;					// varchar(255)
 	var $unr;						// integer
 	var $ext_id;					// bigint
-	
+
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine LE
 	// * @param $conn        	Datenbank-Connection
 	// *        $gruppe_kurzbz
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
+	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
 	function lehreinheit($conn, $lehreinheit_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
+		else
 			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
+
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-		
+
 		if($lehreinheit_id!=null)
 			$this->load($lehreinheit_id);
 	}
-	
+
 	// *********************************************************
 	// * Laedt die LE
 	// * @param lehreinheit_id
@@ -77,9 +77,9 @@ class stundenplan
 	{
 		return false;
 	}
-	
+
 	// *******************************************
-	// * Prueft die Variablen vor dem Speichern 
+	// * Prueft die Variablen vor dem Speichern
 	// * auf Gueltigkeit.
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
@@ -183,7 +183,7 @@ class stundenplan
 
 	// ************************************************
 	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische 
+	// * wenn $var !='' ist werden Datenbankkritische
 	// * Zeichen mit Backslash versehen und das Ergbnis
 	// * unter Hochkomma gesetzt.
 	// ************************************************
@@ -202,7 +202,7 @@ class stundenplan
 	{
 		if(is_null($new))
 			$new = $this->new;
-					
+
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
 			return false;
@@ -210,8 +210,8 @@ class stundenplan
 		if($new)
 		{
 			//ToDo ID entfernen
-			$qry = 'INSERT INTO lehre.tbl_lehreinheit (lehrveranstaltung_nr, studiensemester_kurzbz, 
-			                                     lehrfach_nr, lehrform_kurzbz, stundenblockung, wochenrythmus, 
+			$qry = 'INSERT INTO lehre.tbl_lehreinheit (lehrveranstaltung_nr, studiensemester_kurzbz,
+			                                     lehrfach_nr, lehrform_kurzbz, stundenblockung, wochenrythmus,
 			                                     start_kw, raumtyp, raumtypalternativ, lehre, anmerkung, unr, ext_id)
 			        VALUES('.$this->addslashes($this->lehrveranstaltung_nr).','.
 					$this->addslashes($this->studiensemester_kurzbz).','.

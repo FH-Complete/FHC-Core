@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -26,7 +26,7 @@ class uebung
 	var $errormsg; // string
 	var $new;      // boolean
 	var $uebungen = array(); // lehreinheit Objekt
-	
+
 	//Tabellenspalten
 	var $uebung_id;		// serial
 	var $gewicht;		// smalint
@@ -45,7 +45,7 @@ class uebung
 	var $insertamum;		// timestamp
 	var $insertvon;			// varchar(16)
 	var $statistik;			// boolean
-	
+
 	//Studentuebung
 	var $student_uid;		// varchar(16)
 	var $mitarbeiter_uid;	// varchar(16)
@@ -54,33 +54,33 @@ class uebung
 	var $mitarbeitspunkte;	// smalint
 	var $anmerkung;			// text
 	var $benotungsdatum;	// timestamp
-	
+
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine Uebung
 	// * @param $conn        	Datenbank-Connection
 	// * 		$uebung_id
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
+	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
 	function uebung($conn, $uebung_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
+		else
 			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
+
 		if(!pg_query($this->conn,$qry))
 		{
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-		
+
 		if($uebung_id!=null)
 			$this->load($uebung_id);
 	}
-	
+
 	// *********************************************************
 	// * Laedt die Uebung
 	// * @param uebung_id
@@ -93,7 +93,7 @@ class uebung
 			return false;
 		}
 		$qry = "SELECT * FROM campus.tbl_uebung WHERE uebung_id='$uebung_id'";
-		
+
 		if($result=pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
@@ -117,13 +117,13 @@ class uebung
 				$this->statistik = ($row->statistik=='t'?true:false);
 				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = "Es ist keine Uebung mit der ID $uebung_id vorhanden";
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim laden der Uebung';
 			return false;
@@ -132,7 +132,7 @@ class uebung
 	function load_studentuebung($student_uid, $uebung_id)
 	{
 		$qry = "SELECT * FROM campus.tbl_studentuebung WHERE student_uid='$student_uid' AND uebung_id='$uebung_id'";
-		
+
 		if($result = pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
@@ -152,19 +152,19 @@ class uebung
 				$this->insertvon = $row->insertvon;
 				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Es gibt keinen passenden Eintrag';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim laden des eintrages';
 			return false;
 		}
 	}
-	
+
 	function load_uebung($lehreinheit_id)
 	{
 		if(!is_numeric($lehreinheit_id))
@@ -172,15 +172,15 @@ class uebung
 			$this->errormsg = 'Lehreinheit_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM campus.tbl_uebung WHERE lehreinheit_id='$lehreinheit_id' ORDER BY bezeichnung";
-				
+
 		if($result=pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
 			{
 				$uebung_obj = new uebung($this->conn);
-				
+
 				$uebung_obj->uebung_id = $row->uebung_id;
 				$uebung_obj->gewicht = $row->gewicht;
 				$uebung_obj->punkte = $row->punkte;
@@ -198,20 +198,20 @@ class uebung
 				$uebung_obj->insertamum = $row->insertamum;
 				$uebung_obj->insertvon = $row->insertvon;
 				$uebung_obj->statistik = ($row->statistik=='t'?true:false);
-				
+
 				$this->uebungen[] = $uebung_obj;
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim laden der Uebung';
 			return false;
 		}
 	}
-	
+
 	// *******************************************
-	// * Prueft die Variablen vor dem Speichern 
+	// * Prueft die Variablen vor dem Speichern
 	// * auf Gueltigkeit.
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
@@ -232,7 +232,7 @@ class uebung
 
 	// ************************************************
 	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische 
+	// * wenn $var !='' ist werden Datenbankkritische
 	// * Zeichen mit Backslash versehen und das Ergbnis
 	// * unter Hochkomma gesetzt.
 	// ************************************************
@@ -251,15 +251,15 @@ class uebung
 	{
 		if(is_null($new))
 			$new = $this->new;
-					
+
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
 			return false;
 
 		if($new)
 		{
-			$qry = 'BEGIN; INSERT INTO campus.tbl_uebung(gewicht, punkte, angabedatei, freigabevon, freigabebis, 
-			        abgabe, beispiele, bezeichnung, positiv, defaultbemerkung, lehreinheit_id, updateamum, 
+			$qry = 'BEGIN; INSERT INTO campus.tbl_uebung(gewicht, punkte, angabedatei, freigabevon, freigabebis,
+			        abgabe, beispiele, bezeichnung, positiv, defaultbemerkung, lehreinheit_id, updateamum,
 			        updatevon, insertamum, insertvon, statistik) VALUES('.
 			        $this->addslashes($this->gewicht).','.
 			        $this->addslashes($this->punkte).','.
@@ -311,21 +311,21 @@ class uebung
 						pg_query($this->conn, 'COMMIT');
 						return true;
 					}
-					else 
+					else
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
 						pg_query($this->conn,'ROLLBACK');
 						return false;
 					}
 				}
-				else 
+				else
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
 					pg_query($this->conn,'ROLLBACK');
 					return false;
 				}
 			}
-			else 
+			else
 				return true;
 		}
 		else
@@ -334,9 +334,9 @@ class uebung
 			return false;
 		}
 	}
-	
+
 	// *******************************************
-	// * Prueft die Variablen vor dem Speichern 
+	// * Prueft die Variablen vor dem Speichern
 	// * auf Gueltigkeit.
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
@@ -354,7 +354,7 @@ class uebung
 		}
 		return true;
 	}
-	
+
 	// ************************************************************
 	// * Speichert StudentUebung in die Datenbank
 	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
@@ -365,15 +365,15 @@ class uebung
 	{
 		if(is_null($new))
 			$new = $this->new;
-					
+
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate_studentuebung())
 			return false;
 
 		if($new)
 		{
-			$qry = 'INSERT INTO campus.tbl_studentuebung(student_uid, mitarbeiter_uid, abgabe_id, uebung_id, 
-					note, mitarbeitspunkte, punkte, anmerkung, benotungsdatum, updateamum, 
+			$qry = 'INSERT INTO campus.tbl_studentuebung(student_uid, mitarbeiter_uid, abgabe_id, uebung_id,
+					note, mitarbeitspunkte, punkte, anmerkung, benotungsdatum, updateamum,
 			        updatevon, insertamum, insertvon) VALUES('.
 			        $this->addslashes($this->student_uid).','.
 			        $this->addslashes($this->mitarbeiter_uid).','.
@@ -404,7 +404,7 @@ class uebung
 			       ' updatevon='.$this->addslashes($this->updatevon).
 			       " WHERE uebung_id=".$this->addslashes($this->uebung_id)." AND student_uid=".$this->addslashes($this->student_uid).";";
 		}
-		
+
 		if(pg_query($this->conn,$qry))
 		{
 				return true;
@@ -415,9 +415,9 @@ class uebung
 			return false;
 		}
 	}
-	
+
 	// ************************************************************
-	// * Loescht eine Uebung plus die abhaengigen eintraege in den 
+	// * Loescht eine Uebung plus die abhaengigen eintraege in den
 	// * Tabellen studentuebung, studentbeispiel, und beispiel
 	// ************************************************************
 	function delete($uebung_id)
@@ -427,15 +427,15 @@ class uebung
 			$this->errormsg = 'Uebung_id ist ungueltig';
 			return false;
 		}
-		
+
 		$qry = "DELETE FROM campus.tbl_studentuebung WHERE uebung_id='$uebung_id';
 				DELETE FROM campus.tbl_studentbeispiel WHERE beispiel_id IN(SELECT beispiel_id FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id');
 				DELETE FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id';
 				DELETE FROM campus.tbl_uebung WHERE uebung_id='$uebung_id'";
-	
+
 		if(pg_query($qry))
 			return true;
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Loeschen der Daten';
 			return false;

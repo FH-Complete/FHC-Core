@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -26,7 +26,7 @@ class gruppe
 	var $errormsg; // string
 	var $new;      // boolean
 	var $result = array(); // gruppen Objekt
-	
+
 	//Tabellenspalten
 	var $gruppe_kurzbz;			// varchar(16)
 	var $studiengang_kz;		// integer
@@ -42,33 +42,33 @@ class gruppe
 	var $updatevon;				// varchar(16)
 	var $insertamum;			// timestamp
 	var $insertvon;				// varchar(16)
-	
+
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine Gruppe
 	// * @param $conn        	Datenbank-Connection
 	// *        $gruppe_kurzbz
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
+	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
 	function gruppe($conn, $gruppe_kurzbz=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
+		else
 			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
+
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-		
+
 		if($gruppe_kurzbz!=null)
 			$this->load($gruppe_kurzbz);
 	}
-	
+
 	// *************************
 	// * Loescht eine Gruppe
 	// *************************
@@ -77,13 +77,13 @@ class gruppe
 		$qry ="DELETE FROM public.tbl_gruppe WHERE gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
 		if(pg_query($this->conn, $qry))
 			return true;
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim loeschen der Gruppe';
 			return false;
 		}
 	}
-	
+
 	// ****************************************
 	// * Prueft ob bereits eine Gruppe mit der
 	// * uebergebenen Kurzbezeichnung existiert
@@ -92,21 +92,21 @@ class gruppe
 	function exists($gruppe_kurzbz)
 	{
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_gruppe WHERE gruppe_kurzbz='".addslashes(strtoupper($gruppe_kurzbz))."'";
-		
+
 		if($row = pg_fetch_object(pg_query($this->conn,$qry)))
 		{
 			if($row->anzahl>0)
 				return true;
-			else 
+			else
 				return false;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler bei einer Abfrage: '.$qry;
 			return false;
 		}
 	}
-	
+
 	// *********************************************************
 	// * Laedt die Gruppe
 	// * @param gruppe_kurzbz
@@ -134,23 +134,23 @@ class gruppe
 				$this->insertvon = $row->insertvon;
 				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Fehler beim laden der Daten';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim laden der Daten';
 			return false;
 		}
 	}
-	
+
 	function getAll()
 	{
 		$qry = "SELECT * FROM public.tbl_gruppe ORDER BY gruppe_kurzbz";
-		
+
 		if( $result = pg_query($this->conn, $qry))
 		{
 			while($row=pg_fetch_object($result))
@@ -170,18 +170,18 @@ class gruppe
 				$grp_obj->updatevon = $row->updatevon;
 				$grp_obj->insertamum = $row->insertamum;
 				$grp_obj->insertvon = $row->insertvon;
-				
+
 				$this->result[] = $grp_obj;
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim laden der Gruppen';
 			return false;
 		}
 	}
-	
+
 	function countStudenten($gruppe_kurzbz)
 	{
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
@@ -189,19 +189,19 @@ class gruppe
 		{
 			if($row = pg_fetch_object($result))
 				return $row->anzahl;
-			else 
+			else
 			{
 				$this->errormsg = 'Fehler beim lesen der benutzergruppe';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim lesen der benutzergruppe';
 			return false;
 		}
 	}
-	
+
 	function getgruppe($studiengang_kz=null, $semester=null, $mailgrp=null, $sichtbar=null)
 	{
 		$qry = 'SELECT * FROM public.tbl_gruppe WHERE 1=1';
@@ -213,7 +213,7 @@ class gruppe
 			$qry .= " AND mailgrp=".($mailgrp?'true':'false');
 		if(!is_null($sichtbar))
 			$qry .= " AND sichtbar=".($sichtbar?'true':'false');
-		
+
 		if($result=pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
@@ -233,20 +233,20 @@ class gruppe
 				$grp_obj->updatevon = $row->updatevon;
 				$grp_obj->insertamum = $row->insertamum;
 				$grp_obj->insertvon = $row->insertvon;
-				
+
 				$this->result[] = $grp_obj;
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim laden der Gruppen'.$qry;
 			return false;
 		}
 	}
-	
+
 	// *******************************************
-	// * Prueft die Variablen vor dem Speichern 
+	// * Prueft die Variablen vor dem Speichern
 	// * auf Gueltigkeit.
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
@@ -312,13 +312,13 @@ class gruppe
 			$this->errormsg = 'Insertvon darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
-		
+
 		return true;
 	}
 
 	// ************************************************
 	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische 
+	// * wenn $var !='' ist werden Datenbankkritische
 	// * Zeichen mit Backslash versehen und das Ergbnis
 	// * unter Hochkomma gesetzt.
 	// ************************************************
@@ -337,15 +337,15 @@ class gruppe
 	{
 		if(is_null($new))
 			$new = $this->new;
-					
+
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
 			return false;
 
 		if($new)
-		{		
-			$qry = 'INSERT INTO public.tbl_gruppe (gruppe_kurzbz, studiengang_kz, bezeichnung, semester, sort, 
-			                                mailgrp, beschreibung, sichtbar, generiert, aktiv, 
+		{
+			$qry = 'INSERT INTO public.tbl_gruppe (gruppe_kurzbz, studiengang_kz, bezeichnung, semester, sort,
+			                                mailgrp, beschreibung, sichtbar, generiert, aktiv,
 			                                updateamum, updatevon, insertamum, insertvon)
 			        VALUES('.$this->addslashes(strtoupper($this->gruppe_kurzbz)).','.
 					$this->addslashes($this->studiengang_kz).','.

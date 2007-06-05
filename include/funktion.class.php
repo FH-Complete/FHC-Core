@@ -15,11 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-/** 
+/**
  * Klasse funktion (FAS-Online)
  * @create 14-03-2006
  */
@@ -29,15 +29,15 @@ class funktion
 	var $conn;   			// @var resource DB-Handle
 	var $new;     			// @var boolean
 	var $errormsg; 		// @var string
-	var $result = array(); 	// @var fachbereich Objekt 
-	
+	var $result = array(); 	// @var fachbereich Objekt
+
 	//Tabellenspalten
 	var $funktion_kurzbz;	// @var integer
 	var $beschreibung;		// @var string
 	var $aktiv;			// @var boolean
 	var $ext_id;			// @var bigint
-	
-	
+
+
 	/**
 	 * Konstruktor
 	 * @param $conn Connection zur DB
@@ -49,7 +49,7 @@ class funktion
 		if($funktion_kurzbz != null)
 			$this->load($funktion_kurzbz);
 	}
-	
+
 	/**
 	 * Laedt alle verfuegbaren Funktionen
 	 * @return true wenn ok, false im Fehlerfall
@@ -57,26 +57,26 @@ class funktion
 	function getAll()
 	{
 		$qry = 'SELECT * FROM tbl_funktion order by funktion_kurzbz;';
-		
+
 		if(!$res = pg_query($this->conn, $qry))
 		{
 			$this->errormsg = 'Fehler beim laden der Datensaetze';
 			return false;
 		}
-		
+
 		while($row = pg_fetch_object($res))
 		{
 			$funktion_obj = new funktion($this->conn);
-			
+
 			$funktion_obj->funktion_kurzbz 	= $row->funktion_kurzbz;
 			$funktion_obj->beschreibung    	= $row->beschreibung;
 			$funktion_obj->aktiv           		= $row->aktiv;
-			
+
 			$this->result[] = $funktion_obj;
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Laedt eine Funktion
 	 * @param $funktion_kurzbz ID der zu ladenden Funktion
@@ -89,30 +89,30 @@ class funktion
 			$this->errormsg = 'funktion_bz darf nicht leer sein';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM tbl_funktion WHERE funktion_kurzbz = '$funktion_kurzbz';";
-		
+
 		if(!$res = pg_query($this->conn, $qry))
 		{
 			$this->errormsg = 'Fehler beim laden des Datensatzes';
 			return false;
 		}
-		
+
 		if($row=pg_fetch_object($res))
 		{
 			$this->funktion_kurzbz	= $row->funktion_kurzbz;
 			$this->beschreibung		= $row->beschreibung;
 			$this->aktiv			= $row->aktiv;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Es ist kein Datensatz mit dieser ID vorhanden';
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Loescht einen Datensatz
 	 * @param $funktion_id id des Datensatzes der geloescht werden soll
@@ -136,24 +136,24 @@ class funktion
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	function checkvars()
-	{	
-				
+	{
+
 		//Laenge Pruefen
-		if(strlen($this->beschreibung)>64)           
+		if(strlen($this->beschreibung)>64)
 		{
 			$this->errormsg = "Bezeichnung darf nicht laenger als 128 Zeichen sein bei <b>$this->funktion_kurzbz</b> - $this->beschreibung";
 			return false;
 		}
-				
+
 		$this->errormsg = '';
-		return true;		
+		return true;
 	}
 	function save()
 	{
 		//Gueltigkeit der Variablen pruefen
 		if(!$this->checkvars())
 			return false;
-			
+
 		if($this->new)
 		{
 			//Pruefen ob funktion_kurzbz befüllt ist
@@ -162,29 +162,29 @@ class funktion
 				$this->errormsg = 'funktion_kurzbz darf nicht leer sein';
 				return false;
 			}
-			//Neuen Datensatz anlegen		
+			//Neuen Datensatz anlegen
 			$qry = 'INSERT INTO tbl_funktion (funktion_kurzbz, beschreibung, aktiv) VALUES ('.
 				$this->addslashes($this->funktion_kurzbz).', '.
 				$this->addslashes($this->beschreibung).', '.
 				($this->aktiv?'true':'false').'); ';
 		}
-		else 
+		else
 		{
 			//bestehenden Datensatz akualisieren
-			
+
 			//Pruefen ob fachbereich_id eine gueltige Zahl ist
 			if( $this->funktion_kurzbz == '')
 			{
 				$this->errormsg = 'funktion_kurzbz darf nicht leer sein';
 				return false;
 			}
-			
-			$qry = 'UPDATE tbl_funktion SET '. 
+
+			$qry = 'UPDATE tbl_funktion SET '.
 				'beschreibung='.$this->addslashes($this->beschreibung).', '.
 				'aktiv='.($this->aktiv?'true':'false') .' '.
 				'WHERE funktion_kurzbz = '.$this->addslashes($this->funktion_kurzbz).';';
 		}
-		
+
 		if(pg_query($this->conn, $qry))
 		{
 			/*//Log schreiben
@@ -195,11 +195,11 @@ class funktion
 				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
 				return false;
 			}
-						
+
 			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
 			if(pg_query($this->conn, $qry))
 				return true;
-			else 
+			else
 			{
 				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
 				return false;
@@ -210,7 +210,7 @@ class funktion
 		{
 			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
 			return false;
-		}		
+		}
 	}
 }
 ?>

@@ -15,12 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 /**
- * Klasse bankverbindung 
+ * Klasse bankverbindung
  * @create 20-12-2006
  */
 
@@ -31,7 +31,7 @@ class bankverbindung
 	var $errormsg;  // @var string
 	var $result = array(); // @var adresse Objekt
 	var $done=false;	// @var boolean
-	
+
 	//Tabellenspalten
 	Var $bankverbindung_id;	// @var integer
 	var $person_id;		// @var integer
@@ -48,7 +48,7 @@ class bankverbindung
 	var $insertvon;		// @var bigint
 	var $updateamum;		// @var timestamp
 	var $updatevon;		// @var bigint
-	
+
 	/**
 	 * Konstruktor
 	 * @param $conn      Connection
@@ -61,7 +61,7 @@ class bankverbindung
 		{
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		}
-		else 
+		else
 		{
 			$qry="SET CLIENT_ENCODING TO 'LATIN9';";
 		}
@@ -70,9 +70,9 @@ class bankverbindung
 			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
 			return false;
 		}
-		
+
 	}
-	
+
 	/**
 	 * Laedt die Bankverbindung mit der ID $bankverbindung_id
 	 * @param  $bankverbindung_id ID der zu ladenden  Email
@@ -82,13 +82,13 @@ class bankverbindung
 	{
 		//noch nicht implementiert
 	}
-			
+
 	/**
 	 * Prueft die Variablen auf gueltigkeit
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	function checkvars()
-	{		
+	{
 		//Gesamtlaenge pruefen
 		//$this->errormsg = 'Eine der Maximiallaengen wurde ueberschritten';
 		if(strlen($this->name)>64)
@@ -96,7 +96,7 @@ class bankverbindung
 			$this->errormsg = 'Name darf nicht länger als 64 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->anschrift)>128) 
+		if(strlen($this->anschrift)>128)
 		{
 			$this->errormsg = 'Anschrift darf nicht länger als 128 Zeichen sein';
 			return false;
@@ -121,17 +121,17 @@ class bankverbindung
 			$this->errormsg = 'IBAN darf nicht länger als 32 Zeichen sein';
 			return false;
 		}
-		
+
 		//Zahlenwerte ueberpruefen
 		$this->errormsg = 'Ein Zahlenfeld enthaelt ungueltige Zeichen';
 		if(!is_numeric($this->person_id))         return false;
-		
+
 		$this->errormsg = '';
 		return true;
 	}
 	// ************************************************
 	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische 
+	// * wenn $var !='' ist werden datenbankkritische
 	// * Zeichen mit backslash versehen und das Ergebnis
 	// * unter Hochkomma gesetzt.
 	// ************************************************
@@ -140,7 +140,7 @@ class bankverbindung
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
 	/**
-	 * Speichert den aktuellen Datensatz in die Datenbank	 
+	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
 	 * andernfalls wird der Datensatz mit der ID in $bankverbindung_id aktualisiert
 	 * @return true wenn ok, false im Fehlerfall
@@ -151,31 +151,31 @@ class bankverbindung
 		//Variablen pruefen
 		if(!$this->checkvars())
 			return false;
-			
+
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-					
+
 			$qry = 'INSERT INTO tbl_bankverbindung  (person_id, name, anschrift, blz, bic,
 			       kontonr, iban, typ, ext_id, verrechnung, insertamum, insertvon, updateamum, updatevon) VALUES('.
 			       $this->addslashes($this->person_id).', '.
 			       $this->addslashes($this->name).', '.
 			       $this->addslashes($this->anschrift).', '.
 			       $this->addslashes($this->blz).', '.
-			       $this->addslashes($this->bic).', '. 
+			       $this->addslashes($this->bic).', '.
 			       $this->addslashes($this->kontonr).', '.
 			       $this->addslashes($this->iban).', '.
 			       $this->addslashes($this->typ).', '.
 			       $this->addslashes($this->ext_id).', '.
 			      ($this->verrechnung?'true':'false').',  now(), '.
 			       $this->addslashes($this->insertvon).', now(), '.
-			       $this->addslashes($this->updatevon).');';	
-			$this->done=true;		
+			       $this->addslashes($this->updatevon).');';
+			$this->done=true;
 		}
 		else
 		{
 			//Updaten des bestehenden Datensatzes
-			
+
 			//Pruefen ob bankverbindung_id eine gueltige Zahl ist
 			if(!is_numeric($this->bankverbindung_id))
 			{
@@ -192,7 +192,7 @@ class bankverbindung
 			{
 				while($rowz = pg_fetch_object($resultz))
 				{
-					$update=false;			
+					$update=false;
 					if($rowz->person_id!=$this->person_id) 				$update=true;
 					if($rowz->name!=$this->name)	 				$update=true;
 					if($rowz->anschrift!=$this->anschrift)				$update=true;
@@ -203,14 +203,14 @@ class bankverbindung
 					if($rowz->typ!=$this->typ)	 					$update=true;
 					if($rowz->verrechnung!=$this->verrechnung)			$update=true;
 					if($rowz->ext_id!=$this->ext_id) 					$update=true;
-				
+
 					if($update)
 					{
 						$qry='UPDATE tbl_bankverbindung SET '.
-						'person_id='.$this->addslashes($this->person_id).', '. 
+						'person_id='.$this->addslashes($this->person_id).', '.
 						'name='.$this->addslashes($this->name).', '.
 			     			'anschrift='.$this->addslashes($this->anschrift).', '.
-			     			'blz='.$this->addslashes($this->blz).', '. 
+			     			'blz='.$this->addslashes($this->blz).', '.
 			     			'bic='.$this->addslashes($this->bic).', '.
 			     			'kontonr='.$this->addslashes($this->kontonr).', '.
 			     			'iban='.$this->addslashes($this->iban).', '.
@@ -223,7 +223,7 @@ class bankverbindung
 				}
 			}
 		}
-		
+
 		if ($this->done)
 		{
 			//echo $qry."\n";
@@ -237,29 +237,29 @@ class bankverbindung
 					$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
 					return false;
 				}
-							
+
 				$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
 				if(pg_query($this->conn, $qry))
 					return true;
-				else 
+				else
 				{
 					$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
 					return false;
 				}	*/
-				return true;		
+				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Fehler beim Speichern der Daten';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			return true;
 		}
 	}
-	
+
 	/**
 	 * Loescht den Datenensatz mit der ID die uebergeben wird
 	 * @param $bankverbindung_id ID die geloescht werden soll
@@ -267,7 +267,7 @@ class bankverbindung
 	 */
 	function delete($bankverbindung_id)
 	{
-		//noch nicht implementiert!	
+		//noch nicht implementiert!
 	}
 }
 ?>

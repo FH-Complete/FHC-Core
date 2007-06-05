@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -26,66 +26,66 @@ class lehrverband
 	var $errormsg; // string
 	var $new;      // boolean
 	var $result = array(); // lehrverband Objekt
-	
+
 	//Tabellenspalten
 	var $studiengang_kz;	// integer
 	var $semester;			// integer
 	var $verband;			// integer
-	var $gruppe;			// integer	
+	var $gruppe;			// integer
 	var $aktiv;				// boolean
 	var $bezeichnung;		// varchar(16)
-	
+
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional einen Lehrverband
 	// * @param $conn        	Datenbank-Connection
-	// *        
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
+	// *
+	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
 	function lehrverband($conn, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
+		else
 			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-		
+
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
-		}		
+		}
 	}
-		
+
 	function exists($studiengang_kz, $semester, $verband, $gruppe)
 	{
-		$qry = "SELECT count(*) as anzahl FROM public.tbl_lehrverband WHERE 
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_lehrverband WHERE
 		            studiengang_kz='".addslashes($studiengang_kz)."' AND
 		            semester='".addslashes($semester)."' AND
 		            trim(verband)='".trim(addslashes($verband))."' AND
 		            trim(gruppe)='".trim(addslashes($gruppe))."'";
-		
+
 		if($row=pg_fetch_object(pg_query($this->conn, $qry)))
 		{
 			if($row->anzahl>0)
 			{
 				return true;
 			}
-			else 
+			else
 			{
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler bei Abfrage: '.$qry;
 			return false;
 		}
 	}
-	
+
 	// *******************************************
-	// * Prueft die Variablen vor dem Speichern 
+	// * Prueft die Variablen vor dem Speichern
 	// * auf Gueltigkeit.
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
@@ -111,7 +111,7 @@ class lehrverband
 		}
 		return true;
 	}
-	
+
 	function getlehrverband($studiengang_kz=null, $semester=null, $verband=null)
 	{
 		$qry = 'SELECT * FROM public.tbl_lehrverband WHERE aktiv=true';
@@ -121,26 +121,26 @@ class lehrverband
 			$qry .=' AND semester='.$this->addslashes($semester);
 		if(!is_null($verband))
 			$qry .=' AND verband='.$this->addslashes($verband);
-			
+
 		$qry .= ' ORDER BY studiengang_kz, semester, verband, gruppe';
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row=pg_fetch_object($result))
 			{
 				$lv_obj = new lehrverband($this->conn);
-				
+
 				$lv_obj->studiengang_kz = $row->studiengang_kz;
 				$lv_obj->semester = $row->semester;
 				$lv_obj->verband = $row->verband;
 				$lv_obj->gruppe = $row->gruppe;
 				$lv_obj->aktiv = $row->aktiv;
 				$lv_obj->bezeichnung = $row->bezeichnung;
-				
+
 				$this->result[] = $lv_obj;
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim lesen der Lehrverbaende '.$qry;
 			return false;
@@ -149,7 +149,7 @@ class lehrverband
 
 	// ************************************************
 	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische 
+	// * wenn $var !='' ist werden Datenbankkritische
 	// * Zeichen mit Backslash versehen und das Ergbnis
 	// * unter Hochkomma gesetzt.
 	// ************************************************
@@ -166,11 +166,11 @@ class lehrverband
 	// ************************************************************
 	function save()
 	{
-					
+
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
 			return false;
-				
+
 		$qry = 'INSERT INTO public.tbl_lehrverband (studiengang_kz, semester, verband, gruppe, aktiv, bezeichnung)
 		        VALUES('.$this->addslashes($this->studiengang_kz).','.
 				$this->addslashes($this->semester).','.
@@ -178,7 +178,7 @@ class lehrverband
 				$this->addslashes($this->gruppe).','.
 				($this->aktiv?'true':'false').','.
 				$this->addslashes($this->bezeichnung).');';
-		
+
 		if(pg_query($this->conn,$qry))
 		{
 			//Log schreiben

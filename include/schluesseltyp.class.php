@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -31,13 +31,13 @@ class schluesseltyp
 	var $errormsg; 			// string
 	var $new;      				// boolean
 	//var $schluesseltyp = array(); 	// schluesseltyp Objekt
-	
+
 	//Tabellenspalten
 	var $schluesseltyp;			//string
 	var $beschreibung;   		//string
 	var $anzahl; 				//smallint
 	var $kaution;				//numeric(5,2)
-	
+
 	/**
 	 * Konstruktor
 	 * @param $conn      Connection
@@ -46,31 +46,31 @@ class schluesseltyp
 	function schluesseltyp($conn, $code=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+
 		if($unicode)
 			$qry 			= "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
+		else
 			$qry 			= "SET CLIENT_ENCODING TO 'LATIN9';";
-			
+
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	= 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Laedt die Funktion mit der ID $schluesseltyp
 	 * @param  $code code des zu ladenden  schluesseltyps
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	function load($code)
-	{			
+	{
 		$this->errormsg 		= 'Noch nicht implementiert';
 		return false;
 	}
-	
+
 	/**
 	 * Laedt alle schluesseltypen
 	 */
@@ -88,7 +88,7 @@ class schluesseltyp
 	// * @return true wenn erfolgreich, false im Fehlerfall
 	// ************************************************************
 	function save()
-	{		
+	{
 		$qry1='SELECT * FROM public.tbl_schluesseltyp WHERE beschreibung='.$this->addslashes($this->beschreibung).';';
 		if($result1=pg_query($this->conn,$qry1))
 		{
@@ -100,7 +100,7 @@ class schluesseltyp
 					{
 						$dbanzahl=0;
 					}
-					else 
+					else
 					{
 						$dbanzahl=$row1->anzahl;
 					}
@@ -110,7 +110,7 @@ class schluesseltyp
 					echo nl2br($qry."\n");
 				}
 			}
-			else 
+			else
 			{
 				$qry='INSERT INTO public.tbl_schluesseltyp (schluesseltyp, beschreibung, anzahl, kaution) VALUES('.
 					$this->addslashes($this->schluesseltyp).', '.
@@ -118,19 +118,19 @@ class schluesseltyp
 					$this->addslashes($this->anzahl).', '.
 					$this->addslashes($this->kaution).');';
 					echo nl2br($qry."\n");
-			}	
+			}
 			if(pg_query($this->conn,$qry))
 			{
-				return true;	
+				return true;
 			}
 			else
-			{			
+			{
 				$this->errormsg = 'Fehler beim Speichern des Schluesseltypen-Datensatzes: '.$this->schluesseltyp.' '.$qry;
 				return false;
-			}	
+			}
 		}
 		else
-		{			
+		{
 			$this->errormsg = 'Fehler beim Zugriff auf den Schluesseltypen-Datensatz: '.$this->schluesseltyp.' '.$qry;
 			return false;
 		}

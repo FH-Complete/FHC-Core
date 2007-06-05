@@ -15,12 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 /**
- * Klasse projektarbeit 
+ * Klasse projektarbeit
  * @create 08-02-2007
  */
 
@@ -30,7 +30,7 @@ class projektarbeit
 	var $new;       		// @var boolean
 	var $errormsg;  		// @var string
 	var $result = array(); 	// @var adresse Objekt
-	
+
 	//Tabellenspalten
 	var $projektarbeit_id;	// @var integer
 	var $projekttyp_kurzbz;	// @var string
@@ -55,7 +55,7 @@ class projektarbeit
 	var $updateamum;		// @var timestamp
 	var $updatevon;		// @var bigint
 
-	
+
 	/**
 	 * Konstruktor
 	 * @param $conn      Connection
@@ -68,7 +68,7 @@ class projektarbeit
 		{
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		}
-		else 
+		else
 		{
 			$qry="SET CLIENT_ENCODING TO 'LATIN9';";
 		}
@@ -79,7 +79,7 @@ class projektarbeit
 		}
 		//if($projektarbeit_id != null) 	$this->load($projektarbeit_id);
 	}
-	
+
 	/**
 	 * Laedt die Funktion mit der ID $projektarbeit_id
 	 * @param  $projektarbeit_id ID der zu ladenden Funktion
@@ -89,14 +89,14 @@ class projektarbeit
 	{
 		//noch nicht implementiert
 	}
-			
+
 	/**
 	 * Prueft die Variablen auf gueltigkeit
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	function checkvars()
-	{		
-				
+	{
+
 		//Gesamtlaenge pruefen
 		//$this->errormsg='Eine der Gesamtlaengen wurde ueberschritten';
 		if ($this->projektarbeit_kurzbz=null)
@@ -157,13 +157,13 @@ class projektarbeit
 			$this->errormsg = 'freigegeben ist ungueltig - student_uid: '.$this->student_uid;
 			return false;
 		}
-				
+
 		$this->errormsg = '';
-		return true;		
+		return true;
 	}
 	// ************************************************
 	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische 
+	// * wenn $var !='' ist werden datenbankkritische
 	// * Zeichen mit backslash versehen und das Ergebnis
 	// * unter Hochkomma gesetzt.
 	// ************************************************
@@ -172,7 +172,7 @@ class projektarbeit
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
 	/**
-	 * Speichert den aktuellen Datensatz in die Datenbank	 
+	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
 	 * andernfalls wird der Datensatz mit der ID in $projektarbeit_id aktualisiert
 	 * @return true wenn ok, false im Fehlerfall
@@ -182,11 +182,11 @@ class projektarbeit
 		//Variablen pruefen
 		if(!$this->checkvars())
 			return false;
-			
+
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-								
+
 			$qry='INSERT INTO lehre.tbl_projektarbeit (projekttyp_kurzbz, titel, lehreinheit_id, student_uid,firma_id, note. punkte, beginn, ende, faktor,
 				freigegeben, gesperrtbis, themenbereich, anmerkung, ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
 			     $this->addslashes($this->projekttyp_kurzbz).', '.
@@ -207,21 +207,21 @@ class projektarbeit
 			     $this->addslashes($this->anmerkung).', '.
 			     $this->addslashes($this->ext_id).',  now(), '.
 			     $this->addslashes($this->insertvon).', now(), '.
-			     $this->addslashes($this->updatevon).');';			
+			     $this->addslashes($this->updatevon).');';
 		}
 		else
 		{
 			//Updaten des bestehenden Datensatzes
-			
+
 			//Pruefen ob projektarbeit_id eine gueltige Zahl ist
 			if(!is_numeric($this->projektarbeit_id))
 			{
 				$this->errormsg = 'projektarbeit_id muss eine gueltige Zahl sein';
 				return false;
 			}
-			
+
 			$qry='UPDATE lehre.tbl_projektarbeit SET '.
-				'projekttyp_kurzbz='.$this->addslashes($this->projekttyp_kurzbz).', '. 
+				'projekttyp_kurzbz='.$this->addslashes($this->projekttyp_kurzbz).', '.
 				'titel='.$this->addslashes($this->titel).', '.
 				'lehreinheit_id='.$this->addslashes($this->lehreinheit_id).', '.
 				'student_uid='.$this->addslashes($this->student_uid).', '.
@@ -236,7 +236,7 @@ class projektarbeit
 				'stundensatz='.$this->addslashes($this->stundensatz).', '.
 				'gesamtstunden='.$this->addslashes($this->gesamtstunden).', '.
 				'themenbereich='.$this->addslashes($this->themenbereich).', '.
-				'anmerkung='.$this->addslashes($this->anmerkung).', '.  
+				'anmerkung='.$this->addslashes($this->anmerkung).', '.
 			     	'updateamum= now(), '.
 			     	'updatevon='.$this->addslashes($this->updatevon).' '.
 			     	'firmentyp='.$this->addslashes($this->firmentyp_kurzbz).' '.
@@ -253,24 +253,24 @@ class projektarbeit
 				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
 				return false;
 			}
-						
+
 			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
 			if(pg_query($this->conn, $qry))
 				return true;
-			else 
+			else
 			{
 				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
 				return false;
 			}	*/
-			return true;		
+			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Speichern der Daten';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Loescht den Datenensatz mit der ID die uebergeben wird
 	 * @param $projektarbeit_id ID die geloescht werden soll
@@ -278,7 +278,7 @@ class projektarbeit
 	 */
 	function delete($projektarbeit_id)
 	{
-		//noch nicht implementiert!	
+		//noch nicht implementiert!
 	}
 }
 ?>

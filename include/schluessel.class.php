@@ -15,12 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 /**
- * Klasse Schlüssel 
+ * Klasse Schlüssel
  * @create 22-12-2006
  */
 
@@ -30,7 +30,7 @@ class schluessel
 	var $new;       // @var boolean
 	var $errormsg;  // @var string
 	var $done=false;	// @var boolean
-	
+
 	//Tabellenspalten
 	Var $schluessel_id;		// @var integer
 	var $person_id;		// @var integer
@@ -43,7 +43,7 @@ class schluessel
 	var $insertvon;		// @var bigint
 	var $updateamum;		// @var timestamp
 	var $updatevon;		// @var bigint
-	
+
 	/**
 	 * Konstruktor
 	 * @param $conn      Connection
@@ -56,7 +56,7 @@ class schluessel
 		{
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		}
-		else 
+		else
 		{
 			$qry="SET CLIENT_ENCODING TO 'LATIN9';";
 		}
@@ -66,7 +66,7 @@ class schluessel
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt den Schlüssel mit der ID $schluessel_id
 	 * @param  $schluessel_id ID dem zu ladenden Schlüssel
@@ -76,10 +76,10 @@ class schluessel
 	{
 		//noch nicht implementiert
 	}
-	
+
 	// ************************************************
 	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische 
+	// * wenn $var !='' ist werden datenbankkritische
 	// * Zeichen mit backslash versehen und das Ergebnis
 	// * unter Hochkomma gesetzt.
 	// ************************************************
@@ -88,7 +88,7 @@ class schluessel
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
 	/**
-	 * Speichert den aktuellen Datensatz in die Datenbank	 
+	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
 	 * andernfalls wird der Datensatz mit der ID in $schluessel_id aktualisiert
 	 * @return true wenn ok, false im Fehlerfall
@@ -96,12 +96,12 @@ class schluessel
 	function save()
 	{
 		$this->done=false;
-			
+
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-					
-			$qry='INSERT INTO public.tbl_schluessel (person_id, schluesseltyp, nummer, kaution, ausgegebenam, 
+
+			$qry='INSERT INTO public.tbl_schluessel (person_id, schluesseltyp, nummer, kaution, ausgegebenam,
 				ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
 			     $this->addslashes($this->person_id).', '.
 			     $this->addslashes($this->schluesseltyp).', '.
@@ -111,32 +111,32 @@ class schluessel
 			     $this->addslashes($this->ext_id).',  now(), '.
 			     $this->addslashes($this->insertvon).', now(), '.
 			     $this->addslashes($this->updatevon).');';
-			 $this->done=true;			
+			 $this->done=true;
 		}
 		else
-		{			
+		{
 			$qryz="SELECT * FROM public.tbl_schluessel WHERE schluessel_id='$this->schluessel_id';";
 			if($resultz = pg_query($this->conn, $qryz))
 			{
 				while($rowz = pg_fetch_object($resultz))
 				{
-					$update=false;			
+					$update=false;
 					if($rowz->person_id!=$this->person_id) 				$update=true;
 					if($rowz->schluesseltyp!=$this->schluesseltyp)			$update=true;
 					if($rowz->nummer!=$this->nummer)				$update=true;
 					if($rowz->kaution!=$this->kaution)					$update=true;
 					if($rowz->ausgegebenam!=$this->ausgegebenam)		$update=true;
 					if($rowz->ext_id!=$this->ext_id)	 				$update=true;
-				
+
 					if($update)
 					{
 						$qry='UPDATE public.tbl_schluessel SET '.
-							'person_id='.$this->addslashes($this->person_id).', '. 
-							'schluesseltyp='.$this->addslashes($this->schluesseltyp).', '. 
-							'nummer='.$this->addslashes($this->nummer).', '.  
-							'kaution='.$this->addslashes($this->kaution).', '. 
+							'person_id='.$this->addslashes($this->person_id).', '.
+							'schluesseltyp='.$this->addslashes($this->schluesseltyp).', '.
+							'nummer='.$this->addslashes($this->nummer).', '.
+							'kaution='.$this->addslashes($this->kaution).', '.
 							'ausgegebenam='.$this->addslashes($this->ausgegebenam).', '.
-							'ext_id='.$this->addslashes($this->ext_id).', '. 
+							'ext_id='.$this->addslashes($this->ext_id).', '.
 						     	'updateamum= now(), '.
 						     	'updatevon='.$this->addslashes($this->updatevon).' '.
 							'WHERE schluessel_id='.$this->addslashes($this->schluessel_id).';';
@@ -144,7 +144,7 @@ class schluessel
 					}
 				}
 			}
-			else 
+			else
 			{
 				return false;
 			}
@@ -161,30 +161,30 @@ class schluessel
 					$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
 					return false;
 				}
-							
+
 				$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
 				if(pg_query($this->conn, $qry))
 					return true;
-				else 
+				else
 				{
 					$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
 					return false;
 				}	*/
-				return true;		
+				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = "*****\nFehler beim Speichern des Schluessel-Datensatzes: ID:".$this->person_id." Schlüsseltyp: ".$this->schluesseltyp."\n".$qry."\n".pg_errormessage($this->conn)."\n*****\n";
-				
+
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			return true;
 		}
 	}
-	
+
 	/**
 	 * Loescht den Datenensatz mit der ID die uebergeben wird
 	 * @param $schluessel_id ID die geloescht werden soll
@@ -192,7 +192,7 @@ class schluessel
 	 */
 	function delete($schluessel_id)
 	{
-		//noch nicht implementiert!	
+		//noch nicht implementiert!
 	}
 }
 ?>

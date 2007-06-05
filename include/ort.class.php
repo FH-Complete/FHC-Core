@@ -15,11 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-/** 
+/**
  * Klasse ort (FAS-Online)
  * @create 04-12-2006
  */
@@ -29,8 +29,8 @@ class ort
 	var $conn;   			// @var resource DB-Handle
 	var $new;     			// @var boolean
 	var $errormsg; 		// @var string
-	var $result = array(); 	// @var fachbereich Objekt 
-	
+	var $result = array(); 	// @var fachbereich Objekt
+
 	//Tabellenspalten
 	var $ort_kurzbz;		// @var string
 	var $bezeichnung;		// @var string
@@ -42,7 +42,7 @@ class ort
 	var $dislozierung;		// @var smallint
 	var $kosten;			// @var numeric(8,2)
 
-	
+
 	/**
 	 * Konstruktor
 	 * @param $conn Connection zur DB
@@ -54,7 +54,7 @@ class ort
 		if($ort_kurzbz != null)
 			$this->load($ort_kurzbz);
 	}
-	
+
 	/**
 	 * Laedt alle verfuegbaren Orte
 	 * @return true wenn ok, false im Fehlerfall
@@ -62,17 +62,17 @@ class ort
 	function getAll()
 	{
 		$qry = 'SELECT * FROM public.tbl_ort order by ort_kurzbz;';
-		
+
 		if(!$res = pg_query($this->conn, $qry))
 		{
 			$this->errormsg = 'Fehler beim Laden der Datensaetze';
 			return false;
 		}
-		
+
 		while($row = pg_fetch_object($res))
 		{
 			$ort_obj = new ort($this->conn);
-			
+
 			$ort_obj->ort_kurzbz 		= $row->ort_kurzbz;
 			$ort_obj->bezeichnung 		= $row->bezeichnung;
 			$ort_obj->planbezeichnung 	= $row->planbezeichnung;
@@ -82,12 +82,12 @@ class ort
 			$ort_obj->lageplan 			= $row->lageplan;
 			$ort_obj->dislozierung 		= $row->dislozierung;
 			$ort_obj->kosten 			= $row->kosten;
-			
+
 			$this->result[] = $ort_obj;
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Laedt einen Ort
 	 * @param $fachb_id ID des zu ladenden Ortes
@@ -100,15 +100,15 @@ class ort
 			$this->errormsg = 'kurzbz darf nicht leer sein';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM public.tbl_ort WHERE ort_kurzbz = '$ort_kurzbz';";
-		
+
 		if(!$res = pg_query($this->conn, $qry))
 		{
 			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
-		
+
 		if($row=pg_fetch_object($res))
 		{
 			$this->ort_kurzbz 		= $row->ort_kurzbz;
@@ -121,15 +121,15 @@ class ort
 			$this->dislozierung 		= $row->dislozierung;
 			$this->kosten 		= $row->kosten;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Es ist kein Datensatz mit dieser ID vorhanden';
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Loescht einen Datensatz
 	 * @param $ort_kurzbz ID des Datensatzes der geloescht werden soll
@@ -149,19 +149,19 @@ class ort
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	function checkvars()
-	{	
+	{
 		$this->bezeichnung = str_replace("'",'´',$this->bezeichnung);
 		$this->ort_kurzbz = str_replace("'",'´',$this->ort_kurzbz);
 		$this->planbezeichnung = str_replace("'",'´',$this->planbezeichnung);
 
-		
+
 		//Laenge Pruefen
-		if(strlen($this->bezeichnung)>30)           
+		if(strlen($this->bezeichnung)>30)
 		{
 			$this->errormsg = "Bezeichnung darf nicht laenger als 30 Zeichen sein bei <b>$this->ort_kurzbz</b> - $this->bezeichnung";
 			return false;
-		}		
-		if(strlen($this->planbezeichnung)>30)           
+		}
+		if(strlen($this->planbezeichnung)>30)
 		{
 			$this->errormsg = "Planbezeichnung darf nicht laenger als 30 Zeichen sein bei <b>$this->ort_kurzbz</b> - $this->planbezeichnung";
 			return false;
@@ -170,9 +170,9 @@ class ort
 		{
 			$this->errormsg = "Ort_kurzbz darf nicht laenger als 8 Zeichen sein bei <b>$this->ort_kurzbz/b>";
 			return false;
-		}	
+		}
 		$this->errormsg = '';
-		return true;		
+		return true;
 	}
 	/**
 	 * Speichert den aktuellen Datensatz
@@ -183,7 +183,7 @@ class ort
 		//Gueltigkeit der Variablen pruefen
 		if(!$this->checkvars())
 			return false;
-			
+
 		if($this->new)
 		{
 			//Pruefen ob ort_kurzbz eine gueltige Bezeichnung ist
@@ -192,20 +192,20 @@ class ort
 				$this->errormsg = 'ort_kurzbz darf nicht leer sein';
 				return false;
 			}
-			//Neuen Datensatz anlegen		
-			$qry = 'INSERT INTO public.tbl_ort (ort_kurzbz, bezeichnung, planbezeichnung, max_person, aktiv, lehre, lageplan, 
+			//Neuen Datensatz anlegen
+			$qry = 'INSERT INTO public.tbl_ort (ort_kurzbz, bezeichnung, planbezeichnung, max_person, aktiv, lehre, lageplan,
 				dislozierung, kosten) VALUES ('.
 				$this->addslashes($this->ort_kurzbz).', '.
 				$this->addslashes($this->bezeichnung).', '.
 				$this->addslashes($this->planbezeichnung).', '.
 				$this->addslashes($this->max_person).', '.
-				($this->aktiv?'true':'false').', '. 
-				($this->lehre?'true':'false').', '. 
+				($this->aktiv?'true':'false').', '.
+				($this->lehre?'true':'false').', '.
 				$this->addslashes($this->lageplan).', '.
 				$this->addslashes($this->dislozierung).', '.
 				$this->addslashes($this->kosten).');';
 		}
-		else 
+		else
 		{
 			//bestehenden Datensatz akualisieren
 
@@ -215,8 +215,8 @@ class ort
 				$this->errormsg = 'ort_kurzbz darf nicht leer sein';
 				return false;
 			}
-			
-			$qry = 'UPDATE public.tbl_ort SET '. 
+
+			$qry = 'UPDATE public.tbl_ort SET '.
 				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
 				'planbezeichnung='.$this->addslashes($this->planbezeichnung).', '.
 				'max_person='.$this->addslashes($this->max_person).', '.
@@ -227,7 +227,7 @@ class ort
 				'kosten='.$this->addslashes($this->kosten).' '.
 				'WHERE ort_kurzbz = '.$this->addslashes($this->ort_kurzbz).';';
 		}
-		
+
 		if(pg_query($this->conn, $qry))
 		{
 			/*//Log schreiben
@@ -238,11 +238,11 @@ class ort
 				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
 				return false;
 			}
-						
+
 			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
 			if(pg_query($this->conn, $qry))
 				return true;
-			else 
+			else
 			{
 				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
 				return false;
@@ -253,7 +253,7 @@ class ort
 		{
 			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
 			return false;
-		}		
+		}
 	}
 }
 ?>

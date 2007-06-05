@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -26,7 +26,7 @@ class studiengang
 	var $new;      				// boolean
 	var $errormsg;			// string
 	var $result = array();			// studiengang Objekt
-	
+
 	var $studiengang_kz;		// integer
 	var $kurzbz;				// varchar(5)
 	var $kurzbzlang;			// varchar(10)
@@ -47,9 +47,9 @@ class studiengang
 	var $organisationsform;		// varchar(1)
 	var $titelbescheidvom;		// Date
 	var $ext_id;				// bigint
-	
+
 	var $kuerzel;			// = typ + kurzbz (Bsp: BBE)
-	
+
 	// **************************************************************
 	// * Konstruktor
 	// * @param conn Connection zur Datenbank
@@ -58,22 +58,22 @@ class studiengang
 	function studiengang($conn, $studiengang_kz=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else
 			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
+
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
 			return false;
 		}
-		
+
 		if($studiengang_kz != null)
 			$this->load($studiengang_kz);
 	}
-		
+
 	// *****************************************************
 	// * Laedt einen Studiengang
 	// * @param stg_id ID des Studienganges der zu laden ist
@@ -86,13 +86,13 @@ class studiengang
 			$this->errormsg = 'Studiengang_kz muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM public.tbl_studiengang WHERE studiengang_kz='$studiengang_kz'";
-		
+
 		if($res = pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($res))
-			{			
+			{
 				$this->studiengang_kz=$row->studiengang_kz;
 				$this->kurzbz=$row->kurzbz;
 				$this->kurzbzlang=$row->kurzbzlang;
@@ -114,15 +114,15 @@ class studiengang
 				$this->kuerzel = strtoupper($row->typ.$row->kurzbz);
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;
 		}
-		
-		return true;		
+
+		return true;
 	}
-		
+
 	// *******************************************
 	// * Liefert alle Studiengaenge
 	// * @return true wenn ok, false im Fehlerfall
@@ -130,20 +130,20 @@ class studiengang
 	function getAll($order=null, $aktiv=true)
 	{
 		$qry = "SELECT * FROM public.tbl_studiengang WHERE aktiv=".($aktiv?'true':'false');
-		
+
 		if($order!=null)
 		 	$qry .=" ORDER BY $order";
-		
+
 		if(!$res = pg_query($this->conn, $qry))
 		{
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;
 		}
-		
+
 		while($row = pg_fetch_object($res))
 		{
 			$stg_obj = new studiengang($this->conn);
-			
+
 			$stg_obj->studiengang_kz=$row->studiengang_kz;
 			$stg_obj->kurzbz=$row->kurzbz;
 			$stg_obj->kurzbzlang=$row->kurzbzlang;
@@ -163,13 +163,13 @@ class studiengang
 			$stg_obj->bescheidvom=$row->bescheidvom;
 			$stg_obj->ext_id=$row->ext_id;
 			$stg_obj->kuerzel = strtoupper($row->typ.$row->kurzbz);
-			
+
 			$this->result[] = $stg_obj;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Loescht einen Studiengang
 	 * @param $stg_id ID des zu loeschenden Studienganges
@@ -189,14 +189,14 @@ class studiengang
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	function checkvars()
-	{	
+	{
 		$this->bezeichnung = str_replace("'",'´',$this->bezeichnung);
 		$this->kurzbz = str_replace("'",'´',$this->kurzbz);
 		$this->kurzbzlang = str_replace("'",'´',$this->kurzbzlang);
 		$this->english = str_replace("'",'´',$this->english);
-		
+
 		//Laenge Pruefen
-		if(strlen($this->bezeichnung)>128)           
+		if(strlen($this->bezeichnung)>128)
 		{
 			$this->errormsg = "Bezeichnung darf nicht laenger als 128 Zeichen sein bei <b>$this->ext_id</b> - $this->bezeichnung";
 			return false;
@@ -210,14 +210,14 @@ class studiengang
 		{
 			$this->errormsg = "Kurzbezlang darf nicht laenger als 10 Zeichen sein bei <b>$this->ext_id</b> - $this->kurzbzlang";
 			return false;
-		}	
+		}
 		if(strlen($this->english)>128)
 		{
 			$this->errormsg = "english darf nicht laenger als 128 Zeichen sein bei <b>$this->ext_id</b> - $this->english";
 			return false;
-		}	
+		}
 		$this->errormsg = '';
-		return true;		
+		return true;
 	}
 	/**
 	 * Speichert den aktuellen Datensatz
@@ -226,11 +226,11 @@ class studiengang
 	function save()
 	{
 		//Gueltigkeit der Variablen pruefen
-		if(!$this->checkvars()) 
+		if(!$this->checkvars())
 		{
 			return false;
 		}
-			
+
 		if($this->new)
 		{
 			//Pruefen ob studiengang_kz gueltig ist
@@ -239,7 +239,7 @@ class studiengang
 				$this->errormsg = 'studiengang_kz ungueltig! ('.$this->studiengang_kz.'/'.$this->ext_id.')';
 				return false;
 			}
-			//Neuen Datensatz anlegen		
+			//Neuen Datensatz anlegen
 			$qry = 'INSERT INTO public.tbl_studiengang (studiengang_kz, kurzbz, kurzbzlang, bezeichnung, english,
 				typ, farbe, email, max_verband, max_semester, max_gruppe, erhalter_kz, bescheid, bescheidbgbl1,
 				bescheidbgbl2, bescheidgz, bescheidvom, organisationsform, titelbescheidvom, ext_id) VALUES ('.
@@ -264,18 +264,18 @@ class studiengang
 				$this->addslashes($this->titelbescheidvom).', '.
 				$this->addslashes($this->ext_id).');';
 		}
-		else 
+		else
 		{
 			//bestehenden Datensatz akualisieren
-			
+
 			//Pruefen ob studiengang_kz gueltig ist
 			if(!is_numeric($this->studiengang_kz))
 			{
 				$this->errormsg = 'studiengang_kz ungueltig.';
 				return false;
 			}
-			
-			$qry = 'UPDATE public.tbl_studiengang SET '. 
+
+			$qry = 'UPDATE public.tbl_studiengang SET '.
 				'studiengang_kz='.$this->addslashes($this->studiengang_kz).', '.
 				'kurzbz='.$this->addslashes($this->kurzbz).', '.
 				'kurzbzlang='.$this->addslashes($this->kurzbzlang).', '.
@@ -308,11 +308,11 @@ class studiengang
 				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
 				return false;
 			}
-						
+
 			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
 			if(pg_query($this->conn, $qry))
 				return true;
-			else 
+			else
 			{
 				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
 				return false;

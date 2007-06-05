@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -26,7 +26,7 @@ class feedback
 	var $errormsg; // string
 	var $new;      // boolean
 	var $result = array(); // feedback Objekt
-	
+
 	//Tabellenspalten
 	var $feedback_id;	// integer
 	var $betreff;		// varchar(128)
@@ -34,36 +34,36 @@ class feedback
 	var $datum;			// date
 	var $uid;			// varchar(16)
 	var $lehrveranstaltung_id; // integer
-	
+
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
 	// * @param $conn        	Datenbank-Connection
-	// *        $feedback_id    
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
+	// *        $feedback_id
+	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
 	function feedback($conn, $feedback_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
+		else
 			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
+
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-		
+
 		if($feedback_id!=null)
 			$this->load($feedback_id);
 	}
-	
+
 	// *********************************************************
 	// * Laedt ein Feedback
-	// * @param 
+	// * @param
 	// *********************************************************
 	function load($feedback_id)
 	{
@@ -72,9 +72,9 @@ class feedback
 			$this->errormsg = 'feedback_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM campus.tbl_feedback WHERE feedback_id='$feedback_id'";
-		
+
 		if($result = pg_query($this->conn, $qry))
 		{
 			$this->feedback_id=$row->feedback_id;
@@ -84,15 +84,15 @@ class feedback
 			$this->uid=$row->uid;
 			$this->lehrveranstaltung_id=$row->lehrveranstaltung_id;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim laden der Lehrveranstaltungen';
 			return false;
-		}	
+		}
 	}
-	
+
 	// *******************************************
-	// * Prueft die Variablen vor dem Speichern 
+	// * Prueft die Variablen vor dem Speichern
 	// * auf Gueltigkeit.
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
@@ -108,13 +108,13 @@ class feedback
 			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
-			
+
 		return true;
 	}
 
 	// ************************************************
 	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische 
+	// * wenn $var !='' ist werden Datenbankkritische
 	// * Zeichen mit Backslash versehen und das Ergbnis
 	// * unter Hochkomma gesetzt.
 	// ************************************************
@@ -130,33 +130,33 @@ class feedback
 			$this->errormsg = 'Lehrveranstaltung_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM campus.tbl_feedback WHERE lehrveranstaltung_id='$lehrveranstaltung_id'";
-		
+
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row=pg_fetch_object($result))
-			{				
+			{
 				$fb_obj = new feedback($this->conn);
-				
+
 				$fb_obj->feedback_id=$row->feedback_id;
 				$fb_obj->betreff=$row->betreff;
 				$fb_obj->text=$row->text;
 				$fb_obj->datum=$row->datum;
 				$fb_obj->uid=$row->uid;
 				$fb_obj->lehrveranstaltung_id=$row->lehrveranstaltung_id;
-				
+
 				$this->result[] = $fb_obj;
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim laden der Lehrveranstaltungen';
 			return false;
-		}	
+		}
 	}
-	
+
 	// ************************************************************
 	// * Speichert Feedback in die Datenbank
 	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
