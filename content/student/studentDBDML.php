@@ -45,6 +45,7 @@ require_once('../../include/dokument.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/betriebsmittel.class.php');
 require_once('../../include/betriebsmittelperson.class.php');
+require_once('../../include/bisio.class.php');
 
 $user = get_uid();
 
@@ -1020,6 +1021,77 @@ if(!$error)
 			$errormsg = 'Fehler:'.$bm->errormsg;
 			$return = false;
 		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='deletebisio')
+	{
+		//Loescht einen BisIO Eintrag
+		if(isset($_POST['bisio_id']) && is_numeric($_POST['bisio_id']))
+		{
+			$bisio = new bisio($conn);
+
+			if($bisio->delete($_POST['bisio_id']))
+			{
+				$return = true;
+			}
+			else 
+			{
+				$errormsg = $bisio->errormsg;
+				$return = false;
+			}
+		}
+		else 
+		{
+			$return = false;
+			$errormsg  = 'Fehlerhafte Parameteruebergabe';
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='savebisio')
+	{
+		//Speichert einen BisIO Eintrag
+		
+		$bisio = new bisio($conn);
+
+		if($_POST['neu']=='true')
+		{
+			$bisio->insertamum = date('Y-m-d H:i:s');
+			$bisio->insertvon = $user;
+			$bisio->new = true;
+		}
+		else 
+		{
+			if($bisio->load($_POST['bisio_id']))
+				$bisio->new = false;
+			else 
+			{
+				$error = true;
+				$errormsg = $bisio->errormsg;
+				$return = false;
+			}				
+		}
+		
+		$bisio->bisio_id = (isset($_POST['bisio_id'])?$_POST['bisio_id']:'');
+		$bisio->mobilitaetsprogramm_code = $_POST['mobilitaetsprogramm_code'];
+		$bisio->nation_code = $_POST['nation_code'];
+		$bisio->von = $_POST['von'];
+		$bisio->bis = $_POST['bis'];
+		$bisio->zweck_code = $_POST['zweck_code'];
+		$bisio->student_uid = $_POST['student_uid'];
+		$bisio->updateamum = date('Y-m-d H:i:s');
+		$bisio->updatevon = $user;
+		
+		if(!$error)
+		{
+			if($bisio->save())
+			{
+				$return = true;
+				$data = $bisio->bisio_id;
+			}
+			else 
+			{
+				$errormsg = $bisio->errormsg;
+				$return = false;
+			}
+		}		
 	}
 	else
 	{
