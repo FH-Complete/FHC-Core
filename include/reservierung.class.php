@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -26,7 +26,7 @@ class reservierung
 	var $errormsg; // string
 	var $new;      // boolean
 	var $reservierungen = array(); // reservierung Objekt
-	
+
 	//Tabellenspalten
 	var $reservierung_id;	// int
 	var $ort_kurzbz;		// varchar(8)
@@ -40,35 +40,35 @@ class reservierung
 	var $verband;			// char(1)
 	var $gruppe;			// char(1)
 	var $gruppe_kurzbz;		// varchar(10)
-		
+
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine Reservierung
 	// * @param $conn        	Datenbank-Connection
 	// *        $reservierung_id
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
+	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
 	function reservierung($conn, $reservierung_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
+		else
 			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
+
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-		else 
+		else
 			$this->new = true;
-		
+
 		if($reservierung_id!=null)
 			$this->load($reservierung_id);
 	}
-	
+
 	// *********************************************************
 	// * Laedt eine Reservierung
 	// * @param reservierung_id
@@ -78,9 +78,9 @@ class reservierung
 		$this->errormsg = 'Not implemented';
 		return false;
 	}
-	
+
 	// *******************************************
-	// * Prueft die Variablen vor dem Speichern 
+	// * Prueft die Variablen vor dem Speichern
 	// * auf Gueltigkeit.
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
@@ -136,13 +136,13 @@ class reservierung
 			$this->gruppe_kurzbz = 'Gruppe_kurzbz darf nicht laenger als 10 Zeichen sein';
 			return false;
 		}
-		
+
 		return true;
 	}
 
 	// ************************************************
 	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische 
+	// * wenn $var !='' ist werden Datenbankkritische
 	// * Zeichen mit Backslash versehen und das Ergbnis
 	// * unter Hochkomma gesetzt.
 	// ************************************************
@@ -167,8 +167,8 @@ class reservierung
 			return false;
 
 		if($this->new)
-		{			
-			$qry = 'INSERT INTO campus.tbl_reservierung (reservierung_id, ort_kurzbz, studiengang_kz, uid, stunde, datum, titel, 
+		{
+			$qry = 'INSERT INTO campus.tbl_reservierung (reservierung_id, ort_kurzbz, studiengang_kz, uid, stunde, datum, titel,
 			                                      beschreibung, semester, verband, gruppe, gruppe_kurzbz)
 			        VALUES('.$this->addslashes($this->reservierung_id).','.
 					$this->addslashes($this->ort_kurzbz).','.

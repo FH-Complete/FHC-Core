@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -26,7 +26,7 @@ class log
 	var $errormsg; // string
 	var $new;      // boolean
 	var $logs = array(); // lehreinheit Objekt
-	
+
 	//Tabellenspalten
 	var $log_id;			// Serial
 	var $executetime;		// timestamp
@@ -34,37 +34,37 @@ class log
 	var $sqlundo;			// text
 	var $beschreibung;		// varchar(64)
 	var $mitarbeiter_uid;	// varchar(16)
-	
-	
+
+
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional einen DS
 	// * @param $conn        	Datenbank-Connection
 	// * 		$log_id
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
+	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
 	function log($conn, $log_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+
 		if($unicode!=null)
 		{
 			if($unicode)
 				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			else 
+			else
 				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-				
+
 			if(!pg_query($conn,$qry))
 			{
 				$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 				return false;
 			}
 		}
-		
+
 		if($log_id!=null)
 			$this->load($log_id);
 	}
-	
+
 	// *********************************************************
 	// * Laedt einen Log Eintrag
 	// * @param log_id
@@ -77,7 +77,7 @@ class log
 			return false;
 		}
 		$qry = "SELECT * FROM public.tbl_log WHERE log_id='$log_id'";
-		
+
 		if($result=pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
@@ -90,19 +90,19 @@ class log
 				$this->sqlundo = $row->sqlundo;
 				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = "Es ist kein Log Eintrag mit der ID $log_id vorhanden";
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim laden des Log Eintrages';
 			return false;
 		}
 	}
-	
+
 	// ********************************************
 	// * Laedt die letzten 10 Undo Eintraege
 	// * @param $uid UID des Mitarbeiters dessen
@@ -110,9 +110,9 @@ class log
 	// * @return true wenn ok , false im Fehlerfall
 	// ********************************************
 	function load_undo($uid)
-	{		
+	{
 		$qry = "SELECT * FROM public.tbl_log WHERE mitarbeiter_uid='".addslashes($uid)."' AND sqlundo is not null ORDER BY executetime DESC LIMIT 10";
-		
+
 		if($result=pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
@@ -125,20 +125,20 @@ class log
 				$log_obj->beschreibung = $row->beschreibung;
 				$log_obj->sql = $row->sql;
 				$log_obj->sqlundo = $row->sqlundo;
-				
+
 				$this->logs[] = $log_obj;
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim laden der Log-Eintraege';
 			return false;
 		}
 	}
-	
+
 	// *******************************************
-	// * Prueft die Variablen vor dem Speichern 
+	// * Prueft die Variablen vor dem Speichern
 	// * auf Gueltigkeit.
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
@@ -149,7 +149,7 @@ class log
 
 	// ************************************************
 	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische 
+	// * wenn $var !='' ist werden Datenbankkritische
 	// * Zeichen mit Backslash versehen und das Ergbnis
 	// * unter Hochkomma gesetzt.
 	// ************************************************
@@ -168,13 +168,13 @@ class log
 	{
 		if(is_null($new))
 			$new = $this->new;
-					
+
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
 			return false;
 
 		if($new)
-		{			
+		{
 			$qry = 'INSERT INTO public.tbl_log(executetime, mitarbeiter_uid, beschreibung, sql, sqlundo) VALUES(now(),'.
 			        $this->addslashes($this->mitarbeiter_uid).','.
 			        $this->addslashes($this->beschreibung).','.
@@ -191,7 +191,7 @@ class log
 			       ' sqlundo='.$this->addslashes($this->sqlundo).
 			       " WHERE log_id=".$this->addslashes($this->log_id).";";
 		}
-		
+
 		if(pg_query($this->conn,$qry))
 		{
 				return true;
@@ -202,8 +202,8 @@ class log
 			return false;
 		}
 	}
-	
-	
+
+
 	// **********************************
 	// * Loescht einen Log Eintrag
 	// * @param $log_id ID des DS
@@ -216,18 +216,18 @@ class log
 			$this->errormsg = 'Log_id ist ungueltig';
 			return false;
 		}
-		
+
 		$qry = "DELETE FROM public.tbl_log WHERE log_id='$log_id'";
-		
+
 		if(pg_query($this->conn, $qry))
 			return true;
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim loeschen des LOG Eintrages';
 			return false;
 		}
 	}
-	
+
 	// ************************************
 	// * Fuehrt einen UnDo Befehl aus und
 	// * loescht anschliessend den Eintrag
@@ -261,32 +261,32 @@ class log
 							pg_query($this->conn, 'COMMIT;');
 							return true;
 						}
-						else 
+						else
 						{
 							pg_query($this->conn, 'ROLLBACK;');
 							$this->errormsg = 'UnDo Eintrag konnte nicht entfernt werden';
 							return false;
 						}
 					}
-					else 
+					else
 					{
 						$this->errormsg ='UnDo Befehl konnte nicht durchgefuehrt werden';
 						return false;
 					}
 				}
-				else 
+				else
 				{
 					$this->errormsg = 'Ungueltiger UnDo Befehl';
 					return false;
 				}
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'UnDo Befehl konnte nicht durchgefuehrt werden';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'UnDo Befehl konnte nicht durchgefuehrt werden';
 			return false;

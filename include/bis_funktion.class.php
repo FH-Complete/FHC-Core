@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -31,7 +31,7 @@ class funktion
 	var $errormsg; 			// @var string
 	var $new;      				// @var boolean
 	var $result = array(); 		// @var funktion Objekt
-	
+
 	//vars fuer Tabellenspalten
 	var $funktion_id;        		// @var integer
 	var $mitarbeiter_id;     		// @var integer
@@ -40,7 +40,7 @@ class funktion
 	var $studiengang_id;     		// @var integer
 	var $fachbereich_id;     		// @var integer
 	var $name;       	        		// @var string
-	var $funktion;          			// @var integer ( 0 = Mitarbeiter, 1 = Lektor, 2 = Fachbereichskoordinatior, 3 = Assistenz, 
+	var $funktion;          			// @var integer ( 0 = Mitarbeiter, 1 = Lektor, 2 = Fachbereichskoordinatior, 3 = Assistenz,
 	                         			//                4 = Rektor, 5 = Studiengangsleiter, 6 = Fachbereichsleiter)
 	var $updateamum;         		// @var timestamp
 	var $updatevon=0;          		// @var string
@@ -55,7 +55,7 @@ class funktion
 	var $sws;                			// @var float wird nicht verwendet
 	var $ausmass;            		// @var float ( 1 = Vollzeit, 2 = <=15 Wochenstd, 3 = 15-25 Wochenstd, 4 = 26-36 Wochenstd, 5 = Karenz)
 	var $status;				// @var integer Aktstatus der Person (wird bei loeschen einer funktion gesetzt)
-		
+
 	/**
 	 * Konstruktor
 	 * @param $conn   Connection zur Datenbank
@@ -73,7 +73,7 @@ class funktion
 		if($fkt_id != null)
 			$this->load($fkt_id);
 	}
-	
+
 	/**
 	 * loescht die Funktion mit der uebergebenen ID
 	 * @param $funktion_id ID des zu loeschenden Datensatzes
@@ -93,12 +93,12 @@ class funktion
 				$person_id = $row->person_fk;
 				$mitarbeiter_id = $row->mitarbeiter_pk;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Fehler beim ermitteln der Person';
 				return false;
 			}
-			
+
 			$qry = "DELETE FROM funktion WHERE funktion_pk=$funktion_id;";
 			$sql = $qry;
 			if(pg_query($this->conn,$qry))
@@ -123,7 +123,7 @@ class funktion
 								$fkt[$i]=$row->funktion;
 								$i++;
 							}
-							
+
 							//Aktstatus ermitteln
 							if(in_array(5,$fkt)) //STGL
 								$aktstatus = 104;
@@ -135,7 +135,7 @@ class funktion
 								$aktstatus = 101;
 							else
 								$aktstatus = 100; //Mitarbeiter
-								
+
 							$this->status = $aktstatus;
 							//neuen akstatus setzen
 							$qry = "Update person set aktstatus = $aktstatus where person_pk = $person_id";
@@ -149,26 +149,26 @@ class funktion
 									$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
 									return false;
 								}
-											
+
 								$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
 								if(pg_query($this->conn, $qry))
 									return true;
-								else 
+								else
 								{
 									$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
 									return false;
 								}
 							}
-							else 
+							else
 							{
 								$this->errormsg = 'Fehler beim setzen des Aktstatus';
 								return false;
 							}
 						}
 					}
-					else 
+					else
 						return true;
-						
+
 				}
 				else
 				{
@@ -176,20 +176,20 @@ class funktion
 					return false;
 				}
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Beim loeschen ist ein Fehler aufgetreten';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'funktion_id muss eine gueltige Zahl sein';
 			return false;
-		}		
+		}
 	}
-	
-	
+
+
 	/**
 	 * Prueft die Variablen auf Gueltigkeit
 	 * @return true wenn ok, false im Fehlerfall
@@ -198,15 +198,15 @@ class funktion
 	{
 		//Hochkomma und HTML Tags ersetzen
 		//$this->name = htmlentities($this->name, ENT_QUOTES);
-		
+
 		//Maximallaenge pruefen
 		$this->errormsg = 'Die Maximallaenge eines Feldes wurde ueberschritten';
 		if(strlen($this->name)>255)           return false;
-						
+
 		//Zahlenwerte ueberpruefen
 		/*
 		$this->errormsg = 'Ein Zahlenfeld enthaelt ungueltige Zeichen';
-		
+
 		if(!is_numeric($this->funktion))    return false;
 		if(!is_numeric($this->beschart1))   return false;
 		if(!is_numeric($this->beschart2))   return false;
@@ -220,26 +220,26 @@ class funktion
 		if(!is_numeric($this->fachbereich_id)) return false;
 		if(!is_numeric($this->studiensemester_id))     return false;
 		if(!is_numeric($this->besonderequalifikation)) return false;
-		*/			
+		*/
 		$this->errormsg = '';
 		return true;
 	}
-	
+
 	/**
 	 * Speichert die Daten in die Datenbank
 	 * @return true wenn OK, false im Fehlerfall
-	 */	 
+	 */
 	function save()
 	{
 		if(!$this->checkvars())
 			return false;
-			
+
 		//neuen aktstatus ermitteln
 		if($status=$this->getaktstatus())
 			$statusqry = "Update person SET aktstatus=$status where person_pk = (Select person_fk from mitarbeiter where mitarbeiter_pk='$this->mitarbeiter_id');";
-		else 
+		else
 			$statusqry = "";
-			
+
 		if($this->new)
 		{
 			//Naechste ID aus der Sequence holen
@@ -250,7 +250,7 @@ class funktion
 				return false;
 			}
 			$this->funktion_id = $row->id;
-			
+
 			$qry= $statusqry."INSERT INTO funktion (funktion_pk, mitarbeiter_fk, studiensemester_fk, erhalter_fk, studiengang_fk,".
 			     " fachbereich_fk, name, funktion, creationdate, creationuser, beschart1, beschart2, verwendung,".
 			     " hauptberuflich, hauptberuf, entwicklungsteam, besonderequalifikation, sws, ausmass) VALUES(".
@@ -265,16 +265,16 @@ class funktion
 			     ($this->hauptberuf!=''?" '$this->hauptberuf'":'null').", '".($this->entwicklungsteam?'J':'N')."',".
 			     ($this->besonderequalifikation!=''?" '$this->besonderequalifikation'":'null').", null,".
 			     ($this->ausmass!=''?" '$this->ausmass'":'null').")";
-		
+
 		}
-		else 
+		else
 		{
 			if(!is_numeric($this->mitarbeiter_id) && !is_numeric($this->funktion_id))
 			{
 				$this->errormsg = 'mitarbeiter_id und funktion_id muessen eine gueltige Zahl sein';
 				return false;
 			}
-			
+
 			$qry= $statusqry. "UPDATE funktion SET ".
 				 " studiensemester_fk=".($this->studiensemester_id!=''?"'$this->studiensemester_id'":'null').",".
 				 " erhalter_fk=".($this->erhalter_id!=''?"'$this->erhalter_id'":'null').",".
@@ -293,7 +293,7 @@ class funktion
 			     " ausmass=".($this->ausmass!=''?"'$this->ausmass'":'null').
 			     " WHERE funktion_pk=$this->funktion_id"; // AND mitarbeiter_fk=$this->mitarbeiter_id";
 		}
-		
+
 		if(pg_query($this->conn,$qry))
 		{
 			$qry = "UPDATE funktion SET hauptberuflich='".($this->hauptberuflich?'J':'N')."', hauptberuf=".($this->hauptberuf!=''?"'$this->hauptberuf'":'null')." WHERE mitarbeiter_fk ='$this->mitarbeiter_id' AND studiensemester_fk='$this->studiensemester_id'";
@@ -310,23 +310,23 @@ class funktion
 				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
 				return false;
 			}
-						
+
 			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
 			if(pg_query($this->conn, $qry))
 				return true;
-			else 
+			else
 			{
 				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Speichern der Daten'.$qry;
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Ermittelt den neuen aktstatus einer Person
 	 */
@@ -339,18 +339,18 @@ class funktion
 		{
 			if($row = pg_fetch_object($result))
 				$aktstatus = $row->aktstatus;
-			else 
+			else
 			{
 				$this->errormsg = 'Fehler beim Laden des aktuellen Status';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden des aktuellen Status';
 			return false;
 		}
-		
+
 		/*
 		//Wenn die Funktion das aktuelle Studiensemester betrifft
 		$qry = "Select studiensemester_pk from studiensemester where aktuell='J'";
@@ -369,24 +369,24 @@ class funktion
 					elseif($this->funktion == 6 && $aktstatus < 103) //Fachbereichsleiter
 						$aktstatus = 103;
 					elseif($this->funktion == 5 && $aktstatus < 104) //Studiengangsleiter
-						$aktstatus = 104;						
+						$aktstatus = 104;
 		/*		}
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Fehler beim Laden des aktuellen Studiensemesters';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden des aktuellen Studiensemesters';
 			return false;
 		}*/
 		$this->status = $aktstatus;
-		return $aktstatus;		
+		return $aktstatus;
 	}
-	
+
 	/**
 	 * Laedt eine Funktion aus der DB
 	 * @param  $fkt_id  ID der zu ladenden Funktion
@@ -400,17 +400,17 @@ class funktion
 			$this->errormsg = 'funktion_id muss eine Zahl sein';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM funktion WHERE funktion_pk=$fkt_id";
-		
+
 		if(!$res = pg_query($this->conn, $qry))
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
 			return false;
 		}
-		
+
 		if($row = pg_fetch_object($res))
-		{						
+		{
 			$this->funktion_id            = $row->funktion_pk;
 			$this->mitarbeiter_id         = $row->mitarbeiter_fk;
 			$this->studiensemester_id     = $row->studiensemester_fk;
@@ -431,15 +431,15 @@ class funktion
 			$this->sws                    = $row->sws;
 			$this->ausmass                = $row->ausmass;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Es ist kein Datensatz mit dieser ID vorhanden';
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Laedt die Funktion(en) eines Mitarbeiters
 	 * @param  $ma_id  ID des zu ladenden Mitarbeiters
@@ -453,7 +453,7 @@ class funktion
 			$this->errormsg = 'mitarbeiter_id muss eine Zahl sein';
 			return false;
 		}
-		
+
 		$qry="SELECT * FROM funktion WHERE mitarbeiter_fk=$ma_id";
 		if($stsem!='')
 			$qry.= " AND studiensemester_fk='$stsem'";
@@ -463,11 +463,11 @@ class funktion
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
 			return false;
 		}
-		
+
 		while($row = pg_fetch_object($res))
 		{
 			$fkt_obj = new funktion($this->conn);
-			
+
 			$fkt_obj->funktion_id            = $row->funktion_pk;
 			$fkt_obj->mitarbeiter_id         = $row->mitarbeiter_fk;
 			$fkt_obj->studiensemester_id     = $row->studiensemester_fk;
@@ -487,25 +487,25 @@ class funktion
 			$fkt_obj->besonderequalifikation = $row->besonderequalifikation;
 			$fkt_obj->sws                    = $row->sws;
 			$fkt_obj->ausmass                = $row->ausmass;
-			
+
 			$this->result[] = $fkt_obj;
 		}
-			
+
 		return true;
 	}
-	
+
 	function getMitarbeiter($stg,$fb,$funktion,$stsem=null)
 	{
-		$qry = "SELECT 
-					mitarbeiter_fk 
-				FROM 
-					funktion 
-				WHERE 
-					studiengang_fk='$stg' AND 
-					fachbereich_fk='$fb' 
+		$qry = "SELECT
+					mitarbeiter_fk
+				FROM
+					funktion
+				WHERE
+					studiengang_fk='$stg' AND
+					fachbereich_fk='$fb'
 				GROUP BY mitarbeiter_fk";
 		if($result = pg_query($this->conn,$qry))
-		{			
+		{
 			while($row = pg_fetch_object($result))
 			{
 				$fkt = new funktion($this->conn);
@@ -514,13 +514,13 @@ class funktion
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim laden der Mitarbeiter';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt alle Funktionen
 	 * @return true wenn erfolgreich geladen, false im Fehlerfall
@@ -528,19 +528,19 @@ class funktion
 	function getAll()
 	{
 		/*Eventuell Speicherprobleme
-		
+
 		$qry = "SELECT * FROM funktion";
-			
+
 		if(!$res = pg_query($this->conn, $qry))
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
 			return false;
 		}
-		
+
 		while($row=pg_fetch_object($res))
 		{
 			$fkt_obj = new funktion($this->conn);
-			
+
 			$fkt_obj->funktion_id            = $row->funktion_pk;
 			$fkt_obj->mitarbeiter_id         = $row->mitarbeiter_fk;
 			$fkt_obj->studiensemester_id     = $row->studiensemester_fk;
@@ -560,25 +560,25 @@ class funktion
 			$fkt_obj->besonderequalifikation = $row->besonderequalifikation;
 			$fkt_obj->sws                    = $row->sws;
 			$fkt_obj->ausmass                = $row->ausmass;
-			
+
 			$this->result[] = $fkt_obj;
 		}
 		return true;
 		*/
 		return false;
-	}	
-	
+	}
+
 	function FunktionExists($mitarbeiter_id, $studiengang_id, $fachbereich_id, $studiensemester_id, $funktion)
 	{
-		$qry = "SELECT 
+		$qry = "SELECT
 					count(*) as anzahl
-				FROM 
-					funktion 
-				WHERE 
-					mitarbeiter_fk='$mitarbeiter_id' AND 
-					studiengang_fk='$studiengang_id' AND 
-					fachbereich_fk='$fachbereich_id' AND 
-					studiensemester_fk = '$studiensemester_id' AND 
+				FROM
+					funktion
+				WHERE
+					mitarbeiter_fk='$mitarbeiter_id' AND
+					studiengang_fk='$studiengang_id' AND
+					fachbereich_fk='$fachbereich_id' AND
+					studiensemester_fk = '$studiensemester_id' AND
 					funktion='$funktion'";
 		if($result = pg_query($this->conn, $qry))
 		{
@@ -591,19 +591,19 @@ class funktion
 					return false;
 				}
 			}
-			else 
+			else
 			{
 				return false;
 				$this->errormsg = 'Fehler beim auslesen der Funktionen';
 			}
 		}
-		else 
+		else
 		{
 			return false;
 			$this->errormsg = 'Fehler beim auslesen der Funktionen';
 		}
 	}
-	
+
 	function getNameFunktion($id)
 	{
 		switch($id)
@@ -618,11 +618,11 @@ class funktion
 			default: return '';
 		}
 	}
-	
+
 	function getNameBeschart1($id)
 	{
 		switch($id)
-		{			
+		{
 			case 1: return 'Dienstverhältnis zum Bund';
 			case 2: return 'Dienstverhältnis zu einer anderen Gebietskörperschaft';
 			case 3:	return 'Echter Dienstvertrag';
@@ -632,21 +632,21 @@ class funktion
 			default: return '';
 		}
 	}
-	
+
 	function getNameBeschart2($id)
 	{
 		switch($id)
-		{			
+		{
 			case 1: return 'befristet';
 			case 2: return 'unbefristet';
 			default: return '';
 		}
 	}
-	
+
 	function getNameVerwendung($id)
 	{
 		switch($id)
-		{			
+		{
 			case 1: return 'Lehr- und Forschungspersonal';
 			case 2: return 'Lehr- und Forschungshilfspersonal';
 			case 3: return 'Akademische dienste für Studierende';
@@ -658,13 +658,13 @@ class funktion
 			case 9: return 'Hauspersonal, Gebäude-/Haustechnik';
 			default: return '';
 		}
-		
+
 	}
-	
+
 	function getNameHauptberuf($id)
 	{
 		switch($id)
-		{			
+		{
 			case '': return '';
 			case 0: return 'Universität';
 			case 1: return 'Fachhochschule';
@@ -682,11 +682,11 @@ class funktion
 			default: return '';
 		}
 	}
-	
+
 	function getNameBesonderequalifikation($id)
 	{
 		switch($id)
-		{			
+		{
 			case 0: return 'keine';
 			case 1: return 'Habilitation';
 			case 2: return 'der Habilitation gleichwertige Qualifikation';
@@ -694,11 +694,11 @@ class funktion
 			default: return '';
 		}
 	}
-	
+
 	function getNameAusmass($id)
 	{
 		switch($id)
-		{			
+		{
 			case 1: return 'Vollzeit';
 			case 2: return '<= 15 Wochenstunden';
 			case 3: return '16 - 25 Wochenstunden';

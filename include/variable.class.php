@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -26,50 +26,50 @@ class variable
 	var $errormsg; // string
 	var $new;      // boolean
 	var $variables = array(); // variable Objekt
-	
+
 	//Tabellenspalten
 	var $uid;	// varchar(16)
 	var $name;	// varchar(64)
 	var $wert;	// varchar(64)
-	
+
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine Variable
 	// * @param $conn        	Datenbank-Connection
 	// *        $uid
 	// *		$name
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
+	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
 	function variable($conn, $uid=null, $name=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
+		else
 			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
+
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-		
+
 		if($uid!=null && $name!=null)
 			$this->load($uid, $name);
 	}
-	
+
 	// *********************************************************
 	// * Laedt die Variablen
-	// * @param 
+	// * @param
 	// *********************************************************
 	function load($uid, $name)
 	{
 		return false;
 	}
-	
+
 	// *******************************************
-	// * Prueft die Variablen vor dem Speichern 
+	// * Prueft die Variablen vor dem Speichern
 	// * auf Gueltigkeit.
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
@@ -90,13 +90,13 @@ class variable
 			$this->errormsg = 'Wert darf nicht laenger als 64 Zeichen sein';
 			return false;
 		}
-		
+
 		return true;
 	}
 
 	// ************************************************
 	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische 
+	// * wenn $var !='' ist werden Datenbankkritische
 	// * Zeichen mit Backslash versehen und das Ergbnis
 	// * unter Hochkomma gesetzt.
 	// ************************************************
@@ -115,13 +115,13 @@ class variable
 	{
 		if(is_null($new))
 			$new = $this->new;
-					
+
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
 			return false;
 
 		if($new)
-		{		
+		{
 			$qry = 'INSERT INTO public.tbl_variable (uid, name, wert)
 			        VALUES('.$this->addslashes($this->uid).','.
 					$this->addslashes($this->name).','.

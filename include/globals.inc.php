@@ -19,7 +19,7 @@
 	$tagbez[4]="Donnerstag";
 	$tagbez[5]="Freitag";
 	$tagbez[6]="Samstag";
-	
+
 	// Studiengaenge die keine Alias Email Adressen erhalten
 	$noalias=array();
 	$noalias[0]='330';

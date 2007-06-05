@@ -15,11 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-/** 
+/**
  * Klasse benutzerfunktion (FAS-Online)
  * @create 04-12-2006
  */
@@ -29,8 +29,8 @@ class benutzerfunktion
 	var $conn;   			// @var resource DB-Handle
 	var $new;     			// @var boolean
 	var $errormsg; 		// @var string
-	var $result = array(); 	// @var benutzerfunktion Objekt 
-	
+	var $result = array(); 	// @var benutzerfunktion Objekt
+
 	//Tabellenspalten
 	var $benutzerfunktion_id;	// @var serial
 	var $fachbereich_kurzbz;		// @var integer
@@ -42,8 +42,8 @@ class benutzerfunktion
 	var $insertamum;		// @var timestamp
 	var $insertvon=0;		// @var string
 	var $ext_id;			// @var bigint
-	
-	
+
+
 	/**
 	 * Konstruktor
 	 * @param $conn Connection zur DB
@@ -55,7 +55,7 @@ class benutzerfunktion
 		if($benutzerfunktion_id != null)
 			$this->load($benutzerfunktion_id);
 	}
-	
+
 	/**
 	 * Laedt alle verfuegbaren Benutzerfunktionen
 	 * @return true wenn ok, false im Fehlerfall
@@ -63,17 +63,17 @@ class benutzerfunktion
 	function getAll()
 	{
 		$qry = 'SELECT * FROM public.tbl_benutzerfunktion ORDER BY benutzerfunktion_id;';
-		
+
 		if(!$res = pg_query($this->conn, $qry))
 		{
 			$this->errormsg = 'Fehler beim Laden der Datensaetze';
 			return false;
 		}
-		
+
 		while($row = pg_fetch_object($res))
 		{
 			$pfunktion_obj = new benutzerfunktion($this->conn);
-			
+
 			$pfunktion_obj->benutzerfunktion_id 	= $row->benutzerfunktion_id;
 			$pfunktion_obj->fachbereich_kurzbz 		= $row->fachbereich_kurzbz;
 			$pfunktion_obj->uid 				= $row->uid;
@@ -83,12 +83,12 @@ class benutzerfunktion
 			$pfunktion_obj->insertvon			= $row->insertvon;
 			$pfunktion_obj->updateamum		= $row->updateamum;
 			$pfunktion_obj->updatevon			= $row->updatevon;
-			
+
 			$this->result[] = $pfunktion_obj;
 		}
 		return true;
 	}
-	
+
 	// *********************************
 	// * Prueft ob der Benutzer $uid die
 	// * Funktion $benutzerfunktion hat
@@ -96,21 +96,21 @@ class benutzerfunktion
 	function benutzerfunktion_exists($uid, $benutzerfunktion)
 	{
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_benutzerfunktion WHERE uid='".addslashes($uid)."' AND funktion_kurzbz='".addslashes($benutzerfunktion)."'";
-		
+
 		if($row = pg_fetch_object(pg_query($this->conn, $qry)))
 		{
 			if($row->anzahl>0)
 				return true;
-			else 
+			else
 				return false;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim laden der Bentuzerfunktionen';
 			return false;
 		}
 	}
-	
+
 	// *********************************
 	// * Laedt eine BenutzerFunktion
 	// * @param uid, funktion_kurzbz, studiengang_kz
@@ -120,7 +120,7 @@ class benutzerfunktion
 	function getBentuzerFunktion($uid, $funktion_kurzbz, $studiengang_kz)
 	{
 		$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE uid='".addslashes($uid)."' AND funktion_kurzbz='".addslashes($funktion_kurzbz)."' AND studiengang_kz='".addslashes($studiengang_kz)."'";
-		
+
 		if($result = pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
@@ -136,19 +136,19 @@ class benutzerfunktion
 				$this->updatevon		= $row->updatevon;
 				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = "Benutzerfunktion wurde nicht gefunden";
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim laden der Bentuzerfunktionen';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt eine Benutzerfunktion
 	 * @param $bnutzerfunktion_id ID der zu ladenden Funktion
@@ -161,15 +161,15 @@ class benutzerfunktion
 			$this->errormsg = 'benutzerfunktion_id muß eine gültige Zahl sein';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE benutzerfunktion_id = '$this->benutzerfunktion_id';";
-		
+
 		if(!$res = pg_query($this->conn, $qry))
 		{
 			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
-		
+
 		if($row=pg_fetch_object($res))
 		{
 			$this->benutzerfunktion_id	= $row->benutzerfunktion_id;
@@ -182,15 +182,15 @@ class benutzerfunktion
 			$this->updateamum		= $row->updateamum;
 			$this->updatevon		= $row->updatevon;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Es ist kein Datensatz mit dieser ID vorhanden';
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Loescht einen Datensatz
 	 * @param $fbenutzerfunktion_id id des Datensatzes der geloescht werden soll
@@ -204,7 +204,7 @@ class benutzerfunktion
 			$this->errormsg = pg_errormessage($this->conn);
 			return false;
 		}
-		else 
+		else
 			return true;
 	}
 	function addslashes($var)
@@ -219,7 +219,7 @@ class benutzerfunktion
 	 * Prueft die Gueltigkeit der Variablen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	
+
 	function save($new=null)
 	{
 		//Gueltigkeit der Variablen pruefen
@@ -227,26 +227,26 @@ class benutzerfunktion
 		//	return false;
 		if($new==null)
 			$new = $this->new;
-			
+
 		if($new)
 		{
-			//Neuen Datensatz anlegen	
+			//Neuen Datensatz anlegen
 			//Pruefen ob uid vorhanden
 			$qry = "SELECT uid FROM public.tbl_benutzer WHERE uid = '$this->uid';";
 			if(!$resx = pg_query($this->conn, $qry))
 			{
 				$this->errormsg = 'Fehler beim Laden des Datensatzes';
 				return false;
-			}	
-			else 
+			}
+			else
 			{
 				if (pg_num_rows($resx)==0)
 				{
 					$this->errormsg = "uid <b>$this->uid</b> in Tabelle tbl_benutzer nicht gefunden!";
 					return false;
-				}	
+				}
 			}
-			$qry = 'INSERT INTO public.tbl_benutzerfunktion (fachbereich_kurzbz, uid, studiengang_kz, funktion_kurzbz, insertamum, insertvon, 
+			$qry = 'INSERT INTO public.tbl_benutzerfunktion (fachbereich_kurzbz, uid, studiengang_kz, funktion_kurzbz, insertamum, insertvon,
 				updateamum, updatevon) VALUES ('.
 				$this->addslashes($this->fachbereich_kurzbz).', '.
 				$this->addslashes($this->uid).', '.
@@ -257,18 +257,18 @@ class benutzerfunktion
 				$this->addslashes($this->updateamum).', '.
 				$this->addslashes($this->updatevon).'); ';
 		}
-		else 
+		else
 		{
 			//bestehenden Datensatz akualisieren
-			
+
 			//Pruefen ob benutzerfunktion_id eine gueltige Zahl ist
 			if(!is_numeric($this->benutzerfunktion_id) || $this->benutzerfunktion_id == '')
 			{
 				$this->errormsg = 'benutzerfunktion_id muss eine gueltige Zahl sein';
 				return false;
 			}
-			
-			$qry = 'UPDATE public.tbl_benutzerfunktion SET '. 
+
+			$qry = 'UPDATE public.tbl_benutzerfunktion SET '.
 				'benutzerfunktion_id='.$this->addslashes($this->benutzerfunktion_id).', '.
 				'fachbereich_kurzbz='.$this->addslashes($this->fachbereich_kurzbz).', '.
 				'uid='.$this->addslashes($this->uid).', '.
@@ -280,7 +280,7 @@ class benutzerfunktion
 				'updatevon='.$this->addslashes($this->updatevon).'  '.
 				'WHERE benutzerfunktion_id = '.$this->addslashes($this->benutzerfunktion_id).';';
 		}
-		
+
 		if(pg_query($this->conn, $qry))
 		{
 			/*//Log schreiben
@@ -291,11 +291,11 @@ class benutzerfunktion
 				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
 				return false;
 			}
-						
+
 			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
 			if(pg_query($this->conn, $qry))
 				return true;
-			else 
+			else
 			{
 				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
 				return false;
@@ -306,7 +306,7 @@ class benutzerfunktion
 		{
 			$this->errormsg = 'Fehler beim Speichern des Datensatzes - '.pg_errormessage($this->conn);
 			return false;
-		}		
+		}
 	}
 }
 ?>
