@@ -30,6 +30,8 @@
 
 	$uid = get_uid();
 
+	$PHP_SELF = $_SERVER['PHP_SELF'];
+	
 	if(isset($_GET['type']))
 		$type=$_GET['type'];
 

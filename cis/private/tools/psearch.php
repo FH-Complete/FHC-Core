@@ -30,6 +30,21 @@
     //Connection Herstellen
     if(!$conn = pg_pconnect(CONN_STRING))
        die("Fehler beim öffnen der Datenbankverbindung");
+    
+    if(isset($_POST['cmbChoice']))   
+    	$cmbChoice = $_POST['cmbChoice'];
+    else
+    	$cmbChoice=null;
+    
+    if(isset($_POST['txtSearchQuery']))
+    	$txtSearchQuery = $_POST['txtSearchQuery'];
+    else
+    	$txtSearchQuery=null;
+    	
+    if(isset($_POST['do_search']))
+    	$do_search = $_POST['do_search'];
+    else 
+    	$do_search = null;
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>

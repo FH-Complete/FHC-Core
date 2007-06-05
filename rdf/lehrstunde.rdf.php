@@ -95,7 +95,7 @@ else
 $error_msg='';
 if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg.='Es konnte keine Verbindung zum Server aufgebaut werden!';
-$error_msg.=loadVariables($conn,$REMOTE_USER);
+$error_msg.=loadVariables($conn,$uid);
 
 //if (!isset($datum_bis))
 //	$datum_bis=date('Y-m-d',(mktime(0,0,1,substr($datum,5,2),substr($datum,8),substr($datum,0,4))+86400));

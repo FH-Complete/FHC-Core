@@ -41,12 +41,12 @@ while ($i<100 && isset($_GET[$name_stpl_id]))
 
 if (!$conn = @pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-$error_msg.=loadVariables($conn,$REMOTE_USER);
+$error_msg.=loadVariables($conn,$uid);
 
 // Authentifizierung
-if ($uid=check_student($REMOTE_USER, $conn))
+if ($uid=check_student($uid, $conn))
 	$user='student';
-elseif ($uid=check_lektor($REMOTE_USER, $conn))
+elseif ($uid=check_lektor($uid, $conn))
 	$user='lektor';
 else
     die("Cannot set usertype!");

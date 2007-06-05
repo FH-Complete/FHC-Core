@@ -1,19 +1,20 @@
 <?php
 	include('../../config.inc.php');
+	require_once('../../../include/functions.inc.php');
+	
 	$adress='pam@technikum-wien.at';
-	if (!isset($REMOTE_USER))
-		$REMOTE_USER='pam';
-	$uid=$REMOTE_USER;
+	
+	$user=get_uid();
 
 	if (isset($_GET['uid']))
 		$uid=$_GET['uid'];
 	if (isset($_GET['stdsem']))
 		$stdsem=$_GET['stdsem'];
 
-	if ($uid!=$REMOTE_USER)
+	if ($uid!=$user)
 	{
 		mail($adress,"Unerlaubter Zugriff auf Lehrveranstaltungen",
-			"User $REMOTE_USER hat versucht die LVAs von User $uid zu betrachten!",
+			"User $user hat versucht die LVAs von User $uid zu betrachten!",
 			"From: vilesci@technikum-wien.at");
 		die("Keine Berechtigung!");
 	}

@@ -181,7 +181,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentiooverlay.xul.php"?
 							<tab id="student-tab-konto" label="Konto" />
 							<tab id="student-tab-zeugnis" label="Zeugnis" />
 							<tab id="student-tab-betriebsmittel" label="Betriebsmittel" />
-							<tab id="student-tab-io" label="Incomming/Outgoing" />
+							<tab id="student-tab-io" label="Incoming/Outgoing" />
 						</tabs>
 						<tabpanels id="student-tabpanels-main" flex="1">
 							<vbox id="student-detail"  style="margin-top:10px;" />

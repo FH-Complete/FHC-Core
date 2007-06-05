@@ -36,6 +36,8 @@ var StudentTreeLoadDataOnSelect=true; //Gib an ob beim Selectieren im Tree die D
 var StudentBetriebsmittelTreeDatasource; //Datasource des BetriebsmittelTrees
 var StudentBetriebsmittelSelectBetriebsmittel_id=null; //Betriebsmittelzurodnung die nach dem Refresh markiert werden soll
 var StudentBetriebsmittelSelectPerson_id=null; //Betriebsmittelzurodnung die nach dem Refresh markiert werden soll
+var StudentIOTreeDatasource; //Datasource des Incomming/Outgoing Trees
+var StudentIOSelectID=null; //BISIO Eintrag der nach dem Refresh markiert werden soll
 
 // ********** Observer und Listener ************* //
 
@@ -139,6 +141,41 @@ var StudentBetriebsmittelTreeListener =
   	  //noch keine values haben. Ab Seamonkey funktionierts auch
   	  //ohne dem setTimeout
       window.setTimeout(StudentBetriebsmittelTreeSelectZuordnung,10);
+  }
+};
+
+
+// ****
+// * Observer fuer BISIO Tree
+// * startet Rebuild nachdem das Refresh
+// * der datasource fertig ist
+// ****
+var StudentIOTreeSinkObserver =
+{
+	onBeginLoad : function(pSink) {},
+	onInterrupt : function(pSink) {},
+	onResume : function(pSink) {},
+	onError : function(pSink, pStatus, pError) {},
+	onEndLoad : function(pSink)
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		document.getElementById('student-io-tree').builder.rebuild();
+	}
+};
+
+// ****
+// * Nach dem Rebuild wird der Eintrag wieder
+// * markiert
+// ****
+var StudentIOTreeListener =
+{
+  willRebuild : function(builder) {  },
+  didRebuild : function(builder)
+  {
+  	  //timeout nur bei Mozilla notwendig da sonst die rows
+  	  //noch keine values haben. Ab Seamonkey funktionierts auch
+  	  //ohne dem setTimeout
+      window.setTimeout(StudentIOTreeSelectID,10);
   }
 };
 // ***************** KEY Events ************************* //
@@ -592,6 +629,7 @@ function StudentAuswahl()
 			StudentPrestudentDisableFields(false);
 			StudentKontoDisableFields(false);
 			StudentBetriebsmittelDisableFields(false);
+			StudentIODisableFields(false);
 			document.getElementById('student-detail-button-save').disabled=false;
 		}
 		else
@@ -834,6 +872,28 @@ function StudentAuswahl()
 	betriebsmitteltree.database.AddDataSource(StudentBetriebsmittelTreeDatasource);
 	StudentBetriebsmittelTreeDatasource.addXMLSinkObserver(StudentBetriebsmittelTreeSinkObserver);
 	betriebsmitteltree.builder.addListener(StudentBetriebsmittelTreeListener);	
+	
+	// *** Incomming/Outgoing ***
+	bisiotree = document.getElementById('student-io-tree');
+	
+	url='<?php echo APP_ROOT;?>rdf/bisio.rdf.php?uid='+uid+"&"+gettimestamp();
+	
+	//Alte DS entfernen
+	var oldDatasources = bisiotree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		bisiotree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	bisiotree.builder.rebuild();
+	
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	StudentIOTreeDatasource = rdfService.GetDataSource(url);
+	StudentIOTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	StudentIOTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	bisiotree.database.AddDataSource(StudentIOTreeDatasource);
+	StudentIOTreeDatasource.addXMLSinkObserver(StudentIOTreeSinkObserver);
+	bisiotree.builder.addListener(StudentIOTreeListener);	
 }
 
 // ****
@@ -1759,8 +1819,7 @@ function StudentIOAuswahl()
 	if (tree.currentIndex==-1) return;
 
 	StudentIODetailDisableFields(false);
-	document.getElementById('student-io-checkbox-neu').checked=false;
-	
+		
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["student-io-tree-bisio_id"] : "student-io-tree-bisio_id";
 	var bisio_id=tree.view.getCellText(tree.currentIndex,col);
@@ -1785,13 +1844,15 @@ function StudentIOAuswahl()
 	bis = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bis" ));
 	zweck_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zweck_code" ));
 	student_uid = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#student_uid" ));
-			
+				
 	document.getElementById('student-io-menulist-mobilitaetsprogramm').value=mobilitaetsprogramm_code;
-	document.getElementById('student-io-menulist-nation_code').value=nation_code;
+	document.getElementById('student-io-menulist-nation').value=nation_code;
 	document.getElementById('student-io-textbox-von').value=von;
 	document.getElementById('student-io-textbox-bis').value=bis;
 	document.getElementById('student-io-menulist-zweck').value=zweck_code;
-	document.getElementById('student-io-textbox-uid').value=uid;
+	document.getElementById('student-io-detail-textbox-uid').value=student_uid;
+	document.getElementById('student-io-detail-checkbox-neu').checked=false;
+	document.getElementById('student-io-detail-textbox-bisio_id').value=bisio_id;
 }
 
 // ****
@@ -1812,8 +1873,8 @@ function StudentIODetailDisableFields(val)
 	document.getElementById('student-io-textbox-von').disabled=val;
 	document.getElementById('student-io-textbox-bis').disabled=val;
 	document.getElementById('student-io-menulist-mobilitaetsprogramm').disabled=val;
-	document.getElementById('student-io-menulist-nation_code').disabled=val;
-	document.getElementById('student-io-menulist-zweck_code').disabled=val;
+	document.getElementById('student-io-menulist-nation').disabled=val;
+	document.getElementById('student-io-menulist-zweck').disabled=val;
 	document.getElementById('student-io-button-speichern').disabled=val;
 }
 
@@ -1822,10 +1883,10 @@ function StudentIODetailDisableFields(val)
 // *****
 function StudentIOResetFileds()
 {
-	document.getElementByID('student-io-textbox-von').value='';
+	document.getElementById('student-io-textbox-von').value='';
 	document.getElementById('student-io-textbox-bis').value='';
 	document.getElementById('student-io-menulist-mobilitaetsprogramm').value='6';
-	document.getElementById('student-io-menulist-zweck').value='1';
+	document.getElementById('student-io-menulist-zweck').value='2';
 	document.getElementById('student-io-menulist-nation').value='A';
 }
 
@@ -1841,25 +1902,25 @@ function StudentIODetailSpeichern()
 	mobilitaetsprogramm = document.getElementById('student-io-menulist-mobilitaetsprogramm').value;
 	nation_code = document.getElementById('student-io-menulist-nation').value;
 	zweck_code = document.getElementById('student-io-menulist-zweck').value;
-	uid = document.getElementById('student-io-textbox-uid').value;
-	neu = document.getElementById('student-io-checkbox-neu').checked;
-	bisio_id = document.getElementById('student-io-textbox-bisio_id').value;
+	uid = document.getElementById('student-io-detail-textbox-uid').value;
+	neu = document.getElementById('student-io-detail-checkbox-neu').checked;
+	bisio_id = document.getElementById('student-io-detail-textbox-bisio_id').value;
 	
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 	
-	req.add('type', 'saveio');
+	req.add('type', 'savebisio');
 	
-	if(neu)
+	if(neu==false)
 		req.add('bisio_id', bisio_id);
 	
 	req.add('neu', neu);
 	req.add('von', von);
 	req.add('bis', bis);
-	req.add('mobilitaetsprogramm', mobilitaetsprogramm);
+	req.add('mobilitaetsprogramm_code', mobilitaetsprogramm);
 	req.add('nation_code', nation_code);
 	req.add('zweck_code', zweck_code);
-	req.add('uid', uid);
+	req.add('student_uid', uid);
 		
 	var response = req.executePOST();
 
@@ -1874,7 +1935,10 @@ function StudentIODetailSpeichern()
 	}
 	else
 	{			
-		StudentIOSelectID=bisio_id;
+		if(neu)
+			StudentIOSelectID=val.dbdml_data;
+		else
+			StudentIOSelectID=bisio_id;
 		StudentIOTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 	}
@@ -1901,7 +1965,7 @@ function StudentIODelete()
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 		var req = new phpRequest(url,'','');
 		
-		req.add('type', 'deleteio');
+		req.add('type', 'deletebisio');
 		
 		req.add('bisio_id', bisio_id);
 			
@@ -1921,6 +1985,8 @@ function StudentIODelete()
 			StudentIOSelectID=bisio_id;
 			StudentIOTreeDatasource.Refresh(false); //non blocking
 			SetStatusBarText('Daten wurden geloescht');
+			StudentIOResetFileds();
+			StudentIODetailDisableFields(true);
 		}
 	}
 }
@@ -1934,7 +2000,55 @@ function StudentIONeu()
 	StudentIOResetFileds();
 	StudentIODetailDisableFields(false);
 	
+	var now = new Date();
+	var jahr = now.getFullYear();
+	
+	var monat = now.getMonth()+1;
+	
+	if(monat<10) 
+		monat='0'+monat;
+	var tag = now.getDate();
+	if(tag<10) 
+		tag='0'+tag;
+	
 	//UID ins Textfeld schreiben	
-	document.getElementById('student-io-textbox-uid').value=document.getElementById('student-detail-textbox-uid').value;	
-	document.getElementById('student-io-checkbox-neu').checked=true;
+	document.getElementById('student-io-detail-textbox-uid').value=document.getElementById('student-detail-textbox-uid').value;	
+	document.getElementById('student-io-detail-checkbox-neu').checked=true;
+	document.getElementById('student-io-textbox-von').value=jahr+'-'+monat+'-'+tag;
+	document.getElementById('student-io-textbox-bis').value=jahr+'-'+monat+'-'+tag;
+}
+
+// ****
+// * Selectiert den Incomming/Outgoing Eintrag nachdem der Tree
+// * rebuildet wurde.
+// ****
+function StudentIOTreeSelectID()
+{
+	var tree=document.getElementById('student-io-tree');
+	if(tree.view)
+		var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+	else
+		return false;
+
+	//In der globalen Variable ist die zu selektierende Eintrag gespeichert
+	if(StudentIOSelectID!=null)
+	{		
+	   	for(var i=0;i<items;i++)
+	   	{
+	   		//ID der row holen
+			col = tree.columns ? tree.columns["student-io-tree-bisio_id"] : "student-io-tree-bisio_id";
+			var bisio_id=tree.view.getCellText(i,col);
+
+			//wenn dies die zu selektierende Zeile
+			if(bisio_id == StudentIOSelectID)
+			{
+				//Zeile markieren
+				tree.view.selection.select(i);
+				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
+				tree.treeBoxObject.ensureRowIsVisible(i);
+				StudentIOSelectID=null;
+				return true;
+			}
+	   	}
+	}
 }

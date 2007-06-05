@@ -27,41 +27,37 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
-// xml
-echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-// DAO
 require_once('../vilesci/config.inc.php');
 
+echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+
 // Datenbank Verbindung
-if (!$conn = @pg_pconnect(CONN_STRING))
+if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 $rdf_url='http://www.technikum-wien.at/zweck';
 
-?>
-
+echo '
 <RDF:RDF
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:ZWECK="<?php echo $rdf_url; ?>/rdf#"
+	xmlns:ZWECK="'.$rdf_url.'/rdf#"
 >
-   <RDF:Seq about="<?php echo $rdf_url ?>/liste">
-<?php
-$qry = "SELECT * FROM bis.tbl_zweck ORDER BY kurzbz";
+   <RDF:Seq about="'.$rdf_url.'/liste">';
+
+$qry = "SET CLIENT_ENCODING to 'UNICODE';SELECT * FROM bis.tbl_zweck ORDER BY kurzbz";
 
 if($result = pg_query($conn, $qry))
 {
 	while($row = pg_fetch_object($result))
-	{
-		
-	?>
-      <RDF:li>
-         <RDF:Description  id="<?php echo $row->zweck_code; ?>"  about="<?php echo $rdf_url.'/'.$row->zweck_code; ?>" >
-            <ZWECK:zweck_code><![CDATA[<?php echo $row->zweck_code ?>]]></ZWECK:zweck_code>
-            <ZWECK:kurzbz><![CDATA[<?php echo $row->kurzbz ?>]]></ZWECK:kurzbz>
-            <ZWECK:bezeichnung><![CDATA[<?php echo $row->bezeichnung ?>]]></ZWECK:bezeichnung>
-         </RDF:Description>
-      </RDF:li>
-<?php
+	{		
+		echo '
+		      <RDF:li>
+		         <RDF:Description  id="'.$row->zweck_code.'"  about="'.$rdf_url.'/'.$row->zweck_code.'" >
+		            <ZWECK:zweck_code><![CDATA['.$row->zweck_code.']]></ZWECK:zweck_code>
+		            <ZWECK:kurzbz><![CDATA['.$row->kurzbz.']]></ZWECK:kurzbz>
+		            <ZWECK:bezeichnung><![CDATA['.$row->bezeichnung.']]></ZWECK:bezeichnung>
+		         </RDF:Description>
+		      </RDF:li>';
 	}
 }
 ?>

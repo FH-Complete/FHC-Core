@@ -35,10 +35,10 @@ require_once('../include/benutzer.class.php');
 require_once('../include/mitarbeiter.class.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/studiengang.class.php');
+require_once('../include/functions.inc.php');
 
 if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-
 
 if (isset($_GET['lektor']))
 	$lektor=$_GET['lektor'];
@@ -127,7 +127,7 @@ $seq= "
 if ($user)
 {
 	$bb=new benutzerberechtigung($conn);
-	if($bb->getBerechtigungen($REMOTE_USER))
+	if($bb->getBerechtigungen(get_uid()))
 	{
 		$stge=$bb->getStgKz();
 		$ma=$mitarbeiter->getMitarbeiterStg($lektor,$fixangestellt,$stge, 'lkt');

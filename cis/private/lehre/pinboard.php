@@ -51,6 +51,7 @@
     $datum = '';
     $user = get_uid();
     $stsemarr = array();
+    $PHP_SELF = $_SERVER['PHP_SELF'];
     
     if(isset($_GET['studiensemester_kurzbz']))
     	$studiensemester_kurzbz = $_GET['studiensemester_kurzbz'];

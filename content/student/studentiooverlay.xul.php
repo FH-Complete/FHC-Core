@@ -49,18 +49,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<column flex="1"/>
 			</columns>
 			<rows>
-<!--
-				<row>	
-					<hbox>
-						<spacer flex="1" />
-						<button id="student-io-button-filter" value="alle" oncommand="StudentIOFilter()" label="offene" disabled="true"/>
-					</hbox>
-					<spacer />
-				</row>
--->				
 				<row>
 					<tree id="student-io-tree" seltype="single" hidecolumnpicker="false" flex="1"
-						datasources="rdf:null" ref="http://www.technikum-wien.at/io/liste"
+						datasources="rdf:null" ref="http://www.technikum-wien.at/bisio/liste"
 						style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100px" enableColumnDrag="true"
 						onselect="StudentIOAuswahl()"
 						context="student-io-tree-popup"
@@ -71,27 +62,27 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								class="sortDirectionIndicator"
 								sortActive="true"
 								sortDirection="ascending"
-								sort="rdf:http://www.technikum-wien.at/io/rdf#mobilitaetsprogramm_kurzbz"/>
+								sort="rdf:http://www.technikum-wien.at/bisio/rdf#mobilitaetsprogramm_kurzbz"/>
 							<splitter class="tree-splitter"/>
-							<treecol id="student-io-tree-nation_code" label="Gastnation" flex="5" hidden="false"
+							<treecol id="student-io-tree-nation_code" label="Nation" flex="1" hidden="false"
 							   class="sortDirectionIndicator"
-								sort="rdf:http://www.technikum-wien.at/io/rdf#nation_code"/>
+								sort="rdf:http://www.technikum-wien.at/bisio/rdf#nation_code"/>
 							<splitter class="tree-splitter"/>
 							<treecol id="student-io-tree-von" label="Von" flex="2" hidden="false"
 								class="sortDirectionIndicator"
-								sort="rdf:http://www.technikum-wien.at/io/rdf#von" />
+								sort="rdf:http://www.technikum-wien.at/bisio/rdf#von" />
 							<splitter class="tree-splitter"/>
 							<treecol id="student-io-tree-bis" label="Bis" flex="2" hidden="false"
 								class="sortDirectionIndicator"
-								sort="rdf:http://www.technikum-wien.at/io/rdf#bis" />
+								sort="rdf:http://www.technikum-wien.at/bisio/rdf#bis" />
 							<splitter class="tree-splitter"/>
-							<treecol id="student-io-tree-zweck_kurzbz" label="Zweck" flex="2" hidden="true"
+							<treecol id="student-io-tree-zweck_kurzbz" label="Zweck" flex="2" hidden="false"
 								class="sortDirectionIndicator"
-								sort="rdf:http://www.technikum-wien.at/io/rdf#zweck_bezeichnung" />
+								sort="rdf:http://www.technikum-wien.at/bisio/rdf#zweck_bezeichnung" />
 							<splitter class="tree-splitter"/>
 							<treecol id="student-io-tree-bisio_id" label="bisio_id" flex="2" hidden="true"
 								class="sortDirectionIndicator"
-								sort="rdf:http://www.technikum-wien.at/io/rdf#bisio_id" />
+								sort="rdf:http://www.technikum-wien.at/bisio/rdf#bisio_id" />
 							<splitter class="tree-splitter"/>
 						</treecols>
 					
@@ -99,12 +90,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<treechildren flex="1" >
 									<treeitem uri="rdf:*">
 									<treerow>
-										<treecell label="rdf:http://www.technikum-wien.at/io/rdf#mobilitaetsprogramm_kurzbz"/>
-										<treecell label="rdf:http://www.technikum-wien.at/io/rdf#nation_code"/>
-										<treecell label="rdf:http://www.technikum-wien.at/io/rdf#von"/>
-										<treecell label="rdf:http://www.technikum-wien.at/io/rdf#bis"/>
-										<treecell label="rdf:http://www.technikum-wien.at/io/rdf#zweck_bezeichnung"/>
-										<treecell label="rdf:http://www.technikum-wien.at/io/rdf#bisio_id"/>
+										<treecell label="rdf:http://www.technikum-wien.at/bisio/rdf#mobilitaetsprogramm_kurzbz"/>
+										<treecell label="rdf:http://www.technikum-wien.at/bisio/rdf#nation_code"/>
+										<treecell label="rdf:http://www.technikum-wien.at/bisio/rdf#von"/>
+										<treecell label="rdf:http://www.technikum-wien.at/bisio/rdf#bis"/>
+										<treecell label="rdf:http://www.technikum-wien.at/bisio/rdf#zweck_bezeichnung"/>
+										<treecell label="rdf:http://www.technikum-wien.at/bisio/rdf#bisio_id"/>
 									</treerow>
 								</treeitem>
 							</treechildren>
@@ -117,7 +108,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</hbox>
 						<vbox hidden="true">
 							<label value="Neu"/>
-							<checkbox id="student-io-detail-checkbox-new" checked="true" />      	
+							<checkbox id="student-io-detail-checkbox-neu" checked="true" />      	
 							<label value="Uid"/>
 				      		<textbox id="student-io-detail-textbox-uid" disabled="true"/>					
 				      		<label value="BisIO ID"/>
@@ -134,7 +125,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<row>
 										<label value="Von" control="student-io-textbox-von"/>
 										<hbox>
-					      					<textbox id="student-io-textbox-von" disabled="true" maxlength="9" size="9"/>
+					      					<textbox id="student-io-textbox-von" disabled="true" maxlength="10" size="10"/>
 					      					<spacer flex="1" />			
 					      				</hbox>
 									</row>
@@ -153,7 +144,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 											<template>
 												<menupopup>
 													<menuitem value="rdf:http://www.technikum-wien.at/mobilitaetsprogramm/rdf#mobilitaetsprogramm_code"
-										        		      label="rdf:http://www.technikum-wien.at/mobilitaetsprogramm/rdf#mobilitaetsprogramm_kurzbz"
+										        		      label="rdf:http://www.technikum-wien.at/mobilitaetsprogramm/rdf#kurzbz"
 													  		  uri="rdf:*"/>
 													</menupopup>
 											</template>
@@ -181,7 +172,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 											<template>
 												<menupopup>
 													<menuitem value="rdf:http://www.technikum-wien.at/zweck/rdf#zweck_code"
-										        		      label="rdf:http://www.technikum-wien.at/zweck/rdf#kurzbz"
+										        		      label="rdf:http://www.technikum-wien.at/zweck/rdf#bezeichnung"
 													  		  uri="rdf:*"/>
 													</menupopup>
 											</template>
