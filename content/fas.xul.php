@@ -40,6 +40,7 @@ if(!$benutzer->loadVariables($user))
 	$error_msg = $benutzer->errormsg;
 /*echo '<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>';*/
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
+echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css\" ?>";
 echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
 ?>
 <!DOCTYPE window [

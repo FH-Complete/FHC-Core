@@ -36,8 +36,8 @@
 <!ENTITY menu-prefs-stpltable-stundenplandev.label    	"stundenplandev">
 <!ENTITY menu-prefs-stpltable-stundenplandev.accesskey	"d">
 
-<!ENTITY menu-statistic.label		"Statistik">
-<!ENTITY menu-statistic.accesskey	"S">
+<!ENTITY menu-statistic.label		"Berichte">
+<!ENTITY menu-statistic.accesskey	"R">
 
 <!ENTITY menu-statistic-koordinatorstunden.key			"K">
 <!ENTITY menu-statistic-koordinatorstunden.label		"Koordinatorstunden">

@@ -111,5 +111,14 @@ class datum
 			$datum+=3600;
 		return $datum;
 	}
+	
+	/**
+	 * Konvertiert das ISO Datumsformat (YYYY-MM-DD)
+	 * nach (DD.MM.YYYY)
+	 */
+	function convertISODate($datum)
+	{
+		return (strlen($datum)>0?date('d.m.Y',strtotime($datum)):'');
+	}
 }
 ?>

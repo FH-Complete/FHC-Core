@@ -1,0 +1,4 @@
+box.Datum 
+{
+    -moz-binding: url('bindings.xml.php#Datum');
+}

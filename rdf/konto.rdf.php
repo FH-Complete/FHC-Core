@@ -37,6 +37,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
 require_once('../vilesci/config.inc.php');
 require_once('../include/konto.class.php');
+require_once('../include/person.class.php');
+require_once('../include/studiengang.class.php');
 //require_once('../include/functions.inc.php');
 
 // Datenbank Verbindung
@@ -122,33 +124,35 @@ if($person_id!='')
 {
 	foreach ($konto->result as $buchung)
 	{
-		$buchung = $buchung['parent'];
-		//1. Ebene
-		drawrow($buchung);
-
-		$hier.="
-      	<RDF:li>
-      		<RDF:Seq about=\"".$rdf_url.'/'.$buchung->buchungsnr."\" >";
-
-		if(isset($konto->result[$buchung->buchungsnr]['childs']))
+		if(isset($buchung['parent']))
 		{
-			//2. Ebene
-			foreach ($konto->result[$buchung->buchungsnr]['childs'] as $row)
+			$buchung = $buchung['parent'];
+			//1. Ebene
+			drawrow($buchung);
+	
+			$hier.="
+	      	<RDF:li>
+	      		<RDF:Seq about=\"".$rdf_url.'/'.$buchung->buchungsnr."\" >";
+	
+			if(isset($konto->result[$buchung->buchungsnr]['childs']))
 			{
-				if(is_object($row))
+				//2. Ebene
+				foreach ($konto->result[$buchung->buchungsnr]['childs'] as $row)
 				{
-					drawrow($row);
-
-					$hier.="
-					<RDF:li resource=\"".$rdf_url.'/'.$row->buchungsnr.'" />';
+					if(is_object($row))
+					{
+						drawrow($row);
+	
+						$hier.="
+						<RDF:li resource=\"".$rdf_url.'/'.$row->buchungsnr.'" />';
+					}
 				}
 			}
+	
+			$hier.="
+	      		</RDF:Seq>
+	      	</RDF:li>";
 		}
-
-		$hier.="
-      		</RDF:Seq>
-      	</RDF:li>";
-
 	}
 }
 else
@@ -190,15 +194,26 @@ elseif ($xmlformat=='xml')
 	}
 	function drawperson_xml($row)
 	{
+		global $conn;
+		$pers = new person($conn);
+		$pers->load($row->person_id);
+		
+		$stg = new studiengang($conn, $row->studiengang_kz);
+		
 		echo "
   		<person>
-			<person_id><![CDATA[".$row->person_id."]]></person_id>
-			<anrede><![CDATA[".$row->anrede."]]></anrede>
-			<titelpost><![CDATA[".$row->titelpost."]]></titelpost>
-			<titelpre><![CDATA[".$row->titelpre."]]></titelpre>
-			<nachname><![CDATA[".$row->nachname."]]></nachname>
-			<vorname><![CDATA[".$row->vorname."]]></vorname>
-			<vornamen><![CDATA[".$row->vornamen."]]></vornamen>
+			<person_id><![CDATA[".$pers->person_id."]]></person_id>
+			<anrede><![CDATA[".$pers->anrede."]]></anrede>
+			<titelpost><![CDATA[".$pers->titelpost."]]></titelpost>
+			<titelpre><![CDATA[".$pers->titelpre."]]></titelpre>
+			<nachname><![CDATA[".$pers->nachname."]]></nachname>
+			<vorname><![CDATA[".$pers->vorname."]]></vorname>
+			<vornamen><![CDATA[".$pers->vornamen."]]></vornamen>
+			<geburtsdatum><![CDATA[".$pers->gebdatum."]]></geburtsdatum>
+			<sozialversicherungsnummer><![CDATA[".$pers->svnr."]]></sozialversicherungsnummer>
+			<ersatzkennzeichen><![CDATA[".$pers->ersatzkennzeichen."]]></ersatzkennzeichen>
+			<tagesdatum><![CDATA[".date('d.m.Y')."]]></tagesdatum>
+			<studiengang><![CDATA[".$stg->bezeichnung."]]></studiengang>
 		</person>";
 	}
 
