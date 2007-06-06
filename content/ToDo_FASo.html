@@ -6,7 +6,24 @@
 <body>
 <h1 style="text-align: center;">ToDo Fas-Online</h1>
 Die Liste ist in Module geteilt. Innerhalb eines Moduls erfolgt die
-Auflistung nach Priorit&auml;t (h&ouml;chste oben).
+Auflistung nach Priorit&auml;t (h&ouml;chste oben).<br>
+<h2>&Auml;nderungen</h2>
+<ul>
+  <li>Datumsformat: XBL bei allen Datumseingabefelder. ISO-Format
+zus&auml;tzlich bei&nbsp; allen RDF-Files.</li>
+  <li>Aufgenommener, Warteliste, Absage -&gt;Button</li>
+  <li>Ab- Unterbrecher -&gt; 0.Semester f&uuml;r alle Stg.</li>
+  <li>-&gt;[Student] f&uuml;r ehem. Unterbrecher</li>
+  <li>SVNr/Ersatzkennzeichen, GebDatum und Stg bei
+Zahlungsbest&auml;tigung</li>
+  <li>Inskriptionsbest&auml;tigung -&gt; mehrere Seiten im PDF</li>
+  <li>Koordinatorstunden: Stunden im Fachbereich</li>
+  <li>Zustelladresse bei Lehrauftrag</li>
+  <li>Bericht statt Statistik</li>
+  <li>aktuelles Datum im PDF</li>
+  <li>Dokumente ?</li>
+</ul>
+<br>
 <h2>Fehler</h2>
 <h3>Listen</h3>
 <ul>
@@ -16,31 +33,33 @@ Auflistung nach Priorit&auml;t (h&ouml;chste oben).
 <h2>Dokumente</h2>
 <ul>
   <li> Zahlungsbest&auml;tigung: Ein Button beim Konto liefert ein PDF
-f&uuml;r die Zahlungsbest&auml;tigung. (Button ist vorhanden XSLT fehlt noch) </li>
+f&uuml;r die Zahlungsbest&auml;tigung. (Button ist vorhanden XSLT fehlt
+noch) </li>
   <li> Inskriptionsbest&auml;tigung: Im Hauptmen&uuml; Dokumente
 w&auml;hlbar. Wenn mehrere Studenten gew&auml;hlt sind, werden mehrere
-Seiten im PDF produziert. (Button ist vorhanden, XML und XSLT fehlen noch)</li>
+Seiten im PDF produziert. (Button ist vorhanden, XML und XSLT fehlen
+noch)</li>
 </ul>
-<hr />
+<hr>
 <h2>Statistik</h2>
 Als Hauptmen&uuml;
 <ul>
   <li> LV-Planung: HTML mit &Uuml;bersicht der Lehrauftr&auml;ge.
-Studiengang und optional Semester muss gew&auml;hlt sein. (HTML Seite content/statistik/lvplanung.php muss noch erstellt werden)</li>
+Studiengang und optional Semester muss gew&auml;hlt sein. (HTML Seite
+content/statistik/lvplanung.php muss noch erstellt werden)</li>
 </ul>
-<hr />
+<hr>
 <h2>Studenten-Modul</h2>
 <ul>
   <li> Import: Studiensemester ist ausw&auml;hlbar. Vorgew&auml;hlt ist
 das n&auml;chste. </li>
-  
   <li> Incoming/Outgoing: Zus&auml;tzliche Daten m&uuml;ssen
 gespeichert werden. Karteireiter beim Studenten? </li>
   <li> Noten: Karteireiter (Tab) f&uuml;r die Notenverwaltung. </li>
   <li> Wunsch: SVNR 4stellig: gesamte Nummer wird dann aus dem
 Geburtsdatum konstruiert. </li>
 </ul>
-<hr />
+<hr>
 <h2>Mitarbeiter-Modul</h2>
 <ul>
   <li style="color: rgb(0, 0, 0);">Login funktioniert nicht beim 1. mal
@@ -79,45 +98,54 @@ allen auf einmal setzbar</li>
 <hr>
 <h2>Erledigte Anforderungen</h2>
 <ul>
-	<li> Lehrauftr&auml;ge: PDF mit allen Lektoren. Studiengang muss
-		gew&auml;hlt sein. 
-		<br>01.06.2007 oesi<br><br>
-	</li>
-	<li> Koordinatorstunden: Fachbereich muss gew&auml;hlt sein. <br>
-		Geliefert wird eine HTML-Seite mit einer &Uuml;bersicht &uuml;ber die
-		Stunden der Koordinatoren innerhalb des FB.
-		<br>01.06.2007 oesi<br><br>
-	</li>
-	<li> -&gt;Student: Wenn Bewerber zum Studenten gemacht wird kommt er
-		automatisch ins 1. Semester. 
-		<br>01.06.2007 oesi<br><br>
-	</li>
-	<li> Gegenbuchung: Nur die Differenz gegenbuchen, nicht den
-		urspr&uuml;nglichen Betrag. 
-		<br>31.05.2007 oesi<br><br>
-	</li>
-	<li> Filter offene Buchungen: Saldo!=0 
-		<br>31.05.2007 oesi<br><br>
-	</li>
-	<li> Betriebsmittel: Karteireiter (Tab) f&uuml;r die Verwaltung der
-		Betriebsmittel.
-		<br>31.05.2007 oesi <br><br>
-	</li>
-	<li> Abbrecher/Unterbrecher: Buttons beim Studenten die eine neue
-		Rolle anlegen (wie bei -&gt;Bewerber/Interessent).
-		<br>31.05.2007 oesi <br><br>
-	</li>
-	<li> Lehrverband: In der Liste und in den Details wird die
-		Lehrverbandsgruppe des aktiven Studiensemesters angezeigt, nicht die
-		aktuelle. (tbl_student_lehrverband) <br>
-		Wenn das Studiensemesert das aktuelle ist, wird bei &Auml;nderung auch
-		die Tabelle tbl_student ge&auml;ndert.
-		<br>29.5.2007 oesi<br><br>
-	</li>
-	<li> Student/Interessent: Automatische Auswahl des Reiters
-		"Studenten" wenn LV-Gruppe gew&auml;hlt wird und der Reiter
-		"Interessenten" aktiv ist. Und umgekehrt.
-		<br>29.05.2007 oesi<br><br>
+  <li> Lehrauftr&auml;ge: PDF mit allen Lektoren. Studiengang muss
+gew&auml;hlt sein. <br>
+01.06.2007 oesi<br>
+    <br>
+  </li>
+  <li> Koordinatorstunden: Fachbereich muss gew&auml;hlt sein. <br>
+Geliefert wird eine HTML-Seite mit einer &Uuml;bersicht &uuml;ber die
+Stunden der Koordinatoren innerhalb des FB. <br>
+01.06.2007 oesi<br>
+    <br>
+  </li>
+  <li> -&gt;Student: Wenn Bewerber zum Studenten gemacht wird kommt er
+automatisch ins 1. Semester. <br>
+01.06.2007 oesi<br>
+    <br>
+  </li>
+  <li> Gegenbuchung: Nur die Differenz gegenbuchen, nicht den
+urspr&uuml;nglichen Betrag. <br>
+31.05.2007 oesi<br>
+    <br>
+  </li>
+  <li> Filter offene Buchungen: Saldo!=0 <br>
+31.05.2007 oesi<br>
+    <br>
+  </li>
+  <li> Betriebsmittel: Karteireiter (Tab) f&uuml;r die Verwaltung der
+Betriebsmittel. <br>
+31.05.2007 oesi <br>
+    <br>
+  </li>
+  <li> Abbrecher/Unterbrecher: Buttons beim Studenten die eine neue
+Rolle anlegen (wie bei -&gt;Bewerber/Interessent). <br>
+31.05.2007 oesi <br>
+    <br>
+  </li>
+  <li> Lehrverband: In der Liste und in den Details wird die
+Lehrverbandsgruppe des aktiven Studiensemesters angezeigt, nicht die
+aktuelle. (tbl_student_lehrverband) <br>
+Wenn das Studiensemesert das aktuelle ist, wird bei &Auml;nderung auch
+die Tabelle tbl_student ge&auml;ndert. <br>
+29.5.2007 oesi<br>
+    <br>
+  </li>
+  <li> Student/Interessent: Automatische Auswahl des Reiters
+"Studenten" wenn LV-Gruppe gew&auml;hlt wird und der Reiter
+"Interessenten" aktiv ist. Und umgekehrt. <br>
+29.05.2007 oesi<br>
+    <br>
   </li>
   <li style="color: rgb(0, 0, 0);">Neben den Funktionen soll es einen
 Knopf geben zum anzeigen aller Funktionen (aus allen Studiensemestern)<br>
