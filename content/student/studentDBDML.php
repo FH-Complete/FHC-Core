@@ -183,7 +183,7 @@ if(!$error)
 				$student->sprache = $_POST['sprache'];
 				$student->matrikelnr = $_POST['matrikelnummer'];
 				
-				$stsem = new studiensemester($conn);
+				$stsem = new studiensemester($conn, null, true);
 				$stsem_kurzbz = $stsem->getaktorNext();
 				//Wenn das ausgewaehlte Semester das aktuelle ist, dann wird auch in der
 				//Tabelle Student der Stg/Semester/Verband/Gruppe geaendert.
@@ -202,7 +202,7 @@ if(!$error)
 				{
 					if($student->save())
 					{
-						$student_lvb = new student($conn);
+						$student_lvb = new student($conn, null, true);
 						$student_lvb->uid = $_POST['uid'];
 						$student_lvb->studiensemester_kurzbz = $semester_aktuell;
 						$student_lvb->studiengang_kz = $_POST['studiengang_kz'];

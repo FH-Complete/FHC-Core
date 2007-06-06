@@ -43,15 +43,18 @@ class student extends benutzer
 	{
 		$this->conn = $conn;
 
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-		if(!pg_query($conn,$qry))
+		if($unicode!=null)
 		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
+			if($unicode)
+				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			else
+				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+	
+			if(!pg_query($conn,$qry))
+			{
+				$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
+				return false;
+			}
 		}
 
 		//Student laden
@@ -298,7 +301,7 @@ class student extends benutzer
 		for($i=0;$i<$num_rows;$i++)
 		{
    			$row=pg_fetch_object($erg,$i);
-			$l=new student($this->conn);
+			$l=new student($this->conn, null, null);
 			// Personendaten
 			$l->uid=$row->uid;
 			$l->person_id=$row->person_id;

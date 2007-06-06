@@ -38,6 +38,10 @@ var StudentBetriebsmittelSelectBetriebsmittel_id=null; //Betriebsmittelzurodnung
 var StudentBetriebsmittelSelectPerson_id=null; //Betriebsmittelzurodnung die nach dem Refresh markiert werden soll
 var StudentIOTreeDatasource; //Datasource des Incomming/Outgoing Trees
 var StudentIOSelectID=null; //BISIO Eintrag der nach dem Refresh markiert werden soll
+var StudentNotenTreeDatasource; //Datasource des Noten Trees
+var StudentNotenSelectLehreinheitID=null; //LehreinheitID des Noten Eintrages der nach dem Refresh markiert werden soll
+var StudentLvGesamtNotenTreeDatasource; //Datasource des Noten Trees
+var StudentLvGesamtNotenSelectLehreinheitID=null; //LehreinheitID des Noten Eintrages der nach dem Refresh markiert werden soll
 
 // ********** Observer und Listener ************* //
 
@@ -178,6 +182,76 @@ var StudentIOTreeListener =
       window.setTimeout(StudentIOTreeSelectID,10);
   }
 };
+
+
+// ****
+// * Observer fuer Noten Tree
+// * startet Rebuild nachdem das Refresh
+// * der datasource fertig ist
+// ****
+var StudentNotenTreeSinkObserver =
+{
+	onBeginLoad : function(pSink) {},
+	onInterrupt : function(pSink) {},
+	onResume : function(pSink) {},
+	onError : function(pSink, pStatus, pError) {},
+	onEndLoad : function(pSink)
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		document.getElementById('student-noten-tree').builder.rebuild();
+	}
+};
+
+// ****
+// * Nach dem Rebuild wird der Eintrag wieder
+// * markiert
+// ****
+var StudentNotenTreeListener =
+{
+  willRebuild : function(builder) {  },
+  didRebuild : function(builder)
+  {
+  	  //timeout nur bei Mozilla notwendig da sonst die rows
+  	  //noch keine values haben. Ab Seamonkey funktionierts auch
+  	  //ohne dem setTimeout
+      window.setTimeout(StudentNotenTreeSelectID,10);
+  }
+};
+
+// ****
+// * Observer fuer LvGesamtNoten Tree
+// * startet Rebuild nachdem das Refresh
+// * der datasource fertig ist
+// ****
+var StudentLvGesamtNotenTreeSinkObserver =
+{
+	onBeginLoad : function(pSink) {},
+	onInterrupt : function(pSink) {},
+	onResume : function(pSink) {},
+	onError : function(pSink, pStatus, pError) {},
+	onEndLoad : function(pSink)
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		document.getElementById('student-lvgesamtnoten-tree').builder.rebuild();
+	}
+};
+
+// ****
+// * Nach dem Rebuild wird der Eintrag wieder
+// * markiert
+// ****
+var StudentLvGesamtNotenTreeListener =
+{
+  willRebuild : function(builder) {  },
+  didRebuild : function(builder)
+  {
+  	  //timeout nur bei Mozilla notwendig da sonst die rows
+  	  //noch keine values haben. Ab Seamonkey funktionierts auch
+  	  //ohne dem setTimeout
+      window.setTimeout(StudentLvGesamtNotenTreeSelectID,10);
+  }
+};
+
 // ***************** KEY Events ************************* //
 
 // ****
@@ -894,6 +968,50 @@ function StudentAuswahl()
 	bisiotree.database.AddDataSource(StudentIOTreeDatasource);
 	StudentIOTreeDatasource.addXMLSinkObserver(StudentIOTreeSinkObserver);
 	bisiotree.builder.addListener(StudentIOTreeListener);	
+	
+	// *** Noten ***
+	notentree = document.getElementById('student-noten-tree');
+	
+	url='<?php echo APP_ROOT;?>rdf/zeugnisnote.rdf.php?uid='+uid+"&"+gettimestamp();
+	
+	//Alte DS entfernen
+	var oldDatasources = notentree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		notentree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	notentree.builder.rebuild();
+	
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	StudentNotenTreeDatasource = rdfService.GetDataSource(url);
+	StudentNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	StudentNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	notentree.database.AddDataSource(StudentNotenTreeDatasource);
+	StudentNotenTreeDatasource.addXMLSinkObserver(StudentNotenTreeSinkObserver);
+	notentree.builder.addListener(StudentNotenTreeListener);	
+	
+	// *** Noten ***
+	lvgesamtnotentree = document.getElementById('student-lvgesamtnoten-tree');
+	
+	url='<?php echo APP_ROOT;?>rdf/lvgesamtnote.rdf.php?uid='+uid+"&"+gettimestamp();
+	
+	//Alte DS entfernen
+	var oldDatasources = lvgesamtnotentree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		lvgesamtnotentree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	lvgesamtnotentree.builder.rebuild();
+	
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	StudentLvGesamtNotenTreeDatasource = rdfService.GetDataSource(url);
+	StudentLvGesamtNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	StudentLvGesamtNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	lvgesamtnotentree.database.AddDataSource(StudentLvGesamtNotenTreeDatasource);
+	StudentLvGesamtNotenTreeDatasource.addXMLSinkObserver(StudentLvGesamtNotenTreeSinkObserver);
+	lvgesamtnotentree.builder.addListener(StudentLvGesamtNotenTreeListener);	
 }
 
 // ****
@@ -2047,6 +2165,81 @@ function StudentIOTreeSelectID()
 				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
 				tree.treeBoxObject.ensureRowIsVisible(i);
 				StudentIOSelectID=null;
+				return true;
+			}
+	   	}
+	}
+}
+
+
+// **************** NOTEN ************** //
+
+// ****
+// * Selectiert den Noten Eintrag nachdem der Tree
+// * rebuildet wurde.
+// ****
+function StudentNotenTreeSelectID()
+{
+	var tree=document.getElementById('student-noten-tree');
+	if(tree.view)
+		var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+	else
+		return false;
+
+	//In der globalen Variable ist die zu selektierende Eintrag gespeichert
+	if(StudentNotenSelectLehreinheitID!=null)
+	{		
+	   	for(var i=0;i<items;i++)
+	   	{
+	   		//ID der row holen
+			col = tree.columns ? tree.columns["student-noten-tree-lehrveranstaltung_id"] : "student-noten-tree-lehrveranstaltung_id";
+			var lehrveranstaltung_id=tree.view.getCellText(i,col);
+
+			//wenn dies die zu selektierende Zeile
+			if(lehrveranstaltung_id == StudentNotenSelectLehrveranstaltugnID)
+			{
+				//Zeile markieren
+				tree.view.selection.select(i);
+				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
+				tree.treeBoxObject.ensureRowIsVisible(i);
+				StudentNotenSelectLehrveranstaltungID=null;
+				StudentNotenSelectStudentUID=null;
+				return true;
+			}
+	   	}
+	}
+}
+
+// ****
+// * Selectiert den Noten Eintrag nachdem der Tree
+// * rebuildet wurde.
+// ****
+function StudentLvGesamtNotenTreeSelectID()
+{
+	var tree=document.getElementById('student-lvgesamtnoten-tree');
+	if(tree.view)
+		var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+	else
+		return false;
+
+	//In der globalen Variable ist die zu selektierende Eintrag gespeichert
+	if(StudentLvGesamtNotenSelectLehreinheitID!=null)
+	{		
+	   	for(var i=0;i<items;i++)
+	   	{
+	   		//ID der row holen
+			col = tree.columns ? tree.columns["student-lvgesamtnoten-tree-lehrveranstaltung_id"] : "student-lvgesamtnoten-tree-lehrveranstaltung_id";
+			var lehrveranstaltung_id=tree.view.getCellText(i,col);
+
+			//wenn dies die zu selektierende Zeile
+			if(lehrveranstaltung_id == StudentLvGesamtNotenSelectLehrveranstaltugnID)
+			{
+				//Zeile markieren
+				tree.view.selection.select(i);
+				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
+				tree.treeBoxObject.ensureRowIsVisible(i);
+				StudentNotenSelectLehrveranstaltungID=null;
+				StudentNotenSelectStudentUID=null;
 				return true;
 			}
 	   	}
