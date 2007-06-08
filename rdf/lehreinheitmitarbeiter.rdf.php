@@ -38,9 +38,9 @@ if (!$conn = @pg_pconnect(CONN_STRING))
 
 if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id']))
 	$lehreinheit_id = $_GET['lehreinheit_id'];
-else 
+else
 	$lehreinheit_id = null;
-	
+
 if(isset($_GET['mitarbeiter_uid']))
 	$mitarbeiter_uid = $_GET['mitarbeiter_uid'];
 else

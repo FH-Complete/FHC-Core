@@ -39,7 +39,7 @@ if (!$conn = @pg_pconnect(CONN_STRING))
 
 if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id']))
 	$lehreinheit_id = $_GET['lehreinheit_id'];
-else 
+else
 	$lehreinheit_id = null;
 
 //Gruppen holen
@@ -49,8 +49,8 @@ $DAO_obj->getLehreinheitgruppe($lehreinheit_id);
 $stg_obj = new studiengang($conn);
 $stg_obj->getAll();
 $stg = array();
-foreach ($stg_obj->result as $row) 
-	$stg[$row->studiengang_kz]=$row->kuerzel;	
+foreach ($stg_obj->result as $row)
+	$stg[$row->studiengang_kz]=$row->kuerzel;
 
 $rdf_url='http://www.technikum-wien.at/lehreinheitgruppe';
 ?>
@@ -64,10 +64,10 @@ $rdf_url='http://www.technikum-wien.at/lehreinheitgruppe';
 
 <?php
 foreach ($DAO_obj->lehreinheitgruppe as $row)
-{	
+{
 	if($row->gruppe_kurzbz!='')
 		$bezeichnung = $row->gruppe_kurzbz;
-	else 
+	else
 		$bezeichnung = $stg[$row->studiengang_kz].$row->semester.$row->verband.$row->gruppe;
 	?>
       <RDF:li>
