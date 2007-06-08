@@ -27,6 +27,8 @@ header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../vilesci/config.inc.php');
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
+
+echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css\" ?>";
 ?>
 
 <overlay id="StudentKonto"
@@ -107,6 +109,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		<spacer flex="1"/>
 		<button id="student-note-copy" label="&lt;=" style="font-weight: bold;" oncommand="alert(document.getElementById('student-noten-datum').value);"/>
 		<spacer flex="1"/>
+		<box id="student-noten-datum" class="Datum"/>
 	</vbox>
 	
 	
