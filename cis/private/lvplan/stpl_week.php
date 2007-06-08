@@ -43,14 +43,11 @@
 //$datum=1102260015;
 
 require_once('../../config.inc.php');
+require_once('../../../include/globals.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/wochenplan.class.php');
 
-// Test Einstellungen
-//if (!isset($REMOTE_USER))
-//	$REMOTE_USER='tw01e061';
-//$uid=$REMOTE_USER;
-$uid=get_uid();
+$uid=USER_UID;
 
 
 // Deutsche Umgebung
@@ -134,9 +131,9 @@ if(!$erg_std=pg_query($conn, "SET datestyle TO ISO; SET search_path TO campus;")
 }
 
 // Authentifizierung
-if ($uid=check_student(get_uid(), $conn))
+if (check_student($uid, $conn))
 	$user='student';
-elseif ($uid=check_lektor(get_uid(), $conn))
+elseif (check_lektor($uid, $conn))
 	$user='lektor';
 else
 {
@@ -148,9 +145,12 @@ if (!isset($type))
 	$type=$user;
 if (!isset($pers_uid))
 	$pers_uid=$uid;
+
+var_dump($_POST);
 // Reservieren
-if (isset($reserve) && $uid==$user_uid)
+if (isset($reserve) && $user=='lektor')
 {
+	//echo 'test';
 	if(!$erg_std=pg_query($conn, "SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
 	{
 		die(pg_last_error($conn));

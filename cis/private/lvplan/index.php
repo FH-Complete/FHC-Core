@@ -1,11 +1,9 @@
 <?php
 	include('../../config.inc.php');
+	include('../../../include/globals.inc.php');
 	include('../../../include/functions.inc.php');
 
-	if (isset($REMOTE_USER))
-		$uid=$REMOTE_USER;
-	else
-		$uid='tw01e061';
+	$uid=USER_UID;
 
 	// Verbindung aufbauen
 	$conn=pg_pconnect(CONN_STRING) or die ("Unable to connect to SQL-Server");
