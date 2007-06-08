@@ -8,7 +8,10 @@ header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
 // xml
-echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+if(isset($_GET['xmlformat']) && $_GET['xmlformat']=='xml')
+	echo '<?xml version="1.0" encoding="ISO-8859-9" standalone="yes"?>';
+else
+	echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
 require_once('../vilesci/config.inc.php');
 require_once('../include/functions.inc.php');
