@@ -464,7 +464,7 @@ class wochenplan
 	/**************************************************************************
 	 * Zeichnen der Stundenplanwoche in HTML
 	 */
-	function draw_week($user_uid='pam')
+	function draw_week($user_uid)
 	{
 		// Stundentafel abfragen
 		$sql_query="SELECT stunde, beginn, ende FROM lehre.tbl_stunde ORDER BY stunde";
@@ -474,7 +474,7 @@ class wochenplan
 
 		// Formularbeginn wenn Lektor
 		if ($this->user=='lektor' && $this->type=='ort')
-			echo '<FORM name="reserve" method="post" action="stpl_week.php">';
+			echo '<form name="reserve" method="post" action="stpl_week.php">';
 
 		//Tabelle zeichnen
 		echo '<table class="stdplan" width="100%" border="1" cellpadding="0" cellspacing="0" name="Stundenplantabelle" align="center">';
@@ -643,12 +643,12 @@ class wochenplan
 		{
 				echo '<br>Titel: <INPUT type="text" name="titel" size="10" maxlength="10"> ';
 				echo ' Beschreibung: <INPUT type="text" name="beschreibung" size="20" maxlength="20"> ';
-				echo ' <INPUT type="submit" name="reserve" value="Reservieren">';
+				echo ' <input type="submit" name="reserve" value="Reservieren" />';
 				echo ' <INPUT type="hidden" name="user_uid" value="'.$this->user_uid.'">';
 				echo ' <INPUT type="hidden" name="ort_kurzbz" value="'.$this->ort_kurzbz.'">';
 				echo ' <INPUT type="hidden" name="datum" value="'.$this->datum.'">';
 				echo ' <INPUT type="hidden" name="type" value="'.$this->type.'">';
-				echo '</FORM>';
+				echo '</form>';
 		}
 	}
 
