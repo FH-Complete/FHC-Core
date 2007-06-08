@@ -146,11 +146,14 @@ if (!isset($type))
 if (!isset($pers_uid))
 	$pers_uid=$uid;
 
-var_dump($_POST);
+//echo $uid.':'.$user_uid;
+//var_dump($_POST);
+
 // Reservieren
 if (isset($reserve) && $user=='lektor')
 {
 	//echo 'test';
+	echo 'test';
 	if(!$erg_std=pg_query($conn, "SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
 	{
 		die(pg_last_error($conn));
@@ -169,7 +172,7 @@ if (isset($reserve) && $user=='lektor')
 			{
 				$datum_res=$$var;
 				//echo $datum_res;
-				$query="INSERT INTO tbl_reservierung
+				$query="INSERT INTO lehre.tbl_reservierung
 							(datum, uid, ort_kurzbz, stunde, beschreibung, titel, studiengang_kz )
 						VALUES
 							('$datum_res', '$user_uid', '$ort_kurzbz', $stunde, '$beschreibung', '$titel', 0)"; // semester, verband, gruppe, gruppe_kurzbz,
