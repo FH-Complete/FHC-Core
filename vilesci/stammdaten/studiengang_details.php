@@ -267,7 +267,7 @@
 		$htmlstr .= "<div align='right' id='sub'>\n";
 		$htmlstr .= "	<span id='submsg' style='color:red; visibility:hidden;'>Datensatz ge&auml;ndert!&nbsp;&nbsp;</span>\n";
 		$htmlstr .= "	<input type='submit' value='Speichern' name='schick' disabled>\n";
-		$htmlstr .= "	<input type='reset' value='Reset' onmouseout='unchanged()'>\n";
+		$htmlstr .= "	<input type='button' value='Reset' onclick='unchanged()'>\n";
 		$htmlstr .= "</div>";
 		$htmlstr .= "</form>";
 	}
@@ -284,6 +284,7 @@
 <script type="text/javascript">
 function unchanged()
 {
+		document.studiengangform.reset();
 		document.studiengangform.schick.disabled = true;
 		document.getElementById("submsg").style.visibility="hidden";
 		checkmail();
@@ -292,6 +293,7 @@ function unchanged()
 		checkrequired(document.studiengangform.kurzbz);
 		checkrequired(document.studiengangform.bezeichnung);
 		checkrequired(document.studiengangform.studiengang_kz);
+		
 
 }
 
