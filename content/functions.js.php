@@ -103,3 +103,18 @@ function SetStatusBarText(text)
 {
 	document.getElementById('statusbarpanel-text').label=text;
 }
+
+
+// ****
+// * Prueft ein Datum auf Gueltigkeit
+// * Erlaubte Formate: 1.1.2007, 31.12.2007
+// ****
+function CheckDatum(datum)
+{
+	var pattern = /^(0[1-9]|[1-9]|[12][0-9]|3[01])[.](0[1-9]|[1-9]|1[012])[.](19|20)\d\d$/
+					
+	if(pattern.exec(datum))
+		return true;
+	else
+		return false;
+}

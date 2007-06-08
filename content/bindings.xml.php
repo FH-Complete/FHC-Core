@@ -11,7 +11,7 @@
 
   <binding id="Datum">
   	<content>
-		<xul:textbox id="binding-datefield-textbox" value="asdf"/>
+		<xul:textbox id="binding-datefield-textbox" maxlength="10" size="10"/>
 	</content>
 	<implementation>
 		<property name="value" onget="return document.getElementById('binding-datefield-textbox').value" >
@@ -21,18 +21,15 @@
 		</property>
 	</implementation>
 	<handlers>
-		<handler event="blur" phase="capturing">
+		<handler event="input">
 			 <![CDATA[
 			var datum = document.getElementById('binding-datefield-textbox').value;
+
+			if(CheckDatum(datum))
+				document.getElementById('binding-datefield-textbox').style.backgroundColor="#FFFFFF";
+			else
+				document.getElementById('binding-datefield-textbox').style.backgroundColor="#F46B6B";
 			
-			var pattern = /^\d{2}\.\d{2}\.\d{4}$/
-					
-			if(!pattern.exec(datum))
-			{
-				alert("Das Datum muss im Format tt.mm.yyyy eingegeben werden!");
-				//document.getElementById('binding-datefield-textbox').focus();
-				return false;
-			}
 			 ]]>
 		</handler>
 	</handlers>

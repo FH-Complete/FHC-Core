@@ -263,23 +263,41 @@ class zeugnisnote
 	// *********************************************
 	function getZeugnisnoten($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz)
 	{
-		$qry = "SELECT 
+/*		$qry = "SELECT 
 					tbl_zeugnisnote.*,
 					tbl_note.bezeichnung as note_bezeichnung,
-					tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung
+					vw_student_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung
 				FROM 
 					lehre.tbl_zeugnisnote,
 					lehre.tbl_note,
-					lehre.tbl_lehrveranstaltung			
+					campus.vw_student_lehrveranstaltung		
 				WHERE
 					tbl_zeugnisnote.note=tbl_note.note AND
-					tbl_zeugnisnote.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id";
-		
+					tbl_zeugnisnote.lehrveranstaltung_id=vw_student_lehrveranstaltung.lehrveranstaltung_id AND
+					tbl_zeugnisnote.student_uid=vw_student_lehrveranstaltung.uid AND
+					tbl_zeugnisnote.studiensemester_kurzbz=vw_student_lehrveranstaltung.studiensemester_kurzbz";*/
+		$where='';
 		if($lehrveranstaltung_id!=null)
-			$qry.=" AND tbl_zeugnisnote.lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."'";
+			$where.=" AND tbl_zeugnisnote.lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."'";
 		if($student_uid!=null)
-			$qry.=" AND tbl_zeugnisnote.student_uid='".addslashes($student_uid)."'";
+			$where.=" AND tbl_zeugnisnote.student_uid='".addslashes($student_uid)."'";
+		if($studiensemester_kurzbz!=null)
+			$where.=" AND tbl_zeugnisnote.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+			
+		$qry = "SELECT * FROM 
+				(
+					SELECT distinct on (vw_student_lehrveranstaltung.lehrveranstaltung_id) * 
+					FROM 
+						campus.vw_student_lehrveranstaltung LEFT JOIN lehre.tbl_zeugnisnote 
+							ON(student_uid=uid AND tbl_zeugnisnote.studiensemester_kurzbz=vw_student_lehrveranstaltung.studiensemester_kurzbz 
+							   AND tbl_zeugnisnote.lehrveranstaltung_id=vw_student_lehrveranstaltung.lehrveranstaltung_id)
+					WHERE true $where
+				) as a 
+				LEFT JOIN lehre.tbl_note USING(note)";
 		
+		
+		echo $qry;		
+		return false;
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
