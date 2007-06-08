@@ -69,7 +69,7 @@
 	</script>
 </head>
 
-<body>
+<body style="background-color:#eeeeee;">
 <div class="logo">
 	<a href="intro.php" target="detail">
 		<img src="../skin/images/logo.png" width="200" height="50" alt="VileSci (FASonline)" title="VileSci" />
@@ -254,6 +254,33 @@
 			  	</table>
 			</td>
 		</tr>
+        <tr><td width="10" nowrap>&nbsp;</td></tr>
+        <!--Menu Eintrag Studiengang-->
+		<tr>
+          	<td nowrap><a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Studiengang'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Studiengang</a></td>
+        </tr>
+		<tr>
+          	<td nowrap>
+		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Studiengang" style="display: visible;">
+			  	<tr>
+			  		<td width="10" nowrap>&nbsp;</td>
+					<td nowrap><a class="MenuItem2" href="stammdaten/studiengang_frameset.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;&Uuml;bersicht</a></td>
+			  	</tr>
+			  	<tr>
+			  		<td width="10" nowrap>&nbsp;</td>
+					<td nowrap><a class="MenuItem2" href="stammdaten/studiengang_neu.php" target="detail"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Neu</a></td>
+			  	</tr>
+			  	<!--
+                <tr>
+			  		<td width="10" nowrap>&nbsp;</td>
+					<td nowrap><a class="MenuItem2" href="kommunikation/mlists/index.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Mail-Verteiler</a></td>
+			  	</tr>
+                -->
+			  	<tr><td width="10" nowrap>&nbsp;</td></tr>
+			  	</table>
+			</td>
+		</tr>
+        
 		</table>
 </div>
 <div id="menuemitarbeiter" style="display: none;">

@@ -9,21 +9,21 @@ require_once('../../include/student.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
    die('Verbindung zur Datenbank konnte nicht hergestellt werden');
-   
+
 if (isset($_GET['studiengang_kz']))
 	$studiengang_kz=$_GET['studiengang_kz'];
-else 
+else
 	$studiengang_kz=null;
 if (isset($_GET['sem']))
 
 	$sem=$_GET['sem'];
-else 
+else
 	$sem=null;
-	
+
 if (isset($_GET['ss']))
 
 	$ss=$_GET['ss'];
-else 
+else
 	$ss=null;
 ?>
 <html>
@@ -89,15 +89,15 @@ function doSave()
 {
 	global $conn;
 	$e=new gruppe($conn);
-	
+
 	if ($_POST['new']=='true')
 	{
 		$e->new = true;
 		$e->gruppe_kurzbz=$_POST['kurzbz'];
 		$e->insertamum = date('Y-m-d H:i:s');
-		$e->insertvon = get_uid();	
+		$e->insertvon = get_uid();
 	}
-	else 
+	else
 	{
 		$e->load($_POST['kurzbz']);
 		$e->new=false;
@@ -124,7 +124,7 @@ function doEdit($conn,$kurzbz,$new=false)
 {
     if (!$new)
 		$e=new gruppe($conn,$kurzbz);
-	else 
+	else
 		$e = new gruppe($conn);
 	?>
 	<form name="gruppe" method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>">
@@ -223,13 +223,14 @@ function getUebersicht()
 		die('Fehler beim laden der Studiengaenge');
 	while($row = pg_fetch_object($result))
 		$stg[$row->studiengang_kz] = $row->kuerzel;
-	
+
 	foreach ($gruppe->result as $e)
 	{
 		$i++;
 		$c=$i%2;
 
 		echo '<tr class="liste'.$c.'">';
+
 		echo "<td>$e->gruppe_kurzbz </td>";
 		echo "<td>$e->bezeichnung </td>";
 		echo "<td>".$stg[$e->studiengang_kz]."</td>";
