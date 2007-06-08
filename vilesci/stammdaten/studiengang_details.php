@@ -3,15 +3,15 @@
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/studiengang.class.php');
 	require_once('../../include/erhalter.class.php');
-	
+
 	if (!$conn = @pg_pconnect(CONN_STRING))
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-	
+
 	$reloadstr = "";  // neuladen der liste im oberen frame
-	
+
 	if((isset($_POST["schick"])) || (isset($_POST["schickneu"])))
 	{
-		
+
 		$kennzahl = $_POST["studiengang_kz"];
 		$kurzbz = $_POST["kurzbz"];
 		$kurzbzlang = $_POST["kurzbzlang"];
@@ -37,7 +37,7 @@
 		else
 			$aktiv = "f";
 		$ext_id = $_POST["ext_id"];
-		
+
 		$sg_update = new studiengang($conn);
 		$sg_update->studiengang_kz = $kennzahl;
 		$sg_update->kurzbz = $kurzbz;
@@ -61,29 +61,29 @@
 		$sg_update->titelbescheidvom = $titelbescheidvom;
 		$sg_update->aktiv = $aktiv;
 		$sg_update->ext_id = $ext_id;
-		
+
 		if (isset($_POST["schickneu"]))
 			$sg_update->new = 1;
 
 		if(!$sg_update->save())
 			die($sg_update->errormsg);
-		
+
 		$reloadstr .= "<script type='text/javascript'>\n";
 		$reloadstr .= "	parent.uebersicht.location.href='studiengang_uebersicht.php';";
 		$reloadstr .= "</script>\n";
 	}
-	
+
 	$htmlstr = "";
 	$sel = "";
 	$chk = "";
-	
-	if (isset($_REQUEST['studiengang_kz'])) 
+
+	if (isset($_REQUEST['studiengang_kz']))
 	{
-		$kennzahl = intval($_REQUEST["studiengang_kz"]);
+		$kennzahl = $_REQUEST["studiengang_kz"];
 		$sg = new studiengang($conn,$kennzahl);
-		if (!$sg->studiengang_kz)
+		if ($sg->errormsg!='')
 			die($sg->errormsg);
-		
+
 		$erh = new erhalter($conn);
 
     	if (!$erh->getAll('kurzbz'))
@@ -95,10 +95,10 @@
 
 		$htmlstr .= "	<tr><td colspan='3'>&nbsp;</tr>\n";
 		$htmlstr .= "	<tr>\n";
-		
+
 		// ertse Spalte start
 		$htmlstr .= "		<td valign='top'>\n";
-		
+
 		$htmlstr .= "			<table>\n";
 		$htmlstr .= "				<tr>\n";
 		$htmlstr .= "					<td>Kennzahl</td>\n";
@@ -145,16 +145,16 @@
 		$htmlstr .= "			</table>\n";
 
 		$htmlstr .= "		</td>\n";
-		// 2. Spalte start	
+		// 2. Spalte start
 		$htmlstr .= "		<td valign='top'>\n";
-		
+
 		$htmlstr .= "			<table>\n";
 
 		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>Erhalter</td>\n";	
+		$htmlstr .= "					<td>Erhalter</td>\n";
 		$htmlstr .= "					<td\n>";
 		$htmlstr .= "						<select name='erhalter_kz' onchange='submitable()'>\n";
-			
+
 		foreach($erh->result as $erhalter)
 		{
 			if ($sg->erhalter_kz == $erhalter->erhalter_kz)
@@ -162,11 +162,11 @@
 			else
 				$sel = "";
 			$htmlstr .= "							<option value='".$erhalter->erhalter_kz."'".$sel.">".$erhalter->bezeichnung."</option>\n";
-		}	
+		}
 		$htmlstr .= "						</select>\n";
 		$htmlstr .= "					</td>\n";
 		$htmlstr .= "				</tr>\n";
-		
+
 		$htmlstr .= "				<tr>\n";
 		$htmlstr .= "					<td>Typ</td>\n";
 		$htmlstr .= "					<td\n>";
@@ -181,7 +181,7 @@
 			$sel = " selected";
 		else
 			$sel = "";
-		$htmlstr .= "							<option value='d'".$sel.">Diplom</option>\n";	
+		$htmlstr .= "							<option value='d'".$sel.">Diplom</option>\n";
 		if ($sg->typ == "m")
 			$sel = " selected";
 		else
@@ -202,9 +202,9 @@
 		$htmlstr .= "					</td>\n";
 		//$htmlstr .= "					<td><input class='detail' type='text' name='typ' size='16' maxlength='1' value='".$sg->typ."' onchange='submitable()'></td>\n";
 		$htmlstr .= "				</tr>\n";
-		
 
-		
+
+
 		$htmlstr .= "				<tr>\n";
 		$htmlstr .= "					<td>Farbe</td>\n";
 		$htmlstr .= " 					<td><input class='detail' type='text' name='farbe' size='16' maxlength='6' value='".$sg->farbe."' onchange='submitable()'></td>\n";
@@ -234,7 +234,7 @@
 		$htmlstr .= "		</td>\n";
 		// 3. Spalte start
 		$htmlstr .= "		<td valign='top'>\n";
-		
+
 		$htmlstr .= "			<table>\n";
 		$htmlstr .= "				<tr>\n";
 		$htmlstr .= "					<td>Bezeichnung</td>\n";
@@ -260,7 +260,7 @@
 		$htmlstr .= "			</table>\n";
 
 		$htmlstr .= "		</td>\n";
-		
+
 		$htmlstr .= "	</tr>";
 		$htmlstr .= "</table>\n";
 		$htmlstr .= "<br>\n";
@@ -292,7 +292,7 @@ function unchanged()
 		checkrequired(document.studiengangform.kurzbz);
 		checkrequired(document.studiengangform.bezeichnung);
 		checkrequired(document.studiengangform.studiengang_kz);
-		
+
 }
 
 function checkmail()
@@ -302,7 +302,7 @@ function checkmail()
 		//document.studiengangform.schick.disabled = true;
 		document.studiengangform.email.className="input_error";
 		return false;
-		
+
 	}
 	else
 	{
@@ -323,9 +323,9 @@ function checkdate(feld)
 	}
 	else
 	{
-		if(feld.value != "")	
+		if(feld.value != "")
 			feld.value = dateCheck(feld);
-		
+
 		feld.className = "input_ok";
 		return true;
 	}
@@ -353,7 +353,7 @@ function submitable()
 	required1 = checkrequired(document.studiengangform.kurzbz);
 	required2 = checkrequired(document.studiengangform.bezeichnung);
 	required3 = checkrequired(document.studiengangform.studiengang_kz);
-	
+
 	if((!mail) || (!date1) || (!date2) || (!required1) || (!required2) || (!required3))
 	{
 		document.studiengangform.schick.disabled = true;
@@ -363,7 +363,7 @@ function submitable()
 	{
 		document.studiengangform.schick.disabled = false;
 		document.getElementById("submsg").style.visibility="visible";
-		
+
 	}
 }
 </script>
