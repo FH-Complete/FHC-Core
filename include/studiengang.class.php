@@ -70,7 +70,7 @@ class studiengang
 			return false;
 		}
 
-		if($studiengang_kz != null)
+		if(is_numeric($studiengang_kz))
 			$this->load($studiengang_kz);
 	}
 
@@ -87,7 +87,7 @@ class studiengang
 			return false;
 		}
 
-		$qry = "SELECT * FROM public.tbl_studiengang WHERE studiengang_kz='$studiengang_kz'";
+		$qry = "SELECT * FROM public.tbl_studiengang WHERE studiengang_kz=$studiengang_kz";
 
 		if($res = pg_query($this->conn, $qry))
 		{
@@ -112,7 +112,7 @@ class studiengang
 				$this->bescheidvom=$row->bescheidvom;
 				$this->ext_id=$row->ext_id;
 				$this->kuerzel = strtoupper($row->typ.$row->kurzbz);
-				
+
 				$this->telefon=$row->telefon;
            	 	$this->organisationsform=$row->organisationsform;
             	$this->titelbescheidvom=$row->titelbescheidvom;
@@ -137,7 +137,7 @@ class studiengang
 		$qry = 'SELECT * FROM public.tbl_studiengang';
 		if ($aktiv)
 			$qry.=' WHERE aktiv';
-			
+
 		if($order!=null)
 		 	$qry .=" ORDER BY $order";
 
@@ -158,7 +158,7 @@ class studiengang
 			$stg_obj->english=$row->english;
 			$stg_obj->typ=$row->typ;
 			$stg_obj->farbe=$row->farbe;
-			$stg_obj->email=$row->email;           
+			$stg_obj->email=$row->email;
 			$stg_obj->max_semester=$row->max_semester;
 			$stg_obj->max_verband=$row->max_verband;
 			$stg_obj->max_gruppe=$row->max_gruppe;
@@ -170,12 +170,12 @@ class studiengang
 			$stg_obj->bescheidvom=$row->bescheidvom;
 			$stg_obj->ext_id=$row->ext_id;
 			$stg_obj->kuerzel = strtoupper($row->typ.$row->kurzbz);
-            
+
             $stg_obj->telefon=$row->telefon;
             $stg_obj->organisationsform=$row->organisationsform;
             $stg_obj->titelbescheidvom=$row->titelbescheidvom;
             $stg_obj->aktiv=$row->aktiv;
-			
+
 
 			$this->result[] = $stg_obj;
 		}
@@ -343,13 +343,13 @@ class studiengang
 			return false;
 		}
 	}
-	
+
 	// *******************************************
 	// * Setzt Studiengaenge aktiv/inaktiv
 	// * benoetigt studiengang_kz und 'on'/'off'
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
-	
+
 	function toggleAktiv($studiengang_kz)
 	{
 		if(!is_numeric($studiengang_kz))
@@ -358,18 +358,18 @@ class studiengang
 			return false;
 		}
 		$qry = "UPDATE public.tbl_studiengang SET aktiv = NOT aktiv WHERE studiengang_kz='$studiengang_kz'";
-		
+
 		if(pg_query($this->conn, $qry))
 		{
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
 			return false;
 		}
-		
+
 	}
-	
+
 }
 ?>
