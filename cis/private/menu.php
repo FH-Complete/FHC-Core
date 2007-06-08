@@ -21,6 +21,7 @@
  */
 
 require_once('../config.inc.php');
+require_once('../../include/globals.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/studiensemester.class.php');
@@ -31,7 +32,7 @@ require_once('../../include/lehrveranstaltung.class.php');
 if(!$db_conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim oeffnen der Datenbankverbindung');
 
-$user = get_uid();
+$user=USER_UID;
 
 $rechte=new benutzerberechtigung($db_conn);
 $rechte->getBerechtigungen($user);
