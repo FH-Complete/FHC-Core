@@ -3,7 +3,7 @@
 <HEAD>
 	<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<TITLE>Lehrveranstaltungsplan Technikum-Wien</TITLE>
-	<script language="JavaScript">
+	<script language="JavaScript" type="text/javascript">
 		<!--
 		function MM_jumpMenu(targ,selObj,restore)
 		{ //v3.0
