@@ -77,6 +77,7 @@ $xml_url=APP_ROOT.'rdf/'.$xml.$params;
 $xml_doc = new DOMDocument;
 if(!$xml_doc->load($xml_url))
 	die('unable to load xml');
+//echo ':'.$xml_doc->saveXML().':';
 
 //XSL aus der DB holen
 $qry = "SELECT text FROM public.tbl_vorlagestudiengang WHERE (studiengang_kz=0 OR studiengang_kz='".addslashes($xsl_stg_kz)."') AND vorlage_kurzbz='$xsl' ORDER BY studiengang_kz DESC, version DESC LIMIT 1";
@@ -87,14 +88,14 @@ if(!$row = pg_fetch_object($result))
 	die('Vorlage wurde nicht gefunden'.$qry);
 
 // Load the XSL source
-$xsl = new DOMDocument;
-//if(!$xsl->load('../../../../xsl/collection.xsl'))
-if(!$xsl->loadXML($row->text))
+$xsl_doc = new DOMDocument;
+//if(!$xsl_doc->load('../../../../xsl/collection.xsl'))
+if(!$xsl_doc->loadXML($row->text))
 	die('unable to load xsl');
 
 // Configure the transformer
 $proc = new XSLTProcessor;
-$proc->importStyleSheet($xsl); // attach the xsl rules
+$proc->importStyleSheet($xsl_doc); // attach the xsl rules
 
 $buffer = $proc->transformToXml($xml_doc);
 //in $buffer steht nun das xsl-fo file mit den daten
