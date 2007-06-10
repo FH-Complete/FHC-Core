@@ -258,7 +258,7 @@ class mitarbeiter extends benutzer
 	    //echo $sql_query;
 		if(!($erg=pg_query($this->conn, $sql_query)))
 		{
-			$this->errormsg=pg_errormessage($conn);
+			$this->errormsg=pg_errormessage($this->conn);
 			return false;
 		}
 		$num_rows=pg_numrows($erg);
@@ -336,7 +336,7 @@ class mitarbeiter extends benutzer
 
 		if(!($erg=pg_query($this->conn, $sql_query)))
 		{
-			$this->errormsg=pg_errormessage($conn);
+			$this->errormsg=pg_errormessage($this->conn);
 			return false;
 		}
 		$num_rows=pg_numrows($erg);
@@ -385,7 +385,7 @@ class mitarbeiter extends benutzer
 
 		if(!($erg=pg_query($this->conn, $sql_query)))
 		{
-			$this->errormsg=pg_errormessage($conn);
+			$this->errormsg=pg_errormessage($this->conn);
 			return false;
 		}
 		$num_rows=pg_numrows($erg);

@@ -191,7 +191,7 @@ class lvinfo
 		//Laenge Pruefen
 		if(strlen($this->sprache)>16)
 		{
-			$this->errormsg = "Sprache darf nicht laenger als 16 Zeichen sein bei <b>".$this->$lvinfo_id."</b> - $this->sprache";
+			$this->errormsg = "Sprache darf nicht laenger als 16 Zeichen sein bei <b>".$this->lvinfo_id."</b> - $this->sprache";
 			return false;
 		}
 		if(!is_numeric($this->lehrveranstaltung_id))

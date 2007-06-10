@@ -82,7 +82,7 @@ class raumtyp
 	 */
 	function load($raumtyp_kurzbz)
 	{
-		if($raum_kurzbz == '')
+		if($raumtyp_kurzbz == '')
 		{
 			$this->errormsg = 'Kein gültiger Schlüssel vorhanden';
 			return false;

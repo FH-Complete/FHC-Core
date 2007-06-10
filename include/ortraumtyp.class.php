@@ -82,7 +82,7 @@ class ortraumtyp
 	 */
 	function load($ort_kurzbz, $hierarchie)
 	{
-		if($ort_kurzbz == '' || !is_numeric($hierarche) || $hierarchie=='')
+		if($ort_kurzbz == '' || !is_numeric($hierarchie) || $hierarchie=='')
 		{
 			$this->errormsg = 'Kein gültiger Schlüssel vorhanden';
 			return false;

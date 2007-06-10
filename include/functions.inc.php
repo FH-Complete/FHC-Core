@@ -7,9 +7,19 @@ function db_query($conn, $sql_query)
 		return '';
 }
 
-function get_uid()
+function crlf()
 {
-	return strtolower(trim($_SERVER['REMOTE_USER']));
+	// doing some DOS-CRLF magic...
+	$crlf="\n";
+	$client=getenv("HTTP_USER_AGENT");
+	if (ereg('[^(]*\((.*)\)[^)]*',$client,$regs))
+	{
+		$os = $regs[1];
+		// this looks better under WinX
+		if (eregi("Win",$os))
+			$crlf="\r\n";
+	}
+	return $crlf;
 }
 
 function check_lektor($uid, $conn)
