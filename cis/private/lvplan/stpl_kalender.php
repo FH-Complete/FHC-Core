@@ -65,14 +65,7 @@ if (isset($target))
 	$name.='_'.$target;
 
 // doing some DOS-CRLF magic...
-$crlf="\n";
-$client=getenv("HTTP_USER_AGENT");
-if (ereg('[^(]*\((.*)\)[^)]*',$client,$regs))
-{
-	$os = $regs[1];
-	// this looks better under WinX
-	if (eregi("Win",$os)) $crlf="\r\n";
-}
+$crlf=crlf();
 
 // Check Type
 // Print in csv-file

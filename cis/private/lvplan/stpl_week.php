@@ -1,9 +1,9 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <HTML>
 <HEAD>
 	<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<TITLE>Lehrveranstaltungsplan Technikum-Wien</TITLE>
-	<script language="JavaScript" type="text/javascript">
+	<script type="text/javascript">
 		<!--
 		function MM_jumpMenu(targ,selObj,restore)
 		{ //v3.0
@@ -199,6 +199,7 @@ if (! $stdplan->load_data($type,$pers_uid,$ort_kurzbz,$stg_kz,$sem,$ver,$grp,$gr
 {
 	die($stdplan->errormsg);
 }
+
 //echo 'Datum:'.$datum.'<BR>';
 // Stundenplan einer Woche laden
 if (! $stdplan->load_week($datum))
@@ -211,8 +212,7 @@ if (! $stdplan->draw_header())
 {
 	die($stdplan->errormsg);
 }
-//echo '<P align="center" style="font-size:xx-large;text-decoration:blink;color:#FF0000;">
-//		Achtung! Stundenplan-Update laeuft!!!</P>';
+
 // Stundenplan der Woche drucken
 $stdplan->draw_week($uid);
 
