@@ -119,6 +119,7 @@ class betriebsmitteltyp
 	function save()
 	{		
 		$dbanzahl=0;
+		$qry='';
 		$qry1='SELECT * FROM public.tbl_betriebsmitteltyp WHERE beschreibung='.$this->addslashes($this->beschreibung).';';
 		if($result1=pg_query($this->conn,$qry1))
 		{

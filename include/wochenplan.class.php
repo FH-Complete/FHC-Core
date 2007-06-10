@@ -81,6 +81,7 @@ class wochenplan
 		$this->kal_link='stpl_kalender.php?type='.$type;
 		$this->datum=mktime();
 		$this->init_stdplan();
+		$this->crlf=crlf();
 	}
 
 	function init_stdplan()
@@ -474,23 +475,23 @@ class wochenplan
 
 		// Formularbeginn wenn Lektor
 		if ($this->user=='lektor' && $this->type=='ort')
-			echo '<form name="reserve" method="post" action="stpl_week.php">';
+			echo '<form name="reserve" method="post" action="stpl_week.php">'.$this->crlf;
 
 		//Tabelle zeichnen
-		echo '<table class="stdplan" width="100%" border="1" cellpadding="0" cellspacing="0" name="Stundenplantabelle" align="center">';
+		echo '	<table class="stdplan" width="100%" border="1" cellpadding="0" cellspacing="0" name="Stundenplantabelle" align="center">'.$this->crlf;
 		// Kopfzeile darstellen
-	  	echo '<tr>';
-			echo '<th align="right">Stunde&nbsp;<br>Beginn&nbsp;<br>Ende&nbsp;</th>';
-			for ($i=0;$i<$num_rows_stunde; $i++)
-			{
-				$beginn=pg_result($result_stunde,$i,'"beginn"');
-				$beginn=substr($beginn,0,5);
-				$ende=pg_result($result_stunde,$i,'"ende"');
-				$ende=substr($ende,0,5);
-				$stunde=pg_result($result_stunde,$i,'"stunde"');
-				echo '<th><div align="center">'.$stunde.'<br>&nbsp;'.$beginn .'&nbsp;<br>&nbsp;'.$ende.'&nbsp;</div></th>';
+	  	echo '		<tr>'.$this->crlf;
+		echo '			<th align="right">Stunde&nbsp;<br>Beginn&nbsp;<br>Ende&nbsp;</th>'.$this->crlf;
+		for ($i=0;$i<$num_rows_stunde; $i++)
+		{
+			$beginn=pg_result($result_stunde,$i,'"beginn"');
+			$beginn=substr($beginn,0,5);
+			$ende=pg_result($result_stunde,$i,'"ende"');
+			$ende=substr($ende,0,5);
+			$stunde=pg_result($result_stunde,$i,'"stunde"');
+			echo '			<th><div align="center">'.$stunde.'<br>&nbsp;'.$beginn .'&nbsp;<br>&nbsp;'.$ende.'&nbsp;</div></th>'.$this->crlf;
 			}
-		echo '</tr>';
+		echo '		</tr>'.$this->crlf;
 		// Von Montag bis Samstag
 		$datum_now=mktime();
 		$datum_res_lektor_start=jump_day($datum_now,RES_TAGE_LEKTOR_MIN);
@@ -500,21 +501,23 @@ class wochenplan
 		$datum=$this->datum;
 		for ($i=1; $i<7; $i++)
 		{
-	  		echo '<tr><td>'.date("l",$datum).'<br>'.date("j. M y",$datum).'<br></td>'; //.strftime("%A %d %B %Y",$this->datum)
+	  		echo '		<tr><td>'.date("l",$datum).'<br>'.date("j. M y",$datum).'<br></td>'.$this->crlf; //.strftime("%A %d %B %Y",$this->datum)
 			for ($k=0; $k<$num_rows_stunde; $k++)
 			{
 				$j=pg_result($result_stunde,$k,'"stunde"');
 				// Stunde aufbereiten
 				if (isset($this->std_plan[$i][$j][0]->lehrfach))
 				{
-					// Anzahl der Felder
-
 					// Daten aufbereiten
 					$kollision=-1;
-					unset($unr);
-					unset($lektor);
-					unset($lehrverband);
-					unset($lehrfach);
+					if (isset($unr))
+						unset($unr);
+					if (isset($lektor))
+						unset($lektor);
+					if (isset($lehrverband))
+						unset($lehrverband);
+					if (isset($lehrfach))
+						unset($lehrfach);	
 					foreach ($this->std_plan[$i][$j] as $lehrstunde)
 					{
 						$unr[]=$lehrstunde->unr;
@@ -522,12 +525,12 @@ class wochenplan
 						$lektor[]=$lehrstunde->lektor;
 						// Lehrverband
 						$lvb=$lehrstunde->stg.'-'.$lehrstunde->sem;
-							if ($lehrstunde->ver!=null && $lehrstunde->ver!='0' && $lehrstunde->ver!='')
-							{
-								$lvb.=$lehrstunde->ver;
-								if ($lehrstunde->grp!=null && $lehrstunde->grp!='0' && $lehrstunde->grp!='')
-									$lvb.=$lehrstunde->grp;
-							}
+						if ($lehrstunde->ver!=null && $lehrstunde->ver!='0' && $lehrstunde->ver!='')
+						{
+							$lvb.=$lehrstunde->ver;
+							if ($lehrstunde->grp!=null && $lehrstunde->grp!='0' && $lehrstunde->grp!='')
+								$lvb.=$lehrstunde->grp;
+						}
 						if (count($lehrstunde->gruppe_kurzbz)>0)
 							$lvb=$lehrstunde->gruppe_kurzbz;
 						$lehrverband[]=$lvb;
@@ -540,7 +543,6 @@ class wochenplan
 						$anmerkung=$lehrstunde->anmerkung;
 					}
 
-
 					// Unterrichtsnummer (Kollision?)
 					$unr=array_unique($unr);
 					$kollision+=count($unr);
@@ -552,10 +554,10 @@ class wochenplan
 						sort($lektor);
 						$lkt='';
 						foreach ($lektor as $l)
-							$lkt.=$l.'<BR>';
+							$lkt.=$l.'<BR />';
 					}
 					else
-						$lkt=$lektor[0].'<BR>';
+						$lkt=$lektor[0].'<BR />';
 					//echo $lkt;
 
 					// Lehrverband
@@ -565,10 +567,10 @@ class wochenplan
 						sort($lehrverband);
 						$lvb='';
 						foreach ($lehrverband as $l)
-							$lvb.=$l.'<BR>';
+							$lvb.=$l.'<BR />';
 					}
 					else
-						$lvb=$lehrverband[0].'<BR>';
+						$lvb=$lehrverband[0].'<BR />';
 
 					// Lehrfach
 					if ($this->type=='verband')
@@ -577,10 +579,10 @@ class wochenplan
 						sort($lehrfach);
 						$lf='';
 						foreach ($lehrfach as $l)
-							$lf.=$l.'<BR>';
+							$lf.=$l.'<BR />';
 					}
 					else
-						$lf=$lehrfach[0].'<BR>';
+						$lf=$lehrfach[0].'<BR />';
 
 					//$lkt=$this->std_plan[$i][$j][0]->lektor.'<BR>';
 					//$lvb=$this->std_plan[$i][$j][0]->stg.'-'.$this->std_plan[$i][$j][0]->sem.$this->std_plan[$i][$j][0]->ver.$this->std_plan[$i][$j][0]->grp.'<BR>';
@@ -599,7 +601,7 @@ class wochenplan
 					}
 
 					// Ausgabe einer Stunde im Raster (HTML)
-					echo '<td nowrap ';
+					echo '				<td nowrap ';
 					if (isset($this->std_plan[$i][$j][0]->farbe))
 						echo 'style="background-color: #'.$this->std_plan[$i][$j][0]->farbe.';"';
 					echo '>'.$blink_ein.'<DIV align="center">';
@@ -625,29 +627,29 @@ class wochenplan
 						echo $lkt;
 					if ($this->type!='ort')
 						echo $this->std_plan[$i][$j][0]->ort;
-					echo '</A></DIV>'.$blink_aus.'</td>';
+					echo '</A></DIV>'.$blink_aus.'</td>'.$this->crlf;
 				}
 				else
 				{
-					echo '<td align="center"><br>';
-					if ($this->user=='lektor' && $this->type=='ort' && (($datum>$datum_res_lektor_start && $datum<=$datum_res_lektor_ende) || $user_uid=='wagner'))
+					echo '				<td align="center"><br>';
+					if ($this->user=='lektor' && $this->type=='ort' && ($datum>$datum_res_lektor_start && $datum<=$datum_res_lektor_ende))
 						echo '<INPUT type="checkbox" name="reserve'.$i.'_'.$j.'" value="'.date("Y-m-d",$datum).'">'; //&& $datum>=$datum_now
-					echo '</td>';
+					echo '</td>'.$this->crlf;
 				}
 			}
-			echo "</tr>";
+			echo '		</tr>'.$this->crlf;
 			$datum=jump_day($datum, 1);
 		}
-		echo '</table>';
-		if ($this->user=='lektor' && $this->type=='ort' && (($datum>=$datum_now && $datum>$datum_res_lektor_start && $datum<=$datum_res_lektor_ende) || $user_uid=='wagner' ))
+		echo '	</table>'.$this->crlf;
+		if ($this->user=='lektor' && $this->type=='ort' && ($datum>=$datum_now && $datum>$datum_res_lektor_start && $datum<=$datum_res_lektor_ende))
 		{
-				echo '<br>Titel: <INPUT type="text" name="titel" size="10" maxlength="10"> ';
-				echo ' Beschreibung: <INPUT type="text" name="beschreibung" size="20" maxlength="20"> ';
-				echo ' <input type="submit" name="reserve" value="Reservieren" />';
-				echo ' <INPUT type="hidden" name="user_uid" value="'.$this->user_uid.'">';
-				echo ' <INPUT type="hidden" name="ort_kurzbz" value="'.$this->ort_kurzbz.'">';
-				echo ' <INPUT type="hidden" name="datum" value="'.$this->datum.'">';
-				echo ' <INPUT type="hidden" name="type" value="'.$this->type.'">';
+				echo '	<br />Titel: <input type="text" name="titel" size="10" maxlength="10" /> '.$this->crlf;
+				echo '	Beschreibung: <input type="text" name="beschreibung" size="20" maxlength="20" /> '.$this->crlf;
+				echo '	<input type="submit" name="reserve" value="Reservieren" />'.$this->crlf;
+				echo '	<input type="hidden" name="user_uid" value="'.$this->user_uid.'" />'.$this->crlf;
+				echo '	<input type="hidden" name="ort_kurzbz" value="'.$this->ort_kurzbz.'" />'.$this->crlf;
+				echo '	<input type="hidden" name="datum" value="'.$this->datum.'" />'.$this->crlf;
+				echo '	<input type="hidden" name="type" value="'.$this->type.'" />'.$this->crlf;
 				echo '</form>';
 		}
 	}
@@ -762,10 +764,12 @@ class wochenplan
 				if (isset($this->std_plan[$i][$j][0]->lehrfach))
 				{
 					// Daten aufbereiten
-					unset($lvb);
+					if (isset($lvb))
+						unset($lvb);
 					//$lvb=array();
 					$kollision=-1;
-					unset($a_unr);
+					if (isset($a_unr))
+						unset($a_unr);
 					foreach ($this->std_plan[$i][$j] as $lehrstunde)
 					{
 						$a_unr[]=$lehrstunde->unr;
@@ -806,12 +810,18 @@ class wochenplan
 					foreach ($a_unr as $unr)
 					{
 						// Daten vorbereiten
-						unset($lektor);
-						unset($lehrverband);
-						unset($lehrfach);
-						unset($ort);
-						unset($updateamum);
-						unset($updatevon);
+						if (isset($lektor))
+							unset($lektor);
+						if (isset($lehrverband))
+							unset($lehrverband);
+						if (isset($lehrfach))
+							unset($lehrfach);
+						if (isset($ort))
+							unset($ort);
+						if (isset($updateamum))
+							unset($updateamum);
+						if (isset($updatevon))
+							unset($updatevon);
 						$paramList='';
 						$z=0;
 						foreach ($this->std_plan[$i][$j] as $lehrstunde)
@@ -993,6 +1003,8 @@ class wochenplan
 	 */
 	function load_stpl_search($datum,$stpl_id,$db_stpl_table, $block=1)
 	{
+		// Initatialisierung der Variablen
+		$lehrverband=array();
 		// Name der View
 		$stpl_view=VIEW_BEGIN.$db_stpl_table;
 		$stpl_view_id=$db_stpl_table.TABLE_ID;
@@ -1158,6 +1170,8 @@ class wochenplan
 	 */
 	function load_lva_search($datum,$lva_id,$db_stpl_table,$type)
 	{
+		// Initialiseren der Variablen
+		$lehrverband=array();
 		// Name der View
 		$stpl_view=VIEW_BEGIN.$db_stpl_table;
 		$lva_stpl_view=VIEW_BEGIN.'lva_'.$db_stpl_table;
@@ -1352,7 +1366,8 @@ class wochenplan
 			for ($t=1;$t<7;$t++)
 				for ($s=$min_stunde;$s<=$max_stunde;$s++)
 				{
-					unset($raster[$t][$s]);
+					if (isset($raster[$t][$s]))
+						unset($raster[$t][$s]);
 					$raster[$t][$s]->ort=array();
 					$raster[$t][$s]->kollision=false;
 				}
@@ -1466,10 +1481,14 @@ class wochenplan
 				if (isset($this->std_plan[$i][$j][0]->lehrfach))
 				{
 					// Daten aufbereiten
-					unset($unr);
-					unset($lektor);
-					unset($lehrverband);
-					unset($lehrfach);
+					if (isset($unr))
+						unset($unr);
+					if (isset($lektor))
+						unset($lektor);
+					if (isset($lehrverband))
+						unset($lehrverband);
+					if (isset($lehrfach))
+						unset($lehrfach);
 					foreach ($this->std_plan[$i][$j] as $lehrstunde)
 					{
 						$unr[]=$lehrstunde->unr;

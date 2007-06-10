@@ -137,7 +137,7 @@ class lvgesamtnote
 			$this->errormsg = 'Lehrveranstaltung_id ist ungueltig';
 			return false;
 		}
-		if($student_uid=='')
+		if($this->student_uid=='')
 		{
 			$this->errormsg = 'UID muss angegeben werden';
 			return false;

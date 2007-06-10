@@ -131,7 +131,7 @@ class schluesseltyp
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Zugriff auf den Schluesseltypen-Datensatz: '.$this->schluesseltyp.' '.$qry;
+			$this->errormsg = 'Fehler beim Zugriff auf den Schluesseltypen-Datensatz: '.$this->schluesseltyp.' '.$qry1;
 			return false;
 		}
 	}

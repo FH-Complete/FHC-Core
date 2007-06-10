@@ -199,7 +199,7 @@ class akte
 		else 
 		{
 			//Bestehenden Datensatz aktualisieren
-			$qry= "UPDATE public.tbl_akte SET ";
+			$qry= "UPDATE public.tbl_akte SET".
 				  " person_id=".$this->addslashes($this->person_id).",".
 				  " dokument_kurzbz=".$this->addslashes($this->dokument_kurzbz).",".
 				  " inhalt=".$this->addslashes($this->inhalt).",".
@@ -212,7 +212,7 @@ class akte
 				  " updatevon=".$this->addslashes($this->updatevon).",".
 				  " ext_id=".$this->addslashes($this->ext_id).",".
 				  " uid=".$this->addslashes($this->uid).
-				  " WHERE akte_id='".addslashes($akte_id)."'";
+				  " WHERE akte_id='".addslashes($this->akte_id)."'";
 		}
 		
 		if(pg_query($this->conn, $qry))

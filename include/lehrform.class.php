@@ -64,7 +64,7 @@ class lehrform
 	// *********************************************************
 	function load($lehrform_kurzbz)
 	{
-		$qry = "SELECT * FROM lehre.tbl_lehrform WHERE lehrform_kurzbz='".addslashes($lehrfach_nr)."'";
+		$qry = "SELECT * FROM lehre.tbl_lehrform WHERE lehrform_kurzbz='".addslashes($lehrform_kurzbz)."'";
 		if(!$result=pg_query($this->conn,$qry))
 		{
 			$this->errormsg = 'Fehler beim lesen der Lehrform';
