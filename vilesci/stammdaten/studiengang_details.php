@@ -1,5 +1,6 @@
 <?php
 	require_once('../config.inc.php');
+	require_once('../../include/globals.inc.php');
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/studiengang.class.php');
 	require_once('../../include/erhalter.class.php');
@@ -13,6 +14,9 @@
 	$sel = "";
 	$chk = "";
 
+	$sg_var = new studiengang($conn);
+	$studiengang_typ_arr = $sg_var->studiengang_typ_arr;
+	
 	$studiengang_kz = "";
 	$kurzbz = "";
 	$kurzbzlang = "";
@@ -94,35 +98,7 @@
 
 		if(!$sg_update->save())
 		{
-			/*
-			$studiengang_kz = $_POST["studiengang_kz"];
-			$kurzbz = $_POST["kurzbz"];
-			$kurzbzlang = $_POST["kurzbzlang"];
-			$typ = $_POST["typ"];
-			$bezeichnung = $_POST["bezeichnung"];
-			$english = $_POST["english"];
-			$farbe = $_POST["farbe"];
-			$email = $_POST["email"];
-			$telefon = $_POST["telefon"];
-			$max_semester = $_POST["max_semester"];
-			$max_verband = $_POST["max_verband"];
-			$max_gruppe = $_POST["max_gruppe"];
-			$erhalter_kz = $_POST["erhalter_kz"];
-			$bescheid = $_POST["bescheid"];
-			$bescheidbgbl1 = $_POST["bescheidbgbl1"];
-			$bescheidbgbl2 = $_POST["bescheidbgbl1"];
-			$bescheidgz = $_POST["bescheidgz"];
-			$bescheidvom = $_POST["bescheidvom"];
-			$organisationsform = $_POST["organisationsform"];
-			$titelbescheidvom = $_POST["titelbescheidvom"];
-			if(isset($_POST["aktiv"]))
-				$aktiv = $_POST["aktiv"];
-			else
-				$aktiv = "f";
-			$ext_id = $_POST["ext_id"];
-			*/
 			$errorstr .= $sg_update->errormsg;
-			//die($sg_update->errormsg);
 		}
 		$reloadstr .= "<script type='text/javascript'>\n";
 		$reloadstr .= "	parent.uebersicht.location.href='studiengang_uebersicht.php';";
@@ -167,8 +143,8 @@
    	if (!$erh->getAll('kurzbz'))
        	die($erh->errormsg);
 		
-	$htmlstr .= "<br><div class='kopf'>Studiengang <b>".$bezeichnung."</b></div>";
-	$htmlstr .= "<form action='studiengang_details.php' method='POST' name='studiengangform'>";
+	$htmlstr .= "<br><div class='kopf'>Studiengang <b>".$bezeichnung."</b></div>\n";
+	$htmlstr .= "<form action='studiengang_details.php' method='POST' name='studiengangform'>\n";
 	$htmlstr .= "<table class='detail'>\n";
 
 
@@ -249,37 +225,21 @@
 	$htmlstr .= "				<tr>\n";
 	$htmlstr .= "					<td>Typ</td>\n";
 	$htmlstr .= "					<td\n>";
+	
 	$htmlstr .= "						<select name='typ' onchange='submitable()'>\n";
 	$htmlstr .= "							<option value=''></option>\n";
-	if ($typ == "b")
-		$sel = " selected";
-	else
-		$sel = "";
-	$htmlstr .= "							<option value='b'".$sel.">Bakk</option>\n";
-	if ($typ == "d")
-		$sel = " selected";
-	else
-		$sel = "";
-	$htmlstr .= "							<option value='d'".$sel.">Diplom</option>\n";
-	if ($typ == "m")
-		$sel = " selected";
-	else
-		$sel = "";
-	$htmlstr .= "							<option value='m'".$sel.">Master</option>\n";
-	if ($typ == "l")
-		$sel = " selected";
-	else
-		$sel = "";
-	$htmlstr .= "							<option value='' disabled>---</option>";
-	$htmlstr .= "							<option value='l'".$sel.">LLL</option>\n";
-	if ($typ == "e")
-		$sel = " selected";
-	else
-		$sel = "";
-	$htmlstr .= "							<option value='e'".$sel.">Erhalter</option>\n";
+
+	foreach(array_keys($studiengang_typ_arr) as $typkey)
+	{
+		if ($typ == $typkey)
+			$sel = " selected";
+		else
+			$sel = "";
+		$htmlstr .= "							<option value='".$typkey."'".$sel.">".$studiengang_typ_arr[$typkey]."</option>\n";
+	}
 	$htmlstr .= "						</select>\n";
 	$htmlstr .= "					</td>\n";
-	//$htmlstr .= "					<td><input class='detail' type='text' name='typ' size='16' maxlength='1' value='".$sg->typ."' onchange='submitable()'></td>\n";
+	
 	$htmlstr .= "				</tr>\n";
 
 
@@ -454,7 +414,6 @@ function submitable()
 <body style="background-color:#eeeeee;">
 
 <?php
-
 	echo $htmlstr;
 	echo $reloadstr;
 ?>
