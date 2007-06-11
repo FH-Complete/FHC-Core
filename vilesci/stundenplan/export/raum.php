@@ -13,7 +13,7 @@
 		// this looks better under WinX
 		if (eregi("Win",$os)) $crlf="\r\n";
 	}
-	include('../../../include/config.inc.php');
+	include('../../config.inc.php');
 	include('../../../include/functions.inc.php');
 	if (!$conn = @pg_pconnect($conn_string)) 
 	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
