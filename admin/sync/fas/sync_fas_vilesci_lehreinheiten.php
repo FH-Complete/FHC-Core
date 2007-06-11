@@ -24,6 +24,7 @@ $adress='ruhan@technikum-wien.at';
 
 $error_log='';
 $text = '';
+$ausgabe_all='';
 $ausgabe='';
 $ausgabe_le='';
 $ausgabe_lm='';
@@ -41,6 +42,9 @@ $anzahl_fehler_lg=0;
 $anzahl_eingefuegt_lm=0;
 $anzahl_geaendert_lm=0;
 $anzahl_fehler_lm=0;
+$le_iu='';
+$lm_iu='';
+$lg_iu='';
 
 $m_uid='';
 $lektor='';
@@ -122,8 +126,8 @@ if($result = pg_query($conn_fas, $qry))
 }
 		
 $qry_main = "SELECT *,lehreinheit.lehreinheit_fk as le_fk, mitarbeiter_lehreinheit.creationdate as lm_creationdate FROM lehreinheit, mitarbeiter_lehreinheit 
-		WHERE lehreinheit.lehreinheit_pk=mitarbeiter_lehreinheit.lehreinheit_fk 
-		ORDER BY lehreinheit.lehreinheit_fk;";
+		WHERE lehreinheit.lehreinheit_pk=mitarbeiter_lehreinheit.lehreinheit_fk  
+		ORDER BY lehreinheit.lehreinheit_fk LIMIT 10;";
 
 if($result = pg_query($conn_fas, $qry_main))
 {
@@ -425,18 +429,26 @@ if($result = pg_query($conn_fas, $qry_main))
 				}
 			}
 		}
+		if($error)
+		{
+			continue;
+		}
 		if($lehreinheit_part<0)
 		{
 			//nicht-partizipierend
 			pg_query($conn,'BEGIN;');
 			$qry="	SELECT * FROM campus.vw_lehreinheit WHERE lehrveranstaltung_id='".$lehrveranstaltung_id."' 
 				AND studiensemester_kurzbz='".$studiensemester_kurzbz."' AND lehrform_kurzbz='".$lehrform_kurzbz."' 
-				AND lvnr='".$lvnr."' 
+				AND lvnr='".($lvnr)."' 
 				AND ".($raumtyp!=''?"raumtyp=".myaddslashes($raumtyp):"raumtyp IS NULL")." 
 				AND ".($raumtypalternativ!=''?"raumtypalternativ=".myaddslashes($raumtypalternativ):"raumtypalternativ IS NULL")." 
 				AND ".($stundenblockung!=''?"stundenblockung=".myaddslashes($stundenblockung):"stundenblockung IS NULL")." 
 				AND ".($start_kw!=''?"start_kw=".myaddslashes($start_kw):"start_kw IS NULL")." 
+				AND ".(round($row->gesamtstunden)!=''?"planstunden=".myaddslashes(round($row->gesamtstunden)):"planstunden IS NULL")." 
 				AND ".($m_uid!=''?"mitarbeiter_uid=".myaddslashes($m_uid):"mitarbeiter_uid IS NULL")." 
+				AND lehrfach_bez=".myaddslashes($bezeichnung)." AND lehrfach=".myaddslashes($kurzbezeichnung)." 
+				AND fachbereich_kurzbz=".myaddslashes($fachbereich_kurzbz)." 
+				AND studiengang_kz=".myaddslashes($studiengang_kz)." 
 				AND ((".($gruppe_kurzbz!=''?"gruppe_kurzbz=".myaddslashes($gruppe_kurzbz):"gruppe_kurzbz IS NULL")." AND gruppe_kurzbz IS NOT NULL) OR
 				(".($semester!=''?"semester=".myaddslashes($semester):"semester IS NULL")." AND ".($verband!=''?"verband=".myaddslashes($verband):"verband IS NULL")." 
 				AND ".($gruppe!=''?"gruppe=".myaddslashes($gruppe):"gruppe IS NULL")." AND semester IS NOT NULL AND gruppe_kurzbz IS NULL));";
@@ -445,9 +457,14 @@ if($result = pg_query($conn_fas, $qry_main))
 			{
 				if(pg_num_rows($result2)>0)
 				{
+					/*if(pg_num_rows($result2)>1)
+					{
+						echo pg_num_rows($result2)."/".$qry."<br>";
+					}*/
 					if($row2=pg_fetch_object($result2))
 					{ 	
 						//update
+						$le_iu='u';
 						$update=false;
 						if($row2->lehrveranstaltung_id!=$lehrveranstaltung_id)
 						{
@@ -689,6 +706,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								}
 								$ausgabe.="Lehreinheit lvnr='".$lvnr." Studiensemester='".$studiensemester_kurzbz."' verändert: ".$ausgabe_le.".\n";
 								$anzahl_geaendert++;
+								
 							}
 							else 
 							{
@@ -703,6 +721,7 @@ if($result = pg_query($conn_fas, $qry_main))
 				else 
 				{
 					//insert
+					$le_iu='i';
 					$qry="INSERT INTO lehre.tbl_lehreinheit (lehrveranstaltung_id, studiensemester_kurzbz, lehrfach_id, ".
 						"lehrform_kurzbz, stundenblockung, wochenrythmus, start_kw, raumtyp, raumtypalternativ, sprache, ".
 						"lehre, anmerkung, unr, lvnr, updateamum, updatevon, insertamum, insertvon, ext_id) VALUES (".
@@ -771,7 +790,7 @@ if($result = pg_query($conn_fas, $qry_main))
 			//$mitarbeiter_uid				=m_uid;
 			$lehrfunktion_kurzbz				=$lehrfunktionen[$lehrfunktion];
 			$semesterstunden				=round($row->gesamtstunden,2);
-			$planstunden					=round($row->gesamtstunden,2);
+			$planstunden					=round($row->gesamtstunden);
 			$stundensatz					=$row->plankostenprolektor;
 			$faktor					=$row->faktor;
 			$anmerkung					='';
@@ -798,6 +817,7 @@ if($result = pg_query($conn_fas, $qry_main))
 				if($row3=pg_fetch_object($result3))
 				{ 
 					//update
+					$lm_iu='u';
 					$update=false;
 					if($row3->lehrfunktion_kurzbz!=$lehrfunktion_kurzbz)
 					{
@@ -926,6 +946,7 @@ if($result = pg_query($conn_fas, $qry_main))
 				else 
 				{
 					//insert
+					$lm_iu='i';
 					$qry="INSERT INTO lehre.tbl_lehreinheitmitarbeiter (lehreinheit_id, mitarbeiter_uid, lehrfunktion_kurzbz, semesterstunden, 
 						planstunden, stundensatz, faktor, anmerkung, bismelden, updateamum, updatevon, insertamum, insertvon,
 						ext_id) VALUES (".
@@ -987,6 +1008,7 @@ if($result = pg_query($conn_fas, $qry_main))
 				if($row3=pg_fetch_object($result3))
 				{ 
 					//update
+					$lg_iu='u';
 					$update=false;
 					if($row3->lehreinheit_id!=$lehreinheit_id)
 					{
@@ -1114,6 +1136,7 @@ if($result = pg_query($conn_fas, $qry_main))
 				else 
 				{
 					//insert
+					$lg_iu='i';
 					$qry="INSERT INTO lehre.tbl_lehreinheitgruppe (lehreinheit_id, studiengang_kz, semester, verband, gruppe,
 						gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id) VALUES (".
 						myaddslashes($lehreinheit_id).", ".
@@ -1144,10 +1167,30 @@ if($result = pg_query($conn_fas, $qry_main))
 			}
 			if(!$error)
 			{
+				$ausgabe_all.=$ausgabe;
+				$ausgabe='';
 				pg_query($conn,'COMMIT;');
+				
 			}
 			else 
 			{
+				if($le_iu=='i')
+				{
+					$anzahl_eingefuegt--;
+				}
+				else 
+				{
+					$anzahl_geaendert--;
+				}
+				if($lm_iu=='i')
+				{
+					$anzahl_eingefuegt_lm--;
+				}
+				else 
+				{
+					$anzahl_geaendert_lm--;
+				}
+				$ausgabe='';
 				pg_query($conn,'ROLLBACK;');
 			}
 		}
@@ -1406,6 +1449,7 @@ if($result = pg_query($conn_fas, $qry_main))
 						if($row3=pg_fetch_object($result3))
 						{ 
 							//update
+							$lg_iu='u';
 							$update=false;
 							if($row3->lehreinheit_id!=$lehreinheit_id)
 							{
@@ -1533,6 +1577,7 @@ if($result = pg_query($conn_fas, $qry_main))
 						else 
 						{
 							//insert
+							$lg_iu='i';
 							$qry="INSERT INTO lehre.tbl_lehreinheitgruppe (lehreinheit_id, studiengang_kz, semester, verband, gruppe,
 								gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id) VALUES (".
 								myaddslashes($lehreinheit_id).", ".
@@ -1565,10 +1610,13 @@ if($result = pg_query($conn_fas, $qry_main))
 			}
 			if(!$error)
 			{
+				$ausgabe_all.=$ausgabe;
+				$ausgabe='';
 				pg_query($conn,'COMMIT;');
 			}
 			else 
 			{
+				$ausgabe='';
 				pg_query($conn,'ROLLBACK;');
 			}
 		}
@@ -1580,10 +1628,11 @@ if($result = pg_query($conn_fas, $qry_main))
 	echo "Partizipierende LEs Gesamt: ".$anzahl_part_gesamt." / Eingefügt: ".$anzahl_part."<br><br>";
 	echo "Lehreinheit-Mitarbeiter: Eingefügt:".$anzahl_eingefuegt_lm." / Geändert:".$anzahl_geaendert_lm." / Fehler:".$anzahl_fehler_lm."<br>";
 	echo "Lehreinheit-Gruppen: Eingefügt:".$anzahl_eingefuegt_lg." / Geändert:".$anzahl_geaendert_lg." / Fehler:".$anzahl_fehler_lg."<br><br>";
-	echo nl2br($error_log. "\n------------------------------------------------------------------------\n".$ausgabe);
+	//echo nl2br($error_log. "\n------------------------------------------------------------------------\n".$ausgabe_all);
+	echo nl2br("\n------------------------------------------------------------------------\n".$ausgabe_all);
 	
 	mail($adress, 'SYNC-Fehler Lehreinheiten  von '.$_SERVER['HTTP_HOST'], $error_log, "From: vilesci@technikum-wien.at");
-	mail($adress, 'SYNC Lehreinheiten von '.$_SERVER['HTTP_HOST'], "Sync Lehreinheiten\n-----------------------\n\nGesamt: ".$anzahl_quelle." / Eingefügt: ".$anzahl_eingefuegt." / Geändert: ".$anzahl_geaendert." / Fehler: ".$anzahl_fehler."\nPartizipierende LEs Gesamt: ".$anzahl_part_gesamt." / Eingefügt: ".$anzahl_part."\n\nLehreinheit-Mitarbeiter: Eingefügt:".$anzahl_eingefuegt_lm." / Geändert:".$anzahl_geaendert_lm." / Fehler:".$anzahl_fehler_lm."\nLehreinheit-Gruppen: Eingefügt:".$anzahl_eingefuegt_lg." / Geändert:".$anzahl_geaendert_lg." / Fehler:".$anzahl_fehler_lg."\n\n".$ausgabe, "From: vilesci@technikum-wien.at");
+	mail($adress, 'SYNC Lehreinheiten von '.$_SERVER['HTTP_HOST'], "Sync Lehreinheiten\n-----------------------\n\nGesamt: ".$anzahl_quelle." / Eingefügt: ".$anzahl_eingefuegt." / Geändert: ".$anzahl_geaendert." / Fehler: ".$anzahl_fehler."\nPartizipierende LEs Gesamt: ".$anzahl_part_gesamt." / Eingefügt: ".$anzahl_part."\n\nLehreinheit-Mitarbeiter: Eingefügt:".$anzahl_eingefuegt_lm." / Geändert:".$anzahl_geaendert_lm." / Fehler:".$anzahl_fehler_lm."\nLehreinheit-Gruppen: Eingefügt:".$anzahl_eingefuegt_lg." / Geändert:".$anzahl_geaendert_lg." / Fehler:".$anzahl_fehler_lg."\n\n".$ausgabe_all, "From: vilesci@technikum-wien.at");
 	
 }
 ?>
