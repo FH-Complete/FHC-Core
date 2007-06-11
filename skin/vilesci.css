@@ -19,7 +19,8 @@ table.menu
 }
 table.liste
 {  
-	border: 1;
+	width:100%;
+    border: 1;
 	cellspacing: 0;
 	cellpadding: 0;
 	font-size: small;
@@ -615,3 +616,49 @@ pre.data
 .comment {color: #008080}
 .keyword {color: #FF8000}
 .literal {color: #808080}
+
+/* neu */
+table.detail
+{
+    border-style:solid;
+    border-color:#777777;
+    border-width:1px;
+    width:100%;
+    padding:2px;
+}
+
+.kopf
+{
+    position:absolute;
+    top:10px;
+    left:10px;
+    border-color:#777777;
+    border-style:solid;
+    border-width:1px;
+    background-color:#eeeeee;
+    padding:2px;
+}
+
+input, textarea, select
+{
+	border-width:1px;
+	border-color:#999999;
+	border-style:solid;
+	padding:1px;
+}
+
+.input_error
+{
+	background-color:#FC988D;
+}
+.input_ok
+{
+	background-color:#ffffff;
+}
+
+.inserterror
+{
+	background-color:#FC988D;
+	width:100%;
+	text-align:center;
+}
