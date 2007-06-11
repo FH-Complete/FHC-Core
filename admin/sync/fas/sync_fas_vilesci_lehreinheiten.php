@@ -127,7 +127,7 @@ if($result = pg_query($conn_fas, $qry))
 		
 $qry_main = "SELECT *,lehreinheit.lehreinheit_fk as le_fk, mitarbeiter_lehreinheit.creationdate as lm_creationdate FROM lehreinheit, mitarbeiter_lehreinheit 
 		WHERE lehreinheit.lehreinheit_pk=mitarbeiter_lehreinheit.lehreinheit_fk  
-		ORDER BY lehreinheit.lehreinheit_fk LIMIT 10;";
+		ORDER BY lehreinheit.lehreinheit_fk;";
 
 if($result = pg_query($conn_fas, $qry_main))
 {
@@ -457,11 +457,14 @@ if($result = pg_query($conn_fas, $qry_main))
 			{
 				if(pg_num_rows($result2)>0)
 				{
-					/*if(pg_num_rows($result2)>1)
+					if(pg_num_rows($result2)>1)
 					{
 						echo pg_num_rows($result2)."/".$qry."<br>";
-					}*/
-					if($row2=pg_fetch_object($result2))
+						pg_query($conn,'ROLLBACK;');
+						continue;
+						
+					}
+					 elseif($row2=pg_fetch_object($result2))
 					{ 	
 						//update
 						$le_iu='u';
@@ -1247,6 +1250,7 @@ if($result = pg_query($conn_fas, $qry_main))
 					if($error)
 					{
 						$anzahl_fehler++;
+						pg_query($conn,'ROLLBACK;');
 						continue;
 					}
 					//studiengang ermitteln
@@ -1268,6 +1272,7 @@ if($result = pg_query($conn_fas, $qry_main))
 					if($error)
 					{
 						$anzahl_fehler++;
+						pg_query($conn,'ROLLBACK;');
 						continue;
 					}
 					//gruppe ermitteln
@@ -1406,6 +1411,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									{
 										//$error_log="Gruppentyp nicht 1, 2, 3 oder 10.\n";
 										//$error=true;
+										pg_query($conn,'ROLLBACK;');
 										continue;
 									}
 								}
