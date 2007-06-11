@@ -1,9 +1,4 @@
 <?php
-	// Auth: Benutzer des Webportals
-	//define ('USER_UID','strtolower(trim($_SERVER["REMOTE_USER"]))');
-	// fuer Testzwecke
-	define ('USER_UID','pam');
-
 	// Hintergrundfarben fuer Tabellen beim Zeitwunsch
 	global $cfgStdBgcolor;
 	$cfgStdBgcolor=array();
