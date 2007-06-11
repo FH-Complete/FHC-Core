@@ -770,8 +770,8 @@ if($result = pg_query($conn_fas, $qry_main))
 			//$lehreinheit_id
 			//$mitarbeiter_uid				=m_uid;
 			$lehrfunktion_kurzbz				=$lehrfunktionen[$lehrfunktion];
-			$semesterstunden				=$row->gesamtstunden;
-			$planstunden					=round($row->gesamtstunden);
+			$semesterstunden				=round($row->gesamtstunden,2);
+			$planstunden					=round($row->gesamtstunden,2);
 			$stundensatz					=$row->plankostenprolektor;
 			$faktor					=$row->faktor;
 			$anmerkung					='';
@@ -909,14 +909,16 @@ if($result = pg_query($conn_fas, $qry_main))
 						"insertamum=".myaddslashes($lm_insertamum).", ".
 						"ext_id=".myaddslashes($lm_ext_id)." ".
 						"WHERE lehreinheit_id=".myaddslashes($lehreinheit_id)." AND mitarbeiter_uid=".myaddslashes($m_uid).";";
-						if(!pg_query($conn, $qry))
+						if(pg_query($conn, $qry))
 						{
-							$error=true;
-							$error_log.="Lehreinheitmitarbeiter '".$m_uid."' mit LE '".$lehreiheit_id."' konnte nicht aktualisiert werden!\n";
+							$ausgabe.="Lehreinheitmitarbeiter '".$m_uid."' aktualisiert bei Lehreinheit='".$lehreinheit_id."': ".$ausgabe_lm."\n";
+							$anzahl_geaendert_lm++;
 						}
 						else 
 						{
-							$ausgabe.="Lehreinheitmitarbeiter '".$m_uid."' aktualisiert bei Lehreinheit='".$lehreinheit_id."': ".$ausgabe_lm."\n";
+							$anzahl_fehler_lm++;
+							$error=true;
+							$error_log.="Lehreinheitmitarbeiter '".$m_uid."' mit LE '".$lehreiheit_id."' konnte nicht aktualisiert werden!\n";
 						}
 					}
 					$ausgabe_lm='';
@@ -943,16 +945,16 @@ if($result = pg_query($conn_fas, $qry_main))
 						myaddslashes($lm_ext_id).
 						");";
 						
-					if(!pg_query($conn, $qry))
+					if(pg_query($conn, $qry))
+					{
+						$anzahl_eingefuegt_lm++;
+						$ausgabe.="Lehreinheitmitarbeiter '".$m_uid."' mit Lehreinheit='".$lehreinheit_id."' eingefügt.\n";
+					}
+					else 
 					{
 						$anzahl_fehler_lm++;
 						$error=true;
 						$error_log.="Lehreinheitmitarbeiter '".$m_uid."' konnte nicht eingefügt werden!\n";
-					}
-					else 
-					{
-						$anzahl_eingefuegt_lm++;
-						$ausgabe.="Lehreinheitmitarbeiter '".$m_uid."' mit Lehreinheit='".$lehreinheit_id."' eingefügt.\n";
 					}
 				}
 			}
@@ -1095,16 +1097,16 @@ if($result = pg_query($conn_fas, $qry_main))
 						"insertamum=".myaddslashes($lg_insertamum).", ".
 						"ext_id=".myaddslashes($lg_ext_id)." ".
 						"WHERE lehreinheit_id=".myaddslashes($lehreinheit_id).";";
-						if(!pg_query($conn, $qry))
+						if(pg_query($conn, $qry))
+						{
+							$anzahl_geaendert_lg++;
+							$ausgabe.="Lehreinheitgruppe '".$row3->lehreinheitgruppe_id."' aktualisiert bei Lehreinheit='".$lehreinheit_id."': ".$ausgabe_lm."\n";
+						}
+						else 
 						{
 							$anzahl_fehler_lg++;
 							$error=true;
 							$error_log.="Lehreinheitgruppe '".$row3->lehreinheitgruppe_id."' mit LE '".$lehreiheit_id."' konnte nicht aktualisiert werden!\n";
-						}
-						else 
-						{
-							$anzahl_geaendert_lg++;
-							$ausgabe.="Lehreinheitgruppe '".$row3->lehreinheitgruppe_id."' aktualisiert bei Lehreinheit='".$lehreinheit_id."': ".$ausgabe_lm."\n";
 						}
 					}
 					$ausgabe_lm='';
@@ -1126,17 +1128,17 @@ if($result = pg_query($conn_fas, $qry_main))
 						myaddslashes($lg_insertvon).", ".
 						myaddslashes($lg_ext_id)." ".
 						");";
-					if(!pg_query($conn, $qry))
+					if(pg_query($conn, $qry))
+					{
+						$anzahl_eingefuegt_lg++;
+						$ausgabe.="Lehreinheitgruppe mit Lehreinheit='".$lehreinheit_id."' und Studiengang '".$studiengang_kz."'eingefügt.\n";
+					}
+					else 
 					{
 						$anzahl_fehler_lg++;
 						echo $qry."<br>";
 						$error=true;
 						$error_log.="Lehreinheitgruppe mit LE '".$lehreinheit_id."' in Studiengang '".$studiengang_kz."' konnte nicht eingefügt werden!\n";
-					}
-					else 
-					{
-						$anzahl_eingefuegt_lg++;
-						$ausgabe.="Lehreinheitgruppe mit Lehreinheit='".$lehreinheit_id."' und Studiengang '".$studiengang_kz."'eingefügt.\n";
 					}
 				}
 			}
@@ -1380,9 +1382,9 @@ if($result = pg_query($conn_fas, $qry_main))
 					$lehreinheit_id				=$row5->lehreinheit_id;
 					//$studiengang_kz				='';
 					//$semester					='';
-					$verband					='';
-					$gruppe					='';
-					$gruppe_kurzbz				='';
+					//$verband					='';
+					//$gruppe					='';
+					//$gruppe_kurzbz				='';
 					//$lg_updateamum				='';
 					//$lg_updatevon				='';
 					//$lg_insertvon				='';
@@ -1514,16 +1516,16 @@ if($result = pg_query($conn_fas, $qry_main))
 								"insertamum=".myaddslashes($lg_insertamum).", ".
 								"ext_id=".myaddslashes($lg_ext_id)." ".
 								"WHERE lehreinheit_id=".myaddslashes($lehreinheit_id).";";
-								if(!pg_query($conn, $qry))
+								if(pg_query($conn, $qry))
+								{
+									$anzahl_geaendert_lg++;
+									$ausgabe.="Lehreinheitgruppe '".$row3->lehreinheitgruppe_id."' aktualisiert bei Lehreinheit='".$lehreinheit_id."': ".$ausgabe_lm."\n";
+								}
+								else 
 								{
 									$anzahl_fehler_lg++;
 									$error=true;
 									$error_log.="Lehreinheitgruppe '".$row3->lehreinheitgruppe_id."' mit LE '".$lehreiheit_id."' konnte nicht aktualisiert werden!\n";
-								}
-								else 
-								{
-									$anzahl_geaendert_lg++;
-									$ausgabe.="Lehreinheitgruppe '".$row3->lehreinheitgruppe_id."' aktualisiert bei Lehreinheit='".$lehreinheit_id."': ".$ausgabe_lm."\n";
 								}
 							}
 							$ausgabe_lm='';
@@ -1545,16 +1547,16 @@ if($result = pg_query($conn_fas, $qry_main))
 								myaddslashes($lg_insertvon).", ".
 								myaddslashes($lg_ext_id)." ".
 								");";
-							if(!pg_query($conn, $qry))
+							if(pg_query($conn, $qry))
+							{
+								$anzahl_eingefuegt_lg++;
+								$ausgabe.="Lehreinheitgruppe '".$row3->lehreinheitgruppe_id."' mit Lehreinheit='".$lehreinheit_id."' eingefügt.\n";
+							}
+							else 
 							{
 								$anzahl_fehler_lg++;
 								$error=true;
 								$error_log.="Lehreinheitgruppe '".$row3->lehreinheitgruppe_id."' mit LE '".$lehreiheit_id."' konnte nicht eingefügt werden!\n";
-							}
-							else 
-							{
-								$anzahl_eingefuegt_lg++;
-								$ausgabe.="Lehreinheitgruppe '".$row3->lehreinheitgruppe_id."' mit Lehreinheit='".$lehreinheit_id."' eingefügt.\n";
 							}
 						}
 					}
