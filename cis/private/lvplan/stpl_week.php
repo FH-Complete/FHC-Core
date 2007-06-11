@@ -43,11 +43,11 @@
 //$datum=1102260015;
 
 require_once('../../config.inc.php');
-require_once('../../../include/globals.inc.php');
+//require_once('../../../include/globals.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/wochenplan.class.php');
 
-$uid=USER_UID;
+$uid=get_uid();
 
 
 // Deutsche Umgebung
