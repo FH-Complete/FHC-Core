@@ -8,10 +8,13 @@
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 	$reloadstr = "";  // neuladen der liste im oberen frame
-
-	if((isset($_POST["schick"])) || (isset($_POST["schickneu"])))
+	$htmlstr = "";
+	$errorstr = ""; //fehler beim insert
+	$sel = "";
+	$chk = "";
+	
+	if(isset($_POST["schick"]))
 	{
-
 		$kennzahl = $_POST["studiengang_kz"];
 		$kurzbz = $_POST["kurzbz"];
 		$kurzbzlang = $_POST["kurzbzlang"];
@@ -62,20 +65,45 @@
 		$sg_update->aktiv = $aktiv;
 		$sg_update->ext_id = $ext_id;
 
-		if (isset($_POST["schickneu"]))
+		if ($_POST["neu"] == "true")
 			$sg_update->new = 1;
 
 		if(!$sg_update->save())
-			die($sg_update->errormsg);
-
+		{
+			$kennzahl = $_POST["studiengang_kz"];
+			$kurzbz = $_POST["kurzbz"];
+			$kurzbzlang = $_POST["kurzbzlang"];
+			$typ = $_POST["typ"];
+			$bezeichnung = $_POST["bezeichnung"];
+			$english = $_POST["english"];
+			$farbe = $_POST["farbe"];
+			$email = $_POST["email"];
+			$telefon = $_POST["telefon"];
+			$max_semester = $_POST["max_semester"];
+			$max_verband = $_POST["max_verband"];
+			$max_gruppe = $_POST["max_gruppe"];
+			$erhalter_kz = $_POST["erhalter_kz"];
+			$bescheid = $_POST["bescheid"];
+			$bescheidbgbl1 = $_POST["bescheidbgbl1"];
+			$bescheidbgbl2 = $_POST["bescheidbgbl1"];
+			$bescheidgz = $_POST["bescheidgz"];
+			$bescheidvom = $_POST["bescheidvom"];
+			$organisationsform = $_POST["organisationsform"];
+			$titelbescheidvom = $_POST["titelbescheidvom"];
+			if(isset($_POST["aktiv"]))
+				$aktiv = $_POST["aktiv"];
+			else
+				$aktiv = "f";
+			$ext_id = $_POST["ext_id"];
+			$errorstr .= $sg_update->errormsg;
+			//die($sg_update->errormsg);
+		}
 		$reloadstr .= "<script type='text/javascript'>\n";
 		$reloadstr .= "	parent.uebersicht.location.href='studiengang_uebersicht.php';";
 		$reloadstr .= "</script>\n";
 	}
 
-	$htmlstr = "";
-	$sel = "";
-	$chk = "";
+
 
 	if (isset($_REQUEST['studiengang_kz']))
 	{
@@ -83,194 +111,247 @@
 		$sg = new studiengang($conn,$kennzahl);
 		if ($sg->errormsg!='')
 			die($sg->errormsg);
-
-		$erh = new erhalter($conn);
-
-    	if (!$erh->getAll('kurzbz'))
-        	die($erh->errormsg);
-		$htmlstr .= "<br><div class='kopf'>Studiengang <b>".$sg->bezeichnung."</b></div>";
-		$htmlstr .= "<form action='studiengang_details.php' method='POST' name='studiengangform'>";
-		$htmlstr .= "<table class='detail'>\n";
-
-
-		$htmlstr .= "	<tr><td colspan='3'>&nbsp;</tr>\n";
-		$htmlstr .= "	<tr>\n";
-
-		// ertse Spalte start
-		$htmlstr .= "		<td valign='top'>\n";
-
-		$htmlstr .= "			<table>\n";
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>Kennzahl</td>\n";
-		$htmlstr .= "					<td><input class='detail' type='text' name='studiengang_kz' size='16' maxlength='4' value='".$sg->studiengang_kz."' onchange='submitable()' readonly></td>\n";
-		$htmlstr .= "				</tr>\n";
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>Kurzbezeichnung</td>\n";
-		$htmlstr .= "					<td><input class='detail' type='text' name='kurzbz' size='16' maxlength='3' value='".$sg->kurzbz."' onchange='submitable()'></td>\n";
-		$htmlstr .= "				</tr>\n";
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>KurzbezeichnungLang</td>\n";
-		$htmlstr .= " 					<td><input class='detail' type='text' name='kurzbzlang' size='16' maxlength='8' value='".$sg->kurzbzlang."' onchange='submitable()'></td>\n";
-		$htmlstr .= "				</tr>\n";
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>Max Semester</td>\n";
-		$htmlstr .= "					<td><input class='detail' type='text' name='max_semester' size='16' maxlength='2' value='".$sg->max_semester."' onchange='submitable()'></td>\n";
-		$htmlstr .= "				</tr>\n";
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>Max Verband</td>\n";
-		$htmlstr .= "					<td><input class='detail' type='text' name='max_verband' size='16' maxlength='1' value='".$sg->max_verband."' onchange='submitable()'></td>\n";
-		$htmlstr .= "				</tr>\n";
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>Max Gruppe</td>\n";
-		$htmlstr .= "					<td><input class='detail' type='text' name='max_gruppe' size='16' maxlength='1' value='".$sg->max_gruppe."' onchange='submitable()'></td>\n";
-		$htmlstr .= "				</tr>\n";
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>Organisationsform</td>\n";
-		$htmlstr .= "					<td><input class='detail' type='text' name='organisationsform' size='16' maxlength='1' value='".$sg->organisationsform."' onchange='submitable()'></td>\n";
-		$htmlstr .= "				</tr>\n";
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>Ext ID</td>\n";
-		$htmlstr .= "					<td><input class='detail' type='text' name='ext_id' size='16' maxlength='16' value='".$sg->ext_id."' onchange='submitable()'></td>\n";
-		$htmlstr .= "				</tr>\n";
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td valign='top'>Aktiv</td>\n";
-		$htmlstr .= " 					<td>\n";
-		if($sg->aktiv == 't')
-			$chk = "checked";
-		else
-			$chk = "";
-		$htmlstr .= "						<input type='checkbox' name='aktiv' value='t'".$chk." onchange='submitable()'>";
-		$htmlstr .= " 					</td>\n";
-		$htmlstr .= "				</tr>\n";
-		$htmlstr .= "			</table>\n";
-
-		$htmlstr .= "		</td>\n";
-		// 2. Spalte start
-		$htmlstr .= "		<td valign='top'>\n";
-
-		$htmlstr .= "			<table>\n";
-
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>Erhalter</td>\n";
-		$htmlstr .= "					<td\n>";
-		$htmlstr .= "						<select name='erhalter_kz' onchange='submitable()'>\n";
-
-		foreach($erh->result as $erhalter)
-		{
-			if ($sg->erhalter_kz == $erhalter->erhalter_kz)
-				$sel = " selected";
-			else
-				$sel = "";
-			$htmlstr .= "							<option value='".$erhalter->erhalter_kz."'".$sel.">".$erhalter->bezeichnung."</option>\n";
-		}
-		$htmlstr .= "						</select>\n";
-		$htmlstr .= "					</td>\n";
-		$htmlstr .= "				</tr>\n";
-
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>Typ</td>\n";
-		$htmlstr .= "					<td\n>";
-		$htmlstr .= "						<select name='typ' onchange='submitable()'>\n";
-		$htmlstr .= "							<option value=''></option>\n";
-		if ($sg->typ == "b")
-			$sel = " selected";
-		else
-			$sel = "";
-		$htmlstr .= "							<option value='b'".$sel.">Bakk</option>\n";
-		if ($sg->typ == "d")
-			$sel = " selected";
-		else
-			$sel = "";
-		$htmlstr .= "							<option value='d'".$sel.">Diplom</option>\n";
-		if ($sg->typ == "m")
-			$sel = " selected";
-		else
-			$sel = "";
-		$htmlstr .= "							<option value='m'".$sel.">Master</option>\n";
-		if ($sg->typ == "l")
-			$sel = " selected";
-		else
-			$sel = "";
-		$htmlstr .= "							<option value='' disabled>---</option>";
-		$htmlstr .= "							<option value='l'".$sel.">LLL</option>\n";
-		if ($sg->typ == "e")
-			$sel = " selected";
-		else
-			$sel = "";
-		$htmlstr .= "							<option value='e'".$sel.">Erhalter</option>\n";
-		$htmlstr .= "						</select>\n";
-		$htmlstr .= "					</td>\n";
-		//$htmlstr .= "					<td><input class='detail' type='text' name='typ' size='16' maxlength='1' value='".$sg->typ."' onchange='submitable()'></td>\n";
-		$htmlstr .= "				</tr>\n";
-
-
-
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>Farbe</td>\n";
-		$htmlstr .= " 					<td><input class='detail' type='text' name='farbe' size='16' maxlength='6' value='".$sg->farbe."' onchange='submitable()'></td>\n";
-		$htmlstr .= "				</tr>\n";
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>Bescheidbgbl1</td>\n";
-		$htmlstr .= "					<td><input class='detail' type='text' name='bescheidbgbl1' size='16' maxlength='16' value='".$sg->bescheidbgbl1."' onchange='submitable()'></td>\n";
-		$htmlstr .= "				</tr>\n";
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>Bescheidbgbl2</td>\n";
-		$htmlstr .= "					<td><input class='detail' type='text' name='bescheidbgbl2' size='16' maxlength='16' value='".$sg->bescheidbgbl2."' onchange='submitable()'></td>\n";
-		$htmlstr .= "				</tr>\n";
-				$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>Bescheidgz</td>\n";
-		$htmlstr .= "					<td><input class='detail' type='text' name='bescheidgz' size='16' maxlength='16' value='".$sg->bescheidgz."' onchange='submitable()'></td>\n";
-		$htmlstr .= "				</tr>\n";
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>Bescheidvom</td>\n";
-		$htmlstr .= "					<td><input class='detail' type='text' name='bescheidvom' size='16' maxlength='10' value='".$sg->bescheidvom."' onchange='submitable()'></td>\n";
-		$htmlstr .= "				</tr>\n";
-				$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>Titelbescheidvom</td>\n";
-		$htmlstr .= "					<td><input class='detail' type='text' name='titelbescheidvom' size='16' maxlength='10' value='".$sg->titelbescheidvom."' onchange='submitable()'></td>\n";
-		$htmlstr .= "				</tr>\n";
-		$htmlstr .= "			</table>\n";
-
-		$htmlstr .= "		</td>\n";
-		// 3. Spalte start
-		$htmlstr .= "		<td valign='top'>\n";
-
-		$htmlstr .= "			<table>\n";
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>Bezeichnung</td>\n";
-		$htmlstr .= "					<td><input class='detail' type='text' name='bezeichnung' size='50' maxlength='128' value='".$sg->bezeichnung."' onchange='submitable()'></td>\n";
-		$htmlstr .= "				</tr>\n";
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>English</td>\n";
-		$htmlstr .= "					<td><input class='detail' type='text' name='english' size='50' maxlength='128' value='".$sg->english."' onchange='submitable()'></td>\n";
-		$htmlstr .= "				</tr>\n";
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>Email</td>\n";
-		$htmlstr .= " 					<td><input class='detail' type='text' name='email' size='50' maxlength='64' value='".$sg->email."' onchange='submitable()'></td>\n";
-		$htmlstr .= "				</tr>\n";
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>Telefon</td>\n";
-		$htmlstr .= " 					<td><input class='detail' type='text' name='telefon' size='50' maxlength='32' value='".$sg->telefon."' onchange='submitable()'></td>\n";
-		$htmlstr .= "				</tr>\n";
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td valign='top'>Bescheid</td>\n";
-		$htmlstr .= " 					<td><textarea name='bescheid' cols='37' rows='5' onchange='submitable()'>".$sg->bescheid."</textarea></td>\n";
-		$htmlstr .= "				</tr>\n";
-
-		$htmlstr .= "			</table>\n";
-
-		$htmlstr .= "		</td>\n";
-
-		$htmlstr .= "	</tr>";
-		$htmlstr .= "</table>\n";
-		$htmlstr .= "<br>\n";
-		$htmlstr .= "<div align='right' id='sub'>\n";
-		$htmlstr .= "	<span id='submsg' style='color:red; visibility:hidden;'>Datensatz ge&auml;ndert!&nbsp;&nbsp;</span>\n";
-		$htmlstr .= "	<input type='submit' value='Speichern' name='schick' disabled>\n";
-		$htmlstr .= "	<input type='button' value='Reset' onclick='unchanged()'>\n";
-		$htmlstr .= "</div>";
-		$htmlstr .= "</form>";
+		$studiengang_kz = $sg->studiengang_kz;
+		$kurzbz = $sg->kurzbz;
+		$kurzbzlang = $sg->kurzbzlang;
+		$typ = $sg->typ;
+		$bezeichnung = $sg->bezeichnung;
+		$english = $sg->english;
+		$farbe = $sg->farbe;
+		$email = $sg->email;
+		$telefon = $sg->telefon;
+		$max_semester = $sg->max_semester;
+		$max_verband = $sg->max_verband;
+		$max_gruppe = $sg->max_gruppe;
+		$erhalter_kz = $sg->erhalter_kz;
+		$bescheid = $sg->bescheid;
+		$bescheidbgbl1 = $sg->bescheidbgbl1;
+		$bescheidbgbl2 = $sg->bescheidbgbl1;
+		$bescheidgz = $sg->bescheidgz;
+		$bescheidvom = $sg->bescheidvom;
+		$organisationsform = $sg->organisationsform;
+		$titelbescheidvom = $sg->titelbescheidvom;
+		$ext_id = $sg->ext_id;
+		$aktiv = $sg->aktiv;
+		$neu = "false";
 	}
+	else
+	{
+		$studiengang_kz = "";
+		$kurzbz = "";
+		$kurzbzlang = "";
+		$typ = "";
+		$bezeichnung = "";
+		$english = "";
+		$farbe = "";
+		$email = "";
+		$telefon = "";
+		$max_semester = "";
+		$max_verband = "";
+		$max_gruppe = "";
+		$erhalter_kz = "";
+		$bescheid = "";
+		$bescheidbgbl1 = "";
+		$bescheidbgbl2 = "";
+		$bescheidgz = "";
+		$bescheidvom = "";
+		$organisationsform = "";
+		$titelbescheidvom = "";
+		$ext_id = "";
+		$aktiv = "t";
+		$neu = "true";
+	}
+	
+	$erh = new erhalter($conn);
+
+   	if (!$erh->getAll('kurzbz'))
+       	die($erh->errormsg);
+		
+	$htmlstr .= "<br><div class='kopf'>Studiengang <b>".$bezeichnung."</b></div>";
+	$htmlstr .= "<form action='studiengang_details.php' method='POST' name='studiengangform'>";
+	$htmlstr .= "<table class='detail'>\n";
+
+
+	$htmlstr .= "	<tr><td colspan='3'>&nbsp;</tr>\n";
+	$htmlstr .= "	<tr>\n";
+
+	// ertse Spalte start
+	$htmlstr .= "		<td valign='top'>\n";
+
+	$htmlstr .= "			<table>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>Kennzahl</td>\n";
+	$htmlstr .= "					<td><input class='detail' type='text' name='studiengang_kz' size='16' maxlength='4' value='".$studiengang_kz."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>Kurzbezeichnung</td>\n";
+	$htmlstr .= "					<td><input class='detail' type='text' name='kurzbz' size='16' maxlength='3' value='".$kurzbz."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>KurzbezeichnungLang</td>\n";
+	$htmlstr .= " 					<td><input class='detail' type='text' name='kurzbzlang' size='16' maxlength='8' value='".$kurzbzlang."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>Max Semester</td>\n";
+	$htmlstr .= "					<td><input class='detail' type='text' name='max_semester' size='16' maxlength='2' value='".$max_semester."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>Max Verband</td>\n";
+	$htmlstr .= "					<td><input class='detail' type='text' name='max_verband' size='16' maxlength='1' value='".$max_verband."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>Max Gruppe</td>\n";
+	$htmlstr .= "					<td><input class='detail' type='text' name='max_gruppe' size='16' maxlength='1' value='".$max_gruppe."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>Organisationsform</td>\n";
+	$htmlstr .= "					<td><input class='detail' type='text' name='organisationsform' size='16' maxlength='1' value='".$organisationsform."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>Ext ID</td>\n";
+	$htmlstr .= "					<td><input class='detail' type='text' name='ext_id' size='16' maxlength='16' value='".$ext_id."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td valign='top'>Aktiv</td>\n";
+	$htmlstr .= " 					<td>\n";
+	if($aktiv == 't')
+		$chk = "checked";
+	else
+		$chk = "";
+	$htmlstr .= "						<input type='checkbox' name='aktiv' value='t'".$chk." onchange='submitable()'>";
+	$htmlstr .= " 					</td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "			</table>\n";
+
+	$htmlstr .= "		</td>\n";
+	// 2. Spalte start
+	$htmlstr .= "		<td valign='top'>\n";
+
+	$htmlstr .= "			<table>\n";
+
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>Erhalter</td>\n";
+	$htmlstr .= "					<td\n>";
+	$htmlstr .= "						<select name='erhalter_kz' onchange='submitable()'>\n";
+
+	foreach($erh->result as $erhalter)
+	{
+		if ($erhalter_kz == $erhalter->erhalter_kz)
+			$sel = " selected";
+		else
+			$sel = "";
+		$htmlstr .= "							<option value='".$erhalter->erhalter_kz."'".$sel.">".$erhalter->bezeichnung."</option>\n";
+	}
+	$htmlstr .= "						</select>\n";
+	$htmlstr .= "					</td>\n";
+	$htmlstr .= "				</tr>\n";
+
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>Typ</td>\n";
+	$htmlstr .= "					<td\n>";
+	$htmlstr .= "						<select name='typ' onchange='submitable()'>\n";
+	$htmlstr .= "							<option value=''></option>\n";
+	if ($typ == "b")
+		$sel = " selected";
+	else
+		$sel = "";
+	$htmlstr .= "							<option value='b'".$sel.">Bakk</option>\n";
+	if ($typ == "d")
+		$sel = " selected";
+	else
+		$sel = "";
+	$htmlstr .= "							<option value='d'".$sel.">Diplom</option>\n";
+	if ($typ == "m")
+		$sel = " selected";
+	else
+		$sel = "";
+	$htmlstr .= "							<option value='m'".$sel.">Master</option>\n";
+	if ($typ == "l")
+		$sel = " selected";
+	else
+		$sel = "";
+	$htmlstr .= "							<option value='' disabled>---</option>";
+	$htmlstr .= "							<option value='l'".$sel.">LLL</option>\n";
+	if ($typ == "e")
+		$sel = " selected";
+	else
+		$sel = "";
+	$htmlstr .= "							<option value='e'".$sel.">Erhalter</option>\n";
+	$htmlstr .= "						</select>\n";
+	$htmlstr .= "					</td>\n";
+	//$htmlstr .= "					<td><input class='detail' type='text' name='typ' size='16' maxlength='1' value='".$sg->typ."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				</tr>\n";
+
+
+
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>Farbe</td>\n";
+	$htmlstr .= " 					<td><input class='detail' type='text' name='farbe' size='16' maxlength='6' value='".$farbe."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>Bescheidbgbl1</td>\n";
+	$htmlstr .= "					<td><input class='detail' type='text' name='bescheidbgbl1' size='16' maxlength='16' value='".$bescheidbgbl1."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>Bescheidbgbl2</td>\n";
+	$htmlstr .= "					<td><input class='detail' type='text' name='bescheidbgbl2' size='16' maxlength='16' value='".$bescheidbgbl2."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>Bescheidgz</td>\n";
+	$htmlstr .= "					<td><input class='detail' type='text' name='bescheidgz' size='16' maxlength='16' value='".$bescheidgz."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>Bescheidvom</td>\n";
+	$htmlstr .= "					<td><input class='detail' type='text' name='bescheidvom' size='16' maxlength='10' value='".$bescheidvom."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>Titelbescheidvom</td>\n";
+	$htmlstr .= "					<td><input class='detail' type='text' name='titelbescheidvom' size='16' maxlength='10' value='".$titelbescheidvom."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "			</table>\n";
+
+	$htmlstr .= "		</td>\n";
+	// 3. Spalte start
+	$htmlstr .= "		<td valign='top'>\n";
+
+	$htmlstr .= "			<table>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>Bezeichnung</td>\n";
+	$htmlstr .= "					<td><input class='detail' type='text' name='bezeichnung' size='50' maxlength='128' value='".$bezeichnung."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>English</td>\n";
+	$htmlstr .= "					<td><input class='detail' type='text' name='english' size='50' maxlength='128' value='".$english."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>Email</td>\n";
+	$htmlstr .= " 					<td><input class='detail' type='text' name='email' size='50' maxlength='64' value='".$email."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>Telefon</td>\n";
+	$htmlstr .= " 					<td><input class='detail' type='text' name='telefon' size='50' maxlength='32' value='".$telefon."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td valign='top'>Bescheid</td>\n";
+	$htmlstr .= " 					<td><textarea name='bescheid' cols='37' rows='5' onchange='submitable()'>".$bescheid."</textarea></td>\n";
+	$htmlstr .= "				</tr>\n";
+
+	$htmlstr .= "			</table>\n";
+
+	$htmlstr .= "		</td>\n";
+
+	$htmlstr .= "	</tr>";
+	$htmlstr .= "</table>\n";
+	$htmlstr .= "<br>\n";
+	$htmlstr .= "<div align='right' id='sub'>\n";
+	$htmlstr .= "	<span id='submsg' style='color:red; visibility:hidden;'>Datensatz ge&auml;ndert!&nbsp;&nbsp;</span>\n";
+	$htmlstr .= "	<input type='hidden' name='neu' value='".$neu."'>";
+	$htmlstr .= "	<input type='submit' value='Speichern' name='schick' disabled>\n";
+	$htmlstr .= "	<input type='button' value='Reset' onclick='unchanged()'>\n";
+	$htmlstr .= "</div>";
+	$htmlstr .= "</form>";
+	$htmlstr .= "<div id='inserterror'>".$errorstr."</div>"
+	
 
 ?>
 
