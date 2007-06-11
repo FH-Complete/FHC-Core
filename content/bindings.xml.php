@@ -11,24 +11,43 @@
 
   <binding id="Datum">
   	<content>
-		<xul:textbox id="binding-datefield-textbox" maxlength="10" size="10"/>
+		<xul:textbox maxlength="10" xbl:inherits="disabled, value" size="10" tooltiptext="Format: DD.MM.JJJJ Beispiel: 31.12.2007"/>
 	</content>
 	<implementation>
-		<property name="value" onget="return document.getElementById('binding-datefield-textbox').value" >
+		<property name="value" onget="return document.getAnonymousNodes(this)[0].value" >
 			<setter>
-				return val;
+				<![CDATA[
+				document.getAnonymousNodes(this)[0].value = val;
+				if(val!='')
+				{
+					if(CheckDatum(val))
+						document.getAnonymousNodes(this)[0].style.backgroundColor="#FFFFFF";
+					else
+						document.getAnonymousNodes(this)[0].style.backgroundColor="#F46B6B";
+				}
+				]]>
+			</setter>
+		</property>
+		<property name="iso" onget="return ConvertDateToISO(document.getAnonymousNodes(this)[0].value)" >
+			<setter>
+				return false;
+			</setter>
+		</property>
+		<property name="disabled" onget="return document.getAnonymousNodes(this)[0].disabled" >
+			<setter>
+				document.getAnonymousNodes(this)[0].disabled = val;
 			</setter>
 		</property>
 	</implementation>
 	<handlers>
 		<handler event="input">
 			 <![CDATA[
-			var datum = document.getElementById('binding-datefield-textbox').value;
+			var datum = document.getAnonymousNodes(this)[0].value;
 
 			if(CheckDatum(datum))
-				document.getElementById('binding-datefield-textbox').style.backgroundColor="#FFFFFF";
+				document.getAnonymousNodes(this)[0].style.backgroundColor="#FFFFFF";
 			else
-				document.getElementById('binding-datefield-textbox').style.backgroundColor="#F46B6B";
+				document.getAnonymousNodes(this)[0].style.backgroundColor="#F46B6B";
 			
 			 ]]>
 		</handler>

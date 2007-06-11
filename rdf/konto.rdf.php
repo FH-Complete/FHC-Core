@@ -39,6 +39,7 @@ require_once('../vilesci/config.inc.php');
 require_once('../include/konto.class.php');
 require_once('../include/person.class.php');
 require_once('../include/studiengang.class.php');
+require_once('../include/datum.class.php');
 //require_once('../include/functions.inc.php');
 
 // Datenbank Verbindung
@@ -72,6 +73,7 @@ if(isset($_GET['buchungsnr']) && is_numeric($_GET['buchungsnr']))
 else
 	$buchungsnr = '';
 
+$datum = new datum();
 $konto = new konto($conn, null, true);
 
 if($person_id!='')
@@ -100,7 +102,7 @@ if ($xmlformat=='rdf')
 <?php
 function drawrow($row)
 {
-	global $rdf_url;
+	global $rdf_url, $datum;
 	echo "
   		<RDF:Description  id=\"".$row->buchungsnr."\"  about=\"".$rdf_url.'/'.$row->buchungsnr."\" >
 			<KONTO:buchungsnr><![CDATA[".$row->buchungsnr."]]></KONTO:buchungsnr>
@@ -109,7 +111,8 @@ function drawrow($row)
 			<KONTO:studiensemester_kurzbz><![CDATA[".$row->studiensemester_kurzbz."]]></KONTO:studiensemester_kurzbz>
 			<KONTO:buchungsnr_verweis><![CDATA[".$row->buchungsnr_verweis."]]></KONTO:buchungsnr_verweis>
 			<KONTO:betrag><![CDATA[".$row->betrag."]]></KONTO:betrag>
-			<KONTO:buchungsdatum><![CDATA[".$row->buchungsdatum."]]></KONTO:buchungsdatum>
+			<KONTO:buchungsdatum_iso><![CDATA[".$row->buchungsdatum."]]></KONTO:buchungsdatum_iso>
+			<KONTO:buchungsdatum><![CDATA[".$datum->convertISODate($row->buchungsdatum)."]]></KONTO:buchungsdatum>
 			<KONTO:buchungstext><![CDATA[".$row->buchungstext."]]></KONTO:buchungstext>
 			<KONTO:mahnspanne><![CDATA[".$row->mahnspanne."]]></KONTO:mahnspanne>
 			<KONTO:buchungstyp_kurzbz><![CDATA[".$row->buchungstyp_kurzbz."]]></KONTO:buchungstyp_kurzbz>

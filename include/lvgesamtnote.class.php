@@ -43,6 +43,7 @@ class lvgesamtnote
 	var $updatevon;					// varchar(16)
 	var $insertamum;				// timestamp
 	var $insertvon;					// varchar(16)
+	var $bemerkung;					// text
 	
 	var $lehrveranstaltung_bezeichung;
 	var $note_bezeichnung;
@@ -111,6 +112,7 @@ class lvgesamtnote
 				$this->updatevon = $row->updatevon;
 				$this->insertamum = $row->insertamum;
 				$this->inservon = $row->insertvon;
+				$this->bemerkung = $row->bemerkung;
 				return true;				
 			}
 			else 
@@ -193,7 +195,7 @@ class lvgesamtnote
 		if($new)
 		{
 			//Neuen Datensatz einfuegen					
-			$qry='INSERT INTO campus.tbl_lvgesamtnote (lehrveranstaltung_id, student_uid, studiensemester_kurzbz, mitarbeiter_uid, note, freigabedatum, benotungsdatum,
+			$qry='INSERT INTO campus.tbl_lvgesamtnote (lehrveranstaltung_id, student_uid, studiensemester_kurzbz, mitarbeiter_uid, note, freigabedatum, benotungsdatum, bemerkung,
 				  updateamum, updatevon, insertamum, insertvon) VALUES('.
 			     $this->addslashes($this->lehrveranstaltung_id).', '.
 			     $this->addslashes($this->student_uid).', '.
@@ -202,6 +204,7 @@ class lvgesamtnote
 			     $this->addslashes($this->note).', '.
 			     $this->addslashes($this->freigabedatum).', '.
 			     $this->addslashes($this->benotungsdatum).', '.
+			     $this->addslashes($this->bemerkung).', '.
 			     $this->addslashes($this->updateamum).', '.
 			     $this->addslashes($this->updatevon).', '.
 			     $this->addslashes($this->insertamum).', '.
@@ -213,6 +216,7 @@ class lvgesamtnote
 				'note='.$this->addslashes($this->note).', '. 
 				'freigabedatum='.$this->addslashes($this->freigabedatum).', '. 
 				'benotungsdatum='.$this->addslashes($this->benotungsdatum).', '.
+				'bemerkung='.$this->addslashes($this->bemerkung).', '.
 				'mitarbeiter_uid='.$this->addslashes($this->mitarbeiter_uid).', '.
 		     	'updateamum= '.$this->addslashes($this->updateamum).', '.
 		     	'updatevon='.$this->addslashes($this->updatevon).' '.
@@ -300,7 +304,7 @@ class lvgesamtnote
 				$obj->insertvon = $row->insertvon;
 				$obj->note_bezeichnung = $row->note_bezeichnung;
 				$obj->lehrveranstaltung_bezeichnung = $row->lehrveranstaltung_bezeichnung;
-				
+				$obj->bemerkung = $row->bemerkung;
 				$this->result[] = $obj;
 			}
 			return true;

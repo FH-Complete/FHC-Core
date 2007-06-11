@@ -43,6 +43,7 @@ class zeugnisnote
 	var $insertamum;				// timestamp
 	var $insertvon;					// varchar(16)
 	var $ext_id;					// bigint
+	var $bemerkung;					// text
 	
 	var $lehrveranstaltung_bezeichung;
 	var $note_bezeichnung;
@@ -111,6 +112,7 @@ class zeugnisnote
 				$this->insertamum = $row->insertamum;
 				$this->inservon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
+				$this->bemerkung = $row->bemerkung;
 				return true;				
 			}
 			else 
@@ -137,7 +139,7 @@ class zeugnisnote
 			$this->errormsg = 'Lehrveranstaltung_id ist ungueltig';
 			return false;
 		}
-		if($student_uid=='')
+		if($this->student_uid=='')
 		{
 			$this->errormsg = 'UID muss angegeben werden';
 			return false;
@@ -193,7 +195,7 @@ class zeugnisnote
 		if($new)
 		{
 			//Neuen Datensatz einfuegen					
-			$qry='INSERT INTO lehre.tbl_zeugnisnote (lehrveranstaltung_id, student_uid, studiensemester_kurzbz, note, uebernahmedatum, benotungsdatum,
+			$qry='INSERT INTO lehre.tbl_zeugnisnote (lehrveranstaltung_id, student_uid, studiensemester_kurzbz, note, uebernahmedatum, benotungsdatum, bemerkung,
 				  updateamum, updatevon, insertamum, insertvon, ext_id) VALUES('.
 			     $this->addslashes($this->lehrveranstaltung_id).', '.
 			     $this->addslashes($this->student_uid).', '.
@@ -201,6 +203,7 @@ class zeugnisnote
 			     $this->addslashes($this->note).', '.
 			     $this->addslashes($this->uebernahmedatum).', '.
 			     $this->addslashes($this->benotungsdatum).', '.
+			     $this->addslashes($this->bemerkung).', '.
 			     $this->addslashes($this->updateamum).', '.
 			     $this->addslashes($this->updatevon).', '.
 			     $this->addslashes($this->insertamum).', '.
@@ -213,10 +216,11 @@ class zeugnisnote
 				'note='.$this->addslashes($this->note).', '. 
 				'uebernahmedatum='.$this->addslashes($this->uebernahmedatum).', '. 
 				'benotungsdatum='.$this->addslashes($this->benotungsdatum).', '.
+				'bemerkung='.$this->addslashes($this->bemerkung).', '.
 		     	'updateamum= '.$this->addslashes($this->updateamum).', '.
 		     	'updatevon='.$this->addslashes($this->updatevon).' '.
-				'WHERE lehrveranstaltung_id='.$this->addslashes($this->lehrveranstaltung_id).', '.
-				'AND student_uid='.$this->addslashes($this->student_uid).', '.
+				'WHERE lehrveranstaltung_id='.$this->addslashes($this->lehrveranstaltung_id).' '.
+				'AND student_uid='.$this->addslashes($this->student_uid).' '.
 				'AND studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).';';
 		}
 		
@@ -263,41 +267,31 @@ class zeugnisnote
 	// *********************************************
 	function getZeugnisnoten($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz)
 	{
-/*		$qry = "SELECT 
-					tbl_zeugnisnote.*,
-					tbl_note.bezeichnung as note_bezeichnung,
-					vw_student_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung
-				FROM 
-					lehre.tbl_zeugnisnote,
-					lehre.tbl_note,
-					campus.vw_student_lehrveranstaltung		
-				WHERE
-					tbl_zeugnisnote.note=tbl_note.note AND
-					tbl_zeugnisnote.lehrveranstaltung_id=vw_student_lehrveranstaltung.lehrveranstaltung_id AND
-					tbl_zeugnisnote.student_uid=vw_student_lehrveranstaltung.uid AND
-					tbl_zeugnisnote.studiensemester_kurzbz=vw_student_lehrveranstaltung.studiensemester_kurzbz";*/
 		$where='';
 		if($lehrveranstaltung_id!=null)
-			$where.=" AND tbl_zeugnisnote.lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."'";
+			$where.=" AND vw_student_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."'";
 		if($student_uid!=null)
-			$where.=" AND tbl_zeugnisnote.student_uid='".addslashes($student_uid)."'";
+			$where.=" AND uid='".addslashes($student_uid)."'";
 		if($studiensemester_kurzbz!=null)
-			$where.=" AND tbl_zeugnisnote.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+			$where.=" AND vw_student_lehrveranstaltung.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 			
-		$qry = "SELECT * FROM 
+		$qry = "SELECT vw_student_lehrveranstaltung.lehrveranstaltung_id, uid, 
+					   vw_student_lehrveranstaltung.studiensemester_kurzbz, note, uebernahmedatum, benotungsdatum,
+					   tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum, 
+					   tbl_zeugnisnote.insertvon, tbl_zeugnisnote.ext_id, 
+					   vw_student_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung,
+					   tbl_note.bezeichnung as note_bezeichnung,
+					   tbl_zeugnisnote.bemerkung as bemerkung
+				FROM 
 				(
-					SELECT distinct on (vw_student_lehrveranstaltung.lehrveranstaltung_id) * 
-					FROM 
-						campus.vw_student_lehrveranstaltung LEFT JOIN lehre.tbl_zeugnisnote 
-							ON(student_uid=uid AND tbl_zeugnisnote.studiensemester_kurzbz=vw_student_lehrveranstaltung.studiensemester_kurzbz 
-							   AND tbl_zeugnisnote.lehrveranstaltung_id=vw_student_lehrveranstaltung.lehrveranstaltung_id)
-					WHERE true $where
-				) as a 
-				LEFT JOIN lehre.tbl_note USING(note)";
-		
-		
-		echo $qry;		
-		return false;
+					campus.vw_student_lehrveranstaltung LEFT JOIN lehre.tbl_zeugnisnote 
+						ON(uid=student_uid 
+						   AND vw_student_lehrveranstaltung.studiensemester_kurzbz=tbl_zeugnisnote.studiensemester_kurzbz 
+						   AND vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id
+						  )
+				) LEFT JOIN lehre.tbl_note USING(note) 
+				WHERE true $where";
+
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
@@ -305,7 +299,7 @@ class zeugnisnote
 				$obj = new zeugnisnote($this->conn, null, null, null, null);
 				
 				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
-				$obj->student_uid = $row->student_uid;
+				$obj->student_uid = $row->uid;
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$obj->note = $row->note;
 				$obj->uebernahmedatum = $row->uebernahmedatum;
@@ -317,6 +311,7 @@ class zeugnisnote
 				$obj->ext_id = $row->ext_id;
 				$obj->note_bezeichnung = $row->note_bezeichnung;
 				$obj->lehrveranstaltung_bezeichnung = $row->lehrveranstaltung_bezeichnung;
+				$obj->bemerkung = $row->bemerkung;
 				
 				$this->result[] = $obj;
 			}

@@ -39,9 +39,9 @@ var StudentBetriebsmittelSelectPerson_id=null; //Betriebsmittelzurodnung die nac
 var StudentIOTreeDatasource; //Datasource des Incomming/Outgoing Trees
 var StudentIOSelectID=null; //BISIO Eintrag der nach dem Refresh markiert werden soll
 var StudentNotenTreeDatasource; //Datasource des Noten Trees
-var StudentNotenSelectLehreinheitID=null; //LehreinheitID des Noten Eintrages der nach dem Refresh markiert werden soll
+var StudentNotenSelectLehrveranstaltungID=null; //LehreinheitID des Noten Eintrages der nach dem Refresh markiert werden soll
 var StudentLvGesamtNotenTreeDatasource; //Datasource des Noten Trees
-var StudentLvGesamtNotenSelectLehreinheitID=null; //LehreinheitID des Noten Eintrages der nach dem Refresh markiert werden soll
+var StudentLvGesamtNotenSelectLehrveranstaltungID=null; //LehreinheitID des Noten Eintrages der nach dem Refresh markiert werden soll
 
 // ********** Observer und Listener ************* //
 
@@ -342,51 +342,6 @@ function StudentTreeSort()
 }
 
 // ****
-// * Selectiert die Buchung nachdem der Tree
-// * rebuildet wurde.
-// ****
-function StudentKontoTreeSelectBuchung()
-{
-	var tree=document.getElementById('student-konto-tree');
-	if(tree.view)
-		var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
-	else
-		return false;
-
-	//In der globalen Variable ist die zu selektierende Buchung gespeichert
-	if(StudentKontoSelectBuchung!=null)
-	{
-		//Alle subtrees oeffnen weil rowCount nur die Anzahl der sichtbaren
-		//Zeilen zurueckliefert
-	   	for(var i=items-1;i>=0;i--)
-	   	{
-	   		if(!tree.view.isContainerOpen(i))
-	   			tree.view.toggleOpenState(i);
-	   	}
-
-	   	//Jetzt die wirkliche Anzahl (aller) Zeilen holen
-	   	items = tree.view.rowCount;
-	   	for(var i=0;i<items;i++)
-	   	{
-	   		//buchungsnr der row holen
-			col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
-			buchungsnr=tree.view.getCellText(i,col);
-
-			//wenn dies die zu selektierende Zeile
-			if(buchungsnr == StudentKontoSelectBuchung)
-			{
-				//Zeile markieren
-				tree.view.selection.select(i);
-				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
-				tree.treeBoxObject.ensureRowIsVisible(i);
-				StudentKontoSelectBuchung=null;
-				return true;
-			}
-	   	}
-	}
-}
-
-// ****
 // * Student loeschen
 // ****
 function StudentDelete()
@@ -596,6 +551,11 @@ function StudentDetailSave()
 	verband = document.getElementById('student-detail-textbox-verband').value;
 	gruppe = document.getElementById('student-detail-textbox-gruppe').value;
 		
+	if(geburtsdatum!='' && !CheckDatum(geburtsdatum))
+	{
+		alert('Geburtsdatum ist ungueltig');
+		return false;
+	}
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 	neu = document.getElementById('student-detail-checkbox-new').checked;
@@ -618,7 +578,7 @@ function StudentDetailSave()
 	req.add('vorname', vorname);
 	req.add('vornamen', vornamen);
 	req.add('nachname', nachname);
-	req.add('geburtsdatum', geburtsdatum);
+	req.add('geburtsdatum', ConvertDateToISO(geburtsdatum));
 	req.add('geburtsort', geburtsort);
 	req.add('geburtszeit', geburtszeit);
 	req.add('anmerkung', anmerkung);
@@ -704,6 +664,7 @@ function StudentAuswahl()
 			StudentKontoDisableFields(false);
 			StudentBetriebsmittelDisableFields(false);
 			StudentIODisableFields(false);
+			StudentNoteDetailDisableFields(true);
 			document.getElementById('student-detail-button-save').disabled=false;
 		}
 		else
@@ -1068,6 +1029,22 @@ function StudentPrestudentSave()
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 	anmerkung = document.getElementById('student-prestudent-textbox-anmerkung').value;
 	
+	if(zgvdatum!='' && !CheckDate(zgvdatum))
+	{
+		alert('ZGV Datum ist ungueltig');
+		return false;
+	}
+	if(zgvmasterdatum!='' && !CheckDate(zgvmasterdatum))
+	{
+		alert('ZGVMaster Datum ist ungueltig');
+		return false;
+	}
+	if(anmeldungreihungstest!='' && !CheckDate(anmeldungreihungstest))
+	{
+		alert('ReihungstestDatum ist ungueltig');
+		return false;
+	}
+	
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 	
@@ -1084,14 +1061,14 @@ function StudentPrestudentSave()
 	req.add('ausbildungcode', ausbildungcode);
 	req.add('zgv_code', zgv_code);
 	req.add('zgvort', zgvort);
-	req.add('zgvdatum', zgvdatum);
+	req.add('zgvdatum', ConvertDateToISO(zgvdatum));
 	req.add('zgvmas_code', zgvmaster_code);
 	req.add('zgvmaort', zgvmasterort);
-	req.add('zgvmadatum', zgvmasterdatum);
+	req.add('zgvmadatum', ConvertDateToISO(zgvmasterdatum));
 	req.add('aufnahmeschluessel', aufnahmeschluessel);
 	req.add('facheinschlberuf', facheinschlberuf);
 	req.add('reihungstest_id', reihungstest_id);
-	req.add('anmeldungreihungstest', anmeldungreihungstest);
+	req.add('anmeldungreihungstest', ConvertDateToISO(anmeldungreihungstest));
 	req.add('reihungstestangetreten', reihungstestangetreten);
 	req.add('punkte', punkte);
 	req.add('bismelden', bismelden);
@@ -1134,7 +1111,7 @@ function StudentAnmeldungreihungstestHeute()
 	tag = now.getDate();
 	if(tag<10) tag='0'+tag;
 	
-	document.getElementById('student-prestudent-textbox-anmeldungreihungstest').value=jahr+'-'+monat+'-'+tag;
+	document.getElementById('student-prestudent-textbox-anmeldungreihungstest').value=tag+'.'+monat+'.'+jahr;
 }
 
 // ****
@@ -1213,6 +1190,51 @@ function StudentAkteDel()
 }
 
 // **************** KONTO ******************
+
+// ****
+// * Selectiert die Buchung nachdem der Tree
+// * rebuildet wurde.
+// ****
+function StudentKontoTreeSelectBuchung()
+{
+	var tree=document.getElementById('student-konto-tree');
+	if(tree.view)
+		var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+	else
+		return false;
+
+	//In der globalen Variable ist die zu selektierende Buchung gespeichert
+	if(StudentKontoSelectBuchung!=null)
+	{
+		//Alle subtrees oeffnen weil rowCount nur die Anzahl der sichtbaren
+		//Zeilen zurueckliefert
+	   	for(var i=items-1;i>=0;i--)
+	   	{
+	   		if(!tree.view.isContainerOpen(i))
+	   			tree.view.toggleOpenState(i);
+	   	}
+
+	   	//Jetzt die wirkliche Anzahl (aller) Zeilen holen
+	   	items = tree.view.rowCount;
+	   	for(var i=0;i<items;i++)
+	   	{
+	   		//buchungsnr der row holen
+			col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
+			buchungsnr=tree.view.getCellText(i,col);
+
+			//wenn dies die zu selektierende Zeile
+			if(buchungsnr == StudentKontoSelectBuchung)
+			{
+				//Zeile markieren
+				tree.view.selection.select(i);
+				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
+				tree.treeBoxObject.ensureRowIsVisible(i);
+				StudentKontoSelectBuchung=null;
+				return true;
+			}
+	   	}
+	}
+}
 
 // ****
 // * Wenn eine buchung Ausgewaehlt wird, dann werden
@@ -1361,13 +1383,18 @@ function StudentKontoDetailSpeichern()
 	buchungstyp_kurzbz = document.getElementById('student-konto-menulist-buchungstyp').value;
 	buchungsnr = document.getElementById('student-konto-textbox-buchungsnr').value;
 	
+	if(buchungsdatum!='' && !CheckDatum(buchungsdatum))
+	{
+		alert('Buchungsdatum ist ungueltig');
+		return false;
+	}
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 	
 	req.add('type', 'savebuchung');
 	
 	req.add('betrag', betrag);
-	req.add('buchungsdatum', buchungsdatum);
+	req.add('buchungsdatum', ConvertDateToISO(buchungsdatum));
 	req.add('buchungstext', buchungstext);
 	req.add('mahnspanne', mahnspanne);
 	req.add('buchungstyp_kurzbz', buchungstyp_kurzbz);
@@ -1504,12 +1531,18 @@ function StudentKontoNeuSpeichern(dialog, person_ids, studiengang_kz)
 	mahnspanne = dialog.getElementById('student-konto-neu-textbox-mahnspanne').value;
 	buchungstyp_kurzbz = dialog.getElementById('student-konto-neu-menulist-buchungstyp').value;
 	
+	if(buchungsdatum!='' && !CheckDatum(buchungsdatum))
+	{
+		alert('Buchungsdatum ist ungueltig');
+		return false;
+	}
+	
 	req.add('type', 'neuebuchung');
 	
 	req.add('person_ids', person_ids);
 	req.add('studiengang_kz', studiengang_kz);
 	req.add('betrag', betrag);
-	req.add('buchungsdatum', buchungsdatum);
+	req.add('buchungsdatum', ConvertDateToISO(buchungsdatum));
 	req.add('buchungstext', buchungstext);
 	req.add('mahnspanne', mahnspanne);
 	req.add('buchungstyp_kurzbz', buchungstyp_kurzbz);	
@@ -1716,24 +1749,13 @@ function StudentBetriebsmittelDetailDisableFields(val)
 // * Resetet die Betriebsmitteldetail Felder
 // ****
 function StudentBetriebsmittelDetailResetFields()
-{
-	var now = new Date();
-	var jahr = now.getFullYear();
-	
-	var monat = now.getMonth()+1;
-	
-	if(monat<10) 
-		monat='0'+monat;
-	var tag = now.getDate();
-	if(tag<10) 
-		tag='0'+tag;
-	
+{		
 	document.getElementById('student-betriebsmittel-menulist-betriebsmitteltyp').value='Zutrittskarte';
 	document.getElementById('student-betriebsmittel-textbox-nummer').value='';
 	document.getElementById('student-betriebsmittel-textbox-beschreibung').value='';
 	document.getElementById('student-betriebsmittel-textbox-kaution').value='';
 	document.getElementById('student-betriebsmittel-textbox-anmerkung').value='';
-	document.getElementById('student-betriebsmittel-textbox-ausgegebenam').value=jahr+'-'+monat+'-'+tag;
+	document.getElementById('student-betriebsmittel-textbox-ausgegebenam').value='';
 	document.getElementById('student-betriebsmittel-textbox-retouram').value='';	
 }
 
@@ -1802,6 +1824,17 @@ function StudentBetriebsmittelDetailSpeichern()
 	beschreibung = document.getElementById('student-betriebsmittel-textbox-beschreibung').value;
 	neu = document.getElementById('student-betriebsmittel-checkbox-neu').checked;
 	
+	if(ausgegebenam!='' && !CheckDatum(ausgegebenam))
+	{
+		alert('AusgegebenAm Datum ist ungueltig');
+		return false;
+	}
+	if(retouram!='' && !CheckDatum(retouram))
+	{
+		alert('RetourAm Datum ist ungueltig');
+		return false;
+	}
+	
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 	
@@ -1812,8 +1845,8 @@ function StudentBetriebsmittelDetailSpeichern()
 	req.add('betriebsmittel_id', betriebsmittel_id);
 	req.add('anmerkung', anmerkung);
 	req.add('kaution', kaution);
-	req.add('ausgegebenam', ausgegebenam);
-	req.add('retouram', retouram);
+	req.add('ausgegebenam', ConvertDateToISO(ausgegebenam));
+	req.add('retouram', ConvertDateToISO(retouram));
 	req.add('betriebsmitteltyp', betriebsmitteltyp);
 	req.add('nummer', nummer);
 	req.add('beschreibung', beschreibung);
@@ -1843,10 +1876,22 @@ function StudentBetriebsmittelDetailSpeichern()
 // ****
 function StudentBetriebsmittelNeu()
 {
+	var now = new Date();
+	var jahr = now.getFullYear();
+	
+	var monat = now.getMonth()+1;
+	
+	if(monat<10) 
+		monat='0'+monat;
+	var tag = now.getDate();
+	if(tag<10) 
+		tag='0'+tag;
+	
 	document.getElementById('student-betriebsmittel-checkbox-neu').checked=true;
 	StudentBetriebsmittelDetailDisableFields(false);
 	StudentBetriebsmittelDetailResetFields();
 	document.getElementById('student-betriebsmittel-textbox-person_id').value = document.getElementById('student-prestudent-textbox-person_id').value;
+	document.getElementById('student-betriebsmittel-textbox-ausgegebenam').value=tag+'.'+monat+'.'+jahr;
 }
 
 // ****
@@ -2014,7 +2059,7 @@ function StudentIOResetFileds()
 function StudentIODetailSpeichern()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+		
 	von = document.getElementById('student-io-textbox-von').value;
 	bis = document.getElementById('student-io-textbox-bis').value;
 	mobilitaetsprogramm = document.getElementById('student-io-menulist-mobilitaetsprogramm').value;
@@ -2023,6 +2068,18 @@ function StudentIODetailSpeichern()
 	uid = document.getElementById('student-io-detail-textbox-uid').value;
 	neu = document.getElementById('student-io-detail-checkbox-neu').checked;
 	bisio_id = document.getElementById('student-io-detail-textbox-bisio_id').value;
+	
+	if(von!='' && !CheckDatum(von))
+	{
+		alert('VON Datum ist ungueltig');
+		return false;
+	}
+	
+	if(bis!='' && !CheckDatum(bis))
+	{
+		alert('BIS Datum ist ungueltig');
+		return false;
+	}
 	
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
@@ -2033,8 +2090,8 @@ function StudentIODetailSpeichern()
 		req.add('bisio_id', bisio_id);
 	
 	req.add('neu', neu);
-	req.add('von', von);
-	req.add('bis', bis);
+	req.add('von', ConvertDateToISO(von));
+	req.add('bis', ConvertDateToISO(bis));
 	req.add('mobilitaetsprogramm_code', mobilitaetsprogramm);
 	req.add('nation_code', nation_code);
 	req.add('zweck_code', zweck_code);
@@ -2132,8 +2189,8 @@ function StudentIONeu()
 	//UID ins Textfeld schreiben	
 	document.getElementById('student-io-detail-textbox-uid').value=document.getElementById('student-detail-textbox-uid').value;	
 	document.getElementById('student-io-detail-checkbox-neu').checked=true;
-	document.getElementById('student-io-textbox-von').value=jahr+'-'+monat+'-'+tag;
-	document.getElementById('student-io-textbox-bis').value=jahr+'-'+monat+'-'+tag;
+	document.getElementById('student-io-textbox-von').value=tag+'.'+monat+'.'+jahr;
+	document.getElementById('student-io-textbox-bis').value=tag+'.'+monat+'.'+jahr;
 }
 
 // ****
@@ -2187,7 +2244,7 @@ function StudentNotenTreeSelectID()
 		return false;
 
 	//In der globalen Variable ist die zu selektierende Eintrag gespeichert
-	if(StudentNotenSelectLehreinheitID!=null)
+	if(StudentNotenSelectLehrveranstaltungID!=null)
 	{		
 	   	for(var i=0;i<items;i++)
 	   	{
@@ -2223,7 +2280,7 @@ function StudentLvGesamtNotenTreeSelectID()
 		return false;
 
 	//In der globalen Variable ist die zu selektierende Eintrag gespeichert
-	if(StudentLvGesamtNotenSelectLehreinheitID!=null)
+	if(StudentLvGesamtNotenSelectLehrveranstaltungID!=null)
 	{		
 	   	for(var i=0;i<items;i++)
 	   	{
@@ -2243,5 +2300,169 @@ function StudentLvGesamtNotenTreeSelectID()
 				return true;
 			}
 	   	}
+	}
+}
+
+// ***
+// * Disabled/Enabled die Detailfelder
+// ***
+function StudentNoteDetailDisableFields(val)
+{
+	document.getElementById('student-noten-menulist-note').disabled=val;
+	document.getElementById('student-noten-button-speichern').disabled=val;
+}
+
+// ***
+// * Nach dem Auswaehlen einer Note kann diese veraendert werden
+// ***
+function StudentNotenAuswahl()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-noten-tree');
+
+	if (tree.currentIndex==-1) return;
+
+	StudentNoteDetailDisableFields(false);
+		
+	//Ausgewaehlte Nr holen
+    var col = tree.columns ? tree.columns["student-noten-tree-lehrveranstaltung_id"] : "student-noten-tree-lehrveranstaltung_id";
+	var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
+	var col = tree.columns ? tree.columns["student-noten-tree-student_uid"] : "student-noten-tree-student_uid";
+	var student_uid=tree.view.getCellText(tree.currentIndex,col);
+	var col = tree.columns ? tree.columns["student-noten-tree-studiensemester_kurzbz"] : "student-noten-tree-studiensemester_kurzbz";
+	var studiensemester_kurzbz=tree.view.getCellText(tree.currentIndex,col);
+	
+	//Daten holen
+	var url = '<?php echo APP_ROOT ?>rdf/zeugnisnote.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+'&uid='+student_uid+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&'+gettimestamp();
+	
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
+                   getService(Components.interfaces.nsIRDFService);
+    
+    var dsource = rdfService.GetDataSourceBlocking(url);
+    
+	var subject = rdfService.GetResource("http://www.technikum-wien.at/zeugnisnote/" + lehrveranstaltung_id+'/'+student_uid+'/'+studiensemester_kurzbz);
+
+	var predicateNS = "http://www.technikum-wien.at/zeugnisnote/rdf";
+
+	//Daten holen
+
+	note = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#note" ));
+		
+	if(note=='')
+		note='9';
+	
+	document.getElementById('student-noten-menulist-note').value=note;
+}
+
+// ****
+// * Speichert eine Note
+// ****
+function StudentNoteSpeichern()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-noten-tree');
+
+	if (tree.currentIndex==-1)
+	{
+		alert('Speichern nicht moeglich! Es muss eine Note im Tree ausgewaehlt sein');
+		return;
+	}
+		
+	//Ausgewaehlte Nr holen
+    var col = tree.columns ? tree.columns["student-noten-tree-lehrveranstaltung_id"] : "student-noten-tree-lehrveranstaltung_id";
+	var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
+	var col = tree.columns ? tree.columns["student-noten-tree-student_uid"] : "student-noten-tree-student_uid";
+	var student_uid=tree.view.getCellText(tree.currentIndex,col);
+	var col = tree.columns ? tree.columns["student-noten-tree-studiensemester_kurzbz"] : "student-noten-tree-studiensemester_kurzbz";
+	var studiensemester_kurzbz=tree.view.getCellText(tree.currentIndex,col);
+	
+	note = document.getElementById('student-noten-menulist-note').value;
+	
+	
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+	
+	req.add('type', 'savenote');
+		
+	req.add('lehrveranstaltung_id', lehrveranstaltung_id);
+	req.add('student_uid', student_uid);
+	req.add('studiensemester_kurzbz', studiensemester_kurzbz);
+	req.add('note', note);
+			
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+	
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+	}
+	else
+	{			
+		StudentLvGesamtNotenSelectLehrveranstaltungID=lehrveranstaltung_id;	
+		StudentNotenTreeDatasource.Refresh(false); //non blocking
+		SetStatusBarText('Daten wurden gespeichert');
+		StudentNoteDetailDisableFields(true);
+	}
+}
+
+// ****
+// * Uebernimmt die Noten der Lektoren fuer die Zeugnisnote
+// ****
+function StudentNotenMove()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-lvgesamtnoten-tree');
+	
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
+	var i = 0;
+	
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+	
+	req.add('type', 'movenote');
+	
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			col = tree.columns ? tree.columns["student-lvgesamtnoten-tree-lehrveranstaltung_id"] : "student-lvgesamtnoten-tree-lehrveranstaltung_id";
+			lehrveranstaltung_id = tree.view.getCellText(v,col);
+			col = tree.columns ? tree.columns["student-lvgesamtnoten-tree-student_uid"] : "student-lvgesamtnoten-tree-student_uid";
+			student_uid = tree.view.getCellText(v,col);
+			col = tree.columns ? tree.columns["student-lvgesamtnoten-tree-studiensemester_kurzbz"] : "student-lvgesamtnoten-tree-studiensemester_kurzbz";
+			studiensemester_kurzbz = tree.view.getCellText(v,col);
+
+			req.add('lehrveranstaltung_id_'+i, lehrveranstaltung_id);
+			req.add('student_uid_'+i, student_uid);
+			req.add('studiensemester_kurzbz_'+i, studiensemester_kurzbz);	
+			i++;
+		}
+	}
+	req.add('anzahl', i);
+	
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+	
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+	}
+	else
+	{			
+		StudentNotenTreeDatasource.Refresh(false); //non blocking
+		SetStatusBarText('Daten wurden gespeichert');
+		StudentNoteDetailDisableFields(true);
 	}
 }

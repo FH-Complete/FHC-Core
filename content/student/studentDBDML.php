@@ -46,6 +46,8 @@ require_once('../../include/studiensemester.class.php');
 require_once('../../include/betriebsmittel.class.php');
 require_once('../../include/betriebsmittelperson.class.php');
 require_once('../../include/bisio.class.php');
+require_once('../../include/zeugnisnote.class.php');
+require_once('../../include/lvgesamtnote.class.php');
 
 $user = get_uid();
 
@@ -1092,6 +1094,99 @@ if(!$error)
 				$return = false;
 			}
 		}		
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='savenote')
+	{
+		//Speichert einen Noteneintrag
+		
+		$noten = new zeugnisnote($conn);
+
+		if(isset($_POST['lehrveranstaltung_id']) && isset($_POST['student_uid']) && isset($_POST['studiensemester_kurzbz']))
+		{
+			if($noten->load($_POST['lehrveranstaltung_id'], $_POST['student_uid'], $_POST['studiensemester_kurzbz']))
+			{
+				$noten->new = false;
+				$noten->updateamum = date('Y-m-d H:i:s');
+				$noten->updatevon = $user;
+			}
+			else 
+			{
+				$noten->new = true;
+				$noten->insertamum = date('Y-m-d H:i:s');
+				$noten->insertvon = $user;
+			}
+			
+			$noten->lehrveranstaltung_id = $_POST['lehrveranstaltung_id'];
+			$noten->student_uid = $_POST['student_uid'];
+			$noten->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
+			$noten->benotungsdatum = date('Y-m-d H:i:s');
+			$noten->note = $_POST['note'];
+					
+			if($noten->save())
+			{
+				$return = true;
+			}
+			else 
+			{
+				$errormsg = $noten->errormsg;
+				$return = false;
+			}
+		}
+		else 
+		{
+			$return = false;
+			$errormsg = 'Fehlerhafte Parameteruebergabe';
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='movenote')
+	{
+		//Speichert einen LVGesamtNoten Eintrag in die Tbl Zeugnisnote
+		//Die Daten werden per POST uebermittelt. Es wird ein Feld Anzahl mituebergeben
+		//mit der Anzahl der Felder. Die Felder sind durchnummeriert zB lehreinheit_id_0, lehreinheit_id_1, ...
+		$errormsg = '';
+		
+		for($i=0;$i<$_POST['anzahl'];$i++)
+		{
+			$lvgesamtnote = new lvgesamtnote($conn);
+			$zeugnisnote = new zeugnisnote($conn);
+			
+			if($lvgesamtnote->load($_POST['lehrveranstaltung_id_'.$i], $_POST['student_uid_'.$i], $_POST['studiensemester_kurzbz_'.$i]))
+			{					
+				if($zeugnisnote->load($_POST['lehrveranstaltung_id_'.$i], $_POST['student_uid_'.$i], $_POST['studiensemester_kurzbz_'.$i]))
+				{
+					$zeugnisnote->new = false;
+					$zeugnisnote->updateamum = date('Y-m-d H:i:s');
+					$zeugnisnote->updatevon = $user;
+				}
+				else 
+				{
+					$zeugnisnote->new = true;
+					$zeugnisnote->insertamum = date('Y-m-d H:i:s');
+					$zeugnisnote->insertvon = $user;
+					$zeugnisnote->lehrveranstaltung_id = $_POST['lehrveranstaltung_id_'.$i];
+					$zeugnisnote->student_uid = $_POST['student_uid_'.$i];
+					$zeugnisnote->studiensemester_kurzbz = $_POST['studiensemester_kurzbz_'.$i];
+				}
+				
+				$zeugnisnote->note = $lvgesamtnote->note;
+				$zeugnisnote->uebernahmedatum = date('Y-m-d H:i:s');
+				$zeugnisnote->benotungsdatum = $lvgesamtnote->benotungsdatum;
+				$zeugnisnote->bemerkung = $lvgesamtnote->bemerkung;
+					
+				if(!$zeugnisnote->save())
+				{
+					$errormsg .= "\n".$zeugnisnote->errormsg;
+				}
+			}
+			else 
+			{
+				$errormsg .= "\nLvGesamtNote wurde nicht gefunden";
+			}
+		}
+		if($errormsg=='')
+			$return = true;
+		else 
+			$return = false;
 	}
 	else
 	{

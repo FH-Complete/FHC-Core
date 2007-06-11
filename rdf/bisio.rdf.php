@@ -29,6 +29,7 @@ header("Pragma: no-cache");
 header("Content-type: application/xhtml+xml");
 require_once('../vilesci/config.inc.php');
 require_once('../include/bisio.class.php');
+require_once('../include/datum.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
@@ -46,6 +47,7 @@ if(isset($_GET['bisio_id']))
 else 
 	$bisio_id = null;
 
+$datum = new datum();
 	
 $rdf_url='http://www.technikum-wien.at/bisio';
 
@@ -86,7 +88,7 @@ else
 
 function draw_content($row)
 {		
-	global $rdf_url;
+	global $rdf_url, $datum;
 	
 	echo '
 		  <RDF:li>
@@ -95,8 +97,10 @@ function draw_content($row)
 	            <IO:mobilitaetsprogramm_code><![CDATA['.$row->mobilitaetsprogramm_code.']]></IO:mobilitaetsprogramm_code>
 	            <IO:mobilitaetsprogramm_kurzbz><![CDATA['.$row->mobilitaetsprogramm_kurzbz.']]></IO:mobilitaetsprogramm_kurzbz>
 	            <IO:nation_code><![CDATA['.$row->nation_code.']]></IO:nation_code>
-	            <IO:von><![CDATA['.$row->von.']]></IO:von>
-	            <IO:bis><![CDATA['.$row->bis.']]></IO:bis>
+	            <IO:von_iso><![CDATA['.$row->von.']]></IO:von_iso>
+	            <IO:von><![CDATA['.$datum->convertISODate($row->von).']]></IO:von>
+	            <IO:bis_iso><![CDATA['.$row->bis.']]></IO:bis_iso>
+	            <IO:bis><![CDATA['.$datum->convertISODate($row->bis).']]></IO:bis>
 	            <IO:zweck_code><![CDATA['.$row->zweck_code.']]></IO:zweck_code>
 	            <IO:zweck_bezeichnung><![CDATA['.$row->zweck_bezeichnung.']]></IO:zweck_bezeichnung>
 	            <IO:student_uid><![CDATA['.$row->student_uid.']]></IO:student_uid>

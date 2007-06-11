@@ -118,3 +118,25 @@ function CheckDatum(datum)
 	else
 		return false;
 }
+
+// ****
+// * Wandelt ein Datum ins ISO Format um
+// * aus 31.2.2007 wird 2007-02-31
+// ****
+function ConvertDateToISO(datum)
+{
+	if(datum!='')
+	{
+		arr = datum.split('.');
+		
+		if(arr[0].length==1)
+			arr[0]='0'+arr[0];
+			
+		if(arr[1].length==1)
+			arr[1]='0'+arr[1];
+			
+		return arr[2]+'-'+arr[1]+'-'+arr[0];
+	}
+	else
+		return '';
+}

@@ -30,6 +30,7 @@ include('../../vilesci/config.inc.php');
 echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
+echo '<?xml-stylesheet href="'.APP_ROOT.'content/bindings.css" type="text/css"?>';
 ?>
 
 <window id="student-konto-neu-dialog" title="Neu"
@@ -38,6 +39,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
         >
 
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/student/studentkontoneudialog.js.php" />
+<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/functions.js.php" />
 
 <vbox>
 <groupbox id="student-konto-neu-groupbox" flex="1">
@@ -58,8 +60,8 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 				</row>
 				<row>
 					<label value="Buchungsdatum" control="student-konto-neu-textbox-buchungsdatum"/>
-					<hbox>
-      					<textbox id="student-konto-neu-textbox-buchungsdatum" value="<?php echo date('Y-m-d');?>" maxlength="10" size="10"/>
+					<hbox>      					
+      					<box class='Datum' id="student-konto-neu-textbox-buchungsdatum" value="<?php echo date('d.m.Y');?>" />
       					<spacer flex="1" />			
       				</hbox>
       			</row>

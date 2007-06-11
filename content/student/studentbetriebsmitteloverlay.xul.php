@@ -77,11 +77,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<splitter class="tree-splitter"/>
 							<treecol id="student-betriebsmittel-tree-ausgegebenam" label="Ausgabedatum" flex="2" hidden="true"
 								class="sortDirectionIndicator"
-								sort="rdf:http://www.technikum-wien.at/konto/rdf#ausgegebenam" />
+								sort="rdf:http://www.technikum-wien.at/konto/rdf#ausgegebenam_iso" />
 							<splitter class="tree-splitter"/>
 							<treecol id="student-betriebsmittel-tree-retouram" label="Retourdatum" flex="2" hidden="false"
 								class="sortDirectionIndicator"
-								sort="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#retouram" />
+								sort="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#retouram_iso" />
 							<splitter class="tree-splitter"/>
 							<treecol id="student-betriebsmittel-tree-betriebsmittel_id" label="Betriebsmittel_id" flex="2" hidden="true"
 								class="sortDirectionIndicator"
@@ -170,14 +170,16 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					      			<row>
 										<label value="Ausgegeben am" control="student-betriebsmittel-textbox-ausgegebenam"/>
 										<hbox>
-					      					<textbox id="student-betriebsmittel-textbox-ausgegebenam" disabled="true" maxlength="10"/>
+											<box class="Datum" id="student-betriebsmittel-textbox-ausgegebenam" disabled="true"/>
+					      					<!--<textbox id="student-betriebsmittel-textbox-ausgegebenam" disabled="true" maxlength="10"/>-->
 					      					<spacer flex="1" />			
 					      				</hbox>
 									</row>
 									<row>
 										<label value="Retour am" control="student-betriebsmittel-textbox-retouram"/>
 										<hbox>
-					      					<textbox id="student-betriebsmittel-textbox-retouram" disabled="true" maxlength="10"/>
+											<box class="Datum" id="student-betriebsmittel-textbox-retouram" disabled="true"/>
+					      					<!--<textbox id="student-betriebsmittel-textbox-retouram" disabled="true" maxlength="10"/>-->
 					      					<spacer flex="1" />			
 					      				</hbox>
 									</row>

@@ -112,7 +112,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentnotenoverlay.xul.ph
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-geburtsdatum" label="Geburtsdatum" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/student/rdf#geburtsdatum" onclick="StudentTreeSort()"/>
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#geburtsdatum_iso" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-semester" label="Sem." flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
