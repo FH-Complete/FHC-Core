@@ -50,6 +50,9 @@ class studiengang
 
 	var $kuerzel;			// = typ + kurzbz (Bsp: BBE)
 
+	var $studiengang_typ_arr = array();
+
+	
 	// **************************************************************
 	// * Konstruktor
 	// * @param conn Connection zur Datenbank
@@ -72,6 +75,12 @@ class studiengang
 
 		if(is_numeric($studiengang_kz))
 			$this->load($studiengang_kz);
+		
+		$this->studiengang_typ_arr["b"] = "Bachelor";
+		$this->studiengang_typ_arr["d"] = "Diplom";
+		$this->studiengang_typ_arr["m"] = "Master";
+		$this->studiengang_typ_arr["l"] = "LLL";
+		$this->studiengang_typ_arr["e"] = "Erhalter";
 	}
 
 	// *****************************************************
