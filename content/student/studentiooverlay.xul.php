@@ -70,11 +70,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<splitter class="tree-splitter"/>
 							<treecol id="student-io-tree-von" label="Von" flex="2" hidden="false"
 								class="sortDirectionIndicator"
-								sort="rdf:http://www.technikum-wien.at/bisio/rdf#von" />
+								sort="rdf:http://www.technikum-wien.at/bisio/rdf#von_iso" />
 							<splitter class="tree-splitter"/>
 							<treecol id="student-io-tree-bis" label="Bis" flex="2" hidden="false"
 								class="sortDirectionIndicator"
-								sort="rdf:http://www.technikum-wien.at/bisio/rdf#bis" />
+								sort="rdf:http://www.technikum-wien.at/bisio/rdf#bis_iso" />
 							<splitter class="tree-splitter"/>
 							<treecol id="student-io-tree-zweck_kurzbz" label="Zweck" flex="2" hidden="false"
 								class="sortDirectionIndicator"
@@ -125,14 +125,15 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<row>
 										<label value="Von" control="student-io-textbox-von"/>
 										<hbox>
-					      					<textbox id="student-io-textbox-von" disabled="true" maxlength="10" size="10"/>
+											<box class="Datum" id="student-io-textbox-von" disabled="true"/>
 					      					<spacer flex="1" />			
 					      				</hbox>
 									</row>
 									<row>
 										<label value="Bis" control="student-io-textbox-bis"/>
 										<hbox>
-					      					<textbox id="student-io-textbox-bis" disabled="true" maxlength="10" size="10"/>
+											<box class="Datum" id="student-io-textbox-bis" disabled="true"/>
+					      					<!--<textbox id="student-io-textbox-bis" disabled="true" maxlength="10" size="10"/>-->
 					      					<spacer flex="1" />
 					      				</hbox>
 					      			</row>

@@ -107,13 +107,12 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 	
 	<vbox>
 		<spacer flex="1"/>
-		<button id="student-note-copy" label="&lt;=" style="font-weight: bold;" oncommand="alert(document.getElementById('student-noten-datum').value);"/>
+		<button id="student-note-copy" label="&lt;=" style="font-weight: bold;" oncommand="StudentNotenMove();"/>
 		<spacer flex="1"/>
-		<box id="student-noten-datum" class="Datum"/>
 	</vbox>
 	
 	
-	<tree id="student-lvgesamtnoten-tree" seltype="single" hidecolumnpicker="false" flex="1"
+	<tree id="student-lvgesamtnoten-tree" seltype="multi" hidecolumnpicker="false" flex="1"
 		datasources="rdf:null" ref="http://www.technikum-wien.at/lvgesamtnote/liste"
 		style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100%" enableColumnDrag="true"
 	>
@@ -178,7 +177,22 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 		</template>
 	</tree>
 	
-</hbox>				
-
+</hbox>		
+<hbox>		
+	<label value="Note" control="student-noten-menulist-note"/>
+	<menulist id="student-noten-menulist-note" disabled="true"
+	          datasources="<?php echo APP_ROOT ?>rdf/note.rdf.php" flex="1"
+	          ref="http://www.technikum-wien.at/note/liste" >
+		<template>
+			<menupopup>
+				<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
+	        		      label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
+				  		  uri="rdf:*"/>
+				</menupopup>
+		</template>
+	</menulist>
+	<button id="student-noten-button-speichern" oncommand="StudentNoteSpeichern()" label="Speichern" disabled="true"/>
+	<spacer flex="1" />
+</hbox>
 </vbox>
 </overlay>

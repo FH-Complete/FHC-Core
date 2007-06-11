@@ -69,7 +69,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								class="sortDirectionIndicator"
 								sortActive="true"
 								sortDirection="ascending"
-								sort="rdf:http://www.technikum-wien.at/konto/rdf#buchungsdatum"/>
+								sort="rdf:http://www.technikum-wien.at/konto/rdf#buchungsdatum_iso"/>
 							<splitter class="tree-splitter"/>
 							<treecol id="student-konto-tree-buchungstext" label="Buchungstext" flex="5" hidden="false"
 							   class="sortDirectionIndicator"
@@ -138,7 +138,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<row>
 										<label value="Buchungsdatum" control="student-konto-textbox-buchungsdatum"/>
 										<hbox>
-					      					<textbox id="student-konto-textbox-buchungsdatum" disabled="true" maxlength="10" size="10"/>
+											<box class="Datum" id="student-konto-textbox-buchungsdatum" disabled="true"/>
+					      					<!--<textbox id="student-konto-textbox-buchungsdatum" disabled="true" maxlength="10" size="10"/>-->
 					      					<spacer flex="1" />			
 					      				</hbox>
 					      			</row>

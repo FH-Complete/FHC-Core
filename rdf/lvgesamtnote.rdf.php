@@ -63,7 +63,7 @@ echo '
 ';
    
 //Daten holen
-$obj = new lvgesamtnote($conn);
+$obj = new lvgesamtnote($conn,null, null, null, true);
 
 $obj->getLvGesamtNoten($lehrveranstaltung_id, $uid, $semester_aktuell);
 

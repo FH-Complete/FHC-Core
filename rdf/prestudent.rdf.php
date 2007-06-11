@@ -33,12 +33,15 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 require_once('../vilesci/config.inc.php');
 require_once('../include/person.class.php');
 require_once('../include/prestudent.class.php');
+require_once('../include/datum.class.php');
 
 // Datenbank Verbindung
 if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 $rdf_url='http://www.technikum-wien.at/prestudent';
+
+$datum = new datum();
 
 ?>
 
@@ -68,14 +71,17 @@ if(isset($_GET['prestudent_id']) && is_numeric($_GET['prestudent_id']))
 				<PRESTD:ausbildungcode><![CDATA[<?php echo $prestd->ausbildungcode;  ?>]]></PRESTD:ausbildungcode>
 				<PRESTD:zgv_code><![CDATA[<?php echo $prestd->zgv_code;  ?>]]></PRESTD:zgv_code>
 				<PRESTD:zgvort><![CDATA[<?php echo $prestd->zgvort;  ?>]]></PRESTD:zgvort>
-				<PRESTD:zgvdatum><![CDATA[<?php echo $prestd->zgvdatum;  ?>]]></PRESTD:zgvdatum>
+				<PRESTD:zgvdatum_iso><![CDATA[<?php echo $prestd->zgvdatum;  ?>]]></PRESTD:zgvdatum_iso>
+				<PRESTD:zgvdatum><![CDATA[<?php echo $datum->convertISODate($prestd->zgvdatum);  ?>]]></PRESTD:zgvdatum>
 				<PRESTD:zgvmas_code><![CDATA[<?php echo $prestd->zgvmas_code;  ?>]]></PRESTD:zgvmas_code>
 				<PRESTD:zgvmaort><![CDATA[<?php echo $prestd->zgvmaort;  ?>]]></PRESTD:zgvmaort>
-				<PRESTD:zgvmadatum><![CDATA[<?php echo $prestd->zgvmadatum;  ?>]]></PRESTD:zgvmadatum>
+				<PRESTD:zgvmadatum_iso><![CDATA[<?php echo $prestd->zgvmadatum;  ?>]]></PRESTD:zgvmadatum_iso>
+				<PRESTD:zgvmadatum><![CDATA[<?php echo $datum->convertISODate($prestd->zgvmadatum);  ?>]]></PRESTD:zgvmadatum>
 				<PRESTD:aufnahmeschluessel><![CDATA[<?php echo $prestd->aufnahmeschluessel;  ?>]]></PRESTD:aufnahmeschluessel>
 				<PRESTD:facheinschlberuf><![CDATA[<?php echo ($prestd->facheinschlberuf?'true':'false');  ?>]]></PRESTD:facheinschlberuf>
 				<PRESTD:reihungstest_id><![CDATA[<?php echo $prestd->reihungstest_id;  ?>]]></PRESTD:reihungstest_id>
-				<PRESTD:anmeldungreihungstest><![CDATA[<?php echo $prestd->anmeldungreihungstest;  ?>]]></PRESTD:anmeldungreihungstest>
+				<PRESTD:anmeldungreihungstest_iso><![CDATA[<?php echo $prestd->anmeldungreihungstest;  ?>]]></PRESTD:anmeldungreihungstest_iso>
+				<PRESTD:anmeldungreihungstest><![CDATA[<?php echo $datum->convertISODate($prestd->anmeldungreihungstest);  ?>]]></PRESTD:anmeldungreihungstest>
 				<PRESTD:reihungstestangetreten><![CDATA[<?php echo ($prestd->reihungstestangetreten?'true':'false');  ?>]]></PRESTD:reihungstestangetreten>
 				<PRESTD:punkte><![CDATA[<?php echo $prestd->punkte;  ?>]]></PRESTD:punkte>
 				<PRESTD:bismelden><![CDATA[<?php echo ($prestd->bismelden?'true':'false');  ?>]]></PRESTD:bismelden>

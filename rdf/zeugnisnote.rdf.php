@@ -51,7 +51,12 @@ if(isset($_GET['lehrveranstaltung_id']))
 	$lehrveranstaltung_id = $_GET['lehrveranstaltung_id'];
 else 
 	$lehrveranstaltung_id = null;
-	
+
+if(isset($_GET['studiensemester_kurzbz']))
+	$studiensemester_kurzbz = $_GET['studiensemester_kurzbz'];
+else 
+	$studiensemester_kurzbz = $semester_aktuell;
+
 $rdf_url='http://www.technikum-wien.at/zeugnisnote';
 
 echo '
@@ -63,9 +68,9 @@ echo '
 ';
    
 //Daten holen
-$obj = new zeugnisnote($conn);
+$obj = new zeugnisnote($conn, null, null, null, true);
 
-$obj->getZeugnisnoten($lehrveranstaltung_id, $uid, $semester_aktuell);
+$obj->getZeugnisnoten($lehrveranstaltung_id, $uid, $studiensemester_kurzbz);
 
 foreach ($obj->result as $row)	
 {

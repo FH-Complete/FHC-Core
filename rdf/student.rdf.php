@@ -88,7 +88,7 @@ if($xmlformat=='rdf')
 	<?php
 	function drawStudent($student)
 	{
-		global $rdf_url;
+		global $rdf_url, $datum_obj;
 		?>
 		  <RDF:li>
 	      	<RDF:Description  id="<?php echo $student->uid; ?>"  about="<?php echo $rdf_url.'/'.$student->uid; ?>" >
@@ -100,7 +100,7 @@ if($xmlformat=='rdf')
 	    		<STUDENT:vorname><![CDATA[<?php echo $student->vorname  ?>]]></STUDENT:vorname>
 	    		<STUDENT:nachname><![CDATA[<?php echo $student->nachname  ?>]]></STUDENT:nachname>
 	    		<STUDENT:matrikelnummer><![CDATA[<?php echo $student->matrikelnr  ?>]]></STUDENT:matrikelnummer>
-	    		<STUDENT:geburtsdatum><![CDATA[<?php echo $student->gebdatum  ?>]]></STUDENT:geburtsdatum>
+	    		<STUDENT:geburtsdatum><![CDATA[<?php echo $datum_obj->convertISODate($student->gebdatum)  ?>]]></STUDENT:geburtsdatum>
 	    		<STUDENT:geburtsdatum_iso><![CDATA[<?php echo $student->gebdatum;  ?>]]></STUDENT:geburtsdatum_iso>
 	    		<STUDENT:alias><![CDATA[<?php echo $student->alias  ?>]]></STUDENT:alias>
 	    		<STUDENT:homepage><![CDATA[<?php echo $student->homepage  ?>]]></STUDENT:homepage>

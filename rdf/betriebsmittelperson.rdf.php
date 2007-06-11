@@ -31,6 +31,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
 require_once('../vilesci/config.inc.php');
 require_once('../include/betriebsmittelperson.class.php');
+require_once('../include/datum.class.php');
 
 // Datenbank Verbindung
 if (!$conn = @pg_pconnect(CONN_STRING))
@@ -51,17 +52,18 @@ if(isset($_GET['betriebsmittel_id']))
 else 
 	$betriebsmittel_id = null;
 
-$rdf_url='http://www.technikum-wien.at/betriebsmittel';
-?>
+$datum = new datum();
 
+$rdf_url='http://www.technikum-wien.at/betriebsmittel';
+
+echo '
 <RDF:RDF
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:BTM="<?php echo $rdf_url; ?>/rdf#"
+	xmlns:BTM="'.$rdf_url.'/rdf#"
 >
 
-   <RDF:Seq about="<?php echo $rdf_url ?>/liste">
+   <RDF:Seq about="'.$rdf_url.'/liste">';
 
-<?php
 
 $betriebsmittel = new betriebsmittelperson($conn, null, null, true);
 if($betriebsmittel_id=='')
@@ -78,24 +80,27 @@ else
 
 function draw_content($row)
 {
-	global $rdf_url;
-	?>
+	global $rdf_url, $datum;
+	
+	echo '
       <RDF:li>
-         <RDF:Description  id="<?php echo $row->person_id.'/'.$row->betriebsmittel_id; ?>"  about="<?php echo $rdf_url.'/'.$row->person_id.'/'.$row->betriebsmittel_id; ?>" >
-            <BTM:betriebsmittel_id><![CDATA[<?php echo $row->betriebsmittel_id  ?>]]></BTM:betriebsmittel_id>
-            <BTM:beschreibung><![CDATA[<?php echo $row->beschreibung ?>]]></BTM:beschreibung>
-            <BTM:betriebsmitteltyp><![CDATA[<?php echo $row->betriebsmitteltyp ?>]]></BTM:betriebsmitteltyp>
-            <BTM:nummer><![CDATA[<?php echo $row->nummer ?>]]></BTM:nummer>
-            <BTM:reservieren><![CDATA[<?php echo ($row->reservieren?'Ja':'Nein') ?>]]></BTM:reservieren>
-            <BTM:ort_kurzbz><![CDATA[<?php echo $row->ort_kurzbz ?>]]></BTM:ort_kurzbz>            
-            <BTM:person_id><![CDATA[<?php echo $row->person_id  ?>]]></BTM:person_id>
-            <BTM:anmerkung><![CDATA[<?php echo $row->anmerkung ?>]]></BTM:anmerkung>
-            <BTM:kaution><![CDATA[<?php echo $row->kaution  ?>]]></BTM:kaution>
-            <BTM:ausgegebenam><![CDATA[<?php echo $row->ausgegebenam  ?>]]></BTM:ausgegebenam>
-            <BTM:retouram><![CDATA[<?php echo $row->retouram ?>]]></BTM:retouram>
+         <RDF:Description  id="'.$row->person_id.'/'.$row->betriebsmittel_id.'"  about="'.$rdf_url.'/'.$row->person_id.'/'.$row->betriebsmittel_id.'" >
+            <BTM:betriebsmittel_id><![CDATA['.$row->betriebsmittel_id.']]></BTM:betriebsmittel_id>
+            <BTM:beschreibung><![CDATA['.$row->beschreibung.']]></BTM:beschreibung>
+            <BTM:betriebsmitteltyp><![CDATA['.$row->betriebsmitteltyp.']]></BTM:betriebsmitteltyp>
+            <BTM:nummer><![CDATA['.$row->nummer.']]></BTM:nummer>
+            <BTM:reservieren><![CDATA['.($row->reservieren?'Ja':'Nein').']]></BTM:reservieren>
+            <BTM:ort_kurzbz><![CDATA['.$row->ort_kurzbz.']]></BTM:ort_kurzbz>            
+            <BTM:person_id><![CDATA['.$row->person_id.']]></BTM:person_id>
+            <BTM:anmerkung><![CDATA['.$row->anmerkung.']]></BTM:anmerkung>
+            <BTM:kaution><![CDATA['.$row->kaution.']]></BTM:kaution>
+            <BTM:ausgegebenam_iso><![CDATA['.$row->ausgegebenam.']]></BTM:ausgegebenam_iso>
+            <BTM:ausgegebenam><![CDATA['.$datum->convertISODate($row->ausgegebenam).']]></BTM:ausgegebenam>
+            <BTM:retouram_iso><![CDATA['.$row->retouram.']]></BTM:retouram_iso>
+            <BTM:retouram><![CDATA['.$datum->convertISODate($row->retouram).']]></BTM:retouram>
          </RDF:Description>
-      </RDF:li>
-<?php
+      </RDF:li>';
+
 }
 ?>
    </RDF:Seq>
