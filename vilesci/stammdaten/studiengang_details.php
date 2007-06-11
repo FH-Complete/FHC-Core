@@ -12,10 +12,34 @@
 	$errorstr = ""; //fehler beim insert
 	$sel = "";
 	$chk = "";
+
+	$studiengang_kz = "";
+	$kurzbz = "";
+	$kurzbzlang = "";
+	$typ = "";
+	$bezeichnung = "";
+	$english = "";
+	$farbe = "";
+	$email = "";
+	$telefon = "";
+	$max_semester = "";
+	$max_verband = "";
+	$max_gruppe = "";
+	$erhalter_kz = "";
+	$bescheid = "";
+	$bescheidbgbl1 = "";
+	$bescheidbgbl2 = "";
+	$bescheidgz = "";
+	$bescheidvom = "";
+	$organisationsform = "";
+	$titelbescheidvom = "";
+	$ext_id = "";
+	$aktiv = "t";
+	$neu = "true";
 	
 	if(isset($_POST["schick"]))
 	{
-		$kennzahl = $_POST["studiengang_kz"];
+		$studiengang_kz = $_POST["studiengang_kz"];
 		$kurzbz = $_POST["kurzbz"];
 		$kurzbzlang = $_POST["kurzbzlang"];
 		$typ = $_POST["typ"];
@@ -42,7 +66,7 @@
 		$ext_id = $_POST["ext_id"];
 
 		$sg_update = new studiengang($conn);
-		$sg_update->studiengang_kz = $kennzahl;
+		$sg_update->studiengang_kz = $studiengang_kz;
 		$sg_update->kurzbz = $kurzbz;
 		$sg_update->kurzbzlang = $kurzbzlang;
 		$sg_update->typ = $typ;
@@ -70,7 +94,8 @@
 
 		if(!$sg_update->save())
 		{
-			$kennzahl = $_POST["studiengang_kz"];
+			/*
+			$studiengang_kz = $_POST["studiengang_kz"];
 			$kurzbz = $_POST["kurzbz"];
 			$kurzbzlang = $_POST["kurzbzlang"];
 			$typ = $_POST["typ"];
@@ -95,6 +120,7 @@
 			else
 				$aktiv = "f";
 			$ext_id = $_POST["ext_id"];
+			*/
 			$errorstr .= $sg_update->errormsg;
 			//die($sg_update->errormsg);
 		}
@@ -105,10 +131,10 @@
 
 
 
-	if (isset($_REQUEST['studiengang_kz']))
+	if ((isset($_REQUEST['studiengang_kz'])) && ((!isset($_REQUEST['neu'])) || ($_REQUEST['neu']!= "true")))
 	{
-		$kennzahl = $_REQUEST["studiengang_kz"];
-		$sg = new studiengang($conn,$kennzahl);
+		$studiengang_kz = $_REQUEST["studiengang_kz"];
+		$sg = new studiengang($conn,$studiengang_kz);
 		if ($sg->errormsg!='')
 			die($sg->errormsg);
 		$studiengang_kz = $sg->studiengang_kz;
@@ -134,32 +160,6 @@
 		$ext_id = $sg->ext_id;
 		$aktiv = $sg->aktiv;
 		$neu = "false";
-	}
-	else
-	{
-		$studiengang_kz = "";
-		$kurzbz = "";
-		$kurzbzlang = "";
-		$typ = "";
-		$bezeichnung = "";
-		$english = "";
-		$farbe = "";
-		$email = "";
-		$telefon = "";
-		$max_semester = "";
-		$max_verband = "";
-		$max_gruppe = "";
-		$erhalter_kz = "";
-		$bescheid = "";
-		$bescheidbgbl1 = "";
-		$bescheidbgbl2 = "";
-		$bescheidgz = "";
-		$bescheidvom = "";
-		$organisationsform = "";
-		$titelbescheidvom = "";
-		$ext_id = "";
-		$aktiv = "t";
-		$neu = "true";
 	}
 	
 	$erh = new erhalter($conn);
@@ -350,7 +350,7 @@
 	$htmlstr .= "	<input type='button' value='Reset' onclick='unchanged()'>\n";
 	$htmlstr .= "</div>";
 	$htmlstr .= "</form>";
-	$htmlstr .= "<div id='inserterror'>".$errorstr."</div>"
+	$htmlstr .= "<div class='inserterror'>".$errorstr."</div>"
 	
 
 ?>
