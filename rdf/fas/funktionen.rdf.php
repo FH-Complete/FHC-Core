@@ -92,7 +92,7 @@ if(isset($_GET['mitarbeiter_id']))
 
 	// Funktionen holen
 	$funktionenDAO=new funktion($conn);
-	$funktionenDAO->load_pers($mitarbeiter_id, $stsem_id);
+	$funktionenDAO->load_pers($pers_id, $stsem_id);
 	
 	foreach ($funktionenDAO->result as $funktionen)
 	{
