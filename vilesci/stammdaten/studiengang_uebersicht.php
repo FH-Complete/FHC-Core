@@ -62,6 +62,8 @@ function confdel()
 	  return true;
 	return false;
 }
+
+
 </script>
 
 </head>
@@ -69,9 +71,12 @@ function confdel()
 <body class="background_main">
 <h2>Studieng&auml;nge &Uuml;bersicht</h2>
 
+
+
 <?php 
     echo $htmlstr;
 ?>
+
 
 
 </body>
