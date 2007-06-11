@@ -110,22 +110,23 @@ function jump_week($datum, $wochen)
 
 function jahreskalenderjump($link)
 {
+	$crlf=crlf();
 	$datum=mktime();
 	$woche=kalenderwoche($datum);
 	$datum=montag($datum);
-	echo '<SMALL><CENTER><B>Jump to KW</B><BR><SMALL>';
+	echo '			<SMALL><CENTER><B>Jump to KW</B><BR><SMALL>'.$crlf;
 	for ($anz=1;$anz<26;$anz++)
 	{
 		$linknew=$link.'&datum='.$datum;
 		if ($woche==53)
 			$woche=1;
-		echo ' <A HREF="'.$linknew.'">'.$woche.'</A> ';
+		echo '			<A HREF="'.$linknew.'">'.$woche.'</A>'.$crlf;
 		if ($anz%5==0)
-			echo '<br>';
+			echo '			<br>'.$crlf;
 		$datum+=60*60*24*7;
 		$woche++;
 	}
-	echo '</SMALL></CENTER></SMALL>';
+	echo '			</SMALL></CENTER></SMALL>'.$crlf;
 }
 
 function loadVariables($conn, $user)

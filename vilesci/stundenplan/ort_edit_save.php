@@ -12,7 +12,7 @@
 		//$sql_query="UPDATE ort SET picture=lo_import('$file') WHERE id=$id";
 		if(!($erg=pg_exec($conn, $sql_query)))
 			die(pg_errormessage($conn));
-		echo $erg.<BR>;
+		echo $erg.'<BR>';
 	//echo $sql_query;
 	}
 	

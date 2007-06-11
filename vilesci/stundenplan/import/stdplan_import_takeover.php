@@ -1,5 +1,5 @@
 <?php
-	include('../../../include/config.inc.php');
+	include('../../config.inc.php');
 	include('wochendatum.inc.php');
 	if (!($conn=pg_connect(CONN_STRING)))
 		die ("No connection to Database!");

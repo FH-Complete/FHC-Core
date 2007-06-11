@@ -9,14 +9,21 @@ body
 	font-size: small;
 	/*IE hack end*/
 }
-
-#menujfd
+iframe
 {
-	position:absolute;
+	margin:0px;
+	border-width:0px;
+	border-style:none;
+	padding:0px;
+}
+
+#menue
+{
+	position:relative;
 	top:0px;
-	left:100px;
+	left:0px;
 	width:300px;
-	height:100%;
+	bottom:0px;
 	margin:0;
 	padding:0;
 	border-width:0;

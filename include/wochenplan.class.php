@@ -329,9 +329,10 @@ class wochenplan
 
 	function draw_header()
 	{
-		echo '<TABLE width="100%" bgcolor="#EEEEEE" border="0" cellspacing="0">';
-		echo '<TR>';
-		echo '<TD valign="bottom"><P valign="top">';
+		echo '<TABLE width="100%" bgcolor="#EEEEEE" border="0" cellspacing="0">'.$this->crlf;
+		echo '	<TR>'.$this->crlf;
+		echo '		<TD valign="bottom">'.$this->crlf;
+		echo '			<P valign="top">';
 		if ($this->type=='student' || $this->type=='lektor')
 			echo '<strong>Person: </strong>'.$this->pers_titelpre.' '.$this->pers_vorname.' '.$this->pers_nachname.' - '.$this->pers_uid.'<br>';
 		if ($this->type=='student' || $this->type=='verband')
@@ -346,44 +347,36 @@ class wochenplan
 		}
 		if ($this->type=='ort')
 			echo '<strong>Ort: </strong>'.$this->ort_kurzbz.' - '.$this->ort_bezeichnung.'<br>';
-		echo '</P><div valign="bottom" align="center">';
+		echo '</P>'.$this->crlf;
+		echo '			<div valign="bottom" align="center">'.$this->crlf;
 
 		//Kalender
 		$this->kal_link.='&pers_uid='.$this->pers_uid.'&ort_kurzbz='.$this->ort_kurzbz.'&stg_kz='.$this->stg_kz.'&sem='.$this->sem.'&ver='.$this->ver.'&grp='.$this->grp.'&gruppe_kurzbz='.$this->gruppe_kurzbz;
 		//global $kalender_begin_ws, $kalender_ende_ws, $kalender_begin_ss, $kalender_ende_ss;
 		$kal_link_ws=$this->kal_link.'&begin='.$this->studiensemester_now->start.'&ende='.$this->studiensemester_now->ende;
 		$kal_link_ss=$this->kal_link.'&begin='.$this->studiensemester_next->start.'&ende='.$this->studiensemester_next->ende;
-		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Kalender:&nbsp;&nbsp;&nbsp;&nbsp;</strong>';
-		echo '<A href="'.$kal_link_ws.'&format=html" target="_blank" title="HTML">'.$this->studiensemester_now->name.'</A>&nbsp;';
-		echo '	<A href="'.$kal_link_ws.'&format=html" target="_blank" title="HTML">
-					<IMG src="../../../skin/images/website.png" height="24" alt="HTML" border="0"></A>';
-		echo '	<A href="'.$kal_link_ws.'&format=csv" title="CSV">
-					<IMG src="../../../skin/images/csv.png" height="24" alt="CSV" border="0"></A>';
-		echo '	<A href="'.$kal_link_ws.'&format=csv&target=outlook" title="CSV-Outlook">
-					<IMG src="../../../skin/images/outlook.png" height="24" alt="CSV-Outlook" border="0"></A>';
-		echo '	<A href="'.$kal_link_ws.'&format=ical&version=1&target=ical" title="iCal Version 1.0">
-					<IMG src="../../../skin/images/vcal_v1.png" height="24" alt="vCal Version 1.0" border="0"></A>';
-		echo '	<A href="'.$kal_link_ws.'&format=ical&version=2&target=ical" title="iCal Version 2.0">
-					<IMG src="../../../skin/images/vcal_v2.png" height="24" alt="vCal Version 2.0" border="0"></A>';
-		echo '&nbsp;&nbsp;&nbsp;&nbsp;<A href="'.$kal_link_ss.'&format=html" target="_blank" title="HTML">'.$this->studiensemester_next->name.'</A>&nbsp;';
-		echo '	<A href="'.$kal_link_ss.'&format=html" target="_blank" title="HTML">
-					<IMG src="../../../skin/images/website.png" height="24" alt="HTML" border="0"></A>';
-		echo '	<A href="'.$kal_link_ss.'&format=csv" title="CSV">
-					<IMG src="../../../skin/images/csv.png" height="24" alt="CSV" border="0"></A>';
-		echo '	<A href="'.$kal_link_ss.'&format=csv&target=outlook" title="CSV-Outlook">
-					<IMG src="../../../skin/images/outlook.png" height="24" alt="CSV-Outlook" border="0"></A>';
-		echo '	<A href="'.$kal_link_ss.'&format=ical&version=1&target=ical" title="iCal Version 1.0">
-					<IMG src="../../../skin/images/vcal_v1.png" height="24" alt="iCal Version 1.0" border="0"></A>';
-		echo '	<A href="'.$kal_link_ss.'&format=ical&version=2&target=ical" title="iCal Version 2.0">
-					<IMG src="../../../skin/images/vcal_v2.png" height="24" alt="iCal Version 2.0" border="0"></A>';
-		echo '</div></TD>';
+		echo '				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Kalender:&nbsp;&nbsp;&nbsp;&nbsp;</strong>'.$this->crlf;
+		echo '				<A href="'.$kal_link_ws.'&format=html" target="_blank" title="HTML">'.$this->studiensemester_now->name.'</A>&nbsp;'.$this->crlf;
+		echo '				<A href="'.$kal_link_ws.'&format=html" target="_blank" title="HTML"><IMG src="../../../skin/images/website.png" height="24" alt="HTML" border="0"></A>'.$this->crlf;
+		echo '				<A href="'.$kal_link_ws.'&format=csv" title="CSV"><IMG src="../../../skin/images/csv.png" height="24" alt="CSV" border="0"></A>'.$this->crlf;
+		echo '				<A href="'.$kal_link_ws.'&format=csv&target=outlook" title="CSV-Outlook"><IMG src="../../../skin/images/outlook.png" height="24" alt="CSV-Outlook" border="0"></A>'.$this->crlf;
+		echo '				<A href="'.$kal_link_ws.'&format=ical&version=1&target=ical" title="iCal Version 1.0"><IMG src="../../../skin/images/vcal_v1.png" height="24" alt="vCal Version 1.0" border="0"></A>'.$this->crlf;
+		echo '				<A href="'.$kal_link_ws.'&format=ical&version=2&target=ical" title="iCal Version 2.0"><IMG src="../../../skin/images/vcal_v2.png" height="24" alt="vCal Version 2.0" border="0"></A>'.$this->crlf;
+		echo '				&nbsp;&nbsp;&nbsp;&nbsp;<A href="'.$kal_link_ss.'&format=html" target="_blank" title="HTML">'.$this->studiensemester_next->name.'</A>&nbsp;'.$this->crlf;
+		echo '				<A href="'.$kal_link_ss.'&format=html" target="_blank" title="HTML"><IMG src="../../../skin/images/website.png" height="24" alt="HTML" border="0"></A>'.$this->crlf;
+		echo '				<A href="'.$kal_link_ss.'&format=csv" title="CSV"><IMG src="../../../skin/images/csv.png" height="24" alt="CSV" border="0"></A>'.$this->crlf;
+		echo '				<A href="'.$kal_link_ss.'&format=csv&target=outlook" title="CSV-Outlook"><IMG src="../../../skin/images/outlook.png" height="24" alt="CSV-Outlook" border="0"></A>'.$this->crlf;
+		echo '				<A href="'.$kal_link_ss.'&format=ical&version=1&target=ical" title="iCal Version 1.0"><IMG src="../../../skin/images/vcal_v1.png" height="24" alt="iCal Version 1.0" border="0"></A>'.$this->crlf;
+		echo '				<A href="'.$kal_link_ss.'&format=ical&version=2&target=ical" title="iCal Version 2.0"><IMG src="../../../skin/images/vcal_v2.png" height="24" alt="iCal Version 2.0" border="0"></A>'.$this->crlf;
+		echo '			</div>'.$this->crlf;
+		echo '		</TD>'.$this->crlf;
 
     	// Kalenderjump
-		echo '<TD align="right" valign="top">';
+		echo '		<TD align="right" valign="top">'.$this->crlf;
 		jahreskalenderjump($this->link);
-		echo '</TD>';
-		echo '</TR>';
-		echo '</TABLE><HR>';
+		echo '		</TD>'.$this->crlf;
+		echo '	</TR>'.$this->crlf;
+		echo '</TABLE><HR>'.$this->crlf.$this->crlf;
 
 		// Jump Wochenweise
 		if ($this->type=='verband')
@@ -410,39 +403,39 @@ class wochenplan
 					$next_ort=pg_fetch_object($result_ort,$i);
 
 			// Ort Jump
-			echo '<FORM align="center" name="AuswahlOrt" action="stpl_week.php"><p align="center">';
+			echo '<FORM align="center" name="AuswahlOrt" action="stpl_week.php">'.$this->crlf;
+			echo '	<p align="center">'.$this->crlf;
 			//$datum=mktime($this->datum[hours], $this->datum[minutes], $this->datum[seconds], $this->datum[mon], $this->datum[mday], $this->datum[year]);
 			if (isset($prev_ort))
 			{
-				echo '<a href="stpl_week.php?type='.$this->type;
-				echo '&datum='.$this->datum.'&ort_kurzbz='.$prev_ort->ort_kurzbz;
-				echo '" alt="$prev_ort->kurzbz"><img src="../../../skin/images/left.gif" border="0"></a>';
+				echo '		<a href="stpl_week.php?type='.$this->type.'&datum='.$this->datum.'&ort_kurzbz='.$prev_ort->ort_kurzbz.'">'.$this->crlf;
+				echo '			<img src="../../../skin/images/left.gif" border="0" title="'.$prev_ort->ort_kurzbz.'" />'.$this->crlf;
+				echo '		</a>'.$this->crlf;
 			}
-			echo "<SELECT name=\"select\" onChange=\"MM_jumpMenu('self',this,0)\" class=\"xxxs_black\">";
+			echo "		<SELECT name=\"select\" onChange=\"MM_jumpMenu('self',this,0)\" class=\"xxxs_black\">".$this->crlf;
 			for ($i=0;$i<$num_rows_ort;$i++)
 			{
 				$row=pg_fetch_object ($result_ort, $i);
-				echo '<OPTION value="stpl_week.php?type=ort&ort_kurzbz='.$row->ort_kurzbz.'&datum='.$this->datum.'"';
+				echo '			<OPTION value="stpl_week.php?type=ort&ort_kurzbz='.$row->ort_kurzbz.'&datum='.$this->datum.'"';
 				if ($row->ort_kurzbz==$this->ort_kurzbz)
 					echo ' selected ';
-				echo ">$row->ort_kurzbz</option>";
+				echo ">$row->ort_kurzbz</option>".$this->crlf;
 			}
-			echo '</SELECT>';
+			echo '		</SELECT>'.$this->crlf;
 			if (isset($next_ort))
 			{
-				echo '<a href="stpl_week.php?type='.$this->type;
-				echo '&datum='.$this->datum.'&ort_kurzbz='.$next_ort->ort_kurzbz;
-				echo '" alt="$next_ort->kurzbz"><img src="../../../skin/images/right.gif" border="0"></a>';
+				echo '		<a href="stpl_week.php?type='.$this->type.'&datum='.$this->datum.'&ort_kurzbz='.$next_ort->ort_kurzbz.'">'.$this->crlf;
+				echo '			<img src="../../../skin/images/right.gif" border="0" title="'.$next_ort->ort_kurzbz.'">'.$this->crlf;
+				echo '		</a>'.$this->crlf;
 			}
-			echo '</p>';
+			echo '	</p>';
 			$link_parameter='&ort_kurzbz='.$this->ort_kurzbz;
 		}
-		echo '<p align="center">';
+		echo '	<p align="center">';
 		// 4 Wochen zurueck
-		echo '<a href="stpl_week.php?type='.$this->type;
-		echo $link_parameter;
-		echo '&datum='.$this->datum_prev4week;
-		echo '"><img src="../../../skin/images/moreleft.gif" border="0"></a>';
+		echo '		<a href="stpl_week.php?type='.$this->type.$link_parameter.'&datum='.$this->datum_prev4week.'">'.$this->crlf;
+		echo '			<img src="../../../skin/images/moreleft.gif" border="0" title="4 Wochen zurueck">'.$this->crlf;
+		echo '		</a>';
 		// 1 Woche zurueck
 		echo '<a href="stpl_week.php?type='.$this->type;
 		echo $link_parameter;
