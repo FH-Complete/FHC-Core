@@ -7,6 +7,14 @@ function db_query($conn, $sql_query)
 		return '';
 }
 
+// Auth: Benutzer des Webportals
+function get_uid()
+{
+	return strtolower(trim($_SERVER['REMOTE_USER']));
+	// fuer Testzwecke
+	//return 'pam';
+}
+
 function crlf()
 {
 	// doing some DOS-CRLF magic...
@@ -174,22 +182,22 @@ function writeCISlog($stat, $rm = '')
 function getStudiensemesterFromDatum($conn, $datum, $naechstes=true)
 {
 	$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE";
-	
+
 	if($naechstes)
 		$qry.= " ende>'$datum' ORDER BY ende ASC ";
-	else 
+	else
 		$qry.= " start<'$datum' ORDER BY ende DESC ";
-		
+
 	$qry.= "LIMIT 1";
-	
+
 	if($result = pg_query($conn, $qry))
 	{
 		if($row = pg_fetch_object($result))
 			return $row->studiensemester_kurzbz;
-		else 
-			return false;			
+		else
+			return false;
 	}
-	else 
+	else
 		return false;
 }
 ?>
