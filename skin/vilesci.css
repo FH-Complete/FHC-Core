@@ -662,3 +662,8 @@ input, textarea, select
 	width:100%;
 	text-align:center;
 }
+
+/* Sortable tables */
+table.sortable thead {
+    cursor: pointer;
+}
