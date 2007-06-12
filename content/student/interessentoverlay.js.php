@@ -362,6 +362,12 @@ function InteressentDetailSave()
 	person_id = document.getElementById('interessent-detail-textbox-person_id').value;
 	prestudent_id = document.getElementById('interessent-detail-textbox-prestudent_id').value
 			
+	if(geburtsdatum!='' && !CheckDatum(geburtsdatum))
+	{
+		alert('Geburtsdatum ist ungueltig');
+		return false;
+	}
+	
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 
@@ -374,7 +380,7 @@ function InteressentDetailSave()
 	req.add('vorname', vorname);
 	req.add('vornamen', vornamen);
 	req.add('nachname', nachname);
-	req.add('geburtsdatum', geburtsdatum);
+	req.add('geburtsdatum', ConvertDateToISO(geburtsdatum));
 	req.add('geburtsort', geburtsort);
 	req.add('geburtszeit', geburtszeit);
 	req.add('anmerkung', anmerkung);
@@ -723,6 +729,22 @@ function InteressentPrestudentSave()
 	studiengang_kz = document.getElementById('interessent-prestudent-menulist-studiengang_kz').value;
 	anmerkung = document.getElementById('interessent-prestudent-textbox-anmerkung').value;
 	
+	if(zgvdatum!='' && !CheckDatum(zgvdatum))
+	{
+		alert('ZgvDatum ist ungueltig');
+		return false;
+	}
+	if(zgvmasterdatum!='' && !CheckDatum(zgvdatum))
+	{
+		alert('ZgvMasterDatum ist ungueltig');
+		return false;
+	}
+	if(anmeldungreihungstest!='' && !CheckDatum(anmeldungreihungstest))
+	{
+		alert('Anmeldung zum Reihungstest Datum ist ungueltig');
+		return false;
+	}
+	
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 	
@@ -739,14 +761,14 @@ function InteressentPrestudentSave()
 	req.add('ausbildungcode', ausbildungcode);
 	req.add('zgv_code', zgv_code);
 	req.add('zgvort', zgvort);
-	req.add('zgvdatum', zgvdatum);
+	req.add('zgvdatum', ConvertDateToISO(zgvdatum));
 	req.add('zgvmas_code', zgvmaster_code);
 	req.add('zgvmaort', zgvmasterort);
-	req.add('zgvmadatum', zgvmasterdatum);
+	req.add('zgvmadatum', ConvertDateToISO(zgvmasterdatum));
 	req.add('aufnahmeschluessel', aufnahmeschluessel);
 	req.add('facheinschlberuf', facheinschlberuf);
 	req.add('reihungstest_id', reihungstest_id);
-	req.add('anmeldungreihungstest', anmeldungreihungstest);
+	req.add('anmeldungreihungstest', ConvertDateToISO(anmeldungreihungstest));
 	req.add('reihungstestangetreten', reihungstestangetreten);
 	req.add('punkte', punkte);
 	req.add('bismelden', bismelden);
@@ -789,7 +811,7 @@ function InteressentAnmeldungreihungstestHeute()
 	tag = now.getDate();
 	if(tag<10) tag='0'+tag;
 	
-	document.getElementById('interessent-prestudent-textbox-anmeldungreihungstest').value=jahr+'-'+monat+'-'+tag;
+	document.getElementById('interessent-prestudent-textbox-anmeldungreihungstest').value=tag+'.'+monat+'.'+jahr;
 }
 
 // ****
@@ -1194,6 +1216,49 @@ function InteressentKontoDetailDisableFields(val)
 }
 
 // ****
+// * Fuegt eine Rolle zu einem Interessenten hinzu
+// ****
+function InteressentAddRolle(rolle)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('interessent-tree');
+
+	if (tree.currentIndex==-1) return;
+		
+	//Ausgewaehlte ID holen
+    var col = tree.columns ? tree.columns["interessent-treecol-prestudent_id"] : "interessent-treecol-prestudent_id";
+	var prestudent_id=tree.view.getCellText(tree.currentIndex,col);
+		
+	if(confirm('Diesen Studenten zum '+rolle+' machen?'))
+	{
+		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+		var req = new phpRequest(url,'','');
+		
+		req.add('type', 'addrolle');
+				
+		req.add('prestudent_id', prestudent_id);
+		req.add('rolle_kurzbz', rolle);
+		
+		var response = req.executePOST();
+	
+		var val =  new ParseReturnValue(response);
+		
+		if (!val.dbdml_return)
+		{
+			if(val.dbdml_errormsg=='')
+				alert(response)
+			else
+				alert(val.dbdml_errormsg)
+		}
+		else
+		{			
+			InteressentTreeRefresh();
+			SetStatusBarText('Rolle hinzugefuegt');
+		}
+	}
+}
+
+// ****
 // * Speichert die Buchung
 // ****
 function InteressentKontoDetailSpeichern()
@@ -1207,13 +1272,19 @@ function InteressentKontoDetailSpeichern()
 	buchungstyp_kurzbz = document.getElementById('interessent-konto-menulist-buchungstyp').value;
 	buchungsnr = document.getElementById('interessent-konto-textbox-buchungsnr').value;
 	
+	if(buchungsdatum!='' && !CheckDatum(buchungsdatum))
+	{
+		alert('Buchungsdatum ist ungueltig');
+		return false;
+	}
+	
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 	
 	req.add('type', 'savebuchung');
 	
 	req.add('betrag', betrag);
-	req.add('buchungsdatum', buchungsdatum);
+	req.add('buchungsdatum', ConvertDateToISO(buchungsdatum));
 	req.add('buchungstext', buchungstext);
 	req.add('mahnspanne', mahnspanne);
 	req.add('buchungstyp_kurzbz', buchungstyp_kurzbz);

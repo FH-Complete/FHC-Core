@@ -94,7 +94,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<splitter class="tree-splitter"/>
 				<treecol id="interessent-dokumente-tree-abgegeben-datum" label="Datum" flex="1" hidden="false"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#datum"/>
+					sort="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#datum_iso"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="interessent-dokumente-tree-abgegeben-mitarbeiter_uid" label="Abgegeben bei" flex="1" hidden="true"
 					class="sortDirectionIndicator"

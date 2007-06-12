@@ -34,6 +34,7 @@ require_once('../vilesci/config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/person.class.php');
 require_once('../include/prestudent.class.php');
+require_once('../include/datum.class.php');
 
 // Datenbank Verbindung
 if (!$conn = pg_pconnect(CONN_STRING))
@@ -42,17 +43,16 @@ if (!$conn = pg_pconnect(CONN_STRING))
 $rdf_url='http://www.technikum-wien.at/interessent';
 $user = get_uid();
 loadVariables($conn, $user);
-?>
+$datum = new datum();
 
+echo '
 <RDF:RDF
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:PRESTD="<?php echo $rdf_url; ?>/rdf#"
+	xmlns:PRESTD="'.$rdf_url.'/rdf#"
 >
 
+  <RDF:Seq about="'.$rdf_url.'/alle">';
 
-  <RDF:Seq about="<?php echo $rdf_url ?>/alle">
-
-<?php
 if(isset($_GET['studiensemester_kurzbz']))
 	$studiensemester_kurzbz = $_GET['studiensemester_kurzbz'];
 else
@@ -107,61 +107,65 @@ else
 
 function DrawInteressent($row)
 {
-		global $rdf_url, $conn;
+		global $rdf_url, $conn, $datum;
 		$ps = new prestudent($conn);
 		$ps->getLastStatus($row->prestudent_id);
-?>
+
+		echo '
 		  <RDF:li>
-	      	<RDF:Description  id="<?php echo $row->prestudent_id; ?>"  about="<?php echo $rdf_url.'/'.$row->prestudent_id; ?>" >
-	        	<PRESTD:person_id><![CDATA[<?php echo $row->person_id; ?>]]></PRESTD:person_id>
-	        	<PRESTD:anrede><![CDATA[<?php echo $row->anrede; ?>]]></PRESTD:anrede>
-	        	<PRESTD:sprache><![CDATA[<?php echo $row->sprache; ?>]]></PRESTD:sprache>
-	        	<PRESTD:staatsbuergerschaft><![CDATA[<?php echo $row->staatsbuergerschaft; ?>]]></PRESTD:staatsbuergerschaft>
-	        	<PRESTD:familienstand><![CDATA[<?php echo $row->familienstand; ?>]]></PRESTD:familienstand>
-	    		<PRESTD:titelpre><![CDATA[<?php echo $row->titelpre; ?>]]></PRESTD:titelpre>
-	    		<PRESTD:titelpost><![CDATA[<?php echo $row->titelpost; ?>]]></PRESTD:titelpost>
-	    		<PRESTD:vornamen><![CDATA[<?php echo $row->vornamen  ?>]]></PRESTD:vornamen>
-	    		<PRESTD:vorname><![CDATA[<?php echo $row->vorname  ?>]]></PRESTD:vorname>
-	    		<PRESTD:nachname><![CDATA[<?php echo $row->nachname  ?>]]></PRESTD:nachname>
-	    		<PRESTD:geburtsdatum><![CDATA[<?php echo $row->gebdatum  ?>]]></PRESTD:geburtsdatum>
-	    		<PRESTD:geburtsdatum_iso><![CDATA[<?php echo $row->gebdatum;  ?>]]></PRESTD:geburtsdatum_iso>
-	    		<PRESTD:geburtsnation><![CDATA[<?php echo $row->geburtsnation; ?>]]></PRESTD:geburtsnation>
-	    		<PRESTD:homepage><![CDATA[<?php echo $row->homepage  ?>]]></PRESTD:homepage>
-	    		<PRESTD:aktiv><![CDATA[<?php echo ($row->aktiv?'true':'false')  ?>]]></PRESTD:aktiv>
-	    		<PRESTD:gebort><![CDATA[<?php echo $row->gebort;  ?>]]></PRESTD:gebort>
-	    		<PRESTD:gebzeit><![CDATA[<?php echo $row->gebzeit;  ?>]]></PRESTD:gebzeit>
-	    		<PRESTD:foto><![CDATA[<?php echo $row->foto;  ?>]]></PRESTD:foto>
-	    		<PRESTD:anmerkungen><![CDATA[<?php echo $row->anmerkungen;  ?>]]></PRESTD:anmerkungen>
-	    		<PRESTD:svnr><![CDATA[<?php echo $row->svnr; ?>]]></PRESTD:svnr>
-	    		<PRESTD:ersatzkennzeichen><![CDATA[<?php echo $row->ersatzkennzeichen; ?>]]></PRESTD:ersatzkennzeichen>
-	    		<PRESTD:geschlecht><![CDATA[<?php echo $row->geschlecht; ?>]]></PRESTD:geschlecht>
-	    		<PRESTD:anzahlkinder><![CDATA[<?php echo $row->anzahlkinder; ?>]]></PRESTD:anzahlkinder>
-	    		<PRESTD:updateamum><![CDATA[<?php echo $row->updateamum;  ?>]]></PRESTD:updateamum>
-	    		<PRESTD:updatevon><![CDATA[<?php echo $row->updatevon;  ?>]]></PRESTD:updatevon>
+	      	<RDF:Description  id="'.$row->prestudent_id.'"  about="'.$rdf_url.'/'.$row->prestudent_id.'" >
+	        	<PRESTD:person_id><![CDATA['.$row->person_id.']]></PRESTD:person_id>
+	        	<PRESTD:anrede><![CDATA['.$row->anrede.']]></PRESTD:anrede>
+	        	<PRESTD:sprache><![CDATA['.$row->sprache.']]></PRESTD:sprache>
+	        	<PRESTD:staatsbuergerschaft><![CDATA['.$row->staatsbuergerschaft.']]></PRESTD:staatsbuergerschaft>
+	        	<PRESTD:familienstand><![CDATA['.$row->familienstand.']]></PRESTD:familienstand>
+	    		<PRESTD:titelpre><![CDATA['.$row->titelpre.']]></PRESTD:titelpre>
+	    		<PRESTD:titelpost><![CDATA['.$row->titelpost.']]></PRESTD:titelpost>
+	    		<PRESTD:vornamen><![CDATA['.$row->vornamen.']]></PRESTD:vornamen>
+	    		<PRESTD:vorname><![CDATA['.$row->vorname.']]></PRESTD:vorname>
+	    		<PRESTD:nachname><![CDATA['.$row->nachname.']]></PRESTD:nachname>
+	    		<PRESTD:geburtsdatum><![CDATA['.$datum->convertISODate($row->gebdatum).']]></PRESTD:geburtsdatum>
+	    		<PRESTD:geburtsdatum_iso><![CDATA['.$row->gebdatum.']]></PRESTD:geburtsdatum_iso>
+	    		<PRESTD:geburtsnation><![CDATA['.$row->geburtsnation.']]></PRESTD:geburtsnation>
+	    		<PRESTD:homepage><![CDATA['.$row->homepage.']]></PRESTD:homepage>
+	    		<PRESTD:aktiv><![CDATA['.($row->aktiv?'true':'false').']]></PRESTD:aktiv>
+	    		<PRESTD:gebort><![CDATA['.$row->gebort.']]></PRESTD:gebort>
+	    		<PRESTD:gebzeit><![CDATA['.$row->gebzeit.']]></PRESTD:gebzeit>
+	    		<PRESTD:foto><![CDATA['.$row->foto.']]></PRESTD:foto>
+	    		<PRESTD:anmerkungen><![CDATA['.$row->anmerkungen.']]></PRESTD:anmerkungen>
+	    		<PRESTD:svnr><![CDATA['.$row->svnr.']]></PRESTD:svnr>
+	    		<PRESTD:ersatzkennzeichen><![CDATA['.$row->ersatzkennzeichen.']]></PRESTD:ersatzkennzeichen>
+	    		<PRESTD:geschlecht><![CDATA['.$row->geschlecht.']]></PRESTD:geschlecht>
+	    		<PRESTD:anzahlkinder><![CDATA['.$row->anzahlkinder.']]></PRESTD:anzahlkinder>
+	    		<PRESTD:updateamum><![CDATA['.$row->updateamum.']]></PRESTD:updateamum>
+	    		<PRESTD:updatevon><![CDATA['.$row->updatevon.']]></PRESTD:updatevon>
 	    		
-				<PRESTD:prestudent_id><![CDATA[<?php echo $row->prestudent_id;  ?>]]></PRESTD:prestudent_id>
-				<PRESTD:aufmerksamdurch_kurzbz><![CDATA[<?php echo $row->aufmerksamdurch_kurzbz;  ?>]]></PRESTD:aufmerksamdurch_kurzbz>
-				<PRESTD:studiengang_kz><![CDATA[<?php echo $row->studiengang_kz;  ?>]]></PRESTD:studiengang_kz>
-				<PRESTD:berufstaetigkeit_code><![CDATA[<?php echo $row->berufstaetigkeit_code;  ?>]]></PRESTD:berufstaetigkeit_code>
-				<PRESTD:ausbildungcode><![CDATA[<?php echo $row->ausbildungcode;  ?>]]></PRESTD:ausbildungcode>
-				<PRESTD:zgv_code><![CDATA[<?php echo $row->zgv_code;  ?>]]></PRESTD:zgv_code>
-				<PRESTD:zgvort><![CDATA[<?php echo $row->zgvort;  ?>]]></PRESTD:zgvort>
-				<PRESTD:zgvdatum><![CDATA[<?php echo $row->zgvdatum;  ?>]]></PRESTD:zgvdatum>
-				<PRESTD:zgvmas_code><![CDATA[<?php echo $row->zgvmas_code;  ?>]]></PRESTD:zgvmas_code>
-				<PRESTD:zgvmaort><![CDATA[<?php echo $row->zgvmaort;  ?>]]></PRESTD:zgvmaort>
-				<PRESTD:zgvmadatum><![CDATA[<?php echo $row->zgvmadatum;  ?>]]></PRESTD:zgvmadatum>
-				<PRESTD:aufnahmeschluessel><![CDATA[<?php echo $row->aufnahmeschluessel;  ?>]]></PRESTD:aufnahmeschluessel>
-				<PRESTD:facheinschlberuf><![CDATA[<?php echo ($row->facheinschlberuf?'true':'false');  ?>]]></PRESTD:facheinschlberuf>
-				<PRESTD:reihungstest_id><![CDATA[<?php echo $row->reihungstest_id;  ?>]]></PRESTD:reihungstest_id>
-				<PRESTD:anmeldungreihungstest><![CDATA[<?php echo $row->anmeldungreihungstest;  ?>]]></PRESTD:anmeldungreihungstest>
-				<PRESTD:reihungstestangetreten><![CDATA[<?php echo ($row->reihungstestangetreten?'true':'false');  ?>]]></PRESTD:reihungstestangetreten>
-				<PRESTD:punkte><![CDATA[<?php echo $row->punkte;  ?>]]></PRESTD:punkte>
-				<PRESTD:bismelden><![CDATA[<?php echo ($row->bismelden?'true':'false');  ?>]]></PRESTD:bismelden>
-				<PRESTD:anmerkung><![CDATA[<?php echo $row->anmerkung;  ?>]]></PRESTD:anmerkung>
-				<PRESTD:status><![CDATA[<?php echo $ps->rolle_kurzbz;  ?>]]></PRESTD:status>
+				<PRESTD:prestudent_id><![CDATA['.$row->prestudent_id.']]></PRESTD:prestudent_id>
+				<PRESTD:aufmerksamdurch_kurzbz><![CDATA['.$row->aufmerksamdurch_kurzbz.']]></PRESTD:aufmerksamdurch_kurzbz>
+				<PRESTD:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></PRESTD:studiengang_kz>
+				<PRESTD:berufstaetigkeit_code><![CDATA['.$row->berufstaetigkeit_code.']]></PRESTD:berufstaetigkeit_code>
+				<PRESTD:ausbildungcode><![CDATA['.$row->ausbildungcode.']]></PRESTD:ausbildungcode>
+				<PRESTD:zgv_code><![CDATA['.$row->zgv_code.']]></PRESTD:zgv_code>
+				<PRESTD:zgvort><![CDATA['.$row->zgvort.']]></PRESTD:zgvort>
+				<PRESTD:zgvdatum><![CDATA['.$datum->convertISODate($row->zgvdatum).']]></PRESTD:zgvdatum>
+				<PRESTD:zgvdatum_iso><![CDATA['.$row->zgvdatum.']]></PRESTD:zgvdatum_iso>
+				<PRESTD:zgvmas_code><![CDATA['.$row->zgvmas_code.']]></PRESTD:zgvmas_code>
+				<PRESTD:zgvmaort><![CDATA['.$row->zgvmaort.']]></PRESTD:zgvmaort>
+				<PRESTD:zgvmadatum><![CDATA['.$datum->convertISODate($row->zgvmadatum).']]></PRESTD:zgvmadatum>
+				<PRESTD:zgvmadatum_iso><![CDATA['.$row->zgvmadatum.']]></PRESTD:zgvmadatum_iso>
+				<PRESTD:aufnahmeschluessel><![CDATA['.$row->aufnahmeschluessel.']]></PRESTD:aufnahmeschluessel>
+				<PRESTD:facheinschlberuf><![CDATA['.($row->facheinschlberuf?'true':'false').']]></PRESTD:facheinschlberuf>
+				<PRESTD:reihungstest_id><![CDATA['.$row->reihungstest_id.']]></PRESTD:reihungstest_id>
+				<PRESTD:anmeldungreihungstest><![CDATA['.$datum->convertISODate($row->anmeldungreihungstest).']]></PRESTD:anmeldungreihungstest>
+				<PRESTD:anmeldungreihungstest_iso><![CDATA['.$row->anmeldungreihungstest.']]></PRESTD:anmeldungreihungstest_iso>
+				<PRESTD:reihungstestangetreten><![CDATA['.($row->reihungstestangetreten?'true':'false').']]></PRESTD:reihungstestangetreten>
+				<PRESTD:punkte><![CDATA['.$row->punkte.']]></PRESTD:punkte>
+				<PRESTD:bismelden><![CDATA['.($row->bismelden?'true':'false').']]></PRESTD:bismelden>
+				<PRESTD:anmerkung><![CDATA['.$row->anmerkung.']]></PRESTD:anmerkung>
+				<PRESTD:status><![CDATA['.$ps->rolle_kurzbz.']]></PRESTD:status>
 	      	</RDF:Description>
 	      </RDF:li>
-<?php
+	      ';
 }
 ?>
   </RDF:Seq>

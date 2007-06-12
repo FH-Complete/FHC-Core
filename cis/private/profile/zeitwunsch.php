@@ -286,7 +286,7 @@ if(count($zeit->result)>0)
 		$qry = "SELECT vorname || ' ' || nachname as kurzbz FROM public.tbl_mitarbeiter, public.tbl_benutzer, public.tbl_person WHERE tbl_benutzer.uid=tbl_mitarbeiter.mitarbeiter_uid AND tbl_benutzer.person_id=tbl_person.person_id AND mitarbeiter_uid='$row->vertretung_uid'";
 		$result_vertretung = pg_query($conn, $qry);
 		$row_vertretung = pg_fetch_object($result_vertretung);
-		$content_table.= "<tr class='liste".($i%2)."'><td>$row->bezeichnung</td><td>$row->zeitsperretyp_kurzbz</td><td nowrap>$row->vondatum ".($row->vonstunde!=''?'('.$row->vonstunde.')':'')."</td><td nowrap>$row->bisdatum ".($row->bisstunde!=''?'('.$row->bisstunde.')':'')."</td><td>$row_vertretung->kurzbz</td><td>$row->erreichbarkeit</td><td><a href='$PHP_SELF?type=edit&id=$row->zeitsperre_id' class='Item'>edit</a></td><td><a href='$PHP_SELF?type=delete_sperre&id=$row->zeitsperre_id' onclick='return conf_del()' class='Item'>delete</a></td></tr>";
+		$content_table.= "<tr class='liste".($i%2)."'><td>$row->bezeichnung</td><td>$row->zeitsperretyp_kurzbz</td><td nowrap>$row->vondatum ".($row->vonstunde!=''?'('.$row->vonstunde.')':'')."</td><td nowrap>$row->bisdatum ".($row->bisstunde!=''?'('.$row->bisstunde.')':'')."</td><td>".(isset($row_vertretung->kurzbz)?$row_vertretung->kurzbz:'')."</td><td>$row->erreichbarkeit</td><td><a href='$PHP_SELF?type=edit&id=$row->zeitsperre_id' class='Item'>edit</a></td><td><a href='$PHP_SELF?type=delete_sperre&id=$row->zeitsperre_id' onclick='return conf_del()' class='Item'>delete</a></td></tr>";
 	}
 	$content_table.= '</table>';
 }
@@ -411,9 +411,9 @@ $content_form.= '</SELECT></td></tr>';
 $content_form.= '<tr><td>&nbsp;</td><td>';
 
 if(isset($_GET['type']) && $_GET['type']=='edit')
-	$content_form.= "<input type='submit' name='submit_zeitsperre' onclick='return checkval()' value='Speichern'>";
+	$content_form.= "<input type='submit' name='submit_zeitsperre' value='Speichern'>";
 else
-	$content_form.= "<input type='submit' name='submit_zeitsperre' onclick='return checkval()' value='Hinzufügen'>";
+	$content_form.= "<input type='submit' name='submit_zeitsperre' value='Hinzufügen'>";
 $content_form.= '</td></tr>';
 $content_form.= '</table>';
 

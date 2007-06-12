@@ -32,7 +32,7 @@ require_once('../../include/lehrveranstaltung.class.php');
 if(!$db_conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim oeffnen der Datenbankverbindung');
 
-$user=USER_UID;
+$user=get_uid();
 
 $rechte=new benutzerberechtigung($db_conn);
 $rechte->getBerechtigungen($user);
@@ -132,7 +132,7 @@ else
 				<tr>
 					<td width="10" nowrap>&nbsp;</td>
 				    <td nowrap>
-				    	<a href="profile/zeitwunsch.php?uid=<?php echo $REMOTE_USER; ?>" class="Item" target="content">
+				    	<a href="profile/zeitwunsch.php?uid=<?php echo $user; ?>" class="Item" target="content">
 				    		<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Zeitw&uuml;nsche
 				    	</a>
 				    </td>
@@ -140,7 +140,7 @@ else
 				<tr>
 					<td width="10" nowrap>&nbsp;</td>
 				    <td nowrap>
-				    	<a href="profile/lva_liste.php?uid=<?php echo $REMOTE_USER; ?>" class="Item" target="content">
+				    	<a href="profile/lva_liste.php?uid=<?php echo $user; ?>" class="Item" target="content">
 				    		<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;LV-&Uuml;bersicht
 				    	</a>
 				    </td>

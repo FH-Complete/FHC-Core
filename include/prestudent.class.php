@@ -428,7 +428,7 @@ class prestudent extends person
 		if($semester!=null)
 			$qry.=" AND tbl_prestudentrolle.ausbildungssemester='$semester'";
 
-		echo $qry;
+		//echo $qry;
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))

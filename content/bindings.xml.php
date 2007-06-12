@@ -25,6 +25,12 @@
 					else
 						document.getAnonymousNodes(this)[0].style.backgroundColor="#F46B6B";
 				}
+				else
+				{
+					if(!document.getAnonymousNodes(this)[0].disabled)
+						document.getAnonymousNodes(this)[0].style.backgroundColor="#FFFFFF";
+				}
+					
 				]]>
 			</setter>
 		</property>
