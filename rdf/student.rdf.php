@@ -20,6 +20,8 @@ require_once('../include/benutzer.class.php');
 require_once('../include/student.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/datum.class.php');
+require_once('../include/studiensemester.class.php');
+
 // Datenbank Verbindung
 if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
@@ -188,6 +190,10 @@ else
 					$studiensemester = $row->studiensemester_kurzbz;
 				}
 			}
+			
+			$stsem = new studiensemester($conn);
+			$stsem->getaktorNext();
+			
 			echo '
 			<student>
 				<uid><![CDATA['.$student->uid.']]></uid>
@@ -212,7 +218,9 @@ else
 				<familienstand><![CDATA['.$student->familienstand.']]></familienstand>
 				<rektor><![CDATA['.$rektor.']]></rektor>
 				<studienbeginn><![CDATA['.$datum_obj->convertISODate($studienbeginn).']]></studienbeginn>
-				<studiensemester><![CDATA['.$studiensemester.']]></studiensemester>
+				<studiensemester_beginn><![CDATA['.$studiensemester.']]></studiensemester_beginn>
+				<studiensemester_aktuell><![CDATA['.$stsem->studiensemester_kurzbz.']]></studiensemester_aktuell>
+				<studienbeginn_aktuell><![CDATA['.$stsem->start.']]></studienbeginn_aktuell>
 				<tagesdatum><![CDATA['.date('d.m.Y').']]></tagesdatum>
 	    	</student>';			
 		}

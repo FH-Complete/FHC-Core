@@ -75,7 +75,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     					</row>
     					<row>
       						<label value="Geburtsdatum" control="interessent-detail-textbox-geburtsdatum"/>
-      						<hbox><textbox id="interessent-detail-textbox-geburtsdatum" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/></hbox>
+      						<hbox>
+      							<box class="Datum" id="interessent-detail-textbox-geburtsdatum" disabled="true"/>
+      							<!--<textbox id="interessent-detail-textbox-geburtsdatum" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/>-->
+      						</hbox>
       						<label value="Geburtsort" control="interessent-detail-textbox-geburtsort"/>
       						<textbox id="interessent-detail-textbox-geburtsort" disabled="true" maxlength="128"/>
       						<label value="Geburtszeit" control="interessent-detail-textbox-geburtszeit"/>
@@ -311,7 +314,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<label value="ZGV Ort" control="interessent-prestudent-textbox-zgvort"/>
       						<textbox id="interessent-prestudent-textbox-zgvort" disabled="true" maxlength="64"/>
       						<label value="ZGV Datum" control="interessent-prestudent-textbox-zgvdatum"/>
-      						<hbox><textbox id="interessent-prestudent-textbox-zgvdatum" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/></hbox>
+      						<hbox>
+      							<box class="Datum" id="interessent-prestudent-textbox-zgvdatum" disabled="true"/>
+      							<!--<textbox id="interessent-prestudent-textbox-zgvdatum" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/>-->
+      						</hbox>
     					</row>
     					<row>
       						<label value="ZGV Master" control="interessent-prestudent-menulist-zgvmastercode"/>
@@ -329,7 +335,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<label value="ZGV Master Ort" control="interessent-prestudent-textbox-zgvmasterort"/>
       						<textbox id="interessent-prestudent-textbox-zgvmasterort" disabled="true" maxlength="64"/>
       						<label value="ZGV Master Datum" control="interessent-prestudent-textbox-zgvmasterdatum"/>
-      						<hbox><textbox id="interessent-prestudent-textbox-zgvmasterdatum" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/></hbox>
+      						<hbox>
+      							<box class="Datum" id="interessent-prestudent-textbox-zgvmasterdatum" disabled="true"/>
+      							<!--<textbox id="interessent-prestudent-textbox-zgvmasterdatum" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/>-->
+      						</hbox>
     					</row>
     				</rows>
     			</grid>
@@ -349,7 +358,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     					<row>
     						<label value="Anmeldung zum Reihungstest am" control="interessent-prestudent-textbox-anmeldungreihungstest"/>
       						<hbox>
-      							<textbox id="interessent-prestudent-textbox-anmeldungreihungstest" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/>
+      							<box class="Datum" id="interessent-prestudent-textbox-anmeldungreihungstest" disabled="true" />
+      							<!--<textbox id="interessent-prestudent-textbox-anmeldungreihungstest" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/>-->
       							<button id="interessent-prestudent-button-anmeldungreihungstest-heute" label="Heute" oncommand="InteressentAnmeldungreihungstestHeute()" disabled="true" style="margin:0px;"/>
       						</hbox>
       						<label value="Reihungstest" control="interessent-prestudent-menulist-reihungstest"/>

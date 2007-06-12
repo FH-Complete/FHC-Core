@@ -27,7 +27,7 @@ echo '
 <html>
 <head>
 <title>Koordinatorstunden</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">';
 
 // Datenbank Verbindung
@@ -71,8 +71,9 @@ $qry = "SET CLIENT_ENCODING TO 'UNICODE';
 			lehre.tbl_lehreinheit, 
 			lehre.tbl_lehrveranstaltung,
 			public.tbl_benutzer,
-			public.tbl_person
-		WHERE 
+			public.tbl_person,
+			lehre.tbl_lehrfach
+			WHERE 
 			tbl_benutzerfunktion.uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid AND
 			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
 			tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
@@ -80,6 +81,8 @@ $qry = "SET CLIENT_ENCODING TO 'UNICODE';
 			tbl_benutzerfunktion.funktion_kurzbz='fbk' AND
 			tbl_benutzerfunktion.uid=tbl_benutzer.uid AND
 			tbl_benutzer.person_id=tbl_person.person_id AND
+			tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND
+			tbl_lehrfach.fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."' AND
 			tbl_lehreinheit.studiensemester_kurzbz='$semester_aktuell'
 		ORDER BY tbl_lehreinheit.lehreinheit_id, nachname, vorname
 		";

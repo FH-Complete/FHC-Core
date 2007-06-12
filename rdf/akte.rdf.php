@@ -31,10 +31,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
 require_once('../vilesci/config.inc.php');
 require_once('../include/akte.class.php');
+require_once('../include/datum.class.php');
 
 // Datenbank Verbindung
-if (!$conn = @pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
+if (!$conn = pg_pconnect(CONN_STRING))
+   	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
 
 if(isset($_GET['person_id']))
 	$person_id = $_GET['person_id'];
@@ -50,44 +51,46 @@ if(isset($_GET['uid']))
 	$uid = $_GET['uid'];
 else 
 	$uid = '';
+	
+$datum = new datum();
 
 $akten = new akte($conn);
 if(!$akten->getAkten($person_id, $dokument_kurzbz))
 	die($akten->errormsg);
 $rdf_url='http://www.technikum-wien.at/akte';
-?>
 
+echo '
 <RDF:RDF
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:AKTE="<?php echo $rdf_url; ?>/rdf#"
+	xmlns:AKTE="'.$rdf_url.'/rdf#"
 >
 
-   <RDF:Seq about="<?php echo $rdf_url ?>/liste">
+   <RDF:Seq about="'.$rdf_url.'/liste">
+';
 
-<?php
 foreach ($akten->result as $row)
 {
-	?>
+	echo '
       <RDF:li>
-         <RDF:Description  id="<?php echo $row->akte_id; ?>"  about="<?php echo $rdf_url.'/'.$row->akte_id; ?>" >
-            <AKTE:akte_id><![CDATA[<?php echo $row->akte_id  ?>]]></AKTE:akte_id>
-            <AKTE:person_id><![CDATA[<?php echo $row->person_id  ?>]]></AKTE:person_id>
-            <AKTE:dokument_kurzbz><![CDATA[<?php echo $row->dokument_kurzbz  ?>]]></AKTE:dokument_kurzbz>
-            <AKTE:mimetype><![CDATA[<?php echo $row->mimetype  ?>]]></AKTE:mimetype>
-            <AKTE:erstelltam><![CDATA[<?php echo $row->erstelltam  ?>]]></AKTE:erstelltam>
-			<AKTE:gedruckt><![CDATA[<?php echo ($row->gedruckt?'Ja':'Nein')  ?>]]></AKTE:gedruckt>
-			<AKTE:titel><![CDATA[<?php echo $row->titel  ?>]]></AKTE:titel>
-			<AKTE:bezeichnung><![CDATA[<?php echo $row->bezeichnung;  ?>]]></AKTE:bezeichnung>
-			<AKTE:updateamum><![CDATA[<?php echo $row->updateamum; ?>]]></AKTE:updateamum>
-			<AKTE:updatevon><![CDATA[<?php echo $row->updatevon  ?>]]></AKTE:updatevon>
-			<AKTE:insertamum><![CDATA[<?php echo $row->insertamum; ?>]]></AKTE:insertamum>
-			<AKTE:insertvon><![CDATA[<?php echo $row->insertvon  ?>]]></AKTE:insertvon>
-			<AKTE:uid><![CDATA[<?php echo $row->uid; ?>]]></AKTE:uid>			
+         <RDF:Description  id="'.$row->akte_id.'"  about="'.$rdf_url.'/'.$row->akte_id.'" >
+            <AKTE:akte_id><![CDATA['.$row->akte_id.']]></AKTE:akte_id>
+            <AKTE:person_id><![CDATA['.$row->person_id.']]></AKTE:person_id>
+            <AKTE:dokument_kurzbz><![CDATA['.$row->dokument_kurzbz.']]></AKTE:dokument_kurzbz>
+            <AKTE:mimetype><![CDATA['.$row->mimetype.']]></AKTE:mimetype>
+            <AKTE:erstelltam><![CDATA['.$datum->convertISODate($row->erstelltam).']]></AKTE:erstelltam>
+            <AKTE:erstelltam_iso><![CDATA['.$row->erstelltam.']]></AKTE:erstelltam_iso>
+			<AKTE:gedruckt><![CDATA['.($row->gedruckt?'Ja':'Nein').']]></AKTE:gedruckt>
+			<AKTE:titel><![CDATA['.$row->titel.']]></AKTE:titel>
+			<AKTE:bezeichnung><![CDATA['.$row->bezeichnung.']]></AKTE:bezeichnung>
+			<AKTE:updateamum><![CDATA['.$row->updateamum.']]></AKTE:updateamum>
+			<AKTE:updatevon><![CDATA['.$row->updatevon.']]></AKTE:updatevon>
+			<AKTE:insertamum><![CDATA['.$row->insertamum.']]></AKTE:insertamum>
+			<AKTE:insertvon><![CDATA['.$row->insertvon.']]></AKTE:insertvon>
+			<AKTE:uid><![CDATA['.$row->uid.']]></AKTE:uid>			
          </RDF:Description>
       </RDF:li>
-<?php
+      ';
 }
 ?>
    </RDF:Seq>
-
 </RDF:RDF>
