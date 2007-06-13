@@ -9,6 +9,7 @@
 	require_once('../../../include/lehrveranstaltung.class.php');
 	//$adress='fas_sync@technikum-wien.at';
 	//$adress='oesi@technikum-wien.at';
+	$adress='ruhan@technikum-wien.at';
 
 	$conn=pg_connect(CONN_STRING);
 	$conn_fas=pg_connect(CONN_STRING_FAS);
@@ -441,7 +442,7 @@
 		if($msg!='')
 		{
 			$text.="\nMails an Studiengang ".$stg_data[$stg]['kuerzel'].'('.$stg_data[$stg]['mail'].") ... ";
-			if(mail('oesi@technikum-wien.at',"FAS - Vilesci (Lehrveranstaltungen) ".$stg_data[$stg]['kuerzel'],$head_stg_text.$msg,"From: vilesci@technikum-wien.at"))
+			if(mail('ruhan@technikum-wien.at',"FAS - Vilesci (Lehrveranstaltungen) ".$stg_data[$stg]['kuerzel'],$head_stg_text.$msg,"From: vilesci@technikum-wien.at"))
 				$text.="gesendet\n\n$msg";
 			else
 				$text.="FEHLER beim senden\n\n$msg";
@@ -450,10 +451,10 @@
 
 	$text.="\nEND OF SYNCHRONISATION\n";
 
-	/*if (mail($adress,"FAS - Vilesci (Lehrveranstaltungen)",$headtext."\n\n".$text,"From: vilesci@technikum-wien.at"))
+	if (mail($adress,"FAS - Vilesci (Lehrveranstaltungen)",$headtext."\n\n".$text,"From: vilesci@technikum-wien.at"))
 		$sendmail=true;
 	else
-		$sendmail=false;*/
+		$sendmail=false;
 ?>
 
 <html>
@@ -464,10 +465,10 @@
 <body>
 <?php
 
-/* ($sendmail)
+if ($sendmail)
 	echo 'Mail wurde verschickt an '.$adress.'!<br>';
 else
-	echo "Mail konnte nicht verschickt werden!<br>";*/
+	echo "Mail konnte nicht verschickt werden!<br>";
 echo nl2br($headtext);
 echo "<br><br>";
 echo nl2br($text);
