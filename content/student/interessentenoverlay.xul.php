@@ -54,7 +54,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentkontooverlay.xu
 						<toolbarbutton id="interessent-toolbar-zustudent" label="-> Student" oncommand="InteressentzuStudent()" disabled="false" tooltiptext="Bewerber zu Studenten machen" />
 						<toolbarbutton id="interessent-toolbar-aufgenommener" label="-> Aufgenommener" oncommand="InteressentAddRolle('Aufgenommener')" disabled="false" tooltiptext="Interessent zum Aufgenommenen machen"/>
 						<toolbarbutton id="interessent-toolbar-warteliste" label="-> Warteliste" oncommand="InteressentAddRolle('Wartender')" disabled="false" tooltiptext="Interessent zum Wartenden machen"/>
-						<toolbarbutton id="interessent-toolbar-absage" label="-> Abgewiesener" oncommand="InteressentAddRolle('Abgewiesener')" disabled="false" tooltiptext="Interessent zum Abgewiesenen machen"/>
+						<toolbarbutton id="interessent-toolbar-absage" label="-> Absage" oncommand="InteressentAddRolle('Abgewiesener')" disabled="false" tooltiptext="Interessent zum Absager machen"/>
 						<toolbarbutton id="interessent-toolbar-buchung" label="Neue Buchung" oncommand="InteressentKontoNeu()" disabled="false" tooltiptext="neue Buchung anlegen"/>
 						<toolbarbutton id="interessent-toolbar-refresh" label="Aktualisieren" oncommand="InteressentTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 

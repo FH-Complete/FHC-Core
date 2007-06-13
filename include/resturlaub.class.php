@@ -39,6 +39,10 @@ class resturlaub
 	var $updatevon;
 	var $insertamum;
 	var $insertvon;
+	
+	var $vorname;
+	var $vornamen;
+	var $nachname;
 
 	// **
 	// * Konstruktor
@@ -179,6 +183,43 @@ class resturlaub
 		else
 		{
 			$this->errormsg = 'Fehler beim Speichern der Daten';
+			return false;
+		}
+	}
+	
+	// ***********************************
+	// * Liefert die Resturlaubstage der
+	// * Fixangestellten
+	// ***********************************
+	function getResturlaubFixangestellte()
+	{
+		$qry = "SELECT * FROM campus.vw_mitarbeiter LEFT JOIN campus.tbl_resturlaub ON(uid=mitarbeiter_uid) 
+				WHERE fixangestellt=true ORDER BY nachname, vorname";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$obj = new resturlaub($this->conn, null, null);
+				
+				$obj->mitarbeiter_uid = $row->uid;
+				$obj->resturlaubstage = $row->resturlaubstage;
+				$obj->mehrarbeitsstunden = $row->mehrarbeitsstunden;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->vorname = $row->vorname;
+				$obj->vornamen = $row->vornamen;
+				$obj->nachname = $row->nachname;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden der Daten';
 			return false;
 		}
 	}

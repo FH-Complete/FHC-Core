@@ -192,7 +192,9 @@ else
 			}
 			
 			$stsem = new studiensemester($conn);
-			$stsem->getaktorNext();
+			$aktstsem = $stsem->getaktorNext();
+			
+			$stsem->load($aktstsem);
 			
 			echo '
 			<student>
@@ -204,7 +206,7 @@ else
 				<vorname><![CDATA['.$student->vorname.']]></vorname>
 				<nachname><![CDATA['.$student->nachname.']]></nachname>
 				<matrikelnummer><![CDATA['.$student->matrikelnr.']]></matrikelnummer>
-				<geburtsdatum><![CDATA['.$student->gebdatum.']]></geburtsdatum>
+				<geburtsdatum><![CDATA['.$datum_obj->convertISODate($student->gebdatum).']]></geburtsdatum>
 				<geburtsdatum_iso><![CDATA['.$student->gebdatum.']]></geburtsdatum_iso>
 				<semester><![CDATA['.$student->semester.']]></semester>
 				<verband><![CDATA['.$student->verband.']]></verband>
@@ -217,10 +219,10 @@ else
 				<ersatzkennzeichen><![CDATA['.$student->ersatzkennzeichen.']]></ersatzkennzeichen>
 				<familienstand><![CDATA['.$student->familienstand.']]></familienstand>
 				<rektor><![CDATA['.$rektor.']]></rektor>
-				<studienbeginn><![CDATA['.$datum_obj->convertISODate($studienbeginn).']]></studienbeginn>
+				<studienbeginn_beginn><![CDATA['.$datum_obj->convertISODate($studienbeginn).']]></studienbeginn_beginn>
 				<studiensemester_beginn><![CDATA['.$studiensemester.']]></studiensemester_beginn>
 				<studiensemester_aktuell><![CDATA['.$stsem->studiensemester_kurzbz.']]></studiensemester_aktuell>
-				<studienbeginn_aktuell><![CDATA['.$stsem->start.']]></studienbeginn_aktuell>
+				<studienbeginn_aktuell><![CDATA['.$datum_obj->convertISODate($stsem->start).']]></studienbeginn_aktuell>
 				<tagesdatum><![CDATA['.date('d.m.Y').']]></tagesdatum>
 	    	</student>';			
 		}
