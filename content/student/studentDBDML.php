@@ -389,6 +389,29 @@ if(!$error)
 						
 						if($prestd_neu->save_rolle())
 						{
+							//Unterbrecher und Abbrecher werden ins 0. Semester verschoben
+							if($_POST['rolle_kurzbz']=='Unterbrecher' || $_POST['rolle_kurzbz']=='Abbrecher')
+							{
+								$student = new student($conn);
+								$uid = $student->getUid($_POST['prestudent_id']);
+								$student->load($uid);
+								$student->studiensemester_kurzbz=$semester_aktuell;
+								$student->semester = '0';
+								$student->save(false, false);
+								$student->save_studentlehrverband(false);
+							}
+							
+							//Wenn Unterbrecher zu Studenten werden, dann wird das Semester mituebergeben
+							if($_POST['rolle_kurzbz']=='Student')
+							{
+								$student = new student($conn);
+								$uid = $student->getUid($_POST['prestudent_id']);
+								$student->load($uid);
+								$student->studiensemester_kurzbz=$semester_aktuell;
+								$student->semester = $_POST['semester'];
+								$student->save(false, false);
+								$student->save_studentlehrverband(false);
+							}
 							$return = true;
 						}
 						else 

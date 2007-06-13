@@ -178,6 +178,8 @@ elseif ($xmlformat=='xml')
 	echo "<konto>\n";
 	function drawrow_xml($row)
 	{
+		global $datum;
+		
 		echo "
   		<buchung>
 			<buchungsnr><![CDATA[".$row->buchungsnr."]]></buchungsnr>
@@ -185,8 +187,8 @@ elseif ($xmlformat=='xml')
 			<studiengang_kz><![CDATA[".$row->studiengang_kz."]]></studiengang_kz>
 			<studiensemester_kurzbz><![CDATA[".$row->studiensemester_kurzbz."]]></studiensemester_kurzbz>
 			<buchungsnr_verweis><![CDATA[".$row->buchungsnr_verweis."]]></buchungsnr_verweis>
-			<betrag><![CDATA[".$row->betrag."]]></betrag>
-			<buchungsdatum><![CDATA[".$row->buchungsdatum."]]></buchungsdatum>
+			<betrag><![CDATA[".$row->betrag*(-1)."]]></betrag>
+			<buchungsdatum><![CDATA[".$datum->convertISODate($row->buchungsdatum)."]]></buchungsdatum>
 			<buchungstext><![CDATA[".$row->buchungstext."]]></buchungstext>
 			<mahnspanne><![CDATA[".$row->mahnspanne."]]></mahnspanne>
 			<buchungstyp_kurzbz><![CDATA[".$row->buchungstyp_kurzbz."]]></buchungstyp_kurzbz>
@@ -197,7 +199,7 @@ elseif ($xmlformat=='xml')
 	}
 	function drawperson_xml($row)
 	{
-		global $conn;
+		global $conn, $datum;
 		$pers = new person($conn);
 		$pers->load($row->person_id);
 		
@@ -212,7 +214,7 @@ elseif ($xmlformat=='xml')
 			<nachname><![CDATA[".$pers->nachname."]]></nachname>
 			<vorname><![CDATA[".$pers->vorname."]]></vorname>
 			<vornamen><![CDATA[".$pers->vornamen."]]></vornamen>
-			<geburtsdatum><![CDATA[".$pers->gebdatum."]]></geburtsdatum>
+			<geburtsdatum><![CDATA[".$datum->convertISODate($pers->gebdatum)."]]></geburtsdatum>
 			<sozialversicherungsnummer><![CDATA[".$pers->svnr."]]></sozialversicherungsnummer>
 			<ersatzkennzeichen><![CDATA[".$pers->ersatzkennzeichen."]]></ersatzkennzeichen>
 			<tagesdatum><![CDATA[".date('d.m.Y')."]]></tagesdatum>

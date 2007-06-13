@@ -211,6 +211,7 @@ else
 							<?php
 							if ($rechte->isBerechtigt('admin',0))
 							{
+								echo '<li><a class="Item2" href="profile/resturlaub.php" target="content">Resturlaub</a></li>';
 								echo '<li><a class="Item2" href="profile/zeitsperre.php?fix=true" target="content">Fix-Angestellte</a></li>';
 								echo '<li><a class="Item2" href="profile/zeitsperre.php?fix=true&lektor=true" target="content">Fixe Lektoren</a></li>';
 							}

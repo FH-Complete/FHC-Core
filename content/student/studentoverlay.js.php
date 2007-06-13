@@ -1895,9 +1895,32 @@ function StudentBetriebsmittelNeu()
 }
 
 // ****
+// * Einen Ab-/Unterbrecher wieder zum Studenten machen
+// ****
+function StudentUnterbrecherZuStudent()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-tree');
+
+	if (tree.currentIndex==-1) return;
+	
+	if(sem = prompt('In welches Semester soll dieser Student verschoben werden?'))
+	{
+		if(!isNaN(sem))
+		{
+			StudentAddRolle('Student', sem)
+		}
+		else
+		{
+			alert('Semester ist ungueltig');
+		}
+	}
+}
+
+// ****
 // * Fuegt eine Rolle zu einem Studenten hinzu
 // ****
-function StudentAddRolle(rolle)
+function StudentAddRolle(rolle, semester)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-tree');
@@ -1908,7 +1931,7 @@ function StudentAddRolle(rolle)
     var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
 	var prestudent_id=tree.view.getCellText(tree.currentIndex,col);
 		
-	if(confirm('Diesen Studenten zum '+rolle+' machen?'))
+	if(semester!='0' || confirm('Diesen Studenten zum '+rolle+' machen?'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 		var req = new phpRequest(url,'','');
@@ -1917,6 +1940,7 @@ function StudentAddRolle(rolle)
 				
 		req.add('prestudent_id', prestudent_id);
 		req.add('rolle_kurzbz', rolle);
+		req.add('semester', semester);
 		
 		var response = req.executePOST();
 	

@@ -203,6 +203,12 @@ function onVerbandSelect(event)
 
 	if(typ=='')
 	{
+		//Bei Ansicht von Ab-/Unterbrecher den Button "->Student" anzeigen
+		if(sem=='0')
+			document.getElementById('student-toolbar-student').hidden=false;
+		else
+			document.getElementById('student-toolbar-student').hidden=true;
+			
 		//Wenn der Interessenten Tab markiert ist, dann den Studenten Tab markieren
 		if(document.getElementById('tabbox-main').selectedIndex=="0")
 			document.getElementById('tabbox-main').selectedIndex="1";
