@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -26,26 +26,26 @@ class studiensemester
 	var $errormsg; // string
 	var $new;      // boolean
 	var $studiensemester = array(); // studiensemester Objekt
-	
+
 	//Tabellenspalten
 	var $studiensemester_kurzbz; // varchar(16)
 	var $start; // date
 	var $ende;  // date
-	
+
 	// ***********************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional ein LF
 	// * @param $conn        Datenbank-Connection
 	// *        $studiensemester_kurzbz StSem das geladen werden soll (default=null)
-	// *        $unicode     Gibt an ob die Daten mit UNICODE Codierung 
+	// *        $unicode     Gibt an ob die Daten mit UNICODE Codierung
 	// *                     oder LATIN9 Codierung verarbeitet werden sollen
 	// ***********************************************************************
 	function studiensemester($conn, $studiensemester_kurzbz=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
+		else
 			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
 
 		if(!pg_query($conn,$qry))
@@ -109,7 +109,7 @@ class studiensemester
 
 	// ************************************************
 	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische 
+	// * wenn $var !='' ist werden Datenbankkritische
 	// * zeichen mit backslash versehen und das ergbnis
 	// * unter hochkomma gesetzt.
 	// ************************************************
@@ -138,7 +138,7 @@ class studiensemester
 					$this->addslashes($this->ende).');';
 		}
 		else
-		{			
+		{
 			$qry = 'UPDATE public.tbl_studiensemester SET'.
 			       ' start='.$this->addslashes($this->start).','.
 			       ' ende='.$this->addslashes($this->ende).
@@ -156,7 +156,7 @@ class studiensemester
 			return false;
 		}
 	}
-	
+
 	// ******************************************************************
 	// * Liefert das Aktuelle Studiensemester
 	// * @return aktuelles Studiensemester oder false wenn es keines gibt
@@ -169,19 +169,57 @@ class studiensemester
 			$this->errormsg = pg_errormessage($this->conn);
 			return false;
 		}
-		
+
 		if(pg_num_rows($res)>0)
 		{
 		   $erg = pg_fetch_object($res);
 		   return $erg->studiensemester_kurzbz;
 		}
-		else 
+		else
 		{
 			$this->errormsg = "Kein aktuelles Studiensemester vorhanden";
 			return false;
 		}
 	}
-	
+
+	// ******************************************************************
+	// * Liefert das Aktuelle Studiensemester
+	// * @return aktuelles Studiensemester oder false wenn es keines gibt
+	// ******************************************************************
+	function getAktTillNext()
+	{
+		$qry = "SELECT studiensemester_kurzbz FROM vw_studiensemester ORDER BY delta LIMIT 2";
+		if(!$res=pg_exec($this->conn,$qry))
+		{
+			$this->errormsg = pg_errormessage($this->conn);
+			return false;
+		}
+
+		if(pg_num_rows($res)>1)
+		{
+		   $erg1 = pg_fetch_object($res);
+		   $erg2 = pg_fetch_object($res);
+		   if ($erg1->start<$erg2->start)
+		   {
+		   		$this->studiensemester=$erg1->studiensemester_kurzbz;
+		   		$this->start=$erg1->start;
+		   		$this->ende=$erg2->start;
+		   	}
+		   	else
+		   	{
+		   		$this->studiensemester=$erg2->studiensemester_kurzbz;
+				$this->start=$erg2->start;
+		   		$this->ende=$erg1->start;
+		   	}
+		   return true;
+		}
+		else
+		{
+			$this->errormsg = "Kein aktuelles oder folgendes Studiensemester vorhanden";
+			return false;
+		}
+	}
+
 	/**
 	 * Liefert das Aktuelle Studiensemester oder das darauffolgende
 	 * @return Studiensemester oder false wenn es keines gibt
@@ -190,23 +228,23 @@ class studiensemester
 	{
 		if($stsem=$this->getakt())
 		   return $stsem;
-		else 
+		else
 		{
 			//$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ende >= now() ORDER BY ende";
 			$qry = "SELECT studiensemester_kurzbz FROM vw_studiensemester ORDER BY delta LIMIT 1";
-			
+
 			if(!$res=pg_exec($this->conn,$qry))
 		    {
 				$this->errormsg = pg_errormessage($this->conn);
 				return false;
 		    }
-		
+
 			if(pg_num_rows($res)>0)
 			{
 			   $erg = pg_fetch_object($res);
 			   return $erg->studiensemester_kurzbz;
 			}
-			else 
+			else
 			{
 				$this->errormsg = "Kein aktuelles Studiensemester vorhanden";
 				return false;
@@ -217,21 +255,21 @@ class studiensemester
 	function getAll()
 	{
 		$qry = "SELECT * FROM public.tbl_studiensemester ORDER BY ende";
-		
+
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
 			{
 				$stsem_obj = new studiensemester($this->conn);
-				
+
 				$stsem_obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$stsem_obj->start = $row->start;
 				$stsem_obj->ende = $row->ende;
-				
+
 				$this->studiensemester[] = $stsem_obj;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Studiensemester';
 			return false;
