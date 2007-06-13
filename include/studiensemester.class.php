@@ -188,7 +188,7 @@ class studiensemester
 	// ******************************************************************
 	function getAktTillNext()
 	{
-		$qry = "SELECT studiensemester_kurzbz FROM vw_studiensemester ORDER BY delta LIMIT 2";
+		$qry = "SELECT * FROM vw_studiensemester ORDER BY delta LIMIT 2";
 		if(!$res=pg_exec($this->conn,$qry))
 		{
 			$this->errormsg = pg_errormessage($this->conn);
@@ -199,15 +199,16 @@ class studiensemester
 		{
 		   $erg1 = pg_fetch_object($res);
 		   $erg2 = pg_fetch_object($res);
-		   if ($erg1->start<$erg2->start)
+		   //var_dump($erg1);
+		   if ($erg1->start < $erg2->start)
 		   {
-		   		$this->studiensemester=$erg1->studiensemester_kurzbz;
+		   		$this->studiensemester_kurzbz=$erg1->studiensemester_kurzbz;
 		   		$this->start=$erg1->start;
 		   		$this->ende=$erg2->start;
 		   	}
 		   	else
 		   	{
-		   		$this->studiensemester=$erg2->studiensemester_kurzbz;
+		   		$this->studiensemester_kurzbz=$erg2->studiensemester_kurzbz;
 				$this->start=$erg2->start;
 		   		$this->ende=$erg1->start;
 		   	}
