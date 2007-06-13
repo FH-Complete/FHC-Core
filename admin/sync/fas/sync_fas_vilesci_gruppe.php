@@ -17,8 +17,8 @@ include('../../../vilesci/config.inc.php');
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
-//$adress='ruhan@technikum-wien.at';
-$adress='fas_sync@technikum-wien.at';
+$adress='ruhan@technikum-wien.at';
+//$adress='fas_sync@technikum-wien.at';
 
 $error_log='';
 $error_log_fas='';
@@ -200,13 +200,14 @@ if($result = pg_query($conn_fas, $qry))
 				if($row2=pg_fetch_object($result2))
 				{		
 					//Eintrag bereits vorhanden - Eintragung in Sync-Tabelle
-					$anzahl_update++;
+					
 					$qrysync="SELECT * FROM sync.tbl_syncgruppe WHERE fas_gruppe='".$ext_id."' AND vilesci_gruppe='".$gruppe_kurzbz."';";
 					if($resultsync = pg_query($conn, $qrysync))
 					{
 						$qryupd="UPDATE public.tbl_gruppe SET ext_id='".$ext_id."' WHERE gruppe_kurzbz='".$gruppe_kurzbz."' AND studiengang_kz='".$studiengang_kz."';";
 						if($resultupd = pg_query($conn, $qryupd))
 						{
+							$anzahl_update++;
 							if(pg_num_rows($resultsync)<1) 
 							{
 								//Sync-Eintrag nicht vorhanden
@@ -287,10 +288,10 @@ if($result = pg_query($conn_fas, $qry))
 			
 
 //echo nl2br($text);
-echo nl2br("\nGruppe\nGruppe: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Nicht eingefügt: $anzahl_update / Fehler: $anzahl_fehler\n\n");
+echo nl2br("\nGruppe\nGruppe: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / geändert: $anzahl_update / Fehler: $anzahl_fehler\n\n");
 echo nl2br($error_log_fas."\n\n");
 echo nl2br ($ausgabe_all);
-$ausgabe="\nGruppe\nGruppe: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Nicht eingefügt: $anzahl_update / Fehler: $anzahl_fehler."
+$ausgabe="\nGruppe\nGruppe: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / geändert: $anzahl_update / Fehler: $anzahl_fehler."
 ."\n\n".$ausgabe_all;
  
 
