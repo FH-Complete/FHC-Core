@@ -71,10 +71,7 @@
 	// Studiensemester setzen
 	$ss=new studiensemester($conn,$studiensemester);
 	if ($studiensemester==null)
-	{
-		$studiensemester=$ss->getaktorNext();
-		$ss->load($studiensemester);
-	}
+		$studiensemester=$ss->getAktTillNext();
 	$datum_beginn=$ss->start;
 	$datum_ende=$ss->ende;
 	$ts_beginn=$datum_obj->mktime_fromdate($datum_beginn);
