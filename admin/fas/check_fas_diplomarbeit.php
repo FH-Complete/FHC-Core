@@ -20,9 +20,9 @@ $anzahl_fehler=0;
 $i=0;
 $qry1='';
 $zweitbetreuer='';
-$combobox[]="";
-$valuebox[]="";
-$nachname[]="";
+$combobox=array();
+$valuebox=array();
+$nachname=array();
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
