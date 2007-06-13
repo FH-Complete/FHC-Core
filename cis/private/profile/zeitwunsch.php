@@ -27,6 +27,7 @@
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/zeitsperre.class.php');
 	require_once('../../../include/datum.class.php');
+	require_once('../../../include/resturlaub.class.php');
 
 	$uid = get_uid();
 
@@ -415,14 +416,67 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 else
 	$content_form.= "<input type='submit' name='submit_zeitsperre' value='Hinzufügen'>";
 $content_form.= '</td></tr>';
-$content_form.= '</table>';
+$content_form.= '</table></form>';
+
+// ******* RESTURLAUB ******** //
+$content_resturlaub = '';
+$resturlaubstage = '0';
+$mehrarbeitsstunden = '0';
+
+if(isset($_GET['type']) && $_GET['type']=='save_resturlaub')
+{
+	$_POST['mehrarbeitsstunden'] = str_replace(',','.',$_POST['mehrarbeitsstunden']);
+	
+	$resturlaub = new resturlaub($conn);
+	if($resturlaub->load($uid))
+	{
+		$resturlaub->new = false;
+	}
+	else 
+	{
+		$resturlaub->new = true;
+		$resturlaub->insertamum = date('Y-m-d H:i:s');
+		$resturlaub->insertvon = $uid;
+	}
+	$resturlaub->mitarbeiter_uid = $uid;
+	$resturlaub->updateamum = date('Y-m-d H:i:s');
+	$resturlaub->updatevon = $uid;
+	$resturlaub->resturlaubstage = $_POST['resturlaubstage'];
+	$resturlaub->mehrarbeitsstunden = $_POST['mehrarbeitsstunden'];
+	
+	if($resturlaub->save())
+	{
+		$content_resturlaub .= '<b>Daten wurden gespeichert!</b>';
+	}
+	else 
+	{
+		$content_resturlaub .= "<b>Fehler beim Speichern der Daten: $resturlaub->errormsg</b>";
+	}
+	
+	$resturlaubstage = htmlspecialchars($_POST['resturlaubstage'],ENT_QUOTES);
+	$mehrarbeitsstunden = htmlspecialchars($_POST['mehrarbeitsstunden'],ENT_QUOTES);
+}
+else 
+{
+	$resturlaub = new resturlaub($conn);
+
+	if($resturlaub->load($uid))
+	{
+		$resturlaubstage = $resturlaub->resturlaubstage;
+		$mehrarbeitsstunden = $resturlaub->mehrarbeitsstunden;
+	}
+}
+$content_resturlaub.='<form method="POST" action="'.$PHP_SELF.'?type=save_resturlaub"><table>';
+$content_resturlaub.='<tr><td>Aktuelle Resturlaubstage:</td><td><input type="text" size="6" name="resturlaubstage" value="'.$resturlaubstage.'" /></td></tr>';
+$content_resturlaub.='<tr><td>Aktuelle Mehrarbeitsstunden:</td><td><input type="text" size="6" name="mehrarbeitsstunden" value="'.$mehrarbeitsstunden.'" /></td></tr>';
+$content_resturlaub.='<tr><td></td><td><input type="submit" name="save_resturlaub" value="Speichern" /></td></tr></table>';
 
 echo '<table width="100%">';
 echo '<tr>';
 echo "<td valign='top'>";
 echo $content_form;
-echo '<br></td>';
-echo '<td>';
+echo '</td>';
+echo "<td valign='top'>$content_resturlaub</td>";
 echo '</tr><tr><td>';
 echo $content_table;
 echo '</td>';
