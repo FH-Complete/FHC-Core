@@ -1574,24 +1574,31 @@ function StudentKontoZahlungsbestaetigung()
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-konto-tree');
 
-	if (tree.currentIndex==-1)
-	{
-		alert('Bitte zuerst eine Buchung auswaehlen');
-		return;
-	}
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
 	
-	if(!tree.view.getParentIndex(tree.currentIndex))
+	for (var t = 0; t < numRanges; t++)
 	{
-		alert('Zum Drucken der bestaetigung bitte die oberste Buchung waehlen');
-		return false;
+  		tree.view.selection.getRangeAt(t,start,end);
+			for (var v = start.value; v <= end.value; v++)
+			{
+				if(!tree.view.getParentIndex(v))
+				{
+					alert('Zum Drucken der Bestaetigung bitte die oberste Buchung waehlen');
+					return false;
+				}
+				var col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
+				var buchungsnr=tree.view.getCellText(v,col);
+				paramList += ';'+buchungsnr;
+			}
 	}
-	
-	//Ausgewaehlte Nr holen
-    var col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
-	var buchungsnr=tree.view.getCellText(tree.currentIndex,col);
+			
+	//Ausgewaehlte Nr holen    
 	var uid = document.getElementById('student-detail-textbox-uid').value;
 		
-	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=konto.rdf.php&xsl=Zahlung&uid='+uid+'&buchungsnr='+buchungsnr,'Zahlungsbestaetigung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=konto.rdf.php&xsl=Zahlung&uid='+uid+'&buchungsnummern='+paramList,'Zahlungsbestaetigung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 

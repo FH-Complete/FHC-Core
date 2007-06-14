@@ -57,7 +57,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				</row>
 				
 				<row>
-					<tree id="interessent-konto-tree" seltype="single" hidecolumnpicker="false" flex="1"
+					<tree id="interessent-konto-tree" seltype="multi" hidecolumnpicker="false" flex="1"
 						datasources="rdf:null" ref="http://www.technikum-wien.at/konto/liste"
 						style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100px" enableColumnDrag="true"
 						onselect="InteressentKontoAuswahl()"
@@ -113,6 +113,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<button id="interessent-konto-button-neu" label="Neu" oncommand="InteressentKontoNeu();" disabled="true"/>
 							<button id="interessent-konto-button-gegenbuchung" label="Gegenbuchung" oncommand="InteressentKontoGegenbuchung();" disabled="true"/>
 							<button id="interessent-konto-button-loeschen" label="Loeschen" oncommand="InteressentKontoDelete();" disabled="true"/>
+							<spacer flex="1"/>
+							<button id="interessent-konto-button-zahlungsbestaetigung" label="Zahlungsbestaetigung drucken" oncommand="InteressentKontoZahlungsbestaetigung();" disabled="true"/>
 						</hbox>
 						<vbox hidden="true">
 							<label value="Buchungsnr" control="interessent-konto-textbox-buchungsnr"/>

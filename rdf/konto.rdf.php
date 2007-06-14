@@ -73,6 +73,15 @@ if(isset($_GET['buchungsnr']) && is_numeric($_GET['buchungsnr']))
 else
 	$buchungsnr = '';
 
+if(isset($_GET['buchungsnummern']))
+{
+	$buchungsnummern = $_GET['buchungsnummern'];
+}
+else
+	$buchungsnummern = '';
+
+
+	
 $datum = new datum();
 $konto = new konto($conn, null, true);
 
@@ -85,13 +94,11 @@ elseif($buchungsnr!='')
 	if(!$konto->load($buchungsnr))
 		die($konto->errormsg);
 }
-else
-	die('Falsche Parameteruebergabe');
-
 // ----------------------------------- RDF --------------------------------------
 $rdf_url='http://www.technikum-wien.at/konto';
 if ($xmlformat=='rdf')
 {
+
 ?>
 
 <RDF:RDF
@@ -178,7 +185,7 @@ elseif ($xmlformat=='xml')
 	echo "<konto>\n";
 	function drawrow_xml($row)
 	{
-		global $datum;
+		global $datum, $btyp;
 		
 		echo "
   		<buchung>
@@ -187,11 +194,12 @@ elseif ($xmlformat=='xml')
 			<studiengang_kz><![CDATA[".$row->studiengang_kz."]]></studiengang_kz>
 			<studiensemester_kurzbz><![CDATA[".$row->studiensemester_kurzbz."]]></studiensemester_kurzbz>
 			<buchungsnr_verweis><![CDATA[".$row->buchungsnr_verweis."]]></buchungsnr_verweis>
-			<betrag><![CDATA[".$row->betrag*(-1)."]]></betrag>
+			<betrag><![CDATA[".sprintf('%.2f',$row->betrag*(-1))."]]></betrag>
 			<buchungsdatum><![CDATA[".$datum->convertISODate($row->buchungsdatum)."]]></buchungsdatum>
 			<buchungstext><![CDATA[".$row->buchungstext."]]></buchungstext>
 			<mahnspanne><![CDATA[".$row->mahnspanne."]]></mahnspanne>
 			<buchungstyp_kurzbz><![CDATA[".$row->buchungstyp_kurzbz."]]></buchungstyp_kurzbz>
+			<buchungstyp_beschreibung><![CDATA[".$btyp[$row->buchungstyp_kurzbz]."]]></buchungstyp_beschreibung>
 			<updateamum><![CDATA[".$row->updateamum."]]></updateamum>
 			<updatevon><![CDATA[".$row->updatevon."]]></updatevon>
 			<insertamum><![CDATA[".$row->insertamum."]]></insertamum>
@@ -201,6 +209,7 @@ elseif ($xmlformat=='xml')
 	{
 		global $conn, $datum;
 		$pers = new person($conn);
+		
 		$pers->load($row->person_id);
 		
 		$stg = new studiengang($conn, $row->studiengang_kz);
@@ -222,9 +231,34 @@ elseif ($xmlformat=='xml')
 		</person>";
 	}
 
+	$buchungstyp = new konto($conn);
+	$buchungstyp->getBuchungstyp();
+	$btyp = array();
+	
+	foreach ($buchungstyp->result as $row)
+		$btyp[$row->buchungstyp_kurzbz]=$row->beschreibung;	
+	
 	if($person_id!='')
 		foreach ($konto->result as $buchung)
 			drawrow_xml($buchung);
+	elseif($buchungsnummern!='')
+	{
+		$buchungsnr = split(';',$buchungsnummern);
+		$drawperson=true;
+		foreach($buchungsnr as $bnr)
+		{
+			if($bnr!='')
+			{
+				$konto->load($bnr);
+				if($drawperson)
+				{
+					drawperson_xml($konto);
+					$drawperson=false;
+				}				
+				drawrow_xml($konto);
+			}
+		}
+	}
 	else
 	{
 		drawperson_xml($konto);
