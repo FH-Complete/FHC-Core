@@ -175,12 +175,14 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentkontooverlay.xu
 							<tab id="interessent-tab-prestudent" label="PreStudent" />
 							<tab id="interessent-tab-dokumente" label="Dokumente" />
 							<tab id="interessent-tab-konto" label="Konto" />
+							<tab id="interessent-tab-kontakt" label="Kontakt" />
 						</tabs>
 						<tabpanels id="interessent-tabpanels-main" flex="1">
 							<vbox id="interessent-detail"  style="margin-top:10px;" />
 							<vbox id="interessent-prestudent"  style="margin-top:10px;" />
 							<vbox id="interessent-dokumente"  style="margin-top:10px;" />
 							<vbox id="interessent-konto"  style="margin-top:10px;" />
+							<iframe id="interessent-kontakt" src="" style="margin-top:10px;"/>
 						</tabpanels>
 					</tabbox>				
 				</vbox>

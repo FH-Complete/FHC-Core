@@ -673,6 +673,8 @@ function InteressentAuswahl()
 	InteressentKontoTreeDatasource.addXMLSinkObserver(InteressentKontoTreeSinkObserver);
 	kontotree.builder.addListener(InteressentKontoTreeListener);	
 	
+	// KONTAKTE
+	document.getElementById('interessent-kontakt').setAttribute('src', 'kontakt.xul.php?person_id='+person_id);
 }
 
 // ****

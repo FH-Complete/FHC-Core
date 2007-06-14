@@ -973,6 +973,9 @@ function StudentAuswahl()
 	lvgesamtnotentree.database.AddDataSource(StudentLvGesamtNotenTreeDatasource);
 	StudentLvGesamtNotenTreeDatasource.addXMLSinkObserver(StudentLvGesamtNotenTreeSinkObserver);
 	lvgesamtnotentree.builder.addListener(StudentLvGesamtNotenTreeListener);	
+	
+	// KONTAKTE
+	document.getElementById('student-kontakt').setAttribute('src','kontakt.xul.php?person_id='+person_id);
 }
 
 // ****

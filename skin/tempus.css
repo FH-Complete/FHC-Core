@@ -50,3 +50,30 @@ grid.lvaStundenplan button
   	padding-left: 0px;
   	padding-right: 0px;
 }
+
+
+tree treecol {
+	background-color: #FFFFCC; 
+	border: 1px solid black;	
+}
+
+tree {
+	font-size:9pt;
+	font-family:Arial;	
+}
+
+box.studentDetail {
+    -moz-binding: url('lehrveranstaltungbinding.xml.php#studentDetail');
+}
+
+label,textbox {
+	font-size:9pt;
+	font-family:Arial;
+}
+
+treechildren::-moz-tree-row(selected) { background-color: #FFFFAA; }
+treechildren::-moz-tree-row(odd) { background-color: #EEEEEE; }
+treechildren::-moz-tree-row(odd, selected) { background-color: #FFFFAA; }
+treechildren::-moz-tree-row(even, selected) { background-color: #FFFFAA; }
+treechildren::-moz-tree-cell-text(selected) { color: #000000; }
+treechildren::-moz-tree-cell-text(odd, selected) { color: #000000; }

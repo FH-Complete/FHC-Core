@@ -27,7 +27,6 @@ header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../vilesci/config.inc.php');
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
-echo "<?xml-stylesheet href=\"".APP_ROOT."content/lvplanung/lehrveranstaltung.css\" type=\"text/css\" ?>";
 
 ?>
 
@@ -340,7 +339,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lvplanung/lehrveranstaltung.cs
 					</row>
 			    	<row>
     					<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden" value="Semesterstunden: "/>
-    					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden" disabled="true" maxlength="3" flex="1" oninput="LeMitarbeiterValueChanged();"/>
+    					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden" disabled="true" maxlength="6" flex="1" oninput="LeMitarbeiterValueChanged();"/>
     					<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-planstunden" value="Planstunden: "/>
     					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-planstunden" disabled="true" maxlength="3" flex="1" oninput="LeMitarbeiterValueChanged();"/>
     				</row>

@@ -267,7 +267,7 @@ class lehreinheitmitarbeiter
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der LEMitarbeiter:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern der LEMitarbeiter:'.$qry.pg_errormessage($this->conn);
 			return false;
 		}
 	}
