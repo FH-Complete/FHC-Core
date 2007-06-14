@@ -1,15 +1,16 @@
 <?php
 	include('../../config.inc.php');
-	include('../../../include/globals.inc.php');
+	//include('../../../include/globals.inc.php');
 	include('../../../include/functions.inc.php');
 
-	$uid=USER_UID;
+	$uid=get_uid();
 
 	// Verbindung aufbauen
 	$conn=pg_pconnect(CONN_STRING) or die ("Unable to connect to SQL-Server");
 	$sql_query="SET search_path TO campus; SELECT uid, nachname, vorname FROM vw_benutzer WHERE uid LIKE '$uid'";
-	unset($uid);
+	//echo $sql_query;
 	$result=pg_query($conn, $sql_query);
+
 	if(!$result)
 		echo "User not found!";
 	else
