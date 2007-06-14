@@ -60,15 +60,17 @@
 	<?php
 	$obj=new resturlaub($conn);
 	$obj->getResturlaubFixangestellte();
+	$i=0;
 	
 	foreach ($obj->result as $row)
 	{
-		echo '<TR class="liste">';
+		echo '<TR class="liste'.($i%2).'">';
 		echo "<TD>$row->nachname</TD><TD>$row->vorname $row->vornamen</TD>";
 		echo "<TD>$row->resturlaubstage</TD>";
 		echo "<TD>$row->mehrarbeitsstunden</TD>";
 		echo "<TD>$row->updateamum</TD>";
 		echo '</TR>';
+		$i++;
 	}
 	?>
 

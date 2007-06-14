@@ -57,7 +57,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				</row>
 				
 				<row>
-					<tree id="student-konto-tree" seltype="single" hidecolumnpicker="false" flex="1"
+					<tree id="student-konto-tree" seltype="multi" hidecolumnpicker="false" flex="1"
 						datasources="rdf:null" ref="http://www.technikum-wien.at/konto/liste"
 						style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100px" enableColumnDrag="true"
 						onselect="StudentKontoAuswahl()"

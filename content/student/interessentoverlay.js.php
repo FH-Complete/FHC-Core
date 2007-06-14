@@ -1083,6 +1083,39 @@ function InteressentDokumentTreeNichtabgegebenDatasourceRefresh()
 
 // ***************** KONTO ****************************
 
+// *****
+// * Druckt eine Zahlungsbestaetigung aus
+// *****
+function InteressentKontoZahlungsbestaetigung()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('interessent-konto-tree');
+
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
+	
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+			for (var v = start.value; v <= end.value; v++)
+			{
+				if(!tree.view.getParentIndex(v))
+				{
+					alert('Zum Drucken der Bestaetigung bitte die oberste Buchung waehlen');
+					return false;
+				}
+				var col = tree.columns ? tree.columns["interessent-konto-tree-buchungsnr"] : "interessent-konto-tree-buchungsnr";
+				var buchungsnr=tree.view.getCellText(v,col);
+				paramList += ';'+buchungsnr;
+			}
+	}
+			
+	//Ausgewaehlte Nr holen			
+	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=konto.rdf.php&xsl=Zahlung&buchungsnummern='+paramList,'Zahlungsbestaetigung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+
 // ****
 // * Wenn eine buchung Ausgewaehlt wird, dann werden
 // * die Details geladen und angezeigt
@@ -1199,6 +1232,7 @@ function InteressentKontoDisableFields(val)
 	document.getElementById('interessent-konto-button-neu').disabled=val;
 	document.getElementById('interessent-konto-button-gegenbuchung').disabled=val;
 	document.getElementById('interessent-konto-button-loeschen').disabled=val;
+	document.getElementById('interessent-konto-button-zahlungsbestaetigung').disabled=val;
 	InteressentKontoDetailDisableFields(true);
 }
 
