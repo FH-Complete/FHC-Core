@@ -30,7 +30,7 @@ $nachname=array();
 <head>
 <title>Diplomarbeiten-Datenkorrektur</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-9">
-<link href="../../skin/vilesci_old.css" rel="stylesheet" type="text/css">
+<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 </head>
 <body>
 <?php
