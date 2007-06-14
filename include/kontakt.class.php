@@ -54,30 +54,66 @@ class kontakt
 	function kontakt($conn,$kontakt_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		if ($unicode)
+		
+		if($unicode!=null)
 		{
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			if ($unicode)
+				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			else 
+				$qry="SET CLIENT_ENCODING TO 'LATIN9';";
+			if(!pg_query($conn,$qry))
+			{
+				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
+				return false;
+			}
 		}
-		else 
-		{
-			$qry="SET CLIENT_ENCODING TO 'LATIN9';";
-		}
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-			return false;
-		}
-		//if($firma_id != null) 	$this->load($firma_id);
+		if($kontakt_id != null)
+			$this->load($kontakt_id);
 	}
 	
 	/**
-	 * Laedt die Funktion mit der ID $kontakt_id
-	 * @param  $kontakt_id ID der zu ladenden  Email
+	 * Laedt einen Kontakt mit der ID $kontakt_id
+	 * @param  $kontakt_id ID des zu ladenden Kontaktes
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	function load($kontakt_id)
 	{
-		//noch nicht implementiert
+		if(!is_numeric($kontakt_id))
+		{
+			$this->errormsg = 'Kontakt_id ist ungueltig';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM public.tbl_kontakt WHERE kontakt_id='$kontakt_id'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$this->kontakt_id = $row->kontakt_id;
+				$this->person_id = $row->person_id;
+				$this->firma_id = $row->firma_id;
+				$this->kontakttyp = $row->kontakttyp;
+				$this->anmerkung = $row->anmerkung;
+				$this->kontakt = $row->kontakt;
+				$this->zustellung = ($row->zustellung=='t'?true:false);
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->ext_id = $row->ext_id;
+			}
+			else 
+			{
+				$this->errormsg = 'Datensatz wurde nicht gefunden';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
 	}
 			
 	/**
@@ -107,6 +143,7 @@ class kontakt
 		$this->errormsg = '';
 		return true;		
 	}
+	
 	// ************************************************
 	// * wenn $var '' ist wird "null" zurueckgegeben
 	// * wenn $var !='' ist werden datenbankkritische 
@@ -117,6 +154,7 @@ class kontakt
 	{
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
+	
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank	 
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -134,7 +172,7 @@ class kontakt
 		{
 			//Neuen Datensatz einfuegen
 					
-			$qry='INSERT INTO tbl_kontakt (person_id, firma_id, kontakttyp, anmerkung, kontakt, zustellung, ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
+			$qry='BEGIN;INSERT INTO tbl_kontakt (person_id, firma_id, kontakttyp, anmerkung, kontakt, zustellung, ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
 			     $this->addslashes($this->person_id).', '.
 			     $this->addslashes($this->firma_id).', '.
 			     $this->addslashes($this->kontakttyp).', '.
@@ -193,23 +231,32 @@ class kontakt
 		{
 			if(pg_query($this->conn, $qry))
 			{
-				//Log schreiben
-				/*$sql = $qry;
-				$qry = "SELECT nextval('log_seq') as id;";
-				if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
+				if($this->new)
 				{
-					$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
-					return false;
-				}
-							
-				$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
-				if(pg_query($this->conn, $qry))
-					return true;
-				else 
-				{
-					$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
-					return false;
-				}	*/
+					$qry = "SELECT currval('public.tbl_kontakt_kontakt_id_seq') as id";
+					
+					if($result = pg_query($this->conn, $qry))
+					{
+						if($row = pg_fetch_object($result))
+						{
+							$this->kontakt_id = $row->id;
+							pg_query($this->conn, 'COMMIT');
+							return true;
+						}
+						else 
+						{
+							$this->errormsg = 'Fehler beim Auslesen er Sequence';
+							pg_query($this->conn, 'ROLLBACK');
+							return false;
+						}
+					}
+					else 
+					{
+						$this->errormsg = 'Fehler beim Auslesen der Sequence';
+						pg_query($this->conn, 'ROLLBACK');
+						return false;
+					}
+				}				
 				return true;		
 			}
 			else 
@@ -226,12 +273,63 @@ class kontakt
 	
 	/**
 	 * Loescht den Datenensatz mit der ID die uebergeben wird
-	 * @param $firma_id ID die geloescht werden soll
+	 * @param $kontakt_id ID die geloescht werden soll
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function delete($firma_id)
+	function delete($kontakt_id)
 	{
-		//noch nicht implementiert!	
+		if(!is_numeric($kontakt_id))
+		{
+			$this->errormsg = 'Kontakt_id ist ungueltig';
+			return false;
+		}
+		
+		$qry = "DELETE FROM public.tbl_kontakt WHERE kontakt_id='$kontakt_id'";
+		
+		if(pg_query($this->conn, $qry))
+			return true;
+		else 
+		{
+			$this->errormsg = 'Fehler beim Loeschen der Daten';
+			return false;
+		}	
+	}
+	
+	// **
+	// * Laedt alle Kontaktdaten einer Person
+	// **
+	function load_pers($person_id)
+	{
+		if(!is_numeric($person_id))
+		{
+			$this->errormsg = 'Person_id ist ungueltig';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM public.tbl_kontakt WHERE person_id='$person_id'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$obj = new kontakt($this->conn, null, null);
+				
+				$obj->kontakt_id = $row->kontakt_id;
+				$obj->person_id = $row->person_id;
+				$obj->firma_id = $row->firma_id;
+				$obj->kontakttyp = $row->kontakttyp;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->kontakt = $row->kontakt;
+				$obj->zustellung = $row->zustellung;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->ext_id = $row->ext_id;
+				
+				$this->result[] = $obj;
+			}
+		}
 	}
 }
 ?>

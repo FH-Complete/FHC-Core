@@ -20,7 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 /**
- * Klasse Adresse (FAS-Online)
+ * Klasse Adresse
  * @create 13-03-2006
  */
 
@@ -46,52 +46,58 @@ class adresse
 	var $zustelladresse;	// @var boolean
 	var $firma_id;		// @var integer
 	var $updateamum;	// @var timestamp
-	var $updatevon=0;	// @var string
+	var $updatevon;	// @var string
 	var $insertamum;      // @var timestamp
-	var $insertvon=0;      // @var string
+	var $insertvon;      // @var string
 	var $ext_id;		// @var integer
 	
-	/**
-	 * Konstruktor
-	 * @param $conn      Connection
-	 *        $adress_id ID der Adresse die geladen werden soll (Default=null)
-	 */
-	function adresse($conn,$adress_id=null,$unicode=false)
+	// *************************************************************************
+	// * Konstruktor
+	// * @param $conn      Connection
+	// *        $adress_id ID der Adresse die geladen werden soll (Default=null)
+	// *        $unicode   wenn false dann wird das Encoding auf LATIN9 gesetzt
+	// *                   wenn true dann auf UNICODE
+	// *                   wenn null dann wird das Encoding nicht veraendert
+	// *************************************************************************
+	function adresse($conn,$adresse_id=null,$unicode=false)
 	{
 		$this->conn = $conn;
-		if ($unicode)
+		
+		if($unicode!=null)
 		{
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			if ($unicode)
+				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			else 
+				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+
+			if(!pg_query($conn,$qry))
+			{
+				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
+				return false;
+			}
 		}
-		else 
-		{
-			$qry="SET CLIENT_ENCODING TO 'LATIN9';";
-		}
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-			return false;
-		}
-		//if($adress_id != null) 	$this->load($adress_id);
+		
+		if($adresse_id != null)
+			$this->load($adresse_id);
 	}
 	
-	/**
-	 * Laedt die Funktion mit der ID $adress_id
-	 * @param  $adress_id ID der zu ladenden Funktion
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	function load($adress_id)
+	// ***********************************************
+	// * Laedt die Adresse mit der ID $adresse_id
+	// * @param  $adress_id ID der zu ladenden Adresse
+	// * @return true wenn ok, false im Fehlerfall
+	// ***********************************************
+	function load($adresse_id)
 	{
 		
 		//Pruefen ob adress_id eine gueltige Zahl ist
-		if(!is_numeric($adress_id) || $adress_id == '')
+		if(!is_numeric($adresse_id) || $adresse_id == '')
 		{
-			$this->errormsg = 'Adress_id muss eine Zahl sein';
+			$this->errormsg = 'Adresse_id muss eine Zahl sein';
 			return false;
 		}
 		
 		//Daten aus der Datenbank lesen
-		$qry = "SELECT * FROM tbl_adresse WHERE adresse_id=$adress_id";
+		$qry = "SELECT * FROM public.tbl_adresse WHERE adresse_id='$adresse_id'";
 		
 		if(!$res = pg_query($this->conn,$qry))
 		{
@@ -101,22 +107,22 @@ class adresse
 		
 		if($row = pg_fetch_object($res))
 		{
-			$this->adresse_id      = $row->adresse_id;
-			$this->heimatadresse = ($row->heimatadresse=='t'?true:false);
-			$this->zustelladresse = ($row->zustelladresse=='t'?true:false);
-			$this->gemeinde        = $row->gemeinde;
-			$this->name            = $row->name;
-			$this->nation          = $row->nation;
-			$this->ort             = $row->ort;
-			$this->person_id       = $row->person_id;
-			$this->plz             = $row->plz;
-			$this->strasse         = $row->strasse;
-			$this->typ             = $row->typ;
-			$this->updateamum      = $row->updateamum;
-			$this->updatevon       = $row->updatevon;
-			$this->updateamum      = $row->insertamum;
-			$this->updatevon       = $row->insertvon;
-			$this->firma_id=$row->firma_id;
+			$this->adresse_id		= $row->adresse_id;
+			$this->heimatadresse 	= ($row->heimatadresse=='t'?true:false);
+			$this->zustelladresse	= ($row->zustelladresse=='t'?true:false);
+			$this->gemeinde			= $row->gemeinde;
+			$this->name				= $row->name;
+			$this->nation			= $row->nation;
+			$this->ort				= $row->ort;
+			$this->person_id		= $row->person_id;
+			$this->plz				= $row->plz;
+			$this->strasse			= $row->strasse;
+			$this->typ				= $row->typ;
+			$this->updateamum		= $row->updateamum;
+			$this->updatevon		= $row->updatevon;
+			$this->insertamum		= $row->insertamum;
+			$this->insertvon		= $row->insertvon;
+			$this->firma_id			= $row->firma_id;
 		}
 		else
 		{
@@ -127,11 +133,11 @@ class adresse
 		return true;
 	}
 	
-	/**
-	 * Laedt alle adressen zu der Person die uebergeben wird
-	 * @param $pers_id ID der Person zu der die Adressen geladen werden sollen
-	 * @return true wenn ok, false im Fehlerfall
-	 */
+	// *************************************************************************
+	// * Laedt alle adressen zu der Person die uebergeben wird
+	// * @param $pers_id ID der Person zu der die Adressen geladen werden sollen
+	// * @return true wenn ok, false im Fehlerfall
+	// *************************************************************************
 	function load_pers($pers_id)
 	{
 		//Pruefen ob pers_id eine gueltige Zahl ist
@@ -142,7 +148,7 @@ class adresse
 		}
 		
 		//Lesen der Daten aus der Datenbank
-		$qry = "SELECT * FROM public.tbl_adresse WHERE person_id=$pers_id";
+		$qry = "SELECT * FROM public.tbl_adresse WHERE person_id='$pers_id'";
 		
 		if(!$res = pg_query($this->conn,$qry))
 		{
@@ -152,10 +158,10 @@ class adresse
 		
 		while($row = pg_fetch_object($res))
 		{
-			$adr_obj = new adresse($this->conn);
+			$adr_obj = new adresse($this->conn, null, null);
 		
 			$adr_obj->adresse_id      = $row->adresse_id;
-			$adr_obj->heimatdresse = ($row->heimatadresse=='t'?true:false);
+			$adr_obj->heimatadresse = ($row->heimatadresse=='t'?true:false);
 			$adr_obj->gemeinde        = $row->gemeinde;
 			$adr_obj->name            = $row->name;
 			$adr_obj->nation          = $row->nation;
@@ -174,50 +180,12 @@ class adresse
 		}
 		return true;
 	}
-	
-	/**
-	 * Laedt alle Adressen aus der Datenbank
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	function getAll()
-	{
-		$qry = "SELECT * FROM adresse";
 		
-		if(!$res = pg_query($this->conn,$qry))
-		{
-			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
-			return false;
-		}
-		
-		while($row = pg_fetch_object($res))
-		{
-			$adr_obj = new adresse($this->conn);
-		
-			$adr_obj->adresse_id      = $row->adresse_pk;
-			$adr_obj->bismeldeadresse = ($row->bismeldeadresse=='J'?true:false);
-			$adr_obj->gemeinde        = $row->gemeinde;
-			$adr_obj->name            = $row->name;
-			$adr_obj->nation          = $row->nation;
-			$adr_obj->ort             = $row->ort;
-			$adr_obj->person_id       = $row->person_fk;
-			$adr_obj->plz             = $row->plz;
-			$adr_obj->strasse         = $row->strasse;
-			$adr_obj->typ             = $row->typ;
-			$adr_obj->updateamum      = $row->creationdate;
-			$adr_obj->updatevon       = $row->creationuser;
-			$adr_obj->zustelladresse  = ($row->zustelladresse=='J'?true:false);
-			
-			$this->result[] = $adr_obj;
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * Prueft die Variablen auf gueltigkeit
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	function checkvars()
+	// *******************************************
+	// * Prueft die Variablen auf Gueltigkeit
+	// * @return true wenn ok, false im Fehlerfall
+	// *******************************************
+	function validate()
 	{		
 		//Zahlenfelder pruefen
 		if(!is_numeric($this->person_id))
@@ -262,6 +230,7 @@ class adresse
 		$this->errormsg = '';
 		return true;		
 	}
+	
 	// ************************************************
 	// * wenn $var '' ist wird "null" zurueckgegeben
 	// * wenn $var !='' ist werden datenbankkritische 
@@ -273,34 +242,23 @@ class adresse
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
 	
-	/**
-	 * Speichert den aktuellen Datensatz in die Datenbank	 
-	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
-	 * andernfalls wird der Datensatz mit der ID in $adresse_id aktualisiert
-	 * @return true wenn ok, false im Fehlerfall
-	 */
+	// ***********************************************************************
+	// * Speichert den aktuellen Datensatz in die Datenbank	 
+	// * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	// * andernfalls wird der Datensatz mit der ID in $adresse_id aktualisiert
+	// * @return true wenn ok, false im Fehlerfall
+	// ***********************************************************************
 	function save()
 	{
 		//Variablen pruefen
-		if(!$this->checkvars())
+		if(!$this->validate())
 			return false;
 			
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-			
-			//naechste ID aus der Sequence holen
-			$qry="SELECT nextval('tbl_adresse_adresse_id_seq') as id;";
-			if(!$row = pg_fetch_object(pg_query($this->conn,$qry)))
-			{
-				$this->errormsg = 'Fehler beim auslesen der Sequence'."\n";
-				return false;
-			}
-			$this->adresse_id = $row->id;
-			
-			$qry='INSERT INTO tbl_adresse (adresse_id, person_id, name, strasse, plz, typ, ort, nation, insertamum, insertvon,
+			$qry='BEGIN;INSERT INTO tbl_adresse (person_id, name, strasse, plz, typ, ort, nation, insertamum, insertvon,
 			     gemeinde, heimatadresse, zustelladresse, firma_id, updateamum, updatevon, ext_id) VALUES('.
-			      $this->addslashes($this->adresse_id).', '.
 			      $this->addslashes($this->person_id).', '.
 			      $this->addslashes($this->name).', '.
 			      $this->addslashes($this->strasse).', '.
@@ -315,6 +273,7 @@ class adresse
 			      ($this->firma_id!=null?$this->addslashes($this->firma_id):'null').', now(), '.
 			      $this->addslashes($this->updatevon).', '.
 			      $this->addslashes($this->ext_id).');';	
+			      
 			      $this->done=true;		
 		}
 		else
@@ -327,7 +286,7 @@ class adresse
 				$this->errormsg = 'adresse_id muss eine gueltige Zahl sein: '.$this->adresse_id."\n";
 				return false;
 			}
-			$qryz="SELECT * FROM tbl_adresse WHERE adresse_id='$this->adresse_id';";
+			$qryz="SELECT * FROM public.tbl_adresse WHERE adresse_id='$this->adresse_id';";
 			if($resultz = pg_query($this->conn, $qryz))
 			{
 				if($rowz = pg_fetch_object($resultz))
@@ -346,20 +305,20 @@ class adresse
 								
 					if($update)
 					{
-						$qry='UPDATE tbl_adresse SET'.
+						$qry='UPDATE public.tbl_adresse SET'.
 							' person_id='.$this->addslashes($this->person_id).', '.
 							' name='.$this->addslashes($this->name).', '.
 							' strasse='.$this->addslashes($this->strasse).', '.
 							' plz='.$this->addslashes($this->plz).', '.
-						      	' typ='.$this->addslashes($this->typ).', '.
-						      	' ort='.$this->addslashes($this->ort).', '.
-						      	' nation='.$this->addslashes($this->nation).', '.
-						      	' gemeinde='.$this->addslashes($this->gemeinde).', '. 
-						      	' updateamum= now(), '.
-						      	' updatevon='.$this->addslashes($this->updatevon).', '. 
-						      	' heimatadresse='.($this->heimatadresse?'true':'false').', '.
-						      	' zustelladresse='.($this->zustelladresse?'true':'false').' '.
-						      	'WHERE adresse_id='.$this->adresse_id.';';
+					      	' typ='.$this->addslashes($this->typ).', '.
+					      	' ort='.$this->addslashes($this->ort).', '.
+					      	' nation='.$this->addslashes($this->nation).', '.
+					      	' gemeinde='.$this->addslashes($this->gemeinde).', '. 
+					      	' updateamum= now(), '.
+					      	' updatevon='.$this->addslashes($this->updatevon).', '. 
+					      	' heimatadresse='.($this->heimatadresse?'true':'false').', '.
+					      	' zustelladresse='.($this->zustelladresse?'true':'false').' '.
+					      	'WHERE adresse_id='.$this->adresse_id.';';
 						      	$this->done=true;
 					}
 				}
@@ -370,24 +329,31 @@ class adresse
 		{
 			if(pg_query($this->conn,$qry))
 			{
-				//Log schreiben
-				/*$sql = $qry;
-				$qry = "SELECT nextval('log_seq') as id;";
-				if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
+				if($this->new)
 				{
-					$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
-					return false;
+					//naechste ID aus der Sequence holen
+					$qry="SELECT nextval('public.tbl_adresse_adresse_id_seq') as id;";
+					if($result = pg_query($this->conn, $qry))
+					{
+						if($row = pg_fetch_object($result))
+						{
+							$this->adresse_id = $row->id;
+							pg_query($this->conn, 'COMMIT');
+						}
+						else 
+						{
+							pg_query($this->conn, 'ROLLBACK');
+							$this->errormsg = "Fehler beim Auslesen der Sequence";
+							return false;
+						}
+					}
+					else 
+					{
+						pg_query($this->conn, 'ROLLBACK');
+						$this->errormsg = 'Fehler beim Auslesen der Sequence';
+						return false;
+					}
 				}
-							
-				$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
-				if(pg_query($this->conn, $qry))
-					return true;
-				else 
-				{
-					$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
-					return false;
-				}	*/
-				return true;		
 			}
 			else 
 			{
@@ -401,42 +367,26 @@ class adresse
 		}
 	}
 	
-	/**
-	 * Loescht den Datenensatz mit der ID die uebergeben wird
-	 * @param $adress_id ID die geloescht werden soll
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	function delete($adress_id)
+	// ********************************************************
+	// * Loescht den Datenensatz mit der ID die uebergeben wird
+	// * @param $adresse_id ID die geloescht werden soll
+	// * @return true wenn ok, false im Fehlerfall
+	// ********************************************************
+	function delete($adresse_id)
 	{
 		//Pruefen ob adresse_id eine gueltige Zahl ist
-		if(!is_numeric($adress_id) || $adress_id == '')
+		if(!is_numeric($adresse_id) || $adresse_id == '')
 		{
 			$this->errormsg = 'adresse_id muss eine gueltige Zahl sein'."\n";
 			return false;
 		}
 		
 		//loeschen des Datensatzes
-		$qry="DELETE FROM adresse WHERE adresse_pk=$adress_id;";
+		$qry="DELETE FROM public.tbl_adresse WHERE adresse_id='$adresse_id';";
 		
 		if(pg_query($this->conn,$qry))
 		{
-			//Log schreiben
-			$sql = $qry;
-			$qry = "SELECT nextval('log_seq') as id;";
-			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
-			{
-				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
-				return false;
-			}
-						
-			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
-			if(pg_query($this->conn, $qry))
-				return true;
-			else 
-			{
-				$this->errormsg = "Fehler beim Speichern des Log-Eintrages\n";
-				return false;
-			}		
+			return true;
 		}
 		else 
 		{

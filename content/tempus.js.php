@@ -15,6 +15,10 @@ function onLoad()
   		initLektorTree();
   		//Studenten Tab beim starten markieren
   		document.getElementById('tabbox-main').selectedIndex="1";
+  		
+  		//Funktion ueberschreiben damit sie nicht nochmal aufgerufen wird
+  		//wenn zb ein IFrame geladen wird
+  		onLoad=function() {return false};
 	}
 	catch(e)
 	{

@@ -850,7 +850,7 @@ function LeMitarbeiterValueChanged()
 function LeMitarbeiterDisableFields(val)
 {
 	//Felder Leeren
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lehrfunktion_kurzbz').value='lektor';
+	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lehrfunktion_kurzbz').value='Lektor';
 	//document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor').value='';
 	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden').value='';
 	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-planstunden').value='';
@@ -934,7 +934,6 @@ function LeMitarbeiterAuswahl()
 
 	//Felder aktivieren
 	LeMitarbeiterDisableFields(false);
-
 	//Felder befuellen
 	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lehrfunktion_kurzbz').value=lehrfunktion_kurzbz;
 	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor').value=mitarbeiter_uid;
