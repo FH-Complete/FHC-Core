@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -29,8 +29,8 @@ class zeugnisnote
 	var $conn;     			// resource DB-Handle
 	var $new;       		// boolean
 	var $errormsg;  		// string
-	var $result=array();					
-		
+	var $result=array();
+
 	//Tabellenspalten
 	var $lehrveranstaltung_id;		// integer
 	var $student_uid;				// varchar(16)
@@ -44,10 +44,10 @@ class zeugnisnote
 	var $insertvon;					// varchar(16)
 	var $ext_id;					// bigint
 	var $bemerkung;					// text
-	
+
 	var $lehrveranstaltung_bezeichung;
 	var $note_bezeichnung;
-	
+
 	// *********************************************************************
 	// * Konstruktor
 	// * @param $conn      Connection
@@ -58,12 +58,12 @@ class zeugnisnote
 	function zeugnisnote($conn, $lehrveranstaltung_id=null, $student_uid=null, $studiensemester_kurzbz=null , $unicode=false)
 	{
 		$this->conn = $conn;
-		
+
 		if($unicode!=null)
 		{
 			if ($unicode)
 				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			else 
+			else
 				$qry="SET CLIENT_ENCODING TO 'LATIN9';";
 
 			if(!pg_query($conn,$qry))
@@ -72,11 +72,11 @@ class zeugnisnote
 				return false;
 			}
 		}
-		
+
 		if($lehrveranstaltung_id!=null && $student_uid!=null && $studiensemester_kurzbz!=null)
 			$this->load($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz);
 	}
-	
+
 	// **************************************************************
 	// * Laedt eine Zeugnisnote
 	// * @param  $lehrveranstaltung_id
@@ -91,12 +91,12 @@ class zeugnisnote
 			$this->errormsg = 'Lehrveranstaltung_id ist ungueltig';
 			return false;
 		}
-		
-		$qry = "SELECT * FROM lehre.tbl_zeugnisnote WHERE 
-				lehrveranstaltung_id='$lehrveranstaltung_id' AND 
+
+		$qry = "SELECT * FROM lehre.tbl_zeugnisnote WHERE
+				lehrveranstaltung_id='$lehrveranstaltung_id' AND
 				student_uid='".addslashes($student_uid)."' AND
 				studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
-		
+
 		if($result = pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
@@ -113,23 +113,23 @@ class zeugnisnote
 				$this->inservon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
 				$this->bemerkung = $row->bemerkung;
-				return true;				
+				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Datensatz wurde nicht gefunden';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
-	
+
 	// *************************************
-	// * Prueft die Daten vor dem Speichern 
+	// * Prueft die Daten vor dem Speichern
 	// * auf Gueltigkeit
 	// *************************************
 	function validate()
@@ -166,10 +166,10 @@ class zeugnisnote
 		}
 		return true;
 	}
-	
+
 	// ************************************************
 	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische 
+	// * wenn $var !='' ist werden datenbankkritische
 	// * Zeichen mit backslash versehen und das Ergebnis
 	// * unter Hochkomma gesetzt.
 	// ************************************************
@@ -177,9 +177,9 @@ class zeugnisnote
 	{
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
-	
+
 	// *******************************************************************************
-	// * Speichert den aktuellen Datensatz in die Datenbank	 
+	// * Speichert den aktuellen Datensatz in die Datenbank
 	// * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
 	// * andernfalls wird der Datensatz mit der ID in $betriebsmittel_id aktualisiert
 	// * @return true wenn ok, false im Fehlerfall
@@ -188,13 +188,13 @@ class zeugnisnote
 	{
 		if($new==null)
 			$new=$this->new;
-		
+
 		if(!$this->validate())
 			return false;
-		
+
 		if($new)
 		{
-			//Neuen Datensatz einfuegen					
+			//Neuen Datensatz einfuegen
 			$qry='INSERT INTO lehre.tbl_zeugnisnote (lehrveranstaltung_id, student_uid, studiensemester_kurzbz, note, uebernahmedatum, benotungsdatum, bemerkung,
 				  updateamum, updatevon, insertamum, insertvon, ext_id) VALUES('.
 			     $this->addslashes($this->lehrveranstaltung_id).', '.
@@ -207,14 +207,14 @@ class zeugnisnote
 			     $this->addslashes($this->updateamum).', '.
 			     $this->addslashes($this->updatevon).', '.
 			     $this->addslashes($this->insertamum).', '.
-			     $this->addslashes($this->insertvon).', '.			     
+			     $this->addslashes($this->insertvon).', '.
 			     $this->addslashes($this->ext_id).');';
 		}
 		else
-		{			
+		{
 			$qry='UPDATE lehre.tbl_zeugnisnote SET '.
-				'note='.$this->addslashes($this->note).', '. 
-				'uebernahmedatum='.$this->addslashes($this->uebernahmedatum).', '. 
+				'note='.$this->addslashes($this->note).', '.
+				'uebernahmedatum='.$this->addslashes($this->uebernahmedatum).', '.
 				'benotungsdatum='.$this->addslashes($this->benotungsdatum).', '.
 				'bemerkung='.$this->addslashes($this->bemerkung).', '.
 		     	'updateamum= '.$this->addslashes($this->updateamum).', '.
@@ -223,18 +223,18 @@ class zeugnisnote
 				'AND student_uid='.$this->addslashes($this->student_uid).' '.
 				'AND studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).';';
 		}
-		
+
 		if(pg_query($this->conn, $qry))
 		{
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = "Fehler beim Speichern des Datensatzes";
 			return false;
 		}
 	}
-	
+
 	// ********************************************************
 	// * Loescht den Datenensatz mit der ID die uebergeben wird
 	// * @param $lehrveranstaltung_id
@@ -244,20 +244,20 @@ class zeugnisnote
 	// ********************************************************
 	function delete($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz)
 	{
-		$qry = "DELETE FROM lehre.tbl_zeugnisnote WHERE 
+		$qry = "DELETE FROM lehre.tbl_zeugnisnote WHERE
 				lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."' AND
 				student_uid='".addslashes($student_uid)."' AND
 				studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
-		
+
 		if(pg_query($this->conn, $qry))
 			return true;
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim loeschen der Daten';
 			return false;
 		}
 	}
-	
+
 	// *********************************************
 	// * Laed die Noten
 	// * @param $lehrveranstaltung_id
@@ -274,30 +274,47 @@ class zeugnisnote
 			$where.=" AND uid='".addslashes($student_uid)."'";
 		if($studiensemester_kurzbz!=null)
 			$where.=" AND vw_student_lehrveranstaltung.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
-			
-		$qry = "SELECT vw_student_lehrveranstaltung.lehrveranstaltung_id, uid, 
+		$where2='';
+		if($lehrveranstaltung_id!=null)
+			$where2.=" AND lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."'";
+		if($student_uid!=null)
+			$where2.=" AND student_uid='".addslashes($student_uid)."'";
+		if($studiensemester_kurzbz!=null)
+			$where2.=" AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+
+		$qry = "SELECT vw_student_lehrveranstaltung.lehrveranstaltung_id, uid,
 					   vw_student_lehrveranstaltung.studiensemester_kurzbz, note, uebernahmedatum, benotungsdatum,
-					   tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum, 
-					   tbl_zeugnisnote.insertvon, tbl_zeugnisnote.ext_id, 
+					   tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum,
+					   tbl_zeugnisnote.insertvon, tbl_zeugnisnote.ext_id,
 					   vw_student_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung,
 					   tbl_note.bezeichnung as note_bezeichnung,
 					   tbl_zeugnisnote.bemerkung as bemerkung
-				FROM 
+				FROM
 				(
-					campus.vw_student_lehrveranstaltung LEFT JOIN lehre.tbl_zeugnisnote 
-						ON(uid=student_uid 
-						   AND vw_student_lehrveranstaltung.studiensemester_kurzbz=tbl_zeugnisnote.studiensemester_kurzbz 
+					campus.vw_student_lehrveranstaltung LEFT JOIN lehre.tbl_zeugnisnote
+						ON(uid=student_uid
+						   AND vw_student_lehrveranstaltung.studiensemester_kurzbz=tbl_zeugnisnote.studiensemester_kurzbz
 						   AND vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id
 						  )
-				) LEFT JOIN lehre.tbl_note USING(note) 
-				WHERE true $where";
-
+				) LEFT JOIN lehre.tbl_note USING(note)
+				WHERE true $where
+				UNION
+				SELECT lehre.tbl_lehrveranstaltung.lehrveranstaltung_id,student_uid AS uid,studiensemester_kurzbz, note,
+					uebernahmedatum, benotungsdatum, tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum,
+					tbl_zeugnisnote.insertvon, tbl_zeugnisnote.ext_id, lehre.tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung,
+					tbl_note.bezeichnung as note_bezeichnung, tbl_zeugnisnote.bemerkung as bemerkung
+				FROM
+					lehre.tbl_zeugnisnote
+					JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
+					JOIN lehre.tbl_note USING(note)
+				WHERE true $where2";
+		//echo $qry;
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
 			{
 				$obj = new zeugnisnote($this->conn, null, null, null, null);
-				
+
 				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 				$obj->student_uid = $row->uid;
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
@@ -312,12 +329,12 @@ class zeugnisnote
 				$obj->note_bezeichnung = $row->note_bezeichnung;
 				$obj->lehrveranstaltung_bezeichnung = $row->lehrveranstaltung_bezeichnung;
 				$obj->bemerkung = $row->bemerkung;
-				
+
 				$this->result[] = $obj;
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim laden der Daten';
 			return false;
