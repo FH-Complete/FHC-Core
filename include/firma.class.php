@@ -50,34 +50,76 @@ class firma
 	function firma($conn,$firma_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		if ($unicode)
+		
+		if($unicode!=null)
 		{
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			if ($unicode)
+			{
+				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			}
+			else
+			{
+				$qry="SET CLIENT_ENCODING TO 'LATIN9';";
+			}
+			if(!pg_query($conn,$qry))
+			{
+				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
+				return false;
+			}
 		}
-		else
-		{
-			$qry="SET CLIENT_ENCODING TO 'LATIN9';";
-		}
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-			return false;
-		}
-		//if($firma_id != null) 	$this->load($firma_id);
+		if($firma_id != null)
+			$this->load($firma_id);
 	}
 
 	/**
-	 * Laedt die Funktion mit der ID $adress_id
-	 * @param  $adress_id ID der zu ladenden Funktion
+	 * Laedt die Firma mit der ID $firma_id
+	 * @param  $firma_id ID der zu ladenden Funktion
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load($adress_id)
+	function load($firma_id)
 	{
-		//noch nicht implementiert
+		if(!is_numeric($firma_id))
+		{
+			$this->errormsg = 'Firma_id ist ungueltig';
+			return false;
+		}
+		
+		$qry = "SElECT * FROM public.tbl_firma WHERE firma_id='$firma_id'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$this->firma_id = $row->firma_id;
+				$this->name = $row->name;
+				$this->adresse = $row->adresse;
+				$this->email  = $row->email;
+				$this->telefon = $row->telefon;
+				$this->fax = $row->fax;
+				$this->anmerkung = $row->anmerkung;
+				$this->firmentyp_kurzbz = $row->firmentyp_kurzbz;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->ext_id = $row->ext_id;
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = 'Datensatz wurde nicht gefunden';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
+			return false;
+		}
 	}
 
 	/**
-	 * Prueft die Variablen auf gueltigkeit
+	 * Prueft die Variablen auf Gueltigkeit
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	function checkvars()
@@ -99,6 +141,7 @@ class firma
 		$this->errormsg = '';
 		return true;
 	}
+	
 	// ************************************************
 	// * wenn $var '' ist wird "null" zurueckgegeben
 	// * wenn $var !='' ist werden datenbankkritische
@@ -109,6 +152,7 @@ class firma
 	{
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
+	
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -124,24 +168,19 @@ class firma
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-
-			//naechste ID aus der Sequence holen
-			$qry="SELECT nextval('public.tbl_firma_firma_id_seq') as id;";
-			if(!$row = pg_fetch_object(pg_query($this->conn,$qry)))
-			{
-				$this->errormsg = 'Fehler beim Auslesen der Sequence';
-				return false;
-			}
-			$this->firma_id = $row->id;
-
-			$qry='INSERT INTO public.tbl_firma (firma_id, name, anmerkung, ext_id, insertamum, insertvon, updateamum, updatevon, firmentyp_kurzbz) VALUES('.
-			     $this->addslashes($this->firma_id).', '.
+			$qry='INSERT INTO public.tbl_firma (name, adresse, email, telefon, fax, anmerkung, firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id) VALUES('.
 			     $this->addslashes($this->name).', '.
+			     $this->addslashes($this->adresse).', '.
+			     $this->addslashes($this->email).', '.
+			     $this->addslashes($this->telefon).', '.
+			     $this->addslashes($this->fax).', '.
 			     $this->addslashes($this->anmerkung).', '.
-			     $this->addslashes($this->ext_id).',  now(), '.
-			     $this->addslashes($this->insertvon).', now(), '.
+			     $this->addslashes($this->firmentyp_kurzbz).', '.
+			     $this->addslashes($this->updateamum).', '.
 			     $this->addslashes($this->updatevon).', '.
-			     $this->addslashes($this->firmentyp_kurzbz).');';
+			     $this->addslashes($this->insertamum).', '.
+			     $this->addslashes($this->insertvon).', '.
+			     $this->addslashes($this->ext_id).'); ';
 		}
 		else
 		{
@@ -158,32 +197,41 @@ class firma
 				'firma_id='.$this->addslashes($this->firma_id).', '.
 				'name='.$this->addslashes($this->name).', '.
 				'anmerkung='.$this->addslashes($this->anmerkung).', '.
-			     	'updateamum= now(), '.
-			     	'updatevon='.$this->addslashes($this->updatevon).' '.
-			     	'firmentyp='.$this->addslashes($this->firmentyp_kurzbz).' '.
+		     	'updateamum= now(), '.
+		     	'updatevon='.$this->addslashes($this->updatevon).' '.
+		     	'firmentyp='.$this->addslashes($this->firmentyp_kurzbz).' '.
 				'WHERE firma_id='.$this->addslashes($this->firma_id).';';
 		}
 		//echo $qry;
 		if(pg_query($this->conn,$qry))
 		{
-			//Log schreiben
-			/*$sql = $qry;
-			$qry = "SELECT nextval('log_seq') as id;";
-			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
+			if($this->new)
 			{
-				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
-				return false;
+				//Sequence lesen
+				$qry="SELECT currval('public.tbl_firma_firma_id_seq') as id;";
+				if($result = pg_query($this->conn, $qry))
+				{
+					if($row = pg_fetch_object($result))
+					{
+						$this->firma_id = $row->firma_id;
+						pg_query($this->conn, 'COMMIT');
+						return true;
+					}
+					else 
+					{
+						$this->errormsg = 'Fehler beim Auslesen der Sequence';
+						pg_query($this->conn, 'ROLLBACK');
+						return false;
+					}
+				}
+				else 
+				{
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+					pg_query($this->conn, 'ROLLBACK');
+					return false;
+				}
 			}
-
-			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
-			if(pg_query($this->conn, $qry))
-				return true;
-			else
-			{
-				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
-				return false;
-			}	*/
-			return true;
+			return true;				
 		}
 		else
 		{
@@ -199,7 +247,60 @@ class firma
 	 */
 	function delete($firma_id)
 	{
-		//noch nicht implementiert!
+		if(!is_numeric($firma_id))
+		{
+			$this->errormsg = 'Firma_id ist ungueltig';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM public.tbl_firma WHERE firma_id='$firma_id'";
+		
+		if(pg_query($this->conn, $qry))
+			return true;
+		else 
+		{
+			$this->errormsg = 'Fehler beim Loeschen der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Laedt alle Firmen
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	function getAll()
+	{
+		$qry = "SElECT * FROM public.tbl_firma";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$fa = new firma($this->conn, null, null);
+				
+				$fa->firma_id = $row->firma_id;
+				$fa->name = $row->name;
+				$fa->adresse = $row->adresse;
+				$fa->email  = $row->email;
+				$fa->telefon = $row->telefon;
+				$fa->fax = $row->fax;
+				$fa->anmerkung = $row->anmerkung;
+				$fa->firmentyp_kurzbz = $row->firmentyp_kurzbz;
+				$fa->updateamum = $row->updateamum;
+				$fa->updatevon = $row->updatevon;
+				$fa->insertamum = $row->insertamum;
+				$fa->insertvon = $row->insertvon;
+				$fa->ext_id = $row->ext_id;
+				
+				$this->result[] = $fa;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
+			return false;
+		}
 	}
 }
 ?>

@@ -100,7 +100,7 @@ function studiensemesterChange()
    	if(dbdml_return=='true')
    	{
    		//Statusbar setzen
-   		document.getElementById("statusbarpanel-text").label = "Studiensemester erfolgreich geändert";
+   		document.getElementById("statusbarpanel-text").label = "Studiensemester erfolgreich geaendert";
    		document.getElementById("statusbarpanel-semester").label = stsem;
    		//MitarbeiterDetailStudiensemester_id = dbdml_errormsg;
    		//Ansichten Refreshen
