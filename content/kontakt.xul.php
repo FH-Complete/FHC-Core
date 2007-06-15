@@ -45,7 +45,8 @@ else
 
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/kontakt.js.php" />
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/functions.js.php" />
-<!--<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/fasoverlay.js.php" />-->
+<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/fasoverlay.js.php" />
+<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/phpRequest.js.php" />
 
 <vbox>
  	<!-- ADRESSEN -->
@@ -54,7 +55,7 @@ else
 		<hbox>
 			<tree id="kontakt-adressen-tree" seltype="single" hidecolumnpicker="false" flex="1"
 				datasources="rdf:null" ref="http://www.technikum-wien.at/adresse/liste"
-				onselect="KontaktAdresseSelect();"
+				ondblclick="KontaktAdresseBearbeiten()"
 				flags="dont-build-content"
 				enableColumnDrag="true"
 				style="margin-left:10px;margin-right:10px;margin-bottom:5px;" height="100"
@@ -135,9 +136,9 @@ else
 				</template>
 			</tree>
 			<vbox>
-				<button id='kontakt-adressen-neu' label='Neu' oncommand='' />
-				<button id='kontakt-adressen-bearbeiten' label='Bearbeiten' oncommand='' />
-				<button id='kontakt-adressen-loeschen' label='Loeschen' oncommand='' />
+				<button id='kontakt-adressen-neu' label='Neu' oncommand='KontaktAdresseNeu()' />
+				<button id='kontakt-adressen-bearbeiten' label='Bearbeiten' oncommand='KontaktAdresseBearbeiten()' />
+				<button id='kontakt-adressen-loeschen' label='Loeschen' oncommand='KontaktAdresseDelete()' />
 			</vbox>
 		</hbox>
 	</groupbox>

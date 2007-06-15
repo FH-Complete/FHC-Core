@@ -332,13 +332,14 @@ class adresse
 				if($this->new)
 				{
 					//naechste ID aus der Sequence holen
-					$qry="SELECT nextval('public.tbl_adresse_adresse_id_seq') as id;";
+					$qry="SELECT currval('public.tbl_adresse_adresse_id_seq') as id;";
 					if($result = pg_query($this->conn, $qry))
 					{
 						if($row = pg_fetch_object($result))
 						{
 							$this->adresse_id = $row->id;
 							pg_query($this->conn, 'COMMIT');
+							return true;
 						}
 						else 
 						{
@@ -360,6 +361,7 @@ class adresse
 				$this->errormsg = "*****\nFehler beim Speichern des Adress-Datensatzes: ".$this->person_id."\n".$qry."\n".pg_errormessage($this->conn)."\n*****\n";
 				return false;
 			}
+			return true;
 		}
 		else 
 		{
