@@ -110,7 +110,7 @@ class zeugnisnote
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->insertamum = $row->insertamum;
-				$this->inservon = $row->insertvon;
+				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
 				$this->bemerkung = $row->bemerkung;
 				return true;
