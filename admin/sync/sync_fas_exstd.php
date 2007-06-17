@@ -39,21 +39,21 @@
 		if ($num_rows_std>=1)
 		{
 			$row_std=pg_fetch_object($res_std);
-			if ($row_std->semester!=10)
+			if ($row_std->semester!=0)
 			{
-				//Wenn dieser Lehrverband noch nicht existiert wird er eingefuegt
-				$sql_query = "SELECT * FROM public.tbl_lehrverband WHERE studiengang_kz='$row_std->studiengang_kz' AND semester='10' AND verband=' ' AND gruppe=' '";
+				//Wenn dieser Lehrverband noch nicht existiert, wird er eingefuegt
+				$sql_query = "SELECT * FROM public.tbl_lehrverband WHERE studiengang_kz='$row_std->studiengang_kz' AND semester='0' AND verband='$row_std->verband' AND gruppe='$row_std->gruppe'";
 
 				$result_grp = pg_query($conn, $sql_query);
 				if(pg_num_rows($result_grp)==0)
 				{
-					$sql_query = "INSERT INTO public.tbl_lehrverband(studiengang_kz, semester, verband, gruppe, aktiv, bezeichnung) VALUES('$row_std->studiengang_kz','10',' ',' ', false, 'Ex Studenten');";
+					$sql_query = "INSERT INTO public.tbl_lehrverband(studiengang_kz, semester, verband, gruppe, aktiv, bezeichnung) VALUES('$row_std->studiengang_kz','0','$row_std->verband','$row_std->gruppe', false, 'Ab- / Unterbrecher');";
 					pg_query($conn, $sql_query);
-						$text.="Neuer Lehrverband wird erzeugt:$row_std->studiengang_kz 10\r";
+						$text.="Neuer Lehrverband wird erzeugt:$row_std->studiengang_kz 0\r";
 				}
 
 				$text.="Der Student $row_std->vorname $row_std->nachname ($row_std->uid) wird verschoben.\r";
-				$sql_query="UPDATE public.tbl_student SET semester=10, verband=' ', gruppe=' ', updateamum=now(), updatevon='auto' WHERE student_uid LIKE '$uid'";
+				$sql_query="UPDATE public.tbl_student SET semester=0, verband=' ', gruppe=' ', updateamum=now(), updatevon='auto' WHERE student_uid LIKE '$uid'";
 				echo $sql_query.'<BR>';
 				if(!$res_update=pg_query($conn, $sql_query))
 				{
