@@ -137,7 +137,8 @@
 				$fasnoten_arr[$row->lehrveranstaltung_fk][$row->note_pk]["notenlektor_fk"] = $row->notenlektor_fk;
 				$fasnoten_arr[$row->lehrveranstaltung_fk][$row->note_pk]["student_fk"] = $row->student_fk;
 				$fasnoten_arr[$row->lehrveranstaltung_fk][$row->note_pk]["ext_id"] = $row->note_pk;
-				$fasnoten_arr[$row->lehrveranstaltung_fk][$mehrfach_arr[$row->lehrveranstaltung_fk]["main"]]["bemerkung"] .= "\n".$bemerkung_history;
+				if ($bemerkung_history != "")
+					$fasnoten_arr[$row->lehrveranstaltung_fk][$mehrfach_arr[$row->lehrveranstaltung_fk]["main"]]["bemerkung"] .= "\n".$bemerkung_history;
 			}
 		
 		}
@@ -218,7 +219,7 @@
 	
 	$text .= "<table border='1'>";
 	
-	$sqlstr = "SELECT DISTINCT student_fk FROM note where student_fk > 3000 and student_fk < 4000 order by student_fk";
+	$sqlstr = "SELECT DISTINCT student_fk FROM note where student_fk >= 1 and student_fk < 500 order by student_fk";
 	if($result = pg_query($conn_fas, $sqlstr))
 	{
 		
@@ -262,107 +263,125 @@
 						foreach($lehreinheit_id_arr as $lehreinh)
 						{
 							if (key_exists($lehreinh,$lehreinheiten_sync_arr))
+							{
 								$lehreinheit_id = $lehreinheiten_sync_arr[$lehreinh];
 								break;
+							}
 						}
 					}
 					else
 						$lehreinheit_id = "FEHLT";
 						
+					
+					//begin insert tbl_pruefung
 					$anz_processed_pruef++;
-					$pruef = new pruefung($conn);
-
-					$pruef->lehreinheit_id=$lehreinheit_id;
-					$pruef->student_uid=$student_uid;
-					$pruef->mitarbeiter_uid=$mitarbeiter_uid;
-					$pruef->note=$note;
-					$pruef->pruefungstyp_kurzbz=$pruefungstyp_kurzbz;
-					$pruef->datum=$datum;
-					$pruef->anmerkung=$anmerkung;
-					$pruef->insertamum=$insertamum;
-					$pruef->insertvon=$insertvon;
-					$pruef->updateamum=$insertamum;
-					$pruef->updatevon=$updatevon;
-					$pruef->ext_id=$ext_id;
 					
-					if (!($pruef->pruefung_id=checkUpdatePruefung($conn,$pruef)))				
-						$pruef->new = 1;
-					
-					
-					if($pruef->pruefung_id == -1)
-						$anz_not_updated_pruef++;
-					else if($pruef->student_uid == "FEHLT")
+					if($student_uid == "FEHLT")
 					{
 						$insert_error_pruef++;
 						$text .= "Pr&uuml;fung: Datensatz FAS ID".$idkey.": student_uid ohne zuordnung<br>";
 					}
-					else if($pruef->lehreinheit_id == "FEHLT")
+					else if($lehreinheit_id == "FEHLT")
 					{
 						$insert_error_pruef++;
 						$text .= "Pr&uuml;fung: Datensatz FAS ID".$idkey.": Lehreinheit ohne zuordnung<br>";
-					}				
+					}
 					else
 					{
-						if(!$pruef->save())
-						{
-							$text .= "Pr&uuml;fung: Datensatz FAS ID".$idkey.": ".$pruef->errormsg."<br>";
-							if($pruef->new)
-								$insert_error_pruef++;
-							else
-								$update_error_pruef++;
-						}
-						else
-							if($pruef->new)
-								$anz_insert_pruef++;
-							else
-								$anz_update_pruef++;
-					}
-					
-					if ($zeugnistabeintrag == 1)
-					{
-					
-						$anz_processed_zeug++;
+						$pruef = new pruefung($conn);
+	
+						$pruef->lehreinheit_id=$lehreinheit_id;
+						$pruef->student_uid=$student_uid;
+						$pruef->mitarbeiter_uid=$mitarbeiter_uid;
+						$pruef->note=$note;
+						$pruef->pruefungstyp_kurzbz=$pruefungstyp_kurzbz;
+						$pruef->datum=$datum;
+						$pruef->anmerkung=$anmerkung;
+						$pruef->insertamum=$insertamum;
+						$pruef->insertvon=$insertvon;
+						$pruef->updateamum=date("Y-m-d H:m:s");
+						$pruef->updatevon=$updatevon;
+						$pruef->ext_id=$ext_id;
 						
-						$zeug = new zeugnisnote($conn);
-						$zeug->lehrveranstaltung_id = $lehrveranstaltung_id;
-						$zeug->student_uid = $student_uid;
-						$zeug->studiensemester_kurzbz = $studiensemester_kurzbz;
-						$zeug->note = $note;
-						$zeug->uebernahmedatum = null;
-						$zeug->benotungsdatum = $datum;
-						$zeug->updateamum = $insertamum;
-						$zeug->updatevon = $updatevon;
-						$zeug->insertamum = $insertamum;
-						$zeug->insertvon = $insertvon;
-						$zeug->ext_id = $ext_id;
-						$zeug->bemerkung = $anmerkung;
+						if (!($pruef->pruefung_id=checkUpdatePruefung($conn,$pruef)))				
+							$pruef->new = 1;
 						
 						
-						if (!($zeug->check = checkUpdateZeugnis($conn,$zeug)))				
-							$zeug->new = 1;
-						
-						if($zeug->check == -1)
-							$anz_not_updated_zeug++;
-					else if($zeug->student_uid == "FEHLT")
-					{
-						$insert_error_zeug++;
-						$text .= "<span style='background-color:#cccccc;'>Zeugnis: Datensatz FAS ID".$idkey.": student_uid ohne zuordnung</span><br>";
-					}
+						if($pruef->pruefung_id == -1)
+							$anz_not_updated_pruef++;
+										
 						else
 						{
-							if(!$zeug->save())
+							if(!$pruef->save())
 							{
-								$text .= "<span style='background-color:#cccccc;'>Zeugnis: Datensatz FAS ID".$idkey.": ".$zeug->errormsg."</span><br>";
-								if($zeug->new)
-									$insert_error_zeug++;
+								$text .= "Pr&uuml;fung: Datensatz FAS ID".$idkey.": ".$pruef->errormsg."<br>";
+								if($pruef->new)
+									$insert_error_pruef++;
 								else
-									$update_error_zeug++;
+									$update_error_pruef++;
 							}
 							else
-								if($zeug->new)
-									$anz_insert_zeug++;
+								if($pruef->new)
+									$anz_insert_pruef++;
 								else
-									$anz_update_zeug++;
+									$anz_update_pruef++;
+						}
+					}
+					
+					//begin insert tbl_zeugnisnote
+					if ($zeugnistabeintrag == 1)
+					{
+						$anz_processed_zeug++;
+						
+						if($student_uid == "FEHLT")
+						{
+							$insert_error_zeug++;
+							$text .= "<span style='background-color:#cccccc;'>Zeugnis: Datensatz FAS ID".$idkey.": student_uid ohne zuordnung</span><br>";
+						}
+						else if ($lehrveranstaltung_id == "FEHLT")
+						{
+							$insert_error_zeug++;
+							$text .= "<span style='background-color:#cccccc;'>Zeugnis: Datensatz FAS ID".$idkey.": lehrveranstaltung_id ohne zuordnung</span><br>";
+						}
+						else
+						{
+							$zeug = new zeugnisnote($conn);
+							
+							$zeug->lehrveranstaltung_id = $lehrveranstaltung_id;
+							$zeug->student_uid = $student_uid;
+							$zeug->studiensemester_kurzbz = $studiensemester_kurzbz;
+							$zeug->note = $note;
+							$zeug->uebernahmedatum = null;
+							$zeug->benotungsdatum = $datum;
+							$zeug->updateamum = date("Y-m-d H:m:s");
+							$zeug->updatevon = $updatevon;
+							$zeug->insertamum = $insertamum;
+							$zeug->insertvon = $insertvon;
+							$zeug->ext_id = $ext_id;
+							$zeug->bemerkung = $anmerkung;
+							
+							if (!($zeug->check = checkUpdateZeugnis($conn,$zeug)))				
+								$zeug->new = 1;
+							
+							if($zeug->check == -1)
+								$anz_not_updated_zeug++;
+							
+							else
+							{
+								if(!$zeug->save())
+								{
+									$text .= "<span style='background-color:#cccccc;'>Zeugnis: Datensatz FAS ID".$idkey.": ".$zeug->errormsg."</span><br>";
+									if($zeug->new)
+										$insert_error_zeug++;
+									else
+										$update_error_zeug++;
+								}
+								else
+									if($zeug->new)
+										$anz_insert_zeug++;
+									else
+										$anz_update_zeug++;
+							}
 						}
 					}
 					

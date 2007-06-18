@@ -157,7 +157,7 @@
 	$htmlstr .= "			<table>\n";
 	$htmlstr .= "				<tr>\n";
 	$htmlstr .= "					<td>Kennzahl</td>\n";
-	$htmlstr .= "					<td><input class='detail' type='text' name='studiengang_kz' size='16' maxlength='4' value='".$studiengang_kz."' onchange='submitable()'></td>\n";
+	$htmlstr .= "					<td><input class='detail' type='text' name='studiengang_kz' size='16' maxlength='5' value='".$studiengang_kz."' onchange='submitable()'></td>\n";
 	$htmlstr .= "				</tr>\n";
 	$htmlstr .= "				<tr>\n";
 	$htmlstr .= "					<td>Kurzbezeichnung</td>\n";
