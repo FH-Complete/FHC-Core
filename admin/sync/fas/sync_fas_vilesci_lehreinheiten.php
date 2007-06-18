@@ -135,7 +135,7 @@ $qry_main = "SELECT *,lehreinheit.lehreinheit_fk as le_fk, mitarbeiter_lehreinhe
 			lehreinheit.ivar1 as wochenrythmus, lehreinheit.ivar2 as start_kw, lehreinheit.ivar3 as stundenblockung,
 			lehreinheit.creationuser as lecu, mitarbeiter_lehreinheit.rvar1 as lektorgesamtstunden  
 		FROM lehreinheit left outer join mitarbeiter_lehreinheit 
-		ON lehreinheit.lehreinheit_pk=mitarbeiter_lehreinheit.lehreinheit_fk  
+		ON lehreinheit.lehreinheit_pk=mitarbeiter_lehreinheit.lehreinheit_fk 
 		ORDER BY lehreinheit.lehreinheit_fk;";
 //AND mitarbeiter_fk='1512' 
 if($result = pg_query($conn_fas, $qry_main))
@@ -183,7 +183,7 @@ if($result = pg_query($conn_fas, $qry_main))
 		
 		if($row->lektorgesamtstunden>99)
 		{
-			$error_log.="Stundensatz von Lektor (mitarbeiter_fk) '".$lektor."' zu hoch: '".$row->lektorgesamtstunden."'!\n";
+			$error_log.="Gesamtstunden von Lektor (mitarbeiter_fk) '".$lektor."' zu hoch: '".$row->lektorgesamtstunden."'!\n";
 			$anzahl_fehler++;
 			continue;
 		}
@@ -204,7 +204,7 @@ if($result = pg_query($conn_fas, $qry_main))
 			else 
 			{
 				$error=true;
-				$error_log.="LVA_FAS=".$row->lehrveranstaltung_fk." in Tabelle tbl_synclehrveranstaltung nicht gefunden!\n";
+				$error_log.="LVA_FAS '".$row->lehrveranstaltung_fk."' in Tabelle tbl_synclehrveranstaltung nicht gefunden!\n";
 			}
 		}
 		if($error)
@@ -455,7 +455,7 @@ if($result = pg_query($conn_fas, $qry_main))
 			if($lm_ext_id==null)
 			{
 				$anzahl_fehler++;
-				$error_log.="Kein Mitarbeiter zu dieser Lehreinheit ('".$lehreinheit_id."')eingetragen.\n";
+				$error_log.="Kein Mitarbeiter zu dieser Lehreinheit ('".$ext_id."') eingetragen.\n";
 				continue;
 			}
 			pg_query($conn,'BEGIN;');
@@ -1240,6 +1240,8 @@ if($result = pg_query($conn_fas, $qry_main))
 				}
 			}
 			$qry="SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE ext_id=".myaddslashes($lg_ext_id).";";
+			if($lehreinheit_id==4900)
+				echo "lg --- ".$qry."<br>";
 			if($result4 = pg_query($conn, $qry))
 			{
 				if(!(pg_num_rows($result4)>0))
@@ -1649,6 +1651,8 @@ if($result = pg_query($conn_fas, $qry_main))
 						}
 					}
 					$qry="SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE ext_id=".myaddslashes($lg_ext_id).";";
+					if($lehreinheit_id==4900)
+						echo "lg --- ".$qry."<br>";
 					if($result4 = pg_query($conn, $qry))
 					{
 						if(!(pg_num_rows($result4)>0))
@@ -1964,7 +1968,7 @@ if($result = pg_query($conn_fas, $qry_main))
 			}
 			else 
 			{
-				$anzahl_fehler_lg++;
+				$anzahl_fehler++;
 				$error=true;
 				$error_log.="Part. Lehreinheit nicht in synclehreinheit gefunden!".$qry5."\n";	
 			}
@@ -1983,7 +1987,7 @@ if($result = pg_query($conn_fas, $qry_main))
 	}
 	
 	$error_log="Sync Lehreinheiten\n-----------------------\n\n".$error_log."\n";
-	echo "Lehreinheitensynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\<br><br>";
+	echo "Lehreinheitensynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."<br><br>";
 	echo "Gesamt: ".$anzahl_quelle." / Eingefügt: ".$anzahl_eingefuegt." / Geändert: ".$anzahl_geaendert." / Fehler: ".$anzahl_fehler."<br>";
 	echo "Partizipierende LEs Gesamt: ".$anzahl_part_gesamt." / Eingefügt: ".$anzahl_part." / bereits vorhanden: ".$anzahl_part2."<br><br>";
 	echo "Lehreinheit-Mitarbeiter: Eingefügt:".$anzahl_eingefuegt_lm." / Geändert:".$anzahl_geaendert_lm." / Fehler:".$anzahl_fehler_lm."<br>";
