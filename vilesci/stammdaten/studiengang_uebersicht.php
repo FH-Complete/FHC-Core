@@ -18,14 +18,16 @@
     if (!$sg->getAll('kurzbzlang',false))
         die($sg->errormsg);
     
-    $htmlstr = "<table class='liste sortable'>\n";
-    $htmlstr .= "   <tr class='liste'>\n";
-    $htmlstr .= "       <th>Kz</th><th>Kurzbez</th><th>KurzLang</th> <th>Typ</th><th>Bezeichnung</th><th class='sorttable_nosort'>Aktiv</th><th>Telefon</th><th>Email</th>";
-    $htmlstr .= "   </tr>";
+    //$htmlstr = "<table class='liste sortable'>\n";
+    $htmlstr = "<form name='formular'><input type='hidden' name='check' value=''></form><table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>\n";
+	$htmlstr .= "   <thead><tr class='liste'>\n";
+    $htmlstr .= "       <th class='table-sortable:numeric' onmouseup='document.formular.check.value=0'>Kz</th><th class='table-sortable:default'>Kurzbez</th><th class='table-sortable:default'>KurzLang</th> <th class='table-sortable:default'>Typ</th><th class='table-sortable:alphanumeric'>Bezeichnung</th><th>Aktiv</th><th class='table-sortable:default'>Telefon</th><th class='table-sortable:default'>Email</th>";
+    $htmlstr .= "   </tr></thead><tbody>\n";
     $i = 0;
     foreach ($sg->result as $stg)
     {
-        $htmlstr .= "   <tr class='liste". ($i%2) ."'>\n";
+        //$htmlstr .= "   <tr class='liste". ($i%2) ."'>\n";
+		$htmlstr .= "   <tr>\n";
 		$htmlstr .= "       <td>".$stg->studiengang_kz."</td>\n";
         $htmlstr .= "       <td>".$stg->kurzbz."</td>\n";
         $htmlstr .= "       <td>".$stg->kurzbzlang."</td>\n";
@@ -45,7 +47,7 @@
         $htmlstr .= "   </tr>\n";
         $i++;
     }
-    $htmlstr .= "</table>\n";
+    $htmlstr .= "</tbody></table>\n";
 
 
 ?>
@@ -54,7 +56,8 @@
 <title>Studieng&auml;nge Uebersicht</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<script src="../../include/js/sorttable.js"></script>
+<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 <script language="JavaScript">
 function confdel()
 {
