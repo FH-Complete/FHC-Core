@@ -33,7 +33,7 @@
 	require_once('../../../include/datum.class.php');
 
 	$crlf=crlf();
-	$trenn="\t";
+	$trenn=";";
 
 	$uid = get_uid();
 
