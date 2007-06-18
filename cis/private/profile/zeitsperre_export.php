@@ -32,24 +32,31 @@
 	require_once('../../../include/zeitsperre.class.php');
 	require_once('../../../include/datum.class.php');
 
+	$crlf=crlf();
+	$trenn="\t";
+
 	$uid = get_uid();
 
 	if(isset($_GET['lektor']))
 		$lektor=$_GET['lektor'];
 	else
 		$lektor=null;
+	if ($lektor=='true' || $lektor=='1') $lektor=true;
+	if ($lektor=='false' || $lektor=='') $lektor=false;
 
 	if(isset($_GET['fix']))
 		$fix=$_GET['fix'];
 	else
 		$fix=null;
-	if ($fix=='false') $fix=false;
 	if ($fix=='true' || $fix=='1') $fix=true;
+	if ($fix=='false' || $fix=='') $fix=false;
 
 	if(isset($_GET['funktion']))
 		$funktion=$_GET['funktion'];
 	else
 		$funktion=null;
+	if ($funktion=='true' || $funktion=='1') $funktion=true;
+	if ($funktion=='false' || $funktion=='') $funktion=false;
 
 	$stge=array();
 	if(isset($_GET['stg_kz']))
@@ -63,13 +70,6 @@
 	else
 		$studiensemester=null;
 
-	// Link fuer den Export
-	$export_link='zeitsperre_export.php?';
-	if ($fix==true)
-		$export_link.='fix=true';
-		//&lektor=$lektor&funktion=$funktion";
-
-
 
 	if (!$conn = pg_pconnect(CONN_STRING))
 	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
@@ -80,67 +80,42 @@
 	$ss=new studiensemester($conn,$studiensemester);
 	if ($studiensemester==null)
 		$studiensemester=$ss->getAktTillNext();
-	$datum_beginn=$ss->start;
-	$datum_ende=$ss->ende;
+	$datum_beginn='2007-07-01';//$ss->start;
+	$datum_ende='2007-09-01';//$ss->ende;
 	$ts_beginn=$datum_obj->mktime_fromdate($datum_beginn);
 	$ts_ende=$datum_obj->mktime_fromdate($datum_ende);
 
 	// Lektoren holen
 	$ma=new mitarbeiter($conn);
-	if (is_null($funktion))
-		$mitarbeiter=$ma->getMitarbeiter($lektor,$fix);
-	else
-		$mitarbeiter=$ma->getMitarbeiterStg(true,null,$stge,$funktion);
+	//if (!is_null($funktion))
+	//	$mitarbeiter=$ma->getMitarbeiterStg(true,null,$stge,$funktion);
+	//else
+		$mitarbeiter=$ma->getMitarbeiter(null,true);//($lektor,$fix);
 
+//EXPORT
+	header("Content-type: application/vnd.ms-excel");
+    header('Content-Disposition: attachment; filename="Zeitsperren.csv"');
+    header("Expires: 0");
+    header("Cache-Control: must-revalidate, post-check=0,pre-check=0");
+    header("Pragma: public");
 
-?>
-
-<html>
-<head>
-	<title>Zeitsperren <?php echo $studiensemester; ?></title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-	<link rel="stylesheet" href="../../../skin/cis.css" type="text/css">
-</head>
-
-<body>
-	<H2>
-		<table width="100%" border="0" cellpadding="0" cellspacing="0">
-			<tr>
-				<td>&nbsp;Zeitsperren <?php echo $studiensemester; ?></td>
-				<td align="right">
-					<A onclick="window.open('zeitwunsch_help.html','Hilfe', 'height=320,width=480,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');" class="hilfe" target="_blank">HELP&nbsp;</A>
-				</td>
-			</tr>
-		</table>
-	</H2>
-
-	<H3>Zeitsperren von <?php echo $datum_beginn.' bis '.$datum_ende; ?></H3>
-	<a href="<?php echo $export_link; ?>">Excel</a>
-	<TABLE id="zeitsperren">
-    <TR>
-    	<?php
-	  	echo '<th>Monat<br>Tag</th>';
-		for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
-		{
-			$tag=date('d',$ts);
-			$wt=date('w',$ts);
-			$monat=date('M',$ts);
-			if ($wt==0 || $wt==6)
-				$class='feiertag';
-			else
-				$class='';
-			echo "<th class='$class'><div align=\"center\">$monat<br>$tag</div></th>";
-		}
-		?>
-	</TR>
-
-	<?php
+	echo '"Datum"'.$trenn;
+	for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
+	{
+		$tag=date('d',$ts);
+		$wt=date('w',$ts);
+		$monat=date('M',$ts);
+		if ($wt==0 || $wt==6)
+			$class='feiertag';
+		else
+			$class='';
+		echo '"'.$tagbez[$wt].' '.$tag.'.'.$monat.'"'.$trenn;
+	}
 	$zs=new zeitsperre($conn);
 	foreach ($mitarbeiter as $ma)
 	{
 		$zs->getzeitsperren($ma->uid, false);
-		echo '<TR>';
-		echo "<td>$ma->nachname $ma->vorname</td>";
+		echo $crlf.'"'.$ma->nachname.' '.$ma->vorname.'"'.$trenn;
 		for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
 		{
 			$tag=date('d',$ts);
@@ -152,12 +127,7 @@
 				$class='';
 			$grund=$zs->getTyp($ts);
 			$erbk=$zs->getErreichbarkeit($ts);
-			echo "<td class='$class'>$grund<br>$erbk</td>";
+			echo '"'.$grund.' - '.$erbk.'"'.$trenn;
 		}
-		echo '</TR>';
 	}
 	?>
-
-  </TABLE>
-</body>
-</html>

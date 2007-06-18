@@ -23,6 +23,7 @@
 // * @brief Uebersicht der Zeitsperren fuer Lektorengruppen
 
 	require_once('../../config.inc.php');
+	require_once('../../../include/globals.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/person.class.php');
 	require_once('../../../include/benutzer.class.php');
@@ -75,11 +76,11 @@
 			$tag=date('d',$ts);
 			$wt=date('w',$ts);
 			$monat=date('M',$ts);
-			if ($wt==0)
+			if ($wt==0 || $wt==6)
 				$class='feiertag';
 			else
 				$class='';
-			echo "<th class='$class'><div align=\"center\">$monat<br>$tag</div></th>";
+			echo "<th class='$class'><div align=\"center\">$tagbez[$wt]<BR>$monat<br>$tag</div></th>";
 		}
 		?>
 	</TR>
@@ -95,9 +96,14 @@
 		{
 			$tag=date('d',$ts);
 			$monat=date('M',$ts);
+			$wt=date('w',$ts);
+			if ($wt==0 || $wt==6)
+				$class='feiertag';
+			else
+				$class='';
 			$grund=$zs->getTyp($ts);
 			$erbk=$zs->getErreichbarkeit($ts);
-			echo "<td>$grund<br>$erbk</td>";
+			echo "<td class='$class'>$grund<br>$erbk</td>";
 		}
 		echo '</TR>';
 	}
