@@ -233,10 +233,17 @@ function onVerbandSelect(event)
 			treeStudent.database.AddDataSource(StudentTreeDatasource);
 			StudentTreeDatasource.addXMLSinkObserver(StudentTreeSinkObserver);
 			treeStudent.builder.addListener(StudentTreeListener);
+			
+			//Detailfelder Deaktivieren
 			StudentDetailReset();
 			StudentDetailDisableFields(true);
 			StudentPrestudentDisableFields(true);
 			StudentKontoDisableFields(true);
+			StudentAkteDisableFields(true);
+			StudentBetriebsmittelDisableFields(true);
+			StudentIODisableFields(true);
+			StudentNoteDisableFields(true);
+			document.getElementById('student-kontakt').setAttribute('src','');
 		}
 		catch(e)
 		{

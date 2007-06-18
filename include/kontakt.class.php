@@ -30,7 +30,6 @@ class kontakt
 	var $new;       // @var boolean
 	var $errormsg;  // @var string
 	var $result = array(); // @var adresse Objekt
-	var $done=false;	// @var boolean
 	
 	//Tabellenspalten
 	Var $kontakt_id;	// @var integer
@@ -45,6 +44,9 @@ class kontakt
 	var $insertvon;	// @var bigint
 	var $updateamum;	// @var timestamp
 	var $updatevon;	// @var bigint
+	
+	var $beschreibung;
+	var $firma_name;
 	
 	/**
 	 * Konstruktor
@@ -84,7 +86,7 @@ class kontakt
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_kontakt WHERE kontakt_id='$kontakt_id'";
+		$qry = "SELECT tbl_kontakt.*, tbl_firma.name as firma_name FROM public.tbl_kontakt LEFT JOIN public.tbl_firma USING(firma_id) WHERE kontakt_id='$kontakt_id'";
 		
 		if($result = pg_query($this->conn, $qry))
 		{
@@ -93,6 +95,7 @@ class kontakt
 				$this->kontakt_id = $row->kontakt_id;
 				$this->person_id = $row->person_id;
 				$this->firma_id = $row->firma_id;
+				$this->firma_name = $row->firma_name;
 				$this->kontakttyp = $row->kontakttyp;
 				$this->anmerkung = $row->anmerkung;
 				$this->kontakt = $row->kontakt;
@@ -163,7 +166,6 @@ class kontakt
 	 */
 	function save()
 	{
-		$this->done=false;
 		//Variablen pruefen
 		if(!$this->checkvars())
 			return false;
@@ -181,8 +183,7 @@ class kontakt
 			     ($this->zustellung?'true':'false').', '. 
 			     $this->addslashes($this->ext_id).',  now(), '.
 			     $this->addslashes($this->insertvon).', now(), '.
-			     $this->addslashes($this->updatevon).');';
-			     $this->done=true;			
+			     $this->addslashes($this->updatevon).');';	
 		}
 		else
 		{
@@ -194,88 +195,63 @@ class kontakt
 				$this->errormsg = 'kontakt_id muss eine gueltige Zahl sein: '.$this->kontakt_id.' ('.$this->person_id.')';
 				return false;
 			}
-			$qry="SELECT * FROM tbl_kontakt WHERE kontakt_id='$this->kontakt_id';";
-			if($resultz = pg_query($this->conn, $qry))
-			{
-				if($rowz = pg_fetch_object($resultz))
-				{
-					$update=false;			
-					if($rowz->person_id!=$this->person_id) 				$update=true;
-					if($rowz->firma_id!=$this->firma_id) 				$update=true;
-					if($rowz->kontakttyp!=$this->kontakttyp)				$update=true;
-					if($rowz->anmerkung!=$this->anmerkung)			$update=true;
-					if($rowz->kontakt!=$this->kontakt) 					$update=true;
-					if($rowz->zustellung!=$this->zustellung) 				$update=true;
-					if($rowz->ext_id!=$this->ext_id)	 				$update=true;
-				
-					if($update)
-					{
-						$qry='UPDATE tbl_kontakt SET '.
-							'person_id='.$this->addslashes($this->person_id).', '. 
-							'firma_id='.$this->addslashes($this->firma_id).', '. 
-							'kontakttyp='.$this->addslashes($this->kontakttyp).', '. 
-							'anmerkung='.$this->addslashes($this->anmerkung).', '.  
-							'kontakt='.$this->addslashes($this->kontakt).', '. 
-							'zustellung='.($this->zustellung?'true':'false').', '.
-							'ext_id='.$this->addslashes($this->ext_id).', '. 
-						     	'updateamum= now(), '.
-						     	'updatevon='.$this->addslashes($this->updatevon).' '.
-							'WHERE kontakt_id='.$this->addslashes($this->kontakt_id).';';
-							$this->done=true;
-					}
-				}
-			}
+			
+			$qry='UPDATE tbl_kontakt SET '.
+				'person_id='.$this->addslashes($this->person_id).', '. 
+				'firma_id='.$this->addslashes($this->firma_id).', '. 
+				'kontakttyp='.$this->addslashes($this->kontakttyp).', '. 
+				'anmerkung='.$this->addslashes($this->anmerkung).', '.  
+				'kontakt='.$this->addslashes($this->kontakt).', '. 
+				'zustellung='.($this->zustellung?'true':'false').', '.
+				'ext_id='.$this->addslashes($this->ext_id).', '. 
+			    'updateamum= now(), '.
+			    'updatevon='.$this->addslashes($this->updatevon).' '.
+				'WHERE kontakt_id='.$this->addslashes($this->kontakt_id).';';
 		}
-		//echo $qry;
-		if ($this->done)
+		
+		if(pg_query($this->conn, $qry))
 		{
-			if(pg_query($this->conn, $qry))
+			//Sequence auslesen um die eingefuegte ID zu ermitteln
+			if($this->new)
 			{
-				if($this->new)
+				$qry = "SELECT currval('public.tbl_kontakt_kontakt_id_seq') as id";
+				
+				if($result = pg_query($this->conn, $qry))
 				{
-					$qry = "SELECT currval('public.tbl_kontakt_kontakt_id_seq') as id";
-					
-					if($result = pg_query($this->conn, $qry))
+					if($row = pg_fetch_object($result))
 					{
-						if($row = pg_fetch_object($result))
-						{
-							$this->kontakt_id = $row->id;
-							pg_query($this->conn, 'COMMIT');
-							return true;
-						}
-						else 
-						{
-							$this->errormsg = 'Fehler beim Auslesen er Sequence';
-							pg_query($this->conn, 'ROLLBACK');
-							return false;
-						}
+						$this->kontakt_id = $row->id;
+						pg_query($this->conn, 'COMMIT');
+						return true;
 					}
 					else 
 					{
-						$this->errormsg = 'Fehler beim Auslesen der Sequence';
+						$this->errormsg = 'Fehler beim Auslesen er Sequence';
 						pg_query($this->conn, 'ROLLBACK');
 						return false;
 					}
-				}				
-				return true;		
-			}
-			else 
-			{
-				$this->errormsg = 'Fehler beim Speichern der Daten';
-				return false;
-			}
+				}
+				else 
+				{
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+					pg_query($this->conn, 'ROLLBACK');
+					return false;
+				}
+			}				
+			return true;		
 		}
 		else 
 		{
-			return true;
+			$this->errormsg = 'Fehler beim Speichern der Daten';
+			return false;
 		}
 	}
 	
-	/**
-	 * Loescht den Datenensatz mit der ID die uebergeben wird
-	 * @param $kontakt_id ID die geloescht werden soll
-	 * @return true wenn ok, false im Fehlerfall
-	 */
+	// **
+	// * Loescht den Datenensatz mit der ID die uebergeben wird
+	// * @param $kontakt_id ID die geloescht werden soll
+	// * @return true wenn ok, false im Fehlerfall
+	// **
 	function delete($kontakt_id)
 	{
 		if(!is_numeric($kontakt_id))
@@ -306,7 +282,7 @@ class kontakt
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_kontakt WHERE person_id='$person_id'";
+		$qry = "SELECT tbl_kontakt.*, tbl_firma.name as firma_name FROM public.tbl_kontakt LEFT JOIN public.tbl_firma USING(firma_id) WHERE person_id='$person_id'";
 		
 		if($result = pg_query($this->conn, $qry))
 		{
@@ -317,10 +293,11 @@ class kontakt
 				$obj->kontakt_id = $row->kontakt_id;
 				$obj->person_id = $row->person_id;
 				$obj->firma_id = $row->firma_id;
+				$obj->firma_name = $row->firma_name;
 				$obj->kontakttyp = $row->kontakttyp;
 				$obj->anmerkung = $row->anmerkung;
 				$obj->kontakt = $row->kontakt;
-				$obj->zustellung = $row->zustellung;
+				$obj->zustellung = ($row->zustellung=='t'?true:false);
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
@@ -329,6 +306,35 @@ class kontakt
 				
 				$this->result[] = $obj;
 			}
+		}
+	}
+	
+	// **************************
+	// * Laedt alle Kontakttypen
+	// * @return true wenn ok
+	// * false im Fehlerfall
+	// **************************
+	function getKontakttyp()
+	{
+		$qry = "SELECT * FROM public.tbl_kontakttyp ORDER BY beschreibung";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$obj = new kontakt($this->conn, null, null);
+				
+				$obj->kontakttyp = $row->kontakttyp;
+				$obj->beschreibung = $row->beschreibung;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
 		}
 	}
 }

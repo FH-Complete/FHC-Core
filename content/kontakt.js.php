@@ -36,6 +36,7 @@ var KontaktKontaktSelectID=null; // ID des Kontaktes der nach dem Rebuild markie
 var BankverbindungTreeDatasource=''; // Datasource des Bankverbindung Trees
 var KontaktBankverbindungSelectID=null; // ID der Bankverbindung die nach dem Rebuild markiert werden soll
 var KontaktPerson_id=null;
+
 // ********** LISTENER UND OBSERVER ********** //
 
 // ****
@@ -139,7 +140,12 @@ var KontaktBankverbindungTreeListener =
       window.setTimeout(KontaktBankverbindungTreeSelectID,10);
   }
 };
+
 // ********** FUNKTIONEN ********** //
+
+// ****
+// * Laedt die Trees
+// ****
 function loadKontakte(person_id)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -296,11 +302,17 @@ function KontaktAdresseSpeichern(dialog)
 	}
 }
 
+// ****
+// * Neu Dialog oeffnen
+// ****
 function KontaktAdresseNeu()
 {
 	window.open("<?php echo APP_ROOT; ?>content/adressedialog.xul.php?person_id="+KontaktPerson_id,"","chrome, status=no, width=500, height=350, centerscreen, resizable");
 }
 
+// ****
+// * Bearbeiten Dialog oeffnen
+// ****
 function KontaktAdresseBearbeiten()
 {
 	tree = document.getElementById('kontakt-adressen-tree');
@@ -314,6 +326,9 @@ function KontaktAdresseBearbeiten()
 	window.open("<?php echo APP_ROOT; ?>content/adressedialog.xul.php?adresse_id="+adresse_id,"","chrome, status=no, width=500, height=350, centerscreen, resizable");
 }
 
+// ****
+// * markierten Datensatz loeschen
+// ****
 function KontaktAdresseDelete()
 {
 	tree = document.getElementById('kontakt-adressen-tree');
@@ -354,6 +369,24 @@ function KontaktAdresseDelete()
 	}
 }
 
+// ****
+// * Beim Sortieren des Trees wird der markierte Eintrag gespeichert und nach dem sortieren
+// * wieder markiert. 
+// ****
+function KontaktAdresseTreeSort()
+{
+	var i;
+	var tree=document.getElementById('kontakt-adressen-tree');
+	if(tree.currentIndex>=0)
+		i = tree.currentIndex;
+	else
+		i = 0;
+	col = tree.columns ? tree.columns["kontakt-adressen-treecol-adresse_id"] : "kontakt-adressen-treecol-adresse_id";
+	KontaktAdresseSelectID = tree.view.getCellText(i,col);
+	window.setTimeout("KontaktAdressenTreeSelectID()",10);
+}
+
+
 // ********** KONTAKTE ********** //
 
 // ****
@@ -386,6 +419,139 @@ function KontaktKontaktTreeSelectID()
 	}
 }
 
+// ****
+// * Speichert die Kontaktdaten
+// ****
+function KontaktKontaktSpeichern(dialog)
+{
+	neu = dialog.getElementById('kontakt-checkbox-neu').checked;
+	person_id = dialog.getElementById('kontakt-textbox-person_id').value;
+	kontakt_id = dialog.getElementById('kontakt-textbox-kontakt_id').value;
+	anmerkung = dialog.getElementById('kontakt-textbox-anmerkung').value;
+	kontakt = dialog.getElementById('kontakt-textbox-kontakt').value;
+	zustellung = dialog.getElementById('kontakt-checkbox-zustellung').checked;
+	typ = dialog.getElementById('kontakt-menulist-typ').value;
+	firma_id = dialog.getElementById('kontakt-menulist-firma').value;
+		
+	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
+	var req = new phpRequest(url,'','');
+	
+	req.add('type', 'kontaktsave');
+	
+	req.add('neu', neu);
+	req.add('person_id', person_id);
+	req.add('kontakt_id', kontakt_id);
+	req.add('anmerkung', anmerkung);
+	req.add('kontakt', kontakt);
+	req.add('typ', typ);
+	req.add('zustellung', zustellung);
+	req.add('firma_id', firma_id);
+
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+	
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+		return false;
+	}
+	else
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		KontaktKontaktSelectID = val.dbdml_data;
+		KontaktTreeDatasource.Refresh(false);
+		return true;
+	}
+}
+
+// ****
+// * Neu Dialog anzeigen
+// ****
+function KontaktKontaktNeu()
+{
+	window.open("<?php echo APP_ROOT; ?>content/kontaktdialog.xul.php?person_id="+KontaktPerson_id,"","chrome, status=no, width=500, height=350, centerscreen, resizable");
+}
+
+// ****
+// * Bearbeiten Dialog anzeigen
+// ****
+function KontaktKontaktBearbeiten()
+{
+	tree = document.getElementById('kontakt-kontakt-tree');
+	
+	if (tree.currentIndex==-1) return;
+	
+	//Ausgewaehlte ID holen
+    var col = tree.columns ? tree.columns["kontakt-kontakt-treecol-kontakt_id"] : "kontakt-kontakt-treecol-kontakt_id";
+	var kontakt_id=tree.view.getCellText(tree.currentIndex,col);
+	
+	window.open("<?php echo APP_ROOT; ?>content/kontaktdialog.xul.php?kontakt_id="+kontakt_id,"","chrome, status=no, width=500, height=350, centerscreen, resizable");
+}
+
+// ****
+// * markierten Datensatz loeschen
+// ****
+function KontaktKontaktDelete()
+{
+	tree = document.getElementById('kontakt-kontakt-tree');
+	
+	if (tree.currentIndex==-1) return;
+	
+	//Ausgewaehlte ID holen
+    var col = tree.columns ? tree.columns["kontakt-kontakt-treecol-kontakt_id"] : "kontakt-kontakt-treecol-kontakt_id";
+	var kontakt_id=tree.view.getCellText(tree.currentIndex,col);
+	
+	if(confirm('Diesen Kontakt wirklich loeschen?'))
+	{
+		var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
+		var req = new phpRequest(url,'','');
+		
+		req.add('type', 'kontaktdelete');
+		
+		req.add('kontakt_id', kontakt_id);
+	
+		var response = req.executePOST();
+	
+		var val =  new ParseReturnValue(response)
+		
+		if (!val.dbdml_return)
+		{
+			if(val.dbdml_errormsg=='')
+				alert(response)
+			else
+				alert(val.dbdml_errormsg)
+			return false;
+		}
+		else
+		{
+			netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+			KontaktTreeDatasource.Refresh(false);
+			return true;
+		}
+	}
+}
+
+// ****
+// * Beim Sortieren des Trees wird der markierte Eintrag gespeichert und nach dem sortieren
+// * wieder markiert. 
+// ****
+function KontaktKontaktTreeSort()
+{
+	var i;
+	var tree=document.getElementById('kontakt-kontakt-tree');
+	if(tree.currentIndex>=0)
+		i = tree.currentIndex;
+	else
+		i = 0;
+	col = tree.columns ? tree.columns["kontakt-kontakt-treecol-kontakt_id"] : "kontakt-kontakt-treecol-kontakt_id";
+	KontaktKontaktSelectID = tree.view.getCellText(i,col);
+	window.setTimeout("KontaktKontaktTreeSelectID()",10);
+}
+
 // ********** BANKVERBINDUNG ********** //
 
 // ****
@@ -416,4 +582,145 @@ function KontaktBankverbindungTreeSelectID()
 			}
 	   	}
 	}
+}
+
+
+// ****
+// * Speichert die Bankdaten
+// ****
+function KontaktBankverbindungSpeichern(dialog)
+{
+	neu = dialog.getElementById('bankverbindung-checkbox-neu').checked;
+	person_id = dialog.getElementById('bankverbindung-textbox-person_id').value;
+	bankverbindung_id = dialog.getElementById('bankverbindung-textbox-bankverbindung_id').value;
+	name = dialog.getElementById('bankverbindung-textbox-name').value;
+	anschrift = dialog.getElementById('bankverbindung-textbox-anschrift').value;
+	bic = dialog.getElementById('bankverbindung-textbox-bic').value;
+	blz = dialog.getElementById('bankverbindung-textbox-blz').value;
+	iban = dialog.getElementById('bankverbindung-textbox-iban').value;
+	kontonr = dialog.getElementById('bankverbindung-textbox-kontonr').value;
+	typ = dialog.getElementById('bankverbindung-menulist-typ').value;
+	verrechnung = dialog.getElementById('bankverbindung-checkbox-verrechnung').checked;
+		
+	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
+	var req = new phpRequest(url,'','');
+	
+	req.add('type', 'bankverbindungsave');
+	
+	req.add('neu', neu);
+	req.add('person_id', person_id);
+	req.add('bankverbindung_id', bankverbindung_id);
+	req.add('name', name);
+	req.add('anschrift', anschrift);
+	req.add('bic', bic);
+	req.add('blz', blz);
+	req.add('iban', kontonr);
+	req.add('kontonr', kontonr);
+	req.add('typ', typ);
+	req.add('verrechnung', verrechnung);
+
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+	
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+		return false;
+	}
+	else
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		KontaktBankverbindungSelectID = val.dbdml_data;
+		BankverbindungTreeDatasource.Refresh(false);
+		return true;
+	}
+}
+
+// ****
+// * Neu Dialog anzeigen
+// ****
+function KontaktBankverbindungNeu()
+{
+	window.open("<?php echo APP_ROOT; ?>content/bankverbindungdialog.xul.php?person_id="+KontaktPerson_id,"","chrome, status=no, width=500, height=350, centerscreen, resizable");
+}
+
+// ****
+// * Bearbeiten Dialog anzeigen
+// ****
+function KontaktBankverbindungBearbeiten()
+{
+	tree = document.getElementById('kontakt-bankverbindung-tree');
+	
+	if (tree.currentIndex==-1) return;
+	
+	//Ausgewaehlte ID holen
+    var col = tree.columns ? tree.columns["kontakt-bankverbindung-treecol-bankverbindung_id"] : "kontakt-bankverbindung-treecol-bankverbindung_id";
+	var bankverbindung_id=tree.view.getCellText(tree.currentIndex,col);
+	
+	window.open("<?php echo APP_ROOT; ?>content/bankverbindungdialog.xul.php?bankverbindung_id="+bankverbindung_id,"","chrome, status=no, width=500, height=350, centerscreen, resizable");
+}
+
+// ****
+// * markierten Datensatz loeschen
+// ****
+function KontaktBankverbindungDelete()
+{
+	tree = document.getElementById('kontakt-bankverbindung-tree');
+	
+	if (tree.currentIndex==-1) return;
+	
+	//Ausgewaehlte ID holen
+    var col = tree.columns ? tree.columns["kontakt-bankverbindung-treecol-bankverbindung_id"] : "kontakt-bankverbindung-treecol-bankverbindung_id";
+	var bankverbindung_id=tree.view.getCellText(tree.currentIndex,col);
+	
+	if(confirm('Diese Bankverbindung wirklich loeschen?'))
+	{
+		var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
+		var req = new phpRequest(url,'','');
+		
+		req.add('type', 'bankverbindungdelete');
+		
+		req.add('bankverbindung_id', bankverbindung_id);
+	
+		var response = req.executePOST();
+	
+		var val =  new ParseReturnValue(response)
+		
+		if (!val.dbdml_return)
+		{
+			if(val.dbdml_errormsg=='')
+				alert(response)
+			else
+				alert(val.dbdml_errormsg)
+			return false;
+		}
+		else
+		{
+			netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+			BankverbindungTreeDatasource.Refresh(false);
+			return true;
+		}
+	}
+}
+
+
+// ****
+// * Beim Sortieren des Trees wird der markierte Eintrag gespeichert und nach dem sortieren
+// * wieder markiert. 
+// ****
+function KontaktBankverbindungTreeSort()
+{
+	var i;
+	var tree=document.getElementById('kontakt-bankverbindung-tree');
+	if(tree.currentIndex>=0)
+		i = tree.currentIndex;
+	else
+		i = 0;
+	col = tree.columns ? tree.columns["kontakt-bankverbindung-treecol-bankverbindung_id"] : "kontakt-bankverbindung-treecol-bankverbindung_id";
+	KontaktBankverbindungSelectID = tree.view.getCellText(i,col);
+	window.setTimeout("KontaktBankverbindungTreeSelectID()",10);
 }

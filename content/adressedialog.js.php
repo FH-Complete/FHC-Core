@@ -50,7 +50,7 @@ function AdresseInit(adresse_id, person_id)
 	
 		var predicateNS = "http://www.technikum-wien.at/adresse/rdf";
 	
-		//Daten holen
+		//RDF parsen
 	
 		person_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#person_id" ));
 		name = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#name" ));
@@ -67,6 +67,7 @@ function AdresseInit(adresse_id, person_id)
 	}
 	else
 	{
+		//Defaultwerte bei Neuem Datensatz
 		neu = true;
 		name='';
 		strasse='';
@@ -102,6 +103,9 @@ function AdresseInit(adresse_id, person_id)
 	document.getElementById('adresse-menulist-firma').value=firma_id;
 }
 
+// ****
+// * Speichern der Daten
+// ****
 function AdresseSpeichern()
 {
 	if(window.opener.KontaktAdresseSpeichern(document))

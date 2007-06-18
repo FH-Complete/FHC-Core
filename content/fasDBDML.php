@@ -21,16 +21,12 @@
  */
 
 // ****************************************
-// * Insert/Update/Delete
-// * der Lehreinheiten
-// *
 // * Script sorgt fuer den Datenbanzugriff
-// * fuer das XUL - Lehreinheiten-Modul
+// * der folgender FASonline Daten:
 // *
-// * Derzeitige Funktionen:
-// * - Lehreinheitmitarbeiter Zuteilung hinzufuegen/bearbeiten/loeschen
-// * - Lehreinheitgruppe Zutelung hinzufuegen/loeschen
-// * - Lehreinheit anlegen/bearbeiten/loeschen
+// * - Adressen
+// * - Kontakte
+// * - Bankverbindungen
 // ****************************************
 
 require_once('../vilesci/config.inc.php');
@@ -38,9 +34,11 @@ require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/log.class.php');
 require_once('../include/adresse.class.php');
+require_once('../include/kontakt.class.php');
+require_once('../include/bankverbindung.class.php');
 
 $user = get_uid();
-
+//header("Content-type: application/xhtml+xml");
 //error_reporting(0);
 
 // Datenbank Verbindung
@@ -65,7 +63,8 @@ if(!$rechte->isBerechtigt('admin'))
 
 if(!$error)
 {
-	if(isset($_POST['type']) && $_POST['type']=='adressesave')
+	//in der Variable type wird die auszufuehrende Aktion mituebergeben
+	if(isset($_POST['type']) && $_POST['type']=='adressesave') // ***** ADRESSEN ***** //
 	{
 		//Speichert die Adressdaten in die Datenbank
 		$adresse = new adresse($conn, null, true);
@@ -96,8 +95,6 @@ if(!$error)
 		$adresse->firma_id = $_POST['firma_id'];
 		$adresse->updateamum = date('Y-m-d H:i:s');
 		$adresse->updatevon = $user;
-		$adresse->insertamum = date('Y-m-d H:i:s');
-		$adresse->insertvon = $user;
 		
 		//Wenn die Nation Oesterreich ist, dann muss die Gemeinde in der Tabelle Gemeinde vorkommen
 		if($_POST['nation']=='A')
@@ -136,7 +133,7 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='adressedelete')
 	{
-		//Speichert die Adressdaten in die Datenbank
+		//Loescht Adressen aus der DB
 		$adresse = new adresse($conn, null, true);
 		
 		if($adresse->delete($_POST['adresse_id']))
@@ -149,6 +146,115 @@ if(!$error)
 			$errormsg = $adresse->errormsg;
 		}
 	}
+	elseif(isset($_POST['type']) && $_POST['type']=='kontaktsave') // ***** KONTAKT ***** //
+	{
+		//Speichert die Kontaktdaten in die Datenbank
+		$kontakt = new kontakt($conn, null, true);
+		
+		if($_POST['neu']=='false')
+		{
+			$kontakt->load($_POST['kontakt_id']);
+			$kontakt->new = false;
+		}
+		else 
+		{
+			$kontakt->insertamum = date('Y-m-d H:i:s');
+			$kontakt->insertvon = $user;
+			$kontakt->new = true;
+		}
+		
+		$kontakt->kontakt_id = $_POST['kontakt_id'];
+		$kontakt->person_id = $_POST['person_id'];
+		$kontakt->anmerkung = $_POST['anmerkung'];
+		$kontakt->kontakt = $_POST['kontakt'];
+		$kontakt->kontakttyp = $_POST['typ'];
+		$kontakt->zustellung = ($_POST['zustellung']=='true'?true:false);
+		$kontakt->firma_id = $_POST['firma_id'];
+		$kontakt->updateamum = date('Y-m-d H:i:s');
+		$kontakt->updatevon = $user;
+		
+		if($kontakt->save())
+		{
+			$return = true;
+			$data = $kontakt->kontakt_id;
+		}
+		else 
+		{
+			$return = false;
+			$errormsg = $kontakt->errormsg;
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='kontaktdelete')
+	{
+		//Loescht Kontaktdaten aus der Datenbank
+		$kontakt = new kontakt($conn, null, true);
+		
+		if($kontakt->delete($_POST['kontakt_id']))
+		{
+			$return = true;
+		}
+		else 
+		{
+			$return = false;
+			$errormsg = $kontakt->errormsg;
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='bankverbindungsave') // ***** BANKVERBINDUNG ***** //
+	{
+		//Speichert die Kontaktdaten in die Datenbank
+		$bankverbindung = new bankverbindung($conn, null, true);
+		
+		if($_POST['neu']=='false')
+		{
+			$bankverbindung->load($_POST['bankverbindung_id']);
+			$bankverbindung->new = false;
+		}
+		else 
+		{
+			$bankverbindung->insertamum = date('Y-m-d H:i:s');
+			$bankverbindung->insertvon = $user;
+			$bankverbindung->new = true;
+		}
+		
+		$bankverbindung->bankverbindung_id = $_POST['bankverbindung_id'];
+		$bankverbindung->person_id = $_POST['person_id'];
+		$bankverbindung->name = $_POST['name'];
+		$bankverbindung->anschrift = $_POST['anschrift'];
+		$bankverbindung->bic = $_POST['bic'];
+		$bankverbindung->blz = $_POST['blz'];
+		$bankverbindung->iban = $_POST['iban'];
+		$bankverbindung->kontonr = $_POST['kontonr'];
+		$bankverbindung->typ = $_POST['typ'];
+		$bankverbindung->verrechnung = ($_POST['verrechnung']=='true'?true:false);
+		$bankverbindung->updateamum = date('Y-m-d H:i:s');
+		$bankverbindung->updatevon = $user;
+		
+		if($bankverbindung->save())
+		{
+			$return = true;
+			$data = $bankverbindung->bankverbindung_id;
+		}
+		else 
+		{
+			$return = false;
+			$errormsg = $bankverbindung->errormsg;
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='bankverbindungdelete')
+	{
+		//Loescht Bankverbindungen aus der Datenbank
+		$bankverbindung = new bankverbindung($conn, null, true);
+		
+		if($bankverbindung->delete($_POST['bankverbindung_id']))
+		{
+			$return = true;
+		}
+		else 
+		{
+			$return = false;
+			$errormsg = $bankverbindung->errormsg;
+		}
+	}
 	else
 	{
 		$return = false;
@@ -156,8 +262,9 @@ if(!$error)
 		$data = '';
 	}
 }
-?>
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+//RDF mit den Returnwerden ausgeben
+echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <RDF:RDF
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	xmlns:NC="http://home.netscape.com/NC-rdf#"
@@ -166,10 +273,12 @@ if(!$error)
   <RDF:Seq RDF:about="http://www.technikum-wien.at/dbdml/msg">
 	<RDF:li>
     	<RDF:Description RDF:about="http://www.technikum-wien.at/dbdml/0" >
-    		<DBDML:return><?php echo ($return?'true':'false'); ?></DBDML:return>
-        	<DBDML:errormsg><![CDATA[<?php echo $errormsg; ?>]]></DBDML:errormsg>
-        	<DBDML:data><![CDATA[<?php echo $data ?>]]></DBDML:data>
+    		<DBDML:return>'.($return?'true':'false').'</DBDML:return>
+        	<DBDML:errormsg><![CDATA['.$errormsg.']]></DBDML:errormsg>
+        	<DBDML:data><![CDATA['.$data.']]></DBDML:data>
         </RDF:Description>
 	</RDF:li>
   </RDF:Seq>
 </RDF:RDF>
+';
+?>
