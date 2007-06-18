@@ -13,6 +13,7 @@
 	// Wochentage auf Deutsch (Zeitwunsch)
 	global $tagbez;
 	$tagbez=array();
+	$tagbez[0]="Sonntag";
 	$tagbez[1]="Montag";
 	$tagbez[2]="Dienstag";
 	$tagbez[3]="Mittwoch";
