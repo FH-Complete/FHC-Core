@@ -197,7 +197,6 @@ class bankverbindung
 	 */
 	function save()
 	{
-		$this->done=false;
 		//Variablen pruefen
 		if(!$this->checkvars())
 			return false;
@@ -220,7 +219,6 @@ class bankverbindung
 			      ($this->verrechnung?'true':'false').',  now(), '.
 			       $this->addslashes($this->insertvon).', now(), '.
 			       $this->addslashes($this->updatevon).');';
-			$this->done=true;
 		}
 		else
 		{
@@ -237,66 +235,36 @@ class bankverbindung
 				$this->errormsg = 'person_id muss eine gueltige Zahl sein: '.$this->person_id.'';
 				return false;
 			}
-			$qryz="SELECT * FROM public.tbl_bankverbindung WHERE bankverbindung_id='$this->bankverbindung_id';";
-			if($resultz = pg_query($this->conn, $qryz))
-			{
-				if($rowz = pg_fetch_object($resultz))
-				{
-					$update=false;
-					if($rowz->person_id!=$this->person_id) 				$update=true;
-					if($rowz->name!=$this->name)	 				$update=true;
-					if($rowz->anschrift!=$this->anschrift)				$update=true;
-					if($rowz->bic!=$this->bic)						$update=true;
-					if($rowz->blz!=$this->blz)	 					$update=true;
-					if($rowz->iban!=$this->iban) 					$update=true;
-					if($rowz->kontonr!=$this->kontonr)					$update=true;
-					if($rowz->typ!=$this->typ)	 					$update=true;
-					if($rowz->verrechnung!=$this->verrechnung)			$update=true;
-					if($rowz->ext_id!=$this->ext_id) 					$update=true;
 
-					if($update)
-					{
-						$qry='UPDATE public.tbl_bankverbindung SET '.
-						'person_id='.$this->addslashes($this->person_id).', '.
-						'name='.$this->addslashes($this->name).', '.
-		     			'anschrift='.$this->addslashes($this->anschrift).', '.
-		     			'blz='.$this->addslashes($this->blz).', '.
-		     			'bic='.$this->addslashes($this->bic).', '.
-		     			'kontonr='.$this->addslashes($this->kontonr).', '.
-		     			'iban='.$this->addslashes($this->iban).', '.
-		     			'typ='.$this->addslashes($this->typ).', '.
-		     			'verrechnung='.($this->verrechnung?'true':'false').', '.
-		     			'ext_id='.$this->addslashes($this->ext_id).' '.
-		     			'WHERE bankverbindung_id='.$this->addslashes($this->bankverbindung_id).';';
-						$this->done=true;
-					}
-				}
-			}
+			$qry='UPDATE public.tbl_bankverbindung SET '.
+			'person_id='.$this->addslashes($this->person_id).', '.
+			'name='.$this->addslashes($this->name).', '.
+ 			'anschrift='.$this->addslashes($this->anschrift).', '.
+ 			'blz='.$this->addslashes($this->blz).', '.
+ 			'bic='.$this->addslashes($this->bic).', '.
+ 			'kontonr='.$this->addslashes($this->kontonr).', '.
+ 			'iban='.$this->addslashes($this->iban).', '.
+ 			'typ='.$this->addslashes($this->typ).', '.
+ 			'verrechnung='.($this->verrechnung?'true':'false').', '.
+ 			'ext_id='.$this->addslashes($this->ext_id).', '.
+ 			'updateamum='.$this->addslashes($this->updateamum).','.
+ 			'updatevon='.$this->addslashes($this->updatevon).' '.
+ 			'WHERE bankverbindung_id='.$this->addslashes($this->bankverbindung_id).';';
 		}
-
-		if ($this->done)
+		//echo $qry."\n";
+		if(pg_query($this->conn, $qry))
 		{
-			//echo $qry."\n";
-			if(pg_query($this->conn, $qry))
+			if($this->new)
 			{
-				if($this->new)
+				//Sequence auslesen
+				$qry = "SELECT currval('public.tbl_bankverbindung_bankverbindung_id_seq') as id";
+				if($result = pg_query($this->conn, $qry))
 				{
-					//Sequence auslesen
-					$qry = "SELECT currval('public.tbl_bankverbindung_bankverbindung_id_seq') as id";
-					if($result = pg_query($this->conn, $qry))
+					if($row = pg_fetch_object($result))
 					{
-						if($row = pg_fetch_object($result))
-						{
-							$this->bankverbindung_id = $row->id;
-							pg_query($this->conn, 'COMMIT');
-							return true;
-						}
-						else 
-						{
-							$this->errormsg = 'Fehler beim Auslesen der Sequence';
-							pg_query($this->conn, 'ROLLBACK');
-							return false;
-						}
+						$this->bankverbindung_id = $row->id;
+						pg_query($this->conn, 'COMMIT');
+						return true;
 					}
 					else 
 					{
@@ -305,17 +273,19 @@ class bankverbindung
 						return false;
 					}
 				}
-				return true;
+				else 
+				{
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+					pg_query($this->conn, 'ROLLBACK');
+					return false;
+				}
 			}
-			else
-			{
-				$this->errormsg = 'Fehler beim Speichern der Daten';
-				return false;
-			}
+			return true;
 		}
 		else
 		{
-			return true;
+			$this->errormsg = 'Fehler beim Speichern der Daten';
+			return false;
 		}
 	}
 

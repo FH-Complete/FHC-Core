@@ -516,6 +516,7 @@ function StudentDetailDisableFields(val)
 	document.getElementById('student-detail-textbox-semester').disabled=val;
 	document.getElementById('student-detail-textbox-verband').disabled=val;
 	document.getElementById('student-detail-textbox-gruppe').disabled=val;
+	document.getElementById('student-detail-button-save').disabled=val;
 }
 
 // ****
@@ -663,8 +664,9 @@ function StudentAuswahl()
 			StudentPrestudentDisableFields(false);
 			StudentKontoDisableFields(false);
 			StudentBetriebsmittelDisableFields(false);
+			StudentAkteDisableFields(false);
 			StudentIODisableFields(false);
-			StudentNoteDetailDisableFields(true);
+			StudentNoteDisableFields(false);
 			document.getElementById('student-detail-button-save').disabled=false;
 		}
 		else
@@ -1118,78 +1120,101 @@ function StudentAnmeldungreihungstestHeute()
 }
 
 // ****
-// * Laedt ein Zeugnis dass in der DB gespeichert ist
+// * Einen Ab-/Unterbrecher wieder zum Studenten machen
 // ****
-function StudentZeugnisAnzeigen()
+function StudentUnterbrecherZuStudent()
 {
-	var tree = document.getElementById('student-zeugnis-tree');
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-tree');
 
 	if (tree.currentIndex==-1) return;
 	
-	try
+	if(sem = prompt('In welches Semester soll dieser Student verschoben werden?'))
 	{
-		//Ausgewaehlte ID holen
-        var col = tree.columns ? tree.columns["student-zeugnis-tree-akte_id"] : "student-zeugnis-tree-akte_id";
-		var akte_id=tree.view.getCellText(tree.currentIndex,col);
-		if(akte_id!='')
+		if(!isNaN(sem))
 		{
-			window.open('<?php echo APP_ROOT;?>content/akte.php?id='+akte_id,'File');
-			//document.location.href='<?php echo APP_ROOT;?>content/akte.php?id='+akte_id;
+			StudentAddRolle('Student', sem)
 		}
 		else
 		{
-			return false;
-		}	
-	}
-	catch(e)
-	{
-		alert(e);
-		return false;
+			alert('Semester ist ungueltig');
+		}
 	}
 }
 
 // ****
-// * Loescht ein Zeugnis
+// * Fuegt eine Rolle zu einem Studenten hinzu
 // ****
-function StudentAkteDel()
+function StudentAddRolle(rolle, semester)
 {
-
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	var tree = document.getElementById('student-zeugnis-tree');
-	
-	if (tree.currentIndex==-1)
-		return;
+	var tree = document.getElementById('student-tree');
+
+	if (tree.currentIndex==-1) return;
 		
-	try
+	//Ausgewaehlte ID holen
+    var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
+	var prestudent_id=tree.view.getCellText(tree.currentIndex,col);
+		
+	if(semester!='0' || confirm('Diesen Studenten zum '+rolle+' machen?'))
 	{
-		//Ausgewaehlte Akte holen
-        var col = tree.columns ? tree.columns["student-zeugnis-tree-akte_id"] : "student-zeugnis-tree-akte_id";
-		var akte_id=tree.view.getCellText(tree.currentIndex,col);
-	}
-	catch(e)
-	{
-		alert(e);
-		return false;
-	}
-
-	//Abfrage ob wirklich geloescht werden soll
-	if (confirm('Zeugnis wirklich entfernen?'))
-	{
-		//Script zum loeschen aufrufen
-		var req = new phpRequest('student/studentDBDML.php','','');
-
-		req.add('type','deleteAkte');
-		req.add('akte_id',akte_id);
+		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+		var req = new phpRequest(url,'','');
+		
+		req.add('type', 'addrolle');
 				
-		var response = req.executePOST();
-
-		var val =  new ParseReturnValue(response)
+		req.add('prestudent_id', prestudent_id);
+		req.add('rolle_kurzbz', rolle);
+		req.add('semester', semester);
 		
-		if(!val.dbdml_return)
-			alert(val.dbdml_errormsg)
-
-		StudentTreeRefresh();
+		var response = req.executePOST();
+	
+		var val =  new ParseReturnValue(response);
+		
+		if (!val.dbdml_return)
+		{
+			if(val.dbdml_errormsg=='')
+				alert(response)
+			else
+				alert(val.dbdml_errormsg)
+		}
+		else
+		{			
+			StudentTreeRefresh();
+			SetStatusBarText('Rolle hinzugefuegt');
+		}
 	}
+}
+
+// ****
+// * Druckt die Instkriptionsbestaetigung
+// ****
+function StudentPrintInskriptionsbestaetigung()
+{
+	tree = document.getElementById('student-tree');
+	//Alle markierten Studenten holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
+	var anzahl=0;
+	
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+			for (var v = start.value; v <= end.value; v++)
+			{
+			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+			uid = tree.view.getCellText(v,col);
+			paramList += ';'+uid;
+			anzahl = anzahl+1;
+			}
+	}
+	
+	if(anzahl>0)	
+		window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=student.rdf.php&xsl=Inskription&uid='+paramList,'Inskriptionsbestaetigung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	else
+		alert('Bitte einen Studenten auswaehlen');
 }
 
 // **************** KONTO ******************
@@ -1631,6 +1656,89 @@ function StudentCreateZeugnis()
 	window.open('<?php echo APP_ROOT; ?>content/student/zeugnis.php?uid='+uid+'&studiengang_kz='+studiengang_kz+'&semester='+semester,'Zeugnis', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
+// ****
+// * Laedt ein Zeugnis dass in der DB gespeichert ist
+// ****
+function StudentZeugnisAnzeigen()
+{
+	var tree = document.getElementById('student-zeugnis-tree');
+
+	if (tree.currentIndex==-1) return;
+	
+	try
+	{
+		//Ausgewaehlte ID holen
+        var col = tree.columns ? tree.columns["student-zeugnis-tree-akte_id"] : "student-zeugnis-tree-akte_id";
+		var akte_id=tree.view.getCellText(tree.currentIndex,col);
+		if(akte_id!='')
+		{
+			window.open('<?php echo APP_ROOT;?>content/akte.php?id='+akte_id,'File');
+			//document.location.href='<?php echo APP_ROOT;?>content/akte.php?id='+akte_id;
+		}
+		else
+		{
+			return false;
+		}	
+	}
+	catch(e)
+	{
+		alert(e);
+		return false;
+	}
+}
+
+// ****
+// * Loescht ein Zeugnis
+// ****
+function StudentAkteDel()
+{
+
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-zeugnis-tree');
+	
+	if (tree.currentIndex==-1)
+		return;
+		
+	try
+	{
+		//Ausgewaehlte Akte holen
+        var col = tree.columns ? tree.columns["student-zeugnis-tree-akte_id"] : "student-zeugnis-tree-akte_id";
+		var akte_id=tree.view.getCellText(tree.currentIndex,col);
+	}
+	catch(e)
+	{
+		alert(e);
+		return false;
+	}
+
+	//Abfrage ob wirklich geloescht werden soll
+	if (confirm('Zeugnis wirklich entfernen?'))
+	{
+		//Script zum loeschen aufrufen
+		var req = new phpRequest('student/studentDBDML.php','','');
+
+		req.add('type','deleteAkte');
+		req.add('akte_id',akte_id);
+				
+		var response = req.executePOST();
+
+		var val =  new ParseReturnValue(response)
+		
+		if(!val.dbdml_return)
+			alert(val.dbdml_errormsg)
+
+		StudentTreeRefresh();
+	}
+}
+
+// ****
+// * Deaktiviert die Felder
+// ****
+function StudentAkteDisableFields(val)
+{
+	document.getElementById('student-zeugnis-button-archivieren').disabled=val;
+}
+
 // ********** Betriebsmittel ******************
 
 // ****
@@ -1904,103 +2012,6 @@ function StudentBetriebsmittelNeu()
 	document.getElementById('student-betriebsmittel-textbox-ausgegebenam').value=tag+'.'+monat+'.'+jahr;
 }
 
-// ****
-// * Einen Ab-/Unterbrecher wieder zum Studenten machen
-// ****
-function StudentUnterbrecherZuStudent()
-{
-	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	var tree = document.getElementById('student-tree');
-
-	if (tree.currentIndex==-1) return;
-	
-	if(sem = prompt('In welches Semester soll dieser Student verschoben werden?'))
-	{
-		if(!isNaN(sem))
-		{
-			StudentAddRolle('Student', sem)
-		}
-		else
-		{
-			alert('Semester ist ungueltig');
-		}
-	}
-}
-
-// ****
-// * Fuegt eine Rolle zu einem Studenten hinzu
-// ****
-function StudentAddRolle(rolle, semester)
-{
-	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	var tree = document.getElementById('student-tree');
-
-	if (tree.currentIndex==-1) return;
-		
-	//Ausgewaehlte ID holen
-    var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
-	var prestudent_id=tree.view.getCellText(tree.currentIndex,col);
-		
-	if(semester!='0' || confirm('Diesen Studenten zum '+rolle+' machen?'))
-	{
-		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
-		var req = new phpRequest(url,'','');
-		
-		req.add('type', 'addrolle');
-				
-		req.add('prestudent_id', prestudent_id);
-		req.add('rolle_kurzbz', rolle);
-		req.add('semester', semester);
-		
-		var response = req.executePOST();
-	
-		var val =  new ParseReturnValue(response);
-		
-		if (!val.dbdml_return)
-		{
-			if(val.dbdml_errormsg=='')
-				alert(response)
-			else
-				alert(val.dbdml_errormsg)
-		}
-		else
-		{			
-			StudentTreeRefresh();
-			SetStatusBarText('Rolle hinzugefuegt');
-		}
-	}
-}
-
-// ****
-// * Druckt die Instkriptionsbestaetigung
-// ****
-function StudentPrintInskriptionsbestaetigung()
-{
-	tree = document.getElementById('student-tree');
-	//Alle markierten Studenten holen
-	var start = new Object();
-	var end = new Object();
-	var numRanges = tree.view.selection.getRangeCount();
-	var paramList= '';
-	var anzahl=0;
-	
-	for (var t = 0; t < numRanges; t++)
-	{
-  		tree.view.selection.getRangeAt(t,start,end);
-			for (var v = start.value; v <= end.value; v++)
-			{
-			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-			uid = tree.view.getCellText(v,col);
-			paramList += ';'+uid;
-			anzahl = anzahl+1;
-			}
-	}
-	
-	if(anzahl>0)	
-		window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=student.rdf.php&xsl=Inskription&uid='+paramList,'Inskriptionsbestaetigung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
-	else
-		alert('Bitte einen Studenten auswaehlen');
-}
 
 // **************** Incomming/Outgoing ******************
 
@@ -2335,6 +2346,14 @@ function StudentLvGesamtNotenTreeSelectID()
 			}
 	   	}
 	}
+}
+
+// ***
+// * Disabled/Enabled die Nodenfelder
+// ***
+function StudentNoteDisableFields(val)
+{
+	document.getElementById('student-note-copy').disabled=val;
 }
 
 // ***

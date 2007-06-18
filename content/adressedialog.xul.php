@@ -89,14 +89,14 @@ else
 		      		</hbox>
 				</row>
 				<row>
-					<label value="Ort ??" control="adresse-textbox-ort"/>
+					<label value="Ort" control="adresse-textbox-ort"/>
 					<hbox>
 						<textbox id="adresse-textbox-ort" maxlength="256" size="30"/>
 						<spacer flex="1" />			
       				</hbox>
 				</row>
 				<row>
-					<label value="Gemeinde ??" />
+					<label value="Gemeinde" />
 					<hbox>						
 						<textbox id="adresse-textbox-gemeinde" maxlength="256" size="30" />
 						<spacer flex="1" />			

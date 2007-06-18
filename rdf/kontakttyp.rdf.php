@@ -31,67 +31,41 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
 require_once('../vilesci/config.inc.php');
 require_once('../include/kontakt.class.php');
-require_once('../include/datum.class.php');
 
 // Datenbank Verbindung
 if (!$conn = pg_pconnect(CONN_STRING))
    	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
 
-if(isset($_GET['person_id']))
-	$person_id = $_GET['person_id'];
-else 
-	$person_id = '';
-
-if(isset($_GET['kontakt_id']))
-	$kontakt_id = $_GET['kontakt_id'];
-else 
-	$kontakt_id = '';
-	
-$datum = new datum();
-
 $kontakt = new kontakt($conn, null, true);
 	
-$rdf_url='http://www.technikum-wien.at/kontakt';
+$rdf_url='http://www.technikum-wien.at/kontakttyp';
 
 echo '
 <RDF:RDF
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:KONTAKT="'.$rdf_url.'/rdf#"
+	xmlns:KONTAKTTYP="'.$rdf_url.'/rdf#"
 >
 
    <RDF:Seq about="'.$rdf_url.'/liste">
 ';
 
-if($kontakt_id!='')
-{
-	$kontakt->load($kontakt_id);
-	draw_rdf($kontakt);
-}
-else
-{
-	$kontakt->load_pers($person_id);
+if($kontakt->getKontakttyp())
+{	
 	foreach ($kontakt->result as $row)
-		draw_rdf($row);
+	{	
+		echo '
+	      <RDF:li>
+	         <RDF:Description  id="'.$row->kontakttyp.'"  about="'.$rdf_url.'/'.$row->kontakttyp.'" >
+	            <KONTAKTTYP:kontakttyp><![CDATA['.$row->kontakttyp.']]></KONTAKTTYP:kontakttyp>
+	            <KONTAKTTYP:beschreibung><![CDATA['.$row->beschreibung.']]></KONTAKTTYP:beschreibung>
+	         </RDF:Description>
+	      </RDF:li>
+	      ';
+	}
 }
-
-function draw_rdf($row)
+else 
 {
-	global $rdf_url;
-	
-	echo '
-      <RDF:li>
-         <RDF:Description  id="'.$row->kontakt_id.'"  about="'.$rdf_url.'/'.$row->kontakt_id.'" >
-            <KONTAKT:kontakt_id><![CDATA['.$row->kontakt_id.']]></KONTAKT:kontakt_id>
-            <KONTAKT:person_id><![CDATA['.$row->person_id.']]></KONTAKT:person_id>
-            <KONTAKT:firma_id><![CDATA['.$row->firma_id.']]></KONTAKT:firma_id>
-            <KONTAKT:firma_name><![CDATA['.$row->firma_name.']]></KONTAKT:firma_name>
-            <KONTAKT:kontakttyp><![CDATA['.$row->kontakttyp.']]></KONTAKT:kontakttyp>
-            <KONTAKT:anmerkung><![CDATA['.$row->anmerkung.']]></KONTAKT:anmerkung>
-            <KONTAKT:kontakt><![CDATA['.$row->kontakt.']]></KONTAKT:kontakt>
-            <KONTAKT:zustellung><![CDATA['.($row->zustellung?'Ja':'Nein').']]></KONTAKT:zustellung>
-         </RDF:Description>
-      </RDF:li>
-      ';
+	echo $kontakt->errormsg;
 }
 ?>
    </RDF:Seq>

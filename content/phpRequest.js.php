@@ -56,7 +56,7 @@ function phpRequestExecute()
 	try {
 		var txt = "?";
 		for(var i in this.parms) {
-			txt = txt+'&'+this.parms[i].name+'='+this.parms[i].value;
+			txt = txt+'&'+this.parms[i].name+'='+encodeURIComponent(this.parms[i].value);
 		}
 		//alert('sende '+txt);
 		//Two options here, only uncomment one of these
@@ -113,7 +113,7 @@ function phpRequestExecutePOST()
 		var txt = "";
 		for(var i in this.parms)
 		{
-			txt = txt+'&'+this.parms[i].name+'='+this.parms[i].value;
+			txt = txt+'&'+this.parms[i].name+'='+encodeURIComponent(this.parms[i].value);
 		}
 		//alert('sende '+txt);
 

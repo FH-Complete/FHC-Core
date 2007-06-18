@@ -64,51 +64,51 @@ else
 				<treecols>
 					<treecol id="kontakt-adressen-treecol-name" label="Name" flex="1" hidden="false"
 						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/adresse/rdf#name" onclick="KontaktAdressenTreeSort()"/>
+						sort="rdf:http://www.technikum-wien.at/adresse/rdf#name" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
 					<treecol id="kontakt-adressen-treecol-strasse" label="Strasse" flex="1" hidden="false"
 						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/adresse/rdf#strasse" onclick="KontaktAdressenTreeSort()"/>
+						sort="rdf:http://www.technikum-wien.at/adresse/rdf#strasse" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
 					<treecol id="kontakt-adressen-treecol-plz" label="Plz" flex="1" hidden="false"
 						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/adresse/rdf#plz" onclick="KontaktAdressenTreeSort()"/>
+						sort="rdf:http://www.technikum-wien.at/adresse/rdf#plz" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
 					<treecol id="kontakt-adressen-treecol-ort" label="Ort" flex="1" hidden="false"
 						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/adresse/rdf#ort" onclick="KontaktAdressenTreeSort()"/>
+						sort="rdf:http://www.technikum-wien.at/adresse/rdf#ort" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
 					<treecol id="kontakt-adressen-treecol-gemeinde" label="Gemeinde" flex="1" hidden="true"
 						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/adresse/rdf#gemeinde" onclick="KontaktAdressenTreeSort()"/>
+						sort="rdf:http://www.technikum-wien.at/adresse/rdf#gemeinde" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
 					<treecol id="kontakt-adressen-treecol-nation" label="Nation" flex="1" hidden="true"
 						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/adresse/rdf#nation" onclick="KontaktAdressenTreeSort()"/>
+						sort="rdf:http://www.technikum-wien.at/adresse/rdf#nation" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
 					<treecol id="kontakt-adressen-treecol-typ" label="Typ" flex="1" hidden="true"
 						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/adresse/rdf#typ" onclick="KontaktAdressenTreeSort()"/>
+						sort="rdf:http://www.technikum-wien.at/adresse/rdf#typ" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
 					<treecol id="kontakt-adressen-treecol-heimatadresse" label="Heimatadresse" flex="1" hidden="true"
 						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/adresse/rdf#heimatadresse" onclick="KontaktAdressenTreeSort()"/>
+						sort="rdf:http://www.technikum-wien.at/adresse/rdf#heimatadresse" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
 					<treecol id="kontakt-adressen-treecol-zustelladresse" label="Zustelladresse" flex="1" hidden="true"
 						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/adresse/rdf#zustelladresse" onclick="KontaktAdressenTreeSort()"/>
+						sort="rdf:http://www.technikum-wien.at/adresse/rdf#zustelladresse" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
 					<treecol id="kontakt-adressen-treecol-firma_id" label="Firma_id" flex="1" hidden="true"
 						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/adresse/rdf#firma_id" onclick="KontaktAdressenTreeSort()"/>
+						sort="rdf:http://www.technikum-wien.at/adresse/rdf#firma_id" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
 					<treecol id="kontakt-adressen-treecol-adresse_id" label="Adresse_id" flex="1" hidden="true"
 						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/adresse/rdf#adresse_id" onclick="KontaktAdressenTreeSort()"/>
+						sort="rdf:http://www.technikum-wien.at/adresse/rdf#adresse_id" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
 					<treecol id="kontakt-adressen-treecol-person_id" label="Person_id" flex="1" hidden="true"
 						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/adresse/rdf#person_id" onclick="KontaktAdressenTreeSort()"/>
+						sort="rdf:http://www.technikum-wien.at/adresse/rdf#person_id" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
 				</treecols>
 			
@@ -148,7 +148,7 @@ else
 		<hbox>
 			<tree id="kontakt-kontakt-tree" seltype="single" hidecolumnpicker="false" flex="1"
 				datasources="rdf:null" ref="http://www.technikum-wien.at/kontakt/liste"
-				onselect="KontaktKontaktSelect();"
+				ondblclick="KontaktKontaktBearbeiten();"
 				flags="dont-build-content"
 				enableColumnDrag="true"
 				style="margin-left:10px;margin-right:10px;margin-bottom:5px;" height="100"
@@ -163,23 +163,27 @@ else
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/kontakt/rdf#kontakt" onclick="KontaktKontaktTreeSort()"/>
 					<splitter class="tree-splitter"/>
-					<treecol id="kontakt-adressen-treecol-zustellung" label="Zustellung" flex="1" hidden="false"
+					<treecol id="kontakt-kontakt-treecol-zustellung" label="Zustellung" flex="1" hidden="false"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/kontakt/rdf#zustellung" onclick="KontaktKontaktTreeSort()"/>
 					<splitter class="tree-splitter"/>
-					<treecol id="kontakt-adressen-treecol-anmerkung" label="Anmerkung" flex="1" hidden="false"
+					<treecol id="kontakt-kontakt-treecol-anmerkung" label="Anmerkung" flex="1" hidden="false"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/kontakt/rdf#anmerkung" onclick="KontaktKontaktTreeSort()"/>
 					<splitter class="tree-splitter"/>
-					<treecol id="kontakt-adressen-treecol-firma_id" label="Firma_id" flex="1" hidden="true"
+					<treecol id="kontakt-kontakt-treecol-firma_name" label="Firma" flex="1" hidden="true"
+						class="sortDirectionIndicator"
+						sort="rdf:http://www.technikum-wien.at/kontakt/rdf#firma_name" onclick="KontaktKontaktTreeSort()"/>
+					<splitter class="tree-splitter"/>
+					<treecol id="kontakt-kontakt-treecol-firma_id" label="Firma_id" flex="1" hidden="true"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/kontakt/rdf#firma_id" onclick="KontaktKontaktTreeSort()"/>
 					<splitter class="tree-splitter"/>
-					<treecol id="kontakt-adressen-treecol-person_id" label="Person_id" flex="1" hidden="true"
+					<treecol id="kontakt-kontakt-treecol-person_id" label="Person_id" flex="1" hidden="true"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/kontakt/rdf#person_id" onclick="KontaktKontaktTreeSort()"/>
 					<splitter class="tree-splitter"/>
-					<treecol id="kontakt-adressen-treecol-kontakt_id" label="Kontakt_id" flex="1" hidden="true"
+					<treecol id="kontakt-kontakt-treecol-kontakt_id" label="Kontakt_id" flex="1" hidden="true"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/kontakt/rdf#kontakt_id" onclick="KontaktKontaktTreeSort()"/>
 					<splitter class="tree-splitter"/>
@@ -194,7 +198,8 @@ else
 									<treecell label="rdf:http://www.technikum-wien.at/kontakt/rdf#kontakt" />
 									<treecell label="rdf:http://www.technikum-wien.at/kontakt/rdf#zustellung" />
 									<treecell label="rdf:http://www.technikum-wien.at/kontakt/rdf#anmerkung" />
-									<treecell label="rdf:http://www.technikum-wien.at/kontakt/rdf#firma_is" />
+									<treecell label="rdf:http://www.technikum-wien.at/kontakt/rdf#firma_name" />
+									<treecell label="rdf:http://www.technikum-wien.at/kontakt/rdf#firma_id" />
 									<treecell label="rdf:http://www.technikum-wien.at/kontakt/rdf#person_id" />
 									<treecell label="rdf:http://www.technikum-wien.at/kontakt/rdf#kontakt_id" />
 								</treerow>
@@ -204,9 +209,9 @@ else
 				</template>
 			</tree>
 			<vbox>
-				<button id='kontakt-kontakt-neu' label='Neu' oncommand='' />
-				<button id='kontakt-kontakt-bearbeiten' label='Bearbeiten' oncommand='' />
-				<button id='kontakt-kontakt-loeschen' label='Loeschen' oncommand='' />
+				<button id="kontakt-kontakt-neu" label="Neu" oncommand="KontaktKontaktNeu()" />
+				<button id="kontakt-kontakt-bearbeiten" label="Bearbeiten" oncommand="KontaktKontaktBearbeiten()" />
+				<button id="kontakt-kontakt-loeschen" label="Loeschen" oncommand="KontaktKontaktDelete()" />
 			</vbox>
 		</hbox>
 	</groupbox>
@@ -216,7 +221,7 @@ else
 		<hbox>
 			<tree id="kontakt-bankverbindung-tree" seltype="single" hidecolumnpicker="false" flex="1"
 				datasources="rdf:null" ref="http://www.technikum-wien.at/bankverbindung/liste"
-				onselect="KontakBankverbindungSelect();"
+				ondblclick="KontaktBankverbindungBearbeiten()"
 				flags="dont-build-content"
 				enableColumnDrag="true"
 				style="margin-left:10px;margin-right:10px;margin-bottom:5px;" height="100"
@@ -288,17 +293,11 @@ else
 				</template>
 			</tree>
 			<vbox>
-				<button id='kontakt-bankverbindung-neu' label='Neu' oncommand='' />
-				<button id='kontakt-bankverbindung-bearbeiten' label='Bearbeiten' oncommand='' />
-				<button id='kontakt-bankverbindung-loeschen' label='Loeschen' oncommand='' />
+				<button id="kontakt-bankverbindung-neu" label="Neu" oncommand="KontaktBankverbindungNeu()" />
+				<button id="kontakt-bankverbindung-bearbeiten" label="Bearbeiten" oncommand="KontaktBankverbindungBearbeiten()" />
+				<button id="kontakt-bankverbindung-loeschen" label="Loeschen" oncommand="KontaktBankverbindungDelete()" />
 			</vbox>
 		</hbox>
-	</groupbox>				
-
-<!--				
-<textbox id="kontakt-textbox-adresse" value="Schulgasse" />
-<button onclick="getData();" label="Show" />
-<button onclick="alert(parent.document)" label="Show" />
--->
+	</groupbox>
 </vbox>
 </window>

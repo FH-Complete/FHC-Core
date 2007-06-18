@@ -21,9 +21,9 @@
  */
 header("Content-type: application/vnd.mozilla.xul+xml");
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-include('../vilesci/config.inc.php');
-include('../include/functions.inc.php');
-include('../include/fas/benutzer.class.php');
+require_once('../vilesci/config.inc.php');
+require_once('../include/functions.inc.php');
+require_once('../include/fas/benutzer.class.php');
 
 // Testumgebung
 $user=get_uid();
@@ -40,7 +40,7 @@ if(!$benutzer->loadVariables($user))
 	$error_msg = $benutzer->errormsg;
 /*echo '<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>';*/
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
-echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css\" ?>";
+echo '<?xml-stylesheet href="'.APP_ROOT.'content/bindings.css" type="text/css" ?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
 ?>
 <!DOCTYPE window [
