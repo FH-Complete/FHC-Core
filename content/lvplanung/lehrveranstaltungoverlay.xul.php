@@ -46,7 +46,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungdetailo
 	<!-- ************************ -->
 	<vbox id="LehrveranstaltungEditor" flex="1" uid="" stg_kz="">
 		<toolbox>
-			<toolbar id="nav-toolbar">
+			<toolbar id="lehrveranstaltung-nav-toolbar">
 			<toolbarbutton id="lehrveranstaltung-toolbar-neu" label="Neue Lehreinheit" oncommand="LeNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Neue Lehreinheit anlegen" />
 			<toolbarbutton id="lehrveranstaltung-toolbar-del" label="Löschen" oncommand="LeDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Lehreinheiten löschen"/>
 			<toolbarbutton id="lehrveranstaltung-toolbar-refresh" label="Aktualisieren" oncommand="LvTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
@@ -65,6 +65,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungdetailo
 				onselect="LeAuswahl(this);"
  				persist="height"
  				onkeypress="LvTreeKeyPress(event)"
+ 				flags="dont-build-content"
 		>
 			<treecols>
 				<treecol id="lehrveranstaltung-treecol-kurzbz" label="Kurzbz" flex="2" hidden="false" primary="true"

@@ -48,7 +48,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentkontooverlay.xu
 			<vbox id="InteressentenEditor" persist="height">
 				<hbox>
 					<toolbox flex="1">
-						<toolbar id="nav-toolbar">
+						<toolbar id="interessent-nav-toolbar">
 						<toolbarbutton id="interessent-toolbar-neu" label="Neu" oncommand="InteressentNeu()" disabled="false" image="../skin/images/NeuDokument.png" tooltiptext="Interessent neu anlegen" />
 						<toolbarbutton id="interessent-toolbar-zubewerber" label="-> Bewerber" oncommand="InteressentzuBewerber()" disabled="false" tooltiptext="Interessent zum Bewerber machen" />
 						<toolbarbutton id="interessent-toolbar-zustudent" label="-> Student" oncommand="InteressentzuStudent()" disabled="false" tooltiptext="Bewerber zu Studenten machen" />
