@@ -62,6 +62,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100px" enableColumnDrag="true"
 						onselect="InteressentKontoAuswahl()"
 						context="interessent-konto-tree-popup"
+						flags="dont-build-content"
 					>
 					
 						<treecols>

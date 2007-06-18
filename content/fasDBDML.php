@@ -99,24 +99,28 @@ if(!$error)
 		//Wenn die Nation Oesterreich ist, dann muss die Gemeinde in der Tabelle Gemeinde vorkommen
 		if($_POST['nation']=='A')
 		{
-			$qry = "SELECT * FROM bis.tbl_gemeinde WHERE name='".addslashes($_POST['gemeinde'])."'";
+			$qry = "SELECT * FROM bis.tbl_gemeinde WHERE lower(name)=lower('".addslashes($_POST['gemeinde'])."')";
 			if($result = pg_query($conn, $qry))
 			{
-				if(pg_num_rows($result)==0)
+				if($row = pg_fetch_object($result))
+				{
+					$adresse->gemeinde = $row->name;	
+				}
+				else
 				{
 					$error = true;
 					$errormsg = 'Gemeinde ist ungueltig';
 					$return = false;
 				}
 			}
-			else 
+			else
 			{
 				$error = true;
 				$errormsg = 'Fehler beim Ermitteln der Gemeinde';
 				$return = false;
-			}				
+			}
 		}
-		
+
 		if(!$error)
 		{
 			if($adresse->save())
@@ -124,7 +128,7 @@ if(!$error)
 				$return = true;
 				$data = $adresse->adresse_id;
 			}
-			else 
+			else
 			{
 				$return = false;
 				$errormsg = $adresse->errormsg;
@@ -135,12 +139,12 @@ if(!$error)
 	{
 		//Loescht Adressen aus der DB
 		$adresse = new adresse($conn, null, true);
-		
+
 		if($adresse->delete($_POST['adresse_id']))
 		{
 			$return = true;
 		}
-		else 
+		else
 		{
 			$return = false;
 			$errormsg = $adresse->errormsg;
@@ -150,19 +154,19 @@ if(!$error)
 	{
 		//Speichert die Kontaktdaten in die Datenbank
 		$kontakt = new kontakt($conn, null, true);
-		
+
 		if($_POST['neu']=='false')
 		{
 			$kontakt->load($_POST['kontakt_id']);
 			$kontakt->new = false;
 		}
-		else 
+		else
 		{
 			$kontakt->insertamum = date('Y-m-d H:i:s');
 			$kontakt->insertvon = $user;
 			$kontakt->new = true;
 		}
-		
+
 		$kontakt->kontakt_id = $_POST['kontakt_id'];
 		$kontakt->person_id = $_POST['person_id'];
 		$kontakt->anmerkung = $_POST['anmerkung'];
@@ -172,13 +176,13 @@ if(!$error)
 		$kontakt->firma_id = $_POST['firma_id'];
 		$kontakt->updateamum = date('Y-m-d H:i:s');
 		$kontakt->updatevon = $user;
-		
+
 		if($kontakt->save())
 		{
 			$return = true;
 			$data = $kontakt->kontakt_id;
 		}
-		else 
+		else
 		{
 			$return = false;
 			$errormsg = $kontakt->errormsg;
@@ -188,7 +192,7 @@ if(!$error)
 	{
 		//Loescht Kontaktdaten aus der Datenbank
 		$kontakt = new kontakt($conn, null, true);
-		
+
 		if($kontakt->delete($_POST['kontakt_id']))
 		{
 			$return = true;

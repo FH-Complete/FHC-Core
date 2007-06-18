@@ -48,6 +48,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 		style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100%" enableColumnDrag="true"
 		onselect="StudentNotenAuswahl()"
 		context="student-noten-tree-popup"
+		flags="dont-build-content"
 	>
 	
 		<treecols>
@@ -115,6 +116,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 	<tree id="student-lvgesamtnoten-tree" seltype="multi" hidecolumnpicker="false" flex="1"
 		datasources="rdf:null" ref="http://www.technikum-wien.at/lvgesamtnote/liste"
 		style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100%" enableColumnDrag="true"
+		flags="dont-build-content"
 	>
 	
 		<treecols>
