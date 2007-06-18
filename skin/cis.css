@@ -138,7 +138,10 @@ TABLE#zeitsperren TH.feiertag
 {
 	background-color: #FFFF00;
 }
-
+TABLE#zeitsperren TD.feiertag
+{
+	background-color: #FFFF22;
+}
 TABLE#zeitsperren TD
 {
 	background-color: #EEEEEE
