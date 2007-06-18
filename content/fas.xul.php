@@ -222,7 +222,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
 <statusbar id="status-bar" persist="collapsed">
 	<statusbarpanel class="statusbarpanel-iconic" id="logo-icon" />
 	<statusbarpanel id="statusbarpanel-semester" label="<?php echo $semester_aktuell; ?>"/>
-	<statusbarpanel id="statusbarpanel-db_table" label="<?php echo $db_stpl_table; ?>"/>
+	<!-- <statusbarpanel id="statusbarpanel-db_table" label="<?php //echo $db_stpl_table; ?>"/> -->
 	<statusbarpanel id="statusbarpanel-text" label="<?php echo htmlspecialchars($error_msg); ?>" flex="4" crop="right" />
 	<statusbarpanel class="statusbarpanel-iconic" id="example-status" flex="1" />
 </statusbar>
