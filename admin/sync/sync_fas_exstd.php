@@ -1,7 +1,8 @@
 <?php
 	require_once('../../vilesci/config.inc.php');
-	$adress='fas_sync@technikum-wien.at';
-
+	//$adress='fas_sync@technikum-wien.at';
+	$adress='pam@technikum-wien.at';
+	
 	//mail($adress,"FAS Synchro mit VileSci","BEGIN OF SYNCHRONISATION","From: vilesci@technikum-wien.at");
 	$conn=pg_connect(CONN_STRING);
 	$conn_fas=pg_connect(CONN_STRING_FAS);
@@ -69,7 +70,7 @@
 	$text.="$update_error Fehler bei Student-Update!\r";
 	$text.="$anz_update Studenten wurden ins 10te Semester verschoben.\r";
 	$text.="\rEND OF SYNCHRONISATION\r";
-	if (mail($adress,"FAS Synchro mit VileSci (Ex-Studenten)",$text,"From: vilesci@technikum-wien.at"))
+	if (mail($adress,'FAS-Sync (Ex-Studenten) von '.$_SERVER['HTTP_HOST'],$text,"From: vilesci@technikum-wien.at"))
 		$sendmail=true;
 	else
 		$sendmail=false;

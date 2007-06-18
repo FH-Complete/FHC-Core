@@ -5,12 +5,25 @@ include('../../include/lehrstunde.class.php');
 
 $conn=pg_connect(CONN_STRING);
 $conn_fas=pg_connect(CONN_STRING_FAS);
-//$adress='fas_sync@technikum-wien.at';
 $adress='fas_sync@technikum-wien.at';
-//$adress_stpl='stpl@technikum-wien.at';
+$adress='pam@technikum-wien.at';
 $adress_stpl='lvplan@technikum-wien.at';
+$adress_stpl='pam@technikum-wien.at';
 $adress_fas='fas_sync@technikum-wien.at';
 
+if (isset($_GET['studiensemester']))
+	$ss_where="studiensemester_kurzbz='".$_GET['studiensemester']."'";
+else
+{	
+	$qry="SELECT * FROM public.tbl_studiensemester WHERE ende>now()";
+	$result=pg_query($conn, $qry);
+	$ss_where='';
+	while ($row=pg_fetch_object($result))
+	{
+		$ss_where.= ((strlen($ss_where)>0)?' or ':'')."studiensemester_kurzbz='".$row->studiensemester_kurzbz."' ";
+	}
+	if (strlen($ss_where)>0) $ss_where=" ($ss_where) ";
+}
 
 // error log für jeden Studiengang
 $error_log=array();
@@ -20,23 +33,21 @@ $missing_einheit=array();
 $missing_raumtyp=array();
 $missing_lehrform=array();
 
+function insert_sync($vilesci_id,$ext_id,$table_name,$conn)
+{
+	$qry="INSERT INTO sync.$table_name VALUES ($vilesci_id , $ext_id);";
+	if (!$result=@pg_query($conn, $qry))
+	{
+		//echo pg_result_error($result);
+		return false;
+	}
+	else
+		return true;	
+}
+
 function printLVA($row)
 {
 	return 'lvnr='.$row->lvnr.' '.$row->lv_bezeichnung;
-}
-
-function getSemesterWhereClause()
-{
-	global $conn;
-	$qry="SELECT * FROM public.tbl_studiensemester WHERE ende>now()";
-	$result=pg_query($conn, $qry);
-	$where='';
-	while ($row=pg_fetch_object($result))
-	{
-		$where.= ((strlen($where)>0)?' or ':'')."studiensemester_kurzbz='".$row->studiensemester_kurzbz."' ";
-	}
-	if (strlen($where)>0) $where=" ($where) ";
-	return $where;
 }
 
 function validate($row)
@@ -289,12 +300,11 @@ echo 'FAS-Datenbank wird abgefragt!<BR><i>';
 flush();
 
 // Start Lehrveranstaltungen Synchro
-$sql_query="SELECT DISTINCT fas_id,trim(lvnr) AS lvnr,trim(unr)::int8 AS unr,einheit_kurzbz,lektor,trim(upper(lehrfach_kurzbz)) AS lehrfach_kurzbz,
+$sql_query="SELECT DISTINCT fas_id,lehreinheit_pk,trim(lvnr) AS lvnr,trim(unr)::int8 AS unr,einheit_kurzbz,lektor,trim(upper(lehrfach_kurzbz)) AS lehrfach_kurzbz,
 			trim(upper(lehrform)) AS lehrform, lehrfach_bezeichnung, trim(upper(lv_kurzbz)) AS lv_kurzbz, lv_bezeichnung, 
 			studiengang_kz,fachbereich_id,semester,verband,gruppe,raumtyp,raumtypalternativ,
 			round(semesterstunden) AS semesterstunden,stundenblockung,wochenrythmus,start_kw,anmerkung,studiensemester_kurzbz, ects
-			FROM fas_view_alle_lehreinheiten_vilesci ".
-		   "where ".getSemesterWhereClause();
+			FROM fas_view_alle_lehreinheiten_vilesci WHERE ".$ss_where;
 //echo $sql_query."</i><br>";
 $result=pg_query($conn_fas, $sql_query);
 $num_rows=pg_num_rows($result);
@@ -404,6 +414,8 @@ for ($i=0;$i<$num_rows;$i++)
 				}
 				else 
 				{
+					// Sync-Tabelle aktualisieren
+					insert_sync($row_seq->id,$row->lehreinheit_pk,'tbl_synclehreinheit',$conn);
 					//Gruppe zuteilen
 					$sql_query = 'INSERT INTO lehre.tbl_lehreinheitgruppe(lehreinheit_id, studiengang_kz,'.
 					             ' semester, verband, gruppe, gruppe_kurzbz, updateamum, updatevon ,insertamum, insertvon, ext_id)'.
@@ -494,6 +506,8 @@ for ($i=0;$i<$num_rows;$i++)
 				if ($row->anmerkung!=$row_le->anmerkung)
 					$update_sql.=(strlen($update_sql)>0?',':'')."anmerkung='".$row->anmerkung."'";	
 				
+				insert_sync($row_le->lehreinheit_id,$row->lehreinheit_pk,'tbl_synclehreinheit',$conn);
+					
 				if (strlen($update_sql)>0)
 				{				
 					$sql_query="UPDATE lehre.tbl_lehreinheit SET ".
@@ -681,7 +695,7 @@ for ($i=0;$i<$num_rows;$i++)
 
 // ****************
 // Ueberfluessige Datensaetze loeschen
-$whereClause=getSemesterWhereClause();
+$whereClause=$ss_where;
 $sql_query="SELECT tbl_lehreinheitmitarbeiter.ext_id FROM lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit WHERE tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND $whereClause AND tbl_lehreinheitmitarbeiter.ext_id NOT IN (SELECT fas_id FROM lehre.vw_fas_lehrveranstaltung WHERE ($whereClause) AND (fas_id!=0 OR fas_id IS NOT NULL) AND ($whereClause))";
 //echo $sql_query.'<BR>';
 $anz_delete=0;
@@ -760,7 +774,7 @@ while(list($k,$v)=each($missing_lehrform))
 	$text.="  $k\n";
 }
 
-if (mail($adress,"FAS Synchro mit VileSci (Lehrveranstaltungen)",$text,"From: vilesci@technikum-wien.at"))
+if (mail($adress,"FAS-Sync (Lehreinheiten) $k von ".$_SERVER['HTTP_HOST'],$text,"From: vilesci@technikum-wien.at"))
 	$sendmail=true;
 else
 	$sendmail=false;
@@ -777,11 +791,11 @@ while(list($k,$v)=each($error_log))
 		$stg_text.="$txt\n";
 	echo $stg_text.'<br>';
 	// Studiengang
-	if (!mail($stg_mail[$k],"FAS Synchro mit Portal (Lehrveranstaltungen) $k",$stg_text,"From: vilesci@technikum-wien.at"))
+	if (!mail($stg_mail[$k],"FAS-Sync (Lehreinheiten) $k von ".$_SERVER['HTTP_HOST'],$stg_text,"From: vilesci@technikum-wien.at"))
 		echo "Mail an '".$stg_mail[$k]."' konnte nicht verschickt werden!<br>";
 	// Stundenplanstelle
 	echo "<br>Mail an Studiengang $k ($adress_stpl)<br>";
-	if (!mail($adress_stpl,"FAS Synchro mit Portal (Lehrveranstaltungen) $k",$stg_text,"From: vilesci@technikum-wien.at"))
+	if (!mail($adress_stpl,"FAS-Sync (Lehreinheiten) $k von ".$_SERVER['HTTP_HOST'],$stg_text,"From: vilesci@technikum-wien.at"))
 		echo 'Mail an "'.$adress_stpl.'" konnte nicht verschickt werden!<br>';
 
 }
@@ -799,7 +813,7 @@ if ($num_rows>0)
 		$mail_text_false.=$row->fas_id.'->'.$row->anzahl."x\n";
 $mail_text.=$mail_text_false."\n\nBitte überprüfen die Daten im FAS!!!";
 if ($mail_text_false!='')
-	if (!mail($adress_fas,"FAS Synchro mit Portal (Lehrveranstaltungen)",$mail_text,"From: vilesci@technikum-wien.at"))
+	if (!mail($adress_fas,'FAS-Sync (Lehreinheiten) von '.$_SERVER['HTTP_HOST'],$mail_text,"From: vilesci@technikum-wien.at"))
 		echo "Mail an '".$adress_fas."' konnte nicht verschickt werden!<br>";
 	else
 		echo 'Mail wurde verschickt an '.$adress_fas.'!<br>';
