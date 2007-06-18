@@ -219,7 +219,7 @@
 	
 	$text .= "<table border='1'>";
 	
-	$sqlstr = "SELECT DISTINCT student_fk FROM note where student_fk >= 1 and student_fk < 500 order by student_fk";
+	$sqlstr = "SELECT DISTINCT student_fk FROM note where student_fk >= 1 and student_fk < 200 order by student_fk";
 	if($result = pg_query($conn_fas, $sqlstr))
 	{
 		
@@ -260,6 +260,7 @@
 					
 					if($lehreinheit_id_arr = getLehreinheitID($conn_fas,$idkey))
 					{
+						$lehreinheit_id = "FEHLT";
 						foreach($lehreinheit_id_arr as $lehreinh)
 						{
 							if (key_exists($lehreinh,$lehreinheiten_sync_arr))
