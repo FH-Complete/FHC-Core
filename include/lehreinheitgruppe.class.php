@@ -341,7 +341,7 @@ class lehreinheitgruppe
 					$grp = $row->gruppe_kurzbz;
 				else
 				{
-					$qry_stg = "SELECT UPPER(typ::varchar(1) || kurzbz) as kuerzel FROM tbl_studiengang WHERE studiengang_kz='$row->studiengang_kz'";
+					$qry_stg = "SELECT UPPER(typ::varchar(1) || kurzbz) as kuerzel FROM public.tbl_studiengang WHERE studiengang_kz='$row->studiengang_kz'";
 					$result_stg = pg_query($this->conn, $qry_stg);
 					$row_stg = pg_fetch_object($result_stg);
 					$grp = $row_stg->kuerzel.$row->semester.$row->verband.$row->gruppe;

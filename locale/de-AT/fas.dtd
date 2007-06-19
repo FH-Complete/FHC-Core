@@ -51,6 +51,10 @@
 <!ENTITY menu-statistic-lvplanung.label		"LV-Planung">
 <!ENTITY menu-statistic-lvplanung.accesskey	"V">
 
+<!ENTITY menu-statistic-lehrauftragsliste.key		"A">
+<!ENTITY menu-statistic-lehrauftragsliste.label		"Lehrauftragsliste">
+<!ENTITY menu-statistic-lehrauftragsliste.accesskey	"A">
+
 <!ENTITY menu-dokumente.label		"Dokumente">
 <!ENTITY menu-dokumente.accesskey	"D">
 

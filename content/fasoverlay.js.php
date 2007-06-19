@@ -545,3 +545,25 @@ function StatistikPrintLVPlanung()
 	
 	window.open('<?php echo APP_ROOT ?>content/statistik/lvplanung.php?studiengang_kz='+studiengang_kz+'&semester='+semester,'LV-Planung');
 }
+
+// ****
+// * Erstellt ein Excel File mit der Uebersicht 
+// * ueber alle Lektoren und deren Kosten eines Studienganges
+// ****
+function StatistikPrintLehrauftragsliste()
+{
+	tree = document.getElementById('tree-verband');
+	
+	if(tree.currentIndex==-1)
+	{
+		alert('Bitte zuerst einen Studiengang auswaehlen');
+		return;
+	}
+
+	//Studiengang und Semester holen
+	var col;
+	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+	var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
+	
+	window.open('<?php echo APP_ROOT ?>content/statistik/lehrauftragsliste_gst.xls.php?studiengang_kz='+studiengang_kz,'Lehrauftragsliste');
+}

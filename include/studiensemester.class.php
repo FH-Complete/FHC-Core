@@ -276,5 +276,30 @@ class studiensemester
 			return false;
 		}
 	}
+	
+	function getNextStudiensemester()
+	{
+		$qry = "SELECT * FROM public.tbl_studiensemester where start>now() ORDER BY start LIMIT 1";
+		
+		if(!$result=pg_query($this->conn,$qry))
+		{
+			$this->errormsg = 'Fehler beim lesen des Studiensemesters';
+			return false;
+		}
+
+		if($row = pg_fetch_object($result))
+		{
+			$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+			$this->start = $row->start;
+			$this->ende = $row->ende;
+		}
+		else
+		{
+			$this->errormsg = "Es ist kein Studiensemester mit der Kurzbezeichung $studiensemester_kurzbz vorhanden";
+			return false;
+		}
+
+		return true;
+	}
 }
 ?>

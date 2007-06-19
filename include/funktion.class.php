@@ -56,7 +56,7 @@ class funktion
 	 */
 	function getAll()
 	{
-		$qry = 'SELECT * FROM tbl_funktion order by funktion_kurzbz;';
+		$qry = 'SELECT * FROM public.tbl_funktion order by funktion_kurzbz;';
 
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -90,7 +90,7 @@ class funktion
 			return false;
 		}
 
-		$qry = "SELECT * FROM tbl_funktion WHERE funktion_kurzbz = '$funktion_kurzbz';";
+		$qry = "SELECT * FROM public.tbl_funktion WHERE funktion_kurzbz = '$funktion_kurzbz';";
 
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -163,7 +163,7 @@ class funktion
 				return false;
 			}
 			//Neuen Datensatz anlegen
-			$qry = 'INSERT INTO tbl_funktion (funktion_kurzbz, beschreibung, aktiv) VALUES ('.
+			$qry = 'INSERT INTO public.tbl_funktion (funktion_kurzbz, beschreibung, aktiv) VALUES ('.
 				$this->addslashes($this->funktion_kurzbz).', '.
 				$this->addslashes($this->beschreibung).', '.
 				($this->aktiv?'true':'false').'); ';
@@ -179,7 +179,7 @@ class funktion
 				return false;
 			}
 
-			$qry = 'UPDATE tbl_funktion SET '.
+			$qry = 'UPDATE public.tbl_funktion SET '.
 				'beschreibung='.$this->addslashes($this->beschreibung).', '.
 				'aktiv='.($this->aktiv?'true':'false') .' '.
 				'WHERE funktion_kurzbz = '.$this->addslashes($this->funktion_kurzbz).';';

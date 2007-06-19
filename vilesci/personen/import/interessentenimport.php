@@ -28,6 +28,7 @@ require_once('../../../include/person.class.php');
 require_once('../../../include/prestudent.class.php');
 require_once('../../../include/kontakt.class.php');
 require_once('../../../include/adresse.class.php');
+require_once('../../../include/studiensemester.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
 	die('Fehler beim Herstellen der DB Connection');
@@ -39,7 +40,7 @@ loadVariables($conn, $user);
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
 <link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
 <script language="Javascript">
 function disablefields(obj)
@@ -103,7 +104,15 @@ $anmerkungen = (isset($_POST['anmerkungen'])?$_POST['anmerkungen']:'');
 $studiengang_kz = (isset($_POST['studiengang_kz'])?$_POST['studiengang_kz']:'');
 $person_id = (isset($_POST['person_id'])?$_POST['person_id']:'');
 $ueberschreiben = (isset($_POST['ueberschreiben'])?$_POST['ueberschreiben']:'');
+$studiensemester_kurzbz = (isset($_POST['studiensemester_kurzbz'])?$_POST['studiensemester_kurzbz']:'');
 //end Parameter
+
+if($studiensemester_kurzbz == '')
+{
+	$stsem = new studiensemester($conn);
+	$stsem->getNextStudiensemester();
+	$studiensemester_kurzbz = $stsem->studiensemester_kurzbz;
+}
 
 //Testphase fix
 if($studiengang_kz!='' && $studiengang_kz!='299')
@@ -309,7 +318,7 @@ if(isset($_POST['save']))
 
 		$rolle->prestudent_id = $prestudent->prestudent_id;
 		$rolle->rolle_kurzbz = 'Interessent';
-		$rolle->studiensemester_kurzbz = $semester_aktuell;
+		$rolle->studiensemester_kurzbz = $studiensemester_kurzbz;
 		$rolle->ausbildungssemester = 1;
 		$rolle->datum = date('Y-m-d');
 		$rolle->insertamum = date('Y-m-d H:i:s');
@@ -386,6 +395,13 @@ $stg_obj = new studiengang($conn);
 $stg_obj->getAll('typ, kurzbz');
 foreach ($stg_obj->result as $row)
 	echo '<OPTION value="'.$row->studiengang_kz.'" '.($row->studiengang_kz==$studiengang_kz?'selected':'').'>'.$row->kuerzel.'</OPTION>';
+echo '</SELECT>';
+echo '</td></tr>';
+echo '<tr><td>Studiensemester</td><td><SELECT id="studiensemester_kurzbz" name="studiensemester_kurzbz">';
+$stsem = new studiensemester($conn);
+$stsem->getAll();
+foreach ($stsem->studiensemester as $row)
+	echo '<OPTION value="'.$row->studiensemester_kurzbz.'" '.($row->studiensemester_kurzbz==$studiensemester_kurzbz?'selected':'').'>'.$row->studiensemester_kurzbz.'</OPTION>';
 echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><tr><td></td><td>';

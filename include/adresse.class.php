@@ -257,7 +257,7 @@ class adresse
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-			$qry='BEGIN;INSERT INTO tbl_adresse (person_id, name, strasse, plz, typ, ort, nation, insertamum, insertvon,
+			$qry='BEGIN;INSERT INTO public.tbl_adresse (person_id, name, strasse, plz, typ, ort, nation, insertamum, insertvon,
 			     gemeinde, heimatadresse, zustelladresse, firma_id, updateamum, updatevon, ext_id) VALUES('.
 			      $this->addslashes($this->person_id).', '.
 			      $this->addslashes($this->name).', '.

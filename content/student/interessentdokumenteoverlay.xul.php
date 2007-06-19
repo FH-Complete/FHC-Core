@@ -48,11 +48,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			<treecols>
 				<treecol id="interessent-dokumente-tree-nichtabgegeben-bezeichnung" label="Dokument" flex="1" primary="false"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/dokument/rdf#bezeichnung"  />
+					sort="rdf:http://www.technikum-wien.at/dokument/rdf#bezeichnung"  onclick="InteressentDokumenteNichtAbgegebenTreeSort()" />
 				<splitter class="tree-splitter"/>
 				<treecol id="interessent-dokumente-tree-nichtabgegeben-dokument_kurzbz" label="Kurzbezeichnung" flex="1" hidden="true"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/dokument/rdf#dokument_kurzbz"/>
+					sort="rdf:http://www.technikum-wien.at/dokument/rdf#dokument_kurzbz" onclick="InteressentDokumenteNichtAbgegebenTreeSort()"/>
 				<splitter class="tree-splitter"/>
 			</treecols>
 		
@@ -90,23 +90,23 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			<treecols>
 				<treecol id="interessent-dokumente-tree-abgegeben-bezeichnung" label="Dokument" flex="1" primary="false"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#bezeichnung"  />
+					sort="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#bezeichnung"  onclick="InteressentDokumenteAbgegebenTreeSort()" />
 				<splitter class="tree-splitter"/>
 				<treecol id="interessent-dokumente-tree-abgegeben-datum" label="Datum" flex="1" hidden="false"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#datum_iso"/>
+					sort="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#datum_iso" onclick="InteressentDokumenteAbgegebenTreeSort()"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="interessent-dokumente-tree-abgegeben-mitarbeiter_uid" label="Abgegeben bei" flex="1" hidden="true"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#mitarbeiter_uid"/>
+					sort="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#mitarbeiter_uid" onclick="InteressentDokumenteAbgegebenTreeSort()"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="interessent-dokumente-tree-abgegeben-dokument_kurzbz" label="Dokumentkurzbz" flex="1" hidden="true"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#dokument_kurzbz"/>
+					sort="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#dokument_kurzbz" onclick="InteressentDokumenteAbgegebenTreeSort()"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="interessent-dokumente-tree-abgegeben-prestudent_id" label="PrestudentID" flex="1" hidden="true"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#prestudent_id"/>
+					sort="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#prestudent_id" onclick="InteressentDokumenteAbgegebenTreeSort()"/>
 				<splitter class="tree-splitter"/>
 			</treecols>
 		

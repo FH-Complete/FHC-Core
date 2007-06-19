@@ -126,7 +126,7 @@ class aufmerksamdurch
 		{
 			//Neuen Datensatz einfuegen
 					
-			$qry='INSERT INTO tbl_aufmerksamdurch (aufmerksamdurch_kurzbz, beschreibung, ext_id) VALUES('.
+			$qry='INSERT INTO public.tbl_aufmerksamdurch (aufmerksamdurch_kurzbz, beschreibung, ext_id) VALUES('.
 			     $this->addslashes($this->aufmerksamdurch_kurzbz).', '.
 			     $this->addslashes($this->beschreibung).', '.
 			     $this->addslashes($this->ext_id).');';
@@ -134,7 +134,7 @@ class aufmerksamdurch
 		}
 		else
 		{			
-			$qryz="SELECT * FROM tbl_aufmerksamdurch WHERE aufmerksamdurch_kurzbz='$this->aufmerksamdurch_kurzbz';";
+			$qryz="SELECT * FROM public.tbl_aufmerksamdurch WHERE aufmerksamdurch_kurzbz='$this->aufmerksamdurch_kurzbz';";
 			if($resultz = pg_query($this->conn, $qryz))
 			{
 				while($rowz = pg_fetch_object($resultz))
@@ -145,7 +145,7 @@ class aufmerksamdurch
 				
 					if($update)
 					{
-						$qry='UPDATE tbl_aufmerksamdurch SET '.
+						$qry='UPDATE public.tbl_aufmerksamdurch SET '.
 							'beschreibung='.$this->addslashes($this->beschreibung).', '.
 							'ext_id='.$this->addslashes($this->ext_id).' '. 
 							'WHERE aufmerksamdurch_kurzbz='.$this->addslashes($this->aufmerksamdurch_kurzbz).';';

@@ -136,7 +136,7 @@ class konto
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden der Daten';
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
@@ -406,7 +406,7 @@ class konto
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden der Daten';
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
@@ -453,13 +453,13 @@ class konto
 				return $row->differenz*(-1);
 			else
 			{
-				$this->errormsg = 'Fehler beim ermitteln der Differenz';
+				$this->errormsg = 'Fehler beim Ermitteln der Differenz';
 				return false;
 			}
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim ermitteln der Differenz';
+			$this->errormsg = 'Fehler beim Ermitteln der Differenz';
 			return false;
 		}
 	}

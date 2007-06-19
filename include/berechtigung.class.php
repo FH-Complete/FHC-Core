@@ -162,13 +162,13 @@ class berechtigung
 
 		if($this->new)
 		{
-			$qry = 'INSERT INTO tbl_berechtigung (berechtigung_kurzbz, beschreibung)
+			$qry = 'INSERT INTO public.tbl_berechtigung (berechtigung_kurzbz, beschreibung)
 			        VALUES('.$this->addslashes($this->berechtigung_kurzbz).','.
 					$this->addslashes($this->beschreibung).');';
 		}
 		else
 		{
-			$qry = 'UPDATE tbl_berechtigung SET'.
+			$qry = 'UPDATE public.tbl_berechtigung SET'.
 			       ' beschreibung='.$this->addslashes($this->beschreibung).
 			       " WHERE berechtigung_kurzbz='".addslashes($this->berechtigung_kurzbz)."'";
 		}

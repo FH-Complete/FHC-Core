@@ -174,7 +174,7 @@ class kontakt
 		{
 			//Neuen Datensatz einfuegen
 					
-			$qry='BEGIN;INSERT INTO tbl_kontakt (person_id, firma_id, kontakttyp, anmerkung, kontakt, zustellung, ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
+			$qry='BEGIN;INSERT INTO public.tbl_kontakt (person_id, firma_id, kontakttyp, anmerkung, kontakt, zustellung, ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
 			     $this->addslashes($this->person_id).', '.
 			     $this->addslashes($this->firma_id).', '.
 			     $this->addslashes($this->kontakttyp).', '.
@@ -196,7 +196,7 @@ class kontakt
 				return false;
 			}
 			
-			$qry='UPDATE tbl_kontakt SET '.
+			$qry='UPDATE public.tbl_kontakt SET '.
 				'person_id='.$this->addslashes($this->person_id).', '. 
 				'firma_id='.$this->addslashes($this->firma_id).', '. 
 				'kontakttyp='.$this->addslashes($this->kontakttyp).', '. 
