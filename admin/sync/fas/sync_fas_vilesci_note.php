@@ -4,6 +4,8 @@
 // FAS -> VILESCI
 // setzt vorraus: - tbl_sprache
 //                - tbl_studiengang
+// einschraenkung auf student_fk per http-get:
+// sync_fas_vilesci_note.php?student_fk_von=x&student_fk_bis=y
 // **************************************
 	require_once('../../../vilesci/config.inc.php');
 	require_once('../../../include/zeugnisnote.class.php');
@@ -13,7 +15,9 @@
 
 	$conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 	$conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur Vilesci Datenbank fehlgeschlagen");
-
+	
+	$startzeit = time();
+	
 	$plausi_error=0;
 	$double_error=0;
 	
@@ -219,7 +223,25 @@
 	
 	$text .= "<table border='1'>";
 	
-	$sqlstr = "SELECT DISTINCT student_fk FROM note where student_fk >= 1 and student_fk < 200 order by student_fk";
+	//query bauen: falls http-get-einschraenkungen fuer student_fk
+	//sync_fas_vilesci_note.php?student_fk_von=x&student_fk_bis=y
+	
+	$getstr = "";
+	$sqlstr = "SELECT DISTINCT student_fk FROM note";
+	if (isset($_REQUEST["student_fk_von"]))
+		$getstr .= " student_fk >='".$_REQUEST["student_fk_von"]."'";
+	if (isset($_REQUEST["student_fk_bis"]))
+	{
+		if ($getstr != "")
+			$getstr .= " AND";
+
+		$getstr .= " student_fk <='".$_REQUEST["student_fk_bis"]."'"; 
+	}
+	if ($getstr != "")
+		$getstr = " WHERE ".$getstr;
+	
+	$sqlstr = $sqlstr.$getstr." order by student_fk";
+	
 	if($result = pg_query($conn_fas, $sqlstr))
 	{
 		
@@ -418,6 +440,7 @@
 			}
 		
 		}
+	$text .= "</table>";
 	$text .= "<hr><h3>Stats</h3><hr>";
 	$text .= "Anzahl der bearbeiteten Datens&auml;tze: ".$anz_processed."<br>";
 	$text .= "Anzahl Pr&uuml;fungseintr&auml;ge: ".$anz_processed_pruef."<br>";
@@ -426,7 +449,10 @@
 	$text .= "Anzahl Zeugniseintr&auml;ge: ".$anz_processed_zeug."<br>";
 	$text .= "Zeugnisnoten insert fehler/ok: <span style='color:red'>".$insert_error_zeug."</span>/".$anz_insert_zeug.")<br>";
 	$text .= "Zeugnisnoten update fehler/ok/noupdate: <span style='color:red'> ".$update_error_zeug."</span>/".$anz_update_zeug."/".$anz_not_updated_zeug."<br>";
-	$text .= "</table>";
+	
+	$stopzeit = time();
+	$runzeit = $stopzeit - $startzeit;
+	$text .= "Dauer: ".$runzeit." s";
 	
 	}
 ?>
