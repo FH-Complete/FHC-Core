@@ -71,7 +71,7 @@ $rechte->getBerechtigungen($user);
 //if(!$rechte->isBerechtigt('admin',$stg_kz))
 //	die("Keine Berechtigung");
 
-$xml_url=APP_ROOT.'rdf/'.$xml.$params;
+$xml_url=XML_ROOT.$xml.$params;
 //echo $xml_url;
 // Load the XML source
 $xml_doc = new DOMDocument;
