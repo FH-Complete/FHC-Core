@@ -31,6 +31,7 @@ require_once('../../vilesci/config.inc.php');
 echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes" ?>';
 
 echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungdetailoverlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenoverlay.xul.php"?>';
 ?>
 <overlay id="LehrveranstaltungOverlay"
 	xmlns:html="http://www.w3.org/1999/xhtml"
@@ -182,10 +183,12 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungdetailo
 				<tabs orient="horizontal" id="lehrveranstaltung-tabs">
 					<tab id="lehrveranstaltung-tab-detail" label="Details" />
 					<tab id="lehrveranstaltung-tab-lektor" label="Lektorenzuteilung" />
+					<tab id="lehrveranstaltung-tab-noten" label="Noten" />
 				</tabs>
 				<tabpanels id="lehrveranstaltung-tabpanels-main" flex="1">
 					<vbox id="lehrveranstaltung-detail" />
 					<vbox id="lehrveranstaltung-lektorzuteilung" />
+					<vbox id="lehrveranstaltung-noten" />
 				</tabpanels>
 			</tabbox>
 		</vbox>

@@ -73,6 +73,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
   <command id="menu-statistic-koordinatorstunden:command" oncommand="StatistikPrintKoordinatorstunden();"/>
   <command id="menu-statistic-lehrauftraege:command" oncommand="StatistikPrintLehrauftraege();"/>
   <command id="menu-statistic-lvplanung:command" oncommand="StatistikPrintLVPlanung();"/>
+  <command id="menu-statistic-lehrauftragsliste:command" oncommand="StatistikPrintLehrauftragsliste();"/>
   <command id="menu-dokumente-inskriptionsbestaetigung:command" oncommand="StudentPrintInskriptionsbestaetigung();"/>
 </commandset>
 
@@ -176,6 +177,12 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
                label     = "&menu-statistic-lvplanung.label;"
                command   =  "menu-statistic-lvplanung:command"
                accesskey = "&menu-statistic-lvplanung.accesskey;"/>
+             <menuitem
+               id        =  "menu-statistic-lehrauftragsliste"
+               key       =  "menu-statistic-lehrauftragsliste:key"
+               label     = "&menu-statistic-lehrauftragsliste.label;"
+               command   =  "menu-statistic-lehrauftragsliste:command"
+               accesskey = "&menu-statistic-lehrauftragsliste.accesskey;"/>
           </menupopup>
     </menu>
     <menu id="menu-dokumente" label="&menu-dokumente.label;" accesskey="&menu-dokumente.accesskey;">

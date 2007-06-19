@@ -892,11 +892,11 @@ if(!$error)
 			if($dokument_kurzbz!='')
 			{
 				$dok = new dokument($conn, null, null, true);
-				if($dok->load($dokument_kurzbz, $prestudent_id))
+				if($dok->load($dokument_kurzbz, $_POST['prestudent_id']))
 				{
 					if($dok->mitarbeiter_uid==$user)
 					{
-						if(!$dok->delete($dokument_kurzbz, $prestudent_id))
+						if(!$dok->delete($dokument_kurzbz, $_POST['prestudent_id']))
 						{
 							$errormsg .= "Fehler bei $dokument_kurzbz: $dok->errormsg\n";
 						}

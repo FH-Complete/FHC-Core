@@ -31,7 +31,9 @@ loadVariables($conn, $user);
 // *********** Globale Variablen *****************//
 var InteressentSelectId=null; //Interessent der nach dem Refresh markiert werden soll
 var InteressentDokumentTreeNichtabgegebenDatasource=null; //Datasource fuer Dokumenten tree
+var InteressentDokumentTreeNichtabgegebenSelectID=null; //dokument_kurzbz des zu markierenden Datensatzes
 var InteressentDokumentTreeAbgegebenDatasource=null; //Datasource fuer Dokumenten tree
+var InteressentDokumentTreeAbgegebenSelectID=null; //dokument_kurzbz des zu markierenden Datensatzes
 var InteressentDokumentTreeAbgegebenDoubleRefresh=false; // Wenn true, dann wird der rechte Dokumententree das naechste mal 2 mal hintereinander Refresht
 var InteressentDokumentTreeNichtabgegebenDoubleRefresh=false; // Wenn true, dann wird der linke Dokumententree das naechste mal 2 mal hintereinander Refresht
 var InteressentTreeLoadDataOnSelect=true; //Gibt an ob beim naechsten Select des Interessenten Trees die Daten geladen werden sollen
@@ -1081,6 +1083,84 @@ function InteressentDokumentTreeNichtabgegebenDatasourceRefresh()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	InteressentDokumentTreeNichtabgegebenDatasource.Refresh(false);	
+}
+
+function InteressentDokumentAbgegebenTreeSelect()
+{
+	var tree=document.getElementById('interessent-dokumente-tree-abgegeben');
+	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+
+	//In der globalen Variable ist der zu selektierende DS gespeichert
+	if(InteressentDokumentTreeAbgegebenSelectID!=null)
+	{		
+	   	for(var i=0;i<items;i++)
+	   	{
+	   		//Uid der row holen
+			col = tree.columns ? tree.columns["interessent-dokumente-tree-abgegeben-dokument_kurzbz"] : "interessent-dokumente-tree-abgegeben-dokument_kurzbz";
+			kurzbz=tree.view.getCellText(i,col);
+						
+			if(kurzbz == InteressentDokumentTreeAbgegebenSelectID)
+			{
+				//Zeile markieren
+				tree.view.selection.select(i);
+				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
+				tree.treeBoxObject.ensureRowIsVisible(i);
+				return true;
+			}
+	   	}
+	}
+}
+
+function InteressentDokumentNichtAbgegebenTreeSelect()
+{
+	var tree=document.getElementById('interessent-dokumente-tree-nichtabgegeben');
+	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+
+	//In der globalen Variable ist der zu selektierende DS gespeichert
+	if(InteressentDokumentTreeNichtAbgegebenSelectID!=null)
+	{		
+	   	for(var i=0;i<items;i++)
+	   	{
+	   		//Uid der row holen
+			col = tree.columns ? tree.columns["interessent-dokumente-tree-nichtabgegeben-dokument_kurzbz"] : "interessent-dokumente-tree-nichtabgegeben-dokument_kurzbz";
+			kurzbz=tree.view.getCellText(i,col);
+						
+			if(kurzbz == InteressentDokumentTreeNichtAbgegebenSelectID)
+			{
+				//Zeile markieren
+				tree.view.selection.select(i);
+				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
+				tree.treeBoxObject.ensureRowIsVisible(i);
+				return true;
+			}
+	   	}
+	}
+}
+
+function InteressentDokumenteAbgegebenTreeSort()
+{
+	var i;
+	var tree=document.getElementById('interessent-dokumente-tree-abgegeben');
+	if(tree.currentIndex>=0)
+		i = tree.currentIndex;
+	else
+		i = 0;
+	col = tree.columns ? tree.columns["interessent-dokumente-tree-abgegeben-dokument_kurzbz"] : "interessent-dokumente-tree-abgegeben-dokument_kurzbz";
+	InteressentDokumentTreeAbgegebenSelectID = tree.view.getCellText(i,col);
+	window.setTimeout("InteressentDokumentAbgegebenTreeSelect()",10);
+}
+
+function InteressentDokumenteNichtAbgegebenTreeSort()
+{
+	var i;
+	var tree=document.getElementById('interessent-dokumente-tree-nichtabgegeben');
+	if(tree.currentIndex>=0)
+		i = tree.currentIndex;
+	else
+		i = 0;
+	col = tree.columns ? tree.columns["interessent-dokumente-tree-nichtabgegeben-dokument_kurzbz"] : "interessent-dokumente-tree-abgegeben-nichtdokument_kurzbz";
+	InteressentDokumentTreeNichtAbgegebenSelectID = tree.view.getCellText(i,col);
+	window.setTimeout("InteressentDokumentNichtAbgegebenTreeSelect()",10);
 }
 
 // ***************** KONTO ****************************
