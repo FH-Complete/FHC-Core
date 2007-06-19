@@ -348,7 +348,7 @@ class konto
 		{
 			//Alle Buchungen und 'darunterliegende' holen die noch offen sind
 			$qry = "SELECT tbl_konto.*, anrede, titelpost, titelpre, nachname, vorname, vornamen
-					FROM public.tbl_konto JOIN tbl_person USING (person_id)
+					FROM public.tbl_konto JOIN public.tbl_person USING (person_id)
 					WHERE buchungsnr in (SELECT buchungsnr FROM public.tbl_konto as konto_a WHERE
 									(betrag + (SELECT CASE WHEN sum(betrag) is null THEN 0
 											            ELSE sum(betrag) END
@@ -362,7 +362,7 @@ class konto
 		}
 		else
 			$qry = "SELECT tbl_konto.*, anrede, titelpost, titelpre, nachname, vorname, vornamen
-					FROM public.tbl_konto JOIN tbl_person USING (person_id)
+					FROM public.tbl_konto JOIN public.tbl_person USING (person_id)
 					WHERE person_id='".$person_id."' ORDER BY buchungsdatum";
 
 		if($result = pg_query($this->conn, $qry))
