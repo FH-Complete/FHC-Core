@@ -6,15 +6,15 @@ include('../../include/lehrstunde.class.php');
 $conn=pg_connect(CONN_STRING);
 $conn_fas=pg_connect(CONN_STRING_FAS);
 $adress='fas_sync@technikum-wien.at';
-$adress='pam@technikum-wien.at';
+//$adress='pam@technikum-wien.at';
 $adress_stpl='lvplan@technikum-wien.at';
-$adress_stpl='pam@technikum-wien.at';
+//$adress_stpl='pam@technikum-wien.at';
 $adress_fas='fas_sync@technikum-wien.at';
 
 if (isset($_GET['studiensemester']))
 	$ss_where="studiensemester_kurzbz='".$_GET['studiensemester']."'";
 else
-{	
+{
 	$qry="SELECT * FROM public.tbl_studiensemester WHERE ende>now()";
 	$result=pg_query($conn, $qry);
 	$ss_where='';
@@ -38,11 +38,16 @@ function insert_sync($vilesci_id,$ext_id,$table_name,$conn)
 	$qry="INSERT INTO sync.$table_name VALUES ($vilesci_id , $ext_id);";
 	if (!$result=@pg_query($conn, $qry))
 	{
-		//echo pg_result_error($result);
+		$error = substr(pg_last_error($conn), 0, 25);
+		//echo '<BR>|'.trim($error).'|<BR>';
+		if  (trim($error)==trim('ERROR: Duplizierter Wert'))
+			return true;
+		else
+			//echo pg_last_error($conn);
 		return false;
 	}
 	else
-		return true;	
+		return true;
 }
 
 function printLVA($row)
@@ -206,7 +211,7 @@ function getLvId($kurzbz,$studiengang_kz,$semester,$lv_bezeichnung, $ects, $conn
 		}
 
 		// Nebenbei die ECTS Punkte kontrollieren
-		
+
 		if ($lehrveranstaltung[$kurzbz.'/'.$studiengang_kz.'/'.$semester]['ects']!=$ects)
 		{
 			if ($ects!='') //ereg("[0-9]{1,4}[\.|,][0-9]{0,2}$",$ects)
@@ -301,7 +306,7 @@ flush();
 
 // Start Lehrveranstaltungen Synchro
 $sql_query="SELECT DISTINCT fas_id,lehreinheit_pk,trim(lvnr) AS lvnr,trim(unr)::int8 AS unr,einheit_kurzbz,lektor,trim(upper(lehrfach_kurzbz)) AS lehrfach_kurzbz,
-			trim(upper(lehrform)) AS lehrform, lehrfach_bezeichnung, trim(upper(lv_kurzbz)) AS lv_kurzbz, lv_bezeichnung, 
+			trim(upper(lehrform)) AS lehrform, lehrfach_bezeichnung, trim(upper(lv_kurzbz)) AS lv_kurzbz, lv_bezeichnung,
 			studiengang_kz,fachbereich_id,semester,verband,gruppe,raumtyp,raumtypalternativ,
 			round(semesterstunden) AS semesterstunden,stundenblockung,wochenrythmus,start_kw,anmerkung,studiensemester_kurzbz, ects
 			FROM fas_view_alle_lehreinheiten_vilesci WHERE ".$ss_where;
@@ -309,9 +314,9 @@ $sql_query="SELECT DISTINCT fas_id,lehreinheit_pk,trim(lvnr) AS lvnr,trim(unr)::
 $result=pg_query($conn_fas, $sql_query);
 $num_rows=pg_num_rows($result);
 $text="Dies ist eine automatische eMail!\r\r";
-$text.="Es wurde eine Synchronisation mit FAS durchgeführt.\r";
-$text.="Anzahl der LVA vom FAS-Import: $num_rows \r";
-$text.="Anzahl der LVA in der VileSci: $vil_anz_lva \r\r";
+$text.="Es wurde eine Synchronisation mit FAS durchgeführt.($ss_where)\r";
+$text.="Anzahl der LE vom FAS-Import: $num_rows \r";
+$text.="Anzahl der LE in der VileSci: $vil_anz_lva \r\r";
 $plausi_error=0;
 $update_error=0;
 $insert_error=0;
@@ -321,7 +326,7 @@ $anz_insert=0;
 echo $num_rows.' Datensaetze<BR>';
 for ($i=0;$i<$num_rows;$i++)
 {
-	
+
 	//if ($i%100==0)
 	//{
 	//	echo '-';
@@ -412,7 +417,7 @@ for ($i=0;$i<$num_rows;$i++)
 					$insert_error++;
 					pg_query($conn,'ROLLBACK');
 				}
-				else 
+				else
 				{
 					// Sync-Tabelle aktualisieren
 					insert_sync($row_seq->id,$row->lehreinheit_pk,'tbl_synclehreinheit',$conn);
@@ -437,7 +442,7 @@ for ($i=0;$i<$num_rows;$i++)
 						$insert_error++;
 						pg_query($conn, 'ROLLBACK');
 					}
-					else 
+					else
 					{
 						//Lektor zuteilen
 						$sql_query = 'INSERT INTO lehre.tbl_lehreinheitmitarbeiter(lehreinheit_id, mitarbeiter_uid,'.
@@ -453,7 +458,7 @@ for ($i=0;$i<$num_rows;$i++)
 							$insert_error++;
 							pg_query($conn, 'ROLLBACK');
 						}
-						else 
+						else
 						{
 							pg_query($conn, 'COMMIT');
 							$anz_insert++;
@@ -461,20 +466,20 @@ for ($i=0;$i<$num_rows;$i++)
 					}
 				}
 			}
-			
-		}		
+
+		}
 		elseif ($num_rows_lva>0)// bestehende Lehreinheit
-		{	
+		{
 			$update_sql='';
 			$row_lva=pg_fetch_object($res_lva);
-			
+
 			$sql_query = "SELECT * FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$row_lva->lehreinheit_id'";
 			if(!$result_le = pg_query($conn, $sql_query))
 			{
 				$update_error++;
 				$text.="\nLehreinheit konnte nicht geladen werden: $sql_query\n";
 			}
-			else 
+			else
 			{
 				$row_le = pg_fetch_object($result_le);
 				$update=false;
@@ -486,7 +491,7 @@ for ($i=0;$i<$num_rows;$i++)
 				//if ($row->lehrfach_nr!=$row_le->lehrfach_id)
 				//	$update_sql.=(strlen($update_sql)>0?',':'')."lehrfach_nr=".$row->lehrfach_nr;
 				if ($row->lehrform!=$row_le->lehrform_kurzbz)
-					$update_sql.=(strlen($update_sql)>0?',':'')."lehrform_kurzbz='".$row->lehrform."'";	
+					$update_sql.=(strlen($update_sql)>0?',':'')."lehrform_kurzbz='".$row->lehrform."'";
 				//if ($row->studiengang_kz!=$row_le->studiengang_kz)
 				//	$update_sql.=(strlen($update_sql)>0?',':'')."studiengang_kz=".$row->studiengang_kz;
 				//if ($row->semester!=$row_le->semester)
@@ -494,7 +499,7 @@ for ($i=0;$i<$num_rows;$i++)
 				if ($row->raumtyp!=$row_le->raumtyp)
 					$update_sql.=(strlen($update_sql)>0?',':'')."raumtyp='".$row->raumtyp."'";
 				if ($row->raumtypalternativ!=$row_le->raumtypalternativ)
-					$update_sql.=(strlen($update_sql)>0?',':'')."raumtypalternativ='".$row->raumtypalternativ."'";	
+					$update_sql.=(strlen($update_sql)>0?',':'')."raumtypalternativ='".$row->raumtypalternativ."'";
 				if ($row->stundenblockung!=$row_le->stundenblockung)
 					$update_sql.=(strlen($update_sql)>0?',':'')."stundenblockung=".$row->stundenblockung;
 				if ($row->wochenrythmus!=$row_le->wochenrythmus)
@@ -504,12 +509,12 @@ for ($i=0;$i<$num_rows;$i++)
 				if ($row->studiensemester_kurzbz!=$row_le->studiensemester_kurzbz)
 					$update_sql.=(strlen($update_sql)>0?',':'')."studiensemester_kurzbz='".$row->studiensemester_kurzbz."'";
 				if ($row->anmerkung!=$row_le->anmerkung)
-					$update_sql.=(strlen($update_sql)>0?',':'')."anmerkung='".$row->anmerkung."'";	
-				
-				insert_sync($row_le->lehreinheit_id,$row->lehreinheit_pk,'tbl_synclehreinheit',$conn);
-					
+					$update_sql.=(strlen($update_sql)>0?',':'')."anmerkung='".$row->anmerkung."'";
+
+				//insert_sync($row_le->lehreinheit_id,$row->lehreinheit_pk,'tbl_synclehreinheit',$conn);
+
 				if (strlen($update_sql)>0)
-				{				
+				{
 					$sql_query="UPDATE lehre.tbl_lehreinheit SET ".
 							$update_sql.
 							" where lehreinheit_id=".$row_le->lehreinheit_id;
@@ -522,7 +527,7 @@ for ($i=0;$i<$num_rows;$i++)
 					else
 						$update=true;
 				}
-				
+
 				$sql_query = 'SELECT * FROM lehre.tbl_lehreinheitmitarbeiter'.
 				             " WHERE lehreinheit_id='$row_lva->lehreinheit_id' AND mitarbeiter_uid='$row->lektor'";
 				//echo $sql_query.'<br>';
@@ -535,7 +540,7 @@ for ($i=0;$i<$num_rows;$i++)
 						$update_sql='';
 						if ($row->semesterstunden!=$row_lektor->semesterstunden)
 							$update_sql.=(strlen($update_sql)>0?',':'')."semesterstunden=".$row->semesterstunden;
-						
+
 						if($update_sql!='')
 						{
 							$sql_query = "UPDATE lehre.tbl_lehreinheitmitarbeiter SET $update_sql".
@@ -547,11 +552,11 @@ for ($i=0;$i<$num_rows;$i++)
 								$text .=$sql_query;
 								$text.="\nFehler:".pg_errormessage($conn);
 							}
-							else 
+							else
 								$update=true;
 						}
 					}
-					else 
+					else
 					{
 						//Lehreinheitmitarbeiter Eintrag hinzufuegen
 						$sql_query = 'INSERT INTO lehre.tbl_lehreinheitmitarbeiter(lehreinheit_id, mitarbeiter_uid,'.
@@ -566,17 +571,17 @@ for ($i=0;$i<$num_rows;$i++)
 							$text.="\nFehler:".pg_errormessage($conn);
 							$update_error++;
 						}
-						else 
+						else
 							$update=true;
 					}
 				}
-				
+
 				$sql_query = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row_lva->lehreinheit_id'";
 				if($row->einheit_kurzbz!='')
 				{
 					$sql_query.=" AND gruppe_kurzbz='$row->einheit_kurzbz'";
 				}
-				else 
+				else
 				{
 					$sql_query.=" AND studiengang_kz='$row->studiengang_kz' AND semester='$row->semester'";
 					if($row->verband!='')
@@ -604,34 +609,34 @@ for ($i=0;$i<$num_rows;$i++)
 							{
 								$update=true;
 							}
-							else 
+							else
 							{
 								$text.=$sql_query;
 								$text.="\nFehler:".pg_errormessage($conn);
 								$update_error++;
-							}							
+							}
 						}
-						else 
+						else
 						{
 							if(!isset($missing_einheit[$row->einheit_kurzbz]))
 								$missing_einheit[$row->einheit_kurzbz]=1;
 						}
 					}
 				}
-				else 
-				{	
+				else
+				{
 					$text.=$sql_query;
 					$text.="\nFehler:".pg_errormessage($conn);
 					$update_error++;
 				}
-				
-			
+
+
 				if($update)
 				{
 					$text.="Die Lehreinheit fas-id=$row->fas_id lvnr=$row->lvnr unr=$row->unr wurde upgedatet.\r";
 					$anz_update++;
 				}
-				
+
 					/*
 					// ****************
 					// Auch in tbl_stundenplandev updaten
@@ -678,7 +683,7 @@ for ($i=0;$i<$num_rows;$i++)
 							if (!pg_query($conn,"COMMIT;"))
 								$text.="\rFehler: ".pg_errormessage($conn)."\r";
 					}*/
-				}			
+				}
 			}
 		// LVA kommt mehrmals vor ->Warnung
 		//elseif ($num_rows_lva>1)
@@ -702,17 +707,17 @@ $anz_delete=0;
 if($res_delete=pg_query($conn, $sql_query))
 {
 	while($row = pg_fetch_object($res_delete))
-	{		
+	{
 		$qry = "DELETE FROM lehre.tbl_lehreinheitgruppe WHERE ext_id='$row->ext_id';
 				DELETE FROM lehre.tbl_lehreinheitmitarbeiter WHERE ext_id='$row->ext_id';";
 		//$text.="Lehreinheitengruppe und Lehreinheitmitarbeiter mit FAS_ID '$row->ext_id' wird geloescht\n";
-				
+
 		if(pg_query($conn, $qry))
 		{
 			$anz_delete++;
 			$text.="Lehreinheitengruppe und Lehreinheitmitarbeiter mit FAS_ID '$row->ext_id' wurde geloescht\n";
 		}
-		else 
+		else
 		{
 			$text.=$qry;
 			$text.="\nFehler beim loeschen:".pg_errormessage($conn);"\n";
@@ -720,7 +725,7 @@ if($res_delete=pg_query($conn, $sql_query))
 	}
 }
 else
-{	
+{
 	$text.="\n".$sql_query;
     $text.="\nFehler: ".pg_errormessage($conn)."\n";
 }
@@ -817,7 +822,7 @@ if ($mail_text_false!='')
 		echo "Mail an '".$adress_fas."' konnte nicht verschickt werden!<br>";
 	else
 		echo 'Mail wurde verschickt an '.$adress_fas.'!<br>';
-		
+
 ?>
 
 <html>
