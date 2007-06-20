@@ -12,7 +12,7 @@ function get_uid()
 {
 	return strtolower(trim($_SERVER['REMOTE_USER']));
 	// fuer Testzwecke
-	//return 'pam';
+	//return 'weisss';
 }
 
 function crlf()

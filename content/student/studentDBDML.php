@@ -1170,8 +1170,8 @@ if(!$error)
 		
 		for($i=0;$i<$_POST['anzahl'];$i++)
 		{
-			$lvgesamtnote = new lvgesamtnote($conn);
-			$zeugnisnote = new zeugnisnote($conn);
+			$lvgesamtnote = new lvgesamtnote($conn, null, true);
+			$zeugnisnote = new zeugnisnote($conn, null, true);
 			
 			if($lvgesamtnote->load($_POST['lehrveranstaltung_id_'.$i], $_POST['student_uid_'.$i], $_POST['studiensemester_kurzbz_'.$i]))
 			{					
@@ -1206,6 +1206,83 @@ if(!$error)
 				$errormsg .= "\nLvGesamtNote wurde nicht gefunden";
 			}
 		}
+		if($errormsg=='')
+			$return = true;
+		else 
+			$return = false;
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='importnoten')
+	{
+		//Importiert die Noten einer Lehrveranstaltung
+		//als Parameter wird die Matrikelnummer und die Note uebergeben
+		//Die Felder sind durchnummeriert zB matrikelnummer_0, matrikelnummer_1, ...
+		//Die Anzahl der Gesamten Daten wird auch als Parameter uebergeben
+		$errormsg = '';
+		
+		for($i=0;$i<$_POST['anzahl'];$i++)
+		{
+			if($_POST['matrikelnummer_'.$i]!='')
+			{
+				$zeugnisnote = new zeugnisnote($conn, null, true);
+				$error = false;
+				if(!is_numeric($_POST['matrikelnummer_'.$i]) || !is_numeric($_POST['note_'.$i]))
+				{
+					$error = true;
+					$errormsg = "\nMatrikelnummer oder Note ist ungueltig: ".$_POST['matrikelnummer_'.$i].' - '.$_POST['note_'.$i];
+				}
+				
+				if(!$error)
+				{
+					$qry = "SELECT student_uid FROM public.tbl_student WHERE matrikelnr='".$_POST['matrikelnummer_'.$i]."'";
+					if($result = pg_query($conn, $qry))
+					{
+						if($row = pg_fetch_object($result))
+						{
+							$uid = $row->student_uid;
+						}
+						else 
+						{
+							$error = true;
+							$errormsg.="\nMatrikelnummer ".$_POST['matrikelnummer_'.$i]." wurde nicht gefunden";
+						}
+					}
+					else 
+					{
+						$error = true;
+						$errormsg.="\nFehler beim ermitteln der UID";
+					}			
+					
+					if(!$error)
+					{
+						if($zeugnisnote->load($_POST['lehrveranstaltung_id'], $uid, $semester_aktuell))
+						{
+							$zeugnisnote->new = false;
+							$zeugnisnote->updateamum = date('Y-m-d H:i:s');
+							$zeugnisnote->updatevon = $user;
+						}
+						else
+						{
+							$zeugnisnote->new = true;
+							$zeugnisnote->insertamum = date('Y-m-d H:i:s');
+							$zeugnisnote->insertvon = $user;
+							$zeugnisnote->lehrveranstaltung_id = $_POST['lehrveranstaltung_id'];
+							$zeugnisnote->student_uid = $uid;
+							$zeugnisnote->studiensemester_kurzbz = $semester_aktuell;
+						}
+						
+						$zeugnisnote->note = $_POST['note_'.$i];
+						$zeugnisnote->uebernahmedatum = date('Y-m-d H:i:s');
+						$zeugnisnote->benotungsdatum = date('Y-m-d H:i:s');
+											
+						if(!$zeugnisnote->save())
+						{
+							$errormsg .= "\n".$zeugnisnote->errormsg;
+						}
+					}
+				}
+			}
+		}
+		
 		if($errormsg=='')
 			$return = true;
 		else 

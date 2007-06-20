@@ -52,15 +52,15 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 	>
 	
 		<treecols>
-			<treecol id="lehrveranstaltung-noten-tree-student_vorname" label="vorname" flex="2" hidden="true"
+			<treecol id="lehrveranstaltung-noten-tree-student_vorname" label="Vorname" flex="2" hidden="false"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#student_vorname" />
 			<splitter class="tree-splitter"/>
-			<treecol id="lehrveranstaltung-noten-tree-student_nachname" label="Nachname" flex="2" hidden="true"
+			<treecol id="lehrveranstaltung-noten-tree-student_nachname" label="Nachname" flex="2" hidden="false"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#student_nachname" />
 			<splitter class="tree-splitter"/>
-			<treecol id="lehrveranstaltung-noten-tree-lehrveranstaltung_bezeichnung" label="Lehrveranstaltung" flex="2" hidden="false"
+			<treecol id="lehrveranstaltung-noten-tree-lehrveranstaltung_bezeichnung" label="Lehrveranstaltung" flex="2" hidden="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#lehrveranstaltung_bezeichnung"/>
 			<splitter class="tree-splitter"/>
@@ -136,7 +136,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#student_nachname"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="lehrveranstaltung-lvgesamtnoten-tree-lehrveranstaltung_bezeichnung" label="Lehrveranstaltung" flex="2" hidden="false"
+			<treecol id="lehrveranstaltung-lvgesamtnoten-tree-lehrveranstaltung_bezeichnung" label="Lehrveranstaltung" flex="2" hidden="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#lehrveranstaltung_bezeichnung"/>
 			<splitter class="tree-splitter"/>
@@ -211,7 +211,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 	</menulist>
 	<button id="lehrveranstaltung-noten-button-speichern" oncommand="LehrveranstaltungNoteSpeichern()" label="Speichern" disabled="true"/>
 	<spacer flex="1" />
-	<button id="lehrveranstaltung-noten-button-import" label="Notenimport" />
+	<button id="lehrveranstaltung-noten-button-import" label="Notenimport" oncommand="LehrveranstaltungNotenImport();" />
 </hbox>
 </vbox>
 </overlay>
