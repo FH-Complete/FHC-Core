@@ -140,3 +140,37 @@ function ConvertDateToISO(datum)
 	else
 		return '';
 }
+
+// ****
+// * Liefert die Daten aus der Zwischenablage
+// ****
+function getDataFromClipboard()
+{	
+	netscape.security.PrivilegeManager.enablePrivilege('UniversalXPConnect');
+	var clip = Components.classes["@mozilla.org/widget/clipboard;1"].getService(Components.interfaces.nsIClipboard); 
+	if (!clip) 
+		return false; 
+	var trans = Components.classes["@mozilla.org/widget/transferable;1"].createInstance(Components.interfaces.nsITransferable); 
+	if (!trans) 
+		return false; 
+	
+	trans.addDataFlavor("text/unicode");
+	
+	clip.getData(trans,clip.kGlobalClipboard); 
+	var str = new Object(); 
+	var strLength = new Object(); 
+	trans.getTransferData("text/unicode",str,strLength);
+
+	if (str) str = str.value.QueryInterface(Components.interfaces.nsISupportsString); 
+	if (str) pastetext = str.data.substring(0,strLength.value / 2);
+	
+	return pastetext;
+}
+
+// ****
+// * Liefert das Aktuelle Studiensemester
+// ****
+function getStudiensemester()
+{
+	return document.getElementById('statusbarpanel-semester').label;
+}

@@ -864,6 +864,14 @@ function StudentAuswahl()
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	kontotree.builder.rebuild();
 	
+	try
+	{
+		StudentKontoTreeDatasource.removeXMLSinkObserver(StudentKontoTreeSinkObserver);
+		kontotree.builder.removeListener(StudentKontoTreeListener);
+	}
+	catch(e)
+	{}
+	
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	StudentKontoTreeDatasource = rdfService.GetDataSource(url);
 	StudentKontoTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -902,6 +910,14 @@ function StudentAuswahl()
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	betriebsmitteltree.builder.rebuild();
 	
+	try
+	{
+		StudentBetriebsmittelTreeDatasource.removeXMLSinkObserver(StudentBetriebsmittelTreeSinkObserver);
+		betriebsmitteltree.builder.removeListener(StudentBetriebsmittelTreeListener);	
+	}
+	catch(e)
+	{}
+	
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	StudentBetriebsmittelTreeDatasource = rdfService.GetDataSource(url);
 	StudentBetriebsmittelTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -924,6 +940,14 @@ function StudentAuswahl()
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	bisiotree.builder.rebuild();
 	
+	try
+	{
+		StudentIOTreeDatasource.removeXMLSinkObserver(StudentIOTreeSinkObserver);
+		bisiotree.builder.removeListener(StudentIOTreeListener);
+	}
+	catch(e)
+	{}
+	
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	StudentIOTreeDatasource = rdfService.GetDataSource(url);
 	StudentIOTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -932,7 +956,7 @@ function StudentAuswahl()
 	StudentIOTreeDatasource.addXMLSinkObserver(StudentIOTreeSinkObserver);
 	bisiotree.builder.addListener(StudentIOTreeListener);	
 	
-	// *** Noten ***
+	// *** ZeugnisNoten ***
 	notentree = document.getElementById('student-noten-tree');
 	
 	url='<?php echo APP_ROOT;?>rdf/zeugnisnote.rdf.php?uid='+uid+"&"+gettimestamp();
@@ -946,6 +970,14 @@ function StudentAuswahl()
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	notentree.builder.rebuild();
 	
+	try 
+	{
+		StudentNotenTreeDatasource.removeXMLSinkObserver(StudentNotenTreeSinkObserver);
+		notentree.builder.removeListener(StudentNotenTreeListener);	
+	}
+	catch(e)
+	{}
+	
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	StudentNotenTreeDatasource = rdfService.GetDataSource(url);
 	StudentNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -954,7 +986,7 @@ function StudentAuswahl()
 	StudentNotenTreeDatasource.addXMLSinkObserver(StudentNotenTreeSinkObserver);
 	notentree.builder.addListener(StudentNotenTreeListener);	
 	
-	// *** Noten ***
+	// *** LvGesamtNoten ***
 	lvgesamtnotentree = document.getElementById('student-lvgesamtnoten-tree');
 	
 	url='<?php echo APP_ROOT;?>rdf/lvgesamtnote.rdf.php?uid='+uid+"&"+gettimestamp();
@@ -967,6 +999,14 @@ function StudentAuswahl()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	lvgesamtnotentree.builder.rebuild();
+	
+	try
+	{
+		StudentLvGesamtNotenTreeDatasource.removeXMLSinkObserver(StudentLvGesamtNotenTreeSinkObserver);
+		lvgesamtnotentree.builder.removeListener(StudentLvGesamtNotenTreeListener);
+	}
+	catch(e)
+	{}
 	
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	StudentLvGesamtNotenTreeDatasource = rdfService.GetDataSource(url);
@@ -1362,6 +1402,14 @@ function StudentKontoFilter()
 	
 	StudentKontoSelectBuchung = buchungsnr;
 	
+	try
+	{
+		StudentKontoTreeDatasource.removeXMLSinkObserver(StudentKontoTreeSinkObserver);
+		kontotree.builder.removeListener(StudentKontoTreeListener);	
+	}
+	catch(e)
+	{}
+	
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	StudentKontoTreeDatasource = rdfService.GetDataSource(url);
 	StudentKontoTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -1632,28 +1680,41 @@ function StudentKontoZahlungsbestaetigung()
 
 // *********** Zeugnis *****************
 
+// ****
+// * Erstellt das Zeugnis fuer einen oder mehrere Studenten
+// ****
 function StudentCreateZeugnis()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
 	tree = document.getElementById('student-tree');
 	
-	if (tree.currentIndex==-1) return;
+	//Markierte Studenten holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
 	
-	//Ausgewaehlte UID holen
-    var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-	var uid=tree.view.getCellText(tree.currentIndex,col);
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			if(!tree.view.getParentIndex(v))
+			{
+				alert('Zum Drucken der Bestaetigung bitte die oberste Buchung waehlen');
+				return false;
+			}
+			var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+			var uid=tree.view.getCellText(v,col);
+			paramList += ';'+uid;
+		}
+	}
+	//Studiensemester holen
+	var ss = getStudiensemester();
 	
-	//Studiengang holen
-	var tree_lvb = document.getElementById('tree-verband');
-	
-	col = tree_lvb.columns ? tree_lvb.columns["stg_kz"] : "stg_kz";
-	studiengang_kz=tree_lvb.view.getCellText(tree_lvb.currentIndex,col);
-	
-	col = tree_lvb.columns ? tree_lvb.columns["sem"] : "sem";
-	semester=tree_lvb.view.getCellText(tree_lvb.currentIndex,col);
-		
-	window.open('<?php echo APP_ROOT; ?>content/student/zeugnis.php?uid='+uid+'&studiengang_kz='+studiengang_kz+'&semester='+semester,'Zeugnis', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	//PDF erzeugen
+	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zeugnisnote.rdf.php&xsl=Zeugnis&uid='+paramList+'&ss='+ss,'Zeugnis', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
