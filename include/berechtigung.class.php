@@ -184,5 +184,31 @@ class berechtigung
 			return false;
 		}
 	}
+	
+	// ************************************************************
+	// * Holt alle Berechtigungen aus der Datenbank
+	// * @return true wenn erfolgreich, false im Fehlerfall
+	// ************************************************************
+	function getAll()
+	{
+		$qry = 'SELECT * FROM tbl_berechtigung';
+
+		if(!$res = pg_query($this->conn, $qry))
+		{
+			$this->errormsg = 'Datensatz konnte nicht geladen werden';
+			return false;
+		}
+
+		while($row = pg_fetch_object($res))
+		{
+			$b_obj = new berechtigung($this->conn);
+
+			$b_obj->berechtigung_kurzbz=$row->berechtigung_kurzbz;
+			$b_obj->beschreibung=$row->beschreibung;
+			
+			$this->result[] = $b_obj;
+		}
+		return true;
+	}
 }
 ?>
