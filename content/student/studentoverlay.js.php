@@ -42,6 +42,8 @@ var StudentNotenTreeDatasource; //Datasource des Noten Trees
 var StudentNotenSelectLehrveranstaltungID=null; //LehreinheitID des Noten Eintrages der nach dem Refresh markiert werden soll
 var StudentLvGesamtNotenTreeDatasource; //Datasource des Noten Trees
 var StudentLvGesamtNotenSelectLehrveranstaltungID=null; //LehreinheitID des Noten Eintrages der nach dem Refresh markiert werden soll
+var StudentPruefungTreeDatasource; //Datasource des Pruefung Trees
+var StudentPruefungSelectID=null; //ID der Pruefung die nach dem Refresh markiert werden soll
 
 // ********** Observer und Listener ************* //
 
@@ -252,6 +254,39 @@ var StudentLvGesamtNotenTreeListener =
   }
 };
 
+// ****
+// * Observer fuer Pruefung Tree
+// * startet Rebuild nachdem das Refresh
+// * der datasource fertig ist
+// ****
+var StudentPruefungTreeSinkObserver =
+{
+	onBeginLoad : function(pSink) {},
+	onInterrupt : function(pSink) {},
+	onResume : function(pSink) {},
+	onError : function(pSink, pStatus, pError) {},
+	onEndLoad : function(pSink)
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		document.getElementById('student-pruefung-tree').builder.rebuild();
+	}
+};
+
+// ****
+// * Nach dem Rebuild wird der Eintrag wieder
+// * markiert
+// ****
+var StudentPruefungTreeListener =
+{
+  willRebuild : function(builder) {  },
+  didRebuild : function(builder)
+  {
+  	  //timeout nur bei Mozilla notwendig da sonst die rows
+  	  //noch keine values haben. Ab Seamonkey funktionierts auch
+  	  //ohne dem setTimeout
+      window.setTimeout(StudentPruefungTreeSelectID,10);
+  }
+};
 // ***************** KEY Events ************************* //
 
 // ****
@@ -1016,8 +1051,38 @@ function StudentAuswahl()
 	StudentLvGesamtNotenTreeDatasource.addXMLSinkObserver(StudentLvGesamtNotenTreeSinkObserver);
 	lvgesamtnotentree.builder.addListener(StudentLvGesamtNotenTreeListener);	
 	
-	// KONTAKTE
+	// ***** KONTAKTE *****
 	document.getElementById('student-kontakt').setAttribute('src','kontakt.xul.php?person_id='+person_id);
+	
+	// ***** Pruefungen *****
+	pruefungtree = document.getElementById('student-pruefung-tree');
+	
+	url='<?php echo APP_ROOT;?>rdf/pruefung.rdf.php?student_uid='+uid+"&"+gettimestamp();
+	
+	//Alte DS entfernen
+	var oldDatasources = pruefungtree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		pruefungtree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	pruefungtree.builder.rebuild();
+	
+	try
+	{
+		StudentPruefungTreeDatasource.removeXMLSinkObserver(StudentPruefungTreeSinkObserver);
+		pruefungtree.builder.removeListener(StudentPruefungTreeListener);
+	}
+	catch(e)
+	{}
+	
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	StudentPruefungTreeDatasource = rdfService.GetDataSource(url);
+	StudentPruefungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	StudentPruefungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	pruefungtree.database.AddDataSource(StudentPruefungTreeDatasource);
+	StudentPruefungTreeDatasource.addXMLSinkObserver(StudentPruefungTreeSinkObserver);
+	pruefungtree.builder.addListener(StudentPruefungTreeListener);
 }
 
 // ****
@@ -2580,3 +2645,41 @@ function StudentNotenMove()
 		StudentNoteDetailDisableFields(true);
 	}
 }
+
+// **************** PRUEFUNG ************** //
+
+// ****
+// * Selectiert den Pruefung Eintrag nachdem der Tree
+// * rebuildet wurde.
+// ****
+function StudentPruefungTreeSelectID()
+{
+	var tree=document.getElementById('student-pruefung-tree');
+	if(tree.view)
+		var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+	else
+		return false;
+
+	//In der globalen Variable ist die zu selektierende Eintrag gespeichert
+	if(StudentPruefungSelectID!=null)
+	{		
+	   	for(var i=0;i<items;i++)
+	   	{
+	   		//ID der row holen
+			col = tree.columns ? tree.columns["student-pruefung-tree-pruefung_id"] : "student-pruefung-tree-pruefung_id";
+			var pruefung_id=tree.view.getCellText(i,col);
+
+			//wenn dies die zu selektierende Zeile
+			if(pruefung_id == StudentPruefungSelectLehrveranstaltugnID)
+			{
+				//Zeile markieren
+				tree.view.selection.select(i);
+				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
+				tree.treeBoxObject.ensureRowIsVisible(i);
+				StudentPruefungSelectID=null;
+				return true;
+			}
+	   	}
+	}
+}
+
