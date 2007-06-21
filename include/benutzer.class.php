@@ -20,6 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
+
 class benutzer extends person
 {
 	//Tabellenspalten

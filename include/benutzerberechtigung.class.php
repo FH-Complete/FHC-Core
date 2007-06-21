@@ -184,6 +184,25 @@ class benutzerberechtigung
 		}
 	}
 	
+	// ************************************************************
+	// * Speichert Benutzerberechtigung in die Datenbank
+	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	// * angelegt, ansonsten der Datensatz upgedated
+	// * @return true wenn erfolgreich, false im Fehlerfall
+	// ************************************************************
+	function delete($benutzerberechtigung_id)
+	{
+		// Berechtigungen holen
+		$sql_query="DELETE from tbl_benutzerberechtigung where benutzerberechtigung_id = '".$benutzerberechtigung_id."'";
+
+		if(!pg_query($this->conn, $sql_query))
+		{
+			$this->errormsg='Fehler beim l&ouml;schen';
+			return false;
+		}
+		return true;
+	}
+	
 	//****************************************************************************
 	// * Rueckgabewert ist ein Array mit den Ergebnissen. Bei Fehler false und die
 	// * Fehlermeldung liegt in errormsg.
@@ -191,10 +210,13 @@ class benutzerberechtigung
 	// * @param string $uid    UserID
 	// * @return variable Array mit LVA, false bei Fehler
 	// ***************************************************************************
-	function getBerechtigungen($uid)
+	function getBerechtigungen($uid,$all=false)
 	{
 		// Berechtigungen holen
-		$sql_query="SELECT * FROM public.tbl_benutzerberechtigung WHERE uid='$uid' AND (start<now() OR start IS NULL) AND (ende>now() OR ende IS NULL)";
+		$sql_query="SELECT * FROM public.tbl_benutzerberechtigung WHERE uid='$uid'";
+		if (!$all)
+			$sql_query .= " AND (start<now() OR start IS NULL) AND (ende>now() OR ende IS NULL)";
+		$sql_query .= " order by benutzerberechtigung_id";
 
 		if(!$erg=pg_query($this->conn, $sql_query))
 		{
