@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2007 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -150,31 +150,31 @@ class konto
 		$this->betrag = str_replace(',','.',$this->betrag);
 		if(!is_numeric($this->betrag))
 		{
-			$this->errormsg = 'Betrag ist ungueltig';
+			$this->errormsg = "Betrag ('".$this->betrag."') ist ungueltig bei Person '".$this->person_id."'";
 			return false;
 		}
 
 		if(!is_numeric($this->studiengang_kz))
 		{
-			$this->errormsg = 'Studiengang_kz is ungueltig';
+			$this->errormsg = "'Studiengang_kz ('".$this->studiengang_kz."') ist ungueltig bei Person '".$this->person_id."'";
 			return false;
 		}
 
 		if($this->buchungstyp_kurzbz=='')
 		{
-			$this->errormsg = 'Typ muss angegeben werden';
+			$this->errormsg = "Typ muss angegeben werden bei Person '".$this->person_id."'";
 			return false;
 		}
 
 		if(!is_numeric($this->person_id))
 		{
-			$this->errormsg = 'Person_id ist ungueltig';
+			$this->errormsg = "'Person_id ('".$this->person_id."') ist ungueltig";
 			return false;
 		}
 
 		if(!is_numeric($this->mahnspanne))
 		{
-			$this->errormsg = 'Mahnspanne muss eine gueltige Zahl sein';
+			$this->errormsg = "Mahnspanne ('".$this->mahnspanne."') muss eine gueltige Zahl sein bei Person '".$this->person_id."'";
 			return false;
 		}
 
