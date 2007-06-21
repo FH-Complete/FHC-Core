@@ -31,6 +31,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'content/bindings.css" type="text/css"?>';
+echo '<?xml-stylesheet href="../datepicker/datepicker.css" type="text/css"?>';
 ?>
 
 <window id="student-konto-neu-dialog" title="Neu"
@@ -61,8 +62,8 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/bindings.css" type="text/css"?>
 				<row>
 					<label value="Buchungsdatum" control="student-konto-neu-textbox-buchungsdatum"/>
 					<hbox>      					
-      					<box class='Datum' id="student-konto-neu-textbox-buchungsdatum" value="<?php echo date('d.m.Y');?>" />
-      					<spacer flex="1" />			
+      					<box class='Datum' id="student-konto-neu-textbox-buchungsdatum" value="<?php echo date('d.m.Y');?>"/>
+      					<spacer flex="1" />
       				</hbox>
       			</row>
       			<row>

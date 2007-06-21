@@ -1,0 +1,366 @@
+<?xml version="1.0"?>
+<bindings xmlns="http://www.mozilla.org/xbl"
+	xmlns:xbl="http://www.mozilla.org/xbl"
+	xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+	<binding id="datepicker">
+		<content>
+			<xul:datepicker-view anonid="datepicker-view" flex="1" xbl:inherits="currentyear=currentyear,currentmonth=currentmonth">
+				<xul:datepicker-calendar anonid="datepicker-calendar" xbl:inherits="currentyear=currentyear,currentmonth=currentmonth,currentday=currentday"/>
+			</xul:datepicker-view>
+		</content>
+		<implementation>
+			<property name="selection" onget="return document.getAnonymousElementByAttribute(this ,'anonid', 'datepicker-calendar');"/>
+			<property name="view" onget="return document.getAnonymousElementByAttribute(this ,'anonid', 'datepicker-view');"/>
+			<method name="updateCalendar">
+				<body><![CDATA[
+					var date = new Date(this.view.currentYear, this.view.currentMonth, 1, 0, 0, 0, 0);
+					var rows = document.getAnonymousElementByAttribute(this.selection ,"anonid", "datepicker-rows");
+					var days = rows.getElementsByTagName("datepicker-day");
+					for(var i=0; i<days.length; i++) days[i].setAttribute("value", "");
+					var sem = 0, j =0, d = 0;
+					var month = date.getMonth();
+					while(month==date.getMonth()) {
+						j = date.getDay(); // jour de la semaine; 0-6
+						d = date.getDate() // jour du mois 1-31
+						days[sem*7+j].setAttribute("value", d);
+						if(j==6) sem++;
+						date.setDate(++d);
+					}
+				]]></body>
+			</method>
+		</implementation>
+		<handlers>
+			<handler event="select"><![CDATA[
+				if(this.getAttribute("onselect")!="") try {this.getAttribute("onselect");} catch(e) {}
+				event.preventDefault();
+				event.stopPropagation();
+			]]></handler>
+			<handler event="click"><![CDATA[
+			]]></handler>
+		</handlers>
+	</binding>
+	<binding id="datepicker-month" extends="xul:label">
+		<content value=""/>
+	</binding>
+	<binding id="datepicker-year" extends="xul:label">
+		<content value=""/>
+	</binding>
+	<binding id="datepicker-day" extends="xul:label">
+		<implementation>
+			<field name="_datepicker">null</field>
+			<property name="datepicker">
+				<getter><![CDATA[
+					if(this._datepicker==null) {
+						this._datepicker = this.parentNode;
+						while(this._datepicker.localName!="datepicker") this._datepicker = this._datepicker.parentNode; 
+					}
+					return this._datepicker;
+				]]></getter>
+			</property>
+		</implementation>
+		<handlers>
+			<handler event="click" phase="target"><![CDATA[
+				var val = this.getAttribute("value");
+				if(val!="")	{
+					this.datepicker.selection.currentDay=val;
+					this.datepicker.selection.currentMonth=this.datepicker.view.currentMonth;
+					this.datepicker.selection.currentYear=this.datepicker.view.currentYear;
+				}
+				if(this.datepicker.parentNode.localName=="menupopup") this.datepicker.parentNode.hidePopup();
+				var evt = document.createEvent("HTMLEvents");
+				evt.initEvent("select", true, true);
+				this.datepicker.dispatchEvent(evt);
+				event.preventDefault();
+				event.stopPropagation();
+			]]></handler>
+		</handlers>
+	</binding>
+	<binding id="datepicker-calendar">
+		<content  currentday="" currentmonth="" currentyear="" ismonth="false" isyear="false">
+			<xul:grid flex="1">
+				<xul:columns>
+					<xul:column flex="1"/><xul:column flex="1"/><xul:column flex="1"/><xul:column flex="1"/><xul:column flex="1"/><xul:column flex="1"/><xul:column flex="1"/>
+				</xul:columns>
+				<xul:rows flex="1" anonid="datepicker-rows">
+					<xul:row>
+						<xul:label flex="1"/><xul:label flex="1"/><xul:label flex="1"/><xul:label flex="1"/>
+						<xul:label flex="1"/><xul:label flex="1"/><xul:label flex="1"/>
+					</xul:row>
+					<xul:row><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/></xul:row>
+					<xul:row><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/></xul:row>
+					<xul:row><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/></xul:row>
+					<xul:row><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/></xul:row>
+					<xul:row><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/></xul:row>
+					<xul:row><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/><xul:datepicker-day value=""/></xul:row>
+				</xul:rows>
+			</xul:grid>
+		</content>		
+		<implementation>
+			<constructor><![CDATA[
+				var today = new Date();
+				// mise a jour des label des jours
+				var j;
+				var rows = document.getAnonymousElementByAttribute(this ,"anonid", "datepicker-rows");
+				var title = rows.firstChild;
+				var labels = title.getElementsByTagName("label");
+				for(var i=0; i<7; i++) {
+					j = today.toLocaleString().split(" ")[0];
+					labels[today.getDay()].setAttribute("value", j.substring(0, 1).toUpperCase()+j.substring(1, 2)); 
+					labels[today.getDay()].setAttribute("tooltiptext", j); 
+					today.setDate(today.getDate()+1);
+				} 
+			]]></constructor>
+			<field name="_datepicker">null</field>
+			<property name="datepicker">
+				<getter><![CDATA[
+					if(this._datepicker==null) {
+						this._datepicker = this.parentNode;
+						while(this._datepicker.localName!="datepicker") this._datepicker = this._datepicker.parentNode; 
+					}
+					return this._datepicker;
+				]]></getter>
+			</property>
+			<property name="currentMonth">
+				<getter><![CDATA[
+					return this.getAttribute("currentmonth");
+				]]></getter>
+				<setter><![CDATA[
+					var today = new Date();
+					if(isNaN(val)) val = today.getMonth();
+					if(val>11) {val = 0; this.currentYear++;}
+					if(val<0) {val = 11; this.currentYear--;}
+					this.setAttribute("currentmonth", val);
+					if(val==this.datepicker.view.currentMonth) this.setAttribute("ismonth", true);
+					else this.removeAttribute("ismonth");
+				]]></setter>
+			</property>
+			<property name="currentYear">
+				<getter><![CDATA[
+					return this.getAttribute("currentyear");
+				]]></getter>
+				<setter><![CDATA[
+					var today = new Date();
+					if(isNaN(val)) val = today.getFullYear();
+					this.setAttribute("currentyear", val);
+					if(val==this.datepicker.view.currentYear) this.setAttribute("isyear", true);
+					else this.removeAttribute("isyear");
+				]]></setter>
+			</property>
+			<property name="currentDay">
+				<getter><![CDATA[
+					return this.getAttribute("currentday");
+				]]></getter>
+				<setter><![CDATA[
+					var today = new Date();
+					if(isNaN(val)) val = today.getDate();
+					this.setAttribute("currentday", val);
+				]]></setter>
+			</property>
+			<method name="isSelected">
+				<body><![CDATA[
+					return this.getDate()!=null;
+				]]></body>
+			</method>
+			<method name="getDate">
+				<body><![CDATA[
+					if(this.currentDay!=""&&this.currentMonth!=""&&this.currentYear!="") {
+						return new Date(this.currentYear, this.currentMonth, this.currentDay, 0, 0, 0, 0, 0);
+					}
+					return null;
+				]]></body>
+			</method>
+			<method name="setDate">
+				<parameter name="date"/>
+				<body><![CDATA[
+					try {
+						this.currentDay = date.getDate(); 
+						this.currentMonth = date.getMonth();
+						this.currentYear = date.getFullYear();
+					} catch(e) {}
+				]]></body>
+			</method>
+		</implementation>
+	</binding>
+	<binding id="datepicker-view">
+		<content orient="vertical" today="" currentmonth="" currentyear="" ismonth="false" isyear="false">
+			<xul:toolbox>
+				<xul:toolbar anonid="datepicker-month-toolbar">
+					<xul:datepicker-button class="previous-month" oncommand="this.parentNode.parentNode.parentNode.currentMonth--"/>
+					<xul:datepicker-button class="today" oncommand="this.parentNode.parentNode.parentNode.setDate(new Date())"/>
+					<xul:toolbaritem orient="vertical">
+						<xul:spacer flex="1"/>
+						<xul:datepicker-month/><xul:datepicker-month/><xul:datepicker-month/><xul:datepicker-month/><xul:datepicker-month/><xul:datepicker-month/><xul:datepicker-month/><xul:datepicker-month/><xul:datepicker-month/><xul:datepicker-month/><xul:datepicker-month/><xul:datepicker-month/>
+						<xul:spacer flex="1"/>
+					</xul:toolbaritem>
+					<xul:toolbarspacer width="5px"/>
+					<xul:toolbaritem>
+						<xul:vbox>
+							<xul:spacer flex="1"/>
+							<xul:datepicker-year value="" xbl:inherits="value=currentyear"/>
+							<xul:spacer flex="1"/>
+						</xul:vbox>
+						<xul:spacer width="3px"/>
+						<xul:spinbutton onclickup="this.parentNode.parentNode.parentNode.parentNode.currentYear++"
+										onclickdn="this.parentNode.parentNode.parentNode.parentNode.currentYear--"/>
+					</xul:toolbaritem>
+					<xul:toolbarspacer flex="1"/>
+					<xul:datepicker-button class="next-month" oncommand="this.parentNode.parentNode.parentNode.currentMonth++"/>
+				</xul:toolbar>
+			</xul:toolbox>
+			<children/>
+		</content>
+		<implementation>
+			<constructor><![CDATA[
+				var today = new Date();
+				document.getAnonymousElementByAttribute(this ,"class", "today").setAttribute("tooltiptext", today.toLocaleDateString()); 
+				if(this.getAttribute("currentyear")==""||isNaN(this.getAttribute("currentyear"))) this.currentYear=today.getFullYear();
+				if(this.getAttribute("currentmonth")==""||isNaN(this.getAttribute("currentmonth"))) this.currentMonth=today.getMonth();
+				this.currentYear = this.getAttribute("currentyear");
+				this.currentMonth = this.getAttribute("currentmonth");
+				this.toDay = today.getDate();
+
+				// mise a jour des label des mois
+				var m = "";
+				var tlbritem = document.getAnonymousElementByAttribute(this ,"anonid", "datepicker-month-toolbar");
+				var months = tlbritem.getElementsByTagName("datepicker-month");
+				var idx = 1;
+				today.setDate(15);
+				var fields = today.toLocaleString().split(" ");
+				if(isNaN(fields[2])) idx = 2;
+				for(var i=0; i<12; i++) {
+					m = today.toLocaleString().split(" ")[idx];
+					months[today.getMonth()].setAttribute("value", m.substring(0, 1).toUpperCase()+m.substring(1)); 
+					months[today.getMonth()].value = m.substring(0, 1).toUpperCase()+m.substring(1); 
+					today.setMonth(today.getMonth()+1);
+				} 
+				
+			]]></constructor>
+			<property name="datepicker">
+				<getter><![CDATA[
+					if(this._datepicker==null) {
+						this._datepicker = this.parentNode;
+						while(this._datepicker.localName!="datepicker") this._datepicker = this._datepicker.parentNode; 
+					}
+					return this._datepicker;
+				]]></getter>
+			</property>
+			<property name="currentMonth">
+				<getter><![CDATA[
+					return this.getAttribute("currentmonth");
+				]]></getter>
+				<setter><![CDATA[
+					var today = new Date();
+					if(isNaN(val)) val = today.getMonth();
+					if(val>11) {val = 0; this.currentYear++;}
+					if(val<0) {val = 11; this.currentYear--;}
+					this.setAttribute("currentmonth", val);
+					this.datepicker.updateCalendar();
+					if(val==today.getMonth()) this.setAttribute("ismonth", true);
+					else this.removeAttribute("ismonth");
+					if(val==this.datepicker.selection.currentMonth) this.datepicker.selection.setAttribute("ismonth", true);
+					else this.datepicker.selection.removeAttribute("ismonth");
+				]]></setter>
+			</property>
+			<property name="currentYear">
+				<getter><![CDATA[
+					return this.getAttribute("currentyear");
+				]]></getter>
+				<setter><![CDATA[
+					var today = new Date();
+					if(isNaN(val)) val = today.getFullYear();
+					this.setAttribute("currentyear", val);
+					this.datepicker.updateCalendar();
+
+					if(val==today.getFullYear()) this.setAttribute("isyear", true);
+					else this.removeAttribute("isyear");
+					if(val==this.datepicker.selection.currentYear) this.datepicker.selection.setAttribute("isyear", true);
+					else this.datepicker.selection.removeAttribute("isyear");
+				]]></setter>
+			</property>
+			<property name="toDay">
+				<getter><![CDATA[
+					return this.getAttribute("today");
+				]]></getter>
+				<setter><![CDATA[
+					var today = new Date();
+					if(isNaN(val)) val = today.getDate();
+					this.setAttribute("today", val);
+				]]></setter>
+			</property>
+			<method name="getDate">
+				<body><![CDATA[
+					if(this.toDay!=""&&this.currentMonth!=""&&this.currentYear!="") {
+						return new Date(this.currentYear, this.currentMonth, this.toDay, 0, 0, 0, 0, 0);
+					}
+					return null;
+				]]></body>
+			</method>
+			<method name="setDate">
+				<parameter name="date"/>
+				<body><![CDATA[
+					try {
+						this.toDay = date.getDate(); 
+						this.currentMonth = date.getMonth();
+						this.currentYear = date.getFullYear();
+					} catch(e) {}
+				]]></body>
+			</method>
+		</implementation>
+		<handlers>
+			<handler event="click"><![CDATA[
+				event.preventDefault();
+				event.stopPropagation();
+			]]></handler>
+		</handlers>
+	</binding>
+	<binding id="datepicker-button">
+		<content>
+			<xul:image class="toolbarbutton-icon" xbl:inherits="validate,src=image,toolbarmode,buttonstyle"/>
+		</content>
+		<implementation>
+			<constructor><![CDATA[
+				this.setAttribute("id", "spinbutton-arrow"+Math.random());
+				this.id=this.getAttribute("id");
+			]]></constructor>
+			<field name="_timer">null</field>
+			<field name="_delay">400</field>
+			<field name="id"></field>
+			<method name="_fireEvent">
+				<body><![CDATA[
+				var evt = document.createEvent("MouseEvents");
+				try {
+					evt.initMouseEvent("mousedown", true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, this);
+					this.dispatchEvent(evt);
+				} catch(e) {};
+			]]></body>
+			</method>
+		</implementation>
+		<handlers>
+			<handler event="click"><![CDATA[
+				this._delay = 400;
+				clearTimeout(this._timer);
+			]]></handler>
+			<handler event="mouseout"><![CDATA[
+				this._delay = 400;
+				clearTimeout(this._timer);
+			]]></handler>
+			<handler event="mouseup"><![CDATA[
+				this._delay = 400;
+				clearTimeout(this._timer);
+			]]></handler>
+			<handler event="mousedown" button="0"><![CDATA[
+				var evt = document.createEvent("MouseEvents");
+				try {
+					evt.initMouseEvent("action", true, true, window, 1, event.screenX, event.screenY, event.clientX, event.clientY, false, false, false, false, 0, this);
+				} catch(e) {};
+				this.dispatchEvent(evt);
+				this._timer = setTimeout("document.getElementById('"+this.id+"')._fireEvent()", this._delay);
+				if(this._delay>50) this._delay = this._delay*0.8;
+			]]></handler>
+			<handler event="action"><![CDATA[
+				var command = this.getAttribute("oncommand");
+				if(command!="") try {eval(command);} catch(e) {}
+			]]></handler>
+		</handlers>
+	</binding>
+</bindings>

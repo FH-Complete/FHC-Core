@@ -42,6 +42,7 @@ if(!$benutzer->loadVariables($user))
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'content/bindings.css" type="text/css" ?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
+echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 ?>
 <!DOCTYPE window [
 	<?php require("../locale/de-AT/fas.dtd"); ?>
@@ -225,7 +226,6 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
 	</splitter>
 	<vbox id="vbox-main" flex="15" />
 </hbox>
-
 <statusbar id="status-bar" persist="collapsed">
 	<statusbarpanel class="statusbarpanel-iconic" id="logo-icon" />
 	<statusbarpanel id="statusbarpanel-semester" label="<?php echo $semester_aktuell; ?>"/>
