@@ -1,0 +1,254 @@
+/* ::::: datepicker ::::: */
+/* :::: declarations :::: */
+@IMPORT url("../spinbutton/spinbutton.css");
+datepicker {-moz-binding: url("datepicker.xml#datepicker");}
+datepicker-month {-moz-binding: url("datepicker.xml#datepicker-month");}
+datepicker-year {-moz-binding: url("datepicker.xml#datepicker-year");}
+datepicker-day {-moz-binding: url("datepicker.xml#datepicker-day");}
+datepicker-calendar {-moz-binding: url("datepicker.xml#datepicker-calendar");}
+datepicker-view {-moz-binding: url("datepicker.xml#datepicker-view");}
+datepicker-button {-moz-binding: url("datepicker.xml#datepicker-button");}
+
+/* :::: public style :::: */
+datepicker {
+	font-family:monospace, cursive, serif, sans-serif;
+	font-size:12px;
+}
+/* partie centrale */
+datepicker-calendar {
+	background-color:#E0EAFC;
+	color:black;
+}
+/* affichage des mois */
+datepicker-month {
+	color:black;
+}
+/* affichage des années */
+datepicker-year {
+	color:black;
+}
+/* afichage des jours */
+datepicker-day {
+	color:black;
+}
+/* buttons pour revenir au mois courant */
+datepicker-button.today {
+	list-style-image:url(date.png);
+/*	list-style-image:url(calendar.png); */
+}
+
+/* buttons pour changer de mois */
+datepicker-button.previous-month {
+/*	list-style-image:url(chrome://browser/skin/Toolbar-small.png); */
+	list-style-image:url(navigation.png);
+	-moz-image-region:rect(0px 16px 16px 0px);
+}
+datepicker-button.next-month {
+/*	list-style-image:url(chrome://browser/skin/Toolbar-small.png); */
+	list-style-image:url(navigation.png);
+	-moz-image-region:rect(0px 32px 16px 16px); 
+}
+
+/* jour selectionné */
+datepicker-calendar[isyear][ismonth][currentday="1"] datepicker-day[value="1"],
+datepicker-calendar[isyear][ismonth][currentday="2"] datepicker-day[value="2"],
+datepicker-calendar[isyear][ismonth][currentday="3"] datepicker-day[value="3"],
+datepicker-calendar[isyear][ismonth][currentday="4"] datepicker-day[value="4"], 
+datepicker-calendar[isyear][ismonth][currentday="5"] datepicker-day[value="5"],
+datepicker-calendar[isyear][ismonth][currentday="6"] datepicker-day[value="6"],
+datepicker-calendar[isyear][ismonth][currentday="7"] datepicker-day[value="7"],
+datepicker-calendar[isyear][ismonth][currentday="8"] datepicker-day[value="8"], 
+datepicker-calendar[isyear][ismonth][currentday="9"] datepicker-day[value="9"],
+datepicker-calendar[isyear][ismonth][currentday="10"] datepicker-day[value="10"],
+datepicker-calendar[isyear][ismonth][currentday="11"] datepicker-day[value="11"],
+datepicker-calendar[isyear][ismonth][currentday="12"] datepicker-day[value="12"], 
+datepicker-calendar[isyear][ismonth][currentday="13"] datepicker-day[value="13"],
+datepicker-calendar[isyear][ismonth][currentday="14"] datepicker-day[value="14"],
+datepicker-calendar[isyear][ismonth][currentday="15"] datepicker-day[value="15"],
+datepicker-calendar[isyear][ismonth][currentday="16"] datepicker-day[value="16"], 
+datepicker-calendar[isyear][ismonth][currentday="17"] datepicker-day[value="17"],
+datepicker-calendar[isyear][ismonth][currentday="18"] datepicker-day[value="18"],
+datepicker-calendar[isyear][ismonth][currentday="19"] datepicker-day[value="19"],
+datepicker-calendar[isyear][ismonth][currentday="20"] datepicker-day[value="20"], 
+datepicker-calendar[isyear][ismonth][currentday="21"] datepicker-day[value="21"],
+datepicker-calendar[isyear][ismonth][currentday="22"] datepicker-day[value="22"],
+datepicker-calendar[isyear][ismonth][currentday="23"] datepicker-day[value="23"],
+datepicker-calendar[isyear][ismonth][currentday="24"] datepicker-day[value="24"], 
+datepicker-calendar[isyear][ismonth][currentday="25"] datepicker-day[value="25"],
+datepicker-calendar[isyear][ismonth][currentday="26"] datepicker-day[value="26"],
+datepicker-calendar[isyear][ismonth][currentday="27"] datepicker-day[value="27"],
+datepicker-calendar[isyear][ismonth][currentday="28"] datepicker-day[value="28"], 
+datepicker-calendar[isyear][ismonth][currentday="29"] datepicker-day[value="29"],
+datepicker-calendar[isyear][ismonth][currentday="30"] datepicker-day[value="30"],
+datepicker-calendar[isyear][ismonth][currentday="31"] datepicker-day[value="31"] {
+	color:white;
+	background-color:#005B90;
+}
+/* survol d'une date */
+datepicker-day:hover[value="1"], datepicker-day:hover[value="2"], datepicker-day:hover[value="3"], datepicker-day:hover[value="4"], datepicker-day:hover[value="5"], datepicker-day:hover[value="6"], datepicker-day:hover[value="7"],
+datepicker-day:hover[value="8"], datepicker-day:hover[value="9"], datepicker-day:hover[value="10"], datepicker-day:hover[value="11"], datepicker-day:hover[value="12"], datepicker-day:hover[value="13"], datepicker-day:hover[value="14"],
+datepicker-day:hover[value="15"], datepicker-day:hover[value="16"], datepicker-day:hover[value="17"], datepicker-day:hover[value="18"], datepicker-day:hover[value="19"], datepicker-day:hover[value="20"], datepicker-day:hover[value="21"],
+datepicker-day:hover[value="22"], datepicker-day:hover[value="23"], datepicker-day:hover[value="24"], datepicker-day:hover[value="25"], datepicker-day:hover[value="26"], datepicker-day:hover[value="27"], datepicker-day:hover[value="28"],
+datepicker-day:hover[value="29"], datepicker-day:hover[value="30"], datepicker-day:hover[value="31"] {
+	border:solid 1px lightcoral;
+	cursor:pointer;
+}
+/* jour d'aujourd'hui */
+datepicker-view[isyear][ismonth][today="1"]  datepicker-day[value="1"],
+datepicker-view[isyear][ismonth][today="2"]  datepicker-day[value="2"],
+datepicker-view[isyear][ismonth][today="3"]  datepicker-day[value="3"],
+datepicker-view[isyear][ismonth][today="4"]  datepicker-day[value="4"], 
+datepicker-view[isyear][ismonth][today="5"]  datepicker-day[value="5"],
+datepicker-view[isyear][ismonth][today="6"]  datepicker-day[value="6"],
+datepicker-view[isyear][ismonth][today="7"]  datepicker-day[value="7"],
+datepicker-view[isyear][ismonth][today="8"]  datepicker-day[value="8"], 
+datepicker-view[isyear][ismonth][today="9"]  datepicker-day[value="9"],
+datepicker-view[isyear][ismonth][today="10"] datepicker-day[value="10"],
+datepicker-view[isyear][ismonth][today="11"] datepicker-day[value="11"],
+datepicker-view[isyear][ismonth][today="12"] datepicker-day[value="12"], 
+datepicker-view[isyear][ismonth][today="13"] datepicker-day[value="13"],
+datepicker-view[isyear][ismonth][today="14"] datepicker-day[value="14"],
+datepicker-view[isyear][ismonth][today="15"] datepicker-day[value="15"],
+datepicker-view[isyear][ismonth][today="16"] datepicker-day[value="16"], 
+datepicker-view[isyear][ismonth][today="17"] datepicker-day[value="17"],
+datepicker-view[isyear][ismonth][today="18"] datepicker-day[value="18"],
+datepicker-view[isyear][ismonth][today="19"] datepicker-day[value="19"],
+datepicker-view[isyear][ismonth][today="20"] datepicker-day[value="20"], 
+datepicker-view[isyear][ismonth][today="21"] datepicker-day[value="21"],
+datepicker-view[isyear][ismonth][today="22"] datepicker-day[value="22"],
+datepicker-view[isyear][ismonth][today="23"] datepicker-day[value="23"],
+datepicker-view[isyear][ismonth][today="24"] datepicker-day[value="24"], 
+datepicker-view[isyear][ismonth][today="25"] datepicker-day[value="25"],
+datepicker-view[isyear][ismonth][today="26"] datepicker-day[value="26"],
+datepicker-view[isyear][ismonth][today="27"] datepicker-day[value="27"],
+datepicker-view[isyear][ismonth][today="28"] datepicker-day[value="28"], 
+datepicker-view[isyear][ismonth][today="29"] datepicker-day[value="29"],
+datepicker-view[isyear][ismonth][today="30"] datepicker-day[value="30"],
+datepicker-view[isyear][ismonth][today="31"] datepicker-day[value="31"] {
+	color:#E85C0B;
+}
+/* jour d'aujourd'hui selectionné */
+datepicker-view[isyear][ismonth][today="1"]  datepicker-calendar[isyear][ismonth][currentday="1"]  datepicker-day[value="1"],
+datepicker-view[isyear][ismonth][today="2"]  datepicker-calendar[isyear][ismonth][currentday="2"]  datepicker-day[value="2"],
+datepicker-view[isyear][ismonth][today="3"]  datepicker-calendar[isyear][ismonth][currentday="3"]  datepicker-day[value="3"],
+datepicker-view[isyear][ismonth][today="4"]  datepicker-calendar[isyear][ismonth][currentday="4"]  datepicker-day[value="4"], 
+datepicker-view[isyear][ismonth][today="5"]  datepicker-calendar[isyear][ismonth][currentday="5"]  datepicker-day[value="5"],
+datepicker-view[isyear][ismonth][today="6"]  datepicker-calendar[isyear][ismonth][currentday="6"]  datepicker-day[value="6"],
+datepicker-view[isyear][ismonth][today="7"]  datepicker-calendar[isyear][ismonth][currentday="7"]  datepicker-day[value="7"],
+datepicker-view[isyear][ismonth][today="8"]  datepicker-calendar[isyear][ismonth][currentday="8"]  datepicker-day[value="8"], 
+datepicker-view[isyear][ismonth][today="9"]  datepicker-calendar[isyear][ismonth][currentday="9"]  datepicker-day[value="9"],
+datepicker-view[isyear][ismonth][today="10"] datepicker-calendar[isyear][ismonth][currentday="10"] datepicker-day[value="10"],
+datepicker-view[isyear][ismonth][today="11"] datepicker-calendar[isyear][ismonth][currentday="11"] datepicker-day[value="11"],
+datepicker-view[isyear][ismonth][today="12"] datepicker-calendar[isyear][ismonth][currentday="12"] datepicker-day[value="12"], 
+datepicker-view[isyear][ismonth][today="13"] datepicker-calendar[isyear][ismonth][currentday="13"] datepicker-day[value="13"],
+datepicker-view[isyear][ismonth][today="14"] datepicker-calendar[isyear][ismonth][currentday="14"] datepicker-day[value="14"],
+datepicker-view[isyear][ismonth][today="15"] datepicker-calendar[isyear][ismonth][currentday="15"] datepicker-day[value="15"],
+datepicker-view[isyear][ismonth][today="16"] datepicker-calendar[isyear][ismonth][currentday="16"] datepicker-day[value="16"], 
+datepicker-view[isyear][ismonth][today="17"] datepicker-calendar[isyear][ismonth][currentday="17"] datepicker-day[value="17"],
+datepicker-view[isyear][ismonth][today="18"] datepicker-calendar[isyear][ismonth][currentday="18"] datepicker-day[value="18"],
+datepicker-view[isyear][ismonth][today="19"] datepicker-calendar[isyear][ismonth][currentday="19"] datepicker-day[value="19"],
+datepicker-view[isyear][ismonth][today="20"] datepicker-calendar[isyear][ismonth][currentday="20"] datepicker-day[value="20"], 
+datepicker-view[isyear][ismonth][today="21"] datepicker-calendar[isyear][ismonth][currentday="21"] datepicker-day[value="21"],
+datepicker-view[isyear][ismonth][today="22"] datepicker-calendar[isyear][ismonth][currentday="22"] datepicker-day[value="22"],
+datepicker-view[isyear][ismonth][today="23"] datepicker-calendar[isyear][ismonth][currentday="23"] datepicker-day[value="23"],
+datepicker-view[isyear][ismonth][today="24"] datepicker-calendar[isyear][ismonth][currentday="24"] datepicker-day[value="24"], 
+datepicker-view[isyear][ismonth][today="25"] datepicker-calendar[isyear][ismonth][currentday="25"] datepicker-day[value="25"],
+datepicker-view[isyear][ismonth][today="26"] datepicker-calendar[isyear][ismonth][currentday="26"] datepicker-day[value="26"],
+datepicker-view[isyear][ismonth][today="27"] datepicker-calendar[isyear][ismonth][currentday="27"] datepicker-day[value="27"],
+datepicker-view[isyear][ismonth][today="28"] datepicker-calendar[isyear][ismonth][currentday="28"] datepicker-day[value="28"], 
+datepicker-view[isyear][ismonth][today="29"] datepicker-calendar[isyear][ismonth][currentday="29"] datepicker-day[value="29"],
+datepicker-view[isyear][ismonth][today="30"] datepicker-calendar[isyear][ismonth][currentday="30"] datepicker-day[value="30"],
+datepicker-view[isyear][ismonth][today="31"] datepicker-calendar[isyear][ismonth][currentday="31"] datepicker-day[value="31"] {
+	color:yellow;
+	background-color:#005B90;
+}
+
+
+/* moi courant */
+datepicker-view[isyear][ismonth] datepicker-month {
+	font-weight:bold;
+}
+/* année courante */
+datepicker-view[isyear] datepicker-year {
+	font-weight:bold;
+}
+/* colonne des dimanches */
+datepicker columns column:first-child {
+	background-color:gainsboro;
+	border-right:solid gray 1px;
+}
+/* colonne des lundi */
+datepicker columns column:first-child + column {
+}
+/* colonne des mardis */
+datepicker columns column:first-child + column + column {
+}
+/* colonne des mercredis */
+datepicker columns column:first-child + column + column + column {
+}
+/* colonne des jeudis */
+datepicker columns column:first-child + column + column + column + column {
+}
+/* colonne des vendredi */
+datepicker columns column:first-child + column + column + column + column + column {
+}
+/* colonne des samedis */
+datepicker columns column:first-child + column + column + column + column + column + column {
+	border-left:solid gray 1px;
+}
+/* affichage des jours */
+rows[anonid="datepicker-rows"] row:first-child {
+	font-weight:bold;
+	background-color:linen;
+	color:#005B90;
+}
+
+/* :::: private style :::: */
+datepicker-button {
+	background-color:transparent;
+	-moz-appearance:toolbarbutton;
+	padding:3px;
+	-moz-box-pack:center;
+	-moz-box-align:center;
+	opacity:1.0 !important;
+}
+
+datepicker {
+	margin:0px;
+	padding:0px;
+	text-align:center;
+	cursor:default;
+}
+datepicker-month {
+	text-align:right;
+	width:65px;
+	display:none;
+}
+datepicker-day {
+	border:solid 1px transparent;
+}
+rows[anonid="datepicker-rows"] row:first-child {
+	border-bottom:solid gray 1px;
+	height:25px;
+	padding-top:3px;
+}
+/* mois affiché */
+datepicker-view[currentmonth="0"] spacer:first-child + datepicker-month, 
+datepicker-view[currentmonth="1"] spacer:first-child + datepicker-month + datepicker-month,
+datepicker-view[currentmonth="2"] spacer:first-child + datepicker-month + datepicker-month + datepicker-month, 
+datepicker-view[currentmonth="3"] spacer:first-child + datepicker-month + datepicker-month + datepicker-month + datepicker-month, 
+datepicker-view[currentmonth="4"] spacer:first-child + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month, 
+datepicker-view[currentmonth="5"] spacer:first-child + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month, 
+datepicker-view[currentmonth="6"] spacer:first-child + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month, 
+datepicker-view[currentmonth="7"] spacer:first-child + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month, 
+datepicker-view[currentmonth="8"] spacer:first-child + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month, 
+datepicker-view[currentmonth="9"] spacer:first-child + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month, 
+datepicker-view[currentmonth="10"] spacer:first-child + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month, 
+datepicker-view[currentmonth="11"] spacer:first-child + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month + datepicker-month {
+	display:-moz-box;
+}
+
+
+
+
+

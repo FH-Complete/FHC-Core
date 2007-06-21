@@ -358,7 +358,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       						<textbox id="student-prestudent-textbox-zgvort" disabled="true" maxlength="64"/>
       						<label value="ZGV Datum" control="student-prestudent-textbox-zgvdatum"/>
       						<hbox>
-      							<box class='Datum' id="student-prestudent-textbox-zgvdatum" />
+      							<box class='Datum' id="student-prestudent-textbox-zgvdatum" disabled="true"/>
       							<!--<textbox id="student-prestudent-textbox-zgvdatum" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/>-->
       						</hbox>
     					</row>
@@ -379,7 +379,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       						<textbox id="student-prestudent-textbox-zgvmasterort" disabled="true" maxlength="64"/>
       						<label value="ZGV Master Datum" control="student-prestudent-textbox-zgvmasterdatum"/>
       						<hbox>
-      							<box class='Datum' id="student-prestudent-textbox-zgvmasterdatum" />
+      							<box class='Datum' id="student-prestudent-textbox-zgvmasterdatum" disabled="true"/>
       							<!--<textbox id="student-prestudent-textbox-zgvmasterdatum" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/>-->
       						</hbox>
     					</row>
@@ -401,7 +401,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     					<row>
     						<label value="Anmeldung zum Reihungstest am" control="student-prestudent-textbox-anmeldungreihungstest"/>
       						<hbox>
-      							<box class="Datum" id="student-prestudent-textbox-anmeldungreihungstest" />
+      							<box class="Datum" id="student-prestudent-textbox-anmeldungreihungstest" disabled="true"/>
       							<!--<textbox id="student-prestudent-textbox-zgvmasterdatum" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/>-->
       							<button id="student-prestudent-button-anmeldungreihungstest-heute" label="Heute" oncommand="StudentAnmeldungreihungstestHeute()" disabled="true" style="margin:0px;"/>
       						</hbox>
