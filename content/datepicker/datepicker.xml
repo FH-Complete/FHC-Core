@@ -184,7 +184,7 @@
 	<binding id="datepicker-view">
 		<content orient="vertical" today="" currentmonth="" currentyear="" ismonth="false" isyear="false">
 			<xul:toolbox>
-				<xul:toolbar anonid="datepicker-month-toolbar">
+				<xul:toolbar anonid="datepicker-month-toolbar" grippyhidden="true">
 					<xul:datepicker-button class="previous-month" oncommand="this.parentNode.parentNode.parentNode.currentMonth--"/>
 					<xul:datepicker-button class="today" oncommand="this.parentNode.parentNode.parentNode.setDate(new Date())"/>
 					<xul:toolbaritem orient="vertical">
