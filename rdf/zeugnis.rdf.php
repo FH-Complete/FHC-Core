@@ -73,7 +73,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	
 	//Daten holen
 	
-	$xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n";
+	$xml = "<?xml version='1.0' encoding='ISO-8859-15' standalone='yes'?>\n";
 	$xml .= "<zeugnisse>";
 	
 	for ($i = 0; $i < sizeof($uid_arr); $i++)
@@ -82,7 +82,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		
 	$query = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.bezeichnung, tbl_studentlehrverband.semester, tbl_person.vorname, tbl_person.nachname,tbl_person.gebdatum FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer, tbl_studentlehrverband WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_student.student_uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id and tbl_student.student_uid = '".$uid_arr[$i]."' and tbl_studentlehrverband.student_uid=tbl_student.student_uid and tbl_studentlehrverband.studiensemester_kurzbz = '".$studiensemester_kurzbz."'";
 		if($result = pg_query($conn, $query))
-				$row = pg_fetch_object($result);
+		{
+				if(!$row = pg_fetch_object($result))
+					die('Student not found');
+		}
 		else
 			die('Student not found');
 		
