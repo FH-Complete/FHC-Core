@@ -28,6 +28,7 @@ class pruefung
 	var $errormsg;					// string
 	var $result = array();			// pruefung Objekt
 
+	var $pruefung_id;
 	var $lehreinheit_id;			// integer
 	var $student_uid;				// varchar(16)
 	var $mitarbeiter_uid;			// varchar(16)
@@ -42,6 +43,7 @@ class pruefung
 	var $ext_id;					// bigint
 
 	var $lehrveranstaltung_bezeichnung;
+	var $lehrveranstaltung_id;
 	var $note_bezeichnung;
 	var $pruefungstyp_beschreibung;
 	
@@ -79,20 +81,21 @@ class pruefung
 	// * @param pruefung_id ID
 	// * @return true wenn ok, false im Fehlerfall
 	// *****************************************************
-	function load($pruefung_kz)
+	function load($pruefung_id)
 	{
-		if(!is_numeric($pruefung_kz))
+		if(!is_numeric($pruefung_id))
 		{
-			$this->errormsg = 'pruefung_kz muss eine gueltige Zahl sein';
+			$this->errormsg = 'pruefung_id muss eine gueltige Zahl sein';
 			return false;
 		}
 
-		$qry = "SELECT * FROM lehre.tbl_pruefung WHERE pruefung_id=$pruefung_id";
+		$qry = "SELECT tbl_pruefung.*, tbl_lehreinheit.lehrveranstaltung_id FROM lehre.tbl_pruefung JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) WHERE pruefung_id=$pruefung_id";
 
 		if($res = pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($res))
 			{
+				$this->pruefung_id = $row->pruefung_id;
 				$this->lehreinheit_id=$row->lehreinheit_id;
 				$this->student_uid=$row->student_uid;
 				$this->mitarbeiter_uid=$row->mitarbeiter_uid;
@@ -105,6 +108,7 @@ class pruefung
 				$this->updateamum=$row->updateamum;
 				$this->updatevon=$row->updatevon;
 				$this->ext_id=$row->ext_id;
+				$this->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 			}
 		}
 		else
@@ -314,7 +318,7 @@ class pruefung
 	// *****************************************
 	function getPruefungen($student_uid)
 	{
-		$qry = "SELECT tbl_pruefung.*, tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, 
+		$qry = "SELECT tbl_pruefung.*, tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
 				tbl_note.bezeichnung as note_bezeichnung, tbl_pruefungstyp.beschreibung as typ_beschreibung
 				FROM lehre.tbl_pruefung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_note, lehre.tbl_pruefungstyp
 				WHERE student_uid='".addslashes($student_uid)."' 
@@ -322,7 +326,7 @@ class pruefung
 				AND tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
 				AND tbl_pruefung.note = tbl_note.note
 				AND tbl_pruefung.pruefungstyp_kurzbz=tbl_pruefungstyp.pruefungstyp_kurzbz
-				ORDER BY datum";
+				ORDER BY datum DESC";
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
@@ -344,6 +348,7 @@ class pruefung
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->lehrveranstaltung_bezeichnung = $row->lehrveranstaltung_bezeichnung;
+				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 				
 				$this->result[] = $obj;
 			}

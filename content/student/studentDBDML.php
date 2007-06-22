@@ -48,6 +48,7 @@ require_once('../../include/betriebsmittelperson.class.php');
 require_once('../../include/bisio.class.php');
 require_once('../../include/zeugnisnote.class.php');
 require_once('../../include/lvgesamtnote.class.php');
+require_once('../../include/pruefung.class.php');
 
 $user = get_uid();
 
@@ -1288,6 +1289,77 @@ if(!$error)
 		else 
 			$return = false;
 	}
+	elseif(isset($_POST['type']) && $_POST['type']=='deletepruefung')  // **** PRUEFUNGEN **** //
+	{
+		//Loescht einen Pruefungs Eintrag
+		if(isset($_POST['pruefung_id']) && is_numeric($_POST['pruefung_id']))
+		{
+			$pruefung = new pruefung($conn);
+
+			if($pruefung->delete($_POST['pruefung_id']))
+			{
+				$return = true;
+			}
+			else 
+			{
+				$errormsg = $pruefung->errormsg;
+				$return = false;
+			}
+		}
+		else 
+		{
+			$return = false;
+			$errormsg  = 'Fehlerhafte Parameteruebergabe';
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='savepruefung')  // **** PRUEFUNGEN **** //
+	{
+		$pruefung = new pruefung($conn, null, null);
+		
+		if($_POST['neu']=='false')
+		{
+			if($pruefung->load($_POST['pruefung_id']))
+			{
+				$pruefung->new = false;
+			}
+			else 
+			{
+				$error = true;
+				$return = false;
+				$errormsg = $pruefung->errormsg;
+			}
+		}
+		else 
+		{
+			$pruefung->new = true;
+			$pruefung->insertamum = date('Y-m-d H:i:s');
+			$pruefung->insertvon = $user;
+		}
+		
+		$pruefung->lehreinheit_id = $_POST['lehreinheit_id'];
+		$pruefung->student_uid = $_POST['student_uid'];
+		$pruefung->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
+		$pruefung->note = $_POST['note'];
+		$pruefung->pruefungstyp_kurzbz = $_POST['pruefungstyp_kurzbz'];
+		$pruefung->datum = $_POST['datum'];
+		$pruefung->anmerkung = $_POST['anmerkung'];
+		$pruefung->updateamum = date('Y-m-d H:i:s');
+		$pruefung->updatevon = $user;
+		
+		if(!$error)
+		{
+			if($pruefung->save())
+			{
+				$return = true;
+				$data = $pruefung->pruefung_id;
+			}
+			else 
+			{
+				$return = false;
+				$errormsg = $pruefung->errormsg;
+			}
+		}			
+	}
 	else
 	{
 		$return = false;
@@ -1295,8 +1367,7 @@ if(!$error)
 		$data = '';
 	}
 }
-?>
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <RDF:RDF
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	xmlns:NC="http://home.netscape.com/NC-rdf#"
@@ -1305,10 +1376,11 @@ if(!$error)
   <RDF:Seq RDF:about="http://www.technikum-wien.at/dbdml/msg">
 	<RDF:li>
     	<RDF:Description RDF:about="http://www.technikum-wien.at/dbdml/0" >
-    		<DBDML:return><?php echo ($return?'true':'false'); ?></DBDML:return>
-        	<DBDML:errormsg><![CDATA[<?php echo $errormsg; ?>]]></DBDML:errormsg>
-        	<DBDML:data><![CDATA[<?php echo $data ?>]]></DBDML:data>
+    		<DBDML:return>'.($return?'true':'false').'</DBDML:return>
+        	<DBDML:errormsg><![CDATA['.$errormsg.']]></DBDML:errormsg>
+        	<DBDML:data><![CDATA['.$data.']]></DBDML:data>
         </RDF:Description>
 	</RDF:li>
   </RDF:Seq>
-</RDF:RDF>
+</RDF:RDF>';
+?>

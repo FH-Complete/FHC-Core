@@ -22,6 +22,9 @@
 
 class mitarbeiter extends benutzer
 {
+	var $new;
+	var $errormsg;
+	var $result=array();
 
     //Tabellenspalten
 	var $ausbildungcode;	//integer
@@ -45,15 +48,18 @@ class mitarbeiter extends benutzer
 	{
 		$this->conn = $conn;
 
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-		if(!pg_query($conn,$qry))
+		if($unicode!=null)
 		{
-			$this->errormsg= "Encoding konnte nicht gesetzt werden\n";
-			return false;
+			if($unicode)
+				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			else
+				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+	
+			if(!pg_query($conn,$qry))
+			{
+				$this->errormsg= "Encoding konnte nicht gesetzt werden\n";
+				return false;
+			}
 		}
 
 		//Mitarbeiter laden
@@ -421,6 +427,47 @@ class mitarbeiter extends benutzer
 			$result[]=$l;
 		}
 		return $result;
+	}
+	
+	// ******************************************
+	// * Laedt alle Mitarbeiter einer Lehreinheit
+	// * @param lehreinheit_id
+	// * @return true wenn ok, false wenn Fehler
+	// ******************************************
+	function getMitarbeiterFromLehreinheit($lehreinheit_id)
+	{
+		if(!is_numeric($lehreinheit_id))
+		{
+			$this->errormsg = 'Lehreinheit_id ist ungueltig';
+			return false;
+		}
+		
+		$qry = "SELECT uid, vorname, vornamen, nachname, titelpre, titelpost, kurzbz FROM lehre.tbl_lehreinheitmitarbeiter JOIN campus.vw_mitarbeiter ON(mitarbeiter_uid=uid) 
+				WHERE lehreinheit_id='$lehreinheit_id'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$obj = new mitarbeiter($this->conn, null, null);
+				
+				$obj->uid = $row->uid;
+				$obj->vorname = $row->vorname;
+				$obj->nachname = $row->nachname;
+				$obj->titelpre = $row->titelpre;
+				$obj->titelpost = $row->titelpost;
+				$obj->kurzbz = $row->kurzbz;
+				$obj->vornamen = $row->vornamen;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
 	}
 }
 ?>
