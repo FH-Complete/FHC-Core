@@ -105,16 +105,21 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$obj = new zeugnisnote($conn, null, null, null, true);
 		
 		$obj->getZeugnisnoten($lehrveranstaltung_id=null, $uid_arr[$i], $studiensemester_kurzbz);
-		
+
 		foreach ($obj->result as $row)	
 		{
+			if ($row->note)
+				$note = $note_arr[$row->note];
+			else
+				$note = "";
 			$xml .= "			<unterrichtsfach>";
 			$xml .= "				<bezeichnung>".$row->lehrveranstaltung_bezeichnung."</bezeichnung>";
-			$xml .= "				<note>".$note_arr[$row->note]."</note>";
+			$xml .= "				<note>".$note."</note>";
 			$xml .= "				<sws>".$row->semesterstunden."</sws>";
 			$xml .= "				<ects>".$row->ects."</ects>";
 			$xml .= "			</unterrichtsfach>";
 		}
+
 		$xml .= "	</zeugnis>";
 	}
 	$xml .= "</zeugnisse>";
