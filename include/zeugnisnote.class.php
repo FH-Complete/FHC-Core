@@ -284,6 +284,7 @@ class zeugnisnote
 
 		$qry = "SELECT vw_student_lehrveranstaltung.lehrveranstaltung_id, uid,
 					   vw_student_lehrveranstaltung.studiensemester_kurzbz, note, uebernahmedatum, benotungsdatum,
+					   vw_student_lehrveranstaltung.ects, vw_student_lehrveranstaltung.semesterstunden,
 					   tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum,
 					   tbl_zeugnisnote.insertvon, tbl_zeugnisnote.ext_id,
 					   vw_student_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung,
@@ -300,7 +301,7 @@ class zeugnisnote
 				WHERE true $where
 				UNION
 				SELECT lehre.tbl_lehrveranstaltung.lehrveranstaltung_id,student_uid AS uid,studiensemester_kurzbz, note,
-					uebernahmedatum, benotungsdatum, tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum,
+					uebernahmedatum, benotungsdatum,lehre.tbl_lehrveranstaltung.ects,lehre.tbl_lehrveranstaltung.semesterstunden, tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum,
 					tbl_zeugnisnote.insertvon, tbl_zeugnisnote.ext_id, lehre.tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung,
 					tbl_note.bezeichnung as note_bezeichnung, tbl_zeugnisnote.bemerkung as bemerkung
 				FROM
@@ -329,6 +330,8 @@ class zeugnisnote
 				$obj->note_bezeichnung = $row->note_bezeichnung;
 				$obj->lehrveranstaltung_bezeichnung = $row->lehrveranstaltung_bezeichnung;
 				$obj->bemerkung = $row->bemerkung;
+				$obj->semesterstunden = $row->semesterstunden;
+				$obj->ects = $row->ects;
 
 				$this->result[] = $obj;
 			}

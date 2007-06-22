@@ -1,0 +1,123 @@
+<?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *			Gerald Raab <gerald.raab@technikum-wien.at>.
+ */
+
+// header für no cache
+//header("Cache-Control: no-cache");
+//header("Cache-Control: post-check=0, pre-check=0",false);
+//header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+//header("Pragma: no-cache");
+// content type setzen
+header("Content-type: application/xhtml+xml");
+require_once('../vilesci/config.inc.php');
+require_once('../include/functions.inc.php');
+require_once('../include/zeugnisnote.class.php');
+require_once('../include/datum.class.php');
+require_once('../include/note.class.php');
+
+// Datenbank Verbindung
+if (!$conn = pg_pconnect(CONN_STRING))
+   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
+
+//$user = get_uid();
+//loadVariables($conn, $user);
+$datum = new datum();
+
+if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
+{
+
+	if(isset($_GET['uid']))
+		$uid = $_GET['uid'];
+	else 
+		$uid = null;
+	
+	$uid_arr = explode(";",$uid);
+
+	if ($uid_arr[0] == "")
+	{
+		unset($uid_arr[0]);
+		$uid_arr = array_values($uid_arr);
+	}
+	
+	$note_arr = array();
+	$note = new note($conn);
+	$note->getAll();
+	foreach ($note->result as $n)
+		$note_arr[$n->note] = $n->anmerkung;
+	
+	if(isset($_GET['ss']))
+		$studiensemester_kurzbz = $_GET['ss'];
+	else 
+		$studiensemester_kurzbz = $semester_aktuell;
+	
+	//$rdf_url='http://www.technikum-wien.at/zeugnisnote';
+	
+	//Daten holen
+	
+	$xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n";
+	$xml .= "<zeugnisse>";
+	
+	for ($i = 0; $i < sizeof($uid_arr); $i++)
+	{
+		
+		
+	$query = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.bezeichnung, tbl_studentlehrverband.semester, tbl_person.vorname, tbl_person.nachname,tbl_person.gebdatum FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer, tbl_studentlehrverband WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_student.student_uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id and tbl_student.student_uid = '".$uid_arr[$i]."' and tbl_studentlehrverband.student_uid=tbl_student.student_uid and tbl_studentlehrverband.studiensemester_kurzbz = '".$studiensemester_kurzbz."'";
+		if($result = pg_query($conn, $query))
+				$row = pg_fetch_object($result);
+		else
+			die('Student not found');
+		
+		$stgl_query = "SELECT titelpre, titelpost, vorname, nachname FROM tbl_person, tbl_benutzer, tbl_benutzerfunktion WHERE tbl_person.person_id = tbl_benutzer.person_id and tbl_benutzer.uid = tbl_benutzerfunktion.uid and tbl_benutzerfunktion.funktion_kurzbz = 'stgl' and tbl_benutzerfunktion.studiengang_kz = '".$row->studiengang_kz."'";
+		if($stgl_result = pg_query($conn, $stgl_query))
+				$stgl_row = pg_fetch_object($stgl_result);
+		else
+			die('Stgl not found');
+		$xml .= "	<zeugnis>";
+		$xml .= "		<studiensemester>".$studiensemester_kurzbz."</studiensemester>";
+		$xml .=	"		<semester>".$row->semester."</semester>";
+		$xml .= "		<studiengang>".$row->bezeichnung."</studiengang>";
+		$xml .= "		<studiengang_kz>".$row->studiengang_kz."</studiengang_kz>";
+		$xml .= "		<vorname>".$row->vorname."</vorname>";
+		$xml .= "		<nachname>".$row->nachname."</nachname>";
+		$xml .= "		<gebdatum>".$row->gebdatum."</gebdatum>";
+		$xml .= "		<matrikelnr>".$row->matrikelnr."</matrikelnr>";
+		$xml .= "		<studiengangsleiter>".$stgl_row->titelpre." ".$stgl_row->vorname." ".$stgl_row->nachname."</studiengangsleiter>";
+		
+		$obj = new zeugnisnote($conn, null, null, null, true);
+		
+		$obj->getZeugnisnoten($lehrveranstaltung_id=null, $uid_arr[$i], $studiensemester_kurzbz);
+		
+		foreach ($obj->result as $row)	
+		{
+			$xml .= "			<unterrichtsfach>";
+			$xml .= "				<bezeichnung>".$row->lehrveranstaltung_bezeichnung."</bezeichnung>";
+			$xml .= "				<note>".$note_arr[$row->note]."</note>";
+			$xml .= "				<sws>".$row->semesterstunden."</sws>";
+			$xml .= "				<ects>".$row->ects."</ects>";
+			$xml .= "			</unterrichtsfach>";
+		}
+		$xml .= "	</zeugnis>";
+	}
+	$xml .= "</zeugnisse>";
+	echo $xml;
+}
+?>
