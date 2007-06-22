@@ -1,0 +1,23 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+<HTML>
+
+<HEAD>
+	<title>Zutrittskarten</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<link href="../../skin/cis.css" rel="stylesheet" type="text/css">
+</HEAD>
+
+<BODY>
+	<h1>Zutrittskarten</h1>
+	Hier werden die gesamten Daten des Zutrittskartensystem importiert und ein entsprechendes File für den Datenableich exportiert.
+	<h2>Import</h2>
+	Das File f&uuml;r den Import muss folgende Attribute beinhalten (Reihenfolge beachten):<BR>
+	(Key)	(Name)	(FirstName)	(Group)	(LogAswNumber)	(PhysAswNumber)	(ValidStart)	(ValidEnd)	(Text1)	(Text2)	(Text3)	(Text4)	(Text5)	(Text6)	(PIN)<BR><BR>
+	<form action="import.php" method="POST" enctype="multipart/form-data">
+	<input type="file" name="datei">
+	<input type="submit" value="importieren">
+	</form>
+
+</BODY>
+
+</HTML>
