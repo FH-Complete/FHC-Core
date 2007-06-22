@@ -703,6 +703,7 @@ function StudentAuswahl()
 			StudentIODisableFields(false);
 			StudentNoteDisableFields(false);
 			document.getElementById('student-detail-button-save').disabled=false;
+			StudentPruefungDisableFileds(false);
 		}
 		else
 		{
@@ -1779,7 +1780,7 @@ function StudentCreateZeugnis()
 	var ss = getStudiensemester();
 	
 	//PDF erzeugen
-	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zeugnisnote.rdf.php&xsl=Zeugnis&uid='+paramList+'&ss='+ss,'Zeugnis', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zeugnis.rdf.php&xsl=Zeugnis&uid='+paramList+'&ss='+ss,'Zeugnis', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
@@ -2683,3 +2684,140 @@ function StudentPruefungTreeSelectID()
 	}
 }
 
+// ****
+// * De-/Aktiviert die Pruefungsfelder
+// ****
+function StudentPruefungDisableFileds(val)
+{
+	document.getElementById('student-pruefung-button-neu').disabled = val;
+	document.getElementById('student-pruefung-button-loeschen').disabled= val;
+	
+	if(val)
+		StudentPruefungDetailDisableFields(val);
+}
+
+// ****
+// * De-/Aktiviert die PruefungsDetailFelder
+// ****
+function StudentPruefungDetailDisableFields(val)
+{
+	document.getElementById('student-pruefung-menulist-lehrveranstaltung').disabled=val;
+	document.getElementById('student-pruefung-menulist-lehreinheit').disabled=val;
+	document.getElementById('student-pruefung-menulist-mitarbeiter').disabled=val;
+	document.getElementById('student-pruefung-menulist-typ').disabled=val;
+	document.getElementById('student-pruefung-menulist-note').disabled=val;
+	document.getElementById('student-pruefung-textbox-datum').disabled=val;
+	document.getElementById('student-pruefung-textbox-anmerkung').disabled=val;
+	document.getElementById('student-pruefung-button-speichern').disabled=val;
+}
+
+// ****
+// * Loescht eine Pruefung
+// ****
+function StudentPruefungDelete()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-pruefung-tree');
+
+	if (tree.currentIndex==-1) 
+	{
+		alert('Bitte zuerst einen Eintrag markieren');
+		return;
+	}
+	
+	//Ausgewaehlte Nr holen
+    var col = tree.columns ? tree.columns["student-pruefung-tree-pruefung_id"] : "student-pruefung-tree-pruefung_id";
+	var pruefung_id=tree.view.getCellText(tree.currentIndex,col);
+	
+	if(confirm('Diesen Eintrag wirklich loeschen?'))
+	{
+		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+		var req = new phpRequest(url,'','');
+		
+		req.add('type', 'deletepruefung');
+		
+		req.add('pruefung_id', pruefung_id);
+			
+		var response = req.executePOST();
+	
+		var val =  new ParseReturnValue(response)
+		
+		if (!val.dbdml_return)
+		{
+			if(val.dbdml_errormsg=='')
+				alert(response)
+			else
+				alert(val.dbdml_errormsg)
+		}
+		else
+		{			
+			StudentPruefungTreeDatasource.Refresh(false); //non blocking
+			SetStatusBarText('Daten wurden geloescht');
+			StudentPruefungDetailDisableFields(true);
+		}
+	}
+}
+
+// ****
+// * Aktiviert die Felder um eine Neue Pruefung anzulegen
+// ****
+function StudentPruefungNeu()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	StudentPruefungDetailDisableFields(false);
+	
+	var verband_tree=document.getElementById('tree-verband');
+	
+	document.getElementById('student-pruefung-checkbox-neu').checked=true;
+	
+	var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
+	var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+	col = verband_tree.columns ? verband_tree.columns["sem"] : "sem";
+	var sem=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+	
+	//Lehrveranstaltung Drop Down laden
+	var LVDropDown = document.getElementById('student-pruefung-menulist-lehrveranstaltung');
+	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&sem="+sem+"&"+gettimestamp();
+	
+	//Alte DS entfernen
+	var oldDatasources = LVDropDown.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		LVDropDown.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	LVDropDown.builder.rebuild();
+	
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var datasource = rdfService.GetDataSource(url);
+	LVDropDown.database.AddDataSource(datasource);
+}
+
+// ****
+// * Wenn die Lehrvernastaltung der Pruefung geaendert wird, dann wird die Liste der Lehreinheiten neu geladen
+// ****
+function StudentPruefungLVAChange()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	
+	var lvid = document.getElementById('student-pruefung-menulist-lehrveranstaltung').value;
+	var stsem = getStudiensemester();
+	
+	//Lehreinheiten Drop Down laden
+	var LEDropDown = document.getElementById('student-pruefung-menulist-lehreinheit');
+	url='<?php echo APP_ROOT;?>rdf/lehreinheit.rdf.php?lehrveranstaltung_id='+lvid+"&studiensemester_kurzbz="+stsem+"&"+gettimestamp();
+	
+	//Alte DS entfernen
+	var oldDatasources = LEDropDown.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		LEDropDown.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	LEDropDown.builder.rebuild();
+	
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var datasource = rdfService.GetDataSource(url);
+	LEDropDown.database.AddDataSource(datasource);
+	debug('url:'+url);
+}
