@@ -500,26 +500,5 @@ class lehrveranstaltung
 			return false;
 		}
 	}
-	
-	// *****************************************
-	// * Erstellt das XML File fuers Zeugnis
-	// * @param $uid
-	// *****************************************
-	function generateZeugnisXML($uid)
-	{
-		$qry = "SELECT * FROM lehre.tbl_zeugnisnote JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) WHERE student_uid='".addslashes($uid)."' ORDER BY bezeichnung";
-		$xml = '<?xml version="1.0" encoding="ISO-8859-15" ?><zeugnis>';
-		if($result = pg_query($this->conn, $qry))
-		{
-			while($row = pg_fetch_object($result))
-			{
-				$xml.='<lehreinheit typ="lehreinheit">
-							<titel>'.$row->titel.'</titel>
-						</lehreinheit>'; 
-			}
-		}
-		$xml.='</zeugnis>';
-		return $xml;
-	}
 }
 ?>

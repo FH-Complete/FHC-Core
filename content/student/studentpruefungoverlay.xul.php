@@ -60,8 +60,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<treecols>
 							<treecol id="student-pruefung-tree-datum" label="Datum" flex="2" hidden="false" primary="true"
 								class="sortDirectionIndicator"
-								sortActive="true"
-								sortDirection="ascending"
 								sort="rdf:http://www.technikum-wien.at/pruefung/rdf#datum_iso"/>
 							<splitter class="tree-splitter"/>
 							<treecol id="student-pruefung-tree-lehreinheit_bezeichnung" label="Lehreinheit" flex="5" hidden="false"
@@ -124,6 +122,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<vbox hidden="true">
 							<label value="Pruefung_id" control="student-pruefung-textbox-pruefung_id"/>
 							<textbox id="student-pruefung-textbox-pruefung_id" disabled="true"/>
+							<label value="Neu" control="student-pruefung-checkbox-neu"/>
+							<checkbox id="student-pruefung-checkbox-neu" disabled="true" checked="false"/>
 						</vbox>
 						<groupbox id="student-pruefung-groupbox" flex="1">
 						<caption label="Details"/>
@@ -137,7 +137,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										<label value="Lehrveranstaltung" control="student-pruefung-menulist-lehrveranstaltung"/>
 										<menulist id="student-pruefung-menulist-lehrveranstaltung" disabled="true"
 										          datasources="rdf:null" flex="1"
-										          ref="http://www.technikum-wien.at/lehrveranstaltung/liste" >
+										          ref="http://www.technikum-wien.at/lehrveranstaltung/liste" 
+										          oncommand="StudentPruefungLVAChange()">
 											<template>
 												<menupopup>
 													<menuitem value="rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#lehrveranstaltung_id"
@@ -151,7 +152,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										<label value="Lehreinheit" control="student-pruefung-menulist-lehreinheit"/>
 										<menulist id="student-pruefung-menulist-lehreinheit" disabled="true"
 										          datasources="rdf:null" flex="1"
-										          ref="http://www.technikum-wien.at/lehreinheit/liste" >
+										          ref="http://www.technikum-wien.at/lehreinheit/liste" 
+										          oncommand="StudentPruefungLEChange()">
 											<template>
 												<menupopup>
 													<menuitem value="rdf:http://www.technikum-wien.at/lehreinheit/rdf#lehreinheit_id"
@@ -168,8 +170,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										          ref="http://www.technikum-wien.at/mitarbeiter/liste" >
 											<template>
 												<menupopup>
-													<menuitem value="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#mitarbeiter_uid"
-										        		      label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#bezeichnung"
+													<menuitem value="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"
+										        		      label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname"
 													  		  uri="rdf:*"/>
 													</menupopup>
 											</template>
@@ -178,12 +180,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<row>
 										<label value="Typ" control="student-pruefung-menulist-typ"/>
 										<menulist id="student-pruefung-menulist-typ" disabled="true"
-										          datasources="rdf:null" flex="1"
+										          datasources="<?php echo APP_ROOT; ?>rdf/pruefungstyp.rdf.php" flex="1"
 										          ref="http://www.technikum-wien.at/pruefungstyp/liste" >
 											<template>
 												<menupopup>
-													<menuitem value="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#pruefungstyp_kurzbz"
-										        		      label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#beschreibung"
+													<menuitem value="rdf:http://www.technikum-wien.at/pruefungstyp/rdf#pruefungstyp_kurzbz"
+										        		      label="rdf:http://www.technikum-wien.at/pruefungstyp/rdf#beschreibung"
 													  		  uri="rdf:*"/>
 													</menupopup>
 											</template>
@@ -192,7 +194,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<row>
 										<label value="Note" control="student-pruefung-menulist-note"/>
 										<menulist id="student-pruefung-menulist-note" disabled="true"
-										          datasources="rdf:null" flex="1"
+										          datasources="<?php echo APP_ROOT; ?>rdf/note.rdf.php" flex="1"
 										          ref="http://www.technikum-wien.at/note/liste" >
 											<template>
 												<menupopup>

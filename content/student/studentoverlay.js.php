@@ -1140,17 +1140,17 @@ function StudentPrestudentSave()
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 	anmerkung = document.getElementById('student-prestudent-textbox-anmerkung').value;
 	
-	if(zgvdatum!='' && !CheckDate(zgvdatum))
+	if(zgvdatum!='' && !CheckDatum(zgvdatum))
 	{
 		alert('ZGV Datum ist ungueltig');
 		return false;
 	}
-	if(zgvmasterdatum!='' && !CheckDate(zgvmasterdatum))
+	if(zgvmasterdatum!='' && !CheckDatum(zgvmasterdatum))
 	{
 		alert('ZGVMaster Datum ist ungueltig');
 		return false;
 	}
-	if(anmeldungreihungstest!='' && !CheckDate(anmeldungreihungstest))
+	if(anmeldungreihungstest!='' && !CheckDatum(anmeldungreihungstest))
 	{
 		alert('ReihungstestDatum ist ungueltig');
 		return false;
@@ -2819,5 +2819,213 @@ function StudentPruefungLVAChange()
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var datasource = rdfService.GetDataSource(url);
 	LEDropDown.database.AddDataSource(datasource);
-	debug('url:'+url);
+}
+
+
+// ****
+// * Wenn die Lehrvernastaltung der Pruefung geaendert wird, dann wird die Liste der Lehreinheiten neu geladen
+// ****
+function StudentPruefungLEChange()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	
+	var leid = document.getElementById('student-pruefung-menulist-lehreinheit').value;
+		
+	//Lehreinheiten Drop Down laden
+	var MADropDown = document.getElementById('student-pruefung-menulist-mitarbeiter');
+	url='<?php echo APP_ROOT;?>rdf/mitarbeiter.rdf.php?lehreinheit_id='+leid+"&"+gettimestamp();
+	
+	//Alte DS entfernen
+	var oldDatasources = MADropDown.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		MADropDown.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	MADropDown.builder.rebuild();
+	
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var datasource = rdfService.GetDataSource(url);
+	MADropDown.database.AddDataSource(datasource);
+}
+
+// ****
+// * Speichert die Pruefung
+// ****
+function StudentPruefungDetailSpeichern()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	
+	lehreinheit_id = document.getElementById('student-pruefung-menulist-lehreinheit').value;
+	mitarbeiter_uid = document.getElementById('student-pruefung-menulist-mitarbeiter').value;
+	pruefungstyp_kurzbz = document.getElementById('student-pruefung-menulist-typ').value;
+	note = document.getElementById('student-pruefung-menulist-note').value;
+	datum = document.getElementById('student-pruefung-textbox-datum').value;
+	anmerkung = document.getElementById('student-pruefung-textbox-anmerkung').value;
+	neu = document.getElementById('student-pruefung-checkbox-neu').checked;
+	pruefung_id = document.getElementById('student-pruefung-textbox-pruefung_id').value;
+	
+	var tree = document.getElementById('student-tree');
+
+	if (tree.currentIndex==-1) 
+	{
+		alert('Student muss ausgewaehlt sein');
+		return;
+	}
+    var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+	var student_uid=tree.view.getCellText(tree.currentIndex,col);
+		
+	if(datum!='' && !CheckDatum(datum))
+	{
+		alert('Datum ist ungueltig');
+		return false;
+	}
+	
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+	
+	req.add('type', 'savepruefung');
+		
+	req.add('lehreinheit_id', lehreinheit_id);
+	req.add('mitarbeiter_uid', mitarbeiter_uid);
+	req.add('pruefungstyp_kurzbz', pruefungstyp_kurzbz);
+	req.add('note', note);
+	req.add('datum', datum);
+	req.add('anmerkung', anmerkung);
+	req.add('neu', neu);
+	req.add('pruefung_id', pruefung_id);	
+	req.add('student_uid', student_uid);
+			
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+	
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+	}
+	else
+	{			
+		StudentPruefungSelectID=val.dbdml_data;	
+		StudentPruefungTreeDatasource.Refresh(false); //non blocking
+		SetStatusBarText('Daten wurden gespeichert');
+		StudentPruefungDetailDisableFields(true);
+	}
+}
+
+// ****
+// * Laedt eine Pruefung zum Bearbeiten
+// ****
+function StudentPruefungAuswahl()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-pruefung-tree');
+
+	if (tree.currentIndex==-1) return;
+
+	StudentPruefungDetailDisableFields(false);
+	document.getElementById('student-pruefung-checkbox-neu').checked=false;
+	
+	//Ausgewaehlte Nr holen
+    var col = tree.columns ? tree.columns["student-pruefung-tree-pruefung_id"] : "student-pruefung-tree-pruefung_id";
+	var pruefung_id=tree.view.getCellText(tree.currentIndex,col);
+	
+	//Daten holen
+	var url = '<?php echo APP_ROOT ?>rdf/pruefung.rdf.php?pruefung_id='+pruefung_id+'&'+gettimestamp();
+		
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
+                   getService(Components.interfaces.nsIRDFService);
+    
+    var dsource = rdfService.GetDataSourceBlocking(url);
+    
+	var subject = rdfService.GetResource("http://www.technikum-wien.at/pruefung/" + pruefung_id);
+
+	var predicateNS = "http://www.technikum-wien.at/pruefung/rdf";
+
+	//Daten holen
+	
+	lehreinheit_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehreinheit_id" ));
+	lehrveranstaltung_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehrveranstaltung_id" ));
+	mitarbeiter_uid = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#mitarbeiter_uid" ));
+	note = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#note" ));
+	pruefungstyp_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#pruefungstyp_kurzbz" ));
+	datum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#datum" ));
+	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
+	
+	
+	var verband_tree=document.getElementById('tree-verband');
+	
+	var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
+	var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+	col = verband_tree.columns ? verband_tree.columns["sem"] : "sem";
+	var sem=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+	
+	//Lehrveranstaltung Drop Down laden
+	var LVDropDown = document.getElementById('student-pruefung-menulist-lehrveranstaltung');
+	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&sem="+sem+"&"+gettimestamp();
+	
+	//Alte DS entfernen
+	var oldDatasources = LVDropDown.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		LVDropDown.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	LVDropDown.builder.rebuild();
+	
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var datasource = rdfService.GetDataSourceBlocking(url);
+	LVDropDown.database.AddDataSource(datasource);
+	
+	debug('Lehrveranstaltung geladen:'+url);
+	
+	var stsem = getStudiensemester();
+	
+	//Lehreinheiten Drop Down laden
+	var LEDropDown = document.getElementById('student-pruefung-menulist-lehreinheit');
+	url='<?php echo APP_ROOT;?>rdf/lehreinheit.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+"&studiensemester_kurzbz="+stsem+"&"+gettimestamp();
+	
+	//Alte DS entfernen
+	var oldDatasources = LEDropDown.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		LEDropDown.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	LEDropDown.builder.rebuild();
+	
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var datasource = rdfService.GetDataSourceBlocking(url);
+	LEDropDown.database.AddDataSource(datasource);
+	
+	debug('Lehreinheit geladen');
+	
+	//Lehreinheiten Drop Down laden
+	var MADropDown = document.getElementById('student-pruefung-menulist-mitarbeiter');
+	url='<?php echo APP_ROOT;?>rdf/mitarbeiter.rdf.php?lehreinheit_id='+lehreinheit_id+"&"+gettimestamp();
+	
+	//Alte DS entfernen
+	var oldDatasources = MADropDown.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		MADropDown.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	MADropDown.builder.rebuild();
+	
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var datasource = rdfService.GetDataSourceBlocking(url);
+	MADropDown.database.AddDataSource(datasource);
+	debug('Mitarbeiter geladen');
+	
+	document.getElementById('student-pruefung-menulist-lehrveranstaltung').value=lehrveranstaltung_id;
+	document.getElementById('student-pruefung-menulist-lehreinheit').value=lehreinheit_id;
+	document.getElementById('student-pruefung-menulist-mitarbeiter').value=mitarbeiter_uid;
+	document.getElementById('student-pruefung-menulist-typ').value=pruefungstyp_kurzbz;
+	document.getElementById('student-pruefung-menulist-note').value=note;
+	document.getElementById('student-pruefung-textbox-datum').value=datum;
+	document.getElementById('student-pruefung-textbox-anmerkung').value=anmerkung;
 }

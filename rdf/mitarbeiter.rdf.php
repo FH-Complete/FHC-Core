@@ -25,7 +25,7 @@ header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
-header("Content-type: application/vnd.mozilla.xul+xml");
+header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
 // DAO
@@ -64,104 +64,127 @@ if (isset($_GET['user']))
 	$user=$_GET['user'];
 else
 	$user=false;
+if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id']))
+	$lehreinheit_id = $_GET['lehreinheit_id'];
+else 	
+	$lehreinheit_id=null;
 
 // Mitarbeiter holen
 $mitarbeiter=new mitarbeiter($conn);
-
-$ma=$mitarbeiter->getMitarbeiter($lektor,$fixangestellt,$stg_kz,$fachbereich_id);
-
-$stg_obj = new studiengang($conn);
-$stg_obj->getAll();
-foreach ($stg_obj->result as $stg)
-	$stg_arr[$stg->studiengang_kz]=$stg->kuerzel;
-
 $rdf_url='http://www.technikum-wien.at/mitarbeiter/';
-?>
 
+echo '
 <RDF:RDF
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:MITARBEITER="<?php echo $rdf_url; ?>rdf#"
+	xmlns:MITARBEITER="'.$rdf_url.'rdf#"
 >
-
-<?php
-$alle='';
-foreach ($ma as $mitarbeiter)
-{
-	?>
-
-      	<RDF:Description about="<?php echo $rdf_url.$mitarbeiter->uid; ?>" >
-        	<MITARBEITER:uid><?php echo $mitarbeiter->uid; ?></MITARBEITER:uid>
-    		<MITARBEITER:titelpre><?php echo $mitarbeiter->titelpre; ?></MITARBEITER:titelpre>
-    		<MITARBEITER:titelpost><?php echo $mitarbeiter->titelpost; ?></MITARBEITER:titelpost>
-    		<MITARBEITER:vornamen><?php echo $mitarbeiter->vornamen; ?></MITARBEITER:vornamen>
-    		<MITARBEITER:vorname><?php echo $mitarbeiter->vorname; ?></MITARBEITER:vorname>
-    		<MITARBEITER:nachname><?php echo $mitarbeiter->nachname; ?></MITARBEITER:nachname>
-    		<MITARBEITER:kurzbz><?php echo $mitarbeiter->kurzbz; ?></MITARBEITER:kurzbz>
-    		<MITARBEITER:studiengang_kz></MITARBEITER:studiengang_kz>
-      	</RDF:Description>
-
-<?php
-	$alle.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$mitarbeiter->uid."\" />";
-}
-$desc= '
-		<RDF:Description about="'.$rdf_url.'_alle" >
-			<MITARBEITER:uid></MITARBEITER:uid>
-			<MITARBEITER:titelpre></MITARBEITER:titelpre>
-			<MITARBEITER:titelpost></MITARBEITER:titelpost>
-			<MITARBEITER:vornamen></MITARBEITER:vornamen>
-			<MITARBEITER:vorname></MITARBEITER:vorname>
-			<MITARBEITER:nachname></MITARBEITER:nachname>
-			<MITARBEITER:kurzbz>Alle</MITARBEITER:kurzbz>
-			<MITARBEITER:studiengang_kz>0</MITARBEITER:studiengang_kz>
-		</RDF:Description>
 ';
 
-$seq= "
-<RDF:Seq about=\"".$rdf_url."liste\" >
-	<RDF:li>
-		<RDF:Seq about=\"".$rdf_url."_alle\" >$alle
-		</RDF:Seq>
-	</RDF:li>
-	";
-
-if ($user)
+function draw_row($mitarbeiter)
 {
-	$bb=new benutzerberechtigung($conn);
-	if($bb->getBerechtigungen(get_uid()))
+	global $rdf_url;
+	
+	echo '
+	<RDF:Description about="'.$rdf_url.$mitarbeiter->uid.'" >
+    	<MITARBEITER:uid><![CDATA['.$mitarbeiter->uid.']]></MITARBEITER:uid>
+		<MITARBEITER:titelpre><![CDATA['.$mitarbeiter->titelpre.']]></MITARBEITER:titelpre>
+		<MITARBEITER:titelpost><![CDATA['.$mitarbeiter->titelpost.']]></MITARBEITER:titelpost>
+		<MITARBEITER:vornamen><![CDATA['.$mitarbeiter->vornamen.']]></MITARBEITER:vornamen>
+		<MITARBEITER:vorname><![CDATA['.$mitarbeiter->vorname.']]></MITARBEITER:vorname>
+		<MITARBEITER:nachname><![CDATA['.$mitarbeiter->nachname.']]></MITARBEITER:nachname>
+		<MITARBEITER:kurzbz><![CDATA['.$mitarbeiter->kurzbz.']]></MITARBEITER:kurzbz>
+		<MITARBEITER:studiengang_kz></MITARBEITER:studiengang_kz>
+  	</RDF:Description>
+  	';
+}
+
+if($lehreinheit_id==null)
+{
+	$ma=$mitarbeiter->getMitarbeiter($lektor,$fixangestellt,$stg_kz,$fachbereich_id);
+	
+	$stg_obj = new studiengang($conn);
+	$stg_obj->getAll();
+	foreach ($stg_obj->result as $stg)
+		$stg_arr[$stg->studiengang_kz]=$stg->kuerzel;
+	
+	$alle='';
+	foreach ($ma as $mitarbeiter)
 	{
-		$stge=$bb->getStgKz();
-		$ma=$mitarbeiter->getMitarbeiterStg($lektor,$fixangestellt,$stge, 'lkt');
-		$laststg=-1;
-		foreach ($ma as $mitarbeiter)
+		draw_row($mitarbeiter);
+		$alle.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$mitarbeiter->uid."\" />";
+	}
+	$desc= '
+			<RDF:Description about="'.$rdf_url.'_alle" >
+				<MITARBEITER:uid></MITARBEITER:uid>
+				<MITARBEITER:titelpre></MITARBEITER:titelpre>
+				<MITARBEITER:titelpost></MITARBEITER:titelpost>
+				<MITARBEITER:vornamen></MITARBEITER:vornamen>
+				<MITARBEITER:vorname></MITARBEITER:vorname>
+				<MITARBEITER:nachname></MITARBEITER:nachname>
+				<MITARBEITER:kurzbz>Alle</MITARBEITER:kurzbz>
+				<MITARBEITER:studiengang_kz>0</MITARBEITER:studiengang_kz>
+			</RDF:Description>
+	';
+	
+	$seq= "
+	<RDF:Seq about=\"".$rdf_url."liste\" >
+		<RDF:li>
+			<RDF:Seq about=\"".$rdf_url."_alle\" >$alle
+			</RDF:Seq>
+		</RDF:li>
+		";
+	
+	if ($user)
+	{
+		$bb=new benutzerberechtigung($conn);
+		if($bb->getBerechtigungen(get_uid()))
 		{
-			if($mitarbeiter->studiengang_kz!=$laststg)
+			$stge=$bb->getStgKz();
+			$ma=$mitarbeiter->getMitarbeiterStg($lektor,$fixangestellt,$stge, 'lkt');
+			$laststg=-1;
+			foreach ($ma as $mitarbeiter)
 			{
-				if($laststg!=-1)
+				if($mitarbeiter->studiengang_kz!=$laststg)
 				{
-					$seq.="\n\t\t</RDF:Seq>\n\t</RDF:li>\n";
+					if($laststg!=-1)
+					{
+						$seq.="\n\t\t</RDF:Seq>\n\t</RDF:li>\n";
+					}
+					$desc.="\n\t\t<RDF:Description about=\"".$rdf_url.$mitarbeiter->studiengang_kz."\" >".
+							"\n\t\t\t<MITARBEITER:uid></MITARBEITER:uid>".
+							"\n\t\t\t<MITARBEITER:titelpre></MITARBEITER:titelpre>".
+							"\n\t\t\t<MITARBEITER:titelpost></MITARBEITER:titelpost>".
+							"\n\t\t\t<MITARBEITER:vornamen></MITARBEITER:vornamen>".
+							"\n\t\t\t<MITARBEITER:vorname></MITARBEITER:vorname>".
+							"\n\t\t\t<MITARBEITER:nachname></MITARBEITER:nachname>".
+							"\n\t\t\t<MITARBEITER:kurzbz>".$stg_arr[$mitarbeiter->studiengang_kz]."</MITARBEITER:kurzbz>".
+							"\n\t\t\t<MITARBEITER:studiengang_kz>$mitarbeiter->studiengang_kz</MITARBEITER:studiengang_kz>".
+							"\n\t\t</RDF:Description>\n";
+	
+					$seq.="\n\t<RDF:li>\n\t\t<RDF:Seq about=\"".$rdf_url.$mitarbeiter->studiengang_kz."\" >";
+	
+					$laststg = $mitarbeiter->studiengang_kz;
 				}
-				$desc.="\n\t\t<RDF:Description about=\"".$rdf_url.$mitarbeiter->studiengang_kz."\" >".
-						"\n\t\t\t<MITARBEITER:uid></MITARBEITER:uid>".
-						"\n\t\t\t<MITARBEITER:titelpre></MITARBEITER:titelpre>".
-						"\n\t\t\t<MITARBEITER:titelpost></MITARBEITER:titelpost>".
-						"\n\t\t\t<MITARBEITER:vornamen></MITARBEITER:vornamen>".
-						"\n\t\t\t<MITARBEITER:vorname></MITARBEITER:vorname>".
-						"\n\t\t\t<MITARBEITER:nachname></MITARBEITER:nachname>".
-						"\n\t\t\t<MITARBEITER:kurzbz>".$stg_arr[$mitarbeiter->studiengang_kz]."</MITARBEITER:kurzbz>".
-						"\n\t\t\t<MITARBEITER:studiengang_kz>$mitarbeiter->studiengang_kz</MITARBEITER:studiengang_kz>".
-						"\n\t\t</RDF:Description>\n";
-
-				$seq.="\n\t<RDF:li>\n\t\t<RDF:Seq about=\"".$rdf_url.$mitarbeiter->studiengang_kz."\" >";
-
-				$laststg = $mitarbeiter->studiengang_kz;
+				$seq.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$mitarbeiter->uid."\" />";
 			}
-			$seq.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$mitarbeiter->uid."\" />";
+			$seq.="\n\t\t</RDF:Seq>\n\t</RDF:li>";
 		}
-		$seq.="\n\t\t</RDF:Seq>\n\t</RDF:li>";
+	}
+	echo $desc;
+	echo $seq;
+}
+else 
+{
+	echo "<RDF:Seq about=\"".$rdf_url."liste\" >";
+	$mitarbeiter->getMitarbeiterFromLehreinheit($lehreinheit_id);
+	foreach ($mitarbeiter->result as $row)
+	{
+		echo '<RDF:li>';
+		draw_row($row);
+		echo '</RDF:li>';
 	}
 }
-echo $desc;
-echo $seq;
+
 ?>
 
 </RDF:Seq>
