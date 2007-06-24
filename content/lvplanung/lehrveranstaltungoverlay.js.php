@@ -68,14 +68,18 @@ var LvTreeSinkObserver =
 // ****
 var LvTreeListener =
 {
-  willRebuild : function(builder) {  },
-  didRebuild : function(builder)
-  {
-  	  //timeout nur bei Mozilla notwendig da sonst die rows
-  	  //noch keine values haben. Ab Seamonkey funktionierts auch
-  	  //ohne dem setTimeout
-      window.setTimeout(LvTreeSelectLehreinheit,10);
-  }
+	willRebuild : function(builder)
+	{
+	},
+	didRebuild : function(builder)
+  	{
+		//timeout nur bei Mozilla notwendig da sonst die rows
+		//noch keine values haben. Ab Seamonkey funktionierts auch
+		//ohne dem setTimeout
+	    window.setTimeout(LvTreeSelectLehreinheit,10);
+		// Progressmeter stoppen
+		//document.getElementById('statusbar-progressmeter').setAttribute('mode','determined');
+	}
 };
 
 // ****
@@ -104,14 +108,14 @@ var LeDetailLehrfachSinkObserver =
 		//Das richtige Lehrfach markieren
 		if(LeDetailLehrfach_id!='') //Wenn die Lehrfach_id bekannt ist, dann einfach markieren
 			document.getElementById('lehrveranstaltung-detail-menulist-lehrfach').value=LeDetailLehrfach_id;
-		else 
+		else
 		{
 			if(LeDetailLehrfach_label!='') //Wenn Name bekannt ist
 			{
-				
+
 				menulist = document.getElementById('lehrveranstaltung-detail-menulist-lehrfach');
 
-				//Alle eintraege aus menulist holen			
+				//Alle eintraege aus menulist holen
 				var items = menulist.childNodes[1].childNodes //Anzahl der Zeilen ermitteln
 				found=false;
 			   	for(i in items)
@@ -296,11 +300,11 @@ function LeNeu()
 
 	//Detail Tab als aktiv setzen
 	document.getElementById('lehrveranstaltung-tabbox').selectedIndex=0;
-	
+
 	//Lektor-Tab und GruppenTree ausblenden
 	document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe').hidden=true;
 	document.getElementById('lehrveranstaltung-detail-label-lehreinheitgruppe').hidden=true;
-	document.getElementById('lehrveranstaltung-tab-lektor').collapsed=true;	
+	document.getElementById('lehrveranstaltung-tab-lektor').collapsed=true;
 
 	//Lehrveranstaltungs_id holen
 	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung_id";
@@ -312,7 +316,7 @@ function LeNeu()
 	LeDetailLehrfach_id='';
 	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-bezeichnung"] : "lehrveranstaltung-treecol-bezeichnung";
 	LeDetailLehrfach_label=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	lehrfachmenulist = document.getElementById('lehrveranstaltung-detail-menulist-lehrfach');
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 
@@ -623,7 +627,7 @@ function LeAuswahl()
 
 	document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe').hidden=false;
 	document.getElementById('lehrveranstaltung-detail-label-lehreinheitgruppe').hidden=false;
-	document.getElementById('lehrveranstaltung-tab-lektor').collapsed=false;	
+	document.getElementById('lehrveranstaltung-tab-lektor').collapsed=false;
 
 	if (tree.currentIndex==-1) return;
 	try
@@ -633,7 +637,7 @@ function LeAuswahl()
 		var lehreinheit_id=tree.view.getCellText(tree.currentIndex,col);
 		var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung_id";
 		var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
-		
+
 		if(lehreinheit_id=='')
 		{
 			//Lehrveranstaltung wurde markiert
@@ -643,10 +647,10 @@ function LeAuswahl()
 
 			//Noten Tab aktivieren
 			LehrveranstaltungNotenDisableFields(false);
-			
+
 			//Noten Laden
 			LehrveranstaltungNotenLoad(lehrveranstaltung_id);
-			
+
 			LeDetailDisableFields(true);
 			//Details zuruecksetzen
 			LeDetailReset();
@@ -656,7 +660,7 @@ function LeAuswahl()
 		{
 			LeDetailDisableFields(false);
 			LehrveranstaltungNotenDisableFields(true);
-			
+
 			document.getElementById('lehrveranstaltung-toolbar-neu').disabled=true;
 			document.getElementById('lehrveranstaltung-toolbar-del').disabled=false;
 		}
@@ -709,7 +713,7 @@ function LeAuswahl()
 
 	//ID in globale Variable speichern
 	LeDetailLehrfach_id=lehrfach;
-	
+
 	lehrfachmenulist = document.getElementById('lehrveranstaltung-detail-menulist-lehrfach');
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 
@@ -729,11 +733,11 @@ function LeAuswahl()
 	//RDF holen
 	var newDs  = rdfService.GetDataSource(url);
 	lehrfachmenulist.database.AddDataSource(newDs);
-	
+
 	//SinkObserver hinzufuegen
 	var sink = newDs.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	sink.addXMLSinkObserver(LeDetailLehrfachSinkObserver);
-	
+
 	//Daten den Feldern zuweisen
 
 	document.getElementById('lehrveranstaltung-detail-textbox-unr').value=unr;
@@ -777,7 +781,7 @@ function LeAuswahl()
 		}
 		catch(e)
 		{}
-		
+
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		LeDetailLektorDatasource = rdfService.GetDataSource(url);
 		LeDetailLektorDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -805,7 +809,7 @@ function LeAuswahl()
 		}
 		//Refresh damit die entfernten DS auch wirklich entfernt werden
 		gruppentree.builder.rebuild();
-		
+
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		LeDetailGruppeDatasource = rdfService.GetDataSource(url);
 		LeDetailGruppeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -1139,7 +1143,7 @@ function LehrveranstaltungNotenDisableFields(val)
 {
 	document.getElementById('lehrveranstaltung-note-copy').disabled=val;
 	document.getElementById('lehrveranstaltung-noten-button-import').disabled=val;
-	
+
 	if(val)
 		LehrveranstaltungNotenDetailDisableFields(val);
 }
@@ -1160,9 +1164,9 @@ function LehrveranstaltungNotenLoad(lehrveranstaltung_id)
 {
 	// *** ZeugnisNoten ***
 	notentree = document.getElementById('lehrveranstaltung-noten-tree');
-		
+
 	url='<?php echo APP_ROOT;?>rdf/zeugnisnote.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+"&"+gettimestamp();
-	
+
 	//Alte DS entfernen
 	var oldDatasources = notentree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -1171,28 +1175,28 @@ function LehrveranstaltungNotenLoad(lehrveranstaltung_id)
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	notentree.builder.rebuild();
-	
+
 	try
 	{
 		LehrveranstaltungNotenTreeDatasource.removeXMLSinkObserver(LehrveranstaltungNotenTreeSinkObserver);
-		notentree.builder.removeListener(LehrveranstaltungNotenTreeListener);	
+		notentree.builder.removeListener(LehrveranstaltungNotenTreeListener);
 	}
 	catch(e)
 	{}
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	LehrveranstaltungNotenTreeDatasource = rdfService.GetDataSource(url);
 	LehrveranstaltungNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 	LehrveranstaltungNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	notentree.database.AddDataSource(LehrveranstaltungNotenTreeDatasource);
 	LehrveranstaltungNotenTreeDatasource.addXMLSinkObserver(LehrveranstaltungNotenTreeSinkObserver);
-	notentree.builder.addListener(LehrveranstaltungNotenTreeListener);	
-	
+	notentree.builder.addListener(LehrveranstaltungNotenTreeListener);
+
 	// *** LvGesamtNoten ***
 	var lvgesamtnotentree = document.getElementById('lehrveranstaltung-lvgesamtnoten-tree');
-	
+
 	url='<?php echo APP_ROOT;?>rdf/lvgesamtnote.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+"&"+gettimestamp();
-	
+
 	//Alte DS entfernen
 	var oldDatasources = lvgesamtnotentree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -1201,22 +1205,22 @@ function LehrveranstaltungNotenLoad(lehrveranstaltung_id)
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	lvgesamtnotentree.builder.rebuild();
-	
+
 	try
 	{
 		LehrveranstaltungLvGesamtNotenTreeDatasource.removeXMLSinkObserver(LehrveranstaltungLvGesamtNotenTreeSinkObserver);
-		lvgesamtnotentree.builder.removeListener(LehrveranstaltungLvGesamtNotenTreeListener);	
+		lvgesamtnotentree.builder.removeListener(LehrveranstaltungLvGesamtNotenTreeListener);
 	}
 	catch(e)
 	{}
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	LehrveranstaltungLvGesamtNotenTreeDatasource = rdfService.GetDataSource(url);
 	LehrveranstaltungLvGesamtNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 	LehrveranstaltungLvGesamtNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	lvgesamtnotentree.database.AddDataSource(LehrveranstaltungLvGesamtNotenTreeDatasource);
 	LehrveranstaltungLvGesamtNotenTreeDatasource.addXMLSinkObserver(LehrveranstaltungLvGesamtNotenTreeSinkObserver);
-	lvgesamtnotentree.builder.addListener(LehrveranstaltungLvGesamtNotenTreeListener);	
+	lvgesamtnotentree.builder.addListener(LehrveranstaltungLvGesamtNotenTreeListener);
 }
 
 // ****
@@ -1232,7 +1236,7 @@ function LehrveranstaltungLvGesamtNotenTreeSelectID()
 
 	//In der globalen Variable ist die zu selektierende Eintrag gespeichert
 	if(lehrveranstaltungLvGesamtNotenSelectUID!=null)
-	{		
+	{
 	   	for(var i=0;i<items;i++)
 	   	{
 	   		//ID der row holen
@@ -1266,7 +1270,7 @@ function LehrveranstaltungNotenTreeSelectID()
 
 	//In der globalen Variable ist die zu selektierende Eintrag gespeichert
 	if(lehrveranstaltungNotenSelectUID!=null)
-	{		
+	{
 	   	for(var i=0;i<items;i++)
 	   	{
 	   		//ID der row holen
@@ -1294,18 +1298,18 @@ function LehrveranstaltungNotenMove()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('lehrveranstaltung-lvgesamtnoten-tree');
-	
+
 	var start = new Object();
 	var end = new Object();
 	var numRanges = tree.view.selection.getRangeCount();
 	var paramList= '';
 	var i = 0;
-	
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
-	
+
 	req.add('type', 'movenote');
-	
+
 	for (var t = 0; t < numRanges; t++)
 	{
   		tree.view.selection.getRangeAt(t,start,end);
@@ -1320,16 +1324,16 @@ function LehrveranstaltungNotenMove()
 
 			req.add('lehrveranstaltung_id_'+i, lehrveranstaltung_id);
 			req.add('student_uid_'+i, student_uid);
-			req.add('studiensemester_kurzbz_'+i, studiensemester_kurzbz);	
+			req.add('studiensemester_kurzbz_'+i, studiensemester_kurzbz);
 			i++;
 		}
 	}
 	req.add('anzahl', i);
-	
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -1338,7 +1342,7 @@ function LehrveranstaltungNotenMove()
 			alert(val.dbdml_errormsg)
 	}
 	else
-	{			
+	{
 		LehrveranstaltungNotenTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 		LehrveranstaltungNotenDetailDisableFields(true);
@@ -1358,7 +1362,7 @@ function LehrveranstaltungNoteSpeichern()
 		alert('Speichern nicht moeglich! Es muss eine Note im Tree ausgewaehlt sein');
 		return;
 	}
-		
+
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
 	var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
@@ -1366,24 +1370,24 @@ function LehrveranstaltungNoteSpeichern()
 	var student_uid=tree.view.getCellText(tree.currentIndex,col);
 	var col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiensemester_kurzbz"] : "lehrveranstaltung-noten-tree-studiensemester_kurzbz";
 	var studiensemester_kurzbz=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	note = document.getElementById('lehrveranstaltung-noten-menulist-note').value;
-	
-	
+
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
-	
+
 	req.add('type', 'savenote');
-		
+
 	req.add('lehrveranstaltung_id', lehrveranstaltung_id);
 	req.add('student_uid', student_uid);
 	req.add('studiensemester_kurzbz', studiensemester_kurzbz);
 	req.add('note', note);
-			
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -1392,8 +1396,8 @@ function LehrveranstaltungNoteSpeichern()
 			alert(val.dbdml_errormsg)
 	}
 	else
-	{			
-		LehrveranstaltungLvGesamtNotenSelectUID=student_uid;	
+	{
+		LehrveranstaltungLvGesamtNotenSelectUID=student_uid;
 		LehrveranstaltungNotenTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 		LehrveranstaltungNotenDetailDisableFields(true);
@@ -1411,7 +1415,7 @@ function LehrveranstaltungNotenAuswahl()
 	if (tree.currentIndex==-1) return;
 
 	LehrveranstaltungNotenDetailDisableFields(false);
-		
+
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
 	var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
@@ -1419,15 +1423,15 @@ function LehrveranstaltungNotenAuswahl()
 	var student_uid=tree.view.getCellText(tree.currentIndex,col);
 	var col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiensemester_kurzbz"] : "lehrveranstaltung-noten-tree-studiensemester_kurzbz";
 	var studiensemester_kurzbz=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	//Daten holen
 	var url = '<?php echo APP_ROOT ?>rdf/zeugnisnote.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+'&uid='+student_uid+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&'+gettimestamp();
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                    getService(Components.interfaces.nsIRDFService);
-    
+
     var dsource = rdfService.GetDataSourceBlocking(url);
-    
+
 	var subject = rdfService.GetResource("http://www.technikum-wien.at/zeugnisnote/" + lehrveranstaltung_id+'/'+student_uid+'/'+studiensemester_kurzbz);
 
 	var predicateNS = "http://www.technikum-wien.at/zeugnisnote/rdf";
@@ -1435,10 +1439,10 @@ function LehrveranstaltungNotenAuswahl()
 	//Daten holen
 
 	note = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#note" ));
-		
+
 	if(note=='')
 		note='9';
-	
+
 	document.getElementById('lehrveranstaltung-noten-menulist-note').value=note;
 }
 
@@ -1449,7 +1453,7 @@ function LehrveranstaltungNotenAuswahl()
 // ****
 function LehrveranstaltungNotenImport()
 {
-	
+
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var data = getDataFromClipboard();
 	var tree=document.getElementById('lehrveranstaltung-tree');
@@ -1458,41 +1462,41 @@ function LehrveranstaltungNotenImport()
 		alert("Bitte zuerst eine Lehrveranstaltung auswaehlen");
 		return false;
 	}
-		
+
 	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung_id";
 	var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	if(lehrveranstaltung_id=='')
 	{
 		alert("Bitte zuerst eine Lehrveranstaltung auswaehlen");
 		return false;
 	}
-	
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
-	
+
 	req.add('type', 'importnoten');
-		
+
 	req.add('lehrveranstaltung_id', lehrveranstaltung_id);
-	
+
 	//Reihen ermitteln
 	var rows = data.split("\n");
 	var i=0;
 	for(row in rows)
 	{
 		zeile = rows[row].split("	");
-		
+
 		req.add('matrikelnummer_'+i, zeile[0]);
 		req.add('note_'+i, zeile[1]);
 		i++;
 	}
-	
+
 	req.add('anzahl', i);
-	
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -1501,7 +1505,7 @@ function LehrveranstaltungNotenImport()
 			alert(val.dbdml_errormsg)
 	}
 	else
-	{			
+	{
 		LehrveranstaltungNotenTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 	}

@@ -66,14 +66,18 @@ var InteressentTreeSinkObserver =
 // ****
 var InteressentTreeListener =
 {
-  willRebuild : function(builder) {  },
-  didRebuild : function(builder)
-  {
-  	  //timeout nur bei Mozilla notwendig da sonst die rows
-  	  //noch keine values haben. Ab Seamonkey funktionierts auch
-  	  //ohne dem setTimeout
-      window.setTimeout(InteressentTreeSelectInteressent,10);
-  }
+  	willRebuild : function(builder)
+  	{
+  	},
+  	didRebuild : function(builder)
+  	{
+  	  	//timeout nur bei Mozilla notwendig da sonst die rows
+  	  	//noch keine values haben. Ab Seamonkey funktionierts auch
+  	  	//ohne dem setTimeout
+      	window.setTimeout(InteressentTreeSelectInteressent,10);
+		// Progressmeter stoppen
+		document.getElementById('statusbar-progressmeter').setAttribute('mode','determined');
+  	}
 };
 
 // ****
@@ -109,8 +113,8 @@ var InteressentDokumentTreeNichtabgegebenListener =
       if(InteressentDokumentTreeNichtabgegebenDoubleRefresh==true)
       {
       	window.setTimeout('InteressentDokumentTreeNichtabgegebenDatasourceRefresh()',10);
-      } 
-      InteressentDokumentTreeNichtabgegebenDoubleRefresh=false;  
+      }
+      InteressentDokumentTreeNichtabgegebenDoubleRefresh=false;
   }
 };
 
@@ -206,7 +210,7 @@ function InteressentTreeKeyPress(event)
 function InteressentTreeRefresh()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 	//markierten Interessenten global speichern damit dieser Interessent nach dem
 	//refresh wieder markiert werden kann.
 	var tree = document.getElementById('interessent-tree');
@@ -241,13 +245,13 @@ function InteressentTreeSelectInteressent()
 
 	//In der globalen Variable ist der zu selektierende Interessent gespeichert
 	if(InteressentSelectId!=null)
-	{		
+	{
 	   	for(var i=0;i<items;i++)
 	   	{
 	   		//Id der row holen
 			col = tree.columns ? tree.columns["interessent-treecol-prestudent_id"] : "interessent-treecol-prestudent_id";
 			prestudent_id=tree.view.getCellText(i,col);
-						
+
 			if(prestudent_id == InteressentSelectId)
 			{
 				//Zeile markieren
@@ -263,7 +267,7 @@ function InteressentTreeSelectInteressent()
 
 // ****
 // * Beim Sortieren des Trees wird der markierte Eintrag gespeichert und nach dem sortieren
-// * wieder markiert. 
+// * wieder markiert.
 // ****
 function InteressentTreeSort()
 {
@@ -363,18 +367,18 @@ function InteressentDetailSave()
 	sprache = document.getElementById('interessent-detail-menulist-sprache').value;
 	person_id = document.getElementById('interessent-detail-textbox-person_id').value;
 	prestudent_id = document.getElementById('interessent-detail-textbox-prestudent_id').value
-			
+
 	if(geburtsdatum!='' && !CheckDatum(geburtsdatum))
 	{
 		alert('Geburtsdatum ist ungueltig');
 		return false;
 	}
-	
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 
 	req.add('type', 'saveperson');
-		
+
 	req.add('person_id', person_id);
 	req.add('anrede', anrede);
 	req.add('titelpre', titelpre);
@@ -396,11 +400,11 @@ function InteressentDetailSave()
 	req.add('staatsbuergerschaft', staatsbuergerschaft);
 	req.add('geburtsnation', geburtsnation);
 	req.add('sprache', sprache);
-		
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -411,7 +415,7 @@ function InteressentDetailSave()
 	else
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-				
+
 		InteressentSelectId=prestudent_id;
 		InteressentTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
@@ -444,13 +448,13 @@ function InteressentAuswahl()
 		InteressentTreeLoadDataOnSelect=true;
 		return true;
 	}
-	
+
 	// Trick 17	(sonst gibt's ein Permission denied)
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('interessent-tree');
 
 	if (tree.currentIndex==-1) return;
-	
+
 	try
 	{
 		//Ausgewaehlte ID holen
@@ -468,7 +472,7 @@ function InteressentAuswahl()
 		else
 		{
 			return false;
-		}	
+		}
 	}
 	catch(e)
 	{
@@ -477,12 +481,12 @@ function InteressentAuswahl()
 	}
 
 	var url = '<?php echo APP_ROOT ?>rdf/interessentenbewerber.rdf.php?prestudent_id='+prestudent_id+'&'+gettimestamp();
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                    getService(Components.interfaces.nsIRDFService);
-    
+
     var dsource = rdfService.GetDataSourceBlocking(url);
-    
+
 	var subject = rdfService.GetResource("http://www.technikum-wien.at/interessent/" + prestudent_id);
 
 	var predicateNS = "http://www.technikum-wien.at/interessent/rdf";
@@ -504,13 +508,13 @@ function InteressentAuswahl()
 	ersatzkennzeichen=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ersatzkennzeichen" ));
 	familienstand=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#familienstand" ));
 	geschlecht=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#geschlecht" ));
-	aktiv=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aktiv" ));	
+	aktiv=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aktiv" ));
 	anzahlderkinder=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anzahlkinder" ));
 	staatsbuergerschaft=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#staatsbuergerschaft" ));
 	geburtsnation=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#geburtsnation" ));
 	sprache=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#sprache" ));
 	person_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#person_id" ));
-		
+
 	//Daten den Feldern zuweisen
 
 	document.getElementById('interessent-detail-textbox-prestudent_id').value=prestudent_id;
@@ -539,7 +543,7 @@ function InteressentAuswahl()
 	document.getElementById('interessent-detail-menulist-sprache').value=sprache;
 	document.getElementById('interessent-detail-image').src='<?php echo APP_ROOT?>content/bild.php?src=person&person_id='+person_id+'&'+gettimestamp();
 	document.getElementById('interessent-detail-textbox-person_id').value=person_id;
-		
+
 	//Prestudent Daten holen
 
 	aufmerksamdurch_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aufmerksamdurch_kurzbz" ));
@@ -560,7 +564,7 @@ function InteressentAuswahl()
 	punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
 	bismelden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bismelden" ));
 	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
-	
+
 	document.getElementById('interessent-prestudent-menulist-aufmerksamdurch').value=aufmerksamdurch_kurzbz;
 	document.getElementById('interessent-prestudent-menulist-berufstaetigkeit').value=berufstaetigkeit_code;
 	document.getElementById('interessent-prestudent-menulist-ausbildung').value=ausbildungcode;
@@ -582,21 +586,21 @@ function InteressentAuswahl()
 	else
 		document.getElementById('interessent-prestudent-checkbox-reihungstestangetreten').checked=false;
 	document.getElementById('interessent-prestudent-textbox-punkte').value=punkte;
-	
+
 	if(bismelden=='true')
 		document.getElementById('interessent-prestudent-checkbox-bismelden').checked=true;
 	else
 		document.getElementById('interessent-prestudent-checkbox-bismelden').checked=false;
-		
+
 	document.getElementById('interessent-prestudent-textbox-person_id').value=person_id;
 	document.getElementById('interessent-prestudent-textbox-prestudent_id').value=prestudent_id;
 	document.getElementById('interessent-prestudent-checkbox-new').checked=false;
 	document.getElementById('interessent-prestudent-menulist-studiengang_kz').value=studiengang_kz;
 	document.getElementById('interessent-prestudent-textbox-anmerkung').value=anmerkung;
-		
+
 	rollentree = document.getElementById('interessent-prestudent-tree-rolle');
 	url='<?php echo APP_ROOT;?>rdf/prestudentrolle.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
-	
+
 	//Alte DS entfernen
 	var oldDatasources = rollentree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -605,16 +609,16 @@ function InteressentAuswahl()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	rollentree.builder.rebuild();
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var datasource = rdfService.GetDataSource(url);
 	rollentree.database.AddDataSource(datasource);
-	
+
 	//Dokumente
 	//linker Tree
 	doctree = document.getElementById('interessent-dokumente-tree-nichtabgegeben');
 	url='<?php echo APP_ROOT;?>rdf/dokument.rdf.php?studiengang_kz='+studiengang_kz+'&prestudent_id='+prestudent_id+"&"+gettimestamp();
-	
+
 	//Alte DS entfernen
 	var oldDatasources = doctree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -623,19 +627,19 @@ function InteressentAuswahl()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	doctree.builder.rebuild();
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-	InteressentDokumentTreeNichtabgegebenDatasource = rdfService.GetDataSource(url);	
+	InteressentDokumentTreeNichtabgegebenDatasource = rdfService.GetDataSource(url);
 	InteressentDokumentTreeNichtabgegebenDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 	InteressentDokumentTreeNichtabgegebenDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	doctree.database.AddDataSource(InteressentDokumentTreeNichtabgegebenDatasource);
 	InteressentDokumentTreeNichtabgegebenDatasource.addXMLSinkObserver(InteressentDokumentTreeNichtabgegebenSinkObserver);
 	doctree.builder.addListener(InteressentDokumentTreeNichtabgegebenListener);
-	
+
 	//rechter Tree
 	doctree = document.getElementById('interessent-dokumente-tree-abgegeben');
 	url='<?php echo APP_ROOT;?>rdf/dokumentprestudent.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
-	
+
 	//Alte DS entfernen
 	var oldDatasources = doctree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -644,7 +648,7 @@ function InteressentAuswahl()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	doctree.builder.rebuild();
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	InteressentDokumentTreeAbgegebenDatasource = rdfService.GetDataSource(url);
 	InteressentDokumentTreeAbgegebenDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -652,12 +656,12 @@ function InteressentAuswahl()
 	doctree.database.AddDataSource(InteressentDokumentTreeAbgegebenDatasource);
 	InteressentDokumentTreeAbgegebenDatasource.addXMLSinkObserver(InteressentDokumentTreeAbgegebenSinkObserver);
 	doctree.builder.addListener(InteressentDokumentTreeAbgegebenListener);
-	
+
 	//Konto
 	kontotree = document.getElementById('interessent-konto-tree');
 	filter = document.getElementById('interessent-konto-button-filter').value;
 	url='<?php echo APP_ROOT;?>rdf/konto.rdf.php?person_id='+person_id+"&filter="+filter+"&"+gettimestamp();
-	
+
 	//Alte DS entfernen
 	var oldDatasources = kontotree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -666,15 +670,15 @@ function InteressentAuswahl()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	kontotree.builder.rebuild();
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	InteressentKontoTreeDatasource = rdfService.GetDataSource(url);
 	InteressentKontoTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 	InteressentKontoTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	kontotree.database.AddDataSource(InteressentKontoTreeDatasource);
 	InteressentKontoTreeDatasource.addXMLSinkObserver(InteressentKontoTreeSinkObserver);
-	kontotree.builder.addListener(InteressentKontoTreeListener);	
-	
+	kontotree.builder.addListener(InteressentKontoTreeListener);
+
 	// KONTAKTE
 	document.getElementById('interessent-kontakt').setAttribute('src', 'kontakt.xul.php?person_id='+person_id);
 }
@@ -732,7 +736,7 @@ function InteressentPrestudentSave()
 	neu = document.getElementById('interessent-prestudent-checkbox-new').checked;
 	studiengang_kz = document.getElementById('interessent-prestudent-menulist-studiengang_kz').value;
 	anmerkung = document.getElementById('interessent-prestudent-textbox-anmerkung').value;
-	
+
 	if(zgvdatum!='' && !CheckDatum(zgvdatum))
 	{
 		alert('ZgvDatum ist ungueltig');
@@ -748,18 +752,18 @@ function InteressentPrestudentSave()
 		alert('Anmeldung zum Reihungstest Datum ist ungueltig');
 		return false;
 	}
-	
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
-	
+
 	if (neu)
 	{
 		alert('Fehler! Es wurde versucht einen neuen Prestudenten anzulegen, dies ist aber hier nicht moeglich');
 		return false;
 	}
-	
+
 	req.add('type', 'saveprestudent');
-		
+
 	req.add('aufmerksamdurch_kurzbz', aufmerksamdurch_kurzbz);
 	req.add('berufstaetigkeit_code', berufstaetigkeit_code);
 	req.add('ausbildungcode', ausbildungcode);
@@ -780,11 +784,11 @@ function InteressentPrestudentSave()
 	req.add('prestudent_id', prestudent_id);
 	req.add('studiengang_kz', studiengang_kz);
 	req.add('anmerkung', anmerkung);
-		
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -795,7 +799,7 @@ function InteressentPrestudentSave()
 	else
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-				
+
 		InteressentSelectId=val.dbdml_data;
 		InteressentTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
@@ -809,18 +813,18 @@ function InteressentAnmeldungreihungstestHeute()
 {
 	var now = new Date();
 	var jahr = now.getFullYear();
-	
+
 	monat = now.getMonth();
 	if(monat<10) monat='0'+monat;
 	tag = now.getDate();
 	if(tag<10) tag='0'+tag;
-	
+
 	document.getElementById('interessent-prestudent-textbox-anmeldungreihungstest').value=tag+'.'+monat+'.'+jahr;
 }
 
 // ****
 // * Macht aus einem Interessenten einen Bewerber
-// * Voraussetzungen: 
+// * Voraussetzungen:
 // * 	- Datum fuer Anmeldung zum RT muss eingetragen sein
 // *	- Hakerl "zum Reihungstest angetreten" muss angekreuzt sein
 // * Wenn die Voraussetzungen erfuellt sind wird die Rolle Bewerber hinzugefuegt
@@ -832,39 +836,39 @@ function InteressentzuBewerber()
 
 	//Wenn kein Interessent ausgewaehlt ist, dann abbrechen
 	if (tree.currentIndex==-1) return;
-	
+
 	//Voraussetzungen pruefen
 	anmeldungreihungstest = document.getElementById('interessent-prestudent-textbox-anmeldungreihungstest').value;
 	reihungstestangetreten = document.getElementById('interessent-prestudent-checkbox-reihungstestangetreten').checked;
-	
+
 	if(anmeldungreihungstest=='')
 	{
 		alert('Um einen Interessenten zum Bewerber zu machen, muss das Reihungstestdatum gesetzt sein');
 		return false;
 	}
-	
+
 	if(reihungstestangetreten==false)
 	{
 		alert('Um einen Interessenten zum Bewerber zu machen, muss das Feld "Zum Reihungstest angetreten" gesetzt sein');
 		return false;
 	}
-	
+
 	prestudent_id = document.getElementById('interessent-prestudent-textbox-prestudent_id').value;
-	
+
 	//Rolle Bewerber hinzufuegen
-	
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
-		
+
 	req.add('type', 'addrolle');
-	
+
 	req.add('prestudent_id', prestudent_id);
-	req.add('rolle_kurzbz', 'Bewerber');	
-	
+	req.add('rolle_kurzbz', 'Bewerber');
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -875,7 +879,7 @@ function InteressentzuBewerber()
 	else
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-		
+
 		InteressentSelectId=prestudent_id;
 		InteressentTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
@@ -898,20 +902,20 @@ function InteressentzuStudent()
 
 	//Wenn kein Interessent ausgewaehlt ist, dann abbrechen
 	if (tree.currentIndex==-1) return;
-		
+
 	prestudent_id = document.getElementById('interessent-prestudent-textbox-prestudent_id').value;
 
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
-		
+
 	req.add('type', 'BewerberZuStudent');
-	
+
 	req.add('prestudent_id', prestudent_id);
-	
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -922,7 +926,7 @@ function InteressentzuStudent()
 	else
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-		
+
 		InteressentSelectId=prestudent_id;
 		InteressentTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
@@ -943,7 +947,7 @@ function InteressentDokumenteAdd()
 	var start = new Object();
 	var end = new Object();
 	var numRanges = tree.view.selection.getRangeCount();
-	
+
 	for (var t = 0; t < numRanges; t++)
 	{
   		tree.view.selection.getRangeAt(t,start,end);
@@ -954,24 +958,24 @@ function InteressentDokumenteAdd()
 			paramList += ';'+dok;
 		}
 	}
-	
+
 	//Prestudent_id holen
 	prestudent_id = document.getElementById('interessent-detail-textbox-prestudent_id').value
-	
+
 	if(paramList!='')
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 		var req = new phpRequest(url,'','');
-			
+
 		req.add('type', 'dokumentprestudentadd');
-		
+
 		req.add('prestudent_id', prestudent_id);
 		req.add('dokumente', paramList);
-		
+
 		var response = req.executePOST();
-	
+
 		var val =  new ParseReturnValue(response)
-		
+
 		if (!val.dbdml_return)
 		{
 			if(val.dbdml_errormsg=='')
@@ -1011,7 +1015,7 @@ function InteressentDokumenteRemove()
 	var start = new Object();
 	var end = new Object();
 	var numRanges = tree.view.selection.getRangeCount();
-	
+
 	for (var t = 0; t < numRanges; t++)
 	{
   		tree.view.selection.getRangeAt(t,start,end);
@@ -1022,24 +1026,24 @@ function InteressentDokumenteRemove()
 			paramList += ';'+dok;
 		}
 	}
-	
+
 	//Prestudent_id holen
 	prestudent_id = document.getElementById('interessent-detail-textbox-prestudent_id').value
-	
+
 	if(paramList!='')
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 		var req = new phpRequest(url,'','');
-			
+
 		req.add('type', 'dokumentprestudentdel');
-		
+
 		req.add('prestudent_id', prestudent_id);
 		req.add('dokumente', paramList);
-		
+
 		var response = req.executePOST();
-	
+
 		var val =  new ParseReturnValue(response)
-		
+
 		if (!val.dbdml_return)
 		{
 			if(val.dbdml_errormsg=='')
@@ -1082,7 +1086,7 @@ function InteressentDokumentTreeAbgegebenDatasourceRefresh()
 function InteressentDokumentTreeNichtabgegebenDatasourceRefresh()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	InteressentDokumentTreeNichtabgegebenDatasource.Refresh(false);	
+	InteressentDokumentTreeNichtabgegebenDatasource.Refresh(false);
 }
 
 function InteressentDokumentAbgegebenTreeSelect()
@@ -1092,13 +1096,13 @@ function InteressentDokumentAbgegebenTreeSelect()
 
 	//In der globalen Variable ist der zu selektierende DS gespeichert
 	if(InteressentDokumentTreeAbgegebenSelectID!=null)
-	{		
+	{
 	   	for(var i=0;i<items;i++)
 	   	{
 	   		//Uid der row holen
 			col = tree.columns ? tree.columns["interessent-dokumente-tree-abgegeben-dokument_kurzbz"] : "interessent-dokumente-tree-abgegeben-dokument_kurzbz";
 			kurzbz=tree.view.getCellText(i,col);
-						
+
 			if(kurzbz == InteressentDokumentTreeAbgegebenSelectID)
 			{
 				//Zeile markieren
@@ -1118,13 +1122,13 @@ function InteressentDokumentNichtAbgegebenTreeSelect()
 
 	//In der globalen Variable ist der zu selektierende DS gespeichert
 	if(InteressentDokumentTreeNichtAbgegebenSelectID!=null)
-	{		
+	{
 	   	for(var i=0;i<items;i++)
 	   	{
 	   		//Uid der row holen
 			col = tree.columns ? tree.columns["interessent-dokumente-tree-nichtabgegeben-dokument_kurzbz"] : "interessent-dokumente-tree-nichtabgegeben-dokument_kurzbz";
 			kurzbz=tree.view.getCellText(i,col);
-						
+
 			if(kurzbz == InteressentDokumentTreeNichtAbgegebenSelectID)
 			{
 				//Zeile markieren
@@ -1177,7 +1181,7 @@ function InteressentKontoZahlungsbestaetigung()
 	var end = new Object();
 	var numRanges = tree.view.selection.getRangeCount();
 	var paramList= '';
-	
+
 	for (var t = 0; t < numRanges; t++)
 	{
   		tree.view.selection.getRangeAt(t,start,end);
@@ -1193,8 +1197,8 @@ function InteressentKontoZahlungsbestaetigung()
 				paramList += ';'+buchungsnr;
 			}
 	}
-			
-	//Ausgewaehlte Nr holen			
+
+	//Ausgewaehlte Nr holen
 	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=konto.rdf.php&xsl=Zahlung&buchungsnummern='+paramList,'Zahlungsbestaetigung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
@@ -1210,19 +1214,19 @@ function InteressentKontoAuswahl()
 	if (tree.currentIndex==-1) return;
 
 	InteressentKontoDetailDisableFields(false);
-	
+
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["interessent-konto-tree-buchungsnr"] : "interessent-konto-tree-buchungsnr";
 	var buchungsnr=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	//Daten holen
 	var url = '<?php echo APP_ROOT ?>rdf/konto.rdf.php?buchungsnr='+buchungsnr+'&'+gettimestamp();
-		
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                    getService(Components.interfaces.nsIRDFService);
-    
+
     var dsource = rdfService.GetDataSourceBlocking(url);
-    
+
 	var subject = rdfService.GetResource("http://www.technikum-wien.at/konto/" + buchungsnr);
 
 	var predicateNS = "http://www.technikum-wien.at/konto/rdf";
@@ -1238,7 +1242,7 @@ function InteressentKontoAuswahl()
 	buchungstext = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#buchungstext" ));
 	mahnspanne = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#mahnspanne" ));
 	buchungstyp_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#buchungstyp_kurzbz" ));
-		
+
 	document.getElementById('interessent-konto-textbox-betrag').value=betrag;
 	document.getElementById('interessent-konto-textbox-buchungsdatum').value=buchungsdatum;
 	document.getElementById('interessent-konto-textbox-buchungstext').value=buchungstext;
@@ -1255,7 +1259,7 @@ function InteressentKontoFilter()
 
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	filter = document.getElementById('interessent-konto-button-filter');
-	
+
 	if(filter.value=='offene')
 	{
 		filter.value='alle';
@@ -1266,12 +1270,12 @@ function InteressentKontoFilter()
 		filter.value='offene';
 		filter.label='alle';
 	}
-		
+
 	//Konto Tree mit neuem Filter laden
 	var kontotree = document.getElementById('interessent-konto-tree');
 	var person_id = document.getElementById('interessent-prestudent-textbox-person_id').value
 	url='<?php echo APP_ROOT;?>rdf/konto.rdf.php?person_id='+person_id+"&filter="+filter.value+"&"+gettimestamp();
-	
+
 	var buchungsnr=null;
 	try
 	{
@@ -1284,7 +1288,7 @@ function InteressentKontoFilter()
 	}
 	catch(e)
 	{}
-	
+
 	//Alte DS entfernen
 	var oldDatasources = kontotree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -1293,16 +1297,16 @@ function InteressentKontoFilter()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	kontotree.builder.rebuild();
-	
+
 	InteressentKontoSelectBuchung = buchungsnr;
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	InteressentKontoTreeDatasource = rdfService.GetDataSource(url);
 	InteressentKontoTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 	InteressentKontoTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	kontotree.database.AddDataSource(InteressentKontoTreeDatasource);
 	InteressentKontoTreeDatasource.addXMLSinkObserver(InteressentKontoTreeSinkObserver);
-	kontotree.builder.addListener(InteressentKontoTreeListener);	
+	kontotree.builder.addListener(InteressentKontoTreeListener);
 }
 
 // ****
@@ -1340,25 +1344,25 @@ function InteressentAddRolle(rolle)
 	var tree = document.getElementById('interessent-tree');
 
 	if (tree.currentIndex==-1) return;
-		
+
 	//Ausgewaehlte ID holen
     var col = tree.columns ? tree.columns["interessent-treecol-prestudent_id"] : "interessent-treecol-prestudent_id";
 	var prestudent_id=tree.view.getCellText(tree.currentIndex,col);
-		
+
 	if(confirm('Diesen Studenten zum '+rolle+' machen?'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 		var req = new phpRequest(url,'','');
-		
+
 		req.add('type', 'addrolle');
-				
+
 		req.add('prestudent_id', prestudent_id);
 		req.add('rolle_kurzbz', rolle);
-		
+
 		var response = req.executePOST();
-	
+
 		var val =  new ParseReturnValue(response);
-		
+
 		if (!val.dbdml_return)
 		{
 			if(val.dbdml_errormsg=='')
@@ -1367,7 +1371,7 @@ function InteressentAddRolle(rolle)
 				alert(val.dbdml_errormsg)
 		}
 		else
-		{			
+		{
 			InteressentTreeRefresh();
 			SetStatusBarText('Rolle hinzugefuegt');
 		}
@@ -1380,36 +1384,36 @@ function InteressentAddRolle(rolle)
 function InteressentKontoDetailSpeichern()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 	betrag = document.getElementById('interessent-konto-textbox-betrag').value;
 	buchungsdatum = document.getElementById('interessent-konto-textbox-buchungsdatum').value;
 	buchungstext = document.getElementById('interessent-konto-textbox-buchungstext').value;
 	mahnspanne = document.getElementById('interessent-konto-textbox-mahnspanne').value;
 	buchungstyp_kurzbz = document.getElementById('interessent-konto-menulist-buchungstyp').value;
 	buchungsnr = document.getElementById('interessent-konto-textbox-buchungsnr').value;
-	
+
 	if(buchungsdatum!='' && !CheckDatum(buchungsdatum))
 	{
 		alert('Buchungsdatum ist ungueltig');
 		return false;
 	}
-	
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
-	
+
 	req.add('type', 'savebuchung');
-	
+
 	req.add('betrag', betrag);
 	req.add('buchungsdatum', ConvertDateToISO(buchungsdatum));
 	req.add('buchungstext', buchungstext);
 	req.add('mahnspanne', mahnspanne);
 	req.add('buchungstyp_kurzbz', buchungstyp_kurzbz);
 	req.add('buchungsnr', buchungsnr);
-		
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -1418,7 +1422,7 @@ function InteressentKontoDetailSpeichern()
 			alert(val.dbdml_errormsg)
 	}
 	else
-	{			
+	{
 		InteressentKontoSelectBuchung=buchungsnr;
 		InteressentKontoTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
@@ -1436,22 +1440,22 @@ function InteressentKontoGegenbuchung()
 	if (tree.currentIndex==-1) return;
 
 	InteressentKontoDetailDisableFields(false);
-	
+
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["interessent-konto-tree-buchungsnr"] : "interessent-konto-tree-buchungsnr";
 	var buchungsnr=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
-	
+
 	req.add('type', 'savegegenbuchung');
-	
+
 	req.add('buchungsnr', buchungsnr);
-		
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -1460,7 +1464,7 @@ function InteressentKontoGegenbuchung()
 			alert(val.dbdml_errormsg)
 	}
 	else
-	{			
+	{
 		InteressentKontoSelectBuchung=val.dbdml_data;
 		InteressentKontoTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
@@ -1478,24 +1482,24 @@ function InteressentKontoDelete()
 	if (tree.currentIndex==-1) return;
 
 	InteressentKontoDetailDisableFields(false);
-	
+
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["interessent-konto-tree-buchungsnr"] : "interessent-konto-tree-buchungsnr";
 	var buchungsnr=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	if(confirm('Diese Buchung wirklich loeschen?'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 		var req = new phpRequest(url,'','');
-		
+
 		req.add('type', 'deletebuchung');
-		
+
 		req.add('buchungsnr', buchungsnr);
-			
+
 		var response = req.executePOST();
-	
+
 		var val =  new ParseReturnValue(response)
-		
+
 		if (!val.dbdml_return)
 		{
 			if(val.dbdml_errormsg=='')
@@ -1504,7 +1508,7 @@ function InteressentKontoDelete()
 				alert(val.dbdml_errormsg)
 		}
 		else
-		{			
+		{
 			InteressentSelectId=document.getElementById('interessent-detail-textbox-prestudent_id').value;
 			InteressentTreeDatasource.Refresh(false); //non blocking
 			SetStatusBarText('Daten wurden gespeichert');
@@ -1526,31 +1530,31 @@ function InteressentKontoNeu()
 function InteressentKontoNeuSpeichern(dialog, person_ids, studiengang_kz)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-		
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
-	
+
 	//Daten aus dem Dialog holen
 	betrag = dialog.getElementById('interessent-konto-neu-textbox-betrag').value;
 	buchungsdatum = dialog.getElementById('interessent-konto-neu-textbox-buchungsdatum').value;
 	buchungstext = dialog.getElementById('interessent-konto-neu-textbox-buchungstext').value;
 	mahnspanne = dialog.getElementById('interessent-konto-neu-textbox-mahnspanne').value;
 	buchungstyp_kurzbz = dialog.getElementById('interessent-konto-neu-menulist-buchungstyp').value;
-	
+
 	req.add('type', 'neuebuchung');
-	
+
 	req.add('person_ids', person_ids);
 	req.add('studiengang_kz', studiengang_kz);
 	req.add('betrag', betrag);
 	req.add('buchungsdatum', buchungsdatum);
 	req.add('buchungstext', buchungstext);
 	req.add('mahnspanne', mahnspanne);
-	req.add('buchungstyp_kurzbz', buchungstyp_kurzbz);	
-		
+	req.add('buchungstyp_kurzbz', buchungstyp_kurzbz);
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
