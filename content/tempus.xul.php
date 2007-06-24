@@ -168,6 +168,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/tempusoverlay.xul.php"?>';
 	<statusbarpanel id="statusbarpanel-semester" label="<?php echo $semester_aktuell; ?>"/>
 	<statusbarpanel id="statusbarpanel-db_table" label="<?php echo $db_stpl_table; ?>"/>
 	<statusbarpanel id="statusbarpanel-text" label="<?php echo htmlspecialchars($error_msg); ?>" flex="4" crop="right" />
-	<statusbarpanel class="statusbarpanel-iconic" id="example-status" flex="1" />
+	<statusbarpanel id="progress-panel" class="statusbarpanel-progress">
+		<progressmeter id="statusbar-progressmeter" class="progressmeter-statusbar" mode="determined" value="0%"/>
+	</statusbarpanel>
+	<statusbarpanel class="statusbarpanel-iconic" id="example-status" />
 </statusbar>
 </window>

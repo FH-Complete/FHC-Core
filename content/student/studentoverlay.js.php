@@ -54,7 +54,9 @@ var StudentPruefungSelectID=null; //ID der Pruefung die nach dem Refresh markier
 // ****
 var StudentTreeSinkObserver =
 {
-	onBeginLoad : function(pSink) {},
+	onBeginLoad : function(pSink)
+	{
+	},
 	onInterrupt : function(pSink) {},
 	onResume : function(pSink) {},
 	onError : function(pSink, pStatus, pError) {},
@@ -71,14 +73,18 @@ var StudentTreeSinkObserver =
 // ****
 var StudentTreeListener =
 {
-  willRebuild : function(builder) {  },
-  didRebuild : function(builder)
-  {
-  	  //timeout nur bei Mozilla notwendig da sonst die rows
-  	  //noch keine values haben. Ab Seamonkey funktionierts auch
-  	  //ohne dem setTimeout
-      window.setTimeout(StudentTreeSelectStudent,10);
-  }
+	willRebuild : function(builder)
+	{
+	},
+	didRebuild : function(builder)
+  	{
+ 		//timeout nur bei Mozilla notwendig da sonst die rows
+ 		//noch keine values haben. Ab Seamonkey funktionierts auch
+		//ohne dem setTimeout
+		window.setTimeout(StudentTreeSelectStudent,10);
+		// Progressmeter stoppen
+		document.getElementById('statusbar-progressmeter').setAttribute('mode','determined');
+	}
 };
 
 // ****
@@ -338,13 +344,13 @@ function StudentTreeSelectStudent()
 
 	//In der globalen Variable ist der zu selektierende Student gespeichert
 	if(StudentSelectUid!=null)
-	{		
+	{
 	   	for(var i=0;i<items;i++)
 	   	{
 	   		//Uid der row holen
 			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
 			uid=tree.view.getCellText(i,col);
-						
+
 			if(uid == StudentSelectUid)
 			{
 				//Zeile markieren
@@ -360,7 +366,7 @@ function StudentTreeSelectStudent()
 
 // ****
 // * Beim Sortieren des Trees wird der markierte Eintrag gespeichert und nach dem sortieren
-// * wieder markiert. 
+// * wieder markiert.
 // ****
 function StudentTreeSort()
 {
@@ -432,7 +438,7 @@ function StudentGruppeDel()
 
 	if (tree.currentIndex==-1)
 		return;
-	
+
 	var start = new Object();
 	var end = new Object();
 	var numRanges = tree.view.selection.getRangeCount();
@@ -449,7 +455,7 @@ function StudentGruppeDel()
 			anzahl++;
 		}
 	}
-	
+
 	try
 	{
 		//Ausgewaehlte Gruppe holen
@@ -476,11 +482,11 @@ function StudentGruppeDel()
 		req.add('type','deleteGruppenzuteilung');
 		req.add('uid',uids);
 		req.add('gruppe_kurzbz', gruppe_kurzbz);
-		
+
 		var response = req.executePOST();
 
 		var val =  new ParseReturnValue(response)
-		
+
 		if(!val.dbdml_return)
 			alert(val.dbdml_errormsg)
 
@@ -493,7 +499,7 @@ function StudentGruppeDel()
 // * Leert alle Eingabe- und Auswahlfelder
 // ****
 function StudentDetailReset()
-{	
+{
 	document.getElementById('student-detail-textbox-uid').value='';
 	document.getElementById('student-detail-textbox-anrede').value='';
 	document.getElementById('student-detail-textbox-titelpre').value='';
@@ -586,7 +592,7 @@ function StudentDetailSave()
 	semester = document.getElementById('student-detail-textbox-semester').value;
 	verband = document.getElementById('student-detail-textbox-verband').value;
 	gruppe = document.getElementById('student-detail-textbox-gruppe').value;
-		
+
 	if(geburtsdatum!='' && !CheckDatum(geburtsdatum))
 	{
 		alert('Geburtsdatum ist ungueltig');
@@ -604,9 +610,9 @@ function StudentDetailSave()
 	{
 		req.add('do','update');
 	}
-	
+
 	req.add('type', 'savestudent');
-	
+
 	req.add('uid', uid);
 	req.add('anrede', anrede);
 	req.add('titelpre', titelpre);
@@ -633,11 +639,11 @@ function StudentDetailSave()
 	req.add('semester', semester);
 	req.add('verband', verband);
 	req.add('gruppe', gruppe);
-	
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -649,7 +655,7 @@ function StudentDetailSave()
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 		document.getElementById('student-detail-checkbox-new').checked=false;
-		
+
 		StudentSelectUid=val.dbdml_data;
 		StudentTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
@@ -679,13 +685,13 @@ function StudentAuswahl()
 		StudentTreeLoadDataOnSelect=true;
 		return true;
 	}
-	
+
 	// Trick 17	(sonst gibt's ein Permission denied)
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-tree');
 
 	if (tree.currentIndex==-1) return;
-	
+
 	try
 	{
 		//Ausgewaehlte UID holen
@@ -708,7 +714,7 @@ function StudentAuswahl()
 		else
 		{
 			return false;
-		}	
+		}
 	}
 	catch(e)
 	{
@@ -717,14 +723,14 @@ function StudentAuswahl()
 	}
 
 	var url = '<?php echo APP_ROOT ?>rdf/student.rdf.php?uid='+uid+'&stsem=true&'+gettimestamp();
-	
+
 	//hier wird GetDataSourceBlocking verwendet da sich
 	//bei der Methode mit phpRequest der Mozilla aufhaengt
 	//var req = new phpRequest(url,'','');
 	//req.add('uid',uid);
 
 	//var response = req.execute();
-	
+
 	// Datasource holen
 	//var dsource=parseRDFString(response, 'http://www.technikum-wien.at/student/alle');
 
@@ -732,9 +738,9 @@ function StudentAuswahl()
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                    getService(Components.interfaces.nsIRDFService);
-    
+
     var dsource = rdfService.GetDataSourceBlocking(url);
-    
+
 	var subject = rdfService.GetResource("http://www.technikum-wien.at/student/" + uid);
 
 	var predicateNS = "http://www.technikum-wien.at/student/rdf";
@@ -756,7 +762,7 @@ function StudentAuswahl()
 	ersatzkennzeichen=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ersatzkennzeichen" ));
 	familienstand=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#familienstand" ));
 	geschlecht=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#geschlecht" ));
-	aktiv=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aktiv" ));	
+	aktiv=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aktiv" ));
 	anzahlderkinder=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anzahlkinder" ));
 	staatsbuergerschaft=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#staatsbuergerschaft" ));
 	geburtsnation=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#geburtsnation" ));
@@ -768,7 +774,7 @@ function StudentAuswahl()
 	verband=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#verband" ));
 	gruppe=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#gruppe" ));
 	prestudent_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#prestudent_id" ));
-	
+
 	//Daten den Feldern zuweisen
 
 	document.getElementById('student-detail-textbox-uid').value=uid;
@@ -802,15 +808,15 @@ function StudentAuswahl()
 	document.getElementById('student-detail-textbox-semester').value=semester;
 	document.getElementById('student-detail-textbox-verband').value=verband;
 	document.getElementById('student-detail-textbox-gruppe').value=gruppe;
-	
+
 	//PreStudent Daten holen
 	var url = '<?php echo APP_ROOT ?>rdf/prestudent.rdf.php?prestudent_id='+prestudent_id+'&'+gettimestamp();
-		
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                    getService(Components.interfaces.nsIRDFService);
-    
+
     var dsource = rdfService.GetDataSourceBlocking(url);
-    
+
 	var subject = rdfService.GetResource("http://www.technikum-wien.at/prestudent/" + prestudent_id);
 
 	var predicateNS = "http://www.technikum-wien.at/prestudent/rdf";
@@ -835,7 +841,7 @@ function StudentAuswahl()
 	punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
 	bismelden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bismelden" ));
 	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
-	
+
 	document.getElementById('student-prestudent-menulist-aufmerksamdurch').value=aufmerksamdurch_kurzbz;
 	document.getElementById('student-prestudent-menulist-berufstaetigkeit').value=berufstaetigkeit_code;
 	document.getElementById('student-prestudent-menulist-ausbildung').value=ausbildungcode;
@@ -857,22 +863,22 @@ function StudentAuswahl()
 	else
 		document.getElementById('student-prestudent-checkbox-reihungstestangetreten').checked=false;
 	document.getElementById('student-prestudent-textbox-punkte').value=punkte;
-	
+
 	if(bismelden=='true')
 		document.getElementById('student-prestudent-checkbox-bismelden').checked=true;
 	else
 		document.getElementById('student-prestudent-checkbox-bismelden').checked=false;
-		
+
 	document.getElementById('student-prestudent-textbox-person_id').value=person_id;
 	document.getElementById('student-prestudent-textbox-prestudent_id').value=prestudent_id;
 	document.getElementById('student-prestudent-checkbox-new').checked=false;
 	document.getElementById('student-prestudent-menulist-studiengang_kz').value=studiengang_kz;
 	document.getElementById('student-prestudent-textbox-anmerkung').value=anmerkung;
-	
-	
+
+
 	rollentree = document.getElementById('student-prestudent-tree-rolle');
 	url='<?php echo APP_ROOT;?>rdf/prestudentrolle.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
-	
+
 	//Alte DS entfernen
 	var oldDatasources = rollentree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -881,7 +887,7 @@ function StudentAuswahl()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	rollentree.builder.rebuild();
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var datasource = rdfService.GetDataSource(url);
 	rollentree.database.AddDataSource(datasource);
@@ -890,7 +896,7 @@ function StudentAuswahl()
 	kontotree = document.getElementById('student-konto-tree');
 	filter = document.getElementById('student-konto-button-filter').value;
 	url='<?php echo APP_ROOT;?>rdf/konto.rdf.php?person_id='+person_id+"&filter="+filter+"&"+gettimestamp();
-	
+
 	//Alte DS entfernen
 	var oldDatasources = kontotree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -899,7 +905,7 @@ function StudentAuswahl()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	kontotree.builder.rebuild();
-	
+
 	try
 	{
 		StudentKontoTreeDatasource.removeXMLSinkObserver(StudentKontoTreeSinkObserver);
@@ -907,19 +913,19 @@ function StudentAuswahl()
 	}
 	catch(e)
 	{}
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	StudentKontoTreeDatasource = rdfService.GetDataSource(url);
 	StudentKontoTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 	StudentKontoTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	kontotree.database.AddDataSource(StudentKontoTreeDatasource);
 	StudentKontoTreeDatasource.addXMLSinkObserver(StudentKontoTreeSinkObserver);
-	kontotree.builder.addListener(StudentKontoTreeListener);	
-	
+	kontotree.builder.addListener(StudentKontoTreeListener);
+
 	// *** Zeugnis ***
 	zeugnistree = document.getElementById('student-zeugnis-tree');
 	url='<?php echo APP_ROOT;?>rdf/akte.rdf.php?person_id='+person_id+"&dokument_kurzbz=Zeugnis&"+gettimestamp();
-	
+
 	//Alte DS entfernen
 	var oldDatasources = zeugnistree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -928,15 +934,15 @@ function StudentAuswahl()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	zeugnistree.builder.rebuild();
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var datasource = rdfService.GetDataSource(url);
 	zeugnistree.database.AddDataSource(datasource);
-	
+
 	// *** Betriebsmittel ***
 	betriebsmitteltree = document.getElementById('student-betriebsmittel-tree');
 	url='<?php echo APP_ROOT;?>rdf/betriebsmittelperson.rdf.php?person_id='+person_id+"&"+gettimestamp();
-	
+
 	//Alte DS entfernen
 	var oldDatasources = betriebsmitteltree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -945,28 +951,28 @@ function StudentAuswahl()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	betriebsmitteltree.builder.rebuild();
-	
+
 	try
 	{
 		StudentBetriebsmittelTreeDatasource.removeXMLSinkObserver(StudentBetriebsmittelTreeSinkObserver);
-		betriebsmitteltree.builder.removeListener(StudentBetriebsmittelTreeListener);	
+		betriebsmitteltree.builder.removeListener(StudentBetriebsmittelTreeListener);
 	}
 	catch(e)
 	{}
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	StudentBetriebsmittelTreeDatasource = rdfService.GetDataSource(url);
 	StudentBetriebsmittelTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 	StudentBetriebsmittelTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	betriebsmitteltree.database.AddDataSource(StudentBetriebsmittelTreeDatasource);
 	StudentBetriebsmittelTreeDatasource.addXMLSinkObserver(StudentBetriebsmittelTreeSinkObserver);
-	betriebsmitteltree.builder.addListener(StudentBetriebsmittelTreeListener);	
-	
+	betriebsmitteltree.builder.addListener(StudentBetriebsmittelTreeListener);
+
 	// *** Incomming/Outgoing ***
 	bisiotree = document.getElementById('student-io-tree');
-	
+
 	url='<?php echo APP_ROOT;?>rdf/bisio.rdf.php?uid='+uid+"&"+gettimestamp();
-	
+
 	//Alte DS entfernen
 	var oldDatasources = bisiotree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -975,7 +981,7 @@ function StudentAuswahl()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	bisiotree.builder.rebuild();
-	
+
 	try
 	{
 		StudentIOTreeDatasource.removeXMLSinkObserver(StudentIOTreeSinkObserver);
@@ -983,20 +989,20 @@ function StudentAuswahl()
 	}
 	catch(e)
 	{}
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	StudentIOTreeDatasource = rdfService.GetDataSource(url);
 	StudentIOTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 	StudentIOTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	bisiotree.database.AddDataSource(StudentIOTreeDatasource);
 	StudentIOTreeDatasource.addXMLSinkObserver(StudentIOTreeSinkObserver);
-	bisiotree.builder.addListener(StudentIOTreeListener);	
-	
+	bisiotree.builder.addListener(StudentIOTreeListener);
+
 	// *** ZeugnisNoten ***
 	notentree = document.getElementById('student-noten-tree');
-	
+
 	url='<?php echo APP_ROOT;?>rdf/zeugnisnote.rdf.php?uid='+uid+"&"+gettimestamp();
-	
+
 	//Alte DS entfernen
 	var oldDatasources = notentree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -1005,28 +1011,28 @@ function StudentAuswahl()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	notentree.builder.rebuild();
-	
-	try 
+
+	try
 	{
 		StudentNotenTreeDatasource.removeXMLSinkObserver(StudentNotenTreeSinkObserver);
-		notentree.builder.removeListener(StudentNotenTreeListener);	
+		notentree.builder.removeListener(StudentNotenTreeListener);
 	}
 	catch(e)
 	{}
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	StudentNotenTreeDatasource = rdfService.GetDataSource(url);
 	StudentNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 	StudentNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	notentree.database.AddDataSource(StudentNotenTreeDatasource);
 	StudentNotenTreeDatasource.addXMLSinkObserver(StudentNotenTreeSinkObserver);
-	notentree.builder.addListener(StudentNotenTreeListener);	
-	
+	notentree.builder.addListener(StudentNotenTreeListener);
+
 	// *** LvGesamtNoten ***
 	lvgesamtnotentree = document.getElementById('student-lvgesamtnoten-tree');
-	
+
 	url='<?php echo APP_ROOT;?>rdf/lvgesamtnote.rdf.php?uid='+uid+"&"+gettimestamp();
-	
+
 	//Alte DS entfernen
 	var oldDatasources = lvgesamtnotentree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -1035,7 +1041,7 @@ function StudentAuswahl()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	lvgesamtnotentree.builder.rebuild();
-	
+
 	try
 	{
 		StudentLvGesamtNotenTreeDatasource.removeXMLSinkObserver(StudentLvGesamtNotenTreeSinkObserver);
@@ -1043,23 +1049,23 @@ function StudentAuswahl()
 	}
 	catch(e)
 	{}
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	StudentLvGesamtNotenTreeDatasource = rdfService.GetDataSource(url);
 	StudentLvGesamtNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 	StudentLvGesamtNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	lvgesamtnotentree.database.AddDataSource(StudentLvGesamtNotenTreeDatasource);
 	StudentLvGesamtNotenTreeDatasource.addXMLSinkObserver(StudentLvGesamtNotenTreeSinkObserver);
-	lvgesamtnotentree.builder.addListener(StudentLvGesamtNotenTreeListener);	
-	
+	lvgesamtnotentree.builder.addListener(StudentLvGesamtNotenTreeListener);
+
 	// ***** KONTAKTE *****
 	document.getElementById('student-kontakt').setAttribute('src','kontakt.xul.php?person_id='+person_id);
-	
+
 	// ***** Pruefungen *****
 	pruefungtree = document.getElementById('student-pruefung-tree');
-	
+
 	url='<?php echo APP_ROOT;?>rdf/pruefung.rdf.php?student_uid='+uid+"&"+gettimestamp();
-	
+
 	//Alte DS entfernen
 	var oldDatasources = pruefungtree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -1068,7 +1074,7 @@ function StudentAuswahl()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	pruefungtree.builder.rebuild();
-	
+
 	try
 	{
 		StudentPruefungTreeDatasource.removeXMLSinkObserver(StudentPruefungTreeSinkObserver);
@@ -1076,7 +1082,7 @@ function StudentAuswahl()
 	}
 	catch(e)
 	{}
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	StudentPruefungTreeDatasource = rdfService.GetDataSource(url);
 	StudentPruefungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -1139,7 +1145,7 @@ function StudentPrestudentSave()
 	neu = document.getElementById('student-prestudent-checkbox-new').checked;
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 	anmerkung = document.getElementById('student-prestudent-textbox-anmerkung').value;
-	
+
 	if(zgvdatum!='' && !CheckDatum(zgvdatum))
 	{
 		alert('ZGV Datum ist ungueltig');
@@ -1155,18 +1161,18 @@ function StudentPrestudentSave()
 		alert('ReihungstestDatum ist ungueltig');
 		return false;
 	}
-	
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
-	
+
 	if (neu)
 	{
 		alert('Fehler! Es wurde versucht einen neuen Prestudenten anzulegen, dies ist aber hier nicht moeglich');
 		return false;
 	}
-	
+
 	req.add('type', 'saveprestudent');
-		
+
 	req.add('aufmerksamdurch_kurzbz', aufmerksamdurch_kurzbz);
 	req.add('berufstaetigkeit_code', berufstaetigkeit_code);
 	req.add('ausbildungcode', ausbildungcode);
@@ -1187,11 +1193,11 @@ function StudentPrestudentSave()
 	req.add('prestudent_id', prestudent_id);
 	req.add('studiengang_kz', studiengang_kz);
 	req.add('anmerkung', anmerkung);
-		
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -1202,7 +1208,7 @@ function StudentPrestudentSave()
 	else
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-				
+
 		StudentSelectUid=document.getElementById('student-detail-textbox-uid').value;
 		StudentTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
@@ -1216,12 +1222,12 @@ function StudentAnmeldungreihungstestHeute()
 {
 	var now = new Date();
 	var jahr = now.getFullYear();
-	
+
 	monat = now.getMonth()+1;
 	if(monat<10) monat='0'+monat;
 	tag = now.getDate();
 	if(tag<10) tag='0'+tag;
-	
+
 	document.getElementById('student-prestudent-textbox-anmeldungreihungstest').value=tag+'.'+monat+'.'+jahr;
 }
 
@@ -1234,7 +1240,7 @@ function StudentUnterbrecherZuStudent()
 	var tree = document.getElementById('student-tree');
 
 	if (tree.currentIndex==-1) return;
-	
+
 	if(sem = prompt('In welches Semester soll dieser Student verschoben werden?'))
 	{
 		if(!isNaN(sem))
@@ -1257,26 +1263,26 @@ function StudentAddRolle(rolle, semester)
 	var tree = document.getElementById('student-tree');
 
 	if (tree.currentIndex==-1) return;
-		
+
 	//Ausgewaehlte ID holen
     var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
 	var prestudent_id=tree.view.getCellText(tree.currentIndex,col);
-		
+
 	if(semester!='0' || confirm('Diesen Studenten zum '+rolle+' machen?'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 		var req = new phpRequest(url,'','');
-		
+
 		req.add('type', 'addrolle');
-				
+
 		req.add('prestudent_id', prestudent_id);
 		req.add('rolle_kurzbz', rolle);
 		req.add('semester', semester);
-		
+
 		var response = req.executePOST();
-	
+
 		var val =  new ParseReturnValue(response);
-		
+
 		if (!val.dbdml_return)
 		{
 			if(val.dbdml_errormsg=='')
@@ -1285,7 +1291,7 @@ function StudentAddRolle(rolle, semester)
 				alert(val.dbdml_errormsg)
 		}
 		else
-		{			
+		{
 			StudentTreeRefresh();
 			SetStatusBarText('Rolle hinzugefuegt');
 		}
@@ -1304,7 +1310,7 @@ function StudentPrintInskriptionsbestaetigung()
 	var numRanges = tree.view.selection.getRangeCount();
 	var paramList= '';
 	var anzahl=0;
-	
+
 	for (var t = 0; t < numRanges; t++)
 	{
   		tree.view.selection.getRangeAt(t,start,end);
@@ -1316,8 +1322,8 @@ function StudentPrintInskriptionsbestaetigung()
 			anzahl = anzahl+1;
 			}
 	}
-	
-	if(anzahl>0)	
+
+	if(anzahl>0)
 		window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=student.rdf.php&xsl=Inskription&uid='+paramList,'Inskriptionsbestaetigung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 	else
 		alert('Bitte einen Studenten auswaehlen');
@@ -1382,19 +1388,19 @@ function StudentKontoAuswahl()
 	if (tree.currentIndex==-1) return;
 
 	StudentKontoDetailDisableFields(false);
-	
+
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
 	var buchungsnr=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	//Daten holen
 	var url = '<?php echo APP_ROOT ?>rdf/konto.rdf.php?buchungsnr='+buchungsnr+'&'+gettimestamp();
-		
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                    getService(Components.interfaces.nsIRDFService);
-    
+
     var dsource = rdfService.GetDataSourceBlocking(url);
-    
+
 	var subject = rdfService.GetResource("http://www.technikum-wien.at/konto/" + buchungsnr);
 
 	var predicateNS = "http://www.technikum-wien.at/konto/rdf";
@@ -1410,7 +1416,7 @@ function StudentKontoAuswahl()
 	buchungstext = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#buchungstext" ));
 	mahnspanne = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#mahnspanne" ));
 	buchungstyp_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#buchungstyp_kurzbz" ));
-		
+
 	document.getElementById('student-konto-textbox-betrag').value=betrag;
 	document.getElementById('student-konto-textbox-buchungsdatum').value=buchungsdatum;
 	document.getElementById('student-konto-textbox-buchungstext').value=buchungstext;
@@ -1427,7 +1433,7 @@ function StudentKontoFilter()
 
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	filter = document.getElementById('student-konto-button-filter');
-	
+
 	if(filter.value=='offene')
 	{
 		filter.value='alle';
@@ -1438,12 +1444,12 @@ function StudentKontoFilter()
 		filter.value='offene';
 		filter.label='alle';
 	}
-		
+
 	//Konto Tree mit neuem Filter laden
 	kontotree = document.getElementById('student-konto-tree');
 	person_id = document.getElementById('student-prestudent-textbox-person_id').value
 	url='<?php echo APP_ROOT;?>rdf/konto.rdf.php?person_id='+person_id+"&filter="+filter.value+"&"+gettimestamp();
-	
+
 	var buchungsnr=null;
 	try
 	{
@@ -1456,7 +1462,7 @@ function StudentKontoFilter()
 	}
 	catch(e)
 	{}
-	
+
 	//Alte DS entfernen
 	var oldDatasources = kontotree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -1465,24 +1471,24 @@ function StudentKontoFilter()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	kontotree.builder.rebuild();
-	
+
 	StudentKontoSelectBuchung = buchungsnr;
-	
+
 	try
 	{
 		StudentKontoTreeDatasource.removeXMLSinkObserver(StudentKontoTreeSinkObserver);
-		kontotree.builder.removeListener(StudentKontoTreeListener);	
+		kontotree.builder.removeListener(StudentKontoTreeListener);
 	}
 	catch(e)
 	{}
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	StudentKontoTreeDatasource = rdfService.GetDataSource(url);
 	StudentKontoTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 	StudentKontoTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	kontotree.database.AddDataSource(StudentKontoTreeDatasource);
 	StudentKontoTreeDatasource.addXMLSinkObserver(StudentKontoTreeSinkObserver);
-	kontotree.builder.addListener(StudentKontoTreeListener);	
+	kontotree.builder.addListener(StudentKontoTreeListener);
 }
 
 // ****
@@ -1517,14 +1523,14 @@ function StudentKontoDetailDisableFields(val)
 function StudentKontoDetailSpeichern()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 	betrag = document.getElementById('student-konto-textbox-betrag').value;
 	buchungsdatum = document.getElementById('student-konto-textbox-buchungsdatum').value;
 	buchungstext = document.getElementById('student-konto-textbox-buchungstext').value;
 	mahnspanne = document.getElementById('student-konto-textbox-mahnspanne').value;
 	buchungstyp_kurzbz = document.getElementById('student-konto-menulist-buchungstyp').value;
 	buchungsnr = document.getElementById('student-konto-textbox-buchungsnr').value;
-	
+
 	if(buchungsdatum!='' && !CheckDatum(buchungsdatum))
 	{
 		alert('Buchungsdatum ist ungueltig');
@@ -1532,20 +1538,20 @@ function StudentKontoDetailSpeichern()
 	}
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
-	
+
 	req.add('type', 'savebuchung');
-	
+
 	req.add('betrag', betrag);
 	req.add('buchungsdatum', ConvertDateToISO(buchungsdatum));
 	req.add('buchungstext', buchungstext);
 	req.add('mahnspanne', mahnspanne);
 	req.add('buchungstyp_kurzbz', buchungstyp_kurzbz);
 	req.add('buchungsnr', buchungsnr);
-		
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -1554,7 +1560,7 @@ function StudentKontoDetailSpeichern()
 			alert(val.dbdml_errormsg)
 	}
 	else
-	{			
+	{
 		StudentKontoSelectBuchung=buchungsnr;
 		StudentKontoTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
@@ -1572,22 +1578,22 @@ function StudentKontoGegenbuchung()
 	if (tree.currentIndex==-1) return;
 
 	StudentKontoDetailDisableFields(false);
-	
+
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
 	var buchungsnr=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
-	
+
 	req.add('type', 'savegegenbuchung');
-	
+
 	req.add('buchungsnr', buchungsnr);
-		
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -1596,7 +1602,7 @@ function StudentKontoGegenbuchung()
 			alert(val.dbdml_errormsg)
 	}
 	else
-	{			
+	{
 		StudentKontoSelectBuchung=val.dbdml_data;
 		StudentKontoTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
@@ -1614,24 +1620,24 @@ function StudentKontoDelete()
 	if (tree.currentIndex==-1) return;
 
 	StudentKontoDetailDisableFields(false);
-	
+
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
 	var buchungsnr=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	if(confirm('Diese Buchung wirklich loeschen?'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 		var req = new phpRequest(url,'','');
-		
+
 		req.add('type', 'deletebuchung');
-		
+
 		req.add('buchungsnr', buchungsnr);
-			
+
 		var response = req.executePOST();
-	
+
 		var val =  new ParseReturnValue(response)
-		
+
 		if (!val.dbdml_return)
 		{
 			if(val.dbdml_errormsg=='')
@@ -1640,7 +1646,7 @@ function StudentKontoDelete()
 				alert(val.dbdml_errormsg)
 		}
 		else
-		{			
+		{
 			StudentSelectUid=document.getElementById('student-detail-textbox-uid').value;
 			StudentTreeDatasource.Refresh(false); //non blocking
 			SetStatusBarText('Daten wurden gespeichert');
@@ -1662,37 +1668,37 @@ function StudentKontoNeu()
 function StudentKontoNeuSpeichern(dialog, person_ids, studiengang_kz)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-		
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
-	
+
 	//Daten aus dem Dialog holen
 	betrag = dialog.getElementById('student-konto-neu-textbox-betrag').value;
 	buchungsdatum = dialog.getElementById('student-konto-neu-textbox-buchungsdatum').value;
 	buchungstext = dialog.getElementById('student-konto-neu-textbox-buchungstext').value;
 	mahnspanne = dialog.getElementById('student-konto-neu-textbox-mahnspanne').value;
 	buchungstyp_kurzbz = dialog.getElementById('student-konto-neu-menulist-buchungstyp').value;
-	
+
 	if(buchungsdatum!='' && !CheckDatum(buchungsdatum))
 	{
 		alert('Buchungsdatum ist ungueltig');
 		return false;
 	}
-	
+
 	req.add('type', 'neuebuchung');
-	
+
 	req.add('person_ids', person_ids);
 	req.add('studiengang_kz', studiengang_kz);
 	req.add('betrag', betrag);
 	req.add('buchungsdatum', ConvertDateToISO(buchungsdatum));
 	req.add('buchungstext', buchungstext);
 	req.add('mahnspanne', mahnspanne);
-	req.add('buchungstyp_kurzbz', buchungstyp_kurzbz);	
-		
+	req.add('buchungstyp_kurzbz', buchungstyp_kurzbz);
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -1720,7 +1726,7 @@ function StudentKontoZahlungsbestaetigung()
 	var end = new Object();
 	var numRanges = tree.view.selection.getRangeCount();
 	var paramList= '';
-	
+
 	for (var t = 0; t < numRanges; t++)
 	{
   		tree.view.selection.getRangeAt(t,start,end);
@@ -1736,10 +1742,10 @@ function StudentKontoZahlungsbestaetigung()
 				paramList += ';'+buchungsnr;
 			}
 	}
-			
-	//Ausgewaehlte Nr holen    
+
+	//Ausgewaehlte Nr holen
 	var uid = document.getElementById('student-detail-textbox-uid').value;
-		
+
 	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=konto.rdf.php&xsl=Zahlung&uid='+uid+'&buchungsnummern='+paramList,'Zahlungsbestaetigung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
@@ -1754,13 +1760,13 @@ function StudentCreateZeugnis()
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
 	tree = document.getElementById('student-tree');
-	
+
 	//Markierte Studenten holen
 	var start = new Object();
 	var end = new Object();
 	var numRanges = tree.view.selection.getRangeCount();
 	var paramList= '';
-	
+
 	for (var t = 0; t < numRanges; t++)
 	{
   		tree.view.selection.getRangeAt(t,start,end);
@@ -1778,7 +1784,7 @@ function StudentCreateZeugnis()
 	}
 	//Studiensemester holen
 	var ss = getStudiensemester();
-	
+
 	//PDF erzeugen
 	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zeugnis.rdf.php&xsl=Zeugnis&uid='+paramList+'&ss='+ss,'Zeugnis', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
@@ -1791,7 +1797,7 @@ function StudentZeugnisAnzeigen()
 	var tree = document.getElementById('student-zeugnis-tree');
 
 	if (tree.currentIndex==-1) return;
-	
+
 	try
 	{
 		//Ausgewaehlte ID holen
@@ -1805,7 +1811,7 @@ function StudentZeugnisAnzeigen()
 		else
 		{
 			return false;
-		}	
+		}
 	}
 	catch(e)
 	{
@@ -1822,10 +1828,10 @@ function StudentAkteDel()
 
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-zeugnis-tree');
-	
+
 	if (tree.currentIndex==-1)
 		return;
-		
+
 	try
 	{
 		//Ausgewaehlte Akte holen
@@ -1846,11 +1852,11 @@ function StudentAkteDel()
 
 		req.add('type','deleteAkte');
 		req.add('akte_id',akte_id);
-				
+
 		var response = req.executePOST();
 
 		var val =  new ParseReturnValue(response)
-		
+
 		if(!val.dbdml_return)
 			alert(val.dbdml_errormsg)
 
@@ -1882,7 +1888,7 @@ function StudentBetriebsmittelTreeSelectZuordnung()
 
 	//In der globalen Variable ist die zu selektierende Buchung gespeichert
 	if(StudentBetriebsmittelSelectBetriebsmittel_id!=null && StudentBetriebsmittelSelectPerson_id!=null)
-	{		
+	{
 	   	for(var i=0;i<items;i++)
 	   	{
 	   		//ids der row holen
@@ -1892,7 +1898,7 @@ function StudentBetriebsmittelTreeSelectZuordnung()
 			person_id=tree.view.getCellText(i,col);
 
 			//wenn dies die zu selektierende Zeile ist
-			if(betriebsmittel_id == StudentBetriebsmittelSelectBetriebsmittel_id && 
+			if(betriebsmittel_id == StudentBetriebsmittelSelectBetriebsmittel_id &&
 			   person_id == StudentBetriebsmittelSelectPerson_id)
 			{
 				//Zeile markieren
@@ -1919,23 +1925,23 @@ function StudentBetriebsmittelAuswahl()
 	if (tree.currentIndex==-1) return;
 
 	StudentBetriebsmittelDetailDisableFields(false);
-	
+
 	document.getElementById('student-betriebsmittel-checkbox-neu').checked=false;
-	
+
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["student-betriebsmittel-tree-betriebsmittel_id"] : "student-betriebsmittel-tree-betriebsmittel_id";
 	var betriebsmittel_id=tree.view.getCellText(tree.currentIndex,col);
 	var col = tree.columns ? tree.columns["student-betriebsmittel-tree-person_id"] : "student-betriebsmittel-tree-person_id";
 	var person_id=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	//Daten holen
 	var url = '<?php echo APP_ROOT ?>rdf/betriebsmittelperson.rdf.php?betriebsmittel_id='+betriebsmittel_id+'&person_id='+person_id+'&'+gettimestamp();
-		
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                    getService(Components.interfaces.nsIRDFService);
-    
+
     var dsource = rdfService.GetDataSourceBlocking(url);
-    
+
 	var subject = rdfService.GetResource("http://www.technikum-wien.at/betriebsmittel/"+person_id+'/'+betriebsmittel_id);
 
 	var predicateNS = "http://www.technikum-wien.at/betriebsmittel/rdf";
@@ -1950,7 +1956,7 @@ function StudentBetriebsmittelAuswahl()
 	betriebsmitteltyp = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#betriebsmitteltyp" ));
 	nummer = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#nummer" ));
 	beschreibung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#beschreibung" ));
-		
+
 	document.getElementById('student-betriebsmittel-textbox-person_id').value=person_id;
 	document.getElementById('student-betriebsmittel-textbox-betriebsmittel_id').value=betriebsmittel_id;
 	document.getElementById('student-betriebsmittel-textbox-anmerkung').value=anmerkung;
@@ -1983,9 +1989,9 @@ function StudentBetriebsmittelDetailDisableFields(val)
 	document.getElementById('student-betriebsmittel-textbox-kaution').disabled=val;
 	document.getElementById('student-betriebsmittel-textbox-anmerkung').disabled=val;
 	document.getElementById('student-betriebsmittel-textbox-ausgegebenam').disabled=val;
-	document.getElementById('student-betriebsmittel-textbox-retouram').disabled=val;	
+	document.getElementById('student-betriebsmittel-textbox-retouram').disabled=val;
 	document.getElementById('student-betriebsmittel-button-speichern').disabled=val;
-	
+
 	if(val)
 		StudentBetriebsmittelDetailResetFields();
 }
@@ -1994,14 +2000,14 @@ function StudentBetriebsmittelDetailDisableFields(val)
 // * Resetet die Betriebsmitteldetail Felder
 // ****
 function StudentBetriebsmittelDetailResetFields()
-{		
+{
 	document.getElementById('student-betriebsmittel-menulist-betriebsmitteltyp').value='Zutrittskarte';
 	document.getElementById('student-betriebsmittel-textbox-nummer').value='';
 	document.getElementById('student-betriebsmittel-textbox-beschreibung').value='';
 	document.getElementById('student-betriebsmittel-textbox-kaution').value='';
 	document.getElementById('student-betriebsmittel-textbox-anmerkung').value='';
 	document.getElementById('student-betriebsmittel-textbox-ausgegebenam').value='';
-	document.getElementById('student-betriebsmittel-textbox-retouram').value='';	
+	document.getElementById('student-betriebsmittel-textbox-retouram').value='';
 }
 
 // ****
@@ -2015,27 +2021,27 @@ function StudentBetriebsmittelDelete()
 	if (tree.currentIndex==-1) return;
 
 	StudentBetriebsmittelDetailDisableFields(false);
-	
+
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["student-betriebsmittel-tree-betriebsmittel_id"] : "student-betriebsmittel-tree-betriebsmittel_id";
 	var betriebsmittel_id=tree.view.getCellText(tree.currentIndex,col);
 	var col = tree.columns ? tree.columns["student-betriebsmittel-tree-person_id"] : "student-betriebsmittel-tree-person_id";
 	var person_id=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	if(confirm('Diesen Eintrag wirklich loeschen?'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 		var req = new phpRequest(url,'','');
-		
+
 		req.add('type', 'deletebetriebsmittel');
-		
+
 		req.add('betriebsmittel_id', betriebsmittel_id);
 		req.add('person_id', person_id);
-		
+
 		var response = req.executePOST();
-	
+
 		var val =  new ParseReturnValue(response)
-		
+
 		if (!val.dbdml_return)
 		{
 			if(val.dbdml_errormsg=='')
@@ -2044,7 +2050,7 @@ function StudentBetriebsmittelDelete()
 				alert(val.dbdml_errormsg)
 		}
 		else
-		{			
+		{
 			StudentBetriebsmittelTreeDatasource.Refresh(false);
 			SetStatusBarText('Daten wurden gespeichert');
 		}
@@ -2057,7 +2063,7 @@ function StudentBetriebsmittelDelete()
 function StudentBetriebsmittelDetailSpeichern()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 	person_id = document.getElementById('student-betriebsmittel-textbox-person_id').value;
 	betriebsmittel_id = document.getElementById('student-betriebsmittel-textbox-betriebsmittel_id').value;
 	anmerkung = document.getElementById('student-betriebsmittel-textbox-anmerkung').value;
@@ -2068,7 +2074,7 @@ function StudentBetriebsmittelDetailSpeichern()
 	nummer = document.getElementById('student-betriebsmittel-textbox-nummer').value;
 	beschreibung = document.getElementById('student-betriebsmittel-textbox-beschreibung').value;
 	neu = document.getElementById('student-betriebsmittel-checkbox-neu').checked;
-	
+
 	if(ausgegebenam!='' && !CheckDatum(ausgegebenam))
 	{
 		alert('AusgegebenAm Datum ist ungueltig');
@@ -2079,12 +2085,12 @@ function StudentBetriebsmittelDetailSpeichern()
 		alert('RetourAm Datum ist ungueltig');
 		return false;
 	}
-	
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
-	
+
 	req.add('type', 'savebetriebsmittel');
-	
+
 	req.add('neu', neu);
 	req.add('person_id', person_id);
 	req.add('betriebsmittel_id', betriebsmittel_id);
@@ -2095,11 +2101,11 @@ function StudentBetriebsmittelDetailSpeichern()
 	req.add('betriebsmitteltyp', betriebsmitteltyp);
 	req.add('nummer', nummer);
 	req.add('beschreibung', beschreibung);
-	
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -2108,7 +2114,7 @@ function StudentBetriebsmittelDetailSpeichern()
 			alert(val.dbdml_errormsg)
 	}
 	else
-	{			
+	{
 		StudentBetriebsmittelSelectBetriebsmittel_id=val.dbdml_data;
 		StudentBetriebsmittelSelectPerson_id=person_id;
 		StudentBetriebsmittelTreeDatasource.Refresh(false); //non blocking
@@ -2123,15 +2129,15 @@ function StudentBetriebsmittelNeu()
 {
 	var now = new Date();
 	var jahr = now.getFullYear();
-	
+
 	var monat = now.getMonth()+1;
-	
-	if(monat<10) 
+
+	if(monat<10)
 		monat='0'+monat;
 	var tag = now.getDate();
-	if(tag<10) 
+	if(tag<10)
 		tag='0'+tag;
-	
+
 	document.getElementById('student-betriebsmittel-checkbox-neu').checked=true;
 	StudentBetriebsmittelDetailDisableFields(false);
 	StudentBetriebsmittelDetailResetFields();
@@ -2154,19 +2160,19 @@ function StudentIOAuswahl()
 	if (tree.currentIndex==-1) return;
 
 	StudentIODetailDisableFields(false);
-		
+
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["student-io-tree-bisio_id"] : "student-io-tree-bisio_id";
 	var bisio_id=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	//Daten holen
 	var url = '<?php echo APP_ROOT ?>rdf/bisio.rdf.php?bisio_id='+bisio_id+'&'+gettimestamp();
-		
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                    getService(Components.interfaces.nsIRDFService);
-    
+
     var dsource = rdfService.GetDataSourceBlocking(url);
-    
+
 	var subject = rdfService.GetResource("http://www.technikum-wien.at/bisio/" + bisio_id);
 
 	var predicateNS = "http://www.technikum-wien.at/bisio/rdf";
@@ -2179,7 +2185,7 @@ function StudentIOAuswahl()
 	bis = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bis" ));
 	zweck_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zweck_code" ));
 	student_uid = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#student_uid" ));
-				
+
 	document.getElementById('student-io-menulist-mobilitaetsprogramm').value=mobilitaetsprogramm_code;
 	document.getElementById('student-io-menulist-nation').value=nation_code;
 	document.getElementById('student-io-textbox-von').value=von;
@@ -2231,7 +2237,7 @@ function StudentIOResetFileds()
 function StudentIODetailSpeichern()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-		
+
 	von = document.getElementById('student-io-textbox-von').value;
 	bis = document.getElementById('student-io-textbox-bis').value;
 	mobilitaetsprogramm = document.getElementById('student-io-menulist-mobilitaetsprogramm').value;
@@ -2240,27 +2246,27 @@ function StudentIODetailSpeichern()
 	uid = document.getElementById('student-io-detail-textbox-uid').value;
 	neu = document.getElementById('student-io-detail-checkbox-neu').checked;
 	bisio_id = document.getElementById('student-io-detail-textbox-bisio_id').value;
-	
+
 	if(von!='' && !CheckDatum(von))
 	{
 		alert('VON Datum ist ungueltig');
 		return false;
 	}
-	
+
 	if(bis!='' && !CheckDatum(bis))
 	{
 		alert('BIS Datum ist ungueltig');
 		return false;
 	}
-	
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
-	
+
 	req.add('type', 'savebisio');
-	
+
 	if(neu==false)
 		req.add('bisio_id', bisio_id);
-	
+
 	req.add('neu', neu);
 	req.add('von', ConvertDateToISO(von));
 	req.add('bis', ConvertDateToISO(bis));
@@ -2268,11 +2274,11 @@ function StudentIODetailSpeichern()
 	req.add('nation_code', nation_code);
 	req.add('zweck_code', zweck_code);
 	req.add('student_uid', uid);
-		
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -2281,7 +2287,7 @@ function StudentIODetailSpeichern()
 			alert(val.dbdml_errormsg)
 	}
 	else
-	{			
+	{
 		if(neu)
 			StudentIOSelectID=val.dbdml_data;
 		else
@@ -2302,24 +2308,24 @@ function StudentIODelete()
 	if (tree.currentIndex==-1) return;
 
 	StudentIODetailDisableFields(false);
-	
+
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["student-io-tree-bisio_id"] : "student-io-tree-bisio_id";
 	var bisio_id=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	if(confirm('Diesen Eintrag wirklich loeschen?'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 		var req = new phpRequest(url,'','');
-		
+
 		req.add('type', 'deletebisio');
-		
+
 		req.add('bisio_id', bisio_id);
-			
+
 		var response = req.executePOST();
-	
+
 		var val =  new ParseReturnValue(response)
-		
+
 		if (!val.dbdml_return)
 		{
 			if(val.dbdml_errormsg=='')
@@ -2328,7 +2334,7 @@ function StudentIODelete()
 				alert(val.dbdml_errormsg)
 		}
 		else
-		{			
+		{
 			StudentIOSelectID=bisio_id;
 			StudentIOTreeDatasource.Refresh(false); //non blocking
 			SetStatusBarText('Daten wurden geloescht');
@@ -2346,20 +2352,20 @@ function StudentIONeu()
 	//Felder Resetten und Aktivieren
 	StudentIOResetFileds();
 	StudentIODetailDisableFields(false);
-	
+
 	var now = new Date();
 	var jahr = now.getFullYear();
-	
+
 	var monat = now.getMonth()+1;
-	
-	if(monat<10) 
+
+	if(monat<10)
 		monat='0'+monat;
 	var tag = now.getDate();
-	if(tag<10) 
+	if(tag<10)
 		tag='0'+tag;
-	
-	//UID ins Textfeld schreiben	
-	document.getElementById('student-io-detail-textbox-uid').value=document.getElementById('student-detail-textbox-uid').value;	
+
+	//UID ins Textfeld schreiben
+	document.getElementById('student-io-detail-textbox-uid').value=document.getElementById('student-detail-textbox-uid').value;
 	document.getElementById('student-io-detail-checkbox-neu').checked=true;
 	document.getElementById('student-io-textbox-von').value=tag+'.'+monat+'.'+jahr;
 	document.getElementById('student-io-textbox-bis').value=tag+'.'+monat+'.'+jahr;
@@ -2379,7 +2385,7 @@ function StudentIOTreeSelectID()
 
 	//In der globalen Variable ist die zu selektierende Eintrag gespeichert
 	if(StudentIOSelectID!=null)
-	{		
+	{
 	   	for(var i=0;i<items;i++)
 	   	{
 	   		//ID der row holen
@@ -2417,7 +2423,7 @@ function StudentNotenTreeSelectID()
 
 	//In der globalen Variable ist die zu selektierende Eintrag gespeichert
 	if(StudentNotenSelectLehrveranstaltungID!=null)
-	{		
+	{
 	   	for(var i=0;i<items;i++)
 	   	{
 	   		//ID der row holen
@@ -2453,7 +2459,7 @@ function StudentLvGesamtNotenTreeSelectID()
 
 	//In der globalen Variable ist die zu selektierende Eintrag gespeichert
 	if(StudentLvGesamtNotenSelectLehrveranstaltungID!=null)
-	{		
+	{
 	   	for(var i=0;i<items;i++)
 	   	{
 	   		//ID der row holen
@@ -2503,7 +2509,7 @@ function StudentNotenAuswahl()
 	if (tree.currentIndex==-1) return;
 
 	StudentNoteDetailDisableFields(false);
-		
+
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["student-noten-tree-lehrveranstaltung_id"] : "student-noten-tree-lehrveranstaltung_id";
 	var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
@@ -2511,15 +2517,15 @@ function StudentNotenAuswahl()
 	var student_uid=tree.view.getCellText(tree.currentIndex,col);
 	var col = tree.columns ? tree.columns["student-noten-tree-studiensemester_kurzbz"] : "student-noten-tree-studiensemester_kurzbz";
 	var studiensemester_kurzbz=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	//Daten holen
 	var url = '<?php echo APP_ROOT ?>rdf/zeugnisnote.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+'&uid='+student_uid+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&'+gettimestamp();
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                    getService(Components.interfaces.nsIRDFService);
-    
+
     var dsource = rdfService.GetDataSourceBlocking(url);
-    
+
 	var subject = rdfService.GetResource("http://www.technikum-wien.at/zeugnisnote/" + lehrveranstaltung_id+'/'+student_uid+'/'+studiensemester_kurzbz);
 
 	var predicateNS = "http://www.technikum-wien.at/zeugnisnote/rdf";
@@ -2527,10 +2533,10 @@ function StudentNotenAuswahl()
 	//Daten holen
 
 	note = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#note" ));
-		
+
 	if(note=='')
 		note='9';
-	
+
 	document.getElementById('student-noten-menulist-note').value=note;
 }
 
@@ -2547,7 +2553,7 @@ function StudentNoteSpeichern()
 		alert('Speichern nicht moeglich! Es muss eine Note im Tree ausgewaehlt sein');
 		return;
 	}
-		
+
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["student-noten-tree-lehrveranstaltung_id"] : "student-noten-tree-lehrveranstaltung_id";
 	var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
@@ -2555,24 +2561,24 @@ function StudentNoteSpeichern()
 	var student_uid=tree.view.getCellText(tree.currentIndex,col);
 	var col = tree.columns ? tree.columns["student-noten-tree-studiensemester_kurzbz"] : "student-noten-tree-studiensemester_kurzbz";
 	var studiensemester_kurzbz=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	note = document.getElementById('student-noten-menulist-note').value;
-	
-	
+
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
-	
+
 	req.add('type', 'savenote');
-		
+
 	req.add('lehrveranstaltung_id', lehrveranstaltung_id);
 	req.add('student_uid', student_uid);
 	req.add('studiensemester_kurzbz', studiensemester_kurzbz);
 	req.add('note', note);
-			
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -2581,8 +2587,8 @@ function StudentNoteSpeichern()
 			alert(val.dbdml_errormsg)
 	}
 	else
-	{			
-		StudentLvGesamtNotenSelectLehrveranstaltungID=lehrveranstaltung_id;	
+	{
+		StudentLvGesamtNotenSelectLehrveranstaltungID=lehrveranstaltung_id;
 		StudentNotenTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 		StudentNoteDetailDisableFields(true);
@@ -2596,18 +2602,18 @@ function StudentNotenMove()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-lvgesamtnoten-tree');
-	
+
 	var start = new Object();
 	var end = new Object();
 	var numRanges = tree.view.selection.getRangeCount();
 	var paramList= '';
 	var i = 0;
-	
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
-	
+
 	req.add('type', 'movenote');
-	
+
 	for (var t = 0; t < numRanges; t++)
 	{
   		tree.view.selection.getRangeAt(t,start,end);
@@ -2622,16 +2628,16 @@ function StudentNotenMove()
 
 			req.add('lehrveranstaltung_id_'+i, lehrveranstaltung_id);
 			req.add('student_uid_'+i, student_uid);
-			req.add('studiensemester_kurzbz_'+i, studiensemester_kurzbz);	
+			req.add('studiensemester_kurzbz_'+i, studiensemester_kurzbz);
 			i++;
 		}
 	}
 	req.add('anzahl', i);
-	
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -2640,7 +2646,7 @@ function StudentNotenMove()
 			alert(val.dbdml_errormsg)
 	}
 	else
-	{			
+	{
 		StudentNotenTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 		StudentNoteDetailDisableFields(true);
@@ -2663,7 +2669,7 @@ function StudentPruefungTreeSelectID()
 
 	//In der globalen Variable ist die zu selektierende Eintrag gespeichert
 	if(StudentPruefungSelectID!=null)
-	{		
+	{
 	   	for(var i=0;i<items;i++)
 	   	{
 	   		//ID der row holen
@@ -2691,7 +2697,7 @@ function StudentPruefungDisableFileds(val)
 {
 	document.getElementById('student-pruefung-button-neu').disabled = val;
 	document.getElementById('student-pruefung-button-loeschen').disabled= val;
-	
+
 	if(val)
 		StudentPruefungDetailDisableFields(val);
 }
@@ -2719,29 +2725,29 @@ function StudentPruefungDelete()
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-pruefung-tree');
 
-	if (tree.currentIndex==-1) 
+	if (tree.currentIndex==-1)
 	{
 		alert('Bitte zuerst einen Eintrag markieren');
 		return;
 	}
-	
+
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["student-pruefung-tree-pruefung_id"] : "student-pruefung-tree-pruefung_id";
 	var pruefung_id=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	if(confirm('Diesen Eintrag wirklich loeschen?'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 		var req = new phpRequest(url,'','');
-		
+
 		req.add('type', 'deletepruefung');
-		
+
 		req.add('pruefung_id', pruefung_id);
-			
+
 		var response = req.executePOST();
-	
+
 		var val =  new ParseReturnValue(response)
-		
+
 		if (!val.dbdml_return)
 		{
 			if(val.dbdml_errormsg=='')
@@ -2750,7 +2756,7 @@ function StudentPruefungDelete()
 				alert(val.dbdml_errormsg)
 		}
 		else
-		{			
+		{
 			StudentPruefungTreeDatasource.Refresh(false); //non blocking
 			SetStatusBarText('Daten wurden geloescht');
 			StudentPruefungDetailDisableFields(true);
@@ -2765,20 +2771,20 @@ function StudentPruefungNeu()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	StudentPruefungDetailDisableFields(false);
-	
+
 	var verband_tree=document.getElementById('tree-verband');
-	
+
 	document.getElementById('student-pruefung-checkbox-neu').checked=true;
-	
+
 	var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
 	var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
 	col = verband_tree.columns ? verband_tree.columns["sem"] : "sem";
 	var sem=verband_tree.view.getCellText(verband_tree.currentIndex,col);
-	
+
 	//Lehrveranstaltung Drop Down laden
 	var LVDropDown = document.getElementById('student-pruefung-menulist-lehrveranstaltung');
 	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&sem="+sem+"&"+gettimestamp();
-	
+
 	//Alte DS entfernen
 	var oldDatasources = LVDropDown.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -2787,7 +2793,7 @@ function StudentPruefungNeu()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	LVDropDown.builder.rebuild();
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var datasource = rdfService.GetDataSource(url);
 	LVDropDown.database.AddDataSource(datasource);
@@ -2799,14 +2805,14 @@ function StudentPruefungNeu()
 function StudentPruefungLVAChange()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 	var lvid = document.getElementById('student-pruefung-menulist-lehrveranstaltung').value;
 	var stsem = getStudiensemester();
-	
+
 	//Lehreinheiten Drop Down laden
 	var LEDropDown = document.getElementById('student-pruefung-menulist-lehreinheit');
 	url='<?php echo APP_ROOT;?>rdf/lehreinheit.rdf.php?lehrveranstaltung_id='+lvid+"&studiensemester_kurzbz="+stsem+"&"+gettimestamp();
-	
+
 	//Alte DS entfernen
 	var oldDatasources = LEDropDown.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -2815,7 +2821,7 @@ function StudentPruefungLVAChange()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	LEDropDown.builder.rebuild();
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var datasource = rdfService.GetDataSource(url);
 	LEDropDown.database.AddDataSource(datasource);
@@ -2828,13 +2834,13 @@ function StudentPruefungLVAChange()
 function StudentPruefungLEChange()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 	var leid = document.getElementById('student-pruefung-menulist-lehreinheit').value;
-		
+
 	//Lehreinheiten Drop Down laden
 	var MADropDown = document.getElementById('student-pruefung-menulist-mitarbeiter');
 	url='<?php echo APP_ROOT;?>rdf/mitarbeiter.rdf.php?lehreinheit_id='+leid+"&"+gettimestamp();
-	
+
 	//Alte DS entfernen
 	var oldDatasources = MADropDown.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -2843,7 +2849,7 @@ function StudentPruefungLEChange()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	MADropDown.builder.rebuild();
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var datasource = rdfService.GetDataSource(url);
 	MADropDown.database.AddDataSource(datasource);
@@ -2855,7 +2861,7 @@ function StudentPruefungLEChange()
 function StudentPruefungDetailSpeichern()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 	lehreinheit_id = document.getElementById('student-pruefung-menulist-lehreinheit').value;
 	mitarbeiter_uid = document.getElementById('student-pruefung-menulist-mitarbeiter').value;
 	pruefungstyp_kurzbz = document.getElementById('student-pruefung-menulist-typ').value;
@@ -2864,28 +2870,28 @@ function StudentPruefungDetailSpeichern()
 	anmerkung = document.getElementById('student-pruefung-textbox-anmerkung').value;
 	neu = document.getElementById('student-pruefung-checkbox-neu').checked;
 	pruefung_id = document.getElementById('student-pruefung-textbox-pruefung_id').value;
-	
+
 	var tree = document.getElementById('student-tree');
 
-	if (tree.currentIndex==-1) 
+	if (tree.currentIndex==-1)
 	{
 		alert('Student muss ausgewaehlt sein');
 		return;
 	}
     var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
 	var student_uid=tree.view.getCellText(tree.currentIndex,col);
-		
+
 	if(datum!='' && !CheckDatum(datum))
 	{
 		alert('Datum ist ungueltig');
 		return false;
 	}
-	
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
-	
+
 	req.add('type', 'savepruefung');
-		
+
 	req.add('lehreinheit_id', lehreinheit_id);
 	req.add('mitarbeiter_uid', mitarbeiter_uid);
 	req.add('pruefungstyp_kurzbz', pruefungstyp_kurzbz);
@@ -2893,13 +2899,13 @@ function StudentPruefungDetailSpeichern()
 	req.add('datum', datum);
 	req.add('anmerkung', anmerkung);
 	req.add('neu', neu);
-	req.add('pruefung_id', pruefung_id);	
+	req.add('pruefung_id', pruefung_id);
 	req.add('student_uid', student_uid);
-			
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -2908,8 +2914,8 @@ function StudentPruefungDetailSpeichern()
 			alert(val.dbdml_errormsg)
 	}
 	else
-	{			
-		StudentPruefungSelectID=val.dbdml_data;	
+	{
+		StudentPruefungSelectID=val.dbdml_data;
 		StudentPruefungTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 		StudentPruefungDetailDisableFields(true);
@@ -2928,25 +2934,25 @@ function StudentPruefungAuswahl()
 
 	StudentPruefungDetailDisableFields(false);
 	document.getElementById('student-pruefung-checkbox-neu').checked=false;
-	
+
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["student-pruefung-tree-pruefung_id"] : "student-pruefung-tree-pruefung_id";
 	var pruefung_id=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	//Daten holen
 	var url = '<?php echo APP_ROOT ?>rdf/pruefung.rdf.php?pruefung_id='+pruefung_id+'&'+gettimestamp();
-		
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                    getService(Components.interfaces.nsIRDFService);
-    
+
     var dsource = rdfService.GetDataSourceBlocking(url);
-    
+
 	var subject = rdfService.GetResource("http://www.technikum-wien.at/pruefung/" + pruefung_id);
 
 	var predicateNS = "http://www.technikum-wien.at/pruefung/rdf";
 
 	//Daten holen
-	
+
 	lehreinheit_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehreinheit_id" ));
 	lehrveranstaltung_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehrveranstaltung_id" ));
 	mitarbeiter_uid = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#mitarbeiter_uid" ));
@@ -2954,19 +2960,19 @@ function StudentPruefungAuswahl()
 	pruefungstyp_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#pruefungstyp_kurzbz" ));
 	datum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#datum" ));
 	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
-	
-	
+
+
 	var verband_tree=document.getElementById('tree-verband');
-	
+
 	var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
 	var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
 	col = verband_tree.columns ? verband_tree.columns["sem"] : "sem";
 	var sem=verband_tree.view.getCellText(verband_tree.currentIndex,col);
-	
+
 	//Lehrveranstaltung Drop Down laden
 	var LVDropDown = document.getElementById('student-pruefung-menulist-lehrveranstaltung');
 	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&sem="+sem+"&"+gettimestamp();
-	
+
 	//Alte DS entfernen
 	var oldDatasources = LVDropDown.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -2975,19 +2981,19 @@ function StudentPruefungAuswahl()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	LVDropDown.builder.rebuild();
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var datasource = rdfService.GetDataSourceBlocking(url);
 	LVDropDown.database.AddDataSource(datasource);
-	
+
 	debug('Lehrveranstaltung geladen:'+url);
-	
+
 	var stsem = getStudiensemester();
-	
+
 	//Lehreinheiten Drop Down laden
 	var LEDropDown = document.getElementById('student-pruefung-menulist-lehreinheit');
 	url='<?php echo APP_ROOT;?>rdf/lehreinheit.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+"&studiensemester_kurzbz="+stsem+"&"+gettimestamp();
-	
+
 	//Alte DS entfernen
 	var oldDatasources = LEDropDown.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -2996,17 +3002,17 @@ function StudentPruefungAuswahl()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	LEDropDown.builder.rebuild();
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var datasource = rdfService.GetDataSourceBlocking(url);
 	LEDropDown.database.AddDataSource(datasource);
-	
+
 	debug('Lehreinheit geladen');
-	
+
 	//Lehreinheiten Drop Down laden
 	var MADropDown = document.getElementById('student-pruefung-menulist-mitarbeiter');
 	url='<?php echo APP_ROOT;?>rdf/mitarbeiter.rdf.php?lehreinheit_id='+lehreinheit_id+"&"+gettimestamp();
-	
+
 	//Alte DS entfernen
 	var oldDatasources = MADropDown.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -3015,12 +3021,12 @@ function StudentPruefungAuswahl()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	MADropDown.builder.rebuild();
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var datasource = rdfService.GetDataSourceBlocking(url);
 	MADropDown.database.AddDataSource(datasource);
 	debug('Mitarbeiter geladen');
-	
+
 	document.getElementById('student-pruefung-menulist-lehrveranstaltung').value=lehrveranstaltung_id;
 	document.getElementById('student-pruefung-menulist-lehreinheit').value=lehreinheit_id;
 	document.getElementById('student-pruefung-menulist-mitarbeiter').value=mitarbeiter_uid;

@@ -3,6 +3,39 @@ include('../vilesci/config.inc.php');
 ?>
 var menuUndoDatasource=0;
 
+// ----------------------------------------------------------
+// ------- CLASS Progressmeter ------------------------------
+function Progressmeter()
+{
+	var id;
+    this.StartPM=StartPM;
+    //var m_data = 5;
+    //var m_text = "Hello World";
+    //this.SetText = SetText;
+    //this.ShowData = DisplayData;
+    //this.ShowText = DisplayText;
+
+    Progressmeter.prototype.construct = function(id)
+    {
+    	this.id=id;
+    };
+
+    function StartPM()
+    {
+        // Progressmeter starten.
+		document.getElementById(this.id).setAttribute('mode','undetermined');
+    }
+
+    //function SetData( myVal )
+    //{
+    //    m_data = myVal;
+    //}
+}
+// ------ EndOf CLASS Progressmeter ------------------------------
+
+//var globalProgressmeter=new Progressmeter('statusbar-progressmeter');
+//globalProgressmeter.StartPM();
+
 function closeWindow()
 {
   window.close();
@@ -15,7 +48,7 @@ function onLoad()
   		initLektorTree();
   		//Studenten Tab beim starten markieren
   		document.getElementById('tabbox-main').selectedIndex="1";
-  		
+
   		//Funktion ueberschreiben damit sie nicht nochmal aufgerufen wird
   		//wenn zb ein IFrame geladen wird
   		onLoad=function() {return false};
@@ -41,6 +74,7 @@ function stpltableChange(db_stpl_table)
 {
 //alert(db_stpl_table);
 }
+
 function studiensemesterChange()
 {
 	var items = document.getElementsByTagName('menuitem');
