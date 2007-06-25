@@ -779,6 +779,30 @@ if($result = pg_query($conn_fas, $qry))
 			$error_log.='Fehler beim Abfragen des aktuellen Status bei student_pk: '.$row->student_pk;
 			echo nl2br('Fehler beim Abfragen des aktuellen Status bei student_pk: '.$row->student_pk);	
 		}
+		//Studiengang ermitteln
+		$qry="SELECT studiengang_kz FROM public.tbl_studiengang WHERE ext_id='".$row->studiengang_fk."';";
+		if($resultu = pg_query($conn, $qry))
+		{
+			if(pg_num_rows($resultu)>0) 
+			{
+				if($rowu=pg_fetch_object($resultu))
+				{
+					$studiengang_kz=$rowu->studiengang_kz;
+				}
+			}
+			else 
+			{
+				echo nl2br("\n".$qry."\nSTUDIENGANG NICHT GEFUNDEN!!! \n");
+				$error_log.="\n".$qry."\nSTUDIENGANG NICHT GEFUNDEN!!! \n";
+				$error=true;
+			}
+		}
+		else 
+		{
+			echo nl2br("\n".$qry."\nFehler beim Zugriff auf tbl_studiengang\n".pg_errormessage($conn)."\n");
+			$error_log.="\n".$qry."\nFehler beim Zugriff auf tbl_studiengang\n".pg_errormessage($conn)."\n";
+			$error=true;
+		}
 		//Start der Transaktion
 		pg_query($conn,'BEGIN;');
 		
@@ -901,6 +925,7 @@ if($result = pg_query($conn_fas, $qry))
 			{
 				while($row1 = pg_fetch_object($result1))
 				{
+					
 					$updatep=false;			
 					if($row1->sprache!=$sprache) 
 					{
@@ -1118,7 +1143,7 @@ if($result = pg_query($conn_fas, $qry))
 							$ausgabe_person="Insertvon: '".$insertvon."' (statt '".$row1->insertvon."')";
 						}
 					}
-					if($updatep)
+					if($updatep && $studiengang_kz!=299)
 					{
 						$qry = 'UPDATE public.tbl_person SET'.
 						       ' sprache='.myaddslashes($sprache).','.
@@ -1151,7 +1176,7 @@ if($result = pg_query($conn_fas, $qry))
 					}
 					else 
 					{
-						$qry="SELECT * FROM public.tbl_person;";
+						$qry="select 1;";
 					}
 				}
 			}
@@ -1228,30 +1253,7 @@ if($result = pg_query($conn_fas, $qry))
 				$error_log.='Fehler beim Zugriff auf Tabelle tbl_prestudent bei student_pk: '.$row->student_pk.pg_errormessage($conn)."\n";	
 			}
 			
-			//Studiengang ermitteln
-			$qry="SELECT studiengang_kz FROM public.tbl_studiengang WHERE ext_id='".$row->studiengang_fk."';";
-			if($resultu = pg_query($conn, $qry))
-			{
-				if(pg_num_rows($resultu)>0) 
-				{
-					if($rowu=pg_fetch_object($resultu))
-					{
-						$studiengang_kz=$rowu->studiengang_kz;
-					}
-				}
-				else 
-				{
-					echo nl2br("\n".$qry."\nSTUDIENGANG NICHT GEFUNDEN!!! \n");
-					$error_log.="\n".$qry."\nSTUDIENGANG NICHT GEFUNDEN!!! \n";
-					$error=true;
-				}
-			}
-			else 
-			{
-				echo nl2br("\n".$qry."\nFehler beim Zugriff auf tbl_studiengang\n".pg_errormessage($conn)."\n");
-				$error_log.="\n".$qry."\nFehler beim Zugriff auf tbl_studiengang\n".pg_errormessage($conn)."\n";
-				$error=true;
-			}
+			
 			if($row->aufmerksamdurch=='1')		$aufmerksamdurch_kurzbz='k.A.';
 			else if($row->aufmerksamdurch=='2')	$aufmerksamdurch_kurzbz='Internet';
 			else if($row->aufmerksamdurch=='3')	$aufmerksamdurch_kurzbz='Zeitungen';
@@ -1544,7 +1546,7 @@ if($result = pg_query($conn_fas, $qry))
 								$ausgabe_pre="Insertvon: '".$insertvon."'";
 							}
 						}
-						if($updater)
+						if($updater && $studiengang_kz!=299)
 						{
 							$qry = 'UPDATE public.tbl_prestudent SET'.
 							       ' aufmerksamdurch_kurzbz='.myaddslashes($aufmerksamdurch_kurzbz).','.
@@ -1573,7 +1575,7 @@ if($result = pg_query($conn_fas, $qry))
 						}
 						else 
 						{
-							$qry="SELECT * FROM public.tbl_prestudent;";
+							$qry="select 1;";
 						}
 					}
 				}
@@ -1802,8 +1804,8 @@ if($result = pg_query($conn_fas, $qry))
 														else
 														{
 															$error=true;
-															$error_log.='Fehler beim Abfragen des aktuellen Status auf Unterbrecher bei student_pk: '.$row->student_pk;
-															echo nl2br('Fehler beim Abfragen des aktuellen Status auf Unterbrecher bei student_pk: '.$row->student_pk);	
+															$error_log.="Fehler beim Abfragen des aktuellen Status auf Unterbrecher bei student_pk: ".$row->student_pk."\n";
+															echo 'Fehler beim Abfragen des aktuellen Status auf Unterbrecher bei student_pk: '.$row->student_pk."<br>";	
 														}
 														
 														if(!$aktiv && !$aktiv9) 
@@ -2026,7 +2028,7 @@ if($result = pg_query($conn_fas, $qry))
 										$ausgabe_benutzer="Insertvon: '".$insertvon."' statt('".$rows->insertvon."')";
 									}
 								}
-								if($updateb)
+								if($updateb  && $studiengang_kz!=299)
 								{
 									$qry = 'UPDATE public.tbl_benutzer SET'.
 									       ' uid='.myaddslashes($student_uid).','.
@@ -2042,7 +2044,7 @@ if($result = pg_query($conn_fas, $qry))
 								}
 								else 
 								{
-									$qry="SELECT * FROM public.tbl_benutzer;";
+									$qry="select 1;";
 								}
 							}
 						}
@@ -2222,7 +2224,7 @@ if($result = pg_query($conn_fas, $qry))
 											$ausgabe_student="Insertvon: '".$insertvon."' (statt '".$rows->insertvon."')";
 										}
 									}
-									if($updates)
+									if($updates && $studiengang_kz!=299)
 									{
 										$qry = 'UPDATE public.tbl_student SET'.
 										       ' student_uid='.myaddslashes($student_uid).','.
@@ -2242,7 +2244,7 @@ if($result = pg_query($conn_fas, $qry))
 									}
 									else 
 									{
-										$qry="SELECT * FROM public.tbl_student;";
+										$qry="select 1;";
 									}
 								}
 							}
