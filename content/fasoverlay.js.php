@@ -234,6 +234,13 @@ function onVerbandSelect(event)
 				treeStudent.database.RemoveDataSource(oldDatasources.getNext());
 			}
 
+			try
+			{
+				StudentTreeDatasource.removeXMLSinkObserver(StudentTreeSinkObserver);
+				treeStudent.builder.removeListener(StudentTreeListener);
+			}
+			catch(e)
+			{}
 			var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 			StudentTreeDatasource = rdfService.GetDataSource(url);
 			StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -271,6 +278,13 @@ function onVerbandSelect(event)
 				treeLV.database.RemoveDataSource(oldDatasources.getNext());
 			}
 
+			try
+			{
+				LvTreeDatasource.removeXMLSinkObserver(LvTreeSinkObserver);
+				treeLV.builder.removeListener(LvTreeListener);
+			}
+			catch(e)
+			{}
 			var rdfService1 = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 
 			LvTreeDatasource = rdfService1.GetDataSource(url);
@@ -308,6 +322,14 @@ function onVerbandSelect(event)
 				treeInt.database.RemoveDataSource(oldDatasources.getNext());
 			}
 
+			try
+			{
+				InteressentTreeDatasource.removeXMLSinkObserver(InteressentTreeSinkObserver);
+				treeInt.builder.removeListener(InteressentTreeListener);
+			}
+			catch(e)
+			{}
+			
 			var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 			InteressentTreeDatasource = rdfService.GetDataSource(url);
 			InteressentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -365,6 +387,14 @@ function onFachbereichSelect(event)
 			treeLV.database.RemoveDataSource(oldDatasources.getNext());
 		}
 
+		try
+		{
+			LvTreeDatasource.removeXMLSinkObserver(LvTreeSinkObserver);
+			treeLV.builder.removeListener(LvTreeListener);
+		}
+		catch(e)
+		{}
+			
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		LvTreeDatasource = rdfService.GetDataSource(url);
 		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -440,7 +470,15 @@ function onLektorSelect(event)
 		{
 			treeLV.database.RemoveDataSource(oldDatasources.getNext());
 		}
-
+		
+		try
+		{
+			LvTreeDatasource.removeXMLSinkObserver(LvTreeSinkObserver);
+			treeLV.builder.removeListener(LvTreeListener);
+		}
+		catch(e)
+		{}
+		
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		LvTreeDatasource = rdfService.GetDataSource(url);
 		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
