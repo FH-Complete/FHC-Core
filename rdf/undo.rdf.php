@@ -25,7 +25,7 @@ header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
-header("Content-type: application/vnd.mozilla.xul+xml");
+header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
@@ -34,7 +34,7 @@ require_once('../include/log.class.php');
 require_once('../include/functions.inc.php');
 
 // Datenbank Verbindung
-if (!$conn = @pg_pconnect(CONN_STRING))
+if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 $log = new log($conn, null, true);
@@ -56,7 +56,7 @@ foreach ($log->logs as $row)
 	?>
       <RDF:li>
          <RDF:Description  id="<?php echo $row->log_id; ?>"  about="<?php echo $rdf_url.'/'.$row->log_id; ?>" >
-            <UNDO:log_id><?php echo $row->log_id  ?></UNDO:log_id>
+            <UNDO:log_id><![CDATA[<?php echo $row->log_id  ?>]]></UNDO:log_id>
             <UNDO:beschreibung><![CDATA[<?php echo $row->beschreibung ?>]]></UNDO:beschreibung>
          </RDF:Description>
       </RDF:li>

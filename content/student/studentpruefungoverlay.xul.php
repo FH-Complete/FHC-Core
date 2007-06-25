@@ -142,7 +142,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 											<template>
 												<menupopup>
 													<menuitem value="rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#lehrveranstaltung_id"
-										        		      label="rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#bezeichnung"
+										        		      label="rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#bezeichnung Semester rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#semester"
 													  		  uri="rdf:*"/>
 													</menupopup>
 											</template>
@@ -152,8 +152,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										<label value="Lehreinheit" control="student-pruefung-menulist-lehreinheit"/>
 										<menulist id="student-pruefung-menulist-lehreinheit" disabled="true"
 										          datasources="rdf:null" flex="1"
-										          ref="http://www.technikum-wien.at/lehreinheit/liste" 
-										          oncommand="StudentPruefungLEChange()">
+										          ref="http://www.technikum-wien.at/lehreinheit/liste" >
 											<template>
 												<menupopup>
 													<menuitem value="rdf:http://www.technikum-wien.at/lehreinheit/rdf#lehreinheit_id"

@@ -231,7 +231,11 @@ function InteressentTreeRefresh()
 // ****
 function InteressentNeu()
 {
-	window.open('<?php echo APP_ROOT; ?>vilesci/personen/import/interessentenimport.php','Interessent anlegen', 'height=768,width=1024,resizable=yes,status=yes,scrollbars=yes,toolbar=yes,location=yes,menubar=yes');
+	var verband_tree=document.getElementById('tree-verband');
+	var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
+	var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+	
+	window.open('<?php echo APP_ROOT; ?>vilesci/personen/import/interessentenimport.php?studiengang_kz='+stg_kz,'Interessent anlegen', 'height=768,width=1024,resizable=yes,status=yes,scrollbars=yes,toolbar=yes,location=yes,menubar=yes');
 }
 
 // ****

@@ -26,8 +26,7 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
-// xml
-echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
+
 // DAO
 include('../vilesci/config.inc.php');
 require_once('../include/person.class.php');
@@ -64,13 +63,21 @@ if (isset($_GET['user']))
 	$user=$_GET['user'];
 else
 	$user=false;
-if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id']))
-	$lehreinheit_id = $_GET['lehreinheit_id'];
+if(isset($_GET['lehrveranstaltung_id']) && is_numeric($_GET['lehrveranstaltung_id']))
+{
+	$lehrveranstaltung_id = $_GET['lehrveranstaltung_id'];
+	echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+	$mitarbeiter=new mitarbeiter($conn, null, true);
+}
 else 	
-	$lehreinheit_id=null;
+{
+	echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
+	$lehrveranstaltung_id=null;
+	$mitarbeiter=new mitarbeiter($conn);
+}
 
 // Mitarbeiter holen
-$mitarbeiter=new mitarbeiter($conn);
+
 $rdf_url='http://www.technikum-wien.at/mitarbeiter/';
 
 echo '
@@ -98,7 +105,7 @@ function draw_row($mitarbeiter)
   	';
 }
 
-if($lehreinheit_id==null)
+if($lehrveranstaltung_id==null)
 {
 	$ma=$mitarbeiter->getMitarbeiter($lektor,$fixangestellt,$stg_kz,$fachbereich_id);
 	
@@ -176,7 +183,24 @@ if($lehreinheit_id==null)
 else 
 {
 	echo "<RDF:Seq about=\"".$rdf_url."liste\" >";
-	$mitarbeiter->getMitarbeiterFromLehreinheit($lehreinheit_id);
+	if(isset($_GET['optional']) && $_GET['optional']=='true')
+	{
+		echo '
+		<RDF:li>
+		<RDF:Description about="" >
+	    	<MITARBEITER:uid><![CDATA[]]></MITARBEITER:uid>
+			<MITARBEITER:titelpre><![CDATA[]]></MITARBEITER:titelpre>
+			<MITARBEITER:titelpost><![CDATA[]]></MITARBEITER:titelpost>
+			<MITARBEITER:vornamen><![CDATA[]]></MITARBEITER:vornamen>
+			<MITARBEITER:vorname><![CDATA[]]></MITARBEITER:vorname>
+			<MITARBEITER:nachname><![CDATA[-- Keine Auswahl --]]></MITARBEITER:nachname>
+			<MITARBEITER:kurzbz><![CDATA[]]></MITARBEITER:kurzbz>
+			<MITARBEITER:studiengang_kz></MITARBEITER:studiengang_kz>
+	  	</RDF:Description>
+	  	</RDF:li>
+	  	';
+	}
+	$mitarbeiter->getMitarbeiterFromLehrveranstaltung($lehrveranstaltung_id);
 	foreach ($mitarbeiter->result as $row)
 	{
 		echo '<RDF:li>';

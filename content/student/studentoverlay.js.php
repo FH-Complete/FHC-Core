@@ -44,6 +44,7 @@ var StudentLvGesamtNotenTreeDatasource; //Datasource des Noten Trees
 var StudentLvGesamtNotenSelectLehrveranstaltungID=null; //LehreinheitID des Noten Eintrages der nach dem Refresh markiert werden soll
 var StudentPruefungTreeDatasource; //Datasource des Pruefung Trees
 var StudentPruefungSelectID=null; //ID der Pruefung die nach dem Refresh markiert werden soll
+var StudentDetailRolleTreeDatasource=null; //Datasource fuer denn PrestudentRolleTree
 
 // ********** Observer und Listener ************* //
 
@@ -84,6 +85,24 @@ var StudentTreeListener =
 		window.setTimeout(StudentTreeSelectStudent,10);
 		// Progressmeter stoppen
 		document.getElementById('statusbar-progressmeter').setAttribute('mode','determined');
+	}
+};
+
+// ****
+// * Observer fuer PrestudentRolleTree
+// * startet Rebuild nachdem das Refresh
+// * der datasource fertig ist
+// ****
+var StudentDetailRolleTreeSinkObserver =
+{
+	onBeginLoad : function(pSink) {},
+	onInterrupt : function(pSink) {},
+	onResume : function(pSink) {},
+	onError : function(pSink, pStatus, pError) {},
+	onEndLoad : function(pSink)
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		document.getElementById('student-prestudent-tree-rolle').builder.rebuild();
 	}
 };
 
@@ -889,9 +908,12 @@ function StudentAuswahl()
 	rollentree.builder.rebuild();
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-	var datasource = rdfService.GetDataSource(url);
-	rollentree.database.AddDataSource(datasource);
-
+	StudentDetailRolleTreeDatasource = rdfService.GetDataSource(url);
+	StudentDetailRolleTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	StudentDetailRolleTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	rollentree.database.AddDataSource(StudentDetailRolleTreeDatasource);
+	StudentDetailRolleTreeDatasource.addXMLSinkObserver(StudentDetailRolleTreeSinkObserver);
+	
 	// *** Konto ***
 	kontotree = document.getElementById('student-konto-tree');
 	filter = document.getElementById('student-konto-button-filter').value;
@@ -1212,6 +1234,53 @@ function StudentPrestudentSave()
 		StudentSelectUid=document.getElementById('student-detail-textbox-uid').value;
 		StudentTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
+	}
+}
+
+function StudentPrestudentRolleDelete()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-prestudent-tree-rolle');
+
+	if (tree.currentIndex==-1) return;
+
+	//Ausgewaehlte Nr holen
+    var col = tree.columns ? tree.columns["student-prestudent-tree-rolle-rolle_kurzbz"] : "student-prestudent-tree-rolle-rolle_kurzbz";
+	var rolle_kurzbz=tree.view.getCellText(tree.currentIndex,col);
+
+	var col = tree.columns ? tree.columns["student-prestudent-tree-rolle-studiensemester_kurzbz"] : "student-prestudent-tree-rolle-studiensemester_kurzbz";
+	var studiensemester_kurzbz=tree.view.getCellText(tree.currentIndex,col);
+	
+	var col = tree.columns ? tree.columns["student-prestudent-tree-rolle-prestudent_id"] : "student-prestudent-tree-rolle-prestudent_id";
+	var prestudent_id=tree.view.getCellText(tree.currentIndex,col);
+	
+	if(confirm('Diese Rolle wirklich loeschen?'))
+	{
+		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+		var req = new phpRequest(url,'','');
+
+		req.add('type', 'deleterolle');
+
+		req.add('rolle_kurzbz', rolle_kurzbz);
+		req.add('prestudent_id', prestudent_id);
+		req.add('studiensemester_kurzbz', studiensemester_kurzbz);
+
+		var response = req.executePOST();
+
+		var val =  new ParseReturnValue(response)
+
+		if (!val.dbdml_return)
+		{
+			if(val.dbdml_errormsg=='')
+				alert(response)
+			else
+				alert(val.dbdml_errormsg)
+		}
+		else
+		{
+			StudentDetailRolleTreeDatasource.Refresh(false);
+			SetStatusBarText('Daten wurden geloescht');
+		}
 	}
 }
 
@@ -2431,7 +2500,7 @@ function StudentNotenTreeSelectID()
 			var lehrveranstaltung_id=tree.view.getCellText(i,col);
 
 			//wenn dies die zu selektierende Zeile
-			if(lehrveranstaltung_id == StudentNotenSelectLehrveranstaltugnID)
+			if(lehrveranstaltung_id == StudentNotenSelectLehrveranstaltungID)
 			{
 				//Zeile markieren
 				tree.view.selection.select(i);
@@ -2467,7 +2536,7 @@ function StudentLvGesamtNotenTreeSelectID()
 			var lehrveranstaltung_id=tree.view.getCellText(i,col);
 
 			//wenn dies die zu selektierende Zeile
-			if(lehrveranstaltung_id == StudentLvGesamtNotenSelectLehrveranstaltugnID)
+			if(lehrveranstaltung_id == StudentLvGesamtNotenSelectLehrveranstaltungID)
 			{
 				//Zeile markieren
 				tree.view.selection.select(i);
@@ -2677,7 +2746,7 @@ function StudentPruefungTreeSelectID()
 			var pruefung_id=tree.view.getCellText(i,col);
 
 			//wenn dies die zu selektierende Zeile
-			if(pruefung_id == StudentPruefungSelectLehrveranstaltugnID)
+			if(pruefung_id == StudentPruefungSelectID)
 			{
 				//Zeile markieren
 				tree.view.selection.select(i);
@@ -2825,21 +2894,10 @@ function StudentPruefungLVAChange()
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var datasource = rdfService.GetDataSource(url);
 	LEDropDown.database.AddDataSource(datasource);
-}
 
-
-// ****
-// * Wenn die Lehrvernastaltung der Pruefung geaendert wird, dann wird die Liste der Lehreinheiten neu geladen
-// ****
-function StudentPruefungLEChange()
-{
-	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-
-	var leid = document.getElementById('student-pruefung-menulist-lehreinheit').value;
-
-	//Lehreinheiten Drop Down laden
+	//Mitarbeiter Drop Down laden
 	var MADropDown = document.getElementById('student-pruefung-menulist-mitarbeiter');
-	url='<?php echo APP_ROOT;?>rdf/mitarbeiter.rdf.php?lehreinheit_id='+leid+"&"+gettimestamp();
+	url='<?php echo APP_ROOT;?>rdf/mitarbeiter.rdf.php?lehrveranstaltung_id='+lvid+"&optional=true&"+gettimestamp();
 
 	//Alte DS entfernen
 	var oldDatasources = MADropDown.database.GetDataSources();
@@ -2933,8 +2991,7 @@ function StudentPruefungAuswahl()
 	if (tree.currentIndex==-1) return;
 
 	StudentPruefungDetailDisableFields(false);
-	document.getElementById('student-pruefung-checkbox-neu').checked=false;
-
+	
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["student-pruefung-tree-pruefung_id"] : "student-pruefung-tree-pruefung_id";
 	var pruefung_id=tree.view.getCellText(tree.currentIndex,col);
@@ -2960,7 +3017,7 @@ function StudentPruefungAuswahl()
 	pruefungstyp_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#pruefungstyp_kurzbz" ));
 	datum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#datum" ));
 	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
-
+	studiensemester_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiensemester_kurzbz" ));
 
 	var verband_tree=document.getElementById('tree-verband');
 
@@ -2971,7 +3028,7 @@ function StudentPruefungAuswahl()
 
 	//Lehrveranstaltung Drop Down laden
 	var LVDropDown = document.getElementById('student-pruefung-menulist-lehrveranstaltung');
-	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&sem="+sem+"&"+gettimestamp();
+	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&"+gettimestamp();
 
 	//Alte DS entfernen
 	var oldDatasources = LVDropDown.database.GetDataSources();
@@ -2984,15 +3041,15 @@ function StudentPruefungAuswahl()
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var datasource = rdfService.GetDataSourceBlocking(url);
+	datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	LVDropDown.database.AddDataSource(datasource);
-
-	debug('Lehrveranstaltung geladen:'+url);
-
-	var stsem = getStudiensemester();
+	
+	LVDropDown.builder.rebuild();
 
 	//Lehreinheiten Drop Down laden
 	var LEDropDown = document.getElementById('student-pruefung-menulist-lehreinheit');
-	url='<?php echo APP_ROOT;?>rdf/lehreinheit.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+"&studiensemester_kurzbz="+stsem+"&"+gettimestamp();
+	url='<?php echo APP_ROOT;?>rdf/lehreinheit.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+"&studiensemester_kurzbz="+studiensemester_kurzbz+"&"+gettimestamp();
 
 	//Alte DS entfernen
 	var oldDatasources = LEDropDown.database.GetDataSources();
@@ -3005,13 +3062,15 @@ function StudentPruefungAuswahl()
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var datasource = rdfService.GetDataSourceBlocking(url);
+	datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	LEDropDown.database.AddDataSource(datasource);
 
-	debug('Lehreinheit geladen');
+	LEDropDown.builder.rebuild();
 
-	//Lehreinheiten Drop Down laden
+	//Mitarbeiter Drop Down laden
 	var MADropDown = document.getElementById('student-pruefung-menulist-mitarbeiter');
-	url='<?php echo APP_ROOT;?>rdf/mitarbeiter.rdf.php?lehreinheit_id='+lehreinheit_id+"&"+gettimestamp();
+	url='<?php echo APP_ROOT;?>rdf/mitarbeiter.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+"&optional=true&"+gettimestamp();
 
 	//Alte DS entfernen
 	var oldDatasources = MADropDown.database.GetDataSources();
@@ -3024,9 +3083,12 @@ function StudentPruefungAuswahl()
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var datasource = rdfService.GetDataSourceBlocking(url);
+	datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	MADropDown.database.AddDataSource(datasource);
-	debug('Mitarbeiter geladen');
-
+	
+	MADropDown.builder.rebuild();
+		
 	document.getElementById('student-pruefung-menulist-lehrveranstaltung').value=lehrveranstaltung_id;
 	document.getElementById('student-pruefung-menulist-lehreinheit').value=lehreinheit_id;
 	document.getElementById('student-pruefung-menulist-mitarbeiter').value=mitarbeiter_uid;
@@ -3034,4 +3096,6 @@ function StudentPruefungAuswahl()
 	document.getElementById('student-pruefung-menulist-note').value=note;
 	document.getElementById('student-pruefung-textbox-datum').value=datum;
 	document.getElementById('student-pruefung-textbox-anmerkung').value=anmerkung;
+	document.getElementById('student-pruefung-checkbox-neu').checked=false;
+	document.getElementById('student-pruefung-textbox-pruefung_id').value=pruefung_id;
 }

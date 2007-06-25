@@ -435,6 +435,48 @@ if(!$error)
 			}
 		}
 	}
+	elseif(isset($_POST['type']) && $_POST['type']=='deleterolle')
+	{
+		//Loescht eine Prestudentrolle
+		//Kann nur geloescht werden wenn die Berechtigung ADMIN ist oder der
+		//Datensatz selbst angelegt wurde
+		
+		if(isset($_POST['studiensemester_kurzbz']) && isset($_POST['rolle_kurzbz']) && 
+		   isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id']))
+		{
+			$rolle = new prestudent($conn, null, true);
+			if($rolle->load_rolle($_POST['prestudent_id'],$_POST['rolle_kurzbz'],$_POST['studiensemester_kurzbz']))
+			{
+				if($rechte->isBerechtigt('admin',0) || $rolle->insertvon == $user)
+				{
+					if($rolle->delete_rolle($_POST['prestudent_id'],$_POST['rolle_kurzbz'],$_POST['studiensemester_kurzbz']))
+					{
+						$return = true;
+					}
+					else 
+					{
+						$return = false;
+						$errormsg = $rolle->errormsg;
+					}
+				}
+				else 
+				{
+					$return = false;
+					$errormsg = 'Sie haben keine Berechtigung zum Loeschen dieser Rolle';
+				}
+			}
+			else 
+			{
+				$return = false;
+				$errormsg = $rolle->errormsg;
+			}
+		}
+		else 
+		{
+			$return = false;
+			$errormsg = 'Fehlerhafte Parameteruebergabe';
+		}		
+	}
 	elseif(isset($_POST['type']) && $_POST['type']=='BewerberZuStudent')
 	{
 		// macht aus einem Bewerber einen Studenten

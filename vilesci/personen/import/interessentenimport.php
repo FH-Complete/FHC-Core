@@ -102,6 +102,8 @@ $letzteausbildung = (isset($_POST['letzteausbildung'])?$_POST['letzteausbildung'
 $ausbildungsart = (isset($_POST['ausbildungsart'])?$_POST['ausbildungsart']:'');
 $anmerkungen = (isset($_POST['anmerkungen'])?$_POST['anmerkungen']:'');
 $studiengang_kz = (isset($_POST['studiengang_kz'])?$_POST['studiengang_kz']:'');
+if($studiengang_kz=='' && isset($_GET['studiengang_kz']))
+	$studiengang_kz = $_GET['studiengang_kz'];
 $person_id = (isset($_POST['person_id'])?$_POST['person_id']:'');
 $ueberschreiben = (isset($_POST['ueberschreiben'])?$_POST['ueberschreiben']:'');
 $studiensemester_kurzbz = (isset($_POST['studiensemester_kurzbz'])?$_POST['studiensemester_kurzbz']:'');
