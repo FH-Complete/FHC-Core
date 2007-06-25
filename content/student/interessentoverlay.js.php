@@ -267,6 +267,7 @@ function InteressentTreeSelectInteressent()
 	   	}
 	}
 	document.getElementById('interessent-toolbar-label-anzahl').value='Anzahl: '+items;
+	//debug('items:'+items);
 }
 
 // ****
@@ -632,6 +633,13 @@ function InteressentAuswahl()
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	doctree.builder.rebuild();
 
+	try
+	{
+		InteressentDokumentTreeNichtabgegebenDatasource.removeXMLSinkObserver(InteressentDokumentTreeNichtabgegebenSinkObserver);
+		doctree.builder.removeListener(InteressentDokumentTreeNichtabgegebenListener);
+	}
+	catch(e)
+	{}
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	InteressentDokumentTreeNichtabgegebenDatasource = rdfService.GetDataSource(url);
 	InteressentDokumentTreeNichtabgegebenDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -653,6 +661,13 @@ function InteressentAuswahl()
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	doctree.builder.rebuild();
 
+	try
+	{
+		InteressentDokumentTreeAbgegebenDatasource.removeXMLSinkObserver(InteressentDokumentTreeAbgegebenSinkObserver);
+		doctree.builder.removeListener(InteressentDokumentTreeAbgegebenListener);
+	}
+	catch(e)
+	{}
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	InteressentDokumentTreeAbgegebenDatasource = rdfService.GetDataSource(url);
 	InteressentDokumentTreeAbgegebenDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -675,6 +690,13 @@ function InteressentAuswahl()
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	kontotree.builder.rebuild();
 
+	try
+	{
+		InteressentKontoTreeDatasource.removeXMLSinkObserver(InteressentKontoTreeSinkObserver);
+		kontotree.builder.removeListener(InteressentKontoTreeListener);
+	}
+	catch(e)
+	{}
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	InteressentKontoTreeDatasource = rdfService.GetDataSource(url);
 	InteressentKontoTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -1302,6 +1324,14 @@ function InteressentKontoFilter()
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	kontotree.builder.rebuild();
 
+	try
+	{
+		InteressentKontoTreeDatasource.removeXMLSinkObserver(InteressentKontoTreeSinkObserver);
+		kontotree.builder.removeListener(InteressentKontoTreeListener);
+	}
+	catch(e)
+	{}
+	
 	InteressentKontoSelectBuchung = buchungsnr;
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
