@@ -81,7 +81,7 @@ if(!$error)
 		{
 			$log = new log($conn, null, null, true);
 
-			if($log->undo($log_id))
+			if($log->undo($_POST['log_id']))
 			{
 				$return = true;
 			}

@@ -239,7 +239,7 @@ class log
 	{
 		if(!is_numeric($log_id))
 		{
-			$this->errormsg = 'Log_id ist ungueltig';
+			$this->errormsg = 'Log_id ist ungueltig'.$log_id;
 			return false;
 		}
 		pg_query($this->conn, 'BEGIN;');

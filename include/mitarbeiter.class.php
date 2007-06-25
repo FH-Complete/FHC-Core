@@ -469,5 +469,46 @@ class mitarbeiter extends benutzer
 			return false;
 		}
 	}
+	
+	// *************************************************
+	// * Laedt alle Mitarbeiter einer Lehrveranstaltung
+	// * @param lehrveranstaltung_id
+	// * @return true wenn ok, false wenn Fehler
+	// *************************************************
+	function getMitarbeiterFromLehrveranstaltung($lehrveranstaltung_id)
+	{
+		if(!is_numeric($lehrveranstaltung_id))
+		{
+			$this->errormsg = 'Lehrveranstaltung_id ist ungueltig';
+			return false;
+		}
+		
+		$qry = "SELECT uid, vorname, vornamen, nachname, titelpre, titelpost, kurzbz FROM lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter, lehre.tbl_lehreinheit
+				WHERE lehrveranstaltung_id='$lehrveranstaltung_id' AND mitarbeiter_uid=uid AND tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$obj = new mitarbeiter($this->conn, null, null);
+				
+				$obj->uid = $row->uid;
+				$obj->vorname = $row->vorname;
+				$obj->nachname = $row->nachname;
+				$obj->titelpre = $row->titelpre;
+				$obj->titelpost = $row->titelpost;
+				$obj->kurzbz = $row->kurzbz;
+				$obj->vornamen = $row->vornamen;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>

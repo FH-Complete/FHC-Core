@@ -130,7 +130,7 @@ class prestudent extends person
 		}
 		else 
 		{
-			$this->errormsg = "Fehler beim laden: $qry";
+			$this->errormsg = "Fehler beim Laden: $qry";
 			return false;
 		}		
 	}
@@ -239,7 +239,7 @@ class prestudent extends person
 				}
 				else 
 				{
-					$this->errormsg = 'Fehler beim auslesen der Sequence';
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
 					pg_query($this->conn, 'ROLLBACK;');
 					return false;
 				}
@@ -375,7 +375,45 @@ class prestudent extends person
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim laden der PrestudentDaten';
+			$this->errormsg = 'Fehler beim Laden der PrestudentDaten';
+			return false;
+		}
+	}
+	
+	// ********
+	// * Laedt die Rolle(n) eines Prestudenten
+	// ********
+	function load_rolle($prestudent_id, $rolle_kurzbz, $studiensemester_kurzbz)
+	{
+		if(!is_numeric($prestudent_id))
+		{
+			$this->errormsg = 'Prestudent_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='$prestudent_id'".
+			   " AND rolle_kurzbz='".addslashes($rolle_kurzbz)."'".
+			   " AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{								
+				$this->prestudent_id = $row->prestudent_id;
+				$this->rolle_kurzbz = $row->rolle_kurzbz;
+				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$this->ausbildungssemester = $row->ausbildungssemester;
+				$this->datum = $row->datum;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der PrestudentDaten';
 			return false;
 		}
 	}
@@ -535,13 +573,13 @@ class prestudent extends person
 			}
 			else 
 			{
-				$this->errormsg = 'Fehler beim laden der Daten';
+				$this->errormsg = 'Fehler beim Laden der Daten';
 				return false;
 			}
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim laden der Daten';
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
@@ -586,6 +624,72 @@ class prestudent extends person
 		}
 	}
 	
+	// ******************************************
+	// * Loescht eine Rolle
+	// * @param $prestudent_id
+	// *        $rolle_kurzbz
+	// *        $studiensemester_kurzbz
+	// * @return true wenn ok, false wenn Fehler
+	// ******************************************
+	function delete_rolle($prestudent_id, $rolle_kurzbz, $studiensemester_kurzbz)
+	{
+		if(!is_numeric($prestudent_id))
+		{
+			$this->errormsg = 'Prestudent_id ist ungueltig';
+			return false;
+		}
+
+		$qry = "DELETE FROM public.tbl_prestudentrolle WHERE prestudent_id='$prestudent_id' AND rolle_kurzbz='".addslashes($rolle_kurzbz)."' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+		if($this->load_rolle($prestudent_id, $rolle_kurzbz, $studiensemester_kurzbz))
+		{
+			pg_query($this->conn, 'BEGIN;');
+			
+			$log = new log($this->conn, null, null);
+			
+			$log->executetime = date('Y-m-d H:i:s');
+			$log->beschreibung = 'Loeschen der Rolle '.$rolle_kurzbz.' bei '.$prestudent_id;
+			$log->mitarbeiter_uid = get_uid();
+			$log->sql = $qry;
+			$log->sqlundo = 'INSERT INTO public.tbl_prestudentrolle(prestudent_id, rolle_kurzbz, studiensemester_kurzbz,'.
+							' ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id) VALUES('.
+							$this->addslashes($this->prestudent_id).','.
+							$this->addslashes($this->rolle_kurzbz).','.
+							$this->addslashes($this->studiensemester_kurzbz).','.
+							$this->addslashes($this->ausbildungssemester).','.
+							$this->addslashes($this->datum).','.
+							$this->addslashes($this->insertamum).','.
+							$this->addslashes($this->insertvon).','.
+							$this->addslashes($this->updateamum).','.
+							$this->addslashes($this->updatevon).','.
+							$this->addslashes($this->ext_id).');';
+			if($log->save(true))
+			{
+						
+				if(pg_query($this->conn, $qry))
+				{
+					pg_query($this->conn, 'COMMIT');
+					return true;
+				}
+				else 
+				{
+					pg_query($this->conn, 'ROLLBACK');
+					$this->errormsg = 'Fehler beim Loeschen der Daten';
+					return false;
+				}
+			}
+			else 
+			{
+				pg_query($this->conn, 'ROLLBACK');
+				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
+				return false;
+			}
+		}
+		else 
+		{
+			return false;
+		}			
+	}
+		
 	function getLastStatus($prestudent_id)
 	{
 		$qry = "SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='$prestudent_id' ORDER BY datum DESC LIMIT 1";
@@ -612,7 +716,7 @@ class prestudent extends person
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim laden der PrestudentDaten';
+			$this->errormsg = 'Fehler beim Laden der PrestudentDaten';
 			return false;
 		}
 	}

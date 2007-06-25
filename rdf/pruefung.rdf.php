@@ -94,6 +94,7 @@ function draw_rdf($row)
             <PRUEFUNG:lehrveranstaltung_bezeichnung><![CDATA['.$row->lehrveranstaltung_bezeichnung.']]></PRUEFUNG:lehrveranstaltung_bezeichnung>
             <PRUEFUNG:pruefungstyp_beschreibung><![CDATA['.$row->pruefungstyp_beschreibung.']]></PRUEFUNG:pruefungstyp_beschreibung>
             <PRUEFUNG:lehrveranstaltung_id><![CDATA['.$row->lehrveranstaltung_id.']]></PRUEFUNG:lehrveranstaltung_id>
+            <PRUEFUNG:studiensemester_kurzbz><![CDATA['.$row->studiensemester_kurzbz.']]></PRUEFUNG:studiensemester_kurzbz>
          </RDF:Description>
       </RDF:li>
       ';

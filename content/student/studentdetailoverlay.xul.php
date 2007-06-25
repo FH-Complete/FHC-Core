@@ -222,7 +222,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 <!-- STUDENT PREStudent -->
 <vbox id="student-prestudent" style="margin:0px;" flex="1">
-		
+<popupset>
+	<popup id="student-prestudent-rolle-tree-popup">
+		<menuitem label="Entfernen" oncommand="StudentPrestudentRolleDelete();" id="student-prestudent-rolle-tree-popup-delete" hidden="false"/>
+	</popup>
+</popupset>
 		<vbox hidden="true">
 			<label value="Neu"/>
 			<checkbox id="student-prestudent-checkbox-new" checked="false" />      	
@@ -433,6 +437,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							datasources="rdf:null" ref="http://www.technikum-wien.at/prestudentrolle/liste"
 							style="margin-left:10px;margin-right:10px;margin-bottom:5px;" height="100px" enableColumnDrag="true"
 							flags="dont-build-content"
+							context="student-prestudent-rolle-tree-popup"
 					>
 						<treecols>
 							<treecol id="student-prestudent-tree-rolle-rolle_kurzbz" label="Kurzbz" flex="2" hidden="false" primary="true"
@@ -451,6 +456,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#datum" />									
 							<splitter class="tree-splitter"/>
+							<treecol id="student-prestudent-tree-rolle-prestudent_id" label="PrestudentID" flex="2" hidden="true"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#prestudent_id" />
+							<splitter class="tree-splitter"/>
 						</treecols>
 			
 						<template>
@@ -462,6 +471,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studiensemester_kurzbz"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#ausbildungssemester"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#datum"/>
+											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#prestudent_id"/>
 										</treerow>
 									</treeitem>
 								</treechildren>

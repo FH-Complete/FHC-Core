@@ -46,6 +46,7 @@ class pruefung
 	var $lehrveranstaltung_id;
 	var $note_bezeichnung;
 	var $pruefungstyp_beschreibung;
+	var $studiensemester_kurzbz;
 	
 	// **************************************************************
 	// * Konstruktor
@@ -89,7 +90,8 @@ class pruefung
 			return false;
 		}
 
-		$qry = "SELECT tbl_pruefung.*, tbl_lehreinheit.lehrveranstaltung_id FROM lehre.tbl_pruefung JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) WHERE pruefung_id=$pruefung_id";
+		$qry = "SELECT tbl_pruefung.*, tbl_lehreinheit.lehrveranstaltung_id, tbl_lehreinheit.studiensemester_kurzbz as studiensemester_kurzbz
+				FROM lehre.tbl_pruefung JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) WHERE pruefung_id=$pruefung_id";
 
 		if($res = pg_query($this->conn, $qry))
 		{
@@ -109,6 +111,7 @@ class pruefung
 				$this->updatevon=$row->updatevon;
 				$this->ext_id=$row->ext_id;
 				$this->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 			}
 		}
 		else
@@ -319,7 +322,7 @@ class pruefung
 	function getPruefungen($student_uid)
 	{
 		$qry = "SELECT tbl_pruefung.*, tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
-				tbl_note.bezeichnung as note_bezeichnung, tbl_pruefungstyp.beschreibung as typ_beschreibung
+				tbl_note.bezeichnung as note_bezeichnung, tbl_pruefungstyp.beschreibung as typ_beschreibung, tbl_lehreinheit.studiensemester_kurzbz as studiensemester_kurzbz
 				FROM lehre.tbl_pruefung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_note, lehre.tbl_pruefungstyp
 				WHERE student_uid='".addslashes($student_uid)."' 
 				AND tbl_pruefung.lehreinheit_id=tbl_lehreinheit.lehreinheit_id
@@ -349,6 +352,7 @@ class pruefung
 				$obj->updatevon = $row->updatevon;
 				$obj->lehrveranstaltung_bezeichnung = $row->lehrveranstaltung_bezeichnung;
 				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				
 				$this->result[] = $obj;
 			}
