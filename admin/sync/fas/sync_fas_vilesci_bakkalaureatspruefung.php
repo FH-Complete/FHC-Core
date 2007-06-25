@@ -70,7 +70,7 @@ if($result = pg_query($conn_fas, $qry_main))
 		//$akadgrad_id			='';
 		$datum				=$row->datum;
 		$sponsion				=$row->feier;
-		$typ					='b';
+		$pruefungstyp_kurzbz		='Bachelor';
 		$anmerkung				=$row->protokoll;
 		//$updateamum			='';
 		$updatevon				='SYNC';
@@ -198,7 +198,7 @@ if($result = pg_query($conn_fas, $qry_main))
 		//insert oder update?
 		if(!$error)
 		{
-			$qry="SELECT * FROM lehre.tbl_abschlusspruefung WHERE student_uid='".$student_uid."' AND typ='b' AND ext_id='".$row->bakkalaureatspruefung_pk."';";
+			$qry="SELECT * FROM lehre.tbl_abschlusspruefung WHERE student_uid='".$student_uid."' AND pruefungstyp='Bachelor' AND ext_id='".$row->bakkalaureatspruefung_pk."';";
 			if($resulto=pg_query($conn, $qry))
 			{
 				if($rowo=pg_fetch_object($resulto))
@@ -300,28 +300,16 @@ if($result = pg_query($conn_fas, $qry_main))
 							$ausgabe1="Sponsionsdatum: '".$sponsion."' (statt '".$rowo->sponsion."')";
 						}
 					}
-					if($rowo->typ!=$typ) 
+					if($rowo->pruefungstyp_kurzbz!=$pruefungstyp_kurzbz) 
 					{
 						$update=true;
 						if(strlen(trim($ausgabe1))>0)
 						{
-							$ausgabe1.=", Typ: '".$typ."' (statt '".$rowo->typ."')";
+							$ausgabe1.=", Prüfungstyp: '".$pruefungstyp_kurzbz."' (statt '".$rowo->pruefungstyp_kurzbz."')";
 						}
 						else
 						{
-							$ausgabe1="Typ: '".$typ."' (statt '".$rowo->typ."')";
-						}
-					}
-					if($rowo->typ!=$typ) 
-					{
-						$update=true;
-						if(strlen(trim($ausgabe1))>0)
-						{
-							$ausgabe1.=", Typ: '".$typ."' (statt '".$rowo->typ."')";
-						}
-						else
-						{
-							$ausgabe1="Typ: '".$typ."' (statt '".$rowo->typ."')";
+							$ausgabe1="Prüfungstyp: '".$pruefungstyp_kurzbz."' (statt '".$rowo->pruefungstyp_kurzbz."')";
 						}
 					}
 					if($rowo->anmerkung!=$anmerkung) 
@@ -373,7 +361,7 @@ if($result = pg_query($conn_fas, $qry_main))
 							"akadgrad_id=".myaddslashes($akadgrad_id).", ".
 							"datum=".myaddslashes($datum).", ".
 							"sponsion=".myaddslashes($sponsion).", ".
-							"typ=".myaddslashes($typ).", ".
+							"pruefungstyp_kurzbz=".myaddslashes($pruefungstyp_kurzbz).", ".
 							"anmerkung=".myaddslashes($anmerkung).", ".
 							"insertvon=".myaddslashes($insertvon).", ".
 							"insertamum=".myaddslashes($insertamum).", ".
@@ -392,7 +380,7 @@ if($result = pg_query($conn_fas, $qry_main))
 				else 
 				{
 					$qry="INSERT INTO lehre.tbl_abschlusspruefung (student_uid, vorsitz, pruefer1, pruefer2, pruefer3, ".
-						"abschlussbeurteilung_kurzbz, akadgrad_id, datum, sponsion, typ, anmerkung, ".
+						"abschlussbeurteilung_kurzbz, akadgrad_id, datum, sponsion, pruefungstyp_kurzbz, anmerkung, ".
 						"insertvon, insertamum, updatevon, updateamum, ext_id) VALUES (".
 						myaddslashes($student_uid).", ".
 						myaddslashes($vorsitz).", ".
@@ -403,7 +391,7 @@ if($result = pg_query($conn_fas, $qry_main))
 						myaddslashes($akadgrad_id).", ".
 						myaddslashes($datum).", ".
 						myaddslashes($sponsion).", ".
-						myaddslashes($typ).", ".
+						myaddslashes($pruefungstyp_kurzbz).", ".
 						myaddslashes($anmerkung).", ".
 						myaddslashes($insertvon).", ".
 						myaddslashes($insertamum).", ".
