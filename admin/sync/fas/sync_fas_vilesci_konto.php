@@ -163,7 +163,7 @@ if($result = pg_query($conn_fas, $qry))
 				}
 				else 
 				{
-					$ausgabe.="Person mit person_pk '".$row2->person_fk."' in tbl_syncperson nicht gefunden.\n";
+					$error_log.="Person mit person_pk '".$row2->person_fk."' in tbl_syncperson nicht gefunden.\n";
 					echo "Person mit person_pk '".$row2->person_fk."' in tbl_syncperson nicht gefunden.<br>";
 					$anzahl_fehler++;
 					$error=true;
@@ -172,7 +172,7 @@ if($result = pg_query($conn_fas, $qry))
 			}
 			else 
 			{
-				$ausgabe.="Person mit person_pk '".$row2->person_fk."' in tbl_syncperson nicht gefunden!\n";
+				$error_log.="Person mit person_pk '".$row2->person_fk."' in tbl_syncperson nicht gefunden!\n";
 				echo "Person mit person_pk '".$row2->person_fk."' in tbl_syncperson nicht gefunden!<br>";
 				$anzahl_fehler++;
 				$error=true;
