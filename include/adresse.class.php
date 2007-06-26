@@ -41,7 +41,7 @@ class adresse
 	var $ort;            	// @var string
 	var $gemeinde;	// @var string
 	var $nation;          	// @var string
-	var $typ;		// @var integer
+	var $typ;		// @var string
 	var $heimatadresse;	// @var boolean
 	var $zustelladresse;	// @var boolean
 	var $firma_id;		// @var integer
@@ -110,19 +110,20 @@ class adresse
 			$this->adresse_id		= $row->adresse_id;
 			$this->heimatadresse 	= ($row->heimatadresse=='t'?true:false);
 			$this->zustelladresse	= ($row->zustelladresse=='t'?true:false);
-			$this->gemeinde			= $row->gemeinde;
-			$this->name				= $row->name;
+			$this->gemeinde		= $row->gemeinde;
+			$this->name			= $row->name;
 			$this->nation			= $row->nation;
-			$this->ort				= $row->ort;
+			$this->ort			= $row->ort;
 			$this->person_id		= $row->person_id;
-			$this->plz				= $row->plz;
-			$this->strasse			= $row->strasse;
-			$this->typ				= $row->typ;
+			$this->plz			= $row->plz;
+			$this->strasse		= $row->strasse;
+			$this->typ			= $row->typ;
 			$this->updateamum		= $row->updateamum;
 			$this->updatevon		= $row->updatevon;
 			$this->insertamum		= $row->insertamum;
 			$this->insertvon		= $row->insertvon;
-			$this->firma_id			= $row->firma_id;
+			$this->firma_id		= $row->firma_id;
+
 		}
 		else
 		{
@@ -192,8 +193,7 @@ class adresse
 		{
 			$this->errormsg='person_id enthaelt ungueltige Zeichen:'.$this->person_id.' - adresse: '.$this->adresse_id."\n";
 			return false;
-		}
-		
+		}		
 		//Gesamtlaenge pruefen
 		//$this->errormsg='Eine der Gesamtlaengen wurde ueberschritten';
 		if(strlen($this->name)>255)
