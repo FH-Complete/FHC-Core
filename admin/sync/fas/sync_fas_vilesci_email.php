@@ -53,6 +53,7 @@ $qry = "SELECT * FROM email ORDER BY person_fk;";
 if($result = pg_query($conn_fas, $qry))
 {
 	echo nl2br("E-Mail Sync\n-------------\n");
+	echo nl2br("Emailsynchro Beginn: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
 	$anzahl_quelle=pg_num_rows($result);
 	while($row = pg_fetch_object($result))
 	{
@@ -178,7 +179,7 @@ if($result = pg_query($conn_fas, $qry))
 	}		
 }
 
-
+echo nl2br("Emailsynchro Beginn: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
 
 //echo nl2br($text);
 echo nl2br("\n".$error_log);

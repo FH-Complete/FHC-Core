@@ -12,12 +12,13 @@
 //*
 
 require_once('../../../vilesci/config.inc.php');
+require_once('../../../include/firma.class.php');
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
-$adress='ruhan@technikum-wien.at';
-//$adress='fas_sync@technikum-wien.at';
+//$adress='ruhan@technikum-wien.at';
+$adress='fas_sync@technikum-wien.at';
 
 $error_log='';
 $error_log_fas1='';
@@ -55,6 +56,7 @@ $ausgabe_all='';
 $ausgabe_le='';
 $ausgabe_pa='';
 $ausgabe_pb='';
+$ausgabe_fa='';
 $text1='';
 $text2='';
 $text3='';
@@ -127,7 +129,7 @@ if($result = pg_query($conn_fas, $qry_main))
 		$projektarbeitbeginn			=$row->von;
 		$projektarbeitende			=$row->bis;
 		$projektarbeitfaktor			='1.0';
-		$projektarbeitfreigegeben		=false;
+		$projektarbeitfreigegeben		=true;
 		$projektarbeitgesperrtbis		='';
 		$projektarbeitstundensatz		=$row->stdhonorar;
 		$projektarbeitgesamtstunden	=$row->gesamtstunden;
@@ -158,6 +160,16 @@ if($result = pg_query($conn_fas, $qry_main))
 		$lehreinheitinsertamum			=$row->creationdate;
 		//$lehreinheitinsertvon			=$row->creationuser;
 		$lehreinheitext_id				=$row->berufspraktikum_pk;
+		
+		$farbe				="CCCCCC";
+		$sprache			='German';
+		$bezeichnung		='Berufspraktikum';
+		$kurzbezeichnung		='BPRAX';
+		
+		$firmenname					=$row->firma;
+		$adresse					=$row->adresse;
+		$email						=$row->email;
+		$telefonnummer				=$row->telefonnummer;
 			
 		$studiengang_kz='';
 		$semester='';
@@ -246,8 +258,43 @@ if($result = pg_query($conn_fas, $qry_main))
 					}
 					else 
 					{
-						$error=true;
-						$error_log.="Lehrfach mit Fachbereich='".$fachbereich_kurzbz."', Semester='".$semester."' und Studiengang='".$studiengang_kz."' nicht gefunden.\n";
+						//$error=true;
+						//$error_log.="Lehrfach mit Fachbereich='".$fachbereich_kurzbz."', Semester='".$semester."' und Studiengang='".$studiengang_kz."' nicht gefunden.\n";
+										
+						$qry="INSERT INTO lehre.tbl_lehrfach (studiengang_kz, fachbereich_kurzbz, kurzbz, bezeichnung, farbe, aktiv, 
+							semester, sprache, insertamum, insertvon, updateamum, updatevon, ext_id) VALUES (".
+							myaddslashes($studiengang_kz).", ".
+							myaddslashes($fachbereich_kurzbz).", ".
+							myaddslashes($kurzbezeichnung).", ".
+							myaddslashes($bezeichnung).", ".
+							myaddslashes($farbe).", ".
+							"false, ".
+							myaddslashes($semester).", ".
+							myaddslashes($sprache).", ".
+							"now(), ".
+							"'Sync', ".
+							"now(), ".
+							"'Sync', ".
+							"NULL);";
+						if($result2 = pg_query($conn, $qry))
+						{
+							$qryu = "SELECT currval('lehre.tbl_lehrfach_lehrfach_id_seq') AS id;";
+							if($rowu=pg_fetch_object(pg_query($conn,$qryu)))
+								$lehreinheitlehrfach_id=$rowu->id;
+							else
+							{					
+								$error=true;
+								$error_log.='Lehrfach-Sequence konnte nicht ausgelesen werden.\n';
+							}
+							$ausgabe.="Lehrfach '".$bezeichnung."' ('".$kurzbezeichnung."'), Fachbereich '".$fachbereich_kurzbz."', Studiengang '".$studiengang_kz."' und Semester '".$semester."' angelegt!\n";
+							echo "Lehrfach '".$bezeichnung."' ('".$kurzbezeichnung."'), Fachbereich '".$fachbereich_kurzbz."', Studiengang '".$studiengang_kz."' und Semester '".$semester."' angelegt!<br>";
+							
+						}
+						else 
+						{
+							$error=true;
+							$error_log.='Lehrfach konnte nicht angelegt werden. '.$qry.'\n';
+						}	
 					}
 				}
 				$qry="SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ext_id='$row->studiensemester_fk'";
@@ -264,7 +311,7 @@ if($result = pg_query($conn_fas, $qry_main))
 					}
 				}
 				
-				$qry3="SELECT * FROM lehre.tbl_projektarbeit WHERE projekttyp_kurzbz='Bachelor' AND ext_id='".$row->berufspraktikum_pk."';";
+				$qry3="SELECT * FROM lehre.tbl_projektarbeit WHERE projekttyp_kurzbz='".$projektarbeitprojekttyp_kurzbz."' AND ext_id='".$row->berufspraktikum_pk."';";
 				if($result3 = pg_query($conn, $qry3))
 				{
 					if(pg_num_rows($result3)>0) //eintrag gefunden
@@ -555,7 +602,7 @@ if($result = pg_query($conn_fas, $qry_main))
 							}
 							else 
 							{
-								$qry="SELECT * FROM lehre.tbl_lehreinheit;";
+								$qry="select 1;";
 							}
 						}
 						
@@ -590,6 +637,109 @@ if($result = pg_query($conn_fas, $qry_main))
 						}
 						if(!$error)
 						{
+							if(trim($firmenname)!='' && $firmenname!=null)
+							{
+								//firma anlegen
+								$firma=new firma($conn);
+								$firma->name=trim($firmenname);
+								$firma->adresse=$adresse;
+								$firma->email=$email;
+								$firma->telefon=$telefonnummer;
+								$firma->anmerkung=null;
+								$firma->ext_id=NULL;
+								$firma->firmentyp_kurzbz='Partnerfirma';
+								$qry5="SELECT * FROM tbl_firma WHERE name='".$firma->name."';";
+								if($result5 = pg_query($conn, $qry5))
+								{
+									if(pg_num_rows($result5)>0) //eintrag gefunden
+									{
+										if($row5=pg_fetch_object($result5))
+										{
+											$updatefa=false;			
+											if($row5->adresse!=$firma->adresse) 
+											{
+												$updatefa=true;
+												if(strlen(trim($ausgabe_fa))>0)
+												{
+													$ausgabe_fa.=", Adresse: '".$firma->adresse."' (statt '".$row5->adresse."')";
+												}
+												else
+												{
+													$ausgabe_fa="Adresse: '".$firma->adresse."' (statt '".$row5->adresse."')";
+												}
+											}
+											$updatefa=false;			
+											if($row5->email!=$firma->email) 
+											{
+												$updatefa=true;
+												if(strlen(trim($ausgabe_fa))>0)
+												{
+													$ausgabe_fa.=", Email: '".$firma->email."' (statt '".$row5->email."')";
+												}
+												else
+												{
+													$ausgabe_fa="Email: '".$firma->email."' (statt '".$row5->email."')";
+												}
+											}
+											$updatefa=false;			
+											if($row5->telefon!=$firma->telefon) 
+											{
+												$updatefa=true;
+												if(strlen(trim($ausgabe_fa))>0)
+												{
+													$ausgabe_fa.=", Telefon: '".$firma->telefon."' (statt '".$row5->telefon."')";
+												}
+												else
+												{
+													$ausgabe_fa="Telefon: '".$firma->telefon."' (statt '".$row5->telefon."')";
+												}
+											}
+																					
+											$firma->new=false;	
+											$firma->firma_id=$row5->firma_id;	
+										}
+										else 
+										{
+											$error=true;
+											$error_log.="Firma mit name: ".$firma->name." konnte nicht ermittelt werden! Firma wird nicht eingetragen.\n";
+										}
+									}
+									else
+									{
+										$firma->new=true;
+									}
+								} 
+								if(!$error)
+								{
+									if($updatefa || $firma->new)
+									{
+										if(!$firma->save())
+										{
+											$error_log.=$firma->errormsg."\n";
+											$anzahl_fehler++;
+											$error_log.="Firma mit name: $firma->name wurde nicht eingetragen!\n";
+										}
+										else 
+										{
+											if($firma->new)
+											{
+												$ausgabe.="Firma '".$firma->name."' eingefügt.\n";
+												//$anzahl_eingefuegt2++;
+											}
+											else 
+											{
+												$ausgabe.="Firma '".$firma->name."' geändert: ".$ausgabe_fa."\n";
+												//$anzahl_update2;
+											}
+												$projektarbeitfirma_id=$firma->firma_id;
+										}
+									}											
+								}
+							}
+						}
+						$ausgabe_fa='';
+						if(!$error)
+						{
 							//pa anlegen
 							//if($projektarbeitnote=='0') $projektarbeitnote='9';
 							if($projektarbeitnew)
@@ -615,7 +765,8 @@ if($result = pg_query($conn_fas, $qry_main))
 								     myaddslashes($projektarbeitgesamtstunden).', '.
 								     myaddslashes($projektarbeitthemenbereich).', '.
 								     myaddslashes($projektarbeitanmerkung).', '.
-								     myaddslashes($projektarbeitext_id).',  now(), '.
+								     myaddslashes($projektarbeitext_id).', '.
+								     myaddslashes($projektarbeitinsertamum).', '.
 								     myaddslashes($projektarbeitinsertvon).', now(), '.
 								     myaddslashes($projektarbeitupdatevon).');';
 								     $ausgabe.="Projektarbeit angelegt: Student='".$projektarbeitstudent_uid."' und Lehreinheit='".$projektarbeitlehreinheit_id."'.\n";			
@@ -870,7 +1021,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								}
 								else 
 								{
-									$qry="SELECT * FROM lehre.tbl_projektarbeit;";
+									$qry="select 1;";
 								}
 							}
 							//echo $qry;
@@ -1117,7 +1268,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									}
 									else 
 									{
-										$qry="SELECT * FROM lehre.tbl_projektbetreuer;";
+										$qry="select 1;";
 									}
 								}
 								//echo nl2br ($qry."\n");
@@ -1265,11 +1416,12 @@ if($result = pg_query($conn_fas, $qry_main))
 echo nl2br("Berufspraktikumsynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
 
 $error_log_fas="Sync Berufspraktikum\n------------------------\n\n".$error_log_fas1."\n".$error_log_fas2."\n".$error_log_fas3."\n".$error_log_fas4."\n".$error_log_fas5."\n".$error_log_fas6."\n".$error_log_fas7."\n".$error_log_fas8;
-echo nl2br("Allgemeine Fehler: ".$anzahl_fehler.", lehrveranstaltung_fk<1: ".$anzahl_lv_fehler.", betreuer_fk<1: ".$anzahl_betreuer_fehler.", Anzahl Berufspraktika: ".$anzahl_quelle.".\n");
-echo nl2br("Lehreinheiten:       Gesamt: ".$anzahl_le_gesamt." / Eingefügt: ".$anzahl_le_insert." / Geändert: ".$anzahl_le_update." / Fehler: ".$anzahl_fehler_le."\n");
-echo nl2br("Projektarbeiten:   Gesamt: ".$anzahl_pa_gesamt." / Eingefügt: ".$anzahl_pa_insert." / Geändert: ".$anzahl_pa_update." / Fehler: ".$anzahl_fehler_pa."\n");
-echo nl2br("Betreuer:       Gesamt: ".$anzahl_pbb_gesamt." / Eingefügt: ".$anzahl_pbb_insert." / Geändert: ".$anzahl_pbb_update." / Fehler: ".$anzahl_fehler_pbb."\n");
-echo nl2br("Begutachter:  Gesamt: ".$anzahl_pbg_gesamt." / Eingefügt: ".$anzahl_pbg_insert." / Geändert: ".$anzahl_pbg_update." / Fehler: ".$anzahl_fehler_pbg."\n\n");
+echo nl2br("Anzahl Berufspraktika: ".$anzahl_quelle.".\n");
+echo "Allgemeine Fehler: ".$anzahl_fehler.", lehrveranstaltung_fk<1: ".$anzahl_lv_fehler.", betreuer_fk<1: ".$anzahl_betreuer_fehler."<br>";
+echo "Lehreinheiten:       Gesamt: ".$anzahl_le_gesamt." / Eingefügt: ".$anzahl_le_insert." / Geändert: ".$anzahl_le_update." / Fehler: ".$anzahl_fehler_le."<br>";
+echo "Projektarbeiten:   Gesamt: ".$anzahl_pa_gesamt." / Eingefügt: ".$anzahl_pa_insert." / Geändert: ".$anzahl_pa_update." / Fehler: ".$anzahl_fehler_pa."<br>";
+echo "Betreuer:       Gesamt: ".$anzahl_pbb_gesamt." / Eingefügt: ".$anzahl_pbb_insert." / Geändert: ".$anzahl_pbb_update." / Fehler: ".$anzahl_fehler_pbb."<br><br>";
+
 echo nl2br($error_log_fas."\n--------------------------------------------------------------------------------\n");
 echo nl2br($ausgabe_all);
 
@@ -1277,8 +1429,7 @@ mail($adress, 'SYNC Berufspraktikum von '.$_SERVER['HTTP_HOST'],
 "Allgemeine Fehler: ".$anzahl_fehler.", lehrveranstaltung_fk<1: ".$anzahl_lv_fehler.", betreuer_fk<1: ".$anzahl_betreuer_fehler.", Anzahl Berufspraktika: ".$anzahl_quelle.".\n".
 "Lehreinheiten:       Gesamt: ".$anzahl_le_gesamt." / Eingefügt: ".$anzahl_le_insert." / Geändert: ".$anzahl_le_update." / Fehler: ".$anzahl_fehler_le."\n".
 "Projektarbeiten:   Gesamt: ".$anzahl_pa_gesamt." / Eingefügt: ".$anzahl_pa_insert." / Geändert: ".$anzahl_pa_update." / Fehler: ".$anzahl_fehler_pa."\n".
-"Betreuer:       Gesamt: ".$anzahl_pbb_gesamt." / Eingefügt: ".$anzahl_pbb_insert." / Geändert: ".$anzahl_pbb_update." / Fehler: ".$anzahl_fehler_pbb."\n".
-"Begutachter:  Gesamt: ".$anzahl_pbg_gesamt." / Eingefügt: ".$anzahl_pbg_insert." / Geändert: ".$anzahl_pbg_update." / Fehler: ".$anzahl_fehler_pbg."\n\n".
+"Betreuer:       Gesamt: ".$anzahl_pbb_gesamt." / Eingefügt: ".$anzahl_pbb_insert." / Geändert: ".$anzahl_pbb_update." / Fehler: ".$anzahl_fehler_pbb."\n\n".
 $ausgabe_all,"From: vilesci@technikum-wien.at");
 
 mail($adress, 'SYNC-Fehler Berufspraktikum  von '.$_SERVER['HTTP_HOST'], $error_log_fas, "From: vilesci@technikum-wien.at");

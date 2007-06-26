@@ -16,8 +16,8 @@ require_once('../../../vilesci/config.inc.php');
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
-//$adress='ruhan@technikum-wien.at';
-$adress='fas_sync@technikum-wien.at';
+$adress='ruhan@technikum-wien.at';
+//$adress='fas_sync@technikum-wien.at';
 
 $error_log='';
 $error_log_fas1='';
@@ -565,7 +565,7 @@ if($result = pg_query($conn_fas, $qry_main))
 							}
 							else 
 							{
-								$qry="SELECT * FROM lehre.tbl_lehreinheit;";
+								$qry="select 1;";
 							}
 						}
 						
@@ -880,7 +880,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								}
 								else 
 								{
-									$qry="SELECT * FROM lehre.tbl_projektarbeit;";
+									$qry="select 1;";
 								}
 							}
 							//echo $qry;
@@ -1125,7 +1125,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									}
 									else 
 									{
-										$qry="SELECT * FROM lehre.tbl_projektbetreuer;";
+										$qry="select 1;";
 									}
 								}
 								//echo nl2br ($qry."\n");
@@ -1381,7 +1381,7 @@ if($result = pg_query($conn_fas, $qry_main))
 										}
 										else 
 										{
-											$qry="SELECT * FROM lehre.tbl_projektbetreuer;";
+											$qry="select 1;";
 										}	
 									}
 									//echo nl2br($qry."\n");
