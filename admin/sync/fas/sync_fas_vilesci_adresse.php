@@ -56,7 +56,8 @@ $qry = "SELECT * FROM adresse ORDER BY person_fk;";
 
 if($result = pg_query($conn_fas, $qry))
 {
-	echo nl2br("Adresse Sync\n--------------\n");
+	echo "Adresse Sync\n--------------<br>";
+	echo "Adressensynchro Beginn: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."<br><br>";
 	$anzahl_quelle=pg_num_rows($result);
 	while($row = pg_fetch_object($result))
 	{
@@ -103,7 +104,7 @@ if($result = pg_query($conn_fas, $qry))
 		{
 			if($rowcu=pg_fetch_object($resultcu))
 			{
-				$insertvon=$rowcu->name;
+				$adresse->insertvon=$rowcu->name;
 			}
 		}
 		//person_id herausfinden
@@ -232,6 +233,30 @@ if($result = pg_query($conn_fas, $qry))
 										$ausgabe_adresse="Zustelladresse: '".($adresse->Zustelladresse=='J'?'true':'false')."'";
 									}
 								}
+								if(date("d.m.Y", $row2->insertamum)!=date("d.m.Y", $adresse->insertamum)) 
+								{
+									$update=true;
+									if(strlen(trim($ausgabe_adresse))>0)
+									{
+										$ausgabe_adresse.=", Insertamum: '".$adresse->insertamum."' (statt '".$row2->insertamum."')";
+									}
+									else
+									{
+										$ausgabe_adresse="Insertamum: '".$adresse->insertamum."' (statt '".$row2->insertamum."')";
+									}
+								}
+								if($row2->insertvon!=$adresse->insertvon) 
+								{
+									$update=true;
+									if(strlen(trim($ausgabe_adresse))>0)
+									{
+										$ausgabe_adresse.=", Insertvon: '".$adresse->insertvon."' (statt '".$row2->insertvon."')";
+									}
+									else
+									{
+										$ausgabe_adresse="Insertvon: '".$adresse->insertvon."' (statt '".$row2->insertvon."')";
+									}
+								}
 								// update adresse, wenn datensatz bereits vorhanden
 								$adresse->new=false;
 								$adresse->adresse_id=$row2->adresse_id;
@@ -289,7 +314,7 @@ if($result = pg_query($conn_fas, $qry))
 										else 
 										{
 											$ausgabe.="Firma ".$firma->name." geändert.\n";
-											$anzahl_update2;
+											$anzahl_update2++;
 										}
 										
 									}											
@@ -350,7 +375,7 @@ if($result = pg_query($conn_fas, $qry))
 	}	
 }
 
-
+echo "Adressensynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."<br><br>";
 //echo nl2br($text);
 echo nl2br($error_log);
 echo nl2br("\nAdresse\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler");

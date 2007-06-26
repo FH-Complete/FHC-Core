@@ -17,8 +17,8 @@ require_once('../../../vilesci/config.inc.php');
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
-$adress='ruhan@technikum-wien.at';
-//$adress='fas_sync@technikum-wien.at';
+//$adress='ruhan@technikum-wien.at';
+$adress='fas_sync@technikum-wien.at';
 
 $error_log='';
 $text = '';
@@ -29,6 +29,7 @@ $anzahl_geaendert=0;
 
 $fachbereich_kurzbz='';
 $ausgabe='';
+$ausgabe1='';
 $ausgabe_all='';
 
 
@@ -65,10 +66,10 @@ if($result = pg_query($conn_fas, $qry))
 		//$error_log='';
 		//$abschlusspruefung_id		='';  //serial
 		//$student_uid			='';
-		$vorsitz				=$row->vilesci_vorsitzender;
+		//$vorsitz				='';
 		$pruefer1				=$row->vilesci_pruefer;
 		$pruefer2				=$row->vilesci_pruefer1;
-		//$pruefer3				='';//kein dritter Prüfer bei Diplomarbeiten
+		//$pruefer3				='';//kein dritter Prüfer bei Diplomprüfungen
 		//$abschlussbeurteilung_kurzbz	='';
 		//$akadgrad_id			='';
 		$datum				=$row->pruefungsdatum;
@@ -122,6 +123,27 @@ if($result = pg_query($conn_fas, $qry))
 		{
 			$abschlussbeurteilung_kurzbz=NULL;
 		}
+		//vorsitz ermitteln
+		if($row->vilesci_vorsitzender==null)
+		{
+			$vorsitz=null;
+		}
+		else 
+		{
+			$qry="SELECT uid FROM public.tbl_benutzer WHERE person_id='".$row->vilesci_vorsitzender."';";
+			if($resulto=pg_query($conn, $qry))
+			{
+				if($rowo=pg_fetch_object($resulto))
+				{ 
+					$vorsitz=$rowo->uid;
+				}
+				else 
+				{
+					$error=true;
+					$error_log.="Vorsitz mit person_id: $row->vilesci_vorsitzender konnte nicht gefunden werden.\n";
+				}
+			}
+		}
 		//geschlecht ermitteln
 		$qry="SELECT geschlecht from person,student WHERE student_pk='".$row->student_fk."' AND student.person_fk=person.person_pk;";
 		if($resulto=pg_query($conn_fas, $qry))
@@ -137,7 +159,7 @@ if($result = pg_query($conn_fas, $qry))
 			}
 		}
 		//akadgrad ermitteln
-		if($studiengang_kz<=222)
+		if($studiengang_kz<=222 || $studiengang_kz==308)
 		{
 			$qry="SELECT * FROM lehre.tbl_akadgrad WHERE studiengang_kz='".$studiengang_kz."' AND geschlecht='".$geschlecht."';";
 		}
@@ -297,7 +319,7 @@ if($result = pg_query($conn_fas, $qry))
 					if($update)
 					{
 						$qry="UPDATE lehre.tbl_abschlusspruefung SET ".
-							"abschlusspruefung_id=".myaddslashes($rowo->abschlusspruefung_id).", ".
+							//"abschlusspruefung_id=".myaddslashes($rowo->abschlusspruefung_id).", ".
 							"student_uid=".myaddslashes($student_uid).", ".
 							"vorsitz=".myaddslashes($vorsitz).", ".
 							"pruefer1=".myaddslashes($pruefer1).", ".
@@ -319,7 +341,7 @@ if($result = pg_query($conn_fas, $qry))
 					}
 					else 
 					{
-						$qry="SELECT * FROM lehre.tbl_abschlusspruefung;";
+						$qry="select 1;";
 					}
 				}
 				else 
@@ -362,25 +384,22 @@ if($result = pg_query($conn_fas, $qry))
 		else 
 		{
 			$anzahl_fehler++;
-		}
-		
-		
-		
-		
+		}		
 	}
+	
 //echo und mail
 echo nl2br("Diplomprüfungssynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
 
 $error_log_fas="Sync Diplomprüfung\n------------------------\n\n".$error_log;
-echo nl2br("Allgemeine Fehler: ".$anzahl_fehler."\nAnzahl Diplomprüfungen: ".$anzahl_quelle." / Eingefügt: ".$anzahl_eingefügt." / Geändert: ".$anzahl_geaendert.".\n\n");
+echo nl2br("Allgemeine Fehler: ".$anzahl_fehler."\nAnzahl Diplomprüfungen: ".$anzahl_quelle." / Eingefügt: ".$anzahl_eingefuegt." / Geändert: ".$anzahl_geaendert.".\n\n");
 
 
 echo nl2br($error_log_fas."\n--------------------------------------------------------------------------------------------------------------------------------\n");
-echo nl2br($ausgabe_all);
+echo nl2br($ausgabe);
 
 mail($adress, 'SYNC Diplomprüfung von '.$_SERVER['HTTP_HOST'], 
-"Allgemeine Fehler: ".$anzahl_fehler.", Anzahl Diplomprüfungen: ".$anzahl_quelle.".\n".
-$ausgabe_all,"From: vilesci@technikum-wien.at");
+"Allgemeine Fehler: ".$anzahl_fehler.", Anzahl Diplomprüfungen: ".$anzahl_quelle." / Eingefügt: ".$anzahl_eingefuegt." / Geändert: ".$anzahl_geaendert.".\n\n".
+$ausgabe,"From: vilesci@technikum-wien.at");
 
 mail($adress, 'SYNC-Fehler Diplomprüfung  von '.$_SERVER['HTTP_HOST'], $error_log_fas, "From: vilesci@technikum-wien.at");
 }

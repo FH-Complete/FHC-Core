@@ -103,56 +103,77 @@ if($result = pg_query($conn_fas, $qry_main))
 			}
 		}
 		//vorsitz ermitteln
-		$qry="SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE ext_id='".$row->vorsitz_fk."';";
-		if($resulto=pg_query($conn, $qry))
+		if($row->vorsitz_fk>'-1')
 		{
-			if($rowo=pg_fetch_object($resulto))
-			{ 
-				$vorsitz=$rowo->mitarbeiter_uid;
-			}
-			else 
-			{
-				$error=true;
-				$error_log.="Vorsitz mit mitarbeiter_fk: $row->vorsitz_fk konnte nicht gefunden werden.\n";
-			}
-		}
-		//prüfer1 ermitteln
-		$qry="SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE ext_id='".$row->pruefer1_fk."';";
-		if($resulto=pg_query($conn, $qry))
-		{
-			if($rowo=pg_fetch_object($resulto))
-			{ 
-				$pruefer1=$rowo->mitarbeiter_uid;
-			}
-			else 
-			{
-				$error=true;
-				$error_log.="Prüfer1 mit mitarbeiter_fk: $row->pruefer1_fk konnte nicht gefunden werden.\n";
-			}
-		}
-		//prüfer2 ermitteln
-		$qry="SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE ext_id='".$row->pruefer2_fk."';";
-		if($resulto=pg_query($conn, $qry))
-		{
-			if($rowo=pg_fetch_object($resulto))
-			{ 
-				$pruefer2=$rowo->mitarbeiter_uid;
-			}
-			else 
-			{
-				$error=true;
-				$error_log.="Prüfer2 mit mitarbeiter_fk: $row->pruefer2_fk konnte nicht gefunden werden.\n";
-			}
-		}
-		//prüfer3 ermitteln, wenn an prüfung teilgenommen
-		if($row->pruefer3_fk>'-1')
-		{
-			$qry="SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE ext_id='".$row->pruefer3_fk."';";
+			$qry="SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE ext_id='".$row->vorsitz_fk."';";
 			if($resulto=pg_query($conn, $qry))
 			{
 				if($rowo=pg_fetch_object($resulto))
 				{ 
-					$pruefer3=$rowo->mitarbeiter_uid;
+					$vorsitz=$rowo->mitarbeiter_uid;
+				}
+				else 
+				{
+					$error=true;
+					$error_log.="Vorsitz mit mitarbeiter_fk: $row->vorsitz_fk konnte nicht gefunden werden.\n";
+				}
+			}
+		}
+		else 
+		{
+			$vorsitz=NULL;
+		}	
+		//prüfer1 ermitteln
+		if($row->pruefer1_fk>'-1')
+		{
+			$qry="SELECT person_id FROM public.tbl_mitarbeiter, public.tbl_benutzer WHERE tbl_mitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND tbl_mitarbeiter.ext_id='".$row->pruefer1_fk."';";
+			if($resulto=pg_query($conn, $qry))
+			{
+				if($rowo=pg_fetch_object($resulto))
+				{ 
+					$pruefer1=$rowo->person_id;
+				}
+				else 
+				{
+					$error=true;
+					$error_log.="Prüfer1 mit mitarbeiter_fk: $row->pruefer1_fk konnte nicht gefunden werden.\n";
+				}
+			}
+		}
+		else 
+		{
+			$pruefer1=NULL;
+		}
+		//prüfer2 ermitteln
+		if($row->pruefer2_fk>'-1')
+		{
+			$qry="SELECT person_id FROM public.tbl_mitarbeiter, public.tbl_benutzer WHERE tbl_mitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND tbl_mitarbeiter.ext_id='".$row->pruefer2_fk."';";
+			if($resulto=pg_query($conn, $qry))
+			{
+				if($rowo=pg_fetch_object($resulto))
+				{ 
+					$pruefer2=$rowo->person_id;
+				}
+				else 
+				{
+					$error=true;
+					$error_log.="Prüfer2 mit mitarbeiter_fk: $row->pruefer2_fk konnte nicht gefunden werden.\n";
+				}
+			}
+		}
+		else 
+		{
+			$pruefer2=NULL;
+		}	
+		//prüfer3 ermitteln, wenn an prüfung teilgenommen
+		if($row->pruefer3_fk>'-1')
+		{
+			$qry="SELECT person_id FROM public.tbl_mitarbeiter, public.tbl_benutzer WHERE tbl_mitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND tbl_mitarbeiter.ext_id='".$row->pruefer3_fk."';";
+			if($resulto=pg_query($conn, $qry))
+			{
+				if($rowo=pg_fetch_object($resulto))
+				{ 
+					$pruefer3=$rowo->person_id;
 				}
 				else 
 				{
@@ -198,7 +219,7 @@ if($result = pg_query($conn_fas, $qry_main))
 		//insert oder update?
 		if(!$error)
 		{
-			$qry="SELECT * FROM lehre.tbl_abschlusspruefung WHERE student_uid='".$student_uid."' AND pruefungstyp='Bachelor' AND ext_id='".$row->bakkalaureatspruefung_pk."';";
+			$qry="SELECT * FROM lehre.tbl_abschlusspruefung WHERE student_uid='".$student_uid."' AND pruefungstyp_kurzbz='Bachelor' AND ext_id='".$row->bakkalaureatspruefung_pk."';";
 			if($resulto=pg_query($conn, $qry))
 			{
 				if($rowo=pg_fetch_object($resulto))
@@ -374,7 +395,7 @@ if($result = pg_query($conn_fas, $qry_main))
 					}
 					else 
 					{
-						$qry="SELECT * FROM lehre.tbl_abschlusspruefung;";
+						$qry="select 1;";
 					}
 				}
 				else 
