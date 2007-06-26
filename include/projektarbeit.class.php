@@ -132,7 +132,7 @@ class projektarbeit
 			$this->errormsg = 'Note muß ein numerischer Wert sein - student_uid: '.$this->student_uid;
 			return false;
 		}
-		if(!is_numeric($this->Punkte))
+		if(!is_numeric($this->punkte))
 		{
 			$this->errormsg = 'Punkte muß ein numerischer Wert sein - student_uid: '.$this->student_uid;
 			return false;
@@ -187,8 +187,9 @@ class projektarbeit
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry='INSERT INTO lehre.tbl_projektarbeit (projekttyp_kurzbz, titel, lehreinheit_id, student_uid,firma_id, note. punkte, beginn, ende, faktor,
-				freigegeben, gesperrtbis, themenbereich, anmerkung, ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
+			$qry='INSERT INTO lehre.tbl_projektarbeit (projekttyp_kurzbz, titel, lehreinheit_id, student_uid, firma_id, note, punkte, 
+				beginn, ende, faktor, freigegeben, gesperrtbis, stundensatz, gesamtstunden, themenbereich, anmerkung, 
+				ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
 			     $this->addslashes($this->projekttyp_kurzbz).', '.
 			     $this->addslashes($this->titel).', '.
 			     $this->addslashes($this->lehreinheit_id).', '.
@@ -199,7 +200,7 @@ class projektarbeit
 			     $this->addslashes($this->beginn).', '.
 			     $this->addslashes($this->ende).', '.
 			     $this->addslashes($this->faktor).', '.
-			     ($this->freigegeben?'true':'false').','.
+			     ($this->freigegeben?'true':'false').', '.
 			     $this->addslashes($this->gesperrtbis).', '.
 			     $this->addslashes($this->stundensatz).', '.
 			     $this->addslashes($this->gesamtstunden).', '.
@@ -231,7 +232,7 @@ class projektarbeit
 				'beginn='.$this->addslashes($this->beginn).', '.
 				'ende='.$this->addslashes($this->ende).', '.
 				'faktor='.$this->addslashes($this->faktor).', '.
-				'freigegeben='.($this->freigegeben?'true':'false').','.
+				'freigegeben='.($this->freigegeben?'true':'false').', '.
 				'gesperrtbis='.$this->addslashes($this->gesperrtbis).', '.
 				'stundensatz='.$this->addslashes($this->stundensatz).', '.
 				'gesamtstunden='.$this->addslashes($this->gesamtstunden).', '.
@@ -239,7 +240,7 @@ class projektarbeit
 				'anmerkung='.$this->addslashes($this->anmerkung).', '.
 			     	'updateamum= now(), '.
 			     	'updatevon='.$this->addslashes($this->updatevon).' '.
-			     	'firmentyp='.$this->addslashes($this->firmentyp_kurzbz).' '.
+			     	//'firmentyp='.$this->addslashes($this->firmentyp_kurzbz).' '.
 				'WHERE projektarbeit_id='.$this->addslashes($this->projektarbeit_id).';';
 		}
 		//echo $qry;

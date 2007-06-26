@@ -34,6 +34,10 @@ class firma
 	//Tabellenspalten
 	var $firma_id;			// @var integer
 	var $name;			// @var string
+	var $adresse;			// @var string
+	var $email;			// @var string
+	var $telefon;			// @var string
+	var $fax;			// @var string
 	var $anmerkung;		// @var string
 	var $ext_id;			// @var integer
 	var $insertamum;		// @var timestamp
@@ -196,10 +200,14 @@ class firma
 			$qry='UPDATE public.tbl_firma SET '.
 				'firma_id='.$this->addslashes($this->firma_id).', '.
 				'name='.$this->addslashes($this->name).', '.
+				'adresse='.$this->addslashes($this->adresse).', '.
+				'email='.$this->addslashes($this->email).', '.
+				'telefon='.$this->addslashes($this->telefon).', '.
+				'fax='.$this->addslashes($this->fax).', '.
 				'anmerkung='.$this->addslashes($this->anmerkung).', '.
-		     	'updateamum= now(), '.
-		     	'updatevon='.$this->addslashes($this->updatevon).' '.
-		     	'firmentyp='.$this->addslashes($this->firmentyp_kurzbz).' '.
+				'updateamum= now(), '.
+		     		'updatevon='.$this->addslashes($this->updatevon).', '.
+		     		'firmentyp_kurzbz='.$this->addslashes($this->firmentyp_kurzbz).' '.
 				'WHERE firma_id='.$this->addslashes($this->firma_id).';';
 		}
 		//echo $qry;
@@ -213,7 +221,7 @@ class firma
 				{
 					if($row = pg_fetch_object($result))
 					{
-						$this->firma_id = $row->firma_id;
+						$this->firma_id = $row->id;
 						pg_query($this->conn, 'COMMIT');
 						return true;
 					}
