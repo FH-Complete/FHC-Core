@@ -19,7 +19,7 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-
+echo 'test';
 require_once('../config.inc.php');
 require_once('../../include/globals.inc.php');
 require_once('../../include/functions.inc.php');
@@ -39,9 +39,10 @@ $rechte=new benutzerberechtigung($db_conn);
 $rechte->getBerechtigungen($user);
 
 $fkt=new funktion($db_conn);
-$fkt->getAll($user)
+$fkt->getAll($user);
 
 $stg_obj = new studiengang($db_conn);
+
 if($stg_obj->getAll('kurzbzlang'))
 {
 	$stg = array();
@@ -213,7 +214,7 @@ else
 					  	<td nowrap>
 							<ul style="margin-top: 0px; margin-bottom: 0px;">
 							<?php
-							if ($rechte->isBerechtigt('admin',0))
+							if ($rechte->isBerechtigt('admin',0) || $fkt->checkFunktion('stglstv')|| $fkt->checkFunktion('stgl'))
 							{
 								echo '<li><a class="Item2" href="profile/resturlaub.php" target="content">Resturlaub</a></li>';
 								echo '<li><a class="Item2" href="profile/zeitsperre.php?fix=true" target="content">Fix-Angestellte</a></li>';
