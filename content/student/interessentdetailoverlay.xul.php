@@ -385,7 +385,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     			</grid>
     		</groupbox>
     		<groupbox id="interessent-detail-groupbox-rollen">
-			<caption label="Rollen" />
+			<caption label="Status" />
 					<tree id="interessent-prestudent-tree-rolle" seltype="single" hidecolumnpicker="false" flex="1"
 							datasources="rdf:null" ref="http://www.technikum-wien.at/prestudentrolle/liste"
 							style="margin-left:10px;margin-right:10px;margin-bottom:5px;" height="100px" enableColumnDrag="true"

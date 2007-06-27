@@ -22,11 +22,22 @@
 header("Content-type: application/vnd.mozilla.xul+xml");
 echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
 
-include('../vilesci/config.inc.php');
+require_once('../vilesci/config.inc.php');
+require_once('../include/functions.inc.php');
+require_once('../include/benutzerberechtigung.class.php');
+
+if(!$conn = pg_pconnect(CONN_STRING))
+	die('Fehler beim Herstellen der DB Verbindung');
+
+$user = get_uid();
+
+$rechte = new benutzerberechtigung($conn);
+$rechte->getBerechtigungen($user);
 
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentenoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentenoverlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiteroverlay.xul.php"?>';
 /*echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-week-overlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-semester-overlay.xul.php"?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
@@ -36,7 +47,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 <!DOCTYPE overlay >
 <!-- [<?php require_once("../locale/de-AT/tempus.dtd"); ?>] -->
 
-<overlay id="TempusOverlay"
+<overlay id="FasOverlay"
 	xmlns:html="http://www.w3.org/1999/xhtml"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	>
@@ -169,6 +180,90 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
   	</template>
 </tree>
 
+<tree id="tree-menu-mitarbeiter" onselect="onMitarbeiterSelect();"
+	seltype="single" hidecolumnpicker="true" flex="1"
+	>
+	<treecols>
+	    <treecol id="tree-menu-mitarbeiter-col-name" label="Filter" primary="true" flex="1"/>
+	    <treecol id="tree-menu-mitarbeiter-col-filter" label="ColFilter" hidden="true" flex="1"/>
+	</treecols>
+
+    <treechildren>
+	    <treeitem>
+	        <treerow>
+	        	<treecell label="Alle"/>
+	        	<treecell label="Alle"/>
+	        </treerow>
+	    </treeitem>
+	    <treeitem>
+			<treerow>
+	        	<treecell label="FixAngestellte"/>
+	        	<treecell label="FixAngestellteAlle"/>
+	        </treerow>
+	    </treeitem>
+	    <treeitem>
+			<treerow>
+	        	<treecell label="FreiAngestellte"/>
+	        	<treecell label="FreiAngestellteAlle"/>
+	        </treerow>
+	    </treeitem>
+
+	    <treeitem container="true" open="true">
+			<treerow>
+			   	<treecell label="Aktive"/>
+			   	<treecell label="Aktive"/>
+			</treerow>
+			<treechildren>
+				<treeitem>
+					<treerow>
+					   	<treecell label="FixAngestellte"/>
+					   	<treecell label="FixAngestellte"/>
+					</treerow>
+				</treeitem>
+				<treeitem>
+					<treerow>
+					   	<treecell label="FreiAngestellte"/>
+					   	<treecell label="FreiAngestellte"/>
+					</treerow>
+				</treeitem>
+				<treeitem>
+					<treerow>
+					   	<treecell label="Studiengangsleiter"/>
+					   	<treecell label="Studiengangsleiter"/>
+					</treerow>
+				</treeitem>
+				<treeitem>
+					<treerow>
+					   	<treecell label="Fachbereichsleiter"/>
+					   	<treecell label="Fachbereichsleiter"/>
+					</treerow>
+				</treeitem>
+			</treechildren>
+	    </treeitem>
+
+	    <treeitem container="true" open="true">
+			<treerow>
+			   	<treecell label="Inaktive"/>
+			   	<treecell label="Inaktive"/>
+			</treerow>
+			<treechildren>
+				<treeitem>
+					<treerow>
+					   	<treecell label="Karenziert"/>
+					   	<treecell label="Karenziert"/>
+					</treerow>
+				</treeitem>
+				<treeitem>
+					<treerow>
+					   	<treecell label="Ausgeschieden"/>
+					   	<treecell label="Ausgeschieden"/>
+					</treerow>
+				</treeitem>
+			</treechildren>
+	    </treeitem>
+	</treechildren>
+</tree>
+
 <vbox id="vbox-main">
 <popupset>
 		<popup id="fasoverlay-lektor-tree-popup">
@@ -177,17 +272,37 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 </popupset>
 	<tabbox id="tabbox-main" flex="3" orient="vertical">
 		<tabs orient="horizontal">
-			<tab id="tab-interessenten" label="Interessenten"/>
-			<tab id="tab-studenten" label="Studenten"/>
-			<tab id="tab-lfvt" label="Lehrveranstaltungen" />
+		<?php
+			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('lva-verwaltung'))
+			{
+				echo '<tab id="tab-interessenten" label="Interessenten"/>';
+				echo '<tab id="tab-studenten" label="Studenten"/>';
+				echo '<tab id="tab-lfvt" label="Lehrveranstaltungen" />';
+			}
+			if($rechte->isBerechtigt('admin','0') || $rechte->isBerechtigt('mitarbeiter'))
+			{
+				echo '<tab id="tab-mitarbeiter" label="Mitarbeiter" oncommand="MitarbeiterTabSelect()" />';
+			}
+		?>
 		</tabs>
 		<tabpanels id="tabpanels-main" flex="1">
-			<!--  Interessenten  -->
-			<vbox id="InteressentenEditor" />
-			<!--  Studenten  -->
-			<vbox id="studentenEditor" />
-			<!-- Lehrfachverteilung -->
-            <vbox id="LehrveranstaltungEditor" />
+		<?php
+			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('lva-verwaltung'))
+			{
+				echo '
+				<!--  Interessenten  -->
+				<vbox id="InteressentenEditor" />
+				<!--  Studenten  -->
+				<vbox id="studentenEditor" />
+				<!-- Lehrfachverteilung -->
+	            <vbox id="LehrveranstaltungEditor" />
+	            ';
+			}
+			if($rechte->isBerechtigt('admin','0') || $rechte->isBerechtigt('mitarbeiter'))
+			{
+				 echo '<vbox id="MitarbeiterEditor" />';
+			}
+		?>
 		</tabpanels>
 	</tabbox>
 </vbox>

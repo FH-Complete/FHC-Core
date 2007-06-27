@@ -1,4 +1,25 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
+
 function db_query($conn, $sql_query)
 {
 	if (!$result=pg_query($conn, $sql_query))
@@ -200,5 +221,20 @@ function getStudiensemesterFromDatum($conn, $datum, $naechstes=true)
 	}
 	else
 		return false;
+}
+
+// ***************************************************************
+// * Diese Funktion liefert sowohl bei UTF-8 als auch
+// * bei Latin9 die richtige Anzahl der Zeichen
+// * (das normale strlen liefert bei UTF-8 Zeichen falsche Werte.)
+// ***************************************************************
+function utf8_strlen($str)
+{
+	$count = 0;
+  	for ($i = 0; $i < strlen($str); ++$i) 
+    	if ((ord($str[$i]) & 0xC0) != 0x80) 
+      		++$count;
+
+  	return $count;
 }
 ?>

@@ -19,7 +19,6 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-echo 'test';
 require_once('../config.inc.php');
 require_once('../../include/globals.inc.php');
 require_once('../../include/functions.inc.php');

@@ -19,7 +19,11 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-
+/*
+ * Benoetigt: person.class.php
+ *            benutzer.class.php
+ *            functions.inc.php
+ */
 class mitarbeiter extends benutzer
 {
 	var $new;
@@ -36,6 +40,8 @@ class mitarbeiter extends benutzer
 	var $telefonklappe;		//varchar(25)
 	var $ort_kurzbz;		//varchar(8)
 	var $ext_id_mitarbeiter;	//bigint
+	var $stundensatz;
+	var $anmerkung;
 
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional einen Mitarbeiter
@@ -80,11 +86,13 @@ class mitarbeiter extends benutzer
 				$this->ausbildungcode = $row->ausbildungcode;
 				$this->personalnummer = $row->personalnummer;
 				$this->kurzbz = $row->kurzbz;
-				$this->lektor = $row->lektor;
-				$this->fixangestellt = $row->fixangestellt;
+				$this->lektor = ($row->lektor=='t'?true:false);
+				$this->fixangestellt = ($row->fixangestellt=='t'?true:false);
 				$this->standort_kurzbz = $row->standort_kurzbz;
 				$this->telefonklappe = $row->telefonklappe;
 				$this->ort_kurzbz = $row->ort_kurzbz;
+				$this->stundensatz = $row->stundensatz;
+				$this->anmerkung = $row->anmerkung;
 				$this->ext_id_mitarbeiter = $row->ext_id;
 				return true;
 			}
@@ -107,7 +115,7 @@ class mitarbeiter extends benutzer
 	// ************************************************
 	function validate()
 	{
-		if(strlen($this->uid)>16)
+		if(utf8_strlen($this->uid)>16)
 		{
 			$this->errormsg = "ID darf nicht laenger als 16 Zeichen sein\n";
 			return false;
@@ -127,12 +135,12 @@ class mitarbeiter extends benutzer
 			$this->errormsg = "Personalnummer muss eine gueltige Zahl sein\n";
 			return false;
 		}
-		if(strlen($this->kurzbz)>8)
+		if(utf8_strlen($this->kurzbz)>8)
 		{
 			$this->errormsg = "kurzbz darf nicht laenger als 8 Zeichen sein\n";
 			return false;
 		}
-		if(strlen($this->ort_kurzbz)>8)
+		if(utf8_strlen($this->ort_kurzbz)>8)
 		{
 			$this->errormsg = "Ort_kurzbz darf nicht laenger als 8 Zeichen sein\n";
 			return false;
@@ -147,12 +155,12 @@ class mitarbeiter extends benutzer
 			$this->errormsg = "fixangestellt muss boolean sein\n";
 			return false;
 		}
-		if(strlen($this->telefonklappe)>25)
+		if(utf8_strlen($this->telefonklappe)>25)
 		{
 			$this->errormsg = "telefonklappe darf nicht laenger als 25 Zeichen sein\n";
 			return false;
 		}
-		if(strlen($this->updatevon)>32)
+		if(utf8_strlen($this->updatevon)>32)
 		{
 			$this->errormsg = "updatevon darf nicht laenger als 32 Zeichen sein\n";
 			return false;
@@ -185,7 +193,7 @@ class mitarbeiter extends benutzer
 
 			//Neuen Datensatz anlegen
 			$qry = "INSERT INTO public.tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz,
-			                    fixangestellt, standort_kurzbz, telefonklappe, updateamum, updatevon, ext_id)
+			                    fixangestellt, standort_kurzbz, telefonklappe, anmerkung, stundensatz updateamum, updatevon, ext_id)
 
 			        VALUES('".addslashes($this->uid)."',".
 			 	 	$this->addslashes($this->ausbildungcode).",".
@@ -196,6 +204,8 @@ class mitarbeiter extends benutzer
 					($this->fixangestellt?'true':'false').','.
 					$this->addslashes($this->standort_kurzbz).','.
 					$this->addslashes($this->telefonklappe).','.
+					$this->addslashes($this->anmerkung).','.
+					$this->addslashes($this->stundensatz).','.
 					$this->addslashes($this->updateamum).','.
 					$this->addslashes($this->updatevon).', '.
 					$this->addslashes($this->ext_id_mitarbeiter).');';
@@ -212,6 +222,8 @@ class mitarbeiter extends benutzer
 			       ' standort_kurzbz='.$this->addslashes($this->standort_kurzbz).','.
 			       ' telefonklappe='.$this->addslashes($this->telefonklappe).','.
 			       ' ort_kurzbz='.$this->addslashes($this->ort_kurzbz).','.
+			       ' anmerkung='.$this->addslashes($this->anmerkung).','.
+			       ' stundensatz='.$this->addslashes($this->stundensatz).','.
 			       ' updateamum='.$this->addslashes($this->updateamum).','.
 			       ' updatevon='.$this->addslashes($this->updatevon).','.
 			       ' ext_id='.$this->addslashes($this->ext_id_mitarbeiter).
@@ -510,5 +522,78 @@ class mitarbeiter extends benutzer
 			return false;
 		}
 	}
+	
+	function getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $ausgeschieden, $studiensemester_kurzbz)
+	{
+		$qry = "SELECT *, tbl_benutzer.aktiv as aktiv FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id)) LEFT JOIN public.tbl_benutzerfunktion USING(uid) WHERE true";
+		
+		if($fix)
+			$qry .= " AND fixangestellt=true";
+		if($stgl)
+			$qry .= " AND funktion_kurzbz='stgl'";
+		if($fbl)
+			$qry .= " AND funktion_kurzbz='fbl'";
+		if($aktiv=='true')
+			$qry .= " AND tbl_benutzer.aktiv=true";
+		if($aktiv=='false')
+			$qry .= " AND tbl_benutzer.aktiv=false";
+		if($karenziert)
+			$qry .= " AND uid IN (SELECT mitarbeiter_uid FROM bis.tbl_bisverwendung WHERE beginn<(SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='$studiensemester_kurzbz') AND ende<(SELECT ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='$studiensemester_kurzbz'))";
+		if($ausgeschieden)
+		{
+			//ToDo: 
+		}
+		//echo $qry;
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$obj = new mitarbeiter($this->conn, null, null);
+				
+				$obj->person_id = $row->person_id;
+				$obj->staatsbuergerschaft = $row->staatsbuergerschaft;
+				$obj->geburtsnation = $row->geburtsnation;
+				$obj->sprache = $row->sprache;
+				$obj->anrede = $row->anrede;
+				$obj->titelpost = $row->titelpost;
+				$obj->titelpre = $row->titelpre;
+				$obj->nachname = $row->nachname;
+				$obj->vorname = $row->vorname;
+				$obj->vornamen = $row->vornamen;
+				$obj->gebdatum = $row->gebdatum;
+				$obj->gebort = $row->gebort;
+				$obj->gebzeit = $row->gebzeit;
+				$obj->anmerkungen = $row->anmerkungen;
+				$obj->homepage = $row->anmerkungen;
+				$obj->svnr = $row->svnr;
+				$obj->ersatzkennzeichen = $row->ersatzkennzeichen;
+				$obj->familienstand = $row->familienstand;
+				$obj->geschlecht = $row->geschlecht;
+				$obj->anzahlkinder = $row->anzahlkinder;
+				$obj->aktiv = ($row->aktiv=='t'?true:false);
+				$obj->uid = $row->uid;
+				$obj->personalnummer = $row->personalnummer;
+				$obj->telefonklappe = $row->telefonklappe;
+				$obj->kurzbz = $row->kurzbz;
+				$obj->lektor = ($row->lektor=='t'?true:false);
+				$obj->fixangestellt = ($row->fixangestellt=='t'?true:false);
+				$obj->stundensatz = $row->stundensatz;
+				$obj->ausbildungcode = $row->ausbildungcode;
+				$obj->ort_kurzbz = $row->ort_kurzbz;
+				$obj->standort_kurzbz = $row->standort_kurzbz;
+				$obj->anmerkung = $row->anmerkung;				
+				$obj->alias = $row->alias;
+				
+				$this->result[] = $obj;
+			}
+			return false;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
 }
 ?>

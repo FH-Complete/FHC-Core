@@ -28,7 +28,6 @@ header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
 require_once('../vilesci/config.inc.php');
-require_once('../include/ort.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
@@ -36,41 +35,32 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 	
-$rdf_url='http://www.technikum-wien.at/ort';
+$rdf_url='http://www.technikum-wien.at/standort';
 
 echo '
 <RDF:RDF
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:ORT="'.$rdf_url.'/rdf#"
+	xmlns:STANDORT="'.$rdf_url.'/rdf#"
 >
    <RDF:Seq about="'.$rdf_url.'/liste">
 ';
-
+   
 if(isset($_GET['optional']) && $_GET['optional']=='true')
 {
 	echo '
 	  <RDF:li>
          <RDF:Description  id=""  about="" >
-            <ORT:ort_kurzbz><![CDATA[-- keine Auswahl --]]></ORT:ort_kurzbz>
-            <ORT:bezeichnung><![CDATA[]]></ORT:bezeichnung>
-            <ORT:planbezeichnung><![CDATA[]]></ORT:planbezeichnung>
-            <ORT:max_person><![CDATA[]]></ORT:max_person>
-            <ORT:lehre><![CDATA[]]></ORT:lehre>
-            <ORT:reservieren><![CDATA[]]></ORT:reservieren>
-            <ORT:aktiv><![CDATA[]]></ORT:aktiv>
-			<ORT:lageplan><![CDATA[]]></ORT:lageplan>
-            <ORT:dislozierung><![CDATA[]]></ORT:dislozierung>
-            <ORT:kosten><![CDATA[]]></ORT:kosten>
-            <ORT:ausstattung><![CDATA[]]></ORT:ausstattung>
+            <STANDORT:standort_kurzbz><![CDATA[]]></STANDORT:standort_kurzbz>
+            <STANDORT:adresse_id><![CDATA[]]></STANDORT:adresse_id>
+            <STANDORT:bezeichnung><![CDATA[-- keine Auswahl --]]></STANDORT:bezeichnung>
          </RDF:Description>
       </RDF:li>';
 }
-//Daten holen
-$ortobj = new ort($conn);
 
-$ortobj->getAll();
-foreach ($ortobj->result as $row)
-	draw_content($row);
+$qry = "SELECT * FROM public.tbl_standort ORDER BY standort_kurzbz";
+if($result = pg_query($conn, $qry))
+	while($row = pg_fetch_object($result))
+		draw_content($row);
 
 function draw_content($row)
 {		
@@ -78,18 +68,10 @@ function draw_content($row)
 	
 	echo '
 		  <RDF:li>
-	         <RDF:Description  id="'.$row->ort_kurzbz.'"  about="'.$rdf_url.'/'.$row->ort_kurzbz.'" >
-	            <ORT:ort_kurzbz><![CDATA['.$row->ort_kurzbz.']]></ORT:ort_kurzbz>
-	            <ORT:bezeichnung><![CDATA['.$row->bezeichnung.']]></ORT:bezeichnung>
-	            <ORT:planbezeichnung><![CDATA['.$row->planbezeichnung.']]></ORT:planbezeichnung>
-	            <ORT:max_person><![CDATA['.$row->max_person.']]></ORT:max_person>
-	            <ORT:lehre><![CDATA['.($row->lehre?'Ja':'Nein').']]></ORT:lehre>
-	            <ORT:reservieren><![CDATA['.($row->reservieren?'Ja':'Nein').']]></ORT:reservieren>
-	            <ORT:aktiv><![CDATA['.($row->aktiv?'Ja':'Nein').']]></ORT:aktiv>
-				<ORT:lageplan><![CDATA['.$row->lageplan.']]></ORT:lageplan>
-	            <ORT:dislozierung><![CDATA['.$row->dislozierung.']]></ORT:dislozierung>
-	            <ORT:kosten><![CDATA['.$row->kosten.']]></ORT:kosten>
-	            <ORT:ausstattung><![CDATA['.$row->ausstattung.']]></ORT:ausstattung>
+	         <RDF:Description  id="'.$row->standort_kurzbz.'"  about="'.$rdf_url.'/'.$row->standort_kurzbz.'" >
+	            <STANDORT:standort_kurzbz><![CDATA['.$row->standort_kurzbz.']]></STANDORT:standort_kurzbz>
+	            <STANDORT:adresse_id><![CDATA['.$row->adresse_id.']]></STANDORT:adresse_id>
+	            <STANDORT:bezeichnung><![CDATA['.$row->standort_kurzbz.']]></STANDORT:bezeichnung>
 	         </RDF:Description>
 	      </RDF:li>';
 }
