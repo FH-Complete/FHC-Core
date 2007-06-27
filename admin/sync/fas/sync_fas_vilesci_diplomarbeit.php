@@ -42,6 +42,7 @@ $anzahl_fehler=0;
 $anzahl_fehler_le=0;
 $anzahl_fehler_pa=0;
 $anzahl_fehler_pbb=0;
+$anzahl_fehler_pbb2=0;
 $anzahl_fehler_pbg=0;
 $anzahl_fehler_pbg2=0;
 $anzahl_le_gesamt=0;
@@ -53,7 +54,6 @@ $anzahl_pa_update=0;
 $anzahl_pbb_update=0;
 $anzahl_pbb_gesamt=0;
 $anzahl_pbb_insert=0;
-$anzahl_pbb2_update=0;
 $anzahl_pbb2_gesamt=0;
 $anzahl_pbb2_insert=0;
 $anzahl_pbb2_update=0;
@@ -87,9 +87,14 @@ $projektbetreuernew3=false;
 $updatep3='';
 $projektbetreuernew3=false;
 $updatep3='';
+$projektbetreuernew4=false;
+$updatep4='';
+
 
 $noz=0;
 $noe=0;
+$no1=0;
+$no2=0;
 
 
 function myaddslashes($var)
@@ -110,6 +115,14 @@ function myaddslashes($var)
 <body>
 <?php
 //nation
+$qry="SELECT count(*) FROM lehre.tbl_lehrveranstaltung WHERE bezeichnung='Diplomarbeit';";
+if($result = pg_query($conn, $qry))
+{
+	while($row = pg_fetch_object($result))
+	{
+		$anzahl_lv_gesamt=$row->count;
+	}
+}
 $qry = "SELECT * FROM diplomarbeit WHERE diplomarbeitsdatum IS NOT NULL;";
 
 if($result = pg_query($conn_fas, $qry))
@@ -151,25 +164,34 @@ if($result = pg_query($conn_fas, $qry))
 		//$projektarbeitinsertvon		=$row->;
 		$projektarbeitext_id			=$row->diplomarbeit_pk;
 		
-		if(trim(strtoupper($row->diplomarbeitgesamtnote))=='SEHR GUT')
+		if(trim(strtoupper($row->diplomarbeitgesamtnote))=='SEHR GUT' || trim($row->diplomarbeitgesamtnote)=='1')
 		{
-			$projektarbeitnote='1';	
+			$projektarbeitnote=1;	
 		}
-		elseif(trim(strtoupper($row->diplomarbeitgesamtnote))=='GUT')
+		elseif(trim(strtoupper($row->diplomarbeitgesamtnote))=='GUT' || trim($row->diplomarbeitgesamtnote)=='2')
 		{
-			$projektarbeitnote='2';
+			$projektarbeitnote=2;
 		}
-		elseif(trim(strtoupper($row->diplomarbeitgesamtnote))=='BEFRIEDIGEND')
+		elseif(trim(strtoupper($row->diplomarbeitgesamtnote))=='BEFRIEDIGEND' || trim($row->diplomarbeitgesamtnote)=='3')
 		{
-			$projektarbeitnote='3';
+			$projektarbeitnote=3;
 		}
-		elseif(trim(strtoupper($row->diplomarbeitgesamtnote))=='GENÜGEND')
+		elseif(trim(strtoupper($row->diplomarbeitgesamtnote))=='GENÜGEND' || trim($row->diplomarbeitgesamtnote)=='4')
 		{
-			$projektarbeitnote='4';
+			$projektarbeitnote=4;
 		}
-		elseif(trim(strtoupper($row->diplomarbeitgesamtnote))=='NICHT GENÜGEND')
+		elseif(trim(strtoupper($row->diplomarbeitgesamtnote))=='NICHT GENÜGEND' || trim($row->diplomarbeitgesamtnote)=='5')
 		{
-			$projektarbeitnote='5';
+			$projektarbeitnote=5;
+		}
+		elseif($row->diplomarbeitgesamtnote==NULL || trim($row->diplomarbeitgesamtnote)=='')
+		{
+			$projektarbeitnote=null;
+		}
+		elseif(trim($row->diplomarbeitgesamtnote)=='1,5' || trim($row->diplomarbeitgesamtnote)=='2,5' || trim($row->diplomarbeitgesamtnote)=='3,5')
+		{
+			$projektarbeitnote=round(0+trim($row->diplomarbeitgesamtnote));
+			$projektarbeitanmerkung="Diplomarbeitsnote ursprünglich ".trim($row->diplomarbeitgesamtnote)."!";
 		}
 		//$lehreinheitlehrveranstaltung_id	='';
 		//$lehreinheitstudiensemester_kz	='';
@@ -251,7 +273,8 @@ if($result = pg_query($conn_fas, $qry))
 			}
 		}
 		
-		$qry="SELECT * FROM lehre.tbl_lehrveranstaltung WHERE bezeichnung='Diplomarbeit' AND studiengang_kz='".$lehrveranstaltungstudiengang_kz."' 
+		$qry="SELECT * FROM lehre.tbl_lehrveranstaltung WHERE bezeichnung='Diplomarbeit' 
+			AND studiengang_kz='".$lehrveranstaltungstudiengang_kz."' 
 			AND semester='".$lehrveranstaltungmax_semester."';";
 		if($results = pg_query($conn, $qry))
 		{
@@ -287,6 +310,7 @@ if($result = pg_query($conn_fas, $qry))
 				else 
 				{
 					$anzahl_lv_insert++;
+					$anzahl_lv_gesamt++;
 					$qry = "SELECT currval('lehre.tbl_lehrveranstaltung_lehrveranstaltung_id_seq') AS id;";
 					if($rowu=pg_fetch_object(pg_query($conn,$qry)))
 						$lehreinheitlehrveranstaltung_id=$rowu->id;
@@ -298,7 +322,6 @@ if($result = pg_query($conn_fas, $qry))
 					$ausgabe.="Lehrveranstaltung angelegt: Studiengang '".$lehrveranstaltungstudiengang_kz."' und Semester '".$lehrveranstaltungmax_semester."'\n";
 				}
 			}
-			$anzahl_lv_gesamt++;
 			$studiengang_kz=$lehrveranstaltungstudiengang_kz;
 			$semester=$lehrveranstaltungmax_semester;
 		}
@@ -649,28 +672,28 @@ if($result = pg_query($conn_fas, $qry))
 							}
 							if($updatele)
 							{
-								$qry = 'UPDATE lehre.tbl_lehreinheit SET'.
-								       ' lehrveranstaltung_id='.myaddslashes($lehreinheitlehrveranstaltung_id).','.
-								       ' studiensemester_kurzbz='.myaddslashes($lehreinheitstudiensemester_kurzbz).','.
-								       ' lehrfach_id='.myaddslashes($lehreinheitlehrfach_id).','.
-								       ' lehrform_kurzbz='.myaddslashes($lehreinheitlehrform_kurzbz).','.
-								       ' stundenblockung='.myaddslashes($lehreinheitstundenblockung).','.
-								       ' wochenrythmus='.myaddslashes($lehreinheitwochenrythmus).','.
-								       ' start_kw='.myaddslashes($lehreinheitstart_kw).','.
-								       ' raumtyp='.myaddslashes($lehreinheitraumtyp).','.
-								       ' raumtypalternativ='.myaddslashes($lehreinheitraumtypalternativ).','.
-								       ' lehre='.($lehreinheitlehre?'true':'false').','.
-								       ' anmerkung='.myaddslashes($lehreinheitanmerkung).','.
-								       ' unr='.myaddslashes($lehreinheitunr).','.
-								       ' lvnr='.myaddslashes($lehreinheitlvnr).','.
-								       ' insertvon='.myaddslashes($lehreinheitinsertvon).','.
-								       ' insertamum='.myaddslashes($lehreinheitinsertamum).','.
-								       ' updateamum=now(),'.
-								       ' updatevon='.myaddslashes($lehreinheitupdatevon).','.
-								       ' sprache='.myaddslashes($lehreinheitsprache).','.
-								       ' ext_id='.myaddslashes($lehreinheitext_id).
-								       " WHERE lehreinheit_id=".myaddslashes($lehreinheitlehreinheit_id).";";
-								       $ausgabe.="Lehreinheit aktualisiert bei Lehrveranstaltung='".$lehreinheitlehrveranstaltung_id."', Studiensemester='".$lehreinheitstudiensemester_kurzbz."' und Lehrfach='".$lehreinheitlehrfach_id."':.$ausgabe_le.\n";
+								$qry = 'UPDATE lehre.tbl_lehreinheit SET
+									lehrveranstaltung_id='.myaddslashes($lehreinheitlehrveranstaltung_id).', 
+									studiensemester_kurzbz='.myaddslashes($lehreinheitstudiensemester_kurzbz).', 
+									lehrfach_id='.myaddslashes($lehreinheitlehrfach_id).', 
+									lehrform_kurzbz='.myaddslashes($lehreinheitlehrform_kurzbz).', 
+									stundenblockung='.myaddslashes($lehreinheitstundenblockung).', 
+									wochenrythmus='.myaddslashes($lehreinheitwochenrythmus).', 
+									start_kw='.myaddslashes($lehreinheitstart_kw).', 
+									raumtyp='.myaddslashes($lehreinheitraumtyp).', 
+									raumtypalternativ='.myaddslashes($lehreinheitraumtypalternativ).', 
+									lehre='.($lehreinheitlehre?'true':'false').', 
+									anmerkung='.myaddslashes($lehreinheitanmerkung).', 
+									unr='.myaddslashes($lehreinheitunr).', 
+									lvnr='.myaddslashes($lehreinheitlvnr).', 
+									insertvon='.myaddslashes($lehreinheitinsertvon).', 
+									insertamum='.myaddslashes($lehreinheitinsertamum).', 
+									updateamum=now(), 
+									updatevon='.myaddslashes($lehreinheitupdatevon).', 
+									sprache='.myaddslashes($lehreinheitsprache).', 
+									ext_id='.myaddslashes($lehreinheitext_id).
+									" WHERE lehreinheit_id=".myaddslashes($lehreinheitlehreinheit_id).";";
+								$ausgabe.="Lehreinheit aktualisiert bei Lehrveranstaltung='".$lehreinheitlehrveranstaltung_id."', Studiensemester='".$lehreinheitstudiensemester_kurzbz."' und Lehrfach='".$lehreinheitlehrfach_id."':.$ausgabe_le.\n";
 							}
 							else 
 							{
@@ -734,7 +757,8 @@ if($result = pg_query($conn_fas, $qry))
 								     myaddslashes($projektarbeitgesamtstunden).', '.
 								     myaddslashes($projektarbeitthemenbereich).', '.
 								     myaddslashes($projektarbeitanmerkung).', '.
-								     myaddslashes($projektarbeitext_id).',  now(), '.
+								     myaddslashes($projektarbeitext_id).',  '.
+								     myaddslashes($projektarbeitinsertamum).', '.
 								     myaddslashes($projektarbeitinsertvon).', now(), '.
 								     myaddslashes($projektarbeitupdatevon).');';
 								     $ausgabe.="Projektarbeit angelegt: Student='".$projektarbeitstudent_uid."' und Lehreinheit='".$projektarbeitlehreinheit_id."'.\n";			
@@ -922,18 +946,6 @@ if($result = pg_query($conn_fas, $qry))
 									else
 									{
 										$ausgabe_pa="Themenbereich: '".$projektarbeitthemenbereich."' (statt '".$row3->themenbereich."')";
-									}
-								}
-								if($row3->anmerkung!=$projektarbeitanmerkung) 
-								{
-									$updatep=true;
-									if(strlen(trim($ausgabe_pa))>0)
-									{
-										$ausgabe_pa.=", Anmerkung: '".$projektarbeitanmerkung."' (statt '".$row3->anmerkung."')";
-									}
-									else
-									{
-										$ausgabe_pa="Anmerkung: '".$projektarbeitanmerkung."' (statt '".$row3->anmerkung."')";
 									}
 								}
 								if($row3->anmerkung!=$projektarbeitanmerkung) 
@@ -1540,7 +1552,7 @@ if($result = pg_query($conn_fas, $qry))
 										$projektbetreuerfaktor			=$row->faktor;
 										$projektbetreuername			='';
 										$projektbetreuerpunkte			='';
-										$projektbetreuerstunden			=$row->betreuungsstunden;
+										$projektbetreuerstunden			=number_format($row->betreuungsstunden, 4, '.', '');
 										$projektbetreuerstundensatz		=$row->kosten;
 										//$projektbetreuerupdateamum		=$row->;
 										$projektbetreuerupdatevon			="SYNC";
@@ -1710,7 +1722,7 @@ if($result = pg_query($conn_fas, $qry))
 												'insertvon='.myaddslashes($projektbetreuerinsertvon).', '.
 												'updateamum= now(), '.
 											     	'updatevon='.myaddslashes($projektbetreuerupdatevon).' '.
-												"WHERE projektarbeit_id='".$projektbetreuerprojektarbeit_id."' AND person_id='".$projektbetreuerperson_id."'AND betreuerart='Erstbetreuer';";
+												"WHERE projektarbeit_id='".$projektbetreuerprojektarbeit_id."' AND person_id='".$projektbetreuerperson_id."'AND betreuerart_kurzbz='Erstbetreuer';";
 											}
 											else 
 											{
@@ -1746,7 +1758,7 @@ if($result = pg_query($conn_fas, $qry))
 										$projektbetreuerfaktor			=$row->faktor;
 										$projektbetreuername			='';
 										$projektbetreuerpunkte			='';
-										$projektbetreuerstunden			=$row->betreuungsstunden;
+										$projektbetreuerstunden			=number_format($row->betreuungsstunden, 4, '.', '');
 										$projektbetreuerstundensatz		=$row->kosten;
 										//$projektbetreuerupdateamum		=$row->;
 										$projektbetreuerupdatevon			="SYNC";
@@ -1916,7 +1928,7 @@ if($result = pg_query($conn_fas, $qry))
 												'insertvon='.myaddslashes($projektbetreuerinsertvon).', '.
 												'updateamum= now(), '.
 											     	'updatevon='.myaddslashes($projektbetreuerupdatevon).' '.
-												"WHERE projektarbeit_id='".$projektbetreuerprojektarbeit_id."' AND person_id='".$projektbetreuerperson_id."'AND betreuerart='Zweitbetreuer';";
+												"WHERE projektarbeit_id='".$projektbetreuerprojektarbeit_id."' AND person_id='".$projektbetreuerperson_id."'AND betreuerart_kurzbz='Zweitbetreuer';";
 											}
 											else 
 											{
@@ -1926,7 +1938,7 @@ if($result = pg_query($conn_fas, $qry))
 										//echo nl2br ($qry."\n");
 										if(pg_query($conn,$qry))
 										{
-											$anzahl_pb2_gesamt++;
+											$anzahl_pbb2_gesamt++;
 											$ausgabe_pb4=$ausgabe_pb;
 											$ausgabe_pb='';
 											$projektbetreuerperson_id4=$projektbetreuerperson_id;
@@ -1966,7 +1978,7 @@ if($result = pg_query($conn_fas, $qry))
 											if($updatep1)
 											{
 												$anzahl_pbg_update++;
-												$ausgabe.="Diplomarbeitsbetreuer aktualisiert: UID='".$projektbetreuerperson_id1."' und Projektarbeit='".$projektarbeitlehreinheit_id."':".$ausgabe_pb1.".\n";
+												$ausgabe.="Diplomarbeitsbetreuer(1) aktualisiert: UID='".$projektbetreuerperson_id1."' und Projektarbeit='".$projektarbeitlehreinheit_id."':".$ausgabe_pb1.".\n";
 											}
 										}
 										if($projektbetreuernew2)
@@ -1979,7 +1991,7 @@ if($result = pg_query($conn_fas, $qry))
 											if($updatep2)
 											{
 												$anzahl_pbg2_update++;
-												$ausgabe.="Diplomarbeitsbetreuer aktualisiert: UID='".$projektbetreuerperson_id2."' und Projektarbeit='".$projektarbeitlehreinheit_id."':".$ausgabe_pb2.".\n";
+												$ausgabe.="Diplomarbeitsbetreuer(2) aktualisiert: UID='".$projektbetreuerperson_id2."' und Projektarbeit='".$projektarbeitlehreinheit_id."':".$ausgabe_pb2.".\n";
 											}
 										}
 										if($projektbetreuernew3)
@@ -1992,7 +2004,7 @@ if($result = pg_query($conn_fas, $qry))
 											if($updatep3)
 											{
 												$anzahl_pbb_update++;
-												$ausgabe.="Diplomarbeitsbetreuer aktualisiert: UID='".$projektbetreuerperson_id3."' und Projektarbeit='".$projektarbeitlehreinheit_id."':".$ausgabe_pb3.".\n";
+												$ausgabe.="Diplomarbeitsbetreuer(3) aktualisiert: UID='".$projektbetreuerperson_id3."' und Projektarbeit='".$projektarbeitlehreinheit_id."':".$ausgabe_pb3.".\n";
 											}
 										}
 										if($projektbetreuernew4)
@@ -2005,7 +2017,7 @@ if($result = pg_query($conn_fas, $qry))
 											if($updatep4)
 											{
 												$anzahl_pbb2_update++;
-												$ausgabe.="Diplomarbeitsbetreuer aktualisiert: UID='".$projektbetreuerperson_id4."' und Projektarbeit='".$projektarbeitlehreinheit_id."':".$ausgabe_pb4.".\n";
+												$ausgabe.="Diplomarbeitsbetreuer(4) aktualisiert: UID='".$projektbetreuerperson_id4."' und Projektarbeit='".$projektarbeitlehreinheit_id."':".$ausgabe_pb4.".\n";
 											}
 										}
 										$ausgabe_pb1='';
@@ -2129,11 +2141,11 @@ echo nl2br($ausgabe_all);
 
 mail($adress, 'SYNC Diplomarbeit von '.$_SERVER['HTTP_HOST'], 
 "Allgemeine Fehler: ".$anzahl_fehler.", Anzahl Diplomarbeiten: ".$anzahl_quelle.".\n".
-"Lehrveranstaltungen:       Gesamt: ".$anzahl_lv_gesamt." / Eingefügt: ".$anzahl_lv_insert." / Geändert: ".$anzahl_lv_update." / Fehler: ".$anzahl_fehler_lv."\n".
+"Lehrveranstaltungen:    Gesamt: ".$anzahl_lv_gesamt." / Eingefügt: ".$anzahl_lv_insert." / Geändert: ".$anzahl_lv_update." / Fehler: ".$anzahl_fehler_lv."\n".
 "Lehreinheiten:       	Gesamt: ".$anzahl_le_gesamt." / Eingefügt: ".$anzahl_le_insert." / Geändert: ".$anzahl_le_update." / Fehler: ".$anzahl_fehler_le."\n".
 "Projektarbeiten:    	Gesamt: ".$anzahl_pa_gesamt." / Eingefügt: ".$anzahl_pa_insert." / Geändert: ".$anzahl_pa_update." / Fehler: ".$anzahl_fehler_pa."\n".
-"Begutachter1:  		Gesamt: ".$anzahl_pbg_gesamt." / Eingefügt: ".$anzahl_pbg_insert." / Geändert: ".$anzahl_pbg_update." / Fehler: ".$anzahl_fehler_pbg."\n".
-"Begutachter2:  		Gesamt: ".$anzahl_pbg2_gesamt." / Eingefügt: ".$anzahl_pbg2_insert." / Geändert: ".$anzahl_pbg2_update." / Fehler: ".$anzahl_fehler_pbg2."\n".
+"Begutachter1:  		Gesamt: ".$anzahl_pbg_gesamt." / Eingefügt: ".$anzahl_pbg_insert." / Geändert: ".$anzahl_pbg_update." / Fehler: ".$anzahl_fehler_pbg." / kein Erstbegutachter: ".$noe."\n".
+"Begutachter2:  		Gesamt: ".$anzahl_pbg2_gesamt." / Eingefügt: ".$anzahl_pbg2_insert." / Geändert: ".$anzahl_pbg2_update." / Fehler: ".$anzahl_fehler_pbg2." / kein Zweitbegutachter: ".$noz."\n".
 "Betreuer1:  		Gesamt: ".$anzahl_pbb_gesamt." / Eingefügt: ".$anzahl_pbb_insert." / Geändert: ".$anzahl_pbb_update." / Fehler: ".$anzahl_fehler_pbb." / kein Erstbetreuer: ".$no1."\n".
 "Betreuer2:  		Gesamt: ".$anzahl_pbb2_gesamt." / Eingefügt: ".$anzahl_pbb2_insert." / Geändert: ".$anzahl_pbb2_update." / Fehler: ".$anzahl_fehler_pbb2." / kein Zweitbetreuer: ".$no2."\n\n".
 $ausgabe_all,"From: vilesci@technikum-wien.at");
