@@ -70,8 +70,8 @@ foreach ($studiengangfk AS $stg)
 }
 
 set_time_limit(60);
-$adress='ruhan@technikum-wien.at';
-//$adress='fas_sync@technikum-wien.at';
+//$adress='ruhan@technikum-wien.at';
+$adress='fas_sync@technikum-wien.at';
 
 function myaddslashes($var)
 {
