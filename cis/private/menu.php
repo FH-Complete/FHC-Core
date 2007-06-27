@@ -24,6 +24,7 @@ require_once('../config.inc.php');
 require_once('../../include/globals.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/funktion.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
@@ -36,6 +37,9 @@ $user=get_uid();
 
 $rechte=new benutzerberechtigung($db_conn);
 $rechte->getBerechtigungen($user);
+
+$fkt=new funktion($db_conn);
+$fkt->getAll($user)
 
 $stg_obj = new studiengang($db_conn);
 if($stg_obj->getAll('kurzbzlang'))
@@ -190,7 +194,7 @@ else
 				</tr>
 			<?php
 			}
-			if ($rechte->isBerechtigt('admin'))
+			if ($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter'))
 			{
 				?>
 				<tr>

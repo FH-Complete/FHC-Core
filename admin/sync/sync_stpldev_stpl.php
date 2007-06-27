@@ -5,12 +5,14 @@
 </head>
 <body>
 <?php
-include('../../vilesci/config.inc.php');
-include('../../include/functions.inc.php');
+require('../../vilesci/config.inc.php');
+require('../../include/functions.inc.php');
+require('../../include/studiensemester.class.php');
+
 $conn=pg_connect(CONN_STRING);
 
 // Startvariablen setzen
-$adress='pam@technikum-wien.at';
+$adress='fas_sync@technikum-wien.at';
 //$adress_stpl='pam@technikum-wien.at';
 $adress_stpl='stpl@technikum-wien.at';
 if (isset($_GET['sendmail']))
@@ -42,6 +44,7 @@ $message_sync='';
 $headers= "MIME-Version: 1.0\r\n";
 $headers.="Content-Type: text/html; charset=iso-8859-1\r\n";
 
+/*
 // Anfangsdatum festlegen
 $datum_begin=date("Y-m-d");
 // Endedatum festlegen
@@ -59,12 +62,12 @@ else
 	else
 		$message_sync.='Kein aktuelles Studiensemester gefunden! '.$sql_query.'<BR>';
 }
+*/
 
-// Testumgebung
-//$datum_begin='2007-01-12';
-//$datum_ende='2007-02-10';
-
-
+$ss=new studiensemester($conn);
+$ss->getAktTillNext();
+$datum_begin=$ss->start;
+$datum_ende='2008-02-09'; //$ss->ende;
 
 
 $message_begin='Dies ist eine automatische Mail!<BR>Es haben sich folgende Aenderungen in Ihrem Stundenplan ergeben:<BR>';
@@ -74,9 +77,9 @@ $message_begin='Dies ist eine automatische Mail!<BR>Es haben sich folgende Aende
  * Datensaetze holen die neu sind
  */
 echo 'Neue Datens&auml;tze werden angelegt.<BR>';flush();
-$sql_query="SELECT * FROM vw_stundenplandev WHERE datum>='$datum_begin' AND datum<='$datum_ende' AND
+$sql_query="SELECT * FROM lehre.vw_stundenplandev WHERE datum>='$datum_begin' AND datum<='$datum_ende' AND
 	stundenplandev_id NOT IN
-	(SELECT stundenplan_id FROM tbl_stundenplan WHERE datum>='$datum_begin' AND datum<='$datum_ende');";
+	(SELECT stundenplan_id FROM lehre.tbl_stundenplan WHERE datum>='$datum_begin' AND datum<='$datum_ende');";
 //echo $sql_query.'<BR>';
 if (!$result=pg_query($conn, $sql_query))
 {

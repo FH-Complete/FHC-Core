@@ -54,9 +54,12 @@ class funktion
 	 * Laedt alle verfuegbaren Funktionen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function getAll()
+	function getAll($uid=null)
 	{
-		$qry = 'SELECT * FROM public.tbl_funktion order by funktion_kurzbz;';
+		if (is_null($uid))
+			$qry='SELECT * FROM public.tbl_funktion order by funktion_kurzbz;';
+		else
+			$qry="SELECT * FROM public.tbl_funktion JOIN public.tbl_benutzerfunktion USING (funktion_kurzbz) WHERE uid='$uid';";
 
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -76,6 +79,14 @@ class funktion
 		}
 		return true;
 	}
+
+	funktion checkFunktion($funktion)
+	{
+		foreach ($this->result AS $fkt)
+			if ($fkt->funktion_kurzbz==$funktion)
+				return true;
+		return false;
+	};
 
 	/**
 	 * Laedt eine Funktion
