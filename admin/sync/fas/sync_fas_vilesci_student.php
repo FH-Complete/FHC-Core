@@ -1779,7 +1779,6 @@ if($result = pg_query($conn_fas, $qry))
 									$new_benutzer=false;
 									//echo nl2br("new2\n");
 								}
-						
 								else 
 								{
 									$qry="SELECT uid, person_id, ext_id FROM public.tbl_benutzer WHERE person_id='".$person_id."' AND uid='".$student_uid."';";
