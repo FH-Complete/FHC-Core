@@ -54,6 +54,7 @@ if($result = pg_query($conn_fas, $qry))
 {
 	echo nl2br("Telefon Sync\n-------------\n");
 	$anzahl_quelle=pg_num_rows($result);
+	echo "Beginn: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."<br><br>";
 	while($row = pg_fetch_object($result))
 	{
 		//echo "- ";
@@ -194,7 +195,7 @@ if($result = pg_query($conn_fas, $qry))
 	}		
 }
 
-
+echo "Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."<br><br>";
 
 //echo nl2br($text);
 echo nl2br("\n".$error_log);
