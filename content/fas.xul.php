@@ -24,6 +24,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 require_once('../vilesci/config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/fas/benutzer.class.php');
+require_once('../include/benutzerberechtigung.class.php');
 
 // Testumgebung
 $user=get_uid();
@@ -38,6 +39,10 @@ $error_msg.=loadVariables($conn,$user);
 $benutzer = new benutzer($conn);
 if(!$benutzer->loadVariables($user))
 	$error_msg = $benutzer->errormsg;
+	
+$rechte = new benutzerberechtigung($conn);
+$rechte->getBerechtigungen($user);
+
 /*echo '<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>';*/
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'content/bindings.css" type="text/css" ?>';
@@ -211,14 +216,32 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 <hbox flex="1">
 	<tabbox id="tabbox-left" orient="vertical" flex="1">
 		<tabs orient="horizontal">
-			<tab id="tab-verband" label="Verband" />
-			<tab id="tab-fachbereich" label="Fachbereich" />
-			<tab id="tab-lektor" label="Lektor" />
+		<?php
+			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('lva-verwaltung'))
+			{
+				echo '<tab id="tab-verband" label="Verband" />';
+				echo '<tab id="tab-fachbereich" label="Fachbereich" />';
+				echo '<tab id="tab-lektor" label="Lektor" />';
+			}
+			if($rechte->isBerechtigt('admin','0') || $rechte->isBerechtigt('mitarbeiter'))
+			{
+				echo '<tab id="tab-menu-mitarbeiter" label="Mitarbeiter" />';
+			}
+		?>
 		</tabs>
 		<tabpanels id="tabpanels-left" flex="1">
-			<tree id="tree-verband" />
-			<tree id="tree-fachbereich" />
-			<tree id="tree-lektor" />
+		<?php
+			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('lva-verwaltung'))
+			{
+				echo '<tree id="tree-verband" />';
+				echo '<tree id="tree-fachbereich" />';
+				echo '<tree id="tree-lektor" />';
+			}
+			if($rechte->isBerechtigt('admin','0') || $rechte->isBerechtigt('mitarbeiter'))
+			{
+				echo '<tree id="tree-menu-mitarbeiter"/>';
+			}
+		?>
 		</tabpanels>
 	</tabbox>
 	<splitter collapse="before" persist="state">
@@ -229,7 +252,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 <statusbar id="status-bar" persist="collapsed">
 	<statusbarpanel class="statusbarpanel-iconic" id="logo-icon" />
 	<statusbarpanel id="statusbarpanel-semester" label="<?php echo $semester_aktuell; ?>"/>
-	<!-- <statusbarpanel id="statusbarpanel-db_table" label="<?php //echo $db_stpl_table; ?>"/> -->
+	<statusbarpanel id="statusbarpanel-db_table" label="<?php echo substr(CONN_STRING,strpos(CONN_STRING,'dbname=')+7,strpos(CONN_STRING,'user=')-strpos(CONN_STRING,'dbname=')-7); ?>"/>
 	<statusbarpanel id="statusbarpanel-text" label="<?php echo htmlspecialchars($error_msg); ?>" flex="4" crop="right" />
 	<statusbarpanel id="progress-panel" class="statusbarpanel-progress">
 		<progressmeter id="statusbar-progressmeter" class="progressmeter-statusbar" mode="determined" value="0%"/>

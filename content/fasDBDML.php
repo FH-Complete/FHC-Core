@@ -53,7 +53,7 @@ $error = false;
 //Berechtigungen laden
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
-if(!$rechte->isBerechtigt('admin'))
+if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('mitarbeiter'))
 {
 	$return = false;
 	$errormsg = 'Keine Berechtigung';

@@ -41,16 +41,33 @@ class ort
 	var $lageplan;		// @var oid
 	var $dislozierung;		// @var smallint
 	var $kosten;			// @var numeric(8,2)
+	var $reservieren;
+	var $ausstattung;
 
 
 	/**
 	 * Konstruktor
 	 * @param $conn Connection zur DB
-	 *        $fachb_id ID des zu ladenden Ortes
+	 *        $ort_kurzbz Kurzbz des zu ladenden Ortes
 	 */
-	function ort($conn, $ort_kurzbz=null)
+	function ort($conn, $ort_kurzbz=null, $unicode=false)
 	{
 		$this->conn = $conn;
+		
+		if($unicode!=null)
+		{
+			if($unicode)
+				$qry = "SET CLIENT_ENCODING TO 'UNICODE'";
+			else 
+				$qry = "SET CLIENT_ENCODING TO 'LATIN9'";
+			
+			if(!pg_query($this->conn, $qry))
+			{
+				$this->errormsg ='Fehler beim Setzen des Encodings';
+				return false;
+			}
+		}
+		
 		if($ort_kurzbz != null)
 			$this->load($ort_kurzbz);
 	}
@@ -77,11 +94,13 @@ class ort
 			$ort_obj->bezeichnung 		= $row->bezeichnung;
 			$ort_obj->planbezeichnung 	= $row->planbezeichnung;
 			$ort_obj->max_person 		= $row->max_person;
-			$ort_obj->aktiv 			= $row->aktiv;
-			$ort_obj->lehre 			= $row->lehre;
+			$ort_obj->aktiv 			= ($row->aktiv=='t'?true:false);
+			$ort_obj->lehre 			= ($row->lehre=='t'?true:false);
 			$ort_obj->lageplan 			= $row->lageplan;
 			$ort_obj->dislozierung 		= $row->dislozierung;
 			$ort_obj->kosten 			= $row->kosten;
+			$ort_obj->reservieren		= ($row->reservieren=='t'?true:false);
+			$ort_obj->ausstattung		= $row->ausstattung;
 
 			$this->result[] = $ort_obj;
 		}
@@ -115,11 +134,13 @@ class ort
 			$this->bezeichnung 		= $row->bezeichnung;
 			$this->planbezeichnung 	= $row->planbezeichnung;
 			$this->max_person 		= $row->max_person;
-			$this->aktiv 			= $row->aktiv;
-			$ort_obj->lehre 		= $row->lehre;
+			$this->aktiv 			= ($row->aktiv=='t'?true:false);
+			$ort_obj->lehre 		= ($row->lehre=='t'?true:false);
 			$this->lageplan 		= $row->lageplan;
-			$this->dislozierung 		= $row->dislozierung;
-			$this->kosten 		= $row->kosten;
+			$this->dislozierung 	= $row->dislozierung;
+			$this->kosten 			= $row->kosten;
+			$this->reservieren		= ($row->reservieren=='t'?true:false);
+			$this->ausstattung		= $row->ausstattung;
 		}
 		else
 		{
