@@ -80,13 +80,13 @@ class funktion
 		return true;
 	}
 
-	funktion checkFunktion($funktion)
+	function checkFunktion($funktion)
 	{
 		foreach ($this->result AS $fkt)
 			if ($fkt->funktion_kurzbz==$funktion)
 				return true;
 		return false;
-	};
+	}
 
 	/**
 	 * Laedt eine Funktion
