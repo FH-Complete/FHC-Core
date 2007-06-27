@@ -649,7 +649,7 @@ function LeAuswahl()
 			LehrveranstaltungNotenDisableFields(false);
 
 			//Noten Laden
-			LehrveranstaltungNotenLoad(lehrveranstaltung_id);
+			//LehrveranstaltungNotenLoad(lehrveranstaltung_id);
 
 			LeDetailDisableFields(true);
 			//Details zuruecksetzen
