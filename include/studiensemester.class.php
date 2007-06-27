@@ -188,7 +188,7 @@ class studiensemester
 	// ******************************************************************
 	function getAktTillNext()
 	{
-		$qry = "SELECT * FROM vw_studiensemester ORDER BY delta LIMIT 2";
+		$qry = "SELECT * FROM public.vw_studiensemester ORDER BY delta LIMIT 2";
 		if(!$res=pg_exec($this->conn,$qry))
 		{
 			$this->errormsg = pg_errormessage($this->conn);
@@ -276,11 +276,11 @@ class studiensemester
 			return false;
 		}
 	}
-	
+
 	function getNextStudiensemester()
 	{
 		$qry = "SELECT * FROM public.tbl_studiensemester where start>now() ORDER BY start LIMIT 1";
-		
+
 		if(!$result=pg_query($this->conn,$qry))
 		{
 			$this->errormsg = 'Fehler beim lesen des Studiensemesters';
