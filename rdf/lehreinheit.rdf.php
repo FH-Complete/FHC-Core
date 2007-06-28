@@ -88,7 +88,7 @@ function draw_row($row)
 			$grp .=" ".$leg_row->semester.$leg_row->verband.$leg_row->gruppe;
 	}
 	
-	$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN tbl_mitarbeiter USING(mitarbeiter_uid) WHERE 
+	$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE 
 			lehreinheit_id='$row->lehreinheit_id'";
 
 	$mitarbeiter='';
