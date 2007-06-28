@@ -44,10 +44,10 @@ if(isset($_POST['anlegen']))
 
 if(isset($_POST['da']))
 {
-	if(isset($_POST['erst']) AND trim($_POST['erst'])!='')
+	/*if(isset($_POST['erst']) AND trim($_POST['erst'])!='')
 	{
 		$qry1= "UPDATE praxissemester SET vilesci_ansprechpartner='".$_POST['erst']."' WHERE praxissemester_pk='".$_POST['da']."';";
-	}
+	}*/
 	if(isset($_POST['top1']) AND trim($_POST['top1'])!='')
 	{
 		$qry1= "UPDATE praxissemester SET vilesci_firmenbetreuer='".$_POST['top1']."' WHERE praxissemester_pk='".$_POST['da']."';";
@@ -81,9 +81,9 @@ if($resultvilesci = pg_query($conn, $qryvilesci))
 }
 
 $qry="SELECT count(*) AS anz FROM praxissemester WHERE
-	((vilesci_anspechtpartner IS NULL AND trim(ansprechpartner)!='') OR
-	(vilesci_firmenbetreuer IS NULL AND trim(firmenbetreuer)!='') OR
+	((vilesci_firmenbetreuer IS NULL AND trim(firmenbetreuer)!='') OR
 	(vilesci_beurteiler IS NULL AND trim(beurteiler)!=''));";
+//(vilesci_ansprechpartner IS NULL AND trim(ansprechpartner)!='') OR
 if($result = pg_query($conn_fas, $qry))
 {
 	$row=pg_fetch_object($result);
@@ -93,22 +93,22 @@ if($result = pg_query($conn_fas, $qry))
 echo "<table class='liste'><tr><th>FAS</th><th>Vilesci</th><th></th><th>Titel/Vorname/Nachname</th></tr>";
 
 
-$qry="SELECT *, trim(substring(trim(ansprechpartner) from ' [A-ü]*$')) as erst, 
+$qry="SELECT *, 
 	trim(substring(trim(firmenbetreuer) from ' [A-ü]*$')) as zweit, 
 	trim(substring(trim(beurteiler) from ' [A-ü]*$')) as dritt 
 	FROM praxissemester WHERE
-	((vilesci_ansprechpartner IS NULL AND trim(ansprechpartner)!='') OR
-	(vilesci_firmenbetreuer IS NULL AND trim(firmenbetreuer)!='') OR
+	((vilesci_firmenbetreuer IS NULL AND trim(firmenbetreuer)!='') OR
 	(vilesci_beurteiler IS NULL AND trim(beurteiler)!=''))
 	ORDER BY praxissemester_pk
-	LIMIT 10;";
-//ORDER BY diplomarbeit_pk
+	LIMIT 20;";
+//trim(substring(trim(ansprechpartner) from ' [A-ü]*$')) as erst, 
+//(vilesci_ansprechpartner IS NULL AND trim(ansprechpartner)!='') OR
 
 if($result = pg_query($conn_fas, $qry))
 {
 	for($k=0;$row=pg_fetch_object($result);$k++)
 	{
-		if(($row->vilesci_ansprechpartner=='' OR $row->vilesci_ansprechpartner==NULL) AND trim($row->ansprechpartner)!='')
+		/*if(($row->vilesci_ansprechpartner=='' OR $row->vilesci_ansprechpartner==NULL) AND trim($row->ansprechpartner)!='')
 		{
 			echo "<tr class='liste".($k%2)."'>";
 			echo "<form  method='POST'>";
@@ -137,7 +137,7 @@ if($result = pg_query($conn_fas, $qry))
 			echo "</form>";
 			echo "<form method='Post'><td><input type='text' name='geschlecht' value='m' size='1'><input type='text' name='titel'><input type='text' name='vorname'><input type='text' name='nachname' value='$row->erst'><input type='submit' name='anlegen' value='Anlegen'></td></form>";
 			echo "</tr>";
-		}
+		}*/
 		if(($row->vilesci_firmenbetreuer=='' OR $row->vilesci_firmenbetreuer==NULL) AND trim($row->firmenbetreuer)!='')
 		{
 			echo "<tr class='liste".($k%2)."'>";
