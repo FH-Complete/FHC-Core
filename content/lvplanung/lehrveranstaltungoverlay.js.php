@@ -649,6 +649,8 @@ function LeAuswahl()
 			LehrveranstaltungNotenDisableFields(false);
 
 			//Noten Laden
+			//ToDo: Select fuer das Laden der Noten optimieren, dann kann dieser
+			//Aufruf wieder Einkommentiert werden
 			//LehrveranstaltungNotenLoad(lehrveranstaltung_id);
 
 			LeDetailDisableFields(true);
@@ -731,12 +733,15 @@ function LeAuswahl()
 	var url = '<?php echo APP_ROOT;?>rdf/lehrfach.rdf.php?lehrveranstaltung_id='+lehrveranstaltung+'&'+gettimestamp();
 
 	//RDF holen
-	var newDs  = rdfService.GetDataSource(url);
+	var newDs  = rdfService.GetDataSourceBlocking(url);
+	newDs.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	newDs.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	lehrfachmenulist.database.AddDataSource(newDs);
 
+	lehrfachmenulist.builder.rebuild();
 	//SinkObserver hinzufuegen
-	var sink = newDs.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-	sink.addXMLSinkObserver(LeDetailLehrfachSinkObserver);
+	//var sink = newDs.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	//sink.addXMLSinkObserver(LeDetailLehrfachSinkObserver);
 
 	//Daten den Feldern zuweisen
 
