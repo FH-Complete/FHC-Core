@@ -70,8 +70,8 @@ foreach ($studiengangfk AS $stg)
 }
 
 set_time_limit(60);
-//$adress='ruhan@technikum-wien.at';
-$adress='fas_sync@technikum-wien.at';
+$adress='ruhan@technikum-wien.at';
+//$adress='fas_sync@technikum-wien.at';
 
 function myaddslashes($var)
 {
@@ -874,8 +874,30 @@ if($result = pg_query($conn_fas, $qry))
 							}
 							else 
 							{
-								//insert
-								$new_person=true;
+								/*//vergleich nachname, vorname, geburtsdatum
+								$qry="SELECT person_id FROM public.tbl_person 
+									WHERE nachname=".myaddslashes($nachname)." AND vorname=".$vorname." AND gebdatum=".$gebdatum.";";
+								if($resultz = pg_query($conn, $qry))
+								{
+									if(pg_num_rows($resultz)>0) //wenn dieser eintrag schon vorhanden ist
+									{
+										if($rowz=pg_fetch_object($resultz))
+										{
+											$new_person=false;
+											$person_id=$rowz->person_id;
+										}
+										else 
+										{
+											$error=true;
+											$error_log.="Person mit Nachname ".$nachname." AND Vorname ".$vorname." AND Geburtsdatum=".$gebdatum." konnte nicht ermittelt werden (".pg_num_rows($resultz).")\n";
+										}
+									}
+									else 
+									{*/
+										//insert
+										$new_person=true;
+									/*}
+								}*/
 							}
 						}		
 					}
@@ -1196,7 +1218,7 @@ if($result = pg_query($conn_fas, $qry))
 				else
 				{					
 					$error=true;
-					$error_log.='Person-Sequence konnte nicht ausgelesen werden';
+					$error_log.='Person-Sequence konnte nicht ausgelesen werden\n';
 				}
 				$anzahl_person_insert++;
 			}			
@@ -1599,7 +1621,7 @@ if($result = pg_query($conn_fas, $qry))
 					else
 					{					
 						$error=true;
-						$error_log.='Prestudent-Sequence konnte nicht ausgelesen werden';
+						$error_log.='Prestudent-Sequence konnte nicht ausgelesen werden\n';
 					}
 					$anzahl_pre_insert++;
 				}			
@@ -1707,38 +1729,36 @@ if($result = pg_query($conn_fas, $qry))
 				}
 				//prestudentrolle
 //echo nl2br("Aktiv=".($aktiv?'true':'false').", Semester=".$semester.", Verband=".$verband.", Gruppe=".$gruppe."\n");
-				if($studiengang_kz!=299)
-				{				
-					$qry="SELECT * FROM student_ausbildungssemester where student_fk='$ext_id_student';";
-					if($resultru = pg_query($conn_fas, $qry))
+								
+				$qry="SELECT * FROM student_ausbildungssemester where student_fk='$ext_id_student';";
+				if($resultru = pg_query($conn_fas, $qry))
+				{
+					while($rowru=pg_fetch_object($resultru))
 					{
-						while($rowru=pg_fetch_object($resultru))
+						$qry="SELECT semester FROM ausbildungssemester WHERE ausbildungssemester_pk='$rowru->ausbildungssemester_fk'";
+						if($resultr = pg_query($conn_fas, $qry))
 						{
-							$qry="SELECT semester FROM ausbildungssemester WHERE ausbildungssemester_pk='$rowru->ausbildungssemester_fk'";
-							if($resultr = pg_query($conn_fas, $qry))
+							while($rowr=pg_fetch_object($resultr))
 							{
-								while($rowr=pg_fetch_object($resultr))
+								$ausbildungssemester=$rowr->semester;
+								$date = date('Y-m-d', $datum_obj->mktime_fromtimestamp($rowru->creationdate));
+								$status=$rowru->status;
+								$stm=$rowru->studiensemester_fk;
+								$qry="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='$prestudent_id' AND rolle_kurzbz='$rolle_kurzbz[$status]' AND studiensemester_kurzbz='$studiensemester_kurzbz[$stm]' AND ausbildungssemester='$ausbildungssemester';";
+								if($resultu = pg_query($conn, $qry))
 								{
-									$ausbildungssemester=$rowr->semester;
-									$date = date('Y-m-d', $datum_obj->mktime_fromtimestamp($rowru->creationdate));
-									$status=$rowru->status;
-									$stm=$rowru->studiensemester_fk;
-									$qry="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='$prestudent_id' AND rolle_kurzbz='$rolle_kurzbz[$status]' AND studiensemester_kurzbz='$studiensemester_kurzbz[$stm]' AND ausbildungssemester='$ausbildungssemester';";
-									if($resultu = pg_query($conn, $qry))
+									if(!pg_num_rows($resultu)>0) //wenn dieser eintrag noch nicht vorhanden ist
 									{
-										if(!pg_num_rows($resultu)>0) //wenn dieser eintrag noch nicht vorhanden ist
+										$qry="INSERT INTO public.tbl_prestudentrolle (prestudent_id, rolle_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id) VALUES (".
+										"'$prestudent_id', '$rolle_kurzbz[$status]', '$studiensemester_kurzbz[$stm]', '$ausbildungssemester', '$date',now(),'SYNC',now(),'SYNC', '$rowru->student_ausbildungssemester_pk')";
+										if(!pg_query($conn, $qry))
 										{
-											$qry="INSERT INTO public.tbl_prestudentrolle (prestudent_id, rolle_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id) VALUES (".
-											"'$prestudent_id', '$rolle_kurzbz[$status]', '$studiensemester_kurzbz[$stm]', '$ausbildungssemester', '$date',now(),'SYNC',now(),'SYNC', '$rowru->student_ausbildungssemester_pk')";
-											if(!pg_query($conn, $qry))
-											{
-												$error_log.="FEHLER bei Eintrag in tbl_prestudentrolle: '$prestudent_id', '$rolle_kurzbz[$status]', '$studiensemester_kurzbz[$stm]', '$ausbildungssemester'.\n".pg_errormessage($conn)."\n";
-												$error=true;
-											}
-											else 
-											{
-												$ausgabe_prerolle.="    Prestudentrolle für ID ".$person_id." ('".$prestudent_id."'), ".$nachname." angelegt: '".$rolle_kurzbz[$status]."' in Studiensemester '".$studiensemester_kurzbz[$stm]."' mit Ausbildungssemester '".$ausbildungssemester."'.\n";
-											}
+											$error_log.="FEHLER bei Eintrag in tbl_prestudentrolle: '$prestudent_id', '$rolle_kurzbz[$status]', '$studiensemester_kurzbz[$stm]', '$ausbildungssemester'.\n".pg_errormessage($conn)."\n";
+											$error=true;
+										}
+										else 
+										{
+											$ausgabe_prerolle.="    Prestudentrolle für ID ".$person_id." ('".$prestudent_id."'), ".$nachname." angelegt: '".$rolle_kurzbz[$status]."' in Studiensemester '".$studiensemester_kurzbz[$stm]."' mit Ausbildungssemester '".$ausbildungssemester."'.\n";
 										}
 									}
 								}
@@ -1746,6 +1766,7 @@ if($result = pg_query($conn_fas, $qry))
 						}
 					}
 				}
+				
 				if(!$error)
 				{
 					$ausgabe.=$ausgabe_person;
@@ -2360,7 +2381,7 @@ echo nl2br("Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$a
 
 $error_log="Sync Student\n------------\n\n".$text4."\n".$text3."\n".$text5."\n".$text2."\n".$text1;
 echo nl2br($error_log);
-echo"----------------------------------------------------------------------------------------<br>".$ausgabe;
+echo nl2br("----------------------------------------------------------------------------------------\n".$ausgabe);
 
 mail($adress, 'SYNC-Fehler Student von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");
 
