@@ -35,14 +35,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	>
 <!-- Pruefung Overlay -->
-<vbox id="student-pruefung" style="margin:0px;" flex="1">
+<vbox id="student-pruefung" style="overflow:auto; margin:0px;" flex="1">
 <popupset>
 	<popup id="student-pruefung-tree-popup">
 		<menuitem label="Entfernen" oncommand="StudentPruefungDelete();" id="student-pruefung-tree-popup-delete" hidden="false"/>
 	</popup>
 </popupset>
 <hbox flex="1">
-<grid id="student-pruefung-grid-detail" style="overflow:auto;margin:4px;" flex="1">
+<grid id="student-pruefung-grid-detail" style="margin:4px;" flex="1">
 		  	<columns  >
 				<column flex="1"/>
 				<column flex="1"/>
