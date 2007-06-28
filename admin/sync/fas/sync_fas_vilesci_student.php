@@ -70,8 +70,8 @@ foreach ($studiengangfk AS $stg)
 }
 
 set_time_limit(60);
-$adress='ruhan@technikum-wien.at';
-//$adress='fas_sync@technikum-wien.at';
+//$adress='ruhan@technikum-wien.at';
+$adress='fas_sync@technikum-wien.at';
 
 function myaddslashes($var)
 {
@@ -134,7 +134,7 @@ p2.perskz AS perskz2, p2.aufgenommenam AS aufgenommenam2, p2.aufmerksamdurch AS 
 p2.beendigungsdatum AS beendigungsdatum2, p2.berufstaetigkeit AS berufstaetigkeit2, p2.aufmerksamdurch_fk AS aufmerksamdurchfk2,
 p2.aufnahmeschluessel AS aufnahmeschluessel2, p2.aufnahmeschluessel_fk AS aufnahmeschluesselfk2, p2.angetreten AS angetreten2
 FROM (person JOIN student ON person_pk=student.person_fk ) AS p1 
-CROSS JOIN (person JOIN student ON person_pk=student.person_fk) AS p2 WHERE 
+CROSS JOIN (person JOIN student ON person_pk=student.person_fk) AS p2 WHERE
 ((p1.svnr=p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'') 
 OR ((p1.svnr<>p2.svnr AND (p1.svnr IS NULL OR p1.svnr='' OR p2.svnr IS NULL OR p2.svnr='')) 
 	AND p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!='' 
@@ -426,10 +426,12 @@ foreach ($studiengangfk AS $stg)
 
 $qry="
 SELECT * FROM person JOIN student ON person_fk=person_pk WHERE uid NOT LIKE '\_dummy%' 
+
 AND person_pk NOT IN(
 	SELECT p1.person_pk
 	FROM (person JOIN student ON person_pk=student.person_fk ) AS p1 
 	CROSS JOIN (person JOIN student ON person_pk=student.person_fk) AS p2 WHERE 
+	
 	(
 		(p1.svnr=p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'') 
 		OR (
@@ -1203,6 +1205,8 @@ if($result = pg_query($conn_fas, $qry))
 					}
 					else 
 					{
+						$updatep=false;
+						$ausgabe_person='';
 						$qry="select 1;";
 					}
 				}
@@ -1602,6 +1606,8 @@ if($result = pg_query($conn_fas, $qry))
 						}
 						else 
 						{
+							$updater=false;
+							$ausgabe_pre='';
 							$qry="select 1;";
 						}
 					}
@@ -2072,6 +2078,8 @@ if($result = pg_query($conn_fas, $qry))
 								}
 								else 
 								{
+									$updateb=false;
+									$ausgabe_benutzer='';
 									$qry="select 1;";
 								}
 							}
@@ -2114,7 +2122,7 @@ if($result = pg_query($conn_fas, $qry))
 								myaddslashes($verband).', '.
 								myaddslashes($gruppe).', '.
 								myaddslashes($insertamum).','.
-								myaddslashes($insertavon).','.
+								myaddslashes($insertvon).','.
 								myaddslashes($updateamum).','.
 								"'SYNC'".', '.
 								myaddslashes($ext_id_student).'); ';
@@ -2272,6 +2280,8 @@ if($result = pg_query($conn_fas, $qry))
 									}
 									else 
 									{
+										$updates=false;
+										$ausgabe_student='';
 										$qry="select 1;";
 									}
 								}
