@@ -36,7 +36,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	>
 <!-- Zeugnis Overlay -->
-<vbox id="student-noten" style="margin:0px;" flex="1">
+<vbox id="student-noten" style="overflow:auto;margin:0px;" flex="1">
 <popupset>
 	<popup id="student-noten-tree-popup">
 		<menuitem label="Entfernen" oncommand="StudentNotenDelete();" id="student-noten-tree-popup-delete" hidden="false"/>

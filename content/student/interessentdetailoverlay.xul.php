@@ -35,7 +35,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	>
 <!-- Interessent DETAILS -->
-<vbox id="interessent-detail" style="margin:0px;" flex="1">
+<vbox id="interessent-detail" style="overflow:auto; margin:0px;" flex="1">
 		<vbox hidden="true">
 			<label value="Neu"/>
 			<checkbox id="interessent-detail-checkbox-new" checked="true" />      	
@@ -47,7 +47,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		<vbox flex="1">
 		<groupbox id="interessent-detail-groupbox-person">
 			<caption label="Person" />
-			<grid id="interessent-detail-grid-person" style="overflow:auto;margin:4px;" flex="1">
+			<grid id="interessent-detail-grid-person" style="margin:4px;" flex="1">
 				  	<columns  >
     					<column flex="1"/>
     					<column flex="5"/>
@@ -178,7 +178,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 </vbox>
 
 <!-- interessent PREStudent -->
-<vbox id="interessent-prestudent" style="margin:0px;" flex="1">
+<vbox id="interessent-prestudent" style="overflow:auto; margin:0px;" flex="1">
 		
 		<vbox hidden="true">
 			<label value="Neu"/>
@@ -192,7 +192,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		</vbox>
 		<groupbox id="interessent-detail-groupbox-prestudent">
 		<caption label="Prestudent" />
-		<grid id="interessent-prestudent-grid-prestudent" style="overflow:auto;margin:4px;" flex="1">
+		<grid id="interessent-prestudent-grid-prestudent" style="margin:4px;" flex="1">
 				  	<columns  >
     					<column flex="1"/>
     					<column flex="5"/>

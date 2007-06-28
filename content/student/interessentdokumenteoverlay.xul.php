@@ -35,7 +35,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	>
 <!-- Dokumente Overlay -->
-<vbox id="interessent-dokumente" style="margin:0px;" flex="1">
+<vbox id="interessent-dokumente" style="overflow:auto; margin:0px;" flex="1">
 <hbox flex="1">
 	<groupbox flex="1">
 		<caption label="Noch nicht abgegeben"/>

@@ -35,7 +35,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	>
 <!-- Student DETAILS -->
-<vbox id="student-detail" style="margin:0px;" flex="1">
+<vbox id="student-detail" style="overflow:auto;margin:0px;" flex="1">
 		<vbox hidden="true">
 			<label value="Neu"/>
 			<checkbox id="student-detail-checkbox-new" checked="true" />      	
@@ -45,7 +45,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		<vbox flex="1">
 		<groupbox id="student-detail-groupbox-person">
 			<caption label="Person" />
-			<grid id="student-detail-grid-person" style="overflow:auto;margin:4px;" flex="1">
+			<grid id="student-detail-grid-person" style="margin:4px;" flex="1">
 				  	<columns  >
     					<column flex="1"/>
     					<column flex="5"/>
@@ -176,7 +176,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			</groupbox>
 			<groupbox id="student-detail-groupbox-student">
 			<caption label="Student" />
-			<grid id="student-detail-grid-student" style="overflow:auto;margin:4px;" flex="1">
+			<grid id="student-detail-grid-student" style="margin:4px;" flex="1">
 				  	<columns  >
     					<column flex="1"/>
     					<column flex="5"/>
@@ -221,7 +221,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 </vbox>
 
 <!-- STUDENT PREStudent -->
-<vbox id="student-prestudent" style="margin:0px;" flex="1">
+<vbox id="student-prestudent" style="overflow:auto; margin:0px;" flex="1">
 <popupset>
 	<popup id="student-prestudent-rolle-tree-popup">
 		<menuitem label="Entfernen" oncommand="StudentPrestudentRolleDelete();" id="student-prestudent-rolle-tree-popup-delete" hidden="false"/>
@@ -239,7 +239,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		</vbox>
 		<groupbox id="student-detail-groupbox-prestudent">
 		<caption label="Prestudent" />
-		<grid id="student-prestudent-grid-prestudent" style="overflow:auto;margin:4px;" flex="1">
+		<grid id="student-prestudent-grid-prestudent" style="margin:4px;" flex="1">
 				  	<columns  >
     					<column flex="1"/>
     					<column flex="5"/>

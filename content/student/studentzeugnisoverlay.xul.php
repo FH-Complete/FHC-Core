@@ -35,7 +35,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	>
 <!-- Zeugnis Overlay -->
-<vbox id="student-zeugnis" style="margin:0px;" flex="1">
+<vbox id="student-zeugnis" style="overflow:auto; margin:0px;" flex="1">
 <popupset>
 	<popup id="student-zeugnis-tree-popup">
 		<menuitem label="Entfernen" oncommand="StudentAkteDel();" id="student-zeugnis-tree-popup-aktedel" hidden="false"/>

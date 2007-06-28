@@ -430,43 +430,51 @@ class prestudent extends person
 				tbl_prestudent.prestudent_id=tbl_prestudentrolle.prestudent_id AND 
 				tbl_prestudent.studiengang_kz='$studiengang_kz'";
 
+		$qry = "SELECT * FROM (
+					SELECT *, (
+							SELECT rolle_kurzbz FROM tbl_prestudentrolle WHERE prestudent_id=prestudent.prestudent_id ORDER BY datum DESC LIMIT 1) AS rolle 
+					FROM tbl_prestudent prestudent ORDER BY prestudent_id) a, tbl_prestudentrolle, tbl_person
+				WHERE a.rolle=tbl_prestudentrolle.rolle_kurzbz AND 
+					a.person_id=tbl_person.person_id AND
+					a.prestudent_id = tbl_prestudentrolle.prestudent_id AND
+					a.studiengang_kz='$studiengang_kz'";
+						
 		if(!is_null($studiensemester_kurzbz) && $studiensemester_kurzbz!='')
-			$qry.=" AND tbl_prestudentrolle.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+			$qry.=" AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 		
 		switch ($typ)
 		{
 			case "interessenten": 	
-				$qry.=" AND rolle_kurzbz='Interessent'";
+				$qry.=" AND a.rolle='Interessent'";
 				break;
 			case "zgv":	
-				$qry.=" AND rolle_kurzbz='Interessent' AND (tbl_prestudent.zgv_code is not null OR tbl_prestudent.zgvmas_code is not null)";
+				$qry.=" AND a.rolle='Interessent' AND (a.zgv_code is not null OR a.zgvmas_code is not null)";
 				break;
 			case "reihungstestangemeldet":  
-				$qry.=" AND rolle_kurzbz='Interessent' AND tbl_prestudent.anmeldungreihungstest is not null";
+				$qry.=" AND a.rolle='Interessent' AND a.anmeldungreihungstest is not null";
 				break;
 			case "reihungstestnichtangemeldet":
-				$qry.=" AND rolle_kurzbz='Interessent' AND tbl_prestudent.anmeldungreihungstest is null";
+				$qry.=" AND a.rolle='Interessent' AND a.anmeldungreihungstest is null";
 				break;
 			case "bewerber":
-				$qry.=" AND rolle_kurzbz='Bewerber'";
+				$qry.=" AND a.rolle='Bewerber'";
 				break;
 			case "aufgenommen":
-				$qry.=" AND rolle_kurzbz='Aufgenommener'";
+				$qry.=" AND a.rolle='Aufgenommener'";
 				break;
 			case "warteliste":
-				$qry.=" AND rolle_kurzbz='Wartender'";
+				$qry.=" AND a.rolle='Wartender'";
 				break;
 			case "absage":
-				$qry.=" AND rolle_kurzbz='Abgewiesener'";
+				$qry.=" AND a.rolle='Abgewiesener'";
 				break;
 			default: 
-				$qry .=" AND (rolle_kurzbz='Interessent' OR rolle_kurzbz='Bewerber')";
 				break;		
 		}
 		if($semester!=null)
-			$qry.=" AND tbl_prestudentrolle.ausbildungssemester='$semester'";
+			$qry.=" AND ausbildungssemester='$semester'";
 
-		echo $qry;
+		//echo $qry;
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))

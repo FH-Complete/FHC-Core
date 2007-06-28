@@ -35,7 +35,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	>
 <!-- Incomming/Outgoing DETAILS -->
-<vbox id="student-io" style="margin:0px;" flex="1">
+<vbox id="student-io" style="overflow:auto;margin:0px;" flex="1">
 <popupset>
 	<popup id="student-io-tree-popup">
 		<menuitem label="Entfernen" oncommand="StudentIODelete();" id="student-io-tree-popup-delete" hidden="false"/>
@@ -43,7 +43,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 </popupset>
 
 <hbox flex="1">
-<grid id="student-io-grid-detail" style="overflow:auto;margin:4px;" flex="1">
+<grid id="student-io-grid-detail" style="margin:4px;" flex="1">
 		  	<columns  >
 				<column flex="1"/>
 				<column flex="1"/>
