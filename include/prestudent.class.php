@@ -425,11 +425,6 @@ class prestudent extends person
 	// *******************************************************************************
 	function loadIntessentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester=nulll, $typ=null)
 	{
-		$qry = "SELECT distinct on(tbl_prestudent.prestudent_id) * FROM public.tbl_person, public.tbl_prestudent, public.tbl_prestudentrolle WHERE 
-				tbl_person.person_id=tbl_prestudent.person_id AND 
-				tbl_prestudent.prestudent_id=tbl_prestudentrolle.prestudent_id AND 
-				tbl_prestudent.studiengang_kz='$studiengang_kz'";
-
 		$qry = "SELECT * FROM (
 					SELECT *, (
 							SELECT rolle_kurzbz FROM tbl_prestudentrolle WHERE prestudent_id=prestudent.prestudent_id ORDER BY datum DESC LIMIT 1) AS rolle 
@@ -441,6 +436,9 @@ class prestudent extends person
 						
 		if(!is_null($studiensemester_kurzbz) && $studiensemester_kurzbz!='')
 			$qry.=" AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+			
+		if($semester!=null)
+			$qry.=" AND ausbildungssemester='$semester'";
 		
 		switch ($typ)
 		{
@@ -468,11 +466,14 @@ class prestudent extends person
 			case "absage":
 				$qry.=" AND a.rolle='Abgewiesener'";
 				break;
+			case "prestudent":
+				if($studiensemester_kurzbz=='' || is_null($studiensemester_kurzbz))
+					$qry = "SELECT *, '' as rolle_kurzbz, '' as studiensemester_kurzbz, '' as ausbildungssemester, '' as datum FROM public.tbl_prestudent prestudent, public.tbl_person WHERE NOT EXISTS (select * from tbl_prestudentrolle WHERE prestudent_id=prestudent.prestudent_id) AND studiengang_kz='".addslashes($studiengang_kz)."' AND prestudent.person_id=tbl_person.person_id";
+				break;
 			default: 
 				break;		
 		}
-		if($semester!=null)
-			$qry.=" AND ausbildungssemester='$semester'";
+		
 
 		//echo $qry;
 		if($result = pg_query($this->conn, $qry))

@@ -31,7 +31,16 @@ loadVariables($conn, $user);
 // *********** Globale Variablen *****************//
 var MitarbeiterSelectUid=null; //UID des zu selektierenden Mitarbeiters
 var MitarbeiterTreeLoadDataOnSelect=true; // Gibt an ob die Details beim markieren eines Mitarbeiters geladen werden sollen
+var MitarbeiterVerwendungTreeDatasource=null; // Datasource des Verwendungstrees
+var MitarbeiterVerwendungSelectID=null; // ID der Verwendung die nach dem rebuild markiert werden soll
+var MitarbeiterFunktionTreeDatasource=null; // Datasource des Verwendungstrees
+var MitarbeiterFunktionSelectVerwendungID=null; // ID der Verwendung der Funktion die nach dem rebuild markiert werden soll
+var MitarbeiterFunktionSelectStudiengangID=null; // ID des Studiengangs der Funktion die nach dem rebuild markiert werden soll
+var MitarbeiterEntwicklungsteamTreeDatasource=null; // Datasource des Entwicklungsteamtrees
+var MitarbeiterEntwicklungsteamSelectMitarbeiterUID=null; // UID des Mitarbeiters des Entwicklugnsteams das nach dem rebuild markiert werden soll
+var MitarbeiterEntwicklungsteamSelectStudiengangID=null; // ID des Stg des Entwicklungsteams das nach dem rebuild markiert werden soll
 // ********** Observer und Listener ************* //
+
 
 // ****
 // * Observer fuer Mitarbeiter Tree
@@ -68,6 +77,120 @@ var MitarbeiterTreeListener =
  		//noch keine values haben. Ab Seamonkey funktionierts auch
 		//ohne dem setTimeout
 		window.setTimeout(MitarbeiterTreeSelectMitarbeiter,10);
+	}
+};
+
+// ****
+// * Observer fuer Mitarbeiter VerwendungTree
+// * startet Rebuild nachdem das Refresh
+// * der Datasource fertig ist
+// ****
+var MitarbeiterVerwendungTreeSinkObserver =
+{
+	onBeginLoad : function(pSink)
+	{
+	},
+	onInterrupt : function(pSink) {},
+	onResume : function(pSink) {},
+	onError : function(pSink, pStatus, pError) {},
+	onEndLoad : function(pSink)
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		document.getElementById('mitarbeiter-tree-verwendung').builder.rebuild();
+	}
+};
+
+// ****
+// * Nach dem Rebuild wird der Mitarbeiter wieder
+// * markiert
+// ****
+var MitarbeiterVerwendungTreeListener =
+{
+	willRebuild : function(builder)
+	{
+	},
+	didRebuild : function(builder)
+  	{
+ 		//timeout nur bei Mozilla notwendig da sonst die rows
+ 		//noch keine values haben. Ab Seamonkey funktionierts auch
+		//ohne dem setTimeout
+		window.setTimeout(MitarbeiterVerwendungTreeSelect,10);
+	}
+};
+
+// ****
+// * Observer fuer Mitarbeiter FunktionTree
+// * startet Rebuild nachdem das Refresh
+// * der Datasource fertig ist
+// ****
+var MitarbeiterFunktionTreeSinkObserver =
+{
+	onBeginLoad : function(pSink)
+	{
+	},
+	onInterrupt : function(pSink) {},
+	onResume : function(pSink) {},
+	onError : function(pSink, pStatus, pError) {},
+	onEndLoad : function(pSink)
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		document.getElementById('mitarbeiter-tree-funktion').builder.rebuild();
+	}
+};
+
+// ****
+// * Nach dem Rebuild wird die Funktion wieder
+// * markiert
+// ****
+var MitarbeiterFunktionTreeListener =
+{
+	willRebuild : function(builder)
+	{
+	},
+	didRebuild : function(builder)
+  	{
+ 		//timeout nur bei Mozilla notwendig da sonst die rows
+ 		//noch keine values haben. Ab Seamonkey funktionierts auch
+		//ohne dem setTimeout
+		window.setTimeout(MitarbeiterFunktionTreeSelect,10);
+	}
+};
+
+// ****
+// * Observer fuer Mitarbeiter EntwicklungsteamTree
+// * startet Rebuild nachdem das Refresh
+// * der Datasource fertig ist
+// ****
+var MitarbeiterEntwicklungsteamTreeSinkObserver =
+{
+	onBeginLoad : function(pSink)
+	{
+	},
+	onInterrupt : function(pSink) {},
+	onResume : function(pSink) {},
+	onError : function(pSink, pStatus, pError) {},
+	onEndLoad : function(pSink)
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		document.getElementById('mitarbeiter-tree-entwicklungsteam').builder.rebuild();
+	}
+};
+
+// ****
+// * Nach dem Rebuild wird die Funktion wieder
+// * markiert
+// ****
+var MitarbeiterEntwicklungsteamTreeListener =
+{
+	willRebuild : function(builder)
+	{
+	},
+	didRebuild : function(builder)
+  	{
+ 		//timeout nur bei Mozilla notwendig da sonst die rows
+ 		//noch keine values haben. Ab Seamonkey funktionierts auch
+		//ohne dem setTimeout
+		window.setTimeout(MitarbeiterEntwicklungsteamTreeSelect,10);
 	}
 };
 
@@ -399,6 +522,81 @@ function MitarbeiterAuswahl()
 	// ***** KONTAKTE *****
 	document.getElementById('mitarbeiter-kontakt').setAttribute('src','kontakt.xul.php?person_id='+person_id);
 	
+	// **** VERWENDUNG ****
+	verwendungtree = document.getElementById('mitarbeiter-tree-verwendung');
+	url='<?php echo APP_ROOT;?>rdf/verwendung.rdf.php?uid='+uid+"&"+gettimestamp();
+
+	//Alte DS entfernen
+	var oldDatasources = verwendungtree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		verwendungtree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	verwendungtree.builder.rebuild();
+
+	try
+	{
+		MitarbeiterVerwendungTreeDatasource.removeXMLSinkObserver(MitarbeiterVerwendungTreeSinkObserver);
+		verwendungtree.builder.removeListener(MitarbeiterVerwendungTreeListener);
+	}
+	catch(e)
+	{}
+
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	MitarbeiterVerwendungTreeDatasource = rdfService.GetDataSource(url);
+	MitarbeiterVerwendungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	MitarbeiterVerwendungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	verwendungtree.database.AddDataSource(MitarbeiterVerwendungTreeDatasource);
+	MitarbeiterVerwendungTreeDatasource.addXMLSinkObserver(MitarbeiterVerwendungTreeSinkObserver);
+	verwendungtree.builder.addListener(MitarbeiterVerwendungTreeListener);
+	
+	MitarbeiterVerwendungDisableFields(false);
+	
+	// **** ENTWICKLUNGSTEAM ****
+	entwicklungsteamtree = document.getElementById('mitarbeiter-tree-entwicklungsteam');
+	url='<?php echo APP_ROOT;?>rdf/entwicklungsteam.rdf.php?mitarbeiter_uid='+uid+"&"+gettimestamp();
+
+	//Alte DS entfernen
+	var oldDatasources = entwicklungsteamtree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		entwicklungsteamtree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	entwicklungsteamtree.builder.rebuild();
+
+	try
+	{
+		MitarbeiterEntwicklungsteamTreeDatasource.removeXMLSinkObserver(MitarbeiterEntwicklungsteamTreeSinkObserver);
+		entwicklungsteamtree.builder.removeListener(MitarbeiterEntwicklungsteamTreeListener);
+	}
+	catch(e)
+	{}
+
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	MitarbeiterEntwicklungsteamTreeDatasource = rdfService.GetDataSource(url);
+	MitarbeiterEntwicklungsteamTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	MitarbeiterEntwicklungsteamTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	entwicklungsteamtree.database.AddDataSource(MitarbeiterEntwicklungsteamTreeDatasource);
+	MitarbeiterEntwicklungsteamTreeDatasource.addXMLSinkObserver(MitarbeiterEntwicklungsteamTreeSinkObserver);
+	entwicklungsteamtree.builder.addListener(MitarbeiterEntwicklungsteamTreeListener);
+	
+	MitarbeiterEntwicklungsteamDisableFields(false);
+	
+	// Funktionen Tree Leeren
+	funktiontree = document.getElementById('mitarbeiter-tree-funktion');
+	
+	//Alte DS entfernen
+	var oldDatasources = funktiontree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		funktiontree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	funktiontree.builder.rebuild();
+	
+	MitarbeiterFunktionDisableFields(true);
 }
 
 // ****
@@ -518,4 +716,183 @@ function MitarbeiterSave()
 		MitarbeiterTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 	}
+}
+
+
+// ***************** VERWENDUNG ********************** //
+
+// ****
+// * Selectiert die Verwendung nachdem der Tree
+// * rebuildet wurde.
+// ****
+function MitarbeiterVerwendungTreeSelect()
+{
+	var tree=document.getElementById('mitarbeiter-tree-verwendung');
+	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+
+	//In der globalen Variable ist der zu selektierende Verwendung gespeichert
+	if(MitarbeiterVerwendungSelectID!=null)
+	{
+	   	for(var i=0;i<items;i++)
+	   	{
+	   		//Uid der row holen
+			col = tree.columns ? tree.columns["mitarbeiter-verwendung-treecol-bisverwendung_id"] : "mitarbeiter-verwendung-treecol-bisverwendung_id";
+			id=tree.view.getCellText(i,col);
+
+			if(id == MitarbeiterVerwendungSelectID)
+			{
+				//Zeile markieren
+				tree.view.selection.select(i);
+				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
+				tree.treeBoxObject.ensureRowIsVisible(i);
+				return true;
+			}
+	   	}
+	}
+}
+
+// ****
+// * Wenn ein Eintrag im Verwendungstree Selektiert wird,
+// * dann werden die dazugehoerigen Funktionen geladen
+// ****
+function MitarbeiterVerwendungSelect()
+{
+	// Trick 17	(sonst gibt's ein Permission denied)
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	
+	var tree = document.getElementById('mitarbeiter-tree-verwendung');
+
+	if (tree.currentIndex==-1) return;
+
+	//Ausgewaehlte ID holen
+    var col = tree.columns ? tree.columns["mitarbeiter-verwendung-treecol-bisverwendung_id"] : "mitarbeiter-verwendung-treecol-bisverwendung_id";
+	var bisverwendung_id=tree.view.getCellText(tree.currentIndex,col);
+
+	
+	// Laden der Funktionen
+	funktiontree = document.getElementById('mitarbeiter-tree-funktion');
+	url='<?php echo APP_ROOT;?>rdf/bisfunktion.rdf.php?bisverwendung_id='+bisverwendung_id+"&"+gettimestamp();
+
+	//Alte DS entfernen
+	var oldDatasources = funktiontree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		funktiontree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	funktiontree.builder.rebuild();
+
+	try
+	{
+		MitarbeiterFunktionTreeDatasource.removeXMLSinkObserver(MitarbeiterFunktionTreeSinkObserver);
+		funktiontree.builder.removeListener(MitarbeiterFunktionTreeListener);
+	}
+	catch(e)
+	{}
+
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	MitarbeiterFunktionTreeDatasource = rdfService.GetDataSource(url);
+	MitarbeiterFunktionTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	MitarbeiterFunktionTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	funktiontree.database.AddDataSource(MitarbeiterFunktionTreeDatasource);
+	MitarbeiterFunktionTreeDatasource.addXMLSinkObserver(MitarbeiterFunktionTreeSinkObserver);
+	funktiontree.builder.addListener(MitarbeiterFunktionTreeListener);
+	
+	MitarbeiterFunktionDisableFields(false);
+}
+
+// ****
+// * De-/Aktiviert die Buttons
+// ****
+function MitarbeiterVerwendungDisableFields(val)
+{
+	document.getElementById('mitarbeiter-verwendung-button-neu').disabled=val;
+	document.getElementById('mitarbeiter-verwendung-button-bearbeiten').disabled=val;
+	document.getElementById('mitarbeiter-verwendung-button-loeschen').disabled=val;
+}
+
+// *********** FUNKTION *************** //
+
+// ****
+// * Selectiert die Funktion nachdem der Tree
+// * rebuildet wurde.
+// ****
+function MitarbeiterFunktionTreeSelect()
+{
+	var tree=document.getElementById('mitarbeiter-tree-funktion');
+	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+
+	//In der globalen Variable ist der zu selektierende Verwendung gespeichert
+	if(MitarbeiterFunktionSelectStudiengangID!=null)
+	{
+	   	for(var i=0;i<items;i++)
+	   	{
+			col = tree.columns ? tree.columns["mitarbeiter-funktion-treecol-bisverwendung_id"] : "mitarbeiter-funktion-treecol-bisverwendung_id";
+			verwendung_id=tree.view.getCellText(i,col);
+			col = tree.columns ? tree.columns["mitarbeiter-funktion-treecol-studiengang_kz"] : "mitarbeiter-funktion-treecol-studiengang_kz";
+			studiengang_kz=tree.view.getCellText(i,col);
+
+			if(verwendung_id == MitarbeiterFunktionSelectVerwendungID && studiengang_kz==MitarbeiterFunktionSelectStudiengangID)
+			{
+				//Zeile markieren
+				tree.view.selection.select(i);
+				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
+				tree.treeBoxObject.ensureRowIsVisible(i);
+				return true;
+			}
+	   	}
+	}
+}
+
+// ****
+// * De-/Aktiviert die Buttons
+// ****
+function MitarbeiterFunktionDisableFields(val)
+{
+	document.getElementById('mitarbeiter-funktion-button-neu').disabled=val;
+	document.getElementById('mitarbeiter-funktion-button-bearbeiten').disabled=val;
+	document.getElementById('mitarbeiter-funktion-button-loeschen').disabled=val;
+}
+
+// *********** ENTWICKLUNGSTEAM *************** //
+
+// ****
+// * Selectiert die Funktion nachdem der Tree
+// * rebuildet wurde.
+// ****
+function MitarbeiterEntwicklungsteamTreeSelect()
+{
+	var tree=document.getElementById('mitarbeiter-tree-entwicklungsteam');
+	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+
+	//In der globalen Variable ist der zu selektierende Verwendung gespeichert
+	if(MitarbeiterEntwicklungsteamSelectStudiengangID!=null)
+	{
+	   	for(var i=0;i<items;i++)
+	   	{
+			col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-mitarbeiter_uid"] : "mitarbeiter-entwicklungsteam-treecol-mitarbeiter_uid";
+			mitarbeiter_uid=tree.view.getCellText(i,col);
+			col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-studiengang_kz"] : "mitarbeiter-entwicklungsteam-treecol-studiengang_kz";
+			studiengang_kz=tree.view.getCellText(i,col);
+
+			if(mitarbeiter_uid == MitarbeiterEntwicklungsteamSelectMitarbeiterUID && studiengang_kz==MitarbeiterEntwicklungsteamSelectStudiengangID)
+			{
+				//Zeile markieren
+				tree.view.selection.select(i);
+				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
+				tree.treeBoxObject.ensureRowIsVisible(i);
+				return true;
+			}
+	   	}
+	}
+}
+
+// ****
+// * De-/Aktiviert die Buttons
+// ****
+function MitarbeiterEntwicklungsteamDisableFields(val)
+{
+	document.getElementById('mitarbeiter-entwicklungsteam-button-neu').disabled=val;
+	document.getElementById('mitarbeiter-entwicklungsteam-button-bearbeiten').disabled=val;
+	document.getElementById('mitarbeiter-entwicklungsteam-button-loeschen').disabled=val;
 }

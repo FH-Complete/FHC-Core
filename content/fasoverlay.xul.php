@@ -275,7 +275,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 		<?php
 			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('lva-verwaltung'))
 			{
-				echo '<tab id="tab-interessenten" label="Interessenten"/>';
+				echo '<tab id="tab-interessenten" label="PreStudent"/>';
 				echo '<tab id="tab-studenten" label="Studenten"/>';
 				echo '<tab id="tab-lfvt" label="Lehrveranstaltungen" />';
 			}
