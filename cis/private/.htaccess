@@ -4,35 +4,6 @@ AuthLDAPURL ldap://ldap.technikum-wien.at/ou=People,dc=technikum-wien,dc=at?uid?
 AuthLDAPGroupAttributeIsDN Off
 AuthLDAPGroupAttribute memberuid
 require group cn=fhadmin,ou=Group,dc=technikum-wien,dc=at
-require user trob
-require user wahl
-require user drabek
-require user elgner
-require user schaaf
-require user kofler
-require user esberger
-require user kollmitz
-require user schmoe
-require user trattner
-require user naglr
-require user patai
+require group cn=hadesadm,ou=Group,dc=technikum-wien,dc=at
 require user tw01e061
-require user docsek
-require user teschl
-require user oesi
-require user adams
-require user weisss
-require user moserp
-require user moehring
-require user skritek
-require user kroesl
-require user ffe
-require user kindlm
-require user schmuderm
-require user sagmeister
 require user masik
-require user kubicka
-require user lehner
-require user schwarzl
-require user horauer
-require user me
