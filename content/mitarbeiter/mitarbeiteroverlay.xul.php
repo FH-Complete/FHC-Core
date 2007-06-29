@@ -30,6 +30,7 @@ require_once('../../vilesci/config.inc.php');
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterdetailoverlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterfunktionoverlay.xul.php"?>';
 ?>
 <!DOCTYPE overlay >
 
