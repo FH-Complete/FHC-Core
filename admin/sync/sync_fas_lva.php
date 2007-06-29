@@ -1,15 +1,11 @@
 <?php
-include('../../vilesci/config.inc.php');
-include('../../include/functions.inc.php');
-include('../../include/lehrstunde.class.php');
+require('sync_config.inc.php');
+require('../../vilesci/config.inc.php');
+require('../../include/functions.inc.php');
+require('../../include/lehrstunde.class.php');
 
 $conn=pg_connect(CONN_STRING);
 $conn_fas=pg_connect(CONN_STRING_FAS);
-$adress='fas_sync@technikum-wien.at';
-//$adress='pam@technikum-wien.at';
-$adress_stpl='lvplan@technikum-wien.at';
-//$adress_stpl='pam@technikum-wien.at';
-$adress_fas='fas_sync@technikum-wien.at';
 
 if (isset($_GET['studiensemester']))
 	$ss_where="studiensemester_kurzbz='".$_GET['studiensemester']."'";
@@ -309,8 +305,8 @@ $sql_query="SELECT DISTINCT fas_id,lehreinheit_pk,trim(lvnr) AS lvnr,trim(unr)::
 			trim(upper(lehrform)) AS lehrform, lehrfach_bezeichnung, trim(upper(lv_kurzbz)) AS lv_kurzbz, lv_bezeichnung,
 			studiengang_kz,fachbereich_id,semester,verband,gruppe,raumtyp,raumtypalternativ,
 			round(semesterstunden) AS semesterstunden,stundenblockung,wochenrythmus,start_kw,anmerkung,studiensemester_kurzbz, ects
-			FROM fas_view_alle_lehreinheiten_vilesci WHERE ".$ss_where;
-//echo $sql_query."</i><br>";
+			FROM fas_view_alle_lehreinheiten_vilesci WHERE ".$ss_where.' AND '.$dont_sync_sql.';';
+echo $sql_query."</i><br>";
 $result=pg_query($conn_fas, $sql_query);
 $num_rows=pg_num_rows($result);
 $text="Dies ist eine automatische eMail!\r\r";

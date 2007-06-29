@@ -30,7 +30,7 @@ $nachname=array();
 <head>
 <title>Diplomarbeiten-Datenkorrektur</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-9">
-<link href="../../skin/vilesci_old.css" rel="stylesheet" type="text/css">
+<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 </head>
 <body>
 <?php
@@ -93,15 +93,15 @@ if($result = pg_query($conn_fas, $qry))
 echo "<table class='liste'><tr><th>FAS</th><th>Vilesci</th><th></th><th>Titel/Vorname/Nachname</th></tr>";
 
 
-$qry="SELECT *, 
-	trim(substring(trim(firmenbetreuer) from ' [A-ü]*$')) as zweit, 
-	trim(substring(trim(beurteiler) from ' [A-ü]*$')) as dritt 
+$qry="SELECT *,
+	trim(substring(trim(firmenbetreuer) from ' [A-ü]*$')) as zweit,
+	trim(substring(trim(beurteiler) from ' [A-ü]*$')) as dritt
 	FROM praxissemester WHERE
 	((vilesci_firmenbetreuer IS NULL AND trim(firmenbetreuer)!='') OR
 	(vilesci_beurteiler IS NULL AND trim(beurteiler)!=''))
 	ORDER BY praxissemester_pk
 	LIMIT 20;";
-//trim(substring(trim(ansprechpartner) from ' [A-ü]*$')) as erst, 
+//trim(substring(trim(ansprechpartner) from ' [A-ü]*$')) as erst,
 //(vilesci_ansprechpartner IS NULL AND trim(ansprechpartner)!='') OR
 
 if($result = pg_query($conn_fas, $qry))
