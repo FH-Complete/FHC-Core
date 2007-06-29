@@ -194,7 +194,7 @@ else
 				</tr>
 			<?php
 			}
-			if ($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter'))
+			if ($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter') || $fkt->checkFunktion('stglstv')|| $fkt->checkFunktion('stgl'))
 			{
 				?>
 				<tr>
