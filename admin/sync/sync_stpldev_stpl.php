@@ -91,7 +91,7 @@ else
 	flush();
 	while ($row=pg_fetch_object($result))
 	{
-		$sql_query='INSERT INTO tbl_stundenplan
+		$sql_query='INSERT INTO lehre.tbl_stundenplan
 			(stundenplan_id,unr,mitarbeiter_uid,datum,stunde,ort_kurzbz,studiengang_kz,semester,verband,gruppe,
 			gruppe_kurzbz,titel,anmerkung,fix,updateamum,updatevon,insertamum,insertvon,lehreinheit_id) VALUES';
 		$sql_query.="($row->stundenplandev_id,$row->unr,'$row->uid','$row->datum',$row->stunde,'$row->ort_kurzbz',
@@ -179,9 +179,9 @@ else
 */
 
 echo '<BR>Alte Datens&auml;tze werden gel&ouml;scht.<BR>';flush();
-$sql_query="SELECT * FROM vw_stundenplan WHERE datum>='$datum_begin' AND datum<='$datum_ende'
+$sql_query="SELECT * FROM lehre.vw_stundenplan WHERE datum>='$datum_begin' AND datum<='$datum_ende'
 				AND stundenplan_id NOT IN
-				(SELECT stundenplandev_id FROM tbl_stundenplandev WHERE datum>='$datum_begin' AND datum<='$datum_ende');";
+				(SELECT stundenplandev_id FROM lehre.tbl_stundenplandev WHERE datum>='$datum_begin' AND datum<='$datum_ende');";
 if (!$result=pg_query($conn, $sql_query))
 {
 	echo $sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
@@ -189,7 +189,7 @@ if (!$result=pg_query($conn, $sql_query))
 }
 while ($row=pg_fetch_object($result))
 {
-	$sql_query='DELETE FROM tbl_stundenplan WHERE stundenplan_id='.$row->stundenplan_id;
+	$sql_query='DELETE FROM lehre.tbl_stundenplan WHERE stundenplan_id='.$row->stundenplan_id;
 	//echo $sql_query.'<BR>';
 	if (!$result_delete=pg_query($conn, $sql_query))
 	{
@@ -252,7 +252,7 @@ while ($row=pg_fetch_object($result))
 echo '<BR>Datens&auml;tze werden ge&auml;ndert.<BR>';flush();
 $sql_query="SELECT vw_stundenplandev.*, vw_stundenplan.datum AS old_datum, vw_stundenplan.stunde AS old_stunde,
 				vw_stundenplan.ort_kurzbz AS old_ort_kurzbz, vw_stundenplan.lektor AS old_lektor
-			FROM vw_stundenplandev, vw_stundenplan
+			FROM lehre.vw_stundenplandev, lehre.vw_stundenplan
 			WHERE vw_stundenplan.stundenplan_id=vw_stundenplandev.stundenplandev_id AND (
 				vw_stundenplandev.unr!=vw_stundenplan.unr OR
 				vw_stundenplandev.uid!=vw_stundenplan.uid OR
@@ -278,7 +278,7 @@ if (!$result=pg_query($conn, $sql_query))
 while ($row=pg_fetch_object($result))
 {
 	// Alten Eintrag aus tbl_stundenplan holen
-	$sql_query="SELECT * FROM tbl_stundenplandev WHERE stundenplandev_id=$row->stundenplandev_id;";
+	$sql_query="SELECT * FROM lehre.tbl_stundenplandev WHERE stundenplandev_id=$row->stundenplandev_id;";
 	if (!$result_old=pg_query($conn, $sql_query))
 	{
 		echo $sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
@@ -288,7 +288,7 @@ while ($row=pg_fetch_object($result))
 		$row_old=pg_fetch_object($result_old);
 
 	// Datensaetze aendern
-	$sql_query="UPDATE tbl_stundenplan SET
+	$sql_query="UPDATE lehre.tbl_stundenplan SET
 		unr=$row->unr,mitarbeiter_uid='$row->uid',datum='$row->datum',stunde=$row->stunde,
 		ort_kurzbz='$row->ort_kurzbz',studiengang_kz=$row->studiengang_kz,semester=$row->semester";
 	if ($row->verband==null)
