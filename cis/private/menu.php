@@ -213,7 +213,7 @@ else
 					  	<td nowrap>
 							<ul style="margin-top: 0px; margin-bottom: 0px;">
 							<?php
-							if ($rechte->isBerechtigt('admin',0) ||  || $rechte->isBerechtigt('mitarbeiter') $fkt->checkFunktion('stglstv')|| $fkt->checkFunktion('stgl') || $fkt->checkFunktion('ass'))
+							if ($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('mitarbeiter') $fkt->checkFunktion('stglstv')|| $fkt->checkFunktion('stgl') || $fkt->checkFunktion('ass'))
 							{
 								echo '<li><a class="Item2" href="profile/resturlaub.php" target="content">Resturlaub</a></li>';
 								echo '<li><a class="Item2" href="profile/zeitsperre.php?fix=true" target="content">Fix-Angestellte</a></li>';
