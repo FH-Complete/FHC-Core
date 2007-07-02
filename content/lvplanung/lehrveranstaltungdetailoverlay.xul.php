@@ -46,11 +46,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			<menuitem label="Entfernen" oncommand="LeMitarbeiterDel();" />
 		</popup>
 	</popupset>
-	<hbox style="background:#eeeeee;margin:0px;padding:2px">
-		<label value="Details" style="font-size:12pt;font-weight:bold;margin-top:5px;"  flex="1" />
-		<spacer flex="1" />
-		<button id="lehrveranstaltung-detail-button-save" label="speichern" oncommand="LeDetailSave();" disabled="true"/>
-	</hbox>
+	
 	<!-- Hidden Fields -->
 	<vbox hidden="true">
 		<grid flex="1" style="padding:5px;">
@@ -81,164 +77,178 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		</rows>
 		</grid>
 	</vbox>
-	<!--Details-->
-	<grid flex="1" datasources="rdf:null"
-	      ref="http://www.technikum-wien.at/tempus/lva/liste"
-		  style="padding:5px;">
-		<columns  >
-			<column  />
-			<column style="min-width:240px" />
-			<column />
-			<column style="min-width:240px" />
-	  	</columns>
-	  	<rows>
-			<row>
-	  			<label value="Sprache" />
-				<menulist id="lehrveranstaltung-detail-menulist-sprache"
-				          datasources="<?php echo APP_ROOT; ?>rdf/sprache.rdf.php" flex="1"
-						  ref="http://www.technikum-wien.at/sprachen/liste" disabled="true">
-					<template>
-						<menupopup>
-							<menuitem value="rdf:http://www.technikum-wien.at/sprachen/rdf#bezeichnung"
-							          label="rdf:http://www.technikum-wien.at/sprachen/rdf#bezeichnung"
-									  uri="rdf:*"/>
-							</menupopup>
-					</template>
-				</menulist>
-
-			</row>
-			<row>
-	  			<label value="Lehrfach" />
-				<menulist id="lehrveranstaltung-detail-menulist-lehrfach" disabled="true"
-				          datasources="rdf:null" flex="1"
-				          ref="http://www.technikum-wien.at/lehrfach/liste"  >
-					<template>
-						<menupopup>
-						<menuitem value="rdf:http://www.technikum-wien.at/lehrfach/rdf#lehrfach_id"
-					              label="rdf:http://www.technikum-wien.at/lehrfach/rdf#bezeichnung"
-								  uri="rdf:*"/>
-						</menupopup>
-					</template>
-				</menulist>
-
-				<label value="Lehrform" />
-				<menulist id="lehrveranstaltung-detail-menulist-lehrform" disabled="true"
-				          datasources="<?php echo APP_ROOT ?>rdf/lehrform.rdf.php" flex="1"
-			              ref="http://www.technikum-wien.at/lehrform/liste" >
-					<template>
-						<menupopup>
-							<menuitem value="rdf:http://www.technikum-wien.at/lehrform/rdf#kurzbz"
-				        		      label="rdf:http://www.technikum-wien.at/lehrform/rdf#kurzbz"
-							  		  uri="rdf:*"/>
-							</menupopup>
-					</template>
-				</menulist>
-	  	  	</row>
-			<row>
-	  	    	<label value="Raumtyp" />
-	  			<menulist id="lehrveranstaltung-detail-menulist-raumtyp" disabled="true"
-	  			          datasources="<?php echo APP_ROOT ?>rdf/raumtyp.rdf.php" flex="1"
-			              ref="http://www.technikum-wien.at/raumtyp/liste" >
-					<template>
-						<menupopup>
-							<menuitem value="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
-							          label="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
-									  uri="rdf:*"/>
-						</menupopup>
-					</template>
-				</menulist>
-
-	  			<label value="Raumtyp alternativ" />
-	  			<menulist id="lehrveranstaltung-detail-menulist-raumtypalternativ" disabled="true"
-	  					  datasources="<?php echo APP_ROOT ?>rdf/raumtyp.rdf.php" flex="1"
-			              ref="http://www.technikum-wien.at/raumtyp/liste" >
-					<template>
-						<menupopup>
-							<menuitem value="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
-							          label="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
-									  uri="rdf:*"/>
-							</menupopup>
-					</template>
-				</menulist>
-	  		</row>
-			<row>
-	   	   		<label value="Lehre" />
-				<checkbox id="lehrveranstaltung-detail-checkbox-lehre" disabled="true"/>
-
-				<label value="Stundenblockung" />
-				<textbox id="lehrveranstaltung-detail-textbox-stundenblockung" disabled="true" />
-			</row>
-			<row>
-				<label value="Wochenrythmus" />
-				<textbox id="lehrveranstaltung-detail-textbox-wochenrythmus" disabled="true"/>
-
-				<label value="Start KW" />
-				<textbox id="lehrveranstaltung-detail-textbox-startkw" disabled="true"/>
-			</row>
-			<row>
-	  			<label value="Studiensemester" />
-	  			<vbox>
-					<menulist id="lehrveranstaltung-detail-menulist-studiensemester" disabled="true"
-							  datasources="<?php echo APP_ROOT ?>rdf/studiensemester.rdf.php" flex="0"
-					          ref="http://www.technikum-wien.at/studiensemester/liste" >
+	<hbox>
+	<groupbox >
+		<caption label="Details" />
+		<!--Details-->
+		<grid datasources="rdf:null"
+		      ref="http://www.technikum-wien.at/tempus/lva/liste"
+			  style="padding:5px;">
+			<columns  >
+				<column  />
+				<column style="min-width:240px" />
+				<column />
+				<column style="min-width:240px" />
+		  	</columns>
+		  	<rows>
+				<row>
+		  			<label value="Sprache" />
+					<menulist id="lehrveranstaltung-detail-menulist-sprache"
+					          datasources="<?php echo APP_ROOT; ?>rdf/sprache.rdf.php" flex="1"
+							  ref="http://www.technikum-wien.at/sprachen/liste" disabled="true">
 						<template>
 							<menupopup>
-								<menuitem value="rdf:http://www.technikum-wien.at/studiensemester/rdf#kurzbz"
-								          label="rdf:http://www.technikum-wien.at/studiensemester/rdf#kurzbz"
+								<menuitem value="rdf:http://www.technikum-wien.at/sprachen/rdf#bezeichnung"
+								          label="rdf:http://www.technikum-wien.at/sprachen/rdf#bezeichnung"
+										  uri="rdf:*"/>
+								</menupopup>
+						</template>
+					</menulist>
+	
+				</row>
+				<row>
+		  			<label value="Lehrfach" />
+					<menulist id="lehrveranstaltung-detail-menulist-lehrfach" disabled="true"
+					          datasources="rdf:null" flex="1"
+					          ref="http://www.technikum-wien.at/lehrfach/liste"  >
+						<template>
+							<menupopup>
+							<menuitem value="rdf:http://www.technikum-wien.at/lehrfach/rdf#lehrfach_id"
+						              label="rdf:http://www.technikum-wien.at/lehrfach/rdf#bezeichnung"
+									  uri="rdf:*"/>
+							</menupopup>
+						</template>
+					</menulist>
+	
+					<label value="Lehrform" />
+					<menulist id="lehrveranstaltung-detail-menulist-lehrform" disabled="true"
+					          datasources="<?php echo APP_ROOT ?>rdf/lehrform.rdf.php" flex="1"
+				              ref="http://www.technikum-wien.at/lehrform/liste" >
+						<template>
+							<menupopup>
+								<menuitem value="rdf:http://www.technikum-wien.at/lehrform/rdf#kurzbz"
+					        		      label="rdf:http://www.technikum-wien.at/lehrform/rdf#kurzbz"
+								  		  uri="rdf:*"/>
+								</menupopup>
+						</template>
+					</menulist>
+		  	  	</row>
+				<row>
+		  	    	<label value="Raumtyp" />
+		  			<menulist id="lehrveranstaltung-detail-menulist-raumtyp" disabled="true"
+		  			          datasources="<?php echo APP_ROOT ?>rdf/raumtyp.rdf.php" flex="1"
+				              ref="http://www.technikum-wien.at/raumtyp/liste" >
+						<template>
+							<menupopup>
+								<menuitem value="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
+								          label="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
 										  uri="rdf:*"/>
 							</menupopup>
 						</template>
 					</menulist>
-					<spacer flex="1"/>
-				</vbox>
-				<label value="Anmerkung" />
-	  			<textbox id="lehrveranstaltung-detail-textbox-anmerkung" rows="2" multiline="true" disabled="true"/>
-			</row>
-			<row>
-				<!-- ************* GRUPPEN ************** -->
-				<label id="lehrveranstaltung-detail-label-lehreinheitgruppe" value="Gruppen" />
-				<vbox height="150" flex="1">
-					<hbox flex="1">
-						<tree id="lehrveranstaltung-detail-tree-lehreinheitgruppe" seltype="single" hidecolumnpicker="false" flex="1" disabled="false"
-							  datasources="rdf:null"
-							  ref="http://www.technikum-wien.at/lehreinheitgruppe/liste"
-							  flags="dont-build-content"
-							  style="border: 1px solid black;"
-	        				  ondragdrop="nsDragAndDrop.drop(event,LeLvbgrpDDObserver)"
-							  ondragover="nsDragAndDrop.dragOver(event,LeLvbgrpDDObserver)"
-			  				  ondragenter="nsDragAndDrop.dragEnter(event,LeLvbgrpDDObserver)"
-							  ondragexit="nsDragAndDrop.dragExit(event,LeLvbgrpDDObserver)"
-							  context="lehrveranstaltung-detail-gruppe-tree-popup"
-							  onkeypress="LvDetailGruppenTreeKeyPress(event)"
-						>
-							<treecols>
-								<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-bezeichnung" label="Bezeichnung" flex="2" hidden="false"
-										 class="sortDirectionIndicator"
-										 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#bezeichnung" />
-								<splitter class="tree-splitter"/>
-								<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-lehreinheitgruppe_id" label="ID" flex="2" hidden="true"
-										 class="sortDirectionIndicator"
-										 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#lehreinheitgruppe_id" />
-							</treecols>
+	
+		  			<label value="Raumtyp alternativ" />
+		  			<menulist id="lehrveranstaltung-detail-menulist-raumtypalternativ" disabled="true"
+		  					  datasources="<?php echo APP_ROOT ?>rdf/raumtyp.rdf.php" flex="1"
+				              ref="http://www.technikum-wien.at/raumtyp/liste" >
+						<template>
+							<menupopup>
+								<menuitem value="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
+								          label="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
+										  uri="rdf:*"/>
+								</menupopup>
+						</template>
+					</menulist>
+		  		</row>
+				<row>
+		   	   		<label value="Lehre" />
+					<checkbox id="lehrveranstaltung-detail-checkbox-lehre" disabled="true"/>
+	
+					<label value="Stundenblockung" />
+					<textbox id="lehrveranstaltung-detail-textbox-stundenblockung" disabled="true" />
+				</row>
+				<row>
+					<label value="Wochenrythmus" />
+					<textbox id="lehrveranstaltung-detail-textbox-wochenrythmus" disabled="true"/>
+	
+					<label value="Start KW" />
+					<textbox id="lehrveranstaltung-detail-textbox-startkw" disabled="true"/>
+				</row>
+				<row>
+		  			<label value="Studiensemester" />
+		  			<vbox>
+						<menulist id="lehrveranstaltung-detail-menulist-studiensemester" disabled="true"
+								  datasources="<?php echo APP_ROOT ?>rdf/studiensemester.rdf.php" flex="0"
+						          ref="http://www.technikum-wien.at/studiensemester/liste" >
 							<template>
-								<rule>
-									<treechildren>
-										<treeitem uri="rdf:*">
-											<treerow>
-												<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#bezeichnung"   />
-												<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#lehreinheitgruppe_id"   />
-							 				</treerow>
-							 			</treeitem>
-							 		</treechildren>
-							 	</rule>
+								<menupopup>
+									<menuitem value="rdf:http://www.technikum-wien.at/studiensemester/rdf#kurzbz"
+									          label="rdf:http://www.technikum-wien.at/studiensemester/rdf#kurzbz"
+											  uri="rdf:*"/>
+								</menupopup>
 							</template>
-						</tree>
-						<spacer />
+						</menulist>
+						<spacer flex="1"/>
+					</vbox>
+					<label value="Anmerkung" />
+		  			<textbox id="lehrveranstaltung-detail-textbox-anmerkung" rows="2" multiline="true" disabled="true"/>
+				</row>
+				<row>
+					<spacer />
+					<spacer />
+					<spacer />
+					<hbox>
+						<spacer flex="1"/>
+						<button id="lehrveranstaltung-detail-button-save" label="speichern" oncommand="LeDetailSave();" disabled="true"/>
 					</hbox>
-				</vbox>
-			</row>
-		</rows>
-	</grid>
+				</row>
+			</rows>
+		</grid>
+	</groupbox>
+	</hbox>
+	<!-- ************* GRUPPEN ************** -->
+	<label id="lehrveranstaltung-detail-label-lehreinheitgruppe" value="Gruppen" />
+	<vbox flex="1">
+		<hbox flex="7">
+			<tree id="lehrveranstaltung-detail-tree-lehreinheitgruppe" seltype="single" hidecolumnpicker="false" flex="1" disabled="false"
+				  datasources="rdf:null"
+				  ref="http://www.technikum-wien.at/lehreinheitgruppe/liste"
+				  flags="dont-build-content"
+				  style="border: 1px solid black;"
+				  ondragdrop="nsDragAndDrop.drop(event,LeLvbgrpDDObserver)"
+				  ondragover="nsDragAndDrop.dragOver(event,LeLvbgrpDDObserver)"
+  				  ondragenter="nsDragAndDrop.dragEnter(event,LeLvbgrpDDObserver)"
+				  ondragexit="nsDragAndDrop.dragExit(event,LeLvbgrpDDObserver)"
+				  context="lehrveranstaltung-detail-gruppe-tree-popup"
+				  onkeypress="LvDetailGruppenTreeKeyPress(event)"
+			>
+				<treecols>
+					<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-bezeichnung" label="Bezeichnung" flex="2" hidden="false"
+							 class="sortDirectionIndicator"
+							 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#bezeichnung" />
+					<splitter class="tree-splitter"/>
+					<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-lehreinheitgruppe_id" label="ID" flex="2" hidden="true"
+							 class="sortDirectionIndicator"
+							 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#lehreinheitgruppe_id" />
+				</treecols>
+				<template>
+					<rule>
+						<treechildren>
+							<treeitem uri="rdf:*">
+								<treerow>
+									<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#bezeichnung"   />
+									<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#lehreinheitgruppe_id"   />
+				 				</treerow>
+				 			</treeitem>
+				 		</treechildren>
+				 	</rule>
+				</template>
+			</tree>
+			<spacer flex="2"/>
+		</hbox>
+		<spacer flex="1"/>
+	</vbox>
+			
 </vbox>
 
 <!-- ************************** LEKTORZUTEILUNG ********************** -->
