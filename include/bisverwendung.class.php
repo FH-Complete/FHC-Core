@@ -20,7 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-class verwendung
+class bisverwendung
 {
 	var $conn;    // @var resource DB-Handle
 	var $new;      // @var boolean
@@ -56,7 +56,7 @@ class verwendung
 	// * @param conn    Connection zur Datenbank
 	// *        bisverwendung_id ID des zu ladenden Datensatzes
 	// ***********************************************
-	function verwendung($conn, $bisverwendung_id=null, $unicode=false)
+	function bisverwendung($conn, $bisverwendung_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
 		if($unicode!=null)
@@ -299,7 +299,7 @@ class verwendung
 		{
 			while($row=pg_fetch_object($result))
 			{
-				$obj = new verwendung($this->conn, null, null);
+				$obj = new bisverwendung($this->conn, null, null);
 				
 				$obj->bisverwendung_id = $row->bisverwendung_id;
 				$obj->ba1code = $row->ba1code;

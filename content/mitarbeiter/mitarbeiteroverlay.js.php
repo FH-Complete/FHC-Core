@@ -524,7 +524,7 @@ function MitarbeiterAuswahl()
 	
 	// **** VERWENDUNG ****
 	verwendungtree = document.getElementById('mitarbeiter-tree-verwendung');
-	url='<?php echo APP_ROOT;?>rdf/verwendung.rdf.php?uid='+uid+"&"+gettimestamp();
+	url='<?php echo APP_ROOT;?>rdf/bisverwendung.rdf.php?uid='+uid+"&"+gettimestamp();
 
 	//Alte DS entfernen
 	var oldDatasources = verwendungtree.database.GetDataSources();
