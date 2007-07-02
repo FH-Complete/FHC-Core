@@ -25,7 +25,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	<caption label="Verwendung" />
 	<hbox>
 		<tree id="mitarbeiter-tree-verwendung" seltype="single" hidecolumnpicker="false" flex="1"
-				datasources="rdf:null" ref="http://www.technikum-wien.at/verwendung/liste"
+				datasources="rdf:null" ref="http://www.technikum-wien.at/bisverwendung/liste"
 				onselect="MitarbeiterVerwendungSelect();"
 				flags="dont-build-content"
 				enableColumnDrag="true"
@@ -35,67 +35,67 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			<treecols>
 				<treecol id="mitarbeiter-verwendung-treecol-ba1bez" label="Beschaeftigungsart 1" flex="1" persist="hidden, width" hidden="false"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/verwendung/rdf#ba1bez"  onclick="MitarbeiterTreeVerwendungSort()"/>
+					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#ba1bez"  onclick="MitarbeiterTreeVerwendungSort()"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="mitarbeiter-verwendung-treecol-ba2bez" label="Beschaeftigungsart 2" flex="1" persist="hidden, width" hidden="false"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/verwendung/rdf#ba2bez"  onclick="MitarbeiterTreeVerwendungSort()"/>
+					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#ba2bez"  onclick="MitarbeiterTreeVerwendungSort()"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="mitarbeiter-verwendung-treecol-ausmass" label="Ausmass" flex="1" persist="hidden, width" hidden="false"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/verwendung/rdf#ausmass"  onclick="MitarbeiterTreeVerwendungSort()"/>
+					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#ausmass"  onclick="MitarbeiterTreeVerwendungSort()"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="mitarbeiter-verwendung-treecol-verwendung" label="Verwendung" flex="1" persist="hidden, width" hidden="false"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/verwendung/rdf#verwendung"  onclick="MitarbeiterTreeVerwendungSort()"/>
+					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#verwendung"  onclick="MitarbeiterTreeVerwendungSort()"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="mitarbeiter-verwendung-treecol-hauptberuf" label="Hauptberuf" flex="1" persist="hidden, width" hidden="false"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/verwendung/rdf#hauptberuf"  onclick="MitarbeiterTreeVerwendungSort()"/>
+					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#hauptberuf"  onclick="MitarbeiterTreeVerwendungSort()"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="mitarbeiter-verwendung-treecol-hauptberuflich" label="Hauptberuflich" flex="1" persist="hidden, width" hidden="false"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/verwendung/rdf#hauptberuflich"  onclick="MitarbeiterTreeVerwendungSort()"/>
+					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#hauptberuflich"  onclick="MitarbeiterTreeVerwendungSort()"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="mitarbeiter-verwendung-treecol-habilitation" label="Habilitation" flex="1" persist="hidden, width" hidden="false"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/verwendung/rdf#habilitation"  onclick="MitarbeiterTreeVerwendungSort()"/>
+					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#habilitation"  onclick="MitarbeiterTreeVerwendungSort()"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="mitarbeiter-verwendung-treecol-beginn" label="Beginn" flex="1" persist="hidden, width" hidden="false"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/verwendung/rdf#beginn_iso"  onclick="MitarbeiterTreeVerwendungSort()"/>
+					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#beginn_iso"  onclick="MitarbeiterTreeVerwendungSort()"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="mitarbeiter-verwendung-treecol-ende" label="Ende" flex="1" persist="hidden, width" hidden="false"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/verwendung/rdf#ende_iso"  onclick="MitarbeiterTreeVerwendungSort()"/>
+					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#ende_iso"  onclick="MitarbeiterTreeVerwendungSort()"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="mitarbeiter-verwendung-treecol-ba1code" label="ba1code" flex="1" persist="hidden, width" hidden="true"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/verwendung/rdf#ba1code"  onclick="MitarbeiterTreeVerwendungSort()"/>
+					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#ba1code"  onclick="MitarbeiterTreeVerwendungSort()"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="mitarbeiter-verwendung-treecol-ba2code" label="ba2code" flex="1" persist="hidden, width" hidden="true"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/verwendung/rdf#ba2code"  onclick="MitarbeiterTreeVerwendungSort()"/>
+					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#ba2code"  onclick="MitarbeiterTreeVerwendungSort()"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="mitarbeiter-verwendung-treecol-beschausmasscode" label="beschausmasscode" flex="1" persist="hidden, width" hidden="true"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/verwendung/rdf#beschausmasscode"  onclick="MitarbeiterTreeVerwendungSort()"/>
+					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#beschausmasscode"  onclick="MitarbeiterTreeVerwendungSort()"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="mitarbeiter-verwendung-treecol-verwendungcode" label="verwendungcode" flex="1" persist="hidden, width" hidden="true"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/verwendung/rdf#verwendungcode"  onclick="MitarbeiterTreeVerwendungSort()"/>
+					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#verwendungcode"  onclick="MitarbeiterTreeVerwendungSort()"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="mitarbeiter-verwendung-treecol-mitarbeiter_uid" label="mitarbeiter_uid" flex="1" persist="hidden, width" hidden="true"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/verwendung/rdf#mitarbeiter_uid"  onclick="MitarbeiterTreeVerwendungSort()"/>
+					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#mitarbeiter_uid"  onclick="MitarbeiterTreeVerwendungSort()"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="mitarbeiter-verwendung-treecol-hauptberufcode" label="hauptberufcode" flex="1" persist="hidden, width" hidden="true"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/verwendung/rdf#hauptberufcode"  onclick="MitarbeiterTreeVerwendungSort()"/>
+					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#hauptberufcode"  onclick="MitarbeiterTreeVerwendungSort()"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="mitarbeiter-verwendung-treecol-bisverwendung_id" label="bisverwendungID" flex="1" persist="hidden, width" hidden="true"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/verwendung/rdf#bisverwendung_id"  onclick="MitarbeiterTreeVerwendungSort()"/>
+					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#bisverwendung_id"  onclick="MitarbeiterTreeVerwendungSort()"/>
 				<splitter class="tree-splitter"/>
 			</treecols>
 	
@@ -104,22 +104,22 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<treechildren>
 						<treeitem uri="rdf:*">
 							<treerow>
-								<treecell label="rdf:http://www.technikum-wien.at/verwendung/rdf#ba1bez" />
-								<treecell label="rdf:http://www.technikum-wien.at/verwendung/rdf#ba2bez" />
-								<treecell label="rdf:http://www.technikum-wien.at/verwendung/rdf#ausmass" />
-								<treecell label="rdf:http://www.technikum-wien.at/verwendung/rdf#verwendung" />
-								<treecell label="rdf:http://www.technikum-wien.at/verwendung/rdf#hauptberuf" />
-								<treecell label="rdf:http://www.technikum-wien.at/verwendung/rdf#hauptberuflich" />   							
-								<treecell label="rdf:http://www.technikum-wien.at/verwendung/rdf#habilitation" />
-								<treecell label="rdf:http://www.technikum-wien.at/verwendung/rdf#beginn" />
-								<treecell label="rdf:http://www.technikum-wien.at/verwendung/rdf#ende" />
-								<treecell label="rdf:http://www.technikum-wien.at/verwendung/rdf#ba1code" />
-								<treecell label="rdf:http://www.technikum-wien.at/verwendung/rdf#ba2code" />
-								<treecell label="rdf:http://www.technikum-wien.at/verwendung/rdf#beschausmasscode" />
-								<treecell label="rdf:http://www.technikum-wien.at/verwendung/rdf#verwendungcode" />
-								<treecell label="rdf:http://www.technikum-wien.at/verwendung/rdf#mitarbeiter_uid" />
-								<treecell label="rdf:http://www.technikum-wien.at/verwendung/rdf#hauptberufcode" />
-								<treecell label="rdf:http://www.technikum-wien.at/verwendung/rdf#bisverwendung_id" />
+								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#ba1bez" />
+								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#ba2bez" />
+								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#ausmass" />
+								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#verwendung" />
+								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#hauptberuf" />
+								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#hauptberuflich" />   							
+								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#habilitation" />
+								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#beginn" />
+								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#ende" />
+								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#ba1code" />
+								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#ba2code" />
+								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#beschausmasscode" />
+								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#verwendungcode" />
+								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#mitarbeiter_uid" />
+								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#hauptberufcode" />
+								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#bisverwendung_id" />
 							</treerow>
 						</treeitem>
 					</treechildren>

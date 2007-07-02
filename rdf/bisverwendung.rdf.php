@@ -30,7 +30,7 @@ header("Content-type: application/xhtml+xml");
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
 require_once('../vilesci/config.inc.php');
-require_once('../include/verwendung.class.php');
+require_once('../include/bisverwendung.class.php');
 require_once('../include/datum.class.php');
 
 // Datenbank Verbindung
@@ -49,9 +49,9 @@ else
 
 $datum = new datum();
 
-$verwendung_obj = new verwendung($conn, null, true);
+$verwendung_obj = new bisverwendung($conn, null, true);
 
-$rdf_url='http://www.technikum-wien.at/verwendung';
+$rdf_url='http://www.technikum-wien.at/bisverwendung';
 
 echo '
 <RDF:RDF
