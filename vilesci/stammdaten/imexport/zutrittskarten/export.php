@@ -18,7 +18,8 @@ if (!$conn=pg_pconnect(CONN_STRING))
 	die(pg_last_error($conn));
 
 // Neue Zutrittskarten
-$sql_query='SELECT student_uid, matrikelnr, kurzbzlang AS stg_kurzbzlang,vw_betriebsmittelperson.*,
+$sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer,
+				max(tbl_benutzer.uid) AS uid, max(matrikelnr) AS matrikelnr, max(kurzbzlang) AS stg_kurzbzlang,
 				EXTRACT(DAY FROM vw_betriebsmittelperson.insertamum) AS tag,
 				EXTRACT(MONTH FROM vw_betriebsmittelperson.insertamum) AS monat,
 				EXTRACT(YEAR FROM vw_betriebsmittelperson.insertamum) AS jahr
@@ -26,7 +27,8 @@ $sql_query='SELECT student_uid, matrikelnr, kurzbzlang AS stg_kurzbzlang,vw_betr
 				LEFT OUTER JOIN (public.tbl_benutzer JOIN public.tbl_student ON (uid=student_uid)
 					JOIN public.tbl_studiengang USING (studiengang_kz))
 				USING (person_id)
-			WHERE betriebsmitteltyp='Zutrittskarte' AND nummer NOT IN (SELECT physaswnumber FROM sync.tbl_zutrittskarte);';
+			WHERE betriebsmitteltyp='Zutrittskarte' AND nummer NOT IN (SELECT physaswnumber FROM sync.tbl_zutrittskarte)
+			GROUP BY svnr,vorname,nachname,nummerintern,nummer, vw_betriebsmittelperson.insertamum;";
 //echo $sql_query;
 if(!$result_neu=pg_exec($conn, $sql_query))
 	die(pg_errormessage().'<BR>'.$sql_query);
@@ -79,11 +81,14 @@ $z=1; // Start bei Zeile 1
 while ($row=pg_fetch_object($result_neu))
 {
 	$command='a';
+	$gruppe=$row->stg_kurzbzlang;
+	if ($gruppe=='')
+		$gruppe='Verwaltung';
 	$worksheet->write($z,0, $command);
 	$worksheet->write($z,1, $row->nummerintern);
 	$worksheet->write($z,2, $row->nachname);
 	$worksheet->write($z,3, $row->vorname);
-	$worksheet->write($z,4, $row->matrikelnr);
+	$worksheet->write($z,4, $gruppe);
 	$worksheet->write($z,5, $row->nummerintern);
 	$worksheet->write($z,6, $row->nummer);
 	$worksheet->write($z,7, $row->tag.'.'.$row->monat.'.'.$row->jahr);
