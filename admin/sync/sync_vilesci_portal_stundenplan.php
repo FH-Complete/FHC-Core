@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -48,7 +48,7 @@ if(isset($_GET['dev']))
 	$dev=true;
 else
 	$dev=false;
-	
+
 if($dev)
 	$qry = "SELECT * FROM tbl_stundenplandev";
 else
@@ -60,24 +60,24 @@ if($result = pg_query($conn_vilesci, $qry))
 		$text.="\n Sync StundenplanDEV\n\n";
 	else
 		$text.="\n Sync Stundenplan\n\n";
-		
+
 	while($row = pg_fetch_object($result))
 	{
 		if($row->verband=='0')
 			$row->verband=' ';
 		if($row->gruppe=='0')
 			$row->gruppe=' ';
-		
-		//fix fuer fehlerhafte Lehrverbaende		
+
+		//fix fuer fehlerhafte Lehrverbaende
 		if(trim($row->semester)!='')
 		{
 			$verband=$row->verband;
 			if(trim($verband)!='')
 				$gruppe=$row->gruppe;
-			else 
+			else
 				$gruppe=' ';
 		}
-		else 
+		else
 		{
 			$verband=' ';
 			$gruppe=' ';
@@ -87,14 +87,14 @@ if($result = pg_query($conn_vilesci, $qry))
 		{
 			//Lehrverbandsgruppe
 			$lvb_obj = new lehrverband($conn);
-			
+
 			if(!$lvb_obj->exists($row->studiengang_kz, $row->semester, $verband, $gruppe))
-			{				
+			{
 				$lvb_obj->studiengang_kz = $row->studiengang_kz;
 				$lvb_obj->semester = $row->semester;
 				$lvb_obj->verband = $verband;
 				$lvb_obj->gruppe = $gruppe;
-				$lvb_obj->aktiv = false;				
+				$lvb_obj->aktiv = false;
 				if(!$lvb_obj->save())
 				{
 					$error_log .= $lvb_obj->errormsg."\n";
@@ -106,7 +106,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		{
 			//Spezialgruppe
 			$grp_obj = new gruppe($conn);
-			
+
 			if(!$grp_obj->exists(strtoupper($row->einheit_kurzbz)))
 			{
 				$grp_obj->gruppe_kurzbz = strtoupper($row->einheit_kurzbz);
@@ -116,11 +116,11 @@ if($result = pg_query($conn_vilesci, $qry))
 				$grp_obj->sichtbar = false;
 				$grp_obj->aktiv = false;
 				$grp_obj->new = true;
-				
+
 				//Bei Spezialgruppen keinen Verband/Gruppe angeben
 				$verband=' ';
 				$gruppe=' ';
-				
+
 				if(!$grp_obj->save())
 				{
 					$error_log.=$grp_obj->errormsg;
@@ -128,7 +128,7 @@ if($result = pg_query($conn_vilesci, $qry))
 				}
 			}
 		}
-		
+
 		//Lehreinheit_id ermitteln
 		if($row->lehrveranstaltung_id!='')
 		{
@@ -137,28 +137,28 @@ if($result = pg_query($conn_vilesci, $qry))
 			{
 				$lehreinheit_id = $row_le->lehreinheit_id_portal;
 			}
-			else 
-			{			
+			else
+			{
 				$lehreinheit_id='';
 			}
 		}
-		else 
+		else
 			$lehreinheit_id='';
-			
+
 		if($dev)
 			$qry = "INSERT INTO lehre.tbl_stundenplandev(stundenplandev_id,";
 		else
 			$qry = 'INSERT INTO lehre.tbl_stundenplan(stundenplan_id,';
-			
-		$qry.='unr, mitarbeiter_uid, datum, stunde, ort_kurzbz, gruppe_kurzbz, titel, 
-		       anmerkung, fix, updateamum, updatevon, lehreinheit_id, 
+
+		$qry.='unr, mitarbeiter_uid, datum, stunde, ort_kurzbz, gruppe_kurzbz, titel,
+		       anmerkung, fix, updateamum, updatevon, lehreinheit_id,
 		       studiengang_kz, semester, verband, gruppe) VALUES(';
-		
+
 		if($dev)
 			$qry.="'".$row->stundenplandev_id."'";
-		else 
-			$qry.="'".$row->stundenplan_id."'";		
-							
+		else
+			$qry.="'".$row->stundenplan_id."'";
+
 		$qry.=",".myaddslashes($row->unr).",".
 					myaddslashes($row->uid).",".
 					myaddslashes($row->datum).",".
@@ -180,7 +180,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		{
 			$anzahl_eingefuegt++;
 		}
-		else 
+		else
 		{
 			$anzahl_fehler++;
 			$error_log.= 'Fehler beim Einfuegen: '.$qry;
@@ -190,7 +190,7 @@ if($result = pg_query($conn_vilesci, $qry))
 else
 	$error_log .= "Stundenplan konnten nicht geladen werden\n";
 
-$text.="Anzahl Datensaetze Vilesci: ".pg_num_rows($result)."\n";	
+$text.="Anzahl Datensaetze Vilesci: ".pg_num_rows($result)."\n";
 $text.="Anzahl aktualisierte Datensaetze: $anzahl_eingefuegt\n";
 $text.="Anzahl der Fehler: $anzahl_fehler\n";
 ?>

@@ -15,14 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 /**
  * Synchronisiert die Lehreinheit von Vilesci DB in PORTAL DB
  * Ablauf:
- 
+
  LEHREINHEIT IST BEREITS EINGEFUEGT (IN SYNCTAB)?
  	JA
  		//update ist nicht implementiert
@@ -69,25 +69,25 @@ function lektorzuweisen($lehreinheit_id, $uid, $semesterstunden, $fas_id)
 		$lektor->faktor = 1;
 		$lektor->anmerkung = '';
 		$lektor->ext_id = $fas_id;
-			
+
 		if($lektor->save(true))
 		{
 			return true;
 		}
-		else 
+		else
 		{
 			$error_log.=$lektor->errormsg;
 			return false;
 		}
 	}
-	else 
+	else
 		return true;
 }
 
 function gruppezuweisen($id,$studiengang_kz, $semester, $verband, $gruppe, $einheit_kurzbz, $fas_id)
 {
 	global $error_log,$conn;
-	
+
 	if($einheit_kurzbz=='')
 	{
 		$lehrverband  = new lehrverband($conn);
@@ -99,16 +99,16 @@ function gruppezuweisen($id,$studiengang_kz, $semester, $verband, $gruppe, $einh
 			$lehrverband->gruppe=$gruppe;
 			if($lehrverband->save())
 				$error=false;
-			else 
+			else
 			{
 				$error_log .=$lehrverband->errormsg."\n";
 				$error=true;
 			}
 		}
-		else 
+		else
 			$error=false;
 	}
-	else 
+	else
 	{
 		$gruppe2 = new gruppe($conn);
 		if(!$gruppe2->exists(strtoupper($einheit_kurzbz)))
@@ -123,7 +123,7 @@ function gruppezuweisen($id,$studiengang_kz, $semester, $verband, $gruppe, $einh
 			$gruppe2->mailgrp=false;
 			if($gruppe2->save(true))
 				$error=false;
-			else 
+			else
 			{
 				$error_log.=$gruppe2->errormsg."\n";
 				$error=true;
@@ -132,7 +132,7 @@ function gruppezuweisen($id,$studiengang_kz, $semester, $verband, $gruppe, $einh
 		else
 			$error=false;
 	}
-	
+
 	if(!$error)
 	{
 		//Gruppe Zuweisen
@@ -149,16 +149,16 @@ function gruppezuweisen($id,$studiengang_kz, $semester, $verband, $gruppe, $einh
 			$gruppe1->ext_id=$fas_id;
 			if($gruppe1->save(true))
 				return true;
-			else 
+			else
 			{
 				$error_log .= $gruppe1->errormsg."\n";
 				return false;
 			}
 		}
-		else 
+		else
 			return true;
 	}
-	else 
+	else
 		return false;
 }
 // ***********************************
@@ -171,7 +171,7 @@ $qry = 'SELECT * FROM tbl_lehrveranstaltung';
 if($result = pg_query($conn_vilesci, $qry))
 {
 	$text.="\n Sync Lehreinheiten\n\n";
-	
+
 	//Schauen ob Sync table vorhanden ist
 	$qry = "SELECT 1 FROM public.tbl_synclehreinheit;";
 	if(!@pg_query($conn,$qry))
@@ -186,7 +186,7 @@ if($result = pg_query($conn_vilesci, $qry))
 		          lehreinheit_id_portal integer,
 		          PRIMARY KEY(lehrveranstaltung_id_vilesci, lehreinheit_id_portal)
 		        );";
-		
+
 		if(!pg_query($conn,$qry))
 		{
 			$error=true;
@@ -194,7 +194,7 @@ if($result = pg_query($conn_vilesci, $qry))
 			$anzahl_fehler++;
 		}
 	}
-	
+
 	if(!$error)
 	{
 		while($row = pg_fetch_object($result))
@@ -203,7 +203,7 @@ if($result = pg_query($conn_vilesci, $qry))
 			$lehreinheit = new lehreinheit($conn);
 			//Nachschauen ob diese Lehreinheit bereits synchronisiert wurde
 			$qry = "SELECT lehreinheit_id_portal FROM public.tbl_synclehreinheit WHERE lehrveranstaltung_id_vilesci='".addslashes($row->lehrveranstaltung_id)."'";
-			
+
 			if($result1=pg_query($conn, $qry))
 			{
 				if(pg_num_rows($result1)>0) //Lehreinheit ist bereits vorhanden
@@ -212,14 +212,14 @@ if($result = pg_query($conn_vilesci, $qry))
 					//WORKING
 				}
 				else //Lehreinheit neu anlegen
-				{					
+				{
 					$lehreinheit->ext_id = $row->lehrveranstaltung_id;
 					//Lehrveranstaltungsnummer aus LF ermitteln
 					$qry = "SELECT lehrveranstaltung_id FROM lehre.tbl_lehrveranstaltung WHERE ext_id='".addslashes($row->lehrfach_nr)."'";
 					if($row1 = pg_fetch_object(pg_query($conn, $qry)))
 					{
 						//Wenn alles gleich ist ausser die Gruppe dann wird nur die gruppe bzw Lektor zur LE hinzugefuegt
-						$qry = "SELECT * FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter using(lehreinheit_id) WHERE 
+						$qry = "SELECT * FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter using(lehreinheit_id) WHERE
 						          lehrveranstaltung_id='$row1->lehrveranstaltung_id' AND
 						          studiensemester_kurzbz='$row->studiensemester_kurzbz' AND
 						          lehrfach_id='$row->lehrfach_nr' AND
@@ -237,48 +237,48 @@ if($result = pg_query($conn_vilesci, $qry))
 							{
 								//Lehreinheit vorhanden. Es muss nur noch Gruppe bzw Lektor eingetragen werden
 								if($row_val = pg_fetch_object($result2))
-								{	
+								{
 									pg_query($conn, 'BEGIN');
 									if(lektorzuweisen($row_val->lehreinheit_id, $row->lektor, $row->semesterstunden, $row->fas_id))
 									{
 										if(gruppezuweisen($row_val->lehreinheit_id, $row->studiengang_kz, $row->semester,$row->verband, $row->gruppe, $row->einheit_kurzbz, $row->fas_id))
 										{
-											$qry = "INSERT INTO public.tbl_synclehreinheit(lehrveranstaltung_id_vilesci, lehreinheit_id_portal) 
+											$qry = "INSERT INTO public.tbl_synclehreinheit(lehrveranstaltung_id_vilesci, lehreinheit_id_portal)
 											        VALUES('".$row->lehrveranstaltung_id."','".$row_val->lehreinheit_id."');";
-											
+
 											if(pg_query($conn,$qry))
 											{
 												$anzahl_eingefuegt++;
 												pg_query($conn,'COMMIT');
 											}
-											else 
+											else
 											{
 												$error_log.="Fehler beim Schreiben des Logs\n";
 												$anzahl_fehler++;
 												pg_query($conn, 'ROLLBACK');
 											}
 										}
-										else 
+										else
 										{
-											$error_log.="Fehler beim zuteilen der Gruppe: $row->lehrveranstaltung_id\n";	
+											$error_log.="Fehler beim zuteilen der Gruppe: $row->lehrveranstaltung_id\n";
 											$anzahl_fehler++;
 											pg_query($conn, 'ROLLBACK');
 										}
 									}
-									else 
+									else
 									{
 										$error_log.="Fehler beim zuteilen des Lektors: $row->lehrveranstaltung_id\n";
 										$anzahl_fehler++;
 										pg_query($conn, 'ROLLBACK');
 									}
 								}
-								else 
+								else
 								{
 									$error_log .= 'Fehler beim Select: '.$qry."\n";
 									$anzahl_fehler++;
 								}
 							}
-							else 
+							else
 							{
 								//Neue Lehreinheit anlegen
 								$lehreinheit->lehrveranstaltung_id = $row1->lehrveranstaltung_id;
@@ -300,14 +300,14 @@ if($result = pg_query($conn_vilesci, $qry))
 								$lehreinheit->insertamum = '';
 								$lehreinheit->insertvon = '';
 								$lehreinheit->ext_id = '';
-								
+
 								//Datensatz Speichern
 								pg_query($conn,'BEGIN');
-								
+
 								if(!$lehreinheit->save(true))
 								{
 									$error_log .= $lehreinheit->errormsg."\n";
-									$anzahl_fehler++;									
+									$anzahl_fehler++;
 								}
 								else
 								{
@@ -316,7 +316,7 @@ if($result = pg_query($conn_vilesci, $qry))
 									if($row_val = pg_fetch_object(pg_query($conn, $qry)))
 									{
 										//Beide IDS in die SyncTab einfuegen
-										$qry = "INSERT INTO public.tbl_synclehreinheit(lehrveranstaltung_id_vilesci, lehreinheit_id_portal) 
+										$qry = "INSERT INTO public.tbl_synclehreinheit(lehrveranstaltung_id_vilesci, lehreinheit_id_portal)
 										        VALUES('".$row->lehrveranstaltung_id."','".$row_val->id."');";
 										if(pg_query($conn,$qry))
 										{
@@ -327,18 +327,18 @@ if($result = pg_query($conn_vilesci, $qry))
 													pg_query($conn,'COMMIT');
 													$anzahl_eingefuegt++;
 												}
-												else 
+												else
 												{
-													pg_query($conn,'ROLLBACK');													
+													pg_query($conn,'ROLLBACK');
 													$anzahl_fehler++;
 												}
 											}
-											else 
+											else
 											{
 												$anzahl_fehler++;
 												pg_query($conn,'ROLLBACK');
-												
-											}											
+
+											}
 										}
 										else
 										{
@@ -347,7 +347,7 @@ if($result = pg_query($conn_vilesci, $qry))
 											$error_log .='Fehler beim Insert in die SyncTab '.$qry."\n";
 										}
 									}
-									else 
+									else
 									{
 										pg_query($conn,'ROLLBACK');
 										$anzahl_fehler++;

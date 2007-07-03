@@ -1,7 +1,7 @@
 <?php
 /* Copyright (C) 2007 Technikum-Wien
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -43,7 +43,7 @@ if($result = pg_query($conn_fas, $qry))
 	$anzahl_quelle=pg_num_rows($result);
 	while($row = pg_fetch_object($result))
 	{
-		
+
 		$error=false;
 		$studiengang = new studiengang($conn);
 		$studiengang->studiengang_kz		=$row->kennzahl;
@@ -64,9 +64,9 @@ if($result = pg_query($conn_fas, $qry))
 		$studiengang->bescheidgz			=$row->bescheidgz;
 		$studiengang->bescheidvom		=$row->bescheidvom;
 		$studiengang->organisationsform		='';
-		$studiengang->titelbescheidvom		=$row->titelbescheidvom;			
+		$studiengang->titelbescheidvom		=$row->titelbescheidvom;
 		$studiengang->ext_id			=$row->studiengang_pk;
-		
+
 		If($row->organisationsform=='1')
 		{
 			$studiengang->organisationsform='n'; //normal
@@ -91,10 +91,10 @@ if($result = pg_query($conn_fas, $qry))
 		{
 			$studiengang->typ='d';
 		}
-		
+
 		$qry = "SELECT * FROM tbl_studiengang WHERE studiengang_kz='$row->kennzahl'";
 		if($result1 = pg_query($conn, $qry))
-		{		
+		{
 			if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist
 			{
 				if($row1=pg_fetch_object($result1))
@@ -110,35 +110,35 @@ if($result = pg_query($conn_fas, $qry))
 					$studiengang->typ				=$row1->typ;
 					$studiengang->new=false;
 				}
-				else 
+				else
 				{
 					$error_log.="studiengang_kz von $row->studiengang_kz konnte nicht ermittelt werden\n";
 					$error=true;
 				}
 			}
-			else 
+			else
 			{
 				//Studiengang neu anlegen
 				$studiengang->new=true;
 			}
-			
+
 			if(!$error)
 				if(!$studiengang->save())
 				{
 					$error_log.=$studiengang->errormsg."\n";
 					$anzahl_fehler++;
 				}
-				else 
+				else
 					$anzahl_eingefuegt++;
-			else 
+			else
 				$anzahl_fehler++;
-		}	
+		}
 	}
 	echo nl2br("abgeschlossen\n\n");
 }
 else
 	$error_log .= 'Studiengangsdatensaetze konnten nicht geladen werden';
-	
+
 ?>
 
 <html>

@@ -2,7 +2,7 @@
 /* Copyright (C) 2007 Technikum-Wien
  *
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -69,7 +69,7 @@ if($result = pg_query($conn_fas, $qry))
 		//$reihungstest->insertamum	=$row->;
 		$reihungstest->insertvon		="SYNC";
 		$reihungstest->ext_id		=$row->reihungstest_pk;
-	
+
 		$update=false;
 		$ausgabe_test='';
 		//echo nl2br ($reihungstest->ext_id."\n");
@@ -80,9 +80,9 @@ if($result = pg_query($conn_fas, $qry))
 			if(pg_num_rows($result2)>0) //eintrag gefunden
 			{
 				if($row2=pg_fetch_object($result2))
-				{ 
+				{
 					// update adresse, wenn datensatz bereits vorhanden
-					
+
 					if($row2->anmerkung!=$row->raum)
 					{
 						$update=true;
@@ -119,15 +119,15 @@ if($result = pg_query($conn_fas, $qry))
 							$ausgabe_test="Uhrzeit: '".$row->uhrzeit."'";
 						}
 					}
-					
+
 					$reihungstest->new=false;
 					$reihungstest->reihungstest_id=$row2->reihungstest_id;
 				}
 			}
-			else 
+			else
 			{
 				// insert, wenn datensatz noch nicht vorhanden
-				$reihungstest->new=true;	
+				$reihungstest->new=true;
 			}
 		}
 		if(!$error)
@@ -140,14 +140,14 @@ if($result = pg_query($conn_fas, $qry))
 					$anzahl_fehler++;
 					$ausgabe_test='';
 				}
-				else 
+				else
 				{
 					if($reihungstest->new)
 					{
 						$ausgabe.="Reihungstest '$row->raum', '$row->datum' eingefügt!\n";
 						$anzahl_eingefuegt++;
 					}
-					else 
+					else
 					{
 						if($update)
 						{
@@ -161,8 +161,8 @@ if($result = pg_query($conn_fas, $qry))
 				}
 			}
 		}
-		//flush();	
-	}	
+		//flush();
+	}
 }
 
 

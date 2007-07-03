@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -63,19 +63,19 @@ if($result = pg_query($conn_vilesci, $qry))
 			{
 				if($row_fb=pg_fetch_object($result_fb))
 					$fachbereich = $row_fb->fachbereich_kurzbz;
-				else 
+				else
 				{
 					$anzahl_fehler++;
 					$error_log = "Fachbereich wurde nicht gefunden: $row->fachbereich_id";
 				}
 			}
 			else
-			{	
+			{
 				$anzahl_fehler++;
 				$error_log = "Fachbereich wurde nicht gefunden: $row->fachbereich_id";
 			}
 		}
-		else 
+		else
 			$fachbereich='';
 		if(isset($fachbereich))
 		{
@@ -87,10 +87,10 @@ if($result = pg_query($conn_vilesci, $qry))
 			//$benutzerfunktion->insertvon			='SYNC';
 			//$benutzerfunktion->updateamum			='';
 			//$benutzerfunktion->updatevon			=$row->updatevon;
-			
+
 			$qry = "SELECT benutzerfunktion_id FROM tbl_benutzerfunktion WHERE benutzerfunktion_id='$row->personfunktion_id'";
 			if($result1 = pg_query($conn, $qry))
-			{		
+			{
 				if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist
 				{
 					if($row1=pg_fetch_object($result1))
@@ -99,27 +99,27 @@ if($result = pg_query($conn_vilesci, $qry))
 						$benutzerfunktion->new=false;
 						$benutzerfunktion->benutzerfunktion_id=$row->personfunktion_id;
 					}
-					else 
+					else
 					{
 						$error_log.="benutzerfunktion_id von $row->personfunktion_id konnte nicht ermittelt werden\n";
 						$error=true;
 					}
 				}
-				else 
+				else
 				{
 					//Benutzerfunktion neu anlegen
 					$benutzerfunktion->new=true;
 				}
-				
+
 				if(!$error)
 					if(!$benutzerfunktion->save())
 					{
 						$error_log.=$benutzerfunktion->errormsg."\n";
 						$anzahl_fehler++;
 					}
-					else 
+					else
 						$anzahl_eingefuegt++;
-				else 
+				else
 					$anzahl_fehler++;
 			}
 		}
@@ -128,7 +128,7 @@ if($result = pg_query($conn_vilesci, $qry))
 }
 else
 	$error_log .= 'Funktiondatensaetze konnten nicht geladen werden';
-	
+
 ?>
 
 <html>

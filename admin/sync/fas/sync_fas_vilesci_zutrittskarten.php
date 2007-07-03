@@ -1,7 +1,7 @@
 <?php
 /* Copyright (C) 2007 Technikum-Wien
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -4131,22 +4131,22 @@ for($x=3346;$x<4083;$x++)
 			$ausgabe1.="\n*Betriebsmittel eingefügt: ".$qry[$x];
 			$ausgabe2.="\n*Betriebsmittelperson eingefügt: ".$qry2[$x];
 			echo nl2br("\n*Betriebsmittel eingefügt: ".$qry[$x]."\n*Betriebsmittelperson eingefügt: ".$qry2[$x]."\n");
-			pg_query($conn, "COMMIT");				
+			pg_query($conn, "COMMIT");
 		}
-		else 
+		else
 		{
 			$error_log2.="\n###Fehler bei: ".$qry2[$x]."\n".pg_errormessage($conn)."\n";
 			echo nl2br("\n###Fehler bei: ".$qry2[$x]."\n".pg_errormessage($conn)."\n");
 			pg_query($conn, "ROLLBACK");
-		}	
+		}
 	}
-	else 
+	else
 	{
 		$error_log1.="\n###Fehler bei: ".$qry[$x]."\n".pg_errormessage($conn)."\n";
 		echo nl2br("\n###Fehler bei: ".$qry[$x]."\n".pg_errormessage($conn)."\n");
 		pg_query($conn, "ROLLBACK");
 	}
-	
+
 	//echo "- ";
 	//ob_flush();
 	//flush();

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -71,10 +71,10 @@ if($result = pg_query($conn_vilesci, $qry))
 		$news->datum = $row->updateamum;
 		$news->updateamum	=$row->updateamum;
 		$news->updatevon		=$row->uid;
-		
+
 		$qry = "SELECT news_id FROM campus.tbl_news WHERE news_id='$row->news_id'";
 			if($result1 = pg_query($conn, $qry))
-			{		
+			{
 				if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist
 				{
 					if($row1=pg_fetch_object($result1))
@@ -83,18 +83,18 @@ if($result = pg_query($conn_vilesci, $qry))
 						$news->new=false;
 						$news->news_id=$row->news_id;
 					}
-					else 
+					else
 					{
 						$error_log.="news_id von $row->news_id konnte nicht ermittelt werden\n";
 						$error=true;
 					}
 				}
-				else 
+				else
 				{
 					//News neu anlegen
 					$news->new=true;
 				}
-				
+
 				if(!$error)
 				{
 					$qryuid = "SELECT uid FROM tbl_benutzer WHERE uid = '$row->uid'";
@@ -107,30 +107,30 @@ if($result = pg_query($conn_vilesci, $qry))
 								$error_log.=$news->errormsg."\n";
 								$anzahl_fehler++;
 							}
-							else 
+							else
 								$anzahl_eingefuegt++;
 							}
-						else 
+						else
 						{
 							$error_log.="uid von <b>$row->uid</b> konnte nicht in tbl_benutzer gefunden werden\n";
 							$anzahl_fehler++;
 						}
 					}
-					else 
+					else
 					{
 						$error_log.="Fehler beim Zugriff auf tbl_benuntzer\n";
-						$anzahl_fehler++;	
+						$anzahl_fehler++;
 					}
 				}
-				else 
+				else
 					$anzahl_fehler++;
-			}	
+			}
 	}
 	echo nl2br("abgeschlossen\n\n");
 }
 else
 	$error_log .= 'Newsdatensaetze konnten nicht geladen werden';
-	
+
 ?>
 
 <html>

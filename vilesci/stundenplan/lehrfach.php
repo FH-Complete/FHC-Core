@@ -47,7 +47,7 @@ if (isset($_POST['neu']))
 	$lf->updatevon = $user;
 	$lf->insertamum = date('Y-m-d H:i:s');
 	$lf->insertvon = $user;
-	
+
 	if(!$lf->save())
 	{
 		echo "<br>$lf->errormsg<br>";
@@ -55,7 +55,7 @@ if (isset($_POST['neu']))
 }
 
 if (isset($_POST['type']) && $_POST['type']=='editsave')
-{	
+{
 	$lf = new lehrfach($conn);
 	$lf->new=false;
 	$lf->lehrfach_id = $_POST['lehrfach_id'];
@@ -68,8 +68,8 @@ if (isset($_POST['type']) && $_POST['type']=='editsave')
 	$lf->semester = $semester;
 	$lf->sprache = $_POST['sprache'];
 	$lf->updateamum = date('Y-m-d H:i:s');
-	$lf->updatevon = $user;	
-	
+	$lf->updatevon = $user;
+
 	if(!$lf->save())
 	{
 		echo "<br>$lf->errormsg<br>";
@@ -84,11 +84,11 @@ if(isset($_POST['type']) && $_POST['type']=='lehre' && isset($_GET['lehrfach_id'
        $result=pg_query($conn, $sql_qry);
 		if(!$result)
 			echo pg_errormessage()."<br>";
-	   
+
 	}
-	else 
+	else
 	   echo "Lehrfachnummer wurde nicht übergeben, Bitte nochmals versuchen";
-	
+
 }*/
 
 /*if ($type=="delete")
@@ -110,7 +110,7 @@ if(isset($_POST['type']) && $_POST['type']=='lehre' && isset($_GET['lehrfach_id'
 $sql_query="SELECT tbl_lehrfach.lehrfach_id AS Nummer, tbl_lehrfach.kurzbz AS Fach, tbl_lehrfach.bezeichnung AS Bezeichnung,
 	tbl_lehrfach.farbe AS Farbe, fachbereich_kurzbz as fachbereich,
 	tbl_lehrfach.aktiv, tbl_lehrfach.sprache AS Sprache
-	FROM lehre.tbl_lehrfach 
+	FROM lehre.tbl_lehrfach
 	WHERE tbl_lehrfach.studiengang_kz='$stg_kz' AND semester='$semester' ORDER BY tbl_lehrfach.kurzbz";
 //echo $sql_query;
 $result_lehrfach=pg_query($conn, $sql_query);
@@ -119,13 +119,13 @@ $outp='';
 $s=array();
 foreach ($studiengang as $stg)
 {
-	$outp.= '<A href="lehrfach.php?stg_kz='.$stg->studiengang_kz.'&semester='.$semester.'">'.$stg->kurzbzlang.'</A> - ';	
+	$outp.= '<A href="lehrfach.php?stg_kz='.$stg->studiengang_kz.'&semester='.$semester.'">'.$stg->kurzbzlang.'</A> - ';
 	$s[$stg->studiengang_kz]->max_sem=$stg->max_semester;
 	$s[$stg->studiengang_kz]->kurzbz=$stg->kurzbzlang;
 }
 $outp.= '<BR> -- ';
 for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
-	$outp.= '<A href="lehrfach.php?stg_kz='.$stg_kz.'&semester='.$i.'">'.$i.'</A> -- ';	
+	$outp.= '<A href="lehrfach.php?stg_kz='.$stg_kz.'&semester='.$i.'">'.$i.'</A> -- ';
 ?>
 
 <html>
@@ -138,7 +138,7 @@ for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
 <H1>Lehrfach Verwaltung (<?php echo $s[$stg_kz]->kurzbz.' - '.$semester; ?>)</H1>
 
 <?php
-echo $outp;	
+echo $outp;
 if (isset($_GET['type']) && $_GET['type']=='edit')
 {
 	$lf=new lehrfach($conn);
@@ -174,15 +174,15 @@ if (isset($_GET['type']) && $_GET['type']=='edit')
 	{
 		die( "Fehler bei der DB-Connection");
 	}
-	
-	while($row1=pg_fetch_object($result1))	
+
+	while($row1=pg_fetch_object($result1))
 	{
 	   if($row1->sprache==$lf->sprache)
 	      echo "<option value='$row1->sprache' selected>$row1->sprache</option>";
-	   else 
+	   else
 	      echo "<option value='$row1->sprache'>$row1->sprache</option>";
 	}
-	
+
 	echo '</select></td></tr>';
 	echo '</table>';
 	echo '<input type="hidden" name="type" value="editsave">';
@@ -191,7 +191,7 @@ if (isset($_GET['type']) && $_GET['type']=='edit')
 	echo '<input type="hidden" name="semester" value="'.$semester.'">';
 	echo '<input type="submit" name="save" value="Speichern">';
 	echo '</p><hr></form>';
-} 
+}
 else
 {
 ?>
@@ -223,14 +223,14 @@ else
 	$qry1="SELECT * FROM public.tbl_sprache";
 	if(!$result1=pg_query($conn,$qry1))
 		die( 'Fehler bei der DB-Connection');
-	
-	while($row1=pg_fetch_object($result1))	
+
+	while($row1=pg_fetch_object($result1))
 	   echo "<option value='$row1->sprache'>$row1->sprache</option>";
-	
+
 	echo '</select></td></tr>	</table>';
 		echo '<input type="hidden" name="stg_kz" value="'.$stg_kz.'">';
 	echo '<input type="hidden" name="semester" value="'.$semester.'">';
-	
+
 ?>
 
     <input type="hidden" name="type" value="save">
@@ -254,10 +254,10 @@ if ($result_lehrfach!=0)
 	   echo "<tr class='liste".($i%2)."'>";
 	   echo "<td>$row->nummer</td><td>$row->fach</td><td>$row->bezeichnung</td><td>$row->farbe</td><td>".($row->aktiv=='t'?'Ja':'Nein')."</td><td>$row->fachbereich</td><td>$row->sprache</td>";
 	   //echo "<td><input type='checkbox' onClick='javascript:window.document.location=\"$PHP_SELF?type=lehre&stg_kz=$stg_kz&semester=$semester&lehrfach_nr=$row->nummer\"' ".($row->lehre=='t'?'checked':'')."></td>";
-	   echo "<td><a href=\"lehrfach.php?lehrfach_nr=$row->nummer&type=edit&stg_kz=$stg_kz&semester=$semester\">Edit</a></td>";	
+	   echo "<td><a href=\"lehrfach.php?lehrfach_nr=$row->nummer&type=edit&stg_kz=$stg_kz&semester=$semester\">Edit</a></td>";
 	   echo "</tr>\n";
 	}
-	
+
 	/*
 	$num_fields=pg_numfields($result_lehrfach);
 	$foo = 0;

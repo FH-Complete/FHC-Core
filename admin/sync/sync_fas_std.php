@@ -1,13 +1,13 @@
 <?php
 	require_once('../../vilesci/config.inc.php');
 	$adress='fas_sync@technikum-wien.at';
-	
+
 	function clean_string($string)
  	{
-	 	$trans = array("ä" => "ae", 				   
+	 	$trans = array("ä" => "ae",
 	 				   "ö" => "oe",
 	 				   "ü" => "ue",
-	 				   "Ä" => "ae", 				   
+	 				   "Ä" => "ae",
 	 				   "Ö" => "oe",
 	 				   "Ü" => "ue",
 	 				   "á" => "a",
@@ -60,7 +60,7 @@
 	$anz_insert=0;
 	for ($i=0;$row=pg_fetch_object($result);$i++)
 	{
-		
+
 		$row->gebort=substr($row->gebort,0,30);
 		$row->titel=substr($row->titel,0,15);
 		$uid=str_replace(' ','',$row->uid);
@@ -73,8 +73,8 @@
 			$sql_query="SELECT tbl_person.person_id, uid,titelpre,vorname,nachname,gebdatum,gebort,";
 			$sql_query.="trim(both ' ' from matrikelnr) AS matrikelnr,";
 			$sql_query.=" studiengang_kz,semester,verband,gruppe";
-			$sql_query.=" FROM public.tbl_person, public.tbl_benutzer, public.tbl_student WHERE 
-						  tbl_person.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid=tbl_student.student_uid 
+			$sql_query.=" FROM public.tbl_person, public.tbl_benutzer, public.tbl_student WHERE
+						  tbl_person.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid=tbl_student.student_uid
 			              AND tbl_benutzer.uid='$uid'";
 			// echo $sql_query;
 			$res_std=pg_query($conn, $sql_query);
@@ -83,11 +83,11 @@
 			// neue Studenten
 			if ($num_rows_std==0)
 			{
-				
+
 				$text.="Der Student $row->vornamen $row->nachname ($row->uid) wird neu angelegt.\n";
-				
+
 				pg_query($conn, "BEGIN");
-				
+
 				// person
 				if(!$len=strpos($row->vornamen,' '))
 				{
@@ -95,11 +95,11 @@
 					$vornamen='';
 				}
 				else
-				{				
+				{
 					$vorname=substr($row->vornamen,0,$len);
 					$vornamen=substr($row->vornamen,$len+1,strlen($row->vornamen));
 				}
-				
+
 				// tbl_person
 				$qry_sync = "SELECT * FROM sync.tbl_syncperson WHERE person_fas='$row->person_pk'";
 				if($result_sync = pg_query($conn, $qry_sync))
@@ -110,14 +110,14 @@
 						$row_sync = pg_fetch_object($result_sync);
 						$person_id=$row_sync->person_portal;
 					}
-					else 
+					else
 					{
 						//PesonenDatensatz noch nicht vorhanden
 						$sql_query="INSERT INTO public.tbl_person(titelpre,vorname,vornamen, nachname, gebdatum, gebort, aktiv) ".
 								 "VALUES('$row->titel','$vorname','$vornamen','$row->nachname','$row->gebdatum','$row->gebort', true)";
 						//echo $sql_query.'<BR>';
 						flush();
-				
+
 						if(!$res_insert=pg_query($conn, $sql_query))
 						{
 							$text.=$sql_query;
@@ -125,24 +125,24 @@
 							$insert_error++;
 							pg_query($conn, 'ROLLBACK');
 						}
-						else 
+						else
 						{
 							$qry = "SELECT currval('tbl_person_person_id_seq') AS id;";
-							
+
 							if(!$row_seq=pg_fetch_object(pg_query($conn,$qry)))
 							{
 								pg_query($conn, 'ROLLBACK');
 								$text = 'Sequence konnte nicht ausgelesen werden\n';
 								$insert_error++;
 							}
-							else 
+							else
 							{
 								pg_query($conn, "INSERT INTO sync.tbl_syncperson(person_fas, person_portal) VALUES($row->person_pk, $row_seq->id);");
 								$person_id = $row_seq->id;
 							}
 						}
 					}
-						
+
 					if(isset($person_id) && $person_id!='')
 					{
 						//Schauen ob Benutzerdatensatz mit dieser UID schon vorhanden ist
@@ -151,25 +151,25 @@
 						{
 							$benutzer_insert_error=false;
 							if(pg_num_rows($result_bn)==0)
-							{	
+							{
 								//Benutzer Datensatz anlegen
 								$qry = "INSERT INTO public.tbl_benutzer(uid, person_id, aktiv, insertamum, insertvon, updateamum, updatevon)
 							    	    VALUES('$row->uid','$person_id','true',now(),'auto',now(),'auto');";
-		
+
 								if(!pg_query($conn, $qry))
-								{							
+								{
 									$test.=$qry;
 									$text.="\nFehler: ".pg_errormessage($conn)."\n";
 									pg_query($conn, 'ROLLBACK');
 									$insert_error++;
 									$benutzer_insert_error=true;
 								}
-								else 
-								{								
+								else
+								{
 									//Alias erstellen
 									$vn = split('[- .,]',strtolower($row->vornamen));
 									$vn = clean_string($vn[0]);
-					
+
 									$nn = split('[- .,]',strtolower($row->nachname));
 									$nn = clean_string($nn[0]);
 									$alias = $vn.".".$nn;
@@ -184,16 +184,16 @@
 											$text.="\nFehler: ".pg_errormessage($conn);
 										}
 									}
-									else 
+									else
 									{
 										$text.="UPDATE public.tbl_benutzer set alias='$alias' WHERE uid='$uid'";
 										$text.="\nAlias existiert bereits: $alias\n";
 									}
 								}
 							}
-													
+
 							if(!$benutzer_insert_error)
-							{								
+							{
 								//Lehrverband Check
 								$sql_query = "SELECT * FROM public.tbl_lehrverband WHERE studiengang_kz='$row->kennzahl' AND semester='$row->semester' AND
 											verband='$row->verband' AND gruppe='$row->gruppe'";
@@ -211,7 +211,7 @@
 										}
 									}
 								}
-								else 
+								else
 								{
 									$text.= $sql_query;
 									$text.= "\nFehler:".pg_errormessage($conn)."\n";
@@ -234,7 +234,7 @@
 								}
 							}
 						}
-						else 
+						else
 						{
 							$text.="\nFehler:".pg_errormessage($conn);
 							pg_query($conn, 'ROLLBACK');
@@ -254,7 +254,7 @@
 					$vornamen='';
 				}
 				else
-				{				
+				{
 					$vorname=substr($row->vornamen,0,$len);
 					$vornamen=substr($row->vornamen,$len+1,strlen($row->vornamen));
 				}
@@ -283,7 +283,7 @@
 				if ($update)
 				{
 					$text.="Der Student $row->vornamen $row->nachname ($row->uid) [$update] wird upgedatet.\n";
-					
+
 					// person
 					$sql_query="UPDATE public.tbl_person SET titelpre='$row->titel', vornamen='$vornamen', vorname='$vorname', ".
 							   " nachname='$row->nachname', gebdatum='$row->gebdatum', gebort='$row->gebort'".
@@ -312,7 +312,7 @@
 							}
 						}
 					}
-					else 
+					else
 					{
 						$text.= $sql_query;
 						$text.= "\nFehler:".pg_errormessage($conn)."\n";
@@ -338,7 +338,7 @@
 					}
 					else
 						$anz_update++;
-					
+
 				}
 			}
 			// Student kommt mehrmals vor ->Warnung

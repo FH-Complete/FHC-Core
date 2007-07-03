@@ -2,7 +2,7 @@
 /* Copyright (C) 2007 Technikum-Wien
  *
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -54,8 +54,8 @@ if($result = pg_query($conn_fas, $qry))
 	{
 		echo "- ";
 		ob_flush();
-		flush();	
-			
+		flush();
+
 		$error=false;
 		$aufmerksamdurch					=new aufmerksamdurch($conn);
 		$aufmerksamdurch->aufmerksamdurch_kurzbz	=substr($row->name,0,8);
@@ -69,18 +69,18 @@ if($result = pg_query($conn_fas, $qry))
 			if(pg_num_rows($result3)>0) //eintrag gefunden
 			{
 				if($row3=pg_fetch_object($result3))
-				{ 
+				{
 					// update , wenn datensatz bereits vorhanden
 					$aufmerksamdurch->new=false;
 				}
 			}
-			else 
+			else
 			{
 				// insert, wenn datensatz noch nicht vorhanden
 				$aufmerksamdurch->new=true;
 			}
-		}	
-				
+		}
+
 		If (!$error)
 		{
 			if(!$aufmerksamdurch->save())
@@ -88,12 +88,12 @@ if($result = pg_query($conn_fas, $qry))
 				$error_log.=$aufmerksamdurch->errormsg."\n";
 				$anzahl_fehler++;
 			}
-			else 
+			else
 			{
 				$anzahl_eingefuegt++;
 			}
 		}
-	}		
+	}
 }
 
 

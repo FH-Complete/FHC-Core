@@ -1,7 +1,7 @@
 <?php
 /* Copyright (C) 2006 Technikum-Wien
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -60,11 +60,11 @@ if($result = pg_query($conn_fas, $qry))
 			$error_log.=$nation->errormsg."\n";
 			$anzahl_fehler++;
 		}
-		else 
+		else
 		{
 			$anzahl_eingefuegt++;
 		}
-	}		
+	}
 }
 
 ?>

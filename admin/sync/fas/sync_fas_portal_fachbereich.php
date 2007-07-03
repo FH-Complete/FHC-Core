@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -64,10 +64,10 @@ if($result = pg_query($conn_fas, $qry))
 		$fachbereich->bezeichnung		=$row->name;
 		$fachbereich->farbe			='';
 		$fachbereich->ext_id		=$row->fachbereich_pk;
-		
+
 		$qry = "SELECT * FROM tbl_fachbereich WHERE ext_id='$fachbereich->ext_id'";
 			if($result1 = pg_query($conn, $qry))
-			{		
+			{
 				if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist
 				{
 					if($row1=pg_fetch_object($result1))
@@ -78,35 +78,35 @@ if($result = pg_query($conn_fas, $qry))
 						$fachbereich->farbe			=$row1->farbe;
 						$fachbereich->new=false;
 					}
-					else 
+					else
 					{
 						$error_log.="fachbereich_id von $row->fachbereich_id konnte nicht ermittelt werden\n";
 						$error=true;
 					}
 				}
-				else 
+				else
 				{
 					//Fachbereich neu anlegen
 					$fachbereich->new=true;
 				}
-				
+
 				if(!$error)
 					if(!$fachbereich->save())
 					{
 						$error_log.=$fachbereich->errormsg."\n";
 						$anzahl_fehler++;
 					}
-					else 
+					else
 						$anzahl_eingefuegt++;
-				else 
+				else
 					$anzahl_fehler++;
-			}	
+			}
 	}
 	echo nl2br("abgeschlossen\n\n");
 }
 else
 	$error_log .= 'Fachbereichsdatensaetze konnten nicht geladen werden';
-	
+
 ?>
 
 <html>

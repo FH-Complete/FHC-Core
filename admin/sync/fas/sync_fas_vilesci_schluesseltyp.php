@@ -1,7 +1,7 @@
 <?php
 /* Copyright (C) 2007 Technikum-Wien
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -53,8 +53,8 @@ if($result = pg_query($conn_fas, $qry))
 	{
 		echo "- ";
 		ob_flush();
-		flush();	
-			
+		flush();
+
 		$error=false;
 		$betriebsmitteltyp				=new betriebsmitteltyp($conn);
 		$betriebsmitteltyp->anzahl			=$row->anzahl==''?'0':$row->anzahl;
@@ -82,9 +82,9 @@ if($result = pg_query($conn_fas, $qry))
 			$error_log.=$betriebsmitteltyp->errormsg."\n";
 			$anzahl_fehler++;
 		}
-		else 
+		else
 		{
-			
+
 			//überprüfen, ob sync-eintrag schon vorhanden
 			$qryz="SELECT * FROM sync.tbl_syncschluesseltyp WHERE fas_typ='$row->schluessel_pk' AND portal_typ='$betriebsmitteltyp->betriebsmitteltyp'";
 			if($resultz = pg_query($conn, $qryz))
@@ -96,10 +96,10 @@ if($result = pg_query($conn_fas, $qry))
 					$resulti = pg_query($conn, $qry);
 				}
 			}
-			$anzahl_eingefuegt++;			
-		}		
+			$anzahl_eingefuegt++;
+		}
 	}
-}	
+}
 
 
 //echo nl2br($text);

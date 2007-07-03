@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -78,10 +78,10 @@ if($result = pg_query($conn_vilesci, $qry))
 		//$lehrveranstaltung->updatevon		=$row->updatevon;
 		$lehrveranstaltung->ext_id			=$row->lehrfach_nr;
 		//$lehrveranstaltung->new			=true;
-		
+
 		$qry = "SELECT lehrveranstaltung_id FROM lehre.tbl_lehrveranstaltung WHERE ext_id='$lehrveranstaltung->ext_id'";
 			if($result1 = pg_query($conn, $qry))
-			{		
+			{
 				if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist
 				{
 					if($row1=pg_fetch_object($result1))
@@ -90,35 +90,35 @@ if($result = pg_query($conn_vilesci, $qry))
 						$lehrveranstaltung->new=false;
 						$lehrveranstaltung->lehrveranstaltung_id=$row1->lehrveranstaltung_id;
 					}
-					else 
+					else
 					{
 						$error_log.="lehrveranstaltung_id von $row->lehrveranstaltung_id konnte nicht ermittelt werden\n";
 						$error=true;
 					}
 				}
-				else 
+				else
 				{
 					//Lehrveranstaltung neu anlegen
 					$lehrveranstaltung->new=true;
 				}
-				
+
 				if(!$error)
 					if(!$lehrveranstaltung->save())
 					{
 						$error_log.=$lehrveranstaltung->errormsg."\n";
 						$anzahl_fehler++;
 					}
-					else 
+					else
 						$anzahl_eingefuegt++;
-				else 
+				else
 					$anzahl_fehler++;
-			}	
+			}
 	}
 	$text.="abgeschlossen";
 }
 else
 	$error_log .= 'Lehrveranstaltungsdatensaetze konnten nicht geladen werden';
-	
+
 ?>
 
 <html>

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -59,13 +59,13 @@ if($result = pg_query($conn_vilesci, $qry))
 	{
 		$error=false;
 		$lvinfo = new lvinfo($conn);
-		
+
 		$qry_lv = "SELECT lehrveranstaltung_id FROM lehre.tbl_lehrveranstaltung where ext_id='$row->lehrfach_nr'";
 		if($result_lv = pg_query($conn, $qry_lv))
 		{
 			if($row_lv = pg_fetch_object($result_lv))
 			{
-				
+
 				$lvinfo->lehrveranstaltung_id = $row_lv->lehrveranstaltung_id;
 				$lvinfo->titel				=$row->lehrfach;
 				$lvinfo->lehrziele			=$row->lehrziele;
@@ -83,11 +83,11 @@ if($result = pg_query($conn_vilesci, $qry))
 				$lvinfo->insertvon		='';
 				$lvinfo->updateamum		=$row->updateamum;
 				$lvinfo->updatevon		=$row->updatevon;
-				
+
 				//schon da?
 				$qry = "SELECT * FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$row_lv->lehrveranstaltung_id' AND sprache='$row->sprache'";
 					if($result1 = pg_query($conn, $qry))
-					{		
+					{
 						if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist
 						{
 							if($row1=pg_fetch_object($result1))
@@ -95,39 +95,39 @@ if($result = pg_query($conn_vilesci, $qry))
 								//Funktionsdaten updaten
 								$lvinfo->new=false;
 							}
-							else 
+							else
 							{
 								$error_log.="lvinfo_id von <b>$row->lvinfo_id</b> konnte nicht ermittelt werden\n";
 								$error=true;
 							}
 						}
-						else 
+						else
 						{
 							//LVInfo neu anlegen
 							$lvinfo->new=true;
 						}
-						
+
 						if(!$error)
 							if(!$lvinfo->save())
 							{
 								$error_log.=$lvinfo->errormsg."\n";
 								$anzahl_fehler++;
 							}
-							else 
+							else
 							{
 								$anzahl_eingefuegt++;
 							}
-						else 
+						else
 							$anzahl_fehler++;
-					}	
+					}
 			}
-			else 
+			else
 			{
 				$error_log.="lehrveranstaltung_id fuer das Lehrfach $row->lehrfach_nr konnte nicht ermittelt werden\n";
 				$anzahl_fehler++;
 			}
 		}
-		else 
+		else
 		{
 			$error_log.="lehrveranstaltung_id fuer das Lehrfach $row->lehrfach_nr konnte nicht ermittelt werden\n";
 			$anzahl_fehler++;
@@ -137,7 +137,7 @@ if($result = pg_query($conn_vilesci, $qry))
 }
 else
 	$error_log .= 'Funktiondatensaetze konnten nicht geladen werden';
-	
+
 ?>
 
 <html>

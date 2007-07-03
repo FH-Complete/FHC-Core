@@ -25,10 +25,10 @@ if(!is_numeric($stg_kz))
 	$stg_kz=0;
 if(!is_numeric($semester))
 	$semester=0;
-	
+
 
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
-{	
+{
 	//Lehre Feld setzen
 	if(isset($_GET['lehre']))
 	{
@@ -38,14 +38,14 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 		else
 			echo "Erfolgreich gespeichert";
 	}
-	
+
 	//Lehrevz Speichern
 	if(isset($_POST['lehrevz']))
 	{
 		$qry = "UPDATE lehre.tbl_lehrveranstaltung SET lehreverzeichnis='".addslashes($_POST['lehrevz'])."' WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
 		if(!pg_query($conn, $qry))
 			echo "Fehler beim Speichern!";
-		else 
+		else
 			echo "Erfolgreich gespeichert";
 	}
 }
@@ -59,13 +59,13 @@ $outp='';
 $s=array();
 foreach ($studiengang as $stg)
 {
-	$outp.= '<A href="'.$PHP_SELF.'?stg_kz='.$stg->studiengang_kz.'&semester='.$semester.'">'.$stg->kuerzel.'</A> - ';	
+	$outp.= '<A href="'.$PHP_SELF.'?stg_kz='.$stg->studiengang_kz.'&semester='.$semester.'">'.$stg->kuerzel.'</A> - ';
 	$s[$stg->studiengang_kz]->max_sem=$stg->max_semester;
 	$s[$stg->studiengang_kz]->kurzbz=$stg->kurzbzlang;
 }
 $outp.= '<BR> -- ';
 for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
-	$outp.= '<A href="'.$PHP_SELF.'?stg_kz='.$stg_kz.'&semester='.$i.'">'.$i.'</A> -- ';	
+	$outp.= '<A href="'.$PHP_SELF.'?stg_kz='.$stg_kz.'&semester='.$i.'">'.$i.'</A> -- ';
 ?>
 
 <html>
@@ -78,7 +78,7 @@ for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
 <H1>Lehrveranstaltung Verwaltung (<?php echo $s[$stg_kz]->kurzbz.' - '.$semester; ?>)</H1>
 
 <?php
-echo $outp;	
+echo $outp;
 ?>
 
 <h3>&Uuml;bersicht</h3>
@@ -100,7 +100,7 @@ if ($result_lv!=0)
 	   echo "<td>".($row->aktiv=='t'?'Ja':'Nein')."</td>";
 	   echo "</tr>\n";
 	}
-	
+
 }
 else
 	echo "Kein Eintrag gefunden!";
