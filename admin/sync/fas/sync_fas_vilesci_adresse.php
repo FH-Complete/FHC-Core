@@ -11,15 +11,16 @@
 //*
 //*
 
-include('../../../vilesci/config.inc.php');
-include('../../../include/adresse.class.php');
-include('../../../include/firma.class.php');
+require_once('../../../vilesci/config.inc.php');
+require_once('../../../include/adresse.class.php');
+require_once('../../../include/firma.class.php');
+require_once('../sync_config.inc.php');
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
 //$adress='ruhan@technikum-wien.at';
-$adress='fas_sync@technikum-wien.at';
+//$adress='fas_sync@technikum-wien.at';
 
 $error_log='';
 $text = '';
@@ -257,9 +258,12 @@ if($result = pg_query($conn_fas, $qry))
 										$ausgabe_adresse="Insertvon: '".$adresse->insertvon."' (statt '".$row2->insertvon."')";
 									}
 								}
-								// update adresse, wenn datensatz bereits vorhanden
-								$adresse->new=false;
-								$adresse->adresse_id=$row2->adresse_id;
+								if ($update && $dont_sync_sql)
+								{
+									// update adresse, wenn datensatz bereits vorhanden
+									$adresse->new=false;
+									$adresse->adresse_id=$row2->adresse_id;
+								}
 							}
 						}
 						else 
@@ -343,7 +347,7 @@ if($result = pg_query($conn_fas, $qry))
 		
 		if(!$error)
 		{
-			if($adresse->new || $update)
+			if($adresse->new || ($update && $dont_sync_sql))
 			{
 				if(!$adresse->save())
 				{

@@ -7,9 +7,10 @@
 // **************************************
 	require_once('../../../vilesci/config.inc.php');
 	require_once('../../../include/lehrveranstaltung.class.php');
+	require_once('../sync_config.inc.php');
 	//$adress='fas_sync@technikum-wien.at';
 	//$adress='oesi@technikum-wien.at';
-	$adress='ruhan@technikum-wien.at';
+	//$adress='ruhan@technikum-wien.at';
 
 	$conn=pg_connect(CONN_STRING);
 	$conn_fas=pg_connect(CONN_STRING_FAS);
@@ -235,28 +236,31 @@
 
 					if($row_found = pg_fetch_object($result))
 					{
-						//Datensatz aktualisieren
-						$qry = getupdateqry($row_found, $row_fas_alle);
-
-						if($qry!='')
+						if ($dont_sync_sql)
 						{
-							if(pg_query($conn, $qry))
+							//Datensatz aktualisieren
+							$qry = getupdateqry($row_found, $row_fas_alle);
+	
+							if($qry!='')
 							{
-								//Eintrag zur Synctabelle hinzufuegen
+								if(pg_query($conn, $qry))
+								{
+									//Eintrag zur Synctabelle hinzufuegen
+									synctabentry($row_found->lehrveranstaltung_id, $row_fas_alle->lehrveranstaltung_pk);
+									$text.="LVA wurde aktualisiert: $qry\n";
+									$anz_update++;
+								}
+								else
+								{
+									$text.="Fehler beim Update einer LVA: $qry\n";
+									$update_error++;
+								}
+							}
+							else 
+							{
 								synctabentry($row_found->lehrveranstaltung_id, $row_fas_alle->lehrveranstaltung_pk);
-								$text.="LVA wurde aktualisiert: $qry\n";
-								$anz_update++;
+								$text.="SYNC-Eintrag wurde angelegt!\n";
 							}
-							else
-							{
-								$text.="Fehler beim Update einer LVA: $qry\n";
-								$update_error++;
-							}
-						}
-						else 
-						{
-							synctabentry($row_found->lehrveranstaltung_id, $row_fas_alle->lehrveranstaltung_pk);
-							$text.="SYNC-Eintrag wurde angelegt!\n";
 						}
 					}
 					else
@@ -279,29 +283,32 @@
 					{
 						if($row_found = pg_fetch_object($result))
 						{
-							//Gefunden->Update und Synctab-Eintrag
-							//$text.='FOUND on Name LVA '.getlvabez($row_fas_alle)." -> UPDATE & SYNCTAB-Insert\n";
-							$qry = getupdateqry($row_found, $row_fas_alle);
-
-							if($qry!='')
+							if($dont_sync_sql)
 							{
-								if(pg_query($conn, $qry))
+								//Gefunden->Update und Synctab-Eintrag
+								//$text.='FOUND on Name LVA '.getlvabez($row_fas_alle)." -> UPDATE & SYNCTAB-Insert\n";
+								$qry = getupdateqry($row_found, $row_fas_alle);
+	
+								if($qry!='')
 								{
-									//Eintrag zur Synctabelle hinzufuegen
+									if(pg_query($conn, $qry))
+									{
+										//Eintrag zur Synctabelle hinzufuegen
+										synctabentry($row_found->lehrveranstaltung_id, $row_fas_alle->lehrveranstaltung_pk);
+										$text.="LVA wurde aktualisiert: $qry\n";
+										$anz_update++;
+									}
+									else
+									{
+										$text.="Fehler beim Update einer LVA: $qry\n";
+										$update_error++;
+									}
+								}
+								else 
+								{
 									synctabentry($row_found->lehrveranstaltung_id, $row_fas_alle->lehrveranstaltung_pk);
-									$text.="LVA wurde aktualisiert: $qry\n";
-									$anz_update++;
+									$text.="SYNC-Eintrag wurde angelegt!\n";
 								}
-								else
-								{
-									$text.="Fehler beim Update einer LVA: $qry\n";
-									$update_error++;
-								}
-							}
-							else 
-							{
-								synctabentry($row_found->lehrveranstaltung_id, $row_fas_alle->lehrveranstaltung_pk);
-								$text.="SYNC-Eintrag wurde angelegt!\n";
 							}
 						}
 						else
@@ -369,20 +376,23 @@
 				//UPDATE
 				if($row_found = pg_fetch_object($result))
 				{
-					//Datensatz aktualisieren
-					$qry = getupdateqry($row_found, $row_fas_alle);
-
-					if($qry!='')
+					if($dont_sync_sql)
 					{
-						if(pg_query($conn, $qry))
+						//Datensatz aktualisieren
+						$qry = getupdateqry($row_found, $row_fas_alle);
+	
+						if($qry!='')
 						{
-							$text.="LVA wurde aktualisiert: $qry\n";
-							$anz_update++;
-						}
-						else
-						{
-							$text.="Fehler beim Update einer LVA: $qry\n";
-							$update_error++;
+							if(pg_query($conn, $qry))
+							{
+								$text.="LVA wurde aktualisiert: $qry\n";
+								$anz_update++;
+							}
+							else
+							{
+								$text.="Fehler beim Update einer LVA: $qry\n";
+								$update_error++;
+							}
 						}
 					}
 				}
@@ -442,7 +452,7 @@
 		if($msg!='')
 		{
 			$text.="\nMails an Studiengang ".$stg_data[$stg]['kuerzel'].'('.$stg_data[$stg]['mail'].") ... ";
-			if(mail('ruhan@technikum-wien.at',"FAS - Vilesci (Lehrveranstaltungen) ".$stg_data[$stg]['kuerzel'],$head_stg_text.$msg,"From: vilesci@technikum-wien.at"))
+			if(mail($adress,"FAS - Vilesci (Lehrveranstaltungen) ".$stg_data[$stg]['kuerzel'],$head_stg_text.$msg,"From: vilesci@technikum-wien.at"))
 				$text.="gesendet\n\n$msg";
 			else
 				$text.="FEHLER beim senden\n\n$msg";

@@ -11,6 +11,7 @@
 */
 require_once('../../../vilesci/config.inc.php');
 require_once('../../../include/datum.class.php');
+require_once('../sync_config.inc.php');
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
@@ -70,8 +71,6 @@ foreach ($studiengangfk AS $stg)
 }
 
 set_time_limit(60);
-//$adress='ruhan@technikum-wien.at';
-$adress='fas_sync@technikum-wien.at';
 
 function myaddslashes($var)
 {
@@ -1172,7 +1171,7 @@ if($result = pg_query($conn_fas, $qry))
 							$ausgabe_person="Insertvon: '".$insertvon."' (statt '".$row1->insertvon."')";
 						}
 					}
-					if($updatep && $studiengang_kz!=299)
+					if($updatep && $dont_sync_sql)
 					{
 						$qry = 'UPDATE public.tbl_person SET'.
 						       ' sprache='.myaddslashes($sprache).','.
@@ -1577,7 +1576,7 @@ if($result = pg_query($conn_fas, $qry))
 								$ausgabe_pre="Insertvon: '".$insertvon."'";
 							}
 						}
-						if($updater && $studiengang_kz!=299)
+						if($updater && $dont_sync_sql)
 						{
 							$qry = 'UPDATE public.tbl_prestudent SET'.
 							       ' aufmerksamdurch_kurzbz='.myaddslashes($aufmerksamdurch_kurzbz).','.
@@ -2062,7 +2061,7 @@ if($result = pg_query($conn_fas, $qry))
 										$ausgabe_benutzer="Insertvon: '".$insertvon."' statt('".$rows->insertvon."')";
 									}
 								}
-								if($updateb  && $studiengang_kz!=299)
+								if($updateb  && $dont_sync_sql)
 								{
 									$qry = 'UPDATE public.tbl_benutzer SET'.
 									       ' uid='.myaddslashes($student_uid).','.
@@ -2260,7 +2259,7 @@ if($result = pg_query($conn_fas, $qry))
 											$ausgabe_student="Insertvon: '".$insertvon."' (statt '".$rows->insertvon."')";
 										}
 									}
-									if($updates && $studiengang_kz!=299)
+									if($updates && $dont_sync_sql)
 									{
 										$qry = 'UPDATE public.tbl_student SET'.
 										       ' student_uid='.myaddslashes($student_uid).','.

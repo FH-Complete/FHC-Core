@@ -12,14 +12,15 @@
 //*
 //*benötigt: tbl_kontakttyp, tbl_syncperson
 
-include('../../../vilesci/config.inc.php');
-include('../../../include/kontakt.class.php');
+require_once('../../../vilesci/config.inc.php');
+require_once('../../../include/kontakt.class.php');
+require_once('../sync_config.inc.php');
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
 //$adress='ruhan@technikum-wien.at';
-$adress='fas_sync@technikum-wien.at';
+//$adress='fas_sync@technikum-wien.at';
 
 $error_log='';
 $text = '';
@@ -126,10 +127,13 @@ if($result = pg_query($conn_fas, $qry))
 										$ausgabe_email="Zustelladresse: '".($row->zustelladresse=='J'?'true':'false')."'";
 									}
 								}
-								// update , wenn datensatz bereits vorhanden
-								$kontakt->person_id=$row1->person_portal;
-								$kontakt->kontakt_id=$row2->kontakt_id;
-								$kontakt->new=false;
+								if($update && $dont_sync_sql)
+								{
+									// update , wenn datensatz bereits vorhanden
+									$kontakt->person_id=$row1->person_portal;
+									$kontakt->kontakt_id=$row2->kontakt_id;
+									$kontakt->new=false;
+								}
 							}
 						}
 						else 
@@ -151,7 +155,7 @@ if($result = pg_query($conn_fas, $qry))
 		}
 		If (!$error)
 		{
-			if($kontakt->new || $update)
+			if($kontakt->new || ($update && $dont_sync_sql))
 			{
 				if(!$kontakt->save())
 				{
@@ -175,6 +179,7 @@ if($result = pg_query($conn_fas, $qry))
 					}
 				}
 			}
+			echo nl2br($ausgabe);
 		}
 	}		
 }

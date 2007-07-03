@@ -488,6 +488,8 @@ if($result = pg_query($conn_fas, $qry_main))
 					$insertvon=$rowcu->name;
 				}
 			}
+			
+			
 			$lg_ext_id=$row->mitarbeiter_lehreinheit_pk;
 			$qry="SELECT * FROM lehre.tbl_lehreinheit join lehre.tbl_lehreinheitgruppe USING (lehreinheit_id) WHERE tbl_lehreinheitgruppe.ext_id='".$lg_ext_id."';";
 			if($result3 = pg_query($conn, $qry))
@@ -552,12 +554,9 @@ if($result = pg_query($conn_fas, $qry_main))
 					" AND ".($gruppe!=''?"gruppe=".myaddslashes($gruppe):"gruppe IS NULL").
 					" AND gruppe_kurzbz IS NULL));";
 				*/
-					
-				
+			
 				
 				//echo "-".$start_kw."-".$qry;exit;
-				//fwrite($dateiausgabe,"-".$start_kw."-".$qry);
-				
 				
 				if($result2 = pg_query($conn, $qry))
 				{
@@ -1647,7 +1646,7 @@ if($result = pg_query($conn_fas, $qry_main))
 						}
 						else 
 						{
-							$ausgabe.="Partizipierende Lehreinheit lvnr='".$lvnr."' (Lehreinheit id/pk .'".$row5->lehreinheit_id."'/'".$ext_id."') in synclehreinheit gefunden.\n";
+							//$ausgabe.="Partizipierende Lehreinheit lvnr='".$lvnr."' (Lehreinheit id/pk .'".$row5->lehreinheit_id."'/'".$ext_id."') in synclehreinheit gefunden.\n";
 							$anzahl_part2++;
 							//ext_id für gruppe zusammenstellen
 							$qry="SELECT *, tbl_lehreinheitmitarbeiter.ext_id as lg_ext_id FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) WHERE lehreinheit_id=".myaddslashes($row5->lehreinheit_id)." ORDER BY tbl_lehreinheitmitarbeiter.ext_id ASC;";
