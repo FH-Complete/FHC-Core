@@ -45,7 +45,7 @@ var StudentLvGesamtNotenSelectLehrveranstaltungID=null; //LehreinheitID des Note
 var StudentPruefungTreeDatasource; //Datasource des Pruefung Trees
 var StudentPruefungSelectID=null; //ID der Pruefung die nach dem Refresh markiert werden soll
 var StudentDetailRolleTreeDatasource=null; //Datasource fuer denn PrestudentRolleTree
-
+var StudentAkteTreeDatasource=null;
 // ********** Observer und Listener ************* //
 
 // ****
@@ -311,6 +311,24 @@ var StudentPruefungTreeListener =
   	  //ohne dem setTimeout
       window.setTimeout(StudentPruefungTreeSelectID,10);
   }
+};
+
+// ****
+// * Observer fuer Akte Tree
+// * startet Rebuild nachdem das Refresh
+// * der datasource fertig ist
+// ****
+var StudentAkteTreeSinkObserver =
+{
+	onBeginLoad : function(pSink) {},
+	onInterrupt : function(pSink) {},
+	onResume : function(pSink) {},
+	onError : function(pSink, pStatus, pError) {},
+	onEndLoad : function(pSink)
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		document.getElementById('student-zeugnis-tree').builder.rebuild();
+	}
 };
 // ***************** KEY Events ************************* //
 
@@ -958,8 +976,11 @@ function StudentAuswahl()
 	zeugnistree.builder.rebuild();
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-	var datasource = rdfService.GetDataSource(url);
-	zeugnistree.database.AddDataSource(datasource);
+	StudentAkteTreeDatasource = rdfService.GetDataSource(url);
+	StudentAkteTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	StudentAkteTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	zeugnistree.database.AddDataSource(StudentAkteTreeDatasource);
+	StudentAkteTreeDatasource.addXMLSinkObserver(StudentAkteTreeSinkObserver);
 
 	// *** Betriebsmittel ***
 	betriebsmitteltree = document.getElementById('student-betriebsmittel-tree');
@@ -1939,6 +1960,35 @@ function StudentAkteDel()
 function StudentAkteDisableFields(val)
 {
 	document.getElementById('student-zeugnis-button-archivieren').disabled=val;
+}
+
+// ****
+// * Startet das Script zum Archivieren des Zeugnisses und
+// * Refresht dann den Tree
+// ****
+function StudentZeugnisArchivieren()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-tree');
+
+	if (tree.currentIndex==-1)
+	{
+		alert('Student muss ausgewaehlt sein');
+		return;
+	}
+    var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+	var uid=tree.view.getCellText(tree.currentIndex,col);
+	
+	var stsem = getStudiensemester();
+	
+	url = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl=Zeugnis&xml=zeugnis.rdf.php&uid='+uid+'&ss='+stsem+'&archive=1';
+
+	var req = new phpRequest(url,'','');
+
+	var response = req.execute();
+	
+	StudentAkteTreeDatasource.Refresh(false);
+    
 }
 
 // ********** Betriebsmittel ******************

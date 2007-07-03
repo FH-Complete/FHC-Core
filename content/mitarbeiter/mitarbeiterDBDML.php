@@ -36,6 +36,9 @@ require_once('../../include/log.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/mitarbeiter.class.php');
+require_once('../../include/bisverwendung.class.php');
+require_once('../../include/bisfunktion.class.php');
+require_once('../../include/entwicklungsteam.class.php');
 
 $user = get_uid();
 
@@ -116,6 +119,191 @@ if(!$error)
 			$errormsg = $mitarbeiter->errormsg;
 			$return = false;
 		}	
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='verwendungsave')
+	{
+		//Speichert die BISVerwendung
+		$verwendung = new bisverwendung($conn, null, true);
+		
+		if($_POST['neu']!='true')
+		{
+			if(!$verwendung->load($_POST['bisverwendung_id']))
+			{
+				$error = true;
+				$return = false;
+				$errormsg = $verwendung->errormsg;
+			}
+			$verwendung->new = false;
+		}
+		else 
+		{
+			$verwendung->new = true;
+			$verwendung->insertamum = date('Y-m-d H:i:s');
+			$verwendung->insertvon = $user;
+		}
+		
+		if(!$error)
+		{
+			$verwendung->ba1code = $_POST['ba1code'];
+			$verwendung->ba2code = $_POST['ba2code'];
+			$verwendung->beschausmasscode = $_POST['beschausmasscode'];
+			$verwendung->verwendung_code = $_POST['verwendung_code'];
+			$verwendung->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
+			$verwendung->hauptberufcode = $_POST['hauptberufcode'];
+			$verwendung->hauptberuflich = ($_POST['hauptberuflich']=='true'?true:false);
+			$verwendung->habilitation = ($_POST['habilitation']=='true'?true:false);
+			$verwendung->beginn = $_POST['beginn'];
+			$verwendung->ende = $_POST['ende'];
+			$verwendung->updateamum = date('Y-m-d H:i:s');
+			$verwendung->updatevon = $user;				
+			
+			if($verwendung->save())
+			{
+				$return = true;
+				$data = $verwendung->bisverwendung_id;
+			}
+			else 
+			{
+				$errormsg = $verwendung->errormsg;
+				$return = false;
+			}
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='verwendungdelete')
+	{
+		//Loescht die BISVerwendung
+		$verwendung = new bisverwendung($conn, null, true);
+		if($verwendung->delete($_POST['bisverwendung_id']))
+		{
+			$return = true;
+		}
+		else 
+		{
+			$return = false;
+			$errormsg = $verwendung->errormsg;
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='funktionsave')
+	{
+		//Speichert die BISFunktion
+		$funktion = new bisfunktion($conn, null, true);
+		
+		if($_POST['neu']!='true')
+		{
+			if(!$funktion->load($_POST['bisverwendung_id'],$_POST['studiengang_kz_old']))
+			{
+				$error = true;
+				$return = false;
+				$errormsg = $funktion->errormsg;
+			}
+			$funktion->new = false;
+		}
+		else 
+		{
+			$funktion->new = true;
+			$funktion->insertamum = date('Y-m-d H:i:s');
+			$funktion->insertvon = $user;
+		}
+		
+		if(!$error)
+		{
+			$funktion->bisverwendung_id = $_POST['bisverwendung_id'];
+			$funktion->studiengang_kz = $_POST['studiengang_kz'];
+			$funktion->studiengang_kz_old = $_POST['studiengang_kz_old'];
+			$funktion->sws = str_replace(',','.',$_POST['sws']);
+			$funktion->updateamum = date('Y-m-d H:i:s');
+			$funktion->updatevon = $user;				
+			
+			if($funktion->save())
+			{
+				$return = true;
+			}
+			else 
+			{
+				$errormsg = $funktion->errormsg;
+				$return = false;
+			}
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='funktiondelete')
+	{
+		//Loescht die BISVerwendung
+		$funktion = new bisfunktion($conn, null, true);
+		if($funktion->delete($_POST['bisverwendung_id'],$_POST['studiengang_kz']))
+		{
+			$return = true;
+		}
+		else 
+		{
+			$return = false;
+			$errormsg = $funktion->errormsg;
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='entwicklungsteamsave')
+	{
+		//Speichert den Entwicklungsteameintrag
+		$entwt = new entwicklungsteam($conn, null, true);
+		
+		if($_POST['neu']!='true')
+		{
+			if(!$entwt->load($_POST['mitarbeiter_uid'],$_POST['studiengang_kz_old']))
+			{
+				$error = true;
+				$return = false;
+				$errormsg = $entwt->errormsg;
+			}
+			$entwt->new = false;
+		}
+		else 
+		{			
+
+			if($entwt->exists($_POST['mitarbeiter_uid'],$_POST['studiengang_kz']))
+			{
+				$error = true;
+				$errormsg = 'Es existiert bereits ein Eintrag fuer diesen Studiengang';
+				$return = false;
+			}
+			$entwt->new = true;
+			$entwt->insertamum = date('Y-m-d H:i:s');
+			$entwt->insertvon = $user;
+		}
+			
+		if(!$error)
+		{
+			$entwt->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
+			$entwt->studiengang_kz = $_POST['studiengang_kz'];
+			$entwt->studiengang_kz_old = $_POST['studiengang_kz_old'];
+			$entwt->besqualcode = $_POST['besqualcode'];
+			$entwt->beginn = $_POST['beginn'];
+			$entwt->ende = $_POST['ende'];
+			$entwt->updateamum = date('Y-m-d H:i:s');
+			$entwt->updatevon = $user;				
+			
+			if($entwt->save())
+			{
+				$return = true;
+			}
+			else 
+			{
+				$errormsg = $entwt->errormsg;
+				$return = false;
+			}
+		}
+		
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='entwicklungsteamdelete')
+	{
+		//Loescht einen Entwicklungsteameintrag
+		$entwt = new entwicklungsteam($conn, null, true);
+		if($entwt->delete($_POST['mitarbeiter_uid'],$_POST['studiengang_kz']))
+		{
+			$return = true;
+		}
+		else 
+		{
+			$return = false;
+			$errormsg = $entwt->errormsg;
+		}
 	}
 	else
 	{

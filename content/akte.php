@@ -44,6 +44,7 @@ if(isset($_GET['id']) && is_numeric($_GET['id']))
 
 	//Header fuer Bild schicken
 	header("Content-type: $akte->mimetype");
+	header('Content-Disposition: attachment; filename="'.$akte->titel.'"');
 	echo hexstr($akte->inhalt);
 }
 else 
