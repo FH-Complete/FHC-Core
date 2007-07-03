@@ -31,14 +31,14 @@ $sql_query="SET search_path TO public;
 			SELECT tbl_lehrverband.studiengang_kz, tbl_studiengang.bezeichnung, kurzbz, typ, tbl_lehrverband.semester, verband, gruppe, gruppe_kurzbz, tbl_lehrverband.bezeichnung AS lvb_bezeichnung, tbl_gruppe.bezeichnung AS grp_bezeichnung
 			FROM (tbl_studiengang JOIN tbl_lehrverband USING (studiengang_kz))
 				LEFT OUTER JOIN tbl_gruppe  ON (tbl_lehrverband.studiengang_kz=tbl_gruppe.studiengang_kz AND tbl_lehrverband.semester=tbl_gruppe.semester AND (tbl_lehrverband.verband=''))
-			WHERE tbl_lehrverband.aktiv $stg_kz_query
+			WHERE tbl_lehrverband.aktiv AND tbl_studiengang.aktiv $stg_kz_query
 			ORDER BY erhalter_kz,typ, kurzbz, semester,verband,gruppe, gruppe_kurzbz;";
 
 if(!$result=pg_query($conn, $sql_query))
 	$error_msg.=pg_errormessage($conn);
 else
 	$num_rows=pg_numrows($result);
-	
+
 $stsem_obj = new studiensemester($conn);
 $stsem_obj->getAll();
 ?>
@@ -61,7 +61,7 @@ while ($row=pg_fetch_object($result))
 			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
 			<VERBAND:stg_kz><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
 		</RDF:Description>
-		
+
 		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/prestudent'; ?>" >
 			<VERBAND:name>PreStudent</VERBAND:name>
 			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
@@ -79,7 +79,7 @@ while ($row=pg_fetch_object($result))
 			<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
 			<VERBAND:typ>prestudent</VERBAND:typ>
 		</RDF:Description>
-		
+
 		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/interessenten'; ?>" >
 			<VERBAND:name>Interessenten</VERBAND:name>
 			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
@@ -87,7 +87,7 @@ while ($row=pg_fetch_object($result))
 			<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
 			<VERBAND:typ>interessenten</VERBAND:typ>
 		</RDF:Description>
-		
+
 		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/interessenten/zgv'; ?>" >
 			<VERBAND:name>ZGV erfüllt</VERBAND:name>
 			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
@@ -95,7 +95,7 @@ while ($row=pg_fetch_object($result))
 			<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
 			<VERBAND:typ>zgv</VERBAND:typ>
 		</RDF:Description>
-		
+
 		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/interessenten/reihungstestangemeldet'; ?>" >
 			<VERBAND:name>Reihungstest angemeldet</VERBAND:name>
 			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
@@ -103,7 +103,7 @@ while ($row=pg_fetch_object($result))
 			<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
 			<VERBAND:typ>reihungstestangemeldet</VERBAND:typ>
 		</RDF:Description>
-		
+
 		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/interessenten/reihungstestnichtangemeldet'; ?>" >
 			<VERBAND:name>Nicht zum Reihungstest angemeldet</VERBAND:name>
 			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
@@ -111,7 +111,7 @@ while ($row=pg_fetch_object($result))
 			<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
 			<VERBAND:typ>reihungstestnichtangemeldet</VERBAND:typ>
 		</RDF:Description>
-				
+
 		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/bewerber'; ?>" >
 			<VERBAND:name>Bewerber</VERBAND:name>
 			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
@@ -119,7 +119,7 @@ while ($row=pg_fetch_object($result))
 			<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
 			<VERBAND:typ>bewerber</VERBAND:typ>
 		</RDF:Description>
-		
+
 		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/aufgenommen'; ?>" >
 			<VERBAND:name>Aufgenommen</VERBAND:name>
 			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
@@ -127,7 +127,7 @@ while ($row=pg_fetch_object($result))
 			<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
 			<VERBAND:typ>aufgenommen</VERBAND:typ>
 		</RDF:Description>
-		
+
 		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/warteliste'; ?>" >
 			<VERBAND:name>Warteliste</VERBAND:name>
 			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
@@ -135,7 +135,7 @@ while ($row=pg_fetch_object($result))
 			<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
 			<VERBAND:typ>warteliste</VERBAND:typ>
 		</RDF:Description>
-		
+
 		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/absage'; ?>" >
 			<VERBAND:name>Absage</VERBAND:name>
 			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
@@ -235,10 +235,10 @@ while ($row=pg_fetch_object($result))
 			//Prestudent
 			echo "\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/prestudent\" />\n";
 			echo "\t\t\t<RDF:li>\n\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/prestudent\">\n";
-			foreach ($stsem_obj->studiensemester as $stsem) 
+			foreach ($stsem_obj->studiensemester as $stsem)
 			{
 				echo "\t\t\t<RDF:li>\n\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz\">\n";
-				
+
 				echo "\t\t\t<RDF:li>";
 				echo "\n\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/interessenten\">\n";
 				echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/interessenten/zgv\" />\n";
@@ -246,16 +246,16 @@ while ($row=pg_fetch_object($result))
 				echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/interessenten/reihungstestnichtangemeldet\" />\n";
 				echo "\t\t\t\t</RDF:Seq>";
 				echo "\n\t\t\t</RDF:li>\n";
-				
+
 				echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/bewerber\" />\n";
 				echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/aufgenommen\" />\n";
 				echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/warteliste\" />\n";
 				echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/absage\" />\n";
-				
+
 				echo "\t\t\t</RDF:Seq>\n\t\t\t</RDF:li>\n";
 			}
 			echo "\t\t\t</RDF:Seq>\n\t\t\t</RDF:li>\n";
-					
+
 			$lastout='stg_kz';
 		}
 

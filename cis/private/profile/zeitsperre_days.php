@@ -39,7 +39,7 @@
 
 	$datum_beginn=date('Y-m-d');
 	$ts_beginn=$datum_obj->mktime_fromdate($datum_beginn);
-	$ts_ende=$datum_obj->jump_week($ts_beginn,1);
+	$ts_ende=$datum_obj->jump_day($ts_beginn,12);
 	$datum_ende=date('Y-m-d',$ts_ende);
 
 	// Lektoren holen
