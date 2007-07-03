@@ -740,8 +740,79 @@ function MitarbeiterNeu()
 // ****
 function MitarbeiterExport()
 {
+	var treeMitarbeiter=document.getElementById('mitarbeiter-tree');
+	var treeMitarbeiterMenu=document.getElementById('tree-menu-mitarbeiter');
+	var col = treeMitarbeiterMenu.columns ? treeMitarbeiterMenu.columns["tree-menu-mitarbeiter-col-filter"] : "tree-menu-mitarbeiter-col-filter";
+	var filter=treeMitarbeiterMenu.view.getCellText(treeMitarbeiterMenu.currentIndex,col);
+	cols = treeMitarbeiter.getElementsByTagName('treecol');
+
+	var url = "<?php echo APP_ROOT; ?>content/statistik/mitarbeiterexport.xls.php";
+	var attributes="?type=mitarbeiter";
+	if (filter=="Studiengangsleiter")
+			attributes+="&stgl=true";
+		if (filter=="Fachbereichsleiter")
+			attributes+="&fbl=true";
+		if (filter=="Alle")
+			attributes+="&alle=true";
+		if (filter=="Aktive")
+			attributes+="&aktiv=true";
+		if (filter=="FixAngestellte")
+			attributes+="&fix=true&aktiv=true";
+		if (filter=="FixAngestellteAlle")
+			attributes+="&fix=true";
+		if (filter=="Inaktive")
+			attributes+="&aktiv=false";
+		if (filter=="Karenziert")
+			attributes+="&karenziert=true";
+		if (filter=="Ausgeschieden")
+			attributes+="&ausgeschieden=true";
+		if (filter=="FreiAngestellte")
+			attributes+="&fix=false&aktiv=true";
+		if (filter=="FreiAngestellteAlle")
+			attributes+="&fix=false";
+
+	url+=attributes;
+	spalte=0;
+	for(i in cols)
+	{
+		if(cols[i].hidden==false)
+		{
+			url += "&spalte"+spalte+"="+MitarbeiterDetailgetSpaltenname(cols[i].id);
+			spalte=spalte+1;
+		}
+	}
+	//url+='&spalte0=titelpre&spalte1=vorname&spalte2=vornamen&spalte3=familienname&spalte4=uid';
+
+	//alert(url);
+	//window.open(url,"","chrome,status=no, modal, width=400, height=250, centerscreen, resizable");
+	window.location.href=url;
 }
 
+// ****
+// * Liefert anhand der ID den Namen der Klassenvariable
+// ****
+function MitarbeiterDetailgetSpaltenname(id)
+{
+	if(id=='mitarbeiter-treecol-anrede') return 'anrede';
+	if(id=='mitarbeiter-treecol-titelpre') return 'titelpre';
+	if(id=='mitarbeiter-treecol-vorname') return 'vorname';
+	if(id=='mitarbeiter-treecol-vornamen') return 'vornamen';
+	if(id=='mitarbeiter-treecol-nachname') return 'nachname';
+	if(id=='mitarbeiter-treecol-titelpost') return 'titelpost';
+	if(id=='mitarbeiter-treecol-personalnummer') return 'personalnummer';
+	if(id=='mitarbeiter-treecol-geburtsdatum') return 'gebdatum';
+	if(id=='mitarbeiter-treecol-svnr') return 'svnr';
+	if(id=='mitarbeiter-treecol-ersatzkennzeichen') return 'ersatzkennzeichen';
+	if(id=='mitarbeiter-treecol-uid') return 'uid';
+	if(id=='mitarbeiter-treecol-kurzbz') return 'kurzbz';
+	if(id=='mitarbeiter-treecol-geschlecht') return 'geschlecht';
+	if(id=='mitarbeiter-treecol-ort_kurzbz') return 'ort_kurzbz';
+	if(id=='mitarbeiter-treecol-telefonklappe') return 'telefonklappe';
+	if(id=='mitarbeiter-treecol-aktiv') return 'aktiv';
+	if(id=='mitarbeiter-treecol-person_id') return 'person_id';
+	if(id=='mitarbeiter-treecol-fixangestellt') return 'fixangestellt';
+	if(id=='mitarbeiter-treecol-lektor') return 'lektor';
+}
 // ***************** VERWENDUNG ********************** //
 
 // ****

@@ -532,7 +532,7 @@ class mitarbeiter extends benutzer
 	
 	function getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $ausgeschieden, $studiensemester_kurzbz)
 	{
-		$qry = "SELECT *, tbl_benutzer.aktiv as aktiv FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id)) LEFT JOIN public.tbl_benutzerfunktion USING(uid) WHERE true";
+		$qry = "SELECT distinct on(person_id) *, tbl_benutzer.aktiv as aktiv FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id)) LEFT JOIN public.tbl_benutzerfunktion USING(uid) WHERE true";
 		
 		if($fix)
 			$qry .= " AND fixangestellt=true";
@@ -548,7 +548,7 @@ class mitarbeiter extends benutzer
 			$qry .= " AND uid IN (SELECT mitarbeiter_uid FROM bis.tbl_bisverwendung WHERE beginn<(SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='$studiensemester_kurzbz') AND ende<(SELECT ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='$studiensemester_kurzbz'))";
 		if($ausgeschieden)
 		{
-			//ToDo: 
+			$qry.=" AND NOT EXISTS(SELECT * FROM bis.tbl_bisverwendung WHERE beginn<now() AND ende>now())";
 		}
 		//echo $qry;
 		if($result = pg_query($this->conn, $qry))

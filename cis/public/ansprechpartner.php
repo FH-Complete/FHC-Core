@@ -95,13 +95,13 @@ else
 			  <td width="56" nowrap>&nbsp;</td>
 			  <td nowrap>Termin nach Vereinbarung</td>
 			</tr>
-			<tr>
+			<!--<tr>
 			  <td width="260" nowrap>Braunstorfer Michael</td>
 			  <td width="50" nowrap>240</td>
 			  <td nowrap><?php echo ($visible?'<a class="Item" href="mailto:michael.braunstorfer@technikum-wien.at">michael.braunstorfer@technikum-wien.at</a>':'')?></td>
 			  <td width="56" nowrap>&nbsp;</td>
 			  <td nowrap>Termin nach Vereinbarung</td>
-			</tr>
+			</tr>-->
 			<tr>
 		  	  <td colspan="2" nowrap>&nbsp;</td>
 		  	  <td nowrap>&nbsp;</td>
@@ -295,7 +295,7 @@ else
               <td nowrap>Termin nach Vereinbarung</td>
           	</tr>
           	<tr> 
-              <td width="260" nowrap>Esberger Franz Ferdinand</td>
+              <td width="260" nowrap>Dipl. Ing. (FH) Esberger Franz Ferdinand</td>
               <td width="50" nowrap>346</td>
               <td  nowrap><?php echo ($visible?'<a class="Item" href="mailto:ffe@technikum-wien.at">ferdinand.esberger@technikum-wien.at</a>':'')?></td>
               <td width="56" nowrap>&nbsp;</td>
