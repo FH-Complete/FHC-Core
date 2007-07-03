@@ -1043,7 +1043,8 @@ if(!class_exists('FPDF'))
 	    break;
 	  case 'F':
 	    //Save to local file
-	    $f=fopen($name,'wb');
+	    $name = "/tmp/".$name;
+		$f=fopen($name,'wb');
 	    if(!$f)
 	      $this->Error('Unable to create output file: '.$name);
 	    fwrite($f,$this->buffer,strlen($this->buffer));
