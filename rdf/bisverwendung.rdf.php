@@ -42,7 +42,7 @@ if(isset($_GET['uid']))
 else 
 	$uid = '';
 
-if(isset($_GET['bisverwedung_id']) && is_numeric($_GET['bisverwendung_id']))
+if(isset($_GET['bisverwendung_id']) && is_numeric($_GET['bisverwendung_id']))
 	$bisverwendung_id = $_GET['bisverwendung_id'];
 else 
 	$bisverwendung_id = '';
@@ -70,8 +70,10 @@ if($uid!='')
 }
 elseif($bisverwendung_id!='')
 {
-	$verwendung_obj->load($bisverwendung_id);
-	draw_row($row);
+	if($verwendung_obj->load($bisverwendung_id))
+		draw_row($verwendung_obj);
+	else 
+		die($verwendung_obj->errormsg);
 }
 else 
 	die('Falsche Parameteruebergabe');

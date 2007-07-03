@@ -40,6 +40,7 @@ class entwicklungsteam
 	var $ext_id;
 	
 	var $besqual;
+	var $studiengang_kz_old;
 	
 	// ***********************************************
 	// * Konstruktor
@@ -75,12 +76,6 @@ class entwicklungsteam
 	// ***********************************************
 	function load($mitarbeiter_uid, $studiengang_kz)
 	{
-		//bisverwendung_id auf gueltigkeit pruefen
-		if(!is_numeric($mitarbeiter_uid) || $mitarbeiter_uid == '')
-		{
-			$this->errormsg = 'mitarbeiter_uid muss eine gueltige Zahl sein';
-			return false;
-		}
 		if(!is_numeric($studiengang_kz) || $studiengang_kz == '')
 		{
 			$this->errormsg = 'studiengang_kz muss eine gueltige Zahl sein';
@@ -88,7 +83,7 @@ class entwicklungsteam
 		}
 		
 		//laden des Datensatzes
-		$qry = "SELECT * FROM bis.tbl_entwicklungsteam JOIN bis.tbl_besqual USING(besqualcode) WHERE mitarbeiter_uid='$mitarbeiter_uid' AND studiengang_kz='$studiengang_kz'";
+		$qry = "SELECT * FROM bis.tbl_entwicklungsteam JOIN bis.tbl_besqual USING(besqualcode) WHERE mitarbeiter_uid='".addslashes($mitarbeiter_uid)."' AND studiengang_kz='$studiengang_kz'";
 		
 		if($result = pg_query($this->conn,$qry))
 		{
@@ -127,19 +122,13 @@ class entwicklungsteam
 	// **************************************************
 	function delete($mitarbeiter_uid, $studiengang_kz)
 	{
-		//id auf gueltigkeit pruefen
-		if(!is_numeric($mitarbeiter_uid) || $mitarbeiter_uid == '')
-		{
-			$this->errormsg = 'mitarbeiter_uid muss eine gueltige Zahl sein';
-			return false;
-		}
 		if(!is_numeric($studiengang_kz) || $studiengang_kz == '')
 		{
 			$this->errormsg = 'studiengang_kz muss eine gueltige Zahl sein';
 			return false;
 		}
 		
-		$qry = "DELETE FROM bis.tbl_entwicklungsteam WHERE mitarbeiter_uid = '$mitarbeiter_uid' AND studiengang_kz='$studiengang_kz';";
+		$qry = "DELETE FROM bis.tbl_entwicklungsteam WHERE mitarbeiter_uid = '".addslashes($mitarbeiter_uid)."' AND studiengang_kz='$studiengang_kz';";
 		
 		if(pg_query($this->conn,$qry))
 		{
@@ -185,7 +174,7 @@ class entwicklungsteam
 		if($new)
 		{
 			//Neuen Datensatz anlegen	
-			$qry = "BEGIN;INSERT INTO bis.tbl_entwicklungsteam (mitarbeiter_uid, studiengang_kz, besqualcode, beginn, ende
+			$qry = "INSERT INTO bis.tbl_entwicklungsteam (mitarbeiter_uid, studiengang_kz, besqualcode, beginn, ende,
 					updateamum, updatevon, insertamum, insertvon, ext_id) VALUES (".
 			       $this->addslashes($this->mitarbeiter_uid).', '.
 			       $this->addslashes($this->studiengang_kz).', '.
@@ -201,15 +190,19 @@ class entwicklungsteam
 		}
 		else 
 		{
+			if($this->studiengang_kz_old=='')
+				$this->studiengang_kz_old = $this->studiengang_kz;
+				
 			//Bestehenden Datensatz aktualisieren
-			$qry= "UPDATE bis.tbl_bisfunktion SET".
+			$qry= "UPDATE bis.tbl_entwicklungsteam SET".
 				  " besqualcode=".$this->addslashes($this->besqualcode).",".
 				  " beginn=".$this->addslashes($this->beginn).",".
+				  " studiengang_kz=".$this->addslashes($this->studiengang_kz).",".
 				  " ende=".$this->addslashes($this->ende).",".
 				  " updateamum=".$this->addslashes($this->updateamum).",".
 				  " updatevon=".$this->addslashes($this->updatevon).",".
 				  " ext_id=".$this->addslashes($this->ext_id).
-				  " WHERE mitarbeiter_uid='".addslashes($this->mitarbeiter_uid)."' AND studiengang_kz='$studiengang_kz'";
+				  " WHERE mitarbeiter_uid='".addslashes($this->mitarbeiter_uid)."' AND studiengang_kz='$this->studiengang_kz_old'";
 		}
 		
 		if(pg_query($this->conn, $qry))
@@ -265,5 +258,33 @@ class entwicklungsteam
 		}
 	}
 	
+	// *****
+	// * Preuft ob der Eintrag schon existiert
+	// *****
+	function exists($mitarbeiter_uid,$studiengang_kz)
+	{
+		$qry = "SELECT count(*) as anzahl FROM bis.tbl_entwicklungsteam WHERE mitarbeiter_uid='".addslashes($mitarbeiter_uid)."' AND studiengang_kz='".addslashes($studiengang_kz)."'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				if($row->anzahl>0)
+					return true;
+				else 
+					return false;
+			}
+			else 
+			{
+				$this->errormsg = 'Fehler beim Laden der Daten';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>

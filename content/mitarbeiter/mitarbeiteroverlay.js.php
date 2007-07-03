@@ -39,6 +39,7 @@ var MitarbeiterFunktionSelectStudiengangID=null; // ID des Studiengangs der Funk
 var MitarbeiterEntwicklungsteamTreeDatasource=null; // Datasource des Entwicklungsteamtrees
 var MitarbeiterEntwicklungsteamSelectMitarbeiterUID=null; // UID des Mitarbeiters des Entwicklugnsteams das nach dem rebuild markiert werden soll
 var MitarbeiterEntwicklungsteamSelectStudiengangID=null; // ID des Stg des Entwicklungsteams das nach dem rebuild markiert werden soll
+var MitarbeiterEntwicklungsteamDoubleRefresh=false; // Wenn auf einen Tree der eine leere Datasource enthaelt eine neue Datasource angehaengt wird, dann muss doppelt refresht werden
 // ********** Observer und Listener ************* //
 
 
@@ -190,7 +191,13 @@ var MitarbeiterEntwicklungsteamTreeListener =
  		//timeout nur bei Mozilla notwendig da sonst die rows
  		//noch keine values haben. Ab Seamonkey funktionierts auch
 		//ohne dem setTimeout
-		window.setTimeout(MitarbeiterEntwicklungsteamTreeSelect,10);
+		if(MitarbeiterEntwicklungsteamDoubleRefresh)
+		{
+			MitarbeiterEntwicklungsteamDoubleRefresh=false;
+			window.setTimeout("MitarbeiterEntwicklungsteamTreeRefresh()",10);
+		}
+		else
+			window.setTimeout(MitarbeiterEntwicklungsteamTreeSelect,10);
 	}
 };
 
@@ -582,6 +589,7 @@ function MitarbeiterAuswahl()
 	MitarbeiterEntwicklungsteamTreeDatasource.addXMLSinkObserver(MitarbeiterEntwicklungsteamTreeSinkObserver);
 	entwicklungsteamtree.builder.addListener(MitarbeiterEntwicklungsteamTreeListener);
 	
+	MitarbeiterEntwicklungsteamDetailDisableFields(true);
 	MitarbeiterEntwicklungsteamDisableFields(false);
 	
 	// Funktionen Tree Leeren
@@ -597,6 +605,7 @@ function MitarbeiterAuswahl()
 	funktiontree.builder.rebuild();
 	
 	MitarbeiterFunktionDisableFields(true);
+	
 }
 
 // ****
@@ -811,6 +820,155 @@ function MitarbeiterVerwendungDisableFields(val)
 	document.getElementById('mitarbeiter-verwendung-button-loeschen').disabled=val;
 }
 
+// ****
+// * Ruft den Dialog zum Bearbeiten der Verwendung auf
+// ****
+function MitarbeiterVerwendungBearbeiten()
+{
+	var tree=document.getElementById('mitarbeiter-tree-verwendung');
+
+	if (tree.currentIndex==-1) 
+	{
+		alert('Bitte zuerst einen Eintrag auswaehlen');
+		return false;
+	}
+	
+	//Uid der row holen
+	col = tree.columns ? tree.columns["mitarbeiter-verwendung-treecol-mitarbeiter_uid"] : "mitarbeiter-verwendung-treecol-mitarbeiter_uid";
+	mitarbeiter_uid=tree.view.getCellText(tree.currentIndex,col);
+
+	//Bisverwendung_id holen
+	col = tree.columns ? tree.columns["mitarbeiter-verwendung-treecol-bisverwendung_id"] : "mitarbeiter-verwendung-treecol-bisverwendung_id";
+	bisverwendung_id=tree.view.getCellText(tree.currentIndex,col);
+
+	//Dialog laden
+	window.open("<?php echo APP_ROOT; ?>content/mitarbeiter/mitarbeiterverwendungdialog.xul.php?mitarbeiter_uid="+mitarbeiter_uid+"&bisverwendung_id="+bisverwendung_id,"","chrome, status=no, width=500, height=350, centerscreen, resizable");
+}
+
+// ****
+// * Ruft den Dialog zum Eintragen der Verwendungen auf
+// ****
+function MitarbeiterVerwendungNeu()
+{
+	var tree=document.getElementById('mitarbeiter-tree');
+
+	//Uid der row holen
+	col = tree.columns ? tree.columns["mitarbeiter-treecol-uid"] : "mitarbeiter-treecol-uid";
+	mitarbeiter_uid=tree.view.getCellText(tree.currentIndex,col);
+	
+	window.open("<?php echo APP_ROOT; ?>content/mitarbeiter/mitarbeiterverwendungdialog.xul.php?mitarbeiter_uid="+mitarbeiter_uid,"","chrome, status=no, width=500, height=350, centerscreen, resizable");
+}
+
+function MitarbeiterVerwendungSpeichern(document, bisverwendung_id, mitarbeiter_uid, neu)
+{
+	ba1code = document.getElementById('mitarbeiter-verwendung-detail-menulist-beschart1').value;
+	ba2code = document.getElementById('mitarbeiter-verwendung-detail-menulist-beschart2').value;
+	beschausmasscode = document.getElementById('mitarbeiter-verwendung-detail-menulist-ausmass').value;
+	verwendung_code = document.getElementById('mitarbeiter-verwendung-detail-menulist-verwendung').value;
+	hauptberufcode = document.getElementById('mitarbeiter-verwendung-detail-menulist-hauptberuf').value;
+	hauptberuflich = document.getElementById('mitarbeiter-verwendung-detail-checkbox-hauptberuflich').checked;
+	habilitation = document.getElementById('mitarbeiter-verwendung-detail-checkbox-habilitation').checked;
+	beginn = document.getElementById('mitarbeiter-verwendung-detail-datum-beginn').value;
+	ende = document.getElementById('mitarbeiter-verwendung-detail-datum-ende').value;
+	
+	if(beginn!='' && !CheckDatum(beginn))
+	{
+		alert('Beginn Datum ist ungueltig');
+		return false;
+	}
+	
+	if(ende!='' && !CheckDatum(ende))
+	{
+		alert('Ende Datum ist ungueltig');
+		return false;
+	}
+	
+	var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
+	var req = new phpRequest(url,'','');
+	
+	req.add('type', 'verwendungsave');
+	
+	req.add('neu', neu);
+	req.add('mitarbeiter_uid', mitarbeiter_uid);
+	req.add('bisverwendung_id', bisverwendung_id);
+	req.add('ba1code', ba1code);
+	req.add('ba2code', ba2code);
+	req.add('beschausmasscode', beschausmasscode);
+	req.add('verwendung_code', verwendung_code);
+	req.add('hauptberufcode', hauptberufcode);
+	req.add('hauptberuflich', hauptberuflich);
+	req.add('habilitation', habilitation);
+	req.add('beginn', beginn);
+	req.add('ende', ende);
+
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+	
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+		return false;
+	}
+	else
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		MitarbeiterVerwendungSelectID = val.dbdml_data;
+		MitarbeiterVerwendungTreeDatasource.Refresh(false);
+		return true;
+	}
+}
+
+// ****
+// * Loescht eine Bisverwendung
+// ****
+function MitarbeiterVerwendungLoeschen()
+{
+	var tree=document.getElementById('mitarbeiter-tree-verwendung');
+
+	if (tree.currentIndex==-1) 
+	{
+		alert('Bitte zuerst einen Eintrag auswaehlen');
+		return false;
+	}
+	//Bisverwendung_id holen
+	col = tree.columns ? tree.columns["mitarbeiter-verwendung-treecol-bisverwendung_id"] : "mitarbeiter-verwendung-treecol-bisverwendung_id";
+	bisverwendung_id=tree.view.getCellText(tree.currentIndex,col);
+	
+	if(confirm('Diese Verwendung wirklich loeschen?'))
+	{
+	
+		var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
+		var req = new phpRequest(url,'','');
+		
+		req.add('type', 'verwendungdelete');
+		
+		req.add('bisverwendung_id', bisverwendung_id);
+	
+		var response = req.executePOST();
+	
+		var val =  new ParseReturnValue(response)
+		
+		if (!val.dbdml_return)
+		{
+			if(val.dbdml_errormsg=='')
+				alert(response)
+			else
+				alert(val.dbdml_errormsg)
+			return false;
+		}
+		else
+		{
+			netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+			MitarbeiterVerwendungTreeDatasource.Refresh(false);
+			return true;
+		}
+	}
+}
+
 // *********** FUNKTION *************** //
 
 // ****
@@ -850,8 +1008,178 @@ function MitarbeiterFunktionTreeSelect()
 function MitarbeiterFunktionDisableFields(val)
 {
 	document.getElementById('mitarbeiter-funktion-button-neu').disabled=val;
-	document.getElementById('mitarbeiter-funktion-button-bearbeiten').disabled=val;
 	document.getElementById('mitarbeiter-funktion-button-loeschen').disabled=val;
+	if(val)
+		MitarbeiterFunktionDetailDisableFields(true);
+}
+
+// ****
+// * De-/Aktiviert die Detailfelder
+// ****
+function MitarbeiterFunktionDetailDisableFields(val)
+{
+	document.getElementById('mitarbeiter-funktion-detail-button-speichern').disabled=val;
+	document.getElementById('mitarbeiter-funktion-detail-textbox-sws').disabled=val,
+	document.getElementById('mitarbeiter-funktion-detail-menulist-studiengang').disabled=val;
+}
+
+// ****
+// * Legt eine neue Funktion an
+// ****
+function MitarbeiterFunktionNeu()
+{
+	document.getElementById('mitarbeiter-funktion-detail-checkbox-neu').checked=true;
+	document.getElementById('mitarbeiter-funktion-detail-textbox-studiengang').value='';
+	document.getElementById('mitarbeiter-funktion-detail-textbox-sws').value='';
+	MitarbeiterFunktionDetailDisableFields(false);
+}
+
+// ****
+// * Speichert einen Funktionseintrag
+// ****
+function MitarbeiterFunktionSpeichern()
+{
+	studiengang_kz = document.getElementById('mitarbeiter-funktion-detail-menulist-studiengang').value;
+	sws = document.getElementById('mitarbeiter-funktion-detail-textbox-sws').value;
+	neu = document.getElementById('mitarbeiter-funktion-detail-checkbox-neu').checked;
+	studiengang_kz_old = document.getElementById('mitarbeiter-funktion-detail-textbox-studiengang').value;
+	
+	//Bisverwendung_id holen
+	var tree=document.getElementById('mitarbeiter-tree-verwendung');
+
+	if (tree.currentIndex==-1) 
+	{
+		alert('Es wurde keine Verwendung ausgewaehlt');
+		return false;
+	}
+	
+	col = tree.columns ? tree.columns["mitarbeiter-verwendung-treecol-bisverwendung_id"] : "mitarbeiter-verwendung-treecol-bisverwendung_id";
+	bisverwendung_id=tree.view.getCellText(tree.currentIndex,col);
+
+	var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
+	var req = new phpRequest(url,'','');
+	
+	req.add('type', 'funktionsave');
+	
+	req.add('neu', neu);
+	req.add('studiengang_kz', studiengang_kz);
+	req.add('studiengang_kz_old', studiengang_kz_old);
+	req.add('sws', sws);
+	req.add('bisverwendung_id', bisverwendung_id);
+
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+	
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+		return false;
+	}
+	else
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		MitarbeiterFunktionSelectVerwendungID = bisverwendung_id;
+		MitarbeiterFunktionSelectStudiengangID = studiengang_kz;
+		MitarbeiterFunktionTreeDatasource.Refresh(false);
+		MitarbeiterFunktionDetailDisableFields(true);
+		return true;
+	}
+}
+
+// **** 
+// * bei der Auswahl einer Funktion wird diese zum Bearbeiten geladen
+// ****
+function MitarbeiterFunktionSelect()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	//Daten laden
+	tree = document.getElementById('mitarbeiter-tree-funktion');
+	
+	if (tree.currentIndex==-1) 
+		return false;
+	
+	col = tree.columns ? tree.columns["mitarbeiter-funktion-treecol-bisverwendung_id"] : "mitarbeiter-funktion-treecol-bisverwendung_id";
+	bisverwendung_id=tree.view.getCellText(tree.currentIndex,col);
+	
+	col = tree.columns ? tree.columns["mitarbeiter-funktion-treecol-studiengang_kz"] : "mitarbeiter-funktion-treecol-studiengang_kz";
+	studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
+	
+	var url = '<?php echo APP_ROOT ?>rdf/bisfunktion.rdf.php?bisverwendung_id='+bisverwendung_id+'&studiengang_kz='+studiengang_kz+'&'+gettimestamp();
+		
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
+                   getService(Components.interfaces.nsIRDFService);
+    
+    var dsource = rdfService.GetDataSourceBlocking(url);
+    
+	var subject = rdfService.GetResource("http://www.technikum-wien.at/bisfunktion/" + bisverwendung_id+'/'+studiengang_kz);
+
+	var predicateNS = "http://www.technikum-wien.at/bisfunktion/rdf";
+
+	//RDF parsen
+
+	var sws = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#sws" ));
+	
+	document.getElementById('mitarbeiter-funktion-detail-menulist-studiengang').value=studiengang_kz;
+	document.getElementById('mitarbeiter-funktion-detail-textbox-sws').value=sws;
+	document.getElementById('mitarbeiter-funktion-detail-checkbox-neu').checked=false;	
+	document.getElementById('mitarbeiter-funktion-detail-textbox-studiengang').value=studiengang_kz;
+	MitarbeiterFunktionDetailDisableFields(false);
+}
+
+// ****
+// * Loescht eine BISFunktion
+// ****
+function MitarbeiterFunktionLoeschen()
+{
+	//Daten laden
+	tree = document.getElementById('mitarbeiter-tree-funktion');
+	
+	if (tree.currentIndex==-1) 
+	{
+		alert('Es wurde keine Verwendung ausgewaehlt');
+		return false;
+	}
+	
+	col = tree.columns ? tree.columns["mitarbeiter-funktion-treecol-bisverwendung_id"] : "mitarbeiter-funktion-treecol-bisverwendung_id";
+	bisverwendung_id=tree.view.getCellText(tree.currentIndex,col);
+	
+	col = tree.columns ? tree.columns["mitarbeiter-funktion-treecol-studiengang_kz"] : "mitarbeiter-funktion-treecol-studiengang_kz";
+	studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
+	
+	if(confirm("Wollen Sie diese Funktion wirklich loeschen?"))
+	{
+		var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
+		var req = new phpRequest(url,'','');
+		
+		req.add('type', 'funktiondelete');
+		
+		req.add('studiengang_kz', studiengang_kz);
+		req.add('bisverwendung_id', bisverwendung_id);
+	
+		var response = req.executePOST();
+	
+		var val =  new ParseReturnValue(response)
+		
+		if (!val.dbdml_return)
+		{
+			if(val.dbdml_errormsg=='')
+				alert(response)
+			else
+				alert(val.dbdml_errormsg)
+			return false;
+		}
+		else
+		{
+			netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+			MitarbeiterFunktionTreeDatasource.Refresh(false);
+			MitarbeiterFunktionDetailDisableFields(true);
+			return true;
+		}
+	}
 }
 
 // *********** ENTWICKLUNGSTEAM *************** //
@@ -893,6 +1221,201 @@ function MitarbeiterEntwicklungsteamTreeSelect()
 function MitarbeiterEntwicklungsteamDisableFields(val)
 {
 	document.getElementById('mitarbeiter-entwicklungsteam-button-neu').disabled=val;
-	document.getElementById('mitarbeiter-entwicklungsteam-button-bearbeiten').disabled=val;
 	document.getElementById('mitarbeiter-entwicklungsteam-button-loeschen').disabled=val;
+	
+	if(val)
+		MitarbeiterEntwicklungsteamDetailDisableFields(val)
+}
+
+// ****
+// * De-/Aktiviert die Detailfelder
+// ****
+function MitarbeiterEntwicklungsteamDetailDisableFields(val)
+{
+	document.getElementById('mitarbeiter-entwicklungsteam-detail-menulist-studiengang').disabled=val;
+	document.getElementById('mitarbeiter-entwicklungsteam-detail-menulist-besqual').disabled=val;
+	document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-beginn').disabled=val;
+	document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-ende').disabled=val;
+	document.getElementById('mitarbeiter-entwicklungsteam-detail-button-speichern').disabled=val;	
+}
+
+// ****
+// * Neuen Datensatz anlegen
+// ****
+function MitarbeiterEntwicklungsteamNeu()
+{
+	document.getElementById('mitarbeiter-entwicklungsteam-detail-checkbox-neu').checked=true;
+	document.getElementById('mitarbeiter-entwicklungsteam-detail-menulist-besqual').value='0';
+	document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-beginn').value='';
+	document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-ende').value='';
+	MitarbeiterEntwicklungsteamDetailDisableFields(false);
+}
+
+// ****
+// * Beim Markieren eines Datensatzes wird dieser geladen
+// ****
+function MitarbeiterEntwicklungsteamSelect()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	//Daten laden
+	tree = document.getElementById('mitarbeiter-tree-entwicklungsteam');
+	
+	if (tree.currentIndex==-1) 
+		return false;
+	
+	col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-studiengang_kz"] : "mitarbeiter-entwicklungsteam-treecol-studiengang_kz";
+	studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
+	
+	col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-mitarbeiter_uid"] : "mitarbeiter-entwicklungsteam-treecol-mitarbeiter_uid";
+	mitarbeiter_uid=tree.view.getCellText(tree.currentIndex,col);
+
+	var url = '<?php echo APP_ROOT ?>rdf/entwicklungsteam.rdf.php?studiengang_kz='+studiengang_kz+'&mitarbeiter_uid='+mitarbeiter_uid+'&'+gettimestamp();
+	
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
+                   getService(Components.interfaces.nsIRDFService);
+    
+    var dsource = rdfService.GetDataSourceBlocking(url);
+    
+	var subject = rdfService.GetResource("http://www.technikum-wien.at/entwicklungsteam/" + mitarbeiter_uid+'/'+studiengang_kz);
+
+	var predicateNS = "http://www.technikum-wien.at/entwicklungsteam/rdf";
+
+	//RDF parsen
+
+	var besqualcode = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#besqualcode" ));
+	var beginn = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#beginn" ));
+	var ende = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ende" ));
+	
+	document.getElementById('mitarbeiter-entwicklungsteam-detail-menulist-studiengang').value=studiengang_kz;
+	document.getElementById('mitarbeiter-entwicklungsteam-detail-menulist-besqual').value=besqualcode;
+	document.getElementById('mitarbeiter-entwicklungsteam-detail-checkbox-neu').checked=false;	
+	document.getElementById('mitarbeiter-entwicklungsteam-detail-textbox-studiengang').value=studiengang_kz;
+	document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-beginn').value=beginn;
+	document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-ende').value=ende;
+	MitarbeiterEntwicklungsteamDetailDisableFields(false);
+}
+
+// ****
+// * Speichert die Entwicklungsteam Daten
+// ****
+function MitarbeiterEntwicklungsteamSpeichern()
+{
+	// Trick 17	(sonst gibt's ein Permission denied)
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	
+	studiengang_kz = document.getElementById('mitarbeiter-entwicklungsteam-detail-menulist-studiengang').value;
+	besqualcode = document.getElementById('mitarbeiter-entwicklungsteam-detail-menulist-besqual').value;
+	neu = document.getElementById('mitarbeiter-entwicklungsteam-detail-checkbox-neu').checked;
+	studiengang_kz_old = document.getElementById('mitarbeiter-entwicklungsteam-detail-textbox-studiengang').value;
+	beginn = document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-beginn').value;
+	ende = document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-ende').value;
+	
+	var tree = document.getElementById('mitarbeiter-tree');
+
+	if (tree.currentIndex==-1) 
+	{
+		alert('Es ist kein Mitarbeiter ausgewaehlt');
+		return;
+	}
+
+	//Ausgewaehlte UID holen
+    var col = tree.columns ? tree.columns["mitarbeiter-treecol-uid"] : "mitarbeiter-treecol-uid";
+	var mitarbeiter_uid=tree.view.getCellText(tree.currentIndex,col);
+
+	var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
+	var req = new phpRequest(url,'','');
+	
+	req.add('type', 'entwicklungsteamsave');
+	
+	req.add('neu', neu);
+	req.add('studiengang_kz', studiengang_kz);
+	req.add('studiengang_kz_old', studiengang_kz_old);
+	req.add('besqualcode', besqualcode);
+	req.add('mitarbeiter_uid', mitarbeiter_uid);
+	req.add('beginn', beginn);
+	req.add('ende', ende);
+
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+	
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+		return false;
+	}
+	else
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		MitarbeiterEntwicklungsteamSelectMitarbeiterUID = mitarbeiter_uid;
+		MitarbeiterEntwicklungsteamSelectStudiengangID = studiengang_kz;
+		MitarbeiterEntwicklungsteamDoubleRefresh=true;
+		MitarbeiterEntwicklungsteamTreeDatasource.Refresh(false);
+		MitarbeiterEntwicklungsteamDetailDisableFields(true);
+		return true;
+	}
+}
+
+// ****
+// * Loescht einen Entwicklungsteameintrag
+// ****
+function MitarbeiterEntwicklungsteamLoeschen()
+{
+	//Daten laden
+	tree = document.getElementById('mitarbeiter-tree-entwicklungsteam');
+	
+	if (tree.currentIndex==-1) 
+	{
+		alert('Es wurde keine Eintrag ausgewaehlt');
+		return false;
+	}
+	
+	col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-studiengang_kz"] : "mitarbeiter-entwicklungsteam-treecol-studiengang_kz";
+	studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
+	
+	col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-mitarbeiter_uid"] : "mitarbeiter-entwicklungsteam-treecol-mitarbeiter_uid";
+	mitarbeiter_uid=tree.view.getCellText(tree.currentIndex,col);
+	
+	if(confirm("Wollen Sie diesen Eintrag wirklich loeschen?"))
+	{
+		var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
+		var req = new phpRequest(url,'','');
+		
+		req.add('type', 'entwicklungsteamdelete');
+		
+		req.add('studiengang_kz', studiengang_kz);
+		req.add('mitarbeiter_uid', mitarbeiter_uid);
+	
+		var response = req.executePOST();
+	
+		var val =  new ParseReturnValue(response)
+		
+		if (!val.dbdml_return)
+		{
+			if(val.dbdml_errormsg=='')
+				alert(response)
+			else
+				alert(val.dbdml_errormsg)
+			return false;
+		}
+		else
+		{
+			netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+			MitarbeiterEntwicklungsteamTreeDatasource.Refresh(false);
+			MitarbeiterEntwicklungsteamDetailDisableFields(true);
+			return true;
+		}
+	}
+}
+
+// ****
+// * Refresh des Entwicklungsteam Trees
+// ****
+function MitarbeiterEntwicklungsteamTreeRefresh()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	MitarbeiterEntwicklungsteamTreeDatasource.Refresh(false);
 }

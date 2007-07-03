@@ -30,7 +30,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				flags="dont-build-content"
 				enableColumnDrag="true"
 				style="margin:5px;"
-				persist="hidden, height"						
+				persist="hidden, height"
+				ondblclick="MitarbeiterVerwendungBearbeiten()"
 		>
 			<treecols>
 				<treecol id="mitarbeiter-verwendung-treecol-ba1bez" label="Beschaeftigungsart 1" flex="1" persist="hidden, width" hidden="false"
@@ -127,9 +128,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			</template>
 		</tree>
 		<vbox>
-			<button id="mitarbeiter-verwendung-button-neu" label="Neu" disabled="true" />
-			<button id="mitarbeiter-verwendung-button-bearbeiten" label="Bearbeiten" disabled="true" />
-			<button id="mitarbeiter-verwendung-button-loeschen" label="Loeschen" disabled="true" />
+			<button id="mitarbeiter-verwendung-button-neu" label="Neu" disabled="true" oncommand="MitarbeiterVerwendungNeu()" />
+			<button id="mitarbeiter-verwendung-button-bearbeiten" label="Bearbeiten" disabled="true" oncommand="MitarbeiterVerwendungBearbeiten()"/>
+			<button id="mitarbeiter-verwendung-button-loeschen" label="Loeschen" disabled="true" oncommand="MitarbeiterVerwendungLoeschen()"/>
 		</vbox>
 	</hbox>
 
@@ -179,11 +180,49 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					</rule>
 				</template>
 			</tree>
-			<vbox>
-				<button id="mitarbeiter-funktion-button-neu" label="Neu" disabled="true" />
-				<button id="mitarbeiter-funktion-button-bearbeiten" label="Bearbeiten" disabled="true" />
-				<button id="mitarbeiter-funktion-button-loeschen" label="Loeschen" disabled="true" />
-			</vbox>
+			<hbox>
+				<vbox>
+					<button id="mitarbeiter-funktion-button-neu" label="Neu" disabled="true" oncommand="MitarbeiterFunktionNeu()"/>
+					<button id="mitarbeiter-funktion-button-loeschen" label="Loeschen" disabled="true" oncommand="MitarbeiterFunktionLoeschen()"/>
+				</vbox>
+				<vbox flex="1">
+					<checkbox id="mitarbeiter-funktion-detail-checkbox-neu" checked="true" hidden="true" />
+					<textbox id="mitarbeiter-funktion-detail-textbox-studiengang" hidden="true" />
+					<groupbox id="mitarbeiter-funktion-detail-groupbox" flex="1">
+						<caption label="Details" />
+						<grid id="mitarbeiter-funktion-detail-grid" style="margin:4px;" flex="1">
+						  	<columns  >
+								<column flex="1"/>
+								<column flex="5"/>
+							</columns>
+							<rows>
+								<row>
+									<label value="Studiengang" control="mitarbeiter-funktion-detail-menulist-studiengang"/>
+									<menulist id="mitarbeiter-funktion-detail-menulist-studiengang" disabled="true"
+									          datasources="<?php echo APP_ROOT ?>rdf/studiengang.rdf.php" flex="1"
+								              ref="http://www.technikum-wien.at/studiengang/liste" >
+										<template>
+											<menupopup>
+												<menuitem value="rdf:http://www.technikum-wien.at/studiengang/rdf#studiengang_kz"
+									        		      label="rdf:http://www.technikum-wien.at/studiengang/rdf#kuerzel"
+												  		  uri="rdf:*"/>
+												</menupopup>
+										</template>
+									</menulist>
+								</row>
+								<row>
+									<label value="SWS" control="mitarbeiter-funktion-detail-textbox-sws"/>
+									<textbox id="mitarbeiter-funktion-detail-textbox-sws" maxlenght="7" size="7" disabled="true"/>
+								</row>
+								<row>
+									<spacer />
+									<button id="mitarbeiter-funktion-detail-button-speichern" label="Speichern" disabled="true" oncommand="MitarbeiterFunktionSpeichern()" />
+								</row>
+							</rows>
+						</grid>
+					</groupbox>									
+				</vbox>
+			</hbox>
 		</hbox>
 	</groupbox>
 </groupbox>
@@ -248,9 +287,63 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			</template>
 		</tree>
 		<vbox>
-			<button id="mitarbeiter-entwicklungsteam-button-neu" label="Neu" disabled="true" />
-			<button id="mitarbeiter-entwicklungsteam-button-bearbeiten" label="Bearbeiten" disabled="true" />
-			<button id="mitarbeiter-entwicklungsteam-button-loeschen" label="Loeschen" disabled="true" />
+			<button id="mitarbeiter-entwicklungsteam-button-neu" label="Neu" disabled="true" oncommand="MitarbeiterEntwicklungsteamNeu()"/>
+			<button id="mitarbeiter-entwicklungsteam-button-loeschen" label="Loeschen" disabled="true" oncommand="MitarbeiterEntwicklungsteamLoeschen()"/>
+		</vbox>
+		<vbox>
+			<checkbox id="mitarbeiter-entwicklungsteam-detail-checkbox-neu" checked="true" hidden="true" />
+			<textbox id="mitarbeiter-entwicklungsteam-detail-textbox-studiengang" hidden="true" />
+			<groupbox id="mitarbeiter-entwicklungsteam-detail-groupbox" flex="1">
+				<caption label="Details" />
+				<grid id="mitarbeiter-entwicklungsteam-detail-grid" style="margin:4px;" flex="1">
+				  	<columns  >
+						<column flex="1"/>
+						<column flex="5"/>
+					</columns>
+					<rows>
+						<row>
+							<label value="Studiengang" control="mitarbeiter-entwicklungsteam-detail-menulist-studiengang"/>
+							<menulist id="mitarbeiter-entwicklungsteam-detail-menulist-studiengang" disabled="true"
+							          datasources="<?php echo APP_ROOT ?>rdf/studiengang.rdf.php" flex="1"
+						              ref="http://www.technikum-wien.at/studiengang/liste" >
+								<template>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/studiengang/rdf#studiengang_kz"
+							        		      label="rdf:http://www.technikum-wien.at/studiengang/rdf#kuerzel"
+										  		  uri="rdf:*"/>
+										</menupopup>
+								</template>
+							</menulist>
+						</row>
+						<row>
+							<label value="Besondere Qualifikation" control="mitarbeiter-entwicklungsteam-detail-menulist-besqual"/>
+							<menulist id="mitarbeiter-entwicklungsteam-detail-menulist-besqual" disabled="true"
+							          datasources="<?php echo APP_ROOT ?>rdf/besonderequalifikation.rdf.php" flex="1"
+						              ref="http://www.technikum-wien.at/besonderequalifikation/liste" >
+								<template>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/besonderequalifikation/rdf#besqualcode"
+							        		      label="rdf:http://www.technikum-wien.at/besonderequalifikation/rdf#besqualbez"
+										  		  uri="rdf:*"/>
+										</menupopup>
+								</template>
+							</menulist>
+						</row>
+						<row>
+							<label value="Beginn" control="mitarbeiter-entwicklungsteam-detail-datum-beginn"/>
+							<box id="mitarbeiter-entwicklungsteam-detail-datum-beginn" class="Datum" disabled="true"/>
+						</row>
+						<row>
+							<label value="Ende" control="mitarbeiter-entwicklungsteam-detail-datum-ende"/>
+							<box id="mitarbeiter-entwicklungsteam-detail-datum-ende" class="Datum" disabled="true"/>
+						</row>
+						<row>
+							<spacer />
+							<button id="mitarbeiter-entwicklungsteam-detail-button-speichern" label="Speichern" disabled="true" oncommand="MitarbeiterEntwicklungsteamSpeichern()" />
+						</row>
+					</rows>
+				</grid>
+			</groupbox>
 		</vbox>
 	</hbox>
 </groupbox>

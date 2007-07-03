@@ -92,7 +92,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	</groupbox>
 	<vbox>
 		<spacer flex="1"/>
-		<button id="student-zeugnis-button-archivieren" label="aktuelles Zeugnis archivieren" disabled="false"/>
+		<button id="student-zeugnis-button-archivieren" label="aktuelles Zeugnis archivieren" disabled="false" oncommand="StudentZeugnisArchivieren()"/>
 		<spacer flex="1"/>
 	</vbox>
 </hbox>

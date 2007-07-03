@@ -36,6 +36,7 @@ class bisfunktion
 	var $insertamum;
 	var $insertvon;
 	var $ext_id;
+	var $studiengang_kz_old;
 	
 	// ***********************************************
 	// * Konstruktor
@@ -178,7 +179,7 @@ class bisfunktion
 		if($new)
 		{
 			//Neuen Datensatz anlegen	
-			$qry = "BEGIN;INSERT INTO bis.tbl_bisfunktion (bisverwendung_id, studiengang_kz, sws
+			$qry = "INSERT INTO bis.tbl_bisfunktion (bisverwendung_id, studiengang_kz, sws,
 					updateamum, updatevon, insertamum, insertvon, ext_id) VALUES (".
 			       $this->addslashes($this->bisverwendung_id).', '.
 			       $this->addslashes($this->studiengang_kz).', '.
@@ -192,15 +193,21 @@ class bisfunktion
 		}
 		else 
 		{
+			//Bei einem Update bei dem sich der Studiengang aendert muss der "Alte" Studiengang auch angegeben werden
+			//da der Studiengang teil des Primaerschluessels ist
+			if($this->studiengang_kz_old=='')
+				$this->studiengang_kz_old = $this->studiengang_kz;
+			
 			//Bestehenden Datensatz aktualisieren
 			$qry= "UPDATE bis.tbl_bisfunktion SET".
 				  " sws=".$this->addslashes($this->sws).",".
+				  " studiengang_kz=".$this->addslashes($this->studiengang_kz).",".
 				  " updateamum=".$this->addslashes($this->updateamum).",".
 				  " updatevon=".$this->addslashes($this->updatevon).",".
 				  " ext_id=".$this->addslashes($this->ext_id).
-				  " WHERE bisverwendung_id='".addslashes($this->bisverwendung_id)."' AND studiengang_kz='$studiengang_kz'";
+				  " WHERE bisverwendung_id='".addslashes($this->bisverwendung_id)."' AND studiengang_kz='$this->studiengang_kz_old'";
 		}
-		
+		//echo $qry;
 		if(pg_query($this->conn, $qry))
 		{
 			return true;
@@ -224,7 +231,8 @@ class bisfunktion
 		
 		if($studiengang_kz!=null)
 			$qry.=" AND studiengang_kz='".addslashes($studiengang_kz)."'";
-		
+
+		$qry.=" ORDER BY studiengang_kz";
 		if($result = pg_query($this->conn,$qry))
 		{
 			while($row=pg_fetch_object($result))

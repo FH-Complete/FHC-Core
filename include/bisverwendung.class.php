@@ -91,11 +91,11 @@ class bisverwendung
 		}
 		
 		//laden des Datensatzes
-		$qry = "SELECT * FROM bis.tbl_bisverwendung, bis.tbl_beschaeftigungsart1, bis.tbl_beschaeftigungsart2, 
-				bis.bescharftigungsausmass, bis.tbl_verwendung WHERE 
-				tbl_bisverwendung.ba1code=beschaeftigungsart1.ba1code AND
-				tbl_bisverwendung.ba2code=beschaeftigungsart2.ba2code AND
-				tbl_bisverwendung.beschausmasscode=beschaeftigungsausmass.beschausmasscode AND
+		$qry = "SELECT * FROM bis.tbl_beschaeftigungsart1, bis.tbl_beschaeftigungsart2, 
+				bis.tbl_beschaeftigungsausmass, bis.tbl_verwendung, bis.tbl_bisverwendung LEFT JOIN bis.tbl_hauptberuf USING(hauptberufcode) WHERE 
+				tbl_bisverwendung.ba1code=tbl_beschaeftigungsart1.ba1code AND
+				tbl_bisverwendung.ba2code=tbl_beschaeftigungsart2.ba2code AND
+				tbl_bisverwendung.beschausmasscode=tbl_beschaeftigungsausmass.beschausmasscode AND
 				tbl_bisverwendung.verwendung_code=tbl_verwendung.verwendung_code AND
 				bisverwendung_id='$bisverwendung_id';";
 		
@@ -152,7 +152,19 @@ class bisverwendung
 			$this->errormsg = 'bisverwendung_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+		$qry = "SELECT count(*) as anzahl FROM bis.tbl_bisfunktion WHERE bisverwendung_id='$bisverwendung_id'";
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				if($row->anzahl>0)
+				{
+					$this->errormsg = 'Bitte zuerst alle zugehoerigen Funktionen loeschen';
+					return false;
+				}
+			}
+		}
+				
 		$qry = "DELETE FROM bis.tbl_bisverwendung WHERE bisverwendung_id = '$bisverwendung_id';";
 		
 		if(pg_query($this->conn,$qry))
@@ -250,7 +262,7 @@ class bisverwendung
 				{
 					if($row = pg_fetch_object($result))
 					{
-						$this->akte_id = $row->id;
+						$this->bisverwendung_id = $row->id;
 						pg_query($this->conn, 'COMMIT;');
 						return true;
 					}
@@ -286,15 +298,14 @@ class bisverwendung
 	function getVerwendung($uid)
 	{
 		//laden des Datensatzes
-		$qry = "SELECT * FROM bis.tbl_bisverwendung, bis.tbl_beschaeftigungsart1, bis.tbl_beschaeftigungsart2, 
-				bis.tbl_beschaeftigungsausmass, bis.tbl_verwendung, bis.tbl_hauptberuf WHERE 
+		$qry = "SELECT * FROM bis.tbl_beschaeftigungsart1, bis.tbl_beschaeftigungsart2, 
+				bis.tbl_beschaeftigungsausmass, bis.tbl_verwendung, bis.tbl_bisverwendung LEFT JOIN bis.tbl_hauptberuf USING(hauptberufcode) WHERE 
 				tbl_bisverwendung.ba1code=tbl_beschaeftigungsart1.ba1code AND
 				tbl_bisverwendung.ba2code=tbl_beschaeftigungsart2.ba2code AND
 				tbl_bisverwendung.beschausmasscode=tbl_beschaeftigungsausmass.beschausmasscode AND
 				tbl_bisverwendung.verwendung_code=tbl_verwendung.verwendung_code AND
-				tbl_bisverwendung.hauptberufcode=tbl_hauptberuf.hauptberufcode AND
-				mitarbeiter_uid='".addslashes($uid)."';";
-		
+				mitarbeiter_uid='".addslashes($uid)."' ORDER BY beginn;";
+		//echo $qry;
 		if($result = pg_query($this->conn,$qry))
 		{
 			while($row=pg_fetch_object($result))
