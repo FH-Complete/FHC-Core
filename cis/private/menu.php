@@ -56,6 +56,7 @@ if(check_lektor($user,$db_conn))
    $is_lector=true;
 else
    $is_lector=false;
+
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -194,13 +195,13 @@ else
 				</tr>
 			<?php
 			}
-			if ($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter') || $fkt->checkFunktion('stglstv') || $fkt->checkFunktion('stgl') || $fkt->checkFunktion('ass'))
+			if ($rechte->isFix())
 			{
 				?>
 				<tr>
 					<td width="10" nowrap>&nbsp;</td>
 				    <td nowrap>
-				    	<a href="profile/zeitsperre_days.php?days=7" target="content" class="MenuItem" onClick="js_toggle_container('Zeitsperren');">
+				    	<a href="profile/zeitsperre_days.php?days=12" target="content" class="MenuItem" onClick="js_toggle_container('Zeitsperren');">
 				    		<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Zeitsperren
 				    	</a>
 				    </td>
@@ -213,9 +214,10 @@ else
 					  	<td nowrap>
 							<ul style="margin-top: 0px; margin-bottom: 0px;">
 							<?php
+							if ($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('mitarbeiter'))
+								echo '<li><a class="Item2" href="profile/resturlaub.php" target="content">Resturlaub</a></li>';
 							if ($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('mitarbeiter') || $fkt->checkFunktion('stglstv')|| $fkt->checkFunktion('stgl') || $fkt->checkFunktion('ass'))
 							{
-								echo '<li><a class="Item2" href="profile/resturlaub.php" target="content">Resturlaub</a></li>';
 								echo '<li><a class="Item2" href="profile/zeitsperre.php?fix=true" target="content">Fix-Angestellte</a></li>';
 								echo '<li><a class="Item2" href="profile/zeitsperre.php?fix=true&lektor=true" target="content">Fixe Lektoren</a></li>';
 							}

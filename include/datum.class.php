@@ -111,7 +111,21 @@ class datum
 			$datum+=3600;
 		return $datum;
 	}
-	
+
+	/**
+	 * Springt von einen UNIX Timestamp ($datum) $days nach vor bzw. hinten
+	 */
+	function jump_day($datum, $days)
+	{
+		$stunde_vor=date("G",$datum);
+		// Ein Tag sind 86400 Sekunden
+		$datum+=86400*$days;
+		$stunde_nach=date("G",$datum);
+		if ($stunde_nach!=$stunde_vor)
+			$datum+=3600;
+		return $datum;
+	}
+
 	/**
 	 * Konvertiert das ISO Datumsformat (YYYY-MM-DD)
 	 * nach (DD.MM.YYYY)
