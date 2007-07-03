@@ -11,13 +11,14 @@
 //*
 //*
 
-include('../../../vilesci/config.inc.php');
+require_once('../../../vilesci/config.inc.php');
+require_once('../sync_config.inc.php');
 
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
-$adress='ruhan@technikum-wien.at';
+//$adress='ruhan@technikum-wien.at';
 //$adress='fas_sync@technikum-wien.at';
 
 $error_log='';
@@ -172,28 +173,31 @@ if($result = pg_query($conn_fas, $qry))
 						{
 							if($rowchk2=pg_fetch_object($resultchk2))
 							{
-								//update
-								
-								if($rowchk2->studiensemester_kurzbz<$studiensemester_kurzbz)
+								if($dont_sync_sql)
 								{
-									$qrybg="UPDATE public.tbl_benutzergruppe SET ".
-									"uid=".myaddslashes($uid).", ".
-									"gruppe_kurzbz=".myaddslashes($gruppe_kurzbz).", ".
-									"studiensemester_kurzbz=".myaddslashes($studiensemester_kurzbz).", ".
-									"insertamum=".myaddslashes($insertamum).", ".
-								       	"insertvon=".myaddslashes($insertvon).", ".
-									"updateamum=now(), ".
-									"updatevon='SYNC'".
-									"WHERE uid='".$uid."' AND gruppe_kurzbz='".$gruppe_kurzbz."';";
-									if($resultbg=pg_query($conn, $qrybg))
+									//update
+									
+									if($rowchk2->studiensemester_kurzbz<$studiensemester_kurzbz)
 									{
-										$anzahl_update++;
-										$ausgabe="Benutzergruppe auf UID='".$uid."', Gruppe='".$gruppe_kurzbz."', Studiensemester='".$studiensemester_kurzbz."' geändert (statt UID='".$rowchk2->uid."', Gruppe='".$rowchk2->gruppe_kurzbz."', Studiensemester='".$rowchk2->studiensemester_kurzbz."').\n";
-									}
-									else 
-									{
-										$anzahl_fehler++;
-										$error_log="Fehler beim Ändern in Tabelle tbl_benutzergruppe. ".$qrybg."\n";
+										$qrybg="UPDATE public.tbl_benutzergruppe SET ".
+										"uid=".myaddslashes($uid).", ".
+										"gruppe_kurzbz=".myaddslashes($gruppe_kurzbz).", ".
+										"studiensemester_kurzbz=".myaddslashes($studiensemester_kurzbz).", ".
+										"insertamum=".myaddslashes($insertamum).", ".
+									       	"insertvon=".myaddslashes($insertvon).", ".
+										"updateamum=now(), ".
+										"updatevon='SYNC'".
+										"WHERE uid='".$uid."' AND gruppe_kurzbz='".$gruppe_kurzbz."';";
+										if($resultbg=pg_query($conn, $qrybg))
+										{
+											$anzahl_update++;
+											$ausgabe="Benutzergruppe auf UID='".$uid."', Gruppe='".$gruppe_kurzbz."', Studiensemester='".$studiensemester_kurzbz."' geändert (statt UID='".$rowchk2->uid."', Gruppe='".$rowchk2->gruppe_kurzbz."', Studiensemester='".$rowchk2->studiensemester_kurzbz."').\n";
+										}
+										else 
+										{
+											$anzahl_fehler++;
+											$error_log="Fehler beim Ändern in Tabelle tbl_benutzergruppe. ".$qrybg."\n";
+										}
 									}
 								}
 							}

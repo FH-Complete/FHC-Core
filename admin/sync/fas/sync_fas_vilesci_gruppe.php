@@ -11,13 +11,14 @@
 //*
 //*
 
-include('../../../vilesci/config.inc.php');
+require_once('../../../vilesci/config.inc.php');
+require_once('../sync_config.inc.php');
 
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
-$adress='ruhan@technikum-wien.at';
+//$adress='ruhan@technikum-wien.at';
 //$adress='fas_sync@technikum-wien.at';
 
 $error_log='';
@@ -198,33 +199,36 @@ if($result = pg_query($conn_fas, $qry))
 			if($result2 = pg_query($conn, $qry2))
 			{
 				if($row2=pg_fetch_object($result2))
-				{		
-					//Eintrag bereits vorhanden - Eintragung in Sync-Tabelle
-					
-					$qrysync="SELECT * FROM sync.tbl_syncgruppe WHERE fas_gruppe='".$ext_id."' AND vilesci_gruppe='".$gruppe_kurzbz."';";
-					if($resultsync = pg_query($conn, $qrysync))
-					{
-						$qryupd="UPDATE public.tbl_gruppe SET ext_id='".$ext_id."' WHERE gruppe_kurzbz='".$gruppe_kurzbz."' AND studiengang_kz='".$studiengang_kz."';";
-						if($resultupd = pg_query($conn, $qryupd))
+				{	
+					if($dont_sync_sql)
+					{	
+						//Eintrag bereits vorhanden - Eintragung in Sync-Tabelle
+						
+						$qrysync="SELECT * FROM sync.tbl_syncgruppe WHERE fas_gruppe='".$ext_id."' AND vilesci_gruppe='".$gruppe_kurzbz."';";
+						if($resultsync = pg_query($conn, $qrysync))
 						{
-							$anzahl_update++;
-							if(pg_num_rows($resultsync)<1) 
+							$qryupd="UPDATE public.tbl_gruppe SET ext_id='".$ext_id."' WHERE gruppe_kurzbz='".$gruppe_kurzbz."' AND studiengang_kz='".$studiengang_kz."';";
+							if($resultupd = pg_query($conn, $qryupd))
 							{
-								//Sync-Eintrag nicht vorhanden
-								$qryinss="INSERT INTO sync.tbl_syncgruppe (fas_gruppe, vilesci_gruppe) VALUES ('".$ext_id."','".$gruppe_kurzbz."');";
-								$ausgabe="Gruppe in Vilesci bereits vorhanden.\n";
-								$ausgabe.="---Sync-Eintrag : FAS-'".$ext_id."', Vilesci-'".$gruppe_kurzbz."'.\n";
-								if(!(pg_query($conn, $qryinss)))
+								$anzahl_update++;
+								if(pg_num_rows($resultsync)<1) 
 								{
-									$error=true;
-									$error_log="Eintrag in Tabelle tbl_syncgruppe fehlgeschlagen: ".$qryinss."\n";
+									//Sync-Eintrag nicht vorhanden
+									$qryinss="INSERT INTO sync.tbl_syncgruppe (fas_gruppe, vilesci_gruppe) VALUES ('".$ext_id."','".$gruppe_kurzbz."');";
+									$ausgabe="Gruppe in Vilesci bereits vorhanden.\n";
+									$ausgabe.="---Sync-Eintrag : FAS-'".$ext_id."', Vilesci-'".$gruppe_kurzbz."'.\n";
+									if(!(pg_query($conn, $qryinss)))
+									{
+										$error=true;
+										$error_log="Eintrag in Tabelle tbl_syncgruppe fehlgeschlagen: ".$qryinss."\n";
+									}
 								}
 							}
-						}
-						else 
-						{
-							$error=true;
-							$error_log="Update in Tabelle tbl_gruppe fehlgeschlagen: ".$qryupd."\n";
+							else 
+							{
+								$error=true;
+								$error_log="Update in Tabelle tbl_gruppe fehlgeschlagen: ".$qryupd."\n";
+							}
 						}
 					}
 				}
