@@ -33,6 +33,25 @@ $sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer,
 if(!$result_neu=pg_exec($conn, $sql_query))
 	die(pg_errormessage().'<BR>'.$sql_query);
 
+// Updates von Zutrittskarten
+$sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer,firstname,name,key,
+				max(tbl_benutzer.uid) AS uid, max(matrikelnr) AS matrikelnr, max(kurzbzlang) AS stg_kurzbzlang,
+				EXTRACT(DAY FROM vw_betriebsmittelperson.insertamum) AS tag,
+				EXTRACT(MONTH FROM vw_betriebsmittelperson.insertamum) AS monat,
+				EXTRACT(YEAR FROM vw_betriebsmittelperson.insertamum) AS jahr
+			FROM public.vw_betriebsmittelperson
+				LEFT OUTER JOIN (public.tbl_benutzer JOIN public.tbl_student ON (uid=student_uid)
+					JOIN public.tbl_studiengang USING (studiengang_kz))
+				USING (person_id) JOIN sync.tbl_zutrittskarte ON (physaswnumber=nummer)
+			WHERE trim(vw_betriebsmittelperson.nachname)!=trim(tbl_zutrittskarte.name)
+				OR trim(vw_betriebsmittelperson.vorname)!=trim(tbl_zutrittskarte.firstname)
+				OR trim(vw_betriebsmittelperson.nummerintern)!=trim(tbl_zutrittskarte.key)
+			GROUP BY svnr,vorname,nachname,nummerintern,nummer,firstname,name,key,vw_betriebsmittelperson.insertamum;";
+//echo $sql_query;
+if(!$result_upd=pg_exec($conn, $sql_query))
+	die(pg_errormessage().'<BR>'.$sql_query);
+
+
 //------------ Excel init --------------------------
 
 // Creating a workbook
@@ -100,6 +119,33 @@ while ($row=pg_fetch_object($result_neu))
 	$worksheet->write($z,13,'');
 	$worksheet->write($z,14,'');
 	$worksheet->write($z,15,'');
+	$worksheet->write($z,16,'0');
+	$z++;
+}
+
+// Updates von Zutrittskarten
+while ($row=pg_fetch_object($result_upd))
+{
+	$command='u';
+	$gruppe=$row->stg_kurzbzlang;
+	if ($gruppe=='')
+		$gruppe='Verwaltung';
+	$worksheet->write($z,0, $command);
+	$worksheet->write($z,1, $row->nummerintern);
+	$worksheet->write($z,2, $row->nachname);
+	$worksheet->write($z,3, $row->vorname);
+	$worksheet->write($z,4, $gruppe);
+	$worksheet->write($z,5, $row->nummerintern);
+	$worksheet->write($z,6, $row->nummer);
+	$worksheet->write($z,7, $row->tag.'.'.$row->monat.'.'.$row->jahr);
+	$worksheet->write($z,8, $row->tag.'.'.$row->monat.'.'.($row->jahr+5));
+	$worksheet->write($z,9, $row->uid);
+	$worksheet->write($z,10,$row->matrikelnr);
+	$worksheet->write($z,11,'');
+	$worksheet->write($z,12,'');
+	$worksheet->write($z,13,$row->key);
+	$worksheet->write($z,14,$row->name);
+	$worksheet->write($z,15,$row->firstname);
 	$worksheet->write($z,16,'0');
 	$z++;
 }

@@ -1,13 +1,13 @@
 <?php
 
 	require_once('../../vilesci/config.inc.php');
-	
+
 	function clean_string($string)
  	{
-	 	$trans = array("ä" => "ae", 				   
+	 	$trans = array("ä" => "ae",
 	 				   "ö" => "oe",
 	 				   "ü" => "ue",
-	 				   "Ä" => "ae", 				   
+	 				   "Ä" => "ae",
 	 				   "Ö" => "oe",
 	 				   "Ü" => "ue",
 	 				   "á" => "a",
@@ -30,7 +30,7 @@
 
 	$adress='fas_sync@technikum-wien.at';
 	//$adress='oesi@technikum-wien.at';
-	
+
 	//mail($adress,"FAS Synchro mit VILESCI (Lektoren)","BEGIN OF SYNCHRONISATION","From: vilesci@technikum-wien.at");
 	$conn=pg_connect(CONN_STRING);
 	$conn_fas=pg_connect(CONN_STRING_FAS);
@@ -86,14 +86,14 @@
 					$vornamen='';
 				}
 				else
-				{				
+				{
 					$vorname=substr($row->vornamen,0,$len);
 					$vornamen=substr($row->vornamen,$len+1,strlen($row->vornamen));
 				}
-				$qry = "INSERT INTO public.tbl_person(titelpre, nachname, vorname, vornamen, gebdatum, gebort, aktiv) 
-				VALUES('$row->titel','$row->nachname','$vorname','$vornamen','$row->gebdatum','$row->gebort',true);"; 
+				$qry = "INSERT INTO public.tbl_person(titelpre, nachname, vorname, vornamen, gebdatum, gebort, aktiv)
+				VALUES('$row->titel','$row->nachname','$vorname','$vornamen','$row->gebdatum','$row->gebort',true);";
 				echo $qry.'<BR>';
-				
+
 				if(!$res_insert=pg_query($conn, $qry))
 				{
 					$text.=$qry;
@@ -101,36 +101,36 @@
 					$insert_error++;
 					pg_query($conn, 'ROLLBACK');
 				}
-				else 
+				else
 				{
 					$qry = "SELECT currval('tbl_person_person_id_seq') AS id;";
-					
+
 					if(!$row_seq=pg_fetch_object(pg_query($conn,$qry)))
 					{
 						pg_query($conn, 'ROLLBACK');
 						$text = 'Sequence konnte nicht ausgelesen werden\n';
 						$insert_error++;
 					}
-					else 
+					else
 					{
 						$person_id = $row_seq->id;
-						
+
 						//Benutzer Datensatzt anlegen
 						$qry = "INSERT INTO public.tbl_benutzer(uid, person_id, aktiv, insertamum, insertvon, updateamum, updatevon)
 						        VALUES('$row->uid','$person_id','true',now(),'auto',now(),'auto');";
-	
+
 						if(!pg_query($conn, $qry))
 						{
 							pg_query($conn, 'ROLLBACK');
 							$text.="\rFehler: ".pg_errormessage($conn)."\r";
 							$insert_error++;
 						}
-						else 
-						{						
+						else
+						{
 							//Alias erstellen
 							$vn = split('[- .,]',strtolower($row->vornamen));
 							$vn = clean_string($vn[0]);
-			
+
 							$nn = split('[- .,]',strtolower($row->nachname));
 							$nn = clean_string($nn[0]);
 							$alias = $vn.".".$nn;
@@ -146,7 +146,7 @@
 									$insert_error++;
 								}
 							}
-							else 
+							else
 							{
 								$text.="UPDATE public.tbl_benutzer set alias='$alias' WHERE uid='$uid'";
 								$text.="\rFehler: Alias existiert bereits: $alias";
@@ -170,21 +170,21 @@
 						}
 					}
 				}
-				
+
 			}
 			// bestehende Lektoren
 			elseif ($num_rows_lkt==1)
-			{				
+			{
 				$update=0;
 				$row_lkt=pg_fetch_object($res_lkt,0);
-				
+
 				if(!$len=strpos($row->vornamen,' '))
 				{
 					$vorname=$row->vornamen;
 					$vornamen='';
 				}
 				else
-				{				
+				{
 					$vorname=substr($row->vornamen,0,$len);
 					$vornamen=substr($row->vornamen,$len+1,strlen($row->vornamen));
 				}
@@ -205,7 +205,7 @@
 				if ($update)
 				{
 					$text.="Der Lektor $row->vornamen $row->nachname ($row->uid) [$update] wird upgedatet.\r";
-					
+
 					// person
 					$sql_query="UPDATE public.tbl_person SET titelpre='$row->titel', vorname='$vorname', vornamen='$vornamen', ".
 							   " nachname='$row->nachname', gebdatum='$row->gebdatum', gebort='$row->gebort'".

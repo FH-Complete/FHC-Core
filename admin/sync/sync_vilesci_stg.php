@@ -27,7 +27,7 @@ $stg_vilesci=pg_exec($conn_vilesci, $sql_query);
 //pg_query($conn, "SET CLIENT_ENCODING TO 'LATIN1';");
 while ($stg=pg_fetch_object($stg_vilesci))
 {
-	$sql_query="INSERT INTO tbl_studiengang(studiengang_kz, kurzbz, kurzbzlang, bezeichnung, typ, farbe, email, max_semester, max_verband, max_gruppe, erhalter_kz) 
+	$sql_query="INSERT INTO tbl_studiengang(studiengang_kz, kurzbz, kurzbzlang, bezeichnung, typ, farbe, email, max_semester, max_verband, max_gruppe, erhalter_kz)
 	            VALUES ($stg->studiengang_kz,'".substr($stg->kurzbz,0,3)."', '$stg->kurzbzlang','$stg->bezeichnung',
 					'$stg->typ','$stg->farbe','$stg->email',$stg->max_semester,'$stg->max_verband','$stg->max_gruppe',5)";
 	if (!$result=@pg_exec($conn, $sql_query))

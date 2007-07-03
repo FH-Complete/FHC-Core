@@ -4,7 +4,8 @@
 	 *
 	 */
 
-	include('../config.inc.php');
+	require('../config.inc.php');
+	require('../../include/globals.inc.php');
 	$raum=array();
 
 	if (isset($_POST['datum_beginn']))
@@ -23,6 +24,11 @@
 		$stunde_ende=$_POST['stunde_ende'];
 	else
 		$stunde_ende=16;
+
+	$ts_beginn=mktime(0,0,0,substr($datum_beginn,5,2),substr($datum_beginn,8,2),substr($datum_beginn,0,4));
+	$ts_ende=mktime(0,0,0,substr($datum_ende,5,2),substr($datum_ende,8,2),substr($datum_ende,0,4));
+
+	$wochen=round(($ts_ende-$ts_beginn)/(60*60*24*7));
 
 	if (!$conn = pg_pconnect(CONN_STRING))
 	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
@@ -62,7 +68,7 @@
 	bis:<input name="stunde_ende" value="<?php echo $stunde_ende; ?>" size="2" />
 	<input type="submit">
 </form>
-<h2> Raumauslastung vom <?PHP echo $datum_beginn.' - '.$datum_ende; ?></h2>
+<h2> Raumauslastung vom <?PHP echo $datum_beginn.' - '.$datum_ende.' ('.$wochen; ?> Wochen)</h2>
 <TABLE width="100%" border="1" cellspacing="0" cellpadding="0">
 	<TR>
     <?php
@@ -82,6 +88,7 @@
 	?>
     </TR>
 	<?php
+	$anz_colors=count($cfgStdBgcolor)-1;
 	foreach ($raum AS $ort)
 	{
 		echo '<TR><TD>'.$ort->ort.'</TD>';
@@ -90,7 +97,8 @@
 			{
 				if (!isset($ort->last[$t][$s]->anzahl))
 					$ort->last[$t][$s]->anzahl=0;
-				echo '<TD>';
+				$bgcolor=$cfgStdBgcolor[$anz_colors-round(($ort->last[$t][$s]->anzahl)/($wochen/$anz_colors))];
+				echo '<TD bgcolor="'.$bgcolor.'">';
 				echo $ort->last[$t][$s]->anzahl;
 				echo '</TD>';
 			}

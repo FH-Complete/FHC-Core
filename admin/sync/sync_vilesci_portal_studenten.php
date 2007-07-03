@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -50,8 +50,8 @@ if($result = pg_query($conn_vilesci, $qry))
 	{
 		$error=false;
 		$student = new student($conn);
-		
-	
+
+
 		$student->sprache='German';
 		$student->anrede='';
 		$student->titelpost='';
@@ -84,21 +84,21 @@ if($result = pg_query($conn_vilesci, $qry))
 		$student->updatevon=$row->updatevon;
 		$student->ext_id_student='';
 		$student->geschlecht='m';
-		
+
 		$student->uid=$row->uid;
 		$student->bnaktiv=$row->aktiv;
 		$student->alias=$row->alias;
-		
+
 		$student->matrikelnr=$row->matrikelnr;
 		$student->prestudent_id='';
 		$student->studiengang_kz=$row->studiengang_kz;
 		$student->semester=$row->semester;
 		$student->verband=($row->verband!=''?$row->verband:' ');
 		$student->gruppe=($row->gruppe!=''?$row->gruppe:' ');
-		
+
 		$qry = "SELECT person_id FROM tbl_benutzer WHERE uid='$row->uid'";
 		if($result1 = pg_query($conn, $qry))
-		{		
+		{
 			if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist
 			{
 				if($row1=pg_fetch_object($result1))
@@ -107,35 +107,35 @@ if($result = pg_query($conn_vilesci, $qry))
 					$student->new=false;
 					$student->person_id=$row1->person_id;
 				}
-				else 
+				else
 				{
 					$error_log.="Person_id von $row->uid konnte nicht ermittelt werden\n";
 					$error=true;
 				}
 			}
-			else 
+			else
 			{
 				//Student neu anlegen
 				$student->new=true;
 			}
-			
+
 			if(!$error)
 				if(!$student->save())
 				{
 					$error_log.="Fehler beim Speicher ($row->uid):".$student->errormsg."\n";
 					$anzahl_fehler++;
 				}
-				else 
+				else
 					$anzahl_eingefuegt++;
-			else 
+			else
 				$anzahl_fehler++;
 		}
-		else 
+		else
 		{
 			$error_log .= "$row->nachname ($row->uid) wurde nicht in tbl_benutzer gefunden\n";
 			$anzahl_fehler++;
 		}
-		
+
 	}
 }
 else

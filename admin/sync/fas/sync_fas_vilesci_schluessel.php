@@ -1,7 +1,7 @@
 <?php
 /* Copyright (C) 2006 Technikum-Wien
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -58,8 +58,8 @@ if($result = pg_query($conn_fas, $qry))
 	{
 		//echo "- ";
 		//ob_flush();
-		//flush();	
-			
+		//flush();
+
 		$error=false;
 		$betriebsmittel				=new betriebsmittel($conn);
 		//$betriebsmittel->betriebsmittel_id		='';
@@ -83,7 +83,7 @@ if($result = pg_query($conn_fas, $qry))
 		$betriebsmittelperson->updatevon		="SYNC";
 		$betriebsmittelperson->insertvon		="SYNC";
 		$betriebsmittelperson->ext_id		=$row->person_fk+($row->schluessel_fk*100000);
-		
+
 		//Person_id feststellen
 		$qry1="SELECT person_portal FROM sync.tbl_syncperson WHERE person_fas=".$row->person_fk.";";
 		if($result1 = pg_query($conn, $qry1))
@@ -91,7 +91,7 @@ if($result = pg_query($conn_fas, $qry))
 			if(pg_num_rows($result1)>0) //eintrag gefunden
 			{
 				if($row1=pg_fetch_object($result1))
-				{ 
+				{
 					$betriebsmittelperson->person_id=$row1->person_portal;
 					//Schlüsseltyp feststellen
 					$qry2="SELECT * FROM sync.tbl_syncschluesseltyp WHERE fas_typ='".$row->schluessel_fk."';";
@@ -100,7 +100,7 @@ if($result = pg_query($conn_fas, $qry))
 						if(pg_num_rows($result2)>0) //eintrag gefunden
 						{
 							if($row2=pg_fetch_object($result2))
-							{ 
+							{
 								$betriebsmittel->betriebsmitteltyp=$row2->portal_typ;
 								//Insert oder Update
 								$qry3="SELECT betriebsmittel_id FROM public.tbl_betriebsmittel WHERE ext_id=".($row->person_fk+($row->schluessel_fk*100000))." OR nummer='".$row->nummer."';";
@@ -109,14 +109,14 @@ if($result = pg_query($conn_fas, $qry))
 									if(pg_num_rows($result3)>0) //eintrag gefunden
 									{
 										if($row3=pg_fetch_object($result3))
-										{ 
+										{
 											// update , wenn datensatz bereits vorhanden
 											$betriebsmittel->betriebsmittel_id=$row3->betriebsmittel_id;
 											$betriebsmittelperson->betriebsmittel_id=$row3->betriebsmittel_id;
 											$betriebsmittel->new=false;
 										}
 									}
-									else 
+									else
 									{
 										// insert, wenn datensatz noch nicht vorhanden
 										$betriebsmittel->new=true;
@@ -132,13 +132,13 @@ if($result = pg_query($conn_fas, $qry))
 								}
 							}
 						}
-						else 
+						else
 						{
 							// insert, wenn datensatz noch nicht vorhanden
 							$betriebsmittel->new=true;
 						}
 					}
-					else 
+					else
 					{
 						$error=true;
 						$error_log.="Betriebsmitteltyp mit schluessel_fk: $row->schluessel_fk konnte in tbl_betriebsmitteltyp nicht gefunden werden! \n";
@@ -146,7 +146,7 @@ if($result = pg_query($conn_fas, $qry))
 					}
 				}
 			}
-			else 
+			else
 			{
 				$error=true;
 				$error_log.="Person mit person_fk: $row->person_fk konnte in tbl_syncperson nicht gefunden werden!\n";
@@ -164,7 +164,7 @@ if($result = pg_query($conn_fas, $qry))
 					$anzahl_fehler++;
 					pg_query($conn,"ROLLBACK");
 				}
-				else 
+				else
 				{
 					$anzahl_eingefuegt++;
 					//insert oder update?
@@ -174,18 +174,18 @@ if($result = pg_query($conn_fas, $qry))
 						if(pg_num_rows($result3)>0) //eintrag gefunden
 						{
 							if($row3=pg_fetch_object($result3))
-							{ 
+							{
 								// update , wenn datensatz bereits vorhanden
 								$betriebsmittelperson->new=false;
 							}
 						}
-						else 
+						else
 						{
 							// insert, wenn datensatz noch nicht vorhanden
-							$betriebsmittelperson->new=true;					
+							$betriebsmittelperson->new=true;
 						}
 					}
-					else 
+					else
 					{
 						$error=true;
 						$error_log.="Fehler beim Zugriff auf tbl_betreibsmittelperson.\n";
@@ -200,31 +200,31 @@ if($result = pg_query($conn_fas, $qry))
 								$anzahl_fehler2++;
 								pg_query($conn,"ROLLBACK");
 							}
-							else 
+							else
 							{
 								$anzahl_eingefuegt2++;
 								pg_query($conn,"COMMIT");
 							}
 						}
-						else 
+						else
 						{
 							//es werden keine Datensätze über das Synchro verändert !
 							pg_query($conn, "ROLLBACK");
 						}
 					}
-					else 
+					else
 					{
 						pg_query($conn, "ROLLBACK");
 					}
 				}
 			}
-			else 
+			else
 			{
 				//es werden keine Datensätze über das Synchro verändert !
 				pg_query($conn, "ROLLBACK");
 			}
 		}
-	}		
+	}
 }
 
 

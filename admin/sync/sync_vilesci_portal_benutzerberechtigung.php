@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -55,22 +55,22 @@ if($result = pg_query($conn_vilesci, $qry))
 		$benutzerberechtigung->uid = $row->uid;
 		$benutzerberechtigung->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 		$benutzerberechtigung->start = $row->start;
-		$benutzerberechtigung->ende = $row->ende;		
-		
+		$benutzerberechtigung->ende = $row->ende;
+
 		//$qry = "SELECT count(*) as anz FROM tbl_feedback WHERE feedback_id='$row->feedback_id'";
 		//if($row1 = pg_fetch_object(pg_query($conn, $qry)))
-		//{		
+		//{
 		$benutzerberechtigung->new=true;
-			
+
 		if(!$benutzerberechtigung->save())
 		{
 			$error_log.=$benutzerberechtigung->errormsg."\n";
 			$anzahl_fehler++;
 		}
-		else 
+		else
 			$anzahl_eingefuegt++;
 		//}
-		//else 
+		//else
 		//	$error_log .= "Fehler beim ermitteln der UID\n";
 	}
 }

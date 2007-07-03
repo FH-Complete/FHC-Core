@@ -1,7 +1,7 @@
 <?php
 /* Copyright (C) 2007 Technikum-Wien
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -56,7 +56,7 @@ ECHO NL2BR ( "\nraumtyp synchronisiert");*/
 
 $aufmerksam_kurzbz=array('k.A.', 'Internet', 'Zeitungen','Werbung','Mundpropaganda','FH-Führer','BEST Messe','Partnerfirma','Schule','Bildungstelefon',
 			'TGM','Abgeworben','Technikum Wien','Aussendungen','offene Tür');
-$beschreibung=array('keine Angabe',null,null,'Werbung, Veranstaltungen', null,null,null,null,null,'Bildungstelefon AK',null,'Abgeworben von Konkurrenz',null,'Aussendungen eines Studiengangs','Tag der offenen Tür');			
+$beschreibung=array('keine Angabe',null,null,'Werbung, Veranstaltungen', null,null,null,null,null,'Bildungstelefon AK',null,'Abgeworben von Konkurrenz',null,'Aussendungen eines Studiengangs','Tag der offenen Tür');
 
 for ($i=0; $i<=14; $i++)
 {
@@ -73,7 +73,7 @@ ECHO NL2BR ( "aufmerksamdurch synchronisiert");
 //ECHO NL2BR ( "\nerhalter synchronisiert");
 
 $rolle_kurzbz=array('Interessent','Bewerber','Student','Ausserordentlicher','Abgewiesener','Aufgenommener','Wartender',
-		'Abbrecher','Unterbrecher','Outgoing','Incoming','Praktikant','Diplomant','Absolvent');		
+		'Abbrecher','Unterbrecher','Outgoing','Incoming','Praktikant','Diplomant','Absolvent');
 for ($i=0; $i<=13; $i++)
 {
 	$qry="INSERT INTO public.tbl_rolle(rolle_kurzbz, beschreibung, anmerkung, ext_id) VALUES('".

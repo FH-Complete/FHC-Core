@@ -1,24 +1,25 @@
 <?php
 	/**
 	 *	Statistik der Zeitwuensche
-	 * 
+	 *
 	 */
 
-	include('../config.inc.php');
-	
-	if (!$conn = @pg_pconnect(CONN_STRING)) 
+	require('../config.inc.php');
+	require('../../include/globals.inc.php');
+
+	if (!$conn = @pg_pconnect(CONN_STRING))
 	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
-	   	
+
 	//Stundentabelleholen
-	if(! $result_stunde=pg_exec($conn, "SELECT * FROM tbl_stunde ORDER BY stunde"))
+	if(! $result_stunde=pg_exec($conn, "SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
 		die(pg_last_error($conn));
 	$num_rows_stunde=pg_numrows($result_stunde);
-		
-	if(!($erg=pg_exec($conn, "SELECT DISTINCT uid FROM tbl_zeitwunsch")))
+
+	if(!($erg=pg_exec($conn, "SELECT DISTINCT mitarbeiter_uid AS uid FROM campus.tbl_zeitwunsch")))
 		die(pg_last_error($conn));
 	$anz_lektoren=pg_numrows($erg);
-	
-	if(!($erg=pg_exec($conn, "SELECT tag,stunde,gewicht+3 AS gewicht, count(*) AS anz FROM tbl_zeitwunsch GROUP BY tag,stunde,gewicht;")))
+
+	if(!($erg=pg_exec($conn, "SELECT tag,stunde,gewicht+3 AS gewicht, count(*) AS anz FROM campus.tbl_zeitwunsch GROUP BY tag,stunde,gewicht;")))
 		die(pg_last_error($conn));
 	$num_rows=pg_numrows($erg);
 	for ($i=0;$i<$num_rows;$i++)
@@ -26,7 +27,7 @@
 		$row=pg_fetch_object($erg,$i);
 		$wunsch[$row->tag][$row->stunde][$row->gewicht]=$row->anz;
 	}
-	
+
 ?>
 
 <html>

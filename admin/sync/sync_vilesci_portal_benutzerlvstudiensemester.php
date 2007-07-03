@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -53,29 +53,29 @@ if($result = pg_query($conn_vilesci, $qry))
 		{
 			$obj->lehrveranstaltung_id = $row1->lehrveranstaltung_id;
 
-			$qry = "SELECT count(*) as anz FROM campus.tbl_benutzerlvstudiensemester WHERE 
+			$qry = "SELECT count(*) as anz FROM campus.tbl_benutzerlvstudiensemester WHERE
 		        	uid='".addslashes($row->uid)."' AND studiensemester_kurzbz='".addslashes($row->studiensemester_kurzbz)."'
 		        	AND lehrveranstaltung_id='".addslashes($row1->lehrveranstaltung_id)."';";
-		
+
 			if($row1=pg_fetch_object(pg_query($conn,$qry)))
 			{
 				$new = ($row1->anz>0?false:true);
-			
+
 				if(!$obj->save($new))
-				{				
+				{
 					$anzahl_fehler++;
 					$error_log .= $obj->errormsg."\n";
 				}
-				else 
+				else
 					$anzahl_eingefuegt++;
 			}
-			else 
+			else
 			{
 				$error_log.='Fehler beim Auslesen';
 				$anzahl_fehler++;
 			}
 		}
-		else 
+		else
 		{
 			$error_log .= "Fehler beim Auslesen der Lehrveranstaltung_nr\n.$qry\n";
 			$anzahl_fehler++;

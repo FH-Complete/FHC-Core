@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -50,14 +50,14 @@ if($result = pg_query($conn_vilesci, $qry))
 	{
 		$error=false;
 		$mitarbeiter = new mitarbeiter($conn);
-		
+
 		//if($row->personalnummer!='')
 		//{
 			$mitarbeiter->sprache='German';
 			$mitarbeiter->anrede='';
 			$mitarbeiter->titelpost='';
 			$mitarbeiter->titelpre=$row->titel;
-			
+
 			$mitarbeiter->nachname=$row->nachname;
 			if(!$len=strpos($row->vornamen,' '))
 			{
@@ -65,7 +65,7 @@ if($result = pg_query($conn_vilesci, $qry))
 				$mitarbeiter->vornamen='';
 			}
 			else
-			{				
+			{
 				$mitarbeiter->vorname=substr($row->vornamen,0,$len);
 				$mitarbeiter->vornamen=substr($row->vornamen,$len+1,strlen($row->vornamen));
 			}
@@ -87,11 +87,11 @@ if($result = pg_query($conn_vilesci, $qry))
 			$mitarbeiter->updateamum=$row->updateamum;
 			$mitarbeiter->updatevon=$row->updatevon;
 			$mitarbeiter->ext_id='';
-			
+
 			$mitarbeiter->uid=$row->uid;
 			$mitarbeiter->bnaktiv=$row->aktiv;
 			$mitarbeiter->alias=$row->alias;
-			
+
 			$mitarbeiter->ausbildungcode='';
 			if($row->personalnummer=='OFF')
 				$mitarbeiter->personalnummer='';
@@ -101,10 +101,10 @@ if($result = pg_query($conn_vilesci, $qry))
 			$mitarbeiter->lektor=($row->lektor=='t'?true:false);
 			$mitarbeiter->fixangestellt=($row->fixangestellt=='t'?true:false);
 			$mitarbeiter->telefonklappe=$row->telefonklappe;
-			
+
 			$qry = "SELECT person_id FROM tbl_benutzer WHERE uid='$row->uid'";
 			if($result1 = pg_query($conn, $qry))
-			{		
+			{
 				if(pg_num_rows($result1)>0) //wenn dieser eintrag schon vorhanden ist
 				{
 					if($row1=pg_fetch_object($result1))
@@ -113,33 +113,33 @@ if($result = pg_query($conn_vilesci, $qry))
 						$mitarbeiter->new=false;
 						$mitarbeiter->person_id=$row1->person_id;
 					}
-					else 
+					else
 					{
 						$error_log.="Person_id von $row->uid konnte nicht ermittelt werden\n";
 						$error=true;
 					}
 				}
-				else 
+				else
 				{
 					//Mitarbeiter neu anlegen
 					$mitarbeiter->new=true;
 				}
-				
+
 				if(!$error)
 					if(!$mitarbeiter->save())
 					{
 						$error_log.="Fehler beim Speichern des Mitarbeits ($row->uid):".$mitarbeiter->errormsg."\n";
 						$anzahl_fehler++;
 					}
-					else 
+					else
 						$anzahl_eingefuegt++;
-				else 
+				else
 					$anzahl_fehler++;
 			}
-			else 
+			else
 				$error_log .= "Fehler beim ermitteln der UID\n";
 		//}
-		//else 
+		//else
 		//	$error_log .= "$row->nachname ($row->uid) hat keine Personalnummer\n";
 	}
 }

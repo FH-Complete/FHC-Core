@@ -2,13 +2,13 @@
 	// Hintergrundfarben fuer Tabellen beim Zeitwunsch
 	global $cfgStdBgcolor;
 	$cfgStdBgcolor=array();
-	$cfgStdBgcolor[0]="#FF0000";
-	$cfgStdBgcolor[1]="#D44128";
-	$cfgStdBgcolor[2]="#CA8780";
-	$cfgStdBgcolor[3]="#C0C0C0";
-	$cfgStdBgcolor[4]="#A2C294";
-	$cfgStdBgcolor[5]="#4EA83C";
-	$cfgStdBgcolor[6]="#006000";
+	$cfgStdBgcolor[0]="#AA0000";
+	$cfgStdBgcolor[1]="#FF0000";
+	$cfgStdBgcolor[2]="#FF5500";
+	$cfgStdBgcolor[3]="#FFFF55";
+	$cfgStdBgcolor[4]="#55FF55";
+	$cfgStdBgcolor[5]="#AAFFAA";
+	$cfgStdBgcolor[6]="#CCFFCC";
 
 	// Wochentage auf Deutsch (Zeitwunsch)
 	global $tagbez;
