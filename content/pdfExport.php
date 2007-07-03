@@ -116,7 +116,7 @@ if (!isset($_REQUEST["archive"]))
 else
 {
 	
-	$filename = $_SERVER['REMOTE_USER'];
+	$filename = $user;
 	if (!$fo2pdf->generatePdf($buffer, $filename, 'F'))
 	{
 		echo('Failed to generate PDF');
@@ -164,7 +164,7 @@ else
   	$akte->updateamum = "";
   	$akte->updatevon = "";
 	$akte->insertamum = date('Y-m-d h:m:s');
-	$akte->insertvon = $_SERVER['REMOTE_USER'];
+	$akte->insertvon = $user;
   	$akte->ext_id = "";
   	$akte->uid = $_REQUEST["uid"];
 	$akte->new = true;
