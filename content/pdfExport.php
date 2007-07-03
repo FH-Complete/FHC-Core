@@ -142,7 +142,8 @@ else
 		if($row = pg_fetch_object($result))
 		{
 			$person_id = $row->person_id;
-			$titel = "Zeugnis_".$row->typ.$row->kurzbz."_".$row->semester;
+			$titel = "Zeugnis_".strtoupper($row->typ).strtoupper($row->kurzbz)."_".$row->semester;
+			$bezeichnung = "Zeugnis ".strtoupper($row->typ).strtoupper($row->kurzbz)." ".$row->semester.". Semester";
 		}
 		else
 		{
@@ -156,11 +157,11 @@ else
 	$akte->person_id = $person_id;
   	$akte->dokument_kurzbz = "Zeugnis";
   	$akte->inhalt = $hex;
-  	$akte->mimetype = "Content-Type: application/octet-stream";
+  	$akte->mimetype = "application/octet-stream";
   	$akte->erstelltam = $heute;
   	$akte->gedruckt = true;
-  	$akte->titel = $titel;
-  	$akte->bezeichnung = "";
+  	$akte->titel = $titel.".pdf";
+  	$akte->bezeichnung = $bezeichnung;
   	$akte->updateamum = "";
   	$akte->updatevon = "";
 	$akte->insertamum = date('Y-m-d h:m:s');
