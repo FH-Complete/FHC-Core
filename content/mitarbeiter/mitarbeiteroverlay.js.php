@@ -727,6 +727,20 @@ function MitarbeiterSave()
 	}
 }
 
+// ****
+// * Ruft das Formular zum Eintragen des neuen Mitarbeiters auf
+// ****
+function MitarbeiterNeu()
+{
+	window.open('<?php echo APP_ROOT; ?>vilesci/personen/import/mitarbeiterimport.php','Mitarbeiter anlegen', 'height=768,width=1024,resizable=yes,status=yes,scrollbars=yes,toolbar=yes,location=yes,menubar=yes');
+}
+
+// ****
+// * Exportiert die Daten in ein Excel File
+// ****
+function MitarbeiterExport()
+{
+}
 
 // ***************** VERWENDUNG ********************** //
 
