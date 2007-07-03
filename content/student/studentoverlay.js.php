@@ -1413,8 +1413,10 @@ function StudentPrintInskriptionsbestaetigung()
 			}
 	}
 
+	var stsem = getStudiensemester();
+	
 	if(anzahl>0)
-		window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=student.rdf.php&xsl=Inskription&uid='+paramList,'Inskriptionsbestaetigung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+		window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=student.rdf.php&xsl=Inskription&uid='+paramList+'&ss='+stsem,'Inskriptionsbestaetigung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 	else
 		alert('Bitte einen Studenten auswaehlen');
 }

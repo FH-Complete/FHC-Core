@@ -177,5 +177,63 @@ class benutzer extends person
 			return false;
 		}
 	}
+	
+	// ****
+	// * Prueft ob die UID bereits existiert
+	// ****
+	function uid_exists($uid)
+	{
+		$qry = "SELECT * FROM public.tbl_benutzer WHERE uid='".addslashes($uid)."'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if(pg_num_rows($result)>0)
+			{
+				$this->errormsg = '';
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = '';
+				return false;
+			}
+				
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler bei DatenbankAbfrage';
+			return false;
+		}
+		
+	}
+	
+	// ****
+	// * Prueft ob der alias bereits existiert
+	// ****
+	function alias_exists($alias)
+	{
+		$qry = "SELECT * FROM public.tbl_benutzer WHERE alias='".addslashes($alias)."'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if(pg_num_rows($result)>0)
+			{
+				$this->errormsg = '';
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = '';
+				return false;
+			}
+				
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler bei DatenbankAbfrage';
+			return false;
+		}
+		
+	}
 }
 ?>

@@ -174,26 +174,33 @@ class mitarbeiter extends benutzer
 	// * Speichert die Mitarbeiterdaten in die Datenbank
 	// * @return true wenn ok, false im Fehlerfall
 	// *************************************************
-	function save()
+	function save($new=null, $savebenutzer=true)
 	{
 		//Variablen checken
 		if(!$this->validate())
 			return false;
 
 		pg_query($this->conn,'BEGIN;');
-		//Basisdaten speichern
-		if(!benutzer::save())
+		
+		if($new==null)
+			$new = $this->new;
+			
+		if($savebenutzer)
 		{
-			pg_query($this->conn,'ROLLBACK;');
-			return false;
-		}
+			//Basisdaten speichern
+			if(!benutzer::save())
+			{
+				pg_query($this->conn,'ROLLBACK;');
+				return false;
+			}
+		}		
 
-		if($this->new)
+		if($new)
 		{
 
 			//Neuen Datensatz anlegen
 			$qry = "INSERT INTO public.tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz,
-			                    fixangestellt, standort_kurzbz, telefonklappe, anmerkung, stundensatz updateamum, updatevon, ext_id)
+			                    fixangestellt, standort_kurzbz, telefonklappe, anmerkung, stundensatz, updateamum, updatevon, ext_id)
 
 			        VALUES('".addslashes($this->uid)."',".
 			 	 	$this->addslashes($this->ausbildungcode).",".
@@ -595,5 +602,33 @@ class mitarbeiter extends benutzer
 		}
 	}
 	
+	// ****
+	// * Prueft ob die Kurzbz bereits existiert
+	// ****
+	function kurzbz_exists($kurzbz)
+	{
+		$qry = "SELECT * FROM public.tbl_mitarbeiter WHERE kurzbz='".addslashes($kurzbz)."'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if(pg_num_rows($result)>0)
+			{
+				$this->errormsg = '';
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = '';
+				return false;
+			}
+				
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler bei DatenbankAbfrage';
+			return false;
+		}
+		
+	}
 }
 ?>

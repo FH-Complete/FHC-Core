@@ -49,7 +49,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterfunktionove
 	<hbox>
 		<toolbox flex="1">
 			<toolbar id="mitarbeiter-nav-toolbar">
-			<toolbarbutton id="mitarbeiter-toolbar-neu" label="Neu" oncommand="MitarbeiterNeu()" disabled="false" image="../skin/images/new.png" tooltiptext="Neuen Mitarbeiter anlegen"/>
+			<toolbarbutton id="mitarbeiter-toolbar-neu" label="Neu" oncommand="MitarbeiterNeu()" disabled="false" image="../skin/images/NeuDokument.png" tooltiptext="Neuen Mitarbeiter anlegen"/>
+			<toolbarbutton id="mitarbeiter-toolbar-export" label="Export" oncommand="MitarbeiterExport()" disabled="false" image="../skin/images/ExcelIcon.png" tooltiptext="Daten ins Excel Exportieren"/>
 			<toolbarbutton id="mitarbeiter-toolbar-refresh" label="Aktualisieren" oncommand="MitarbeiterTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 			<spacer flex="1"/>
 			<label id="mitarbeiter-toolbar-label-anzahl"/>

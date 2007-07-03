@@ -51,7 +51,7 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
 	echo '
 	  <RDF:li>
          <RDF:Description  id=""  about="" >
-            <ORT:ort_kurzbz><![CDATA[-- keine Auswahl --]]></ORT:ort_kurzbz>
+            <ORT:ort_kurzbz><![CDATA[]]></ORT:ort_kurzbz>
             <ORT:bezeichnung><![CDATA[]]></ORT:bezeichnung>
             <ORT:planbezeichnung><![CDATA[]]></ORT:planbezeichnung>
             <ORT:max_person><![CDATA[]]></ORT:max_person>
@@ -62,11 +62,12 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
             <ORT:dislozierung><![CDATA[]]></ORT:dislozierung>
             <ORT:kosten><![CDATA[]]></ORT:kosten>
             <ORT:ausstattung><![CDATA[]]></ORT:ausstattung>
+            <ORT:anzeigename><![CDATA[-- keine Auswahl --]]></ORT:anzeigename>
          </RDF:Description>
       </RDF:li>';
 }
 //Daten holen
-$ortobj = new ort($conn);
+$ortobj = new ort($conn, null, true);
 
 $ortobj->getAll();
 foreach ($ortobj->result as $row)
@@ -90,6 +91,7 @@ function draw_content($row)
 	            <ORT:dislozierung><![CDATA['.$row->dislozierung.']]></ORT:dislozierung>
 	            <ORT:kosten><![CDATA['.$row->kosten.']]></ORT:kosten>
 	            <ORT:ausstattung><![CDATA['.$row->ausstattung.']]></ORT:ausstattung>
+	            <ORT:anzeigename><![CDATA['.$row->ort_kurzbz.']]></ORT:anzeigename>
 	         </RDF:Description>
 	      </RDF:li>';
 }

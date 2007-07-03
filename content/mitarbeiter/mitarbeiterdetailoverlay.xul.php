@@ -209,7 +209,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						          ref="http://www.technikum-wien.at/ort/liste">
 						    <template>
 						       <menupopup>
-							      <menuitem uri="rdf:*" label="rdf:http://www.technikum-wien.at/ort/rdf#ort_kurzbz"
+							      <menuitem uri="rdf:*" label="rdf:http://www.technikum-wien.at/ort/rdf#anzeigename"
 							                value="rdf:http://www.technikum-wien.at/ort/rdf#ort_kurzbz"/>
 							      </menupopup>
 							</template>

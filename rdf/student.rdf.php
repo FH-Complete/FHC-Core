@@ -53,6 +53,7 @@ $grp=(isset($_GET['grp'])?$_GET['grp']:null);
 $ver=(isset($_GET['ver'])?$_GET['ver']:null);
 $sem=(isset($_GET['sem'])?$_GET['sem']:null);
 $stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:null);
+$ss = (isset($_GET['ss'])?$_GET['ss']:null);
 if(isset($_GET['uid']))
 	$uid=$_GET['uid'];
 
@@ -192,9 +193,9 @@ else
 			}
 			
 			$stsem = new studiensemester($conn);
-			$aktstsem = $stsem->getaktorNext();
+			//$aktstsem = $stsem->getaktorNext();
 			
-			$stsem->load($aktstsem);
+			$stsem->load($ss);
 			
 			echo '
 			<student>
