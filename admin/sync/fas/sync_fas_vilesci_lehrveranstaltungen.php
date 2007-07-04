@@ -231,18 +231,18 @@
 				        kurzbz='$row_fas_alle->kurzbezeichnung'";
 				$result = pg_query($conn, $qry);
 				$studiengang_kz=$row_fas_alle->kurzbezeichnung;
-				
+
 				if(pg_num_rows($result)==1)
 				{
 					//$text.='FOUND on Kurzbz LVA '.getlvabez($row_fas_alle)." -> UPDATE & SYNCTAB-Insert\n";
 
 					if($row_found = pg_fetch_object($result))
 					{
-						if ($dont_sync_php)
+						if (!in_array($studiengang_kz,$dont_sync_php))
 						{
 							//Datensatz aktualisieren
 							$qry = getupdateqry($row_found, $row_fas_alle);
-	
+
 							if($qry!='')
 							{
 								if(pg_query($conn, $qry))
@@ -258,7 +258,7 @@
 									$update_error++;
 								}
 							}
-							else 
+							else
 							{
 								synctabentry($row_found->lehrveranstaltung_id, $row_fas_alle->lehrveranstaltung_pk);
 								$text.="SYNC-Eintrag wurde angelegt!\n";
@@ -281,17 +281,17 @@
 					        bezeichnung='$row_fas_alle->name'";
 					$result = pg_query($conn, $qry);
 					$studiengang_kz=$row_fas_alle->kurzbezeichnung;
-					
+
 					if(pg_num_rows($result)==1)
 					{
 						if($row_found = pg_fetch_object($result))
 						{
-							if($dont_sync_php)
+							if(!in_array($studiengang_kz,$dont_sync_php))
 							{
 								//Gefunden->Update und Synctab-Eintrag
 								//$text.='FOUND on Name LVA '.getlvabez($row_fas_alle)." -> UPDATE & SYNCTAB-Insert\n";
 								$qry = getupdateqry($row_found, $row_fas_alle);
-	
+
 								if($qry!='')
 								{
 									if(pg_query($conn, $qry))
@@ -307,7 +307,7 @@
 										$update_error++;
 									}
 								}
-								else 
+								else
 								{
 									synctabentry($row_found->lehrveranstaltung_id, $row_fas_alle->lehrveranstaltung_pk);
 									$text.="SYNC-Eintrag wurde angelegt!\n";
@@ -379,11 +379,11 @@
 				//UPDATE
 				if($row_found = pg_fetch_object($result))
 				{
-					if($dont_sync_php)
+					if(!in_array($studiengang_kz,$dont_sync_php))
 					{
 						//Datensatz aktualisieren
 						$qry = getupdateqry($row_found, $row_fas_alle);
-	
+
 						if($qry!='')
 						{
 							if(pg_query($conn, $qry))
