@@ -7,7 +7,8 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-include('../../vilesci/config.inc.php');
+require_once('../../vilesci/config.inc.php');
+
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
