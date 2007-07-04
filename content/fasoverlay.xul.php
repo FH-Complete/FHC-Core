@@ -271,7 +271,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 		</popup>
 </popupset>
 	<tabbox id="tabbox-main" flex="3" orient="vertical">
-		<tabs orient="horizontal">
+		<tabs id="main-content-tabs" orient="horizontal">
 		<?php
 			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('lva-verwaltung'))
 			{
@@ -281,7 +281,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 			}
 			if($rechte->isBerechtigt('admin','0') || $rechte->isBerechtigt('mitarbeiter'))
 			{
-				echo '<tab id="tab-mitarbeiter" label="Mitarbeiter" oncommand="MitarbeiterTabSelect()" />';
+				echo '<tab id="tab-mitarbeiter" label="Mitarbeiter" onclick="document.getElementById(\'menu-content-tabs\').selectedItem=document.getElementById(\'tab-menu-mitarbeiter\');" />';
 			}
 		?>
 		</tabs>

@@ -19,6 +19,11 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+/**
+ * Exportiert die Mitarbeiterdaten in ein Excel File.
+ * Der Mitarbeiterfilter und die zu exportierenden Spalten werden per GET uebergeben.
+ * Die Adressen der Mitarbeiter werden immer dazugehaengt
+ */
 require_once('../../vilesci/config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/person.class.php');
@@ -71,13 +76,13 @@ if (isset($_GET['zustelladresse']))
 else
 	$zustelladresse = null;
 
-//Spalten
+//die Spalten die Exportiert werden sollen, werden per GET uebergeben
+//spalte1=nachname, spalte2=vorname, spalte3=gebdatum, ...
 $anzSpalten=0;
 $varname='spalte'.(string)$anzSpalten;
 while (isset($_GET[$varname]))
 {
 	$spalte[$anzSpalten]=$_GET[$varname];
-	//echo $spalte[$anzSpalten];
 	$anzSpalten++;
 	$varname='spalte'.(string)$anzSpalten;
 }
@@ -86,10 +91,6 @@ $zustelladresse=true;
 // Mitarbeiter holen
 $mitarbeiterDAO=new mitarbeiter($conn);
 $mitarbeiterDAO->getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $ausgeschieden, $semester_aktuell);
-//echo 'fix:'.$fix.' stgl:'.$stgl.' fbl:'.$fbl.' aktiv:'.$aktiv.' karenziert:'.$karenziert.' ausgeschieden:'.$ausgeschieden.' semester_aktuell:'.$semester_aktuell;
-	/*
-	 * Create Excel File with Content from Students Examples solved
-	 */
 
 	// Creating a workbook
 	$workbook = new Spreadsheet_Excel_Writer();
@@ -105,23 +106,17 @@ $mitarbeiterDAO->getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $ausgeschie
 
 	$format_title =& $workbook->addFormat();
 	$format_title->setBold();
-//	$format_title->setColor('yellow');
-//	$format_title->setPattern(1);
-//	$format_title->setFgColor('blue');
 	// let's merge
 	$format_title->setAlign('merge');
 
+	//Zeilenueberschriften ausgeben
 	for ($i=0;$i<$anzSpalten;$i++)
 		$worksheet->write(0,$i,strtoupper(str_replace('_bezeichnung','',$spalte[$i])), $format_bold);
 	$worksheet->write(0,$i,"STRASSE", $format_bold);
 	$worksheet->write(0,$i+1,"PLZ", $format_bold);
 	$worksheet->write(0,$i+2,"ORT", $format_bold);
 
-	// set width of columns
-
-	//$worksheet->setColumn(1,4,20); // ersten 3 Spalten auf width=17
-	//$worksheet->setColumn(0,0,22);
-
+	//Maximale Spaltenbreite ermitteln damit sie am Schluss gesetzt werden kann
 	$j=1;
 	$maxlength = array();
 	for ($i=0;$i<$anzSpalten;$i++)
@@ -130,14 +125,18 @@ $mitarbeiterDAO->getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $ausgeschie
 	$maxlength[$i+1]=strlen('PLZ');
 	$maxlength[$i+2]=strlen('ORT');
 
+	//Zeilen (Mitarbeiter) ausgeben
 	foreach ($mitarbeiterDAO->result as $mitarbeiter)
 	{
+		//Spalten ausgeben
 		for ($i=0;$i<$anzSpalten;$i++)
 		{
 			if(strlen($mitarbeiter->$spalte[$i])>$maxlength[$i])
 				$maxlength[$i] = strlen($mitarbeiter->$spalte[$i]);
 			$worksheet->write($j,$i, $mitarbeiter->$spalte[$i]);
 		}
+		
+		//Zustelladresse aus der Datenbank holen und dazuhaengen
 		$qry = "SELECT * FROM public.tbl_adresse WHERE person_id='$mitarbeiter->person_id' ORDER BY zustelladresse LIMIT 1";
 		if($result = pg_query($conn, $qry))
 		{
@@ -158,6 +157,7 @@ $mitarbeiterDAO->getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $ausgeschie
 		$j++;
 	}
 
+	//Die Breite der Spalten setzen
 	for ($i=0;$i<$anzSpalten;$i++)
 		$worksheet->setColumn($i, $i, $maxlength[$i]+2);
     $worksheet->setColumn($i, $i, $maxlength[$i]+2);

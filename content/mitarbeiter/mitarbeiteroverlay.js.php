@@ -233,59 +233,49 @@ function onMitarbeiterSelect()
 	if (filter=="Studiengangsleiter")
 	{
 		attributes+="&stgl=true";
-		document.getElementById('mitarbeiter-toolbar-neu').disabled=true;
 	}
 	if (filter=="Fachbereichsleiter")
 	{
 		attributes+="&fbl=true";
-		document.getElementById('mitarbeiter-toolbar-neu').disabled=true;
 	}
 	if (filter=="Alle")
 	{
 		attributes+="&alle=true";
-		document.getElementById('mitarbeiter-toolbar-neu').disabled=false;
 	}
 	if (filter=="Aktive")
 	{
 		attributes+="&aktiv=true";
-		document.getElementById('mitarbeiter-toolbar-neu').disabled=false;
 	}
 	if (filter=="FixAngestellte")
 	{
 		attributes+="&fix=true&aktiv=true";
-		document.getElementById('mitarbeiter-toolbar-neu').disabled=false;
 	}
 	if (filter=="FixAngestellteAlle")
 	{
 		attributes+="&fix=true";
-		document.getElementById('mitarbeiter-toolbar-neu').disabled=false;
 	}
 	if (filter=="Inaktive")
 	{
 		attributes+="&aktiv=false";
-		document.getElementById('mitarbeiter-toolbar-neu').disabled=true;
 	}
 	if (filter=="Karenziert")
 	{
 		attributes+="&karenziert=true";
-		document.getElementById('mitarbeiter-toolbar-neu').disabled=true;
 	}
 	if (filter=="Ausgeschieden")
 	{
 		attributes+="&ausgeschieden=true";
-		document.getElementById('mitarbeiter-toolbar-neu').disabled=true;
 	}
 	if (filter=="FreiAngestellte")
 	{
 		attributes+="&fix=false&aktiv=true";
-		document.getElementById('mitarbeiter-toolbar-neu').disabled=false;
 	}
 	if (filter=="FreiAngestellteAlle")
 	{
 		attributes+="&fix=false";
-		document.getElementById('mitarbeiter-toolbar-neu').disabled=false;
 	}
 	
+	document.getElementById('mitarbeiter-toolbar-neu').disabled=false;	
 	//Timestamp anhaengen da beim Laden von Zwischengespeicherten Dateien kein
 	//Observer Event ausgeloest wird.
 	url+=attributes+'&'+gettimestamp();
@@ -813,6 +803,40 @@ function MitarbeiterDetailgetSpaltenname(id)
 	if(id=='mitarbeiter-treecol-fixangestellt') return 'fixangestellt';
 	if(id=='mitarbeiter-treecol-lektor') return 'lektor';
 }
+
+function MitarbeiterSendMail()
+{
+	mailempfaenger='';
+	var treeMitarbeiter=document.getElementById('mitarbeiter-tree');
+	var numRanges = treeMitarbeiter.view.selection.getRangeCount();
+	var start = new Object();
+	var end = new Object();
+	var anzfault=0;
+	//Markierte Datensaetze holen
+	for (var t=0; t<numRanges; t++)
+	{
+  		treeMitarbeiter.view.selection.getRangeAt(t,start,end);
+  		for (v=start.value; v<=end.value; v++)
+  		{
+  			var col = treeMitarbeiter.columns ? treeMitarbeiter.columns["mitarbeiter-treecol-uid"] : "mitarbeiter-treecol-uid";
+  			if(treeMitarbeiter.view.getCellText(v,col).length>1)
+  			{
+  				if(mailempfaenger!='')
+					mailempfaenger=mailempfaenger+','+treeMitarbeiter.view.getCellText(v,col)+'@technikum-wien.at';
+				else
+					mailempfaenger='mailto:'+treeMitarbeiter.view.getCellText(v,col)+'@technikum-wien.at';
+  			}
+  			else
+  			{
+  				anzfault=anzfault+1;
+  			}
+  		}
+	}
+	if(anzfault!=0)
+		alert(anzfault+' Mitarbeiter konnten nicht hinzugefuegt werden weil keine UID eingetragen ist!');
+	window.location.href=mailempfaenger;
+}
+
 // ***************** VERWENDUNG ********************** //
 
 // ****

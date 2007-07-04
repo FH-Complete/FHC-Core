@@ -45,7 +45,11 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterfunktionove
 <!-- *  MITARBEITER * -->
 <!-- **************** -->
 <vbox id="MitarbeiterEditor" persist="height">
-			
+<popupset>
+	<popup id="mitarbeiter-tree-popup">
+		<menuitem label="EMail versenden" oncommand="MitarbeiterSendMail();" id="mitarbeiter-tree-popup-mail" hidden="false"/>
+	</popup>
+</popupset>
 	<hbox>
 		<toolbox flex="1">
 			<toolbar id="mitarbeiter-nav-toolbar">
@@ -67,7 +71,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterfunktionove
 			flags="dont-build-content"
 			enableColumnDrag="true"
 			style="margin:0px;"
-			persist="hidden, height"						
+			persist="hidden, height"
+			context="mitarbeiter-tree-popup"				
 	>
 		<treecols>
 			<treecol id="mitarbeiter-treecol-uid" label="UID" flex="1" persist="hidden, width" hidden="false"
