@@ -1,0 +1,481 @@
+/* Allgemein */
+body
+{
+	background-color: White;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: x-small;
+	/*IE hack*/
+	voice-family: "\"}\"";
+	voice-family: inherit;
+	font-size: small;
+	/*IE hack end*/
+}
+iframe
+{
+	margin:0px;
+	border-width:0px;
+	border-style:none;
+	padding:0px;
+}
+#menue
+{
+	position:absolute;
+	top:8%;
+	width:19%;
+	height:90%;
+}
+#content
+{
+	position:absolute;
+	width:80%;
+	height:90%;
+	left:20%;
+}
+input.TextBox					
+{
+	background-color: White;
+}
+#GlobalMenu
+{
+	margin-top: 3px;
+	text-align: right;
+}
+
+
+/* Links */
+a
+{
+	color: #008381; text-decoration: none;
+	cursor: pointer;
+}
+a.HyperItem
+{
+	color: Black; text-decoration: none;
+	font-weight: bold;
+}
+a:hover.HyperItem
+{
+	color: #008381; text-decoration: none;
+	font-weight: bold;
+}
+a[onClick]:hover.Item
+{
+	color: Black; text-decoration: none;
+}
+a:hover.Item
+{
+	color: Black; text-decoration: none;
+}
+a.Item2
+{
+	color: Black; text-decoration: none;
+}
+a:hover.Item2
+{
+	color: #008381; text-decoration: none;
+}
+a.MenuItem
+{
+	color: #008381; text-decoration: none;
+	font-weight: bold;
+}
+a:hover.MenuItem
+{
+	color: Black; text-decoration: none;
+	font-weight: bold;
+}
+A.hilfe 
+{ 
+	text-decoration:none;
+}
+A.hilfe:hover 
+{ 
+	text-decoration:none;
+	cursor:help;
+}
+A.stpl_detail 
+{ 
+	font-size:x-small; 
+	color:#000000;
+	text-decoration:none;
+}
+A.stpl_detail:hover
+{ 
+	font-size:x-small;
+	color:#000000; 
+	text-decoration:underline;
+	cursor:hand;
+}
+
+
+/* Tables */
+td.ContentHeader
+{
+	background-color: #008381; //grün
+	font-weight: bold;
+	height: 19px;
+}
+td.ContentHeader2
+{
+	background-color: #CCCCCC; //mittel-grau
+	font-weight: normal;
+	height: 19px
+}
+td.ContentHeader3					
+{
+	background-color: #CCCCCC; //mittel-grau
+	font-weight: bold;
+	height: 19px
+}
+td.MarkLine
+{
+	background-color: #F2F2F2; //wie #EEEEEE; also grau fast weiß
+}
+TR.liste
+{
+	background-color: #D3DCE3; //grau wie #DDDDDD
+}
+TR.liste0						
+{
+	background-color: #FFFFFF; //weiß
+}
+TR.liste1						
+{
+	background-color: #EEEEEE; //grau fast weiß
+}
+
+/* private/profile/zeitsperre.php */
+TABLE#zeitsperren
+{  
+	border: 1;
+	cellspacing: 0;
+	cellpadding: 0;
+	font-size: small;
+	width:100%;
+}
+TABLE#zeitsperren TH
+{
+	background-color: #DDDDDD; //hellgrau
+}
+TABLE#zeitsperren TH.feiertag
+{
+	background-color: #FFFF00;//grelles gelb
+}
+TABLE#zeitsperren TD.feiertag
+{
+	background-color: #FFFF22; //bissi helleres gelb
+}
+TABLE#zeitsperren TD
+{
+	background-color: #EEEEEE //grau fast weiß
+}
+
+/* Stundeplan */
+TABLE.stdplan
+{  
+	border: 1;
+	cellspacing: 0;
+	cellpadding: 0;
+	font-size: small;
+}
+TABLE.stdplan TH
+{
+	background-color: #DDDDDD;
+}
+TABLE.stdplan TD
+{
+	background-color: #EEEEEE
+}
+.row-even { --> liste1
+ background-color:#f2f2f2;
+}
+
+.row-odd { --> liste0
+  background-color:#ffffff;
+}
+
+
+/* Fonts */
+h1 
+{ 
+	font-size: medium;
+	color: #ffffff; 
+	background-color: #009e84; 
+}
+h1 td
+{ 
+	font-size: medium; 
+	color: #ffffff; 
+	background-color: #009e84;
+}
+h1 a
+{
+	color: #dddddd;
+}
+h1 a:hover
+{
+	color: #ffffff;
+	text-decoration:none;
+}
+
+h2 
+{ 
+	font-size: small; 
+	color: #ffffff; 
+	background-color: #00a4d2; //hellblau
+}
+h2 td
+{ 
+	font-size: small; 
+	color: #ffffff; 
+	background-color: #00a4d2; //hellblau
+}
+h2 a
+{
+	color: #dddddd; 
+}
+h2 a:hover
+{
+	color: #ffffff;
+	text-decoration:none;
+}
+h3 
+{ 
+	font-size: small; 
+	font-weight: bold; 
+	color: #008E74; 
+}
+h4 
+{ 
+	font-size: x-small; 
+	font-style: normal; 
+	line-height: normal; 
+	font-weight: bold; 
+	font-variant: normal; 
+	text-transform: none; 
+	color: #008E74; 
+	cursor: hand; 
+	text-decoration: none; 
+}
+font.error
+{
+	color: #ff0000;
+}
+font.ContentHeader
+{
+	color: #FFFFFF;
+}
+
+#news
+{
+}
+#news .news
+{
+	//-moz-border-radius-topright: 20px;
+	-moz-border-radius-topleft: 10px;
+	width: 100%;
+	border: 1px solid #E0E0E0;
+	background-color: #F0F0F0;
+	
+}
+#news .news .titel
+{
+	font-weight: bold;
+	font-size: normal;
+	padding: 0px 10px 0px 10px;
+}
+#news .news .text
+{
+	background-color: #FCFCFC;
+	padding: 0px 10px 0px 10px;
+}
+
+
+/* Images */
+img.testtoolfrage
+{
+	max-width:400px;
+	max-height:300px;
+}
+img.testtoolvorschlag
+{
+	max-width:200px;
+	max-height:150px;
+}
+img
+{
+	border: 0;
+}
+
+
+/* neu */
+
+TABLE.tabcontent
+{
+	margin: 0px;
+	padding: 0px;
+	border-style: none;
+	width: 100%;
+	cellspacing: 0;
+	cellpadding: 0;
+}
+
+TABLE.tabcontent2
+{
+	margin: 0px;
+	padding: 0px;
+	border-style: none;
+	cellspacing: 0;
+	cellpadding: 0;
+}
+
+td.tdwidth10
+{
+	width: 10px;
+}
+
+td.tdwidth30
+{
+	width: 30px;
+}
+
+a.aheader
+{
+	color:#FFFFFF;
+}
+
+a.head
+{
+   color:#ffffff;
+}
+
+a.head:hover
+{
+	color:#000000;
+}
+
+
+TABLE.tabborder
+{
+	cellspacing: 0;
+	cellpadding: 1;
+	width: 100%;
+	border: 1;
+}
+
+TR.tryellow
+{
+	background-color: #FFFF99;
+}
+
+td.tdgreen
+{
+	background-color: #CCFFCC;
+}
+
+div.tip
+{
+
+	position: absolute;
+	display: none;
+	width: 300px;
+	background-color: #f7f7ee;
+	padding: 3px 7px 4px 6px;
+	border: 1px solid #336;
+	background-color: #f7f7ee;
+	text-align: left;
+}
+
+
+td.tdborder
+{
+	text-align: center;
+	border:2px solid black;
+	background-color: #ffffff;
+}
+
+TABLE#tabterm
+{
+	cellpadding: 0;
+	cellspacing: 0;
+	margin:auto;
+}
+
+td.tdwrap
+{
+	white-space: nowrap;
+}
+
+td.tdvertical
+{
+	vertical-align: top;
+}
+.home_logo
+{
+	background-image:url(images/TWLogo_klein.jpg);
+	width:170px;
+	height:53px;
+}
+.header_line
+{
+	background-image:url(images/header_line.gif);
+	width:100%;
+	height:3px;
+}
+
+
+/*aussortiert*/
+
+
+
+/*font.headline					
+{
+	color: #008381; 
+	text-decoration: none;
+	font-weight: bold;
+
+	font-size: 20px;
+	line-height: 24px;
+	color: #003399;
+	margin-bottom: 0px;
+	margin-top: 0px;
+	
+}*/
+
+/*font.subline					
+{
+	font-size: 17px;
+	line-height: 20px;
+	color: #003399;
+	margin-bottom: 0px;
+	margin-top: 0px;
+}*/
+
+/*#bgcolor0					
+{
+	background-color: #FF0000;
+}
+#bgcolor1					
+{
+	background-color: #FF4444;
+}
+#bgcolor2					
+{
+	background-color: #FF7777;
+}
+#bgcolor3					
+{
+	background-color: #C0EEC0;
+}
+#bgcolor4					
+{
+	background-color: #77FF77;
+}
+#bgcolor5					
+{
+	background-color: #44FF44;
+}
+#bgcolor6					
+{
+	background-color: #00FF00;
+}*/
