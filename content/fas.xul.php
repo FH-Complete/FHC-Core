@@ -81,6 +81,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-statistic-lvplanung:command" oncommand="StatistikPrintLVPlanung();"/>
   <command id="menu-statistic-lehrauftragsliste:command" oncommand="StatistikPrintLehrauftragsliste();"/>
   <command id="menu-dokumente-inskriptionsbestaetigung:command" oncommand="StudentPrintInskriptionsbestaetigung();"/>
+  <command id="menu-help-close:command" oncommand="test();"/>
 </commandset>
 
 <keyset id="mainkeys">
@@ -215,7 +216,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 </toolbox>
 <hbox flex="1">
 	<tabbox id="tabbox-left" orient="vertical" flex="1">
-		<tabs orient="horizontal">
+		<tabs id="menu-content-tabs" orient="horizontal">
 		<?php
 			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('lva-verwaltung'))
 			{
@@ -225,7 +226,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 			}
 			if($rechte->isBerechtigt('admin','0') || $rechte->isBerechtigt('mitarbeiter'))
 			{
-				echo '<tab id="tab-menu-mitarbeiter" label="Mitarbeiter" />';
+				echo '<tab id="tab-menu-mitarbeiter" label="Mitarbeiter" onclick="document.getElementById(\'main-content-tabs\').selectedItem=document.getElementById(\'tab-mitarbeiter\');"/>';
 			}
 		?>
 		</tabs>
