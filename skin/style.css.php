@@ -1,9 +1,14 @@
 <?php
-	setcookie('stylesheet', 'tw');
+	if (isset($_GET['path']))
+		$path=$_GET['path'];
+	else
+		$path='../';
+	require ($path.'cis/config.inc.php');
+	setcookie('stylesheet', DEFAULT_STYLE);
 	if (isset($_COOKIE['stylesheet']))
 		$stylesheet=$_COOKIE['stylesheet'];
 	else
-		$stylesheet='tw';
+		$stylesheet=DEFAULT_STYLE;
 	header("Content-Type: text/css");
 	readfile ('styles/'.$stylesheet.'.css');
 ?>
