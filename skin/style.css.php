@@ -10,6 +10,6 @@
 	else
 		$stylesheet=DEFAULT_STYLE;
 	header("Content-Type: text/css");
-	readfile ('styles/'.$stylesheet.'.css');
+	readfile ($path.'skin/styles/'.$stylesheet.'.css');
 ?>
 
