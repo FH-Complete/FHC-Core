@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -34,7 +34,7 @@ function microtime_float()
 {
     list($usec, $sec) = explode(" ", microtime());
     return ((float)$usec + (float)$sec);
-} 
+}
 $time = microtime_float();
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -44,12 +44,12 @@ $time = microtime_float();
 <link href="../../../../skin/cis.css" rel="stylesheet" type="text/css">
 <title>Kreuzerltool</title>
 <script language="JavaScript">
-<!--        
+<!--
 	function MM_jumpMenu(targ, selObj, restore)
 	{
 	  eval(targ + ".location='" + selObj.options[selObj.selectedIndex].value + "'");
-	  
-	  if(restore) 
+
+	  if(restore)
 	  {
 	  	selObj.selectedIndex = 0;
 	  }
@@ -71,31 +71,31 @@ $user = get_uid();
 
 if(!check_lektor($user, $conn))
 	die('Sie haben keine Berechtigung fuer diesen Bereich');
-	
+
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
 
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id
 	$lvid = $_GET['lvid'];
-else 
+else
 	die('Fehlerhafte Parameteruebergabe');
 
 if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id'])) //Lehreinheit_id
 	$lehreinheit_id = $_GET['lehreinheit_id'];
-else 
+else
 	$lehreinheit_id = '';
 
 //Laden der Lehrveranstaltung
 $lv_obj = new lehrveranstaltung($conn);
 if(!$lv_obj->load($lvid))
 	die($lv_obj->errormsg);
-	
+
 //Studiengang laden
 $stg_obj = new studiengang($conn,$lv_obj->studiengang_kz);
 
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
-else 
+else
 	$stsem = '';
 
 //Vars
@@ -117,9 +117,9 @@ $freigabevon = (isset($_POST['freigabevon'])?$_POST['freigabevon']:'');
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 
 //Kopfzeile
-echo '<table border="0" cellspacing="0" cellpadding="0" height="100%" width="100%">';
+echo '<table class="tabcontent" height="100%">';
 echo ' <tr>';
-echo '<td width="10">&nbsp;</td>';
+echo '<td class="tdwidth10">&nbsp;</td>';
 echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;"Kreuzerl"-Tool';
 echo '</font></td><td  class="ContentHeader" align="right">'."\n";
 
@@ -150,7 +150,7 @@ if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lv_obj->st
 			tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
 			tbl_lehreinheit.studiensemester_kurzbz = '$stsem'";
 }
-else 
+else
 {
 	$qry = "SELECT distinct tbl_lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehreinheitmitarbeiter
 			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND
@@ -170,7 +170,7 @@ if($result = pg_query($conn, $qry))
 		while($row = pg_fetch_object($result))
 		{
 			if($lehreinheit_id=='')
-				$lehreinheit_id=$row->lehreinheit_id;				
+				$lehreinheit_id=$row->lehreinheit_id;
 			$selected = ($row->lehreinheit_id == $lehreinheit_id?'selected':'');
 			//Zugeteilte Lektoren
 			$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter using(mitarbeiter_uid) WHERE lehreinheit_id='$row->lehreinheit_id'";
@@ -189,7 +189,7 @@ if($result = pg_query($conn, $qry))
 				}
 				$lektoren .=')';
 			}
-			
+
 
 			//Zugeteilte Gruppen
 			$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
@@ -201,12 +201,12 @@ if($result = pg_query($conn, $qry))
 				{
 					if($row_gruppen->gruppe_kurzbz=='')
 						$gruppen.=$row_gruppen->semester.$row_gruppen->verband.$row_gruppen->gruppe;
-					else 
+					else
 						$gruppen.=$row_gruppen->gruppe_kurzbz;
 					$i++;
 					if($i<pg_num_rows($result_gruppen))
 						$gruppen.=', ';
-					else 
+					else
 						$gruppen.=' ';
 				}
 			}
@@ -214,20 +214,20 @@ if($result = pg_query($conn, $qry))
 		}
 		echo '</SELECT> ';
 	}
-	else 
+	else
 	{
 		if($row = pg_fetch_object($result))
 			$lehreinheit_id = $row->lehreinheit_id;
 	}
 }
-else 
+else
 {
 	echo 'Fehler beim Auslesen der Lehreinheiten';
 }
 echo $stsem_content;
 echo '</td><tr></table>';
 echo '<table><tr>';
-echo '<td width="10">&nbsp;</td>';
+echo '<td class="tdwidth10">&nbsp;</td>';
 echo "<td>\n";
 echo "<b>$lv_obj->bezeichnung</b><br>";
 
@@ -262,7 +262,7 @@ if(isset($_POST['uebung_neu']))
 		{
 			$error_thema.= "<span class='error'>Thema muss eingegeben werden</span>";
 			$error=true;
-		}		
+		}
 		if(!is_numeric($punkteprobeispiel))
 		{
 			$error_punkteprobeispiel= "<span class='error'>Punkte pro Beispiel muss eine g&uuml;ltige Zahl sein</span>";
@@ -288,28 +288,28 @@ if(isset($_POST['uebung_neu']))
 			$error_anzahlderbeispiele = "<span class='error'>Anzahl der Beispiele muss kleiner 100 sein</span>";
 			$error=true;
 		}
-		
+
 		$freigabevon_sav = $datum_obj->mktime_datumundzeit($freigabevon);
 		$freigabebis_sav = $datum_obj->mktime_datumundzeit($freigabebis);
-		
+
 		if(!$freigabebis_sav)
-		{				
+		{
 			$error_freigabebis = "<span class='error'>Bis-Datum hat ein ung&uuml;ltiges Format</span>";
 			$error=true;
 		}
-		
+
 		if(!$freigabevon_sav)
 		{
 			$error_freigabevon = "<span class='error'>Von-Datum hat ein ung&uuml;ltiges Format</span>";
 			$error=true;
 		}
-		
+
 		if($freigabevon_sav && $freigabebis_sav && $freigabevon_sav>$freigabebis_sav)
 		{
 					$error_freigabevon = "<span class='error'>Von Datum darf nicht gr&ouml;sser als Bis Datum sein</span>";
 					$error=true;
 		}
-		
+
 		if(!$error)
 		{
 			//Uebung anlegen
@@ -331,7 +331,7 @@ if(isset($_POST['uebung_neu']))
 			$uebung_obj->insertamum = date('Y-m-d H:i:s');
 			$uebung_obj->insertvon = $user;
 			$uebung_obj->statistik = isset($_POST['statistik']);
-						
+
 			if($uebung_obj->save(true))
 			{
 				//Beispiele anlegen
@@ -347,19 +347,19 @@ if(isset($_POST['uebung_neu']))
 					$beispiel_obj->updatevon = $user;
 					$beispiel_obj->insertamum = date('Y-m-d H:i:s');
 					$beispiel_obj->insertvon = $user;
-					
+
 					if(!$beispiel_obj->save(true))
 						$error_msg = $beispiel_obj->errormsg;
 				}
 				if($error_msg!='')
 					echo "<span class='error'>$error_msg</span>";
 			}
-			else 
+			else
 				echo "<span class='error'>$uebung_obj->errormsg</span>";
 		}
 
 	}
-	else 
+	else
 		echo "<span class='error'>Kreuzerlliste konnte nicht angelegt werden!</span><br>";
 }
 
@@ -412,27 +412,27 @@ if(isset($_POST['uebung_edit']))
 		echo "<span class='error'>Thema muss eingegeben werden'</span>";
 		$error = true;
 	}
-	
+
 	$freigabevon_sav = $datum_obj->mktime_datumundzeit($freigabevon);
 	$freigabebis_sav = $datum_obj->mktime_datumundzeit($freigabebis);
-	
+
 	if($freigabevon_sav>$freigabebis_sav)
 	{
 		echo "<span class='error'>Von Datum darf nicht gr&ouml;sser als Bis Datum sein</span>";
 		$error=true;
 	}
 	if(!$freigabebis_sav)
-	{				
+	{
 		echo "<span class='error'>Bis-Datum hat ein ung&uuml;ltiges Format</span>";
 		$error=true;
 	}
-	
+
 	if(!$freigabevon_sav)
 	{
 		echo "<span class='error'>Von-Datum hat ein ung&uuml;ltiges Format</span>";
 		$error=true;
 	}
-	
+
 	if(!$error)
 	{
 		$uebung_obj = new uebung($conn);
@@ -451,13 +451,13 @@ if(isset($_POST['uebung_edit']))
 		$uebung_obj->updatevon = $user;
 		$uebung_obj->uebung_id = $uebung_id;
 		$uebung_obj->statistik = (isset($_POST['statistik'])?true:false);
-		
+
 		if($uebung_obj->save(false))
 			echo "Die &Auml;nderung wurde gespeichert!";
 		else
 			echo "<span class='error'>$uebung_obj->errormsg</span>";
 	}
-	
+
 }
 
 //Neues Beispiel anlegen
@@ -467,10 +467,10 @@ if(isset($_POST['beispiel_neu']) || isset($_POST['beispiel_edit']))
 	{
 		echo "<span class='error'>Beispiel_id ist ungueltig</span>";
 	}
-	else 
+	else
 	{
 		if(isset($uebung_id) && $uebung_id!='' && is_numeric($uebung_id))
-		{			
+		{
 			$punkte = (isset($_POST['punkte'])?$_POST['punkte']:'');
 			$punkte = str_replace(',','.',$punkte);
 			if(is_numeric($punkte) && $punkte!='')
@@ -483,13 +483,13 @@ if(isset($_POST['beispiel_neu']) || isset($_POST['beispiel_edit']))
 						$beispiel_obj->beispiel_id= $beispiel_id;
 						$beispiel_obj->new=false;
 					}
-					else 
+					else
 					{
 						$beispiel_obj->new=true;
 						$beispiel_obj->insertamum = date('Y-m-d H:i:s');
-						$beispiel_obj->insertvon = $user;				
+						$beispiel_obj->insertvon = $user;
 					}
-					
+
 					$beispiel_obj->uebung_id = $uebung_id;
 					$beispiel_obj->bezeichnung = $bezeichnung;
 					$beispiel_obj->punkte = $punkte;
@@ -499,16 +499,16 @@ if(isset($_POST['beispiel_neu']) || isset($_POST['beispiel_edit']))
 					{
 						$beispiel_id='';
 					}
-					else 
+					else
 						echo "<span class='error'>$beispiel_obj->errormsg</span>";
 				}
-				else 
+				else
 					echo "<span class='error'>Bezeichnung muss eingegeben werden</span>";
 			}
-			else 
+			else
 				echo "<span class='error'>Punkte muss eine g&uuml;ltige Zahl sein</span>";
 		}
-		else 
+		else
 			echo "<span class='error'>Zugehoerige Uebung ist fehlerhaft</span>";
 	}
 }
@@ -519,7 +519,7 @@ if(isset($_GET['kopieren']) && $_GET['kopieren']=='true')
 	//echo "Kopiere Uebung ".$_GET['uebung_copy_id']." to ".$_POST['lehreinheit_copy_id'];
 	//Laden der zu kopierenden Uebung
 	if(is_numeric($_GET['uebung_copy_id']) && is_numeric($_POST['lehreinheit_copy_id']))
-	{		
+	{
 		//Source Uebung Laden
 		$qry = "SELECT * FROM campus.tbl_uebung WHERE uebung_id='".$_GET['uebung_copy_id']."'";
 		if($result_source = pg_query($conn, $qry))
@@ -529,9 +529,9 @@ if(isset($_GET['kopieren']) && $_GET['kopieren']=='true')
 				//Berechtigung Checken
 				$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='".$_POST['lehreinheit_copy_id']."' AND mitarbeiter_uid='$user'";
 				if($row_berechtigt = pg_query($conn, $qry))
-				{					
-					if(pg_num_rows($row_berechtigt)>0 || 
-					   $rechte->isBerechtigt('admin',0) || 
+				{
+					if(pg_num_rows($row_berechtigt)>0 ||
+					   $rechte->isBerechtigt('admin',0) ||
 					   $rechte->isBerechtigt('admin',$lv_obj->studiengang_kz))
 					{
 						//Schauen ob bereits eine uebung mit diesem Namen vorhanden ist
@@ -557,13 +557,13 @@ if(isset($_GET['kopieren']) && $_GET['kopieren']=='true')
 							$uebung_dest->updatevon = $user;
 							$uebung_dest->insertamum = date('Y-m-d H:i:s');
 							$uebung_dest->insertvon = $user;
-							
+
 							if($uebung_dest->save(true))
 							{
 								//Beispiel laden
 								$qry = "SELECT * FROM campus.tbl_beispiel WHERE uebung_id='".$_GET['uebung_copy_id']."'";
 								if($result_bsp_source = pg_query($conn, $qry))
-								{									
+								{
 									$error_bsp_save=false;
 									while($row_bsp_source = pg_fetch_object($result_bsp_source))
 									{
@@ -576,37 +576,37 @@ if(isset($_GET['kopieren']) && $_GET['kopieren']=='true')
 										$beispiel_dest->updatevon = $user;
 										$beispiel_dest->insertamum = date('Y-m-d H:i:s');
 										$beispiel_dest->insertvon = $user;
-										
+
 										if(!$beispiel_dest->save(true))
 											$error_bsp_save=true;
 									}
-									
+
 									if($error_bsp_save)
 										echo "<span class='error'>Fehler: Es konnten nicht alle Beispiel kopiert werden</span>";
-									else 
+									else
 										echo "Daten wurden erfolgreich kopiert";
 								}
 							}
-							else 
+							else
 							{
-							
+
 								echo "<span class='error'>Fehler beim kopieren der Daten: $uebung_dest->errormsg</span>";
 							}
 						}
-						else 
+						else
 							echo "<span class='error'>Fehler beim Kopieren: In der Ziel-Lehreinheit existiert bereits eine Kreuzerlliste mit diesem Namen!</span>";
 					}
-					else 
+					else
 						echo "<span class='error'>Sie haben keine Berechtigung f&uuml;r diese Aktion</span>";
 				}
 			}
 			else
 				echo "<span class='error'>Uebung ".$_GET['uebung_copy_id']." wurde nicht gefunden</span>";
 		}
-		else 
+		else
 			echo "<span class='error'>Uebung ".$_GET['uebung_copy_id']." wurde nicht gefunden</span>";
 	}
-	else 
+	else
 		echo "<span class='error'>Fehler bei der Parameteruebergabe</span>";
 }
 
@@ -616,12 +616,12 @@ if(isset($uebung_id) && $uebung_id!='')
 	echo "<table><tr><td valign='top'>";
 	//Bearbeiten der ausgewaehlten Uebung
 	echo "<form action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' method=POST>\n";
-	echo "<table><tr><td colspan='2' width='340' class='ContentHeader3'>Ausgew&auml;hlte Kreuzerlliste bearbeiten</td><td>&nbsp;</td></tr>\n";	
+	echo "<table><tr><td colspan='2' width='340' class='ContentHeader3'>Ausgew&auml;hlte Kreuzerlliste bearbeiten</td><td>&nbsp;</td></tr>\n";
 	echo "<tr><td>&nbsp;</td><td></td></tr>";
-		
+
 	$uebung_obj = new uebung($conn);
 	$uebung_obj->load($uebung_id);
-	
+
 	echo "
 	<tr><td>Thema</td><td align='right'><input type='text' name='thema'  maxlength='32' value='$uebung_obj->bezeichnung'></td><td>$error_thema</td></tr>
 	<tr><td>Freigabe</td><td align='right'>von <input type='text' size='16' name='freigabevon' value='".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon))."'></td></tr>
@@ -630,35 +630,35 @@ if(isset($uebung_id) && $uebung_id!='')
 	<tr><td colspan=2 align='right'><input type='submit' name='uebung_edit' value='Speichern'></td></tr>
 	</table>
 	</form>";
-	
+
 	$beispiel_obj = new beispiel($conn);
 	$beispiel_obj->load_beispiel($uebung_id);
 	$anzahl = count($beispiel_obj->beispiele);
 	echo "</td><td valign='top'>";
-	
+
 	//Beispiel neu Anlegen
 	echo "<form action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' method=POST>\n";
-	echo "<table width='340'><tr><td colspan='3' class='ContentHeader3'>Neues Beispiel anlegen</td></tr>\n";	
-	echo "<tr><td>&nbsp;</td><td></td></tr>\n\n";	
-	
+	echo "<table width='340'><tr><td colspan='3' class='ContentHeader3'>Neues Beispiel anlegen</td></tr>\n";
+	echo "<tr><td>&nbsp;</td><td></td></tr>\n\n";
+
 	echo "<tr><td>Bezeichnung <input type='text' name='bezeichnung' maxlength='32' value='Beispiel ".($anzahl<9?'0'.($anzahl+1):($anzahl+1))."'>";
 	echo "&nbsp;Punkte <input type='text' size='2' name='punkte' value='1'></td></tr>";
 	echo "<tr><td align='right'><input type='submit' name='beispiel_neu' value='Anlegen'></td></tr>";
-		
+
 	echo "</table>
 	</form>";
-	
+
 	echo "</td></tr><tr><td valign='top'>";
-	
+
 	//Uebersicht der Beispiele
 	echo "<form action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' method=POST>\n";
-	echo "<table width='340'><tr><td colspan='3' class='ContentHeader3'>Vorhandene Beispiele</td></tr>\n";	
-	echo "<tr><td>&nbsp;</td><td></td><td></td></tr>\n\n";	
-		
+	echo "<table width='340'><tr><td colspan='3' class='ContentHeader3'>Vorhandene Beispiele</td></tr>\n";
+	echo "<tr><td>&nbsp;</td><td></td><td></td></tr>\n\n";
+
 	if($anzahl>0)
 	{
 		echo "<tr><th>Beispiel</th><th>Punkte</th><th>Auswahl</th></tr>\n";
-		foreach ($beispiel_obj->beispiele as $row) 
+		foreach ($beispiel_obj->beispiele as $row)
 		{
 			echo "<tr><td><a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&beispiel_id=$row->beispiel_id' class='Item'><u>".htmlentities($row->bezeichnung)."</u></a></td>
 			<td align='center'>$row->punkte</td>
@@ -666,14 +666,14 @@ if(isset($uebung_id) && $uebung_id!='')
 		}
 		echo "<tr><td></td><td></td><td align='right'><input type='Submit' value='Auswahl löschen' onclick='return confirmdelete()' name='beispiel_delete'></td></tr>";
 	}
-	else 
+	else
 		echo "<tr><td colspan='3'>Derzeit sind keine Beispiele angelegt</td><td></td></tr>";
-	
+
 	echo "</table>
 	</form>";
-	
+
 	echo "</td><td valign='top'>";
-			
+
 	//Beispiel Aendern
 	$error_msg = '';
 	if(isset($beispiel_id) && $beispiel_id!='')
@@ -682,28 +682,28 @@ if(isset($uebung_id) && $uebung_id!='')
 		if($beispiel_obj->load($beispiel_id))
 		{
 			echo "<form action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&beispiel_id=$beispiel_id' method=POST>\n";
-			echo "<table width='340'><tr><td colspan='3' class='ContentHeader3'>Beispiel bearbeiten</td></tr>\n";	
-			echo "<tr><td>&nbsp;</td><td></td></tr>\n\n";	
-	
+			echo "<table width='340'><tr><td colspan='3' class='ContentHeader3'>Beispiel bearbeiten</td></tr>\n";
+			echo "<tr><td>&nbsp;</td><td></td></tr>\n\n";
+
 			echo "<tr><td>Bezeichnung <input type='text' name='bezeichnung' maxlength='32' value='$beispiel_obj->bezeichnung'>";
 			echo "&nbsp;Punkte <input type='text' size='2' name='punkte' value='$beispiel_obj->punkte'></td></tr>";
 			echo "<tr><td align='right'><input type='submit' name='beispiel_edit' value='Ändern'></td></tr>";
-		
+
 			echo "</table>
 					</form><br><br>";
 		}
-		else 
-			$error_msg = $beispiel_obj->errormsg;			
+		else
+			$error_msg = $beispiel_obj->errormsg;
 	}
 	echo "</td></tr></table>";
 }
-else 
+else
 {
 	//Gesamtuebersicht ueber alle Uebungen
 	echo "<table><tr><td valign='top'>";
-	echo "<form action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method=POST>";	
-	echo "<table width='440'><tr><td colspan='3' class='ContentHeader3'>Vorhandene Kreuzerllisten bearbeiten</td></tr>";	
-	
+	echo "<form action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method=POST>";
+	echo "<table width='440'><tr><td colspan='3' class='ContentHeader3'>Vorhandene Kreuzerllisten bearbeiten</td></tr>";
+
 	$uebung_obj = new uebung($conn);
 	$uebung_obj->load_uebung($lehreinheit_id);
 	$anzahl = count($uebung_obj->uebungen);
@@ -712,7 +712,7 @@ else
 	if($anzahl>0)
 	{
 		echo "<tr><td></td><td></td><td>&nbsp;</td></tr><tr><th>Thema</th><th>Freigeschalten</th><th>Auswahl</th><th>&nbsp;</th></tr>";
-		
+
 		//Alle Lehreinheiten holen die zu dieser lehrveranstaltung gehoeren
 		//und der angemeldete User berechtigt ist
 		$copy_option_content = array();
@@ -724,7 +724,7 @@ else
 				//zugeteilte Lektoren holen
 				$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter using(mitarbeiter_uid) WHERE lehreinheit_id='$row_alle_lehreinheiten->lehreinheit_id'";
 				if($result_lektoren = pg_query($conn, $qry_lektoren))
-				{					
+				{
 					$lektoren = '( ';
 					$j=0;
 					while($row_lektoren = pg_fetch_object($result_lektoren))
@@ -748,12 +748,12 @@ else
 					{
 						if($row_gruppen->gruppe_kurzbz=='')
 							$gruppen.=$row_gruppen->semester.$row_gruppen->verband.$row_gruppen->gruppe;
-						else 
+						else
 							$gruppen.=$row_gruppen->gruppe_kurzbz;
 						$j++;
 						if($j<pg_num_rows($result_gruppen))
 							$gruppen.=', ';
-						else 
+						else
 							$gruppen.=' ';
 					}
 				}
@@ -761,19 +761,19 @@ else
 				$copy_le_content[$row_alle_lehreinheiten->lehreinheit_id] = "$row_alle_lehreinheiten->lfbez-$row_alle_lehreinheiten->lehrform_kurzbz - $gruppen $lektoren";
 			}
 		}
-		
+
 		//Uebungen durchlaufen
-		foreach ($uebung_obj->uebungen as $row) 
+		foreach ($uebung_obj->uebungen as $row)
 		{
 			$has_option_content=false;
 			echo "<tr height=23><td align='left'><a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id' class='Item'><u>".htmlentities($row->bezeichnung)."</u></a></td><td align='center'>";
-			
+
 			if((strtotime(strftime($row->freigabevon))<=time()) && (strtotime(strftime($row->freigabebis))>=time()))
 				echo 'Ja';
-			else 
+			else
 				echo 'Nein';
 			echo "</td><td align='center'><input type='Checkbox' name='uebung[]' value='$row->uebung_id'></td>";
-			//Wenn andere Lehreinheiten vorhanden sind dann wird die moeglichkeit zum kopieren von 
+			//Wenn andere Lehreinheiten vorhanden sind dann wird die moeglichkeit zum kopieren von
 			//Uebungen in diese Lehreinheiten angeboten.
 			if(isset($result_alle_lehreinheiten) && pg_num_rows($result_alle_lehreinheiten)>1)
 			{
@@ -801,13 +801,13 @@ else
 				if($has_option_content)
 				{
 					$copy_content.= "\n<form  style='margin:1px;' action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&kopieren=true&uebung_copy_id=$row->uebung_id' method='POST'>";
-					$copy_content.= "\n<SELECT name='lehreinheit_copy_id'>\n";								
-					$copy_content.= $copy_option_content;				
-					$copy_content.= '</SELECT> ';				
+					$copy_content.= "\n<SELECT name='lehreinheit_copy_id'>\n";
+					$copy_content.= $copy_option_content;
+					$copy_content.= '</SELECT> ';
 					$copy_content.= "&nbsp;&nbsp;&nbsp;<input type='submit' value='COPY'>";
 					$copy_content.= "</form>\n";
 				}
-				else 
+				else
 				{
 					$copy_content.="&nbsp;";
 				}
@@ -816,19 +816,19 @@ else
 		}
 		echo "<tr><td></td><td></td><td><input type='Submit' value='Auswahl löschen' name='delete_uebung' onclick='return confirmdelete();'></td></tr>";
 	}
-	else 
+	else
 		echo "<tr><td colspan='3'>Derzeit sind keine Kreuzerllisten angelegt</td><td></td></tr>";
-	
+
 	echo "</table>
 	</form><br><br>";
-	
+
 	//Kopier-Buttons anzeigen
 	$copy_content.='</table>';
 	echo "</td><td valign='top'>";
 	if($has_copy_content)
 		echo $copy_content;
 	echo "</td></tr></table>";
-	
+
 	//Uebung neu anlegen
 	if(!isset($_POST['uebung_neu']))
 	{
@@ -838,7 +838,7 @@ else
 		$freigabevon = date('d.m.Y H:i');
 		$freigabebis = date('d.m.Y H:i');
 	}
-	
+
 	echo "
 	<form action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method=POST>
 	<table >
@@ -850,9 +850,9 @@ else
 	<tr><td>(Format: 31.12.2007 14:30)</td><td align='right'>bis <input type='text' size='16' name='freigabebis' value='$freigabebis'></td><td>$error_freigabebis</td></tr>
 	<tr><td>Statistik f&uuml;r Studenten anzeigen <input type='checkbox' name='statistik'></td><td></td></tr>
 	<tr><td colspan=2 align='right'><input type='submit' name='uebung_neu' value='Anlegen'></td></tr>
-	</table>	
+	</table>
 	</form>
-	";	
+	";
 }
 ?>
 </td></tr>
