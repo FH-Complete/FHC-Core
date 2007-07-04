@@ -19,14 +19,18 @@ iframe
 
 #menue
 {
-	position:relative;
-	top:0px;
-	left:0px;
-	width:300px;
-	bottom:0px;
-	margin:0;
-	padding:0;
-	border-width:0;
+	position:absolute;
+	top:8%;
+	width:19%;
+	height:90%;
+}
+
+#content
+{
+	position:absolute;
+	width:80%;
+	height:90%;
+	left:20%;
 }
 
 a
@@ -128,6 +132,7 @@ TABLE#zeitsperren
 	cellspacing: 0;
 	cellpadding: 0;
 	font-size: small;
+	width:100%;
 }
 
 TABLE#zeitsperren TH
@@ -371,4 +376,107 @@ img.testtoolvorschlag
 {
 	max-width:200px;
 	max-height:150px;
+}
+
+
+
+/* neu */
+
+TABLE.tabcontent
+{
+	margin: 0px;
+	padding: 0px;
+	border-style: none;
+	width: 100%;
+	cellspacing: 0;
+	cellpadding: 0;
+}
+
+TABLE.tabcontent2
+{
+	margin: 0px;
+	padding: 0px;
+	border-style: none;
+	cellspacing: 0;
+	cellpadding: 0;
+}
+
+td.tdwidth10
+{
+	width: 10px;
+}
+
+td.tdwidth30
+{
+	width: 30px;
+}
+
+a.aheader
+{
+	color:#FFFFFF;
+}
+
+TABLE.tabborder
+{
+	cellspacing: 0;
+	cellpadding: 1;
+	width: 100%;
+	border: 1;
+}
+
+TR.tryellow
+{
+	background-color: #FFFF99;
+}
+
+td.tdgreen
+{
+	background-color: #CCFFCC;
+}
+
+div.tip
+{
+
+	position: absolute;
+	display: none;
+	width: 300px;
+	background-color: #f7f7ee;
+	padding: 3px 7px 4px 6px;
+	border: 1px solid #336;
+	background-color: #f7f7ee;
+	text-align: left;
+}
+
+a.head
+{
+   color:#ffffff;
+}
+
+a.head:hover
+{
+	color:#000000;
+}
+
+td.tdborder
+{
+	text-align: center;
+	border:2px solid black;
+	background-color: #ffffff;
+}
+
+TABLE#tabterm
+{
+	cellpadding: 0;
+	cellspacing: 0;
+	margin:auto;
+}
+
+td.tdwrap
+{
+	white-space: nowrap;
+}
+
+td.tdvertical
+{
+	vertical-align: top;
 }
