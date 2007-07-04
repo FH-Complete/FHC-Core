@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -39,12 +39,12 @@ require_once('../../../../include/datum.class.php');
 <link href="../../../../skin/cis.css" rel="stylesheet" type="text/css">
 <title>Kreuzerltool</title>
 <script language="JavaScript">
-<!--        
+<!--
 	function MM_jumpMenu(targ, selObj, restore)
 	{
 	  eval(targ + ".location='" + selObj.options[selObj.selectedIndex].value + "'");
-	  
-	  if(restore) 
+
+	  if(restore)
 	  {
 	  	selObj.selectedIndex = 0;
 	  }
@@ -66,31 +66,31 @@ $user = get_uid();
 
 if(!check_lektor($user, $conn))
 	die('Sie haben keine Berechtigung fuer diesen Bereich');
-	
+
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
 
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id
 	$lvid = $_GET['lvid'];
-else 
+else
 	die('Fehlerhafte Parameteruebergabe');
 
 if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id'])) //Lehreinheit_id
 	$lehreinheit_id = $_GET['lehreinheit_id'];
-else 
+else
 	$lehreinheit_id = '';
 
 //Laden der Lehrveranstaltung
 $lv_obj = new lehrveranstaltung($conn);
 if(!$lv_obj->load($lvid))
 	die($lv_obj->errormsg);
-	
+
 //Studiengang laden
 $stg_obj = new studiengang($conn,$lv_obj->studiengang_kz);
 
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
-else 
+else
 	$stsem = '';
 
 //Vars
@@ -99,9 +99,9 @@ $datum_obj = new datum();
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 
 //Kopfzeile
-echo '<table border="0" cellspacing="0" cellpadding="0" height="100%" width="100%">';
+echo '<table class="tabcontent">';
 echo ' <tr>';
-echo '<td width="10">&nbsp;</td>';
+echo '<td class="tdwidth10">&nbsp;</td>';
 echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;"Kreuzerl"-Tool';
 echo '</font></td><td  class="ContentHeader" align="right">'."\n";
 
@@ -131,7 +131,7 @@ if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lv_obj->st
 			tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
 			tbl_lehreinheit.studiensemester_kurzbz = '$stsem'";
 }
-else 
+else
 {
 	$qry = "SELECT distinct tbl_lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehreinheitmitarbeiter
 			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND
@@ -139,7 +139,7 @@ else
 			tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
 			tbl_lehreinheit.lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) WHERE mitarbeiter_uid='$user') AND
 			tbl_lehreinheit.studiensemester_kurzbz = '$stsem'";
-	
+
 }
 
 if($result = pg_query($conn, $qry))
@@ -151,7 +151,7 @@ if($result = pg_query($conn, $qry))
 		while($row = pg_fetch_object($result))
 		{
 			if($lehreinheit_id=='')
-				$lehreinheit_id=$row->lehreinheit_id;				
+				$lehreinheit_id=$row->lehreinheit_id;
 			$selected = ($row->lehreinheit_id == $lehreinheit_id?'selected':'');
 			$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE lehreinheit_id='$row->lehreinheit_id'";
 			if($result_lektoren = pg_query($conn, $qry_lektoren))
@@ -178,12 +178,12 @@ if($result = pg_query($conn, $qry))
 				{
 					if($row_gruppen->gruppe_kurzbz=='')
 						$gruppen.=$row_gruppen->semester.$row_gruppen->verband.$row_gruppen->gruppe;
-					else 
+					else
 						$gruppen.=$row_gruppen->gruppe_kurzbz;
 					$i++;
 					if($i<pg_num_rows($result_gruppen))
 						$gruppen.=', ';
-					else 
+					else
 						$gruppen.=' ';
 				}
 			}
@@ -191,20 +191,20 @@ if($result = pg_query($conn, $qry))
 		}
 		echo '</SELECT> ';
 	}
-	else 
+	else
 	{
 		if($row = pg_fetch_object($result))
 			$lehreinheit_id = $row->lehreinheit_id;
 	}
 }
-else 
+else
 {
 	echo 'Fehler beim Auslesen der Lehreinheiten';
 }
 echo $stsem_content;
 echo '</td><tr></table>';
 echo '<table><tr>';
-echo '<td width="10">&nbsp;</td>';
+echo '<td class="tdwidth10">&nbsp;</td>';
 echo "<td>\n";
 echo "<b>$lv_obj->bezeichnung</b><br>";
 
@@ -235,17 +235,17 @@ if(count($uebung_obj->uebungen)>0)
 	{
 		if($uebung_id=='')
 			$uebung_id=$row->uebung_id;
-			
+
 		if($uebung_id == $row->uebung_id)
 			$selected = 'selected';
-		else 
+		else
 			$selected = '';
 		echo "<OPTION value='anwesenheitstabelle.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id' $selected>";
 		//Freigegeben = +
 		//Nicht Freigegeben = -
 		if($datum_obj->mktime_fromtimestamp($row->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($row->freigabebis)>time())
 			echo '+ ';
-		else 
+		else
 			echo '- ';
 		echo $row->bezeichnung;
 		echo '</OPTION>';
@@ -266,7 +266,7 @@ if(count($uebung_obj->uebungen)>0)
 		</td>
 	</tr></table>";
 }
-else 
+else
 	die("Derzeit gibt es keine Uebungen");
 
 $uebung_obj = new uebung($conn);
@@ -282,12 +282,12 @@ if($result = pg_query($conn, $qry))
 	while($row = pg_fetch_object($result))
 	{
 		echo "<li><a href='anwesenheitsliste.php?output=html&uebung_id=$uebung_id&gruppe=$row->lehreinheitgruppe_id' target='_blank'>";
-		
+
 		if($row->gruppe_kurzbz=='')
 			echo "Gruppe $row->verband$row->gruppe";
 		else
 			echo "$row->gruppe_kurzbz";
-			
+
 		echo "</a>&nbsp;<a href='anwesenheitsliste.php?output=xls&uebung_id=$uebung_id&gruppe=$row->lehreinheitgruppe_id'><img src='../../../../skin/images/excel.gif' width=16 height=16></a></li>";
 	}
 }
