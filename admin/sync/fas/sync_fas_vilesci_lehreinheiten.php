@@ -1,7 +1,7 @@
 <?php
 /* Copyright (C) 2007 Technikum-Wien
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -15,9 +15,9 @@ require_once('../../../vilesci/config.inc.php');
 require_once('../sync_config.inc.php');
 
 
-$conn=pg_connect(CONN_STRING) 
+$conn=pg_connect(CONN_STRING)
 	or die("Connection zur Portal Datenbank fehlgeschlagen");
-$conn_fas=pg_connect(CONN_STRING_FAS) 
+$conn_fas=pg_connect(CONN_STRING_FAS)
 	or die("Connection zur FAS Datenbank fehlgeschlagen");
 
 //$adress='ruhan@technikum-wien.at';
@@ -82,7 +82,7 @@ $qry="SELECT studiensemester_kurzbz, ext_id FROM public.tbl_studiensemester;";
 if($result = pg_query($conn, $qry))
 {
 	while($row=pg_fetch_object($result))
-	{ 
+	{
 		$studiensemester[$row->ext_id]=$row->studiensemester_kurzbz;
 	}
 }
@@ -91,7 +91,7 @@ $qry="SELECT fachbereich_kurzbz,ext_id FROM public.tbl_fachbereich WHERE ext_id 
 if($result = pg_query($conn, $qry))
 {
 	while($row=pg_fetch_object($result))
-	{ 
+	{
 		$fachbereiche[$row->ext_id]=$row->fachbereich_kurzbz;
 	}
 }
@@ -100,7 +100,7 @@ $qry="SELECT kurzbezeichnung,lehrform_pk FROM lehrform;";
 if($result = pg_query($conn_fas, $qry))
 {
 	while($row=pg_fetch_object($result))
-	{ 
+	{
 		$lehrformen[$row->lehrform_pk]=trim($row->kurzbezeichnung);
 	}
 }
@@ -109,7 +109,7 @@ $qry="SELECT kurzbezeichnung,raumtyp_pk FROM raumtyp;";
 if($result = pg_query($conn_fas, $qry))
 {
 	while($row=pg_fetch_object($result))
-	{ 
+	{
 		$raumtypen[$row->raumtyp_pk]=trim($row->kurzbezeichnung);
 	}
 }
@@ -120,7 +120,7 @@ $qry="SELECT bezeichnung, lehrfunktion_pk FROM lehrfunktion;";
 if($result = pg_query($conn_fas, $qry))
 {
 	while($row=pg_fetch_object($result))
-	{ 
+	{
 		$qry2="SELECT lehrfunktion_kurzbz FROM lehre.tbl_lehrfunktion WHERE beschreibung='".$row->bezeichnung."';";
 		if($result2 = pg_query($conn, $qry2))
 		{
@@ -132,14 +132,14 @@ if($result = pg_query($conn_fas, $qry))
 		}
 	}
 }
-		
+
 $qry_main = "SELECT *,lehreinheit.lehreinheit_fk as le_fk, mitarbeiter_lehreinheit.creationdate as lm_creationdate,
 			lehreinheit.ivar1 as wochenrythmus, lehreinheit.ivar2 as start_kw, lehreinheit.ivar3 as stundenblockung,
-			lehreinheit.creationuser as lecu, mitarbeiter_lehreinheit.rvar1 as lektorgesamtstunden  
-		FROM lehreinheit left outer join mitarbeiter_lehreinheit 
-		ON lehreinheit.lehreinheit_pk=mitarbeiter_lehreinheit.lehreinheit_fk 
+			lehreinheit.creationuser as lecu, mitarbeiter_lehreinheit.rvar1 as lektorgesamtstunden
+		FROM lehreinheit left outer join mitarbeiter_lehreinheit
+		ON lehreinheit.lehreinheit_pk=mitarbeiter_lehreinheit.lehreinheit_fk
 		ORDER BY lehreinheit.lehreinheit_fk;";
-//WHERE mitarbeiter_fk='1512' 
+//WHERE mitarbeiter_fk='1512'
 //WHERE mitarbeiter_lehreinheit_pk IN ('63232','63344','63231','47087')
 if($result = pg_query($conn_fas, $qry_main))
 {
@@ -170,41 +170,41 @@ if($result = pg_query($conn_fas, $qry_main))
 		$kurzbezeichnung		=$row->kurzbezeichnung;
 		$bezeichnung		=$row->bezeichnung;
 		$farbe				="CCCCCC";
-		
+
 		$lehrfunktion			=$row->lehrfunktion_fk;
-		
+
 		$lektor				=$row->mitarbeiter_fk;
 		$gruppe_fk			=$row->gruppe_fk;
 		$lehreinheit_part		=$row->le_fk;
 		$fachbereich_kurzbz		=$fachbereiche[$row->fachbereich_fk];
-		
+
 		$lm_ext_id			=$row->mitarbeiter_lehreinheit_pk;
-		
+
 		$semester='';
 		$verband='';
 		$gruppe='';
-		
+
 		if($row->lektorgesamtstunden>99)
 		{
 			$error_log.="Gesamtstunden von Lektor (mitarbeiter_fk) '".$lektor."' zu hoch: '".$row->lektorgesamtstunden."'!\n";
 			$anzahl_fehler++;
 			continue;
 		}
-		
+
 		if($start_kw<1 || $start_kw>53)
 		{
 			$start_kw=NULL;
 		}
-		
+
 		//lehrveranstaltung ermitteln
 		$qry="SELECT lva_vilesci FROM sync.tbl_synclehrveranstaltung WHERE lva_fas='".$row->lehrveranstaltung_fk."';";
 		if($results = pg_query($conn, $qry))
 		{
 			if($rows=pg_fetch_object($results))
-			{ 
-				$lva=$rows->lva_vilesci;	
+			{
+				$lva=$rows->lva_vilesci;
 			}
-			else 
+			else
 			{
 				$error=true;
 				$error_log.="LVA_FAS '".$row->lehrveranstaltung_fk."' in Tabelle tbl_synclehrveranstaltung nicht gefunden!\n";
@@ -220,12 +220,12 @@ if($result = pg_query($conn_fas, $qry_main))
 		if($result1 = pg_query($conn, $qry))
 		{
 			if($row1=pg_fetch_object($result1))
-			{ 
+			{
 				$lehrveranstaltung_id=$row1->lehrveranstaltung_id;
 				$studiengang_kz=$row1->studiengang_kz;
 				$semester=$row1->semester;
 			}
-			else 
+			else
 			{
 				$error=true;
 				$error_log.="Lehrveranstaltung mit ext_id='".$row->lehrveranstaltung_fk."' nicht gefunden.\n";
@@ -241,13 +241,13 @@ if($result = pg_query($conn_fas, $qry_main))
 		if($resulto = pg_query($conn, $qry))
 		{
 			if($rowo=pg_fetch_object($resulto))
-			{ 
+			{
 				$lehrfach_id=$rowo->lehrfach_id;
 			}
-			else 
+			else
 			{
 				//lehrfach nicht vorhanden => anlegen
-				$qry="INSERT INTO lehre.tbl_lehrfach (studiengang_kz, fachbereich_kurzbz, kurzbz, bezeichnung, farbe, aktiv, 
+				$qry="INSERT INTO lehre.tbl_lehrfach (studiengang_kz, fachbereich_kurzbz, kurzbz, bezeichnung, farbe, aktiv,
 					semester, sprache, insertamum, insertvon, updateamum, updatevon, ext_id) VALUES (".
 					myaddslashes($studiengang_kz).", ".
 					myaddslashes($fachbereich_kurzbz).", ".
@@ -268,16 +268,16 @@ if($result = pg_query($conn_fas, $qry_main))
 					if($rowu=pg_fetch_object(pg_query($conn,$qryu)))
 						$lehrfach_id=$rowu->id;
 					else
-					{					
+					{
 						$error=true;
 						$error_log.='Lehrfach-Sequence konnte nicht ausgelesen werden.\n';
 					}
 					$anzahl_lehrfaecher++;
 					$ausgabe.="Lehrfach '".$bezeichnung."' ('".$kurzbezeichnung."'), Fachbereich '".$fachbereich_kurzbz."', Studiengang '".$studiengang_kz."' und Semester '".$semester."' angelegt!\n";
 					echo "Lehrfach '".$bezeichnung."' ('".$kurzbezeichnung."'), Fachbereich '".$fachbereich_kurzbz."', Studiengang '".$studiengang_kz."' und Semester '".$semester."' angelegt!<br>";
-					
+
 				}
-				else 
+				else
 				{
 					$error=true;
 					$error_log.='Lehrfach konnte nicht angelegt werden.\n';
@@ -292,21 +292,21 @@ if($result = pg_query($conn_fas, $qry_main))
 			$anzahl_fehler++;
 			continue;
 		}
-				
-		
+
+
 		//gruppe ermitteln
 		//spezialgruppe?
 		$qry="SELECT * FROM sync.tbl_syncgruppe WHERE fas_gruppe='".$gruppe_fk."';";
 		if($result2 = pg_query($conn, $qry))
 		{
 			if($row2=pg_fetch_object($result2))
-			{ 
+			{
 				$gruppe_kurzbz=$row2->vilesci_gruppe;
 				//$semester=NULL;
 				$verband=NULL;
 				$gruppe=NULL;
 			}
-			else 
+			else
 			{
 				//verbandsgruppe
 				$gruppe_kurzbz=NULL;
@@ -314,75 +314,75 @@ if($result = pg_query($conn_fas, $qry_main))
 				if($result2 = pg_query($conn_fas, $qry2))
 				{
 					if($row2=pg_fetch_object($result2))
-					{ 
+					{
 						$typ=$row2->typ;
 						if($row2->typ=='1')
 						{
 							$semester=$row2->name;
 							$verband=NULL;
 							$gruppe=NULL;
-							
+
 						}
 						elseif ($row2->typ=='2')
 						{
 							$verband=$row2->name;
 							$gruppe=NULL;
-							
+
 							$qry3="SELECT * FROM gruppe WHERE gruppe_pk='".$row2->obergruppe_fk."';";
 							if($result3 = pg_query($conn_fas, $qry3))
 							{
 								if($row3=pg_fetch_object($result3))
-								{ 
-									$semester=$row3->name;	
+								{
+									$semester=$row3->name;
 								}
-								else 
+								else
 								{
 									$error_log.="Gruppe mit gruppe_pk=".$row2->obergruppe_fk."nicht gefunden (1).\n";
 									$error=true;
 								}
 							}
-							else 
+							else
 							{
 								$error_log.="Fehler beim Zugriff auf Tabelle gruppe (1).\n";
 								$error=true;
-							}	
+							}
 						}
 						elseif ($row2->typ=='3')
 						{
 							$gruppe=$row2->name;
-							
+
 							$qry3="SELECT * FROM gruppe WHERE gruppe_pk='".$row2->obergruppe_fk."';";
 							if($result3 = pg_query($conn_fas, $qry3))
 							{
 								if($row3=pg_fetch_object($result3))
-								{ 
-									$verband=$row3->name;	
+								{
+									$verband=$row3->name;
 									$qry4="SELECT * FROM gruppe WHERE gruppe_pk='".$row3->obergruppe_fk."';";
 									if($result4 = pg_query($conn_fas, $qry4))
 									{
 										if($row4=pg_fetch_object($result4))
-										{ 
-											$semester=$row4->name;	
+										{
+											$semester=$row4->name;
 										}
-										else 
+										else
 										{
 											$error_log.="Gruppe mit gruppe_pk=".$row2->obergruppe_fk."nicht gefunden (3).\n";
 											$error=true;
 										}
 									}
-									else 
+									else
 									{
 										$error_log.="Fehler beim Zugriff auf Tabelle gruppe (3).\n";
 										$error=true;
 									}
 								}
-								else 
+								else
 								{
 									$error_log.="Gruppe mit gruppe_pk=".$row2->obergruppe_fk."nicht gefunden (2).\n";
 									$error=true;
 								}
 							}
-							else 
+							else
 							{
 								$error_log.="Fehler beim Zugriff auf Tabelle gruppe (2).\n";
 								$error=true;
@@ -396,21 +396,21 @@ if($result = pg_query($conn_fas, $qry_main))
 								if($result3 = pg_query($conn_fas, $qry3))
 								{
 									if($row3=pg_fetch_object($result3))
-									{ 
+									{
 										if($row3->obergruppe_fk!=0)
 										{
 											$qry4="SELECT * FROM gruppe WHERE gruppe_pk='".$row3->obergruppe_fk."';";
 											if($result4 = pg_query($conn_fas, $qry4))
 											{
 												if($row4=pg_fetch_object($result4))
-												{ 
+												{
 													$semester=$row4->name;
 													$verband=$row3->name;
-													$gruppe=$row2->name;	
+													$gruppe=$row2->name;
 												}
 											}
 										}
-										else 
+										else
 										{
 											$semester=$row3->name;
 											$verband=$row2->name;
@@ -419,7 +419,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									}
 								}
 							}
-							else 
+							else
 							{
 								$semester=$row2->name;
 								$verband=NULL;
@@ -440,7 +440,7 @@ if($result = pg_query($conn_fas, $qry_main))
 						$error=true;
 					}
 				}
-				else 
+				else
 				{
 					$error_log.="Fehler beim Zugriff auf Tabelle gruppe (1).\n";
 					$error=true;
@@ -462,8 +462,8 @@ if($result = pg_query($conn_fas, $qry_main))
 				continue;
 			}
 			pg_query($conn,'BEGIN;');
-			
-				
+
+
 			//unterrichtenden lektor ermitteln
 			if($lektor!=null)
 			{
@@ -471,12 +471,12 @@ if($result = pg_query($conn_fas, $qry_main))
 				if($resulto = pg_query($conn, $qry))
 				{
 					if($rowo=pg_fetch_object($resulto))
-					{ 
+					{
 						$m_uid=$rowo->mitarbeiter_uid;
 					}
 				}
 			}
-			else 
+			else
 			{
 				$m_uid=null;
 			}
@@ -489,8 +489,8 @@ if($result = pg_query($conn_fas, $qry_main))
 					$insertvon=$rowcu->name;
 				}
 			}
-			
-			
+
+
 			$lg_ext_id=$row->mitarbeiter_lehreinheit_pk;
 			$qry="SELECT * FROM lehre.tbl_lehreinheit join lehre.tbl_lehreinheitgruppe USING (lehreinheit_id) WHERE tbl_lehreinheitgruppe.ext_id='".$lg_ext_id."';";
 			if($result3 = pg_query($conn, $qry))
@@ -500,7 +500,7 @@ if($result = pg_query($conn_fas, $qry_main))
 					$gja=true;
 					$lehreinheit_id=$row3->lehreinheit_id;
 				}
-				else 
+				else
 				{
 					$gja=false;
 				}
@@ -508,57 +508,57 @@ if($result = pg_query($conn_fas, $qry_main))
 			$qry="SELECT * FROM lehre.tbl_lehreinheit join lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id) WHERE tbl_lehreinheitmitarbeiter.ext_id='".$lm_ext_id."';";
 			if($result3 = pg_query($conn, $qry))
 			{
-				if($row3=pg_fetch_object($result3)) 
+				if($row3=pg_fetch_object($result3))
 				{
 					$mja=true;
 					$lehreinheit_id=$row3->lehreinheit_id;
 				}
-				else 
+				else
 				{
-					$mja=false;	
+					$mja=false;
 				}
 			}
 			if($gja==false && $mja==false)
-			{	
+			{
 				//ext_ids nicht gefunden
-				
-				$qry="	SELECT * FROM campus.vw_lehreinheit 
-					WHERE lehrveranstaltung_id='".$lehrveranstaltung_id."' 
-					AND studiensemester_kurzbz='".$studiensemester_kurzbz."' 
-					AND lehrform_kurzbz='".$lehrform_kurzbz."' 
-					AND lvnr='".(int)$lvnr."' 
-					AND ".($m_uid!=''?"mitarbeiter_uid=".myaddslashes($m_uid):"mitarbeiter_uid IS NULL")." 
-					AND lehrfach=".myaddslashes($kurzbezeichnung)." 
-					AND fachbereich_kurzbz=".myaddslashes($fachbereich_kurzbz)." 
-					AND studiengang_kz=".myaddslashes($studiengang_kz)." 
+
+				$qry="	SELECT * FROM campus.vw_lehreinheit
+					WHERE lehrveranstaltung_id='".$lehrveranstaltung_id."'
+					AND studiensemester_kurzbz='".$studiensemester_kurzbz."'
+					AND lehrform_kurzbz='".$lehrform_kurzbz."'
+					AND lvnr='".(int)$lvnr."'
+					AND ".($m_uid!=''?"mitarbeiter_uid=".myaddslashes($m_uid):"mitarbeiter_uid IS NULL")."
+					AND lehrfach=".myaddslashes($kurzbezeichnung)."
+					AND fachbereich_kurzbz=".myaddslashes($fachbereich_kurzbz)."
+					AND studiengang_kz=".myaddslashes($studiengang_kz)."
 					AND ((".($gruppe_kurzbz!=''?"gruppe_kurzbz=".myaddslashes($gruppe_kurzbz):"gruppe_kurzbz IS NULL")." AND gruppe_kurzbz IS NOT NULL) OR
-					(".($semester!=''?"semester=".myaddslashes($semester):"semester IS NULL")." AND ".($verband!=''?"verband=".myaddslashes($verband):"verband IS NULL")." 
+					(".($semester!=''?"semester=".myaddslashes($semester):"semester IS NULL")." AND ".($verband!=''?"verband=".myaddslashes($verband):"verband IS NULL")."
 					AND ".($gruppe!=''?"gruppe=".myaddslashes($gruppe):"gruppe IS NULL")." AND semester IS NOT NULL AND gruppe_kurzbz IS NULL));";
 				/*
-				$qry="	SELECT * FROM campus.vw_lehreinheit 
-					WHERE lehrveranstaltung_id='".$lehrveranstaltung_id."' 
-					AND studiensemester_kurzbz='".$studiensemester_kurzbz."' 
-					AND lehrform_kurzbz='".$lehrform_kurzbz."' 
-					AND lvnr='".(int)$lvnr."' 
-					AND ".($raumtyp!=''?"raumtyp=".myaddslashes($raumtyp):"raumtyp IS NULL")." 
-					AND ".($raumtypalternativ!=''?"raumtypalternativ=".myaddslashes($raumtypalternativ):"raumtypalternativ IS NULL")." 
-					AND ".($stundenblockung!=''?"stundenblockung=".myaddslashes($stundenblockung):"stundenblockung IS NULL")." 
-					AND ".(round($row->gesamtstunden)!=''?"planstunden=".myaddslashes(round($row->gesamtstunden)):"planstunden IS NULL")." 				
-					AND ".($start_kw!=''?"start_kw=".myaddslashes($start_kw):"start_kw IS NULL")." 
-					AND ".($m_uid!=''?"mitarbeiter_uid=".myaddslashes($m_uid):"mitarbeiter_uid IS NULL")." 
-					AND lehrfach=".myaddslashes($kurzbezeichnung)." 
-					AND fachbereich_kurzbz=".myaddslashes($fachbereich_kurzbz)." 
-					AND studiengang_kz=".myaddslashes($studiengang_kz)." 
+				$qry="	SELECT * FROM campus.vw_lehreinheit
+					WHERE lehrveranstaltung_id='".$lehrveranstaltung_id."'
+					AND studiensemester_kurzbz='".$studiensemester_kurzbz."'
+					AND lehrform_kurzbz='".$lehrform_kurzbz."'
+					AND lvnr='".(int)$lvnr."'
+					AND ".($raumtyp!=''?"raumtyp=".myaddslashes($raumtyp):"raumtyp IS NULL")."
+					AND ".($raumtypalternativ!=''?"raumtypalternativ=".myaddslashes($raumtypalternativ):"raumtypalternativ IS NULL")."
+					AND ".($stundenblockung!=''?"stundenblockung=".myaddslashes($stundenblockung):"stundenblockung IS NULL")."
+					AND ".(round($row->gesamtstunden)!=''?"planstunden=".myaddslashes(round($row->gesamtstunden)):"planstunden IS NULL")."
+					AND ".($start_kw!=''?"start_kw=".myaddslashes($start_kw):"start_kw IS NULL")."
+					AND ".($m_uid!=''?"mitarbeiter_uid=".myaddslashes($m_uid):"mitarbeiter_uid IS NULL")."
+					AND lehrfach=".myaddslashes($kurzbezeichnung)."
+					AND fachbereich_kurzbz=".myaddslashes($fachbereich_kurzbz)."
+					AND studiengang_kz=".myaddslashes($studiengang_kz)."
 					AND ((".($gruppe_kurzbz!=''?"gruppe_kurzbz=".myaddslashes($gruppe_kurzbz):"gruppe_kurzbz IS NULL")." AND gruppe_kurzbz IS NOT NULL) OR
 					(".($semester!=''?"semester=".myaddslashes($semester):"semester IS NULL").
 					" AND ".($verband!=''?"verband=".myaddslashes($verband):"verband IS NULL").
 					" AND ".($gruppe!=''?"gruppe=".myaddslashes($gruppe):"gruppe IS NULL").
 					" AND gruppe_kurzbz IS NULL));";
 				*/
-			
-				
+
+
 				//echo "-".$start_kw."-".$qry;exit;
-				
+
 				if($result2 = pg_query($conn, $qry))
 				{
 					if(pg_num_rows($result2)>0)
@@ -570,10 +570,10 @@ if($result = pg_query($conn_fas, $qry_main))
 							$anzahl_fehler++;
 							pg_query($conn,'ROLLBACK;');
 							continue;
-							
+
 						}
 						 elseif($row2=pg_fetch_object($result2))
-						{ 	
+						{
 							//update
 							$le_iu='u';
 							$update=false;
@@ -660,7 +660,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								{
 									$ausgabe_le="Lehre: '".($lehre?'true':'false')."' statt('".($row2->lehre?'true':'false')."')";
 								}
-							}						
+							}
 							if($row2->anmerkung!=$anmerkung)
 							{
 								$update=true;
@@ -698,7 +698,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								}
 							}
 							$lehreinheit_id=$row2->lehreinheit_id;
-							if ($update && $dont_sync_php)
+							if ($update && !in_array($studiengang_kz,$dont_sync_php))
 							{
 								$qry="UPDATE lehre.tbl_lehreinheit SET ".
 								"lehrveranstaltung_id=".myaddslashes($lehrveranstaltung_id).", ".
@@ -739,9 +739,9 @@ if($result = pg_query($conn_fas, $qry_main))
 									//}
 									$ausgabe.="Lehreinheit lvnr='".$lvnr." Studiensemester='".$studiensemester_kurzbz."' verändert: ".$ausgabe_le.".\n";
 									$anzahl_geaendert++;
-									
+
 								}
-								else 
+								else
 								{
 									$anzahl_geaendert++;
 									$error=true;
@@ -752,9 +752,9 @@ if($result = pg_query($conn_fas, $qry_main))
 							}
 						}
 					}
-					else 
+					else
 					{
-						
+
 						//insert
 						$le_iu='i';
 						$qry="INSERT INTO lehre.tbl_lehreinheit (lehrveranstaltung_id, studiensemester_kurzbz, lehrfach_id, ".
@@ -779,15 +779,15 @@ if($result = pg_query($conn_fas, $qry_main))
 							myaddslashes($insertamum).','.
 							myaddslashes($insertvon).
 							");";
-							//echo $qry."<BR>";					
+							//echo $qry."<BR>";
 						if(pg_query($conn, $qry))
 						{
 							$qryu = "SELECT currval('lehre.tbl_lehreinheit_lehreinheit_id_seq') AS id;";
 							if($rowu=pg_fetch_object(pg_query($conn,$qryu)))
 								$lehreinheit_id=$rowu->id;
 							else
-							{	
-								$anzahl_fehler++;				
+							{
+								$anzahl_fehler++;
 								$error=true;
 								$error_log.='Lehreinheit-Sequence konnte nicht ausgelesen werden';
 							}
@@ -812,7 +812,7 @@ if($result = pg_query($conn_fas, $qry_main))
 							$ausgabe.="Lehreinheit lvnr='".$lvnr." eingefügt.\n";
 							$anzahl_eingefuegt++;
 						}
-						else 
+						else
 						{
 							$anzahl_eingefuegt++; //bei fehler wird später 1 abgezogen
 							$error=true;
@@ -824,7 +824,7 @@ if($result = pg_query($conn_fas, $qry_main))
 					}
 				}
 			}
-			else 
+			else
 			{
 				//ext_id gefunden
 				if(pg_num_rows($result3)>1)
@@ -836,7 +836,7 @@ if($result = pg_query($conn_fas, $qry_main))
 					continue;
 				}
 				//update
-				
+
 				$qry="SELECT * FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='".$lehreinheit_id."';";
 				if($result3=pg_query($conn, $qry))
 				{
@@ -927,7 +927,7 @@ if($result = pg_query($conn_fas, $qry_main))
 							{
 								$ausgabe_le="Lehre: '".($lehre?'true':'false')."' statt('".($row3->lehre?'true':'false')."')";
 							}
-						}						
+						}
 						if($row3->anmerkung!=$anmerkung)
 						{
 							$update=true;
@@ -965,7 +965,7 @@ if($result = pg_query($conn_fas, $qry_main))
 							}
 						}
 						$lehreinheit_id=$row3->lehreinheit_id;
-						if ($update && $dont_sync_php)
+						if ($update && !in_array($studiengang_kz,$dont_sync_php))
 						{
 							$qry="UPDATE lehre.tbl_lehreinheit SET ".
 							"lehrveranstaltung_id=".myaddslashes($lehrveranstaltung_id).", ".
@@ -991,7 +991,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								if($result4 = pg_query($conn, $qry4))
 								{
 									if(!(pg_num_rows($result4)>0))
-									{ 
+									{
 										$qry4="INSERT INTO sync.tbl_synclehreinheit (lehreinheit_id, lehreinheit_pk) VALUES (".
 											myaddslashes($lehreinheit_id).", ".
 											myaddslashes($ext_id).
@@ -1006,9 +1006,9 @@ if($result = pg_query($conn_fas, $qry_main))
 								}
 								$ausgabe.="Lehreinheit lvnr='".$lvnr." Studiensemester='".$studiensemester_kurzbz."' verändert: ".$ausgabe_le.".\n";
 								$anzahl_geaendert++;
-								
+
 							}
-							else 
+							else
 							{
 								$anzahl_fehler++;
 								$error=true;
@@ -1023,7 +1023,7 @@ if($result = pg_query($conn_fas, $qry_main))
 			if($lektor!=null)
 			{
 				//lehreinheitmitarbeiter synchronisieiren
-				
+
 				//$lehreinheit_id
 				//$mitarbeiter_uid				=m_uid;
 				$lehrfunktion_kurzbz				=$lehrfunktionen[$lehrfunktion];
@@ -1038,7 +1038,7 @@ if($result = pg_query($conn_fas, $qry_main))
 				//$lm_insertvon				='';
 				$lm_insertamum				=$row->lm_creationdate;
 				//$lm_ext_id					=$row->mitarbeiter_lehreinheit_pk;
-				
+
 				//insertvon ermitteln
 				$qrycu="SELECT name FROM public.benutzer WHERE benutzer_pk='".$row->lecu."';";
 				if($resultcu = pg_query($conn_fas, $qrycu))
@@ -1048,12 +1048,12 @@ if($result = pg_query($conn_fas, $qry_main))
 						$lm_insertvon=$rowcu->name;
 					}
 				}
-				
+
 				$qry="SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id=".myaddslashes($lehreinheit_id)." AND mitarbeiter_uid=".myaddslashes($m_uid).";";
 				if($result3 = pg_query($conn, $qry))
 				{
 					if($row3=pg_fetch_object($result3))
-					{ 
+					{
 						//update
 						$lm_iu='u';
 						$update=false;
@@ -1153,7 +1153,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								$ausgabe_lm="Insertamum: '".$lm_insertamum."' (statt '".$row3->insertamum."')";
 							}
 						}
-						if($update && $dont_sync_php)
+						if($update && !in_array($studiengang_kz,$dont_sync_php))
 						{
 							$qry="UPDATE lehre.tbl_lehreinheitmitarbeiter SET ".
 							"lehrfunktion_kurzbz=".myaddslashes($lehrfunktion_kurzbz).", ".
@@ -1172,7 +1172,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								$ausgabe.="Lehreinheitmitarbeiter '".$m_uid."' aktualisiert bei Lehreinheit='".$lehreinheit_id."': ".$ausgabe_lm."\n";
 								$anzahl_geaendert_lm++;
 							}
-							else 
+							else
 							{
 								$anzahl_fehler_lm++;
 								$error=true;
@@ -1181,11 +1181,11 @@ if($result = pg_query($conn_fas, $qry_main))
 						}
 						$ausgabe_lm='';
 					}
-					else 
+					else
 					{
 						//insert
 						$lm_iu='i';
-						$qry="INSERT INTO lehre.tbl_lehreinheitmitarbeiter (lehreinheit_id, mitarbeiter_uid, lehrfunktion_kurzbz, semesterstunden, 
+						$qry="INSERT INTO lehre.tbl_lehreinheitmitarbeiter (lehreinheit_id, mitarbeiter_uid, lehrfunktion_kurzbz, semesterstunden,
 							planstunden, stundensatz, faktor, anmerkung, bismelden, updateamum, updatevon, insertamum, insertvon, ext_id
 							) VALUES (".
 							myaddslashes($lehreinheit_id).", ".
@@ -1203,13 +1203,13 @@ if($result = pg_query($conn_fas, $qry_main))
 							myaddslashes($lm_insertvon).", ".
 							myaddslashes($lm_ext_id)." ".
 							");";
-							
+
 						if(pg_query($conn, $qry))
 						{
 							$anzahl_eingefuegt_lm++;
 							$ausgabe.="Lehreinheitmitarbeiter '".$m_uid."' mit Lehreinheit='".$lehreinheit_id."' eingefügt.\n";
 						}
-						else 
+						else
 						{
 							$anzahl_fehler_lm++;
 							$error=true;
@@ -1219,8 +1219,8 @@ if($result = pg_query($conn_fas, $qry_main))
 				}
 			}
 			//lehreinheitgruppe synchronisieren
-			
-			//$lehreinheit_id				
+
+			//$lehreinheit_id
 			//$studiengang_kz
 			//$semester
 			//$verband
@@ -1231,7 +1231,7 @@ if($result = pg_query($conn_fas, $qry_main))
 			//$lg_insertvon				='';
 			$lg_insertamum				='';
 			$lg_ext_id					=$row->mitarbeiter_lehreinheit_pk;
-			
+
 			//insertvon ermitteln
 			$qrycu="SELECT name FROM public.benutzer WHERE benutzer_pk='".$row->lecu."';";
 			if($resultcu = pg_query($conn_fas, $qrycu))
@@ -1247,16 +1247,16 @@ if($result = pg_query($conn_fas, $qry_main))
 				if(!(pg_num_rows($result4)>0))
 				{
 					//ext_id nicht gefunden
-					$qry="SELECT * FROM lehre.tbl_lehreinheitgruppe 
-					WHERE lehreinheit_id=".myaddslashes($lehreinheit_id)." AND studiengang_kz=".$studiengang_kz." 
-					AND ".($semester!=''?"semester=".myaddslashes($semester):"semester IS NULL")." 
-					AND ".($verband!=''?"verband=".myaddslashes($verband):"verband IS NULL")." 
-					AND ".($gruppe!=''?"gruppe=".myaddslashes($gruppe):"gruppe IS NULL")." 
+					$qry="SELECT * FROM lehre.tbl_lehreinheitgruppe
+					WHERE lehreinheit_id=".myaddslashes($lehreinheit_id)." AND studiengang_kz=".$studiengang_kz."
+					AND ".($semester!=''?"semester=".myaddslashes($semester):"semester IS NULL")."
+					AND ".($verband!=''?"verband=".myaddslashes($verband):"verband IS NULL")."
+					AND ".($gruppe!=''?"gruppe=".myaddslashes($gruppe):"gruppe IS NULL")."
 					AND ".($gruppe_kurzbz!=''?"gruppe_kurzbz=".myaddslashes($gruppe_kurzbz):"gruppe_kurzbz IS NULL").";";
 					if($result3 = pg_query($conn, $qry))
 					{
 						if($row3=pg_fetch_object($result3))
-						{ 
+						{
 							//update
 							$lg_iu='u';
 							$update=false;
@@ -1371,8 +1371,8 @@ if($result = pg_query($conn_fas, $qry_main))
 							if($row3->ext_id!=NULL)
 							{
 								$update=false;
-							}	
-							if($update && $dont_sync_php)
+							}
+							if($update && !in_array($studiengang_kz,$dont_sync_php))
 							{
 								$qry="UPDATE lehre.tbl_lehreinheitgruppe SET ".
 								"lehreinheit_id=".myaddslashes($lehreinheit_id).", ".
@@ -1385,10 +1385,10 @@ if($result = pg_query($conn_fas, $qry_main))
 								"insertamum=".myaddslashes($lg_insertamum).", ".
 								"ext_id=".myaddslashes($lg_ext_id)." ".
 								"WHERE lehreinheitgruppe_id=".myaddslashes($row3->lehreinheitgruppe_id).";";
-								/*"WHERE lehreinheit_id=".myaddslashes($lehreinheit_id)." AND studiengang_kz=".$studiengang_kz." 
-								AND ".($semester!=''?"semester=".myaddslashes($semester):"semester IS NULL")." 
-								AND ".($verband!=''?"verband=".myaddslashes($verband):"verband IS NULL")." 
-								AND ".($gruppe!=''?"gruppe=".myaddslashes($gruppe):"gruppe IS NULL")." 
+								/*"WHERE lehreinheit_id=".myaddslashes($lehreinheit_id)." AND studiengang_kz=".$studiengang_kz."
+								AND ".($semester!=''?"semester=".myaddslashes($semester):"semester IS NULL")."
+								AND ".($verband!=''?"verband=".myaddslashes($verband):"verband IS NULL")."
+								AND ".($gruppe!=''?"gruppe=".myaddslashes($gruppe):"gruppe IS NULL")."
 								AND ".($gruppe_kurzbz!=''?"gruppe_kurzbz=".myaddslashes($gruppe_kurzbz):"gruppe_kurzbz IS NULL").";";
 								*/
 								if(pg_query($conn, $qry))
@@ -1396,7 +1396,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									$anzahl_geaendert_lg++;
 									$ausgabe.="Lehreinheitgruppe '".$row3->lehreinheitgruppe_id."' aktualisiert bei Lehreinheit='".$lehreinheit_id."': ".$ausgabe_lm."!\n".$qry."\n";
 								}
-								else 
+								else
 								{
 									$anzahl_fehler_lg++;
 									$error=true;
@@ -1405,7 +1405,7 @@ if($result = pg_query($conn_fas, $qry_main))
 							}
 							$ausgabe_lm='';
 						}
-						else 
+						else
 						{
 							//insert
 							$lg_iu='i';
@@ -1428,7 +1428,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								$anzahl_eingefuegt_lg++;
 								$ausgabe.="Lehreinheitgruppe mit Lehreinheit='".$lehreinheit_id."' und Studiengang '".$studiengang_kz."'eingefügt.\n";
 							}
-							else 
+							else
 							{
 								$anzahl_fehler_lg++;
 								echo $qry."<br>";
@@ -1438,7 +1438,7 @@ if($result = pg_query($conn_fas, $qry_main))
 						}
 					}
 				}
-				else 
+				else
 				{
 					//ext_id gefunden
 					//update
@@ -1542,7 +1542,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								$ausgabe_lm="Insertamum: '".$lg_insertamum."' (statt '".$row4->insertamum."')";
 							}
 						}
-						if($update && $dont_sync_php)
+						if($update && !in_array($studiengang_kz,$dont_sync_php))
 						{
 							$qry="UPDATE lehre.tbl_lehreinheitgruppe SET ".
 							"lehreinheit_id=".myaddslashes($lehreinheit_id).", ".
@@ -1559,7 +1559,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								$anzahl_geaendert_lg++;
 								$ausgabe.="Lehreinheitgruppe '".$row4->lehreinheitgruppe_id."' wurde aktualisiert bei Lehreinheit='".$lehreinheit_id."': ".$ausgabe_lm."\n".$qry."!!\n";
 							}
-							else 
+							else
 							{
 								$anzahl_fehler_lg++;
 								$error=true;
@@ -1575,9 +1575,9 @@ if($result = pg_query($conn_fas, $qry_main))
 				$ausgabe_all.=$ausgabe;
 				$ausgabe='';
 				pg_query($conn,'COMMIT;');
-				
+
 			}
-			else 
+			else
 			{
 				if($le_iu=='i')
 				{
@@ -1599,7 +1599,7 @@ if($result = pg_query($conn_fas, $qry_main))
 				pg_query($conn,'ROLLBACK;');
 			}
 		}
-		else 
+		else
 		{
 			//partizipierend
 			//in synclehreinheit eintragen und Gruppe synchonisieren
@@ -1609,7 +1609,7 @@ if($result = pg_query($conn_fas, $qry_main))
 			if($result5 = pg_query($conn, $qry5))
 			{
 				if($row5=pg_fetch_object($result5))
-				{ 
+				{
 					$qry3="SELECT * FROM sync.tbl_synclehreinheit WHERE lehreinheit_id='".$row5->lehreinheit_id."' AND lehreinheit_pk='".$ext_id."';";
 					if($result3 = pg_query($conn, $qry3))
 					{
@@ -1625,7 +1625,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								$error=true;
 								$error_log.="Eintrag in tbl_synclehreinheit fehlgeschlagen (".$row5->lehreinheit_id."/".$ext_id.")!\n";
 							}
-							else 
+							else
 							{
 								$ausgabe.="Lehreinheit lvnr='".$lvnr."' (Lehreinheit id/pk .'".$row5->lehreinheit_id."'/'".$ext_id."') partizipierend eingefügt.\n";
 								$anzahl_part++;
@@ -1639,13 +1639,13 @@ if($result = pg_query($conn_fas, $qry_main))
 										{
 											$row6->lg_ext_id='';
 										}
-										
+
 										$lg_ext_id='-'.$row->lehreinheit_pk.$row6->lg_ext_id;
 									}
 								}
 							}
 						}
-						else 
+						else
 						{
 							//$ausgabe.="Partizipierende Lehreinheit lvnr='".$lvnr."' (Lehreinheit id/pk .'".$row5->lehreinheit_id."'/'".$ext_id."') in synclehreinheit gefunden.\n";
 							$anzahl_part2++;
@@ -1659,37 +1659,37 @@ if($result = pg_query($conn_fas, $qry_main))
 									{
 										$row6->lg_ext_id='';
 									}
-									
+
 									$lg_ext_id='-'.$row->lehreinheit_pk.$row6->lg_ext_id;
 								}
 							}
 						}
 					}
-					else 
+					else
 					{
 						$anzahl_part_fehler++;
 						$error=true;
-						$error_log.="Abfrage von tbl_synclehreinheit fehlgeschlagen (".$row5->lehreinheit_id."/".$ext_id.")!\n";	
+						$error_log.="Abfrage von tbl_synclehreinheit fehlgeschlagen (".$row5->lehreinheit_id."/".$ext_id.")!\n";
 						pg_query($conn,'ROLLBACK;');
 						continue;
 					}
-					
-					
-					
+
+
+
 					//lehreinheitgruppe synchronisieren
-				
+
 					//lehrveranstaltung ermitteln
 					$qry="SELECT * FROM lehre.tbl_lehreinheit join lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id) WHERE lehreinheit_id='".$row5->lehreinheit_id."';";
 					if($results = pg_query($conn, $qry))
 					{
 						if($rows=pg_fetch_object($results))
-						{ 
+						{
 							$lehrveranstaltung_id=$rows->lehrveranstaltung_id;
 							$studiengang_kz=$rows->studiengang_kz;
 							$semester=$rows->semester;
 						}
 					}
-					
+
 					$lehreinheit_id				=$row5->lehreinheit_id;
 					//$studiengang_kz				='';
 					//$semester					='';
@@ -1700,8 +1700,8 @@ if($result = pg_query($conn_fas, $qry_main))
 					//$lg_updatevon				='';
 					//$lg_insertvon				='';
 					$lg_insertamum				='';
-					
-					
+
+
 					//insertvon ermitteln
 					$qrycu="SELECT name FROM public.benutzer WHERE benutzer_pk='".$row->lecu."';";
 					if($resultcu = pg_query($conn_fas, $qrycu))
@@ -1718,16 +1718,16 @@ if($result = pg_query($conn_fas, $qry_main))
 						if(!(pg_num_rows($result4)>0))
 						{
 							//ext_id nicht gefunden
-							$qry="SELECT * FROM lehre.tbl_lehreinheitgruppe 
-							WHERE lehreinheit_id=".myaddslashes($lehreinheit_id)." AND studiengang_kz=".$studiengang_kz." 
-							AND ".($semester!=''?"semester=".myaddslashes($semester):"semester IS NULL")." 
-							AND ".($verband!=''?"verband=".myaddslashes($verband):"verband IS NULL")." 
-							AND ".($gruppe!=''?"gruppe=".myaddslashes($gruppe):"gruppe IS NULL")." 
+							$qry="SELECT * FROM lehre.tbl_lehreinheitgruppe
+							WHERE lehreinheit_id=".myaddslashes($lehreinheit_id)." AND studiengang_kz=".$studiengang_kz."
+							AND ".($semester!=''?"semester=".myaddslashes($semester):"semester IS NULL")."
+							AND ".($verband!=''?"verband=".myaddslashes($verband):"verband IS NULL")."
+							AND ".($gruppe!=''?"gruppe=".myaddslashes($gruppe):"gruppe IS NULL")."
 							AND ".($gruppe_kurzbz!=''?"gruppe_kurzbz=".myaddslashes($gruppe_kurzbz):"gruppe_kurzbz IS NULL")." ;";
 							if($result3 = pg_query($conn, $qry))
 							{
 								if($row3=pg_fetch_object($result3))
-								{ 
+								{
 									//update
 									$lg_iu='u';
 									$update=false;
@@ -1843,7 +1843,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									{
 										$update=false;
 									}
-									if($update && $dont_sync_php)
+									if($update && !in_array($studiengang_kz,$dont_sync_php))
 									{
 										$qry="UPDATE lehre.tbl_lehreinheitgruppe SET ".
 										"lehreinheit_id=".myaddslashes($lehreinheit_id).", ".
@@ -1855,17 +1855,17 @@ if($result = pg_query($conn_fas, $qry_main))
 										"insertvon=".myaddslashes($lg_insertvon).", ".
 										"insertamum=".myaddslashes($lg_insertamum).", ".
 										"ext_id=".myaddslashes($lg_ext_id)." ".
-										"WHERE lehreinheit_id=".myaddslashes($lehreinheit_id)." AND studiengang_kz=".$studiengang_kz." 
-										AND ".($semester!=''?"semester=".myaddslashes($semester):"semester IS NULL")." 
-										AND ".($verband!=''?"verband=".myaddslashes($verband):"verband IS NULL")." 
-										AND ".($gruppe!=''?"gruppe=".myaddslashes($gruppe):"gruppe IS NULL")." 
+										"WHERE lehreinheit_id=".myaddslashes($lehreinheit_id)." AND studiengang_kz=".$studiengang_kz."
+										AND ".($semester!=''?"semester=".myaddslashes($semester):"semester IS NULL")."
+										AND ".($verband!=''?"verband=".myaddslashes($verband):"verband IS NULL")."
+										AND ".($gruppe!=''?"gruppe=".myaddslashes($gruppe):"gruppe IS NULL")."
 										AND ".($gruppe_kurzbz!=''?"gruppe_kurzbz=".myaddslashes($gruppe_kurzbz):"gruppe_kurzbz IS NULL").";";
 										if(pg_query($conn, $qry))
 										{
 											$anzahl_geaendert_lg++;
 											$ausgabe.="Lehreinheitgruppe (part.) '".$row3->lehreinheitgruppe_id."' aktualisiert bei Lehreinheit='".$lehreinheit_id."': ".$ausgabe_lm."!\n";
 										}
-										else 
+										else
 										{
 											$anzahl_part_fehler++;
 											$error=true;
@@ -1874,7 +1874,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									}
 									$ausgabe_lm='';
 								}
-								else 
+								else
 								{
 									//insert
 									$lg_iu='i';
@@ -1897,7 +1897,7 @@ if($result = pg_query($conn_fas, $qry_main))
 										$anzahl_eingefuegt_lg++;
 										$ausgabe.="Lehreinheitgruppe (part.) mit Lehreinheit='".$lehreinheit_id."' und Studiengang='".$studiengang_kz."' eingefügt.\n";
 									}
-									else 
+									else
 									{
 										$anzahl_part_fehler++;
 										$error=true;
@@ -1906,7 +1906,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								}
 							}
 						}
-						else 
+						else
 						{
 							//ext_id gefunden
 							//update
@@ -2010,7 +2010,7 @@ if($result = pg_query($conn_fas, $qry_main))
 										$ausgabe_lm="Insertamum: '".$lg_insertamum."' (statt '".$row4->insertamum."')";
 									}
 								}
-								if($update && $dont_sync_php)
+								if($update && !in_array($studiengang_kz,$dont_sync_php))
 								{
 									$qry="UPDATE lehre.tbl_lehreinheitgruppe SET ".
 									"lehreinheit_id=".myaddslashes($lehreinheit_id).", ".
@@ -2027,35 +2027,35 @@ if($result = pg_query($conn_fas, $qry_main))
 										$anzahl_geaendert_lg++;
 										$ausgabe.="Lehreinheitgruppe (part) '".$row4->lehreinheitgruppe_id."' wurde aktualisiert bei Lehreinheit='".$lehreinheit_id."': ".$ausgabe_lm.".\n";
 									}
-									else 
+									else
 									{
 										$anzahl_part_fehler++;
 										$error=true;
 										$error_log.="Lehreinheitgruppe (part.) '".$row4->lehreinheitgruppe_id."' mit LE '".$lehreinheit_id."' konnte nicht aktualisiert werden.\n";
 									}
 								}
-								$ausgabe_lm='';	
+								$ausgabe_lm='';
 							}
 						}
 					}
-					else 
+					else
 					{
 						echo '#\n';
 					}
 				}
-				else 
+				else
 				{
 					$anzahl_part_fehler++;
 					$error=true;
 					$error_log.="Lehreinheit_part='".$lehreinheit_part."' in sync.tbl_synclehreinheit nicht gefunden.\n";
 				}
-				
+
 			}
-			else 
+			else
 			{
 				$anzahl_fehler++;
 				$error=true;
-				$error_log.="Part. Lehreinheit nicht in synclehreinheit gefunden!".$qry5."\n";	
+				$error_log.="Part. Lehreinheit nicht in synclehreinheit gefunden!".$qry5."\n";
 			}
 			if(!$error)
 			{
@@ -2063,14 +2063,14 @@ if($result = pg_query($conn_fas, $qry_main))
 				$ausgabe='';
 				pg_query($conn,'COMMIT;');
 			}
-			else 
+			else
 			{
 				$ausgabe='';
 				pg_query($conn,'ROLLBACK;');
 			}
 		}
 	}
-	
+
 	$error_log="Sync Lehreinheiten\n-----------------------\n\n".$error_log."\n";
 	echo "Lehreinheitensynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."<br><br>";
 	echo "Gesamt: ".$anzahl_quelle." / Eingefügt: ".$anzahl_eingefuegt." / Geändert: ".$anzahl_geaendert." / Fehler: ".$anzahl_fehler."<br>";
@@ -2079,10 +2079,10 @@ if($result = pg_query($conn_fas, $qry_main))
 	echo "Lehreinheit-Gruppen: Eingefügt:".$anzahl_eingefuegt_lg." / Geändert:".$anzahl_geaendert_lg." / Fehler:".$anzahl_fehler_lg."<br>";
 	echo "Lehrfächer eingefügt: ".$anzahl_lehrfaecher.".<br><br>";
 	echo nl2br($error_log. "\n------------------------------------------------------------------------\n".$ausgabe_all);
-	
+
 	mail($adress, 'SYNC-Fehler Lehreinheiten  von '.$_SERVER['HTTP_HOST'], $error_log, "From: vilesci@technikum-wien.at");
 	mail($adress, 'SYNC Lehreinheiten von '.$_SERVER['HTTP_HOST'], "Sync Lehreinheiten\n-----------------------\n\nGesamt: ".$anzahl_quelle." / Eingefügt: ".$anzahl_eingefuegt." / Geändert: ".$anzahl_geaendert." / Fehler: ".$anzahl_fehler."\nPartizipierende LEs Gesamt: ".$anzahl_part_gesamt." / Eingefügt: ".$anzahl_part." / bereits vorhanden: ".$anzahl_part2."\n\nLehreinheit-Mitarbeiter: Eingefügt:".$anzahl_eingefuegt_lm." / Geändert:".$anzahl_geaendert_lm." / Fehler:".$anzahl_fehler_lm."\nLehreinheit-Gruppen: Eingefügt:".$anzahl_eingefuegt_lg." / Geändert:".$anzahl_geaendert_lg." / Fehler:".$anzahl_fehler_lg."\nLehrfächer eingefügt: ".$anzahl_lehrfaecher."\n\n".$ausgabe_all, "From: vilesci@technikum-wien.at");
-//fclose($dateiausgabe);	
+//fclose($dateiausgabe);
 }
 ?>
 </body>
