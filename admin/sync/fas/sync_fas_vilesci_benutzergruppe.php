@@ -54,7 +54,8 @@ function myaddslashes($var)
 <?php
 //nation
 $qry="SELECT * FROM person left join student on person_pk=person_fk
-WHERE uid IS NOT null AND uid<>'' AND perskz IS NOT null AND perskz<>'' 
+WHERE uid IS NOT null AND uid<>'' 
+AND perskz IS NOT null AND perskz<>'' 
 ORDER BY Familienname, Vorname;";
 
 if($result = pg_query($conn_fas, $qry))
@@ -75,6 +76,7 @@ if($result = pg_query($conn_fas, $qry))
 		
 		$error=false;
 		$error_log="";
+		$studiengang_kz='';
 		
 		$qrycu="SELECT name FROM benutzer WHERE benutzer_pk='".$row->creationuser."';";
 		if($resultcu = pg_query($conn_fas, $qrycu))
@@ -132,7 +134,7 @@ if($result = pg_query($conn_fas, $qry))
 						$error_log="Fehler beim Zugriff auf Tablelle tbl_gruppe.".$qry2;
 						$anzahl_fehler++;
 					}
-					$qry3="SELECT studiensemester_fk FROM gruppe WHERE gruppe_pk='".$row1->gruppe_fk."';";	
+					$qry3="SELECT studiensemester_fk,studiengang_fk FROM gruppe WHERE gruppe_pk='".$row1->gruppe_fk."';";	
 					$studiensemester_kurzbz="";
 					if($result3 = pg_query($conn_fas, $qry3))
 					{
@@ -150,6 +152,20 @@ if($result = pg_query($conn_fas, $qry))
 							{
 								$error=true;
 								$error_log="Fehler beim Zugriff auf Tablelle tbl_studiensemester.".$qry4;
+								$anzahl_fehler++;
+							}
+							$qry5="SELECT studiengang_kz FROM public.tbl_studiengang WHERE ext_id='".$row3->studiengang_fk."';";
+							if($result5 = pg_query($conn, $qry5))
+							{
+								if($row5=pg_fetch_object($result5))
+								{
+									$studiengang_kz=$row5->studiengang_kz;
+								}
+							}
+							else 
+							{
+								$error=true;
+								$error_log="Fehler beim Zugriff auf Tablelle tbl_studiengang.".$qry5;
 								$anzahl_fehler++;
 							}
 						}
@@ -173,7 +189,7 @@ if($result = pg_query($conn_fas, $qry))
 						{
 							if($rowchk2=pg_fetch_object($resultchk2))
 							{
-								if($dont_sync_sql)
+								if($dont_sync_php)
 								{
 									//update
 									

@@ -14,8 +14,9 @@
 //* setzt voraus: sync von tbl_nation, tbl_sprache
 //* benötigt: tbl_syncperson
 
-include('../../../vilesci/config.inc.php');
-include('../../../include/person.class.php');
+require_once('../../../vilesci/config.inc.php');
+require_once('../../../include/person.class.php');
+require_once('../sync_config.inc.php');
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 //$conn_vilesci=pg_connect(CONN_STRING_VILESCI) or die("Connection zur Vilesci Datenbank fehlgeschlagen");
@@ -24,7 +25,7 @@ $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlg
 //set_time_limit(60);
 
 //$adress='ruhan@technikum-wien.at';
-$adress='fas_sync@technikum-wien.at';
+//$adress='fas_sync@technikum-wien.at';
 
 $error_log='';
 $error_log_fas='';

@@ -29,6 +29,7 @@
 	$double_lva = array();
 	$stg_data = array();
 	$studiensemester = array();
+	$studiengang_kz='';
 
 	//**** FUNCTIONS ****
 
@@ -229,14 +230,15 @@
 				        semester='$row_fas_alle->semester' AND
 				        kurzbz='$row_fas_alle->kurzbezeichnung'";
 				$result = pg_query($conn, $qry);
-
+				$studiengang_kz=$row_fas_alle->kurzbezeichnung;
+				
 				if(pg_num_rows($result)==1)
 				{
 					//$text.='FOUND on Kurzbz LVA '.getlvabez($row_fas_alle)." -> UPDATE & SYNCTAB-Insert\n";
 
 					if($row_found = pg_fetch_object($result))
 					{
-						if ($dont_sync_sql)
+						if ($dont_sync_php)
 						{
 							//Datensatz aktualisieren
 							$qry = getupdateqry($row_found, $row_fas_alle);
@@ -278,12 +280,13 @@
 					        semester='$row_fas_alle->semester' AND
 					        bezeichnung='$row_fas_alle->name'";
 					$result = pg_query($conn, $qry);
-
+					$studiengang_kz=$row_fas_alle->kurzbezeichnung;
+					
 					if(pg_num_rows($result)==1)
 					{
 						if($row_found = pg_fetch_object($result))
 						{
-							if($dont_sync_sql)
+							if($dont_sync_php)
 							{
 								//Gefunden->Update und Synctab-Eintrag
 								//$text.='FOUND on Name LVA '.getlvabez($row_fas_alle)." -> UPDATE & SYNCTAB-Insert\n";
@@ -372,11 +375,11 @@
 				$row_id = pg_fetch_object($result);
 				$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='$row_id->lva_vilesci'";
 				$result = pg_query($conn, $qry);
-
+				$studiengang_kz=$row_fas_alle->kurzbezeichnung;
 				//UPDATE
 				if($row_found = pg_fetch_object($result))
 				{
-					if($dont_sync_sql)
+					if($dont_sync_php)
 					{
 						//Datensatz aktualisieren
 						$qry = getupdateqry($row_found, $row_fas_alle);

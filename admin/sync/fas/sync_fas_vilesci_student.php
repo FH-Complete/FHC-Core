@@ -478,33 +478,33 @@ if($result = pg_query($conn_fas, $qry))
 		echo " ";
 		//ob_flush();
 		//flush();
-		$ausgabe_person='';
-		$ausgabe_benutzer='';
-		$ausgabe_pre='';
-		$ausgabe_prerolle='';
-		$ausgabe_student='';
-		$error_log='';
+		$ausgabe_person		='';
+		$ausgabe_benutzer		='';
+		$ausgabe_pre		='';
+		$ausgabe_prerolle		='';
+		$ausgabe_student		='';
+		$error_log			='';
 		//$text='';
-		$error=false;
+		$error				=false;
 		
 		//Attribute Person
-		$staatsbuergerschaft=$row->staatsbuergerschaft;
-		$geburtsnation=$row->gebnation;
-		$sprache='German';
-		$anrede=$row->anrede;
-		$titelpost=trim($row->postnomentitel);
-		$titelpre=trim($row->titel);
-		$nachname=trim($row->familienname);
-		$vorname=trim($row->vorname);
-		$vornamen=trim($row->vornamen);
-		$gebdatum=$row->gebdat;
-		$gebort=$row->gebort;
-		$gebzeit=''; //bei update auslassen
-		$foto=''; //bei update auslassen
-		$anmerkungen='';
-		$homepage='';
-		$svnr=$row->svnr;
-		$ersatzkennzeichen=$row->ersatzkennzeichen;
+		$staatsbuergerschaft	=$row->staatsbuergerschaft;
+		$geburtsnation		=$row->gebnation;
+		$sprache			='German';
+		$anrede			=$row->anrede;
+		$titelpost			=trim($row->postnomentitel);
+		$titelpre			=trim($row->titel);
+		$nachname			=trim($row->familienname);
+		$vorname			=trim($row->vorname);
+		$vornamen			=trim($row->vornamen);
+		$gebdatum			=$row->gebdat;
+		$gebort			=$row->gebort;
+		$gebzeit			=''; //bei update auslassen
+		$foto				=''; //bei update auslassen
+		$anmerkungen		='';
+		$homepage			='';
+		$svnr				=$row->svnr;
+		$ersatzkennzeichen		=$row->ersatzkennzeichen;
 		if ($row->familienstand<='0')
 		{
 			$familienstand=null;
@@ -525,55 +525,55 @@ if($result = pg_query($conn_fas, $qry))
 		{
 			$familienstand='w';
 		}
-		$geschlecht=strtolower($row->geschlecht);
-		$anzahlkinder=$row->anzahlderkinder;
-		//$aktiv=($row->aktiv=='t'?true:false);
-		//$insertvon=$row->creationuser;
-		$insertamum=$row->creationdate;
-		$updateamum=$row->creationdate;
-		$updatevon='SYNC';
-		$ext_id_person=$row->person_pk;
+		$geschlecht			=strtolower($row->geschlecht);
+		$anzahlkinder		=$row->anzahlderkinder;
+		//$aktiv			=($row->aktiv=='t'?true:false);
+		//$insertvon			=$row->creationuser;
+		$insertamum			=$row->creationdate;
+		$updateamum		=$row->creationdate;
+		$updatevon			='SYNC';
+		$ext_id_person		=$row->person_pk;
 				
 		//Attribute Benutzer
-		$uid='';
-		$person_id='';
-		$alias='';
-		$ext_id_benutzer=$row->student_pk;
+		$uid				='';
+		$person_id			='';
+		$alias				='';
+		$ext_id_benutzer		=$row->student_pk;
 		
 		//Attribute Prestudent
-		$aufmerksamdurch_kurzbz='';
-		$person_id='';
-		$studiengang_kz='';
-		$berufstaetigkeit_code=$row->berufstaetigkeit;
+		$aufmerksamdurch_kurzbz	='';
+		$person_id			='';
+		$studiengang_kz		='';
+		$berufstaetigkeit_code	=$row->berufstaetigkeit;
 		if($berufstaetigkeit_code<0)
 		{
 			$berufstaetigkeit_code=null;
 		}
 		$ausbildungcode='';
-		$zgv_code=$row->zgv;
-		$zgvort=trim($row->zgvort);
-		$zgvdatum=$row->zgvdatum;
-		$zgvmas_code=$row->zgvmagister;
-		$zgvmaort=trim($row->zgvmagisterort);
-		$zgvmadatum=$row->zgvmagisterdatum;
-		$facheinschlberuf=($row->berufstaetigkeit=='J'?true:false);
-		$reihungstest_id='';
-		$punkte=$row->punkte;
-		$ext_id_pre=$row->student_pk;
-		$anmeldungreihungstest='';
-		$reihungstestangetreten=($row->angetreten=='J'?true:false);
-		$anmerkung=$row->bemerkung;
+		$zgv_code			=$row->zgv;
+		$zgvort			=trim($row->zgvort);
+		$zgvdatum			=$row->zgvdatum;
+		$zgvmas_code		=$row->zgvmagister;
+		$zgvmaort			=trim($row->zgvmagisterort);
+		$zgvmadatum			=$row->zgvmagisterdatum;
+		$facheinschlberuf		=($row->berufstaetigkeit=='J'?true:false);
+		$reihungstest_id		='';
+		$punkte			=$row->punkte;
+		$ext_id_pre			=$row->student_pk;
+		$anmeldungreihungstest	='';
+		$reihungstestangetreten	=($row->angetreten=='J'?true:false);
+		$anmerkung			=$row->bemerkung;
 		//bismelden		
 
 		//Attribute Student
-		$student_uid=trim($row->uid);
-		$matrikelnr=trim($row->perskz);		
-		$prestudent_id='';
+		$student_uid			=trim($row->uid);
+		$matrikelnr			=trim($row->perskz);		
+		$prestudent_id		='';
 		//studiengang_kz bei prestudent
-		$semester='';
-		$verband='';
-		$gruppe='';
-		$ext_id_student=$row->student_pk;
+		$semester			='';
+		$verband			='';
+		$gruppe			='';
+		$ext_id_student		=$row->student_pk;
 			
 		if($zgv_code<=0 or $zgv_code=='')
 		{
@@ -1171,7 +1171,7 @@ if($result = pg_query($conn_fas, $qry))
 							$ausgabe_person="Insertvon: '".$insertvon."' (statt '".$row1->insertvon."')";
 						}
 					}
-					if($updatep && $dont_sync_sql)
+					if($updatep && $dont_sync_php)
 					{
 						$qry = 'UPDATE public.tbl_person SET'.
 						       ' sprache='.myaddslashes($sprache).','.
@@ -1576,7 +1576,7 @@ if($result = pg_query($conn_fas, $qry))
 								$ausgabe_pre="Insertvon: '".$insertvon."'";
 							}
 						}
-						if($updater && $dont_sync_sql)
+						if($updater && $dont_sync_php)
 						{
 							$qry = 'UPDATE public.tbl_prestudent SET'.
 							       ' aufmerksamdurch_kurzbz='.myaddslashes($aufmerksamdurch_kurzbz).','.
@@ -2061,7 +2061,7 @@ if($result = pg_query($conn_fas, $qry))
 										$ausgabe_benutzer="Insertvon: '".$insertvon."' statt('".$rows->insertvon."')";
 									}
 								}
-								if($updateb  && $dont_sync_sql)
+								if($updateb  && $dont_sync_php)
 								{
 									$qry = 'UPDATE public.tbl_benutzer SET'.
 									       ' uid='.myaddslashes($student_uid).','.
@@ -2259,7 +2259,7 @@ if($result = pg_query($conn_fas, $qry))
 											$ausgabe_student="Insertvon: '".$insertvon."' (statt '".$rows->insertvon."')";
 										}
 									}
-									if($updates && $dont_sync_sql)
+									if($updates && $dont_sync_php)
 									{
 										$qry = 'UPDATE public.tbl_student SET'.
 										       ' student_uid='.myaddslashes($student_uid).','.
