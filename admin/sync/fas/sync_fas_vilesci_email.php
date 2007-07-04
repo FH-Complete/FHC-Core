@@ -127,7 +127,7 @@ if($result = pg_query($conn_fas, $qry))
 										$ausgabe_email="Zustelladresse: '".($row->zustelladresse=='J'?'true':'false')."'";
 									}
 								}
-								if($update && $dont_sync_sql)
+								if($update)
 								{
 									// update , wenn datensatz bereits vorhanden
 									$kontakt->person_id=$row1->person_portal;
@@ -155,8 +155,9 @@ if($result = pg_query($conn_fas, $qry))
 		}
 		If (!$error)
 		{
-			if($kontakt->new || ($update && $dont_sync_sql))
+			if($kontakt->new || $update)
 			{
+				echo $studiengang_kz."<br>";
 				if(!$kontakt->save())
 				{
 					$error_log.=$kontakt->errormsg."\n";

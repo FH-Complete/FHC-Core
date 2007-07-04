@@ -258,7 +258,7 @@ if($result = pg_query($conn_fas, $qry))
 										$ausgabe_adresse="Insertvon: '".$adresse->insertvon."' (statt '".$row2->insertvon."')";
 									}
 								}
-								if ($update && $dont_sync_sql)
+								if ($update)
 								{
 									// update adresse, wenn datensatz bereits vorhanden
 									$adresse->new=false;
@@ -347,7 +347,7 @@ if($result = pg_query($conn_fas, $qry))
 		
 		if(!$error)
 		{
-			if($adresse->new || ($update && $dont_sync_sql))
+			if($adresse->new || $update)
 			{
 				if(!$adresse->save())
 				{

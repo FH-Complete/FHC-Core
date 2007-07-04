@@ -12,6 +12,7 @@
 //*
 
 require_once('../../../vilesci/config.inc.php');
+require_once('../sync_config.inc.php');
 
 
 $conn=pg_connect(CONN_STRING) 
@@ -19,7 +20,7 @@ $conn=pg_connect(CONN_STRING)
 $conn_fas=pg_connect(CONN_STRING_FAS) 
 	or die("Connection zur FAS Datenbank fehlgeschlagen");
 
-$adress='ruhan@technikum-wien.at';
+//$adress='ruhan@technikum-wien.at';
 //$adress='fas_sync@technikum-wien.at';
 
 $error_log='';
@@ -697,7 +698,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								}
 							}
 							$lehreinheit_id=$row2->lehreinheit_id;
-							if ($update)
+							if ($update && $dont_sync_php)
 							{
 								$qry="UPDATE lehre.tbl_lehreinheit SET ".
 								"lehrveranstaltung_id=".myaddslashes($lehrveranstaltung_id).", ".
@@ -964,7 +965,7 @@ if($result = pg_query($conn_fas, $qry_main))
 							}
 						}
 						$lehreinheit_id=$row3->lehreinheit_id;
-						if ($update)
+						if ($update && $dont_sync_php)
 						{
 							$qry="UPDATE lehre.tbl_lehreinheit SET ".
 							"lehrveranstaltung_id=".myaddslashes($lehrveranstaltung_id).", ".
@@ -1152,7 +1153,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								$ausgabe_lm="Insertamum: '".$lm_insertamum."' (statt '".$row3->insertamum."')";
 							}
 						}
-						if($update)
+						if($update && $dont_sync_php)
 						{
 							$qry="UPDATE lehre.tbl_lehreinheitmitarbeiter SET ".
 							"lehrfunktion_kurzbz=".myaddslashes($lehrfunktion_kurzbz).", ".
@@ -1371,7 +1372,7 @@ if($result = pg_query($conn_fas, $qry_main))
 							{
 								$update=false;
 							}	
-							if($update)
+							if($update && $dont_sync_php)
 							{
 								$qry="UPDATE lehre.tbl_lehreinheitgruppe SET ".
 								"lehreinheit_id=".myaddslashes($lehreinheit_id).", ".
@@ -1541,7 +1542,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								$ausgabe_lm="Insertamum: '".$lg_insertamum."' (statt '".$row4->insertamum."')";
 							}
 						}
-						if($update)
+						if($update && $dont_sync_php)
 						{
 							$qry="UPDATE lehre.tbl_lehreinheitgruppe SET ".
 							"lehreinheit_id=".myaddslashes($lehreinheit_id).", ".
@@ -1842,7 +1843,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									{
 										$update=false;
 									}
-									if($update)
+									if($update && $dont_sync_php)
 									{
 										$qry="UPDATE lehre.tbl_lehreinheitgruppe SET ".
 										"lehreinheit_id=".myaddslashes($lehreinheit_id).", ".
@@ -2009,7 +2010,7 @@ if($result = pg_query($conn_fas, $qry_main))
 										$ausgabe_lm="Insertamum: '".$lg_insertamum."' (statt '".$row4->insertamum."')";
 									}
 								}
-								if($update)
+								if($update && $dont_sync_php)
 								{
 									$qry="UPDATE lehre.tbl_lehreinheitgruppe SET ".
 									"lehreinheit_id=".myaddslashes($lehreinheit_id).", ".

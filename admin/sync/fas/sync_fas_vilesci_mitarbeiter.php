@@ -11,13 +11,14 @@
  * benötigt: tbl_syncperson
  */
 require_once('../../../vilesci/config.inc.php');
+require_once('../sync_config.inc.php');
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
 //$adress='ruhan@technikum-wien.at';
 //$adress_plausi='ruhan@technikum-wien.at';
-$adress='fas_sync@technikum-wien.at';
+//$adress='fas_sync@technikum-wien.at';
 $adress_plausi='fas_sync@technikum-wien.at';
 
 $error_log='';

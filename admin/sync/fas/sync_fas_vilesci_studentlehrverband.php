@@ -387,7 +387,7 @@ if($result = pg_query($conn_fas, $qry))
 												}
 											}
 										}
-										if($updates && $dont_sync_sql)
+										if($updates && $dont_sync_php)
 										{
 											$anzahl_update++;
 											$qry = "UPDATE public.tbl_studentlehrverband SET".
