@@ -49,6 +49,7 @@ require_once('../../include/bisio.class.php');
 require_once('../../include/zeugnisnote.class.php');
 require_once('../../include/lvgesamtnote.class.php');
 require_once('../../include/pruefung.class.php');
+require_once('../../include/abschlusspruefung.class.php');
 
 $user = get_uid();
 
@@ -1356,7 +1357,7 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='savepruefung')  // **** PRUEFUNGEN **** //
 	{
-		$pruefung = new pruefung($conn, null, null);
+		$pruefung = new pruefung($conn, null, true);
 		
 		if($_POST['neu']=='false')
 		{
@@ -1401,6 +1402,81 @@ if(!$error)
 				$errormsg = $pruefung->errormsg;
 			}
 		}			
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='saveabschlusspruefung')  // **** ABSCHLUSSPRUEFUNGEN **** //
+	{
+		$pruefung = new abschlusspruefung($conn, null, true);
+		
+		if($_POST['neu']=='false')
+		{
+			if($pruefung->load($_POST['abschlusspruefung_id']))
+			{
+				$pruefung->new = false;
+			}
+			else 
+			{
+				$error = true;
+				$return = false;
+				$errormsg = $pruefung->errormsg;
+			}
+		}
+		else 
+		{
+			$pruefung->new = true;
+			$pruefung->insertamum = date('Y-m-d H:i:s');
+			$pruefung->insertvon = $user;
+		}
+				
+		$pruefung->student_uid = $_POST['student_uid'];
+		$pruefung->vorsitz = $_POST['vorsitz'];
+		$pruefung->pruefer1 = $_POST['pruefer1'];
+		$pruefung->pruefer2 = $_POST['pruefer2'];
+		$pruefung->pruefer3 = $_POST['pruefer3'];
+		$pruefung->abschlussbeurteilung_kurzbz = $_POST['abschlussbeurteilung_kurzbz'];
+		$pruefung->akadgrad_id = $_POST['akadgrad_id'];
+		$pruefung->pruefungstyp_kurzbz = $_POST['pruefungstyp_kurzbz'];
+		$pruefung->datum = $_POST['datum'];
+		$pruefung->sponsion = $_POST['sponsion'];
+		$pruefung->anmerkung = $_POST['anmerkung'];
+		$pruefung->updateamum = date('Y-m-d H:i:s');
+		$pruefung->updatevon = $user;
+		
+		if(!$error)
+		{
+			if($pruefung->save())
+			{
+				$return = true;
+				$data = $pruefung->abschlusspruefung_id;
+			}
+			else 
+			{
+				$return = false;
+				$errormsg = $pruefung->errormsg;
+			}
+		}			
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='deleteabschlusspruefung')
+	{
+		//Loescht einen Pruefungs Eintrag
+		if(isset($_POST['abschlusspruefung_id']) && is_numeric($_POST['abschlusspruefung_id']))
+		{
+			$pruefung = new abschlusspruefung($conn);
+
+			if($pruefung->delete($_POST['abschlusspruefung_id']))
+			{
+				$return = true;
+			}
+			else 
+			{
+				$errormsg = $pruefung->errormsg;
+				$return = false;
+			}
+		}
+		else 
+		{
+			$return = false;
+			$errormsg  = 'Fehlerhafte Parameteruebergabe';
+		}
 	}
 	else
 	{

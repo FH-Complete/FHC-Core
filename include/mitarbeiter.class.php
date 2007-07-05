@@ -630,5 +630,37 @@ class mitarbeiter extends benutzer
 		}
 		
 	}
+	
+	// *************************************
+	// * Laedt die Mitarbeiter deren
+	// * Nachname mit $filter beginnt
+	// *************************************
+	function getMitarbeiterFilter($filter)
+	{
+		$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE nachname ~* '".addslashes($filter).".*'";
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$obj = new mitarbeiter($this->conn, null, null);
+				
+				$obj->uid = $row->uid;
+				$obj->vorname = $row->vorname;
+				$obj->nachname = $row->nachname;
+				$obj->titelpre = $row->titelpre;
+				$obj->titelpost = $row->titelpost;
+				$obj->kurzbz = $row->kurzbz;
+				$obj->vornamen = $row->vornamen;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>

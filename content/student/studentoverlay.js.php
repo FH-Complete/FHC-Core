@@ -1133,6 +1133,10 @@ function StudentAuswahl()
 	pruefungtree.database.AddDataSource(StudentPruefungTreeDatasource);
 	StudentPruefungTreeDatasource.addXMLSinkObserver(StudentPruefungTreeSinkObserver);
 	pruefungtree.builder.addListener(StudentPruefungTreeListener);
+	
+	// ****** Abschlusspruefung ******** //
+	StudentAbschlusspruefungDetailDisableFields(true);
+	StudentAbschlusspruefungTreeLoad(uid);	
 }
 
 // ****
