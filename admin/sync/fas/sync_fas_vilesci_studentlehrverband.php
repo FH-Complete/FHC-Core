@@ -387,7 +387,7 @@ if($result = pg_query($conn_fas, $qry))
 												}
 											}
 										}
-										if($updates && $dont_sync_php)
+										if($updates && !in_array($studiengang_kz, $dont_sync_php))
 										{
 											$anzahl_update++;
 											$qry = "UPDATE public.tbl_studentlehrverband SET".

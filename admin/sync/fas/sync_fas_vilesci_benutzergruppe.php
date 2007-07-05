@@ -189,7 +189,7 @@ if($result = pg_query($conn_fas, $qry))
 						{
 							if($rowchk2=pg_fetch_object($resultchk2))
 							{
-								if($dont_sync_php)
+								if(!in_array($studiengang_kz, $dont_sync_php))
 								{
 									//update
 									
