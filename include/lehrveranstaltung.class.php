@@ -500,5 +500,71 @@ class lehrveranstaltung
 			return false;
 		}
 	}
+	/**
+	 * Liefert die Tabellenelemente die den Kriterien der Parameter entsprechen
+	 * @param 	$stg Studiengangs_kz
+	 *			$sem Semester
+	 *			$order Sortierkriterium
+	 * @return array mit Lehrferanstaltungen oder false=fehler
+	 */
+	function getTab($stg=null,$sem=null, $order='lehrveranstaltung_id')
+	{
+		if($stg!=null && !is_numeric($stg))
+		{
+			$this->errormsg = 'Studiengang_kz muss eine gueltige Zahl sein';
+			return false;
+		}
+		if($sem!=null && !is_numeric($sem))
+		{
+			$this->errormsg = 'Semester muss eine gueltige Zahl sein';
+			return false;
+		}
+		$sql_query = "SELECT * FROM lehre.tbl_lehrveranstaltung";
+
+		if($stg!=null || $sem!=null)
+		   $sql_query .= " WHERE true";
+
+		if($stg!=null)
+		   $sql_query .= " AND studiengang_kz='$stg'";
+
+		if($sem!=null)
+			$sql_query .= " AND semester='$sem'";
+
+		$sql_query .= " ORDER BY $order";
+
+		if($result=pg_query($this->conn,$sql_query))
+		{
+			while($row=pg_fetch_object($result))
+			{
+				$l = new lehrveranstaltung($this->conn);
+				$l->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$l->kurzbz = $row->kurzbz;
+				$l->bezeichnung = $row->bezeichnung;
+				$l->studiengang_kz = $row->studiengang_kz;
+				$l->sprache = $row->sprache;
+				$l->ects = $row->ects;
+				$l->semesterstunden = $row->semesterstunden;
+				$l->anmerkung = $row->anmerkung;
+				$l->lehre = $row->lehre;
+				$l->lehreverzeichnis = $row->lehreverzeichnis;
+				$l->aktiv = $row->aktiv;
+				$l->planfaktor = $row->planfaktor;
+				$l->planlektoren = $row->planlektoren;
+				$l->planpersonalkosten = $row->planpersonalkosten;
+				$l->plankostenprolektor = $row->plankostenprolektor;
+				$l->updateamum = $row->updateamum;
+				$l->updatevon = $row->updatevon;
+				$l->insertamum = $row->insertamum;
+				$l->insertvon = $row->insertvon;
+				$this->lehrveranstaltungen[]=$l;
+			}
+		}
+		else
+		{
+			$this->errormsg = pg_errormessage($this->conn);
+			return false;
+		}
+		return true;
+	}
 }
 ?>
