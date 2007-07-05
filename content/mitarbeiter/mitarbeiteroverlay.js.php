@@ -824,7 +824,7 @@ function MitarbeiterSendMail()
   				if(mailempfaenger!='')
 					mailempfaenger=mailempfaenger+','+treeMitarbeiter.view.getCellText(v,col)+'@technikum-wien.at';
 				else
-					mailempfaenger='mailto:'+treeMitarbeiter.view.getCellText(v,col)+'@technikum-wien.at';
+					mailempfaenger='mailto:'+treeMitarbeiter.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
   			}
   			else
   			{

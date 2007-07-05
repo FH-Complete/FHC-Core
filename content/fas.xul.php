@@ -81,7 +81,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-statistic-lvplanung:command" oncommand="StatistikPrintLVPlanung();"/>
   <command id="menu-statistic-lehrauftragsliste:command" oncommand="StatistikPrintLehrauftragsliste();"/>
   <command id="menu-dokumente-inskriptionsbestaetigung:command" oncommand="StudentPrintInskriptionsbestaetigung();"/>
-  <command id="menu-help-close:command" oncommand="test();"/>
+  <command id="menu-help-close:command" oncommand="OpenAboutDialog()"/>
 </commandset>
 
 <keyset id="mainkeys">

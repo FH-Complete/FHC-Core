@@ -174,3 +174,37 @@ function getStudiensemester()
 {
 	return document.getElementById('statusbarpanel-semester').label;
 }
+
+// ****
+// * Markiert in einem Editierbaren DropDown Menu
+// * einen Eintrag.
+// * @param id = ID der Menulist
+// *        data = value des Eintrages der markiert werden soll
+// ****
+function MenulistSelectItemOnValue(id, data)
+{
+	var children = document.getElementById(id).getElementsByAttribute('value',data);
+	document.getElementById(id).selectedItem=children[0];	
+}
+
+// ****
+// * Liefert den value eines Editierbaren DropDowns
+// * @param id = ID der Menulist
+// ****
+function MenulistGetSelectedValue(id)
+{
+	menulist = document.getElementById(id);
+	
+	//Es kann sein, dass im Eingabefeld nichts steht und
+	//trotzdem ein Eintrag auf selected gesetzt ist.
+	//In diesem Fall soll aber kein Wert zurueckgegeben werden
+	if(menulist.value=='')
+		return '';
+	
+	//Wenn es Selektierte Eintraege gibt, dann den value zurueckliefern
+	var children = menulist.getElementsByAttribute('selected','true');
+	if(children.length>0)
+		return children[0].value;
+	else
+		return '';
+}

@@ -63,6 +63,12 @@ if (isset($_GET['user']))
 	$user=$_GET['user'];
 else
 	$user=false;
+	
+if(isset($_GET['filter']))
+	$filter = $_GET['filter'];
+else 
+	$filter=null;
+
 if(isset($_GET['lehrveranstaltung_id']) && is_numeric($_GET['lehrveranstaltung_id']))
 {
 	$lehrveranstaltung_id = $_GET['lehrveranstaltung_id'];
@@ -105,7 +111,7 @@ function draw_row($mitarbeiter)
   	';
 }
 
-if($lehrveranstaltung_id==null)
+if($lehrveranstaltung_id==null && $filter==null)
 {
 	$ma=$mitarbeiter->getMitarbeiter($lektor,$fixangestellt,$stg_kz,$fachbereich_id);
 	
@@ -200,7 +206,16 @@ else
 	  	</RDF:li>
 	  	';
 	}
-	$mitarbeiter->getMitarbeiterFromLehrveranstaltung($lehrveranstaltung_id);
+	
+	if($filter==null)
+	{
+		$mitarbeiter->getMitarbeiterFromLehrveranstaltung($lehrveranstaltung_id);
+	}
+	else 
+	{
+		$mitarbeiter->getMitarbeiterFilter($filter);		
+	}
+	
 	foreach ($mitarbeiter->result as $row)
 	{
 		echo '<RDF:li>';

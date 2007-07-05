@@ -279,6 +279,7 @@ function onVerbandSelect(event)
 			StudentIODisableFields(true);
 			StudentNoteDisableFields(true);
 			document.getElementById('student-kontakt').setAttribute('src','');
+			StudentAbschlusspruefungDisableFields(true);
 		}
 		catch(e)
 		{
@@ -632,4 +633,9 @@ function StatistikPrintLehrauftragsliste()
 	var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
 
 	window.open('<?php echo APP_ROOT ?>content/statistik/lehrauftragsliste_gst.xls.php?studiengang_kz='+studiengang_kz,'Lehrauftragsliste');
+}
+
+function OpenAboutDialog()
+{
+	window.open('<?php echo APP_ROOT ?>content/about.xul.php','About','height=520,width=500,left=350,top=350,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
