@@ -200,7 +200,7 @@ if($result = pg_query($conn_fas, $qry))
 			{
 				if($row2=pg_fetch_object($result2))
 				{	
-					if($dont_sync_php)
+					if(!in_array($studiengang_kz, $dont_sync_php))
 					{	
 						//Eintrag bereits vorhanden - Eintragung in Sync-Tabelle
 						
