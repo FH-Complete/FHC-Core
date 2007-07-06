@@ -148,9 +148,19 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 			{
 				while($row1 = pg_fetch_object($result1))
 				{
-					while($row1 = pg_fetch_object($result1))
+					while($row2 = pg_fetch_object($result2))
 					{
-						
+						if($row2->updateamum>$row1->updateamum)
+						{
+							//wenn lvinfo neuer als die bestehende, ersetzt sie diese
+							$sql_query_upd1.="DELETE FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$radio_2';";
+							$sql_query_upd1.="UPDATE campus.tbl_lvinfo SET lehrveranstaltung_id='$radio_2' WHERE lehrveranstaltung_id='$radio_1';";	
+						}
+						else 
+						{
+							//wenn lvinfo älter als die bestehende, wird sie gelöscht
+							$sql_query_upd1.="DELETE FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$radio_1';";
+						}
 					}
 				}
 			}
