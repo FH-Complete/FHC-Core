@@ -33,7 +33,7 @@ header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
 // xml
-echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+
 // DAO
 require_once('../vilesci/config.inc.php');
 require_once('../include/konto.class.php');
@@ -49,10 +49,14 @@ if (!$conn = pg_pconnect(CONN_STRING))
 $hier='';
 if(isset($_GET['xmlformat']))
 {
+	echo '<?xml version="1.0" encoding="ISO-8859-15" standalone="yes"?>';
 	$xmlformat=$_GET['xmlformat'];
 }
 else
+{
+	echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 	$xmlformat='rdf';
+}
 
 if(isset($_GET['person_id']) && is_numeric($_GET['person_id']))
 {
@@ -83,7 +87,10 @@ else
 
 	
 $datum = new datum();
-$konto = new konto($conn, null, true);
+if($xmlformat=='rdf')
+	$konto = new konto($conn, null, true);
+else
+	$konto = new konto($conn, null, false);
 
 if($person_id!='')
 {
@@ -208,11 +215,11 @@ elseif ($xmlformat=='xml')
 	function drawperson_xml($row)
 	{
 		global $conn, $datum;
-		$pers = new person($conn);
+		$pers = new person($conn, null, null);
 		
 		$pers->load($row->person_id);
 		
-		$stg = new studiengang($conn, $row->studiengang_kz);
+		$stg = new studiengang($conn, $row->studiengang_kz, null);
 		
 		echo "
   		<person>
