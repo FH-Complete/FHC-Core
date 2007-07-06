@@ -39,23 +39,23 @@ loadVariables($conn, $user);
 // Clean stuff from a string
  function clean_string($string)
  {
- 	$trans = array("Ã¤" => "ae",
- 				   "Ã„" => "Ae",
- 				   "Ã¶" => "oe",
- 				   "Ã–" => "Oe",
- 				   "Ã¼" => "ue",
- 				   "Ãœ" => "Ue",
- 				   "Ã¡" => "a",
- 				   "Ã " => "a",
- 				   "Ã©" => "e",
- 				   "Ã¨" => "e",
- 				   "Ã³" => "o",
- 				   "Ã²" => "o",
- 				   "Ã­" => "i",
- 				   "Ã¬" => "i",
- 				   "Ãº" => "u",
- 				   "Ã¹" => "u",
- 				   "ÃŸ" => "ss");
+ 	$trans = array("ä" => "ae",
+ 				   "Ä" => "Ae",
+ 				   "ö" => "oe",
+ 				   "Ö" => "Oe",
+ 				   "ü" => "ue",
+ 				   "Ü" => "Ue",
+ 				   "á" => "a",
+ 				   "à" => "a",
+ 				   "é" => "e",
+ 				   "è" => "e",
+ 				   "ó" => "o",
+ 				   "ò" => "o",
+ 				   "ì" => "i",
+ 				   "í" => "i",
+ 				   "ú" => "u",
+ 				   "ù" => "u",
+ 				   "ß" => "ss");
 	$string = strtr($string, $trans);
     return ereg_replace("[^a-zA-Z0-9]", "", $string);
     //[:space:]
