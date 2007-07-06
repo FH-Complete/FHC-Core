@@ -142,7 +142,29 @@ function generateUID($conn, $matrikelnummer)
 	return $stg_obj->kurzbz.$jahr.($art!='0'?$stg_obj->typ:'x').$nr;	
 }
 // ***
-
+function clean_string($string)
+ {
+ 	$trans = array("ä" => "ae",
+ 				   "Ä" => "Ae",
+ 				   "ö" => "oe",
+ 				   "Ö" => "Oe",
+ 				   "ü" => "ue",
+ 				   "Ü" => "Ue",
+ 				   "á" => "a",
+ 				   "à" => "a",
+ 				   "é" => "e",
+ 				   "è" => "e",
+ 				   "ó" => "o",
+ 				   "ò" => "o",
+ 				   "í" => "i",
+ 				   "ì" => "i",
+ 				   "ù" => "u",
+ 				   "ú" => "u",
+ 				   "ß" => "ss");
+	$string = strtr($string, $trans);
+    return ereg_replace("[^a-zA-Z0-9]", "", $string);
+    //[:space:]
+ }
 
 if(!$error)
 {
@@ -541,10 +563,10 @@ if(!$error)
 									$benutzer->person_id = $prestd->person_id;
 									$benutzer->aktiv = true;
 									
-									$qry_alias = "SELECT * FROM public.tbl_benutzer WHERE alias='$prestd->vorname.$prestd->nachname'";
+									$qry_alias = "SELECT * FROM public.tbl_benutzer WHERE alias=LOWER('".clean_string($prestd->vorname).".".clean_string($prestd->nachname)."')";
 									$result_alias = pg_query($conn, $qry_alias);
 									if(pg_num_rows($result_alias)==0)								
-										$benutzer->alias = $prestd->vorname.'.'.$prestd->nachname;
+										$benutzer->alias = strtolower(clean_string($prestd->vorname).'.'.clean_string($prestd->nachname));
 									else 
 										$benutzer->alias = '';
 									
