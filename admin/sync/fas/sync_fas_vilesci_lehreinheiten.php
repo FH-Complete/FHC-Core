@@ -1839,10 +1839,10 @@ if($result = pg_query($conn_fas, $qry_main))
 											$ausgabe_lm="ext_id: '".$lg_ext_id."' (statt '".$row3->ext_id."')";
 										}
 									}
-									if($row3->ext_id!=NULL)
-									{
+									//if($row3->ext_id!=NULL)
+									//{
 										$update=false;
-									}
+									//}
 									if($update && !in_array($studiengang_kz,$dont_sync_php))
 									{
 										$qry="UPDATE lehre.tbl_lehreinheitgruppe SET ".
