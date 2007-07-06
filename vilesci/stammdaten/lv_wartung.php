@@ -21,10 +21,10 @@ $msg='';
 $outp='';
 $smax=0;
 
-if(!isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
+/*if(!isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
 {
-	$msg=substr(CONN_STRING,strpos(CONN_STRING,'dbname=')+7,strpos(CONN_STRING,'user=')-strpos(CONN_STRING,'dbname=')-7);
-}
+	echo substr(CONN_STRING,strpos(CONN_STRING,'dbname=')+7,strpos(CONN_STRING,'user=')-strpos(CONN_STRING,'dbname=')-7);
+}*/
 	
 $s=new studiengang($conn);
 $s->getAll();
@@ -146,23 +146,20 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 		{
 			if($result2=pg_query($conn,$qry2))
 			{
-				while($row1 = pg_fetch_object($result1))
+				if($row1 = pg_fetch_object($result1))
 				{
-					while($row2 = pg_fetch_object($result2))
+					if($row2 = pg_fetch_object($result2))
 					{
-						if ($row2->sprache==$row1->sprache)
+						if($row2->updateamum>$row1->updateamum)
 						{
-							if($row2->updateamum>$row1->updateamum)
-							{
-								//wenn lvinfo neuer als die bestehende, ersetzt sie diese
-								$sql_query_upd1.="DELETE FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$radio_2' AND sprache='$row2->sprache';";
-								$sql_query_upd1.="UPDATE campus.tbl_lvinfo SET lehrveranstaltung_id='$radio_2' WHERE lehrveranstaltung_id='$radio_1';";	
-							}
-							else 
-							{
-								//wenn lvinfo älter als die bestehende, wird sie gelöscht
-								$sql_query_upd1.="DELETE FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$radio_1' AND sprache='$row1->sprache';";
-							}
+							//wenn lvinfo neuer als die bestehende, ersetzt sie diese
+							$sql_query_upd1.="DELETE FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$radio_2';";
+							$sql_query_upd1.="UPDATE campus.tbl_lvinfo SET lehrveranstaltung_id='$radio_2' WHERE lehrveranstaltung_id='$radio_1';";	
+						}
+						else 
+						{
+							//wenn lvinfo älter als die bestehende, wird sie gelöscht
+							$sql_query_upd1.="DELETE FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$radio_1';";
 						}
 					}
 				}
@@ -171,17 +168,19 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 		$sql_query_upd1.="UPDATE campus.tbl_lvinfo SET lehrveranstaltung_id='$radio_2' WHERE lehrveranstaltung_id='$radio_1';";
 		$sql_query_upd1.="UPDATE sync.tbl_synclehrveranstaltung SET lva_vilesci='$radio_2' WHERE lva_vilesci='$radio_1';";
 		$sql_query_upd1.="DELETE FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='$radio_1';";
-		$sql_query_upd1.="COMMIT;";
-		
 		if(pg_query($conn,$sql_query_upd1))
 		{
 			$msg = "Daten Erfolgreich gespeichert<br>";
+			pg_query($conn,"COMMIT;");
+			$msg .= "<br>".str_replace(';',';<br>',$sql_query_upd1)."COMMIT";
 		}
 		else 
 		{
 			$msg = "Die Änderung konnte nicht durchgeführt werden!";
+			pg_query($conn,"ROLLBACK;");
+			$msg .= "<br>".str_replace(';',';<br><b>',$sql_query_upd1)."ROLLBACK</b>";
 		}
-		$msg .= "<br>".str_replace(';',';<br>',$sql_query_upd1);
+		
 
 	}
 }
