@@ -7,9 +7,10 @@ body
 	/*IE hack*/
 	voice-family: "\"}\"";
 	voice-family: inherit;
-	font-size: small;
+	font-size: small;	
 	/*IE hack end*/
 }
+
 iframe
 {
 	margin:0px;
@@ -17,20 +18,32 @@ iframe
 	border-style:none;
 	padding:0px;
 }
+
 #menue
 {
-	position:absolute;
 	top:8%;
 	width:19%;
 	height:90%;
 }
-#content
+/* IE < 7 */
+html>body #menue
 {
 	position:absolute;
+}
+
+#content
+{
 	width:80%;
 	height:90%;
 	left:20%;
 }
+/* IE < 7 */
+html>body #content
+{
+	position:absolute;
+}
+
+
 input.TextBox					
 {
 	background-color: White;
