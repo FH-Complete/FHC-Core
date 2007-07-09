@@ -101,10 +101,17 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 		$sql_query_upd1.="UPDATE public.tbl_konto SET person_id='$radio_2' WHERE person_id='$radio_1';";
 		$sql_query_upd1.="UPDATE public.tbl_prestudent SET person_id='$radio_2' WHERE person_id='$radio_1';";
 		$sql_query_upd1.="UPDATE sync.tbl_syncperson SET person_portal='$radio_2' WHERE person_portal='$radio_1';";
+		$sql_query_upd1.="UPDATE lehre.tbl_abschlusspruefung SET pruefer1='$radio_2' WHERE pruefer1='$radio_1';";
+		$sql_query_upd1.="UPDATE lehre.tbl_abschlusspruefung SET pruefer2='$radio_2' WHERE pruefer2='$radio_1';";
+		$sql_query_upd1.="UPDATE lehre.tbl_abschlusspruefung SET pruefer3='$radio_2' WHERE pruefer3='$radio_1';";
+		$sql_query_upd1.="UPDATE lehre.tbl_projektbetreuer SET person_id='$radio_2' WHERE person_id='$radio_1';";
+		$sql_query_upd1.="UPDATE public.tbl_adresse SET person_id='$radio_2' WHERE person_id='$radio_1';";
+		$sql_query_upd1.="UPDATE public.tbl_akte SET person_id='$radio_2' WHERE person_id='$radio_1';";
+		$sql_query_upd1.="UPDATE public.tbl_bankverbindung SET person_id='$radio_2' WHERE person_id='$radio_1';";
+		$sql_query_upd1.="UPDATE public.tbl_kontakt SET person_id='$radio_2' WHERE person_id='$radio_1';";
+		
 		$sql_query_upd1.="DELETE FROM public.tbl_person WHERE person_id='$radio_1';";
-		/*wenn synchronisiert auch:
-		 * tbl_abschlusspruefung(pruefer1 bis 3), tbl_projektbetreuer, tbl_adresse, tbl_akte, tbl_bankverbindung, tbl_kontakt
-		 */
+		
 		$radio_1=0;
 		$radio_2=0;
 		if(pg_query($conn,$sql_query_upd1))
@@ -166,12 +173,12 @@ echo "</table></form>";
 
 	 //Tabelle 1
 	 echo "<table class='liste'><tr class='liste'>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=person_id&order_2=$order_2'>ID</a></th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=nachname&order_2=$order_2'>Nachname</a></th>";
+	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=person_id&order_2=$order_2&nn=$nn&vn=$vn'>ID</a></th>";
+	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=nachname&order_2=$order_2&nn=$nn&vn=$vn'>Nachname</a></th>";
 	 echo "<th>Vorname</th>";
 	 echo "<th>Geburtsdatum</th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=svnr&order_2=$order_2'>SVNr</a></th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=ersatzkennzeichen&order_2=$order_2'>Ersatzkennz.</a></th>";
+	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=svnr&order_2=$order_2&nn=$nn&vn=$vn'>SVNr</a></th>";
+	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=ersatzkennzeichen&order_2=$order_2&nn=$nn&vn=$vn'>Ersatzkennz.</a></th>";
 	 echo "<th>Ext-ID</th>";
 	 echo "<th>&nbsp;</th></tr>";
 
@@ -200,12 +207,12 @@ echo "</table></form>";
 	 //Tabelle 2
 	 echo "<table class='liste'><tr class='liste'>";
 	 echo "<th>&nbsp;</th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=person_id'>UID</a></th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=nachname'>Nachname</a></th>";
+	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=person_id&nn=$nn&vn=$vn'>UID</a></th>";
+	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=nachname&nn=$nn&vn=$vn'>Nachname</a></th>";
 	 echo "<th>Vorname</th>";
 	 echo "<th>Geburtsdatum</th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=svnr'>SVNr</a></th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=ersatzkennzeichen'>Ersatzkennz.</a></th>";
+	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=svnr&nn=$nn&vn=$vn'>SVNr</a></th>";
+	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=ersatzkennzeichen&nn=$nn&vn=$vn'>Ersatzkennz.</a></th>";
 	 echo "<th>Ext-ID</th>";
 	 echo "</tr>";
 
