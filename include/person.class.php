@@ -443,5 +443,72 @@ class person
 			return true;
 		}	
 	}
+	
+	/**
+	 * Liefert die Tabellenelemente die den Kriterien der Parameter entsprechen
+	 * @param 	$nn Nachname
+	 *		$vn Vorname
+	 *		$order Sortierkriterium
+	 * @return array mit LPersonen oder false=fehler
+	 */
+	function getTab($nn=null,$vn=null, $order='person_id')
+	{
+		$sql_query = "SELECT * FROM public.tbl_person";
+
+		if($nn!=null || $nn!=null)
+		   $sql_query .= " WHERE true";
+
+		if($nn!=null)
+		   $sql_query .= " AND nachname='$nn'";
+
+		if($vn!=null)
+			$sql_query .= " AND vorname='$vn'";
+
+		$sql_query .= " ORDER BY $order";
+		if($nn==null || $nn==null)
+		   $sql_query .= " LIMIT 30";
+
+		if($result=pg_query($this->conn,$sql_query))
+		{
+			while($row=pg_fetch_object($result))
+			{
+				$l = new person($this->conn);
+				$l->person_id = $row->person_id;
+				$l->staatsbuergerschaft = $row->staatsbuergerschaft;
+				$l->geburtsnation = $row->geburtsnation;
+				$l->sprache = $row->sprache;
+				$l->anrede = $row->anrede;
+				$l->titelpost = $row->titelpost;
+				$l->titelpre = $row->titelpre;
+				$l->nachname = $row->nachname;
+				$l->vorname = $row->vorname;
+				$l->vornamen = $row->vornamen;
+				$l->gebdatum = $row->gebdatum;
+				$l->gebort = $row->gebort;
+				$l->gebzeit = $row->gebzeit;
+				$l->foto = $row->foto;
+				$l->anmerkungen = $row->anmerkungen;
+				$l->homepage = $row->homepage;
+				$l->svnr = $row->svnr;
+				$l->ersatzkennzeichen = $row->ersatzkennzeichen;
+				$l->familienstand = $row->familienstand;
+				$l->geschlecht = $row->geschlecht;
+				$l->anzahlkinder = $row->anzahlkinder;
+				$l->aktiv = $row->aktiv;				
+				$l->updateamum = $row->updateamum;
+				$l->updatevon = $row->updatevon;
+				$l->insertamum = $row->insertamum;
+				$l->insertvon = $row->insertvon;
+				$l->ext_id = $row->ext_id;
+				$this->personen[]=$l;
+			}
+		}
+		else
+		{
+			$this->errormsg = pg_errormessage($this->conn);
+			return false;
+		}
+		return true;
+	}
 }
 ?>
