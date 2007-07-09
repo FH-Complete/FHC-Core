@@ -46,7 +46,7 @@ class projektarbeit
 	var $freigegeben;		// @var boolean
 	var $gesperrtbis;		// @var date
 	var $stundensatz;		// @var numeric(6,2)
-	var $gesamtstunden;	// @var integer
+	var $gesamtstunden;	// @var numeric(8,2)
 	var $themenbereich;		// @var sting
 	var $anmerkung;		// @var string
 	var $ext_id;			// @var integer
@@ -64,30 +64,81 @@ class projektarbeit
 	function projektarbeit($conn,$projektarbeit_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		if ($unicode)
+		
+		if($unicode!=null)
 		{
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			if ($unicode)
+			{
+				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			}
+			else
+			{
+				$qry="SET CLIENT_ENCODING TO 'LATIN9';";
+			}
+			if(!pg_query($conn,$qry))
+			{
+				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
+				return false;
+			}
 		}
-		else
-		{
-			$qry="SET CLIENT_ENCODING TO 'LATIN9';";
-		}
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-			return false;
-		}
-		//if($projektarbeit_id != null) 	$this->load($projektarbeit_id);
+		if($projektarbeit_id != null) 	
+			$this->load($projektarbeit_id);
 	}
 
 	/**
-	 * Laedt die Funktion mit der ID $projektarbeit_id
-	 * @param  $projektarbeit_id ID der zu ladenden Funktion
+	 * Laedt die Projektarbeit mit der ID $projektarbeit_id
+	 * @param  $projektarbeit_id ID der zu ladenden Projektarbeit
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	function load($projektarbeit_id)
 	{
-		//noch nicht implementiert
+		if(!is_numeric($projektarbeit_id))
+		{
+			$this->errormsg = 'Projektarbeit_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM lehre.tbl_projektarbeit WHERE projektarbeit_id='$projektarbeit_id'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$this->projektarbeit_id = $row->projektarbeit_id;
+				$this->projekttyp_kurzbz = $row->projekttyp_kurzbz;
+				$this->titel = $row->titel;
+				$this->lehreinheit_id = $row->lehreinheit_id;
+				$this->student_uid = $row->student_uid;
+				$this->firma_id = $row->firma_id;
+				$this->note = $row->note;
+				$this->punkte = $row->punkte;
+				$this->beginn = $row->beginn;
+				$this->ende = $row->ende;
+				$this->faktor = $row->faktor;
+				$this->freigegeben = ($row->freigegeben=='t'?true:false);
+				$this->gesperrtbis = $row->gesperrtbis;
+				$this->stundensatz = $row->stundensatz;
+				$this->gesamtstunden = $row->gesamtstunden;
+				$this->themenbereich = $row->themenbereich;
+				$this->anmerkung = $row->anmerkung;
+				$this->ext_id = $row->ext_id;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = 'Datensatz wurde nicht gefunden';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
 	}
 
 	/**
@@ -99,17 +150,17 @@ class projektarbeit
 
 		//Gesamtlaenge pruefen
 		//$this->errormsg='Eine der Gesamtlaengen wurde ueberschritten';
-		if ($this->projektarbeit_kurzbz=null)
+		if ($this->projekttyp_kurzbz==null)
 		{
-			$this->errormsg='Projektarbeit_kurzbz darf nicht NULL sein! - student_uid: '.$this->student_uid;
+			$this->errormsg='Projekttyp_kurzbz darf nicht NULL sein! - student_uid: '.$this->student_uid;
 		}
-		if ($this->lehreinheit_id=null)
+		if ($this->lehreinheit_id==null)
 		{
 			$this->errormsg='Lehreinheit_id darf nicht NULL sein! - student_uid: '.$this->student_uid;
 		}
-		if(strlen($this->projektarbeit_kurzbz)>16)
+		if(strlen($this->projekttyp_kurzbz)>16)
 		{
-			$this->errormsg = 'Projektarbeit_kurzbz darf nicht länger als 16 Zeichen sein  - student_uid: '.$this->student_uid;
+			$this->errormsg = 'Projektyp_kurzbz darf nicht länger als 16 Zeichen sein  - student_uid: '.$this->student_uid;
 			return false;
 		}
 		if(strlen($this->titel)>256)
@@ -177,17 +228,20 @@ class projektarbeit
 	 * andernfalls wird der Datensatz mit der ID in $projektarbeit_id aktualisiert
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function save()
+	function save($new=null)
 	{
 		//Variablen pruefen
 		if(!$this->checkvars())
 			return false;
 
-		if($this->new)
+		if($new==null)
+			$new = $this->new;
+			
+		if($new)
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry='INSERT INTO lehre.tbl_projektarbeit (projekttyp_kurzbz, titel, lehreinheit_id, student_uid, firma_id, note, punkte, 
+			$qry='BEGIN; INSERT INTO lehre.tbl_projektarbeit (projekttyp_kurzbz, titel, lehreinheit_id, student_uid, firma_id, note, punkte, 
 				beginn, ende, faktor, freigegeben, gesperrtbis, stundensatz, gesamtstunden, themenbereich, anmerkung, 
 				ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
 			     $this->addslashes($this->projekttyp_kurzbz).', '.
@@ -238,31 +292,40 @@ class projektarbeit
 				'gesamtstunden='.$this->addslashes($this->gesamtstunden).', '.
 				'themenbereich='.$this->addslashes($this->themenbereich).', '.
 				'anmerkung='.$this->addslashes($this->anmerkung).', '.
-			     	'updateamum= now(), '.
-			     	'updatevon='.$this->addslashes($this->updatevon).' '.
-			     	//'firmentyp='.$this->addslashes($this->firmentyp_kurzbz).' '.
+				'updateamum= now(), '.
+				'updatevon='.$this->addslashes($this->updatevon).' '.
 				'WHERE projektarbeit_id='.$this->addslashes($this->projektarbeit_id).';';
 		}
-		//echo $qry;
+		
 		if(pg_query($this->conn,$qry))
 		{
-			//Log schreiben
-			/*$sql = $qry;
-			$qry = "SELECT nextval('log_seq') as id;";
-			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
+			if($new)
 			{
-				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
-				return false;
+				//Sequence auslesen
+				$qry = "SELECT currval('lehre.tbl_projektarbeit_projektarbeit_id_seq') as id;";
+				if($result = pg_query($this->conn, $qry))
+				{
+					if($row = pg_fetch_object($result))
+					{
+						$this->projektarbeit_id = $row->id;
+						pg_query($this->conn, 'COMMIT');
+						return true;
+					}
+					else 
+					{
+						$this->errormsg = 'Fehler beim Auslesen der Sequence';
+						pg_query($this->conn, 'ROLLBACK;');
+						return false;
+					}
+				}
+				else 
+				{
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+					pg_query($this->conn, 'ROLLBACK;');
+					return false;
+				}
 			}
-
-			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
-			if(pg_query($this->conn, $qry))
-				return true;
-			else
-			{
-				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
-				return false;
-			}	*/
+					
 			return true;
 		}
 		else
@@ -279,7 +342,72 @@ class projektarbeit
 	 */
 	function delete($projektarbeit_id)
 	{
-		//noch nicht implementiert!
+		if(!is_numeric($projektarbeit_id))
+		{
+			$this->errormsg = 'Projektarbeit_id ist ungueltig';
+			return true;
+		}
+		
+		$qry = "DELETE FROM lehre.tbl_projektarbeit WHERE projektarbeit_id='$projektarbeit_id'";
+		
+		if(pg_query($this->conn, $qry))
+		{
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Loeschen des Datensatzes';
+			return false;
+		}		
+	}
+	
+	// ********************************************
+	// * Laedt alle Projektarbeiten eines Studenten
+	// * @param student_uid
+	// * @return true wenn ok, false wenn Fehler
+	// ********************************************
+	function getProjektarbeit($student_uid)
+	{
+		$qry = "SELECT * FROM lehre.tbl_projektarbeit WHERE student_uid='".addslashes($student_uid)."'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$obj = new projektarbeit($this->conn, null, null);
+				
+				$obj->projektarbeit_id = $row->projektarbeit_id;
+				$obj->projekttyp_kurzbz = $row->projekttyp_kurzbz;
+				$obj->titel = $row->titel;
+				$obj->lehreinheit_id = $row->lehreinheit_id;
+				$obj->student_uid = $row->student_uid;
+				$obj->firma_id = $row->firma_id;
+				$obj->note = $row->note;
+				$obj->punkte = $row->punkte;
+				$obj->beginn = $row->beginn;
+				$obj->ende = $row->ende;
+				$obj->faktor = $row->faktor;
+				$obj->freigegeben = ($row->freigegeben=='t'?true:false);
+				$obj->gesperrtbis = $row->gesperrtbis;
+				$obj->stundensatz = $row->stundensatz;
+				$obj->gesamtstunden = $row->gesamtstunden;
+				$obj->themenbereich = $row->themenbereich;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->ext_id = $row->ext_id;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				
+				$this->result[] = $obj;
+			}
+
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
 	}
 }
 ?>

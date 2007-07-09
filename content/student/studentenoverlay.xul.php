@@ -37,6 +37,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentiooverlay.xul.php"?
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentnotenoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentpruefungoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentabschlusspruefungoverlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentprojektarbeitoverlay.xul.php"?>';
 ?>
 <!DOCTYPE overlay >
 
@@ -190,6 +191,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentabschlusspruefungov
 							<tab id="student-tab-kontakt" label="Kontakt" />
 							<tab id="student-tab-pruefung" label="Prüfung" />
 							<tab id="student-tab-abschlusspruefung" label="AbschlussPrüfung" />
+							<tab id="student-tab-projektarbeit" label="Projektarbeit" />
 						</tabs>
 						<tabpanels id="student-tabpanels-main" flex="1">
 							<vbox id="student-detail"  style="margin-top:10px;" />
@@ -202,6 +204,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentabschlusspruefungov
 							<iframe id="student-kontakt" src="" style="margin-top:10px;" />
 							<vbox id="student-pruefung"  style="margin-top:10px;" />
 							<vbox id="student-abschlusspruefung"  style="margin-top:10px;" />
+							<vbox id="student-projektarbeit"  style="margin-top:10px;" />
 						</tabpanels>
 					</tabbox>	
 				</vbox>

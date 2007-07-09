@@ -50,6 +50,8 @@ require_once('../../include/zeugnisnote.class.php');
 require_once('../../include/lvgesamtnote.class.php');
 require_once('../../include/pruefung.class.php');
 require_once('../../include/abschlusspruefung.class.php');
+require_once('../../include/projektarbeit.class.php');
+require_once('../../include/projektbetreuer.class.php');
 
 $user = get_uid();
 
@@ -1491,6 +1493,164 @@ if(!$error)
 			else 
 			{
 				$errormsg = $pruefung->errormsg;
+				$return = false;
+			}
+		}
+		else 
+		{
+			$return = false;
+			$errormsg  = 'Fehlerhafte Parameteruebergabe';
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='saveprojektarbeit')  // **** Projektarbeit **** //
+	{
+		$projektarbeit = new projektarbeit($conn, null, true);
+		
+		if($_POST['neu']=='false')
+		{
+			if($projektarbeit->load($_POST['projektarbeit_id']))
+			{
+				$projektarbeit->new = false;
+			}
+			else 
+			{
+				$error = true;
+				$return = false;
+				$errormsg = $projektarbeit->errormsg;
+			}
+		}
+		else 
+		{
+			$projektarbeit->new = true;
+			$projektarbeit->insertamum = date('Y-m-d H:i:s');
+			$projektarbeit->insertvon = $user;
+		}
+				
+		$projektarbeit->projekttyp_kurzbz = $_POST['projekttyp_kurzbz'];
+		$projektarbeit->titel = $_POST['titel'];
+		$projektarbeit->lehreinheit_id = $_POST['lehreinheit_id'];
+		$projektarbeit->student_uid = $_POST['student_uid'];
+		$projektarbeit->firma_id = $_POST['firma_id'];
+		$projektarbeit->note = $_POST['note'];
+		$projektarbeit->punkte = str_replace(',','.',$_POST['punkte']);
+		$projektarbeit->beginn = $_POST['beginn'];
+		$projektarbeit->ende = $_POST['ende'];
+		$projektarbeit->faktor = str_replace(',','.',$_POST['faktor']);
+		$projektarbeit->freigegeben = ($_POST['freigegeben']=='true'?true:false);
+		$projektarbeit->gesperrtbis = $_POST['gesperrtbis'];
+		$projektarbeit->stundensatz = str_replace(',','.',$_POST['stundensatz']);
+		$projektarbeit->gesamtstunden = $_POST['gesamtstunden'];
+		$projektarbeit->themenbereich = $_POST['themenbereich'];
+		$projektarbeit->anmerkung = $_POST['anmerkung'];
+		$projektarbeit->updateamum = date('Y-m-d H:i:s');
+		$projektarbeit->updatevon = $user;
+		
+		if(!$error)
+		{
+			if($projektarbeit->save())
+			{
+				$return = true;
+				$data = $projektarbeit->projektarbeit_id;
+			}
+			else 
+			{
+				$return = false;
+				$errormsg = $projektarbeit->errormsg;
+			}
+		}			
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='deleteprojektarbeit')
+	{
+		//Loescht einen Projektarbeit Eintrag
+		if(isset($_POST['projektarbeit_id']) && is_numeric($_POST['projektarbeit_id']))
+		{
+			$projektarbeit = new projektarbeit($conn);
+
+			if($projektarbeit->delete($_POST['projektarbeit_id']))
+			{
+				$return = true;
+			}
+			else 
+			{
+				$errormsg = $projektarbeit->errormsg;
+				$return = false;
+			}
+		}
+		else 
+		{
+			$return = false;
+			$errormsg  = 'Fehlerhafte Parameteruebergabe';
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='saveprojektbetreuer')  // **** Projektbetreuer **** //
+	{
+		$projektbetreuer = new projektbetreuer($conn, null, null, true);
+		
+		if($_POST['neu']=='false')
+		{
+			if($projektbetreuer->load($_POST['person_id_old'], $_POST['projektarbeit_id']))
+			{
+				$projektbetreuer->new = false;
+			}
+			else 
+			{
+				$error = true;
+				$return = false;
+				$errormsg = $projektbetreuer->errormsg;
+			}
+		}
+		else 
+		{
+			if($projektbetreuer->load($_POST['person_id'], $_POST['projektarbeit_id']))
+			{
+				$error = true;
+				$errormsg = 'Dieser Betreuer ist bereits zugeteilt';
+			}
+			$projektbetreuer->new = true;
+			$projektbetreuer->insertamum = date('Y-m-d H:i:s');
+			$projektbetreuer->insertvon = $user;
+		}
+				
+		$projektbetreuer->person_id = $_POST['person_id'];
+		$projektbetreuer->person_id_old = $_POST['person_id_old'];
+		$projektbetreuer->projektarbeit_id = $_POST['projektarbeit_id'];
+		$projektbetreuer->note = $_POST['note'];
+		$projektbetreuer->faktor = str_replace(',','.', $_POST['faktor']);
+		$projektbetreuer->name = $_POST['name'];
+		$projektbetreuer->punkte = str_replace(',','.', $_POST['punkte']);
+		$projektbetreuer->stunden = str_replace(',','.', $_POST['stunden']);
+		$projektbetreuer->stundensatz = str_replace(',','.', $_POST['stundensatz']);
+		$projektbetreuer->betreuerart_kurzbz = $_POST['betreuerart_kurzbz'];
+		$projektbetreuer->updateamum = date('Y-m-d H:i:s');
+		$projektbetreuer->updatevon = $user;
+		
+		if(!$error)
+		{
+			if($projektbetreuer->save())
+			{
+				$return = true;
+			}
+			else 
+			{
+				$return = false;
+				$errormsg = $projektbetreuer->errormsg;
+			}
+		}			
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='deleteprojektbetreuer')
+	{
+		//Loescht einen Projektbetreuer Eintrag
+		if(isset($_POST['person_id']) && is_numeric($_POST['person_id']))
+		{
+			$projektbetreuer = new projektbetreuer($conn, null, null, true);
+
+			if($projektbetreuer->delete($_POST['person_id'], $_POST['projektarbeit_id']))
+			{
+				$return = true;
+			}
+			else 
+			{
+				$errormsg = $projektbetreuer->errormsg;
 				$return = false;
 			}
 		}
