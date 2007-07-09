@@ -161,7 +161,7 @@ echo "</table></form>";
 //aufruf
 ?>
 <br>
-<center><h2><?php echo $msg; ?></h2></center>
+<center><h2><?php echo "<span style=\"font-size:0.7em\">".$msg."</span>"; ?></h2></center>
 <br>
 <?php
 	//Tabellen anzeigen
@@ -207,7 +207,7 @@ echo "</table></form>";
 	 //Tabelle 2
 	 echo "<table class='liste'><tr class='liste'>";
 	 echo "<th>&nbsp;</th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=person_id&nn=$nn&vn=$vn'>UID</a></th>";
+	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=person_id&nn=$nn&vn=$vn'>ID</a></th>";
 	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=nachname&nn=$nn&vn=$vn'>Nachname</a></th>";
 	 echo "<th>Vorname</th>";
 	 echo "<th>Geburtsdatum</th>";
