@@ -215,7 +215,7 @@ $smax=$s[$stg_kz]->max_sem;
 	echo "<form name='form_table' action='lv_wartung.php?stg_kz=$stg_kz&semester=$semester&max=$smax&order_1=$order_1&order_2=$order_2' method='POST'>";
 	echo "<table width='100%' border='0' cellspacing='0' cellpadding='0'>";
 	echo "<tr>";
-		echo "<td valign='top'>Quelle:";
+		echo "<td valign='top'>Das wird gelöscht:";
 
 	 //Tabelle 1
 	 echo "<table class='liste'><tr class='liste'>";
@@ -244,7 +244,7 @@ $smax=$s[$stg_kz]->max_sem;
 	 echo "</table>";
 	 echo "</td>";
 	 echo "<td valign='top'><input type='submit' value='  ->  '></td>";
-	 echo "<td valign='top'>Ziel:";
+	 echo "<td valign='top'>Das bleibt:";
 
 	 //Tabelle 2
 	 echo "<table class='liste'><tr class='liste'>";
