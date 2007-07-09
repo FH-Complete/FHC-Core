@@ -224,6 +224,39 @@ class person
 			$this->errormsg = "*****\nSVNR darf nicht laenger als 10 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
+		if($this->svnr!='')
+		{
+			//SVNR mit Pruefziffer pruefen
+			//Die 4. Stelle in der SVNR ist die Pruefziffer
+			//(Summe von (gewichtung[i]*svnr[i])) modulo 11 ergibt diese Pruefziffer
+			//Falls nicht, ist die SVNR ungueltig
+			$gewichtung = array(3,7,9,0,5,8,4,2,1,6);
+			$erg=0;
+			//Quersumme bilden
+			for($i=0;$i<10;$i++)
+				$erg += $gewichtung[$i] * $this->svnr{$i};
+			
+			if($this->svnr{3}!=($erg%11)) //Vergleichen der Pruefziffer mit Quersumme Modulo 11
+			{
+				$this->errormsg = 'SVNR ist ungueltig';
+				return false;
+			}
+		}
+		
+		//Pruefen ob bereits ein Eintrag mit dieser SVNR vorhanden ist
+		$qry = "SELECT person_id FROM public.tbl_person WHERE svnr='$this->svnr'";
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				if($row->person_id!=$this->person_id)
+				{
+					$this->errormsg = 'Es existiert bereits eine Person mit dieser SVNR';
+					return false;
+				}
+			}
+		}
+		
 		if(utf8_strlen($this->ersatzkennzeichen)>10)
 		{
 			$this->errormsg = "*****\nErsatzkennzeichen darf nicht laenger als 10 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
@@ -444,73 +477,6 @@ class person
 		{
 			return true;
 		}	
-	}
-	
-	/**
-	 * Liefert die Tabellenelemente die den Kriterien der Parameter entsprechen
-	 * @param 	$nn Nachname
-	 *		$vn Vorname
-	 *		$order Sortierkriterium
-	 * @return array mit LPersonen oder false=fehler
-	 */
-	function getTab($nn=null,$vn=null, $order='person_id')
-	{
-		$sql_query = "SELECT * FROM public.tbl_person";
-
-		if($nn!=null || $vn!=null)
-		   $sql_query .= " WHERE true";
-
-		if($nn!=null)
-		   $sql_query .= " AND nachname='$nn'";
-
-		if($vn!=null)
-			$sql_query .= " AND vorname='$vn'";
-
-		$sql_query .= " ORDER BY $order";
-		if($nn==null || $nn==null)
-		   $sql_query .= " LIMIT 30";
-
-		if($result=pg_query($this->conn,$sql_query))
-		{
-			while($row=pg_fetch_object($result))
-			{
-				$l = new person($this->conn);
-				$l->person_id = $row->person_id;
-				$l->staatsbuergerschaft = $row->staatsbuergerschaft;
-				$l->geburtsnation = $row->geburtsnation;
-				$l->sprache = $row->sprache;
-				$l->anrede = $row->anrede;
-				$l->titelpost = $row->titelpost;
-				$l->titelpre = $row->titelpre;
-				$l->nachname = $row->nachname;
-				$l->vorname = $row->vorname;
-				$l->vornamen = $row->vornamen;
-				$l->gebdatum = $row->gebdatum;
-				$l->gebort = $row->gebort;
-				$l->gebzeit = $row->gebzeit;
-				$l->foto = $row->foto;
-				$l->anmerkungen = $row->anmerkungen;
-				$l->homepage = $row->homepage;
-				$l->svnr = $row->svnr;
-				$l->ersatzkennzeichen = $row->ersatzkennzeichen;
-				$l->familienstand = $row->familienstand;
-				$l->geschlecht = $row->geschlecht;
-				$l->anzahlkinder = $row->anzahlkinder;
-				$l->aktiv = $row->aktiv;				
-				$l->updateamum = $row->updateamum;
-				$l->updatevon = $row->updatevon;
-				$l->insertamum = $row->insertamum;
-				$l->insertvon = $row->insertvon;
-				$l->ext_id = $row->ext_id;
-				$this->personen[]=$l;
-			}
-		}
-		else
-		{
-			$this->errormsg = pg_errormessage($this->conn);
-			return false;
-		}
-		return true;
 	}
 }
 ?>
