@@ -455,7 +455,7 @@ class person
 	{
 		$sql_query = "SELECT * FROM public.tbl_person";
 
-		if($nn!=null || $nn!=null)
+		if($nn!=null || $vn!=null)
 		   $sql_query .= " WHERE true";
 
 		if($nn!=null)
