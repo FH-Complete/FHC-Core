@@ -1137,6 +1137,11 @@ function StudentAuswahl()
 	// ****** Abschlusspruefung ******** //
 	StudentAbschlusspruefungDetailDisableFields(true);
 	StudentAbschlusspruefungTreeLoad(uid);	
+	
+	// ****** Projektarbeit ********* //
+	StudentProjektarbeitDetailDisableFields(true);
+	StudentProjektbetreuerDisableFields(true);
+	StudentProjektarbeitTreeLoad(uid);
 }
 
 // ****

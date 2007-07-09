@@ -70,16 +70,18 @@ class person
 	function person($conn, $person_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
-		if(!pg_query($conn,$qry))
+		if(!$unicode==null)
 		{
-			$this->errormsg	 = "Encoding konnte nicht gesetzt werden\n";
-			return false;
+			if($unicode)
+				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			else 
+				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+				
+			if(!pg_query($conn,$qry))
+			{
+				$this->errormsg	 = "Encoding konnte nicht gesetzt werden\n";
+				return false;
+			}
 		}
 		
 		if($person_id != null)

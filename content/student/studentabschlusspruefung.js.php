@@ -397,7 +397,7 @@ function StudentAbschlusspruefungSpeichern()
 
 	if(sponsion!='' && !CheckDatum(sponsion))
 	{
-		alert('Datum ist ungueltig');
+		alert('Sponsionsdatum ist ungueltig');
 		return false;
 	}
 
