@@ -52,17 +52,20 @@ class lehreinheitgruppe
 	{
 		$this->conn = $conn;
 
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-		if(!pg_query($conn,$qry))
+		if($unicode!=null)
 		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
+			if($unicode)
+				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			else
+				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+	
+			if(!pg_query($conn,$qry))
+			{
+				$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
+				return false;
+			}
 		}
-
+			
 		if($lehreinheitgruppe_id!=null)
 			$this->load($lehreinheitgruppe_id);
 	}
@@ -274,7 +277,7 @@ class lehreinheitgruppe
 		{
 			while($row = pg_fetch_object($result))
 			{
-				$leg_obj = new lehreinheitgruppe($this->conn);
+				$leg_obj = new lehreinheitgruppe($this->conn, null, null);
 
 				$leg_obj->lehreinheitgruppe_id = $row->lehreinheitgruppe_id;
 				$leg_obj->lehreinheit_id = $row->lehreinheit_id;

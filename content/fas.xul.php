@@ -220,9 +220,9 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 		<?php
 			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('lva-verwaltung'))
 			{
-				echo '<tab id="tab-verband" label="Verband" />';
-				echo '<tab id="tab-fachbereich" label="Fachbereich" />';
-				echo '<tab id="tab-lektor" label="Lektor" />';
+				echo '<tab id="tab-verband" label="Verband" onclick="ChangeTabVerband()"/>';
+				echo '<tab id="tab-fachbereich" label="Fachbereich" onclick="ChangeTabsToLehrveranstaltung()"/>';
+				echo '<tab id="tab-lektor" label="Lektor" onclick="ChangeTabsToLehrveranstaltung()"/>';
 			}
 			if($rechte->isBerechtigt('admin','0') || $rechte->isBerechtigt('mitarbeiter'))
 			{

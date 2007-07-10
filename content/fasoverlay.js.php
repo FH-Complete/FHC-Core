@@ -635,7 +635,38 @@ function StatistikPrintLehrauftragsliste()
 	window.open('<?php echo APP_ROOT ?>content/statistik/lehrauftragsliste_gst.xls.php?studiengang_kz='+studiengang_kz,'Lehrauftragsliste');
 }
 
+// ****
+// * Oeffnet den About Dialog
+// ****
 function OpenAboutDialog()
 {
 	window.open('<?php echo APP_ROOT ?>content/about.xul.php','About','height=520,width=500,left=350,top=350,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+
+// ****
+// * Wenn der Tab Mitarbeiter aktiviert ist und der Prestudent-, Student- oder Lehrveranstaltungstab
+// * markiert wird, dann wird im Menue auf den Verband Tag gewechselt
+// ****
+function ChangeTabsToVerband()
+{
+	if(document.getElementById('menu-content-tabs').selectedItem==document.getElementById('tab-menu-mitarbeiter'))
+		document.getElementById('menu-content-tabs').selectedItem=document.getElementById('tab-verband');
+}
+
+// ****
+// * Wenn der Tab Fachbereich oder Lektor gewaehlt wird, dann wird auf den Tab Lehrveranstaltung gewechselt
+// ****
+function ChangeTabsToLehrveranstaltung()
+{
+	document.getElementById('main-content-tabs').selectedItem=document.getElementById('tab-lfvt');
+}
+
+// ****
+// * Wenn der Tab Mitarbeiter Markiert ist, und auf den Tab Verband geklickt wird, 
+// * dann wird der StudententTab markiert
+// ****
+function ChangeTabVerband()
+{
+	if(document.getElementById('main-content-tabs').selectedItem==document.getElementById('tab-mitarbeiter'))
+		document.getElementById('main-content-tabs').selectedItem=document.getElementById('tab-studenten');
 }

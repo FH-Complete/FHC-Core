@@ -30,6 +30,7 @@ loadVariables($conn, $user);
 ?>
 // *********** Globale Variablen *****************//
 var MitarbeiterSelectUid=null; //UID des zu selektierenden Mitarbeiters
+var MitarbeiterTreeDatasource=null; // Datasource des Mitarbeiter Trees
 var MitarbeiterTreeLoadDataOnSelect=true; // Gibt an ob die Details beim markieren eines Mitarbeiters geladen werden sollen
 var MitarbeiterVerwendungTreeDatasource=null; // Datasource des Verwendungstrees
 var MitarbeiterVerwendungSelectID=null; // ID der Verwendung die nach dem rebuild markiert werden soll
@@ -204,15 +205,21 @@ var MitarbeiterEntwicklungsteamTreeListener =
 // ****************** FUNKTIONEN ************************** //
 
 // ****
-// * Wenn der Mitarbeiter Tab markiert wird, dann wird
-// * automatisch der Mitarbeiter Reiter im linken Tree 
-// * markiert.
+// * Beim Sortieren des Trees wird der markierte Eintrag gespeichert und nach dem sortieren
+// * wieder markiert.
 // ****
-function MitarbeiterTabSelect()
+function MitarbeiterTreeSort()
 {
-	//Index des Mitarbeiter Tabs ermitteln
-
-	//Tab markieren
+	var i;
+	var tree=document.getElementById('mitarbeiter-tree');
+	if(tree.currentIndex>=0)
+		i = tree.currentIndex;
+	else
+		i = 0;
+	col = tree.columns ? tree.columns["mitarbeiter-treecol-uid"] : "mitarbeiter-treecol-uid";
+	MitarbeiterSelectUid = tree.view.getCellText(i,col);
+	MitarbeiterTreeLoadDataOnSelect=false;
+	window.setTimeout("MitarbeiterTreeSelectMitarbeiter()",10);
 }
 
 // ****
@@ -340,6 +347,22 @@ function MitarbeiterTreeSelectMitarbeiter()
 	   	}
 	}
 	document.getElementById('mitarbeiter-toolbar-label-anzahl').value='Anzahl: '+items;
+}
+
+// ****
+// * Aktualisiert den MitarbeiterTree
+// ****
+function MitarbeiterTreeRefresh()
+{
+	var tree=document.getElementById('mitarbeiter-tree');
+	if(tree.currentIndex>=0)
+		i = tree.currentIndex;
+	else
+		i = 0;
+	col = tree.columns ? tree.columns["mitarbeiter-treecol-uid"] : "mitarbeiter-treecol-uid";
+	MitarbeiterSelectUid = tree.view.getCellText(i,col);
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	MitarbeiterTreeDatasource.Refresh(false);
 }
 
 // ****
