@@ -687,7 +687,7 @@ if($result = pg_query($conn_fas, $qry))
 		}
 		//if(!is_numeric($person_id))
 		{
-			$error_log = 'person_id muss eine gueltige Zahl sein '.$nachname.", ".$vorname."\n";
+			//$error_log = 'person_id muss eine gueltige Zahl sein, bei: '.$nachname.", ".$vorname."\n";
 		}//
 		if(strlen($matrikelnr)>15)
 		{
@@ -1977,8 +1977,8 @@ if($result = pg_query($conn_fas, $qry))
 						if(!is_numeric($person_id))
 						{				
 							$error=true;
-							$text.='person_id muss eine gueltige Zahl sein\n';
-							$error_log.= 'person_id muss eine gueltige Zahl sein\n';
+							$text.='person_id muss eine gueltige Zahl sein.\n';
+							$error_log.= 'person_id muss eine gueltige Zahl sein.\n';
 						}
 						
 						
