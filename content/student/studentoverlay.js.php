@@ -1134,6 +1134,8 @@ function StudentAuswahl()
 	StudentPruefungTreeDatasource.addXMLSinkObserver(StudentPruefungTreeSinkObserver);
 	pruefungtree.builder.addListener(StudentPruefungTreeListener);
 	
+	StudentPruefungDetailDisableFields(true);
+	
 	// ****** Abschlusspruefung ******** //
 	StudentAbschlusspruefungDetailDisableFields(true);
 	StudentAbschlusspruefungTreeLoad(uid);	

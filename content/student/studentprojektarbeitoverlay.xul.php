@@ -468,7 +468,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<spacer />
 								<hbox>
 									<spacer flex="1" />
-									<button id="student-projektbetreuer-speichern" label="Speichern" oncommand="StudentProjektbetreuerSpeichern()" />
+									<button id="student-projektbetreuer-button-speichern" label="Speichern" oncommand="StudentProjektbetreuerSpeichern()" />
 								</hbox>
 							</row>
 						</rows>

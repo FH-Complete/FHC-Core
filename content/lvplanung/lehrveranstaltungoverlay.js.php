@@ -649,9 +649,7 @@ function LeAuswahl()
 			LehrveranstaltungNotenDisableFields(false);
 
 			//Noten Laden
-			//ToDo: Select fuer das Laden der Noten optimieren, dann kann dieser
-			//Aufruf wieder Einkommentiert werden
-			//LehrveranstaltungNotenLoad(lehrveranstaltung_id);
+			LehrveranstaltungNotenLoad(lehrveranstaltung_id);
 
 			LeDetailDisableFields(true);
 			//Details zuruecksetzen

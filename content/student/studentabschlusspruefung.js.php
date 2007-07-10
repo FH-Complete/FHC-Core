@@ -446,10 +446,36 @@ function StudentAbschlusspruefungSpeichern()
 // ****
 function StudentAbschlusspruefungNeu()
 {
+
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	document.getElementById('student-abschlusspruefung-checkbox-neu').checked=true;
 	document.getElementById('student-abschlusspruefung-textbox-abschlusspruefung_id').value='';
 	StudentAbschlusspruefungResetFields();
 	StudentAbschlusspruefungDetailDisableFields(false);
+	
+	var verband_tree=document.getElementById('tree-verband');
+	var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
+	var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+	
+	//Akadgrad DropDown laden
+	var AkadgradDropDown = document.getElementById('student-abschlusspruefung-menulist-akadgrad');
+	url='<?php echo APP_ROOT;?>rdf/akadgrad.rdf.php?studiengang_kz='+stg_kz+"&"+gettimestamp();
+	//Alte DS entfernen
+	var oldDatasources = AkadgradDropDown.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		AkadgradDropDown.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	AkadgradDropDown.builder.rebuild();
+
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var datasource = rdfService.GetDataSourceBlocking(url);
+	datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	AkadgradDropDown.database.AddDataSource(datasource);
+	
+	AkadgradDropDown.builder.rebuild();
 }
 
 // ****

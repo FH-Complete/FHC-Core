@@ -470,10 +470,36 @@ function StudentProjektarbeitSpeichern()
 // ****
 function StudentProjektarbeitNeu()
 {
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	
 	document.getElementById('student-projektarbeit-checkbox-neu').checked=true;
 	document.getElementById('student-projektarbeit-textbox-projektarbeit_id').value='';
 	StudentProjektarbeitResetFields();
 	StudentProjektarbeitDetailDisableFields(false);
+	var verband_tree=document.getElementById('tree-verband');
+	var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
+	var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+	
+	//Lehrveranstaltung DropDown laden
+	var LvDropDown = document.getElementById('student-projektarbeit-menulist-lehrveranstaltung');
+	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&"+gettimestamp();
+
+	//Alte DS entfernen
+	var oldDatasources = LvDropDown.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		LvDropDown.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	LvDropDown.builder.rebuild();
+
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var datasource = rdfService.GetDataSourceBlocking(url);
+	datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	LvDropDown.database.AddDataSource(datasource);
+	
+	LvDropDown.builder.rebuild();
 }
 
 // ****
@@ -684,6 +710,7 @@ function StudentProjektbetreuerDetailDisableFields(val)
 	document.getElementById('student-projektbetreuer-textbox-punkte').disabled=val;
 	document.getElementById('student-projektbetreuer-textbox-stunden').disabled=val;
 	document.getElementById('student-projektbetreuer-textbox-stundensatz').disabled=val;
+	document.getElementById('student-projektbetreuer-button-speichern').disabled=val;
 }
 
 // ****
