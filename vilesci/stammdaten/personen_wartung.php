@@ -116,7 +116,7 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 		$radio_2=0;
 		if(pg_query($conn,$sql_query_upd1))
 		{
-			$msg = "Daten Erfolgreich gespeichert<br>";
+			$msg = "Daten erfolgreich gespeichert<br>";
 			pg_query($conn,"COMMIT;");
 			$msg .= "<br>".str_replace(';',';<br>',$sql_query_upd1)."COMMIT";
 		}
