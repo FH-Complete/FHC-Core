@@ -127,33 +127,6 @@ $pruefung = new abschlusspruefung($conn, null, true);
 if ($xmlformat=='rdf')
 {
 	$rdf_url='http://www.technikum-wien.at/abschlusspruefung';
-
-	echo '
-	<RDF:RDF
-		xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-		xmlns:ABSCHLUSSPRUEFUNG="'.$rdf_url.'/rdf#"
-	>
-
-	   <RDF:Seq about="'.$rdf_url.'/liste">
-	';
-
-	if(isset($_GET['student_uid']))
-	{
-		$pruefung->getAbschlusspruefungen($_GET['student_uid']);
-
-		foreach ($pruefung->result as $row)
-			draw_content($row);
-	}
-	elseif(isset($_GET['abschlusspruefung_id']) && is_numeric($_GET['abschlusspruefung_id']))
-	{
-		if($pruefung->load($_GET['abschlusspruefung_id']))
-			draw_content($pruefung);
-		else
-			die('Eintrag wurde nicht gefunden');
-	}
-	else
-		die('Student_uid oder Abschlusspruefung_id muss uebergeben werden');
-
 	function draw_content($row)
 	{
 		global $conn, $rdf_url, $datum_obj;
@@ -200,6 +173,33 @@ if ($xmlformat=='rdf')
 	      </RDF:li>
 	      ';
 	}
+	echo '
+	<RDF:RDF
+		xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+		xmlns:ABSCHLUSSPRUEFUNG="'.$rdf_url.'/rdf#"
+	>
+
+	   <RDF:Seq about="'.$rdf_url.'/liste">
+	';
+
+	if(isset($_GET['student_uid']))
+	{
+		$pruefung->getAbschlusspruefungen($_GET['student_uid']);
+
+		foreach ($pruefung->result as $row)
+			draw_content($row);
+	}
+	elseif(isset($_GET['abschlusspruefung_id']) && is_numeric($_GET['abschlusspruefung_id']))
+	{
+		if($pruefung->load($_GET['abschlusspruefung_id']))
+			draw_content($pruefung);
+		else
+			die('Eintrag wurde nicht gefunden');
+	}
+	else
+		die('Student_uid oder Abschlusspruefung_id muss uebergeben werden');
+
+	
 	echo '	</RDF:Seq>';
 	echo '</RDF:RDF>';
 }	//endof xmlformat==rdf
