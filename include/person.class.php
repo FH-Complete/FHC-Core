@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -30,7 +30,7 @@ class person
 	var $new;      			// boolean
 	var $personen = array(); 	// person Objekt
 	var $done=false;		// boolean
-	
+
 	//Tabellenspalten
 	var $person_id;        		// integer
 	var $sprache;			// varchar(16)
@@ -59,12 +59,12 @@ class person
 	var $staatsbuergerschaft;	// varchar(3)
 	var $geburtsnation;		// varchar(3);
 	var $ext_id;            		// bigint
-	
+
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine Person
 	// * @param $conn        	Datenbank-Connection
 	// *        $person_id      Person die geladen werden soll (default=null)
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
+	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
 	function person($conn, $person_id=null, $unicode=false)
@@ -74,20 +74,20 @@ class person
 		{
 			if($unicode)
 				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			else 
+			else
 				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-				
+
 			if(!pg_query($conn,$qry))
 			{
 				$this->errormsg	 = "Encoding konnte nicht gesetzt werden\n";
 				return false;
 			}
 		}
-		
+
 		if($person_id != null)
 			$this->load($person_id);
 	}
-	
+
 	// *********************************************************
 	// * Laedt Person mit der uebergebenen ID
 	// * @param $person_id ID der Person die geladen werden soll
@@ -98,17 +98,17 @@ class person
 		if(is_numeric($person_id) && $person_id!='')
 		{
 			$qry = "SELECT person_id, sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen,
-				gebdatum, gebort, gebzeit, foto, anmerkungen, homepage, svnr, ersatzkennzeichen, 
+				gebdatum, gebort, gebzeit, foto, anmerkungen, homepage, svnr, ersatzkennzeichen,
 				familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon, ext_id,
-				geschlecht, staatsbuergerschaft, geburtsnation 
+				geschlecht, staatsbuergerschaft, geburtsnation
 				FROM public.tbl_person WHERE person_id='$person_id'";
-			
+
 			if(!$result=pg_query($this->conn,$qry))
 			{
 				$this->errormsg = "Fehler beim lesen der Personendaten\n";
 				return false;
 			}
-			
+
 			if($row = pg_fetch_object($result))
 			{
 				$this->person_id = $row->person_id;
@@ -144,7 +144,7 @@ class person
 				$this->errormsg = "Es ist kein Personendatensatz mit der ID ".$person_id." vorhanden\n";
 				return false;
 			}
-			
+
 			return true;
 		}
 		else
@@ -153,9 +153,9 @@ class person
 			return false;
 		}
 	}
-	
+
 	// *******************************************
-	// * Prueft die Variablen vor dem Speichern 
+	// * Prueft die Variablen vor dem Speichern
 	// * auf Gueltigkeit.
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
@@ -175,7 +175,7 @@ class person
 		{
 			$this->errormsg = "*****\nTitelpost darf nicht laenger als 32 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
-		} 
+		}
 		if(utf8_strlen($this->titelpre)>64)
 		{
 			$this->errormsg = "*****\nTitelpre darf nicht laenger als 64 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
@@ -190,8 +190,8 @@ class person
 		{
 			$this->errormsg = "*****\nNachname muss eingegeben werden: ".$this->ext_id.", ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
-		}		
-		
+		}
+
 		if(utf8_strlen($this->vorname)>32)
 		{
 			$this->errormsg = "*****\nVorname darf nicht laenger als 32 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
@@ -213,7 +213,7 @@ class person
 			$this->errormsg = "*****\nGeburtsort darf nicht laenger als 128 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
-		
+
 		if(utf8_strlen($this->homepage)>256)
 		{
 			$this->errormsg = "*****\nHomepage darf nicht laenger als 256 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
@@ -235,14 +235,14 @@ class person
 			//Quersumme bilden
 			for($i=0;$i<10;$i++)
 				$erg += $gewichtung[$i] * $this->svnr{$i};
-			
+
 			if($this->svnr{3}!=($erg%11)) //Vergleichen der Pruefziffer mit Quersumme Modulo 11
 			{
 				$this->errormsg = 'SVNR ist ungueltig';
 				return false;
 			}
 		}
-		
+
 		//Pruefen ob bereits ein Eintrag mit dieser SVNR vorhanden ist
 		$qry = "SELECT person_id FROM public.tbl_person WHERE svnr='$this->svnr'";
 		if($result = pg_query($this->conn, $qry))
@@ -256,7 +256,7 @@ class person
 				}
 			}
 		}
-		
+
 		if(utf8_strlen($this->ersatzkennzeichen)>10)
 		{
 			$this->errormsg = "*****\nErsatzkennzeichen darf nicht laenger als 10 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
@@ -312,13 +312,13 @@ class person
 			$this->errormsg = "*****\nGeschlecht muß entweder w oder m sein!: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
-		
-		return true;		
+
+		return true;
 	}
-	
+
 	// ************************************************
 	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische 
+	// * wenn $var !='' ist werden datenbankkritische
 	// * Zeichen mit backslash versehen und das Ergebnis
 	// * unter Hochkomma gesetzt.
 	// ************************************************
@@ -326,7 +326,7 @@ class person
 	{
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
-	
+
 	// ************************************************************
 	// * Speichert die Personendaten in die Datenbank
 	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
@@ -334,15 +334,15 @@ class person
 	// * @return true wenn erfolgreich, false im Fehlerfall
 	// ************************************************************
 	function save()
-	{		
+	{
 		//Variablen auf Gueltigkeit pruefen
 		if(!person::validate())
 			return false;
-		
+
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = 'INSERT INTO public.tbl_person (sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen, 
-			                    gebdatum, gebort, gebzeit, foto, anmerkungen, homepage, svnr, ersatzkennzeichen, 
+			$qry = 'INSERT INTO public.tbl_person (sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen,
+			                    gebdatum, gebort, gebzeit, foto, anmerkungen, homepage, svnr, ersatzkennzeichen,
 			                    familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon,
 			                    geschlecht, geburtsnation, staatsbuergerschaft, ext_id)
 			        VALUES('.$this->addslashes($this->sprache).','.
@@ -377,18 +377,18 @@ class person
 		{
 			//person_id auf gueltigkeit pruefen
 			if(!is_numeric($this->person_id))
-			{				
+			{
 				$this->errormsg = "person_id muss eine gueltige Zahl sein\n";
 				return false;
 			}
-			
+
 			//update nur wenn änderungen gemacht
 			$qry="SELECT * FROM public.tbl_person WHERE person_id='$this->person_id';";
 			if($result = pg_query($this->conn, $qry))
 			{
 				if($row = pg_fetch_object($result))
 				{
-					$update=false;			
+					$update=false;
 					if($row->sprache!=$this->sprache) 				$update=true;
 					if($row->anrede!=$this->anrede) 					$update=true;
 					if($row->titelpost!=$this->titelpost) 					$update=true;
@@ -410,7 +410,7 @@ class person
 					if($row->geburtsnation!=$this->geburtsnation) 			$update=true;
 					if($row->geschlecht!=$this->geschlecht) 				$update=true;
 					if($row->staatsbuergerschaft!=$this->staatsbuergerschaft)	$update=true;
-										
+
 					if($update)
 					{
 						$qry = 'UPDATE public.tbl_person SET'.
@@ -446,10 +446,10 @@ class person
 				}
 			}
 		}
-				
+
 		if ($this->done)
 		{
-			
+
 			if(pg_query($this->conn,$qry))
 			{
 				if($this->new)
@@ -458,25 +458,92 @@ class person
 					if($row=pg_fetch_object(pg_query($this->conn,$qry)))
 						$this->person_id=$row->id;
 					else
-					{					
+					{
 						$this->errormsg = "Sequence konnte nicht ausgelesen werden\n";
 						return false;
 					}
 				}
 				//Log schreiben
 				return true;
-				
+
 			}
 			else
-			{			
+			{
 				$this->errormsg = "*****\nFehler beim Speichern des Person-Datensatzes: ".$this->nachname."\n".$qry."\n".pg_errormessage($this->conn)."\n*****\n";
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			return true;
-		}	
+		}
 	}
+	/**
+	 * Liefert die Tabellenelemente die den Kriterien der Parameter entsprechen
+	 * @param 	$nn Nachname
+	 *		$vn Vorname
+	 *		$order Sortierkriterium
+	 * @return array mit LPersonen oder false=fehler
+	 */
+	function getTab($nn=null,$vn=null, $order='person_id')
+	{
+		$sql_query = "SELECT * FROM public.tbl_person";
+
+		if($nn!=null || $vn!=null)
+		   $sql_query .= " WHERE true";
+
+		if($nn!=null)
+		   $sql_query .= " AND nachname='$nn'";
+
+		if($vn!=null)
+			$sql_query .= " AND vorname='$vn'";
+
+		$sql_query .= " ORDER BY $order";
+		if($nn==null || $nn==null)
+		   $sql_query .= " LIMIT 30";
+
+		if($result=pg_query($this->conn,$sql_query))
+		{
+			while($row=pg_fetch_object($result))
+			{
+				$l = new person($this->conn);
+				$l->person_id = $row->person_id;
+				$l->staatsbuergerschaft = $row->staatsbuergerschaft;
+				$l->geburtsnation = $row->geburtsnation;
+				$l->sprache = $row->sprache;
+				$l->anrede = $row->anrede;
+				$l->titelpost = $row->titelpost;
+				$l->titelpre = $row->titelpre;
+				$l->nachname = $row->nachname;
+				$l->vorname = $row->vorname;
+				$l->vornamen = $row->vornamen;
+				$l->gebdatum = $row->gebdatum;
+				$l->gebort = $row->gebort;
+				$l->gebzeit = $row->gebzeit;
+				$l->foto = $row->foto;
+				$l->anmerkungen = $row->anmerkungen;
+				$l->homepage = $row->homepage;
+				$l->svnr = $row->svnr;
+				$l->ersatzkennzeichen = $row->ersatzkennzeichen;
+				$l->familienstand = $row->familienstand;
+				$l->geschlecht = $row->geschlecht;
+				$l->anzahlkinder = $row->anzahlkinder;
+				$l->aktiv = $row->aktiv;
+				$l->updateamum = $row->updateamum;
+				$l->updatevon = $row->updatevon;
+				$l->insertamum = $row->insertamum;
+				$l->insertvon = $row->insertvon;
+				$l->ext_id = $row->ext_id;
+				$this->personen[]=$l;
+			}
+		}
+		else
+		{
+			$this->errormsg = pg_errormessage($this->conn);
+			return false;
+		}
+		return true;
+	}
+
 }
 ?>
