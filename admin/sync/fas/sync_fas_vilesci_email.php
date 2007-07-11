@@ -157,7 +157,7 @@ if($result = pg_query($conn_fas, $qry))
 		{
 			if($kontakt->new || $update)
 			{
-				echo $studiengang_kz."<br>";
+				//echo $studiengang_kz."<br>";
 				if(!$kontakt->save())
 				{
 					$error_log.=$kontakt->errormsg."\n";
