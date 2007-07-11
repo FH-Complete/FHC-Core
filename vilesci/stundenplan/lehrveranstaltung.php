@@ -59,13 +59,13 @@ $outp='';
 $s=array();
 foreach ($studiengang as $stg)
 {
-	$outp.= '<A href="'.$PHP_SELF.'?stg_kz='.$stg->studiengang_kz.'&semester='.$semester.'">'.$stg->kuerzel.'</A> - ';
+	$outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg->studiengang_kz.'&semester='.$semester.'">'.$stg->kuerzel.'</A> - ';
 	$s[$stg->studiengang_kz]->max_sem=$stg->max_semester;
 	$s[$stg->studiengang_kz]->kurzbz=$stg->kurzbzlang;
 }
 $outp.= '<BR> -- ';
 for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
-	$outp.= '<A href="'.$PHP_SELF.'?stg_kz='.$stg_kz.'&semester='.$i.'">'.$i.'</A> -- ';
+	$outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semester='.$i.'">'.$i.'</A> -- ';
 ?>
 
 <html>
@@ -95,8 +95,8 @@ if ($result_lv!=0)
 	   $row=pg_fetch_object($result_lv);
 	   echo "<tr class='liste".($i%2)."'>";
 	   echo "<td align='right'>$row->lehrveranstaltung_id</td><td>$row->kurzbz</td><td>$row->bezeichnung</td><td>$row->ects</td>";
-	   echo "<td><a href='$PHP_SELF?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&lehre=$row->lehre'><img src='../../skin/images/".($row->lehre=='t'?'true.gif':'false.gif')."'></a></td>";
-	   echo "<td><form action='$PHP_SELF?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester' method='POST'><input type='text' value='$row->lehreverzeichnis' size='4' name='lehrevz'><input type='submit' value='ok'></form></td>";
+	   echo "<td><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&lehre=$row->lehre'><img src='../../skin/images/".($row->lehre=='t'?'true.gif':'false.gif')."'></a></td>";
+	   echo "<td><form action='?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester' method='POST'><input type='text' value='$row->lehreverzeichnis' size='4' name='lehrevz'><input type='submit' value='ok'></form></td>";
 	   echo "<td>".($row->aktiv=='t'?'Ja':'Nein')."</td>";
 	   echo "</tr>\n";
 	}

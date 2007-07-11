@@ -9,6 +9,7 @@
 		$stylesheet=$_COOKIE['stylesheet'];
 	else
 		$stylesheet=DEFAULT_STYLE;
+	//setcookie('stylesheet', DEFAULT_STYLE);
 	header("Content-Type: text/css");
 	readfile ($path.'skin/styles/'.$stylesheet.'.css');
 ?>

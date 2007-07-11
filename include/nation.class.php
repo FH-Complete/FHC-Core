@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -31,10 +31,10 @@ class nation
 	var $errormsg; // string
 	var $new;      // boolean
 	var $nation = array(); // nation Objekt
-	
+
 	//Tabellenspalten
-	var $code;   
-	var $sperre; 
+	var $code;
+	var $sperre;
 	var $kontinent;
 	var $entwicklungsstand;
 	var $eu;
@@ -42,7 +42,7 @@ class nation
 	var $kurztext;
 	var $langtext;
 	var $engltext;
-	
+
 	/**
 	 * Konstruktor
 	 * @param $conn      Connection
@@ -51,34 +51,60 @@ class nation
 	function nation($conn, $code=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
+		else
 			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
+
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-		
-		//if($person_id != null)
-		//	$this->load($person_id);
+
+		if($code != null)
+			$this->load($code);
 	}
-	
-	
+
+
 	/**
 	 * Laedt die Funktion mit der ID $adress_id
 	 * @param  $code code der zu ladenden Nation
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	function load($code)
-	{			
-		$this->errormsg = 'Noch nicht implementiert';
-		return false;
+	{
+		//Lesen der Daten aus der Datenbank
+		$qry = "SELECT * FROM bis.tbl_nation WHERE nation_code='$code';";
+		//echo $qry;
+		if(!$res = pg_query($this->conn,$qry))
+		{
+			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
+			return false;
+		}
+
+		if($row = pg_fetch_object($res))
+		{
+			$this->code = $code;
+
+			$this->sperre = ($row->sperre=='t'?true:false);
+			$this->kontinent = $row->kontinent;
+			$this->entwicklungsstand = $row->entwicklungsstand;
+			$this->eu = ($row->eu=='t'?true:false);
+			$this->ewr = ($row->ewr=='t'?true:false);
+			$this->kurztext = $row->kurztext;
+			$this->langtext = $row->langtext;
+			$this->engltext = $row->engltext;
+		}
+		else
+		{
+			$this->errormsg = 'Kein Datensatz vorhanden!';
+			return false;
+		}
+		return true;
 	}
-	
+
 	/**
 	 * Laedt alle Nationen
 	 * @param ohnesperre wenn dieser Parameter auf true gesetzt ist werden
@@ -90,21 +116,21 @@ class nation
 		$qry = "SELECT * FROM bis.tbl_nation";
 		if($ohnesperre)
 			$qry .= " WHERE sperre is null";
-			
+
 		$qry .=" ORDER BY kurztext";
-		
+
 		if(!$res = pg_query($this->conn,$qry))
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
 			return false;
 		}
-		
+
 		while($row = pg_fetch_object($res))
 		{
 			$nation = new nation($this->conn);
-		
+
 			$nation->code = $row->nation_code;
-			$nation->sperre = ($row->sperre=='t'?true:false); 
+			$nation->sperre = ($row->sperre=='t'?true:false);
 			$nation->kontinent = $row->kontinent;
 			$nation->entwicklungsstand = $row->entwicklungsstand;
 			$nation->eu = ($row->eu=='t'?true:false);
@@ -112,7 +138,7 @@ class nation
 			$nation->kurztext = $row->kurztext;
 			$nation->langtext = $row->langtext;
 			$nation->engltext = $row->engltext;
-			
+
 			$this->nation[] = $nation;
 		}
 		return true;
@@ -126,9 +152,9 @@ class nation
 	// * @return true wenn erfolgreich, false im Fehlerfall
 	// ************************************************************
 	function save()
-	{		
-		
-		
+	{
+
+
 		$qry='INSERT INTO bis.tbl_nation (nation_code, entwicklungsstand, eu, ewr, kontinent, kurztext, langtext, engltext, sperre) VALUES('.
 			$this->addslashes($this->code).', '.
 			$this->addslashes($this->entwicklungsstand).', '.
@@ -139,14 +165,14 @@ class nation
 			$this->addslashes($this->langtext).', '.
 			$this->addslashes($this->engltext).', '.
 			$this->addslashes($this->sperre).');';
-		
+
 
 		if(pg_query($this->conn,$qry))
 		{
-			return true;	
+			return true;
 		}
 		else
-		{			
+		{
 			$this->errormsg = 'Fehler beim Speichern des Nationen-Datensatzes:'.$this->code.' '.$qry;
 			return false;
 		}
