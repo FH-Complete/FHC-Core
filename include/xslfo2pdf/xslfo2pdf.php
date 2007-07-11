@@ -55,8 +55,20 @@ class XslFo2PDF {
       echo "Didn't find root node<br>";
       return false;
     }
-		
-    $pdf = new MyPDF();
+    
+    // oesi - Format und orientation auslesen
+	$masterpage = $rootNode->getElementsByTagName('simple-page-master');
+	$format = 'A4';
+	$orient = 'P';
+	foreach ($masterpage as $x=>$mp) 
+	{
+		if($mp->getAttribute('format')!='')
+			$format = $mp->getAttribute('format');
+		if($mp->getAttribute('orientation')!='')
+			$orient = $mp->getAttribute('orientation');
+	}
+	
+    $pdf = new MyPDF($orient, 'mm', $format);
     $root = new FO_Root($pdf);
     $this->initDefaults($pdf, $root);		
     if ($root->parse($rootNode) === false) {
