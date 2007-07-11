@@ -331,7 +331,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     		</groupbox>
    			<groupbox id="student-detail-groupbox-zgv">
 			<caption label="Zugangsvoraussetzung" />
-				<grid id="student-prestudent-grid-zgv" style="overflow:auto;margin:4px;" flex="1">
+				<grid id="student-prestudent-grid-zgv" style="margin:4px;" flex="1">
 				  	<columns  >
     					<column flex="1"/>
     					<column flex="5"/>
@@ -388,7 +388,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     		</groupbox>
     		<groupbox id="student-detail-groupbox-reihungstest">
 			<caption label="Reihungstest" />
-				<grid id="student-prestudent-grid-reihungstest" style="overflow:auto;margin:4px;" flex="1">
+				<grid id="student-prestudent-grid-reihungstest" style="margin:4px;" flex="1">
 				  	<columns  >
     					<column flex="1"/>
     					<column flex="5"/>

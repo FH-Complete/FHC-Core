@@ -24,7 +24,7 @@ if (!$conn = @pg_pconnect(CONN_STRING))
 
 // raumtypen holen
 $studiengangDAO=new studiengang($conn);
-$studiengangDAO->getAll('typ, kurzbz');
+$studiengangDAO->getAll('typ, kurzbz', false);
 
 $rdf_url='http://www.technikum-wien.at/studiengang';
 

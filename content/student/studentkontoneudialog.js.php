@@ -51,22 +51,24 @@ function StudentKontoNeuInit()
 			for (var v = start.value; v <= end.value; v++)
 			{
 			col = tree.columns ? tree.columns["student-treecol-person_id"] : "student-treecol-person_id";
-			uid = tree.view.getCellText(v,col);
-			paramList += ';'+uid;
-			anzahl +=1;
+			person_id = tree.view.getCellText(v,col);
+			paramList += ';'+person_id;
+			anzahl = anzahl +1;
 			}
 	}
-
-	//Studiengang holen
-	try
-	{
-		studiengang_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
-	}
-	catch(e) 
-	{}
 	
-	if(studiengang_kz=='')
-		studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+	tree_vb=window.opener.document.getElementById('tree-verband');
+
+	//Wenn nichts markiert wurde -> beenden
+	if(tree_vb.currentIndex==-1)
+	{
+		alert('Es muss ein Studiengang markiert sein!');
+		window.close();
+		return;
+	}
+		
+	col = tree_vb.columns ? tree_vb.columns["stg_kz"] : "stg_kz";
+	var stg_kz=tree_vb.view.getCellText(tree_vb.currentIndex,col);
 		
 	person_ids = paramList;
 	

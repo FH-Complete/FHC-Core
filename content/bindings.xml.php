@@ -107,17 +107,24 @@
 			//Wenn das Datum stimmt, dann wird der Hintergrund auf Weiss gesetzt und
 			//das Datum im Datepicker gesetzt
 			//Wenn das Datum falsch ist, dann wird der Hintergrund auf Rot gesetzt
-			if(CheckDatum(datum))
-			{	
-				parts = datum.split('.');
-
-				dat = new Date(parts[2],parts[1]-1,parts[0]);
-				picker.view.setDate(dat);		
-				picker.selection.setDate(dat);
+			if(datum=='')
+			{
 				menulist.style.backgroundColor="#FFFFFF";
 			}
 			else
-				menulist.style.backgroundColor="#F46B6B";
+			{
+				if(CheckDatum(datum))
+				{	
+					parts = datum.split('.');
+	
+					dat = new Date(parts[2],parts[1]-1,parts[0]);
+					picker.view.setDate(dat);		
+					picker.selection.setDate(dat);
+					menulist.style.backgroundColor="#FFFFFF";
+				}
+				else
+					menulist.style.backgroundColor="#F46B6B";
+			}
 			
 			 ]]>
 		</handler>

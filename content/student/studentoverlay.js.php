@@ -436,6 +436,7 @@ function StudentGruppeDel()
 	var numRanges = tree.view.selection.getRangeCount();
 	var paramList= '';
 	var anzahl=0;
+	var uids='';
 	for (var t = 0; t < numRanges; t++)
 	{
   		tree.view.selection.getRangeAt(t,start,end);
@@ -443,7 +444,7 @@ function StudentGruppeDel()
 		{
 			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
 			uid = ';'+tree.view.getCellText(v,col);
-			uids += uid;
+			uids = uids + uid;
 			anzahl++;
 		}
 	}
@@ -451,8 +452,15 @@ function StudentGruppeDel()
 	try
 	{
 		//Ausgewaehlte Gruppe holen
-        var col = tree_vb.columns ? tree_vb.columns["gruppe"] : "gruppe";
-		var gruppe_kurzbz=tree_vb.view.getCellText(tree_vb.currentIndex,col);
+		var gruppe_kurzbz = '';
+		try
+		{
+        	var col = tree_vb.columns ? tree_vb.columns["gruppe"] : "gruppe";
+			var gruppe_kurzbz=tree_vb.view.getCellText(tree_vb.currentIndex,col);
+		}
+		catch(e)
+		{}
+		
 		if(gruppe_kurzbz=='')
 		{
 			alert('Studenten koennen nur aus Spezialgruppen entfernt werden');
@@ -758,7 +766,7 @@ function StudentAuswahl()
 	sprache=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#sprache" ));
 	matrikelnummer=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#matrikelnummer" ));
 	person_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#person_id" ));
-	studiengang_kz=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiengang_kz" ));
+	studiengang_kz_student=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiengang_kz_student" ));
 	semester=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#semester" ));
 	verband=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#verband" ));
 	gruppe=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#gruppe" ));
@@ -793,7 +801,7 @@ function StudentAuswahl()
 	document.getElementById('student-detail-textbox-matrikelnummer').value=matrikelnummer;
 	document.getElementById('student-detail-image').src='<?php echo APP_ROOT?>content/bild.php?src=person&person_id='+person_id+'&'+gettimestamp();
 	document.getElementById('student-detail-textbox-person_id').value=person_id;
-	document.getElementById('student-detail-menulist-studiengang_kz').value=studiengang_kz;
+	document.getElementById('student-detail-menulist-studiengang_kz').value=studiengang_kz_student;
 	document.getElementById('student-detail-textbox-semester').value=semester;
 	document.getElementById('student-detail-textbox-verband').value=verband;
 	document.getElementById('student-detail-textbox-gruppe').value=gruppe;
@@ -802,7 +810,7 @@ function StudentAuswahl()
 	//PreStudent Daten holen
 
 	aufmerksamdurch_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aufmerksamdurch_kurzbz" ));
-	studiengang_kz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiengang_kz" ));
+	studiengang_kz_prestudent = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiengang_kz_prestudent" ));
 	berufstaetigkeit_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#berufstaetigkeit_code" ));
 	ausbildungcode = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ausbildungcode" ));
 	zgv_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgv_code" ));
@@ -850,7 +858,7 @@ function StudentAuswahl()
 	document.getElementById('student-prestudent-textbox-person_id').value=person_id;
 	document.getElementById('student-prestudent-textbox-prestudent_id').value=prestudent_id;
 	document.getElementById('student-prestudent-checkbox-new').checked=false;
-	document.getElementById('student-prestudent-menulist-studiengang_kz').value=studiengang_kz;
+	document.getElementById('student-prestudent-menulist-studiengang_kz').value=studiengang_kz_prestudent;
 	document.getElementById('student-prestudent-textbox-anmerkung').value=anmerkung;
 
 
@@ -899,6 +907,12 @@ function StudentAuswahl()
 		document.getElementById('interessent-toolbar-warteliste').hidden=false;
 		document.getElementById('interessent-toolbar-absage').hidden=false;
 		
+		//Wenn ein Tab markiert ist der nun ausgeblendet wurde, 
+		//dann wird der Detail Tab markiert
+		if(document.getElementById('student-content-tabs').selectedItem.collapsed)
+		{
+			document.getElementById('student-content-tabs').selectedItem=document.getElementById('student-tab-detail');
+		}
 	}
 	else
 	{
@@ -927,7 +941,7 @@ function StudentAuswahl()
 	//Dokumente
 	//linker Tree
 	doctree = document.getElementById('interessent-dokumente-tree-nichtabgegeben');
-	url='<?php echo APP_ROOT;?>rdf/dokument.rdf.php?studiengang_kz='+studiengang_kz+'&prestudent_id='+prestudent_id+"&"+gettimestamp();
+	url='<?php echo APP_ROOT;?>rdf/dokument.rdf.php?studiengang_kz='+studiengang_kz_prestudent+'&prestudent_id='+prestudent_id+"&"+gettimestamp();
 
 	//Alte DS entfernen
 	var oldDatasources = doctree.database.GetDataSources();
@@ -2984,16 +2998,26 @@ function StudentPruefungNeu()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	StudentPruefungDetailDisableFields(false);
-
-	var verband_tree=document.getElementById('tree-verband');
-
+	
 	document.getElementById('student-pruefung-checkbox-neu').checked=true;
 
-	var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
-	var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
-	col = verband_tree.columns ? verband_tree.columns["sem"] : "sem";
-	var sem=verband_tree.view.getCellText(verband_tree.currentIndex,col);
-
+	try
+	{
+		//Wenn nach dem Personen gesucht wurde, ist es moeglich, dass kein Studiengang gewaehlt ist.
+		//Dann wird der Studiengang/Semester des Studenten genommen
+		var verband_tree=document.getElementById('tree-verband');
+		var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
+		var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+		
+		col = verband_tree.columns ? verband_tree.columns["sem"] : "sem";
+		var sem=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+	}
+	catch(e)
+	{	
+		var stg_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;	
+		var sem = document.getElementById('student-detail-textbox-semester').value;
+	}
+	
 	//Lehrveranstaltung Drop Down laden
 	var LVDropDown = document.getElementById('student-pruefung-menulist-lehrveranstaltung');
 	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&sem="+sem+"&"+gettimestamp();
@@ -3163,12 +3187,22 @@ function StudentPruefungAuswahl()
 	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
 	studiensemester_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiensemester_kurzbz" ));
 
-	var verband_tree=document.getElementById('tree-verband');
-
-	var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
-	var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
-	col = verband_tree.columns ? verband_tree.columns["sem"] : "sem";
-	var sem=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+	try
+	{
+		//Wenn nach dem Personen gesucht wurde, ist es moeglich, dass kein Studiengang gewaehlt ist.
+		//Dann wird der Studiengang/Semester des Studenten genommen
+		var verband_tree=document.getElementById('tree-verband');
+		var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
+		var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+		
+		col = verband_tree.columns ? verband_tree.columns["sem"] : "sem";
+		var sem=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+	}
+	catch(e)
+	{	
+		var stg_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;	
+		var sem = document.getElementById('student-detail-textbox-semester').value;
+	}
 
 	//Lehrveranstaltung Drop Down laden
 	var LVDropDown = document.getElementById('student-pruefung-menulist-lehrveranstaltung');
@@ -3244,13 +3278,22 @@ function StudentPruefungAuswahl()
 	document.getElementById('student-pruefung-textbox-pruefung_id').value=pruefung_id;
 }
 
+// ****
+// * Startet die Personensuche
+// ****
 function StudentSuche()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	filter = document.getElementById('student-toolbar-textbox-suche').value;
 	
+	//Wenn mehr als 2 Zeichen eingegeben wurden, die Personensuche starten
 	if(filter.length>2)
 	{
+		//Bei der Suche wird die Markierung vom Verband Tree entfernt da
+		//es sonst zu Problemen kommen kann
+		document.getElementById('tree-verband').view.selection.clearSelection();
+
+		//Datasource setzten und Felder deaktivieren
 		url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?filter="+encodeURIComponent(filter)+"&"+gettimestamp();
 		
 		var treeStudent=document.getElementById('student-tree');
@@ -3293,12 +3336,18 @@ function StudentSuche()
 		alert('Es muessen mindestens 3 Zeichen eingegeben werden');		
 }
 
+// ****
+// * Wenn im Suchfeld Enter gedrueckt wird, dann die Suchfunktion starten
+// ****
 function StudentSearchFieldKeyPress(event)
 {
 	if(event.keyCode==13) //Enter
 		StudentSuche();
 }
 
+// ****
+// * Email an die markierten Studenten versenden
+// ****
 function StudentSendMail()
 {
 	mailempfaenger='';

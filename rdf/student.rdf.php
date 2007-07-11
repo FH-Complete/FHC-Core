@@ -22,6 +22,7 @@ require_once('../include/studiengang.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/studiensemester.class.php');
 require_once('../include/prestudent.class.php');
+require_once('../include/studiengang.class.php');
 
 // Datenbank Verbindung
 if (!$conn = pg_pconnect(CONN_STRING))
@@ -38,6 +39,7 @@ if(isset($_SERVER['REMOTE_USER']))
 	$user = get_uid();
 	loadVariables($conn, $user);
 }
+
 $gruppe_kurzbz=(isset($_GET['gruppe_kurzbz'])?$_GET['gruppe_kurzbz']:null);
 $gruppe=(isset($_GET['gruppe'])?$_GET['gruppe']:null);
 $verband=(isset($_GET['verband'])?$_GET['verband']:null);
@@ -48,6 +50,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:null);
 $typ = (isset($_GET['typ'])?$_GET['typ']:null);
 $prestudent_id = (isset($_GET['prestudent_id'])?$_GET['prestudent_id']:null);
 $filter = (isset($_GET['filter'])?$_GET['filter']:null);
+$ss = (isset($_GET['ss'])?$_GET['ss']:null);
 
 if($studiensemester_kurzbz=='aktuelles')
 	$studiensemester_kurzbz = $semester_aktuell;
@@ -61,6 +64,12 @@ $datum_obj = new datum();
 
 if($xmlformat=='rdf')
 {	
+	$stg_arr = array();
+	$stg_obj = new studiengang($conn, null, null);
+	$stg_obj->getAll(null, false);
+	foreach ($stg_obj->result as $row) 
+		$stg_arr[$row->studiengang_kz]=$row->kuerzel;
+	
 	$rdf_url='http://www.technikum-wien.at/student';
 	echo '	
 	<RDF:RDF
@@ -119,14 +128,14 @@ if($xmlformat=='rdf')
 	}
 	function draw_prestudent($row)
 	{
-		global $rdf_url, $datum_obj;
+		global $rdf_url, $datum_obj, $stg_arr;
 		if($row->prestudent_id!='')
 		{
 		echo '	
 				<STUDENT:prestudent_id><![CDATA['.$row->prestudent_id.']]></STUDENT:prestudent_id>
 	    		<STUDENT:studiengang_kz_prestudent><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz_prestudent>
 				<STUDENT:aufmerksamdurch_kurzbz><![CDATA['.$row->aufmerksamdurch_kurzbz.']]></STUDENT:aufmerksamdurch_kurzbz>
-				<STUDENT:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz>
+				<STUDENT:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></STUDENT:studiengang>
 				<STUDENT:berufstaetigkeit_code><![CDATA['.$row->berufstaetigkeit_code.']]></STUDENT:berufstaetigkeit_code>
 				<STUDENT:ausbildungcode><![CDATA['.$row->ausbildungcode.']]></STUDENT:ausbildungcode>
 				<STUDENT:zgv_code><![CDATA['.$row->zgv_code.']]></STUDENT:zgv_code>
