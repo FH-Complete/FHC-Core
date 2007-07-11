@@ -244,7 +244,8 @@ function onVerbandSelect(event)
 		// -------------- Studenten --------------------------
 		try
 		{
-			url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe+"&stsem=true&"+gettimestamp();
+			stsem = getStudiensemester();
+			url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ=student&"+gettimestamp();
 			var treeStudent=document.getElementById('student-tree');
 
 			//Alte DS entfernen
@@ -326,15 +327,15 @@ function onVerbandSelect(event)
 	if(typ!='')
 	{
 		// Interessenten Tab markieren
-		document.getElementById('main-content-tabs').selectedItem=document.getElementById('tab-interessenten');
+		//document.getElementById('main-content-tabs').selectedItem=document.getElementById('tab-interessenten');
 
 		// -------------- Interessenten / Bewerber --------------------------
 		try
 		{
 			if(stsem=='' && typ=='')
 				stsem='aktuelles';
-			url = "<?php echo APP_ROOT; ?>rdf/interessentenbewerber.rdf.php?"+"studiengang_kz="+stg_kz+"&semester="+sem+"&typ="+typ+"&studiensemester_kurzbz="+stsem+"&"+gettimestamp();
-			var treeInt=document.getElementById('interessent-tree');
+			url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"studiengang_kz="+stg_kz+"&semester="+sem+"&typ="+typ+"&studiensemester_kurzbz="+stsem+"&"+gettimestamp();
+			var treeInt=document.getElementById('student-tree');
 
 			//Alte DS entfernen
 			var oldDatasources = treeInt.database.GetDataSources();
@@ -345,22 +346,31 @@ function onVerbandSelect(event)
 
 			try
 			{
-				InteressentTreeDatasource.removeXMLSinkObserver(InteressentTreeSinkObserver);
-				treeInt.builder.removeListener(InteressentTreeListener);
+				StudentTreeDatasource.removeXMLSinkObserver(StudentTreeSinkObserver);
+				treeInt.builder.removeListener(StudentTreeListener);
 			}
 			catch(e)
 			{}
 			
 			var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-			InteressentTreeDatasource = rdfService.GetDataSource(url);
-			InteressentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-			InteressentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-			treeInt.database.AddDataSource(InteressentTreeDatasource);
-			InteressentTreeDatasource.addXMLSinkObserver(InteressentTreeSinkObserver);
-			treeInt.builder.addListener(InteressentTreeListener);
-			InteressentDetailReset();
-			InteressentDetailDisableFields(true);
-			InteressentPrestudentDisableFields(true);
+			StudentTreeDatasource = rdfService.GetDataSource(url);
+			StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+			StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+			treeInt.database.AddDataSource(StudentTreeDatasource);
+			StudentTreeDatasource.addXMLSinkObserver(StudentTreeSinkObserver);
+			treeInt.builder.addListener(StudentTreeListener);
+			
+			//Detailfelder Deaktivieren
+			StudentDetailReset();
+			StudentDetailDisableFields(true);
+			StudentPrestudentDisableFields(true);
+			StudentKontoDisableFields(true);
+			StudentAkteDisableFields(true);
+			StudentBetriebsmittelDisableFields(true);
+			StudentIODisableFields(true);
+			StudentNoteDisableFields(true);
+			document.getElementById('student-kontakt').setAttribute('src','');
+			StudentAbschlusspruefungDisableFields(true);
 		}
 		catch(e)
 		{

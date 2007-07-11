@@ -244,7 +244,7 @@ if(!$error)
 						{
 							$return = true;
 							$error=false;
-							$data = $student->uid;
+							$data = $student->prestudent_id;
 						}
 						else 
 						{

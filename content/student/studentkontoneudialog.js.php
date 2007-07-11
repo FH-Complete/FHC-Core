@@ -58,11 +58,16 @@ function StudentKontoNeuInit()
 	}
 
 	//Studiengang holen
-	var tree=window.opener.document.getElementById('tree-verband');
+	try
+	{
+		studiengang_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
+	}
+	catch(e) 
+	{}
 	
-	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
-	studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
-	
+	if(studiengang_kz=='')
+		studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+		
 	person_ids = paramList;
 	
 	if(anzahl>1)

@@ -275,7 +275,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 		<?php
 			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('lva-verwaltung'))
 			{
-				echo '<tab id="tab-interessenten" label="PreStudent" onclick="ChangeTabsToVerband()"/>';
+				//echo '<tab id="tab-interessenten" label="PreStudent" onclick="ChangeTabsToVerband()"/>';
 				echo '<tab id="tab-studenten" label="Studenten" onclick="ChangeTabsToVerband()"/>';
 				echo '<tab id="tab-lfvt" label="Lehrveranstaltungen" onclick="ChangeTabsToVerband()"/>';
 			}
@@ -291,7 +291,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 			{
 				echo '
 				<!--  Interessenten  -->
-				<vbox id="InteressentenEditor" />
+				<!--<vbox id="InteressentenEditor" />-->
 				<!--  Studenten  -->
 				<vbox id="studentenEditor" />
 				<!-- Lehrfachverteilung -->

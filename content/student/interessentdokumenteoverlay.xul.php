@@ -34,6 +34,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	xmlns:html="http://www.w3.org/1999/xhtml"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	>
+<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/student/interessentdokumenteoverlay.js.php" />
+
 <!-- Dokumente Overlay -->
 <vbox id="interessent-dokumente" style="overflow:auto; margin:0px;" flex="1">
 <hbox flex="1">

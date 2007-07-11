@@ -29,7 +29,7 @@ $user = get_uid();
 loadVariables($conn, $user);
 ?>
 // *********** Globale Variablen *****************//
-var StudentSelectUid=null; //Student der nach dem Refresh markiert werden soll
+var StudentSelectID=null; //Student der nach dem Refresh markiert werden soll
 var StudentKontoSelectBuchung=null; //Buchung die nach dem Refresh markiert werden soll
 var StudentKontoTreeDatasource; //Datasource des KontoTrees
 var StudentTreeLoadDataOnSelect=true; //Gib an ob beim Selectieren im Tree die Daten geladen werden sollen
@@ -358,14 +358,14 @@ function StudentTreeRefresh()
 	//markierten Studenten global speichern damit dieser Student nach dem
 	//refresh wieder markiert werden kann.
 	var tree = document.getElementById('student-tree');
-	var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+	var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
 	try
 	{
-		StudentSelectUid=tree.view.getCellText(tree.currentIndex,col);
+		StudentSelectID=tree.view.getCellText(tree.currentIndex,col);
 	}
 	catch(e)
 	{
-		StudentSelectUid=null;
+		StudentSelectID=null;
 	}
 	StudentTreeDatasource.Refresh(false); //non blocking
 }
@@ -380,15 +380,15 @@ function StudentTreeSelectStudent()
 	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
 
 	//In der globalen Variable ist der zu selektierende Student gespeichert
-	if(StudentSelectUid!=null)
+	if(StudentSelectID!=null)
 	{
 	   	for(var i=0;i<items;i++)
 	   	{
 	   		//Uid der row holen
-			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-			uid=tree.view.getCellText(i,col);
+			col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
+			prestudent_id=tree.view.getCellText(i,col);
 
-			if(uid == StudentSelectUid)
+			if(prestudent_id == StudentSelectID)
 			{
 				//Zeile markieren
 				tree.view.selection.select(i);
@@ -413,55 +413,10 @@ function StudentTreeSort()
 		i = tree.currentIndex;
 	else
 		i = 0;
-	col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-	StudentSelectUid = tree.view.getCellText(i,col);
+	col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
+	StudentSelectID = tree.view.getCellText(i,col);
 	StudentTreeLoadDataOnSelect=false;
 	window.setTimeout("StudentTreeSelectStudent()",10);
-}
-
-// ****
-// * Student loeschen
-// ****
-function StudentDelete()
-{
-	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	var tree = document.getElementById('student-tree');
-
-	if (tree.currentIndex==-1)
-		return;
-
-	try
-	{
-		//Ausgewaehlte UID holen
-        var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-		var uid=tree.view.getCellText(tree.currentIndex,col);
-		if(uid=='')
-			return false
-	}
-	catch(e)
-	{
-		alert(e);
-		return false;
-	}
-
-	//Abfrage ob wirklich geloescht werden soll
-	if (confirm('Wollen Sie diesen Studenten wirklich löschen?'))
-	{
-		//Script zum loeschen der Lehreinheit aufrufen
-		var req = new phpRequest('student/studentDBDML.php','','');
-
-		req.add('type','student');
-		req.add('do','delete');
-		req.add('uid',uid);
-		var response = req.executePOST();
-
-		var val =  new ParseReturnValue(response)
-		if(!val.dbdml_return)
-			alert(val.dbdml_errormsg)
-
-		StudentTreeRefresh();
-		StudentDetailReset();
-	}
 }
 
 // ****
@@ -588,9 +543,9 @@ function StudentDetailDisableFields(val)
 	document.getElementById('student-detail-menulist-staatsbuergerschaft').disabled=val;
 	document.getElementById('student-detail-menulist-geburtsnation').disabled=val;
 	document.getElementById('student-detail-menulist-sprache').disabled=val;
-	document.getElementById('student-detail-textbox-matrikelnummer').disabled=val;
+	//document.getElementById('student-detail-textbox-matrikelnummer').disabled=val;
 	document.getElementById('student-detail-button-image-upload').disabled=val;
-	document.getElementById('student-detail-menulist-studiengang_kz').disabled=val;
+	//document.getElementById('student-detail-menulist-studiengang_kz').disabled=val;
 	document.getElementById('student-detail-textbox-semester').disabled=val;
 	document.getElementById('student-detail-textbox-verband').disabled=val;
 	document.getElementById('student-detail-textbox-gruppe').disabled=val;
@@ -603,6 +558,7 @@ function StudentDetailDisableFields(val)
 function StudentDetailSave()
 {
 	//Werte holen
+	person_id = document.getElementById('student-detail-textbox-person_id').value;
 	uid = document.getElementById('student-detail-textbox-uid').value;
 	anrede = document.getElementById('student-detail-textbox-anrede').value;
 	titelpre = document.getElementById('student-detail-textbox-titelpre').value;
@@ -648,8 +604,12 @@ function StudentDetailSave()
 		req.add('do','update');
 	}
 
-	req.add('type', 'savestudent');
+	if(uid=='')
+		req.add('type', 'saveperson');
+	else
+		req.add('type', 'savestudent');
 
+	req.add('person_id', person_id);
 	req.add('uid', uid);
 	req.add('anrede', anrede);
 	req.add('titelpre', titelpre);
@@ -693,7 +653,7 @@ function StudentDetailSave()
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 		document.getElementById('student-detail-checkbox-new').checked=false;
 
-		StudentSelectUid=val.dbdml_data;
+		StudentSelectID=document.getElementById('student-prestudent-textbox-prestudent_id').value;
 		StudentTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 	}
@@ -732,9 +692,12 @@ function StudentAuswahl()
 	try
 	{
 		//Ausgewaehlte UID holen
-        var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-		var uid=tree.view.getCellText(tree.currentIndex,col);
-		if(uid!='')
+        //var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+		//var uid=tree.view.getCellText(tree.currentIndex,col);
+		 var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
+		var prestudent_id=tree.view.getCellText(tree.currentIndex,col);
+		
+		if(prestudent_id!='')
 		{
 			//Student wurde markiert
 			//loeschen button aktivieren
@@ -758,32 +721,21 @@ function StudentAuswahl()
 		alert(e);
 		return false;
 	}
-
-	var url = '<?php echo APP_ROOT ?>rdf/student.rdf.php?uid='+uid+'&stsem=true&'+gettimestamp();
-
-	//hier wird GetDataSourceBlocking verwendet da sich
-	//bei der Methode mit phpRequest der Mozilla aufhaengt
-	//var req = new phpRequest(url,'','');
-	//req.add('uid',uid);
-
-	//var response = req.execute();
-
-	// Datasource holen
-	//var dsource=parseRDFString(response, 'http://www.technikum-wien.at/student/alle');
-
-	//dsource=dsource.QueryInterface(Components.interfaces.nsIRDFDataSource);
-
+	stsem = getStudiensemester();
+	var url = '<?php echo APP_ROOT ?>rdf/student.rdf.php?prestudent_id='+prestudent_id+'&studiensemester_kurzbz='+stsem+'&'+gettimestamp();
+	
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                    getService(Components.interfaces.nsIRDFService);
 
     var dsource = rdfService.GetDataSourceBlocking(url);
 
-	var subject = rdfService.GetResource("http://www.technikum-wien.at/student/" + uid);
+	var subject = rdfService.GetResource("http://www.technikum-wien.at/student/" + prestudent_id);
 
 	var predicateNS = "http://www.technikum-wien.at/student/rdf";
 
 	//Daten holen
 
+	uid = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#uid" ));
 	anrede = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anrede" ));
 	titelpre=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#titelpre" ));
 	titelpost=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#titelpost" ));
@@ -845,20 +797,9 @@ function StudentAuswahl()
 	document.getElementById('student-detail-textbox-semester').value=semester;
 	document.getElementById('student-detail-textbox-verband').value=verband;
 	document.getElementById('student-detail-textbox-gruppe').value=gruppe;
+	document.getElementById('student-detail-textbox-person_id').value = person_id;
 
 	//PreStudent Daten holen
-	var url = '<?php echo APP_ROOT ?>rdf/prestudent.rdf.php?prestudent_id='+prestudent_id+'&'+gettimestamp();
-
-	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
-                   getService(Components.interfaces.nsIRDFService);
-
-    var dsource = rdfService.GetDataSourceBlocking(url);
-
-	var subject = rdfService.GetResource("http://www.technikum-wien.at/prestudent/" + prestudent_id);
-
-	var predicateNS = "http://www.technikum-wien.at/prestudent/rdf";
-
-	//Daten holen
 
 	aufmerksamdurch_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aufmerksamdurch_kurzbz" ));
 	studiengang_kz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiengang_kz" ));
@@ -932,6 +873,114 @@ function StudentAuswahl()
 	rollentree.database.AddDataSource(StudentDetailRolleTreeDatasource);
 	StudentDetailRolleTreeDatasource.addXMLSinkObserver(StudentDetailRolleTreeSinkObserver);
 	
+	if(uid=='')
+	{
+		//PRESTUDENT
+		
+		//Wenn keine UID gesetzt ist, dann ist er noch kein Student.
+		//Hierbei werden einige der Tabs nicht angezeigt und auch nicht geladen!
+		
+		document.getElementById('student-tab-zeugnis').collapsed=true;
+		document.getElementById('student-tab-betriebsmittel').collapsed=true;
+		document.getElementById('student-tab-io').collapsed=true;
+		document.getElementById('student-tab-noten').collapsed=true;
+		document.getElementById('student-tab-pruefung').collapsed=true;
+		document.getElementById('student-tab-abschlusspruefung').collapsed=true;
+		document.getElementById('student-tab-projektarbeit').collapsed=true;
+		document.getElementById('student-detail-groupbox-student').hidden=true;
+		
+		document.getElementById('student-toolbar-abbrecher').hidden=true;
+		document.getElementById('student-toolbar-unterbrecher').hidden=true;
+		document.getElementById('student-toolbar-student').hidden=true;
+		
+		document.getElementById('interessent-toolbar-zubewerber').hidden=false;
+		document.getElementById('interessent-toolbar-zustudent').hidden=false;
+		document.getElementById('interessent-toolbar-aufgenommener').hidden=false;
+		document.getElementById('interessent-toolbar-warteliste').hidden=false;
+		document.getElementById('interessent-toolbar-absage').hidden=false;
+		
+	}
+	else
+	{
+		//STUDENT
+		document.getElementById('student-tab-zeugnis').collapsed=false;
+		document.getElementById('student-tab-betriebsmittel').collapsed=false;
+		document.getElementById('student-tab-io').collapsed=false;
+		document.getElementById('student-tab-noten').collapsed=false;
+		document.getElementById('student-tab-pruefung').collapsed=false;
+		document.getElementById('student-tab-abschlusspruefung').collapsed=false;
+		document.getElementById('student-tab-projektarbeit').collapsed=false;
+		document.getElementById('student-detail-groupbox-student').hidden=false;
+		
+		document.getElementById('student-toolbar-abbrecher').hidden=false;
+		document.getElementById('student-toolbar-unterbrecher').hidden=false;
+		document.getElementById('student-toolbar-student').hidden=false;
+		
+		document.getElementById('interessent-toolbar-zubewerber').hidden=true;
+		document.getElementById('interessent-toolbar-zustudent').hidden=true;
+		document.getElementById('interessent-toolbar-aufgenommener').hidden=true;
+		document.getElementById('interessent-toolbar-warteliste').hidden=true;
+		document.getElementById('interessent-toolbar-absage').hidden=true;
+	}
+	
+	// *** Dokumente *** //
+	//Dokumente
+	//linker Tree
+	doctree = document.getElementById('interessent-dokumente-tree-nichtabgegeben');
+	url='<?php echo APP_ROOT;?>rdf/dokument.rdf.php?studiengang_kz='+studiengang_kz+'&prestudent_id='+prestudent_id+"&"+gettimestamp();
+
+	//Alte DS entfernen
+	var oldDatasources = doctree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		doctree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	doctree.builder.rebuild();
+
+	try
+	{
+		InteressentDokumentTreeNichtabgegebenDatasource.removeXMLSinkObserver(InteressentDokumentTreeNichtabgegebenSinkObserver);
+		doctree.builder.removeListener(InteressentDokumentTreeNichtabgegebenListener);
+	}
+	catch(e)
+	{}
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	InteressentDokumentTreeNichtabgegebenDatasource = rdfService.GetDataSource(url);
+	InteressentDokumentTreeNichtabgegebenDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	InteressentDokumentTreeNichtabgegebenDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	doctree.database.AddDataSource(InteressentDokumentTreeNichtabgegebenDatasource);
+	InteressentDokumentTreeNichtabgegebenDatasource.addXMLSinkObserver(InteressentDokumentTreeNichtabgegebenSinkObserver);
+	doctree.builder.addListener(InteressentDokumentTreeNichtabgegebenListener);
+
+	//rechter Tree
+	doctree = document.getElementById('interessent-dokumente-tree-abgegeben');
+	url='<?php echo APP_ROOT;?>rdf/dokumentprestudent.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
+
+	//Alte DS entfernen
+	var oldDatasources = doctree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		doctree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	doctree.builder.rebuild();
+
+	try
+	{
+		InteressentDokumentTreeAbgegebenDatasource.removeXMLSinkObserver(InteressentDokumentTreeAbgegebenSinkObserver);
+		doctree.builder.removeListener(InteressentDokumentTreeAbgegebenListener);
+	}
+	catch(e)
+	{}
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	InteressentDokumentTreeAbgegebenDatasource = rdfService.GetDataSource(url);
+	InteressentDokumentTreeAbgegebenDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	InteressentDokumentTreeAbgegebenDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	doctree.database.AddDataSource(InteressentDokumentTreeAbgegebenDatasource);
+	InteressentDokumentTreeAbgegebenDatasource.addXMLSinkObserver(InteressentDokumentTreeAbgegebenSinkObserver);
+	doctree.builder.addListener(InteressentDokumentTreeAbgegebenListener);
+	
 	// *** Konto ***
 	kontotree = document.getElementById('student-konto-tree');
 	filter = document.getElementById('student-konto-button-filter').value;
@@ -962,188 +1011,209 @@ function StudentAuswahl()
 	StudentKontoTreeDatasource.addXMLSinkObserver(StudentKontoTreeSinkObserver);
 	kontotree.builder.addListener(StudentKontoTreeListener);
 
-	// *** Zeugnis ***
-	zeugnistree = document.getElementById('student-zeugnis-tree');
-	url='<?php echo APP_ROOT;?>rdf/akte.rdf.php?person_id='+person_id+"&dokument_kurzbz=Zeugnis&"+gettimestamp();
-
-	//Alte DS entfernen
-	var oldDatasources = zeugnistree.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
+	if(uid!='')
 	{
-		zeugnistree.database.RemoveDataSource(oldDatasources.getNext());
+		// *** Zeugnis ***
+		zeugnistree = document.getElementById('student-zeugnis-tree');
+		url='<?php echo APP_ROOT;?>rdf/akte.rdf.php?person_id='+person_id+"&dokument_kurzbz=Zeugnis&"+gettimestamp();
+	
+		//Alte DS entfernen
+		var oldDatasources = zeugnistree.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			zeugnistree.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		zeugnistree.builder.rebuild();
+	
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		StudentAkteTreeDatasource = rdfService.GetDataSource(url);
+		StudentAkteTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		StudentAkteTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		zeugnistree.database.AddDataSource(StudentAkteTreeDatasource);
+		StudentAkteTreeDatasource.addXMLSinkObserver(StudentAkteTreeSinkObserver);
 	}
-	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	zeugnistree.builder.rebuild();
-
-	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-	StudentAkteTreeDatasource = rdfService.GetDataSource(url);
-	StudentAkteTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-	StudentAkteTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-	zeugnistree.database.AddDataSource(StudentAkteTreeDatasource);
-	StudentAkteTreeDatasource.addXMLSinkObserver(StudentAkteTreeSinkObserver);
-
-	// *** Betriebsmittel ***
-	betriebsmitteltree = document.getElementById('student-betriebsmittel-tree');
-	url='<?php echo APP_ROOT;?>rdf/betriebsmittelperson.rdf.php?person_id='+person_id+"&"+gettimestamp();
-
-	//Alte DS entfernen
-	var oldDatasources = betriebsmitteltree.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
+	
+	if(uid!='')
 	{
-		betriebsmitteltree.database.RemoveDataSource(oldDatasources.getNext());
+		// *** Betriebsmittel ***
+		betriebsmitteltree = document.getElementById('student-betriebsmittel-tree');
+		url='<?php echo APP_ROOT;?>rdf/betriebsmittelperson.rdf.php?person_id='+person_id+"&"+gettimestamp();
+	
+		//Alte DS entfernen
+		var oldDatasources = betriebsmitteltree.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			betriebsmitteltree.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		betriebsmitteltree.builder.rebuild();
+	
+		try
+		{
+			StudentBetriebsmittelTreeDatasource.removeXMLSinkObserver(StudentBetriebsmittelTreeSinkObserver);
+			betriebsmitteltree.builder.removeListener(StudentBetriebsmittelTreeListener);
+		}
+		catch(e)
+		{}
+	
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		StudentBetriebsmittelTreeDatasource = rdfService.GetDataSource(url);
+		StudentBetriebsmittelTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		StudentBetriebsmittelTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		betriebsmitteltree.database.AddDataSource(StudentBetriebsmittelTreeDatasource);
+		StudentBetriebsmittelTreeDatasource.addXMLSinkObserver(StudentBetriebsmittelTreeSinkObserver);
+		betriebsmitteltree.builder.addListener(StudentBetriebsmittelTreeListener);
 	}
-	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	betriebsmitteltree.builder.rebuild();
 
-	try
+	if(uid!='')
 	{
-		StudentBetriebsmittelTreeDatasource.removeXMLSinkObserver(StudentBetriebsmittelTreeSinkObserver);
-		betriebsmitteltree.builder.removeListener(StudentBetriebsmittelTreeListener);
+		// *** Incomming/Outgoing ***
+		bisiotree = document.getElementById('student-io-tree');
+	
+		url='<?php echo APP_ROOT;?>rdf/bisio.rdf.php?uid='+uid+"&"+gettimestamp();
+	
+		//Alte DS entfernen
+		var oldDatasources = bisiotree.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			bisiotree.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		bisiotree.builder.rebuild();
+	
+		try
+		{
+			StudentIOTreeDatasource.removeXMLSinkObserver(StudentIOTreeSinkObserver);
+			bisiotree.builder.removeListener(StudentIOTreeListener);
+		}
+		catch(e)
+		{}
+	
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		StudentIOTreeDatasource = rdfService.GetDataSource(url);
+		StudentIOTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		StudentIOTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		bisiotree.database.AddDataSource(StudentIOTreeDatasource);
+		StudentIOTreeDatasource.addXMLSinkObserver(StudentIOTreeSinkObserver);
+		bisiotree.builder.addListener(StudentIOTreeListener);
 	}
-	catch(e)
-	{}
-
-	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-	StudentBetriebsmittelTreeDatasource = rdfService.GetDataSource(url);
-	StudentBetriebsmittelTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-	StudentBetriebsmittelTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-	betriebsmitteltree.database.AddDataSource(StudentBetriebsmittelTreeDatasource);
-	StudentBetriebsmittelTreeDatasource.addXMLSinkObserver(StudentBetriebsmittelTreeSinkObserver);
-	betriebsmitteltree.builder.addListener(StudentBetriebsmittelTreeListener);
-
-	// *** Incomming/Outgoing ***
-	bisiotree = document.getElementById('student-io-tree');
-
-	url='<?php echo APP_ROOT;?>rdf/bisio.rdf.php?uid='+uid+"&"+gettimestamp();
-
-	//Alte DS entfernen
-	var oldDatasources = bisiotree.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
+	
+	if(uid!='')
 	{
-		bisiotree.database.RemoveDataSource(oldDatasources.getNext());
+		// *** ZeugnisNoten ***
+		notentree = document.getElementById('student-noten-tree');
+	
+		url='<?php echo APP_ROOT;?>rdf/zeugnisnote.rdf.php?uid='+uid+"&"+gettimestamp();
+	
+		//Alte DS entfernen
+		var oldDatasources = notentree.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			notentree.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		notentree.builder.rebuild();
+	
+		try
+		{
+			StudentNotenTreeDatasource.removeXMLSinkObserver(StudentNotenTreeSinkObserver);
+			notentree.builder.removeListener(StudentNotenTreeListener);
+		}
+		catch(e)
+		{}
+	
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		StudentNotenTreeDatasource = rdfService.GetDataSource(url);
+		StudentNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		StudentNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		notentree.database.AddDataSource(StudentNotenTreeDatasource);
+		StudentNotenTreeDatasource.addXMLSinkObserver(StudentNotenTreeSinkObserver);
+		notentree.builder.addListener(StudentNotenTreeListener);
+
+		// *** LvGesamtNoten ***
+		lvgesamtnotentree = document.getElementById('student-lvgesamtnoten-tree');
+	
+		url='<?php echo APP_ROOT;?>rdf/lvgesamtnote.rdf.php?uid='+uid+"&"+gettimestamp();
+	
+		//Alte DS entfernen
+		var oldDatasources = lvgesamtnotentree.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			lvgesamtnotentree.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		lvgesamtnotentree.builder.rebuild();
+	
+		try
+		{
+			StudentLvGesamtNotenTreeDatasource.removeXMLSinkObserver(StudentLvGesamtNotenTreeSinkObserver);
+			lvgesamtnotentree.builder.removeListener(StudentLvGesamtNotenTreeListener);
+		}
+		catch(e)
+		{}
+
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		StudentLvGesamtNotenTreeDatasource = rdfService.GetDataSource(url);
+		StudentLvGesamtNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		StudentLvGesamtNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		lvgesamtnotentree.database.AddDataSource(StudentLvGesamtNotenTreeDatasource);
+		StudentLvGesamtNotenTreeDatasource.addXMLSinkObserver(StudentLvGesamtNotenTreeSinkObserver);
+		lvgesamtnotentree.builder.addListener(StudentLvGesamtNotenTreeListener);
 	}
-	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	bisiotree.builder.rebuild();
-
-	try
-	{
-		StudentIOTreeDatasource.removeXMLSinkObserver(StudentIOTreeSinkObserver);
-		bisiotree.builder.removeListener(StudentIOTreeListener);
-	}
-	catch(e)
-	{}
-
-	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-	StudentIOTreeDatasource = rdfService.GetDataSource(url);
-	StudentIOTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-	StudentIOTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-	bisiotree.database.AddDataSource(StudentIOTreeDatasource);
-	StudentIOTreeDatasource.addXMLSinkObserver(StudentIOTreeSinkObserver);
-	bisiotree.builder.addListener(StudentIOTreeListener);
-
-	// *** ZeugnisNoten ***
-	notentree = document.getElementById('student-noten-tree');
-
-	url='<?php echo APP_ROOT;?>rdf/zeugnisnote.rdf.php?uid='+uid+"&"+gettimestamp();
-
-	//Alte DS entfernen
-	var oldDatasources = notentree.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
-	{
-		notentree.database.RemoveDataSource(oldDatasources.getNext());
-	}
-	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	notentree.builder.rebuild();
-
-	try
-	{
-		StudentNotenTreeDatasource.removeXMLSinkObserver(StudentNotenTreeSinkObserver);
-		notentree.builder.removeListener(StudentNotenTreeListener);
-	}
-	catch(e)
-	{}
-
-	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-	StudentNotenTreeDatasource = rdfService.GetDataSource(url);
-	StudentNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-	StudentNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-	notentree.database.AddDataSource(StudentNotenTreeDatasource);
-	StudentNotenTreeDatasource.addXMLSinkObserver(StudentNotenTreeSinkObserver);
-	notentree.builder.addListener(StudentNotenTreeListener);
-
-	// *** LvGesamtNoten ***
-	lvgesamtnotentree = document.getElementById('student-lvgesamtnoten-tree');
-
-	url='<?php echo APP_ROOT;?>rdf/lvgesamtnote.rdf.php?uid='+uid+"&"+gettimestamp();
-
-	//Alte DS entfernen
-	var oldDatasources = lvgesamtnotentree.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
-	{
-		lvgesamtnotentree.database.RemoveDataSource(oldDatasources.getNext());
-	}
-	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	lvgesamtnotentree.builder.rebuild();
-
-	try
-	{
-		StudentLvGesamtNotenTreeDatasource.removeXMLSinkObserver(StudentLvGesamtNotenTreeSinkObserver);
-		lvgesamtnotentree.builder.removeListener(StudentLvGesamtNotenTreeListener);
-	}
-	catch(e)
-	{}
-
-	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-	StudentLvGesamtNotenTreeDatasource = rdfService.GetDataSource(url);
-	StudentLvGesamtNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-	StudentLvGesamtNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-	lvgesamtnotentree.database.AddDataSource(StudentLvGesamtNotenTreeDatasource);
-	StudentLvGesamtNotenTreeDatasource.addXMLSinkObserver(StudentLvGesamtNotenTreeSinkObserver);
-	lvgesamtnotentree.builder.addListener(StudentLvGesamtNotenTreeListener);
 
 	// ***** KONTAKTE *****
 	document.getElementById('student-kontakt').setAttribute('src','kontakt.xul.php?person_id='+person_id);
 
-	// ***** Pruefungen *****
-	pruefungtree = document.getElementById('student-pruefung-tree');
-
-	url='<?php echo APP_ROOT;?>rdf/pruefung.rdf.php?student_uid='+uid+"&"+gettimestamp();
-
-	//Alte DS entfernen
-	var oldDatasources = pruefungtree.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
+	if(uid!='')
 	{
-		pruefungtree.database.RemoveDataSource(oldDatasources.getNext());
+		// ***** Pruefungen *****
+		pruefungtree = document.getElementById('student-pruefung-tree');
+	
+		url='<?php echo APP_ROOT;?>rdf/pruefung.rdf.php?student_uid='+uid+"&"+gettimestamp();
+	
+		//Alte DS entfernen
+		var oldDatasources = pruefungtree.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			pruefungtree.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		pruefungtree.builder.rebuild();
+	
+		try
+		{
+			StudentPruefungTreeDatasource.removeXMLSinkObserver(StudentPruefungTreeSinkObserver);
+			pruefungtree.builder.removeListener(StudentPruefungTreeListener);
+		}
+		catch(e)
+		{}
+	
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		StudentPruefungTreeDatasource = rdfService.GetDataSource(url);
+		StudentPruefungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		StudentPruefungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		pruefungtree.database.AddDataSource(StudentPruefungTreeDatasource);
+		StudentPruefungTreeDatasource.addXMLSinkObserver(StudentPruefungTreeSinkObserver);
+		pruefungtree.builder.addListener(StudentPruefungTreeListener);
+		
+		StudentPruefungDetailDisableFields(true);
 	}
-	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	pruefungtree.builder.rebuild();
-
-	try
+	
+	if(uid!='')
 	{
-		StudentPruefungTreeDatasource.removeXMLSinkObserver(StudentPruefungTreeSinkObserver);
-		pruefungtree.builder.removeListener(StudentPruefungTreeListener);
+		// ****** Abschlusspruefung ******** //
+		StudentAbschlusspruefungDetailDisableFields(true);
+		StudentAbschlusspruefungTreeLoad(uid);	
 	}
-	catch(e)
-	{}
-
-	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-	StudentPruefungTreeDatasource = rdfService.GetDataSource(url);
-	StudentPruefungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-	StudentPruefungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-	pruefungtree.database.AddDataSource(StudentPruefungTreeDatasource);
-	StudentPruefungTreeDatasource.addXMLSinkObserver(StudentPruefungTreeSinkObserver);
-	pruefungtree.builder.addListener(StudentPruefungTreeListener);
 	
-	StudentPruefungDetailDisableFields(true);
-	
-	// ****** Abschlusspruefung ******** //
-	StudentAbschlusspruefungDetailDisableFields(true);
-	StudentAbschlusspruefungTreeLoad(uid);	
-	
-	// ****** Projektarbeit ********* //
-	StudentProjektarbeitDetailDisableFields(true);
-	StudentProjektbetreuerDisableFields(true);
-	StudentProjektarbeitTreeLoad(uid);
+	if(uid!='')
+	{
+		// ****** Projektarbeit ********* //
+		StudentProjektarbeitDetailDisableFields(true);
+		StudentProjektbetreuerDisableFields(true);
+		StudentProjektarbeitTreeLoad(uid);
+	}
 }
 
 // ****
@@ -1263,7 +1333,7 @@ function StudentPrestudentSave()
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
-		StudentSelectUid=document.getElementById('student-detail-textbox-uid').value;
+		StudentSelectID=document.getElementById('student-prestudent-textbox-prestudent_id').value;
 		StudentTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 	}
@@ -1425,6 +1495,11 @@ function StudentPrintInskriptionsbestaetigung()
 	}
 
 	var stsem = getStudiensemester();
+	if(paramList.replace(";",'')=='')
+	{
+		alert('Bitte einen Studenten auswaehlen');
+		return false;
+	}
 	
 	if(anzahl>0)
 		window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=student.rdf.php&xsl=Inskription&uid='+paramList+'&ss='+stsem,'Inskriptionsbestaetigung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
@@ -1750,7 +1825,7 @@ function StudentKontoDelete()
 		}
 		else
 		{
-			StudentSelectUid=document.getElementById('student-detail-textbox-uid').value;
+			StudentSelectID=document.getElementById('student-prestudent-textbox-prestudent_id').value;
 			StudentTreeDatasource.Refresh(false); //non blocking
 			SetStatusBarText('Daten wurden gespeichert');
 		}
@@ -1887,7 +1962,13 @@ function StudentCreateZeugnis()
 	}
 	//Studiensemester holen
 	var ss = getStudiensemester();
-
+	
+	if(paramList.replace(";",'')=='')
+	{
+		alert('Bitte einen Studenten auswaehlen');
+		return false;
+	}
+	
 	//PDF erzeugen
 	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zeugnis.rdf.php&xsl=Zeugnis&uid='+paramList+'&ss='+ss,'Zeugnis', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
@@ -3161,4 +3242,92 @@ function StudentPruefungAuswahl()
 	document.getElementById('student-pruefung-textbox-anmerkung').value=anmerkung;
 	document.getElementById('student-pruefung-checkbox-neu').checked=false;
 	document.getElementById('student-pruefung-textbox-pruefung_id').value=pruefung_id;
+}
+
+function StudentSuche()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	filter = document.getElementById('student-toolbar-textbox-suche').value;
+	
+	if(filter.length>2)
+	{
+		url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?filter="+encodeURIComponent(filter)+"&"+gettimestamp();
+		
+		var treeStudent=document.getElementById('student-tree');
+	
+		//Alte DS entfernen
+		var oldDatasources = treeStudent.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			treeStudent.database.RemoveDataSource(oldDatasources.getNext());
+		}
+	
+		try
+		{
+			StudentTreeDatasource.removeXMLSinkObserver(StudentTreeSinkObserver);
+			treeStudent.builder.removeListener(StudentTreeListener);
+		}
+		catch(e)
+		{}
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		StudentTreeDatasource = rdfService.GetDataSource(url);
+		StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		treeStudent.database.AddDataSource(StudentTreeDatasource);
+		StudentTreeDatasource.addXMLSinkObserver(StudentTreeSinkObserver);
+		treeStudent.builder.addListener(StudentTreeListener);
+	
+		//Detailfelder Deaktivieren
+		StudentDetailReset();
+		StudentDetailDisableFields(true);
+		StudentPrestudentDisableFields(true);
+		StudentKontoDisableFields(true);
+		StudentAkteDisableFields(true);
+		StudentBetriebsmittelDisableFields(true);
+		StudentIODisableFields(true);
+		StudentNoteDisableFields(true);
+		document.getElementById('student-kontakt').setAttribute('src','');
+		StudentAbschlusspruefungDisableFields(true);
+	}
+	else
+		alert('Es muessen mindestens 3 Zeichen eingegeben werden');		
+}
+
+function StudentSearchFieldKeyPress(event)
+{
+	if(event.keyCode==13) //Enter
+		StudentSuche();
+}
+
+function StudentSendMail()
+{
+	mailempfaenger='';
+	var tree=document.getElementById('student-tree');
+	var numRanges = tree.view.selection.getRangeCount();
+	var start = new Object();
+	var end = new Object();
+	var anzfault=0;
+	//Markierte Datensaetze holen
+	for (var t=0; t<numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+  		for (v=start.value; v<=end.value; v++)
+  		{
+  			var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+  			if(tree.view.getCellText(v,col).length>1)
+  			{
+  				if(mailempfaenger!='')
+					mailempfaenger=mailempfaenger+','+tree.view.getCellText(v,col)+'@technikum-wien.at';
+				else
+					mailempfaenger='mailto:'+tree.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
+  			}
+  			else
+  			{
+  				anzfault=anzfault+1;
+  			}
+  		}
+	}
+	if(anzfault!=0)
+		alert(anzfault+' Student konnten nicht hinzugefuegt werden weil keine UID eingetragen ist!');
+	window.location.href=mailempfaenger;
 }

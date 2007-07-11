@@ -47,7 +47,7 @@ function onLoad()
 	{
   		initLektorTree();
   		//Studenten Tab beim starten markieren
-  		document.getElementById('tabbox-main').selectedIndex="1";
+  		document.getElementById('main-content-tabs').selectedItem=document.getElementById('tab-studenten');
 
   		//Funktion ueberschreiben damit sie nicht nochmal aufgerufen wird
   		//wenn zb ein IFrame geladen wird
