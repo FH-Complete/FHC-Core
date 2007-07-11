@@ -47,6 +47,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentprojektarbeitoverla
 	>
 
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/student/studentoverlay.js.php" />
+<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/student/interessentoverlay.js.php" />
 
 			<!-- *************** -->
 			<!-- *  Studenten  * -->
@@ -55,21 +56,30 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentprojektarbeitoverla
 			<popupset>
 				<popup id="student-tree-popup">
 					<menuitem label="Student aus dieser Gruppe Entfernen" oncommand="StudentGruppeDel();" id="student-tree-popup-gruppedel" hidden="false"/>
+					<menuitem label="EMail senden" oncommand="StudentSendMail();" id="student-tree-popup-mail" hidden="false"/>
 				</popup>
 			</popupset>
 				<hbox>
 					<toolbox flex="1">
 						<toolbar id="student-nav-toolbar">
-						<!--<toolbarbutton id="student-toolbar-neu" label="Neuer Student" oncommand="StudentNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Student neu anlegen" />-->
-						<!--<toolbarbutton id="student-toolbar-del" label="Löschen" oncommand="StudentDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Student löschen"/>-->
-						<toolbarbutton id="student-toolbar-refresh" label="Aktualisieren" oncommand="StudentTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
-						<toolbarbutton id="student-toolbar-buchung" label="Neue Buchung" oncommand="StudentKontoNeu()" disabled="false" tooltiptext="neue Buchung anlegen"/>
-						<toolbarbutton id="student-toolbar-zeugnis" label="Zeugnis erstellen" oncommand="StudentCreateZeugnis()" disabled="false" tooltiptext="Zeugnis erstellen"/>
-						<toolbarbutton id="student-toolbar-abbrecher" label="-> Abbrecher" oncommand="StudentAddRolle('Abbrecher','0')" disabled="false" tooltiptext="Student zum Abbrecher machen"/>
-						<toolbarbutton id="student-toolbar-unterbrecher" label="-> Unterbrecher" oncommand="StudentAddRolle('Unterbrecher','0')" disabled="false" tooltiptext="Student zum Unterbrecher machen"/>
-						<toolbarbutton id="student-toolbar-student" label="-> Student" oncommand="StudentUnterbrecherZuStudent()" disabled="false" tooltiptext="Ab/Unterbrecher wieder zum Studenten machen" hidden="true"/>
-						<spacer flex="1"/>
-						<label id="student-toolbar-label-anzahl"/>
+							<toolbarbutton id="interessent-toolbar-neu" label="Neu" oncommand="InteressentNeu()" disabled="false" image="../skin/images/NeuDokument.png" tooltiptext="Interessent neu anlegen" />
+													
+							<toolbarbutton id="student-toolbar-buchung" label="Neue Buchung" oncommand="StudentKontoNeu()" disabled="false" tooltiptext="neue Buchung anlegen"/>
+							<toolbarbutton id="student-toolbar-abbrecher" label="-> Abbrecher" oncommand="StudentAddRolle('Abbrecher','0')" disabled="false" tooltiptext="Student zum Abbrecher machen" hidden="true"/>
+							<toolbarbutton id="student-toolbar-unterbrecher" label="-> Unterbrecher" oncommand="StudentAddRolle('Unterbrecher','0')" disabled="false" tooltiptext="Student zum Unterbrecher machen" hidden="true"/>
+							<toolbarbutton id="student-toolbar-student" label="-> Student" oncommand="StudentUnterbrecherZuStudent()" disabled="false" tooltiptext="Ab/Unterbrecher wieder zum Studenten machen" hidden="true"/>
+		
+							<toolbarbutton id="interessent-toolbar-zubewerber" label="-> Bewerber" oncommand="InteressentzuBewerber()" disabled="false" tooltiptext="Interessent zum Bewerber machen" hidden="true"/>
+							<toolbarbutton id="interessent-toolbar-zustudent" label="-> Student" oncommand="InteressentzuStudent()" disabled="false" tooltiptext="Bewerber zu Studenten machen" hidden="true"/>
+							<toolbarbutton id="interessent-toolbar-aufgenommener" label="-> Aufgenommener" oncommand="InteressentAddRolle('Aufgenommener')" disabled="false" tooltiptext="Interessent zum Aufgenommenen machen" hidden="true"/>
+							<toolbarbutton id="interessent-toolbar-warteliste" label="-> Warteliste" oncommand="InteressentAddRolle('Wartender')" disabled="false" tooltiptext="Interessent zum Wartenden machen" hidden="true"/>
+							<toolbarbutton id="interessent-toolbar-absage" label="-> Absage" oncommand="InteressentAddRolle('Abgewiesener')" disabled="false" tooltiptext="Interessent zum Absager machen" hidden="true"/>
+							
+							<toolbarbutton id="student-toolbar-refresh" label="Aktualisieren" oncommand="StudentTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
+							<textbox id="student-toolbar-textbox-suche" control="student-toolbar-button-search" onkeypress="StudentSearchFieldKeyPress(event)" />
+							<button id="student-toolbar-button-search" oncommand="StudentSuche()" label="Suchen"/>
+							<spacer flex="1"/>
+							<label id="student-toolbar-label-anzahl"/>
 						</toolbar>
 					</toolbox>
 				</hbox>
@@ -137,12 +147,19 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentprojektarbeitoverla
 						<treecol id="student-treecol-matrikelnummer" label="Matrikelnummer" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#matrikelnummer" onclick="StudentTreeSort()"/>
+	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-prestudent_id" label="PreStudentID" flex="1" hidden="true"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#prestudent_id" onclick="StudentTreeSort()"/>
+	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-person_id" label="PersonID" flex="1" hidden="true"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#person_id" onclick="StudentTreeSort()"/>
+	    				<splitter class="tree-splitter"/>
+	    				<treecol id="student-treecol-status" label="Status" flex="1" hidden="false"
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#status" onclick="StudentTreeSort()"/>
+	    				<splitter class="tree-splitter"/>
 					</treecols>
 
 					<template>
@@ -164,6 +181,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentprojektarbeitoverla
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#matrikelnummer" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#prestudent_id" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#person_id" />
+	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#status" />
 	         						</treerow>
 	       						</treeitem>
 	      					</treechildren>
@@ -183,6 +201,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentprojektarbeitoverla
 						<tabs orient="horizontal" id="lehrveranstaltung-tabs">
 							<tab id="student-tab-detail" label="Details" />
 							<tab id="student-tab-prestudent" label="PreStudent" />
+							<tab id="student-tab-dokumente" label="Dokumente" />
 							<tab id="student-tab-konto" label="Konto" />
 							<tab id="student-tab-zeugnis" label="Zeugnis" />
 							<tab id="student-tab-betriebsmittel" label="Betriebsmittel" />
@@ -196,6 +215,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentprojektarbeitoverla
 						<tabpanels id="student-tabpanels-main" flex="1">
 							<vbox id="student-detail"  style="margin-top:10px;" />
 							<vbox id="student-prestudent"  style="margin-top:10px;" />
+							<vbox id="interessent-dokumente"  style="margin-top:10px;" />
 							<vbox id="student-konto"  style="margin-top:10px;" />
 							<vbox id="student-zeugnis"  style="margin-top:10px;" />
 							<vbox id="student-betriebsmittel"  style="margin-top:10px;" />

@@ -273,9 +273,10 @@ function StudentProjektarbeitAuswahl()
 	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
 	gesamtstunden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#gesamtstunden" ));
 		
-	var verband_tree=document.getElementById('tree-verband');
-	var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
-	var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+	//var verband_tree=document.getElementById('tree-verband');
+	//var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
+	//var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+	var stg_kz = studiengang_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 	
 	//Lehrveranstaltung DropDown laden
 	var LvDropDown = document.getElementById('student-projektarbeit-menulist-lehrveranstaltung');
@@ -476,9 +477,10 @@ function StudentProjektarbeitNeu()
 	document.getElementById('student-projektarbeit-textbox-projektarbeit_id').value='';
 	StudentProjektarbeitResetFields();
 	StudentProjektarbeitDetailDisableFields(false);
-	var verband_tree=document.getElementById('tree-verband');
-	var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
-	var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+	//var verband_tree=document.getElementById('tree-verband');
+	//var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
+	//var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+	var stg_kz = studiengang_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 	
 	//Lehrveranstaltung DropDown laden
 	var LvDropDown = document.getElementById('student-projektarbeit-menulist-lehrveranstaltung');

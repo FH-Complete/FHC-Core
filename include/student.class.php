@@ -75,7 +75,6 @@ class student extends benutzer
 	{
 		if(!benutzer::load($uid))
 			return false;
-
 		if(is_null($studiensemester_kurzbz))
 			$qry = "SELECT * FROM public.tbl_student WHERE student_uid='".addslashes($uid)."'";
 		else
@@ -83,7 +82,6 @@ class student extends benutzer
 					tbl_studentlehrverband.verband as verband, tbl_studentlehrverband.gruppe as gruppe  
 					FROM public.tbl_student JOIN public.tbl_studentlehrverband USING(student_uid) 
 					WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND student_uid='".addslashes($uid)."'";
-		
 		if($result = pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
@@ -362,9 +360,9 @@ class student extends benutzer
 					" gruppe=".$this->addslashes(($this->gruppe==''?' ':$this->gruppe)).",".
 					" updateamum=".$this->addslashes($this->updateamum).",".
 					" updatevon=".$this->addslashes($this->updatevon).
-					"WHERE student_uid='".addslashes($this->uid)."' AND studiensemester_kurzbz='".addslashes($this->studiensemester_kurzbz)."'";
+					" WHERE student_uid='".addslashes($this->uid)."' AND studiensemester_kurzbz='".addslashes($this->studiensemester_kurzbz)."'";
 		}
-		
+		//echo $qry;
 		if(pg_query($this->conn, $qry))
 		{
 			return true;

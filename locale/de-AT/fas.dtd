@@ -61,3 +61,7 @@
 <!ENTITY menu-dokumente-inskriptionsbestaetigung.key		"I">
 <!ENTITY menu-dokumente-inskriptionsbestaetigung.label		"Inskriptionsbestaetigung">
 <!ENTITY menu-dokumente-inskriptionsbestaetigung.accesskey	"I">
+
+<!ENTITY menu-dokumente-zeugnis.key		"Z">
+<!ENTITY menu-dokumente-zeugnis.label		"Zeugnis">
+<!ENTITY menu-dokumente-zeugnis.accesskey	"Z">

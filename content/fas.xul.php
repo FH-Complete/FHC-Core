@@ -81,6 +81,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-statistic-lvplanung:command" oncommand="StatistikPrintLVPlanung();"/>
   <command id="menu-statistic-lehrauftragsliste:command" oncommand="StatistikPrintLehrauftragsliste();"/>
   <command id="menu-dokumente-inskriptionsbestaetigung:command" oncommand="StudentPrintInskriptionsbestaetigung();"/>
+  <command id="menu-dokumente-zeugnis:command" oncommand="StudentCreateZeugnis();"/>
   <command id="menu-help-close:command" oncommand="OpenAboutDialog()"/>
 </commandset>
 
@@ -200,6 +201,12 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                label     = "&menu-dokumente-inskriptionsbestaetigung.label;"
                command   =  "menu-dokumente-inskriptionsbestaetigung:command"
                accesskey = "&menu-dokumente-inskriptionsbestaetigung.accesskey;"/>
+            <menuitem
+               id        =  "menu-dokumente-zeugnis"
+               key       =  "menu-dokumente-zeugnis:key"
+               label     = "&menu-dokumente-zeugnis.label;"
+               command   =  "menu-dokumente-zeugnis:command"
+               accesskey = "&menu-dokumente-zeugnis.accesskey;"/>
           </menupopup>
     </menu>
     <menu id="menu-help" label="&menu-help.label;" accesskey="&menu-help.accesskey;">

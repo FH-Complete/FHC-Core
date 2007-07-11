@@ -56,14 +56,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
   					</columns>
   					<rows>
     					<row>
-      						<label value="UID" control="student-detail-textbox-uid"/>
-      						<hbox><textbox id="student-detail-textbox-uid" disabled="true" maxlength="16" size="16"/></hbox>
-      						<spacer />
-      						<spacer />
-      						<label value="Aktiv" control="student-detail-checkbox-aktiv"/>
-      						<checkbox id="student-detail-checkbox-aktiv" checked="true" disabled="true"/>
-    					</row>
-    					<row>
       						<label value="Anrede" control="student-detail-textbox-anrede"/>
       						<hbox><textbox id="student-detail-textbox-anrede" disabled="true" maxlength="16" size="16"/></hbox>
       						<label value="TitelPre" control="student-detail-textbox-titelpre"/>
@@ -95,6 +87,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       						<hbox><textbox id="student-detail-textbox-svnr" disabled="true" maxlength="10" size="10"/></hbox>
       						<label value="Ersatzkennzeichen" control="student-detail-textbox-ersatzkennzeichen"/>
       						<hbox><textbox id="student-detail-textbox-ersatzkennzeichen" disabled="true" maxlength="10" size="10"/></hbox>
+      						<label value="Aktiv" control="student-detail-checkbox-aktiv"/>
+      						<checkbox id="student-detail-checkbox-aktiv" checked="true" disabled="true"/>
     					</row>
     					<row>
 							<label value="Staatsbuergerschaft" control="student-detail-menulist-staatsbuergerschaft"/>
@@ -187,6 +181,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
   					</columns>
   					<rows>
     					<row>
+    						<label value="UID" control="student-detail-textbox-uid"/>
+      						<hbox><textbox id="student-detail-textbox-uid" disabled="true" maxlength="16" size="16"/></hbox>
     						<label value="Matrikelnummer" control="student-detail-textbox-matrikelnummer"/>
       						<hbox><textbox id="student-detail-textbox-matrikelnummer" disabled="true" maxlength="15" size="15"/></hbox>
       						<label value="Studiengang" control="student-detail-textbox-studiengang_kz"/>

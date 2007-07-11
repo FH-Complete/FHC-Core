@@ -278,7 +278,9 @@ class lvgesamtnote
 					lehre.tbl_lehrveranstaltung			
 				WHERE
 					tbl_lvgesamtnote.note=tbl_note.note AND
-					tbl_lvgesamtnote.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id";
+					tbl_lvgesamtnote.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
+					tbl_lvgesamtnote.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
+					tbl_lvgesamtnote.freigabedatum<now()";
 		
 		if($lehrveranstaltung_id!=null)
 			$qry.=" AND tbl_lvgesamtnote.lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."'";

@@ -309,9 +309,10 @@ function StudentAbschlusspruefungAuswahl()
 	pruefungstyp_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#pruefungstyp_kurzbz" ));
 	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
 	
-	var verband_tree=document.getElementById('tree-verband');
-	var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
-	var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+	//var verband_tree=document.getElementById('tree-verband');
+	//var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
+	//var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+	stg_kz = studiengang_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 	
 	//Akadgrad DropDown laden
 	var AkadgradDropDown = document.getElementById('student-abschlusspruefung-menulist-akadgrad');
@@ -453,9 +454,11 @@ function StudentAbschlusspruefungNeu()
 	StudentAbschlusspruefungResetFields();
 	StudentAbschlusspruefungDetailDisableFields(false);
 	
-	var verband_tree=document.getElementById('tree-verband');
-	var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
-	var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+	//var verband_tree=document.getElementById('tree-verband');
+	//var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
+	//var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+	
+	var stg_kz = studiengang_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 	
 	//Akadgrad DropDown laden
 	var AkadgradDropDown = document.getElementById('student-abschlusspruefung-menulist-akadgrad');
@@ -521,4 +524,88 @@ function StudentAbschlusspruefungLoeschen()
 		SetStatusBarText('Daten wurden geloescht');
 		StudentAbschlusspruefungDetailDisableFields(true);
 	}
+}
+
+// ***** AUSDRUCKE ***** //
+
+function StudentAbschlusspruefungPrintPruefungsprotokoll()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-abschlusspruefung-tree');
+
+	if (tree.currentIndex==-1) 
+	{
+		alert('Bitte zuerst einen Eintrag markieren');
+		return false;
+	}
+
+	//Ausgewaehlte Nr holen
+    var col = tree.columns ? tree.columns["student-abschlusspruefung-treecol-abschlusspruefung_id"] : "student-abschlusspruefung-treecol-abschlusspruefung_id";
+	var abschlusspruefung_id=tree.view.getCellText(tree.currentIndex,col);
+	
+	var col = tree.columns ? tree.columns["student-abschlusspruefung-treecol-pruefungstyp_kurzbz"] : "student-abschlusspruefung-treecol-pruefungstyp_kurzbz";
+	var pruefungstyp_kurzbz=tree.view.getCellText(tree.currentIndex,col);
+	
+	if(pruefungstyp_kurzbz=='Bachelor')
+		xsl='PrProtokollBakk';
+	else
+		xsl='PrProtokollDipl';
+			
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&abschlusspruefung_id='+abschlusspruefung_id,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+
+function StudentAbschlusspruefungPrintPruefungszeugnis()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-abschlusspruefung-tree');
+
+	if (tree.currentIndex==-1) 
+	{
+		alert('Bitte zuerst einen Eintrag markieren');
+		return false;
+	}
+
+	//Ausgewaehlte Nr holen
+    var col = tree.columns ? tree.columns["student-abschlusspruefung-treecol-abschlusspruefung_id"] : "student-abschlusspruefung-treecol-abschlusspruefung_id";
+	var abschlusspruefung_id=tree.view.getCellText(tree.currentIndex,col);
+	
+	var col = tree.columns ? tree.columns["student-abschlusspruefung-treecol-pruefungstyp_kurzbz"] : "student-abschlusspruefung-treecol-pruefungstyp_kurzbz";
+	var pruefungstyp_kurzbz=tree.view.getCellText(tree.currentIndex,col);
+	
+	if(pruefungstyp_kurzbz=='Bachelor')
+		xsl='Bakkzeugnis';
+	else
+		xsl='Diplomzeugnis';
+			
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&abschlusspruefung_id='+abschlusspruefung_id,'PruefungsZeugnis', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+
+function StudentAbschlusspruefungPrintUrkunde(sprache)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-abschlusspruefung-tree');
+
+	if (tree.currentIndex==-1) 
+	{
+		alert('Bitte zuerst einen Eintrag markieren');
+		return false;
+	}
+
+	//Ausgewaehlte Nr holen
+    var col = tree.columns ? tree.columns["student-abschlusspruefung-treecol-abschlusspruefung_id"] : "student-abschlusspruefung-treecol-abschlusspruefung_id";
+	var abschlusspruefung_id=tree.view.getCellText(tree.currentIndex,col);
+	
+	var col = tree.columns ? tree.columns["student-abschlusspruefung-treecol-pruefungstyp_kurzbz"] : "student-abschlusspruefung-treecol-pruefungstyp_kurzbz";
+	var pruefungstyp_kurzbz=tree.view.getCellText(tree.currentIndex,col);
+	
+	if(pruefungstyp_kurzbz=='Bachelor' && sprache=='deutsch')
+		xsl='Bakkurkunde';
+	else if(pruefungstyp_kurzbz=='Bachelor' && sprache=='englisch')
+		xsl='BakkurkundeEng';
+	else if(pruefungstyp_kurzbz=='Diplom' && sprache=='deutsch')
+		xsl='Diplomurkunde';
+	else if(pruefungstyp_kurzbz=='Diplom' && sprache=='englisch')
+		xsl='DiplomurkundeEng';
+			
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&abschlusspruefung_id='+abschlusspruefung_id,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }

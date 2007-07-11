@@ -39,7 +39,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentkontooverlay.xu
 	xmlns:html="http://www.w3.org/1999/xhtml"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	>
-
+</overlay>
+<?php
+/*
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/student/interessentoverlay.js.php" />
 
 			<!-- ******************* -->
@@ -188,3 +190,4 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentkontooverlay.xu
 				</vbox>
 			</vbox>
 </overlay>
+*/?>

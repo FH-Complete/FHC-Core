@@ -39,7 +39,19 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 <!-- Abschlusspruefung DETAILS -->
 <vbox id="student-abschlusspruefung" style="overflow:auto;margin:10px;" flex="1">
-
+<popupset>
+	<popup id="student-abschlusspruefung-tree-popup">
+		<menuitem label="Entfernen" oncommand="StudentAbschlusspruefungLoeschen();" id="student-abschlusspruefung-tree-popup-delete" hidden="false"/>
+		<menu id="student-abschlusspruefung-tree-popup-dokumente" label="Dokumente">
+	      <menupopup id="menu-file-popup">
+	        <menuitem label="Pruefungsprotokoll" oncommand="StudentAbschlusspruefungPrintPruefungsprotokoll()"/>
+	        <menuitem label="Pruefungszeugnis" oncommand="StudentAbschlusspruefungPrintPruefungszeugnis()"/>
+	        <menuitem label="Urkunde" oncommand="StudentAbschlusspruefungPrintUrkunde('deutsch')"/>
+	        <menuitem label="Urkunde Englisch" oncommand="StudentAbschlusspruefungPrintUrkunde('englisch')"/>
+	      </menupopup>
+	    </menu>
+	</popup>
+</popupset>
 	<hbox>
 		<tree id="student-abschlusspruefung-tree" seltype="single" hidecolumnpicker="false" flex="1"
 				datasources="rdf:null" ref="http://www.technikum-wien.at/abschlusspruefung/liste"
@@ -48,6 +60,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				enableColumnDrag="true"
 				style="margin:0px;"
 				persist="hidden, height"
+				context="student-abschlusspruefung-tree-popup"
 		>
 			<treecols>
 				<treecol id="student-abschlusspruefung-treecol-student_uid" label="UID" flex="1" persist="hidden, width" hidden="true"
@@ -90,6 +103,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#abschlusspruefung_id" onclick="StudentAbschlusspruefungTreeSort()"/>
 				<splitter class="tree-splitter"/>
+				<treecol id="student-abschlusspruefung-treecol-pruefungstyp_kurzbz" label="Typ" flex="1" persist="hidden, width" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefungstyp_kurzbz" onclick="StudentAbschlusspruefungTreeSort()"/>
+				<splitter class="tree-splitter"/>
 			</treecols>
 	
 			<template>
@@ -107,6 +124,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	   							<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#sponsion" />
 	   							<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#anmerkung" />
 	   							<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#abschlusspruefung_id" />
+	   							<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefungstyp_kurzbz" />
 	 						</treerow>
 							</treeitem>
 						</treechildren>
