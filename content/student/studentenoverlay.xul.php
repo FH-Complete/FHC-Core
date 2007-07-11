@@ -38,6 +38,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentnotenoverlay.xul.ph
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentpruefungoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentabschlusspruefungoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentprojektarbeitoverlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverlay.xul.php"?>';
 ?>
 <!DOCTYPE overlay >
 
@@ -140,9 +141,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentprojektarbeitoverla
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#gruppe" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="student-treecol-studiengang_kz" label="StudiengangKz" flex="1" hidden="true"
+	    				<treecol id="student-treecol-studiengang" label="Studiengang" flex="1" hidden="true"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/student/rdf#studiengang_kz" onclick="StudentTreeSort()"/>
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#studiengang" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 						<treecol id="student-treecol-matrikelnummer" label="Matrikelnummer" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
@@ -177,7 +178,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentprojektarbeitoverla
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#semester" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#verband" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#gruppe" />
-	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#studiengang_kz" />
+	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#studiengang" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#matrikelnummer" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#prestudent_id" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#person_id" />
@@ -198,7 +199,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentprojektarbeitoverla
 				<!-- ************ -->
 				<vbox flex="1"  style="overflow:auto;margin:0px;" persist="height">
 					<tabbox id="student-tabbox" flex="3" orient="vertical">
-						<tabs orient="horizontal" id="lehrveranstaltung-tabs">
+						<tabs orient="horizontal" id="student-content-tabs">
 							<tab id="student-tab-detail" label="Details" />
 							<tab id="student-tab-prestudent" label="PreStudent" />
 							<tab id="student-tab-dokumente" label="Dokumente" />
