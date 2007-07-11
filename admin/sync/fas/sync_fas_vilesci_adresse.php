@@ -1,7 +1,7 @@
 <?php
 /* Copyright (C) 2006 Technikum-Wien
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -79,7 +79,7 @@ if($result = pg_query($conn_fas, $qry))
 		$adresse->insertamum		=$row->creationdate;
 		//$adresse->insertvon		="SYNC";
 		$adresse->ext_id			=$row->adresse_pk;
-		
+
 		if($row->typ=='1')
 		{
 			$adresse->typ='f';
@@ -92,11 +92,11 @@ if($result = pg_query($conn_fas, $qry))
 		{
 			$adresse->typ='n';
 		}
-		else 
+		else
 		{
 			$adresse->typ='h';
 		}
-		
+
 		$ausgabe_adresse='';
 		$update=false;
 		//echo nl2br ($adresse->ext_id."\n");
@@ -115,7 +115,7 @@ if($result = pg_query($conn_fas, $qry))
 			if(pg_num_rows($result1)>0) //eintrag gefunden
 			{
 				if($row1=pg_fetch_object($result1))
-				{ 
+				{
 					$adresse->person_id=$row1->person_portal;
 
 					$qry2="SELECT * FROM public.tbl_adresse WHERE ext_id=".$row->adresse_pk.";";
@@ -124,7 +124,7 @@ if($result = pg_query($conn_fas, $qry))
 						if(pg_num_rows($result2)>0) //eintrag gefunden
 						{
 							if($row2=pg_fetch_object($result2))
-							{ 
+							{
 								$update=false;
 								if(trim($row2->name)!=trim($adresse->name))
 								{
@@ -234,7 +234,7 @@ if($result = pg_query($conn_fas, $qry))
 										$ausgabe_adresse="Zustelladresse: '".($adresse->Zustelladresse=='J'?'true':'false')."'";
 									}
 								}
-								if(date("d.m.Y", $row2->insertamum)!=date("d.m.Y", $adresse->insertamum)) 
+								if($row2->insertamum!=$adresse->insertamum)
 								{
 									$update=true;
 									if(strlen(trim($ausgabe_adresse))>0)
@@ -246,7 +246,7 @@ if($result = pg_query($conn_fas, $qry))
 										$ausgabe_adresse="Insertamum: '".$adresse->insertamum."' (statt '".$row2->insertamum."')";
 									}
 								}
-								if($row2->insertvon!=$adresse->insertvon) 
+								if($row2->insertvon!=$adresse->insertvon)
 								{
 									$update=true;
 									if(strlen(trim($ausgabe_adresse))>0)
@@ -266,11 +266,11 @@ if($result = pg_query($conn_fas, $qry))
 								}
 							}
 						}
-						else 
+						else
 						{
 							// insert, wenn datensatz noch nicht vorhanden
 							$adresse->new=true;
-							
+
 							//firma eintragen, wenn firmenadresse
 							if ($row->typ==1 && strlen(trim($row->bezeichnung))>0 && $row->bezeichnung!=NULL)
 							{
@@ -287,10 +287,10 @@ if($result = pg_query($conn_fas, $qry))
 									{
 										if($row3=pg_fetch_object($result3))
 										{
-											$firma->new=false;	
-											$firma->firma_id=$row3->firma_id;	
+											$firma->new=false;
+											$firma->firma_id=$row3->firma_id;
 										}
-										else 
+										else
 										{
 											$error_log.="Firma mit adresse_pk: $row->adresse_pk konnte nicht ermittelt werden! Firma wird nicht eingetragen.\n";
 										}
@@ -299,7 +299,7 @@ if($result = pg_query($conn_fas, $qry))
 									{
 										$firma->new=true;
 									}
-								} 
+								}
 								if(!$error)
 								{
 									if(!$firma->save())
@@ -308,27 +308,27 @@ if($result = pg_query($conn_fas, $qry))
 										$anzahl_fehler2++;
 										$error_log.="Firma mit adresse_pk: $row->adresse_pk wurde nicht eingetragen!\n";
 									}
-									else 
+									else
 									{
 										if($firma->new)
 										{
 											$ausgabe.="Firma ".$firma->name." eingefügt.\n";
 											$anzahl_eingefuegt2++;
 										}
-										else 
+										else
 										{
 											$ausgabe.="Firma ".$firma->name." geändert.\n";
 											$anzahl_update2++;
 										}
-										
-									}											
+
+									}
 									$adresse->firma_id=$firma->firma_id;
 								}
-							}	
+							}
 						}
 					}
 				}
-				else 
+				else
 				{
 					$ausgabe_adresse='';
 					$error=true;
@@ -336,7 +336,7 @@ if($result = pg_query($conn_fas, $qry))
 					$anzahl_fehler++;
 				}
 			}
-			else 
+			else
 			{
 				$ausgabe_adresse='';
 				$error=true;
@@ -344,7 +344,7 @@ if($result = pg_query($conn_fas, $qry))
 				$anzahl_fehler++;
 			}
 		}
-		
+
 		if(!$error)
 		{
 			if($adresse->new || $update)
@@ -354,14 +354,14 @@ if($result = pg_query($conn_fas, $qry))
 					$error_log.=$adresse->errormsg."\n";
 					$anzahl_fehler++;
 				}
-				else 
+				else
 				{
 					if($adresse->new)
 					{
 						$ausgabe.="Adresse '".$adresse->plz."',  '".$adresse->strasse."' eingefügt.\n";
 						$anzahl_eingefuegt++;
 					}
-					else 
+					else
 					{
 						if($update)
 						{
@@ -375,8 +375,8 @@ if($result = pg_query($conn_fas, $qry))
 				}
 			}
 		}
-		//flush();	
-	}	
+		//flush();
+	}
 }
 
 echo "Adressensynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."<br><br>";

@@ -2,11 +2,11 @@
 	// Hintergrundfarben fuer Tabellen beim Zeitwunsch
 	global $cfgStdBgcolor;
 	$cfgStdBgcolor=array();
-	$cfgStdBgcolor[0]="#AA0000";
-	$cfgStdBgcolor[1]="#FF0000";
-	$cfgStdBgcolor[2]="#FF5500";
+	$cfgStdBgcolor[0]="#CC0000";
+	$cfgStdBgcolor[1]="#FF2200";
+	$cfgStdBgcolor[2]="#FF9922";
 	$cfgStdBgcolor[3]="#FFFF55";
-	$cfgStdBgcolor[4]="#55FF55";
+	$cfgStdBgcolor[4]="#88FF88";
 	$cfgStdBgcolor[5]="#AAFFAA";
 	$cfgStdBgcolor[6]="#CCFFCC";
 

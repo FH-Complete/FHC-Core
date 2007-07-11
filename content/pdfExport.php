@@ -64,6 +64,12 @@ if(isset($_GET['stg_kz']))
 	$params.='&stg_kz='.$_GET['stg_kz'];
 if(isset($_GET['ss']))
 	$params.='&ss='.$_GET['ss'];
+if(isset($_GET['abschlusspruefung_id']))
+	$params.='&abschlusspruefung_id='.$_GET['abschlusspruefung_id'];
+
+
+
+
 //Berechtigung pruefen
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
@@ -115,7 +121,7 @@ if (!isset($_REQUEST["archive"]))
 }
 else
 {
-	
+
 	$filename = $user;
 	if (!$fo2pdf->generatePdf($buffer, $filename, 'F'))
 	{
@@ -126,17 +132,17 @@ else
 	$string = fread($handle, filesize($file));
 	fclose($handle);
 	unlink($file);
-	
+
 	$hex="";
 	for ($i=0;$i<strlen($string);$i++)
 		$hex.=(strlen(dechex(ord($string[$i])))<2)? "0".dechex(ord($string[$i])): dechex(ord($string[$i]));
-	
+
 
 	$uid = $_REQUEST["uid"];
 	$ss = $_REQUEST["ss"];
 	$heute = date('Y-m-d');
 	$query = "SELECT tbl_studentlehrverband.semester, tbl_studiengang.typ, tbl_studiengang.kurzbz, tbl_person.person_id FROM tbl_person, tbl_benutzer, tbl_studentlehrverband, tbl_studiengang where tbl_studentlehrverband.student_uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id and tbl_studentlehrverband.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_studentlehrverband.student_uid = '".$uid."' and tbl_studentlehrverband.studiensemester_kurzbz = '".$ss."'";
-	
+
 	if($result = pg_query($conn, $query))
 	{
 		if($row = pg_fetch_object($result))
@@ -148,11 +154,11 @@ else
 		else
 		{
 			$echo = 'Datensatz wurde nicht gefunden';
-			
+
 		}
 	}
-	
-	
+
+
 	$akte = new akte($conn);
 	$akte->person_id = $person_id;
   	$akte->dokument_kurzbz = "Zeugnis";
