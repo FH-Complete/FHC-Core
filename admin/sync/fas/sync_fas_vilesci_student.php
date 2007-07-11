@@ -583,7 +583,7 @@ if($result = pg_query($conn_fas, $qry))
 		{
 			$zgvmas_code=null;
 		}
-		
+		$rolleinsertvon='';
 		$qrycu="SELECT name FROM benutzer WHERE benutzer_pk='".$row->creationuser."';";
 		if($resultcu = pg_query($conn_fas, $qrycu))
 		{
@@ -1740,6 +1740,16 @@ if($result = pg_query($conn_fas, $qry))
 				{
 					while($rowru=pg_fetch_object($resultru))
 					{
+						//insertvom  ermitteln
+						$qrycu="SELECT name FROM benutzer WHERE benutzer_pk='".$rowru->creationuser."';";
+						if($resultcu = pg_query($conn_fas, $qrycu))
+						{
+							if($rowcu=pg_fetch_object($resultcu))
+							{
+								$rolleinsertvon=$rowcu->name;
+							}
+						}
+						
 						$qry="SELECT semester FROM ausbildungssemester WHERE ausbildungssemester_pk='$rowru->ausbildungssemester_fk'";
 						if($resultr = pg_query($conn_fas, $qry))
 						{
@@ -1755,7 +1765,7 @@ if($result = pg_query($conn_fas, $qry))
 									if(!pg_num_rows($resultu)>0) //wenn dieser eintrag noch nicht vorhanden ist
 									{
 										$qry="INSERT INTO public.tbl_prestudentrolle (prestudent_id, rolle_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id) VALUES (".
-										"'$prestudent_id', '$rolle_kurzbz[$status]', '$studiensemester_kurzbz[$stm]', '$ausbildungssemester', '$date',now(),'SYNC',now(),'SYNC', '$rowru->student_ausbildungssemester_pk')";
+										"'$prestudent_id', '$rolle_kurzbz[$status]', '$studiensemester_kurzbz[$stm]', '$ausbildungssemester', '$date','$rowru->creationdate','$rolleinsertvon',now(),'SYNC', '$rowru->student_ausbildungssemester_pk')";
 										if(!pg_query($conn, $qry))
 										{
 											$error_log.="FEHLER bei Eintrag in tbl_prestudentrolle: '$prestudent_id', '$rolle_kurzbz[$status]', '$studiensemester_kurzbz[$stm]', '$ausbildungssemester'.\n".pg_errormessage($conn)."\n";
@@ -2347,7 +2357,7 @@ if($result = pg_query($conn_fas, $qry))
 						$text5.="\n".$qry." C1\n";
 						$text5.="***********\n\n";
 					}
-					$ausgabe.=$ausgabe_person;
+					//$ausgabe.=$ausgabe_person;
 					//fwrite($dateiausgabe,$ausgabe);
 					//$ausgabe='';
 					pg_query($conn,'COMMIT;'); //Commit, wenn kein Gruppeneintrag gefunden (Interessent, Bewerber) => nur Person und Prestudent werden angelegt	
