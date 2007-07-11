@@ -25,6 +25,30 @@ require_once("fpdf.php");
 
 
 class MyPdf extends FPDF {
+	
+  /**
+	 * Konstruktor
+	 *
+	 * @param $orientation: p oder portrait  = Hochformat
+	 *                      l oder landscape = Querformat
+	 *
+	 *        $unit:        pt = Point
+	 *                      mm = Millimeter
+	 *                      cm = Zentimeter
+	 *                      in = Inch
+	 *
+	 *        $format:      A3
+	 *                      A4
+	 *                      A5
+	 *                      letter
+	 *                      legal
+	 */
+	function MyPdf($orientation='P',$unit='mm',$format='A4')
+	{
+	    //Call parent constructor
+	    $this->FPDF($orientation,$unit,$format);
+	}
+	
   /**
    * Additional getter methods
    **/
