@@ -36,16 +36,13 @@ require_once('../include/mitarbeiter.class.php');
 require_once('../include/nation.class.php');
 require_once('../include/datum.class.php');
 
+$xmlformat='rdf';
 if(isset($_GET['xmlformat']))
-{
-	echo '<?xml version="1.0" encoding="ISO-8859-15" standalone="yes"?>';
 	$xmlformat=$_GET['xmlformat'];
-}
+if($xmlformat=='xml')
+	echo '<?xml version="1.0" encoding="ISO-8859-15" standalone="yes"?>';
 else
-{
 	echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-	$xmlformat='rdf';
-}
 
 // Datenbank Verbindung
 if (!$conn = pg_pconnect(CONN_STRING))
@@ -63,11 +60,11 @@ $pruefung = new abschlusspruefung($conn, null, true);
 		$pruefer3= '';
 
 		//Nachnamen der Pruefer holden
-		$person = new person($conn, null, true);
-		$mitarbeiter = new mitarbeiter($conn, null, true);
-		$student= new benutzer($conn,$row->student_uid,true);
+		$person = new person($conn,null,false);
+		$mitarbeiter = new mitarbeiter($conn,null,false);
+		$student= new benutzer($conn,$row->student_uid,false);
 
-		$nation=new nation($conn,$student->geburtsnation,true);
+		$nation=new nation($conn,$student->geburtsnation,false);
 		$geburtsnation=$nation->kurztext;
 		$geburtsnation_engl=$nation->engltext;
 		$nation->load($student->staatsbuergerschaft);
