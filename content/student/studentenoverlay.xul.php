@@ -201,28 +201,28 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 					<tabbox id="student-tabbox" flex="3" orient="vertical">
 						<tabs orient="horizontal" id="student-content-tabs">
 							<tab id="student-tab-detail" label="Details" />
+							<tab id="student-tab-kontakt" label="Kontakt" />
 							<tab id="student-tab-prestudent" label="PreStudent" />
 							<tab id="student-tab-dokumente" label="Dokumente" />
-							<tab id="student-tab-konto" label="Konto" />
-							<tab id="student-tab-zeugnis" label="Zeugnis" />
+							<tab id="student-tab-konto" label="Konto" />							
 							<tab id="student-tab-betriebsmittel" label="Betriebsmittel" />
 							<tab id="student-tab-io" label="Incoming/Outgoing" />
 							<tab id="student-tab-noten" label="Noten" />
-							<tab id="student-tab-kontakt" label="Kontakt" />
+							<tab id="student-tab-zeugnis" label="Zeugnis" />
 							<tab id="student-tab-pruefung" label="Prüfung" />
 							<tab id="student-tab-abschlusspruefung" label="AbschlussPrüfung" />
 							<tab id="student-tab-projektarbeit" label="Projektarbeit" />
 						</tabs>
 						<tabpanels id="student-tabpanels-main" flex="1">
 							<vbox id="student-detail"  style="margin-top:10px;" />
+							<iframe id="student-kontakt" src="" style="margin-top:10px;" />
 							<vbox id="student-prestudent"  style="margin-top:10px;" />
 							<vbox id="interessent-dokumente"  style="margin-top:10px;" />
-							<vbox id="student-konto"  style="margin-top:10px;" />
-							<vbox id="student-zeugnis"  style="margin-top:10px;" />
+							<vbox id="student-konto"  style="margin-top:10px;" />							
 							<vbox id="student-betriebsmittel"  style="margin-top:10px;" />
 							<vbox id="student-io"  style="margin-top:10px;" />
 							<vbox id="student-noten"  style="margin-top:10px;" />
-							<iframe id="student-kontakt" src="" style="margin-top:10px;" />
+							<vbox id="student-zeugnis"  style="margin-top:10px;" />
 							<vbox id="student-pruefung"  style="margin-top:10px;" />
 							<vbox id="student-abschlusspruefung"  style="margin-top:10px;" />
 							<vbox id="student-projektarbeit"  style="margin-top:10px;" />

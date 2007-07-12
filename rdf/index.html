@@ -12,19 +12,23 @@ mehr oder anders zu verwenden sind.<br>
 <br>
 <h2>Student</h2>
 <span style="font-weight: bold;">Aufruf:</span>
-student.rdf.php?stg_kz=...&amp;sem=...&amp;ver=...&amp;grp=...&amp;einheit=...&amp;uid=...<br>
-Beispiel: <a target="_blank" href="student.rdf.php?stg_kz=227&amp;sem=2">student.rdf.php?stg_kz=227&amp;sem=2</a><br>
+student.rdf.php?studiengang_kz=...&amp;semester=...&amp;verband=...&amp;gruppe=...&amp;gruppe_kurzbz=...&amp;uid=...<br>
+Beispiel: <a target="_blank" href="student.rdf.php?studiengang_kz=227&amp;semester=2">student.rdf.php?studiengang_kz=227&amp;semester=2</a><br>
 <span style="font-weight: bold;"><br>
 Parameter</span>: <br>
 <ul>
-  <li>stg_kz: Studiengangskennzahl<br>
+  <li>studiengang_kz: Studiengangskennzahl<br>
   </li>
-  <li>sem: Semester (optional)<br>
+  <li>semester: Semester (optional)<br>
   </li>
-  <li>ver: Verband (optional)</li>
-  <li>grp: Gruppe (optional)</li>
-  <li>einheit: Spezialgruppen, Module, ... (optional)</li>
+  <li>verband: Verband (optional)</li>
+  <li>gruppe: Gruppe (optional)</li>
+  <li>gruppe_kurzbz: Spezialgruppen, Module, ... (optional)</li>
   <li>uid: UID eines bestimmten Studenten (Wenn gesetzt werden alle anderen Parameter nicht verwendet)</li>
+  <li>typ: Typ der gelieferten Personen (student, prestudent, interressent, bewerber, aufgenommen, warteliste, absage, zgv, reihungstestangeledet, reihungstestnichtangemeldet)</li>
+  <li>prestudent_id: Prestudent_id</li>
+  <li>xmlformat: Wenn xmlformat=xml dann wird ein XML statt dem RDF geliefert</li>
+  <li>filter: Alle Personen die filter im Nachnamen enthalten</li>
 </ul>
 <span style="font-weight: bold;"><br>
 Attribute:</span><br>
