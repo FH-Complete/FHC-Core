@@ -82,27 +82,6 @@ else
       				</hbox>
       			</row>
       			<row>
-      				<label value="Plz" control="adresse-textbox-plz"/>
-      				<hbox>
-		      			<textbox id="adresse-textbox-plz" maxlength="16" size="5"/>
-		      			<spacer flex="1" />
-		      		</hbox>
-				</row>
-				<row>
-					<label value="Ort" control="adresse-textbox-ort"/>
-					<hbox>
-						<textbox id="adresse-textbox-ort" maxlength="256" size="30"/>
-						<spacer flex="1" />			
-      				</hbox>
-				</row>
-				<row>
-					<label value="Gemeinde" />
-					<hbox>						
-						<textbox id="adresse-textbox-gemeinde" maxlength="256" size="30" />
-						<spacer flex="1" />			
-      				</hbox>
-				</row>
-				<row>
 					<label value="Nation" control="adresse-menulist-nation"/>
 					<menulist id="adresse-menulist-nation" 
 					          datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php" flex="1"
@@ -113,6 +92,54 @@ else
 					        		      label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
 								  		  uri="rdf:*"/>
 								</menupopup>
+						</template>
+					</menulist>
+				</row>
+      			<row>
+      				<label value="Plz" control="adresse-textbox-plz"/>
+      				<hbox>
+		      			<textbox id="adresse-textbox-plz" maxlength="16" size="5" oninput="AdresseLoadGemeinde(false)"/>
+		      			<spacer flex="1" />
+		      		</hbox>
+				</row>
+				<row>
+					<label value="Gemeinde" />
+					<!--<hbox>						
+						<textbox id="adresse-textbox-gemeinde" maxlength="256" size="30" />
+						<spacer flex="1" />			
+      				</hbox>-->
+      				<menulist id="adresse-textbox-gemeinde"
+						  editable="true" 
+				          datasources="rdf:null" flex="1"
+				          ref="http://www.technikum-wien.at/gemeinde/liste" 
+				          oncommand="AdresseLoadOrtschaft(false)"
+					>
+						<template>
+							<menupopup>
+								<menuitem value="rdf:http://www.technikum-wien.at/gemeinde/rdf#name"
+					        		      label="rdf:http://www.technikum-wien.at/gemeinde/rdf#name"
+								  		  uri="rdf:*"/>
+							</menupopup>
+						</template>
+					</menulist>
+				</row>
+				<row>
+					<label value="Ortschaft" control="adresse-textbox-ort"/>
+					<!--<hbox>
+						<textbox id="adresse-textbox-ort" maxlength="256" size="30"/>
+						<spacer flex="1" />			
+      				</hbox>-->
+      				<menulist id="adresse-textbox-ort"
+						  editable="true"
+				          datasources="rdf:null" flex="1"
+				          ref="http://www.technikum-wien.at/gemeinde/liste" 
+					>
+						<template>
+							<menupopup>
+								<menuitem value="rdf:http://www.technikum-wien.at/gemeinde/rdf#ortschaftsname"
+					        		      label="rdf:http://www.technikum-wien.at/gemeinde/rdf#ortschaftsname"
+								  		  uri="rdf:*"/>
+							</menupopup>
 						</template>
 					</menulist>
 				</row>
