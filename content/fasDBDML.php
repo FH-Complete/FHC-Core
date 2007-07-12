@@ -99,7 +99,7 @@ if(!$error)
 		//Wenn die Nation Oesterreich ist, dann muss die Gemeinde in der Tabelle Gemeinde vorkommen
 		if($_POST['nation']=='A')
 		{
-			$qry = "SELECT * FROM bis.tbl_gemeinde WHERE lower(name)=lower('".addslashes($_POST['gemeinde'])."')";
+			$qry = "SELECT * FROM bis.tbl_gemeinde WHERE lower(name)=lower('".addslashes($_POST['gemeinde'])."') AND plz='".addslashes($_POST['plz'])."'";
 			if($result = pg_query($conn, $qry))
 			{
 				if($row = pg_fetch_object($result))

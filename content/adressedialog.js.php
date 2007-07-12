@@ -87,8 +87,10 @@ function AdresseInit(adresse_id, person_id)
 	document.getElementById('adresse-textbox-name').value=name;
 	document.getElementById('adresse-textbox-strasse').value=strasse;
 	document.getElementById('adresse-textbox-plz').value=plz;
-	document.getElementById('adresse-textbox-ort').value=ort;
+	AdresseLoadGemeinde(true);
 	document.getElementById('adresse-textbox-gemeinde').value=gemeinde;
+	AdresseLoadOrtschaft(true);
+	document.getElementById('adresse-textbox-ort').value=ort;
 	document.getElementById('adresse-menulist-nation').value=nation;
 	document.getElementById('adresse-menulist-typ').value=typ;
 	if(heimatadresse=='Ja')
@@ -110,4 +112,86 @@ function AdresseSpeichern()
 {
 	if(window.opener.KontaktAdresseSpeichern(document))
 		window.close();
+	else
+		this.focus();
+}
+
+// ****
+// * Laedt die Gemeinden zur eingegebenen Postleitzahl
+// ****
+function AdresseLoadGemeinde(blocking)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	
+	menulist_gemeinde = document.getElementById('adresse-textbox-gemeinde');
+	if(document.getElementById('adresse-menulist-nation').value=='A')
+	{
+		menulist_gemeinde.value='';
+		document.getElementById('adresse-textbox-ort').value='';
+	}
+	plz = document.getElementById('adresse-textbox-plz').value;
+	
+	if(plz.length>3)
+	{
+		var url = '<?php echo APP_ROOT; ?>rdf/gemeinde.rdf.php?plz='+plz+'&'+gettimestamp();
+		
+		var oldDatasources = menulist_gemeinde.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			menulist_gemeinde.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		menulist_gemeinde.builder.rebuild();
+
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		if(blocking)
+			var datasource = rdfService.GetDataSourceBlocking(url);
+		else
+			var datasource = rdfService.GetDataSource(url);
+		datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		menulist_gemeinde.database.AddDataSource(datasource);
+		
+		menulist_gemeinde.builder.rebuild();
+	}
+}
+
+// ****
+// * Laedt die Ortschaften zu Plz und Gemeinde
+// ****
+function AdresseLoadOrtschaft(blocking)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	gemeinde = document.getElementById('adresse-textbox-gemeinde').value;
+	menulist_ort = document.getElementById('adresse-textbox-ort');
+	if(document.getElementById('adresse-menulist-nation').value=='A')
+	{
+		menulist_ort.value='';
+	}
+	plz = document.getElementById('adresse-textbox-plz').value;
+	
+	if(plz.length>3 && gemeinde!='')
+	{
+		var url = '<?php echo APP_ROOT; ?>rdf/gemeinde.rdf.php?plz='+plz+'&gemeinde='+encodeURIComponent(gemeinde)+'&'+gettimestamp();
+		
+		var oldDatasources = menulist_ort.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			menulist_ort.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		menulist_ort.builder.rebuild();
+	
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		if(blocking)
+			var datasource1 = rdfService.GetDataSourceBlocking(url);
+		else
+			var datasource1 = rdfService.GetDataSource(url);
+		datasource1.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		datasource1.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		menulist_ort.database.AddDataSource(datasource1);
+		
+		menulist_ort.builder.rebuild();
+	}
 }
