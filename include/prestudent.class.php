@@ -469,6 +469,8 @@ class prestudent extends person
 			case "prestudent":
 				if($studiensemester_kurzbz=='' || is_null($studiensemester_kurzbz))
 					$qry = "SELECT *, '' as rolle_kurzbz, '' as studiensemester_kurzbz, '' as ausbildungssemester, '' as datum FROM public.tbl_prestudent prestudent, public.tbl_person WHERE NOT EXISTS (select * from tbl_prestudentrolle WHERE prestudent_id=prestudent.prestudent_id) AND studiengang_kz='".addslashes($studiengang_kz)."' AND prestudent.person_id=tbl_person.person_id";
+				else 
+					$qry .= " AND a.rolle IN('Interessent', 'Bewerber', 'Aufgenommener', 'Wartender', 'Abgewiesener')";
 				break;
 			default: 
 				break;		
