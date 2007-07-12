@@ -685,10 +685,10 @@ if($result = pg_query($conn_fas, $qry))
 		{
 			$error_log = 'Alias darf nicht laenger als 256 Zeichen sein '.$nachname.", ".$vorname."\n";
 		}
-		//if(!is_numeric($person_id))
+		/*if(!is_numeric($person_id))
 		{
 			//$error_log = 'person_id muss eine gueltige Zahl sein, bei: '.$nachname.", ".$vorname."\n";
-		}//
+		}*/
 		if(strlen($matrikelnr)>15)
 		{
 			$error_log = 'Matrikelnummer darf nicht laenger als 15 Zeichen sein '.$nachname.", ".$vorname."\n";
