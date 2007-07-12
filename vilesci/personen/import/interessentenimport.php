@@ -21,6 +21,7 @@
  */
 
 require_once('../../config.inc.php');
+require_once('../../../admin/sync/sync_config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/studiengang.class.php');
@@ -117,7 +118,7 @@ if($studiensemester_kurzbz == '')
 }
 
 //Testphase fix
-if($studiengang_kz!='' && $studiengang_kz!='299')
+if($studiengang_kz!='' && !in_array($studiengang_kz,$dont_sync_php))
 	die('Keine Berechtigung zum Importieren');
 //end Testphase
 
