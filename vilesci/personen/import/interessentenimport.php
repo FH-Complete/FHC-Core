@@ -380,6 +380,7 @@ echo '<tr><td>EMail</td><td><input type="text" id="email" maxlength="128" name="
 echo '<tr><td>Telefon</td><td><input type="text" id="telefon" maxlength="128" name="telefon" value="'.$telefon.'" /></td></tr>';
 echo '<tr><td>Mobil</td><td><input type="text" id="mobil" maxlength="128" name="mobil" value="'.$mobil.'" /></td></tr>';
 echo '<tr><td>Letzte Ausbildung</td><td><SELECT id="letzteausbildung" name="letzteausbildung">';
+echo '<OPTION value="" '.($letzteausbildung==''?'selected':'').'>-- keine Auswahl --</OPTION>';
 $qry = "SELECT * FROM bis.tbl_ausbildung ORDER BY ausbildungcode";
 if($result = pg_query($conn, $qry))
 {

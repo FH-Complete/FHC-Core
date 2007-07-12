@@ -42,6 +42,7 @@ class prestudent extends person
 	var $punkte;
 	var $bismelden;
 	var $anmerkung;
+	var $ext_id_prestudent;
 	
 	var $rolle_kurzbz;
 	var $studiensemester_kurzbz;
@@ -116,6 +117,7 @@ class prestudent extends person
 				$this->bismelden = ($row->bismelden=='t'?true:false);
 				$this->person_id = $row->person_id;
 				$this->anmerkung = $row->anmerkung;
+				$this->ext_id_prestudent = $row->ext_id;
 				
 				if(!person::load($row->person_id))
 					return false;
@@ -186,7 +188,7 @@ class prestudent extends person
 			       $this->addslashes($this->insertvon).",".
 			       $this->addslashes($this->updateamum).",".
 			       $this->addslashes($this->updatevon).",".
-			       $this->addslashes($this->ext_id).",".
+			       $this->addslashes($this->ext_id_prestudent).",".
 			       $this->addslashes($this->anmerkung).");";
 		}
 		else
@@ -212,7 +214,7 @@ class prestudent extends person
 			       ' bismelden='.($this->bismelden?'true':'false').",".
 			       ' updateamum='.$this->addslashes($this->updateamum).",".
 			       ' updatevon='.$this->addslashes($this->updatevon).",".
-			       ' ext_id='.$this->addslashes($this->ext_id).",".
+			       ' ext_id='.$this->addslashes($this->ext_id_prestudent).",".
 			       ' anmerkung='.$this->addslashes($this->anmerkung).
 			       " WHERE prestudent_id='".addslashes($this->prestudent_id)."';";
 		}
@@ -328,7 +330,7 @@ class prestudent extends person
 			$ps->updatevon = $row->updatevon;
 			$ps->insertamum = $row->insertamum;
 			$ps->insertvon = $row->insertvon;
-			$ps->ext_id = $row->ext_id;
+			$ps->ext_id_prestudent = $row->ext_id_prestudent;
 			$this->result[]=$ps;
 			$this->num_rows++; 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	
 		}	
@@ -408,6 +410,7 @@ class prestudent extends person
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
+				$this->ext_id_prestudent = $row->ext_id;
 			}
 			return true;
 		}
@@ -613,7 +616,7 @@ class prestudent extends person
 			       $this->addslashes($this->insertvon).",".
 			       $this->addslashes($this->updateamum).",".
 			       $this->addslashes($this->updatevon).",".
-			       $this->addslashes($this->ext_id).");";
+			       $this->addslashes($this->ext_id_prestudent).");";
 		}
 		else
 		{			
@@ -672,7 +675,7 @@ class prestudent extends person
 							$this->addslashes($this->insertvon).','.
 							$this->addslashes($this->updateamum).','.
 							$this->addslashes($this->updatevon).','.
-							$this->addslashes($this->ext_id).');';
+							$this->addslashes($this->ext_id_prestudent).');';
 			if($log->save(true))
 			{
 						

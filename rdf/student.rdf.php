@@ -183,7 +183,7 @@ if($xmlformat=='rdf')
 				draw_prestudent($prestd);
 			}
 	}
-	elseif(in_array($typ, array('prestudent', 'interessent','bewerber','aufgenommen',
+	elseif(in_array($typ, array('prestudent', 'interessenten','bewerber','aufgenommen',
 	                      'warteliste','absage','zgv','reihungstestangemeldet',
 	                      'reihungstestnichtangemeldet')))
 	{
