@@ -99,23 +99,23 @@
 <head>
 	<title>Zeitsperren <?php echo $studiensemester; ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-	<link rel="stylesheet" href="../../../skin/cis.css" type="text/css">
+	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </head>
 
-<body>
+<body id="inhalt">
 	<H2>
-		<table width="100%" border="0" cellpadding="0" cellspacing="0">
+		<table class="tabcontent">
 			<tr>
 				<td>&nbsp;Zeitsperren <?php echo $studiensemester; ?></td>
 				<td align="right">
-					<A onclick="window.open('zeitwunsch_help.html','Hilfe', 'height=320,width=480,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');" class="hilfe" target="_blank">HELP&nbsp;</A>
+					<A class="hilfe" onclick="window.open('zeitwunsch_help.html','Hilfe', 'height=320,width=480,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');" target="_blank">HELP&nbsp;</A>
 				</td>
 			</tr>
 		</table>
 	</H2>
 
 	<H3>Zeitsperren von <?php echo $datum_beginn.' bis '.$datum_ende; ?></H3>
-	<a href="<?php echo $export_link; ?>">Excel</a>
+	<a class="Item" href="<?php echo $export_link; ?>">Excel</a>
 	<TABLE id="zeitsperren">
     <TR>
     	<?php

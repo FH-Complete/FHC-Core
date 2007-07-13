@@ -4,6 +4,7 @@ body
 	background-color: White;
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: x-small;
+	overflow:visible;
 	/*IE hack*/
 	voice-family: "\"}\"";
 	voice-family: inherit;
@@ -17,20 +18,35 @@ iframe
 	border-style:none;
 	padding:0px;
 }
+textarea
+{
+	font-family: Arial, Helvetica, sans-serif;
+}
 #menue
 {
-	position:absolute;
 	top:80px;
 	width:19%;
-	height:90%;
+	height:80%;
+	z-index:1000;
 }
-#content
+/*Alle außer IE 6*/
+html>body #menue
 {
 	position:absolute;
+}
+
+#content
+{
 	width:80%;
-	height:90%;
+	height:80%;
 	left:20%;
 }
+/*Alle außer IE 6*/
+html>body #content
+{
+	position:absolute;
+}
+
 input.TextBox					
 {
 	background-color: White;
@@ -40,7 +56,40 @@ input.TextBox
 	margin-top: 3px;
 	text-align: right;
 }
+.home_logo
+{
+	background-image:url(styles/tw/TWLogo_klein.jpg);
+	width:170px;
+	height:53px;
+}
+.header_line
+{
+	background-image:url(styles/tw/header_line.jpg);
+	background-repeat:repeat-x;
+	width:100%;
+	height:3px;
+}
+/*Vor IE/Mac verstecken \*/
+*html .header_line{
+	height:0.5px;
+}
+/* Vor IE/Mac verstecken*/
+div.tip
+{
 
+	position: absolute;
+	display: none;
+	width: 300px;
+	background-color: #f7f7ee;
+	padding: 3px 7px 4px 6px;
+	border: 1px solid #336;
+	background-color: #f7f7ee;
+	text-align: left;
+}
+#header
+{
+	vertical-align:middle;
+}
 
 /* Links */
 a
@@ -106,42 +155,111 @@ A.stpl_detail:hover
 	text-decoration:underline;
 	cursor:hand;
 }
+a.head
+{
+   color:#ffffff;
+}
+a.head:hover
+{
+	color:#000000;
+}
 
 
 /* Tables */
+TABLE.tabcontent
+{
+	margin: 0px;
+	padding: 0px;
+	border-style: none;
+	width: 100%;
+	cellspacing: 0;
+	cellpadding: 0;
+}
+TABLE.tabcontent2
+{
+	margin: 0px;
+	padding: 0px;
+	border-style: none;
+	cellspacing: 0;
+	cellpadding: 0;
+}
+TABLE.tabborder
+{
+	cellspacing: 0;
+	cellpadding: 1;
+	width: 100%;
+	border: 1;
+}
+TABLE#tabterm
+{
+	cellpadding: 0;
+	cellspacing: 0;
+	margin:auto;
+}
 td.ContentHeader
 {
-	background-color: #008381; //grün
+	background-color: #008381; /*grün*/
 	font-weight: bold;
 	height: 19px;
 }
 td.ContentHeader2
 {
-	background-color: #CCCCCC; //mittel-grau
+	background-color: #CCCCCC; /*mittel-grau*/
 	font-weight: normal;
 	height: 19px
 }
 td.ContentHeader3					
 {
-	background-color: #CCCCCC; //mittel-grau
+	background-color: #CCCCCC; /*mittel-grau*/
 	font-weight: bold;
 	height: 19px
 }
 td.MarkLine
 {
-	background-color: #F2F2F2; //wie #EEEEEE; also grau fast weiß
+	background-color: #F2F2F2; /*wie #EEEEEE; also grau fast weiß*/
+}
+td.tdwidth10
+{
+	width: 10px;
+}
+td.tdwidth30
+{
+	width: 30px;
+}
+td.tdgreen
+{
+	background-color: #CCFFCC;
+}
+td.tdborder
+{
+	text-align: center;
+	border:2px solid black;
+	background-color: #ffffff;
+}
+td.tdwrap
+{
+	white-space: nowrap;
+}
+
+td.tdvertical
+{
+	vertical-align: top;
 }
 TR.liste
 {
-	background-color: #D3DCE3; //grau wie #DDDDDD
+	background-color: #D3DCE3; /*grau wie #DDDDDD*/
 }
 TR.liste0						
 {
-	background-color: #FFFFFF; //weiß
+	background-color: #FFFFFF; /*weiß*/
 }
 TR.liste1						
 {
-	background-color: #EEEEEE; //grau fast weiß
+	background-color: #EEEEEE; /*grau fast weiß*/
+}
+TR.tryellow
+{
+	background-color: #FFFF99;
 }
 
 /* private/profile/zeitsperre.php */
@@ -155,19 +273,19 @@ TABLE#zeitsperren
 }
 TABLE#zeitsperren TH
 {
-	background-color: #DDDDDD; //hellgrau
+	background-color: #DDDDDD; /*hellgrau*/
 }
 TABLE#zeitsperren TH.feiertag
 {
-	background-color: #FFFF00;//grelles gelb
+	background-color: #FFFF00; /*grelles gelb*/
 }
 TABLE#zeitsperren TD.feiertag
 {
-	background-color: #FFFF22; //bissi helleres gelb
+	background-color: #FFFF22; /*bissi helleres gelb*/
 }
 TABLE#zeitsperren TD
 {
-	background-color: #EEEEEE //grau fast weiß
+	background-color: #EEEEEE /*grau fast weiß*/
 }
 
 /* Stundeplan */
@@ -186,11 +304,11 @@ TABLE.stdplan TD
 {
 	background-color: #EEEEEE
 }
-.row-even { --> liste1
+.row-even { /*liste1*/
  background-color:#f2f2f2;
 }
 
-.row-odd { --> liste0
+.row-odd { /*liste0*/
   background-color:#ffffff;
 }
 
@@ -222,13 +340,13 @@ h2
 { 
 	font-size: small; 
 	color: #ffffff; 
-	background-color: #00a4d2; //hellblau
+	background-color: #00a4d2; /*hellblau*/
 }
 h2 td
 { 
 	font-size: small; 
 	color: #ffffff; 
-	background-color: #00a4d2; //hellblau
+	background-color: #00a4d2; /*hellblau*/
 }
 h2 a
 {
@@ -306,126 +424,44 @@ img
 {
 	border: 0;
 }
-
-
-/* neu */
-
-TABLE.tabcontent
+img#layout
 {
-	margin: 0px;
-	padding: 0px;
-	border-style: none;
-	width: 100%;
-	cellspacing: 0;
-	cellpadding: 0;
+	border: 1px solid #AAAAAA;
 }
 
-TABLE.tabcontent2
+/*Farben*/
+#bgcolor0					
 {
-	margin: 0px;
-	padding: 0px;
-	border-style: none;
-	cellspacing: 0;
-	cellpadding: 0;
+	background-color: #CC0000;
 }
-
-td.tdwidth10
+#bgcolor1					
 {
-	width: 10px;
+	background-color: #FF2200;
 }
-
-td.tdwidth30
+#bgcolor2					
 {
-	width: 30px;
+	background-color: #FF9922;
 }
-
-a.aheader
+#bgcolor3					
 {
-	color:#FFFFFF;
+	background-color: #FFFF55;
 }
-
-a.head
+#bgcolor4					
 {
-   color:#ffffff;
+	background-color: #88FF88;
 }
-
-a.head:hover
+#bgcolor5					
 {
-	color:#000000;
+	background-color: #AAFFAA;
 }
-
-
-TABLE.tabborder
-{
-	cellspacing: 0;
-	cellpadding: 1;
-	width: 100%;
-	border: 1;
-}
-
-TR.tryellow
-{
-	background-color: #FFFF99;
-}
-
-td.tdgreen
+#bgcolor6					
 {
 	background-color: #CCFFCC;
 }
 
-div.tip
-{
-
-	position: absolute;
-	display: none;
-	width: 300px;
-	background-color: #f7f7ee;
-	padding: 3px 7px 4px 6px;
-	border: 1px solid #336;
-	background-color: #f7f7ee;
-	text-align: left;
-}
-
-
-td.tdborder
-{
-	text-align: center;
-	border:2px solid black;
-	background-color: #ffffff;
-}
-
-TABLE#tabterm
-{
-	cellpadding: 0;
-	cellspacing: 0;
-	margin:auto;
-}
-
-td.tdwrap
-{
-	white-space: nowrap;
-}
-
-td.tdvertical
-{
-	vertical-align: top;
-}
-.home_logo
-{
-	background-image:url(styles/tw/TWLogo_klein.jpg);
-	width:170px;
-	height:53px;
-}
-.header_line
-{
-	background-image:url(images/header_line.gif);
-	width:100%;
-	height:3px;
-}
 
 
 /*aussortiert*/
-
 
 
 /*font.headline					
@@ -451,31 +487,3 @@ td.tdvertical
 	margin-top: 0px;
 }*/
 
-/*#bgcolor0					
-{
-	background-color: #FF0000;
-}
-#bgcolor1					
-{
-	background-color: #FF4444;
-}
-#bgcolor2					
-{
-	background-color: #FF7777;
-}
-#bgcolor3					
-{
-	background-color: #C0EEC0;
-}
-#bgcolor4					
-{
-	background-color: #77FF77;
-}
-#bgcolor5					
-{
-	background-color: #44FF44;
-}
-#bgcolor6					
-{
-	background-color: #00FF00;
-}*/

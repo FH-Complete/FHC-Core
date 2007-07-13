@@ -83,9 +83,9 @@ $num_rows_repl=pg_numrows($erg_repl);
 <head>
     <title>Lehrveranstaltungsplan Details</title>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-    <link rel="stylesheet" href="../../../skin/cis.css" type="text/css">
+    <link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </head>
-<body class="background_main">
+<body id="inhalt">
 <H2>Lehrveranstaltungsplan &rArr; Details</H2>
 Datum: <?php echo $datum; ?><BR>
 Stunde: <?php echo $stunde; ?><BR><BR>
@@ -113,13 +113,13 @@ for ($i=0; $i<$num_rows_stpl; $i++)
     ?>
     <tr class="<?php echo 'liste'.$i%2; ?>">
         <td><?php echo $unr; ?></td>
-        <td><A href="mailto:<?php echo $pers_email; ?>"><?php echo $titelpre.' '.$pers_vorname.' '.$pers_nachname; ?></A></td>
+        <td><A class="Item" href="mailto:<?php echo $pers_email; ?>"><?php echo $titelpre.' '.$pers_vorname.' '.$pers_nachname; ?></A></td>
         <td><?php echo $ortkurzbz; ?></td>
         <td><?php echo $lehrfachkurzbz; ?></td>
         <td><?php echo $bezeichnung; ?></td>
-        <td><A href="mailto:<?php echo $stgkurzbz.$semester.strtolower($verband).$gruppe; ?>@technikum-wien.at">
+        <td><A class="Item" href="mailto:<?php echo $stgkurzbz.$semester.strtolower($verband).$gruppe; ?>@technikum-wien.at">
         <?php echo $stgkurzbz.'-'.$semester.$verband.$gruppe; ?></A></td>
-        <td><A href="mailto:<?php echo strtolower($gruppe_kurzbz); ?>@technikum-wien.at">
+        <td><A class="Item" href="mailto:<?php echo strtolower($gruppe_kurzbz); ?>@technikum-wien.at">
         <?php echo $gruppe_kurzbz; ?></A></td>
     </tr>
     <?php
@@ -150,5 +150,5 @@ if ($num_rows_repl>0)
     echo '</table>';
 }
 ?>
-<P>Fehler und Feedback bitte an <A href="mailto:lvplan@technikum-wien.at">LV-Koordinationsstelle</A>.</P>
+<P>Fehler und Feedback bitte an <A class="Item" href="mailto:lvplan@technikum-wien.at">LV-Koordinationsstelle</A>.</P>
 </body></html>

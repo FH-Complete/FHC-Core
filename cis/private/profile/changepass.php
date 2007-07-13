@@ -1,10 +1,10 @@
 <?php	session_start(); ?>
 <html>
 <head>
-<link rel="stylesheet" href="../../../skin/cis.css" type="text/css">
+<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 <title>Passwort ändern</title>
 </head>
-<body class="background_main">
+<body id="inhalt">
 
 <?php
 
@@ -42,17 +42,17 @@
 			{
 				if ($newpass1 != $null)
 				{
-					
+
 					$mySalt = substr(ereg_replace("[^a-zA-Z0-9./]","",crypt(rand(10000000,99999999), rand(10,99))),2, 2);
 					$cryptPW = rtrim(crypt($newpass1,$mySalt));
 					$info["userPassword"] = "{crypt}$cryptPW";
-					$newpass1=escapeshellarg($newpass1);	
+					$newpass1=escapeshellarg($newpass1);
 					$info["sambalmPassword"] = rtrim(shell_exec("/usr/local/sbin/mkntpwd -L $newpass1"));
 					$info["sambantPassword"] = rtrim(shell_exec("/usr/local/sbin/mkntpwd -N $newpass1"));
 
 					$mod_r = ldap_mod_replace($ds,"uid=$username,ou=People,dc=technikum-wien,dc=at",$info);
- 
-					if ($mod_r) 
+
+					if ($mod_r)
 					{
 						echo "<h4>Das Passwort wurde erfolgreich geändert!</h4>";
 						session_unregister('count');
@@ -63,24 +63,24 @@
 					{
 						echo "<h4>Beim Ändern des Passwortes ist ein Fehler aufgetreten!</h4>";
 					}
-				} 
-				else 
+				}
+				else
 				{
 					echo "<h4>Das neue Passwort darf nicht leer sein!</h4>";
 				}
-			} 
-			else 
+			}
+			else
 			{
 				echo "<h4>Die neuen Passwörter stimmen nicht überein!</h4>";
 			}
-		} 
-		else 
+		}
+		else
 		{
 			echo "<h4>Passwort inkorrekt!</h4>";
 		}
 		ldap_close($ds);
-	} 
-	else 
+	}
+	else
 	{
 		echo "Der Technikum Wien LDAP Server ist zur Zeit nicht erreichbar!";
 	}

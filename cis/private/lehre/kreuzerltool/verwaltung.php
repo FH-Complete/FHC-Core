@@ -41,7 +41,7 @@ $time = microtime_float();
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <title>Kreuzerltool</title>
 <script language="JavaScript">
 <!--
@@ -62,7 +62,7 @@ $time = microtime_float();
 </script>
 </head>
 
-<body>
+<body id="inhalt">
 <?php
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim oeffnen der Datenbankverbindung');
@@ -613,7 +613,7 @@ if(isset($_GET['kopieren']) && $_GET['kopieren']=='true')
 //Uebersichtstabelle
 if(isset($uebung_id) && $uebung_id!='')
 {
-	echo "<table><tr><td valign='top'>";
+	echo "<table><tr><td class='tdvertical'>";
 	//Bearbeiten der ausgewaehlten Uebung
 	echo "<form action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' method=POST>\n";
 	echo "<table><tr><td colspan='2' width='340' class='ContentHeader3'>Ausgew&auml;hlte Kreuzerlliste bearbeiten</td><td>&nbsp;</td></tr>\n";
@@ -634,7 +634,7 @@ if(isset($uebung_id) && $uebung_id!='')
 	$beispiel_obj = new beispiel($conn);
 	$beispiel_obj->load_beispiel($uebung_id);
 	$anzahl = count($beispiel_obj->beispiele);
-	echo "</td><td valign='top'>";
+	echo "</td><td class='tdvertical'>";
 
 	//Beispiel neu Anlegen
 	echo "<form action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' method=POST>\n";
@@ -648,7 +648,7 @@ if(isset($uebung_id) && $uebung_id!='')
 	echo "</table>
 	</form>";
 
-	echo "</td></tr><tr><td valign='top'>";
+	echo "</td></tr><tr><td class='tdvertical'>";
 
 	//Uebersicht der Beispiele
 	echo "<form action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' method=POST>\n";
@@ -672,7 +672,7 @@ if(isset($uebung_id) && $uebung_id!='')
 	echo "</table>
 	</form>";
 
-	echo "</td><td valign='top'>";
+	echo "</td><td class='tdvertical'>";
 
 	//Beispiel Aendern
 	$error_msg = '';
@@ -700,7 +700,7 @@ if(isset($uebung_id) && $uebung_id!='')
 else
 {
 	//Gesamtuebersicht ueber alle Uebungen
-	echo "<table><tr><td valign='top'>";
+	echo "<table><tr><td class='tdvertical'>";
 	echo "<form action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method=POST>";
 	echo "<table width='440'><tr><td colspan='3' class='ContentHeader3'>Vorhandene Kreuzerllisten bearbeiten</td></tr>";
 
@@ -824,7 +824,7 @@ else
 
 	//Kopier-Buttons anzeigen
 	$copy_content.='</table>';
-	echo "</td><td valign='top'>";
+	echo "</td><td class='tdvertical'>";
 	if($has_copy_content)
 		echo $copy_content;
 	echo "</td></tr></table>";

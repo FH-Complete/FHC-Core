@@ -30,34 +30,34 @@
     //Connection Herstellen
     if(!$conn = pg_pconnect(CONN_STRING))
        die("Fehler beim öffnen der Datenbankverbindung");
-    
-    if(isset($_POST['cmbChoice']))   
+
+    if(isset($_POST['cmbChoice']))
     	$cmbChoice = $_POST['cmbChoice'];
     else
     	$cmbChoice=null;
-    
+
     if(isset($_POST['txtSearchQuery']))
     	$txtSearchQuery = $_POST['txtSearchQuery'];
     else
     	$txtSearchQuery=null;
-    	
+
     if(isset($_POST['do_search']))
     	$do_search = $_POST['do_search'];
-    else 
+    else
     	$do_search = null;
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
 
 <body onLoad="document.SearchFormular.txtSearchQuery.focus();">
-<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+<table class="tabcontent" id="inhalt">
   <tr>
-    <td width="10">&nbsp;</td>
-    <td><table width="100%"  border="0" cellspacing="0" cellpadding="0">
+    <td class="tdwidth10">&nbsp;</td>
+    <td><table class="tabcontent">
       <tr>
         <td class="ContentHeader"><font class="ContentHeader">&nbsp;Personensuche Technikum Wien</font></td>
       </tr>
@@ -145,20 +145,20 @@
 						echo "<table border=\"0\" cellpadding=\"0\" cellspacing=\"1\" width=\"100%\">";
 
 						echo "<tr>
-								<td align=\"left\" class=\"ContentHeader\" nowrap><font class=\"ContentHeader\">&nbsp;Titel</font></td>
-								<td align=\"left\" class=\"ContentHeader\" nowrap><font class=\"ContentHeader\">&nbsp;Vorname</font></td>
-								<td align=\"left\" class=\"ContentHeader\" nowrap><font class=\"ContentHeader\">&nbsp;Nachname</font></td>
-								<td align=\"left\" class=\"ContentHeader\" nowrap><font class=\"ContentHeader\">&nbsp;Telefonnummer</font></td>
-								<td align=\"left\" class=\"ContentHeader\" nowrap><font class=\"ContentHeader\">&nbsp;E-Mail Adresse</font></td>
-								<td align=\"left\" class=\"ContentHeader\" nowrap><font class=\"ContentHeader\">&nbsp;Raum</font></td>
-								<td align=\"left\" class=\"ContentHeader\" nowrap><font class=\"ContentHeader\">&nbsp;Studiengang</font></td>
-								<td align=\"left\" class=\"ContentHeader\" nowrap><font class=\"ContentHeader\">&nbsp;Semester</font></td>
-								<td align=\"left\" class=\"ContentHeader\" nowrap><font class=\"ContentHeader\">&nbsp;Hauptverteiler</font></td>";
+								<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Titel</font></td>
+								<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Vorname</font></td>
+								<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Nachname</font></td>
+								<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Telefonnummer</font></td>
+								<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;E-Mail Adresse</font></td>
+								<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Raum</font></td>
+								<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Studiengang</font></td>
+								<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Semester</font></td>
+								<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Hauptverteiler</font></td>";
 
 
 						echo "</tr>
 							  <tr>
-							  	<td nowrap>&nbsp;</td>
+							  	<td class='tdwrap'>&nbsp;</td>
 							  </tr>";
 
 						for($i = 0; $i < $num_rows; $i++)
@@ -171,22 +171,22 @@
 							{
 								if($i % 2 == 0)
 								{
-									echo "	<td align=\"left\" nowrap>&nbsp;$row->titelpre</td>";
+									echo "	<td align=\"left\" class='tdwrap'>&nbsp;$row->titelpre</td>";
 								}
 								else
 								{
-									echo "	<td align=\"left\" class=\"MarkLine\" nowrap>&nbsp;$row->titelpre</td>";
+									echo "	<td align=\"left\" class=\"MarkLine\" class='tdwrap'>&nbsp;$row->titelpre</td>";
 								}
 							}
 							else
 							{
 								if($i % 2 == 0)
 								{
-									echo "	<td align=\"left\" nowrap>&nbsp;</td>";
+									echo "	<td align=\"left\" class='tdwrap'>&nbsp;</td>";
 								}
 								else
 								{
-									echo "	<td align=\"left\" class=\"MarkLine\" nowrap>&nbsp;</td>";
+									echo "	<td align=\"left\" class=\"MarkLine\" class='tdwrap'>&nbsp;</td>";
 								}
 							}
 
@@ -197,22 +197,22 @@
 									$vorname.=' '.substr($row->vornamen,0,1).'.';
 								if($i % 2 == 0)
 								{
-									echo "	<td align=\"left\" nowrap>&nbsp;$vorname</td>";
+									echo "	<td align=\"left\" class='tdwrap'>&nbsp;$vorname</td>";
 								}
 								else
 								{
-									echo "	<td align=\"left\" class=\"MarkLine\" nowrap>&nbsp;$vorname</td>";
+									echo "	<td align=\"left\" class=\"MarkLine\" class='tdwrap'>&nbsp;$vorname</td>";
 								}
 							}
 							else
 							{
 								if($i % 2 == 0)
 								{
-									echo "	<td align=\"left\" nowrap>&nbsp;</td>";
+									echo "	<td align=\"left\" class='tdwrap'>&nbsp;</td>";
 								}
 								else
 								{
-									echo "	<td align=\"left\" class=\"MarkLine\" nowrap>&nbsp;</td>";
+									echo "	<td align=\"left\" class=\"MarkLine\" class='tdwrap'>&nbsp;</td>";
 								}
 							}
 
@@ -220,22 +220,22 @@
 							{
 								if($i % 2 == 0)
 								{
-									echo "	<td align=\"left\" nowrap>&nbsp;<a href='../profile/index.php?uid=$row->uid' title='Profil anzeigen'>$row->nachname $row->titelpost</a></td>";
+									echo "	<td align=\"left\" class='tdwrap'>&nbsp;<a class='Item' href='../profile/index.php?uid=$row->uid' title='Profil anzeigen'>$row->nachname $row->titelpost</a></td>";
 								}
 								else
 								{
-									echo "	<td align=\"left\" class=\"MarkLine\" nowrap>&nbsp;<a href='../profile/index.php?uid=$row->uid'  title='Profil anzeigen'>$row->nachname $row->titelpost</a></td>";
+									echo "	<td align=\"left\" class=\"MarkLine\" class='tdwrap'>&nbsp;<a class='Item' href='../profile/index.php?uid=$row->uid'  title='Profil anzeigen'>$row->nachname $row->titelpost</a></td>";
 								}
 							}
 							else
 							{
 								if($i % 2 == 0)
 								{
-									echo "	<td align=\"left\" nowrap>&nbsp;</td>";
+									echo "	<td align=\"left\" class='tdwrap'>&nbsp;</td>";
 								}
 								else
 								{
-									echo "	<td align=\"left\" class=\"MarkLine\" nowrap>&nbsp;</td>";
+									echo "	<td align=\"left\" class=\"MarkLine\" class='tdwrap'>&nbsp;</td>";
 								}
 							}
 
@@ -251,22 +251,22 @@
 								}
 								if($i % 2 == 0)
 								{
-									echo "	<td align=\"left\" nowrap>&nbsp;$vorwahl - $row->teltw</td>";
+									echo "	<td align=\"left\" class='tdwrap'>&nbsp;$vorwahl - $row->teltw</td>";
 								}
 								else
 								{
-									echo "	<td align=\"left\" class=\"MarkLine\" nowrap>&nbsp;$vorwahl - $row->teltw</td>";
+									echo "	<td align=\"left\" class=\"MarkLine\" class='tdwrap'>&nbsp;$vorwahl - $row->teltw</td>";
 								}
 							}
 							else
 							{
 								if($i % 2 == 0)
 								{
-									echo "	<td align=\"left\" nowrap>&nbsp;</td>";
+									echo "	<td align=\"left\" class='tdwrap'>&nbsp;</td>";
 								}
 								else
 								{
-									echo "	<td align=\"left\" class=\"MarkLine\" nowrap>&nbsp;</td>";
+									echo "	<td align=\"left\" class=\"MarkLine\" class='tdwrap'>&nbsp;</td>";
 								}
 							}
 
@@ -274,22 +274,22 @@
 							{
 								if($i % 2 == 0)
 								{
-									echo "	<td align=\"left\" nowrap>&nbsp;<a href=\"mailto:$row->emailtw\" class=\"Item\">$row->emailtw</a></td>";
+									echo "	<td align=\"left\" class='tdwrap'>&nbsp;<a href=\"mailto:$row->emailtw\" class=\"Item\">$row->emailtw</a></td>";
 								}
 								else
 								{
-									echo "	<td align=\"left\" class=\"MarkLine\" nowrap>&nbsp;<a href=\"mailto:$row->emailtw\" class=\"Item\">$row->emailtw</a></td>";
+									echo "	<td align=\"left\" class=\"MarkLine\" class='tdwrap'>&nbsp;<a class='Item' href=\"mailto:$row->emailtw\" class=\"Item\">$row->emailtw</a></td>";
 								}
 							}
 							else
 							{
 								if($i % 2 == 0)
 								{
-									echo "	<td align=\"left\" nowrap>&nbsp;</td>";
+									echo "	<td align=\"left\" class='tdwrap'>&nbsp;</td>";
 								}
 								else
 								{
-									echo "	<td align=\"left\" class=\"MarkLine\" nowrap>&nbsp;</td>";
+									echo "	<td align=\"left\" class=\"MarkLine\" class='tdwrap'>&nbsp;</td>";
 								}
 							}
 
@@ -297,22 +297,22 @@
 							{
 								if($i % 2 == 0)
 								{
-									echo "	<td align=\"left\" nowrap>&nbsp;$row->ort</td>";
+									echo "	<td align=\"left\" class='tdwrap'>&nbsp;$row->ort</td>";
 								}
 								else
 								{
-									echo "	<td align=\"left\" class=\"MarkLine\" nowrap>&nbsp;$row->ort</td>";
+									echo "	<td align=\"left\" class=\"MarkLine\" class='tdwrap'>&nbsp;$row->ort</td>";
 								}
 							}
 							else
 							{
 								if($i % 2 == 0)
 								{
-									echo "	<td align=\"left\" nowrap>&nbsp;</td>";
+									echo "	<td align=\"left\" class='tdwrap'>&nbsp;</td>";
 								}
 								else
 								{
-									echo "	<td align=\"left\" class=\"MarkLine\" nowrap>&nbsp;</td>";
+									echo "	<td align=\"left\" class=\"MarkLine\" class='tdwrap'>&nbsp;</td>";
 								}
 							}
 
@@ -323,12 +323,12 @@
 
 								if($i % 2 == 0)
 								{
-									echo "<td align=\"left\" nowrap>&nbsp;$stg_obj->kuerzel</td>";
+									echo "<td align=\"left\" class='tdwrap'>&nbsp;$stg_obj->kuerzel</td>";
 									$kurzbz=$stg_obj->kuerzel;
 								}
 								else
 								{
-									echo "<td align=\"left\" class =\"MarkLine\" nowrap>&nbsp;$stg_obj->kuerzel</td>";
+									echo "<td align=\"left\" class =\"MarkLine\" class='tdwrap'>&nbsp;$stg_obj->kuerzel</td>";
 									      $kurzbz=$stg_obj->kuerzel;
 								}
 							}
@@ -336,33 +336,33 @@
 							{
 								if($i % 2 == 0)
 								{
-									echo "	<td align=\"left\" nowrap>&nbsp;</td>";
+									echo "	<td align=\"left\" class='tdwrap'>&nbsp;</td>";
 								}
 								else
 								{
-									echo "	<td align=\"left\" class=\"MarkLine\" nowrap>&nbsp;</td>";
+									echo "	<td align=\"left\" class=\"MarkLine\" class='tdwrap'>&nbsp;</td>";
 								}
 							}
 							if($row->semester != -1)
 							{
 								if($i % 2 == 0)
 								{
-									echo "	<td align=\"center\" nowrap>&nbsp;$row->semester</td>";
+									echo "	<td align=\"center\" class='tdwrap'>&nbsp;$row->semester</td>";
 								}
 								else
 								{
-									echo "	<td align=\"center\" class=\"MarkLine\" nowrap>&nbsp;$row->semester</td>";
+									echo "	<td align=\"center\" class=\"MarkLine\" class='tdwrap'>&nbsp;$row->semester</td>";
 								}
 							}
 							else
 							{
 								if($i % 2 == 0)
 								{
-									echo "	<td align=\"center\" nowrap>&nbsp;</td>";
+									echo "	<td align=\"center\" class='tdwrap'>&nbsp;</td>";
 								}
 								else
 								{
-									echo "	<td align=\"center\" class=\"MarkLine\" nowrap>&nbsp;</td>";
+									echo "	<td align=\"center\" class=\"MarkLine\" class='tdwrap'>&nbsp;</td>";
 								}
 							}
 
@@ -377,22 +377,22 @@
 								$verband=strtolower($verband);
 								if($i % 2 == 0)
 								{
-									echo "	<td align=\"center\" nowrap>&nbsp;<a href='mailto:$kurzbz$row->semester$verband$gruppe@technikum-wien.at'>$kurzbz$row->semester$verband$gruppe@technikum-wien.at</td>";
+									echo "	<td align=\"center\" class='tdwrap'>&nbsp;<a class='Item' href='mailto:$kurzbz$row->semester$verband$gruppe@technikum-wien.at'>$kurzbz$row->semester$verband$gruppe@technikum-wien.at</td>";
 								}
 								else
 								{
-									echo "	<td align=\"center\" class=\"MarkLine\" nowrap>&nbsp;<a href='mailto:$kurzbz$row->semester$verband$gruppe@technikum-wien.at'>$kurzbz$row->semester$verband$gruppe@technikum-wien.at</td>";
+									echo "	<td align=\"center\" class=\"MarkLine\" class='tdwrap'>&nbsp;<a class='Item' href='mailto:$kurzbz$row->semester$verband$gruppe@technikum-wien.at'>$kurzbz$row->semester$verband$gruppe@technikum-wien.at</td>";
 								}
 							}
 							else
 							{
 								if($i % 2 == 0)
 								{
-									echo "	<td align=\"center\" nowrap>&nbsp;</td>";
+									echo "	<td align=\"center\" class='tdwrap'>&nbsp;</td>";
 								}
 								else
 								{
-									echo "	<td align=\"center\" class=\"MarkLine\" nowrap>&nbsp;</td>";
+									echo "	<td align=\"center\" class=\"MarkLine\" class='tdwrap'>&nbsp;</td>";
 								}
 							}
 
@@ -401,7 +401,7 @@
 						}
 
 						echo "<tr>
-								<td nowrap>&nbsp;</td>
+								<td class='tdwrap'>&nbsp;</td>
 							  </tr>";
 
 						echo "</table>";
@@ -424,7 +424,7 @@
 		</td>
 	  </tr>
     </table></td>
-	<td width="30">&nbsp;</td>
+	<td class="tdwidth30">&nbsp;</td>
   </tr>
 </table>
 </body>

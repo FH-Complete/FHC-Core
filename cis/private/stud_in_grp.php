@@ -2,13 +2,13 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
 <title>Personen im Mailverteiler</title>
-<body>
+<body id="inhalt">
 <?php
     require_once('../config.inc.php');
-    
+
     //Connection Herstellen
     if(!$conn = pg_pconnect(CONN_STRING))
        die('Fehler beim öffnen der Datenbankverbindung');
@@ -16,7 +16,7 @@
     if(!isset($_GET['kz']))
     	die('Fehlerhafte parameteruebergabe');
 ?>
-<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+<table class="tabcontent">
 	      <tr>
 	        <td class="ContentHeader"><font class="ContentHeader">Nachname</font></td>
 	        <td class="ContentHeader"><font class="ContentHeader">Vorname</font></td>
@@ -30,19 +30,19 @@
 	else
 	{
 		$qry = "SELECT vorname, nachname, uid FROM campus.vw_student WHERE studiengang_kz='".addslashes($_GET['kz'])."'";
-		
+
 		if(isset($_GET['sem']))
 			$qry.=" AND semester='".addslashes($_GET['sem'])."'";
-		
+
 		if(isset($_GET['verband']))
 			$qry.=" AND verband='".addslashes($_GET['verband'])."'";
-		
+
 		if(isset($_GET['grp']))
 			$qry.=" AND gruppe='".addslashes($_GET['grp'])."'";
-		
+
 		$qry.= ' ORDER BY nachname, vorname';
 	}
-	
+
 	if($result=pg_query($conn, $qry))
 	{
 		while($row=pg_fetch_object($result))
@@ -54,7 +54,7 @@
 			echo "</tr>";
 		}
 	}
-	else 
+	else
 		echo 'Fehler beim Auslesen der Studentendaten';
 ?>
 </table>

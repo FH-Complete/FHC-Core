@@ -36,7 +36,7 @@ require_once('../../../../include/datum.class.php');
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <title>Kreuzerltool</title>
 <script language="JavaScript">
 <!--
@@ -57,7 +57,7 @@ require_once('../../../../include/datum.class.php');
 </script>
 </head>
 
-<body>
+<body id="inhalt">
 <?php
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim oeffnen der Datenbankverbindung');
@@ -229,7 +229,7 @@ $uebung_obj = new uebung($conn);
 $uebung_obj->load_uebung($lehreinheit_id);
 if(count($uebung_obj->uebungen)>0)
 {
-	echo "<table width='100%'><tr><td valign='top'>";
+	echo "<table width='100%'><tr><td class='tdvertical'>";
 	echo "Wählen Sie bitte eine Kreuzerlliste aus: <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
 	foreach ($uebung_obj->uebungen as $row)
 	{
@@ -292,7 +292,7 @@ if($result = pg_query($conn, $qry))
 	}
 }
 echo '</ul>';
-echo "</td><td valign='top'>
+echo "</td><td class='tdvertical'>
 <ul><li>
 <a href='anwesenheitsliste.php?output=xls&lehreinheit_id=$lehreinheit_id&all'>Gesamt&uuml;bersicht&nbsp;<img src='../../../../skin/images/excel.gif' width=16 height=16></a>
 </li></ul>

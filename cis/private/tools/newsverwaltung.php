@@ -2,18 +2,18 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
 
 <frameset rows="380,*" cols="*" framespacing="0"" frameborder="NO" border="0">
   <frame src="news_entry.php" name="news_entry">
   <frame src="news_show.php" name="news_window">
 </frameset>
-<noframes><body>
-<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+<noframes><body id="inhalt">
+<table class="tabcontent">
   <tr>
-    <td width="10">&nbsp;</td>
-    <td><table width="100%"  border="0" cellspacing="0" cellpadding="0">
+    <td class="tdwidth10">&nbsp;</td>
+    <td><table class="tabcontent">
       <tr>
         <td class="ContentHeader"><font class="ContentHeader">&nbsp;Verwaltungstools - Newsverwaltung</td>
       </tr>
@@ -26,7 +26,7 @@
 		&nbsp;</td>
 	  </tr>
     </table></td>
-	<td width="30">&nbsp;</td>
+	<td class="tdwidth30">&nbsp;</td>
   </tr>
 </table>
 </body></noframes>

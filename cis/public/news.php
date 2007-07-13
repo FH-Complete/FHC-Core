@@ -15,13 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
     require_once('../config.inc.php');
     require_once('../../include/news.class.php');
-    
+
     //Connection Herstellen
     if(!$conn = pg_pconnect(CONN_STRING))
        die("Fehler beim öffnen der Datenbankverbindung");
@@ -31,14 +31,14 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
 
 <body>
-<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+<table id="inhalt" class="tabcontent">
   <tr>
-    <td width="10">&nbsp;</td>
-    <td><table width="100%"  border="0" cellspacing="0" cellpadding="0">
+    <td class="tdwidth10">&nbsp;</td>
+    <td><table class="tabcontent">
       <tr>
         <td class="ContentHeader"><font class="ContentHeader">&nbsp;News</font></td>
       </tr>
@@ -48,18 +48,18 @@
 	  	<td>
 	  	<div id="news">
 		  <?php
-		  
+
 		  	$news = new news($conn);
 
 		  	$news->getnews(MAXNEWSALTER,0,null);
 		  	$zaehler=0;
 		  	$open=true;
 		  	foreach ($news->result as $row)
-		  	{		  		
+		  	{
 		  		$zaehler++;
 		  		//no comment
 		  		$datum = date('d.m.Y',strtotime(strftime($row->datum)));
-		  		
+
 				//echo $datum.'&nbsp;'.$row->verfasser.'<br><br><strong>'.$row->betreff.'</strong><br>'.$row->text.'<br><br><br>
 				echo '<div class="news">';
 				echo '
@@ -69,7 +69,7 @@
 							<td width="30%" align="left">'.$row->betreff.'</td>
 							<td width="30%" align="center">'.$datum.'</td>
 							<td width="30%" align="right" style="display: '.($open?'none':'block').'" id="'.$zaehler.'Mehr" ><a href="#" class="Item" onclick="return show(\''.$zaehler.'\')">mehr &gt;&gt;</a></td>
-							<td width="30%" align="right" style="display: '.($open?'block':'none').'" id="'.$zaehler.'Verfasser">'.$row->verfasser.'</td>				
+							<td width="30%" align="right" style="display: '.($open?'block':'none').'" id="'.$zaehler.'Verfasser">'.$row->verfasser.'</td>
 						</tr>
 					</table>
 					</div>
@@ -79,8 +79,8 @@
 					';
 				echo "</div><br />";
 			}
-				
-			
+
+
 			if($zaehler==0)
 				echo 'Zur Zeit gibt es keine aktuellen News!';
 		  ?>
@@ -89,7 +89,7 @@
 		<td>&nbsp;</td>
 	  </tr>
     </table></td>
-	<td width="30">&nbsp;</td>
+	<td class="tdwidth30">&nbsp;</td>
   </tr>
 </table>
 </body>

@@ -32,7 +32,7 @@
 	$uid = get_uid();
 
 	$PHP_SELF = $_SERVER['PHP_SELF'];
-	
+
 	if(isset($_GET['type']))
 		$type=$_GET['type'];
 
@@ -103,7 +103,7 @@
 <head>
 <title>Zeitwunsch/Zeitsperre</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link rel="stylesheet" href="../../../skin/cis.css" type="text/css">
+<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 <script language="Javascript">
 function conf_del()
 {
@@ -123,11 +123,11 @@ function checkval()
 </script>
 </head>
 
-<body>
-<H2><table width="100%" border="0" cellpadding="0" cellspacing="0">
+<body id="inhalt">
+<H2><table class="tabcontent">
 	<tr>
 	<td>
-		&nbsp;<a href="index.php">Userprofil</a> &gt;&gt;
+		&nbsp;<a class="Item" href="index.php">Userprofil</a> &gt;&gt;
 		&nbsp;Zeitw&uuml;nsche
 	</td>
 	<td align="right"><A onclick="window.open('zeitwunsch_help.html','Hilfe', 'height=320,width=480,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');" class="hilfe" target="_blank">HELP&nbsp;</A></td>
@@ -426,13 +426,13 @@ $mehrarbeitsstunden = '0';
 if(isset($_GET['type']) && $_GET['type']=='save_resturlaub')
 {
 	$_POST['mehrarbeitsstunden'] = str_replace(',','.',$_POST['mehrarbeitsstunden']);
-	
+
 	$resturlaub = new resturlaub($conn);
 	if($resturlaub->load($uid))
 	{
 		$resturlaub->new = false;
 	}
-	else 
+	else
 	{
 		$resturlaub->new = true;
 		$resturlaub->insertamum = date('Y-m-d H:i:s');
@@ -443,20 +443,20 @@ if(isset($_GET['type']) && $_GET['type']=='save_resturlaub')
 	$resturlaub->updatevon = $uid;
 	$resturlaub->resturlaubstage = $_POST['resturlaubstage'];
 	$resturlaub->mehrarbeitsstunden = $_POST['mehrarbeitsstunden'];
-	
+
 	if($resturlaub->save())
 	{
 		$content_resturlaub .= '<b>Daten wurden gespeichert!</b>';
 	}
-	else 
+	else
 	{
 		$content_resturlaub .= "<b>Fehler beim Speichern der Daten: $resturlaub->errormsg</b>";
 	}
-	
+
 	$resturlaubstage = htmlspecialchars($_POST['resturlaubstage'],ENT_QUOTES);
 	$mehrarbeitsstunden = htmlspecialchars($_POST['mehrarbeitsstunden'],ENT_QUOTES);
 }
-else 
+else
 {
 	$resturlaub = new resturlaub($conn);
 
@@ -473,10 +473,10 @@ $content_resturlaub.='<tr><td></td><td><input type="submit" name="save_resturlau
 
 echo '<table width="100%">';
 echo '<tr>';
-echo "<td valign='top'>";
+echo "<td class='tdvertical'>";
 echo $content_form;
 echo '</td>';
-echo "<td valign='top'>$content_resturlaub</td>";
+echo "<td class='tdvertical'>$content_resturlaub</td>";
 echo '</tr><tr><td>';
 echo $content_table;
 echo '</td>';

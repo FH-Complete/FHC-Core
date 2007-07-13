@@ -15,39 +15,39 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-	require_once('../../config.inc.php');	
+	require_once('../../config.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/news.class.php');
-    
+
     //Connection Herstellen
     if(!$conn = pg_pconnect(CONN_STRING))
        die('Fehler beim oeffnen der Datenbankverbindung');
-        
+
 	$user = get_uid();
-	
+
 	if(check_lektor($user,$conn))
 		$is_lector=true;
-    else 
+    else
     	$is_lector=false;
-		
+
 	if($is_lector)
 	{
 		if(isset($remove_id) && $remove_id != "")
 		{
 			$news_obj = new news($conn);
 			if($news_obj->delete($remove_id))
-			{			
+			{
 				writeCISlog('DELETE PINBOARD','');
 				echo '<script language="JavaScript">';
 				echo "	document.location.href = 'pinboard_show.php?course_id=$course_id&term_id=$term_id'";
 				echo '</script>';
 				exit;
 			}
-			else 
+			else
 				echo 'Fehler beim loeschen:'.$news_obj->errormsg;
 		}
 	}
@@ -56,10 +56,10 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 
 <script language="JavaScript">
-	
+
 	function deleteEntry(id, course_id, term_id)
 	{
 		if(confirm("Soll dieser Eintrag wirklich gelöscht werden?") == true)
@@ -67,7 +67,7 @@
 			document.location.href = 'pinboard_show.php?course_id=' + course_id + '&term_id=' + term_id + '&remove_id=' + id;
 		}
 	}
-	
+
 	function editEntry(id, course_id, term_id)
 	{
 		parent.news_entry.location.href = 'pinboard_entry.php?course_id=' + course_id + '&term_id=' + term_id + '&news_id=' + id;
@@ -76,23 +76,23 @@
 </script>
 </head>
 
-<body>
-<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+<body id="inhalt">
+<table class="tabcontent">
   <tr>
-    <td width="10">&nbsp;</td>
-    <td><table width="100%"  border="0" cellspacing="0" cellpadding="0">
+    <td class="tdwidth10">&nbsp;</td>
+    <td><table class="tabcontent">
         <tr>
 	  	  <?php
 		  	if(!$is_lector || !isset($course_id) || !isset($term_id))
 				exit;
 		  ?>
           <td>
-		  	<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+		  	<table class="tabcontent">
 			<?php
 
 			$news_obj = new news($conn);
 			$news_obj->getnews(MAXNEWSALTER,$course_id, $term_id, true);
-			  
+
 			$i=0;
 			foreach($news_obj->result as $row)
 			{
@@ -101,23 +101,23 @@
 				{
 					$i++;
 					echo "<tr>";
-					
+
 					if($i % 2 != 0)
 						echo '<td class="MarkLine">';
 					else
 						echo '<td>';
-					
+
 					if($row->datum!='')
 						$datum = date('d.m.Y',strtotime(strftime($row->datum)));
-					else 	
+					else
 						$datum='';
-							
-					echo '  <table width="100%"  border="0" cellspacing="0" cellpadding="0">';
+
+					echo '  <table class="tabcontent">';
 					echo '    <tr>';
-					echo '      <td nowarp>';
+					echo '      <td class="tdwrap">';
 					echo '        <small>'.$datum.'&nbsp;-&nbsp;'.$row->verfasser.'</small>';
 					echo '      </td>';
-					echo '		<td align="right" nowrap>';
+					echo '		<td align="right" class="tdwrap">';
 					echo '		  <a onClick="editEntry('.$row->news_id.', '.$row->studiengang_kz.', '.($row->semester==''?0:$row->semester).');">Editieren</a>, <a onClick="deleteEntry('.$row->news_id.', '.$row->studiengang_kz.',' .($row->semester==''?0:$row->semester).');">L&ouml;schen</a>';
 					echo '		</td>';
 					echo '    </tr>';
@@ -133,7 +133,7 @@
 				}
 			}
 
-				
+
 					if($i==0)
 						echo 'Zur Zeit gibt es keine aktuellen News!';
 			  ?>
@@ -141,7 +141,7 @@
 		  </td>
         </tr>
     </table></td>
-    <td width="30">&nbsp;</td>
+    <td class="tdwidth30">&nbsp;</td>
   </tr>
 </table>
 </body>

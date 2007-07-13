@@ -15,14 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 /**
  * Pinboard
  * Zeigt alle Pinboardeintraege an. Am rechten Rand werden
- * Studiengangsleiter, Studiengangsleiter Stellvertreter, Assistentin 
+ * Studiengangsleiter, Studiengangsleiter Stellvertreter, Assistentin
  * und Studentenvertreter dieses Studienganges angezeigt.
  *
  * Aufruf pinboard.php?course_id=254&term_id=1[&showall]
@@ -35,7 +35,7 @@
 	require_once('../../../include/studiengang.class.php');
 	require_once('../../../include/news.class.php');
 	require_once('../../../include/studiensemester.class.php');
-    
+
     //Connection Herstellen
     if(!$sql_conn = pg_pconnect(CONN_STRING))
        die('Fehler beim öffnen der Datenbankverbindung');
@@ -52,18 +52,18 @@
     $user = get_uid();
     $stsemarr = array();
     $PHP_SELF = $_SERVER['PHP_SELF'];
-    
+
     if(isset($_GET['studiensemester_kurzbz']))
     	$studiensemester_kurzbz = $_GET['studiensemester_kurzbz'];
-    else 
+    else
     {
     	$stsem_obj = new studiensemester($sql_conn);
     	$studiensemester_kurzbz = $stsem_obj->getaktorNext();
     }
-    
+
     if(isset($_GET['datum']))
     	$datum = $_GET['datum'];
-    	
+
 	if(isset($_GET['course_id']) && is_numeric($_GET['course_id']))
 	{
 		$stg_obj = new studiengang($sql_conn, $_GET['course_id']);
@@ -72,56 +72,56 @@
 		$course_id = $_GET['course_id'];
 		$term_id = $_GET['term_id'];
 	}
-	
+
 	if(isset($_GET['fachbereich_kurzbz']))
 	{
 		$fachbereich_kurzbz = $_GET['fachbereich_kurzbz'];
 		if($fachbereich_kurzbz=='Senat')
 			$senat = true;
 	}
-		
+
 	if(isset($_GET['showall']))
 	{
 		$showall=true;
 	}
-	else 
+	else
 	{
 		$showall=false;
 	}
-	
+
 	function print_STGnews($stg_id, $semester, $sql_conn, $showall=false, $fachbereich_kurzbz)
-	{		
+	{
 		$alter = ($showall?0:MAXNEWSALTER);
 		$news_obj = new news($sql_conn);
-		
+
 		if($news_obj->getnews($alter, $stg_id, $semester, $showall, $fachbereich_kurzbz))
 		{
 			$zaehler = print_news($news_obj);
 		}
-		else 
+		else
 			echo $news_obj->errormsg;
 		if($zaehler==0)
 		   echo '<p>Zur Zeit gibt es keine aktuellen News!</p>';
 	}
-	
+
 	function print_FBnews($sql_conn, $fachbereich_kurzbz, $datum)
-	{		
+	{
 		$news_obj = new news($sql_conn);
-		
+
 		if($news_obj->getFBNews($fachbereich_kurzbz, $datum))
 		{
 			if($fachbereich_kurzbz=='Senat')
 				$open=false;
-			else 
+			else
 				$open=true;
 			$zaehler = print_news($news_obj, $open);
 		}
-		else 
+		else
 			echo $news_obj->errormsg;
 		if($zaehler==0)
 		   echo '<p>Zur Zeit gibt es keine aktuellen News!</p>';
 	}
-	
+
 	function print_news($news_obj, $open=true)
 	{
 		$zaehler=0;
@@ -131,9 +131,9 @@
 			$zaehler++;
 			if($row->datum!='')
 				$datum = date('d.m.Y',strtotime(strftime($row->datum)));
-			else 	
+			else
 				$datum='';
-			
+
 			echo '<div class="news">';
 			//if($row->semester == '')
 			//{
@@ -144,7 +144,7 @@
 					<td width="30%" align="left">'.$row->betreff.'</td>
 					<td width="30%" align="center">'.$datum.'</td>
 					<td width="30%" align="right" style="display: '.($open?'none':'block').'" id="'.$zaehler.'Mehr" ><a href="#" class="Item" onclick="return show(\''.$zaehler.'\')">mehr &gt;&gt;</a></td>
-					<td width="30%" align="right" style="display: '.($open?'block':'none').'" id="'.$zaehler.'Verfasser">'.$row->verfasser.'</td>				
+					<td width="30%" align="right" style="display: '.($open?'block':'none').'" id="'.$zaehler.'Verfasser">'.$row->verfasser.'</td>
 				</tr>
 			</table>
 			</div>
@@ -157,7 +157,7 @@
 			//else
 			//{
 			//	echo '<div class="titel">'.$row->betreff.' [Semester '.$row->semester.'] '.$datum.' '.$row->verfasser.'</div>';
-			//}			
+			//}
 			//echo '<div class="text">'.$row->text.'</div>';
 			echo "</div><br />";
 		}
@@ -170,7 +170,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <script language="Javascript">
 function show(id)
 {
@@ -184,25 +184,25 @@ function show(id)
 </head>
 
 <body>
-<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+<table class="tabcontent" id="inhalt">
   <tr>
-    <td width="10">&nbsp;</td>
-    <td><table width="100%"  border="0" cellspacing="0" cellpadding="0">
+    <td class="tdwidth10">&nbsp;</td>
+    <td><table class="tabcontent">
       <tr>
-        
-<?php 
+
+<?php
 
 	//Anzeigen der Senatsbeschluesse
 	if($senat)
-	{		
-		echo '<td class="ContentHeader" width="100%"><font class="ContentHeader">&nbsp;Senatsbeschl&uuml;sse '; 
+	{
+		echo '<td class="ContentHeader" width="100%"><font class="ContentHeader">&nbsp;Senatsbeschl&uuml;sse ';
 		echo '</font></td>';
 		echo ' </tr>';
-		
+
 		//Senatsbeschluesse duerfen nur die Mitarbeiter sehen
 		if(!check_lektor($user, $sql_conn))
 			die('<tr><td>Sie haben keine Berechtigung für diesen Bereich</td></tr>');
-		
+
 		echo '<tr><td>&nbsp;</td></tr>';
 		echo '<tr><td>';
 		//Datum aller Senatsbeschluesse holen
@@ -219,12 +219,12 @@ function show(id)
 					if($stsem_content!='')
 						$stsem_content.=' - ';
 					$stsem_content .="<a href='$PHP_SELF?fachbereich_kurzbz=Senat&studiensemester_kurzbz=$stsem' class='Item'>";
-					
+
 					if(isset($studiensemester_kurzbz) && $studiensemester_kurzbz==$stsem)
 						$stsem_content .="<u>$stsem</u>";
-					else 
+					else
 						$stsem_content .=$stsem;
-						
+
 					$stsem_content .="</a>";
 					$stsemarr[] = $stsem;
 				}
@@ -247,40 +247,40 @@ function show(id)
 			echo "$stsem_content<br><br>$datum_content";
 		}
 		echo '</td><td>&nbsp;</td></tr>';
-		echo '<tr><td valign="top">';
+		echo '<tr><td class="tdvertical">';
 		//News ausgeben
 		print_FBnews($sql_conn, $fachbereich_kurzbz, $datum);
 		echo '</td>';
-	
+
 	}
-	else 
+	else
 	{
 		echo '<td class="ContentHeader" width="70%"><font class="ContentHeader">&nbsp;Pinboard ';
-		
+
 		if(isset($short))
-			echo $short; 
-			
+			echo $short;
+
 		echo '</font></td>';
 
 		if(!isset($short))
 			exit;
-		
+
 		echo '
 		<td>&nbsp;</td>
 		<td class="ContentHeader3" width="25%"><font class="HyperItem">&nbsp;Studiengangsmanagement</font></td>';
-	
+
 		echo ' </tr>';
-			
+
 		echo '<tr><td>&nbsp;</td>';
 
-	
+
 	?>
 	</tr>
 	  <tr>
-	  	<td valign="top"><?php print_STGnews($course_id, (int)$term_id, $sql_conn, $showall, $fachbereich_kurzbz); ?><a href='<?php echo $_SERVER['REQUEST_URI']."&showall"; ?>' class='Item'>Archiv</a></td>
+	  	<td class="tdvertical"><?php print_STGnews($course_id, (int)$term_id, $sql_conn, $showall, $fachbereich_kurzbz); ?><a href='<?php echo $_SERVER['REQUEST_URI']."&showall"; ?>' class='Item'>Archiv</a></td>
 
 		<td>&nbsp;</td>
-		<td valign="top">
+		<td class="tdvertical">
           <p>Studiengangsleiter:<br>
                 <?php
 
@@ -288,7 +288,7 @@ function show(id)
 				$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stgl' LIMIT 1)";
 				if($result_course_leader = pg_query($sql_conn, $qry))
 				{
-					$num_rows_course_leader = pg_numrows($result_course_leader);					
+					$num_rows_course_leader = pg_numrows($result_course_leader);
 					if($num_rows_course_leader > 0)
 					{
 						$row_course_leader = pg_fetch_object($result_course_leader, 0);
@@ -296,7 +296,7 @@ function show(id)
 				}
 
                 echo "<b>";
-                
+
                 if(isset($row_course_leader) && $row_course_leader != "")
 				{
 					if(!($row_course_leader->vorname == "" && $row_course_leader->nachname == ""))
@@ -312,9 +312,9 @@ function show(id)
 				{
 					echo "Nicht definiert";
 				}
-				
+
                 echo "</b><br>";
-                
+
 				if(isset($row_course_leader) && $row_course_leader != "")
 				{
 					if($row_course_leader->uid != "")
@@ -330,14 +330,14 @@ function show(id)
 				{
 					echo "E-Mail nicht definiert";
 				}
-				
+
                 echo "<br>";
 			  	echo "Tel.:";
-			  	
+
 			  	if(isset($row_course_leader) && $row_course_leader != "")
 				{
 					if($row_course_leader->telefonklappe != "")
-					{	
+					{
 						echo '01 333 40 77 - '.$row_course_leader->telefonklappe;
 					}
 					else
@@ -349,26 +349,26 @@ function show(id)
 				{
 					echo "Nicht vorhanden";
 				}
-				
+
 			  	echo "</p>";
 			  	echo "<p></p>";
 			  	echo "<p>Stellvertreter:<br>";
-                
+
 			  	//Studiengangsleiter Stellvertreter auselesen
 				$sql_query = "SELECT * FROM campus.vw_mitarbeiter WHERE uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stglstv' LIMIT 1)";
-				
+
 				if($result_course_leader_deputy = pg_query($sql_conn, $sql_query))
 				{
 					$num_rows_course_leader_deputy = pg_numrows($result_course_leader_deputy);
-						
+
 					if($num_rows_course_leader_deputy > 0)
 					{
 						$row_course_leader_deputy = pg_fetch_object($result_course_leader_deputy, 0);
 					}
 				}
-				
+
                 echo "<b>";
-                
+
                 if(isset($row_course_leader_deputy) && $row_course_leader_deputy != "")
 				{
 					if(!($row_course_leader_deputy->vorname == "" && $row_course_leader_deputy->nachname == ""))
@@ -384,9 +384,9 @@ function show(id)
 				{
 					echo "Nicht definiert";
 				}
-				
+
                 echo "</b><br>";
-                
+
 				if(isset($row_course_leader_deputy) && $row_course_leader_deputy != "")
 				{
 					if($row_course_leader_deputy->uid != "")
@@ -402,14 +402,14 @@ function show(id)
 				{
 					echo "E-Mail nicht definiert";
 				}
-				
+
                 echo "<br>";
   				echo "Tel.:";
-  				
+
   				if(isset($row_course_leader_deputy) && $row_course_leader_deputy != "")
 				{
 					if($row_course_leader_deputy->telefonklappe != "")
-					{	
+					{
 						echo '01 333 40 77 - '.$row_course_leader_deputy->telefonklappe;
 					}
 					else
@@ -421,25 +421,25 @@ function show(id)
 				{
 					echo "Nicht vorhanden";
 				}
-				
+
 			  	echo "</p>";
 			  	echo "<p>Sekretariat:</font><font face='Arial, Helvetica, sans-serif' size='2'><br>";
                 //Sektritariat auslesen
-                
+
 				$sql_query = "SELECT * FROM campus.vw_mitarbeiter WHERE uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$course_id' AND funktion_kurzbz='ass' LIMIT 1)";
-					
+
 				if($result_course_secretary = pg_query($sql_conn, $sql_query))
 				{
 					$num_rows_course_secretary = pg_numrows($result_course_secretary);
-					
+
 					if($num_rows_course_secretary > 0)
 					{
 						$row_course_secretary = pg_fetch_object($result_course_secretary, 0);
 					}
 				}
-				
+
                 echo "<b>";
-                
+
                 if(isset($row_course_secretary) && $row_course_secretary != "")
 				{
 					if(!($row_course_secretary->vorname == "" && $row_course_secretary->nachname == ""))
@@ -455,9 +455,9 @@ function show(id)
 				{
 					echo "Nicht definiert";
 				}
-				
+
                 echo "</b><br>";
-                
+
 				if(isset($row_course_secretary) && $row_course_secretary != "")
 				{
 					if($row_course_secretary->uid != "")
@@ -473,14 +473,14 @@ function show(id)
 				{
 					echo "E-Mail nicht definiert";
 				}
-				
+
                 echo "<br>";
   				echo "Tel.:";
-  				
+
   				if(isset($row_course_secretary) && $row_course_secretary != "")
 				{
 					if($row_course_secretary->telefonklappe != "")
-					{	
+					{
 						echo '01 333 40 77 - '.$row_course_secretary->telefonklappe;
 					}
 					else
@@ -492,20 +492,20 @@ function show(id)
 				{
 					echo "Nicht vorhanden";
 				}
-				
+
 				echo "<p>Studentenvertreter:</font><font face='Arial, Helvetica, sans-serif' size='2'><br>";
-				
+
 				$sql_query = "SELECT tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre, tbl_person.titelpost, tbl_benutzer.uid FROM public.tbl_person, public.tbl_benutzer,public.tbl_benutzerfunktion WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stdv' AND tbl_person.person_id=public.tbl_benutzer.person_id AND tbl_benutzerfunktion.uid=tbl_benutzer.uid";
-				
+
 				if($result_course_stdv = pg_query($sql_conn, $sql_query))
 				{
 					$num_rows_course_stdv = pg_numrows($result_course_stdv);
-					
+
 					if($num_rows_course_stdv > 0)
 					{
 						while($row_stdv = pg_fetch_object($result_course_stdv))
-						{						
-							echo "<a href='mailto:".$row_stdv->uid."@technikum-wien.at'>$row_stdv->titelpre $row_stdv->vorname $row_stdv->nachname $row_stdv->titelpost</a><br>";
+						{
+							echo "<a class='Item' href='mailto:".$row_stdv->uid."@technikum-wien.at'>$row_stdv->titelpre $row_stdv->vorname $row_stdv->nachname $row_stdv->titelpost</a><br>";
 						}
 					}
 					else
@@ -514,7 +514,7 @@ function show(id)
 					}
 				}
 ?>
-				
+
             	<table border="0" width="100%" cellpadding="0" cellspacing="0">
 				<tr>
 				  <td>&nbsp;</td>
@@ -523,12 +523,12 @@ function show(id)
 				  <td>&nbsp;</td>
 				</tr>
 				<tr>
-				  <td nowrap>
+				  <td class="tdwrap">
 				  <?php
 				    $path = '../../../documents/'.strtolower($short).'/lehrziele';
-				    
+
 					if(!$dest_dir = @dir($path))
-					{	
+					{
 						if(!is_dir($path))
 						{
 							if(!is_dir('../../../documents/'.strtolower($short)))
@@ -537,37 +537,37 @@ function show(id)
 							exec('sudo chgrp teacher ../../../documents/'.strtolower($short).'/lehrziele');
 						}
 					}
-					
-					$dir_empty = true;			
+
+					$dir_empty = true;
 					$dest_dir = @dir($path);
 					while($entry = $dest_dir->read())
 					{
 						if($entry != "." && $entry != "..")
 						{
 							$dir_empty = false;
-							
+
 							break;
 						}
 					}
-										
+
 					if(isset($dir_empty) && $dir_empty == false)
 					{
 						echo '<img src="../../../skin/images/seperator.gif">&nbsp;<a href="'.$dest_dir->path.'/" class="Item" target="_blank">Lehrziele</a>';
 					}
 					else
-					{						
+					{
 						echo '<img src="../../../skin/images/seperator.gif">&nbsp;Lehrziele';
 					}
 				  ?>
               </td>
             </tr>
             <tr>
-              <td nowrap>
-                <?php						
+              <td class="tdwrap">
+                <?php
                 	$path = '../../../documents/'.strtolower($short).'/download';
 					if(!$dest_dir = is_dir($path))
 					{
-					
+
 						if(!is_dir($path))
 						{
 							if(!is_dir('../../../documents/'.strtolower($short)))
@@ -575,7 +575,7 @@ function show(id)
 							exec('mkdir -m 775 "../../../documents/'.strtolower($short).'/download"');
 							exec('sudo chgrp teacher ../../../documents/'.strtolower($short).'/download');
 						}
-						
+
 					}
 					$dest_dir = @dir($path);
 					while($entry = $dest_dir->read())
@@ -586,36 +586,36 @@ function show(id)
 							break;
 						}
 					}
-										
+
 					if(isset($dir_empty) && $dir_empty == false)
 					{
 						echo '<img src="../../../skin/images/seperator.gif">&nbsp;<a href="'.$dest_dir->path.'/" class="Item" target="_blank">Allgemeiner Download</a>';
 					}
 					else
-					{						
+					{
 						echo '<img src="../../../skin/images/seperator.gif">&nbsp;Allgemeiner Download';
 					}
 
 				?>
-				
+
               </td>
             </tr>
             <tr>
-              <td nowrap>
+              <td class="tdwrap">
                 <?php
 					echo '<img src="../../../skin/images/seperator.gif">&nbsp;<a href="news://cis.technikum-wien.at/'.strtolower($short_long).'" class="Item" target="_blank">Newsgroups</a>';
 
 				?>
               </td>
             </tr>
-          </table>          
+          </table>
           </td>
 <?php
 	}
 	?>
 	  </tr>
     </table></td>
-	<td width="30">&nbsp;</td>
+	<td class="tdwidth30">&nbsp;</td>
   </tr>
 </table>
 </body>

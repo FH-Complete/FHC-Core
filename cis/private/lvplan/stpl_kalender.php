@@ -100,7 +100,7 @@ else
 	echo '<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">';
 	echo '<link rel="stylesheet" href="../../../skin/cis.css" type="text/css">';
 	echo '</head>';
-	echo '<body>';
+	echo '<body id="inhalt">';
 }
 
 
@@ -220,7 +220,7 @@ else if ($format=='ical')
 // Print in HTML-File
 else
 {
-	echo '<P>Fehler und Feedback bitte an <A href="mailto:stpl@technikum-wien.at">Stundenplan</A></P>';
+	echo '<P>Fehler und Feedback bitte an <A class="Item" href="mailto:stpl@technikum-wien.at">Stundenplan</A></P>';
 	echo '</body></html>';
 }
 ?>

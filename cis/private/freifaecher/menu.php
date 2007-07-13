@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -23,21 +23,21 @@
     require_once('../../../include/functions.inc.php');
     require_once('../../../include/benutzerberechtigung.class.php');
     require_once('../../../include/lehrveranstaltung.class.php');
-    
+
     //Connection Herstellen
     if(!$sql_conn = pg_pconnect(CONN_STRING))
-       die("Fehler beim oeffnen der Datenbankverbindung");	
+       die("Fehler beim oeffnen der Datenbankverbindung");
 
 	$user = get_uid();
-	
+
     $rechte= new benutzerberechtigung($sql_conn);
     $rechte->getBerechtigungen($user);
-    
+
 	if(check_lektor($user,$sql_conn))
        $is_lector=true;
-    else 
+    else
        $is_lector=false;
-	
+
 	function CutString($strVal, $limit)
 	{
 		if(strlen($strVal) > $limit)
@@ -55,26 +55,26 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 
 <script language="JavaScript">
-<!--        
+<!--
         __js_page_array = new Array();
-        
+
         function js_toggle_container(conid) {
-        
+
 	if (document.getElementById) {
               var block = "table-row";
-	      
+
               if (navigator.appName.indexOf('Microsoft') > -1) {
                  block = 'block';
               }
-        
+
               var status = __js_page_array[conid];
               if (status == null) {
                   status = "none";
               }
-        
+
               if (status == "none") {
                  document.getElementById(conid).style.display = block;
                  __js_page_array[conid] = "visible";
@@ -98,65 +98,65 @@
 </head>
 
 <body>
-<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+<table class="tabcontent">
   <tr>
-    <td width="159" valign="top" nowrap>
-	  <table width="100%" cellspacing="0" cellpadding="0" frame="rhs" style="border-color:#BCBCBC;">
+    <td width="159" class='tdvertical' nowrap>
+	  <table class="tabcontent" frame="rhs">
 	    <tr>
-          <td nowrap><a class="HyperItem" href="../../index.html" target="_top">&lt;&lt; HOME</a> </a></td>
+          <td class='tdwrap'><a class="HyperItem" href="../../index.html" target="_top">&lt;&lt; HOME</a> </a></td>
   		</tr>
 		<tr>
-		  <td nowrap>&nbsp;</td>
+		  <td class='tdwrap'>&nbsp;</td>
 		</tr>
-		<?php		
+		<?php
 			$lv_obj = new lehrveranstaltung($sql_conn);
 			if(!$lv_obj->load_lva('0',null, null, true))
 				echo "<tr><td>$lv_obj->errormsg</td></tr>";
-						
-			foreach($lv_obj->lehrveranstaltungen AS $row)			
-			{				
+
+			foreach($lv_obj->lehrveranstaltungen AS $row)
+			{
 				echo '<tr>';
-				echo '	<td nowrap>';
+				echo '	<td class="tdwrap">';
 				echo "	  <li><a class=\"Item2\" title=\"".$row->bezeichnung."\" href=\"lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".CutString($row->bezeichnung, 21)."</a></li>";
 				echo '	</td>';
 				echo '</tr>';
 			}
-			
+
 		?>
 		<tr><td>&nbsp;</td></tr>
 		<tr>
-          <td nowrap><a class="MenuItem" href="pinboard.php" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Pinboard</a></td>
+          <td class='tdwrap'><a class="MenuItem" href="pinboard.php" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Pinboard</a></td>
   		</tr>
   		<tr>
-          <td nowrap><a href="anmeldung.php" target='content' class="MenuItem" onClick="js_toggle_container('Anmeldung')"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Anmeldung</a></td>
+          <td class='tdwrap'><a href="anmeldung.php" target='content' class="MenuItem" onClick="js_toggle_container('Anmeldung')"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Anmeldung</a></td>
   		</tr>
 		<tr>
-          <td nowrap>
-		  	<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Anmeldung" style="display: none;">
+          <td class='tdwrap'>
+		  	<table class="tabcontent" id="Anmeldung" style="display: none;">
 			  <tr>
-			  	<td width="10" nowrap>&nbsp;</td>
-				<td nowrap><a class="Item" href="anmeldungsuebersicht.php" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;&Uuml;bersicht</a></td>
+			  	<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td class='tdwrap'><a class="Item" href="anmeldungsuebersicht.php" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;&Uuml;bersicht</a></td>
 			  </tr>
 			</table>
 		  </td>
   		</tr>
 		<tr>
-          <td nowrap><a href="?Info &amp; Kommunikation" class="MenuItem" onClick="return(js_toggle_container('Info &amp; Kommunikation'));"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Info &amp; Kommunikation</a></td>
+          <td class='tdwrap'><a href="?Info &amp; Kommunikation" class="MenuItem" onClick="return(js_toggle_container('Info &amp; Kommunikation'));"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Info &amp; Kommunikation</a></td>
   		</tr>
 		<tr>
-          <td nowrap>
-		  	<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Info &amp; Kommunikation" style="display: none;">
+          <td class='tdwrap'>
+		  	<table class="tabcontent" id="Info &amp; Kommunikation" style="display: none;">
 			  <tr>
-			  	<td width="10" nowrap>&nbsp;</td>
-				<td nowrap><a class="Item" href="../../private/lvplan/" target="_blank"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;LV-Plan</a></td>
+			  	<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td class='tdwrap'><a class="Item" href="../../private/lvplan/" target="_blank"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;LV-Plan</a></td>
 			  </tr>
 	    	  <tr>
-			  	<td width="10" nowrap>&nbsp;</td>
-				<td nowrap><a class="Item" href="https://webmail.technikum-wien.at" target="_blank"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Webmail</a></td>
+			  	<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td class='tdwrap'><a class="Item" href="https://webmail.technikum-wien.at" target="_blank"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Webmail</a></td>
 			  </tr>
 			  <tr>
-			  	<td width="10" nowrap>&nbsp;</td>
-				<td nowrap><a class="Item" href="../../public/faq_upload.html" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;FAQ</a></td>
+			  	<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td class='tdwrap'><a class="Item" href="../../public/faq_upload.html" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;FAQ</a></td>
 			  </tr>
 			</table>
 		  </td>
@@ -165,14 +165,14 @@
 			if($is_lector || $rechte->isBerechtigt('admin'))
 			{
 				echo '<tr>';
-				echo '  <td nowrap><a href="?Lektorenbereich" class="MenuItem" onClick="return(js_toggle_container(\'Lektorenbereich\'));"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Lektorenbereich</a></td>';
+				echo '  <td class="tdwrap"><a href="?Lektorenbereich" class="MenuItem" onClick="return(js_toggle_container(\'Lektorenbereich\'));"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Lektorenbereich</a></td>';
 				echo '</tr>';
 				echo '<tr>';
-				echo '  <td nowrap>';
-				echo '  	<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Lektorenbereich" style="display: none;">';				
+				echo '  <td class="tdwrap">';
+				echo '  	<table class="tabcontent" id="Lektorenbereich" style="display: none;">';
 				echo '	  <tr>';
-				echo '	  	<td width="10" nowrap>&nbsp;</td>';
-				echo '		<td nowrap><a class="Item" href="pinboardverwaltung.php" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Pinboardverwaltung</a></td>';
+				echo '	  	<td class="tdwidth10" nowrap>&nbsp;</td>';
+				echo '		<td class="tdwrap"><a class="Item" href="pinboardverwaltung.php" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Pinboardverwaltung</a></td>';
 				echo '	  </tr>';
 				echo '	</table>';
 				echo '  </td>';

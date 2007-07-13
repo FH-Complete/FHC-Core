@@ -51,12 +51,12 @@
 <head>
 	<title>Zeitsperren</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-	<link rel="stylesheet" href="../../../skin/cis.css" type="text/css">
+	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </head>
 
-<body>
+<body id="inhalt">
 	<H2>
-		<table width="100%" border="0" cellpadding="0" cellspacing="0">
+		<table class="tabcontent">
 			<tr>
 				<td>&nbsp;Zeitsperren</td>
 				<td align="right">
