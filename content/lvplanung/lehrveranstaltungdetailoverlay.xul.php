@@ -127,7 +127,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<template>
 							<menupopup>
 								<menuitem value="rdf:http://www.technikum-wien.at/lehrform/rdf#kurzbz"
-					        		      label="rdf:http://www.technikum-wien.at/lehrform/rdf#kurzbz"
+					        		      label="rdf:http://www.technikum-wien.at/lehrform/rdf#kurzbz rdf:http://www.technikum-wien.at/lehrform/rdf#bezeichnung"
 								  		  uri="rdf:*"/>
 								</menupopup>
 						</template>
@@ -141,7 +141,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<template>
 							<menupopup>
 								<menuitem value="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
-								          label="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
+								          label="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz rdf:http://www.technikum-wien.at/raumtyp/rdf#beschreibung"
 										  uri="rdf:*"/>
 							</menupopup>
 						</template>
@@ -154,7 +154,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<template>
 							<menupopup>
 								<menuitem value="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
-								          label="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
+								          label="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz rdf:http://www.technikum-wien.at/raumtyp/rdf#beschreibung"
 										  uri="rdf:*"/>
 								</menupopup>
 						</template>

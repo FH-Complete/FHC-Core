@@ -65,3 +65,7 @@
 <!ENTITY menu-dokumente-zeugnis.key		"Z">
 <!ENTITY menu-dokumente-zeugnis.label		"Zeugnis">
 <!ENTITY menu-dokumente-zeugnis.accesskey	"Z">
+
+<!ENTITY menu-dokumente-diplsupplement.key		"S">
+<!ENTITY menu-dokumente-diplsupplement.label	"Diploma Supplement">
+<!ENTITY menu-dokumente-diplsupplement.accesskey	"S">
