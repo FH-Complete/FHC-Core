@@ -34,10 +34,10 @@ else
 <head>
 <title>Profil</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link rel="stylesheet" href="../../skin/cis.css" type="text/css">
+<link rel="stylesheet" href="../../skin/style.css.php" type="text/css">
 </head>
 
-<body class="background_main">
+<body id="inhalt">
 <h4>Zeitw&uuml;nsche von <?php echo $titel.' '.$vornamen.' '.$nachname; ?></h4>
 Results: <?php echo $num_rows; ?><br>
 Username: <?php echo $uid; ?><br>
@@ -73,7 +73,7 @@ Username: <?php echo $uid; ?><br>
 <hr>
 <H3>Ekl&auml;rung:</H3>
 <P>Bitte kontrollieren Sie Ihre Zeitw&uuml;nsche, &auml;nderungen per Mail bitte
-  an <A href="mailto:stpl@technikum-wien.at">Stundenplan</A>!<BR>
+  an <A class="Item" href="mailto:stpl@technikum-wien.at">Stundenplan</A>!<BR>
   <BR>
 </P>
 <TABLE width="35%" border="1" cellspacing="0" name="Zeitwerte">
@@ -130,7 +130,7 @@ Username: <?php echo $uid; ?><br>
     Beispiel: Sie unterrichten 4Stunden/Woche, dann m&uuml;ssen Sie mindesten
     6 Stunden im Raster mit positiven Werten ausf&uuml;llen.</LI>
 </OL>
-<P>Bei Problemen wenden Sie sich bitte an die <A href="mailto:stpl@technikum-wien.at">Stundenplanstelle</A>.</P>
+<P>Bei Problemen wenden Sie sich bitte an die <A class="Item" href="mailto:stpl@technikum-wien.at">Stundenplanstelle</A>.</P>
 <P>&nbsp;</P>
 </body>
 </html>

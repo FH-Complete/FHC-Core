@@ -4,26 +4,26 @@
 	require_once('../../../include/studiensemester.class.php');
 	require_once('../../../include/lehrveranstaltung.class.php');
 	require_once('../../../include/feedback.class.php');
-    
+
     //Connection Herstellen
     if(!$conn = pg_pconnect(CONN_STRING))
        die('Fehler beim oeffnen der Datenbankverbindung');
-    
+
 	$user = get_uid();
-	
+
 	if(check_lektor($user, $conn))
        $is_lector=true;
-    
+
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
-<body>
-<?php	
+<body id="inhalt">
+<?php
 	if(!isset($_GET['lvid']) || !is_numeric($_GET['lvid']))
 	   die('Fehler bei der Uebergabe der Parameter');
 	$lvid = $_GET['lvid'];
@@ -31,20 +31,20 @@
 	$stsem = $stsem_obj->getaktorNext();
 	if(isset($POST["feedback_message"]))
 	   $feedback_message=$POST["feedback_message"];
-	   
-//	if(isset($feedback_message))	
-//		echo $feedback_message;  
+
+//	if(isset($feedback_message))
+//		echo $feedback_message;
 
 ?>
 
-<table border="0" cellpadding="0" width="100%" cellspacing="0">
+<table class="tabcontent">
 	<tr>
 		<td width="3%">&nbsp;</td>
 			<?php
 				echo '<form method="POST" action="feedback.php?lvid='.$lvid.'" enctype="multipart/form-data">';
 			?>
 		<td width="97%">
-			<table width="100%" border="0" cellspacing="0" cellpadding="0">
+			<table class="tabcontent">
 			  <tr>
 			<?php
 				$lv_obj = new lehrveranstaltung($conn);
@@ -52,11 +52,11 @@
 				{
 					$short_name = $lv_obj->bezeichnung;
 				}
-				else 
+				else
 					die($lv_obj->errormsg);
 			?>
-          <td class='ContentHeader'><font class='ContentHeader'>&nbsp;<?php echo $short_name; ?> - Feedback 
-            an: 
+          <td class='ContentHeader'><font class='ContentHeader'>&nbsp;<?php echo $short_name; ?> - Feedback
+            an:
 			<?php
 			$qry = "SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE lehrveranstaltung_id='$lvid' ORDER BY ende DESC LIMIT 1";
 			$result = pg_query($conn, $qry);
@@ -78,9 +78,9 @@
     		</td>
 		  </tr>
 		</table>
-				
+
 	<br>
-      <p><b>Betreff:&nbsp;</b> 
+      <p><b>Betreff:&nbsp;</b>
 	    <?php
 			if(isset($edit_id) && $edit_id != "" && !isset($edit_break))
 			{
@@ -92,7 +92,7 @@
 					echo '<input type="submit" value="&Auml;ndern" name="edit_feedback">&nbsp;';
 					echo '<input type="submit" value="Abbrechen" name="edit_break">';
 				}
-				else 
+				else
 					echo $fb_obj->errormsg.'<br>';
 			}
 			else
@@ -102,12 +102,12 @@
 				echo '<input type="submit" value="Abschicken" name="send_feedback">';
 			}
 		?>
-        &nbsp; 
+        &nbsp;
         <input type="reset" value="Zur&uuml;cksetzen" name="reset_message">
       </p>
       <?php
 		if(isset($feedback_message) && $feedback_message != "")
-		{	
+		{
 			if(isset($edit_feedback))
 			{
 				$fb_obj = new feedback($conn);
@@ -118,13 +118,13 @@
 				$fb_obj->uid = $user;
 				$fb_obj->lehrveranstaltung_id = $lvid;
 				$fb_obj->new = false;
-				
+
 				if($fb_obj->save())
 					echo "<script language=\"JavaScript\">document.location = document.location + \"&message_sent=true\"</script>";
-				else 
+				else
 					echo $fb_obj->errormsg."<br>";
 			}
-			
+
 			if(!isset($edit_id) && !isset($edit_break) && !isset($edit_feedback))
 			{
 				$fb_obj = new feedback($conn);
@@ -134,56 +134,56 @@
 				$fb_obj->uid = $user;
 				$fb_obj->lehrveranstaltung_id = $lvid;
 				$fb_obj->new = true;
-				
+
 				if($fb_obj->save())
 					echo "<script language=\"JavaScript\">document.location = document.location + \"&message_sent=true\"</script>";
-				else 
+				else
 					echo $fb_obj->errormsg." save<br>";
 			}
 		}
-		
+
 		if(isset($message_sent) && $message_sent == true)
 		{
 			echo 'Die Nachricht wurde erfolgreich eingetragen.<br><br><br>';
 		}
-	
+
 		$fb_obj = new feedback($conn);
 		if($fb_obj->load_feedback($lvid))
 		{
-			echo '<table width="100%" border="0" cellspacing="0" cellpadding="0">';
-								
+			echo '<table class="tabcontent">';
+
 			foreach($fb_obj->result as $row)
-			{								
+			{
 				$sql_query = "SELECT vorname, nachname FROM campus.vw_benutzer WHERE uid='$row->uid'";
-				
+
 				if($result_person = pg_query($conn, $sql_query))
 				{
 					if($row_pers=pg_fetch_object($result_person))
 					{
-				
+
 						echo '<tr>';
 						echo '	<td class="ContentHeader"><font class="ContentHeader"><strong>&nbsp;'.$row->betreff.'</font></td>';
 						echo '	<td class="ContentHeader" width="30%"><font class="ContentHeader">'.$row_pers->vorname.' '.$row_pers->nachname.'</font></td>';
 						echo '	<td class="ContentHeader" width="20%"><font class="ContentHeader">'.$row->datum.'</font></td>';
-						echo '	<td class="ContentHeader" width="20%"><font class="ContentHeader">&nbsp;</font></td>';						
+						echo '	<td class="ContentHeader" width="20%"><font class="ContentHeader">&nbsp;</font></td>';
 						echo '  <td class="ContentHeader" align="right"><font class="ContentHeader">&nbsp;</font></td>';
-						
+
 						echo '</tr>';
 						echo '<tr>';
-						echo '	<td bgcolor="#F2F2F2" colspan=5><font color="#000000">'.nl2br($row->text).'</font></td>';
-						//echo '	<td bgcolor="#F2F2F2"><font color="#000000">&nbsp;</font></td>';
-						//echo '	<td bgcolor="#F2F2F2" colspan=2><font color="#000000">&nbsp;</font></td>';
-						//echo '	<td bgcolor="#F2F2F2"><font color="#000000">&nbsp;</font></td>';
+						echo '	<td class="MarkLine" colspan=5>'.nl2br($row->text).'</td>';
+						//echo '	<td class="MarkLine">&nbsp;</td>';
+						//echo '	<td class="MarkLine" colspan=2>&nbsp;</td>';
+						//echo '	<td class="MarkLine">&nbsp;</td>';
 						echo '</tr>';
 						echo '<tr>';
-						echo '	<td><font color="#FFFFFF">&nbsp;</font></td>';
+						echo '	<td>&nbsp;</td>';
 						echo '</tr>';
-					}	
+					}
 				}
-			}			
+			}
 			echo '</table>';
 		}
-		else 
+		else
 			echo 'Fehler beim laden der Daten '.$fb_obj->errormsg;
 	?>
     </td>

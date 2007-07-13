@@ -13,13 +13,13 @@
 		}
 		-->
 	</script>
-	<LINK rel="stylesheet" href="../../../skin/cis.css" type="text/css">
+	<LINK rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </HEAD>
 
-<BODY>
-<H2><table width="100%" border="0" cellpadding="0" cellspacing="0">
+<BODY id="inhalt">
+<H2><table class="tabcontent">
 	<tr>
-	<td>&nbsp;<a href="index.php">Lehrveranstaltungsplan</a> &gt;&gt; Wochenplan</td>
+	<td>&nbsp;<a class="Item" href="index.php">Lehrveranstaltungsplan</a> &gt;&gt; Wochenplan</td>
 	<td align="right"><A href="help/index.html" class="hilfe" target="_blank">HELP&nbsp;</A></td>
 	</tr>
 	</table>
@@ -220,6 +220,6 @@ if (isset($count))
 	echo "Es wurden $count Stunden reserviert!<BR>";
 ?>
 <HR>
-<P>Fehler und Feedback bitte an <A href="mailto:lvplan@technikum-wien.at">LV-Koordinationsstelle</A>.</P>
+<P>Fehler und Feedback bitte an <A class="Item" href="mailto:lvplan@technikum-wien.at">LV-Koordinationsstelle</A>.</P>
 </BODY>
 </HTML>

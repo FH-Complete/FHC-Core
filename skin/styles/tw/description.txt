@@ -1,0 +1,3 @@
+Das ist das Standard Layout <br>vom Technikum Wien.<br><br>
+
+<i><small>copyright by FH Technikum Wien</small></i>

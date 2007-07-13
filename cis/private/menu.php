@@ -62,7 +62,7 @@ else
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 
 <script language="JavaScript">
 <!--
@@ -99,10 +99,10 @@ else
 </head>
 
 <body>
-<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+<table class="tabcontent">
 <tr>
-	<td width="159" valign="top" nowrap>
-		<table width="100%"  border="0" cellspacing="0" cellpadding="0" style="border-right-width:1px;border-right-color:#BCBCBC;">
+	<td width="159" class='tdvertical' nowrap>
+		<table class="tabcontent">
 		<tr>
           <td nowrap><a class="HyperItem" href="../index.html" target="_top">&lt;&lt; HOME</a></td>
   		</tr>
@@ -116,18 +116,18 @@ else
 
 		<tr>
 	       	<td nowrap>
-		  	<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="MeineCIS" style="display: visible;">
+		  	<table class="tabcontent" id="MeineCIS" style="display: visible;">
 		  	<tr>
-			  	<td width="10" nowrap>&nbsp;</td>
-				<td nowrap><a class="Item" href="profile/index.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Profil</a></td>
+			  	<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td class='tdwrap'><a class="Item" href="profile/index.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Profil</a></td>
 			</tr>
 			<tr>
-			  	<td width="10" nowrap>&nbsp;</td>
-				<td nowrap><a class="Item" href="https://webmail.technikum-wien.at" target="_blank"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Webmail</a></td>
+			  	<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td class='tdwrap'><a class="Item" href="https://webmail.technikum-wien.at" target="_blank"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Webmail</a></td>
 			</tr>
 		  	<tr>
-				<td width="10" nowrap>&nbsp;</td>
-				<td nowrap><a class="Item" href="lvplan/stpl_week.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;LV-Plan</a></td>
+				<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td class='tdwrap'><a class="Item" href="lvplan/stpl_week.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;LV-Plan</a></td>
 			</tr>
 			<?php
 			//Eigene LVs des eingeloggten Lektors anzeigen
@@ -135,35 +135,35 @@ else
 			{
 				?>
 				<tr>
-					<td width="10" nowrap>&nbsp;</td>
-				    <td nowrap>
+					<td class="tdwidth10" nowrap>&nbsp;</td>
+				    <td class='tdwrap'>
 				    	<a href="profile/zeitwunsch.php?uid=<?php echo $user; ?>" class="Item" target="content">
 				    		<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Zeitw&uuml;nsche
 				    	</a>
 				    </td>
 				</tr>
 				<tr>
-					<td width="10" nowrap>&nbsp;</td>
-				    <td nowrap>
+					<td class="tdwidth10" nowrap>&nbsp;</td>
+				    <td class='tdwrap'>
 				    	<a href="profile/lva_liste.php?uid=<?php echo $user; ?>" class="Item" target="content">
 				    		<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;LV-&Uuml;bersicht
 				    	</a>
 				    </td>
 				</tr>
 				<tr>
-					<td width="10" nowrap>&nbsp;</td>
-				    <td nowrap>
+					<td class="tdwidth10" nowrap>&nbsp;</td>
+				    <td class='tdwrap'>
 				    	<a href="?Location" class="MenuItem" onClick="return(js_toggle_container('MeineLVs'));">
 				    		<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Meine LV
 				    	</a>
 				    </td>
 				</tr>
 				<tr>
-          			<td width="10" nowrap>&nbsp;</td>
-					<td nowrap>
-		  			<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="MeineLVs" style="display: visible;">
+          			<td class="tdwidth10" nowrap>&nbsp;</td>
+					<td class='tdwrap'>
+		  			<table class="tabcontent" id="MeineLVs" style="display: visible;">
 					<tr>
-					  	<td nowrap>
+					  	<td class='tdwrap'>
 							<ul style="margin-top: 0px; margin-bottom: 0px;">
 							<?php
 							$stsemobj = new studiensemester($db_conn);
@@ -199,19 +199,19 @@ else
 			{
 				?>
 				<tr>
-					<td width="10" nowrap>&nbsp;</td>
-				    <td nowrap>
+					<td class="tdwidth10" nowrap>&nbsp;</td>
+				    <td class='tdwrap'>
 				    	<a href="profile/zeitsperre_days.php?days=12" target="content" class="MenuItem" onClick="js_toggle_container('Zeitsperren');">
 				    		<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Zeitsperren
 				    	</a>
 				    </td>
 				</tr>
 				<tr>
-          			<td width="10" nowrap>&nbsp;</td>
+          			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td nowrap>
-		  			<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Zeitsperren" style="display: none;">
+		  			<table class="tabcontent" id="Zeitsperren" style="display: none;">
 					<tr>
-					  	<td nowrap>
+					  	<td class='tdwrap'>
 							<ul style="margin-top: 0px; margin-bottom: 0px;">
 							<?php
 							if ($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('mitarbeiter'))

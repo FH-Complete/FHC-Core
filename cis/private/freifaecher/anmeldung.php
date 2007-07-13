@@ -15,11 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-/* 
+/*
  * Ermoeglicht das Anmelden zu Freifaechern
  */
 require_once('../../config.inc.php');
@@ -29,7 +29,7 @@ require_once('../../../include/lehrveranstaltung.class.php');
 
 if(!$conn=pg_connect(CONN_STRING))
 	die('Die Datenbankverbindung konnte nicht hergestellt werden.');
-	
+
 $user = get_uid();
 
 //Aktuelles Studiensemester holen
@@ -41,19 +41,19 @@ $stsem = $stsem_obj->getaktorNext();
 	<html>
 	<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-	<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
+	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<title>Freifaecher Anmeldung</title>
 	</head>
-	
+
 	<body>
-	<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+	<table class="tabcontent" id="inhalt">
 		<tr>
-	    <td width="10">&nbsp;</td>
-	    <td><table width="100%"  border="0" cellspacing="0" cellpadding="0">
-	    	<tr> 
+	    <td class="tdwidth10">&nbsp;</td>
+	    <td><table class="tabcontent">
+	    	<tr>
 	      	<td class="ContentHeader"><font class="ContentHeader">&nbsp;Freif&auml;cher Anmeldung</font></td>
 	    	</tr>
-	    	<tr> 
+	    	<tr>
 	      	<td>&nbsp;</td>
 	    	</tr>
 	    	<tr>
@@ -72,9 +72,9 @@ if(isset($_POST['submit']))
 		$qry = "DELETE FROM campus.tbl_benutzerlvstudiensemester WHERE uid='$user' AND studiensemester_kurzbz='$stsem'";
 		if(!pg_query($conn,$qry))
 			die('Fehler beim aktualisieren der Freifaecherzuteilung! Bitte Versuchen Sie es erneut');
-		
+
 		//...dann die angeklickten FF hinzufuegen
-		foreach ($_POST['chkbox'] as $elem) 
+		foreach ($_POST['chkbox'] as $elem)
 		{
 			$qry = "INSERT INTO campus.tbl_benutzerlvstudiensemester(uid, lehrveranstaltung_id, studiensemester_kurzbz) VALUES('$user','$elem','$stsem');";
 			if(!pg_query($conn,$qry))
@@ -86,13 +86,13 @@ if(isset($_POST['submit']))
 		pg_query($conn,'COMMIT');
 		echo "<b>Ihre Daten wurden erfolgreich aktualisiert!</b><br />";
 	}
-	else 
+	else
 	{
 		//Wenn keine Checkbox angeklickt wurde, alle Eintraege herausloeschen
 		$qry = "DELETE FROM campus.tbl_benutzerlvstudiensemester WHERE uid='$user' AND studiensemester_kurzbz='$stsem'";
 		if(!pg_query($conn,$qry))
 			die("Fehler beim aktualisieren der Freifaecherzuteilung! Bitte Versuchen Sie es erneut");
-		else 
+		else
 			echo "<b>Ihre Daten wurden erfolgreich aktualisiert!</b><br />";
 	}
 }
@@ -101,20 +101,20 @@ if(isset($_POST['submit']))
 $qry = "SELECT * FROM campus.tbl_benutzerlvstudiensemester WHERE uid = '$user' AND studiensemester_kurzbz='$stsem'";
 if($result=pg_query($conn,$qry))
 {
-	$ff = array();	
+	$ff = array();
 	while($row=pg_fetch_object($result))
 		$ff[] = $row->lehrveranstaltung_id;
 }
-else 
+else
 	echo 'Fehler beim Auslesen der Zuteilunstabelle';
-		
+
 echo '<br />';
 //Freifaecher laden
 $lv_obj = new lehrveranstaltung($conn);
 if($lv_obj->load_lva('0',null,null,true))
 {
 	$anz = count($lv_obj->lehrveranstaltungen);
-	
+
 	echo "<form method='POST'>";
 	$i=0;
 	echo "<table><tr><td valign='top'>";
@@ -123,23 +123,23 @@ if($lv_obj->load_lva('0',null,null,true))
 		//Auftrennen in eine zweite Spalte bei der haelfte der Eintraege
 		if($i==intval($anz/2))
 			echo "</td><td valign='top'>";
-			
+
 		if(in_array($row->lehrveranstaltung_id,$ff))
 			$checked = "checked='true'";
-		else 
+		else
 			$checked = '';
-			
+
 		//Wenn aktiv=false dann ist fuer dieses Lehrfach keine Anmeldung mehr moeglich
 		if($row->aktiv==false && $checked=='')
 			$disabled = "disabled='true'";
-		else 
+		else
 			$disabled = "";
-			
+
 		echo "<input type='checkbox' value='$row->lehrveranstaltung_id' name='chkbox[]' $checked $disabled >$row->bezeichnung<br />";
 		$i++;
 	}
 	echo "</td></tr><tr><td></td><td>&nbsp;</td></tr>";
-	echo "<tr><td></td><td><input type='submit' name='submit' value='Speichern'></td></tr>";	
+	echo "<tr><td></td><td><input type='submit' name='submit' value='Speichern'></td></tr>";
 	echo "</table>";
 	echo "</form>";
 }

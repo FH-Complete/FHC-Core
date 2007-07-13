@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -23,7 +23,7 @@
 /* @author Andres Oesterreicher
    @date 20.10.2005
    @brief Formular zum Freigeben der LV Informationen aus der tabelle tbl_lvinfo
-   
+
    @edit	08-11-2006 Versionierung entfernt. Studiensemester = WS2007
    			03-01-2006 Anpassung an neue DB
 */
@@ -31,7 +31,7 @@
 	require_once('../../../../include/functions.inc.php');
 	require_once('../../../../include/studiensemester.class.php');
 	require_once('../../../../include/lvinfo.class.php');
-	
+
 	if(!$conn=pg_pconnect(CONN_STRING))
 		die('Es konnte keine Verbindung zur Datenbank hergestellt werden');
 
@@ -42,7 +42,7 @@
 	 * @param $qry Query anweisung
 	 *        $uid Username
 	 * @return true wenn ok false wenn fehler beim oeffnen
-	 */    
+	 */
 	function WriteLog($qry,$uid)
 	{
 
@@ -53,15 +53,15 @@
 			fclose($fp);
 			return true;
 		}
-		else 
-			return false;   	  
+		else
+			return false;
 	}
-   
+
 	if(!check_lektor($user,$conn))
 	{
 		die('<center>Sie haben keine Berechtigung fuer diesen Bereich</center>');
 	}
-   
+
 	if(isset($_POST['stg'])) //Studiengang der Angezeigt werden soll
 		$stg=$_POST['stg'];
 	else if(isset($_GET['stg']))
@@ -75,37 +75,37 @@
 		$sem = $_GET['sem'];
 	else
 		$sem='';
-        
+
 	if(isset($_POST["lv"])) //Id des DS der freigegeben/nicht freigegeben werden soll
 		$id=$_POST["lv"];
 
 	if(isset($_GET["del"])) //Wenn diese Variable gesetzt ist dann wird DS mit $idde und $iden geloescht
-		$del=$_GET["del"];        
-   
+		$del=$_GET["del"];
+
 	if(isset($_POST["changestat"])) //Wenn diese Variable gesetzt ist dann wird DS mit $id freigegeben/nicht freigegeben
 		$changestat=$_POST["changestat"];
 
 	if(!isset($_GET['lv']) && !isset($_POST['lv']))
 		$lv='';
-		
+
 	if(isset($_POST["status"]) && $_POST["status"] =='changestg')
 		unset($sem);
 
 	if(isset($del) && isset($lv))
 	{
 		//Loeschen der beiden Datensaetze
-   	  
+
 		$lvinfo_obj = new lvinfo($conn);
 		pg_query('BEGIN');
 		if($lvinfo_obj->delete($lv))
-		{			
+		{
 			if(!WriteLog($lvinfo_obj->lastqry,$user))
 			{
 				echo "<br>Fehler beim Schreiben des Log-files<br>";
 			}
-			pg_query('COMMIT');				
+			pg_query('COMMIT');
 		}
-		else 
+		else
 		{
 			pg_query('ROLLBACK');
 			echo "<br>Fehler beim loeschen<br>";
@@ -120,7 +120,7 @@
 		$qry="SELECT genehmigt FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$lv' AND sprache=";
 		if($_GET['lang']=='de')
 			$qry.="'".ATTR_SPRACHE_DE."'";
-		else 
+		else
 			$qry.="'".ATTR_SPRACHE_EN."'";
 
 		if($result=pg_query($conn,$qry))
@@ -131,60 +131,46 @@
 				$qry="UPDATE campus.tbl_lvinfo SET genehmigt=$wert WHERE lehrveranstaltung_id=$lv AND sprache=";
 				if($_GET['lang']=='de')
 					$qry.="'".ATTR_SPRACHE_DE."'";
-				else 
+				else
 					$qry.="'".ATTR_SPRACHE_EN."'";
 
 				if(pg_query($conn,$qry))
 					WriteLog($qry,$user);
-				else 
+				else
 					echo "Fehler beim Datenbankzugriff";
 			}
-			else 
+			else
 				echo "Fehler beim Datenbankzugriff";
 		}
-		else 
-			echo "Fehler beim Datenbankzugriff";  
+		else
+			echo "Fehler beim Datenbankzugriff";
 	}
-   
+
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <title>ECTS - LV INFO</title>
-<style type="text/css">
-<!--
-td {
-font-family:verdana,arial,helvetica;
-font-size:10pt;
-}
-
-textarea {
-font-family:verdana,arial,helvetica;
-font-size:10pt;
-border:1px dashed #000000;
-}
-//-->
-</style>
 <script language="JavaScript">
 function ask() {
-	return confirm("Wollen sie diese LV-Information wirklich loeschen ?")	  
+	return confirm("Wollen sie diese LV-Information wirklich loeschen ?")
 }
 </script>
 </head>
 <body>
-<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+<table class="tabcontent" id="inhalt">
   <tr>
     <td width="3%">&nbsp;</td>
     <td>
-    	<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+    	<table class="tabcontent">
 	      <tr>
 	        <td class="ContentHeader"><font class="ContentHeader">&nbsp;LV Info - Freigabe</font></td>
-	      </tr>	
+	      </tr>
 		  <tr>
 			   <td>
-			      <table width='100%'  border='0' cellspacing='0' cellpadding='0'>
+			      <table class="tabcontent">
 			         <tr>
 			               <td width="85%">
 				              &nbsp;
@@ -202,75 +188,75 @@ function ask() {
 			   </td>
 		  </tr>
 		</table>
-               
+
        <?php
        //DropDown Menues zur Auswahl von Studiengang und Semester anzeigen
-       
+
        echo "<form name='auswFrm' action='$PHP_SELF' method='POST'>";
        echo "<input type='hidden' name='status' value='a'>";
        echo "<input type='hidden' name='lv' value='$lv'>";
        //stg Drop Down
-       $qry = "SELECT distinct tbl_studiengang.studiengang_kz, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbzlang FROM campus.tbl_lvinfo, lehre.tbl_lehrveranstaltung, public.tbl_studiengang 
-       			WHERE tbl_lvinfo.aktiv=true 
+       $qry = "SELECT distinct tbl_studiengang.studiengang_kz, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbzlang FROM campus.tbl_lvinfo, lehre.tbl_lehrveranstaltung, public.tbl_studiengang
+       			WHERE tbl_lvinfo.aktiv=true
        			AND tbl_lvinfo.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
        			AND tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz
        			ORDER by kurzbzlang";
        if(!$result=pg_query($conn,$qry))
           die ('<center>Fehler bei einer Datenbankabfrage</center>');
-       
+
        echo "Studiengang   <SELECT name='stg' onChange='javascript:window.document.auswFrm.status.value=\"changestg\";window.document.auswFrm.submit();'>";
        //$firststg;
        $vorhanden=false;
-       
+
        while($row=pg_fetch_object($result))
        {
        	   if(!isset($firststg))
-       	      $firststg=$row->studiengang_kz; 
-       	      
+       	      $firststg=$row->studiengang_kz;
+
        	   if(!isset($stg))
        	      $stg=$row->studiengang_kz;
-       	   
+
        	   if($stg==$row->studiengang_kz)
        	   {
        	      echo "<option value='$row->studiengang_kz' selected>$row->kurzbzlang</option>";
        	      $vorhanden=true;
        	   }
-       	   else 
+       	   else
        	      echo "<option value='$row->studiengang_kz'>$row->kurzbzlang</option>";
        }
        echo "</SELECT>";
-       
+
        if(!$vorhanden) //Wenn $stg einen Wert enthaelt der nicht in der Liste vorkommt wird der erste Eintrag der Liste ausgewaehlt
           $stg=$firststg;
-          
+
        //Semester Drop Down
        $qry = "SELECT distinct semester FROM campus.tbl_lvinfo, lehre.tbl_lehrveranstaltung
-       			WHERE tbl_lvinfo.aktiv=true 
+       			WHERE tbl_lvinfo.aktiv=true
        			AND tbl_lvinfo.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
        			AND tbl_lehrveranstaltung.studiengang_kz='$stg'
        			ORDER by semester";
        if(!$result=pg_query($conn,$qry))
           die ("<center>Fehler bei einer Datenbankabfrage</center>");
-       
+
        echo " Semester   <SELECT name='sem' onChange='javascript:window.document.auswFrm.submit();'>";
 
        //$firstsem;
        $vorhanden=false;
-       
+
        while($row=pg_fetch_object($result))
        {
        	   if(!isset($firstsem))
        	      $firstsem = $row->semester;
-       	      
+
        	   if(!isset($sem))
        	      $sem=$row->semester;
-       	   
+
        	   if($sem==$row->semester)
        	   {
        	      echo "<option value='$row->semester' selected>$row->semester</option>";
        	      $vorhanden=true;
        	   }
-       	   else 
+       	   else
        	      echo "<option value='$row->semester'>$row->semester</option>";
        }
        echo "</SELECT>";
@@ -278,12 +264,12 @@ function ask() {
            $sem=$firstsem;
 
        //Anzeigen der Liste mit den LV - Informationen
-       ?> 
+       ?>
        <br><br>
-        <table width="900"  border="0" cellspacing="0" cellpadding="0" style="border: 1px solid black">
+        <table width="900" class="tabcontent2" style="border: 1px solid black">
 	        <tr>
 	          <td>
-	              <table width="100%"  border="0" cellspacing="0" cellpadding="0">
+	              <table class="tabcontent">
 	              <tr class='liste'>
 	                 <th>x</th>
 	                 <th>Lehrfach</th>
@@ -292,32 +278,32 @@ function ask() {
 	                 <th>Anzeigen</th>
 	                 <th>Online<br>de &nbsp; en</th>
 	              </tr>
-	              
-		             <?php 
+
+		             <?php
 						$qry="SELECT *, tbl_lehrveranstaltung.bezeichnung as bezeichnung, to_char(tbl_lvinfo.updateamum,'DD-MM-YYYY HH24:MI') as amum,tbl_lvinfo.updateamum as updateamum, tbl_lvinfo.updatevon as updatevon FROM campus.tbl_lvinfo JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) WHERE studiengang_kz=$stg AND semester=$sem AND tbl_lvinfo.aktiv=true AND tbl_lvinfo.sprache='".ATTR_SPRACHE_DE."' ORDER BY tbl_lehrveranstaltung.bezeichnung ASC";
 
 		                if(!$result=pg_query($conn,$qry))
 		                    die("<center>Fehler bei einer Datenbankabfrage</center>");
 
-		                $i=-1;		                
+		                $i=-1;
 		                while($row=pg_fetch_object($result))
 		                {
 							$i++;
 							$qry1="SELECT *, tbl_lehrveranstaltung.bezeichnung as bezeichnung, tbl_lvinfo.updatevon as updatevon FROM campus.tbl_lvinfo JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) WHERE tbl_lvinfo.sprache='".ATTR_SPRACHE_EN."' AND lehrveranstaltung_id='$row->lehrveranstaltung_id'";
-	
+
 		                	if(!$result1=pg_query($conn,$qry1))
 			                    die("<center>Fehler bei einer Datenbankabfrage</center>");
 
                             if(!$row1=pg_fetch_object($result1))
 								die("<center>Fehler bei einer Datenbankabfrage</center>");
-                               
+
                             $qry2="SELECT vorname, nachname FROM campus.vw_mitarbeiter WHERE uid='$row->updatevon'";
-							
+
                             $bearbeitet=$row->updatevon;
 		                	if($result2=pg_query($conn,$qry2))
 			                   if($row2=pg_fetch_object($result2))
                                    $bearbeitet=$row2->vorname.' '.$row2->nachname;
-                            echo "\n";   
+                            echo "\n";
 		                	echo "<tr class='liste".($i%2)."'>"."\n";
 		                    echo "<td align='center'><a href='$PHP_SELF?del=1&stg=$stg&sem=$sem&lv=$row->lehrveranstaltung_id' onClick='return ask();'>Delete</a></td>"."\n";
 		                    echo "<td align='center'>$row->bezeichnung</td>"."\n";
@@ -331,7 +317,7 @@ function ask() {
 		                    echo "</tr>";
 		                }
 	             ?>
-		             
+
 		          </table>
 		      </td>
 		    </tr>

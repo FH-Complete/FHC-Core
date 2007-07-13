@@ -46,18 +46,17 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 }
 //-->
 </script>
-<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
 
-<BODY>
-	<H1>
-	<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<BODY id="inhalt">
+<font face="Arial, Helvetica, sans-serif" size="2">
+	<table class="tabcontent">
 		<tr>
-			<td>&nbsp;Lehrveranstaltungsplan</td>
-			<td align="right"><A href="help/index.html" class="hilfe" target="_blank">HELP&nbsp;</A></td>
+			<td class="ContentHeader"><font class="ContentHeader">Lehrveranstaltungsplan</font></td>
+			<td align="right" class="ContentHeader"><A href="help/index.html" class="hilfe" target="_blank"><font class="ContentHeader">HELP&nbsp;</font></A></td>
 		</tr>
 	</table>
-	</H1>
 	<DIV align="right">Version: <?php echo VERSION; ?></DIV>
 	<font class="beschriftung">Username: </font>
 	<?php
@@ -67,26 +66,26 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 			echo 'nicht vorhanden! Bitte wenden Sie sich an den <A href="mailto:vilesci@technikum-wien.at">Admin</A>!';
 	?><BR>
   	<DIV align="left">
-  		<a href="stpl_week.php?pers_uid=<?php echo $uid; ?>"><?php echo $vornamen." ".$nachname;?></a>
+  		<a class="Item" href="stpl_week.php?pers_uid=<?php echo $uid; ?>"><?php echo $vornamen." ".$nachname;?></a>
 		&nbsp; -> Ihr pers&ouml;nlicher Lehrveranstaltungsplan<BR>
-		<a href="../profile/index.php">PROFIL</a>
+		<a class="Item" href="../profile/index.php">PROFIL</a>
 		&nbsp; -> Hier k&ouml;nnen Sie Ihre Stammdaten kontrollieren.<BR>
 	</DIV>
 	<BR>
 	<FORM name="Auswahl" action="stpl_week.php">
-		<table width="100%" border="0" cellpadding="0" cellspacing="3">
+		<table class="tabcontent">
 		<tr>
-			<td width="50%">
-				<H2>&nbsp;Saalplan</H2>
+			<td width="50%" class="ContentHeader2">
+				&nbsp;Saalplan
 			</td>
-			<td width="50%">
-				<H2>&nbsp;Lektorenplan</H2>
+			<td width="50%" class="ContentHeader2">
+				&nbsp;Lektorenplan
 			</td>
 		</tr>
 		<tr>
 			<td>
 			<BR>
-			<font class="beschriftung">Saal: </font>
+			Saal:
 			<select name="select" onChange="MM_jumpMenu('self',this,0)">
         		<option value="stpl_wekk.php" selected>... ??? ...</option>
         	  	<?php
@@ -98,11 +97,11 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 				?>
 			</select>
 			(Saalreservierung)<BR><BR>
-			<A href="stpl_reserve_list.php">Reservierungsliste</A> (Reservierungen l&ouml;schen)<BR>
+			<A class="Item" href="stpl_reserve_list.php">Reservierungsliste</A> (Reservierungen l&ouml;schen)<BR>
 			</td>
 
 			<td>
-			<font class="beschriftung">Lektor: </font>
+			Lektor:
 	  		<select name="lektor" onChange="MM_jumpMenu('self',this,0)">
 			    	<option value="stpl_week.php" selected>... ??? ...</option>
 			    	<?php
@@ -116,12 +115,12 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 			</td>
 		</tr>
 		</table>
-
-		<H2>&nbsp;Lehr-Verband</H2>
+		<br><br>
+		<table class="tabcontent"><tr><td class="ContentHeader2">&nbsp;Lehr-Verband</td></tr></table>
 		<table width="40%" border="0" cellpadding="0" cellspacing="3">
 		<tr nowrap>
 		<td width="20%" valign="middle">
-			<font class="beschriftung"> Studiengang</font><BR>
+			Studiengang<BR>
 			<select name="stg_kz" >
 				<?php
 				$num_rows=pg_numrows($result_stg);
@@ -134,7 +133,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 			</select>
 		</td>
 		<td valign="middle">
-			<font class="beschriftung"> Sem</font><BR>
+			Sem<BR>
 			<select name="sem">
 			<option value="1">1</option>
 			<option value="2">2</option>
@@ -147,7 +146,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 			</select>
 		</td>
 		<td valign="middle">
-			<font class="beschriftung"> Ver</font><BR>
+			Ver<BR>
 			<select name="ver" >
 			<option value="0" selected>*</option>
 			<option value="A">A</option>
@@ -157,7 +156,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 			</select>
 		</td>
 		<td valign="middle" >
-			<font class="beschriftung"> Grp</font><BR>
+			Grp<BR>
 			<select name="grp">
 			<option value="0" selected>*</option>
 			<option value="1">1</option>
@@ -171,14 +170,15 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 		</tr>
 		</table>
 	</form>
-	<a href="verband_uebersicht.php">Lehrverb&auml;nde</a> -> &Uuml;bersicht der Lehrverb&auml;nde<BR>
+	<a class="Item" href="verband_uebersicht.php">Lehrverb&auml;nde</a> -> &Uuml;bersicht der Lehrverb&auml;nde<BR>
 <BR><BR><HR>
-<P>Fehler und Feedback bitte an <A href="mailto:lvplan@technikum-wien.at">LV-Koordinationsstelle</A>.</P>
+<P>Fehler und Feedback bitte an <A class="Item" href="mailto:lvplan@technikum-wien.at">LV-Koordinationsstelle</A>.</P>
 <!--
 <P class=little>
     Erstellt am 24.8.2001 von <A href="mailto:pam@technikum-wien.at">Christian Paminger</A>.<BR>
     Letzte &Auml;nderung am 11.1.2005 von <A href="mailto:pam@technikum-wien.at">Christian Paminger</A>.
 </P>
 -->
+</font>
 </body>
 </html>

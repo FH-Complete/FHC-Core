@@ -2,37 +2,37 @@
 	<html>
 	<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-	<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
+	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<title>Leistungsbeurteilung</title>
-	
+
 	<script language="JavaScript">
 	function MM_jumpMenu(targ, selObj, restore)
 	{
 	  eval(targ + ".location='" + selObj.options[selObj.selectedIndex].value + "'");
-	  
-	  if(restore) 
+
+	  if(restore)
 	  {
 	  	selObj.selectedIndex = 0;
 	  }
 	}
 	</script>
 	</head>
-	
+
 	<body>
-	<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+	<table class="tabcontent" id="inhalt">
 		<tr>
-	    <td width="10">&nbsp;</td>
-	    <td><table width="100%"  border="0" cellspacing="0" cellpadding="0">
-	    	<tr> 
+	    <td class="tdwidth10">&nbsp;</td>
+	    <td><table class="tabcontent">
+	    	<tr>
 	      	<td class="ContentHeader"><font class="ContentHeader">&nbsp;Leistungsbeurteilung</font></td>
 	    	</tr>
-	    	<tr> 
+	    	<tr>
 	      	<td>&nbsp;</td>
 	    	</tr>
 	    	<tr>
 	    	<td>
 <?php
-/* 
+/*
  * Erstellt eine Notenliste des aktuellen Studiensemesters
  * zur Information fuer Studenten
  */
@@ -49,20 +49,20 @@ $error = '';
 $student_id = '';
 
 //Student ID ermitteln
-$qry = "SELECT 
+$qry = "SELECT
 			student.student_pk as student_id,
-			vorname, 
+			vorname,
 			familienname,
 			studiengang.name as stg
-		FROM 
-			person, 
+		FROM
+			person,
 			student,
-			studiengang 
-		WHERE 
-			person.uid='$user' AND 
+			studiengang
+		WHERE
+			person.uid='$user' AND
 			person.person_pk=student.person_fk AND
 			aufgenommenam is not null AND
-			studiengang.studiengang_pk=student.studiengang_fk 
+			studiengang.studiengang_pk=student.studiengang_fk
 		ORDER BY aufgenommenam DESC, student_id DESC LIMIT 1
 			";
 
@@ -70,30 +70,30 @@ if(!$row=pg_fetch_object(pg_query($conn,$qry)))
 {
 	$error .= 'Sie m&uuml;ssen als Student eingeloggt sein um ihre Noten abzufragen!';
 }
-else 
-{	
+else
+{
 	$vorname=$row->vorname;
 	$nachname=$row->familienname;
 	$stg_name=$row->stg;
 	$student_id = $row->student_id;
 	//Aktuelles Studiensemester ermitteln
-	$qry = "SELECT 
-				CASE studiensemester.art 
+	$qry = "SELECT
+				CASE studiensemester.art
 					WHEN 1 THEN 'WS' || studiensemester.jahr
-					WHEN 2 THEN 'SS' || studiensemester.jahr 					
+					WHEN 2 THEN 'SS' || studiensemester.jahr
 				END as stsem_name,
 				studiensemester_pk, aktuell
 			FROM studiensemester order by jahr, art DESC";
-	
+
 	if(!$result = pg_query($conn, $qry))
 		die("Fehler beim lesen aus der Datenbank");
-		
+
 	/*if($row = pg_fetch_object($result))
 	{
 		$stsem = $row->studiensemester_pk;
 		$stsem_name = $row->stsem_name;
 	}
-	else 
+	else
 		die("Derzeit kann keine Notenliste erstellt werden");
 		*/
 	echo "<br />";
@@ -110,24 +110,24 @@ else
 			echo "<OPTION value='notenliste.php?stsem=$row->studiensemester_pk'>$row->stsem_name</OPTION>";
 	}
 	echo "</SELECT><br />";
-	
+
 	//echo "Datum: ".date('d.m.Y')."<br />";
 	echo "<br />";
-	
+
 	//Lehrveranstaltungen und Noten holen
-	$qry = "SELECT 
-				lehrveranstaltung.name as lvname, 
-				note.note as note, 				
+	$qry = "SELECT
+				lehrveranstaltung.name as lvname,
+				note.note as note,
 				status
-			FROM 
-				note, 
+			FROM
+				note,
 				lehrveranstaltung
-			WHERE 
-				note.lehrveranstaltung_fk=lehrveranstaltung.lehrveranstaltung_pk AND 
-				lehrveranstaltung.studiensemester_fk='$stsem' AND 
+			WHERE
+				note.lehrveranstaltung_fk=lehrveranstaltung.lehrveranstaltung_pk AND
+				lehrveranstaltung.studiensemester_fk='$stsem' AND
 				note.student_fk='$student_id'
 			ORDER BY lvname";
-	
+
 	if($result=pg_query($conn,$qry))
 	{
 		//Tabelle anzeigen
@@ -169,10 +169,10 @@ else
 		$tbl.= "</table>";
 		if($i==0)
 			echo "Es wurden noch keine Beurteilungen eingetragen";
-		else 
+		else
 			echo $tbl;
 	}
-	else 
+	else
 	{
 		$error .= "Fehler beim Auslesen der Noten";
 	}

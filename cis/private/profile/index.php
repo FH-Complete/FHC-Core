@@ -66,17 +66,17 @@
 <head>
 <title>Profil</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
 
 <body>
-<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+<table class="tabcontent" id="inhalt">
   <tr>
-    <td width="10">&nbsp;</td>
+    <td class="tdwidth10">&nbsp;</td>
     <td>
-    <table width="100%"  border="0" cellspacing="0" cellpadding="0">
+    <table class="tabcontent">
       <tr>
-		<td class='ContentHeader'><font class='ContentHeader'>&nbsp;Userprofil</font></td>
+		<td class='ContentHeader'><font class='ContentHeader'>Userprofil</font></td>
 		<!--<td align="right"><A href="../lvplan/help/index.html" class="hilfe" target="_blank">HELP&nbsp;</A></td>-->
 	  </tr>
 	</table>
@@ -88,20 +88,20 @@
 	if ($num_rows==1)
 	{
 		?>
-		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+		<table class="tabcontent">
   		<tr>
     		<td colspan="2">
       		<P>
-      			<FONT class="beschriftung">Titel: </FONT> <?php echo $titelpre; ?> <br>
-        		<FONT class="beschriftung">Vornamen: </FONT> <?php echo $vorname.'  '.$vornamen; ?> <br>
-        		<FONT class="beschriftung">Nachname: </FONT> <?php echo $nachname; ?> <br>
-        		<FONT class="beschriftung">Postnomen: </FONT> <?php echo $titelpost; ?> <br>
+      			Titel: <?php echo $titelpre; ?> <br>
+        		Vornamen: <?php echo $vorname.'  '.$vornamen; ?> <br>
+        		Nachname: <?php echo $nachname; ?> <br>
+        		Postnomen: <?php echo $titelpost; ?> <br>
         		<?php
         		if(!$ansicht)
         		{
         		?>
-        			<FONT class="beschriftung">Geburtsdatum: </FONT> <?php echo $gebdatum; ?> <br>
-        			<FONT class="beschriftung">Geburtsort: </FONT> <?php echo $gebort; ?> <br>
+        			Geburtsdatum: <?php echo $gebdatum; ?> <br>
+        			Geburtsort: <?php echo $gebort; ?> <br>
         		<?php
         		}
         		?>
@@ -110,20 +110,20 @@
       		</P>
       		<P>
       			<b>eMail</b><br>
-        		<FONT class="beschriftung">Technikum:</FONT><a class='Item' href='mailto:<?php echo $uid; ?>@technikum-wien.at'> <?php echo $uid; ?>@technikum-wien.at</a><br>
+        		Technikum: <a class='Item' href='mailto:<?php echo $uid; ?>@technikum-wien.at'> <?php echo $uid; ?>@technikum-wien.at</a><br>
 
         		<?php
         		if($email_alias!='')
         		{
         		?>
-        			<FONT class="beschriftung">Alias:</FONT> <a class='Item' href='mailto:<?php echo $email_alias; ?>@technikum-wien.at'><?php echo $email_alias; ?>@technikum-wien.at</a>
+        			Alias: <a class='Item' href='mailto:<?php echo $email_alias; ?>@technikum-wien.at'><?php echo $email_alias; ?>@technikum-wien.at</a>
         		<?php
 				}
 				?>
-        		<!--<FONT class="beschriftung"><small>(fr&uuml;hestens ab Sommer in Verwendung)</small></FONT><BR>-->
+        		<!--<small>(fr&uuml;hestens ab Sommer in Verwendung)</small><BR>-->
         		<?php
         	    if($email!='')
-        	       	echo "<br><FONT class='beschriftung'>Extern:</FONT>$email";
+        	       	echo "<br>Extern: $email";
         	    ?>
 
         	</P>
@@ -141,11 +141,11 @@
 				{
 					?>
       				<b>Student</b><br><br>
-        			<FONT class="beschriftung">Studiengang: </FONT><?php echo $stgbez; ?><br>
-        			<FONT class="beschriftung">Semester: </FONT><?php echo $semester; ?><br>
-        			<FONT class="beschriftung">Verband: </FONT><?php echo $verband; ?><br>
-        			<FONT class="beschriftung">Gruppe: </FONT><?php echo $gruppe; ?><br>
-	        		<FONT class="beschriftung">Matrikelnummer: </FONT><?php echo $matrikelnr; ?><br />
+        			Studiengang: <?php echo $stgbez; ?><br>
+        			Semester: <?php echo $semester; ?><br>
+        			Verband: <?php echo $verband; ?><br>
+        			Gruppe: <?php echo $gruppe; ?><br>
+	        		Matrikelnummer: <?php echo $matrikelnr; ?><br />
 	        		<?php
 	        		if(!$ansicht)
 	        		{
@@ -161,10 +161,10 @@
 					?>
       				<P>
       				<b>Lektor</b><br><br>
-        			<FONT class="beschriftung">Kurzzeichen: </FONT><?php echo $kurzbz; ?><BR>
+        			Kurzzeichen: <?php echo $kurzbz; ?><BR>
         			<?php
         			if($tel!='')
-        				echo "<FONT class='beschriftung'>Telefon TW: </FONT>+43 1 333 40 77- $tel<BR><BR>";
+        				echo "Telefon TW: +43 1 333 40 77- $tel<BR><BR>";
 
         			if(!$ansicht)
         			{?>
@@ -181,7 +181,7 @@
 						if(pg_num_rows($result_betriebsmittel)>0)
 						{
 							echo '<br><br><b>Entlehnte Betriebsmittel</b><table><tr class="liste"><th>Betriebsmittel</th><th>Nummer</th><th>Ausgegeben am</th></tr>';
-							
+
 							while($row_bm = pg_fetch_object($result_betriebsmittel))
 							{
 								echo "<tr class='liste1'><td>$row_bm->betriebsmitteltyp</td><td>$row_bm->nummer</td><td>$row_bm->ausgegebenam</td></tr>";

@@ -15,43 +15,43 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 	require_once('../../config.inc.php');
     require_once('../../../include/functions.inc.php');
     require_once('../../../include/benutzerberechtigung.class.php');
-    
+
     //Connection Herstellen
     if(!$sql_conn = pg_pconnect(CONN_STRING))
        die("Fehler beim herstellen der Datenbankverbindung");
-        
+
 	$user = get_uid();
-	
+
 	if(check_lektor($user,$sql_conn))
        $is_lector=true;
-    else 
+    else
        $is_lector=false;
 
     if(!isset($_GET['lvid']) || !is_numeric($_GET['lvid']))
     	die('Fehlerhafte Parameteruebergabe');
-    else 
+    else
     	$lvid = $_GET['lvid'];
-    
+
 	$sql_query = "SELECT DISTINCT lehreverzeichnis, bezeichnung FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='$lvid'";
-	
+
 	if(!$result_lessons = pg_query($sql_conn, $sql_query))
 		die('Freifach konnte nicht aufgeloest werden');
-		
+
 	$num_rows_lessons = pg_num_rows($result_lessons);
-	
+
 	if(!$row = pg_fetch_object($result_lessons))
 		die('Freifach konnte nicht aufgeloest werden');
-	
+
 	$short_name = $row->bezeichnung;
 	$short_short_name = $row->lehreverzeichnis;
-	
+
 	$rechte=new benutzerberechtigung($sql_conn);
 	$rechte->getBerechtigungen($user);
 	$user_is_allowed_to_upload=false;
@@ -61,13 +61,13 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
 
 <body>
-<table border="0" cellspacing="0" cellpadding="0" height="100%" width="100%">
+<table class="tabcontent" id="inhalt">
 	<tr>
-		<td width="10">&nbsp;</td>
+		<td class="tdwidth10">&nbsp;</td>
 		<td class="ContentHeader"><font class="ContentHeader">&nbsp;
 		<?php
 			echo $short_name;
@@ -77,55 +77,55 @@
 	<tr>
 		<td valign="top">&nbsp;</td>
 		<td>
-		<?php			
+		<?php
 			$qry = "SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE lehrveranstaltung_id='$lvid' ORDER BY ende DESC LIMIT 1";
 			$angezeigtes_stsem ='';
 			if($result = pg_query($sql_conn, $qry))
 				if($row = pg_fetch_object($result))
 					$angezeigtes_stsem = $row->studiensemester_kurzbz;
-					
-			$qry = "SELECT distinct vorname, nachname, tbl_benutzer.uid as uid FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_benutzer, public.tbl_person WHERE tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND tbl_person.person_id=tbl_benutzer.person_id AND lehrveranstaltung_id='$lvid' AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid NOT like '_Dummy%' AND tbl_person.aktiv=true AND studiensemester_kurzbz='$angezeigtes_stsem' ORDER BY nachname, vorname";		
+
+			$qry = "SELECT distinct vorname, nachname, tbl_benutzer.uid as uid FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_benutzer, public.tbl_person WHERE tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND tbl_person.person_id=tbl_benutzer.person_id AND lehrveranstaltung_id='$lvid' AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid NOT like '_Dummy%' AND tbl_person.aktiv=true AND studiensemester_kurzbz='$angezeigtes_stsem' ORDER BY nachname, vorname";
 			if(!$result = pg_query($sql_conn, $qry))
 				die('Fehler bei Abfrage'.$qry);
-			
+
 			$num_rows_result = pg_num_rows($result);
-			
+
 			if(!($num_rows_result > 0))
 			{
 				echo 'Derzeit sind keine Lektoren f&uuml;r dieses Fach zugeteilt.';
 			}
 			else
-			{				
+			{
 				$i=1;
 				while($row_lector=pg_fetch_object($result))
-				{	
+				{
 					if($row_lector==$user)
 						$user_is_allowed_to_upload=true;
-						
+
 					echo '<a class="Item2" href="mailto:'.$row_lector->uid.'@technikum-wien.at">'.$row_lector->vorname.' '.$row_lector->nachname.'</a>';
 					if(!($i == $num_rows_result))
 					{
 						echo ',';
 					}
-											
-					$i++;	
-				}				
+
+					$i++;
+				}
 			}
 		?></td>
 	</tr>
 	<tr>
-		<td valign="top">&nbsp;</td>
-		<td valign="top">&nbsp;</td>
-	</tr>	
+		<td class='tdvertical'>&nbsp;</td>
+		<td class='tdvertical'>&nbsp;</td>
+	</tr>
 	<tr>
-		<td valign="top">&nbsp;</td>
-		<td valign="top">
-		<table border="0" cellpadding="0" cellspacing="0" width="100%">
+		<td class='tdvertical'>&nbsp;</td>
+		<td class='tdvertical'>
+		<table class="tabcontent">
 			<tr>
-			    <td valign="top" align="center">
+			    <td class='tdvertical' align="center">
 				  <?php
 				  	$dest_dir = @dir('../../../documents/freifaecher/'.strtolower($short_short_name).'/semesterplan');
-					
+
 					if(!@is_dir($dest_dir->path))
 					{
 						if(!is_dir('../../../documents/freifaecher'))
@@ -144,49 +144,49 @@
 							exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/freifaecher/'.strtolower($short_short_name).'/semesterplan"');
 						}
 					}
-					
+
 					if($dest_dir)
 					{
 						$dir_empty = true;
-						
+
 						while($entry = $dest_dir->read())
 						{
 							if($entry != "." && $entry != "..")
 							{
 								$dir_empty = false;
-								
+
 								break;
 							}
 						}
 					}
-										
+
 					if(isset($dir_empty) && $dir_empty == false)
 					{
 						echo '<a href="'.$dest_dir->path.'/" target="_blank">';
-						echo '<img border="0" src="../../../skin/images/button_semplan.jpg" width="67" height="45"><br>';
+						echo '<img src="../../../skin/images/button_semplan.jpg" width="67" height="45"><br>';
 						echo '<strong>Semesterplan</strong>';
 						echo '</a>';
 					}
 					else
-					{						
-						echo '<img border="0" src="../../../skin/images/button_semplan.jpg" width="67" height="45"><br>';
+					{
+						echo '<img src="../../../skin/images/button_semplan.jpg" width="67" height="45"><br>';
 						echo '<strong>Semesterplan</strong>';
 					}
 					if($is_lector > 0 ) //islector=True
-					{							
-						if($user_is_allowed_to_upload || $rechte->isBerechtigt('admin',0)|| $rechte->isBerechtigt('lehre',0)) 
-						{	
+					{
+						if($user_is_allowed_to_upload || $rechte->isBerechtigt('admin',0)|| $rechte->isBerechtigt('lehre',0))
+						{
 							echo '<br><a onClick="javascript:window.open(\'semupload.php?lvid='.$lvid.'\',\'_blank\',\'width=400,height=300,location=no,menubar=no,status=no,toolbar=no\');">Upload</a>';
 							echo '&nbsp;&nbsp;&nbsp;<a href="semdownhlp.php" >Vorlage</a>';
 						}
-					}					
+					}
 			    ?>
 				  <p>&nbsp;</p>
 				</td>
-				<td valign="top" align="center">
+				<td class='tdvertical' align="center">
 				<?php
 					$dest_dir = @dir('../../../documents/freifaecher/'.strtolower($short_short_name).'/download');
-					
+
 					if(!@is_dir($dest_dir->path))
 					{
 						if(!is_dir('../../../documents/freifaecher'))
@@ -205,44 +205,44 @@
 							exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/freifaecher/'.strtolower($short_short_name).'/download"');
 						}
 					}
-					
+
 					if($dest_dir)
 					{
 						$dir_empty = true;
-						
+
 						while($entry = $dest_dir->read())
 						{
 							if($entry != "." && $entry != "..")
 							{
 								$dir_empty = false;
-								
+
 								break;
 							}
 						}
 					}
-										
+
 					if(isset($dir_empty) && $dir_empty == false)
 					{
 						echo '<a href="'.$dest_dir->path.'/" target="_blank">';
-						echo '<img border="0" src="../../../skin/images/button_dl.jpg" width="67" height="45"><br>';
+						echo '<img src="../../../skin/images/button_dl.jpg" width="67" height="45"><br>';
 						echo '<strong>Download</strong>';
 						echo '</a>';
 					}
 					else
-					{						
-						echo '<img border="0" src="../../../skin/images/button_dl.jpg" width="67" height="45"><br>';
+					{
+						echo '<img src="../../../skin/images/button_dl.jpg" width="67" height="45"><br>';
 						echo '<strong>Download</strong>';
 					}
 			    ?>
 			      <p>&nbsp;</p>
 			    </td>
 			</tr>
-			
+
 			<tr>
-				<td valign="top" align="center">
+				<td class='tdvertical' align="center">
 				<?php
 					/*$dest_dir = @dir('../../../documents/freifaecher/'.strtolower($short_short_name).'/leistung');
-					
+
 					if(!@is_dir($dest_dir->path))
 					{
 						if(!is_dir('../../../documents/freifaecher'))
@@ -261,54 +261,54 @@
 							exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/freifaecher/'.strtolower($short_short_name).'/'.strtolower($short_short_name).'_leistung"');
 						}
 					}
-					
+
 					if($dest_dir)
 					{
 						$dir_empty = true;
-						
+
 						while($entry = $dest_dir->read())
 						{
 							if($entry != "." && $entry != "..")
 							{
 								$dir_empty = false;
-								
+
 								break;
 							}
 						}
 					}
-										
+
 					if(isset($dir_empty) && $dir_empty == false)
 					{
 						echo '<a href="'.$dest_dir->path.'/" target="_blank">';
-						echo '<img border="0" src="../../../skin/images/button_lb.jpg" width="67" height="45"><br>';
+						echo '<img src="../../../skin/images/button_lb.jpg" width="67" height="45"><br>';
 						echo '<strong>Leistungsbeurteilung</strong>';
 						echo '</a>';
 					}
 					else
-					{						
-						echo '<img border="0" src="../../../skin/images/button_lb.jpg" width="67" height="45"><br>';
+					{
+						echo '<img src="../../../skin/images/button_lb.jpg" width="67" height="45"><br>';
 						echo '<strong>Leistungsbeurteilung</strong>';
 					}*/
 			    ?>
 				<p>&nbsp;</p>
 				</td>
-				
-          <td valign="top" align="center">&nbsp;</td>
+
+          <td class='tdvertical' align="center">&nbsp;</td>
 			</tr>
 			<tr>
-				<td valign="top" align="center"><?php
-				
-				  echo "<a href=\"../lehre/feedback.php?lvid=$lvid\" target=\"_blank\"><img border=\"0\" src=\"../../../skin/images/button_fb.jpg\" width=\"67\" height=\"45\"><br>
+				<td class='tdvertical' align="center"><?php
+
+				  echo "<a href=\"../lehre/feedback.php?lvid=$lvid\" target=\"_blank\"><img src=\"../../../skin/images/button_fb.jpg\" width=\"67\" height=\"45\"><br>
 				     <strong>Feedback</strong></a>";
-				       
+
 				?>
             <p>&nbsp;</p>
 				</td>
-				<td valign="top" align="center">
+				<td class='tdvertical' align="center">
 				<a href="<?php
 				  			echo 'news://cis.technikum-wien.at/'.strtolower($short_short_name);
 				  		   ?>">
-				<img border="0" src="../../../skin/images/button_ng.jpg" width="67" height="45"><br>
+				<img src="../../../skin/images/button_ng.jpg" width="67" height="45"><br>
 				<strong>Newsgroups</strong>
 				</a>
 				<p>&nbsp;</p>
@@ -316,7 +316,7 @@
 			</tr>
 		</table>
 		</td>
-		<td width="30">&nbsp;</td>
+		<td class="tdwidth30">&nbsp;</td>
 	</tr>
 </table>
 </body>

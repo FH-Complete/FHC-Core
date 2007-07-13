@@ -2,14 +2,14 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
 
 <body>
-<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+<table class="tabcontent" id="inhalt">
   <tr>
-    <td width="10">&nbsp;</td>
-    <td><table width="100%"  border="0" cellspacing="0" cellpadding="0">
+    <td class="tdwidth10">&nbsp;</td>
+    <td><table class="tabcontent">
       <tr>
         <td class="ContentHeader"><font class="ContentHeader">&nbsp;Infrastruktur - WLan-Registration</font></td>
       </tr>
@@ -20,13 +20,13 @@
 	  	<td>
 		  <p>
 		  	Die WLAN-Registration entfällt durch den Einsatz von OpenVPN im WLAN Netzwerk.
-		  	<br /><br /><a href="http://helios.technikum-wien.at/" target="_blank">Details zum Verbinden mittels OpenVPN (nur aus dem Technikum-Wien LAN, bzw. dem TWWLAN erreichbar)</a> 
+		  	<br /><br /><a class="Item" href="http://helios.technikum-wien.at/" target="_blank">Details zum Verbinden mittels OpenVPN (nur aus dem Technikum-Wien LAN, bzw. dem TWWLAN erreichbar)</a>
 
-			<br /><br />Bei etwaigen Problemen stehen wir Ihnen gerne per Mail unter <a href="mailto:wlan@technikum-wien.at">wlan@technikum-wien.at</a> zur Verfügung.
+			<br /><br />Bei etwaigen Problemen stehen wir Ihnen gerne per Mail unter <a class="Item" href="mailto:wlan@technikum-wien.at">wlan@technikum-wien.at</a> zur Verfügung.
 		</td>
 	  </tr>
     </table></td>
-	<td width="30">&nbsp;</td>
+	<td class="tdwidth30">&nbsp;</td>
   </tr>
 </table>
 </body>

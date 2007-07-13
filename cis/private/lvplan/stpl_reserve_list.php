@@ -32,12 +32,12 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<title>Reservierungsliste</title>
-	<link rel="stylesheet" href="../../../skin/cis.css" type="text/css">
+	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </head>
-<body>
-	<H2><table width="100%" border="0" cellpadding="0" cellspacing="0">
+<body id="inhalt">
+	<H2><table class="tabcontent">
 		<tr>
-		<td>&nbsp;<a href="index.php">Lehrveranstaltungsplan</a> &gt;&gt; Reservierungen</td>
+		<td>&nbsp;<a class="Item" href="index.php">Lehrveranstaltungsplan</a> &gt;&gt; Reservierungen</td>
 		<td align="right"><A href="help/index.html" class="hilfe" target="_blank">HELP&nbsp;</A></td>
 		</tr>
 		</table>
@@ -67,7 +67,7 @@
 			echo '<td>'.$beschreibung.'<a  name="liste'.$i.'">&nbsp;</a></td>';
 			$z=$i-1;
 			if (($pers_uid==$uid)||($uid=='pam')||($uid=='kindlm')||($uid=='dvorak')||($uid=='betty'))
-				echo '<td><A href="stpl_reserve_list.php?id='.$id.'#liste'.$z.'">Delete</A></td>';
+				echo '<td><A class="Item" href="stpl_reserve_list.php?id='.$id.'#liste'.$z.'">Delete</A></td>';
 			echo '</tr>';
 		}
 		echo '</table>';

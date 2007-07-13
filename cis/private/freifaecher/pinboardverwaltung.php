@@ -15,19 +15,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 	require_once('../../config.inc.php');
 	require_once('../../../include/functions.inc.php');
-    
+
     //Connection Herstellen
     if(!$sql_conn = pg_pconnect(CONN_STRING))
        die('Fehler beim oeffnen der Datenbankverbindung');
-    
+
 	$user = get_uid();
-	
+
 	if(check_lektor($user,$sql_conn))
        $is_lector=true;
 ?>
@@ -35,7 +35,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
 
 <frameset rows="375,*" cols="*" framespacing="0"" frameborder="NO" border="0">
@@ -43,10 +43,10 @@
   <frame src="pinboard_show.php" name="news_window">
 </frameset>
 <noframes><body>
-<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+<table class="tabcontent" id="inhalt">
   <tr>
-    <td width="10">&nbsp;</td>
-    <td><table width="100%"  border="0" cellspacing="0" cellpadding="0">
+    <td class="tdwidth10">&nbsp;</td>
+    <td><table class="tabcontent">
       <tr>
         <td class="ContentHeader"><font class="ContentHeader">&nbsp;Lektorenbereich - Pinboardverwaltung</td>
       </tr>
@@ -55,7 +55,7 @@
       </tr>
 	  <tr>
 	  	<td>
-		<?php	
+		<?php
 			if(!$is_lector)
 			{
 				die('Sie haben leider keine Berechtigung f&uuml;r diese Seite.');
@@ -64,7 +64,7 @@
 		&nbsp;</td>
 	  </tr>
     </table></td>
-	<td width="30">&nbsp;</td>
+	<td class="tdwidth30">&nbsp;</td>
   </tr>
 </table>
 </body></noframes>

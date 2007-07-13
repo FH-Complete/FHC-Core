@@ -2,34 +2,34 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
 <title>Personen im Mailverteiler</title>
-<body>
+<body id="inhalt">
 <?php
     require_once('../../include/functions.inc.php');
 	require_once('../../include/studiensemester.class.php');
     require_once('../config.inc.php');
-    
+
     //Connection Herstellen
     if(!$conn = pg_pconnect(CONN_STRING))
        die('Fehler beim öffnen der Datenbankverbindung');
-    
+
     $user=get_uid();
-    
+
 	$stsem_obj = new studiensemester($conn);
 	$stsem = $stsem_obj->getaktorNext();
-	
+
 	if(check_lektor($user,$conn))
        $is_lector=true;
 ?>
-<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+<table class="tabcontent">
 	      <tr>
 	        <td class="ContentHeader"><font class="ContentHeader">Nachname</font></td>
 	        <td class="ContentHeader"><font class="ContentHeader">Vorname</font></td>
 	        <td class="ContentHeader"><font class="ContentHeader">E-Mail</font></td>
 	      </tr>
-	    
+
 
 <?php
  		  //$sql_query = "SELECT vornamen AS vn,nachname AS nn,a.uid as uid FROM public.tbl_personmailgrp AS a, public.tbl_person AS b WHERE a.uid=b.uid AND a.mailgrp_kurzbz='$grp' ORDER BY nachname";

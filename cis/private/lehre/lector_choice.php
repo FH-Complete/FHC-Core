@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -29,23 +29,23 @@
     //Connection Herstellen
     if(!$sql_conn = pg_pconnect(CONN_STRING))
        die('Fehler beim oeffnen der Datenbankverbindung');
-    
+
 	$user = get_uid();
-	
+
 	$rechte= new benutzerberechtigung($sql_conn);
 	$rechte->getBerechtigungen($user);
 
 	if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 		$lvid=$_GET['lvid'];
-	else 
+	else
 		die('Fehler bei der Parameteruebergabe');
-	
+
 	$lv_obj = new lehrveranstaltung($sql_conn);
 	$lv_obj->load($lvid);
-	
+
 	$stg_obj=new studiengang($sql_conn);
 	$stg_obj->load($lv_obj->studiengang_kz);
-	
+
 	$openpath="../../../documents/".strtolower($stg_obj->kuerzel)."/".$lv_obj->semester."/".strtolower($lv_obj->lehreverzeichnis)."/upload/";
 
 	$stsem_obj = new studiensemester($sql_conn);
@@ -56,18 +56,18 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 
 <script language="JavaScript">
-	
+
 	var del = false;
-	
+
 	function ConfirmDir(handle)
 	{
 		if(del)
 		{
 			del = false;
-			
+
 			return confirm("Wollen Sie das Uploadverzeichnis wirklich leeren? Dieser Vorgang ist unwiderruflich!");
 		}
 	}
@@ -75,9 +75,9 @@
 </head>
 
 <body>
-<table border="0" cellspacing="0" cellpadding="0"width="100%">
+<table class="tabcontent" id="inhalt">
 	<tr>
-		<td width="10">&nbsp;</td>
+		<td class="tdwidth10">&nbsp;</td>
 		<td class="ContentHeader"><font class="ContentHeader">&nbsp;Studenten-Upload verwalten</font>
 	</tr>
 	<tr>
@@ -98,20 +98,20 @@
 							$is_berechtigt=true;
 					}
 				}
-				else 
+				else
 					die('Fehler beim Lesen aus der Datenbank');
-				
+
 				if($rechte->isBerechtigt('lehre',$lv_obj->studiengang_kz))
 					$is_berechtigt=true;
 				if($rechte->isBerechtigt('admin',$lv_obj->studiengang_kz))
 					$is_berechtigt=true;
-				
-				$sql_query = "SELECT DISTINCT vorname, nachname, uid FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter 
+
+				$sql_query = "SELECT DISTINCT vorname, nachname, uid FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter
 								WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND
 								tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
 								mitarbeiter_uid=uid AND uid='$user' ORDER BY nachname, vorname, uid";
 								//studiensemester_kurzbz='$stsem' AND
-			
+
 				if($result = pg_query($sql_conn, $sql_query))
 				{
 					if(pg_num_rows($result)>0)
@@ -119,14 +119,14 @@
 						$is_berechtigt=true;
 					}
 				}
-				else 
+				else
 					die('Fehler beim Lesen aus der Datenbank');
-				
+
 				if(!$is_berechtigt)
 					die('Sie haben keine Berechtigung fuer diesen Bereich');
-				
+
 				echo "<form method=\"POST\" action=\"lector_choice.php?lvid=$lvid\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmDir(this);\">";
-				
+
 				if(isset($delete_dir))
 				{
 					if(@is_dir($openpath))
@@ -136,30 +136,30 @@
 							exec('rm -r *');
 							writeCISlog('DELETE', "rm -r $openpath/*");
 						}
-						else 
+						else
 							echo 'Fehler beim loeschen des Ordners';
 					}
 					echo "<script language=\"JavaScript\">document.location = \"lector_choice.php?lvid=$lvid\"</script>";
 				}
-				
+
 				if(isset($openpath) && $openpath != "")
 				{
 					if(@is_dir($openpath))
 					{
 						$dest_dir = @dir($openpath);
-						
+
 						$dir_empty = true;
-						
+
 						while($entry = $dest_dir->read())
 						{
 							if($entry != "." && $entry != "..")
 							{
 								$dir_empty = false;
-								
+
 								break;
 							}
 						}
-						
+
 						if(!$dir_empty)
 						{
 							echo "<li><a class=\"Item2\" href=\"$openpath\" target=\"_blank\">Studenten-Upload einsehen</a></li>";
@@ -181,11 +181,11 @@
 				{
 					die('<p align="center">Es wurde kein Pfad definiert.</p>');
 				}
-				
+
 				echo '</form>';
 			?>
 		</td>
-		<td width="30">&nbsp;</td>
+		<td class="tdwidth30">&nbsp;</td>
 	</tr>
 </table>
 </body>

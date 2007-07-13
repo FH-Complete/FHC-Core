@@ -36,7 +36,7 @@ require_once('../../../../include/datum.class.php');
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <title>Kreuzerltool</title>
 <script language="JavaScript">
 <!--
@@ -57,7 +57,7 @@ require_once('../../../../include/datum.class.php');
 </script>
 </head>
 
-<body>
+<body id="inhalt">
 <?php
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim oeffnen der Datenbankverbindung');
@@ -214,10 +214,10 @@ if($lehreinheit_id=='')
 //Menue
 echo "\n<!--Menue-->\n";
 echo "<br>
-<a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Verwaltung</font>&nbsp;&nbsp;&nbsp;&nbsp;
-<a href='anwesenheitstabelle.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Anwesenheits- und Übersichtstabelle</font></a>&nbsp;&nbsp;&nbsp;&nbsp;
-<a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Studentenpunkte verwalten</font></a>&nbsp;&nbsp;&nbsp;&nbsp;
-<a href='statistik.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Statistik</font></a>
+<a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Verwaltung&nbsp;&nbsp;&nbsp;&nbsp;
+<a href='anwesenheitstabelle.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' class='Item'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Anwesenheits- und Übersichtstabelle</a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Studentenpunkte verwalten</a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href='statistik.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Statistik</a>
 <br><br>
 <!--Menue Ende-->\n";
 
@@ -409,7 +409,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 	echo "</table>";
 
 	echo "
-	</td><td valign='top' algin='right'>";
+	</td><td class='tdvertical' algin='right'>";
 
 	//Gesamtpunkte diese Kreuzerlliste
 	$qry = "SELECT sum(punkte) as punktegesamt FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id'";

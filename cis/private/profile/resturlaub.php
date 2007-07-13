@@ -25,10 +25,10 @@
 	require_once('../../config.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/resturlaub.class.php');
-	
+
 	if (!$conn = pg_pconnect(CONN_STRING))
 	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
-	   	
+
 	$uid = get_uid();
 ?>
 
@@ -36,12 +36,12 @@
 <head>
 	<title>Resturlaubstage</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-	<link rel="stylesheet" href="../../../skin/cis.css" type="text/css">
+	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </head>
 
-<body>
+<body id="inhalt">
 	<H2>
-		<table width="100%" border="0" cellpadding="0" cellspacing="0">
+		<table class="tabcontent">
 			<tr>
 				<td>&nbsp;Resturlaubstage</td>
 			</tr>
@@ -61,7 +61,7 @@
 	$obj=new resturlaub($conn);
 	$obj->getResturlaubFixangestellte();
 	$i=0;
-	
+
 	foreach ($obj->result as $row)
 	{
 		echo '<TR class="liste'.($i%2).'">';

@@ -36,7 +36,7 @@ require_once('../../../../include/datum.class.php');
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <title>Kreuzerltool</title>
 <script language="JavaScript">
 <!--
@@ -57,7 +57,7 @@ require_once('../../../../include/datum.class.php');
 </script>
 </head>
 
-<body>
+<body id="inhalt">
 <?php
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim oeffnen der Datenbankverbindung');
@@ -229,7 +229,7 @@ $uebung_obj = new uebung($conn);
 $uebung_obj->load_uebung($lehreinheit_id);
 if(count($uebung_obj->uebungen)>0)
 {
-	echo "<table width='100%'><tr><td valign='top'>";
+	echo "<table width='100%'><tr><td class='tdvertical'>";
 	echo "Wählen Sie bitte eine Kreuzerlliste aus: <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
 	foreach ($uebung_obj->uebungen as $row)
 	{
@@ -277,11 +277,11 @@ if(isset($uebung_id) && $uebung_id!='')
 	{
 		if(count($beispiel_obj->beispiele)>0)
 		{
-			echo '<table border="0" cellpadding="0" cellspacing="0" width="600">
+			echo '<table class="tabcontent2" width="600">
          		 <tr>
 	           		 <td>&nbsp;</td>
 	           		 <td height="19" width="339" valign="bottom">
-		           		 <table border="0" cellpadding="0" cellspacing="0" width="339" background="../../../../skin/images/bg.gif">
+		           		 <table class="tabcontent2" width="339" background="../../../../skin/images/bg.gif">
 		                	<tr>
 		                  		<td>&nbsp;</td>
 		                	</tr>
@@ -313,9 +313,9 @@ if(isset($uebung_id) && $uebung_id!='')
 	              			'.$row->bezeichnung.'
 	              		</font></td>
 						<td '.($i%2?'class="MarkLine"':'').'>
-	            			<table width="339" border="0" cellpadding="0" cellspacing="0" background="../../../../skin/images/bg_.gif">
+	            			<table width="339" class="tabcontent2" background="../../../../skin/images/bg_.gif">
 	                		<tr>
-	                  			<td valign="top">
+	                  			<td class="tdvertical">
 	                  				<table class="tabcontent">
 	                      			<tr>
 	                        			<td nowrap><font size="2" face="Arial, Helvetica, sans-serif">

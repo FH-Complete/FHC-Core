@@ -1,9 +1,9 @@
 <?php
 	include('../../config.inc.php');
 	require_once('../../../include/functions.inc.php');
-	
+
 	$adress='pam@technikum-wien.at';
-	
+
 	$user=get_uid();
 
 	if (isset($_GET['uid']))
@@ -41,14 +41,14 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<title>Reservierungsliste</title>
-	<link rel="stylesheet" href="../../../skin/cis.css" type="text/css">
+	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </head>
-<body>
+<body id="inhalt">
 	<H2>
-		<table width="100%" border="0" cellpadding="0" cellspacing="0">
+		<table class="tabcontent">
 		<tr>
 			<td>
-				&nbsp;<a href="index.php">Userprofil</a> &gt;&gt;
+				&nbsp;<a class="Item" href="index.php">Userprofil</a> &gt;&gt;
 				&nbsp;Lehrveranstaltungen (<?php echo $stdsem;?>)
 			</td>
 			<td align="right"><A href="../help/index.html" class="hilfe" target="_blank">HELP&nbsp;</A></td>
@@ -59,7 +59,7 @@
 	for ($i=0;$i<$num_rows_stdsem;$i++)
 	{
 		$row=pg_fetch_object($result_stdsem);
-		echo '<A href="lva_liste.php?uid='.$uid.'&stdsem='.$row->studiensemester_kurzbz.'">'.$row->studiensemester_kurzbz.'</A> - ';
+		echo '<A class="Item" href="lva_liste.php?uid='.$uid.'&stdsem='.$row->studiensemester_kurzbz.'">'.$row->studiensemester_kurzbz.'</A> - ';
 	}
 	if ($num_rows>0)
 	{
@@ -75,7 +75,7 @@
 			echo '<td>'.$row->lehrfach.'</td>';
 			echo '<td>'.$row->lehrform_kurzbz.'</td>';
 			$qry = "SELECT bezeichnung FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='$row->lehrveranstaltung_id'";
-			$result_lv = pg_query($conn, $qry);			
+			$result_lv = pg_query($conn, $qry);
 			$row_lv = pg_fetch_object($result_lv);
 			echo '<td>'.$row_lv->bezeichnung.'</td>';
 			echo '<td>'.$row->lehrfach_bez.'</td>';
