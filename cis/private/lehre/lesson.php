@@ -492,11 +492,11 @@
 	  			else
 	  				$studiensem = '';
 	  	?>
-	  <a href="kreuzerltool/verwaltung.php?<?php echo "lvid=$lvid$studiensem"?>" >
+	  <a href="benotungstool/verwaltung.php?<?php echo "lvid=$lvid$studiensem"?>" >
             <img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
             <strong>"Kreuzerl"-Tool</strong></a>
 	    <?php } else { ?>
-	  <a href="kreuzerltool/studentenansicht.php?<?php echo "lvid=$lvid"?>" >
+	  <a href="benotungstool/studentenansicht.php?<?php echo "lvid=$lvid"?>" >
             <img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
             <strong>"Kreuzerl"-Tool</strong></a>
 
