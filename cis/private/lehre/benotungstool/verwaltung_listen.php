@@ -174,6 +174,30 @@ if (isset($_GET["deletefile"])){
 	unlink($filename);
 }
 
+if (isset($_POST["schluessel"]) && $_POST["schluessel"]=='Speichern')
+{
+	$punkte_arr = array();
+	$punkte_arr[1] = $_POST["schluessel_punkte_1"];
+	$punkte_arr[2] = $_POST["schluessel_punkte_2"];
+	$punkte_arr[3] = $_POST["schluessel_punkte_3"];
+	$punkte_arr[4] = $_POST["schluessel_punkte_4"];
+	$punkte_arr[5] = $_POST["schluessel_punkte_5"];
+	for ($i=1;$i<=5;$i++)
+	{
+		if (is_numeric($punkte_arr[$i]))
+		{
+			$qry = "select * from campus.tbl_notenschluesseluebung where uebung_id = '".$uebung_id."' and note = '".$i."'";
+			$result = pg_query($conn, $qry);
+			if(pg_num_rows($result)>0)
+				$str = "update campus.tbl_notenschluesseluebung set punkte = '".$punkte_arr[$i]."' where uebung_id = '".$uebung_id."' and note = '".$i."'";
+			else
+				$str = "insert into campus.tbl_notenschluesseluebung (uebung_id, note, punkte) values ('".$uebung_id."','".$i."','".$punkte_arr[$i]."')";
+			if (!pg_query($conn, $str))
+				echo "<span class='error'>Daten konnten nicht gespeichert werden</span>";
+		}
+	}
+
+}
 //Kopfzeile
 echo '<table class="tabcontent" height="100%">';
 echo ' <tr>';
@@ -837,7 +861,42 @@ if(isset($_GET["uebung_id"]) && $_GET["uebung_id"]!='')
 	
 		echo "</table>
 		</form>";
+		
+		// notenschlüssel
+		$qry = "select * from campus.tbl_notenschluesseluebung where uebung_id = '$uebung_id' order by note";
+		if($result = pg_query($conn, $qry))
+		{
+			$notenschluessel = array();
+			$notenschluessel[1] = '';
+			$notenschluessel[2] = '';
+			$notenschluessel[3] = '';
+			$notenschluessel[4] = '';
+			$notenschluessel[5] = '';
+			if(pg_num_rows($result)>=1)
+			{
+				while($schluesselrow = pg_fetch_object($result))
+				{
+					$notenschluessel[$schluesselrow->note] = $schluesselrow->punkte;
+				}
+			}
+		}
+		
+		echo "<form action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&liste_id=$liste_id' method=POST>\n";
+		echo "<table width='340'><tr><td colspan='3' class='ContentHeader3'>Notenschlüssel definieren</td></tr>\n";
+		echo "<tr><td>&nbsp;</td><td></td></tr>\n\n";
+	
+		echo "<tr><td>Note</td><td>Mindestpunkte</td></tr>";
+		echo "<tr><td><input type='text' name='schluessel_note_1' maxlength='2' size='2' value='1'></td><td><input type='text' size='2' name='schluessel_punkte_1' value='$notenschluessel[1]'></td></tr>";
+echo "<tr><td><input type='text' name='schluessel_note_2' maxlength='2' size='2' value='2'></td><td><input type='text' size='2' name='schluessel_punkte_2' value='$notenschluessel[2]'></td></tr>";
+echo "<tr><td><input type='text' name='schluessel_note_3' maxlength='2' size='2' value='3'></td><td><input type='text' size='2' name='schluessel_punkte_3' value='$notenschluessel[3]'></td></tr>";
+echo "<tr><td><input type='text' name='schluessel_note_4' maxlength='2' size='2' value='4'></td><td><input type='text' size='2' name='schluessel_punkte_4' value='$notenschluessel[4]'></td></tr>";
+echo "<tr><td><input type='text' name='schluessel_note_5' maxlength='2' size='2' value='5'></td><td><input type='text' size='2' name='schluessel_punkte_5' value='$notenschluessel[5]'></td></tr>";
+		echo "<tr><td align='right' colspan='2'><input type='submit' name='schluessel' value='Speichern'></td></tr>";
+	
+		echo "</table>
+		</form>";
 	}
+	
 	echo "</td></tr><tr><td valign='top'>";
 	
 	
