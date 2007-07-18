@@ -97,6 +97,7 @@ else
 $datum_obj = new datum();
 
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
+$uid = (isset($_GET['uid'])?$_GET['uid']:'');
 
 //Kopfzeile
 echo '<table class="tabcontent" height="100%">';
@@ -212,22 +213,23 @@ if($lehreinheit_id=='')
 	die('Es wurde keine passende Lehreinheit in diesem Studiensemester gefunden');
 
 //Menue
+include("menue.inc.php");
+/*
 echo "\n<!--Menue-->\n";
-echo "<br>
-<a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Verwaltung</font>&nbsp;&nbsp;&nbsp;&nbsp;
+echo "<br><a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Verwaltung</font>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href='anwesenheitstabelle.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Anwesenheits- und Übersichtstabelle</font></a>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Studentenpunkte verwalten</font></a>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href='statistik.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Statistik</font></a>
 <br><br>
 <!--Menue Ende-->\n";
+*/
 
-
-echo "<h3>Studentenpunkte verwalten</h3>";
+echo "<h3>Studentenaufgaben verwalten</h3>";
 if(isset($_POST['submit']))
 {
 	$error=false;
 	$punkte = (isset($_POST['punkte'])?str_replace(',','.',$_POST['punkte']):'');
-	if(isset($punkte) && is_numeric($punkte))
+	if(isset($punkte) && is_numeric($punkte) && !isset($_POST['abgabe']))
 	{
 		$ueb_obj = new uebung($conn);
 		if($ueb_obj->load_studentuebung($uid, $uebung_id))
@@ -289,10 +291,40 @@ if(isset($_POST['submit']))
 			echo "Die Daten wurden erfolgreich gespeichert<br>";
 
 	}
-	else
+	else if (!isset($_POST['abgabe']))
 	{
 		echo "<span class='error'>Punkte sind ungueltig</span>";
 	}
+	if(isset($_POST['abgabe']) && is_numeric($_POST['note']))
+	{
+		$note = $_POST['note'];
+		$ueb_obj = new uebung($conn);
+		if($ueb_obj->load_studentuebung($uid, $uebung_id))
+			$ueb_obj->new = false;
+		else
+		{
+			$ueb_obj->new = true;
+			$ueb_obj->insertamum = date('Y-m-d H:i:s');
+			$ueb_obj->insertvon = $user;
+		}
+
+		$ueb_obj->note = $note;
+		$ueb_obj->anmerkung = $_POST['anmerkung'];
+		$ueb_obj->updateamum = date('Y-m-d H:i:s');
+		$ueb_obj->updatevon = $user;
+		$ueb_obj->mitarbeiter_uid = $user;
+		$ueb_obj->uebung_id = $uebung_id;
+		$ueb_obj->student_uid = $uid;
+
+		if(!$ueb_obj->studentuebung_save())
+			$error = true;
+		if($error)
+			echo "<span class='error'>Es konnten nicht alle Daten gespeichert werden</span>";
+		else
+			echo "Die Daten wurden erfolgreich gespeichert<br>";
+	}
+	else if (isset($_POST['abgabe']))
+		echo "<span class='error'>Note ist ungueltig<br></span>";
 }
 
 if(isset($_GET['uid']) && $_GET['uid']!='')
@@ -309,13 +341,15 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 		die('Student wurde nicht gefunden');
 
 	echo "<b>$row_stud->vorname $row_stud->nachname</b><br>\n";
-
+	
+	
 	$uebung_obj = new uebung($conn);
-	$uebung_obj->load_uebung($lehreinheit_id);
+	$uebung_obj->load_uebung($lehreinheit_id,1);
 	if(count($uebung_obj->uebungen)>0)
 	{
 		echo "<table width='100%'><tr><td valign='top'>";
-		echo "<br>Wählen Sie bitte eine Kreuzerlliste aus: <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
+		echo "<br>Wählen Sie bitte eine Aufgabe aus (Kreuzerllisten, Abgaben): <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
+		echo "<option value='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=&uid=$uid'></option>";
 		foreach ($uebung_obj->uebungen as $row)
 		{
 			if($uebung_id=='')
@@ -325,27 +359,65 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 				$selected = 'selected';
 			else
 				$selected = '';
-			echo "<OPTION value='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id&uid=$uid' $selected>";
-			//Freigegeben = +
-			//Nicht Freigegeben = -
-			if($datum_obj->mktime_fromtimestamp($row->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($row->freigabebis)>time())
-				echo '+ ';
+			
+			$subuebung_obj = new uebung($conn);
+			$subuebung_obj->load_uebung($lehreinheit_id,2,$row->uebung_id);
+			if(count($subuebung_obj->uebungen)>0)
+				{
+				$disabled = 'disabled';
+				$selected = '';
+				}
 			else
-				echo '- ';
+				$disabled = '';
+			
+			echo "<OPTION style='background-color:#cccccc;' value='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id&uid=$uid' $selected $disabled>";
+			
+			
 			echo $row->bezeichnung;
 			echo '</OPTION>';
+			
+			if(count($subuebung_obj->uebungen)>0)
+			{
+				foreach ($subuebung_obj->uebungen as $subrow)
+				{
+					if($uebung_id=='')
+						$uebung_id=$subrow->uebung_id;
+		
+					if($uebung_id == $subrow->uebung_id)
+						$selected = 'selected';
+					else
+						$selected = '';
+					
+					echo "<OPTION value='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$subrow->uebung_id&uid=$uid' $selected>";
+
+					
+					//Freigegeben = +
+					//Nicht Freigegeben = -
+					if($datum_obj->mktime_fromtimestamp($subrow->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($subrow->freigabebis)>time())
+						echo ' + ';
+					else
+						echo ' - ';
+					
+					echo $subrow->bezeichnung;
+					echo '</OPTION>';
+					
+				}
+			}
 		}
+		
 		echo '</SELECT>';
-		echo "</td>
-		<td>
+		
+		echo '</td>';
+		
+		echo "<td>
 			<table>
 			<tr>
 				<td><b>+</b>...</td>
-				<td>Kreuzerlliste ist <u>freigeschalten</u>.</td>
+				<td><u>freigeschaltet</u>.</td>
 			</tr>
 			<tr>
 				<td><b>-</b>...</td>
-				<td>Kreuzerlliste ist <u>nicht freigeschalten</u>.</td>
+				<td><u>nicht freigeschaltet</u>.</td>
 			</tr>
 			</table>
 		</td>
@@ -355,171 +427,202 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 		die("Derzeit gibt es keine Uebungen");
 
 	$ueb_obj = new uebung($conn);
+	$ueb_obj->load($uebung_id);
 	if($ueb_obj->load_studentuebung($uid, $uebung_id))
 	{
 		$anmerkung = $ueb_obj->anmerkung;
 		$mitarbeit = $ueb_obj->mitarbeitspunkte;
+		$note = $ueb_obj->note;
 	}
 	else
 	{
 		$anmerkung = '';
 		$mitarbeit = 0;
+		$note = '';
 	}
 
-	echo "
-	<form method='POST' action='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid'>
-	<table width='100%'><tr><td valign='top'>
-	Anmerkungen:<br>
-	<textarea name='anmerkung' cols=50 rows=5>".htmlentities($anmerkung)."</textarea>
-	<br><br>
-	<table border='1'>
-	<tr>
-		<td class='ContentHeader2'>Beispiel</td>
-	    <td class='ContentHeader2'>Vorbereitet</td>
-	    <td class='ContentHeader2'>Nicht vorbereitet</td>
-	    <td class='ContentHeader2'>Probleme</td>
-	    <td class='ContentHeader2'>Punkte</td>
-	</tr>";
-
-	$bsp_obj = new beispiel($conn);
-	$bsp_obj->load_beispiel($uebung_id);
-
-	foreach ($bsp_obj->beispiele as $row)
+	if ($ueb_obj->beispiele && is_numeric($_GET['uebung_id']))
 	{
-		$stud_bsp_obj = new beispiel($conn);
-		if($stud_bsp_obj->load_studentbeispiel($uid, $row->beispiel_id))
-		{
-			$vorbereitet = $stud_bsp_obj->vorbereitet;
-			$probleme = $stud_bsp_obj->probleme;
-		}
-		else
-		{
-			$vorbereitet = false;
-			$probleme = false;
-		}
-		echo "<tr>
-			<td>$row->bezeichnung</td>
-				<td align='center'><input type='radio' name='solved_$row->beispiel_id' value='1' ".($vorbereitet?'checked':'')."></td>
-				<td align='center'><input type='radio' name='solved_$row->beispiel_id' value='0' ".(!$vorbereitet?'checked':'')."></td>
-				<td align='center'><input type='checkbox' name='problem_$row->beispiel_id' ".($probleme?'checked':'')."></td>
-				<td align='center'>$row->punkte</td>
-			</tr>";
-	}
-
-	echo "</table>";
-
-	echo "
-	</td><td valign='top' algin='right'>";
-
-	//Gesamtpunkte diese Kreuzerlliste
-	$qry = "SELECT sum(punkte) as punktegesamt FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id'";
-	$punkte_gesamt=0;
-	if($result=pg_query($conn, $qry))
-		if($row = pg_fetch_object($result))
-			$punkte_gesamt = $row->punktegesamt;
-
-	//Eingetragen diese Kreuzerlliste
-	$qry = "SELECT sum(punkte) as punkteeingetragen FROM campus.tbl_beispiel JOIN campus.tbl_studentbeispiel USING(beispiel_id) WHERE uebung_id='$uebung_id' AND student_uid='$uid' AND vorbereitet=true";
-	$punkte_eingetragen=0;
-	if($result=pg_query($conn, $qry))
-		if($row = pg_fetch_object($result))
-			$punkte_eingetragen = ($row->punkteeingetragen!=''?$row->punkteeingetragen:0);
-
-	//Gesamtpunkte alle Kreuzerllisten
-	$qry = "SELECT sum(tbl_beispiel.punkte) as punktegesamt_alle FROM campus.tbl_beispiel, campus.tbl_uebung
-			WHERE tbl_uebung.uebung_id=tbl_beispiel.uebung_id AND
-			tbl_uebung.lehreinheit_id='$lehreinheit_id'";
-	$punkte_gesamt_alle=0;
-	if($result=pg_query($conn, $qry))
-		if($row = pg_fetch_object($result))
-			$punkte_gesamt_alle = $row->punktegesamt_alle;
-
-	//Eingetragen alle Kreuzerllisten
-	$qry = "SELECT sum(tbl_beispiel.punkte) as punkteeingetragen_alle FROM campus.tbl_beispiel, campus.tbl_studentbeispiel, campus.tbl_uebung
-			WHERE tbl_beispiel.beispiel_id = tbl_studentbeispiel.beispiel_id AND
-			tbl_uebung.uebung_id=tbl_beispiel.uebung_id AND
-			tbl_uebung.lehreinheit_id='$lehreinheit_id' AND
-			tbl_studentbeispiel.student_uid='$uid' AND vorbereitet=true";
-	$punkte_eingetragen_alle=0;
-	if($result=pg_query($conn, $qry))
-		if($row = pg_fetch_object($result))
-			$punkte_eingetragen_alle = ($row->punkteeingetragen_alle!=''?$row->punkteeingetragen_alle:0);
-
-	//Mitarbeitspunkte
-	$qry = "SELECT sum(mitarbeitspunkte) as mitarbeitspunkte FROM campus.tbl_studentuebung JOIN campus.tbl_uebung USING(uebung_id)
-			WHERE lehreinheit_id='$lehreinheit_id' AND student_uid='$uid'";
-	$mitarbeit_alle=0;
-	if($result=pg_query($conn, $qry))
-		if($row = pg_fetch_object($result))
-			$mitarbeit_alle = ($row->mitarbeitspunkte!=''?$row->mitarbeitspunkte:0);
-
-	//Mitarbeitspunkte
-	$qry = "SELECT mitarbeitspunkte FROM campus.tbl_studentuebung
-			WHERE uebung_id='$uebung_id' AND student_uid='$uid'";
-	$mitarbeit=0;
-	if($result=pg_query($conn, $qry))
-		if($row = pg_fetch_object($result))
-			$mitarbeit = $row->mitarbeitspunkte;
-	echo "
-	<br>
-		<table border='1' width='210'>
-		<tr>
-			<td colspan='2' class='ContentHeader2'>Diese Kreuzerlliste:</td>
-		</tr>
-		<tr>
-			<td width='180'>Punkte insgesamt m&ouml;glich:</td>
-			<td width='30'>$punkte_gesamt</td>
-		</tr>
-		<tr>
-			<td>Punkte eingetragen:</td>
-			<td>$punkte_eingetragen</td>
-		</tr>
-		</table>
+		echo "
+		<form method='POST' action='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid'>
+		<table width='100%'><tr><td valign='top'>
+		Anmerkungen:<br>
+		<textarea name='anmerkung' cols=50 rows=5>".htmlentities($anmerkung)."</textarea>
 		<br><br>
-		<table border='1' width='210'>
+		<table border='1'>
 		<tr>
-			<td colspan='2' class='ContentHeader2'>Alle Kreuzerllisten bisher:</td>
-		</tr>
+			<td class='ContentHeader2'>Beispiel</td>
+		    <td class='ContentHeader2'>Vorbereitet</td>
+		    <td class='ContentHeader2'>Nicht vorbereitet</td>
+		    <td class='ContentHeader2'>Probleme</td>
+		    <td class='ContentHeader2'>Punkte</td>
+		</tr>";
+	
+		$bsp_obj = new beispiel($conn);
+		$bsp_obj->load_beispiel($uebung_id);
+	
+		foreach ($bsp_obj->beispiele as $row)
+		{
+			$stud_bsp_obj = new beispiel($conn);
+			if($stud_bsp_obj->load_studentbeispiel($uid, $row->beispiel_id))
+			{
+				$vorbereitet = $stud_bsp_obj->vorbereitet;
+				$probleme = $stud_bsp_obj->probleme;
+			}
+			else
+			{
+				$vorbereitet = false;
+				$probleme = false;
+			}
+			echo "<tr>
+				<td>$row->bezeichnung</td>
+					<td align='center'><input type='radio' name='solved_$row->beispiel_id' value='1' ".($vorbereitet?'checked':'')."></td>
+					<td align='center'><input type='radio' name='solved_$row->beispiel_id' value='0' ".(!$vorbereitet?'checked':'')."></td>
+					<td align='center'><input type='checkbox' name='problem_$row->beispiel_id' ".($probleme?'checked':'')."></td>
+					<td align='center'>$row->punkte</td>
+				</tr>";
+		}
+	
+		echo "</table>";
+	
+		echo "
+		</td><td valign='top' algin='right'>";
+	
+		//Gesamtpunkte diese Kreuzerlliste
+		$qry = "SELECT sum(punkte) as punktegesamt FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id'";
+		$punkte_gesamt=0;
+		if($result=pg_query($conn, $qry))
+			if($row = pg_fetch_object($result))
+				$punkte_gesamt = $row->punktegesamt;
+	
+		//Eingetragen diese Kreuzerlliste
+		$qry = "SELECT sum(punkte) as punkteeingetragen FROM campus.tbl_beispiel JOIN campus.tbl_studentbeispiel USING(beispiel_id) WHERE uebung_id='$uebung_id' AND student_uid='$uid' AND vorbereitet=true";
+		$punkte_eingetragen=0;
+		if($result=pg_query($conn, $qry))
+			if($row = pg_fetch_object($result))
+				$punkte_eingetragen = ($row->punkteeingetragen!=''?$row->punkteeingetragen:0);
+	
+		//Gesamtpunkte alle Kreuzerllisten
+		$qry = "SELECT sum(tbl_beispiel.punkte) as punktegesamt_alle FROM campus.tbl_beispiel, campus.tbl_uebung
+				WHERE tbl_uebung.uebung_id=tbl_beispiel.uebung_id AND
+				tbl_uebung.lehreinheit_id='$lehreinheit_id'";
+		$punkte_gesamt_alle=0;
+		if($result=pg_query($conn, $qry))
+			if($row = pg_fetch_object($result))
+				$punkte_gesamt_alle = $row->punktegesamt_alle;
+	
+		//Eingetragen alle Kreuzerllisten
+		$qry = "SELECT sum(tbl_beispiel.punkte) as punkteeingetragen_alle FROM campus.tbl_beispiel, campus.tbl_studentbeispiel, campus.tbl_uebung
+				WHERE tbl_beispiel.beispiel_id = tbl_studentbeispiel.beispiel_id AND
+				tbl_uebung.uebung_id=tbl_beispiel.uebung_id AND
+				tbl_uebung.lehreinheit_id='$lehreinheit_id' AND
+				tbl_studentbeispiel.student_uid='$uid' AND vorbereitet=true";
+		$punkte_eingetragen_alle=0;
+		if($result=pg_query($conn, $qry))
+			if($row = pg_fetch_object($result))
+				$punkte_eingetragen_alle = ($row->punkteeingetragen_alle!=''?$row->punkteeingetragen_alle:0);
+	
+		//Mitarbeitspunkte
+		$qry = "SELECT sum(mitarbeitspunkte) as mitarbeitspunkte FROM campus.tbl_studentuebung JOIN campus.tbl_uebung USING(uebung_id)
+				WHERE lehreinheit_id='$lehreinheit_id' AND student_uid='$uid'";
+		$mitarbeit_alle=0;
+		if($result=pg_query($conn, $qry))
+			if($row = pg_fetch_object($result))
+				$mitarbeit_alle = ($row->mitarbeitspunkte!=''?$row->mitarbeitspunkte:0);
+	
+		//Mitarbeitspunkte
+		$qry = "SELECT mitarbeitspunkte FROM campus.tbl_studentuebung
+				WHERE uebung_id='$uebung_id' AND student_uid='$uid'";
+		$mitarbeit=0;
+		if($result=pg_query($conn, $qry))
+			if($row = pg_fetch_object($result))
+				$mitarbeit = $row->mitarbeitspunkte;
+		echo "
+		<br>
+			<table border='1' width='210'>
+			<tr>
+				<td colspan='2' class='ContentHeader2'>Diese Kreuzerlliste:</td>
+			</tr>
+			<tr>
+				<td width='180'>Punkte insgesamt m&ouml;glich:</td>
+				<td width='30'>$punkte_gesamt</td>
+			</tr>
+			<tr>
+				<td>Punkte eingetragen:</td>
+				<td>$punkte_eingetragen</td>
+			</tr>
+			</table>
+			<br><br>
+			<table border='1' width='210'>
+			<tr>
+				<td colspan='2' class='ContentHeader2'>Alle Kreuzerllisten bisher:</td>
+			</tr>
+			<tr>
+				<td width='180'>Punkte insgesamt m&ouml;glich:</td>
+				<td width='30'>$punkte_gesamt_alle</td>
+			</tr>
+			<tr>
+				<td>Punkte eingetragen:</td>
+				<td>$punkte_eingetragen_alle</td>
+			</tr>
+			</table>
+			<br><br>
+			<table border='1' width='210'>
+			<tr>
+				<td colspan='2' class='ContentHeader2'>Mitarbeitspunkte:</td>
+			</tr>
+			<tr>
+				<td width='180'>Bisher insgesamt:</td>
+				<td width='30'>$mitarbeit_alle</td>
+			</tr>
+			<tr>
+				<td>Diese Kreuzerlliste:</td>
+				<td><input type='text' size=2 name='punkte' value='$mitarbeit'></td>
+			</tr>
+			</table>
+			";
+	
+	
+		echo "
+		</td></tr>
 		<tr>
-			<td width='180'>Punkte insgesamt m&ouml;glich:</td>
-			<td width='30'>$punkte_gesamt_alle</td>
-		</tr>
-		<tr>
-			<td>Punkte eingetragen:</td>
-			<td>$punkte_eingetragen_alle</td>
+			<td>&nbsp;</td>
+			<td>
+				<input type='button' value='Zurück' onclick='history.back();'>
+				<input type='submit' value='Speichern' name='submit'>
+			</td>
+	
 		</tr>
 		</table>
-		<br><br>
-		<table border='1' width='210'>
-		<tr>
-			<td colspan='2' class='ContentHeader2'>Mitarbeitspunkte:</td>
-		</tr>
-		<tr>
-			<td width='180'>Bisher insgesamt:</td>
-			<td width='30'>$mitarbeit_alle</td>
-		</tr>
-		<tr>
-			<td>Diese Kreuzerlliste:</td>
-			<td><input type='text' size=2 name='punkte' value='$mitarbeit'></td>
-		</tr>
-		</table>
+	
+		</form>
 		";
-
-
-	echo "
-	</td></tr>
-	<tr>
-		<td>&nbsp;</td>
-		<td>
-			<input type='button' value='Zurück' onclick='history.back();'>
-			<input type='submit' value='Speichern' name='submit'>
-		</td>
-
-	</tr>
-	</table>
-
-	</form>
-	";
+	}
+	else if (is_numeric($_GET['uebung_id']))
+	{
+		//Abgaben benoten
+		echo "
+		<form method='POST' action='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid'>
+		<table width='100%'><tr><td valign='top'>
+		Anmerkungen:<br>
+		<textarea name='anmerkung' cols=50 rows=5>".htmlentities($anmerkung)."</textarea>
+		</td><td>
+		<table border='1'>
+		<tr>
+			<td class='ContentHeader2'>Note</td>
+			<td><input type='text' name='note' value='$note'><input type='hidden' name='abgabe' value='1'></td>
+		</tr>";
+		echo "
+		<tr>
+			<td colspan='2'>
+				<input type='button' value='Zurück' onclick='history.back();'>
+				<input type='submit' value='Speichern' name='submit'>	
+			</td>
+	
+		</tr>
+		</table>
+		</form>";
+	}
 
 }
 else
