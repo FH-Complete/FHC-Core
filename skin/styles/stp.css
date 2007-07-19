@@ -20,6 +20,11 @@ iframe
 textarea
 {
 	font-family: Verdana;
+	font-size: x-small;
+}
+form
+{
+	font-family: Verdana;
 }
 #menue
 {

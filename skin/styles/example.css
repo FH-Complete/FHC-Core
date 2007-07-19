@@ -21,7 +21,12 @@ iframe
 }
 textarea
 {
-	font-family: Arial, Helvetica, sans-serif;
+	font-family: Trebuchet MS;
+	font-size: x-small;
+}
+form
+{
+	font-family: Trebuchet MS;
 }
 #menue
 {
