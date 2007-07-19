@@ -58,6 +58,35 @@ $time = microtime_float();
 	{
 		return confirm('Wollen Sie die markierten Einträge wirklich löschen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
 	}
+	
+	//Aus- und Einblenden der Listen
+	__js_page_array = new Array();
+
+    function js_toggle_container(conid)
+    {
+		if (document.getElementById)
+		{
+        	var block = "table-row";
+			if (navigator.appName.indexOf('Microsoft') > -1)
+				block = 'block';
+            var status = __js_page_array[conid];
+            if (status == null)
+            	status=document.getElementById(conid).style.display; //status = "none";
+            if (status == "none")
+            {
+            	document.getElementById(conid).style.display = block;
+            	__js_page_array[conid] = "visible";
+            }
+            else
+            {
+            	document.getElementById(conid).style.display = 'none';
+            	__js_page_array[conid] = "none";
+            }
+            return false;
+     	}
+     	else
+     		return true;
+  	}
   //-->
 </script>
 </head>
@@ -579,7 +608,7 @@ else
 		{
 			$has_option_content=false;
 			echo "<tr height=23><td align='left'>";
-			echo "<a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$row->uebung_id' class='Item'><u>".htmlentities($row->bezeichnung)."</u></a>";
+			echo "<a onClick='return(js_toggle_container(\"submenu_$row->uebung_id\"));' class='MenuItem'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'></a>&nbsp;<a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$row->uebung_id' class='Item'><u>".htmlentities($row->bezeichnung)."</u></a>";
 			echo "</td><td align='center'>";
 
 			//if((strtotime(strftime($row->freigabevon))<=time()) && (strtotime(strftime($row->freigabebis))>=time()))
@@ -632,16 +661,18 @@ else
 			$subuebung_obj->load_uebung($lehreinheit_id,$level=2,$uebung_id=$row->uebung_id);
 			$subanzahl = count($subuebung_obj->uebungen);
 			echo "<tr><td colspan='3'>";
-			echo "<table width='440'>";
+			echo "<table width='440' id='submenu_".$row->uebung_id."' style='display:none;'>";
+			echo "<ul style='margin-top: 0px; margin-bottom: 0px;'>";
 			foreach ($subuebung_obj->uebungen as $subrow)
 			{
-				echo "<tr><td>|-&nbsp;<a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$subrow->uebung_id&liste_id=$row->uebung_id'>".$subrow->bezeichnung."</a></td><td>";
+				echo "<tr><td width='120'><li style='margin-left:20px;'><a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$subrow->uebung_id&liste_id=$row->uebung_id'>".$subrow->bezeichnung."</a></li></td><td width='170'>";
 				if((strtotime(strftime($subrow->freigabevon))<=time()) && (strtotime(strftime($subrow->freigabebis))>=time()))
 					echo 'Ja';
 				else
 					echo 'Nein';
 				echo "</td><td align='center'><input type='Checkbox' name='uebung[]' value='$subrow->uebung_id'></td></tr>";
 			}
+			echo "</ul>";
 			echo "</table>";
 			echo "</td></tr>";
 		}
