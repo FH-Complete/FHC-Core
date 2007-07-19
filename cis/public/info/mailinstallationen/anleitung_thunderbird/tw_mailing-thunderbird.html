@@ -7,282 +7,367 @@
 <link href="../../../../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
 <body id="inhalt">
-<div id="titel">
-  <h1>Anleitung: Mailing mit Mozilla Tunderbird</h1>
-</div>
-<div id="navigation"><ul class="toplinks"><li></li></ul>
+<table class="tabcontent">
+	<tr>
+		<td class="ContentHeader"><font class="ContentHeader">&nbsp;Anleitung: Mailing mit Mozilla Tunderbird</font></td>
+	</tr>
+	<tr>
+		<td><br />Diese Anleitung soll Ihnen beim Einrichten der Mailing-Funktionen von Mozilla Tunderbird
+		behilflich sein, damit Sie &uuml;ber den Mailserver des Technikum
+		Wien Emails versenden und empfangen k&ouml;nnen. Sie bezieht sich
+		auf die jeweils deutschen Versionen - anhand der Abbildungen ist es jedoch m&ouml;glich,
+		R&uuml;ckschl&uuml;sse auf die englischen zu ziehen. Bitte beachten Sie weiters,
+		dass die Kombination mit der jeweiligen Betriebssystemvariante f&uuml;r
+		den Aufbau und die Bezeichnungen von Mozilla Tunderbird ausschlaggebend sein kann und daher
+		Einzelheiten in Ihrer Version geringf&uuml;gig abweichen k&ouml;nnten. <br /><br />
+		</td>
+	</tr>
+	<tr>
+		<td class="ContentHeader2">Sie ben&ouml;tigen ...</td>
+	</tr>
+	<tr>
+		<td><br />... einen PC mit installiertem Betriebssystem und Zugang zum Internet.<br />
+		... eine g&uuml;ltige User ID <a href="/ZID/unet/"></a> mit
+		Passwort <br />
+		... Mozilla Thunderbird<br /><br />
+		</td>
+	</tr>
+	<tr>
+		<td class="ContentHeader2">POP oder IMAP?</td>
+	</tr>
+	<tr>
+		<td><br />Beim Empfang Ihrer eMail-Nachrichten vom Server k&ouml;nnen Sie zwischen den
+		Protokollen POP (Post Office Protocol) und IMAP (Internet Message Access Protocol)
+		w&auml;hlen. Mit POP werden die eingehenden Nachrichten auf den lokalen PC heruntergeladen,
+		bei IMAP hingegen verbleiben sie (und auch eventuell angelegte Ordner) am Mailserver.
+		IMAP ist daher vor allem dann zu empfehlen, wenn Sie auf Ihre Nachrichten von
+		mehreren unterschiedlichen Standorten (z.B. von der Fachhochschule und von
+		zu Hause) zugreifen wollen.
+		Zum Einrichten eines Mailkontos starten Sie Mozilla Tunderbird entweder durch Doppelklick
+		auf das Icon am Desktop oder &uuml;ber<b><i> Start</i></b> - <b><i>Programme</i></b> - <b><i>Mozilla Tunderbird</i></b>.<br />
+		<br />
+		Anmerkung: Sollte auf dem PC bereits ein anderes eMail-Programm
+		installiert und konfiguriert sein, erscheint beim ersten Startvorgang meist die
+		Frage, ob Sie die Einstellungen der bereits angelegten eMail-Konten importieren
+		wollen. Im Zweifelsfall w&auml;hlen Sie hier <i><b>Nein</b></i>, falls erforderlich
+		k&ouml;nnen die entsprechenden Daten auch sp&auml;ter importiert werden (n&auml;heres
+		dazu am Ende dieses Dokuments unter <a href="#Haeufige">H&auml;ufig ben&ouml;tigte
+		Einstellungen und Funktionen</a>).<br />
+		<br />
+		Grunds&auml;tzlich gibt es zwei M&ouml;glichkeiten, den Programmpunkt f&uuml;r
+		die Einrichtung eines eMail-Kontos unter Mozilla Tunderbird aufzurufen. beim ersten Aufruf des Programms meldet sich der <a href="#XP_Assistent">Start-Assistent</a> . Sie k&ouml;nnen aber auch jederzeit &uuml;ber <a href="#XP_Normal"><em>extras - Konten</em></a> den Assistenten starten und ein neues Konto einrichten.
+		<br /><br />
+		</td>
+	</tr>
+	<tr>
+		<td class="ContentHeader2"><a name="XP_Assistent" id="XP_Assistent"></a>Mailkonto einrichten</td>
+	</tr>
+	<tr>
+		<td><br />Der Start-Assistent f&uuml;hrt Sie durch die Konfiguration von Mozilla Tunderbird.<br />
+		<br />
+		<br />
+		.<img src="pics/thunderbird001.gif" width="540" height="452" /><br />
+		<br />
+		W&auml;hlen Sie hier den Punkt <i>Emailkonto</i> und klicken Sie auf <i>Weiter</i>.<br />
+		<br />
+		Die weitere Vorgehensweise mit dem Startassistenten entspricht der Einrichtung
+		auf normalem Weg ab dem Fenster <a href="#Servertyp">Servertyp</a>. <a name="XP_Normal" id="XP_Normal"></a><br /><br />
+		</td>
+	</tr>
+	<tr>
+		<td class="ContentHeader2">Kontenassistent manuell starten</td>
+	</tr>
+	<tr>
+		<td><br />Um ein Mailkonto einzurichten, w&auml;hlen Sie den Men&uuml;punkt <b><i>Extras</i> - </b><b><i> Konten</i></b>.<br />
+		<br />
+		<img src="pics/thunderbird001.gif" width="540" height="452" /><br />
+		<br />
+		Sie k&ouml;nnen entweder ein neues Konto hinzuf&uuml;gen, oder bereits vorhandende
+		Konten darstellen bzw. bearbeiten. (Dies gilt auch f&uuml;r Verzeichnisse und
+		Adressb&uuml;cher.) W&auml;hlen Sie <i>Ein neues E-Mail-Konto hinzuf&uuml;gen</i> und
+		klicken Sie auf <i>Weiter</i>.<br />
+		<br />
+		<a name="Servertyp" id="Servertyp"></a> <img src="pics/thunderbird009.gif" width="540" height="452" /><br />
+		<br />
+		In dem daraufhin erscheinenden Fenster m&uuml;ssen Sie den ben&ouml;tigten Servertyp
+		w&auml;hlen. Falls Sie IMAP verwenden, w&auml;hlen Sie bitte IMAP (falls Sie
+		POP verwenden, dann <i>POP3</i>).
+		Klicken Sie auf <b><i>Weiter</i></b>.<br />
+		<br />
+		<img src="pics/thunderbird008.gif" width="540" height="452" /> <br />
+		<br />
+		Danach erscheint das Fenster Internet-E-Mail-Einstellungen.<br />
+		<br />
+		Unter Benutzerinformationen im Feld <i>Ihr Name:</i> geben Sie bitte Ihren vollst&auml;ndigen
+		Namen ein. Im Feld <i>E-Mail-Adresse:</i> geben Sie Ihre eMail-Adresse ein (<b><i>acountname</i>@technikum-wien.at</b> f&uuml;r
+		Studierende, bzw. <b><i>vorname.nachname</i>@technikum-wien.at</b> f&uuml;r Mitarbeiter).<br />
+		<br />
+		Unter Anmeldeinformationen geben Sie nun im Feld <i>Benutzername:</i> Ihre UserID
+		ein und unter <i>Kennwort</i> Ihr Passwort. Falls Sie nicht bei jedem Verbindungsaufbau
+		Ihr Passwort erneut eingeben m&ouml;chten, k&ouml;nnen Sie die Option <i>Kennwort
+		sichern</i> ausw&auml;hlen. (Bitte achten Sie darauf, dass das K&auml;stchen <i>Anmeldung
+		durch gesicherte Kennwortauthentifizierung</i> aktiviert ist.)<br />
+		<br />
+		Nun m&uuml;ssen Sie die Serverinformationen eingeben:<br />
+		Im Feld <i>Posteingangsserver</i> geben Sie <code>pop.technikum-wien</code>.at
+		bzw. <code>imap.technikum-wien.at</code> (falls der Zugriff
+		via IMAP erfolgen soll). Im Feld <i>Postausgangsserver</i> geben Sie <code>smtp.technikum-wien.at</code> ein.<br />
+		<br />
+		<br />
+		<img src="pics/thunderbird006.gif" width="540" height="452" /><br />
+		<br />
+		Danach erscheint ein Fenster mit der Information, dass die Einrichtung Ihres
+		Kontos abgeschlossen ist. Mit Klick auf <i>Fertig</i> stellen
+		schlie&szlig;en Sie den Assistenten.<br />
+		<br />
+		Um weitere Einstellungen vorzunehmen oder zu &auml;ndern, w&auml;hlen Sie erneut <b><i>Extras</i></b> - <b><i>Konten</i></b>. Dort k&ouml;nnen Sie Ihr Konto anzeigen lassen oder bearbeiten.<br />
+		<br />
+		Eine Zusammenfassung &uuml;ber weitere <a href="#Haeufige">h&auml;ufig ben&ouml;tigte
+		Einstellungen und Funktionen</a> finden Sie am Ende dieses Dokuments.<br /><br />		
+		</td>
+	</tr>
+	<tr>
+		<td class="ContentHeader2"><a name="Haeufige" id="Haeufige"></a>H&auml;ufig ben&ouml;tigte Einstellungen und Funktionen</td>
+	</tr>
+	<tr>
+		<td><br />Die Men&uuml;struktur f&uuml;r die Konfiguration von Mozilla Tunderbird und besonders
+		von Mozilla Tunderbird ist unter Umst&auml;nden sehr un&uuml;bersichtlich. Als zus&auml;tzliche
+		Erschwernis weichen die Bezeichnungen der Men&uuml;punkte und Funktionen von
+		Version zu Version ab.<br />
+		<br />
+		Im Folgenden finden Sie daher eine Zusammenstellung der am h&auml;ufigsten ben&ouml;tigten
+		Einstellungen und Funktionen.<br /><br />
+		</td>
+	</tr>
+	<tr>
+		<td class="ContentHeader2">Servernamen, UserID und Passwort eintragen</td>
+	</tr>
+	<tr>
+		<td><br />Hier k&ouml;nnen Sie die Daten f&uuml;r Posteingangsserver (POP bzw. IMAP) und
+		Postausgangsserver (SMTP) und die Anmeldeinformationen   und das entsprechende
+		Passwort) festlegen.<br />
+		<br />
+		<img src="pics/thunderbird003.gif" width="700" height="558" /><br /><br />
+		<img src="pics/thunderbird002.gif" width="700" height="558" /><br />
+		<br />
+		Bitte achten Sie auch darauf, dass die beiden K&auml;stchen vor <i>Sichere Verbindung (SSL) verwenden </i> und <i>Postausgangsserver</i> - <i>Benutzername und Passwort verwenden </i> aktiviert sind.<br />
+		<br />
+		<table class="border">
+			<tr>
+				<td class="h2">Mozilla Tunderbird</td>
+				<td>Extras - Konten  [Kontoname] - Servereinstellungen </td>
+			</tr>
+			<tr>
+				<td class="h2">Mozilla Tunderbird </td>
+				<td>Extras - Konten  [Kontoname] - Postausgangsserver </td>
+			</tr>
+		</table>
+		<br />	
+		</td>
+	</tr>
+	<tr>
+		<td class="ContentHeader2">Name und eMail-Adresse eintragen</td>
+	</tr>
+	<tr>
+		<td><br />Hier k&ouml;nnen Sie Ihren Namen und Ihre eMail-Adresse (<i>accountname@technikum-wien.at</i> f&uuml;r
+		Studierende bzw. <i>Vorname.Nachname@technikum-wien.at</i> f&uuml;r Mitarbeiter) festlegen.<br />
+		<br />
+		<table class="border">
+			<tr>
+				<td>Mozilla Tunderbird</td>
+				<td>Extras - Konten [Kontoname] - Kontoeinstellungen </td>
+			</tr>
+		</table>
+		<br />
+		</td>
+	</tr>
+	<tr>
+		<td class="ContentHeader2">Abfrageintervall f&uuml;r Nachrichten</td>
+	</tr>
+	<tr>
+		<td><br />Wenn Sie &uuml;ber eine st&auml;ndige Verbindung zum Internet verf&uuml;gen,
+		k&ouml;nnen Sie festlegen, wie oft gepr&uuml;ft werden soll, ob neue Nachrichten
+		am Mailserver eingelangt sind. <br />
+		<br />
+		Bitte w&auml;hlen Sie das Intervall nicht zu kurz, da es sonst zu einer unn&ouml;tigen
+		Belastung des Mailservers kommen kann. Ein zul&auml;ssiger Wert w&auml;re z.B.
+		10 oder 15 Minuten.<br />
+		<br />
+		<table class="border">
+			<tr>
+				<td class="h2">Mozilla Tunderbird</td>
+				<td>Extras - Optionen - Servereinstellungen - Alle
+				XX Minuten auf neue Nachrichten pr&uuml;fen</td>
+			</tr>
+		</table>
+		<br />
+		</td>
+	</tr>
+	<tr>
+		<td class="ContentHeader2">POP: Nachrichten am Server belassen</td>
+	</tr>
+	<tr>
+		<td><br />Wenn Sie Ihre Nachrichten per POP abfragen und trotzdem am Server belassen m&ouml;chten
+		(wenn Sie z.B. die Nachrichten von mehreren PCs abfragen wollen), k&ouml;nnen
+		Sie das hier festlegen.<br />
+		<br />
+		Bitte achten Sie aber darauf, dass zu viele am Server belassene Nachrichten
+		unseren Mailserver &uuml;berlasten k&ouml;nnen und solche Nachrichten daher ab
+		einem gewissen Umfang automatisch archiviert und aus der Mailbox gel&ouml;scht
+		werden. Sie sollten diese Funktion daher mit Vorsicht einsetzen!<br />
+		<br />
+		Studierende und Mitarbeiter, die Ihre Nachrichten am Server belassen wollen,
+		sollten einen Umstieg auf das Protkoll IMAP in Erw&auml;gung ziehen.<br />
+		<br />
+		<table class="border">
+			<tr>
+				<td class="h2">Mozilla Tunderbird </td>
+				<td>Extras - Optionen - Servereinstellungen - Nachrichten auf dem Server belassen </td>
+			</tr>
+		</table>
+		<br />
+		</td>
+	</tr>
+	<tr>
+		<td class="ContentHeader2">Filterregeln erstellen</td>
+	</tr>
+	<tr>
+		<td><br />Sie k&ouml;nnen Regeln festlegen, um beispielsweise Nachrichten von bestimmten
+		Absendern oder mit bestimmten Inhalten automatisch in spezielle Ordner zu verschieben
+		oder zu l&ouml;schen. <br />
+		<br />
+		<table class="border">
+			<tr>
+				<td class="h2">Mozilla Tunderbird</td>
+				<td>Extras - Filter </td>
+			</tr>
+		</table><br />
+		</td>
+	</tr>
+	<tr>
+		<td class="ContentHeader2">Headerzeilen darstellen</td>
+	</tr>
+	<tr>
+		<td><br />Die Headerzeilen einer Nachricht geben Aufschluss dar&uuml;ber, von welchem
+		PC bzw. &uuml;ber welche Mailserver eine Nachricht verschickt wurde.  Au&szlig;erdem
+		k&ouml;nnen die Headerzeilen noch weitere Informationen wie z.B. den verwendeten
+		eMail-Klienten des Absenders oder bestimmte Kennzeichnungen vom Mailserver (z.B.
+		SPAM-Flags) enthalten.<br />
+		<br />
+		<table class="border">
+			<tr>
+				<td class="h2">Mozilla Tunderbird 4</td>
+				<td>Ansicht - Kopfzeilen </td>
+			</tr>
+		</table>
+		<br />
+		</td>
+	</tr>
+	<tr>
+		<td class="ContentHeader2">Import von Nachrichten bzw. Adressb&uuml;chern</td>
+	</tr>
+	<tr>
+		<td><br />An dieser Stelle k&ouml;nnen Sie Nachrichten, Adressb&uuml;cher und Konto-Daten
+		von anderen Mail-Programmen importieren.<br />
+		<br />
+		<table class="border">
+			<tr>
+				<td class="h2">Mozilla Tunderbird 4</td>
+				<td>Extras - importieren </td>
+			</tr>
+		</table>
+		<br />
+		</td>
+	</tr>
+	<tr>
+		<td class="ContentHeader2">Priorit&auml;t einer ausgehenden Nachricht &auml;ndern</td>
+	</tr>
+	<tr>
+		<td><br />Sie k&ouml;nnen die Priori&auml;t bzw. Dringlichkeit einer ausgehenden Nachricht
+		festlegen. Sofern der eMail-Klient des Empf&auml;ngers diese Funktion unterst&uuml;tzt,
+		wird bei ihm die entsprechende Priorit&auml;t angezeigt.<br />
+		<br />
+		<table class="border">
+			<tr>
+				<td class="h2">Mozilla Tunderbird 4</td>
+				<td>(Neue Nachricht erstellen) - Einstellungen - Priorit&auml;t </td>
+			</tr>
+		</table>
+		<br />
+		</td>
+	</tr>
+	<tr>
+		<td class="ContentHeader2">Anfordern von Lese und Empfangsbest&auml;tigungen f&uuml;r Nachrichten</td>
+	</tr>
+	<tr>
+		<td><br />Wenn Sie eine Lesebest&auml;tigung anfordern und der eMail-Klient des Empf&auml;ngers
+		dies unterst&uuml;tzt, erhalten Sie eine R&uuml;ckmeldung, sobald Ihre Nachricht
+		gelesen wurde.<br />
+		<br />
+		Hier k&ouml;nnen Sie diese Anforderung f&uuml;r ihre Nachrichten festlegen:<br />
+		<br />
+		<table class="border">
+			<tr>
+				<td class="h2">Mozilla Tunderbird 4</td>
+				<td>Optionen - Extras - erweitert - Empfangsbest&auml;tigungen </td>
+			</tr>
+		</table>
+		<br />
+		</td>
+	</tr>
+	<tr>
+		<td class="ContentHeader2">Mailing-Parameter</td>
+	</tr>
+	<tr>
+		<td><br />In der folgenden Tabelle finden Sie eine Zusammenstellung der erforderlichen
+		Kontodaten und Servernamen f&uuml;r Mitarbeiter und Studierende des Technikum
+		Wien. <br />
+		<br />
+		<table class="border">
+			<tr class="h1">
+				<td> </td>
+				<td>MitarbeiterInnen (Mailbox)</td>
+				<td>Studierende (Unet)</td>
+			</tr>
+			<tr>
+				<td class="h2">eMail-Adresse</td>
+				<td><i>vorname.nachname</i>@technikum-wien.at</td>
+				<td>accountname<i></i>@technikum-wien.at</td>
+			</tr>
+			<tr>
+				<td class="h2">POP-Server (Posteingang)</td>
+				<td>pop.technikum-wien.at</td>
+				<td>pop.technikum-wien.at</td>
+			</tr>
+			<tr>
+				<td class="h2">IMAP-Server (Posteingang)</td>
+				<td>imap.technikum-wien.at</td>
+				<td>imap.technikum-wien.at</td>
+			</tr>
+			<tr>
+				<td class="h2">SMTP-Server (Postausgang)</td>
+				<td>smtp.technikum-wien.at</td>
+				<td>smtp.technikum-wien.at</td>
+			</tr>
+		</table>
+		<br />
+		</td>
+	</tr>
+	<tr>
+		<td class="ContentHeader2">Wenn nichts funktioniert</td>
+	</tr>
+	<tr>
+		<td>Sie haben sich genau an diese Anleitung gehalten, und trotzdem haben Sie Probleme
+		mit dem Versenden und Empfangen von eMail-Nachrichten? Bevor Sie den Service Desk
+		telefonisch (244) oder per eMail (an <a
+		href="mailto:helpdesk@technikum-wien.at">support@technikum-wien.at</a>) kontaktieren,
+		notieren Sie bitte eventuell auftretende Fehlermeldungen und stellen Sie sicher,
+		dass Sie auch Bescheid &uuml;ber die von Ihnen verwendeten Ger&auml;te (PC
+		oder Laptop und das verwendete Betriebssystem) wissen.<br />
+		<p class="noprint"><a href="#top">zum Seitenanfang</a></p>
+		</td>
+	</tr>
+</table>
 
-
-</div>
-<div id="content2"> Diese Anleitung soll Ihnen beim Einrichten der Mailing-Funktionen von Mozilla Tunderbird
- behilflich sein, damit Sie &uuml;ber den Mailserver des Technikum
-Wien Emails versenden und empfangen k&ouml;nnen. Sie bezieht sich
-auf die jeweils deutschen Versionen - anhand der Abbildungen ist es jedoch m&ouml;glich,
-R&uuml;ckschl&uuml;sse auf die englischen zu ziehen. Bitte beachten Sie weiters,
-dass die Kombination mit der jeweiligen Betriebssystemvariante f&uuml;r
-den Aufbau und die Bezeichnungen von Mozilla Tunderbird ausschlaggebend sein kann und daher
-Einzelheiten in Ihrer Version geringf&uuml;gig abweichen k&ouml;nnten. <br />
-<h2>Sie ben&ouml;tigen ...</h2>
-<p>... einen PC mit installiertem Betriebssystem und Zugang zum Internet.<br />
-  ... eine g&uuml;ltige User ID <a href="/ZID/unet/"></a> mit
-  Passwort <br />
-  ... Mozilla Thunderbird</p>
-<h2>POP oder IMAP?</h2>
-Beim Empfang Ihrer eMail-Nachrichten vom Server k&ouml;nnen Sie zwischen den
-Protokollen POP (Post Office Protocol) und IMAP (Internet Message Access Protocol)
-w&auml;hlen. Mit POP werden die eingehenden Nachrichten auf den lokalen PC heruntergeladen,
-bei IMAP hingegen verbleiben sie (und auch eventuell angelegte Ordner) am Mailserver.
-IMAP ist daher vor allem dann zu empfehlen, wenn Sie auf Ihre Nachrichten von
-mehreren unterschiedlichen Standorten (z.B. von der Fachhochschule und von
-zu Hause) zugreifen wollen.
-Zum Einrichten eines Mailkontos starten Sie Mozilla Tunderbird entweder durch Doppelklick
-auf das Icon am Desktop oder &uuml;ber<b><i> Start</i></b> - <b><i>Programme</i></b> - <b><i>Mozilla Tunderbird</i></b>.<br />
-<br />
-Anmerkung: Sollte auf dem PC bereits ein anderes eMail-Programm
-installiert und konfiguriert sein, erscheint beim ersten Startvorgang meist die
-Frage, ob Sie die Einstellungen der bereits angelegten eMail-Konten importieren
-wollen. Im Zweifelsfall w&auml;hlen Sie hier <i><b>Nein</b></i>, falls erforderlich
-k&ouml;nnen die entsprechenden Daten auch sp&auml;ter importiert werden (n&auml;heres
-dazu am Ende dieses Dokuments unter <a href="#Haeufige">H&auml;ufig ben&ouml;tigte
-Einstellungen und Funktionen</a>).<br />
-<br />
-Grunds&auml;tzlich gibt es zwei M&ouml;glichkeiten, den Programmpunkt f&uuml;r
-die Einrichtung eines eMail-Kontos unter Mozilla Tunderbird aufzurufen. beim ersten Aufruf des Programms meldet sich der <a href="#XP_Assistent">Start-Assistent</a> . Sie k&ouml;nnen aber auch jederzeit &uuml;ber <a href="#XP_Normal"><em>extras - Konten</em></a> den Assistenten starten und ein neues Konto einrichten.
-<h2><a name="XP_Assistent" id="XP_Assistent"></a>Mailkonto
-  einrichten</h2>
-Der Start-Assistent f&uuml;hrt Sie durch die Konfiguration von Mozilla Tunderbird.<br />
-<br />
-<br />
-.<img src="pics/thunderbird001.gif" width="540" height="452" /><br />
-<br />
-W&auml;hlen Sie hier den Punkt <i>Emailkonto</i> und klicken Sie auf <i>Weiter</i>.<br />
-<br />
-Die weitere Vorgehensweise mit dem Startassistenten entspricht der Einrichtung
-auf normalem Weg ab dem Fenster <a href="#Servertyp">Servertyp</a>. <a name="XP_Normal" id="XP_Normal"></a>
-<h2>Kontenassistent manuell starten </h2>
-Um ein Mailkonto einzurichten, w&auml;hlen Sie den Men&uuml;punkt <b><i>Extras</i> - </b><b><i> Konten</i></b>.<br />
-<br />
-<img src="pics/thunderbird001.gif" width="540" height="452" /><br />
-<br />
-Sie k&ouml;nnen entweder ein neues Konto hinzuf&uuml;gen, oder bereits vorhandende
-Konten darstellen bzw. bearbeiten. (Dies gilt auch f&uuml;r Verzeichnisse und
-Adressb&uuml;cher.) W&auml;hlen Sie <i>Ein neues E-Mail-Konto hinzuf&uuml;gen</i> und
-klicken Sie auf <i>Weiter</i>.<br />
-<br />
-<a name="Servertyp" id="Servertyp"></a> <img src="pics/thunderbird009.gif" width="540" height="452" /><br />
-<br />
-In dem daraufhin erscheinenden Fenster m&uuml;ssen Sie den ben&ouml;tigten Servertyp
-w&auml;hlen. Falls Sie IMAP verwenden, w&auml;hlen Sie bitte IMAP (falls Sie
-POP verwenden, dann <i>POP3</i>).
-Klicken Sie auf <b><i>Weiter</i></b>.<br />
-<br />
-<img src="pics/thunderbird008.gif" width="540" height="452" /> <br />
-<br />
-Danach erscheint das Fenster Internet-E-Mail-Einstellungen.<br />
-<br />
-Unter Benutzerinformationen im Feld <i>Ihr Name:</i> geben Sie bitte Ihren vollst&auml;ndigen
-Namen ein. Im Feld <i>E-Mail-Adresse:</i> geben Sie Ihre eMail-Adresse ein (<b><i>acountname</i>@technikum-wien.at</b> f&uuml;r
-Studierende, bzw. <b><i>vorname.nachname</i>@technikum-wien.at</b> f&uuml;r Mitarbeiter).<br />
-<br />
-Unter Anmeldeinformationen geben Sie nun im Feld <i>Benutzername:</i> Ihre UserID
- ein und unter <i>Kennwort</i> Ihr Passwort. Falls Sie nicht bei jedem Verbindungsaufbau
-Ihr Passwort erneut eingeben m&ouml;chten, k&ouml;nnen Sie die Option <i>Kennwort
-sichern</i> ausw&auml;hlen. (Bitte achten Sie darauf, dass das K&auml;stchen <i>Anmeldung
-durch gesicherte Kennwortauthentifizierung</i> aktiviert ist.)<br />
-  <br />
-Nun m&uuml;ssen Sie die Serverinformationen eingeben:<br />
-Im Feld <i>Posteingangsserver</i> geben Sie <code>pop.technikum-wien</code>.at
-bzw. <code>imap.technikum-wien.at</code> (falls der Zugriff
-via IMAP erfolgen soll). Im Feld <i>Postausgangsserver</i> geben Sie <code>smtp.technikum-wien.at</code> ein.<br />
-<br />
-<br />
-<img src="pics/thunderbird006.gif" width="540" height="452" /><br />
-<br />
-Danach erscheint ein Fenster mit der Information, dass die Einrichtung Ihres
-Kontos abgeschlossen ist. Mit Klick auf <i>Fertig</i> stellen
-schlie&szlig;en Sie den Assistenten.<br />
-  <br />
-Um weitere Einstellungen vorzunehmen oder zu &auml;ndern, w&auml;hlen Sie erneut <b><i>Extras</i></b> - <b><i>Konten</i></b>. Dort k&ouml;nnen Sie Ihr Konto anzeigen lassen oder bearbeiten.<br />
-<br />
-Eine Zusammenfassung &uuml;ber weitere <a href="#Haeufige">h&auml;ufig ben&ouml;tigte
-Einstellungen und Funktionen</a> finden Sie am Ende dieses Dokuments.<br />
-<h2>&nbsp;</h2>
-<h2><a name="Haeufige" id="Haeufige"></a>H&auml;ufig ben&ouml;tigte Einstellungen
-  und Funktionen</h2>
-Die Men&uuml;struktur f&uuml;r die Konfiguration von Mozilla Tunderbird und besonders
-von Mozilla Tunderbird ist unter Umst&auml;nden sehr un&uuml;bersichtlich. Als zus&auml;tzliche
-Erschwernis weichen die Bezeichnungen der Men&uuml;punkte und Funktionen von
-Version zu Version ab.<br />
-<br />
-Im Folgenden finden Sie daher eine Zusammenstellung der am h&auml;ufigsten ben&ouml;tigten
-Einstellungen und Funktionen.
-<h2>Servernamen, UserID und Passwort eintragen</h2>
-<p>Hier k&ouml;nnen Sie die Daten f&uuml;r Posteingangsserver (POP bzw. IMAP) und
-  Postausgangsserver (SMTP) und die Anmeldeinformationen   und das entsprechende
-  Passwort) festlegen.<br />
-  <br />
-  <img src="pics/thunderbird003.gif" width="700" height="558" /></p>
-<p>&nbsp;</p>
-<p><img src="pics/thunderbird002.gif" width="700" height="558" /><br />
-    <br />
-    Bitte achten Sie auch darauf, dass die beiden K&auml;stchen vor <i>Sichere Verbindung (SSL) verwenden </i> und <i>Postausgangsserver</i> - <i>Benutzername und Passwort verwenden </i> aktiviert sind.<br />
-    <br />
-</p>
-<table class="border">
-  <tr>
-    <td class="h2">Mozilla Tunderbird</td>
-    <td>Extras - Konten  [Kontoname] - Servereinstellungen </td>
-  </tr>
-  <tr>
-    <td class="h2">Mozilla Tunderbird </td>
-    <td>Extras - Konten  [Kontoname] - Postausgangsserver </td>
-  </tr>
-</table>
-<br />
-<h2>Name und eMail-Adresse eintragen</h2>
-Hier k&ouml;nnen Sie Ihren Namen und Ihre eMail-Adresse (<i>accountname@technikum-wien.at</i> f&uuml;r
-Studierende bzw. <i>Vorname.Nachname@technikum-wien.at</i> f&uuml;r Mitarbeiter) festlegen.<br />
-<br />
-<table class="border">
-  <tr>
-    <td>Mozilla Tunderbird</td>
-    <td>Extras - Konten [Kontoname] - Kontoeinstellungen </td>
-  </tr>
-</table>
-<h2>Abfrageintervall f&uuml;r Nachrichten</h2>
-Wenn Sie &uuml;ber eine st&auml;ndige Verbindung zum Internet verf&uuml;gen,
-k&ouml;nnen Sie festlegen, wie oft gepr&uuml;ft werden soll, ob neue Nachrichten
-am Mailserver eingelangt sind. <br />
-<br />
-Bitte w&auml;hlen Sie das Intervall nicht zu kurz, da es sonst zu einer unn&ouml;tigen
-Belastung des Mailservers kommen kann. Ein zul&auml;ssiger Wert w&auml;re z.B.
-10 oder 15 Minuten.<br />
-<br />
-<table class="border">
-  <tr>
-    <td class="h2">Mozilla Tunderbird</td>
-    <td>Extras - Optionen - Servereinstellungen - Alle
-      XX Minuten auf neue Nachrichten pr&uuml;fen</td>
-  </tr>
-</table>
-<h2>POP: Nachrichten am Server belassen</h2>
-Wenn Sie Ihre Nachrichten per POP abfragen und trotzdem am Server belassen m&ouml;chten
-(wenn Sie z.B. die Nachrichten von mehreren PCs abfragen wollen), k&ouml;nnen
-Sie das hier festlegen.<br />
-<br />
-Bitte achten Sie aber darauf, dass zu viele am Server belassene Nachrichten
-unseren Mailserver &uuml;berlasten k&ouml;nnen und solche Nachrichten daher ab
-einem gewissen Umfang automatisch archiviert und aus der Mailbox gel&ouml;scht
-werden. Sie sollten diese Funktion daher mit Vorsicht einsetzen!<br />
-<br />
-Studierende und Mitarbeiter, die Ihre Nachrichten am Server belassen wollen,
-sollten einen Umstieg auf das Protkoll IMAP in Erw&auml;gung ziehen.<br />
-<br />
-<table class="border">
-  <tr>
-    <td class="h2">Mozilla Tunderbird </td>
-    <td>Extras - Optionen - Servereinstellungen - Nachrichten auf dem Server belassen </td>
-  </tr>
-</table>
-<h2>Filterregeln erstellen</h2>
-Sie k&ouml;nnen Regeln festlegen, um beispielsweise Nachrichten von bestimmten
-Absendern oder mit bestimmten Inhalten automatisch in spezielle Ordner zu verschieben
-oder zu l&ouml;schen. <br />
-<br />
-<table class="border">
-  <tr>
-    <td class="h2">Mozilla Tunderbird</td>
-    <td>Extras - Filter </td>
-  </tr>
-</table>
-<h2>Headerzeilen darstellen</h2>
-Die Headerzeilen einer Nachricht geben Aufschluss dar&uuml;ber, von welchem
-PC bzw. &uuml;ber welche Mailserver eine Nachricht verschickt wurde.  Au&szlig;erdem
-k&ouml;nnen die Headerzeilen noch weitere Informationen wie z.B. den verwendeten
-eMail-Klienten des Absenders oder bestimmte Kennzeichnungen vom Mailserver (z.B.
-SPAM-Flags) enthalten.<br />
-<br />
-<table class="border">
-  <tr>
-    <td class="h2">Mozilla Tunderbird 4</td>
-    <td>Ansicht - Kopfzeilen </td>
-  </tr>
-</table>
-<h2>Import von Nachrichten bzw. Adressb&uuml;chern</h2>
-An dieser Stelle k&ouml;nnen Sie Nachrichten, Adressb&uuml;cher und Konto-Daten
-von anderen Mail-Programmen importieren.<br />
-<br />
-<table class="border">
-  <tr>
-    <td class="h2">Mozilla Tunderbird 4</td>
-    <td>Extras - importieren </td>
-  </tr>
-</table>
-<h2>Priorit&auml;t einer ausgehenden Nachricht &auml;ndern</h2>
-Sie k&ouml;nnen die Priori&auml;t bzw. Dringlichkeit einer ausgehenden Nachricht
-festlegen. Sofern der eMail-Klient des Empf&auml;ngers diese Funktion unterst&uuml;tzt,
-wird bei ihm die entsprechende Priorit&auml;t angezeigt.<br />
-<br />
-<table class="border">
-  <tr>
-    <td class="h2">Mozilla Tunderbird 4</td>
-    <td>(Neue Nachricht erstellen) - Einstellungen - Priorit&auml;t </td>
-  </tr>
-</table>
-<h2>Anfordern von Lese und Empfangsbest&auml;tigungen f&uuml;r Nachrichten</h2>
-Wenn Sie eine Lesebest&auml;tigung anfordern und der eMail-Klient des Empf&auml;ngers
-dies unterst&uuml;tzt, erhalten Sie eine R&uuml;ckmeldung, sobald Ihre Nachricht
-gelesen wurde.<br />
-<br />
-Hier k&ouml;nnen Sie diese Anforderung f&uuml;r ihre Nachrichten festlegen:<br />
-<br />
-<table class="border">
-  <tr>
-    <td class="h2">Mozilla Tunderbird 4</td>
-    <td>Optionen - Extras - erweitert - Empfangsbest&auml;tigungen </td>
-  </tr>
-</table>
-<h2>Mailing-Parameter</h2>
-In der folgenden Tabelle finden Sie eine Zusammenstellung der erforderlichen
-Kontodaten und Servernamen f&uuml;r Mitarbeiter und Studierende des Technikum
-Wien. <br />
-<br />
-<table class="border">
-  <tr class="h1">
-    <td> </td>
-    <td>MitarbeiterInnen (Mailbox)</td>
-    <td>Studierende (Unet)</td>
-  </tr>
-  <tr>
-    <td class="h2">eMail-Adresse</td>
-    <td><i>vorname.nachname</i>@technikum-wien.at</td>
-    <td>accountname<i></i>@technikum-wien.at</td>
-  </tr>
-  <tr>
-    <td class="h2">POP-Server (Posteingang)</td>
-    <td>pop.technikum-wien.at</td>
-    <td>pop.technikum-wien.at</td>
-  </tr>
-  <tr>
-    <td class="h2">IMAP-Server (Posteingang)</td>
-    <td>imap.technikum-wien.at</td>
-    <td>imap.technikum-wien.at</td>
-  </tr>
-  <tr>
-    <td class="h2">SMTP-Server (Postausgang)</td>
-    <td>smtp.technikum-wien.at</td>
-    <td>smtp.technikum-wien.at</td>
-  </tr>
-</table>
-<h2>Wenn nichts funktioniert</h2>
-Sie haben sich genau an diese Anleitung gehalten, und trotzdem haben Sie Probleme
-mit dem Versenden und Empfangen von eMail-Nachrichten? Bevor Sie den Service Desk
-telefonisch (244) oder per eMail (an <a
- href="mailto:helpdesk@technikum-wien.at">support@technikum-wien.at</a>) kontaktieren,
-notieren Sie bitte eventuell auftretende Fehlermeldungen und stellen Sie sicher,
-dass Sie auch Bescheid &uuml;ber die von Ihnen verwendeten Ger&auml;te (PC
-oder Laptop und das verwendete Betriebssystem) wissen.<br />
-<p class="noprint"><a href="#top">zum Seitenanfang</a></p>
-</div>
 </body>
 </html>
