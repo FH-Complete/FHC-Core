@@ -36,6 +36,7 @@ class beispiel
 	var $updatevon;		// varchar(16)
 	var $insertamum;	// timestamp
 	var $insertvon;		// varchar(16)
+	var $nummer;		// smallint
 
 	var $student_uid;
 	var $vorbereitet;
@@ -92,6 +93,7 @@ class beispiel
 				$this->updatevon = $row->updatevon;
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
+				$this->nummer = $row->nummer;
 				return true;
 			}
 			else
@@ -131,6 +133,7 @@ class beispiel
 				$beispiel_obj->updatevon = $row->updatevon;
 				$beispiel_obj->insertamum = $row->insertamum;
 				$beispiel_obj->insertvon = $row->insertvon;
+				$beispiel_obj->nummer = $row->nummer;
 
 				$this->beispiele[] = $beispiel_obj;
 			}
@@ -197,14 +200,15 @@ class beispiel
 				return false;
 			}
 			$qry = 'BEGIN; INSERT INTO campus.tbl_beispiel(uebung_id, punkte, bezeichnung, updateamum,
-			        updatevon, insertamum, insertvon) VALUES('.
+			        updatevon, insertamum, insertvon, nummer) VALUES('.
 			        $this->addslashes($this->uebung_id).','.
 			        $this->addslashes($this->punkte).','.
 			        $this->addslashes($this->bezeichnung).','.
 			        $this->addslashes($this->updateamum).','.
 			        $this->addslashes($this->updatevon).','.
 			        $this->addslashes($this->insertamum).','.
-			        $this->addslashes($this->insertvon).');';
+			        $this->addslashes($this->insertvon).','.
+					$this->addslashes($this->nummer).');';
 		}
 		else
 		{
@@ -213,6 +217,7 @@ class beispiel
 			       ' punkte='.$this->addslashes($this->punkte).','.
 			       ' bezeichnung='.$this->addslashes($this->bezeichnung).','.
 			       ' updateamum='.$this->addslashes($this->updateamum).','.
+				   ' nummer='.$this->addslashes($this->nummer).','.
 			       ' updatevon='.$this->addslashes($this->updatevon).
 			       " WHERE beispiel_id=".$this->addslashes($this->beispiel_id).";";
 		}
@@ -395,7 +400,7 @@ class beispiel
 			        $this->addslashes($this->updateamum).','.
 			        $this->addslashes($this->updatevon).','.
 			        $this->addslashes($this->insertamum).','.
-			        $this->addslashes($this->insertvon).');';
+					$this->addslashes($this->insertvon).');';
 		}
 		else
 		{
