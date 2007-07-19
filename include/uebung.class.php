@@ -45,6 +45,10 @@ class uebung
 	var $insertamum;		// timestamp
 	var $insertvon;			// varchar(16)
 	var $statistik;			// boolean
+	var $liste_id;			//integer
+	var $maxbsp;			//smallint
+	var $maxstd;			//smallint
+	var $nummer;			//smallint
 
 	//Studentuebung
 	var $student_uid;		// varchar(16)
@@ -115,6 +119,10 @@ class uebung
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->statistik = ($row->statistik=='t'?true:false);
+				$this->liste_id = $row->liste_id;
+				$this->maxbsp = $row->maxbsp;
+				$this->maxstd = $row->maxstd;
+				$this->nummer = $row->nummer;
 				return true;
 			}
 			else
@@ -165,7 +173,7 @@ class uebung
 		}
 	}
 
-	function load_uebung($lehreinheit_id)
+	function load_uebung($lehreinheit_id, $level=null, $uebung_id=null)
 	{
 		if(!is_numeric($lehreinheit_id))
 		{
@@ -173,7 +181,12 @@ class uebung
 			return false;
 		}
 
-		$qry = "SELECT * FROM campus.tbl_uebung WHERE lehreinheit_id='$lehreinheit_id' ORDER BY bezeichnung";
+		$qry = "SELECT * FROM campus.tbl_uebung WHERE lehreinheit_id='".$lehreinheit_id."'";
+		if ($level == 1)
+			$qry .= " and liste_id is null";
+		if ($level == 2)
+			$qry .= " and liste_id = '".$uebung_id."'";
+		$qry .= " ORDER BY bezeichnung";
 
 		if($result=pg_query($this->conn, $qry))
 		{
@@ -198,6 +211,10 @@ class uebung
 				$uebung_obj->insertamum = $row->insertamum;
 				$uebung_obj->insertvon = $row->insertvon;
 				$uebung_obj->statistik = ($row->statistik=='t'?true:false);
+				$uebung_obj->liste_id = $row->liste_id;
+				$uebung_obj->maxstd = $row->maxstd;
+				$uebung_obj->maxbsp = $row->maxbsp;
+				$uebung_obj->nummer = $row->nummer;
 
 				$this->uebungen[] = $uebung_obj;
 			}
@@ -260,7 +277,7 @@ class uebung
 		{
 			$qry = 'BEGIN; INSERT INTO campus.tbl_uebung(gewicht, punkte, angabedatei, freigabevon, freigabebis,
 			        abgabe, beispiele, bezeichnung, positiv, defaultbemerkung, lehreinheit_id, updateamum,
-			        updatevon, insertamum, insertvon, statistik) VALUES('.
+			        updatevon, insertamum, insertvon, liste_id, maxstd, maxbsp, nummer, statistik) VALUES('.
 			        $this->addslashes($this->gewicht).','.
 			        $this->addslashes($this->punkte).','.
 			        $this->addslashes($this->angabedatei).','.
@@ -276,6 +293,10 @@ class uebung
 			        $this->addslashes($this->updatevon).','.
 			        $this->addslashes($this->insertamum).','.
 			        $this->addslashes($this->insertvon).','.
+					$this->addslashes($this->liste_id).','.
+					$this->addslashes($this->maxstd).','.
+					$this->addslashes($this->maxbsp).','.
+					$this->addslashes($this->nummer).','.
 			        ($this->statistik?'true':'false').');';
 		}
 		else
@@ -294,6 +315,10 @@ class uebung
 			       ' lehreinheit_id='.$this->addslashes($this->lehreinheit_id).','.
 			       ' updateamum='.$this->addslashes($this->updateamum).','.
 			       ' updatevon='.$this->addslashes($this->updatevon).','.
+				   ' liste_id='.$this->addslashes($this->liste_id).','.
+				   ' maxstd='.$this->addslashes($this->maxstd).','.
+				   ' maxbsp='.$this->addslashes($this->maxbsp).','.
+				   ' nummer='.$this->addslashes($this->nummer).','.
 			       ' statistik='.($this->statistik?'true':'false').
 			       " WHERE uebung_id=".$this->addslashes($this->uebung_id).";";
 		}
@@ -427,7 +452,11 @@ class uebung
 			$this->errormsg = 'Uebung_id ist ungueltig';
 			return false;
 		}
-
+		foreach (glob(BENOTUNGSTOOL_PATH."angabe/*".$uebung_id.".*") as $angabe)
+		{
+				if(file_exists($angabe))
+					unlink($angabe);
+		}
 		$qry = "DELETE FROM campus.tbl_studentuebung WHERE uebung_id='$uebung_id';
 				DELETE FROM campus.tbl_studentbeispiel WHERE beispiel_id IN(SELECT beispiel_id FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id');
 				DELETE FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id';
