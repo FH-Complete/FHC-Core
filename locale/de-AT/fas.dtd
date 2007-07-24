@@ -1,5 +1,5 @@
 <!ENTITY window.title			"FASo"> 
-<!ENTITY window.version			"0.5 vom 21.Maerz 2007"> 
+<!ENTITY window.version			"1.1 vom 17.Juli 2007"> 
 
 <!ENTITY menu-file.label              	"Datei">
 <!ENTITY menu-file.accesskey           	"D">
