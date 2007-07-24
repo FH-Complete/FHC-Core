@@ -50,15 +50,15 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 </head>
 
 <BODY id="inhalt">
-<font face="Arial, Helvetica, sans-serif" size="2">
+<font size="2">
 	<table class="tabcontent">
 		<tr>
-			<td class="ContentHeader"><font class="ContentHeader">Lehrveranstaltungsplan</font></td>
+			<td class="ContentHeader"><font class="ContentHeader">&nbsp;Lehrveranstaltungsplan</font></td>
 			<td align="right" class="ContentHeader"><A href="help/index.html" class="hilfe" target="_blank"><font class="ContentHeader">HELP&nbsp;</font></A></td>
 		</tr>
 	</table>
 	<DIV align="right">Version: <?php echo VERSION; ?></DIV>
-	<font class="beschriftung">Username: </font>
+	Username:
 	<?php
 		if (isset($uid))
 			echo $uid;
