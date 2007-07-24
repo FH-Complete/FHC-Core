@@ -26,6 +26,11 @@ form
 {
 	font-family: Arial, Helvetica, sans-serif;
 }
+hr
+{
+	color:#CCCCCC;
+	height:1px;
+}
 #menue
 {
 	top:80px;

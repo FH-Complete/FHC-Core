@@ -27,6 +27,11 @@ form
 {
 	font-family: Trebuchet MS;
 }
+hr
+{
+	color:#449ada;
+	height:1px;
+}
 #menue
 {
 	width:25%;
