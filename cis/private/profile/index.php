@@ -76,7 +76,7 @@
     <td>
     <table class="tabcontent">
       <tr>
-		<td class='ContentHeader'><font class='ContentHeader'>Userprofil</font></td>
+		<td class='ContentHeader'><font class='ContentHeader'>&nbsp;Userprofil</font></td>
 		<!--<td align="right"><A href="../lvplan/help/index.html" class="hilfe" target="_blank">HELP&nbsp;</A></td>-->
 	  </tr>
 	</table>
@@ -90,8 +90,8 @@
 		?>
 		<table class="tabcontent">
   		<tr>
-    		<td colspan="2">
-      		<P>
+    		<td colspan="2" class="MarkLine">
+      		<P><br>
       			Titel: <?php echo $titelpre; ?> <br>
         		Vornamen: <?php echo $vorname.'  '.$vornamen; ?> <br>
         		Nachname: <?php echo $nachname; ?> <br>
