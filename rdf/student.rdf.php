@@ -54,33 +54,33 @@ $ss = (isset($_GET['ss'])?$_GET['ss']:null);
 
 if($studiensemester_kurzbz=='aktuelles')
 	$studiensemester_kurzbz = $semester_aktuell;
-	
+
 if(isset($_GET['xmlformat']) && $_GET['xmlformat']=='xml')
 	$xmlformat='xml';
-else 
+else
 	$xmlformat='rdf';
 
 $datum_obj = new datum();
 
 if($xmlformat=='rdf')
-{	
+{
 	$stg_arr = array();
 	$stg_obj = new studiengang($conn, null, null);
 	$stg_obj->getAll(null, false);
-	foreach ($stg_obj->result as $row) 
+	foreach ($stg_obj->result as $row)
 		$stg_arr[$row->studiengang_kz]=$row->kuerzel;
-	
+
 	$rdf_url='http://www.technikum-wien.at/student';
-	echo '	
+	echo '
 	<RDF:RDF
 		xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 		xmlns:STUDENT="'.$rdf_url.'/rdf#"
 	>
-	
-	
+
+
 	  <RDF:Seq about="'.$rdf_url.'/alle">
 	';
-	
+
 	function draw_content($row)
 	{
 		global $rdf_url, $datum_obj, $conn;
@@ -116,9 +116,9 @@ if($xmlformat=='rdf')
 	    		<STUDENT:geburtsnation><![CDATA['.$row->geburtsnation.']]></STUDENT:geburtsnation>
 	    		<STUDENT:sprache><![CDATA['.$row->sprache.']]></STUDENT:sprache>
 	    		<STUDENT:status><![CDATA['.$status.']]></STUDENT:status>
-	    			    		
+
 	    		<STUDENT:uid><![CDATA['.(isset($row->uid)?$row->uid:'').']]></STUDENT:uid>
-	    		<STUDENT:matrikelnummer><![CDATA['.(isset($row->matrikelnr)?$row->matrikelnr:'').']]></STUDENT:matrikelnummer>	    		
+	    		<STUDENT:matrikelnummer><![CDATA['.(isset($row->matrikelnr)?$row->matrikelnr:'').']]></STUDENT:matrikelnummer>
 				<STUDENT:alias><![CDATA['.(isset($row->alias)?$row->alias:'').']]></STUDENT:alias>
 	    		<STUDENT:semester><![CDATA['.(isset($row->semester)?$row->semester:'').']]></STUDENT:semester>
 	    		<STUDENT:verband><![CDATA['.(isset($row->verband)?$row->verband:'').']]></STUDENT:verband>
@@ -131,9 +131,10 @@ if($xmlformat=='rdf')
 		global $rdf_url, $datum_obj, $stg_arr;
 		if($row->prestudent_id!='')
 		{
-		echo '	
+		echo '
 				<STUDENT:prestudent_id><![CDATA['.$row->prestudent_id.']]></STUDENT:prestudent_id>
 	    		<STUDENT:studiengang_kz_prestudent><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz_prestudent>
+				<STUDENT:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz>
 				<STUDENT:aufmerksamdurch_kurzbz><![CDATA['.$row->aufmerksamdurch_kurzbz.']]></STUDENT:aufmerksamdurch_kurzbz>
 				<STUDENT:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></STUDENT:studiengang>
 				<STUDENT:berufstaetigkeit_code><![CDATA['.$row->berufstaetigkeit_code.']]></STUDENT:berufstaetigkeit_code>
@@ -159,7 +160,7 @@ if($xmlformat=='rdf')
 	      </RDF:li>';
 		}
 	}
-	
+
 	if($typ=='student')
 	{
 		// Studenten holen
@@ -175,7 +176,7 @@ if($xmlformat=='rdf')
 			$prestd->load($student->prestudent_id);
 			draw_prestudent($prestd);
 		}
-		else 
+		else
 			foreach ($studenten as $student)
 			{
 				draw_content($student);
@@ -188,7 +189,7 @@ if($xmlformat=='rdf')
 	                      'reihungstestnichtangemeldet')))
 	{
 		$prestd = new prestudent($conn, null, true);
-		
+
 		if($studiengang_kz!=null)
 		{
 			if($prestd->loadIntessentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester, $typ))
@@ -202,7 +203,7 @@ if($xmlformat=='rdf')
 							$student->load($uid);
 						draw_content($student);
 					}
-					else 
+					else
 						draw_content($row);
 					draw_prestudent($row);
 				}
@@ -215,15 +216,15 @@ if($xmlformat=='rdf')
 				draw_content($prestd);
 				draw_prestudent($prestd);
 			}
-			else 
-				echo $prestd->errormsg;	
+			else
+				echo $prestd->errormsg;
 		}
-		else 
+		else
 		{
 			echo 'Falsche Parameteruebergabe';
 		}
 	}
-	else 
+	else
 	{
 		if($filter!='')
 		{
@@ -236,9 +237,9 @@ if($xmlformat=='rdf')
 					$student=new student($conn,null,true);
 					if($uid = $student->getUid($row->prestudent_id))
 					{
-						//Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann 
+						//Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann
 						//nochmal laden aber ohne studiensemester
-						if(!$student->load($uid, $studiensemester_kurzbz))	
+						if(!$student->load($uid, $studiensemester_kurzbz))
 							$student->load($uid);
 					}
 					$prestd = new prestudent($conn, null, true);
@@ -248,7 +249,7 @@ if($xmlformat=='rdf')
 						draw_content($student);
 						draw_prestudent($prestd);
 					}
-					else 
+					else
 					{
 						draw_content($prestd);
 						draw_prestudent($prestd);
@@ -261,9 +262,9 @@ if($xmlformat=='rdf')
 			$student=new student($conn,null,true);
 			if($uid = $student->getUid($prestudent_id))
 			{
-				//Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann 
+				//Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann
 				//nochmal laden aber ohne studiensemester
-				if(!$student->load($uid, $studiensemester_kurzbz))	
+				if(!$student->load($uid, $studiensemester_kurzbz))
 					$student->load($uid);
 			}
 			$prestd = new prestudent($conn, null, true);
@@ -273,20 +274,20 @@ if($xmlformat=='rdf')
 				draw_content($student);
 				draw_prestudent($prestd);
 			}
-			else 
+			else
 			{
 				draw_content($prestd);
 				draw_prestudent($prestd);
 			}
 		}
-		
-		
+
+
 	}
-	
-		
+
+
 	echo "</RDF:Seq>\n</RDF:RDF>";
 }
-else 
+else
 {
 	//XML
 	$uids = split(';',$uid);
@@ -297,10 +298,10 @@ else
 		{
 			$student = new student($conn);
 			$student->load($uid);
-			
+
 			$studiengang = new studiengang($conn);
 			$studiengang->load($student->studiengang_kz);
-			
+
 			$typ='';
 			switch($studiengang->typ)
 			{
@@ -312,7 +313,7 @@ else
 							break;
 				default:	$typ = 'FH-Studiengang';
 			}
-				
+
 			$qry = "SELECT * FROM campus.vw_benutzer JOIN public.tbl_benutzerfunktion USING(uid) WHERE funktion_kurzbz='rek'";
 			$rektor = '';
 			if($result = pg_query($conn, $qry))
@@ -322,10 +323,10 @@ else
 					$rektor = $row->titelpre.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost;
 				}
 			}
-			
+
 			$studiengbeginn = '';
 			$studiensemester_kurzbz='';
-			$qry = "SELECT * FROM public.tbl_prestudentrolle JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
+			$qry = "SELECT * FROM public.tbl_prestudentrolle JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
 					WHERE prestudent_id='$student->prestudent_id' ORDER BY datum LIMIT 1";
 			if($result = pg_query($conn, $qry))
 			{
@@ -335,12 +336,12 @@ else
 					$studiensemester = $row->studiensemester_kurzbz;
 				}
 			}
-			
+
 			$stsem = new studiensemester($conn);
 			//$aktstsem = $stsem->getaktorNext();
-			
+
 			$stsem->load($ss);
-			
+
 			echo '
 			<student>
 				<uid><![CDATA['.$student->uid.']]></uid>
@@ -369,7 +370,7 @@ else
 				<studiensemester_aktuell><![CDATA['.$stsem->studiensemester_kurzbz.']]></studiensemester_aktuell>
 				<studienbeginn_aktuell><![CDATA['.$datum_obj->convertISODate($stsem->start).']]></studienbeginn_aktuell>
 				<tagesdatum><![CDATA['.date('d.m.Y').']]></tagesdatum>
-	    	</student>';			
+	    	</student>';
 		}
 	}
 	echo '</studenten>';
