@@ -209,7 +209,7 @@ function js_toggle_container(conid)
 						}
 					}
 				?>
-			  	</select>&nbsp;&nbsp;&nbsp;&nbsp;
+			  	</select>
 			  	</td>
 			  </tr>
 			  <tr>
@@ -238,7 +238,7 @@ function js_toggle_container(conid)
 					}
 
 				?>
-			  	</select>&nbsp;
+			  	</select>
 			  	</td>
 			  </tr>
 			</table>
