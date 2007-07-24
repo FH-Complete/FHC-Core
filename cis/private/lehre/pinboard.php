@@ -149,7 +149,7 @@
 			</table>
 			</div>
 			<div class="text" style="display: '.($open?'block':'none').';" id="'.$zaehler.'Text">
-			'.$row->text.'
+			'.str_replace("../../skin","../../../skin","$row->text").'
 			</div>
 			';
 				//echo '<div class="titel"><table style="width: 100%"><tr><td  width="30%" align="left">'.$row->betreff.' </td><td width="30%" align=center>'.$datum.'</td><td width="30%" align=right>'.$row->verfasser.'</td></tr></table></div>';
