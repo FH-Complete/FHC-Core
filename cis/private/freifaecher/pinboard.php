@@ -34,7 +34,7 @@
 		$news_obj->getnews(MAXNEWSALTER,'0','0');
 
 		$zaehler=0;
-
+		echo "<table>";
 		foreach ($news_obj->result as $row)
 		{
 			$zaehler++;
@@ -45,16 +45,16 @@
 
 			if($row->semester == 0)
 			{
-				echo '<p><small>'.$datum.' - '.$row->verfasser.' - [Allgemein]</small><br><b>'.$row->betreff.'</b><br>';
+				echo '<tr><td class="ContentHeader2"><p><small>'.$datum.' - '.$row->verfasser.' - [Allgemein]</small><br><b>'.$row->betreff.'</b><br></td></tr>';
 			}
 			else
 			{
-				echo '<p><small>'.$datum.' - '.$row->verfasser.' - </small><br><b>'.$row->betreff.'</b><br>';
+				echo '<tr><td class="ContentHeader2"><p><small>'.$datum.' - '.$row->verfasser.' - </small><br><b>'.$row->betreff.'</b><br></td></tr>';
 			}
 
-			echo "$row->text</p>";
+			echo "<tr><td class='MarkLine'>".str_replace("../../skin","../../../skin","$row->text")."</p></td></tr>";
 		}
-
+		echo "</table>";
 		if($zaehler==0)
 			echo '<p>Zur Zeit gibt es keine aktuellen News!</p>';
 	}
