@@ -29,6 +29,7 @@ require_once('../../../../include/lehreinheit.class.php');
 require_once('../../../../include/benutzerberechtigung.class.php');
 require_once('../../../../include/uebung.class.php');
 require_once('../../../../include/beispiel.class.php');
+require_once('../../../../include/studentnote.class.php');
 require_once('../../../../include/datum.class.php');
 
 ?>
@@ -443,6 +444,8 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 
 	if ($ueb_obj->beispiele && is_numeric($_GET['uebung_id']))
 	{
+		$studentnote = new studentnote($conn,$lehreinheit_id,$stsem,$uid,$uebung_id);
+		echo "<span class='studentnote'>Note: ".$studentnote->note." (Gewicht: ".$studentnote->gewicht.")</span><br><br>";
 		echo "
 		<form method='POST' action='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid'>
 		<table width='100%'><tr><td valign='top'>
@@ -601,6 +604,9 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 	else if (is_numeric($_GET['uebung_id']))
 	{
 		//Abgaben benoten
+		$studentnote = new studentnote($conn,$lehreinheit_id,$stsem,$uid,$uebung_id);
+		echo "<span class='studentnote'>Note: ".$studentnote->note." (Gewicht: ".$studentnote->gewicht.")</span><br><br>";
+
 		echo "
 		<form method='POST' action='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid'>
 		<table width='100%'><tr><td valign='top'>
@@ -623,7 +629,6 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 		</table>
 		</form>";
 	}
-
 }
 else
 {
@@ -643,13 +648,16 @@ else
 					<td>&nbsp;</td>
 					<td>&nbsp;</td>
 					<td>&nbsp;</td>
+					<td>&nbsp;</td>
 				</tr>
 				<tr>
 					<td class='ContentHeader2'>UID</td>
 					<td class='ContentHeader2'>Nachname</td>
 					<td class='ContentHeader2'>Vorname</td>
+					<td class='ContentHeader2'>Gesamtnote</td>
 				</tr>
 				<tr>
+					<td>&nbsp;</td>
 					<td>&nbsp;</td>
 					<td>&nbsp;</td>
 					<td>&nbsp;</td>
@@ -658,7 +666,7 @@ else
 			{
 					echo "
 					<tr>
-						<td colspan='3' align='center'><b>$row_grp->gruppe_kurzbz</b></td>
+						<td colspan='4' align='center'><b>$row_grp->gruppe_kurzbz</b></td>
 					</tr>";
 					$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row_grp->gruppe_kurzbz)."' ORDER BY nachname, vorname";
 			}
@@ -666,7 +674,7 @@ else
 			{
 				echo "
 					<tr>
-						<td colspan='3' align='center'><b>Verband $row_grp->verband ".($row_grp->gruppe!=''?"Gruppe $row_grp->gruppe":'')."</b></td>
+						<td colspan='4' align='center'><b>Verband $row_grp->verband ".($row_grp->gruppe!=''?"Gruppe $row_grp->gruppe":'')."</b></td>
 					</tr>";
 					$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student
 					             WHERE studiengang_kz='$row_grp->studiengang_kz' AND
@@ -675,17 +683,33 @@ else
 								 ($row_grp->gruppe!=''?" AND trim(gruppe)=trim('$row_grp->gruppe')":'').
 					            " ORDER BY nachname, vorname";
 			}
-
-			if($result_stud = pg_query($conn, $qry_stud))
+			
+            if($result_stud = pg_query($conn, $qry_stud))
 			{
 				$i=1;
 				while($row_stud = pg_fetch_object($result_stud))
 				{
+					//$studentgesamtnote = 0;
+        			//$ueb_obj = new uebung($conn);	
+        			//$ueb_obj->load_uebung($lehreinheit_id);
+        			//foreach ($ueb_obj->uebungen as $ueb)
+        			//{
+        				
+					$studentnote = new studentnote($conn,$lehreinheit_id,$stsem,$row_stud->uid);
+					//	if ($studentnote->note)
+        			//	{
+        			//			$studentgesamtnote = $studentgesamtnote + $studentnote->note;
+        			//	}
+        			//}
+        			
+
+					
 					echo "
 					<tr class='liste".($i%2)."'>
 						<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->uid</a></td>
 						<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->nachname</a></td>
 						<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->vorname</a></td>
+						<td>$studentnote->studentgesamtnote</td>
 					</tr>";
 					$i++;
 				}
