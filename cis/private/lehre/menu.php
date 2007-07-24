@@ -30,7 +30,12 @@
     if(!$sql_conn = pg_pconnect(CONN_STRING))
        die('Fehler beim oeffnen der Datenbankverbindung');
 
+	// Variablen setzen
 	$user = get_uid();
+	if (isset($_GET['course_id']))
+		$course_id=$_GET['course_id'];
+	if (isset($_GET['term_id']))
+		$term_id=$_GET['term_id'];
 
 	$rechte=new benutzerberechtigung($sql_conn);
 	$rechte->getBerechtigungen($user);
