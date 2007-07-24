@@ -37,13 +37,13 @@ var person_ids=''; // enthaelt eine durch ';' getrennte Liste an Personen_ids
 function StudentKontoNeuInit()
 {
 	var tree = window.opener.document.getElementById('student-tree')
-    
+
 	var start = new Object();
 	var end = new Object();
 	var numRanges = tree.view.selection.getRangeCount();
 	var paramList= '';
 	var anzahl=0;
-	
+
 	//alle markierten personen holen
 	for (var t = 0; t < numRanges; t++)
 	{
@@ -56,7 +56,7 @@ function StudentKontoNeuInit()
 			anzahl = anzahl +1;
 			}
 	}
-	
+
 	tree_vb=window.opener.document.getElementById('tree-verband');
 
 	//Wenn nichts markiert wurde -> beenden
@@ -66,12 +66,13 @@ function StudentKontoNeuInit()
 		window.close();
 		return;
 	}
-		
+
 	col = tree_vb.columns ? tree_vb.columns["stg_kz"] : "stg_kz";
-	var stg_kz=tree_vb.view.getCellText(tree_vb.currentIndex,col);
-		
+	//var stg_kz=tree_vb.view.getCellText(tree_vb.currentIndex,col);
+	studiengang_kz=tree_vb.view.getCellText(tree_vb.currentIndex,col);
+
 	person_ids = paramList;
-	
+
 	if(anzahl>1)
 		document.getElementById('student-konto-neu-label').value='Anzahl Studenten: '+anzahl;
 }

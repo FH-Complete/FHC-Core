@@ -64,18 +64,18 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 					<toolbox flex="1">
 						<toolbar id="student-nav-toolbar">
 							<toolbarbutton id="interessent-toolbar-neu" label="Neu" oncommand="InteressentNeu()" disabled="false" image="../skin/images/NeuDokument.png" tooltiptext="Interessent neu anlegen" />
-													
+
 							<toolbarbutton id="student-toolbar-buchung" label="Neue Buchung" oncommand="StudentKontoNeu()" disabled="false" tooltiptext="neue Buchung anlegen"/>
 							<toolbarbutton id="student-toolbar-abbrecher" label="-> Abbrecher" oncommand="StudentAddRolle('Abbrecher','0')" disabled="false" tooltiptext="Student zum Abbrecher machen" hidden="true"/>
 							<toolbarbutton id="student-toolbar-unterbrecher" label="-> Unterbrecher" oncommand="StudentAddRolle('Unterbrecher','0')" disabled="false" tooltiptext="Student zum Unterbrecher machen" hidden="true"/>
 							<toolbarbutton id="student-toolbar-student" label="-> Student" oncommand="StudentUnterbrecherZuStudent()" disabled="false" tooltiptext="Ab/Unterbrecher wieder zum Studenten machen" hidden="true"/>
-		
+
 							<toolbarbutton id="interessent-toolbar-zubewerber" label="-> Bewerber" oncommand="InteressentzuBewerber()" disabled="false" tooltiptext="Interessent zum Bewerber machen" hidden="true"/>
 							<toolbarbutton id="interessent-toolbar-zustudent" label="-> Student" oncommand="InteressentzuStudent()" disabled="false" tooltiptext="Bewerber zu Studenten machen" hidden="true"/>
 							<toolbarbutton id="interessent-toolbar-aufgenommener" label="-> Aufgenommener" oncommand="InteressentAddRolle('Aufgenommener')" disabled="false" tooltiptext="Interessent zum Aufgenommenen machen" hidden="true"/>
 							<toolbarbutton id="interessent-toolbar-warteliste" label="-> Warteliste" oncommand="InteressentAddRolle('Wartender')" disabled="false" tooltiptext="Interessent zum Wartenden machen" hidden="true"/>
 							<toolbarbutton id="interessent-toolbar-absage" label="-> Absage" oncommand="InteressentAddRolle('Abgewiesener')" disabled="false" tooltiptext="Interessent zum Absager machen" hidden="true"/>
-							
+
 							<toolbarbutton id="student-toolbar-refresh" label="Aktualisieren" oncommand="StudentTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 							<textbox id="student-toolbar-textbox-suche" control="student-toolbar-button-search" onkeypress="StudentSearchFieldKeyPress(event)" />
 							<button id="student-toolbar-button-search" oncommand="StudentSuche()" label="Suchen"/>
@@ -145,6 +145,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#studiengang" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
+						<treecol id="student-treecol-studiengang_kz" label="Studiengang_kz" flex="1" hidden="true"
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#studiengang_kz" onclick="StudentTreeSort()"/>
+	    				<splitter class="tree-splitter"/>
 						<treecol id="student-treecol-matrikelnummer" label="Matrikelnummer" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#matrikelnummer" onclick="StudentTreeSort()"/>
@@ -179,6 +183,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#verband" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#gruppe" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#studiengang" />
+	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#studiengang_kz" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#matrikelnummer" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#prestudent_id" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#person_id" />
@@ -204,7 +209,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 							<tab id="student-tab-kontakt" label="Kontakt" />
 							<tab id="student-tab-prestudent" label="PreStudent" />
 							<tab id="student-tab-dokumente" label="Dokumente" />
-							<tab id="student-tab-konto" label="Konto" />							
+							<tab id="student-tab-konto" label="Konto" />
 							<tab id="student-tab-betriebsmittel" label="Betriebsmittel" />
 							<tab id="student-tab-io" label="Incoming/Outgoing" />
 							<tab id="student-tab-noten" label="Noten" />
@@ -218,7 +223,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 							<iframe id="student-kontakt" src="" style="margin-top:10px;" />
 							<vbox id="student-prestudent"  style="margin-top:10px;" />
 							<vbox id="interessent-dokumente"  style="margin-top:10px;" />
-							<vbox id="student-konto"  style="margin-top:10px;" />							
+							<vbox id="student-konto"  style="margin-top:10px;" />
 							<vbox id="student-betriebsmittel"  style="margin-top:10px;" />
 							<vbox id="student-io"  style="margin-top:10px;" />
 							<vbox id="student-noten"  style="margin-top:10px;" />
@@ -227,7 +232,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 							<vbox id="student-abschlusspruefung"  style="margin-top:10px;" />
 							<vbox id="student-projektarbeit"  style="margin-top:10px;" />
 						</tabpanels>
-					</tabbox>	
+					</tabbox>
 				</vbox>
 			</vbox>
 </overlay>
