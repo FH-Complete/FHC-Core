@@ -118,7 +118,7 @@ class studentnote
 						$note_x_gewicht_l1 += ($s->note * $ueb1->gewicht);
 						$gewichte_l1 += $ueb1->gewicht;
 					}
-						else
+					else
 							$fehlt = true;
 				}
 			}
@@ -185,11 +185,16 @@ class studentnote
 			else
 			{
 				if($ueb->load_studentuebung($student_uid, $uebung_id))
-	            	{
-	            		$this->note = $ueb->note;
-					$this->gewicht = $ueb->gewicht;
-					return true;
-	            	}
+            	{
+            	$this->note = $ueb->note;
+				$this->gewicht = $ueb->gewicht;
+				return true;
+            	}
+	            else
+	            {
+					$this->note = null;		            
+		            return true;
+		        }
 			}
 			
 		}
