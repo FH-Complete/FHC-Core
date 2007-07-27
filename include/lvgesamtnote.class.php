@@ -195,8 +195,7 @@ class lvgesamtnote
 		if($new)
 		{
 			//Neuen Datensatz einfuegen					
-			$qry='INSERT INTO campus.tbl_lvgesamtnote (lehrveranstaltung_id, student_uid, studiensemester_kurzbz, mitarbeiter_uid, note, freigabedatum, benotungsdatum, bemerkung,
-				  updateamum, updatevon, insertamum, insertvon) VALUES('.
+			$qry='INSERT INTO campus.tbl_lvgesamtnote (lehrveranstaltung_id, student_uid, studiensemester_kurzbz, mitarbeiter_uid, note, freigabedatum, benotungsdatum, bemerkung, updateamum, updatevon, insertamum, insertvon) VALUES('.
 			     $this->addslashes($this->lehrveranstaltung_id).', '.
 			     $this->addslashes($this->student_uid).', '.
 			     $this->addslashes($this->studiensemester_kurzbz).', '.
@@ -220,8 +219,8 @@ class lvgesamtnote
 				'mitarbeiter_uid='.$this->addslashes($this->mitarbeiter_uid).', '.
 		     	'updateamum= '.$this->addslashes($this->updateamum).', '.
 		     	'updatevon='.$this->addslashes($this->updatevon).' '.
-				'WHERE lehrveranstaltung_id='.$this->addslashes($this->lehrveranstaltung_id).', '.
-				'AND student_uid='.$this->addslashes($this->student_uid).', '.
+				'WHERE lehrveranstaltung_id='.$this->addslashes($this->lehrveranstaltung_id).' '.
+				'AND student_uid='.$this->addslashes($this->student_uid).' '.
 				'AND studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).';';
 		}
 		

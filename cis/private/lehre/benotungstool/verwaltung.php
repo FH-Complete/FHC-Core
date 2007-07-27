@@ -334,8 +334,8 @@ if(isset($_POST['uebung_neu']))
 			{
 				if($error_msg!='')
 					echo "<span class='error'>$error_msg</span>";
-				else
-					header("Location: verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$uebung_obj->uebung_id");
+				//else
+				//	header("Location: verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$uebung_obj->uebung_id");
 			}
 			else
 				echo "<span class='error'>$uebung_obj->errormsg</span>";
@@ -615,8 +615,8 @@ else
 			//	echo 'Ja';
 			//else
 			//	echo 'Nein';
-			//echo "</td><td align='center'><input type='Checkbox' name='uebung[]' value='$row->uebung_id'></td>";
-			echo "</td><td></td>";
+			echo "</td><td align='center'><input type='Checkbox' name='uebung[]' value='$row->uebung_id'></td>";
+			//echo "</td><td></td>";
 			//Wenn andere Lehreinheiten vorhanden sind dann wird die moeglichkeit zum kopieren von
 			//Uebungen in diese Lehreinheiten angeboten.
 			if(isset($result_alle_lehreinheiten) && pg_num_rows($result_alle_lehreinheiten)>1)

@@ -137,6 +137,7 @@ class uebung
 			return false;
 		}
 	}
+	
 	function load_studentuebung($student_uid, $uebung_id)
 	{
 		$qry = "SELECT * FROM campus.tbl_studentuebung WHERE student_uid='$student_uid' AND uebung_id='$uebung_id'";
@@ -172,7 +173,23 @@ class uebung
 			return false;
 		}
 	}
+	
+	function check_studentuebung($uebung_id)
+	{
+		$qry = "SELECT * FROM campus.tbl_studentuebung WHERE uebung_id='$uebung_id'";
 
+		if($result = pg_query($this->conn, $qry))	
+		{
+			if (pg_num_rows($result) >0)			
+				return true;
+			else
+				return false;
+		}
+		else
+			return false;
+		
+	}
+	
 	function load_uebung($lehreinheit_id, $level=null, $uebung_id=null)
 	{
 		if(!is_numeric($lehreinheit_id))
@@ -452,15 +469,46 @@ class uebung
 			$this->errormsg = 'Uebung_id ist ungueltig';
 			return false;
 		}
+		
+		// subübungen wegräumen
+		$qry = "SELECT * FROM campus.tbl_uebung WHERE liste_id = '".$uebung_id."'";
+		if($result=pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				
+					foreach (glob(BENOTUNGSTOOL_PATH."angabe/*".$row->uebung_id.".*") as $angabe)
+					{
+							if(file_exists($angabe))
+								unlink($angabe);
+					}
+					$qry = "DELETE FROM campus.tbl_studentbeispiel WHERE beispiel_id IN(SELECT beispiel_id FROM campus.tbl_beispiel WHERE uebung_id='$row->uebung_id');
+							DELETE FROM campus.tbl_abgabe WHERE abgabe_id IN(SELECT abgabe_id FROM campus.tbl_studentuebung WHERE uebung_id='$row->uebung_id');
+							DELETE FROM campus.tbl_studentuebung WHERE uebung_id='$row->uebung_id';
+							DELETE FROM campus.tbl_beispiel WHERE uebung_id='$row->uebung_id';
+							DELETE FROM campus.tbl_uebung WHERE uebung_id='$row->uebung_id';
+							DELETE FROM campus.tbl_studentuebung WHERE uebung_id = '$row->uebung_id'";
+			
+					if(!pg_query($qry))
+					{
+						$this->errormsg = 'Fehler beim Loeschen der Daten';
+						return false;
+					}								
+			}
+		}		
+		
+		
 		foreach (glob(BENOTUNGSTOOL_PATH."angabe/*".$uebung_id.".*") as $angabe)
 		{
 				if(file_exists($angabe))
 					unlink($angabe);
 		}
-		$qry = "DELETE FROM campus.tbl_studentuebung WHERE uebung_id='$uebung_id';
-				DELETE FROM campus.tbl_studentbeispiel WHERE beispiel_id IN(SELECT beispiel_id FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id');
+		$qry = "DELETE FROM campus.tbl_studentbeispiel WHERE beispiel_id IN(SELECT beispiel_id FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id');
+				DELETE FROM campus.tbl_abgabe WHERE abgabe_id IN(SELECT abgabe_id FROM campus.tbl_studentuebung WHERE uebung_id='$uebung_id');
+				DELETE FROM campus.tbl_studentuebung WHERE uebung_id='$uebung_id';
 				DELETE FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id';
-				DELETE FROM campus.tbl_uebung WHERE uebung_id='$uebung_id'";
+				DELETE FROM campus.tbl_uebung WHERE uebung_id='$uebung_id';
+				DELETE FROM campus.tbl_studentuebung WHERE uebung_id = '$uebung_id'";
 
 		if(pg_query($qry))
 			return true;
@@ -469,6 +517,9 @@ class uebung
 			$this->errormsg = 'Fehler beim Loeschen der Daten';
 			return false;
 		}
+		
+		
+		
 	}
 }
 ?>
