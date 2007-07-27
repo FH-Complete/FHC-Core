@@ -811,7 +811,7 @@ if(isset($_GET["uebung_id"]) && $_GET["uebung_id"]!='')
 	echo "<table><tr><td valign='top'>";
 	//Bearbeiten der ausgewaehlten Uebung
 	echo "<form action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&liste_id=$liste_id' method=POST enctype='multipart/form-data'>\n";
-	echo "<table><tr><td colspan='2' width='340' class='ContentHeader3'>Ausgew&auml;hlte Kreuzerlliste bearbeiten</td><td>&nbsp;</td></tr>\n";
+	echo "<table><tr><td colspan='2' width='340' class='ContentHeader3'>Ausgew&auml;hlte Aufgabe bearbeiten</td><td>&nbsp;</td></tr>\n";
 	echo "<tr><td>&nbsp;</td><td></td></tr>";
 
 	$uebung_obj = new uebung($conn);
@@ -972,7 +972,10 @@ else
 	//Gesamtuebersicht ueber alle Listen innerhalb der Uebung
 	echo "<table><tr><td valign='top'>";
 	echo "<form action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id' method=POST>";
-	echo "<table width='440'><tr><td colspan='3' class='ContentHeader3'>Vorhandene Aufgaben bearbeiten</td></tr>";
+	echo "<table width='440'>";
+	$studentuebung = new uebung($conn);
+	if (!$studentuebung->check_studentuebung($liste_id))	
+		echo "<tr><td colspan='3' class='ContentHeader3'>Vorhandene Aufgaben bearbeiten</td></tr>";
 
 	$uebung_obj = new uebung($conn);
 	$uebung_obj->load_uebung($lehreinheit_id,$level=2,$uebung_id=$liste_id);
@@ -1092,8 +1095,14 @@ else
 	}
 	else
 	{
-		echo "<tr><td colspan='3'>Derzeit sind keine Aufgaben angelegt</td><td></td></tr>";
-		$anzeigen = 'beide';
+		$studentuebung = new uebung($conn);
+		if (!$studentuebung->check_studentuebung($liste_id))
+		{
+			echo "<tr><td colspan='3'>Derzeit sind keine Aufgaben angelegt</td><td></td></tr>";
+			$anzeigen = 'beide';
+		}
+		else
+			$anzeigen = "nada";
 	}
 
 	echo "</table>
@@ -1121,7 +1130,7 @@ else
 	}
 	echo "</td><td valign='top'>";
 	
-	if ($anzeigen != 'abgabe')
+	if ($anzeigen != 'abgabe' && $anzeigen != 'nada')
 	{
 		echo "
 	<form action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id' method=POST enctype='multipart/form-data'>
@@ -1146,7 +1155,7 @@ else
 	if(!isset($_POST['uebung_neu']))
 		$thema = "Abgabe ".($anzahl<9?'0'.($anzahl+1):($anzahl+1));
 	
-	if ($anzeigen != 'beispiele')
+	if ($anzeigen != 'beispiele' && $anzeigen != 'nada')
 	{
 		echo "
 	<form action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id' method=POST enctype='multipart/form-data'>

@@ -29,7 +29,9 @@ require_once('../../../../include/lehreinheit.class.php');
 require_once('../../../../include/benutzerberechtigung.class.php');
 require_once('../../../../include/uebung.class.php');
 require_once('../../../../include/beispiel.class.php');
+require_once('../../../../include/studentnote.class.php');
 require_once('../../../../include/datum.class.php');
+require_once('../../../../include/legesamtnote.class.php');
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -97,6 +99,7 @@ else
 $datum_obj = new datum();
 
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
+$uid = (isset($_GET['uid'])?$_GET['uid']:'');
 
 //Kopfzeile
 echo '<table class="tabcontent" height="100%">';
@@ -118,7 +121,7 @@ $stsem_content = "Studiensemester: <SELECT name='stsem' onChange=\"MM_jumpMenu('
 foreach($stsem_obj->studiensemester as $studiensemester)
 {
 	$selected = ($stsem == $studiensemester->studiensemester_kurzbz?'selected':'');
-	$stsem_content.= "<OPTION value='statistik.php?lvid=$lvid&stsem=$studiensemester->studiensemester_kurzbz' $selected>$studiensemester->studiensemester_kurzbz</OPTION>\n";
+	$stsem_content.= "<OPTION value='studentenpunkteverwalten.php?lvid=$lvid&stsem=$studiensemester->studiensemester_kurzbz' $selected>$studiensemester->studiensemester_kurzbz</OPTION>\n";
 }
 $stsem_content.= "</SELECT>\n";
 
@@ -167,7 +170,6 @@ if($result = pg_query($conn, $qry))
 					else
 						$lektoren.=' ';
 				}
-
 				$lektoren .=')';
 			}
 			$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
@@ -188,7 +190,7 @@ if($result = pg_query($conn, $qry))
 						$gruppen.=' ';
 				}
 			}
-			echo "<OPTION value='statistik.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$row->lehreinheit_id' $selected>$row->lfbez-$row->lehrform_kurzbz - $gruppen $lektoren</OPTION>\n";
+			echo "<OPTION value='legesamtnoteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$row->lehreinheit_id' $selected>$row->lfbez-$row->lehrform_kurzbz - $gruppen $lektoren</OPTION>\n";
 		}
 		echo '</SELECT> ';
 	}
@@ -216,8 +218,7 @@ if($lehreinheit_id=='')
 include("menue.inc.php");
 /*
 echo "\n<!--Menue-->\n";
-echo "<br>
-<a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Verwaltung</font>&nbsp;&nbsp;&nbsp;&nbsp;
+echo "<br><a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Verwaltung</font>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href='anwesenheitstabelle.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Anwesenheits- und Übersichtstabelle</font></a>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Studentenpunkte verwalten</font></a>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href='statistik.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Statistik</font></a>
@@ -225,120 +226,163 @@ echo "<br>
 <!--Menue Ende-->\n";
 */
 
-echo "<h3>Statistik</h3>";
-
-$uebung_obj = new uebung($conn);
-$uebung_obj->load_uebung($lehreinheit_id);
-if(count($uebung_obj->uebungen)>0)
-{
-	echo "<table width='100%'><tr><td valign='top'>";
-	echo "Wählen Sie bitte eine Kreuzerlliste aus: <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
-	foreach ($uebung_obj->uebungen as $row)
-	{
-		if($uebung_id =='')
-			$uebung_id = $row->uebung_id;
-
-		if($uebung_id == $row->uebung_id)
-			$selected = 'selected';
-		else
-			$selected = '';
-		echo "<OPTION value='statistik.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id' $selected>";
-		//Freigegeben = +
-		//Nicht Freigegeben = -
-		if($datum_obj->mktime_fromtimestamp($row->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($row->freigabebis)>time())
-			echo '+ ';
-		else
-			echo '- ';
-		echo $row->bezeichnung;
-		echo '</OPTION>';
+// legesamtnote für studenten speichern
+if (isset($_REQUEST["submit"]) && ($_POST["student_uid"] != '')){
+	
+	$jetzt = date("Y-m-d H:i:s");	
+	$student_uid = $_POST["student_uid"];	
+	$legesamtnote = new legesamtnote($conn, $lehreinheit_id);
+    if (!$legesamtnote->load($student_uid,$lehreinheit_id))
+    {
+		$legesamtnote->student_uid = $student_uid;
+		$legesamtnote->lehreinheit_id = $lehreinheit_id;
+		$legesamtnote->note = $_POST["note"];
+		$legesamtnote->benotungsdatum = $jetzt;
+		$legesamtnote->updateamum = null;
+		$legesamtnote->updatevon = null;
+		$legesamtnote->insertamum = $jetzt;
+		$legesamtnote->insertvon = $user;
+		$legesamtnote->new = true;
+    }
+    else
+    {
+		$legesamtnote->note = $_POST["note"];
+		$legesamtnote->benotungsdatum = $jetzt;
+		$legesamtnote->updateamum = $jetzt;
+		$legesamtnote->updatevon = $user;
 	}
-	echo '</SELECT>';
-	echo "</td>
-		<td>
-			<table>
-			<tr>
-				<td><b>+</b>...</td>
-				<td>Kreuzerlliste ist <u>freigeschalten</u>.</td>
-			</tr>
-			<tr>
-				<td><b>-</b>...</td>
-				<td>Kreuzerlliste ist <u>nicht freigeschalten</u>.</td>
-			</tr>
-			</table>
-		</td>
-	</tr></table>";
+	if (!$legesamtnote->save())
+		echo "<span class='error'>".$legesamtnote->errormsg."</span>";
 }
-else
-	echo "Derzeit gibt es keine Uebungen";
 
-echo "<br><br><br>";
-if(isset($uebung_id) && $uebung_id!='')
+echo "<h3>LE Gesamtnote verwalten</h3>";
+
+
+//Studentenliste
+echo "
+<table>
+";
+
+$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id' ORDER BY semester, verband, gruppe, gruppe_kurzbz";
+
+if($result_grp = pg_query($conn, $qry))
 {
-	$beispiel_obj = new beispiel($conn);
-	if($beispiel_obj->load_beispiel($uebung_id))
+	while($row_grp = pg_fetch_object($result_grp))
 	{
-		if(count($beispiel_obj->beispiele)>0)
+		echo "<tr>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+			</tr>
+			<tr>
+				<td class='ContentHeader2'>UID</td>
+				<td class='ContentHeader2'>Nachname</td>
+				<td class='ContentHeader2'>Vorname</td>
+				<td class='ContentHeader2'>Gesamtnote</td>
+				<td class='ContentHeader2'>&nbsp;</td>
+				<td class='ContentHeader2'></td>
+				<td class='ContentHeader2'></td>
+				<td class='ContentHeader2'>LE-Gesamtnote</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+			</tr>";
+		if($row_grp->gruppe_kurzbz!='')
 		{
-			echo '<table border="0" cellpadding="0" cellspacing="0" width="600">
-         		 <tr>
-	           		 <td>&nbsp;</td>
-	           		 <td height="19" width="339" valign="bottom">
-		           		 <table border="0" cellpadding="0" cellspacing="0" width="339" background="../../../../skin/images/bg.gif">
-		                	<tr>
-		                  		<td>&nbsp;</td>
-		                	</tr>
-		              	</table>
-		             </td>
-          		</tr>';
-			$i=0;
-			$qry_cnt = "SELECT distinct student_uid FROM campus.tbl_studentbeispiel JOIN campus.tbl_beispiel USING(beispiel_id) WHERE uebung_id='$uebung_id' GROUP BY student_uid";
-				if($result_cnt = pg_query($conn,$qry_cnt))
-						$gesamt=pg_num_rows($result_cnt);
-
-			foreach ($beispiel_obj->beispiele as $row)
+				echo "
+				<tr>
+					<td colspan='8' align='center'><b>$row_grp->gruppe_kurzbz</b></td>
+				</tr>";
+				$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row_grp->gruppe_kurzbz)."' ORDER BY nachname, vorname";
+		}
+		else
+		{
+			echo "
+				<tr>
+					<td colspan='8' align='center'><b>Verband $row_grp->verband ".($row_grp->gruppe!=''?"Gruppe $row_grp->gruppe":'')."</b></td>
+				</tr>";
+				$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student
+				             WHERE studiengang_kz='$row_grp->studiengang_kz' AND
+				             semester='$row_grp->semester' ".
+							 ($row_grp->verband!=''?" AND trim(verband)=trim('$row_grp->verband')":'').
+							 ($row_grp->gruppe!=''?" AND trim(gruppe)=trim('$row_grp->gruppe')":'').
+				            " ORDER BY nachname, vorname";
+		}
+		
+        if($result_stud = pg_query($conn, $qry_stud))
+		{
+			$i=1;
+			while($row_stud = pg_fetch_object($result_stud))
 			{
+    				
+				$studentnote = new studentnote($conn,$lehreinheit_id,$stsem,$row_stud->uid);
+				//echo $studentnote->debug;
+    			$legesamtnote = new legesamtnote($conn, $lehreinheit_id);
+    			
+    			if (!$legesamtnote->load($row_stud->uid,$lehreinheit_id))
+				{    				
+    				$note = null;
+    			}
+    			else
+    			{
+    				$note = $legesamtnote->note;
+				} 
+				
+				if ($studentnote->studentgesamtnote!=0)
+					$note_calc = round($studentnote->studentgesamtnote,2);
+				else
+					$note_calc = null;
+				echo "
+				<tr class='liste".($i%2)."'>
+					<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->uid</a></td>
+					<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->nachname</a></td>
+					<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->vorname</a></td>";					
+				echo "<td>$note_calc</td>";
+				echo "<td align='center'>";
+				if ($studentnote->negativ)
+					echo "<span class='negativ'>neg</span>";
+				echo "</td>";
+				echo "<td align='center'>";
+				if ($studentnote->fehlt)
+					echo "<span class='negativ'>X</span>";
+				else
+					echo "ok";
+				echo "</td>";				
+				if ($note)
+					$note_final = $note;
+				else
+				{						
+					if ($studentnote->negativ)
+						$note_final = 5;
+					else
+					{		
+						$note_final = round($studentnote->studentgesamtnote);
+						if ($note_final == 0)
+							$note_final = null;
+					}
+				}
+				echo "<form name='$row_stud->uid' method='POST' action='legesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_final' name='note'><input type='submit' name='submit' value='->'></td></form>";
+					
+				echo "<td>$note</td>";				
+				echo "</tr>";
 				$i++;
-				$solved = 0;
-				$psolved = 0;
-				$qry_cnt = "SELECT count(*) as anzahl FROM campus.tbl_studentbeispiel WHERE beispiel_id=$row->beispiel_id AND vorbereitet=true";
-				if($result_cnt = pg_query($conn,$qry_cnt))
-					if($row_cnt = pg_fetch_object($result_cnt))
-						$solved = $row_cnt->anzahl;
-
-
-
-				if($solved>0)
-					$psolved = $solved/$gesamt*100;
-
-				echo '<tr>
-	            		<td '.($i%2?'class="MarkLine"':'').' valign="top" height="10" width="200"><font size="2" face="Arial, Helvetica, sans-serif">
-	              			'.$row->bezeichnung.'
-	              		</font></td>
-						<td '.($i%2?'class="MarkLine"':'').'>
-	            			<table width="339" border="0" cellpadding="0" cellspacing="0" background="../../../../skin/images/bg_.gif">
-	                		<tr>
-	                  			<td valign="top">
-	                  				<table class="tabcontent">
-	                      			<tr>
-	                        			<td nowrap><font size="2" face="Arial, Helvetica, sans-serif">
-	                        			<img src="../../../../skin/images/entry.gif" width="'.($psolved*3).'" height="5" alt="" border="1" />
-	                        			<span class="smallb"><b>&nbsp;'.$solved.'</b> ['.number_format($psolved,1,'.','').'%]</span></font>
-	                        			</td>
-									</tr>
-									</table>
-								</td>
-	                		</tr>
-	              			</table>
-						</td>
-	          		</tr>';
 			}
-			echo "</table>";
-			echo "<br><br>Es haben insgesamt <u>$gesamt Studenten</u> eingetragen.";
 		}
 	}
-	else
-		echo "<span class='error'>$beispiel_obj->errormsg</span>";
 }
+echo "</table>";
 
 ?>
 </td></tr>

@@ -212,6 +212,8 @@ if($lehreinheit_id=='')
 	die('Es wurde keine passende Lehreinheit in diesem Studiensemester gefunden');
 
 //Menue
+include("menue.inc.php");
+/*
 echo "\n<!--Menue-->\n";
 echo "<br>
 <a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Verwaltung</font>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -220,7 +222,7 @@ echo "<br>
 <a href='statistik.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Statistik</font></a>
 <br><br>
 <!--Menue Ende-->\n";
-
+*/
 
 echo "<h3>Anwesenheits- und &Uuml;bersichtstabelle</h3>";
 
