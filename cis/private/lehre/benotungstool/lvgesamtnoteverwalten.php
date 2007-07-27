@@ -280,7 +280,7 @@ if($result_grp = pg_query($conn, $qry))
 				<td class='ContentHeader2'>UID</td>
 				<td class='ContentHeader2'>Nachname</td>
 				<td class='ContentHeader2'>Vorname</td>
-				<td class='ContentHeader2'>LE-Gesamtnote</td>
+				<td class='ContentHeader2'>LE-Noten (LE-ID)</td>
 				<td class='ContentHeader2'></td>
 				<td class='ContentHeader2'>LV-Gesamtnote</td>
 			</tr>
@@ -322,6 +322,9 @@ if($result_grp = pg_query($conn, $qry))
     				
 				//$studentnote = new studentnote($conn,$lehreinheit_id,$stsem,$row_stud->uid);
 				
+
+				
+				/*
     			$legesamtnote = new legesamtnote($conn, $lehreinheit_id);
     			
     			if (!$legesamtnote->load($row_stud->uid,$lehreinheit_id))
@@ -341,14 +344,53 @@ if($result_grp = pg_query($conn, $qry))
 					$note_vorschlag = $note_lv;
 				else
 					$note_vorschlag = $note_le;
-					
+				*/
+				
 				echo "
 				<tr class='liste".($i%2)."'>
 					<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->uid</a></td>
 					<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->nachname</a></td>
-					<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->vorname</a></td>
-					<td>$note_le</td>";
+					<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->vorname</a></td>";
+					
 				
+				$note_les_str = '';
+				$le_anz = 0;
+				$note_le = 0;
+				$le = new lehreinheit($conn);
+				$le->load_lehreinheiten($lvid, $stsem);
+				foreach($le->lehreinheiten as $l)				
+				{				
+					$legesamtnote = new legesamtnote($conn, $l->lehreinheit_id);
+	    			
+	    			if (!$legesamtnote->load($row_stud->uid,$l->lehreinheit_id))
+					{    				
+	    				//$note_les_str .= "- (".$l->lehreinheit_id.")";
+	    			}
+	    			else
+	    			{
+	    				$note_le += $legesamtnote->note;
+	    				$le_anz += 1;
+	    				$note_les_str .= $legesamtnote->note." (".$l->lehreinheit_id.") ";
+	    			}
+	    		}
+	    			
+    			if ($lvgesamtnote = new lvgesamtnote($conn, $lvid,$row_stud->uid,$stsem))
+    			{
+    				$note_lv = $lvgesamtnote->note;
+    			}
+    			else
+    				$note_lv = null;
+				
+				if ($note_lv)
+					$note_vorschlag = $note_lv;
+				else if ($le_anz > 0)
+					$note_vorschlag = round($note_le/$le_anz);
+				else
+					$note_vorschlag = null;
+							
+								
+				
+				echo "<td>$note_les_str</td>";
 				echo "<form name='$row_stud->uid' method='POST' action='lvgesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_vorschlag' name='note'><input type='submit' name='submit' value='->'></td></form>";
 					
 				echo "<td>$note_lv</td>";				
