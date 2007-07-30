@@ -23,11 +23,16 @@ function onVerbandSelect()
 	var tree=document.getElementById('tree-verband');
 	if(tree.currentIndex==-1)
 		return;
-	var stg_kz=tree.view.getCellText(tree.currentIndex,"stg_kz");
-	var sem=tree.view.getCellText(tree.currentIndex,"sem");
-	var ver=tree.view.getCellText(tree.currentIndex,"ver");
-	var grp=tree.view.getCellText(tree.currentIndex,"grp");
-	var gruppe=tree.view.getCellText(tree.currentIndex,"gruppe");
+	var col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+	var stg_kz=tree.view.getCellText(tree.currentIndex, col);
+	var col = tree.columns ? tree.columns["sem"] : "sem";
+	var sem=tree.view.getCellText(tree.currentIndex,col);
+	var col = tree.columns ? tree.columns["ver"] : "ver";
+	var ver=tree.view.getCellText(tree.currentIndex,col);
+	var col = tree.columns ? tree.columns["grp"] : "grp";
+	var grp=tree.view.getCellText(tree.currentIndex,col);
+	var col = tree.columns ? tree.columns["gruppe"] : "gruppe";
+	var gruppe=tree.view.getCellText(tree.currentIndex,col);
 	var daten=window.TimeTableWeek.document.getElementById('TimeTableWeekData');
 	var datum=parseInt(daten.getAttribute("datum"));
 	var attributes="&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
@@ -134,7 +139,8 @@ function onOrtSelect()
 {
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
 	var treeOrt=document.getElementById('tree-ort');
-	var ort=treeOrt.view.getCellText(treeOrt.currentIndex,"ort_kurzbz");
+	var col = treeOrt.columns ? treeOrt.columns["ort_kurzbz"] : "ort_kurzbz";
+	var ort=treeOrt.view.getCellText(treeOrt.currentIndex,col);
 	var daten=window.TimeTableWeek.document.getElementById('TimeTableWeekData');
 	var datum=parseInt(daten.getAttribute("datum"));
 
@@ -150,7 +156,8 @@ function onLektorSelect()
 
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
 	var treeLektor=document.getElementById('tree-lektor');
-	var uid=treeLektor.view.getCellText(treeLektor.currentIndex,"uid");
+	var col = treeLektor.columns ? treeLektor.columns["uid"] : "uid";
+	var uid=treeLektor.view.getCellText(treeLektor.currentIndex,col);
 	if(uid=='')
 		return;
 	//var treeVerband=document.getElementById('tree-verband');
