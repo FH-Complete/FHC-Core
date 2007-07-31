@@ -70,8 +70,8 @@ geboren am <xsl:value-of select="gebdatum" /> in <xsl:value-of select="gebort"  
 		<fo:block text-align="center" line-height="14pt" font-family="sans-serif" font-size="12pt">	
 							   gemäß § 5 Abs. 1 des Bundesgesetzes
 							   \nüber Fachhochschul-Studiengänge (Fachhochschul-Studiengesetz - FHStG),
-							   \nBGBl.Nr. 340/1993, idgF,
- 							   \nden mit Bescheid des Fachhochschulrates vom 31.08.2006,
+							   \nBGBl.Nr. <xsl:value-of select="bescheidbgbl1" />, idgF,
+ 							   \nden mit Bescheid des Fachhochschulrates vom <xsl:value-of select="titelbescheidvom" />,
 							   \ngemäß § 5 Abs. 2 FHStG festgesetzten
 
                          </fo:block>
@@ -89,7 +89,7 @@ geboren am <xsl:value-of select="gebdatum" /> in <xsl:value-of select="gebort"  
 
 <fo:block-container position="absolute" top="185mm" left="25mm" height="10mm">
 						<fo:block text-align="center" line-height="14pt" font-family="sans-serif" font-size="14pt">
-	Bachelor of Science in Engineering
+	<xsl:value-of select="titel" />
 						
 		</fo:block>
 </fo:block-container>
@@ -106,7 +106,7 @@ geboren am <xsl:value-of select="gebdatum" /> in <xsl:value-of select="gebort"  
 
 <fo:block-container position="absolute" top="205mm" left="25mm" height="10mm">
 						<fo:block text-align="center" line-height="14pt" font-family="sans-serif" font-size="14pt">
-	BSc
+	<xsl:value-of select="akadgrad_kurzbz" />
 						
 	</fo:block>
 </fo:block-container> 
@@ -129,7 +129,7 @@ geboren am <xsl:value-of select="gebdatum" /> in <xsl:value-of select="gebort"  
 
 <fo:block-container position="absolute" top="250mm" left="25mm" height="10mm">
 	<fo:block text-align="center" line-height="14pt" font-family="sans-serif" font-size="12pt">	
-							   FH-Prof. Dipl.-Ing. Dr. Fritz Schmöllebeck
+							   <xsl:value-of select="rektor" />
 							
        </fo:block>
 </fo:block-container>

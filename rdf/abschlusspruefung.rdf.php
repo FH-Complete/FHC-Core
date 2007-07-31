@@ -78,14 +78,20 @@ $pruefung = new abschlusspruefung($conn, null, true);
 		$akadgrad = new akadgrad($conn, $row->akadgrad_id, false);
 		
 		if($mitarbeiter->load($row->vorsitz))
-			$vorsitz = $mitarbeiter->nachname;
+			$vorsitz = $mitarbeiter->titelpre.' '.$mitarbeiter->nachname.' '.$mitarbeiter->titelpost;
 		if($person->load($row->pruefer1))
 			$pruefer1 = $person->nachname;
 		if($person->load($row->pruefer2))
 			$pruefer2 = $person->nachname;
 		if($person->load($row->pruefer3))
 			$pruefer3 = $person->nachname;
-
+			
+		$qry = "SELECT * FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='rek'";
+		$rektor = '';
+		if($result_rek = pg_query($conn, $qry))
+			if($row_rek = pg_fetch_object($result_rek))
+				$rektor = $row_rek->titelpre.' '.$row_rek->vorname.' '.$row_rek->nachname.' '.$row_rek->titelpost;
+		
 		echo "\t<pruefung>".'
 		<abschlusspruefung_id><![CDATA['.$row->abschlusspruefung_id.']]></abschlusspruefung_id>
 		<student_uid><![CDATA['.$row->student_uid.']]></student_uid>
@@ -108,8 +114,9 @@ $pruefung = new abschlusspruefung($conn, null, true);
 		<vorname><![CDATA['.$student->vorname.']]></vorname>
 		<vornamen><![CDATA['.$student->vornamen.']]></vornamen>
 		<nachname><![CDATA['.$student->nachname.']]></nachname>
+		<matrikelnr><![CDATA['.$student->matrikelnr.']]></matrikelnr>
 		<gebdatum_iso><![CDATA['.$student->gebdatum.']]></gebdatum_iso>
-		<gebdatum><![CDATA['.$student->gebdatum.']]></gebdatum>
+		<gebdatum><![CDATA['.$datum_obj->convertISODate($student->gebdatum).']]></gebdatum>
 		<gebort><![CDATA['.$student->gebort.']]></gebort>
 		<staatsbuergerschaft><![CDATA['.$staatsbuergerschaft.']]></staatsbuergerschaft>
 		<staatsbuergerschaft_engl><![CDATA['.$staatsbuergerschaft_engl.']]></staatsbuergerschaft_engl>
@@ -120,7 +127,11 @@ $pruefung = new abschlusspruefung($conn, null, true);
 		<akadgrad_kurzbz><![CDATA['.$akadgrad->akadgrad_kurzbz.']]></akadgrad_kurzbz>
 		<titel><![CDATA['.$akadgrad->titel.']]></titel>
 		<datum_aktuell><![CDATA['.date('d.m.Y').']]></datum_aktuell>
-		<anmerkung><![CDATA['.$row->anmerkung.']]></anmerkung>';
+		<anmerkung><![CDATA['.$row->anmerkung.']]></anmerkung>
+		<bescheidbgbl1><![CDATA['.$studiengang->bescheidbgbl1.']]></bescheidbgbl1>
+		<titelbescheidvom><![CDATA['.$datum_obj->convertISODate($studiengang->titelbescheidvom).']]></titelbescheidvom>
+		<rektor><![CDATA['.$rektor.']]></rektor>';
+		
 	 	echo "\n\t</pruefung>";
 	}
 
