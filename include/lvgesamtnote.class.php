@@ -200,8 +200,7 @@ class lvgesamtnote
 			     $this->addslashes($this->student_uid).', '.
 			     $this->addslashes($this->studiensemester_kurzbz).', '.
 			     $this->addslashes($this->mitarbeiter_uid).', '.
-			     $this->addslashes($this->note).', '.
-			     $this->addslashes($this->freigabedatum).', '.
+			     $this->addslashes($this->note).', now(), '.
 			     $this->addslashes($this->benotungsdatum).', '.
 			     $this->addslashes($this->bemerkung).', '.
 			     $this->addslashes($this->updateamum).', '.
@@ -213,7 +212,7 @@ class lvgesamtnote
 		{			
 			$qry='UPDATE campus.tbl_lvgesamtnote SET '.
 				'note='.$this->addslashes($this->note).', '. 
-				'freigabedatum='.$this->addslashes($this->freigabedatum).', '. 
+				'freigabedatum=now(), '. 
 				'benotungsdatum='.$this->addslashes($this->benotungsdatum).', '.
 				'bemerkung='.$this->addslashes($this->bemerkung).', '.
 				'mitarbeiter_uid='.$this->addslashes($this->mitarbeiter_uid).', '.

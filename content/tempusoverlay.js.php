@@ -23,16 +23,18 @@ function onVerbandSelect()
 	var tree=document.getElementById('tree-verband');
 	if(tree.currentIndex==-1)
 		return;
-	var col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
-	var stg_kz=tree.view.getCellText(tree.currentIndex, col);
-	var col = tree.columns ? tree.columns["sem"] : "sem";
+
+	var col=tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+	var stg_kz=tree.view.getCellText(tree.currentIndex,col);
+	col=tree.columns ? tree.columns["sem"] : "sem";
 	var sem=tree.view.getCellText(tree.currentIndex,col);
-	var col = tree.columns ? tree.columns["ver"] : "ver";
+	col=tree.columns ? tree.columns["ver"] : "ver";
 	var ver=tree.view.getCellText(tree.currentIndex,col);
-	var col = tree.columns ? tree.columns["grp"] : "grp";
+	col=tree.columns ? tree.columns["grp"] : "grp";
 	var grp=tree.view.getCellText(tree.currentIndex,col);
-	var col = tree.columns ? tree.columns["gruppe"] : "gruppe";
+	col=tree.columns ? tree.columns["gruppe"] : "gruppe";
 	var gruppe=tree.view.getCellText(tree.currentIndex,col);
+
 	var daten=window.TimeTableWeek.document.getElementById('TimeTableWeekData');
 	var datum=parseInt(daten.getAttribute("datum"));
 	var attributes="&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
@@ -81,7 +83,7 @@ function onVerbandSelect()
 	//var treeStudenten=document.getElementById('treeStudenten');
 	//attribute="<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
 	//treeStudenten.setAttribute('datasources',attribute);
-	
+
 	// Studenten
 	try
 	{
@@ -137,9 +139,10 @@ function onVerbandSelect()
 
 function onOrtSelect()
 {
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
 	var treeOrt=document.getElementById('tree-ort');
-	var col = treeOrt.columns ? treeOrt.columns["ort_kurzbz"] : "ort_kurzbz";
+	var col=treeOrt.columns ? treeOrt.columns["ort_kurzbz"] : "ort_kurzbz";
 	var ort=treeOrt.view.getCellText(treeOrt.currentIndex,col);
 	var daten=window.TimeTableWeek.document.getElementById('TimeTableWeekData');
 	var datum=parseInt(daten.getAttribute("datum"));
@@ -153,10 +156,10 @@ function onOrtSelect()
 
 function onLektorSelect()
 {
-
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
 	var treeLektor=document.getElementById('tree-lektor');
-	var col = treeLektor.columns ? treeLektor.columns["uid"] : "uid";
+	var col=treeLektor.columns ? treeLektor.columns["uid"] : "uid";
 	var uid=treeLektor.view.getCellText(treeLektor.currentIndex,col);
 	if(uid=='')
 		return;
@@ -173,6 +176,36 @@ function onLektorSelect()
 	// LVAs
 	var vboxLehrveranstalungPlanung=document.getElementById('vboxLehrveranstalungPlanung');
 	vboxLehrveranstalungPlanung.setAttribute('datasources','../rdf/lehreinheit-lvplan.rdf.php?'+"type=lektor&lektor="+uid);
+
+	// Lehrveranstaltung
+	try
+	{
+		//var stg_idx = treeLektor.view.getParentIndex(tree.currentIndex);
+		//var col = tree.columns ? tree.columns["studiengang_kz"] : "studiengang_kz";
+		//var stg_kz=tree.view.getCellText(stg_idx,col);
+
+		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?stg_kz=0&uid='+uid+'&'+gettimestamp();
+		var treeLV=document.getElementById('lehrveranstaltung-tree');
+
+		//Alte DS entfernen
+		var oldDatasources = treeLV.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			treeLV.database.RemoveDataSource(oldDatasources.getNext());
+		}
+
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		LvTreeDatasource = rdfService.GetDataSource(url);
+		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		treeLV.database.AddDataSource(LvTreeDatasource);
+		LvTreeDatasource.addXMLSinkObserver(LvTreeSinkObserver);
+		treeLV.builder.addListener(LvTreeListener);
+	}
+	catch(e)
+	{
+		debug(e);
+	}
 }
 
 function loadURL(event)

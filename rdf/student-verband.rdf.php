@@ -53,7 +53,7 @@ for ($i=0;$i<$num_rows_stg;$i++)
 	$sql_query="SELECT DISTINCT semester FROM tbl_student WHERE studiengang_kz=$row_stg->studiengang_kz ORDER BY semester";
 	if(!($result_sem=pg_query($conn, $sql_query)))
 		die(pg_errormessage($conn));
-	$num_rows_sem=pg_numrows($result_sem);
+	$num_rows_sem=pg_numrows($result_sem);
 	for  ($j=0; $j<$num_rows_sem; $j++)
 	{
 		$row_sem=pg_fetch_object($result_sem, $j);
