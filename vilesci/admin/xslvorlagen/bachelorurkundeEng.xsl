@@ -22,13 +22,13 @@
 
 <fo:block-container position="absolute" top="42mm" left="25mm" height="20mm">
 	<fo:block text-align="center" line-height="20pt" font-family="sans-serif" font-size="18pt">
-		<xsl:text>DIPLOMURKUNDE</xsl:text>
+		<xsl:text>DIPLOMA</xsl:text>
 	</fo:block>
 </fo:block-container> 
 
 <fo:block-container position="absolute" top="56mm" left="25mm" height="20mm">
 	<fo:block text-align="center" line-height="20pt" font-family="sans-serif" font-size="12pt">
-	<xsl:text>Das Fachhochschulkollegium verleiht</xsl:text>
+	<xsl:text>The Fachhochschulkollegium awards</xsl:text>
 	</fo:block>
 </fo:block-container> 
 
@@ -41,10 +41,10 @@
 
 <fo:block-container position="absolute" top="80mm" left="25mm" height="10mm">
 <fo:block text-align="center" line-height="14pt" font-family="sans-serif" font-size="12pt">
-geboren am <xsl:value-of select="gebdatum" /> in <xsl:value-of select="gebort"  />,<xsl:text> </xsl:text><xsl:value-of select="geburtsnation"  />,
-\nStaatsbürgerschaft <xsl:value-of select="staatsbuergerschaft" />,
-\ndie/der den Fachhochschul-Diplomstudiengang,
-\nStudiengangskennzahl <xsl:value-of select="studiengang_kz" />, 
+born <xsl:value-of select="gebdatum" /> in <xsl:value-of select="gebort"  />,<xsl:text> </xsl:text><xsl:value-of select="geburtsnation"  />,
+\ncitizen of <xsl:value-of select="staatsbuergerschaft" />,
+\nstudent of the FH bachelor degree programme
+\nprogramme classification number <xsl:value-of select="studiengang_kz" />, 
 							   
                 </fo:block>
 </fo:block-container> 
@@ -58,9 +58,8 @@ geboren am <xsl:value-of select="gebdatum" /> in <xsl:value-of select="gebort"  
 
 <fo:block-container position="absolute" top="120mm" left="25mm" height="10mm">
 	<fo:block text-align="center" line-height="14pt" font-family="sans-serif" font-size="12pt">	
-							   an der "Fachhochschule Technikum Wien"
-							   \ndurch Ablegung der Diplomprüfung am <xsl:value-of select="datum" />
-							   \nordnungsgemäß abgeschlossen hat,
+							   who successfully passed the bachelor examination on <xsl:value-of select="datum" />
+							   \nat the "Fachhochschule Technikum Wien"
               </fo:block>
 </fo:block-container> 
 
@@ -68,19 +67,18 @@ geboren am <xsl:value-of select="gebdatum" /> in <xsl:value-of select="gebort"  
 
 <fo:block-container position="absolute" top="145mm" left="25mm" height="10mm">
 		<fo:block text-align="center" line-height="14pt" font-family="sans-serif" font-size="12pt">	
-							   gemäß § 5 Abs. 1 des Bundesgesetzes
-							   \nüber Fachhochschul-Studiengänge (Fachhochschul-Studiengesetz - FHStG),
-							   \nBGBl.Nr. <xsl:value-of select="bescheidbgbl1" />, idgF,
- 							   \nden mit Bescheid des Fachhochschulrates vom <xsl:value-of select="titelbescheidvom" />,
-							   \ngemäß § 5 Abs. 2 FHStG festgesetzten
-
-                         </fo:block>
+							   pursuant to the paragraph 5 subsection 1 of the Fachhochschule Studiens Act
+							   \n(Austrian legal reference: Fachhochschul-Studiengesetz - FHStG, 
+							   \nBGBl.Nr. <xsl:value-of select="bescheidbgbl1" />, idgF)
+		</fo:block>
 </fo:block-container>
 
 
 <fo:block-container position="absolute" top="175mm" left="25mm" height="10mm">
 <fo:block text-align="center" line-height="14pt" font-family="sans-serif" font-size="12pt">	
-							   akademischen Grad
+							   and in accordance with the notice of 
+							   \nthe Fachhochschulrat on <xsl:value-of select="titelbescheidvom" />,
+							   \nthe academic degree
 							
          </fo:block>
 </fo:block-container>
@@ -99,7 +97,7 @@ geboren am <xsl:value-of select="gebdatum" /> in <xsl:value-of select="gebort"  
 
 <fo:block-container position="absolute" top="195mm" left="25mm" height="10mm">
 <fo:block text-align="center" line-height="14pt" font-family="sans-serif" font-size="12pt">	
-							   abgekürzt
+							   abbreviation
 							
        </fo:block>
 </fo:block-container>
@@ -113,15 +111,15 @@ geboren am <xsl:value-of select="gebdatum" /> in <xsl:value-of select="gebort"  
 
 <fo:block-container position="absolute" top="215mm" left="25mm" height="10mm">
 	<fo:block text-align="center" line-height="14pt" font-family="sans-serif" font-size="12pt">
-						     Wien,<xsl:text> </xsl:text><xsl:value-of select="datum_aktuell" />				
+						     Vienna,<xsl:text> </xsl:text><xsl:value-of select="datum_aktuell" />				
 		</fo:block>
 </fo:block-container> 
 
 
 	<fo:block-container position="absolute" top="225mm" left="25mm" height="10mm">
 						<fo:block text-align="center" line-height="14pt" font-family="sans-serif" font-size="12pt">	
-							   Für das Fachhochschulkollegium:
-							   \nDer Rektor
+							   On behalf of the Fachhochschulkollegium:
+							   \nThe Rector
 							
           </fo:block>
 </fo:block-container>
