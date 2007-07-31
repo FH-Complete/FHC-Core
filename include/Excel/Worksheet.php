@@ -1228,9 +1228,12 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
     */
     function _XF(&$format)
     {
-        if ($format != 0) {
+        if ($format != 0) 
+        {
             return($format->getXfIndex());
-        } else {
+        } 
+        else 
+        {
             return(0x0F);
         }
     }

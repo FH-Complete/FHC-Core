@@ -73,7 +73,7 @@ else
 	$stg_kz=null;
 if (isset($_GET['sem']))
 	$sem=$_GET['sem'];
-else
+else
 	$sem=null;
 if (isset($_GET['ver']))
 	$ver=$_GET['ver'];

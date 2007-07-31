@@ -5,10 +5,6 @@ include('../vilesci/config.inc.php');
 include('../include/functions.inc.php');
 include('../include/fas/benutzer.class.php');
 
-// Testumgebung
-//if (!isset($REMOTE_USER))
-//	$REMOTE_USER='pam';
-//$uid=$REMOTE_USER;
 $user = get_uid();
 
 $error_msg='';
@@ -60,7 +56,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasold/fasoldoverlay.xul.php"?>';
      observes  =  "menu-file-close:command"
      modifiers =  "accel" />
 </keyset>
-
+
 <toolbox id="main-toolbox">
   <menubar id="menu">
     <menu id="menu-file" label="Datei" accesskey="D">

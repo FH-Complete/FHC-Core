@@ -5,17 +5,13 @@ include('../vilesci/config.inc.php');
 include('../include/functions.inc.php');
 include('../include/fas/benutzer.class.php');
 
-// Testumgebung
-if (!isset($REMOTE_USER))
-	$REMOTE_USER='pam';
-
-$uid=$REMOTE_USER;
+$uid=get_uid();
 $error_msg='';
 
 //Variablen laden
 if (!$conn = @pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-$error_msg.=loadVariables($conn,$REMOTE_USER);
+$error_msg.=loadVariables($conn,$uid);
 
 $benutzer = new benutzer($conn);
 if(!$benutzer->loadVariables($uid))
