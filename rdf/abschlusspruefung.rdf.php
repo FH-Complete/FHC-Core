@@ -32,9 +32,12 @@ require_once('../vilesci/config.inc.php');
 require_once('../include/abschlusspruefung.class.php');
 require_once('../include/person.class.php');
 require_once('../include/benutzer.class.php');
+require_once('../include/student.class.php');
 require_once('../include/mitarbeiter.class.php');
 require_once('../include/nation.class.php');
 require_once('../include/datum.class.php');
+require_once('../include/studiengang.class.php');
+require_once('../include/akadgrad.class.php');
 
 $xmlformat='rdf';
 if(isset($_GET['xmlformat']))
@@ -62,7 +65,7 @@ $pruefung = new abschlusspruefung($conn, null, true);
 		//Nachnamen der Pruefer holden
 		$person = new person($conn,null,false);
 		$mitarbeiter = new mitarbeiter($conn,null,false);
-		$student= new benutzer($conn,$row->student_uid,false);
+		$student= new student($conn,$row->student_uid,false);
 
 		$nation=new nation($conn,$student->geburtsnation,false);
 		$geburtsnation=$nation->kurztext;
@@ -71,6 +74,9 @@ $pruefung = new abschlusspruefung($conn, null, true);
 		$staatsbuergerschaft=$nation->kurztext;
 		$staatsbuergerschaft_engl=$nation->engltext;
 
+		$studiengang = new studiengang($conn, $student->studiengang_kz, false);
+		$akadgrad = new akadgrad($conn, $row->akadgrad_id, false);
+		
 		if($mitarbeiter->load($row->vorsitz))
 			$vorsitz = $mitarbeiter->nachname;
 		if($person->load($row->pruefer1))
@@ -109,11 +115,11 @@ $pruefung = new abschlusspruefung($conn, null, true);
 		<staatsbuergerschaft_engl><![CDATA['.$staatsbuergerschaft_engl.']]></staatsbuergerschaft_engl>
 		<geburtsnation><![CDATA['.$geburtsnation.']]></geburtsnation>
 		<geburtsnation_engl><![CDATA['.$geburtsnation_engl.']]></geburtsnation_engl>
-		<studiengang_kz><![CDATA['.$student.']]></studiengang_kz>
-		<stg_bezeichnung><![CDATA['.$student.']]></stg_bezeichnung>
-		<akadgrad_kurzbz><![CDATA['.$student.']]></akadgrad_kurzbz>
-		<titel><![CDATA['.$student.']]></titel>
-		<datum_aktuell><![CDATA['.$student.']]></datum_aktuell>
+		<studiengang_kz><![CDATA['.$student->studiengang_kz.']]></studiengang_kz>
+		<stg_bezeichnung><![CDATA['.$studiengang->bezeichnung.']]></stg_bezeichnung>
+		<akadgrad_kurzbz><![CDATA['.$akadgrad->akadgrad_kurzbz.']]></akadgrad_kurzbz>
+		<titel><![CDATA['.$akadgrad->titel.']]></titel>
+		<datum_aktuell><![CDATA['.date('d.m.Y').']]></datum_aktuell>
 		<anmerkung><![CDATA['.$row->anmerkung.']]></anmerkung>';
 	 	echo "\n\t</pruefung>";
 	}
