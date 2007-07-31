@@ -36,6 +36,7 @@ require_once('../include/log.class.php');
 require_once('../include/adresse.class.php');
 require_once('../include/kontakt.class.php');
 require_once('../include/bankverbindung.class.php');
+require_once('../include/variable.class.php');
 
 $user = get_uid();
 //header("Content-type: application/xhtml+xml");
@@ -257,6 +258,35 @@ if(!$error)
 		{
 			$return = false;
 			$errormsg = $bankverbindung->errormsg;
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='variablechange') /**********************SONSTIGES*****************/
+	{
+		// Aendert die Variable Studiensemester		
+		if(isset($_POST['stsem']))
+		{
+			$variable = new variable($conn, null, null, true);
+			
+			$variable->uid = $user;
+			$variable->name = 'semester_aktuell';
+			$variable->wert = $_POST['stsem'];
+			$variable->new = false;
+			
+			if($variable->save())
+			{
+				$return = true;
+				$data = $variable->wert;
+			}
+			else
+			{
+				$return = false;
+				$errormsg = $variable->errormsg;
+			}
+		}
+		else
+		{
+			$return = false;
+			$errormsg = 'Falsche Paramenteruebergabe';
 		}
 	}
 	else

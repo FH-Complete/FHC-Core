@@ -88,52 +88,28 @@ function studiensemesterChange()
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
 	// Request absetzen
-	var httpRequest = new XMLHttpRequest();
-	var url = "<?php echo APP_ROOT; ?>rdf/fas/db_dml.rdf.php";
+	
+	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
 
-	httpRequest.open("POST", url, false, '','');
-	httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	var req = new phpRequest(url,'','');
 
-	var param = "type=variablechange";
-	param = param + "&stsem="+stsem;
+	req.add('type', 'variablechange');
+	req.add('stsem', stsem);
+	
+	var response = req.executePOST();
 
-	//Parameter schicken
-	httpRequest.send(param);
+	var val =  new ParseReturnValue(response)
 
-	// Bei status 4 ist sendung Ok
-	switch(httpRequest.readyState)
+	if (!val.dbdml_return)
 	{
-		case 1,2,3: alert('Bad Ready State: '+httpRequest.status);
-			        return false;
-		            break;
-
-		case 4:		if(httpRequest.status !=200)
-			        {
-				        alert('The server respond with a bad status code: '+httpRequest.status);
-				        return false;
-			        }
-			        else
-			        {
-				        var response = httpRequest.responseText;
-			        }
-		            break;
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
 	}
-
-	// Returnwerte aus RDF abfragen
-	var dsource=parseRDFString(response, 'http://www.technikum-wien.at/dbdml');
-
-	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
-                   getService(Components.interfaces.nsIRDFService);
-	var subject = rdfService.GetResource("http://www.technikum-wien.at/dbdml/0");
-
-   	var predicateNS = "http://www.technikum-wien.at/dbdml/rdf";
-
-   	var dbdml_return = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#return" ));
-   	var dbdml_errormsg = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#errormsg" ));
-
-   	if(dbdml_return=='true')
-   	{
-   		//Statusbar setzen
+	else
+	{
+		//Statusbar setzen
    		document.getElementById("statusbarpanel-text").label = "Studiensemester erfolgreich geaendert";
    		document.getElementById("statusbarpanel-semester").label = stsem;
    		//MitarbeiterDetailStudiensemester_id = dbdml_errormsg;
@@ -141,18 +117,14 @@ function studiensemesterChange()
    		try
    		{
    			StudentTreeRefresh();
-   			InteressentTreeRefresh();
    			LvTreeRefresh();
    		}
    		catch(e)
    		{
    			debug('catch: '+e);
    		}
-   	}
-   	else
-   	{
-		alert("Fehler beim Speichern der Daten: "+dbdml_errormsg);
-   	}
+	}
+   
 	return true;
 }
 
