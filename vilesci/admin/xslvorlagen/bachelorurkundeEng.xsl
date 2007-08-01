@@ -74,7 +74,7 @@ born <xsl:value-of select="gebdatum" /> in <xsl:value-of select="gebort"  />,<xs
 </fo:block-container>
 
 
-<fo:block-container position="absolute" top="175mm" left="25mm" height="10mm">
+<fo:block-container position="absolute" top="160mm" left="25mm" height="10mm">
 <fo:block text-align="center" line-height="14pt" font-family="sans-serif" font-size="12pt">	
 							   and in accordance with the notice of 
 							   \nthe Fachhochschulrat on <xsl:value-of select="titelbescheidvom" />,

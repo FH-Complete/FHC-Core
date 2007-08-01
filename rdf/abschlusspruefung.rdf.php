@@ -91,6 +91,18 @@ $pruefung = new abschlusspruefung($conn, null, true);
 		if($result_rek = pg_query($conn, $qry))
 			if($row_rek = pg_fetch_object($result_rek))
 				$rektor = $row_rek->titelpre.' '.$row_rek->vorname.' '.$row_rek->nachname.' '.$row_rek->titelpost;
+		$qry = "SELECT themenbereich, ende FROM lehre.tbl_projektarbeit WHERE student_uid='$student->uid' AND (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom') ORDER BY beginn LIMIT 1";
+		$themenbereich='';
+		$datum_projekt='';
+		
+		if($result_proj = pg_query($conn, $qry))
+		{
+			if($row_proj = pg_fetch_object($result_proj))
+			{
+				$themenbereich = $row_proj->themenbereich;
+				$datum_projekt = $datum_obj->convertISODate($row_proj->ende);
+			}
+		}
 		
 		echo "\t<pruefung>".'
 		<abschlusspruefung_id><![CDATA['.$row->abschlusspruefung_id.']]></abschlusspruefung_id>
@@ -130,7 +142,9 @@ $pruefung = new abschlusspruefung($conn, null, true);
 		<anmerkung><![CDATA['.$row->anmerkung.']]></anmerkung>
 		<bescheidbgbl1><![CDATA['.$studiengang->bescheidbgbl1.']]></bescheidbgbl1>
 		<titelbescheidvom><![CDATA['.$datum_obj->convertISODate($studiengang->titelbescheidvom).']]></titelbescheidvom>
-		<rektor><![CDATA['.$rektor.']]></rektor>';
+		<rektor><![CDATA['.$rektor.']]></rektor>
+		<themenbereich><![CDATA['.$themenbereich.']]></themenbereich>
+		<datum_projekt><![CDATA['.$datum_projekt.']]></datum_projekt>';
 		
 	 	echo "\n\t</pruefung>";
 	}

@@ -67,6 +67,26 @@ else
 		  	  <td class='tdwrap'>&nbsp;</td>
 		  	  <td class='tdwrap'>&nbsp;</td>
 		  	</tr>
+		  	<tr>
+		  	  <td width="260" class='tdwrap'>Mag. Dietmar Nestlang (Leitung)</td>
+		  	  <td width="50" class='tdwrap'>215</td>
+		  	  <td class='tdwrap'><?php echo ($visible?'<a class="Item" href="mailto:nestlang@technikum-wien.at">nestlang@technikum-wien.at</a>':'')?></td>
+		  	  <td class='tdwrap'>&nbsp;</td>
+		  	  <td class='tdwrap'>Termin nach Vereinbarung </td>
+		  	</tr>
+		  	<tr>
+		  	  <td colspan="2" class='tdwrap'>&nbsp;</td>
+		  	  <td class='tdwrap'>&nbsp;</td>
+		  	  <td class='tdwrap'>&nbsp;</td>
+		  	  <td class='tdwrap'>&nbsp;</td>
+		  	</tr>
+		  	<tr>
+		      <td width="260" class='tdwrap'><strong>Helpdesk</strong></td>
+			  <td width="50" class='tdwrap'>&nbsp;</td>
+			  <td  class='tdwrap'>&nbsp;</td>
+			  <td width="56" class='tdwrap'>&nbsp;</td>
+			  <td class='tdwrap'>&nbsp;</td>
+			</tr>
 			<tr>
 			  <td width="260" class='tdwrap'>Ing. Esberger Franz (Teamleiter)</td>
 			  <td width="50" class='tdwrap'>243</td>
@@ -116,16 +136,16 @@ else
 			  <td class='tdwrap'>&nbsp;</td>
 			</tr>
 			<tr>
-			  <td width="260" class='tdwrap'>Kata Papp </td>
-			  <td width="50" class='tdwrap'>247</td>
-			  <td  class='tdwrap'><?php echo ($visible?'<a class="Item" href="mailto:kata.papp@technikum-wien.at">kata.papp@technikum-wien.at</a>':'')?></td>
+			  <td width="260" class='tdwrap'>Mag. Gerald Raab (Teamleiter)</td>
+			  <td width="50" class='tdwrap'>342</td>
+			  <td  class='tdwrap'><?php echo ($visible?'<a class="Item" href="mailto:gerald.rool@technikum-wien.at">gerald.rool@technikum-wien.at</a>':'')?></td>
 			  <td width="56" class='tdwrap'>&nbsp;</td>
 			  <td class='tdwrap'>Termin nach Vereinbarung</td>
 			</tr>
 			<tr>
-			  <td width="260" class='tdwrap'>Gerald Rool (Teamleiter)</td>
-			  <td width="50" class='tdwrap'>&nbsp;</td>
-			  <td  class='tdwrap'><?php echo ($visible?'<a class="Item" href="mailto:gerald.rool@technikum-wien.at">gerald.rool@technikum-wien.at</a>':'')?></td>
+			  <td width="260" class='tdwrap'>Kata Papp </td>
+			  <td width="50" class='tdwrap'>247</td>
+			  <td  class='tdwrap'><?php echo ($visible?'<a class="Item" href="mailto:kata.papp@technikum-wien.at">kata.papp@technikum-wien.at</a>':'')?></td>
 			  <td width="56" class='tdwrap'>&nbsp;</td>
 			  <td class='tdwrap'>Termin nach Vereinbarung</td>
 			</tr>
