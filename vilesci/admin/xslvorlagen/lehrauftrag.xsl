@@ -20,7 +20,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 			<fo:flow flow-name="xsl-region-body" >
 				<!-- Logo -->
 				<fo:block>
-					<fo:external-graphic src="../skin/images/TWLogo_klein.jpg"  posx="140" posy="15" />
+					<fo:external-graphic src="../skin/images/logo.jpg"  posx="140" posy="15" width="60mm" height="20mm" />
 				</fo:block>
 				<!-- Titel -->
 				<fo:block font-size="15pt">Fachhochschule Technikum Wien Lehrauftrag</fo:block>
