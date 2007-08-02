@@ -1521,6 +1521,44 @@ function StudentPrintInskriptionsbestaetigung()
 		alert('Bitte einen Studenten auswaehlen');
 }
 
+// ****
+// * Excel Export der Studentendaten
+// ****
+function StudentExport()
+{
+	var tree=document.getElementById('tree-verband');
+
+	//Wenn nichts markiert wurde -> beenden
+	if(tree.currentIndex==-1)
+		return;
+
+	var col;
+	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+	var stg_kz=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["sem"] : "sem";
+	var sem=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["ver"] : "ver";
+	var ver=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["grp"] : "grp";
+	var grp=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["gruppe"] : "gruppe";
+	var gruppe=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["typ"] : "typ";
+	var typ=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["stsem"] : "stsem";
+	var stsem=tree.view.getCellText(tree.currentIndex,col);
+	if(typ=='')
+		typ='student';
+	
+	if(typ=='student')
+		stsem = getStudiensemester();
+	url = "<?php echo APP_ROOT; ?>content/statistik/studentenexport.xls.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ="+typ+"&"+gettimestamp();
+	
+	//alert(url);
+	window.open(url,"","chrome,status=no, modal, width=400, height=250, centerscreen, resizable");
+	//window.location.href=url;	
+}
+
 // **************** KONTO ******************
 
 // ****
@@ -3292,6 +3330,8 @@ function StudentSuche()
 		//Bei der Suche wird die Markierung vom Verband Tree entfernt da
 		//es sonst zu Problemen kommen kann
 		document.getElementById('tree-verband').view.selection.clearSelection();
+		//Export deaktivieren
+		document.getElementById('student-toolbar-export').disabled=true;
 
 		//Datasource setzten und Felder deaktivieren
 		url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?filter="+encodeURIComponent(filter)+"&"+gettimestamp();

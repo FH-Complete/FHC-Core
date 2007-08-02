@@ -75,7 +75,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 							<toolbarbutton id="interessent-toolbar-aufgenommener" label="-> Aufgenommener" oncommand="InteressentAddRolle('Aufgenommener')" disabled="false" tooltiptext="Interessent zum Aufgenommenen machen" hidden="true"/>
 							<toolbarbutton id="interessent-toolbar-warteliste" label="-> Warteliste" oncommand="InteressentAddRolle('Wartender')" disabled="false" tooltiptext="Interessent zum Wartenden machen" hidden="true"/>
 							<toolbarbutton id="interessent-toolbar-absage" label="-> Absage" oncommand="InteressentAddRolle('Abgewiesener')" disabled="false" tooltiptext="Interessent zum Absager machen" hidden="true"/>
-
+							
+							<toolbarbutton id="student-toolbar-export" label="Export" oncommand="StudentExport()" disabled="false" image="../skin/images/ExcelIcon.png" tooltiptext="Daten ins Excel Exportieren"/>
 							<toolbarbutton id="student-toolbar-refresh" label="Aktualisieren" oncommand="StudentTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 							<textbox id="student-toolbar-textbox-suche" control="student-toolbar-button-search" onkeypress="StudentSearchFieldKeyPress(event)" />
 							<button id="student-toolbar-button-search" oncommand="StudentSuche()" label="Suchen"/>
@@ -124,6 +125,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 	    				<treecol id="student-treecol-titelpost" label="TitelPost" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#titelpost" onclick="StudentTreeSort()"/>
+	    				<splitter class="tree-splitter"/>
+	    				<treecol id="student-treecol-svnr" label="SVNR" flex="1" hidden="false"
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#svnr" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-geburtsdatum" label="Geburtsdatum" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
@@ -178,6 +183,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#vornamen" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#nachname" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#titelpost" />
+	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#svnr" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#geburtsdatum" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#semester" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#verband" />

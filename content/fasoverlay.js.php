@@ -203,6 +203,9 @@ function onVerbandSelect(event)
 	if(row.value!=tree.currentIndex)
 		return;
 
+	//Export aktivieren
+	document.getElementById('student-toolbar-export').disabled=false;
+	
     // Progressmeter starten. Ab jetzt keine 'return's mehr.
     document.getElementById('statusbar-progressmeter').setAttribute('mode','undetermined');
     //globalProgressmeter.StartPM();
