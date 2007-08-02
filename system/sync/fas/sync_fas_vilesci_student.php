@@ -1185,7 +1185,7 @@ if($result = pg_query($conn_fas, $qry))
 						       }
 						       if($titelpre!='' AND $titelpre!=NULL)
 						       {
-						       	$qry.=' titelpre='.myaddslashes($titelpre).','.
+						       	$qry.=' titelpre='.myaddslashes($titelpre).',';
 						       }
 						       $qry.=' nachname='.myaddslashes($nachname).','.
 						       ' vorname='.myaddslashes($vorname).','.
