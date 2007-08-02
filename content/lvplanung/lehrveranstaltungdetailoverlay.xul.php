@@ -67,8 +67,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	  			<label value="LVNR" />
 	  			<textbox id="lehrveranstaltung-detail-textbox-lvnr" maxlength="20" disabled="true" />
 
-	  			<label value="UNR" />
-	  	    	<textbox id="lehrveranstaltung-detail-textbox-unr" disabled="true"/>
+	  			
 			</row>
 			<row>
 				<label value="Lehrveranstaltung" />
@@ -104,7 +103,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								</menupopup>
 						</template>
 					</menulist>
-	
+					<label value="UNR" />
+		  	    	<textbox id="lehrveranstaltung-detail-textbox-unr" disabled="true" tooltiptext="Nur aendern wenn man weiss was man tut!"/>	
 				</row>
 				<row>
 		  			<label value="Lehrfach" />

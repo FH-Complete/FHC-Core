@@ -141,7 +141,7 @@ if(!$result = pg_query($conn, $qry))
 		if($fbk!='')
 			$fbk='FBK: '.$fbk;
 
-		//Lehrveranstaltung
+		//Lehrveranstaltung	
 		echo "
 		<RDF:Description  id=\"".$row_lva->lehrveranstaltung_id."\"  about=\"".$rdf_url.'/'.$row_lva->lehrveranstaltung_id."\" >
 			<LVA:lehrveranstaltung_id>".$row_lva->lehrveranstaltung_id."</LVA:lehrveranstaltung_id>
@@ -152,10 +152,10 @@ if(!$result = pg_query($conn, $qry))
 			<LVA:sprache><![CDATA[".$row_lva->sprache."]]></LVA:sprache>
 			<LVA:ects>".$row_lva->lv_ects."</LVA:ects>
 			<LVA:semesterstunden>".$row_lva->semesterstunden."</LVA:semesterstunden>
-			<LVA:anmerkung><![CDATA[".$row_lva->anmerkung."]]></LVA:anmerkung>
-			<LVA:lehre>".($row_lva->lehre?'Ja':'Nein')."</LVA:lehre>
+			<LVA:anmerkung><![CDATA[".$row_lva->anmerkung."]]></LVA:anmerkung>			
+			<LVA:lehre>".($row_lva->lehre=='t'?'Ja':'Nein')."</LVA:lehre>
 			<LVA:lehreverzeichnis><![CDATA[".$row_lva->lv_lehreverzeichnis."]]></LVA:lehreverzeichnis>
-			<LVA:aktiv>".($row_lva->aktiv?'Ja':'Nein')."</LVA:aktiv>
+			<LVA:aktiv>".($row_lva->aktiv=='t'?'Ja':'Nein')."</LVA:aktiv>
 			<LVA:planfaktor>".$row_lva->lv_planfaktor."</LVA:planfaktor>
 			<LVA:planlektoren>".$row_lva->lv_planlektoren."</LVA:planlektoren>
 			<LVA:planpersonalkosten>".$row_lva->lv_planpersonalkosten."</LVA:planpersonalkosten>

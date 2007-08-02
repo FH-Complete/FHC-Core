@@ -80,61 +80,46 @@
 		echo $lv_obj->bezeichnung;
 
 		$qry = "SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE lehrveranstaltung_id='$lvid' ORDER BY ende DESC LIMIT 1";
+		$stsem = new studiensemester($sql_conn);
+		$angezeigtes_stsem = $stsem->getaktorNext($term_id);
+						
+	    echo "&nbsp;($angezeigtes_stsem)";
+	    echo '</font></td>
+              </tr>
+              <tr>
+              <td class="tdvertical">&nbsp;</td>
+              <td>';
 
-		if($result_stsem=pg_query($sql_conn, $qry))
+	    $qry = "SELECT distinct vorname, nachname, tbl_benutzer.uid as uid FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_benutzer, public.tbl_person WHERE tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND tbl_person.person_id=tbl_benutzer.person_id AND lehrveranstaltung_id='$lvid' AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid NOT like '_Dummy%' AND tbl_person.aktiv=true AND studiensemester_kurzbz='$angezeigtes_stsem' ORDER BY nachname, vorname";
+
+		if(!$result = pg_query($sql_conn, $qry))
 		{
-			if(pg_num_rows($result_stsem)<=0)
+			echo 'Es konnten keine Lektoren zugeordnet werden';
+		}
+		else
+		{
+			$num_rows_result = pg_num_rows($result);
+
+			if(!($num_rows_result > 0))
 			{
-				echo '</font></td>
-	                  </tr>
-	                  <tr>
-		              <td class="tdvertical">&nbsp;</td>
-		              <td>';
 				echo 'Derzeit sind keine Lektoren f&uuml;r dieses Fach zugeteilt.';
 			}
 			else
 			{
-				$row_stsem=pg_fetch_object($result_stsem);
-			    $angezeigtes_stsem=$row_stsem->studiensemester_kurzbz;
-
-			    echo "&nbsp;($angezeigtes_stsem)";
-			    echo '</font></td>
-	                  </tr>
-	                  <tr>
-		              <td class="tdvertical">&nbsp;</td>
-		              <td>';
-
-			    $qry = "SELECT distinct vorname, nachname, tbl_benutzer.uid as uid FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_benutzer, public.tbl_person WHERE tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND tbl_person.person_id=tbl_benutzer.person_id AND lehrveranstaltung_id='$lvid' AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid NOT like '_Dummy%' AND tbl_person.aktiv=true AND studiensemester_kurzbz='$angezeigtes_stsem' ORDER BY nachname, vorname";
-
-				if(!$result = pg_query($sql_conn, $qry))
+				$i=0;
+				while($row_lector = pg_fetch_object($result))
 				{
-					echo 'Es konnten keine Lektoren zugeordnet werden';
-				}
-				else
-				{
-					$num_rows_result = pg_num_rows($result);
+					$i++;
+					if($user==$row_lector->uid)
+						$user_is_allowed_to_upload=true;
 
-					if(!($num_rows_result > 0))
-					{
-						echo 'Derzeit sind keine Lektoren f&uuml;r dieses Fach zugeteilt.';
-					}
-					else
-					{
-						$i=0;
-						while($row_lector = pg_fetch_object($result))
-						{
-							$i++;
-							if($user==$row_lector->uid)
-								$user_is_allowed_to_upload=true;
-
-							echo '<a class="Item2" href="mailto:'.$row_lector->uid.'@technikum-wien.at">'.$row_lector->vorname.' '.$row_lector->nachname.'</a>';
-							if($i!=$num_rows_result)
-								echo ', ';
-						}
-					}
+					echo '<a class="Item2" href="mailto:'.$row_lector->uid.'@technikum-wien.at">'.$row_lector->vorname.' '.$row_lector->nachname.'</a>';
+					if($i!=$num_rows_result)
+						echo ', ';
 				}
 			}
 		}
+			
 		?></td>
 	</tr>
 	<tr>

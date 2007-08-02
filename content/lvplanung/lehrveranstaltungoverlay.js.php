@@ -535,6 +535,8 @@ function LeDetailDisableFields(val)
 	document.getElementById('lehrveranstaltung-detail-menulist-lehrform').disabled=val;
 	document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe').disabled=val;
 	document.getElementById('lehrveranstaltung-detail-button-save').disabled=val;
+	
+	document.getElementById('lehrveranstaltung-detail-textbox-unr').disabled=val;
 }
 
 // ****
