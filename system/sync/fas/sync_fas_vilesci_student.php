@@ -979,7 +979,7 @@ if($result = pg_query($conn_fas, $qry))
 							$ausgabe_person="Anrede: '".$anrede."' (statt '".$row1->anrede."')";
 						}
 					}
-					if($row1->titelpost!=$titelpost AND $titelpopst!='' AND $titelpost!=NULL)
+					if($row1->titelpost!=$titelpost AND $titelpost!='' AND $titelpost!=NULL)
 					{
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
