@@ -223,17 +223,29 @@ class studiensemester
 
 	/**
 	 * Liefert das Aktuelle Studiensemester oder das darauffolgende
+	 * @param $semester wenn das semester uebergeben wird, dann werden nur die studiensemester
+	 *                  geliefert die in dieses semester fallen (Bei geradem semester nur SS sonst WS)
 	 * @return Studiensemester oder false wenn es keines gibt
 	 */
-	function getaktorNext()
+	function getaktorNext($semester='')
 	{
 		if($stsem=$this->getakt())
 		   return $stsem;
 		else
 		{
 			//$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ende >= now() ORDER BY ende";
-			$qry = "SELECT studiensemester_kurzbz FROM vw_studiensemester ORDER BY delta LIMIT 1";
-
+			$qry = "SELECT studiensemester_kurzbz FROM vw_studiensemester ";
+			if($semester!='')
+			{
+				if($semester%2==0)
+					$ss='SS';
+				else 
+					$ss='WS';
+					
+				$qry.= " WHERE substring(studiensemester_kurzbz from 1 for 2)='$ss' ";
+			}
+			$qry.= " ORDER BY delta LIMIT 1";
+			
 			if(!$res=pg_exec($this->conn,$qry))
 		    {
 				$this->errormsg = pg_errormessage($this->conn);
