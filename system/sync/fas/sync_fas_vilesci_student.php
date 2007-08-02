@@ -679,7 +679,7 @@ if($result = pg_query($conn_fas, $qry))
 		}
 		//if($student_uid == '')
 		{
-			$error_log = 'UID muss eingegeben werden '.$nachname.", ".$vorname."\n";
+		//	$error_log = 'UID muss eingegeben werden '.$nachname.", ".$vorname."\n";
 		}//
 		if(strlen($alias)>256)
 		{
@@ -967,7 +967,7 @@ if($result = pg_query($conn_fas, $qry))
 							$ausgabe_person="Sprache: '".$sprache."' (statt '".$row1->sprache."')";
 						}
 					}
-					if($row1->anrede!=$anrede)
+					if($row1->anrede!=$anrede AND $anrede!='' AND $anrede!=NULL)
 					{
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
@@ -979,7 +979,7 @@ if($result = pg_query($conn_fas, $qry))
 							$ausgabe_person="Anrede: '".$anrede."' (statt '".$row1->anrede."')";
 						}
 					}
-					if($row1->titelpost!=$titelpost)
+					if($row1->titelpost!=$titelpost AND $titelpopst!='' AND $titelpost!=NULL)
 					{
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
@@ -991,7 +991,7 @@ if($result = pg_query($conn_fas, $qry))
 							$ausgabe_person="Postnomentitel: '".$titelpost."' (statt '".$row1->titelpost."')";
 						}
 					}
-					if($row1->titelpre!=$titelpre)
+					if($row1->titelpre!=$titelpre AND $titelpre!='' AND $titelpre!=NULL)
 					{
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
@@ -1147,7 +1147,7 @@ if($result = pg_query($conn_fas, $qry))
 							$ausgabe_person="Staatsbürgerschaft: '".$staatsbuergerschaft."' (statt '".$row1->staatsbuergerschaft."')";
 						}
 					}
-					if(date("d.m.Y", $row1->insertamum)!=date("d.m.Y", $insertamum))
+					if($row1->insertamum!=$insertamum)
 					{
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
@@ -1174,11 +1174,20 @@ if($result = pg_query($conn_fas, $qry))
 					if($updatep && $dont_sync_php)
 					{
 						$qry = 'UPDATE public.tbl_person SET'.
-						       ' sprache='.myaddslashes($sprache).','.
-						       ' anrede='.myaddslashes($anrede).','.
-						       ' titelpost='.myaddslashes($titelpost).','.
-						       ' titelpre='.myaddslashes($titelpre).','.
-						       ' nachname='.myaddslashes($nachname).','.
+						       ' sprache='.myaddslashes($sprache).',';
+						       if($anrede!='' AND $anrede!=NULL)
+						       {
+						       	$qry.=' anrede='.myaddslashes($anrede).',';
+						       }
+						       if($titelpost!='' AND $titelpost!=NULL)
+						       {
+						       	$qry.=' titelpost='.myaddslashes($titelpost).',';
+						       }
+						       if($titelpre!='' AND $titelpre!=NULL)
+						       {
+						       	$qry.=' titelpre='.myaddslashes($titelpre).','.
+						       }
+						       $qry.=' nachname='.myaddslashes($nachname).','.
 						       ' vorname='.myaddslashes($vorname).','.
 						       ' vornamen='.myaddslashes($vornamen).','.
 						       ' gebdatum='.myaddslashes($gebdatum).','.
@@ -1552,7 +1561,7 @@ if($result = pg_query($conn_fas, $qry))
 								$ausgabe_pre="EXT_ID: '".$ext_id."'";
 							}
 						}
-						if(date("d.m.Y", $rows->insertamum)!=date("d.m.Y", $insertamum))
+						if($rows->insertamum!=$insertamum)
 						{
 							$updater=true;
 							if(strlen(trim($ausgabe_pre))>0)
@@ -2047,7 +2056,7 @@ if($result = pg_query($conn_fas, $qry))
 										$ausgabe_benutzer="Ext_ID: '".$ext_id_benutzer."' statt('".$rows->ext_id."')";
 									}
 								}
-								if(date("d.m.Y", $rows->insertamum)!=date("d.m.Y", $insertamum))
+								if($rows->insertamum!=$insertamum)
 								{
 									$updateb=true;
 									if(strlen(trim($ausgabe_benutzer))>0)
@@ -2245,7 +2254,7 @@ if($result = pg_query($conn_fas, $qry))
 											$ausgabe_student="EXT_ID: '".$ext_id_student."' (statt '".$rows->ext_id."')";
 										}
 									}	
-									if(date("d.m.Y", $rows->insertamum)!=date("d.m.Y", $insertamum))
+									if($rows->insertamum!=$insertamum)
 									{
 										$updates=true;
 										if(strlen(trim($ausgabe_student))>0)
