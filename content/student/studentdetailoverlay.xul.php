@@ -168,50 +168,54 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				</rows>
 			</grid>
 			</groupbox>
-			<groupbox id="student-detail-groupbox-student">
-			<caption label="Student" />
-			<grid id="student-detail-grid-student" style="margin:4px;" flex="1">
-				  	<columns  >
-    					<column flex="1"/>
-    					<column flex="5"/>
-    					<column flex="1"/>
-    					<column flex="5"/>
-    					<column flex="1"/>
-    					<column flex="5"/>
-  					</columns>
-  					<rows>
-    					<row>
-    						<label value="UID" control="student-detail-textbox-uid"/>
-      						<hbox><textbox id="student-detail-textbox-uid" disabled="true" maxlength="16" size="16"/></hbox>
-    						<label value="Matrikelnummer" control="student-detail-textbox-matrikelnummer"/>
-      						<hbox><textbox id="student-detail-textbox-matrikelnummer" disabled="true" maxlength="15" size="15"/></hbox>
-      						<label value="Studiengang" control="student-detail-textbox-studiengang_kz"/>
-      						<menulist id="student-detail-menulist-studiengang_kz" disabled="true"
-							          datasources="<?php echo APP_ROOT ?>rdf/studiengang.rdf.php" flex="1"
-						              ref="http://www.technikum-wien.at/studiengang/liste" >
-								<template>
-									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/studiengang/rdf#studiengang_kz"
-							        		      label="rdf:http://www.technikum-wien.at/studiengang/rdf#kuerzel - rdf:http://www.technikum-wien.at/studiengang/rdf#bezeichnung"
-										  		  uri="rdf:*"/>
-										</menupopup>
-								</template>
-							</menulist>
-    					</row>
-    					<row>
-	    					<label value="Semester" control="student-detail-textbox-semester"/>
-      						<hbox><textbox id="student-detail-textbox-semester" disabled="true" maxlength="2" size="1"/></hbox>
-      						<label value="Verband" control="student-detail-textbox-verband"/>
-      						<hbox><textbox id="student-detail-textbox-verband" disabled="true" maxlength="1" size="1"/></hbox>
-      						<label value="Gruppe" control="student-detail-textbox-gruppe"/>
-      						<hbox><textbox id="student-detail-textbox-gruppe" disabled="true" maxlength="1" size="1"/></hbox>
-    					</row>
-    				</rows>
-    		</grid>
-    		</groupbox>
-    		<hbox>
-    			<spacer flex="1" />
-    			<button id="student-detail-button-save" label="Speichern" oncommand="StudentDetailSave();" disabled="true"/>
+			<hbox>
+				<groupbox id="student-detail-groupbox-student" flex="1">
+				<caption label="Student" />
+				<grid id="student-detail-grid-student" style="margin:4px;" flex="1">
+					  	<columns  >
+	    					<column flex="1"/>
+	    					<column flex="5"/>
+	    					<column flex="1"/>
+	    					<column flex="5"/>
+	    					<column flex="1"/>
+	    					<column flex="5"/>
+	  					</columns>
+	  					<rows>
+	    					<row>
+	    						<label value="UID" control="student-detail-textbox-uid"/>
+	      						<hbox><textbox id="student-detail-textbox-uid" disabled="true" maxlength="16" size="16"/></hbox>
+	    						<label value="Matrikelnummer" control="student-detail-textbox-matrikelnummer"/>
+	      						<hbox><textbox id="student-detail-textbox-matrikelnummer" disabled="true" maxlength="15" size="15"/></hbox>
+	      						<!--<label value="Studiengang" control="student-detail-textbox-studiengang_kz"/>-->
+	      						<textbox id="student-detail-menulist-studiengang_kz" disabled="true" hidden="true" />
+	      						<!--
+	      						<menulist id="student-detail-menulist-studiengang_kz" disabled="true"
+								          datasources="<?php echo APP_ROOT ?>rdf/studiengang.rdf.php" flex="1"
+							              ref="http://www.technikum-wien.at/studiengang/liste" >
+									<template>
+										<menupopup>
+											<menuitem value="rdf:http://www.technikum-wien.at/studiengang/rdf#studiengang_kz"
+								        		      label="rdf:http://www.technikum-wien.at/studiengang/rdf#kuerzel - rdf:http://www.technikum-wien.at/studiengang/rdf#bezeichnung"
+											  		  uri="rdf:*"/>
+											</menupopup>
+									</template>
+								</menulist>-->
+	    					</row>
+	    					<row>
+		    					<label value="Semester" control="student-detail-textbox-semester"/>
+	      						<hbox><textbox id="student-detail-textbox-semester" disabled="true" maxlength="2" size="1"/></hbox>
+	      						<label value="Verband" control="student-detail-textbox-verband"/>
+	      						<hbox><textbox id="student-detail-textbox-verband" disabled="true" maxlength="1" size="1"/></hbox>
+	      						<label value="Gruppe" control="student-detail-textbox-gruppe"/>
+	      						<hbox><textbox id="student-detail-textbox-gruppe" disabled="true" maxlength="1" size="1"/></hbox>
+	    					</row>
+	    				</rows>
+	    		</grid>
+	    		</groupbox>
+    			<vbox>
+    				<spacer flex="1" />-->
+    				<button id="student-detail-button-save" label="Speichern" oncommand="StudentDetailSave();" disabled="true"/>
+    			</vbox>
     		</hbox>
 		</vbox>
 </vbox>

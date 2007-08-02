@@ -281,6 +281,7 @@ class student extends benutzer
 			}
 			if($stsem!=null)
 				$where.=" AND tbl_studentlehrverband.studiensemester_kurzbz='$stsem'";
+
 		}			
 
 		//$sql_query="SELECT * FROM campus.vw_student WHERE $where ORDER by nachname,vorname";
@@ -312,6 +313,7 @@ class student extends benutzer
 			$l->gebdatum=$row->gebdatum;
 			$l->gebort=$row->gebort;
 			$l->gebzeit=$row->gebzeit;
+			$l->svnr=$row->svnr;
 			$l->foto=$row->foto;
 			$l->anmerkungen=$row->anmerkungen;
 			$l->aktiv=$row->aktiv=='t'?true:false;
@@ -328,6 +330,7 @@ class student extends benutzer
 			//$l->stg_bezeichnung=$row->bezeichnung;
 			// student in Array speichern
 			$result[]=$l;
+	
 		}
 		return $result;
 	}

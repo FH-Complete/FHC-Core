@@ -21,7 +21,7 @@
  */
 
 require_once('../../config.inc.php');
-require_once('../../../admin/sync/sync_config.inc.php');
+require_once('../../../system/sync/sync_config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/studiengang.class.php');
@@ -88,26 +88,26 @@ if(!$rechte->isBerechtigt('admin'))
 $where = '';
 $error = false;
 //Parameter
-$titel = (isset($_POST['titel'])?$_POST['titel']:'');
-$nachname = (isset($_POST['nachname'])?$_POST['nachname']:'');
-$vorname = (isset($_POST['vorname'])?$_POST['vorname']:'');
-$geschlecht = (isset($_POST['geschlecht'])?$_POST['geschlecht']:'');
-$geburtsdatum = (isset($_POST['geburtsdatum'])?$_POST['geburtsdatum']:'');
-$adresse = (isset($_POST['adresse'])?$_POST['adresse']:'');
-$plz = (isset($_POST['plz'])?$_POST['plz']:'');
-$ort = (isset($_POST['ort'])?$_POST['ort']:'');
-$email = (isset($_POST['email'])?$_POST['email']:'');
-$telefon = (isset($_POST['telefon'])?$_POST['telefon']:'');
-$mobil = (isset($_POST['mobil'])?$_POST['mobil']:'');
-$letzteausbildung = (isset($_POST['letzteausbildung'])?$_POST['letzteausbildung']:'');
-$ausbildungsart = (isset($_POST['ausbildungsart'])?$_POST['ausbildungsart']:'');
-$anmerkungen = (isset($_POST['anmerkungen'])?$_POST['anmerkungen']:'');
-$studiengang_kz = (isset($_POST['studiengang_kz'])?$_POST['studiengang_kz']:'');
+$titel = (isset($_REQUEST['titel'])?$_REQUEST['titel']:'');
+$nachname = (isset($_REQUEST['nachname'])?$_REQUEST['nachname']:'');
+$vorname = (isset($_REQUEST['vorname'])?$_REQUEST['vorname']:'');
+$geschlecht = (isset($_REQUEST['geschlecht'])?$_REQUEST['geschlecht']:'');
+$geburtsdatum = (isset($_REQUEST['geburtsdatum'])?$_REQUEST['geburtsdatum']:'');
+$adresse = (isset($_REQUEST['adresse'])?$_REQUEST['adresse']:'');
+$plz = (isset($_REQUEST['plz'])?$_REQUEST['plz']:'');
+$ort = (isset($_REQUEST['ort'])?$_REQUEST['ort']:'');
+$email = (isset($_REQUEST['email'])?$_REQUEST['email']:'');
+$telefon = (isset($_REQUEST['telefon'])?$_REQUEST['telefon']:'');
+$mobil = (isset($_REQUEST['mobil'])?$_REQUEST['mobil']:'');
+$letzteausbildung = (isset($_REQUEST['letzteausbildung'])?$_REQUEST['letzteausbildung']:'');
+$ausbildungsart = (isset($_REQUEST['ausbildungsart'])?$_REQUEST['ausbildungsart']:'');
+$anmerkungen = (isset($_REQUEST['anmerkungen'])?$_REQUEST['anmerkungen']:'');
+$studiengang_kz = (isset($_REQUEST['studiengang_kz'])?$_REQUEST['studiengang_kz']:'');
 if($studiengang_kz=='' && isset($_GET['studiengang_kz']))
 	$studiengang_kz = $_GET['studiengang_kz'];
-$person_id = (isset($_POST['person_id'])?$_POST['person_id']:'');
-$ueberschreiben = (isset($_POST['ueberschreiben'])?$_POST['ueberschreiben']:'');
-$studiensemester_kurzbz = (isset($_POST['studiensemester_kurzbz'])?$_POST['studiensemester_kurzbz']:'');
+$person_id = (isset($_REQUEST['person_id'])?$_REQUEST['person_id']:'');
+$ueberschreiben = (isset($_REQUEST['ueberschreiben'])?$_REQUEST['ueberschreiben']:'');
+$studiensemester_kurzbz = (isset($_REQUEST['studiensemester_kurzbz'])?$_REQUEST['studiensemester_kurzbz']:'');
 //end Parameter
 
 if($studiensemester_kurzbz == '')

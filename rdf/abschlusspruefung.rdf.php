@@ -91,16 +91,34 @@ $pruefung = new abschlusspruefung($conn, null, true);
 		if($result_rek = pg_query($conn, $qry))
 			if($row_rek = pg_fetch_object($result_rek))
 				$rektor = $row_rek->titelpre.' '.$row_rek->vorname.' '.$row_rek->nachname.' '.$row_rek->titelpost;
-		$qry = "SELECT themenbereich, ende FROM lehre.tbl_projektarbeit WHERE student_uid='$student->uid' AND (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom') ORDER BY beginn LIMIT 1";
+		$qry = "SELECT themenbereich, ende, projektarbeit_id FROM lehre.tbl_projektarbeit a WHERE student_uid='$student->uid' AND (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom') ORDER BY beginn LIMIT 2";
 		$themenbereich='';
 		$datum_projekt='';
+		$betreuer = '';
+		$betreuer_2 = '';
+		$themenbereich_2 = '';
 		
 		if($result_proj = pg_query($conn, $qry))
 		{
 			if($row_proj = pg_fetch_object($result_proj))
 			{
+				$qry_bet = "SELECT titelpre, vorname, nachname, titelpost FROM lehre.tbl_projektbetreuer JOIN public.tbl_person USING(person_id) WHERE projektarbeit_id='$row_proj->projektarbeit_id' LIMIT 1";
+				if($result_bet = pg_query($conn, $qry_bet))
+					if($row_bet = pg_fetch_object($result_bet))
+						$betreuer = $row_bet->titelpre.' '.$row_bet->vorname.' '.$row_bet->nachname.' '.$row_bet->titelpost;
+
 				$themenbereich = $row_proj->themenbereich;
 				$datum_projekt = $datum_obj->convertISODate($row_proj->ende);
+			}
+			
+			if($row_proj = pg_fetch_object($result_proj))
+			{
+				$qry_bet = "SELECT titelpre, vorname, nachname, titelpost FROM lehre.tbl_projektbetreuer JOIN public.tbl_person USING(person_id) WHERE projektarbeit_id='$row_proj->projektarbeit_id' LIMIT 1";
+					if($result_bet = pg_query($conn, $qry_bet))
+						if($row_bet = pg_fetch_object($result_bet))
+							$betreuer_2 = $row_bet->titelpre.' '.$row_bet->vorname.' '.$row_bet->nachname.' '.$row_bet->titelpost;
+
+				$themenbereich_2 = $row_proj->themenbereich;
 			}
 		}
 		
@@ -144,6 +162,9 @@ $pruefung = new abschlusspruefung($conn, null, true);
 		<titelbescheidvom><![CDATA['.$datum_obj->convertISODate($studiengang->titelbescheidvom).']]></titelbescheidvom>
 		<rektor><![CDATA['.$rektor.']]></rektor>
 		<themenbereich><![CDATA['.$themenbereich.']]></themenbereich>
+		<themenbereich_2><![CDATA['.$themenbereich_2.']]></themenbereich_2>
+		<betreuer><![CDATA['.$betreuer.']]></betreuer>
+		<betreuer_2><![CDATA['.$betreuer_2.']]></betreuer_2>
 		<datum_projekt><![CDATA['.$datum_projekt.']]></datum_projekt>';
 		
 	 	echo "\n\t</pruefung>";
