@@ -7,7 +7,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-include('../../vilesci/config.inc.php');
+include('../../../vilesci/config.inc.php');
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
@@ -29,7 +29,7 @@ $qry1='';
 <head>
 <title>Personendatenkorrektur</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-9">
-<link href="../../skin/vilesci_old.css" rel="stylesheet" type="text/css">
+<link href="../../../skin/vilesci_old.css" rel="stylesheet" type="text/css">
 </head>
 <body>
 <style>
@@ -262,7 +262,7 @@ if($result = pg_query($conn_fas, $qry))
 	{
 		$i++;
 		echo "<tr class='liste".($i%2)."'>";
-		echo "<form action='$PHP_SELF'  method='POST'>";
+		echo "<form action=''  method='POST'>";
 		echo "<td><input type='submit' value='Speichern'></td>";
 		echo "<td>'".$row->personpk1."'";
 		echo "<input type='hidden' name='person_pk' value='".$row->personpk1."'>";
@@ -331,7 +331,7 @@ if($result = pg_query($conn_fas, $qry))
 		echo "</tr>";
 		echo "</form>";
 		echo "<tr class='liste".($i%2)."'>";
-		echo "<form action='$PHP_SELF'  method='POST'>";
+		echo "<form action=''  method='POST'>";
 		echo "<td><input type='submit' value='Speichern'></td>";
 		echo "<td>'".$row->personpk2."'";
 		echo "<input type='hidden' name='person_pk' value='".$row->personpk2."'>";
