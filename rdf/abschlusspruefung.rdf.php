@@ -159,6 +159,9 @@ $pruefung = new abschlusspruefung($conn, null, true);
 		<datum_aktuell><![CDATA['.date('d.m.Y').']]></datum_aktuell>
 		<anmerkung><![CDATA['.$row->anmerkung.']]></anmerkung>
 		<bescheidbgbl1><![CDATA['.$studiengang->bescheidbgbl1.']]></bescheidbgbl1>
+		<bescheidbgbl2><![CDATA['.$studiengang->bescheidbgbl2.']]></bescheidbgbl2>
+		<bescheidgz><![CDATA['.$studiengang->bescheidgz.']]></bescheidgz>
+		<bescheidvom><![CDATA['.$datum_obj->convertISODate($studiengang->bescheidvom).']]></bescheidvom>
 		<titelbescheidvom><![CDATA['.$datum_obj->convertISODate($studiengang->titelbescheidvom).']]></titelbescheidvom>
 		<rektor><![CDATA['.$rektor.']]></rektor>
 		<themenbereich><![CDATA['.$themenbereich.']]></themenbereich>

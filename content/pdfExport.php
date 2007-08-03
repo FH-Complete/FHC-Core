@@ -66,8 +66,8 @@ if(isset($_GET['ss']))
 	$params.='&ss='.$_GET['ss'];
 if(isset($_GET['abschlusspruefung_id']))
 	$params.='&abschlusspruefung_id='.$_GET['abschlusspruefung_id'];
-
-
+if(isset($_GET['typ']))
+	$params.='&typ='.$_GET['typ'];
 
 
 //Berechtigung pruefen
