@@ -25,70 +25,85 @@ header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
-require_once('../../vilesci/config.inc.php');
+require_once('../vilesci/config.inc.php');
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
+
+echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
+echo '<?xml-stylesheet href="'.APP_ROOT.'content/bindings.css" type="text/css"?>';
+echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type="text/css"?>';
+
+if(isset($_GET['person_id']) && is_numeric($_GET['person_id']))
+	$person_id = $_GET['person_id'];
+else 
+	die('Parameter person_id muss uebergeben werden');
 ?>
 
-<overlay id="StudentBetriebsmittel"
+<window id="Betriebsmittel"
 	xmlns:html="http://www.w3.org/1999/xhtml"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+	 onload="loadBetriebsmittel(<?php echo $person_id; ?>);"
 	>
-<!-- Zeugnis Overlay -->
-<vbox id="student-betriebsmittel" style="margin:0px;" flex="1">
+
+<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/betriebsmitteloverlay.js.php" />
+<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/functions.js.php" />
+<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/fasoverlay.js.php" />
+<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/phpRequest.js.php" />
+
+<vbox id="betriebsmittel" style="margin:0px;" flex="1">
 <popupset>
-	<popup id="student-betriebsmittel-tree-popup">
-		<menuitem label="Entfernen" oncommand="StudentBetriebsmittelDelete();" id="student-betriebsmittel-tree-popup-delete" hidden="false"/>
+	<popup id="betriebsmittel-tree-popup">
+		<menuitem label="Entfernen" oncommand="BetriebsmittelDelete();" id="betriebsmittel-tree-popup-delete" hidden="false"/>
 	</popup>
 </popupset>
 <hbox flex="1">
-<grid id="student-betriebsmittel-grid-detail" style="overflow:auto;margin:4px;" flex="1">
+<grid id="betriebsmittel-grid-detail" style="overflow:auto;margin:4px;" flex="1">
 		  	<columns  >
 				<column flex="1"/>
 				<column flex="1"/>
 			</columns>
 			<rows>								
 				<row>
-					<tree id="student-betriebsmittel-tree" seltype="single" hidecolumnpicker="false" flex="1"
+					<tree id="betriebsmittel-tree" seltype="single" hidecolumnpicker="false" flex="1"
 						datasources="rdf:null" ref="http://www.technikum-wien.at/betriebsmittel/liste"
 						style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100px" enableColumnDrag="true"
-						onselect="StudentBetriebsmittelAuswahl()"
-						context="student-betriebsmittel-tree-popup"
+						onselect="BetriebsmittelAuswahl()"
+						context="betriebsmittel-tree-popup"
 						flags="dont-build-content"
 					>
 					
 						<treecols>
-							<treecol id="student-betriebsmittel-tree-nummer" label="Nummer" flex="2" hidden="false" primary="true"
+							<treecol id="betriebsmittel-tree-nummer" label="Nummer" flex="2" hidden="false" primary="true"
 								class="sortDirectionIndicator"
 								sortActive="true"
 								sortDirection="ascending"
 								sort="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#nummer"/>
 							<splitter class="tree-splitter"/>
-							<treecol id="student-betriebsmittel-tree-betriebsmitteltyp" label="Typ" flex="5" hidden="false"
+							<treecol id="betriebsmittel-tree-betriebsmitteltyp" label="Typ" flex="5" hidden="false"
 							   class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#betriebsmitteltyp"/>
 							<splitter class="tree-splitter"/>
-							<treecol id="student-betriebsmittel-tree-anmerkung" label="Anmerkung" flex="2" hidden="true"
+							<treecol id="betriebsmittel-tree-anmerkung" label="Anmerkung" flex="2" hidden="true"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#anmerkung" />
 							<splitter class="tree-splitter"/>
-							<treecol id="student-betriebsmittel-tree-kaution" label="Kaution" flex="2" hidden="true"
+							<treecol id="betriebsmittel-tree-kaution" label="Kaution" flex="2" hidden="true"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#kaution" />
 							<splitter class="tree-splitter"/>
-							<treecol id="student-betriebsmittel-tree-ausgegebenam" label="Ausgabedatum" flex="2" hidden="true"
+							<treecol id="betriebsmittel-tree-ausgegebenam" label="Ausgabedatum" flex="2" hidden="true"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/konto/rdf#ausgegebenam_iso" />
 							<splitter class="tree-splitter"/>
-							<treecol id="student-betriebsmittel-tree-retouram" label="Retourdatum" flex="2" hidden="false"
+							<treecol id="betriebsmittel-tree-retouram" label="Retourdatum" flex="2" hidden="false"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#retouram_iso" />
 							<splitter class="tree-splitter"/>
-							<treecol id="student-betriebsmittel-tree-betriebsmittel_id" label="Betriebsmittel_id" flex="2" hidden="true"
+							<treecol id="betriebsmittel-tree-betriebsmittel_id" label="Betriebsmittel_id" flex="2" hidden="true"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#betriebsmittel_id" />
 							<splitter class="tree-splitter"/>
-							<treecol id="student-betriebsmittel-tree-person_id" label="Person_id" flex="2" hidden="true"
+							<treecol id="betriebsmittel-tree-person_id" label="Person_id" flex="2" hidden="true"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#person_id" />
 							<splitter class="tree-splitter"/>
@@ -113,28 +128,28 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					</tree>
 					<vbox>
 						<hbox>
-							<button id="student-betriebsmittel-button-neu" label="Neu" oncommand="StudentBetriebsmittelNeu();" disabled="true"/>
-							<button id="student-betriebsmittel-button-loeschen" label="Loeschen" oncommand="StudentBetriebsmittelDelete();" disabled="true"/>
+							<button id="betriebsmittel-button-neu" label="Neu" oncommand="BetriebsmittelNeu();"/>
+							<button id="betriebsmittel-button-loeschen" label="Loeschen" oncommand="BetriebsmittelDelete();"/>
 						</hbox>
 						<vbox hidden="true">
-							<label value="betriebsmittel_id" control="student-betriebsmittel-textbox-betriebsmittel_id"/>
-							<textbox id="student-betriebsmittel-textbox-betriebsmittel_id" disabled="true"/>
-							<label value="person_id" control="student-betriebsmittel-textbox-person_id"/>
-							<textbox id="student-betriebsmittel-textbox-person_id" disabled="true"/>
-							<label value="Neu" control="student-betriebsmittel-checkbox-neu"/>
-							<checkbox id="student-betriebsmittel-checkbox-neu" disabled="true" checked="false"/>
+							<label value="betriebsmittel_id" control="betriebsmittel-textbox-betriebsmittel_id"/>
+							<textbox id="betriebsmittel-textbox-betriebsmittel_id" disabled="true"/>
+							<label value="person_id" control="betriebsmittel-textbox-person_id"/>
+							<textbox id="betriebsmittel-textbox-person_id" disabled="true"/>
+							<label value="Neu" control="betriebsmittel-checkbox-neu"/>
+							<checkbox id="betriebsmittel-checkbox-neu" disabled="true" checked="false"/>
 						</vbox>
-						<groupbox id="student-betriebsmittel-groupbox" flex="1">
+						<groupbox id="betriebsmittel-groupbox" flex="1">
 						<caption label="Details"/>
-							<grid id="student-betriebsmittel-grid-detail" style="overflow:auto;margin:4px;" flex="1">
+							<grid id="betriebsmittel-grid-detail" style="overflow:auto;margin:4px;" flex="1">
 							  	<columns  >
 									<column flex="1"/>
 									<column flex="5"/>
 								</columns>
 								<rows>
 									<row>
-										<label value="Typ" control="student-betriebsmittel-menulist-betriebsmitteltyp"/>
-										<menulist id="student-betriebsmittel-menulist-betriebsmitteltyp" disabled="true"
+										<label value="Typ" control="betriebsmittel-menulist-betriebsmitteltyp"/>
+										<menulist id="betriebsmittel-menulist-betriebsmitteltyp" disabled="true"
 										          datasources="<?php echo APP_ROOT ?>rdf/betriebsmitteltyp.rdf.php" flex="1"
 										          ref="http://www.technikum-wien.at/betriebsmitteltyp/liste" >
 											<template>
@@ -147,40 +162,40 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										</menulist>
 									</row>
 									<row>
-										<label value="Nummer" control="student-betriebsmittel-textbox-nummer"/>
+										<label value="Nummer" control="betriebsmittel-textbox-nummer"/>
 										<hbox>
-					      					<textbox id="student-betriebsmittel-textbox-nummer" disabled="true" maxlength="32"/>
+					      					<textbox id="betriebsmittel-textbox-nummer" disabled="true" maxlength="32"/>
 					      					<spacer flex="1" />			
 					      				</hbox>
 									</row>
 									<row>
-										<label value="Beschreibung" control="student-betriebsmittel-textbox-beschreibung"/>
-				      					<textbox id="student-betriebsmittel-textbox-beschreibung" disabled="true" multiline="true"/>
+										<label value="Beschreibung" control="betriebsmittel-textbox-beschreibung"/>
+				      					<textbox id="betriebsmittel-textbox-beschreibung" disabled="true" multiline="true"/>
 					      			</row>
 					      			<row>
-										<label value="Kaution" control="student-betriebsmittel-textbox-kaution"/>
+										<label value="Kaution" control="betriebsmittel-textbox-kaution"/>
 										<hbox>
-					      					<textbox id="student-betriebsmittel-textbox-kaution" disabled="true" maxlength="8"/>
+					      					<textbox id="betriebsmittel-textbox-kaution" disabled="true" maxlength="8"/>
 					      					<spacer flex="1" />			
 					      				</hbox>
 									</row>
 									<row>
-										<label value="Anmerkung" control="student-betriebsmittel-textbox-anmerkung"/>
-				      					<textbox id="student-betriebsmittel-textbox-anmerkung" disabled="true" multiline="true"/>
+										<label value="Anmerkung" control="betriebsmittel-textbox-anmerkung"/>
+				      					<textbox id="betriebsmittel-textbox-anmerkung" disabled="true" multiline="true"/>
 					      			</row>
 					      			<row>
-										<label value="Ausgegeben am" control="student-betriebsmittel-textbox-ausgegebenam"/>
+										<label value="Ausgegeben am" control="betriebsmittel-textbox-ausgegebenam"/>
 										<hbox>
-											<box class="Datum" id="student-betriebsmittel-textbox-ausgegebenam" disabled="true"/>
-					      					<!--<textbox id="student-betriebsmittel-textbox-ausgegebenam" disabled="true" maxlength="10"/>-->
+											<box class="Datum" id="betriebsmittel-textbox-ausgegebenam" disabled="true"/>
+					      					<!--<textbox id="betriebsmittel-textbox-ausgegebenam" disabled="true" maxlength="10"/>-->
 					      					<spacer flex="1" />			
 					      				</hbox>
 									</row>
 									<row>
-										<label value="Retour am" control="student-betriebsmittel-textbox-retouram"/>
+										<label value="Retour am" control="betriebsmittel-textbox-retouram"/>
 										<hbox>
-											<box class="Datum" id="student-betriebsmittel-textbox-retouram" disabled="true"/>
-					      					<!--<textbox id="student-betriebsmittel-textbox-retouram" disabled="true" maxlength="10"/>-->
+											<box class="Datum" id="betriebsmittel-textbox-retouram" disabled="true"/>
+					      					<!--<textbox id="betriebsmittel-textbox-retouram" disabled="true" maxlength="10"/>-->
 					      					<spacer flex="1" />			
 					      				</hbox>
 									</row>
@@ -188,7 +203,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							</grid>
 							<hbox>
 								<spacer flex="1" />
-								<button id="student-betriebsmittel-button-speichern" oncommand="StudentBetriebsmittelDetailSpeichern()" label="Speichern" disabled="true"/>
+								<button id="betriebsmittel-button-speichern" oncommand="BetriebsmittelDetailSpeichern()" label="Speichern" disabled="true"/>
 							</hbox>
 						</groupbox>
 					</vbox>
@@ -199,4 +214,4 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 </hbox>
 <spacer flex="1" />
 </vbox>
-</overlay>
+</window>

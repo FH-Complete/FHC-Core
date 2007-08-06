@@ -32,7 +32,6 @@ echo '<?xml version="1.0" encoding="ISO-8859-15" standalone="yes" ?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentdetailoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentzeugnisoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentkontooverlay.xul.php"?>';
-echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentbetriebsmitteloverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentiooverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentnotenoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentpruefungoverlay.xul.php"?>';
@@ -230,7 +229,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 							<vbox id="student-prestudent"  style="margin-top:10px;" />
 							<vbox id="interessent-dokumente"  style="margin-top:10px;" />
 							<vbox id="student-konto"  style="margin-top:10px;" />
-							<vbox id="student-betriebsmittel"  style="margin-top:10px;" />
+							<iframe id="student-betriebsmittel" src="" style="margin-top:10px;" />
 							<vbox id="student-io"  style="margin-top:10px;" />
 							<vbox id="student-noten"  style="margin-top:10px;" />
 							<vbox id="student-zeugnis"  style="margin-top:10px;" />

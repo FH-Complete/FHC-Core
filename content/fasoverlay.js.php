@@ -279,10 +279,10 @@ function onVerbandSelect(event)
 			StudentPrestudentDisableFields(true);
 			StudentKontoDisableFields(true);
 			StudentAkteDisableFields(true);
-			StudentBetriebsmittelDisableFields(true);
 			StudentIODisableFields(true);
 			StudentNoteDisableFields(true);
 			document.getElementById('student-kontakt').setAttribute('src','');
+			document.getElementById('student-betriebsmittel').setAttribute('src','');
 			StudentAbschlusspruefungDisableFields(true);
 		}
 		catch(e)
@@ -373,6 +373,7 @@ function onVerbandSelect(event)
 			StudentIODisableFields(true);
 			StudentNoteDisableFields(true);
 			document.getElementById('student-kontakt').setAttribute('src','');
+			document.getElementById('student-betriebsmittel').setAttribute('src','');
 			StudentAbschlusspruefungDisableFields(true);
 		}
 		catch(e)

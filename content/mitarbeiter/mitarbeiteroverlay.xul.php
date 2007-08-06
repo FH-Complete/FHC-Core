@@ -194,11 +194,13 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterfunktionove
 				<tab id="mitarbeiter-tab-detail" label="Stammdaten" />
 				<tab id="mitarbeiter-tab-kontakt" label="Kontaktdaten" />
 				<tab id="mitarbeiter-tab-funktionen" label="Funktionen" />
+				<tab id="mitarbeiter-tab-betriebsmittel" label="Betriebsmittel" />
 			</tabs>
 			<tabpanels id="mitarbeiter-tabpanels-main" flex="1">
 				<vbox id="mitarbeiter-detail-stammdaten"  style="margin-top:10px;" />
 				<iframe id="mitarbeiter-kontakt" src="" style="margin-top:10px;" />
 				<vbox id="mitarbeiter-detail-funktionen"  style="margin-top:10px;" />
+				<iframe id="mitarbeiter-betriebsmittel" src="" style="margin-top:10px;" />
 			</tabpanels>
 		</tabbox>	
 	</vbox>
