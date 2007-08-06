@@ -541,6 +541,9 @@ function MitarbeiterAuswahl()
 	
 	// ***** KONTAKTE *****
 	document.getElementById('mitarbeiter-kontakt').setAttribute('src','kontakt.xul.php?person_id='+person_id);
+
+	// ***** BETRIEBSMITTEL *****
+	document.getElementById('mitarbeiter-betriebsmittel').setAttribute('src','betriebsmitteloverlay.xul.php?person_id='+person_id);
 	
 	// **** VERWENDUNG ****
 	verwendungtree = document.getElementById('mitarbeiter-tree-verwendung');
