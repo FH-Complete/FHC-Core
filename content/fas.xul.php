@@ -83,6 +83,8 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-dokumente-inskriptionsbestaetigung:command" oncommand="StudentPrintInskriptionsbestaetigung();"/>
   <command id="menu-dokumente-zeugnis:command" oncommand="StudentCreateZeugnis();"/>
   <command id="menu-dokumente-diplsupplement:command" oncommand="StudentCreateDiplSupplement();"/>
+  <command id="menu-dokumente-studienerfolg-normal:command" oncommand="StudentCreateStudienerfolg();"/>
+  <command id="menu-dokumente-studienerfolg-finanzamt:command" oncommand="StudentCreateStudienerfolg('finanzamt');"/>
   <command id="menu-help-close:command" oncommand="OpenAboutDialog()"/>
 </commandset>
 
@@ -214,6 +216,22 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                label     = "&menu-dokumente-diplsupplement.label;"
                command   =  "menu-dokumente-diplsupplement:command"
                accesskey = "&menu-dokumente-diplsupplement.accesskey;"/>
+            <menu id="menu-dokumente-studienerfolg" label="&menu-dokumente-studienerfolg.label;" accesskey="&menu-dokumente-studienerfolg.accesskey;">
+	          <menupopup id="menu-dokumente-studienerfolg-popup">
+	            <menuitem
+	               id        =  "menu-dokumente-studienerfolg-normal"
+	               key       =  "menu-dokumente-studienerfolg-normal:key"
+	               label     = "&menu-dokumente-studienerfolg-normal.label;"
+	               command   =  "menu-dokumente-studienerfolg-normal:command"
+	               accesskey = "&menu-dokumente-studienerfolg-normal.accesskey;"/>
+	           	<menuitem
+	               id        =  "menu-dokumente-studienerfolg-finanzamt"
+	               key       =  "menu-dokumente-studienerfolg-finanzamt:key"
+	               label     = "&menu-dokumente-studienerfolg-finanzamt.label;"
+	               command   =  "menu-dokumente-studienerfolg-finanzamt:command"
+	               accesskey = "&menu-dokumente-studienerfolg-finanzamt.accesskey;"/>
+	            </menupopup>
+	        </menu>
           </menupopup>
     </menu>
     <menu id="menu-help" label="&menu-help.label;" accesskey="&menu-help.accesskey;">

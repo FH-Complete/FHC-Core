@@ -69,3 +69,12 @@
 <!ENTITY menu-dokumente-diplsupplement.key		"S">
 <!ENTITY menu-dokumente-diplsupplement.label	"Diploma Supplement">
 <!ENTITY menu-dokumente-diplsupplement.accesskey	"S">
+
+<!ENTITY menu-dokumente-studienerfolg.label	"Studienerfolgsbestaetigung">
+<!ENTITY menu-dokumente-studienerfolg.accesskey	"E">
+
+<!ENTITY menu-dokumente-studienerfolg-normal.label	"Normal">
+<!ENTITY menu-dokumente-studienerfolg-normal.accesskey	"N">
+
+<!ENTITY menu-dokumente-studienerfolg-finanzamt.label	"Finanzamt">
+<!ENTITY menu-dokumente-studienerfolg-finanzamt.accesskey	"F">
