@@ -428,7 +428,7 @@ if($result = pg_query($conn_fas, $qry))
 				}
 				if(!$error)
 				{
-					$qry2="SELECT * FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='".$lehreinheitlehrveranstaltung_id."' AND lehrform_kurzbz='BE' AND ext_id='".$row->diplomarbeit_pk."';";
+					$qry2="SELECT * FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='".$lehreinheitlehrveranstaltung_id."' AND anmerkung='Diplomarbeit'; AND ext_id='".$row->diplomarbeit_pk."';";
 					if($result2 = pg_query($conn, $qry2))
 					{
 						if(pg_num_rows($result2)>0) //eintrag gefunden

@@ -64,7 +64,10 @@ $text5='';
 $text6='';
 $text7='';
 $text8='';
-
+$stg_praxissemester=array();
+$stg_fktokz=array();
+$stg_ects=array(11=>24.5, 94=>24.5, 145=>14,182=>23,203=>24.5,204=>28,222=>25,308=>24.5);
+$stg_sws=array(11=>38.5, 94=>38.5,145=>2,182=>3,203=>38.5,204=>38.5,222=>38.5,308=>38.5);
 
 $ausgabe_pb1='';
 $projektbetreuerperson_id1="";
@@ -86,7 +89,69 @@ function myaddslashes($var)
 </head>
 <body>
 <?php
-//nation
+//praxissemester
+//array mit Zähler studiengang_fk (fas) und Inhalt studiengang_kz (vilesci) der DIPLOMSTUDIENGÄNGE
+$qry="SELECT studiengang_kz, ext_id FROM public.tbl_studiengang WHERE typ='d' AND studiengang_kz!='91' AND studiengang_kz!='92' AND ext_id>'0' AND ext_id IS NOT NULL;";
+if($result = pg_query($conn, $qry))
+{
+	while($row = pg_fetch_object($result))
+	{
+		$stg_fktokz[$row->ext_id]=$row->studiengang_kz;
+	}
+}
+//array mit Zähler studiengang_kz und Inhalt Ausbildungssemester des Praxissemesters 
+$qry="SELECT studiengang_fk, semester, name FROM ausbildungssemester WHERE name='Praxissemester';";
+if($result = pg_query($conn_fas, $qry))
+{
+	while($row = pg_fetch_object($result))
+	{
+		$stg_praxissemester[$stg_fktokz[$row->studiengang_fk]]=$row->semester;
+	}
+}
+//LVAs anlegen bzw. überprüfen
+foreach ($stg_fktokz as $stg)
+{
+	$qry="SELECT * FROM lehre.tbl_lehrveranstaltung WHERE studiengang_kz=$stg AND kurzbz='PRAX'";
+	if($result = pg_query($conn, $qry))
+	{
+		if(pg_num_rows($result)=0) //Eintag nicht gefunden
+		{			
+			if($row = pg_fetch_object($result))
+			{
+				//anlegen
+				$qry = "INSERT INTO lehre.tbl_lehrveranstaltung (kurzbz, bezeichnung, studiengang_kz, semester, 
+					sprache, ects, semesterstunden, anmerkung, lehre, lehreverzeichnis, aktiv, planfaktor, 
+					planlektoren, planpersonalkosten, plankostenprolektor, updateamum, updatevon, 
+					insertamum, insertvon, ext_id) VALUES (".
+					"'PRAX', ".
+					"'Praxissemester', ".
+					myaddslashes($stg).", ".
+					myaddslashes($stg_praxissemester[$stg]).", ".
+					"'German', ".
+					myaddslashes($stg_ects[$stg]).", ".
+					myaddslashes($stg_sws[$stg]).", ".
+					"'', ".
+					"true, ".
+					"'prax', ".
+					"true, ".
+					"'1.0', ".
+					"'1', ".
+					"'80.0', ".
+					"NULL, ".
+					"NULL, ".
+					"now(), ".
+					"'SYNC', ".
+					"now(), ".
+					"'SYNC', ".
+					"NULL);"; 
+			}
+		}
+	}
+}
+
+
+//----------------------------------------------------------------------
+
 $qry_main = "SELECT * FROM praxissemester;";
 
 if($result = pg_query($conn_fas, $qry_main))
@@ -168,12 +233,13 @@ if($result = pg_query($conn_fas, $qry_main))
 		
 		
 		//student_id ermitteln
-		$qry="SELECT student_uid FROM public.tbl_student WHERE ext_id='".$row->student_fk."';";
+		$qry="SELECT student_uid, studiengang_kz FROM public.tbl_student WHERE ext_id='".$row->student_fk."';";
 		if($resulto=pg_query($conn, $qry))
 		{
 			if($rowo=pg_fetch_object($resulto))
 			{ 
 				$projektarbeitstudent_uid=$rowo->student_uid;
+				$studiengang_kz=$rowo->studiengang_kz;
 			}
 			else 
 			{
@@ -182,56 +248,26 @@ if($result = pg_query($conn_fas, $qry_main))
 			}
 		}
 		
-		
-		//das Praxissemester verfügt über keine Zuordnung zu einer LV oder LE im FAS!!!
-		//lehrveranstaltung ermitteln
-		$qry="SELECT lva_vilesci FROM sync.tbl_synclehrveranstaltung WHERE lva_fas='".$row->lehrveranstaltung_fk."';";
-		if($results = pg_query($conn, $qry))
-		{
-			if($rows=pg_fetch_object($results))
-			{ 
-				$lva=$rows->lva_vilesci;	
-			}
-			else 
-			{
-				$error=true;
-				$error_log.="LVA_FAS=".$row->lehrveranstaltung_fk." in Tabelle tbl_synclehrveranstaltung nicht gefunden:\n";
-			}
-		}
 		if(!$error)
 		{
-			$qry="SELECT lehrveranstaltung_id, studiengang_kz, semester FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='".$lva."';";
+			$qry="SELECT * FROM lehre.tbl_lehrveranstaltung WHERE kurzbz='PRAX' AND studiengang_kz=".$studiengang_kz."';";
 			if($result1 = pg_query($conn, $qry))
 			{
 				if($row1=pg_fetch_object($result1))
 				{ 
 					$lehreinheitlehrveranstaltung_id=$row1->lehrveranstaltung_id;
-					$studiengang_kz=$row1->studiengang_kz;
 					$semester=$row1->semester;
 				}
 				else 
 				{
-					$error=true;
-					$error_log.="Lehrveranstaltung mit ext_id='".$row->lehrveranstaltung_fk."' nicht gefunden.\n";
-				}
-			}
-			$qry="SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE ext_id='$row->fachbereich_fk'";
-			if($result2 = pg_query($conn, $qry))
-			{
-				if($row2=pg_fetch_object($result2))
-				{ 
-					$fachbereich_kurzbz=$row2->fachbereich_kurzbz;
-				}
-				else 
-				{
-					$error=true;
-					$error_log.="Fachbereich mit ext_id='".$row->fachbereich_fk."' nicht gefunden.\n";
+					$error_log.="Lehrveranstaltung 'PRAX' in Studiengang '".$studiengang_kz."'nicht gefunden.\n";
+					continue;
 				}
 			}
 			if(!$error)
 			{
 				//echo nl2br("fachbereich_kurzbz='".$fachbereich_kurzbz."' AND semester='".$semester."' AND studiengang_kz='".$studiengang_kz."';");		
-				$qry="SELECT lehrfach_id FROM lehre.tbl_lehrfach WHERE fachbereich_kurzbz='".$fachbereich_kurzbz."' AND semester='".$semester."' AND studiengang_kz='".$studiengang_kz."';";
+				$qry="SELECT lehrfach_id FROM lehre.tbl_lehrfach WHERE fachbereich_kurzbz='Praxissemester u' AND semester='".$semester."' AND studiengang_kz='".$studiengang_kz."';";
 				if($resulto = pg_query($conn, $qry))
 				{
 					if($rowo=pg_fetch_object($resulto))
@@ -244,7 +280,21 @@ if($result = pg_query($conn_fas, $qry_main))
 						$error_log.="Lehrfach mit Fachbereich='".$fachbereich_kurzbz."', Semester='".$semester."' und Studiengang='".$studiengang_kz."' nicht gefunden.\n";
 					}
 				}
-				$qry="SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ext_id='$row->studiensemester_fk'";
+				//Wann war student in studiensemester?
+				/*$qry="SELECT * FROM student_ausbildungssemester where student_fk='".$row->student_fk."' AND studiensemester_fk='".$semester."'";
+				if($resulto = pg_query($conn, $qry))
+				{
+					if($rowo=pg_fetch_object($resulto))
+					{ 
+						$ausbildungssemester=$rowo->ausbildungssemester_fk;
+					}
+					else 
+					{
+						$error=true;
+						$error_log.="Ausbildungssemester von student(fk) '".$row->student_fk."' mit studiensemester(fk) '".$semester."' in Tabelle student_ausbildungssemester nicht gefunden.\n";
+					}
+				}*/
+				$qry="SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ext_id='$semester'";
 				if($resulto = pg_query($conn, $qry))
 				{
 					if($rowo=pg_fetch_object($resulto))
@@ -254,11 +304,11 @@ if($result = pg_query($conn_fas, $qry_main))
 					else 
 					{
 						$error=true;
-						$error_log.="Studiensemester mit ext_id='".$row->studiensemester_fk."' nicht gefunden.\n";
+						$error_log.="Studiensemester mit ext_id='".$semester."' nicht gefunden.\n";
 					}
 				}
 				
-				$qry3="SELECT * FROM lehre.tbl_projektarbeit WHERE projekttyp_kurzbz='Bachelor' AND ext_id='".$row->praxissemester_pk."';";
+				$qry3="SELECT * FROM lehre.tbl_projektarbeit WHERE projekttyp_kurzbz='".$projektarbeitprojekttyp_kurzbz."' AND ext_id='".$row->praxissemester_pk."';";
 				if($result3 = pg_query($conn, $qry3))
 				{
 					if(pg_num_rows($result3)>0) //eintrag gefunden
@@ -278,7 +328,7 @@ if($result = pg_query($conn_fas, $qry_main))
 				}
 				if(!$error)
 				{
-					$qry2="SELECT * FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='".$lehreinheitlehrveranstaltung_id."' AND lehrform_kurzbz='BE' AND ext_id='".$row->praxissemester_pk."';";
+					$qry2="SELECT * FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='".$lehreinheitlehrveranstaltung_id."' AND anmerkung='Praxissemester'; AND ext_id='".$row->praxissemester_pk."';";
 					if($result2 = pg_query($conn, $qry2))
 					{
 						if(pg_num_rows($result2)>0) //eintrag gefunden
