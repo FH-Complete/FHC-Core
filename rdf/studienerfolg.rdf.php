@@ -143,9 +143,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$anzahl++;
 			}
 		}
+		if($anzahl=!0)
+			$schnitt = $notensumme/$anzahl;
+		else 
+			$schnitt = 0;
 		$xml .= "		<gesamtstunden>$gesamtstunden</gesamtstunden>";
 		$xml .= "		<gesamtects>$gesamtects</gesamtects>";
-		$xml .= "		<schnitt>".sprintf('%.2f',$notensumme/$anzahl)."</schnitt>";
+		$xml .= "		<schnitt>".sprintf('%.2f',$schnitt)."</schnitt>";
 		$xml .= "	</studienerfolg>";
 	}
 	$xml .= "</studienerfolge>";

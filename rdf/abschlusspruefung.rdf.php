@@ -80,23 +80,24 @@ $pruefung = new abschlusspruefung($conn, null, true);
 		if($mitarbeiter->load($row->vorsitz))
 			$vorsitz = $mitarbeiter->titelpre.' '.$mitarbeiter->nachname.' '.$mitarbeiter->titelpost;
 		if($person->load($row->pruefer1))
-			$pruefer1 = $person->nachname;
+			$pruefer1 = $person->titelpre.' '.$person->vorname.' '.$person->nachname.' '.$person->titelpost;
 		if($person->load($row->pruefer2))
-			$pruefer2 = $person->nachname;
+			$pruefer2 = $person->titelpre.' '.$person->vorname.' '.$person->nachname.' '.$person->titelpost;
 		if($person->load($row->pruefer3))
-			$pruefer3 = $person->nachname;
+			$pruefer3 = $person->titelpre.' '.$person->vorname.' '.$person->nachname.' '.$person->titelpost;
 			
 		$qry = "SELECT * FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='rek'";
 		$rektor = '';
 		if($result_rek = pg_query($conn, $qry))
 			if($row_rek = pg_fetch_object($result_rek))
 				$rektor = $row_rek->titelpre.' '.$row_rek->vorname.' '.$row_rek->nachname.' '.$row_rek->titelpost;
-		$qry = "SELECT themenbereich, ende, projektarbeit_id FROM lehre.tbl_projektarbeit a WHERE student_uid='$student->uid' AND (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom') ORDER BY beginn LIMIT 2";
+		$qry = "SELECT themenbereich, ende, projektarbeit_id, note FROM lehre.tbl_projektarbeit a WHERE student_uid='$student->uid' AND (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom') ORDER BY beginn LIMIT 2";
 		$themenbereich='';
 		$datum_projekt='';
 		$betreuer = '';
 		$betreuer_2 = '';
 		$themenbereich_2 = '';
+		$note = '';
 		
 		if($result_proj = pg_query($conn, $qry))
 		{
@@ -108,6 +109,7 @@ $pruefung = new abschlusspruefung($conn, null, true);
 						$betreuer = $row_bet->titelpre.' '.$row_bet->vorname.' '.$row_bet->nachname.' '.$row_bet->titelpost;
 
 				$themenbereich = $row_proj->themenbereich;
+				$note = $row_proj->note;
 				$datum_projekt = $datum_obj->convertISODate($row_proj->ende);
 			}
 			
@@ -168,6 +170,7 @@ $pruefung = new abschlusspruefung($conn, null, true);
 		<themenbereich_2><![CDATA['.$themenbereich_2.']]></themenbereich_2>
 		<betreuer><![CDATA['.$betreuer.']]></betreuer>
 		<betreuer_2><![CDATA['.$betreuer_2.']]></betreuer_2>
+		<note><![CDATA['.$note.']]></note>
 		<datum_projekt><![CDATA['.$datum_projekt.']]></datum_projekt>';
 		
 	 	echo "\n\t</pruefung>";
