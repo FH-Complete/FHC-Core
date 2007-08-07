@@ -256,7 +256,7 @@ if($result = pg_query($conn_fas, $qry_main))
 				if($row1=pg_fetch_object($result1))
 				{ 
 					$lehreinheitlehrveranstaltung_id=$row1->lehrveranstaltung_id;
-					$semester=$row1->semester;
+					$semester=$row1->semester; //ausbildungssemester
 				}
 				else 
 				{
@@ -280,21 +280,21 @@ if($result = pg_query($conn_fas, $qry_main))
 						$error_log.="Lehrfach mit Fachbereich='".$fachbereich_kurzbz."', Semester='".$semester."' und Studiengang='".$studiengang_kz."' nicht gefunden.\n";
 					}
 				}
-				//Wann war student in studiensemester?
-				/*$qry="SELECT * FROM student_ausbildungssemester where student_fk='".$row->student_fk."' AND studiensemester_fk='".$semester."'";
+				//Wann(ausbildungssemester) war student in studiensemester?
+				$qry="SELECT * FROM student_ausbildungssemester where student_fk='".$row->student_fk."' AND ausbildungssemester_fk='".$semester."'";
 				if($resulto = pg_query($conn, $qry))
 				{
 					if($rowo=pg_fetch_object($resulto))
 					{ 
-						$ausbildungssemester=$rowo->ausbildungssemester_fk;
+						$studiensemester=$rowo->studiensemester_fk;
 					}
 					else 
 					{
 						$error=true;
 						$error_log.="Ausbildungssemester von student(fk) '".$row->student_fk."' mit studiensemester(fk) '".$semester."' in Tabelle student_ausbildungssemester nicht gefunden.\n";
 					}
-				}*/
-				$qry="SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ext_id='$semester'";
+				}
+				$qry="SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ext_id=''.$studiensemester.";
 				if($resulto = pg_query($conn, $qry))
 				{
 					if($rowo=pg_fetch_object($resulto))
@@ -304,7 +304,7 @@ if($result = pg_query($conn_fas, $qry_main))
 					else 
 					{
 						$error=true;
-						$error_log.="Studiensemester mit ext_id='".$semester."' nicht gefunden.\n";
+						$error_log.="Studiensemester mit ext_id='".$studiensemester."' nicht gefunden.\n";
 					}
 				}
 				
@@ -328,7 +328,7 @@ if($result = pg_query($conn_fas, $qry_main))
 				}
 				if(!$error)
 				{
-					$qry2="SELECT * FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='".$lehreinheitlehrveranstaltung_id."' AND anmerkung='Praxissemester'; AND ext_id='".$row->praxissemester_pk."';";
+					$qry2="SELECT * FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='".$lehreinheitlehrveranstaltung_id."' AND anmerkung='Praxissemester' AND ext_id='".$row->praxissemester_pk."';";
 					if($result2 = pg_query($conn, $qry2))
 					{
 						if(pg_num_rows($result2)>0) //eintrag gefunden
