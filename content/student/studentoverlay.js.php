@@ -3063,7 +3063,7 @@ function StudentSendMail()
   			if(tree.view.getCellText(v,col).length>1)
   			{
   				if(mailempfaenger!='')
-					mailempfaenger=mailempfaenger+','+tree.view.getCellText(v,col)+'@technikum-wien.at';
+					mailempfaenger=mailempfaenger+','+tree.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
 				else
 					mailempfaenger='mailto:'+tree.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
   			}
@@ -3075,9 +3075,47 @@ function StudentSendMail()
 	}
 	if(anzfault!=0)
 		alert(anzfault+' Student konnten nicht hinzugefuegt werden weil keine UID eingetragen ist!');
-	window.location.href=mailempfaenger;
+	if(mailempfaenger!='')
+		window.location.href=mailempfaenger;
 }
 
+// ****
+// * Email an die Privatadresse markierten Studenten versenden
+// ****
+function StudentSendMailPrivat()
+{
+	mailempfaenger='';
+	var tree=document.getElementById('student-tree');
+	var numRanges = tree.view.selection.getRangeCount();
+	var start = new Object();
+	var end = new Object();
+	var anzfault=0;
+	//Markierte Datensaetze holen
+	for (var t=0; t<numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+  		for (v=start.value; v<=end.value; v++)
+  		{
+  			var col = tree.columns ? tree.columns["student-treecol-mail_privat"] : "student-treecol-mail_privat";
+  			if(tree.view.getCellText(v,col).length>1)
+  			{
+  				if(mailempfaenger!='')
+					mailempfaenger=mailempfaenger+','+tree.view.getCellText(v,col);
+				else
+					mailempfaenger='mailto:'+tree.view.getCellText(v,col);
+  			}
+  			else
+  			{
+  				anzfault=anzfault+1;
+  			}
+  		}
+	}
+	if(anzfault!=0)
+		alert(anzfault+' Student konnten nicht hinzugefuegt werden weil keine Privatemailadresse eingetragen ist!');
+		
+	if(mailempfaenger!='')
+		window.location.href=mailempfaenger;
+}
 
 // ****
 // * Erstellt das Diploma Supplement fuer einen oder mehrere Studenten

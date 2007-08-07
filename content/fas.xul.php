@@ -80,6 +80,8 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-statistic-lehrauftraege:command" oncommand="StatistikPrintLehrauftraege();"/>
   <command id="menu-statistic-lvplanung:command" oncommand="StatistikPrintLVPlanung();"/>
   <command id="menu-statistic-lehrauftragsliste:command" oncommand="StatistikPrintLehrauftragsliste();"/>
+  <command id="menu-statistic-projektarbeit:command" oncommand="StatistikPrintProjektarbeit();"/>
+  <command id="menu-statistic-abschlusspruefung:command" oncommand="StatistikPrintAbschlusspruefung();"/>
   <command id="menu-dokumente-inskriptionsbestaetigung:command" oncommand="StudentPrintInskriptionsbestaetigung();"/>
   <command id="menu-dokumente-zeugnis:command" oncommand="StudentCreateZeugnis();"/>
   <command id="menu-dokumente-diplsupplement:command" oncommand="StudentCreateDiplSupplement();"/>
@@ -194,6 +196,18 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                label     = "&menu-statistic-lehrauftragsliste.label;"
                command   =  "menu-statistic-lehrauftragsliste:command"
                accesskey = "&menu-statistic-lehrauftragsliste.accesskey;"/>
+             <menuitem
+               id        =  "menu-statistic-projektarbeit"
+               key       =  "menu-statistic-projektarbeit:key"
+               label     = "&menu-statistic-projektarbeit.label;"
+               command   =  "menu-statistic-projektarbeit:command"
+               accesskey = "&menu-statistic-projektarbeit.accesskey;"/>
+             <menuitem
+               id        =  "menu-statistic-abschlusspruefung"
+               key       =  "menu-statistic-abschlusspruefung:key"
+               label     = "&menu-statistic-abschlusspruefung.label;"
+               command   =  "menu-statistic-abschlusspruefung:command"
+               accesskey = "&menu-statistic-abschlusspruefung.accesskey;"/>
           </menupopup>
     </menu>
     <menu id="menu-dokumente" label="&menu-dokumente.label;" accesskey="&menu-dokumente.accesskey;">

@@ -85,6 +85,17 @@ if($xmlformat=='rdf')
 	{
 		global $rdf_url, $datum_obj, $conn;
 		$status='';
+		
+		$mail_privat = '';
+		$qry_mail = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id='$row->person_id' AND zustellung=true ORDER BY kontakt_id DESC LIMIT 1";
+		if($result_mail = pg_query($conn, $qry_mail))
+		{
+			if($row_mail = pg_fetch_object($result_mail))
+			{
+				$mail_privat = $row_mail->kontakt;
+			}
+		}
+		
 		if($row->prestudent_id!='')
 		{
 			$prestudent = new prestudent($conn, null, null);
@@ -116,6 +127,8 @@ if($xmlformat=='rdf')
 	    		<STUDENT:geburtsnation><![CDATA['.$row->geburtsnation.']]></STUDENT:geburtsnation>
 	    		<STUDENT:sprache><![CDATA['.$row->sprache.']]></STUDENT:sprache>
 	    		<STUDENT:status><![CDATA['.$status.']]></STUDENT:status>
+	    		<STUDENT:mail_privat><![CDATA['.$mail_privat.']]></STUDENT:mail_privat>
+	    		<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
 
 	    		<STUDENT:uid><![CDATA['.(isset($row->uid)?$row->uid:'').']]></STUDENT:uid>
 	    		<STUDENT:matrikelnummer><![CDATA['.(isset($row->matrikelnr)?$row->matrikelnr:'').']]></STUDENT:matrikelnummer>
