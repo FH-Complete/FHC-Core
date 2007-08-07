@@ -98,12 +98,17 @@ loadVariables($conn, $user);
 	$maxlength[$i]=15;
 	$worksheet->write(0,++$i,"STATUS", $format_bold);
 	$maxlength[$i]=6;
+	$worksheet->write(0,++$i,"EMail Intern", $format_bold);
+	$maxlength[$i]=12;
+	$worksheet->write(0,++$i,"EMail Privat", $format_bold);
+	$maxlength[$i]=12;
 	$worksheet->write(0,++$i,"STRASSE", $format_bold);
 	$maxlength[$i]=7;
 	$worksheet->write(0,++$i,"PLZ", $format_bold);
 	$maxlength[$i]=3;
 	$worksheet->write(0,++$i,"ORT", $format_bold);
 	$maxlength[$i]=3;
+
 			
 	// Student holen
 	if($typ=='student')
@@ -237,6 +242,27 @@ loadVariables($conn, $user);
 		$worksheet->write($zeile,$i, $status);
 		$i++;
 		
+		if(isset($row->uid))
+		{
+			if(strlen($row->uid.'@'.DOMAIN)>$maxlength[$i])
+				$maxlength[$i] = strlen($row->uid.'@'.DOMAIN);
+			$worksheet->write($zeile,$i, $row->uid.'@'.DOMAIN);
+		}
+		$i++;
+		
+		//Zustelladresse aus der Datenbank holen und dazuhaengen
+		$qry_1 = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id='$row->person_id' AND zustellung=true ORDER BY kontakt_id DESC LIMIT 1";
+		if($result_1 = pg_query($conn, $qry_1))
+		{
+			if($row_1 = pg_fetch_object($result_1))
+			{	
+				if(strlen($row_1->kontakt)>$maxlength[$i])
+					$maxlength[$i]=strlen($row_1->kontakt);
+				$worksheet->write($zeile,$i, $row_1->kontakt);
+			}
+		}
+		$i++;
+		
 		//Zustelladresse aus der Datenbank holen und dazuhaengen
 		$qry_1 = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id' ORDER BY zustelladresse LIMIT 1";
 		if($result_1 = pg_query($conn, $qry_1))
@@ -257,7 +283,7 @@ loadVariables($conn, $user);
 					$maxlength[$i]=strlen($row_1->ort);
 				$worksheet->write($zeile,$i, $row_1->ort);
 			}
-		}
+		}		
 	}
 		
 

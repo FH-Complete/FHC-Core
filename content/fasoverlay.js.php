@@ -369,7 +369,6 @@ function onVerbandSelect(event)
 			StudentPrestudentDisableFields(true);
 			StudentKontoDisableFields(true);
 			StudentAkteDisableFields(true);
-			StudentBetriebsmittelDisableFields(true);
 			StudentIODisableFields(true);
 			StudentNoteDisableFields(true);
 			document.getElementById('student-kontakt').setAttribute('src','');
@@ -647,6 +646,59 @@ function StatistikPrintLehrauftragsliste()
 	var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
 
 	window.open('<?php echo APP_ROOT ?>content/statistik/lehrauftragsliste_gst.xls.php?studiengang_kz='+studiengang_kz,'Lehrauftragsliste');
+}
+
+// ****
+// * Erstellt ein Excelfile mit den Daten der Abschlusspruefung
+// ****
+function StatistikPrintProjektarbeit()
+{
+	tree = document.getElementById('tree-verband');
+
+	if(tree.currentIndex==-1)
+	{
+		alert('Bitte zuerst einen Studiengang auswaehlen');
+		return;
+	}
+
+	//Studiengang und Semester holen
+	var col;
+	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+	var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["sem"] : "sem";
+	var semester=tree.view.getCellText(tree.currentIndex,col);
+
+	if(studiengang_kz!='')
+		window.open('<?php echo APP_ROOT ?>content/statistik/projektarbeitexport.xls.php?studiengang_kz='+studiengang_kz+'&semester='+semester+'&studiensemester_kurzbz='+getStudiensemester(),'Excel');
+	else
+		alert('Bitte zuerst Studiengang / Semester auswaehlen');
+}
+
+// ****
+// * Liefert eine HTML Liste mit Uebersicht der Lehrauftraege.
+// * Studiengang und optional Semester muss gewaehlt sein.
+// ****
+function StatistikPrintAbschlusspruefung()
+{
+	tree = document.getElementById('tree-verband');
+
+	if(tree.currentIndex==-1)
+	{
+		alert('Bitte zuerst einen Studiengang auswaehlen');
+		return;
+	}
+
+	//Studiengang und Semester holen
+	var col;
+	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+	var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["sem"] : "sem";
+	var semester=tree.view.getCellText(tree.currentIndex,col);
+
+	if(studiengang_kz!='')
+		window.open('<?php echo APP_ROOT ?>content/statistik/abschlusspruefungexport.xls.php?studiengang_kz='+studiengang_kz+'&semester='+semester+'&studiensemester_kurzbz='+getStudiensemester(),'Excel');
+	else
+		alert('Bitte zuerst Studiengang / Semester auswaehlen');
 }
 
 // ****

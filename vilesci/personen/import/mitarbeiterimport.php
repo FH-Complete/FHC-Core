@@ -28,11 +28,13 @@ require_once('../../../include/benutzer.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/kontakt.class.php');
 require_once('../../../include/adresse.class.php');
+require_once('../../../include/datum.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
 	die('Fehler beim Herstellen der DB Connection');
 
 $user=get_uid();
+$datum_obj = new datum();
 
 loadVariables($conn, $user);
 
@@ -146,6 +148,7 @@ $ueberschreiben = (isset($_POST['ueberschreiben'])?$_POST['ueberschreiben']:'');
 $svnr = (isset($_POST['svnr'])?$_POST['svnr']:'');
 $ersatzkennzeichen = (isset($_POST['ersatzkennzeichen'])?$_POST['ersatzkennzeichen']:'');
 //end Parameter
+$geburtsdatum_error=false;
 
 // *** Speichern der Daten ***
 if(isset($_POST['save']))
@@ -468,6 +471,29 @@ if(isset($_POST['save']))
 	}
 }
 // *** SAVE ENDE ***
+if($geburtsdatum!='')
+{
+	//Wenn das Datum im Format d.m.Y ist dann in Y-m-d umwandeln
+	if(strpos($geburtsdatum,'.'))
+	{
+		if($datum_obj->mktime_datum($geburtsdatum))
+		{
+			$geburtsdatum = date('Y-m-d',$datum_obj->mktime_datum($geburtsdatum));
+		}
+		else
+		{
+			$geburtsdatum_error=true;
+		}
+	}
+	else 
+	{
+		if(!ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$geburtsdatum))
+			$geburtsdatum_error=true;
+	}
+	
+	if($geburtsdatum_error)
+		echo "Format des Geburtsdatums ist ungueltig!";
+}
 ?>
 <form method='POST'>
 <table width="100%">
@@ -514,7 +540,7 @@ echo '</td></tr>';
 echo '<tr><td>Anmerkungen</td><td><textarea id="anmerkung" name="anmerkungen">'.$anmerkungen.'</textarea></td></tr>';
 echo '<tr><tr><td></td><td>';
 
-if($geburtsdatum=='' && $vorname=='' && $nachname=='')
+if(($geburtsdatum=='' && $vorname=='' && $nachname=='') || $geburtsdatum_error)
 	echo '<input type="submit" name="showagain" value="Vorschlag laden"</td></tr>';
 else
 	echo '<input type="submit" name="save" value="Speichern"</td></tr>';
@@ -527,7 +553,7 @@ else
 <?php
 //Vorschlaege laden
 if($geburtsdatum!='')
-{
+{		
 	if(ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$geburtsdatum))
 	{
 		$where = " gebdatum='".$geburtsdatum."'";

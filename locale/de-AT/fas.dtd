@@ -55,6 +55,14 @@
 <!ENTITY menu-statistic-lehrauftragsliste.label		"Lehrauftragsliste">
 <!ENTITY menu-statistic-lehrauftragsliste.accesskey	"A">
 
+<!ENTITY menu-statistic-projektarbeit.key		"P">
+<!ENTITY menu-statistic-projektarbeit.label		"Projektarbeit">
+<!ENTITY menu-statistic-projektarbeit.accesskey	"P">
+
+<!ENTITY menu-statistic-abschlusspruefung.key		"B">
+<!ENTITY menu-statistic-abschlusspruefung.label		"Abschlusspruefung">
+<!ENTITY menu-statistic-abschlusspruefung.accesskey	"B">
+
 <!ENTITY menu-dokumente.label		"Dokumente">
 <!ENTITY menu-dokumente.accesskey	"D">
 
