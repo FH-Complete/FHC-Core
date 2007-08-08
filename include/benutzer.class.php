@@ -39,15 +39,18 @@ class benutzer extends person
 	{
 		$this->conn = $conn;
 		
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
-		if(!pg_query($conn,$qry))
+		if($unicode!=null)
 		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
+			if($unicode)
+				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			else 
+				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+				
+			if(!pg_query($conn,$qry))
+			{
+				$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
+				return false;
+			}
 		}
 		
 		if($uid != null)

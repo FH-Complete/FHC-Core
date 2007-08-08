@@ -59,7 +59,7 @@ loadVariables($conn, $user);
 
 	$format_bold =& $workbook->addFormat();
 	$format_bold->setBold();
-
+	
 	$format_title =& $workbook->addFormat();
 	$format_title->setBold();
 	// let's merge
@@ -67,9 +67,9 @@ loadVariables($conn, $user);
 
 	//Zeilenueberschriften ausgeben
 	
-	$headline=array('Typ der Projektarbeit','Titel der Projektarbeit','Titelpre','Vorname','Nachname','Titelpost',
+	$headline=array('Typ der Projektarbeit','Titel der Projektarbeit','Student',
 	                'Note','Punkte','Beginn','Ende','Freigegeben','Gesperrt bis','Gesamtstunden','Themenbereich',
-	                'Anmerkung');
+	                'Anmerkung','Projektarbeit ID');
 	
 	$i=0;
 	foreach ($headline as $title)
@@ -81,8 +81,8 @@ loadVariables($conn, $user);
 			
 	// Daten holen
 	$qry = "SELECT 
-				tbl_projekttyp.bezeichnung, titel, titelpre, vorname, nachname, titelpost, tbl_note.anmerkung, punkte, beginn,
-				ende, CASE WHEN freigegeben THEN 'Ja' ELSE 'Nein' END, gesperrtbis, gesamtstunden, themenbereich, tbl_projektarbeit.anmerkung
+				tbl_projekttyp.bezeichnung, titel, trim(COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || COALESCE(titelpost,'')), tbl_note.anmerkung, punkte, beginn,
+				ende, CASE WHEN freigegeben THEN 'Ja' ELSE 'Nein' END, gesperrtbis, gesamtstunden, themenbereich, tbl_projektarbeit.anmerkung, projektarbeit_id
 			FROM 
 				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, 
 				public.tbl_benutzer, public.tbl_person, lehre.tbl_projekttyp, lehre.tbl_note
@@ -106,8 +106,10 @@ loadVariables($conn, $user);
 	{
 		while($row = pg_fetch_array($result))
 		{
+			$zeile++;
 			$i=0;
 			
+			//Projektarbeit
 			foreach ($row as $idx=>$content)
 			{
 				if(is_numeric($idx))
@@ -119,6 +121,47 @@ loadVariables($conn, $user);
 				}
 			}
 			$zeile++;
+						
+			//Betreuer
+									
+			$qry_betreuer = "SELECT betreuerart_kurzbz, COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,''), tbl_note.anmerkung, faktor, name, punkte, stunden, stundensatz FROM (lehre.tbl_projektbetreuer JOIN tbl_person USING(person_id)) LEFT JOIN lehre.tbl_note USING(note) WHERE projektarbeit_id='".$row['projektarbeit_id']."'";
+			
+			if($result_betreuer = pg_query($conn, $qry_betreuer))
+			{
+				if(pg_num_rows($result_betreuer)>0)
+				{
+					$headline=array('Betreuerart','Betreuer','Note','Faktor','Name','Punkte','Stunden','Stundensatz');
+		
+					$i=1;
+					
+					foreach ($headline as $title)
+					{
+						$worksheet->write($zeile,$i,$title, $format_bold);
+						if(strlen($title)>$maxlength[$i])
+							$maxlength[$i]=strlen($title);
+						$i++;
+					}
+					
+					$zeile++;
+					while($row_betreuer = pg_fetch_array($result_betreuer))
+					{
+						$i=1;
+				
+						foreach ($row_betreuer as $idx=>$content)
+						{
+							if(is_numeric($idx))
+							{
+								$worksheet->write($zeile, $i, $content);
+								if(strlen($content)>$maxlength[$i])
+									$maxlength[$i]=strlen($content);
+								$i++;
+							}
+						}
+						$zeile++;
+					}
+				}
+			}
+			
 		}
 	}
 	//Die Breite der Spalten setzen

@@ -179,7 +179,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<row>
 										<label value="Typ" control="student-pruefung-menulist-typ"/>
 										<menulist id="student-pruefung-menulist-typ" disabled="true"
-										          datasources="<?php echo APP_ROOT; ?>rdf/pruefungstyp.rdf.php" flex="1"
+										          datasources="<?php echo APP_ROOT; ?>rdf/pruefungstyp.rdf.php?abschluss=false" flex="1"
 										          ref="http://www.technikum-wien.at/pruefungstyp/liste" >
 											<template>
 												<menupopup>

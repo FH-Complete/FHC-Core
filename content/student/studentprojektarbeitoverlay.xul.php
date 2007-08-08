@@ -175,7 +175,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<rows>
 						<row>
 							<label value="Titel" control="student-projektarbeit-textbox-titel"/>
-							<textbox id="student-projektarbeit-textbox-titel" disabled="true" />
+							<textbox id="student-projektarbeit-textbox-titel" disabled="true" maxlength="256" />
 						</row>
 						<row>
 							<label value="Typ" control="student-projektarbeit-menulist-projekttyp"/>
