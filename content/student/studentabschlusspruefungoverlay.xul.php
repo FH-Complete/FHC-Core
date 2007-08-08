@@ -248,7 +248,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     			<label value="Typ" control="student-abschlusspruefung-menulist-typ" />
     			<menulist id="student-abschlusspruefung-menulist-typ"
 						  disabled="true"
-				          datasources="<?php echo APP_ROOT; ?>rdf/pruefungstyp.rdf.php" flex="1"
+				          datasources="<?php echo APP_ROOT; ?>rdf/pruefungstyp.rdf.php?abschluss=true" flex="1"
 				          ref="http://www.technikum-wien.at/pruefungstyp/liste" 
 				>
 					<template>
@@ -267,7 +267,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     				<spacer flex="1" />
     			</vbox>
     			<label value="Anmerkung" control="student-abschlusspruefung-textbox-anmerkung" />
-    			<textbox id="student-abschlusspruefung-textbox-anmerkung" multiline="true" maxLength="256" disabled="true"/>
+    			<textbox id="student-abschlusspruefung-textbox-anmerkung" multiline="true" maxlength="256" disabled="true"/>
     		</row>
     		<row>
     			<spacer />

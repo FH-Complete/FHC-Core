@@ -36,6 +36,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 	
+if(isset($_GET['abschluss']))
+{
+	if($_GET['abschluss']!='true' && $_GET['abschluss']!='false')
+		die('Parameter abschluss darf nur true oder false sein');
+	else 
+		$abschlusspruefung = $_GET['abschluss'];
+}
+
 $rdf_url='http://www.technikum-wien.at/pruefungstyp';
 
 echo '
@@ -47,7 +55,10 @@ echo '
 ';
    
 //Daten holen
-$qry = "SET CLIENT_ENCODING TO 'UNICODE';SELECT * FROM lehre.tbl_pruefungstyp ORDER BY beschreibung";
+$qry = "SET CLIENT_ENCODING TO 'UNICODE';SELECT * FROM lehre.tbl_pruefungstyp ";
+if(isset($abschlusspruefung))
+	$qry.= " WHERE abschluss='".$abschlusspruefung."'";
+$qry.= " ORDER BY beschreibung";
 
 if($result = pg_query($conn, $qry))
 {
