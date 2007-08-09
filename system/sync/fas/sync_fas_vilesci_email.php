@@ -185,7 +185,7 @@ if($result = pg_query($conn_fas, $qry))
 	}		
 }
 
-echo nl2br("Emailsynchro Beginn: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
+echo nl2br("Emailsynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
 
 //echo nl2br($text);
 echo nl2br("\n".$error_log);

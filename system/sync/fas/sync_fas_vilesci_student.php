@@ -1171,7 +1171,7 @@ if($result = pg_query($conn_fas, $qry))
 							$ausgabe_person="Insertvon: '".$insertvon."' (statt '".$row1->insertvon."')";
 						}
 					}
-					if($updatep && $dont_sync_php)
+					if($updatep && !in_array($studiengang_kz, $dont_sync_php))
 					{
 						$qry = 'UPDATE public.tbl_person SET'.
 						       ' sprache='.myaddslashes($sprache).',';
@@ -1585,7 +1585,7 @@ if($result = pg_query($conn_fas, $qry))
 								$ausgabe_pre="Insertvon: '".$insertvon."'";
 							}
 						}
-						if($updater && $dont_sync_php)
+						if($updater && !in_array($studiengang_kz, $dont_sync_php))
 						{
 							$qry = 'UPDATE public.tbl_prestudent SET'.
 							       ' aufmerksamdurch_kurzbz='.myaddslashes($aufmerksamdurch_kurzbz).','.
@@ -2080,7 +2080,7 @@ if($result = pg_query($conn_fas, $qry))
 										$ausgabe_benutzer="Insertvon: '".$insertvon."' statt('".$rows->insertvon."')";
 									}
 								}
-								if($updateb  && $dont_sync_php)
+								if($updateb  && !in_array($studiengang_kz, $dont_sync_php))
 								{
 									$qry = 'UPDATE public.tbl_benutzer SET'.
 									       ' uid='.myaddslashes($student_uid).','.
@@ -2278,7 +2278,7 @@ if($result = pg_query($conn_fas, $qry))
 											$ausgabe_student="Insertvon: '".$insertvon."' (statt '".$rows->insertvon."')";
 										}
 									}
-									if($updates && $dont_sync_php)
+									if($updates && !in_array($studiengang_kz, $dont_sync_php))
 									{
 										$qry = 'UPDATE public.tbl_student SET'.
 										       ' student_uid='.myaddslashes($student_uid).','.
