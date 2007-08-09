@@ -8,7 +8,7 @@
  */
 
 //*
-//* Synchronisiert IO-atensaetze von FAS DB in VILESCI DB
+//* Synchronisiert IO-Datensaetze von FAS DB in VILESCI DB
 //*
 //*
 
@@ -18,7 +18,7 @@ require_once('../sync_config.inc.php');
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
-$adress='ruhan@technikum-wien.at';
+//$adress='ruhan@technikum-wien.at';
 //$adress='fas_sync@technikum-wien.at';
 
 $error_log='';
@@ -266,7 +266,7 @@ echo nl2br("IO-Synchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']
 
 //echo nl2br($text);
 echo nl2br("\n".$error_log);
-echo nl2br("\n\nIO-Sync:\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler");
+echo nl2br("\n\nIO-Sync:\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n$ausgabe");
 $ausgabe="IO-Sync:\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n\n".$ausgabe;
 if(strlen(trim($error_log))>0)
 {
