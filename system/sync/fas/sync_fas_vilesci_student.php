@@ -1,6 +1,6 @@
 <?php
-/* Copyright (C) 2007 
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+/* Copyright (C) 2007
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          AndreAS Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -113,48 +113,48 @@ if(pg_numrows($resultp)==0)
 }
 echo nl2br($plausisvnr."\n");
 $qry="
-SELECT 
-p1.person_pk AS person1, p1.familienname AS familienname1, p1.vorname AS vorname1, p1.vornamen AS vornamen1, p1.geschlecht AS geschlecht1, 
-p1.gebdat AS gebdat1, p1.gebort AS gebort1, p1.staatsbuergerschaft AS staatsbuergerschaft1, p1.familienstand AS familienstand1, 
-p1.svnr AS svnr1, p1. ersatzkennzeichen  AS ersatzkennzeichen1, p1.anrede AS anrede1, p1.anzahlderkinder AS anzahlderkinder1, 
+SELECT
+p1.person_pk AS person1, p1.familienname AS familienname1, p1.vorname AS vorname1, p1.vornamen AS vornamen1, p1.geschlecht AS geschlecht1,
+p1.gebdat AS gebdat1, p1.gebort AS gebort1, p1.staatsbuergerschaft AS staatsbuergerschaft1, p1.familienstand AS familienstand1,
+p1.svnr AS svnr1, p1. ersatzkennzeichen  AS ersatzkennzeichen1, p1.anrede AS anrede1, p1.anzahlderkinder AS anzahlderkinder1,
 p1.titel AS titel1,  p1.gebnation AS gebnation1, p1.postnomentitel AS postnomentitel1, p1.uid as uid1,
 p1.student_pk AS student1, p1.zgv AS zgv1, p1.studiengang_fk AS studiengang1, p1.zgvdatum AS zgvdatum1, p1.zgvort AS zgvort1,
 p1.zgvmagister AS zgvmagister1, p1.zgvmagisterort AS zgvmagisterort1, p1.zgvmagisterdatum AS zgvmagisterdatum1, p1.punkte AS punkte1,
 p1.perskz AS perskz1, p1.aufgenommenam AS aufgenommenam1, p1.aufmerksamdurch AS aufmerksamdurch1, p1.berufstaetigkeit AS berufstaetigkeit1,
 p1.beendigungsdatum AS beendigungsdatum1, p1.berufstaetigkeit AS berufstaetigkeit1, p1.aufmerksamdurch_fk AS aufmerksamdurchfk1,
 p1.aufnahmeschluessel AS aufnahmeschluessel1, p1.aufnahmeschluessel_fk AS aufnahmeschluesselfk1, p1.angetreten AS angetreten1,
-p2.person_pk AS person2, p2.familienname AS familienname2, p2.vorname AS vorname2, p2.vornamen AS vornamen2, p2.geschlecht AS geschlecht2, 
-p2.gebdat AS gebdat2, p2.gebort AS gebort2, p2.staatsbuergerschaft AS staatsbuergerschaft2, p2.familienstand AS familienstand2, 
-p2.svnr AS svnr2, p2. ersatzkennzeichen  AS ersatzkennzeichen2, p2.anrede AS anrede2, p2.anzahlderkinder AS anzahlderkinder2, 
-p2.titel AS titel2,  p2.gebnation AS gebnation2, p2.postnomentitel AS postnomentitel2, p2.uid as uid2, 
+p2.person_pk AS person2, p2.familienname AS familienname2, p2.vorname AS vorname2, p2.vornamen AS vornamen2, p2.geschlecht AS geschlecht2,
+p2.gebdat AS gebdat2, p2.gebort AS gebort2, p2.staatsbuergerschaft AS staatsbuergerschaft2, p2.familienstand AS familienstand2,
+p2.svnr AS svnr2, p2. ersatzkennzeichen  AS ersatzkennzeichen2, p2.anrede AS anrede2, p2.anzahlderkinder AS anzahlderkinder2,
+p2.titel AS titel2,  p2.gebnation AS gebnation2, p2.postnomentitel AS postnomentitel2, p2.uid as uid2,
 p2.student_pk AS student2, p2.zgv AS zgv2, p2.studiengang_fk AS studiengang2, p2.zgvdatum AS zgvdatum2, p2.zgvort AS zgvort2,
 p2.zgvmagister AS zgvmagister2, p2.zgvmagisterort AS zgvmagisterort2, p2.zgvmagisterdatum AS zgvmagisterdatum2, p2.punkte AS punkte2,
 p2.perskz AS perskz2, p2.aufgenommenam AS aufgenommenam2, p2.aufmerksamdurch AS aufmerksamdurch2, p2.berufstaetigkeit AS berufstaetigkeit2,
 p2.beendigungsdatum AS beendigungsdatum2, p2.berufstaetigkeit AS berufstaetigkeit2, p2.aufmerksamdurch_fk AS aufmerksamdurchfk2,
 p2.aufnahmeschluessel AS aufnahmeschluessel2, p2.aufnahmeschluessel_fk AS aufnahmeschluesselfk2, p2.angetreten AS angetreten2
-FROM (person JOIN student ON person_pk=student.person_fk ) AS p1 
+FROM (person JOIN student ON person_pk=student.person_fk ) AS p1
 CROSS JOIN (person JOIN student ON person_pk=student.person_fk) AS p2 WHERE
-((p1.svnr=p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'') 
-OR ((p1.svnr<>p2.svnr AND (p1.svnr IS NULL OR p1.svnr='' OR p2.svnr IS NULL OR p2.svnr='')) 
-	AND p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!='' 
+((p1.svnr=p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'')
+OR ((p1.svnr<>p2.svnr AND (p1.svnr IS NULL OR p1.svnr='' OR p2.svnr IS NULL OR p2.svnr=''))
+	AND p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!=''
 	AND p1.gebdat=p2.gebdat AND p1.gebdat IS NOT NULL AND p1.gebdat>'1935-01-01' AND p1.gebdat<'2000-01-01'))
-AND (p1.person_pk < p2.person_pk) 
-AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400') 
+AND (p1.person_pk < p2.person_pk)
+AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400')
 AND (trim(p1.familienname)<>trim(p2.familienname) OR trim(p1.vorname)<>trim(p2.vorname) OR trim(p1.vornamen)<>trim(p2.vornamen)
-	OR p1.geschlecht<>p2.geschlecht OR p1.gebort<>p2.gebort 
-	OR p1.gebdat<>p2.gebdat OR p1.staatsbuergerschaft<> p2.staatsbuergerschaft OR p1.familienstand<>p2.familienstand 
-	OR p1.svnr<>p2.svnr OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.anrede<>p2.anrede OR p1.titel<>p2.titel 
-	OR p1.anzahlderkinder<>p2.anzahlderkinder OR p1.gebnation<>p2.gebnation OR p1.postnomentitel<> p2.postnomentitel 
+	OR p1.geschlecht<>p2.geschlecht OR p1.gebort<>p2.gebort
+	OR p1.gebdat<>p2.gebdat OR p1.staatsbuergerschaft<> p2.staatsbuergerschaft OR p1.familienstand<>p2.familienstand
+	OR p1.svnr<>p2.svnr OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.anrede<>p2.anrede OR p1.titel<>p2.titel
+	OR p1.anzahlderkinder<>p2.anzahlderkinder OR p1.gebnation<>p2.gebnation OR p1.postnomentitel<> p2.postnomentitel
 
-	OR ((p1.zgv<>p2.zgv OR p1.zgvdatum<>p2.zgvdatum OR p1.zgvort<>p2.zgvort 
-	OR p1.zgvmagister<>p2.zgvmagister OR p1.zgvmagisterort<>p2.zgvmagisterort OR p1.zgvmagisterdatum<>p2.zgvmagisterdatum 
-	OR p1.punkte<>p2.punkte 
+	OR ((p1.zgv<>p2.zgv OR p1.zgvdatum<>p2.zgvdatum OR p1.zgvort<>p2.zgvort
+	OR p1.zgvmagister<>p2.zgvmagister OR p1.zgvmagisterort<>p2.zgvmagisterort OR p1.zgvmagisterdatum<>p2.zgvmagisterdatum
+	OR p1.punkte<>p2.punkte
 	OR (p1.perskz<>p2.perskz AND p1.perskz='') OR (p1.perskz<>p2.perskz AND p2.perskz='')
-	OR (p1.aufgenommenam<>p2.aufgenommenam AND ((p1.perskz<>p2.perskz AND p1.perskz='') OR (p1.perskz<>p2.perskz AND p2.perskz='')))	
-	OR (p1.beendigungsdatum<>p2.beendigungsdatum AND ((p1.perskz<>p2.perskz AND p1.perskz='') OR (p1.perskz<>p2.perskz AND p2.perskz='')))	
-	OR p1.aufmerksamdurch<>p2.aufmerksamdurch 
-	OR p1.aufnahmeschluessel<>p2.aufnahmeschluessel OR p1.aufnahmeschluessel_fk<>p2.aufnahmeschluessel_fk 
-	OR p1.berufstaetigkeit<>p2.berufstaetigkeit OR p1.aufmerksamdurch_fk<>p2.aufmerksamdurch_fk 
+	OR (p1.aufgenommenam<>p2.aufgenommenam AND ((p1.perskz<>p2.perskz AND p1.perskz='') OR (p1.perskz<>p2.perskz AND p2.perskz='')))
+	OR (p1.beendigungsdatum<>p2.beendigungsdatum AND ((p1.perskz<>p2.perskz AND p1.perskz='') OR (p1.perskz<>p2.perskz AND p2.perskz='')))
+	OR p1.aufmerksamdurch<>p2.aufmerksamdurch
+	OR p1.aufnahmeschluessel<>p2.aufnahmeschluessel OR p1.aufnahmeschluessel_fk<>p2.aufnahmeschluessel_fk
+	OR p1.berufstaetigkeit<>p2.berufstaetigkeit OR p1.aufmerksamdurch_fk<>p2.aufmerksamdurch_fk
 	OR p1.angetreten<>p2.angetreten) AND p1.studiengang_fk=p2.studiengang_fk))
 order by p1.familienname;
 ";
@@ -176,17 +176,17 @@ if($resultp = pg_query($conn_fas, $qry))
 					$studstg1=strtoupper(trim($rowstg->typ)).strtoupper(trim($rowstg->kurzbz));
 				}
 			}
-			else 
+			else
 			{
 				echo nl2br("Studiengang ".$studiengangfk[$rowp->studiengang1]." nicht gefunden.");
-				
+
 			}
 		}
-		else 
+		else
 		{
 			echo nl2br("Kein Zugriff auf tbl_studiengang => Studiengang ".$studiengangfk[$rowp->studiengang1]." nicht gefunden.");
 		}
-		
+
 		//ermittle Stg-Kürzel
 		$qrystg="SELECT typ, kurzbz FROM tbl_studiengang WHERE studiengang_kz='".$studiengangfk[$rowp->studiengang2]."';";
 		if($resultstg = pg_query($conn, $qrystg))
@@ -198,12 +198,12 @@ if($resultp = pg_query($conn_fas, $qry))
 					$studstg2=strtoupper(trim($rowstg->typ)).strtoupper(trim($rowstg->kurzbz));
 				}
 			}
-			else 
+			else
 			{
 				echo nl2br("Studiengang ".$studiengangfk[$rowp->studiengang2]." nicht gefunden.");
 			}
 		}
-		else 
+		else
 		{
 			echo nl2br("Kein Zugriff auf tbl_studiengang => Studiengang ".$studiengangfk[$rowp->studiengang2]." nicht gefunden.");
 		}
@@ -371,10 +371,10 @@ if($resultp = pg_query($conn_fas, $qry))
 				$error=true;
 			}
 		}
-		
+
 		if ($error)
 		{
-			
+
 			$error_log_fas[$studiengangfk[$rowp->studiengang1]].="*****\n".$plausi."*****\n";
 			echo nl2br ("*****\n".$plausi."*****\n");
 			//ob_flush();
@@ -397,24 +397,24 @@ foreach ($studiengangfk AS $stg)
 				{
 					$errro_log_fas[$stg]=$plausiueb.$error_log_fas[$stg];
 					//mail(trim($rowass->email), 'Plausicheck von Studenten / Studiengang: '.$stg, $error_log_fas[$stg],"From: vilesci@technikum-wien.at");
-					
+
 					if (!mail($adress, 'Plausicheck von Studenten / Studiengang: '.$stg.", von ".$_SERVER['HTTP_HOST'], $error_log_fas[$stg],"From: vilesci@technikum-wien.at"))
 					{
 						echo nl2br("Plausicheck-Mail('".$stg."') an '".$adress."' konnte nicht verschickt werden!\n");
 					}
-					else 
+					else
 					{
 						echo nl2br("Plausicheck-Mail('".$stg."') an '".$adress."' verschickt!\n");
 					}
 				}
 			}
 		}
-		else 
+		else
 		{
 			echo nl2br("Studiengang ".$stg." nicht gefunden. E-Mail mit folgenden Inhalt wird nicht verschickt:\n".$error_log_fas[$stg]);
 		}
 	}
-	else 
+	else
 	{
 		echo nl2br("Kein Zugriff auf tbl_studiengang => Studiengang ".$stg." nicht gefunden. E-Mail mit folgendem Inhalt wird nicht verschickt:\n".$error_log_fas[$stg]);
 	}
@@ -424,41 +424,41 @@ foreach ($studiengangfk AS $stg)
 
 
 $qry="
-SELECT *, creationdate::timestamp AS insertamum FROM person JOIN student ON person_fk=person_pk WHERE uid NOT LIKE '\_dummy%' 
+SELECT *, student.creationdate::timestamp AS insertamum FROM person JOIN student ON person_fk=person_pk WHERE uid NOT LIKE '\_dummy%'
 
 AND person_pk NOT IN(
 	SELECT p1.person_pk
-	FROM (person JOIN student ON person_pk=student.person_fk ) AS p1 
-	CROSS JOIN (person JOIN student ON person_pk=student.person_fk) AS p2 WHERE 
-	
+	FROM (person JOIN student ON person_pk=student.person_fk ) AS p1
+	CROSS JOIN (person JOIN student ON person_pk=student.person_fk) AS p2 WHERE
+
 	(
-		(p1.svnr=p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'') 
+		(p1.svnr=p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'')
 		OR (
-			(p1.svnr<>p2.svnr AND 
+			(p1.svnr<>p2.svnr AND
 				(p1.svnr IS NULL OR p1.svnr='' OR p2.svnr IS NULL OR p2.svnr='')
-			) 
-			AND p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!='' 
+			)
+			AND p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!=''
 			AND p1.gebdat=p2.gebdat AND p1.gebdat IS NOT NULL AND p1.gebdat>'1935-01-01' AND p1.gebdat<'2000-01-01'
 		)
 	)
-	AND (p1.person_pk < p2.person_pk) 
-	AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400') 
+	AND (p1.person_pk < p2.person_pk)
+	AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400')
 	AND (trim(p1.familienname)<>trim(p2.familienname) OR trim(p1.vorname)<>trim(p2.vorname) OR trim(p1.vornamen)<>trim(p2.vornamen)
-		OR p1.geschlecht<>p2.geschlecht OR p1.gebort<>p2.gebort 
-		OR p1.gebdat<>p2.gebdat OR p1.staatsbuergerschaft<> p2.staatsbuergerschaft OR p1.familienstand<>p2.familienstand 
-		OR p1.svnr<>p2.svnr OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.anrede<>p2.anrede OR p1.titel<>p2.titel 
-		OR p1.anzahlderkinder<>p2.anzahlderkinder OR p1.gebnation<>p2.gebnation OR p1.postnomentitel<> p2.postnomentitel 
-	
+		OR p1.geschlecht<>p2.geschlecht OR p1.gebort<>p2.gebort
+		OR p1.gebdat<>p2.gebdat OR p1.staatsbuergerschaft<> p2.staatsbuergerschaft OR p1.familienstand<>p2.familienstand
+		OR p1.svnr<>p2.svnr OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.anrede<>p2.anrede OR p1.titel<>p2.titel
+		OR p1.anzahlderkinder<>p2.anzahlderkinder OR p1.gebnation<>p2.gebnation OR p1.postnomentitel<> p2.postnomentitel
+
 		OR (
 			(
-				p1.zgv<>p2.zgv OR p1.zgvdatum<>p2.zgvdatum OR p1.zgvort<>p2.zgvort 
-				OR p1.zgvmagister<>p2.zgvmagister OR p1.zgvmagisterort<>p2.zgvmagisterort 
-				OR p1.zgvmagisterdatum<>p2.zgvmagisterdatum OR p1.punkte<>p2.punkte 
+				p1.zgv<>p2.zgv OR p1.zgvdatum<>p2.zgvdatum OR p1.zgvort<>p2.zgvort
+				OR p1.zgvmagister<>p2.zgvmagister OR p1.zgvmagisterort<>p2.zgvmagisterort
+				OR p1.zgvmagisterdatum<>p2.zgvmagisterdatum OR p1.punkte<>p2.punkte
 				OR (p1.perskz<>p2.perskz AND p1.perskz='') OR (p1.perskz<>p2.perskz AND p2.perskz='')
-				OR (p1.aufgenommenam<>p2.aufgenommenam AND ((p1.perskz<>p2.perskz AND p1.perskz='') OR (p1.perskz<>p2.perskz AND p2.perskz='')))	
+				OR (p1.aufgenommenam<>p2.aufgenommenam AND ((p1.perskz<>p2.perskz AND p1.perskz='') OR (p1.perskz<>p2.perskz AND p2.perskz='')))
 				OR (p1.beendigungsdatum<>p2.beendigungsdatum AND ((p1.perskz<>p2.perskz AND p1.perskz='') OR (p1.perskz<>p2.perskz AND p2.perskz='')))
-				OR p1.aufmerksamdurch<>p2.aufmerksamdurch OR p1.aufnahmeschluessel<>p2.aufnahmeschluessel 
-				OR p1.aufnahmeschluessel_fk<>p2.aufnahmeschluessel_fk OR p1.berufstaetigkeit<>p2.berufstaetigkeit 
+				OR p1.aufmerksamdurch<>p2.aufmerksamdurch OR p1.aufnahmeschluessel<>p2.aufnahmeschluessel
+				OR p1.aufnahmeschluessel_fk<>p2.aufnahmeschluessel_fk OR p1.berufstaetigkeit<>p2.berufstaetigkeit
 				OR p1.aufmerksamdurch_fk<>p2.aufmerksamdurch_fk OR p1.angetreten<>p2.angetreten
 			)
 			AND p1.studiengang_fk=p2.studiengang_fk
@@ -486,7 +486,7 @@ if($result = pg_query($conn_fas, $qry))
 		$error_log			='';
 		//$text='';
 		$error				=false;
-		
+
 		//Attribute Person
 		$staatsbuergerschaft	=$row->staatsbuergerschaft;
 		$geburtsnation		=$row->gebnation;
@@ -533,13 +533,13 @@ if($result = pg_query($conn_fas, $qry))
 		$updateamum		=$row->insertamum;
 		$updatevon			='SYNC';
 		$ext_id_person		=$row->person_pk;
-				
+
 		//Attribute Benutzer
 		$uid				='';
 		$person_id			='';
 		$alias				='';
 		$ext_id_benutzer		=$row->student_pk;
-		
+
 		//Attribute Prestudent
 		$aufmerksamdurch_kurzbz	='';
 		$person_id			='';
@@ -563,18 +563,18 @@ if($result = pg_query($conn_fas, $qry))
 		$anmeldungreihungstest	='';
 		$reihungstestangetreten	=($row->angetreten=='J'?true:false);
 		$anmerkung			=$row->bemerkung;
-		//bismelden		
+		//bismelden
 
 		//Attribute Student
 		$student_uid			=trim($row->uid);
-		$matrikelnr			=trim($row->perskz);		
+		$matrikelnr			=trim($row->perskz);
 		$prestudent_id		='';
 		//studiengang_kz bei prestudent
 		$semester			='';
 		$verband			='';
 		$gruppe			='';
 		$ext_id_student		=$row->student_pk;
-			
+
 		if($zgv_code<=0 or $zgv_code=='')
 		{
 			$zgv_code=null;
@@ -592,7 +592,7 @@ if($result = pg_query($conn_fas, $qry))
 				$insertvon=$rowcu->name;
 			}
 		}
-		//Attribute überprüfen!!!	
+		//Attribute überprüfen!!!
 		if(strlen($sprache)>16)
 		{
 			$error_log = "Sprache darf nicht laenger als 16 Zeichen sein: ".$nachname.", ".$vorname."\n";
@@ -604,7 +604,7 @@ if($result = pg_query($conn_fas, $qry))
 		if(strlen($titelpost)>32)
 		{
 			$error_log = "Titelpost darf nicht laenger als 32 Zeichen sein: ".$nachname.", ".$vorname."\n";
-		} 
+		}
 		if(strlen($titelpre)>64)
 		{
 			$error_log = "Titelpre darf nicht laenger als 64 Zeichen sein: ".$nachname.", ".$vorname."\n";
@@ -616,7 +616,7 @@ if($result = pg_query($conn_fas, $qry))
 		if($nachname=='' || is_null($nachname))
 		{
 			$error_log = "Nachname muss eingegeben werden: ".$ext_id_person.", ".$nachname.", ".$vorname."\n";
-		}		
+		}
 		if(strlen($vorname)>32)
 		{
 			$error_log = "Vorname darf nicht laenger als 32 Zeichen sein: ".$nachname.", ".$vorname."\n";
@@ -672,7 +672,7 @@ if($result = pg_query($conn_fas, $qry))
 		if($geschlecht!='m' && $geschlecht!='w')
 		{
 			$error_log = "Geschlecht muß entweder w oder m sein!: ".$nachname.", ".$vorname."\n";
-		}		
+		}
 		if(strlen($student_uid)>16)
 		{
 			$error_log = 'UID darf nicht laenger als 16 Zeichen sein. : '.$nachname.", ".$vorname."\n";
@@ -692,7 +692,7 @@ if($result = pg_query($conn_fas, $qry))
 		if(strlen($matrikelnr)>15)
 		{
 			$error_log = 'Matrikelnummer darf nicht laenger als 15 Zeichen sein '.$nachname.", ".$vorname."\n";
-		}		
+		}
 		if(!is_numeric($berufstaetigkeit_code))
 		{
 			$error_log = 'berufstaetigkeit_code muss eine gueltige Zahl sein '.$nachname.", ".$vorname."\n";
@@ -721,36 +721,36 @@ if($result = pg_query($conn_fas, $qry))
 		//Ermittlung der Daten des Reihungstests
 		$qry="SELECT student_fk, reihungstest_fk, anmeldedatum FROM student_reihungstest WHERE student_fk='".$row->student_pk."';";
 		if($result_rt1 = pg_query($conn_fas, $qry))
-		{		
+		{
 			if($row_rt1=pg_fetch_object($result_rt1))
 			{
 				$qry="SELECT reihungstest_id FROM public.tbl_reihungstest WHERE ext_id='".$row_rt1->reihungstest_fk."';";
 				if($result_rt2 = pg_query($conn, $qry))
-				{		
+				{
 					if($row_rt2=pg_fetch_object($result_rt2))
 					{
 						$reihungstest_id=$row_rt2->reihungstest_id;
 						$anmeldungreihungstest=$row_rt1->anmeldedatum;
 					}
-					else 
+					else
 					{
-						$error_log.="Reihungstest_id von $row_rt1->reihungstest_fk konnte nicht gefunden werden.\n";	
-					}	
+						$error_log.="Reihungstest_id von $row_rt1->reihungstest_fk konnte nicht gefunden werden.\n";
+					}
 				}
-				else 
+				else
 				{
-					$error_log.="Reihungstest von $row_rt1->reihungstest_fk wurde nicht gefunden.\n";	
+					$error_log.="Reihungstest von $row_rt1->reihungstest_fk wurde nicht gefunden.\n";
 				}
 			}
-			else 
+			else
 			{
-				$error_log.="Kein Reihungstest von Student $row->familienname, $row->vorname gefunden!\n";	
+				$error_log.="Kein Reihungstest von Student $row->familienname, $row->vorname gefunden!\n";
 				$reihungstest_id='';
 				$anmeldungreihungstest='';
 				$notest++;
 			}
 		}
-		
+
 		//Student aktiv?
 		$qry="SELECT * FROM (SELECT status, creationdate, ausbildungssemester_fk FROM student_ausbildungssemester WHERE student_fk= '".$ext_id_student."'  AND
 		studiensemester_fk=(SELECT studiensemester_pk FROM studiensemester WHERE aktuell='J') ORDER BY creationdate DESC LIMIT 1) AS abc
@@ -762,19 +762,19 @@ if($result = pg_query($conn_fas, $qry))
 			if(pg_num_rows($resultu)>0)
 			{
 				if($rowu=pg_fetch_object($resultu))
-				{	
+				{
 					$aktiv=true;
 					$qry="SELECT * FROM ausbildungssemester WHERE ausbildungssemester_pk='".$rowu->ausbildungssemester_fk."';";
 					if($resultx = pg_query($conn_fas, $qry))
 					{
 						if($rowx=pg_fetch_object($resultx))
 						{
-							$semester=$rowx->semester;	
+							$semester=$rowx->semester;
 						}
 					}
 				}
 			}
-			else 
+			else
 			{
 				$aktiv=false;
 			}
@@ -783,27 +783,27 @@ if($result = pg_query($conn_fas, $qry))
 		{
 			$error=true;
 			$error_log.='Fehler beim Abfragen des aktuellen Status bei student_pk: '.$row->student_pk;
-			echo nl2br('Fehler beim Abfragen des aktuellen Status bei student_pk: '.$row->student_pk);	
+			echo nl2br('Fehler beim Abfragen des aktuellen Status bei student_pk: '.$row->student_pk);
 		}
 		//Studiengang ermitteln
 		$qry="SELECT studiengang_kz FROM public.tbl_studiengang WHERE ext_id='".$row->studiengang_fk."';";
 		if($resultu = pg_query($conn, $qry))
 		{
-			if(pg_num_rows($resultu)>0) 
+			if(pg_num_rows($resultu)>0)
 			{
 				if($rowu=pg_fetch_object($resultu))
 				{
 					$studiengang_kz=$rowu->studiengang_kz;
 				}
 			}
-			else 
+			else
 			{
 				echo nl2br("\n".$qry."\nSTUDIENGANG NICHT GEFUNDEN!!! \n");
 				$error_log.="\n".$qry."\nSTUDIENGANG NICHT GEFUNDEN!!! \n";
 				$error=true;
 			}
 		}
-		else 
+		else
 		{
 			echo nl2br("\n".$qry."\nFehler beim Zugriff auf tbl_studiengang\n".pg_errormessage($conn)."\n");
 			$error_log.="\n".$qry."\nFehler beim Zugriff auf tbl_studiengang\n".pg_errormessage($conn)."\n";
@@ -811,9 +811,9 @@ if($result = pg_query($conn_fas, $qry))
 		}
 		//Start der Transaktion
 		pg_query($conn,'BEGIN;');
-		
-		//Reihenfolge: person - prestudent - benutzer - student 
-		
+
+		//Reihenfolge: person - prestudent - benutzer - student
+
 		//insert oder update bei person?
 		$qry="SELECT person_id FROM public.tbl_benutzer WHERE uid='$row->uid'";
 
@@ -827,13 +827,13 @@ if($result = pg_query($conn_fas, $qry))
 					$person_id=$rowu->person_id;
 					$new_person=false;
 				}
-				else 
+				else
 				{
 					$error=true;
 					$error_log.="benutzer von $row->uid konnte nicht ermittelt werden\n";
 				}
-			}	
-			else 
+			}
+			else
 			{
 				$qry="SELECT person_fas, person_portal FROM sync.tbl_syncperson WHERE person_fas='$row->person_pk'";
 				if($result_sync1 = pg_query($conn, $qry))
@@ -841,12 +841,12 @@ if($result = pg_query($conn_fas, $qry))
 					if(pg_num_rows($result_sync1)>0) //wenn dieser eintrag schon vorhanden ist
 					{
 						if($row_sync1=pg_fetch_object($result_sync1))
-						{ 
+						{
 							//update
 							$person_id=$row_sync1->person_portal;
 							$new_person=false;
 						}
-						else 
+						else
 						{
 							$error=true;
 							$error_log.="Person von $row->person_pk konnte nicht ermittelt werden\n";
@@ -855,8 +855,8 @@ if($result = pg_query($conn_fas, $qry))
 					else
 					{
 						//vergleich svnr und ersatzkennzeichen
-						$qry="SELECT person_id FROM public.tbl_person 
-							WHERE ('$row->svnr' is not null AND '$row->svnr'<> '' AND svnr = '$row->svnr') 
+						$qry="SELECT person_id FROM public.tbl_person
+							WHERE ('$row->svnr' is not null AND '$row->svnr'<> '' AND svnr = '$row->svnr')
 								OR ('$row->ersatzkennzeichen' is not null AND '$row->ersatzkennzeichen' <> '' AND ersatzkennzeichen = '$row->ersatzkennzeichen')";
 						if($resultz = pg_query($conn, $qry))
 						{
@@ -867,16 +867,16 @@ if($result = pg_query($conn_fas, $qry))
 									$new_person=false;
 									$person_id=$rowz->person_id;
 								}
-								else 
+								else
 								{
 									$error=true;
 									$error_log.="Person mit SVNR: $row->svnr bzw. Ersatzkennzeichen: $row->ersatzkennzeichen konnte nicht ermittelt werden (".pg_num_rows($resultz).")\n";
 								}
 							}
-							else 
+							else
 							{
 								/*//vergleich nachname, vorname, geburtsdatum
-								$qry="SELECT person_id FROM public.tbl_person 
+								$qry="SELECT person_id FROM public.tbl_person
 									WHERE nachname=".myaddslashes($nachname)." AND vorname=".$vorname." AND gebdatum=".$gebdatum.";";
 								if($resultz = pg_query($conn, $qry))
 								{
@@ -887,23 +887,23 @@ if($result = pg_query($conn_fas, $qry))
 											$new_person=false;
 											$person_id=$rowz->person_id;
 										}
-										else 
+										else
 										{
 											$error=true;
 											$error_log.="Person mit Nachname ".$nachname." AND Vorname ".$vorname." AND Geburtsdatum=".$gebdatum." konnte nicht ermittelt werden (".pg_num_rows($resultz).")\n";
 										}
 									}
-									else 
+									else
 									{*/
 										//insert
 										$new_person=true;
 									/*}
 								}*/
 							}
-						}		
+						}
 					}
-				}					
-			}	
+				}
+			}
 		}
 		if($new_person)
 		{
@@ -937,25 +937,25 @@ if($result = pg_query($conn_fas, $qry))
 				        myaddslashes($ext_id_person).');';
 				        $ausgabe_person="Person ".$nachname." ".$vorname." eingefügt.\n";
 		}
-		else 
+		else
 		{
 			//update person
 			//person_id auf gueltigkeit pruefen
 			if(!is_numeric($person_id))
-			{				
+			{
 				$error=true;
 				$error_log.= 'person_id muss eine gueltige Zahl sein: '.$nachname;
 			}
-			
+
 			//update nur wenn änderungen gemacht
 			$qry="SELECT * FROM public.tbl_person WHERE person_id='$person_id';";
 			if($result1 = pg_query($conn, $qry))
 			{
 				while($row1 = pg_fetch_object($result1))
 				{
-					
-					$updatep=false;			
-					if($row1->sprache!=$sprache) 
+
+					$updatep=false;
+					if($row1->sprache!=$sprache)
 					{
 						$updatep=true;
 						if(strlen(trim($ausgabe_person))>0)
@@ -1211,7 +1211,7 @@ if($result = pg_query($conn_fas, $qry))
 						       ' WHERE person_id='.myaddslashes($person_id).';';
 						       $ausgabe_person="Änderungen bei Person ".$nachname." ".$vorname.": ".$ausgabe_person."\n";
 					}
-					else 
+					else
 					{
 						$updatep=false;
 						$ausgabe_person='';
@@ -1228,13 +1228,13 @@ if($result = pg_query($conn_fas, $qry))
 				if($rowu=pg_fetch_object(pg_query($conn,$qry)))
 					$person_id=$rowu->id;
 				else
-				{					
+				{
 					$error=true;
 					$error_log.='Person-Sequence konnte nicht ausgelesen werden\n';
 				}
 				$anzahl_person_insert++;
-			}			
-			else 
+			}
+			else
 			{
 				if($updatep)
 				{
@@ -1255,16 +1255,16 @@ if($result = pg_query($conn_fas, $qry))
 			$anzahl_person_gesamt++;
 		}
 		else
-		{			
+		{
 			$error=true;
 			$error_log.='Fehler beim Speichern des Person-Datensatzes:'.$nachname.' '.$qry."\n".pg_errormessage($conn)."\n";
 			$ausgabe_person='';
 		}
-		
+
 		if(!$error)
 		{
 			//Weitere Reihenfolge: prestudent - benutzer - student
-			
+
 			//Prestudent schon vorhanden?
 			$qry="SELECT prestudent_id FROM public.tbl_prestudent WHERE ext_id='".$row->student_pk."';";
 			if($resultu = pg_query($conn, $qry))
@@ -1274,14 +1274,14 @@ if($result = pg_query($conn_fas, $qry))
 					if($rowu=pg_fetch_object($resultu))
 					{
 						$prestudent_id=$rowu->prestudent_id;
-						$new_prestudent=false;		
+						$new_prestudent=false;
 					}
-					else 
+					else
 					{
 						$new_prestudent=true;
 					}
 				}
-				else 
+				else
 				{
 					$new_prestudent=true;
 				}
@@ -1289,10 +1289,10 @@ if($result = pg_query($conn_fas, $qry))
 			else
 			{
 				$error=true;
-				$error_log.='Fehler beim Zugriff auf Tabelle tbl_prestudent bei student_pk: '.$row->student_pk.pg_errormessage($conn)."\n";	
+				$error_log.='Fehler beim Zugriff auf Tabelle tbl_prestudent bei student_pk: '.$row->student_pk.pg_errormessage($conn)."\n";
 			}
-			
-			
+
+
 			if($row->aufmerksamdurch=='1')		$aufmerksamdurch_kurzbz='k.A.';
 			else if($row->aufmerksamdurch=='2')	$aufmerksamdurch_kurzbz='Internet';
 			else if($row->aufmerksamdurch=='3')	$aufmerksamdurch_kurzbz='Zeitungen';
@@ -1309,12 +1309,12 @@ if($result = pg_query($conn_fas, $qry))
 			else if($row->aufmerksamdurch=='14')	$aufmerksamdurch_kurzbz='Aussendungen';
 			else if($row->aufmerksamdurch=='15')	$aufmerksamdurch_kurzbz='offene Tür';
 			else $aufmerksamdurch_kurzbz='k.A.';
-			
-			
+
+
 			if($new_prestudent)
 			{
 				//insert prestudent
-				
+
 				$qry = 'INSERT INTO public.tbl_prestudent (aufmerksamdurch_kurzbz, person_id, studiengang_kz, berufstaetigkeit_code, zgv_code, zgvort, zgvdatum, zgvmas_code, zgvmaort, zgvmadatum, facheinschlberuf, reihungstest_id, punkte, anmeldungreihungstest, reihungstestangetreten, anmerkung, insertamum, insertvon, updateamum, updatevon, ext_id) VALUES('.
 					myaddslashes($aufmerksamdurch_kurzbz).', '.
 					myaddslashes($person_id).', '.
@@ -1339,24 +1339,24 @@ if($result = pg_query($conn_fas, $qry))
 					myaddslashes($ext_id_pre).');';
 					$ausgabe_pre="Prestudent:  ID:".$person_id.", ".$nachname." eingefügt.\n";
 			}
-			else 
+			else
 			{
 				//update prestudent
-				
+
 				//prestudent_id auf gueltigkeit pruefen
 				if(!is_numeric($prestudent_id))
-				{				
+				{
 					$error=true;
 					$error_log.= 'prestudent_id muss eine gueltige Zahl sein';
 				}
-				
+
 				//update nur wenn änderungen gemacht
 				$qry="SELECT * FROM public.tbl_prestudent WHERE prestudent_id='$prestudent_id';";
 				if($results = pg_query($conn, $qry))
 				{
 					while($rows = pg_fetch_object($results))
 					{
-						$updater=false;			
+						$updater=false;
 						if($rows->aufmerksamdurch_kurzbz!=$aufmerksamdurch_kurzbz)
 						{
 							$updater=true;
@@ -1524,7 +1524,7 @@ if($result = pg_query($conn_fas, $qry))
 							{
 								$ausgabe_pre="Anmeldung Reihungstest: '".$anmeldungreihungstest."'";
 							}
-						}						
+						}
 						if($rows->reihungstestangetreten!=($reihungstestangetreten?'t':'f'))
 						{
 							$updater=true;
@@ -1612,7 +1612,7 @@ if($result = pg_query($conn_fas, $qry))
 							       ' WHERE prestudent_id='.myaddslashes($prestudent_id).';';
 							       $ausgabe_pre="Änderungen bei Prestudent mit person_id '".$person_id."', ('".$prestudent_id."'), ".$nachname.": ".$ausgabe_pre."\n";
 						}
-						else 
+						else
 						{
 							$updater=false;
 							$ausgabe_pre='';
@@ -1621,7 +1621,7 @@ if($result = pg_query($conn_fas, $qry))
 					}
 				}
 			}
-			
+
 			if(pg_query($conn,$qry))
 			{
 //echo nl2br("person_id=".$person_id."\nPrestudent: ".$qry."\n");
@@ -1633,13 +1633,13 @@ if($result = pg_query($conn_fas, $qry))
 						$prestudent_id=$rowu->id;
 					}
 					else
-					{					
+					{
 						$error=true;
 						$error_log.='Prestudent-Sequence konnte nicht ausgelesen werden\n';
 					}
 					$anzahl_pre_insert++;
-				}			
-				else 
+				}
+				else
 				{
 					if($updater)
 					{
@@ -1649,17 +1649,17 @@ if($result = pg_query($conn_fas, $qry))
 				$anzahl_pre_gesamt++;
 			}
 			else
-			{			
+			{
 				$error=true;
 				$error_log.='Fehler beim Speichern des Prestudent-Datensatzes:'.$nachname." \n".$qry."\n".pg_errormessage($conn)."\n";
 				$ausgabe_pre='';
 			}
-									
+
 			if(!$error)
 			{
 				//Weitere Reihenfolge: benutzer, student
-				
-				
+
+
 
 				//Gruppenverband ermitteln
 				$qry="SELECT fas_function_find_verband_from_student(".$ext_id_student.") AS verband,
@@ -1679,7 +1679,7 @@ if($result = pg_query($conn_fas, $qry))
 							{
 								$verband=' ';
 							}
-							else 
+							else
 							{
 								$verband=$rowu->verband;
 							}
@@ -1687,7 +1687,7 @@ if($result = pg_query($conn_fas, $qry))
 							{
 								$gruppe=' ';
 							}
-							else 
+							else
 							{
 								$gruppe=$rowu->gruppe;
 							}
@@ -1702,14 +1702,14 @@ if($result = pg_query($conn_fas, $qry))
 								{
 									if(pg_num_rows($resultg)<1)
 									{
-										$qry="INSERT INTO public.tbl_lehrverband (studiengang_kz, semester, verband, gruppe, aktiv, bezeichnung, ext_id) 
+										$qry="INSERT INTO public.tbl_lehrverband (studiengang_kz, semester, verband, gruppe, aktiv, bezeichnung, ext_id)
 										VALUES(".myaddslashes($studiengang_kz).", ".
 										myaddslashes($semester).", ".
 										myaddslashes($verband).", ".
 										myaddslashes($gruppe).", ".
 										"true, null , null );";
 										pg_query($conn, $qry);
-										
+
 									}
 								}
 								$qry="SELECT * from public.tbl_lehrverband WHERE studiengang_kz=".myaddslashes($studiengang_kz)." AND semester=".myaddslashes($semester)." AND verband=".myaddslashes($verband)." AND gruppe=' ';";
@@ -1717,7 +1717,7 @@ if($result = pg_query($conn_fas, $qry))
 								{
 									if(pg_num_rows($resultg)<1)
 									{
-										$qry="INSERT INTO public.tbl_lehrverband (studiengang_kz, semester, verband, gruppe, aktiv, bezeichnung, ext_id) 
+										$qry="INSERT INTO public.tbl_lehrverband (studiengang_kz, semester, verband, gruppe, aktiv, bezeichnung, ext_id)
 										VALUES(".myaddslashes($studiengang_kz).", ".
 										myaddslashes($semester).", ".
 										myaddslashes($verband).", ".
@@ -1730,7 +1730,7 @@ if($result = pg_query($conn_fas, $qry))
 								{
 									if(pg_num_rows($resultg)<1)
 									{
-										$qry="INSERT INTO public.tbl_lehrverband (studiengang_kz, semester, verband, gruppe, aktiv, bezeichnung, ext_id) 
+										$qry="INSERT INTO public.tbl_lehrverband (studiengang_kz, semester, verband, gruppe, aktiv, bezeichnung, ext_id)
 										VALUES(".myaddslashes($studiengang_kz).", ".
 										myaddslashes($semester).", ".
 										"' ', ' ', true, null, null);";
@@ -1743,7 +1743,7 @@ if($result = pg_query($conn_fas, $qry))
 				}
 				//prestudentrolle
 //echo nl2br("Aktiv=".($aktiv?'true':'false').", Semester=".$semester.", Verband=".$verband.", Gruppe=".$gruppe."\n");
-								
+
 				$qry="SELECT * FROM student_ausbildungssemester where student_fk='$ext_id_student';";
 				if($resultru = pg_query($conn_fas, $qry))
 				{
@@ -1758,7 +1758,7 @@ if($result = pg_query($conn_fas, $qry))
 								$rolleinsertvon=$rowcu->name;
 							}
 						}
-						
+
 						$qry="SELECT semester FROM ausbildungssemester WHERE ausbildungssemester_pk='$rowru->ausbildungssemester_fk'";
 						if($resultr = pg_query($conn_fas, $qry))
 						{
@@ -1780,7 +1780,7 @@ if($result = pg_query($conn_fas, $qry))
 											$error_log.="FEHLER bei Eintrag in tbl_prestudentrolle: '$prestudent_id', '$rolle_kurzbz[$status]', '$studiensemester_kurzbz[$stm]', '$ausbildungssemester'.\n".pg_errormessage($conn)."\n";
 											$error=true;
 										}
-										else 
+										else
 										{
 											$ausgabe_prerolle.="    Prestudentrolle für ID ".$person_id." ('".$prestudent_id."'), ".$nachname." angelegt: '".$rolle_kurzbz[$status]."' in Studiensemester '".$studiensemester_kurzbz[$stm]."' mit Ausbildungssemester '".$ausbildungssemester."'.\n";
 										}
@@ -1790,22 +1790,22 @@ if($result = pg_query($conn_fas, $qry))
 						}
 					}
 				}
-				
+
 				if(!$error)
 				{
 					$ausgabe.=$ausgabe_person;
 					$ausgabe_pre.=$ausgabe_prerolle;
 					$ausgabe.=$ausgabe_pre;
 				}
-				if ($semester!=null and $semester!='' and is_numeric($semester) 
+				if ($semester!=null and $semester!='' and is_numeric($semester)
 				    and $verband!=null and $gruppe!=null)
 				{
 					//Benutzer schon vorhanden?
 					$qry="SELECT uid,person_id,ext_id FROM public.tbl_benutzer WHERE ext_id=".$ext_id_student.";";
 					if($resultx = pg_query($conn, $qry))
 					{
-						if(pg_num_rows($resultx)>0) 
-						{	
+						if(pg_num_rows($resultx)>0)
+						{
 							if($rowx=pg_fetch_object($resultx))
 							{
 								$new_benutzer=false;
@@ -1813,28 +1813,28 @@ if($result = pg_query($conn_fas, $qry))
 								//echo nl2br("new1\n");
 							}
 						}
-						else 
+						else
 						{
 							$qry="SELECT uid, person_id, ext_id FROM public.tbl_benutzer WHERE person_id='".$person_id."' AND uid='".$matrikelnr."';";
 							if($resultu = pg_query($conn, $qry))
 							{
-								if(pg_num_rows($resultu)>0) 
+								if(pg_num_rows($resultu)>0)
 								{
 									$student_uid=$matrikelnr;
 									$new_benutzer=false;
 									//echo nl2br("new2\n");
 								}
-								else 
+								else
 								{
 									$qry="SELECT uid, person_id, ext_id FROM public.tbl_benutzer WHERE person_id='".$person_id."' AND uid='".$student_uid."';";
 									if($resultu = pg_query($conn, $qry))
 									{
-										if(pg_num_rows($resultu)>0) 
-										{	
+										if(pg_num_rows($resultu)>0)
+										{
 											if($rowu=pg_fetch_object($resultu))
 											{
 												$qryfas="SELECT * FROM person, student WHERE person_pk=person_fk AND uid='".$student_uid."' AND perskz<>'';";
-												if($resultfas = pg_query($conn_fas, $qryfas)) 
+												if($resultfas = pg_query($conn_fas, $qryfas))
 												{
 													if(pg_num_rows($resultfas)>1) //person mit mehreren studentendatensätzen?
 													{
@@ -1848,7 +1848,7 @@ if($result = pg_query($conn_fas, $qry))
 															{
 																$aktiv9=true;
 															}
-															else 
+															else
 															{
 																$aktiv9=false;
 															}
@@ -1857,27 +1857,27 @@ if($result = pg_query($conn_fas, $qry))
 														{
 															$error=true;
 															$error_log.="Fehler beim Abfragen des aktuellen Status auf Unterbrecher bei student_pk: ".$row->student_pk."\n";
-															echo 'Fehler beim Abfragen des aktuellen Status auf Unterbrecher bei student_pk: '.$row->student_pk."<br>";	
+															echo 'Fehler beim Abfragen des aktuellen Status auf Unterbrecher bei student_pk: '.$row->student_pk."<br>";
 														}
-														
-														if(!$aktiv && !$aktiv9) 
+
+														if(!$aktiv && !$aktiv9)
 														{
 															if($rowu->uid==$matrikelnr)
 															{
 																$new_benutzer=false;
 																//echo nl2br("new3\n");
 															}
-															else 
+															else
 															{
 																$qrychk="SELECT * FROM public.tbl_benutzer WHERE person_id=person_id AND uid='".$matrikelnr."';";
-																if($resultchk = pg_query($conn, $qrychk)) 
+																if($resultchk = pg_query($conn, $qrychk))
 																{
 																	if(pg_num_rows($resultchk)>0)
 																	{
 																		$new_benutzer=false;
 																		//echo nl2br("new4\n");
 																	}
-																	else 
+																	else
 																	{
 																		$new_benutzer=true;
 																		$student_uid=$matrikelnr;
@@ -1887,30 +1887,30 @@ if($result = pg_query($conn_fas, $qry))
 																else
 																{
 																	$error=true;
-																	$error_log.='Fehler beim Zugriff auf Tabelle tbl_benutzer - person_id: '.$person_id."\n".pg_errormessage($conn)."\n";	
+																	$error_log.='Fehler beim Zugriff auf Tabelle tbl_benutzer - person_id: '.$person_id."\n".pg_errormessage($conn)."\n";
 																}
 															}
 														}
-														else 
+														else
 														{
 															$new_benutzer=false;
 															//echo nl2br("new6\n");
 														}
 													}
-													else 
+													else
 													{
 														$new_benutzer=false;
 														//echo nl2br("new7\n");
 													}
 												}
 											}
-											else 
+											else
 											{
 												$new_benutzer=true;
 												//echo nl2br("new8\n");
 											}
 										}
-										else 
+										else
 										{
 											$new_benutzer=true;
 											//echo nl2br("new9\n");
@@ -1919,20 +1919,20 @@ if($result = pg_query($conn_fas, $qry))
 									else
 									{
 										$error=true;
-										$error_log.='Fehler beim Zugriff auf Tabelle tbl_benutzer bei person_id: '.$person_id."\n".pg_errormessage($conn)."\n";	
+										$error_log.='Fehler beim Zugriff auf Tabelle tbl_benutzer bei person_id: '.$person_id."\n".pg_errormessage($conn)."\n";
 									}
 								}
-							}	
+							}
 						}
 					}
 					else
 					{
 						$error=true;
-						$error_log.='Fehler beim Zugriff auf Tabelle tbl_benutzer mit person_id: '.$person_id."\n".pg_errormessage($conn)."\n";	
+						$error_log.='Fehler beim Zugriff auf Tabelle tbl_benutzer mit person_id: '.$person_id."\n".pg_errormessage($conn)."\n";
 					}
-					
-					
-					
+
+
+
 //echo nl2br("Neu=".$new_benutzer.", UID=".$student_uid."\n");
 					//Student schon vorhanden?
 					$qry="SELECT student_uid FROM public.tbl_student WHERE ext_id='".$ext_id_student."';";
@@ -1942,11 +1942,11 @@ if($result = pg_query($conn_fas, $qry))
 						{
 							if($rowu=pg_fetch_object($resultu))
 							{
-								$new_student=false;	
-								$student_where=" WHERE ext_id=".myaddslashes($ext_id_student).";";	
+								$new_student=false;
+								$student_where=" WHERE ext_id=".myaddslashes($ext_id_student).";";
 							}
 						}
-						else 
+						else
 						{
 							$qry="SELECT student_uid FROM public.tbl_student WHERE matrikelnr='".$matrikelnr."';";
 							if($resultu = pg_query($conn, $qry))
@@ -1954,12 +1954,12 @@ if($result = pg_query($conn_fas, $qry))
 								if(pg_num_rows($resultu)>0) //wenn dieser eintrag schon vorhanden ist
 								{
 									if($rowu=pg_fetch_object($resultu))
-									{	
-										$new_student=false;	
+									{
+										$new_student=false;
 										$student_where=" WHERE matrikelnr=".myaddslashes($matrikelnr).";";
 									}
 								}
-								else 
+								else
 								{
 									$new_student=true;
 								}
@@ -1969,10 +1969,10 @@ if($result = pg_query($conn_fas, $qry))
 					else
 					{
 						$error=true;
-						$error_log.='Fehler beim Zugriff auf Tabelle tbl_student bei student_pk: '.$ext_id_student."\n".pg_errormessage($conn)."\n";	
+						$error_log.='Fehler beim Zugriff auf Tabelle tbl_student bei student_pk: '.$ext_id_student."\n".pg_errormessage($conn)."\n";
 					}
 //echo nl2br($student_where);
-					
+
 					if($new_benutzer)
 					{
 						//insert benutzer
@@ -1986,21 +1986,21 @@ if($result = pg_query($conn_fas, $qry))
 						myaddslashes($updateamum).','.
 						"'SYNC'".', '.
 						myaddslashes($ext_id_benutzer).'); ';
-						$ausgabe_benutzer="Benutzer ".$student_uid." ".$alias." eingefügt.\n";	
+						$ausgabe_benutzer="Benutzer ".$student_uid." ".$alias." eingefügt.\n";
 					}
-					else 
+					else
 					{
 						//update benutzer
 						//person_id auf gueltigkeit pruefen
-						
+
 						if(!is_numeric($person_id))
-						{				
+						{
 							$error=true;
 							$text.='person_id muss eine gueltige Zahl sein.\n';
 							$error_log.= 'person_id muss eine gueltige Zahl sein.\n';
 						}
-						
-						
+
+
 						//update nur wenn änderungen gemacht
 						$qry="SELECT * FROM public.tbl_benutzer WHERE person_id='$person_id' AND uid='$student_uid'";
 						if($results = pg_query($conn, $qry))
@@ -2019,7 +2019,7 @@ if($result = pg_query($conn_fas, $qry))
 									{
 										$ausgabe_benutzer="UID: '".$student_uid."' statt('".$rows->uid."')";
 									}
-								}	
+								}
 								if($rows->person_id!=$person_id)
 								{
 									$updateb=true;
@@ -2031,7 +2031,7 @@ if($result = pg_query($conn_fas, $qry))
 									{
 										$ausgabe_benutzer="Person_ID: '".$person_id."' statt('".$rows->person_id."')";
 									}
-								}			
+								}
 								if($rows->aktiv!=($aktiv?'t':'f'))
 								{
 									$updateb=true;
@@ -2043,7 +2043,7 @@ if($result = pg_query($conn_fas, $qry))
 									{
 										$ausgabe_benutzer="Aktiv: '".($aktiv?'true':'false')."' statt('".($rows->aktiv?'true':'false')."')";
 									}
-								}		
+								}
 								if($rows->ext_id!=$ext_id_benutzer)
 								{
 									$updateb=true;
@@ -2094,7 +2094,7 @@ if($result = pg_query($conn_fas, $qry))
 									       " WHERE person_id='$person_id' AND uid='$student_uid'";
 									       $ausgabe_benutzer="Änderungen bei Benutzer ".$student_uid." ".$alias.": ".$ausgabe_benutzer.".\n";
 								}
-								else 
+								else
 								{
 									$updateb=false;
 									$ausgabe_benutzer='';
@@ -2104,18 +2104,18 @@ if($result = pg_query($conn_fas, $qry))
 						}
 					}
 					if(!pg_query($conn,$qry))
-					{			
+					{
 						$error=true;
 						$error_log.='Fehler beim Speichern des Benutzer-Datensatzes:'.$nachname.' '.$qry."\n".pg_errormessage($conn)."\n";
 						$ausgabe_benutzer='';
 					}
-					else 
+					else
 					{
 						if($new_benutzer)
 						{
 							$anzahl_benutzer_insert++;
 						}
-						else 
+						else
 						{
 							if($updateb)
 							{
@@ -2126,11 +2126,11 @@ if($result = pg_query($conn_fas, $qry))
 					}
 					if(!$error)
 					{
-						
+
 						if($new_student)
 						{
 							//insert student
-							
+
 							$qry = 'INSERT INTO public.tbl_student (student_uid, matrikelnr, prestudent_id, studiengang_kz, semester, verband, gruppe, insertamum, insertvon, updateamum, updatevon, ext_id) VALUES('.
 								myaddslashes($student_uid).', '.
 								myaddslashes($matrikelnr).', '.
@@ -2146,18 +2146,18 @@ if($result = pg_query($conn_fas, $qry))
 								myaddslashes($ext_id_student).'); ';
 								$ausgabe_student="Student mit ID ".$student_uid.", ".$nachname.", Matrikelnummer:'".$matrikelnr."' eingefügt.\n";
 						}
-						else 
+						else
 						{
 							//update student
-																									
+
 							//update nur wenn änderungen gemacht
 							$qry="SELECT * FROM public.tbl_student ".$student_where;
-							
+
 							if($results = pg_query($conn, $qry))
 							{
 								while($rows = pg_fetch_object($results))
 								{
-									$updates=false;	
+									$updates=false;
 									if(trim($rows->student_uid)!=trim($student_uid))
 									{
 										$updates=true;
@@ -2169,7 +2169,7 @@ if($result = pg_query($conn_fas, $qry))
 										{
 											$ausgabe_student="Student_UID: '".$student_uid."' (statt '".trim($rows->student_uid)."')";
 										}
-									}		
+									}
 									if(trim($rows->matrikelnr)!=trim($matrikelnr))
 									{
 										$updates=true;
@@ -2241,7 +2241,7 @@ if($result = pg_query($conn_fas, $qry))
 										{
 											$ausgabe_student="Gruppe: '".$gruppe."' (statt '".$rows->gruppe."')";
 										}
-									}						
+									}
 									if($rows->ext_id!=$ext_id_student)
 									{
 										$updates=true;
@@ -2253,7 +2253,7 @@ if($result = pg_query($conn_fas, $qry))
 										{
 											$ausgabe_student="EXT_ID: '".$ext_id_student."' (statt '".$rows->ext_id."')";
 										}
-									}	
+									}
 									if($rows->insertamum!=$insertamum)
 									{
 										$updates=true;
@@ -2296,7 +2296,7 @@ if($result = pg_query($conn_fas, $qry))
 										       $student_where;
 										       $ausgabe_student="Änderungen bei Student ".$student_uid.", ".$nachname.", (".$matrikelnr."): ".$ausgabe_student.".\n";
 									}
-									else 
+									else
 									{
 										$updates=false;
 										$ausgabe_student='';
@@ -2306,18 +2306,18 @@ if($result = pg_query($conn_fas, $qry))
 							}
 						}
 						if(!@pg_query($conn,$qry))
-						{			
+						{
 							$error=true;
 							$error_log.='Fehler beim Speichern des Student-Datensatzes:'.$nachname.' / '.$qry."\n".pg_errormessage($conn)."\n";
 							$ausgabe_student='';
 						}
-						else 
+						else
 						{
 							if($new_student)
 							{
 								$anzahl_student_insert++;
 							}
-							else 
+							else
 							{
 								if($updates)
 								{
@@ -2342,9 +2342,9 @@ if($result = pg_query($conn_fas, $qry))
 							$text1.="\n".$qry." R1\n";
 							$text1.="***********\n\n";
 							pg_query($conn,'ROLLBACK;');
-						}									
+						}
 					}
-					else 
+					else
 					{
 						$anzahl_fehler_benutzer++;
 						$text2.="\n***********".$student_uid." / ".$nachname.", ".$vorname." / ".$matrikelnr."\n";
@@ -2354,7 +2354,7 @@ if($result = pg_query($conn_fas, $qry))
 						pg_query($conn,'ROLLBACK;');
 					}
 				}
-				else 
+				else
 				{
 					$anzahl_nichtstudenten++;
 					if($error)
@@ -2369,9 +2369,9 @@ if($result = pg_query($conn_fas, $qry))
 					//$ausgabe.=$ausgabe_person;
 					//fwrite($dateiausgabe,$ausgabe);
 					//$ausgabe='';
-					pg_query($conn,'COMMIT;'); //Commit, wenn kein Gruppeneintrag gefunden (Interessent, Bewerber) => nur Person und Prestudent werden angelegt	
+					pg_query($conn,'COMMIT;'); //Commit, wenn kein Gruppeneintrag gefunden (Interessent, Bewerber) => nur Person und Prestudent werden angelegt
 				}
-				
+
 			}
 			else
 			{
@@ -2381,7 +2381,7 @@ if($result = pg_query($conn_fas, $qry))
 				$text3.="\n".$qry." R3\n";
 				$text3.="***********\n\n";
 				pg_query($conn,'ROLLBACK;');
-			}						
+			}
 		}
 		else
 		{
@@ -2393,7 +2393,7 @@ if($result = pg_query($conn_fas, $qry))
 			pg_query($conn,'ROLLBACK;');
 		}
 	}
-}	
+}
 
 
 

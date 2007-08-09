@@ -16,7 +16,7 @@
 
 <H1>FAS - Lehrveranstaltung</h1>
 <?php
-	require_once('../../vilesci/config.inc.php');
+	require_once('../../config.inc.php');
 
 	//DB Verbindung herstellen
 	if (!$conn = @pg_pconnect(CONN_STRING_FAS))

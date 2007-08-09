@@ -65,13 +65,13 @@ function validate($row)
 		$error_log[$row->studiengang_kz][]=printLVA($row).': Semester bei '.$row->semester.$row->verband.$row->gruppe.' größer als 8';
 		$valid=false;
 	}
-	if (!($row->verband==null || $row->verband=='' || $row->verband=='A' || $row->verband=='B' || $row->verband=='C' || $row->verband=='D'))
+	if (!(is_null($row->verband) || $row->verband==null || $row->verband=='' || $row->verband=='A' || $row->verband=='B' || $row->verband=='C' || $row->verband=='D'))
 	{
 		$error_log[$row->studiengang_kz][]=printLVA($row).': Verband bei '.$row->semester.$row->verband.$row->gruppe.' außerhalb des gültigen Bereichs (A bis D)';
 		//print_r($row);
 		$valid=false;
 	}
-	if (!($row->gruppe==null || $row->gruppe=='' || $row->gruppe=='1' || $row->gruppe=='2' || $row->gruppe=='3' || $row->gruppe=='4'))
+	if (!(is_null($row->gruppe) || $row->gruppe==null || $row->gruppe=='' || $row->gruppe=='1' || $row->gruppe=='2' || $row->gruppe=='3' || $row->gruppe=='4'))
 	{
 		$error_log[$row->studiengang_kz][]=printLVA($row).': Gruppe bei '.$row->semester.$row->verband.$row->gruppe.' außerhalb des gültigen Bereichs (1 bis 4)';
 		$valid=false;

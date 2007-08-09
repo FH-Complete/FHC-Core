@@ -1,7 +1,7 @@
 <?php
 /* Copyright (C) 2007 Technikum-Wien
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -54,8 +54,8 @@ function myaddslashes($var)
 <body>
 <?php
 //nation
-$qry="SELECT * FROM person, student 
-WHERE person_pk=person_fk AND uid IS NOT null AND uid<>'' AND perskz IS NOT null AND perskz<>'' 
+$qry="SELECT * FROM person, student
+WHERE person_pk=person_fk AND uid IS NOT null AND uid<>'' AND perskz IS NOT null AND perskz<>''
 ORDER BY Familienname, Vorname;";
 
 if($result = pg_query($conn_fas, $qry))
@@ -76,7 +76,7 @@ if($result = pg_query($conn_fas, $qry))
 		$insertamum				="";
 		$insertvon				="SYNC";
 		$ext_id				="";
-		
+
 		$qry5="SELECT * from public.tbl_student WHERE ext_id='".$row->student_pk."';";
 		if($result5 = pg_query($conn, $qry5))
 		{
@@ -86,12 +86,12 @@ if($result = pg_query($conn_fas, $qry))
 				$error_log_fas.="Student mit ext_id='".$row->student_pk."' nicht gefunden! ('".$row->perskz."', '".$row->familienname."', '".$row->vorname."')\n";
 				$nicht_gefunden++;
 			}
-			else 
+			else
 			{
 				if($row5=pg_fetch_object($result5))
 				{
 					$student_uid=$row5->student_uid;
-				}	
+				}
 			}
 		}
 		if(!$error)
@@ -99,8 +99,8 @@ if($result = pg_query($conn_fas, $qry))
 			$qry="SELECT * FROM student_gruppe WHERE student_fk='".$row->student_pk."';";
 			if($result1 = pg_query($conn_fas, $qry))
 			{
-				While($row1=pg_fetch_object($result1))
-				{ 
+				while($row1=pg_fetch_object($result1))
+				{
 					//semester, verband, gruppe
 					$typ='';
 					$error=false;
@@ -112,75 +112,75 @@ if($result = pg_query($conn_fas, $qry))
 					if($result2 = pg_query($conn_fas, $qry2))
 					{
 						if($row2=pg_fetch_object($result2))
-						{ 
+						{
 							$typ=$row2->typ;
 							if($row2->typ=='1')
 							{
 								$semester=$row2->name;
 								$verband=' ';
 								$gruppe=' ';
-								
+
 							}
 							elseif ($row2->typ=='2')
 							{
 								$verband=$row2->name;
 								$gruppe=' ';
-								
+
 								$qry3="SELECT * FROM gruppe WHERE gruppe_pk='".$row2->obergruppe_fk."';";
 								if($result3 = pg_query($conn_fas, $qry3))
 								{
 									if($row3=pg_fetch_object($result3))
-									{ 
-										$semester=$row3->name;	
+									{
+										$semester=$row3->name;
 									}
-									else 
+									else
 									{
 										$error_log="Gruppe mit gruppe_pk=".$row2->obergruppe_fk."nicht gefunden (1).\n";
 										$error=true;
 									}
 								}
-								else 
+								else
 								{
 									$error_log="Fehler beim Zugriff auf Tabelle gruppe (1).\n";
 									$error=true;
-								}	
+								}
 							}
 							elseif ($row2->typ=='3')
 							{
 								$gruppe=$row2->name;
-								
+
 								$qry3="SELECT * FROM gruppe WHERE gruppe_pk='".$row2->obergruppe_fk."';";
 								if($result3 = pg_query($conn_fas, $qry3))
 								{
 									if($row3=pg_fetch_object($result3))
-									{ 
-										$verband=$row3->name;	
+									{
+										$verband=$row3->name;
 										$qry4="SELECT * FROM gruppe WHERE gruppe_pk='".$row3->obergruppe_fk."';";
 										if($result4 = pg_query($conn_fas, $qry4))
 										{
 											if($row4=pg_fetch_object($result4))
-											{ 
-												$semester=$row4->name;	
+											{
+												$semester=$row4->name;
 											}
-											else 
+											else
 											{
 												$error_log="Gruppe mit gruppe_pk=".$row2->obergruppe_fk."nicht gefunden (3).\n";
 												$error=true;
 											}
 										}
-										else 
+										else
 										{
 											$error_log="Fehler beim Zugriff auf Tabelle gruppe (3).\n";
 											$error=true;
 										}
 									}
-									else 
+									else
 									{
 										$error_log="Gruppe mit gruppe_pk=".$row2->obergruppe_fk."nicht gefunden (2).\n";
 										$error=true;
 									}
 								}
-								else 
+								else
 								{
 									$error_log="Fehler beim Zugriff auf Tabelle gruppe (2).\n";
 									$error=true;
@@ -194,21 +194,21 @@ if($result = pg_query($conn_fas, $qry))
 									if($result3 = pg_query($conn_fas, $qry3))
 									{
 										if($row3=pg_fetch_object($result3))
-										{ 
+										{
 											if($row3->obergruppe_fk!=0)
 											{
 												$qry4="SELECT * FROM gruppe WHERE gruppe_pk='".$row3->obergruppe_fk."';";
 												if($result4 = pg_query($conn_fas, $qry4))
 												{
 													if($row4=pg_fetch_object($result4))
-													{ 
+													{
 														$semester=$row4->name;
 														$verband=$row3->name;
-														$gruppe=$row2->name;	
+														$gruppe=$row2->name;
 													}
 												}
 											}
-											else 
+											else
 											{
 												$semester=$row3->name;
 												$verband=$row2->name;
@@ -217,7 +217,7 @@ if($result = pg_query($conn_fas, $qry))
 										}
 									}
 								}
-								else 
+								else
 								{
 									$semester=$row2->name;
 									$verband=' ';
@@ -251,7 +251,7 @@ if($result = pg_query($conn_fas, $qry))
 							{
 								$studiengang_kz=$row3->kennzahl;
 							}
-							else 
+							else
 							{
 								$error_log="Studiengang mit studiengang_pk='".$row2->studiengang_fk."' nicht gefunden.\n";
 								$error=true;
@@ -265,14 +265,14 @@ if($result = pg_query($conn_fas, $qry))
 							{
 								$studiensemester_kurzbz=$row3->studiensemester_kurzbz;
 							}
-							else 
+							else
 							{
 								$error_log="Studiensemester '".$row2->studiensemester_fk."' nicht gefunden.\n";
 								$error=true;
 							}
 						}
 					}
-					else 
+					else
 					{
 						$error_log="Fehler beim Zugriff auf Tabelle gruppe (1).\n";
 						$error=true;
@@ -308,10 +308,10 @@ if($result = pg_query($conn_fas, $qry))
 								{
 									if($row4=pg_fetch_object($result4))
 									{
-										
+
 										//update
 										$updates=false;
-										$ausgabe_slv="";	
+										$ausgabe_slv="";
 										if(trim($row4->student_uid)!=trim($student_uid))
 										{
 											$updates=true;
@@ -359,7 +359,7 @@ if($result = pg_query($conn_fas, $qry))
 											{
 												$ausgabe_slv="Semester: '".$semester."' (statt '".trim($row4->semester)."')";
 											}
-										}	
+										}
 										if(trim($row4->verband)!=trim($verband))
 										{
 											$updates=true;
@@ -407,12 +407,12 @@ if($result = pg_query($conn_fas, $qry))
 											       " WHERE student_uid='".$student_uid."' AND studiensemester_kurzbz='".$studiensemester_kurzbz."';";
 											       $ausgabe="SLV-Änderungen bei Student ".$student_uid.", ".$row->familienname.", (".$row->perskz."): ".$ausgabe_slv."('".$semester.$verband.$gruppe."/".$studiensemester_kurzbz."'). ".$typ."\n";
 											       $ausgabe_slv='';
-										 	
+
 										}
-										
+
 									}
 								}
-								else 
+								else
 								{
 									//insert
 									$qry = "INSERT INTO public.tbl_studentlehrverband (student_uid, studiensemester_kurzbz, studiengang_kz, semester, verband, gruppe, insertamum, insertvon, updateamum, updatevon, ext_id) VALUES("
@@ -422,9 +422,9 @@ if($result = pg_query($conn_fas, $qry))
 									        myaddslashes($semester).", ".
 									        myaddslashes($verband).", ".
 									        myaddslashes($gruppe).",
-									        now(), 
-									        'SYNC', 
-									        now(), 
+									        now(),
+									        'SYNC',
+									        now(),
 									        'SYNC',".
 									        myaddslashes($ext_id).");";
 									        $ausgabe="SLV für Student mit UID/Name/Perskz ".$student_uid.", ".$row->familienname.", (".$row->perskz.") eingefügt: Studiengang '".$studiengang_kz."', Sem.'".$studiensemester_kurzbz."' gruppe_pk='".$row1->gruppe_fk."' mit Semester/Verband/Gruppe: '".$semester."'/'".$verband."'/'".$gruppe."'.\n";
@@ -432,30 +432,30 @@ if($result = pg_query($conn_fas, $qry))
 								}
 							}
 							if(!pg_query($conn,$qry))
-							{		
+							{
 								$error_log.= "*****\nFehler beim Speichern des Studentlehrverband-Datensatzes: ".$row->familienname."\n".$qry."\n".pg_errormessage($conn)."\n*****\n";
 								$error=true;
 							}
-							else 
+							else
 							{
 								$ausgabe_all.=$ausgabe;
 								$ausgabe='';
 							}
 						}
-						else 
+						else
 						{
 							$anzahl_fehler++;
-							$error_log_fas.="### Student ".$student_uid.", ".$row->familienname.", (".$row->perskz.") gruppe_pk='".$row1->gruppe_fk."' : ".$error_log;			
+							$error_log_fas.="### Student ".$student_uid.", ".$row->familienname.", (".$row->perskz.") gruppe_pk='".$row1->gruppe_fk."' : ".$error_log;
 						}
 					}
-					else 
+					else
 					{
 						$anzahl_fehler++;
-						$error_log_fas.="### Student mit UID/Name/Perskz ".$student_uid.", ".$row->familienname.", (".$row->perskz.") gruppe_pk='".$row1->gruppe_fk."' : ".$error_log;					
+						$error_log_fas.="### Student mit UID/Name/Perskz ".$student_uid.", ".$row->familienname.", (".$row->perskz.") gruppe_pk='".$row1->gruppe_fk."' : ".$error_log;
 					}
 				}
 			}
-			else 
+			else
 			{
 				$error_log_fas.="Fehler beim Zugriff auf Tabelle student_gruppe.\n";
 				$error=true;
