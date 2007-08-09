@@ -235,6 +235,7 @@ if($result = pg_query($conn_fas, $qry))
 						{
 							$error_log="Eintragung in Tabelle gruppe mit gruppe_pk='".$row1->gruppe_fk."' nicht gefunden.\n";
 							$error=true;
+							continue;
 						}
 						if($semester==null || $semester=='') $semester=' ';
 						if($verband==null || $verband=='') $verband=' ';
