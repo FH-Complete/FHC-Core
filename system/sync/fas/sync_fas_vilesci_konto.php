@@ -151,7 +151,7 @@ if($result = pg_query($conn_fas, $qry))
 				continue;
 			}
 		}
-		if(in_array($studiengang_kz, $dont_sync_php))
+		if(in_array($konto->studiengang_kz, $dont_sync_php))
 		{
 			//bestimmte Stg auslassen!
 			continue;
