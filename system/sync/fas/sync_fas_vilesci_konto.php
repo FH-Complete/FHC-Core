@@ -151,7 +151,11 @@ if($result = pg_query($conn_fas, $qry))
 				continue;
 			}
 		}
-		
+		if(in_array($studiengang_kz, $dont_sync_php))
+		{
+			//bestimmte Stg auslassen!
+			continue;
+		}
 		$qry1="SELECT person_portal FROM sync.tbl_syncperson WHERE person_fas=".$row2->person_fk.";";
 		if($result1 = pg_query($conn, $qry1))
 		{
