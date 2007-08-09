@@ -424,7 +424,7 @@ foreach ($studiengangfk AS $stg)
 
 
 $qry="
-SELECT * FROM person JOIN student ON person_fk=person_pk WHERE uid NOT LIKE '\_dummy%' 
+SELECT *, creationdate::timestamp AS insertamum FROM person JOIN student ON person_fk=person_pk WHERE uid NOT LIKE '\_dummy%' 
 
 AND person_pk NOT IN(
 	SELECT p1.person_pk
@@ -529,8 +529,8 @@ if($result = pg_query($conn_fas, $qry))
 		$anzahlkinder		=$row->anzahlderkinder;
 		//$aktiv			=($row->aktiv=='t'?true:false);
 		//$insertvon			=$row->creationuser;
-		$insertamum			=$row->creationdate;
-		$updateamum		=$row->creationdate;
+		$insertamum			=$row->insertamum;
+		$updateamum		=$row->insertamum;
 		$updatevon			='SYNC';
 		$ext_id_person		=$row->person_pk;
 				
@@ -1554,11 +1554,11 @@ if($result = pg_query($conn_fas, $qry))
 							$updater=true;
 							if(strlen(trim($ausgabe_pre))>0)
 							{
-								$ausgabe_pre.=", EXT_ID: '".$ext_id."'";
+								$ausgabe_pre.=", EXT_ID: '".$ext_id_pre."'";
 							}
 							else
 							{
-								$ausgabe_pre="EXT_ID: '".$ext_id."'";
+								$ausgabe_pre="EXT_ID: '".$ext_id_pre."'";
 							}
 						}
 						if($rows->insertamum!=$insertamum)
