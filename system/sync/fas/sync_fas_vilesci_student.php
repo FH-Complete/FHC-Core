@@ -677,10 +677,10 @@ if($result = pg_query($conn_fas, $qry))
 		{
 			$error_log = 'UID darf nicht laenger als 16 Zeichen sein. : '.$nachname.", ".$vorname."\n";
 		}
-		//if($student_uid == '')
+		/*if($student_uid == '')
 		{
 		//	$error_log = 'UID muss eingegeben werden '.$nachname.", ".$vorname."\n";
-		}//
+		}*/
 		if(strlen($alias)>256)
 		{
 			$error_log = 'Alias darf nicht laenger als 256 Zeichen sein '.$nachname.", ".$vorname."\n";
