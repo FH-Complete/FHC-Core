@@ -223,7 +223,7 @@ class student extends benutzer
 			       ' matrikelnr='.$this->addslashes($this->matrikelnr).','.
 			       ' updateamum='.$this->addslashes($this->updateamum).','.
 			       ' updatevon='.$this->addslashes($this->updatevon).','.
-			       ' prestudent_id='.$this->addslashes($this->prestudent_id).','.
+			       //' prestudent_id='.$this->addslashes($this->prestudent_id).','.
 			       ' studiengang_kz='.$this->studiengang_kz.','.
 			       ' semester='.$this->semester.','.
 			       ' ext_id='.($this->ext_id_student!=''?$this->ext_id_student:'null').','.
@@ -263,7 +263,7 @@ class student extends benutzer
 		$where = '';
 		if ($gruppe!=null)
 		{
-			$where=" gruppe_kurzbz='".$gruppe."'";
+			$where=" gruppe_kurzbz='".$gruppe."' AND tbl_benutzer.uid=tbl_benutzergruppe.uid";
 			if($stsem!=null)
 				$where.=" AND tbl_benutzergruppe.studiensemester_kurzbz='$stsem'";
 		}
@@ -279,16 +279,18 @@ class student extends benutzer
 				if ($grp!=null)
 					$where.=" AND tbl_studentlehrverband.gruppe='".$grp."'";
 			}
-			if($stsem!=null)
-				$where.=" AND tbl_studentlehrverband.studiensemester_kurzbz='$stsem'";
-
 		}			
 
+		if($stsem!=null)
+				$where.=" AND tbl_studentlehrverband.studiensemester_kurzbz='$stsem'";
+		
 		//$sql_query="SELECT * FROM campus.vw_student WHERE $where ORDER by nachname,vorname";
 		$sql_query = "SELECT *, tbl_student.semester as std_semester, tbl_student.verband as std_verband, tbl_student.gruppe as std_gruppe, tbl_student.studiengang_kz as std_studiengang_kz,
 					  tbl_studentlehrverband.studiengang_kz as lvb_studiengang_kz, tbl_studentlehrverband.semester as lvb_semester, tbl_studentlehrverband.verband as lvb_verband, tbl_studentlehrverband.gruppe as lvb_gruppe 
-					  FROM public.tbl_person, public.tbl_student, ((public.tbl_benutzer LEFT JOIN public.tbl_benutzergruppe USING(uid)) LEFT JOIN public.tbl_studentlehrverband ON(uid = student_uid))
-					  WHERE tbl_person.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid = tbl_student.student_uid AND $where ORDER BY nachname, vorname";
+					  FROM public.tbl_person, public.tbl_student, public.tbl_benutzer, public.tbl_studentlehrverband";
+		if($gruppe!=null)
+			$sql_query.= ",public.tbl_benutzergruppe";
+		$sql_query.= " WHERE tbl_person.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid = tbl_student.student_uid AND tbl_studentlehrverband.student_uid=tbl_student.student_uid AND $where ORDER BY nachname, vorname";
 	    //echo $sql_query;
 		if(!($erg=pg_query($this->conn, $sql_query)))
 		{
