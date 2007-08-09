@@ -118,7 +118,7 @@
 	}
 	
 	$sg = new studiengang($conn);
-	$sg->getAll();
+	$sg->getAll('kurzbzlang');
 	foreach($sg->result as $studiengang)
 	{
 		$sg_arr[$studiengang->studiengang_kz] = $studiengang->kurzbzlang;
