@@ -231,7 +231,7 @@ if($result = pg_query($conn_fas, $qry))
 									}
 									else
 									{
-										$ausgabe_adresse="Zustelladresse: '".($adresse->Zustelladresse=='J'?'true':'false')."'";
+										$ausgabe_adresse="Zustelladresse: '".($adresse->zustelladresse=='J'?'true':'false')."'";
 									}
 								}
 								if($row2->insertamum!=$adresse->insertamum)
