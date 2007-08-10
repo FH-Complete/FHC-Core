@@ -58,6 +58,12 @@ class uebung
 	var $mitarbeitspunkte;	// smalint
 	var $anmerkung;			// text
 	var $benotungsdatum;	// timestamp
+	
+	//Abgabe
+	var $abgabe_abgabe_id;	// integer
+	var $abgabedatei;	// varchar(64)
+	var $abgabezeit;		// timestamp
+	var $abgabe_anmerkung;			// text
 
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine Uebung
@@ -173,6 +179,33 @@ class uebung
 			return false;
 		}
 	}
+
+	function load_abgabe($abgabe_id)
+	{
+		$qry = "SELECT * FROM campus.tbl_abgabe WHERE abgabe_id = '$abgabe_id'";
+
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$this->abgabe_id = $row->abgabe_id;
+				$this->abgabedatei = $row->abgabedatei;
+				$this->abgabezeit = $row->abgabezeit;
+				$this->anmerkung = $row->anmerkung;
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Es gibt keinen passenden Eintrag';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden des Eintrages';
+			return false;
+		}
+	}
 	
 	function check_studentuebung($uebung_id)
 	{
@@ -186,9 +219,9 @@ class uebung
 				return false;
 		}
 		else
-			return false;
-		
+			return false;	
 	}
+
 	
 	function load_uebung($lehreinheit_id, $level=null, $uebung_id=null)
 	{
@@ -458,6 +491,67 @@ class uebung
 		}
 	}
 
+function abgabe_save($new=null)
+	{
+		if(is_null($new))
+			$new = $this->new;
+
+
+		if($new)
+		{
+			$qry = 'INSERT INTO campus.tbl_abgabe(abgabedatei, abgabezeit, anmerkung) VALUES('.
+			        $this->addslashes($this->abgabedatei).','.
+			        $this->addslashes($this->abgabezeit).','.
+			        $this->addslashes($this->abgabe_anmerkung).');';
+		}
+		else
+		{
+			$qry = 'UPDATE campus.tbl_abgabe SET'.
+			       ' abgabe_id='.$this->addslashes($this->abgabe_id).','.
+			       ' abgabedatei='.$this->addslashes($this->abgabedatei).','.
+			       ' abgabezeit='.$this->addslashes($this->abgabezeit).','.
+			       ' anmerkung='.$this->addslashes($this->abgabe_anmerkung).
+			       " WHERE abgabe_id=".$this->addslashes($this->abgabe_id).";";
+		}
+
+		if(pg_query($this->conn,$qry))
+		{
+			if($new)
+			{
+				$qry = "SELECT currval('campus.tbl_abgabe_abgabe_id_seq') as id;";
+				if($result = pg_query($this->conn, $qry))
+				{
+					if($row=pg_fetch_object($result))
+					{
+						$this->abgabe_id = $row->id;
+						pg_query($this->conn, 'COMMIT');
+						return true;
+					}
+					else
+					{
+						$this->errormsg = 'Fehler beim Auslesen der Sequence';
+						pg_query($this->conn,'ROLLBACK');
+						return false;
+					}
+				}
+				else
+				{
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+					pg_query($this->conn,'ROLLBACK');
+					return false;
+				}
+			}
+			else
+				return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern der StudentUebung';
+			return false;
+		}
+	}
+
+
 	// ************************************************************
 	// * Loescht eine Uebung plus die abhaengigen eintraege in den
 	// * Tabellen studentuebung, studentbeispiel, und beispiel
@@ -521,5 +615,43 @@ class uebung
 		
 		
 	}
+
+	// ************************************************************
+	// * Loescht eine Uebung plus die abhaengigen eintraege in den
+	// * Tabellen studentuebung, studentbeispiel, und beispiel
+	// ************************************************************
+	function delete_abgabe($abgabe_id)
+	{
+		if(!is_numeric($abgabe_id))
+		{
+			$this->errormsg = 'abgabe_id ist ungueltig';
+			return false;
+		}
+		
+		// subübungen wegräumen
+		$qry = "SELECT * FROM campus.tbl_abgabe WHERE abgabe_id = '".$abgabe_id."'";
+		if($result=pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				
+														
+					if(file_exists(BENOTUNGSTOOL_PATH."abgabe/".$row->abgabedatei))
+						unlink(BENOTUNGSTOOL_PATH."abgabe/".$row->abgabedatei);
+					$qry = "UPDATE campus.tbl_studentuebung set abgabe_id = null where abgabe_id = '$abgabe_id';
+							DELETE FROM campus.tbl_abgabe WHERE abgabe_id = '$abgabe_id'";
+			
+					if(!pg_query($qry))
+					{
+						$this->errormsg = 'Fehler beim Loeschen der Daten';
+						return false;
+					}
+					else
+						return true;							
+			}
+		}
+		
+	}
+
 }
 ?>

@@ -526,35 +526,69 @@ function addUser(student_uid)
 		{
 			if($uid!='')
 			{
-				foreach($beispiel_obj->beispiele as $bsp)
-				{
-					if(isset($_POST['update_'.$uid.'_'.$bsp->beispiel_id]))
-						$vorbereitet=true;
-					else 
-						$vorbereitet=false;
-						
-					$bsp_obj = new beispiel($conn);
-					
-					if(!$bsp_obj->studentbeispiel_exists($uid,$bsp->beispiel_id))
+				if ($uebung_obj->beispiele)				
+				{				
+					foreach($beispiel_obj->beispiele as $bsp)
 					{
-						$new=true;
-						$bsp_obj->insertamum = date('Y-m-d H:i:s');
-						$bsp_obj->insertvon = $user;
-					}
-					else 
-					{		
-						$bsp_obj->load_studentbeispiel($uid, $bsp->beispiel_id);
-						$new=false;
-					}
+						if(isset($_POST['update_'.$uid.'_'.$bsp->beispiel_id]))
+							$vorbereitet=true;
+						else 
+							$vorbereitet=false;
+							
+						$bsp_obj = new beispiel($conn);
 						
-					$bsp_obj->student_uid = $uid;
-					$bsp_obj->beispiel_id = $bsp->beispiel_id;
-					$bsp_obj->vorbereitet = $vorbereitet;
-					$bsp_obj->updateamum = date('Y-m-d H:i:s');
-					$bsp_obj->updatevon = $user;
-					
-					if(!$bsp_obj->studentbeispiel_save($new))
-						$error=true;
+						if(!$bsp_obj->studentbeispiel_exists($uid,$bsp->beispiel_id))
+						{
+							$new=true;
+							$bsp_obj->insertamum = date('Y-m-d H:i:s');
+							$bsp_obj->insertvon = $user;
+						}
+						else 
+						{		
+							$bsp_obj->load_studentbeispiel($uid, $bsp->beispiel_id);
+							$new=false;
+						}
+							
+						$bsp_obj->student_uid = $uid;
+						$bsp_obj->beispiel_id = $bsp->beispiel_id;
+						$bsp_obj->vorbereitet = $vorbereitet;
+						$bsp_obj->updateamum = date('Y-m-d H:i:s');
+						$bsp_obj->updatevon = $user;
+						
+						if(!$bsp_obj->studentbeispiel_save($new))
+							$error=true;
+					}
+				}
+				else
+				{
+					if (!$uebung_obj->load_studentuebung($uid,$uebung_id))
+					{
+						$uebung_obj->student_uid = $uid;
+						$uebung_obj->mitarbeiter_uid = $user;
+						$uebung_obj->abgabe_id = null;
+						$uebung_obj->note = $_POST['update_'.$uid.'_note'];
+						$uebung_obj->mitarbeitspunkte = null;
+						$uebung_obj->punkte = null;
+						$uebung_obj->anmerkung = null;
+						$uebung_obj->benotungsdatum = date("Y-m-d H:i:s");
+						$uebung_obj->updateamum = null;
+						$uebung_obj->updatevon = null;
+						$uebung_obj->insertamum = date("Y-m-d H:i:s");
+						$uebung_obj->insertvon = $user;
+						$new = true;						
+					}
+					else
+					{
+						$uebung_obj->load_studentuebung($uid,$uebung_id);				
+						$uebung_obj->mitarbeiter_uid = $user;
+						$uebung_obj->note = $_POST['update_'.$uid.'_note'];
+						$uebung_obj->benotungsdatum = date("Y-m-d H:i:s");
+						$uebung_obj->updateamum = date("Y-m-d H:i:s");
+						$uebung_obj->updatevon = $user;
+						$new = false;						
+					}
+					$uebung_obj->studentuebung_save($new);
+									
 				}
 			}
 		}
@@ -573,7 +607,10 @@ function addUser(student_uid)
 	$stg_obj = new studiengang($conn, $lehrveranstaltung_obj->studiengang_kz);
 	
 	$beispiel_obj->load_beispiel($uebung_id);
-	$anzahl = count($beispiel_obj->beispiele);
+	if ($uebung_obj->beispiele)	
+		$anzahl = count($beispiel_obj->beispiele);
+	else
+		$anzahl = 1;
 	if(isset($_GET['gruppe']) && $_GET['gruppe']!='')
 	{
 		$gruppe = $_GET['gruppe'];
@@ -657,9 +694,14 @@ function addUser(student_uid)
 			</tr>";
 	
 	echo "<tr><td align='center'><b>Name</b></td>";
-	foreach($beispiel_obj->beispiele as $row)
+	if (!$uebung_obj->beispiele)
+		echo "<td>Note</td>";
+	else
 	{
-		echo "<td>$row->bezeichnung</td>";
+		foreach($beispiel_obj->beispiele as $row)
+		{
+			echo "<td>$row->bezeichnung</td>";
+		}
 	}
 	echo "<td align='center' width='200'><b>Unterschrift</b></td></tr>\n";
 	
@@ -669,11 +711,21 @@ function addUser(student_uid)
 		{
 			echo "<tr onMouseOver=\"this.style.backgroundColor='#c7dfe8'\" onMouseOut=\"this.style.backgroundColor='#ffffff'\">
 			<td nowrap><input type='checkbox' name='update_$row_stud->uid' disabled>&nbsp;<b>$row_stud->nachname</b>&nbsp;$row_stud->vorname $row_stud->uid</td>";
-			foreach($beispiel_obj->beispiele as $row_bsp)
+			if (!$uebung_obj->beispiele)
 			{
-				$studentbeispiel_obj = new beispiel($conn);
-				$studentbeispiel_obj->load_studentbeispiel($row_stud->uid, $row_bsp->beispiel_id);
-				echo "<td align='center'><input type='checkbox' name='update_".$row_stud->uid."_".$row_bsp->beispiel_id."' onClick=\"addUser('$row_stud->uid');\" ".($studentbeispiel_obj->vorbereitet?'checked':'').">".($studentbeispiel_obj->probleme?'<i><small>P</small></i>':'')."</td>\n";
+				$studentuebung_obj = new uebung($conn);
+				$studentuebung_obj->load_studentuebung($row_stud->uid,$uebung_id);
+				echo "<td align='center'><input type='text' name='update_".$row_stud->uid."_note' onchange=\"addUser('$row_stud->uid');\" value='".$studentuebung_obj->note."' size='3'></td>\n";
+				
+			}			
+			else
+			{			
+				foreach($beispiel_obj->beispiele as $row_bsp)
+				{
+					$studentbeispiel_obj = new beispiel($conn);
+					$studentbeispiel_obj->load_studentbeispiel($row_stud->uid, $row_bsp->beispiel_id);
+					echo "<td align='center'><input type='checkbox' name='update_".$row_stud->uid."_".$row_bsp->beispiel_id."' onClick=\"addUser('$row_stud->uid');\" ".($studentbeispiel_obj->vorbereitet?'checked':'').">".($studentbeispiel_obj->probleme?'<i><small>P</small></i>':'')."</td>\n";
+				}
 			}
 			echo "<td>&nbsp;</td>\n</tr>\n";
 		}

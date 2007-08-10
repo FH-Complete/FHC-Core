@@ -33,35 +33,17 @@ require_once('../../../../include/benutzerberechtigung.class.php');
 require_once('../../../../include/uebung.class.php');
 require_once('../../../../include/beispiel.class.php');
 require_once('../../../../include/datum.class.php');
+require_once('../../../../include/studentnote.class.php');
+require_once('../../../../include/legesamtnote.class.php');
+require_once('../../../../include/lvgesamtnote.class.php');
+include('functions.inc.php');
 
-?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../../skin/cis.css" rel="stylesheet" type="text/css">
-<title>Kreuzerltool</title>
-<script language="JavaScript">
-<!--
-	function MM_jumpMenu(targ, selObj, restore)
-	{
-	  eval(targ + ".location='" + selObj.options[selObj.selectedIndex].value + "'");
-
-	  if(restore)
-	  {
-	  	selObj.selectedIndex = 0;
-	  }
-	}
-  //-->
-</script>
-</head>
-
-<body>
-<?php
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim oeffnen der Datenbankverbindung');
 
-$user = get_uid();
+//$user = get_uid();
+//$user = 'if06b172';
+$user = 'if06b144';
 
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
@@ -94,11 +76,141 @@ $datum_obj = new datum();
 
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 
+//Abgabedatei ausliefern
+if (isset($_GET["download_abgabe"])){
+	$file=$_GET["download_abgabe"];
+	$uebung_id = $_GET["uebung_id"];
+	$ueb = new uebung($conn);
+	$ueb->load_studentuebung($user, $uebung_id);
+	$ueb->load_abgabe($ueb->abgabe_id);
+	$filename = BENOTUNGSTOOL_PATH."abgabe/".$ueb->abgabedatei;
+	header('Content-Type: application/octet-stream');
+	header('Content-disposition: attachment; filename="'.$file.'"');
+	readfile($filename);
+	exit;
+}
+
+//Angabedatei ausliefern
+if (isset($_GET["download"])){
+	$file=$_GET["download"];
+	$uebung_id = $_GET["uebung_id"];
+	$ueb = new uebung($conn);
+	$ueb->load($uebung_id);
+	$filename = "/documents/benotungstool/angabe/".$ueb->angabedatei;
+	header('Content-Type: application/octet-stream');
+	header('Content-disposition: attachment; filename="'.$file.'"');
+	readfile($filename);
+	exit;
+}
+
+?>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../../skin/cis.css" rel="stylesheet" type="text/css">
+<title>Kreuzerltool</title>
+<script language="JavaScript">
+<!--
+	function MM_jumpMenu(targ, selObj, restore)
+	{
+	  eval(targ + ".location='" + selObj.options[selObj.selectedIndex].value + "'");
+
+	  if(restore)
+	  {
+	  	selObj.selectedIndex = 0;
+	  }
+	}
+  //-->
+</script>
+</head>
+
+<body>
+
+
+<?php
+
+if (isset($_REQUEST["deleteabgabe"]))
+{
+	$ueb = new uebung($conn);
+	$ueb->load_studentuebung($user, $uebung_id);
+	if (!$ueb->delete_abgabe($ueb->abgabe_id))
+		echo $ueb->errormsg;
+
+}
+if (isset($_FILES["abgabedatei"]))
+{
+	$abgabedatei_up = $_FILES["abgabedatei"]["tmp_name"];
+					
+	if ($abgabedatei_up)
+	{
+				
+
+		$datum = date('Y-m-d H:i:s');
+		$datumstr = ereg_replace(" ","_",$datum);
+		$name_up = pathinfo($_FILES["abgabedatei"]["name"]);
+		$name_neu = makeUploadName($conn, $which='abgabe', $lehreinheit_id=$lehreinheit_id, $uebung_id=$uebung_id, $ss=$stsem,$uid=$user, $date=$datumstr);
+		$abgabedatei = $name_neu.".".$name_up["extension"];
+		$abgabepfad = BENOTUNGSTOOL_PATH."abgabe/".$abgabedatei;	
+			
+		$uebung_obj = new uebung($conn);
+		$uebung_obj->load_studentuebung($user, $uebung_id);
+	
+			
+		if ($uebung_obj->errormsg != "")
+		{
+			$uebung_obj->student_uid = $user;
+			$uebung_obj->mitarbeiter_uid = null;
+			$uebung_obj->abgabe_id = null;
+			$uebung_obj->uebung_id = $uebung_id;
+			$uebung_obj->note = null;
+			$uebung_obj->mitarbeitspunkte = null;
+			$uebung_obj->punkte = null;
+			$uebung_obj->anmerkung = null;
+			$uebung_obj->benotungsdatum = null;
+			$uebung_obj->updateamum = null;
+			$uebung_obj->updatevon = null;
+			$uebung_obj->insertamum = $datum;
+			$uebung_obj->insertvon = $user;
+			$uebung_obj->new = true;
+			$uebung_obj->studentuebung_save($new=true);
+			//echo $uebung_obj->errormsg;
+			
+		}
+		if ($uebung_obj->abgabe_id != null)
+		{			
+			$uebung_obj->load_abgabe($uebung_obj->abgabe_id);			
+			unlink(BENOTUNGSTOOL_PATH."abgabe/".$uebung_obj->abgabedatei);			
+			$uebung_obj->abgabedatei = $abgabedatei;
+			$uebung_obj->abgabezeit = 	$datum;
+			$uebung_obj->abgabe_anmerkung = "";
+			$uebung_obj->abgabe_save(false);
+		}
+		else
+		{
+			$uebung_obj->abgabedatei = $abgabedatei;
+			$uebung_obj->abgabezeit = 	$datum;
+			$uebung_obj->abgabe_anmerkung = "";
+			$uebung_obj->abgabe_save(true);
+		}
+		$uebung_obj->studentuebung_save(false);
+		//Abgabedatei ablegen				
+		move_uploaded_file($_FILES['abgabedatei']['tmp_name'], $abgabepfad);
+		
+	}
+}
+else
+	$abgabedatei_up = null;
+
+
+
+
 //Kopfzeile
 echo '<table class="tabcontent" height="100%">';
 echo ' <tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
-echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;"Kreuzerl"-Tool';
+echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;Benotungstool';
 echo '</font></td><td  class="ContentHeader" align="right">'."\n";
 
 //Studiensemester laden
@@ -227,347 +339,657 @@ if($result = pg_query($conn, $qry))
 	if($row = pg_fetch_object($result))
 		$name = $row->vorname.' '.$row->nachname;
 
-echo "<br><b>Leistungsuebersicht f&uuml;r $name</b><br><br>";
 
-$uebung_obj = new uebung($conn);
-$uebung_obj->load_uebung($lehreinheit_id);
-if(count($uebung_obj->uebungen)>0)
+
+if (!isset($_GET["notenuebersicht"]))
 {
-	echo "<table width='100%'><tr><td valign='top'>";
-	echo "Wählen Sie bitte eine Kreuzerlliste aus: <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
-	foreach ($uebung_obj->uebungen as $row)
+	echo "<br><b>Leistungsuebersicht / <a href='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&notenuebersicht=1'>NotenÜbersicht</a> f&uuml;r $name</b><br><br>";
+	$uebung_obj = new uebung($conn);
+	$uebung_obj->load_uebung($lehreinheit_id,1);
+	if(count($uebung_obj->uebungen)>0)
 	{
-		if($uebung_id=='')
-			$uebung_id=$row->uebung_id;
-
-		if($uebung_id == $row->uebung_id)
-			$selected = 'selected';
-		else
-			$selected = '';
-		echo "<OPTION value='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id' $selected>";
-		//Freigegeben = +
-		//Nicht Freigegeben = -
-		if($datum_obj->mktime_fromtimestamp($row->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($row->freigabebis)>time())
-			echo '+ ';
-		else
-			echo '- ';
-		echo $row->bezeichnung;
-		echo '</OPTION>';
-	}
-	echo '</SELECT>';
-	echo "</td>
-		<td>
+		echo "<table width='100%'><tr><td valign='top'>";
+		echo "<br>Wählen Sie bitte eine Aufgabe aus (Kreuzerllisten, Abgaben): <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
+		echo "<option value='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' selected></option>";
+		foreach ($uebung_obj->uebungen as $row)
+		{
+			
+			if($uebung_id == $row->uebung_id)
+				$selected = 'selected';
+			else
+				$selected = '';		
+					
+			//if($uebung_id=='')
+			//	$uebung_id=$row->uebung_id;
+			
+			$subuebung_obj = new uebung($conn);
+			$subuebung_obj->load_uebung($lehreinheit_id,2,$row->uebung_id);
+			if(count($subuebung_obj->uebungen)>0)
+				{
+				$disabled = 'disabled';
+				$selected = '';
+				echo "<OPTION style='background-color:#cccccc;' value='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id' $selected $disabled>";
+				echo $row->bezeichnung;
+				echo '</OPTION>';
+				}
+			else
+				$disabled = '';
+			
+	
+			
+			if(count($subuebung_obj->uebungen)>0)
+			{
+				foreach ($subuebung_obj->uebungen as $subrow)
+				{
+					if($uebung_id=='')
+						$uebung_id=$subrow->uebung_id;
+		
+					if($uebung_id == $subrow->uebung_id)
+						$selected = 'selected';
+					else
+						$selected = '';
+					
+					echo "<OPTION value='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$subrow->uebung_id' $selected>";
+	
+					
+					//Freigegeben = +
+					//Nicht Freigegeben = -
+					if($datum_obj->mktime_fromtimestamp($subrow->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($subrow->freigabebis)>time())
+						echo ' + ';
+					else
+						echo ' - ';
+					
+					echo $subrow->bezeichnung;
+					echo '</OPTION>';
+					
+				}
+			}
+		}
+		
+		echo '</SELECT>';
+		echo '</td>';
+		
+		echo "<td>
 			<table>
 			<tr>
 				<td><b>+</b>...</td>
-				<td>Kreuzerlliste ist <u>freigeschalten</u>.</td>
+				<td><u>freigeschaltet</u>.</td>
 			</tr>
 			<tr>
 				<td><b>-</b>...</td>
-				<td>Kreuzerlliste ist <u>nicht freigeschalten</u>.</td>
+				<td><u>nicht freigeschaltet</u>.</td>
 			</tr>
 			</table>
 		</td>
 	</tr></table>";
-
-}
-else
-	die("Derzeit gibt es keine Uebungen");
-
-//******SPEICHERN DER DATEN*************
-if(isset($_POST['submit']))
-{
-	$error=false;
-
-	$ueb_hlp_obj = new uebung($conn);
-	$ueb_hlp_obj->load($uebung_id);
-	//Wenn Kreuzerlliste Freigegeben ist
-	if($datum_obj->mktime_fromtimestamp($ueb_hlp_obj->freigabevon)<time() &&
-	   $datum_obj->mktime_fromtimestamp($ueb_hlp_obj->freigabebis)>time())
+	}
+	else
+		die("Derzeit gibt es keine Uebungen");
+	
+	
+	
+	
+	//******SPEICHERN DER DATEN*************
+	if(isset($_POST['submit']))
 	{
-		$bsp_obj = new beispiel($conn);
-
-		if($bsp_obj->load_beispiel($uebung_id))
+		$error=false;
+	
+		$ueb_hlp_obj = new uebung($conn);
+		$ueb_hlp_obj->load($uebung_id);
+		//Wenn Kreuzerlliste Freigegeben ist
+		if($datum_obj->mktime_fromtimestamp($ueb_hlp_obj->freigabevon)<time() &&
+		   $datum_obj->mktime_fromtimestamp($ueb_hlp_obj->freigabebis)>time())
 		{
-			foreach ($bsp_obj->beispiele as $row)
+			$bsp_obj = new beispiel($conn);
+	
+			if($bsp_obj->load_beispiel($uebung_id))
 			{
-				$stud_bsp_obj = new beispiel($conn);
-
-				if($stud_bsp_obj->load_studentbeispiel($user, $row->beispiel_id))
+				$anzahl_solved = 0;			
+				foreach ($bsp_obj->beispiele as $row)
 				{
-					$stud_bsp_obj->new=false;
+						if (isset($_POST['solved_'.$row->beispiel_id]) && ($_POST['solved_'.$row->beispiel_id]==1))
+							$anzahl_solved++;
+				}
+				if (($anzahl_solved <= $ueb_hlp_obj->maxbsp) || ($ueb_hlp_obj->maxbsp == 0))
+				{		
+					foreach ($bsp_obj->beispiele as $row)
+					{
+						$stud_bsp_obj = new beispiel($conn);
+		
+						if($stud_bsp_obj->load_studentbeispiel($user, $row->beispiel_id))
+						{
+							$stud_bsp_obj->new=false;
+						}
+						else
+						{
+							$stud_bsp_obj->new=true;
+							$stud_bsp_obj->insertamum = date('Y-m-d H:i:s');
+							$stud_bsp_obj->insertvon = $user;
+							$stud_bsp_obj->vorbereitet = false;
+						}
+						if (isset($_POST['solved_'.$row->beispiel_id]))				
+							$stud_bsp_obj->vorbereitet = ($_POST['solved_'.$row->beispiel_id]==1?true:false);
+							
+						$stud_bsp_obj->probleme = (isset($_POST['problem_'.$row->beispiel_id])?true:false);
+						$stud_bsp_obj->updateamum = date('Y-m-d H:i:s');
+						$stud_bsp_obj->updatevon = $user;
+						$stud_bsp_obj->student_uid = $user;
+						$stud_bsp_obj->beispiel_id = $row->beispiel_id;
+						
+						$row->check_anzahl_studentbeispiel($row->beispiel_id);
+						if (($row->anzahl_studentbeispiel >= $ueb_hlp_obj->maxstd) && isset($_POST['problem_'.$row->beispiel_id]))
+						{
+							echo "<span class='error'>Beispiel kann nicht mehr angekreuzt werden<br></span>";
+							$error = true;					
+						}					
+						else
+						{
+							if(!$stud_bsp_obj->studentbeispiel_save())
+							{
+								echo $stud_bsp_obj->errormsg;
+								$error=true;
+							}
+						}
+					}
 				}
 				else
 				{
-					$stud_bsp_obj->new=true;
-					$stud_bsp_obj->insertamum = date('Y-m-d H:i:s');
-					$stud_bsp_obj->insertvon = $user;
-				}
-				$stud_bsp_obj->vorbereitet = ($_POST['solved_'.$row->beispiel_id]==1?true:false);
-				$stud_bsp_obj->probleme = (isset($_POST['problem_'.$row->beispiel_id])?true:false);
-				$stud_bsp_obj->updateamum = date('Y-m-d H:i:s');
-				$stud_bsp_obj->updatevon = $user;
-				$stud_bsp_obj->student_uid = $user;
-				$stud_bsp_obj->beispiel_id = $row->beispiel_id;
-
-				if(!$stud_bsp_obj->studentbeispiel_save())
-				{
-					echo $stud_bsp_obj->errormsg;
-					$error=true;
+					$error=true;				
+					echo "Zu viele Beispiele angekreuzt!<br>";
 				}
 			}
+	
+			if($error)
+				echo "<span class='error'>Es konnten nicht alle Daten gespeichert werden</span><br>";
+			else
+				echo "Die Daten wurden erfolgreich gespeichert<br>";
 		}
-
-		if($error)
-			echo "<span class='error'>Es konnten nicht alle Daten gespeichert werden</span>";
 		else
-			echo "Die Daten wurden erfolgreich gespeichert<br>";
+			echo "<span class='error'>Die &Auml;nderungen k&ouml;nnen nicht gespeichert werden, da diese Kreuzerlliste nicht freigegeben ist!</span>";
+	}
+	
+	//********ANZEIGE DER EINGETRAGENEN KREUZERL***********
+	$uebung_obj = new uebung($conn);
+	$uebung_obj->load($uebung_id);
+	$downloadname = str_replace($uebung_id,ereg_replace(' ','_',$uebung_obj->bezeichnung), $uebung_obj->angabedatei);
+	echo "Freigegeben von ".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon))." bis ".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis));
+	echo "<br><br><h3><u>$uebung_obj->bezeichnung</u></h3>";
+	if ($uebung_obj->angabedatei)
+		echo "Angabe: <a href='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&download=".$downloadname."'>".$downloadname."</a><br><br>";
+	
+	
+	$ueb_obj = new uebung($conn);
+	if($ueb_obj->load_studentuebung($user, $uebung_id))
+	{
+		$anmerkung = $ueb_obj->anmerkung;
+		$mitarbeit = $ueb_obj->mitarbeitspunkte;
+		$note = $ueb_obj->note;
 	}
 	else
-		echo "<span class='error'>Die &Auml;nderungen k&ouml;nnen nicht gespeichert werden, da diese Kreuzerlliste nicht freigegeben ist!</span>";
-}
+	{
+		$anmerkung = '';
+		$mitarbeit = 0;
+		$note = null;
+	}
+	$anmerkung = ereg_replace("\n","<br>",htmlentities($anmerkung));
+	
+	if ($uebung_obj->beispiele)
+	{
+		
+		$qry_cnt = "SELECT count(*) as anzahl FROM campus.tbl_studentbeispiel WHERE beispiel_id IN (SELECT beispiel_id from campus.tbl_beispiel where uebung_id = $uebung_id) AND vorbereitet=true and student_uid = '$user'";
+			if($result_cnt = pg_query($conn,$qry_cnt))
+				if($row_cnt = pg_fetch_object($result_cnt))
+					$anzahl = $row_cnt->anzahl;
+					
+		echo "<script type='text/javascript'>";
+		echo "maxbsp = ".$uebung_obj->maxbsp.";";
+		echo "aktbsp = ".$anzahl.";";
+		echo "function plus1(id)
+			{
+				aktbsp++;
+				if (aktbsp > maxbsp)
+				{			
+					document.bspform.reset();
+					alert('Sie dürfen maximal '+maxbsp+' Beispiele markieren!');		
+					aktbsp = ".$anzahl.";		
+				}
+				
+			}
+			function minus1()
+			{
+				aktbsp--;		
+			}		
+			";
+			
+		echo "</script>";
+			
+		echo " <table>";
+		if ($uebung_obj->maxbsp > 0)
+			echo "<tr><td>Maximale Anzahl der Beispiele/Student:</td><td><b>".$uebung_obj->maxbsp."</b></td></tr>";
+		if ($uebung_obj->maxstd > 0)
+			echo "<tr><td>Maximale Anzahl Student/Übung erreicht</td><td style='background-color:#dddddd;'>&nbsp;</td></tr>";
+		echo "</table>";	
+		echo "
+		<form method='POST' name='bspform' action='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem'>
+		<table width='100%'>
+			<tr>
+				<td valign='top'><div style='width: 70%;'>
+				".($anmerkung!=''?'<b>Anmerkungen:</b><br> '.$anmerkung.'<br><br>':'')."
+				</div>
+					<table border='1'>
+					<tr>
+						<td class='ContentHeader2'>Beispiel</td>
+					    <td class='ContentHeader2'>Vorbereitet</td>
+					    <td class='ContentHeader2'>Nicht vorbereitet</td>
+					    <td class='ContentHeader2'>Probleme</td>
+					    <td class='ContentHeader2'>Punkte</td>
+					</tr>";
+		
+		$bsp_obj = new beispiel($conn);
+		$bsp_obj->load_beispiel($uebung_id);
+		
+		foreach ($bsp_obj->beispiele as $row)
+		{
+			$bsp_voll = false;		
+			$stud_bsp_obj = new beispiel($conn);
+				
+			if ($uebung_obj->maxstd > 0)
+			{
+				$stud_bsp_obj->check_anzahl_studentbeispiel($row->beispiel_id);
+				if ($stud_bsp_obj->anzahl_studentbeispiel >= $uebung_obj->maxstd)
+					$bsp_voll = true;
+			}
+			if($stud_bsp_obj->load_studentbeispiel($user, $row->beispiel_id))
+			{
+				$vorbereitet = $stud_bsp_obj->vorbereitet;
+				$probleme = $stud_bsp_obj->probleme;
+			}
+			else
+			{
+				$vorbereitet = false;
+				$probleme = false;
+			}
+			if ($bsp_voll)
+			{
+				$ro = " disabled";
+				$markiert = " style='background-color:#dddddd;'";		
+			}
+			else
+			{
+				$ro = "";
+				$markiert = "";
+			}
+			echo "<tr$markiert>
+					<td>$row->bezeichnung</td>
+					<td align='center'><input type='radio' onchange='plus1($row->beispiel_id);' name='solved_$row->beispiel_id' value='1' ".($vorbereitet?'checked':'')."$ro></td>
+					<td align='center'><input type='radio' onchange='minus1();' name='solved_$row->beispiel_id' value='0' ".(!$vorbereitet?'checked':'')."></td>
+					<td align='center'><input type='checkbox' name='problem_$row->beispiel_id' ".($probleme?'checked':'')."$ro></td>
+					<td align='center'>$row->punkte</td>
+				</tr>";
+	
+				
+		}
+		
+		//Speichern button nur Anzeigen wenn die Uebung Freigegeben ist
+		if($datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis)>time())
+			echo "<tr><td align='right' colspan=5><input type='submit' value='Speichern' name='submit'></td></tr>";
+		
+		echo "</table>";
+		echo "
+		</td><td valign='top' algin='right'>";
+		
+		//Gesamtpunkte diese Kreuzerlliste
+		$qry = "SELECT sum(punkte) as punktegesamt FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id'";
+		$punkte_gesamt=0;
+		if($result=pg_query($conn, $qry))
+			if($row = pg_fetch_object($result))
+				$punkte_gesamt = $row->punktegesamt;
+		
+		//Eingetragen diese Kreuzerlliste
+		$qry = "SELECT sum(punkte) as punkteeingetragen FROM campus.tbl_beispiel JOIN campus.tbl_studentbeispiel USING(beispiel_id) WHERE uebung_id='$uebung_id' AND student_uid='$user' AND vorbereitet=true";
+		$punkte_eingetragen=0;
+		if($result=pg_query($conn, $qry))
+			if($row = pg_fetch_object($result))
+				$punkte_eingetragen = ($row->punkteeingetragen!=''?$row->punkteeingetragen:0);
+		
+		//Gesamtpunkte alle Kreuzerllisten
+		$qry = "SELECT sum(tbl_beispiel.punkte) as punktegesamt_alle FROM campus.tbl_beispiel, campus.tbl_uebung
+				WHERE tbl_uebung.uebung_id=tbl_beispiel.uebung_id AND
+				tbl_uebung.lehreinheit_id='$lehreinheit_id'";
+		$punkte_gesamt_alle=0;
+		if($result=pg_query($conn, $qry))
+			if($row = pg_fetch_object($result))
+				$punkte_gesamt_alle = $row->punktegesamt_alle;
+		
+		//Eingetragen alle Kreuzerllisten
+		$qry = "SELECT sum(tbl_beispiel.punkte) as punkteeingetragen_alle FROM campus.tbl_beispiel, campus.tbl_studentbeispiel, campus.tbl_uebung
+				WHERE tbl_beispiel.beispiel_id = tbl_studentbeispiel.beispiel_id AND
+				tbl_uebung.uebung_id=tbl_beispiel.uebung_id AND
+				tbl_uebung.lehreinheit_id='$lehreinheit_id' AND
+				tbl_studentbeispiel.student_uid='$user' AND vorbereitet=true";
+		$punkte_eingetragen_alle=0;
+		if($result=pg_query($conn, $qry))
+			if($row = pg_fetch_object($result))
+				$punkte_eingetragen_alle = ($row->punkteeingetragen_alle!=''?$row->punkteeingetragen_alle:0);
+		
+		//Mitarbeitspunkte
+		$qry = "SELECT sum(mitarbeitspunkte) as mitarbeitspunkte FROM campus.tbl_studentuebung JOIN campus.tbl_uebung USING(uebung_id)
+				WHERE lehreinheit_id='$lehreinheit_id' AND student_uid='$user'";
+		$mitarbeit_alle=0;
+		if($result=pg_query($conn, $qry))
+			if($row = pg_fetch_object($result))
+				$mitarbeit_alle = ($row->mitarbeitspunkte!=''?$row->mitarbeitspunkte:0);
+		
+		//Mitarbeitspunkte
+		$qry = "SELECT mitarbeitspunkte FROM campus.tbl_studentuebung
+				WHERE uebung_id='$uebung_id' AND student_uid='$user'";
+		$mitarbeit=0;
+		if($result=pg_query($conn, $qry))
+			if($row = pg_fetch_object($result))
+				$mitarbeit = $row->mitarbeitspunkte;
+		echo "
+		
+			<table border='1' width='210'>
+			<tr>
+				<td colspan='2' class='ContentHeader2'>Diese Kreuzerlliste:</td>
+			</tr>
+			<tr>
+				<td width='180'>Punkte insgesamt m&ouml;glich:</td>
+				<td width='30'>$punkte_gesamt</td>
+			</tr>
+			<tr>
+				<td>Punkte eingetragen:</td>
+				<td>$punkte_eingetragen</td>
+			</tr>
+			</table>
+			<br><br>
+			<table border='1' width='210'>
+			<tr>
+				<td colspan='2' class='ContentHeader2'>Alle Kreuzerllisten bisher:</td>
+			</tr>
+			<tr>
+				<td width='180'>Punkte insgesamt m&ouml;glich:</td>
+				<td width='30'>$punkte_gesamt_alle</td>
+			</tr>
+			<tr>
+				<td>Punkte eingetragen:</td>
+				<td>$punkte_eingetragen_alle</td>
+			</tr>
+			</table>
+			<br><br>
+			<table border='1' width='210'>
+			<tr>
+				<td colspan='2' class='ContentHeader2'>Mitarbeitspunkte:</td>
+			</tr>
+			<tr>
+				<td width='180'>Bisher insgesamt:</td>
+				<td width='30'>$mitarbeit_alle</td>
+			</tr>
+			<tr>
+				<td>Diese Kreuzerlliste:</td>
+				<td>$mitarbeit</td>
+			</tr>
+			</table>
+			";
+		
+		
+		echo "
+		</td></tr>
+		
+		</table>
+		
+		</form>
+		";
+		
+		//**********STATISTIK***************
+		if($uebung_obj->statistik)
+		{
+			echo "<h3>Statistik</h3>";
+			$beispiel_obj = new beispiel($conn);
+			if($beispiel_obj->load_beispiel($uebung_id))
+			{
+				if(count($beispiel_obj->beispiele)>0)
+				{
+					echo '<table border="0" cellpadding="0" cellspacing="0" width="600">
+		         		 <tr>
+			           		 <td>&nbsp;</td>
+			           		 <td height="19" width="339" valign="bottom">
+				           		 <table border="0" cellpadding="0" cellspacing="0" width="339" background="../../../../skin/images/bg.gif">
+				                	<tr>
+				                  		<td>&nbsp;</td>
+				                	</tr>
+				              	</table>
+				             </td>
+		          		</tr>';
+					$i=0;
+					$qry_cnt = "SELECT distinct student_uid FROM campus.tbl_studentbeispiel JOIN campus.tbl_beispiel USING(beispiel_id) WHERE uebung_id='$uebung_id' GROUP BY student_uid";
+						if($result_cnt = pg_query($conn,$qry_cnt))
+								$gesamt=pg_num_rows($result_cnt);
+		
+					foreach ($beispiel_obj->beispiele as $row)
+					{
+						$i++;
+						$solved = 0;
+						$psolved = 0;
+						$qry_cnt = "SELECT count(*) as anzahl FROM campus.tbl_studentbeispiel WHERE beispiel_id=$row->beispiel_id AND vorbereitet=true";
+						if($result_cnt = pg_query($conn,$qry_cnt))
+							if($row_cnt = pg_fetch_object($result_cnt))
+								$solved = $row_cnt->anzahl;
+		
+		
+		
+						if($solved>0)
+							$psolved = $solved/$gesamt*100;
+		
+						echo '<tr>
+			            		<td '.($i%2?'class="MarkLine"':'').' valign="top" height="10" width="200"><font size="2" face="Arial, Helvetica, sans-serif">
+			              			'.$row->bezeichnung.'
+			              		</font></td>
+								<td '.($i%2?'class="MarkLine"':'').'>
+			            			<table width="339" border="0" cellpadding="0" cellspacing="0" background="../../../../skin/images/bg_.gif">
+			                		<tr>
+			                  			<td valign="top">
+			                  				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+			                      			<tr>
+			                        			<td nowrap><font size="2" face="Arial, Helvetica, sans-serif">
+			                        			<img src="../../../../skin/images/entry.gif" width="'.($psolved*3).'" height="5" alt="" border="1" />
+			                        			<span class="smallb"><b>&nbsp;'.$solved.'</b> ['.number_format($psolved,1,'.','').'%]</span></font>
+			                        			</td>
+											</tr>
+											</table>
+										</td>
+			                		</tr>
+			              			</table>
+								</td>
+			          		</tr>';
+					}
+					echo "</table>";
+					echo "<br><br>Es haben insgesamt <u>$gesamt Studenten</u> eingetragen.";
+				}
+			}
+			else
+				echo "<span class='error'>$beispiel_obj->errormsg</span>";
+			echo "</td></tr>";
+			echo "</table>";
+		}
+	}
+	else if ($uebung_obj->abgabe)
+	{
+		
+		echo "<table width='100%'>\n";
+		echo "<tr><td>".($note!=''?'<b>Note: </b>'.$note.'<br><br>':'')."</td></tr>\n";
+		echo"	
+		<tr>
+				<td valign='top'>
+				".($anmerkung!=''?'<b>Anmerkungen:</b><br> '.$anmerkung.'<br><br>':'')."
+				</td>";
+		echo "</tr>\n";
+	
+		echo "<tr><td><hr></td></tr>\n";
+		$uebung_obj->load_studentuebung($user, $uebung_id);
+		if ($uebung_obj->abgabe_id)
+		{		
+			$uebung_obj->load_abgabe($uebung_obj->abgabe_id);	
+			echo " <tr>";
+			echo"	<td>Abgabedatei: <a href='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&download_abgabe=".$uebung_obj->abgabedatei."'>".$uebung_obj->abgabedatei."</a>";
+			if($datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis)>time())	
+				echo " <a href='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&deleteabgabe=1'>[del]</a></td>";
+			echo "</tr>";
+		}
+		if($datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis)>time())
+		{
+			echo "	<tr>\n";
+			echo "	<form method='POST' action='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem' enctype='multipart/form-data'>\n";
+			echo "		<td>\n";
+			echo "			<input type='file' name='abgabedatei'> <input type='submit' name='abgabe' value='Abgeben'>";
+			echo "		</td>\n";	
+			echo "	</form>\n";
+		}
+		echo "</table>\n";
+					
+	}
 
-//********ANZEIGE DER EINGETRAGENEN KREUZERL***********
-$uebung_obj = new uebung($conn);
-$uebung_obj->load($uebung_id);
-echo "Freigegeben von ".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon))." bis ".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis));
-echo "<br><br><h3><u>$uebung_obj->bezeichnung</u></h3>";
-echo "Angabe: ".$uebung_obj->angabedatei."<br><br>";
-$ueb_obj = new uebung($conn);
-if($ueb_obj->load_studentuebung($user, $uebung_id))
-{
-	$anmerkung = $ueb_obj->anmerkung;
-	$mitarbeit = $ueb_obj->mitarbeitspunkte;
+
 }
+//notenübersicht
 else
 {
-	$anmerkung = '';
-	$mitarbeit = 0;
-}
-
-echo "
-<form method='POST' action='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id'>
-<table width='100%'>
-	<tr>
-		<td valign='top'><div style='width: 70%;'>
-		".($anmerkung!=''?'<b>Anmerkungen:</b> '.htmlentities($anmerkung).'<br><br>':'')."
-		</div>
-			<table border='1'>
-			<tr>
-				<td class='ContentHeader2'>Beispiel</td>
-			    <td class='ContentHeader2'>Vorbereitet</td>
-			    <td class='ContentHeader2'>Nicht vorbereitet</td>
-			    <td class='ContentHeader2'>Probleme</td>
-			    <td class='ContentHeader2'>Punkte</td>
-			</tr>";
-
-$bsp_obj = new beispiel($conn);
-$bsp_obj->load_beispiel($uebung_id);
-
-foreach ($bsp_obj->beispiele as $row)
-{
-	$stud_bsp_obj = new beispiel($conn);
-	if($stud_bsp_obj->load_studentbeispiel($user, $row->beispiel_id))
+	
+	echo "<br><b><a href='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id'>Leistungsuebersicht</a> / Notenübersicht f&uuml;r $name</b><br><br>";	
+	echo "<table><tr><td>";
+	
+	$uebung_obj = new uebung($conn);
+	$uebung_obj->load_uebung($lehreinheit_id,1);
+	if(count($uebung_obj->uebungen)>0)
 	{
-		$vorbereitet = $stud_bsp_obj->vorbereitet;
-		$probleme = $stud_bsp_obj->probleme;
-	}
-	else
-	{
-		$vorbereitet = false;
-		$probleme = false;
-	}
-	echo "<tr>
-			<td>$row->bezeichnung</td>
-			<td align='center'><input type='radio' name='solved_$row->beispiel_id' value='1' ".($vorbereitet?'checked':'')."></td>
-			<td align='center'><input type='radio' name='solved_$row->beispiel_id' value='0' ".(!$vorbereitet?'checked':'')."></td>
-			<td align='center'><input type='checkbox' name='problem_$row->beispiel_id' ".($probleme?'checked':'')."></td>
-			<td align='center'>$row->punkte</td>
-		</tr>";
-}
-
-//Speichern button nur Anzeigen wenn die Uebung Freigegeben ist
-if($datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis)>time())
-	echo "<tr><td align='right' colspan=5><input type='submit' value='Speichern' name='submit'></td></tr>";
-
-echo "</table>";
-echo "
-</td><td valign='top' algin='right'>";
-
-//Gesamtpunkte diese Kreuzerlliste
-$qry = "SELECT sum(punkte) as punktegesamt FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id'";
-$punkte_gesamt=0;
-if($result=pg_query($conn, $qry))
-	if($row = pg_fetch_object($result))
-		$punkte_gesamt = $row->punktegesamt;
-
-//Eingetragen diese Kreuzerlliste
-$qry = "SELECT sum(punkte) as punkteeingetragen FROM campus.tbl_beispiel JOIN campus.tbl_studentbeispiel USING(beispiel_id) WHERE uebung_id='$uebung_id' AND student_uid='$user' AND vorbereitet=true";
-$punkte_eingetragen=0;
-if($result=pg_query($conn, $qry))
-	if($row = pg_fetch_object($result))
-		$punkte_eingetragen = ($row->punkteeingetragen!=''?$row->punkteeingetragen:0);
-
-//Gesamtpunkte alle Kreuzerllisten
-$qry = "SELECT sum(tbl_beispiel.punkte) as punktegesamt_alle FROM campus.tbl_beispiel, campus.tbl_uebung
-		WHERE tbl_uebung.uebung_id=tbl_beispiel.uebung_id AND
-		tbl_uebung.lehreinheit_id='$lehreinheit_id'";
-$punkte_gesamt_alle=0;
-if($result=pg_query($conn, $qry))
-	if($row = pg_fetch_object($result))
-		$punkte_gesamt_alle = $row->punktegesamt_alle;
-
-//Eingetragen alle Kreuzerllisten
-$qry = "SELECT sum(tbl_beispiel.punkte) as punkteeingetragen_alle FROM campus.tbl_beispiel, campus.tbl_studentbeispiel, campus.tbl_uebung
-		WHERE tbl_beispiel.beispiel_id = tbl_studentbeispiel.beispiel_id AND
-		tbl_uebung.uebung_id=tbl_beispiel.uebung_id AND
-		tbl_uebung.lehreinheit_id='$lehreinheit_id' AND
-		tbl_studentbeispiel.student_uid='$user' AND vorbereitet=true";
-$punkte_eingetragen_alle=0;
-if($result=pg_query($conn, $qry))
-	if($row = pg_fetch_object($result))
-		$punkte_eingetragen_alle = ($row->punkteeingetragen_alle!=''?$row->punkteeingetragen_alle:0);
-
-//Mitarbeitspunkte
-$qry = "SELECT sum(mitarbeitspunkte) as mitarbeitspunkte FROM campus.tbl_studentuebung JOIN campus.tbl_uebung USING(uebung_id)
-		WHERE lehreinheit_id='$lehreinheit_id' AND student_uid='$user'";
-$mitarbeit_alle=0;
-if($result=pg_query($conn, $qry))
-	if($row = pg_fetch_object($result))
-		$mitarbeit_alle = ($row->mitarbeitspunkte!=''?$row->mitarbeitspunkte:0);
-
-//Mitarbeitspunkte
-$qry = "SELECT mitarbeitspunkte FROM campus.tbl_studentuebung
-		WHERE uebung_id='$uebung_id' AND student_uid='$user'";
-$mitarbeit=0;
-if($result=pg_query($conn, $qry))
-	if($row = pg_fetch_object($result))
-		$mitarbeit = $row->mitarbeitspunkte;
-echo "
-
-	<table border='1' width='210'>
-	<tr>
-		<td colspan='2' class='ContentHeader2'>Diese Kreuzerlliste:</td>
-	</tr>
-	<tr>
-		<td width='180'>Punkte insgesamt m&ouml;glich:</td>
-		<td width='30'>$punkte_gesamt</td>
-	</tr>
-	<tr>
-		<td>Punkte eingetragen:</td>
-		<td>$punkte_eingetragen</td>
-	</tr>
-	</table>
-	<br><br>
-	<table border='1' width='210'>
-	<tr>
-		<td colspan='2' class='ContentHeader2'>Alle Kreuzerllisten bisher:</td>
-	</tr>
-	<tr>
-		<td width='180'>Punkte insgesamt m&ouml;glich:</td>
-		<td width='30'>$punkte_gesamt_alle</td>
-	</tr>
-	<tr>
-		<td>Punkte eingetragen:</td>
-		<td>$punkte_eingetragen_alle</td>
-	</tr>
-	</table>
-	<br><br>
-	<table border='1' width='210'>
-	<tr>
-		<td colspan='2' class='ContentHeader2'>Mitarbeitspunkte:</td>
-	</tr>
-	<tr>
-		<td width='180'>Bisher insgesamt:</td>
-		<td width='30'>$mitarbeit_alle</td>
-	</tr>
-	<tr>
-		<td>Diese Kreuzerlliste:</td>
-		<td>$mitarbeit</td>
-	</tr>
-	</table>
-	";
-
-
-echo "
-</td></tr>
-
-</table>
-
-</form>
-";
-
-//**********STATISTIK***************
-if($uebung_obj->statistik)
-{
-	echo "<h3>Statistik</h3>";
-	$beispiel_obj = new beispiel($conn);
-	if($beispiel_obj->load_beispiel($uebung_id))
-	{
-		if(count($beispiel_obj->beispiele)>0)
-		{
-			echo '<table border="0" cellpadding="0" cellspacing="0" width="600">
-         		 <tr>
-	           		 <td>&nbsp;</td>
-	           		 <td height="19" width="339" valign="bottom">
-		           		 <table border="0" cellpadding="0" cellspacing="0" width="339" background="../../../../skin/images/bg.gif">
-		                	<tr>
-		                  		<td>&nbsp;</td>
-		                	</tr>
-		              	</table>
-		             </td>
-          		</tr>';
-			$i=0;
-			$qry_cnt = "SELECT distinct student_uid FROM campus.tbl_studentbeispiel JOIN campus.tbl_beispiel USING(beispiel_id) WHERE uebung_id='$uebung_id' GROUP BY student_uid";
-				if($result_cnt = pg_query($conn,$qry_cnt))
-						$gesamt=pg_num_rows($result_cnt);
-
-			foreach ($beispiel_obj->beispiele as $row)
+		
+		echo "<table style='border: 1px #dddddd solid'>";
+		echo "	<tr>\n";
+		echo "		<th colspan='2'>Aufgabe</th>\n";
+		echo "		<th>Gewicht</th>\n";
+		echo "		<th>Punkte</th>";
+		echo "		<th>Teilnote</th>\n";
+		echo "		<th>Note</th>";
+		echo "	</tr>\n";
+		foreach ($uebung_obj->uebungen as $row)
+		{	
+			
+			$subuebung_obj = new uebung($conn);
+			$subuebung_obj->load_uebung($lehreinheit_id,2,$row->uebung_id);
+			$l1note = new studentnote($conn);
+			if(count($subuebung_obj->uebungen) >= 0)
 			{
-				$i++;
-				$solved = 0;
-				$psolved = 0;
-				$qry_cnt = "SELECT count(*) as anzahl FROM campus.tbl_studentbeispiel WHERE beispiel_id=$row->beispiel_id AND vorbereitet=true";
-				if($result_cnt = pg_query($conn,$qry_cnt))
-					if($row_cnt = pg_fetch_object($result_cnt))
-						$solved = $row_cnt->anzahl;
-
-
-
-				if($solved>0)
-					$psolved = $solved/$gesamt*100;
-
-				echo '<tr>
-	            		<td '.($i%2?'class="MarkLine"':'').' valign="top" height="10" width="200"><font size="2" face="Arial, Helvetica, sans-serif">
-	              			'.$row->bezeichnung.'
-	              		</font></td>
-						<td '.($i%2?'class="MarkLine"':'').'>
-	            			<table width="339" border="0" cellpadding="0" cellspacing="0" background="../../../../skin/images/bg_.gif">
-	                		<tr>
-	                  			<td valign="top">
-	                  				<table width="100%" border="0" cellspacing="0" cellpadding="0">
-	                      			<tr>
-	                        			<td nowrap><font size="2" face="Arial, Helvetica, sans-serif">
-	                        			<img src="../../../../skin/images/entry.gif" width="'.($psolved*3).'" height="5" alt="" border="1" />
-	                        			<span class="smallb"><b>&nbsp;'.$solved.'</b> ['.number_format($psolved,1,'.','').'%]</span></font>
-	                        			</td>
-									</tr>
-									</table>
-								</td>
-	                		</tr>
-	              			</table>
-						</td>
-	          		</tr>';
+				
+				
+				$l1note->calc_l1_note($row->uebung_id, $user, $lehreinheit_id);
+				if ($l1note->negativ)
+					$l1_note = 5;
+				else
+					$l1_note = $l1note->l1_note;		
+				echo "	<tr>\n";			
+				echo "		<td colspan='2'>";
+				echo $row->bezeichnung;
+				if ($row->positiv)
+					echo "*";
+				echo "		</td>\n";
+				echo "		<td>".$row->gewicht."</td>\n";
+				echo "		<td>";
+				if ($l1note->punkte_gesamt_l1 >0)		
+					echo $l1note->punkte_gesamt_l1;
+				echo "</td>\n";
+				echo "<td></td>";
+				echo "<td>".$l1_note."</td>\n";
+				echo "	</tr>\n";
+				
 			}
-			echo "</table>";
-			echo "<br><br>Es haben insgesamt <u>$gesamt Studenten</u> eingetragen.";
+			
+			if(count($subuebung_obj->uebungen) > 0)
+			{
+				
+				foreach ($subuebung_obj->uebungen as $subrow)
+				{
+									
+					echo "	<tr>\n";
+					echo "		<td>- </td>";		
+					echo "		<td>\n";
+					echo $subrow->bezeichnung;
+					if ($subrow->positiv)
+						echo "*";
+					echo "		</td>\n";
+					echo "		<td>\n";
+					if ($subrow->abgabe)
+						echo $subrow->gewicht;
+					echo "		</td>\n";
+					if ($subrow->beispiele)
+					{
+						$l1note->calc_punkte($subrow->uebung_id, $user);
+						echo "		<td>".$l1note->punkte_gesamt."</td>";
+						echo "		<td></td>\n";	
+						echo "		<td></td>\n";				
+					}
+					else if ($subrow->abgabe)
+					{
+						$l1note->calc_note($subrow->uebung_id, $user);
+						echo "		<td></td>\n";	
+						echo "		<td>".$l1note->note."</td>";	
+						echo "		<td></td>\n";		
+					}
+					echo "	</tr>\n";					/*
+					if($datum_obj->mktime_fromtimestamp($subrow->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($subrow->freigabebis)>time())
+						echo ' + ';
+					else
+						echo ' - ';
+					*/
+					
+				}
+	
+			}
 		}
+		$l1note->calc_gesamtnote($lehreinheit_id, $stsem, $user);
+		if ($l1note->negativ)
+			$gesamtnote = 5;
+		else
+			$gesamtnote = $l1note->studentgesamtnote;
+		echo "<tr style='background-color:#dddddd;'><td colspan='5'>Errechnete Gesamtnote: </td><td>".$gesamtnote."</td></tr>";
+	
+		
+		echo "</table>";
+		echo "<span style='font-size:8pt;'>* muss positiv sein</span>";
+	}
+	
+	echo "</td><td valign='top'>";
+	
+	$legesamtnote = new legesamtnote($conn, $lehreinheit_id);
+	    			
+	if (!$legesamtnote->load($user, $lehreinheit_id))
+	{    				
+		$lenote = null;
 	}
 	else
-		echo "<span class='error'>$beispiel_obj->errormsg</span>";
+	{
+		$lenote = $legesamtnote->note;
+	} 
+	if ($lvgesamtnote = new lvgesamtnote($conn, $lvid,$user,$stsem))
+	{
+		$lvnote = $lvgesamtnote->note;
+	}
+	else
+		$lvnote = null;
+	
+	echo "<table style='border: 1px #dddddd solid'>\n";
+	echo "	<tr><th colspan='2'>Eingetragene Noten</th></tr>";
+	echo "<tr>\n";
+	echo "<td>Lehreinheit</td>";
+	echo "<td>".$lenote."</td>";
+	echo "</tr>\n";
+	echo "<tr>\n";
+	echo "<td>Lehrveranstaltung</td>";
+	echo "<td>".$lvnote."</td>";
+	echo "</tr>\n";
+	echo "</table>";
+	
+	echo "</td></tr></table>";
 }
 ?>
-</td></tr>
-</table>
 </body>
 </html>

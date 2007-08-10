@@ -31,35 +31,8 @@ require_once('../../../../include/uebung.class.php');
 require_once('../../../../include/beispiel.class.php');
 require_once('../../../../include/studentnote.class.php');
 require_once('../../../../include/datum.class.php');
+require_once('functions.inc.php');
 
-?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../../skin/cis.css" rel="stylesheet" type="text/css">
-<title>Kreuzerltool</title>
-<script language="JavaScript">
-<!--
-	function MM_jumpMenu(targ, selObj, restore)
-	{
-	  eval(targ + ".location='" + selObj.options[selObj.selectedIndex].value + "'");
-
-	  if(restore)
-	  {
-	  	selObj.selectedIndex = 0;
-	  }
-	}
-	function confirmdelete()
-	{
-		return confirm('Wollen Sie die markierten Einträge wirklich löschen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
-	}
-  //-->
-</script>
-</head>
-
-<body>
-<?php
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim oeffnen der Datenbankverbindung');
 
@@ -99,6 +72,50 @@ $datum_obj = new datum();
 
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 $uid = (isset($_GET['uid'])?$_GET['uid']:'');
+
+//Abgabedatei ausliefern
+if (isset($_GET["download_abgabe"])){
+	$file=$_GET["download_abgabe"];
+	$uebung_id = $_GET["uebung_id"];
+	$ueb = new uebung($conn);
+	$ueb->load_studentuebung($uid, $uebung_id);
+	$ueb->load_abgabe($ueb->abgabe_id);
+	$filename = BENOTUNGSTOOL_PATH."abgabe/".$ueb->abgabedatei;
+	header('Content-Type: application/octet-stream');
+	header('Content-disposition: attachment; filename="'.$file.'"');
+	readfile($filename);
+	exit;
+}
+
+?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../../skin/cis.css" rel="stylesheet" type="text/css">
+<title>Kreuzerltool</title>
+<script language="JavaScript">
+<!--
+	function MM_jumpMenu(targ, selObj, restore)
+	{
+	  eval(targ + ".location='" + selObj.options[selObj.selectedIndex].value + "'");
+
+	  if(restore)
+	  {
+	  	selObj.selectedIndex = 0;
+	  }
+	}
+	function confirmdelete()
+	{
+		return confirm('Wollen Sie die markierten Einträge wirklich löschen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
+	}
+  //-->
+</script>
+</head>
+
+<body>
+<?php
+
 
 //Kopfzeile
 echo '<table class="tabcontent" height="100%">';
@@ -445,8 +462,8 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 	
 	if ($ueb_obj->beispiele && is_numeric($_GET['uebung_id']))
 	{
-		$studentnote = new studentnote($conn,$lehreinheit_id,$stsem,$uid,$uebung_id);
-		echo "<span class='studentnote'>Note: ".$studentnote->note." (Gewicht: ".$ueb_obj->gewicht.")</span><br><br>";
+		//$studentnote = new studentnote($conn,$lehreinheit_id,$stsem,$uid,$uebung_id);
+		//echo "<span class='studentnote'>Note: ".$studentnote->note." (Gewicht: ".$ueb_obj->gewicht.")</span><br><br>";
 		echo "
 		<form method='POST' action='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid'>
 		<table width='100%'><tr><td valign='top'>
@@ -604,10 +621,20 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 	}
 	else if (is_numeric($_GET['uebung_id']))
 	{
+		$ueb_obj->load_studentuebung($uid, $uebung_id);
+		if ($ueb_obj->abgabe_id)	
+		{	
+			$ueb_obj->load_abgabe($ueb_obj->abgabe_id);
+			$filename = $ueb_obj->abgabedatei;
+		}
+		else
+			$filename='';
 		//Abgaben benoten
 		$studentnote = new studentnote($conn,$lehreinheit_id,$stsem,$uid,$uebung_id);
+		$studentnote->calc_note($uebung_id, $uid);
 		echo "<span class='studentnote'>Note: ".$studentnote->note." (Gewicht: ".$ueb_obj->gewicht.")</span><br><br>";
-
+		if ($filename != '')
+			echo "Abgabedatei: <a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid&download_abgabe=$filename'>".$filename."</a><br><br>";
 		echo "
 		<form method='POST' action='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid'>
 		<table width='100%'><tr><td valign='top'>
@@ -633,6 +660,89 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 }
 else
 {
+	
+	//Übungen benoten
+	$uebung_obj = new uebung($conn);
+	$uebung_obj->load_uebung($lehreinheit_id,1);
+	if(count($uebung_obj->uebungen)>0)
+	{
+		echo "<table width='100%'><tr><td valign='top'>";
+		echo "<br>Aufgabe (Kreuzerllisten, Abgaben): <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
+		echo "<option value='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=&uid=$uid' selected></option>";
+		foreach ($uebung_obj->uebungen as $row)
+		{
+			
+			if($uebung_id == $row->uebung_id)
+				$selected = 'selected';
+			else
+				$selected = '';		
+					
+			if($uebung_id=='')
+				$uebung_id=$row->uebung_id;
+			
+			$subuebung_obj = new uebung($conn);
+			$subuebung_obj->load_uebung($lehreinheit_id,2,$row->uebung_id);
+			if(count($subuebung_obj->uebungen)>0)
+				{
+				$disabled = 'disabled';
+				$selected = '';
+				}
+			else
+				$disabled = '';
+			
+			echo "<OPTION style='background-color:#cccccc;' value='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id&uid=$uid' $selected $disabled>";
+			
+			
+			echo $row->bezeichnung;
+			echo '</OPTION>';
+			
+			if(count($subuebung_obj->uebungen)>0)
+			{
+				foreach ($subuebung_obj->uebungen as $subrow)
+				{
+					if($uebung_id=='')
+						$uebung_id=$subrow->uebung_id;
+		
+					if($uebung_id == $subrow->uebung_id)
+						$selected = 'selected';
+					else
+						$selected = '';
+					
+					echo "<OPTION value='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$subrow->uebung_id&uid=$uid' $selected>";
+
+					
+					//Freigegeben = +
+					//Nicht Freigegeben = -
+					if($datum_obj->mktime_fromtimestamp($subrow->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($subrow->freigabebis)>time())
+						echo ' + ';
+					else
+						echo ' - ';
+					
+					echo $subrow->bezeichnung;
+					echo '</OPTION>';
+					
+				}
+			}
+		}
+		
+		echo '</SELECT>';
+		echo "<a href='anwesenheitsliste.php?output=html&uebung_id=$uebung_id&gruppe=$lehreinheit_id' target='_blank'> [benoten]</a>";
+		$abgabe_obj = new uebung($conn, $uebung_id);
+		if ($abgabe_obj->abgabe && glob(BENOTUNGSTOOL_PATH."abgabe/*_[WS]S[0-9][0-9][0-9][0-9]_".$uebung_id."_*"))
+		{
+		   $date = date('Y-m-d_H:i:s');
+			$downloadname = makeUploadName($conn, $which="zip", $lehreinheit_id, $uebung_id, $stsem, $uid=null, $date);
+			$downloadname = str_replace($uebung_id, ereg_replace(" ","_",$abgabe_obj->bezeichnung), $downloadname);
+			echo "<a href='zipdownload_benotungstool.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&downloadname=$downloadname'> [Abgaben downloaden]</a>";
+		}
+		
+		echo '</td></tr></table>';
+	}
+	
+	
+	
+	
+	echo "<br><hr><br>";
 	//Studentenliste
 	echo "Bitte w&auml;hlen Sie den Studenten aus.<br><br>";
 	echo "

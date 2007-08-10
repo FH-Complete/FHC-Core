@@ -30,6 +30,7 @@ require_once('../../../../include/benutzerberechtigung.class.php');
 require_once('../../../../include/uebung.class.php');
 require_once('../../../../include/beispiel.class.php');
 require_once('../../../../include/datum.class.php');
+require_once('functions.inc.php');
 function microtime_float()
 {
     list($usec, $sec) = explode(" ", microtime());
@@ -144,6 +145,7 @@ else
 $beispiel_id = (isset($_GET['beispiel_id'])?$_GET['beispiel_id']:'');
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 
+/*
 //Filenamen für up-/downloads bauen
 // which kann sein angabe, abgabe oder zip
 function makeUploadName($conn, $which, $lehreinheit_id=null, $uebung_id=null, $ss=null)
@@ -160,7 +162,7 @@ if ($which == "angabe")
 
 	return $name;
 }
-
+*/
 
 
 //Angabedatei löschen
@@ -186,12 +188,12 @@ if (isset($_POST["schluessel"]) && $_POST["schluessel"]=='Speichern')
 	{
 		if (is_numeric($punkte_arr[$i]))
 		{
-			$qry = "select * from campus.tbl_notenschluesseluebung where uebung_id = '".$uebung_id."' and note = '".$i."'";
+			$qry = "select * from campus.tbl_notenschluesseluebung where uebung_id = '".$liste_id."' and note = '".$i."'";
 			$result = pg_query($conn, $qry);
 			if(pg_num_rows($result)>0)
-				$str = "update campus.tbl_notenschluesseluebung set punkte = '".$punkte_arr[$i]."' where uebung_id = '".$uebung_id."' and note = '".$i."'";
+				$str = "update campus.tbl_notenschluesseluebung set punkte = '".$punkte_arr[$i]."' where uebung_id = '".$liste_id."' and note = '".$i."'";
 			else
-				$str = "insert into campus.tbl_notenschluesseluebung (uebung_id, note, punkte) values ('".$uebung_id."','".$i."','".$punkte_arr[$i]."')";
+				$str = "insert into campus.tbl_notenschluesseluebung (uebung_id, note, punkte) values ('".$liste_id."','".$i."','".$punkte_arr[$i]."')";
 			if (!pg_query($conn, $str))
 				echo "<span class='error'>Daten konnten nicht gespeichert werden</span>";
 		}
@@ -342,8 +344,6 @@ if(isset($_POST['uebung_neu']) || isset($_POST['abgabe_neu']))
 	{
 		//pruefen ob alle Daten eingegeben wurden
 		$error=false;
-		$maxbsp = null;
-		$maxstd = null;
 		if($thema=='')
 		{
 			$error_thema.= "<span class='error'>Thema muss eingegeben werden</span>";
@@ -826,9 +826,11 @@ if(isset($_GET["uebung_id"]) && $_GET["uebung_id"]!='')
 	if ($uebung_obj->beispiele)
 		echo "<tr><td>Max. Studenten/Beispiel</td><td align='right'><input type='text' name='maxstd' value='$uebung_obj->maxstd'></td><td>$error_maxstd</td></tr>
 	<tr><td>Max. Beispiele/Student</td><td align='right'><input type='text' name='maxbsp' value='$uebung_obj->maxbsp'></td><td>$error_maxbsp</td></tr>";
-		echo "<tr><td>Gewicht</td><td align='right'><input type='text' size='16' name='gewicht' value='$uebung_obj->gewicht'></td><td>$error_gewicht</td></tr>";
-	echo"<tr><td>Positiv </td><td><input type='checkbox' name='positiv' ".($uebung_obj->positiv?'checked':'')."></td></tr>";
-	echo"<tr><td>Statistik f&uuml;r Studenten anzeigen </td><td><input type='checkbox' name='statistik' ".($uebung_obj->statistik?'checked':'')."></td></tr>";
+	//echo "<tr><td>Gewicht</td><td align='right'><input type='text' size='16' name='gewicht' value='$uebung_obj->gewicht'></td><td>$error_gewicht</td></tr>";
+	echo "<input type='hidden' size='16' name='gewicht' value='0'>";
+	//echo"<tr><td>Positiv </td><td><input type='checkbox' name='positiv' ".($uebung_obj->positiv?'checked':'')."></td></tr>";
+	if ($uebung_obj->beispiele)	
+		echo"<tr><td>Statistik f&uuml;r Studenten anzeigen </td><td><input type='checkbox' name='statistik' ".($uebung_obj->statistik?'checked':'')."></td></tr>";
 	echo "<tr>";
 	echo "<td>Angabedatei</td>";
 	if ($uebung_obj->angabedatei != '')
@@ -862,6 +864,7 @@ if(isset($_GET["uebung_id"]) && $_GET["uebung_id"]!='')
 		echo "</table>
 		</form>";
 		
+		/*
 		// notenschlüssel
 		$qry = "select * from campus.tbl_notenschluesseluebung where uebung_id = '$uebung_id' order by note";
 		if($result = pg_query($conn, $qry))
@@ -895,6 +898,7 @@ echo "<tr><td><input type='text' name='schluessel_note_5' maxlength='2' size='2'
 	
 		echo "</table>
 		</form>";
+		*/
 	}
 	
 	echo "</td></tr><tr><td valign='top'>";
@@ -1143,14 +1147,49 @@ else
 	<tr><td>Max. Beispiele/Student</td><td align='right'><input type='text' name='maxbsp' value='$maxbsp'></td><td>$error_maxbsp</td></tr>
 	<tr><td>Freigabe</td><td align='right'>von <input type='text' size='16' name='freigabevon' value='$freigabevon'></td><td>$error_freigabevon</td></tr>
 	<tr><td>(Format: 31.12.2007 14:30)</td><td align='right'>bis <input type='text' size='16' name='freigabebis' value='$freigabebis'></td><td>$error_freigabebis</td></tr>
-	<tr><td>Gewicht</td><td align='right'><input type='text' size='16' name='gewicht' value='$gewicht'></td><td>$error_gewicht</td></tr>
-	<tr><td>Positiv </td><td><input type='checkbox' name='positiv'></td></tr>
+	<input type='hidden' size='16' name='gewicht' value='0'>
+	<!--<tr><td>Positiv </td><td><input type='checkbox' name='positiv'></td></tr>-->
 	<tr><td>Statistik f&uuml;r Studenten anzeigen </td><td><input type='checkbox' name='statistik'></td></tr>
 	<tr><td>Angabedatei</td><td><input type='file' name='angabedatei'></td></tr>
 	<tr><td colspan=2 align='right'><input type='submit' name='uebung_neu' value='Anlegen'></td></tr>
 	</table>
 	</form>
 	";
+		// notenschlüssel
+		$qry = "select * from campus.tbl_notenschluesseluebung where uebung_id = '$liste_id' order by note";
+		if($result = pg_query($conn, $qry))
+		{
+			$notenschluessel = array();
+			$notenschluessel[1] = '';
+			$notenschluessel[2] = '';
+			$notenschluessel[3] = '';
+			$notenschluessel[4] = '';
+			$notenschluessel[5] = '';
+			if(pg_num_rows($result)>=1)
+			{
+				while($schluesselrow = pg_fetch_object($result))
+				{
+					$notenschluessel[$schluesselrow->note] = $schluesselrow->punkte;
+				}
+			}
+		}
+		
+		echo "<form action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id' method=POST>\n";
+		echo "<table width='340'><tr><td colspan='3' class='ContentHeader3'>Notenschlüssel definieren</td></tr>\n";
+		echo "<tr><td>&nbsp;</td><td></td></tr>\n\n";
+	
+		echo "<tr><td>Note</td><td>Mindestpunkte</td></tr>";
+		echo "<tr><td><input type='text' name='schluessel_note_1' maxlength='2' size='2' value='1'></td><td><input type='text' size='2' name='schluessel_punkte_1' value='$notenschluessel[1]'></td></tr>";
+echo "<tr><td><input type='text' name='schluessel_note_2' maxlength='2' size='2' value='2'></td><td><input type='text' size='2' name='schluessel_punkte_2' value='$notenschluessel[2]'></td></tr>";
+echo "<tr><td><input type='text' name='schluessel_note_3' maxlength='2' size='2' value='3'></td><td><input type='text' size='2' name='schluessel_punkte_3' value='$notenschluessel[3]'></td></tr>";
+echo "<tr><td><input type='text' name='schluessel_note_4' maxlength='2' size='2' value='4'></td><td><input type='text' size='2' name='schluessel_punkte_4' value='$notenschluessel[4]'></td></tr>";
+echo "<tr><td><input type='text' name='schluessel_note_5' maxlength='2' size='2' value='5'></td><td><input type='text' size='2' name='schluessel_punkte_5' value='$notenschluessel[5]'></td></tr>";
+		echo "<tr><td align='right' colspan='2'><input type='submit' name='schluessel' value='Speichern'></td></tr>";
+	
+		echo "</table>
+		</form>";	
+	
+	
 	}
 	if(!isset($_POST['uebung_neu']))
 		$thema = "Abgabe ".($anzahl<9?'0'.($anzahl+1):($anzahl+1));
@@ -1166,7 +1205,7 @@ else
 	<tr><td>(Format: 31.12.2007 14:30)</td><td align='right'>bis <input type='text' size='16' name='freigabebis' value='$freigabebis'></td><td>$error_freigabebis</td></tr>
 	<tr><td>Gewicht</td><td align='right'><input type='text' size='16' name='gewicht' value='$gewicht'></td><td>$error_gewicht</td></tr>
 	<tr><td>Positiv </td><td><input type='checkbox' name='positiv'></td></tr>
-	<tr><td>Statistik f&uuml;r Studenten anzeigen </td><td><input type='checkbox' name='statistik'></td></tr>
+	<!--<tr><td>Statistik f&uuml;r Studenten anzeigen </td><td><input type='checkbox' name='statistik'></td></tr>-->
 	<tr><td>Angabedatei</td><td><input type='file' name='angabedatei'></td></tr>
 	<tr><td colspan=2 align='right'><input type='submit' name='abgabe_neu' value='Anlegen'></td></tr>
 	</table>
