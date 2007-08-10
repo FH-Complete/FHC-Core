@@ -27,7 +27,7 @@
 		$row=pg_fetch_object($erg, $i);
      	$stg_id=$row->studiengang_kz;
 		$stg_kzbz=$row->kurzbz;
-		$sql_query="SELECT DISTINCT semester FROM public.tbl_student WHERE studiengang_kz=$stg_id AND student_uid NOT LIKE '\\\\_%' AND semester<10 ORDER BY semester";
+		$sql_query="SELECT DISTINCT semester FROM public.tbl_student WHERE studiengang_kz=$stg_id AND student_uid NOT LIKE '\\\\_%' AND semester<10 AND semester>0 ORDER BY semester";
 		//echo $sql_query;
 		if(!($result_sem=pg_query($conn, $sql_query)))
 			die(pg_errormessage($conn));
