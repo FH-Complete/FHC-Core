@@ -38,6 +38,16 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 		else
 			echo "Erfolgreich gespeichert";
 	}
+	
+	//Aktiv Feld setzen
+	if(isset($_GET['aktiv']))
+	{
+		$qry = "UPDATE lehre.tbl_lehrveranstaltung SET aktiv=".($_GET['aktiv']=='t'?'false':'true')." WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
+		if(!pg_query($conn, $qry))
+			echo "Fehler beim Speichen!";
+		else
+			echo "Erfolgreich gespeichert";
+	}
 
 	//Lehrevz Speichern
 	if(isset($_POST['lehrevz']))
@@ -97,7 +107,7 @@ if ($result_lv!=0)
 	   echo "<td align='right'>$row->lehrveranstaltung_id</td><td>$row->kurzbz</td><td>$row->bezeichnung</td><td>$row->ects</td>";
 	   echo "<td><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&lehre=$row->lehre'><img src='../../skin/images/".($row->lehre=='t'?'true.gif':'false.gif')."'></a></td>";
 	   echo "<td><form action='?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester' method='POST'><input type='text' value='$row->lehreverzeichnis' size='4' name='lehrevz'><input type='submit' value='ok'></form></td>";
-	   echo "<td>".($row->aktiv=='t'?'Ja':'Nein')."</td>";
+	   echo "<td><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&aktiv=$row->aktiv'><img src='../../skin/images/".($row->aktiv=='t'?'true.gif':'false.gif')."'></a></td>";
 	   echo "</tr>\n";
 	}
 
