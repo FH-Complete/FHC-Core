@@ -363,6 +363,34 @@ class beispiel
 		}
 	}
 
+	function check_anzahl_studentbeispiel($beispiel_id)
+	{
+		if(!is_numeric($beispiel_id))
+		{
+			$this->errormsg = 'Beispiel_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		$qry = "SELECT count(*) as anzahl FROM campus.tbl_studentbeispiel WHERE vorbereitet = true and beispiel_id='$beispiel_id'";
+
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$this->anzahl_studentbeispiel = $row->anzahl;
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim laden der Anzahl der Einträge in Student_Beispiel';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim laden der Anzahl der Einträge in Student_Beispiel';
+			return false;
+		}
+	}
 	// **
 	// * Prueft die studentbeispiel Daten auf gueltigkeit
 	// *

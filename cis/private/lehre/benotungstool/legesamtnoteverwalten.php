@@ -327,7 +327,8 @@ if($result_grp = pg_query($conn, $qry))
 			while($row_stud = pg_fetch_object($result_stud))
 			{
     				
-				$studentnote = new studentnote($conn,$lehreinheit_id,$stsem,$row_stud->uid);
+				$studentnote = new studentnote($conn);
+				$studentnote->calc_gesamtnote($lehreinheit_id,$stsem,$row_stud->uid);
 				//echo $studentnote->debug;
     			$legesamtnote = new legesamtnote($conn, $lehreinheit_id);
     			
@@ -375,7 +376,7 @@ if($result_grp = pg_query($conn, $qry))
 				}
 				echo "<form name='$row_stud->uid' method='POST' action='legesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_final' name='note'><input type='submit' name='submit' value='->'></td></form>";
 					
-				echo "<td>$note</td>";				
+				echo "<td align='center'>$note</td>";				
 				echo "</tr>";
 				$i++;
 			}

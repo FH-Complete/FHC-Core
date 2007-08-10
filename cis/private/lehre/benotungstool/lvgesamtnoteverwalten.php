@@ -33,6 +33,7 @@ require_once('../../../../include/studentnote.class.php');
 require_once('../../../../include/datum.class.php');
 require_once('../../../../include/legesamtnote.class.php');
 require_once('../../../../include/lvgesamtnote.class.php');
+require_once('../../../../include/zeugnisnote.class.php');
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -254,6 +255,56 @@ if (isset($_REQUEST["submit"]) && ($_POST["student_uid"] != '')){
 		echo "<span class='error'>".$lvgesamtnote->errormsg."</span>";
 }
 
+// eingetragene lv-gesamtnoten freigeben
+if (isset($_GET["freigabe"]) and ($_GET["freigabe"] == 1))
+{
+	$jetzt = date("Y-m-d H:i:s");
+	
+	$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id' ORDER BY semester, verband, gruppe, gruppe_kurzbz";
+	
+	if($result_grp = pg_query($conn, $qry))
+	{
+		while($row_grp = pg_fetch_object($result_grp))
+		{
+			
+			if($row_grp->gruppe_kurzbz!='')
+			{
+					$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row_grp->gruppe_kurzbz)."' ORDER BY nachname, vorname";
+			}
+			else
+			{
+					$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student
+					             WHERE studiengang_kz='$row_grp->studiengang_kz' AND
+					             semester='$row_grp->semester' ".
+								 ($row_grp->verband!=''?" AND trim(verband)=trim('$row_grp->verband')":'').
+								 ($row_grp->gruppe!=''?" AND trim(gruppe)=trim('$row_grp->gruppe')":'').
+					            " ORDER BY nachname, vorname";
+			}
+			
+	        if($result_stud = pg_query($conn, $qry_stud))
+			{
+				$i=1;
+				while($row_stud = pg_fetch_object($result_stud))
+				{	
+					$lvgesamtnote = new lvgesamtnote($conn);
+	    			if ($lvgesamtnote->load($lvid,$row_stud->uid,$stsem))
+	    			{
+						if ($lvgesamtnote->benotungsdatum > $lvgesamtnote->freigabedatum)	    				
+						{	    				
+	    					$lvgesamtnote->freigabedatum = $jetzt;
+	    					$lvgesamtnote->save($new=null);
+	    				}
+	    			}
+				}
+			}
+		}
+	}
+
+
+
+
+}
+
 echo "<h3>LV Gesamtnote verwalten</h3>";
 
 
@@ -269,12 +320,7 @@ if($result_grp = pg_query($conn, $qry))
 	while($row_grp = pg_fetch_object($result_grp))
 	{
 		echo "<tr>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
+				<td colspan='8'>&nbsp;</td>
 			</tr>
 			<tr>
 				<td class='ContentHeader2'>UID</td>
@@ -282,15 +328,13 @@ if($result_grp = pg_query($conn, $qry))
 				<td class='ContentHeader2'>Vorname</td>
 				<td class='ContentHeader2'>LE-Noten (LE-ID)</td>
 				<td class='ContentHeader2'></td>
-				<td class='ContentHeader2'>LV-Gesamtnote</td>
+				<td class='ContentHeader2'>LV-Note</td>
+				<td class='ContentHeader2'><a href='lvgesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem&freigabe=1'><input type='button' name='frei' value='Freigabe'></a></td>
+				<td class='ContentHeader2'>Zeugnisnote</td>
 			</tr>
 			<tr>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
+				<td colspan='8'>&nbsp;</td>
+
 			</tr>";
 		if($row_grp->gruppe_kurzbz!='')
 		{
@@ -387,13 +431,32 @@ if($result_grp = pg_query($conn, $qry))
 					$note_vorschlag = round($note_le/$le_anz);
 				else
 					$note_vorschlag = null;
-							
+				if ($zeugnisnote = new zeugnisnote($conn, $lvid, $row_stud->uid, $stsem))
+					$znote = $zeugnisnote->note;
+				else
+					$znote = null;			
 								
 				
 				echo "<td>$note_les_str</td>";
 				echo "<form name='$row_stud->uid' method='POST' action='lvgesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_vorschlag' name='note'><input type='submit' name='submit' value='->'></td></form>";
 					
-				echo "<td>$note_lv</td>";				
+				echo "<td align='center'>$note_lv</td>";
+				
+				//status
+				echo "<td align='center'>";				
+				if (!$lvgesamtnote->freigabedatum)
+					echo "<img src='../../../../skin/images/offen.png'>";				
+				else if	($lvgesamtnote->benotungsdatum > $lvgesamtnote->freigabedatum)
+					echo "<img src='../../../../skin/images/changed.png'>";
+				else
+					echo "<img src='../../../../skin/images/ok.png'>";
+					
+				echo "</td>";
+				if (($znote) and ($note_lv != $znote))
+					$stylestr = " style='color:red; border-color:red; border-style:solid; border-width:1px;'";
+				else
+					$stylestr ="";
+				echo "<td".$stylestr." align='center'>".$znote."</td>";
 				echo "</tr>";
 				$i++;
 			}
