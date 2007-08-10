@@ -749,6 +749,7 @@ function StudentAuswahl()
 	document.getElementById('student-detail-textbox-svnr').value=svnr;
 	document.getElementById('student-detail-textbox-ersatzkennzeichen').value=ersatzkennzeichen;
 	document.getElementById('student-detail-menulist-familienstand').value=familienstand;
+	
 	document.getElementById('student-detail-menulist-geschlecht').value=geschlecht;
 	if(aktiv=='true')
 		document.getElementById('student-detail-checkbox-aktiv').checked=true;
@@ -3023,7 +3024,7 @@ function StudentSuche()
 		StudentPrestudentDisableFields(true);
 		StudentKontoDisableFields(true);
 		StudentAkteDisableFields(true);
-		StudentBetriebsmittelDisableFields(true);
+		document.getElementById('student-betriebsmittel').setAttribute('src','');
 		StudentIODisableFields(true);
 		StudentNoteDisableFields(true);
 		document.getElementById('student-kontakt').setAttribute('src','');

@@ -139,6 +139,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<label value="Familienstand" control="student-detail-menulist-familienstand"/>
       						<menulist id="student-detail-menulist-familienstand" disabled="true">
 								<menupopup>
+										<menuitem value="" label="--keine Auswahl--"/>
 										<menuitem value="g" label="geschieden"/>
 										<menuitem value="l" label="ledig"/>
 										<menuitem value="v" label="verheiratet"/>
@@ -213,7 +214,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	    		</grid>
 	    		</groupbox>
     			<vbox>
-    				<spacer flex="1" />-->
+    				<spacer flex="1" />
     				<button id="student-detail-button-save" label="Speichern" oncommand="StudentDetailSave();" disabled="true"/>
     			</vbox>
     		</hbox>

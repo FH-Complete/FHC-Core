@@ -48,7 +48,9 @@ class lehrveranstaltung
 	var $updateamum;			//@var timestamp
 	var $updatevon;				//@var string
 	var $sprache;				//@var varchar(16)
-
+	var $sort;					//@var smallint
+	var $zeugnis;				//@var boolean
+	
 	/**
 	 * Konstruktor
 	 * @param $conn Connection zur Datenbank
@@ -119,6 +121,8 @@ class lehrveranstaltung
 			$this->updateamum=$row->updateamum;
 			$this->updatevon=$row->updatevon;
 			$this->sprache=$row->sprache;
+			$this->sort=$row->sort;
+			$this->zeugnis=$row->zeugnis;
 		}
 
 		return true;
@@ -163,6 +167,8 @@ class lehrveranstaltung
 			$lv_obj->updateamum=$row->updateamum;
 			$lv_obj->updatevon=$row->updatevon;
 			$lv_obj->sprache=$row->sprache;
+			$lv_obj->sort=$row->sort;
+			$lv_obj->zeugnis=$row->zeugnis;
 
 			$this->lehrveranstaltungen[] = $lv_obj;
 		}
@@ -243,6 +249,8 @@ class lehrveranstaltung
 			$lv_obj->updateamum=$row->updateamum;
 			$lv_obj->updatevon=$row->updatevon;
 			$lv_obj->sprache=$row->sprache;
+			$lv_obj->sort=$row->sort;
+			$lv_obj->zeugnis=$row->zeugnis;
 
 			$this->lehrveranstaltungen[] = $lv_obj;
 		}
@@ -338,7 +346,7 @@ class lehrveranstaltung
 			//Neuen Datensatz anlegen
 			$qry = 'BEGIN; INSERT INTO lehre.tbl_lehrveranstaltung (studiengang_kz, bezeichnung, kurzbz,
 				semester, ects, semesterstunden,  anmerkung, lehre, lehreverzeichnis, aktiv, ext_id, insertamum,
-				insertvon, planfaktor, planlektoren, planpersonalkosten, plankostenprolektor, updateamum, updatevon, sprache) VALUES ('.
+				insertvon, planfaktor, planlektoren, planpersonalkosten, plankostenprolektor, updateamum, updatevon, sort,zeugnis, sprache) VALUES ('.
 				$this->addslashes($this->studiengang_kz).', '.
 				$this->addslashes($this->bezeichnung).', '.
 				$this->addslashes($this->kurzbz).', '.
@@ -358,6 +366,8 @@ class lehrveranstaltung
 				$this->addslashes($this->plankostenprolektor).', '.
 				$this->addslashes($this->updateamum).', '.
 				$this->addslashes($this->updatevon).','.
+				$this->addslashes($this->sort).','.
+				($this->zeugnis?'true':'false').','.
 				$this->addslashes($this->sprache).');';
 		}
 		else
@@ -380,7 +390,7 @@ class lehrveranstaltung
 				'ects='.$this->addslashes($this->ects) .', '.
 				'semesterstunden='.$this->addslashes($this->semesterstunden) .', '.
 				'anmerkung='.$this->addslashes($this->anmerkung) .', '.
-				'lehre='.$this->addslashes($this->lehre) .', '.
+				'lehre='.($this->lehre?'true':'false') .', '.
 				'lehreverzeichnis='.$this->addslashes($this->lehreverzeichnis) .', '.
 				'aktiv='.($this->aktiv?'true':'false') .', '.
 				'ext_id='.$this->addslashes($this->ext_id) .', '.
@@ -392,6 +402,8 @@ class lehrveranstaltung
 				'plankostenprolektor='.$this->addslashes($this->plankostenprolektor) .', '.
 				'updateamum='.$this->addslashes($this->updateamum) .','.
 				'updatevon='.$this->addslashes($this->updatevon) .','.
+				'sort='.$this->addslashes($this->sort) .','.
+				'zeugnis='.($this->zeugnis?'true':'false').','.
 				'sprache='.$this->addslashes($this->sprache).' '.
 				'WHERE lehrveranstaltung_id = '.$this->addslashes($this->lehrveranstaltung_id).';';
 		}
@@ -492,6 +504,8 @@ class lehrveranstaltung
 				$lv_obj->updateamum=$row->updateamum;
 				$lv_obj->updatevon=$row->updatevon;
 				$lv_obj->sprache=$row->sprache;
+				$lv_obj->sort=$row->sort;
+				$lv_obj->zeugnis=$row->zeugnis;
 
 				$this->lehrveranstaltungen[] = $lv_obj;
 			}
@@ -559,6 +573,8 @@ class lehrveranstaltung
 				$l->updatevon = $row->updatevon;
 				$l->insertamum = $row->insertamum;
 				$l->insertvon = $row->insertvon;
+				$l->sort = $row->sort;
+				$l->zeugnis = $row->zeugnis;
 				$this->lehrveranstaltungen[]=$l;
 			}
 		}

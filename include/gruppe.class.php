@@ -33,6 +33,7 @@ class gruppe
 	var $bezeichnung;			// varchar(32)
 	var $semester;				// smallint
 	var $sort;					// smallint
+	var $lehre=true;			//boolean
 	var $mailgrp;				// boolean
 	var $beschreibung;			// varchar(128)
 	var $generiert;				// boolean
@@ -54,15 +55,18 @@ class gruppe
 	{
 		$this->conn = $conn;
 
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-		if(!pg_query($conn,$qry))
+		if($unicode!=null)
 		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
+			if($unicode)
+				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			else
+				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+	
+			if(!pg_query($conn,$qry))
+			{
+				$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
+				return false;
+			}
 		}
 
 		if($gruppe_kurzbz!=null)
@@ -124,6 +128,7 @@ class gruppe
 				$this->semester = $row->semester;
 				$this->sort = $row->sort;
 				$this->mailgrp = ($row->mailgrp=='t'?true:false);
+				$this->lehre = ($row->lehre=='t'?true:false);
 				$this->beschreibung = $row->beschreibung;
 				$this->sichtbar = ($row->sichtbar=='t'?true:false);
 				$this->aktiv = ($row->aktiv=='t'?true:false);
@@ -155,12 +160,13 @@ class gruppe
 		{
 			while($row=pg_fetch_object($result))
 			{
-				$grp_obj = new gruppe($this->conn);
+				$grp_obj = new gruppe($this->conn, null, null);
 				$grp_obj->gruppe_kurzbz = $row->gruppe_kurzbz;
 				$grp_obj->studiengang_kz = $row->studiengang_kz;
 				$grp_obj->bezeichnung = $row->bezeichnung;
 				$grp_obj->semester = $row->semester;
 				$grp_obj->sort = $row->sort;
+				$grp_obj->lehre = ($row->lehre=='t'?true:false);
 				$grp_obj->mailgrp = ($row->mailgrp=='t'?true:false);
 				$grp_obj->beschreibung = $row->beschreibung;
 				$grp_obj->sichtbar = ($row->sichtbar=='t'?true:false);
@@ -218,13 +224,14 @@ class gruppe
 		{
 			while($row = pg_fetch_object($result))
 			{
-				$grp_obj = new gruppe($this->conn);
+				$grp_obj = new gruppe($this->conn, null, null);
 				$grp_obj->gruppe_kurzbz = $row->gruppe_kurzbz;
 				$grp_obj->studiengang_kz = $row->studiengang_kz;
 				$grp_obj->bezeichnung = $row->bezeichnung;
 				$grp_obj->semester = $row->semester;
 				$grp_obj->sort = $row->sort;
 				$grp_obj->mailgrp = ($row->mailgrp=='t'?true:false);
+				$grp_obj->lehre = ($row->lehre=='t'?true:false);
 				$grp_obj->beschreibung = $row->beschreibung;
 				$grp_obj->sichtbar = ($row->sichtbar=='t'?true:false);
 				$grp_obj->aktiv = ($row->aktiv=='t'?true:false);
@@ -345,7 +352,7 @@ class gruppe
 		if($new)
 		{
 			$qry = 'INSERT INTO public.tbl_gruppe (gruppe_kurzbz, studiengang_kz, bezeichnung, semester, sort,
-			                                mailgrp, beschreibung, sichtbar, generiert, aktiv,
+			                                mailgrp, beschreibung, sichtbar, generiert, aktiv, lehre,
 			                                updateamum, updatevon, insertamum, insertvon)
 			        VALUES('.$this->addslashes(strtoupper($this->gruppe_kurzbz)).','.
 					$this->addslashes($this->studiengang_kz).','.
@@ -357,6 +364,7 @@ class gruppe
 					($this->sichtbar?'true':'false').','.
 					($this->generiert?'true':'false').','.
 					($this->aktiv?'true':'false').','.
+					($this->lehre?'true':'false').','.
 					$this->addslashes($this->updateamum).','.
 					$this->addslashes($this->updatevon).','.
 					$this->addslashes($this->insertamum).','.
@@ -374,6 +382,7 @@ class gruppe
 			       ' sichtbar='.($this->sichtbar?'true':'false').','.
 			       ' generiert='.($this->generiert?'true':'false').','.
 			       ' aktiv='.($this->aktiv?'true':'false').','.
+			       ' lehre='.($this->lehre?'true':'false').','.
 			       ' updateamum='.$this->addslashes($this->updateamum).','.
 			       ' updatevon='.$this->addslashes($this->updatevon).
 			       " WHERE gruppe_kurzbz=".$this->addslashes(strtoupper($this->gruppe_kurzbz)).";";

@@ -210,6 +210,8 @@ if(!$error)
 				$student->geburtsnation = $_POST['geburtsnation'];
 				$student->sprache = $_POST['sprache'];
 				$student->matrikelnr = $_POST['matrikelnummer'];
+				$student->updateamum = date('Y-m-d H:i:s');
+				$student->updatevon = $user;
 				
 				$stsem = new studiensemester($conn, null, true);
 				$stsem_kurzbz = $stsem->getaktorNext();
@@ -231,6 +233,12 @@ if(!$error)
 					if($student->save())
 					{
 						$student_lvb = new student($conn, null, true);
+						
+						if($student_lvb->studentlehrverband_exists($_POST['uid'], $semester_aktuell))
+							$student_lvb->new = false;
+						else 
+							$student_lvb->new = true;
+						
 						$student_lvb->uid = $_POST['uid'];
 						$student_lvb->studiensemester_kurzbz = $semester_aktuell;
 						$student_lvb->studiengang_kz = $_POST['studiengang_kz'];
@@ -240,7 +248,7 @@ if(!$error)
 						$student_lvb->updateamum = date('Y-m-d H:i:s');
 						$student_lvb->updatevon = $user;
 						
-						if($student_lvb->save_studentlehrverband(false))
+						if($student_lvb->save_studentlehrverband())
 						{
 							$return = true;
 							$error=false;
@@ -301,6 +309,8 @@ if(!$error)
 				$person->staatsbuergerschaft = $_POST['staatsbuergerschaft'];
 				$person->geburtsnation = $_POST['geburtsnation'];
 				$person->sprache = $_POST['sprache'];
+				$person->updateamum = date('Y-m-d H:i:s');
+				$person->updatevon = $user;
 								
 				$person->new=false;				
 
