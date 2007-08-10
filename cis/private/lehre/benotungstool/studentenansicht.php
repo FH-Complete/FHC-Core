@@ -41,9 +41,9 @@ include('functions.inc.php');
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim oeffnen der Datenbankverbindung');
 
-$user = get_uid();
+//$user = get_uid();
 //$user = 'if06b172';
-//$user = 'if06b144';
+$user = 'if06b144';
 
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
@@ -567,7 +567,7 @@ if (!isset($_GET["notenuebersicht"]))
 		if ($uebung_obj->maxbsp > 0)
 			echo "<tr><td>Maximale Anzahl der Beispiele/Student:</td><td><b>".$uebung_obj->maxbsp."</b></td></tr>";
 		if ($uebung_obj->maxstd > 0)
-			echo "<tr><td>Maximale Anzahl Student/Übung erreicht</td><td style='background-color:#dddddd;'>&nbsp;</td></tr>";
+			echo "<tr><td>Maximale Anzahl Studenten/Übung:</td><td style='background-color:#dddddd;'><b>".$uebung_obj->maxstd."</b></td></tr>";
 		echo "</table>";	
 		echo "
 		<form method='POST' name='bspform' action='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem'>

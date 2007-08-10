@@ -226,7 +226,7 @@ echo "<br>
 
 echo "<h3>Anwesenheits- und &Uuml;bersichtstabelle</h3>";
 
-
+/*
 $uebung_obj = new uebung($conn);
 $uebung_obj->load_uebung($lehreinheit_id);
 if(count($uebung_obj->uebungen)>0)
@@ -270,6 +270,91 @@ if(count($uebung_obj->uebungen)>0)
 }
 else
 	die("Derzeit gibt es keine Uebungen");
+*/
+
+	$uebung_obj = new uebung($conn);
+	$uebung_obj->load_uebung($lehreinheit_id,1);
+	if(count($uebung_obj->uebungen)>0)
+	{
+		echo "<table width='100%'><tr><td valign='top'>";
+		echo "<br>Wählen Sie bitte eine Aufgabe aus (Kreuzerllisten, Abgaben): <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
+		echo "<option value='anwesenheitstabelle.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=' selected></option>";
+		foreach ($uebung_obj->uebungen as $row)
+		{
+			
+			if($uebung_id == $row->uebung_id)
+				$selected = 'selected';
+			else
+				$selected = '';		
+					
+			if($uebung_id=='')
+				$uebung_id=$row->uebung_id;
+			
+			$subuebung_obj = new uebung($conn);
+			$subuebung_obj->load_uebung($lehreinheit_id,2,$row->uebung_id);
+			if(count($subuebung_obj->uebungen)>0)
+				{
+				$disabled = 'disabled';
+				$selected = '';
+				}
+			else
+				$disabled = '';
+			
+			echo "<OPTION style='background-color:#cccccc;' value='anwesenheitstabelle.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id' $selected $disabled>";
+			
+			
+			echo $row->bezeichnung;
+			echo '</OPTION>';
+			
+			if(count($subuebung_obj->uebungen)>0)
+			{
+				foreach ($subuebung_obj->uebungen as $subrow)
+				{
+					if($uebung_id=='')
+						$uebung_id=$subrow->uebung_id;
+		
+					if($uebung_id == $subrow->uebung_id)
+						$selected = 'selected';
+					else
+						$selected = '';
+					
+					echo "<OPTION value='anwesenheitstabelle.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$subrow->uebung_id' $selected>";
+
+					
+					//Freigegeben = +
+					//Nicht Freigegeben = -
+					if($datum_obj->mktime_fromtimestamp($subrow->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($subrow->freigabebis)>time())
+						echo ' + ';
+					else
+						echo ' - ';
+					
+					echo $subrow->bezeichnung;
+					echo '</OPTION>';
+					
+				}
+			}
+		}
+		
+		echo '</SELECT>';
+		
+		echo '</td>';
+		
+		echo "<td>
+			<table>
+			<tr>
+				<td><b>+</b>...</td>
+				<td><u>freigeschaltet</u>.</td>
+			</tr>
+			<tr>
+				<td><b>-</b>...</td>
+				<td><u>nicht freigeschaltet</u>.</td>
+			</tr>
+			</table>
+		</td>
+	</tr></table>";
+	}
+	else
+		die("Derzeit gibt es keine Uebungen");
 
 $uebung_obj = new uebung($conn);
 $uebung_obj->load($uebung_id);
