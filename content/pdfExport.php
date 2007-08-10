@@ -81,6 +81,7 @@ $xml_url=XML_ROOT.$xml.$params;
 //echo $xml_url;
 // Load the XML source
 $xml_doc = new DOMDocument;
+
 if(!$xml_doc->load($xml_url))
 	die('unable to load xml');
 //echo ':'.$xml_doc->saveXML().':';
@@ -112,9 +113,26 @@ $buffer = '<?xml version="1.0" encoding="ISO-8859-15" ?>'.substr($buffer, strpos
 //Pdf erstellen
 $fo2pdf = new XslFo2Pdf();
 
+//wenn uid gefunden wird, dann den Nachnamen zum Dateinamen dazuhaengen
+$nachname='';
+if(isset($_GET['uid']) && $_GET['uid']!='')
+{
+	$uid = str_replace(';','',$_GET['uid']);
+	$qry = "SELECT nachname FROM campus.vw_benutzer WHERE uid='".addslashes($uid)."'";
+	
+	if($result = pg_query($conn, $qry))
+	{
+		if($row = pg_fetch_object($result))
+		{
+			$nachname = '_'.$row->nachname;
+		}
+	}
+}
+$filename=$xsl.$nachname;
+
 if (!isset($_REQUEST["archive"]))
 {
- if (!$fo2pdf->generatePdf($buffer, 'filename', "D"))
+ if (!$fo2pdf->generatePdf($buffer, $filename, "D"))
  {
      echo('Failed to generate PDF');
  }

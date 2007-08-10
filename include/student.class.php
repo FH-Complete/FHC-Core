@@ -315,6 +315,7 @@ class student extends benutzer
 			$l->gebdatum=$row->gebdatum;
 			$l->gebort=$row->gebort;
 			$l->gebzeit=$row->gebzeit;
+			$l->familienstand = $row->familienstand;
 			$l->svnr=$row->svnr;
 			$l->foto=$row->foto;
 			$l->anmerkungen=$row->anmerkungen;
@@ -337,6 +338,42 @@ class student extends benutzer
 		return $result;
 	}
 	
+	// ****
+	// * Prueft ob die StudentLehrverband Zuteilung
+	// * bereits existiert
+	// * @param student_uid
+	// *        studiensemester_kurzbz
+	// * @return true wenn vorhanden, false wenn nicht
+	// ****
+	function studentlehrverband_exists($student_uid, $studiensemester_kurzbz)
+	{
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_studentlehrverband WHERE student_uid='".addslashes($student_uid)."' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				if($row->anzahl>0)
+					return true;
+				else 
+					return false;
+			}
+			else 
+			{
+				$this->errormsg = 'Fehler beim Ermitteln des Lehrverbandes';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg ='Fehler beim Ermitteln des Lehrverbandes';
+			return false;
+		}
+	}
+	
+	// ****
+	// * Speichert die Zuteilung von Student zu Lehrverband
+	// ****
 	function save_studentlehrverband($new=null)
 	{
 		if($new==null)

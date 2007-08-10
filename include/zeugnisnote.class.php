@@ -47,6 +47,7 @@ class zeugnisnote
 
 	var $lehrveranstaltung_bezeichung;
 	var $note_bezeichnung;
+	var $zeugnis;
 
 	// *********************************************************************
 	// * Konstruktor
@@ -289,7 +290,9 @@ class zeugnisnote
 					   tbl_zeugnisnote.insertvon, tbl_zeugnisnote.ext_id,
 					   vw_student_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung,
 					   tbl_note.bezeichnung as note_bezeichnung,
-					   tbl_zeugnisnote.bemerkung as bemerkung
+					   tbl_zeugnisnote.bemerkung as bemerkung,
+					   vw_student_lehrveranstaltung.sort,
+					   vw_student_lehrveranstaltung.zeugnis
 				FROM
 				(
 					campus.vw_student_lehrveranstaltung LEFT JOIN lehre.tbl_zeugnisnote
@@ -303,12 +306,13 @@ class zeugnisnote
 				SELECT lehre.tbl_lehrveranstaltung.lehrveranstaltung_id,student_uid AS uid,studiensemester_kurzbz, note,
 					uebernahmedatum, benotungsdatum,lehre.tbl_lehrveranstaltung.ects,lehre.tbl_lehrveranstaltung.semesterstunden, tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum,
 					tbl_zeugnisnote.insertvon, tbl_zeugnisnote.ext_id, lehre.tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung,
-					tbl_note.bezeichnung as note_bezeichnung, tbl_zeugnisnote.bemerkung as bemerkung
+					tbl_note.bezeichnung as note_bezeichnung, tbl_zeugnisnote.bemerkung as bemerkung, tbl_lehrveranstaltung.sort, tbl_lehrveranstaltung.zeugnis
 				FROM
 					lehre.tbl_zeugnisnote
 					JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
 					JOIN lehre.tbl_note USING(note)
-				WHERE true $where2";
+				WHERE true $where2
+				ORDER BY sort";
 		//echo $qry;
 		if($result = pg_query($this->conn, $qry))
 		{
@@ -332,7 +336,9 @@ class zeugnisnote
 				$obj->bemerkung = $row->bemerkung;
 				$obj->semesterstunden = $row->semesterstunden;
 				$obj->ects = $row->ects;
-
+				$obj->sort = $row->sort;				
+				$obj->zeugnis = ($row->zeugnis=='t'?true:false);
+				
 				$this->result[] = $obj;
 			}
 			return true;

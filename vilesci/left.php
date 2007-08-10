@@ -319,6 +319,22 @@
 			</td>
 		</tr>
         <tr><td width="10" nowrap>&nbsp;</td></tr>
+         <!--Menu Eintrag Lehrverbandsgruppen-->
+		<tr>
+          	<td nowrap><a href="?lehrverbandsgruppen" class="MenuItem1" onClick="return(js_toggle_container('Lehrverbandsgruppen'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Lehrverbandsgruppen</a></td>
+        </tr>
+		<tr>
+          	<td nowrap>
+		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Lehrverbandsgruppen" style="display: visible;">
+			  	<tr>
+			  		<td width="10" nowrap>&nbsp;</td>
+					<td nowrap><a class="MenuItem2" href="stammdaten/lvbgruppenverwaltung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Verwaltung</a></td>
+			  	</tr>
+			  	<tr><td width="10" nowrap>&nbsp;</td></tr>
+			  	</table>
+			</td>
+		</tr>
+        <tr><td width="10" nowrap>&nbsp;</td></tr>
 		</table>
 </div>
 <div id="menuemitarbeiter" style="display: none;">

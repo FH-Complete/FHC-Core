@@ -73,7 +73,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	
 	//Daten holen
 	
-	$xml = "<?xml version='1.0' encoding='ISO-8859-15' standalone='yes'?>\n";
+	$xml = "<?xml version='1.0' encoding='ISO-8859-15' standalone='yes'?>";
 	$xml .= "<zeugnisse>";
 	
 	for ($i = 0; $i < sizeof($uid_arr); $i++)
@@ -92,12 +92,12 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$stgl_row = pg_fetch_object($stgl_result);
 		else
 			die('Stgl not found');
-		$xml .= "	<zeugnis>";
+		$xml .= "\n	<zeugnis>";
 		$xml .= "		<studiensemester>".$row->sembezeichnung."</studiensemester>";
 		$xml .=	"		<semester>".$row->semester."</semester>";
 		$xml .= "		<studiengang>".$row->bezeichnung."</studiengang>";
 		$xml .= "		<studiengang_kz>".$row->studiengang_kz."</studiengang_kz>";
-		$xml .= "		<vorname>".$row->vorname."</vorname>";
+		$xml .= "\n		<vorname>".$row->vorname."</vorname>";
 		$xml .= "		<nachname>".$row->nachname."</nachname>";
 		$gebdatum = date('d.m.Y',strtotime($row->gebdatum));
 		$xml .= "		<gebdatum>".$gebdatum."</gebdatum>";
@@ -112,16 +112,19 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 
 		foreach ($obj->result as $row)	
 		{
-			if ($row->note)
-				$note = $note_arr[$row->note];
-			else
-				$note = "";
-			$xml .= "			<unterrichtsfach>";
-			$xml .= "				<bezeichnung>".$row->lehrveranstaltung_bezeichnung."</bezeichnung>";
-			$xml .= "				<note>".$note."</note>";
-			$xml .= "				<sws>".$row->semesterstunden."</sws>";
-			$xml .= "				<ects>".$row->ects."</ects>";
-			$xml .= "			</unterrichtsfach>";
+			if($row->zeugnis)
+			{
+				if ($row->note)
+					$note = $note_arr[$row->note];
+				else
+					$note = "";
+				$xml .= "\n			<unterrichtsfach>";
+				$xml .= "				<bezeichnung>".$row->lehrveranstaltung_bezeichnung."</bezeichnung>";
+				$xml .= "				<note>".$note."</note>";
+				$xml .= "				<sws>".$row->semesterstunden."</sws>";
+				$xml .= "				<ects>".$row->ects."</ects>";
+				$xml .= "			</unterrichtsfach>";
+			}
 		}
 
 		$xml .= "	</zeugnis>";

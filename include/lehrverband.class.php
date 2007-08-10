@@ -84,6 +84,39 @@ class lehrverband
 		}
 	}
 
+	function load($studiengang_kz, $semester, $verband, $gruppe)
+	{
+		$qry = "SELECT * FROM public.tbl_lehrverband
+				WHERE studiengang_kz='".addslashes($studiengang_kz)."'
+				AND semester='".addslashes($semester)."'
+				AND verband='".addslashes($verband)."'
+				AND gruppe='".addslashes($gruppe)."'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$this->studiengang_kz = $row->studiengang_kz;
+				$this->semester = $row->semester;
+				$this->verband = $row->verband;
+				$this->gruppe = $row->gruppe;
+				$this->aktiv = ($row->aktiv=='t'?true:false);
+				$this->bezeichnung = $row->bezeichnung;
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = 'Eintrag nicht gefunden';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim lesen der Daten';
+			return false;
+		}
+	}
+	
 	// *******************************************
 	// * Prueft die Variablen vor dem Speichern
 	// * auf Gueltigkeit.
@@ -164,20 +197,35 @@ class lehrverband
 	// * angelegt, ansonsten der Datensatz upgedated
 	// * @return true wenn erfolgreich, false im Fehlerfall
 	// ************************************************************
-	function save()
+	function save($new=null)
 	{
-
+		if($new==null)
+			$new = $this->new;
+			
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
 			return false;
 
-		$qry = 'INSERT INTO public.tbl_lehrverband (studiengang_kz, semester, verband, gruppe, aktiv, bezeichnung)
-		        VALUES('.$this->addslashes($this->studiengang_kz).','.
-				$this->addslashes($this->semester).','.
-				$this->addslashes($this->verband).','.
-				$this->addslashes($this->gruppe).','.
-				($this->aktiv?'true':'false').','.
-				$this->addslashes($this->bezeichnung).');';
+		if($new)
+		{
+			$qry = 'INSERT INTO public.tbl_lehrverband (studiengang_kz, semester, verband, gruppe, aktiv, bezeichnung)
+			        VALUES('.$this->addslashes($this->studiengang_kz).','.
+					$this->addslashes($this->semester).','.
+					$this->addslashes($this->verband).','.
+					$this->addslashes($this->gruppe).','.
+					($this->aktiv?'true':'false').','.
+					$this->addslashes($this->bezeichnung).');';
+		}
+		else 
+		{
+			$qry = "UPDATE public.tbl_lehrverband SET ".
+				   " aktiv=".($this->aktiv?'true':'false').", ".
+				   " bezeichnung='".addslashes($this->bezeichnung)."'".
+				   " WHERE studiengang_kz='".addslashes($this->studiengang_kz)."'".
+				   " AND semester='".addslashes($this->semester)."'".
+				   " AND verband='".addslashes($this->verband)."'".
+				   " AND gruppe='".addslashes($this->gruppe)."';";
+		}
 
 		if(pg_query($this->conn,$qry))
 		{
