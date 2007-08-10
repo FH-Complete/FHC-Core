@@ -1173,8 +1173,11 @@ if($result = pg_query($conn_fas, $qry))
 					}
 					if($updatep && !in_array($studiengang_kz, $dont_sync_php))
 					{
-						$qry = 'UPDATE public.tbl_person SET'.
-						       ' sprache='.myaddslashes($sprache).',';
+						$qry = '';
+						        if($sprache!='' AND $sprache!=NULL)
+						       {
+						       	$qry.=' sprache='.myaddslashes($sprache).',';
+						       }
 						       if($anrede!='' AND $anrede!=NULL)
 						       {
 						       	$qry.=' anrede='.myaddslashes($anrede).',';
@@ -1187,29 +1190,82 @@ if($result = pg_query($conn_fas, $qry))
 						       {
 						       	$qry.=' titelpre='.myaddslashes($titelpre).',';
 						       }
-						       $qry.=' nachname='.myaddslashes($nachname).','.
-						       ' vorname='.myaddslashes($vorname).','.
-						       ' vornamen='.myaddslashes($vornamen).','.
-						       ' gebdatum='.myaddslashes($gebdatum).','.
-						       ' gebort='.myaddslashes($gebort).','.
+						       if($nachname!='' AND $nachname!=NULL)
+						       {
+						       	$qry.=' nachname='.myaddslashes($nachname).',';
+						       }
+						       if($vorname!='' AND $vorname!=NULL)
+						       {
+						       	$qry.=' vorname='.myaddslashes($vorname).',';
+						       }
+						       if($vornamen!='' AND $vornamen!=NULL)
+						       {
+						       	$qry.=' vornamen='.myaddslashes($vornamen).',';
+						       }
+						       if($gebdatum!='' AND $gebdatum!=NULL)
+						       {
+						       	$qry.=' gebdatum='.myaddslashes($gebdatum).',';
+						       }
+						       if($gebort!='' AND $gebort!=NULL)
+						       {
+						       	$qry.=' gebort='.myaddslashes($gebort).',';
+						       }
 						       //' gebzeit='.myaddslashes($gebzeit).','.
 						       //' foto='.myaddslashes($foto).','.
 						       //' homepage='.myaddslashes($homepage).','.
-						       ' svnr='.myaddslashes($svnr).','.
-						       ' ersatzkennzeichen='.myaddslashes($ersatzkennzeichen).','.
-						       ' familienstand='.myaddslashes($familienstand).','.
-						       ' anzahlkinder='.myaddslashes($anzahlkinder).','.
-						       ' aktiv=true, '.
-						       ' geschlecht='.myaddslashes($geschlecht).','.
-						       ' geburtsnation='.myaddslashes($geburtsnation).','.
-						       ' staatsbuergerschaft='.myaddslashes($staatsbuergerschaft).','.
-						       ' insertamum='.myaddslashes($insertamum).','.
-						       ' insertvon='.myaddslashes($insertvon).','.
-				        		       " updateamum=now()".','.
-				        		       " updatevon=".myaddslashes($updatevon).','.
-						       ' ext_id='.myaddslashes($ext_id_person).
-						       ' WHERE person_id='.myaddslashes($person_id).';';
-						       $ausgabe_person="Änderungen bei Person ".$nachname." ".$vorname.": ".$ausgabe_person."\n";
+						       if($svnr!='' AND $svnr!=NULL)
+						       {
+						       	$qry.=' svnr='.myaddslashes($svnr).',';
+						       }
+						       if($ersatzkennzeichen!='' AND $ersatzkennzeichen!=NULL)
+						       {
+						       	$qry.=' ersatzkennzeichen='.myaddslashes($ersatzkennzeichen).',';
+						       }
+						       if($familienstand!='' AND $familienstand!=NULL)
+						       {
+						       	$qry.=' familienstand='.myaddslashes($familienstand).',';
+						       }
+						       if($anzahlkinder!='' AND $anzahlkinder!=NULL)
+						       {
+						       	$qry.=' anzahlkinder='.myaddslashes($anzahlkinder).',';
+						       }
+						       if($aktiv!='' AND $aktiv!=NULL)
+						       {
+						       	$qry.=' aktiv='.myaddslashes($aktiv).',';
+						       }
+						       if($geschlecht!='' AND $geschlecht!=NULL)
+						       {
+						       	$qry.=' geschlecht='.myaddslashes($geschlecht).',';
+						       }
+						       if($geburtsnation!='' AND $geburtsnation!=NULL)
+						       {
+						       	$qry.=' geburtsnation='.myaddslashes($geburtsnation).',';
+						       }
+						       if($staatsbuergerschaft!='' AND $staatsbuergerschaft!=NULL)
+						       {
+						       	$qry.=' staatsbuergerschaft='.myaddslashes($staatsbuergerschaft).',';
+						       }
+						       if($insertamum!='' AND $insertamum!=NULL)
+						       {
+						       	$qry.=' insertamum='.myaddslashes($insertamum).',';
+						       }
+						       if($insertvon!='' AND $insertvon!=NULL)
+						       {
+						       	$qry.=' insertvon='.myaddslashes($insertvon).',';
+						       }
+				        		       if($qry!='')
+						       {
+						       	$qry.=" updateamum=now()".','.
+						       		' updatevon='.myaddslashes($updatevon).','.
+						       		' ext_id='.myaddslashes($ext_id_person);
+						       	$qry = 'UPDATE public.tbl_person SET'.$qry.' WHERE person_id='.myaddslashes($person_id).';';
+						       	$ausgabe_person="Änderung bei Person: ".$qry."\n";
+						       	//$ausgabe_person="Änderungen bei Person ".$nachname." ".$vorname.": ".$ausgabe_person."\n";
+						       }
+						       else 
+						       {
+						       	$qry="select 1;";
+						       }
 					}
 					else
 					{
@@ -1587,30 +1643,92 @@ if($result = pg_query($conn_fas, $qry))
 						}
 						if($updater && !in_array($studiengang_kz, $dont_sync_php))
 						{
-							$qry = 'UPDATE public.tbl_prestudent SET'.
-							       ' aufmerksamdurch_kurzbz='.myaddslashes($aufmerksamdurch_kurzbz).','.
-							       ' person_id='.myaddslashes($person_id).','.
-							       ' studiengang_kz='.myaddslashes($studiengang_kz).','.
-							       ' berufstaetigkeit_code='.myaddslashes($berufstaetigkeit_code).','.
-							       ' zgv_code='.myaddslashes($zgv_code).','.
-							       ' zgvort='.myaddslashes($zgvort).','.
-							       ' zgvdatum='.myaddslashes($zgvdatum).','.
-							       ' zgvmas_code='.myaddslashes($zgvmas_code).','.
-							       ' zgvmaort='.myaddslashes($zgvmaort).','.
-							       ' zgvmadatum='.myaddslashes($zgvmadatum).','.
-							       ' facheinschlberuf='.($facheinschlberuf?'true':'false').','.
-							       ' reihungstest_id='.myaddslashes($reihungstest_id).','.
-							       ' punkte='.myaddslashes($punkte).','.
-							       ' anmeldungreihungstest='.myaddslashes($anmeldungreihungstest).','.
-							       ' reihungstestangetreten='.($reihungstestangetreten?'true':'false').','.
-							       ' anmerkung='.myaddslashes($anmerkung).','.
-							       ' insertamum='.myaddslashes($insertamum).','.
-							       ' insertvon='.myaddslashes($insertvon).','.
-					        		       " updateamum=now()".','.
-					        		       " updatevon=".myaddslashes($updatevon).','.
-							       ' ext_id='.myaddslashes($ext_id_pre).
-							       ' WHERE prestudent_id='.myaddslashes($prestudent_id).';';
-							       $ausgabe_pre="Änderungen bei Prestudent mit person_id '".$person_id."', ('".$prestudent_id."'), ".$nachname.": ".$ausgabe_pre."\n";
+							$qry = '';
+						           if($aufmerksamdurch_kurzbz!='' AND $aufmerksamdurch_kurzbz!=NULL)
+						           {
+						       		$qry.=' aufmerksamdurch_kurzbz='.myaddslashes($aufmerksamdurch_kurzbz).',';
+							}
+							if($person_id!='' AND $person_id!=NULL)
+						           {
+						       		$qry.=' person_id='.myaddslashes($person_id).',';
+							}
+							if($studiengang_kz!='' AND $studiengang_kz!=NULL)
+						           {
+						       		$qry.=' studiengang_kz='.myaddslashes($studiengang_kz).',';
+							}
+							if($berufstaetigkeit_code!='' AND $berufstaetigkeit_code!=NULL)
+						           {
+						       		$qry.=' berufstaetigkeit_code='.myaddslashes($berufstaetigkeit_code).',';
+							}       
+							if($zgv_code!='' AND $zgv_code!=NULL)
+						           {
+						       		$qry.=' zgv_code='.myaddslashes($zgv_code).',';
+							}         
+							if($zgvort!='' AND $zgvort!=NULL)
+						           {
+						       		$qry.=' zgvort='.myaddslashes($zgvort).',';
+							}        
+							if($zgvdatum!='' AND $zgvdatum!=NULL)
+						           {
+						       		$qry.=' zgvdatum='.myaddslashes($zgvdatum).',';
+							}          
+							if($zgvmas_code!='' AND $zgvmas_code!=NULL)
+						           {
+						       		$qry.=' zgvmas_code='.myaddslashes($zgvmas_code).',';
+							}         
+							if($zgvmaort!='' AND $zgvmaort!=NULL)
+						           {
+						       		$qry.=' zgvmaort='.myaddslashes($zgvmaort).',';
+							}        
+							if($zgvmadatum!='' AND $zgvmadatum!=NULL)
+						           {
+						       		$qry.=' zgvmadatum='.myaddslashes($zgvmadatum).',';
+							}        
+							if($facheinschlberuf!='' AND $facheinschlberuf!=NULL)
+						           {
+						       		$qry.=' facheinschlberuf='.myaddslashes($facheinschlberuf).',';
+							}         
+							if($reihungstest_id!='' AND $reihungstest_id!=NULL)
+						           {
+						       		$qry.=' reihungstest_id='.myaddslashes($reihungstest_id).',';
+							}    
+							if($punkte!='' AND $punkte!=NULL)
+						           {
+						       		$qry.=' punkte='.myaddslashes($punkte).',';
+							}        
+							if($anmeldungreihungstest!='' AND $anmeldungreihungstest!=NULL)
+						           {
+						       		$qry.=' anmeldungreihungstest='.myaddslashes($anmeldungreihungstest).',';
+							}        
+							if($reihungstestangetreten!='' AND $reihungstestangetreten!=NULL)
+						           {
+						       		$qry.=' reihungstestangetreten='.myaddslashes($reihungstestangetreten).',';
+							}       
+							if($anmerkung!='' AND $anmerkung!=NULL)
+						           {
+						       		$qry.=' anmerkung='.myaddslashes($anmerkung).',';
+							}       
+							if($insertamum!='' AND $insertamum!=NULL)
+						           {
+						       		$qry.=' insertamum='.myaddslashes($insertamum).',';
+						           }
+						           if($insertvon!='' AND $insertvon!=NULL)
+						           {
+						       		$qry.=' insertvon='.myaddslashes($insertvon).',';
+						           }
+				        		           if($qry!='')
+						           {
+						       		$qry.=" updateamum=now()".','.
+						       		' updatevon='.myaddslashes($updatevon).','.
+						       		' ext_id='.myaddslashes($ext_id_pre);
+						       		$qry = 'UPDATE public.tbl_prestudent SET'.$qry.' WHERE prestudent_id='.myaddslashes($prestudent_id).';';
+						       		$ausgabe_pre="Änderung bei Prestudent: ".$qry."\n";
+							           //$ausgabe_pre="Änderungen bei Prestudent mit person_id '".$person_id."', ('".$prestudent_id."'), ".$nachname.": ".$ausgabe_pre."\n";
+						           }
+						           else 
+							{
+							      	$qry="select 1;";
+							}
 						}
 						else
 						{
