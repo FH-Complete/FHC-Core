@@ -225,13 +225,20 @@ class zeugnisnote
 				'AND studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).';';
 		}
 
-		if(pg_query($this->conn, $qry))
+		if(pg_send_query($this->conn, $qry))
 		{
-			return true;
+			if ($result=pg_get_result($this->conn))
+				return true;
+			else
+			{
+				$this->errormsg='Fehler beim Speichern der Zeugnisnote:'.pg_result_error();
+				return false;
+			}
 		}
 		else
 		{
-			$this->errormsg = "Fehler beim Speichern des Datensatzes";
+			//echo $qry;
+			$this->errormsg='Fehler beim senden der BD-Abfrage (Class: zeugnisnote->save())';
 			return false;
 		}
 	}
@@ -336,9 +343,9 @@ class zeugnisnote
 				$obj->bemerkung = $row->bemerkung;
 				$obj->semesterstunden = $row->semesterstunden;
 				$obj->ects = $row->ects;
-				$obj->sort = $row->sort;				
+				$obj->sort = $row->sort;
 				$obj->zeugnis = ($row->zeugnis=='t'?true:false);
-				
+
 				$this->result[] = $obj;
 			}
 			return true;

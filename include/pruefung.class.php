@@ -47,7 +47,7 @@ class pruefung
 	var $note_bezeichnung;
 	var $pruefungstyp_beschreibung;
 	var $studiensemester_kurzbz;
-	
+
 	// **************************************************************
 	// * Konstruktor
 	// * @param conn Connection zur Datenbank
@@ -65,14 +65,14 @@ class pruefung
 				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 			else
 				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-	
+
 			if(!pg_query($conn,$qry))
 			{
 				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
 				return false;
 			}
 		}
-		
+
 		if($pruefung_id!=null)
 			$this->load($pruefung_id);
 	}
@@ -176,31 +176,31 @@ class pruefung
 			$this->errormsg = 'Pruefung_id ist ungueltig';
 			return false;
 		}
-		
+
 		$qry = "DELETE FROM lehre.tbl_pruefung WHERE pruefung_id='$pruefung_id'";
-		
+
 		if(pg_query($this->conn, $qry))
 		{
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Loeschen der Pruefung';
 			return false;
-		}		
+		}
 	}
-	
+
 	function addslashes($var)
 	{
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
-	
+
 	// *******************************************
 	// * Prueft die Gueltigkeit der Variablen
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
 	function checkvars()
-	{		
+	{
 		//Laenge Pruefen
 		if(strlen($this->anmerkung)>256)
 		{
@@ -220,7 +220,7 @@ class pruefung
 		$this->errormsg = '';
 		return true;
 	}
-	
+
 	// *******************************************
 	// * Speichert den aktuellen Datensatz
 	// * @return true wenn ok, false im Fehlerfall
@@ -291,14 +291,14 @@ class pruefung
 						pg_query($this->conn, 'COMMIT');
 						return true;
 					}
-					else 
+					else
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
 						pg_query($this->conn, 'ROLLBACK');
 						return false;
 					}
 				}
-				else 
+				else
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
 					pg_query($this->conn, 'ROLLBACK');
@@ -309,7 +309,8 @@ class pruefung
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
+			pg_query($this->conn, 'ROLLBACK');
+			$this->errormsg = 'Fehler beim Speichern der Pruefung (Class pruefung->save()):'.pg_last_error($this->conn);
 			return false;
 		}
 	}
@@ -324,7 +325,7 @@ class pruefung
 		$qry = "SELECT tbl_pruefung.*, tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
 				tbl_note.bezeichnung as note_bezeichnung, tbl_pruefungstyp.beschreibung as typ_beschreibung, tbl_lehreinheit.studiensemester_kurzbz as studiensemester_kurzbz
 				FROM lehre.tbl_pruefung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_note, lehre.tbl_pruefungstyp
-				WHERE student_uid='".addslashes($student_uid)."' 
+				WHERE student_uid='".addslashes($student_uid)."'
 				AND tbl_pruefung.lehreinheit_id=tbl_lehreinheit.lehreinheit_id
 				AND tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
 				AND tbl_pruefung.note = tbl_note.note
@@ -335,7 +336,7 @@ class pruefung
 			while($row = pg_fetch_object($result))
 			{
 				$obj = new pruefung($this->conn, null, null);
-				
+
 				$obj->pruefung_id = $row->pruefung_id;
 				$obj->lehreinheit_id = $row->lehreinheit_id;
 				$obj->student_uid = $row->student_uid;
@@ -353,12 +354,12 @@ class pruefung
 				$obj->lehrveranstaltung_bezeichnung = $row->lehrveranstaltung_bezeichnung;
 				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
-				
+
 				$this->result[] = $obj;
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
