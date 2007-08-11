@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
  *          Gerald Raab <gerald.raab@technikum-wien.at>.
@@ -28,7 +28,7 @@ if(!$conn=pg_pconnect(CONN_STRING))
    die("Konnte Verbindung zur Datenbank nicht herstellen");
 
 $s=new studiengang($conn);
-$s->getAll('typ, kurzbz');
+$s->getAll('typ, kurzbz', false);
 $studiengang=$s->result;
 
 $user = get_uid();
@@ -59,7 +59,7 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 		else
 			echo "Erfolgreich gespeichert";
 	}
-	
+
 	//Aktiv Feld setzen
 	if(isset($_GET['aktiv']))
 	{
@@ -69,7 +69,7 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 		else
 			echo "Erfolgreich gespeichert";
 	}
-	
+
 	//Zeugnis Feld setzen
 	if(isset($_GET['zeugnis']))
 	{
