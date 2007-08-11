@@ -122,7 +122,7 @@ class lehrveranstaltung
 			$this->updatevon=$row->updatevon;
 			$this->sprache=$row->sprache;
 			$this->sort=$row->sort;
-			$this->zeugnis=$row->zeugnis;
+			$this->zeugnis=($row->zeugnis=='t'?true:false);
 		}
 
 		return true;
@@ -168,7 +168,7 @@ class lehrveranstaltung
 			$lv_obj->updatevon=$row->updatevon;
 			$lv_obj->sprache=$row->sprache;
 			$lv_obj->sort=$row->sort;
-			$lv_obj->zeugnis=$row->zeugnis;
+			$lv_obj->zeugnis=($row->zeugnis=='t'?true:false);
 
 			$this->lehrveranstaltungen[] = $lv_obj;
 		}
@@ -250,7 +250,7 @@ class lehrveranstaltung
 			$lv_obj->updatevon=$row->updatevon;
 			$lv_obj->sprache=$row->sprache;
 			$lv_obj->sort=$row->sort;
-			$lv_obj->zeugnis=$row->zeugnis;
+			$lv_obj->zeugnis=($row->zeugnis=='t'?true:false);
 
 			$this->lehrveranstaltungen[] = $lv_obj;
 		}
@@ -505,7 +505,7 @@ class lehrveranstaltung
 				$lv_obj->updatevon=$row->updatevon;
 				$lv_obj->sprache=$row->sprache;
 				$lv_obj->sort=$row->sort;
-				$lv_obj->zeugnis=$row->zeugnis;
+				$lv_obj->zeugnis=($row->zeugnis=='t'?true:false);
 
 				$this->lehrveranstaltungen[] = $lv_obj;
 			}
@@ -574,7 +574,7 @@ class lehrveranstaltung
 				$l->insertamum = $row->insertamum;
 				$l->insertvon = $row->insertvon;
 				$l->sort = $row->sort;
-				$l->zeugnis = $row->zeugnis;
+				$l->zeugnis = ($row->zeugnis=='t'?true:false);
 				$this->lehrveranstaltungen[]=$l;
 			}
 		}
