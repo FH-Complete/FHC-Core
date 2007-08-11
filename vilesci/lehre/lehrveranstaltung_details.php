@@ -91,7 +91,7 @@
 	}
 		
 	$sg = new studiengang($conn);
-	$sg->getAll('typ, kurzbz');
+	$sg->getAll('typ, kurzbz', false);
 	foreach($sg->result as $studiengang)
 	{
 		$stg_arr[$studiengang->studiengang_kz] = $studiengang->kuerzel;
