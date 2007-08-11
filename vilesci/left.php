@@ -17,6 +17,10 @@
 	<script language="JavaScript">
 	<!--
 		__js_page_array = new Array();
+		__js_tab_array= new Array();
+		__js_tab_array[0]='menueStammdaten';
+		__js_tab_array[1]='menuePersonen';
+		__js_tab_array[2]='menueLehre';
 
    	function js_toggle_container(conid)
    	{
@@ -30,7 +34,7 @@
             	status = "none";
  				if (status == "none")
  			   {
-         	  	document.getElementById(conid).style.display = block;
+         	  	document.getElementById(conid).style.display = 'block';
             	__js_page_array[conid] = "visible";
          	}
          	else
@@ -46,25 +50,13 @@
 
 	function js_show_tab(tabid)
    	{
-			if (document.getElementById)
-			{
-      	  	if (status == null)
-            	status = "none";
- 				if (status == "none")
- 			   {
-         	  	document.getElementById(conid).style.display = block;
-            	__js_page_array[conid] = "visible";
-         	}
-         	else
-           	{
-           		document.getElementById(conid).style.display = 'none';
-            	__js_page_array[conid] = "none";
-      		}
-      	   return false;
-     		}
-     		else
-     			return true;
-  		}
+		for(i=0;i<(__js_tab_array.length);i++)
+			if (__js_tab_array[i]==tabid)
+				document.getElementById(tabid).style.display = 'block';
+       		else
+       			document.getElementById(tabid).style.display = 'none';
+        return true;
+  	}
 	//-->
 	</script>
 </head>
@@ -78,14 +70,14 @@
 
 <table class="tabs">
 	<tr>
-		<td class="tab active" onClick="js_show_tab('menueStammdaten'));">Stammdaten</td>
-		<td class="tab" onClick="js_show_tab('MenueMitarbeiter'));">Mitarbeiter</a></td>
-		<td class="tab" onClick="js_show_tab('MenueStudenten'));">Studenten</td>
+		<td class="tab active" onClick="js_show_tab('menueStammdaten');">Stammdaten</td>
+		<td class="tab" onClick="js_show_tab('menuePersonen');">Personen</a></td>
+		<td class="tab" onClick="js_show_tab('menueLehre');">Lehre</td>
 	</tr>
 </table>
 
 <!--____________Menue Stammdaten______________________________________________-->
-<div id="menueStammdaten" style="display: visible;">
+<div id="menueStammdaten" style="display:block;">
 	<table class="menue" style="border-right-width:1px;border-right-color:#BCBCBC;">
 		<tr>
 			<td>&nbsp;</td>
@@ -101,7 +93,7 @@
       </tr>
 		<tr>
         	<td nowrap>
-				<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Personen" style="display: visible;">
+				<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Personen" style="display:block;">
 				<tr>
 					<td width="10" nowrap>&nbsp;</td>
 					<td nowrap><a class="MenuItem2" href="personen/index.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Suche</a></td>
@@ -177,7 +169,7 @@
         </tr>
 		<tr>
           	<td nowrap>
-		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Kommunikation" style="display: visible;">
+		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Kommunikation" style="display:block;">
 			  	<tr>
 			  		<td width="10" nowrap>&nbsp;</td>
 					<td nowrap><a class="MenuItem2" href="kommunikation/kontakt.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Kontakte</a></td>
@@ -196,7 +188,7 @@
         </tr>
 		<tr>
           	<td nowrap>
-		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Stundenplan" style="display: visible;">
+		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Stundenplan" style="display:block;">
 			  	<tr>
 			  		<td width="10" nowrap>&nbsp;</td>
 					<td nowrap><a class="MenuItem2" href="../cis/private/lvplan/index.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Stundenplan</a></td>
@@ -266,7 +258,7 @@
         </tr>
 		<tr>
           	<td nowrap>
-		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Studiengang" style="display: visible;">
+		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Studiengang" style="display:block;">
 			  	<tr>
 			  		<td width="10" nowrap>&nbsp;</td>
 					<td nowrap><a class="MenuItem2" href="stammdaten/studiengang_frameset.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;&Uuml;bersicht</a></td>
@@ -287,7 +279,7 @@
         </tr>
 		<tr>
           	<td nowrap>
-		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Berechtigung" style="display: visible;">
+		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Berechtigung" style="display:block;">
 			  	<tr>
 			  		<td width="10" nowrap>&nbsp;</td>
 					<td nowrap><a class="MenuItem2" href="stammdaten/benutzerberechtigung_frameset.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;&Uuml;bersicht</a></td>
@@ -304,7 +296,7 @@
         </tr>
 		<tr>
           	<td nowrap>
-		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Lehrveranstaltungen" style="display: visible;">
+		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Lehrveranstaltungen" style="display:block;">
 			  	<tr>
 			  		<td width="10" nowrap>&nbsp;</td>
 					<td nowrap><a class="MenuItem2" href="stundenplan/lehrveranstaltung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;&Uuml;bersicht</a></td>
@@ -325,7 +317,7 @@
         </tr>
 		<tr>
           	<td nowrap>
-		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Lehrverbandsgruppen" style="display: visible;">
+		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Lehrverbandsgruppen" style="display:block;">
 			  	<tr>
 			  		<td width="10" nowrap>&nbsp;</td>
 					<td nowrap><a class="MenuItem2" href="stammdaten/lvbgruppenverwaltung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Verwaltung</a></td>
@@ -337,7 +329,12 @@
         <tr><td width="10" nowrap>&nbsp;</td></tr>
 		</table>
 </div>
-<div id="menuemitarbeiter" style="display: none;">
+<div id="menuePersonen" style="display: none;">
+bal
  </div>
+ <div id="menueLehre" style="display: none;">
+ bla
+  </div>
+
  </body>
  </html>
