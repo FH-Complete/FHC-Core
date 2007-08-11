@@ -87,7 +87,7 @@ if($result = pg_query($conn, $qry))
 	}
 }
 //fachbereiche
-$qry="SELECT fachbereich_kurzbz,ext_id FROM public.tbl_fachbereich WHERE ext_id IS NOT NULL;";
+$qry="SELECT fachbereich_kurzbz, ext_id FROM public.tbl_fachbereich WHERE ext_id IS NOT NULL;";
 if($result = pg_query($conn, $qry))
 {
 	while($row=pg_fetch_object($result))
@@ -230,6 +230,11 @@ if($result = pg_query($conn_fas, $qry_main))
 				$error=true;
 				$error_log.="Lehrveranstaltung mit ext_id='".$row->lehrveranstaltung_fk."' nicht gefunden.\n";
 			}
+		}
+		if(in_array($studiengang_kz, $dont_sync_php))
+		{
+			//bereits umgestellte Stg. werden nicht bearbeitet
+			continue;
 		}
 		if($error)
 		{

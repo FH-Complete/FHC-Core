@@ -30,6 +30,7 @@
 	$stg_data = array();
 	$studiensemester = array();
 	$studiengang_kz='';
+	$notin='';
 
 	//**** FUNCTIONS ****
 
@@ -185,12 +186,25 @@
 	$result=pg_query($conn, $sql_query);
 	$row=pg_fetch_object($result);
 	$vilesci_anz_lva = $row->anz;
-
+	
+	foreach ($dont_sync_php as $notstg)
+	{
+		if($notin=='')
+		{
+			$notin="'".$notstg."'";
+		}
+		else 
+		{
+			$notin.=", '".$notstg."'";
+		}
+	}
+	
 	// Start LVA Synchro
 	$sql_query="SELECT lehrveranstaltung.*, ausbildungssemester.semester, studiengang.kennzahl
 	            FROM lehrveranstaltung, ausbildungssemester, studiengang
 	            WHERE ausbildungssemester_fk=ausbildungssemester_pk AND
 	                  lehrveranstaltung.studiengang_fk=studiengang_pk AND
+	                  studiengang.kennzahl NOT IN (".$notin.") AND
 	                  studiensemester_fk<>0 AND
 	                  lehrveranstaltung.lehrveranstaltung_pk NOT IN(
 	                  	SELECT lv1.lehrveranstaltung_pk
