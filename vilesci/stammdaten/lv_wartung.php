@@ -2,7 +2,7 @@
 // *****************************************
 // * Script zum Zusammenlegen Doppelter LVs
 // * Es werden zwei Listen mit LVs angezeigt
-// * Links wird die LV markiert mit dem rechts 
+// * Links wird die LV markiert mit dem rechts
 // * markierten zusammengelegt werden soll.
 // * Die linke LV wird danach entfernt.
 // ************************************
@@ -25,9 +25,9 @@ $smax=0;
 {
 	echo substr(CONN_STRING,strpos(CONN_STRING,'dbname=')+7,strpos(CONN_STRING,'user=')-strpos(CONN_STRING,'dbname=')-7);
 }*/
-	
+
 $s=new studiengang($conn);
-$s->getAll();
+$s->getAll(null,false);
 $studiengang=$s->result;
 $user = get_uid();
 
@@ -52,12 +52,12 @@ else
 {
 	$semester=0;
 }
-	
+
 if (isset($_GET['order_1']) || isset($_POST['order_1']))
 {
 	$order_1=(isset($_GET['order_1'])?$_GET['order_1']:$_POST['order_1']);
 }
-else 
+else
 {
 	$order_1='lehrveranstaltung_id';
 }
@@ -65,7 +65,7 @@ if (isset($_GET['order_2']) || isset($_POST['order_2']))
 {
 	$order_2=(isset($_GET['order_2'])?$_GET['order_2']:$_POST['order_2']);
 }
-else 
+else
 {
 	$order_2='lehrveranstaltung_id';
 }
@@ -73,7 +73,7 @@ if (isset($_GET['radio_1']) || isset($_POST['radio_1']))
 {
 	$radio_1=(isset($_GET['radio_1'])?$_GET['radio_1']:$_POST['radio_1']);
 }
-else 
+else
 {
 	$radio_1=-1;
 }
@@ -81,7 +81,7 @@ if (isset($_GET['radio_2']) || isset($_POST['radio_2']))
 {
 	$radio_2=(isset($_GET['radio_2'])?$_GET['radio_2']:$_POST['radio_2']);
 }
-else 
+else
 {
 	$radio_2=-1;
 }
@@ -94,21 +94,21 @@ if(!is_numeric($semester))
 {
 	$semester=0;
 }
-	
+
 $s=array();
 foreach ($studiengang as $stg)
 {
 	$s[$stg->studiengang_kz]->max_sem=$stg->max_semester;
 	$s[$stg->studiengang_kz]->kurzbz=$stg->kurzbzlang;
 	$outp.= '<A href="lv_wartung.php?stg_kz='.$stg->studiengang_kz.'&semester='.$semester.'&max='.$stg->max_semester.'">'.$stg->kurzbzlang.'</A> - ';
-	
+
 }
 $outp.= '<BR> -- ';
 for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
 {
-	$outp.= '<A href="lv_wartung.php?stg_kz='.$stg_kz.'&semester='.$i.'&max='.$s[$stg_kz]->max_sem.'">'.$i.'</A> -- ';	
-}		
-		
+	$outp.= '<A href="lv_wartung.php?stg_kz='.$stg_kz.'&semester='.$i.'&max='.$s[$stg_kz]->max_sem.'">'.$i.'</A> -- ';
+}
+
 //Initialisierung der Variablen
 
 function kuerze($string)
@@ -154,9 +154,9 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 						{
 							//wenn lvinfo neuer als die bestehende, ersetzt sie diese
 							$sql_query_upd1.="DELETE FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$radio_2';";
-							$sql_query_upd1.="UPDATE campus.tbl_lvinfo SET lehrveranstaltung_id='$radio_2' WHERE lehrveranstaltung_id='$radio_1';";	
+							$sql_query_upd1.="UPDATE campus.tbl_lvinfo SET lehrveranstaltung_id='$radio_2' WHERE lehrveranstaltung_id='$radio_1';";
 						}
-						else 
+						else
 						{
 							//wenn lvinfo älter als die bestehende, wird sie gelöscht
 							$sql_query_upd1.="DELETE FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$radio_1';";
@@ -174,13 +174,13 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 			pg_query($conn,"COMMIT;");
 			$msg .= "<br>".str_replace(';',';<br>',$sql_query_upd1)."COMMIT";
 		}
-		else 
+		else
 		{
 			$msg = "Die Änderung konnte nicht durchgeführt werden!";
 			pg_query($conn,"ROLLBACK;");
 			$msg .= "<br>".str_replace(';',';<br><b>',$sql_query_upd1)."ROLLBACK</b>";
 		}
-		
+
 
 	}
 }
