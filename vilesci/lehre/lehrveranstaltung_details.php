@@ -105,7 +105,7 @@
 			$sprache_arr[] = $row->sprache;
 		}
 	}
-		
+	
 	if (isset($_REQUEST['lv_id']) || isset($_REQUEST['neu']))
 	{		
 		$lv = new lehrveranstaltung($conn);
