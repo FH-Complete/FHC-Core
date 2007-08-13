@@ -8,7 +8,7 @@
 	require_once('../../../vilesci/config.inc.php');
 	require_once('../../../include/lehrveranstaltung.class.php');
 	require_once('../sync_config.inc.php');
-	//$adress='fas_sync@technikum-wien.at';
+	$adress='fas_sync@technikum-wien.at';
 	//$adress='oesi@technikum-wien.at';
 	//$adress='ruhan@technikum-wien.at';
 
@@ -263,7 +263,7 @@
 								{
 									//Eintrag zur Synctabelle hinzufuegen
 									synctabentry($row_found->lehrveranstaltung_id, $row_fas_alle->lehrveranstaltung_pk);
-									$text.="LVA wurde aktualisiert: $qry\n";
+									//$text.="LVA wurde aktualisiert: $qry\n";
 									$anz_update++;
 								}
 								else
@@ -312,7 +312,7 @@
 									{
 										//Eintrag zur Synctabelle hinzufuegen
 										synctabentry($row_found->lehrveranstaltung_id, $row_fas_alle->lehrveranstaltung_pk);
-										$text.="LVA wurde aktualisiert: $qry\n";
+										//$text.="LVA wurde aktualisiert: $qry\n";
 										$anz_update++;
 									}
 									else
@@ -402,7 +402,7 @@
 						{
 							if(pg_query($conn, $qry))
 							{
-								$text.="LVA wurde aktualisiert: $qry\n";
+								//$text.="LVA wurde aktualisiert: $qry\n";
 								$anz_update++;
 							}
 							else

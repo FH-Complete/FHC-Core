@@ -10,8 +10,8 @@
 	require_once('../../../vilesci/config.inc.php');
 	require_once('../../../include/zeugnisnote.class.php');
 	require_once('../../../include/pruefung.class.php');
-	//$adress='fas_sync@technikum-wien.at';
-	//$adress='oesi@technikum-wien.at';
+	$adress='fas_sync@technikum-wien.at';
+	//$adress='pam@technikum-wien.at';
 
 	$conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 	$conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur Vilesci Datenbank fehlgeschlagen");
@@ -456,6 +456,13 @@
 	$text .= "Dauer: ".$runzeit." s";
 
 	}
+	
+	$text.="\nEND OF SYNCHRONISATION\n";
+
+	if (mail($adress,"FAS - Vilesci (Noten/Pruefungen)",$headtext."\n\n".$text,"From: vilesci@technikum-wien.at"))
+		$sendmail=true;
+	else
+		$sendmail=false;
 ?>
 
 <html>
@@ -466,10 +473,10 @@
 <body>
 <?php
 
-/* ($sendmail)
+if ($sendmail)
 	echo 'Mail wurde verschickt an '.$adress.'!<br>';
 else
-	echo "Mail konnte nicht verschickt werden!<br>";*/
+	echo "Mail konnte nicht verschickt werden!<br>";
 echo $headtext;
 echo "<br><br>";
 echo $text;
