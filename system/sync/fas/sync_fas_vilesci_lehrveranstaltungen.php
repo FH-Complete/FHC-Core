@@ -187,6 +187,7 @@
 	$row=pg_fetch_object($result);
 	$vilesci_anz_lva = $row->anz;
 	
+	//bereits umgestellte Stg. werden nicht bearbeitet
 	foreach ($dont_sync_php as $notstg)
 	{
 		if($notin=='')

@@ -23,6 +23,7 @@ $adress='ruhan@technikum-wien.at';
 
 $error_log='';
 $error_log1='';
+$error_log_prax='';
 $error_log_fas1='';
 $error_log_fas2='';
 $error_log_fas3='';
@@ -76,7 +77,8 @@ $stg_kztofk=array();
 $stg_fktokz=array();
 $stg_ects=array();
 $stg_sws=array();
-
+$stg_nolva=array();
+$arr_nolva='';
 //1 11 91 92 94 145 182 203 204 222 227 228 254 255 256 257 258 297 298 299 300 301 302 303 308 327 328 329 330 331 332 333 334 335 336 476 
 $ausgabe_pb1='';
 $projektbetreuerperson_id1="";
@@ -146,9 +148,11 @@ if($result = pg_query($conn_fas, $qry))
 		//echo "p:".$stg_fktokz[$row->studiengang_fk]."/".$row->semester."<br>";
 	}
 }
+
 /*var_dump($stg_praxissemester);
 echo "<br>";
-var_dump($stg_fktokz);*/
+var_dump($stg_fktokz);
+exit;*/
 //LVAs anlegen bzw. überprüfen
 foreach ($stg_fktokz as $stg)
 {
@@ -204,7 +208,7 @@ foreach ($stg_fktokz as $stg)
 
 //----------------------------------------------------------------------
 
-$qry_main = "SELECT * FROM praxissemester;";
+$qry_main = "SELECT *, creationdate::timestamp AS insertamum FROM praxissemester;";
 
 if($result = pg_query($conn_fas, $qry_main))
 {
@@ -244,7 +248,7 @@ if($result = pg_query($conn_fas, $qry_main))
 		$projektarbeitanmerkung		=substr($row->bemerkung,0,255);	//nur für testzwecke!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!	
 		//$projektarbeitupdateamum	='';
 		$projektarbeitupdatevon		="SYNC";
-		$projektarbeitinsertamum		=$row->creationdate;
+		$projektarbeitinsertamum		=$row->insertamum;
 		//$projektarbeitinsertvon		=$row->creationuser;
 		$projektarbeitext_id			=$row->praxissemester_pk;	
 		$firmenbetreuer			=$row->vilesci_firmenbetreuer;
@@ -266,7 +270,7 @@ if($result = pg_query($conn_fas, $qry_main))
 		$lehreinheitlvnr				='';
 		//$lehreinheitupdateamum			='';
 		$lehreinheitupdatevon			="SYNC";
-		$lehreinheitinsertamum			=$row->creationdate;
+		$lehreinheitinsertamum			=$row->insertamum;
 		//$lehreinheitinsertvon			=$row->creationuser;
 		$lehreinheitext_id				=$row->praxissemester_pk;
 			
@@ -322,10 +326,10 @@ if($result = pg_query($conn_fas, $qry_main))
 				else 
 				{
 					$LVA_unbekannt++;
-					$error_log1.="Lehrveranstaltung 'PRAX' in Studiengang '".$studiengang_kz."' nicht gefunden.\n";
-					//echo "Lehrveranstaltung 'PRAX' in Studiengang '".$studiengang_kz."'nicht gefunden.<br>";
-					//ob_flush();
-					//flush();
+					if(!in_array($studiengang_kz, $dont_sync_php))
+					{
+						array_push($stg_nolva, $studiengang_kz);
+					}
 					continue;
 				}
 			}
@@ -343,8 +347,32 @@ if($result = pg_query($conn_fas, $qry_main))
 					}
 					else 
 					{
-						$error=true;
-						$error_log.="Lehrfach mit Fachbereich='Praxissemester u', Semester='".$semester."' und Studiengang(Kennz.)='".$studiengang_kz."' nicht gefunden.\n";
+						$qry="INSERT INTO lehre.tbl_lehrfach (studiengang_kz, fachbereich_kurzbz, kurzbz,
+							bezeichnung, farbe, aktiv, semester, sprache, updateamum, updatevon, insertamum,
+							insertvon, ext_id) VALUES(".
+							myaddslashes($studiengang_kz).", ".
+							"'Praxissemester u', ".
+							"'PRAX', ".
+							"'Praxissemester', ".
+							"'CCBBCC', ".
+							"true, ".
+							myaddslashes($semester).", ".
+							"'German', ".
+							"now(), ".
+							"'SYNC', ".
+							"now(), ".
+							"'SYNC', ".
+							"NULL);";
+						if(pg_query($conn, $qry))
+						{	
+							$ausgabe="Lehrfach angelegt: Fachbereich='Praxissemester u', Semester='".$semester."' und Studiengang(Kennz.)='".$studiengang_kz."'.\n";;
+						}
+						else 
+						{
+							$error=true;
+							$error_log.="Lehrfach mit Fachbereich='Praxissemester u', Semester='".$semester."' und Studiengang(Kennz.)='".$studiengang_kz."' konnte nicht angelegt werden.\n";					
+						}
+						
 					}
 				}
 				//Wann(ausbildungssemester) war student in studiensemester?
@@ -642,7 +670,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									$ausgabe_le="Insertvon: '".$lehreinheitinsertvon."' (statt '".$row2->insertvon."')";
 								}
 							}
-							if(date("d.m.Y", $row2->insertamum)!=date("d.m.Y", $lehreinheitinsertamum)) 
+							if($row2->insertamum!=$lehreinheitinsertamum) 
 							{
 								$updatele=true;
 								if(strlen(trim($ausgabe_le))>0)
@@ -678,6 +706,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								       ' ext_id='.myaddslashes($lehreinheitext_id).
 								       " WHERE lehreinheit_id=".myaddslashes($lehreinheitlehreinheit_id).";";
 								       $ausgabe.="Lehreinheit aktualisiert bei Lehrveranstaltung='".$lehreinheitlehrveranstaltung_id."', Studiensemester='".$lehreinheitstudiensemester_kurzbz."' und Lehrfach='".$lehreinheitlehrfach_id."':.$ausgabe_le.\n";
+								       $ausgabe_le='';
 							}
 							else 
 							{
@@ -944,7 +973,7 @@ if($result = pg_query($conn_fas, $qry_main))
 										$ausgabe_pa="Anmerkung: '".$projektarbeitanmerkung."' (statt '".$row3->anmerkung."')";
 									}
 								}
-								if(date("d.m.Y", $row3->insertamum)!=date("d.m.Y", $projektarbeitinsertamum) )
+								if( $row3->insertamum!=$projektarbeitinsertamum) 
 								{
 									$updatep=true;
 									if(strlen(trim($ausgabe_pa))>0)
@@ -1049,7 +1078,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									$projektbetreuerstundensatz		=$row->kosten;
 									//$projektbetreuerupdateamum		=$row->;
 									$projektbetreuerupdatevon			="SYNC";
-									$projektbetreuerinsertamum		=$row->creationdate;
+									$projektbetreuerinsertamum		=$row->insertamum;
 									//$projektbetreuerinsertvon	 		="SYNC";
 									$projektbetreuerext_id			=$row->praxissemester_pk;
 									
@@ -1177,7 +1206,7 @@ if($result = pg_query($conn_fas, $qry_main))
 												$ausgabe_pb="Stundensatz: '".$projektbetreuerstundensatz."' (statt '".$row2->stundensatz."')";
 											}
 										}
-										if(date("d.m.Y", $row2->insertamum)!=date("d.m.Y", $projektbetreuerinsertamum)) 
+										if($row2->insertamum!=$projektbetreuerinsertamum) 
 										{
 											$updatep1=true;
 											if(strlen(trim($ausgabe_pb))>0)
@@ -1215,7 +1244,7 @@ if($result = pg_query($conn_fas, $qry_main))
 											'insertvon='.myaddslashes($projektbetreuerinsertvon).', '.
 											'updateamum= now(), '.
 										     	'updatevon='.myaddslashes($projektbetreuerupdatevon).' '.
-											"WHERE projektarbeit_id='".$projektbetreuerprojektarbeit_id."' AND person_id='".$projektbetreuerperson_id."'AND betreuerart='Betreuer';";
+											"WHERE projektarbeit_id='".$projektbetreuerprojektarbeit_id."' AND person_id='".$projektbetreuerperson_id."'AND betreuerart_kurzbz='Betreuer';";
 											
 											
 										}
@@ -1231,6 +1260,19 @@ if($result = pg_query($conn_fas, $qry_main))
 										$ausgabe_pb1=$ausgabe_pb;
 										$ausgabe_pb='';
 										$projektbetreuerperson_id1=$projektbetreuerperson_id;
+										if($projektbetreuernew1)
+										{
+											$anzahl_pbb_insert++;
+											$ausgabe.="Praxissemesterbetreuer eingefügt: UID='".$projektbetreuerperson_id1."' und Projektarbeit='".$projektarbeitlehreinheit_id."'.\n";
+										}			
+										else 
+										{
+											if($updatep1)
+											{
+												$anzahl_pbb_update++;
+												$ausgabe.="Praxissemesterbetreuer aktualisiert: UID='".$projektbetreuerperson_id1."' und Projektarbeit='".$projektarbeitlehreinheit_id."':".$ausgabe_pb1.".\n";
+											}
+										}
 									}
 									else
 									{			
@@ -1254,7 +1296,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									$projektbetreuerstundensatz		='';
 									//$projektbetreuerupdateamum		=$row->;
 									$projektbetreuerupdatevon			="SYNC";
-									//$projektbetreuerinsertamum		=$row->;
+									$projektbetreuerinsertamum		=$row->insertamum;
 									//$projektbetreuerinsertvon			="SYNC";
 									$projektbetreuerext_id			=$row->praxissemester_pk;
 								
@@ -1411,7 +1453,7 @@ if($result = pg_query($conn_fas, $qry_main))
 													$ausgabe_pb="Stundensatz: '".$projektbetreuerstundensatz."' (statt '".$row2->stundensatz."')";
 												}
 											}
-											if(date("d.m.Y", $row2->insertamum)!=date("d.m.Y", $projektbetreuerinsertamum))
+											if($row2->insertamum!=$projektbetreuerinsertamum)
 											{
 												$updatep=true;
 												if(strlen(trim($ausgabe_pb))>0)
@@ -1485,19 +1527,7 @@ if($result = pg_query($conn_fas, $qry_main))
 										else 
 										{
 											//COMMIT
-											if($projektbetreuernew1)
-											{
-												$anzahl_pbb_insert++;
-												$ausgabe.="Praxissemesterbetreuer eingefügt: UID='".$projektbetreuerperson_id1."' und Projektarbeit='".$projektarbeitlehreinheit_id."'.\n";
-											}			
-											else 
-											{
-												if($updatep1)
-												{
-													$anzahl_pbb_update++;
-													$ausgabe.="Praxissemesterbetreuer aktualisiert: UID='".$projektbetreuerperson_id1."' und Projektarbeit='".$projektarbeitlehreinheit_id."':".$ausgabe_pb1.".\n";
-												}
-											}
+											
 											if($projektbetreuernew)
 											{
 												$anzahl_pbg_insert++;
@@ -1611,7 +1641,20 @@ if($result = pg_query($conn_fas, $qry_main))
 		$error_log_fas7.=$text7;
 		$error_log_fas8.=$text8;
 	}
-//echo und mail
+	
+foreach($stg_nolva as $nolva)	
+{
+	if ($arr_nolva=='')
+	{
+		$arr_nolva=$nolva;
+	}
+	else 
+	{
+		$arr_nolva.=", ".$nolva;	
+	}
+}
+$error_log_prax.="Lehrveranstaltung 'PRAX' konnte nicht angelegt werden in den Studiengängen:\n'".$arr_nolva."' .\n";
+//echo und mail	
 echo nl2br("Praxissemestersynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
 
 $error_log_fas="Sync Praxissemester\n------------------------\n\n".$error_log_fas1."\n".$error_log_fas2."\n".$error_log_fas3."\n".$error_log_fas4."\n".$error_log_fas5."\n".$error_log_fas6."\n".$error_log_fas7."\n".$error_log_fas8."\n------------------------\n";
@@ -1622,7 +1665,7 @@ echo nl2br("Projektarbeiten:   Gesamt: ".$anzahl_pa_gesamt." / Eingefügt: ".$anz
 echo nl2br("Betreuer:       Gesamt: ".$anzahl_pbb_gesamt." / Eingefügt: ".$anzahl_pbb_insert." / Geändert: ".$anzahl_pbb_update." / Fehler: ".$anzahl_fehler_pbb."\n");
 echo nl2br("Begutachter:  Gesamt: ".$anzahl_pbg_gesamt." / Eingefügt: ".$anzahl_pbg_insert." / Geändert: ".$anzahl_pbg_update." / Fehler: ".$anzahl_fehler_pbg."\n\n");
 echo nl2br($error_log_fas."\n--------------------------------------------------------------------------------\n");
-echo nl2br($ausgabe_all."<br>-----------<br>".$error_log1);
+echo nl2br($ausgabe_all."<br>-----------<br>".$error_log_prax."<br><br>".$error_log1);
 
 mail($adress, 'SYNC Praxissemester von '.$_SERVER['HTTP_HOST'], 
 "Allgemeine Fehler: ".$anzahl_fehler.",  (keine Semestereintragung: ".$semnull.", Student nicht gefunden: ".$studunbekannt.")\nAnzahl Praxissemester: ".$anzahl_quelle.", Ausbildungssemester nicht gefunden: ".$ausbsem_unbekannt.", LVA nicht gefunden: ".$LVA_unbekannt.".\n".
