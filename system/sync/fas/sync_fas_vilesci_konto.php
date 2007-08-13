@@ -153,7 +153,7 @@ if($result = pg_query($conn_fas, $qry))
 		}
 		if(in_array($konto->studiengang_kz, $dont_sync_php))
 		{
-			//bestimmte Stg auslassen!
+			//bereits umgestellte Stg. werden nicht bearbeitet
 			continue;
 		}
 		$qry1="SELECT person_portal FROM sync.tbl_syncperson WHERE person_fas=".$row2->person_fk.";";

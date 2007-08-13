@@ -1231,7 +1231,7 @@ if($result = pg_query($conn_fas, $qry))
 						       }
 						       if($aktiv!='' AND $aktiv!=NULL)
 						       {
-						       	$qry.=' aktiv='.myaddslashes($aktiv).',';
+						       	$qry.=' aktiv='.($aktiv?'true':'false').',';
 						       }
 						       if($geschlecht!='' AND $geschlecht!=NULL)
 						       {
@@ -2403,9 +2403,9 @@ if($result = pg_query($conn_fas, $qry))
 										       ' matrikelnr='.myaddslashes($matrikelnr).','.
 										       ' prestudent_id='.myaddslashes($prestudent_id).','.
 										       ' studiengang_kz='.myaddslashes($studiengang_kz).','.
-										       //' semester='.myaddslashes($semester).','.
-										       //' verband='.myaddslashes($verband).','.
-										       //' gruppe='.myaddslashes($gruppe).','.
+										       ' semester='.myaddslashes($semester).','.
+										       ' verband='.myaddslashes($verband).','.
+										       ' gruppe='.myaddslashes($gruppe).','.
 										       " insertamum=".myaddslashes($insertamum).",".
 										       " insertvon=".myaddslashes($insertvon).",".
 								        		       " updateamum=now()".','.
