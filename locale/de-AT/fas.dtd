@@ -63,6 +63,10 @@
 <!ENTITY menu-statistic-abschlusspruefung.label		"Abschlusspruefung">
 <!ENTITY menu-statistic-abschlusspruefung.accesskey	"B">
 
+<!ENTITY menu-statistic-notenspiegel.key		"N">
+<!ENTITY menu-statistic-notenspiegel.label		"Notenspiegel">
+<!ENTITY menu-statistic-notenspiegel.accesskey	"N">
+
 <!ENTITY menu-dokumente.label		"Dokumente">
 <!ENTITY menu-dokumente.accesskey	"D">
 

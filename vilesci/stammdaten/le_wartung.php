@@ -36,6 +36,10 @@
 	$semester = (isset($_GET['semester'])?$_GET['semester']:'');
 	$stsem = (isset($_GET['stsem'])?$_GET['stsem']:'');
 	$check = (isset($_GET['check'])?true:false);
+	if(isset($_GET['mitcheck']) && $_GET['mitcheck']=='false')
+		$mitcheck = false;
+	else 
+		$mitcheck = true;
 	
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
@@ -59,7 +63,7 @@
 	{
 		if($stg_kz=='')
 			$stg_kz=$row->studiengang_kz;
-		echo "<OPTION onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$row->studiengang_kz&semester=$semester&stsem=$stsem'\" ".($row->studiengang_kz==$stg_kz?'selected':'').">$row->kuerzel - $row->bezeichnung</OPTION>";
+		echo "<OPTION onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$row->studiengang_kz&semester=$semester&mitcheck=".($mitcheck?'true':'false')."&stsem=$stsem'\" ".($row->studiengang_kz==$stg_kz?'selected':'').">$row->kuerzel - $row->bezeichnung</OPTION>";
 		$s[$row->studiengang_kz]=$row->max_semester;
 	}
 	
@@ -70,7 +74,11 @@
 	
 	echo " Semester: <SELECT name='semester'>";
 	for ($i=0;$i<=$s[$stg_kz];$i++)
-		echo "<OPTION onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&semester=$i&stsem=$stsem'\" ".($i==$semester?'selected':'').">$i</OPTION>";
+	{
+		if($semester=='')
+			$semester=$i;
+		echo "<OPTION onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&semester=$i&mitcheck=".($mitcheck?'true':'false')."&stsem=$stsem'\" ".($i==$semester?'selected':'').">$i</OPTION>";
+	}
 	echo '</SELECT>';
 	
 	$studiensem = new studiensemester($conn);
@@ -80,9 +88,10 @@
 	echo " StSem: <SELECT name='stsem'>";
 	foreach ($studiensem->studiensemester as $row)
 	{
-		echo "<OPTION onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&semester=$semester&stsem=$row->studiensemester_kurzbz'\" ".($row->studiensemester_kurzbz==$stsem?'selected':'').">$row->studiensemester_kurzbz</OPTION>";
+		echo "<OPTION onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&semester=$semester&mitcheck=".($mitcheck?'true':'false')."&stsem=$row->studiensemester_kurzbz'\" ".($row->studiensemester_kurzbz==$stsem?'selected':'').">$row->studiensemester_kurzbz</OPTION>";
 	}
 	echo '</SELECT>';
+	echo 'Mit Check?<input type="checkbox" name="mitcheck" onchange="window.location.href = \''.$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&semester=$semester&stsem=$stsem&mitcheck=".($mitcheck?'false':'true')."'\" ".($mitcheck?'checked':'').'>';
 	echo '</td><td align="right" style="font-size: small;">';
 	echo '<a href="'.$_SERVER['PHP_SELF'].'?check=true">CHECK</a>';
 	echo '</td></tr></table>';
@@ -254,10 +263,24 @@
 							$qry .= "UPDATE lehre.tbl_projektarbeit SET lehreinheit_id='$le_id_bleibt' WHERE lehreinheit_id='$le_id_delete';\n";
 							$qry .= "UPDATE lehre.tbl_pruefung SET lehreinheit_id='$le_id_bleibt' WHERE lehreinheit_id='$le_id_delete';\n";
 							$qry .= "UPDATE lehre.tbl_lehreinheitmitarbeiter SET lehreinheit_id='$le_id_bleibt' WHERE lehreinheit_id='$le_id_delete';\n";
-							$qry .= "UPDATE sync.tbl_synclehreinheit SET lehreinheit_id='$le_id_bleibt' WHERE lehreinheit_id='$le_id_delete';\n";
 							pg_query($conn, $qry);
 							echo nl2br($qry);
-							
+
+							//Wenn der Synclehreinheit Eintrag schon existiert dann den anderen loeschen sonst umbiegen
+							$qry = "SELECT * FROM sync.tbl_synclehreinheit WHERE lehreinheit_id='$le_id_bleibt' AND lehreinheit_pk=(SELECT lehreinheit_pk FROM sync.tbl_synclehreinheit WHERE lehreinheit_id='$le_id_delete')";
+			
+							if($result = pg_query($conn, $qry))
+							{
+								if(pg_numrows($result)==0)
+								{
+									$qry = "UPDATE sync.tbl_synclehreinheit SET lehreinheit_id='$le_id_bleibt' WHERE lehreinheit_id='$le_id_delete';";
+								}
+								else 
+									$qry = "DELETE FROM sync.tbl_synclehreinheit WHERE lehreinheit_id='$le_id_bleibt' AND lehreinheit_pk=(SELECT lehreinheit_pk FROM sync.tbl_synclehreinheit WHERE lehreinheit_id='$le_id_delete');";
+								
+								pg_query($conn, $qry);
+								echo $qry.'<br>';
+							}
 							$qry = "DELETE FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$le_id_delete'\n";
 							pg_query($conn, $qry);
 							echo nl2br($qry);
@@ -285,9 +308,14 @@
 	echo '<br><br><h3>Das wird geloescht:</h3>';
 
 	if($check)
-		$qry = "SELECT distinct a.* FROM lehre.tbl_lehreinheit a, lehre.tbl_lehreinheit b WHERE a.lehreinheit_id!=b.lehreinheit_id AND a.unr=b.unr AND a.unr!=0 ORDER BY unr DESC LIMIT 10";
+		$qry = "SELECT distinct a.* FROM lehre.tbl_lehreinheit a, lehre.tbl_lehreinheit b WHERE a.lehreinheit_id!=b.lehreinheit_id AND a.unr=b.unr AND a.unr!=0 AND a.studiensemester_kurzbz=b.studiensemester_kurzbz ORDER BY unr DESC LIMIT 10";
 	else
-		$qry = "SELECT * FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) WHERE studiengang_kz='$stg_kz' AND semester='$semester' AND studiensemester_kurzbz='$stsem'";
+	{
+		if($mitcheck)
+			$qry = "SELECT a.* FROM (Select * FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) WHERE studiengang_kz='$stg_kz' AND semester='$semester' AND studiensemester_kurzbz='$stsem') as a, lehre.tbl_lehreinheit as b WHERE a.lehreinheit_id!=b.lehreinheit_id AND a.unr=b.unr AND a.studiensemester_kurzbz=b.studiensemester_kurzbz ORDER BY unr DESC";
+		else
+			$qry = "SELECT * FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) WHERE studiengang_kz='$stg_kz' AND semester='$semester' AND studiensemester_kurzbz='$stsem'";
+	}
 
 	echo "<form method='POST' action='".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&semester=$semester&stsem=$stsem".($check?'&check=true':'')."'>";
 	

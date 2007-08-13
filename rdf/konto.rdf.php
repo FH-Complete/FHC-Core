@@ -230,6 +230,7 @@ elseif ($xmlformat=='xml')
 			<nachname><![CDATA[".$pers->nachname."]]></nachname>
 			<vorname><![CDATA[".$pers->vorname."]]></vorname>
 			<vornamen><![CDATA[".$pers->vornamen."]]></vornamen>
+			<name_gesamt><![CDATA[".trim($pers->anrede.' '.$pers->titelpre.' '.$pers->vorname.' '.$pers->nachname.' '.$pers->titelpost)."]]></name_gesamt>
 			<geburtsdatum><![CDATA[".$datum->convertISODate($pers->gebdatum)."]]></geburtsdatum>
 			<sozialversicherungsnummer><![CDATA[".$pers->svnr."]]></sozialversicherungsnummer>
 			<ersatzkennzeichen><![CDATA[".$pers->ersatzkennzeichen."]]></ersatzkennzeichen>

@@ -315,6 +315,10 @@
 			  		<td width="10" nowrap>&nbsp;</td>
 					<td nowrap><a class="MenuItem2" href="stammdaten/lv_wartung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;LV-Zusammenlegung</a></td>
 			  	</tr>
+			  	<tr>
+			  		<td width="10" nowrap>&nbsp;</td>
+					<td nowrap><a class="MenuItem2" href="stammdaten/le_wartung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;LE-Zusammenlegung</a></td>
+			  	</tr>
 
 			  	<tr><td width="10" nowrap>&nbsp;</td></tr>
 			  	</table>
