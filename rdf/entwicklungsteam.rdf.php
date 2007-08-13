@@ -50,13 +50,13 @@ else
 	
 $datum = new datum();
 $stg = new studiengang($conn, null, null, true);
-$stg->getAll();
+$stg->getAll(null, false);
 $stg_arr = array();
 
 foreach ($stg->result as $row)
 	$stg_arr[$row->studiengang_kz]=$row->kuerzel;
 
-$entwicklungsteam = new entwicklungsteam($conn, null, true);
+$entwicklungsteam = new entwicklungsteam($conn, null, null, true);
 if(!$entwicklungsteam->getEntwicklungsteam($mitarbeiter_uid, $studiengang_kz))
 	die($entwicklungsteam->errormsg);
 $rdf_url='http://www.technikum-wien.at/entwicklungsteam';
