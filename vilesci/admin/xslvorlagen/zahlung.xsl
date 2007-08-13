@@ -15,7 +15,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 				<fo:flow flow-name="xsl-region-body" >
 					<!-- Logo -->
 					<fo:block>
-						<fo:external-graphic src="../skin/images/TWLogo_klein.jpg"  posx="140" posy="15" />
+						<fo:external-graphic src="../skin/images/logo.jpg"  posx="140" posy="15" width="60mm" height="20mm"/>
 					</fo:block>
 					<fo:block><xsl:text>
 					</xsl:text></fo:block>
@@ -65,7 +65,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					</xsl:text></fo:block>
 					<!-- ZahlungsbestÃ¤tigung -->
 					<fo:block text-align="center" font-size="20pt">
-							ZAHLUNGSBESTÃ„TIGUNG
+							ZAHLUNGSBESTÄTIGUNG
 					</fo:block>
 					<fo:block><xsl:text>
 					</xsl:text></fo:block>
@@ -82,9 +82,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					<fo:block><xsl:text>
 					</xsl:text></fo:block>
 					<fo:block text-align="left" font-size="10pt">
-						Die Studiengangsleitung bestÃ¤tigt hiermit, dass <xsl:value-of select="person/anrede" /><xsl:text> </xsl:text>
-						<xsl:value-of select="person/titelpre" /><xsl:text> </xsl:text><xsl:value-of select="person/vorname" /><xsl:text> </xsl:text><xsl:value-of select="person/nachname" />
-						<xsl:text> </xsl:text><xsl:value-of select="person/titelpost" />, geboren am <xsl:value-of select="person/geburtsdatum" />, folgende Einzahlungen getÃ¤tigt hat:
+						\nDie Studiengangsleitung bestätigt hiermit, dass <xsl:value-of select="person/name_gesamt" />, geboren am <xsl:value-of select="person/geburtsdatum" />, folgende Einzahlungen getätigt hat:
 						</fo:block>
 					<fo:block><xsl:text>
 					</xsl:text></fo:block>
@@ -148,7 +146,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					<!-- Unterschrift -->
 					
 					<fo:block text-align="left" font-size="10pt">
-					Fachhochschule Technikum\nWien\nHÃ¶chstÃ¤dtplatz 5\nA-1200 Wien\nZVR-Nr.: 074476526\nDVR-Nr.: 0928381
+					\nFachhochschule Technikum\nWien\nHöchstädtplatz 5\nA-1200 Wien\nZVR-Nr.: 074476526\nDVR-Nr.: 0928381
 					</fo:block>
 				</fo:flow>
 			</fo:page-sequence>

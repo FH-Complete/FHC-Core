@@ -156,6 +156,7 @@ function drawLehrauftrag($uid)
 			<familienname>'.$row->nachname.'</familienname>
 			<titelpost>'.$row->titelpost.'</titelpost>
 			<anschrift>'.$row->strasse.'</anschrift>
+			<name_gesamt>'.trim($row->titelpre.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost).'</name_gesamt>
 			<plz>'.$row->plz.'</plz>
 			<ort>'.$row->ort.'</ort>
 			<svnr>'.$row->svnr.'</svnr>

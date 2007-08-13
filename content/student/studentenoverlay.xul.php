@@ -55,7 +55,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 			<vbox id="studentenEditor" persist="height">
 			<popupset>
 				<popup id="student-tree-popup">
-					<menuitem label="Student aus dieser Gruppe Entfernen" oncommand="StudentGruppeDel();" id="student-tree-popup-gruppedel" hidden="false"/>
+					<menuitem label="Student aus dieser Gruppe entfernen" oncommand="StudentGruppeDel();" id="student-tree-popup-gruppedel" hidden="false"/>
 					<menuitem label="EMail senden (intern)" oncommand="StudentSendMail();" id="student-tree-popup-mail" hidden="false"/>
 					<menuitem label="EMail senden (privat)" oncommand="StudentSendMailPrivat();" id="student-tree-popup-mailprivat" hidden="false"/>
 				</popup>

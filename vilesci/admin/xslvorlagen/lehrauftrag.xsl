@@ -32,10 +32,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 				<fo:block font-size="10pt">
 					\n\nAn
 					\n<fo:inline font-weight="bold" font-size="12pt">
-						<xsl:value-of select="mitarbeiter/titelpre" /><xsl:text> </xsl:text> 
-						<xsl:value-of select="mitarbeiter/vorname" /><xsl:text> </xsl:text>
-						<xsl:value-of select="mitarbeiter/familienname" /><xsl:text> </xsl:text>
-						<xsl:value-of select="mitarbeiter/titelpost" />
+						<xsl:value-of select="mitarbeiter/name_gesamt" />
 						\n<xsl:value-of select="mitarbeiter/anschrift" />		
 						\n<xsl:value-of select="mitarbeiter/plz" /><xsl:text> </xsl:text>
 						<xsl:value-of select="mitarbeiter/ort" />
@@ -46,10 +43,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					
 					\n\n\n\n\n\n<fo:block font-size="8pt">
 						<fo:inline font-weight="bold">
-							<xsl:value-of select="mitarbeiter/titelpre" /><xsl:text> </xsl:text> 
-							<xsl:value-of select="mitarbeiter/vorname" /><xsl:text> </xsl:text>
-							<xsl:value-of select="mitarbeiter/familienname" /><xsl:text> </xsl:text>
-							<xsl:value-of select="mitarbeiter/titelpost" />
+							<xsl:value-of select="mitarbeiter/name_gesamt" />
 						</fo:inline>
 						\n<xsl:text>SV.Nr.: </xsl:text><xsl:value-of select="mitarbeiter/svnr" />		
 						\n<xsl:text>Personalnummer: </xsl:text><xsl:value-of select="mitarbeiter/personalnummer" />
