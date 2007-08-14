@@ -10,8 +10,8 @@
 	require_once('../../../vilesci/config.inc.php');
 	require_once('../../../include/zeugnisnote.class.php');
 	require_once('../../../include/pruefung.class.php');
-	$adress='fas_sync@technikum-wien.at';
-	//$adress='raab@technikum-wien.at';
+	//$adress='fas_sync@technikum-wien.at';
+	$adress='raab@technikum-wien.at';
 
 	$conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 	$conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur Vilesci Datenbank fehlgeschlagen");
@@ -37,6 +37,7 @@
 	$anz_processed=0;
 	$anz_students_processed = 0;
 	$stg_processed = "";
+	$fas_lvs_notinsync = array();
 
 	$headtext='';
 	$head_stg_text="Dies ist eine automatische Mail!\n\nFolgende Fehler sind bei der Synchronisation der Lehrveranstaltungen aufgetreten:\n\n";
@@ -279,7 +280,8 @@
 	function getLehreinheitID($conn_fas, $note_pk)
 	{
 		$lehreinheiten_fas_arr = array();
-		$sqlstr = "select lehreinheit.lehreinheit_pk,note.note_pk from lehreinheit, lehrveranstaltung, note, student_gruppe where lehrveranstaltung.lehrveranstaltung_pk = lehreinheit.lehrveranstaltung_fk  and note.lehrveranstaltung_fk = lehrveranstaltung.lehrveranstaltung_pk and note.student_fk=student_gruppe.student_fk and student_gruppe.gruppe_fk = lehreinheit.gruppe_fk and note.note_pk = '".$note_pk."'";
+		//$sqlstr = "select lehreinheit.lehreinheit_pk,note.note_pk from lehreinheit, lehrveranstaltung, note, student_gruppe where lehrveranstaltung.lehrveranstaltung_pk = lehreinheit.lehrveranstaltung_fk  and note.lehrveranstaltung_fk = lehrveranstaltung.lehrveranstaltung_pk and note.student_fk=student_gruppe.student_fk and student_gruppe.gruppe_fk = lehreinheit.gruppe_fk and note.note_pk = '".$note_pk."'";
+	$sqlstr = "select lehreinheit.lehreinheit_pk,note.note_pk from lehreinheit, lehrveranstaltung, note where lehrveranstaltung.lehrveranstaltung_pk = lehreinheit.lehrveranstaltung_fk  and note.lehrveranstaltung_fk = lehrveranstaltung.lehrveranstaltung_pk and note.note_pk = '".$note_pk."'";
 		if($result = pg_query($conn_fas, $sqlstr))
 		{
 			while($row = pg_fetch_object($result))
@@ -376,7 +378,8 @@
 						else
 							$lehrveranstaltung_id = "FEHLT";
 						$studiensemester_kurzbz = $studsem_arr[$fasnoten_arr[$studkey][$lvkey][$idkey]["studiensemester_fk"]];
-	
+						
+						$lehreinheit_str = "fas-lh: ";
 						if($lehreinheit_id_arr = getLehreinheitID($conn_fas,$idkey))
 						{
 							$lehreinheit_id = "FEHLT";
@@ -385,6 +388,7 @@
 								if (key_exists($lehreinh,$lehreinheiten_sync_arr))
 								{
 									$lehreinheit_id = $lehreinheiten_sync_arr[$lehreinh];
+									$lehreinheit_str .= $lehreinh."; ";
 									break;
 								}
 							}
@@ -404,7 +408,7 @@
 						else if($lehreinheit_id == "FEHLT")
 						{
 							$insert_error_pruef++;
-							$text .= "Pr&uuml;fung: Datensatz FAS ID".$idkey.": Lehreinheit ohne zuordnung<br>";
+							$text .= "Pr&uuml;fung: Datensatz FAS ID".$idkey.": Lehreinheit ohne zuordnung (".$lehreinheit_str.")<br>";
 						}
 						else
 						{
@@ -462,7 +466,9 @@
 							else if ($lehrveranstaltung_id == "FEHLT")
 							{
 								$insert_error_zeug++;
-								$text .= "<span style='background-color:#cccccc;'>Zeugnis: Datensatz FAS ID".$idkey.": lehrveranstaltung_id ohne zuordnung</span><br>";
+								$text .= "<span style='background-color:#cccccc;'>Zeugnis: Datensatz FAS ID".$idkey.": lehrveranstaltung_id ohne zuordnung (".$lvkey.")</span><br>";
+								if (!in_array($lvkey, $fas_lvs_notinsync))								
+									$fas_lvs_notinsync[] = $lvkey;
 							}
 							else
 							{
@@ -550,6 +556,10 @@
 	$text .= "Anzahl Zeugniseintr&auml;ge: ".$anz_processed_zeug."<br>";
 	$text .= "Zeugnisnoten insert fehler/ok: <span style='color:red'>".$insert_error_zeug."</span>/".$anz_insert_zeug.")<br>";
 	$text .= "Zeugnisnoten update fehler/ok/noupdate: <span style='color:red'> ".$update_error_zeug."</span>/".$anz_update_zeug."/".$anz_not_updated_zeug."<br>";
+	$text .= "FAS- LVs nicht in sync-Tabelle: ";
+	foreach ($fas_lvs_notinsync as $lv_id)
+		$text .= $lv_id."; ";
+	$text .= "<br>";
 
 	$stopzeit = time();
 	$runzeit = $stopzeit - $startzeit;
