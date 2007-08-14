@@ -197,6 +197,7 @@ function BetriebsmittelAuswahl()
 	retouram = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#retouram" ));
 	betriebsmitteltyp = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#betriebsmitteltyp" ));
 	nummer = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#nummer" ));
+	nummerintern = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#nummerintern" ));
 	beschreibung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#beschreibung" ));
 
 	document.getElementById('betriebsmittel-textbox-person_id').value=person_id;
@@ -207,6 +208,7 @@ function BetriebsmittelAuswahl()
 	document.getElementById('betriebsmittel-textbox-retouram').value=retouram;
 	document.getElementById('betriebsmittel-menulist-betriebsmitteltyp').value=betriebsmitteltyp;
 	document.getElementById('betriebsmittel-textbox-nummer').value=nummer;
+	document.getElementById('betriebsmittel-textbox-nummerintern').value=nummerintern;
 	document.getElementById('betriebsmittel-textbox-beschreibung').value=beschreibung;
 }
 
