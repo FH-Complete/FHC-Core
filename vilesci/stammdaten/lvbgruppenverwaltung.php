@@ -65,14 +65,14 @@ if(!$stud->getAll('typ, kurzbzlang'))
 	echo 'Fehler beim Laden der Studiengaenge:'.$stud->errormsg;
 
 echo '<form name="frm_studiengang" action="'.$_SERVER['PHP_SELF'].'" method="GET">';
-echo 'Studiengang: <SELECT name="studiengang_kz">';
+echo 'Studiengang: <SELECT name="studiengang_kz"  onchange="document.frm_studiengang.submit()">';
 
 foreach($stud->result as $row)
 {
 	if($studiengang_kz=='')
 		$studiengang_kz=$row->studiengang_kz;
 	
-	echo '<OPTION value="'.$row->studiengang_kz.'"'.($studiengang_kz==$row->studiengang_kz?'selected':'').' onclick="document.frm_studiengang.submit()">'.$row->kuerzel.'</OPTION>';
+	echo '<OPTION value="'.$row->studiengang_kz.'"'.($studiengang_kz==$row->studiengang_kz?'selected':'').'>'.$row->kuerzel.'</OPTION>';
 }
 echo '</SELECT>';
 echo '</form>';

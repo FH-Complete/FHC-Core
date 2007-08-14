@@ -74,6 +74,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	</groupbox>
 	
 	<vbox>
+		<spacer flex="1" />
+		<button id="interessent-dokumente-add" oncommand="InteressentDokumenteFilter()" label="Filter" tooltiptext="Liste aller Studenten mit fehlenden Dokumenten" />
 		<spacer flex="4"/>
 		<button id="interessent-dokumente-add" oncommand="InteressentDokumenteAdd()" label="=&gt;" style="font-weight: bold;"/>
 		<spacer flex="1" />

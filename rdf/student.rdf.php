@@ -51,6 +51,7 @@ $typ = (isset($_GET['typ'])?$_GET['typ']:null);
 $prestudent_id = (isset($_GET['prestudent_id'])?$_GET['prestudent_id']:null);
 $filter = (isset($_GET['filter'])?$_GET['filter']:null);
 $ss = (isset($_GET['ss'])?$_GET['ss']:null);
+$filter2 = (isset($_GET['filter2'])?$_GET['filter2']:null);
 
 if($studiensemester_kurzbz=='aktuelles')
 	$studiensemester_kurzbz = $semester_aktuell;
@@ -81,6 +82,25 @@ if($xmlformat=='rdf')
 	  <RDF:Seq about="'.$rdf_url.'/alle">
 	';
 
+	function checkfilter($row, $filter2)
+	{
+		global $conn;
+		
+		if($filter2=='dokumente')
+		{
+			$qry = "SELECT count(*) as anzahl FROM public.tbl_dokumentstudiengang WHERE 
+					dokument_kurzbz NOT IN(
+						SELECT dokument_kurzbz FROM tbl_dokumentprestudent WHERE prestudent_id='$row->prestudent_id') 
+					AND studiengang_kz='$row->studiengang_kz'";
+			if($result_filter = pg_query($conn, $qry))
+				if($row_filter = pg_fetch_object($result_filter))
+					if($row_filter->anzahl==0)
+						return false;
+		}
+		
+		return true;		
+	}
+	
 	function draw_content($row)
 	{
 		global $rdf_url, $datum_obj, $conn;
@@ -185,16 +205,22 @@ if($xmlformat=='rdf')
 		$prestd = new prestudent($conn, null, true);
 		if(isset($uid))
 		{
-			draw_content($student);
-			$prestd->load($student->prestudent_id);
-			draw_prestudent($prestd);
-		}
-		else
-			foreach ($studenten as $student)
+			if(checkfilter($student, $filter2))
 			{
 				draw_content($student);
 				$prestd->load($student->prestudent_id);
 				draw_prestudent($prestd);
+			}
+		}
+		else
+			foreach ($studenten as $student)
+			{
+				if(checkfilter($student, $filter2))
+				{
+					draw_content($student);
+					$prestd->load($student->prestudent_id);
+					draw_prestudent($prestd);
+				}
 			}
 	}
 	elseif(in_array($typ, array('prestudent', 'interessenten','bewerber','aufgenommen',
@@ -209,16 +235,19 @@ if($xmlformat=='rdf')
 			{
 				foreach ($prestd->result as $row)
 				{
-					$student=new student($conn,null,true);
-					if($uid = $student->getUid($row->prestudent_id))
+					if(checkfilter($row, $filter2))
 					{
-						if(!$student->load($uid, $studiensemester_kurzbz))
-							$student->load($uid);
-						draw_content($student);
+						$student=new student($conn,null,true);
+						if($uid = $student->getUid($row->prestudent_id))
+						{
+							if(!$student->load($uid, $studiensemester_kurzbz))
+								$student->load($uid);
+							draw_content($student);
+						}
+						else
+							draw_content($row);
+						draw_prestudent($row);
 					}
-					else
-						draw_content($row);
-					draw_prestudent($row);
 				}
 			}
 		}

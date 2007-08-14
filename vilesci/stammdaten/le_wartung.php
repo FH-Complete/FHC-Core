@@ -58,7 +58,7 @@
 	echo "<table width='100%'><tr><td>";
 	
 	//Studiengang DropDown
-	echo "Studiengang: <SELECT name='stg_kz'>";
+	echo "Studiengang: <SELECT name='stg_kz' onchange='window.location.href=this.value'>";
 	
 	$stg = new studiengang($conn);
 	$stg->getAll('typ, kurzbz', false);
@@ -68,7 +68,7 @@
 	{
 		if($stg_kz=='')
 			$stg_kz=$row->studiengang_kz;
-		echo "<OPTION onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$row->studiengang_kz&semester=$semester&mitcheck=".($mitcheck?'true':'false')."&stsem=$stsem'\" ".($row->studiengang_kz==$stg_kz?'selected':'').">$row->kuerzel - $row->bezeichnung</OPTION>";
+		echo "<OPTION value=\"".$_SERVER['PHP_SELF']."?stg_kz=$row->studiengang_kz&semester=$semester&mitcheck=".($mitcheck?'true':'false')."&stsem=$stsem\" ".($row->studiengang_kz==$stg_kz?'selected':'').">$row->kuerzel - $row->bezeichnung</OPTION>";
 		$s[$row->studiengang_kz]=$row->max_semester;
 	}
 	
@@ -78,12 +78,12 @@
 	if($semester>$s[$stg_kz])
 		$semester = $s[$stg_kz];
 	
-	echo " Semester: <SELECT name='semester'>";
+	echo " Semester: <SELECT name='semester' onchange='window.location.href=this.value'>";
 	for ($i=0;$i<=$s[$stg_kz];$i++)
 	{
 		if($semester=='')
 			$semester=$i;
-		echo "<OPTION onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&semester=$i&mitcheck=".($mitcheck?'true':'false')."&stsem=$stsem'\" ".($i==$semester?'selected':'').">$i</OPTION>";
+		echo "<OPTION value=\"".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&semester=$i&mitcheck=".($mitcheck?'true':'false')."&stsem=$stsem\" ".($i==$semester?'selected':'').">$i</OPTION>";
 	}
 	echo '</SELECT>';
 	
@@ -92,13 +92,13 @@
 	if($stsem=='')
 		$stsem = $studiensem->getAktorNext();
 	$studiensem->getAll();
-	echo " StSem: <SELECT name='stsem'>";
+	echo " StSem: <SELECT name='stsem' onchange='window.location.href=this.value'>";
 	foreach ($studiensem->studiensemester as $row)
 	{
-		echo "<OPTION onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&semester=$semester&mitcheck=".($mitcheck?'true':'false')."&stsem=$row->studiensemester_kurzbz'\" ".($row->studiensemester_kurzbz==$stsem?'selected':'').">$row->studiensemester_kurzbz</OPTION>";
+		echo "<OPTION value=\"".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&semester=$semester&mitcheck=".($mitcheck?'true':'false')."&stsem=$row->studiensemester_kurzbz\" ".($row->studiensemester_kurzbz==$stsem?'selected':'').">$row->studiensemester_kurzbz</OPTION>";
 	}
 	echo '</SELECT>';
-	echo 'Mit Check?<input type="checkbox" name="mitcheck" onchange="window.location.href = \''.$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&semester=$semester&stsem=$stsem&mitcheck=".($mitcheck?'false':'true')."'\" ".($mitcheck?'checked':'').'>';
+	echo 'Mit Check?<input type="checkbox" name="mitcheck" onclick="window.location.href = \''.$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&semester=$semester&stsem=$stsem&mitcheck=".($mitcheck?'false':'true')."'\" ".($mitcheck?'checked':'').'>';
 	echo '</td><td align="right" style="font-size: small;">';
 	echo '<a href="'.$_SERVER['PHP_SELF'].'?check=true">CHECK</a>';
 	echo '</td></tr></table>';
