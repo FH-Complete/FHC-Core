@@ -10,8 +10,8 @@
 	require_once('../../../vilesci/config.inc.php');
 	require_once('../../../include/zeugnisnote.class.php');
 	require_once('../../../include/pruefung.class.php');
-	//$adress='fas_sync@technikum-wien.at';
-	$adress='raab@technikum-wien.at';
+	$adress='fas_sync@technikum-wien.at';
+	//$adress='raab@technikum-wien.at';
 
 	$conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 	$conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur Vilesci Datenbank fehlgeschlagen");
