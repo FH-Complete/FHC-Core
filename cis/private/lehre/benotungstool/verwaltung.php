@@ -97,7 +97,7 @@ if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim oeffnen der Datenbankverbindung');
 
 $user = get_uid();
-
+//$user = "sauermann";
 if(!check_lektor($user, $conn))
 	die('Sie haben keine Berechtigung fuer diesen Bereich');
 
