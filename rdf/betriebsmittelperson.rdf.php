@@ -89,6 +89,7 @@ function draw_content($row)
             <BTM:beschreibung><![CDATA['.$row->beschreibung.']]></BTM:beschreibung>
             <BTM:betriebsmitteltyp><![CDATA['.$row->betriebsmitteltyp.']]></BTM:betriebsmitteltyp>
             <BTM:nummer><![CDATA['.$row->nummer.']]></BTM:nummer>
+            <BTM:nummerintern><![CDATA['.$row->nummerintern.']]></BTM:nummerintern>
             <BTM:reservieren><![CDATA['.($row->reservieren?'Ja':'Nein').']]></BTM:reservieren>
             <BTM:ort_kurzbz><![CDATA['.$row->ort_kurzbz.']]></BTM:ort_kurzbz>            
             <BTM:person_id><![CDATA['.$row->person_id.']]></BTM:person_id>

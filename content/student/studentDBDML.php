@@ -52,6 +52,7 @@ require_once('../../include/pruefung.class.php');
 require_once('../../include/abschlusspruefung.class.php');
 require_once('../../include/projektarbeit.class.php');
 require_once('../../include/projektbetreuer.class.php');
+require_once('../../include/lehrverband.class.php');
 
 $user = get_uid();
 
@@ -228,6 +229,14 @@ if(!$error)
 				
 				$student->new=false;				
 
+				$lehrverband = new lehrverband($conn, true);
+				if(!$lehrverband->exists($_POST['studiengang_kz'],$_POST['semester'],$_POST['verband'], $_POST['gruppe']))
+				{
+					$errormsg = 'Die angegebene Lehrverbandsgruppe existiert nicht!';
+					$return = false;
+					$error = true;
+				}
+				
 				if(!$error)
 				{
 					if($student->save())

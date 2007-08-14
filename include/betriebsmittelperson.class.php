@@ -104,6 +104,7 @@ class betriebsmittelperson
 				$this->beschreibung = $row->beschreibung;
 				$this->betriebsmitteltyp = $row->betriebsmitteltyp;
 				$this->nummer = $row->nummer;
+				$this->nummerintern = $row->nummerintern;
 				$this->reservieren = ($row->reservieren=='t'?true:false);
 				$this->ort_kurzbz = $row->ort_kurzbz;
 				$this->person_id = $row->person_id;
@@ -295,6 +296,7 @@ class betriebsmittelperson
 				$bm->beschreibung = $row->beschreibung;
 				$bm->betriebsmitteltyp = $row->betriebsmitteltyp;
 				$bm->nummer = $row->nummer;
+				$bm->nummerintern = $row->nummerintern;
 				$bm->reservieren = ($row->reservieren=='t'?true:false);
 				$bm->ort_kurzbz = $row->ort_kurzbz;
 				$bm->person_id = $row->person_id;
