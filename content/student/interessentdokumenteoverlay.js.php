@@ -346,3 +346,59 @@ function InteressentDokumenteNichtAbgegebenTreeSort()
 	InteressentDokumentTreeNichtAbgegebenSelectID = tree.view.getCellText(i,col);
 	window.setTimeout("InteressentDokumentNichtAbgegebenTreeSelect()",10);
 }
+
+function InteressentDokumenteFilter()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree=document.getElementById('tree-verband');
+
+	//Wenn nichts markiert wurde -> beenden
+	if(tree.currentIndex==-1)
+		return;
+	
+    // Progressmeter starten. Ab jetzt keine 'return's mehr.
+    document.getElementById('statusbar-progressmeter').setAttribute('mode','undetermined');
+    //globalProgressmeter.StartPM();
+
+	var col;
+	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+	var stg_kz=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["sem"] : "sem";
+	var sem=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["ver"] : "ver";
+	var ver=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["grp"] : "grp";
+	var grp=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["gruppe"] : "gruppe";
+	var gruppe=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["typ"] : "typ";
+	var typ=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["stsem"] : "stsem";
+	var stsem=tree.view.getCellText(tree.currentIndex,col);
+	
+	stsem = getStudiensemester();
+	url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ=student&filter2=dokumente&"+gettimestamp();
+	var treeStudent=document.getElementById('student-tree');
+
+	//Alte DS entfernen
+	var oldDatasources = treeStudent.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		treeStudent.database.RemoveDataSource(oldDatasources.getNext());
+	}
+
+	try
+	{
+		StudentTreeDatasource.removeXMLSinkObserver(StudentTreeSinkObserver);
+		treeStudent.builder.removeListener(StudentTreeListener);
+	}
+	catch(e)
+	{}
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	StudentTreeDatasource = rdfService.GetDataSource(url);
+	StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	treeStudent.database.AddDataSource(StudentTreeDatasource);
+	StudentTreeDatasource.addXMLSinkObserver(StudentTreeSinkObserver);
+	treeStudent.builder.addListener(StudentTreeListener);
+}
