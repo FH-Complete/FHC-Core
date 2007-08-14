@@ -36,6 +36,9 @@
 	$semester = (isset($_GET['semester'])?$_GET['semester']:'');
 	$stsem = (isset($_GET['stsem'])?$_GET['stsem']:'');
 	$check = (isset($_GET['check'])?true:false);
+	
+	//Wenn mitcheck=true ist, dann werden in der Tabelle (gefiltert nach Studiengang/Semester/Stsem) 
+	//nur die Eintraege mit zusammenpassenden UNRs angezeigt
 	if(isset($_GET['mitcheck']) && $_GET['mitcheck']=='false')
 		$mitcheck = false;
 	else 
@@ -53,6 +56,8 @@
 <?php
 
 	echo "<table width='100%'><tr><td>";
+	
+	//Studiengang DropDown
 	echo "Studiengang: <SELECT name='stg_kz'>";
 	
 	$stg = new studiengang($conn);
@@ -68,7 +73,8 @@
 	}
 	
 	echo '</SELECT>';
-		
+
+	//Semester DropDown
 	if($semester>$s[$stg_kz])
 		$semester = $s[$stg_kz];
 	
@@ -81,6 +87,7 @@
 	}
 	echo '</SELECT>';
 	
+	//Studiensemester DropDown
 	$studiensem = new studiensemester($conn);
 	if($stsem=='')
 		$stsem = $studiensem->getAktorNext();
@@ -104,6 +111,7 @@
 		
 		if($le_id_bleibt!=$le_id_delete)
 		{
+			//unr beider Lehreinheiten ermitteln
 			$qry = "SELECT (SELECT unr FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$le_id_bleibt') as unr_bleibt, 
 						   (SELECT unr FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$le_id_delete') as unr_delete";
 
@@ -111,6 +119,7 @@
 			{
 				if($row = pg_fetch_object($result))
 				{
+					//Wenn beide UNRs gleich sind -> zusammenlegen
 					if($row->unr_bleibt==$row->unr_delete)
 					{
 						
@@ -304,7 +313,7 @@
 	}
 	
 	
-	//Obere Tabelle
+	
 	echo '<br><br><h3>Das wird geloescht:</h3>';
 
 	if($check)
@@ -318,12 +327,13 @@
 	}
 
 	echo "<form method='POST' action='".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&semester=$semester&stsem=$stsem".($check?'&check=true':'')."'>";
-	
+	//Obere Tabelle
 	draw_table($qry, true);
 	
 	echo '<input type="submit" name="zusammenlegen" value="Zusammenlegen">';
 	echo '<br><br><h3>Das bleibt:</h3>';
 	
+	//Untere Tabelle
 	draw_table($qry, false);
 	
 	echo "</form>";
@@ -345,6 +355,8 @@
 					  <td>$row->wochenrythmus</td><td>$row->start_kw</td><td>$row->raumtyp</td>
 					  <td>$row->raumtypalternativ</td><td>".($row->lehre=='t'?'Ja':'Nein')."</td>
 					  <td>$row->unr</td><td>$row->lvnr</td></tr>";
+				
+				//Liste der zugehoerigen Mitarbeiter
 				$qry_ma = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$row->lehreinheit_id'";
 				if($result_ma = pg_query($conn, $qry_ma))
 				{
