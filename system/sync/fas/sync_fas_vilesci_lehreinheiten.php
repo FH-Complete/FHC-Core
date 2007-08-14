@@ -133,7 +133,7 @@ if($result = pg_query($conn_fas, $qry))
 	}
 }
 
-$qry_main = "SELECT *,lehreinheit.lehreinheit_fk as le_fk, mitarbeiter_lehreinheit.creationdate as lm_creationdate,
+$qry_main = "SELECT *, lehreinheit.lehreinheit_fk as le_fk, mitarbeiter_lehreinheit.creationdate as lm_creationdate,
 			lehreinheit.ivar1 as wochenrythmus, lehreinheit.ivar2 as start_kw, lehreinheit.ivar3 as stundenblockung,
 			lehreinheit.creationuser as lecu, mitarbeiter_lehreinheit.rvar1 as lektorgesamtstunden
 		FROM lehreinheit left outer join mitarbeiter_lehreinheit
@@ -170,7 +170,8 @@ if($result = pg_query($conn_fas, $qry_main))
 		$kurzbezeichnung		=$row->kurzbezeichnung;
 		$bezeichnung		=$row->bezeichnung;
 		$farbe				="CCCCCC";
-
+		$lektorgesamtstunden	=$row->lektorgesamtstunden;
+		
 		$lehrfunktion			=$row->lehrfunktion_fk;
 
 		$lektor				=$row->mitarbeiter_fk;
@@ -184,11 +185,12 @@ if($result = pg_query($conn_fas, $qry_main))
 		$verband='';
 		$gruppe='';
 
-		if($row->lektorgesamtstunden>99)
+		if($row->lektorgesamtstunden>999)
 		{
-			$error_log.="Gesamtstunden von Lektor (mitarbeiter_fk) '".$lektor."' zu hoch: '".$row->lektorgesamtstunden."'!\n";
+			/*$error_log.="Gesamtstunden von Lektor (mitarbeiter_fk) '".$lektor."' zu hoch: '".$row->lektorgesamtstunden."'!\n";
 			$anzahl_fehler++;
-			continue;
+			continue;*/
+			$lektorgesamtstunden=999;
 		}
 
 		if($start_kw<1 || $start_kw>53)
@@ -460,12 +462,12 @@ if($result = pg_query($conn_fas, $qry_main))
 		if($lehreinheit_part<0 || $lehreinheit_part==null)
 		{
 			//nicht-partizipierend
-			if($lm_ext_id==null)
+			/*if($lm_ext_id==null)
 			{
 				$anzahl_fehler++;
 				$error_log.="Kein Mitarbeiter zu dieser Lehreinheit ('".$ext_id."') eingetragen.\n";
 				continue;
-			}
+			}*/
 			pg_query($conn,'BEGIN;');
 
 
@@ -497,31 +499,45 @@ if($result = pg_query($conn_fas, $qry_main))
 
 
 			$lg_ext_id=$row->mitarbeiter_lehreinheit_pk;
-			$qry="SELECT * FROM lehre.tbl_lehreinheit join lehre.tbl_lehreinheitgruppe USING (lehreinheit_id) WHERE tbl_lehreinheitgruppe.ext_id='".$lg_ext_id."';";
-			if($result3 = pg_query($conn, $qry))
+			if($lg_ext_id!=NULL && $lg_ext_id!='')
 			{
-				if($row3=pg_fetch_object($result3))
+				$qry="SELECT * FROM lehre.tbl_lehreinheit join lehre.tbl_lehreinheitgruppe USING (lehreinheit_id) WHERE tbl_lehreinheitgruppe.ext_id='".$lg_ext_id."';";
+				if($result3 = pg_query($conn, $qry))
 				{
-					$gja=true;
-					$lehreinheit_id=$row3->lehreinheit_id;
-				}
-				else
-				{
-					$gja=false;
+					if($row3=pg_fetch_object($result3))
+					{
+						$gja=true;
+						$lehreinheit_id=$row3->lehreinheit_id;
+					}
+					else
+					{
+						$gja=false;
+					}
 				}
 			}
-			$qry="SELECT * FROM lehre.tbl_lehreinheit join lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id) WHERE tbl_lehreinheitmitarbeiter.ext_id='".$lm_ext_id."';";
-			if($result3 = pg_query($conn, $qry))
+			else 
 			{
-				if($row3=pg_fetch_object($result3))
+				$gja=false;
+			}
+			if($lm_ext_id!=NULL && $lm_ext_id!='')
+			{
+				$qry="SELECT * FROM lehre.tbl_lehreinheit join lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id) WHERE tbl_lehreinheitmitarbeiter.ext_id='".$lm_ext_id."';";
+				if($result3 = pg_query($conn, $qry))
 				{
-					$mja=true;
-					$lehreinheit_id=$row3->lehreinheit_id;
+					if($row3=pg_fetch_object($result3))
+					{
+						$mja=true;
+						$lehreinheit_id=$row3->lehreinheit_id;
+					}
+					else
+					{
+						$mja=false;
+					}
 				}
-				else
-				{
-					$mja=false;
-				}
+			}
+			else 
+			{
+				$mja=false;
 			}
 			if($gja==false && $mja==false)
 			{
@@ -1032,8 +1048,8 @@ if($result = pg_query($conn_fas, $qry_main))
 				//$lehreinheit_id
 				//$mitarbeiter_uid				=m_uid;
 				$lehrfunktion_kurzbz				=$lehrfunktionen[$lehrfunktion];
-				$semesterstunden				=round($row->lektorgesamtstunden,2);
-				$planstunden					=round($row->lektorgesamtstunden);
+				$semesterstunden				=round($lektorgesamtstunden,2);
+				$planstunden					=round($lektorgesamtstunden);
 				$stundensatz					=round($row->kosten,2);
 				$faktor					=round($row->faktor,2);
 				$anmerkung					='';
