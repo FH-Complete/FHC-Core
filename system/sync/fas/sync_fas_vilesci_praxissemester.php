@@ -148,6 +148,10 @@ if($result = pg_query($conn_fas, $qry))
 		//echo "p:".$stg_fktokz[$row->studiengang_fk]."/".$row->semester."<br>";
 	}
 }
+$stg_praxissemester[145]='7';
+$stg_praxissemester[91]='5';
+$stg_praxissemester[92]='5';
+$stg_praxissemester[308]='7';
 
 /*var_dump($stg_praxissemester);
 echo "<br>";
@@ -175,8 +179,8 @@ foreach ($stg_fktokz as $stg)
 					myaddslashes($stg).", ".
 					myaddslashes($stg_praxissemester[$stg]).", ".
 					"'German', ".
-					myaddslashes($stg_ects[$stg]).", ".
-					myaddslashes($stg_sws[$stg]).", ".
+					myaddslashes($stg_ects[$stg_kztofk[$stg]]).", ".
+					myaddslashes($stg_sws[$stg_kztofk[$stg]]).", ".
 					"'', ".
 					"true, ".
 					"'prax', ".
@@ -326,7 +330,7 @@ if($result = pg_query($conn_fas, $qry_main))
 				else 
 				{
 					$LVA_unbekannt++;
-					if(!in_array($studiengang_kz, $dont_sync_php))
+					if(!in_array($studiengang_kz, $stg_nolva))
 					{
 						array_push($stg_nolva, $studiengang_kz);
 					}
@@ -1641,7 +1645,7 @@ if($result = pg_query($conn_fas, $qry_main))
 		$error_log_fas7.=$text7;
 		$error_log_fas8.=$text8;
 	}
-	
+asort ($stg_nolva);	
 foreach($stg_nolva as $nolva)	
 {
 	if ($arr_nolva=='')
@@ -1653,7 +1657,7 @@ foreach($stg_nolva as $nolva)
 		$arr_nolva.=", ".$nolva;	
 	}
 }
-$error_log_prax.="Lehrveranstaltung 'PRAX' konnte nicht angelegt werden in den Studiengängen:\n'".$arr_nolva."' .\n";
+$error_log_prax.="Lehrveranstaltung 'PRAX' nicht vorhanden in den Studiengängen:\n'".$arr_nolva."' .\n";
 //echo und mail	
 echo nl2br("Praxissemestersynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
 
