@@ -725,6 +725,11 @@ function StatistikPrintNotenspiegel()
 	window.open('<?php echo APP_ROOT ?>content/statistik/notenspiegel.php?studiengang_kz='+studiengang_kz+'&semester='+semester,'Notenspiegel');
 }
 
+function ExtrasShowReihungstest()
+{
+	window.open('<?php echo APP_ROOT ?>vilesci/stammdaten/reihungstestverwaltung.php','Reihungstest','');
+}
+
 // ****
 // * Oeffnet den About Dialog
 // ****

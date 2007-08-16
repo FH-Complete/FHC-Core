@@ -116,6 +116,16 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$datum_aktuell = date('d.m.Y');
 		$xml .= "		<ort_datum>Wien, am ".$datum_aktuell."</ort_datum>";
 		
+		
+		$qry = "SELECT wochen FROM public.tbl_semesterwochen WHERE studiengang_kz='$row->studiengang_kz' AND semester='$row->semester'";
+		$wochen = 15;
+		if($result_wochen = pg_query($conn, $qry))
+		{
+			if($row_wochen = pg_fetch_object($result_wochen))
+			{
+				$wochen = $row_wochen->wochen;
+			}
+		}
 		$obj = new zeugnisnote($conn, null, null, null, false);
 		
 		$obj->getZeugnisnoten($lehrveranstaltung_id=null, $uid_arr[$i], $studiensemester_kurzbz);
@@ -131,7 +141,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$xml .= "\n			<unterrichtsfach>";
 				$xml .= "				<bezeichnung>".$row->lehrveranstaltung_bezeichnung."</bezeichnung>";
 				$xml .= "				<note>".$note."</note>";
-				$xml .= "				<sws>".$row->semesterstunden."</sws>";
+				$xml .= "				<sws>".sprintf('%.1f',$row->semesterstunden/$wochen)."</sws>";
 				$xml .= "				<ects>".$row->ects."</ects>";
 				$xml .= "			</unterrichtsfach>";
 			}

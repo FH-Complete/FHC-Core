@@ -104,23 +104,23 @@
 							<fo:table-body>
 								<fo:table-row  line-height="10pt">
 									<fo:table-cell border-width="0.2mm" border-style="solid">
-										<fo:block font-size="8pt" font-weight="bold">
+										<fo:block font-size="10pt" font-weight="bold">
 										 Lehrveranstaltung\n
 										</fo:block>
 									</fo:table-cell>
 									<fo:table-cell border-width="0.2mm" border-style="solid">
-										<fo:block font-size="8pt" font-weight="bold" content-width="30mm" text-align="center">
+										<fo:block font-size="10pt" font-weight="bold" content-width="30mm" text-align="center">
 											 Note\n
 										</fo:block>
 									</fo:table-cell>
 									
 									<fo:table-cell border-width="0.2mm" border-style="solid">
-										<fo:block font-size="8pt" font-weight="bold" content-width="25mm" text-align="center">
+										<fo:block font-size="10pt" font-weight="bold" content-width="25mm" text-align="center">
 										 Anzahl\n SWS
 										</fo:block>
 									</fo:table-cell>
 									<fo:table-cell border-width="0.2mm" border-style="solid">
-										<fo:block font-size="8pt" font-weight="bold" content-width="25mm" text-align="center">
+										<fo:block font-size="10pt" font-weight="bold" content-width="25mm" text-align="center">
 										ECTS\n Punkte
 										</fo:block>
 									</fo:table-cell>	
@@ -154,7 +154,7 @@
 						</fo:table>
 					</fo:block-container>
 					
-					<fo:block-container position="absolute" top="260mm" left="25mm" height="10mm">
+					<fo:block-container position="absolute" top="250mm" left="25mm" height="10mm">
 						<fo:table table-layout="fixed" border-collapse="separate">
 						<fo:table-column column-width="75mm"/>
 						<fo:table-column column-width="15mm"/>
@@ -210,7 +210,7 @@
 								<fo:table-row  line-height="10pt">
 									<fo:table-cell number-columns-spanned="3">
 										<fo:block font-size="8pt" content-width="165mm" text-align="center">
-											<xsl:text>Fachhochschule Technikum Wien\nHöchstädtplatz 5\nA-1200 Wien</xsl:text>
+											<xsl:text>Fachhochschule Technikum Wien\nHöchstädtplatz 5\nA-1200 Wien\nZVR-Nr.: 074476426\nDVR-Nr.:0928381</xsl:text>
 										</fo:block></fo:table-cell>
 								</fo:table-row>
 								
