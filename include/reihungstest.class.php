@@ -115,9 +115,17 @@ class reihungstest
 		}
 	}
 	
-	function getAll()
+	// ****
+	// * Liefert alle Reihungstests
+	// * wenn ein Datum uebergeben wird, dann werden alle Reihungstests ab diesem 
+	// * Datum zurueckgeliefert
+	// ****
+	function getAll($datum=null)
 	{
-		$qry = "SELECT * FROM public.tbl_reihungstest ORDER BY datum, uhrzeit";
+		$qry = "SELECT * FROM public.tbl_reihungstest ";
+		if($datum!=null)
+			$qry.=" WHERE datum>='$datum'";
+		$qry.=" ORDER BY datum, uhrzeit";
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))

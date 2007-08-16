@@ -32,7 +32,7 @@
 
 	$user = get_uid();
 	$datum_obj = new datum();
-	$stg_kz = (isset($_GET['stg_kz'])?$_GET['stg_kz']:'');
+	$stg_kz = (isset($_GET['stg_kz'])?$_GET['stg_kz']:'-1');
 	$reihungstest_id = (isset($_GET['reihungstest_id'])?$_GET['reihungstest_id']:'');
 	$neu = (isset($_GET['neu'])?true:false);
 	$stg_arr = array();
@@ -51,23 +51,27 @@
 <h2>Reihungstest - Verwaltung</h2>
 <?php
 
+	// Speichern eines Reihungstesttermines
 	if(isset($_POST['speichern']))
 	{
 		$reihungstest = new reihungstest($conn);
 		
 		if(isset($_POST['reihungstest_id']) && $_POST['reihungstest_id']!='')
 		{
+			//Reihungstest laden
 			if(!$reihungstest->load($_POST['reihungstest_id']))
 				die($reihungstest->errormsg);
 			$reihungstest->new = false;
 		}
 		else 
 		{
+			//Neuen Reihungstest anlegen
 			$reihungstest->new=true;
 			$reihungstest->insertvon = $user;
 			$reihungstest->insertamum = date('Y-m-d H:i:s');
 		}
 		
+		//Datum und Uhrzeit pruefen
 		if($_POST['datum']!='' && !$datum_obj->checkDatum($_POST['datum']))
 		{
 			echo 'Datum ist ungueltig';
@@ -95,7 +99,7 @@
 				$reihungstest_id = $reihungstest->reihungstest_id;
 				$stg_kz = $reihungstest->studiengang_kz;
 			}
-			else 
+			else
 			{
 				echo 'Fehler beim Speichern der Daten: '.$reihungstest->errormsg;
 			}
@@ -131,7 +135,7 @@
 	//Reihungstest DropDown
 	$reihungstest = new reihungstest($conn);
 	if($stg_kz==-1)
-		$reihungstest->getAll();
+		$reihungstest->getAll(date('Y').'-01-01'); //Alle Reihungstests ab diesem Jahr laden
 	else
 		$reihungstest->getReihungstest($stg_kz);
 	
@@ -164,7 +168,8 @@
 		if($stg_kz!=-1 && $stg_kz!='')
 			$reihungstest->studiengang_kz = $stg_kz;
 	}
-	
+
+	//Formular zum bearbeiten des Reihungstests
 	echo '<HR>';
 	echo "<FORM method='POST'>";
 	echo "<input type='hidden' value='$reihungstest->reihungstest_id' name='reihungstest_id' />";
@@ -188,6 +193,7 @@
 	}
 	echo "</SELECT></TD></TR>";
 	
+	//Ort DropDown
 	echo "<tr><td>Ort</td><td><SELECT name='ort_kurzbz'>";
 	
 	if($reihungstes->ort_kurzbz=='')
@@ -218,7 +224,7 @@
 	
 	echo '<HR>';	
 	
-	
+	//Liste der Interessenten die zum Reihungstest angemeldet sind
 	$qry = "SELECT *, (SELECT kontakt FROM tbl_kontakt WHERE kontakttyp='email' AND person_id=tbl_prestudent.person_id ORDER BY zustellung LIMIT 1) as email FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE reihungstest_id='$reihungstest_id' ORDER BY nachname, vorname";
 	$mailto = '';
 	if($result = pg_query($conn, $qry))

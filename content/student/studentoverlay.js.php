@@ -355,10 +355,12 @@ function StudentTreeSelectStudent()
 				tree.view.selection.select(i);
 				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
 				tree.treeBoxObject.ensureRowIsVisible(i);
+				document.getElementById('student-toolbar-label-anzahl').value='Anzahl: '+items;
 				return true;
 			}
 	   	}
 	}
+
 	document.getElementById('student-toolbar-label-anzahl').value='Anzahl: '+items;
 }
 
