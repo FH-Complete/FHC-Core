@@ -18,7 +18,7 @@ require_once('../sync_config.inc.php');
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
-$adress='ruhan@technikum-wien.at';
+//$adress='ruhan@technikum-wien.at';
 //$adress='fas_sync@technikum-wien.at';
 
 $error_log='';
@@ -57,6 +57,7 @@ $semnull=0;
 $studunbekannt=0;
 $ausbsem_unbekannt=0;
 $LVA_unbekannt=0;
+$LVA_unbekannt_stg=array();
 $fachbereich_kurzbz='';
 $ausgabe='';
 $ausgabe_all='';
@@ -152,6 +153,22 @@ $stg_praxissemester[145]='7';
 $stg_praxissemester[91]='5';
 $stg_praxissemester[92]='5';
 $stg_praxissemester[308]='7';
+$stg_praxissemester[228]='2';
+$stg_praxissemester[258]='5';
+$stg_praxissemester[297]='2';
+$stg_praxissemester[298]='2';
+$stg_praxissemester[299]='2';
+$stg_praxissemester[300]='2';
+$stg_praxissemester[301]='2';
+$stg_praxissemester[302]='2';
+$stg_praxissemester[303]='2';
+$stg_praxissemester[327]='5';
+$stg_praxissemester[331]='2';
+$stg_praxissemester[332]='2';
+$stg_praxissemester[333]='5';
+$stg_praxissemester[334]='2';
+$stg_praxissemester[335]='5';
+$stg_praxissemester[336]='2';
 
 /*var_dump($stg_praxissemester);
 echo "<br>";
@@ -330,6 +347,10 @@ if($result = pg_query($conn_fas, $qry_main))
 				else 
 				{
 					$LVA_unbekannt++;
+					if(!isset($LVA_unbekannt_stg[$studiengang_kz]))
+						$LVA_unbekannt_stg[$studiengang_kz]=1;
+					else
+						$LVA_unbekannt_stg[$studiengang_kz]++;
 					if(!in_array($studiengang_kz, $stg_nolva))
 					{
 						array_push($stg_nolva, $studiengang_kz);
@@ -1658,6 +1679,9 @@ foreach($stg_nolva as $nolva)
 	}
 }
 $error_log_prax.="Lehrveranstaltung 'PRAX' nicht vorhanden in den Studiengängen:\n'".$arr_nolva."' .\n";
+print_r($LVA_unbekannt_stg);
+echo "<br>";
+
 //echo und mail	
 echo nl2br("Praxissemestersynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
 

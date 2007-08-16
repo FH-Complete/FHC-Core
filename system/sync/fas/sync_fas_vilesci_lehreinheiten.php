@@ -732,7 +732,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									$ausgabe_le="LVNr: '".$lvnr."' statt('".$row2->lvnr."')";
 								}
 							}
-							if(date("d.m.Y", $row2->insertamum)!=date("d.m.Y", $insertamum))
+							if($row2->insertamum!=$insertamum)
 							{
 								$update=true;
 								if(strlen(trim($ausgabe_le))>0)
@@ -1025,7 +1025,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								$ausgabe_le="LVNr: '".$lvnr."' statt('".$row3->lvnr."')";
 							}
 						}
-						if(date("d.m.Y", $row3->insertamum)!=date("d.m.Y", $insertamum))
+						if($row3->insertamum!=$insertamum)
 						{
 							$update=true;
 							if(strlen(trim($ausgabe_le))>0)
@@ -1228,7 +1228,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								$ausgabe_lm="Insertvon: '".$lm_insertvon."' statt('".$row3->insertvon."')";
 							}
 						}
-						if(date("d.m.Y", $row3->insertamum)!=date("d.m.Y", $lm_insertamum))
+						if($row3->insertamum!=$lm_insertamum)
 						{
 							$update=true;
 							if(strlen(trim($ausgabe_lm))>0)
@@ -1431,7 +1431,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									$ausgabe_lm="Insertvon: '".$lg_insertvon."' statt('".$row3->insertvon."')";
 								}
 							}
-							if(date("d.m.Y", $row3->insertamum)!=date("d.m.Y", $lg_insertamum))
+							if($row3->insertamum!=$lg_insertamum)
 							{
 								$update=true;
 								if(strlen(trim($ausgabe_lm))>0)
@@ -1617,7 +1617,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								$ausgabe_lm="Insertvon: '".$lg_insertvon."' statt('".$row4->insertvon."')";
 							}
 						}
-						if(date("d.m.Y", $row4->insertamum)!=date("d.m.Y", $lg_insertamum))
+						if($row4->insertamum!=$lg_insertamum)
 						{
 							$update=true;
 							if(strlen(trim($ausgabe_lm))>0)
@@ -1902,7 +1902,7 @@ if($result = pg_query($conn_fas, $qry_main))
 											$ausgabe_lm="Insertvon: '".$lg_insertvon."' statt('".$row3->insertvon."')";
 										}
 									}
-									if(date("d.m.Y", $row3->insertamum)!=date("d.m.Y", $lg_insertamum))
+									if($row3->insertamum!=$lg_insertamum)
 									{
 										$update=true;
 										if(strlen(trim($ausgabe_lm))>0)
@@ -2085,7 +2085,7 @@ if($result = pg_query($conn_fas, $qry_main))
 										$ausgabe_lm="Insertvon: '".$lg_insertvon."' statt('".$row4->insertvon."')";
 									}
 								}
-								if(date("d.m.Y", $row4->insertamum)!=date("d.m.Y", $lg_insertamum))
+								if($row4->insertamum!=$lg_insertamum)
 								{
 									$update=true;
 									if(strlen(trim($ausgabe_lm))>0)
