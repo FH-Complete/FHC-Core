@@ -488,31 +488,39 @@ if(!$error)
 		if(isset($_POST['studiensemester_kurzbz']) && isset($_POST['rolle_kurzbz']) && 
 		   isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id']))
 		{
-			$rolle = new prestudent($conn, null, true);
-			if($rolle->load_rolle($_POST['prestudent_id'],$_POST['rolle_kurzbz'],$_POST['studiensemester_kurzbz']))
+			if($_POST['rolle_kurzbz']=='Student')
 			{
-				if($rechte->isBerechtigt('admin',0) || $rolle->insertvon == $user)
-				{
-					if($rolle->delete_rolle($_POST['prestudent_id'],$_POST['rolle_kurzbz'],$_POST['studiensemester_kurzbz']))
+				$return = false;
+				$errormsg = 'Studentenrolle kann nur durch den Administrator geloescht werden';
+			}
+			else 
+			{
+				$rolle = new prestudent($conn, null, true);
+				if($rolle->load_rolle($_POST['prestudent_id'],$_POST['rolle_kurzbz'],$_POST['studiensemester_kurzbz']))
+				{				
+					if($rechte->isBerechtigt('admin',0) || $rolle->insertvon == $user)
 					{
-						$return = true;
+						if($rolle->delete_rolle($_POST['prestudent_id'],$_POST['rolle_kurzbz'],$_POST['studiensemester_kurzbz']))
+						{
+							$return = true;
+						}
+						else 
+						{
+							$return = false;
+							$errormsg = $rolle->errormsg;
+						}
 					}
 					else 
 					{
 						$return = false;
-						$errormsg = $rolle->errormsg;
+						$errormsg = 'Sie haben keine Berechtigung zum Loeschen dieser Rolle';
 					}
 				}
 				else 
 				{
 					$return = false;
-					$errormsg = 'Sie haben keine Berechtigung zum Loeschen dieser Rolle';
+					$errormsg = $rolle->errormsg;
 				}
-			}
-			else 
-			{
-				$return = false;
-				$errormsg = $rolle->errormsg;
 			}
 		}
 		else 
@@ -602,7 +610,7 @@ if(!$error)
 										$student->matrikelnr = $matrikelnr;
 										$student->prestudent_id = $prestd->prestudent_id;
 										$student->studiengang_kz = $prestd->studiengang_kz;
-										$student->semester = 1; //$hlp->result[0]->ausbildungssemester
+										$student->semester = $hlp->result[0]->ausbildungssemester;
 										$student->verband = ' ';
 										$student->gruppe = ' ';
 										$student->insertamum = date('Y-m-d H:i:s');
@@ -614,8 +622,8 @@ if(!$error)
 											$rolle = new prestudent($conn);
 											$rolle->prestudent_id = $prestd->prestudent_id;
 											$rolle->rolle_kurzbz = 'Student';
-											$rolle->studiensemester_kurzbz = $semester_aktuell; //$hlp->result[0]->studiensemester_kurzbz;
-											$rolle->ausbildungssemester = 1; //$hlp->result[0]->ausbildungssemester
+											$rolle->studiensemester_kurzbz = $hlp->result[0]->studiensemester_kurzbz;
+											$rolle->ausbildungssemester = $hlp->result[0]->ausbildungssemester;
 											$rolle->datum = date('Y-m-d');
 											$rolle->insertamum = date('Y-m-d H:i:s');
 											$rolle->insertvon = $user;
@@ -626,9 +634,9 @@ if(!$error)
 												//StudentLehrverband anlegen
 												$studentlehrverband = new student($conn);
 												$studentlehrverband->uid = $uid;
-												$studentlehrverband->studiensemester_kurzbz = $semester_aktuell; //$hlp->result[0]->studiensemester_kurzbz;
+												$studentlehrverband->studiensemester_kurzbz = $hlp->result[0]->studiensemester_kurzbz;
 												$studentlehrverband->studiengang_kz = $prestd->studiengang_kz;
-												$studentlehrverband->semester = 1; //$hlp->result[0]->ausbildungssemester
+												$studentlehrverband->semester = $hlp->result[0]->ausbildungssemester;
 												$studentlehrverband->verband = ' ';
 												$studentlehrverband->gruppe = ' ';
 												$studentlehrverband->insertamum = date('Y-m-d H:i:s');

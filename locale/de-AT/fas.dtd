@@ -90,3 +90,11 @@
 
 <!ENTITY menu-dokumente-studienerfolg-finanzamt.label	"Finanzamt">
 <!ENTITY menu-dokumente-studienerfolg-finanzamt.accesskey	"F">
+
+
+<!ENTITY menu-extras.label		"Extras">
+<!ENTITY menu-extras.accesskey	"E">
+
+<!ENTITY menu-extras-reihungstest.key		"R">
+<!ENTITY menu-extras-reihungstest.label		"Reihungstestverwaltung">
+<!ENTITY menu-extras-reihungstest.accesskey	"R">

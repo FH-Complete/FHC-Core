@@ -58,12 +58,12 @@
 			if (__js_menu_array[i]==tabid)
 			{
 				document.getElementById(__js_menu_array[i]).style.display = 'block';
-				document.getElementById(__js_tab_array[i]).class = 'tab active';
+				//document.getElementById(__js_tab_array[i]).class = 'tab active';
 			}
        		else
        		{
        			document.getElementById(__js_menu_array[i]).style.display = 'none';
-       			document.getElementById(__js_tab_array[i]).class = 'tab';
+       			//document.getElementById(__js_tab_array[i]).class = 'tab';
 			}
         return true;
   	}
@@ -335,6 +335,22 @@
 			  	<tr>
 			  		<td width="10" nowrap>&nbsp;</td>
 					<td nowrap><a class="MenuItem2" href="stammdaten/lvbgruppenverwaltung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Verwaltung</a></td>
+			  	</tr>
+			  	<tr><td width="10" nowrap>&nbsp;</td></tr>
+			  	</table>
+			</td>
+		</tr>
+        <tr><td width="10" nowrap>&nbsp;</td></tr>
+          <!--Menu Eintrag Reihungstest-->
+		<tr>
+          	<td nowrap><a href="?reihungstest" class="MenuItem1" onClick="return(js_toggle_container('Reihungstest'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Reihungstest</a></td>
+        </tr>
+		<tr>
+          	<td nowrap>
+		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Reihungstest" style="display:block;">
+			  	<tr>
+			  		<td width="10" nowrap>&nbsp;</td>
+					<td nowrap><a class="MenuItem2" href="stammdaten/reihungstestverwaltung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Verwaltung</a></td>
 			  	</tr>
 			  	<tr><td width="10" nowrap>&nbsp;</td></tr>
 			  	</table>

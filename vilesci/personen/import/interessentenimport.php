@@ -109,6 +109,7 @@ if($studiengang_kz=='' && isset($_GET['studiengang_kz']))
 $person_id = (isset($_REQUEST['person_id'])?$_REQUEST['person_id']:'');
 $ueberschreiben = (isset($_REQUEST['ueberschreiben'])?$_REQUEST['ueberschreiben']:'');
 $studiensemester_kurzbz = (isset($_REQUEST['studiensemester_kurzbz'])?$_REQUEST['studiensemester_kurzbz']:'');
+$ausbildungssemester = (isset($_REQUEST['ausbildungssemester'])?$_REQUEST['ausbildungssemester']:'');
 //end Parameter
 $geburtsdatum_error=false;
 
@@ -324,7 +325,7 @@ if(isset($_POST['save']))
 		$rolle->prestudent_id = $prestudent->prestudent_id;
 		$rolle->rolle_kurzbz = 'Interessent';
 		$rolle->studiensemester_kurzbz = $studiensemester_kurzbz;
-		$rolle->ausbildungssemester = 1;
+		$rolle->ausbildungssemester = $ausbildungssemester;
 		$rolle->datum = date('Y-m-d');
 		$rolle->insertamum = date('Y-m-d H:i:s');
 		$rolle->insertvon = $user;
@@ -434,6 +435,12 @@ foreach ($stsem->studiensemester as $row)
 	echo '<OPTION value="'.$row->studiensemester_kurzbz.'" '.($row->studiensemester_kurzbz==$studiensemester_kurzbz?'selected':'').'>'.$row->studiensemester_kurzbz.'</OPTION>';
 echo '</SELECT>';
 echo '</td></tr>';
+echo '<tr><td>Ausbildungssemester</td><td><SELECT id="ausbildungssemester" name="ausbildungssemester">';
+for ($i=1;$i<9;$i++)
+	echo '<OPTION value="'.$i.'" '.($i==$ausbildungssemester?'selected':'').'>'.$i.'. Semester</OPTION>';
+echo '</SELECT>';
+echo '</td></tr>';
+
 echo '<tr><tr><td></td><td>';
 
 if(($geburtsdatum=='' && $vorname=='' && $nachname=='') || $geburtsdatum_error)

@@ -384,6 +384,16 @@ else
 
 			$stsem->load($ss);
 
+			$qry = "SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='$student->prestudent_id' AND studiensemester_kurzbz='$ss'";
+			$semester=0;
+			if($result = pg_query($conn, $qry))
+			{
+				if($row = pg_fetch_object($result))
+				{
+					$semester = $row->ausbildungssemester;
+				}
+			}
+			
 			echo '
 			<student>
 				<uid><![CDATA['.$student->uid.']]></uid>
@@ -396,7 +406,7 @@ else
 				<matrikelnummer><![CDATA['.$student->matrikelnr.']]></matrikelnummer>
 				<geburtsdatum><![CDATA['.$datum_obj->convertISODate($student->gebdatum).']]></geburtsdatum>
 				<geburtsdatum_iso><![CDATA['.$student->gebdatum.']]></geburtsdatum_iso>
-				<semester><![CDATA['.$student->semester.']]></semester>
+				<semester><![CDATA['.$semester.']]></semester>
 				<verband><![CDATA['.$student->verband.']]></verband>
 				<gruppe><![CDATA['.$student->gruppe.']]></gruppe>
 				<studiengang_kz><![CDATA['.sprintf("%04d",$student->studiengang_kz).']]></studiengang_kz>

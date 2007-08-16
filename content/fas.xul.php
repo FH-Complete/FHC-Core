@@ -88,6 +88,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-dokumente-diplsupplement:command" oncommand="StudentCreateDiplSupplement();"/>
   <command id="menu-dokumente-studienerfolg-normal:command" oncommand="StudentCreateStudienerfolg();"/>
   <command id="menu-dokumente-studienerfolg-finanzamt:command" oncommand="StudentCreateStudienerfolg('finanzamt');"/>
+  <command id="menu-extras-reihungstest:command" oncommand="ExtrasShowReihungstest();"/>
   <command id="menu-help-close:command" oncommand="OpenAboutDialog()"/>
 </commandset>
 
@@ -253,6 +254,16 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 	               accesskey = "&menu-dokumente-studienerfolg-finanzamt.accesskey;"/>
 	            </menupopup>
 	        </menu>
+          </menupopup>
+    </menu>
+    <menu id="menu-extras" label="&menu-extras.label;" accesskey="&menu-extras.accesskey;">
+          <menupopup id="menu-extras-popup">
+            <menuitem
+               id        =  "menu-extras-reihungstest"
+               key       =  "menu-extras-reihungstest:key"
+               label     = "&menu-extras-reihungstest.label;"
+               command   =  "menu-extras-reihungstest:command"
+               accesskey = "&menu-extras-reihungstest.accesskey;"/>
           </menupopup>
     </menu>
     <menu id="menu-help" label="&menu-help.label;" accesskey="&menu-help.accesskey;">
