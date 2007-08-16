@@ -10,8 +10,8 @@
 	require_once('../../../vilesci/config.inc.php');
 	require_once('../../../include/zeugnisnote.class.php');
 	require_once('../../../include/pruefung.class.php');
-	$adress='fas_sync@technikum-wien.at';
-	//$adress='raab@technikum-wien.at';
+	//$adress='fas_sync@technikum-wien.at';
+	$adress='raab@technikum-wien.at';
 
 	$conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 	$conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur Vilesci Datenbank fehlgeschlagen");
@@ -38,6 +38,7 @@
 	$anz_students_processed = 0;
 	$stg_processed = "";
 	$fas_lvs_notinsync = array();
+	$stud_no_ext_id = array();
 
 	$headtext='';
 	$head_stg_text="Dies ist eine automatische Mail!\n\nFolgende Fehler sind bei der Synchronisation der Lehrveranstaltungen aufgetreten:\n\n";
@@ -61,7 +62,7 @@
 			$mitarbeiter_arr[$row->ext_id] = $row->mitarbeiter_uid;
 	}
 
-	//array aller studenten (ext_id->mitarbeiter_uid)
+	//array aller studenten (ext_id->student_uid)
 	$sqlstr = "SELECT ext_id, student_uid FROM tbl_student";
 	if($result = pg_query($conn, $sqlstr))
 	{
@@ -339,7 +340,7 @@
 			//$fasnoten_arr = getNoten4Student($conn_fas,$row->student_fk);
 			$fasnoten_arr = getNoten4Studiengang($conn_fas,$row->studiengang_pk);
 			
-			$stg_processed .= $row->kuerzel." / ";
+			$stg_processed .= $row->kuerzel." (".$row->studiengang_pk.") / ";
 
 			$studkeys_arr = array_keys($fasnoten_arr);
 			foreach ($studkeys_arr as $studkey)
@@ -462,6 +463,8 @@
 							{
 								$insert_error_zeug++;
 								$text .= "<span style='background-color:#cccccc;'>Zeugnis: Datensatz FAS ID".$idkey.": student_uid ohne zuordnung</span><br>";
+								if (!in_array($studkey, $stud_no_ext_id))								
+									$stud_no_ext_id[] = $studkey;
 							}
 							else if ($lehrveranstaltung_id == "FEHLT")
 							{
@@ -560,6 +563,10 @@
 	foreach ($fas_lvs_notinsync as $lv_id)
 		$text .= $lv_id."; ";
 	$text .= "<br>";
+	$text .= "Studenten Ext-IDs: ";
+	foreach ($stud_no_ext_id as $stud_ext_id)
+		$text .= $stud_ext_id."; ";
+	$text .= "<br>";
 
 	$stopzeit = time();
 	$runzeit = $stopzeit - $startzeit;
@@ -567,7 +574,7 @@
 
 	$text.="\nEND OF SYNCHRONISATION\n";
 
-	if (mail($adress,"FAS - Vilesci (Noten/Pruefungen)",$headtext."\n\n".$text,"From: vilesci@technikum-wien.at"))
+	if (mail($adress,"FAS - Vilesci (Noten/Pruefungen)",$headtext."\n\n<html><body>".$text."</body></html>","From: vilesci@technikum-wien.at\nContent-Type: text/html\n"))
 		$sendmail=true;
 	else
 		$sendmail=false;
