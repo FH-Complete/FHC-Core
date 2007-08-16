@@ -30,7 +30,7 @@
 					<fo:block-container position="absolute" top="63mm" left="25mm" height="20mm">
 						<fo:block text-align="left" line-height="20pt" font-family="sans-serif" font-size="18pt">
 							<fo:inline font-weight="900">
-							<xsl:text>Studiengang\n </xsl:text>
+							<xsl:value-of select="studiengang_art" />\n
 							<xsl:value-of select="studiengang" />
 							</fo:inline>
 						</fo:block>
@@ -38,14 +38,25 @@
 					
 
 
-					<fo:block-container position="absolute" top="85mm" left="25mm" height="10mm">
-						<fo:block text-align="right" line-height="14pt" font-family="sans-serif" font-size="10pt" content-width="165mm">
+					<fo:block-container position="absolute" top="85mm" left="145mm">
+						<fo:block line-height="14pt" font-family="sans-serif" font-size="10pt">
 							<xsl:text>Personenkennzahl: </xsl:text>
+						</fo:block>
+					</fo:block-container>
+					<fo:block-container position="absolute" top="85mm" left="177mm">
+						<fo:block line-height="14pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
 							<xsl:value-of select="matrikelnr" />
-							<xsl:text>\nKennzahl des Studiengangs: </xsl:text>
+						</fo:block>
+					</fo:block-container>
+					<fo:block-container position="absolute" top="90mm" left="143mm">
+						<fo:block line-height="14pt" font-family="sans-serif" font-size="10pt">
+							<xsl:text>Kennzahl des Studiengangs: </xsl:text>
+						</fo:block>
+					</fo:block-container>
+					<fo:block-container position="absolute" top="90mm" left="189mm">
+						<fo:block line-height="14pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
 							<xsl:value-of select="studiengang_kz" />
-							<xsl:text> </xsl:text>
-                        </fo:block>
+						</fo:block>
 					</fo:block-container> 
 
 					<fo:block-container position="absolute" top="102mm" left="25mm" height="10mm">
@@ -61,7 +72,7 @@
 									<fo:table-cell>
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
 												<fo:inline font-weight="900">	
-												<xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="nachname" />
+												<xsl:value-of select="name" />
 												</fo:inline>
 											</fo:block>
 									</fo:table-cell>
@@ -94,7 +105,7 @@
 								<fo:table-row  line-height="10pt">
 									<fo:table-cell border-width="0.2mm" border-style="solid">
 										<fo:block font-size="8pt" font-weight="bold">
-										 Unterrichtsfach\n
+										 Lehrveranstaltung\n
 										</fo:block>
 									</fo:table-cell>
 									<fo:table-cell border-width="0.2mm" border-style="solid">
