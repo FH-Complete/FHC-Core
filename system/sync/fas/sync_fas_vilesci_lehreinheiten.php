@@ -133,14 +133,14 @@ if($result = pg_query($conn_fas, $qry))
 	}
 }
 
-$qry_main = "SELECT *, lehreinheit.lehreinheit_fk as le_fk, mitarbeiter_lehreinheit.creationdate as lm_creationdate,
+$qry_main = "SELECT *,lehreinheit.creationdate::timestamp as insertamum, lehreinheit.lehreinheit_fk as le_fk, mitarbeiter_lehreinheit.creationdate::timestamp as lm_creationdate,
 			lehreinheit.ivar1 as wochenrythmus, lehreinheit.ivar2 as start_kw, lehreinheit.ivar3 as stundenblockung,
 			lehreinheit.creationuser as lecu, mitarbeiter_lehreinheit.rvar1 as lektorgesamtstunden
 		FROM lehreinheit left outer join mitarbeiter_lehreinheit
 		ON lehreinheit.lehreinheit_pk=mitarbeiter_lehreinheit.lehreinheit_fk
 		ORDER BY lehreinheit.lehreinheit_fk;";
-/* test bei tkit 1.Semester WS2007
-$qry_main = "SELECT *, lehreinheit.lehreinheit_fk as le_fk, mitarbeiter_lehreinheit.creationdate as lm_creationdate,
+// test bei tkit 1.Semester WS2007
+/*$qry_main = "SELECT *,lehreinheit.creationdate::timestamp as insertamum, lehreinheit.lehreinheit_fk as le_fk, mitarbeiter_lehreinheit.creationdate::timestamp as lm_creationdate,
 			lehreinheit.ivar1 as wochenrythmus, lehreinheit.ivar2 as start_kw, lehreinheit.ivar3 as stundenblockung,
 			lehreinheit.creationuser as lecu, mitarbeiter_lehreinheit.rvar1 as lektorgesamtstunden
 		FROM lehreinheit left outer join mitarbeiter_lehreinheit
@@ -172,7 +172,7 @@ if($result = pg_query($conn_fas, $qry_main))
 		$lvnr				=$row->nummer;
 		//$updateamum		='';
 		$updatevon			='SYNC';
-		$insertamum			=$row->creationdate;
+		$insertamum			=$row->insertamum;
 		//$insertvon			='';
 		$ext_id			=$row->lehreinheit_pk;
 		$kurzbezeichnung		=$row->kurzbezeichnung;
