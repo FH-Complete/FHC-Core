@@ -139,6 +139,14 @@ $qry_main = "SELECT *, lehreinheit.lehreinheit_fk as le_fk, mitarbeiter_lehreinh
 		FROM lehreinheit left outer join mitarbeiter_lehreinheit
 		ON lehreinheit.lehreinheit_pk=mitarbeiter_lehreinheit.lehreinheit_fk
 		ORDER BY lehreinheit.lehreinheit_fk;";
+/* test bei tkit 1.Semester WS2007
+$qry_main = "SELECT *, lehreinheit.lehreinheit_fk as le_fk, mitarbeiter_lehreinheit.creationdate as lm_creationdate,
+			lehreinheit.ivar1 as wochenrythmus, lehreinheit.ivar2 as start_kw, lehreinheit.ivar3 as stundenblockung,
+			lehreinheit.creationuser as lecu, mitarbeiter_lehreinheit.rvar1 as lektorgesamtstunden
+		FROM lehreinheit left outer join mitarbeiter_lehreinheit
+		ON lehreinheit.lehreinheit_pk=mitarbeiter_lehreinheit.lehreinheit_fk WHERE studiengang_fk='27' and studiensemester_fk='12' and ausbildungssemester_fk='245' 
+		ORDER BY lehreinheit.lehreinheit_fk;";
+*/
 //WHERE mitarbeiter_fk='1512'
 //WHERE mitarbeiter_lehreinheit_pk IN ('63232','63344','63231','47087')
 if($result = pg_query($conn_fas, $qry_main))
@@ -160,7 +168,7 @@ if($result = pg_query($conn_fas, $qry_main))
 		$sprache			='German';
 		$lehre				=true;
 		$anmerkung			=$row->bemerkungen;
-		$unr				="";
+		$unr				=$row->nummer;
 		$lvnr				=$row->nummer;
 		//$updateamum		='';
 		$updatevon			='SYNC';
@@ -215,6 +223,7 @@ if($result = pg_query($conn_fas, $qry_main))
 		if($error)
 		{
 			$anzahl_fehler++;
+			//echo $error_log;
 			continue;
 		}
 		//studiengang ermitteln
@@ -236,11 +245,13 @@ if($result = pg_query($conn_fas, $qry_main))
 		if(in_array($studiengang_kz, $dont_sync_php))
 		{
 			//bereits umgestellte Stg. werden nicht bearbeitet
+			//echo "Stg.:".$studiengang." bereits umgestellt.";
 			continue;
 		}
 		if($error)
 		{
 			$anzahl_fehler++;
+			//echo $error_log;
 			continue;
 		}
 		//lehrfach ermitteln
@@ -297,6 +308,7 @@ if($result = pg_query($conn_fas, $qry_main))
 		if($error)
 		{
 			$anzahl_fehler++;
+			//echo $error_log;
 			continue;
 		}
 
@@ -457,6 +469,7 @@ if($result = pg_query($conn_fas, $qry_main))
 		if($error)
 		{
 			$anzahl_fehler++;
+			//echo $error_log;
 			continue;
 		}
 		if($lehreinheit_part<0 || $lehreinheit_part==null)
@@ -539,6 +552,7 @@ if($result = pg_query($conn_fas, $qry_main))
 			{
 				$mja=false;
 			}
+			
 			if($gja==false && $mja==false)
 			{
 				//ext_ids nicht gefunden
@@ -694,6 +708,30 @@ if($result = pg_query($conn_fas, $qry_main))
 									$ausgabe_le="Anmerkung: '".$anmerkung."' statt('".$row2->anmerkung."')";
 								}
 							}
+							if($row2->unr!=$unr)
+							{
+								$update=true;
+								if(strlen(trim($ausgabe_le))>0)
+								{
+									$ausgabe_le.=", UNr: '".$unr."' statt('".$row2->unr."')";
+								}
+								else
+								{
+									$ausgabe_le="UNr: '".$unr."' statt('".$row2->unr."')";
+								}
+							}
+							if($row2->lvnr!=$lvnr)
+							{
+								$update=true;
+								if(strlen(trim($ausgabe_le))>0)
+								{
+									$ausgabe_le.=", LVNr: '".$lvnr."' statt('".$row2->lvnr."')";
+								}
+								else
+								{
+									$ausgabe_le="LVNr: '".$lvnr."' statt('".$row2->lvnr."')";
+								}
+							}
 							if(date("d.m.Y", $row2->insertamum)!=date("d.m.Y", $insertamum))
 							{
 								$update=true;
@@ -731,6 +769,8 @@ if($result = pg_query($conn_fas, $qry_main))
 								//"sprache=".myaddslashes($sprache).", ".
 								"lehre=".($lehre?'true':'false').", ".
 								"anmerkung=".myaddslashes($anmerkung).", ".
+								"unr=".myaddslashes($unr).", ".
+								"lvnr=".myaddslashes($lvnr).", ".
 								"updateamum=now(), ".
 								"updatevon=".myaddslashes($updatevon).", ".
 								"insertamum=".myaddslashes($insertamum).", ".
@@ -961,6 +1001,30 @@ if($result = pg_query($conn_fas, $qry_main))
 								$ausgabe_le="Anmerkung: '".$anmerkung."' statt('".$row3->anmerkung."')";
 							}
 						}
+						if($row3->unr!=$unr)
+						{
+							$update=true;
+							if(strlen(trim($ausgabe_le))>0)
+							{
+								$ausgabe_le.=", UNr: '".$unr."' statt('".$row3->unr."')";
+							}
+							else
+							{
+								$ausgabe_le="UNr: '".$unr."' statt('".$row3->unr."')";
+							}
+						}
+						if($row3->lvnr!=$lvnr)
+						{
+							$update=true;
+							if(strlen(trim($ausgabe_le))>0)
+							{
+								$ausgabe_le.=", LVNr: '".$lvnr."' statt('".$row3->lvnr."')";
+							}
+							else
+							{
+								$ausgabe_le="LVNr: '".$lvnr."' statt('".$row3->lvnr."')";
+							}
+						}
 						if(date("d.m.Y", $row3->insertamum)!=date("d.m.Y", $insertamum))
 						{
 							$update=true;
@@ -996,6 +1060,8 @@ if($result = pg_query($conn_fas, $qry_main))
 							"raumtyp=".myaddslashes($raumtyp).", ".
 							"raumtypalternativ=".myaddslashes($raumtypalternativ).", ".
 							//"sprache=".myaddslashes($sprache).", ".
+							"unr=".myaddslashes($unr).", ".
+							"lvnr=".myaddslashes($lvnr).", ".
 							"lehre=".($lehre?'true':'false').", ".
 							"anmerkung=".myaddslashes($anmerkung).", ".
 							"updateamum=now(), ".
@@ -1452,7 +1518,7 @@ if($result = pg_query($conn_fas, $qry_main))
 							else
 							{
 								$anzahl_fehler_lg++;
-								echo $qry."<br>";
+								//echo $qry."<br>";
 								$error=true;
 								$error_log.="Lehreinheitgruppe mit LE '".$lehreinheit_id."' in Studiengang '".$studiengang_kz."' konnte nicht eingefügt werden!\n";
 							}
