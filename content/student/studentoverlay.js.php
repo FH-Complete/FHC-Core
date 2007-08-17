@@ -1303,7 +1303,10 @@ function StudentPrestudentRolleDelete()
 	
 	var col = tree.columns ? tree.columns["student-prestudent-tree-rolle-prestudent_id"] : "student-prestudent-tree-rolle-prestudent_id";
 	var prestudent_id=tree.view.getCellText(tree.currentIndex,col);
-	
+
+	var col = tree.columns ? tree.columns["student-prestudent-tree-rolle-ausbildungssemester"] : "student-prestudent-tree-rolle-ausbildungssemester";
+	var ausbildungssemester=tree.view.getCellText(tree.currentIndex,col);
+
 	if(confirm('Diese Rolle wirklich loeschen?'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
@@ -1314,6 +1317,7 @@ function StudentPrestudentRolleDelete()
 		req.add('rolle_kurzbz', rolle_kurzbz);
 		req.add('prestudent_id', prestudent_id);
 		req.add('studiensemester_kurzbz', studiensemester_kurzbz);
+		req.add('ausbildungssemester', ausbildungssemester);
 
 		var response = req.executePOST();
 
@@ -1332,6 +1336,83 @@ function StudentPrestudentRolleDelete()
 			SetStatusBarText('Daten wurden geloescht');
 		}
 	}
+}
+
+// ****
+// * oeffnet den BearbeitenDialog fuer die Prestudentrollen
+// ****
+function StudentRolleBearbeiten()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-prestudent-tree-rolle');
+
+	if (tree.currentIndex==-1) return;
+
+	//Ausgewaehlte Nr holen
+    var col = tree.columns ? tree.columns["student-prestudent-tree-rolle-rolle_kurzbz"] : "student-prestudent-tree-rolle-rolle_kurzbz";
+	var rolle_kurzbz=tree.view.getCellText(tree.currentIndex,col);
+
+	var col = tree.columns ? tree.columns["student-prestudent-tree-rolle-studiensemester_kurzbz"] : "student-prestudent-tree-rolle-studiensemester_kurzbz";
+	var studiensemester_kurzbz=tree.view.getCellText(tree.currentIndex,col);
+	
+	var col = tree.columns ? tree.columns["student-prestudent-tree-rolle-prestudent_id"] : "student-prestudent-tree-rolle-prestudent_id";
+	var prestudent_id=tree.view.getCellText(tree.currentIndex,col);
+
+	var col = tree.columns ? tree.columns["student-prestudent-tree-rolle-ausbildungssemester"] : "student-prestudent-tree-rolle-ausbildungssemester";
+	var ausbildungssemester=tree.view.getCellText(tree.currentIndex,col);
+
+	window.open('<?php echo APP_ROOT?>content/student/studentrolledialog.xul.php?prestudent_id='+prestudent_id+'&rolle_kurzbz='+rolle_kurzbz+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&ausbildungssemester='+ausbildungssemester,"","chrome, status=no, width=500, height=300, centerscreen, resizable");
+}
+
+// ****
+// * Speichert die Daten aus dem BearbeitenDialog
+// ****
+function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_old)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	prestudent_id = dialog.getElementById('student-rolle-textbox-prestudent_id').value;
+	rolle_kurzbz = dialog.getElementById('student-rolle-textbox-rolle_kurzbz').value;
+	studiensemester_kurzbz = dialog.getElementById('student-rolle-menulist-studiensemester').value;
+	ausbildungssemester = dialog.getElementById('student-rolle-menulist-ausbildungssemester').value;
+	datum = dialog.getElementById('student-rolle-datum-datum').value;
+	
+	if(!CheckDatum(datum))
+	{
+		alert('Datum ist ungueltig');
+		return false;
+	}
+	
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'saverolle');
+
+	req.add('rolle_kurzbz', rolle_kurzbz);
+	req.add('prestudent_id', prestudent_id);
+	req.add('studiensemester_kurzbz', studiensemester_kurzbz);
+	req.add('studiensemester_old', studiensemester_old);
+	req.add('ausbildungssemester_old', ausbildungssemester_old);
+	req.add('ausbildungssemester', ausbildungssemester);
+	req.add('datum', datum);
+
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+		return false;
+	}
+	else
+	{
+		StudentDetailRolleTreeDatasource.Refresh(false);
+		SetStatusBarText('Daten wurden geloescht');
+		return true;
+	}	
 }
 
 // ****

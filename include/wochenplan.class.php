@@ -458,7 +458,7 @@ class wochenplan
 	/**************************************************************************
 	 * Zeichnen der Stundenplanwoche in HTML
 	 */
-	function draw_week($user_uid)
+	function draw_week($user_uid='')
 	{
 		// Stundentafel abfragen
 		$sql_query="SELECT stunde, beginn, ende FROM lehre.tbl_stunde ORDER BY stunde";

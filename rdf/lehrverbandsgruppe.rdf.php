@@ -143,6 +143,13 @@ while ($row=pg_fetch_object($result))
 			<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
 			<VERBAND:typ>absage</VERBAND:typ>
 		</RDF:Description>
+		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/incoming'; ?>" >
+			<VERBAND:name>Incoming</VERBAND:name>
+			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
+			<VERBAND:stg_kz><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
+			<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
+			<VERBAND:typ>incoming</VERBAND:typ>
+		</RDF:Description>
 		<?php
 		}
    	}
@@ -257,6 +264,7 @@ while ($row=pg_fetch_object($result))
 				echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/aufgenommen\" />\n";
 				echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/warteliste\" />\n";
 				echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/absage\" />\n";
+				echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/incoming\" />\n";
 
 				echo "\t\t\t</RDF:Seq>\n\t\t\t</RDF:li>\n";
 			}

@@ -70,7 +70,7 @@
 											</fo:block>
 									</fo:table-cell>
 									<fo:table-cell>
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="12pt" content-width="45mm" text-align="left">
 												<fo:inline font-weight="900">	
 												<xsl:value-of select="name" />
 												</fo:inline>
@@ -102,25 +102,25 @@
 						
 
 							<fo:table-body>
-								<fo:table-row  line-height="10pt">
+								<fo:table-row  line-height="14pt">
 									<fo:table-cell border-width="0.2mm" border-style="solid">
-										<fo:block font-size="10pt" font-weight="bold">
+										<fo:block font-size="14pt" font-weight="bold">
 										 Lehrveranstaltung\n
 										</fo:block>
 									</fo:table-cell>
 									<fo:table-cell border-width="0.2mm" border-style="solid">
-										<fo:block font-size="10pt" font-weight="bold" content-width="30mm" text-align="center">
+										<fo:block font-size="14pt" font-weight="bold" content-width="30mm" text-align="center">
 											 Note\n
 										</fo:block>
 									</fo:table-cell>
 									
 									<fo:table-cell border-width="0.2mm" border-style="solid">
-										<fo:block font-size="10pt" font-weight="bold" content-width="25mm" text-align="center">
+										<fo:block font-size="14pt" font-weight="bold" content-width="25mm" text-align="center">
 										 Anzahl\n SWS
 										</fo:block>
 									</fo:table-cell>
 									<fo:table-cell border-width="0.2mm" border-style="solid">
-										<fo:block font-size="10pt" font-weight="bold" content-width="25mm" text-align="center">
+										<fo:block font-size="14pt" font-weight="bold" content-width="25mm" text-align="center">
 										ECTS\n Punkte
 										</fo:block>
 									</fo:table-cell>	
@@ -229,11 +229,11 @@
 	</xsl:template>
 	
 	<xsl:template match="unterrichtsfach">
-		<fo:table-row  line-height="10pt">
-			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"><xsl:text> </xsl:text><xsl:value-of select="bezeichnung" /></fo:block></fo:table-cell>
-			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="30mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="note" /></fo:block></fo:table-cell>
-			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="25mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="sws" /></fo:block></fo:table-cell>
-			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="25mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="ects" /></fo:block></fo:table-cell>
+		<fo:table-row  line-height="16pt">
+			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="12pt"><xsl:text> </xsl:text><xsl:value-of select="bezeichnung" /></fo:block></fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="12pt" content-width="30mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="note" /></fo:block></fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="12pt" content-width="25mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="sws" /></fo:block></fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="12pt" content-width="25mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="ects" /></fo:block></fo:table-cell>
 		</fo:table-row>
 	</xsl:template>
 </xsl:stylesheet >

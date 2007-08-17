@@ -486,7 +486,8 @@ if(!$error)
 		//Datensatz selbst angelegt wurde
 		
 		if(isset($_POST['studiensemester_kurzbz']) && isset($_POST['rolle_kurzbz']) && 
-		   isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id']))
+		   isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id']) &&
+		   isset($_POST['ausbildungssemester']) && is_numeric($_POST['ausbildungssemester']))
 		{
 			if($_POST['rolle_kurzbz']=='Student')
 			{
@@ -496,11 +497,11 @@ if(!$error)
 			else 
 			{
 				$rolle = new prestudent($conn, null, true);
-				if($rolle->load_rolle($_POST['prestudent_id'],$_POST['rolle_kurzbz'],$_POST['studiensemester_kurzbz']))
+				if($rolle->load_rolle($_POST['prestudent_id'],$_POST['rolle_kurzbz'],$_POST['studiensemester_kurzbz'], $_POST['ausbildungssemester']))
 				{				
 					if($rechte->isBerechtigt('admin',0) || $rolle->insertvon == $user)
 					{
-						if($rolle->delete_rolle($_POST['prestudent_id'],$_POST['rolle_kurzbz'],$_POST['studiensemester_kurzbz']))
+						if($rolle->delete_rolle($_POST['prestudent_id'],$_POST['rolle_kurzbz'],$_POST['studiensemester_kurzbz'], $_POST['ausbildungssemester']))
 						{
 							$return = true;
 						}
@@ -528,6 +529,44 @@ if(!$error)
 			$return = false;
 			$errormsg = 'Fehlerhafte Parameteruebergabe';
 		}		
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='saverolle')
+	{
+		//Prestudentrolle speichern
+		if(!$error)
+		{
+			if(isset($_POST['prestudent_id']))
+			{
+				$rolle = new prestudent($conn);
+				if(!$rolle->load_rolle($_POST['prestudent_id'], $_POST['rolle_kurzbz'], $_POST['studiensemester_old'], $_POST['ausbildungssemester_old']))
+				{
+					$errormsg = 'Rolle konnte nicht geladen werden';
+					$return = false;
+				}
+				else 
+				{				
+					$rolle->ausbildungssemester = $_POST['ausbildungssemester'];
+					$rolle->ausbildungssemester_old = $_POST['ausbildungssemester_old'];
+					$rolle->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
+					$rolle->studiensemester_old = $_POST['studiensemester_old'];
+					$rolle->datum = $_POST['datum'];
+					$rolle->new = false;
+					
+					if($rolle->save_rolle())
+						$return = true;
+					else 
+					{
+						$return = false;
+						$errormsg = $rolle->errormsg;
+					}
+				}
+			}
+			else 
+			{
+				$return = false;
+				$errormsg = 'Prestudent_id muss angegeben werden';
+			}
+		}
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='BewerberZuStudent')
 	{

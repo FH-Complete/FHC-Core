@@ -225,7 +225,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <vbox id="student-prestudent" style="overflow:auto; margin:0px;" flex="1">
 <popupset>
 	<popup id="student-prestudent-rolle-tree-popup">
-		<menuitem label="Entfernen" oncommand="StudentPrestudentRolleDelete();" id="student-prestudent-rolle-tree-popup-delete" hidden="false"/>
+		<menuitem label="Bearbeiten" oncommand="StudentRolleBearbeiten();" id="student-prestudent-rolle-tree-popup-edit" hidden="false"/>
+		<menuitem label="Entfernen" oncommand="StudentPrestudentRolleDelete();" id="student-prestudent-rolle-tree-popup-delete" hidden="false"/>		
 	</popup>
 </popupset>
 		<vbox hidden="true">
@@ -439,6 +440,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							style="margin-left:10px;margin-right:10px;margin-bottom:5px;" height="100px" enableColumnDrag="true"
 							flags="dont-build-content"
 							context="student-prestudent-rolle-tree-popup"
+							ondblclick="StudentRolleBearbeiten()"
 					>
 						<treecols>
 							<treecol id="student-prestudent-tree-rolle-rolle_kurzbz" label="Kurzbz" flex="2" hidden="false" primary="true"
