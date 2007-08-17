@@ -53,10 +53,10 @@ function myaddslashes($var)
 </head>
 <body>
 <?php
-//nation
-$qry="SELECT * FROM person, student
-WHERE person_pk=person_fk AND uid IS NOT null AND uid<>'' AND perskz IS NOT null AND perskz<>''
-ORDER BY Familienname, Vorname;";
+$qry="SELECT * FROM person, student, studiengang
+WHERE person_pk=person_fk AND student.studiengang_fk=studiengang.studiengang_pk ".$dont_sync_sql_fas."
+	AND uid IS NOT null AND uid<>'' AND perskz IS NOT null AND perskz<>''
+;"; //ORDER BY Familienname, Vorname
 
 if($result = pg_query($conn_fas, $qry))
 {
@@ -299,7 +299,8 @@ if($result = pg_query($conn_fas, $qry))
 										"'true', ".
 										"null, ".
 										"null);"	;
-									pg_query($conn, $qryinsl);
+									if (!pg_query($conn, $qryinsl))
+										echo pg_last_error($conn).'<BR>'.$qryinsl;
 								}
 							}
 							$qry="SELECT * FROM public.tbl_studentlehrverband WHERE student_uid='".$student_uid."' AND studiensemester_kurzbz='".$studiensemester_kurzbz."';";
