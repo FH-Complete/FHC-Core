@@ -31,6 +31,8 @@ require_once('../../../include/kontakt.class.php');
 require_once('../../../include/adresse.class.php');
 require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/datum.class.php');
+require_once('../../../include/benutzer.class.php');
+require_once('../../../include/student.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
 	die('Fehler beim Herstellen der DB Connection');
@@ -110,8 +112,91 @@ $person_id = (isset($_REQUEST['person_id'])?$_REQUEST['person_id']:'');
 $ueberschreiben = (isset($_REQUEST['ueberschreiben'])?$_REQUEST['ueberschreiben']:'');
 $studiensemester_kurzbz = (isset($_REQUEST['studiensemester_kurzbz'])?$_REQUEST['studiensemester_kurzbz']:'');
 $ausbildungssemester = (isset($_REQUEST['ausbildungssemester'])?$_REQUEST['ausbildungssemester']:'');
+$incoming = (isset($_REQUEST['incoming'])?true:false);
 //end Parameter
 $geburtsdatum_error=false;
+
+// ****
+// * Generiert die Matrikelnummer
+// * FORMAT: 0710254001
+// * 07 = Jahr
+// * 1/2/0  = WS/SS/incoming
+// * 0254 = Studiengangskennzahl vierstellig
+// * 001 = Laufende Nummer
+// ****
+function generateMatrikelnummer($conn, $studiengang_kz, $studiensemester_kurzbz)
+{
+	$jahr = substr($studiensemester_kurzbz, 4);	
+	$art =0;
+	
+	$matrikelnummer = sprintf("%02d",$jahr).$art.sprintf("%04d",$studiengang_kz);
+	
+	$qry = "SELECT matrikelnr FROM public.tbl_student WHERE matrikelnr LIKE '$matrikelnummer%' ORDER BY matrikelnr DESC LIMIT 1";
+	
+	if($result = pg_query($conn, $qry))
+	{
+		if($row = pg_fetch_object($result))
+		{
+			$max = substr($row->matrikelnr,7);
+		}
+		else 
+			$max = 0;
+		
+		$max += 1;
+		return $matrikelnummer.sprintf("%03d",$max);
+	}
+	else 
+	{
+		return false;
+	}
+}
+
+// ****
+// * Generiert die UID
+// * FORMAT: el07b001
+// * el = studiengangskuerzel
+// * 07 = Jahr
+// * b/m/d/x = Bachelor/Master/Diplom/incoming
+// * 001 = Laufende Nummer ( Wenn StSem==SS dann wird zur nummer 500 dazugezaehlt)
+// ****
+function generateUID($conn, $matrikelnummer)
+{
+	$jahr = substr($matrikelnummer,0, 2);
+	$art = substr($matrikelnummer, 2, 1);
+	$stg = substr($matrikelnummer, 3, 4);
+	$nr = substr($matrikelnummer, 7);
+	
+	if($art=='2')
+		$nr = $nr+500;
+	
+	$stg_obj = new studiengang($conn);
+	$stg_obj->load(ltrim($stg,'0'));
+	
+	return $stg_obj->kurzbz.$jahr.($art!='0'?$stg_obj->typ:'x').$nr;	
+}
+function clean_string($string)
+ {
+ 	$trans = array("ä" => "ae",
+ 				   "Ä" => "Ae",
+ 				   "ö" => "oe",
+ 				   "Ö" => "Oe",
+ 				   "ü" => "ue",
+ 				   "Ü" => "Ue",
+ 				   "á" => "a",
+ 				   "à" => "a",
+ 				   "é" => "e",
+ 				   "è" => "e",
+ 				   "ó" => "o",
+ 				   "ò" => "o",
+ 				   "í" => "i",
+ 				   "ì" => "i",
+ 				   "ù" => "u",
+ 				   "ú" => "u",
+ 				   "ß" => "ss");
+	$string = strtr($string, $trans);
+    return ereg_replace("[^a-zA-Z0-9]", "", $string);
+    //[:space:]
+ }
 
 if($studiensemester_kurzbz == '')
 {
@@ -317,13 +402,16 @@ if(isset($_POST['save']))
 		}
 	}
 
-	//Prestudent Rolle Anlegen
 	if(!$error)
 	{
+		//Prestudent Rolle Anlegen			
 		$rolle = new prestudent($conn);
 
 		$rolle->prestudent_id = $prestudent->prestudent_id;
-		$rolle->rolle_kurzbz = 'Interessent';
+		if(!$incoming)
+			$rolle->rolle_kurzbz = 'Interessent';
+		else
+			$rolle->rolle_kurzbz = 'Incoming';
 		$rolle->studiensemester_kurzbz = $studiensemester_kurzbz;
 		$rolle->ausbildungssemester = $ausbildungssemester;
 		$rolle->datum = date('Y-m-d');
@@ -341,10 +429,78 @@ if(isset($_POST['save']))
 			$error = false;
 	}
 
+	if(!$error && $incoming)
+	{
+		//Matrikelnummer und UID generieren
+		$matrikelnr = generateMatrikelnummer($conn, $studiengang_kz, $studiensemester_kurzbz);
+		$uid = generateUID($conn, $matrikelnr);
+						
+		//Benutzerdatensatz anlegen
+		$benutzer = new benutzer($conn);
+		$benutzer->uid = $uid;
+		$benutzer->person_id = $person->person_id;
+		$benutzer->aktiv = true;
+							
+		$qry_alias = "SELECT * FROM public.tbl_benutzer WHERE alias=LOWER('".clean_string($person->vorname).".".clean_string($person->nachname)."')";
+		$result_alias = pg_query($conn, $qry_alias);
+		if(pg_num_rows($result_alias)==0)								
+			$benutzer->alias = strtolower(clean_string($person->vorname).'.'.clean_string($person->nachname));
+		else 
+			$benutzer->alias = '';
+									
+		$benutzer->insertamum = date('Y-m-d H:i:s');
+		$benutzer->insertvon = $user;
+																	
+		if($benutzer->save(true, false))
+		{
+			//Studentendatensatz anlegen
+			$student = new student($conn);
+			$student->uid = $uid;
+			$student->matrikelnr = $matrikelnr;
+			$student->prestudent_id = $prestudent->prestudent_id;
+			$student->studiengang_kz = $studiengang_kz;
+			$student->semester = $ausbildungssemester;
+			$student->verband = ' ';
+			$student->gruppe = ' ';
+			$student->insertamum = date('Y-m-d H:i:s');
+			$student->insertvon = $user;
+			
+			if($student->save(true, false))
+			{
+				//StudentLehrverband anlegen
+				$studentlehrverband = new student($conn);
+				$studentlehrverband->uid = $uid;
+				$studentlehrverband->studiensemester_kurzbz = $studiensemester_kurzbz;
+				$studentlehrverband->studiengang_kz = $studiengang_kz;
+				$studentlehrverband->semester = $ausbildungssemester;
+				$studentlehrverband->verband = ' ';
+				$studentlehrverband->gruppe = ' ';
+				$studentlehrverband->insertamum = date('Y-m-d H:i:s');
+				$studentlehrverband->insertvon = $user;
+					
+				if(!$studentlehrverband->save_studentlehrverband(true))
+				{
+					$error = true;
+					$errormsg = 'StudentLehrverband konnte nicht angelegt werden';
+				}
+			}
+			else 
+			{
+				$error = true;
+				$errormsg = 'Student konnte nicht angelegt werden: '.$student->errormsg;
+			}
+		}
+		else 
+		{
+			$error = true;
+			$errormsg = 'Benutzer konnte nicht angelegt werden:'.$benutzer->errormsg;
+		}
+	}
+	
 	if(!$error)
 	{
 		pg_query($conn, 'COMMIT');
-		die("<b>Interessent $vorname $nachname wurde erfolgreich angelegt</b><br>");
+		die("<b>".($incoming?'Incomming':'Interessent')." $vorname $nachname wurde erfolgreich angelegt</b><br>");
 	}
 	else
 	{
@@ -440,7 +596,7 @@ for ($i=1;$i<9;$i++)
 	echo '<OPTION value="'.$i.'" '.($i==$ausbildungssemester?'selected':'').'>'.$i.'. Semester</OPTION>';
 echo '</SELECT>';
 echo '</td></tr>';
-
+echo '<tr><td>incoming:</td><td><input type="checkbox" name="incoming" '.($incoming?'checked':'').' /></td></tr>';
 echo '<tr><tr><td></td><td>';
 
 if(($geburtsdatum=='' && $vorname=='' && $nachname=='') || $geburtsdatum_error)

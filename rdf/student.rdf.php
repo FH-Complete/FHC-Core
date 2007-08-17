@@ -223,6 +223,36 @@ if($xmlformat=='rdf')
 				}
 			}
 	}
+	elseif($typ=='incoming')
+	{
+		$qry = "SELECT prestudent_id FROM public.tbl_prestudentrolle WHERE rolle_kurzbz='Incoming' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+		if($result = pg_query($conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$student=new student($conn,null,true);
+				if($uid = $student->getUid($row->prestudent_id))
+				{
+					//Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann
+					//nochmal laden aber ohne studiensemester
+					if(!$student->load($uid, $studiensemester_kurzbz))
+						$student->load($uid);
+				}
+				$prestd = new prestudent($conn, null, true);
+				$prestd->load($row->prestudent_id);
+				if($uid!='')
+				{
+					draw_content($student);
+					draw_prestudent($prestd);
+				}
+				else
+				{
+					draw_content($prestd);
+					draw_prestudent($prestd);
+				}
+			}
+		}
+	}
 	elseif(in_array($typ, array('prestudent', 'interessenten','bewerber','aufgenommen',
 	                      'warteliste','absage','zgv','reihungstestangemeldet',
 	                      'reihungstestnichtangemeldet')))

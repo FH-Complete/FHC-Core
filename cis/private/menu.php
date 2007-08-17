@@ -42,7 +42,7 @@ $fkt->getAll($user);
 
 $stg_obj = new studiengang($db_conn);
 
-if($stg_obj->getAll('kurzbzlang'))
+if($stg_obj->getAll('kurzbzlang', false))
 {
 	$stg = array();
 	foreach($stg_obj->result as $row)

@@ -116,35 +116,52 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		
 		$obj->getZeugnisnoten($lehrveranstaltung_id=null, $uid_arr[$i], $studiensemester_kurzbz);
 
+		$qry = "SELECT wochen FROM public.tbl_semesterwochen WHERE studiengang_kz='$row->studiengang_kz' AND semester='$row->semester'";
+		$wochen = 15;
+		if($result_wochen = pg_query($conn, $qry))
+		{
+			if($row_wochen = pg_fetch_object($result_wochen))
+			{
+				$wochen = $row_wochen->wochen;
+			}
+		}
+		
 		$gesamtstunden=0;
 		$gesamtects=0;
 		$notensumme=0;
 		$anzahl=0;
 		foreach ($obj->result as $row)	
 		{
-			if ($row->note)
-				$note = $note_arr[$row->note];
-			else
-				$note = "";
-			$xml .= "			<unterrichtsfach>";
-			$xml .= "				<bezeichnung>".$row->lehrveranstaltung_bezeichnung."</bezeichnung>";
-			$xml .= "				<note>".$note."</note>";
-			$xml .= "				<sws>".$row->semesterstunden."</sws>";
-			$xml .= "				<ects>".$row->ects."</ects>";
-			if($row->benotungsdatum!='')
-				$xml .= "				<benotungsdatum>".date('d.m.Y',$datum->mktime_fromtimestamp($row->benotungsdatum))."</benotungsdatum>";
-			$xml .= "			</unterrichtsfach>";
-			
-			$gesamtstunden +=$row->semesterstunden;
-			$gesamtects += $row->ects;
-			if(is_numeric($note))
+			if($row->zeugnis && $row->note!=5)
 			{
-				$notensumme += $note;
-				$anzahl++;
+				if ($row->note)
+					$note = $note_arr[$row->note];
+				else
+					$note = "";
+				$xml .= "			<unterrichtsfach>";
+				$xml .= "				<bezeichnung>".$row->lehrveranstaltung_bezeichnung."</bezeichnung>";
+				$xml .= "				<note>".$note."</note>";
+				$xml .= "				<sws>".sprintf('%.1f',$row->semesterstunden/$wochen)."</sws>";
+				$xml .= "				<ects>".$row->ects."</ects>";
+				if($row->benotungsdatum!='')
+					$xml .= "				<benotungsdatum>".date('d.m.Y',$datum->mktime_fromtimestamp($row->benotungsdatum))."</benotungsdatum>";
+				$xml .= "			</unterrichtsfach>";
+				
+				$gesamtstunden +=$row->semesterstunden;
+				$gesamtects += $row->ects;
+				if(is_numeric($note))
+				{
+					$notensumme += $note;
+					$anzahl++;
+				}
 			}
 		}
-		if($anzahl=!0)
-			$schnitt = $notensumme/$anzahl;
+		
+		
+		if($anzahl!=0)
+		{
+			$schnitt = ($notensumme/$anzahl);
+		}
 		else 
 			$schnitt = 0;
 		$xml .= "		<gesamtstunden>$gesamtstunden</gesamtstunden>";

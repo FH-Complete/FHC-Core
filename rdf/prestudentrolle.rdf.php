@@ -47,14 +47,19 @@ if(isset($_GET['studiensemester_kurzbz']))
 else 
 	$studiensemester_kurzbz=null;
 
+if(isset($_GET['ausbildungssemester']))
+	$ausbildungssemester=$_GET['ausbildungssemester'];
+else 
+	$ausbildungssemester=null;
+	
 $ps = new prestudent($conn);
-$ps->getPrestudentRolle($prestudent_id, $rolle_kurzbz, $studiensemester_kurzbz);
+$ps->getPrestudentRolle($prestudent_id, $rolle_kurzbz, $studiensemester_kurzbz, 'datum, insertamum', $ausbildungssemester);
 
 foreach($ps->result as $row)
 {
 	echo '
 	  <RDF:li>
-      	<RDF:Description  id="'.$row->prestudent_id.'/'.$row->rolle_kurzbz.'/'.$row->studiensemester_kurzbz.'"  about="'.$rdf_url.'/'.$row->prestudent_id.'/'.$row->rolle_kurzbz.'/'.$row->studiensemester_kurzbz.'" >
+      	<RDF:Description  id="'.$row->prestudent_id.'/'.$row->rolle_kurzbz.'/'.$row->studiensemester_kurzbz.'/'.$row->ausbildungssemester.'"  about="'.$rdf_url.'/'.$row->prestudent_id.'/'.$row->rolle_kurzbz.'/'.$row->studiensemester_kurzbz.'/'.$row->ausbildungssemester.'" >
         	<ROLLE:prestudent_id><![CDATA['.$row->prestudent_id.']]></ROLLE:prestudent_id>
         	<ROLLE:rolle_kurzbz><![CDATA['.$row->rolle_kurzbz.']]></ROLLE:rolle_kurzbz>
         	<ROLLE:studiensemester_kurzbz><![CDATA['.$row->studiensemester_kurzbz.']]></ROLLE:studiensemester_kurzbz>

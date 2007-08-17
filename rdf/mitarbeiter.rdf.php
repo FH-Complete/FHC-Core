@@ -116,7 +116,7 @@ if($lehrveranstaltung_id==null && $filter==null)
 	$ma=$mitarbeiter->getMitarbeiter($lektor,$fixangestellt,$stg_kz,$fachbereich_id);
 	
 	$stg_obj = new studiengang($conn);
-	$stg_obj->getAll();
+	$stg_obj->getAll('typ, kurzbz', false);
 	foreach ($stg_obj->result as $stg)
 		$stg_arr[$stg->studiengang_kz]=$stg->kuerzel;
 	
