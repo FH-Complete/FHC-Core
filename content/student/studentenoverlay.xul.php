@@ -178,6 +178,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#mail_intern" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
+	    				<treecol id="student-treecol-anmerkungen" label="Anmerkungen" flex="1" hidden="true"
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#anmerkungen" onclick="StudentTreeSort()"/>
+	    				<splitter class="tree-splitter"/>
 					</treecols>
 
 					<template>
@@ -187,9 +191,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 	         						<treerow>
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#uid"   />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#titelpre" />
-	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#vorname" />
-	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#vornamen" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#nachname" />
+	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#vorname" />
+	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#vornamen" />	           							
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#titelpost" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#svnr" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#geburtsdatum" />
@@ -204,6 +208,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#status" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#mail_privat" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#mail_intern" />
+	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#anmerkungen" />
 	         						</treerow>
 	       						</treeitem>
 	      					</treechildren>
