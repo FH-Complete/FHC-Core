@@ -108,6 +108,12 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#titelpre" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
+    					<treecol id="student-treecol-nachname" label="Nachname" flex="1" hidden="false"
+	    					sortActive="true"
+	    					sortDirection="ascending"
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#nachname" onclick="StudentTreeSort()"/>
+	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-vorname" label="Vorname" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#vorname" onclick="StudentTreeSort()"/>
@@ -115,12 +121,6 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 	    				<treecol id="student-treecol-vornamen" label="Vornamen" flex="1" hidden="true"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#vornamen" onclick="StudentTreeSort()"/>
-	    				<splitter class="tree-splitter"/>
-	    				<treecol id="student-treecol-nachname" label="Nachname" flex="1" hidden="false"
-	    					sortActive="true"
-	    					sortDirection="ascending"
-	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/student/rdf#nachname" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-titelpost" label="TitelPost" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
