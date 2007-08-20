@@ -478,7 +478,7 @@ if (!isset($_GET["notenuebersicht"]))
 						$stud_bsp_obj->beispiel_id = $row->beispiel_id;
 						
 						$row->check_anzahl_studentbeispiel($row->beispiel_id);
-						if (($row->anzahl_studentbeispiel >= $ueb_hlp_obj->maxstd) && isset($_POST['problem_'.$row->beispiel_id]))
+						if (($row->anzahl_studentbeispiel >= $ueb_hlp_obj->maxstd) && isset($_POST['problem_'.$row->beispiel_id]) && $stud_bsp_obj->new)
 						{
 							echo "<span class='error'>Beispiel kann nicht mehr angekreuzt werden<br></span>";
 							$error = true;					
