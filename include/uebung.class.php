@@ -222,6 +222,14 @@ class uebung
 			return false;	
 	}
 
+	function get_next_nummer()
+	{
+		$qry = "SELECT max(nummer) FROM campus.tbl_uebung";
+		$result = pg_query($this->conn, $qry);
+		$row = pg_fetch_object($result);
+		$next = $row->max + 1;
+		$this->next_nummer = $next;
+	}
 	
 	function load_uebung($lehreinheit_id, $level=null, $uebung_id=null)
 	{

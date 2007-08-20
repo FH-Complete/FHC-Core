@@ -176,6 +176,7 @@ if (isset($_GET["deletefile"])){
 	unlink($filename);
 }
 
+//notenschlüssel anlegen
 if (isset($_POST["schluessel"]) && $_POST["schluessel"]=='Speichern')
 {
 	$punkte_arr = array();
@@ -198,7 +199,6 @@ if (isset($_POST["schluessel"]) && $_POST["schluessel"]=='Speichern')
 				echo "<span class='error'>Daten konnten nicht gespeichert werden</span>";
 		}
 	}
-
 }
 //Kopfzeile
 echo '<table class="tabcontent" height="100%">';
@@ -480,6 +480,8 @@ if(isset($_POST['uebung_neu']) || isset($_POST['abgabe_neu']))
 			$uebung_obj->maxstd = $maxstd;
 			$uebung_obj->maxbsp = $maxbsp;
 			$uebung_obj->gewicht = $gewicht;
+			$uebung_obj->get_next_nummer();
+			$uebung_obj->nummer = $uebung_obj->next_nummer;	
 
 			if($uebung_obj->save(true))
 			{
@@ -513,6 +515,8 @@ if(isset($_POST['uebung_neu']) || isset($_POST['abgabe_neu']))
 					$beispiel_obj->updatevon = $user;
 					$beispiel_obj->insertamum = date('Y-m-d H:i:s');
 					$beispiel_obj->insertvon = $user;
+					$beispiel_obj->get_next_nummer();
+					$beispiel_obj->nummer = $beispiel_obj->next_nummer;
 
 					if(!$beispiel_obj->save(true))
 						$error_msg = $beispiel_obj->errormsg;
@@ -720,7 +724,7 @@ if(isset($_POST['liste_edit']))
 	{
 		
 		$uebung_obj = new uebung($conn);
-		$uebung_obj->load($uebung_id);
+		$uebung_obj->load($_GET['liste_id']);
 		$uebung_obj->gewicht=$gewicht;
 		$uebung_obj->punkte='';
 		$uebung_obj->angabedatei='';
@@ -769,6 +773,7 @@ if(isset($_POST['beispiel_neu']) || isset($_POST['beispiel_edit']))
 					$beispiel_obj = new beispiel($conn);
 					if(isset($_POST['beispiel_edit']))
 					{
+						$beispiel_obj->load($beispiel_id);					
 						$beispiel_obj->beispiel_id= $beispiel_id;
 						$beispiel_obj->new=false;
 					}
@@ -777,6 +782,8 @@ if(isset($_POST['beispiel_neu']) || isset($_POST['beispiel_edit']))
 						$beispiel_obj->new=true;
 						$beispiel_obj->insertamum = date('Y-m-d H:i:s');
 						$beispiel_obj->insertvon = $user;
+						$beispiel_obj->get_next_nummer();
+						$beispiel_obj->nummer = $beispiel_obj->next_nummer;
 					}
 
 					$beispiel_obj->uebung_id = $uebung_id;
