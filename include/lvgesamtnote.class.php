@@ -44,6 +44,7 @@ class lvgesamtnote
 	var $insertamum;				// timestamp
 	var $insertvon;					// varchar(16)
 	var $bemerkung;					// text
+	var $freigabevon_uid;			//varchar(16)
 	
 	var $lehrveranstaltung_bezeichung;
 	var $note_bezeichnung;
@@ -113,6 +114,7 @@ class lvgesamtnote
 				$this->insertamum = $row->insertamum;
 				$this->inservon = $row->insertvon;
 				$this->bemerkung = $row->bemerkung;
+				$this->freigabevon_uid = $row->freigabevon_uid;
 				return true;				
 			}
 			else 
@@ -195,13 +197,14 @@ class lvgesamtnote
 		if($new)
 		{
 			//Neuen Datensatz einfuegen					
-			$qry='INSERT INTO campus.tbl_lvgesamtnote (lehrveranstaltung_id, student_uid, studiensemester_kurzbz, mitarbeiter_uid, note, freigabedatum, benotungsdatum, bemerkung, updateamum, updatevon, insertamum, insertvon) VALUES('.
+			$qry='INSERT INTO campus.tbl_lvgesamtnote (lehrveranstaltung_id, student_uid, studiensemester_kurzbz, mitarbeiter_uid, note, freigabedatum, freigabevon_uid, benotungsdatum, bemerkung, updateamum, updatevon, insertamum, insertvon) VALUES('.
 			     $this->addslashes($this->lehrveranstaltung_id).', '.
 			     $this->addslashes($this->student_uid).', '.
 			     $this->addslashes($this->studiensemester_kurzbz).', '.
 			     $this->addslashes($this->mitarbeiter_uid).', '.
 			     $this->addslashes($this->note).', '.
 			     $this->addslashes($this->freigabedatum).', '.
+			     $this->addslashes($this->freigabevon_uid).', '.
 			     $this->addslashes($this->benotungsdatum).', '.
 			     $this->addslashes($this->bemerkung).', '.
 			     $this->addslashes($this->updateamum).', '.
@@ -214,6 +217,7 @@ class lvgesamtnote
 			$qry='UPDATE campus.tbl_lvgesamtnote SET '.
 				'note='.$this->addslashes($this->note).', '. 
 				'freigabedatum='.$this->addslashes($this->freigabedatum).', '.
+				'freigabevon_uid='.$this->addslashes($this->freigabevon_uid).', '.
 				'benotungsdatum='.$this->addslashes($this->benotungsdatum).', '.
 				'bemerkung='.$this->addslashes($this->bemerkung).', '.
 				'mitarbeiter_uid='.$this->addslashes($this->mitarbeiter_uid).', '.
@@ -298,6 +302,7 @@ class lvgesamtnote
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$obj->note = $row->note;
 				$obj->freigabedatum = $row->freigabedatum;
+				$obj->freigabevon_uid = $row->freigabevon_uid;
 				$obj->benotungsdatum = $row->benotungsdatum;
 				$obj->updateamum = $row->updateamum;
 				$obj->udpatevon = $row->updatevon;

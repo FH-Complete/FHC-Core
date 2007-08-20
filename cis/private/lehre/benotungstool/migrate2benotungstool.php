@@ -44,7 +44,7 @@ $inserted = 0;
 $upgedated = 0;
 $text = "";
 
-$qry = "SELECT DISTINCT(lehreinheit_id) from campus.tbl_uebung where lehreinheit_id = 2429 order by lehreinheit_id";
+$qry = "SELECT DISTINCT(lehreinheit_id) from campus.tbl_uebung order by lehreinheit_id";
 if($result = pg_query($conn, $qry))
 {
 	while($row = pg_fetch_object($result))
@@ -56,8 +56,10 @@ if($result = pg_query($conn, $qry))
 		if ($anzahl->count > 0)
 		{
 		
+						
 			$datum_obj = new datum();
 			$uebung_obj = new uebung($conn);
+			$uebung_obj->get_next_nummer();
 			$uebung_obj->gewicht=1;
 			$uebung_obj->punkte='';
 			$uebung_obj->angabedatei='';
@@ -65,7 +67,7 @@ if($result = pg_query($conn, $qry))
 			$uebung_obj->freigabebis = null;
 			$uebung_obj->abgabe=false;
 			$uebung_obj->beispiele=false;
-			$uebung_obj->bezeichnung="Uebung";
+			$uebung_obj->bezeichnung="Kreuzerllisten";
 			$uebung_obj->positiv=false;
 			$uebung_obj->defaultbemerkung='';
 			$uebung_obj->lehreinheit_id=$row->lehreinheit_id;
@@ -75,12 +77,13 @@ if($result = pg_query($conn, $qry))
 			$uebung_obj->insertvon = "sync";
 			$uebung_obj->statistik = false;
 			$uebung_obj->liste_id = null;
+			$uebung_obj->nummer = $uebung_obj->next_nummer;
 			
 			if($uebung_obj->save(true))
 			{
 				$inserted++;				
 				$liste_id = $uebung_obj->uebung_id;
-				$update_qry = "UPDATE campus.tbl_uebung set liste_id = '".$liste_id."' where lehreinheit_id = '".$row->lehreinheit_id."' and uebung_id != '".$liste_id."'";
+				$update_qry = "UPDATE campus.tbl_uebung set liste_id = '".$liste_id."' where lehreinheit_id = '".$row->lehreinheit_id."' and uebung_id != '".$liste_id."' and beispiele = 't'";
 				$r = pg_query($conn, $update_qry);
 				$upgedated += pg_affected_rows($r);
 			}

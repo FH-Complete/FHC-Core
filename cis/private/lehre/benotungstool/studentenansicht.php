@@ -36,6 +36,7 @@ require_once('../../../../include/datum.class.php');
 require_once('../../../../include/studentnote.class.php');
 require_once('../../../../include/legesamtnote.class.php');
 require_once('../../../../include/lvgesamtnote.class.php');
+require_once('../../../../include/zeugnisnote.class.php');
 include('functions.inc.php');
 
 if(!$conn = pg_pconnect(CONN_STRING))
@@ -652,10 +653,12 @@ if (!isset($_GET["notenuebersicht"]))
 			if($row = pg_fetch_object($result))
 				$punkte_eingetragen = ($row->punkteeingetragen!=''?$row->punkteeingetragen:0);
 		
-		//Gesamtpunkte alle Kreuzerllisten
+		//Gesamtpunkte alle Kreuzerllisten in dieser Übung
+		$ueb_help = new uebung($conn, $uebung_id);
+		$liste_id = $ueb_help->liste_id;
 		$qry = "SELECT sum(tbl_beispiel.punkte) as punktegesamt_alle FROM campus.tbl_beispiel, campus.tbl_uebung
 				WHERE tbl_uebung.uebung_id=tbl_beispiel.uebung_id AND
-				tbl_uebung.lehreinheit_id='$lehreinheit_id'";
+				tbl_uebung.lehreinheit_id='$lehreinheit_id' and tbl_uebung.liste_id = '$liste_id'";
 		$punkte_gesamt_alle=0;
 		if($result=pg_query($conn, $qry))
 			if($row = pg_fetch_object($result))
@@ -666,6 +669,7 @@ if (!isset($_GET["notenuebersicht"]))
 				WHERE tbl_beispiel.beispiel_id = tbl_studentbeispiel.beispiel_id AND
 				tbl_uebung.uebung_id=tbl_beispiel.uebung_id AND
 				tbl_uebung.lehreinheit_id='$lehreinheit_id' AND
+				tbl_uebung.liste_id = '$liste_id' AND 
 				tbl_studentbeispiel.student_uid='$user' AND vorbereitet=true";
 		$punkte_eingetragen_alle=0;
 		if($result=pg_query($conn, $qry))
@@ -674,7 +678,7 @@ if (!isset($_GET["notenuebersicht"]))
 		
 		//Mitarbeitspunkte
 		$qry = "SELECT sum(mitarbeitspunkte) as mitarbeitspunkte FROM campus.tbl_studentuebung JOIN campus.tbl_uebung USING(uebung_id)
-				WHERE lehreinheit_id='$lehreinheit_id' AND student_uid='$user'";
+				WHERE lehreinheit_id='$lehreinheit_id' AND student_uid='$user' AND liste_id = '$liste_id'";
 		$mitarbeit_alle=0;
 		if($result=pg_query($conn, $qry))
 			if($row = pg_fetch_object($result))
@@ -892,13 +896,13 @@ else
 				if ($row->positiv)
 					echo "*";
 				echo "		</td>\n";
-				echo "		<td>".$row->gewicht."</td>\n";
-				echo "		<td>";
+				echo "		<td align='center'>".$row->gewicht."</td>\n";
+				echo "		<td align='center'>";
 				if ($l1note->punkte_gesamt_l1 >0)		
 					echo $l1note->punkte_gesamt_l1;
 				echo "</td>\n";
-				echo "<td></td>";
-				echo "<td>".$l1_note."</td>\n";
+				echo "<td align='center'></td>";
+				echo "<td align='center'>".$l1_note."</td>\n";
 				echo "	</tr>\n";
 				
 			}
@@ -916,23 +920,23 @@ else
 					if ($subrow->positiv)
 						echo "*";
 					echo "		</td>\n";
-					echo "		<td>\n";
+					echo "		<td align='center'>\n";
 					if ($subrow->abgabe)
 						echo $subrow->gewicht;
 					echo "		</td>\n";
 					if ($subrow->beispiele)
 					{
 						$l1note->calc_punkte($subrow->uebung_id, $user);
-						echo "		<td>".$l1note->punkte_gesamt."</td>";
-						echo "		<td></td>\n";	
-						echo "		<td></td>\n";				
+						echo "		<td align='center'>".$l1note->punkte_gesamt."</td>";
+						echo "		<td align='center'></td>\n";	
+						echo "		<td align='center'></td>\n";				
 					}
 					else if ($subrow->abgabe)
 					{
 						$l1note->calc_note($subrow->uebung_id, $user);
-						echo "		<td></td>\n";	
-						echo "		<td>".$l1note->note."</td>";	
-						echo "		<td></td>\n";		
+						echo "		<td align='center'></td>\n";	
+						echo "		<td align='center'>".$l1note->note."</td>";	
+						echo "		<td align='center'></td>\n";		
 					}
 					echo "	</tr>\n";					/*
 					if($datum_obj->mktime_fromtimestamp($subrow->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($subrow->freigabebis)>time())
@@ -950,7 +954,7 @@ else
 			$gesamtnote = 5;
 		else
 			$gesamtnote = $l1note->studentgesamtnote;
-		echo "<tr style='background-color:#dddddd;'><td colspan='5'>Errechnete Gesamtnote: </td><td>".$gesamtnote."</td></tr>";
+		echo "<tr style='background-color:#dddddd;'><td colspan='5'>Errechnete Gesamtnote: </td><td align='center'>".$gesamtnote."</td></tr>";
 	
 		
 		echo "</table>";
@@ -975,6 +979,12 @@ else
 	}
 	else
 		$lvnote = null;
+	if ($zeugnisnote = new zeugnisnote($conn, $lvid,$user,$stsem))
+	{
+		$znote = $zeugnisnote->note;
+	}
+	else
+		$znote = null;
 	
 	echo "<table style='border: 1px #dddddd solid'>\n";
 	echo "	<tr><th colspan='2'>Eingetragene Noten</th></tr>";
@@ -985,6 +995,10 @@ else
 	echo "<tr>\n";
 	echo "<td>Lehrveranstaltung</td>";
 	echo "<td>".$lvnote."</td>";
+	echo "</tr>\n";
+	echo "<tr>\n";
+	echo "<td>Zeugnis</td>";
+	echo "<td>".$znote."</td>";
 	echo "</tr>\n";
 	echo "</table>";
 	

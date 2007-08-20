@@ -236,6 +236,7 @@ if (isset($_REQUEST["submit"]) && ($_POST["student_uid"] != '')){
 		$lvgesamtnote->mitarbeiter_uid = $user;
 		$lvgesamtnote->benotungsdatum = $jetzt;
 		$lvgesamtnote->freigabedatum = null;
+		$lvgesamtnote->freigabevon_uid = null;
 		$lvgesamtnote->bemerkung = null;
 		$lvgesamtnote->updateamum = null;
 		$lvgesamtnote->updatevon = null;
@@ -256,10 +257,10 @@ if (isset($_REQUEST["submit"]) && ($_POST["student_uid"] != '')){
 }
 
 // eingetragene lv-gesamtnoten freigeben
-if (isset($_GET["freigabe"]) and ($_GET["freigabe"] == 1))
+if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 {
 	$jetzt = date("Y-m-d H:i:s");
-	
+	$studlist = "";
 	$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id' ORDER BY semester, verband, gruppe, gruppe_kurzbz";
 	
 	if($result_grp = pg_query($conn, $qry))
@@ -284,6 +285,7 @@ if (isset($_GET["freigabe"]) and ($_GET["freigabe"] == 1))
 	        if($result_stud = pg_query($conn, $qry_stud))
 			{
 				$i=1;
+				
 				while($row_stud = pg_fetch_object($result_stud))
 				{	
 					$lvgesamtnote = new lvgesamtnote($conn);
@@ -292,14 +294,26 @@ if (isset($_GET["freigabe"]) and ($_GET["freigabe"] == 1))
 						if ($lvgesamtnote->benotungsdatum > $lvgesamtnote->freigabedatum)	    				
 						{	    				
 	    					$lvgesamtnote->freigabedatum = $jetzt;
+	    					$lvgesamtnote->freigabevon_uid = $user;
 	    					$lvgesamtnote->save($new=null);
+	    					$studlist .= $row_stud->matrikelnr." ".$row_stud->nachname." ".$row_stud->vorname."<br>";
 	    				}
 	    			}
-				}
+				}	
 			}
 		}
 	}
-
+	//mail an assistentin und den user selber verschicken	
+	if ($studlist != "")
+	{
+		$lv = new lehrveranstaltung($conn, $lvid);
+		$sg = new studiengang($conn, $lv->studiengang_kz);
+		$adress = $user."@technikum-wien.at";
+		$adressen = $sg->email.", ".$user."@technikum-wien.at";
+		
+		$freigeber = "<b>".strtoupper($user)."</b>";
+		mail($adress,"Notenfreigabe ".$lv->bezeichnung,"<html><body><b>".$lv->bezeichnung."</b><br><br>Benutzer ".$freigeber." hat die LV-Noten f&uuml;r folgende Studenten freigegeben:<br>".$studlist."<br>Mail wurde verschickt an: ".$adressen."</body></html>","From: vilesci@technikum-wien.at\nContent-Type: text/html\n");
+	}	
 
 
 
@@ -329,7 +343,9 @@ if($result_grp = pg_query($conn, $qry))
 				<td class='ContentHeader2'>LE-Noten (LE-ID)</td>
 				<td class='ContentHeader2'></td>
 				<td class='ContentHeader2'>LV-Note</td>
-				<td class='ContentHeader2'><a href='lvgesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem&freigabe=1'><input type='button' name='frei' value='Freigabe'></a></td>
+				<form name='freigabeform' action='lvgesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem' method='POST'><input type='hidden' name='freigabe' value='1'>
+				<td class='ContentHeader2'><input type='submit' name='frei' value='Freigabe'></a></td>
+				</form>
 				<td class='ContentHeader2'>Zeugnisnote</td>
 			</tr>
 			<tr>
