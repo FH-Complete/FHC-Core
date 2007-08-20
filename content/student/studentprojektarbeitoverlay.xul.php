@@ -178,6 +178,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<textbox id="student-projektarbeit-textbox-titel" disabled="true" maxlength="256" />
 						</row>
 						<row>
+							<label value="Themenbereich" control="student-projektarbeit-textbox-themenbereich"/>
+							<textbox id="student-projektarbeit-textbox-themenbereich" disabled="true" maxlength="64"/>
+						</row>
+						<row>
 							<label value="Typ" control="student-projektarbeit-menulist-projekttyp"/>
 							<menulist id="student-projektarbeit-menulist-projekttyp" disabled="true"
 							          datasources="<?php echo APP_ROOT ?>rdf/projekttyp.rdf.php" flex="1"
@@ -194,7 +198,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<row>
 							<label value="Firma" control="student-projektarbeit-menulist-firma"/>
 							<menulist id="student-projektarbeit-menulist-firma" disabled="true"
-							          datasources="<?php echo APP_ROOT ?>rdf/firma.rdf.php" flex="1"
+							          datasources="<?php echo APP_ROOT ?>rdf/firma.rdf.php?optional=true" flex="1"
 							          ref="http://www.technikum-wien.at/firma/liste" >
 								<template>
 									<menupopup>
@@ -202,20 +206,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							        		      label="rdf:http://www.technikum-wien.at/firma/rdf#name"
 										  		  uri="rdf:*"/>
 										</menupopup>
-								</template>
-							</menulist>
-						</row>
-						<row>
-							<label value="Note" control="student-projektarbeit-menulist-note"/>
-							<menulist id="student-projektarbeit-menulist-note" disabled="true"
-							          datasources="<?php echo APP_ROOT ?>rdf/note.rdf.php" flex="1"
-							          ref="http://www.technikum-wien.at/note/liste" >
-								<template>
-									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
-							        		      label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
-										  		  uri="rdf:*"/>
-									</menupopup>
 								</template>
 							</menulist>
 						</row>
@@ -249,31 +239,43 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								</template>
 							</menulist>
 						</row>
+					</rows>
+				</grid>
+				<grid style="margin:4px;" flex="1">
+				  	<columns  >
+						<column flex="1"/>
+						<column flex="5"/>
+						<column flex="1"/>
+						<column flex="5"/>
+					</columns>
+					<rows>
 						<row>
 							<label value="Punkte" control="student-projektarbeit-textbox-punkte" />
 							<hbox>
 								<textbox id="student-projektarbeit-textbox-punkte" maxlength="5" size="5" disabled="true"/>
 							</hbox>
+							<label value="Note" control="student-projektarbeit-menulist-note"/>
+							<menulist id="student-projektarbeit-menulist-note" disabled="true"
+							          datasources="<?php echo APP_ROOT ?>rdf/note.rdf.php?optional=true" flex="1"
+							          ref="http://www.technikum-wien.at/note/liste" >
+								<template>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
+							        		      label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
+										  		  uri="rdf:*"/>
+									</menupopup>
+								</template>
+							</menulist>
 						</row>
 						<row>
 							<label value="Beginn" control="student-projektarbeit-datum-beginn"/>
 							<box class="Datum" id="student-projektarbeit-datum-beginn" disabled="true" />
-						</row>
-						<row>
 							<label value="Ende" control="student-projektarbeit-datum-ende"/>
 							<box class="Datum" id="student-projektarbeit-datum-ende" disabled="true" />
 						</row>
 						<row>
-							<label value="Faktor" control="student-projektarbeit-textbox-faktor"/>
-							<hbox>
-								<textbox id="student-projektarbeit-textbox-faktor" disabled="true" maxlength="3" size="3"/>
-							</hbox>
-						</row>
-						<row>
 							<label value="Freigegeben" control="student-projektarbeit-checkbox-freigegeben"/>
 							<checkbox id="student-projektarbeit-checkbox-freigegeben" disabled="true" />
-						</row>
-						<row>
 							<label value="Gesperrt bis" control="student-projektarbeit-datum-gesperrtbis"/>
 							<box class="Datum" id="student-projektarbeit-datum-gesperrtbis" disabled="true" />
 						</row>
@@ -282,16 +284,16 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<hbox>
 								<textbox id="student-projektarbeit-textbox-stundensatz" disabled="true" maxlength="5" size="5"/>
 							</hbox>
+							<label value="Faktor" control="student-projektarbeit-textbox-faktor"/>
+							<hbox>
+								<textbox id="student-projektarbeit-textbox-faktor" disabled="true" maxlength="3" size="3"/>
+							</hbox>
 						</row>
 						<row>
 							<label value="Gesamtstunden" control="student-projektarbeit-textbox-gesamtstunden"/>
 							<hbox>
 								<textbox id="student-projektarbeit-textbox-gesamtstunden" disabled="true" maxlength="8" size="8"/>
 							</hbox>
-						</row>
-						<row>
-							<label value="Themenbereich" control="student-projektarbeit-textbox-themenbereich"/>
-							<textbox id="student-projektarbeit-textbox-themenbereich" disabled="true" maxlength="64"/>
 						</row>
 						<row>
 							<label value="Anmerkung" control="student-projektarbeit-textbox-anmerkung"/>
@@ -417,38 +419,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								</menulist>
 							</row>
 							<row>
-								<label value="Note" control="student-projektbetreuer-menulist-note"/>
-								<menulist id="student-projektbetreuer-menulist-note" disabled="true"
-								          datasources="<?php echo APP_ROOT ?>rdf/note.rdf.php?optional=true" flex="1"
-								          ref="http://www.technikum-wien.at/note/liste" >
-									<template>
-										<menupopup>
-											<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
-								        		      label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
-											  		  uri="rdf:*"/>
-										</menupopup>
-									</template>
-								</menulist>
-							</row>
-							<row>
-								<label value="Faktor" control="student-projektbetreuer-textbox-faktor"/>
-								<textbox id="student-projektbetreuer-textbox-faktor" disabled="true" maxlength="3"/>
-							</row>
-							<row>
 								<label value="Name" control="student-projektbetreuer-textbox-name"/>
 								<textbox id="student-projektbetreuer-textbox-name" disabled="true" maxlength="32"/>
-							</row>
-							<row>
-								<label value="Punkte" control="student-projektbetreuer-textbox-punkte"/>
-								<textbox id="student-projektbetreuer-textbox-punkte" disabled="true" maxlength="6"/>
-							</row>
-							<row>
-								<label value="Stunden" control="student-projektbetreuer-textbox-stunden"/>
-								<textbox id="student-projektbetreuer-textbox-stunden" disabled="true" maxlength="8"/>
-							</row>
-							<row>
-								<label value="Stundensatz" control="student-projektbetreuer-textbox-stundensatz"/>
-								<textbox id="student-projektbetreuer-textbox-stundensatz" disabled="true" maxlength="5"/>
 							</row>
 							<row>
 								<label value="Art" control="student-projektbetreuer-menulist-betreuerart"/>
@@ -463,6 +435,36 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										</menupopup>
 									</template>
 								</menulist>
+							</row>
+							<row>
+								<label value="Note" control="student-projektbetreuer-menulist-note"/>
+								<menulist id="student-projektbetreuer-menulist-note" disabled="true"
+								          datasources="<?php echo APP_ROOT ?>rdf/note.rdf.php?optional=true" flex="1"
+								          ref="http://www.technikum-wien.at/note/liste" >
+									<template>
+										<menupopup>
+											<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
+								        		      label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
+											  		  uri="rdf:*"/>
+										</menupopup>
+									</template>
+								</menulist>
+							</row>
+							<row>
+								<label value="Punkte" control="student-projektbetreuer-textbox-punkte"/>
+								<textbox id="student-projektbetreuer-textbox-punkte" disabled="true" maxlength="6"/>
+							</row>
+							<row>
+								<label value="Stunden" control="student-projektbetreuer-textbox-stunden"/>
+								<textbox id="student-projektbetreuer-textbox-stunden" disabled="true" maxlength="8"/>
+							</row>
+							<row>
+								<label value="Stundensatz" control="student-projektbetreuer-textbox-stundensatz"/>
+								<textbox id="student-projektbetreuer-textbox-stundensatz" disabled="true" maxlength="5"/>
+							</row>
+							<row>
+								<label value="Faktor" control="student-projektbetreuer-textbox-faktor"/>
+								<textbox id="student-projektbetreuer-textbox-faktor" disabled="true" maxlength="3"/>
 							</row>
 							<row>
 								<spacer />

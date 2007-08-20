@@ -62,9 +62,9 @@ else
 				persist="hidden, height"
 			>
 				<treecols>
-					<treecol id="kontakt-adressen-treecol-name" label="Name" flex="1" hidden="false"
+					<treecol id="kontakt-adressen-treecol-typ" label="Typ" flex="1" hidden="false"
 						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/adresse/rdf#name" onclick="KontaktAdresseTreeSort()"/>
+						sort="rdf:http://www.technikum-wien.at/adresse/rdf#typ_name" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
 					<treecol id="kontakt-adressen-treecol-strasse" label="Strasse" flex="1" hidden="false"
 						class="sortDirectionIndicator"
@@ -86,10 +86,6 @@ else
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/adresse/rdf#nation" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
-					<treecol id="kontakt-adressen-treecol-typ" label="Typ" flex="1" hidden="true"
-						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/adresse/rdf#typ" onclick="KontaktAdresseTreeSort()"/>
-					<splitter class="tree-splitter"/>
 					<treecol id="kontakt-adressen-treecol-heimatadresse" label="Heimatadresse" flex="1" hidden="true"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/adresse/rdf#heimatadresse" onclick="KontaktAdresseTreeSort()"/>
@@ -110,6 +106,10 @@ else
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/adresse/rdf#person_id" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
+					<treecol id="kontakt-adressen-treecol-name" label="Anmerkung" flex="1" hidden="true"
+						class="sortDirectionIndicator"
+						sort="rdf:http://www.technikum-wien.at/adresse/rdf#name" onclick="KontaktAdresseTreeSort()"/>
+					<splitter class="tree-splitter"/>
 				</treecols>
 			
 				<template>
@@ -117,18 +117,18 @@ else
 						<treechildren>
 							<treeitem uri="rdf:*">
 								<treerow>
-									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#name" />
+									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#typ_name" />
 									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#strasse" />
 									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#plz" />
 									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#ort" />
 									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#gemeinde" />
 									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#nation" />
-									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#typ" />
 									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#heimatadresse" />
 									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#zustelladresse" />
 									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#firma_id" />
 									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#adresse_id" />
 									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#person_id" />
+									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#name" />
 								</treerow>
 							</treeitem>
 						</treechildren>

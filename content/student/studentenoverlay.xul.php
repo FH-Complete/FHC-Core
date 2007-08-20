@@ -130,6 +130,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#svnr" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
+	    				<treecol id="student-treecol-ersatzkennzeichen" label="Ersatzkennzeichen" flex="1" hidden="false"
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#ersatzkennzeichen" onclick="StudentTreeSort()"/>
+	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-geburtsdatum" label="Geburtsdatum" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#geburtsdatum_iso" onclick="StudentTreeSort()"/>
@@ -154,7 +158,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#studiengang_kz" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
-						<treecol id="student-treecol-matrikelnummer" label="Matrikelnummer" flex="1" hidden="false"
+						<treecol id="student-treecol-matrikelnummer" label="Personenkennzeichen" flex="1" hidden="false"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#matrikelnummer" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
@@ -196,6 +200,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#vornamen" />	           							
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#titelpost" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#svnr" />
+	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#ersatzkennzeichen" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#geburtsdatum" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#semester" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#verband" />

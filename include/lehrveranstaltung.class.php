@@ -215,7 +215,7 @@ class lehrveranstaltung
 			if ($aktiv)
 				$qry .= " AND aktiv";
 
-		$qry .= " AND semester is not null AND lehreverzeichnis<>'' ORDER BY bezeichnung";
+		$qry .= " AND semester is not null AND lehreverzeichnis<>'' ORDER BY semester, bezeichnung";
 
 		//Datensaetze laden
 		if(!$res = pg_query($this->conn, $qry))

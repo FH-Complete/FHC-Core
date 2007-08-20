@@ -68,11 +68,15 @@ else
 			</columns>
 			<rows>
 				<row>
-					<label value="Name" control="adresse-textbox-name"/>
-					<hbox>
-      					<textbox id="adresse-textbox-name" maxlength="256" size="30"/>
-      					<spacer flex="1" />			
-      				</hbox>
+					<label value="Typ" control="adresse-menulist-typ"/>
+					<menulist id="adresse-menulist-typ" 
+					          flex="1">
+							<menupopup>
+								<menuitem value="h" label="Hauptwohnsitz"/>
+								<menuitem value="n" label="Nebenwohnsitz"/>
+								<menuitem value="f" label="Firma"/>
+							</menupopup>
+					</menulist>
 				</row>
 				<row>
 					<label value="Strasse" control="adresse-textbox-strasse"/>
@@ -144,17 +148,6 @@ else
 					</menulist>
 				</row>
 				<row>
-					<label value="Typ" control="adresse-menulist-typ"/>
-					<menulist id="adresse-menulist-typ" 
-					          flex="1">
-							<menupopup>
-								<menuitem value="h" label="Hauptwohnsitz"/>
-								<menuitem value="n" label="Nebenwohnsitz"/>
-								<menuitem value="f" label="Firma"/>
-							</menupopup>
-					</menulist>
-				</row>
-				<row>
 					<label value="Heimatadresse" control="adresse-checkbox-heimatadresse"/>
    					<checkbox id="adresse-checkbox-heimatadresse" checked="true"/>
       			</row>
@@ -175,6 +168,13 @@ else
 								</menupopup>
 						</template>
 					</menulist>
+				</row>
+				<row>
+					<label value="Anmerkung" control="adresse-textbox-name"/>
+					<hbox>
+      					<textbox id="adresse-textbox-name" maxlength="256" size="30"/>
+      					<spacer flex="1" />			
+      				</hbox>
 				</row>
 			</rows>
 	</grid>

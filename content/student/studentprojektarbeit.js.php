@@ -181,11 +181,11 @@ function StudentProjektarbeitResetFields()
 	document.getElementById('student-projektarbeit-textbox-punkte').value='0.0';
 	document.getElementById('student-projektarbeit-datum-beginn').value='';
 	document.getElementById('student-projektarbeit-datum-ende').value='';
-	document.getElementById('student-projektarbeit-textbox-faktor').value='0.0';
+	document.getElementById('student-projektarbeit-textbox-faktor').value='1.0';
 	document.getElementById('student-projektarbeit-checkbox-freigegeben').checked=false;
 	document.getElementById('student-projektarbeit-datum-gesperrtbis').value='';
-	document.getElementById('student-projektarbeit-textbox-stundensatz').value='0.0';
-	document.getElementById('student-projektarbeit-textbox-gesamtstunden').value='0.0';
+	document.getElementById('student-projektarbeit-textbox-stundensatz').value='80.0';
+	document.getElementById('student-projektarbeit-textbox-gesamtstunden').value='3.0';
 	document.getElementById('student-projektarbeit-textbox-themenbereich').value='';
 	document.getElementById('student-projektarbeit-textbox-anmerkung').value='';
 }
@@ -720,11 +720,11 @@ function StudentProjektbetreuerDetailDisableFields(val)
 // ****
 function StudentProjektbetreuerDetailReset()
 {
-	document.getElementById('student-projektbetreuer-textbox-faktor').value='0.0';
+	document.getElementById('student-projektbetreuer-textbox-faktor').value=document.getElementById('student-projektarbeit-textbox-faktor').value;
 	document.getElementById('student-projektbetreuer-textbox-name').value='';
 	document.getElementById('student-projektbetreuer-textbox-punkte').value='0.0';
-	document.getElementById('student-projektbetreuer-textbox-stunden').value='0.0';
-	document.getElementById('student-projektbetreuer-textbox-stundensatz').value='0.0';
+	document.getElementById('student-projektbetreuer-textbox-stunden').value=document.getElementById('student-projektarbeit-textbox-gesamtstunden').value;
+	document.getElementById('student-projektbetreuer-textbox-stundensatz').value=document.getElementById('student-projektarbeit-textbox-stundensatz').value;
 }
 
 // ****

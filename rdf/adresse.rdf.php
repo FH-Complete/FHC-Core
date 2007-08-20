@@ -78,6 +78,13 @@ function draw_rdf($row)
 {
 	global $rdf_url;
 	
+	$typ='';
+	switch ($row->typ)
+	{
+		case 'h': $typ='Hauptwohnsitz'; break;
+		case 'n': $typ='Nebenwohnsitz'; break;
+		case 'f': $typ='Firma'; break;
+	}
 	echo '
       <RDF:li>
          <RDF:Description  id="'.$row->adresse_id.'"  about="'.$rdf_url.'/'.$row->adresse_id.'" >
@@ -90,6 +97,7 @@ function draw_rdf($row)
             <ADRESSE:gemeinde><![CDATA['.$row->gemeinde.']]></ADRESSE:gemeinde>
             <ADRESSE:nation><![CDATA['.$row->nation.']]></ADRESSE:nation>
             <ADRESSE:typ><![CDATA['.$row->typ.']]></ADRESSE:typ>
+            <ADRESSE:typ_name><![CDATA['.$typ.']]></ADRESSE:typ_name>
             <ADRESSE:heimatadresse><![CDATA['.($row->heimatadresse?'Ja':'Nein').']]></ADRESSE:heimatadresse>
             <ADRESSE:zustelladresse><![CDATA['.($row->zustelladresse?'Ja':'Nein').']]></ADRESSE:zustelladresse>
             <ADRESSE:firma_id><![CDATA['.$row->firma_id.']]></ADRESSE:firma_id>

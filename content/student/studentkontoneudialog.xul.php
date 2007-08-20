@@ -62,7 +62,7 @@ echo '<?xml-stylesheet href="../datepicker/datepicker.css" type="text/css"?>';
 				<row>
 					<label value="Buchungsdatum" control="student-konto-neu-textbox-buchungsdatum"/>
 					<hbox>      					
-      					<box class='Datum' id="student-konto-neu-textbox-buchungsdatum" value="<?php echo date('d.m.Y');?>"/>
+      					<box class='Datum' id="student-konto-neu-textbox-buchungsdatum"/>
       					<spacer flex="1" />
       				</hbox>
       			</row>
