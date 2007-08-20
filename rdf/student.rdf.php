@@ -101,20 +101,65 @@ if($xmlformat=='rdf')
 		return true;		
 	}
 	
-	function draw_content($row)
+	function draw_content_liste($row)
 	{
 		global $rdf_url, $datum_obj, $conn;
 		$status='';
 		
 		$mail_privat = '';
-		$qry_mail = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id='$row->person_id' AND zustellung=true ORDER BY kontakt_id DESC LIMIT 1";
+		/*$qry_mail = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id='$row->person_id' AND zustellung=true ORDER BY kontakt_id DESC LIMIT 1";
 		if($result_mail = pg_query($conn, $qry_mail))
 		{
 			if($row_mail = pg_fetch_object($result_mail))
 			{
 				$mail_privat = $row_mail->kontakt;
 			}
-		}
+		}*/
+
+		$prestudent = new prestudent($conn, null, null);
+		$prestudent->getLastStatus($row->prestudent_id);
+		$status = $prestudent->rolle_kurzbz;
+			
+		echo '
+		  <RDF:li>
+	      	<RDF:Description  id="'.$row->prestudent_id.'"  about="'.$rdf_url.'/'.$row->prestudent_id.'" >
+	        	<STUDENT:person_id><![CDATA['.$row->person_id.']]></STUDENT:person_id>
+	        	<STUDENT:prestudent_id><![CDATA['.$row->prestudent_id.']]></STUDENT:prestudent_id>
+	        	<STUDENT:uid><![CDATA['.(isset($row->uid)?$row->uid:'').']]></STUDENT:uid>
+	    		<STUDENT:titelpre><![CDATA['.$row->titelpre.']]></STUDENT:titelpre>
+	    		<STUDENT:titelpost><![CDATA['.$row->titelpost.']]></STUDENT:titelpost>
+	    		<STUDENT:vornamen><![CDATA['.$row->vornamen.']]></STUDENT:vornamen>
+	    		<STUDENT:vorname><![CDATA['.$row->vorname.']]></STUDENT:vorname>
+	    		<STUDENT:nachname><![CDATA['.$row->nachname.']]></STUDENT:nachname>
+	    		<STUDENT:svnr><![CDATA['.$row->svnr.']]></STUDENT:svnr>
+	    		<STUDENT:geburtsdatum><![CDATA['.$datum_obj->convertISODate($row->gebdatum).']]></STUDENT:geburtsdatum>
+				<STUDENT:semester><![CDATA['.(isset($row->semester)?$row->semester:'').']]></STUDENT:semester>
+	    		<STUDENT:verband><![CDATA['.(isset($row->verband)?$row->verband:'').']]></STUDENT:verband>
+	    		<STUDENT:gruppe><![CDATA['.(isset($row->gruppe)?$row->gruppe:'').']]></STUDENT:gruppe>
+				<STUDENT:studiengang_kz_student><![CDATA['.(is_a($row,'student')?$row->studiengang_kz:'').']]></STUDENT:studiengang_kz_student>	    		
+				<STUDENT:matrikelnummer><![CDATA['.(isset($row->matrikelnr)?$row->matrikelnr:'').']]></STUDENT:matrikelnummer>
+	    		<STUDENT:mail_privat><![CDATA['.$mail_privat.']]></STUDENT:mail_privat>
+	    		<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
+				<STUDENT:status><![CDATA['.$status.']]></STUDENT:status>    		
+	    		<STUDENT:anmerkungen><![CDATA['.$row->anmerkungen.']]></STUDENT:anmerkungen>
+	      	</RDF:Description>
+	      </RDF:li>';
+	}
+	
+	function draw_content($row)
+	{
+		global $rdf_url, $datum_obj, $conn;
+		$status='';
+		
+		$mail_privat = '';
+		/*$qry_mail = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id='$row->person_id' AND zustellung=true ORDER BY kontakt_id DESC LIMIT 1";
+		if($result_mail = pg_query($conn, $qry_mail))
+		{
+			if($row_mail = pg_fetch_object($result_mail))
+			{
+				$mail_privat = $row_mail->kontakt;
+			}
+		}*/
 		
 		if($row->prestudent_id!='')
 		{
@@ -194,33 +239,53 @@ if($xmlformat=='rdf')
 		}
 	}
 
+	if(isset($uid))
+	{
+		$student=new student($conn,null,true);
+		$student->load($uid, $studiensemester_kurzbz);
+		$prestd = new prestudent($conn, null, true);
+		
+		draw_content($student);
+		$prestd->load($student->prestudent_id);
+		draw_prestudent($prestd);
+	}
 	if($typ=='student')
 	{
 		// Studenten holen
-		$student=new student($conn,null,true);
-		if (isset($uid))
-			$student->load($uid, $studiensemester_kurzbz);
-		else
-			$studenten=$student->getStudents($studiengang_kz,$semester,$verband,$gruppe,$gruppe_kurzbz, $studiensemester_kurzbz);
-		$prestd = new prestudent($conn, null, true);
-		if(isset($uid))
+		$where = '';
+		if ($gruppe_kurzbz!=null)
 		{
-			if(checkfilter($student, $filter2))
-			{
-				draw_content($student);
-				$prestd->load($student->prestudent_id);
-				draw_prestudent($prestd);
-			}
+			$where=" gruppe_kurzbz='".$gruppe_kurzbz."' AND tbl_benutzer.uid=tbl_benutzergruppe.uid";
+			if($stsem!=null)
+				$where.=" AND tbl_benutzergruppe.studiensemester_kurzbz='$studiensemester_kurzbz'";
 		}
 		else
-			foreach ($studenten as $student)
+		{		
+			$where.=" tbl_studentlehrverband.studiengang_kz=$studiengang_kz";
+			if ($semester!=null)
+				$where.=" AND tbl_studentlehrverband.semester=$semester";
+			if ($verband!=null)
+				$where.=" AND tbl_studentlehrverband.verband='".$verband."'";
+			if ($gruppe!=null)
+				$where.=" AND tbl_studentlehrverband.gruppe='".$gruppe."'";	
+		}			
+
+		$where.=" AND tbl_studentlehrverband.studiensemester_kurzbz='$studiensemester_kurzbz'";
+		
+		$sql_query = "SET CLIENT_ENCODING TO 'UNICODE'; SELECT tbl_person.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, tbl_person.titelpre, 
+		                     tbl_person.titelpost, tbl_person.vorname, tbl_person.vornamen, tbl_person.nachname,
+		                      tbl_person.gebdatum, tbl_person.anmerkungen,
+		                     tbl_person.svnr, tbl_student.matrikelnr, tbl_studentlehrverband.semester, 
+		                     tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe, tbl_studentlehrverband.studiengang_kz
+					  FROM public.tbl_person, public.tbl_student, public.tbl_benutzer, public.tbl_studentlehrverband";
+		if($gruppe_kurzbz!=null)
+			$sql_query.= ",public.tbl_benutzergruppe";
+		$sql_query.= " WHERE tbl_person.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid = tbl_student.student_uid AND tbl_studentlehrverband.student_uid=tbl_student.student_uid AND $where ORDER BY nachname, vorname";
+		if($result = pg_query($conn, $sql_query))
+			while($row = pg_fetch_object($result))
 			{
-				if(checkfilter($student, $filter2))
-				{
-					draw_content($student);
-					$prestd->load($student->prestudent_id);
-					draw_prestudent($prestd);
-				}
+				if(checkfilter($row, $filter2))
+					draw_content_liste($row);
 			}
 	}
 	elseif($typ=='incoming')
