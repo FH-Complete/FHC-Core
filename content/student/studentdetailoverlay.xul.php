@@ -185,7 +185,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	    					<row>
 	    						<label value="UID" control="student-detail-textbox-uid"/>
 	      						<hbox><textbox id="student-detail-textbox-uid" disabled="true" maxlength="16" size="16"/></hbox>
-	    						<label value="Matrikelnummer" control="student-detail-textbox-matrikelnummer"/>
+	    						<label value="Personenkennzeichen" control="student-detail-textbox-matrikelnummer"/>
 	      						<hbox><textbox id="student-detail-textbox-matrikelnummer" disabled="true" maxlength="15" size="15"/></hbox>
 	      						<!--<label value="Studiengang" control="student-detail-textbox-studiengang_kz"/>-->
 	      						<textbox id="student-detail-menulist-studiengang_kz" disabled="true" hidden="true" />

@@ -48,7 +48,17 @@ echo '
    
 //Daten holen
 $qry = "SET CLIENT_ENCODING TO 'UNICODE';SELECT * FROM lehre.tbl_note ORDER BY note";
-
+if(isset($_GET['optional']))
+{
+	echo '
+	  <RDF:li>
+	     <RDF:Description  id=""  about="'.$rdf_url.'/" >
+			<NOTE:note><![CDATA[]]></NOTE:note>
+			<NOTE:bezeichnung><![CDATA[-- keine Auswahl --]]></NOTE:bezeichnung>
+			<NOTE:anmerkung><![CDATA[]]></NOTE:anmerkung>
+	     </RDF:Description>
+	  </RDF:li>';
+}
 if($result = pg_query($conn, $qry))
 {
 	while($row = pg_fetch_object($result))

@@ -103,7 +103,7 @@ if($xmlformat=='rdf')
 	
 	function draw_content_liste($row)
 	{
-		global $rdf_url, $datum_obj, $conn;
+		global $rdf_url, $datum_obj, $conn, $stg_arr;
 		$status='';
 		
 		$mail_privat = '';
@@ -132,16 +132,19 @@ if($xmlformat=='rdf')
 	    		<STUDENT:vorname><![CDATA['.$row->vorname.']]></STUDENT:vorname>
 	    		<STUDENT:nachname><![CDATA['.$row->nachname.']]></STUDENT:nachname>
 	    		<STUDENT:svnr><![CDATA['.$row->svnr.']]></STUDENT:svnr>
+	    		<STUDENT:ersatzkennzeichen><![CDATA['.$row->ersatzkennzeichen.']]></STUDENT:ersatzkennzeichen>
 	    		<STUDENT:geburtsdatum><![CDATA['.$datum_obj->convertISODate($row->gebdatum).']]></STUDENT:geburtsdatum>
+	    		<STUDENT:geburtsdatum_iso><![CDATA['.$row->gebdatum.']]></STUDENT:geburtsdatum_iso>
 				<STUDENT:semester><![CDATA['.(isset($row->semester)?$row->semester:'').']]></STUDENT:semester>
 	    		<STUDENT:verband><![CDATA['.(isset($row->verband)?$row->verband:'').']]></STUDENT:verband>
 	    		<STUDENT:gruppe><![CDATA['.(isset($row->gruppe)?$row->gruppe:'').']]></STUDENT:gruppe>
-				<STUDENT:studiengang_kz_student><![CDATA['.(is_a($row,'student')?$row->studiengang_kz:'').']]></STUDENT:studiengang_kz_student>	    		
 				<STUDENT:matrikelnummer><![CDATA['.(isset($row->matrikelnr)?$row->matrikelnr:'').']]></STUDENT:matrikelnummer>
 	    		<STUDENT:mail_privat><![CDATA['.$mail_privat.']]></STUDENT:mail_privat>
 	    		<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
 				<STUDENT:status><![CDATA['.$status.']]></STUDENT:status>    		
 	    		<STUDENT:anmerkungen><![CDATA['.$row->anmerkungen.']]></STUDENT:anmerkungen>
+	    		<STUDENT:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz>
+				<STUDENT:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></STUDENT:studiengang>				
 	      	</RDF:Description>
 	      </RDF:li>';
 	}
@@ -256,7 +259,7 @@ if($xmlformat=='rdf')
 		if ($gruppe_kurzbz!=null)
 		{
 			$where=" gruppe_kurzbz='".$gruppe_kurzbz."' AND tbl_benutzer.uid=tbl_benutzergruppe.uid";
-			if($stsem!=null)
+			if($studiensemester_kurzbz!=null)
 				$where.=" AND tbl_benutzergruppe.studiensemester_kurzbz='$studiensemester_kurzbz'";
 		}
 		else
@@ -274,7 +277,7 @@ if($xmlformat=='rdf')
 		
 		$sql_query = "SET CLIENT_ENCODING TO 'UNICODE'; SELECT tbl_person.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, tbl_person.titelpre, 
 		                     tbl_person.titelpost, tbl_person.vorname, tbl_person.vornamen, tbl_person.nachname,
-		                      tbl_person.gebdatum, tbl_person.anmerkungen,
+		                      tbl_person.gebdatum, tbl_person.anmerkungen, tbl_person.ersatzkennzeichen,
 		                     tbl_person.svnr, tbl_student.matrikelnr, tbl_studentlehrverband.semester, 
 		                     tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe, tbl_studentlehrverband.studiengang_kz
 					  FROM public.tbl_person, public.tbl_student, public.tbl_benutzer, public.tbl_studentlehrverband";
