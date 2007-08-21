@@ -42,9 +42,9 @@ include('functions.inc.php');
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim oeffnen der Datenbankverbindung');
 
-//$user = get_uid();
+$user = get_uid();
 //$user = 'if06b172';
-$user = 'if06b144';
+//$user = 'if06b144';
 
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
