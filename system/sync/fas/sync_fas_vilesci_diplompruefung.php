@@ -18,7 +18,7 @@ $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschl
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
 //$adress='ruhan@technikum-wien.at';
-$adress='fas_sync@technikum-wien.at';
+//$adress='fas_sync@technikum-wien.at';
 
 $error_log='';
 $text = '';
@@ -52,7 +52,7 @@ function myaddslashes($var)
 <body>
 <?php
 //nation
-$qry = "SELECT * FROM diplomarbeit WHERE mitarbeiter_fk IS NOT NULL AND pruefungsdatum IS NOT NULL AND mitarbeiter_fk>0;";
+$qry = "SELECT *,creationdate::timestamp as insertamum FROM diplomarbeit WHERE mitarbeiter_fk IS NOT NULL AND pruefungsdatum IS NOT NULL AND mitarbeiter_fk>0;";
 
 if($result = pg_query($conn_fas, $qry))
 {
@@ -78,7 +78,7 @@ if($result = pg_query($conn_fas, $qry))
 		$anmerkung				=$row->pruefungsprotokoll;
 		//$updateamum			='';
 		$updatevon				='SYNC';
-		$insertamum				=$row->creationdate;
+		$insertamum				=$row->insertamum;
 		//$insertvon				='';
 		$ext_id				=$row->diplomarbeit_pk;
 				
@@ -130,7 +130,7 @@ if($result = pg_query($conn_fas, $qry))
 		}
 		else 
 		{
-			$qry="SELECT uid FROM public.tbl_benutzer WHERE person_id='".$row->vilesci_vorsitzender."';";
+			$qry="SELECT uid FROM public.tbl_person WHERE person_id='".$row->vilesci_vorsitzender."';";
 			if($resulto=pg_query($conn, $qry))
 			{
 				if($rowo=pg_fetch_object($resulto))
@@ -304,7 +304,7 @@ if($result = pg_query($conn_fas, $qry))
 							$ausgabe1="Insertvon: '".$insertvon."' (statt '".$rowo->insertvon."')";
 						}
 					}
-					if(date("d.m.Y", $rowo->insertamum)!=date("d.m.Y", $insertamum)) 
+					if($rowo->insertamum!=$insertamum) 
 					{
 						$update=true;
 						if(strlen(trim($ausgabe1))>0)
