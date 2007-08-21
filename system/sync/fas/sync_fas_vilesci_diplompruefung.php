@@ -130,7 +130,7 @@ if($result = pg_query($conn_fas, $qry))
 		}
 		else 
 		{
-			$qry="SELECT uid FROM public.tbl_person WHERE person_id='".$row->vilesci_vorsitzender."';";
+			$qry="SELECT uid FROM public.tbl_benutzer WHERE person_id='".$row->vilesci_vorsitzender."';";
 			if($resulto=pg_query($conn, $qry))
 			{
 				if($rowo=pg_fetch_object($resulto))
