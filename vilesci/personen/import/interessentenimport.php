@@ -631,12 +631,13 @@ if($vorname!='' && $nachname!='')
 {
 	if($where!='')
 		$where.=' OR';
-	$where.=" (LOWER(vorname)='".strtolower($vorname)."' AND LOWER(nachname)='".strtolower($nachname)."')";
+	$where.=" (LOWER(vorname)=LOWER('".$vorname."') AND LOWER(nachname)=LOWER('".$nachname."'))";
 }
 
 if($where!='')
 {
 	$qry = "SELECT * FROM public.tbl_person WHERE $where ORDER BY nachname, vorname, gebdatum";
+	
 	if($result = pg_query($conn, $qry))
 	{
 		echo '<table><tr><th></th><th>Nachname</th><th>Vorname</th><th>GebDatum</th><th>SVNR</th><th>Geschlecht</th><th>Adresse</th></tr>';
