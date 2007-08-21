@@ -479,7 +479,7 @@
 	  	?>
 	  <a href="benotungstool/verwaltung.php?<?php echo "lvid=$lvid$studiensem"?>" >
             <img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
-            <strong>"Kreuzerl"-Tool</strong></a>
+            <strong>Benotungstool<br>("Kreuzerl"-Tool)</strong></a>
 	    <?php } else { ?>
 	  <a href="benotungstool/studentenansicht.php?<?php echo "lvid=$lvid"?>" >
             <img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>

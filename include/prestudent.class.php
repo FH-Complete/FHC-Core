@@ -330,7 +330,7 @@ class prestudent extends person
 			$ps->updatevon = $row->updatevon;
 			$ps->insertamum = $row->insertamum;
 			$ps->insertvon = $row->insertvon;
-			$ps->ext_id_prestudent = $row->ext_id_prestudent;
+			//$ps->ext_id_prestudent = $row->ext_id_prestudent;
 			$this->result[]=$ps;
 			$this->num_rows++; 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	
 		}	
