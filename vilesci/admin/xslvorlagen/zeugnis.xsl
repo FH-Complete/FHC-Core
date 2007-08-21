@@ -127,6 +127,13 @@
 								</fo:table-row>
 								
 								<xsl:apply-templates select="unterrichtsfach"/>
+								<fo:table-row line-height="0pt">
+									<fo:table-cell border-width="0.2mm" border-style="solid" ></fo:table-cell>
+									<fo:table-cell border-width="0.2mm" border-style="solid" ></fo:table-cell>
+									<fo:table-cell border-width="0.2mm" border-style="solid" ></fo:table-cell>
+									<fo:table-cell border-width="0.2mm" border-style="solid" ></fo:table-cell>
+								</fo:table-row>
+								<xsl:apply-templates select="fussnote"/>
 								    
 							</fo:table-body>
 						</fo:table>
@@ -234,6 +241,23 @@
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="12pt" content-width="30mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="note" /></fo:block></fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="12pt" content-width="25mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="sws" /></fo:block></fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="12pt" content-width="25mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="ects" /></fo:block></fo:table-cell>
+		</fo:table-row>
+	</xsl:template>
+	
+	<xsl:template match="fussnote">
+		<fo:table-row line-height="10pt">
+			<fo:table-cell border-width="0.2mm" border-style="solid" >
+				<fo:block font-size="8pt">
+					<xsl:value-of select="fussnotenzeichen" /><xsl:text> </xsl:text>
+					<fo:inline font-weight="bold"><xsl:value-of select="themenbereich_bezeichnung" /><xsl:text> </xsl:text></fo:inline>
+					<xsl:value-of select="themenbereich" /><xsl:text> </xsl:text>
+					<fo:inline font-weight="bold"><xsl:value-of select="titel_bezeichnung" /><xsl:text> </xsl:text></fo:inline>
+					<xsl:value-of select="titel" />
+				</fo:block>
+			</fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="12pt" content-width="30mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="note" /></fo:block></fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="30mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="sws" /></fo:block></fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="30mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="ects" /></fo:block></fo:table-cell>
 		</fo:table-row>
 	</xsl:template>
 </xsl:stylesheet >
