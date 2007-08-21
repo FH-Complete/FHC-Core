@@ -61,7 +61,7 @@ if(isset($_GET['projektarbeit_id']) && !isset($_GET['person_id']))
 }
 elseif(isset($_GET['person_id']) && is_numeric($_GET['person_id']) && isset($_GET['projektarbeit_id']) && is_numeric($_GET['projektarbeit_id']))
 {
-	if($projektbetreuer->load($_GET['person_id'], $_GET['projektarbeit_id']))
+	if($projektbetreuer->load($_GET['person_id'], $_GET['projektarbeit_id'], $_GET['betreuerart_kurzbz']))
 		draw_content($projektbetreuer);
 	else 
 		die('Eintrag wurde nicht gefunden');
@@ -75,7 +75,7 @@ function draw_content($row)
 	$person=new person($conn, $row->person_id, null);
 	echo '
       <RDF:li>
-         <RDF:Description id="'.$row->person_id.'/'.$row->projektarbeit_id.'"  about="'.$rdf_url.'/'.$row->person_id.'/'.$row->projektarbeit_id.'" >
+         <RDF:Description id="'.$row->person_id.'/'.$row->projektarbeit_id.'/'.$row->betreuerart_kurzbz.'"  about="'.$rdf_url.'/'.$row->person_id.'/'.$row->projektarbeit_id.'/'.$row->betreuerart_kurzbz.'" >
             <PROJEKTBETREUER:projektarbeit_id><![CDATA['.$row->projektarbeit_id.']]></PROJEKTBETREUER:projektarbeit_id>
             <PROJEKTBETREUER:person_id><![CDATA['.$row->person_id.']]></PROJEKTBETREUER:person_id>
             <PROJEKTBETREUER:person_nachname><![CDATA['.$person->nachname.']]></PROJEKTBETREUER:person_nachname>

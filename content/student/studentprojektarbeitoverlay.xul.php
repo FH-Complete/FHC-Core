@@ -379,7 +379,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 											<treecell label="rdf:http://www.technikum-wien.at/projektbetreuer/rdf#punkte"/>
 											<treecell label="rdf:http://www.technikum-wien.at/projektbetreuer/rdf#stunden"/>
 											<treecell label="rdf:http://www.technikum-wien.at/projektbetreuer/rdf#stundensatz"/>
-											<treecell label="rdf:http://www.technikum-wien.at/projektbetreuer/rdf#beutreuerart_kurzbz"/>
+											<treecell label="rdf:http://www.technikum-wien.at/projektbetreuer/rdf#betreuerart_kurzbz"/>
 											<treecell label="rdf:http://www.technikum-wien.at/projektbetreuer/rdf#person_id"/>
 											<treecell label="rdf:http://www.technikum-wien.at/projektbetreuer/rdf#projektarbeit_id"/>
 										</treerow>
@@ -394,6 +394,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					</hbox>
 					<vbox hidden="true">
 						<textbox id="student-projektbetreuer-textbox-person_id" />
+						<textbox id="student-projektbetreuer-textbox-betreuerart_kurzbz_old" />
 						<checkbox id="student-projektbetreuer-checkbox-neu" />
 					</vbox>
 					<grid style="margin:4px;" flex="1">
