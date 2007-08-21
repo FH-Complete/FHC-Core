@@ -125,7 +125,7 @@ class reihungstest
 		$qry = "SELECT * FROM public.tbl_reihungstest ";
 		if($datum!=null)
 			$qry.=" WHERE datum>='$datum'";
-		$qry.=" ORDER BY datum, uhrzeit";
+		$qry.=" ORDER BY datum DESC, uhrzeit";
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
