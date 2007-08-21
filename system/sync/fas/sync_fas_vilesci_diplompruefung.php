@@ -12,6 +12,7 @@
 //*
 
 require_once('../../../vilesci/config.inc.php');
+require_once('../sync_config.inc.php');
 
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
