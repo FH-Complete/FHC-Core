@@ -65,7 +65,7 @@ else if (isset($_GET['type']) && $_GET['type']=='delete')
 <?php
 	$qry = "SELECT * FROM public.tbl_benutzergruppe, public.tbl_benutzer, public.tbl_person WHERE".
 	       " tbl_benutzergruppe.gruppe_kurzbz='".addslashes($kurzbz)."' AND".
-	       " tbl_benutzergruppe.uid = tbl_benutzer.uid AND tbl_benutzer.person_id=tbl_person.person_id";
+	       " tbl_benutzergruppe.uid = tbl_benutzer.uid AND tbl_benutzer.person_id=tbl_person.person_id ORDER BY nachname, vorname";
 
 	if($result = pg_query($conn, $qry))
 	{	
@@ -80,7 +80,7 @@ else if (isset($_GET['type']) && $_GET['type']=='delete')
 		    echo "<td>".$row->uid."</td>";
 			echo "<td>".$row->vorname."</td>";
 			echo "<td>".$row->nachname."</td>";
-			echo '<td class="button"><a href="einheit_det.php?uid='.$row->uid.'&type=delete&kurzbz=$kurzbz">Delete</a></td>';
+			echo '<td class="button"><a href="einheit_det.php?uid='.$row->uid.'&type=delete&kurzbz='.$kurzbz.'">Delete</a></td>';
 		    echo "</tr>\n";
 		}
 	}
