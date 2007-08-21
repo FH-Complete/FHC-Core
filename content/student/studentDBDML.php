@@ -1654,7 +1654,7 @@ if(!$error)
 		
 		if($_POST['neu']=='false')
 		{
-			if($projektbetreuer->load($_POST['person_id_old'], $_POST['projektarbeit_id']))
+			if($projektbetreuer->load($_POST['person_id_old'], $_POST['projektarbeit_id'], $_POST['betreuerart_kurzbz_old']))
 			{
 				$projektbetreuer->new = false;
 			}
@@ -1667,7 +1667,7 @@ if(!$error)
 		}
 		else 
 		{
-			if($projektbetreuer->load($_POST['person_id'], $_POST['projektarbeit_id']))
+			if($projektbetreuer->load($_POST['person_id'], $_POST['projektarbeit_id'], $_POST['betreuerart_kurzbz']))
 			{
 				$error = true;
 				$errormsg = 'Dieser Betreuer ist bereits zugeteilt';
@@ -1687,6 +1687,7 @@ if(!$error)
 		$projektbetreuer->stunden = str_replace(',','.', $_POST['stunden']);
 		$projektbetreuer->stundensatz = str_replace(',','.', $_POST['stundensatz']);
 		$projektbetreuer->betreuerart_kurzbz = $_POST['betreuerart_kurzbz'];
+		$projektbetreuer->betreuerart_kurzbz_old = $_POST['betreuerart_kurzbz_old'];
 		$projektbetreuer->updateamum = date('Y-m-d H:i:s');
 		$projektbetreuer->updatevon = $user;
 		
@@ -1710,7 +1711,7 @@ if(!$error)
 		{
 			$projektbetreuer = new projektbetreuer($conn, null, null, true);
 
-			if($projektbetreuer->delete($_POST['person_id'], $_POST['projektarbeit_id']))
+			if($projektbetreuer->delete($_POST['person_id'], $_POST['projektarbeit_id'], $_POST['betreuerart_kurzbz']))
 			{
 				$return = true;
 			}

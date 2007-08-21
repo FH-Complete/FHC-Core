@@ -83,7 +83,7 @@ class projektbetreuer
 	 * @param  $projektarbeit_id ID der zu ladenden Funktion
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load($person_id, $projektarbeit_id)
+	function load($person_id, $projektarbeit_id, $betreuerart_kurzbz)
 	{
 		if(!is_numeric($person_id))
 		{
@@ -97,7 +97,7 @@ class projektbetreuer
 			return false;
 		}
 		
-		$qry = "SELECT * FROM lehre.tbl_projektbetreuer WHERE person_id='$person_id' AND projektarbeit_id='$projektarbeit_id'";
+		$qry = "SELECT * FROM lehre.tbl_projektbetreuer WHERE person_id='$person_id' AND projektarbeit_id='$projektarbeit_id' AND betreuerart_kurzbz='".addslashes($betreuerart_kurzbz)."'";
 		
 		if($result = pg_query($this->conn, $qry))
 		{
@@ -241,6 +241,8 @@ class projektbetreuer
 				$this->errormsg = 'person_id muss eine gueltige Zahl sein';
 				return false;
 			}
+			if($this->betreuerart_kurzbz_old=='')
+				$this->betreuerart_kurzbz_old = $this->betreuerart_kurzbz;
 			
 			$qry='UPDATE lehre.tbl_projektbetreuer SET '.
 				'person_id='.$this->addslashes($this->person_id).', '. 
@@ -253,7 +255,7 @@ class projektbetreuer
 				'stundensatz='.$this->addslashes($this->stundensatz).', '.
 				'updateamum='.$this->addslashes($this->updateamum).', '.
 			    'updatevon='.$this->addslashes($this->updatevon).' '.
-				"WHERE projektarbeit_id='".addslashes($this->projektarbeit_id)."' AND person_id='".addslashes($this->person_id_old)."';";
+				"WHERE projektarbeit_id='".addslashes($this->projektarbeit_id)."' AND person_id='".addslashes($this->person_id_old)."' AND betreuerart_kurzbz='".addslashes($this->betreuerart_kurzbz_old)."';";
 		}
 		//echo $qry;
 		if(pg_query($this->conn,$qry))
@@ -273,7 +275,7 @@ class projektbetreuer
 	 * @param $projektarbeit_id ID die geloescht werden soll
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function delete($person_id, $projektarbeit_id)
+	function delete($person_id, $projektarbeit_id, $betreuerart_kurzbz)
 	{
 		if(!is_numeric($person_id))
 		{
@@ -287,7 +289,7 @@ class projektbetreuer
 			return false;
 		}
 		
-		$qry = "DELETE FROM lehre.tbl_projektbetreuer WHERE person_id='".$person_id."' AND projektarbeit_id='".$projektarbeit_id."';";
+		$qry = "DELETE FROM lehre.tbl_projektbetreuer WHERE person_id='".$person_id."' AND projektarbeit_id='".$projektarbeit_id."' AND betreuerart_kurzbz='".addslashes($betreuerart_kurzbz)."';";
 		
 		if(pg_query($this->conn, $qry))
 		{

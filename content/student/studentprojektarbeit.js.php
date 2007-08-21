@@ -34,6 +34,7 @@ var StudentProjektarbeitTreeDatasource=null; //Datasource des Projektarbeit Tree
 var StudentProjektbetreuerTreeDatasource=null; //Datasource des Projektbetreuer Trees
 var StudentProjektbetreuerSelectPersonID=null;
 var StudentProjektbetreuerSelectProjektarbeitID=null;
+var StudentProjektbetreuerSelectBetreuerartKurzbz=null;
 // ********** Observer und Listener ************* //
 
 // ****
@@ -606,9 +607,11 @@ function StudentProjektbetreuerTreeSelectID()
 			var projektarbeit_id=tree.view.getCellText(i,col);
 			col = tree.columns ? tree.columns["student-projektbetreuer-tree-person_id"] : "student-projektbetreuer-tree-person_id";
 			var person_id=tree.view.getCellText(i,col);
+			col = tree.columns ? tree.columns["student-projektbetreuer-tree-betreuerart_kurzbz"] : "student-projektbetreuer-tree-betreuerart_kurzbz";
+			var betreuerart_kurzbz=tree.view.getCellText(i,col);
 
 			//wenn dies die zu selektierende Zeile
-			if(person_id == StudentProjektbetreuerSelectPersonID && projektarbeit_id == StudentProjektbetreuerSelectProjektarbeitID)
+			if(person_id == StudentProjektbetreuerSelectPersonID && projektarbeit_id == StudentProjektbetreuerSelectProjektarbeitID && betreuerart_kurzbz == StudentProjektbetreuerSelectBetreuerartKurzbz)
 			{
 				//Zeile markieren
 				tree.view.selection.select(i);
@@ -638,16 +641,18 @@ function StudentProjektbetreuerAuswahl()
 	var projektarbeit_id=tree.view.getCellText(tree.currentIndex,col);
 	var col = tree.columns ? tree.columns["student-projektbetreuer-tree-person_id"] : "student-projektbetreuer-treecol-person_id";
 	var person_id=tree.view.getCellText(tree.currentIndex,col);
+	var col = tree.columns ? tree.columns["student-projektbetreuer-tree-betreuerart_kurzbz"] : "student-projektbetreuer-treecol-betreuerart_kurzbz";
+	var betreuerart_kurzbz=tree.view.getCellText(tree.currentIndex,col);
 
 	//Daten holen
-	var url = '<?php echo APP_ROOT ?>rdf/projektbetreuer.rdf.php?projektarbeit_id='+projektarbeit_id+'&person_id='+person_id+'&'+gettimestamp();
+	var url = '<?php echo APP_ROOT ?>rdf/projektbetreuer.rdf.php?projektarbeit_id='+projektarbeit_id+'&person_id='+person_id+'&betreuerart_kurzbz='+betreuerart_kurzbz+'&'+gettimestamp();
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                    getService(Components.interfaces.nsIRDFService);
 
     var dsource = rdfService.GetDataSourceBlocking(url);
 
-	var subject = rdfService.GetResource("http://www.technikum-wien.at/projektbetreuer/" + person_id+'/'+projektarbeit_id);
+	var subject = rdfService.GetResource("http://www.technikum-wien.at/projektbetreuer/" + person_id+'/'+projektarbeit_id+'/'+betreuerart_kurzbz);
 
 	var predicateNS = "http://www.technikum-wien.at/projektbetreuer/rdf";
 
@@ -673,6 +678,7 @@ function StudentProjektbetreuerAuswahl()
 	document.getElementById('student-projektbetreuer-textbox-stunden').value=stunden;
 	document.getElementById('student-projektbetreuer-textbox-stundensatz').value=stundensatz;
 	document.getElementById('student-projektbetreuer-menulist-betreuerart').value=betreuerart_kurzbz;
+	document.getElementById('student-projektbetreuer-textbox-betreuerart_kurzbz_old').value=betreuerart_kurzbz;
 	document.getElementById('student-projektbetreuer-textbox-person_id').value=person_id;
 	document.getElementById('student-projektbetreuer-checkbox-neu').checked=false;	
 }
@@ -780,6 +786,7 @@ function StudentProjektbetreuerSpeichern()
 	stunden = document.getElementById('student-projektbetreuer-textbox-stunden').value;
 	stundensatz = document.getElementById('student-projektbetreuer-textbox-stundensatz').value;
 	betreuerart_kurzbz = document.getElementById('student-projektbetreuer-menulist-betreuerart').value;
+	betreuerart_kurzbz_old = document.getElementById('student-projektbetreuer-textbox-betreuerart_kurzbz_old').value;
 	person_id_old = document.getElementById('student-projektbetreuer-textbox-person_id').value;
 	neu = document.getElementById('student-projektbetreuer-checkbox-neu').checked;
 	
@@ -806,6 +813,7 @@ function StudentProjektbetreuerSpeichern()
 	req.add('stunden', stunden);
 	req.add('stundensatz', stundensatz);
 	req.add('betreuerart_kurzbz', betreuerart_kurzbz);
+	req.add('betreuerart_kurzbz_old', betreuerart_kurzbz_old);
 	req.add('projektarbeit_id', projektarbeit_id);
 	req.add('person_id_old', person_id_old);
 	req.add('neu', neu);
@@ -825,6 +833,7 @@ function StudentProjektbetreuerSpeichern()
 	{
 		StudentProjektbetreuerSelectPersonID=person_id;
 		StudentProjektbetreuerSelectProjektarbeitID=projektarbeit_id;
+		StudentProjektbetreuerSelectBetreuerartKurzbz=betreuerart_kurzbz;
 		StudentProjektbetreuerTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 		StudentProjektbetreuerDetailDisableFields(true);
@@ -859,6 +868,8 @@ function StudentProjektbetreuerLoeschen()
 	var projektarbeit_id=tree.view.getCellText(tree.currentIndex,col);
 	var col = tree.columns ? tree.columns["student-projektbetreuer-tree-person_id"] : "student-projektbetreuer-tree-person_id";
 	var person_id=tree.view.getCellText(tree.currentIndex,col);
+	var col = tree.columns ? tree.columns["student-projektbetreuer-tree-betreuerart_kurzbz"] : "student-projektbetreuer-tree-betreuerart_kurzbz";
+	var betreuerart_kurzbz=tree.view.getCellText(tree.currentIndex,col);
 	
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
@@ -867,6 +878,7 @@ function StudentProjektbetreuerLoeschen()
 	
 	req.add('person_id', person_id);
 	req.add('projektarbeit_id', projektarbeit_id);
+	req.add('betreuerart_kurzbz', betreuerart_kurzbz);
 
 	var response = req.executePOST();
 
@@ -883,6 +895,7 @@ function StudentProjektbetreuerLoeschen()
 	{
 		StudentProjektbetreuerSelectPersonID=null;
 		StudentProjektbetreuerSelectProjektarbeitID=null;
+		StudentProjektbetreuerSelectBetreuerartKurzbz=null;
 		StudentProjektbetreuerTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden geloescht');
 		StudentProjektbetreuerDetailDisableFields(true);

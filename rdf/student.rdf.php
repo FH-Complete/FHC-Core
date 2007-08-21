@@ -97,7 +97,14 @@ if($xmlformat=='rdf')
 					if($row_filter->anzahl==0)
 						return false;
 		}
-		
+		elseif($filter2=='konto')
+		{
+			$qry = "SELECT sum(betrag) as summe FROM tbl_konto WHERE person_id='$row->person_id'";
+			if($result_filter = pg_query($conn, $qry))
+				if($row_filter = pg_fetch_object($result_filter))
+					if($row_filter->summe=='0.00')
+						return false;
+		}
 		return true;		
 	}
 	
