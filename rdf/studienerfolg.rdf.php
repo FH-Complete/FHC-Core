@@ -138,21 +138,24 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					$note = $note_arr[$row->note];
 				else
 					$note = "";
-				$xml .= "			<unterrichtsfach>";
-				$xml .= "				<bezeichnung>".$row->lehrveranstaltung_bezeichnung."</bezeichnung>";
-				$xml .= "				<note>".$note."</note>";
-				$xml .= "				<sws>".sprintf('%.1f',$row->semesterstunden/$wochen)."</sws>";
-				$xml .= "				<ects>".$row->ects."</ects>";
-				if($row->benotungsdatum!='')
-					$xml .= "				<benotungsdatum>".date('d.m.Y',$datum->mktime_fromtimestamp($row->benotungsdatum))."</benotungsdatum>";
-				$xml .= "			</unterrichtsfach>";
-				
-				$gesamtstunden +=$row->semesterstunden;
-				$gesamtects += $row->ects;
-				if(is_numeric($note))
+				if($note!='')
 				{
-					$notensumme += $note;
-					$anzahl++;
+					$xml .= "			<unterrichtsfach>";
+					$xml .= "				<bezeichnung>".$row->lehrveranstaltung_bezeichnung."</bezeichnung>";
+					$xml .= "				<note>".$note."</note>";
+					$xml .= "				<sws>".sprintf('%.1f',$row->semesterstunden/$wochen)."</sws>";
+					$xml .= "				<ects>".$row->ects."</ects>";
+					if($row->benotungsdatum!='')
+						$xml .= "				<benotungsdatum>".date('d.m.Y',$datum->mktime_fromtimestamp($row->benotungsdatum))."</benotungsdatum>";
+					$xml .= "			</unterrichtsfach>";
+					
+					$gesamtstunden +=$row->semesterstunden;
+					$gesamtects += $row->ects;
+					if(is_numeric($note))
+					{
+						$notensumme += $note;
+						$anzahl++;
+					}
 				}
 			}
 		}

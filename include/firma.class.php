@@ -278,7 +278,7 @@ class firma
 	 */
 	function getAll()
 	{
-		$qry = "SElECT * FROM public.tbl_firma";
+		$qry = "SElECT * FROM public.tbl_firma ORDER BY name";
 		
 		if($result = pg_query($this->conn, $qry))
 		{

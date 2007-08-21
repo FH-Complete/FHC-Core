@@ -74,7 +74,7 @@ $worksheet->write(0,++$i,"Stunden", $format_bold);
 $worksheet->write(0,++$i,"Kosten", $format_bold);
 
 //Daten holen
-$qry = "SELECT vw_lehreinheit.*, tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre, tbl_mitarbeiter.personalnummer
+$qry = "SELECT vw_lehreinheit.*, tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre, tbl_mitarbeiter.personalnummer, tbl_person.person_id
 		FROM campus.vw_lehreinheit, public.tbl_mitarbeiter, public.tbl_benutzer, public.tbl_person WHERE 
 		tbl_person.person_id = tbl_benutzer.person_id AND tbl_benutzer.uid=tbl_mitarbeiter.mitarbeiter_uid AND
 		vw_lehreinheit.mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid AND
@@ -93,17 +93,38 @@ if($result = pg_query($conn, $qry))
 		if(array_key_exists($row->mitarbeiter_uid, $liste))
 		{
 			$liste[$row->mitarbeiter_uid]['gesamtstunden'] = $liste[$row->mitarbeiter_uid]['gesamtstunden'] + $row->semesterstunden;
-			$liste[$row->mitarbeiter_uid]['gesamtkosten'] = $liste[$row->mitarbeiter_uid]['gesamtstunden'] + ($row->semesterstunden*$row->stundensatz);
+			$liste[$row->mitarbeiter_uid]['gesamtkosten'] = $liste[$row->mitarbeiter_uid]['gesamtkosten'] + ($row->semesterstunden*$row->stundensatz*$row->faktor);
 		}
 		else 
 		{
 			$liste[$row->mitarbeiter_uid]['gesamtstunden'] = $row->semesterstunden;
-			$liste[$row->mitarbeiter_uid]['gesamtkosten'] = $row->semesterstunden*$row->stundensatz;
+			$liste[$row->mitarbeiter_uid]['gesamtkosten'] = $row->semesterstunden*$row->stundensatz*$row->faktor;
 		}
 		$liste[$row->mitarbeiter_uid]['personalnummer'] = $row->personalnummer;
 		$liste[$row->mitarbeiter_uid]['titelpre'] = $row->titelpre;
 		$liste[$row->mitarbeiter_uid]['vorname'] = $row->vorname;
 		$liste[$row->mitarbeiter_uid]['nachname'] = $row->nachname;
+	}
+	
+	//Betreuungen fuer Projektarbeiten
+	foreach ($liste as $uid=>$arr)
+	{
+		$qry = "SELECT tbl_projektbetreuer.faktor, tbl_projektbetreuer.stunden, tbl_projektbetreuer.stundensatz
+	        FROM lehre.tbl_projektbetreuer, lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehrveranstaltung, 
+	               public.tbl_benutzer, lehre.tbl_projektarbeit, campus.vw_student 
+	        WHERE tbl_projektbetreuer.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid='$uid' AND 
+	              tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND student_uid=vw_student.uid
+	              AND tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
+	              tbl_lehreinheit.studiensemester_kurzbz='$semester_aktuell' AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
+	              tbl_lehrveranstaltung.studiengang_kz='$studiengang_kz'";
+		if($result = pg_query($conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$liste[$uid]['gesamtstunden'] = $liste[$uid]['gesamtstunden'] + $row->stunden;
+				$liste[$uid]['gesamtkosten'] = $liste[$uid]['gesamtkosten'] + ($row->stunden*$row->stundensatz*$row->faktor);
+			}
+		}
 	}
 	
 	//Daten ausgeben

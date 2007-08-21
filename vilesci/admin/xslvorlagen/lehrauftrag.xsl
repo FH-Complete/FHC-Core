@@ -41,7 +41,11 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						Abs.: Fachhochschule Technikum Wien, Höchstädtplatz 5, A-1200 Wien
 					</fo:block>
 					
-					\n\n\n\n\n\n<fo:block font-size="8pt">
+					\n\n\n
+					<fo:block font-size="10pt" font-weight="bold">
+							<xsl:value-of select="studiensemester_kurzbz" />
+					</fo:block>
+					\n<fo:block font-size="8pt">
 						<fo:inline font-weight="bold">
 							<xsl:value-of select="mitarbeiter/name_gesamt" />
 						</fo:inline>

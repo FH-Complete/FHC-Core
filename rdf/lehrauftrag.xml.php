@@ -69,6 +69,12 @@ function CutString($strVal, $limit)
 
 // GENERATE XML
 $xml = '<?xml version="1.0" encoding="ISO-8859-15" ?><lehrauftraege>';
+$stg_arr = array();
+$studiengang = new studiengang($conn);
+$studiengang->getAll();
+
+foreach ($studiengang->result as $row)
+	$stg_arr[$row->studiengang_kz] = $row->kuerzel;
 
 //Studiengang laden
 $studiengang = new studiengang($conn, $studiengang_kz);
@@ -116,6 +122,7 @@ function drawLehrauftrag($uid)
 	global $studiengang;
 	global $studiengang_kz;
 	global $fb_arr;
+	global $stg_arr;
 	global $ss;
 	global $xml;
 	global $conn;
@@ -139,7 +146,7 @@ function drawLehrauftrag($uid)
 		$studiensemester = 'Wintersemester '.substr($ss,2);
 	else
 		$studiensemester = 'Sommersemester '.substr($ss,2);
-	$xml.="
+	$xml.="<studiensemester_kurzbz>$ss</studiensemester_kurzbz>
 		<studiensemester>$studiensemester</studiensemester>";
 	
 	//Lektor
@@ -226,27 +233,71 @@ function drawLehrauftrag($uid)
 		array_unique($gruppen);
 		foreach ($gruppen as $gruppe)
 			$grp.=$gruppe.' ';
-	$xml.='
-		<lehreinheit>
-			<lehreinheit_id>'.(isset($lehreinheit_id)?$lehreinheit_id:'').'</lehreinheit_id>
-			<lehrveranstaltung><![CDATA['.(isset($lehrveranstaltung)?$lehrveranstaltung:'').']]></lehrveranstaltung>
-			<fachbereich>'.(isset($fachbereich)?$fb_arr[$fachbereich]:'').'</fachbereich>
-			<gruppe>'.trim($grp).'</gruppe>
-			<stunden>'.(isset($stunden)?$stunden:'').'</stunden>
-			<satz>'.(isset($satz)?$satz:'').'</satz>
-			<faktor>'.(isset($faktor)?$faktor:'').'</faktor>
-			<brutto>'.(isset($brutto)?number_format($brutto,2,',','.'):'').'</brutto>
-		</lehreinheit>';
-	
-		if(isset($brutto))
-			$gesamtkosten = $gesamtkosten + $brutto;
-		if(isset($stunden))
-			$gesamtstunden = $gesamtstunden + $stunden;
+		if(isset($lehreinheit_id))
+		{
+		$xml.='
+			<lehreinheit>
+				<lehreinheit_id>'.(isset($lehreinheit_id)?$lehreinheit_id:'').'</lehreinheit_id>
+				<lehrveranstaltung><![CDATA['.(isset($lehrveranstaltung)?$lehrveranstaltung:'').']]></lehrveranstaltung>
+				<fachbereich>'.(isset($fachbereich)?$fb_arr[$fachbereich]:'').'</fachbereich>
+				<gruppe>'.trim($grp).'</gruppe>
+				<stunden>'.(isset($stunden)?$stunden:'').'</stunden>
+				<satz>'.(isset($satz)?$satz:'').'</satz>
+				<faktor>'.(isset($faktor)?$faktor:'').'</faktor>
+				<brutto>'.(isset($brutto)?number_format($brutto,2,',','.'):'').'</brutto>
+			</lehreinheit>';
+		
+			if(isset($brutto))
+				$gesamtkosten = $gesamtkosten + $brutto;
+			if(isset($stunden))
+				$gesamtstunden = $gesamtstunden + $stunden;
+		}
 	}
-	
+	$qry = "SELECT tbl_projektarbeit.projektarbeit_id, tbl_projektbetreuer.faktor, tbl_projektbetreuer.stunden, tbl_projektbetreuer.stundensatz, vw_student.semester, 
+	               vorname, nachname, vw_student.studiengang_kz, projekttyp_kurzbz, tbl_lehrfach.fachbereich_kurzbz
+	        FROM lehre.tbl_projektbetreuer, lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehrveranstaltung, 
+	               public.tbl_benutzer, lehre.tbl_projektarbeit, campus.vw_student 
+	        WHERE tbl_projektbetreuer.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid='$uid' AND 
+	              tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND student_uid=vw_student.uid
+	              AND tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
+	              tbl_lehreinheit.studiensemester_kurzbz='$ss' AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
+	              tbl_lehrveranstaltung.studiengang_kz='$studiengang_kz'";
+	if($result = pg_query($conn, $qry))
+	{
+		while($row = pg_fetch_object($result))
+		{
+			$brutto = $row->stunden*$row->stundensatz*$row->faktor;
+			if($brutto!=0)
+			{
+				switch($row->projekttyp_kurzbz)
+				{
+					case 'Bachelor':  $kuerzel='BA'; break;
+					case 'Diplom':    $kuerzel='DA'; break;
+					case 'Projekt':   $kuerzel='PJ'; break;
+					case 'Praktikum': $kuerzel='PX'; break;
+					case 'Praxis':    $kuerzel='PX'; break;
+					default:          $kuerzel='PA'; break;
+				}
+				
+				$xml.='
+					<lehreinheit>
+						<lehreinheit_id>'.(isset($row->projektarbeit_id)?$kuerzel.$row->projektarbeit_id:'').'</lehreinheit_id>
+						<lehrveranstaltung><![CDATA[Betreuung '.$row->vorname.' '.$row->nachname.' '.$row->semester.'. Semester]]></lehrveranstaltung>
+						<fachbereich>'.(isset($row->fachbereich_kurzbz)?$fb_arr[$row->fachbereich_kurzbz]:'').'</fachbereich>
+						<gruppe></gruppe>
+						<stunden>'.(isset($row->stunden)?number_format($row->stunden,2):'').'</stunden>
+						<satz>'.(isset($row->stundensatz)?$row->stundensatz:'').'</satz>
+						<faktor>'.(isset($row->faktor)?$row->faktor:'').'</faktor>
+						<brutto>'.(isset($brutto)?number_format($brutto,2,',','.'):'').'</brutto>
+					</lehreinheit>';
+				$gesamtkosten = $gesamtkosten + $brutto;
+				$gesamtstunden = $gesamtstunden + $row->stunden;
+			}
+		}
+	}
 	// Gesamtstunden und Gesamtkosten
 	$xml.="
-		<gesamtstunden>$gesamtstunden</gesamtstunden>
+		<gesamtstunden>".number_format($gesamtstunden,2)."</gesamtstunden>
 		<gesamtbetrag>".number_format($gesamtkosten,2,',','.')."</gesamtbetrag>";
 	
 	
