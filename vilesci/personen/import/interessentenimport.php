@@ -76,6 +76,12 @@ function disablefields(obj)
 	}
 }
 
+function disablefields2(val)
+{
+	document.getElementById('adresse').disabled=val;
+	document.getElementById('plz').disabled=val;
+	document.getElementById('ort').disabled=val;
+}
 </script>
 </head>
 <body>
@@ -296,13 +302,15 @@ if(isset($_POST['save']))
 				else
 				{
 					$error = true;
-					$errormsg = 'Fehler beim laden der Adresse';
+					$errormsg = 'Fehler beim Laden der Adresse';
 				}
 			}
 			else
 			{
-				$error = true;
-				$errormsg = 'Kann die Adresse nicht ueberschreiben wenn keine da ist';
+				//Wenn keine Adrese vorhanden ist dann eine neue Anlegen
+				$adr->new = true;
+				$adr->insertamum = date('Y-m-d H:i:s');
+				$adr->insertvon = $user;
 			}
 		}
 
@@ -556,9 +564,9 @@ echo '<tr><td>Adresse</td><td><input type="text" id="adresse" maxlength="256" na
 echo '<tr><td>Postleitzahl</td><td><input type="text" maxlength="16" id="plz" name="plz" value="'.$plz.'" /></td></tr>';
 echo '<tr><td>Ort</td><td><input type="text" id="ort" maxlength="256" name="ort" value="'.$ort.'" /></td></tr>';
 echo '</table>';
-echo '<div style="display: none;" id="ueb1"><input type="radio" id="ueberschreiben1" name="ueberschreiben" value="Ja" checked>Bestehende Adresse überschreiben</div>';
-echo '<div style="display: none;" id="ueb2"><input type="radio" id="ueberschreiben2" name="ueberschreiben" value="Nein">Adresse neu anlegen</div>';
-echo '<div style="display: none;" id="ueb3"><input type="radio" id="ueberschreiben3" name="ueberschreiben" value="">Adresse nicht anlegen</div>';
+echo '<div style="display: none;" id="ueb1"><input type="radio" id="ueberschreiben1" name="ueberschreiben" value="Ja" onclick="disablefields2(false)">Bestehende Adresse überschreiben</div>';
+echo '<div style="display: none;" id="ueb2"><input type="radio" id="ueberschreiben2" name="ueberschreiben" value="Nein" onclick="disablefields2(false)" checked>Adresse hinzufügen</div>';
+echo '<div style="display: none;" id="ueb3"><input type="radio" id="ueberschreiben3" name="ueberschreiben" value="" onclick="disablefields2(true)">Adresse nicht anlegen</div>';
 echo '</fieldset></td></tr>';
 echo '<tr><td>EMail</td><td><input type="text" id="email" maxlength="128" name="email" value="'.$email.'" /></td></tr>';
 echo '<tr><td>Telefon</td><td><input type="text" id="telefon" maxlength="128" name="telefon" value="'.$telefon.'" /></td></tr>';
@@ -596,7 +604,7 @@ for ($i=1;$i<9;$i++)
 	echo '<OPTION value="'.$i.'" '.($i==$ausbildungssemester?'selected':'').'>'.$i.'. Semester</OPTION>';
 echo '</SELECT>';
 echo '</td></tr>';
-echo '<tr><td>incoming:</td><td><input type="checkbox" name="incoming" '.($incoming?'checked':'').' /></td></tr>';
+echo '<tr><td>Incoming:</td><td><input type="checkbox" name="incoming" '.($incoming?'checked':'').' /></td></tr>';
 echo '<tr><tr><td></td><td>';
 
 if(($geburtsdatum=='' && $vorname=='' && $nachname=='') || $geburtsdatum_error)
