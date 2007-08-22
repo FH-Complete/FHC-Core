@@ -27,6 +27,9 @@ if (count($berechtigt_studiengang)>0)
 		$stg_kz_query='AND ('.substr($stg_kz_query,3).')';
 	}
 
+if (isset($_GET['studiengang_kz']))
+	$stg_kz_query='AND tbl_lehrverband.studiengang_kz='.$_GET['studiengang_kz'];
+
 $sql_query="SET search_path TO public;
 			SELECT tbl_lehrverband.studiengang_kz, tbl_studiengang.bezeichnung, kurzbz,kurzbzlang, typ, tbl_lehrverband.semester, verband, gruppe, gruppe_kurzbz, tbl_lehrverband.bezeichnung AS lvb_bezeichnung, tbl_gruppe.bezeichnung AS grp_bezeichnung
 			FROM (tbl_studiengang JOIN tbl_lehrverband USING (studiengang_kz))
@@ -34,6 +37,7 @@ $sql_query="SET search_path TO public;
 			WHERE tbl_lehrverband.aktiv AND tbl_studiengang.aktiv $stg_kz_query
 			ORDER BY erhalter_kz,typ, kurzbz, semester,verband,gruppe, gruppe_kurzbz;";
 
+//echo $sql_query;
 if(!$result=pg_query($conn, $sql_query))
 	$error_msg.=pg_errormessage($conn);
 else
