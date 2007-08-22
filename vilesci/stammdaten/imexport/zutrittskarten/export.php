@@ -17,9 +17,20 @@ require_once('../../../../include/Excel/Validator.php');
 if (!$conn=pg_pconnect(CONN_STRING))
 	die(pg_last_error($conn));
 
+// letzte Nummer
+$sql_query="SELECT max(key) AS last_keynr FROM sync.tbl_zutrittskarte;";
+//echo $sql_query;
+if(!$result=pg_exec($conn, $sql_query))
+	die(pg_errormessage().'<BR>'.$sql_query);
+if ($row=pg_fetch_object($result))
+	$key_nummer=$row->last_keynr+1;
+else
+	die ('Letzte Nummer konnte nicht eroiert werden!');
+
 // Neue Zutrittskarten
 $sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer,
 				max(tbl_benutzer.uid) AS uid, max(matrikelnr) AS matrikelnr, max(kurzbzlang) AS stg_kurzbzlang,
+				upper(max(typ) || max(kurzbz)) AS stg_kurzbz,
 				EXTRACT(DAY FROM vw_betriebsmittelperson.insertamum) AS tag,
 				EXTRACT(MONTH FROM vw_betriebsmittelperson.insertamum) AS monat,
 				EXTRACT(YEAR FROM vw_betriebsmittelperson.insertamum) AS jahr
@@ -36,6 +47,7 @@ if(!$result_neu=pg_exec($conn, $sql_query))
 // Updates von Zutrittskarten
 $sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer,firstname,name,key,
 				max(tbl_benutzer.uid) AS uid, max(matrikelnr) AS matrikelnr, max(kurzbzlang) AS stg_kurzbzlang,
+				upper(max(typ) || max(kurzbz)) AS stg_kurzbz,
 				EXTRACT(DAY FROM vw_betriebsmittelperson.insertamum) AS tag,
 				EXTRACT(MONTH FROM vw_betriebsmittelperson.insertamum) AS monat,
 				EXTRACT(YEAR FROM vw_betriebsmittelperson.insertamum) AS jahr
@@ -100,15 +112,15 @@ $z=1; // Start bei Zeile 1
 while ($row=pg_fetch_object($result_neu))
 {
 	$command='a';
-	$gruppe=$row->stg_kurzbzlang;
+	$gruppe=$row->stg_kurzbz;
 	if ($gruppe=='')
 		$gruppe='Verwaltung';
 	$worksheet->write($z,0, $command);
-	$worksheet->write($z,1, $row->nummerintern);
+	$worksheet->write($z,1, $key_nummer);				//$row->nummerintern);
 	$worksheet->write($z,2, $row->nachname);
 	$worksheet->write($z,3, $row->vorname);
 	$worksheet->write($z,4, $gruppe);
-	$worksheet->write($z,5, $row->nummerintern);
+	$worksheet->write($z,5, $key_nummer++);				//$row->nummerintern);
 	$worksheet->write($z,6, $row->nummer);
 	$worksheet->write($z,7, $row->tag.'.'.$row->monat.'.'.$row->jahr);
 	$worksheet->write($z,8, $row->tag.'.'.$row->monat.'.'.($row->jahr+5));
@@ -127,7 +139,7 @@ while ($row=pg_fetch_object($result_neu))
 while ($row=pg_fetch_object($result_upd))
 {
 	$command='u';
-	$gruppe=$row->stg_kurzbzlang;
+	$gruppe=$row->stg_kurzbz;
 	if ($gruppe=='')
 		$gruppe='Verwaltung';
 	$worksheet->write($z,0, $command);
