@@ -264,9 +264,10 @@ else
 }
 echo $stsem_content;
 echo '</td><tr></table>';
-echo '<table><tr>';
-echo '<td class="tdwidth10">&nbsp;</td>';
+
+echo '<table width="100%"><tr>';echo '<td class="tdwidth10">&nbsp;</td>';
 echo "<td>\n";
+
 echo "<b>$lv_obj->bezeichnung</b><br>";
 
 if($lehreinheit_id=='')
@@ -298,203 +299,208 @@ if (isset($_REQUEST["copy_uebung"]))
 	$copy_update_bsp = 0;
 	$uebung_id_source = $_REQUEST["uebung_id_source"];
 	$lehreinheit_id_target = $_REQUEST["lehreinheit_id_target"];
-	
-	$ueb_1 = new uebung($conn, $uebung_id_source);
-	$nummer_source = $ueb_1->nummer;
-	$qry = "SELECT * from campus.tbl_uebung where nummer = '".$nummer_source."' and lehreinheit_id = '".$lehreinheit_id_target."'";
-	if($result1 = pg_query($conn, $qry))	
+	if (!is_numeric($uebung_id_source) or !is_numeric($lehreinheit_id_target))
+		echo "<span class='error'>Übung und Lehreinheit muss ausgewählt sein!</span>";
+	else
 	{
-		if (pg_num_rows($result1) >0)
+		$ueb_1 = new uebung($conn, $uebung_id_source);
+		$nummer_source = $ueb_1->nummer;
+		$qry = "SELECT * from campus.tbl_uebung where nummer = '".$nummer_source."' and lehreinheit_id = '".$lehreinheit_id_target."'";
+		//echo $qry;
+		if($result1 = pg_query($conn, $qry))	
 		{
-			$row1 = pg_fetch_object($result1);		
-			$ueb_1_target =new uebung($conn, $row1->uebung_id);
-			$ueb_1_target->new = false;
-			$new = null;
-			$ueb_1_target->insertamum = null;
-			$ueb_1_target->insertvon = null;
-			$ueb_1_target->updateamum = date('Y-m-d H:i:s');
-			$ueb_1_target->updatevon = $user;
-			$copy_update++;
-		}
-		else
-		{
-			$ueb_1_target =new uebung($conn);
-			$ueb_1_target->new = true;
-			$new = true;
-			$ueb_1_target->insertamum = date('Y-m-d H:i:s');
-			$ueb_1_target->insertvon = $user;
-			$ueb_1_target->updateamum = null;
-			$ueb_1_target->updatevon = null;
-			$copy_insert++;
-		}
-		$ueb_1_target->gewicht = $ueb_1->gewicht;
-		$ueb_1_target->punkte = null;
-		$ueb_1_target->angabedatei=null;
-		$ueb_1_target->freigabevon = null;
-		$ueb_1_target->freigabebis = null;
-		$ueb_1_target->abgabe = false;
-		$ueb_1_target->beispiele = false;
-		$ueb_1_target->statistik = false;
-		$ueb_1_target->maxstd = null;
-		$ueb_1_target->maxbsp=null;
-		$ueb_1_target->liste_id=null;
-		$ueb_1_target->bezeichnung = $ueb_1->bezeichnung;
-		$ueb_1_target->positiv = $ueb_1->positiv;
-		$ueb_1_target->defaultbemerkung = $ueb_1->defaultbemerkung;
-		$ueb_1_target->lehreinheit_id = $lehreinheit_id_target;
-		$ueb_1_target->nummer = $nummer_source;
-				
-		if (!$ueb_1_target->save($new))
-		{
-			$error = 1;
-			echo "<span class='error'>Hauptübung konnte nicht kopiert werden!</span>";
-		}
-			
-		else
-		{
-			// Subübungen durchlaufen			
-			$error = 0;
-			$ueb_2 = new uebung($conn);
-			$ueb_2->load_uebung($lehreinheit_id,2,$uebung_id_source);
-			
-			$ueb_2anzahl = count($ueb_2->uebungen);
-			if ($ueb_2anzahl >0)			
+			if (pg_num_rows($result1) >0)
 			{
-				foreach ($ueb_2->uebungen as $subrow)
-				{
-														
-					$nummer_source2 = $subrow->nummer;
-					$qry2 = "SELECT * from campus.tbl_uebung where nummer = '".$nummer_source2."' and lehreinheit_id = '".$lehreinheit_id_target."'";
-					$result2 = pg_query($conn, $qry2);
-
-					if (pg_num_rows($result2) >0)
-					{
-						$row2 = pg_fetch_object($result2);		
-						$ueb_2_target =new uebung($conn, $row2->uebung_id);
-						$ueb_2_target->new = false;
-						$new = null;
-						$ueb_2_target->insertamum = null;
-						$ueb_2_target->insertvon = null;
-						$ueb_2_target->updateamum = date('Y-m-d H:i:s');
-						$ueb_2_target->updatevon = $user;
-						$copy_update++;
-					}
-					else
-					{
-						$ueb_2_target =new uebung($conn);
-						$ueb_2_target->new = true;
-						$new = true;
-						$ueb_2_target->insertamum = date('Y-m-d H:i:s');
-						$ueb_2_target->insertvon = $user;
-						$ueb_2_target->updateamum = null;
-						$ueb_2_target->updatevon = null;
-						$copy_insert++;
-					}
-					$ueb_2_target->gewicht = $subrow->gewicht;
-					$ueb_2_target->punkte = $subrow->punkte;
-					$ueb_2_target->angabedatei=null;
-					$ueb_2_target->freigabevon = $subrow->freigabevon;
-					$ueb_2_target->freigabebis = $subrow->freigabebis;
-					$ueb_2_target->abgabe = $subrow->abgabe;
-					$ueb_2_target->beispiele = $subrow->beispiele;
-					$ueb_2_target->statistik = $subrow->statistik;
-					$ueb_2_target->maxstd = $subrow->maxstd;
-					$ueb_2_target->maxbsp=$subrow->maxbsp;
-					$ueb_2_target->liste_id=$ueb_1_target->uebung_id;
-					$ueb_2_target->bezeichnung = $subrow->bezeichnung;
-					$ueb_2_target->positiv = $subrow->positiv;
-					$ueb_2_target->defaultbemerkung = $subrow->defaultbemerkung;
-					$ueb_2_target->lehreinheit_id = $lehreinheit_id_target;
-					$ueb_2_target->nummer = $nummer_source2;
-							
-					if (!$ueb_2_target->save($new))
-					{
-						$error = 1;
-						echo "<span class='error'>Übung konnte nicht kopiert werden!</span>";
-					}
+				$row1 = pg_fetch_object($result1);		
+				$ueb_1_target =new uebung($conn, $row1->uebung_id);
+				$ueb_1_target->new = false;
+				$new = null;
+				$ueb_1_target->insertamum = null;
+				$ueb_1_target->insertvon = null;
+				$ueb_1_target->updateamum = date('Y-m-d H:i:s');
+				$ueb_1_target->updatevon = $user;
+				$copy_update++;
+			}
+			else
+			{
+				$ueb_1_target =new uebung($conn);
+				$ueb_1_target->new = true;
+				$new = true;
+				$ueb_1_target->insertamum = date('Y-m-d H:i:s');
+				$ueb_1_target->insertvon = $user;
+				$ueb_1_target->updateamum = null;
+				$ueb_1_target->updatevon = null;
+				$copy_insert++;
+			}
+			$ueb_1_target->gewicht = $ueb_1->gewicht;
+			$ueb_1_target->punkte = null;
+			$ueb_1_target->angabedatei=null;
+			$ueb_1_target->freigabevon = null;
+			$ueb_1_target->freigabebis = null;
+			$ueb_1_target->abgabe = false;
+			$ueb_1_target->beispiele = false;
+			$ueb_1_target->statistik = false;
+			$ueb_1_target->maxstd = null;
+			$ueb_1_target->maxbsp=null;
+			$ueb_1_target->liste_id=null;
+			$ueb_1_target->bezeichnung = $ueb_1->bezeichnung;
+			$ueb_1_target->positiv = $ueb_1->positiv;
+			$ueb_1_target->defaultbemerkung = $ueb_1->defaultbemerkung;
+			$ueb_1_target->lehreinheit_id = $lehreinheit_id_target;
+			$ueb_1_target->nummer = $nummer_source;
 					
-					//angabedatei syncen
-					if ($subrow->angabedatei != "")
-					{	
-						$angabedatei_source = $subrow->angabedatei;
-						$angabedatei_target = makeUploadName($conn, 'angabe', $lehreinheit_id, $ueb_2_target->uebung_id, $stsem);
-						$angabedatei_target .= ".".substr($angabedatei_source, strrpos($angabedatei_source, '.') + 1);
-						echo $angabedatei_source."->".$angabedatei_target."<br>";
-						exec("cp ".BENOTUNGSTOOL_PATH."angabe/".$angabedatei_source." ".BENOTUNGSTOOL_PATH."angabe/".$angabedatei_target);
-						$angabeupdate = "update campus.tbl_uebung set angabedatei = '".$angabedatei_target."' where uebung_id = '".$ueb_2_target->uebung_id."'";
-						pg_query($conn, $angabeupdate);
-					}
-									
-					if (($error == 0) and $ueb_2_target->beispiele)
+			if (!$ueb_1_target->save($new))
+			{
+				$error = 1;
+				echo "<span class='error'>Hauptübung konnte nicht kopiert werden!</span>";
+			}
+				
+			else
+			{
+				// Subübungen durchlaufen			
+				$error = 0;
+				$ueb_2 = new uebung($conn);
+				$ueb_2->load_uebung($lehreinheit_id,2,$uebung_id_source);
+				
+				$ueb_2anzahl = count($ueb_2->uebungen);
+				if ($ueb_2anzahl >0)			
+				{
+					foreach ($ueb_2->uebungen as $subrow)
 					{
-						// beispiele synchronisieren
-						$bsp_obj = new beispiel($conn);
-						$bsp_obj->load_beispiel($subrow->uebung_id);
-						foreach ($bsp_obj->beispiele as $bsp)
+															
+						$nummer_source2 = $subrow->nummer;
+						$qry2 = "SELECT * from campus.tbl_uebung where nummer = '".$nummer_source2."' and lehreinheit_id = '".$lehreinheit_id_target."'";
+						$result2 = pg_query($conn, $qry2);
+	
+						if (pg_num_rows($result2) >0)
 						{
-							$nummer_source_bsp = $bsp->nummer;
-							$qrybsp = "SELECT * from campus.tbl_beispiel where nummer = '".$nummer_source_bsp."' and uebung_id = '".$ueb_2_target->uebung_id."'";
-							$resultbsp = pg_query($conn, $qrybsp);
-		
-							if (pg_num_rows($resultbsp) >0)
-							{
-								$rowbsp = pg_fetch_object($resultbsp);		
-								$bsp_target =new beispiel($conn, $rowbsp->beispiel_id);
-								$bsp_target->new = false;
-								$new = null;
-								$bsp_target->insertamum = null;
-								$bsp_target->insertvon = null;
-								$bsp_target->updateamum = date('Y-m-d H:i:s');
-								$bsp_target->updatevon = $user;
-								$copy_update_bsp++;
-							}
-							else
-							{
-								$bsp_target =new beispiel($conn);
-								$bsp_target->new = true;
-								$new = true;
-								$bsp_target->insertamum = date('Y-m-d H:i:s');
-								$bsp_target->insertvon = $user;
-								$bsp_target->updateamum = null;
-								$bsp_target->updatevon = null;
-								$copy_insert_bsp++;
-							}
-							$bsp_target->uebung_id = $ueb_2_target->uebung_id;
-							$bsp_target->nummer = $nummer_source_bsp;
-							$bsp_target->bezeichnung = $bsp->bezeichnung;
-							$bsp_target->punkte = $bsp->punkte;
-							
-							if (!$bsp_target->save($new))
-							{
-								$error = 1;
-								echo "<span class='error'>Beispiele konnten nicht angelegt werden</span>";							
-							}
-							
-							//Notenschlüssel synchronisieren
-							$clear = "delete from campus.tbl_notenschluesseluebung where uebung_id = '".$ueb_1_target->uebung_id."'";
-							pg_query($conn, $clear);
-							
-							$qry_ns_source = "SELECT * from campus.tbl_notenschluesseluebung where uebung_id = '".$uebung_id_source."'";
-							$result_ns_source = pg_query($conn, $qry_ns_source);
-							while($row_ns = pg_fetch_object($result_ns_source))
-							{
-								$ns_insert = "INSERT INTO campus.tbl_notenschluesseluebung values ('".$ueb_1_target->uebung_id."','".$row_ns->note."', '".$row_ns->punkte."')";
-								pg_query($conn, $ns_insert);					
-							}					
-										
-						}									
-					}
+							$row2 = pg_fetch_object($result2);		
+							$ueb_2_target =new uebung($conn, $row2->uebung_id);
+							$ueb_2_target->new = false;
+							$new = null;
+							$ueb_2_target->insertamum = null;
+							$ueb_2_target->insertvon = null;
+							$ueb_2_target->updateamum = date('Y-m-d H:i:s');
+							$ueb_2_target->updatevon = $user;
+							$copy_update++;
+						}
+						else
+						{
+							$ueb_2_target =new uebung($conn);
+							$ueb_2_target->new = true;
+							$new = true;
+							$ueb_2_target->insertamum = date('Y-m-d H:i:s');
+							$ueb_2_target->insertvon = $user;
+							$ueb_2_target->updateamum = null;
+							$ueb_2_target->updatevon = null;
+							$copy_insert++;
+						}
+						$ueb_2_target->gewicht = $subrow->gewicht;
+						$ueb_2_target->punkte = $subrow->punkte;
+						$ueb_2_target->angabedatei=null;
+						$ueb_2_target->freigabevon = $subrow->freigabevon;
+						$ueb_2_target->freigabebis = $subrow->freigabebis;
+						$ueb_2_target->abgabe = $subrow->abgabe;
+						$ueb_2_target->beispiele = $subrow->beispiele;
+						$ueb_2_target->statistik = $subrow->statistik;
+						$ueb_2_target->maxstd = $subrow->maxstd;
+						$ueb_2_target->maxbsp=$subrow->maxbsp;
+						$ueb_2_target->liste_id=$ueb_1_target->uebung_id;
+						$ueb_2_target->bezeichnung = $subrow->bezeichnung;
+						$ueb_2_target->positiv = $subrow->positiv;
+						$ueb_2_target->defaultbemerkung = $subrow->defaultbemerkung;
+						$ueb_2_target->lehreinheit_id = $lehreinheit_id_target;
+						$ueb_2_target->nummer = $nummer_source2;
+								
+						if (!$ueb_2_target->save($new))
+						{
+							$error = 1;
+							echo "<span class='error'>Übung konnte nicht kopiert werden!</span>";
+						}
 						
+						//angabedatei syncen
+						if ($subrow->angabedatei != "")
+						{	
+							$angabedatei_source = $subrow->angabedatei;
+							$angabedatei_target = makeUploadName($conn, 'angabe', $lehreinheit_id, $ueb_2_target->uebung_id, $stsem);
+							$angabedatei_target .= ".".substr($angabedatei_source, strrpos($angabedatei_source, '.') + 1);
+							echo $angabedatei_source."->".$angabedatei_target."<br>";
+							exec("cp ".BENOTUNGSTOOL_PATH."angabe/".$angabedatei_source." ".BENOTUNGSTOOL_PATH."angabe/".$angabedatei_target);
+							$angabeupdate = "update campus.tbl_uebung set angabedatei = '".$angabedatei_target."' where uebung_id = '".$ueb_2_target->uebung_id."'";
+							pg_query($conn, $angabeupdate);
+						}
+										
+						if (($error == 0) and $ueb_2_target->beispiele)
+						{
+							// beispiele synchronisieren
+							$bsp_obj = new beispiel($conn);
+							$bsp_obj->load_beispiel($subrow->uebung_id);
+							foreach ($bsp_obj->beispiele as $bsp)
+							{
+								$nummer_source_bsp = $bsp->nummer;
+								$qrybsp = "SELECT * from campus.tbl_beispiel where nummer = '".$nummer_source_bsp."' and uebung_id = '".$ueb_2_target->uebung_id."'";
+								$resultbsp = pg_query($conn, $qrybsp);
+			
+								if (pg_num_rows($resultbsp) >0)
+								{
+									$rowbsp = pg_fetch_object($resultbsp);		
+									$bsp_target =new beispiel($conn, $rowbsp->beispiel_id);
+									$bsp_target->new = false;
+									$new = null;
+									$bsp_target->insertamum = null;
+									$bsp_target->insertvon = null;
+									$bsp_target->updateamum = date('Y-m-d H:i:s');
+									$bsp_target->updatevon = $user;
+									$copy_update_bsp++;
+								}
+								else
+								{
+									$bsp_target =new beispiel($conn);
+									$bsp_target->new = true;
+									$new = true;
+									$bsp_target->insertamum = date('Y-m-d H:i:s');
+									$bsp_target->insertvon = $user;
+									$bsp_target->updateamum = null;
+									$bsp_target->updatevon = null;
+									$copy_insert_bsp++;
+								}
+								$bsp_target->uebung_id = $ueb_2_target->uebung_id;
+								$bsp_target->nummer = $nummer_source_bsp;
+								$bsp_target->bezeichnung = $bsp->bezeichnung;
+								$bsp_target->punkte = $bsp->punkte;
+								
+								if (!$bsp_target->save($new))
+								{
+									$error = 1;
+									echo "<span class='error'>Beispiele konnten nicht angelegt werden</span>";							
+								}
+								
+								//Notenschlüssel synchronisieren
+								$clear = "delete from campus.tbl_notenschluesseluebung where uebung_id = '".$ueb_1_target->uebung_id."'";
+								pg_query($conn, $clear);
+								
+								$qry_ns_source = "SELECT * from campus.tbl_notenschluesseluebung where uebung_id = '".$uebung_id_source."'";
+								$result_ns_source = pg_query($conn, $qry_ns_source);
+								while($row_ns = pg_fetch_object($result_ns_source))
+								{
+									$ns_insert = "INSERT INTO campus.tbl_notenschluesseluebung values ('".$ueb_1_target->uebung_id."','".$row_ns->note."', '".$row_ns->punkte."')";
+									pg_query($conn, $ns_insert);					
+								}					
+											
+							}									
+						}
+							
+					}
 				}
 			}
+			
 		}
-		
+		else
+			echo "<span class='error'>Fehler beim Datenbankzugriff!</span>";
+			
+		if ($error == 0)
+			echo "Übung erfolgreich kopiert! (Ü: ".$copy_insert."/".$copy_update."; B: ".$copy_insert_bsp."/".$copy_update_bsp.")";
 	}
-	else
-		echo "<span class='error'>Fehler beim Datenbankzugriff!</span>";
-		
-	if ($error == 0)
-		echo "Übung erfolgreich kopiert! (Ü: ".$copy_insert."/".$copy_update."; B: ".$copy_insert_bsp."/".$copy_update_bsp.")";
 }
 
 
@@ -758,8 +764,8 @@ else
 	//Gesamtuebersicht ueber alle Uebungen
 	
 	echo "<table><tr><td valign='top'>";
-	echo "<form action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method=POST>";
-	echo "<table width='440'><tr><td colspan='4' class='ContentHeader3'>Vorhandene Übungen bearbeiten</td></tr>";
+	echo "<form name='del' action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method='POST'>";
+	echo "<table width='440'><tr><td colspan='3' class='ContentHeader3'>Vorhandene Übungen bearbeiten</td></tr>";
 
 	$uebung_obj = new uebung($conn);
 	$uebung_obj->load_uebung($lehreinheit_id,$level=1,$uebung_id=null);
@@ -768,7 +774,7 @@ else
 	$has_copy_content=false;
 	if($anzahl>0)
 	{
-		echo "<tr><td></td><td></td><td>&nbsp;</td><td></td></tr><tr><th>Thema</th><th>Freigeschalten</th><th>Auswahl</th><th>Kopieren</th></tr>";
+		echo "<tr><td></td><td></td><td>&nbsp;</td><td></td></tr><tr><th>Thema</th><th>Freigeschalten</th><th>Auswahl</th></tr>";
 
 		//Alle Lehreinheiten holen die zu dieser lehrveranstaltung gehoeren
 		//und der angemeldete User berechtigt ist
@@ -819,10 +825,11 @@ else
 			}
 			
 		}
-
+		$uebung_id_source_dropdown = "<select name='uebung_id_source'><option></option>";
 		//Uebungen durchlaufen
 		foreach ($uebung_obj->uebungen as $row)
 		{
+			$uebung_id_source_dropdown .= "<option value='$row->uebung_id'>$row->bezeichnung</option>";
 			$has_option_content=false;
 			echo "<tr height=23><td align='left'>";
 			echo "<a onClick='return(js_toggle_container(\"submenu_$row->uebung_id\"));' class='MenuItem'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'></a>&nbsp;<a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$row->uebung_id' class='Item'><u>".htmlentities($row->bezeichnung)."</u></a>";
@@ -833,60 +840,18 @@ else
 			//else
 			//	echo 'Nein';
 			echo "</td><td align='center'><input type='Checkbox' name='uebung[]' value='$row->uebung_id'></td>";
-			echo "<td><form name='copy' action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method='POST'><input type='hidden' name='uebung_id_source' value='".$row->uebung_id."'>".$copy_dropdown."<input type='submit' name='copy_uebung' value='>'></form></td>";
+			echo "<!--<form name='copy' action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method='POST'><td><input type='hidden' name='uebung_id_source' value='".$row->uebung_id."'>".$copy_dropdown."<input type='submit' name='copy_uebung' value='>'></td></form>-->";
 			echo "</tr>";
-			//echo "</td><td></td>";
-			//Wenn andere Lehreinheiten vorhanden sind dann wird die moeglichkeit zum kopieren von
-			//Uebungen in diese Lehreinheiten angeboten.
-			/*			
-			if(isset($result_alle_lehreinheiten) && pg_num_rows($result_alle_lehreinheiten)>1)
-			{
-				$copy_content.= '<tr height=23>';
-				$copy_content.= '<td nowrap align="right">';
-				$copy_option_content = '';
-				//Lehreinheiten fuer Combo durchgehen und schauen ob
-				//fuer diese Lehreinheit bereits eine Uebung mit gleichem Namen existiert
-				//Falls ja wird diese nicht in der Combo angezeigt
-				foreach ($copy_le_content as $id=>$bezeichnung)
-				{
-					$qry = "SELECT uebung_id FROM campus.tbl_uebung WHERE lehreinheit_id='$id' AND bezeichnung='$row->bezeichnung'";
-					//echo $qry;
-					if($result_vorhanden = pg_query($conn, $qry))
-					{
-						if(pg_num_rows($result_vorhanden)==0)
-						{
-							$copy_option_content.= "<OPTION value='$id'>$bezeichnung</OPTION>\n";
-							$has_option_content=true;
-							$has_copy_content=true;
-						}
-					}
-				}
-				//Wenn eintraege fuer Combo vorhanden sind dann wirds angezeigt
-				if($has_option_content)
-				{
-					$copy_content.= "\n<form  style='margin:1px;' action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&kopieren=true&uebung_copy_id=$row->uebung_id' method='POST'>";
-					$copy_content.= "\n<SELECT name='lehreinheit_copy_id'>\n";
-					$copy_content.= $copy_option_content;
-					$copy_content.= '</SELECT> ';
-					$copy_content.= "&nbsp;&nbsp;&nbsp;<input type='submit' value='COPY'>";
-					$copy_content.= "</form>\n";
-				}
-				else
-				{
-					$copy_content.="&nbsp;";
-				}
-				$copy_content.= "</td></tr>";
-			}
-			*/
+
 			$subuebung_obj = new uebung($conn);
 			$subuebung_obj->load_uebung($lehreinheit_id,$level=2,$uebung_id=$row->uebung_id);
 			$subanzahl = count($subuebung_obj->uebungen);
 			echo "<tr><td colspan='3'>";
-			echo "<table id='submenu_".$row->uebung_id."' style='display:none;'>";
+			echo "<table id='submenu_".$row->uebung_id."' style='display:none;' width='400'>";
 			//echo "<ul style='margin-top: 0px; margin-bottom: 0px;'>";
 			foreach ($subuebung_obj->uebungen as $subrow)
 			{
-				echo "<tr><td width='150px'><li style='margin-left:20px;'><a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$subrow->uebung_id&liste_id=$row->uebung_id'>".$subrow->bezeichnung."</a></li></td><td width='50'>";
+				echo "<tr><td width='200'><li style='margin-left:20px;'><a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$subrow->uebung_id&liste_id=$row->uebung_id'>".$subrow->bezeichnung."</a></li></td><td width='150'>";
 				if((strtotime(strftime($subrow->freigabevon))<=time()) && (strtotime(strftime($subrow->freigabebis))>=time()))
 					echo 'Ja';
 				else
@@ -895,17 +860,26 @@ else
 			}
 			//echo "</ul>";
 			echo "</table>";
-			echo "</td><td></td></tr>";
-			
+			echo "</td></tr>";
 		}
 		echo "<tr><td colspan='3' align='right'><input type='Submit' value='Auswahl löschen' name='delete_uebung' onclick='return confirmdelete();'></td><td></td></tr>";
-
+		echo "</form>";
+		echo "<tr><td colspan='3'>&nbsp;</td></tr>";
+		echo "<tr><td colspan='3' class='ContentHeader3'>Vorhandene Übungen kopieren</td></tr>";
+		
+		$uebung_id_source_dropdown .= "</select>";
+		echo "<tr><td colspan='3'>";
+		echo "<form name='copy' action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method='POST'><table><tr><td>Übung</td><td></td><td>Lehreinheit</td><td></td></tr><tr><td>".$uebung_id_source_dropdown."</td><td>-></td><td>".$copy_dropdown."</td><td><input type='submit' name='copy_uebung' value='kopieren'></td></tr></table></form>";
+		echo "</td></tr>";
 	}
 	else
-		echo "<tr><td colspan='4'>Derzeit sind keine Übungen angelegt</td><td></td></tr>";
+		echo "<tr><td colspan='3'>Derzeit sind keine Übungen angelegt</td><td></td></tr>";
 
 	echo "</table>
-	</form><br><br>";
+	<br><br>";
+
+
+
 
 	//Kopier-Buttons anzeigen
 	//$copy_content.='</table>';

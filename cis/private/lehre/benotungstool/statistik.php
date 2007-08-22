@@ -204,7 +204,7 @@ else
 }
 echo $stsem_content;
 echo '</td><tr></table>';
-echo '<table><tr>';
+echo '<table width="100%"><tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
 echo "<td>\n";
 echo "<b>$lv_obj->bezeichnung</b><br>";
