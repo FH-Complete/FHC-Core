@@ -28,7 +28,7 @@ if (count($berechtigt_studiengang)>0)
 	}
 
 $sql_query="SET search_path TO public;
-			SELECT tbl_lehrverband.studiengang_kz, tbl_studiengang.bezeichnung, kurzbz, typ, tbl_lehrverband.semester, verband, gruppe, gruppe_kurzbz, tbl_lehrverband.bezeichnung AS lvb_bezeichnung, tbl_gruppe.bezeichnung AS grp_bezeichnung
+			SELECT tbl_lehrverband.studiengang_kz, tbl_studiengang.bezeichnung, kurzbz,kurzbzlang, typ, tbl_lehrverband.semester, verband, gruppe, gruppe_kurzbz, tbl_lehrverband.bezeichnung AS lvb_bezeichnung, tbl_gruppe.bezeichnung AS grp_bezeichnung
 			FROM (tbl_studiengang JOIN tbl_lehrverband USING (studiengang_kz))
 				LEFT OUTER JOIN tbl_gruppe  ON (tbl_lehrverband.studiengang_kz=tbl_gruppe.studiengang_kz AND tbl_lehrverband.semester=tbl_gruppe.semester AND (tbl_lehrverband.verband='') AND tbl_gruppe.lehre AND tbl_gruppe.aktiv)
 			WHERE tbl_lehrverband.aktiv AND tbl_studiengang.aktiv $stg_kz_query
@@ -57,7 +57,7 @@ while ($row=pg_fetch_object($result))
 		$stg_kurzbz=strtoupper($row->typ.$row->kurzbz);
 		?>
 		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz; ?>" >
-			<VERBAND:name><?php echo $stg_kurzbz.' - '.$row->bezeichnung; ?></VERBAND:name>
+			<VERBAND:name><?php echo $row->kurzbzlang.' ('.$stg_kurzbz.') - '.$row->bezeichnung; ?></VERBAND:name>
 			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
 			<VERBAND:stg_kz><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
 		</RDF:Description>
@@ -175,7 +175,7 @@ while ($row=pg_fetch_object($result))
 		?>
 
 		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$row->semester.'/'.$row->gruppe_kurzbz; ?>">
-			<VERBAND:name><?php echo $row->gruppe_kurzbz.'-'.$row->grp_bezeichnung; ?></VERBAND:name>
+			<VERBAND:name><?php echo $row->gruppe_kurzbz.' ('.$row->grp_bezeichnung.')'; ?></VERBAND:name>
 			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
 			<VERBAND:stg_kz><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
 			<VERBAND:sem><?php echo $row->semester; ?></VERBAND:sem>
