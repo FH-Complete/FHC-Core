@@ -102,7 +102,7 @@ $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 echo '<table class="tabcontent" height="100%">';
 echo ' <tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
-echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;"Kreuzerl"-Tool';
+echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;Benotungstool';
 echo '</font></td><td  class="ContentHeader" align="right">'."\n";
 
 //Studiensemester laden
