@@ -492,3 +492,28 @@ td.tdvertical
 {
 	background-color: #00FF00;
 }*/
+.studentnote
+{
+	font-weight:bold;
+}
+
+.benotungstool_tabs
+{
+	border-top: 1px solid gray;
+	border-left: 1px solid gray;
+	border-right: 1px solid gray;
+	text-align: center;
+}
+.benotungstool_tabs_active
+{
+	border-top: 2px solid gray;
+	border-left: 2px solid gray;
+	border-right: 2px solid gray;
+	background-color: #eeeeee;
+	text-align: center;
+}
+.benotungstool_subtab
+{
+	border-top: 1px solid gray;
+	border-bottom: 1px solid gray;
+}
