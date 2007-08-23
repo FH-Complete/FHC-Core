@@ -286,16 +286,33 @@ if($xmlformat=='rdf')
 
 		$where.=" AND tbl_studentlehrverband.studiensemester_kurzbz='$studiensemester_kurzbz'";
 
-		$sql_query = "SET CLIENT_ENCODING TO 'UNICODE'; SELECT tbl_person.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, tbl_person.titelpre,
+		/*$sql_query = "SET CLIENT_ENCODING TO 'UNICODE'; SELECT tbl_person.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, tbl_person.titelpre,
 		                     tbl_person.titelpost, tbl_person.vorname, tbl_person.vornamen, tbl_person.nachname,
 		                      tbl_person.gebdatum, tbl_person.anmerkungen, tbl_person.ersatzkennzeichen,
 		                     tbl_person.svnr, tbl_student.matrikelnr, tbl_studentlehrverband.semester,
 		                     tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe, tbl_studentlehrverband.studiengang_kz
-					  FROM public.tbl_person, public.tbl_student, public.tbl_benutzer, public.tbl_studentlehrverband";
+					  FROM public.tbl_person, public.tbl_student, public.tbl_benutzer, public.tbl_studentlehrverband";*/
+		/*$sql_query="SET CLIENT_ENCODING TO 'UNICODE';
+					SELECT person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,
+						vorname, vornamen, nachname, gebdatum, anmerkungen,ersatzkennzeichen,svnr, tbl_student.matrikelnr,
+						tbl_studentlehrverband.semester,tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
+						tbl_studentlehrverband.studiengang_kz, kontakt AS email_privat
+					FROM public.tbl_studentlehrverband JOIN public.tbl_student USING (student_uid)
+						JOIN public.tbl_benutzer ON (student_uid=uid) JOIN public.tbl_person USING (person_id)
+						LEFT OUTER JOIN public.tbl_kontakt ON (tbl_person.person_id=tbl_kontakt.person_id AND kontakttyp='email' AND zustellung) ";*/
+		$sql_query="SET CLIENT_ENCODING TO 'UNICODE';
+					SELECT person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,
+						vorname, vornamen, nachname, gebdatum, anmerkungen,ersatzkennzeichen,svnr, tbl_student.matrikelnr,
+						tbl_studentlehrverband.semester,tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
+						tbl_studentlehrverband.studiengang_kz
+					FROM public.tbl_studentlehrverband JOIN public.tbl_student USING (student_uid)
+						JOIN public.tbl_benutzer ON (student_uid=uid) JOIN public.tbl_person USING (person_id)
+					WHERE ";
 		if($gruppe_kurzbz!=null)
 			$sql_query.= ",public.tbl_benutzergruppe";
-		$sql_query.= " WHERE tbl_person.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid = tbl_student.student_uid AND tbl_studentlehrverband.student_uid=tbl_student.student_uid AND $where ORDER BY nachname, vorname";
-		echo $sql_query;
+		//$sql_query.= " WHERE tbl_person.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid = tbl_student.student_uid AND tbl_studentlehrverband.student_uid=tbl_student.student_uid AND $where ORDER BY nachname, vorname";
+		$sql_query.=$where.' ORDER BY nachname, vorname';
+		//echo $sql_query;
 		if($result = pg_query($conn, $sql_query))
 			while($row = pg_fetch_object($result))
 			{
