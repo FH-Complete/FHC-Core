@@ -94,7 +94,7 @@ function convdate($date)
 	    		<STUDENT:verband><![CDATA['.(isset($row->verband)?$row->verband:'').']]></STUDENT:verband>
 	    		<STUDENT:gruppe><![CDATA['.(isset($row->gruppe)?$row->gruppe:'').']]></STUDENT:gruppe>
 				<STUDENT:matrikelnummer><![CDATA['.(isset($row->matrikelnr)?$row->matrikelnr:'').']]></STUDENT:matrikelnummer>
-	    		<STUDENT:mail_privat><![CDATA['.$mail_privat.']]></STUDENT:mail_privat>
+	    		<STUDENT:mail_privat><![CDATA['.$row->email_privat.']]></STUDENT:mail_privat>
 	    		<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
 				<STUDENT:status><![CDATA['.$status.']]></STUDENT:status>
 	    		<STUDENT:anmerkungen>'.($row->anmerkungen==''?'&#xA0;':'<![CDATA['.$row->anmerkungen.']]>').'</STUDENT:anmerkungen>
@@ -269,7 +269,7 @@ if($xmlformat=='rdf')
 		$where = '';
 		if ($gruppe_kurzbz!=null)
 		{
-			$where=" gruppe_kurzbz='".$gruppe_kurzbz."' AND tbl_benutzer.uid=tbl_benutzergruppe.uid";
+			$where=" gruppe_kurzbz='".$gruppe_kurzbz."' ";
 			if($studiensemester_kurzbz!=null)
 				$where.=" AND tbl_benutzergruppe.studiensemester_kurzbz='$studiensemester_kurzbz'";
 		}
@@ -300,18 +300,31 @@ if($xmlformat=='rdf')
 					FROM public.tbl_studentlehrverband JOIN public.tbl_student USING (student_uid)
 						JOIN public.tbl_benutzer ON (student_uid=uid) JOIN public.tbl_person USING (person_id)
 						LEFT OUTER JOIN public.tbl_kontakt ON (tbl_person.person_id=tbl_kontakt.person_id AND kontakttyp='email' AND zustellung) ";*/
-		$sql_query="SET CLIENT_ENCODING TO 'UNICODE';
+		/*$sql_query="SET CLIENT_ENCODING TO 'UNICODE';
 					SELECT person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,
 						vorname, vornamen, nachname, gebdatum, anmerkungen,ersatzkennzeichen,svnr, tbl_student.matrikelnr,
 						tbl_studentlehrverband.semester,tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 						tbl_studentlehrverband.studiengang_kz
 					FROM public.tbl_studentlehrverband JOIN public.tbl_student USING (student_uid)
 						JOIN public.tbl_benutzer ON (student_uid=uid) JOIN public.tbl_person USING (person_id)
-					WHERE ";
+					WHERE ";*/
+		$sql_query="SET CLIENT_ENCODING TO 'UNICODE';
+					SELECT person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,	vorname, vornamen,
+						nachname, gebdatum, anmerkungen,ersatzkennzeichen,svnr, tbl_student.matrikelnr,
+						tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
+						tbl_studentlehrverband.studiengang_kz,
+						(	SELECT kontakt
+							FROM public.tbl_kontakt
+							WHERE kontakttyp='email' AND person_id=p.person_id AND zustellung
+							LIMIT 1
+						)
+						AS email_privat
+						FROM public.tbl_studentlehrverband JOIN public.tbl_student USING (student_uid)
+							JOIN public.tbl_benutzer ON (student_uid=uid) JOIN public.tbl_person p USING (person_id) ";
 		if($gruppe_kurzbz!=null)
-			$sql_query.= ",public.tbl_benutzergruppe";
+			$sql_query.= "JOIN public.tbl_benutzergruppe USING (uid) ";
 		//$sql_query.= " WHERE tbl_person.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid = tbl_student.student_uid AND tbl_studentlehrverband.student_uid=tbl_student.student_uid AND $where ORDER BY nachname, vorname";
-		$sql_query.=$where.' ORDER BY nachname, vorname';
+		$sql_query.="WHERE ".$where.' ORDER BY nachname, vorname';
 		//echo $sql_query;
 		if($result = pg_query($conn, $sql_query))
 			while($row = pg_fetch_object($result))
