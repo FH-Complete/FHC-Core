@@ -28,7 +28,7 @@ $error_msg='';
    		$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden.\n';
 
    	// aktuelles Studiensemester ermitteln
-	$sql_query="SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE start<=now() ORDER BY start DESC LIMIT 1";
+	$sql_query="SELECT studiensemester_kurzbz FROM public.vw_studiensemester ORDER BY delta LIMIT 1";
 	if(!($result=pg_query($conn, $sql_query)))
 		$error_msg.=pg_errormessage($conn);
 	if($row=pg_fetch_object($result))

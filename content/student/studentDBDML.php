@@ -1794,6 +1794,31 @@ if(!$error)
 			$errormsg = 'Fehlerhafte Parameteruebergabe';
 		}
 	}
+	elseif(isset($_POST['type']) && $_POST['type']=='getstundensatz')
+	{
+		if(isset($_POST['person_id']))
+		{
+			$qry = "SELECT stundensatz FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid) WHERE person_id='".addslashes($_POST['person_id'])."'";
+			if($result = pg_query($conn, $qry))
+			{
+				if($row = pg_fetch_object($result))
+				{
+					$data = $row->stundensatz;
+					$return = true;
+				}
+				else 
+				{
+					$data = '80.00';
+					$return = true;
+				}
+			}
+			else 
+			{
+				$return = false;
+				$errormsg = 'Unbekannter Fehler';
+			}
+		}
+	}
 	else
 	{
 		$return = false;

@@ -4,7 +4,7 @@ body
 	background-color: White;
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: x-small;
-	overflow:visible;
+	/*overflow:visible;*/
 	/*IE hack*/
 	voice-family: "\"}\"";
 	voice-family: inherit;
@@ -47,7 +47,7 @@ html>body #menue
 #content
 {
 	width:80%;
-	height:80%;
+	height:75%;
 	left:20%;
 }
 /*Alle auﬂer IE 6*/
