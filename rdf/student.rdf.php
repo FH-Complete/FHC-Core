@@ -24,73 +24,21 @@ require_once('../include/studiensemester.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/studiengang.class.php');
 
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-
+// *********** Funktionen *************************++
 function convdate($date)
 {
 	list($d,$m,$y) = explode('.',$date);
 	return $y.'-'.$m.'-'.$d;
 }
-
-if(isset($_SERVER['REMOTE_USER']))
-{
-	$user = get_uid();
-	loadVariables($conn, $user);
-}
-
-$gruppe_kurzbz=(isset($_GET['gruppe_kurzbz'])?$_GET['gruppe_kurzbz']:null);
-$gruppe=(isset($_GET['gruppe'])?$_GET['gruppe']:null);
-$verband=(isset($_GET['verband'])?$_GET['verband']:null);
-$semester=(isset($_GET['semester'])?$_GET['semester']:null);
-$studiengang_kz=(isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:null);
-$studiensemester_kurzbz = (isset($_GET['studiensemester_kurzbz'])?$_GET['studiensemester_kurzbz']:null);
-$uid = (isset($_GET['uid'])?$_GET['uid']:null);
-$typ = (isset($_GET['typ'])?$_GET['typ']:null);
-$prestudent_id = (isset($_GET['prestudent_id'])?$_GET['prestudent_id']:null);
-$filter = (isset($_GET['filter'])?$_GET['filter']:null);
-$ss = (isset($_GET['ss'])?$_GET['ss']:null);
-$filter2 = (isset($_GET['filter2'])?$_GET['filter2']:null);
-
-if($studiensemester_kurzbz=='aktuelles')
-	$studiensemester_kurzbz = $semester_aktuell;
-
-if(isset($_GET['xmlformat']) && $_GET['xmlformat']=='xml')
-	$xmlformat='xml';
-else
-	$xmlformat='rdf';
-
-$datum_obj = new datum();
-
-if($xmlformat=='rdf')
-{
-	$stg_arr = array();
-	$stg_obj = new studiengang($conn, null, null);
-	$stg_obj->getAll(null, false);
-	foreach ($stg_obj->result as $row)
-		$stg_arr[$row->studiengang_kz]=$row->kuerzel;
-
-	$rdf_url='http://www.technikum-wien.at/student';
-	echo '
-	<RDF:RDF
-		xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-		xmlns:STUDENT="'.$rdf_url.'/rdf#"
-	>
-
-
-	  <RDF:Seq about="'.$rdf_url.'/alle">
-	';
-
 	function checkfilter($row, $filter2)
 	{
 		global $conn;
-		
+
 		if($filter2=='dokumente')
 		{
-			$qry = "SELECT count(*) as anzahl FROM public.tbl_dokumentstudiengang WHERE 
+			$qry = "SELECT count(*) as anzahl FROM public.tbl_dokumentstudiengang WHERE
 					dokument_kurzbz NOT IN(
-						SELECT dokument_kurzbz FROM tbl_dokumentprestudent WHERE prestudent_id='$row->prestudent_id') 
+						SELECT dokument_kurzbz FROM tbl_dokumentprestudent WHERE prestudent_id='$row->prestudent_id')
 					AND studiengang_kz='$row->studiengang_kz'";
 			if($result_filter = pg_query($conn, $qry))
 				if($row_filter = pg_fetch_object($result_filter))
@@ -105,14 +53,14 @@ if($xmlformat=='rdf')
 					if($row_filter->summe=='0.00')
 						return false;
 		}
-		return true;		
+		return true;
 	}
-	
+
 	function draw_content_liste($row)
 	{
 		global $rdf_url, $datum_obj, $conn, $stg_arr;
 		$status='';
-		
+
 		$mail_privat = '';
 		/*$qry_mail = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id='$row->person_id' AND zustellung=true ORDER BY kontakt_id DESC LIMIT 1";
 		if($result_mail = pg_query($conn, $qry_mail))
@@ -126,7 +74,7 @@ if($xmlformat=='rdf')
 		$prestudent = new prestudent($conn, null, null);
 		$prestudent->getLastStatus($row->prestudent_id);
 		$status = $prestudent->rolle_kurzbz;
-			
+
 		echo '
 		  <RDF:li>
 	      	<RDF:Description  id="'.$row->prestudent_id.'"  about="'.$rdf_url.'/'.$row->prestudent_id.'" >
@@ -148,19 +96,19 @@ if($xmlformat=='rdf')
 				<STUDENT:matrikelnummer><![CDATA['.(isset($row->matrikelnr)?$row->matrikelnr:'').']]></STUDENT:matrikelnummer>
 	    		<STUDENT:mail_privat><![CDATA['.$mail_privat.']]></STUDENT:mail_privat>
 	    		<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
-				<STUDENT:status><![CDATA['.$status.']]></STUDENT:status>    		
+				<STUDENT:status><![CDATA['.$status.']]></STUDENT:status>
 	    		<STUDENT:anmerkungen>'.($row->anmerkungen==''?'&#xA0;':'<![CDATA['.$row->anmerkungen.']]>').'</STUDENT:anmerkungen>
 	    		<STUDENT:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz>
-				<STUDENT:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></STUDENT:studiengang>				
+				<STUDENT:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></STUDENT:studiengang>
 	      	</RDF:Description>
 	      </RDF:li>';
 	}
-	
+
 	function draw_content($row)
 	{
 		global $rdf_url, $datum_obj, $conn;
 		$status='';
-		
+
 		$mail_privat = '';
 		/*$qry_mail = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id='$row->person_id' AND zustellung=true ORDER BY kontakt_id DESC LIMIT 1";
 		if($result_mail = pg_query($conn, $qry_mail))
@@ -170,7 +118,7 @@ if($xmlformat=='rdf')
 				$mail_privat = $row_mail->kontakt;
 			}
 		}*/
-		
+
 		if($row->prestudent_id!='')
 		{
 			$prestudent = new prestudent($conn, null, null);
@@ -249,12 +197,68 @@ if($xmlformat=='rdf')
 		}
 	}
 
+// ******* Init **************************
+// Datenbank Verbindung
+if (!$conn = pg_pconnect(CONN_STRING))
+   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
+
+
+if(isset($_SERVER['REMOTE_USER']))
+{
+	$user = get_uid();
+	loadVariables($conn, $user);
+}
+
+$gruppe_kurzbz=(isset($_GET['gruppe_kurzbz'])?$_GET['gruppe_kurzbz']:null);
+$gruppe=(isset($_GET['gruppe'])?$_GET['gruppe']:null);
+$verband=(isset($_GET['verband'])?$_GET['verband']:null);
+$semester=(isset($_GET['semester'])?$_GET['semester']:null);
+$studiengang_kz=(isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:null);
+$studiensemester_kurzbz = (isset($_GET['studiensemester_kurzbz'])?$_GET['studiensemester_kurzbz']:null);
+$uid = (isset($_GET['uid'])?$_GET['uid']:null);
+$typ = (isset($_GET['typ'])?$_GET['typ']:null);
+$prestudent_id = (isset($_GET['prestudent_id'])?$_GET['prestudent_id']:null);
+$filter = (isset($_GET['filter'])?$_GET['filter']:null);
+$ss = (isset($_GET['ss'])?$_GET['ss']:null);
+$filter2 = (isset($_GET['filter2'])?$_GET['filter2']:null);
+
+if($studiensemester_kurzbz=='aktuelles')
+	$studiensemester_kurzbz = $semester_aktuell;
+
+if(isset($_GET['xmlformat']) && $_GET['xmlformat']=='xml')
+	$xmlformat='xml';
+else
+	$xmlformat='rdf';
+
+$datum_obj = new datum();
+
+// ************ Beginn **************************
+
+if($xmlformat=='rdf')
+{
+	$stg_arr = array();
+	$stg_obj = new studiengang($conn, null, null);
+	$stg_obj->getAll(null, false);
+	foreach ($stg_obj->result as $row)
+		$stg_arr[$row->studiengang_kz]=$row->kuerzel;
+
+	$rdf_url='http://www.technikum-wien.at/student';
+	echo '
+	<RDF:RDF
+		xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+		xmlns:STUDENT="'.$rdf_url.'/rdf#"
+	>
+
+
+	  <RDF:Seq about="'.$rdf_url.'/alle">
+	';
+
 	if(isset($uid))
 	{
 		$student=new student($conn,null,true);
 		$student->load($uid, $studiensemester_kurzbz);
 		$prestd = new prestudent($conn, null, true);
-		
+
 		draw_content($student);
 		$prestd->load($student->prestudent_id);
 		draw_prestudent($prestd);
@@ -270,27 +274,28 @@ if($xmlformat=='rdf')
 				$where.=" AND tbl_benutzergruppe.studiensemester_kurzbz='$studiensemester_kurzbz'";
 		}
 		else
-		{		
+		{
 			$where.=" tbl_studentlehrverband.studiengang_kz=$studiengang_kz";
 			if ($semester!=null)
 				$where.=" AND tbl_studentlehrverband.semester=$semester";
 			if ($verband!=null)
 				$where.=" AND tbl_studentlehrverband.verband='".$verband."'";
 			if ($gruppe!=null)
-				$where.=" AND tbl_studentlehrverband.gruppe='".$gruppe."'";	
-		}			
+				$where.=" AND tbl_studentlehrverband.gruppe='".$gruppe."'";
+		}
 
 		$where.=" AND tbl_studentlehrverband.studiensemester_kurzbz='$studiensemester_kurzbz'";
-		
-		$sql_query = "SET CLIENT_ENCODING TO 'UNICODE'; SELECT tbl_person.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, tbl_person.titelpre, 
+
+		$sql_query = "SET CLIENT_ENCODING TO 'UNICODE'; SELECT tbl_person.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, tbl_person.titelpre,
 		                     tbl_person.titelpost, tbl_person.vorname, tbl_person.vornamen, tbl_person.nachname,
 		                      tbl_person.gebdatum, tbl_person.anmerkungen, tbl_person.ersatzkennzeichen,
-		                     tbl_person.svnr, tbl_student.matrikelnr, tbl_studentlehrverband.semester, 
+		                     tbl_person.svnr, tbl_student.matrikelnr, tbl_studentlehrverband.semester,
 		                     tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe, tbl_studentlehrverband.studiengang_kz
 					  FROM public.tbl_person, public.tbl_student, public.tbl_benutzer, public.tbl_studentlehrverband";
 		if($gruppe_kurzbz!=null)
 			$sql_query.= ",public.tbl_benutzergruppe";
 		$sql_query.= " WHERE tbl_person.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid = tbl_student.student_uid AND tbl_studentlehrverband.student_uid=tbl_student.student_uid AND $where ORDER BY nachname, vorname";
+		echo $sql_query;
 		if($result = pg_query($conn, $sql_query))
 			while($row = pg_fetch_object($result))
 			{
@@ -498,7 +503,7 @@ else
 					$semester = $row->ausbildungssemester;
 				}
 			}
-			
+
 			echo '
 			<student>
 				<uid><![CDATA['.$student->uid.']]></uid>
