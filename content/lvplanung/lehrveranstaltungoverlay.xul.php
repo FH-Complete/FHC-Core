@@ -69,75 +69,75 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
  				flags="dont-build-content"
 		>
 			<treecols>
-				<treecol id="lehrveranstaltung-treecol-kurzbz" label="Kurzbz" flex="2" hidden="false" primary="true"
+				<treecol id="lehrveranstaltung-treecol-kurzbz" label="Kurzbz" flex="2" hidden="false" primary="true" persist="hidden, width"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#kurzbz"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="lehrveranstaltung-treecol-bezeichnung" label="Bezeichnung" flex="5" hidden="false"
+				<treecol id="lehrveranstaltung-treecol-bezeichnung" label="Bezeichnung" flex="5" hidden="false" persist="hidden, width"
 				   class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#bezeichnung"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="lehrveranstaltung-treecol-sprache" label="Sprache" flex="2" hidden="false"
+				<treecol id="lehrveranstaltung-treecol-sprache" label="Sprache" flex="2" hidden="false" persist="hidden, width"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#sprache" />
 				<splitter class="tree-splitter"/>
-				<treecol id="lehrveranstaltung-treecol-ects" label="ECTS" flex="2" hidden="false"
+				<treecol id="lehrveranstaltung-treecol-ects" label="ECTS" flex="2" hidden="false" persist="hidden, width"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#ects" />
 				<splitter class="tree-splitter"/>
-				<treecol id="lehrveranstaltung-treecol-semesterstunden" label="Semesterstunden" flex="1" hidden="true"
+				<treecol id="lehrveranstaltung-treecol-semesterstunden" label="Semesterstunden" flex="1" hidden="true" persist="hidden, width"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#semesterstunden"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="lehrveranstaltung-treecol-lehre" label="Lehre" flex="2" hidden="false"
+				<treecol id="lehrveranstaltung-treecol-lehre" label="Lehre" flex="2" hidden="false" persist="hidden, width"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehre"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="lehrveranstaltung-treecol-lehrform" label="Lehrform" flex="5" hidden="true"
+				<treecol id="lehrveranstaltung-treecol-lehrform" label="Lehrform" flex="5" hidden="false" persist="hidden, width"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrform_kurzbz"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="lehrveranstaltung-treecol-stundenblockung" label="Blockung" flex="5" hidden="true"
+				<treecol id="lehrveranstaltung-treecol-stundenblockung" label="Blockung" flex="5" hidden="true" persist="hidden, width"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#stundenblockung"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="lehrveranstaltung-treecol-wochenrythmus" label="WR" flex="5" hidden="true"
+				<treecol id="lehrveranstaltung-treecol-wochenrythmus" label="WR" flex="5" hidden="true" persist="hidden, width"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#wochenrythmus"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="lehrveranstaltung-treecol-startkw" label="StartKW" flex="5" hidden="true"
+				<treecol id="lehrveranstaltung-treecol-startkw" label="StartKW" flex="5" hidden="true" persist="hidden, width"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#startkw"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="lehrveranstaltung-treecol-raumtyp" label="Raumtyp" flex="5" hidden="true"
+				<treecol id="lehrveranstaltung-treecol-raumtyp" label="Raumtyp" flex="5" hidden="true" persist="hidden, width"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#raumtyp"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="lehrveranstaltung-treecol-raumtypalternativ" label="RaumtypAlt" flex="5" hidden="true"
+				<treecol id="lehrveranstaltung-treecol-raumtypalternativ" label="RaumtypAlt" flex="5" hidden="true" persist="hidden, width"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#raumtypalternativ"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="lehrveranstaltung-treecol-gruppen" label="Gruppen" flex="5" hidden="false"
+				<treecol id="lehrveranstaltung-treecol-gruppen" label="Gruppen" flex="5" hidden="false" persist="hidden, width"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#gruppen"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="lehrveranstaltung-treecol-lektoren" label="Lektoren" flex="5" hidden="false"
+				<treecol id="lehrveranstaltung-treecol-lektoren" label="Lektoren" flex="5" hidden="false" persist="hidden, width"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lektoren"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="lehrveranstaltung-treecol-anmerkung" label="Anmerkung" flex="5" hidden="false"
+				<treecol id="lehrveranstaltung-treecol-anmerkung" label="Anmerkung" flex="5" hidden="false" persist="hidden, width"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#anmerkung"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="lehrveranstaltung-treecol-fachbereich" label="Fachbereich" flex="1" hidden="false"
+				<treecol id="lehrveranstaltung-treecol-fachbereich" label="Fachbereich" flex="1" hidden="false" persist="hidden, width"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#fachbereich"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="lehrveranstaltung-treecol-lehrveranstaltung_id" label="Lehrveranstaltung_id" flex="1" hidden="true"
+				<treecol id="lehrveranstaltung-treecol-lehrveranstaltung_id" label="Lehrveranstaltung_id" flex="1" hidden="true" persist="hidden, width"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrveranstaltung_id"	/>
 				<splitter class="tree-splitter"/>
-				<treecol id="lehrveranstaltung-treecol-lehreinheit_id" label="Lehreinheit_id" flex="1" hidden="true"
+				<treecol id="lehrveranstaltung-treecol-lehreinheit_id" label="Lehreinheit_id" flex="1" hidden="true" persist="hidden, width"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehreinheit_id"/>
 				<splitter class="tree-splitter"/>

@@ -51,65 +51,69 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<row>	
 					<hbox>
 						<spacer flex="1" />
-						<button id="student-konto-button-filterstudenten" oncommand="StudentKontoFilterStudenten()" label="Filter" tooltiptext="Liste aller Studenten mit offenen Buchungen"/>
-						<button id="student-konto-button-filter" value="alle" oncommand="StudentKontoFilter()" label="offene" disabled="true"/>
+						<button id="student-konto-button-filter" value="alle" oncommand="StudentKontoFilter()" label="offene Anzeigen" disabled="true"/>
 					</hbox>
-					<spacer />
+					<hbox>
+						<button id="student-konto-button-filterstudenten" oncommand="StudentKontoFilterStudenten()" label="Studentenliste auf offene Buchungen filtern" tooltiptext="Liste aller Studenten mit offenen Buchungen"/>
+					</hbox>
 				</row>
 				
 				<row>
-					<tree id="student-konto-tree" seltype="multi" hidecolumnpicker="false" flex="1"
-						datasources="rdf:null" ref="http://www.technikum-wien.at/konto/liste"
-						style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100px" enableColumnDrag="true"
-						onselect="StudentKontoAuswahl()"
-						context="student-konto-tree-popup"
-						flags="dont-build-content"
-					>
-					
-						<treecols>
-							<treecol id="student-konto-tree-buchungsdatum" label="Buchungsdatum" flex="2" hidden="false" primary="true"
-								class="sortDirectionIndicator"
-								sortActive="true"
-								sortDirection="ascending"
-								sort="rdf:http://www.technikum-wien.at/konto/rdf#buchungsdatum_iso"/>
-							<splitter class="tree-splitter"/>
-							<treecol id="student-konto-tree-buchungstext" label="Buchungstext" flex="5" hidden="false"
-							   class="sortDirectionIndicator"
-								sort="rdf:http://www.technikum-wien.at/konto/rdf#buchungstext"/>
-							<splitter class="tree-splitter"/>
-							<treecol id="student-konto-tree-betrag" label="Betrag" flex="2" hidden="false"
-								class="sortDirectionIndicator"
-								sort="rdf:http://www.technikum-wien.at/konto/rdf#betrag" />
-							<splitter class="tree-splitter"/>
-							<treecol id="student-konto-tree-studiensemester_kurzbz" label="StSem" flex="2" hidden="false"
-								class="sortDirectionIndicator"
-								sort="rdf:http://www.technikum-wien.at/konto/rdf#studiensemester_kurzbz" />
-							<splitter class="tree-splitter"/>
-							<treecol id="student-konto-tree-buchungstyp_kurzbz" label="Typ" flex="2" hidden="true"
-								class="sortDirectionIndicator"
-								sort="rdf:http://www.technikum-wien.at/konto/rdf#buchungstyp_kurzbz" />
-							<splitter class="tree-splitter"/>
-							<treecol id="student-konto-tree-buchungsnr" label="buchungs_nr" flex="2" hidden="true"
-								class="sortDirectionIndicator"
-								sort="rdf:http://www.technikum-wien.at/konto/rdf#buchungsnr" />
-							<splitter class="tree-splitter"/>
-						</treecols>
-					
-						<template>
-							<treechildren flex="1" >
-									<treeitem uri="rdf:*">
-									<treerow>
-										<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#buchungsdatum"/>
-										<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#buchungstext"/>
-										<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#betrag"/>
-										<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#studiensemester_kurzbz"/>
-										<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#buchungstyp_kurzbz"/>
-										<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#buchungsnr"/>
-									</treerow>
-								</treeitem>
-							</treechildren>
-						</template>
-					</tree>
+					<vbox>
+						<label id="student-konto-label-filter" value="alle Buchungen:"/>
+						<tree id="student-konto-tree" seltype="multi" hidecolumnpicker="false" flex="1"
+							datasources="rdf:null" ref="http://www.technikum-wien.at/konto/liste"
+							style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100px" enableColumnDrag="true"
+							onselect="StudentKontoAuswahl()"
+							context="student-konto-tree-popup"
+							flags="dont-build-content"
+						>
+						
+							<treecols>
+								<treecol id="student-konto-tree-buchungsdatum" label="Buchungsdatum" flex="2" hidden="false" primary="true"
+									class="sortDirectionIndicator"
+									sortActive="true"
+									sortDirection="ascending"
+									sort="rdf:http://www.technikum-wien.at/konto/rdf#buchungsdatum_iso"/>
+								<splitter class="tree-splitter"/>
+								<treecol id="student-konto-tree-buchungstext" label="Buchungstext" flex="5" hidden="false"
+								   class="sortDirectionIndicator"
+									sort="rdf:http://www.technikum-wien.at/konto/rdf#buchungstext"/>
+								<splitter class="tree-splitter"/>
+								<treecol id="student-konto-tree-betrag" label="Betrag" flex="2" hidden="false"
+									class="sortDirectionIndicator"
+									sort="rdf:http://www.technikum-wien.at/konto/rdf#betrag" />
+								<splitter class="tree-splitter"/>
+								<treecol id="student-konto-tree-studiensemester_kurzbz" label="StSem" flex="2" hidden="false"
+									class="sortDirectionIndicator"
+									sort="rdf:http://www.technikum-wien.at/konto/rdf#studiensemester_kurzbz" />
+								<splitter class="tree-splitter"/>
+								<treecol id="student-konto-tree-buchungstyp_kurzbz" label="Typ" flex="2" hidden="true"
+									class="sortDirectionIndicator"
+									sort="rdf:http://www.technikum-wien.at/konto/rdf#buchungstyp_kurzbz" />
+								<splitter class="tree-splitter"/>
+								<treecol id="student-konto-tree-buchungsnr" label="buchungs_nr" flex="2" hidden="true"
+									class="sortDirectionIndicator"
+									sort="rdf:http://www.technikum-wien.at/konto/rdf#buchungsnr" />
+								<splitter class="tree-splitter"/>
+							</treecols>
+						
+							<template>
+								<treechildren flex="1" >
+										<treeitem uri="rdf:*">
+										<treerow>
+											<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#buchungsdatum"/>
+											<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#buchungstext"/>
+											<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#betrag"/>
+											<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#studiensemester_kurzbz"/>
+											<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#buchungstyp_kurzbz"/>
+											<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#buchungsnr"/>
+										</treerow>
+									</treeitem>
+								</treechildren>
+							</template>
+						</tree>
+					</vbox>
 					<vbox>
 						<hbox>
 							<button id="student-konto-button-neu" label="Neu" oncommand="StudentKontoNeu();" disabled="true"/>

@@ -1682,12 +1682,14 @@ function StudentKontoFilter()
 	if(filter.value=='offene')
 	{
 		filter.value='alle';
-		filter.label='offene';
+		filter.label='offene Anzeigen';
+		document.getElementById('student-konto-label-filter').value='alle Buchungen:';
 	}
 	else
 	{
 		filter.value='offene';
-		filter.label='alle';
+		filter.label='alle Anzeigen';
+		document.getElementById('student-konto-label-filter').value='offene Buchungen:';
 	}
 
 	//Konto Tree mit neuem Filter laden

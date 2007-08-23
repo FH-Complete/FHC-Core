@@ -236,6 +236,7 @@ function StudentProjektarbeitAuswahl()
 	if (tree.currentIndex==-1) return;
 
 	StudentProjektarbeitDetailDisableFields(false);
+	StudentProjektbetreuerDetailDisableFields(true);
 	
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["student-projektarbeit-tree-projektarbeit_id"] : "student-projektarbeit-treecol-projektarbeit_id";
@@ -728,6 +729,8 @@ function StudentProjektbetreuerDetailReset()
 {
 	document.getElementById('student-projektbetreuer-textbox-faktor').value=document.getElementById('student-projektarbeit-textbox-faktor').value;
 	document.getElementById('student-projektbetreuer-textbox-name').value='';
+	document.getElementById('student-projektbetreuer-menulist-note').value='';
+	document.getElementById('student-projektbetreuer-menulist-betreuerart').value='Betreuer';
 	document.getElementById('student-projektbetreuer-textbox-punkte').value='0.0';
 	document.getElementById('student-projektbetreuer-textbox-stunden').value=document.getElementById('student-projektarbeit-textbox-gesamtstunden').value;
 	document.getElementById('student-projektbetreuer-textbox-stundensatz').value=document.getElementById('student-projektarbeit-textbox-stundensatz').value;
@@ -900,4 +903,33 @@ function StudentProjektbetreuerLoeschen()
 		SetStatusBarText('Daten wurden geloescht');
 		StudentProjektbetreuerDetailDisableFields(true);
 	}
+}
+
+function StudentProjektbetreuerLoadMitarbeiterDaten()
+{
+	person_id = MenulistGetSelectedValue('student-projektbetreuer-menulist-person');
+	
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'getstundensatz');
+	req.add('person_id', person_id);
+	
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+	}
+	else
+	{
+		stundensatz = val.dbdml_data
+	}
+	
+	document.getElementById('student-projektbetreuer-textbox-stundensatz').value=stundensatz;
 }

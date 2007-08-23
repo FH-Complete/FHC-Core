@@ -219,7 +219,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<template>
 									<menupopup>
 										<menuitem value="rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#lehrveranstaltung_id"
-							        		      label="rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#bezeichnung rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#semester Semester"
+							        		      label="rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#bezeichnung (rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#semester Sem)"
 										  		  uri="rdf:*"/>
 									</menupopup>
 								</template>
@@ -409,7 +409,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										  editable="true" disabled="true"
 								          datasources="rdf:null" flex="1"
 								          ref="http://www.technikum-wien.at/person/liste" 
-								          oninput="StudentProjektbetreuerMenulistPersonLoad(this)">
+								          oninput="StudentProjektbetreuerMenulistPersonLoad(this)"
+								          oncommand="StudentProjektbetreuerLoadMitarbeiterDaten()">
 									<template>
 										<menupopup>
 											<menuitem value="rdf:http://www.technikum-wien.at/person/rdf#person_id"
