@@ -35,6 +35,11 @@ if(isset($_GET['studiengang_kz']) && is_numeric($_GET['studiengang_kz']))
 	$studiengang_kz=$_GET['studiengang_kz'];
 else 
 	die('studiengangs_kz muss uebergeben werden');
+	
+if(isset($_GET['semester']) && is_numeric($_GET['semester']))
+	$semester=$_GET['semester'];
+else 
+	$semester='';
 
 $user = get_uid();
 loadVariables($conn, $user);
@@ -46,7 +51,7 @@ $studiengang = new studiengang($conn, $studiengang_kz);
 $workbook = new Spreadsheet_Excel_Writer();
 
 // sending HTTP headers
-$workbook->send("Lehrauftragsliste_GST_" . date("Y_m_d") . ".xls");
+$workbook->send("Lehrauftragsliste_".$semester_aktuell."_".$studiengang->kuerzel.($semester!=''?'_'.$semester:'').".xls");
 
 // Creating a worksheet
 $worksheet =& $workbook->addWorksheet("Lehrauftragsliste");
@@ -63,27 +68,29 @@ $format_number_bold->setNumFormat('0,0.00');
 $format_number_bold->setBold();
 
 $i=0;
-
+$worksheet->write(0,0,'Erstellt am '.date('d.m.Y').' '.$semester_aktuell.' '.$studiengang->kuerzel.' '.$semester, $format_bold);
 //Ueberschriften
-$worksheet->write(0,$i,"Studiengang", $format_bold);
-$worksheet->write(0,++$i,"Personalnr", $format_bold);
-$worksheet->write(0,++$i,"Titel", $format_bold);
-$worksheet->write(0,++$i,"Vorname", $format_bold);
-$worksheet->write(0,++$i,"Familienname", $format_bold);
-$worksheet->write(0,++$i,"Stunden", $format_bold);
-$worksheet->write(0,++$i,"Kosten", $format_bold);
+$worksheet->write(2,$i,"Studiengang", $format_bold);
+$worksheet->write(2,++$i,"Personalnr", $format_bold);
+$worksheet->write(2,++$i,"Titel", $format_bold);
+$worksheet->write(2,++$i,"Vorname", $format_bold);
+$worksheet->write(2,++$i,"Familienname", $format_bold);
+$worksheet->write(2,++$i,"Stunden", $format_bold);
+$worksheet->write(2,++$i,"Kosten", $format_bold);
 
 //Daten holen
 $qry = "SELECT vw_lehreinheit.*, tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre, tbl_mitarbeiter.personalnummer, tbl_person.person_id
 		FROM campus.vw_lehreinheit, public.tbl_mitarbeiter, public.tbl_benutzer, public.tbl_person WHERE 
 		tbl_person.person_id = tbl_benutzer.person_id AND tbl_benutzer.uid=tbl_mitarbeiter.mitarbeiter_uid AND
 		vw_lehreinheit.mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid AND
-		studiengang_kz='$studiengang_kz' AND studiensemester_kurzbz='$semester_aktuell' 
-		ORDER BY nachname, vorname, mitarbeiter_uid";
+		studiengang_kz='$studiengang_kz' AND studiensemester_kurzbz='$semester_aktuell'";
+if($semester!='')
+	$qry.=" AND semester='$semester'";
+$qry.="	ORDER BY nachname, vorname, mitarbeiter_uid";
 
 if($result = pg_query($conn, $qry))
 {
-	$zeile=1;
+	$zeile=3;
 	$gesamtkosten = 0;
 	$liste=array();
 	
@@ -117,6 +124,8 @@ if($result = pg_query($conn, $qry))
 	              AND tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
 	              tbl_lehreinheit.studiensemester_kurzbz='$semester_aktuell' AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
 	              tbl_lehrveranstaltung.studiengang_kz='$studiengang_kz'";
+		if($semester!='')
+			$qry.=" AND tbl_lehrveranstaltung.semester='$semester'";
 		if($result = pg_query($conn, $qry))
 		{
 			while($row = pg_fetch_object($result))

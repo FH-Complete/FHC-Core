@@ -873,46 +873,62 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='savegegenbuchung')
 	{
 		//Speichert eine Buchung
-		if(isset($_POST['buchungsnr']) && is_numeric($_POST['buchungsnr']))
+		if(isset($_POST['buchungsnr']))
 		{
-			$buchung = new konto($conn, null, true);
-
-			if($buchung->load($_POST['buchungsnr']))
+			$bnr_arr = explode(';',$_POST['buchungsnr']);
+			$errormsg='';
+			foreach ($bnr_arr as $buchungsnr)
 			{
-				if($buchung->buchungsnr_verweis=='')
+				if(is_numeric($buchungsnr))
 				{
-					$kto = new konto($conn, null, true);
-					//$buchung->betrag*(-1);					
-					$buchung->betrag = $kto->getDifferenz($_POST['buchungsnr']);
-					$buchung->buchungsdatum = date('Y-m-d');
-					$buchung->mahnspanne = '0';
-					$buchung->buchungsnr_verweis = $buchung->buchungsnr;
-					$buchung->new = true;
-					$buchung->insertamum = date('Y-m-d H:i:s');
-					$buchung->insertvon = $user;
-					
-					if($buchung->save())
+					$buchung = new konto($conn, null, true);
+		
+					if($buchung->load($buchungsnr))
 					{
-						$data = $buchung->buchungsnr;
-						$return = true;
+						if($buchung->buchungsnr_verweis=='')
+						{
+							$kto = new konto($conn, null, true);
+							//$buchung->betrag*(-1);					
+							$buchung->betrag = $kto->getDifferenz($buchungsnr);
+							$buchung->buchungsdatum = date('Y-m-d');
+							$buchung->mahnspanne = '0';
+							$buchung->buchungsnr_verweis = $buchung->buchungsnr;
+							$buchung->new = true;
+							$buchung->insertamum = date('Y-m-d H:i:s');
+							$buchung->insertvon = $user;
+							
+							if($buchung->save())
+							{
+								//$data = $buchung->buchungsnr;
+								$return = true;
+							}
+							else 
+							{
+								$return = false;
+								$errormsg .= "\n".'Fehler beim Speichern:'.$buchung->errormsg;
+							}
+						}
+						else 
+						{
+							$return = false;
+							$errormsg .= "\n".'Gegenbuchungen koennen nur auf die obersten Buchungen getaetigt werden';
+						}
 					}
 					else 
 					{
+						$errormsg .= "\n".'Buchung wurde nicht gefunden:'.$_POST['buchungsnr'];
 						$return = false;
-						$errormsg = 'Fehler beim Speichern:'.$buchung->errormsg;
 					}
+				}
+				if($errormsg!='')
+				{
+					$return = false;
 				}
 				else 
 				{
-					$return = false;
-					$errormsg = 'Gegenbuchungen koennen nur auf die obersten Buchungen getaetigt werden';
+					$return = true;
 				}
-			}
-			else 
-			{
-				$errormsg = 'Buchung wurde nicht gefunden:'.$_POST['buchungsnr'];
-				$return = false;
-			}
+			}			
 		}
 		else 
 		{
@@ -1725,6 +1741,57 @@ if(!$error)
 		{
 			$return = false;
 			$errormsg  = 'Fehlerhafte Parameteruebergabe';
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='getprivatemailadress')
+	{
+		if(isset($_POST['person_ids']))
+		{
+			$pers_arr = explode(';',$_POST['person_ids']);
+			$data='';
+			$anz_error=0;
+			
+			foreach ($pers_arr as $person_id)
+			{
+				if(is_numeric($person_id))
+				{
+					$qry = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id='$person_id' ORDER BY zustellung LIMIT 1";
+					if($result = pg_query($conn, $qry))
+					{
+						if($row = pg_fetch_object($result))
+						{
+							if($data!='')
+								$data.=','.$row->kontakt;
+							else 
+								$data = $row->kontakt;
+						}
+						else 
+						{
+							$anz_error++;
+						}
+					}
+				}
+			}
+			if($data!='')
+			{
+				if($anz_error==0)
+					$return = true;
+				else 
+				{
+					$return = false;
+					$errormsg = "Bei $anz_error Personen wurde keine Emailadresse gefunden!";
+				}
+			}
+			else 
+			{
+				$return = false;
+				$errormsg = 'Es wurde keine Privatadresse gefunden';
+			}
+		}
+		else 
+		{
+			$return = false;
+			$errormsg = 'Fehlerhafte Parameteruebergabe';
 		}
 	}
 	else

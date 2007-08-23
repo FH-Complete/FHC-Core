@@ -1593,11 +1593,11 @@ function StudentKontoTreeSelectBuchung()
 	{
 		//Alle subtrees oeffnen weil rowCount nur die Anzahl der sichtbaren
 		//Zeilen zurueckliefert
-	   	for(var i=items-1;i>=0;i--)
-	   	{
-	   		if(!tree.view.isContainerOpen(i))
-	   			tree.view.toggleOpenState(i);
-	   	}
+	   	//for(var i=items-1;i>=0;i--)
+	   	//{
+	   	//	if(!tree.view.isContainerOpen(i))
+	   	//		tree.view.toggleOpenState(i);
+	   	//}
 
 	   	//Jetzt die wirkliche Anzahl (aller) Zeilen holen
 	   	items = tree.view.rowCount;
@@ -1737,6 +1737,65 @@ function StudentKontoFilter()
 }
 
 // ****
+// * Zeigt im Studententree nur diejenigen Studenten an die noch nicht alle Dokumente abgegeben haben
+// ****
+function StudentKontoFilterStudenten()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree=document.getElementById('tree-verband');
+
+	//Wenn nichts markiert wurde -> beenden
+	if(tree.currentIndex==-1)
+		return;
+	
+    // Progressmeter starten. Ab jetzt keine 'return's mehr.
+    document.getElementById('statusbar-progressmeter').setAttribute('mode','undetermined');
+    //globalProgressmeter.StartPM();
+
+	var col;
+	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+	var stg_kz=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["sem"] : "sem";
+	var sem=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["ver"] : "ver";
+	var ver=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["grp"] : "grp";
+	var grp=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["gruppe"] : "gruppe";
+	var gruppe=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["typ"] : "typ";
+	var typ=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["stsem"] : "stsem";
+	var stsem=tree.view.getCellText(tree.currentIndex,col);
+	
+	stsem = getStudiensemester();
+	url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ=student&filter2=konto&"+gettimestamp();
+	var treeStudent=document.getElementById('student-tree');
+
+	//Alte DS entfernen
+	var oldDatasources = treeStudent.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		treeStudent.database.RemoveDataSource(oldDatasources.getNext());
+	}
+
+	try
+	{
+		StudentTreeDatasource.removeXMLSinkObserver(StudentTreeSinkObserver);
+		treeStudent.builder.removeListener(StudentTreeListener);
+	}
+	catch(e)
+	{}
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	StudentTreeDatasource = rdfService.GetDataSource(url);
+	StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	treeStudent.database.AddDataSource(StudentTreeDatasource);
+	StudentTreeDatasource.addXMLSinkObserver(StudentTreeSinkObserver);
+	treeStudent.builder.addListener(StudentTreeListener);
+}
+
+// ****
 // * Aktiviert / Deaktiviert die Konto Felder
 // ****
 function StudentKontoDisableFields(val)
@@ -1824,16 +1883,37 @@ function StudentKontoGegenbuchung()
 
 	StudentKontoDetailDisableFields(false);
 
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
+
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+			for (var v = start.value; v <= end.value; v++)
+			{
+				if(!tree.view.getParentIndex(v))
+				{
+					alert('Zum Drucken der Bestaetigung bitte die oberste Buchung waehlen');
+					return false;
+				}
+				var col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
+				var buchungsnr=tree.view.getCellText(v,col);
+				paramList += ';'+buchungsnr;
+			}
+	}
+	
 	//Ausgewaehlte Nr holen
-    var col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
-	var buchungsnr=tree.view.getCellText(tree.currentIndex,col);
+    //var col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
+	//var buchungsnr=tree.view.getCellText(tree.currentIndex,col);
 
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 
 	req.add('type', 'savegegenbuchung');
 
-	req.add('buchungsnr', buchungsnr);
+	req.add('buchungsnr', paramList);
 
 	var response = req.executePOST();
 
@@ -1842,13 +1922,15 @@ function StudentKontoGegenbuchung()
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
-			alert(response)
+			alert(response);
 		else
-			alert(val.dbdml_errormsg)
+			alert(val.dbdml_errormsg);
+		StudentKontoTreeDatasource.Refresh(false); //non blocking
 	}
 	else
 	{
-		StudentKontoSelectBuchung=val.dbdml_data;
+		//StudentKontoSelectBuchung=val.dbdml_data;
+		StudentKontoSelectBuchung=null;
 		StudentKontoTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 	}
@@ -2016,12 +2098,7 @@ function StudentCreateZeugnis()
 	{
   		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
-		{
-			if(!tree.view.getParentIndex(v))
-			{
-				alert('Zum Drucken der Bestaetigung bitte die oberste Buchung waehlen');
-				return false;
-			}
+		{			
 			var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
 			var uid=tree.view.getCellText(v,col);
 			paramList += ';'+uid;
@@ -3168,37 +3245,49 @@ function StudentSendMail()
 // ****
 function StudentSendMailPrivat()
 {
-	mailempfaenger='';
 	var tree=document.getElementById('student-tree');
 	var numRanges = tree.view.selection.getRangeCount();
 	var start = new Object();
-	var end = new Object();
-	var anzfault=0;
+	var end = new Object();	
+	var person_ids='';
+	
 	//Markierte Datensaetze holen
 	for (var t=0; t<numRanges; t++)
 	{
   		tree.view.selection.getRangeAt(t,start,end);
   		for (v=start.value; v<=end.value; v++)
   		{
-  			var col = tree.columns ? tree.columns["student-treecol-mail_privat"] : "student-treecol-mail_privat";
-  			if(tree.view.getCellText(v,col).length>1)
-  			{
-  				if(mailempfaenger!='')
-					mailempfaenger=mailempfaenger+','+tree.view.getCellText(v,col);
-				else
-					mailempfaenger='mailto:'+tree.view.getCellText(v,col);
-  			}
-  			else
-  			{
-  				anzfault=anzfault+1;
-  			}
+  			var col = tree.columns ? tree.columns["student-treecol-person_id"] : "student-treecol-person_id";
+  			person_ids=person_ids+';'+tree.view.getCellText(v,col);
   		}
 	}
-	if(anzfault!=0)
-		alert(anzfault+' Student konnten nicht hinzugefuegt werden weil keine Privatemailadresse eingetragen ist!');
-		
-	if(mailempfaenger!='')
-		window.location.href=mailempfaenger;
+	
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'getprivatemailadress');
+	req.add('person_ids', person_ids);
+	
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+		{
+			alert(val.dbdml_errormsg)
+			if(val.dbdml_data!='')
+				window.location.href='mailto:'+val.dbdml_data;
+		}
+	}
+	else
+	{
+		if(val.dbdml_data!='')
+			window.location.href='mailto:'+val.dbdml_data;
+	}	
 }
 
 // ****

@@ -433,7 +433,7 @@ class prestudent extends person
 	{
 		$qry = "SELECT * FROM (
 					SELECT *, (
-							SELECT rolle_kurzbz FROM tbl_prestudentrolle WHERE prestudent_id=prestudent.prestudent_id ORDER BY datum DESC, insertamum DESC LIMIT 1) AS rolle 
+							SELECT rolle_kurzbz FROM tbl_prestudentrolle WHERE prestudent_id=prestudent.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) AS rolle 
 					FROM tbl_prestudent prestudent ORDER BY prestudent_id) a, tbl_prestudentrolle, tbl_person
 				WHERE a.rolle=tbl_prestudentrolle.rolle_kurzbz AND 
 					a.person_id=tbl_person.person_id AND
@@ -715,7 +715,7 @@ class prestudent extends person
 		
 	function getLastStatus($prestudent_id)
 	{
-		$qry = "SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='$prestudent_id' ORDER BY datum DESC, insertamum DESC LIMIT 1";
+		$qry = "SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='$prestudent_id' ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1";
 		if($result = pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
