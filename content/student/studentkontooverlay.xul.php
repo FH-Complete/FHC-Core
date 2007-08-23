@@ -44,13 +44,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <hbox flex="1">
 <grid id="student-konto-grid-detail" style="margin:4px;" flex="1">
 		  	<columns  >
-				<column flex="1"/>
+				<column flex="4"/>
 				<column flex="1"/>
 			</columns>
 			<rows>
 				<row>	
 					<hbox>
 						<spacer flex="1" />
+						<button id="student-konto-button-filterstudenten" oncommand="StudentKontoFilterStudenten()" label="Filter" tooltiptext="Liste aller Studenten mit offenen Buchungen"/>
 						<button id="student-konto-button-filter" value="alle" oncommand="StudentKontoFilter()" label="offene" disabled="true"/>
 					</hbox>
 					<spacer />

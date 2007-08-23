@@ -287,10 +287,10 @@ class student extends benutzer
 		//$sql_query="SELECT * FROM campus.vw_student WHERE $where ORDER by nachname,vorname";
 		$sql_query = "SELECT *, tbl_student.semester as std_semester, tbl_student.verband as std_verband, tbl_student.gruppe as std_gruppe, tbl_student.studiengang_kz as std_studiengang_kz,
 					  tbl_studentlehrverband.studiengang_kz as lvb_studiengang_kz, tbl_studentlehrverband.semester as lvb_semester, tbl_studentlehrverband.verband as lvb_verband, tbl_studentlehrverband.gruppe as lvb_gruppe 
-					  FROM public.tbl_person, public.tbl_student, public.tbl_benutzer, public.tbl_studentlehrverband";
+					  FROM public.tbl_person, public.tbl_student, public.tbl_benutzer, public.tbl_studentlehrverband, public.tbl_prestudent";
 		if($gruppe!=null)
 			$sql_query.= ",public.tbl_benutzergruppe";
-		$sql_query.= " WHERE tbl_person.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid = tbl_student.student_uid AND tbl_studentlehrverband.student_uid=tbl_student.student_uid AND $where ORDER BY nachname, vorname";
+		$sql_query.= " WHERE tbl_prestudent.prestudent_id=tbl_student.prestudent_id AND tbl_person.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid = tbl_student.student_uid AND tbl_studentlehrverband.student_uid=tbl_student.student_uid AND $where ORDER BY nachname, vorname";
 	    //echo $sql_query;
 		if(!($erg=pg_query($this->conn, $sql_query)))
 		{
@@ -330,6 +330,14 @@ class student extends benutzer
 			$l->verband=$row->lvb_verband;
 			$l->semester=$row->lvb_semester;
 			$l->studiengang_kz=$row->lvb_studiengang_kz;
+			$l->staatsbuergerschaft = $row->staatsbuergerschaft;
+			
+			$l->zgv_code = $row->zgv_code;
+			$l->zgvort = $row->zgvort;
+			$l->zgvdatum = $row->zgvdatum;
+			$l->zgvmas_code = $row->zgvmas_code;
+			$l->zgvmaort = $row->zgvmaort;
+			$l->zgvmadatum = $row->zgvmadatum;
 			//$l->stg_bezeichnung=$row->bezeichnung;
 			// student in Array speichern
 			$result[]=$l;

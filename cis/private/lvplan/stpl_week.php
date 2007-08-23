@@ -172,7 +172,7 @@ if (isset($reserve) && $user=='lektor')
 			{
 				$datum_res=$$var;
 				//echo $datum_res;
-				$query="INSERT INTO lehre.tbl_reservierung
+				$query="INSERT INTO campus.tbl_reservierung
 							(datum, uid, ort_kurzbz, stunde, beschreibung, titel, studiengang_kz )
 						VALUES
 							('$datum_res', '$user_uid', '$ort_kurzbz', $stunde, '$beschreibung', '$titel', 0)"; // semester, verband, gruppe, gruppe_kurzbz,

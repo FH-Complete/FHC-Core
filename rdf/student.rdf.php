@@ -138,8 +138,8 @@ if($xmlformat=='rdf')
 	    		<STUDENT:vornamen><![CDATA['.$row->vornamen.']]></STUDENT:vornamen>
 	    		<STUDENT:vorname><![CDATA['.$row->vorname.']]></STUDENT:vorname>
 	    		<STUDENT:nachname><![CDATA['.$row->nachname.']]></STUDENT:nachname>
-	    		<STUDENT:svnr><![CDATA['.$row->svnr.']]></STUDENT:svnr>
-	    		<STUDENT:ersatzkennzeichen><![CDATA['.$row->ersatzkennzeichen.']]></STUDENT:ersatzkennzeichen>
+	    		<STUDENT:svnr>'.($row->svnr==''?'&#xA0;':'<![CDATA['.$row->svnr.']]>').'</STUDENT:svnr>
+	    		<STUDENT:ersatzkennzeichen>'.($row->ersatzkennzeichen==''?'&#xA0;':'<![CDATA['.$row->ersatzkennzeichen.']]>').'</STUDENT:ersatzkennzeichen>
 	    		<STUDENT:geburtsdatum><![CDATA['.$datum_obj->convertISODate($row->gebdatum).']]></STUDENT:geburtsdatum>
 	    		<STUDENT:geburtsdatum_iso><![CDATA['.$row->gebdatum.']]></STUDENT:geburtsdatum_iso>
 				<STUDENT:semester><![CDATA['.(isset($row->semester)?$row->semester:'').']]></STUDENT:semester>
@@ -149,7 +149,7 @@ if($xmlformat=='rdf')
 	    		<STUDENT:mail_privat><![CDATA['.$mail_privat.']]></STUDENT:mail_privat>
 	    		<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
 				<STUDENT:status><![CDATA['.$status.']]></STUDENT:status>    		
-	    		<STUDENT:anmerkungen><![CDATA['.$row->anmerkungen.']]></STUDENT:anmerkungen>
+	    		<STUDENT:anmerkungen>'.($row->anmerkungen==''?'&#xA0;':'<![CDATA['.$row->anmerkungen.']]>').'</STUDENT:anmerkungen>
 	    		<STUDENT:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz>
 				<STUDENT:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></STUDENT:studiengang>				
 	      	</RDF:Description>
@@ -191,7 +191,7 @@ if($xmlformat=='rdf')
 	    		<STUDENT:aktiv><![CDATA['.($row->aktiv?'true':'false').']]></STUDENT:aktiv>
 	    		<STUDENT:gebort><![CDATA['.$row->gebort.']]></STUDENT:gebort>
 	    		<STUDENT:gebzeit><![CDATA['.$row->gebzeit.']]></STUDENT:gebzeit>
-	    		<STUDENT:anmerkungen><![CDATA['.$row->anmerkungen.']]></STUDENT:anmerkungen>
+	    		<STUDENT:anmerkungen>'.($row->anmerkungen==''?'&#xA0;':'<![CDATA['.$row->anmerkungen.']]>').'</STUDENT:anmerkungen>
 	    		<STUDENT:anrede><![CDATA['.$row->anrede.']]></STUDENT:anrede>
 	    		<STUDENT:svnr><![CDATA['.$row->svnr.']]></STUDENT:svnr>
 	    		<STUDENT:ersatzkennzeichen><![CDATA['.$row->ersatzkennzeichen.']]></STUDENT:ersatzkennzeichen>

@@ -644,8 +644,10 @@ function StatistikPrintLehrauftragsliste()
 	var col;
 	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
 	var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["sem"] : "sem";
+	var semester=tree.view.getCellText(tree.currentIndex,col);
 
-	window.open('<?php echo APP_ROOT ?>content/statistik/lehrauftragsliste_gst.xls.php?studiengang_kz='+studiengang_kz,'Lehrauftragsliste');
+	window.open('<?php echo APP_ROOT ?>content/statistik/lehrauftragsliste_gst.xls.php?studiengang_kz='+studiengang_kz+'&semester='+semester,'Lehrauftragsliste');
 }
 
 // ****
