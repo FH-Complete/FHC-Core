@@ -30,6 +30,8 @@ class konto
 	var $new;       // @var boolean
 	var $errormsg;  // @var string
 	var $result = array(); // @var adresse Objekt
+	var $buch_nr = array();
+	var $buch_date = array();
 
 	//Tabellenspalten
 	var $buchungsnr;
@@ -451,6 +453,55 @@ class konto
 		{
 			if($row = pg_fetch_object($result))
 				return $row->differenz*(-1);
+			else
+			{
+				$this->errormsg = 'Fehler beim Ermitteln der Differenz';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Ermitteln der Differenz';
+			return false;
+		}
+	}
+
+
+	// ******************************
+	// * Überprüft, ob studiengebühr gebucht ist für  
+	// * student_uid und studiensemester
+	// * gibt true/false zurück und setzt bei true das buchungsdatum $this->buchungsdatum
+	// ******************************
+	function checkStudienbeitrag($uid, $stsem)
+	{
+		$subqry = "SELECT tbl_konto.buchungsnr, tbl_konto.buchungsdatum FROM public.tbl_konto, public.tbl_benutzer WHERE tbl_konto.studiensemester_kurzbz = '".$stsem."' AND tbl_benutzer.uid = '".$uid."' AND tbl_benutzer.person_id = tbl_konto.person_id and tbl_konto.buchungstyp_kurzbz = 'Studiengebuehr' ORDER BY buchungsnr";
+		$subres = pg_query($this->conn, $subqry);
+		if (pg_num_rows($subres)==0)
+			return false;
+		else
+		{
+			while ($subrow = pg_fetch_object($subres))
+			{
+					$buch_nr[] = $subrow->buchungsnr;
+					$buch_date[] = $subrow->buchungsdatum;
+			}
+		}
+		
+		
+		$qry = "SELECT sum(betrag) as differenz FROM public.tbl_konto WHERE buchungsnr='".$buch_nr[0]."' OR buchungsnr_verweis='".$buch_nr[0]."'";
+
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				if ($row->differenz == 0)
+				{
+					$this->buchungsdatum = $buch_date[1];
+					return true;	
+				}				
+				else
+					return false;
+			}
 			else
 			{
 				$this->errormsg = 'Fehler beim Ermitteln der Differenz';
