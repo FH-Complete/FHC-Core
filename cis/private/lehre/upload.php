@@ -707,6 +707,7 @@ A:hover {
                   echo "<table class='tabcontent'>";
                   echo "  <tr>";
 			      echo "    <td align=\"right\" width=\"59%\">";
+			      echo "<span style='font-size:8pt;'>Max. Uploadgröße (alle Dateien): <b>8 MB</b></span>";
 			      echo "      <input id=\"btnupload\" type=\"submit\" name=\"upload\" value=\"Upload\">";
 			      echo "    </td>";
 			      echo "    <td width=\"41%\">&nbsp;</td>";

@@ -234,7 +234,7 @@ class studiensemester
 		else
 		{
 			//$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ende >= now() ORDER BY ende";
-			$qry = "SELECT studiensemester_kurzbz FROM vw_studiensemester ";
+			$qry = "SELECT studiensemester_kurzbz FROM public.vw_studiensemester ";
 			if($semester!='')
 			{
 				if($semester%2==0)

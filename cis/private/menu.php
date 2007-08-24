@@ -56,6 +56,11 @@ if(check_lektor($user,$db_conn))
    $is_lector=true;
 else
    $is_lector=false;
+  
+if(check_student($user,$db_conn))
+   $is_student=true;
+else
+   $is_student=false;
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -129,6 +134,14 @@ else
 				<td class="tdwidth10" nowrap>&nbsp;</td>
 				<td class='tdwrap'><a class="Item" href="lvplan/stpl_week.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;LV-Plan</a></td>
 			</tr>
+			<?php			
+			if ($is_student)
+				echo '<tr>
+			  	<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td class="tdwrap"><a class="Item" href="profile/dokumente.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Dokumente</a></td>
+			</tr>'
+			?>
+			
 			<?php
 			//Eigene LVs des eingeloggten Lektors anzeigen
 			if($is_lector)
