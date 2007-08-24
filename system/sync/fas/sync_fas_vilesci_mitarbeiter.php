@@ -287,7 +287,7 @@ $error_log_fas='';
 
 
 
-$qryall = "SELECT * FROM person JOIN mitarbeiter ON person_pk=mitarbeiter.person_fk WHERE (person.uid IS NOT NULL  AND person.uid<>'')
+$qryall = "SELECT *, person.creationdate::timestamp AS insertamum FROM person JOIN mitarbeiter ON person_pk=mitarbeiter.person_fk WHERE (person.uid IS NOT NULL  AND person.uid<>'')
 AND person_pk NOT IN (
 SELECT p1.person_pk
 FROM (person JOIN mitarbeiter ON person_pk=mitarbeiter.person_fk ) AS p1
@@ -340,8 +340,8 @@ if($resultall = pg_query($conn_fas, $qryall))
 		$personaktiv=true;
 		//$personinsertvon=$rowall->creationuser;
 		$personupdatevon='SYNC';
-		$personupdateamum=$rowall->creationdate;
-		$personinsertamum=$rowall->creationdate;
+		$personupdateamum=$rowall->insertamum;
+		$personinsertamum=$rowall->insertamum;
 		if($rowall->familienstand==1)
 		{
 			$personfamilienstand='l';
@@ -387,8 +387,8 @@ if($resultall = pg_query($conn_fas, $qryall))
 		$mitarbeiterort_kurzbz=null;
 		$mitarbeiteranmerkung=$rowall->bemerkung;
 		//$mitarbeiterinsertvon=$rowall->creationuser;
-		$mitarbeiterinsertamum=$rowall->creationdate;
-		$mitarbeiterupdateamum=$rowall->creationdate;
+		$mitarbeiterinsertamum=$rowall->insertamum;
+		$mitarbeiterupdateamum=$rowall->insertamum;
 		$mitarbeiterupdatevon='SYNC';
 		$mitarbeiterext_id=$rowall->mitarbeiter_pk;
 		
@@ -400,8 +400,8 @@ if($resultall = pg_query($conn_fas, $qryall))
 		$benutzeraktiv=($rowall->aktiv=='t'?true:false);
 		$benutzeralias='';
 		//$benutzerinsertvon=$rowall->creationuser;
-		$benutzerinsertamum=$rowall->creationdate;
-		$benutzerupdateamum=$rowall->creationdate;
+		$benutzerinsertamum=$rowall->insertamum;
+		$benutzerupdateamum=$rowall->insertamum;
 		$benutzerupdatevon='SYNC';
 		$benutzerext_id=$rowall->person_pk;
 		
@@ -756,7 +756,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 									$ausgabe_person="Staatsbürgerschaft: '".$personstaatsbuergerschaft."' (statt '".$row1->staatsbuergerschaft."')";
 								}
 							}
-							if(date("d.m.Y", $row1->insertamum)!=date("d.m.Y", $personinsertamum))
+							if($row1->insertamum!=$personinsertamum)
 							{
 								$updatep=true;
 								if(strlen(trim($ausgabe_person))>0)
@@ -909,7 +909,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 										$ausgabe_benutzer="PersonID: '".$personperson_id."'";
 									}
 								}
-								if(date("d.m.Y", $rowu->insertamum)!=date("d.m.Y", $benutzerinsertamum))
+								if($rowu->insertamum!=$benutzerinsertamum)
 								{
 									$updateb=true;
 									if(strlen(trim($ausgabe_benutzer))>0)
@@ -1113,7 +1113,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 												$ausgabe_mitarbeiter="Anmerkung: '".$mitarbeiteranmerkung."'";
 											}
 										}
-										if(date("d.m.Y", $rowu->insertamum)!=date("d.m.Y", $mitarbeiterinsertamum))
+										if($rowu->insertamum!=$mitarbeiterinsertamum)
 										{
 											$updatem=true;
 											if(strlen(trim($ausgabe_mitarbeiter))>0)
