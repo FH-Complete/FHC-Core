@@ -28,7 +28,7 @@ else
 	die ('Letzte Nummer konnte nicht eroiert werden!');
 
 // Neue Zutrittskarten
-$sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer,
+/*$sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer,
 				max(tbl_benutzer.uid) AS uid, max(matrikelnr) AS matrikelnr, max(kurzbzlang) AS stg_kurzbzlang,
 				upper(max(typ) || max(kurzbz)) AS stg_kurzbz,
 				EXTRACT(DAY FROM vw_betriebsmittelperson.insertamum) AS tag,
@@ -39,7 +39,15 @@ $sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer,
 					JOIN public.tbl_studiengang USING (studiengang_kz))
 				USING (person_id)
 			WHERE betriebsmitteltyp='Zutrittskarte' AND nummer NOT IN (SELECT physaswnumber FROM sync.tbl_zutrittskarte)
-			GROUP BY svnr,vorname,nachname,nummerintern,nummer, vw_betriebsmittelperson.insertamum;";
+			GROUP BY svnr,vorname,nachname,nummerintern,nummer, vw_betriebsmittelperson.insertamum;";*/
+$sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer, uid, matrikelnr, kurzbzlang AS stg_kurzbzlang,
+		upper(typ)||upper(kurzbz) AS stg_kurzbz, EXTRACT(DAY FROM vw_betriebsmittelperson.insertamum) AS tag,
+				EXTRACT(MONTH FROM vw_betriebsmittelperson.insertamum) AS monat,
+				EXTRACT(YEAR FROM vw_betriebsmittelperson.insertamum) AS jahr
+			FROM public.vw_betriebsmittelperson
+				 JOIN public.tbl_student ON (uid=student_uid)
+					JOIN public.tbl_studiengang USING (studiengang_kz)
+			WHERE betriebsmitteltyp='Zutrittskarte' AND benutzer_aktiv AND retouram IS NULL AND nummer NOT IN (SELECT physaswnumber FROM sync.tbl_zutrittskarte);";
 //echo $sql_query;
 if(!$result_neu=pg_exec($conn, $sql_query))
 	die(pg_errormessage().'<BR>'.$sql_query);
