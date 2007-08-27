@@ -510,7 +510,7 @@ class wochenplan
 					if (isset($lehrverband))
 						unset($lehrverband);
 					if (isset($lehrfach))
-						unset($lehrfach);	
+						unset($lehrfach);
 					foreach ($this->std_plan[$i][$j] as $lehrstunde)
 					{
 						$unr[]=$lehrstunde->unr;
@@ -609,7 +609,7 @@ class wochenplan
 					echo '&grp='.$this->grp;
 					echo '&ort_kurzbz='.$this->std_plan[$i][$j][0]->ort;		//.'">'
 					echo "','Details', 'height=320,width=480,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes');";
-					echo '" title="'.$titel.' - '.$anmerkung.'" ';
+					echo '" title="'.$titel.'" ';
 					echo ' href="#">';
 
 					// Ausgabe
