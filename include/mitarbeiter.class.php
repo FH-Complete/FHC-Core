@@ -534,8 +534,10 @@ class mitarbeiter extends benutzer
 	{
 		$qry = "SELECT distinct on(person_id) *, tbl_benutzer.aktiv as aktiv FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id)) LEFT JOIN public.tbl_benutzerfunktion USING(uid) WHERE true";
 		
-		if($fix)
+		if($fix=='true')
 			$qry .= " AND fixangestellt=true";
+		if($fix=='false')
+			$qry .= " AND fixangestellt=false";
 		if($stgl)
 			$qry .= " AND funktion_kurzbz='stgl'";
 		if($fbl)
@@ -545,7 +547,7 @@ class mitarbeiter extends benutzer
 		if($aktiv=='false')
 			$qry .= " AND tbl_benutzer.aktiv=false";
 		if($karenziert)
-			$qry .= " AND uid IN (SELECT mitarbeiter_uid FROM bis.tbl_bisverwendung WHERE beginn<(SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='$studiensemester_kurzbz') AND ende<(SELECT ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='$studiensemester_kurzbz'))";
+			$qry .= " AND uid IN (SELECT mitarbeiter_uid FROM bis.tbl_bisverwendung WHERE beschausmasscode='5' AND beginn<(SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='$studiensemester_kurzbz') AND ende<(SELECT ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='$studiensemester_kurzbz'))";
 		if($ausgeschieden)
 		{
 			$qry.=" AND NOT EXISTS(SELECT * FROM bis.tbl_bisverwendung WHERE beginn<now() AND ende>now())";
