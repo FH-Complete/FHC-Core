@@ -292,7 +292,7 @@ class lehrstunde
 			// Gruppen ermitteln
 			if (is_null($this->ss))
 				$this->ss=studiensemester::getNearest();
-			$sql_query="SELECT gruppe_kurzbz FROM public.tbl_benutzergruppe WHERE uid='$uid' AND studiensemester_kurzbz='$this->ss'";
+			$sql_query="SELECT gruppe_kurzbz FROM public.tbl_benutzergruppe WHERE uid='$uid' AND (studiensemester_kurzbz='$this->ss' OR studiensemester_kurzbz IS NULL)";
 			//echo $sql_query;
 			if (! $result_einheit=pg_query($this->conn, $sql_query) )
 			{
