@@ -152,7 +152,7 @@ function convdate($date)
 	    		<STUDENT:mail_privat><![CDATA['.$mail_privat.']]></STUDENT:mail_privat>
 	    		<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
 
-	    		<STUDENT:aktiv><![CDATA['.($row->bnaktiv?'true':'false').']]></STUDENT:aktiv>
+	    		<STUDENT:aktiv><![CDATA['.((isset($row->bnaktiv) && $row->bnaktiv)?'true':'false').']]></STUDENT:aktiv>
 	    		<STUDENT:uid><![CDATA['.(isset($row->uid)?$row->uid:'').']]></STUDENT:uid>
 	    		<STUDENT:matrikelnummer><![CDATA['.(isset($row->matrikelnr)?$row->matrikelnr:'').']]></STUDENT:matrikelnummer>
 				<STUDENT:alias><![CDATA['.(isset($row->alias)?$row->alias:'').']]></STUDENT:alias>
