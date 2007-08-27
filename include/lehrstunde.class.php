@@ -18,6 +18,8 @@
  *****************************************************************************/
 
 // include_once('mitarbeiter.class.php');
+require_once('studiensemester.class.php');
+
 
 class lehrstunde
 {
@@ -52,6 +54,7 @@ class lehrstunde
 
 	var $lehrstunden=array();	// @brief Objekt der eigenen Klasse
 	var $anzahl;		// @brief Gesamte Anzahl der Stunden im Array
+	var $ss=null;			// @brief Studiensemester
 
 
 	/** Konstruktor
@@ -287,7 +290,9 @@ class lehrstunde
 			$grp=$row->gruppe;
 
 			// Gruppen ermitteln
-			$sql_query="SELECT gruppe_kurzbz FROM public.tbl_benutzergruppe WHERE uid='$uid'";
+			if (is_null($this->ss))
+				$this->ss=studiensemester::getNearest();
+			$sql_query="SELECT gruppe_kurzbz FROM public.tbl_benutzergruppe WHERE uid='$uid' AND studiensemester_kurzbz='$this->ss'";
 			//echo $sql_query;
 			if (! $result_einheit=pg_query($this->conn, $sql_query) )
 			{
