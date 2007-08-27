@@ -233,19 +233,19 @@ class studiensemester
 		   return $stsem;
 		else
 		{
-			//$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ende >= now() ORDER BY ende";
-			$qry = "SELECT studiensemester_kurzbz FROM public.vw_studiensemester ";
+			$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE 1";
+			//$qry = "SELECT studiensemester_kurzbz FROM public.vw_studiensemester ";
 			if($semester!='')
 			{
 				if($semester%2==0)
 					$ss='SS';
-				else 
+				else
 					$ss='WS';
-					
-				$qry.= " WHERE substring(studiensemester_kurzbz from 1 for 2)='$ss' ";
+
+				$qry.= " AND substring(studiensemester_kurzbz from 1 for 2)='$ss' ";
 			}
-			$qry.= " ORDER BY delta LIMIT 1";
-			
+			$qry.= " AND ende >= now() ORDER BY ende LIMIT 1";
+
 			if(!$res=pg_exec($this->conn,$qry))
 		    {
 				$this->errormsg = pg_errormessage($this->conn);
@@ -264,6 +264,32 @@ class studiensemester
 			}
 		}
 	}
+
+	/**
+	 * Liefert das naechstgelegenste Studiensemester
+	 * @return Studiensemester oder false wenn es keines gibt
+	 */
+	function getNearest()
+	{
+		$qry = "SELECT studiensemester_kurzbz FROM public.vw_studiensemester  ORDER BY delta LIMIT 1";
+		if(!$res=pg_exec($this->conn,$qry))
+		{
+			$this->errormsg = pg_errormessage($this->conn);
+			return false;
+		}
+
+		if(pg_num_rows($res)>0)
+		{
+		   $erg = pg_fetch_object($res);
+		   return $erg->studiensemester_kurzbz;
+		}
+		else
+		{
+			$this->errormsg = "Kein aktuelles Studiensemester vorhanden";
+			return false;
+		}
+	}
+
 
 	function getAll()
 	{
