@@ -41,6 +41,7 @@ var MitarbeiterEntwicklungsteamTreeDatasource=null; // Datasource des Entwicklun
 var MitarbeiterEntwicklungsteamSelectMitarbeiterUID=null; // UID des Mitarbeiters des Entwicklugnsteams das nach dem rebuild markiert werden soll
 var MitarbeiterEntwicklungsteamSelectStudiengangID=null; // ID des Stg des Entwicklungsteams das nach dem rebuild markiert werden soll
 var MitarbeiterEntwicklungsteamDoubleRefresh=false; // Wenn auf einen Tree der eine leere Datasource enthaelt eine neue Datasource angehaengt wird, dann muss doppelt refresht werden
+var MitarbeiterTreeLoadDataOnSelect2=true; // Gibt an ob die Details beim markieren eines Mitarbeiters geladen werden sollen
 // ********** Observer und Listener ************* //
 
 
@@ -53,6 +54,7 @@ var MitarbeiterTreeSinkObserver =
 {
 	onBeginLoad : function(pSink)
 	{
+		MitarbeiterTreeLoadDataOnSelect2=false;
 	},
 	onInterrupt : function(pSink) {},
 	onResume : function(pSink) {},
@@ -78,7 +80,8 @@ var MitarbeiterTreeListener =
  		//timeout nur bei Mozilla notwendig da sonst die rows
  		//noch keine values haben. Ab Seamonkey funktionierts auch
 		//ohne dem setTimeout
-		window.setTimeout(MitarbeiterTreeSelectMitarbeiter,10);
+		MitarbeiterTreeLoadDataOnSelect2=true;
+		window.setTimeout(MitarbeiterTreeSelectMitarbeiter,10);		
 	}
 };
 
@@ -414,7 +417,9 @@ function MitarbeiterAuswahl()
 		MitarbeiterTreeLoadDataOnSelect=true;
 		return true;
 	}
-
+	if(!MitarbeiterTreeLoadDataOnSelect2)
+		return true;
+	
 	// Trick 17	(sonst gibt's ein Permission denied)
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('mitarbeiter-tree');
@@ -508,6 +513,7 @@ function MitarbeiterAuswahl()
 	document.getElementById('mitarbeiter-detail-textbox-ersatzkennzeichen').value=ersatzkennzeichen;
 	document.getElementById('mitarbeiter-detail-menulist-familienstand').value=familienstand;
 	document.getElementById('mitarbeiter-detail-menulist-geschlecht').value=geschlecht;
+	
 	if(aktiv=='Ja')
 		document.getElementById('mitarbeiter-detail-checkbox-aktiv').checked=true;
 	else

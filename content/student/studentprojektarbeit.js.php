@@ -189,6 +189,8 @@ function StudentProjektarbeitResetFields()
 	document.getElementById('student-projektarbeit-textbox-gesamtstunden').value='3.0';
 	document.getElementById('student-projektarbeit-textbox-themenbereich').value='';
 	document.getElementById('student-projektarbeit-textbox-anmerkung').value='';
+	document.getElementById('student-projektarbeit-menulist-firma').value='';
+	document.getElementById('student-projektarbeit-menulist-note').value='';
 }
 
 // *****
@@ -479,6 +481,7 @@ function StudentProjektarbeitNeu()
 	document.getElementById('student-projektarbeit-textbox-projektarbeit_id').value='';
 	StudentProjektarbeitResetFields();
 	StudentProjektarbeitDetailDisableFields(false);
+	StudentProjektbetreuerDisableFields(true);
 	//var verband_tree=document.getElementById('tree-verband');
 	//var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
 	//var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
@@ -734,6 +737,7 @@ function StudentProjektbetreuerDetailReset()
 	document.getElementById('student-projektbetreuer-textbox-punkte').value='0.0';
 	document.getElementById('student-projektbetreuer-textbox-stunden').value=document.getElementById('student-projektarbeit-textbox-gesamtstunden').value;
 	document.getElementById('student-projektbetreuer-textbox-stundensatz').value=document.getElementById('student-projektarbeit-textbox-stundensatz').value;
+	document.getElementById('student-projektbetreuer-menulist-person').value='';
 }
 
 // ****

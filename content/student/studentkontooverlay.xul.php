@@ -174,6 +174,20 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 											</template>
 										</menulist>
 									</row>
+									<row>
+										<label value="Studiensemester" control="student-konto-menulist-studiensemester"/>
+										<menulist id="student-konto-menulist-studiensemester" disabled="true"
+										          datasources="<?php echo APP_ROOT ?>rdf/studiensemester.rdf.php" flex="1"
+										          ref="http://www.technikum-wien.at/studiensemester/liste" >
+											<template>
+												<menupopup>
+													<menuitem value="rdf:http://www.technikum-wien.at/studiensemester/rdf#kurzbz"
+										        		      label="rdf:http://www.technikum-wien.at/studiensemester/rdf#kurzbz"
+													  		  uri="rdf:*"/>
+													</menupopup>
+											</template>
+										</menulist>
+									</row>
 								</rows>
 							</grid>
 							<hbox>

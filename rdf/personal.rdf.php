@@ -141,7 +141,7 @@ function draw_row($mitarbeiter)
     		<MITARBEITER:kurzbz><![CDATA['.$mitarbeiter->kurzbz.']]></MITARBEITER:kurzbz>
     		<MITARBEITER:stundensatz NC:parseType="Integer"><![CDATA['.$mitarbeiter->stundensatz.']]></MITARBEITER:stundensatz>
     		<MITARBEITER:ausbildung><![CDATA['.$mitarbeiter->ausbildungcode.']]></MITARBEITER:ausbildung>
-    		<MITARBEITER:aktiv><![CDATA['.($mitarbeiter->aktiv?'Ja':'Nein').']]></MITARBEITER:aktiv>
+    		<MITARBEITER:aktiv><![CDATA['.($mitarbeiter->bnaktiv?'Ja':'Nein').']]></MITARBEITER:aktiv>
     		<MITARBEITER:lektor><![CDATA['.($mitarbeiter->lektor?'Ja':'Nein').']]></MITARBEITER:lektor>
     		<MITARBEITER:fixangestellt><![CDATA['.($mitarbeiter->fixangestellt?'Ja':'Nein').']]></MITARBEITER:fixangestellt>
     		<MITARBEITER:ort_kurzbz><![CDATA['.$mitarbeiter->ort_kurzbz.']]></MITARBEITER:ort_kurzbz>

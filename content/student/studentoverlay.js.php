@@ -33,6 +33,7 @@ var StudentSelectID=null; //Student der nach dem Refresh markiert werden soll
 var StudentKontoSelectBuchung=null; //Buchung die nach dem Refresh markiert werden soll
 var StudentKontoTreeDatasource; //Datasource des KontoTrees
 var StudentTreeLoadDataOnSelect=true; //Gib an ob beim Selectieren im Tree die Daten geladen werden sollen
+var StudentTreeLoadDataOnSelect2=true; //Gib an ob beim Selectieren im Tree die Daten geladen werden sollen
 var StudentIOTreeDatasource; //Datasource des Incomming/Outgoing Trees
 var StudentIOSelectID=null; //BISIO Eintrag der nach dem Refresh markiert werden soll
 var StudentNotenTreeDatasource; //Datasource des Noten Trees
@@ -54,6 +55,7 @@ var StudentTreeSinkObserver =
 {
 	onBeginLoad : function(pSink)
 	{
+		StudentTreeLoadDataOnSelect2=false;
 	},
 	onInterrupt : function(pSink) {},
 	onResume : function(pSink) {},
@@ -79,6 +81,7 @@ var StudentTreeListener =
  		//timeout nur bei Mozilla notwendig da sonst die rows
  		//noch keine values haben. Ab Seamonkey funktionierts auch
 		//ohne dem setTimeout
+		StudentTreeLoadDataOnSelect2=true;
 		window.setTimeout(StudentTreeSelectStudent,10);
 		// Progressmeter stoppen
 		document.getElementById('statusbar-progressmeter').setAttribute('mode','determined');
@@ -648,13 +651,17 @@ function StudentImageUpload()
 // ****
 function StudentAuswahl()
 {
+	
 	if(!StudentTreeLoadDataOnSelect)
 	{
 		StudentTreeLoadDataOnSelect=true;
 		return true;
 	}
+	
+	if(!StudentTreeLoadDataOnSelect2)
+		return true;
 
-	// Trick 17	(sonst gibt's ein Permission denied)
+		// Trick 17	(sonst gibt's ein Permission denied)
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-tree');
 
@@ -863,6 +870,8 @@ function StudentAuswahl()
 		document.getElementById('student-toolbar-abbrecher').hidden=true;
 		document.getElementById('student-toolbar-unterbrecher').hidden=true;
 		document.getElementById('student-toolbar-student').hidden=true;
+		document.getElementById('student-toolbar-diplomand').hidden=true;
+		document.getElementById('student-toolbar-absolvent').hidden=true;
 		
 		document.getElementById('interessent-toolbar-zubewerber').hidden=false;
 		document.getElementById('interessent-toolbar-zustudent').hidden=false;
@@ -892,6 +901,8 @@ function StudentAuswahl()
 		document.getElementById('student-toolbar-abbrecher').hidden=false;
 		document.getElementById('student-toolbar-unterbrecher').hidden=false;
 		document.getElementById('student-toolbar-student').hidden=false;
+		document.getElementById('student-toolbar-diplomand').hidden=false;
+		document.getElementById('student-toolbar-absolvent').hidden=false;
 		
 		document.getElementById('interessent-toolbar-zubewerber').hidden=true;
 		document.getElementById('interessent-toolbar-zustudent').hidden=true;
@@ -1668,6 +1679,7 @@ function StudentKontoAuswahl()
 	document.getElementById('student-konto-textbox-mahnspanne').value=mahnspanne;
 	document.getElementById('student-konto-menulist-buchungstyp').value=buchungstyp_kurzbz;
 	document.getElementById('student-konto-textbox-buchungsnr').value=buchungsnr;
+	document.getElementById('student-konto-menulist-studiensemester').value=studiensemester_kurzbz;
 }
 
 // ****
@@ -1820,6 +1832,7 @@ function StudentKontoDetailDisableFields(val)
 	document.getElementById('student-konto-textbox-buchungstext').disabled=val;
 	document.getElementById('student-konto-textbox-mahnspanne').disabled=val;
 	document.getElementById('student-konto-menulist-buchungstyp').disabled=val;
+	document.getElementById('student-konto-menulist-studiensemester').disabled=val;
 	document.getElementById('student-konto-button-speichern').disabled=val;
 }
 
@@ -1836,6 +1849,7 @@ function StudentKontoDetailSpeichern()
 	mahnspanne = document.getElementById('student-konto-textbox-mahnspanne').value;
 	buchungstyp_kurzbz = document.getElementById('student-konto-menulist-buchungstyp').value;
 	buchungsnr = document.getElementById('student-konto-textbox-buchungsnr').value;
+	studiensemester_kurzbz = document.getElementById('student-konto-menulist-studiensemester').value;
 
 	if(buchungsdatum!='' && !CheckDatum(buchungsdatum))
 	{
@@ -1853,6 +1867,7 @@ function StudentKontoDetailSpeichern()
 	req.add('mahnspanne', mahnspanne);
 	req.add('buchungstyp_kurzbz', buchungstyp_kurzbz);
 	req.add('buchungsnr', buchungsnr);
+	req.add('studiensemester_kurzbz', studiensemester_kurzbz);
 
 	var response = req.executePOST();
 
