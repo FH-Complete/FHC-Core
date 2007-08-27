@@ -136,7 +136,6 @@ function convdate($date)
 	    		<STUDENT:geburtsdatum><![CDATA['.$datum_obj->convertISODate($row->gebdatum).']]></STUDENT:geburtsdatum>
 	    		<STUDENT:geburtsdatum_iso><![CDATA['.$row->gebdatum.']]></STUDENT:geburtsdatum_iso>
 	    		<STUDENT:homepage><![CDATA['.$row->homepage.']]></STUDENT:homepage>
-	    		<STUDENT:aktiv><![CDATA['.($row->aktiv?'true':'false').']]></STUDENT:aktiv>
 	    		<STUDENT:gebort><![CDATA['.$row->gebort.']]></STUDENT:gebort>
 	    		<STUDENT:gebzeit><![CDATA['.$row->gebzeit.']]></STUDENT:gebzeit>
 	    		<STUDENT:anmerkungen>'.($row->anmerkungen==''?'&#xA0;':'<![CDATA['.$row->anmerkungen.']]>').'</STUDENT:anmerkungen>
@@ -153,6 +152,7 @@ function convdate($date)
 	    		<STUDENT:mail_privat><![CDATA['.$mail_privat.']]></STUDENT:mail_privat>
 	    		<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
 
+	    		<STUDENT:aktiv><![CDATA['.($row->bnaktiv?'true':'false').']]></STUDENT:aktiv>
 	    		<STUDENT:uid><![CDATA['.(isset($row->uid)?$row->uid:'').']]></STUDENT:uid>
 	    		<STUDENT:matrikelnummer><![CDATA['.(isset($row->matrikelnr)?$row->matrikelnr:'').']]></STUDENT:matrikelnummer>
 				<STUDENT:alias><![CDATA['.(isset($row->alias)?$row->alias:'').']]></STUDENT:alias>

@@ -88,7 +88,7 @@ if(!$error)
 			$mitarbeiter->ersatzkennzeichen = $_POST['ersatzkennzeichen'];
 			$mitarbeiter->familienstand = $_POST['familienstand'];
 			$mitarbeiter->geschlecht = $_POST['geschlecht'];
-			$mitarbeiter->aktiv = ($_POST['aktiv']=='true'?true:false);
+			$mitarbeiter->bnaktiv = ($_POST['aktiv']=='true'?true:false);
 			$mitarbeiter->anzahlkinder = $_POST['anzahlderkinder'];
 			$mitarbeiter->staatsbuergerschaft = $_POST['staatsbuergerschaft'];
 			$mitarbeiter->geburtsnation = $_POST['geburtsnation'];

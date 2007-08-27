@@ -25,7 +25,7 @@ class benutzer extends person
 {
 	//Tabellenspalten
 	var $uid;		// varchar(16)
-	var $bnaktiv;	// boolean
+	var $bnaktiv=true;	// boolean
 	var $alias;		// varchar(256)
 		
 	// *************************************************************************
@@ -69,7 +69,7 @@ class benutzer extends person
 			if($row = pg_fetch_object($result))
 			{
 				$this->uid = $row->uid;
-				$this->bnaktiv = $row->aktiv;
+				$this->bnaktiv = ($row->aktiv=='t'?true:false);
 				$this->alias = $row->alias;
 				if(!person::load($row->person_id))
 					return false;
@@ -150,7 +150,7 @@ class benutzer extends person
 		{
 			$qry = 'INSERT INTO public.tbl_benutzer (uid, aktiv, alias, person_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
 			       "'".addslashes($this->uid)."',".
-			       ($this->aktiv?'true':'false').','.
+			       ($this->bnaktiv?'true':'false').','.
 			       $this->addslashes($this->alias).",'".
 			       $this->person_id."',".
 			       $this->addslashes($this->insertamum).",".
@@ -161,7 +161,7 @@ class benutzer extends person
 		else
 		{			
 			$qry = 'UPDATE public.tbl_benutzer SET'.
-			       ' aktiv='.($this->aktiv?'true':'false').','.
+			       ' aktiv='.($this->bnaktiv?'true':'false').','.
 			       ' alias='.$this->addslashes($this->alias).','.
 			       " person_id='".$this->person_id."',".
 			       ' updateamum='.$this->addslashes($this->updateamum).','.

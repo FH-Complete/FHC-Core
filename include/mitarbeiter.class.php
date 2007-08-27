@@ -577,7 +577,7 @@ class mitarbeiter extends benutzer
 				$obj->familienstand = $row->familienstand;
 				$obj->geschlecht = $row->geschlecht;
 				$obj->anzahlkinder = $row->anzahlkinder;
-				$obj->aktiv = ($row->aktiv=='t'?true:false);
+				$obj->bnaktiv = ($row->aktiv=='t'?true:false);
 				$obj->uid = $row->uid;
 				$obj->personalnummer = $row->personalnummer;
 				$obj->telefonklappe = $row->telefonklappe;

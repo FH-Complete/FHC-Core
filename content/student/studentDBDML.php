@@ -205,7 +205,7 @@ if(!$error)
 				$student->ersatzkennzeichen = $_POST['ersatzkennzeichen'];
 				$student->familienstand = $_POST['familienstand'];
 				$student->geschlecht = $_POST['geschlecht'];
-				$student->aktiv = ($_POST['aktiv']=='true'?true:false);
+				$student->bnaktiv = ($_POST['aktiv']=='true'?true:false);
 				$student->anzahlkinder = $_POST['anzahlderkinder'];
 				$student->staatsbuergerschaft = $_POST['staatsbuergerschaft'];
 				$student->geburtsnation = $_POST['geburtsnation'];
@@ -313,7 +313,7 @@ if(!$error)
 				$person->ersatzkennzeichen = $_POST['ersatzkennzeichen'];
 				$person->familienstand = $_POST['familienstand'];
 				$person->geschlecht = $_POST['geschlecht'];
-				$person->aktiv = ($_POST['aktiv']=='true'?true:false);
+				//$person->aktiv = ($_POST['aktiv']=='true'?true:false);
 				$person->anzahlkinder = $_POST['anzahlderkinder'];
 				$person->staatsbuergerschaft = $_POST['staatsbuergerschaft'];
 				$person->geburtsnation = $_POST['geburtsnation'];
@@ -844,6 +844,7 @@ if(!$error)
 				$buchung->buchungstext = $_POST['buchungstext'];
 				$buchung->mahnspanne = $_POST['mahnspanne'];
 				$buchung->buchungstyp_kurzbz = $_POST['buchungstyp_kurzbz'];
+				$buchung->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
 				$buchung->new = false;
 				$buchung->updateamum = date('Y-m-d H:i:s');
 				$buchung->updatevon = $user;

@@ -499,7 +499,7 @@ function LeDetailReset()
 		lektortree.database.RemoveDataSource(oldDatasources.getNext());
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	lektortree.builder.refresh();
+	lektortree.builder.rebuild();
 
 	//Gruppentree leeren
 	gruppentree = document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe');
@@ -511,7 +511,7 @@ function LeDetailReset()
 		gruppentree.database.RemoveDataSource(oldDatasources.getNext());
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	gruppentree.builder.refresh();
+	gruppentree.builder.rebuild();
 }
 
 // ****
