@@ -83,7 +83,7 @@ if($result = pg_query($conn_fas, $qry))
 			if(pg_num_rows($result5)<1)
 			{
 				$error=true;
-				$error_log_fas.="Student mit ext_id='".$row->student_pk."' nicht gefunden! ('".$row->perskz."', '".$row->familienname."', '".$row->vorname."')\n";
+				$error_log_fas.="Student mit ext_id='".$row->student_pk."' nicht gefunden! ('".$row->perskz."', '".$row->familienname."', '".$row->vorname."')\n".$qry."\n";
 				$nicht_gefunden++;
 			}
 			else
@@ -468,7 +468,7 @@ if($result = pg_query($conn_fas, $qry))
 
 //echo nl2br($text);
 echo nl2br("\nStudentlehrverband\nStudenten: $anzahl_quelle_student / Gruppen: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n\n");
-echo nl2br("\nStudenten, die in tbl_benutzer nicht gefunden wurden: ".$nicht_gefunden."\n".$error_log_fas);
+echo nl2br("\nStudenten, die in tbl_student nicht gefunden wurden: ".$nicht_gefunden."\n".$error_log_fas);
 echo nl2br ("---------------------------------------------------------------------------------------------------------\n".$ausgabe_all);
 $ausgabe="\nStudentlehrverband\nStudenten: $anzahl_quelle_student / Gruppen: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler."
 ."\n\n".$ausgabe_all;
