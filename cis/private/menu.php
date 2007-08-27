@@ -181,11 +181,11 @@ else
 							<?php
 							$stsemobj = new studiensemester($db_conn);
 							$stsem = $stsemobj->getAktorNext();
-							$qry = "SELECT distinct bezeichnung, studiengang_kz, semester, lehreverzeichnis, tbl_lehrveranstaltung.lehrveranstaltung_id
-										FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter
+							$qry = "SELECT distinct tbl_lehrveranstaltung.bezeichnung,typ, tbl_studiengang.kurzbz, tbl_lehrveranstaltung.studiengang_kz, semester, lehreverzeichnis, tbl_lehrveranstaltung.lehrveranstaltung_id
+										FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_studiengang
 								        WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-									        tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-									        mitarbeiter_uid='$user' AND tbl_lehreinheit.studiensemester_kurzbz='$stsem'";
+									        tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz AND
+									        mitarbeiter_uid='$user' AND tbl_lehreinheit.studiensemester_kurzbz='$stsem' ORDER BY typ, tbl_studiengang.kurzbz, semester, lehreverzeichnis";
 
 							if($result = pg_query($db_conn,$qry))
 							{
