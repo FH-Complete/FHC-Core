@@ -413,8 +413,12 @@ if(!$error)
 				$prestd = new prestudent($conn);
 				if($prestd->getLastStatus($_POST['prestudent_id']))
 				{
+					if($_POST['rolle_kurzbz']=='Absolvent' || $_POST['rolle_kurzbz']=='Diplomand')
+						$studiensemester = $semester_aktuell;
+					else 
+						$studiensemester = $prestd->studiensemester_kurzbz;
 					$hlp = new prestudent($conn);
-					$hlp->getPrestudentRolle($_POST['prestudent_id'], $_POST['rolle_kurzbz'], $prestd->studiensemester_kurzbz);
+					$hlp->getPrestudentRolle($_POST['prestudent_id'], $_POST['rolle_kurzbz'], $studiensemester);
 					if(count($hlp->result)>0)
 					{
 						$errormsg = 'Diese Rolle ist bereits vorhanden';
@@ -425,7 +429,7 @@ if(!$error)
 						$prestd_neu = new prestudent($conn);
 						$prestd_neu->prestudent_id = $_POST['prestudent_id'];
 						$prestd_neu->rolle_kurzbz = $_POST['rolle_kurzbz'];
-						$prestd_neu->studiensemester_kurzbz = $prestd->studiensemester_kurzbz;
+						$prestd_neu->studiensemester_kurzbz = $studiensemester;
 						$prestd_neu->datum = date('Y-m-d');
 						$prestd_neu->ausbildungssemester = $prestd->ausbildungssemester;
 						$prestd_neu->insertamum = date('Y-m-d H:i:s');
