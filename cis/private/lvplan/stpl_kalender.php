@@ -54,8 +54,8 @@ if ($uid=='maderdon')
 		$format='ical';
 		$version=2;
 		$target='ical';
-		$begin=1171234800;
-		$ende=1183068000;
+		$begin=1188597600;
+		$ende=1202166000;
 	}
 
 $jahr=date("Y",$begin);
