@@ -25,19 +25,18 @@
  * Hilfe der XSL-FO Vorlage aus der DB und generiert
  * daraus ein PDF (xslfo2pdf)
  */
-require_once('../vilesci/config.inc.php');
-require_once('../include/functions.inc.php');
-require_once('../include/benutzerberechtigung.class.php');
-require_once('../include/xslfo2pdf/xslfo2pdf.php');
-require_once('../include/akte.class.php');
-require_once('../include/konto.class.php');
+require_once('../../cis/config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/xslfo2pdf/xslfo2pdf.php');
+require_once('../../include/akte.class.php');
+require_once('../../include/konto.class.php');
 
 // Datenbank Verbindung
 if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
-//$user = get_uid();
-$user = strtolower(trim($_SERVER['REMOTE_USER']));
+$user = get_uid();
 loadVariables($conn, $user);
 
 //Parameter holen
