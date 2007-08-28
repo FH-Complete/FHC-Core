@@ -12,6 +12,7 @@
 //*
 
 require_once('../../../vilesci/config.inc.php');
+require_once('../sync_config.inc.php');
 require_once('../../../include/firma.class.php');
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
@@ -732,9 +733,10 @@ if($result = pg_query($conn_fas, $qry_main))
 												$ausgabe.="Firma '".$firma->name."' geändert: ".$ausgabe_fa."\n";
 												//$anzahl_update2;
 											}
-												$projektarbeitfirma_id=$firma->firma_id;
+												
 										}
-									}											
+									}
+									$projektarbeitfirma_id=$firma->firma_id;											
 								}
 							}
 						}
