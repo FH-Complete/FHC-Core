@@ -233,7 +233,7 @@ class studiensemester
 		   return $stsem;
 		else
 		{
-			$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE 1";
+			$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE true";
 			//$qry = "SELECT studiensemester_kurzbz FROM public.vw_studiensemester ";
 			if($semester!='')
 			{
@@ -245,7 +245,7 @@ class studiensemester
 				$qry.= " AND substring(studiensemester_kurzbz from 1 for 2)='$ss' ";
 			}
 			$qry.= " AND ende >= now() ORDER BY ende LIMIT 1";
-
+			//echo $qry;
 			if(!$res=pg_exec($this->conn,$qry))
 		    {
 				$this->errormsg = pg_errormessage($this->conn);
