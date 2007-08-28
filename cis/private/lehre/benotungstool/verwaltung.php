@@ -149,6 +149,7 @@ $positiv = (isset($_POST['positiv'])?$_POST['positiv']:'');
 
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 $copy_content = '';
+$copy_dropdown = '';
 
 //Kopfzeile
 echo '<table class="tabcontent" height="100%">';
@@ -864,13 +865,16 @@ else
 		}
 		echo "<tr><td colspan='3' align='right'><input type='Submit' value='Auswahl löschen' name='delete_uebung' onclick='return confirmdelete();'></td><td></td></tr>";
 		echo "</form>";
-		echo "<tr><td colspan='3'>&nbsp;</td></tr>";
-		echo "<tr><td colspan='3' class='ContentHeader3'>Vorhandene Übungen kopieren</td></tr>";
-		
-		$uebung_id_source_dropdown .= "</select>";
-		echo "<tr><td colspan='3'>";
-		echo "<form name='copy' action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method='POST'><table><tr><td>Übung</td><td></td><td>Lehreinheit</td><td></td></tr><tr><td>".$uebung_id_source_dropdown."</td><td>-></td><td>".$copy_dropdown."</td><td><input type='submit' name='copy_uebung' value='kopieren'></td></tr></table></form>";
-		echo "</td></tr>";
+		if ($copy_dropdown != '')
+		{		
+			echo "<tr><td colspan='3'>&nbsp;</td></tr>";
+			echo "<tr><td colspan='3' class='ContentHeader3'>Vorhandene Übungen kopieren</td></tr>";
+			
+			$uebung_id_source_dropdown .= "</select>";
+			echo "<tr><td colspan='3'>";
+			echo "<form name='copy' action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method='POST'><table><tr><td>Übung</td><td></td><td>Lehreinheit</td><td></td></tr><tr><td>".$uebung_id_source_dropdown."</td><td>-></td><td>".$copy_dropdown."</td><td><input type='submit' name='copy_uebung' value='kopieren'></td></tr></table></form>";
+			echo "</td></tr>";
+		}
 	}
 	else
 		echo "<tr><td colspan='3'>Derzeit sind keine Übungen angelegt</td><td></td></tr>";
