@@ -83,7 +83,7 @@ if($result = pg_query($conn_fas, $qry))
 			if(pg_num_rows($result5)<1)
 			{
 				$error=true;
-				$error_log_fas.="Student mit ext_id='".$row->student_pk."' nicht gefunden! ('".$row->perskz."', '".$row->familienname."', '".$row->vorname."')\n".$qry."\n";
+				$error_log_fas.="Student mit ext_id='".$row->student_pk."' nicht gefunden! ('".$row->perskz."', '".$row->familienname."', '".$row->vorname."')\n".$qry5."\n";
 				$nicht_gefunden++;
 			}
 			else
