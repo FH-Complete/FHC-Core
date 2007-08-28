@@ -830,11 +830,14 @@ if(isset($_GET["uebung_id"]) && $_GET["uebung_id"]!='')
 	<tr><td>Freigabe</td><td align='right'>von <input type='text' size='16' name='freigabevon' value='".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon))."'></td></tr>
 	<tr><td>(Format: 31.12.2007 14:30)</td><td align='right'>bis <input type='text' size='16' name='freigabebis' value='".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis))."'></td></tr>";
 	
-	if ($uebung_obj->beispiele)
+	if ($uebung_obj->beispiele){
 		echo "<tr><td>Max. Studenten/Beispiel</td><td align='right'><input type='text' name='maxstd' value='$uebung_obj->maxstd'></td><td>$error_maxstd</td></tr>
 	<tr><td>Max. Beispiele/Student</td><td align='right'><input type='text' name='maxbsp' value='$uebung_obj->maxbsp'></td><td>$error_maxbsp</td></tr>";
-	//echo "<tr><td>Gewicht</td><td align='right'><input type='text' size='16' name='gewicht' value='$uebung_obj->gewicht'></td><td>$error_gewicht</td></tr>";
-	echo "<input type='hidden' size='16' name='gewicht' value='0'>";
+		echo "<input type='hidden' size='16' name='gewicht' value='0'>";
+	}	
+	else if ($uebung_obj->abgabe)
+		echo "<tr><td>Gewicht</td><td align='right'><input type='text' size='16' name='gewicht' value='$uebung_obj->gewicht'></td><td>$error_gewicht</td></tr>";
+	
 	//echo"<tr><td>Positiv </td><td><input type='checkbox' name='positiv' ".($uebung_obj->positiv?'checked':'')."></td></tr>";
 	if ($uebung_obj->beispiele)	
 		echo"<tr><td>Statistik f&uuml;r Studenten anzeigen </td><td><input type='checkbox' name='statistik' ".($uebung_obj->statistik?'checked':'')."></td></tr>";
