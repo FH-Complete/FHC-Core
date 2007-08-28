@@ -36,7 +36,8 @@ require_once('../include/konto.class.php');
 if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
-$user = get_uid();
+//$user = get_uid();
+$user = strtolower(trim($_SERVER['REMOTE_USER']));
 loadVariables($conn, $user);
 
 //Parameter holen
