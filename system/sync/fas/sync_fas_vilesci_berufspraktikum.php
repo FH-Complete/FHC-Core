@@ -640,6 +640,7 @@ if($result = pg_query($conn_fas, $qry_main))
 							if(trim($firmenname)!='' && $firmenname!=null)
 							{
 								//firma anlegen
+								$updatefa=false;
 								$firma=new firma($conn);
 								$firma->name=trim($firmenname);
 								$firma->adresse=$adresse;
@@ -655,7 +656,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									{
 										if($row5=pg_fetch_object($result5))
 										{
-											$updatefa=false;			
+														
 											if($row5->adresse!=$firma->adresse) 
 											{
 												$updatefa=true;
