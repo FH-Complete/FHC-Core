@@ -287,7 +287,7 @@ function js_toggle_container(conid)
 				$stsem = $stsemobj->getAktorNext();
 
 				$stg_obj = new studiengang($sql_conn);
-				if($stg_obj->getAll())
+				if($stg_obj->getAll(null,false))
 				{
 					$stg = array();
 
