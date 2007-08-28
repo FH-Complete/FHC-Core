@@ -730,7 +730,7 @@ else
 		}
 		
 		echo '</SELECT>';
-		echo "<a href='anwesenheitsliste.php?output=html&uebung_id=$uebung_id&gruppe=$lehreinheit_id' target='_blank'> [benoten]</a>";
+		echo "<a href='anwesenheitsliste.php?output=html&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id' target='_blank'> [benoten]</a>";
 		$abgabe_obj = new uebung($conn, $uebung_id);
 		if ($abgabe_obj->abgabe && glob(BENOTUNGSTOOL_PATH."abgabe/*_[WS]S[0-9][0-9][0-9][0-9]_".$uebung_id."_*"))
 		{
