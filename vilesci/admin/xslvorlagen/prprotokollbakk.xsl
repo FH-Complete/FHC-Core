@@ -215,27 +215,27 @@
 										</fo:table-cell>
 									</fo:table-row>
 									<fo:table-row line-height="14pt">
-										<fo:table-cell border-width="0.2mm" border-style="solid">
+									<fo:table-cell>
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
 												\n
 											</fo:block>
 										</fo:table-cell>
-										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
-												Präsentation Praktikum\n
-											</fo:block>
-										</fo:table-cell>
-										<fo:table-cell border-width="0.2mm" border-style="solid">
+										<fo:table-cell>
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
 												\n
 											</fo:block>
 										</fo:table-cell>
-										<fo:table-cell border-width="0.2mm" border-style="solid">
+										<fo:table-cell>
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
 												\n
 											</fo:block>
 										</fo:table-cell>
-										<fo:table-cell border-width="0.2mm" border-style="solid">
+										<fo:table-cell>
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
+												\n
+											</fo:block>
+										</fo:table-cell>
+										<fo:table-cell>
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
 												\n
 											</fo:block>

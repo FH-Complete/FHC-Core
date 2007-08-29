@@ -60,7 +60,7 @@ echo '
    <RDF:Seq about="'.$rdf_url.'/liste">
 ';
 
-$qry = "SELECT * FROM public.tbl_benutzergruppe JOIN tbl_gruppe using(gruppe_kurzbz) WHERE uid='".addslashes($uid)."' AND (studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' OR studiensemester_kurzbz is null)";
+$qry = "SET CLIENT_ENCODING TO 'UNICODE';SELECT * FROM public.tbl_benutzergruppe JOIN tbl_gruppe using(gruppe_kurzbz) WHERE uid='".addslashes($uid)."' AND (studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' OR studiensemester_kurzbz is null)";
 if($result = pg_query($conn, $qry))
 {
 	while($row = pg_fetch_object($result))
@@ -70,6 +70,7 @@ if($result = pg_query($conn, $qry))
 	      <RDF:li>
 	         <RDF:Description  id="'.$row->uid.'/'.$row->gruppe_kurzbz.'"  about="'.$rdf_url.'/'.$row->uid.'/'.$row->gruppe_kurzbz.'" >
 	            <GRP:gruppe_kurzbz><![CDATA['.$row->gruppe_kurzbz.']]></GRP:gruppe_kurzbz>
+	            <GRP:bezeichnung><![CDATA['.$row->bezeichnung.']]></GRP:bezeichnung>
 	            <GRP:generiert><![CDATA['.($row->generiert=='t'?'Ja':'Nein').']]></GRP:generiert>
 	            <GRP:uid><![CDATA['.$row->uid.']]></GRP:uid>
 	            <GRP:studiensemester_kurzbz><![CDATA['.$row->studiensemester_kurzbz.']]></GRP:studiensemester_kurzbz>

@@ -89,6 +89,7 @@ function draw_rdf($row)
             <KONTAKT:anmerkung><![CDATA['.$row->anmerkung.']]></KONTAKT:anmerkung>
             <KONTAKT:kontakt><![CDATA['.$row->kontakt.']]></KONTAKT:kontakt>
             <KONTAKT:zustellung><![CDATA['.($row->zustellung?'Ja':'Nein').']]></KONTAKT:zustellung>
+            <KONTAKT:updateamum><![CDATA['.date('d.m.Y H:i:s',strtotime($row->updateamum)).']]></KONTAKT:updateamum>
          </RDF:Description>
       </RDF:li>
       ';

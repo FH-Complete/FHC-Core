@@ -348,14 +348,33 @@ if(!$error)
 		else if ($_POST['do']=='delete') //Lehreinheit loeschen
 		{
 			// LE loeschen
-			if ($leDAO->delete($_POST['lehreinheit_id']))
+			$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev WHERE lehreinheit_id='".$_POST['lehreinheit_id']."' 
+					UNION
+					SELECT stundenplan_id as id FROM lehre.tbl_stundenplan WHERE lehreinheit_id='".$_POST['lehreinheit_id']."'";
+			if($result = pg_query($conn, $qry))
 			{
-				$return = true;
+				if(pg_num_rows($result)>0)
+				{
+					$return = false;
+					$errormsg = 'Diese Lehreinheit ist bereits im LV-Plan verplant und kann daher nicht geloescht werden!';
+				}
+				else 
+				{
+					if ($leDAO->delete($_POST['lehreinheit_id']))
+					{
+						$return = true;
+					}
+					else
+					{
+						$return = false;
+						$errormsg = $leDAO->errormsg;
+					}
+				}
 			}
-			else
+			else 
 			{
 				$return = false;
-				$errormsg = $leDAO->errormsg;
+				$errormsg = 'unbekannter Fehler';
 			}
 		}
 	}
