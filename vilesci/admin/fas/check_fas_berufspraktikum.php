@@ -24,6 +24,9 @@ $zweitbetreuer='';
 $combobox=array();
 $valuebox=array();
 $nachname=array();
+$firmabox=array();
+$firmaidbox=array();
+$firmaname=array();
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -55,6 +58,27 @@ if(isset($_POST['da']))
 		echo $qry1;
 	}
 }
+if(isset($_POST['anlegen2']))
+{
+	$qry="INSERT INTO public.tbl_firma (name,adresse,email,telefon,firmentyp_kurzbz,updatevon) VALUES
+		('".$_POST['name']."','".$_POST['adresse']."','".$_POST['email']."','".$_POST['telefon']."','".$_POST['firmentyp_kurzbz']."','Administrator');";
+	if($result = pg_query($conn, $qry))
+		echo 'Firma '.$_POST['name'].' wurde in VileSci angelegt!<BR>';
+}
+
+if(isset($_POST['da2']))
+{
+	if(isset($_POST['top2']) AND trim($_POST['top2'])!='')
+	{
+		$qry1= "UPDATE berufspraktikum SET vilesci_firma='".$_POST['top2']."' WHERE berufspraktikum_pk='".$_POST['da2']."';";
+	}
+	if(trim($qry1)!='')
+	{
+		pg_query($conn_fas, $qry1);
+		echo $qry1;
+	}
+}
+
 
 $qryvilesci="SELECT titelpre, nachname, vorname, titelpost, person_id
 				FROM public.tbl_person WHERE trim(updatevon)='Administrator'";
@@ -72,6 +96,21 @@ if($resultvilesci = pg_query($conn, $qryvilesci))
 		$i++;
 	}
 }
+$qryvilesci="SELECT firma_id,name, adresse,email,telefon,firmentyp_kurzbz 	FROM public.tbl_firma";
+
+if (isset($_GET['all']))
+	$qryvilesci.=" ORDER BY name;";
+$m=0;	
+if($resultvilesci = pg_query($conn, $qryvilesci))
+{
+	while($rowvilesci = pg_fetch_object($resultvilesci))
+	{
+		$firmabox[$m]=trim($rowvilesci->name);
+		$firmaname[$m]=trim($rowvilesci->name);
+		$firmaidbox[$m]=$rowvilesci->firma_id;
+		$m++;
+	}
+}
 
 $qry="SELECT count(*) AS anz FROM berufspraktikum WHERE
 	vilesci_firmenbetreuer IS NULL AND trim(firmenbetreuer)!='';";
@@ -82,16 +121,19 @@ if($result = pg_query($conn_fas, $qry))
 	echo '<BR>Verbleibend: '.$row->anz.' Berufspraktika<BR>';
 }
 
-echo "<table class='liste'><tr><th>FAS</th><th>Vilesci</th><th></th><th>Titel/Vorname/Nachname</th></tr>";
+echo "<table class='liste'><tr><th>&nbsp;&nbsp;&nbsp;</th><th>&nbsp;&nbsp;&nbsp;</th><th></th><th>Titel/Vorname/Nachname</th></tr>".
+	"<tr><th>FAS</th><th>Vilesci</th><th></th><th>Firmenname/Adresse/E-Mail/Telefon</th></tr>";
 
 
 $qry="SELECT *,
-	trim(substring(trim(firmenbetreuer) from ' [A-ü]*$')) as zweit 
-	FROM berufspraktikum WHERE
-	vilesci_firmenbetreuer IS NULL AND trim(firmenbetreuer)!=''
+	trim(substring(trim(firmenbetreuer) from ' [A-ü]*$')) as zweit
+	FROM berufspraktikum 
+	WHERE trim(firmenbetreuer)!='' 
 	ORDER BY berufspraktikum_pk
 	LIMIT 20;";
-
+/*WHERE vilesci_firmenbetreuer IS NULL AND trim(firmenbetreuer)!=''
+	AND vilesci_firma IS NULL AND trim(firma)!=''*/
+//trim(substring(trim(firma) from ' [A-ü]*$')) as dritt
 if($result = pg_query($conn_fas, $qry))
 {
 	for($k=0;$row=pg_fetch_object($result);$k++)
@@ -126,8 +168,39 @@ if($result = pg_query($conn_fas, $qry))
 			echo "<form method='Post'><td><input type='text' name='geschlecht' value='m' size='1'><input type='text' name='titel'><input type='text' name='vorname'><input type='text' name='nachname' value='$row->zweit'><input type='submit' name='anlegen' value='Anlegen'></td></form>";
 			echo "</tr>";
 		}
+		if(($row->vilesci_firma=='' OR $row->vilesci_firma==NULL) AND trim($row->firma)!='')
+		{
+			echo "<tr class='liste".($k%2)."'>";
+			echo "<form  method='POST'>";
+			echo "<input type='hidden' name='da2' value='".$row->berufspraktikum_pk."'>";
+			echo "<td>".$row->firma."</td>";
+			echo "<td><select name=\"top2\">";
+			echo"<option value=\"\"></option>";
+			for($j=0;$j<$i;$j++)
+			{
+				if(strstr($firmaname[$j],$row->firma) OR strstr($row->firma,$firmaname[$j]))
+				{
+					echo"<option value=\"".$firmaidbox[$j]."\" selected=\"selected\">".$firmabox[$j]."</option>";
+				}
+				else  if(soundex($name[$j])==soundex($row->firma))
+				{
+					echo"<option value=\"".$firmaidbox[$j]."\">".$firmabox[$j]."</option>";
+				}
+				else if($_GET['all']==true)
+				{
+					echo"<option value=\"".$firmaidbox[$j]."\">".$firmabox[$j]."</option>";
+				}
+			}
+			echo"</select>";
+			echo "</td>";
+			echo "<td><input type='submit' value='Speichern'></td>";
+			echo "</form>";
+			echo "<form method='Post'><td><input type='text' name='name' value='$row->firma'><input type='text' name='adresse'><input type='text' name='email'><input type='text' name='telefon'><input type='submit' name='anlegen' value='Anlegen'></td></form>";
+			echo "</tr>";
+		}
 	}
 }
+
 echo "</table>";
 ?>
 </body>
