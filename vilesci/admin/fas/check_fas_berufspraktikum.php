@@ -61,7 +61,7 @@ if(isset($_POST['da']))
 if(isset($_POST['anlegen2']))
 {
 	$qry="INSERT INTO public.tbl_firma (name,adresse,email,telefon,firmentyp_kurzbz,updatevon) VALUES
-		('".$_POST['name']."','".$_POST['adresse']."','".$_POST['email']."','".$_POST['telefon']."','".$_POST['firmentyp_kurzbz']."','Administrator');";
+		('".$_POST['name']."','".$_POST['adresse']."','".$_POST['email']."','".$_POST['telefon']."','Partnerfirma','Administrator');";
 	if($result = pg_query($conn, $qry))
 		echo 'Firma '.$_POST['name'].' wurde in VileSci angelegt!<BR>';
 }
@@ -195,7 +195,7 @@ if($result = pg_query($conn_fas, $qry))
 			echo "</td>";
 			echo "<td><input type='submit' value='Speichern'></td>";
 			echo "</form>";
-			echo "<form method='Post'><td><input type='text' name='name' value='$row->firma'><input type='text' name='adresse'><input type='text' name='email'><input type='text' name='telefon'><input type='submit' name='anlegen' value='Anlegen'></td></form>";
+			echo "<form method='Post'><td><input type='text' name='name' value='$row->firma'><input type='text' name='adresse'><input type='text' name='email'><input type='text' name='telefon'><input type='submit' name='anlegen2' value='Anlegen'></td></form>";
 			echo "</tr>";
 		}
 	}
