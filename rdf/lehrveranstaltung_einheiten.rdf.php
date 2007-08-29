@@ -141,7 +141,7 @@ if(!$result = pg_query($conn, $qry))
 		if($fbk!='')
 			$fbk='FBK: '.$fbk;
 
-		//Lehrveranstaltung	
+		//Lehrveranstaltung
 		echo "
 		<RDF:Description  id=\"".$row_lva->lehrveranstaltung_id."\"  about=\"".$rdf_url.'/'.$row_lva->lehrveranstaltung_id."\" >
 			<LVA:lehrveranstaltung_id>".$row_lva->lehrveranstaltung_id."</LVA:lehrveranstaltung_id>
@@ -152,7 +152,7 @@ if(!$result = pg_query($conn, $qry))
 			<LVA:sprache><![CDATA[".$row_lva->sprache."]]></LVA:sprache>
 			<LVA:ects>".$row_lva->lv_ects."</LVA:ects>
 			<LVA:semesterstunden>".$row_lva->semesterstunden."</LVA:semesterstunden>
-			<LVA:anmerkung><![CDATA[".$row_lva->anmerkung."]]></LVA:anmerkung>			
+			<LVA:anmerkung><![CDATA[".$row_lva->anmerkung."]]></LVA:anmerkung>
 			<LVA:lehre>".($row_lva->lehre=='t'?'Ja':'Nein')."</LVA:lehre>
 			<LVA:lehreverzeichnis><![CDATA[".$row_lva->lv_lehreverzeichnis."]]></LVA:lehreverzeichnis>
 			<LVA:aktiv>".($row_lva->aktiv=='t'?'Ja':'Nein')."</LVA:aktiv>
@@ -200,12 +200,16 @@ if(!$result = pg_query($conn, $qry))
 				else
 					$grp.=' '.$row_grp->gruppe_kurzbz;
 			}
-			//Lektoren holen
+			//Lektoren und Stunden holen
 			$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE lehreinheit_id='$row_le->lehreinheit_id'";
 			$result_lkt = pg_query($conn, $qry);
 			$lkt='';
+			$semesterstunden='';
 			while($row_lkt = pg_fetch_object($result_lkt))
+			{
 				$lkt.=$row_lkt->kurzbz.' ';
+				$semesterstunden.=$row_lkt->semesterstunden.' ';
+			}
 			$qry = "SELECT tbl_fachbereich.bezeichnung FROM public.tbl_fachbereich, lehre.tbl_lehrfach, lehre.tbl_lehreinheit WHERE tbl_fachbereich.fachbereich_kurzbz=tbl_lehrfach.fachbereich_kurzbz AND tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND tbl_lehreinheit.lehreinheit_id='$row_le->lehreinheit_id'";
 			$fachbereich='';
 			if($result_fb = pg_query($conn, $qry))
@@ -221,7 +225,7 @@ if(!$result = pg_query($conn, $qry))
 				<LVA:semester>".$row_lva->semester."</LVA:semester>
 				<LVA:sprache><![CDATA[".$row_le->sprache."]]></LVA:sprache>
 				<LVA:ects></LVA:ects>
-				<LVA:semesterstunden></LVA:semesterstunden>
+				<LVA:semesterstunden><![CDATA[".$semesterstunden."]]></LVA:semesterstunden>
 				<LVA:anmerkung><![CDATA[".$row_le->anmerkung."]]></LVA:anmerkung>
 				<LVA:lehre>".($row_le->lehre?'Ja':'Nein')."</LVA:lehre>
 				<LVA:lehreverzeichnis></LVA:lehreverzeichnis>

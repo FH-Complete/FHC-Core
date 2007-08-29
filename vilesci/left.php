@@ -81,7 +81,11 @@
 <table class="tabs">
 	<tr>
 		<td class="tab" id="tabStammdaten" onClick="js_show_tab('menueStammdaten');">Stammdaten</td>
+	</tr>
+	<tr>
 		<td class="tab" id="tabPersonen" onClick="js_show_tab('menuePersonen');">Personen</a></td>
+	</tr>
+	<tr>
 		<td class="tab" id="tabLehre" onClick="js_show_tab('menueLehre');">Lehre</td>
 	</tr>
 </table>

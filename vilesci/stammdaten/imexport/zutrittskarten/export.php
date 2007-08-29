@@ -45,9 +45,9 @@ $sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer, uid, matrikelnr, k
 				EXTRACT(MONTH FROM vw_betriebsmittelperson.insertamum) AS monat,
 				EXTRACT(YEAR FROM vw_betriebsmittelperson.insertamum) AS jahr
 			FROM public.vw_betriebsmittelperson
-				 JOIN public.tbl_student ON (uid=student_uid)
-					JOIN public.tbl_studiengang USING (studiengang_kz)
-			WHERE betriebsmitteltyp='Zutrittskarte' AND benutzer_aktiv AND retouram IS NULL AND nummer NOT IN (SELECT physaswnumber FROM sync.tbl_zutrittskarte);";
+				 LEFT OUTER JOIN (public.tbl_student JOIN public.tbl_studiengang USING (studiengang_kz)) ON (uid=student_uid)
+			WHERE betriebsmitteltyp='Zutrittskarte' AND benutzer_aktiv AND retouram IS NULL
+				AND nummer NOT IN (SELECT physaswnumber FROM sync.tbl_zutrittskarte);";
 //echo $sql_query;
 if(!$result_neu=pg_exec($conn, $sql_query))
 	die(pg_errormessage().'<BR>'.$sql_query);
