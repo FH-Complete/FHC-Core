@@ -93,8 +93,12 @@
 
 
 <!ENTITY menu-extras.label		"Extras">
-<!ENTITY menu-extras.accesskey	"E">
+<!ENTITY menu-extras.accesskey	"X">
 
 <!ENTITY menu-extras-reihungstest.key		"R">
 <!ENTITY menu-extras-reihungstest.label		"Reihungstestverwaltung">
 <!ENTITY menu-extras-reihungstest.accesskey	"R">
+
+<!ENTITY menu-extras-firma.key			"F">
+<!ENTITY menu-extras-firma.label		"Firmenverwaltung">
+<!ENTITY menu-extras-firma.accesskey	"F">

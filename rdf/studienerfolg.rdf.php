@@ -132,7 +132,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$anzahl=0;
 		foreach ($obj->result as $row)	
 		{
-			if($row->zeugnis && $row->note!=5)
+			//Note darf nicht negativ(5), nicht beurteilt (9) order nicht erfolgreich absolviert (13) sein
+			if($row->zeugnis && $row->note!=5 && $row->note!=9 && $row->note!=13)
 			{
 				if ($row->note)
 					$note = $note_arr[$row->note];

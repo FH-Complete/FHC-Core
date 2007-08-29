@@ -37,6 +37,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentnotenoverlay.xul.ph
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentpruefungoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentabschlusspruefungoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentprojektarbeitoverlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentgruppenoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverlay.xul.php"?>';
 ?>
 <!DOCTYPE overlay >
@@ -251,6 +252,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 							<tab id="student-tab-pruefung" label="Prüfung" />
 							<tab id="student-tab-abschlusspruefung" label="AbschlussPrüfung" />
 							<tab id="student-tab-projektarbeit" label="Projektarbeit" />
+							<tab id="student-tab-gruppen" label="Gruppen" onclick="StudentGruppenLoadData();"/>
 						</tabs>
 						<tabpanels id="student-tabpanels-main" flex="1">
 							<vbox id="student-detail"  style="margin-top:10px;" />
@@ -265,6 +267,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 							<vbox id="student-pruefung"  style="margin-top:10px;" />
 							<vbox id="student-abschlusspruefung"  style="margin-top:10px;" />
 							<vbox id="student-projektarbeit"  style="margin-top:10px;" />
+							<vbox id="student-gruppen"  style="margin-top:10px;" />
 						</tabpanels>
 					</tabbox>
 				</vbox>

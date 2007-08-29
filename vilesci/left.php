@@ -198,7 +198,6 @@
 			  	</table>
 			</td>
 		</tr>
-        <tr><td width="10" nowrap>&nbsp;</td></tr>
           <!--Menu Eintrag Reihungstest-->
 		<tr>
           	<td nowrap><a href="?reihungstest" class="MenuItem1" onClick="return(js_toggle_container('Reihungstest'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Reihungstest</a></td>
@@ -209,6 +208,20 @@
 			  	<tr>
 			  		<td width="10" nowrap>&nbsp;</td>
 					<td nowrap><a class="MenuItem2" href="stammdaten/reihungstestverwaltung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Verwaltung</a></td>
+			  	</tr>
+			  	<tr><td width="10" nowrap>&nbsp;</td></tr>
+			  	</table>
+			</td>
+		</tr>
+        <tr>
+          	<td nowrap><a href="?firma" class="MenuItem1" onClick="return(js_toggle_container('Firma'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Firma</a></td>
+        </tr>
+		<tr>
+          	<td nowrap>
+		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Firma" style="display:block;">
+			  	<tr>
+			  		<td width="10" nowrap>&nbsp;</td>
+					<td nowrap><a class="MenuItem2" href="stammdaten/firma_frameset.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Verwaltung</a></td>
 			  	</tr>
 			  	<tr><td width="10" nowrap>&nbsp;</td></tr>
 			  	</table>

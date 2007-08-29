@@ -865,6 +865,7 @@ function StudentAuswahl()
 		document.getElementById('student-tab-pruefung').collapsed=true;
 		document.getElementById('student-tab-abschlusspruefung').collapsed=true;
 		document.getElementById('student-tab-projektarbeit').collapsed=true;
+		document.getElementById('student-tab-gruppen').collapsed=true;
 		document.getElementById('student-detail-groupbox-student').hidden=true;
 		
 		document.getElementById('student-toolbar-abbrecher').hidden=true;
@@ -896,6 +897,7 @@ function StudentAuswahl()
 		document.getElementById('student-tab-pruefung').collapsed=false;
 		document.getElementById('student-tab-abschlusspruefung').collapsed=false;
 		document.getElementById('student-tab-projektarbeit').collapsed=false;
+		document.getElementById('student-tab-gruppen').collapsed=false;
 		document.getElementById('student-detail-groupbox-student').hidden=false;
 		
 		document.getElementById('student-toolbar-abbrecher').hidden=false;
@@ -1172,6 +1174,16 @@ function StudentAuswahl()
 		StudentProjektarbeitDetailDisableFields(true);
 		StudentProjektbetreuerDisableFields(true);
 		StudentProjektarbeitTreeLoad(uid);
+	}
+	
+	
+	if(uid!='')
+	{
+		StudentGruppenRemoveDatasource();
+		if(document.getElementById('student-content-tabs').selectedItem==document.getElementById('student-tab-gruppen'))
+		{
+			StudentGruppenLoadData();
+		}
 	}
 }
 

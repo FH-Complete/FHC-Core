@@ -727,9 +727,20 @@ function StatistikPrintNotenspiegel()
 	window.open('<?php echo APP_ROOT ?>content/statistik/notenspiegel.php?studiengang_kz='+studiengang_kz+'&semester='+semester,'Notenspiegel');
 }
 
+// ****
+// * Zeigt HTML Seite zur Bearbeitung der Reihungstests an
+// ****
 function ExtrasShowReihungstest()
 {
 	window.open('<?php echo APP_ROOT ?>vilesci/stammdaten/reihungstestverwaltung.php','Reihungstest','');
+}
+
+// ****
+// * Zeigt HTML Seite zur bearbeitung der Firmen an
+// ****
+function ExtrasShowFirmenverwaltung()
+{
+	window.open('<?php echo APP_ROOT ?>vilesci/stammdaten/firma_frameset.html','Firma','');
 }
 
 // ****
