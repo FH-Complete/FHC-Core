@@ -124,7 +124,7 @@ function GeburtsdatumEintragen()
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
 
-if(!$rechte->isBerechtigt('admin',0) && !$rechte->isBerechtigt('mitarbeiter'))
+if(!$rechte->isBerechtigt('admin',0) && !$rechte->isBerechtigt('mitarbeiter','0'))
 	die('Sie haben keine Berechtigung fuer diese Seite');
 
 $where = '';
