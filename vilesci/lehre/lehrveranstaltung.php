@@ -139,7 +139,7 @@ echo "<h3>&Uuml;bersicht</h3>
 if ($result_lv!=0)
 {
 	$num_rows=pg_num_rows($result_lv);
-	echo "<th class='table-sortable:default'>ID</th><th class='table-sortable:default'>Kurzbz</th><th class='table-sortable:default'>Bezeichnung</th><th class='table-sortable:default'>ECTS</th><th class='table-sortable:default'>Lehre</th><th class='table-sortable:default'>LehreVz</th><th class='table-sortable:default'>Aktiv</th><th class='table-sortable:default'>Sort</th><th class='table-sortable:default'>Zeugnis</th>\n";
+	echo "<th class='table-sortable:default'>ID</th><th class='table-sortable:default'>Kurzbz</th><th class='table-sortable:default'>Bezeichnung</th><th class='table-sortable:default'>ECTS</th><th class='table-sortable:default'>Lehre</th><th class='table-sortable:default'>LehreVz</th><th class='table-sortable:default'>Aktiv</th><th class='table-sortable:numeric'>Sort</th><th class='table-sortable:default'>Zeugnis</th>\n";
 	echo "</tr></thead>";
 	echo "<tbody>";
 	for($i=0;$i<$num_rows;$i++)
