@@ -78,7 +78,7 @@ $pruefung = new abschlusspruefung($conn, null, true);
 		$akadgrad = new akadgrad($conn, $row->akadgrad_id, false);
 		
 		if($mitarbeiter->load($row->vorsitz))
-			$vorsitz = $mitarbeiter->titelpre.' '.$mitarbeiter->nachname.' '.$mitarbeiter->titelpost;
+			$vorsitz = $mitarbeiter->titelpre.' '.$mitarbeiter->vorname.' '.$mitarbeiter->nachname.' '.$mitarbeiter->titelpost;
 		if($person->load($row->pruefer1))
 			$pruefer1 = $person->titelpre.' '.$person->vorname.' '.$person->nachname.' '.$person->titelpost;
 		if($person->load($row->pruefer2))
@@ -91,7 +91,7 @@ $pruefung = new abschlusspruefung($conn, null, true);
 		if($result_rek = pg_query($conn, $qry))
 			if($row_rek = pg_fetch_object($result_rek))
 				$rektor = $row_rek->titelpre.' '.$row_rek->vorname.' '.$row_rek->nachname.' '.$row_rek->titelpost;
-		$qry = "SELECT themenbereich, ende, projektarbeit_id, note FROM lehre.tbl_projektarbeit a WHERE student_uid='$student->uid' AND (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom') ORDER BY beginn LIMIT 2";
+		$qry = "SELECT titel as themenbereich, ende, projektarbeit_id, note FROM lehre.tbl_projektarbeit a WHERE student_uid='$student->uid' AND (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom') ORDER BY beginn LIMIT 2";
 		$themenbereich='';
 		$datum_projekt='';
 		$betreuer = '';

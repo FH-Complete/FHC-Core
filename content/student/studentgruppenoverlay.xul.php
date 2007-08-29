@@ -59,6 +59,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/gruppen/rdf#gruppe_kurzbz" />
 				<splitter class="tree-splitter"/>
+				<treecol id="student-gruppen-bezeichnung" label="Bezeichnung" flex="1" hidden="false"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/gruppen/rdf#bezeichnung" />
+				<splitter class="tree-splitter"/>
 				<treecol id="student-gruppen-studiensemester_kurzbz" label="Studiensemester" flex="1" hidden="false"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/gruppen/rdf#studiensemester_kurzbz" />
@@ -79,6 +83,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<treeitem uri="rdf:*">
 							<treerow>
 								<treecell label="rdf:http://www.technikum-wien.at/gruppen/rdf#gruppe_kurzbz"   />
+								<treecell label="rdf:http://www.technikum-wien.at/gruppen/rdf#bezeichnung"   />
 								<treecell label="rdf:http://www.technikum-wien.at/gruppen/rdf#studiensemester_kurzbz" />
 								<treecell label="rdf:http://www.technikum-wien.at/gruppen/rdf#generiert" />
 								<treecell label="rdf:http://www.technikum-wien.at/gruppen/rdf#uid" />

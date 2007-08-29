@@ -40,20 +40,23 @@ function initLektorTree()
 		url = '<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php?user=true&lektor=true&'+gettimestamp();
 		var LektorTree=document.getElementById('tree-lektor');
 
-		//Alte DS entfernen
-		var oldDatasources = LektorTree.database.GetDataSources();
-		while(oldDatasources.hasMoreElements())
+		if(LektorTree)
 		{
-			LektorTree.database.RemoveDataSource(oldDatasources.getNext());
+			//Alte DS entfernen
+			var oldDatasources = LektorTree.database.GetDataSources();
+			while(oldDatasources.hasMoreElements())
+			{
+				LektorTree.database.RemoveDataSource(oldDatasources.getNext());
+			}
+	
+			var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+			LektorTreeDatasource = rdfService.GetDataSource(url);
+			LektorTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+			LektorTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+			LektorTree.database.AddDataSource(LektorTreeDatasource);
+			//LektorTreeDatasource.addXMLSinkObserver(LektorTreeSinkObserver);
+			LektorTree.builder.addListener(LektorTreeListener);
 		}
-
-		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-		LektorTreeDatasource = rdfService.GetDataSource(url);
-		LektorTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-		LektorTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-		LektorTree.database.AddDataSource(LektorTreeDatasource);
-		//LektorTreeDatasource.addXMLSinkObserver(LektorTreeSinkObserver);
-		LektorTree.builder.addListener(LektorTreeListener);
 	}
 	catch(e)
 	{

@@ -55,6 +55,7 @@ function onLoad()
 	}
 	catch(e)
 	{
+		onLoad=function() {return false};
 	}
 }
 
