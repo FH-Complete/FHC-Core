@@ -7,7 +7,7 @@
  */
 
 //*
-//* Synchronisiert Berufspraktikumsdatensaetze von FAS DB in PORTAL DB
+//* Synchronisiert Betriebsmitteldaten (Kaution, Datum der Entleihung) von FAS DB in PORTAL DB
 //* 
 //*
 
