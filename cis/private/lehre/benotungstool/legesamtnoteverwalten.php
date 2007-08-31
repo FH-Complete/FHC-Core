@@ -56,6 +56,73 @@ require_once('../../../../include/legesamtnote.class.php');
 		return confirm('Wollen Sie die markierten Einträge wirklich löschen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
 	}
   //-->
+  
+    var anfrage = null;
+
+    function erzeugeAnfrage(){
+        try {
+        anfrage = new XMLHttpRequest();
+        } catch (versuchmicrosoft) {
+            try {
+                anfrage = new ActiveXObject("Msxml12.XMLHTTP");
+            } catch (anderesmicrosoft){
+                try {
+                    anfrage = new ActiveXObject("Microsoft.XMLHTTP");
+                } catch (fehlschlag){
+                    anfrage = null;
+                }
+
+            }
+        }
+        if (anfrage == null) alert("Fehler beim Erstellen des Anfrageobjekts!");
+    }
+   
+   function saveLENote(uid){
+	note = document.getElementById(uid).note.value;	
+	if ((note < 0) || (note > 5 && note != 8))
+	{
+		alert("Bitte geben Sie eine Note von 1 - 5 bzw. 8 (teilgenommen) ein!");
+		document.getElementById(uid).note.value="";
+	}
+	else
+	{	
+		erzeugeAnfrage(); 
+	    //note = document.getElementById(uid).note.value;
+	    stud_uid = uid;
+	    var url= '<?php echo "legesamtnoteeintragen.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem"; ?>';
+	    url += '&submit=1&student_uid='+uid+"&note="+note;
+	    anfrage.open("GET", url, true);
+	    anfrage.onreadystatechange = updateSeite;
+	    anfrage.send(null);
+    }
+   }
+   
+   function updateSeite(){
+	    if (anfrage.readyState == 4){
+	        if (anfrage.status == 200) {
+	        	uid = stud_uid;
+				var note = document.getElementById(uid).note.value;
+	            var resp = anfrage.responseText;
+	            if (resp == "neu" || resp == "update")
+	            {
+					            	
+	            	notentd = document.getElementById("note_"+uid);
+	            	while (notentd.childNodes.length>0)
+	            	{
+						notentd.removeChild(notentd.lastChild);
+	            	}
+	            	notenode = document.createTextNode(note);
+                    notentd.appendChild(notenode);
+                 }
+                 else
+                 	{
+	                 	alert(resp);
+	                 	document.getElementById(uid).note.value="";
+                 	}
+	        } else alert("Request status:" + anfrage.status);
+	    }
+	}  
+
 </script>
 </head>
 
@@ -374,9 +441,9 @@ if($result_grp = pg_query($conn, $qry))
 							$note_final = null;
 					}
 				}
-				echo "<form name='$row_stud->uid' method='POST' action='legesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_final' name='note'><input type='submit' name='submit' value='->'></td></form>";
+				echo "<form name='$row_stud->uid' id='$row_stud->uid' method='POST' action='legesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_final' name='note'><input type='button' value='->' onclick='saveLENote(\"$row_stud->uid\")'></td></form>";
 					
-				echo "<td align='center'>$note</td>";				
+				echo "<td align='center' id='note_$row_stud->uid'>$note</td>";				
 				echo "</tr>";
 				$i++;
 			}

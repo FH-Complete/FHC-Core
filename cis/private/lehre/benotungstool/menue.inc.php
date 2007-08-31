@@ -18,6 +18,7 @@ else if ($pfile == 'statistik.php')
 	$class_statistik = 'benotungstool_tabs_active';
 	
 echo "\n\n<!--Menue-->\n";
+echo "<br><div><a href='lvgesamtnoteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'>Lehrveranstaltung benoten</font></a></div>";
 echo "<br>\n";
 echo "<table cellpadding='3' width='100%'>\n";
 echo "	<tr>\n";
