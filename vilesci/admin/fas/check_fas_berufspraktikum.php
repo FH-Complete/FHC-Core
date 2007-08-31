@@ -113,7 +113,8 @@ if($resultvilesci = pg_query($conn, $qryvilesci))
 }
 
 $qry="SELECT count(*) AS anz FROM berufspraktikum WHERE
-	vilesci_firmenbetreuer IS NULL AND trim(firmenbetreuer)!='';";
+	(vilesci_firmenbetreuer IS NULL AND trim(firmenbetreuer)!='')
+	OR (vilesci_firmenbetreuer IS NULL AND trim(firma)!='');";
 
 if($result = pg_query($conn_fas, $qry))
 {
@@ -128,11 +129,10 @@ echo "<table class='liste'><tr><th>&nbsp;&nbsp;&nbsp;</th><th>&nbsp;&nbsp;&nbsp;
 $qry="SELECT *,
 	trim(substring(trim(firmenbetreuer) from ' [A-ü]*$')) as zweit
 	FROM berufspraktikum 
-	WHERE trim(firmenbetreuer)!='' 
+	WHERE trim(firmenbetreuer)!='' OR trim(firma)!=''
 	ORDER BY berufspraktikum_pk
 	LIMIT 20;";
-/*WHERE vilesci_firmenbetreuer IS NULL AND trim(firmenbetreuer)!=''
-	AND vilesci_firma IS NULL AND trim(firma)!=''*/
+
 //trim(substring(trim(firma) from ' [A-ü]*$')) as dritt
 if($result = pg_query($conn_fas, $qry))
 {
