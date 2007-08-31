@@ -128,8 +128,9 @@ echo "<table class='liste'><tr><th>&nbsp;&nbsp;&nbsp;</th><th>&nbsp;&nbsp;&nbsp;
 
 $qry="SELECT *,
 	trim(substring(trim(firmenbetreuer) from ' [A-ü]*$')) as zweit
-	FROM berufspraktikum 
-	WHERE trim(firmenbetreuer)!='' OR trim(firma)!=''
+	FROM berufspraktikum WHERE
+	((vilesci_firmenbetreuer IS NULL AND trim(firmenbetreuer)!='') OR
+	(vilesci_firma IS NULL AND trim(firma)!=''))
 	ORDER BY berufspraktikum_pk
 	LIMIT 20;";
 
