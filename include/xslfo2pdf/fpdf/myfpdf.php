@@ -133,14 +133,17 @@ class MyPdf extends FPDF {
    * Get the number of characters having space whithin the
    * given width, respecting not to break words
    */
-  function GetNumberOfChars($width, $s) {
+  function GetNumberOfChars($width, $s, $fontsize=null) {
     //Get width of a string in the current font
     //	$s=(string)$s;
+    if($fontsize==null)
+    	$fontsize=$this->FontSize;
+    //echo "width:$width s:$s font:$fontsize";
     $cw=&$this->CurrentFont['cw'];
     $w=0;
     $wordPos = 0;
     $l=strlen($s);
-    $width = $width*1000/$this->FontSize;
+    $width = $width*1000/$fontsize;
     for($i=0;$i<$l;$i++) {
       $w+=$cw[$s{$i}];
       if ($s{$i} == ' ') {
@@ -179,19 +182,23 @@ class MyPdf extends FPDF {
     }
     else
     	$pw = $this->GetPageWidth();
+    //echo "x: $x width: $width pw: $pw<br>";
     $nb = 0;
     $maxWidth = 0;
     $sx = $x;
     $sy = $y;
     foreach($lines as $line) 
     {    	
+    	
 		$width = $this->GetStringWidth($line);	 
 		do 
       	{
-			$w=$this->w-$this->rMargin-$x;	
+			//$w=$this->w-$this->rMargin-$x;	
+			$w = $pw-$x; //oesi - changed
+			//echo "w:$w<br>";
 			//$wmax=($w-2*$this->cMargin)*1000/$this->FontSize;
 			$noc = $this->GetNumberOfChars($w, $line);
-			//echo "noc:$noc:$x:$w:".strlen($line).":$line<br>";
+			//echo "noc:$noc xNewLine: $xNewLine x:$x w:$w strlen:".strlen($line)." line:$line<br>";
 			if ($noc == -1) 
 			{
 				if ($x == $xNewLine) 
@@ -201,6 +208,7 @@ class MyPdf extends FPDF {
 	  			}
 	  			else 
 	  			{
+	  				//echo "NEWLINE";
 	    			if ($nb == 0) 
 	    			{
 	      				$sy += $height;
@@ -216,6 +224,7 @@ class MyPdf extends FPDF {
 	
 			$showLine = substr($line, 0, $noc);
 			$textWidth = $this->GetStringWidth($showLine);
+			//echo "showline: $showLine<br>";
 			//	    echo "wmax:$nb:$x:$w:$textWidth:$showLine<br>";
 			switch ($align) 
 			{
@@ -240,7 +249,12 @@ class MyPdf extends FPDF {
 			}
 			$y += $height;
 			$nb++;
-			$x = $xNewLine;
+			//oesi - wenn er die zeileumbricht dann soll in der naechsten zeile um
+			//1 eingerueckt werden sonst schaut des in einer tablle nicht gut aus
+			if($width!=0)
+				$x = $xNewLine+1;
+			else
+				$x = $xNewLine;
 		} while ($width > 0);
     }
     //$this->y = $y;

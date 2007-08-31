@@ -538,19 +538,19 @@ if($result = pg_query($conn, $qry))
 echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><td>Anmerkungen</td><td><textarea id="anmerkung" name="anmerkungen">'.$anmerkungen.'</textarea></td></tr>';
-echo '<tr><tr><td></td><td>';
+echo '<tr><td></td><td>';
 
 if(($geburtsdatum=='' && $vorname=='' && $nachname=='') || $geburtsdatum_error)
-	echo '<input type="submit" name="showagain" value="Vorschlag laden"</td></tr>';
+	echo '<input type="submit" name="showagain" value="Vorschlag laden"></td></tr>';
 else
-	echo '<input type="submit" name="save" value="Speichern"</td></tr>';
-?>
+	echo '<input type="submit" name="save" value="Speichern"></td></tr>';
 
+echo '
 </table>
 </td>
 <td valign="top">
-<!--Vorschlaege-->
-<?php
+';
+
 //Vorschlaege laden
 if($geburtsdatum!='')
 {		
