@@ -120,10 +120,10 @@ require_once('../../../../include/zeugnisnote.class.php');
                     	notenstatus.innerHTML = "<img src='../../../../skin/images/changed.png'>";
                  }
                  else
-                 	{
-	                 	alert(resp);
-	                 	document.getElementById(uid).note.value="";
-                 	}
+             		{
+                 		alert(resp);
+                 		document.getElementById(uid).note.value="";
+             		}
 	        } else alert("Request status:" + anfrage.status);
 	    }
 	}
