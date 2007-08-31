@@ -92,7 +92,7 @@ if($lehreinheit_id=='')
 $note = $_REQUEST["note"];
 
 // lvgesamtnote für studenten speichern
-if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '') && ((($note>0) && ($note < 6)) || ($note==8))  ){
+if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '') && ((($note>0) && ($note < 6)) || ($note == 7) || ($note==8))  ){
 	
 	$jetzt = date("Y-m-d H:i:s");	
 	$student_uid = $_REQUEST["student_uid"];
@@ -134,7 +134,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '') && ((($note>0
 		echo $response;
 }
 else
-	echo "Bitte geben Sie eine Note von 1 - 5 bzw. 8 (teilgenommen) ein!";
+	echo "Bitte geben Sie eine Note von 1 - 5 bzw. 7 (nicht beurteilt) oder 8 (teilgenommen) ein!";
 
 
 
