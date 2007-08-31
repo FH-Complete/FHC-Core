@@ -123,7 +123,10 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '') && ((($note>0
 		$lvgesamtnote->updateamum = $jetzt;
 		$lvgesamtnote->updatevon = $user;
 		$new = false;
-		$response = "update";
+		if ($lvgesamtnote->freigabedatum)		
+			$response = "update_f";
+		else
+			$response = "update";
 	}
 	if (!$lvgesamtnote->save($new))
 		echo "<span class='error'>".$lvgesamtnote->errormsg."</span>";

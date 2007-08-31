@@ -105,7 +105,7 @@ require_once('../../../../include/zeugnisnote.class.php');
 	        	uid = stud_uid;
 				var note = document.getElementById(uid).note.value;
 	            var resp = anfrage.responseText;
-	            if (resp == "neu" || resp == "update")
+	            if (resp == "neu" || resp == "update" || resp == "update_f")
 	            {
 					            	
 	            	notentd = document.getElementById("note_"+uid);
@@ -116,7 +116,7 @@ require_once('../../../../include/zeugnisnote.class.php');
 	            	notenode = document.createTextNode(note);
                     notentd.appendChild(notenode);
 					notenstatus = document.getElementById("status_"+uid);
-					if (resp == "update")
+					if (resp == "update_f")
                     	notenstatus.innerHTML = "<img src='../../../../skin/images/changed.png'>";
                  }
                  else
