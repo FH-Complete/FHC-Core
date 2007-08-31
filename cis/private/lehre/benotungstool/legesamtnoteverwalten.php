@@ -79,9 +79,9 @@ require_once('../../../../include/legesamtnote.class.php');
    
    function saveLENote(uid){
 	note = document.getElementById(uid).note.value;	
-	if ((note < 0) || (note > 5 && note != 8))
+	if ((note < 0) || (note > 5 && note != 8 && note != 7))
 	{
-		alert("Bitte geben Sie eine Note von 1 - 5 bzw. 8 (teilgenommen) ein!");
+		alert("Bitte geben Sie eine Note von 1 - 5 bzw. 7 (nicht beurteilt) oder 8 (teilgenommen) ein!");
 		document.getElementById(uid).note.value="";
 	}
 	else
@@ -323,6 +323,7 @@ if (isset($_REQUEST["submit"]) && ($_POST["student_uid"] != '')){
 }
 
 echo "<h3>LE Gesamtnote verwalten</h3>";
+echo "Noten: 1-5, 7 (nicht beurteilt), 8 (teilgenommen)";
 
 
 //Studentenliste
