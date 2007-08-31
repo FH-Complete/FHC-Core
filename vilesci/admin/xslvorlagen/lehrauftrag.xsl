@@ -140,9 +140,9 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 		
 	<xsl:template match="lehreinheit">
 		<fo:table-row  line-height="10pt">
-			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"><xsl:text> </xsl:text><xsl:value-of select="lehreinheit_id" /></fo:block></fo:table-cell>
-			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"><xsl:text> </xsl:text><xsl:value-of select="lehrveranstaltung" /></fo:block></fo:table-cell>
-			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"><xsl:text> </xsl:text><xsl:value-of select="fachbereich" /></fo:block></fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="12mm"><xsl:text> </xsl:text><xsl:value-of select="lehreinheit_id" /></fo:block></fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="65mm"><xsl:text> </xsl:text><xsl:value-of select="lehrveranstaltung" /></fo:block></fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="40mm"><xsl:text> </xsl:text><xsl:value-of select="fachbereich" /></fo:block></fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="20mm" text-align="center"><xsl:value-of select="gruppe" /></fo:block></fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="12mm" text-align="right"><xsl:value-of select="stunden" /></fo:block></fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="10mm" text-align="right"><xsl:value-of select="satz" /></fo:block></fo:table-cell>

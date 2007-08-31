@@ -27,7 +27,7 @@ class FO_LayoutObject extends FO_FlowContainer {
   var $_oldFontStyle;
   var $_oldColor;
   var $_buffer;
-
+  
   function initDefaultAttributes($node) {
     //read attributes
     $this->initLocalAttribute($node, "border-top-style");
@@ -57,7 +57,7 @@ class FO_LayoutObject extends FO_FlowContainer {
     $this->initLocalSizeAttribute($node, "space-before.optimum");
     $this->initLocalSizeAttribute($node, "space-after.optimum");
     $this->initLocalAttribute($node, "break-before");
-    $this->initLocalAttribute($node, "break-after");
+    $this->initLocalAttribute($node, "break-after");    
     $this->initSizeAttribute($node, "line-height");
     $this->initLocalSizeAttribute($node, "padding-top");
     //$this->initLocalSizeAttribute($node, "padding-bottom");
@@ -71,64 +71,154 @@ class FO_LayoutObject extends FO_FlowContainer {
   	//echo str_replace('EURO',chr(128),utf8_decode($str));
   	return str_replace('EURO',chr(128),utf8_decode($str));
   }
-
-  function parse(DOMNode $node)
+	
+  //oesi - Bei Tabellen wird die Hoehe der Row im vorhinein berechnet
+  function BerechneTabellenHoehe($child)
   {
+  	global $max_line_height_for_that_row;
+  	//var_dump($child);
+  	$pdf = $this->getPdf();
+  	$anzahl_lines_max=0;
+  	$output = '';
+  	//alle Zellen durchlaufen
+  	foreach($child->childNodes as $cell)
+  	{
+  		if($cell->childNodes)
+  		{
+	  		foreach($cell->childNodes as $block)
+	  		{
+	  			//Blockelement heraussuchen
+	  			if($block->nodeName=='fo:block')
+	  			{
+	  				//Width des block Elements holen
+	  				if($block->attributes->getNamedItem('content-width'))
+	  				{
+	  					//Schriftgroesse des Elements holen bzw des uebergeordneten
+	  					if($block->attributes->getNamedItem('font-size'))
+	  						$font_size=$block->attributes->getNamedItem('font-size')->nodeValue;
+	  					else 
+	  						$font_size=$this->getContext("font-size");
+	  					
+	  					//wenn schriftgroesse in pt angegeben ist dann in mm umrechnen
+	  					if(strstr($font_size,'pt'))
+	  						$font_size = $font_size/72*25.4;
+		  		 		$content_width = $block->attributes->getNamedItem('content-width')->nodeValue;
+		  				//$output .= $block->nodeValue;
+		  				
+		  				$anzahl_lines=0;
+		  				//sonderzeichen konvertieren
+		  				$line = $this->convert($block->nodeValue);
+		  				//Zeilenumbrueche loeschen
+		  				$line = str_replace("\n",'', trim($line));
+		  				//Lines nach Newlines splitten
+		  				$lines = explode('\n', $line);
+		  				foreach ($lines as $line)
+		  				{
+			  				do
+			  				{
+			  					/*$x = $this->getContext("x");
+								$x2 = $this->getContext("startx");
+								if (!$x2) {
+								  $x2 = $x;
+								}*/
+								//echo "x2:$x2<br>";
+								
+			  					$w = $content_width-1;
+			  					
+			  					//Anzahl der zeichen holen die in dieser zeile noch platz haben
+				  				$noc = $pdf->GetNumberOfChars($w, $line, $font_size);
+				  				//wenn das wort nicht abgeteilt werden kann dann ueber den rand hinausschreiben
+				  				if($noc==-1)
+				  					$noc = strlen($line);
+				  				//Zeile abteilen
+				  				$showLine = substr($line, 0, $noc);
+				  				
+				  				$output.= "w=$w noc=$noc fontsize=$font_size<br>$showLine ($line)";
+				  				
+								$textWidth = $pdf->GetStringWidth($showLine);
+								//Rest der Line als neue Line
+								$line = trim(substr($line, $noc));
+								//Anzahl der verbleibenden zeichen ermitteln
+								$width = $pdf->GetNumberOfChars($w, $line, $font_size);
+								$anzahl_lines++;
+			  				} while($width>0);
+		  				}
+						$output.= " Breaks $anzahl_lines <br><br>";
+						//Wenn die Anzahl der benoetigten Zeilen in dieser Zelle
+						//Groesser als die bisher groesste ist dann aendern
+						if($anzahl_lines_max<$anzahl_lines)
+		  					$anzahl_lines_max = $anzahl_lines;
+		  				break;
+	  				}
+	  			}
+	  		}
+  		}
+  	}  		
+  	//Groesse der Zellen in Globale Variable schreiben
+  	$max_line_height_for_that_row = $anzahl_lines_max;
+  	//echo $output." - Line breaks $anzahl_lines_max times<br>";
+  }
+  
+  function parse(DOMNode $node) {
     //set default attributes
     $this->initDefaultAttributes($node);
     $this->initAttributes($node);
     $this->initialize();
     $acceptPageBreak = $this->getContext("acceptPageBreak");
-
+    
     $pos = $this->getPosition();
     list($x, $y, $width, $height) = $pos[0];
     list($xOrig, $yOrig, $width, $height) = $pos[1];
 
     //automatic page break if component exceeds page limits
     $pdf = $this->getPdf();
-    if ($yOrig > $pdf->PageBreakTrigger && $pdf->AcceptPageBreak() && $acceptPageBreak)
-    {
-		$pdf->AddPage();
-		$this->handleEvent("sync-position");
-		$this->parse($node);
-		return;
+    if ($yOrig > $pdf->PageBreakTrigger && 
+	$pdf->AcceptPageBreak() && 
+	$acceptPageBreak) {
+	$pdf->AddPage();
+	$this->handleEvent("sync-position");
+	$this->parse($node);
+	return;
     }
 
 	//update to inner position
     $this->setContext("x", $x);
     $this->setContext("y", $y);
-
+    
 	//draw us
     $this->setColor();
-    $this->setFont();
+    $this->setFont();    
 
     $this->startCapture();
-    foreach($node->childNodes as $child)
+    foreach($node->childNodes as $child) 
     {
-	 	if ($child->nodeType == self::NODE_TYPE_TEXT)
-	    {
+		if ($child->nodeType == self::NODE_TYPE_TEXT) 
+		{
 			$this->preParseContent($child->textContent);
 			//oesi - add function utf8_decode for special chars (umlaut)
 			$this->processContent($this->convert($child->nodeValue));
 			$this->postParseContent($child->textContent);
-		}
-		else
-		{
+      	}
+      	else 
+      	{
+      		//oesi - Bei Table-rows im vorhinein die hoehe berechnen
+      		if($child->nodeName=='fo:table-row')
+      			$this->BerechneTabellenHoehe($child);
 			$this->processChildNode($child, $this->getChildNodes());
       	}
-	}
-
+    }
+    
     //oesi - hack for ExternalGraphic Tag to show without content
     if($this instanceof FO_ExternalGraphic)
        $this->processContent('');
     //endhack
 
-    $contentBuffer = $this->endCapture();
-
+    $contentBuffer = $this->endCapture();	
+    
     //update to outer position
     $this->setContext("x", $xOrig);
     $this->setContext("y", $yOrig);
-
+        
     //recalc positions
     $pos2 = $this->getPosition();
     //merge with X and y values of the original psoition
@@ -139,17 +229,17 @@ class FO_LayoutObject extends FO_FlowContainer {
 
     //automatic page break if component exceeds page limits
     $pdf = $this->getPdf();
-    if ($pos2[1][3] < $pdf->PageBreakTrigger &&
-	$pos2[1][3]+$this->getContext("y") > $pdf->PageBreakTrigger &&
+    if ($pos2[1][3] < $pdf->PageBreakTrigger && 
+	$pos2[1][3]+$this->getContext("y") > $pdf->PageBreakTrigger && 
 	$pdf->AcceptPageBreak() && $acceptPageBreak) {
       $pdf->AddPage();
       $this->handleEvent("sync-position");
       $this->parse($node);
       return;
     }
-
+    
     $this->drawBordersAndBackground($pos2);
-
+        
     //update to outer positions
     $this->setLocalContext("width", $pos2[1][2]);
     $this->setLocalContext("height", $pos2[1][3]);
@@ -169,10 +259,10 @@ class FO_LayoutObject extends FO_FlowContainer {
 
   function preParseContent($content) {
   }
-
+  
   function postParseContent($textcontent) {
   }
-
+  
   /**
    * Draw borders and backgrounds according to the positions
    * May be overwritten to specify behaviour
@@ -180,7 +270,7 @@ class FO_LayoutObject extends FO_FlowContainer {
   function drawBordersAndBackground($pos) {
     list($x, $y, $width, $height) = $pos[1];
     $this->drawBackground($x, $y, $width, $height);
-    $this->drawBorders($x, $y, $width, $height);
+    $this->drawBorders($x, $y, $width, $height);    
   }
 
   function getChildNodes() {
@@ -191,12 +281,12 @@ class FO_LayoutObject extends FO_FlowContainer {
   function initialize() {
     $break_before = $this->getContext("break-before");
     $this->handleBreak($break_before);
-  }
+  }  
 
   function closeDown() {
      $pdf = $this->getPdf();
      if ($this->_oldFont) {
-       $pdf->SetFont($this->_oldFont, $this->_oldFontStyle,
+       $pdf->SetFont($this->_oldFont, $this->_oldFontStyle, 
 		     $this->_oldFontSize);
      }
      else if ($this->_oldFontSize) {
@@ -210,7 +300,7 @@ class FO_LayoutObject extends FO_FlowContainer {
      $space_after = $this->getContext("space-after.optimum");
 //     echo "Space-after:".$space_after.":".get_class($this).":".$this->getContext("height")."<br>";
      if ($space_after) {
-       $this->setLocalContext("height", $this->getContext("height") +
+       $this->setLocalContext("height", $this->getContext("height") + 
 			      $space_after);
      }
      $break_after = $this->getContext("break-after");
@@ -226,9 +316,9 @@ class FO_LayoutObject extends FO_FlowContainer {
   }
 
   function endCapture() {
-    if (!$this->_buffer) {
+    if (!$this->_buffer) {      
       return;
-    }
+    }    
     $partBuffer = $this->getPdf()->endCapture($this->_buffer);
     $this->_buffer = NULL;
     return $partBuffer;
@@ -243,23 +333,23 @@ class FO_LayoutObject extends FO_FlowContainer {
   }
 
   function getPosition() {
-    $space_before = $this->getContext("space-before.optimum");
+    $space_before = $this->getContext("space-before.optimum");    
     $height = $this->getContext("line-height");
-    $pdf = $this->getPdf();
-
+    $pdf = $this->getPdf();    
+    
     $bw_top = $this->getContext("border-top-width");
     $bw_left = $this->getContext("border-left-width");
     $bw_right = $this->getContext("border-right-width");
-    $bw_bottom = $this->getContext("border-bottom-width");
-    $padding_left = $this->getContext("padding-left");
-    $padding_top = $this->getContext("padding-top");
+    $bw_bottom = $this->getContext("border-bottom-width");    
+    $padding_left = $this->getContext("padding-left");    
+    $padding_top = $this->getContext("padding-top");    
 
     $bw = $this->getContext("border-width");
     $xx = $this->getContext("x");
     $yy = $this->getContext("y");
 
-    $height2 = $this->getContext("height");
-    if (!$height || $height < $height2) {
+    $height2 = $this->getContext("height");    
+    if (!$height || $height < $height2) {            
       $height = $height2;
     }
     $width = $this->getContext("width");
@@ -267,7 +357,7 @@ class FO_LayoutObject extends FO_FlowContainer {
     if (!$bw_bottom) {$bw_bottom = $bw;}
     if (!$bw_right) {$bw_right = $bw;}
     if (!$bw_left) {$bw_left = $bw;}
-
+    
     sscanf($bw_top, "%f%s", $wt, $unit);
     sscanf($bw_left, "%f%s", $wl, $unit);
     sscanf($bw_right, "%f%s", $wr, $unit);
@@ -276,7 +366,7 @@ class FO_LayoutObject extends FO_FlowContainer {
     $yy += $wt;
     $height += $wt+$wb;
     $width += $wl+$wr;
-
+    
     if ($space_before) {
       //echo "Spacebefore:$space_before<br>";
       $yy += $space_before;
@@ -289,27 +379,27 @@ class FO_LayoutObject extends FO_FlowContainer {
       $yy += $padding_top;
     }
 
-    return
+    return 
       array(
 	    //inner coordinates
-	    array($xx, $yy, $width-$wl-$wr, $height-$wt-$wb),
+	    array($xx, $yy, $width-$wl-$wr, $height-$wt-$wb), 	    
 	    //outer coordinates
-	    array($xx-$wl, $yy-$wr, $width, $height));
+	    array($xx-$wl, $yy-$wr, $width, $height));     
   }
-
+  
   function setColor() {
     $pdf = $this->getPdf();
     $this->_oldColor = $pdf->GetTextColor();
-    $color = $this->getContext("color");
+    $color = $this->getContext("color");    
     if ($color) {
       $this->setTextColor($color, $pdf);
     }
   }
 
   function setFont() {
-    $pdf = $this->getPdf();
+    $pdf = $this->getPdf();      
     $this->_oldFont = $pdf->GetFontFamily();
-    $this->_oldFontStyle = $pdf->GetFontStyle();
+    $this->_oldFontStyle = $pdf->GetFontStyle();      
     $this->_oldFontSize = $pdf->GetFontSizePt();
     $weight = $this->getContext("font-weight");
     $style = $this->getContext("font-style");
@@ -320,7 +410,7 @@ class FO_LayoutObject extends FO_FlowContainer {
     }
     else {
       $f = $this->_oldFont;
-    }
+    }    
     if ($weight || $style) {
       if ($weight) {
 	$st = "B";
@@ -328,7 +418,7 @@ class FO_LayoutObject extends FO_FlowContainer {
       if ($style) {
 	//TODO: check which styles are supported
       }
-    }
+    } 
     else {
       $st = $this->_oldFontStyle;
     }
@@ -337,13 +427,13 @@ class FO_LayoutObject extends FO_FlowContainer {
     }
     else {
       $sz = $this->_oldFontSize;
-    }
-    if ($pdf->FontExists($f, $st)) {
+    }   
+    if ($pdf->FontExists($f, $st)) {     
       $pdf->SetFont($f, $st, $sz);
     }
-    else if ($pdf->FontExists($this->_oldFont, $st)) {
+    else if ($pdf->FontExists($this->_oldFont, $st)) {     
       $pdf->SetFont($this->_oldFont, $st, $sz);
-    }
+    }      
     else {
       //adjust only size
       $pdf->SetFontSize($sz);
@@ -359,14 +449,14 @@ class FO_LayoutObject extends FO_FlowContainer {
     $bc_top = $this->getContext("border-top-color");
     $bc_left = $this->getContext("border-left-color");
     $bc_right = $this->getContext("border-right-color");
-    $bc_bottom = $this->getContext("border-bottom-color");
-    $bc = $this->getContext("border-color");
+    $bc_bottom = $this->getContext("border-bottom-color");    
+    $bc = $this->getContext("border-color");    
     $bw_top = $this->getContext("border-top-width");
     $bw_left = $this->getContext("border-left-width");
     $bw_right = $this->getContext("border-right-width");
-    $bw_bottom = $this->getContext("border-bottom-width");
+    $bw_bottom = $this->getContext("border-bottom-width");    
     $bw = $this->getContext("border-width");
-
+    
     $pdf = $this->getPdf();
     if (!$bs_top) {$bs_top = $bs;}
     if (!$bs_bottom) {$bs_bottom = $bs;}
@@ -385,7 +475,7 @@ class FO_LayoutObject extends FO_FlowContainer {
     sscanf($bw_left, "%f%s", $wl, $unit);
     sscanf($bw_right, "%f%s", $wr, $unit);
     sscanf($bw_bottom, "%f%s", $wb, $unit);
-    $wt /= 2;
+    $wt /= 2;    
     $wl /= 2;
     $wr /= 2;
     $wb /= 2;
@@ -394,13 +484,13 @@ class FO_LayoutObject extends FO_FlowContainer {
     $height -= $wt+$wb;
     $x += $wl;
     $y += $wt;
-    $this->drawLine($x, $y, $x+$width, $y, $bs_top, $bc_top,
+    $this->drawLine($x, $y, $x+$width, $y, $bs_top, $bc_top, 
 		    $bw_top, $pdf);
-    $this->drawLine($x, $y, $x, $y+$height, $bs_left,
+    $this->drawLine($x, $y, $x, $y+$height, $bs_left, 
 		    $bc_left, $bw_left,$pdf);
-    $this->drawLine($x, $y+$height, $x+$width, $y+$height,
+    $this->drawLine($x, $y+$height, $x+$width, $y+$height, 
 		    $bs_bottom, $bc_bottom, $bw_bottom, $pdf);
-    $this->drawLine($x+$width, $y, $x+$width, $y+$height,
+    $this->drawLine($x+$width, $y, $x+$width, $y+$height, 
 		    $bs_right, $bc_right,$bw_right, $pdf);
   }
 
@@ -415,12 +505,12 @@ class FO_LayoutObject extends FO_FlowContainer {
       $pdf->Rect($x, $y, $width, $height, "F");
       list($r, $g, $b) = $this->parseColor($oldColor);
       $pdf->SetFillColor($r, $g, $b);
-    }
+    }   
     else if ($bg_img) {
       $this->NotYetSupported("background-image");
     }
   }
-
+   
   function drawLine($x, $y, $x2, $y2, $style, $color, $width, &$pdf) {
      $oldColor = $pdf->GetDrawColor();
      $oldLineWidth = $pdf->GetLineWidth();
@@ -462,20 +552,20 @@ class FO_LayoutObject extends FO_FlowContainer {
    function setDrawColor($color, &$pdf) {
      if ($color == '') {
        return;
-     }
-     list($r, $g, $b) = $this->parseColor($color);
+     }     
+     list($r, $g, $b) = $this->parseColor($color);   
      $pdf->SetDrawColor($r, $g, $b);
    }
 
    function setTextColor($color, &$pdf) {
      if ($color == '') {
        return;
-     }
-     list($r, $g, $b) = $this->parseColor($color);
+     }     
+     list($r, $g, $b) = $this->parseColor($color);   
      $pdf->SetTextColor($r, $g, $b);
-   }
+   }   
 
-   function handleBreak($break) {
+   function handleBreak($break) {     
      if (!$break) {
        return;
      }
@@ -483,11 +573,11 @@ class FO_LayoutObject extends FO_FlowContainer {
      switch($break) {
      case "page":
        $pdf->AddPage();
-       $this->handleEvent("sync-position");
+       $this->handleEvent("sync-position");       
        return;
      default:
        $this->NotYetSupported("Break:$break");
-     }
+     }       
    }
 }
 
@@ -504,7 +594,7 @@ class FO_PageSequence extends FO_Object {
   static $CHILDNODES = array(
 				     'FO_Flow'
 				     );
-
+  
   function parse(DOMNode $node) {
     $masterRef = $node->attributes->getNamedItem("master-reference");
     if ($masterRef) {
@@ -515,7 +605,7 @@ class FO_PageSequence extends FO_Object {
     $pdf->AddPage();
     $this->handleEvent("sync-position");
     $this->processChildNodes($node, self::$CHILDNODES);
-  }
+  }  
 }
 
 class FO_FlowContainer extends FO_Object {
@@ -524,20 +614,20 @@ class FO_FlowContainer extends FO_Object {
     $acceptPageBreak = $this->getContext("acceptPageBreak");
     $this->setLocalContext("width", $obj->getContext("width"));
     $height =  $this->getContext("height")+$obj->getContext("height");
-    $this->setLocalContext("height", $height);
+    $this->setLocalContext("height", $height);    
     $y = $this->getContext("y")+$obj->getContext("height");
     $pdf = $this->getPdf();
-    if ($height < $pdf->PageBreakTrigger &&
-	$y > $pdf->PageBreakTrigger &&
-	$pdf->AcceptPageBreak() &&
+    if ($height < $pdf->PageBreakTrigger && 
+	$y > $pdf->PageBreakTrigger && 
+	$pdf->AcceptPageBreak() && 
 	$acceptPageBreak) {
 
       $pdf->AddPage();
       $this->handleEvent("sync-position");
       //echo "Page break on .".get_class($obj)."<br>";
     }
-    else {
-      $this->setContext("y", $y);
+    else {    
+      $this->setContext("y", $y);    
       //echo "Move :".get_class($obj).":".$y.":".$obj->getContext("height")."<br>;";
     }
   }
@@ -555,7 +645,7 @@ class FO_Flow extends FO_FlowContainer {
   function parse(DOMNode $node) {
     //TODO: use attributes
     $this->processChildNodes($node, self::$CHILDNODES);
-  }
+  }  
 }
 
 class FO_BlockContainer extends FO_LayoutObject {
@@ -573,7 +663,7 @@ class FO_BlockContainer extends FO_LayoutObject {
     $this->initLocalSizeAttribute($node, "height");
     $this->initLocalSizeAttribute($node, "width");
   }
-
+  
   function getChildNodes() {
     return self::$CHILDNODES;
   }
@@ -595,7 +685,7 @@ class FO_BlockContainer extends FO_LayoutObject {
 }
 
 class FO_ListBlock extends FO_LayoutObject {
-
+  
 }
 
 ?>

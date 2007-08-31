@@ -306,7 +306,7 @@
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> 5.2 \n \n \n</fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Beruflicher Status \n Professional status conferred \n \n</fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Zugang zu akademischen Berufen nach Maﬂgabe der berufsrechtlichen \n Vorschriften; Diplom im Sinne der Richtlinie 89/48/EWG \n Access to academic professions according to the professional \n regulation; Diploma in the sense of directive RL 89/48/EEC</fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt">Zugang zu akademischen Berufen nach Maﬂgabe der berufsrechtlichen Vorschriften; Diplom im Sinne der Richtlinie 89/48/EWG Access to academic professions according to the professional regulation; Diploma in the sense of directive RL 89/48/EEC</fo:block></fo:table-cell>
 							</fo:table-row>
 						</fo:table-body>
 					</fo:table>

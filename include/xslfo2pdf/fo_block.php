@@ -21,7 +21,10 @@ mike.toggweiler@tegonal.com
 http://xslf2pdf.tegonal.com
 */ ?>
 <?PHP
+$max_line_height_for_that_row=0;
+
 class FO_Block extends FO_LayoutObject{
+  
   static $CHILDNODES = array(
 	  //FO_BidiOverride,
 	  //FO_Character,
@@ -46,11 +49,16 @@ class FO_Block extends FO_LayoutObject{
   }
 
   function initAttributes($node) {
+  	global $height_of_current_row;
+  	//echo $node->parentNode->nodeName.'<br>';
+  	if($node->parentNode->nodeName!='fo:table-cell')
+  		$height_of_current_row=0;
     $this->initAttribute($node, "text-align");
     $this->initAttribute($node, "content-width");
   }
 
   function processContent($text) {
+  	global $max_line_height_for_that_row;
     $talign = $this->getContext("text-align");
     //oesi - add attribute content-width
     $colwidth = $this->getContext("content-width");
@@ -78,10 +86,23 @@ class FO_Block extends FO_LayoutObject{
     //    echo "Draw at:$x:$x2:$y<br>";
     $pdf = $this->getPdf();
     $lineHeight = $this->getContext("line-height");
-    
+            
     list($width, $height, $nb, $sx, $sy, $lx, $ly) = 
 	    $pdf->Text2($x2, $y, $text, $align, $lineHeight, $x, $colwidth);
-//echo "Wrote block:$x:$y:$height:$lineHeight:".$pdf->FontSize.":".$pdf->FontSizePt."<br>";
+//echo "Wrote block:$colwidth:$height:$lineHeight:".$pdf->FontSize.":".$pdf->FontSizePt."$text<br>";
+
+	//oesi - wenn die hoehe einer Spalte groesser ist, dann muss der Border
+	//fuer die ganze row groesser gezeichnet werden.
+	//berechnung von max_line_heigth_for_that_row in fo_layout.php
+	if($max_line_height_for_that_row!=0 && $max_line_height_for_that_row!=1)
+    {
+    	//echo "aendere hoehe fuer $text : $max_line_height_for_that_row<br>";
+    	$height=$lineHeight*$max_line_height_for_that_row;
+    }
+    else 
+    {
+    	//echo "<br>$text : $max_line_height_for_that_row";
+    }
     $this->setLocalContext("content_height", $height);
     $this->setLocalContext("content_width", $width);
     $this->setLocalContext("lx", $lx);

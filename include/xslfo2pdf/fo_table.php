@@ -98,6 +98,7 @@ class FO_Table extends FO_LayoutObject {
   }
 
   function postParse(FO_Object $obj) {
+  	global $max_line_height_for_that_row;
     if ($obj instanceof FO_TableHeader) {
       $this->setLocalContext("width", $obj->getContext("width"));
       $this->setLocalContext("height", $this->getContext("height")+
@@ -111,6 +112,7 @@ class FO_Table extends FO_LayoutObject {
 			$obj->getContext("height"));
       $this->setContext("y", $this->getContext("y") + 
 			     $obj->getContext("height"));
+	  $max_line_height_for_that_row=1;
     }
     else if($obj instanceof FO_TableColumn) {
       $col = $obj->getContext("column");
@@ -163,7 +165,8 @@ class FO_TableRow extends FO_LayoutObject {
     $col->setContext("column", $this->colIndex++);
   }
 
-  function postParse(FO_Object $obj) {    
+  function postParse(FO_Object $obj) {  
+  	  
     if ($obj instanceof FO_TableCell) {
       $this->setContext("x", $this->getContext("x")+
 			$obj->getContext("width"));
@@ -172,8 +175,9 @@ class FO_TableRow extends FO_LayoutObject {
       if ($this->getContext("height") < $obj->getContext("height")) {
 	$this->setLocalContext("height", $obj->getContext("height"));
       }
-    }    
+    }
     else if ($obj instanceof FO_TableRow) {
+    	
 	 $this->setLocalContext("width", $obj->getContext("width"));
 	 $this->setLocalContext("height", $this->getContext("height")+
 			   $obj->getContext("height"));
@@ -217,7 +221,7 @@ class FO_TableBody extends FO_LayoutObject {
   function getChildNodes() {
     return self::$CHILDNODES;
   }
-
+    
   function postParse(FO_Object $obj) {
     if ($obj instanceof FO_TableRow) {
 	 $this->setLocalContext("width", $obj->getContext("width"));
@@ -227,6 +231,8 @@ class FO_TableBody extends FO_LayoutObject {
 			     $obj->getContext("height"));	 	 
     }
   }
+  
+  
 }
 
 class FO_TableCell extends FO_LayoutObject {
