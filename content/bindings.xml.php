@@ -40,7 +40,7 @@
 			<xul:spacer flex="1"/>
 			<xul:menulist anonid="binding-menulist-field" style="margin: 1px" editable="true" xbl:inherits="disabled, value" label="">
 				<xul:menupopup>
-					<xul:datepicker anonid="binding-datepicker-field" currentday="20" currentmonth="5" currentyear="2007" 
+					<xul:datepicker anonid="binding-datepicker-field" 
 								onselect="parentNode.parentNode.parentNode.parentNode.value=this.selection.currentDay+'.'+(parseInt(this.selection.currentMonth)+1)+'.'+this.selection.currentYear"/>
 				</xul:menupopup>		
 			</xul:menulist>
