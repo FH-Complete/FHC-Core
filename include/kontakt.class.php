@@ -105,6 +105,7 @@ class kontakt
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
+				return true;
 			}
 			else 
 			{

@@ -87,12 +87,12 @@
 									</fo:table-row>
 									<fo:table-row line-height="14pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="80mm" text-align="left">
 												<xsl:text> </xsl:text><xsl:value-of select="betreuer" />\n <xsl:value-of select="betreuer_2" />
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="181.2mm" text-align="left">
 												<xsl:text> </xsl:text><xsl:value-of select="themenbereich" />\n <xsl:value-of select="themenbereich_2" />
 											</fo:block>
 										</fo:table-cell>

@@ -171,6 +171,7 @@ class adresse
 			$adr_obj->plz             = $row->plz;
 			$adr_obj->strasse         = $row->strasse;
 			$adr_obj->typ             = $row->typ;
+			$adr_obj->firma_id		  = $row->firma_id;
 			$adr_obj->updateamum      = $row->updateamum;
 			$adr_obj->updatevon       = $row->updatevon;
 			$adr_obj->insertamum      = $row->insertamum;

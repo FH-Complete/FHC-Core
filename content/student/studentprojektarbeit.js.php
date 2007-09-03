@@ -937,3 +937,23 @@ function StudentProjektbetreuerLoadMitarbeiterDaten()
 	
 	document.getElementById('student-projektbetreuer-textbox-stundensatz').value=stundensatz;
 }
+
+// ****
+// * Neuen Projektbetreuer anlegen
+// ****
+function StudentProjektbetreuerNeuePerson()
+{
+	window.open('<?php echo APP_ROOT; ?>vilesci/personen/personen_anlegen.php','Person anlegen');
+}
+
+// ****
+// * Kontaktdaten eines Betreuers Bearbeiten
+// ****
+function StudentProjektbetreuerKontaktdaten()
+{
+	person_id = MenulistGetSelectedValue('student-projektbetreuer-menulist-person');
+	if(person_id!='')
+		window.open('<?php echo APP_ROOT; ?>vilesci/personen/kontaktdaten_edit.php?person_id='+person_id,'Kontaktdaten');
+	else
+		alert('Bitte zuerst eine Person auswaehlen');
+}

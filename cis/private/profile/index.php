@@ -1,6 +1,7 @@
 <?php
 	require_once('../../config.inc.php');
 	require_once('../../../include/functions.inc.php');
+	require_once('../../../include/globals.inc.php');
 
 	//if (!isset($REMOTE_USER))
 	//	$REMOTE_USER='pam';
@@ -113,7 +114,7 @@
         		Technikum: <a class='Item' href='mailto:<?php echo $uid; ?>@technikum-wien.at'> <?php echo $uid; ?>@technikum-wien.at</a><br>
 
         		<?php
-        		if($email_alias!='')
+        		if($email_alias!='' && !in_array($stg,$noalias))
         		{
         		?>
         			Alias: <a class='Item' href='mailto:<?php echo $email_alias; ?>@technikum-wien.at'><?php echo $email_alias; ?>@technikum-wien.at</a>
