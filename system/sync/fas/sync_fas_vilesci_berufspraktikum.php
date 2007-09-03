@@ -1164,7 +1164,7 @@ if($result = pg_query($conn_fas, $qry_main))
 										'insertvon='.myaddslashes($projektbetreuerinsertvon).', '.
 										'updateamum= now(), '.
 									     	'updatevon='.myaddslashes($projektbetreuerupdatevon).' '.
-										"WHERE projektarbeit_id='".$projektbetreuerprojektarbeit_id."' AND person_id='".$projektbetreuerperson_id."'AND betreuerart='Betreuer';";
+										"WHERE projektarbeit_id='".$projektbetreuerprojektarbeit_id."' AND person_id='".$projektbetreuerperson_id."'AND betreuerart_kurzbz='Betreuer';";
 										
 										
 									}
@@ -1369,7 +1369,7 @@ if($result = pg_query($conn_fas, $qry_main))
 											'insertvon='.myaddslashes($projektbetreuerinsertvon).', '.
 											'updateamum= now(), '.
 										     	'updatevon='.myaddslashes($projektbetreuerupdatevon).' '.
-											"WHERE projektarbeit_id='".$projektbetreuerprojektarbeit_id."' AND person_id='".$projektbetreuerperson_id."'AND betreuerart='".$projektbetreuerbetreuerart."';";
+											"WHERE projektarbeit_id='".$projektbetreuerprojektarbeit_id."' AND person_id='".$projektbetreuerperson_id."'AND betreuerart_kurzbz='".$projektbetreuerbetreuerart."';";
 											
 											
 										}
