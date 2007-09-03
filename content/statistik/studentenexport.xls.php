@@ -99,11 +99,11 @@ loadVariables($conn, $user);
 	$maxlength[$i]=3;
 	$worksheet->write($zeile,++$i,"TITELPRE", $format_bold);
 	$maxlength[$i]=8;
+	$worksheet->write($zeile,++$i,"NACHNAME", $format_bold);
+	$maxlength[$i]=8;
 	$worksheet->write($zeile,++$i,"VORNAME", $format_bold);
 	$maxlength[$i]=7;
 	$worksheet->write($zeile,++$i,"VORNAMEN", $format_bold);
-	$maxlength[$i]=8;
-	$worksheet->write($zeile,++$i,"NACHNAME", $format_bold);
 	$maxlength[$i]=8;
 	$worksheet->write($zeile,++$i,"TITELPOST", $format_bold);
 	$maxlength[$i]=9;
@@ -253,6 +253,11 @@ loadVariables($conn, $user);
 		$worksheet->write($zeile,$i, $row->titelpre);
 		$i++;
 		
+		if(strlen($row->nachname)>$maxlength[$i])
+			$maxlength[$i] = strlen($row->nachname);
+		$worksheet->write($zeile,$i, $row->nachname);
+		$i++;
+		
 		if(strlen($row->vorname)>$maxlength[$i])
 			$maxlength[$i] = strlen($row->vorname);
 		$worksheet->write($zeile,$i, $row->vorname);
@@ -262,12 +267,7 @@ loadVariables($conn, $user);
 			$maxlength[$i] = strlen($row->vornamen);
 		$worksheet->write($zeile,$i, $row->vornamen);
 		$i++;
-		
-		if(strlen($row->nachname)>$maxlength[$i])
-			$maxlength[$i] = strlen($row->nachname);
-		$worksheet->write($zeile,$i, $row->nachname);
-		$i++;
-		
+						
 		if(strlen($row->titelpost)>$maxlength[$i])
 			$maxlength[$i] = strlen($row->titelpost);
 		$worksheet->write($zeile,$i, $row->titelpost);

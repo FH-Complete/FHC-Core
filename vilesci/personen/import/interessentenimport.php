@@ -98,6 +98,7 @@ $where = '';
 $error = false;
 //Parameter
 $titel = (isset($_REQUEST['titel'])?$_REQUEST['titel']:'');
+$anrede = (isset($_REQUEST['anrede'])?$_REQUEST['anrede']:'');
 $nachname = (isset($_REQUEST['nachname'])?$_REQUEST['nachname']:'');
 $vorname = (isset($_REQUEST['vorname'])?$_REQUEST['vorname']:'');
 $geschlecht = (isset($_REQUEST['geschlecht'])?$_REQUEST['geschlecht']:'');
@@ -207,8 +208,8 @@ function clean_string($string)
 if($studiensemester_kurzbz == '')
 {
 	$stsem = new studiensemester($conn);
-	$stsem->getNextStudiensemester();
-	$studiensemester_kurzbz = $stsem->studiensemester_kurzbz;
+	$studiensemester_kurzbz = $stsem->getaktorNext();
+	
 }
 
 //Testphase fix
@@ -253,6 +254,7 @@ if(isset($_POST['save']))
 	else
 	{
 		$person->new = true;
+		$person->anrede = $anrede;
 		$person->titelpre = $titel;
 		$person->nachname = $nachname;
 		$person->vorname = $vorname;
@@ -550,6 +552,7 @@ if($geburtsdatum!='')
 <!--Formularfelder-->
 <table>
 <?php
+echo '<tr><td>Anrede</td><td><input type="text" id="anrede" name="anrede" maxlength="64" value="'.$anrede.'" /></td></tr>';
 echo '<tr><td>Titel</td><td><input type="text" id="titel" name="titel" maxlength="64" value="'.$titel.'" /></td></tr>';
 echo '<tr><td>Vorname</td><td><input type="text" id="vorname" maxlength="32" name="vorname" value="'.$vorname.'" /></td></tr>';
 echo '<tr><td>Nachname</td><td><input type="text" maxlength="64" id="nachname" name="nachname" value="'.$nachname.'" /></td></tr>';

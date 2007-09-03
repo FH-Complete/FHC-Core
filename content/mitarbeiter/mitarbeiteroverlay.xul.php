@@ -75,77 +75,77 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterfunktionove
 			context="mitarbeiter-tree-popup"				
 	>
 		<treecols>
-			<treecol id="mitarbeiter-treecol-uid" label="UID" flex="1" persist="hidden, width" hidden="false"
+			<treecol id="mitarbeiter-treecol-uid" label="UID" flex="1" persist="hidden, width, ordinal" hidden="false"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-anrede" label="Anrede" flex="1" persist="hidden, width" hidden="false"
+			<treecol id="mitarbeiter-treecol-anrede" label="Anrede" flex="1" persist="hidden, width, ordinal" hidden="false"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#anrede"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-titelpre" label="TitelPre" flex="1" persist="hidden, width" hidden="true"
+			<treecol id="mitarbeiter-treecol-titelpre" label="TitelPre" flex="1" persist="hidden, width, ordinal" hidden="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpre"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-nachname" label="Nachname" flex="1"  persist="hidden, width" hidden="false"
+			<treecol id="mitarbeiter-treecol-nachname" label="Nachname" flex="1"  persist="hidden, width, ordinal" hidden="false"
 				class="sortDirectionIndicator"
 				sortActive="true"
 				sortDirection="ascending"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-vorname" label="Vorname" flex="1" persist="hidden, width" hidden="false"
+			<treecol id="mitarbeiter-treecol-vorname" label="Vorname" flex="1" persist="hidden, width, ordinal" hidden="false"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-vornamen" label="Vornamen" flex="1" persist="hidden, width" hidden="true"
+			<treecol id="mitarbeiter-treecol-vornamen" label="Vornamen" flex="1" persist="hidden, width, ordinal" hidden="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vornamen"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-titelpost" label="TitelPost" flex="1" persist="hidden, width" hidden="true"
+			<treecol id="mitarbeiter-treecol-titelpost" label="TitelPost" flex="1" persist="hidden, width, ordinal" hidden="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpost"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-geburtsdatum" label="Geburtsdatum" flex="1" persist="hidden, width" hidden="false"
+			<treecol id="mitarbeiter-treecol-geburtsdatum" label="Geburtsdatum" flex="1" persist="hidden, width, ordinal" hidden="false"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#geburtsdatum_iso"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-svnr" label="SVNR" flex="1" persist="hidden, width" hidden="false"
+			<treecol id="mitarbeiter-treecol-svnr" label="SVNR" flex="1" persist="hidden, width, ordinal" hidden="false"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#svnr"  onclick="MitarbeiterTreeSort()"/> 
 			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-ersatzkennzeichen" label="Ersatzkennzeichen" flex="1" persist="hidden, width" hidden="false"
+			<treecol id="mitarbeiter-treecol-ersatzkennzeichen" label="Ersatzkennzeichen" flex="1" persist="hidden, width, ordinal" hidden="false"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#ersatzkennzeichen"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-aktiv" label="Aktiv" flex="1" persist="hidden, width" hidden="false"
+			<treecol id="mitarbeiter-treecol-aktiv" label="Aktiv" flex="1" persist="hidden, width, ordinal" hidden="false"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-personalnummer" label="PNr" flex="1" persist="hidden, width" hidden="false"
+			<treecol id="mitarbeiter-treecol-personalnummer" label="PNr" flex="1" persist="hidden, width, ordinal" hidden="false"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#personalnummer"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-kurzbz" label="Kurzbz" flex="1" persist="hidden, width" hidden="false"
+			<treecol id="mitarbeiter-treecol-kurzbz" label="Kurzbz" flex="1" persist="hidden, width, ordinal" hidden="false"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#kurzbz"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-lektor" label="Lektor" flex="1" persist="hidden, width" hidden="true"
+			<treecol id="mitarbeiter-treecol-lektor" label="Lektor" flex="1" persist="hidden, width, ordinal" hidden="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#lektor"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-fixangestellt" label="Fix" flex="1" persist="hidden, width" hidden="true"
+			<treecol id="mitarbeiter-treecol-fixangestellt" label="Fix" flex="1" persist="hidden, width, ordinal" hidden="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#fixangestellt"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-telefonklappe" label="Klappe" flex="1" persist="hidden, width" hidden="true"
+			<treecol id="mitarbeiter-treecol-telefonklappe" label="Klappe" flex="1" persist="hidden, width, ordinal" hidden="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#telefonklappe"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-ort_kurzbz" label="Buero" flex="1" persist="hidden, width" hidden="true"
+			<treecol id="mitarbeiter-treecol-ort_kurzbz" label="Buero" flex="1" persist="hidden, width, ordinal" hidden="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#ort_kurzbz"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-person_id" label="Person_id" flex="1" persist="hidden, width" hidden="true"
+			<treecol id="mitarbeiter-treecol-person_id" label="Person_id" flex="1" persist="hidden, width, ordinal" hidden="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#person_id"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>

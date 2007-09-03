@@ -78,7 +78,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	
 	for ($i = 0; $i < sizeof($uid_arr); $i++)
 	{	
-	$query = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.bezeichnung, tbl_studentlehrverband.semester, tbl_person.vorname, tbl_person.nachname,tbl_person.gebdatum, tbl_studiensemester.bezeichnung as sembezeichnung FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer, tbl_studentlehrverband, tbl_studiensemester WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_student.student_uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id and tbl_student.student_uid = '".$uid_arr[$i]."' and tbl_studentlehrverband.student_uid=tbl_student.student_uid and tbl_studiensemester.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz and tbl_studentlehrverband.studiensemester_kurzbz = '".$studiensemester_kurzbz."'";
+	$query = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.bezeichnung, tbl_studentlehrverband.semester, tbl_person.titelpre, tbl_person.titelpost, tbl_person.vorname, tbl_person.nachname,tbl_person.gebdatum, tbl_studiensemester.bezeichnung as sembezeichnung FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer, tbl_studentlehrverband, tbl_studiensemester WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_student.student_uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id and tbl_student.student_uid = '".$uid_arr[$i]."' and tbl_studentlehrverband.student_uid=tbl_student.student_uid and tbl_studiensemester.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz and tbl_studentlehrverband.studiensemester_kurzbz = '".$studiensemester_kurzbz."'";
 	
 		if($result = pg_query($conn, $query))
 		{
@@ -98,6 +98,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .=	"		<semester>".$row->semester."</semester>";
 		$xml .= "		<studiengang>".$row->bezeichnung."</studiengang>";
 		$xml .= "		<studiengang_kz>".$row->studiengang_kz."</studiengang_kz>";
+		$xml .= "		<titelpre>".$row->titelpre."</titelpre>";
+		$xml .= "		<titelpost>".$row->titelpost."</titelpost>";
 		$xml .= "		<vorname>".$row->vorname."</vorname>";
 		$xml .= "		<nachname>".$row->nachname."</nachname>";
 		$gebdatum = date('d.m.Y',strtotime($row->gebdatum));
@@ -142,7 +144,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				if($note!='')
 				{
 					$xml .= "			<unterrichtsfach>";
-					$xml .= "				<bezeichnung>".$row->lehrveranstaltung_bezeichnung."</bezeichnung>";
+					$xml .= "				<bezeichnung><![CDATA[".$row->lehrveranstaltung_bezeichnung."]]></bezeichnung>";
 					$xml .= "				<note>".$note."</note>";
 					$xml .= "				<sws>".sprintf('%.1f',$row->semesterstunden/$wochen)."</sws>";
 					$xml .= "				<ects>".$row->ects."</ects>";

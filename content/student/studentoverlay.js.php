@@ -831,7 +831,7 @@ function StudentAuswahl()
 	document.getElementById('student-prestudent-menulist-studiengang_kz').value=studiengang_kz_prestudent;
 	document.getElementById('student-prestudent-textbox-anmerkung').value=anmerkung;
 
-
+	document.getElementById('student-detail-groupbox-caption').label='Zugangsvoraussetzung für '+nachname+' '+vorname;
 	rollentree = document.getElementById('student-prestudent-tree-rolle');
 	url='<?php echo APP_ROOT;?>rdf/prestudentrolle.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
 
@@ -2034,7 +2034,8 @@ function StudentKontoNeuSpeichern(dialog, person_ids, studiengang_kz)
 	buchungstext = dialog.getElementById('student-konto-neu-textbox-buchungstext').value;
 	mahnspanne = dialog.getElementById('student-konto-neu-textbox-mahnspanne').value;
 	buchungstyp_kurzbz = dialog.getElementById('student-konto-neu-menulist-buchungstyp').value;
-
+	studiensemester_kurzbz = dialog.getElementById('student-konto-neu-menulist-studiensemester').value;
+	
 	if(buchungsdatum!='' && !CheckDatum(buchungsdatum))
 	{
 		alert('Buchungsdatum ist ungueltig');
@@ -2050,6 +2051,7 @@ function StudentKontoNeuSpeichern(dialog, person_ids, studiengang_kz)
 	req.add('buchungstext', buchungstext);
 	req.add('mahnspanne', mahnspanne);
 	req.add('buchungstyp_kurzbz', buchungstyp_kurzbz);
+	req.add('studiensemester_kurzbz', studiensemester_kurzbz);
 
 	var response = req.executePOST();
 

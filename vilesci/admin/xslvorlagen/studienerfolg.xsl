@@ -61,7 +61,7 @@
 					
 					<fo:block-container position="absolute" top="55mm" left="16mm" height="20mm">
 						<fo:block text-align="left" line-height="14pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
-							<xsl:value-of select="nachname" /><xsl:text> </xsl:text><xsl:value-of select="vorname" />
+							<xsl:value-of select="titelpre" /><xsl:text> </xsl:text><xsl:value-of select="nachname" /><xsl:text> </xsl:text><xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="titelpost" />
 						</fo:block>
 					</fo:block-container>
 					

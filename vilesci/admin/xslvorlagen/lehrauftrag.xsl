@@ -30,7 +30,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 				</fo:block>
 				<!--Name und Adresse-->
 				<fo:block font-size="10pt">
-					\n\nAn
+					\n\n
 					\n<fo:inline font-weight="bold" font-size="12pt">
 						<xsl:value-of select="mitarbeiter/name_gesamt" />
 						\n<xsl:value-of select="mitarbeiter/anschrift" />		

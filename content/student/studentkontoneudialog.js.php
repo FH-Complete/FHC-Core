@@ -75,7 +75,8 @@ function StudentKontoNeuInit()
 
 	if(anzahl>1)
 		document.getElementById('student-konto-neu-label').value='Anzahl Studenten: '+anzahl;
-		
+	
+	document.getElementById('student-konto-neu-menulist-studiensemester').value='<?php echo $semester_aktuell;?>';
 	document.getElementById('student-konto-neu-textbox-buchungsdatum').value='<?php echo date("d.m.Y"); ?>';
 }
 

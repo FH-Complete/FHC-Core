@@ -79,14 +79,27 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       						</hbox>
       						<label value="Geburtsort" control="student-detail-textbox-geburtsort"/>
       						<textbox id="student-detail-textbox-geburtsort" disabled="true" maxlength="128"/>
-      						<label value="Geburtszeit" control="student-detail-textbox-geburtszeit"/>
-      						<hbox><textbox id="student-detail-textbox-geburtszeit" disabled="true" maxlength="5" size="5" tooltiptext="Format: hh:mm Beispiel: 10:30"/></hbox>
+      						<label value="Geburtsnation" control="student-detail-menulist-geburtsnation"/>
+							<menulist id="student-detail-menulist-geburtsnation" disabled="true"
+							          datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php" flex="1"
+						              ref="http://www.technikum-wien.at/nation/liste" >
+								<template>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
+							        		      label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
+										  		  uri="rdf:*"/>
+										</menupopup>
+								</template>
+							</menulist>
+      						
     					</row>
     					<row>
       						<label value="SVNR" control="student-detail-textbox-svnr"/>
       						<hbox><textbox id="student-detail-textbox-svnr" disabled="true" maxlength="10" size="10"/></hbox>
       						<label value="Ersatzkennzeichen" control="student-detail-textbox-ersatzkennzeichen"/>
       						<hbox><textbox id="student-detail-textbox-ersatzkennzeichen" disabled="true" maxlength="10" size="10"/></hbox>
+      						<label value="Geburtszeit" control="student-detail-textbox-geburtszeit"/>
+      						<hbox><textbox id="student-detail-textbox-geburtszeit" disabled="true" maxlength="5" size="5" tooltiptext="Format: hh:mm Beispiel: 10:30"/></hbox>
     					</row>
     					<row>
 							<label value="Staatsbuergerschaft" control="student-detail-menulist-staatsbuergerschaft"/>
@@ -101,18 +114,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										</menupopup>
 								</template>
 							</menulist>
-							<label value="Geburtsnation" control="student-detail-menulist-geburtsnation"/>
-							<menulist id="student-detail-menulist-geburtsnation" disabled="true"
-							          datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php" flex="1"
-						              ref="http://www.technikum-wien.at/nation/liste" >
-								<template>
-									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
-							        		      label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
-										  		  uri="rdf:*"/>
-										</menupopup>
-								</template>
-							</menulist>
+							<spacer />
+							<spacer />						
+							
 							<label value="Sprache" control="student-detail-menulist-sprache" />
 							<menulist id="student-detail-menulist-sprache" disabled="true"
 							          datasources="<?php echo APP_ROOT ?>rdf/sprache.rdf.php" flex="1"
@@ -182,9 +186,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	  					<rows>
 	    					<row>
 	    						<label value="UID" control="student-detail-textbox-uid"/>
-	      						<hbox><textbox id="student-detail-textbox-uid" disabled="true" maxlength="16" size="16"/></hbox>
+	      						<hbox><textbox id="student-detail-textbox-uid" readonly="true" maxlength="16" size="16"/></hbox>
 	    						<label value="Personenkennzeichen" control="student-detail-textbox-matrikelnummer"/>
-	      						<hbox><textbox id="student-detail-textbox-matrikelnummer" disabled="true" maxlength="15" size="15"/></hbox>
+	      						<hbox><textbox id="student-detail-textbox-matrikelnummer" readonly="true" maxlength="15" size="15"/></hbox>
 	      						<!--<label value="Studiengang" control="student-detail-textbox-studiengang_kz"/>-->
 	      						<textbox id="student-detail-menulist-studiengang_kz" disabled="true" hidden="true" />
 	      						<!--
@@ -239,104 +243,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       		<label value="studiengang_kz"/>
       		<textbox id="student-prestudent-textbox-studiengang_kz" disabled="true"/>
 		</vbox>
-		<groupbox id="student-detail-groupbox-prestudent">
-		<caption label="Prestudent" />
-		<grid id="student-prestudent-grid-prestudent" style="margin:4px;" flex="1">
-				  	<columns  >
-    					<column flex="1"/>
-    					<column flex="5"/>
-    					<column flex="1"/>
-    					<column flex="5"/>
-    					<column flex="1"/>
-    					<column flex="5"/>    					
-  					</columns>
-  					<rows>
-  						<row>
-      						<label value="Aufmerksam durch" control="student-prestudent-menulist-aufmerksamdurch"/>
-      						<menulist id="student-prestudent-menulist-aufmerksamdurch" disabled="true"
-							          datasources="<?php echo APP_ROOT ?>rdf/aufmerksamdurch.rdf.php" flex="1"
-						              ref="http://www.technikum-wien.at/aufmerksamdurch/alle" >
-								<template>
-									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/aufmerksamdurch/rdf#aufmerksamdurch_kurzbz"
-							        		      label="rdf:http://www.technikum-wien.at/aufmerksamdurch/rdf#aufmerksamdurch_kurzbz"
-										  		  uri="rdf:*"/>
-										</menupopup>
-								</template>
-							</menulist>
-							<label value="Berufstaetigkeit" control="student-prestudent-menulist-berufstaetigkeit"/>
-      						<menulist id="student-prestudent-menulist-berufstaetigkeit" disabled="true"
-							          datasources="<?php echo APP_ROOT ?>rdf/berufstaetigkeit.rdf.php?optional=true" flex="1"
-						              ref="http://www.technikum-wien.at/berufstaetigkeit/alle" >
-								<template>
-									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/berufstaetigkeit/rdf#code"
-							        		      label="rdf:http://www.technikum-wien.at/berufstaetigkeit/rdf#bezeichnung"
-										  		  uri="rdf:*"/>
-										</menupopup>
-								</template>
-							</menulist>
-							<label value="Ausbildung" control="student-prestudent-menulist-ausbildung"/>
-      						<menulist id="student-prestudent-menulist-ausbildung" disabled="true"
-							          datasources="<?php echo APP_ROOT ?>rdf/ausbildung.rdf.php?optional=true" flex="1"
-						              ref="http://www.technikum-wien.at/ausbildung/alle" >
-								<template>
-									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/ausbildung/rdf#code"
-							        		      label="rdf:http://www.technikum-wien.at/ausbildung/rdf#bezeichnung"
-										  		  uri="rdf:*"/>
-										</menupopup>
-								</template>
-							</menulist>
-    					</row>
-    					<row>
-      						<label value="Aufnahmeschluessel" control="student-prestudent-menulist-aufnahmeschluessel"/>
-      						<menulist id="student-prestudent-menulist-aufnahmeschluessel" disabled="true"
-							          datasources="<?php echo APP_ROOT ?>rdf/aufnahmeschluessel.rdf.php?optional=true" flex="1"
-						              ref="http://www.technikum-wien.at/aufnahmeschluessel/alle" >
-								<template>
-									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/aufnahmeschluessel/rdf#aufnahmeschluessel"
-							        		      label="rdf:http://www.technikum-wien.at/aufnahmeschluessel/rdf#bezeichnung"
-										  		  uri="rdf:*"/>
-										</menupopup>
-								</template>
-							</menulist>
-							<label value="Studiengang" control="student-prestudent-menulist-studiengang_kz"/>
-							<menulist id="student-prestudent-menulist-studiengang_kz" disabled="true"
-							          datasources="<?php echo APP_ROOT ?>rdf/studiengang.rdf.php" flex="1"
-						              ref="http://www.technikum-wien.at/studiengang/liste" >
-								<template>
-									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/studiengang/rdf#studiengang_kz"
-							        		      label="rdf:http://www.technikum-wien.at/studiengang/rdf#kuerzel - rdf:http://www.technikum-wien.at/studiengang/rdf#bezeichnung"
-										  		  uri="rdf:*"/>
-										</menupopup>
-								</template>
-							</menulist>
-    					</row>
-    					<row>
-    						<vbox>
-								<label value="Anmerkung" control="student-prestudent-textbox-anmerkung"/>
-								<spacer flex="1" />
-      						</vbox>
-							<textbox id="student-prestudent-textbox-anmerkung" multiline="true" disabled="true"/>
-							<label value="Facheinschlaegig berufstaetig" control="student-prestudent-checkbox-facheinschlberuf"/>
-							<vbox>	
-      							<checkbox id="student-prestudent-checkbox-facheinschlberuf" checked="true" disabled="true"/>
-      							<spacer flex="1"/>
-							</vbox>
-      						<label value="Bismelden" control="student-prestudent-checkbox-bismelden"/>
-      						<vbox>	
-      							<checkbox id="student-prestudent-checkbox-bismelden" checked="true" disabled="true"/>
-      							<spacer flex="1"/>
-							</vbox>
-    					</row>
-    				</rows>
-    			</grid>
-    		</groupbox>
+		
    			<groupbox id="student-detail-groupbox-zgv">
-			<caption label="Zugangsvoraussetzung" />
+			<caption id="student-detail-groupbox-caption" label="Zugangsvoraussetzung" />
 				<grid id="student-prestudent-grid-zgv" style="margin:4px;" flex="1">
 				  	<columns  >
     					<column flex="1"/>
@@ -432,6 +341,105 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     					</row>
     				</rows>
     			</grid>
+    		</groupbox>
+    		<groupbox id="student-detail-groupbox-prestudent">
+		<caption label="Prestudent" />
+		<grid id="student-prestudent-grid-prestudent" style="margin:4px;" flex="1">
+				  	<columns  >
+    					<column flex="1"/>
+    					<column flex="5"/>
+    					<column flex="1"/>
+    					<column flex="5"/>
+    					<column flex="1"/>
+    					<column flex="5"/>    					
+  					</columns>
+  					<rows>
+  						<row>
+      						<label value="Aufmerksam durch" control="student-prestudent-menulist-aufmerksamdurch"/>
+      						<menulist id="student-prestudent-menulist-aufmerksamdurch" disabled="true"
+							          datasources="<?php echo APP_ROOT ?>rdf/aufmerksamdurch.rdf.php" flex="1"
+						              ref="http://www.technikum-wien.at/aufmerksamdurch/alle" >
+								<template>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/aufmerksamdurch/rdf#aufmerksamdurch_kurzbz"
+							        		      label="rdf:http://www.technikum-wien.at/aufmerksamdurch/rdf#aufmerksamdurch_kurzbz"
+										  		  uri="rdf:*"/>
+										</menupopup>
+								</template>
+							</menulist>
+							<label value="Berufstaetigkeit" control="student-prestudent-menulist-berufstaetigkeit"/>
+      						<menulist id="student-prestudent-menulist-berufstaetigkeit" disabled="true"
+							          datasources="<?php echo APP_ROOT ?>rdf/berufstaetigkeit.rdf.php?optional=true" flex="1"
+						              ref="http://www.technikum-wien.at/berufstaetigkeit/alle" >
+								<template>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/berufstaetigkeit/rdf#code"
+							        		      label="rdf:http://www.technikum-wien.at/berufstaetigkeit/rdf#bezeichnung"
+										  		  uri="rdf:*"/>
+										</menupopup>
+								</template>
+							</menulist>
+							<label value="Ausbildung" control="student-prestudent-menulist-ausbildung"/>
+      						<menulist id="student-prestudent-menulist-ausbildung" disabled="true"
+							          datasources="<?php echo APP_ROOT ?>rdf/ausbildung.rdf.php?optional=true" flex="1"
+						              ref="http://www.technikum-wien.at/ausbildung/alle" >
+								<template>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/ausbildung/rdf#code"
+							        		      label="rdf:http://www.technikum-wien.at/ausbildung/rdf#bezeichnung"
+										  		  uri="rdf:*"/>
+										</menupopup>
+								</template>
+							</menulist>
+    					</row>
+    					<row>
+      						<label value="Aufnahmeschluessel" control="student-prestudent-menulist-aufnahmeschluessel"/>
+      						<menulist id="student-prestudent-menulist-aufnahmeschluessel" disabled="true"
+							          datasources="<?php echo APP_ROOT ?>rdf/aufnahmeschluessel.rdf.php?optional=true" flex="1"
+						              ref="http://www.technikum-wien.at/aufnahmeschluessel/alle" >
+								<template>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/aufnahmeschluessel/rdf#aufnahmeschluessel"
+							        		      label="rdf:http://www.technikum-wien.at/aufnahmeschluessel/rdf#bezeichnung"
+										  		  uri="rdf:*"/>
+										</menupopup>
+								</template>
+							</menulist>
+							<label value="Studiengang" control="student-prestudent-menulist-studiengang_kz"/>
+							<menulist id="student-prestudent-menulist-studiengang_kz" disabled="true"
+							          datasources="<?php echo APP_ROOT ?>rdf/studiengang.rdf.php" flex="1"
+						              ref="http://www.technikum-wien.at/studiengang/liste" >
+								<template>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/studiengang/rdf#studiengang_kz"
+							        		      label="rdf:http://www.technikum-wien.at/studiengang/rdf#kuerzel - rdf:http://www.technikum-wien.at/studiengang/rdf#bezeichnung"
+										  		  uri="rdf:*"/>
+										</menupopup>
+								</template>
+							</menulist>
+							
+							<label value="Facheinschlaegig berufstaetig" control="student-prestudent-checkbox-facheinschlberuf"/>
+							<checkbox id="student-prestudent-checkbox-facheinschlberuf" checked="true" disabled="true"/>
+							
+    					</row>
+    				</rows>
+    			</grid>
+    			<grid style="margin:4px;" flex="1">
+				  	<columns  >
+    					<column flex="1"/>
+    					<column flex="11"/>
+    					<column flex="1"/>
+    					<column flex="5"/>    					
+  					</columns>
+  					<rows>
+  						<row>
+		    				<label value="Anmerkung" control="student-prestudent-textbox-anmerkung"/>
+		      				<textbox id="student-prestudent-textbox-anmerkung" disabled="true"/>
+		      				<label value="Bismelden" control="student-prestudent-checkbox-bismelden"/>
+		      				<checkbox id="student-prestudent-checkbox-bismelden" checked="true" disabled="true"/>
+						</row>
+					</rows>
+				</grid>      			
     		</groupbox>
     		<groupbox id="student-detail-groupbox-rollen">
 			<caption label="Status" />
