@@ -1438,7 +1438,7 @@ if($result = pg_query($conn_fas, $qry_main))
 											if($updatep2)
 											{
 												$anzahl_pbb_update++;
-												$ausgabe.="Berufspraktikumsfirmenbetreuer aktualisiert: UID='".$projektbetreuerperson_id3."' und Projektarbeit='".$projektarbeitlehreinheit_id."':".$ausgabe_pb2.".\n";
+												$ausgabe.="Berufspraktikumsfirmenbetreuer aktualisiert: UID='".$projektbetreuerperson_id2."' und Projektarbeit='".$projektarbeitlehreinheit_id."':".$ausgabe_pb2.".\n";
 											}
 										}
 									}
