@@ -396,6 +396,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<textbox id="student-projektbetreuer-textbox-person_id" />
 						<textbox id="student-projektbetreuer-textbox-betreuerart_kurzbz_old" />
 						<checkbox id="student-projektbetreuer-checkbox-neu" />
+						<label value="Name" control="student-projektbetreuer-textbox-name"/>
+						<textbox id="student-projektbetreuer-textbox-name" disabled="true" maxlength="32"/>
 					</vbox>
 					<grid style="margin:4px;" flex="1">
 					  	<columns  >
@@ -421,8 +423,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								</menulist>
 							</row>
 							<row>
-								<label value="Name" control="student-projektbetreuer-textbox-name"/>
-								<textbox id="student-projektbetreuer-textbox-name" disabled="true" maxlength="32"/>
+								<button id="student-projektbetreuer-button-neueperson" label="Neue Person anlegen" oncommand="StudentProjektbetreuerNeuePerson()" />
+								<button id="student-projektbetreuer-button-kontaktdaten" label="Kontakttdaten bearbeiten" oncommand="StudentProjektbetreuerKontaktdaten()" />
 							</row>
 							<row>
 								<label value="Art" control="student-projektbetreuer-menulist-betreuerart"/>

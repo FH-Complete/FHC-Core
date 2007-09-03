@@ -111,6 +111,12 @@
 		  	</td>
   		</tr>
 
+  		<!-- FuE -->
+  		<tr>
+			<td class="tdwrap"><a href="#" class="MenuItem" onClick="alert('Dieser Bereich befindet sich im Aufbau')"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;F &amp; E</a>
+		</tr>
+		
+		<!-- Weiterbildung -->
 		<tr>
 			<td class="tdwrap"><a href="private/info/weiterbildung/info.html" target="content" class="MenuItem" onClick="js_toggle_container('Weiterbildung');"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Weiterbildung</a>
 		  	<table class="tabcontent" id="Weiterbildung" style="display: none">
@@ -328,8 +334,18 @@
 						<td class="tdwrap"><a class="Item" href="public/info/verordnungen/EDV_Richtlinien.doc" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;EDV Richtlinien</a></td>
 					</tr>
 					<tr>
-					  	<td class="tdwidth10" nowrap>&nbsp;</td>
-						<td class="tdwrap"><a class="Item" href="public/info/verordnungen/laborordnung.doc" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Laborordnung</a></td>
+					    <td class="tdwidth10" nowrap>&nbsp;</td>
+						<td class="tdwrap"><a href="?Verordnungen" class="MenuItem" onClick="return(js_toggle_container('Laborordnung'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Laborordnung</a>
+						  	<table class="tabcontent" id="Laborordnung" style="display: none">
+						  	<tr>
+							  	<td class="tdwidth10" nowrap>&nbsp;</td>
+								<td class="tdwrap"><a class="Item" href="public/info/verordnungen/laborordnung.doc" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Laborordnung Chemie</a></td>
+							</tr>
+							<tr>
+								<td class="tdwidth10" nowrap>&nbsp;</td>
+								<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Roboter_Laborordnung.doc" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Laborordnung Roboter</a></td>
+							</tr>
+							</table>
 					</tr>
 					</table>
 				</td>

@@ -98,12 +98,12 @@
 									</fo:table-row>
 									<fo:table-row line-height="14pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="80mm" text-align="left">
 												<xsl:text> </xsl:text><xsl:value-of select="betreuer" />
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="120mm" text-align="left">
 												<xsl:text> </xsl:text><xsl:value-of select="themenbereich" />
 											</fo:block>
 										</fo:table-cell>
@@ -113,7 +113,7 @@
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="36.4mm" text-align="left">
 												<xsl:text> </xsl:text>
 											</fo:block>
 										</fo:table-cell>
@@ -125,7 +125,7 @@
 								<fo:table-body>
 						            <fo:table-row line-height="14pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left" font-weight="bold">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="261.6mm" text-align="left" font-weight="bold">
 												<xsl:text> Technisches Fachgebiet:</xsl:text>
 											</fo:block>
 										</fo:table-cell>
@@ -200,7 +200,7 @@
 								<fo:table-body>
 						            <fo:table-row line-height="14pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left" font-weight="bold">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="261.6mm" text-align="left" font-weight="bold">
 												<xsl:text> Nichttechnisches Fachgebiet:</xsl:text>
 											</fo:block>
 										</fo:table-cell>

@@ -153,9 +153,9 @@ class projektbetreuer
 			return false;
 		}
 		
-		if(!is_numeric($this->note))
+		if($this->note!='' && !is_numeric($this->note))
 		{
-			$this->errormsg = 'Note muß ein numerischer Wert sein - person_id/projektarbeit: '.$this->person_id.'/'.$this->projektarbeit_id;
+			$this->errormsg = 'Note muss ein numerischer Wert sein - person_id/projektarbeit: '.$this->person_id.'/'.$this->projektarbeit_id;
 			return false;
 		}
 		if(!is_numeric($this->punkte))
