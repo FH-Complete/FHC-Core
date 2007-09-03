@@ -91,6 +91,20 @@ echo '<?xml-stylesheet href="../datepicker/datepicker.css" type="text/css"?>';
 						</template>
 					</menulist>
 				</row>
+				<row>
+					<label value="Studiensemester" control="student-konto-neu-menulist-studiensemester"/>
+					<menulist id="student-konto-neu-menulist-studiensemester" 
+					          datasources="<?php echo APP_ROOT ?>rdf/studiensemester.rdf.php" flex="1"
+					          ref="http://www.technikum-wien.at/studiensemester/liste" >
+						<template>
+							<menupopup>
+								<menuitem value="rdf:http://www.technikum-wien.at/studiensemester/rdf#kurzbz"
+					        		      label="rdf:http://www.technikum-wien.at/studiensemester/rdf#kurzbz"
+								  		  uri="rdf:*"/>
+								</menupopup>
+						</template>
+					</menulist>
+				</row>
 			</rows>
 	</grid>
 	<hbox>

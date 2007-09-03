@@ -91,7 +91,7 @@ $summe_lv=array();
 foreach ($result_student as $row_student)
 {
 	$i++;
-	echo "<tr><td>$i</td><td>$row_student->vorname $row_student->nachname</td><td>$row_student->matrikelnr</td>";
+	echo "<tr><td>$i</td><td>$row_student->nachname $row_student->vorname</td><td>$row_student->matrikelnr</td>";
 	
 	$noten = array();
 	$qry = "SELECT * FROM lehre.tbl_zeugnisnote WHERE student_uid='$row_student->uid' AND studiensemester_kurzbz='$semester_aktuell'";

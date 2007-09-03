@@ -60,7 +60,7 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
       </RDF:li>	
 ';
 }
-$qry = "SET CLIENT_ENCODING to 'UNICODE'; SELECT * FROM bis.tbl_zgvmaster ORDER BY zgvmas_kurzbz";
+$qry = "SET CLIENT_ENCODING to 'UNICODE'; SELECT * FROM bis.tbl_zgvmaster ORDER BY zgvmas_code";
 if($result = pg_query($conn, $qry))
 {
 	while($row = pg_fetch_object($result))

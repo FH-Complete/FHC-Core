@@ -418,7 +418,15 @@ if(!$error)
 					else 
 						$studiensemester = $prestd->studiensemester_kurzbz;
 					$hlp = new prestudent($conn);
-					$hlp->getPrestudentRolle($_POST['prestudent_id'], $_POST['rolle_kurzbz'], $studiensemester);
+					
+					if($_POST['rolle_kurzbz']=='Unterbrecher' || $_POST['rolle_kurzbz']=='Abbrecher')
+						$sem=0;
+					elseif($_POST['rolle_kurzbz']=='Student')
+						$sem=$_POST['semester'];
+					else 
+						$sem=$prestd->ausbildungssemester;
+						
+					$hlp->getPrestudentRolle($_POST['prestudent_id'], $_POST['rolle_kurzbz'], $studiensemester, "datum, insertamum", $sem);
 					if(count($hlp->result)>0)
 					{
 						$errormsg = 'Diese Rolle ist bereits vorhanden';
@@ -431,7 +439,7 @@ if(!$error)
 						$prestd_neu->rolle_kurzbz = $_POST['rolle_kurzbz'];
 						$prestd_neu->studiensemester_kurzbz = $studiensemester;
 						$prestd_neu->datum = date('Y-m-d');
-						$prestd_neu->ausbildungssemester = $prestd->ausbildungssemester;
+						$prestd_neu->ausbildungssemester = $sem;
 						$prestd_neu->insertamum = date('Y-m-d H:i:s');
 						$prestd_neu->insertvon = $user;
 						$prestd_neu->new = true;
@@ -460,6 +468,13 @@ if(!$error)
 								$student->semester = $_POST['semester'];
 								$student->save(false, false);
 								$student->save_studentlehrverband(false);
+								//Aktiv Status setzen
+								$benutzer = new benutzer($conn);
+								if($benutzer->load($uid))
+								{
+									$benutzer->bnaktiv=true;
+									$benutzer->save(false, false);
+								}								
 							}
 							$return = true;
 						}
@@ -978,7 +993,7 @@ if(!$error)
 				$buchung = new konto($conn, null, true);
 				$buchung->person_id = $person_id;
 				$buchung->studiengang_kz = $_POST['studiengang_kz'];
-				$buchung->studiensemester_kurzbz = $semester_aktuell;
+				$buchung->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
 				$buchung->buchungsnr_verweis='';
 				$buchung->betrag = $_POST['betrag'];
 				$buchung->buchungsdatum = $_POST['buchungsdatum'];

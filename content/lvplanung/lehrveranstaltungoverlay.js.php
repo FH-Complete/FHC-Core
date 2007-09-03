@@ -442,7 +442,10 @@ function LeDelete()
         var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehreinheit_id"] : "lehrveranstaltung-treecol-lehreinheit_id";
 		var lehreinheit_id=tree.view.getCellText(tree.currentIndex,col);
 		if(lehreinheit_id=='')
-			return false
+		{
+			alert('Lehrveranstaltungen koennen nur von Administratoren geloescht werden');
+			return false;
+		}
 	}
 	catch(e)
 	{
@@ -662,6 +665,7 @@ function LeAuswahl()
 		{
 			LeDetailDisableFields(false);
 			LehrveranstaltungNotenDisableFields(true);
+			LehrveranstaltungNotenTreeUnload();
 
 			document.getElementById('lehrveranstaltung-toolbar-neu').disabled=true;
 			document.getElementById('lehrveranstaltung-toolbar-del').disabled=false;
@@ -1160,6 +1164,32 @@ function LehrveranstaltungNotenDetailDisableFields(val)
 {
 	document.getElementById('lehrveranstaltung-noten-button-speichern').disabled=val;
 	document.getElementById('lehrveranstaltung-noten-menulist-note').disabled=val;
+}
+
+// ****
+// * Noten Trees Loeschen
+// ****
+function LehrveranstaltungNotenTreeUnload()
+{
+ 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+   
+	notentree = document.getElementById('lehrveranstaltung-noten-tree');
+	var oldDatasources = notentree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		notentree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	notentree.builder.rebuild();
+	
+	var lvgesamtnotentree = document.getElementById('lehrveranstaltung-lvgesamtnoten-tree');
+	var oldDatasources = lvgesamtnotentree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		lvgesamtnotentree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	lvgesamtnotentree.builder.rebuild();
 }
 
 // ****

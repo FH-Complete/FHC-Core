@@ -348,7 +348,7 @@ else
 		  	  <td class='tdwrap'>&nbsp;</td>
 		  	</tr>
 			<tr> 
-              <td width="260" class='tdwrap'>Isailovic Zirka</td>
+              <td width="260" class='tdwrap'>Isailovic Julia</td>
               <td width="50" class='tdwrap'>224</td>
               <td class='tdwrap'><?php echo ($visible?'<a class="Item" href="mailto:isailovic@technikum-wien.at">isailovic@technikum-wien.at</a>':'')?></td>
               <td width="56" class='tdwrap'>&nbsp;</td>

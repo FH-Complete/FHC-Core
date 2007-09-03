@@ -98,6 +98,7 @@ function convdate($date)
 	    		<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
 				<STUDENT:status><![CDATA['.$status.']]></STUDENT:status>
 	    		<STUDENT:anmerkungen>'.($row->anmerkungen==''?'&#xA0;':'<![CDATA['.$row->anmerkungen.']]>').'</STUDENT:anmerkungen>
+	    		<STUDENT:anmerkungpre>'.($row->anmerkung==''?'&#xA0;':'<![CDATA['.$row->anmerkung.']]>').'</STUDENT:anmerkungpre>
 	    		<STUDENT:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz>
 				<STUDENT:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></STUDENT:studiengang>
 	      	</RDF:Description>
@@ -309,8 +310,8 @@ if($xmlformat=='rdf')
 						JOIN public.tbl_benutzer ON (student_uid=uid) JOIN public.tbl_person USING (person_id)
 					WHERE ";*/
 		$sql_query="SET CLIENT_ENCODING TO 'UNICODE';
-					SELECT person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,	vorname, vornamen,
-						nachname, gebdatum, anmerkungen,ersatzkennzeichen,svnr, tbl_student.matrikelnr,
+					SELECT p.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,	vorname, vornamen,
+						nachname, gebdatum, anmerkungen,ersatzkennzeichen,svnr, tbl_student.matrikelnr, anmerkung,
 						tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 						tbl_studentlehrverband.studiengang_kz,
 						(	SELECT kontakt
@@ -320,7 +321,7 @@ if($xmlformat=='rdf')
 						)
 						AS email_privat
 						FROM public.tbl_studentlehrverband JOIN public.tbl_student USING (student_uid)
-							JOIN public.tbl_benutzer ON (student_uid=uid) JOIN public.tbl_person p USING (person_id) ";
+							JOIN public.tbl_benutzer ON (student_uid=uid) JOIN public.tbl_person p USING (person_id)  JOIN public.tbl_prestudent USING(prestudent_id) ";
 		if($gruppe_kurzbz!=null)
 			$sql_query.= "JOIN public.tbl_benutzergruppe USING (uid) ";
 		//$sql_query.= " WHERE tbl_person.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid = tbl_student.student_uid AND tbl_studentlehrverband.student_uid=tbl_student.student_uid AND $where ORDER BY nachname, vorname";
