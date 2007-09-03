@@ -91,7 +91,7 @@ function myaddslashes($var)
 <body>
 <?php
 //nation
-$qry_main = "SELECT * FROM berufspraktikum;";
+$qry_main = "SELECT *, creationdate::timestamp AS insertamum FROM berufspraktikum;";
 
 if($result = pg_query($conn_fas, $qry_main))
 {
@@ -140,7 +140,7 @@ if($result = pg_query($conn_fas, $qry_main))
 		$projektarbeitanmerkung			='';		
 		//$projektarbeitupdateamum		='';
 		$projektarbeitupdatevon			="SYNC";
-		$projektarbeitinsertamum			=$row->creationdate;
+		$projektarbeitinsertamum			=$row->insertamum;
 		//$projektarbeitinsertvon			=$row->creationuser;
 		$projektarbeitext_id				=$row->berufspraktikum_pk;	
 		
@@ -160,7 +160,7 @@ if($result = pg_query($conn_fas, $qry_main))
 		$lehreinheitlvnr				='';
 		//$lehreinheitupdateamum			='';
 		$lehreinheitupdatevon			="SYNC";
-		$lehreinheitinsertamum			=$row->creationdate;
+		$lehreinheitinsertamum			=$row->insertamum;
 		//$lehreinheitinsertvon			=$row->creationuser;
 		$lehreinheitext_id				=$row->berufspraktikum_pk;
 		
@@ -566,7 +566,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									$ausgabe_le="Insertvon: '".$lehreinheitinsertvon."' (statt '".$row2->insertvon."')";
 								}
 							}
-							if(date("d.m.Y", $row2->insertamum)!=date("d.m.Y", $lehreinheitinsertamum)) 
+							if($row2->insertamum!=$lehreinheitinsertamum) 
 							{
 								$updatele=true;
 								if(strlen(trim($ausgabe_le))>0)
@@ -870,7 +870,7 @@ if($result = pg_query($conn_fas, $qry_main))
 										$ausgabe_pa="Anmerkung: '".$projektarbeitanmerkung."' (statt '".$row3->anmerkung."')";
 									}
 								}
-								if(date("d.m.Y", $row3->insertamum)!=date("d.m.Y", $projektarbeitinsertamum) )
+								if($row3->insertamum!=$projektarbeitinsertamum)
 								{
 									$updatep=true;
 									if(strlen(trim($ausgabe_pa))>0)
@@ -999,7 +999,7 @@ if($result = pg_query($conn_fas, $qry_main))
 								$projektbetreuerstundensatz		=$row->stdhonorar;
 								//$projektbetreuerupdateamum		=$row->;
 								$projektbetreuerupdatevon			="SYNC";
-								$projektbetreuerinsertamum		=$row->creationdate;
+								$projektbetreuerinsertamum		=$row->insertamum;
 								//$projektbetreuerinsertvon	 		="SYNC";
 								$projektbetreuerext_id			=$row->berufspraktikum_pk;
 								
@@ -1126,7 +1126,7 @@ if($result = pg_query($conn_fas, $qry_main))
 											$ausgabe_pb="Stundensatz: '".$projektbetreuerstundensatz."' (statt '".$row2->stundensatz."')";
 										}
 									}
-									if(date("d.m.Y", $row2->insertamum)!=date("d.m.Y", $projektbetreuerinsertamum)) 
+									if($row2->insertamum!=$projektbetreuerinsertamum) 
 									{
 										$updatep1=true;
 										if(strlen(trim($ausgabe_pb))>0)
@@ -1203,7 +1203,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									$projektbetreuerstundensatz		='';
 									//$projektbetreuerupdateamum		=$row->;
 									$projektbetreuerupdatevon			="SYNC";
-									$projektbetreuerinsertamum		=$row->creationdate;
+									$projektbetreuerinsertamum		=$row->insertamum;
 									//$projektbetreuerinsertvon	 		="SYNC";
 									$projektbetreuerext_id			=$row->berufspraktikum_pk;
 									
@@ -1331,7 +1331,7 @@ if($result = pg_query($conn_fas, $qry_main))
 												$ausgabe_pb="Stundensatz: '".$projektbetreuerstundensatz."' (statt '".$row2->stundensatz."')";
 											}
 										}
-										if(date("d.m.Y", $row2->insertamum)!=date("d.m.Y", $projektbetreuerinsertamum)) 
+										if($row2->insertamum!=$projektbetreuerinsertamum) 
 										{
 											$updatep2=true;
 											if(strlen(trim($ausgabe_pb))>0)
@@ -1404,7 +1404,7 @@ if($result = pg_query($conn_fas, $qry_main))
 									//ROLLBACK
 									$anzahl_fehler_pbg++;
 									$ausgabe='';
-									$text1.="\n***********Berufspraktikum:".$row->berufspraktium_pk."\n";
+									$text1.="\n***********Berufspraktikum:".$row->berufspraktikum_pk."\n";
 									$text1.=$error_log;
 									$text1.=" R1\n";
 									$text1.="***********\n";
