@@ -118,26 +118,26 @@ if(isset($_GET['deletekontakt']))
 if(isset($_POST['saveadresse']))
 {
 	$adresse_obj = new adresse($conn);
-	
+
 	if(is_numeric($adresse_id))
 	{
 		if($adresse_obj->load($adresse_id))
 		{
 			$adresse_obj->new = false;
 		}
-		else 
+		else
 		{
 			$errormsg = 'Adresse wurde nicht gefunden:'.$adresse_id;
 			$error=true;
 		}
 	}
-	else 
+	else
 	{
 		$adresse_obj->new = true;
 		$adresse_obj->insertamum = date('Y-m-d H:i:s');
 		$adresse_obj->insertvon = $user;
 	}
-	
+
 	if(!$error)
 	{
 		$adresse_obj->person_id=$person_id;
@@ -152,14 +152,14 @@ if(isset($_POST['saveadresse']))
 		$adresse_obj->firma_id = $firma_id;
 		$adresse_obj->updateamum = date('Y-m-d H:i:s');
 		$adresse_obj->updatvon = $user;
-		
+
 		//var_dump($adresse_obj);
-		
+
 		if(!$adresse_obj->save())
 		{
 			$errormsg = 'Fehler beim Speichern der Adresse:'.$adresse_obj->errormsg;
 		}
-		else 
+		else
 		{
 			$errormsg = 'Daten wurden gespeichert';
 		}
@@ -170,26 +170,26 @@ if(isset($_POST['saveadresse']))
 if(isset($_POST['savekontakt']))
 {
 	$kontakt_obj = new kontakt($conn);
-	
+
 	if(is_numeric($kontakt_id))
 	{
 		if($kontakt_obj->load($kontakt_id))
 		{
 			$kontakt_obj->new = false;
 		}
-		else 
+		else
 		{
 			$errormsg = 'Kontakt wurde nicht gefunden:'.$kontakt_id;
 			$error=true;
 		}
 	}
-	else 
+	else
 	{
 		$kontakt_obj->new = true;
 		$kontakt_obj->insertamum = date('Y-m-d H:i:s');
 		$kontakt_obj->insertvon = $user;
 	}
-	
+
 	if(!$error)
 	{
 		$kontakt_obj->person_id=$person_id;
@@ -200,23 +200,23 @@ if(isset($_POST['savekontakt']))
 		$kontakt_obj->zustellung = $zustellung;
 		$kontakt_obj->updateamum = date('Y-m-d H:i:s');
 		$kontakt_obj->updatvon = $user;
-						
+
 		if(!$kontakt_obj->save())
 		{
 			$errormsg = 'Fehler beim Speichern des Kontaktes:'.$kontakt_obj->errormsg;
 		}
-		else 
+		else
 		{
 			$errormsg = 'Daten wurden gespeichert';
 		}
 	}
 }
 
-//Person laden	
+//Person laden
 $person = new person($conn);
 if(!$person->load($person_id))
 	die('Person wurde nicht gefunden');
-	
+
 //Nationen laden
 $nation_arr = array();
 $nation = new nation($conn);
@@ -224,7 +224,7 @@ $nation->getAll();
 
 foreach($nation->nation as $row)
 	$nation_arr[$row->code]=$row->kurztext;
-	
+
 //Firmen laden
 
 $firma_arr = array();
@@ -233,7 +233,7 @@ $firma->getAll();
 
 foreach($firma->result as $row)
 	$firma_arr[$row->firma_id]=$row->name;
-	
+
 $adresstyp_arr = array('h'=>'Hauptwohnsitz','n'=>'Nebenwohnsitz','f'=>'Firma');
 
 //Kontakttypen laden
@@ -246,7 +246,7 @@ foreach ($kontakt_obj->result as $row)
 echo "<h2>Kontaktdaten von $person->vorname $person->nachname</h2>";
 echo $errormsg.'<br>';
 
-// *** ADRESSEN *** 
+// *** ADRESSEN ***
 echo "<h3>Adressen:</h3>";
 echo "<form action='".$_SERVER['PHP_SELF']."?person_id=$person_id' method='POST' />";
 echo "<table class='liste'><tr><th>STRASSE</th><th>PLZ</th><th>ORT</th><th>GEMEINDE</th><th>NATION</th><th>TYP</th><th>HEIMAT</th><th>ZUSTELLUNG</th><th>FIRMA</th></tr>";
@@ -287,7 +287,7 @@ if(isset($_GET['editadresse']))
 		$savebuttonvalue='Speichern';
 	}
 }
-else 
+else
 {
 	$strasse='';
 	$plz='';
@@ -311,43 +311,43 @@ else
 	{
 		if($code==$nation)
 			$selected='selected';
-		else 
+		else
 			$selected='';
-			
+
 		echo "<OPTION value='$code' $selected>$kurzbz</OPTION>";
 	}
-	
+
 	echo "</SELECT></td>";
 	echo "<td><SELECT name='adresstyp'>";
 	foreach($adresstyp_arr as $code=>$kurzbz)
 	{
 		if($code==$typ)
 			$selected='selected';
-		else 
+		else
 			$selected='';
-			
+
 		echo "<OPTION value='$code' $selected>$kurzbz</OPTION>";
 	}
 	echo "</SELECT></td>";
 	echo "<td><input type='checkbox' name='heimatadresse' ".($heimatadresse?'checked':'')." /></td>";
 	echo "<td><input type='checkbox' name='zustelladresse' ".($zustelladresse?'checked':'')." /></td>";
-	echo "<td><SELECT name='firma'>";
+	echo "<td><SELECT name='firma' style='width:200px'>";
 	echo "<OPTION value=''>-- keine Auswahl --</OPTION>";
 	foreach ($firma_arr as $id=>$kurzbz)
 	{
 		if($id==$firma_id)
 			$selected='selected';
-		else 
+		else
 			$selected='';
-		
+
 		echo "<OPTION value='$id' $selected>$kurzbz</OPTION>";
 	}
 	echo "</SELECT></td>";
 	echo "<td><input type='submit' name='saveadresse' value='$savebuttonvalue' /></td>";
-	
+
 	echo "</table>";
 	echo "</form>";
-	
+
 // *** Kontakte ***
 echo "<h3>Kontakte:</h3>";
 echo "<form action='".$_SERVER['PHP_SELF']."?person_id=$person_id' method='POST' />";
@@ -380,10 +380,10 @@ if(isset($_GET['editkontakt']))
 		$firma_id = $kontakt_obj->firma_id;
 		$savebuttonvalue='Speichern';
 	}
-	else 	
+	else
 		echo 'Fehler beim Laden'.$kontakt_id;
 }
-else 
+else
 {
 	$kontakt_id='';
 	$kontakttyp='';
@@ -395,18 +395,18 @@ else
 	echo "<input type='hidden' name='kontakt_id' value='".$kontakt_id."' />";
 	echo '<tr class="liste1">';
 	echo "<td><SELECT name='kontakttyp'>";
-	
+
 	foreach ($kontakttyp_arr as $kurzbz)
 	{
 		if($kurzbz==$kontakttyp)
 			$selected='selected';
-		else 
+		else
 			$selected='';
-		
+
 		echo "<OPTION value='$kurzbz' $selected>$kurzbz</OPTION>";
 	}
 	echo "</SELECT></td>";
-	
+
 	echo "<td><input type='text' name='kontakt' value='".htmlentities($kontakt)."' /></td>";
 	echo "<td><input type='checkbox' name='zustellung' ".($zustellung?'checked':'')." /></td>";
 	echo "<td><input type='text' name='anmerkung' value='".htmlentities($anmerkung)."' /></td>";
@@ -416,14 +416,14 @@ else
 	{
 		if($id==$firma_id)
 			$selected='selected';
-		else 
+		else
 			$selected='';
-		
+
 		echo "<OPTION value='$id' $selected>$kurzbz</OPTION>";
 	}
 	echo "</SELECT></td>";
 	echo "<td><input type='submit' name='savekontakt' value='$savebuttonvalue' /></td>";
-	
+
 	echo "</table>";
 	echo "</form>";
 
