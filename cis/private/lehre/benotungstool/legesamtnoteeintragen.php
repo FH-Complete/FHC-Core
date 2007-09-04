@@ -117,6 +117,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '') && ((($note>0
 		$legesamtnote->benotungsdatum = $jetzt;
 		$legesamtnote->updateamum = $jetzt;
 		$legesamtnote->updatevon = $user;
+		$legesamtnote->new = false;
 		$response = "update";
 	}
 	if (!$legesamtnote->save())

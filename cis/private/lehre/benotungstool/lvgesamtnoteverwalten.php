@@ -34,6 +34,7 @@ require_once('../../../../include/datum.class.php');
 require_once('../../../../include/legesamtnote.class.php');
 require_once('../../../../include/lvgesamtnote.class.php');
 require_once('../../../../include/zeugnisnote.class.php');
+$ts = time();
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -91,7 +92,7 @@ require_once('../../../../include/zeugnisnote.class.php');
 		erzeugeAnfrage(); 
 	    //note = document.getElementById(uid).note.value;
 	    stud_uid = uid;
-	    var url= '<?php echo "lvgesamtnoteeintragen.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem"; ?>';
+	    var url= '<?php echo "lvgesamtnoteeintragen.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem&$ts"; ?>';
 	    url += '&submit=1&student_uid='+uid+"&note="+note;
 	    anfrage.open("GET", url, true);
 	    anfrage.onreadystatechange = updateSeite;
