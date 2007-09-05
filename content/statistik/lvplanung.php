@@ -30,18 +30,18 @@ if(!$conn = pg_pconnect(CONN_STRING))
 	die('Datenbankverbindung konnte nicht hergestellt werden');
 
 if(isset($_GET['studiengang_kz']))
-	$studiengang_kz = $_GET['studiengang_kz'];	
-else 
-	$studiengang_kz = '';	
-	
+	$studiengang_kz = $_GET['studiengang_kz'];
+else
+	$studiengang_kz = '';
+
 if(isset($_GET['semester']))
 	$semester = $_GET['semester'];
-else 
+else
 	$semester = '';
 
 if(isset($_GET['uid']))
 	$mitarbeiter_uid = $_GET['uid'];
-else 
+else
 	$mitarbeiter_uid = '';
 
 $user = get_uid();
@@ -58,7 +58,7 @@ if($mitarbeiter_uid!='')
 	$mitarbeiter = new benutzer($conn);
 	$mitarbeiter->load($mitarbeiter_uid);
 }
-	
+
 echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
@@ -77,22 +77,22 @@ table td
 
 if($studiengang_kz!='')
 	echo '<h2>LV Uebersicht '.$studiengang->kuerzel.' '.($semester!=''?"$semester. Semester":'').'</h2>';
-else 
+else
 	echo '<h2>LV Uebersicht '.$mitarbeiter->nachname.' '.$mitarbeiter->vorname.'</h2>';
 
 if($studiengang_kz!='')
 {
-	$qry = "SELECT 
-				tbl_lehrveranstaltung.kurzbz as kurzbz, tbl_lehrveranstaltung.bezeichnung as bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id, 
+	$qry = "SELECT
+				tbl_lehrveranstaltung.kurzbz as kurzbz, tbl_lehrveranstaltung.bezeichnung as bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
 				tbl_lehrveranstaltung.ects as ects, tbl_lehrveranstaltung.semesterstunden as semesterstunden,
 				tbl_lehrfach.kurzbz as lf_kurzbz, tbl_lehrfach.bezeichnung as lf_bezeichnung, tbl_lehreinheit.lehreinheit_id as lehreinheit_id,
 				tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz, tbl_lehreinheitmitarbeiter.semesterstunden as lektor_semesterstunden,
 				tbl_lehreinheitmitarbeiter.stundensatz as lektor_stundensatz, tbl_lehreinheitmitarbeiter.faktor as lektor_faktor,
 				tbl_person.vorname, tbl_person.nachname
-			FROM 
-				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, 
+			FROM
+				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter,
 				lehre.tbl_lehrfach, public.tbl_benutzer, public.tbl_person
-			WHERE 
+			WHERE
 				tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
 				tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND
@@ -104,19 +104,19 @@ if($studiengang_kz!='')
 		$qry.=" AND tbl_lehrveranstaltung.semester='".addslashes($semester)."'";
 	$qry.=" ORDER BY tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehreinheit.lehreinheit_id";
 }
-else 
+else
 {
-$qry = "SELECT 
-				tbl_lehrveranstaltung.kurzbz as kurzbz, tbl_lehrveranstaltung.bezeichnung as bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id, 
+$qry = "SELECT
+				tbl_lehrveranstaltung.kurzbz as kurzbz, tbl_lehrveranstaltung.bezeichnung as bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
 				tbl_lehrveranstaltung.ects as ects, tbl_lehrveranstaltung.semesterstunden as semesterstunden,
 				tbl_lehrfach.kurzbz as lf_kurzbz, tbl_lehrfach.bezeichnung as lf_bezeichnung, tbl_lehreinheit.lehreinheit_id as lehreinheit_id,
 				tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz, tbl_lehreinheitmitarbeiter.semesterstunden as lektor_semesterstunden,
 				tbl_lehreinheitmitarbeiter.stundensatz as lektor_stundensatz, tbl_lehreinheitmitarbeiter.faktor as lektor_faktor,
 				tbl_person.vorname, tbl_person.nachname
-			FROM 
-				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, 
+			FROM
+				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter,
 				lehre.tbl_lehrfach, public.tbl_benutzer, public.tbl_person
-			WHERE 
+			WHERE
 				tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
 				tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND
@@ -124,7 +124,7 @@ $qry = "SELECT
 				tbl_person.person_id=tbl_benutzer.person_id AND
 				tbl_lehreinheitmitarbeiter.mitarbeiter_uid='".addslashes($mitarbeiter_uid)."' AND
 				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."'";
-	$qry.=" ORDER BY tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehreinheit.lehreinheit_id";	
+	$qry.=" ORDER BY tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehreinheit.lehreinheit_id";
 }
 echo '<table class="liste">';
 echo '<tr>';
@@ -158,7 +158,7 @@ if($result = pg_query($conn, $qry))
 				echo "<td align='right' style='border-top: 1px solid black; font-weight: bold;'>".sprintf('%.2f',$stunden_lv)."</td>";
 				echo '<td>&nbsp;</td>';
 				echo '<td>&nbsp;</td>';
-				echo "<td align='right' style='border-top: 1px solid black; font-weight: bold'>".number_format($kosten_lv,2,',','.')." ¤</td>";
+				echo "<td align='right' style='border-top: 1px solid black; font-weight: bold'>".number_format($kosten_lv,2,',','.')." &euro;</td>";
 				echo '<td>&nbsp;</td>';
 				echo '</tr>';
 				$gesamtkosten_lva +=$kosten_lv;
@@ -178,7 +178,7 @@ if($result = pg_query($conn, $qry))
 			echo '<td>&nbsp;</td>';
 			echo '</tr>';
 		}
-		
+
 		$gruppen='';
 		$qry_grp = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
 		if($result_grp=pg_query($conn, $qry_grp))
@@ -187,7 +187,7 @@ if($result = pg_query($conn, $qry))
 			{
 				if($gruppen=='')
 					$gruppen = ($row_grp->gruppe_kurzbz!=''?$row_grp->gruppe_kurzbz:trim($row_grp->semester.$row_grp->verband.$row_grp->gruppe));
-				else 
+				else
 					$gruppen .= ','.($row_grp->gruppe_kurzbz!=''?$row_grp->gruppe_kurzbz:trim($row_grp->semester.$row_grp->verband.$row_grp->gruppe));
 			}
 		}
@@ -199,7 +199,7 @@ if($result = pg_query($conn, $qry))
 		echo "<td align='right'>$row->lektor_semesterstunden</td>";
 		echo "<td>$gruppen</td>";
 		echo "<td>$row->nachname $row->vorname</td>";
-		echo "<td align='right'>".number_format(($row->lektor_stundensatz*$row->lektor_faktor*$row->lektor_semesterstunden),2,',','.')." ¤</td>";
+		echo "<td align='right'>".number_format(($row->lektor_stundensatz*$row->lektor_faktor*$row->lektor_semesterstunden),2,',','.')." &euro;</td>";
 		echo '<td>&nbsp;</td>';
 		echo '</tr>';
 		$kosten_lv +=($row->lektor_stundensatz*$row->lektor_faktor*$row->lektor_semesterstunden);
@@ -214,16 +214,16 @@ if($result = pg_query($conn, $qry))
 	echo "<td align='right' style='border-top: 1px solid black; font-weight: bold;'>".sprintf('%.2f',$stunden_lv)."</td>";
 	echo '<td>&nbsp;</td>';
 	echo '<td>&nbsp;</td>';
-	echo "<td align='right' style='border-top: 1px solid black; font-weight: bold'>".number_format($kosten_lv,2,',','.')." ¤</td>";
-	echo '<td align="right"><b>'.number_format($gesamtkosten_lva,2,',','.').' ¤</b></td>';
+	echo "<td align='right' style='border-top: 1px solid black; font-weight: bold'>".number_format($kosten_lv,2,',','.')." &euro;</td>";
+	echo '<td align="right"><b>'.number_format($gesamtkosten_lva,2,',','.').' &euro;</b></td>';
 	echo '</tr>';
 }
 
 if($studiengang_kz!='')
 {
-	$qry = "SELECT 
-				* 
-			FROM 
+	$qry = "SELECT
+				*
+			FROM
 				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektbetreuer, public.tbl_person
 			WHERE
 				tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
@@ -234,15 +234,15 @@ if($studiengang_kz!='')
 				tbl_lehreinheit.studiensemester_kurzbz='$semester_aktuell' AND
 				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0
 				";
-	
+
 	if($semester!='')
 		$qry.=" AND tbl_lehrveranstaltung.semester='$semester'";
 }
-else 
+else
 {
-	$qry = "SELECT 
-				* 
-			FROM 
+	$qry = "SELECT
+				*
+			FROM
 				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektbetreuer, public.tbl_person
 			WHERE
 				tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
@@ -254,13 +254,13 @@ else
 				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0
 				";
 }
-	
+
 if($result = pg_query($conn, $qry))
 {
 	if(pg_num_rows($result)>0)
 	{
 		echo '<tr><td colspan="2"><b>Betreuungen</b></td></tr>';
-		
+
 		$gesamtkosten_betreuung=0;
 		$stunden_betreuung=0;
 		while($row = pg_fetch_object($result))
@@ -275,13 +275,13 @@ if($result = pg_query($conn, $qry))
 			$benutzer->load($row->student_uid);
 			echo "<td>$benutzer->nachname $benutzer->vorname</td>";
 			echo "<td>$row->nachname $row->vorname</td>";
-			echo "<td align='right'>".number_format(($row->stundensatz*$row->faktor*$row->stunden),2,',','.')." ¤</td>";
+			echo "<td align='right'>".number_format(($row->stundensatz*$row->faktor*$row->stunden),2,',','.')." &euro;</td>";
 			echo '<td>&nbsp;</td>';
 			echo '</tr>';
 			$gesamtkosten_betreuung +=($row->stundensatz*$row->faktor*$row->stunden);
 			$stunden_betreuung+=$row->stunden;
 		}
-		
+
 		echo '<tr>';
 		echo '<td>&nbsp;</td>';
 		echo "<td>&nbsp;</td>";
@@ -290,10 +290,10 @@ if($result = pg_query($conn, $qry))
 		echo "<td align='right' style='border-top: 1px solid black;'><b>".number_format($stunden_betreuung,2)."</b></td>";
 		echo "<td>&nbsp;</td>";
 		echo "<td>&nbsp;</td>";
-		echo "<td align='right' style='border-top: 1px solid black;'><b>".number_format($gesamtkosten_betreuung,2,',','.')." ¤</b></td>";
-		echo "<td align='right' ><b>".number_format($gesamtkosten_betreuung,2,',','.')." ¤</b></td>";
+		echo "<td align='right' style='border-top: 1px solid black;'><b>".number_format($gesamtkosten_betreuung,2,',','.')." &euro;</b></td>";
+		echo "<td align='right' ><b>".number_format($gesamtkosten_betreuung,2,',','.')." &euro;</b></td>";
 		echo '</tr>';
-		
+
 		echo '<tr>';
 		echo '<td>&nbsp;</td>';
 		echo "<td>&nbsp;</td>";
@@ -303,11 +303,11 @@ if($result = pg_query($conn, $qry))
 		echo "<td>&nbsp;</td>";
 		echo "<td>&nbsp;</td>";
 		echo "<td>&nbsp;</td>";
-		echo "<td align='right' style='border-top: 1px solid black;'><b>".number_format(($gesamtkosten_betreuung+$gesamtkosten_lva),2,',','.')." ¤</b></td>";
+		echo "<td align='right' style='border-top: 1px solid black;'><b>".number_format(($gesamtkosten_betreuung+$gesamtkosten_lva),2,',','.')." &euro;</b></td>";
 		echo '</tr>';
-	}	
+	}
 }
-	
+
 echo '</table>';
 ?>
 </body>
