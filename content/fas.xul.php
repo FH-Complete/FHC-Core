@@ -83,6 +83,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-statistic-projektarbeit:command" oncommand="StatistikPrintProjektarbeit();"/>
   <command id="menu-statistic-abschlusspruefung:command" oncommand="StatistikPrintAbschlusspruefung();"/>
   <command id="menu-statistic-notenspiegel:command" oncommand="StatistikPrintNotenspiegel();"/>
+  <command id="menu-statistic-bewerberstatistik:command" oncommand="StatistikPrintBewerberstatistik();"/>
   <command id="menu-dokumente-inskriptionsbestaetigung:command" oncommand="StudentPrintInskriptionsbestaetigung();"/>
   <command id="menu-dokumente-zeugnis:command" oncommand="StudentCreateZeugnis();"/>
   <command id="menu-dokumente-diplsupplement:command" oncommand="StudentCreateDiplSupplement();"/>
@@ -217,6 +218,12 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                label     = "&menu-statistic-notenspiegel.label;"
                command   =  "menu-statistic-notenspiegel:command"
                accesskey = "&menu-statistic-notenspiegel.accesskey;"/>
+             <menuitem
+               id        =  "menu-statistic-bewerberstatistik"
+               key       =  "menu-statistic-bewerberstatistik:key"
+               label     = "&menu-statistic-bewerberstatistik.label;"
+               command   =  "menu-statistic-bewerberstatistik:command"
+               accesskey = "&menu-statistic-bewerberstatistik.accesskey;"/>
           </menupopup>
     </menu>
     <menu id="menu-dokumente" label="&menu-dokumente.label;" accesskey="&menu-dokumente.accesskey;">

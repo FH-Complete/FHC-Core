@@ -79,14 +79,24 @@ $worksheet->write(2,++$i,"Stunden", $format_bold);
 $worksheet->write(2,++$i,"Kosten", $format_bold);
 
 //Daten holen
-$qry = "SELECT vw_lehreinheit.*, tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre, tbl_mitarbeiter.personalnummer, tbl_person.person_id
-		FROM campus.vw_lehreinheit, public.tbl_mitarbeiter, public.tbl_benutzer, public.tbl_person WHERE 
-		tbl_person.person_id = tbl_benutzer.person_id AND tbl_benutzer.uid=tbl_mitarbeiter.mitarbeiter_uid AND
-		vw_lehreinheit.mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid AND
-		studiengang_kz='$studiengang_kz' AND studiensemester_kurzbz='$semester_aktuell'";
+$qry = "SELECT 
+			tbl_lehreinheit.*, tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre, 
+			tbl_mitarbeiter.personalnummer, tbl_person.person_id, tbl_mitarbeiter.mitarbeiter_uid,
+			tbl_lehreinheitmitarbeiter.faktor as faktor, tbl_lehreinheitmitarbeiter.stundensatz as stundensatz,
+			tbl_lehreinheitmitarbeiter.semesterstunden as semesterstunden
+		FROM 
+			lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_mitarbeiter, 
+			public.tbl_benutzer, public.tbl_person, lehre.tbl_lehrveranstaltung
+		WHERE 
+			tbl_person.person_id = tbl_benutzer.person_id AND 
+			tbl_benutzer.uid=tbl_mitarbeiter.mitarbeiter_uid AND
+			tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid AND
+			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
+			tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
+			studiengang_kz='$studiengang_kz' AND studiensemester_kurzbz='$semester_aktuell'";
 if($semester!='')
 	$qry.=" AND semester='$semester'";
-$qry.="	ORDER BY nachname, vorname, mitarbeiter_uid";
+$qry.="	ORDER BY nachname, vorname, tbl_mitarbeiter.mitarbeiter_uid";
 
 if($result = pg_query($conn, $qry))
 {
