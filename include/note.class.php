@@ -36,6 +36,7 @@ class note
 	var $note;		// smallint
 	var $bezeichnung;				// varchar(32)
 	var $anmerkung;	// varchar(256)
+	var $farbe;
 
 
 
@@ -92,6 +93,7 @@ class note
 				$this->note = $row->note;
 				$this->bezeichnung = $row->bezeichnung;
 				$this->anmerkung = $row->anmerkung;
+				$this->farbe = $row->farbe;
 				return true;
 			}
 			else
@@ -206,6 +208,7 @@ class note
 				$n->note = $row->note;
 				$n->bezeichnung = $row->bezeichnung;
 				$n->anmerkung = $row->anmerkung;
+				$n->farbe = $row->farbe;
 
 				$this->result[] = $n;
 			}

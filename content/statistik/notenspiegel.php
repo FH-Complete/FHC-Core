@@ -73,11 +73,15 @@ $lehrveranstaltung->load_lva($studiengang_kz, $semester, null, null, true);
 $noten = new note($conn);
 $noten->getAll();
 $noten_arr = array();
+$noten_farben = array();
 
 foreach ($noten->result as $row)
+{
 	$noten_arr[$row->note]=$row->anmerkung;
+	$noten_farben[$row->note]=$row->farbe;
+}
 
-echo '<table class="liste" style="border: 1px solid black" cellspacing="0"><tr class="liste"><th>Nr</th><th>Name</th><th>Matrikelnr</th>';
+echo '<table class="liste" style="border: 1px solid black" cellspacing="0"><tr class="liste"><th>Nr</th><th>Name</th><th>Personenkennzeichen</th>';
 foreach ($lehrveranstaltung->lehrveranstaltungen as $row_lva)
 {
 	echo "<th>$row_lva->bezeichnung</th>";
