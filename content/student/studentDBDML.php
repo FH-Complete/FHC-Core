@@ -420,7 +420,7 @@ if(!$error)
 					$hlp = new prestudent($conn);
 					
 					if($_POST['rolle_kurzbz']=='Unterbrecher' || $_POST['rolle_kurzbz']=='Abbrecher')
-						$sem=0;
+						$sem='0';
 					elseif($_POST['rolle_kurzbz']=='Student')
 						$sem=$_POST['semester'];
 					else 
@@ -1195,7 +1195,7 @@ if(!$error)
 				$bmp->person_id = $_POST['person_id'];
 				$bmp->betriebsmittel_id=$betriebsmittel_id;
 				$bmp->anmerkung = $_POST['anmerkung'];
-				$bmp->kaution = str_replace(',','.',$_POST['kaution']);
+				$bmp->kaution = trim(str_replace(',','.',$_POST['kaution']));
 				$bmp->ausgegebenam = $_POST['ausgegebenam'];
 				$bmp->retouram = $_POST['retouram'];
 				

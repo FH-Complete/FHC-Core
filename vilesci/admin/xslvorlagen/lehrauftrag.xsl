@@ -110,24 +110,29 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 				</xsl:text></fo:block>
 				<!-- Unterschrift -->
 				<fo:table table-layout="fixed" border-collapse="separate">
-					<fo:table-column column-width="80mm"/>
-					<fo:table-column column-width="50mm"/>
-					<fo:table-column column-width="80mm"/>
+					<fo:table-column column-width="70mm"/>
+					<fo:table-column column-width="40mm"/>
+					<fo:table-column column-width="70mm"/>
 					<fo:table-body>
 						<fo:table-row  line-height="12pt">
 							<fo:table-cell border-width="0"><fo:block font-size="8pt" ></fo:block></fo:table-cell>
 							<fo:table-cell border-width="0"><fo:block font-size="8pt" ></fo:block></fo:table-cell>
-							<fo:table-cell border-width="0"><fo:block font-size="8pt" content-width="45" text-align="center" >Wien, am <xsl:value-of select="datum" /></fo:block></fo:table-cell>
+							<fo:table-cell border-width="0"><fo:block font-size="8pt" content-width="70" text-align="center" >Wien, am <xsl:value-of select="datum" /></fo:block></fo:table-cell>
 						</fo:table-row>
 						<fo:table-row  line-height="12pt">
-							<fo:table-cell border-width="0"><fo:block font-size="10pt" >________________________</fo:block></fo:table-cell>
+							<fo:table-cell border-width="0"><fo:block font-size="10pt" content-width="70" text-align="center">________________________</fo:block></fo:table-cell>
 							<fo:table-cell border-width="0"><fo:block font-size="10pt" ></fo:block></fo:table-cell>
-							<fo:table-cell border-width="0"><fo:block font-size="10pt" >________________________</fo:block></fo:table-cell>
+							<fo:table-cell border-width="0"><fo:block font-size="10pt" content-width="70" text-align="center">________________________</fo:block></fo:table-cell>
 						</fo:table-row>
 						<fo:table-row  line-height="12pt">
-							<fo:table-cell border-width="0"><fo:block font-size="8pt" content-width="45" text-align="center" ><xsl:value-of select="studiengangsleiter" /></fo:block></fo:table-cell>
+							<fo:table-cell border-width="0"><fo:block font-size="8pt" content-width="70" text-align="center" ><xsl:value-of select="studiengangsleiter" /></fo:block></fo:table-cell>
 							<fo:table-cell border-width="0"><fo:block font-size="8pt" ></fo:block></fo:table-cell>
-							<fo:table-cell border-width="0"><fo:block font-size="8pt" content-width="45" text-align="center" >Ort, Datum</fo:block></fo:table-cell>
+							<fo:table-cell border-width="0"><fo:block font-size="8pt" content-width="70" text-align="center" >Ort, Datum</fo:block></fo:table-cell>
+						</fo:table-row>
+						<fo:table-row  line-height="12pt">
+							<fo:table-cell border-width="0"><fo:block font-size="8pt" content-width="70" text-align="center" >Studiengangsleitung</fo:block></fo:table-cell>
+							<fo:table-cell border-width="0"><fo:block font-size="8pt" ></fo:block></fo:table-cell>
+							<fo:table-cell border-width="0"><fo:block font-size="8pt" content-width="70" text-align="center" ></fo:block></fo:table-cell>
 						</fo:table-row>
 					</fo:table-body>
 				</fo:table>

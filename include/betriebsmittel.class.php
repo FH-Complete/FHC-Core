@@ -52,18 +52,21 @@ class betriebsmittel
 	function betriebsmittel($conn,$betriebsmittel_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		if ($unicode)
+		if($unicode!=null)
 		{
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		}
-		else 
-		{
-			$qry="SET CLIENT_ENCODING TO 'LATIN9';";
-		}
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg= "Encoding konnte nicht gesetzt werden";
-			return false;
+			if ($unicode)
+			{
+				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
+			}
+			else 
+			{
+				$qry="SET CLIENT_ENCODING TO 'LATIN9';";
+			}
+			if(!pg_query($conn,$qry))
+			{
+				$this->errormsg= "Encoding konnte nicht gesetzt werden";
+				return false;
+			}
 		}
 	}
 	

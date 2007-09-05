@@ -67,6 +67,10 @@
 <!ENTITY menu-statistic-notenspiegel.label		"Notenspiegel">
 <!ENTITY menu-statistic-notenspiegel.accesskey	"N">
 
+<!ENTITY menu-statistic-bewerberstatistik.key		"E">
+<!ENTITY menu-statistic-bewerberstatistik.label		"Bewerberstatistik">
+<!ENTITY menu-statistic-bewerberstatistik.accesskey	"E">
+
 <!ENTITY menu-dokumente.label		"Dokumente">
 <!ENTITY menu-dokumente.accesskey	"D">
 

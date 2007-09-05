@@ -95,7 +95,7 @@ if($result = pg_query($conn, $qry))
 {
 	if($row = pg_fetch_object($result))
 	{
-		$stgl = trim($row->titelpost.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost);
+		$stgl = trim($row->titelpre.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost);
 	}
 }
 
@@ -173,7 +173,11 @@ function drawLehrauftrag($uid)
 	}
 	
 	//Lehreinheiten
-	$qry = "SELECT * FROM campus.vw_lehreinheit WHERE lv_studiengang_kz='".addslashes($studiengang_kz)."' AND mitarbeiter_uid='".addslashes($uid)."' AND studiensemester_kurzbz='$ss' ORDER BY lehreinheit_id";
+	$qry = "SELECT * FROM campus.vw_lehreinheit WHERE mitarbeiter_uid='".addslashes($uid)."' AND studiensemester_kurzbz='$ss'";
+
+	if($studiengang_kz!='0' && $studiengang_kz!='')
+		$qry .= "AND lv_studiengang_kz='".addslashes($studiengang_kz)."'";
+	$qry.=" ORDER BY lehreinheit_id";
 	
 	if($result = pg_query($conn, $qry))
 	{
@@ -260,8 +264,9 @@ function drawLehrauftrag($uid)
 	        WHERE tbl_projektbetreuer.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid='$uid' AND 
 	              tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND student_uid=vw_student.uid
 	              AND tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
-	              tbl_lehreinheit.studiensemester_kurzbz='$ss' AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
-	              tbl_lehrveranstaltung.studiengang_kz='$studiengang_kz'";
+	              tbl_lehreinheit.studiensemester_kurzbz='$ss' AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id ";
+	if($studiengang_kz!='0' && $studiengang_kz!='')
+		$qry.=" AND tbl_lehrveranstaltung.studiengang_kz='$studiengang_kz'";
 	if($result = pg_query($conn, $qry))
 	{
 		while($row = pg_fetch_object($result))

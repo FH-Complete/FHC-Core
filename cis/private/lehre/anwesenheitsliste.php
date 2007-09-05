@@ -113,7 +113,7 @@
 
 	  	echo "<br />";
 	  	//Spezialgruppen Auslesen
-	  	$qry = "SELECT distinct gruppe_kurzbz, bezeichnung FROM public.tbl_gruppe JOIN public.tbl_benutzergruppe USING(gruppe_kurzbz) WHERE studiengang_kz='$stg_kz' AND semester='$sem';";
+	  	$qry = "SELECT distinct gruppe_kurzbz, bezeichnung FROM public.tbl_gruppe JOIN public.tbl_benutzergruppe USING(gruppe_kurzbz) WHERE studiengang_kz='$stg_kz' AND semester='$sem' AND lehre AND aktiv;";
 	  	if($result = pg_query($conn,$qry))
 	  	{
 	  		while($row = pg_fetch_object($result))

@@ -731,6 +731,16 @@ function StatistikPrintNotenspiegel()
 }
 
 // ****
+// * Liefert ein Excel-File mit den aktuellen Rollen aller Studenten
+// ****
+function StatistikPrintBewerberstatistik()
+{
+	var stsem = getStudiensemester();
+
+	window.open('<?php echo APP_ROOT ?>content/statistik/bewerberstatistik.xls.php?studiensemester_kurzbz='+stsem,'Bewerberstatistik','height=200,width=300,left=10,top=10,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+
+// ****
 // * Zeigt HTML Seite zur Bearbeitung der Reihungstests an
 // ****
 function ExtrasShowReihungstest()
