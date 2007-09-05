@@ -1184,7 +1184,7 @@ class wochenplan
 		$max_stunde=pg_result($result_stunde,0,'max');
 
 		// LEs holen
-		$sql_query='SELECT *, (semesterstunden-verplant::smallint) AS offenestunden FROM '.$lva_stpl_view.' WHERE';
+		$sql_query='SELECT *, (planstunden-verplant::smallint) AS offenestunden FROM '.$lva_stpl_view.' WHERE';
 		$lvas='';
 		foreach ($lva_id as $id)
 			$lvas.=' OR lehreinheit_id='.$id;
@@ -1200,6 +1200,7 @@ class wochenplan
 		$verplant=array();
 		$block=array();
 		$semesterstunden=array();
+		$planstunden=array();
 		$offenestunden=array();
 		// Daten aufbereiten
 		for ($i=0;$i<$num_rows_lva;$i++)
@@ -1215,6 +1216,7 @@ class wochenplan
 			$lehrverband[$i]->grp=$row->gruppe;
 			$lektor[$i]=$row->lektor_uid;
 			$verplant[$i]=$row->verplant;
+			$planstunden[$i]=$row->planstunden;
 			$offenestunden[]=$row->offenestunden;
 			$unr=$row->unr;
 			$block[$i]=$row->stundenblockung;

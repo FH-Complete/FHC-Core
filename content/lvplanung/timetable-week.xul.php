@@ -286,6 +286,7 @@ elseif ($aktion=='lva_multi_set')
 	$block=array();
 	$wochenrythmus=array();
 	$semesterstunden=array();
+	$planstunden=array();
 	$offenestunden=array();
 	// LVAs holen
 	$sql_query='SELECT * FROM lehre.'.$lva_stpl_view.' WHERE';
@@ -305,7 +306,8 @@ elseif ($aktion=='lva_multi_set')
 		$block[]=$row->stundenblockung;
 		$wochenrythmus[]=$row->wochenrythmus;
 		$semesterstunden[]=$row->semesterstunden;
-		$offenestunden[]=$row->semesterstunden-$row->verplant;
+		$planstunden[]=$row->planstunden;
+		$offenestunden[]=$row->planstunden-$row->verplant;
 	}
 	// Variablen eindeutig?
 	// Offene Stunden
@@ -316,6 +318,7 @@ elseif ($aktion=='lva_multi_set')
 	else
 		$error_msg.='Offene Stunden sind nicht eindeutig!';
 	//$error_msg.='Offene Stunden='.$offenestunden;
+
 	/*// Verplante Stunden
 	$verplant=array_unique($verplant);
 	if (count($verplant)==1)
@@ -328,6 +331,7 @@ elseif ($aktion=='lva_multi_set')
 		$semesterstunden=$semesterstunden[0];
 	else
 		$error_msg.='Semesterstunden sind nicht eindeutig!';*/
+
 	//Blockung
 	$blk=$block[0];
 	$block=array_unique($block);
