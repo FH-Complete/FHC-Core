@@ -29,7 +29,7 @@ $berechtigung=new benutzerberechtigung($conn);
 $berechtigung->getBerechtigungen($uid);
 $error_msg.=loadVariables($conn,$uid);
 
-//$semester_aktuell='SS2007';
+//$semester_aktuell='WS2007';
 if (isset($semester_aktuell))
 	$studiensemester=$semester_aktuell;
 else
@@ -161,6 +161,16 @@ foreach ($lva as $l)
 		$semesterstunden.=$lf.' ';
 	if (count($l->semesterstunden)>1)
 		$semesterstunden.=' ?';
+
+	// Planstunden
+	$planstunden='';
+	$l->planstunden=array_unique($l->planstunden);
+	sort($l->planstunden);
+	foreach($l->planstunden as $lf)
+		$planstunden.=$lf.' ';
+	if (count($l->planstunden)>1)
+		$planstunden.=' ?';
+
 	// Verplant
 	$verplant='';
 	$l->verplant=array_unique($l->verplant);
@@ -193,7 +203,7 @@ foreach ($lva as $l)
 				<LVA:gruppe_kurzbz>'.$l->gruppe_kurzbz[0].'</LVA:gruppe_kurzbz>
 				<LVA:raumtyp>'.$l->raumtyp.'</LVA:raumtyp>
 				<LVA:raumtypalternativ>'.$l->raumtypalternativ.'</LVA:raumtypalternativ>
-				<LVA:semesterstunden>'.$semesterstunden.'</LVA:semesterstunden>
+				<LVA:semesterstunden>'.$planstunden.'</LVA:semesterstunden>
 				<LVA:stundenblockung>'.$stundenblockung.'</LVA:stundenblockung>
 				<LVA:wochenrythmus>'.$wochenrythmus.'</LVA:wochenrythmus>
 				<LVA:verplant>'.$verplant.'</LVA:verplant>

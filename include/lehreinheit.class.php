@@ -79,7 +79,7 @@ class lehreinheit
 				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 			else
 				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-		
+
 			if(!pg_query($conn,$qry))
 			{
 				$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
@@ -90,7 +90,7 @@ class lehreinheit
 		if($lehreinheit_id!=null)
 			$this->load($lehreinheit_id);
 	}
-	
+
 	// *********************************************************
 	// * Laedt die LE
 	// * @param lehreinheit_id
@@ -202,17 +202,17 @@ class lehreinheit
 	function load_lehreinheiten($lehrveranstaltung_id, $studiensemester_kurzbz, $uid='', $fachbereich_kurzbz='')
 	{
 		$qry = "SELECT * FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lehrveranstaltung_id' AND studiensemester_kurzbz='$studiensemester_kurzbz' ";
-		
+
 		if($uid!='')
 			$qry .= " AND lehreinheit_id IN ( SELECT lehreinheit_id FROM lehre.tbl_lehreinheitmitarbeiter WHERE mitarbeiter_uid='".addslashes($uid)."')";
-		
+
 		if($fachbereich_kurzbz!='')
 			$qry .= " AND lehrfach_id IN ( SELECT lehrfach_id FROM lehre.tbl_lehrfach WHERE fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."')";
-		
+
 		$qry.= "ORDER BY lehreinheit_id";
 
 		if($result = pg_query($this->conn, $qry))
-		{			
+		{
 			while($row = pg_fetch_object($result))
 			{
 				$le_obj = new lehreinheit($this->conn, null, null);
@@ -382,7 +382,7 @@ class lehreinheit
 		{
 			if($this->unr=='')
 				$unr="currval('lehre.tbl_lehreinheit_lehreinheit_id_seq')";
-			else 
+			else
 				$unr = $this->addslashes($this->unr);
 			//ToDo ID entfernen
 			$qry = 'BEGIN; INSERT INTO lehre.tbl_lehreinheit (lehrveranstaltung_id, studiensemester_kurzbz,
@@ -444,14 +444,14 @@ class lehreinheit
 						$this->lehreinheit_id = $row->lehreinheit_id;
 						pg_query($this->conn, 'COMMIT;');
 					}
-					else 
+					else
 					{
 						$this->errormsg = 'Fehler beim auslesen der Sequence';
 						pg_query($this->conn, 'ROLLBACK;');
 						return false;
 					}
 				}
-				else 
+				else
 				{
 					$this->errormsg = 'Fehler beim auslesen der Sequence';
 					pg_query($this->conn, 'ROLLBACK;');
@@ -596,7 +596,7 @@ class lehreinheit
 			if (strlen($grp)>0 && $grp!=' ')
 				$where.=" AND gruppe='$grp' ";
 		}
-		$sql_query='SELECT *, semesterstunden-verplant::smallint AS offenestunden
+		$sql_query='SELECT *, planstunden-verplant::smallint AS offenestunden
 			FROM lehre.'.$lva_stpl_view.' JOIN lehre.tbl_lehrform ON '.$lva_stpl_view.'.lehrform=tbl_lehrform.lehrform_kurzbz
 			WHERE '.$where.' AND verplanen ORDER BY offenestunden DESC, lehrfach, lehrform, semester, verband, gruppe, gruppe_kurzbz;';
 	    //$this->errormsg=$sql_query;
@@ -635,6 +635,7 @@ class lehreinheit
 			$this->lehreinheiten[$row->unr]->stundenblockung[]=$row->stundenblockung;
 			$this->lehreinheiten[$row->unr]->wochenrythmus[]=$row->wochenrythmus;
 			$this->lehreinheiten[$row->unr]->semesterstunden[]=$row->semesterstunden;
+			$this->lehreinheiten[$row->unr]->planstunden[]=$row->planstunden;
 			$this->lehreinheiten[$row->unr]->start_kw[]=$row->start_kw;
 			$this->lehreinheiten[$row->unr]->anmerkung[]=$row->anmerkung;
 			$this->lehreinheiten[$row->unr]->studiensemester_kurzbz=$row->studiensemester_kurzbz;
@@ -679,7 +680,7 @@ class lehreinheit
 					$this->errormsg = 'Zu dieser Lehreinheit wurde bereits eine Kreuzerlliste angelegt. Solange fuer eine Lehreinheit Kreuzerllisten vorhanden sind, kann diese nicht geloescht werden.';
 					return false;
 				}
-				else 
+				else
 				{
 					//Gruppenzuteilung, Mitarbeiterzuteilung und Lehreinheit loeschen
 					$qry = "BEGIN;
@@ -696,18 +697,18 @@ class lehreinheit
 					}
 				}
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Fehler beim loeschen';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim loeschen';
 			return false;
 		}
-		
+
 	}
 
 }
