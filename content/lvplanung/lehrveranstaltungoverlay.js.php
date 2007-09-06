@@ -327,7 +327,7 @@ function LeNeu()
 		lehrfachmenulist.database.RemoveDataSource(oldDatasources.getNext());
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	lehrfachmenulist.builder.refresh();
+	lehrfachmenulist.builder.rebuild();
 
 	//Url zusammenbauen
 	var url = '<?php echo APP_ROOT;?>rdf/lehrfach.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+'&'+gettimestamp();

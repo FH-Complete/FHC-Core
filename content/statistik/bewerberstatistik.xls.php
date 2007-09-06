@@ -70,19 +70,23 @@ loadVariables($conn, $user);
 		
 	for($i=0;$i<10;$i++)
 		$maxlength[$i]=0;
-	$i=10;
+	$i=9;
 	$stg_spalte=array();
 	$studiengang = new studiengang($conn);
 	$studiengang->getAll('typ, kurzbzlang', false);
 	foreach ($studiengang->result as $row)
 	{
-		if(isset($stg_arr_2[$row->studiengang_kz]))
-			$worksheet->write(0,$i,$stg_arr_2[$row->studiengang_kz], $format_bold);
-		else			
-			$worksheet->write(0,$i,'('.strtoupper($row->typ).') '.$row->kurzbzlang, $format_bold);
-		$maxlength[$i]=strlen('('.strtoupper($row->typ).') '.$row->kurzbzlang);
-		$stg_spalte[$row->studiengang_kz]=$i;
-		$i++;
+		//btec, tw und LLLC nicht anzeigen
+		if($row->studiengang_kz!='0' && $row->studiengang_kz!='203' && $row->studiengang_kz!='10001')
+		{
+			if(isset($stg_arr_2[$row->studiengang_kz]))
+				$worksheet->write(0,$i,$stg_arr_2[$row->studiengang_kz], $format_bold);
+			else			
+				$worksheet->write(0,$i,'('.strtoupper($row->typ).') '.$row->kurzbzlang, $format_bold);
+			$maxlength[$i]=strlen('('.strtoupper($row->typ).') '.$row->kurzbzlang);
+			$stg_spalte[$row->studiengang_kz]=$i;
+			$i++;
+		}
 	}
 			
 	// Daten holen
@@ -94,7 +98,7 @@ loadVariables($conn, $user);
 				tbl_prestudent.person_id=tbl_person.person_id AND
 				studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
 				rolle_kurzbz in('Interessent','Bewerber','Student','Abbrecher','Unterbrecher')
-			ORDER BY nachname, vorname, tbl_prestudentrolle.datum, tbl_prestudentrolle.insertamum";
+			ORDER BY nachname, vorname, tbl_prestudentrolle.datum, tbl_prestudentrolle.insertamum, tbl_prestudentrolle.ext_id";
 				
 	//echo $qry;
 
@@ -123,6 +127,10 @@ loadVariables($conn, $user);
 					$worksheet->write($zeile,4,$anzahl_bewerbung);
 					if($maxlength[4]<strlen($anzahl_bewerbung))
 						$maxlength[4]=strlen($anzahl_bewerbung);
+						
+					$worksheet->write($zeile,6,$anzahl_bewerbung);
+					if($maxlength[6]<strlen($anzahl_bewerbung))
+						$maxlength[6]=strlen($anzahl_bewerbung);
 					
 					if($anzahl_bewerbung>0)
 						$wert='M';
@@ -155,13 +163,19 @@ loadVariables($conn, $user);
 					$maxlength[$i]=strlen($row->nachname);
 				
 				//GESCHLECHT
-				$worksheet->write($zeile,++$i,$row->geschlecht);
+				$worksheet->write($zeile,++$i,strtoupper($row->geschlecht));
 				if($maxlength[$i]<strlen($row->geschlecht))
 					$maxlength[$i]=strlen($row->geschlecht);
 				
 				//Spalten fuer Anzahl der Bewerbungen freilassen
 				$i++;
 				$i++;
+				$i++;
+				
+				//NACHNAME
+				$worksheet->write($zeile,++$i,$row->nachname);
+				if($maxlength[$i]<strlen($row->nachname))
+					$maxlength[$i]=strlen($row->nachname);
 				
 				//ZGV CODE
 				$worksheet->write($zeile,++$i,$row->zgv_code);
