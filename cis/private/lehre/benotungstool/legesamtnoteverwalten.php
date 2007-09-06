@@ -92,7 +92,7 @@ require_once('../../../../include/legesamtnote.class.php');
 	    stud_uid = uid;
 	    var jetzt = new Date();
 		var ts = jetzt.getTime();
-	    var url= '<?php echo "legesamtnoteeintragen.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem&$ts"; ?>';
+	    var url= '<?php echo "legesamtnoteeintragen.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem"; ?>';
 	    url += '&submit=1&student_uid='+uid+"&note="+note+"&"+ts;
 	    anfrage.open("GET", url, true);
 	    anfrage.onreadystatechange = updateSeite;
@@ -376,7 +376,7 @@ if($result_grp = pg_query($conn, $qry))
 				<tr>
 					<td colspan='8' align='center'><b>$row_grp->gruppe_kurzbz</b></td>
 				</tr>";
-				$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row_grp->gruppe_kurzbz)."' ORDER BY nachname, vorname";
+				$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row_grp->gruppe_kurzbz)."' AND studiensemester_kurzbz = '".$stsem."' ORDER BY nachname, vorname";
 		}
 		else
 		{
