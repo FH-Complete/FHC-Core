@@ -178,11 +178,11 @@ class projektarbeit
 			$this->errormsg = 'Anmerkung darf nicht länger als 256 Zeichen sein - student_uid: '.$this->student_uid;
 			return false;
 		}
-		if(!is_numeric($this->note))
+		/*if(!is_numeric($this->note))
 		{
 			$this->errormsg = 'Note muß ein numerischer Wert sein - student_uid: '.$this->student_uid;
 			return false;
-		}
+		}*/
 		if(!is_numeric($this->punkte))
 		{
 			$this->errormsg = 'Punkte muß ein numerischer Wert sein - student_uid: '.$this->student_uid;

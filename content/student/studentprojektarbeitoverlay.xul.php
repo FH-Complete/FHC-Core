@@ -423,8 +423,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								</menulist>
 							</row>
 							<row>
-								<button id="student-projektbetreuer-button-neueperson" label="Neue Person anlegen" oncommand="StudentProjektbetreuerNeuePerson()" />
-								<button id="student-projektbetreuer-button-kontaktdaten" label="Kontakttdaten bearbeiten" oncommand="StudentProjektbetreuerKontaktdaten()" />
+								<button id="student-projektbetreuer-button-neueperson" label="Neue Person anlegen" oncommand="StudentProjektbetreuerNeuePerson()" disabled="true"/>
+								<button id="student-projektbetreuer-button-kontaktdaten" label="Kontakttdaten bearbeiten" oncommand="StudentProjektbetreuerKontaktdaten()" disabled="true"/>
 							</row>
 							<row>
 								<label value="Art" control="student-projektbetreuer-menulist-betreuerart"/>

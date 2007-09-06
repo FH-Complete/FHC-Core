@@ -42,6 +42,12 @@ loadVariables($conn, $user);
 		
 	$maxlength= array();
 	$zeile=1;
+	$stg_arr_2=array("227"=>"(B)BME","228"=>"(M)BMES","999"=>"(DI)bTec","11"=>"(DI)E","254"=>"(B)E","91"=>"(DI)EW",
+					 "94"=>"(DI)EID","297"=>"(M)ES","1"=>"(M)EUE","329"=>"(M)GRT","300"=>"(M)IE","257"=>"(B)INF",
+					 "182"=>"(DI)SET","327"=>"(B)SET","332"=>"(M)MTUM","298"=>"(M)TKIT","476"=>"(B)EUE","222"=>"(DI)VT",
+					"301"=>"(M)ITM","334"=>"(M)ITS","333"=>"(B)ITS","308"=>"(DI)IWI","335"=>"(B)IWI","336"=>"(M)IWI",
+					"330"=>"(B)MR","204"=>"(DI)MR","299"=>"(M)MMSE","92"=>"(DI)PW","328"=>"(M)SET","302"=>"(M)WI",
+					"145"=>"(DI)ICSS","258"=>"(B)ICSS","331"=>"(M)MR","256"=>"(B)WI","303"=>"(M)IMCS","255"=>"(B)EW");
 
 	// Creating a workbook
 	$workbook = new Spreadsheet_Excel_Writer();
@@ -70,7 +76,10 @@ loadVariables($conn, $user);
 	$studiengang->getAll('typ, kurzbzlang', false);
 	foreach ($studiengang->result as $row)
 	{
-		$worksheet->write(0,$i,'('.strtoupper($row->typ).') '.$row->kurzbzlang, $format_bold);
+		if(isset($stg_arr_2[$row->studiengang_kz]))
+			$worksheet->write(0,$i,$stg_arr_2[$row->studiengang_kz], $format_bold);
+		else			
+			$worksheet->write(0,$i,'('.strtoupper($row->typ).') '.$row->kurzbzlang, $format_bold);
 		$maxlength[$i]=strlen('('.strtoupper($row->typ).') '.$row->kurzbzlang);
 		$stg_spalte[$row->studiengang_kz]=$i;
 		$i++;
