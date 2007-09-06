@@ -63,9 +63,17 @@
 <!ENTITY menu-statistic-abschlusspruefung.label		"Abschlusspruefung">
 <!ENTITY menu-statistic-abschlusspruefung.accesskey	"B">
 
-<!ENTITY menu-statistic-notenspiegel.key		"N">
-<!ENTITY menu-statistic-notenspiegel.label		"Notenspiegel">
-<!ENTITY menu-statistic-notenspiegel.accesskey	"N">
+<!ENTITY menu-statistic-subnotenspiegel.key			"N">
+<!ENTITY menu-statistic-subnotenspiegel.label		"Notenspiegel">
+<!ENTITY menu-statistic-subnotenspiegel.accesskey	"N">
+
+<!ENTITY menu-statistic-notenspiegel-excel.key			"E">
+<!ENTITY menu-statistic-notenspiegel-excel.label		"Notenspiegel EXCEL">
+<!ENTITY menu-statistic-notenspiegel-excel.accesskey	"E">
+
+<!ENTITY menu-statistic-notenspiegel.key		"H">
+<!ENTITY menu-statistic-notenspiegel.label		"Notenspiegel HTML">
+<!ENTITY menu-statistic-notenspiegel.accesskey	"H">
 
 <!ENTITY menu-statistic-bewerberstatistik.key		"E">
 <!ENTITY menu-statistic-bewerberstatistik.label		"Bewerberstatistik">

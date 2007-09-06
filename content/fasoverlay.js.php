@@ -710,7 +710,7 @@ function StatistikPrintAbschlusspruefung()
 // * Liefert eine HTML Liste mit Uebersicht ueber die eingetragenen Noten
 // * Studiengang und optional Semester muss gewaehlt sein.
 // ****
-function StatistikPrintNotenspiegel()
+function StatistikPrintNotenspiegel(typ)
 {
 	tree = document.getElementById('tree-verband');
 
@@ -727,7 +727,7 @@ function StatistikPrintNotenspiegel()
 	col = tree.columns ? tree.columns["sem"] : "sem";
 	var semester=tree.view.getCellText(tree.currentIndex,col);
 
-	window.open('<?php echo APP_ROOT ?>content/statistik/notenspiegel.php?studiengang_kz='+studiengang_kz+'&semester='+semester,'Notenspiegel');
+	window.open('<?php echo APP_ROOT ?>content/statistik/notenspiegel.php?studiengang_kz='+studiengang_kz+'&semester='+semester+'&typ='+typ,'Notenspiegel');
 }
 
 // ****

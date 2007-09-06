@@ -82,7 +82,8 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-statistic-lehrauftragsliste:command" oncommand="StatistikPrintLehrauftragsliste();"/>
   <command id="menu-statistic-projektarbeit:command" oncommand="StatistikPrintProjektarbeit();"/>
   <command id="menu-statistic-abschlusspruefung:command" oncommand="StatistikPrintAbschlusspruefung();"/>
-  <command id="menu-statistic-notenspiegel:command" oncommand="StatistikPrintNotenspiegel();"/>
+  <command id="menu-statistic-notenspiegel:command" oncommand="StatistikPrintNotenspiegel('html');"/>
+  <command id="menu-statistic-notenspiegel-excel:command" oncommand="StatistikPrintNotenspiegel('xls');"/>
   <command id="menu-statistic-bewerberstatistik:command" oncommand="StatistikPrintBewerberstatistik();"/>
   <command id="menu-dokumente-inskriptionsbestaetigung:command" oncommand="StudentPrintInskriptionsbestaetigung();"/>
   <command id="menu-dokumente-zeugnis:command" oncommand="StudentCreateZeugnis();"/>
@@ -212,12 +213,22 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                label     = "&menu-statistic-abschlusspruefung.label;"
                command   =  "menu-statistic-abschlusspruefung:command"
                accesskey = "&menu-statistic-abschlusspruefung.accesskey;"/>
-             <menuitem
-               id        =  "menu-statistic-notenspiegel"
-               key       =  "menu-statistic-notenspiegel:key"
-               label     = "&menu-statistic-notenspiegel.label;"
-               command   =  "menu-statistic-notenspiegel:command"
-               accesskey = "&menu-statistic-notenspiegel.accesskey;"/>
+             <menu id="menu-statistic-subnotenspiegel" label="&menu-statistic-subnotenspiegel.label;" accesskey="&menu-statistic-subnotenspiegel.accesskey;">
+				<menupopup id="menu-statistic-subnotenspiegel-popup">
+		             <menuitem
+		               id        =  "menu-statistic-notenspiegel-excel"
+		               key       =  "menu-statistic-notenspiegel-excel:key"
+		               label     = "&menu-statistic-notenspiegel-excel.label;"
+		               command   =  "menu-statistic-notenspiegel-excel:command"
+		               accesskey = "&menu-statistic-notenspiegel-excel.accesskey;"/>
+		             <menuitem
+		               id        =  "menu-statistic-notenspiegel"
+		               key       =  "menu-statistic-notenspiegel:key"
+		               label     = "&menu-statistic-notenspiegel.label;"
+		               command   =  "menu-statistic-notenspiegel:command"
+		               accesskey = "&menu-statistic-notenspiegel.accesskey;"/>
+				</menupopup>
+			</menu>
           <!--   <menuitem
                id        =  "menu-statistic-bewerberstatistik"
                key       =  "menu-statistic-bewerberstatistik:key"
