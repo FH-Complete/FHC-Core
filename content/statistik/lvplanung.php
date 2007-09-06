@@ -261,15 +261,27 @@ if($result = pg_query($conn, $qry))
 	{
 		echo '<tr><td colspan="2"><b>Betreuungen</b></td></tr>';
 
+		echo '<tr>';
+		echo '<th>&nbsp;</th>';
+		echo "<th colspan='3'>Titel</th>";
+		//echo "<th>&nbsp;</th>";
+		//echo '<th>&nbsp;</th>';
+		echo "<th align='right'>Stunden</th>";
+		echo "<th>Student</th>";
+		echo "<th>Lektor</th>";
+		echo "<th>Kosten</th>";
+		echo '<th>&nbsp;</th>';
+		echo '</tr>';
+		
 		$gesamtkosten_betreuung=0;
 		$stunden_betreuung=0;
 		while($row = pg_fetch_object($result))
 		{
 			echo '<tr class="liste1">';
 			echo '<td>&nbsp;</td>';
-			echo "<td>$row->titel</td>";
-			echo "<td>&nbsp;</td>";
-			echo '<td>&nbsp;</td>';
+			echo "<td colspan='3'>$row->titel</td>";
+			//echo "<td>&nbsp;</td>";
+			//echo '<td>&nbsp;</td>';
 			echo "<td align='right'>".number_format($row->stunden,2)."</td>";
 			$benutzer = new benutzer($conn);
 			$benutzer->load($row->student_uid);

@@ -191,6 +191,7 @@ function StudentProjektarbeitResetFields()
 	document.getElementById('student-projektarbeit-textbox-anmerkung').value='';
 	document.getElementById('student-projektarbeit-menulist-firma').value='';
 	document.getElementById('student-projektarbeit-menulist-note').value='';
+	document.getElementById('student-projektarbeit-menulist-projekttyp').value='Bachelor';
 }
 
 // *****
@@ -426,6 +427,11 @@ function StudentProjektarbeitSpeichern()
 		return false;
 	}
 
+	if(lehreinheit_id=='')
+	{
+		alert('Bitte eine Lehreinheit Auswaehlen');
+		return false;
+	}
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 
@@ -723,6 +729,8 @@ function StudentProjektbetreuerDetailDisableFields(val)
 	document.getElementById('student-projektbetreuer-textbox-stunden').disabled=val;
 	document.getElementById('student-projektbetreuer-textbox-stundensatz').disabled=val;
 	document.getElementById('student-projektbetreuer-button-speichern').disabled=val;
+	document.getElementById('student-projektbetreuer-button-neueperson').disabled=val;
+	document.getElementById('student-projektbetreuer-button-kontaktdaten').disabled=val;
 }
 
 // ****

@@ -218,12 +218,12 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                label     = "&menu-statistic-notenspiegel.label;"
                command   =  "menu-statistic-notenspiegel:command"
                accesskey = "&menu-statistic-notenspiegel.accesskey;"/>
-             <menuitem
+          <!--   <menuitem
                id        =  "menu-statistic-bewerberstatistik"
                key       =  "menu-statistic-bewerberstatistik:key"
                label     = "&menu-statistic-bewerberstatistik.label;"
                command   =  "menu-statistic-bewerberstatistik:command"
-               accesskey = "&menu-statistic-bewerberstatistik.accesskey;"/>
+               accesskey = "&menu-statistic-bewerberstatistik.accesskey;"/>-->
           </menupopup>
     </menu>
     <menu id="menu-dokumente" label="&menu-dokumente.label;" accesskey="&menu-dokumente.accesskey;">
