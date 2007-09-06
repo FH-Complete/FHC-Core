@@ -836,9 +836,10 @@ if(isset($_GET["uebung_id"]) && $_GET["uebung_id"]!='')
 		echo "<input type='hidden' size='16' name='gewicht' value='0'>";
 	}	
 	else if ($uebung_obj->abgabe)
+	{
 		echo "<tr><td>Gewicht</td><td align='right'><input type='text' size='16' name='gewicht' value='$uebung_obj->gewicht'></td><td>$error_gewicht</td></tr>";
-	
-	//echo"<tr><td>Positiv </td><td><input type='checkbox' name='positiv' ".($uebung_obj->positiv?'checked':'')."></td></tr>";
+		echo"<tr><td>Positiv </td><td><input type='checkbox' name='positiv' ".($uebung_obj->positiv?'checked':'')."></td></tr>";
+	}
 	if ($uebung_obj->beispiele)	
 		echo"<tr><td>Statistik f&uuml;r Studenten anzeigen </td><td><input type='checkbox' name='statistik' ".($uebung_obj->statistik?'checked':'')."></td></tr>";
 	echo "<tr>";
