@@ -32,7 +32,7 @@ function convdate($date)
 }
 	function checkfilter($row, $filter2)
 	{
-		global $conn;
+		global $conn, $studiensemester_kurzbz;
 
 		if($filter2=='dokumente')
 		{
@@ -51,6 +51,17 @@ function convdate($date)
 			if($result_filter = pg_query($conn, $qry))
 				if($row_filter = pg_fetch_object($result_filter))
 					if($row_filter->summe=='0.00')
+						return false;
+		}
+		elseif($filter2=='studiengebuehr')
+		{
+			$qry = "SELECT count(*) as anzahl FROM public.tbl_konto WHERE 
+						studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND 
+						person_id='".addslashes($row->person_id)."' AND 
+						buchungstyp_kurzbz='Studiengebuehr'";
+			if($result_filter = pg_query($conn, $qry))
+				if($row_filter = pg_fetch_object($result_filter))
+					if($row_filter->anzahl>0)
 						return false;
 		}
 		return true;
@@ -412,7 +423,13 @@ if($xmlformat=='rdf')
 		if($filter!='')
 		{
 			$filter = utf8_decode($filter);
-			$qry = "SELECT prestudent_id FROM public.tbl_person JOIN tbl_prestudent USING (person_id) WHERE nachname ~* '".addslashes($filter)."';";
+			$qry = "SELECT prestudent_id 
+					FROM 
+						public.tbl_person JOIN tbl_prestudent USING (person_id) LEFT JOIN tbl_student using(prestudent_id) 
+					WHERE 
+						nachname ~* '".addslashes($filter)."' OR 
+						vorname ~* '".addslashes($filter)."' OR
+						student_uid ~* '".addslashes($filter)."';";
 			if($result = pg_query($conn, $qry))
 			{
 				while($row = pg_fetch_object($result))

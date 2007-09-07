@@ -181,6 +181,12 @@ function loadVariables($conn, $user)
 		}
 	if (!isset($db_stpl_table))
 		$db_stpl_table='stundenplan';
+		
+	if (!isset($kontofilterstg))
+	{
+		global $kontofilterstg;
+		$kontofilterstg='false';
+	}
 
 	return $error_msg;
 }

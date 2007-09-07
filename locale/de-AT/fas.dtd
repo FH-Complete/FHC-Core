@@ -36,6 +36,10 @@
 <!ENTITY menu-prefs-stpltable-stundenplandev.label    	"stundenplandev">
 <!ENTITY menu-prefs-stpltable-stundenplandev.accesskey	"d">
 
+<!ENTITY menu-prefs-kontofilterstg.key      	"B">
+<!ENTITY menu-prefs-kontofilterstg.label    	"Buchungen auf Studiengang filtern">
+<!ENTITY menu-prefs-kontofilterstg.accesskey	"B">
+
 <!ENTITY menu-statistic.label		"Berichte">
 <!ENTITY menu-statistic.accesskey	"R">
 

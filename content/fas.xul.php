@@ -76,6 +76,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-properties-studiensemester:command" oncommand="studiensemesterChange();"/>
   <command id="menu-prefs-stpltable-stundenplan:command" oncommand="stpltableChange('stundenplan');"/>
   <command id="menu-prefs-stpltable-stundenplandev:command" oncommand="stpltableChange('stundenplandev');"/>
+  <command id="menu-prefs-kontofilterstg:command" oncommand="EinstellungenKontoFilterStgChange();"/>
   <command id="menu-statistic-koordinatorstunden:command" oncommand="StatistikPrintKoordinatorstunden();"/>
   <command id="menu-statistic-lehrauftraege:command" oncommand="StatistikPrintLehrauftraege();"/>
   <command id="menu-statistic-lvplanung:command" oncommand="StatistikPrintLVPlanung();"/>
@@ -173,6 +174,15 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 
       		</menupopup>
         </menu>
+   		<menuitem
+			 id        	="menu-prefs-kontofilterstg"
+			 type		="checkbox"
+  			 key       	="menu-prefs-kontofilterstg:key"
+			 label     	="&menu-prefs-kontofilterstg.label;"
+			 command   	="menu-prefs-kontofilterstg:command"
+   			 accesskey 	="&menu-prefs-kontofilterstg.accesskey;"
+   			 checkbox   ="<?php echo $kontofilterstg;?>"
+   			 />
 	    </menupopup>
     </menu>
     <menu id="menu-statistic" label="&menu-statistic.label;" accesskey="&menu-statistic.accesskey;">
