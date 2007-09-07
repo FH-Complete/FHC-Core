@@ -97,9 +97,10 @@ loadVariables($conn, $user);
 				tbl_prestudentrolle.prestudent_id=tbl_prestudent.prestudent_id AND
 				tbl_prestudent.person_id=tbl_person.person_id AND
 				studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
-				rolle_kurzbz in('Interessent','Bewerber','Student','Abbrecher','Unterbrecher')
+				rolle_kurzbz in('Interessent','Bewerber','Student','Abbrecher','Unterbrecher','Diplomand','Incoming', 'Praktikant')
 			ORDER BY nachname, vorname, tbl_prestudentrolle.datum, tbl_prestudentrolle.insertamum, tbl_prestudentrolle.ext_id";
-				
+	//'Outgoing',
+	
 	//echo $qry;
 
 	if($result = pg_query($conn, $qry))
@@ -190,6 +191,10 @@ loadVariables($conn, $user);
 				case 'Student': $kuerzel='s'; break;
 				case 'Abbrecher': $kuerzel='a'; break;
 				case 'Unterbrecher': $kuerzel='u'; break;
+				case 'Diplomand': $kuerzel='s'; break;
+				case 'Incoming': $kuerzel='s'; break;
+				//case 'Outgoing': $kuerzel='s'; break;
+				case 'Praktikant': $kuerzel='s'; break;
 				default: $kuerzel=''; break;
 			}
 			if(isset($rollen[$row->studiengang_kz]))
