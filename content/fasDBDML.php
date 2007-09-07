@@ -262,16 +262,29 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='variablechange') /**********************SONSTIGES*****************/
 	{
+		$variable = new variable($conn, null, null, true);
+		
+		$variable->uid = $user;
+		$variable->new = false;
+		
 		// Aendert die Variable Studiensemester		
 		if(isset($_POST['stsem']))
 		{
-			$variable = new variable($conn, null, null, true);
-			
-			$variable->uid = $user;
 			$variable->name = 'semester_aktuell';
 			$variable->wert = $_POST['stsem'];
-			$variable->new = false;
+		}
+		elseif(isset($_POST['kontofilterstg']))
+		{
+			$variable->name = 'kontofilterstg';
+			$variable->wert = $_POST['kontofilterstg'];
+		}
+		else
+		{
+			$error = true;
+		}
 			
+		if(!$error)
+		{
 			if($variable->save())
 			{
 				$return = true;

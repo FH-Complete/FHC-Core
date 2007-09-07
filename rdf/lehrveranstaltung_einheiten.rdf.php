@@ -38,6 +38,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 require_once('../vilesci/config.inc.php');
 require_once('../include/lehrveranstaltung.class.php');
 require_once('../include/lehreinheit.class.php');
+require_once('../include/studiengang.class.php');
 require_once('../include/functions.inc.php');
 
 // Datenbank Verbindung
@@ -65,6 +66,14 @@ $uid=(isset($_GET['uid'])?$_GET['uid']:'');
 $fachbereich_kurzbz=(isset($_GET['fachbereich_kurzbz'])?$_GET['fachbereich_kurzbz']:'');
 
 loadVariables($conn, $user);
+
+$stg_arr = array();
+$stg_obj = new studiengang($conn);
+$stg_obj->getAll('typ, kurzbzlang', false);
+foreach ($stg_obj->result as $row)
+{
+	$stg_arr[$row->studiengang_kz]=$row->kuerzel;
+}
 
 // LVAs holen
 $lvaDAO=new lehrveranstaltung($conn, null, true);
@@ -148,6 +157,7 @@ if(!$result = pg_query($conn, $qry))
 			<LVA:kurzbz><![CDATA[".$row_lva->lv_kurzbz."]]></LVA:kurzbz>
 			<LVA:bezeichnung><![CDATA[".$row_lva->lv_bezeichnung."]]></LVA:bezeichnung>
 			<LVA:studiengang_kz>".$row_lva->studiengang_kz."</LVA:studiengang_kz>
+			<LVA:studiengang>".$stg_arr[$row_lva->studiengang_kz]."</LVA:studiengang>
 			<LVA:semester>".$row_lva->semester."</LVA:semester>
 			<LVA:sprache><![CDATA[".$row_lva->sprache."]]></LVA:sprache>
 			<LVA:ects>".$row_lva->lv_ects."</LVA:ects>
@@ -222,6 +232,7 @@ if(!$result = pg_query($conn, $qry))
 				<LVA:kurzbz><![CDATA[".$row_lf->kurzbz."]]></LVA:kurzbz>
 				<LVA:bezeichnung><![CDATA[".$row_lf->bezeichnung."]]></LVA:bezeichnung>
 				<LVA:studiengang_kz>".$row_lva->studiengang_kz."</LVA:studiengang_kz>
+				<LVA:studiengang>".$stg_arr[$row_lva->studiengang_kz]."</LVA:studiengang>
 				<LVA:semester>".$row_lva->semester."</LVA:semester>
 				<LVA:sprache><![CDATA[".$row_le->sprache."]]></LVA:sprache>
 				<LVA:ects></LVA:ects>

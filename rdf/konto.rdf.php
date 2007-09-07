@@ -40,7 +40,7 @@ require_once('../include/konto.class.php');
 require_once('../include/person.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/datum.class.php');
-//require_once('../include/functions.inc.php');
+require_once('../include/functions.inc.php');
 
 // Datenbank Verbindung
 if (!$conn = pg_pconnect(CONN_STRING))
@@ -84,7 +84,7 @@ if(isset($_GET['buchungsnummern']))
 else
 	$buchungsnummern = '';
 
-
+$studiengang_kz = (isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:'');
 	
 $datum = new datum();
 if($xmlformat=='rdf')
@@ -92,9 +92,16 @@ if($xmlformat=='rdf')
 else
 	$konto = new konto($conn, null, false);
 
+if(isset($_SERVER['REMOTE_USER']))
+{
+	$user = get_uid();
+	loadVariables($conn, $user);
+	if($kontofilterstg=='false')
+		$studiengang_kz='';
+}
 if($person_id!='')
 {
-	$konto->getBuchungen($person_id, $filter);
+	$konto->getBuchungen($person_id, $filter, $studiengang_kz);
 }
 elseif($buchungsnr!='')
 {
@@ -105,7 +112,7 @@ elseif($buchungsnr!='')
 $rdf_url='http://www.technikum-wien.at/konto';
 if ($xmlformat=='rdf')
 {
-
+	
 ?>
 
 <RDF:RDF

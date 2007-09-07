@@ -974,7 +974,7 @@ function StudentAuswahl()
 	// *** Konto ***
 	kontotree = document.getElementById('student-konto-tree');
 	filter = document.getElementById('student-konto-button-filter').value;
-	url='<?php echo APP_ROOT;?>rdf/konto.rdf.php?person_id='+person_id+"&filter="+filter+"&"+gettimestamp();
+	url='<?php echo APP_ROOT;?>rdf/konto.rdf.php?person_id='+person_id+"&filter="+filter+"&studiengang_kz="+studiengang_kz_prestudent+"&"+gettimestamp();
 
 	//Alte DS entfernen
 	var oldDatasources = kontotree.database.GetDataSources();
@@ -1719,7 +1719,8 @@ function StudentKontoFilter()
 	//Konto Tree mit neuem Filter laden
 	kontotree = document.getElementById('student-konto-tree');
 	person_id = document.getElementById('student-prestudent-textbox-person_id').value
-	url='<?php echo APP_ROOT;?>rdf/konto.rdf.php?person_id='+person_id+"&filter="+filter.value+"&"+gettimestamp();
+	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value
+	url='<?php echo APP_ROOT;?>rdf/konto.rdf.php?person_id='+person_id+"&filter="+filter.value+"&studiengang_kz="+studiengang_kz+"&"+gettimestamp();
 
 	var buchungsnr=null;
 	try
@@ -1765,7 +1766,7 @@ function StudentKontoFilter()
 // ****
 // * Zeigt im Studententree nur diejenigen Studenten an die noch nicht alle Dokumente abgegeben haben
 // ****
-function StudentKontoFilterStudenten()
+function StudentKontoFilterStudenten(filter)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree=document.getElementById('tree-verband');
@@ -1795,7 +1796,7 @@ function StudentKontoFilterStudenten()
 	var stsem=tree.view.getCellText(tree.currentIndex,col);
 	
 	stsem = getStudiensemester();
-	url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ=student&filter2=konto&"+gettimestamp();
+	url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ=student&filter2="+filter+"&"+gettimestamp();
 	var treeStudent=document.getElementById('student-tree');
 
 	//Alte DS entfernen

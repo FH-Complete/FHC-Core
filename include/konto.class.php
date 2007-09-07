@@ -338,14 +338,18 @@ class konto
 	// * @param person_id, filter
 	// * @return true wenn ok, false wenn fehler
 	// ******************************************
-	function getBuchungen($person_id, $filter='alle')
+	function getBuchungen($person_id, $filter='alle', $studiengang_kz='')
 	{
 		if(!is_numeric($person_id))
 		{
 			$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
 			return false;
 		}
-
+		if($studiengang_kz!='')
+			$stgwhere = " AND tbl_konto.studiengang_kz='$studiengang_kz' ";
+		else 
+			$stgwhere = '';
+		
 		if($filter=='offene')
 		{
 			//Alle Buchungen und 'darunterliegende' holen die noch offen sind
@@ -360,12 +364,12 @@ class konto
 									(betrag + (SELECT CASE WHEN sum(betrag) is null THEN 0
 														ELSE sum(betrag) END
 												 FROM public.tbl_konto WHERE buchungsnr_verweis=konto_a.buchungsnr))<>0
-									AND person_id='$person_id') ORDER BY buchungsdatum";
+									AND person_id='$person_id') $stgwhere ORDER BY buchungsdatum";
 		}
 		else
 			$qry = "SELECT tbl_konto.*, anrede, titelpost, titelpre, nachname, vorname, vornamen
 					FROM public.tbl_konto JOIN public.tbl_person USING (person_id)
-					WHERE person_id='".$person_id."' ORDER BY buchungsdatum";
+					WHERE person_id='".$person_id."' $stgwhere ORDER BY buchungsdatum";
 
 		if($result = pg_query($this->conn, $qry))
 		{
