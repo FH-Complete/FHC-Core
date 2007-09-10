@@ -138,7 +138,8 @@
 
 	// ---------- Eine Datei mit allen Studentent anlegen -------------------
 	$sql_query="SELECT studiengang_kz, bezeichnung, lower(typ::varchar(1) || kurzbz) as kurzbz,uid, nachname, vorname,
-				semester, verband, gruppe FROM campus.vw_student JOIN tbl_studiengang USING (studiengang_kz) WHERE uid NOT LIKE '\\\\_%' AND semester<10 AND semester>0";
+				semester, verband, gruppe FROM campus.vw_student JOIN tbl_studiengang USING (studiengang_kz)
+				WHERE uid NOT LIKE '\\\\_%' AND semester<10 AND semester>0 AND vw_student.aktiv AND (substring(uid from 1 for 1)<'0' OR substring(uid from 1 for 1)>'9')";
 	echo $sql_query;
 	if(!($result=pg_query($conn, $sql_query)))
 		die(pg_errormessage($conn));

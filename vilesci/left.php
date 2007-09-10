@@ -285,6 +285,34 @@
 	<tr>
 		<td>&nbsp;</td>
 	</tr>
+	<!--================ Menue Personen->Benutzer =====================-->
+	<tr>
+       	<td nowrap>
+			<a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Benutzer'));">
+	   			<img src="../skin/images/menu_item.gif" width="7" height="9" />
+	   			&nbsp;Benutzer
+       		</a>
+       	</td>
+   	</tr>
+	<tr>
+		<td nowrap>
+			<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Benutzer" style="display:block;">
+			<!-- Personen->Benutzer->LDAP-Check -->
+			<tr>
+				<td width="10" nowrap>&nbsp;</td>
+				<td nowrap>
+					<a class="MenuItem2" href="personen/ldap_check.php" target="main">
+						<img src="../skin/images/menu_item.gif" width="7" height="9">
+						&nbsp;LDAP-Check
+					</a>
+				</td>
+			</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+	</tr>
 	<!--================ Menue Personen->Studenten ===================== -->
 	<tr>
 		<td nowrap>
@@ -320,18 +348,18 @@
 	<tr>
 		<td>&nbsp;</td>
 	</tr>
-	<!--================ Menue Personen->Lektoren =====================-->
+	<!--================ Menue Personen->Mitarbeiter =====================-->
 	<tr>
 		<td nowrap>
-			<a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Lektoren'));">
+			<a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Mitarbeiter'));">
 				<img src="../skin/images/menu_item.gif" width="7" height="9">
-				&nbsp;Lektoren
+				&nbsp;Mitarbeiter
 			</a>
 		</td>
 	<tr>
 	<tr>
 		<td nowrap>
-			<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Lektoren" style="display: none">
+			<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Mitarbeiter" style="display: block">
 			<tr>
 				<td width="10" nowrap>&nbsp;</td>
 		    	<td nowrap><a class="MenuItem2" href="personen/lektor_uebersicht.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;&Uuml;bersicht</a></td>

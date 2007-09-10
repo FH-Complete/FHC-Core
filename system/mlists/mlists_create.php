@@ -5,12 +5,16 @@
 	require_once('../../vilesci/config.inc.php');
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/globals.inc.php');
+	require_once('../../include/studiensemester.class.php');
+
 
 	if (!$conn = pg_pconnect(CONN_STRING))
 	   	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 	if(!($result_stg=pg_query($conn, "SELECT studiengang_kz, bezeichnung, lower(typ::varchar(1) || kurzbz) as kurzbz FROM public.tbl_studiengang ORDER BY kurzbz ASC")))
 		die(pg_errormessage($conn));
 	$num_rows=pg_num_rows($result_stg);
+	$ss=new studiensemester($conn);
+	$ss_nearest=$ss->getNearest();
 
 ?>
 <HTML>
@@ -46,7 +50,7 @@
 				       'FROM campus.vw_benutzer, public.tbl_benutzergruppe '.
 				       'WHERE vw_benutzer.uid=tbl_benutzergruppe.uid AND '.
 				       "UPPER(gruppe_kurzbz)=UPPER('$mg_kurzbz') AND tbl_benutzergruppe.uid NOT LIKE '\\\\_%' ".
-					   'AND studiensemester_kurzbz IS NULL ORDER BY nachname';
+					   "AND (studiensemester_kurzbz IS NULL OR studiensemester_kurzbz='$ss_nearest') ORDER BY nachname;";
 			//echo $sql_query;
 			if(!($result_person=pg_query($conn, $sql_query)))
 				die(pg_errormessage($conn));
