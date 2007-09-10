@@ -81,7 +81,7 @@
 
 		$qry = "SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE lehrveranstaltung_id='$lvid' ORDER BY ende DESC LIMIT 1";
 		$stsem = new studiensemester($sql_conn);
-		$angezeigtes_stsem = $stsem->getaktorNext($term_id);
+		$angezeigtes_stsem = $stsem->getNearest($term_id);
 						
 	    echo "&nbsp;($angezeigtes_stsem)";
 	    echo '</font></td>
@@ -302,7 +302,7 @@
           	{
 				//Anwesenheitsliste
 
-				echo "<b><a href='anwesenheitsliste.php?stg_kz=$course_id&sem=$term_id&lvid=$lvid' class='Item'>Anwesenheits- und Notenlisten</a></b><br>";
+				echo "<b><a href='anwesenheitsliste.php?stg_kz=$course_id&sem=$term_id&lvid=$lvid&stsem=$angezeigtes_stsem' class='Item'>Anwesenheits- und Notenlisten</a></b><br>";
           	}
 
           	//Leistungsuebersicht

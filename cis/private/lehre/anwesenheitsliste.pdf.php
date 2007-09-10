@@ -4,12 +4,6 @@
     *
     * Erstellt eine Anwesenheitsliste im PDF-Format
     *
-    * Aufruf:
-    * anwesenheitsliste.pdf.php?stg=222&lfvt=1234 //alle Studenten vom Studiengang 222 Lehrfach 1234
-    * anwesenheitsliste.pdf.php?stg=222&sem=1&lfvt=1234 //alle Studenten vom Studiengang 222 und Semester 1 Lehrfach 1234
-    * anwesenheitsliste.pdf.php?stg=222&sem=1&verband=A&lfvt=1234 //alle Studenten vom Studiengang 222, Semester 1, Verband A Lehrfach 1234
-    * anwesenheitsliste.pdf.php?stg=222&sem=1&verband=A&gruppe=1&lfvt=1234 //alle Studenten vom Studiengang 222, Semester 1, Verband A, Gruppe 1 Lehrfach 1234
-    * anwesenheitsliste.pdf.php?stg=222&sem=1&einheit=DVT-1xyz1&lfvt=1234 //alle Studenten vom Studiengang 222, Semester 1,  Einheit DVT-1xyz1 Lehrfach 1234
     */
 
    setlocale(LC_ALL, "de");
@@ -67,7 +61,13 @@
    		$lvid = $_GET['lvid'];
    	else 
    		die('Fehler bei der Parameteruebergabe');
+   		
+   	if(isset($_GET['stsem']))
+   		$stsem = $_GET['stsem'];
+   	else 
+   		die('Studiensemester wurde nicht uebergeben');
 
+   $lehreinheit_id = (isset($_GET['lehreinheit_id'])?$_GET['lehreinheit_id']:'');
 /**
  * liefert den groesseren der beiden werte
  *
@@ -108,13 +108,27 @@ $pdf->SetXY(30,75);
 else
 $pdf->SetXY(30,60);
 
-$stsem_obj = new studiensemester($conn);
-$stsem = $stsem_obj->getaktorNext();
+//$stsem_obj = new studiensemester($conn);
+//$stsem = $stsem_obj->getaktorNext();
 
-if($gruppe_kurzbz!='')
-	$pdf->MultiCell(0,20,'Gruppe: '.$gruppe_kurzbz.' Studiensemester: '.$stsem);
-else 
-	$pdf->MultiCell(0,20,'Gruppe: '.strtoupper($stgobj->typ.$stgobj->kurzbz).' '.$sem.$verband.$gruppe.' Studiensemester: '.$stsem);
+$qry = "SELECT distinct on(kuerzel, semester, verband, gruppe, gruppe_kurzbz) UPPER(stg_typ::varchar(1) || stg_kurzbz) as kuerzel, semester, verband, gruppe, gruppe_kurzbz from campus.vw_lehreinheit WHERE lehrveranstaltung_id='".addslashes($lvid)."' AND studiensemester_kurzbz='".addslashes($stsem)."'";
+if($lehreinheit_id!='')
+	$qry.=" AND lehreinheit_id='".addslashes($lehreinheit_id)."'";
+	
+$gruppen='';
+if($result = pg_query($conn, $qry))
+{
+	while($row = pg_fetch_object($result))
+	{
+		if($gruppen!='')
+			$gruppen.=', ';
+		if($row->gruppe_kurzbz=='')
+			$gruppen.=trim($row->kuerzel.'-'.$row->semester.$row->verband.$row->gruppe);
+		else
+			$gruppen=$row->gruppe_kurzbz;
+	}
+}
+$pdf->MultiCell(0,20,'Gruppe: '.$gruppen.' Studiensemester: '.$stsem);
 	
 $maxY=$pdf->GetY();
 $maxY=getmax($maxY,$pdf->GetY());
@@ -185,7 +199,17 @@ $pdf->MultiCell(520,$lineheight+2,'Lektoren',1,'L',1);
 
 //Schleife aller lektoren
 
-$qry = "SELECT distinct vorname, nachname FROM campus.vw_benutzer, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter WHERE uid=mitarbeiter_uid AND tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND lehrveranstaltung_id='".addslashes($lvid)."' AND studiensemester_kurzbz='$stsem' ORDER BY nachname, vorname;";
+$qry = "SELECT 
+			distinct vorname, nachname 
+		FROM campus.vw_benutzer, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter 
+		WHERE 
+			uid=mitarbeiter_uid AND 
+			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND 
+			lehrveranstaltung_id='".addslashes($lvid)."' AND 
+			studiensemester_kurzbz='$stsem' ";
+if($lehreinheit_id!='')
+	$qry.=" AND tbl_lehreinheit.lehreinheit_id='".addslashes($lehreinheit_id)."'";
+$qry.=" ORDER BY nachname, vorname;";
 
 if($result = pg_query($conn,$qry))
 {
@@ -271,24 +295,26 @@ $pdf->SetFont('Arial','',8);
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
 
-//$stud = new student($conn);
-//$result = $stud->getStudents($einheit,$gruppe,$verband,$sem,$stg);
-$qry = 'SELECT distinct vorname, nachname, uid, matrikelnr, verband, gruppe, semester FROM ';
-if($gruppe_kurzbz!='')
-	$qry .= "campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE studiensemester_kurzbz='$stsem' AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
-else 
-{
-	$qry .= "campus.vw_student WHERE studiengang_kz='$stg' AND semester='$sem'";
-	if($verband!='')
-		$qry.=" AND verband='$verband'";
-	if($gruppe!='')
-		$qry.=" AND gruppe='$gruppe'";
-}	
-$qry.= " ORDER BY nachname, vorname";
+$qry = "SELECT 
+			distinct vorname, nachname, matrikelnr, 
+			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe 
+		FROM 
+			campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid) 
+			JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid) 
+			LEFT JOIN public.tbl_studentlehrverband USING(student_uid)
+		WHERE 
+			lehrveranstaltung_id='".addslashes($lvid)."' AND 
+			vw_student_lehrveranstaltung.studiensemester_kurzbz='".addslashes($stsem)."' AND
+			tbl_studentlehrverband.studiensemester_kurzbz='".addslashes($stsem)."'";
+
+if($lehreinheit_id!='')
+	$qry.=" AND lehreinheit_id='".addslashes($lehreinheit_id)."'";
+	
+$qry.=' ORDER BY nachname, vorname';
 
 if($result = pg_query($conn, $qry))
 {
-$i=0;
+	$i=0;
 	while($elem = pg_fetch_object($result))
 	{
 	   $i++;
@@ -343,40 +369,6 @@ $i=0;
 	   $inhalt[]=array($i,$elem->nachname.' '.$elem->vorname,trim($elem->matrikelnr),$elem->semester.$elem->verband.$elem->gruppe,'','','','','','');
    }
 }
-
-
-/*
-
-
-
-
-
-
-
-$stud = new student($conn);
-$result = $stud->getStudents($einheit,$gruppe,$verband,$sem,$stg);
-
-$i=0;
-
-foreach($result as $elem)
-{
-   //Dummys filtern
-   if(!preg_match('*dummy*',$elem->uid) && $elem->semester!=10)
-   {
-   	
-   	
-   	
-   	
-	   $i++;
-	   $inhalt[]=array($i,$elem->nachname.' '.$elem->vornamen,trim($elem->matrikelnr),$elem->semester.$elem->verband.$elem->gruppe,'','','','','','');
-   }
-}
-//Tabelle zeichnen
-$h=$pdf->morepagestable($inhalt,10,$aligns);
-*/
-
-
-
 
 //FHStg
 $maxY=$pdf->GetY()+5;

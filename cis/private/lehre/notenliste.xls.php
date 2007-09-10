@@ -1,29 +1,13 @@
 <?php
 /*
- * Aufruf:
- * notenliste.xls.php?stg=222&lfvt=1234 //alle Studenten vom Studiengang 222 Lehrfach 1234
- * notenliste.xls.php?stg=222&sem=1&lfvt=1234 //alle Studenten vom Studiengang 222 und Semester 1 Lehrfach 1234
- * notenliste.xls.php?stg=222&sem=1&verband=A&lfvt=1234 //alle Studenten vom Studiengang 222, Semester 1, Verband A Lehrfach 1234
- * notenliste.xls.php?stg=222&sem=1&verband=A&gruppe=1&lfvt=1234 //alle Studenten vom Studiengang 222, Semester 1, Verband A, Gruppe 1 Lehrfach 1234
- * notenliste.xls.php?stg=222&sem=1&einheit=DVT-1xyz1&lfvt=1234 //alle Studenten vom Studiengang 222, Semester 1,  Einheit DVT-1xyz1 Lehrfach 1234
-*/
+ * Erstellt Notenliste im Excel Format
+ */
 
 require_once('../../config.inc.php');
 require_once('../../../include/lehrveranstaltung.class.php');
 require_once('../../../include/studiengang.class.php');
 require_once('../../../include/studiensemester.class.php');
-require_once('../../../include/Excel/PEAR.php');
-require_once('../../../include/Excel/BIFFwriter.php');
-require_once('../../../include/Excel/Workbook.php');
-require_once('../../../include/Excel/Format.php');
-require_once('../../../include/Excel/Worksheet.php');
-require_once('../../../include/Excel/Parser.php');
-require_once('../../../include/Excel/OLE.php');
-require_once('../../../include/Excel/PPS.php');
-require_once('../../../include/Excel/Root.php');
-require_once('../../../include/Excel/File.php');
-require_once('../../../include/Excel/Writer.php');
-
+require_once('../../../include/Excel/excel.php');
 
 // Datenbank Verbindung
 if (!$conn = pg_pconnect(CONN_STRING))
@@ -59,6 +43,16 @@ if (!$conn = pg_pconnect(CONN_STRING))
    	else
    		$gruppe = '';
    		
+   	if(isset($_GET['stsem']))
+   		$stsem = $_GET['stsem'];
+   	else
+   		die('Studiensemester muss uebergeben werden');
+   		
+   	if(isset($_GET['lehreinheit_id']))
+   		$lehreinheit_id = $_GET['lehreinheit_id'];
+   	else 
+   		$lehreinheit_id = '';
+   	
    	/*
 	 * Create Excel File
 	 */
@@ -89,22 +83,43 @@ if (!$conn = pg_pconnect(CONN_STRING))
 	
 	$stg_obj = new studiengang($conn, $stg);
 	
-	if($gruppe_kurzbz!='')
-		$grpname = "Gruppe: $gruppe_kurzbz";
-	else 
-		if($sem!='')
-			$grpname = "Gruppe: $sem$verband$gruppe";
-		else 
-			$grpname = '';
+	$qry = "SELECT distinct on(kuerzel, semester, verband, gruppe, gruppe_kurzbz) UPPER(stg_typ::varchar(1) || stg_kurzbz) as kuerzel, semester, verband, gruppe, gruppe_kurzbz from campus.vw_lehreinheit WHERE lehrveranstaltung_id='".addslashes($lvid)."' AND studiensemester_kurzbz='".addslashes($stsem)."'";
+	if($lehreinheit_id!='')
+		$qry.=" AND lehreinheit_id='".addslashes($lehreinheit_id)."'";
 		
-	$worksheet->write(1,0,"Studiengang: $stg_obj->bezeichnung $grpname");
+	$gruppen='';
+	if($result = pg_query($conn, $qry))
+	{
+		while($row = pg_fetch_object($result))
+		{
+			if($gruppen!='')
+				$gruppen.=', ';
+			if($row->gruppe_kurzbz=='')
+				$gruppen.=trim($row->kuerzel.'-'.$row->semester.$row->verband.$row->gruppe);
+			else
+				$gruppen=$row->gruppe_kurzbz;
+		}
+	}
+			
+	$worksheet->write(1,0,"Studiengang: $stg_obj->bezeichnung $gruppen");
 	$lines=2;
 	//Lektoren ermitteln
-	$stsem_obj = new studiensemester($conn);
-	$stsem = $stsem_obj->getaktorNext();
-
-	$qry = "SELECT distinct vorname, nachname FROM campus.vw_benutzer, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter WHERE uid=mitarbeiter_uid AND tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND lehrveranstaltung_id='".addslashes($lvid)."' AND studiensemester_kurzbz='$stsem' ORDER BY nachname, vorname;";
-
+	
+	$qry = "SELECT 
+				distinct vorname, nachname 
+			FROM 
+				campus.vw_benutzer, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter 
+			WHERE 
+				uid=mitarbeiter_uid AND 
+				tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND 
+				lehrveranstaltung_id='".addslashes($lvid)."' AND 
+				studiensemester_kurzbz='".addslashes($stsem)."'";
+	
+	if($lehreinheit_id!='')
+		$qry.=" AND tbl_lehreinheit.lehreinheit_id='".addslashes($lehreinheit_id)."'";
+	
+	$qry.=' ORDER BY nachname, vorname';
+	
 	if($result = pg_query($conn,$qry))
 	{
 		while($row=pg_fetch_object($result))
@@ -123,19 +138,23 @@ if (!$conn = pg_pconnect(CONN_STRING))
 	$worksheet->write($lines,5,"Note");
 	
 	
-	$qry = 'SELECT distinct vorname, nachname, uid, matrikelnr, verband, gruppe, semester FROM ';
-	if($gruppe_kurzbz!='')
-		$qry .= "campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE studiensemester_kurzbz='$stsem' AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
-	else 
-	{
-		$qry .= "campus.vw_student WHERE studiengang_kz='$stg' AND semester='$sem'";
-		if($verband!='')
-			$qry.=" AND verband='$verband'";
-		if($gruppe!='')
-			$qry.=" AND gruppe='$gruppe'";
-	}	
-	$qry.= " ORDER BY nachname, vorname";
-	//echo $qry;
+	$qry = "SELECT 
+				distinct vorname, nachname, matrikelnr, student_uid as uid, 
+				tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe 
+			FROM 
+				campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid) 
+				JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid) 
+				LEFT JOIN public.tbl_studentlehrverband USING(student_uid)
+			WHERE 
+				lehrveranstaltung_id='".addslashes($lvid)."' AND 
+				vw_student_lehrveranstaltung.studiensemester_kurzbz='".addslashes($stsem)."' AND
+				tbl_studentlehrverband.studiensemester_kurzbz='".addslashes($stsem)."'";
+
+	if($lehreinheit_id!='')
+		$qry.=" AND lehreinheit_id='".addslashes($lehreinheit_id)."'";
+	
+	$qry.=' ORDER BY nachname, vorname';
+	
 	if($result = pg_query($conn, $qry))
 	{
 		$i=1;

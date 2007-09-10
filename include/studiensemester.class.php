@@ -229,7 +229,7 @@ class studiensemester
 	 */
 	function getaktorNext($semester='')
 	{
-		if($stsem=$this->getakt())
+		if($stsem=$this->getakt() && $semester=='')
 		   return $stsem;
 		else
 		{
@@ -269,10 +269,21 @@ class studiensemester
 	 * Liefert das naechstgelegenste Studiensemester
 	 * @return Studiensemester oder false wenn es keines gibt
 	 */
-	function getNearest()
+	function getNearest($semester='')
 	{
-		$qry = "SELECT studiensemester_kurzbz FROM public.vw_studiensemester  ORDER BY delta LIMIT 1";
-		if(!$res=pg_exec($this->conn,$qry))
+		$qry = "SELECT studiensemester_kurzbz FROM public.vw_studiensemester ";
+		if($semester!='')
+		{
+			if($semester%2==0)
+				$ss='SS';
+			else
+				$ss='WS';
+
+			$qry.= " WHERE substring(studiensemester_kurzbz from 1 for 2)='$ss' ";
+		}
+		$qry.=' ORDER BY delta LIMIT 1';
+		
+		if(!$res=pg_query($this->conn,$qry))
 		{
 			$this->errormsg = pg_errormessage($this->conn);
 			return false;
