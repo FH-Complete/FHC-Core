@@ -30,6 +30,7 @@
 	require_once('../../config.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/studiengang.class.php');
+	require_once('../../../include/lehrveranstaltung.class.php');
 
     $error=0;
     //Connection Herstellen
@@ -52,6 +53,11 @@
     	$lvid=$_GET['lvid'];
     else
     	$error=2;
+    	
+    if(isset($_GET['stsem']))
+    	$stsem = $_GET['stsem'];
+    else 
+    	die('Studiensemester ist ungueltig');
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -81,53 +87,86 @@
 	  	$nt_content='';
 
 	  	//Content fuer Anwesenheitslisten erstellen
-	  	$stg_obj = new studiengang($conn, $stg_kz);
-	  	$kurzbzlang = $stg_obj->kuerzel;
-
-	  	//"normale" Gruppen auslesen
-	  	$qry = "SELECT verband, gruppe, count(*) FROM public.tbl_lehrverband JOIN public.tbl_student USING(studiengang_kz, semester, verband, gruppe) WHERE studiengang_kz='$stg_kz' AND semester='$sem' AND student_uid not like '%Dummy%' GROUP BY verband, gruppe;";
-	  	if($result = pg_query($conn,$qry))
-	  	{
-	  		if(pg_num_rows($result)>0)
-	  		{
-	  			$aw_content .= "<tr><td>.<a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid'>$kurzbzlang $sem</a></td><td>$kurzbzlang Semester $sem</td></tr>";
-	  			$nt_content .= "<tr><td>.<a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&lvid=$lvid'>$kurzbzlang $sem</a></td><td>$kurzbzlang Semester $sem</td></tr>";
-	  		}
-
-	  		$lastverband = '';
-
-	  		while($row = pg_fetch_object($result))
-	  		{
-	  			if($lastverband!=$row->verband)
-	  			{
-	  				$lastverband=$row->verband;
-	  				$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&verband=$row->verband&lvid=$lvid'>&nbsp;&nbsp;<img src='../../../skin/images/haken.gif'>$kurzbzlang $sem$row->verband</a></td><td>$kurzbzlang Semester $sem Verband $row->verband</td></tr>";
-	  				$nt_content .= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&verband=$row->verband&lvid=$lvid'>&nbsp;&nbsp;<img src='../../../skin/images/haken.gif'>$kurzbzlang $sem$row->verband</a></td><td>$kurzbzlang Semester $sem Verband $row->verband</td></tr>";
-	  			}
-	  			$aw_content.= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&verband=$row->verband&gruppe=$row->gruppe&lvid=$lvid'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif'>$kurzbzlang $sem$row->verband$row->gruppe</a></td><td>$kurzbzlang Semester $sem Verband $row->verband Gruppe $row->gruppe</td></tr>";
-	  			$nt_content.= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&verband=$row->verband&gruppe=$row->gruppe&lvid=$lvid'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif'>$kurzbzlang $sem$row->verband$row->gruppe</a></td><td>$kurzbzlang Semester $sem Verband $row->verband Gruppe $row->gruppe</td></tr>";
-	  		}
-	  	}
-	  	else
-	  		echo "Fehler beim Auslesen der Daten";
-
-	  	echo "<br />";
-	  	//Spezialgruppen Auslesen
-	  	$qry = "SELECT distinct gruppe_kurzbz, bezeichnung FROM public.tbl_gruppe JOIN public.tbl_benutzergruppe USING(gruppe_kurzbz) WHERE studiengang_kz='$stg_kz' AND semester='$sem' AND lehre AND aktiv;";
-	  	if($result = pg_query($conn,$qry))
-	  	{
-	  		while($row = pg_fetch_object($result))
-	  		{
-	  			$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&gruppe_kurzbz=$row->gruppe_kurzbz&lvid=$lvid'>&nbsp;&nbsp;<img src='../../../skin/images/haken.gif'>$row->gruppe_kurzbz</a></td><td>$row->bezeichnung</td></tr>";
-	  			$nt_content .= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&gruppe_kurzbz=$row->gruppe_kurzbz&lvid=$lvid'>&nbsp;&nbsp;<img src='../../../skin/images/haken.gif'>$row->gruppe_kurzbz</a></td><td>$row->bezeichnung</td></tr>";
-	  		}
-	  	}
-	  	else
-	  		echo "Fehler beim auslesen der Daten";
+	  	$stg_arr = array();
+	  	$stg_obj = new studiengang($conn);
+	  	$stg_obj->getAll();
+	  	
+	  	foreach ($stg_obj->result as $row)
+	  		$stg_arr[$row->studiengang_kz]=$row->kuerzel;
+	  	
+	  	$lv = new lehrveranstaltung($conn, $lvid);
+	  	  	
+	  	$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>Gesamtliste $lv->bezeichnung</a></td></tr>";
+	  	$nt_content .= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>Gesamtliste $lv->bezeichnung</a></td></tr>";
+	  	
 
 	  	echo "</table>";
 
+	  	$qry = "SELECT *, tbl_lehreinheitgruppe.studiengang_kz FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitgruppe USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
+	  			WHERE lehrveranstaltung_id='$lvid' AND studiensemester_kurzbz='".addslashes($stsem)."'";
+	  		  	
+	  	if($result = pg_query($conn, $qry))
+	  	{
+	  		$lastlehreinheit='';
+	  		$gruppen = '';
+	  		while($row = pg_fetch_object($result))
+	  		{
+	  			if($lastlehreinheit!=$row->lehreinheit_id)
+	  			{
+	  				if($lastlehreinheit!='')
+	  				{
+		  				$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid)
+		  						WHERE lehreinheit_id='$lastlehreinheit'";
+		  				$lektoren = '';
+		  				
+		  				if($result_lkt = pg_query($conn, $qry))
+		  				{
+		  					while($row_lkt = pg_fetch_object($result_lkt))
+		  					{
+		  						if($lektoren!='')
+		  							$lektoren.=', ';
+		  						$lektoren .= $row_lkt->kurzbz;
+		  					}
+		  				}
+		  				
+		  				$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
+		  				$nt_content .= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
+		  
+		  				$lastlehreinheit = $row->lehreinheit_id;
+		  				$gruppen='';
+	  				}
+	  				else 
+	  					$lastlehreinheit = $row->lehreinheit_id;
+	  			}
+	  			
+	  			if($gruppen!='')
+	  				$gruppen.= ', ';
+	  				  			
+	  			if($row->gruppe_kurzbz!='')
+	  				$gruppen .= $row->gruppe_kurzbz;
+	  			else 
+	  				$gruppen .= trim($stg_arr[$row->studiengang_kz].'-'.$row->semester.$row->verband.$row->gruppe);
+	  				
+	  			$lehrform = $row->lehrform_kurzbz;
+	  			$kurzbz = $row->kurzbz;
+	  		}
+	  		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid)
+					WHERE lehreinheit_id='$lastlehreinheit'";
+			$lektoren = '';
+			if($result_lkt = pg_query($conn, $qry))
+			{
+				while($row_lkt = pg_fetch_object($result_lkt))
+				{
+					if($lektoren!='')
+						$lektoren.=', ';
+					$lektoren .= $row_lkt->kurzbz;
+				}
+			}
+			
+			$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
+			$nt_content .= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
 
+	  	}
 
 	  	if($nt_content=='' && $aw_content=='')
 	  	{
@@ -136,21 +175,18 @@
 	  	else
 	  	{
 		  	if($aw_content!='')
-				$aw_content = "<table border='0'><tr class='liste'><td>Gruppe</td><td>Bezeichnung</td></tr>".$aw_content."</table>";
+				$aw_content = "<table border='0'><tr class='liste'><td><b>Anwesenheitslisten</b></td></tr>".$aw_content."</table>";
 		  	else
 		  		$aw_content = "Derzeit sind in diesem Studiengang / Semester keine Studenten vorhanden";
 
 		  	if($nt_content!='')
-				$nt_content = "<table border='0'><tr class='liste'><td>Gruppe</td><td>Bezeichnung</td></tr>".$nt_content."</table>";
+				$nt_content = "<table border='0'><tr class='liste'><td><b>Notenlisten</b></td></tr>".$nt_content."</table>";
 		  	else
 		  		$nt_content = "Derzeit sind in diesem Studiengang / Semester keine Studenten vorhanden";
 		  	echo "Zum Erstellen der Liste klicken Sie bitte auf die gew&uuml;nschte Gruppe!";
 		  	echo "<br /><br/>";
 		  	echo "<table>
-		  		<tr>
-		  			<th>Anwesenheitslisten</th>
-		  			<th>Notenlisten</th>
-		  		</tr>
+		  		
 		  		<tr>
 		  		   <td>$aw_content</td>
 		  		   <td>$nt_content</td>
