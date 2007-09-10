@@ -94,7 +94,16 @@
 				$pin=trim(substr($fp[$i],$beginpos,$endpos-$beginpos));
 				//echo $pin.'<br>';
 				$sql_query="INSERT INTO sync.tbl_zutrittskarte (key,name,firstname,groupe,logaswnumber,physaswnumber,validstart,validend,text1,text2,text3,text4,text5,text6,pin)
-					VALUES ('$key','$name','$firstname','$groupe','$logaswnumber','$physaswnumber','$validstart','$validend','$text1','$text2','$text3','$text4','$text5','$text6','$pin')";
+					VALUES ('$key','$name','$firstname','$groupe','$logaswnumber','$physaswnumber',";
+				if ($validstart=='')
+					$sql_query.="NULL,";
+				else
+					$sql_query.="'$validstart',";
+				if ($validend=='')
+					$sql_query.="NULL,";
+				else
+					$sql_query.="'$validend',";
+				$sql_query.="'$text1','$text2','$text3','$text4','$text5','$text6','$pin')";
 				$result=pg_exec($conn, $sql_query);
 				//echo $sql_query;
 				if(!$result)
