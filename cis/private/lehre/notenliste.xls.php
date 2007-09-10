@@ -7,8 +7,17 @@ require_once('../../config.inc.php');
 require_once('../../../include/lehrveranstaltung.class.php');
 require_once('../../../include/studiengang.class.php');
 require_once('../../../include/studiensemester.class.php');
-require_once('../../../include/Excel/excel.php');
-
+require_once('../../../include/Excel/PEAR.php');
+require_once('../../../include/Excel/BIFFwriter.php');
+require_once('../../../include/Excel/Workbook.php');
+require_once('../../../include/Excel/Format.php');
+require_once('../../../include/Excel/Worksheet.php');
+require_once('../../../include/Excel/Parser.php');
+require_once('../../../include/Excel/OLE.php');
+require_once('../../../include/Excel/PPS.php');
+require_once('../../../include/Excel/Root.php');
+require_once('../../../include/Excel/File.php');
+require_once('../../../include/Excel/Writer.php');
 // Datenbank Verbindung
 if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
