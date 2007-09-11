@@ -234,7 +234,7 @@ class lvgesamtnote
 		}
 		else 
 		{
-			$this->errormsg = "Fehler beim Speichern des Datensatzes";
+			$this->errormsg = "Fehler beim Speichern des Datensatzes: ".pg_last_error($this->conn);
 			return false;
 		}
 	}

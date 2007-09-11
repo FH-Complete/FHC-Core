@@ -49,6 +49,7 @@ class uebung
 	var $maxbsp;			//smallint
 	var $maxstd;			//smallint
 	var $nummer;			//smallint
+	var $prozent;
 
 	//Studentuebung
 	var $student_uid;		// varchar(16)
@@ -129,6 +130,7 @@ class uebung
 				$this->maxbsp = $row->maxbsp;
 				$this->maxstd = $row->maxstd;
 				$this->nummer = $row->nummer;
+				$this->prozent = $row->prozent;
 				return true;
 			}
 			else
@@ -143,6 +145,18 @@ class uebung
 			return false;
 		}
 	}
+
+	function toggle_prozent_punkte($uebung_id)
+	{
+		$qry = "update campus.tbl_uebung set prozent = not prozent where uebung_id = '".$uebung_id."'";
+		if(pg_query($this->conn, $qry))
+			return true;
+		else
+		{
+			return false;
+			$this->errormsg = "toggle misslungen";
+		}		
+	}	
 	
 	function load_studentuebung($student_uid, $uebung_id)
 	{
@@ -273,6 +287,7 @@ class uebung
 				$uebung_obj->maxstd = $row->maxstd;
 				$uebung_obj->maxbsp = $row->maxbsp;
 				$uebung_obj->nummer = $row->nummer;
+				$uebung_obj->prozent = $row->prozent;
 
 				$this->uebungen[] = $uebung_obj;
 			}
