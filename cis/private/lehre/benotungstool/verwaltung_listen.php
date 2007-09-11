@@ -94,6 +94,15 @@ if (isset($_GET["download"])){
 	{
 		return confirm('Wollen Sie die markierten Einträge wirklich löschen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
 	}
+	
+	function set_notenschluessel_prozent()
+	{
+		document.ns.schluessel_punkte_1.value=89;
+		document.ns.schluessel_punkte_2.value=76;
+		document.ns.schluessel_punkte_3.value=63;
+		document.ns.schluessel_punkte_4.value=50;
+		document.ns.schluessel_punkte_5.value=0;
+	}
   //-->
 </script>
 </head>
@@ -704,6 +713,16 @@ if(isset($_POST['uebung_edit']))
 
 }
 
+// Notenschluessel toggle
+
+if (isset($_GET['liste_id']) && isset($_GET['notenschluessel']))
+{
+	$ueb_ns = new uebung($conn);
+	$ueb_ns->toggle_prozent_punkte($_GET['liste_id']);
+	echo $ueb_ns->errormsg;
+}
+
+
 //Editieren einer Liste
 if(isset($_POST['liste_edit']))
 {
@@ -1185,20 +1204,43 @@ else
 			}
 		}
 		
-		echo "<form action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id' method=POST>\n";
-		echo "<table width='340'><tr><td colspan='3' class='ContentHeader3'>Notenschlüssel definieren</td></tr>\n";
-		echo "<tr><td>&nbsp;</td><td></td></tr>\n\n";
-	
-		echo "<tr><td>Note</td><td>Mindestpunkte</td></tr>";
-		echo "<tr><td><input type='text' name='schluessel_note_1' maxlength='2' size='2' value='1'></td><td><input type='text' size='2' name='schluessel_punkte_1' value='$notenschluessel[1]'></td></tr>";
-echo "<tr><td><input type='text' name='schluessel_note_2' maxlength='2' size='2' value='2'></td><td><input type='text' size='2' name='schluessel_punkte_2' value='$notenschluessel[2]'></td></tr>";
-echo "<tr><td><input type='text' name='schluessel_note_3' maxlength='2' size='2' value='3'></td><td><input type='text' size='2' name='schluessel_punkte_3' value='$notenschluessel[3]'></td></tr>";
-echo "<tr><td><input type='text' name='schluessel_note_4' maxlength='2' size='2' value='4'></td><td><input type='text' size='2' name='schluessel_punkte_4' value='$notenschluessel[4]'></td></tr>";
-echo "<tr><td><input type='text' name='schluessel_note_5' maxlength='2' size='2' value='5'></td><td><input type='text' size='2' name='schluessel_punkte_5' value='$notenschluessel[5]'></td></tr>";
-		echo "<tr><td align='right' colspan='2'><input type='submit' name='schluessel' value='Speichern'></td></tr>";
-	
-		echo "</table>
-		</form>";	
+		if ($anzeigen != "beide")
+		{	
+			if ($liste_obj->prozent == 't')
+			{
+				$einheit = " %";
+				$einheit_link = "Notenschlüssel in <u>Prozent</u> / <a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id&notenschluessel=punkte'>Punkten</a>";
+			}			
+			else
+			{
+				$einheit=" Punkte";
+				$einheit_link = "Notenschlüssel in <a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id&notenschluessel=prozent'>Prozent</a> / <u>Punkten</u>";
+			}
+			
+			echo "<form action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id' method='POST' name='ns'>\n";
+			echo "<table><tr><td colspan='3' class='ContentHeader3'>Notenschlüssel definieren</td></tr>\n";
+			echo "<tr>";
+			echo "<td colspan='3'>";
+			echo $einheit_link;
+			echo "</td>";			
+			echo "</tr>";			
+			echo "<tr><td colspan='3'>&nbsp;</td></tr>\n";
+			echo "<tr><td>Note</td><td>Minimum</td></tr>";
+			echo "<tr><td><input type='text' name='schluessel_note_1' maxlength='2' size='2' value='1' readonly></td><td><input type='text' size='4' name='schluessel_punkte_1' value='$notenschluessel[1]'>$einheit</td></tr>";
+			echo "<tr><td><input type='text' name='schluessel_note_2' maxlength='2' size='2' value='2' readonly></td><td><input type='text' size='4' name='schluessel_punkte_2' value='$notenschluessel[2]'>$einheit</td></tr>";
+			echo "<tr><td><input type='text' name='schluessel_note_3' maxlength='2' size='2' value='3' readonly></td><td><input type='text' size='4' name='schluessel_punkte_3' value='$notenschluessel[3]'>$einheit</td></tr>";
+			echo "<tr><td><input type='text' name='schluessel_note_4' maxlength='2' size='2' value='4' readonly></td><td><input type='text' size='4' name='schluessel_punkte_4' value='$notenschluessel[4]'>$einheit</td></tr>";
+			echo "<tr><td><input type='text' name='schluessel_note_5' maxlength='2' size='2' value='5' readonly></td><td><input type='text' size='4' name='schluessel_punkte_5' value='$notenschluessel[5]'>$einheit</td></tr>";
+			echo "<tr>";
+			echo "<td align='right' colspan='3'>";
+			if ($liste_obj->prozent == 't')
+				echo "<input type='button' onclick='set_notenschluessel_prozent();' value='Standardwerte setzen'><br>";
+			echo "<input type='submit' name='schluessel' value='Speichern'></td>";
+			echo "</tr>";
+		
+			echo "</table>
+			</form>";
+		}
 	
 	
 	}

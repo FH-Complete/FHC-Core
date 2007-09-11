@@ -226,6 +226,7 @@ class zeugnisnote
 		}
 
 		if(pg_send_query($this->conn, $qry))
+		//if(pg_query($this->conn, $qry))		
 		{
 			if ($result=pg_get_result($this->conn))
 				return true;

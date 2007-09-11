@@ -169,7 +169,27 @@ class studentnote
 				//if ($punkte_gesamt > 0)
 				if ($beispiele)
 				{
-					$qry = "SELECT min(note) as note from campus.tbl_notenschluesseluebung where punkte <= '".$punkte_gesamt."' and uebung_id = '".$ueb1->uebung_id."'";
+					
+					if ($ueb1->prozent == 't')
+					{					
+						$qry = "SELECT sum(tbl_beispiel.punkte) as punktegesamt_alle FROM campus.tbl_beispiel, campus.tbl_uebung
+								WHERE tbl_uebung.uebung_id=tbl_beispiel.uebung_id AND
+								tbl_uebung.lehreinheit_id='$lehreinheit_id' and tbl_uebung.liste_id = '$ueb1->uebung_id'";
+						$punkte_moeglich=1;
+						if($result=pg_query($conn, $qry))
+							if($row = pg_fetch_object($result))
+								$punkte_moeglich = $row->punktegesamt_alle;					
+						$punkte_ns = $punkte_gesamt/$punkte_moeglich*100;
+					}
+					else
+						$punkte_ns = $punkte_gesamt;
+
+					//Prozentpunkte
+					$qry = "SELECT min(note) as note from campus.tbl_notenschluesseluebung where punkte <= '".$punkte_ns."' and uebung_id = '".$ueb1->uebung_id."'";
+					
+					// Punkteanzahl
+					//$qry = "SELECT min(note) as note from campus.tbl_notenschluesseluebung where punkte <= '".$punkte_gesamt."' and uebung_id = '".$ueb1->uebung_id."'";
+					
 					if($result=pg_query($this->conn, $qry))
 					{
 	                	if($row = pg_fetch_object($result))

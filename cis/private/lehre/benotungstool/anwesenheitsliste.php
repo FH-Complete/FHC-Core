@@ -51,7 +51,12 @@ $user = get_uid();
 
 if(!check_lektor($user, $conn))
 	die('Sie haben keine Berechtigung fuer diesen Bereich');
-	
+
+if(isset($_GET['stsem']))
+	$stsem = $_GET['stsem'];
+else
+	$stsem = '';
+
 if(isset($_GET['uebung_id']) && is_numeric($_GET['uebung_id']))
 {
 	$uebung_id = $_GET['uebung_id'];
@@ -157,7 +162,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 					if($row->gruppe_kurzbz!='')
 					{
 						$gruppe_bez = 'Gruppe '.$row->gruppe_kurzbz;
-						$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row->gruppe_kurzbz)."' ORDER BY nachname, vorname";
+						$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row->gruppe_kurzbz)."' AND studiensemester_kurzbz = '".$stsem."' ORDER BY nachname, vorname";
 					}
 					else 
 					{
@@ -344,7 +349,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 					if($row->gruppe_kurzbz!='')
 					{
 						$gruppe_bez = 'Gruppe '.$row->gruppe_kurzbz;
-						$qry_stud = "SELECT uid, vorname, nachname, matrikelnr, vw_student.semester, vw_student.verband, vw_student.gruppe FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row->gruppe_kurzbz)."' ORDER BY nachname, vorname";
+						$qry_stud = "SELECT uid, vorname, nachname, matrikelnr, vw_student.semester, vw_student.verband, vw_student.gruppe FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row->gruppe_kurzbz)."' AND studiensemester_kurzbz = '".$stsem."' ORDER BY nachname, vorname";
 					}
 					else 
 					{
@@ -622,7 +627,7 @@ function addUser(student_uid)
 				if($row->gruppe_kurzbz!='')
 				{
 					$gruppe_bez = 'Gruppe '.$row->gruppe_kurzbz;
-					$qry_stud = "SELECT uid, vorname, nachname FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row->gruppe_kurzbz)."' ORDER BY nachname, vorname";
+					$qry_stud = "SELECT uid, vorname, nachname FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row->gruppe_kurzbz)."' AND studiensemester_kurzbz = '".$stsem."' ORDER BY nachname, vorname";
 				}
 				else 
 				{
@@ -653,7 +658,8 @@ function addUser(student_uid)
 			$qry_stud = "SELECT vw_student.uid, vorname, nachname FROM campus.vw_student, public.tbl_benutzergruppe, lehre.tbl_lehreinheitgruppe 
 						WHERE tbl_lehreinheitgruppe.lehreinheit_id='$lehreinheit_id' AND 
 						vw_student.uid = tbl_benutzergruppe.uid AND
-						tbl_benutzergruppe.gruppe_kurzbz = tbl_lehreinheitgruppe.gruppe_kurzbz
+						tbl_benutzergruppe.gruppe_kurzbz = tbl_lehreinheitgruppe.gruppe_kurzbz AND
+						tbl_benutzergruppe.studiensemester_kurzbz = '$stsem'
 						UNION
 						SELECT vw_student.uid, vorname, nachname FROM campus.vw_student, lehre.tbl_lehreinheitgruppe WHERE
 						tbl_lehreinheitgruppe.lehreinheit_id='$lehreinheit_id' AND
