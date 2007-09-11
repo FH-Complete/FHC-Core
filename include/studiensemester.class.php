@@ -164,7 +164,8 @@ class studiensemester
 	function getakt()
 	{
 		$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE start <= now() AND ende >= now()";
-		if(!$res=pg_exec($this->conn,$qry))
+		
+		if(!$res=pg_query($this->conn,$qry))
 		{
 			$this->errormsg = pg_errormessage($this->conn);
 			return false;
@@ -189,7 +190,7 @@ class studiensemester
 	function getAktTillNext()
 	{
 		$qry = "SELECT * FROM public.vw_studiensemester ORDER BY delta LIMIT 2";
-		if(!$res=pg_exec($this->conn,$qry))
+		if(!$res=pg_query($this->conn,$qry))
 		{
 			$this->errormsg = pg_errormessage($this->conn);
 			return false;
@@ -229,7 +230,7 @@ class studiensemester
 	 */
 	function getaktorNext($semester='')
 	{
-		if($stsem=$this->getakt() && $semester=='')
+		if(($stsem=$this->getakt()) && $semester=='')
 		   return $stsem;
 		else
 		{
@@ -246,7 +247,7 @@ class studiensemester
 			}
 			$qry.= " AND ende >= now() ORDER BY ende LIMIT 1";
 			
-			if(!$res=pg_exec($this->conn,$qry))
+			if(!$res=pg_query($this->conn,$qry))
 		    {
 				$this->errormsg = pg_errormessage($this->conn);
 				return false;

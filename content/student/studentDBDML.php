@@ -183,7 +183,7 @@ if(!$error)
 			if(!$student->load($_POST['uid']))
 			{
 				$return = false;
-				$errormsg = 'Fehler beim laden:'.$student->errormsg;
+				$errormsg = 'Fehler beim Laden:'.$student->errormsg;
 				$error = true;
 			}
 			
@@ -291,7 +291,7 @@ if(!$error)
 			if(!$person->load($_POST['person_id']))
 			{
 				$return = false;
-				$errormsg = 'Fehler beim laden:'.$person->errormsg;
+				$errormsg = 'Fehler beim Laden:'.$person->errormsg;
 				$error = true;
 			}
 			
@@ -352,7 +352,7 @@ if(!$error)
 			if(!$prestudent->load($_POST['prestudent_id']))
 			{
 				$return = false;
-				$errormsg = 'Fehler beim laden:'.$prestudent->errormsg;
+				$errormsg = 'Fehler beim Laden:'.$prestudent->errormsg;
 				$error = true;
 			}
 			
@@ -875,7 +875,7 @@ if(!$error)
 				else 
 				{
 					$return = false;
-					$errormsg = 'Fehler beim Speicher:'.$buchung->errormsg;
+					$errormsg = 'Fehler beim Speichern:'.$buchung->errormsg;
 				}
 			}
 			else 
@@ -1180,7 +1180,7 @@ if(!$error)
 				{
 					$error = true;
 					$return = false;
-					$errormsg = 'Fehler beim laden der Betriebmittelperson Zuordnung';
+					$errormsg = 'Fehler beim Laden der Betriebmittelperson Zuordnung';
 				}
 			}
 			else 

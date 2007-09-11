@@ -38,7 +38,7 @@
 		<!--<xul:textbox maxlength="10" xbl:inherits="disabled, value" size="10" tooltiptext="Format: DD.MM.JJJJ Beispiel: 31.12.2007"/>-->
 		<xul:hbox>
 			<xul:spacer flex="1"/>
-			<xul:menulist anonid="binding-menulist-field" style="margin: 1px" editable="true" xbl:inherits="disabled, value" label="">
+			<xul:menulist anonid="binding-menulist-field" style="padding: 1px" editable="true" xbl:inherits="disabled, value" label="">
 				<xul:menupopup>
 					<xul:datepicker anonid="binding-datepicker-field" 
 								onselect="parentNode.parentNode.parentNode.parentNode.value=this.selection.currentDay+'.'+(parseInt(this.selection.currentMonth)+1)+'.'+this.selection.currentYear"/>

@@ -42,10 +42,12 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 		<menuitem label="Entfernen" oncommand="StudentNotenDelete();" id="student-noten-tree-popup-delete" hidden="false"/>
 	</popup>
 </popupset>
-<hbox flex="1">
+<hbox flex="1" style="margin-top: 10px;">
+	<vbox flex="1">
+	<label value='Zeugnis' />
 	<tree id="student-noten-tree" seltype="single" hidecolumnpicker="false" flex="1"
 		datasources="rdf:null" ref="http://www.technikum-wien.at/zeugnisnote/liste"
-		style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100%" enableColumnDrag="true"
+		style="margin-bottom:5px;" height="100%" enableColumnDrag="true"
 		onselect="StudentNotenAuswahl()"
 		context="student-noten-tree-popup"
 		flags="dont-build-content"
@@ -105,17 +107,18 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 			</treechildren>
 		</template>
 	</tree>
-	
+	</vbox>
 	<vbox>
 		<spacer flex="1"/>
 		<button id="student-note-copy" label="&lt;=" style="font-weight: bold;" oncommand="StudentNotenMove();"/>
 		<spacer flex="1"/>
 	</vbox>
 	
-	
+	<vbox flex="1">
+	<label value='Lektor' />
 	<tree id="student-lvgesamtnoten-tree" seltype="multi" hidecolumnpicker="false" flex="1"
 		datasources="rdf:null" ref="http://www.technikum-wien.at/lvgesamtnote/liste"
-		style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100%" enableColumnDrag="true"
+		style="margin-bottom:5px;" height="100%" enableColumnDrag="true"
 		flags="dont-build-content"
 	>
 	
@@ -178,7 +181,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 			</treechildren>
 		</template>
 	</tree>
-	
+	</vbox>
 </hbox>		
 <hbox>		
 	<label value="Note" control="student-noten-menulist-note"/>

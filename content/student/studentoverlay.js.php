@@ -2922,6 +2922,40 @@ function StudentPruefungNeu()
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var datasource = rdfService.GetDataSource(url);
 	LVDropDown.database.AddDataSource(datasource);
+	LVDropDown.value='';
+	LVDropDown.selectedItem='';
+	
+	var LEDropDown = document.getElementById('student-pruefung-menulist-lehreinheit');
+	
+	//Alte DS entfernen
+	var oldDatasources = LEDropDown.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		LEDropDown.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	LEDropDown.builder.rebuild();
+	
+	LEDropDown.value='';
+	LEDropDown.selectedItem='';
+		
+	var MADropDown = document.getElementById('student-pruefung-menulist-mitarbeiter');
+	
+	//Alte DS entfernen
+	var oldDatasources = MADropDown.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		MADropDown.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	MADropDown.builder.rebuild();
+	
+	MADropDown.value='';
+	MADropDown.selectedItem='';
+	
+	document.getElementById('student-pruefung-menulist-note').value='9';
+	document.getElementById('student-pruefung-textbox-datum').value='<?php echo date('d.m.Y');?>';
+	document.getElementById('student-pruefung-textbox-anmerkung').value='';
 }
 
 // ****
@@ -2985,6 +3019,11 @@ function StudentPruefungDetailSpeichern()
 	neu = document.getElementById('student-pruefung-checkbox-neu').checked;
 	pruefung_id = document.getElementById('student-pruefung-textbox-pruefung_id').value;
 
+	if(lehreinheit_id=='')
+	{
+		alert('Es muss eine Lehreinheit ausgewaehlt werden');
+		return false;
+	}
 	var tree = document.getElementById('student-tree');
 
 	if (tree.currentIndex==-1)
