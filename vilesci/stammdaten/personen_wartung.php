@@ -109,6 +109,7 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 		$sql_query_upd1.="UPDATE public.tbl_akte SET person_id='$radio_2' WHERE person_id='$radio_1';";
 		$sql_query_upd1.="UPDATE public.tbl_bankverbindung SET person_id='$radio_2' WHERE person_id='$radio_1';";
 		$sql_query_upd1.="UPDATE public.tbl_kontakt SET person_id='$radio_2' WHERE person_id='$radio_1';";
+		$sql_query_upd1.="UPDATE public.tbl_betriebsmittelperson SET person_id='$radio_2' WHERE person_id='$radio_1';";
 		
 		$sql_query_upd1.="DELETE FROM public.tbl_person WHERE person_id='$radio_1';";
 		
