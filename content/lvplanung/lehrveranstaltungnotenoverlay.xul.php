@@ -42,10 +42,12 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 		<menuitem label="Entfernen" oncommand="LehrveranstaltungNotenDelete();" id="lehrveranstaltung-noten-tree-popup-delete" hidden="false"/>
 	</popup>
 </popupset>
-<hbox flex="1">
+<hbox flex="1" style="margin-top: 10px;">
+	<vbox flex="1">
+	<label value="Zeugnis" />
 	<tree id="lehrveranstaltung-noten-tree" seltype="single" hidecolumnpicker="false" flex="1"
 		datasources="rdf:null" ref="http://www.technikum-wien.at/zeugnisnote/liste"
-		style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100%" enableColumnDrag="true"
+		style="margin-bottom:5px;" height="100%" enableColumnDrag="true"
 		onselect="LehrveranstaltungNotenAuswahl()"
 		context="lehrveranstaltung-noten-tree-popup"
 		flags="dont-build-content"
@@ -113,17 +115,18 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 			</treechildren>
 		</template>
 	</tree>
-	
+	</vbox>
 	<vbox>
 		<spacer flex="1"/>
 		<button id="lehrveranstaltung-note-copy" label="&lt;=" style="font-weight: bold;" oncommand="LehrveranstaltungNotenMove();"/>
 		<spacer flex="1"/>
 	</vbox>
 	
-	
+	<vbox flex="1">
+	<label value="Lektor" />
 	<tree id="lehrveranstaltung-lvgesamtnoten-tree" seltype="multi" hidecolumnpicker="false" flex="1"
 		datasources="rdf:null" ref="http://www.technikum-wien.at/lvgesamtnote/liste"
-		style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100%" enableColumnDrag="true"
+		style="margin-bottom:5px;" height="100%" enableColumnDrag="true"
 		flags="dont-build-content"
 	>
 	
@@ -194,7 +197,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 			</treechildren>
 		</template>
 	</tree>
-	
+	</vbox>
 </hbox>		
 <hbox>		
 	<label value="Note" control="lehrveranstaltung-noten-menulist-note"/>
