@@ -527,7 +527,7 @@ else
 			$studiengbeginn = '';
 			$studiensemester_kurzbz='';
 			$qry = "SELECT * FROM public.tbl_prestudentrolle JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
-					WHERE prestudent_id='$student->prestudent_id' ORDER BY datum LIMIT 1";
+					WHERE prestudent_id='$student->prestudent_id' AND rolle_kurzbz in('Student','Incoming') ORDER BY datum LIMIT 1";
 			if($result = pg_query($conn, $qry))
 			{
 				if($row = pg_fetch_object($result))
