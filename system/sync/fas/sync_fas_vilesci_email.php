@@ -181,7 +181,7 @@ if($result = pg_query($conn_fas, $qry))
 					}
 				}
 			}
-			echo nl2br($ausgabe);
+			//echo nl2br($ausgabe);
 		}
 	}		
 }
@@ -191,6 +191,7 @@ echo nl2br("Emailsynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST
 //echo nl2br($text);
 echo nl2br("\n".$error_log);
 echo nl2br("\n\nE-Mailsync:\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler");
+echo nl2br("\n".$ausgabe);
 $ausgabe="E-Mailsync:\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n\n".$ausgabe;
 if(strlen(trim($error_log))>0)
 {

@@ -154,6 +154,7 @@ if($result = pg_query($conn_fas, $qry))
 //echo nl2br($text);
 echo nl2br("\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
 echo nl2br("\n".$error_log);
+echo nl2br("\n".$ausgabe_all);
 if(strlen(trim($error_log))>0)
 {
 	mail($adress, 'SYNC-Fehler Bankverbindung von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");
