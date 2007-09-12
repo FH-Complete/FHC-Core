@@ -741,6 +741,13 @@ function StudentAuswahl()
 	verband=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#verband" ));
 	gruppe=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#gruppe" ));
 	prestudent_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#prestudent_id" ));
+	status=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#status" ));
+	
+	//Bei Incoming wird das Menue zur Statusaenderung deaktiviert
+	if(status=='Incoming')
+		document.getElementById('student-toolbar-status').disabled=true;
+	else
+		document.getElementById('student-toolbar-status').disabled=false;
 
 	//Daten den Feldern zuweisen
 

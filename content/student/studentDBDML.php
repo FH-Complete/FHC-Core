@@ -1395,7 +1395,7 @@ if(!$error)
 			{
 				$zeugnisnote = new zeugnisnote($conn, null, true);
 				$error = false;
-				if(!is_numeric($_POST['matrikelnummer_'.$i]) || !is_numeric($_POST['note_'.$i]))
+				if(!is_numeric(trim($_POST['matrikelnummer_'.$i])) || !is_numeric($_POST['note_'.$i]))
 				{
 					$error = true;
 					$errormsg = "\nMatrikelnummer oder Note ist ungueltig: ".$_POST['matrikelnummer_'.$i].' - '.$_POST['note_'.$i];
@@ -1403,7 +1403,7 @@ if(!$error)
 				
 				if(!$error)
 				{
-					$qry = "SELECT student_uid FROM public.tbl_student WHERE matrikelnr='".$_POST['matrikelnummer_'.$i]."'";
+					$qry = "SELECT student_uid FROM public.tbl_student WHERE trim(matrikelnr)='".trim($_POST['matrikelnummer_'.$i])."'";
 					if($result = pg_query($conn, $qry))
 					{
 						if($row = pg_fetch_object($result))
