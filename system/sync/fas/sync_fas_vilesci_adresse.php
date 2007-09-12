@@ -19,7 +19,7 @@ require_once('../sync_config.inc.php');
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
-//$adress='ruhan@technikum-wien.at';
+$adress='ruhan@technikum-wien.at';
 //$adress='fas_sync@technikum-wien.at';
 
 $error_log='';
@@ -53,7 +53,8 @@ function validate($row)
 <body>
 <?php
 //nation
-$qry = "SELECT * FROM adresse ORDER BY person_fk;";
+$qry = "SELECT * FROM adresse WHERE person_fk IN 
+	(SELECT person_fk FROM mitarbeiter WHERE creationdate>'2007-07-12');";
 
 if($result = pg_query($conn_fas, $qry))
 {
@@ -384,6 +385,7 @@ echo "Adressensynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST'].
 echo nl2br($error_log);
 echo nl2br("\nAdresse\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler");
 echo nl2br("\nFirma\nGesamt: $anzahl_quelle2 / Eingefügt: $anzahl_eingefuegt2 / Geändert: $anzahl_update2 / Fehler: $anzahl_fehler2");
+echo nl2br("\n".$ausgabe);
 $ausgabe="\nAdresse\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler"
 ."\nFirma\nGesamt: $anzahl_quelle2 / Eingefügt: $anzahl_eingefuegt2 / Geändert: $anzahl_update2 / Fehler: $anzahl_fehler2\n\n".$ausgabe;
 if(strlen(trim($error_log))>0)

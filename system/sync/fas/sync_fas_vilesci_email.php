@@ -49,7 +49,8 @@ function validate($row)
  */
 
 //nation
-$qry = "SELECT * FROM email ORDER BY person_fk;";
+$qry = "SELECT * FROM email WHERE person_fk IN 
+	(SELECT person_fk FROM mitarbeiter WHERE creationdate>'2007-07-11');";
 
 if($result = pg_query($conn_fas, $qry))
 {
