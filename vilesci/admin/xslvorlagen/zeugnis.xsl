@@ -18,7 +18,7 @@
 			<fo:page-sequence master-reference="PageMaster">
 				<fo:flow flow-name="xsl-region-body" >
 	
-					<fo:block-container position="absolute" top="42mm" left="25mm" height="20mm">
+					<fo:block-container position="absolute" top="25mm" left="30mm" height="20mm">
 						<fo:block text-align="left" line-height="20pt" font-family="sans-serif" font-size="18pt">
 							<fo:inline font-weight="900">
 							<xsl:text>Zeugnis </xsl:text><xsl:value-of select="studiensemester" />
@@ -27,7 +27,7 @@
 						</fo:block>
 					</fo:block-container> 
 						
-					<fo:block-container position="absolute" top="63mm" left="25mm" height="20mm">
+					<fo:block-container position="absolute" top="46mm" left="30mm" height="20mm">
 						<fo:block text-align="left" line-height="20pt" font-family="sans-serif" font-size="18pt">
 							<fo:inline font-weight="900">
 							<xsl:value-of select="studiengang_art" />\n
@@ -38,30 +38,31 @@
 					
 
 
-					<fo:block-container position="absolute" top="85mm" left="145mm">
+					<fo:block-container position="absolute" top="68mm" left="140mm">
 						<fo:block line-height="14pt" font-family="sans-serif" font-size="10pt">
-							<xsl:text>Personenkennzahl: </xsl:text>
+							<xsl:text>Personenkennzeichen: </xsl:text>
 						</fo:block>
 					</fo:block-container>
-					<fo:block-container position="absolute" top="85mm" left="177mm">
+					<fo:block-container position="absolute" top="68mm" left="177mm">
 						<fo:block content-width="80mm" line-height="14pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
 							<xsl:value-of select="matrikelnr" />
 						</fo:block>
 					</fo:block-container>
-					<fo:block-container position="absolute" top="90mm" left="143mm">
+					<fo:block-container position="absolute" top="73mm" left="143mm">
 						<fo:block line-height="14pt" font-family="sans-serif" font-size="10pt">
 							<xsl:text>Kennzahl des Studiengangs: </xsl:text>
 						</fo:block>
 					</fo:block-container>
-					<fo:block-container position="absolute" top="90mm" left="189mm">
+					<fo:block-container position="absolute" top="73mm" left="189mm">
 						<fo:block content-width="80mm" line-height="14pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
 							<xsl:value-of select="studiengang_kz" />
 						</fo:block>
 					</fo:block-container> 
 
-					<fo:block-container position="absolute" top="102mm" left="25mm" height="10mm">
+					<fo:block-container position="absolute" top="85mm" left="30mm" height="10mm">
 						<fo:table table-layout="fixed" border-collapse="separate">
 						    <fo:table-column column-width="45mm"/>
+						    <fo:table-column column-width="100mm"/>
 								<fo:table-body>
 						            <fo:table-row line-height="14pt">
 										<fo:table-cell>
@@ -70,7 +71,7 @@
 											</fo:block>
 									</fo:table-cell>
 									<fo:table-cell>
-											<fo:block font-family="sans-serif" font-size="12pt" content-width="45mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="12pt" content-width="100mm" text-align="left">
 												<fo:inline font-weight="900"><xsl:value-of select="name" /></fo:inline>
 											</fo:block>
 									</fo:table-cell>
@@ -91,7 +92,7 @@
 						</fo:table>
 					</fo:block-container>
  
- 					<fo:block-container position="absolute" top="118mm" left="25mm">
+ 					<fo:block-container position="absolute" top="101mm" left="30mm">
 						<fo:table table-layout="fixed" border-collapse="separate" border-width="2pt" border-style="solid">
 						<fo:table-column column-width="85mm"/>
 						<fo:table-column column-width="30mm"/>
@@ -157,7 +158,7 @@
 						</fo:table>
 					</fo:block-container>
 					
-					<fo:block-container position="absolute" top="250mm" left="25mm" height="10mm">
+					<fo:block-container position="absolute" top="250mm" left="30mm" height="10mm">
 						<fo:table table-layout="fixed" border-collapse="separate">
 						<fo:table-column column-width="75mm"/>
 						<fo:table-column column-width="15mm"/>
@@ -174,7 +175,7 @@
 										</fo:block>
 									</fo:table-cell>
 									<fo:table-cell>
-										<fo:block font-size="8pt" content-width="75mm" text-align="center">
+										<fo:block font-size="10pt" content-width="75mm" text-align="center">
 										<xsl:value-of select="ort_datum" />
 										</fo:block>
 									</fo:table-cell>
@@ -195,16 +196,16 @@
 								
 								<fo:table-row  line-height="12pt">
 									<fo:table-cell>
-										<fo:block font-size="8pt" content-width="75mm" text-align="center">
+										<fo:block font-size="10pt" content-width="75mm" text-align="center">
 											<xsl:value-of select="studiengangsleiter" />
-											<xsl:text>\nStudiengangsleiter</xsl:text>
+											<xsl:text>\nStudiengangsleitung</xsl:text>
 										</fo:block></fo:table-cell>
 									<fo:table-cell>
 										<fo:block>
 										</fo:block>
 									</fo:table-cell>
 									<fo:table-cell>
-										<fo:block font-size="8pt" content-width="75mm" text-align="center">
+										<fo:block font-size="10pt" content-width="75mm" text-align="center">
 										Ort, Datum
 										</fo:block>
 									</fo:table-cell>
@@ -212,7 +213,7 @@
 								
 								<fo:table-row  line-height="10pt">
 									<fo:table-cell number-columns-spanned="3">
-										<fo:block font-size="8pt" content-width="165mm" text-align="center">
+										<fo:block font-size="10pt" content-width="165mm" text-align="center">
 											<xsl:text>Fachhochschule Technikum Wien\nHöchstädtplatz 5\nA-1200 Wien\nZVR-Nr.: 074476426\nDVR-Nr.:0928381</xsl:text>
 										</fo:block></fo:table-cell>
 								</fo:table-row>
@@ -233,10 +234,10 @@
 	
 	<xsl:template match="unterrichtsfach">
 		<fo:table-row  line-height="16pt">
-			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="12pt" content-width="85mm"><xsl:text> </xsl:text><xsl:value-of select="bezeichnung" /></fo:block></fo:table-cell>
-			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="12pt" content-width="30mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="note" /></fo:block></fo:table-cell>
-			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="12pt" content-width="25mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="sws" /></fo:block></fo:table-cell>
-			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="12pt" content-width="25mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="ects" /></fo:block></fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="11pt" content-width="85mm"><xsl:text> </xsl:text><xsl:value-of select="bezeichnung" /></fo:block></fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="11pt" content-width="30mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="note" /></fo:block></fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="11pt" content-width="25mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="sws" /></fo:block></fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="11pt" content-width="25mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="ects" /></fo:block></fo:table-cell>
 		</fo:table-row>
 	</xsl:template>
 	

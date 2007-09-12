@@ -36,6 +36,25 @@ $rdf_url='http://www.technikum-wien.at/nation';
 >
    <RDF:Seq about="<?php echo $rdf_url ?>/liste">
 <?php
+if(isset($_GET['optional']) && $_GET['optional']=='true')
+{
+	?>
+      <RDF:li>
+         <RDF:Description  id=""  about="<?php echo $rdf_url.'/'; ?>" >
+            <NATION:nation_code><![CDATA[]]></NATION:nation_code>
+            <NATION:entwicklungsstand><![CDATA[]]></NATION:entwicklungsstand>
+            <NATION:eu><![CDATA[]]></NATION:eu>
+            <NATION:ewr><![CDATA[]]></NATION:ewr>
+            <NATION:kontinent><![CDATA[]]></NATION:kontinent>
+            <NATION:kurztext><![CDATA[-- keine Auswahl --]]></NATION:kurztext>
+            <NATION:langtext><![CDATA[-- keine Auswahl --]]></NATION:langtext>
+            <NATION:engltext><![CDATA[-- keine Auswahl --]]></NATION:engltext>
+            <NATION:sperre><![CDATA[false]]></NATION:sperre>
+         </RDF:Description>
+      </RDF:li>
+<?php
+}
+
 foreach ($nation->nation as $row)
 {
 	?>

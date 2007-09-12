@@ -146,7 +146,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					$xml .= "			<unterrichtsfach>";
 					$xml .= "				<bezeichnung><![CDATA[".$row->lehrveranstaltung_bezeichnung."]]></bezeichnung>";
 					$xml .= "				<note>".$note."</note>";
-					$xml .= "				<sws>".sprintf('%.1f',$row->semesterstunden/$wochen)."</sws>";
+					$xml .= "				<sws>".sprintf('%.1f',$row->semesterstunden)."</sws>"; ///$wochen
 					$xml .= "				<ects>".$row->ects."</ects>";
 					if($row->benotungsdatum!='')
 						$xml .= "				<benotungsdatum>".date('d.m.Y',$datum->mktime_fromtimestamp($row->benotungsdatum))."</benotungsdatum>";
