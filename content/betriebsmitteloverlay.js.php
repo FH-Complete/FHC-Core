@@ -208,6 +208,7 @@ function BetriebsmittelAuswahl()
 	document.getElementById('betriebsmittel-textbox-retouram').value=retouram;
 	document.getElementById('betriebsmittel-menulist-betriebsmitteltyp').value=betriebsmitteltyp;
 	document.getElementById('betriebsmittel-textbox-nummer').value=nummer;
+	document.getElementById('betriebsmittel-textbox-nummerold').value=nummer;
 	document.getElementById('betriebsmittel-textbox-nummerintern').value=nummerintern;
 	document.getElementById('betriebsmittel-textbox-beschreibung').value=beschreibung;
 }
@@ -315,6 +316,7 @@ function BetriebsmittelDetailSpeichern()
 	retouram = document.getElementById('betriebsmittel-textbox-retouram').value;
 	betriebsmitteltyp = document.getElementById('betriebsmittel-menulist-betriebsmitteltyp').value;
 	nummer = document.getElementById('betriebsmittel-textbox-nummer').value;
+	nummerold = document.getElementById('betriebsmittel-textbox-nummerold').value;
 	beschreibung = document.getElementById('betriebsmittel-textbox-beschreibung').value;
 	neu = document.getElementById('betriebsmittel-checkbox-neu').checked;
 
@@ -343,6 +345,7 @@ function BetriebsmittelDetailSpeichern()
 	req.add('retouram', ConvertDateToISO(retouram));
 	req.add('betriebsmitteltyp', betriebsmitteltyp);
 	req.add('nummer', nummer);
+	req.add('nummerold', nummerold);
 	req.add('beschreibung', beschreibung);
 
 	var response = req.executePOST();

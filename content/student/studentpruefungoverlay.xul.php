@@ -44,7 +44,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <hbox flex="1">
 <grid id="student-pruefung-grid-detail" style="margin:4px;" flex="1">
 		  	<columns  >
-				<column flex="1"/>
+				<column flex="2"/>
 				<column flex="1"/>
 			</columns>
 			<rows>
