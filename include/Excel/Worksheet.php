@@ -1684,7 +1684,9 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
     function writeBlank($row, $col, $format)
     {
         // Don't write a blank cell unless it has a format
-        if ($format == 0) {
+        //if ($format == 0)
+        if (is_null($format))
+        {
             return(0);
         }
 
