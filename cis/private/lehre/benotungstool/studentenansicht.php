@@ -46,6 +46,15 @@ $user = get_uid();
 //$user = 'if06b172';
 //$user = 'if06b144';
 
+if(check_lektor($user, $conn) and $_GET["uid"] != "")
+{
+	if(!check_lektor_lehreinheit($conn, $user, $_GET["lehreinheit_id"]))
+		die("Sie haben keine Berechtigung für diese Lehreinheit");
+	$user = $_GET["uid"];
+}
+
+
+
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
 
@@ -58,6 +67,7 @@ if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id'])) //Lehr
 	$lehreinheit_id = $_GET['lehreinheit_id'];
 else
 	$lehreinheit_id = '';
+
 
 //Laden der Lehrveranstaltung
 $lv_obj = new lehrveranstaltung($conn);
@@ -332,8 +342,9 @@ echo '<td class="tdwidth10">&nbsp;</td>';
 echo "<td width='100%'>\n";
 echo "<table width='100%'><tr><td><b>$lv_obj->bezeichnung</b></td><td align='right'><a href='../../../../documents/".strtolower($stg_obj->kuerzel)."/$lv_obj->semester/$lv_obj->lehreverzeichnis/download/' target='_blank' class='Item'>Downloadverzeichnis anzeigen</a></td></tr></table><br>";
 
-if($lehreinheit_id=='')
+if($lehreinheit_id=='')		
 	die('Derzeit gibt es keine Kreuzerllisten f&uuml;r diese Lehrveranstaltung');
+
 $qry = "SELECT vorname, nachname FROM campus.vw_student WHERE uid='$user'";
 $name='';
 if($result = pg_query($conn, $qry))
@@ -360,14 +371,14 @@ if (!isset($_GET["notenuebersicht"]))
 	
 	if ($l > 0)
 	{
-		echo "<br><b>Leistungsuebersicht / <a href='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&notenuebersicht=1'>NotenÜbersicht</a> f&uuml;r $name</b><br><br>";
+		echo "<br><b>Leistungsuebersicht / <a href='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&notenuebersicht=1&uid=$user'>Notenübersicht</a> f&uuml;r $name</b><br><br>";
 		$uebung_obj = new uebung($conn);
 		$uebung_obj->load_uebung($lehreinheit_id,1);
 		if(count($uebung_obj->uebungen)>0)
 		{
 			echo "<table width='100%'><tr><td valign='top'>";
 			echo "<br>Wählen Sie bitte eine Aufgabe aus (Kreuzerllisten, Abgaben): <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
-			echo "<option value='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' selected></option>";
+			echo "<option value='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uid=$user' selected></option>";
 			foreach ($uebung_obj->uebungen as $row)
 			{
 				
@@ -385,7 +396,7 @@ if (!isset($_GET["notenuebersicht"]))
 					{
 					$disabled = 'disabled';
 					$selected = '';
-					echo "<OPTION style='background-color:#cccccc;' value='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id' $selected $disabled>";
+					echo "<OPTION style='background-color:#cccccc;' value='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id&uid=$user' $selected $disabled>";
 					echo $row->bezeichnung;
 					echo '</OPTION>';
 					}
@@ -406,7 +417,7 @@ if (!isset($_GET["notenuebersicht"]))
 						else
 							$selected = '';
 						
-						echo "<OPTION value='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$subrow->uebung_id' $selected>";
+						echo "<OPTION value='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$subrow->uebung_id&uid=$user' $selected>";
 		
 						
 						//Freigegeben = +
@@ -445,7 +456,8 @@ if (!isset($_GET["notenuebersicht"]))
 	}
 	else
 	{
-		echo "Derzeit sind keine Kreuzerllisten oder Abgaben angelegt";	
+		header("Location:studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&notenuebersicht=1&uid=$user");	
+		//echo "Derzeit sind keine Kreuzerllisten oder Abgaben angelegt";	
 	}
 	
 	
@@ -539,7 +551,7 @@ if (!isset($_GET["notenuebersicht"]))
 		echo "Freigegeben von ".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon))." bis ".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis));
 		echo "<br><br><h3><u>$uebung_obj->bezeichnung</u></h3>";
 		if ($uebung_obj->angabedatei)
-			echo "Angabe: <a href='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&download=".$downloadname."'>".$downloadname."</a><br><br>";
+			echo "Angabe: <a href='studentenansicht.php?uid=$user&lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&download=".$downloadname."'>".$downloadname."</a><br><br>";
 		
 		
 		$ueb_obj = new uebung($conn);
@@ -594,7 +606,7 @@ if (!isset($_GET["notenuebersicht"]))
 				echo "<tr><td>Maximale Anzahl Studenten/Übung:</td><td style='background-color:#dddddd;'><b>".$uebung_obj->maxstd."</b></td></tr>";
 			echo "</table>";	
 			echo "
-			<form method='POST' name='bspform' action='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem'>
+			<form method='POST' name='bspform' action='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&uid=$user'>
 			<table width='100%'>
 				<tr>
 					<td valign='top'><div style='width: 70%;'>
@@ -858,15 +870,15 @@ if (!isset($_GET["notenuebersicht"]))
 			{		
 				$uebung_obj->load_abgabe($uebung_obj->abgabe_id);	
 				echo " <tr>";
-				echo"	<td>Abgabedatei: <a href='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&download_abgabe=".$uebung_obj->abgabedatei."'>".$uebung_obj->abgabedatei."</a>";
+				echo"	<td>Abgabedatei: <a href='studentenansicht.php?uid=$user&lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&download_abgabe=".$uebung_obj->abgabedatei."'>".$uebung_obj->abgabedatei."</a>";
 				if($datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis)>time())	
-					echo " <a href='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&deleteabgabe=1'>[del]</a></td>";
+					echo " <a href='studentenansicht.php?uid=$user&lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&deleteabgabe=1'>[del]</a></td>";
 				echo "</tr>";
 			}
 			if($datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis)>time())
 			{
 				echo "	<tr>\n";
-				echo "	<form method='POST' action='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem' enctype='multipart/form-data'>\n";
+				echo "	<form method='POST' action='studentenansicht.php?uid=$user&lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem' enctype='multipart/form-data'>\n";
 				echo "		<td>\n";
 				echo "			<input type='file' name='abgabedatei'> <input type='submit' name='abgabe' value='Abgeben'>";
 				echo "		</td>\n";	
@@ -882,7 +894,7 @@ if (!isset($_GET["notenuebersicht"]))
 else
 {
 	
-	echo "<br><b><a href='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id'>Leistungsuebersicht</a> / Notenübersicht f&uuml;r $name</b><br><br>";	
+	echo "<br><b><a href='studentenansicht.php?uid=$user&lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id'>Leistungsuebersicht</a> / Notenübersicht f&uuml;r $name</b><br><br>";	
 	echo "<table><tr><td>";
 	
 	$uebung_obj = new uebung($conn);

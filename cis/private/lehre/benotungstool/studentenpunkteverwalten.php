@@ -87,6 +87,15 @@ if (isset($_GET["download_abgabe"])){
 	exit;
 }
 
+//Handbuch ausliefern
+if (isset($_GET["handbuch"])){
+	$filename = BENOTUNGSTOOL_PATH."handbuch_benotungstool.pdf";
+	header('Content-Type: application/octet-stream');
+	header('Content-disposition: attachment; filename="handbuch_benotungstool.pdf"');
+	readfile($filename);
+	exit;
+}
+
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -763,25 +772,27 @@ else
 					<td>&nbsp;</td>
 					<td>&nbsp;</td>
 					<td>&nbsp;</td>
+					<td>&nbsp;</td>
 					
 				</tr>
 				<tr>
 					<td class='ContentHeader2'>UID</td>
 					<td class='ContentHeader2'>Nachname</td>
 					<td class='ContentHeader2'>Vorname</td>
+					<td class='ContentHeader2'>Studentenansicht</td>
 					
 				</tr>
 				<tr>
 					<td>&nbsp;</td>
 					<td>&nbsp;</td>
 					<td>&nbsp;</td>
-					
+					<td>&nbsp;</td>
 				</tr>";
 			if($row_grp->gruppe_kurzbz!='')
 			{
 					echo "
 					<tr>
-						<td colspan='3' align='center'><b>$row_grp->gruppe_kurzbz</b></td>
+						<td colspan='4' align='center'><b>$row_grp->gruppe_kurzbz</b></td>
 					</tr>";
 					$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row_grp->gruppe_kurzbz)."' AND studiensemester_kurzbz = '".$stsem."' ORDER BY nachname, vorname";
 			}
@@ -789,7 +800,7 @@ else
 			{
 				echo "
 					<tr>
-						<td colspan='3' align='center'><b>Verband $row_grp->verband ".($row_grp->gruppe!=''?"Gruppe $row_grp->gruppe":'')."</b></td>
+						<td colspan='4' align='center'><b>Verband $row_grp->verband ".($row_grp->gruppe!=''?"Gruppe $row_grp->gruppe":'')."</b></td>
 					</tr>";
 					$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student
 					             WHERE studiengang_kz='$row_grp->studiengang_kz' AND
@@ -812,6 +823,7 @@ else
 						<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->uid</a></td>
 						<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->nachname</a></td>
 						<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->vorname</a></td>
+						<td><a href='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item' target='_blank'>Studentenansicht</a></td>
 					</tr>";
 					$i++;
 				}
