@@ -682,18 +682,81 @@ class lehreinheit
 				}
 				else
 				{
-					//Gruppenzuteilung, Mitarbeiterzuteilung und Lehreinheit loeschen
-					$qry = "BEGIN;
-							DELETE FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$lehreinheit_id';
-							DELETE FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id';
-							DELETE FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$lehreinheit_id';
-							COMMIT;";
-					if(pg_query($this->conn, $qry))
-						return true;
-					else
+					pg_query($this->conn, 'BEGIN');
+					
+					//UNDO Befehl zusammenbauen
+					$undosql='';
+					
+					//LehreinheitMitarbeiter
+					$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$lehreinheit_id'";
+					if($result = pg_query($this->conn, $qry))
 					{
-						$this->errormsg = pg_last_error($this->conn);
+						while($row = pg_fetch_object($result))
+						{
+							$undosql.=" INSERT INTO lehre.tbl_lehreinheitmitarbeiter(lehreinheit_id, mitarbeiter_uid, lehrfunktion_kurzbz, planstunden, stundensatz, faktor, anmerkung, bismelden, updateamum, updatevon, insertamum, insertvon, semesterstunden) 
+							            VALUES(".$this->addslashes($row->lehreinheit_id).",".$this->addslashes($row->mitarbeiter_uid).",".$this->addslashes($row->lehrfunktion_kurzbz).",".$this->addslashes($row->planstunden).",".$this->addslashes($row->stundensatz).",".$this->addslashes($row->faktor).",".
+										$this->addslashes($row->anmerkung).",".($row->bismelden=='t'?'true':'false').",".$this->addslashes($row->updateamum).",".$this->addslashes($row->updatevon).",".$this->addslashes($row->insertamum).",".$this->addslashes($row->insertvon).",".$this->addslashes($row->semesterstunden).");";
+						}
+					}
+				
+					//LehreinheitGruppe	
+					$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id'";
+					if($result = pg_query($this->conn, $qry))
+					{
+						while($row = pg_fetch_object($result))
+						{
+							$undosql.=" INSERT INTO lehre.tbl_lehreinheitgruppe(lehreinheitgruppe_id, lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon) 
+							            VALUES(".$this->addslashes($row->lehreinheitgruppe_id).",".$this->addslashes($row->lehreinheit_id).",".$this->addslashes($row->studiengang_kz).",'".addslashes($row->semester)."','".addslashes($row->verband)."','".addslashes($row->gruppe)."',".
+										$this->addslashes($row->gruppe_kurzbz).",".$this->addslashes($row->updateamum).",".$this->addslashes($row->updatevon).",".$this->addslashes($row->insertamum).",".$this->addslashes($row->insertvon).");";
+						}
+					}
+					
+					//Lehreinheit
+					$qry = "SELECT * FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$lehreinheit_id'";
+					if($result = pg_query($this->conn, $qry))
+					{
+						while($row = pg_fetch_object($result))
+						{
+							$undosql.=" INSERT INTO lehre.tbl_lehreinheit(lehreinheit_id, lehrveranstaltung_id, studiensemester_kurzbz, lehrfach_id, lehrform_kurzbz, stundenblockung, wochenrythmus, start_kw, raumtyp, raumtypalternativ, sprache, lehre, anmerkung, unr, lvnr,  updateamum, updatevon, insertamum, insertvon) 
+							            VALUES(".$this->addslashes($row->lehreinheit_id).",".$this->addslashes($row->lehrveranstaltung_id).",".$this->addslashes($row->studiensemester_kurzbz).",".$this->addslashes($row->lehrfach_id).",".$this->addslashes($row->lehrform_kurzbz).",".$this->addslashes($row->stundenblockung).",".
+										$this->addslashes($row->wochenrythmus).",".$this->addslashes($row->startkw).",".$this->addslashes($row->raumtyp).",".$this->addslashes($row->raumtypalternativ).",".$this->addslashes($row->sprache).",".($row->wochenrythmus=='t'?'true':'false').",".
+										$this->addslashes($row->anmerkung).",".$this->addslashes($row->unr).",".$this->addslashes($row->lvnr).",".$this->addslashes($row->updateamum).",".$this->addslashes($row->updatevon).",".$this->addslashes($row->insertamum).",".$this->addslashes($row->insertvon).");";
+						}
+					}
+					
+					$log = new log($this->conn);
+					
+					//Gruppenzuteilung, Mitarbeiterzuteilung und Lehreinheit loeschen
+					$qry = "DELETE FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$lehreinheit_id';
+							DELETE FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id';
+							DELETE FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$lehreinheit_id';";
+					
+					$log->new = true;
+					$log->sql = $qry;
+					$log->sqlundo = $undosql;
+					$log->executetime = date('Y-m-d H:i:s');
+					$log->mitarbeiter_uid = get_uid();
+					$log->beschreibung = "Lehreinheit loeschen - $lehreinheit_id";
+					
+					if(!$log->save())
+					{
+						$this->errormsg = 'Fehler beim Schreiben des Log-Eintrages';
+						pg_query($this->conn, 'ROLLBACK');
 						return false;
+					}
+					else 
+					{
+						if(pg_query($this->conn, $qry))
+						{
+							pg_query($this->conn, 'COMMIT');
+							return true;
+						}
+						else
+						{
+							pg_query($this->conn, 'ROLLBACK');
+							$this->errormsg = pg_last_error($this->conn);
+							return false;
+						}
 					}
 				}
 			}

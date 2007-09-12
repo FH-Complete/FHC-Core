@@ -44,6 +44,7 @@ var StudentPruefungTreeDatasource; //Datasource des Pruefung Trees
 var StudentPruefungSelectID=null; //ID der Pruefung die nach dem Refresh markiert werden soll
 var StudentDetailRolleTreeDatasource=null; //Datasource fuer denn PrestudentRolleTree
 var StudentAkteTreeDatasource=null;
+var doublerebuildkonto='false';
 // ********** Observer und Listener ************* //
 
 // ****
@@ -136,7 +137,7 @@ var StudentKontoTreeListener =
   	  //timeout nur bei Mozilla notwendig da sonst die rows
   	  //noch keine values haben. Ab Seamonkey funktionierts auch
   	  //ohne dem setTimeout
-      window.setTimeout(StudentKontoTreeSelectBuchung,10);
+  	  window.setTimeout(StudentKontoTreeSelectBuchung,10);
   }
 };
 
@@ -1644,6 +1645,40 @@ function StudentKontoTreeSelectBuchung()
 	}
 }
 
+function StudentKontoLoad()
+{
+	person_id = document.getElementById('student-detail-textbox-person_id').value;
+	kontotree = document.getElementById('student-konto-tree');
+	filter = document.getElementById('student-konto-button-filter').value;
+	studienang_kz_prestudent = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+	url='<?php echo APP_ROOT;?>rdf/konto.rdf.php?person_id='+person_id+"&filter="+filter+"&studiengang_kz="+studiengang_kz_prestudent+"&"+gettimestamp();
+
+	//Alte DS entfernen
+	var oldDatasources = kontotree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		kontotree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	kontotree.builder.rebuild();
+
+	try
+	{
+		StudentKontoTreeDatasource.removeXMLSinkObserver(StudentKontoTreeSinkObserver);
+		kontotree.builder.removeListener(StudentKontoTreeListener);
+	}
+	catch(e)
+	{}
+
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	StudentKontoTreeDatasource = rdfService.GetDataSource(url);
+	StudentKontoTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	StudentKontoTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	kontotree.database.AddDataSource(StudentKontoTreeDatasource);
+	StudentKontoTreeDatasource.addXMLSinkObserver(StudentKontoTreeSinkObserver);
+	kontotree.builder.addListener(StudentKontoTreeListener);
+}
+
 // ****
 // * Wenn eine buchung Ausgewaehlt wird, dann werden
 // * die Details geladen und angezeigt
@@ -1961,7 +1996,10 @@ function StudentKontoGegenbuchung()
 	{
 		//StudentKontoSelectBuchung=val.dbdml_data;
 		StudentKontoSelectBuchung=null;
-		StudentKontoTreeDatasource.Refresh(false); //non blocking
+		//StudentKontoTreeDatasource.Refresh(false); //non blocking
+		//Hier wird der ganze Konto Tree Neu geladen da bei ein
+		//normales Refresh hier nicht immer funktioniert
+		StudentKontoLoad();
 		SetStatusBarText('Daten wurden gespeichert');
 	}
 }
