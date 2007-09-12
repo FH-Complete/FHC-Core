@@ -1117,7 +1117,7 @@ if(!$error)
 		$bm = new betriebsmittel($conn, null, true);
 		
 		//Nachschauen ob dieses Betriebsmittel schon existiert
-		if($bm->getBetriebsmittel($_POST['betriebsmitteltyp'],$_POST['nummer']))
+		if($bm->getBetriebsmittel($_POST['betriebsmitteltyp'],$_POST['nummerold']))
 		{
 			if(count($bm->result)>0)
 			{
@@ -1125,6 +1125,7 @@ if(!$error)
 				if($bm->load($bm->result[0]->betriebsmittel_id))
 				{
 					$bm->beschreibung = $_POST['beschreibung'];
+					$bm->nummer = $_POST['nummer'];
 					if(!$bm->save(false))
 					{
 						$return = false;
@@ -1166,7 +1167,7 @@ if(!$error)
 				}
 			}
 						
-			//Zuordnung Betriebsmittel-Person anlgegen
+			//Zuordnung Betriebsmittel-Person anlegen
 			$bmp = new betriebsmittelperson($conn, null, null, true);
 			if($_POST['neu']!='true')
 			{

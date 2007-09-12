@@ -175,7 +175,7 @@ class betriebsmittel
 			$qry='UPDATE public.tbl_betriebsmittel SET '.
 				'betriebsmitteltyp='.$this->addslashes($this->betriebsmitteltyp).', '. 
 				'beschreibung='.$this->addslashes($this->beschreibung).', '. 
-				//'nummer='.$this->addslashes($this->nummer).', '.  
+				'nummer='.$this->addslashes($this->nummer).', '.  
 				'reservieren='.($this->reservieren?'true':'false').', '.
 				'ort_kurzbz='.$this->addslashes($this->ort_kurzbz).', '.
 				'ext_id='.$this->addslashes($this->ext_id).', '. 

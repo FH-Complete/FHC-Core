@@ -157,7 +157,9 @@ loadVariables($conn, $user);
 	$maxlength[$i]=3;
 	$worksheet->write($zeile,++$i,"TELEFON", $format_bold);
 	$maxlength[$i]=3;
-
+	$worksheet->write($zeile,++$i,"GRUPPEn", $format_bold);
+	$maxlength[$i]=3;
+	
 	$zeile++;
 	// Student holen
 	if($typ=='student')
@@ -234,6 +236,7 @@ loadVariables($conn, $user);
 		global $maxlength, $datum_obj;
 		global $zeile, $worksheet, $conn;
 		global $zgv_arr, $zgvmas_arr;
+		global $studiensemester_kurzbz;
 		
 		$prestudent = new prestudent($conn, null, null);
 		$prestudent->getLastStatus($row->prestudent_id);
@@ -452,6 +455,24 @@ loadVariables($conn, $user);
 			}
 		}
 		$i++;
+		
+		$grps='';
+		$qry_1 = "SELECT gruppe_kurzbz FROM public.tbl_student JOIN public.tbl_benutzergruppe ON (student_uid=uid) WHERE tbl_student.prestudent_id='$row->prestudent_id' AND tbl_benutzergruppe.studiensemester_kurzbz='$studiensemester_kurzbz'";
+		if($result_1 = pg_query($conn, $qry_1))
+		{
+			while($row_1 = pg_fetch_object($result_1))
+			{
+				if($grps!='')
+					$grps.=',';
+				
+				$grps.=$row_1->gruppe_kurzbz;
+			}
+		}
+		if(strlen($grps)>$maxlength[$i])
+			$maxlength[$i]=strlen($grps);
+		$worksheet->write($zeile,$i, $grps);
+		$i++;
+		
 	}
 		
 
