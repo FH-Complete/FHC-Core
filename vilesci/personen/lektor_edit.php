@@ -24,7 +24,7 @@ if(!$conn = pg_pconnect(CONN_STRING))
 	else if (isset($_GET['new']))
 	{
 		doEDIT($conn,null,true);
-	
+
 	}
 	else
 	{
@@ -34,7 +34,7 @@ if(!$conn = pg_pconnect(CONN_STRING))
 		}
 		doEDIT($conn,$_GET['id']);
 	}
-	
+
 /**
  * Lektor speichern/anlegen
  */
@@ -44,7 +44,7 @@ function doSAVE($conn)
 	if ($_POST['new']==1)
 	{
 		$lektor->new=true;
-	} 
+	}
 	else
 	{
 		$lektor->load($_POST['uid']);
@@ -78,7 +78,7 @@ function doSAVE($conn)
 	{
 		echo "<p>Datensatz gespeichert.</p>";
 		return true;
-	} 
+	}
 	else
 	{
 		echo "<p>".$lektor->errormsg."</p>";
@@ -103,12 +103,12 @@ function doEDIT($conn,$id='',$new=false,$msg='')
 	{
 		$status_ok=$lektor->load(addslashes($id));
 	}
-	
+
 	if (!$status_ok && !$new)
 	{
 		// Laden fehlgeschlagen
 		echo $lektor->errormsg;
-	} 
+	}
 	else
 	{
 ?>
