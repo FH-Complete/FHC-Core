@@ -130,6 +130,13 @@ else
 			  	<td class="tdwidth10" nowrap>&nbsp;</td>
 				<td class='tdwrap'><a class="Item" href="https://webmail.technikum-wien.at" target="_blank"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Webmail</a></td>
 			</tr>
+			<?php			
+			if ($is_student)
+				echo '<tr>
+			  	<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td class="tdwrap"><a class="Item" href="profile/dokumente.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Dokumente</a></td>
+			</tr>'
+			?>		  	
 		  	<tr>
 				<td class="tdwidth10" nowrap>&nbsp;</td>
 				<td class='tdwrap'><a class="Item" href="lvplan/stpl_week.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;LV-Plan</a></td>
@@ -138,7 +145,7 @@ else
 			if ($is_student)
 				echo '<tr>
 			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a class="Item" href="profile/dokumente.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Dokumente</a></td>
+				<td class="tdwrap"><a class="Item" href="lehre/notenliste.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Leistungsbeurteilung</a></td>
 			</tr>'
 			?>
 			

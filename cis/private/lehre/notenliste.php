@@ -36,78 +36,64 @@
  * Erstellt eine Notenliste des aktuellen Studiensemesters
  * zur Information fuer Studenten
  */
+
+
 require('../../../include/functions.inc.php');
+require('../../../include/studiensemester.class.php');
 require('../../config.inc.php');
-if(!$conn=pg_connect(CONN_STRING_FAS))
+
+if(!$conn=pg_connect(CONN_STRING))
 	die("Die Datenbankverbindung konnte nicht hergestellt werden.");
 
-if(isset($stsem) && (!is_numeric($stsem) || strlen($stsem)>2))
-	die('Fehler');
+if(isset($_GET["stsem"]))
+	$stsem = $_GET["stsem"];
+else
+	$stsem = '';
+	
 $user = get_uid();
 
 $error = '';
-$student_id = '';
 
-//Student ID ermitteln
-$qry = "SELECT
-			student.student_pk as student_id,
-			vorname,
-			familienname,
-			studiengang.name as stg
-		FROM
-			person,
-			student,
-			studiengang
-		WHERE
-			person.uid='$user' AND
-			person.person_pk=student.person_fk AND
-			aufgenommenam is not null AND
-			studiengang.studiengang_pk=student.studiengang_fk
-		ORDER BY aufgenommenam DESC, student_id DESC LIMIT 1
-			";
 
-if(!$row=pg_fetch_object(pg_query($conn,$qry)))
+if(!check_student($user, $conn))
 {
 	$error .= 'Sie m&uuml;ssen als Student eingeloggt sein um ihre Noten abzufragen!';
+	echo $error;
 }
 else
 {
-	$vorname=$row->vorname;
-	$nachname=$row->familienname;
-	$stg_name=$row->stg;
-	$student_id = $row->student_id;
-	//Aktuelles Studiensemester ermitteln
-	$qry = "SELECT
-				CASE studiensemester.art
-					WHEN 1 THEN 'WS' || studiensemester.jahr
-					WHEN 2 THEN 'SS' || studiensemester.jahr
-				END as stsem_name,
-				studiensemester_pk, aktuell
-			FROM studiensemester order by jahr, art DESC";
-
-	if(!$result = pg_query($conn, $qry))
-		die("Fehler beim lesen aus der Datenbank");
-
-	/*if($row = pg_fetch_object($result))
-	{
-		$stsem = $row->studiensemester_pk;
-		$stsem_name = $row->stsem_name;
-	}
+	$qry = "SELECT vw_student.vorname, vw_student.nachname, tbl_studiengang.bezeichnung FROM public.tbl_studiengang JOIN campus.vw_student USING (studiengang_kz) WHERE campus.vw_student.uid = '$user'";
+	
+	if (!$result=pg_query($conn,$qry))
+		die("Kein Studentendatensatz!");
 	else
-		die("Derzeit kann keine Notenliste erstellt werden");
-		*/
+	{
+		$row=pg_fetch_object($result);
+		
+		$vorname= $row->vorname;
+		$nachname = $row->nachname;
+		$stg_name = $row->bezeichnung;
+	}
+	
+	//Aktuelles Studiensemester ermitteln
+	
+	$stsem_obj = new studiensemester($conn);
+	if($stsem=='')
+		$stsem = $stsem_obj->getaktorNext();
+	
+	$stsem_obj->getAll();
+
+	
 	echo "<br />";
 	echo "<b>Name:</b> $vorname $nachname<br />";
 	echo "<b>Studiengang:</b>  $stg_name<br />";
 	echo "<b>Studiensemester:</b> <SELECT name='stsem' onChange=\"MM_jumpMenu('self',this,0)\">";
-	while($row = pg_fetch_object($result))
+	foreach ($stsem_obj->studiensemester as $semrow)
 	{
-		if(!isset($stsem) && $row->aktuell=='J')
-			$stsem=$row->studiensemester_pk;
-		if($stsem==$row->studiensemester_pk)
-			echo "<OPTION value='notenliste.php?stsem=$row->studiensemester_pk' selected>$row->stsem_name</OPTION>";
+		if($stsem == $semrow->studiensemester_kurzbz)
+			echo "<OPTION value='notenliste.php?stsem=$semrow->studiensemester_kurzbz' selected>$semrow->studiensemester_kurzbz</OPTION>";
 		else
-			echo "<OPTION value='notenliste.php?stsem=$row->studiensemester_pk'>$row->stsem_name</OPTION>";
+			echo "<OPTION value='notenliste.php?stsem=$semrow->studiensemester_kurzbz'>$semrow->studiensemester_kurzbz</OPTION>";
 	}
 	echo "</SELECT><br />";
 
@@ -116,28 +102,54 @@ else
 
 	//Lehrveranstaltungen und Noten holen
 	$qry = "SELECT
-				lehrveranstaltung.name as lvname,
-				note.note as note,
-				status
+				tbl_lehrveranstaltung.bezeichnung, tbl_zeugnisnote.note, tbl_lvgesamtnote.note as lvnote
 			FROM
-				note,
-				lehrveranstaltung
+				lehre.tbl_lehrveranstaltung, lehre.tbl_zeugnisnote
+			LEFT OUTER JOIN
+				campus.tbl_lvgesamtnote
+			USING (lehrveranstaltung_id, student_uid)
 			WHERE
-				note.lehrveranstaltung_fk=lehrveranstaltung.lehrveranstaltung_pk AND
-				lehrveranstaltung.studiensemester_fk='$stsem' AND
-				note.student_fk='$student_id'
-			ORDER BY lvname";
+				tbl_zeugnisnote.student_uid = '$user'
+			AND
+				tbl_zeugnisnote.studiensemester_kurzbz = '$stsem'
+			AND
+				tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_zeugnisnote.lehrveranstaltung_id
+			ORDER BY bezeichnung";
 
 	if($result=pg_query($conn,$qry))
 	{
 		//Tabelle anzeigen
-		$tbl= "<table><tr class='liste'><th>Lehrveranstaltung</th><th>Note</th><th></th></tr>";
+		$tbl= "<table><tr class='liste'><th>Lehrveranstaltung</th><th>LV-Note</th><th>Zeugnisnote</th></tr>";
 		$i=0;
 		while($row=pg_fetch_object($result))
 		{
 			$i++;
-			$tbl.= "<tr class='liste".($i%2)."'><td>$row->lvname</td>";
+			$tbl.= "<tr class='liste".($i%2)."'><td>$row->bezeichnung</td>";
 			$tbl.= "<td>";
+			//lv-Note ausgeben
+			switch($row->lvnote)
+			{
+				case  1: $tbl.= "Sehr gut"; 						break;
+				case  2: $tbl.= "Gut";							break;
+				case  3: $tbl.= "Befriedigend";					break;
+				case  4: $tbl.= "Gen&uuml;gend";					break;
+				case  5: $tbl.= "Nicht Gen&uuml;gend";			break;
+				case  6: $tbl.= "Angerechnet";					break;
+				case  7: $tbl.= "Nicht Beurteilt";				break;
+				case  8: $tbl.= "Teilgenommen";					break;
+				case  9: $tbl.= "Noch nicht eingetragen";			break;
+				case 10: $tbl.= "Bestanden";						break;
+				case 11: $tbl.= "Approbiert";						break;
+				case 12: $tbl.= "erfolgreich Absolviert";			break;
+				case 13: $tbl.= "nicht erfolgreich Absolviert";	break;
+			}
+			$tbl.= "</td>";
+			if ($row->note != $row->lvnote && $row->lvnote != NULL)
+				$markier = " style='border: 1px solid red;'";
+			else
+				$markier = "";
+			$tbl .= "<td".$markier.">";
+			
 			//Note ausgeben
 			switch($row->note)
 			{
@@ -155,17 +167,11 @@ else
 				case 12: $tbl.= "erfolgreich Absolviert";			break;
 				case 13: $tbl.= "nicht erfolgreich Absolviert";	break;
 			}
-			$tbl.= "</td><td>";
-			//Status ausgeben
-			switch($row->status)
-			{
-				case  1: $tbl.= "1. Prüfung"; 			break;
-				case  2: $tbl.= "2. Prüfung"; 			break;
-				case 11: $tbl.= "Kommissionelle Prüfung"; break;
-				default: $tbl.= "&nbsp;"; 				break;
-			}
-			$tbl.= "</td></tr>";
+			$tbl .= "</td>";
+			$tbl .= "</tr>";
 		}
+		
+
 		$tbl.= "</table>";
 		if($i==0)
 			echo "Es wurden noch keine Beurteilungen eingetragen";
