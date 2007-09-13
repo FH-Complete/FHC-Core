@@ -128,7 +128,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 			<row>
 				<label value="Hauptberuf" control="mitarbeiter-verwendung-detail-menulist-hauptberuf"/>
 				<menulist id="mitarbeiter-verwendung-detail-menulist-hauptberuf"
-				          datasources="<?php echo APP_ROOT ?>rdf/hauptberuf.rdf.php" flex="1"
+				          datasources="<?php echo APP_ROOT ?>rdf/hauptberuf.rdf.php?optional=true" flex="1"
 			              ref="http://www.technikum-wien.at/hauptberuf/liste" >
 					<template>
 						<menupopup>

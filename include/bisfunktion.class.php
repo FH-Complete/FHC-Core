@@ -149,6 +149,12 @@ class bisfunktion
 	
 	function validate()
 	{
+		
+		if($this->sws!='' && !is_numeric($this->sws))
+		{
+			$this->errormsg = 'SWS muss eine gueltige Zahl sein';
+			return false;
+		}
 		return true;
 	}
 	

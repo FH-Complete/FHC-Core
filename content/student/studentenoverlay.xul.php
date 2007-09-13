@@ -83,12 +83,18 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 									<menuitem id="interessent-toolbar-absage" label="-> Absage" oncommand="InteressentAddRolle('Abgewiesener')" disabled="false" tooltiptext="Interessent zum Absager machen" hidden="true"/>    
 						      </menupopup>
 						    </toolbarbutton>
-							
-							
+														
 							<toolbarbutton id="student-toolbar-export" label="Export" oncommand="StudentExport()" disabled="false" image="../skin/images/ExcelIcon.png" tooltiptext="Daten ins Excel Exportieren"/>
 							<toolbarbutton id="student-toolbar-refresh" label="Aktualisieren" oncommand="StudentTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 							<textbox id="student-toolbar-textbox-suche" control="student-toolbar-button-search" onkeypress="StudentSearchFieldKeyPress(event)" />
 							<button id="student-toolbar-button-search" oncommand="StudentSuche()" label="Suchen"/>
+							<toolbarbutton label="Filter " id="student-toolbar-filter" type="menu">							
+						      <menupopup id="student-filter-menu-popup" >
+								    <menuitem id="student-toolbar-filter-dokumente" label="fehlende Dokumente" oncommand="InteressentDokumenteFilter()" disabled="false" tooltiptext="Liste aller Studenten mit Fehlenden Dokumenten"/>
+									<menuitem id="student-toolbar-filter-offenebuchungen" label="offene Buchungen" oncommand="StudentKontoFilterStudenten('konto')" disabled="false" tooltiptext="Liste aller Studenten mit offenen Buchungen"/>
+									<menuitem id="student-toolbar-filter-studiengebuehr" label="nicht gebuchte Studiengebuehr" oncommand="StudentKontoFilterStudenten('studiengebuehr')" disabled="false" tooltiptext="Liste aller Studenten die noch nicht mit Studienbebuehr belastet wurden" />
+						      </menupopup>
+						    </toolbarbutton>
 							<spacer flex="1"/>
 							<label id="student-toolbar-label-anzahl"/>
 						</toolbar>

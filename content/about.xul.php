@@ -66,8 +66,9 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 			 
 	Authors: Christian Paminger &lt;christian.paminger@technikum-wien.at&gt;,
-			 Andreas Oesterreicher &lt;andreas.oesterreicher@technikum-wien.at&gt; and	
-			 Rudolf Hangl &lt;rudolf.hangl@technikum-wien.at&gt;.
+			 Andreas Oesterreicher &lt;andreas.oesterreicher@technikum-wien.at&gt;,
+			 Rudolf Hangl &lt;rudolf.hangl@technikum-wien.at&gt; and
+			 Gerald Raab &lt;gerald.raab@technikum-wien.at&gt;.
 		   	</description>
 		</groupbox>
 		<spacer flex="1"/>

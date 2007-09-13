@@ -193,7 +193,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterfunktionove
 			<tabs orient="horizontal" id="mitarbeiter-tabs">
 				<tab id="mitarbeiter-tab-detail" label="Stammdaten" />
 				<tab id="mitarbeiter-tab-kontakt" label="Kontaktdaten" />
-				<tab id="mitarbeiter-tab-funktionen" label="Funktionen" />
+				<tab id="mitarbeiter-tab-funktionen" label="BIS-Daten" />
 				<tab id="mitarbeiter-tab-betriebsmittel" label="Betriebsmittel" />
 			</tabs>
 			<tabpanels id="mitarbeiter-tabpanels-main" flex="1">

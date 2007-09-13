@@ -1011,6 +1011,19 @@ function MitarbeiterVerwendungSpeichern(document, bisverwendung_id, mitarbeiter_
 	habilitation = document.getElementById('mitarbeiter-verwendung-detail-checkbox-habilitation').checked;
 	beginn = document.getElementById('mitarbeiter-verwendung-detail-datum-beginn').value;
 	ende = document.getElementById('mitarbeiter-verwendung-detail-datum-ende').value;
+		
+	if(hauptberuflich==true)
+	{
+		hauptberufcode='';
+	}
+	else
+	{
+		if(hauptberufcode=='')
+		{
+			alert('Hauptberuf muss ausgewaehlt werden');
+			return false;
+		}
+	}
 	
 	if(beginn!='' && !CheckDatum(beginn))
 	{
@@ -1185,6 +1198,12 @@ function MitarbeiterFunktionSpeichern()
 	neu = document.getElementById('mitarbeiter-funktion-detail-checkbox-neu').checked;
 	studiengang_kz_old = document.getElementById('mitarbeiter-funktion-detail-textbox-studiengang').value;
 	
+	if(studiengang_kz=='')
+	{
+		alert('Bitte einen Studiengang auswaehlen');
+		return false;
+	}
+		
 	//Bisverwendung_id holen
 	var tree=document.getElementById('mitarbeiter-tree-verwendung');
 
@@ -1451,6 +1470,11 @@ function MitarbeiterEntwicklungsteamSpeichern()
 	beginn = document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-beginn').value;
 	ende = document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-ende').value;
 	
+	if(studiengang_kz=='')
+	{
+		alert('Bitte einen Studiengang auswaehlen');
+		return false;
+	}
 	var tree = document.getElementById('mitarbeiter-tree');
 
 	if (tree.currentIndex==-1) 

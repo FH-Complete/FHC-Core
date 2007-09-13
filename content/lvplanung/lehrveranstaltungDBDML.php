@@ -216,15 +216,35 @@ if(!$error)
 		//Lehreinheitmitarbeiterzuteilung loeschen
 		if(isset($_POST['lehreinheit_id']) && is_numeric($_POST['lehreinheit_id']) && isset($_POST['mitarbeiter_uid']))
 		{
-			$leg = new lehreinheitmitarbeiter($conn);
-			if($leg->delete($_POST['lehreinheit_id'], $_POST['mitarbeiter_uid']))
+			//Wenn der Mitarbeiter im Stundenplan verplant ist, dann wird das Loeschen verhindert
+			$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev WHERE lehreinheit_id='".$_POST['lehreinheit_id']."' AND mitarbeiter_uid='".addslashes($_POST['mitarbeiter_uid'])."' 
+					UNION
+					SELECT stundenplan_id as id FROM lehre.tbl_stundenplan WHERE lehreinheit_id='".$_POST['lehreinheit_id']."' AND mitarbeiter_uid='".addslashes($_POST['mitarbeiter_uid'])."'";
+			if($result = pg_query($conn, $qry))
 			{
-				$return = true;
+				if(pg_num_rows($result)>0)
+				{
+					$return = false;
+					$errormsg = 'Dieser Lektor kann nicht geloescht werden da er schon verplant ist';
+				}
+				else 
+				{			
+					$leg = new lehreinheitmitarbeiter($conn);
+					if($leg->delete($_POST['lehreinheit_id'], $_POST['mitarbeiter_uid']))
+					{
+						$return = true;
+					}
+					else
+					{
+						$return = false;
+						$errormsg = $leg->errormsg;
+					}
+				}
 			}
-			else
+			else 
 			{
 				$return = false;
-				$errormsg = $leg->errormsg;
+				$errormsg = 'Fehler:'.$qry;
 			}
 		}
 		else
@@ -237,7 +257,7 @@ if(!$error)
 	{
 		//Lehreinheitgruppezuteilung loeschen
 		if(isset($_POST['lehreinheitgruppe_id']) && is_numeric($_POST['lehreinheitgruppe_id']))
-		{
+		{			
 			$leg = new lehreinheitgruppe($conn);
 			if($leg->delete($_POST['lehreinheitgruppe_id']))
 			{

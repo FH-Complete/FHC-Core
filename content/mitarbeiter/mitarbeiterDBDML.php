@@ -204,7 +204,7 @@ if(!$error)
 			$funktion->insertamum = date('Y-m-d H:i:s');
 			$funktion->insertvon = $user;
 		}
-		
+				
 		if(!$error)
 		{
 			$funktion->bisverwendung_id = $_POST['bisverwendung_id'];

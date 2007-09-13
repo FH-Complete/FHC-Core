@@ -46,6 +46,17 @@ echo '
    <RDF:Seq about="'.$rdf_url.'/liste">
 ';
 
+if(isset($_GET['optional']) && $_GET['optional']=='true')
+{
+	echo '
+	      <RDF:li>
+	         <RDF:Description  id=""  about="'.$rdf_url.'/" >
+	            <HAUPTBERUF:hauptberufcode><![CDATA[]]></HAUPTBERUF:hauptberufcode>
+	            <HAUPTBERUF:bezeichnung><![CDATA[-- keine Auswahl --]]></HAUPTBERUF:bezeichnung>
+	         </RDF:Description>
+	      </RDF:li>
+	      ';
+}
 $qry = "SET CLIENT_ENCODING TO 'UNICODE'; SELECT * FROM bis.tbl_hauptberuf ORDER BY hauptberufcode";
 if($result = pg_query($conn, $qry))
 {

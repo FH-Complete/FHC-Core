@@ -131,6 +131,9 @@ $mitarbeiterDAO->getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $ausgeschie
 		//Spalten ausgeben
 		for ($i=0;$i<$anzSpalten;$i++)
 		{
+			if(is_bool($mitarbeiter->$spalte[$i]))
+				$mitarbeiter->$spalte[$i] = ($mitarbeiter->$spalte[$i]?'Ja':'Nein');
+			
 			if(strlen($mitarbeiter->$spalte[$i])>$maxlength[$i])
 				$maxlength[$i] = strlen($mitarbeiter->$spalte[$i]);
 			$worksheet->write($j,$i, $mitarbeiter->$spalte[$i]);
