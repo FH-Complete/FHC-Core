@@ -27,7 +27,7 @@ $smax=0;
 }*/
 
 $s=new studiengang($conn);
-$s->getAll(null,false);
+$s->getAll('erhalter_kz,typ,kurzbzlang',false);
 $studiengang=$s->result;
 $user = get_uid();
 
@@ -100,7 +100,7 @@ foreach ($studiengang as $stg)
 {
 	$s[$stg->studiengang_kz]->max_sem=$stg->max_semester;
 	$s[$stg->studiengang_kz]->kurzbz=$stg->kurzbzlang;
-	$outp.= '<A href="lv_wartung.php?stg_kz='.$stg->studiengang_kz.'&semester='.$semester.'&max='.$stg->max_semester.'">'.$stg->kurzbzlang.'</A> - ';
+	$outp.= '<A href="lv_wartung.php?stg_kz='.$stg->studiengang_kz.'&semester='.$semester.'&max='.$stg->max_semester.'">'.$stg->kurzbzlang.' ('.strtoupper($stg->typ.$stg->kurzbz).') </A>  -  ';
 
 }
 $outp.= '<BR> -- ';

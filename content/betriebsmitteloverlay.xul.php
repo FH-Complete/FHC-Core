@@ -35,7 +35,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 
 if(isset($_GET['person_id']) && is_numeric($_GET['person_id']))
 	$person_id = $_GET['person_id'];
-else 
+else
 	die('Parameter person_id muss uebergeben werden');
 ?>
 
@@ -50,6 +50,7 @@ else
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/fasoverlay.js.php" />
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/phpRequest.js.php" />
 
+
 <vbox id="betriebsmittel" style="margin:0px;" flex="1">
 <popupset>
 	<popup id="betriebsmittel-tree-popup">
@@ -62,7 +63,7 @@ else
 				<column flex="1"/>
 				<column flex="1"/>
 			</columns>
-			<rows>								
+			<rows>
 				<row>
 					<tree id="betriebsmittel-tree" seltype="single" hidecolumnpicker="false" flex="1"
 						datasources="rdf:null" ref="http://www.technikum-wien.at/betriebsmittel/liste"
@@ -71,7 +72,7 @@ else
 						context="betriebsmittel-tree-popup"
 						flags="dont-build-content"
 					>
-					
+
 						<treecols>
 							<treecol id="betriebsmittel-tree-nummer" label="Nummer" flex="2" hidden="false" primary="true"
 								class="sortDirectionIndicator"
@@ -108,7 +109,7 @@ else
 								sort="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#person_id" />
 							<splitter class="tree-splitter"/>
 						</treecols>
-					
+
 						<template>
 							<treechildren flex="1" >
 									<treeitem uri="rdf:*">
@@ -167,7 +168,7 @@ else
 											<textbox id="betriebsmittel-textbox-nummerold" hidden="true"/>
 					      					<textbox id="betriebsmittel-textbox-nummer" disabled="true" maxlength="32"/>
 					      					<textbox id="betriebsmittel-textbox-nummerintern" disabled="true"/>
-					      					<spacer flex="1" />			
+					      					<spacer flex="1" />
 					      				</hbox>
 									</row>
 									<row>
@@ -178,7 +179,7 @@ else
 										<label value="Kaution" control="betriebsmittel-textbox-kaution"/>
 										<hbox>
 					      					<textbox id="betriebsmittel-textbox-kaution" disabled="true" maxlength="8"/>
-					      					<spacer flex="1" />			
+					      					<spacer flex="1" />
 					      				</hbox>
 									</row>
 									<row>
@@ -190,7 +191,7 @@ else
 										<hbox>
 											<box class="Datum" id="betriebsmittel-textbox-ausgegebenam" disabled="true"/>
 					      					<!--<textbox id="betriebsmittel-textbox-ausgegebenam" disabled="true" maxlength="10"/>-->
-					      					<spacer flex="1" />			
+					      					<spacer flex="1" />
 					      				</hbox>
 									</row>
 									<row>
@@ -198,7 +199,7 @@ else
 										<hbox>
 											<box class="Datum" id="betriebsmittel-textbox-retouram" disabled="true"/>
 					      					<!--<textbox id="betriebsmittel-textbox-retouram" disabled="true" maxlength="10"/>-->
-					      					<spacer flex="1" />			
+					      					<spacer flex="1" />
 					      				</hbox>
 									</row>
 								</rows>
@@ -216,4 +217,5 @@ else
 </hbox>
 <spacer flex="1" />
 </vbox>
+<!--<iframe src="cardReader.html" />-->
 </window>
