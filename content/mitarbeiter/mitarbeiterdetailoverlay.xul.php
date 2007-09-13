@@ -103,7 +103,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     					<row>
 							<label value="Staatsbuergerschaft" control="mitarbeiter-detail-menulist-staatsbuergerschaft"/>
 							<menulist id="mitarbeiter-detail-menulist-staatsbuergerschaft" disabled="true"
-							          datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php" flex="1"
+							          datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php?optional=true" flex="1"
 						              ref="http://www.technikum-wien.at/nation/liste" >
 								<template>
 									<menupopup>
@@ -115,7 +115,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							</menulist>
 							<label value="Geburtsnation" control="mitarbeiter-detail-menulist-geburtsnation"/>
 							<menulist id="mitarbeiter-detail-menulist-geburtsnation" disabled="true"
-							          datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php" flex="1"
+							          datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php?optional=true" flex="1"
 						              ref="http://www.technikum-wien.at/nation/liste" >
 								<template>
 									<menupopup>

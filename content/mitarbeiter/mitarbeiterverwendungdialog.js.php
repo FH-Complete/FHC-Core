@@ -113,9 +113,13 @@ function MitarbeiterVerwendungDetailToggleHauptberuf()
 	var checked = document.getElementById('mitarbeiter-verwendung-detail-checkbox-hauptberuflich').checked;
 	
 	if(checked)
+	{
 		document.getElementById('mitarbeiter-verwendung-detail-menulist-hauptberuf').disabled=true;
+	}
 	else
+	{
 		document.getElementById('mitarbeiter-verwendung-detail-menulist-hauptberuf').disabled=false;
+	}
 }
 
 // ****
