@@ -388,4 +388,5 @@ function BetriebsmittelNeu()
 	BetriebsmittelDetailResetFields();
 	document.getElementById('betriebsmittel-textbox-person_id').value = BetriebsmittelPerson_id;
 	document.getElementById('betriebsmittel-textbox-ausgegebenam').value=tag+'.'+monat+'.'+jahr;
+	document.getElementById('betriebsmittel-textbox-kaution').value = '0.0';
 }
