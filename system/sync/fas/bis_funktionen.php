@@ -54,6 +54,7 @@ if($result = pg_query($conn, $qry))
 {
 	while($row = pg_fetch_object($result))
 	{
+		echo "<br>";
 		$qry_erg="SELECT lehre.tbl_lehreinheitmitarbeiter.mitarbeiter_uid, lehre.tbl_lehrveranstaltung.studiengang_kz, lehre.tbl_lehreinheit.studiensemester_kurzbz, lehre.tbl_lehreinheitmitarbeiter.semesterstunden, lehre.tbl_lehrveranstaltung.semester, public.tbl_semesterwochen.wochen 
 			FROM lehre.tbl_lehreinheitmitarbeiter join lehre.tbl_lehreinheit USING (lehreinheit_id) 
 			JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
