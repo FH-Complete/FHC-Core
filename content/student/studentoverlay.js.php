@@ -3450,7 +3450,7 @@ function StudentCreateDiplSupplement()
 // ****
 // * Erstellt die Studienerfolgsbestaetigung fuer einen oder mehrere Studenten
 // ****
-function StudentCreateStudienerfolg(finanzamt)
+function StudentCreateStudienerfolg(finanzamt, studiensemester)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
@@ -3483,7 +3483,8 @@ function StudentCreateStudienerfolg(finanzamt)
 		alert('Bitte einen Studenten auswaehlen');
 		return false;
 	}
-	
+	if(!studiensemester)
+		studiensemester=getStudiensemester();
 	//PDF erzeugen
-	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=studienerfolg.rdf.php&xsl=Studienerfolg&uid='+paramList+'&ss='+getStudiensemester()+'&typ='+finanzamt,'DiplomaSupplement', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=studienerfolg.rdf.php&xsl=Studienerfolg&uid='+paramList+'&ss='+studiensemester+'&typ='+finanzamt,'DiplomaSupplement', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }

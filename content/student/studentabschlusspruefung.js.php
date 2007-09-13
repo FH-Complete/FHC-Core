@@ -386,6 +386,13 @@ function StudentAbschlusspruefungSpeichern()
 		alert('Student muss ausgewaehlt sein');
 		return;
 	}
+	
+	if(pruefungstyp_kurzbz=='')
+	{
+		alert('Bitte den Pruefungstyp auswaehlen');
+		return false;
+	}
+	
     var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
 	var student_uid=tree.view.getCellText(tree.currentIndex,col);
 

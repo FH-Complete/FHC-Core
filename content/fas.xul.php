@@ -25,6 +25,7 @@ require_once('../vilesci/config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/fas/benutzer.class.php');
 require_once('../include/benutzerberechtigung.class.php');
+require_once('../include/studiensemester.class.php');
 
 // Testumgebung
 $user=get_uid();
@@ -269,6 +270,27 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                accesskey = "&menu-dokumente-diplsupplement.accesskey;"/>
             <menu id="menu-dokumente-studienerfolg" label="&menu-dokumente-studienerfolg.label;" accesskey="&menu-dokumente-studienerfolg.accesskey;">
 	          <menupopup id="menu-dokumente-studienerfolg-popup">
+	          <?php
+	          $stsem = new studiensemester($conn);
+	          $stsem_kurzbz = $stsem->getPrevious();
+	          echo '
+	           <menu id="menu-dokumente-studienerfolg-menu" label="'.$stsem_kurzbz.'">
+		          <menupopup id="menu-dokumente-studienerfolg-menu-popup">
+		            <menuitem
+		               id        =  "menu-dokumente-studienerfolg-menu-normal"
+		               key       =  "menu-dokumente-studienerfolg-normal:key"
+		               label     = "&menu-dokumente-studienerfolg-normal.label;"
+		               oncommand   =  "StudentCreateStudienerfolg(null, \''.$stsem_kurzbz.'\');"
+		               accesskey = "&menu-dokumente-studienerfolg-normal.accesskey;"/>
+		           	<menuitem
+		               id        =  "menu-dokumente-studienerfolg-finanzamt"
+		               key       =  "menu-dokumente-studienerfolg-finanzamt:key"
+		               label     = "&menu-dokumente-studienerfolg-finanzamt.label;"
+		               oncommand   =  "StudentCreateStudienerfolg(\'finanzamt\', \''.$stsem_kurzbz.'\');"
+		               accesskey = "&menu-dokumente-studienerfolg-finanzamt.accesskey;"/>
+		            </menupopup>
+		        </menu>';
+	          	?>
 	            <menuitem
 	               id        =  "menu-dokumente-studienerfolg-normal"
 	               key       =  "menu-dokumente-studienerfolg-normal:key"

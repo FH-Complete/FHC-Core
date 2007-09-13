@@ -149,7 +149,8 @@ if (!$conn = pg_pconnect(CONN_STRING))
 	
 	$qry = "SELECT 
 				distinct vorname, nachname, matrikelnr, student_uid as uid, 
-				tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe 
+				tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
+				(SELECT rolle_kurzbz FROM public.tbl_prestudentrolle WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status 
 			FROM 
 				campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid) 
 				JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid) 
@@ -173,7 +174,11 @@ if (!$conn = pg_pconnect(CONN_STRING))
 			if(!preg_match('*dummy*',$elem->uid) && $elem->semester!=10)
 	   		{   	
 				$worksheet->write($lines,0,$i);
-				$worksheet->write($lines,1,$elem->nachname);
+				if($elem->status=='Incoming')
+					$inc=' (i)';
+				else 
+					$inc='';
+				$worksheet->write($lines,1,$elem->nachname.$inc);
 				$worksheet->write($lines,2,$elem->vorname);
 				$worksheet->write($lines,3,$elem->semester.$elem->verband.$elem->gruppe);
 				$worksheet->write($lines,4,'="'.trim($elem->matrikelnr).'"');
@@ -189,6 +194,8 @@ if (!$conn = pg_pconnect(CONN_STRING))
 	$worksheet->write(++$lines,0,'5-Nicht Genügend, 6-Angerechnet, 7-nicht beurteilt,');
 	$worksheet->write(++$lines,0,'8-teilgenommen, 9-noch nicht eingetragen, 10-bestanden,');
 	$worksheet->write(++$lines,0,'11-approbiert, 12-erfolgreich absolviert, 13-nicht erfolgreich absolviert');	
+	$lines++;
+	$worksheet->write(++$lines,0,'(i) ... Incoming');	
 	
 	$worksheet->setColumn(0, 0, 5);
 	$worksheet->setColumn(1, 1, 25);

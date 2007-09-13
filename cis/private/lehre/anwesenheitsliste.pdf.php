@@ -297,7 +297,8 @@ $pdf->SetFont('Arial','',8);
 
 $qry = "SELECT 
 			distinct vorname, nachname, matrikelnr, 
-			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe 
+			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
+			(SELECT rolle_kurzbz FROM public.tbl_prestudentrolle WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status 
 		FROM 
 			campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid) 
 			JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid) 
@@ -340,7 +341,11 @@ if($result = pg_query($conn, $qry))
 		$pdf->MultiCell(130,$lineheight,$elem->nachname,1,'L',1);
 		$pdf->SetFont('Arial','',8);
 		$pdf->SetXY($maxX+strlen($elem->nachname)*5+1,$maxY);
-		$pdf->MultiCell(130,$lineheight,$elem->vorname,0,'L',0);
+		if($elem->status=='Incoming')
+			$inc=' (i)';
+		else 
+			$inc='';
+		$pdf->MultiCell(130,$lineheight,$elem->vorname.$inc,0,'L',0);
 		$maxX +=130;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->SetFont('Arial','',8);
@@ -369,6 +374,12 @@ if($result = pg_query($conn, $qry))
 	   $inhalt[]=array($i,$elem->nachname.' '.$elem->vorname,trim($elem->matrikelnr),$elem->semester.$elem->verband.$elem->gruppe,'','','','','','');
    }
 }
+//Fussnote
+$maxY=$pdf->GetY()+5;
+$maxX=30;
+$pdf->SetXY($maxX,$maxY);
+$pdf->SetFont('Arial','',8);
+$pdf->MultiCell(520,$lineheight,'(i) ... Incoming',0,'L',0);
 
 //FHStg
 $maxY=$pdf->GetY()+5;
