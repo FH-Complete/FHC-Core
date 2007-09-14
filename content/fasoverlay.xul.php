@@ -68,23 +68,23 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 	ondragexit="nsDragAndDrop.dragExit(event,verbandtreeDDObserver)"
 	>
 	<treecols>
-	    <treecol id="bez" label="Bezeichnung" flex="15" primary="true" />
+	    <treecol id="bez" label="Bezeichnung" persist="hidden, width, ordinal" flex="15" primary="true" />
 	    <splitter class="tree-splitter"/>
-	    <treecol id="stg" label="STG" flex="2" hidden="true"/>
+	    <treecol id="stg" label="STG" flex="2" persist="hidden, width, ordinal" hidden="true"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="stg_kz" label="KZ" flex="2" hidden="true"/>
+	    <treecol id="stg_kz" label="KZ" flex="2" persist="hidden, width, ordinal" hidden="true"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="sem" label="Sem" flex="1" hidden="true"/>
+	    <treecol id="sem" label="Sem" flex="1" persist="hidden, width, ordinal" hidden="true"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="ver" label="Ver" flex="1" hidden="true"/>
+	    <treecol id="ver" label="Ver" flex="1" persist="hidden, width, ordinal" hidden="true"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="grp" label="Grp" flex="1" hidden="true"/>
+	    <treecol id="grp" label="Grp" flex="1" persist="hidden, width, ordinal" hidden="true"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="gruppe" label="SpzGruppe" flex="1" hidden="true"/>
+	    <treecol id="gruppe" label="SpzGruppe" persist="hidden, width, ordinal" flex="1" hidden="true"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="typ" label="Typ" flex="1" hidden="true"/>
+	    <treecol id="typ" label="Typ" flex="1" persist="hidden, width, ordinal" hidden="true"/>
 		<splitter class="tree-splitter"/>
-	    <treecol id="stsem" label="StSem" flex="1" hidden="true"/>
+	    <treecol id="stsem" label="StSem" flex="1" persist="hidden, width, ordinal" hidden="true"/>
 	</treecols>
 
 	<template>

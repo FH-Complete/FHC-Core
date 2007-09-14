@@ -983,7 +983,7 @@ function MitarbeiterVerwendungBearbeiten()
 	bisverwendung_id=tree.view.getCellText(tree.currentIndex,col);
 
 	//Dialog laden
-	window.open("<?php echo APP_ROOT; ?>content/mitarbeiter/mitarbeiterverwendungdialog.xul.php?mitarbeiter_uid="+mitarbeiter_uid+"&bisverwendung_id="+bisverwendung_id,"","chrome, status=no, width=500, height=350, centerscreen, resizable");
+	window.open("<?php echo APP_ROOT; ?>content/mitarbeiter/mitarbeiterverwendungdialog.xul.php?mitarbeiter_uid="+mitarbeiter_uid+"&bisverwendung_id="+bisverwendung_id,"popup","chrome, status=no, width=500, height=350, centerscreen, resizable");
 }
 
 // ****
@@ -997,33 +997,41 @@ function MitarbeiterVerwendungNeu()
 	col = tree.columns ? tree.columns["mitarbeiter-treecol-uid"] : "mitarbeiter-treecol-uid";
 	mitarbeiter_uid=tree.view.getCellText(tree.currentIndex,col);
 	
-	window.open("<?php echo APP_ROOT; ?>content/mitarbeiter/mitarbeiterverwendungdialog.xul.php?mitarbeiter_uid="+mitarbeiter_uid,"","chrome, status=no, width=500, height=350, centerscreen, resizable");
+	window.open("<?php echo APP_ROOT; ?>content/mitarbeiter/mitarbeiterverwendungdialog.xul.php?mitarbeiter_uid="+mitarbeiter_uid,"popup","chrome, status=no, width=500, height=350, centerscreen, resizable");
 }
 
-function MitarbeiterVerwendungSpeichern(document, bisverwendung_id, mitarbeiter_uid, neu)
+function MitarbeiterVerwendungSpeichern(dialog, bisverwendung_id, mitarbeiter_uid, neu)
 {
-	ba1code = document.getElementById('mitarbeiter-verwendung-detail-menulist-beschart1').value;
-	ba2code = document.getElementById('mitarbeiter-verwendung-detail-menulist-beschart2').value;
-	beschausmasscode = document.getElementById('mitarbeiter-verwendung-detail-menulist-ausmass').value;
-	verwendung_code = document.getElementById('mitarbeiter-verwendung-detail-menulist-verwendung').value;
-	hauptberufcode = document.getElementById('mitarbeiter-verwendung-detail-menulist-hauptberuf').value;
-	hauptberuflich = document.getElementById('mitarbeiter-verwendung-detail-checkbox-hauptberuflich').checked;
-	habilitation = document.getElementById('mitarbeiter-verwendung-detail-checkbox-habilitation').checked;
-	beginn = document.getElementById('mitarbeiter-verwendung-detail-datum-beginn').value;
-	ende = document.getElementById('mitarbeiter-verwendung-detail-datum-ende').value;
+	ba1code = dialog.getElementById('mitarbeiter-verwendung-detail-menulist-beschart1').value;
+	ba2code = dialog.getElementById('mitarbeiter-verwendung-detail-menulist-beschart2').value;
+	beschausmasscode = dialog.getElementById('mitarbeiter-verwendung-detail-menulist-ausmass').value;
+	verwendung_code = dialog.getElementById('mitarbeiter-verwendung-detail-menulist-verwendung').value;
+	hauptberufcode = dialog.getElementById('mitarbeiter-verwendung-detail-menulist-hauptberuf').value;
+	hauptberuflich = dialog.getElementById('mitarbeiter-verwendung-detail-checkbox-hauptberuflich').checked;
+	habilitation = dialog.getElementById('mitarbeiter-verwendung-detail-checkbox-habilitation').checked;
+	beginn = dialog.getElementById('mitarbeiter-verwendung-detail-datum-beginn').value;
+	ende = dialog.getElementById('mitarbeiter-verwendung-detail-datum-ende').value;
 		
-	if(hauptberuflich==true)
+	if(verwendung_code=='1' || verwendung_code=='5' || verwendung_code=='6')
 	{
-		hauptberufcode='';
+		if(hauptberuflich==true)
+		{
+			hauptberufcode='';
+		}
+		else
+		{
+			if(hauptberufcode=='')
+			{
+				alert('Hauptberuf muss ausgewaehlt werden');
+				return false;
+			}
+		}
 	}
 	else
 	{
-		if(hauptberufcode=='')
-		{
-			alert('Hauptberuf muss ausgewaehlt werden');
-			return false;
-		}
-	}
+		hauptberufcode='';
+		hauptberuflich='';
+	}	
 	
 	if(beginn!='' && !CheckDatum(beginn))
 	{

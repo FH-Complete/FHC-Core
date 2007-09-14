@@ -532,7 +532,7 @@ class mitarbeiter extends benutzer
 	
 	function getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $ausgeschieden, $studiensemester_kurzbz)
 	{
-		$qry = "SELECT distinct on(person_id) *, tbl_benutzer.aktiv as aktiv FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id)) LEFT JOIN public.tbl_benutzerfunktion USING(uid) WHERE true";
+		$qry = "SELECT distinct on(person_id) *, tbl_benutzer.aktiv as aktiv, tbl_mitarbeiter.insertamum, tbl_mitarbeiter.insertvon FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id)) LEFT JOIN public.tbl_benutzerfunktion USING(uid) WHERE true";
 		
 		if($fix=='true')
 			$qry .= " AND fixangestellt=true";
@@ -592,6 +592,8 @@ class mitarbeiter extends benutzer
 				$obj->standort_kurzbz = $row->standort_kurzbz;
 				$obj->anmerkung = $row->anmerkung;				
 				$obj->alias = $row->alias;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
 				
 				$this->result[] = $obj;
 			}

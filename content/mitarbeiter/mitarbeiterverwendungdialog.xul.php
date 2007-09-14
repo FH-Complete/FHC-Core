@@ -111,7 +111,8 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 				<label value="Verwendung" control="mitarbeiter-verwendung-detail-menulist-verwendung"/>
 				<menulist id="mitarbeiter-verwendung-detail-menulist-verwendung"
 				          datasources="<?php echo APP_ROOT ?>rdf/verwendung.rdf.php" flex="1"
-			              ref="http://www.technikum-wien.at/verwendung/liste" >
+			              ref="http://www.technikum-wien.at/verwendung/liste" 
+			              oncommand="MitarbeiterVerwendungVerwendungChange()">
 					<template>
 						<menupopup>
 							<menuitem value="rdf:http://www.technikum-wien.at/verwendung/rdf#verwendung_code"
@@ -122,11 +123,11 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 				</menulist>
 			</row>
 			<row>
-				<label value="Hauptberuflich Lehrende(r)" control="mitarbeiter-verwendung-detail-checkbox-hauptberuflich"/>
+				<label value="Hauptberuflich Lehrende(r)" id="mitarbeiter-verwendung-detail-label-hauptberuflich" control="mitarbeiter-verwendung-detail-checkbox-hauptberuflich"/>
       			<checkbox id="mitarbeiter-verwendung-detail-checkbox-hauptberuflich" checked="true" oncommand="MitarbeiterVerwendungDetailToggleHauptberuf()"/>
       		</row>
 			<row>
-				<label value="Hauptberuf" control="mitarbeiter-verwendung-detail-menulist-hauptberuf"/>
+				<label value="Hauptberuf" id="mitarbeiter-verwendung-detail-label-hauptberuf" control="mitarbeiter-verwendung-detail-menulist-hauptberuf"/>
 				<menulist id="mitarbeiter-verwendung-detail-menulist-hauptberuf"
 				          datasources="<?php echo APP_ROOT ?>rdf/hauptberuf.rdf.php?optional=true" flex="1"
 			              ref="http://www.technikum-wien.at/hauptberuf/liste" >

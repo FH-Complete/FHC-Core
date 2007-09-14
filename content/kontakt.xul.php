@@ -90,7 +90,7 @@ else
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/adresse/rdf#heimatadresse" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
-					<treecol id="kontakt-adressen-treecol-zustelladresse" label="Zustelladresse" flex="1" hidden="true"
+					<treecol id="kontakt-adressen-treecol-zustelladresse" label="Zustelladresse" flex="1" hidden="false"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/adresse/rdf#zustelladresse" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>

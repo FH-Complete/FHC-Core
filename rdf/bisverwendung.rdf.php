@@ -84,6 +84,11 @@ function draw_row($row)
 {
 	global $rdf_url, $datum;
 	
+	if(is_bool($row->hauptberuflich))
+		$hauptberuflich = $row->hauptberuflich?'Ja':'Nein';
+	else 
+		$hauptberuflich = '';
+		
 	echo '
       <RDF:li>
          <RDF:Description  id="'.$row->bisverwendung_id.'"  about="'.$rdf_url.'/'.$row->bisverwendung_id.'" >
@@ -94,7 +99,7 @@ function draw_row($row)
             <VERWENDUNG:verwendung_code><![CDATA['.$row->verwendung_code.']]></VERWENDUNG:verwendung_code>
             <VERWENDUNG:mitarbeiter_uid><![CDATA['.$row->mitarbeiter_uid.']]></VERWENDUNG:mitarbeiter_uid>
             <VERWENDUNG:hauptberufcode><![CDATA['.$row->hauptberufcode.']]></VERWENDUNG:hauptberufcode>
-            <VERWENDUNG:hauptberuflich><![CDATA['.($row->hauptberuflich?'Ja':'Nein').']]></VERWENDUNG:hauptberuflich>
+            <VERWENDUNG:hauptberuflich><![CDATA['.$hauptberuflich.']]></VERWENDUNG:hauptberuflich>
             <VERWENDUNG:habilitation><![CDATA['.($row->habilitation?'Ja':'Nein').']]></VERWENDUNG:habilitation>
             <VERWENDUNG:beginn><![CDATA['.$datum->convertISODate($row->beginn).']]></VERWENDUNG:beginn>
             <VERWENDUNG:beginn_iso><![CDATA['.$row->beginn.']]></VERWENDUNG:beginn_iso>            
