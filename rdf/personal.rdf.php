@@ -149,6 +149,9 @@ function draw_row($mitarbeiter)
     		<MITARBEITER:anmerkung><![CDATA['.$mitarbeiter->anmerkung.']]></MITARBEITER:anmerkung>
     		<MITARBEITER:standort_kurzbz><![CDATA['.$mitarbeiter->standort_kurzbz.']]></MITARBEITER:standort_kurzbz>
     		<MITARBEITER:alias><![CDATA['.$mitarbeiter->alias.']]></MITARBEITER:alias>
+    		<MITARBEITER:insertamum><![CDATA['.date('d.m.Y H:i:s',$datum->mktime_fromtimestamp($mitarbeiter->insertamum)).']]></MITARBEITER:insertamum>
+    		<MITARBEITER:insertamum_iso><![CDATA['.$mitarbeiter->insertamum.']]></MITARBEITER:insertamum_iso>
+    		<MITARBEITER:insertvon><![CDATA['.$mitarbeiter->insertvon.']]></MITARBEITER:insertvon>
       	</RDF:Description>
       </RDF:li>
 	';

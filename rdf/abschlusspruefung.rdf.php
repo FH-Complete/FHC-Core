@@ -52,7 +52,7 @@ if (!$conn = pg_pconnect(CONN_STRING))
    	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
 
 $datum_obj = new datum();
-$pruefung = new abschlusspruefung($conn, null, true);
+
 
 	function draw_content_xml($row)
 	{
@@ -181,6 +181,7 @@ $pruefung = new abschlusspruefung($conn, null, true);
 // ----------------------------------- RDF --------------------------------------
 if ($xmlformat=='rdf')
 {
+	$pruefung = new abschlusspruefung($conn, null, true);
 	$rdf_url='http://www.technikum-wien.at/abschlusspruefung';
 	function draw_content($row)
 	{
@@ -261,6 +262,7 @@ if ($xmlformat=='rdf')
 // ----------------------------------- XML --------------------------------------
 elseif ($xmlformat=='xml')
 {
+	$pruefung = new abschlusspruefung($conn, null, false);
 	echo "\n<abschlusspruefung>\n";
 
 	if(isset($_GET['student_uid']))

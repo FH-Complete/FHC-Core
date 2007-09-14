@@ -150,7 +150,12 @@ if(!$error)
 			$verwendung->verwendung_code = $_POST['verwendung_code'];
 			$verwendung->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
 			$verwendung->hauptberufcode = $_POST['hauptberufcode'];
-			$verwendung->hauptberuflich = ($_POST['hauptberuflich']=='true'?true:false);
+			if($_POST['hauptberuflich']=='true')
+				$verwendung->hauptberuflich = true;
+			elseif($_POST['hauptberuflich']=='false')
+				$verwendung->hauptberuflich = false;
+			else 
+				$verwendung->hauptberuflich = '';
 			$verwendung->habilitation = ($_POST['habilitation']=='true'?true:false);
 			$verwendung->beginn = $_POST['beginn'];
 			$verwendung->ende = $_POST['ende'];

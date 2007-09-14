@@ -149,6 +149,18 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterfunktionove
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#person_id"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
+			<treecol id="mitarbeiter-treecol-insertamum" label="Angelegt am" flex="1" persist="hidden, width, ordinal" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#insertamum_iso"  onclick="MitarbeiterTreeSort()"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="mitarbeiter-treecol-insertvon" label="Angelegt von" flex="1" persist="hidden, width, ordinal" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#insertvon"  onclick="MitarbeiterTreeSort()"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="mitarbeiter-treecol-insertamum_iso" label="Angelegt am (ISO)" flex="1" persist="hidden, width, ordinal" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#insertamum_iso"  onclick="MitarbeiterTreeSort()"/>
+			<splitter class="tree-splitter"/>
 		</treecols>
 
 		<template>
@@ -174,6 +186,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterfunktionove
    							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#telefonklappe" />
    							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#ort_kurzbz" />
    							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#person_id" />
+   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#insertamum" />
+   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#insertvon" />
+   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#insertamum_iso" />
  						</treerow>
 						</treeitem>
 					</treechildren>

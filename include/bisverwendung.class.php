@@ -110,7 +110,13 @@ class bisverwendung
 				$this->verwendung_code = $row->verwendung_code;
 				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$this->hauptberufcode = $row->hauptberufcode;
-				$this->hauptberuflich = ($row->hauptberuflich=='t'?true:false);
+				if($row->hauptberuflich=='t')
+					$this->hauptberuflich = true;
+				elseif($row->hauptberuflich=='f')
+					$this->hauptberuflich = false;
+				else 
+					$this->hauptberuflich = '';
+
 				$this->habilitation = ($row->habilitation=='t'?true:false);
 				$this->beginn = $row->beginn;
 				$this->ende = $row->ende;
@@ -208,6 +214,10 @@ class bisverwendung
 		if($new==null)
 			$new = $this->new;
 			
+		if(is_bool($this->hauptberuflich))
+			$hauptberuflich = ($this->hauptberuflich?'true':'false');
+		else 
+			$hauptberuflich = 'null';
 		if($new)
 		{
 			//Neuen Datensatz anlegen	
@@ -220,7 +230,7 @@ class bisverwendung
 			       $this->addslashes($this->verwendung_code).', '.
 			       $this->addslashes($this->mitarbeiter_uid).', '.
 			       $this->addslashes($this->hauptberufcode).', '.
-			       ($this->hauptberuflich?'true':'false').', '.
+			       $hauptberuflich.', '.
 			       ($this->habilitation?'true':'false').', '.
 			       $this->addslashes($this->beginn).', '.
 			       $this->addslashes($this->ende).', '.
@@ -241,7 +251,7 @@ class bisverwendung
 				  " verwendung_code=".$this->addslashes($this->verwendung_code).",".
 				  " mitarbeiter_uid=".$this->addslashes($this->mitarbeiter_uid).",".
 				  " hauptberufcode=".$this->addslashes($this->hauptberufcode).",".
-				  " hauptberuflich=".($this->hauptberuflich?'true':'false').",".
+				  " hauptberuflich=".$hauptberuflich.",".
 				  " habilitation=".($this->habilitation?'true':'false').",".
 				  " beginn=".$this->addslashes($this->beginn).",".
 				  " ende=".$this->addslashes($this->ende).",".
@@ -319,7 +329,12 @@ class bisverwendung
 				$obj->verwendung_code = $row->verwendung_code;
 				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$obj->hauptberufcode = $row->hauptberufcode;
-				$obj->hauptberuflich = ($row->hauptberuflich=='t'?true:false);
+				if($row->hauptberuflich=='t')
+					$obj->hauptberuflich = true;
+				elseif($row->hauptberuflich=='f')
+					$obj->hauptberuflich = false;
+				else 
+					$obj->hauptberuflich = '';
 				$obj->habilitation = ($row->habilitation=='t'?true:false);
 				$obj->beginn = $row->beginn;
 				$obj->ende = $row->ende;
