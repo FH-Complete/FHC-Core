@@ -54,7 +54,9 @@ function disablefields(obj)
 	else
 		val=true;
 
+	document.getElementById('anrede').disabled=val;
 	document.getElementById('titel').disabled=val;
+	document.getElementById('titelpost').disabled=val;
 	document.getElementById('nachname').disabled=val;
 	document.getElementById('vorname').disabled=val;
 	document.getElementById('geschlecht').disabled=val;
@@ -98,6 +100,7 @@ $where = '';
 $error = false;
 //Parameter
 $titel = (isset($_REQUEST['titel'])?$_REQUEST['titel']:'');
+$titelpost = (isset($_REQUEST['titelpost'])?$_REQUEST['titelpost']:'');
 $anrede = (isset($_REQUEST['anrede'])?$_REQUEST['anrede']:'');
 $nachname = (isset($_REQUEST['nachname'])?$_REQUEST['nachname']:'');
 $vorname = (isset($_REQUEST['vorname'])?$_REQUEST['vorname']:'');
@@ -242,6 +245,7 @@ if(isset($_POST['save']))
 			$vorname = $person->vorname;
 			$nachname = $person->nachname;
 			$titel = $person->titelpre;
+			$titelpost = $person->titelpost;
 			$geschlecht = $person->geschlecht;
 			//Wenn Prestudent bereits existiert, dann abbrechen
 			if($prestudent->exists($person_id, $studiengang_kz))
@@ -256,6 +260,7 @@ if(isset($_POST['save']))
 		$person->new = true;
 		$person->anrede = $anrede;
 		$person->titelpre = $titel;
+		$person->titelpost = $titelpost;
 		$person->nachname = $nachname;
 		$person->vorname = $vorname;
 		$person->geschlecht = $geschlecht;
@@ -553,9 +558,10 @@ if($geburtsdatum!='')
 <table>
 <?php
 echo '<tr><td>Anrede</td><td><input type="text" id="anrede" name="anrede" maxlength="64" value="'.$anrede.'" /></td></tr>';
-echo '<tr><td>Titel</td><td><input type="text" id="titel" name="titel" maxlength="64" value="'.$titel.'" /></td></tr>';
+echo '<tr><td>Titel(Pre)</td><td><input type="text" id="titel" name="titel" maxlength="64" value="'.$titel.'" /></td></tr>';
 echo '<tr><td>Vorname</td><td><input type="text" id="vorname" maxlength="32" name="vorname" value="'.$vorname.'" /></td></tr>';
 echo '<tr><td>Nachname</td><td><input type="text" maxlength="64" id="nachname" name="nachname" value="'.$nachname.'" /></td></tr>';
+echo '<tr><td>Titel(Post)</td><td><input type="text" id="titelpost" name="titelpost" maxlength="64" value="'.$titelpost.'" /></td></tr>';
 echo '<tr><td>Geschlecht</td><td><SELECT id="geschlecht" name="geschlecht">';
 echo '<OPTION value="m" '.($geschlecht=='m'?'selected':'').'>m&auml;nnlich</OPTION>';
 echo '<OPTION value="w" '.($geschlecht=='w'?'selected':'').'>weiblich</OPTION>';

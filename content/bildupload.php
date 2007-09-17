@@ -37,11 +37,40 @@ function strhex($string)
     return $hex;
 }
 
+function resize($filename, $width, $height)
+{
+	$ext = explode('.',$_FILES['bild']['name']);
+    $ext = strtolower($ext[count($ext)-1]);
+
+	// Hoehe und Breite neu berechnen
+	list($width_orig, $height_orig) = getimagesize($filename);
+	if ($width && ($width_orig < $height_orig)) 
+	{
+	   $width = ($height / $height_orig) * $width_orig;
+	}
+	else
+	{
+	   $height = ($width / $width_orig) * $height_orig;
+	}
+	
+	$image_p = imagecreatetruecolor($width, $height);                       
+	
+	//Bilder vergroessern/verkleinern und wieder zurueckschreiben
+	
+	$image = imagecreatefromjpeg($filename);
+	imagecopyresampled($image_p, $image, 0, 0, 0, 0, $width, $height, $width_orig, $height_orig);
+	imagejpeg($image_p, $filename, 80);
+		
+	imagedestroy($image_p);
+	imagedestroy($image);
+}
+
 //Connection Herstellen
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim oeffnen der Datenbankverbindung');
 
 $user = get_uid();
+
 
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
@@ -56,10 +85,27 @@ if(isset($_POST['submitbild']))
     	$ext = explode('.',$_FILES['bild']['name']);
         $ext = strtolower($ext[count($ext)-1]);
 
+        $width=101;
+		$height=130;
+		
         //--check that it's a jpeg or gif or png
-        if ($ext=='gif' || $ext=='png' || $ext=='jpg' || $ext=='jpeg')
+        if ($ext=='jpg' || $ext=='jpeg')
         {
 			$filename = $_FILES['bild']['tmp_name'];
+			
+			//groesse auf maximal 827x1063 begrenzen
+			resize($filename, 827, 1063);
+			
+			//im Dateisystem speichern
+			if(!copy($filename, IMAGE_PATH.$_GET['person_id'].'.jpg'))
+			{
+				die( 'copy failed:'.IMAGE_PATH.$_GET['person_id'].'.jpg');
+			}
+			
+			//groesse auf maximal 101x130 begrenzen
+			resize($filename, 101, 130);
+			
+			//in DB speichern           
 			//File oeffnen
 			$fp = fopen($filename,'r');
 			//auslesen
