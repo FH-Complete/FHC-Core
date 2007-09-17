@@ -94,6 +94,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-dokumente-studienerfolg-finanzamt:command" oncommand="StudentCreateStudienerfolg('finanzamt');"/>
   <command id="menu-extras-reihungstest:command" oncommand="ExtrasShowReihungstest();"/>
   <command id="menu-extras-firma:command" oncommand="ExtrasShowFirmenverwaltung();"/>
+  <command id="menu-bis-mitarbeiter-import:command" oncommand="BISMitarbeiterImport();"/>
   <command id="menu-help-close:command" oncommand="OpenAboutDialog()"/>
 </commandset>
 
@@ -322,6 +323,26 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                command   =  "menu-extras-firma:command"
                accesskey = "&menu-extras-firma.accesskey;"/>
           </menupopup>
+    </menu>
+    <menu id="menu-bis" label="&menu-bis.label;" accesskey="&menu-bis.accesskey;">
+		<menupopup id="menu-bis-popup">
+            <menu id="menu-bis-mitarbeiter" label="&menu-bis-mitarbeiter.label;" accesskey="&menu-bis-mitarbeiter.accesskey;">
+         		<menupopup id="menu-bis-mitarbeiter-popup">
+		            <menuitem
+		               id        =  "menu-bis-mitarbeiter-import"
+		               key       =  "menu-bis-mitarbeiter-import:key"
+		               label     = "&menu-bis-mitarbeiter-import.label;"
+		               command   =  "menu-bis-mitarbeiter-import:command"
+		               accesskey = "&menu-bis-mitarbeiter-import.accesskey;"/>
+		            <menuitem
+		               id        =  "menu-bis-mitarbeiter-export"
+		               key       =  "menu-bis-mitarbeiter-export:key"
+		               label     = "&menu-bis-mitarbeiter-export.label;"
+		               command   =  "menu-bis-mitarbeiter-export:command"
+		               accesskey = "&menu-bis-mitarbeiter-export.accesskey;"/>
+				</menupopup>
+			</menu>
+		</menupopup>
     </menu>
     <menu id="menu-help" label="&menu-help.label;" accesskey="&menu-help.accesskey;">
           <menupopup id="menu-about-popup">

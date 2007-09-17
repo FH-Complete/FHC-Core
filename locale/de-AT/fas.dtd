@@ -118,3 +118,19 @@
 <!ENTITY menu-extras-firma.key			"F">
 <!ENTITY menu-extras-firma.label		"Firmenverwaltung">
 <!ENTITY menu-extras-firma.accesskey	"F">
+
+<!ENTITY menu-bis.label		"BIS">
+<!ENTITY menu-bis.accesskey	"I">
+<!ENTITY menu-bis.accesskey	"I">
+
+<!ENTITY menu-bis-mitarbeiter.key		"M">
+<!ENTITY menu-bis-mitarbeiter.label		"Mitarbeiter">
+<!ENTITY menu-bis-mitarbeiter.accesskey	"M">
+
+<!ENTITY menu-bis-mitarbeiter-import.key		"I">
+<!ENTITY menu-bis-mitarbeiter-import.label		"Import">
+<!ENTITY menu-bis-mitarbeiter-import.accesskey	"I">
+
+<!ENTITY menu-bis-mitarbeiter-export.key		"E">
+<!ENTITY menu-bis-mitarbeiter-export.label		"Export">
+<!ENTITY menu-bis-mitarbeiter-export.accesskey	"E">

@@ -343,7 +343,7 @@ class bisverwendung
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->ext_id = $row->ext_id;
-				$obj->ba1bez = $row->ba1bez;
+				$obj->ba1bez = $row->ba1kurzbz;
 				$obj->ba2bez = $row->ba2bez;
 				$obj->beschausmass = $row->beschausmassbez;
 				$obj->verwendung = $row->verwendungbez;

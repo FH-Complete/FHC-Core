@@ -757,6 +757,14 @@ function ExtrasShowFirmenverwaltung()
 }
 
 // ****
+// * Zeigt eine Seite zum Importieren der Funktionen aus der vorherigen BISMeldung
+// ****
+function BISMitarbeiterImport()
+{
+	window.open('<?php echo APP_ROOT ?>vilesci/bis/personalimport.php','Import','');
+}
+
+// ****
 // * Oeffnet den About Dialog
 // ****
 function OpenAboutDialog()
@@ -846,3 +854,4 @@ function EinstellungenKontoFilterStgChange()
    
 	return true;
 }
+

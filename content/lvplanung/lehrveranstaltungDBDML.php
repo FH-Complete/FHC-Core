@@ -338,6 +338,10 @@ if(!$error)
 				if (isset($_POST['anmerkung'])) $leDAO->anmerkung=$_POST['anmerkung'];
 				$leDAO->lvnr=(isset($_POST['lvnr'])?$_POST['lvnr']:'');
 				$leDAO->unr=(isset($_POST['unr'])?$_POST['unr']:'');
+				if($leDAO->unr=='')
+				{
+					$leDAO->unr = $_POST['lehreinheit_id'];
+				}
 				$leDAO->updateamum=date('Y-m-d H:i:s');
 				$leDAO->updatevon=$user;
 
