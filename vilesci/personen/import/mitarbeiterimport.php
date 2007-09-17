@@ -131,6 +131,7 @@ $where = '';
 $error = false;
 //Parameter
 $titel = (isset($_POST['titel'])?$_POST['titel']:'');
+$titelpost = (isset($_POST['titelpost'])?$_POST['titelpost']:'');
 $nachname = (isset($_POST['nachname'])?$_POST['nachname']:'');
 $vorname = (isset($_POST['vorname'])?$_POST['vorname']:'');
 $geschlecht = (isset($_POST['geschlecht'])?$_POST['geschlecht']:'');
@@ -176,6 +177,7 @@ if(isset($_POST['save']))
 			$svnr = $person->svnr;
 			$ersatzkennzeichen = $person->ersatzkennzeichen;
 			$titel = $person->titelpre;
+			$titelpost = $person->titelpost;
 			$geschlecht = $person->geschlecht;
 		}
 	}
@@ -185,6 +187,7 @@ if(isset($_POST['save']))
 		$person->titelpre = $titel;
 		$person->nachname = $nachname;
 		$person->vorname = $vorname;
+		$person->titelpost = $titelpost;
 		$person->geschlecht = $geschlecht;
 		$person->gebdatum = $geburtsdatum;
 		$person->svnr = $svnr;
@@ -503,9 +506,10 @@ if($geburtsdatum!='')
 <!--Formularfelder-->
 <table>
 <?php
-echo '<tr><td>Titel</td><td><input type="text" id="titel" name="titel" maxlength="64" value="'.$titel.'" /></td></tr>';
+echo '<tr><td>Titel(Pre)</td><td><input type="text" id="titel" name="titel" maxlength="64" value="'.$titel.'" /></td></tr>';
 echo '<tr><td>Vorname</td><td><input type="text" id="vorname" maxlength="32" name="vorname" value="'.$vorname.'" /></td></tr>';
 echo '<tr><td>Nachname</td><td><input type="text" maxlength="64" id="nachname" name="nachname" value="'.$nachname.'" /></td></tr>';
+echo '<tr><td>Titel(Post)</td><td><input type="text" id="titelpost" name="titelpost" maxlength="64" value="'.$titelpost.'" /></td></tr>';
 echo '<tr><td>Geschlecht</td><td><SELECT id="geschlecht" name="geschlecht">';
 echo '<OPTION value="m" '.($geschlecht=='m'?'selected':'').'>m&auml;nnlich</OPTION>';
 echo '<OPTION value="w" '.($geschlecht=='w'?'selected':'').'>weiblich</OPTION>';

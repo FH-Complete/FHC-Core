@@ -160,7 +160,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       							</hbox>
       						</vbox>
    							<hbox>
-   								<image src='' id="student-detail-image" width="60" height="60" style="margin-left:5px;"/>
+   								<image src='' id="student-detail-image" style="margin-left:5px;"/> <!--height="60" width="60"-->
    								<spacer flex="1"/>
    							</hbox>
       						<label value="Anmerkung" control="student-detail-textbox-anmerkung"/>
