@@ -73,7 +73,7 @@ while ($row=pg_fetch_object($result))
 // Ergebnisse laden
 $sql_query="SELECT vw_auswertung.* FROM testtool.vw_auswertung";
 if (isset($_POST['reihungstest']))
-	$sql_query.=' JOIN public.tbl_prestudent USING (prestudent_id) WHERE reihungstest_id='.$_POST['reihungstest'];
+	$sql_query.=' JOIN public.tbl_prestudent USING (prestudent_id) WHERE 1 OR reihungstest_id='.$_POST['reihungstest'];
 
 //echo $sql_query;
 if(!($result=pg_query($conn, $sql_query)))
