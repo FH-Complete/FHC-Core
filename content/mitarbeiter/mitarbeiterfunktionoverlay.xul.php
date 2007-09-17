@@ -43,7 +43,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 <groupbox id="mitarbeiter-detail-groupbox-verwendung" flex="1">
 	<caption label="Verwendung" />
-	<hbox>
+	<hbox flex="1">
 		<tree id="mitarbeiter-tree-verwendung" seltype="single" hidecolumnpicker="false" flex="1"
 				datasources="rdf:null" ref="http://www.technikum-wien.at/bisverwendung/liste"
 				onselect="MitarbeiterVerwendungSelect();"
@@ -155,7 +155,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	</hbox>
 
 
-	<groupbox id="mitarbeiter-detail-groupbox-funktion" flex="1">
+	<groupbox id="mitarbeiter-detail-groupbox-funktion">
 		<caption label="Funktion" />
 		<hbox>
 			<tree id="mitarbeiter-tree-funktion" seltype="single" hidecolumnpicker="false" flex="1"
@@ -246,7 +246,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		</hbox>
 	</groupbox>
 </groupbox>
-<groupbox id="mitarbeiter-detail-groupbox-entwicklungsteam" flex="1">
+<groupbox id="mitarbeiter-detail-groupbox-entwicklungsteam">
 	<caption label="Entwicklungsteam" />
 	<hbox>
 		<tree id="mitarbeiter-tree-entwicklungsteam" seltype="single" hidecolumnpicker="false" flex="1"

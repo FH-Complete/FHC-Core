@@ -69,6 +69,18 @@ $obj->getLvGesamtNoten($lehrveranstaltung_id, $uid, $semester_aktuell);
 
 foreach ($obj->result as $row)	
 {
+	$vorname = '';
+	$nachname = '';
+	$qry_name = "SELECT vorname, nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid='$row->student_uid'";
+	if($result_name = pg_query($conn, $qry_name))
+	{
+		if($row_name = pg_fetch_object($result_name))
+		{
+			$vorname = $row_name->vorname;
+			$nachname = $row_name->nachname;
+		}
+	}
+	
 	echo '
 		  <RDF:li>
 	         <RDF:Description  id="'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'"  about="'.$rdf_url.'/'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'" >
@@ -83,6 +95,8 @@ foreach ($obj->result as $row)
 				<NOTE:benotungsdatum><![CDATA['.$datum->convertISODate($row->benotungsdatum).']]></NOTE:benotungsdatum>
 				<NOTE:note_bezeichnung><![CDATA['.$row->note_bezeichnung.']]></NOTE:note_bezeichnung>
 				<NOTE:lehrveranstaltung_bezeichnung><![CDATA['.$row->lehrveranstaltung_bezeichnung.']]></NOTE:lehrveranstaltung_bezeichnung>
+				<NOTE:student_vorname><![CDATA['.$vorname.']]></NOTE:student_vorname>
+				<NOTE:student_nachname><![CDATA['.$nachname.']]></NOTE:student_nachname>
 	         </RDF:Description>
 	      </RDF:li>';
 }

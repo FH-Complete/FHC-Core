@@ -55,7 +55,7 @@ if($result = pg_query($conn, $qry))
 	      <RDF:li>
 	         <RDF:Description  id="'.$row->ba1code.'"  about="'.$rdf_url.'/'.$row->ba1code.'" >
 	            <BESCHAEFTIGUNGSART:ba1code><![CDATA['.$row->ba1code.']]></BESCHAEFTIGUNGSART:ba1code>
-	            <BESCHAEFTIGUNGSART:ba1bez><![CDATA['.$row->ba1bez.']]></BESCHAEFTIGUNGSART:ba1bez>
+	            <BESCHAEFTIGUNGSART:ba1bez><![CDATA['.$row->ba1kurzbz.']]></BESCHAEFTIGUNGSART:ba1bez>
 	         </RDF:Description>
 	      </RDF:li>
 	      ';
