@@ -255,7 +255,7 @@ elseif ($aktion=='lva_single_set')
 		//$error_msg.='Datum:'.$new_datum.' Std:'.($new_stunde+$j).$new_ort.$db_stpl_table.$uid;
 		for ($j=0;$j<$lva[$i]->stundenblockung;$j++)
 			if (!$lva[$i]->save_stpl($new_datum,$new_stunde+$j,$new_ort,$db_stpl_table,$uid))
-				$error_msg.='fehler'.$lva[$i]->errormsg;
+				$error_msg.='Error: '.$lva[$i]->errormsg;
 			//else die('test');
 	}
 	//$error_msg.='test';
@@ -488,7 +488,7 @@ while ($begin<=$ende)
 <script type="application/x-javascript">
 	<?php
 		if ($error_msg!='')
-			echo "alert('$error_msg');";
+			echo "alert('".str_replace("'",'"',$error_msg)."');";
 	?>
 	top.document.getElementById("statusbarpanel-text").setAttribute("label","<?php echo htmlspecialchars($PHP_SELF.$error_msg); ?>");
 </script>

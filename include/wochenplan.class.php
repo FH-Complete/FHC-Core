@@ -1370,13 +1370,15 @@ class wochenplan
 			// Stundenplanabfrage bauen (Wo ist Kollision?)
 			$sql_query="SELECT DISTINCT datum, stunde FROM $stpl_table
 				WHERE datum>='$datum_begin' AND datum<'$datum_end' AND
-				($lkt $gruppen OR ($lvb) ) AND unr!=$unr";
+				($lkt $gruppen OR ($lvb) )";
+			if (is_numeric($unr))
+				$sql_query.=" AND unr!=$unr";
 			//$this->errormsg.=htmlspecialchars($sql_query);
 			//return false;
 			if(!$result_kollision=pg_query($this->conn, $sql_query))
 			{
 				//die(pg_last_error($this->conn));
-				$this->errormsg=pg_last_error($this->conn);
+				$this->errormsg=pg_last_error($this->conn).$sql_query;
 				return false;
 			}
 			$num_k=pg_numrows($result_kollision);
@@ -1395,11 +1397,13 @@ class wochenplan
 			$sql_query="SELECT DISTINCT datum, stunde, ort_kurzbz FROM $stpl_view
 				JOIN public.tbl_ortraumtyp USING (ort_kurzbz)
 				WHERE datum>='$datum_begin' AND datum<'$datum_end' AND
-				($rtype) AND unr!=$unr"; //
+				($rtype)";
+			if (is_numeric($unr))
+				$sql_query.=" AND unr!=$unr";
 			//echo $sql_query;
 			if(!$result_besetzt=pg_query($this->conn, $sql_query))
 			{
-				$this->errormsg=pg_last_error($this->conn);
+				$this->errormsg=pg_last_error($this->conn).$sql_query;
 				return false;
 			}
 			$num_b=pg_numrows($result_besetzt);
