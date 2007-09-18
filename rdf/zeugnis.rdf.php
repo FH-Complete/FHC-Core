@@ -148,7 +148,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$datum_aktuell = date('d.m.Y');
 		$xml .= "		<ort_datum>Wien, am ".$datum_aktuell."</ort_datum>";
 		
-		$qry_proj = "SELECT lehrveranstaltung_id, titel, themenbereich, note FROM lehre.tbl_projektarbeit JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) WHERE student_uid='".$uid_arr[$i]."' AND studiensemester_kurzbz='$studiensemester_kurzbz'";
+		$qry_proj = "SELECT lehrveranstaltung_id, titel, themenbereich, note FROM lehre.tbl_projektarbeit JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) WHERE student_uid='".$uid_arr[$i]."' AND studiensemester_kurzbz='$studiensemester_kurzbz' AND projekttyp_kurzbz in('Bachelor', 'Diplom')";
 		if($result_proj = pg_query($conn, $qry_proj))
 		{
 			while($row_proj = pg_fetch_object($result_proj))
@@ -187,7 +187,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					$xml_fussnote .="\n <fussnote>";
 					$xml_fussnote .=" 		<fussnotenzeichen>".$fussnotenzeichen[$anzahl_fussnoten]."</fussnotenzeichen>";
 					
-					$projektarbeit[$row->lehrveranstaltung_id]['titel'] = breaktext($projektarbeit[$row->lehrveranstaltung_id]['titel'], 40);
+					//$projektarbeit[$row->lehrveranstaltung_id]['titel'] = breaktext($projektarbeit[$row->lehrveranstaltung_id]['titel'], 40);
 					
 					$anzahl_nl = substr_count($projektarbeit[$row->lehrveranstaltung_id]['titel'],'\n');
 					$nl2='';
@@ -204,10 +204,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					else 
 						$typ = 'Diplomarbeit:';
 						
+					$nl='';
+					$nl2='';
 					$xml_fussnote .="      <titel_bezeichnung>$typ</titel_bezeichnung>";
 					$xml_fussnote .="      <titel>".$projektarbeit[$row->lehrveranstaltung_id]['titel'].$nl2."</titel>";
-					$note = $note_arr[$projektarbeit[$row->lehrveranstaltung_id]['note']];
-					$nl = str_repeat('\n',($anzahl_nl));
+					//$note = $note_arr[$projektarbeit[$row->lehrveranstaltung_id]['note']];
+					$note = $projektarbeit[$row->lehrveranstaltung_id]['note'];
+					//$nl = str_repeat('\n',($anzahl_nl));
 					$xml_fussnote .='      <note>'.$note.$nl.'</note>';
 					$xml_fussnote .='      <sws>'.$nl.'</sws>';
 					$xml_fussnote .='      <ects>'.$nl.'</ects>';
