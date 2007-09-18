@@ -33,6 +33,7 @@ require_once('../include/functions.inc.php');
 require_once('../include/zeugnisnote.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/note.class.php');
+require_once('../include/studiensemester.class.php');
 
 // Datenbank Verbindung
 if (!$conn = pg_pconnect(CONN_STRING))
@@ -78,7 +79,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	
 	for ($i = 0; $i < sizeof($uid_arr); $i++)
 	{	
-	$query = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.bezeichnung, tbl_studentlehrverband.semester, tbl_person.titelpre, tbl_person.titelpost, tbl_person.vorname, tbl_person.nachname,tbl_person.gebdatum, tbl_studiensemester.bezeichnung as sembezeichnung FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer, tbl_studentlehrverband, tbl_studiensemester WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_student.student_uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id and tbl_student.student_uid = '".$uid_arr[$i]."' and tbl_studentlehrverband.student_uid=tbl_student.student_uid and tbl_studiensemester.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz and tbl_studentlehrverband.studiensemester_kurzbz = '".$studiensemester_kurzbz."'";
+		$query = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.bezeichnung, tbl_studentlehrverband.semester, tbl_person.titelpre, tbl_person.titelpost, tbl_person.vorname, tbl_person.nachname,tbl_person.gebdatum, tbl_studiensemester.bezeichnung as sembezeichnung FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer, tbl_studentlehrverband, tbl_studiensemester WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_student.student_uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id and tbl_student.student_uid = '".$uid_arr[$i]."' and tbl_studentlehrverband.student_uid=tbl_student.student_uid and tbl_studiensemester.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz and tbl_studentlehrverband.studiensemester_kurzbz = '".$studiensemester_kurzbz."'";
 	
 		if($result = pg_query($conn, $query))
 		{
@@ -87,7 +88,18 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		}
 		else
 			die('Student not found');
-		
+
+		$studiensemester = new studiensemester($conn);
+		$studiensemester_aktuell = $studiensemester->getNearest();
+
+		$semester_aktuell='';
+		$qry_semester = "SELECT tbl_student.semester FROM public.tbl_student, public.tbl_prestudentrolle WHERE tbl_student.prestudent_id=tbl_prestudentrolle.prestudent_id AND tbl_prestudentrolle.rolle_kurzbz in('Student','Incoming','Outgoing','Praktikant','Diplomand') AND studiensemester_kurzbz='$studiensemester_aktuell' AND tbl_student.student_uid = '".$uid_arr[$i]."'";
+		if($result_semester = pg_query($conn, $qry_semester))
+			if($row_semester = pg_fetch_object($result_semester))
+				$semester_aktuell=$row_semester->semester;
+				
+		if($semester_aktuell=='')
+			$studiensemester_aktuell='';
 		$stgl_query = "SELECT titelpre, titelpost, vorname, nachname FROM tbl_person, tbl_benutzer, tbl_benutzerfunktion WHERE tbl_person.person_id = tbl_benutzer.person_id and tbl_benutzer.uid = tbl_benutzerfunktion.uid and tbl_benutzerfunktion.funktion_kurzbz = 'stgl' and tbl_benutzerfunktion.studiengang_kz = '".$row->studiengang_kz."'";
 		if($stgl_result = pg_query($conn, $stgl_query))
 				$stgl_row = pg_fetch_object($stgl_result);
@@ -95,7 +107,9 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			die('Stgl not found');
 		$xml .= "	<studienerfolg>";
 		$xml .= "		<studiensemester>".$row->sembezeichnung."</studiensemester>";
+		$xml .= "		<studiensemester_aktuell>".$studiensemester_aktuell."</studiensemester_aktuell>";
 		$xml .=	"		<semester>".$row->semester."</semester>";
+		$xml .=	"		<semester_aktuell>".$semester_aktuell.($semester_aktuell!=''?'. Semester':'')."</semester_aktuell>";
 		$xml .= "		<studiengang>".$row->bezeichnung."</studiengang>";
 		$xml .= "		<studiengang_kz>".$row->studiengang_kz."</studiengang_kz>";
 		$xml .= "		<titelpre>".$row->titelpre."</titelpre>";
@@ -134,8 +148,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$anzahl=0;
 		foreach ($obj->result as $row)	
 		{
-			//Note darf nicht teilnote(0), negativ(5), noch nicht eingetragen(7), nicht beurteilt (9), nicht erfolgreich absolviert (13) sein
-			if($row->zeugnis && $row->note!=0 && $row->note!=5 && $row->note!=7 && $row->note!=9 && $row->note!=13)
+			//Note darf nicht teilnote(0), negativ(5), noch nicht eingetragen(7), nicht beurteilt (9), nicht erfolgreich absolviert (13), angerechnet(6) sein
+			if($row->zeugnis && $row->note!=0 && $row->note!=5 && $row->note!=7 && $row->note!=9 && $row->note!=13 && $row->note!=6)
 			{
 				if ($row->note)
 					$note = $note_arr[$row->note];

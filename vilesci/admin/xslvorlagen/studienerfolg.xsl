@@ -133,13 +133,13 @@
 					
 					<fo:block-container position="absolute" top="77mm" left="16mm" height="20mm">
 						<fo:block text-align="left" line-height="10pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
-							<xsl:value-of select="studiensemester_kurzbz" />
+							<xsl:value-of select="studiensemester_aktuell" />
 						</fo:block>
 					</fo:block-container>
 					
 					<fo:block-container position="absolute" top="77mm" left="137mm" height="20mm">
 						<fo:block text-align="left" line-height="10pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
-							<xsl:value-of select="semester" />. Semester
+							<xsl:value-of select="semester_aktuell" />
 						</fo:block>
 					</fo:block-container>
 					
