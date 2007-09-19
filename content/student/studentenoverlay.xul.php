@@ -264,6 +264,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 							<tab id="student-tab-abschlusspruefung" label="AbschlussPrüfung" />
 							<tab id="student-tab-projektarbeit" label="Projektarbeit" />
 							<tab id="student-tab-gruppen" label="Gruppen" onclick="StudentGruppenLoadData();"/>
+							<tab id="student-tab-funktionen" label="Funktionen" onclick="StudentFunktionIFrameLoad();"/>
 						</tabs>
 						<tabpanels id="student-tabpanels-main" flex="1">
 							<vbox id="student-detail"  style="margin-top:10px;" />
@@ -279,6 +280,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 							<vbox id="student-abschlusspruefung"  style="margin-top:10px;" />
 							<vbox id="student-projektarbeit"  style="margin-top:10px;" />
 							<vbox id="student-gruppen"  style="margin-top:10px;" />
+							<iframe id="student-funktionen" src="" style="margin-top:10px;" />
 						</tabpanels>
 					</tabbox>
 				</vbox>

@@ -72,6 +72,19 @@ $rdf_url='http://www.technikum-wien.at/fachbereich';
   <RDF:Seq about="<?php echo $rdf_url ?>/liste">
 
 <?php
+if(isset($_GET['optional']) && $_GET['optional']=='true')
+{
+		?>
+  <RDF:li>
+      	<RDF:Description  id=""  about="<?php echo $rdf_url.'/'; ?>" >
+    		<FACHBEREICH:kurzbz></FACHBEREICH:kurzbz>
+    		<FACHBEREICH:bezeichnung>-- keine Auswahl --</FACHBEREICH:bezeichnung>
+    		<FACHBEREICH:farbe></FACHBEREICH:farbe>
+    		<FACHBEREICH:studiengang_kz></FACHBEREICH:studiengang_kz>
+      	</RDF:Description>
+  </RDF:li>
+	  <?php
+}
 
 while ($row = pg_fetch_object($result))
 {

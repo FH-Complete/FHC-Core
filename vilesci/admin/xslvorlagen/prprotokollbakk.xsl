@@ -18,14 +18,14 @@
 			<fo:page-sequence master-reference="PageMaster">
 				<fo:flow flow-name="xsl-region-body" >
 	
-					<fo:block-container position="absolute" top="25mm" left="15mm" height="20mm">
+					<fo:block-container position="absolute" top="25mm" left="15mm">
 						<fo:block text-align="left" line-height="20pt" font-family="sans-serif" font-size="16pt">
 							Protokoll Bachelorprüfung
 						</fo:block>
 					</fo:block-container> 
 					
 					<!--FINANZAMT-->
-					<fo:block-container position="absolute" top="35mm" left="15mm" height="20mm">
+					<fo:block-container position="absolute" top="35mm" left="15mm">
 						<fo:block text-align="left" line-height="10pt" font-family="sans-serif" font-size="8pt">
 							abgehalten an dem Fachhochschul-Studiengang <xsl:value-of select="stg_bezeichnung" /> gemäß (FhStG), BGBl <xsl:value-of select="bescheidbgbl1" /> idgF BGBl. <xsl:value-of select="bescheidbgbl2" /> und dem mit Bescheid des Fachhochschulrates GZ:\n
 							<xsl:value-of select="bescheidgz" /> vom <xsl:value-of select="bescheidvom" /> genehmigten Antrag.
@@ -33,8 +33,8 @@
 					</fo:block-container>
 					
 					<!-- LOGO und DATUM -->
-					<fo:block-container position="absolute" top="40mm" left="260mm" height="20mm">
-						<fo:block text-align="left" line-height="10pt" font-family="sans-serif" font-size="8pt">
+					<fo:block-container position="absolute" top="40mm" left="260mm">
+						<fo:block text-align="left" line-height="10pt" content-width="50mm" font-family="sans-serif" font-size="8pt">
 							Datum: <xsl:value-of select="datum_aktuell" />
 						</fo:block>
 					</fo:block-container>
@@ -135,7 +135,7 @@
 									</fo:table-row>
 									<fo:table-row line-height="14pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="80mm" text-align="left">
 												<xsl:text> </xsl:text><xsl:value-of select="pruefer1_nachname" />\n
 											</fo:block>
 										</fo:table-cell>
@@ -162,7 +162,7 @@
 									</fo:table-row>
 									<fo:table-row line-height="14pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="80mm" text-align="left">
 												<xsl:text> </xsl:text><xsl:value-of select="pruefer2_nachname" />\n
 											</fo:block>
 										</fo:table-cell>
@@ -189,7 +189,7 @@
 									</fo:table-row>
 									<fo:table-row line-height="14pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="80mm" text-align="left">
 												<xsl:text> </xsl:text><xsl:value-of select="pruefer3_nachname" />\n
 											</fo:block>
 										</fo:table-cell>
@@ -244,7 +244,7 @@
 							</fo:table-body>
 						</fo:table>
 					</fo:block-container>
-					<fo:block-container position="absolute" top="140mm" left="15mm" height="20mm">
+					<fo:block-container position="absolute" top="140mm" left="15mm">
 						<fo:block text-align="left" line-height="10pt" font-family="sans-serif" font-size="10pt">
 							Gesamtbeurteilung: _______________________________________________________
 						</fo:block>
@@ -255,7 +255,7 @@
 						</fo:block>
 					</fo:block-container>
 					
-					<fo:block-container position="absolute" top="160mm" left="15mm" height="10mm">
+					<fo:block-container position="absolute" top="160mm" left="15mm">
 						<fo:table table-layout="fixed" border-collapse="separate">
 						    <fo:table-column column-width="65mm"/>
 							<fo:table-column column-width="65mm"/>

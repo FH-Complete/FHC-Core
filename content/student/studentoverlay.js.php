@@ -699,6 +699,8 @@ function StudentAuswahl()
 		alert(e);
 		return false;
 	}
+	StudentFunktionIFrameUnLoad();
+	
 	stsem = getStudiensemester();
 	var url = '<?php echo APP_ROOT ?>rdf/student.rdf.php?prestudent_id='+prestudent_id+'&studiensemester_kurzbz='+stsem+'&'+gettimestamp();
 	
@@ -874,7 +876,8 @@ function StudentAuswahl()
 		document.getElementById('student-tab-abschlusspruefung').collapsed=true;
 		document.getElementById('student-tab-projektarbeit').collapsed=true;
 		document.getElementById('student-tab-gruppen').collapsed=true;
-		document.getElementById('student-detail-groupbox-student').hidden=true;
+		document.getElementById('student-tab-funktionen').collapsed=true;
+		document.getElementById('student-detail-groupbox-student').hidden=true;		
 		
 		document.getElementById('student-toolbar-abbrecher').hidden=true;
 		document.getElementById('student-toolbar-unterbrecher').hidden=true;
@@ -906,6 +909,7 @@ function StudentAuswahl()
 		document.getElementById('student-tab-abschlusspruefung').collapsed=false;
 		document.getElementById('student-tab-projektarbeit').collapsed=false;
 		document.getElementById('student-tab-gruppen').collapsed=false;
+		document.getElementById('student-tab-funktionen').collapsed=false;
 		document.getElementById('student-detail-groupbox-student').hidden=false;
 		
 		document.getElementById('student-toolbar-abbrecher').hidden=false;
@@ -1187,10 +1191,21 @@ function StudentAuswahl()
 	
 	if(uid!='')
 	{
+		// ******* GRUPPEN ************ //
 		StudentGruppenRemoveDatasource();
 		if(document.getElementById('student-content-tabs').selectedItem==document.getElementById('student-tab-gruppen'))
 		{
 			StudentGruppenLoadData();
+		}
+	}
+	
+	if(uid!='')
+	{
+		// ******* FUNKTIONEN ********* //
+		if(document.getElementById('student-content-tabs').selectedItem==document.getElementById('student-tab-funktionen'))
+		{
+			url = '<?php echo APP_ROOT; ?>content/funktionen.xul.php?uid='+uid;
+			document.getElementById('student-funktionen').setAttribute('src',url);
 		}
 	}
 }
@@ -3487,4 +3502,30 @@ function StudentCreateStudienerfolg(finanzamt, studiensemester)
 		studiensemester=getStudiensemester();
 	//PDF erzeugen
 	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=studienerfolg.rdf.php&xsl=Studienerfolg&uid='+paramList+'&ss='+studiensemester+'&typ='+finanzamt,'DiplomaSupplement', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+
+// ************* FUNKTIONEN ***************** //
+
+// ****
+// * Laedt den Funktionen IFrame
+// ****
+function StudentFunktionIFrameLoad()
+{
+	if(document.getElementById('student-funktionen').getAttribute('src')=='')
+	{
+		uid = document.getElementById('student-detail-textbox-uid').value;
+		if(uid!='')
+		{
+			url = '<?php echo APP_ROOT; ?>content/funktionen.xul.php?uid='+uid;
+			document.getElementById('student-funktionen').setAttribute('src',url);
+		}
+	}
+}
+
+// ****
+// * Funktionen IFrame ins leere zeigen lassen
+// ****
+function StudentFunktionIFrameUnLoad()
+{
+	document.getElementById('student-funktionen').setAttribute('src','');
 }

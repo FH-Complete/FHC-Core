@@ -39,7 +39,7 @@
 </head>
 
 <frameset rows="375,*" cols="*" framespacing="0"" frameborder="NO" border="0">
-  <frame src="pinboard_entry.php" name="news_entry" scrolling="NO">
+  <frame src="pinboard_entry.php" name="news_entry">
   <frame src="pinboard_show.php" name="news_window">
 </frameset>
 <noframes><body>

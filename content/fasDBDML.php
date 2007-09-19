@@ -37,6 +37,7 @@ require_once('../include/adresse.class.php');
 require_once('../include/kontakt.class.php');
 require_once('../include/bankverbindung.class.php');
 require_once('../include/variable.class.php');
+require_once('../include/benutzerfunktion.class.php');
 
 $user = get_uid();
 //header("Content-type: application/xhtml+xml");
@@ -258,6 +259,75 @@ if(!$error)
 		{
 			$return = false;
 			$errormsg = $bankverbindung->errormsg;
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='funktionsave') // ****************** BENUTZERFUNKTION **************** //
+	{
+		$benutzerfunktion = new benutzerfunktion($conn);
+		if(isset($_POST['neu']) && $_POST['neu']=='true')
+		{
+			$benutzerfunktion->new = true;
+			$bentuzerfunktion->insertamum=date('Y-m-d H:i:s');
+			$benutzerfunktion->insertvon = $user;
+		}
+		else 
+		{
+			if(isset($_POST['benutzerfunktion_id']))
+			{
+				if($benutzerfunktion->load($_POST['benutzerfunktion_id']))
+				{
+					$benutzerfunktion->new = false;
+				}
+				else 
+				{
+					$error = true;
+					$errormsg = 'Fehler beim Laden der Funktion: '.$benutzerfunktion->errormsg;
+					$return = false;
+				}
+			}
+			else 
+			{
+				$error = true;
+				$errormsg = 'Benutzerfunktion_id wurde nicht uebergeben';
+				$return = false;
+			}
+		}
+		
+		if(!$error)
+		{
+			$benutzerfunktion->studiengang_kz = $_POST['studiengang_kz'];
+			$benutzerfunktion->fachbereich_kurzbz = $_POST['fachbereich_kurzbz'];
+			$benutzerfunktion->uid = $_POST['uid'];
+			$benutzerfunktion->funktion_kurzbz = $_POST['funktion_kurzbz'];
+			$benutzerfunktion->updateamum = date('Y-m-d H:i:s');
+			$benutzerfunktion->updatevon = $user;
+			
+			if($benutzerfunktion->save())
+			{
+				$return = true;
+				$data = $benutzerfunktion->benutzerfunktion_id;
+			}
+			else 
+			{
+				$return = false;
+				$errormsg = 'Fehler beim Speichern:'.$benutzerfunktion->errormsg.' "'.$_POST['fachbereich_kurzbz'].' "';
+			}
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='funktiondelete')
+	{
+		if(isset($_POST['benutzerfunktion_id']) && is_numeric($_POST['benutzerfunktion_id']))
+		{
+			$benutzerfunktion = new benutzerfunktion($conn);
+			if($benutzerfunktion->delete($_POST['benutzerfunktion_id']))
+			{
+				$return = true;	
+			}
+			else 
+			{
+				$return = false;
+				$errormsg = 'Fehler beim Loeschen:'.$benutzerfunktion->errormsg;
+			}
 		}
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='variablechange') /**********************SONSTIGES*****************/

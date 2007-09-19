@@ -435,6 +435,7 @@ function MitarbeiterAuswahl()
 		{
 			//Aktivieren der Felder
 			MitarbeiterDetailDisableFields(false);
+			MitarbeiterFunktionIFrameUnLoad();
 		}
 		else
 		{
@@ -627,6 +628,13 @@ function MitarbeiterAuswahl()
 	funktiontree.builder.rebuild();
 	
 	MitarbeiterFunktionDisableFields(true);
+	
+	//Funktionen Laden
+	if(document.getElementById('mitarbeiter-tabs').selectedItem==document.getElementById('mitarbeiter-tab-funktionen'))
+	{
+		url = '<?php echo APP_ROOT; ?>content/funktionen.xul.php?uid='+uid;
+		document.getElementById('mitarbeiter-funktionen').setAttribute('src',url);
+	}
 	
 }
 
@@ -1591,4 +1599,28 @@ function MitarbeiterEntwicklungsteamTreeRefresh()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	MitarbeiterEntwicklungsteamTreeDatasource.Refresh(false);
+}
+
+// ****
+// * Laedt den Funktionen IFrame
+// ****
+function MitarbeiterFunktionIFrameLoad()
+{
+	if(document.getElementById('mitarbeiter-funktionen').getAttribute('src')=='')
+	{
+		uid = document.getElementById('mitarbeiter-detail-textbox-uid').value;
+		if(uid!='')
+		{
+			url = '<?php echo APP_ROOT; ?>content/funktionen.xul.php?uid='+uid;
+			document.getElementById('mitarbeiter-funktionen').setAttribute('src',url);
+		}
+	}
+}
+
+// ****
+// * IFrame ins leere Zeigen lassen
+// ****
+function MitarbeiterFunktionIFrameUnLoad()
+{
+	document.getElementById('mitarbeiter-funktionen').setAttribute('src','');
 }

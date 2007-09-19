@@ -162,7 +162,7 @@ class benutzerfunktion
 			return false;
 		}
 
-		$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE benutzerfunktion_id = '$this->benutzerfunktion_id';";
+		$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE benutzerfunktion_id = '$benutzerfunktion_id';";
 
 		if(!$res = pg_query($this->conn, $qry))
 		{
@@ -246,7 +246,7 @@ class benutzerfunktion
 					return false;
 				}
 			}
-			$qry = 'INSERT INTO public.tbl_benutzerfunktion (fachbereich_kurzbz, uid, studiengang_kz, funktion_kurzbz, insertamum, insertvon,
+			$qry = 'BEGIN;INSERT INTO public.tbl_benutzerfunktion (fachbereich_kurzbz, uid, studiengang_kz, funktion_kurzbz, insertamum, insertvon,
 				updateamum, updatevon) VALUES ('.
 				$this->addslashes($this->fachbereich_kurzbz).', '.
 				$this->addslashes($this->uid).', '.
@@ -283,23 +283,29 @@ class benutzerfunktion
 
 		if(pg_query($this->conn, $qry))
 		{
-			/*//Log schreiben
-			$sql = $qry;
-			$qry = "SELECT nextval('log_seq') as id;";
-			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
+			if($new)
 			{
-				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
-				return false;
+				//Sequence Auslesen
+				$qry = "SELECT currval('public.tbl_benutzerfunktion_benutzerfunktion_id_seq') as id";
+				if($result = pg_query($this->conn, $qry))
+				{
+					if($row = pg_fetch_object($result))
+					{
+						$this->benutzerfunktion_id = $row->id;
+						pg_query($this->conn, 'COMMIT;');
+					}
+					else 
+					{
+						$this->errormsg = 'Fehler beim Auslesen der Sequence';
+						pg_query($this->conn, 'ROLLBACK');
+					}
+				}
+				else 
+				{
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+					pg_query($this->conn, 'ROLLBACK');
+				}
 			}
-
-			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
-			if(pg_query($this->conn, $qry))
-				return true;
-			else
-			{
-				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
-				return false;
-			}*/
 			return true;
 		}
 		else
