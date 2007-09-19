@@ -115,6 +115,7 @@ $mitarbeiterDAO->getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $ausgeschie
 	$worksheet->write(0,$i,"STRASSE", $format_bold);
 	$worksheet->write(0,$i+1,"PLZ", $format_bold);
 	$worksheet->write(0,$i+2,"ORT", $format_bold);
+	$worksheet->write(0,$i+3,"FIRMENNAME", $format_bold);
 
 	//Maximale Spaltenbreite ermitteln damit sie am Schluss gesetzt werden kann
 	$j=1;
@@ -124,6 +125,7 @@ $mitarbeiterDAO->getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $ausgeschie
 	$maxlength[$i]=strlen('STRASSE');
 	$maxlength[$i+1]=strlen('PLZ');
 	$maxlength[$i+2]=strlen('ORT');
+	$maxlength[$i+3]=strlen('FIRMENNAME');
 
 	//Zeilen (Mitarbeiter) ausgeben
 	foreach ($mitarbeiterDAO->result as $mitarbeiter)
@@ -154,6 +156,20 @@ $mitarbeiterDAO->getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $ausgeschie
 				if(strlen($row->ort)>$maxlength[$i+2])
 					$maxlength[$i+2]=strlen($row->ort);
 				$worksheet->write($j,$i+2, $row->ort);
+				
+				if($row->firma_id!='')
+				{
+					$qry = "SELECT * FROM public.tbl_firma WHERE firma_id='$row->firma_id'";
+					if($result = pg_query($conn, $qry))
+					{
+						if($row = pg_fetch_object($result))
+						{
+							if(strlen($row->name)>$maxlength[$i+3])
+								$maxlength[$i+3]=strlen($row->name);
+							$worksheet->write($j,$i+3, $row->name);
+						}
+					}
+				}
 			}
 		}
 		

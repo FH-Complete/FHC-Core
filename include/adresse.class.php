@@ -303,6 +303,7 @@ class adresse
 					if($rowz->gemeinde!=$this->gemeinde) 				$update=true;
 					if($rowz->heimatadresse!=$this->heimatadresse?'true':'false')	$update=true;
 					if($rowz->zustelladresse!=$this->zustelladresse?'true':'false') 	$update=true;
+					if($rowz->firma_id!=$this->firma_id) 	$update=true;
 
 					if($update)
 					{
@@ -315,6 +316,7 @@ class adresse
 					      	' ort='.$this->addslashes($this->ort).', '.
 					      	' nation='.$this->addslashes($this->nation).', '.
 					      	' gemeinde='.$this->addslashes($this->gemeinde).', '.
+					      	' firma_id='.$this->addslashes($this->firma_id).','.
 					      	' updateamum= now(), '.
 					      	' updatevon='.$this->addslashes($this->updatevon).', '.
 					      	' heimatadresse='.($this->heimatadresse?'true':'false').', '.
