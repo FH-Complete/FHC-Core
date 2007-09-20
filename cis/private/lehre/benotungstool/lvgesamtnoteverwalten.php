@@ -386,7 +386,7 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 		$adressen = $sg->email.", ".$user."@technikum-wien.at";
 		
 		$freigeber = "<b>".strtoupper($user)."</b>";
-		mail($adress,"Notenfreigabe ".$lv->bezeichnung,"<html><body><b>".$lv->bezeichnung."</b><br><br>Benutzer ".$freigeber." hat die LV-Noten f&uuml;r folgende Studenten freigegeben:<br>".$studlist."<br>Mail wurde verschickt an: ".$adressen."</body></html>","From: vilesci@technikum-wien.at\nContent-Type: text/html\n");
+		mail($adressen,"Notenfreigabe ".$lv->bezeichnung,"<html><body><b>".$lv->bezeichnung."</b><br><br>Benutzer ".$freigeber." hat die LV-Noten f&uuml;r folgende Studenten freigegeben:<br>".$studlist."<br>Mail wurde verschickt an: ".$adressen."</body></html>","From: vilesci@technikum-wien.at\nContent-Type: text/html\n");
 	}	
 
 
