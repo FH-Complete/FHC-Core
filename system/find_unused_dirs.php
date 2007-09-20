@@ -7,19 +7,15 @@
 // einschraenkung auf studiengang_fk per http-get:
 // sync_fas_vilesci_note_stg.php?stg_von=x&stg_bis=y
 // **************************************
-	require_once('../../../vilesci/config.inc.php');
-	require_once('../../../include/zeugnisnote.class.php');
-	require_once('../../../include/pruefung.class.php');
+	require_once('../cis/config.inc.php');
 	//$adress='fas_sync@technikum-wien.at';
-	$adress='raab@technikum-wien.at';
+
 
 	$conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
-	$conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur Vilesci Datenbank fehlgeschlagen");
 
 
 
 	$headtext='';
-	$head_stg_text="Dies ist eine automatische Mail!\n\nFolgende Fehler sind bei der Synchronisation der Lehrveranstaltungen aufgetreten:\n\n";
 	$text='';
 
 
