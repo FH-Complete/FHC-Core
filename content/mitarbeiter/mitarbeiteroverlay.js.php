@@ -1025,6 +1025,7 @@ function MitarbeiterVerwendungSpeichern(dialog, bisverwendung_id, mitarbeiter_ui
 	habilitation = dialog.getElementById('mitarbeiter-verwendung-detail-checkbox-habilitation').checked;
 	beginn = dialog.getElementById('mitarbeiter-verwendung-detail-datum-beginn').value;
 	ende = dialog.getElementById('mitarbeiter-verwendung-detail-datum-ende').value;
+	vertragsstunden = dialog.getElementById('mitarbeiter-verwendung-detail-textbox-vertragsstunden').value;
 		
 	if(verwendung_code=='1' || verwendung_code=='5' || verwendung_code=='6')
 	{
@@ -1076,6 +1077,7 @@ function MitarbeiterVerwendungSpeichern(dialog, bisverwendung_id, mitarbeiter_ui
 	req.add('habilitation', habilitation);
 	req.add('beginn', beginn);
 	req.add('ende', ende);
+	req.add('vertragsstunden', vertragsstunden);
 
 	var response = req.executePOST();
 

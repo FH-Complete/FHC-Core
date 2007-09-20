@@ -110,6 +110,11 @@ function draw_row($row)
             <VERWENDUNG:ausmass><![CDATA['.$row->beschausmass.']]></VERWENDUNG:ausmass>
             <VERWENDUNG:verwendung><![CDATA['.$row->verwendung.']]></VERWENDUNG:verwendung>
             <VERWENDUNG:hauptberuf><![CDATA['.$row->hauptberuf.']]></VERWENDUNG:hauptberuf>
+            <VERWENDUNG:vertragsstunden><![CDATA['.$row->vertragsstunden.']]></VERWENDUNG:vertragsstunden>
+            <VERWENDUNG:updateamum><![CDATA['.$row->updateamum.']]></VERWENDUNG:updateamum>
+            <VERWENDUNG:updatevon><![CDATA['.$row->updatevon.']]></VERWENDUNG:updatevon>
+            <VERWENDUNG:insertamum><![CDATA['.$row->insertamum.']]></VERWENDUNG:insertamum>
+            <VERWENDUNG:insertvon><![CDATA['.$row->insertvon.']]></VERWENDUNG:insertvon>
          </RDF:Description>
       </RDF:li>
       ';
