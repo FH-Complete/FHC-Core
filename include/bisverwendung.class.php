@@ -39,6 +39,7 @@ class bisverwendung
 	var $habilitation;
 	var $beginn;
 	var $ende;
+	var $vertragsstunden;
 	var $updateamum;
 	var $updatevon;
 	var $insertamum;
@@ -130,6 +131,7 @@ class bisverwendung
 				$this->beschausmass = $row->beschausmassbez;
 				$this->verwendung = $row->verwendungbez;
 				$this->hauptberuf = $row->bezeichnung;
+				$this->vertragsstunden = $row->vertragsstunden;
 				return true;		
 			}
 			else 
@@ -187,6 +189,11 @@ class bisverwendung
 	
 	function validate()
 	{
+		if(!is_numeric($this->vertragsstunden) && $this->vertragsstunden!='')
+		{
+			$this->errormsg = 'Vertragsstunden sind ungueltig';
+			return false;
+		}
 		return true;
 	}
 	
@@ -222,7 +229,7 @@ class bisverwendung
 		{
 			//Neuen Datensatz anlegen	
 			$qry = "BEGIN;INSERT INTO bis.tbl_bisverwendung (ba1code, ba2code, beschausmasscode, 
-					verwendung_code, mitarbeiter_uid, hauptberufcode, hauptberuflich, habilitation, beginn, ende, 
+					verwendung_code, mitarbeiter_uid, hauptberufcode, hauptberuflich, habilitation, beginn, ende, vertragsstunden, 
 					updateamum, updatevon, insertamum, insertvon, ext_id) VALUES (".
 			       $this->addslashes($this->ba1code).', '.
 			       $this->addslashes($this->ba2code).', '.
@@ -234,6 +241,7 @@ class bisverwendung
 			       ($this->habilitation?'true':'false').', '.
 			       $this->addslashes($this->beginn).', '.
 			       $this->addslashes($this->ende).', '.
+			       $this->addslashes($this->vertragsstunden).', '.
 			       $this->addslashes($this->updateamum).', '.
 			       $this->addslashes($this->updatevon).', '.
 			       $this->addslashes($this->insertamum).', '.
@@ -255,6 +263,7 @@ class bisverwendung
 				  " habilitation=".($this->habilitation?'true':'false').",".
 				  " beginn=".$this->addslashes($this->beginn).",".
 				  " ende=".$this->addslashes($this->ende).",".
+				  " vertragsstunden=".$this->addslashes($this->vertragsstunden).",".
 				  " updateamum=".$this->addslashes($this->updateamum).",".
 				  " updatevon=".$this->addslashes($this->updatevon).",".
 				  " insertamum=".$this->addslashes($this->insertamum).",".
@@ -348,6 +357,7 @@ class bisverwendung
 				$obj->beschausmass = $row->beschausmassbez;
 				$obj->verwendung = $row->verwendungbez;
 				$obj->hauptberuf = $row->bezeichnung;
+				$obj->vertragsstunden = $row->vertragsstunden;
 				
 				$this->result[] = $obj;
 			}

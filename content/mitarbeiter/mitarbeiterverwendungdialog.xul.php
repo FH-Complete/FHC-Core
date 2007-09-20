@@ -153,6 +153,10 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 				<box class="Datum" id="mitarbeiter-verwendung-detail-datum-ende" />
       		</row>
       		<row>
+      			<label value="Vertragsstunden" control="mitarbeiter-verwendung-detail-textbox-vertragsstunden" />
+      			<textbox id="mitarbeiter-verwendung-detail-textbox-vertragsstunden" />
+      		</row>
+      		<row>
       			<spacer />
       			<hbox>
       				<spacer flex="1"/>

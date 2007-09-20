@@ -159,6 +159,7 @@ if(!$error)
 			$verwendung->habilitation = ($_POST['habilitation']=='true'?true:false);
 			$verwendung->beginn = $_POST['beginn'];
 			$verwendung->ende = $_POST['ende'];
+			$verwendung->vertragsstunden = str_replace(',','.',$_POST['vertragsstunden']);
 			$verwendung->updateamum = date('Y-m-d H:i:s');
 			$verwendung->updatevon = $user;				
 			

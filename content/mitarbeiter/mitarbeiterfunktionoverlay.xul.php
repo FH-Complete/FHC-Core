@@ -82,6 +82,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#habilitation"  onclick="MitarbeiterTreeVerwendungSort()"/>
 				<splitter class="tree-splitter"/>
+				<treecol id="mitarbeiter-verwendung-treecol-vertragsstunden" label="Vertragsstunden" flex="1" persist="hidden, width" hidden="false"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#vertragsstunden"  onclick="MitarbeiterTreeVerwendungSort()"/>
+				<splitter class="tree-splitter"/>
 				<treecol id="mitarbeiter-verwendung-treecol-beginn" label="Beginn" flex="1" persist="hidden, width" hidden="false"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#beginn_iso"  onclick="MitarbeiterTreeVerwendungSort()"/>
@@ -118,6 +122,22 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#bisverwendung_id"  onclick="MitarbeiterTreeVerwendungSort()"/>
 				<splitter class="tree-splitter"/>
+				<treecol id="mitarbeiter-verwendung-treecol-updateamum" label="Geaendert am" flex="1" persist="hidden, width" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#updateamum"  onclick="MitarbeiterTreeVerwendungSort()"/>
+				<splitter class="tree-splitter"/>
+				<treecol id="mitarbeiter-verwendung-treecol-updatevon" label="Geaendert von" flex="1" persist="hidden, width" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#updatevon"  onclick="MitarbeiterTreeVerwendungSort()"/>
+				<splitter class="tree-splitter"/>
+				<treecol id="mitarbeiter-verwendung-treecol-insertamum" label="Angelegt am" flex="1" persist="hidden, width" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#insertamum"  onclick="MitarbeiterTreeVerwendungSort()"/>
+				<splitter class="tree-splitter"/>
+				<treecol id="mitarbeiter-verwendung-treecol-insertvon" label="Angelegt von" flex="1" persist="hidden, width" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#insertvon"  onclick="MitarbeiterTreeVerwendungSort()"/>
+				<splitter class="tree-splitter"/>
 			</treecols>
 	
 			<template>
@@ -132,6 +152,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#hauptberuf" />
 								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#hauptberuflich" />   							
 								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#habilitation" />
+								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#vertragsstunden" />
 								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#beginn" />
 								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#ende" />
 								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#ba1code" />
@@ -141,6 +162,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#mitarbeiter_uid" />
 								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#hauptberufcode" />
 								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#bisverwendung_id" />
+								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#updateamum" />
+								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#updatevon" />
+								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#insertamum" />
+								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#insertvon" />
 							</treerow>
 						</treeitem>
 					</treechildren>
