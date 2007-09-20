@@ -34,7 +34,7 @@
 					<!-- LOGO und DATUM -->
 					<fo:block-container position="absolute" top="40mm" left="260mm">
 						<fo:block text-align="left" line-height="10pt" content-width="50mm" font-family="sans-serif" font-size="8pt">
-							Datum: <xsl:value-of select="datum_aktuell" />
+							Datum: <xsl:value-of select="datum" />
 						</fo:block>
 					</fo:block-container>
 					

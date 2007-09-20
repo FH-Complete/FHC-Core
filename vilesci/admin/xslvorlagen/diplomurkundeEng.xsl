@@ -34,15 +34,15 @@
 
 <fo:block-container position="absolute" top="70mm" left="25mm" height="10mm">
 	<fo:block text-align="center" line-height="14pt" font-family="sans-serif" font-size="14pt">
-	<xsl:value-of select="anrede" /><xsl:text>   </xsl:text><xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="vornamen" /><xsl:text> </xsl:text><xsl:value-of select="nachname" />
+	<xsl:value-of select="anrede_engl" /><xsl:text>   </xsl:text><xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="vornamen" /><xsl:text> </xsl:text><xsl:value-of select="nachname" />
 	</fo:block>
 </fo:block-container> 
 
 
 <fo:block-container position="absolute" top="80mm" left="25mm" height="10mm">
 <fo:block text-align="center" line-height="14pt" font-family="sans-serif" font-size="12pt">
-born <xsl:value-of select="gebdatum" /> in <xsl:value-of select="gebort"  />,<xsl:text> </xsl:text><xsl:value-of select="geburtsnation"  />,
-\ncitizen of <xsl:value-of select="staatsbuergerschaft" />,
+born <xsl:value-of select="gebdatum" /> in <xsl:value-of select="gebort"  />,<xsl:text> </xsl:text><xsl:value-of select="geburtsnation_engl"  />,
+\ncitizen of <xsl:value-of select="staatsbuergerschaft_engl" />,
 \nstudent of the FH diploma degree programme
 \nprogramme classification number <xsl:value-of select="studiengang_kz" />, 
 							   
@@ -110,7 +110,7 @@ born <xsl:value-of select="gebdatum" /> in <xsl:value-of select="gebort"  />,<xs
 
 <fo:block-container position="absolute" top="215mm" left="25mm" height="10mm">
 	<fo:block text-align="center" line-height="14pt" font-family="sans-serif" font-size="12pt">
-						     Vienna,<xsl:text> </xsl:text><xsl:value-of select="datum_aktuell" />				
+						     Vienna,<xsl:text> </xsl:text><xsl:value-of select="sponsion" />				
 		</fo:block>
 </fo:block-container> 
 

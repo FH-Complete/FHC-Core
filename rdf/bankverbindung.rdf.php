@@ -78,6 +78,13 @@ function draw_rdf($row)
 {
 	global $rdf_url;
 	
+	switch($row->typ)
+	{
+		case 'p': $typ = 'Privatkonto'; break;
+		case 'f': $typ = 'Firmenkonto'; break;
+		default: $typ = ''; break;
+	}
+	
 	echo '
       <RDF:li>
          <RDF:Description  id="'.$row->bankverbindung_id.'"  about="'.$rdf_url.'/'.$row->bankverbindung_id.'" >
@@ -89,7 +96,7 @@ function draw_rdf($row)
             <BANKVERBINDUNG:blz><![CDATA['.$row->blz.']]></BANKVERBINDUNG:blz>
             <BANKVERBINDUNG:iban><![CDATA['.$row->iban.']]></BANKVERBINDUNG:iban>
             <BANKVERBINDUNG:kontonr><![CDATA['.$row->kontonr.']]></BANKVERBINDUNG:kontonr>
-            <BANKVERBINDUNG:typ><![CDATA['.$row->typ.']]></BANKVERBINDUNG:typ>
+            <BANKVERBINDUNG:typ><![CDATA['.$typ.']]></BANKVERBINDUNG:typ>
             <BANKVERBINDUNG:verrechnung><![CDATA['.($row->verrechnung?'Ja':'Nein').']]></BANKVERBINDUNG:verrechnung>
          </RDF:Description>
       </RDF:li>

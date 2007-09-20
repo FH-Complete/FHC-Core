@@ -124,6 +124,23 @@ $datum_obj = new datum();
 			}
 		}
 		
+		switch($student->anrede)
+		{
+			case 'Herr': $anrede_engl = 'Mr.'; break;
+			case 'Frau': $anrede_engl = 'Mrs.'; break;
+			default: $anrede_engl = ''; break;
+		}
+		
+		if($student->anrede == 'Herr')
+			$anrede = 'Herrn';
+		else 
+			$anrede = $student->anrede;
+		
+		
+					
+		if($row->sponsion=='')
+			$row->sponsion=$row->datum;
+			
 		echo "\t<pruefung>".'
 		<abschlusspruefung_id><![CDATA['.$row->abschlusspruefung_id.']]></abschlusspruefung_id>
 		<student_uid><![CDATA['.$row->student_uid.']]></student_uid>
@@ -142,7 +159,8 @@ $datum_obj = new datum();
 		<sponsion><![CDATA['.$datum_obj->convertISODate($row->sponsion).']]></sponsion>
 		<sponsion_iso><![CDATA['.$row->sponsion.']]></sponsion_iso>
 		<pruefungstyp_kurzbz><![CDATA['.$row->pruefungstyp_kurzbz.']]></pruefungstyp_kurzbz>
-		<anrede><![CDATA['.$student->anrede.']]></anrede>
+		<anrede><![CDATA['.$anrede.']]></anrede>
+		<anrede_engl><![CDATA['.$anrede_engl.']]></anrede_engl>
 		<vorname><![CDATA['.$student->vorname.']]></vorname>
 		<vornamen><![CDATA['.$student->vornamen.']]></vornamen>
 		<nachname><![CDATA['.$student->nachname.']]></nachname>
@@ -154,7 +172,7 @@ $datum_obj = new datum();
 		<staatsbuergerschaft_engl><![CDATA['.$staatsbuergerschaft_engl.']]></staatsbuergerschaft_engl>
 		<geburtsnation><![CDATA['.$geburtsnation.']]></geburtsnation>
 		<geburtsnation_engl><![CDATA['.$geburtsnation_engl.']]></geburtsnation_engl>
-		<studiengang_kz><![CDATA['.$student->studiengang_kz.']]></studiengang_kz>
+		<studiengang_kz><![CDATA['.sprintf('%04s',$student->studiengang_kz).']]></studiengang_kz>
 		<stg_bezeichnung><![CDATA['.$studiengang->bezeichnung.']]></stg_bezeichnung>
 		<akadgrad_kurzbz><![CDATA['.$akadgrad->akadgrad_kurzbz.']]></akadgrad_kurzbz>
 		<titel><![CDATA['.$akadgrad->titel.']]></titel>

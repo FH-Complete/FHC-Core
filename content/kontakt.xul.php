@@ -242,11 +242,11 @@ else
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/bankverbindung/rdf#name" onclick="KontaktBankverbindungTreeSort()"/>
 					<splitter class="tree-splitter"/>
-					<treecol id="kontakt-bankverbindung-treecol-anschrift" label="Anschrift" flex="1" hidden="false"
+					<treecol id="kontakt-bankverbindung-treecol-anschrift" label="Anschrift" flex="1" hidden="true"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/bankverbindung/rdf#anschrift" onclick="KontaktBankverbindungTreeSort()"/>
 					<splitter class="tree-splitter"/>
-					<treecol id="kontakt-bankverbindung-treecol-bic" label="BIC" flex="1" hidden="false"
+					<treecol id="kontakt-bankverbindung-treecol-bic" label="BIC" flex="1" hidden="true"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/bankverbindung/rdf#bic" onclick="KontaktBankverbindungTreeSort()"/>
 					<splitter class="tree-splitter"/>
@@ -258,11 +258,11 @@ else
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/bankverbindung/rdf#iban" onclick="KontaktBankverbindungTreeSort()"/>
 					<splitter class="tree-splitter"/>
-					<treecol id="kontakt-bankverbindung-treecol-kontonr" label="Kontonummer" flex="1" hidden="true"
+					<treecol id="kontakt-bankverbindung-treecol-kontonr" label="Kontonummer" flex="1" hidden="false"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/bankverbindung/rdf#kontonr" onclick="KontaktBankverbindungTreeSort()"/>
 					<splitter class="tree-splitter"/>
-					<treecol id="kontakt-bankverbindung-treecol-typ" label="Typ" flex="1" hidden="true"
+					<treecol id="kontakt-bankverbindung-treecol-typ" label="Typ" flex="1" hidden="false"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/bankverbindung/rdf#typ" onclick="KontaktBankverbindungTreeSort()"/>
 					<splitter class="tree-splitter"/>

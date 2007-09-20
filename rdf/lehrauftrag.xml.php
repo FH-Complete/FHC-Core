@@ -226,7 +226,7 @@ function drawLehrauftrag($uid)
 			if($row->gruppe_kurzbz!='')
 				$gruppen[] = $row->gruppe_kurzbz;
 			else
-				$gruppen[] = $row->semester.$row->verband.$row->gruppe.' ';
+				$gruppen[] = trim($stg_arr[$row->studiengang_kz].'-'.$row->semester.$row->verband.$row->gruppe).' ';
 	
 			$stunden = $row->semesterstunden;
 			$satz = $row->stundensatz;
