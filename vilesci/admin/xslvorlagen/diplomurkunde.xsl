@@ -113,7 +113,7 @@ geboren am <xsl:value-of select="gebdatum" /> in <xsl:value-of select="gebort"  
 
 <fo:block-container position="absolute" top="215mm" left="25mm" height="10mm">
 	<fo:block text-align="center" line-height="14pt" font-family="sans-serif" font-size="12pt">
-						     Wien,<xsl:text> </xsl:text><xsl:value-of select="datum_aktuell" />				
+						     Wien,<xsl:text> </xsl:text><xsl:value-of select="sponsion" />				
 		</fo:block>
 </fo:block-container> 
 
