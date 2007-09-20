@@ -842,6 +842,12 @@ function MitarbeiterDetailgetSpaltenname(id)
 	if(id=='mitarbeiter-treecol-person_id') return 'person_id';
 	if(id=='mitarbeiter-treecol-fixangestellt') return 'fixangestellt';
 	if(id=='mitarbeiter-treecol-lektor') return 'lektor';
+	if(id=='mitarbeiter-treecol-insertamum') return 'insertamum';
+	if(id=='mitarbeiter-treecol-insertamum_iso') return 'insertamum_iso';
+	if(id=='mitarbeiter-treecol-insertvon') return 'insertvon';
+	if(id=='mitarbeiter-treecol-updateamum') return 'updateamum';
+	if(id=='mitarbeiter-treecol-updateamum_iso') return 'updateamum';
+	if(id=='mitarbeiter-treecol-updatevon') return 'updatevon';
 }
 
 function MitarbeiterSendMail()
