@@ -40,6 +40,9 @@ require_once('../../include/lehreinheitmitarbeiter.class.php');
 require_once('../../include/lehreinheitgruppe.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/log.class.php');
+require_once('../../include/person.class.php');
+require_once('../../include/benutzer.class.php');
+require_once('../../include/mitarbeiter.class.php');
 
 $user = get_uid();
 
@@ -400,6 +403,28 @@ if(!$error)
 				$return = false;
 				$errormsg = 'unbekannter Fehler';
 			}
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='getstundensatz')
+	{
+		if(isset($_POST['mitarbeiter_uid']))
+		{
+			$mitarbeiter = new mitarbeiter($conn);
+			if($mitarbeiter->load($_POST['mitarbeiter_uid']))
+			{
+				$data = $mitarbeiter->stundensatz;
+				$return = true;
+			}
+			else 
+			{
+				$errormsg = 'Fehler beim Laden des Mitarbeiters';
+				$return = false;
+			}
+		}
+		else 
+		{
+			$errormsg = 'MitarbeiterUID muss uebergeben werden';
+			$return = false;
 		}
 	}
 	else

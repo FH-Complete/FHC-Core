@@ -1632,3 +1632,15 @@ function MitarbeiterFunktionIFrameUnLoad()
 {
 	document.getElementById('mitarbeiter-funktionen').setAttribute('src','');
 }
+
+// ****
+// * Wenn die Sozialversicherungsnummer eingegeben wird, dann wird automatisch das
+// * Geburtsdatum-Feld befuellt
+// ****
+function MitarbeiterGenerateGebDatFromSVNR()
+{
+	var svnr = document.getElementById('mitarbeiter-detail-textbox-svnr').value;
+	
+	if(svnr!='' && svnr.length==10)
+		document.getElementById('mitarbeiter-detail-textbox-geburtsdatum').value = svnr.charAt(4) + svnr.charAt(5) + "." + svnr.charAt(6) + svnr.charAt(7) + ".19" + svnr.charAt(8) + svnr.charAt(9);
+}

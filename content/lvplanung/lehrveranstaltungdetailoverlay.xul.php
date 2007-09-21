@@ -336,7 +336,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					         </template>
 				   		 </menulist>
 				   		 <label align="end" control="lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor" value="Lektor:"/>
-						 <menulist id="lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor" disabled="true" oncommand="LeMitarbeiterValueChanged();"
+						 <menulist id="lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor" disabled="true" oncommand="LeMitarbeiterLektorChange(); LeMitarbeiterValueChanged();"
 	    		                   datasources="<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php"
 			                       ref="http://www.technikum-wien.at/mitarbeiter/_alle" flex="1">
 				         <template>

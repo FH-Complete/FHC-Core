@@ -611,22 +611,58 @@ function StatistikPrintLehrauftraege()
 // ****
 function StatistikPrintLVPlanung()
 {
-	tree = document.getElementById('tree-verband');
 
-	if(tree.currentIndex==-1)
+	if(document.getElementById('menu-content-tabs').selectedItem == document.getElementById('tab-verband'))
 	{
-		alert('Bitte zuerst einen Studiengang auswaehlen');
-		return;
+		tree = document.getElementById('tree-verband');
+	
+		if(tree.currentIndex==-1)
+		{
+			alert('Bitte zuerst einen Studiengang auswaehlen');
+			return;
+		}
+	
+		//Studiengang und Semester holen
+		var col;
+		col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+		var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
+		col = tree.columns ? tree.columns["sem"] : "sem";
+		var semester=tree.view.getCellText(tree.currentIndex,col);
+		var url = '<?php echo APP_ROOT ?>content/statistik/lvplanung.php?studiengang_kz='+studiengang_kz+'&semester='+semester;
 	}
-
-	//Studiengang und Semester holen
-	var col;
-	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
-	var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
-	col = tree.columns ? tree.columns["sem"] : "sem";
-	var semester=tree.view.getCellText(tree.currentIndex,col);
-
-	window.open('<?php echo APP_ROOT ?>content/statistik/lvplanung.php?studiengang_kz='+studiengang_kz+'&semester='+semester,'LV-Planung');
+	else if(document.getElementById('menu-content-tabs').selectedItem == document.getElementById('tab-fachbereich'))
+	{
+		tree = document.getElementById('tree-fachbereich');
+	
+		if(tree.currentIndex==-1)
+		{
+			alert('Bitte zuerst einen Fachbereich auswaehlen');
+			return;
+		}
+	
+		//Fachbereich holen
+		var col;
+		col = tree.columns ? tree.columns["kurzbz"] : "kurzbz";
+		var fachbereich_kurzbz=tree.view.getCellText(tree.currentIndex,col);
+		var url = '<?php echo APP_ROOT ?>content/statistik/lvplanung.php?fachbereich_kurzbz='+fachbereich_kurzbz;
+	}
+	else if(document.getElementById('menu-content-tabs').selectedItem == document.getElementById('tab-lektor'))
+	{
+		tree = document.getElementById('tree-lektor');
+	
+		if(tree.currentIndex==-1)
+		{
+			alert('Bitte zuerst einen Mitarbeiter auswaehlen');
+			return;
+		}
+	
+		//UID holen
+		var col;
+		col = tree.columns ? tree.columns["uid"] : "uid";
+		var uid=tree.view.getCellText(tree.currentIndex,col);
+		var url = '<?php echo APP_ROOT ?>content/statistik/lvplanung.php?uid='+uid;
+	}
+	window.open(url,'LV-Planung');
 }
 
 // ****
