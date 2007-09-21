@@ -53,10 +53,16 @@ if (!$conn = pg_pconnect(CONN_STRING))
 
 $datum_obj = new datum();
 
+$abschlussbeurteilung_arr = array();
+$qry = "SELECT * FROM lehre.tbl_abschlussbeurteilung";
+if($result = pg_query($conn, $qry))
+	if($row = pg_fetch_object($result))
+		$abschlussbeurteilung_arr[$row->abschlussbeurteilung_kurzbz]=$row->bezeichnung;
+
 
 	function draw_content_xml($row)
 	{
-		global $conn, $rdf_url, $datum_obj;
+		global $conn, $rdf_url, $datum_obj, $abschlussbeurteilung_arr;
 		$vorsitz = '';
 		$pruefer1= '';
 		$pruefer2= '';
@@ -152,7 +158,7 @@ $datum_obj = new datum();
 		<pruefer2_nachname><![CDATA['.$pruefer2.']]></pruefer2_nachname>
 		<pruefer3><![CDATA['.$row->pruefer3.']]></pruefer3>
 		<pruefer3_nachname><![CDATA['.$pruefer3.']]></pruefer3_nachname>
-		<abschlussbeurteilung_kurzbz><![CDATA['.$row->abschlussbeurteilung_kurzbz.']]></abschlussbeurteilung_kurzbz>
+		<abschlussbeurteilung_kurzbz><![CDATA['.$abschlussbeurteilung_arr[$row->abschlussbeurteilung_kurzbz].']]></abschlussbeurteilung_kurzbz>
 		<akadgrad_id><![CDATA['.$row->akadgrad_id.']]></akadgrad_id>
 		<datum><![CDATA['.$datum_obj->convertISODate($row->datum).']]></datum>
 		<datum_iso><![CDATA['.$row->datum.']]></datum_iso>

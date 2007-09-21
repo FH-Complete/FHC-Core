@@ -32,7 +32,7 @@ loadVariables($conn, $user);
 var BetriebsmittelTreeDatasource; //Datasource des BetriebsmittelTrees
 var BetriebsmittelSelectBetriebsmittel_id=null; //Betriebsmittelzurodnung die nach dem Refresh markiert werden soll
 var BetriebsmittelSelectPerson_id=null; //Betriebsmittelzurodnung die nach dem Refresh markiert werden soll
-var BetriebsmittePerson_id
+var BetriebsmittePerson_id;
 // ********** Observer und Listener ************* //
 
 // ****
@@ -65,6 +65,7 @@ var BetriebsmittelTreeListener =
   	  //timeout nur bei Mozilla notwendig da sonst die rows
   	  //noch keine values haben. Ab Seamonkey funktionierts auch
   	  //ohne dem setTimeout
+  	  
       window.setTimeout(BetriebsmittelTreeSelectZuordnung,10);
   }
 };
@@ -161,11 +162,12 @@ function BetriebsmittelTreeSelectZuordnung()
 // ****
 function BetriebsmittelAuswahl()
 {
+	
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('betriebsmittel-tree');
 
 	if (tree.currentIndex==-1) return;
-
+		
 	BetriebsmittelDetailDisableFields(false);
 
 	document.getElementById('betriebsmittel-checkbox-neu').checked=false;
@@ -253,6 +255,8 @@ function BetriebsmittelDetailResetFields()
 	document.getElementById('betriebsmittel-textbox-anmerkung').value='';
 	document.getElementById('betriebsmittel-textbox-ausgegebenam').value='';
 	document.getElementById('betriebsmittel-textbox-retouram').value='';
+	document.getElementById('betriebsmittel-textbox-nummerold').value='';
+	document.getElementById('betriebsmittel-textbox-nummerintern').value='';
 }
 
 // ****
@@ -296,6 +300,7 @@ function BetriebsmittelDelete()
 		}
 		else
 		{
+			BetriebsmittelDetailDisableFields(true);
 			BetriebsmittelTreeDatasource.Refresh(false);
 		}
 	}
@@ -363,7 +368,8 @@ function BetriebsmittelDetailSpeichern()
 	{
 		BetriebsmittelSelectBetriebsmittel_id=val.dbdml_data;
 		BetriebsmittelSelectPerson_id=person_id;
-		BetriebsmittelTreeDatasource.Refresh(false); //non blocking
+		//BetriebsmittelTreeDatasource.Refresh(false); //blocking
+		loadBetriebsmittel(BetriebsmittelPerson_id);
 	}
 }
 
@@ -389,4 +395,6 @@ function BetriebsmittelNeu()
 	document.getElementById('betriebsmittel-textbox-person_id').value = BetriebsmittelPerson_id;
 	document.getElementById('betriebsmittel-textbox-ausgegebenam').value=tag+'.'+monat+'.'+jahr;
 	document.getElementById('betriebsmittel-textbox-kaution').value = '0.0';
+	document.getElementById('betriebsmittel-textbox-nummerold').value='';
+	document.getElementById('betriebsmittel-textbox-nummerintern').value='';
 }

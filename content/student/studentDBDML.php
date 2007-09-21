@@ -1660,7 +1660,7 @@ if(!$error)
 				$return = false;
 				$errormsg = $projektarbeit->errormsg;
 			}
-		}			
+		}
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='deleteprojektarbeit')
 	{
@@ -1669,17 +1669,42 @@ if(!$error)
 		{
 			$projektarbeit = new projektarbeit($conn);
 
-			if($projektarbeit->delete($_POST['projektarbeit_id']))
+			$qry = "SELECT count(*) as anzahl FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id='".$_POST['projektarbeit_id']."'";
+			if($result = pg_query($conn, $qry))
 			{
-				$return = true;
+				if($row = pg_fetch_object($result))
+				{
+					if($row->anzahl>0)
+					{
+						$errormsg = 'Bitte zuerst alle Betreuer loeschen';
+						$return = false;
+					}
+					else
+					{
+						if($projektarbeit->delete($_POST['projektarbeit_id']))
+						{
+							$return = true;
+						}
+						else
+						{
+							$errormsg = $projektarbeit->errormsg;
+							$return = false;
+						}
+					}
+				}
+				else
+				{
+					$errormsg = 'Fehler beim Loeschen';
+					$return = false;
+				}
 			}
-			else 
+			else
 			{
-				$errormsg = $projektarbeit->errormsg;
+				$errormsg = 'Fehler beim Loeschen';
 				$return = false;
-			}
+			}			
 		}
-		else 
+		else
 		{
 			$return = false;
 			$errormsg  = 'Fehlerhafte Parameteruebergabe';
@@ -1688,7 +1713,7 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='saveprojektbetreuer')  // **** Projektbetreuer **** //
 	{
 		$projektbetreuer = new projektbetreuer($conn, null, null, true);
-		
+
 		if($_POST['neu']=='false')
 		{
 			if($projektbetreuer->load($_POST['person_id_old'], $_POST['projektarbeit_id'], $_POST['betreuerart_kurzbz_old']))

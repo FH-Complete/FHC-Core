@@ -945,6 +945,38 @@ function LeMitarbeiterValueChanged()
 }
 
 // ****
+// * Wenn der Lektor geaendert wird, dann den Stundensatz aus der Tabelle Mitarbeiter holen
+// ****
+function LeMitarbeiterLektorChange()
+{
+	mitarbeiter_uid = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor').value;
+	
+	var url = '<?php echo APP_ROOT ?>content/lvplanung/lehrveranstaltungDBDML.php';
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'getstundensatz');
+	req.add('mitarbeiter_uid', mitarbeiter_uid);
+	
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response);
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response);
+		else
+			alert(val.dbdml_errormsg);
+	}
+	else
+	{
+		stundensatz = val.dbdml_data;
+	}
+	
+	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz').value=stundensatz;
+}
+
+// ****
 // * deaktiviert/aktiviert die Lektorendetails und
 // * loescht den Inhalt der Felder
 // * wenn val=false dann werden die Felder deaktiviert
