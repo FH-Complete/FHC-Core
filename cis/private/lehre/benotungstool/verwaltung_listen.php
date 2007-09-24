@@ -468,7 +468,10 @@ if(isset($_POST['uebung_neu']) || isset($_POST['abgabe_neu']))
 			$uebung_obj->freigabebis = date('Y-m-d H:i',$freigabebis_sav);
 			if (isset($_POST["uebung_neu"]))
 			{
-				$uebung_obj->abgabe=false;
+				if (isset($_POST["kl_abgabe"]))				
+					$uebung_obj->abgabe=true;
+				else
+					$uebung_obj->abgabe=false;
 				$uebung_obj->beispiele=true;
 			}
 			else
@@ -691,7 +694,8 @@ if(isset($_POST['uebung_edit']))
 		$uebung_obj->angabedatei=$angabedatei_neu;
 		$uebung_obj->freigabevon = date('Y-m-d H:i',$freigabevon_sav);
 		$uebung_obj->freigabebis = date('Y-m-d H:i',$freigabebis_sav);
-		//$uebung_obj->abgabe=false;
+		if ($uebung_obj->beispiele)		
+			$uebung_obj->abgabe = (isset($_POST['kl_abgabe'])?true:false);
 		//$uebung_obj->beispiele=true;
 		$uebung_obj->bezeichnung=$thema;
 		$uebung_obj->positiv=(isset($_POST['positiv'])?true:false);
@@ -852,12 +856,13 @@ if(isset($_GET["uebung_id"]) && $_GET["uebung_id"]!='')
 	if ($uebung_obj->beispiele){
 		echo "<tr><td>Max. Studenten/Beispiel</td><td align='right'><input type='text' name='maxstd' value='$uebung_obj->maxstd'></td><td>$error_maxstd</td></tr>
 	<tr><td>Max. Beispiele/Student</td><td align='right'><input type='text' name='maxbsp' value='$uebung_obj->maxbsp'></td><td>$error_maxbsp</td></tr>";
+		echo"<tr><td>Abgabe </td><td><input type='checkbox' name='kl_abgabe' ".($uebung_obj->abgabe?'checked':'')."></td></tr>";
 		echo "<input type='hidden' size='16' name='gewicht' value='0'>";
 	}	
 	else if ($uebung_obj->abgabe)
 	{
 		echo "<tr><td>Gewicht</td><td align='right'><input type='text' size='16' name='gewicht' value='$uebung_obj->gewicht'></td><td>$error_gewicht</td></tr>";
-		echo"<tr><td>Positiv </td><td><input type='checkbox' name='positiv' ".($uebung_obj->positiv?'checked':'')."></td></tr>";
+		echo "<tr><td>Positiv </td><td><input type='checkbox' name='positiv' ".($uebung_obj->positiv?'checked':'')."></td></tr>";
 	}
 	if ($uebung_obj->beispiele)	
 		echo"<tr><td>Statistik f&uuml;r Studenten anzeigen </td><td><input type='checkbox' name='statistik' ".($uebung_obj->statistik?'checked':'')."></td></tr>";
@@ -1178,7 +1183,7 @@ else
 	<tr><td>Freigabe</td><td align='right'>von <input type='text' size='16' name='freigabevon' value='$freigabevon'></td><td>$error_freigabevon</td></tr>
 	<tr><td>(Format: 31.12.2007 14:30)</td><td align='right'>bis <input type='text' size='16' name='freigabebis' value='$freigabebis'></td><td>$error_freigabebis</td></tr>
 	<input type='hidden' size='16' name='gewicht' value='0'>
-	<!--<tr><td>Positiv </td><td><input type='checkbox' name='positiv'></td></tr>-->
+	<tr><td>Abgabe </td><td><input type='checkbox' name='kl_abgabe'></td></tr>
 	<tr><td>Statistik f&uuml;r Studenten anzeigen </td><td><input type='checkbox' name='statistik'></td></tr>
 	<tr><td>Angabedatei</td><td><input type='file' name='angabedatei'></td></tr>
 	<tr><td colspan=2 align='right'><input type='submit' name='uebung_neu' value='Anlegen'></td></tr>

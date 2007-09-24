@@ -132,7 +132,7 @@ class studentnote
 				
 				foreach ($ueb_obj->uebungen as $ueb)
 				{
-					if ($ueb->abgabe)
+					if ($ueb->abgabe && !$ueb->beispiele)
 					{							
 						if ($this->calc_note($ueb->uebung_id, $student_uid))
 						{
