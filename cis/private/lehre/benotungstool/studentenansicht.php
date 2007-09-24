@@ -150,14 +150,14 @@ if (isset($_REQUEST["deleteabgabe"]))
 		echo $ueb->errormsg;
 
 }
+//echo $_FILES["abgabedatei"];
 if (isset($_FILES["abgabedatei"]))
 {
 	$abgabedatei_up = $_FILES["abgabedatei"]["tmp_name"];
 					
 	if ($abgabedatei_up)
 	{
-				
-
+		//echo $abgabedatei_up;
 		$datum = date('Y-m-d H:i:s');
 		$datumstr = ereg_replace(" ","_",$datum);
 		$name_up = pathinfo($_FILES["abgabedatei"]["name"]);
@@ -208,7 +208,6 @@ if (isset($_FILES["abgabedatei"]))
 		$uebung_obj->studentuebung_save(false);
 		//Abgabedatei ablegen				
 		move_uploaded_file($_FILES['abgabedatei']['tmp_name'], $abgabepfad);
-		
 	}
 }
 else
@@ -668,11 +667,40 @@ if (!isset($_GET["notenuebersicht"]))
 			
 			//Speichern button nur Anzeigen wenn die Uebung Freigegeben ist
 			if($datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis)>time())
-				echo "<tr><td align='right' colspan=5><input type='submit' value='Speichern' name='submit'></td></tr>";
+				echo "<tr><td align='right' colspan=5><input type='submit' value='Speichern' name='submit'></td></form></tr>";
 			
 			echo "</table>";
-			echo "
-			</td><td valign='top' algin='right'>";
+			
+			if ($uebung_obj->abgabe)
+			{
+				
+				echo "<br><table>\n";
+				$uebung_obj->load_studentuebung($user, $uebung_id);
+				if ($uebung_obj->abgabe_id)
+				{		
+					$uebung_obj->load_abgabe($uebung_obj->abgabe_id);	
+					echo " <tr>";
+					echo"	<td>Abgabedatei: <a href='studentenansicht.php?uid=$user&lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&download_abgabe=".$uebung_obj->abgabedatei."'>".$uebung_obj->abgabedatei."</a>";
+					if($datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis)>time())	
+						echo " <a href='studentenansicht.php?uid=$user&lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&deleteabgabe=1'>[del]</a></td>";
+					echo "</tr>";
+				}				
+		
+				if($datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis)>time())
+				{
+					echo "	<tr>\n";
+					echo "	<form method='POST' action='studentenansicht.php?uid=$user&lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem' enctype='multipart/form-data' name='kl_angabe'>\n";
+					echo "		<td>\n";
+					echo "			<input type='file' name='abgabedatei'> <input type='submit' name='abgabe' value='Abgeben'>";
+					echo "		</td>\n";	
+					echo "	</form>\n";
+					echo "</tr>\n";
+					
+				}
+				echo "</table>";
+			}
+			
+			echo "</td><td valign='top' algin='right'>";
 			
 			//Gesamtpunkte diese Kreuzerlliste
 			$qry = "SELECT sum(punkte) as punktegesamt FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id'";
@@ -883,6 +911,7 @@ if (!isset($_GET["notenuebersicht"]))
 				echo "			<input type='file' name='abgabedatei'> <input type='submit' name='abgabe' value='Abgeben'>";
 				echo "		</td>\n";	
 				echo "	</form>\n";
+				echo "</tr>\n";
 			}
 			echo "</table>\n";
 						

@@ -514,7 +514,23 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 		}
 	
 		echo "</table>";
-	
+		
+		
+		
+		$ueb_obj->load_studentuebung($uid, $uebung_id);
+		if ($ueb_obj->abgabe_id)	
+		{	
+			$ueb_obj->load_abgabe($ueb_obj->abgabe_id);
+			$filename = $ueb_obj->abgabedatei;
+		}
+		else
+			$filename='';
+
+		if ($filename != '')
+			echo "<br>Abgabedatei: <a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid&download_abgabe=$filename'>".$filename."</a><br><br>";
+		
+		
+		
 		echo "
 		</td><td valign='top' algin='right'>";
 	
@@ -748,6 +764,8 @@ else
 			$downloadname = str_replace($uebung_id, ereg_replace(" ","_",$abgabe_obj->bezeichnung), $downloadname);
 			echo "<a href='zipdownload_benotungstool.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&downloadname=$downloadname'> [Abgaben downloaden]</a>";
 		}
+		else
+			echo "[Keine Abgaben verfügbar]";
 		
 		echo '</td></tr></table>';
 	}

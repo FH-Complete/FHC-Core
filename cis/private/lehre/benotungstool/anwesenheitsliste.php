@@ -75,6 +75,20 @@ else
 	}
 }
 
+//Abgabedatei ausliefern
+if (isset($_GET["download_abgabe"])){
+	$file=$_GET["download_abgabe"];
+	$uebung_id = $_GET["uebung_id"];
+	$ueb = new uebung($conn);
+	$ueb->load_studentuebung($uid, $uebung_id);
+	$ueb->load_abgabe($ueb->abgabe_id);
+	$filename = BENOTUNGSTOOL_PATH."abgabe/".$ueb->abgabedatei;
+	header('Content-Type: application/octet-stream');
+	header('Content-disposition: attachment; filename="'.$file.'"');
+	readfile($filename);
+	exit;
+}
+
 $qry = "SELECT * FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) WHERE 
 		tbl_lehreinheit.lehreinheit_id='$lehreinheit_obj->lehreinheit_id' AND
 		mitarbeiter_uid='$user'";
@@ -688,7 +702,7 @@ function addUser(student_uid)
 	echo "<input type='hidden' name='update_ids' value=''>";
 	echo "<table border='1'>
 			<tr>
-				<td colspan='".($anzahl+2)."' width='100%'>
+				<td colspan='".($anzahl+3)."' width='100%'>
 					<table width='100%'>
 					<tr>
 						<td><font class='headline'>$lehrveranstaltung_obj->semester.Semester</font></td>
@@ -709,12 +723,22 @@ function addUser(student_uid)
 			echo "<td>$row->bezeichnung</td>";
 		}
 	}
-	echo "<td align='center' width='200'><b>Unterschrift</b></td></tr>\n";
+	echo "<td align='center' width='200'><b>Unterschrift</b></td><td></td></tr>\n";
 	
 	if($result = pg_query($conn, $qry_stud))
 	{
 		while($row_stud = pg_fetch_object($result))
 		{
+			
+			$uebung_obj->load_studentuebung($row_stud->uid, $uebung_id);
+			if ($uebung_obj->abgabe_id)	
+			{	
+				$uebung_obj->load_abgabe($uebung_obj->abgabe_id);
+				$filename = $uebung_obj->abgabedatei;
+			}
+			else
+				$filename='';
+						
 			echo "<tr onMouseOver=\"this.style.backgroundColor='#c7dfe8'\" onMouseOut=\"this.style.backgroundColor='#ffffff'\">
 			<td nowrap><input type='checkbox' name='update_$row_stud->uid' disabled>&nbsp;<b>$row_stud->nachname</b>&nbsp;$row_stud->vorname $row_stud->uid</td>";
 			if (!$uebung_obj->beispiele)
@@ -733,7 +757,14 @@ function addUser(student_uid)
 					echo "<td align='center'><input type='checkbox' name='update_".$row_stud->uid."_".$row_bsp->beispiel_id."' onClick=\"addUser('$row_stud->uid');\" ".($studentbeispiel_obj->vorbereitet?'checked':'').">".($studentbeispiel_obj->probleme?'<i><small>P</small></i>':'')."</td>\n";
 				}
 			}
-			echo "<td>&nbsp;</td>\n</tr>\n";
+			echo "<td>&nbsp;</td>";
+			if ($filename != "")			
+				echo "<td><a href='anwesenheitsliste.php?uid=$row_stud->uid&output=html&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id&stsem=$stsem&download_abgabe=$filename'>Abgabe</a></td>\n";
+			else if ($uebung_obj->abgabe)
+				echo "<td><span style='color:red;'>Fehlt!</span></td>";
+			else
+				echo "<td></td>";
+			echo "</tr>\n";
 		}
 	}
 	
