@@ -278,7 +278,7 @@ if($result = pg_query($conn, $qry))
 		}
 	}
 }
-echo "Fehlende BIS-Daten: <br>";
+echo "Fehlende BIS-Daten (für Meldung 11.2007): <br>";
 echo "(Doppelte Zeilen deuten auf mehrere Heimatadressen hin - bitte Kontakte überprüfen)<br><br>";
 foreach ($fehler as $f => $v)
 {
