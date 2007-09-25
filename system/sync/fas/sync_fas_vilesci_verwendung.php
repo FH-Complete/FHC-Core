@@ -109,7 +109,7 @@ if($result_ma = pg_query($conn_fas, $qry_ma))
 			{
 				if(!($row->verwendung>=1 AND $row->verwendung<=9))
 				{
-					$error_log.="Verwendungscode ungülig (".$row->verwendung.") bei funktion_pk=".$row->funktion_pk.".\n";
+					$error_log.="Verwendungscode ungültig (".$row->verwendung.") bei funktion_pk=".$row->funktion_pk.".\n";
 					$fehler++;
 					continue;
 				}
@@ -123,13 +123,13 @@ if($result_ma = pg_query($conn_fas, $qry_ma))
 				}
 				if(!($row->beschart1>=1 AND $row->beschart1<=6))
 				{
-					$error_log.="Beschäftigungsart 1 ungülig (".$row->beschart1.") bei funktion_pk=".$row->funktion_pk.".\n";
+					$error_log.="Beschäftigungsart 1 ungültig (".$row->beschart1.") bei funktion_pk=".$row->funktion_pk.".\n";
 					$fehler++;
 					continue;
 				}
 				if(!($row->beschart2>=1 AND $row->beschart2<=2))
 				{
-					$error_log.="Beschäftigungsart 2 ungülig (".$row->beschart2.") bei funktion_pk=".$row->funktion_pk.".\n";
+					$error_log.="Beschäftigungsart 2 ungültig (".$row->beschart2.") bei funktion_pk=".$row->funktion_pk.".\n";
 					$fehler++;
 					continue;
 				}
@@ -247,9 +247,9 @@ if($result_ma = pg_query($conn_fas, $qry_ma))
 	}
 }
 
-echo nl2br("Fehler: ".$fehler."\n".$error_log);
+echo nl2br("Gesamt: ".$anzahl_quelle."\nFehler: ".$fehler."\n".$error_log);
 echo nl2br("\n***********************************\nLog: \n".$ausgabe);
 
-mail($adress, 'SYNC-Fehler BIS-Verwendung von '.$_SERVER['HTTP_HOST'], "Fehler: ".$fehler."\n".$error_log,"From: vilesci@technikum-wien.at");
+mail($adress, 'SYNC-Fehler BIS-Verwendung von '.$_SERVER['HTTP_HOST'], "Gesamt: ".$anzahl_quelle."\nFehler: ".$fehler."\n".$error_log,"From: vilesci@technikum-wien.at");
 mail($adress, 'SYNC BIS-Verwendung von '.$_SERVER['HTTP_HOST'], $ausgabe,"From: vilesci@technikum-wien.at");
 ?>
