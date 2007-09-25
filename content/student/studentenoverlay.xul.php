@@ -257,7 +257,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 							<tab id="student-tab-dokumente" label="Dokumente" />
 							<tab id="student-tab-konto" label="Konto" />
 							<tab id="student-tab-betriebsmittel" label="Betriebsmittel" />
-							<tab id="student-tab-io" label="Incoming/Outgoing" />
+							<tab id="student-tab-io" label="Inc/Out" />
 							<tab id="student-tab-noten" label="Noten" />
 							<tab id="student-tab-zeugnis" label="Zeugnis" />
 							<tab id="student-tab-pruefung" label="Prüfung" />

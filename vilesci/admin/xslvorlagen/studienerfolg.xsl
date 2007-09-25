@@ -17,22 +17,38 @@
 	<xsl:template match="studienerfolg">
 			<fo:page-sequence master-reference="PageMaster">
 				<fo:flow flow-name="xsl-region-body" >
-	
-					<fo:block-container position="absolute" top="35mm" left="15mm" height="20mm">
+				
+					<!-- Logo -->
+					<fo:block>
+						<fo:external-graphic src="../skin/images/logo.jpg"  posx="140" posy="15" width="60mm" height="20mm" />
+					</fo:block>
+					
+					<!-- Titel -->
+					<fo:block-container position="absolute" top="20mm" left="15mm">
+						<fo:block font-size="16pt">Fachhochschule Technikum Wien</fo:block>
+					</fo:block-container>
+					
+					<fo:block-container position="absolute" top="26mm" left="15mm">
+						<fo:block font-size="12pt">Höchstädtplatz 5\nA-1200 Wien</fo:block>
+						<fo:block font-size="6pt">ZVR-Nr.: 074476426, DVR-Nr.: 0928381</fo:block>
+					</fo:block-container>
+
+					
+					<fo:block-container position="absolute" top="45mm" left="15mm">
 						<fo:block text-align="left" line-height="20pt" font-family="sans-serif" font-size="16pt">
 							Bestätigung des Studienerfolges
 						</fo:block>
 					</fo:block-container> 
 					
 					<!--FINANZAMT-->
-					<fo:block-container position="absolute" top="45mm" left="15mm" height="20mm">
+					<fo:block-container position="absolute" top="55mm" left="15mm">
 						<fo:block text-align="left" line-height="10pt" font-family="sans-serif" font-size="8pt">
 							<xsl:value-of select="finanzamt" />
 						</fo:block>
 					</fo:block-container>
 					
 					<!-- NAME - GEBURTSDATUM - MATRIKELNUMMER -->
-					<fo:block-container position="absolute" top="50mm" left="15mm" height="10mm">
+					<fo:block-container position="absolute" top="60mm" left="15mm">
 						<fo:table table-layout="fixed" border-collapse="separate">
 						    <fo:table-column column-width="120mm"/>
 							<fo:table-column column-width="30mm"/>
@@ -59,25 +75,25 @@
 						</fo:table>
 					</fo:block-container>
 					
-					<fo:block-container position="absolute" top="55mm" left="16mm" height="20mm">
+					<fo:block-container position="absolute" top="65mm" left="16mm">
 						<fo:block text-align="left" line-height="14pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
 							<xsl:value-of select="titelpre" /><xsl:text> </xsl:text><xsl:value-of select="nachname" /><xsl:text> </xsl:text><xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="titelpost" />
 						</fo:block>
 					</fo:block-container>
 					
-					<fo:block-container position="absolute" top="55mm" left="137mm" height="20mm">
+					<fo:block-container position="absolute" top="65mm" left="137mm">
 						<fo:block text-align="left" line-height="14pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
 							<xsl:value-of select="gebdatum" />
 						</fo:block>
 					</fo:block-container>
-					<fo:block-container position="absolute" top="55mm" left="167mm" height="20mm">
+					<fo:block-container position="absolute" top="65mm" left="167mm">
 						<fo:block text-align="left" line-height="14pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
 							<xsl:value-of select="matrikelnr" />
 						</fo:block>
 					</fo:block-container>
 					
 					<!--STUDIENGANG UND KENNZAHL -->
-					<fo:block-container position="absolute" top="60.8mm" left="15mm" height="10mm">
+					<fo:block-container position="absolute" top="70.8mm" left="15mm">
 						<fo:table table-layout="fixed" border-collapse="separate">
 						    <fo:table-column column-width="150.4mm"/>
 							<fo:table-column column-width="30mm"/>
@@ -98,19 +114,19 @@
 						</fo:table>
 					</fo:block-container>
 					
-					<fo:block-container position="absolute" top="66mm" left="16mm" height="20mm">
+					<fo:block-container position="absolute" top="76mm" left="16mm">
 						<fo:block text-align="left" line-height="14pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
 							<xsl:value-of select="studiengang" />
 						</fo:block>
 					</fo:block-container>
-					<fo:block-container position="absolute" top="66mm" left="167mm" height="20mm">
+					<fo:block-container position="absolute" top="76mm" left="167mm">
 						<fo:block text-align="left" line-height="14pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
 							<xsl:value-of select="studiengang_kz" />
 						</fo:block>
 					</fo:block-container>
 					
 					<!-- Studiensemester - Ausbildungssemester -->
-					<fo:block-container position="absolute" top="71.6mm" left="15mm" height="10mm">
+					<fo:block-container position="absolute" top="81.6mm" left="15mm">
 						<fo:table table-layout="fixed" border-collapse="separate">
 						    <fo:table-column column-width="120mm"/>
 							<fo:table-column column-width="60.4mm"/>
@@ -131,26 +147,26 @@
 						</fo:table>
 					</fo:block-container>
 					
-					<fo:block-container position="absolute" top="77mm" left="16mm" height="20mm">
+					<fo:block-container position="absolute" top="87mm" left="16mm">
 						<fo:block text-align="left" line-height="10pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
 							<xsl:value-of select="studiensemester_aktuell" />
 						</fo:block>
 					</fo:block-container>
 					
-					<fo:block-container position="absolute" top="77mm" left="137mm" height="20mm">
+					<fo:block-container position="absolute" top="87mm" left="137mm">
 						<fo:block text-align="left" line-height="10pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
 							<xsl:value-of select="semester_aktuell" />
 						</fo:block>
 					</fo:block-container>
 					
 					<!-- TABELLE -->
-					<fo:block-container position="absolute" top="100mm" left="15mm" height="20mm">
+					<fo:block-container position="absolute" top="110mm" left="15mm">
 						<fo:block text-align="left" line-height="14pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
 							Folgende Prüfungen wurden erfolgreich abgelegt:
 						</fo:block>
 					</fo:block-container>
 					
- 					<fo:block-container position="absolute" top="110mm" left="15mm">
+ 					<fo:block-container position="absolute" top="120mm" left="15mm">
 						<fo:table table-layout="fixed" border-collapse="separate" border-width="0.2mm" border-style="solid">
 						<fo:table-column column-width="70mm"/>
 						<fo:table-column column-width="24mm"/>

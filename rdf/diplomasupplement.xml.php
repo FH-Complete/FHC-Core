@@ -136,7 +136,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$qry = "SELECT bezeichnung FROM lehre.tbl_abschlusspruefung JOIN lehre.tbl_abschlussbeurteilung USING(abschlussbeurteilung_kurzbz) WHERE student_uid='".$uid_arr[$i]."' ORDER BY datum DESC LIMIT 1";
 		if($result1 = pg_query($conn, $qry))
 		{
-			if($row1 = pg_fetch_object($result))
+			if($row1 = pg_fetch_object($result1))
 			{
 				echo "		<beurteilung>$row1->bezeichnung</beurteilung>";
 			}

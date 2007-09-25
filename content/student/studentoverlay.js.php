@@ -3310,19 +3310,25 @@ function StudentSuche()
 		treeStudent.builder.addListener(StudentTreeListener);
 	
 		//Detailfelder Deaktivieren
-		StudentDetailReset();
-		StudentDetailDisableFields(true);
-		StudentPrestudentDisableFields(true);
-		StudentKontoDisableFields(true);
-		StudentAkteDisableFields(true);
-		document.getElementById('student-betriebsmittel').setAttribute('src','');
-		StudentIODisableFields(true);
-		StudentNoteDisableFields(true);
-		document.getElementById('student-kontakt').setAttribute('src','');
-		StudentAbschlusspruefungDisableFields(true);
+		StudentDisableDetails();
 	}
 	else
 		alert('Es muessen mindestens 3 Zeichen eingegeben werden');		
+}
+
+function StudentDisableDetails()
+{
+	StudentDetailReset();
+	StudentDetailDisableFields(true);
+	StudentPrestudentDisableFields(true);
+	StudentKontoDisableFields(true);
+	StudentAkteDisableFields(true);
+	document.getElementById('student-betriebsmittel').setAttribute('src','');
+	StudentIODisableFields(true);
+	StudentNoteDisableFields(true);
+	document.getElementById('student-kontakt').setAttribute('src','');
+	StudentAbschlusspruefungDisableFields(true);
+	StudentProjektarbeitDisableAll();
 }
 
 // ****

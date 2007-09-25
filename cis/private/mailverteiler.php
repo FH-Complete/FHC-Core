@@ -157,7 +157,7 @@
 		  		$qry_stud = "SELECT count(*) as anzahl FROM public.tbl_student WHERE studiengang_kz='$row->studiengang_kz' AND student_uid NOT LIKE '_Dummy%'";
 
 			  		if(!$row_stud=pg_fetch_object(pg_query($conn, $qry_stud)))
-			  			echo 'Fehler beim laden der Studenten';
+			  			echo 'Fehler beim Laden der Studenten';
 
 			  		if($row_stud->anzahl>0)
 			  		{
@@ -194,7 +194,7 @@
 			  		echo "\n";
 			  		foreach($lv_obj->result as $row1)
 			  		{
-			  			if((!is_null($row1->semester)) AND ($row1->semester != "") AND ($row1->semester<=$row->max_semester)) //($row1->semester<'10'))
+			  			if((!is_null($row1->semester)) && ($row1->semester != "") && ($row1->semester<=$row->max_semester) && ($row1->semester>'0')) //($row1->semester<'10'))
 			  			{
 			  				$qry_cnt = "SELECT count(*) as anzahl FROM public.tbl_student WHERE studiengang_kz='$row1->studiengang_kz' AND semester='$row1->semester' AND student_uid NOT LIKE '_Dummy%'";
 			  				if(trim($row1->verband)!='')
