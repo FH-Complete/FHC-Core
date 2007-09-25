@@ -17,7 +17,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	
 	<xsl:template match="lehrauftrag">
 		<fo:page-sequence master-reference="PageMaster">
-			<fo:flow flow-name="xsl-region-body" >
+			<fo:flow  ><!--flow-name="xsl-region-body"-->
 				<!-- Logo -->
 				<fo:block>
 					<fo:external-graphic src="../skin/images/logo.jpg"  posx="140" posy="15" width="60mm" height="20mm" />
@@ -58,7 +58,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					\n\n\n\n\n\n\n\n\n\nWir beauftragen Sie, im <xsl:value-of select="studiensemester" /> folgende Lehrveranstaltungen abzuhalten:\n
 				</fo:block>
 				<!-- Tabelle -->
-				
+
 				<fo:table table-layout="fixed" border-collapse="separate">
 					<fo:table-column column-width="12mm"/>
 					<fo:table-column column-width="65mm"/>
@@ -80,6 +80,21 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 							<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" font-weight="bold"> Brutto</fo:block></fo:table-cell>
 						</fo:table-row>
 						<xsl:apply-templates select="lehreinheit"/>
+					</fo:table-body>
+				</fo:table>
+				
+				<xsl:apply-templates select="newsite"/>
+				
+				<fo:table table-layout="fixed" border-collapse="separate">
+					<fo:table-column column-width="12mm"/>
+					<fo:table-column column-width="65mm"/>
+					<fo:table-column column-width="40mm"/>
+					<fo:table-column column-width="20mm"/>
+					<fo:table-column column-width="12mm"/>
+					<fo:table-column column-width="10mm"/>
+					<fo:table-column column-width="10mm"/>
+					<fo:table-column column-width="17mm"/>
+					<fo:table-body>
 						<fo:table-row  line-height="10pt">
 							<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"></fo:block></fo:table-cell>
 							<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"></fo:block></fo:table-cell>
@@ -92,6 +107,8 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						</fo:table-row>
 					</fo:table-body>
 				</fo:table>
+				
+				
 				
 				<fo:block><xsl:text>
 				</xsl:text></fo:block>
@@ -154,6 +171,27 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="10mm" text-align="right"><xsl:value-of select="faktor" /></fo:block></fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="17mm" text-align="right">EURO <xsl:value-of select="brutto" /></fo:block></fo:table-cell>
 		</fo:table-row>
+	</xsl:template>
+	<xsl:template match="newsite">
+		  <fo:block font-size="16pt" 
+	            font-family="sans-serif" 
+	            space-after.optimum="15pt"
+	            text-align="center"
+	            break-before="page">
+	      </fo:block>
+		<fo:table table-layout="fixed" border-collapse="separate">
+						<fo:table-column column-width="12mm"/>
+						<fo:table-column column-width="65mm"/>
+						<fo:table-column column-width="40mm"/>
+						<fo:table-column column-width="20mm"/>
+						<fo:table-column column-width="12mm"/>
+						<fo:table-column column-width="10mm"/>
+						<fo:table-column column-width="10mm"/>
+						<fo:table-column column-width="17mm"/>
+						<fo:table-body>
+				<xsl:apply-templates select="lehreinheit"/>
+			</fo:table-body>
+		</fo:table>
 	</xsl:template>
 
 </xsl:stylesheet >
