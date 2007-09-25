@@ -29,7 +29,7 @@
 	}
 	else
 	{
-		$qry = "SELECT vorname, nachname, uid FROM campus.vw_student WHERE studiengang_kz='".addslashes($_GET['kz'])."'";
+		$qry = "SELECT vorname, nachname, uid FROM campus.vw_student WHERE aktiv=true AND studiengang_kz='".addslashes($_GET['kz'])."'";
 
 		if(isset($_GET['sem']))
 			$qry.=" AND semester='".addslashes($_GET['sem'])."'";

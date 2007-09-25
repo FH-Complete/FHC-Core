@@ -135,6 +135,26 @@ function StudentProjektarbeitTreeLoad(uid)
 }
 
 // ****
+// * Deaktiviert alle Felder in diesem Tab
+// ****
+function StudentProjektarbeitDisableAll()
+{
+	//Tree Leeren
+	var tree = document.getElementById('student-projektarbeit-tree');
+	
+	//Alte DS entfernen
+	var oldDatasources = tree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		tree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	tree.builder.rebuild();
+	
+	StudentProjektarbeitDisableFields(true);
+}
+
+// ****
 // * De-/Aktiviert die ProjektarbeitFelder
 // ****
 function StudentProjektarbeitDisableFields(val)
@@ -143,7 +163,9 @@ function StudentProjektarbeitDisableFields(val)
 	document.getElementById('student-projektarbeit-button-loeschen').disabled=val;
 	
 	if(val)
+	{
 		StudentProjektarbeitDetailDisableFields(val);
+	}
 }
 
 // ****
@@ -398,16 +420,13 @@ function StudentProjektarbeitSpeichern()
 	anmerkung = document.getElementById('student-projektarbeit-textbox-anmerkung').value;
 	neu = document.getElementById('student-projektarbeit-checkbox-neu').checked;
 
-	var tree = document.getElementById('student-tree');
-
-	if (tree.currentIndex==-1)
+	student_uid =document.getElementById('student-detail-textbox-uid').value;
+	if(student_uid=='')
 	{
-		alert('Student muss ausgewaehlt sein');
-		return;
+		alert('UID dieser Person konnte nicht ermittelt werden');
+		return false;
 	}
-    var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-	var student_uid=tree.view.getCellText(tree.currentIndex,col);
-
+	
 	//Datum pruefen
 	if(beginn!='' && !CheckDatum(beginn))
 	{
