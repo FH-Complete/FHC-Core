@@ -57,6 +57,8 @@ if(isset($_GET['ss']))
 else
 	die('Fehlerhafte Parameteruebergabe');
 
+$ANZAHL_ZEILEN_PRO_SEITE=25;
+
 //String der laenger als limit ist wird
 //abgeschnitten und '...' angehaengt
 function CutString($strVal, $limit)
@@ -127,6 +129,7 @@ function drawLehrauftrag($uid)
 	global $xml;
 	global $conn;
 	global $stgl;
+	global $ANZAHL_ZEILEN_PRO_SEITE;
 	
 	$xml.='<lehrauftrag>
 		<studiengang>FH-';
@@ -178,7 +181,8 @@ function drawLehrauftrag($uid)
 	if($studiengang_kz!='0' && $studiengang_kz!='')
 		$qry .= "AND lv_studiengang_kz='".addslashes($studiengang_kz)."'";
 	$qry.=" ORDER BY lehreinheit_id";
-	
+	$lv = array();
+	$anzahl_lvs=0;
 	if($result = pg_query($conn, $qry))
 	{
 		$last_le='';
@@ -193,17 +197,27 @@ function drawLehrauftrag($uid)
 				array_unique($gruppen);
 				foreach ($gruppen as $gruppe)
 					$grp.=$gruppe.' ';
-	$xml.='
-		<lehreinheit>
-			<lehreinheit_id>'.$lehreinheit_id.'</lehreinheit_id>
-			<lehrveranstaltung><![CDATA['.$lehrveranstaltung.']]></lehrveranstaltung>
-			<fachbereich>'.$fb_arr[$fachbereich].'</fachbereich>
-			<gruppe>'.trim($grp).'</gruppe>
-			<stunden>'.$stunden.'</stunden>
-			<satz>'.$satz.'</satz>
-			<faktor>'.$faktor.'</faktor>
-			<brutto>'.number_format($brutto,2,',','.').'</brutto>
-		</lehreinheit>';
+					
+				$lv[$anzahl_lvs]['lehreinheit_id'] = $lehreinheit_id;
+				$lv[$anzahl_lvs]['lehrveranstaltung'] = $lehrveranstaltung;
+				$lv[$anzahl_lvs]['fachbereich'] = $fb_arr[$fachbereich];
+				$lv[$anzahl_lvs]['gruppe'] = ($grp!=''?trim($grp):' ');
+				$lv[$anzahl_lvs]['stunden'] = ($stunden!=''?$stunden:' ');
+				$lv[$anzahl_lvs]['satz'] = ($satz!=''?$satz:' ');
+				$lv[$anzahl_lvs]['faktor'] = ($faktor!=''?$faktor:' ');
+				$lv[$anzahl_lvs]['brutto'] = number_format($brutto,2,',','.');
+				$anzahl_lvs++;
+				/*$xml.='
+					<lehreinheit>
+						<lehreinheit_id>'.$lehreinheit_id.'</lehreinheit_id>
+						<lehrveranstaltung><![CDATA['.$lehrveranstaltung.']]></lehrveranstaltung>
+						<fachbereich>'.$fb_arr[$fachbereich].'</fachbereich>
+						<gruppe>'.trim($grp).'</gruppe>
+						<stunden>'.$stunden.'</stunden>
+						<satz>'.$satz.'</satz>
+						<faktor>'.$faktor.'</faktor>
+						<brutto>'.number_format($brutto,2,',','.').'</brutto>
+					</lehreinheit>';*/
 	
 				$gesamtkosten = $gesamtkosten + $brutto;
 				$gesamtstunden = $gesamtstunden + $stunden;
@@ -239,6 +253,16 @@ function drawLehrauftrag($uid)
 			$grp.=$gruppe.' ';
 		if(isset($lehreinheit_id))
 		{
+			$lv[$anzahl_lvs]['lehreinheit_id'] = (isset($lehreinheit_id)?$lehreinheit_id:' ');
+			$lv[$anzahl_lvs]['lehrveranstaltung'] = (isset($lehrveranstaltung)?$lehrveranstaltung:' ');
+			$lv[$anzahl_lvs]['fachbereich'] = (isset($fachbereich)?$fb_arr[$fachbereich]:' ');
+			$lv[$anzahl_lvs]['gruppe'] = ($grp!=''?trim($grp):' ');
+			$lv[$anzahl_lvs]['stunden'] = (isset($stunden)?$stunden:' ');
+			$lv[$anzahl_lvs]['satz'] = (isset($satz)?$satz:' ');
+			$lv[$anzahl_lvs]['faktor'] = (isset($faktor)?$faktor:' ');
+			$lv[$anzahl_lvs]['brutto'] = (isset($brutto)?number_format($brutto,2,',','.'):' ');
+			$anzahl_lvs++;
+			/*
 		$xml.='
 			<lehreinheit>
 				<lehreinheit_id>'.(isset($lehreinheit_id)?$lehreinheit_id:'').'</lehreinheit_id>
@@ -250,7 +274,8 @@ function drawLehrauftrag($uid)
 				<faktor>'.(isset($faktor)?$faktor:'').'</faktor>
 				<brutto>'.(isset($brutto)?number_format($brutto,2,',','.'):'').'</brutto>
 			</lehreinheit>';
-		
+			*/
+			
 			if(isset($brutto))
 				$gesamtkosten = $gesamtkosten + $brutto;
 			if(isset($stunden))
@@ -284,6 +309,16 @@ function drawLehrauftrag($uid)
 					default:          $kuerzel='PA'; break;
 				}
 				
+				$lv[$anzahl_lvs]['lehreinheit_id'] = (isset($row->projektarbeit_id)?$kuerzel.$row->projektarbeit_id:' ');
+				$lv[$anzahl_lvs]['lehrveranstaltung'] = 'Betreuung '.$row->vorname.' '.$row->nachname.' '.$row->semester.'. Semester';
+				$lv[$anzahl_lvs]['fachbereich'] = (isset($row->fachbereich_kurzbz)?$fb_arr[$row->fachbereich_kurzbz]:' ');
+				$lv[$anzahl_lvs]['gruppe'] = ' ';
+				$lv[$anzahl_lvs]['stunden'] = (isset($row->stunden)?number_format($row->stunden,2):' ');
+				$lv[$anzahl_lvs]['satz'] = (isset($row->stundensatz)?$row->stundensatz:' ');
+				$lv[$anzahl_lvs]['faktor'] = (isset($row->faktor)?$row->faktor:'');
+				$lv[$anzahl_lvs]['brutto'] = (isset($brutto)?number_format($brutto,2,',','.'):' ');
+				$anzahl_lvs++;
+				/*
 				$xml.='
 					<lehreinheit>
 						<lehreinheit_id>'.(isset($row->projektarbeit_id)?$kuerzel.$row->projektarbeit_id:'').'</lehreinheit_id>
@@ -295,11 +330,41 @@ function drawLehrauftrag($uid)
 						<faktor>'.(isset($row->faktor)?$row->faktor:'').'</faktor>
 						<brutto>'.(isset($brutto)?number_format($brutto,2,',','.'):'').'</brutto>
 					</lehreinheit>';
+				*/
 				$gesamtkosten = $gesamtkosten + $brutto;
 				$gesamtstunden = $gesamtstunden + $row->stunden;
 			}
 		}
 	}
+	
+	$anz=0;
+	$newsite=false;
+	foreach ($lv as $lv_row) 
+	{
+		if($anz>$ANZAHL_ZEILEN_PRO_SEITE)
+		{
+			if($newsite)
+				$xml.='</newsite>';
+			$xml.='<newsite>';
+			$newsite=true;
+			$anz=0;
+		}
+			$xml.='
+				<lehreinheit>
+					<lehreinheit_id>'.$lv_row['lehreinheit_id'].'</lehreinheit_id>
+					<lehrveranstaltung><![CDATA['.$lv_row['lehrveranstaltung'].']]></lehrveranstaltung>
+					<fachbereich>'.$lv_row['fachbereich'].'</fachbereich>
+					<gruppe>'.$lv_row['gruppe'].'</gruppe>
+					<stunden>'.$lv_row['stunden'].'</stunden>
+					<satz>'.$lv_row['satz'].'</satz>
+					<faktor>'.$lv_row['faktor'].'</faktor>
+					<brutto>'.$lv_row['brutto'].'</brutto>
+				</lehreinheit>';
+		$anz++;
+	}
+	if($newsite)
+		$xml.='</newsite>';
+		
 	// Gesamtstunden und Gesamtkosten
 	$xml.="
 		<gesamtstunden>".number_format($gesamtstunden,2)."</gesamtstunden>
