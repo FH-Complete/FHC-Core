@@ -12,7 +12,7 @@ require_once('../sync_config.inc.php');
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
-
+//$adress="ruhan@technikum-wien.at";
 $error_log='';
 $error_log_all="";
 $stgart=array();
@@ -284,7 +284,7 @@ foreach ($fehler as $f => $v)
 {
 	echo nl2br("Studiengang: ".$f."(".$email[$f].")\n".$v."\n");
 	//mail(trim($email[$f]), 'BIS-Daten / Studiengang: '.$f,"Fehlende Daten für die BIS-Meldung:\n(Doppelte Zeilen deuten auf mehrere Heimatadressen hin - bitte Kontakte überprüfen)\n\nStudiengang: ".$f."(".$email[$f].")\n".$v."\n","From: vilesci@technikum-wien.at");
-	mail('ruhan@technikum-wien.at', 'BIS-Daten / Studiengang: '.$f,"Fehlende Daten für die BIS-Meldung:\n(Doppelte Zeilen deuten auf mehrere Heimatadressen hin - bitte Kontakte überprüfen)\n\nStudiengang: ".$f."(".$email[$f].")\n".$v."\n","From: vilesci@technikum-wien.at");	
+	mail($adress, 'BIS-Daten / Studiengang: '.$f,"Fehlende Daten für die BIS-Meldung:\n(Doppelte Zeilen deuten auf mehrere Heimatadressen hin - bitte Kontakte überprüfen)\n\nStudiengang: ".$f."(".$email[$f].")\n".$v."\n","From: vilesci@technikum-wien.at");	
 }
 
 
