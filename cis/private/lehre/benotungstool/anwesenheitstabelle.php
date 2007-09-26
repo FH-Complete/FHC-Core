@@ -95,7 +95,7 @@ else
 
 //Vars
 $datum_obj = new datum();
-
+$show_excel_link = false;
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 
 //Kopfzeile
@@ -314,9 +314,15 @@ else
 						$uebung_id=$subrow->uebung_id;
 		
 					if($uebung_id == $subrow->uebung_id)
+					{				
 						$selected = 'selected';
+						if ($subrow->beispiele)	
+							$show_excel_link = true;
+					}
 					else
+					{						
 						$selected = '';
+					}
 					
 					echo "<OPTION value='anwesenheitstabelle.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$subrow->uebung_id' $selected>";
 
@@ -362,7 +368,8 @@ echo "<h3><u>$uebung_obj->bezeichnung</u></h3>";
 
 echo '<table width="100%"><tr><td>';
 echo "<ul><li><a href='anwesenheitsliste.php?output=html&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id&stsem=$stsem' target='_blank'>Alle Studierende</a>&nbsp;";
-//echo "<a href='anwesenheitsliste.php?output=xls&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id'><img src='../../../../skin/images/excel.gif' width=16 height=16></a></li>";
+if ($show_excel_link)
+	echo "<a href='anwesenheitsliste.php?output=xls&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id'><img src='../../../../skin/images/excel.gif' width=16 height=16></a></li>";
 
 $qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id' ORDER BY semester, verband, gruppe, gruppe_kurzbz";
 if($result = pg_query($conn, $qry))
@@ -376,17 +383,18 @@ if($result = pg_query($conn, $qry))
 		else
 			echo "$row->gruppe_kurzbz";
 
-		//echo "</a>&nbsp;<a href='anwesenheitsliste.php?output=xls&uebung_id=$uebung_id&gruppe=$row->lehreinheitgruppe_id'><img src='../../../../skin/images/excel.gif' width=16 height=16></a></li>";
+		if ($show_excel_link)		
+			echo "</a>&nbsp;<a href='anwesenheitsliste.php?output=xls&uebung_id=$uebung_id&gruppe=$row->lehreinheitgruppe_id'><img src='../../../../skin/images/excel.gif' width=16 height=16></a></li>";
 	}
 }
 echo '</ul>';
-/*
-echo "</td><td valign='top'>
+
+echo "</td><!--<td valign='top'>
 <ul><li>
 <a href='anwesenheitsliste.php?output=xls&lehreinheit_id=$lehreinheit_id&all'>Gesamt&uuml;bersicht&nbsp;<img src='../../../../skin/images/excel.gif' width=16 height=16></a>
 </li></ul>
-</td></tr></table>";
-*/
+</td>--></tr></table>";
+
 ?>
 </td></tr>
 </table>
