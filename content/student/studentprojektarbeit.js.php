@@ -762,8 +762,8 @@ function StudentProjektbetreuerDetailReset()
 	document.getElementById('student-projektbetreuer-menulist-note').value='';
 	document.getElementById('student-projektbetreuer-menulist-betreuerart').value='Betreuer';
 	document.getElementById('student-projektbetreuer-textbox-punkte').value='0.0';
-	document.getElementById('student-projektbetreuer-textbox-stunden').value=document.getElementById('student-projektarbeit-textbox-gesamtstunden').value;
-	document.getElementById('student-projektbetreuer-textbox-stundensatz').value=document.getElementById('student-projektarbeit-textbox-stundensatz').value;
+	document.getElementById('student-projektbetreuer-textbox-stunden').value='3.0';
+	document.getElementById('student-projektbetreuer-textbox-stundensatz').value='80.0';
 	document.getElementById('student-projektbetreuer-menulist-person').value='';
 }
 

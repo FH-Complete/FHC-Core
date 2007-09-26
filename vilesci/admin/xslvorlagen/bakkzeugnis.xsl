@@ -83,7 +83,7 @@
 
 				<fo:block-container position="absolute" top="170pt" left="60pt" height="0pt">
 				<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="16pt">
-					Bachelorprüfungszeugnis
+					Bachelor-Prüfungszeugnis
 				</fo:block>
 				</fo:block-container>
 
@@ -211,7 +211,7 @@
 
 				<fo:block-container position="absolute" top="354pt" left="62pt" height="0pt">
 				<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt">
-						Note der Bachelorprüfung
+						Note der Bachelor-Prüfung
 
 				                 <fo:inline font-size="12pt" font-weight="900" text-align="center" >                    \n
 				                 

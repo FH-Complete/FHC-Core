@@ -20,7 +20,7 @@
 	
 					<fo:block-container position="absolute" top="25mm" left="15mm">
 						<fo:block text-align="left" line-height="20pt" font-family="sans-serif" font-size="16pt">
-							Protokoll Bachelorprüfung
+							Protokoll Bachelor-Prüfung
 						</fo:block>
 					</fo:block-container> 
 					

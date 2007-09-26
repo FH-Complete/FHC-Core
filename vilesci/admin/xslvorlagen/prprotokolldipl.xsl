@@ -20,7 +20,7 @@
 	
 					<fo:block-container position="absolute" top="25mm" left="15mm" height="20mm">
 						<fo:block text-align="left" line-height="20pt" font-family="sans-serif" font-size="16pt">
-							<xsl:text>Protokoll Diplomprüfung</xsl:text>
+							<xsl:text>Protokoll Diplom-Prüfung</xsl:text>
 						</fo:block>
 					</fo:block-container>
 

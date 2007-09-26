@@ -83,7 +83,7 @@
 
 				<fo:block-container position="absolute" top="170pt" left="60pt" height="0pt">
 				<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="16pt">
-						Diplomprüfungszeugnis
+						Diplom-Prüfungszeugnis
 				</fo:block>
 				</fo:block-container>
 
@@ -211,7 +211,7 @@
 
 				<fo:block-container position="absolute" top="354pt" left="62pt" height="0pt">
 				<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt">
-						Gesamtnote der Diplomprüfung
+						Gesamtnote der Diplom-Prüfung
 
 				                 <fo:inline font-size="12pt" font-weight="900" text-align="center" >                    \n
 				                 
@@ -283,7 +283,7 @@
 
 				<fo:block-container position="absolute" top="475pt" left="62pt" height="0pt">
 				<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt">
-						1. Teil der Diplomprüfung: Diplomarbeit
+						1. Teil der Diplom-Prüfung: Diplomarbeit
 
 				</fo:block>
 				</fo:block-container>
@@ -353,7 +353,7 @@
 
 				<fo:block-container position="absolute" top="571pt" left="62pt" height="0pt">
 				<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt">
-						2. Teil der Diplomprüfung: Kommissionelle Prüfung
+						2. Teil der Diplom-Prüfung: Kommissionelle Prüfung
 
 				</fo:block>
 				</fo:block-container>
