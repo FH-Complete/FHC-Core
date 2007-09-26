@@ -56,9 +56,8 @@ $datum_obj = new datum();
 $abschlussbeurteilung_arr = array();
 $qry = "SELECT * FROM lehre.tbl_abschlussbeurteilung";
 if($result = pg_query($conn, $qry))
-	if($row = pg_fetch_object($result))
+	while($row = pg_fetch_object($result))
 		$abschlussbeurteilung_arr[$row->abschlussbeurteilung_kurzbz]=$row->bezeichnung;
-
 
 	function draw_content_xml($row)
 	{
