@@ -67,10 +67,6 @@ $qry="SELECT *, tbl_abschlusspruefung.datum AS abdatum FROM public.tbl_student
 	";
 //
 
-//uid='tw01e036' AND
-
-//$qry="SELECT DISTINCT ON(mitarbeiter_uid) mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter ;";
-
 if($result = pg_query($conn, $qry))
 {
 	while($row = pg_fetch_object($result))
@@ -283,8 +279,8 @@ echo "(Doppelte Zeilen deuten auf mehrere Heimatadressen hin - bitte Kontakte üb
 foreach ($fehler as $f => $v)
 {
 	echo nl2br("Studiengang: ".$f."(".$email[$f].")\n".$v."\n");
-	//mail(trim($email[$f]), 'BIS-Daten / Studiengang: '.$f,"Fehlende Daten für die BIS-Meldung:\n(Doppelte Zeilen deuten auf mehrere Heimatadressen hin - bitte Kontakte überprüfen)\n\nStudiengang: ".$f."(".$email[$f].")\n".$v."\n","From: vilesci@technikum-wien.at");
-	mail($adress, 'BIS-Daten / Studiengang: '.$f,"Fehlende Daten für die BIS-Meldung:\n(Doppelte Zeilen deuten auf mehrere Heimatadressen hin - bitte Kontakte überprüfen)\n\nStudiengang: ".$f."(".$email[$f].")\n".$v."\n","From: vilesci@technikum-wien.at");	
+	//mail(trim($email[$f]), 'BIS-Daten / Studiengang: '.$f,"Fehlende Daten für die BIS-Meldung:(von ".$_SERVER['HTTP_HOST'].")\n(Doppelte Zeilen deuten auf mehrere Heimatadressen hin - bitte Kontakte überprüfen)\n\nStudiengang: ".$f."(".$email[$f].")\n".$v."\n","From: vilesci@technikum-wien.at");
+	mail($adress, 'BIS-Daten / Studiengang: '.$f,"\nFehlende Daten für die BIS-Meldung: (von ".$_SERVER['HTTP_HOST'].")\n(Doppelte Zeilen deuten auf mehrere Heimatadressen hin - bitte Kontakte überprüfen)\n\nStudiengang: ".$f."(".$email[$f].")\n".$v."\n","From: vilesci@technikum-wien.at");	
 }
 
 
