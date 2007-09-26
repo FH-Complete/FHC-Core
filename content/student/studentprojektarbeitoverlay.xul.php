@@ -250,11 +250,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					</columns>
 					<rows>
 						<row>
-							<label value="Punkte" control="student-projektarbeit-textbox-punkte" />
+							<label value="Gesamtpunkte" control="student-projektarbeit-textbox-punkte" />
 							<hbox>
 								<textbox id="student-projektarbeit-textbox-punkte" maxlength="5" size="5" disabled="true"/>
 							</hbox>
-							<label value="Note" control="student-projektarbeit-menulist-note"/>
+							<label value="Gesamtnote" control="student-projektarbeit-menulist-note"/>
 							<menulist id="student-projektarbeit-menulist-note" disabled="true"
 							          datasources="<?php echo APP_ROOT ?>rdf/note.rdf.php?optional=true" flex="1"
 							          ref="http://www.technikum-wien.at/note/liste" >
@@ -280,22 +280,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<box class="Datum" id="student-projektarbeit-datum-gesperrtbis" disabled="true" />
 						</row>
 						<row>
-							<label value="Stundensatz" control="student-projektarbeit-textbox-stundensatz"/>
-							<hbox>
-								<textbox id="student-projektarbeit-textbox-stundensatz" disabled="true" maxlength="5" size="5"/>
-							</hbox>
-							<label value="Faktor" control="student-projektarbeit-textbox-faktor"/>
-							<hbox>
-								<textbox id="student-projektarbeit-textbox-faktor" disabled="true" maxlength="3" size="3"/>
-							</hbox>
-						</row>
-						<row>
-							<label value="Gesamtstunden" control="student-projektarbeit-textbox-gesamtstunden"/>
-							<hbox>
-								<textbox id="student-projektarbeit-textbox-gesamtstunden" disabled="true" maxlength="8" size="8"/>
-							</hbox>
-						</row>
-						<row>
 							<label value="Anmerkung" control="student-projektarbeit-textbox-anmerkung"/>
 							<textbox id="student-projektarbeit-textbox-anmerkung" disabled="true" maxlength="256"/>
 						</row>
@@ -308,6 +292,22 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</row>
 					</rows>
 				</grid>
+				<vbox hidden="true">
+					<!-- Stundensatz/Faktor und Gesamtstunden werden nicht mehr benoetigt -->
+					<label value="Stundensatz" control="student-projektarbeit-textbox-stundensatz"/>
+					<hbox>
+						<textbox id="student-projektarbeit-textbox-stundensatz" disabled="true" maxlength="5" size="5"/>
+					</hbox>
+					<label value="Faktor" control="student-projektarbeit-textbox-faktor"/>
+					<hbox>
+						<textbox id="student-projektarbeit-textbox-faktor" disabled="true" maxlength="3" size="3"/>
+					</hbox>
+				
+					<label value="Gesamtstunden" control="student-projektarbeit-textbox-gesamtstunden"/>
+					<hbox>
+						<textbox id="student-projektarbeit-textbox-gesamtstunden" disabled="true" maxlength="8" size="8"/>
+					</hbox>
+				</vbox>
 			</groupbox>
 			<groupbox flex="1">
 				<caption label="Betreuer"/>

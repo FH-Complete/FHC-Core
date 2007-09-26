@@ -550,7 +550,7 @@ class mitarbeiter extends benutzer
 			$qry .= " AND uid IN (SELECT mitarbeiter_uid FROM bis.tbl_bisverwendung WHERE beschausmasscode='5' AND beginn<(SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='$studiensemester_kurzbz') AND ende<(SELECT ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='$studiensemester_kurzbz'))";
 		if($ausgeschieden)
 		{
-			$qry.=" AND NOT EXISTS(SELECT * FROM bis.tbl_bisverwendung WHERE beginn<now() AND ende>now())";
+			$qry.=" AND tbl_benutzer.aktiv=false"; //AND NOT EXISTS(SELECT * FROM bis.tbl_bisverwendung WHERE beginn<now() AND ende>now() AND tbl_bisverwendung.mitarbeiter_uid=tbl_benutzer.uid)
 		}
 		//echo $qry;
 		if($result = pg_query($this->conn, $qry))

@@ -107,65 +107,67 @@
 	  		  	
 	  	if($result = pg_query($conn, $qry))
 	  	{
-	  		$lastlehreinheit='';
-	  		$gruppen = '';
-	  		while($row = pg_fetch_object($result))
+	  		if(pg_num_rows($result)>0)
 	  		{
-	  			if($lastlehreinheit!=$row->lehreinheit_id)
-	  			{
-	  				if($lastlehreinheit!='')
-	  				{
-		  				$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid)
-		  						WHERE lehreinheit_id='$lastlehreinheit'";
-		  				$lektoren = '';
-		  				
-		  				if($result_lkt = pg_query($conn, $qry))
+		  		$lastlehreinheit='';
+		  		$gruppen = '';
+		  		while($row = pg_fetch_object($result))
+		  		{
+		  			if($lastlehreinheit!=$row->lehreinheit_id)
+		  			{
+		  				if($lastlehreinheit!='')
 		  				{
-		  					while($row_lkt = pg_fetch_object($result_lkt))
-		  					{
-		  						if($lektoren!='')
-		  							$lektoren.=', ';
-		  						$lektoren .= $row_lkt->kurzbz;
-		  					}
+			  				$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid)
+			  						WHERE lehreinheit_id='$lastlehreinheit'";
+			  				$lektoren = '';
+			  				
+			  				if($result_lkt = pg_query($conn, $qry))
+			  				{
+			  					while($row_lkt = pg_fetch_object($result_lkt))
+			  					{
+			  						if($lektoren!='')
+			  							$lektoren.=', ';
+			  						$lektoren .= $row_lkt->kurzbz;
+			  					}
+			  				}
+			  				
+			  				$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
+			  				$nt_content .= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
+			  
+			  				$lastlehreinheit = $row->lehreinheit_id;
+			  				$gruppen='';
 		  				}
+		  				else 
+		  					$lastlehreinheit = $row->lehreinheit_id;
+		  			}
+		  			
+		  			if($gruppen!='')
+		  				$gruppen.= ', ';
+		  				  			
+		  			if($row->gruppe_kurzbz!='')
+		  				$gruppen .= $row->gruppe_kurzbz;
+		  			else 
+		  				$gruppen .= trim($stg_arr[$row->studiengang_kz].'-'.$row->semester.$row->verband.$row->gruppe);
 		  				
-		  				$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
-		  				$nt_content .= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
-		  
-		  				$lastlehreinheit = $row->lehreinheit_id;
-		  				$gruppen='';
-	  				}
-	  				else 
-	  					$lastlehreinheit = $row->lehreinheit_id;
-	  			}
-	  			
-	  			if($gruppen!='')
-	  				$gruppen.= ', ';
-	  				  			
-	  			if($row->gruppe_kurzbz!='')
-	  				$gruppen .= $row->gruppe_kurzbz;
-	  			else 
-	  				$gruppen .= trim($stg_arr[$row->studiengang_kz].'-'.$row->semester.$row->verband.$row->gruppe);
-	  				
-	  			$lehrform = $row->lehrform_kurzbz;
-	  			$kurzbz = $row->kurzbz;
-	  		}
-	  		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid)
-					WHERE lehreinheit_id='$lastlehreinheit'";
-			$lektoren = '';
-			if($result_lkt = pg_query($conn, $qry))
-			{
-				while($row_lkt = pg_fetch_object($result_lkt))
+		  			$lehrform = $row->lehrform_kurzbz;
+		  			$kurzbz = $row->kurzbz;
+		  		}
+		  		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid)
+						WHERE lehreinheit_id='$lastlehreinheit'";
+				$lektoren = '';
+				if($result_lkt = pg_query($conn, $qry))
 				{
-					if($lektoren!='')
-						$lektoren.=', ';
-					$lektoren .= $row_lkt->kurzbz;
+					while($row_lkt = pg_fetch_object($result_lkt))
+					{
+						if($lektoren!='')
+							$lektoren.=', ';
+						$lektoren .= $row_lkt->kurzbz;
+					}
 				}
-			}
-			
-			$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
-			$nt_content .= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
-
+				
+				$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
+				$nt_content .= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
+	  		}
 	  	}
 
 	  	if($nt_content=='' && $aw_content=='')
