@@ -32,6 +32,10 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'content/bindings.css" type="text/css"?>';
 echo '<?xml-stylesheet href="../datepicker/datepicker.css" type="text/css"?>';
+
+if(!$conn = pg_pconnect(CONN_STRING))
+	die('Fehler beim Herstellen der DB Connection');
+	
 if(isset($_GET['prestudent_id']))
 	$prestudent_id=$_GET['prestudent_id'];
 else 
@@ -93,16 +97,22 @@ else
       				<label value="Ausbildungssemester" control="student-rolle-menulist-ausbildungssemester"/>
 					<menulist id="student-rolle-menulist-ausbildungssemester" >
 						<menupopup>
-							<menuitem value="1" label="1"/>
-							<menuitem value="2" label="2"/>
-							<menuitem value="3" label="3"/>
-							<menuitem value="4" label="4"/>
-							<menuitem value="5" label="5"/>
-							<menuitem value="6" label="6"/>
-							<menuitem value="7" label="7"/>
-							<menuitem value="8" label="8"/>
-							<menuitem value="9" label="9"/>
-							<menuitem value="10" label="10"/>							
+						<?php
+							$maxsem=10;
+							$qry = "SELECT max(semester) as maxsem FROM public.tbl_lehrverband WHERE studiengang_kz=(SELECT studiengang_kz FROM public.tbl_prestudent WHERE prestudent_id='".addslashes($prestudent_id)."')";
+							if($result = pg_query($conn, $qry))
+							{
+								if($row = pg_fetch_object($result))
+								{
+									$maxsem = $row->maxsem;
+								}
+							}
+														
+							for($i=1;$i<=$maxsem;$i++)
+							{
+								echo '<menuitem value="'.$i.'" label="'.$i.'"/>';
+							}
+						?>
 						</menupopup>
 					</menulist>
       			</row>

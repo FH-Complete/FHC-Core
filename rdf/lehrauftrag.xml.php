@@ -103,11 +103,35 @@ if($result = pg_query($conn, $qry))
 
 if($uid==null)
 {
-	$qry = "SELECT distinct tbl_lehreinheitmitarbeiter.mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung WHERE
-			tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
-			tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
-			tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND
-			tbl_lehreinheit.studiensemester_kurzbz='".addslashes($ss)."'";
+	$qry = "
+			SELECT 
+				distinct mitarbeiter_uid 
+			FROM (
+					SELECT 
+						tbl_lehreinheitmitarbeiter.mitarbeiter_uid 
+					FROM 
+						lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung 
+					WHERE
+						tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
+						tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
+						tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND
+						tbl_lehreinheit.studiensemester_kurzbz='".addslashes($ss)."'
+					UNION
+					SELECT
+						tbl_benutzer.uid as mitarbeiter_uid
+			        FROM 
+			        	lehre.tbl_projektbetreuer, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung,
+						public.tbl_benutzer, lehre.tbl_projektarbeit, campus.vw_student, public.tbl_mitarbeiter
+			        WHERE 
+			        	tbl_projektbetreuer.person_id=tbl_benutzer.person_id AND
+						tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
+						student_uid=vw_student.uid AND
+						tbl_benutzer.uid = tbl_mitarbeiter.mitarbeiter_uid AND
+						tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND
+						tbl_lehreinheit.studiensemester_kurzbz='".addslashes($ss)."' AND
+						tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
+						tbl_lehrveranstaltung.studiengang_kz=".addslashes($studiengang_kz)."
+					) as mitarbeiter";
 	
 	if($result = pg_query($conn, $qry))
 	{
