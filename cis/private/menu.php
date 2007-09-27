@@ -34,6 +34,7 @@ if(!$db_conn = pg_pconnect(CONN_STRING))
 
 $user=get_uid();
 
+$cutlength=10;
 $rechte=new benutzerberechtigung($db_conn);
 $rechte->getBerechtigungen($user);
 
@@ -61,6 +62,18 @@ if(check_student($user,$db_conn))
    $is_student=true;
 else
    $is_student=false;
+
+   function CutString($strVal, $limit)
+	{
+		if(strlen($strVal) > $limit+3)
+		{
+			return substr($strVal, 0, $limit) . "...";
+		}
+		else
+		{
+			return $strVal;
+		}
+	}
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -132,24 +145,67 @@ else
 			</tr>
 			<?php			
 			if ($is_student)
-				echo '<tr>
-			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a class="Item" href="profile/dokumente.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Dokumente</a></td>
-			</tr>'
-			?>		  	
+			{
+					echo '<tr>
+				  	<td class="tdwidth10" nowrap>&nbsp;</td>
+					<td class="tdwrap"><a class="Item" href="profile/dokumente.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Dokumente</a></td>
+				</tr>';
+			}
+			
+			echo '
 		  	<tr>
 				<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class='tdwrap'><a class="Item" href="lvplan/stpl_week.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;LV-Plan</a></td>
-			</tr>
-			<?php			
+				<td class="tdwrap"><a class="Item" href="lvplan/stpl_week.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;LV-Plan</a></td>
+			</tr>';
+								
 			if ($is_student)
+			{
 				echo '<tr>
-			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a class="Item" href="lehre/notenliste.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Leistungsbeurteilung</a></td>
-			</tr>'
-			?>
+					  	<td class="tdwidth10" nowrap>&nbsp;</td>
+						<td class="tdwrap"><a class="Item" href="lehre/notenliste.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Leistungsbeurteilung</a></td>
+					  </tr>';
+				
+				echo '	<tr>
+					<td class="tdwidth10" nowrap>&nbsp;</td>
+				    <td class="tdwrap">
+				    	<a href="?Location" class="MenuItem" onClick="return(js_toggle_container(\'MeineLVs\'));">
+				    		<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Meine LV
+				    	</a>
+				    </td>
+				</tr>
+				<tr>
+          			<td class="tdwidth10" nowrap>&nbsp;</td>
+					<td class="tdwrap">
+		  			<table class="tabcontent" id="MeineLVs" style="display: visible;">
+					<tr>
+					  	<td class="tdwrap">
+							<ul style="margin-top: 0px; margin-bottom: 0px;">';
+							
+							$stsemobj = new studiensemester($db_conn);
+							$stsem = $stsemobj->getAktorNext();
+							$qry = "SELECT distinct lehrveranstaltung_id, bezeichnung, studiengang_kz, semester, lehre, lehreverzeichnis from campus.vw_student_lehrveranstaltung WHERE uid='$user' AND studiensemester_kurzbz='$stsem' AND lehre=true AND lehreverzeichnis<>'' ORDER BY studiengang_kz, semester, bezeichnung";
+
+							if($result = pg_query($db_conn,$qry))
+							{
+								while($row = pg_fetch_object($result))
+								{
+									if($row->studiengang_kz==0 && $row->semester==0)
+										echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">FF '.CutString($row->bezeichnung,$cutlength).'</a></li>';
+									else
+										echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="lehre/lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">'.$stg[$row->studiengang_kz].$row->semester.' '.CutString($row->bezeichnung,$cutlength).'</a></li>';
+								}
+							}
+							else
+								echo "Fehler beim Auslesen der LV";
+				echo '
+							</ul>
+						</td>
+					</tr>
+					</table>
+		  			</td>
+				</tr>';
+			}
 			
-			<?php
 			//Eigene LVs des eingeloggten Lektors anzeigen
 			if($is_lector)
 			{
@@ -192,16 +248,16 @@ else
 										FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_studiengang
 								        WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 									        tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz AND
-									        mitarbeiter_uid='$user' AND tbl_lehreinheit.studiensemester_kurzbz='$stsem' ORDER BY typ, tbl_studiengang.kurzbz, semester, lehreverzeichnis";
+									        mitarbeiter_uid='$user' AND tbl_lehreinheit.studiensemester_kurzbz='$stsem' ORDER BY typ, tbl_studiengang.kurzbz, semester, bezeichnung";
 
 							if($result = pg_query($db_conn,$qry))
 							{
 								while($row = pg_fetch_object($result))
 								{
 									if($row->studiengang_kz==0 AND $row->semester==0)
-										echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">FF '.$row->lehreverzeichnis.'</a></li>';
+										echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">FF '.CutString($row->bezeichnung,$cutlength).'</a></li>';
 									else
-										echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="lehre/lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">'.$stg[$row->studiengang_kz].' '.$row->semester.' '.$row->lehreverzeichnis.'</a></li>';
+										echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="lehre/lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">'.$stg[$row->studiengang_kz].$row->semester.' '.CutString($row->bezeichnung, $cutlength).'</a></li>';
 								}
 							}
 							else

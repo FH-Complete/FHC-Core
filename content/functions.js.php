@@ -168,6 +168,18 @@ function getDataFromClipboard()
 }
 
 // ****
+// * Oeffnet ein neues Fenster welches dann die Datei 'action' mit dem POST Parameter 'data' aufruft
+// ****
+function OpenWindowPost(action, data)
+{	
+	newwindow= window.open ("","FAS","width=350, height=350");
+	newwindow.document.getElementsByTagName('body')[0].innerHTML = "<form id='postform-form' name='postfrm' action='' method='POST'><input type='hidden' id='postform-textbox-data' name='data' /></form>"; 
+	newwindow.document.getElementById('postform-textbox-data').value=data;
+	newwindow.document.getElementById('postform-form').action=action;
+	newwindow.document.postfrm.submit();
+}
+
+// ****
 // * Liefert das Aktuelle Studiensemester
 // ****
 function getStudiensemester()

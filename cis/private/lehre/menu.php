@@ -30,6 +30,7 @@
     if(!$sql_conn = pg_pconnect(CONN_STRING))
        die('Fehler beim oeffnen der Datenbankverbindung');
 
+     $cutlength=10;
 	// Variablen setzen
 	$user = get_uid();
 	if (isset($_GET['course_id']))
@@ -95,6 +96,17 @@
 			$term_id = 1;
 		}
 	}
+	
+	$stg_obj = new studiengang($sql_conn);
+				if($stg_obj->getAll(null,false))
+				{
+					$stg = array();
+
+					foreach($stg_obj->result as $row)
+							$stg[$row->studiengang_kz] = $row->kurzbzlang;
+				}
+				else
+					echo "Fehler beim Auslesen der Studiengaenge";
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
@@ -267,6 +279,47 @@ function js_toggle_container(conid)
 			echo '<tr>';
 			echo '	<td class="tdwrap">&nbsp;</td>';
 			echo '</tr>';
+			
+			if(!$is_lector)
+			{
+				echo '	<tr>
+				    <td class="tdwrap">
+				    	<a href="?Location" class="MenuItem" onClick="return(js_toggle_container(\'MeineLVs\'));">
+				    		<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Meine LV
+				    	</a>
+				    </td>
+				</tr>
+				<tr>
+					<td class="tdwrap">
+		  			<table class="tabcontent" id="MeineLVs" style="display: none;">
+					<tr>
+					  	<td class="tdwrap">
+							<ul style="margin-top: 0px; margin-bottom: 0px;">';
+							
+							$stsemobj = new studiensemester($sql_conn);
+							$stsem = $stsemobj->getAktorNext();
+							$qry = "SELECT distinct lehrveranstaltung_id, bezeichnung, studiengang_kz, semester, lehre, lehreverzeichnis from campus.vw_student_lehrveranstaltung WHERE uid='$user' AND studiensemester_kurzbz='$stsem' AND lehre=true AND lehreverzeichnis<>'' ORDER BY studiengang_kz, semester, bezeichnung";
+
+							if($result = pg_query($sql_conn,$qry))
+							{
+								while($row = pg_fetch_object($result))
+								{
+									if($row->studiengang_kz==0 && $row->semester==0)
+										echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="../freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">FF '.CutString($row->bezeichnung, $cutlength).'</a></li>';
+									else
+										echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">'.$stg[$row->studiengang_kz].$row->semester.' '.CutString($row->bezeichnung, $cutlength).'</a></li>';
+								}
+							}
+							else
+								echo "Fehler beim Auslesen der LV";
+				echo '
+							</ul>
+						</td>
+					</tr>
+					</table>
+		  			</td>
+				</tr>';
+			}
 
 			//Eigenen LV des eingeloggten Lektors anzeigen
 			if($is_lector || $rechte->isBerechtigt('admin'))
@@ -286,16 +339,7 @@ function js_toggle_container(conid)
 				$stsemobj = new studiensemester($sql_conn);
 				$stsem = $stsemobj->getAktorNext();
 
-				$stg_obj = new studiengang($sql_conn);
-				if($stg_obj->getAll(null,false))
-				{
-					$stg = array();
-
-					foreach($stg_obj->result as $row)
-							$stg[$row->studiengang_kz] = $row->kurzbzlang;
-				}
-				else
-					echo "Fehler beim Auslesen der Studiengaenge";
+				
 
 				//$qry = "SELECT * FROM tbl_lehrfach WHERE lehrfach_nr IN (SELECT distinct lehrfach_nr FROM tbl_lehrveranstaltung WHERE lektor='$user' AND studiensemester_kurzbz='$stsem') AND studiengang_kz!=0";
 				$qry = "SELECT distinct bezeichnung, studiengang_kz, semester, lehreverzeichnis, tbl_lehrveranstaltung.lehrveranstaltung_id  FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter
@@ -308,9 +352,9 @@ function js_toggle_container(conid)
 						while($row = pg_fetch_object($result))
 						{
 							if($row->studiengang_kz==0 AND $row->semester==0)
-								echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="../freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">FF '.$row->lehreverzeichnis.'</a></li>';
+								echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="../freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">FF '.CutString($row->lehreverzeichnis, $cutlength).'</a></li>';
 							else
-								echo "<li><a class=\"Item2\" title=\"".$row->bezeichnung."\" href=\"lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".$stg[$row->studiengang_kz].' '.$row->semester.' '.$row->lehreverzeichnis."</a></li>";
+								echo "<li><a class=\"Item2\" title=\"".$row->bezeichnung."\" href=\"lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".$stg[$row->studiengang_kz].$row->semester.' '.CutString($row->bezeichnung, $cutlength)."</a></li>";
 						}
 				}
 				else
