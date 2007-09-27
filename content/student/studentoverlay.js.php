@@ -1587,6 +1587,49 @@ function StudentPrintInskriptionsbestaetigung()
 // ****
 function StudentExport()
 {
+	var tree = document.getElementById('student-tree');
+	var data='';
+	//Wenn nichts markiert wurde -> alle exportieren
+	if(tree.currentIndex==-1)
+	{
+		if(tree.view)
+			var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+		else
+			return false;
+			
+		for (var v=0; v < items; v++)
+		{
+			col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
+			prestudent_id = tree.view.getCellText(v,col);
+			data = data+';'+prestudent_id;
+		}
+	}
+	else
+	{	
+		var start = new Object();
+		var end = new Object();
+		var numRanges = tree.view.selection.getRangeCount();
+		var paramList= '';
+		var anzahl=0;
+	
+		//alle markierten personen holen
+		for (var t = 0; t < numRanges; t++)
+		{
+	  		tree.view.selection.getRangeAt(t,start,end);
+			for (var v = start.value; v <= end.value; v++)
+			{
+				col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
+				prestudent_id = tree.view.getCellText(v,col);
+				data = data+';'+prestudent_id;
+			}
+		}
+	}
+	
+	stsem = getStudiensemester();
+	action = '<?php echo APP_ROOT; ?>content/statistik/studentenexport.xls.php?studiensemester_kurzbz='+stsem;
+	OpenWindowPost(action, data);
+	
+/*
 	var tree=document.getElementById('tree-verband');
 
 	//Wenn nichts markiert wurde -> beenden
@@ -1618,6 +1661,7 @@ function StudentExport()
 	//alert(url);
 	window.open(url,"","chrome,status=no, modal, width=400, height=250, centerscreen, resizable");
 	//window.location.href=url;	
+	*/
 }
 
 // **************** KONTO ******************
