@@ -228,7 +228,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$xml .= "				<bezeichnung><![CDATA[".$bezeichnung."]]></bezeichnung>";
 				$xml .= "				<note>".$note2."</note>";
 				$xml .= "				<sws>".($row->semesterstunden==0?'':sprintf('%.1f',$row->semesterstunden/$wochen))."</sws>";
-				$xml .= "				<ects>".$row->ects."</ects>";
+				$xml .= "				<ects>".number_format($row->ects,1)."</ects>";
 				$xml .= "			</unterrichtsfach>";
 			}
 		}

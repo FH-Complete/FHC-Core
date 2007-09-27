@@ -276,7 +276,7 @@
 							echo nl2br($qry);
 
 							//Wenn der Synclehreinheit Eintrag schon existiert dann den anderen loeschen sonst umbiegen
-							$qry = "SELECT * FROM sync.tbl_synclehreinheit WHERE lehreinheit_id='$le_id_bleibt' AND lehreinheit_pk=(SELECT lehreinheit_pk FROM sync.tbl_synclehreinheit WHERE lehreinheit_id='$le_id_delete')";
+							$qry = "SELECT * FROM sync.tbl_synclehreinheit WHERE lehreinheit_id='$le_id_bleibt' AND lehreinheit_pk in(SELECT lehreinheit_pk FROM sync.tbl_synclehreinheit WHERE lehreinheit_id='$le_id_delete')";
 			
 							if($result = pg_query($conn, $qry))
 							{
@@ -285,7 +285,7 @@
 									$qry = "UPDATE sync.tbl_synclehreinheit SET lehreinheit_id='$le_id_bleibt' WHERE lehreinheit_id='$le_id_delete';";
 								}
 								else 
-									$qry = "DELETE FROM sync.tbl_synclehreinheit WHERE lehreinheit_id='$le_id_bleibt' AND lehreinheit_pk=(SELECT lehreinheit_pk FROM sync.tbl_synclehreinheit WHERE lehreinheit_id='$le_id_delete');";
+									$qry = "DELETE FROM sync.tbl_synclehreinheit WHERE lehreinheit_id='$le_id_bleibt' AND lehreinheit_pk in(SELECT lehreinheit_pk FROM sync.tbl_synclehreinheit WHERE lehreinheit_id='$le_id_delete');";
 								
 								pg_query($conn, $qry);
 								echo $qry.'<br>';
