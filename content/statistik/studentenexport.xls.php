@@ -42,13 +42,9 @@ $datum_obj = new datum();
 loadVariables($conn, $user);
 	
 	//Parameter holen
-	$studiengang_kz = $_GET['studiengang_kz'];
-	$semester = $_GET['semester'];
-	$verband = $_GET['verband'];
-	$gruppe = $_GET['gruppe'];
-	$gruppe_kurzbz = $_GET['gruppe_kurzbz'];
+	$data = $_POST['data'];
 	$studiensemester_kurzbz = $_GET['studiensemester_kurzbz'];
-	$typ = $_GET['typ'];
+	//$typ = $_GET['typ'];
 	$maxlength= array();
 	$zeile=1;
 	$zgv_arr=array();
@@ -157,79 +153,32 @@ loadVariables($conn, $user);
 	$maxlength[$i]=3;
 	$worksheet->write($zeile,++$i,"TELEFON", $format_bold);
 	$maxlength[$i]=3;
-	$worksheet->write($zeile,++$i,"GRUPPEn", $format_bold);
+	$worksheet->write($zeile,++$i,"GRUPPEN", $format_bold);
 	$maxlength[$i]=3;
 	
 	$zeile++;
+	
+	$ids = explode(';',$data);
+	$prestudent_ids = '';
+	
+	foreach ($ids as $id) 
+	{
+		if($id!='')
+		{
+			if($prestudent_ids!='')
+				$prestudent_ids .= ',';
+			$prestudent_ids .= "'$id'";
+		}
+	}
 	// Student holen
-	if($typ=='student')
-	{
-		$where = '';
-		if ($gruppe_kurzbz!=null)
-		{
-			$where=" gruppe_kurzbz='".$gruppe_kurzbz."' ";
-			if($studiensemester_kurzbz!=null)
-				$where.=" AND tbl_benutzergruppe.studiensemester_kurzbz='$studiensemester_kurzbz'";
-		}
-		else
-		{
-			$where.=" tbl_studentlehrverband.studiengang_kz=$studiengang_kz";
-			if ($semester!=null)
-				$where.=" AND tbl_studentlehrverband.semester=$semester";
-			if ($verband!=null)
-				$where.=" AND tbl_studentlehrverband.verband='".$verband."'";
-			if ($gruppe!=null)
-				$where.=" AND tbl_studentlehrverband.gruppe='".$gruppe."'";
-		}
+	$qry = "SELECT * FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) LEFT JOIN public.tbl_student USING(prestudent_id) LEFT JOIN public.tbl_studentlehrverband USING(student_uid) WHERE (studiensemester_kurzbz='$studiensemester_kurzbz' OR studiensemester_kurzbz is null) AND prestudent_id in($prestudent_ids) ORDER BY nachname, vorname";
 
-		$where.=" AND tbl_studentlehrverband.studiensemester_kurzbz='$studiensemester_kurzbz'";
-
-		$sql_query="SELECT *						
-						FROM public.tbl_studentlehrverband JOIN public.tbl_student USING (student_uid)
-							JOIN public.tbl_benutzer ON (student_uid=uid) JOIN public.tbl_person p USING (person_id) 
-							JOIN public.tbl_prestudent using(prestudent_id)
-							";
-		
-		if($gruppe_kurzbz!=null)
-			$sql_query.= "JOIN public.tbl_benutzergruppe USING (uid) ";
-		
-		$sql_query.="WHERE ".$where.' ORDER BY nachname, vorname';
-		//echo $sql_query;
-		if($result = pg_query($conn, $sql_query))
+	if($result = pg_query($conn, $qry))
+		while($row = pg_fetch_object($result))
 		{
-			while($row = pg_fetch_object($result))
-			{
-				draw_content($row);
-				$zeile++;
-			}
+			draw_content($row);
+			$zeile++;
 		}
-	}
-	elseif(in_array($typ, array('prestudent', 'interessenten','bewerber','aufgenommen',
-	                      'warteliste','absage','zgv','reihungstestangemeldet',
-	                      'reihungstestnichtangemeldet')))
-	{
-		$prestd = new prestudent($conn, null, false);
-
-		if($studiengang_kz!=null)
-		{
-			if($prestd->loadIntessentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester, $typ))
-			{
-				foreach ($prestd->result as $row)
-				{
-					$student=new student($conn,null,false);
-					if($uid = $student->getUid($row->prestudent_id))
-					{
-						if(!$student->load($uid, $studiensemester_kurzbz))
-							$student->load($uid);
-						draw_content($student);
-					}
-					else
-						draw_content($row);
-					$zeile++;
-				}
-			}
-		}
-	}
 
 	function draw_content($row)
 	{
@@ -243,11 +192,11 @@ loadVariables($conn, $user);
 		$status = $prestudent->rolle_kurzbz;
 			
 		$i=0;
-		if(isset($row->uid))
+		if(isset($row->student_uid))
 		{
-			if(strlen($row->uid)>$maxlength[$i])
-				$maxlength[$i] = strlen($row->uid);
-			$worksheet->write($zeile,$i, $row->uid);
+			if(strlen($row->student_uid)>$maxlength[$i])
+				$maxlength[$i] = strlen($row->student_uid);
+			$worksheet->write($zeile,$i, $row->student_uid);
 		}
 		$i++;
 		
@@ -369,11 +318,11 @@ loadVariables($conn, $user);
 		$worksheet->write($zeile,$i, $status);
 		$i++;
 		
-		if(isset($row->uid))
+		if(isset($row->student_uid))
 		{
-			if(strlen($row->uid.'@'.DOMAIN)>$maxlength[$i])
-				$maxlength[$i] = strlen($row->uid.'@'.DOMAIN);
-			$worksheet->write($zeile,$i, $row->uid.'@'.DOMAIN);
+			if(strlen($row->student_uid.'@'.DOMAIN)>$maxlength[$i])
+				$maxlength[$i] = strlen($row->student_uid.'@'.DOMAIN);
+			$worksheet->write($zeile,$i, $row->student_uid.'@'.DOMAIN);
 		}
 		$i++;
 		
