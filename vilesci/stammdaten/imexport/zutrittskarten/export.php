@@ -39,9 +39,12 @@ else
 					JOIN public.tbl_studiengang USING (studiengang_kz))
 				USING (person_id)
 			WHERE betriebsmitteltyp='Zutrittskarte' AND nummer NOT IN (SELECT physaswnumber FROM sync.tbl_zutrittskarte)
-			GROUP BY svnr,vorname,nachname,nummerintern,nummer, vw_betriebsmittelperson.insertamum;";*/
+			GROUP BY svnr,vorname,nachname,nummerintern,nummer, vw_betriebsmittelperson.insertamum;";
+*/
+
 $sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer, uid, matrikelnr, kurzbzlang AS stg_kurzbzlang,
-		upper(typ)||upper(kurzbz) AS stg_kurzbz, EXTRACT(DAY FROM vw_betriebsmittelperson.insertamum) AS tag,
+				upper(typ)||upper(kurzbz) AS stg_kurzbz,
+				EXTRACT(DAY FROM vw_betriebsmittelperson.insertamum) AS tag,
 				EXTRACT(MONTH FROM vw_betriebsmittelperson.insertamum) AS monat,
 				EXTRACT(YEAR FROM vw_betriebsmittelperson.insertamum) AS jahr
 			FROM public.vw_betriebsmittelperson
@@ -53,20 +56,18 @@ if(!$result_neu=pg_exec($conn, $sql_query))
 	die(pg_errormessage().'<BR>'.$sql_query);
 
 // Updates von Zutrittskarten
-$sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer,firstname,name,key,
-				max(tbl_benutzer.uid) AS uid, max(matrikelnr) AS matrikelnr, max(kurzbzlang) AS stg_kurzbzlang,
-				upper(max(typ) || max(kurzbz)) AS stg_kurzbz, text1,
+$sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer,firstname,name,key, uid, matrikelnr,
+				kurzbzlang AS stg_kurzbzlang, upper(typ)||upper(kurzbz) AS stg_kurzbz, text1,
 				EXTRACT(DAY FROM vw_betriebsmittelperson.insertamum) AS tag,
 				EXTRACT(MONTH FROM vw_betriebsmittelperson.insertamum) AS monat,
 				EXTRACT(YEAR FROM vw_betriebsmittelperson.insertamum) AS jahr
 			FROM public.vw_betriebsmittelperson
-				LEFT OUTER JOIN (public.tbl_benutzer JOIN public.tbl_student ON (uid=student_uid)
-					JOIN public.tbl_studiengang USING (studiengang_kz))
-				USING (person_id) JOIN sync.tbl_zutrittskarte ON (physaswnumber=nummer)
-			WHERE trim(vw_betriebsmittelperson.nachname)!=trim(tbl_zutrittskarte.name)
-				OR trim(vw_betriebsmittelperson.vorname)!=trim(tbl_zutrittskarte.firstname)
-				OR trim(vw_betriebsmittelperson.uid)!=trim(tbl_zutrittskarte.text1)
-			GROUP BY svnr,vorname,nachname,nummerintern,nummer,firstname,name,key,vw_betriebsmittelperson.insertamum,text1;";
+				 LEFT OUTER JOIN (public.tbl_student JOIN public.tbl_studiengang USING (studiengang_kz)) ON (uid=student_uid)
+				 JOIN sync.tbl_zutrittskarte ON (physaswnumber=nummer)
+			WHERE benutzer_aktiv AND retouram IS NULL
+				AND (trim(vw_betriebsmittelperson.nachname)!=trim(tbl_zutrittskarte.name)
+					OR trim(vw_betriebsmittelperson.vorname)!=trim(tbl_zutrittskarte.firstname)
+					OR trim(vw_betriebsmittelperson.uid)!=trim(tbl_zutrittskarte.text1));";
 //echo $sql_query;
 if(!$result_upd=pg_exec($conn, $sql_query))
 	die(pg_errormessage().'<BR>'.$sql_query);
