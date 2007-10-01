@@ -890,4 +890,3 @@ function EinstellungenKontoFilterStgChange()
    
 	return true;
 }
-

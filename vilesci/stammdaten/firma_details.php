@@ -62,7 +62,7 @@
 				$reloadstr .= "	parent.uebersicht.location.href='firma_uebersicht.php';";
 				$reloadstr .= "</script>\n";
 			}
-			else 
+			else
 			{
 				$errorstr = 'Datensatz konnte nicht gespeichert werden: '.$firma->errormsg;
 			}

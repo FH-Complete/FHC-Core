@@ -84,6 +84,16 @@ function disablefields2(val)
 	document.getElementById('plz').disabled=val;
 	document.getElementById('ort').disabled=val;
 }
+
+function AnredeChange()
+{
+	anrede = document.getElementById('anrede').value;
+	
+	if(anrede=='Herr')
+		document.getElementById('geschlecht').value='m';
+	if(anrede=='Frau')
+		document.getElementById('geschlecht').value='w';
+}
 </script>
 </head>
 <body>
@@ -515,7 +525,7 @@ if(isset($_POST['save']))
 	if(!$error)
 	{
 		pg_query($conn, 'COMMIT');
-		die("<b>".($incoming?'Incomming':'Interessent')." $vorname $nachname wurde erfolgreich angelegt</b><br>");
+		die("<b>".($incoming?'Incomming':'Interessent')." $vorname $nachname wurde erfolgreich angelegt</b><br><br><a href='interessentenimport.php?studiengang_kz=$studiengang_kz'>Neue Person Anlegen</a>");
 	}
 	else
 	{
@@ -557,7 +567,7 @@ if($geburtsdatum!='')
 <!--Formularfelder-->
 <table>
 <?php
-echo '<tr><td>Anrede</td><td><input type="text" id="anrede" name="anrede" maxlength="64" value="'.$anrede.'" /></td></tr>';
+echo '<tr><td>Anrede</td><td><input type="text" id="anrede" name="anrede" maxlength="64" value="'.$anrede.'"  onblur="AnredeChange()"/></td></tr>';
 echo '<tr><td>Titel(Pre)</td><td><input type="text" id="titel" name="titel" maxlength="64" value="'.$titel.'" /></td></tr>';
 echo '<tr><td>Vorname</td><td><input type="text" id="vorname" maxlength="32" name="vorname" value="'.$vorname.'" /></td></tr>';
 echo '<tr><td>Nachname</td><td><input type="text" maxlength="64" id="nachname" name="nachname" value="'.$nachname.'" /></td></tr>';
@@ -605,7 +615,7 @@ echo '<tr><td>Studiensemester</td><td><SELECT id="studiensemester_kurzbz" name="
 $stsem = new studiensemester($conn);
 $stsem->getAll();
 foreach ($stsem->studiensemester as $row)
-	echo '<OPTION value="'.$row->studiensemester_kurzbz.'" '.($row->studiensemester_kurzbz==$studiensemester_kurzbz?'selected':'').'>'.$row->studiensemester_kurzbz.'</OPTION>';
+	echo '<OPTION value="'.$row->studiensemester_kurzbz.'" '.($row->studiensemester_kurzbz==$semester_aktuell?'selected':'').'>'.$row->studiensemester_kurzbz.'</OPTION>';
 echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><td>Ausbildungssemester</td><td><SELECT id="ausbildungssemester" name="ausbildungssemester">';
