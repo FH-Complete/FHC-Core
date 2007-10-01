@@ -41,19 +41,19 @@
 				//echo $$var;
 				$gewicht=$_POST[$var];
 				$stunde=$i+1;
-				$query="SELECT * FROM campus.tbl_zeitwunsch WHERE uid='$uid' AND stunde=$stunde AND tag=$t";
+				$query="SELECT * FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid='$uid' AND stunde=$stunde AND tag=$t";
 				if(! $erg_wunsch=pg_exec($conn, $query))
 					die(pg_last_error($conn));
 				$num_rows_wunsch=pg_num_rows($erg_wunsch);
 				if ($num_rows_wunsch==0)
 				{
-					$query="INSERT INTO campus.tbl_zeitwunsch (uid, stunde, tag, gewicht) VALUES ('$uid', $stunde, $t, $gewicht)";
+					$query="INSERT INTO campus.tbl_zeitwunsch (mitarbeiter_uid, stunde, tag, gewicht) VALUES ('$uid', $stunde, $t, $gewicht)";
 					if(!($erg=pg_exec($conn, $query)))
 						die(pg_last_error($conn));
 				}
 				elseif ($num_rows_wunsch==1)
 				{
-					$query="UPDATE campus.tbl_zeitwunsch SET gewicht=$gewicht WHERE uid='$uid' AND stunde=$stunde AND tag=$t";
+					$query="UPDATE campus.tbl_zeitwunsch SET gewicht=$gewicht WHERE mitarbeiter_uid='$uid' AND stunde=$stunde AND tag=$t";
 					//echo $query;
 					if(!($erg=pg_exec($conn, $query)))
 						die(pg_last_error($conn));
