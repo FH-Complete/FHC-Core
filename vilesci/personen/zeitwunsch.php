@@ -8,11 +8,13 @@
 
 	include('../config.inc.php');
 	include('../../include/functions.inc.php');
+	include('../../include/globals.inc.php');
 
 	if (isset($_GET['uid']))
 	{
 		$uid=$_GET['uid'];
-	} else if (isset($_POST['uid']))
+	} 
+	else if (isset($_POST['uid']))
 	{
 		$uid=$_POST['uid'];
 	}
@@ -21,12 +23,11 @@
 		die( "uid nicht gesetzt");
 	}
 
-
 	if (!$conn = @pg_pconnect(CONN_STRING))
 	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
 
 	//Stundentabelleholen
-	if(! $result_stunde=pg_exec($conn, "SELECT * FROM tbl_stunde ORDER BY stunde"))
+	if(! $result_stunde=pg_exec($conn, "SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
 		die(pg_last_error($conn));
 	$num_rows_stunde=pg_numrows($result_stunde);
 
@@ -40,19 +41,19 @@
 				//echo $$var;
 				$gewicht=$_POST[$var];
 				$stunde=$i+1;
-				$query="SELECT * FROM tbl_zeitwunsch WHERE uid='$uid' AND stunde=$stunde AND tag=$t";
+				$query="SELECT * FROM campus.tbl_zeitwunsch WHERE uid='$uid' AND stunde=$stunde AND tag=$t";
 				if(! $erg_wunsch=pg_exec($conn, $query))
 					die(pg_last_error($conn));
 				$num_rows_wunsch=pg_num_rows($erg_wunsch);
 				if ($num_rows_wunsch==0)
 				{
-					$query="INSERT INTO tbl_zeitwunsch (uid, stunde, tag, gewicht) VALUES ('$uid', $stunde, $t, $gewicht)";
+					$query="INSERT INTO campus.tbl_zeitwunsch (uid, stunde, tag, gewicht) VALUES ('$uid', $stunde, $t, $gewicht)";
 					if(!($erg=pg_exec($conn, $query)))
 						die(pg_last_error($conn));
 				}
 				elseif ($num_rows_wunsch==1)
 				{
-					$query="UPDATE tbl_zeitwunsch SET gewicht=$gewicht WHERE uid='$uid' AND stunde=$stunde AND tag=$t";
+					$query="UPDATE campus.tbl_zeitwunsch SET gewicht=$gewicht WHERE uid='$uid' AND stunde=$stunde AND tag=$t";
 					//echo $query;
 					if(!($erg=pg_exec($conn, $query)))
 						die(pg_last_error($conn));
@@ -62,7 +63,7 @@
 			}
 	}
 
-	if(!($erg=pg_exec($conn, "SELECT * FROM tbl_zeitwunsch WHERE uid='$uid'")))
+	if(!($erg=pg_exec($conn, "SELECT * FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid='$uid'")))
 		die(pg_last_error($conn));
 	$num_rows=pg_numrows($erg);
 	for ($i=0;$i<$num_rows;$i++)
@@ -72,11 +73,21 @@
 		$gewicht=pg_result($erg,$i,"gewicht");
 		$wunsch[$tag][$stunde]=$gewicht;
 	}
-
+	if(!isset($wunsch))
+	{
+		//6-16
+		for ($i=1;$i<7;$i++)
+		{
+			for ($j=0;$j<17;$j++)
+			{
+				$wunsch[$i][$j]='1';
+			}
+		}
+	}
 
 
 	// Personendaten
-	if(! $result=pg_exec($conn, "SELECT * FROM tbl_person WHERE uid='$uid'"))
+	if(! $result=pg_exec($conn, "SELECT * FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid='$uid'"))
 		die(pg_last_error($conn));
 	if (pg_numrows($result)==1)
 		$person=pg_fetch_object($result);
@@ -91,7 +102,7 @@
 </head>
 
 <body>
-<h2>Zeitw&uuml;nsche von <?php echo $person->titel.' '.$person->vornamen.' '.$person->nachname; ?></h2>
+<h2>Zeitw&uuml;nsche von <?php echo $person->titelpre.' '.$person->vornamen.' '.$person->nachname. ' '.$person->titelpost; ?></h2>
 
 <FORM name="zeitwunsch" method="post" action="zeitwunsch.php?type=save">
   <TABLE width="100%" border="1" cellspacing="0" cellpadding="0">
