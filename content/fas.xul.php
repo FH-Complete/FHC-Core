@@ -272,25 +272,33 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
             <menu id="menu-dokumente-studienerfolg" label="&menu-dokumente-studienerfolg.label;" accesskey="&menu-dokumente-studienerfolg.accesskey;">
 	          <menupopup id="menu-dokumente-studienerfolg-popup">
 	          <?php
-	          $stsem = new studiensemester($conn);
-	          $stsem_kurzbz = $stsem->getPrevious();
-	          echo '
-	           <menu id="menu-dokumente-studienerfolg-menu" label="'.$stsem_kurzbz.'">
-		          <menupopup id="menu-dokumente-studienerfolg-menu-popup">
-		            <menuitem
-		               id        =  "menu-dokumente-studienerfolg-menu-normal"
-		               key       =  "menu-dokumente-studienerfolg-normal:key"
-		               label     = "&menu-dokumente-studienerfolg-normal.label;"
-		               oncommand   =  "StudentCreateStudienerfolg(null, \''.$stsem_kurzbz.'\');"
-		               accesskey = "&menu-dokumente-studienerfolg-normal.accesskey;"/>
-		           	<menuitem
-		               id        =  "menu-dokumente-studienerfolg-finanzamt"
-		               key       =  "menu-dokumente-studienerfolg-finanzamt:key"
-		               label     = "&menu-dokumente-studienerfolg-finanzamt.label;"
-		               oncommand   =  "StudentCreateStudienerfolg(\'finanzamt\', \''.$stsem_kurzbz.'\');"
-		               accesskey = "&menu-dokumente-studienerfolg-finanzamt.accesskey;"/>
-		            </menupopup>
-		        </menu>';
+	          
+	          $qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ende<now() ORDER BY ende DESC LIMIT 5";
+	          if($result = pg_query($conn, $qry))
+	          {
+	          	while($row = pg_fetch_object($result))
+	          	{
+	          		$stsem_kurzbz = $row->studiensemester_kurzbz;
+	          		
+					echo '
+					<menu id="menu-dokumente-studienerfolg-menu" label="'.$stsem_kurzbz.'">
+					  <menupopup id="menu-dokumente-studienerfolg-menu-popup">
+					    <menuitem
+					       id        =  "menu-dokumente-studienerfolg-menu-normal"
+					       key       =  "menu-dokumente-studienerfolg-normal:key"
+					       label     = "&menu-dokumente-studienerfolg-normal.label;"
+					       oncommand   =  "StudentCreateStudienerfolg(null, \''.$stsem_kurzbz.'\');"
+					       accesskey = "&menu-dokumente-studienerfolg-normal.accesskey;"/>
+					   	<menuitem
+					       id        =  "menu-dokumente-studienerfolg-finanzamt"
+					       key       =  "menu-dokumente-studienerfolg-finanzamt:key"
+					       label     = "&menu-dokumente-studienerfolg-finanzamt.label;"
+					       oncommand   =  "StudentCreateStudienerfolg(\'finanzamt\', \''.$stsem_kurzbz.'\');"
+					       accesskey = "&menu-dokumente-studienerfolg-finanzamt.accesskey;"/>
+					    </menupopup>
+					</menu>';
+	          	}
+	          }
 	          	?>
 	            <menuitem
 	               id        =  "menu-dokumente-studienerfolg-normal"

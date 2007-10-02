@@ -108,7 +108,7 @@ if($result = pg_query($conn, $qry))
 		{
 			if($row_proj = pg_fetch_object($result_proj))
 			{
-				$qry_bet = "SELECT titelpre, vorname, nachname, titelpost FROM lehre.tbl_projektbetreuer JOIN public.tbl_person USING(person_id) WHERE projektarbeit_id='$row_proj->projektarbeit_id' LIMIT 1";
+				$qry_bet = "SELECT titelpre, vorname, nachname, titelpost FROM lehre.tbl_projektbetreuer JOIN public.tbl_person USING(person_id) WHERE projektarbeit_id='$row_proj->projektarbeit_id' AND (betreuerart_kurzbz='Erstbegutachter' OR betreuerart_kurzbz='Erstbetreuer') LIMIT 1";
 				if($result_bet = pg_query($conn, $qry_bet))
 					if($row_bet = pg_fetch_object($result_bet))
 						$betreuer = $row_bet->titelpre.' '.$row_bet->vorname.' '.$row_bet->nachname.' '.$row_bet->titelpost;
