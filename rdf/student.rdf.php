@@ -542,7 +542,7 @@ else
 
 			$stsem->load($ss);
 
-			$qry = "SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='$student->prestudent_id' AND studiensemester_kurzbz='$ss'";
+			$qry = "SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='$student->prestudent_id' AND studiensemester_kurzbz='$ss' ORDER BY datum DESC";
 			$semester=0;
 			if($result = pg_query($conn, $qry))
 			{
