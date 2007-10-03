@@ -334,7 +334,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									</template>
 								</menulist>
 							
-								<button id="student-prestudent-button-reihungstest-refresh" image="../skin/images/refresh.png" tooltiptext="Liste neu laden" onclick="StudentReihungstestDropDownRefresh()"/>
+								<toolbarbutton id="student-prestudent-button-reihungstest-refresh" image="../skin/images/refresh.png" tooltiptext="Liste neu laden" onclick="StudentReihungstestDropDownRefresh()"/>
 								
 							</hbox>
     					</row>
