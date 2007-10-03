@@ -308,33 +308,37 @@
 		echo '</FORM>';
 		
 		echo '<HR>';	
-		echo "<a href='".$_SERVER['PHP_SELF']."?reihungstest_id=$reihungstest_id&excel=true'>Excel Export</a><br><br>";
-		//Liste der Interessenten die zum Reihungstest angemeldet sind
-		$qry = "SELECT *, (SELECT kontakt FROM tbl_kontakt WHERE kontakttyp='email' AND person_id=tbl_prestudent.person_id ORDER BY zustellung LIMIT 1) as email FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE reihungstest_id='$reihungstest_id' ORDER BY nachname, vorname";
-		$mailto = '';
-		if($result = pg_query($conn, $qry))
+		if($reihungstest_id!='')
 		{
-			echo 'Anzahl: '.pg_num_rows($result);
-			
-			echo "<table class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'><thead><tr class='liste'><th class='table-sortable:default'>Vorname</th><th class='table-sortable:default'>Nachname</th><th class='table-sortable:default'>Studiengang</th><th class='table-sortable:default'>Geburtsdatum</th><th>EMail</th></tr></thead><tbody>";
-			while($row = pg_fetch_object($result))
+			echo "<a href='".$_SERVER['PHP_SELF']."?reihungstest_id=$reihungstest_id&excel=true'>Excel Export</a><br><br>";
+			//Liste der Interessenten die zum Reihungstest angemeldet sind
+			$qry = "SELECT *, (SELECT kontakt FROM tbl_kontakt WHERE kontakttyp='email' AND person_id=tbl_prestudent.person_id ORDER BY zustellung LIMIT 1) as email FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE reihungstest_id='$reihungstest_id' ORDER BY nachname, vorname";
+			$mailto = '';
+			if($result = pg_query($conn, $qry))
 			{
-				echo "
-					<tr>
-						<td>$row->vorname</td>
-						<td>$row->nachname</td>
-						<td>".$stg_arr[$row->studiengang_kz]."</td>
-						<td>".$datum_obj->convertISODate($row->gebdatum)."</td>
-						<td><a href='mailto:$row->email'>$row->email</a></td>
-					</tr>";
+				echo 'Anzahl: '.pg_num_rows($result);
 				
-				$mailto.= ($mailto!=''?',':'').$row->email;
+				echo "<table class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'><thead><tr class='liste'><th class='table-sortable:default'>Vorname</th><th class='table-sortable:default'>Nachname</th><th class='table-sortable:default'>Studiengang</th><th class='table-sortable:default'>Geburtsdatum</th><th>EMail</th></tr></thead><tbody>";
+				while($row = pg_fetch_object($result))
+				{
+					echo "
+						<tr>
+							<td>$row->vorname</td>
+							<td>$row->nachname</td>
+							<td>".$stg_arr[$row->studiengang_kz]."</td>
+							<td>".$datum_obj->convertISODate($row->gebdatum)."</td>
+							<td><a href='mailto:$row->email'>$row->email</a></td>
+						</tr>";
+					
+					$mailto.= ($mailto!=''?',':'').$row->email;
+				}
+				echo "</tbody></table>";
+				echo "<br><a href='mailto:$mailto'>Mail an alle senden</a>";
 			}
-			echo "</tbody></table>";
-			echo "<br><a href='mailto:$mailto'>Mail an alle senden</a>";
 		}
 		echo '
 				</body>
 				</html>';
+		
 	}
 ?>
