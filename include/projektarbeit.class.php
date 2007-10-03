@@ -152,30 +152,30 @@ class projektarbeit
 		//$this->errormsg='Eine der Gesamtlaengen wurde ueberschritten';
 		if ($this->projekttyp_kurzbz==null)
 		{
-			$this->errormsg='Projekttyp_kurzbz darf nicht NULL sein! - student_uid: '.$this->student_uid;
+			$this->errormsg='Projekttyp_kurzbz darf nicht NULL sein!';
 		}
 		if ($this->lehreinheit_id==null)
 		{
-			$this->errormsg='Lehreinheit_id darf nicht NULL sein! - student_uid: '.$this->student_uid;
+			$this->errormsg='Lehreinheit_id darf nicht NULL sein!';
 		}
 		if(strlen($this->projekttyp_kurzbz)>16)
 		{
-			$this->errormsg = 'Projektyp_kurzbz darf nicht länger als 16 Zeichen sein  - student_uid: '.$this->student_uid;
+			$this->errormsg = 'Projektyp_kurzbz darf nicht länger als 16 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->titel)>256)
 		{
-			$this->errormsg = 'Titel darf nicht länger als 256 Zeichen sein - student_uid: '.$this->student_uid;
+			$this->errormsg = 'Titel darf nicht länger als 256 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->themenbereich)>64)
 		{
-			$this->errormsg = 'Themenbereich darf nicht länger als 64 Zeichen sein - student_uid: '.$this->student_uid;
+			$this->errormsg = 'Themenbereich darf nicht länger als 64 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->anmerkung)>256)
 		{
-			$this->errormsg = 'Anmerkung darf nicht länger als 256 Zeichen sein - student_uid: '.$this->student_uid;
+			$this->errormsg = 'Anmerkung darf nicht länger als 256 Zeichen sein';
 			return false;
 		}
 		/*if(!is_numeric($this->note))
@@ -183,29 +183,29 @@ class projektarbeit
 			$this->errormsg = 'Note muß ein numerischer Wert sein - student_uid: '.$this->student_uid;
 			return false;
 		}*/
-		if(!is_numeric($this->punkte))
+		if($this->punkte!='' && !is_numeric($this->punkte))
 		{
-			$this->errormsg = 'Punkte muß ein numerischer Wert sein - student_uid: '.$this->student_uid;
+			$this->errormsg = 'Punkte muss ein numerischer Wert sein';
 			return false;
 		}
-		if(!is_numeric($this->faktor))
+		if($this->faktor!='' && !is_numeric($this->faktor))
 		{
-			$this->errormsg = 'Faktor muß ein numerischer Wert sein - student_uid: '.$this->student_uid;
+			$this->errormsg = 'Faktor muss ein numerischer Wert sein';
 			return false;
 		}
-		if(!is_numeric($this->stundensatz))
+		if($this->stundensatz!='' && !is_numeric($this->stundensatz))
 		{
-			$this->errormsg = 'Stundensatz muß ein numerischer Wert sein - student_uid: '.$this->student_uid;
+			$this->errormsg = 'Stundensatz muss ein numerischer Wert sein';
 			return false;
 		}
-		if(!is_numeric($this->gesamtstunden))
+		if($this->gesamtstunden!='' && !is_numeric($this->gesamtstunden))
 		{
-			$this->errormsg = 'Gesamtstunden muß ein numerischer Wert sein - student_uid: '.$this->student_uid;
+			$this->errormsg = 'Gesamtstunden muss ein numerischer Wert sein';
 			return false;
 		}
 		if(!is_bool($this->freigegeben))
 		{
-			$this->errormsg = 'freigegeben ist ungueltig - student_uid: '.$this->student_uid;
+			$this->errormsg = 'freigegeben ist ungueltig';
 			return false;
 		}
 

@@ -474,6 +474,10 @@ function StudentProjektarbeitSpeichern()
 		alert('Bitte eine Lehreinheit Auswaehlen');
 		return false;
 	}
+	
+	if(isNaN(gesamtstunden))
+		gesamtstunden=0;
+	
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 
