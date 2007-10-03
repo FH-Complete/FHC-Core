@@ -57,10 +57,11 @@ if($result = pg_query($conn, $qry))
 		$ende[$row->studiensemester_kurzbz]=$row->ende;
 	}
 }
-$qryall="SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter WHERE aktiv ORDER by nachname,vorname;";
+$qryall='SELECT uid,nachname,vorname, count(bisverwendung_id) FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) WHERE aktiv AND (ende>now() OR ende IS NULL) GROUP BY uid,nachname,vorname HAVING count(bisverwendung_id)!=1 ORDER by nachname,vorname;';
 if($resultall = pg_query($conn, $qryall))
 {
-	echo '<H2>Bei $anz Mitarbeitern sind die aktuellen Verwendungen nicht plausibel</H2>';
+	$num_rows=pg_num_rows($resultall);
+	echo "<H2>Bei $num_rows Mitarbeitern sind die aktuellen Verwendungen nicht plausibel</H2>";
 	while($rowall=pg_fetch_object($resultall))
 	{
 		$i=0;
@@ -68,8 +69,7 @@ if($resultall = pg_query($conn, $qryall))
 			WHERE tbl_benutzer.aktiv=TRUE AND (ende>now() OR ende IS NULL) AND mitarbeiter_uid='".$rowall->uid."';";
 		if($result = pg_query($conn, $qry))
 		{
-			$num_rows=pg_num_rows($result);
-			if($num_rows>1)
+			if(pg_num_rows($result)>1)
 			{
 				while($row=pg_fetch_object($result))
 				{
