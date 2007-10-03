@@ -60,6 +60,7 @@
 			{
 				$reloadstr .= "<script type='text/javascript'>\n";
 				$reloadstr .= "	parent.uebersicht.location.href='firma_uebersicht.php';";
+				$reloadstr .= " window.top.opener.StudentProjektarbeitFirmaRefresh();";
 				$reloadstr .= "</script>\n";
 			}
 			else

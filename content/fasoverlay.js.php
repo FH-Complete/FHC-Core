@@ -801,6 +801,30 @@ function BISMitarbeiterImport()
 }
 
 // ****
+// * Oeffnet Script zum generieren der BIS-Meldung
+// ****
+function BISMitarbeiterExport()
+{
+	window.open('<?php echo APP_ROOT ?>vilesci/bis/personalmeldung.php','Generieren','');
+}
+
+// ****
+// * Oeffnet Script zum Checken der Verwendung
+// ****
+function BISMitarbeiterCheckVerwendung()
+{
+	window.open('<?php echo APP_ROOT ?>vilesci/bis/checkverwendung.php','CheckVerwendung','');
+}
+
+// ****
+// * oeffnet Script zum Checken der Funktion
+// ****
+function BISMitarbeiterCheckFunktion()
+{
+	window.open('<?php echo APP_ROOT ?>vilesci/bis/checkfunktion.php','CheckFunktion','');
+}
+
+// ****
 // * Oeffnet den About Dialog
 // ****
 function OpenAboutDialog()
