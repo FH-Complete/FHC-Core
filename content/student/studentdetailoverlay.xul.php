@@ -321,17 +321,22 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       							<button id="student-prestudent-button-anmeldungreihungstest-heute" label="Heute" oncommand="StudentAnmeldungreihungstestHeute()" disabled="true" style="margin:0px;"/>
       						</hbox>
       						<label value="Reihungstest" control="student-prestudent-menulist-reihungstest"/>
-      						<menulist id="student-prestudent-menulist-reihungstest" disabled="true"
-							          datasources="<?php echo APP_ROOT ?>rdf/reihungstest.rdf.php?optional=true" flex="1"
-						              ref="http://www.technikum-wien.at/reihungstest/alle" >
-								<template>
-									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/reihungstest/rdf#reihungstest_id"
-							        		      label="rdf:http://www.technikum-wien.at/reihungstest/rdf#bezeichnung"
-										  		  uri="rdf:*"/>
-										</menupopup>
-								</template>
-							</menulist>
+      						<hbox>
+	      						<menulist id="student-prestudent-menulist-reihungstest" disabled="true"
+								          datasources="<?php echo APP_ROOT ?>rdf/reihungstest.rdf.php?optional=true" flex="1"
+							              ref="http://www.technikum-wien.at/reihungstest/alle" >
+									<template>
+										<menupopup>
+											<menuitem value="rdf:http://www.technikum-wien.at/reihungstest/rdf#reihungstest_id"
+								        		      label="rdf:http://www.technikum-wien.at/reihungstest/rdf#bezeichnung"
+											  		  uri="rdf:*"/>
+											</menupopup>
+									</template>
+								</menulist>
+							
+								<button id="student-prestudent-button-reihungstest-refresh" image="../skin/images/refresh.png" tooltiptext="Liste neu laden" onclick="StudentReihungstestDropDownRefresh()"/>
+								
+							</hbox>
     					</row>
     					<row>
       						<label value="Zum Reihungstest angetreten" control="student-prestudent-checkbox-reihungstestangetreten"/>

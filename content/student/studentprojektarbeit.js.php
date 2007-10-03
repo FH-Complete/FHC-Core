@@ -413,8 +413,8 @@ function StudentProjektarbeitFirmaRefresh()
 	tree.builder.rebuild();
 	
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-	StudentProjektbetreuerTreeDatasource = rdfService.GetDataSource(url);
-	tree.database.AddDataSource(StudentProjektbetreuerTreeDatasource);
+	var myDatasource = rdfService.GetDataSource(url);
+	tree.database.AddDataSource(myDatasource);
 }
 
 // ****

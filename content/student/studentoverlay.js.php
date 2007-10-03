@@ -3579,3 +3579,24 @@ function StudentFunktionIFrameUnLoad()
 {
 	document.getElementById('student-funktionen').setAttribute('src','');
 }
+
+function StudentReihungstestDropDownRefresh()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-prestudent-menulist-reihungstest');
+	var url="<?php echo APP_ROOT ?>rdf/reihungstest.rdf.php?optional=true&"+gettimestamp();
+	
+	//Alte DS entfernen
+	var oldDatasources = tree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		tree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	tree.builder.rebuild();
+	
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var myDatasource = rdfService.GetDataSource(url);
+	tree.database.AddDataSource(myDatasource);
+	SetStatusBarText('Reihungstest Liste wurde aktualisiert')
+}

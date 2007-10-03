@@ -180,7 +180,7 @@
 				
 				if($reihungstest->save())
 				{
-					echo 'Daten wurden erfolgreich gespeichert';
+					echo 'Daten wurden erfolgreich gespeichert <script>window.opener.StudentReihungstestDropDownRefresh();</script>';
 					$reihungstest_id = $reihungstest->reihungstest_id;
 					$stg_kz = $reihungstest->studiengang_kz;
 				}
@@ -252,6 +252,9 @@
 		{
 			if($stg_kz!=-1 && $stg_kz!='')
 				$reihungstest->studiengang_kz = $stg_kz;
+				
+			$reihungstest->datum = date('Y-m-d');
+			$reihungstest->uhrzeit = date('H:i:s');
 		}
 	
 		//Formular zum bearbeiten des Reihungstests
