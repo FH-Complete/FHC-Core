@@ -197,17 +197,20 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</row>
 						<row>
 							<label value="Firma" control="student-projektarbeit-menulist-firma"/>
-							<menulist id="student-projektarbeit-menulist-firma" disabled="true"
-							          datasources="<?php echo APP_ROOT ?>rdf/firma.rdf.php?optional=true" flex="1"
-							          ref="http://www.technikum-wien.at/firma/liste" >
-								<template>
-									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/firma/rdf#firma_id"
-							        		      label="rdf:http://www.technikum-wien.at/firma/rdf#name"
-										  		  uri="rdf:*"/>
-										</menupopup>
-								</template>
-							</menulist>
+							<hbox>
+								<menulist id="student-projektarbeit-menulist-firma" disabled="true"
+								          datasources="<?php echo APP_ROOT ?>rdf/firma.rdf.php?optional=true" flex="1"
+								          ref="http://www.technikum-wien.at/firma/liste" >
+									<template>
+										<menupopup>
+											<menuitem value="rdf:http://www.technikum-wien.at/firma/rdf#firma_id"
+								        		      label="rdf:http://www.technikum-wien.at/firma/rdf#name"
+											  		  uri="rdf:*"/>
+											</menupopup>
+									</template>
+								</menulist>
+								<toolbarbutton id="student-projektarbeit-button-firma-refresh" image="../skin/images/refresh.png" tooltiptext="Liste neu laden" onclick="StudentProjektarbeitFirmaRefresh()"/>
+							</hbox>
 						</row>
 						<row>
 							<label value="Lehrveranstaltung" control="student-projektarbeit-menulist-lehrveranstaltung"/>
