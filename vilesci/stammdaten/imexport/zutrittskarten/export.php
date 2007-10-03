@@ -57,7 +57,7 @@ if(!$result_neu=pg_exec($conn, $sql_query))
 
 // Updates von Zutrittskarten
 $sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer,firstname,name,key, uid, matrikelnr,
-				kurzbzlang AS stg_kurzbzlang, upper(typ)||upper(kurzbz) AS stg_kurzbz, text1,
+				kurzbzlang AS stg_kurzbzlang, upper(typ)||upper(kurzbz) AS stg_kurzbz, text1,pin,
 				EXTRACT(DAY FROM vw_betriebsmittelperson.insertamum) AS tag,
 				EXTRACT(MONTH FROM vw_betriebsmittelperson.insertamum) AS monat,
 				EXTRACT(YEAR FROM vw_betriebsmittelperson.insertamum) AS jahr
@@ -71,6 +71,19 @@ $sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer,firstname,name,key,
 //echo $sql_query;
 if(!$result_upd=pg_exec($conn, $sql_query))
 	die(pg_errormessage().'<BR>'.$sql_query);
+
+// Loeschen von Zutrittskarten
+$sql_query="SELECT *
+			FROM sync.tbl_zutrittskarte
+			WHERE physaswnumber NOT IN
+				(SELECT nummer
+					FROM public.vw_betriebsmittelperson
+					WHERE betriebsmitteltyp='Zutrittskarte' AND retouram IS NULL
+				);";	// AND benutzer_aktiv
+//echo $sql_query;
+if(!$result_del=pg_exec($conn, $sql_query))
+	die(pg_errormessage().'<BR>'.$sql_query);
+
 
 
 //------------ Excel init --------------------------
@@ -163,10 +176,34 @@ while ($row=pg_fetch_object($result_upd))
 	$worksheet->write($z,9, $row->uid);
 	$worksheet->write($z,10,$row->matrikelnr);
 	$worksheet->write($z,11,'');
-	$worksheet->write($z,12,'');
-	$worksheet->write($z,13,$row->text1);
-	$worksheet->write($z,14,$row->name);
-	$worksheet->write($z,15,$row->firstname);
+	$worksheet->write($z,12,$row->text1);
+	$worksheet->write($z,13,$row->name);
+	$worksheet->write($z,14,$row->firstname);
+	$worksheet->write($z,15,$row->pin);
+	$worksheet->write($z,16,'0');
+	$z++;
+}
+
+// Loeschen von Zutrittskarten
+while ($row=pg_fetch_object($result_del))
+{
+	$command='d';
+	$worksheet->write($z,0, $command);
+	$worksheet->write($z,1, $row->key);
+	$worksheet->write($z,2, $row->name);
+	$worksheet->write($z,3, $row->firstname);
+	$worksheet->write($z,4, $row->groupe);
+	$worksheet->write($z,5, $row->logaswnumber);
+	$worksheet->write($z,6, $row->physaswnumber);
+	$worksheet->write($z,7, $row->validstart);
+	$worksheet->write($z,8, $row->validend);
+	$worksheet->write($z,9, $row->text1);
+	$worksheet->write($z,10,$row->text2);
+	$worksheet->write($z,11,$row->text3);
+	$worksheet->write($z,12,$row->text4);
+	$worksheet->write($z,13,$row->text5);
+	$worksheet->write($z,14,$row->text6);
+	$worksheet->write($z,15,$row->pin);
 	$worksheet->write($z,16,'0');
 	$z++;
 }
