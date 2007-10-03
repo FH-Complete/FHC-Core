@@ -395,6 +395,29 @@ function StudentProjektarbeitAuswahl()
 }
 
 // ****
+// * Refresht das Firma DropDown
+// ****
+function StudentProjektarbeitFirmaRefresh()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-projektarbeit-menulist-firma');
+	var url="<?php echo APP_ROOT ?>rdf/firma.rdf.php?optional=true&"+gettimestamp();
+	
+	//Alte DS entfernen
+	var oldDatasources = tree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		tree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	tree.builder.rebuild();
+	
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	StudentProjektbetreuerTreeDatasource = rdfService.GetDataSource(url);
+	tree.database.AddDataSource(StudentProjektbetreuerTreeDatasource);
+}
+
+// ****
 // * Speichert die Projektarbeit Daten
 // ****
 function StudentProjektarbeitSpeichern()
@@ -757,7 +780,7 @@ function StudentProjektbetreuerDetailDisableFields(val)
 // ****
 function StudentProjektbetreuerDetailReset()
 {
-	document.getElementById('student-projektbetreuer-textbox-faktor').value=document.getElementById('student-projektarbeit-textbox-faktor').value;
+	document.getElementById('student-projektbetreuer-textbox-faktor').value='1';
 	document.getElementById('student-projektbetreuer-textbox-name').value='';
 	document.getElementById('student-projektbetreuer-menulist-note').value='';
 	document.getElementById('student-projektbetreuer-menulist-betreuerart').value='Betreuer';
@@ -826,6 +849,12 @@ function StudentProjektbetreuerSpeichern()
 	
 	var tree = document.getElementById('student-projektarbeit-tree');
 
+	if(person_id=='')
+	{
+		alert('Bitte zuerst einen Betreuer auswaehlen');
+		return false;
+	}
+	
 	if (tree.currentIndex==-1)
 	{
 		alert('Projektarbeit muss ausgewaehlt sein');

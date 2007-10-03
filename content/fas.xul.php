@@ -95,6 +95,9 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-extras-reihungstest:command" oncommand="ExtrasShowReihungstest();"/>
   <command id="menu-extras-firma:command" oncommand="ExtrasShowFirmenverwaltung();"/>
   <command id="menu-bis-mitarbeiter-import:command" oncommand="BISMitarbeiterImport();"/>
+  <command id="menu-bis-mitarbeiter-export:command" oncommand="BISMitarbeiterExport();"/>
+  <command id="menu-bis-mitarbeiter-checkverwendung:command" oncommand="BISMitarbeiterCheckVerwendung();"/>
+  <command id="menu-bis-mitarbeiter-checkfunktion:command" oncommand="BISMitarbeiterCheckFunktion();"/>
   <command id="menu-help-close:command" oncommand="OpenAboutDialog()"/>
 </commandset>
 
@@ -336,18 +339,30 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 		<menupopup id="menu-bis-popup">
             <menu id="menu-bis-mitarbeiter" label="&menu-bis-mitarbeiter.label;" accesskey="&menu-bis-mitarbeiter.accesskey;">
          		<menupopup id="menu-bis-mitarbeiter-popup">
+         			<menuitem
+		               id        =  "menu-bis-mitarbeiter-checkverwendung"
+		               key       =  "menu-bis-mitarbeiter-checkverwendung:key"
+		               label     = "&menu-bis-mitarbeiter-checkverwendung.label;"
+		               command   =  "menu-bis-mitarbeiter-checkverwendung:command"
+		               accesskey = "&menu-bis-mitarbeiter-checkverwendung.accesskey;"/>
+		            <menuitem
+		               id        =  "menu-bis-mitarbeiter-checkfunktion"
+		               key       =  "menu-bis-mitarbeiter-checkfunktion:key"
+		               label     = "&menu-bis-mitarbeiter-checkfunktion.label;"
+		               command   =  "menu-bis-mitarbeiter-checkfunktion:command"
+		               accesskey = "&menu-bis-mitarbeiter-checkfunktion.accesskey;"/>
+         			<menuitem
+		               id        =  "menu-bis-mitarbeiter-export"
+		               key       =  "menu-bis-mitarbeiter-export:key"
+		               label     = "&menu-bis-mitarbeiter-export.label;"
+		               command   =  "menu-bis-mitarbeiter-export:command"
+		               accesskey = "&menu-bis-mitarbeiter-export.accesskey;"/>
 		            <menuitem
 		               id        =  "menu-bis-mitarbeiter-import"
 		               key       =  "menu-bis-mitarbeiter-import:key"
 		               label     = "&menu-bis-mitarbeiter-import.label;"
 		               command   =  "menu-bis-mitarbeiter-import:command"
 		               accesskey = "&menu-bis-mitarbeiter-import.accesskey;"/>
-		            <menuitem
-		               id        =  "menu-bis-mitarbeiter-export"
-		               key       =  "menu-bis-mitarbeiter-export:key"
-		               label     = "&menu-bis-mitarbeiter-export.label;"
-		               command   =  "menu-bis-mitarbeiter-export:command"
-		               accesskey = "&menu-bis-mitarbeiter-export.accesskey;"/>
 				</menupopup>
 			</menu>
 		</menupopup>
