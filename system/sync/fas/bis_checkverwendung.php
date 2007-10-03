@@ -72,7 +72,7 @@ if($resultall = pg_query($conn, $qryall))
 				{
 					if($i==0)
 					{
-						echo "<br><u>Mitarbeiter: ".$row->nachname." ".$row->vorname." hat ".pg_num_rows($result)." aktuelle Verwendungen:</u><br>";
+						echo "<br><u>Mitarbeiter(in): ".$row->nachname." ".$row->vorname." hat ".pg_num_rows($result)." aktuelle Verwendungen:</u><br>";
 						$i++;
 					}
 					echo "Verwendung Code ".$row->verwendung_code.", Beschäftigungscode ".$row->ba1code.", ".$row->ba2code.", mit Ausmaß ".$row->beschausmasscode.", ".$row->beginn." - ".$row->ende."<br>";
