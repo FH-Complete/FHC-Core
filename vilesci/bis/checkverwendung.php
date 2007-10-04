@@ -45,7 +45,7 @@ function myaddslashes($var)
 	<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-<H1>BIS-Verwendungen werden &uuml;berpr&uuml;ft</H1>
+<br><H1>BIS-Verwendungen werden &uuml;berpr&uuml;ft</H1><br><br>
 <?php
 
 $qry="SELECT * FROM public.tbl_studiensemester";
@@ -84,7 +84,7 @@ if($resultall = pg_query($conn, $qryall))
 				}
 			}
 			elseif($num_rows==0)
-				echo "<br><u>Mitarbeiter(in): ".$rowall->nachname." ".$rowall->vorname." hat ".$num_rows." aktuelle Verwendungen:</u><br>";
+				echo "<br><u>Aktiv(e) Mitarbeiter(in): ".$rowall->nachname." ".$rowall->vorname." hat ".$num_rows." aktuelle Verwendungen:</u><br>";
 		}
 	}
 }
@@ -102,20 +102,15 @@ if($resultall = pg_query($conn, $qryall))
 		if($result = pg_query($conn, $qry))
 		{
 			$num_rows=pg_num_rows($result);
-			//if($num_rows>1)
-			//{
-				while($row=pg_fetch_object($result))
+			while($row=pg_fetch_object($result))
+			{
+				if($i==0)
 				{
-					if($i==0)
-					{
-						echo "<br><u>Aktiv(e) Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname." hat keine aktuelle Verwendungen:</u><br>";
-						$i++;
-					}
-					echo "Verwendung Code ".$row->verwendung_code.", Beschäftigungscode ".$row->ba1code.", ".$row->ba2code.", mit Ausmaß ".$row->beschausmasscode.", ".$row->beginn." - ".$row->ende."<br>";
+					echo "<br><u>Aktiv(e) Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname." hat keine aktuelle Verwendungen:</u><br>";
+					$i++;
 				}
-			//}
-			//elseif($num_rows==0)
-			//	echo "<br><u>Mitarbeiter(in): ".$rowall->nachname." ".$rowall->vorname." hat ".$num_rows." aktuelle Verwendungen:</u><br>";
+				echo "Verwendung Code ".$row->verwendung_code.", Beschäftigungscode ".$row->ba1code.", ".$row->ba2code.", mit Ausmaß ".$row->beschausmasscode.", ".$row->beginn." - ".$row->ende."<br>";
+			}
 		}
 	}
 }
@@ -135,7 +130,6 @@ if($resultall = pg_query($conn, $qryall))
 	echo "<br><br><H2>Bei $num_rows_all nicht aktiven Mitarbeitern sind die aktuellen Verwendungen nicht plausibel</H2>";
 	while($rowall=pg_fetch_object($resultall))
 	{
-	//	echo "<br><u>Mitarbeiter(in) (.$rowall->aktiv.) ".$rowall->nachname." ".$rowall->vorname." hat aktuelle Verwendungen:</u><br>";
 		$i=0;
 		$qry="SELECT * FROM bis.tbl_bisverwendung 
 			WHERE (ende>now() OR ende IS NULL) AND mitarbeiter_uid='".$rowall->uid."';";
