@@ -175,8 +175,6 @@ if($result = pg_query($conn, $qry))
 	//Gesamtkosten anzeigen
 	$worksheet->writeNumber($zeile,6,$gesamtkosten, $format_number_bold);
 }
-	foreach($maxlength as $i=>$breite)
-		$worksheet->setColumn($i, $i, $breite+2);
 	
 	$workbook->close();
 ?>
