@@ -57,11 +57,12 @@ if($result = pg_query($conn, $qry))
 		$ende[$row->studiensemester_kurzbz]=$row->ende;
 	}
 }
-$qryall='SELECT uid,nachname,vorname, count(bisverwendung_id) FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) WHERE aktiv AND (ende>now() OR ende IS NULL) GROUP BY uid,nachname,vorname HAVING count(bisverwendung_id)!=1 ORDER by nachname,vorname;';
+//1 - aktive mitarbeiter mit keiner verwendung oder mehr als einer aktuellen verwendung
+$qryall='SELECT uid,nachname,vorname, count(bisverwendung_id)  FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) WHERE aktiv AND (ende>now() OR ende IS NULL) GROUP BY uid,nachname,vorname HAVING count(bisverwendung_id)!=1 ORDER by nachname,vorname;';
 if($resultall = pg_query($conn, $qryall))
 {
 	$num_rows_all=pg_num_rows($resultall);
-	echo "<H2>Bei $num_rows_all Mitarbeitern sind die aktuellen Verwendungen nicht plausibel</H2>";
+	echo "<H2>Bei $num_rows_all aktiven Mitarbeitern sind die aktuellen Verwendungen nicht plausibel</H2>";
 	while($rowall=pg_fetch_object($resultall))
 	{
 		$i=0;
@@ -76,7 +77,7 @@ if($resultall = pg_query($conn, $qryall))
 				{
 					if($i==0)
 					{
-						echo "<br><u>Mitarbeiter(in): ".$row->nachname." ".$row->vorname." hat ".$num_rows." aktuelle Verwendungen:</u><br>";
+						echo "<br><u>Aktiv(e) Mitarbeiter(in) ".$row->nachname." ".$row->vorname." hat ".$num_rows." aktuelle Verwendungen:</u><br>";
 						$i++;
 					}
 					echo "Verwendung Code ".$row->verwendung_code.", Beschäftigungscode ".$row->ba1code.", ".$row->ba2code.", mit Ausmaß ".$row->beschausmasscode.", ".$row->beginn." - ".$row->ende."<br>";
@@ -84,6 +85,72 @@ if($resultall = pg_query($conn, $qryall))
 			}
 			elseif($num_rows==0)
 				echo "<br><u>Mitarbeiter(in): ".$rowall->nachname." ".$rowall->vorname." hat ".$num_rows." aktuelle Verwendungen:</u><br>";
+		}
+	}
+}
+//2 - aktive mitarbeiter mit keiner aktuellen verwendung
+$qryall='SELECT uid,nachname,vorname, count(bisverwendung_id) FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) WHERE aktiv AND NOT ende>now() AND NOT ende IS NULL AND uid NOT IN (SELECT uid FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) WHERE aktiv AND (ende>now() OR ende IS NULL)) GROUP BY uid,nachname,vorname ORDER by nachname,vorname;';
+if($resultall = pg_query($conn, $qryall))
+{
+	$num_rows_all=pg_num_rows($resultall);
+	echo "<br><br><H2>Bei $num_rows_all aktiven Mitarbeitern sind keine aktuellen Verwendungen eingetragen</H2>";
+	while($rowall=pg_fetch_object($resultall))
+	{
+		$i=0;
+		$qry="SELECT * FROM bis.tbl_bisverwendung JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid) JOIN public.tbl_person USING(person_id)
+			WHERE tbl_benutzer.aktiv=TRUE AND mitarbeiter_uid='".$rowall->uid."';";
+		if($result = pg_query($conn, $qry))
+		{
+			$num_rows=pg_num_rows($result);
+			//if($num_rows>1)
+			//{
+				while($row=pg_fetch_object($result))
+				{
+					if($i==0)
+					{
+						echo "<br><u>Aktiv(e) Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname." hat keine aktuelle Verwendungen:</u><br>";
+						$i++;
+					}
+					echo "Verwendung Code ".$row->verwendung_code.", Beschäftigungscode ".$row->ba1code.", ".$row->ba2code.", mit Ausmaß ".$row->beschausmasscode.", ".$row->beginn." - ".$row->ende."<br>";
+				}
+			//}
+			//elseif($num_rows==0)
+			//	echo "<br><u>Mitarbeiter(in): ".$rowall->nachname." ".$rowall->vorname." hat ".$num_rows." aktuelle Verwendungen:</u><br>";
+		}
+	}
+}
+
+//3 - nicht aktive mitarbeiter mitarbeiter mit aktueller verwendung
+$qryall='SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter 
+	JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) 
+	WHERE aktiv=false AND (ende>now() OR ende IS NULL) 
+	GROUP BY uid,nachname,vorname
+	ORDER by nachname,vorname;';
+
+
+
+if($resultall = pg_query($conn, $qryall))
+{
+	$num_rows_all=pg_num_rows($resultall);
+	echo "<br><br><H2>Bei $num_rows_all nicht aktiven Mitarbeitern sind die aktuellen Verwendungen nicht plausibel</H2>";
+	while($rowall=pg_fetch_object($resultall))
+	{
+	//	echo "<br><u>Mitarbeiter(in) (.$rowall->aktiv.) ".$rowall->nachname." ".$rowall->vorname." hat aktuelle Verwendungen:</u><br>";
+		$i=0;
+		$qry="SELECT * FROM bis.tbl_bisverwendung 
+			WHERE (ende>now() OR ende IS NULL) AND mitarbeiter_uid='".$rowall->uid."';";
+		if($result = pg_query($conn, $qry))
+		{
+			$num_rows=pg_num_rows($result);
+			while($row=pg_fetch_object($result))
+			{
+				if($i==0)
+				{
+					echo "<br><u>Nicht aktive(r) Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname." hat ".$num_rows." aktuelle Verwendungen:</u><br>";
+					$i++;
+				}
+				echo "Verwendung Code ".$row->verwendung_code.", Beschäftigungscode ".$row->ba1code.", ".$row->ba2code.", mit Ausmaß ".$row->beschausmasscode.", ".$row->beginn." - ".$row->ende."<br>";
+			}
 		}
 	}
 }
