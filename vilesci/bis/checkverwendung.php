@@ -179,5 +179,46 @@ if($resultall = pg_query($conn, $qryall))
 	}
 }
 //5 - stimmt beschausmasscode mit vertragsstunden überein?
-
+$qryall="SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter 
+	JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) 
+	WHERE (beschausmasscode='1' AND vertragsstunden<'38.5') 
+	OR (beschausmasscode='2' AND vertragsstunden>'15') 
+	OR (beschausmasscode='3' AND vertragsstunden<'16') 
+	OR (beschausmasscode='3' AND vertragsstunden>'25') 
+	OR (beschausmasscode='4' AND vertragsstunden<'26') 
+	OR (beschausmasscode='4' AND vertragsstunden>'35') 
+	OR (beschausmasscode='5' AND vertragsstunden>'0')
+	GROUP BY uid,nachname,vorname
+	ORDER by nachname,vorname,uid;";
+if($resultall = pg_query($conn, $qryall))
+{
+	$num_rows_all=pg_num_rows($resultall);
+	echo "<br><br><H2>Bei $num_rows_all Mitarbeitern ist das Beschäftigungsausmaß nicht plausibel</H2>";
+	while($rowall=pg_fetch_object($resultall))
+	{
+		$i=0;
+		$qry="SELECT * FROM bis.tbl_bisverwendung 
+			WHERE (beschausmasscode='1' AND vertragsstunden<'38.5') 
+			OR (beschausmasscode='2' AND vertragsstunden>'15') 
+			OR (beschausmasscode='3' AND vertragsstunden<'16') 
+			OR (beschausmasscode='3' AND vertragsstunden>'25') 
+			OR (beschausmasscode='4' AND vertragsstunden<'26') 
+			OR (beschausmasscode='4' AND vertragsstunden>'35') 
+			OR (beschausmasscode='5' AND vertragsstunden>'0')
+			AND mitarbeiter_uid='".$rowall->uid."';";
+		if($result = pg_query($conn, $qry))
+		{
+			$num_rows=pg_num_rows($result);
+			while($row=pg_fetch_object($result))
+			{
+				if($i==0)
+				{
+					echo "<br><u>Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname.":</u><br>";
+					$i++;
+				}
+				echo "Beschäftigungsausmaß ".$row->beschausmasscode.", Vertragsstunden ".$row->vertragsstunden.", Verwendung Code ".$row->verwendung_code.", Beschäftigungscode ".$row->ba1code.", ".$row->ba2code.", mit Ausmaß ".$row->beschausmasscode.", ".$row->beginn." - ".$row->ende."<br>";
+			}
+		}
+	}
+}
 ?>
