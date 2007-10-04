@@ -96,6 +96,69 @@ if (isset($_GET["handbuch"])){
 	exit;
 }
 
+
+if (isset($_FILES["abgabedatei"]))
+{
+	//echo $_FILES["abgabedatei"];	
+	$abgabedatei_up = $_FILES["abgabedatei"]["tmp_name"];
+					
+	if ($abgabedatei_up)
+	{		$student_uid = $uid;
+		$datum = date('Y-m-d H:i:s');
+		$datumstr = ereg_replace(" ","_",$datum);
+		$name_up = pathinfo($_FILES["abgabedatei"]["name"]);
+		$name_neu = makeUploadName($conn, $which='abgabe', $lehreinheit_id=$lehreinheit_id, $uebung_id=$uebung_id, $ss=$stsem,$uid=$student_uid, $date=$datumstr);
+		$abgabedatei = $name_neu.".".$name_up["extension"];
+		$abgabepfad = BENOTUNGSTOOL_PATH."abgabe/".$abgabedatei;	
+			
+		$uebung_obj = new uebung($conn);
+		$uebung_obj->load_studentuebung($student_uid, $uebung_id);
+	
+			
+		if ($uebung_obj->errormsg != "")
+		{
+			$uebung_obj->student_uid = $student_uid;
+			$uebung_obj->mitarbeiter_uid = null;
+			$uebung_obj->abgabe_id = null;
+			$uebung_obj->uebung_id = $uebung_id;
+			$uebung_obj->note = null;
+			$uebung_obj->mitarbeitspunkte = null;
+			$uebung_obj->punkte = null;
+			$uebung_obj->anmerkung = null;
+			$uebung_obj->benotungsdatum = null;
+			$uebung_obj->updateamum = null;
+			$uebung_obj->updatevon = null;
+			$uebung_obj->insertamum = $datum;
+			$uebung_obj->insertvon = $user;
+			$uebung_obj->new = true;
+			$uebung_obj->studentuebung_save($new=true);
+			echo $uebung_obj->errormsg;
+			
+		}
+		if ($uebung_obj->abgabe_id != null)
+		{			
+			$uebung_obj->load_abgabe($uebung_obj->abgabe_id);			
+			unlink(BENOTUNGSTOOL_PATH."abgabe/".$uebung_obj->abgabedatei);			
+			$uebung_obj->abgabedatei = $abgabedatei;
+			$uebung_obj->abgabezeit = 	$datum;
+			$uebung_obj->abgabe_anmerkung = "";
+			$uebung_obj->abgabe_save(false);
+		}
+		else
+		{
+			$uebung_obj->abgabedatei = $abgabedatei;
+			$uebung_obj->abgabezeit = 	$datum;
+			$uebung_obj->abgabe_anmerkung = "";
+			$uebung_obj->abgabe_save(true);
+		}
+		$uebung_obj->studentuebung_save(false);
+		//Abgabedatei ablegen				
+		move_uploaded_file($_FILES['abgabedatei']['tmp_name'], $abgabepfad);
+	}
+}
+else
+	$abgabedatei_up = null;
+
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -367,7 +430,72 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 	if(!$row_stud = pg_fetch_object($result_stud))
 		die('Student wurde nicht gefunden');
 
-	echo "<b>$row_stud->vorname $row_stud->nachname</b><br>\n";
+	//echo "<b>$row_stud->vorname $row_stud->nachname</b><br>\n";
+	
+
+	
+	$uid_arr = Array();
+	$vorname_arr = Array();
+	$nachname_arr = Array();
+
+	$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id' ORDER BY semester, verband, gruppe, gruppe_kurzbz";
+
+	if($result_grp = pg_query($conn, $qry))
+	{
+		while($row_grp = pg_fetch_object($result_grp))
+		{
+			if($row_grp->gruppe_kurzbz!='')
+			{
+					$qry_stud_dd = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row_grp->gruppe_kurzbz)."' AND studiensemester_kurzbz = '".$stsem."' ORDER BY nachname, vorname";
+			}
+			else
+			{
+					$qry_stud_dd = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student
+					             WHERE studiengang_kz='$row_grp->studiengang_kz' AND
+					             semester='$row_grp->semester' ".
+								 ($row_grp->verband!=''?" AND trim(verband)=trim('$row_grp->verband')":'').
+								 ($row_grp->gruppe!=''?" AND trim(gruppe)=trim('$row_grp->gruppe')":'').
+					            " ORDER BY nachname, vorname";
+			}
+			
+            if($result_stud_dd = pg_query($conn, $qry_stud_dd))
+			{
+				$i=1;
+				while($row_stud_dd = pg_fetch_object($result_stud_dd))
+				{
+					$uid_arr[] = $row_stud_dd->uid;
+					$vorname_arr[] = $row_stud_dd->vorname;
+					$nachname_arr[] = $row_stud_dd->nachname;				
+					/*					
+					if ($row_stud_dd->uid == $uid)
+						$selected = " selected";
+					else
+						$selected = "";				
+					echo "<option value='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud_dd->uid&stsem=$stsem'$selected>$row_stud_dd->vorname $row_stud_dd->nachname</option>";
+					*/
+				}
+			}
+		}
+	}
+	echo "Bitte Wählen Sie eine/n Studierende/n aus: ";
+	$key = array_search($uid,$uid_arr);
+	$prev = $key-1;
+	$next = $key+1;
+	if ($key > 0)
+		echo "<a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid_arr[$prev]&stsem=$stsem'> &lt;&lt; </a>";	
+	echo "<SELECT name='stud_dd' onChange=\"MM_jumpMenu('self',this,0)\">\n";	
+	for ($j = 0; $j < count($uid_arr); $j++)
+	{						
+			if ($uid_arr[$j] == $uid)
+				$selected = " selected";
+			else
+				$selected = "";
+		
+			echo "<option value='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid_arr[$j]&stsem=$stsem'$selected>$vorname_arr[$j] $nachname_arr[$j]</option>";
+	}
+	echo "</select>";
+	if ($key < count($uid_arr)-1)
+		echo "<a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid_arr[$next]&stsem=$stsem'> &gt;&gt; </a>";	
 	
 	
 	$uebung_obj = new uebung($conn);
@@ -529,7 +657,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 		if ($filename != '')
 			echo "<br>Abgabedatei: <a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid&download_abgabe=$filename'>".$filename."</a><br><br>";
 		
-		
+
 		
 		echo "
 		</td><td valign='top' algin='right'>";
@@ -586,7 +714,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 		$mitarbeit=0;
 		if($result=pg_query($conn, $qry))
 			if($row = pg_fetch_object($result))
-				$mitarbeit = $row->mitarbeitspunkte;
+				$mitarbeit = ($row->mitarbeitspunkte!=''?$row->mitarbeitspunkte:0);
 		echo "
 		<br>
 			<table border='1' width='210'>
@@ -685,7 +813,18 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 		</tr>
 		</table>
 		</form>";
+
 	}
+	echo "</td></tr></table>";	
+	echo "<table>\n";		
+	echo "	<tr>\n";
+	echo "	<form method='POST' action='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&uid=$uid' enctype='multipart/form-data'>\n";
+	echo "		<td>\n";
+	echo "			<b>Studentenabgabedatei:</b><br><input type='file' name='abgabedatei'> <input type='submit' name='abgabe' value='Abgeben'>";
+	echo "		</td>\n";	
+	echo "	</form>\n";
+	echo "</tr>\n";
+	echo "</table>";
 }
 else
 {
@@ -775,7 +914,7 @@ else
 	
 	echo "<br><hr><br>";
 	//Studentenliste
-	echo "Bitte w&auml;hlen Sie den Studenten aus.<br><br>";
+	echo "Bitte w&auml;hlen Sie den Studenten aus um in die Detailansicht bzw. Studentenansicht zu gelangen.<br>(Administration von Noten, Mitarbeitspunkte, Kreuzerl, Anmerkungen, Studentenabgaben)<br>";
 	echo "
 	<table width='80%'>
 	";

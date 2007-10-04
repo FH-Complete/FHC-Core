@@ -698,7 +698,7 @@ function addUser(student_uid)
 		$gruppe='';
 	}
 	
-	echo "<form method='POST' action='anwesenheitsliste.php?output=html&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id&gruppe=$gruppe'>";
+	echo "<form method='POST' action='anwesenheitsliste.php?output=html&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id&gruppe=$gruppe&stsem=$stsem'>";
 	echo "<input type='hidden' name='update_ids' value=''>";
 	echo "<table border='1'>
 			<tr>
@@ -729,8 +729,6 @@ function addUser(student_uid)
 	{
 		while($row_stud = pg_fetch_object($result))
 		{
-			
-			$filename='';
 
 			$filename = '';
 			$su_obj = new uebung($conn, $uebung_id);
@@ -738,14 +736,11 @@ function addUser(student_uid)
 			if ($su_obj->abgabe_id)	
 			{	
 				$su_obj->load_abgabe($su_obj->abgabe_id);
-
 				$filename = $su_obj->abgabedatei;
 			}
 			else
 				$filename='';
 			
-
-						
 			echo "<tr onMouseOver=\"this.style.backgroundColor='#c7dfe8'\" onMouseOut=\"this.style.backgroundColor='#ffffff'\">
 			<td nowrap><input type='checkbox' name='update_$row_stud->uid' disabled>&nbsp;<b>$row_stud->nachname</b>&nbsp;$row_stud->vorname $row_stud->uid</td>";
 			if (!$uebung_obj->beispiele)
@@ -764,7 +759,7 @@ function addUser(student_uid)
 					echo "<td align='center'><input type='checkbox' name='update_".$row_stud->uid."_".$row_bsp->beispiel_id."' onClick=\"addUser('$row_stud->uid');\" ".($studentbeispiel_obj->vorbereitet?'checked':'').">".($studentbeispiel_obj->probleme?'<i><small>P</small></i>':'')."</td>\n";
 				}
 			}
-			echo "<td>&nbsp;</td>";
+			echo "<td>&nbsp;</td>";
 			if ($filename != "")			
 				echo "<td><a href='anwesenheitsliste.php?uid=$row_stud->uid&output=html&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id&stsem=$stsem&download_abgabe=$filename'>Abgabe</a></td>\n";
 			else if ($uebung_obj->abgabe)
