@@ -1,4 +1,24 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
 /*
  * Erstellt Notenliste im Excel Format
  */
@@ -106,7 +126,7 @@ if (!$conn = pg_pconnect(CONN_STRING))
 			if($row->gruppe_kurzbz=='')
 				$gruppen.=trim($row->kuerzel.'-'.$row->semester.$row->verband.$row->gruppe);
 			else
-				$gruppen=$row->gruppe_kurzbz;
+				$gruppen.=$row->gruppe_kurzbz;
 		}
 	}
 			
@@ -173,18 +193,21 @@ if (!$conn = pg_pconnect(CONN_STRING))
 		{
 			if(!preg_match('*dummy*',$elem->uid) && $elem->semester!=10)
 	   		{   	
-				$worksheet->write($lines,0,$i);
-				if($elem->status=='Incoming')
-					$inc=' (i)';
-				else 
-					$inc='';
-				$worksheet->write($lines,1,$elem->nachname.$inc);
-				$worksheet->write($lines,2,$elem->vorname);
-				$worksheet->write($lines,3,$elem->semester.$elem->verband.$elem->gruppe);
-				$worksheet->write($lines,4,'="'.trim($elem->matrikelnr).'"');
-				$worksheet->write($lines,5,'');
-				$i++;
-				$lines++;
+	   			if($elem->status!='Abbrecher' && $elem->status!='Unterbrecher')
+	   			{
+					$worksheet->write($lines,0,$i);
+					if($elem->status=='Incoming')
+						$inc=' (i)';
+					else 
+						$inc='';
+					$worksheet->write($lines,1,$elem->nachname.$inc);
+					$worksheet->write($lines,2,$elem->vorname);
+					$worksheet->write($lines,3,$elem->semester.$elem->verband.$elem->gruppe);
+					$worksheet->write($lines,4,'="'.trim($elem->matrikelnr).'"');
+					$worksheet->write($lines,5,'');
+					$i++;
+					$lines++;
+	   			}
 	   		}
 		}
 	}

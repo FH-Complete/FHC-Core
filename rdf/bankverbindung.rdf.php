@@ -80,9 +80,9 @@ function draw_rdf($row)
 	
 	switch($row->typ)
 	{
-		case 'p': $typ = 'Privatkonto'; break;
-		case 'f': $typ = 'Firmenkonto'; break;
-		default: $typ = ''; break;
+		case 'p': $typ_bezeichnung = 'Privatkonto'; break;
+		case 'f': $typ_bezeichnung = 'Firmenkonto'; break;
+		default: $typ_bezeichnung = ''; break;
 	}
 	
 	echo '
@@ -96,7 +96,8 @@ function draw_rdf($row)
             <BANKVERBINDUNG:blz><![CDATA['.$row->blz.']]></BANKVERBINDUNG:blz>
             <BANKVERBINDUNG:iban><![CDATA['.$row->iban.']]></BANKVERBINDUNG:iban>
             <BANKVERBINDUNG:kontonr><![CDATA['.$row->kontonr.']]></BANKVERBINDUNG:kontonr>
-            <BANKVERBINDUNG:typ><![CDATA['.$typ.']]></BANKVERBINDUNG:typ>
+            <BANKVERBINDUNG:typ_bezeichnung><![CDATA['.$typ_bezeichnung.']]></BANKVERBINDUNG:typ_bezeichnung>
+            <BANKVERBINDUNG:typ><![CDATA['.$row->typ.']]></BANKVERBINDUNG:typ>
             <BANKVERBINDUNG:verrechnung><![CDATA['.($row->verrechnung?'Ja':'Nein').']]></BANKVERBINDUNG:verrechnung>
          </RDF:Description>
       </RDF:li>
