@@ -243,16 +243,19 @@ class person
 			}
 		}
 
-		//Pruefen ob bereits ein Eintrag mit dieser SVNR vorhanden ist
-		$qry = "SELECT person_id FROM public.tbl_person WHERE svnr='$this->svnr'";
-		if($result = pg_query($this->conn, $qry))
+		if($this->svnr!='')
 		{
-			if($row = pg_fetch_object($result))
+			//Pruefen ob bereits ein Eintrag mit dieser SVNR vorhanden ist
+			$qry = "SELECT person_id FROM public.tbl_person WHERE svnr='$this->svnr'";
+			if($result = pg_query($this->conn, $qry))
 			{
-				if($row->person_id!=$this->person_id)
+				if($row = pg_fetch_object($result))
 				{
-					$this->errormsg = 'Es existiert bereits eine Person mit dieser SVNR';
-					return false;
+					if($row->person_id!=$this->person_id)
+					{
+						$this->errormsg = 'Es existiert bereits eine Person mit dieser SVNR';
+						return false;
+					}
 				}
 			}
 		}
