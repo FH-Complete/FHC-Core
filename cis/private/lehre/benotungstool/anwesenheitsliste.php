@@ -730,14 +730,21 @@ function addUser(student_uid)
 		while($row_stud = pg_fetch_object($result))
 		{
 			
-			$uebung_obj->load_studentuebung($row_stud->uid, $uebung_id);
-			if ($uebung_obj->abgabe_id)	
+			$filename='';
+
+			$filename = '';
+			$su_obj = new uebung($conn, $uebung_id);
+			$su_obj->load_studentuebung($row_stud->uid, $uebung_id);
+			if ($su_obj->abgabe_id)	
 			{	
-				$uebung_obj->load_abgabe($uebung_obj->abgabe_id);
-				$filename = $uebung_obj->abgabedatei;
+				$su_obj->load_abgabe($su_obj->abgabe_id);
+
+				$filename = $su_obj->abgabedatei;
 			}
 			else
 				$filename='';
+			
+
 						
 			echo "<tr onMouseOver=\"this.style.backgroundColor='#c7dfe8'\" onMouseOut=\"this.style.backgroundColor='#ffffff'\">
 			<td nowrap><input type='checkbox' name='update_$row_stud->uid' disabled>&nbsp;<b>$row_stud->nachname</b>&nbsp;$row_stud->vorname $row_stud->uid</td>";
