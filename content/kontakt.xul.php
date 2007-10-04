@@ -226,7 +226,7 @@ else
 		</hbox>
 	</groupbox>
 
-	<groupbox id="kontakt-groupbox-adresse">
+	<groupbox id="kontakt-groupbox-bankverbindung">
 		<caption label="Bankverbindungen" />
 		<hbox>
 			<tree id="kontakt-bankverbindung-tree" seltype="single" hidecolumnpicker="false" flex="1"
@@ -262,9 +262,9 @@ else
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/bankverbindung/rdf#kontonr" onclick="KontaktBankverbindungTreeSort()"/>
 					<splitter class="tree-splitter"/>
-					<treecol id="kontakt-bankverbindung-treecol-typ" label="Typ" flex="1" hidden="false"
+					<treecol id="kontakt-bankverbindung-treecol-typ_bezeichnung" label="Typ" flex="1" hidden="false"
 						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/bankverbindung/rdf#typ" onclick="KontaktBankverbindungTreeSort()"/>
+						sort="rdf:http://www.technikum-wien.at/bankverbindung/rdf#typ_bezeichnung" onclick="KontaktBankverbindungTreeSort()"/>
 					<splitter class="tree-splitter"/>
 					<treecol id="kontakt-bankverbindung-treecol-verrechnung" label="Verrechnung" flex="1" hidden="true"
 						class="sortDirectionIndicator"
@@ -291,7 +291,7 @@ else
 									<treecell label="rdf:http://www.technikum-wien.at/bankverbindung/rdf#blz" />
 									<treecell label="rdf:http://www.technikum-wien.at/bankverbindung/rdf#iban" />
 									<treecell label="rdf:http://www.technikum-wien.at/bankverbindung/rdf#kontonr" />
-									<treecell label="rdf:http://www.technikum-wien.at/bankverbindung/rdf#typ" />
+									<treecell label="rdf:http://www.technikum-wien.at/bankverbindung/rdf#typ_bezeichnung" />
 									<treecell label="rdf:http://www.technikum-wien.at/bankverbindung/rdf#verrechnung" />
 									<treecell label="rdf:http://www.technikum-wien.at/bankverbindung/rdf#person_id" />
 									<treecell label="rdf:http://www.technikum-wien.at/bankverbindung/rdf#bankverbindung_id" />

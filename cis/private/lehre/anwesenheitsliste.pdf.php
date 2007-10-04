@@ -1,4 +1,24 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
    /**
     * anwesenheitsliste.pdf.php
     *
@@ -125,7 +145,7 @@ if($result = pg_query($conn, $qry))
 		if($row->gruppe_kurzbz=='')
 			$gruppen.=trim($row->kuerzel.'-'.$row->semester.$row->verband.$row->gruppe);
 		else
-			$gruppen=$row->gruppe_kurzbz;
+			$gruppen.=$row->gruppe_kurzbz;
 	}
 }
 $pdf->MultiCell(0,20,'Gruppe: '.$gruppen.' Studiensemester: '.$stsem);
@@ -318,60 +338,64 @@ if($result = pg_query($conn, $qry))
 	$i=0;
 	while($elem = pg_fetch_object($result))
 	{
-	   $i++;
-		if($i%2)
-			$pdf->SetFillColor(190,190,190);
-		else 
-			$pdf->SetFillColor(255,255,255);
-			
-		$pdf->SetFont('Arial','',8);
-		$maxY=$pdf->GetY();
-		if($maxY>770)
+		//Abbrecher und Unterbrecher nicht anzeigen
+		if($elem->status!='Abbrecher' && $elem->status!='Unterbrecher')
 		{
-			$pdf->AddPage();
+			$i++;
+			if($i%2)
+				$pdf->SetFillColor(190,190,190);
+			else 
+				$pdf->SetFillColor(255,255,255);
+				
+			$pdf->SetFont('Arial','',8);
 			$maxY=$pdf->GetY();
+			if($maxY>770)
+			{
+				$pdf->AddPage();
+				$maxY=$pdf->GetY();
+			}
+	
+			$maxX=30;
+			$pdf->SetXY($maxX,$maxY);
+			$pdf->MultiCell(20,$lineheight,$i,1,'R',1);
+			$maxX +=20;
+			$pdf->SetXY($maxX,$maxY);
+			$pdf->SetFont('Courier','B',8);
+			$pdf->MultiCell(130,$lineheight,$elem->nachname,1,'L',1);
+			$pdf->SetFont('Arial','',8);
+			$pdf->SetXY($maxX+strlen($elem->nachname)*5+1,$maxY);
+			if($elem->status=='Incoming')
+				$inc=' (i)';
+			else 
+				$inc='';
+			$pdf->MultiCell(130,$lineheight,$elem->vorname.$inc,0,'L',0);
+			$maxX +=130;
+			$pdf->SetXY($maxX,$maxY);
+			$pdf->SetFont('Arial','',8);
+			$pdf->MultiCell(65,$lineheight,trim($elem->matrikelnr),1,'C',1);
+			$maxX +=65;
+			$pdf->SetXY($maxX,$maxY);
+			$pdf->MultiCell(65,$lineheight,$elem->semester.$elem->verband.$elem->gruppe,1,'C',1);
+			$maxX +=65;
+			$pdf->SetXY($maxX,$maxY);
+			$pdf->MultiCell(40,$lineheight,'',1,'L',1);
+			$maxX +=40;
+			$pdf->SetXY($maxX,$maxY);
+			$pdf->MultiCell(40,$lineheight,'',1,'L',1);	
+			$maxX +=40;
+			$pdf->SetXY($maxX,$maxY);
+			$pdf->MultiCell(40,$lineheight,'',1,'L',1);	
+			$maxX +=40;
+			$pdf->SetXY($maxX,$maxY);
+			$pdf->MultiCell(40,$lineheight,'',1,'L',1);	
+			$maxX +=40;
+			$pdf->SetXY($maxX,$maxY);
+			$pdf->MultiCell(40,$lineheight,'',1,'L',1);	
+			$maxX +=40;
+			$pdf->SetXY($maxX,$maxY);
+			$pdf->MultiCell(40,$lineheight,'',1,'L',1);	
+		   $inhalt[]=array($i,$elem->nachname.' '.$elem->vorname,trim($elem->matrikelnr),$elem->semester.$elem->verband.$elem->gruppe,'','','','','','');
 		}
-
-		$maxX=30;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(20,$lineheight,$i,1,'R',1);
-		$maxX +=20;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->SetFont('Courier','B',8);
-		$pdf->MultiCell(130,$lineheight,$elem->nachname,1,'L',1);
-		$pdf->SetFont('Arial','',8);
-		$pdf->SetXY($maxX+strlen($elem->nachname)*5+1,$maxY);
-		if($elem->status=='Incoming')
-			$inc=' (i)';
-		else 
-			$inc='';
-		$pdf->MultiCell(130,$lineheight,$elem->vorname.$inc,0,'L',0);
-		$maxX +=130;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->SetFont('Arial','',8);
-		$pdf->MultiCell(65,$lineheight,trim($elem->matrikelnr),1,'C',1);
-		$maxX +=65;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(65,$lineheight,$elem->semester.$elem->verband.$elem->gruppe,1,'C',1);
-		$maxX +=65;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',1);
-		$maxX +=40;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',1);	
-		$maxX +=40;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',1);	
-		$maxX +=40;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',1);	
-		$maxX +=40;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',1);	
-		$maxX +=40;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',1);	
-	   $inhalt[]=array($i,$elem->nachname.' '.$elem->vorname,trim($elem->matrikelnr),$elem->semester.$elem->verband.$elem->gruppe,'','','','','','');
    }
 }
 //Fussnote

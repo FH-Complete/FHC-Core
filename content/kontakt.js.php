@@ -614,7 +614,7 @@ function KontaktBankverbindungSpeichern(dialog)
 	req.add('anschrift', anschrift);
 	req.add('bic', bic);
 	req.add('blz', blz);
-	req.add('iban', kontonr);
+	req.add('iban', iban);
 	req.add('kontonr', kontonr);
 	req.add('typ', typ);
 	req.add('verrechnung', verrechnung);
