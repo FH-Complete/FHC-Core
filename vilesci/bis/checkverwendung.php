@@ -173,7 +173,7 @@ if($resultall = pg_query($conn, $qryall))
 					echo "<br><u>Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname.":</u><br>";
 					$i++;
 				}
-				echo "Verwendung Code ".$row->verwendung_code.", hauptberuflich ".$row->hauptberuflich.", Beschäftigungscode ".$row->ba1code.", ".$row->ba2code.", mit Ausmaß ".$row->beschausmasscode.", ".$row->beginn." - ".$row->ende."<br>";
+				echo "Verwendung Code ".$row->verwendung_code.", hauptberuflich ".($row->hauptberuflich=='t'?'ja':'nein').", Beschäftigungscode ".$row->ba1code.", ".$row->ba2code.", mit Ausmaß ".$row->beschausmasscode.", ".$row->beginn." - ".$row->ende."<br>";
 			}
 		}
 	}
@@ -217,6 +217,38 @@ if($resultall = pg_query($conn, $qryall))
 					$i++;
 				}
 				echo "Beschäftigungsausmaß ".$row->beschausmasscode.", Vertragsstunden ".$row->vertragsstunden.", Verwendung Code ".$row->verwendung_code.", Beschäftigungscode ".$row->ba1code.", ".$row->ba2code.", mit Ausmaß ".$row->beschausmasscode.", ".$row->beginn." - ".$row->ende."<br>";
+			}
+		}
+	}
+}
+//6 - aktive, freie lektoren auf verwendung 1 oder 2 prüfen
+$qryall="SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter 
+	JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) 
+	WHERE aktiv 	AND lektor AND fixangestellt=false
+	AND verwendung_code NOT IN ('1','2') 
+	GROUP BY uid,nachname,vorname
+	ORDER by nachname,vorname,uid;";
+if($resultall = pg_query($conn, $qryall))
+{
+	$num_rows_all=pg_num_rows($resultall);
+	echo "<br><br><H2>Bei $num_rows_all aktiven, freien Lektoren ist die Verwendung nicht plausibel</H2>";
+	while($rowall=pg_fetch_object($resultall))
+	{
+		$i=0;
+		$qry="SELECT * FROM bis.tbl_bisverwendung 
+			WHERE verwendung_code NOT IN ('1','2') 
+			AND mitarbeiter_uid='".$rowall->uid."';";
+		if($result = pg_query($conn, $qry))
+		{
+			$num_rows=pg_num_rows($result);
+			while($row=pg_fetch_object($result))
+			{
+				if($i==0)
+				{
+					echo "<br><u>Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname.":</u><br>";
+					$i++;
+				}
+				echo "Verwendung Code ".$row->verwendung_code.", Beschäftigungscode ".$row->ba1code.", ".$row->ba2code.", ".$row->beginn." - ".$row->ende."<br>";
 			}
 		}
 	}
