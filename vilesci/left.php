@@ -78,7 +78,7 @@
 	</a>
 </div>
 
-<table class="tabs">
+<!-- <table class="tabs">
 	<tr>
 		<td class="tab" id="tabStammdaten" onClick="js_show_tab('menueStammdaten');">Stammdaten</td>
 	</tr>
@@ -88,165 +88,110 @@
 	<tr>
 		<td class="tab" id="tabLehre" onClick="js_show_tab('menueLehre');">Lehre</td>
 	</tr>
-</table>
+</table>-->
 
-<!-- ******************* Haupt-Menue Stammdaten *******************************-->
-<div id="menueStammdaten" style="display:block;">
-	<table class="menue" style="border-right-width:1px;border-right-color:#BCBCBC;">
-		<tr>
-			<td>&nbsp;</td>
-		</tr>
-		<!--=========== Menue Funktionen ==============-->
-		<tr>
-			<td nowrap>
-				<a class="MenuItem2" href="personen/funktion.php" target="main">
-				<img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Funtionen</a>
-			</td>
-			<td width="10" nowrap>&nbsp;</td>
-		</tr>
-
-		<!--=========== Menue Kommunikation ==============-->
-		<tr>
-          	<td nowrap><a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Kommunikation'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Kommunikation</a></td>
-        </tr>
-		<tr>
-          	<td nowrap>
-		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Kommunikation" style="display:block;">
-			  	<tr>
-			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="kommunikation/kontakt.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Kontakte</a></td>
-			  	</tr>
-			  	<tr>
-			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="kommunikation/mlists/index.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Mail-Verteiler</a></td>
-			  	</tr>
-			  	<tr><td width="10" nowrap>&nbsp;</td></tr>
-			  	</table>
-			</td>
-		</tr>
-        <!--Menu Eintrag Studiengang-->
-		<tr>
-          	<td nowrap><a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Studiengang'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Studiengang</a></td>
-        </tr>
-		<tr>
-          	<td nowrap>
-		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Studiengang" style="display:block;">
-			  	<tr>
-			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="stammdaten/studiengang_frameset.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;&Uuml;bersicht</a></td>
-			  	</tr>
-			  	<tr>
-			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="stammdaten/studiengang_details.php" target="detail"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Neu</a></td>
-			  	</tr>
-
-			  	<tr><td width="10" nowrap>&nbsp;</td></tr>
-			  	</table>
-			</td>
-		</tr>
-        <tr><td width="10" nowrap>&nbsp;</td></tr>
-        <!--Menu Eintrag Berechtigungen-->
-		<tr>
-          	<td nowrap><a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Berechtigung'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Berechtigungen</a></td>
-        </tr>
-		<tr>
-          	<td nowrap>
-		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Berechtigung" style="display:block;">
-			  	<tr>
-			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="stammdaten/benutzerberechtigung_frameset.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;&Uuml;bersicht</a></td>
-			  	</tr>
-
-			  	<tr><td width="10" nowrap>&nbsp;</td></tr>
-			  	</table>
-			</td>
-		</tr>
-		<tr><td width="10" nowrap>&nbsp;</td></tr>
-        <!--Menu Eintrag Lehrveranstaltungen-->
-		<tr>
-          	<td nowrap><a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Lehrveranstaltungen'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Lehrveranstaltungen</a></td>
-        </tr>
-		<tr>
-          	<td nowrap>
-		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Lehrveranstaltungen" style="display:block;">
-			  	<tr>
-			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="lehre/lehrveranstaltung_frameset.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;&Uuml;bersicht</a></td>
-			  	</tr>
-			  	<tr>
-			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="stammdaten/lv_wartung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;LV-Zusammenlegung</a></td>
-			  	</tr>
-			  	<tr>
-			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="stammdaten/le_wartung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;LE-Zusammenlegung</a></td>
-			  	</tr>
-
-			  	<tr><td width="10" nowrap>&nbsp;</td></tr>
-			  	</table>
-			</td>
-		</tr>
-        <tr><td width="10" nowrap>&nbsp;</td></tr>
-         <!--Menu Eintrag Lehrverbandsgruppen-->
-		<tr>
-          	<td nowrap><a href="?lehrverbandsgruppen" class="MenuItem1" onClick="return(js_toggle_container('Lehrverbandsgruppen'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Lehrverbandsgruppen</a></td>
-        </tr>
-		<tr>
-          	<td nowrap>
-		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Lehrverbandsgruppen" style="display:block;">
-			  	<tr>
-			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="stammdaten/lvbgruppenverwaltung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Verwaltung</a></td>
-			  	</tr>
-			  	<tr><td width="10" nowrap>&nbsp;</td></tr>
-			  	</table>
-			</td>
-		</tr>
-          <!--Menu Eintrag Reihungstest-->
-		<tr>
-          	<td nowrap><a href="?reihungstest" class="MenuItem1" onClick="return(js_toggle_container('Reihungstest'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Reihungstest</a></td>
-        </tr>
-		<tr>
-          	<td nowrap>
-		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Reihungstest" style="display:block;">
-			  	<tr>
-			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="stammdaten/reihungstestverwaltung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Verwaltung</a></td>
-			  	</tr>
-			  	<tr><td width="10" nowrap>&nbsp;</td></tr>
-			  	</table>
-			</td>
-		</tr>
-        <tr>
-          	<td nowrap><a href="?firma" class="MenuItem1" onClick="return(js_toggle_container('Firma'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Firma</a></td>
-        </tr>
-		<tr>
-          	<td nowrap>
-		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Firma" style="display:block;">
-			  	<tr>
-			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="stammdaten/firma_frameset.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Verwaltung</a></td>
-			  	</tr>
-			  	<tr><td width="10" nowrap>&nbsp;</td></tr>
-			  	</table>
-			</td>
-		</tr>
-        <tr><td width="10" nowrap>&nbsp;</td></tr>
-		</table>
-</div>
-<!--****************** Haupt-Menue Personen *****************************-->
-<div id="menuePersonen" style="display: none;">
-	<table class="menue" style="border-right-width:1px;border-right-color:#BCBCBC;">
+<!-- ******************* Haupt-Menue Lehre *******************************-->
+<a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('menueLehre'));">
+	<img src="../skin/images/menu_item.gif" width="7" height="9" />&nbsp;Lehre
+</a>
+<div id="menueLehre" style="display: block;">
+	<table class="menue">
+	<!--Menu Eintrag LV-Planung -->
 	<tr>
-		<td>&nbsp;</td>
-	</tr>
-	<!--================ Menue Personen->Personen =====================-->
+       	<td nowrap><a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Stundenplan'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;LV-Planung</a></td>
+    </tr>
 	<tr>
        	<td nowrap>
-			<a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Personen'));">
-	   			<img src="../skin/images/menu_item.gif" width="7" height="9" />
-	   			&nbsp;Personen
-       		</a>
+	 		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Stundenplan" style="display:block;">
+		  	<tr>
+		  		<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a class="MenuItem2" href="../cis/private/lvplan/index.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Stundenplan</a></td>
+		  	</tr>
+		  	<tr>
+		  		<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a class="MenuItem2" href="lehre/lvplanwartung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Wartung</a></td>
+		  	</tr>
+		  	<tr>
+		  		<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a class="MenuItem2" href="lehre/stdplan_insert.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Insert</a></td>
+		  	</tr>
+		  	<tr>
+		  		<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a class="MenuItem2" href="lehre/stdplan_delete.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Delete</a></td>
+		  	</tr>
+			<tr>
+		  		<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a class="MenuItem2" href="lehre/check/index.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Checken</a></td>
+		  	</tr>
+		  	<tr>
+		  		<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a class="MenuItem2" href="lehre/import/index.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Import</a></td>
+		  	</tr>
+		  	<tr>
+		  		<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a class="MenuItem2" href="lehre/export/index.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Export</a></td>
+		  	</tr>
+			</table>
+		</td>
+	</tr>
+	<!--Menu Eintrag Zeitwunsch-->
+  	<tr>
+		<td nowrap><a class="MenuItem1" href="lehre/zeitwuensche.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Zeitw&uuml;nsche</a></td>
+  	</tr>
+	<!--Menu Eintrag LV-Verteilung-->
+  	<tr>
+		<td nowrap><a class="MenuItem1" href="lehre/lv_verteilung/lv_verteilung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Lehreinheiten</a></td>
+	</tr>
+    <!--Menu Eintrag Lehrveranstaltungen-->
+	<tr>
+       	<td nowrap><a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Lehrveranstaltungen'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Lehrveranstaltungen</a></td>
+    </tr>
+	<tr>
+       	<td nowrap>
+	  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Lehrveranstaltungen" style="display:block;">
+		  	<tr>
+		  		<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a class="MenuItem2" href="lehre/lehrveranstaltung_frameset.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;&Uuml;bersicht</a></td>
+		  	</tr>
+		  	<tr>
+		  		<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a class="MenuItem2" href="stammdaten/lv_wartung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;LV-Zusammenlegung</a></td>
+		  	</tr>
+		  	<tr>
+		  		<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a class="MenuItem2" href="stammdaten/le_wartung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;LE-Zusammenlegung</a></td>
+		  	</tr>
+		  	</table>
+		</td>
+	</tr>
+  	<!--Menu Eintrag Lehrfach-->
+	<tr>
+	  	<td nowrap><a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Lehrfach'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Lehrfach</a>
+			<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Lehrfach" style="display: block;">
+		  	<tr>
+		  		<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a class="MenuItem2" href="lehre/lehrfach.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Verwaltung</a></td>
+		  	</tr>
+		  	<tr>
+		  		<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a class="MenuItem2" href="lehre/lehrfach/wartung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Wartung</a></td>
+		  	</tr>
+		 	</table>
+		</td>
+	</tr>
+	</table>
+</div>
+
+<HR>
+<!--****************** Haupt-Menue Personen *****************************-->
+<a href="?Personen" class="MenuItem1" onClick="return(js_toggle_container('menuePersonen'));">
+	<img src="../skin/images/menu_item.gif" width="7" height="9" />&nbsp;Personen
+</a>
+<div id="menuePersonen" style="display: none;">
+	<table class="menue" style="border-right-width:1px;border-right-color:#BCBCBC;">
+	<!--================ Menue Personen->Personen =====================-->
+	<tr>
+       	<td nowrap><a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Personen'));"><img src="../skin/images/menu_item.gif" width="7" height="9" />&nbsp;Personen</a>
        	</td>
    	</tr>
 	<tr>
@@ -282,17 +227,9 @@
 			</table>
 		</td>
 	</tr>
-	<tr>
-		<td>&nbsp;</td>
-	</tr>
 	<!--================ Menue Personen->Benutzer =====================-->
 	<tr>
-       	<td nowrap>
-			<a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Benutzer'));">
-	   			<img src="../skin/images/menu_item.gif" width="7" height="9" />
-	   			&nbsp;Benutzer
-       		</a>
-       	</td>
+       	<td nowrap><a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Benutzer'));"><img src="../skin/images/menu_item.gif" width="7" height="9" />&nbsp;Benutzer</a></td>
    	</tr>
 	<tr>
 		<td nowrap>
@@ -300,31 +237,18 @@
 			<!-- Personen->Benutzer->LDAP-Check -->
 			<tr>
 				<td width="10" nowrap>&nbsp;</td>
-				<td nowrap>
-					<a class="MenuItem2" href="personen/ldap_check.php" target="main">
-						<img src="../skin/images/menu_item.gif" width="7" height="9">
-						&nbsp;LDAP-Check
-					</a>
-				</td>
+				<td nowrap><a class="MenuItem2" href="personen/ldap_check.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;LDAP-Check</a></td>
 			</tr>
 			</table>
 		</td>
 	</tr>
-	<tr>
-		<td>&nbsp;</td>
-	</tr>
 	<!--================ Menue Personen->Studenten ===================== -->
 	<tr>
-		<td nowrap>
-		    <a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Studenten'));">
-		    	<img src="../skin/images/menu_item.gif" width="7" height="9">
-		    	&nbsp;Studenten
-		    </a>
-		</td>
+		<td nowrap><a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Studenten'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Studenten</a></td>
 	<tr>
 	<tr>
 		<td nowrap>
-			<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Studenten" style="display: none">
+			<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Studenten" style="display: block">
 			<tr>
 				<td width="10" nowrap>&nbsp;</td>
 			   	<td nowrap><a class="MenuItem2" href="personen/studenten_uebersicht.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;&Uuml;bersicht</a></td>
@@ -345,17 +269,9 @@
 			</table>
 		</td>
 	</tr>
-	<tr>
-		<td>&nbsp;</td>
-	</tr>
 	<!--================ Menue Personen->Mitarbeiter =====================-->
 	<tr>
-		<td nowrap>
-			<a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Mitarbeiter'));">
-				<img src="../skin/images/menu_item.gif" width="7" height="9">
-				&nbsp;Mitarbeiter
-			</a>
-		</td>
+		<td nowrap><a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Mitarbeiter'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Mitarbeiter</a></td>
 	<tr>
 	<tr>
 		<td nowrap>
@@ -371,90 +287,122 @@
 			</table>
 		</td>
 	</tr>
+	<!--=========== Menue Funktionen ==============-->
+	<tr>
+		<td nowrap>
+			<a class="MenuItem2" href="personen/funktion.php" target="main">
+			<img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Funtionen</a>
+		</td>
+	</tr>
 	</table>
- </div>
+</div>
 
- <div id="menueLehre" style="display: none;">
+<HR>
+<!-- ******************* Haupt-Menue Stammdaten *******************************-->
+<a href="?Stammdaten" class="MenuItem1" onClick="return(js_toggle_container('menueStammdaten'));">
+	<img src="../skin/images/menu_item.gif" width="7" height="9" />&nbsp;Stammdaten
+</a>
+<div id="menueStammdaten" style="display:block;">
 	<table class="menue" style="border-right-width:1px;border-right-color:#BCBCBC;">
+    <!--Menu Eintrag Berechtigungen-->
+	<tr>
+       	<td nowrap><a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Berechtigung'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Berechtigungen</a></td>
+    </tr>
+	<tr>
+       	<td nowrap>
+	  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Berechtigung" style="display:block;">
+		  	<tr>
+		  		<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a class="MenuItem2" href="stammdaten/benutzerberechtigung_frameset.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;&Uuml;bersicht</a></td>
+		  	</tr>
+		  	</table>
+		</td>
+	</tr>
+    <!--Menu Eintrag Studiengang-->
+	<tr>
+       	<td nowrap><a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Studiengang'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Studiengang</a></td>
+    </tr>
+	<tr>
+      	<td nowrap>
+	  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Studiengang" style="display:block;">
+		  	<tr>
+		  		<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a class="MenuItem2" href="stammdaten/studiengang_frameset.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;&Uuml;bersicht</a></td>
+		  	</tr>
+		  	<tr>
+		  		<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a class="MenuItem2" href="stammdaten/studiengang_details.php" target="detail"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Neu</a></td>
+		  	</tr>
+		  	</table>
+		</td>
+	</tr>
+    <!--Menu Eintrag Lehrverbandsgruppen-->
+	<tr>
+       	<td nowrap><a href="?lehrverbandsgruppen" class="MenuItem1" onClick="return(js_toggle_container('Lehrverbandsgruppen'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Lehrverbandsgruppen</a></td>
+    </tr>
+	<tr>
+       	<td nowrap>
+	  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Lehrverbandsgruppen" style="display:block;">
+		  	<tr>
+		  		<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a class="MenuItem2" href="stammdaten/lvbgruppenverwaltung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Verwaltung</a></td>
+		  	</tr>
+		  	<tr><td width="10" nowrap>&nbsp;</td></tr>
+		  	</table>
+		</td>
+	</tr>
+	<!--=========== Menue Kommunikation ==============-->
 		<tr>
-			<td>&nbsp;</td>
-		</tr>
-		<!--Menu Eintrag Stundenplan-->
-		<tr>
-          	<td nowrap><a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Stundenplan'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Stundenplan</a></td>
+          	<td nowrap><a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Kommunikation'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Kommunikation</a></td>
         </tr>
 		<tr>
           	<td nowrap>
-		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Stundenplan" style="display:block;">
+		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Kommunikation" style="display:block;">
 			  	<tr>
 			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="../cis/private/lvplan/index.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Stundenplan</a></td>
+					<td nowrap><a class="MenuItem2" href="kommunikation/kontakt.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Kontakte</a></td>
 			  	</tr>
 			  	<tr>
 			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="lehre/lvplanwartung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Wartung</a></td>
+					<td nowrap><a class="MenuItem2" href="kommunikation/mlists/index.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Mail-Verteiler</a></td>
 			  	</tr>
-			  	<tr>
-			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="lehre/zeitwuensche.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Zeitw&uuml;nsche</a></td>
-			  	</tr>
-			  	<tr>
-			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="lehre/lv_verteilung/lv_verteilung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Lehreinheiten</a></td>
-			  	</tr>
-			  	<!--<tr>
-			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="lehre/lehrveranstaltung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Lehrveranstaltungen</a></td>
-			  	</tr>-->
-			  	<tr>
-			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="lehre/stdplan_insert.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Stundenplan</a></td>
-			  	</tr>
-			  	<tr>
-			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="lehre/stdplan_delete.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Delete</a></td>
-			  	</tr>
-			  	<!--
-			  	<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="lehre/einheit_menu.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Einheiten</a></td>
-			  	</tr> -->
-			  	<!--Menu Eintrag Lehrfach-->
-			  	<tr>
-				  	<td width="10" nowrap>&nbsp;</td>
-				  	<td nowrap>
-				  		<a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Lehrfach'));">
-				  			<img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Lehrfach
-				  		</a>
-				  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Lehrfach" style="display: none;">
-						  	<tr>
-						  		<td width="10" nowrap>&nbsp;</td>
-								<td nowrap><a class="MenuItem2" href="lehre/lehrfach.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Verwaltung</a></td>
-						  	</tr>
-						  	<tr>
-						  		<td width="10" nowrap>&nbsp;</td>
-								<td nowrap><a class="MenuItem2" href="lehre/lehrfach/wartung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Wartung</a></td>
-						  	</tr>
-					  	</table>
-					</td>
-				</tr>
-				<tr>
-			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="lehre/check/index.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Checken</a></td>
-			  	</tr>
-			  	<tr>
-			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="lehre/import/index.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Import</a></td>
-			  	</tr>
-			  	<tr>
-			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="lehre/export/index.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Export</a></td>
-			  	</tr>
+			  	<tr><td width="10" nowrap>&nbsp;</td></tr>
 			  	</table>
 			</td>
 		</tr>
         <tr><td width="10" nowrap>&nbsp;</td></tr>
-	</table>
-  </div>
+          <!--Menu Eintrag Reihungstest-->
+		<tr>
+          	<td nowrap><a href="?reihungstest" class="MenuItem1" onClick="return(js_toggle_container('Reihungstest'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Reihungstest</a></td>
+        </tr>
+		<tr>
+          	<td nowrap>
+		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Reihungstest" style="display:block;">
+			  	<tr>
+			  		<td width="10" nowrap>&nbsp;</td>
+					<td nowrap><a class="MenuItem2" href="stammdaten/reihungstestverwaltung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Verwaltung</a></td>
+			  	</tr>
+			  	<tr><td width="10" nowrap>&nbsp;</td></tr>
+			  	</table>
+			</td>
+		</tr>
+        <tr>
+          	<td nowrap><a href="?firma" class="MenuItem1" onClick="return(js_toggle_container('Firma'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Firma</a></td>
+        </tr>
+		<tr>
+          	<td nowrap>
+		  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Firma" style="display:block;">
+			  	<tr>
+			  		<td width="10" nowrap>&nbsp;</td>
+					<td nowrap><a class="MenuItem2" href="stammdaten/firma_frameset.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Verwaltung</a></td>
+			  	</tr>
+			  	<tr><td width="10" nowrap>&nbsp;</td></tr>
+			  	</table>
+			</td>
+		</tr>
+        <tr><td width="10" nowrap>&nbsp;</td></tr>
+		</table>
+</div>
 
- </body>
- </html>
+</body>
+</html>
