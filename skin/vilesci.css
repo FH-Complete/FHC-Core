@@ -1,23 +1,24 @@
-body 
-{ 
-	font-family: Verdana, Arial, Helvetica, Geneva, Swiss, SunSans-Regular; 
-	font-size: small; 
-	color: #000000; 
-	background-color: #F6F7FF; 
+body
+{
+	background-color: #F6F7FF;
+	font-family: Arial, Helvetica, Verdana, Geneva, sans-serif;
+	font-size: x-small;
+	/*IE hack*/
+	voice-family: "\"}\"";
+	voice-family: inherit;
+	font-size: small;	
+	/*IE hack end*/
 }
 
-table
+table.menue
 {
-	font-size: small; 
-}
-table.menu
-{
+	border-right-width:1px;
+	border-right-color:#BCBCBC;"
 	width:	100%;
 }
 table.liste
 {  
 	width:100%;
-	font-size: small;
 }
 
 tr.liste
@@ -46,39 +47,47 @@ td.button
 	padding-right: 6px;
 	text-align: center;
 }
-A.stpl_detail 
+
+a.stpl_detail 
 { 
-	font-size:x-small; 
+	font-size:smaller; 
 	color:#000000;
 	text-decoration:none;
 }
-A.stpl_detail:hover
+a.stpl_detail:hover
 { 
-	font-size:x-small;
+	font-size:smaller;
 	color:#000000; 
 	text-decoration:underline;
 	cursor:help;
 }
 a.linkgreen 
 { 
-	font-size:x-small; 
+	font-size:smaller; 
 	color:#008E74; 
 	text-decoration:none;
 }
 a.linkblue 
 { 
-	font-size:x-small; 
+	font-size:smaller; 
 	color:#00A4D2;
 	text-decoration:none;
 }
 a.linkblue:hover 
 { 
-	font-size:x-small; 
+	font-size:smaller; 
 	color:#00A4D2;
 	text-decoration:underline;
 	cursor:pointer;
 }
-a 
+
+a.h1:hover 
+{ 
+	color:#FFFFFF;
+	text-decoration:none;
+	cursor:pointer;
+}
+a
 { 
 	color:#00A4D2;
 	text-decoration:none;
@@ -89,18 +98,54 @@ a:hover
 	text-decoration:underline;
 	cursor:pointer;
 }
-a.h1:hover 
+
+a.hilfe 
 { 
-	color:#FFFFFF;
 	text-decoration:none;
-	cursor:pointer;
 }
+a.hilfe:hover 
+{ 
+	text-decoration:none;
+}
+a.MenuItem1
+{ 
+	color:#008E74; 
+	text-decoration:none;
+}
+a.MenuItem1:hover
+{ 
+	color:#008E74; 
+	text-decoration:underline;
+}
+
+a.MenuItem2
+{ 
+	color:#00A4D2;
+	text-decoration:none;
+}
+a.MenuItem2:hover
+{ 
+	color:#00A4D2;
+	text-decoration:underline;
+}
+
 img
 {
    border:0;
 }
 
-h1 { font-size: 14px; font-style: normal; line-height: normal; font-weight: normal; font-variant: normal; color: #ffffff; background-color: #009e84; text-decoration: none;}
+h1 
+{
+	font-size: 14px; 
+	font-style: normal; 
+	line-height: normal; 
+	font-weight: normal; 
+	font-variant: normal; 
+	color: #ffffff; 
+	background-color: 
+	#009e84; 
+	text-decoration: none;
+}
 h2 { font-size: 12px; font-style: normal; line-height: normal; font-weight: normal; font-variant: normal; color: #ffffff; background-color: #00a4d2; text-decoration: none;}
 h3 { font-size: x-small; font-style: normal; line-height: normal; font-weight: bold; font-variant: normal; text-transform: none; color: #008E74; cursor: pointer; text-decoration: none; }
 h4 { font-size: medium; font-style: normal; line-height: normal; font-weight: bold; font-variant: normal; text-transform: none; color: #008E74; cursor: pointer; text-decoration: none; }
@@ -108,37 +153,15 @@ p.littleblack { font-size: x-small; color: #000000;}
 
 .h1 { font-family: "Bookman Old Style"; font-size: 12px; font-style: normal; line-height: normal; font-weight: normal; font-variant: normal; color: #ffffff; background-color: #009e84; text-decoration: none}
 .h2 { font-family: "Bookman Old Style"; font-size: 12px; font-style: normal; line-height: normal; font-weight: normal; font-variant: normal; color: #ffffff; background-color: #00a4d2; text-decoration: none}
-body 
-{ 
-	font-family: Verdana, Arial, Helvetica, Geneva, Swiss, SunSans-Regular; 
-	font-size: small; 
-	color: #000000; 
-	background-color: #F6F7FF; 
-}
 
-TABLE
-{
-	font-size: small; 
-}
-
-TABLE.stdplan
-{  
-	font-size: small;
-}
-
-TABLE.stdplan TH
+table.stdplan TH
 {
 	background-color: #DDDDDD;
 }
 
-TABLE.stdplan TD
+table.stdplan TD
 {
 	background-color: #EEEEEE
-}
-
-TABLE.liste
-{  
-	font-size: small;
 }
 
 TR.liste
@@ -155,7 +178,6 @@ TR.liste1
 }
 
 
-
 FONT.beschriftung
 {
 	color:#666666;
@@ -165,68 +187,16 @@ P.little
 	font-size: xx-small;
 }
 
-A
-{ 
-	color:#00A4D2;
-	text-decoration:none;
-}
-A:hover 
-{ 
-	color:#00A4D2;
-	text-decoration:underline;
-}
-
-A.stpl_detail 
-{ 
-	font-size:x-small; 
-	color:#000000;
-	text-decoration:none;
-}
-A.stpl_detail:hover
-{ 
-	font-size:x-small;
-	color:#000000; 
-	text-decoration:underline;
-}
-A.hilfe 
-{ 
-	text-decoration:none;
-}
-A.hilfe:hover 
-{ 
-	text-decoration:none;
-}
-A.MenuItem1
-{ 
-	color:#008E74; 
-	text-decoration:none;
-}
-A.MenuItem1:hover
-{ 
-	color:#008E74; 
-	text-decoration:underline;
-}
-
-A.MenuItem2
-{ 
-	color:#00A4D2;
-	text-decoration:none;
-}
-A.MenuItem2:hover
-{ 
-	color:#00A4D2;
-	text-decoration:underline;
-}
 
 h1 
 { 
-	font-size: medium;
+	font-size: larger;
 	color: #ffffff; 
 	background-color: #009e84; 
 }
 h1 td
 { 
-	font-size: medium; 
+	font-size: larger; 
 	color: #ffffff; 
 	background-color: #009e84;
 }
@@ -242,13 +212,11 @@ h1 a:hover
 
 h2 
 { 
-	font-size: small; 
 	color: #ffffff; 
 	background-color: #00a4d2;
 }
 h2 td
 { 
-	font-size: small; 
 	color: #ffffff; 
 	background-color: #00a4d2;
 }
@@ -264,13 +232,13 @@ h2 a:hover
 
 h3 
 { 
-	font-size: x-small; 
+	font-size: smaller; 
 	font-weight: bold; 
 	color: #008E74; 
 }
 h4 
 { 
-	font-size: x-small; 
+	font-size: smaller; 
 	font-style: normal; 
 	line-height: normal; 
 	font-weight: bold; 
@@ -315,15 +283,6 @@ td
 	font-size: smaller; /*0.8em;*/
 }
 
-body
-{
-	background-color: #FFFFFF;
-	margin:	4px;
-	font-family: arial, tahoma, verdana, helvetica, sans-serif, serif;
-	padding: 0px;
-	font-size: smaller; /*0.8em;*/
-}
-
 img { border: none; }
 
 div.logo
@@ -338,32 +297,13 @@ div.logo
 	margin-bottom: 2px;
 }
 
-body.browser
+p.message 
 {
-	height:	100%;
-	background-color: #efefef;
-	margin:	0px;
-	padding: 0px;
-	font-family: arial, tahoma, verdana, helvetica, sans-serif, serif;
-	font-size: smaller; /*1em;*/
-	border-right: 1px dashed #c0c0c0;
-	text-align: left;
-}
-
-body.bottombar {
-	background-color: #CECF9C;
-	margin:	0px;
-	padding: 0px;
-	font-family: arial, tahoma, verdana, helvetica, sans-serif, serif;
-	font-size: smaller; /*1em;*/
-	text-align: left;
-}
-
-p.message {
 	color: blue;
 }
 
-p.comment {
+p.comment 
+{
 	font-style: italic;
 }
 
