@@ -657,7 +657,7 @@ class wochenplan
 	 */
 	function draw_week_xul($semesterplan,$uid, $wunsch=null)
 	{
-		echo $wunsch;
+		//echo $wunsch;
 		global $cfgStdBgcolor;
 		$count=0;
 		$berechtigung=new benutzerberechtigung($this->conn);
