@@ -479,6 +479,8 @@ class lehreinheit
 	 *************************************************************************/
 	function check_lva($datum,$stunde,$ort,$stpl_table)
 	{
+		$ignore_reservation=false;
+		$ignore_zeitsperre=false;
 		// Parameter Checken
 		// Bezeichnung der Stundenplan-Tabelle und des Keys
 		$stpl_id=$stpl_table.TABLE_ID;
@@ -511,7 +513,83 @@ class lehreinheit
 		$anzahl=pg_numrows($erg_stpl);
 		//Check
 		if ($anzahl==0)
+		{
+			// Reservierungen pruefen?
+			if (!$ignore_reservation)
+			{
+				// Datenbank abfragen  	( studiengang_kz, titel, beschreibung )	 		
+				//Lektoren SQL
+				$sql_lkt='';
+				foreach ($this->mitarbeiter_uid as $lkt)
+					$sql_lkt.="OR uid='$lkt' ";
+				$sql_lkt=substr($sql_lkt,3);
+				$sql_lkt="(($sql_lkt) AND uid!='_DummyLektor')";
+				$sql_query="SELECT reservierung_id AS id, uid AS lektor, stg_kurzbz, ort_kurzbz, semester, verband, gruppe, gruppe_kurzbz, datum, stunde 
+							FROM lehre.vw_reservierung
+							WHERE datum='$datum' AND stunde=$stunde AND (ort_kurzbz='$ort' OR $sql_lkt)";
+				// Verband SQL
+				//$sql_query.="(studiengang_kz=$this->studiengang_kz AND semester=$this->sem";
+				//if ($this->ver!=null && $this->ver!='' && $this->ver!=' ')
+				//	$sql_query.=" AND (verband='$this->ver' OR verband IS NULL OR verband='' OR verband=' ')";
+				//if ($this->grp!=null && $this->grp!='' && $this->grp!=' ')
+				//	$sql_query.=" AND (gruppe='$this->grp' OR gruppe IS NULL OR gruppe='' OR gruppe=' ')";
+				//if ($this->gruppe_kurzbz!=null && $this->gruppe_kurzbz!='' && $this->gruppe_kurzbz!=' ')
+				//	$sql_query.=" AND (gruppe_kurzbz='$this->gruppe_kurzbz')";
+				//$sql_query.="))";
+				
+				//echo $sql_query.'<br>';
+				if (! $erg_res=pg_query($this->conn, $sql_query))
+				{
+					$this->errormsg=$sql_query.pg_last_error($this->conn);
+					return false;
+				}
+				$anz_res=pg_numrows($erg_res);
+				//Check
+				if ($anz_res==0)
+				{
+					// Zeitsperren pruefen?
+					if (!$ignore_zeitsperre)
+					{
+						// Datenbank abfragen  	( studiengang_kz, titel, beschreibung )	 		
+						//Lektoren SQL
+						$sql_lkt='';
+						foreach ($this->mitarbeiter_uid as $lkt)
+							$sql_lkt.="OR mitarbeiter_uid='$lkt' ";
+						$sql_lkt=substr($sql_lkt,3);
+						$sql_query="SELECT * FROM campus.tbl_zeitsperre
+										WHERE ($sql_lkt) AND 
+											(  (vondatum<'$datum' AND bisdatum>'$datum') 
+											OR (vondatum='$datum' AND bisdatum='$datum' AND vonstunde<=$stunde AND bisstunde>=$stunde)
+											OR (vondatum='$datum' AND bisdatum>'$datum' AND vonstunde<=$stunde)
+											OR (vondatum<'$datum' AND bisdatum='$datum' AND bisstunde>=$stunde) )";	
+						//echo $sql_query.'<br>';
+						if (! $erg_zs=pg_query($this->conn, $sql_query))
+						{
+							$this->errormsg=$sql_query.pg_last_error($this->conn);
+							return false;
+						}
+						$anz_zs=pg_numrows($erg_zs);
+						//Check
+						if ($anz_zs==0)
+							return true;
+						else
+						{
+							$row=pg_fetch_object($erg_zs); 																							 	 	 	 	 	
+							$this->errormsg="Kollision (Zeitsperre): $row->zeitsperre_id|$row->mitarbeiter_uid|$row->zeitsperretyp_kurzbz|$row->bezeichnung|$row->vondatum/$row->vonstunde-$row->bisdatum/$row->bisstunde - $row->vertretung_uid";
+							return false;
+						}				
+					}
+					return true;
+				}
+				else
+				{
+					$row=pg_fetch_object($erg_res);
+					$this->errormsg="Kollision (Reservierung): $row->id|$row->lektor|$row->ort_kurzbz|$row->stg_kurzbz-$row->semester$row->verband$row->gruppe$row->gruppe_kurzbz - $row->datum/$row->stunde";
+					return false;
+				}				
+			}
 			return true;
+		}
 		else
 		{
 			$row=pg_fetch_row($erg_stpl);
@@ -612,7 +690,7 @@ class lehreinheit
 	    //return false;
 		if(!($erg=pg_query($this->conn, $sql_query)))
 		{
-			$this->errormsg=pg_errormessage($this->conn);
+			$this->errormsg=pg_errormessage($this->conn).$sql_query;
 			return false;
 		}
 		$num_rows=pg_numrows($erg);

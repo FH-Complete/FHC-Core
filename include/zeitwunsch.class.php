@@ -220,28 +220,36 @@ class zeitwunsch
 		if ($datum!=null)
 		{
 			$beginn=montag($datum);
-			$ende=jump_day($beginn,6);
+			$ende=jump_day($beginn,7);
 			$beginniso=date("Y-m-d",$beginn);
 			$endeiso=date("Y-m-d",$ende);
-			$sql_query="SELECT min(vondatum) AS vondatum,min(vonstunde) AS vonstunde,
-							min(bisdatum) AS bisdatum,min(bisstunde) AS bisstunde
+			$sql_query="SELECT vondatum,vonstunde,bisdatum,bisstunde
 						FROM campus.tbl_zeitsperre
 						WHERE mitarbeiter_uid IN ($sql_query_le)
-							AND vondatum<'$endeiso' AND bisdatum>'$beginniso'";
-			// Zeitwuensche abfragen
+							AND vondatum<='$endeiso' AND bisdatum>'$beginniso'";
+			//echo $sql_query;
+			// Zeitsperren abfragen
 			if(!$result=pg_query($this->conn, $sql_query))
 			{
 				$this->errormsg=pg_last_error($this->conn);
 				return false;
 			}
-			else if (!$row=pg_fetch_object($result));
+			while ($row=pg_fetch_object($result))
 			{
+				echo "\nTagBeginn: ".$row->vondatum;
+				echo "\nTagEnde: ".$row->bisdatum;
+				echo "\nStundeBeginn: ".$row->vonstunde;
+				echo "\nStundeEnde: ".$row->bisstunde;
 				if ($row->vonstunde==null || $row->vondatum==null)
 					return true;
 				$stundebeginn=$row->vonstunde;
 				$stundeende=$row->bisstunde;
-				$beginnDB=mktime(0,0,0,substr($row->vondatum,6,2),substr($row->vondatum,9,2),substr($row->vondatum,0,4));
-				$endeDB=mktime(0,0,0,substr($row->bisdatum,6,2),substr($row->bisdatum,9,2),substr($row->bisdatum,0,4));
+				$beginnDB=mktime(0,0,0,substr($row->vondatum,5,2),substr($row->vondatum,8,2),substr($row->vondatum,0,4));
+				$endeDB=mktime(0,0,0,substr($row->bisdatum,5,2),substr($row->bisdatum,8,2),substr($row->bisdatum,0,4));
+				echo "\nTagBeginnDB: ".$beginnDB;
+				echo "\nTagEndeDB: ".$endeDB;
+				echo "\nTagBeginn: ".$beginn;
+				echo "\nTagEnde: ".$ende;
 				if ($beginn<$beginnDB)
 					$beginn=$beginnDB;
 				else
@@ -257,8 +265,12 @@ class zeitwunsch
 					$tagende=6;
 					$stundeende=$this->max_stunde;
 				}
-				$first=true;
-				for ($t=$tagbeginn;$t<=$tagende;$t++)
+				echo "\nTagBeginn: ".$tagbeginn;
+				echo "\nTagEnde: ".$tagende;
+				echo "\nStundeBeginn: ".$stundebeginn;
+				echo "\nStundeEnde: ".$stundeende;
+				$first=false;
+				for ($t=1;$t<=6;$t++)
 					for ($h=$this->min_stunde;$h<=$this->max_stunde;$h++)
 					{
 						if ($first)
@@ -266,8 +278,22 @@ class zeitwunsch
 							$h=$stundebeginn;
 							$first=false;
 						}
-						if (!($t==$tagende && $h>$stundeende))
-							$this->zeitwunsch[$t][$h]=-3;
+						if ($t>=$tagbeginn && $t<=$tagende)
+							if ($t==$tagbeginn && $h>=$stundebeginn && ($t<$tagende || $h<=$stundeende))
+							{
+								$this->zeitwunsch[$t][$h]=-3;
+								echo 'Zeitsperre eingetragen:'.$t.$h;
+							}
+							elseif($t==$tagende && $h<=$stundeende && ($t>$tagbeginn || $h>=$stundebeginn))
+							{
+								$this->zeitwunsch[$t][$h]=-3;
+								echo 'Zeitsperre eingetragen:'.$t.$h;
+							}
+							elseif ($t>$tagbeginn && $t<$tagende)
+							{
+								$this->zeitwunsch[$t][$h]=-3;
+								echo 'Zeitsperre eingetragen:'.$t.$h;
+							}
 					}
 			}
 		}
