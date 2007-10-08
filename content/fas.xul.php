@@ -92,6 +92,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-dokumente-diplsupplement:command" oncommand="StudentCreateDiplSupplement();"/>
   <command id="menu-dokumente-studienerfolg-normal:command" oncommand="StudentCreateStudienerfolg();"/>
   <command id="menu-dokumente-studienerfolg-finanzamt:command" oncommand="StudentCreateStudienerfolg('finanzamt');"/>
+  <command id="menu-dokumente-accountinfoblatt:command" oncommand="PrintAccountInfoBlatt();"/>
   <command id="menu-extras-reihungstest:command" oncommand="ExtrasShowReihungstest();"/>
   <command id="menu-extras-firma:command" oncommand="ExtrasShowFirmenverwaltung();"/>
   <command id="menu-bis-mitarbeiter-import:command" oncommand="BISMitarbeiterImport();"/>
@@ -317,6 +318,12 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 	               accesskey = "&menu-dokumente-studienerfolg-finanzamt.accesskey;"/>
 	            </menupopup>
 	        </menu>
+	         <menuitem
+               id        =  "menu-dokumente-accountinfoblatt"
+               key       =  "menu-dokumente-accountinfoblatt:key"
+               label     = "&menu-dokumente-accountinfoblatt.label;"
+               command   =  "menu-dokumente-accountinfoblatt:command"
+               accesskey = "&menu-dokumente-accountinfoblatt.accesskey;"/>
           </menupopup>
     </menu>
     <menu id="menu-extras" label="&menu-extras.label;" accesskey="&menu-extras.accesskey;">

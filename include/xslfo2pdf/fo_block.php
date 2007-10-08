@@ -163,6 +163,8 @@ class FO_BasicLink extends FO_Block {
     $height = $this->getContext("content_height");
     $lx = $this->getContext("lx");
     $ly = $this->getContext("ly");
+    $x = $this->getContext("x");
+    $y = $this->getContext("y");
     $sx = $this->getContext("sx");
     $sy = $this->getContext("sy");    
     //echo "Link at:$x:$y:$width:$height<br>";
