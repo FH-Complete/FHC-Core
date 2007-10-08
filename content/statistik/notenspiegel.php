@@ -51,6 +51,19 @@ $result_student = $student->getStudents($studiengang_kz,$semester,null,null,null
 
 $lehrveranstaltung = new lehrveranstaltung($conn);
 $lehrveranstaltung->load_lva($studiengang_kz, $semester, null, null, true);
+$qry = "SELECT 
+			lehrveranstaltung_id, bezeichnung 
+		FROM 
+			lehre.tbl_lehrveranstaltung 
+        WHERE 
+        	lehrveranstaltung_id IN 
+        	(
+				SELECT distinct lehrveranstaltung_id FROM campus.vw_student_lehrveranstaltung 
+	        	WHERE studiengang_kz='$studiengang_kz' AND semester='$semester' AND studiensemester_kurzbz='$semester_aktuell'
+	        ) 
+		ORDER BY bezeichnung";
+if(!$result_lva = pg_query($conn, $qry))
+	die('Fehler beim Ermitteln der Lehrveranstaltungen');
 
 $noten = new note($conn);
 $noten->getAll();
@@ -114,7 +127,7 @@ if($typ=='xls')
 	$worksheet->write($zeile,++$spalte,'Personenkennzeichen', $format_bold);
 	$maxlength[$spalte]=20;
 	
-	foreach ($lehrveranstaltung->lehrveranstaltungen as $row_lva)
+	while($row_lva = pg_fetch_object($result_lva))
 	{
 		$worksheet->write($zeile,++$spalte,$row_lva->bezeichnung, $format_rotate);
 		$maxlength[$spalte]=3;
@@ -146,8 +159,11 @@ if($typ=='xls')
 		
 		$anzahl=0;
 		$summe=0;
-		foreach ($lehrveranstaltung->lehrveranstaltungen as $row_lva)
+		$rowcount=0;
+		while($rowcount<pg_num_rows($result_lva))
 		{
+			$row_lva = pg_fetch_object($result_lva,$rowcount);
+			$rowcount++;
 			if(isset($noten[$row_lva->lehrveranstaltung_id]))
 			{								
 				unset($format_colored);
@@ -200,8 +216,11 @@ if($typ=='xls')
 	
 	$summe_schnitt=0;
 	$anzahl_schnitt=0;
-	foreach ($lehrveranstaltung->lehrveranstaltungen as $row_lva)
+	$rowcount=0;
+	while($rowcount<pg_numrows($result_lva))
 	{
+		$row_lva = pg_fetch_object($result_lva, $rowcount);
+		$rowcount++;
 		if(isset($summe_lv[$row_lva->lehrveranstaltung_id]))
 		{
 			if($anzahl_lv[$row_lva->lehrveranstaltung_id]!=0)
@@ -255,7 +274,7 @@ else
 	echo "<h2>Notenspiegel $stg->kuerzel $semester</h2>";
 	
 	echo '<table class="liste" style="border: 1px solid black" cellspacing="0"><tr class="liste"><th>Nr</th><th>Name</th><th>Personenkennzeichen</th>';
-	foreach ($lehrveranstaltung->lehrveranstaltungen as $row_lva)
+	while($row_lva = pg_fetch_object($result_lva))
 	{
 		echo "<th>$row_lva->bezeichnung</th>";
 	}
@@ -278,8 +297,11 @@ else
 		
 		$anzahl=0;
 		$summe=0;
-		foreach ($lehrveranstaltung->lehrveranstaltungen as $row_lva)
+		$rowcount=0;
+		while($rowcount<pg_numrows($result_lva))
 		{
+			$row_lva =  pg_fetch_object($result_lva, $rowcount);
+			$rowcount++;
 			if(isset($noten[$row_lva->lehrveranstaltung_id]))
 			{
 				if($noten_farben[$noten[$row_lva->lehrveranstaltung_id]]!='')
@@ -318,8 +340,11 @@ else
 	echo '<tr><td>&nbsp;</td><td>&nbsp;</td><td>Notendurchschnitt</td>';
 	$summe_schnitt=0;
 	$anzahl_schnitt=0;
-	foreach ($lehrveranstaltung->lehrveranstaltungen as $row_lva)
+	$rowcount=0;
+	while($rowcount<pg_numrows($result_lva))
 	{
+		$row_lva = pg_fetch_object($result_lva, $rowcount);
+		$rowcount++;
 		if(isset($summe_lv[$row_lva->lehrveranstaltung_id]))
 		{
 			if($anzahl_lv[$row_lva->lehrveranstaltung_id]!=0)

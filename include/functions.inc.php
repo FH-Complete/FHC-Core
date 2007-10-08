@@ -260,4 +260,14 @@ function utf8_strlen($str)
 
   	return $count;
 }
+
+// ****************************************************************
+// * Prueft den uebergebenen Alias auf Gueltigkeit.
+// * Format: mindestens 1 Punkt enhalten, mind. 1 Zeichen vor und 
+// * 1 Zeichen nach dem Punkt, keine Sonderzeichen
+// ****************************************************************
+function checkalias($alias)
+{
+	
+}
 ?>

@@ -107,6 +107,8 @@
 <!ENTITY menu-dokumente-studienerfolg-finanzamt.label	"Finanzamt">
 <!ENTITY menu-dokumente-studienerfolg-finanzamt.accesskey	"F">
 
+<!ENTITY menu-dokumente-accountinfoblatt.label	"Account InfoBlatt">
+<!ENTITY menu-dokumente-accountinfoblatt.accesskey	"A">
 
 <!ENTITY menu-extras.label		"Extras">
 <!ENTITY menu-extras.accesskey	"X">
