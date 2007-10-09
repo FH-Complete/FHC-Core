@@ -6,8 +6,8 @@
  */
 
 
-require_once('../../../vilesci/config.inc.php');
-require_once('../sync_config.inc.php');
+require('../config.inc.php');
+require('../../include/studiensemester.class.php');
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
@@ -15,9 +15,35 @@ $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlg
 //$adress="ruhan@technikum-wien.at";
 $error_log='';
 $error_log_all="";
-$stgart=array();
-$fehler=array();
+$stgart='';
+$fehler='';
+$v='';
+$studiensemester=new studiensemester($conn);
+$ssem=$studiensemester->getaktorNext();
 
+if(isset($_GET['stg_kz']))
+{
+	$stg_kz=$_GET['stg_kz'];
+}
+else 
+{
+	$stg_kz=0;
+}
+if(isset($_GET['email']))
+{
+	if($_GET['email']==true)
+	{
+		$email=true;
+	}
+	else 
+	{
+		$email=false;	
+	}
+}
+else 
+{
+	$email=false;
+}
 function myaddslashes($var)
 {
 	return ($var!=''?"'".addslashes($var)."'":'null');
@@ -29,10 +55,10 @@ function myaddslashes($var)
 <head>
 <title>Datenüberprüfung für BIS-Meldung</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 </head>
 <body>
 <?php
-
 $qry="SELECT * FROM public.tbl_studiensemester";
 if($result = pg_query($conn, $qry))
 {
@@ -42,13 +68,13 @@ if($result = pg_query($conn, $qry))
 		$ende[$row->studiensemester_kurzbz]=$row->ende;
 	}
 }
-$qry="SELECT * FROM public.tbl_studiengang";
+$qry="SELECT * FROM public.tbl_studiengang WHERE studiengang_kz='".$stg_kz."'";
 if($result = pg_query($conn, $qry))
 {
 	while($row = pg_fetch_object($result))
 	{
-		$stgart[$row->studiengang_kz]=$row->typ;
-		$email[$row->studiengang_kz]=$row->email;
+		$stgart=$row->typ;
+		$stgemail=$row->email;
 	}
 }
 
@@ -60,18 +86,17 @@ $qry="SELECT *, tbl_abschlusspruefung.datum AS abdatum FROM public.tbl_student
 	JOIN public.tbl_adresse ON(tbl_person.person_id=tbl_adresse.person_id)
 	LEFT JOIN lehre.tbl_abschlusspruefung USING(student_uid) 
 	WHERE heimatadresse IS TRUE 
-	AND (studiensemester_kurzbz='WS2007')
+	AND (studiensemester_kurzbz='".$ssem."') AND tbl_student.studiengang_kz='".$stg_kz."'
 	AND (rolle_kurzbz='Student' OR rolle_kurzbz='Incoming' OR rolle_kurzbz='Outgiong'
 		OR rolle_kurzbz='Praktikant' OR rolle_kurzbz='Diplomand' OR rolle_kurzbz='Absolvent') 
-	ORDER BY tbl_student.studiengang_kz, student_uid, nachname, vorname
+	ORDER BY nachname, vorname,student_uid
 	";
-//
 
 if($result = pg_query($conn, $qry))
 {
 	while($row = pg_fetch_object($result))
 	{
-		if($row->gebdatum<'1920-01-01')
+		if($row->gebdatum<'1920-01-01' OR $row->gebdatum==null OR $row->gebdatum='')
 		{
 			$error_log.="Geburtsdatum ('".$row->gebdatum."')";
 		}
@@ -196,7 +221,7 @@ if($result = pg_query($conn, $qry))
 				$error_log.="ZugangDatum ('".$row->zgvdatum."')";
 			}
 		}
-		if($stgart[$row->studiengang_kz]=='m')
+		if($stgart=='m')
 		{
 			if($row->zgvmas_code=='' || $row->zgvmas_code==null)
 			{
@@ -262,26 +287,23 @@ if($result = pg_query($conn, $qry))
 		if($error_log!='')
 		{
 			$error_log="Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($row->rolle_kurzbz) fehlt: ".$error_log."\n";
-			if(!isset($fehler[$row->studiengang_kz]))
-			{
-				$fehler[$row->studiengang_kz]=$error_log;
-			}
-			else 
-			{
-				$fehler[$row->studiengang_kz].=$error_log;
-			}
-			$error_log="";
 		}
+		$v.=$error_log;
+		$error_log='';
 	}
 }
-echo "Fehlende BIS-Daten (für Meldung 11.2007): <br>";
+echo "<H1>BIS - Studentendaten werden überprüft. Studiengang: ".$stg_kz."</H1>\n";
+echo "<H2>Fehlende BIS-Daten (für Meldung ".$ssem."): </H2><br>";
 echo "(Doppelte Zeilen deuten auf mehrere Heimatadressen hin - bitte Kontakte überprüfen)<br><br>";
-foreach ($fehler as $f => $v)
+
+echo nl2br($v."\n");
+
+if($email)
 {
-	echo nl2br("Studiengang: ".$f."(".$email[$f].")\n".$v."\n");
-	//mail(trim($email[$f]), 'BIS-Daten / Studiengang: '.$f,"Fehlende Daten für die BIS-Meldung:(von ".$_SERVER['HTTP_HOST'].")\n(Doppelte Zeilen deuten auf mehrere Heimatadressen hin - bitte Kontakte überprüfen)\n\nStudiengang: ".$f."(".$email[$f].")\n".$v."\n","From: vilesci@technikum-wien.at");
-	mail($adress, 'BIS-Daten / Studiengang: '.$f,"\nFehlende Daten für die BIS-Meldung: (von ".$_SERVER['HTTP_HOST'].")\n(Doppelte Zeilen deuten auf mehrere Heimatadressen hin - bitte Kontakte überprüfen)\n\nStudiengang: ".$f."(".$email[$f].")\n".$v."\n","From: vilesci@technikum-wien.at");	
-}
+	mail(trim($stgemail), 'BIS-Daten / Studiengang: '.$stg_kz,"Fehlende Daten für die BIS-Meldung:(von ".$_SERVER['HTTP_HOST'].")\n(Doppelte Zeilen deuten auf mehrere Heimatadressen hin - bitte Kontakte überprüfen)\n\nStudiengang: ".$stg_kz."(".$stgemail.")\n".$v."\n","From: vilesci@technikum-wien.at");
+	//mail($adress, 'BIS-Daten / Studiengang: '.$f,"\nFehlende Daten für die BIS-Meldung: (von ".$_SERVER['HTTP_HOST'].")\n(Doppelte Zeilen deuten auf mehrere Heimatadressen hin - bitte Kontakte überprüfen)\n\nStudiengang: ".$f."(".$email[$f].")\n".$v."\n","From: vilesci@technikum-wien.at");	
+}	
+
 
 
 ?>
