@@ -64,6 +64,16 @@
 
 	$rechte = new benutzerberechtigung($sql_conn);
 	$rechte->getBerechtigungen($user);
+
+	//Handbuch ausliefern
+	if (isset($_GET["handbuch"])){
+		$filename = BENOTUNGSTOOL_PATH."handbuch_benotungstool.pdf";
+		header('Content-Type: application/octet-stream');
+		header('Content-disposition: attachment; filename="handbuch_benotungstool.pdf"');
+		readfile($filename);
+		exit;
+	}	
+	
 ?>
 <html>
 <head>
@@ -479,7 +489,8 @@
 	  	?>
 	  <a href="benotungstool/verwaltung.php?<?php echo "lvid=$lvid$studiensem"?>" >
             <img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
-            <strong>Benotungstool<br>("Kreuzerl"-Tool)</strong></a>
+            <strong>Benotungstool<br>("Kreuzerl"-Tool)</strong></a><br>
+            <a href="lesson.php?handbuch=1&<?php echo "lvid=$lvid$studiensem"?>">Handbuch [PDF]</a>
 	    <?php } else { ?>
 	  <a href="benotungstool/studentenansicht.php?<?php echo "lvid=$lvid"?>" >
             <img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>

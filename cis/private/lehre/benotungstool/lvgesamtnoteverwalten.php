@@ -334,7 +334,8 @@ if (isset($_REQUEST["submit"]) && ($_POST["student_uid"] != '')){
 if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 {
 	$jetzt = date("Y-m-d H:i:s");
-	$studlist = "";
+	$neuenoten = 0;
+	$studlist = "<table border='1'><tr><td><b>Mat. Nr.</b></td><td><b>Nachname</b></td><td><b>Vorname</b></td><td><b>Note</b></td></tr>";
 	$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id' ORDER BY semester, verband, gruppe, gruppe_kurzbz";
 	
 	if($result_grp = pg_query($conn, $qry))
@@ -370,23 +371,25 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 	    					$lvgesamtnote->freigabedatum = $jetzt;
 	    					$lvgesamtnote->freigabevon_uid = $user;
 	    					$lvgesamtnote->save($new=null);
-	    					$studlist .= $row_stud->matrikelnr." ".$row_stud->nachname." ".$row_stud->vorname."<br>";
+	    					$studlist .= "<tr><td>".$row_stud->matrikelnr."</td><td>".$row_stud->nachname."</td><td>".$row_stud->vorname."</td><td>".$lvgesamtnote->note."</td></tr>";
+	    					$neuenoten++;
 	    				}
 	    			}
 				}	
 			}
 		}
 	}
+	$studlist .= "</table>";
 	//mail an assistentin und den user selber verschicken	
-	if ($studlist != "")
+	if ($neuenoten > 0)
 	{
 		$lv = new lehrveranstaltung($conn, $lvid);
 		$sg = new studiengang($conn, $lv->studiengang_kz);
-		$adress = $user."@technikum-wien.at";
+		$debug_adressen = $user."@technikum-wien.at";
 		$adressen = $sg->email.", ".$user."@technikum-wien.at";
 		
 		$freigeber = "<b>".strtoupper($user)."</b>";
-		mail($adressen,"Notenfreigabe ".$lv->bezeichnung,"<html><body><b>".$lv->bezeichnung."</b><br><br>Benutzer ".$freigeber." hat die LV-Noten f&uuml;r folgende Studenten freigegeben:<br>".$studlist."<br>Mail wurde verschickt an: ".$adressen."</body></html>","From: vilesci@technikum-wien.at\nContent-Type: text/html\n");
+		mail($adressen,"Notenfreigabe ".$lv->bezeichnung,"<html><body><b>".$lv->bezeichnung."</b><br><br>Benutzer ".$freigeber." hat die LV-Noten f&uuml;r folgende Studenten freigegeben:<br><br>".$studlist."<br>Mail wurde verschickt an: ".$adressen."</body></html>","From: vilesci@technikum-wien.at\nContent-Type: text/html\n");
 	}	
 
 
