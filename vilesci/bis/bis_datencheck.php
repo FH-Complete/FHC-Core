@@ -299,7 +299,7 @@ if($result = pg_query($conn, $qry))
 		}
 		if($error_log!='' OR $error_log1!='')
 		{
-			$v.="Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($row->rolle_kurzbz): \n";
+			$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($row->rolle_kurzbz): </u>\n";
 			if($error_log!='')
 			{
 				$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Es fehlt: ".$error_log."\n";
@@ -308,6 +308,7 @@ if($result = pg_query($conn, $qry))
 			{
 				$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".$error_log1;
 			}
+			$v.="\n";
 		}
 		$error_log='';
 		$error_log1='';
