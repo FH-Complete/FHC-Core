@@ -344,6 +344,9 @@ function LeNeu()
 	document.getElementById('lehrveranstaltung-detail-checkbox-new').checked=true;
 	document.getElementById('lehrveranstaltung-detail-textbox-stundenblockung').value='2';
 	document.getElementById('lehrveranstaltung-detail-textbox-wochenrythmus').value='1';
+	
+	var stsem = getStudiensemester();
+	document.getElementById('lehrveranstaltung-detail-menulist-studiensemester').value=stsem;
 }
 // ****
 // * Selectiert die Lektorzuordnung nachdem der Tree

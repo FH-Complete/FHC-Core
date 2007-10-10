@@ -355,6 +355,8 @@ function StudentAbschlusspruefungAuswahl()
 	document.getElementById('student-abschlusspruefung-textbox-anmerkung').value=anmerkung;
 	document.getElementById('student-abschlusspruefung-textbox-abschlusspruefung_id').value=abschlusspruefung_id;
 	document.getElementById('student-abschlusspruefung-checkbox-neu').checked=false;
+	
+	StudentAbschlusspruefungTypChange();
 }
 
 // ****
@@ -615,4 +617,22 @@ function StudentAbschlusspruefungPrintUrkunde(sprache)
 		xsl='DiplomurkundeEng';
 			
 	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&abschlusspruefung_id='+abschlusspruefung_id,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+
+function StudentAbschlusspruefungTypChange()
+{
+	if(document.getElementById('student-abschlusspruefung-menulist-typ').value=='Bachelor')
+	{
+		document.getElementById('student-abschlusspruefung-label-pruefer1').value='Pruefer 1';
+		document.getElementById('student-abschlusspruefung-label-pruefer2').value='Pruefer 2';
+		document.getElementById('student-abschlusspruefung-menulist-pruefer3').hidden=false;
+		document.getElementById('student-abschlusspruefung-label-pruefer3').hidden=false;
+	}
+	else
+	{
+		document.getElementById('student-abschlusspruefung-label-pruefer1').value='Pruefer 1 (nicht technisch)';
+		document.getElementById('student-abschlusspruefung-label-pruefer2').value='Pruefer 2 (technisch)';
+		document.getElementById('student-abschlusspruefung-menulist-pruefer3').hidden=true;
+		document.getElementById('student-abschlusspruefung-label-pruefer3').hidden=true;
+	}
 }

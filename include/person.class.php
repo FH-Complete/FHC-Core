@@ -374,7 +374,6 @@ class person
 				        $this->addslashes($this->geburtsnation).','.
 				        $this->addslashes($this->staatsbuergerschaft).','.
 				        $this->addslashes($this->ext_id).');';
-				        $this->done=true;
 		}
 		else
 		{
@@ -384,101 +383,58 @@ class person
 				$this->errormsg = "person_id muss eine gueltige Zahl sein\n";
 				return false;
 			}
-
-			//update nur wenn änderungen gemacht
-			$qry="SELECT * FROM public.tbl_person WHERE person_id='$this->person_id';";
-			if($result = pg_query($this->conn, $qry))
-			{
-				if($row = pg_fetch_object($result))
-				{
-					$update=false;
-					if($row->sprache!=$this->sprache) 				$update=true;
-					if($row->anrede!=$this->anrede) 					$update=true;
-					if($row->titelpost!=$this->titelpost) 					$update=true;
-					if($row->titelpre!=$this->titelpre) 					$update=true;
-					if($row->nachname!=$this->nachname) 				$update=true;
-					if($row->vorname!=$this->vorname) 				$update=true;
-					if($row->vornamen!=$this->vornamen) 				$update=true;
-					if($row->gebdatum!=$this->gebdatum) 				$update=true;
-					if($row->gebort!=$this->gebort) 					$update=true;
-					if($row->gebzeit!=$this->gebzeit) 					$update=true;
-					if($row->foto!=$this->foto) 						$update=true;
-					if($row->anmerkungen!=$this->anmerkungen) 			$update=true;
-					if($row->homepage!=$this->homepage) 				$update=true;
-					if($row->svnr!=$this->svnr) 						$update=true;
-					if($row->ersatzkennzeichen!=$this->ersatzkennzeichen) 	$update=true;
-					if($row->familienstand!=$this->familienstand) 			$update=true;
-					if($row->anzahlkinder!=$this->anzahlkinder) 			$update=true;
-					if($row->aktiv!=$this->aktiv) 					$update=true;
-					if($row->geburtsnation!=$this->geburtsnation) 			$update=true;
-					if($row->geschlecht!=$this->geschlecht) 				$update=true;
-					if($row->staatsbuergerschaft!=$this->staatsbuergerschaft)	$update=true;
-
-					if($update)
-					{
-						$qry = 'UPDATE public.tbl_person SET'.
-						       ' sprache='.$this->addslashes($this->sprache).','.
-						       ' anrede='.$this->addslashes($this->anrede).','.
-						       ' titelpost='.$this->addslashes($this->titelpost).','.
-						       ' titelpre='.$this->addslashes($this->titelpre).','.
-						       ' nachname='.$this->addslashes($this->nachname).','.
-						       ' vorname='.$this->addslashes($this->vorname).','.
-						       ' vornamen='.$this->addslashes($this->vornamen).','.
-						       ' gebdatum='.$this->addslashes($this->gebdatum).','.
-						       ' gebort='.$this->addslashes($this->gebort).','.
-						       ' gebzeit='.$this->addslashes($this->gebzeit).','.
-						       ' foto='.$this->addslashes($this->foto).','.
-						       ' anmerkungen='.$this->addslashes($this->anmerkungen).','.
-						       ' homepage='.$this->addslashes($this->homepage).','.
-						       ' svnr='.$this->addslashes($this->svnr).','.
-						       ' ersatzkennzeichen='.$this->addslashes($this->ersatzkennzeichen).','.
-						       ' familienstand='.$this->addslashes($this->familienstand).','.
-						       ' anzahlkinder='.$this->addslashes($this->anzahlkinder).','.
-						       ' aktiv='.($this->aktiv?'true':'false').','.
-						       ' insertamum=now(),'.
-						       ' insertvon='.$this->addslashes($this->insertvon).','.
-						       ' updateamum=now(),'.
-						       ' updatevon='.$this->addslashes($this->updatevon).','.
-						       ' geschlecht='.$this->addslashes($this->geschlecht).','.
-						       ' geburtsnation='.$this->addslashes($this->geburtsnation).','.
-						       ' staatsbuergerschaft='.$this->addslashes($this->staatsbuergerschaft).','.
-						       ' ext_id='.$this->addslashes($this->ext_id).
-						       ' WHERE person_id='.$this->person_id.';';
-						       $this->done=true;
-					}
-				}
-			}
+						
+			$qry = 'UPDATE public.tbl_person SET'.
+			       ' sprache='.$this->addslashes($this->sprache).','.
+			       ' anrede='.$this->addslashes($this->anrede).','.
+			       ' titelpost='.$this->addslashes($this->titelpost).','.
+			       ' titelpre='.$this->addslashes($this->titelpre).','.
+			       ' nachname='.$this->addslashes($this->nachname).','.
+			       ' vorname='.$this->addslashes($this->vorname).','.
+			       ' vornamen='.$this->addslashes($this->vornamen).','.
+			       ' gebdatum='.$this->addslashes($this->gebdatum).','.
+			       ' gebort='.$this->addslashes($this->gebort).','.
+			       ' gebzeit='.$this->addslashes($this->gebzeit).','.
+			       ' foto='.$this->addslashes($this->foto).','.
+			       ' anmerkungen='.$this->addslashes($this->anmerkungen).','.
+			       ' homepage='.$this->addslashes($this->homepage).','.
+			       ' svnr='.$this->addslashes($this->svnr).','.
+			       ' ersatzkennzeichen='.$this->addslashes($this->ersatzkennzeichen).','.
+			       ' familienstand='.$this->addslashes($this->familienstand).','.
+			       ' anzahlkinder='.$this->addslashes($this->anzahlkinder).','.
+			       ' aktiv='.($this->aktiv?'true':'false').','.
+			       ' insertamum=now(),'.
+			       ' insertvon='.$this->addslashes($this->insertvon).','.
+			       ' updateamum=now(),'.
+			       ' updatevon='.$this->addslashes($this->updatevon).','.
+			       ' geschlecht='.$this->addslashes($this->geschlecht).','.
+			       ' geburtsnation='.$this->addslashes($this->geburtsnation).','.
+			       ' staatsbuergerschaft='.$this->addslashes($this->staatsbuergerschaft).','.
+			       ' ext_id='.$this->addslashes($this->ext_id).
+			       ' WHERE person_id='.$this->person_id.';';
 		}
 
-		if ($this->done)
+		if(pg_query($this->conn,$qry))
 		{
-
-			if(pg_query($this->conn,$qry))
+			if($this->new)
 			{
-				if($this->new)
+				$qry = "SELECT currval('public.tbl_person_person_id_seq') AS id;";
+				if($row=pg_fetch_object(pg_query($this->conn,$qry)))
+					$this->person_id=$row->id;
+				else
 				{
-					$qry = "SELECT currval('tbl_person_person_id_seq') AS id;";
-					if($row=pg_fetch_object(pg_query($this->conn,$qry)))
-						$this->person_id=$row->id;
-					else
-					{
-						$this->errormsg = "Sequence konnte nicht ausgelesen werden\n";
-						return false;
-					}
+					$this->errormsg = "Sequence konnte nicht ausgelesen werden\n";
+					return false;
 				}
-				//Log schreiben
-				return true;
+			}
+			//Log schreiben
+			return true;
 
-			}
-			else
-			{
-				$this->errormsg = "*****\nFehler beim Speichern des Person-Datensatzes: ".$this->nachname."\n".$qry."\n".pg_errormessage($this->conn)."\n*****\n";
-				return false;
-			}
 		}
 		else
 		{
-			return true;
+			$this->errormsg = "Fehler beim Speichern des Person-Datensatzes:".pg_errormessage($this->conn);
+			return false;
 		}
 	}
 	/**
