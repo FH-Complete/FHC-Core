@@ -274,13 +274,26 @@ class benutzerberechtigung
 		return true;
 	}
 
+	//****************************************************************************
+	// * Rueckgabewert ist TRUE wenn eine Berechtigung entspricht.
+	// * Wenn der Parameter stg_kz NULL ist tritt einheit_kurzbzb in Kraft.
+	// * @param string $uid    UserID
+	// * @return variable Array mit LVA, false bei Fehler
+	// ***************************************************************************
 	function isBerechtigt($berechtigung,$studiengang_kz=null,$art=null, $fachbereich_kurzbz=null)
 	{
 		$timestamp=time();
 		foreach ($this->berechtigungen as $b)
 		{
 			//Admin auf alles ist immer TRUE
-			if ($b->berechtigung_kurzbz=='admin' && is_null($b->fachbereich_kurzbz) && is_null($b->studiengang_kz))
+			if ($b->berechtigung_kurzbz=='admin' && is_null($b->fachbereich_kurzbz) && is_null($b->studiengang_kz) )
+				if ($b->starttimestamp!=null && $b->endetimestamp!=null)
+				{
+					if ($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp)
+						return true;
+				}
+				else
+					return true;
 				return true;
 
 			//Fachbereichsberechtigung
