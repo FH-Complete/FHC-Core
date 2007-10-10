@@ -99,6 +99,8 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-bis-mitarbeiter-export:command" oncommand="BISMitarbeiterExport();"/>
   <command id="menu-bis-mitarbeiter-checkverwendung:command" oncommand="BISMitarbeiterCheckVerwendung();"/>
   <command id="menu-bis-mitarbeiter-checkfunktion:command" oncommand="BISMitarbeiterCheckFunktion();"/>
+  <command id="menu-bis-studenten-plausibilitaetspruefung:command" oncommand="BISStudentenPlausicheck();"/>
+  <command id="menu-bis-studenten-export:command" oncommand="BISStudentenExport();"/>
   <command id="menu-help-close:command" oncommand="OpenAboutDialog()"/>
 </commandset>
 
@@ -370,6 +372,22 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 		               label     = "&menu-bis-mitarbeiter-import.label;"
 		               command   =  "menu-bis-mitarbeiter-import:command"
 		               accesskey = "&menu-bis-mitarbeiter-import.accesskey;"/>
+				</menupopup>
+			</menu>
+			<menu id="menu-bis-studenten" label="&menu-bis-studenten.label;" accesskey="&menu-bis-studenten.accesskey;">
+         		<menupopup id="menu-bis-studenten-popup">
+         			<menuitem
+		               id        =  "menu-bis-studenten-plausibilitaetspruefung"
+		               key       =  "menu-bis-studenten-plausibilitaetspruefung:key"
+		               label     = "&menu-bis-studenten-plausibilitaetspruefung.label;"
+		               command   =  "menu-bis-studenten-plausibilitaetspruefung:command"
+		               accesskey = "&menu-bis-studenten-plausibilitaetspruefung.accesskey;"/>
+		            <menuitem
+		               id        =  "menu-bis-studenten-export"
+		               key       =  "menu-bis-studenten-export:key"
+		               label     = "&menu-bis-studenten-export.label;"
+		               command   =  "menu-bis-studenten-export:command"
+		               accesskey = "&menu-bis-studenten-export.accesskey;"/>
 				</menupopup>
 			</menu>
 		</menupopup>

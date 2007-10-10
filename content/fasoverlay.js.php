@@ -825,6 +825,52 @@ function BISMitarbeiterCheckFunktion()
 }
 
 // ****
+// * oeffnet Script zum Checken der Studentendaten
+// ****
+function BISStudentenPlausicheck()
+{
+	var tree=document.getElementById('tree-verband');
+
+	//Wenn nichts markiert wurde -> beenden
+	if(tree.currentIndex==-1)
+	{
+		alert('Bitte einen Studiengang auswaehlen');
+		return;
+	}
+
+	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+	var stg_kz=tree.view.getCellText(tree.currentIndex,col);
+	
+	if(stg_kz!='')
+		window.open('<?php echo APP_ROOT ?>vilesci/bis/bis_datencheck.php?stg_kz='+stg_kz,'Datencheck','');
+	else
+		alert('Bitte einen Studiengang auswaehlen');
+}
+
+// ****
+// * oeffnet Script zum Checken der Studentendaten
+// ****
+function BISStudentenExport()
+{
+	var tree=document.getElementById('tree-verband');
+
+	//Wenn nichts markiert wurde -> beenden
+	if(tree.currentIndex==-1)
+	{
+		alert('Bitte einen Studiengang auswaehlen');
+		return;
+	}
+
+	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+	var stg_kz=tree.view.getCellText(tree.currentIndex,col);
+	
+	if(stg_kz!='')
+		window.open('<?php echo APP_ROOT ?>vilesci/bis/studentenmeldung.php?stg_kz='+stg_kz,'StudentenMeldung','');
+	else
+		alert('Bitte einen Studiengang auswaehlen');
+}
+
+// ****
 // * Oeffnet den About Dialog
 // ****
 function OpenAboutDialog()

@@ -151,6 +151,23 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     		<column flex="5"/>
     	</columns>
   		<rows>
+  			<row>
+  				<label value="Typ" control="student-abschlusspruefung-menulist-typ" />
+    			<menulist id="student-abschlusspruefung-menulist-typ"
+						  disabled="true"
+				          datasources="<?php echo APP_ROOT; ?>rdf/pruefungstyp.rdf.php?abschluss=true" flex="1"
+				          ref="http://www.technikum-wien.at/pruefungstyp/liste" 
+				          oncommand="StudentAbschlusspruefungTypChange()"
+				>
+					<template>
+						<menupopup>
+							<menuitem value="rdf:http://www.technikum-wien.at/pruefungstyp/rdf#pruefungstyp_kurzbz"
+				        		      label="rdf:http://www.technikum-wien.at/pruefungstyp/rdf#beschreibung"
+							  		  uri="rdf:*"/>
+						</menupopup>
+					</template>
+				</menulist>
+  			</row>
     		<row>
     			<label value="Vorsitz" control="student-abschlusspruefung-menulist-vorsitz" />
     			<menulist id="student-abschlusspruefung-menulist-vorsitz"
@@ -167,7 +184,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</menupopup>
 					</template>
 				</menulist>
-				<label value="Pruefer1" control="student-abschlusspruefung-menulist-pruefer1" />
+				<label value="Pruefer1" id="student-abschlusspruefung-label-pruefer1" control="student-abschlusspruefung-menulist-pruefer1" />
     			<menulist id="student-abschlusspruefung-menulist-pruefer1"
 						  editable="true" disabled="true"
 				          datasources="rdf:null" flex="1"
@@ -197,7 +214,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</menupopup>
 					</template>
 				</menulist>
-				<label value="Pruefer2" control="student-abschlusspruefung-menulist-pruefer2" />
+				<label value="Pruefer2" id="student-abschlusspruefung-label-pruefer2" control="student-abschlusspruefung-menulist-pruefer2" />
     			<menulist id="student-abschlusspruefung-menulist-pruefer2"
 						  editable="true" disabled="true"
 				          datasources="rdf:null" flex="1"
@@ -227,7 +244,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							</menupopup>
 					</template>
 				</menulist>
-				<label value="Pruefer3" control="student-abschlusspruefung-menulist-pruefer3" />
+				<label value="Pruefer3" id="student-abschlusspruefung-label-pruefer3" control="student-abschlusspruefung-menulist-pruefer3" />
     			<menulist id="student-abschlusspruefung-menulist-pruefer3"
 						  editable="true" disabled="true"
 				          datasources="rdf:null" flex="1"
@@ -243,32 +260,19 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				</menulist>
     		</row>
     		<row>
-    			<label value="Datum" control="student-abschlusspruefung-datum-datum" />
-    			<box class="Datum" id="student-abschlusspruefung-datum-datum"  disabled="true"/>
-    			<label value="Typ" control="student-abschlusspruefung-menulist-typ" />
-    			<menulist id="student-abschlusspruefung-menulist-typ"
-						  disabled="true"
-				          datasources="<?php echo APP_ROOT; ?>rdf/pruefungstyp.rdf.php?abschluss=true" flex="1"
-				          ref="http://www.technikum-wien.at/pruefungstyp/liste" 
-				>
-					<template>
-						<menupopup>
-							<menuitem value="rdf:http://www.technikum-wien.at/pruefungstyp/rdf#pruefungstyp_kurzbz"
-				        		      label="rdf:http://www.technikum-wien.at/pruefungstyp/rdf#beschreibung"
-							  		  uri="rdf:*"/>
-						</menupopup>
-					</template>
-				</menulist>
-    		</row>
-    		<row>
-    			<label value="Sponsion" control="student-abschlusspruefung-datum-sponsion" />
     			<vbox>
-    				<box class="Datum" id="student-abschlusspruefung-datum-sponsion"  disabled="true"/>
-    				<spacer flex="1" />
+    				<label value="Datum" control="student-abschlusspruefung-datum-datum" />
+    				<label value="Sponsion" control="student-abschlusspruefung-datum-sponsion" />
     			</vbox>
-    			<label value="Anmerkung" control="student-abschlusspruefung-textbox-anmerkung" />
+    			<vbox>
+					<box class="Datum" id="student-abschlusspruefung-datum-datum"  disabled="true"/>
+    				<box class="Datum" id="student-abschlusspruefung-datum-sponsion"  disabled="true"/>
+    			</vbox>    		
+		    	
+		    	<label value="Anmerkung" control="student-abschlusspruefung-textbox-anmerkung" />
     			<textbox id="student-abschlusspruefung-textbox-anmerkung" multiline="true" maxlength="256" disabled="true"/>
     		</row>
+    		
     		<row>
     			<spacer />
     			<spacer />

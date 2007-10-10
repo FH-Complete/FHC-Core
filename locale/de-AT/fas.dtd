@@ -144,3 +144,15 @@
 <!ENTITY menu-bis-mitarbeiter-checkfunktion.key			"F">
 <!ENTITY menu-bis-mitarbeiter-checkfunktion.label		"checkFunktion">
 <!ENTITY menu-bis-mitarbeiter-checkfunktion.accesskey	"F">
+
+<!ENTITY menu-bis-studenten.key		"S">
+<!ENTITY menu-bis-studenten.label		"Studenten">
+<!ENTITY menu-bis-studenten.accesskey	"S">
+
+<!ENTITY menu-bis-studenten-plausibilitaetspruefung.key			"P">
+<!ENTITY menu-bis-studenten-plausibilitaetspruefung.label		"Plausibilitaetspruefung">
+<!ENTITY menu-bis-studenten-plausibilitaetspruefung.accesskey	"P">
+
+<!ENTITY menu-bis-studenten-export.key		"E">
+<!ENTITY menu-bis-studenten-export.label		"Meldung generieren">
+<!ENTITY menu-bis-studenten-export.accesskey	"E">

@@ -200,7 +200,7 @@ class mitarbeiter extends benutzer
 
 			//Neuen Datensatz anlegen
 			$qry = "INSERT INTO public.tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz,
-			                    fixangestellt, standort_kurzbz, telefonklappe, anmerkung, stundensatz, updateamum, updatevon, ext_id)
+			                    fixangestellt, standort_kurzbz, telefonklappe, anmerkung, stundensatz, updateamum, updatevon, insertamum, insertvon, ext_id)
 
 			        VALUES('".addslashes($this->uid)."',".
 			 	 	$this->addslashes($this->ausbildungcode).",".
@@ -215,6 +215,8 @@ class mitarbeiter extends benutzer
 					$this->addslashes($this->stundensatz).','.
 					$this->addslashes($this->updateamum).','.
 					$this->addslashes($this->updatevon).', '.
+					$this->addslashes($this->insertamum).','.
+					$this->addslashes($this->insertvon).', '.
 					$this->addslashes($this->ext_id_mitarbeiter).');';
 		}
 		else
