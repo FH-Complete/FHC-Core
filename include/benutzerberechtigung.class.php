@@ -296,7 +296,7 @@ class benutzerberechtigung
 			}
 
 			//Wenn Berechtigung fuer Bestimmte Klasse vorhanden ist
-			if($berechtigung == $b->berechtigung_kurzbz && $studiengang_kz==null && $art==null && $fachbereich_kurzbz==null)
+			if(($berechtigung==$b->berechtigung_kurzbz || $b->berechtigung_kurzbz=='admin') && is_null($studiengang_kz) && is_null($art) && is_null($fachbereich_kurzbz))
 			   if ($b->starttimestamp!=null && $b->endetimestamp!=null)
 				{
 					if ($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp)
@@ -304,9 +304,9 @@ class benutzerberechtigung
 				}
 				else
 					return true;
+
 			//Wenn Berechtigung fuer Bestimmten Studiengang vorhanden ist
-			if	($berechtigung==$b->berechtigung_kurzbz
-			     && ($studiengang_kz==$b->studiengang_kz || $b->studiengang_kz==0) && $art==null && $b->fachbereich_kurzbz==null)
+			if	($berechtigung==$b->berechtigung_kurzbz && ($studiengang_kz==$b->studiengang_kz || is_null($b->studiengang_kz)) && $art==null && $b->fachbereich_kurzbz==null)
 				if ($b->starttimestamp!=null && $b->endetimestamp!=null)
 				{
 					if ($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp)
