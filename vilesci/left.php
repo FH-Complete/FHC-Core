@@ -1,9 +1,13 @@
 <?php
- require("config.inc.php");
- 	if (!isset($REMOTE_USER))
- 		//die ('REMOTE_USER ist nicht gesetzt!');
-		$REMOTE_USER='pam';
-	$uid=$REMOTE_USER;
+	require("config.inc.php");
+ 	require("../include/functions.inc.php");
+ 	require("../include/benutzerberechtigung.class.php");
+ 	$uid=get_uid();
+ 	$conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
+	$berechtigung=new benutzerberechtigung($conn);
+	$berechtigung->getBerechtigungen($uid); //|| $berechtigung->isBerechtigt('lvplan')
+	if (!($berechtigung->isBerechtigt('admin',0) ))
+		die ('Keine Berechtigung!');
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
