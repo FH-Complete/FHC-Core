@@ -279,6 +279,10 @@ class benutzerberechtigung
 		$timestamp=time();
 		foreach ($this->berechtigungen as $b)
 		{
+			//Admin auf alles ist immer TRUE
+			if ($b->berechtigung_kurzbz=='admin' && is_null($b->fachbereich_kurzbz) && is_null($b->studiengang_kz))
+				return true;
+
 			//Fachbereichsberechtigung
 			if($fachbereich_kurzbz!=null)
 			{
