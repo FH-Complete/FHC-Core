@@ -21,6 +21,7 @@ $fehler='';
 $v='';
 $studiensemester=new studiensemester($conn);
 $ssem=$studiensemester->getaktorNext();
+$zaehl=0;
 
 if(isset($_GET['stg_kz']))
 {
@@ -28,7 +29,9 @@ if(isset($_GET['stg_kz']))
 }
 else 
 {
-	$stg_kz=0;
+	$stg_kz=222;
+	//echo "<H2>Es wurde keine Studiengangskennzahl übergeben!</H2>";
+	//exit;
 }
 if(isset($_GET['email']))
 {
@@ -54,7 +57,7 @@ function myaddslashes($var)
 
 <html>
 <head>
-<title>Datenüberprüfung für BIS-Meldung</title>
+<title>Estellung der BIS-Meldung</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 </head>
@@ -308,22 +311,23 @@ if($result = pg_query($conn, $qry))
 			{
 				$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".$error_log1;
 			}
+			$zaehl++;
 		}
 		$error_log='';
 		$error_log1='';
 	}
 }
 echo "<H1>BIS - Studentendaten werden überprüft. Studiengang: ".$stg_kz."</H1>\n";
-echo "<H2>Fehlende BIS-Daten (für Meldung ".$ssem."): </H2><br>";
-//echo "(Doppelte Zeilen deuten auf mehrere Heimatadressen hin - bitte Kontakte überprüfen)<br><br>";
+echo "<H2>Nicht plausible BIS-Daten (für Meldung ".$ssem."): </H2><br>";
+//echo $zaehl." (Doppelte Zeilen deuten auf mehrere Heimatadressen hin - bitte Kontakte überprüfen)<br><br>";
 
 echo nl2br($v."\n");
 
-if($email)
+/*if($email)
 {
 	mail(trim($stgemail), 'BIS-Daten / Studiengang: '.$stg_kz,"Fehlende Daten für die BIS-Meldung:(von ".$_SERVER['HTTP_HOST'].")\n(Doppelte Zeilen deuten auf mehrere Heimatadressen hin - bitte Kontakte überprüfen)\n\nStudiengang: ".$stg_kz."(".$stgemail.")\n".$v."\n","From: vilesci@technikum-wien.at");
 	//mail($adress, 'BIS-Daten / Studiengang: '.$f,"\nFehlende Daten für die BIS-Meldung: (von ".$_SERVER['HTTP_HOST'].")\n(Doppelte Zeilen deuten auf mehrere Heimatadressen hin - bitte Kontakte überprüfen)\n\nStudiengang: ".$f."(".$email[$f].")\n".$v."\n","From: vilesci@technikum-wien.at");	
-}	
+}*/	
 
 
 
