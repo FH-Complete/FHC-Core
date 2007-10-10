@@ -285,22 +285,24 @@ class benutzerberechtigung
 		$timestamp=time();
 		foreach ($this->berechtigungen as $b)
 		{
+			//echo 'Admin<BR>';
 			//Admin auf alles ist immer TRUE
 			if ($b->berechtigung_kurzbz=='admin' && is_null($b->fachbereich_kurzbz) && is_null($b->studiengang_kz) )
-				if ($b->starttimestamp!=null && $b->endetimestamp!=null)
+			//if ($b->berechtigung_kurzbz=='admin' && $b->fachbereich_kurzbz===NULL && $b->studiengang_kz===NULL )
+				if (!is_null($b->starttimestamp) && !is_null($b->endetimestamp))
 				{
 					if ($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp)
 						return true;
 				}
 				else
 					return true;
-				return true;
 
+			//echo 'Fachbereich<BR>';
 			//Fachbereichsberechtigung
 			if($fachbereich_kurzbz!=null)
 			{
 				//Wenn Fachbereichs oder Adminberechtigung
-				if(($berechtigung == $b->berechtigung_kurzbz || $b->berechtigung_kurzbz == 'admin') && ($b->fachbereich_kurzbz==$fachbereich_kurzbz || $b->fachbereich_kurzbz=='0'))
+				if(($berechtigung == $b->berechtigung_kurzbz || $b->berechtigung_kurzbz == 'admin') && ($b->fachbereich_kurzbz==$fachbereich_kurzbz || is_null($b->fachbereich_kurzbz)))
 				{
 					if ($b->starttimestamp!=null && $b->endetimestamp!=null)
 					{
@@ -312,9 +314,16 @@ class benutzerberechtigung
 				}
 			}
 
+			//echo 'Klasse<BR>';
 			//Wenn Berechtigung fuer Bestimmte Klasse vorhanden ist
-			if(($berechtigung==$b->berechtigung_kurzbz || $b->berechtigung_kurzbz=='admin') && is_null($studiengang_kz) && is_null($art) && is_null($fachbereich_kurzbz))
-			   if ($b->starttimestamp!=null && $b->endetimestamp!=null)
+			if	(	($berechtigung==$b->berechtigung_kurzbz && is_null($studiengang_kz) && is_null($art) && is_null($fachbereich_kurzbz))
+					||
+					($b->berechtigung_kurzbz=='admin'
+						&& (is_null($studiengang_kz) && (is_null($b->studiengang_kz) || $b->studiengang_kz==$studiengang_kz) )
+						&& (is_null($fachbereich_kurzbz) && (is_null($b->fachbereich_kurzbz) || $b->fachbereich_kurzbz==$fachbereich_kurzbz) )
+				 	)
+				)
+				if ($b->starttimestamp!=null && $b->endetimestamp!=null)
 				{
 					if ($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp)
 						return true;
@@ -322,6 +331,7 @@ class benutzerberechtigung
 				else
 					return true;
 
+			//echo 'Studiengang<BR>';
 			//Wenn Berechtigung fuer Bestimmten Studiengang vorhanden ist
 			if	($berechtigung==$b->berechtigung_kurzbz && ($studiengang_kz==$b->studiengang_kz || is_null($b->studiengang_kz)) && $art==null && $b->fachbereich_kurzbz==null)
 				if ($b->starttimestamp!=null && $b->endetimestamp!=null)
@@ -331,9 +341,10 @@ class benutzerberechtigung
 				}
 				else
 					return true;
+
 			//Wenn Berechtigung mit Studiengang und der richtigen BerechtigungsArt (suid) vorhanden ist
 			if	($berechtigung==$b->berechtigung_kurzbz
-			     && ($studiengang_kz==$b->studiengang_kz || $b->studiengang_kz==0)
+			     && ($studiengang_kz==$b->studiengang_kz || is_null($b->studiengang_kz))
 			     && strstr($b->art,$art))
 				if ($b->starttimestamp!=null && $b->endetimestamp!=null)
 				{
