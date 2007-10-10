@@ -510,7 +510,7 @@ if (!isset($_GET["notenuebersicht"]))
 						$stud_bsp_obj->beispiel_id = $row->beispiel_id;
 						
 						$row->check_anzahl_studentbeispiel($row->beispiel_id);
-						if (($row->anzahl_studentbeispiel >= $ueb_hlp_obj->maxstd) && isset($_POST['problem_'.$row->beispiel_id]) && $stud_bsp_obj->new)
+						if (($row->anzahl_studentbeispiel >= $ueb_hlp_obj->maxstd) && isset($_POST['problem_'.$row->beispiel_id]) && $stud_bsp_obj->new && ($ueb_hlp_obj->maxstd != null))
 						{
 							echo "<span class='error'>Beispiel kann nicht mehr angekreuzt werden<br></span>";
 							$error = true;					
@@ -602,7 +602,7 @@ if (!isset($_GET["notenuebersicht"]))
 			if ($uebung_obj->maxbsp > 0)
 				echo "<tr><td>Maximale Anzahl der Beispiele/Student:</td><td><b>".$uebung_obj->maxbsp."</b></td></tr>";
 			if ($uebung_obj->maxstd > 0)
-				echo "<tr><td>Maximale Anzahl Studenten/Übung:</td><td style='background-color:#dddddd;'><b>".$uebung_obj->maxstd."</b></td></tr>";
+				echo "<tr><td>Maximale Anzahl Studenten/Beispiel:</td><td style='background-color:#dddddd;'><b>".$uebung_obj->maxstd."</b></td></tr>";
 			echo "</table>";	
 			echo "
 			<form method='POST' name='bspform' action='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&uid=$user'>
