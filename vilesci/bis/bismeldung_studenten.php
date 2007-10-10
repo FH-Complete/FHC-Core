@@ -29,6 +29,11 @@ $orgform='';
 $status='';
 $datei='';
 $aktstatus='';
+$mob='';
+$gast='';
+$avon='';
+$abis='';
+$zweck='';
 
 if(isset($_GET['stg_kz']))
 {
@@ -303,9 +308,39 @@ $datei.="
 				}
 			}
 		}
-		
+		$qrystatus="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='".$row->prestudent_id."' AND studiensemester_kurzbz='".$ssem."' ORDER BY insertamum desc, ext_id desc;";
+		if($resultstatus = pg_query($conn, $qrystatus))
+		{
+			if($rowstatus = pg_fetch_object($resultstatus))
+			{
+				$sem=$rowstatus->ausbildungssemester;
+				if($rowstatus->rolle_kurzbz=="Student" || $rowstatus->rolle_kurzbz=="Outgoing" 
+					|| $rowstatus->rolle_kurzbz=="Incoming" || $rowstatus->rolle_kurzbz='Praktikant' 
+					|| $rowstatus->rolle_kurzbz="Diplomand")
+				{
+					$status=1;
+				}
+				else if($rowstatus->rolle_kurzbz=="Unterbrecher" )
+				{
+					$status=2;
+				}
+				else if($rowstatus->rolle_kurzbz=="Absolvent" )
+				{
+					$status=3;
+				}
+				else if($rowstatus->rolle_kurzbz=="Abbrecher" )
+				{
+					$status=4;
+				}
+				else 
+				{
+					continue;
+				}
+				$aktstatus=$rowstatus->rolle_kurzbz;
+			}
+		}
 		//bei Absolventen das Beendigungsdatum (Sponsion oder Abschlussprüfung) überprüfen
-		if($row->rolle_kurzbz=='Absolvent')
+		if($aktstatus=='Absolvent')
 		{
 			if($row->abdatum=='' || $row->abdatum==null)
 			{
@@ -360,42 +395,14 @@ $datei.="
 		}
 		else 
 		{
-			$qrystatus="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='".$row->prestudent_id."' AND studiensemester_kurzbz='".$ssem."' ORDER BY insertamum desc, ext_id desc;";
-			if($resultstatus = pg_query($conn, $qrystatus))
-			{
-				if($rowstatus = pg_fetch_object($resultstatus))
-				{
-					$sem=$rowstatus->ausbildungssemester;
-					if($rowstatus->rolle_kurzbz=="Student" || $rowstatus->rolle_kurzbz=="Outgoing" 
-						|| $rowstatus->rolle_kurzbz=="Incoming" || $rowstatus->rolle_kurzbz='Praktikant' 
-						|| $rowstatus->rolle_kurzbz="Diplomand")
-					{
-						$status=1;
-					}
-					else if($rowstatus->rolle_kurzbz=="Unterbrecher" )
-					{
-						$status=2;
-					}
-					else if($rowstatus->rolle_kurzbz=="Absolvent" )
-					{
-						$status=3;
-					}
-					else if($rowstatus->rolle_kurzbz=="Abbrecher" )
-					{
-						$status=4;
-					}
-					else 
-					{
-						continue;
-					}
-					$aktstatus=$rowstatus->rolle_kurzbz;
-				}
-			}
+			
 			$datei.="
          <Student>
           <PersKz>".trim($row->matrikelnr)."</PersKz>
           <GeburtsDatum>".date("dmY", $datumobj->mktime_fromdate($row->gebdatum))."</GeburtsDatum>
-          <Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>";
+          <Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>
+          <Vorname>".$row->vorname."</Vorname>
+          <Familienname>".$row->nachname."<Familienname>";
 			if($row->svnr!='')
 			{
 				$datei.="
@@ -414,9 +421,38 @@ $datei.="
           <HeimatNation>".$row->nation."</HeimatNation>
           <ZugangCode>".$row->zgv_code."</ZugangCode>
           <ZugangDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvdatum))."</ZugangDatum>
+          <ZugangMagStgCode></ZugangMagStgCode>
+          <ZugangMagStgDatum></ZugangMagStgDatum>
           <BeginnDatum>???</BeginnDatum>
+          <Beendigungsdatum></Beendigungsdatum>
           <Ausbildungssemester>".$sem."</Ausbildungssemester>
           <StudStatusCode>".$status."</StudStatusCode>
+          <BerufstaetigkeitCode></BerufstaetigkeitCode>";
+			if($aktstatus=='Incoming' OR $aktstatus=='Outgoing')
+			{
+				$qryio="SELECT * FROM bisio WHERE student_uid='".$row->student_uid."';";
+				if($resultio = pg_query($conn, $qryio))
+				{
+					if($rowio = pg_fetch_object($resultio))
+					{
+						$mob=$rowio->mobilitaetsprogramm_code;
+						$gast=$rowio->nation_code;
+						$avon=$rowio->von;
+						$abis=$rowio->bis;
+						$zweck=$rowio->zweck_code;
+					}
+				}
+				$datei.="
+          <IO>
+          	 <Status>".$aktstatus."</Status>
+            <MobilitaetsProgrammCode>".$mob."</MobilitaetsProgrammCode>
+            <GastlandCode>".$gast."</GastlandCode>
+            <AufenthaltVon>".$avon."</AufenthaltVon>
+            <AufenthaltBis>".$abis."</AufenthaltBis>
+            <AufenthaltZweckCode>".$zweck."</AufenthaltZweckCode>
+          </IO>";
+			}
+			$datei.="
          </Student>";
 
 		}
