@@ -8,6 +8,7 @@
 
 require('../config.inc.php');
 require('../../include/studiensemester.class.php');
+require('../../include/datum.class.php');
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
@@ -22,6 +23,12 @@ $v='';
 $studiensemester=new studiensemester($conn);
 $ssem=$studiensemester->getaktorNext();
 $zaehl=0;
+$erhalter='';
+$stgart='';
+$orgform='';
+$status='';
+$datei='';
+$aktstatus='';
 
 if(isset($_GET['stg_kz']))
 {
@@ -38,16 +45,8 @@ function myaddslashes($var)
 	return ($var!=''?"'".addslashes($var)."'":'null');
 }
 
-?>
+$datumobj=new datum();
 
-<html>
-<head>
-<title>Estellung der BIS-Meldung</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
-</head>
-<body>
-<?php
 $qry="SELECT * FROM public.tbl_studiensemester";
 if($result = pg_query($conn, $qry))
 {
@@ -60,14 +59,55 @@ if($result = pg_query($conn, $qry))
 $qry="SELECT * FROM public.tbl_studiengang WHERE studiengang_kz='".$stg_kz."'";
 if($result = pg_query($conn, $qry))
 {
-	while($row = pg_fetch_object($result))
+	if($row = pg_fetch_object($result))
 	{
 		$stgart=$row->typ;
 		$stgemail=$row->email;
+		if(strlen(trim($row->erhalter_kz))==1)
+		{
+			$erhalter='00'.trim($row->erhalter_kz);
+		}
+		elseif(strlen(trim($row->erhalter_kz))==2)
+		{
+			$erhalter='0'.trim($row->erhalter_kz);
+		}
+		else 
+		{
+			$erhalter=$row->erhalter_kz;
+		}
+		if($row->typ=='b')
+		{
+			$stgart=1;
+		}
+		elseif($row->typ=='m')
+		{
+			$stgart=2;
+		}
+		elseif($row->typ=='d')
+		{
+			$stgart=3;
+		}
+		else 
+		{
+			exit;
+		}
+		if($row->organisationsform=='n')
+		{
+			$orgform=1;
+		}
+		elseif($row->organisationsform=='b')
+		{
+			$orgform=2;
+		}
+		else 
+		{
+			exit;
+		}
 	}
 }
 
-$qry="SELECT DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, tbl_abschlusspruefung.datum AS abdatum FROM public.tbl_student 
+$qry="SELECT DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, tbl_abschlusspruefung.datum AS abdatum 
+	FROM public.tbl_student 
 	JOIN public.tbl_benutzer ON(student_uid=uid) 
 	JOIN public.tbl_person USING (person_id) 
 	JOIN public.tbl_prestudent USING (prestudent_id)
@@ -77,12 +117,28 @@ $qry="SELECT DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.pe
 	WHERE heimatadresse IS TRUE 
 	AND (studiensemester_kurzbz='".$ssem."') AND tbl_student.studiengang_kz='".$stg_kz."'
 	AND (rolle_kurzbz='Student' OR rolle_kurzbz='Incoming' OR rolle_kurzbz='Outgiong'
-		OR rolle_kurzbz='Praktikant' OR rolle_kurzbz='Diplomand' OR rolle_kurzbz='Absolvent') 
+		OR rolle_kurzbz='Praktikant' OR rolle_kurzbz='Diplomand' OR rolle_kurzbz='Absolvent' 
+		OR rolle_kurzbz='Abbrecher' OR rolle_kurzbz='Unterbrecher') 
 	ORDER BY student_uid, nachname, vorname
 	";
 
 if($result = pg_query($conn, $qry))
 {
+	
+$datei.="
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<Erhalter>
+  <ErhKz>".$erhalter."</ErhKz>
+  <MeldeDatum>15112007</MeldeDatum>
+  <StudierendenBewerberMeldung>
+    <StudiengangStamm>
+      <StgKz>".$stg_kz."</StgKz>
+      <StgArtCode>".$stgart."</StgArtCode>
+      <OrgFormCode>".$orgform."</OrgFormCode>
+      <StudiengangDetail>
+        <OrgFormTeilCode>1</OrgFormTeilCode>
+        <StgStartSemCode>1</StgStartSemCode>
+";
 	while($row = pg_fetch_object($result))
 	{
 		$qryadr="SELECT * from public.tbl_adresse WHERE heimatadresse IS TRUE AND person_id='".$row->pers_id."';";
@@ -90,7 +146,7 @@ if($result = pg_query($conn, $qry))
 		{
 			$error_log1="Es sind ".pg_num_rows(pg_query($conn,$qryadr))." Heimatadressen eingetragen\n";
 		}
-		if($row->gebdatum<'1920-01-01' OR $row->gebdatum==null OR $row->gebdatum='')
+		if($row->gebdatum<'1920-01-01' OR $row->gebdatum==null OR $row->gebdatum=='')
 		{
 			if($error_log!='')
 			{
@@ -298,14 +354,95 @@ if($result = pg_query($conn, $qry))
 			}
 			$zaehl++;
 			$v.="\n";
+			$error_log='';
+			$error_log1='';
+			continue;
 		}
-		$error_log='';
-		$error_log1='';
+		else 
+		{
+			$qrystatus="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='".$row->prestudent_id."' AND studiensemester_kurzbz='".$ssem."' ORDER BY insertamum desc, ext_id desc;";
+			if($resultstatus = pg_query($conn, $qrystatus))
+			{
+				if($rowstatus = pg_fetch_object($resultstatus))
+				{
+					$sem=$rowstatus->ausbildungssemester;
+					if($rowstatus->rolle_kurzbz=="Student" || $rowstatus->rolle_kurzbz=="Outgoing" 
+						|| $rowstatus->rolle_kurzbz=="Incoming" || $rowstatus->rolle_kurzbz='Praktikant' 
+						|| $rowstatus->rolle_kurzbz="Diplomand")
+					{
+						$status=1;
+					}
+					else if($rowstatus->rolle_kurzbz=="Unterbrecher" )
+					{
+						$status=2;
+					}
+					else if($rowstatus->rolle_kurzbz=="Absolvent" )
+					{
+						$status=3;
+					}
+					else if($rowstatus->rolle_kurzbz=="Abbrecher" )
+					{
+						$status=4;
+					}
+					else 
+					{
+						continue;
+					}
+					$aktstatus=$rowstatus->rolle_kurzbz;
+				}
+			}
+			$datei.="
+         <Student>
+          <PersKz>".trim($row->matrikelnr)."</PersKz>
+          <GeburtsDatum>".date("dmY", $datumobj->mktime_fromdate($row->gebdatum))."</GeburtsDatum>
+          <Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>";
+			if($row->svnr!='')
+			{
+				$datei.="
+          <SVNR>".$row->svnr."</SVNR>";
+			}
+			if($row->ersatzkennzeichen!='')
+			{
+				$datei.="
+          <Ersatzkennzeichen>".$row->ersatzkennzeichen."</Ersatzkennzeichen>";
+			}
+			$datei.="
+          <StaatsangehoerigkeitCode>".$row->staatsbuergerschaft."</StaatsangehoerigkeitCode>
+          <HeimatPLZ>".$row->plz."</HeimatPLZ>
+          <HeimatGemeinde>".$row->plz."</HeimatGemeinde>
+          <HeimatStrasse>".$row->strasse."</HeimatStrasse>
+          <HeimatNation>".$row->nation."</HeimatNation>
+          <ZugangCode>".$row->zgv_code."</ZugangCode>
+          <ZugangDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvdatum))."</ZugangDatum>
+          <BeginnDatum>???</BeginnDatum>
+          <Ausbildungssemester>".$sem."</Ausbildungssemester>
+          <StudStatusCode>".$status."</StudStatusCode>
+         </Student>";
+
+		}
+		
 	}
+	$datei.="
+       </StudiengangDetail>
+    </StudiengangStamm>
+  </StudierendenBewerberMeldung>
+</Erhalter>";
+	
 }
-echo "<H1>BIS - Studentendaten werden überprüft. Studiengang: ".$stg_kz."</H1>\n";
-echo "<H2>Nicht plausible BIS-Daten (für Meldung ".$ssem."): </H2><br>";
 
-
-echo nl2br($v."\n");
+if(strlen($v)!='')
+{
+	echo '<html><head><title>Synchro - FAS -> Vilesci - Student</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		</head><body>';
+	echo "<H1>BIS - Studentendaten werden überprüft! Studiengang: ".$stg_kz."</H1>\n";
+	echo "<H2>Nicht plausible BIS-Daten (für Meldung ".$ssem."): </H2><br>";
+	echo nl2br($v."\n\n");
+	echo $datei;
+}
+else 
+{
+	header("Content-type: application/xhtml+xml");
+	echo $datei;
+}
 ?>
