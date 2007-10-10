@@ -148,21 +148,21 @@ if($resultall = pg_query($conn, $qryall))
 		}
 	}
 }
-//4 - wenn verwendung=1,5,6 dann sollte hauptberuf=j sein - check
+//4 - wenn hauptberuf=j dann sollte verwendung=1,5,6 sein - check
 $qryall="SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter 
 	JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) 
-	WHERE verwendung_code IN ('1','5','6') AND hauptberuflich=false 
+	WHERE verwendung_code NOT IN ('1','5','6') AND hauptberuflich=true 
 	GROUP BY uid,nachname,vorname
 	ORDER by nachname,vorname,uid;";
 if($resultall = pg_query($conn, $qryall))
 {
 	$num_rows_all=pg_num_rows($resultall);
-	echo "<br><br><H2>Bei $num_rows_all Mitarbeitern sind die Eintragungen 'hauptberuflich' nicht plausibel</H2>";
+	echo "<br><br><H2>Bei $num_rows_all Mitarbeitern sind die Eintragungen 'hauptberuflich' nicht plausibel (hauptberuflich ja, aber Verwendung nicht 1,5,6)</H2>";
 	while($rowall=pg_fetch_object($resultall))
 	{
 		$i=0;
 		$qry="SELECT * FROM bis.tbl_bisverwendung 
-			WHERE verwendung_code IN ('1','5','6') AND hauptberuflich=false AND mitarbeiter_uid='".$rowall->uid."';";
+			WHERE verwendung_code NOT IN ('1','5','6') AND hauptberuflich=true AND mitarbeiter_uid='".$rowall->uid."';";
 		if($result = pg_query($conn, $qry))
 		{
 			$num_rows=pg_num_rows($result);

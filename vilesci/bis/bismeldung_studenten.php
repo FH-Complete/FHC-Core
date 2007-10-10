@@ -33,21 +33,6 @@ else
 	//echo "<H2>Es wurde keine Studiengangskennzahl übergeben!</H2>";
 	//exit;
 }
-if(isset($_GET['email']))
-{
-	if($_GET['email']==true)
-	{
-		$email=true;
-	}
-	else 
-	{
-		$email=false;	
-	}
-}
-else 
-{
-	$email=false;
-}
 function myaddslashes($var)
 {
 	return ($var!=''?"'".addslashes($var)."'":'null');
@@ -100,7 +85,7 @@ if($result = pg_query($conn, $qry))
 {
 	while($row = pg_fetch_object($result))
 	{
-		$qryadr="SELECT * from public.tbl_adresse WHERE person_id='".$row->pers_id."';";
+		$qryadr="SELECT * from public.tbl_adresse WHERE heimatadresse IS TRUE AND person_id='".$row->pers_id."';";
 		if(pg_num_rows(pg_query($conn,$qryadr))!=1)
 		{
 			$error_log1="Es sind ".pg_num_rows(pg_query($conn,$qryadr))." Heimatadressen eingetragen\n";
@@ -302,7 +287,7 @@ if($result = pg_query($conn, $qry))
 		}
 		if($error_log!='' OR $error_log1!='')
 		{
-			$v.="Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($row->rolle_kurzbz): \n";
+			$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($row->rolle_kurzbz): </u>\n";
 			if($error_log!='')
 			{
 				$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Es fehlt: ".$error_log."\n";
@@ -312,6 +297,7 @@ if($result = pg_query($conn, $qry))
 				$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".$error_log1;
 			}
 			$zaehl++;
+			$v.="\n";
 		}
 		$error_log='';
 		$error_log1='';
@@ -319,16 +305,7 @@ if($result = pg_query($conn, $qry))
 }
 echo "<H1>BIS - Studentendaten werden überprüft. Studiengang: ".$stg_kz."</H1>\n";
 echo "<H2>Nicht plausible BIS-Daten (für Meldung ".$ssem."): </H2><br>";
-//echo $zaehl." (Doppelte Zeilen deuten auf mehrere Heimatadressen hin - bitte Kontakte überprüfen)<br><br>";
+
 
 echo nl2br($v."\n");
-
-/*if($email)
-{
-	mail(trim($stgemail), 'BIS-Daten / Studiengang: '.$stg_kz,"Fehlende Daten für die BIS-Meldung:(von ".$_SERVER['HTTP_HOST'].")\n(Doppelte Zeilen deuten auf mehrere Heimatadressen hin - bitte Kontakte überprüfen)\n\nStudiengang: ".$stg_kz."(".$stgemail.")\n".$v."\n","From: vilesci@technikum-wien.at");
-	//mail($adress, 'BIS-Daten / Studiengang: '.$f,"\nFehlende Daten für die BIS-Meldung: (von ".$_SERVER['HTTP_HOST'].")\n(Doppelte Zeilen deuten auf mehrere Heimatadressen hin - bitte Kontakte überprüfen)\n\nStudiengang: ".$f."(".$email[$f].")\n".$v."\n","From: vilesci@technikum-wien.at");	
-}*/	
-
-
-
 ?>
