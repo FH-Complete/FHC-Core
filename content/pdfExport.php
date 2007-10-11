@@ -38,6 +38,30 @@ if (!$conn = pg_pconnect(CONN_STRING))
 $user = get_uid();
 loadVariables($conn, $user);
 
+function clean_string($string)
+ {
+ 	$trans = array("ä" => "ae",
+ 				   "Ä" => "Ae",
+ 				   "ö" => "oe",
+ 				   "Ö" => "Oe",
+ 				   "ü" => "ue",
+ 				   "Ü" => "Ue",
+ 				   "á" => "a",
+ 				   "à" => "a",
+ 				   "é" => "e",
+ 				   "è" => "e",
+ 				   "ó" => "o",
+ 				   "ò" => "o",
+ 				   "í" => "i",
+ 				   "ì" => "i",
+ 				   "ù" => "u",
+ 				   "ú" => "u",
+ 				   "ß" => "ss");
+	$string = strtr($string, $trans);
+    return ereg_replace("[^a-zA-Z0-9]", "", $string);
+    //[:space:]
+ }
+ 
 //Parameter holen
 if(isset($_GET['xml']))
 	$xml=$_GET['xml'];
@@ -124,7 +148,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 	{
 		if($row = pg_fetch_object($result))
 		{
-			$nachname = '_'.$row->nachname;
+			$nachname = '_'.clean_string($row->nachname);
 		}
 	}
 }
