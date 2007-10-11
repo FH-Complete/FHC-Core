@@ -28,7 +28,7 @@ if(isset($_GET['stg_kz']))
 }
 else 
 {
-	$stg_kz=0;
+	$stg_kz=222;
 }
 if(isset($_GET['email']))
 {
@@ -97,12 +97,12 @@ if($result = pg_query($conn, $qry))
 {
 	while($row = pg_fetch_object($result))
 	{
-		$qryadr="SELECT * from public.tbl_adresse WHERE person_id='".$row->pers_id."';";
+		$qryadr="SELECT * from public.tbl_adresse WHERE heimatadresse IS TRUE AND person_id='".$row->pers_id."';";
 		if(pg_num_rows(pg_query($conn,$qryadr))!=1)
 		{
 			$error_log1="Es sind ".pg_num_rows(pg_query($conn,$qryadr))." Heimatadressen eingetragen\n";
 		}
-		if($row->gebdatum<'1920-01-01' OR $row->gebdatum==null OR $row->gebdatum='')
+		if($row->gebdatum<'1920-01-01' OR $row->gebdatum==null OR $row->gebdatum=='')
 		{
 			if($error_log!='')
 			{
@@ -259,9 +259,39 @@ if($result = pg_query($conn, $qry))
 				}
 			}
 		}
-		
+		$qrystatus="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='".$row->prestudent_id."' AND studiensemester_kurzbz='".$ssem."' ORDER BY insertamum desc, ext_id desc;";
+		if($resultstatus = pg_query($conn, $qrystatus))
+		{
+			if($rowstatus = pg_fetch_object($resultstatus))
+			{
+				$sem=$rowstatus->ausbildungssemester;
+				if($rowstatus->rolle_kurzbz=="Student" || $rowstatus->rolle_kurzbz=="Outgoing" 
+					|| $rowstatus->rolle_kurzbz=="Incoming" || $rowstatus->rolle_kurzbz=='Praktikant' 
+					|| $rowstatus->rolle_kurzbz=="Diplomand")
+				{
+					$status=1;
+				}
+				else if($rowstatus->rolle_kurzbz=="Unterbrecher" )
+				{
+					$status=2;
+				}
+				else if($rowstatus->rolle_kurzbz=="Absolvent" )
+				{
+					$status=3;
+				}
+				else if($rowstatus->rolle_kurzbz=="Abbrecher" )
+				{
+					$status=4;
+				}
+				else 
+				{
+					$error_log1.="In diesem Semester ist keine Rolle eingtragen.";
+				}
+				$aktstatus=$rowstatus->rolle_kurzbz;
+			}
+		}
 		//bei Absolventen das Beendigungsdatum (Sponsion oder Abschlussprüfung) überprüfen
-		if($row->rolle_kurzbz=='Absolvent')
+		if($aktstatus=='Absolvent')
 		{
 			if($row->abdatum=='' || $row->abdatum==null)
 			{
@@ -286,15 +316,81 @@ if($result = pg_query($conn, $qry))
 				}
 			}
 		}
-		if($row->zgvdatum=='' || $row->zgvdatum==null)
+		if($aktstatus=='Incoming' OR $aktstatus=='Outgoing')
+		{
+			$qryio="SELECT * FROM bis.tbl_bisio WHERE student_uid='".$row->student_uid."';";
+			if($resultio = pg_query($conn, $qryio))
+			{
+				if($rowio = pg_fetch_object($resultio))
+				{
+					if($rowio->mobilitaetsprogramm_code='' || $rowio->mobilitaetsprogramm_code=null)
+					{
+						if($error_log!='')
+						{
+							$error_log.=", Mobilitätsprogramm ('".$rowio->mobilitaetsprogramm_code."')";
+						}
+						else 
+						{
+							$error_log.="Mobilitätsprogramm ('".$rowio->mobilitaetsprogramm_code."')";
+						}
+					}
+					if($rowio->nation_code='' || $rowio->nation_code=null)
+					{
+						if($error_log!='')
+						{
+							$error_log.=", IO - Nation ('".$rowio->nation_code."')";
+						}
+						else 
+						{
+							$error_log.="IO - Nation ('".$rowio->nation_code."')";
+						}
+					}
+					if($rowio->von='' || $rowio->von=null)
+					{
+						if($error_log!='')
+						{
+							$error_log.=", IO - von ('".$rowio->von."')";
+						}
+						else 
+						{
+							$error_log.="IO - von ('".$rowio->von."')";
+						}
+					}
+					if($rowio->bis='' || $rowio->bis=null)
+					{
+						if($error_log!='')
+						{
+							$error_log.=", IO - bis ('".$rowio->bis."')";
+						}
+						else 
+						{
+							$error_log.="IO - bis ('".$rowio->bis."')";
+						}
+					}
+					if($rowio->zweck_code='' || $$rowio->zweck_code=null)
+					{
+						if($error_log!='')
+						{
+							$error_log.=", IO - bis ('".$rowio->zweck_code."')";
+						}
+						else 
+						{
+							$error_log.="IO - bis ('".$rowio->zweck_code."')";
+						}
+					}
+				}
+			}
+			
+		}
+		if($row->berufstaetigkeit_code=='' || $row->berufstaetigkeit_code==null)
 		{
 			if($error_log!='')
 			{
-				$error_log.=", Berufstätigkeitscode ('".$row->zgvdatum."')";
+				$error_log.=", Berufstätigkeitscode ('".$row->berufstaetigkeit_code."')";
 			}
 			else 
 			{
-				$error_log.="Berufstätigkeitscode ('".$row->zgvdatum."')";
+				$error_log.="Berufstätigkeitscode ('".$row->berufstaetigkeit_code."')";
 			}
 		}
 		if($error_log!='' OR $error_log1!='')
@@ -308,7 +404,11 @@ if($result = pg_query($conn, $qry))
 			{
 				$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".$error_log1;
 			}
+			//$zaehl++;
 			$v.="\n";
+			$error_log='';
+			$error_log1='';
+			continue;
 		}
 		$error_log='';
 		$error_log1='';
