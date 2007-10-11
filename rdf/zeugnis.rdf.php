@@ -181,9 +181,33 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				else
 					$note = "";
 				$note2=$note;
+				
+				//Firma fuer Berufspraktikum
+				$qry = "SELECT tbl_firma.name 
+						FROM 
+							lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, public.tbl_firma
+						WHERE 
+							tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
+							tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
+							tbl_projektarbeit.firma_id = tbl_firma.firma_id AND
+							tbl_projektarbeit.student_uid='".$uid_arr[$i]."' AND 
+							tbl_lehreinheit.studiensemester_kurzbz='$studiensemester_kurzbz' AND 
+							tbl_lehrveranstaltung.lehrveranstaltung_id='$row->lehrveranstaltung_id'";
+				
+				$firma = '';
+				if($result_firma = pg_query($conn, $qry))
+				{
+					if($row_firma = pg_fetch_object($result_firma))
+					{
+						if($row_firma->name!='')
+							$firma = " bei Firma: $row_firma->name";
+					}
+				}
+				
+				//Bakk/Dipl Fussnoten
 				if(array_key_exists($row->lehrveranstaltung_id, $projektarbeit))
 				{
-					$bezeichnung = $row->lehrveranstaltung_bezeichnung.' '.$fussnotenzeichen[$anzahl_fussnoten];
+					$bezeichnung = $row->lehrveranstaltung_bezeichnung.$firma.' '.$fussnotenzeichen[$anzahl_fussnoten];
 					$xml_fussnote .="\n <fussnote>";
 					$xml_fussnote .=" 		<fussnotenzeichen>".$fussnotenzeichen[$anzahl_fussnoten]."</fussnotenzeichen>";
 					
@@ -222,7 +246,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					$anzahl_fussnoten++;
 				}
 				else 
-					$bezeichnung = $row->lehrveranstaltung_bezeichnung;
+					$bezeichnung = $row->lehrveranstaltung_bezeichnung.$firma;
+				
 				
 				$xml .= "\n			<unterrichtsfach>";
 				$xml .= "				<bezeichnung><![CDATA[".$bezeichnung."]]></bezeichnung>";
