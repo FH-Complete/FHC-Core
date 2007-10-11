@@ -48,6 +48,7 @@ class wochenplan
 
 	var $ort_kurzbz;	// @brief Ort PK
 	var $ort_bezeichnung;
+	var $ort_planbezeichnung;
 
 	var $gruppe_kurzbz;
 	var $gruppe_bezeichnung;
@@ -199,12 +200,13 @@ class wochenplan
 		//ortdaten ermitteln
 		if ($this->type=='ort')
 		{
-			$sql_query="SELECT bezeichnung, ort_kurzbz FROM public.tbl_ort WHERE ort_kurzbz='$this->ort_kurzbz'";
+			$sql_query="SELECT bezeichnung, ort_kurzbz, planbezeichnung FROM public.tbl_ort WHERE ort_kurzbz='$this->ort_kurzbz'";
 			//echo $sql_query;
 			if (!$result=pg_query($this->conn, $sql_query))
 				$this->errormsg=pg_last_error($this->conn);
 			$this->ort_bezeichnung=pg_result($result,0,'"bezeichnung"');
 			$this->ort_kurzbz=pg_result($result,0,'"ort_kurzbz"');
+			$this->ort_planbezeichnung=pg_result($result,0,'"planbezeichnung"');
 			$this->link.='&ort_kurzbz='.$this->ort_kurzbz;	//Link erweitern
 		}
 
@@ -346,7 +348,7 @@ class wochenplan
 			$this->link.='&stg_kz='.$this->stg_kz.'&sem='.$this->sem.'&ver='.$this->ver.'&grp='.$this->grp;
 		}
 		if ($this->type=='ort')
-			echo '<strong>Ort: </strong>'.$this->ort_kurzbz.' - '.$this->ort_bezeichnung.'<br>';
+			echo '<strong>Ort: </strong>'.$this->ort_kurzbz.' - '.$this->ort_bezeichnung.' - '.$this->ort_planbezeichnung.'<br>';
 		echo '</P>'.$this->crlf;
 		echo '			<div valign="bottom" align="center">'.$this->crlf;
 
