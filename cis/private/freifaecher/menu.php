@@ -110,7 +110,7 @@
 		</tr>
 		<?php
 			$lv_obj = new lehrveranstaltung($sql_conn);
-			if(!$lv_obj->load_lva('0',null, null, true))
+			if(!$lv_obj->load_lva('0',null, null, true,null,'bezeichnung'))
 				echo "<tr><td>$lv_obj->errormsg</td></tr>";
 
 			foreach($lv_obj->lehrveranstaltungen AS $row)

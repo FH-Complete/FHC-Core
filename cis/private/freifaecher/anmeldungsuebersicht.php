@@ -65,7 +65,7 @@ $stsem = $stsem_obj->getaktorNext();
 
 $lv_obj = new lehrveranstaltung($conn);
 
-if($lv_obj->load_lva('0',null,null,true))
+if($lv_obj->load_lva('0',null,null,true,null,'bezeichnung'))
 {
 	echo "<FORM method='POST' name='frmauswahl'>";
 	echo "<SELECT name='lvid' onchange='window.document.frmauswahl.submit();'>";
