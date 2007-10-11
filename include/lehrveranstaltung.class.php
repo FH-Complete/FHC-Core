@@ -182,7 +182,7 @@ class lehrveranstaltung
 	 *        $semester
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load_lva($studiengang_kz, $semester=null, $lehreverzeichnis=null, $lehre=null, $aktiv=null)
+	function load_lva($studiengang_kz, $semester=null, $lehreverzeichnis=null, $lehre=null, $aktiv=null, $sort=null)
 	{
 		//Variablen pruefen
 
@@ -215,7 +215,12 @@ class lehrveranstaltung
 			if ($aktiv)
 				$qry .= " AND aktiv";
 
-		$qry .= " AND semester is not null AND lehreverzeichnis<>'' ORDER BY semester, bezeichnung";
+		$qry .= " AND semester is not null AND lehreverzeichnis<>''";
+		
+		if ($sort == "bezeichnung")
+			$qry .= " ORDER BY bezeichnung";		
+		else
+			$qry .= " ORDER BY semester, bezeichnung";
 
 		//Datensaetze laden
 		if(!$res = pg_query($this->conn, $qry))

@@ -111,7 +111,7 @@ else
 echo '<br />';
 //Freifaecher laden
 $lv_obj = new lehrveranstaltung($conn);
-if($lv_obj->load_lva('0',null,null,true))
+if($lv_obj->load_lva('0',null,null,true,null,'bezeichnung'))
 {
 	$anz = count($lv_obj->lehrveranstaltungen);
 
