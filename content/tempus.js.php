@@ -73,7 +73,35 @@ function loadURL(event)
 }
 function stpltableChange(db_stpl_table)
 {
-//alert(db_stpl_table);
+	// Request absetzen
+	
+	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
+
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'variablechange');
+	req.add('name', 'db_stpl_table');
+	req.add('wert', db_stpl_table);
+		
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+	}
+	else
+	{
+		//Statusbar setzen
+   		document.getElementById("statusbarpanel-text").label = "Tabelle erfolgreich geaendert";
+   		document.getElementById("statusbarpanel-db_table").label = db_stpl_table;
+	}
+   
+	return true;
 }
 
 function studiensemesterChange()
@@ -127,6 +155,45 @@ function studiensemesterChange()
 	}
    
 	return true;
+}
+
+function variableChange(variable, id)
+{
+	item = document.getElementById(id);
+	
+	if(item.getAttribute('checked')=='true')
+		checked='true';
+	else
+		checked='false';
+	
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	// Request absetzen
+	
+	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
+
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'variablechange');
+	req.add('name', variable);
+	req.add('wert', checked);
+	
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+	}
+	else
+	{
+		//Statusbar setzen
+   		document.getElementById("statusbarpanel-text").label = "Variable erfolgreich geaendert";
+	}
 }
 
 // ****

@@ -3,6 +3,7 @@ header("Content-type: application/vnd.mozilla.xul+xml");
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 include('../vilesci/config.inc.php');
 include('../include/functions.inc.php');
+include('../include/benutzerberechtigung.class.php');
 include('../include/fas/benutzer.class.php');
 
 $uid=get_uid();
@@ -14,8 +15,12 @@ if (!$conn = @pg_pconnect(CONN_STRING))
 $error_msg.=loadVariables($conn,$uid);
 
 $benutzer = new benutzer($conn);
-if(!$benutzer->loadVariables($uid))
-	$error_msg = $benutzer->errormsg;
+$benutzer->loadVariables($uid);
+
+loadVariables($conn, $uid);
+$rechte = new benutzerberechtigung($conn);
+$rechte->getBerechtigungen($uid);
+
 /*echo '<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>';*/
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/tempusoverlay.xul.php"?>';
@@ -46,6 +51,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/tempusoverlay.xul.php"?>';
   <command id="menu-properties-studiensemester:command" oncommand="studiensemesterChange();"/>
   <command id="menu-prefs-stpltable-stundenplan:command" oncommand="stpltableChange('stundenplan');"/>
   <command id="menu-prefs-stpltable-stundenplandev:command" oncommand="stpltableChange('stundenplandev');"/>
+  <command id="menu-prefs-ignore_kollision:command" oncommand="variableChange('ignore_kollision','menu-prefs-ignore_kollision');"/>
+  <command id="menu-prefs-ignore_zeitsperre:command" oncommand="variableChange('ignore_zeitsperre','menu-prefs-ignore_zeitsperre');"/>
+  <command id="menu-prefs-ignore_reservierung:command" oncommand="variableChange('ignore_reservierung','menu-prefs-ignore_reservierung');"/>
 </commandset>
 
 <keyset id="mainkeys">
@@ -88,24 +96,6 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/tempusoverlay.xul.php"?>';
     </menu>
     <menu id="menu-prefs" label="&menu-prefs.label;" accesskey="&menu-prefs.accesskey;">
 		<menupopup id="menu-prefs-popup">
-			<menu id="menu-prefs-stpltable" label="&menu-prefs-stpltable.label;" accesskey="&menu-prefs-stpltable.accesskey;">
-				<menupopup id="menu-prefs-stpltable-popup">
-	        		<menuitem
-	          			 id     	="menu-prefs-stpltable-stundenplan"
-	          			 type		="radio"
-	          			 key       	="menu-prefs-stpltable-stundenplan:key"
-	         			 label     	="&menu-prefs-stpltable-stundenplan.label;"
-	         			 command   	="menu-prefs-stpltable-stundenplan:command"
-	           			 accesskey 	="&menu-prefs-stpltable-stundenplan.accesskey;"/>
-	           		<menuitem
-						 id        	="menu-prefs-stpltable-stundenplandev"
-						 type		="radio"
-	          			 key       	="menu-prefs-stpltable-stundenplandev:key"
-						 label     	="&menu-prefs-stpltable-stundenplandev.label;"
-						 command   	="menu-prefs-stpltable-stundenplandev:command"
-	           			 accesskey 	="&menu-prefs-stpltable-stundenplandev.accesskey;"/>
-	      		</menupopup>
-	      	</menu>
 	      	<menu
            id        =  "menu-properies-studiensemester"
            label     = "Studiensemester">
@@ -126,6 +116,58 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/tempusoverlay.xul.php"?>';
 
       		</menupopup>
         </menu>
+        <?php
+        if($rechte->isBerechtigt('admin'))
+        {
+        ?>	
+        <menu id="menu-prefs-stpltable" label="&menu-prefs-stpltable.label;" accesskey="&menu-prefs-stpltable.accesskey;">
+				<menupopup id="menu-prefs-stpltable-popup">
+	        		<menuitem
+	          			 id     	="menu-prefs-stpltable-stundenplan"
+	          			 type		="radio"
+	          			 key       	="menu-prefs-stpltable-stundenplan:key"
+	         			 label     	="&menu-prefs-stpltable-stundenplan.label;"
+	         			 command   	="menu-prefs-stpltable-stundenplan:command"
+	           			 accesskey 	="&menu-prefs-stpltable-stundenplan.accesskey;"/>
+	           		<menuitem
+						 id        	="menu-prefs-stpltable-stundenplandev"
+						 type		="radio"
+	          			 key       	="menu-prefs-stpltable-stundenplandev:key"
+						 label     	="&menu-prefs-stpltable-stundenplandev.label;"
+						 command   	="menu-prefs-stpltable-stundenplandev:command"
+	           			 accesskey 	="&menu-prefs-stpltable-stundenplandev.accesskey;"/>
+	      		</menupopup>
+	      	</menu>
+        <menuitem
+			 id        	="menu-prefs-ignore_kollision"
+			 type		="checkbox"
+  			 key       	="menu-prefs-ignore_kollision:key"
+			 label     	="&menu-prefs-ignore_kollision.label;"
+			 command   	="menu-prefs-ignore_kollision:command"
+   			 accesskey 	="&menu-prefs-ignore_kollision.accesskey;"
+   			 checkbox   ="<?php echo $ignore_kollision;?>"
+   			 />
+   		<menuitem
+			 id        	="menu-prefs-ignore_zeitsperre"
+			 type		="checkbox"
+  			 key       	="menu-prefs-ignore_zeitsperre:key"
+			 label     	="&menu-prefs-ignore_zeitsperre.label;"
+			 command   	="menu-prefs-ignore_zeitsperre:command"
+   			 accesskey 	="&menu-prefs-ignore_zeitsperre.accesskey;"
+   			 checkbox   ="<?php echo $ignore_zeitsperre;?>"
+   			 />
+   		<menuitem
+			 id        	="menu-prefs-ignore_reservierung"
+			 type		="checkbox"
+  			 key       	="menu-prefs-ignore_reservierung:key"
+			 label     	="&menu-prefs-ignore_reservierung.label;"
+			 command   	="menu-prefs-ignore_reservierung:command"
+   			 accesskey 	="&menu-prefs-ignore_reservierung.accesskey;"
+   			 checkbox   ="<?php echo $ignore_reservierung;?>"
+   			 />
+   		<?php
+        }
+        ?>
 	    </menupopup>
     </menu>
     <menu id="menu-help" label="&menu-help.label;" accesskey="&menu-help.accesskey;">

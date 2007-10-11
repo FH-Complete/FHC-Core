@@ -568,6 +568,25 @@ function LeDetailSave()
 
 	if(lehrveranstaltung=='')
 		return false;
+		
+	if(raumtyp=='')
+	{
+		alert('Raumtyp muss ausgewaehlt werden');
+		return false;
+	}
+	
+	if(raumtypalternativ=='')
+	{
+		alert('RaumtypAlternativ muss ausgewaehlt werden');
+		return false;
+	}
+	
+	if(sprache=='')
+	{
+		alert('Sprache muss ausgewaehlt werden');
+		return false;
+	}
+	
 
 	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
 	neu = document.getElementById('lehrveranstaltung-detail-checkbox-new').checked;

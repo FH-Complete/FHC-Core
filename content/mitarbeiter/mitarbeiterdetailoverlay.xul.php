@@ -251,17 +251,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</menulist>
 						<spacer flex="1"/>
 					</vbox>
-					<label align="end" control="mitarbeiter-detail-menulist-ausbildung" value="Ausbildung:"/>
-				 	<menulist id="mitarbeiter-detail-menulist-ausbildung" disabled="true"
-				              datasources="<?php echo APP_ROOT; ?>rdf/ausbildung.rdf.php?optional=true"
-					          ref="http://www.technikum-wien.at/ausbildung/alle" flex="1">
-					    <template>
-					       <menupopup>
-						      <menuitem uri="rdf:*" label="rdf:http://www.technikum-wien.at/ausbildung/rdf#bezeichnung"
-						                value="rdf:http://www.technikum-wien.at/ausbildung/rdf#code"/>
-						      </menupopup>
-						</template>
-					</menulist>
+					<spacer />
+					<checkbox label="Bismelden" id="mitarbeiter-detail-checkbox-bismelden" checked="false" disabled="true"/>
 		    	</row>
 		    	<row>
 		    		<label value="Anmerkung" control="mitarbeiter-detail-textbox-mitarbeiteranmerkung"/>
@@ -271,6 +262,20 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       					<textbox id="mitarbeiter-detail-textbox-alias" disabled="true"/>
       					<spacer />
       				</vbox>
+      				<label align="end" control="mitarbeiter-detail-menulist-ausbildung" value="Ausbildung:"/>
+      				<vbox>
+				 	<menulist id="mitarbeiter-detail-menulist-ausbildung" disabled="true"
+				              datasources="<?php echo APP_ROOT; ?>rdf/ausbildung.rdf.php?optional=true"
+					          ref="http://www.technikum-wien.at/ausbildung/alle">
+					    <template>
+					       <menupopup>
+						      <menuitem uri="rdf:*" label="rdf:http://www.technikum-wien.at/ausbildung/rdf#bezeichnung"
+						                value="rdf:http://www.technikum-wien.at/ausbildung/rdf#code"/>
+						      </menupopup>
+						</template>
+					</menulist>
+					<spacer flex="1"/>
+					</vbox>
 		    	</row>
 		  	</rows>
 		 </grid>

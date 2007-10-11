@@ -144,6 +144,7 @@ function draw_row($mitarbeiter)
     		<MITARBEITER:aktiv><![CDATA['.($mitarbeiter->bnaktiv?'Ja':'Nein').']]></MITARBEITER:aktiv>
     		<MITARBEITER:lektor><![CDATA['.($mitarbeiter->lektor?'Ja':'Nein').']]></MITARBEITER:lektor>
     		<MITARBEITER:fixangestellt><![CDATA['.($mitarbeiter->fixangestellt?'Ja':'Nein').']]></MITARBEITER:fixangestellt>
+    		<MITARBEITER:bismelden><![CDATA['.($mitarbeiter->bismelden?'Ja':'Nein').']]></MITARBEITER:bismelden>
     		<MITARBEITER:ort_kurzbz><![CDATA['.$mitarbeiter->ort_kurzbz.']]></MITARBEITER:ort_kurzbz>
     		<MITARBEITER:telefonklappe><![CDATA['.$mitarbeiter->telefonklappe.']]></MITARBEITER:telefonklappe>
     		<MITARBEITER:anmerkung><![CDATA['.$mitarbeiter->anmerkung.']]></MITARBEITER:anmerkung>

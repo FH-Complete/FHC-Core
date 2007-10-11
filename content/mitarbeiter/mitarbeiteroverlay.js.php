@@ -402,6 +402,7 @@ function MitarbeiterDetailDisableFields(val)
 	document.getElementById('mitarbeiter-detail-textbox-stundensatz').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-telefonklappe').disabled=val;
 	document.getElementById('mitarbeiter-detail-checkbox-fixangestellt').disabled=val;
+	document.getElementById('mitarbeiter-detail-checkbox-bismelden').disabled=val;
 	document.getElementById('mitarbeiter-detail-menulist-ort_kurzbz').disabled=val;
 	document.getElementById('mitarbeiter-detail-menulist-standort').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-mitarbeiteranmerkung').disabled=val;
@@ -489,6 +490,7 @@ function MitarbeiterAuswahl()
 	telefonklappe=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#telefonklappe" ));
 	lektor=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lektor" ));
 	fixangestellt=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#fixangestellt" ));
+	bismelden=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bismelden" ));
 	ausbildung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ausbildung" ));
 	anmerkung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
 	ort_kurzbz=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ort_kurzbz" ));
@@ -540,6 +542,11 @@ function MitarbeiterAuswahl()
 		document.getElementById('mitarbeiter-detail-checkbox-fixangestellt').checked=true;
 	else
 		document.getElementById('mitarbeiter-detail-checkbox-fixangestellt').checked=false;
+		
+	if(bismelden=='Ja')
+		document.getElementById('mitarbeiter-detail-checkbox-bismelden').checked=true;
+	else
+		document.getElementById('mitarbeiter-detail-checkbox-bismelden').checked=false;
 	document.getElementById('mitarbeiter-detail-menulist-ausbildung').value=ausbildung;
 	document.getElementById('mitarbeiter-detail-textbox-mitarbeiteranmerkung').value=anmerkung;
 	document.getElementById('mitarbeiter-detail-menulist-ort_kurzbz').value=ort_kurzbz;
@@ -687,6 +694,7 @@ function MitarbeiterSave()
 	telefonklappe = document.getElementById('mitarbeiter-detail-textbox-telefonklappe').value;
 	lektor = document.getElementById('mitarbeiter-detail-checkbox-lektor').checked;
 	fixangestellt = document.getElementById('mitarbeiter-detail-checkbox-fixangestellt').checked;
+	bismelden = document.getElementById('mitarbeiter-detail-checkbox-bismelden').checked;
 	ausbildung = document.getElementById('mitarbeiter-detail-menulist-ausbildung').value;
 	anmerkung = document.getElementById('mitarbeiter-detail-textbox-mitarbeiteranmerkung').value;
 	ort_kurzbz = document.getElementById('mitarbeiter-detail-menulist-ort_kurzbz').value;
@@ -730,6 +738,7 @@ function MitarbeiterSave()
 	req.add('telefonklappe', telefonklappe);
 	req.add('lektor', lektor);
 	req.add('fixangestellt', fixangestellt);
+	req.add('bismelden', bismelden);
 	req.add('ausbildung', ausbildung);
 	req.add('anmerkung', anmerkung);
 	req.add('ort_kurzbz', ort_kurzbz);

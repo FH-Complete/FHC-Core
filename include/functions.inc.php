@@ -204,6 +204,24 @@ function loadVariables($conn, $user)
 		global $kontofilterstg;
 		$kontofilterstg='false';
 	}
+	
+	if (!isset($ignore_kollision))
+	{
+		global $ignore_kollision;
+		$ignore_kollision='false';
+	}
+	
+	if (!isset($ignore_zeitsperre))
+	{
+		global $ignore_zeitsperre;
+		$ignore_zeitsperre='false';
+	}
+	
+	if (!isset($ignore_reservierung))
+	{
+		global $ignore_reservierung;
+		$ignore_reservierung='false';
+	}
 
 	return $error_msg;
 }
@@ -268,6 +286,10 @@ function utf8_strlen($str)
 // ****************************************************************
 function checkalias($alias)
 {
-	
+	if($anz = preg_match("/^[a-z0-9]*[a-z0-9]{1,}\.[a-z0-9]{1,}$/",$alias))
+		return true;
+	else 
+		return false;
+		
 }
 ?>

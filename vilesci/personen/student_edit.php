@@ -1,4 +1,24 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
 /**
  * Changes:	23.10.2004: Anpassung an neues DB-Schema sowie Verwendung der
  *                      'student'-Klasse; Datei ersetzt student_edit_save.php
@@ -13,7 +33,8 @@ require_once('../../include/studiengang.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
 	die("Fehler beim Connecten zur Datenbank");
-?>
+
+echo '
 <html>
 <head>
 <title>Student Edit</title>
@@ -22,14 +43,15 @@ if(!$conn=pg_pconnect(CONN_STRING))
 </head>
 
 <body class="background_main">
-<?php
+';
+
 $user = get_uid();
 
-echo '<h4>Student ';
+echo '<h2>Student ';
 if (isset($_GET['new']))
-	echo 'Neu</h4>';
+	echo 'Neu</h2>';
 else
-	echo 'Edit</h4>';
+	echo 'Edit</h2>';
 
 if (isset($_POST['Save']))
 {
@@ -88,7 +110,7 @@ function doSAVE($conn)
 	}
 	else
 	{
-		echo "<p>Studiengang-KZ ist keine Zahl (".$_POST['studiengang_kz'].").</p>";
+		echo "<p>Studiengang ist keine Zahl (".$_POST['studiengang_kz'].").</p>";
 		return;
 	}
 	$student->matrikelnr=$_POST['matrikelnr'];
@@ -106,7 +128,7 @@ function doSAVE($conn)
 
 	if ($student->save())
 	{
-		echo "<h2>Datensatz gespeichert.</h2>";
+		echo "<h3>Datensatz gespeichert.</h3>";
 	}
 	else
 	{
@@ -137,72 +159,65 @@ function doEDIT($conn,$id,$new=false)
 	else
 	{
 		// Eingabeformular anzeigen
-		?>
-		<form name="std_edit" action="<?php echo $_SERVER['REQUEST_URI'] ?>" method="POST">
-		<input type="hidden" name="new" value="<?php echo $new; ?>">
+		echo '<table><tr><td>';
+		
+		echo '
+		<form name="std_edit" action="'.$_SERVER['REQUEST_URI'].'" method="POST">
+		<input type="hidden" name="new" value="'.$new.'">
 			<table>
 			<tr>
 			      <td>UID*</td>
-			      <td>	<input type="text" name="new_uid" value="<?php echo $student->uid; ?>">
-			      		<input type="hidden" name="uid" value="<?php echo $student->uid ?>" >
+			      <td>	<input type="text" name="new_uid" value="'.$student->uid.'">
+			      		<input type="hidden" name="uid" value="'.$student->uid.'" >
 			      </td>
 			</tr>
-			<tr><td>Titel</td><td><input type="text" name="titelpre" value="<?php   echo $student->titelpre;
-		?>"></td></tr>
-			<tr><td>Vornamen</td><td><input type="text" name="vorname" value="<?php   echo $student->vorname;
-		?>"></td></tr>
-			<tr><td>Nachname</td><td><input type="text" name="nachname" value="<?php   echo $student->nachname;
-		?>"></td></tr>
-			<tr><td>Aktiv</td><td><input type="checkbox" name="aktiv" value="1" <?php   echo $student->aktiv?'checked':'';
-		?>></td></tr>
-			<tr><td>Geburtsdatum</td><td><input type="text" name="gebdatum" value="<?php   echo $student->gebdatum;
-		?>"> (TT.MM.JJJJ)</td></tr>
-			<tr><td>Gebort</td><td><input type="text" name="gebort" value="<?php   echo $student->gebort;
-		?>"></td></tr>
-			<tr><td>eMail Alias</td><td><input type="text" name="alias" value="<?php   echo $student->alias;
-		?>"></td></tr>
+			<tr><td>Titel</td><td><input type="text" name="titelpre" value="'.$student->titelpre.'"></td></tr>
+			<tr><td>Vornamen</td><td><input type="text" name="vorname" value="'.$student->vorname.'"></td></tr>
+			<tr><td>Nachname</td><td><input type="text" name="nachname" value="'.$student->nachname.'"></td></tr>
+			<tr><td>Aktiv</td><td><input type="checkbox" name="aktiv" value="1" '.($student->aktiv?'checked':'').'></td></tr>
+			<tr><td>Geburtsdatum</td><td><input type="text" name="gebdatum" value="'.$student->gebdatum.'"> (TT.MM.JJJJ)</td></tr>
+			<tr><td>Gebort</td><td><input type="text" name="gebort" value="'.$student->gebort.'"></td></tr>
+			<tr><td>eMail Alias</td><td><input type="text" name="alias" value="'.$student->alias.'"></td></tr>
 	
-			<tr><td>Homepage</td><td><input type="text" name="homepage" value="<?php echo $student->homepage;	?>"></td></tr>
+			<tr><td>Homepage</td><td><input type="text" name="homepage" value="'.$student->homepage.'"></td></tr>
 			<tr>
 			      <td>Matrikelnr*</td>
-			      <td><input type="text" name="matrikelnr" value="<?php   echo $student->matrikelnr;
-		?>"></td></tr>
-			<tr><td>Studiengang-KZ</td><td>
+			      <td><input type="text" name="matrikelnr" value="'.$student->matrikelnr.'"></td></tr>
+			<tr><td>Studiengang</td><td>
 			<SELECT name="studiengang_kz">
-      			<option value="-1">- auswählen -</option>
-<?php
-			// Auswahl des Studiengangs
-			$stg=new studiengang($conn);
-			$stg->getAll();
-			foreach($stg->result as $studiengang)
-			{
-				echo "<option value=\"$studiengang->studiengang_kz\" ";
-				if ($studiengang->studiengang_kz==$student->studiengang_kz)
-					echo "selected";
-				echo " >$studiengang->kuerzel ($studiengang->bezeichnung)</option>\n";
-			}
-?>
+      			<option value="-1">- auswählen -</option>';
+
+		// Auswahl des Studiengangs
+		$stg=new studiengang($conn);
+		$stg->getAll();
+		foreach($stg->result as $studiengang)
+		{
+			echo "<option value=\"$studiengang->studiengang_kz\" ";
+			if ($studiengang->studiengang_kz==$student->studiengang_kz)
+				echo "selected";
+			echo " >$studiengang->kuerzel ($studiengang->bezeichnung)</option>\n";
+		}
+		
+		echo '
 		    </SELECT>
 
 			</td></tr>
-			<tr><td>Semester</td><td><input type="text" name="semester" value="<?php   echo $student->semester;
-		?>"></td></tr>
-			<tr><td>Verband</td><td><input type="text" name="verband" value="<?php   echo $student->verband;
-		?>"></td></tr>
-			<tr><td>Gruppe</td><td><input type="text" name="gruppe" value="<?php   echo $student->gruppe;
-		?>"></td></tr>
-
+			<tr><td>Semester</td><td><input type="text" name="semester" value="'.$student->semester.'"></td></tr>
+			<tr><td>Verband</td><td><input type="text" name="verband" value="'.$student->verband.'"></td></tr>
+			<tr><td>Gruppe</td><td><input type="text" name="gruppe" value="'.$student->gruppe.'"></td></tr>
 
 			</table>
 
 			<input type="submit" name="Save" value="Speichern">
-			<input type="hidden" name="id" value="<?php   echo $id;
-		?>">
-			</form>
+			<input type="hidden" name="id" value="'.$id.'">
+			</form>';
+			
+		echo '</td><td valign="top">';
+		echo '<a href="../../content/pdfExport.php?xsl=AccountInfo&xml=accountinfoblatt.xml.php&uid='.$student->uid.'" >AccountInfoBlatt erstellen</a>';
+			
+		echo '</td></tr></table>';
 
-			<?php
-
-				}
+	}
 
 } // ENDE doEDIT()
 
