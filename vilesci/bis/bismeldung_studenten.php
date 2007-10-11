@@ -13,7 +13,8 @@ require('../../include/datum.class.php');
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
-//$adress="ruhan@technikum-wien.at";
+
+
 $error_log='';
 $error_log1='';
 $error_log_all="";
@@ -35,13 +36,34 @@ $avon='';
 $abis='';
 $zweck='';
 
+$qry="SELECT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='".$ssem."';";
+if($result = pg_query($conn, $qry))
+{
+	if($row = pg_fetch_object($result))
+	{
+		$beginn=$row->start;
+		$ende=$row->ende;
+	}
+}
+if(strstr($ssem,"WS"))
+{
+	$bisdatum=date("Y-m-d",  mktime(0, 0, 0, 11, 15, date("Y")));
+}
+elseif(strstr($ssem,"SS"))
+{
+	$bisdatum=date("Y-m-d",  mktime(0, 0, 0, 04, 15, date("Y")));
+}
+else 
+{
+	echo "Ungültiges Semester!";
+}
 if(isset($_GET['stg_kz']))
 {
 	$stg_kz=$_GET['stg_kz'];
 }
 else 
 {
-	$stg_kz=222;
+	$stg_kz=254;
 	//echo "<H2>Es wurde keine Studiengangskennzahl übergeben!</H2>";
 	//exit;
 }
@@ -52,15 +74,6 @@ function myaddslashes($var)
 
 $datumobj=new datum();
 
-$qry="SELECT * FROM public.tbl_studiensemester";
-if($result = pg_query($conn, $qry))
-{
-	while($row = pg_fetch_object($result))
-	{
-		$beginn[$row->studiensemester_kurzbz]=$row->start;
-		$ende[$row->studiensemester_kurzbz]=$row->ende;
-	}
-}
 $qry="SELECT * FROM public.tbl_studiengang WHERE studiengang_kz='".$stg_kz."'";
 if($result = pg_query($conn, $qry))
 {
@@ -134,7 +147,7 @@ $datei.="
 <?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <Erhalter>
   <ErhKz>".$erhalter."</ErhKz>
-  <MeldeDatum>15112007</MeldeDatum>
+  <MeldeDatum>".date("dmY", $datumobj->mktime_fromdate($bisdatum))."</MeldeDatum>
   <StudierendenBewerberMeldung>
     <StudiengangStamm>
       <StgKz>".$stg_kz."</StgKz>
@@ -315,8 +328,8 @@ $datei.="
 			{
 				$sem=$rowstatus->ausbildungssemester;
 				if($rowstatus->rolle_kurzbz=="Student" || $rowstatus->rolle_kurzbz=="Outgoing" 
-					|| $rowstatus->rolle_kurzbz=="Incoming" || $rowstatus->rolle_kurzbz='Praktikant' 
-					|| $rowstatus->rolle_kurzbz="Diplomand")
+					|| $rowstatus->rolle_kurzbz=="Incoming" || $rowstatus->rolle_kurzbz=='Praktikant' 
+					|| $rowstatus->rolle_kurzbz=="Diplomand")
 				{
 					$status=1;
 				}
@@ -337,6 +350,10 @@ $datei.="
 					continue;
 				}
 				$aktstatus=$rowstatus->rolle_kurzbz;
+			}
+			else 
+			{	
+				continue;
 			}
 		}
 		//bei Absolventen das Beendigungsdatum (Sponsion oder Abschlussprüfung) überprüfen
@@ -365,15 +382,15 @@ $datei.="
 				}
 			}
 		}
-		if($row->zgvdatum=='' || $row->zgvdatum==null)
+		if($row->berufstaetigkeit_code=='' || $row->berufstaetigkeit_code==null)
 		{
 			if($error_log!='')
 			{
-				$error_log.=", Berufstätigkeitscode ('".$row->zgvdatum."')";
+				$error_log.=", Berufstätigkeitscode ('".$row->berufstaetigkeit_code."')";
 			}
 			else 
 			{
-				$error_log.="Berufstätigkeitscode ('".$row->zgvdatum."')";
+				$error_log.="Berufstätigkeitscode ('".$row->berufstaetigkeit_code."')";
 			}
 		}
 		if($error_log!='' OR $error_log1!='')
@@ -420,17 +437,34 @@ $datei.="
           <HeimatStrasse>".$row->strasse."</HeimatStrasse>
           <HeimatNation>".$row->nation."</HeimatNation>
           <ZugangCode>".$row->zgv_code."</ZugangCode>
-          <ZugangDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvdatum))."</ZugangDatum>
-          <ZugangMagStgCode></ZugangMagStgCode>
-          <ZugangMagStgDatum></ZugangMagStgDatum>
-          <BeginnDatum>???</BeginnDatum>
-          <Beendigungsdatum></Beendigungsdatum>
+          <ZugangDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvdatum))."</ZugangDatum>";
+		          if($stgart==2)
+		          {
+		          		$datei.="
+          <ZugangMagStgCode>".$row->zgvmas_code."</ZugangMagStgCode>
+          <ZugangMagStgDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvmadatum))."</ZugangMagStgDatum>";
+		          }
+		          $qryad="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='".$row->prestudent_id."' AND rolle_kurzbz='Student' ORDER BY datum desc;";
+		          if($resultad = pg_query($conn, $qryad))
+			{
+				if($rowad = pg_fetch_object($resultad))
+				{
+          			$datei.="
+          <BeginnDatum>".date("dmY", $datumobj->mktime_fromdate($rowad->datum))."</BeginnDatum>";
+				}
+			}
+          			if($aktstatus=='Absolvent')
+			{
+				$datei.="
+          <Beendigungsdatum>".date("dmY", $datumobj->mktime_fromdate($row->sponsion))."</Beendigungsdatum>";
+			}
+			$datei.="
           <Ausbildungssemester>".$sem."</Ausbildungssemester>
           <StudStatusCode>".$status."</StudStatusCode>
-          <BerufstaetigkeitCode></BerufstaetigkeitCode>";
+          <BerufstaetigkeitCode>".$row->berufstaetigkeit_code."</BerufstaetigkeitCode>";
 			if($aktstatus=='Incoming' OR $aktstatus=='Outgoing')
 			{
-				$qryio="SELECT * FROM bisio WHERE student_uid='".$row->student_uid."';";
+				$qryio="SELECT * FROM bis.tbl_bisio WHERE student_uid='".$row->student_uid."';";
 				if($resultio = pg_query($conn, $qryio))
 				{
 					if($rowio = pg_fetch_object($resultio))
@@ -447,8 +481,13 @@ $datei.="
           	 <Status>".$aktstatus."</Status>
             <MobilitaetsProgrammCode>".$mob."</MobilitaetsProgrammCode>
             <GastlandCode>".$gast."</GastlandCode>
-            <AufenthaltVon>".$avon."</AufenthaltVon>
-            <AufenthaltBis>".$abis."</AufenthaltBis>
+            <AufenthaltVon>".$avon."</AufenthaltVon>";
+	            		if($abis<$bisdatum)
+	            		{
+	            			$datei.="
+            <AufenthaltBis>".$abis."</AufenthaltBis>";
+				}
+				$datei.="
             <AufenthaltZweckCode>".$zweck."</AufenthaltZweckCode>
           </IO>";
 			}
@@ -468,7 +507,7 @@ $datei.="
 
 if(strlen($v)!='')
 {
-	echo '<html><head><title>Synchro - FAS -> Vilesci - Student</title>
+	echo '<html><head><title>BIS - Meldung Student - ('.$stg_kz.')</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 		</head><body>';
 	echo "<H1>BIS - Studentendaten werden überprüft! Studiengang: ".$stg_kz."</H1>\n";
