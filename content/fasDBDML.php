@@ -348,6 +348,11 @@ if(!$error)
 			$variable->name = 'kontofilterstg';
 			$variable->wert = $_POST['kontofilterstg'];
 		}
+		elseif(isset($_POST['name']))
+		{
+			$variable->name = $_POST['name'];
+			$variable->wert = $_POST['wert'];
+		}
 		else
 		{
 			$error = true;

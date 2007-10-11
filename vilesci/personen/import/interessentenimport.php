@@ -130,7 +130,7 @@ if($studiengang_kz=='' && isset($_GET['studiengang_kz']))
 	$studiengang_kz = $_GET['studiengang_kz'];
 $person_id = (isset($_REQUEST['person_id'])?$_REQUEST['person_id']:'');
 $ueberschreiben = (isset($_REQUEST['ueberschreiben'])?$_REQUEST['ueberschreiben']:'');
-$studiensemester_kurzbz = (isset($_REQUEST['studiensemester_kurzbz'])?$_REQUEST['studiensemester_kurzbz']:'');
+$studiensemester_kurzbz = (isset($_REQUEST['studiensemester_kurzbz'])?$_REQUEST['studiensemester_kurzbz']:$semester_aktuell);
 $ausbildungssemester = (isset($_REQUEST['ausbildungssemester'])?$_REQUEST['ausbildungssemester']:'');
 $incoming = (isset($_REQUEST['incoming'])?true:false);
 //end Parameter
@@ -615,7 +615,7 @@ echo '<tr><td>Studiensemester</td><td><SELECT id="studiensemester_kurzbz" name="
 $stsem = new studiensemester($conn);
 $stsem->getAll();
 foreach ($stsem->studiensemester as $row)
-	echo '<OPTION value="'.$row->studiensemester_kurzbz.'" '.($row->studiensemester_kurzbz==$semester_aktuell?'selected':'').'>'.$row->studiensemester_kurzbz.'</OPTION>';
+	echo '<OPTION value="'.$row->studiensemester_kurzbz.'" '.($row->studiensemester_kurzbz==$studiensemester_kurzbz?'selected':'').'>'.$row->studiensemester_kurzbz.'</OPTION>';
 echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><td>Ausbildungssemester</td><td><SELECT id="ausbildungssemester" name="ausbildungssemester">';

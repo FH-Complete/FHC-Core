@@ -37,3 +37,15 @@
 <!ENTITY menu-prefs-stpltable-stundenplandev.key      	"d">
 <!ENTITY menu-prefs-stpltable-stundenplandev.label    	"stundenplandev">
 <!ENTITY menu-prefs-stpltable-stundenplandev.accesskey	"d">
+
+<!ENTITY menu-prefs-ignore_reservierung.key      	"r">
+<!ENTITY menu-prefs-ignore_reservierung.label    	"ignore_reservierung">
+<!ENTITY menu-prefs-ignore_reservierung.accesskey	"r">
+
+<!ENTITY menu-prefs-ignore_zeitsperre.key      	"z">
+<!ENTITY menu-prefs-ignore_zeitsperre.label    	"ignore_zeitsperre">
+<!ENTITY menu-prefs-ignore_zeitsperre.accesskey	"z">
+
+<!ENTITY menu-prefs-ignore_kollision.key      	"k">
+<!ENTITY menu-prefs-ignore_kollision.label    	"ignore_kollision">
+<!ENTITY menu-prefs-ignore_kollision.accesskey	"k">

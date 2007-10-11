@@ -98,6 +98,7 @@ if(!$error)
 			$mitarbeiter->telefonklappe = $_POST['telefonklappe'];
 			$mitarbeiter->lektor = ($_POST['lektor']=='true'?true:false);
 			$mitarbeiter->fixangestellt = ($_POST['fixangestellt']=='true'?true:false);
+			$mitarbeiter->bismelden = ($_POST['bismelden']=='true'?true:false);
 			$mitarbeiter->ausbildungcode = $_POST['ausbildung'];
 			$mitarbeiter->anmerkung = $_POST['anmerkung'];
 			$mitarbeiter->ort_kurzbz = $_POST['ort_kurzbz'];

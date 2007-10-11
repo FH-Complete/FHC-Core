@@ -42,6 +42,7 @@ class mitarbeiter extends benutzer
 	var $ext_id_mitarbeiter;	//bigint
 	var $stundensatz;
 	var $anmerkung;
+	var $bismelden;
 
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional einen Mitarbeiter
@@ -94,6 +95,7 @@ class mitarbeiter extends benutzer
 				$this->stundensatz = $row->stundensatz;
 				$this->anmerkung = $row->anmerkung;
 				$this->ext_id_mitarbeiter = $row->ext_id;
+				$this->bismelden = ($row->bismelden=='t'?true:false);
 				return true;
 			}
 			else
@@ -200,7 +202,7 @@ class mitarbeiter extends benutzer
 
 			//Neuen Datensatz anlegen
 			$qry = "INSERT INTO public.tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz,
-			                    fixangestellt, standort_kurzbz, telefonklappe, anmerkung, stundensatz, updateamum, updatevon, insertamum, insertvon, ext_id)
+			                    fixangestellt, standort_kurzbz, telefonklappe, anmerkung, stundensatz, updateamum, updatevon, insertamum, insertvon, ext_id, bismelden)
 
 			        VALUES('".addslashes($this->uid)."',".
 			 	 	$this->addslashes($this->ausbildungcode).",".
@@ -217,7 +219,8 @@ class mitarbeiter extends benutzer
 					$this->addslashes($this->updatevon).', '.
 					$this->addslashes($this->insertamum).','.
 					$this->addslashes($this->insertvon).', '.
-					$this->addslashes($this->ext_id_mitarbeiter).');';
+					$this->addslashes($this->ext_id_mitarbeiter).','.
+					($this->bismelden?'true':'false').');';
 		}
 		else
 		{
@@ -228,6 +231,7 @@ class mitarbeiter extends benutzer
 			       ' kurzbz='.$this->addslashes($this->kurzbz).','.
 			       ' lektor='.($this->lektor?'true':'false').','.
 			       ' fixangestellt='.($this->fixangestellt?'true':'false').','.
+			       ' bismelden='.($this->bismelden?'true':'false').','.
 			       ' standort_kurzbz='.$this->addslashes($this->standort_kurzbz).','.
 			       ' telefonklappe='.$this->addslashes($this->telefonklappe).','.
 			       ' ort_kurzbz='.$this->addslashes($this->ort_kurzbz).','.
@@ -314,6 +318,7 @@ class mitarbeiter extends benutzer
 			$l->personalnummer=$row->personalnummer;
 			$l->kurzbz=$row->kurzbz;
 			$l->lektor=$row->lektor=='t'?true:false;
+			$l->bismelden=$row->bismelden=='t'?true:false;
 			$l->fixangestellt=$row->fixangestellt=='t'?true:false;
 			$l->standort_kurzbz = $row->standort_kurzbz;
 			$l->telefonklappe=$row->telefonklappe;
@@ -385,6 +390,7 @@ class mitarbeiter extends benutzer
 			$l->foto=$row->foto;
 			$l->anmerkungen=$row->anmerkungen;
 			$l->aktiv=$row->aktiv=='t'?true:false;
+			$l->bismelden=$row->bismelden=='t'?true:false;
 			$l->homepage=$row->homepage;
 			$l->updateamum=$row->updateamum;
 			$l->updatevon=$row->updatevon;
@@ -588,6 +594,7 @@ class mitarbeiter extends benutzer
 				$obj->kurzbz = $row->kurzbz;
 				$obj->lektor = ($row->lektor=='t'?true:false);
 				$obj->fixangestellt = ($row->fixangestellt=='t'?true:false);
+				$obj->bismelden = ($row->bismelden=='t'?true:false);
 				$obj->stundensatz = $row->stundensatz;
 				$obj->ausbildungcode = $row->ausbildungcode;
 				$obj->ort_kurzbz = $row->ort_kurzbz;
