@@ -22,13 +22,25 @@ $v='';
 $studiensemester=new studiensemester($conn);
 $ssem=$studiensemester->getaktorNext();
 
+if(strstr($ssem,"WS"))
+{
+	$bisdatum=date("Y-m-d",  mktime(0, 0, 0, 11, 15, date("Y")));
+}
+elseif(strstr($ssem,"SS"))
+{
+	$bisdatum=date("Y-m-d",  mktime(0, 0, 0, 04, 15, date("Y")));
+}
+else 
+{
+	echo "Ungültiges Semester!";
+}
 if(isset($_GET['stg_kz']))
 {
 	$stg_kz=$_GET['stg_kz'];
 }
 else 
 {
-	$stg_kz=222;
+	$stg_kz=0;
 }
 if(isset($_GET['email']))
 {
@@ -86,7 +98,7 @@ $qry="SELECT DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.pe
 	JOIN public.tbl_prestudentrolle ON(tbl_prestudent.prestudent_id=tbl_prestudentrolle.prestudent_id) 
 	JOIN public.tbl_adresse ON(tbl_person.person_id=tbl_adresse.person_id)
 	LEFT JOIN lehre.tbl_abschlusspruefung USING(student_uid) 
-	WHERE heimatadresse IS TRUE 
+	WHERE heimatadresse IS TRUE AND bismelden IS TRUE 
 	AND (studiensemester_kurzbz='".$ssem."') AND tbl_student.studiengang_kz='".$stg_kz."'
 	AND (rolle_kurzbz='Student' OR rolle_kurzbz='Incoming' OR rolle_kurzbz='Outgiong'
 		OR rolle_kurzbz='Praktikant' OR rolle_kurzbz='Diplomand' OR rolle_kurzbz='Absolvent') 
@@ -367,7 +379,7 @@ if($result = pg_query($conn, $qry))
 							$error_log.="IO - bis ('".$rowio->bis."')";
 						}
 					}
-					if($rowio->zweck_code='' || $$rowio->zweck_code=null)
+					if($rowio->zweck_code='' || $rowio->zweck_code=null)
 					{
 						if($error_log!='')
 						{
@@ -414,8 +426,43 @@ if($result = pg_query($conn, $qry))
 		$error_log1='';
 	}
 }
+$qrybw="SELECT * FROM public.tbl_prestudent 
+	JOIN public.tbl_prestudentrolle ON(tbl_prestudent.prestudent_id=tbl_prestudentrolle.prestudent_id) 
+	JOIN public.tbl_person USING(person_id)  
+	WHERE bismelden IS TRUE AND (studiensemester_kurzbz='".$ssem."') AND tbl_prestudent.studiengang_kz='".$stg_kz."'
+	AND rolle_kurzbz='Bewerber';
+	";
+if($resultbw = pg_query($conn, $qrybw))
+{
+	while($rowbw = pg_fetch_object($resultbw))
+	{
+		if($stgart=='b' || $stgart=='d')
+		{
+			if(!($rowbw->zgv_code>=4 && $rowbw->zgv_code<=19) && $rowbw->zgv_code!=99 || $rowbw->zgv_code=='' || $rowbw->zgv_code==NULL)
+			{
+				$v.="Bei Bewerber (Vorname, Nachname) '".$rowbw->nachname."', '".$rowbw->vorname."' ($rowbw->rolle_kurzbz) fehlt die Zugangsvoraussetzungsart (".$rowbw->zgv_code.")\n";	
+			}			
+		}
+		if($stgart=='m')
+		{	
+			if(!($rowbw->zgv_code>=4 && $rowbw->zgv_code<=19) && $rowbw->zgv_code!=99)
+			{
+				$v.="Bei Bewerber (Vorname, Nachname) '".$rowbw->nachname."', '".$rowbw->vorname."' ($rowbw->rolle_kurzbz) fehlt die Zugangsvoraussetzungsart (".$rowbw->zgv_code.")\n";	
+			}
+			if(!($rowbw->zgvmas_code>=1 && $rowbw->zgvmas_code<=11))
+			{
+				$v.="Bei Bewerber (Vorname, Nachname) '".$rowbw->nachname."', '".$rowbw->vorname."' ($rowbw->rolle_kurzbz) fehlt die Mag.-Zugangsvoraussetzungsart (".$rowbw->zgvmas_code.")\n";	
+			}
+		}
+	}
+}
+else 
+{
+	echo "Bewerber - Leider nein";	
+}
+
 echo "<H1>BIS - Studentendaten werden überprüft. Studiengang: ".$stg_kz."</H1>\n";
-echo "<H2>Fehlende BIS-Daten (für Meldung ".$ssem."): </H2><br>";
+echo "<H2>Fehlende BIS-Daten (für Meldung ".$ssem."/".$bisdatum."): </H2><br>";
 //echo "(Doppelte Zeilen deuten auf mehrere Heimatadressen hin - bitte Kontakte überprüfen)<br><br>";
 
 echo nl2br($v."\n");

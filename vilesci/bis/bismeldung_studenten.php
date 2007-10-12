@@ -35,6 +35,8 @@ $gast='';
 $avon='';
 $abis='';
 $zweck='';
+$bewerberM=array();
+$bewerberW=array();
 
 $qry="SELECT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='".$ssem."';";
 if($result = pg_query($conn, $qry))
@@ -63,9 +65,9 @@ if(isset($_GET['stg_kz']))
 }
 else 
 {
-	$stg_kz=254;
-	//echo "<H2>Es wurde keine Studiengangskennzahl übergeben!</H2>";
-	//exit;
+	//$stg_kz=0;
+	echo "<H2>Es wurde kein Studiengang ausgewählt!</H2>";
+	exit;
 }
 function myaddslashes($var)
 {
@@ -132,7 +134,7 @@ $qry="SELECT DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.pe
 	JOIN public.tbl_prestudentrolle ON(tbl_prestudent.prestudent_id=tbl_prestudentrolle.prestudent_id) 
 	JOIN public.tbl_adresse ON(tbl_person.person_id=tbl_adresse.person_id)
 	LEFT JOIN lehre.tbl_abschlusspruefung USING(student_uid) 
-	WHERE heimatadresse IS TRUE 
+	WHERE heimatadresse IS TRUE AND bismelden IS TRUE 
 	AND (studiensemester_kurzbz='".$ssem."') AND tbl_student.studiengang_kz='".$stg_kz."'
 	AND (rolle_kurzbz='Student' OR rolle_kurzbz='Incoming' OR rolle_kurzbz='Outgiong'
 		OR rolle_kurzbz='Praktikant' OR rolle_kurzbz='Diplomand' OR rolle_kurzbz='Absolvent' 
@@ -433,7 +435,7 @@ $datei.="
 			$datei.="
           <StaatsangehoerigkeitCode>".$row->staatsbuergerschaft."</StaatsangehoerigkeitCode>
           <HeimatPLZ>".$row->plz."</HeimatPLZ>
-          <HeimatGemeinde>".$row->plz."</HeimatGemeinde>
+          <HeimatGemeinde>".$row->gemeinde."</HeimatGemeinde>
           <HeimatStrasse>".$row->strasse."</HeimatStrasse>
           <HeimatNation>".$row->nation."</HeimatNation>
           <ZugangCode>".$row->zgv_code."</ZugangCode>
@@ -444,7 +446,7 @@ $datei.="
           <ZugangMagStgCode>".$row->zgvmas_code."</ZugangMagStgCode>
           <ZugangMagStgDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvmadatum))."</ZugangMagStgDatum>";
 		          }
-		          $qryad="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='".$row->prestudent_id."' AND rolle_kurzbz='Student' ORDER BY datum desc;";
+		          $qryad="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='".$row->prestudent_id."' AND rolle_kurzbz='Student' ORDER BY datum asc;";
 		          if($resultad = pg_query($conn, $qryad))
 			{
 				if($rowad = pg_fetch_object($resultad))
@@ -497,14 +499,110 @@ $datei.="
 		}
 		
 	}
-	$datei.="
+}
+//Bewerber
+$qrybw="SELECT * FROM public.tbl_prestudent 
+	JOIN public.tbl_prestudentrolle ON(tbl_prestudent.prestudent_id=tbl_prestudentrolle.prestudent_id) 
+	JOIN public.tbl_person USING(person_id)  
+	WHERE bismelden IS TRUE AND (studiensemester_kurzbz='".$ssem."') AND tbl_prestudent.studiengang_kz='".$stg_kz."'
+	AND rolle_kurzbz='Bewerber';
+	";
+if($resultbw = pg_query($conn, $qrybw))
+{
+	while($rowbw = pg_fetch_object($resultbw))
+	{
+		if($stgart==1 || $stgart==3)
+		{
+			if(strtoupper($rowbw->geschlecht)=='M')
+			{
+				If(!isset($bewerberM[$rowbw->zgv_code]))
+				{
+					$bewerberM[$rowbw->zgv_code]=0;
+				}
+				$bewerberM[$rowbw->zgv_code]++;
+			}
+			else 
+			{
+				If(!isset($bewerberW[$rowbw->zgv_code]))
+				{
+					$bewerberW[$rowbw->zgv_code]=0;
+				}
+				$bewerberW[$rowbw->zgv_code]++;
+			}			
+		}
+		if($stgart==2)
+		{	
+			if(strtoupper($rowbw->geschlecht)=='M')
+			{
+				If(!isset($bewerberM[$rowbw->zgvmas_code]))
+				{
+					$bewerberM[$rowbw->zgvmas_code]=0;
+				}
+				$bewerberM[$rowbw->zgvmas_code]++;
+			}
+			else 
+			{
+				If(!isset($bewerberW[$rowbw->zgvmas_code]))
+				{
+					$bewerberW[$rowbw->zgvmas_code]=0;
+				}
+				$bewerberW[$rowbw->zgvmas_code]++;
+			}
+		}
+	}
+}
+
+if($stgart==1 || $stgart==3)
+{
+	for($i=4;$i<100;$i++)
+	{
+		if(isset($bewerberM[$i]) || isset($bewerberW[$i]))
+		{
+			If(!isset($bewerberM[$i]))
+			{
+				$bewerberM[$i]=0;
+			}
+			If(!isset($bewerberW[$i]))
+			{
+				$bewerberW[$i]=0;
+			}
+			$datei.="
+         <Bewerber>
+           <ZugangCode>".$i."</ZugangCode>
+           <AnzBewerberM>".$bewerberM[$i]."</AnzBewerberM>
+           <AnzBewerberW>".$bewerberW[$i]."</AnzBewerberW>
+         </Bewerber>";
+		}
+	}
+}
+if($stgart==2)
+{
+	for($i=1;$i<12;$i++)
+	{
+		if(isset($bewerberM[$i]) || isset($bewerberW[$i]))
+		{
+			if(!isset($bewerberM[$i]))
+			{
+				$bewerberM[$i]=0;	
+			}
+			if(!isset($bewerberW[$i]))
+			{
+				$bewerberW[$i]=0;	
+			}
+			$datei.="
+         <Bewerber>
+           <ZugangMagStgCode>".$i."</ZugangMagStgCode>
+           <AnzBewerberM>".$bewerberM[$i]."</AnzBewerberM>
+           <AnzBewerberW>".$bewerberW[$i]."</AnzBewerberW>
+         </Bewerber>";
+		}
+	}
+}
+$datei.="
        </StudiengangDetail>
     </StudiengangStamm>
   </StudierendenBewerberMeldung>
 </Erhalter>";
-	
-}
-
 if(strlen($v)!='')
 {
 	echo '<html><head><title>BIS - Meldung Student - ('.$stg_kz.')</title>

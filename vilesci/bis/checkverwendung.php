@@ -12,6 +12,7 @@
 //*
 
 require('../config.inc.php');
+require('../../include/studiensemester.class.php');
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 $conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
@@ -30,6 +31,8 @@ $anzahl_fehler=0;
 $ausgabe='';
 $error_log_fas='';
 $update=false;
+$studiensemester=new studiensemester($conn);
+$ssem=$studiensemester->getaktorNext();
 
 function myaddslashes($var)
 {
@@ -57,7 +60,7 @@ if($result = pg_query($conn, $qry))
 		$ende[$row->studiensemester_kurzbz]=$row->ende;
 	}
 }
-//1 - aktive mitarbeiter mit keiner verwendung oder mehr als einer aktuellen verwendung
+//1 - aktive mitarbeiter und bismelden mit keiner verwendung oder mehr als einer aktuellen verwendung
 $qryall='SELECT uid,nachname,vorname, count(bisverwendung_id)  FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) WHERE aktiv AND (ende>now() OR ende IS NULL) GROUP BY uid,nachname,vorname HAVING count(bisverwendung_id)!=1 ORDER by nachname,vorname;';
 if($resultall = pg_query($conn, $qryall))
 {
@@ -67,7 +70,7 @@ if($resultall = pg_query($conn, $qryall))
 	{
 		$i=0;
 		$qry="SELECT * FROM bis.tbl_bisverwendung JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid) JOIN public.tbl_person USING(person_id)
-			WHERE tbl_benutzer.aktiv=TRUE AND (ende>now() OR ende IS NULL) AND mitarbeiter_uid='".$rowall->uid."';";
+			WHERE tbl_benutzer.aktiv=TRUE AND bismelden=TRUE AND (ende>now() OR ende IS NULL) AND mitarbeiter_uid='".$rowall->uid."';";
 		if($result = pg_query($conn, $qry))
 		{
 			$num_rows=pg_num_rows($result);
@@ -253,4 +256,14 @@ if($resultall = pg_query($conn, $qryall))
 		}
 	}
 }
+//7 - Lehrauftrag aber keine aktuelle Verwendung
+$qry_erg="SELECT lehre.tbl_lehreinheitmitarbeiter.mitarbeiter_uid, lehre.tbl_lehrveranstaltung.studiengang_kz, 
+	lehre.tbl_lehreinheit.studiensemester_kurzbz, lehre.tbl_lehreinheitmitarbeiter.semesterstunden, 
+	lehre.tbl_lehrveranstaltung.semester, public.tbl_semesterwochen.wochen 
+	FROM lehre.tbl_lehreinheitmitarbeiter join lehre.tbl_lehreinheit USING (lehreinheit_id) 
+	JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
+	JOIN public.tbl_semesterwochen USING(studiengang_kz, semester)
+	WHERE lehre.tbl_lehreinheitmitarbeiter.mitarbeiter_uid='".$row->mitarbeiter_uid."' 
+	AND lehre.tbl_lehreinheit.studiensemester_kurzbz='".$ssem."';";
+			
 ?>
