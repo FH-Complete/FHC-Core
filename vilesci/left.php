@@ -5,8 +5,8 @@
  	$uid=get_uid();
  	$conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
 	$berechtigung=new benutzerberechtigung($conn);
-	$berechtigung->getBerechtigungen($uid); //|| $berechtigung->isBerechtigt('lvplan')
-	if (!($berechtigung->isBerechtigt('admin',0) ))
+	$berechtigung->getBerechtigungen($uid);
+	if (!($berechtigung->isBerechtigt('admin') || $berechtigung->isBerechtigt('support') || $berechtigung->isBerechtigt('lvplan') ))
 		die ('Keine Berechtigung!');
 
 ?>
@@ -368,7 +368,7 @@
 			  	</tr>
 			  	<tr>
 			  		<td width="10" nowrap>&nbsp;</td>
-					<td nowrap><a class="MenuItem2" href="kommunikation/mlists/index.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Mail-Verteiler</a></td>
+					<td nowrap><a class="MenuItem2" href="kommunikation/index.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Mail-Verteiler</a></td>
 			  	</tr>
 			  	<tr><td width="10" nowrap>&nbsp;</td></tr>
 			  	</table>
