@@ -69,8 +69,12 @@ if($resultall = pg_query($conn, $qryall))
 	while($rowall=pg_fetch_object($resultall))
 	{
 		$i=0;
-		$qry="SELECT * FROM bis.tbl_bisverwendung JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid) JOIN public.tbl_person USING(person_id)
-			WHERE tbl_benutzer.aktiv=TRUE AND bismelden=TRUE AND (ende>now() OR ende IS NULL) AND mitarbeiter_uid='".$rowall->uid."';";
+		$qry="SELECT * FROM bis.tbl_bisverwendung 
+			JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid) 
+			JOIN public.tbl_person USING(person_id) 
+			JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid)
+			WHERE tbl_benutzer.aktiv=TRUE AND bismelden=TRUE 
+			AND (ende>now() OR ende IS NULL) AND mitarbeiter_uid='".$rowall->uid."';";
 		if($result = pg_query($conn, $qry))
 		{
 			$num_rows=pg_num_rows($result);
@@ -257,7 +261,7 @@ if($resultall = pg_query($conn, $qryall))
 	}
 }
 //7 - Lehrauftrag aber keine aktuelle Verwendung
-$qry_erg="SELECT lehre.tbl_lehreinheitmitarbeiter.mitarbeiter_uid, lehre.tbl_lehrveranstaltung.studiengang_kz, 
+/*$qry_erg="SELECT lehre.tbl_lehreinheitmitarbeiter.mitarbeiter_uid, lehre.tbl_lehrveranstaltung.studiengang_kz, 
 	lehre.tbl_lehreinheit.studiensemester_kurzbz, lehre.tbl_lehreinheitmitarbeiter.semesterstunden, 
 	lehre.tbl_lehrveranstaltung.semester, public.tbl_semesterwochen.wochen 
 	FROM lehre.tbl_lehreinheitmitarbeiter join lehre.tbl_lehreinheit USING (lehreinheit_id) 
@@ -265,5 +269,5 @@ $qry_erg="SELECT lehre.tbl_lehreinheitmitarbeiter.mitarbeiter_uid, lehre.tbl_leh
 	JOIN public.tbl_semesterwochen USING(studiengang_kz, semester)
 	WHERE lehre.tbl_lehreinheitmitarbeiter.mitarbeiter_uid='".$row->mitarbeiter_uid."' 
 	AND lehre.tbl_lehreinheit.studiensemester_kurzbz='".$ssem."';";
-			
+*/			
 ?>
