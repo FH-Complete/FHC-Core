@@ -236,7 +236,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<template>
 									<menupopup>
 										<menuitem value="rdf:http://www.technikum-wien.at/lehreinheit/rdf#lehreinheit_id"
-							        		      label="rdf:http://www.technikum-wien.at/lehreinheit/rdf#bezeichnung"
+							        		      label="rdf:http://www.technikum-wien.at/lehreinheit/rdf#bezeichnung rdf:http://www.technikum-wien.at/lehreinheit/rdf#studiensemester_kurzbz"
 										  		  uri="rdf:*"/>
 									</menupopup>
 								</template>

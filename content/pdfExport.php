@@ -164,26 +164,10 @@ if (!isset($_REQUEST["archive"]))
 else
 {
 
-	$filename = $user;
-	if (!$fo2pdf->generatePdf($buffer, $filename, 'F'))
-	{
-		echo('Failed to generate PDF');
-	}
-	$file = "/tmp/".$filename.".pdf";
-	$handle = fopen($file, "rb");
-	$string = fread($handle, filesize($file));
-	fclose($handle);
-	unlink($file);
-
-	$hex="";
-	for ($i=0;$i<strlen($string);$i++)
-		$hex.=(strlen(dechex(ord($string[$i])))<2)? "0".dechex(ord($string[$i])): dechex(ord($string[$i]));
-
-
 	$uid = $_REQUEST["uid"];
 	$ss = $_REQUEST["ss"];
 	$heute = date('Y-m-d');
-	$query = "SELECT tbl_studentlehrverband.semester, tbl_studiengang.typ, tbl_studiengang.kurzbz, tbl_person.person_id FROM tbl_person, tbl_benutzer, tbl_studentlehrverband, tbl_studiengang where tbl_studentlehrverband.student_uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id and tbl_studentlehrverband.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_studentlehrverband.student_uid = '".$uid."' and tbl_studentlehrverband.studiensemester_kurzbz = '".$ss."'";
+	$query = "SELECT tbl_studiengang.studiengang_kz, tbl_studentlehrverband.semester, tbl_studiengang.typ, tbl_studiengang.kurzbz, tbl_person.person_id FROM tbl_person, tbl_benutzer, tbl_studentlehrverband, tbl_studiengang where tbl_studentlehrverband.student_uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id and tbl_studentlehrverband.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_studentlehrverband.student_uid = '".$uid."' and tbl_studentlehrverband.studiensemester_kurzbz = '".$ss."'";
 
 	if($result = pg_query($conn, $query))
 	{
@@ -192,6 +176,7 @@ else
 			$person_id = $row->person_id;
 			$titel = "Zeugnis_".strtoupper($row->typ).strtoupper($row->kurzbz)."_".$row->semester;
 			$bezeichnung = "Zeugnis ".strtoupper($row->typ).strtoupper($row->kurzbz)." ".$row->semester.". Semester";
+			$studiengang_kz = $row->studiengang_kz;
 		}
 		else
 		{
@@ -199,27 +184,47 @@ else
 
 		}
 	}
-
-
-	$akte = new akte($conn);
-	$akte->person_id = $person_id;
-  	$akte->dokument_kurzbz = "Zeugnis";
-  	$akte->inhalt = $hex;
-  	$akte->mimetype = "application/octet-stream";
-  	$akte->erstelltam = $heute;
-  	$akte->gedruckt = true;
-  	$akte->titel = $titel.".pdf";
-  	$akte->bezeichnung = $bezeichnung;
-  	$akte->updateamum = "";
-  	$akte->updatevon = "";
-	$akte->insertamum = date('Y-m-d h:m:s');
-	$akte->insertvon = $user;
-  	$akte->ext_id = "";
-  	$akte->uid = $_REQUEST["uid"];
-	$akte->new = true;
-	if (!$akte->save('new'))
-		return true;
-	else
-		return false;
+	
+	if($rechte->isBerechtigt('admin', $studiengang_kz, 'suid') || $rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid'))
+	{
+	
+		$filename = $user;
+		if (!$fo2pdf->generatePdf($buffer, $filename, 'F'))
+		{
+			echo('Failed to generate PDF');
+		}
+		$file = "/tmp/".$filename.".pdf";
+		$handle = fopen($file, "rb");
+		$string = fread($handle, filesize($file));
+		fclose($handle);
+		unlink($file);
+	
+		$hex="";
+		for ($i=0;$i<strlen($string);$i++)
+			$hex.=(strlen(dechex(ord($string[$i])))<2)? "0".dechex(ord($string[$i])): dechex(ord($string[$i]));
+	
+		$akte = new akte($conn);
+		$akte->person_id = $person_id;
+	  	$akte->dokument_kurzbz = "Zeugnis";
+	  	$akte->inhalt = $hex;
+	  	$akte->mimetype = "application/octet-stream";
+	  	$akte->erstelltam = $heute;
+	  	$akte->gedruckt = true;
+	  	$akte->titel = $titel.".pdf";
+	  	$akte->bezeichnung = $bezeichnung;
+	  	$akte->updateamum = "";
+	  	$akte->updatevon = "";
+		$akte->insertamum = date('Y-m-d h:m:s');
+		$akte->insertvon = $user;
+	  	$akte->ext_id = "";
+	  	$akte->uid = $_REQUEST["uid"];
+		$akte->new = true;
+		if (!$akte->save('new'))
+			return true;
+		else
+			return false;
+	}
+	else 
+		echo 'Keine Berechtigung zum Speichern';
 }
 ?>

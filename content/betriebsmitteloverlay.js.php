@@ -277,6 +277,11 @@ function BetriebsmittelDelete()
 	var col = tree.columns ? tree.columns["betriebsmittel-tree-person_id"] : "betriebsmittel-tree-person_id";
 	var person_id=tree.view.getCellText(tree.currentIndex,col);
 
+	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-studenten'))
+		studiengang_kz=window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+	else
+		studiengang_kz='';
+		
 	if(confirm('Diesen Eintrag wirklich loeschen?'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
@@ -286,6 +291,7 @@ function BetriebsmittelDelete()
 
 		req.add('betriebsmittel_id', betriebsmittel_id);
 		req.add('person_id', person_id);
+		req.add('studiengang_kz', studiengang_kz);
 
 		var response = req.executePOST();
 
@@ -336,6 +342,11 @@ function BetriebsmittelDetailSpeichern()
 		return false;
 	}
 
+	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-studenten'))
+		studiengang_kz=window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+	else
+		studiengang_kz='';
+	
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 
@@ -352,6 +363,7 @@ function BetriebsmittelDetailSpeichern()
 	req.add('nummer', nummer);
 	req.add('nummerold', nummerold);
 	req.add('beschreibung', beschreibung);
+	req.add('studiengang_kz', studiengang_kz);
 
 	var response = req.executePOST();
 

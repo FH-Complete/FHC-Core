@@ -70,7 +70,7 @@ function StudentKontoNeuInit()
 	col = tree_vb.columns ? tree_vb.columns["stg_kz"] : "stg_kz";
 	//var stg_kz=tree_vb.view.getCellText(tree_vb.currentIndex,col);
 	studiengang_kz=tree_vb.view.getCellText(tree_vb.currentIndex,col);
-
+	debug('kz:'+studiengang_kz);
 	person_ids = paramList;
 
 	if(anzahl>1)

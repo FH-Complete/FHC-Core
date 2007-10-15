@@ -34,7 +34,7 @@
 
 <fo:block-container position="absolute" top="70mm" left="25mm" height="10mm">
 	<fo:block text-align="center" line-height="14pt" font-family="sans-serif" font-size="14pt">
-	<xsl:value-of select="anrede_engl" /><xsl:text>   </xsl:text><xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="vornamen" /><xsl:text> </xsl:text><xsl:value-of select="nachname" />
+	<xsl:value-of select="anrede_engl" /><xsl:text>   </xsl:text><xsl:value-of select="titelpre" /><xsl:text>   </xsl:text><xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="vornamen" /><xsl:text> </xsl:text><xsl:value-of select="nachname" /><xsl:text>   </xsl:text><xsl:value-of select="titelpost" />
 	</fo:block>
 </fo:block-container> 
 

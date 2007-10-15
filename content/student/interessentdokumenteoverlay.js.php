@@ -142,6 +142,8 @@ function InteressentDokumenteAdd()
 	//Prestudent_id holen
 	prestudent_id = document.getElementById('student-prestudent-textbox-prestudent_id').value
 
+	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value
+	
 	if(paramList!='')
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
@@ -151,6 +153,7 @@ function InteressentDokumenteAdd()
 
 		req.add('prestudent_id', prestudent_id);
 		req.add('dokumente', paramList);
+		req.add('studiengang_kz', studiengang_kz);
 
 		var response = req.executePOST();
 
@@ -208,8 +211,9 @@ function InteressentDokumenteRemove()
 	}
 
 	//Prestudent_id holen
-	prestudent_id = document.getElementById('student-prestudent-textbox-prestudent_id').value
-
+	prestudent_id = document.getElementById('student-prestudent-textbox-prestudent_id').value;
+	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+	
 	if(paramList!='')
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
@@ -219,6 +223,7 @@ function InteressentDokumenteRemove()
 
 		req.add('prestudent_id', prestudent_id);
 		req.add('dokumente', paramList);
+		req.add('studiengang_kz', studiengang_kz);
 
 		var response = req.executePOST();
 

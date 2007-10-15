@@ -381,6 +381,8 @@ function StudentAbschlusspruefungSpeichern()
 	abschlusspruefung_id = document.getElementById('student-abschlusspruefung-textbox-abschlusspruefung_id').value;
 	neu = document.getElementById('student-abschlusspruefung-checkbox-neu').checked;
 
+	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+	
 	var tree = document.getElementById('student-tree');
 
 	if (tree.currentIndex==-1)
@@ -429,6 +431,7 @@ function StudentAbschlusspruefungSpeichern()
 	req.add('anmerkung', anmerkung);
 	req.add('abschlusspruefung_id', abschlusspruefung_id);
 	req.add('neu', neu);
+	req.add('studiengang_kz', studiengang_kz);
 	
 
 	var response = req.executePOST();
@@ -504,6 +507,8 @@ function StudentAbschlusspruefungLoeschen()
 		return false;
 	}
 
+	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+	
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["student-abschlusspruefung-treecol-abschlusspruefung_id"] : "student-abschlusspruefung-treecol-abschlusspruefung_id";
 	var abschlusspruefung_id=tree.view.getCellText(tree.currentIndex,col);
@@ -514,6 +519,7 @@ function StudentAbschlusspruefungLoeschen()
 	req.add('type', 'deleteabschlusspruefung');
 		
 	req.add('abschlusspruefung_id', abschlusspruefung_id);
+	req.add('studiengang_kz', studiengang_kz);
 	
 	var response = req.executePOST();
 

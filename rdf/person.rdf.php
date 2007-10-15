@@ -59,7 +59,7 @@ echo '
   <RDF:Seq RDF:about="'.$rdf_url.'/liste">
 ';
 
-$qry = "SET CLIENT_ENCODING TO 'UNICODE'; SELECT * FROM public.tbl_person WHERE nachname ~* '".addslashes($filter).".*'";
+$qry = "SET CLIENT_ENCODING TO 'UNICODE'; SELECT distinct person_id, vorname, nachname, titelpre, titelpost FROM public.tbl_person WHERE nachname ~* '".addslashes($filter).".*'";
 if($result = pg_query($conn, $qry))
 {
 	while($row = pg_fetch_object($result))
@@ -70,7 +70,7 @@ if($result = pg_query($conn, $qry))
 	        	<PERSON:person_id NC:parseType="Integer"><![CDATA['.$row->person_id.']]></PERSON:person_id>
 	        	<PERSON:vorname><![CDATA['.$row->vorname.']]></PERSON:vorname>
 	        	<PERSON:nachname><![CDATA['.$row->nachname.']]></PERSON:nachname>
-	    		<PERSON:anzeigename><![CDATA['.$row->nachname.' '.$row->vorname.']]></PERSON:anzeigename>
+	    		<PERSON:anzeigename><![CDATA['.$row->nachname.' '.$row->vorname.' '.$row->titelpre.' '.$row->titelpost.']]></PERSON:anzeigename>
 	      	</RDF:Description>
 	      </RDF:li>
 		';

@@ -273,13 +273,13 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 	<tabbox id="tabbox-main" flex="3" orient="vertical">
 		<tabs id="main-content-tabs" orient="horizontal">
 		<?php
-			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('lva-verwaltung'))
+			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz'))
 			{
 				//echo '<tab id="tab-interessenten" label="PreStudent" onclick="ChangeTabsToVerband()"/>';
 				echo '<tab id="tab-studenten" label="Studenten" onclick="ChangeTabsToVerband()"/>';
 				echo '<tab id="tab-lfvt" label="Lehrveranstaltungen" onclick="ChangeTabsToVerband()"/>';
 			}
-			if($rechte->isBerechtigt('admin','0') || $rechte->isBerechtigt('mitarbeiter'))
+			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter'))
 			{
 				echo '<tab id="tab-mitarbeiter" label="Mitarbeiter" onclick="document.getElementById(\'menu-content-tabs\').selectedItem=document.getElementById(\'tab-menu-mitarbeiter\');" />';
 			}
@@ -287,7 +287,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 		</tabs>
 		<tabpanels id="tabpanels-main" flex="1">
 		<?php
-			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('lva-verwaltung'))
+			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz'))
 			{
 				echo '
 				<!--  Interessenten  -->
@@ -298,7 +298,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 	            <vbox id="LehrveranstaltungEditor" />
 	            ';
 			}
-			if($rechte->isBerechtigt('admin','0') || $rechte->isBerechtigt('mitarbeiter'))
+			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter'))
 			{
 				 echo '<vbox id="MitarbeiterEditor" />';
 			}

@@ -219,8 +219,7 @@ function InteressentzuBewerber()
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
-		StudentSelectId=prestudent_id;
-		StudentTreeDatasource.Refresh(false); //non blocking
+		StudentTreeRefresh();
 		SetStatusBarText('Daten wurden gespeichert');
 	}
 }
@@ -266,8 +265,7 @@ function InteressentzuStudent()
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
-		StudentSelectId=prestudent_id;
-		StudentTreeDatasource.Refresh(false); //non blocking
+		StudentTreeRefresh();
 		SetStatusBarText('Daten wurden gespeichert');
 	}
 }
@@ -309,8 +307,7 @@ function InteressentAddRolle(rolle)
 		}
 		else
 		{			
-			StudentSelectId=prestudent_id;
-			StudentTreeDatasource.Refresh(false); //non blocking
+			StudentTreeRefresh();
 			SetStatusBarText('Rolle hinzugefuegt');
 		}
 	}

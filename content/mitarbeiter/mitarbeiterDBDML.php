@@ -88,6 +88,7 @@ if(!$error)
 			$mitarbeiter->ersatzkennzeichen = $_POST['ersatzkennzeichen'];
 			$mitarbeiter->familienstand = $_POST['familienstand'];
 			$mitarbeiter->geschlecht = $_POST['geschlecht'];
+			$aktiv_alt = $mitarbeiter->bnaktiv;
 			$mitarbeiter->bnaktiv = ($_POST['aktiv']=='true'?true:false);
 			$mitarbeiter->anzahlkinder = $_POST['anzahlderkinder'];
 			$mitarbeiter->staatsbuergerschaft = $_POST['staatsbuergerschaft'];
@@ -107,6 +108,27 @@ if(!$error)
 			
 			if($mitarbeiter->save())
 			{
+				if($aktiv_alt==true && $_POST['aktiv']=='false')
+				{
+					$message = "Dies ist eine automatische Mail!\n";
+					$message .= "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun für Sie?\n\n";
+					$message .= "Vorerst werden Sie aus allen Mail-Verteilern gelöscht.\n";
+					$message .= "Wenn der Datensatz in den nächsten 12 Monaten nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:\n";
+					$message .= "- Ihr Account wird gelöscht.\n";
+					$message .= "- Ihre Mailbox mit sämtlichen Mails wird gelöscht.\n";
+					$message .= "- Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht.\n\n";
+					$message .= "Sollte es sich hierbei um einen Irrtum handeln, wenden sie sich bitte an die Mitarbeiter unserer Personalabteillung.\n";
+					$message .= "Adelheit Schaaf  - schaaf@technikum-wien.at\n";
+					$message .= "Orestis Kazamias - kazamias@technikum-wien.at\n\n";
+					$message .= "Mit freundlichen Grüßen,\n";
+					$message .= "FACHHOCHSCHULE TECHNIKUM WIEN\n";
+					$message .= "Höchstädtplatz 5\n";
+					$message .= "A-1200 Wien \n";
+					
+					$to = 'oesi@technikum-wien.at';
+					//$to = $_POST['uid'].'@'.DOMAIN;
+					mail($to,'Ihr Datensatz wurde deaktiviert! '.$_POST['uid'], $message, 'From: vilesci@'.DOMAIN);
+				}
 				$return = true;
 			}
 			else 
