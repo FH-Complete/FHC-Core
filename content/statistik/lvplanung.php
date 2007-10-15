@@ -116,7 +116,7 @@ if($studiengang_kz!='') //Liste nach Studiengang
 				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."'";
 	if($semester!='')
 		$qry.=" AND tbl_lehrveranstaltung.semester='".addslashes($semester)."'";
-	$qry.=" ORDER BY tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehreinheit.lehreinheit_id";
+	$qry.=" ORDER BY tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehreinheit.lehreinheit_id";
 }
 elseif($mitarbeiter_uid!='') // Liste nach Mitarbeiter
 {
