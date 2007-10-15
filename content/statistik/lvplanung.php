@@ -138,7 +138,7 @@ $qry = "SELECT
 				tbl_person.person_id=tbl_benutzer.person_id AND
 				tbl_lehreinheitmitarbeiter.mitarbeiter_uid='".addslashes($mitarbeiter_uid)."' AND
 				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."'";
-	$qry.=" ORDER BY tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehreinheit.lehreinheit_id";
+	$qry.=" ORDER BY tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehreinheit.lehreinheit_id";
 }
 elseif($fachbereich_kurzbz!='') // Liste nach Fachbereich
 {
@@ -160,7 +160,7 @@ $qry = "SELECT
 				tbl_person.person_id=tbl_benutzer.person_id AND
 				tbl_lehrfach.fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."' AND
 				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."'";
-	$qry.=" ORDER BY tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehreinheit.lehreinheit_id";	
+	$qry.=" ORDER BY tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehreinheit.lehreinheit_id";	
 }
 else 
 	die('Fehlerhafte Parameteruebergabe');
