@@ -22,7 +22,7 @@
 						<fo:block text-align="left" line-height="20pt" font-family="sans-serif" font-size="18pt">
 							<fo:inline font-weight="900">
 							<xsl:text>Zeugnis </xsl:text><xsl:value-of select="studiensemester" />
-							<xsl:text>\n </xsl:text><xsl:value-of select="semester" />. Semester
+							<xsl:text>\n </xsl:text><xsl:value-of select="semester_bezeichnung" />
 							</fo:inline>
 						</fo:block>
 					</fo:block-container> 
