@@ -444,6 +444,8 @@ function StudentProjektarbeitSpeichern()
 	neu = document.getElementById('student-projektarbeit-checkbox-neu').checked;
 
 	student_uid =document.getElementById('student-detail-textbox-uid').value;
+	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+	
 	if(student_uid=='')
 	{
 		alert('UID dieser Person konnte nicht ermittelt werden');
@@ -500,7 +502,8 @@ function StudentProjektarbeitSpeichern()
 	req.add('gesamtstunden', gesamtstunden);
 	req.add('themenbereich', themenbereich);
 	req.add('anmerkung', anmerkung);
-	req.add('neu', neu);	
+	req.add('neu', neu);
+	req.add('studiengang_kz', studiengang_kz);
 
 	var response = req.executePOST();
 
@@ -569,6 +572,8 @@ function StudentProjektarbeitLoeschen()
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-projektarbeit-tree');
 
+	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+	
 	if (tree.currentIndex==-1) 
 	{
 		alert('Bitte zuerst einen Eintrag markieren');
@@ -585,6 +590,7 @@ function StudentProjektarbeitLoeschen()
 	req.add('type', 'deleteprojektarbeit');
 		
 	req.add('projektarbeit_id', projektarbeit_id);
+	req.add('studiengang_kz', studiengang_kz);
 	
 	var response = req.executePOST();
 
@@ -635,6 +641,8 @@ function StudentProjektarbeitLVAChange()
 	datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 	datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	LeDropDown.database.AddDataSource(datasource);
+	
+	LeDropDown.selectedIndex=-1;
 	
 	LeDropDown.builder.rebuild();
 }
@@ -851,6 +859,8 @@ function StudentProjektbetreuerSpeichern()
 	person_id_old = document.getElementById('student-projektbetreuer-textbox-person_id').value;
 	neu = document.getElementById('student-projektbetreuer-checkbox-neu').checked;
 	
+	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+	
 	var tree = document.getElementById('student-projektarbeit-tree');
 
 	if(person_id=='')
@@ -884,6 +894,7 @@ function StudentProjektbetreuerSpeichern()
 	req.add('projektarbeit_id', projektarbeit_id);
 	req.add('person_id_old', person_id_old);
 	req.add('neu', neu);
+	req.add('studiengang_kz', studiengang_kz);
 
 	var response = req.executePOST();
 
@@ -938,6 +949,8 @@ function StudentProjektbetreuerLoeschen()
 	var col = tree.columns ? tree.columns["student-projektbetreuer-tree-betreuerart_kurzbz"] : "student-projektbetreuer-tree-betreuerart_kurzbz";
 	var betreuerart_kurzbz=tree.view.getCellText(tree.currentIndex,col);
 	
+	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+	
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 
@@ -946,6 +959,7 @@ function StudentProjektbetreuerLoeschen()
 	req.add('person_id', person_id);
 	req.add('projektarbeit_id', projektarbeit_id);
 	req.add('betreuerart_kurzbz', betreuerart_kurzbz);
+	req.add('studiengang_kz', studiengang_kz);
 
 	var response = req.executePOST();
 

@@ -161,6 +161,12 @@ function FunktionDelete()
     var col = tree.columns ? tree.columns["funktion-treecol-benutzerfunktion_id"] : "funktion-treecol-benutzerfunktion_id";
 	var benutzerfunktion_id=tree.view.getCellText(tree.currentIndex,col);
 	
+	//Bei Mitarbeitern wird kein Studiengang mitgeschickt
+	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
+		studiengang_kz='';	
+	else
+		studiengang_kz = window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+
 	if(confirm('Soll diese Funktion wirklich geloescht werden?'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
@@ -169,6 +175,7 @@ function FunktionDelete()
 		req.add('type', 'funktiondelete');
 		
 		req.add('benutzerfunktion_id', benutzerfunktion_id);
+		req.add('studiengang_kz', studiengang_kz);
 	
 		var response = req.executePOST();
 	
@@ -204,6 +211,12 @@ function FunktionDetailSpeichern()
 	neu = document.getElementById('funktion-checkbox-neu').checked;
 	benutzerfunktion_id = document.getElementById('funktion-textbox-benutzerfunktion_id').value;
 		
+	//Bei Mitarbeitern wird kein Studiengang mitgeschickt
+	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
+		studiengang_kz_berecht='';	
+	else
+		studiengang_kz_berecht = window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+
 	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
 	var req = new phpRequest(url,'','');
 
@@ -215,6 +228,7 @@ function FunktionDetailSpeichern()
 
 	req.add('funktion_kurzbz', funktion_kurzbz);
 	req.add('studiengang_kz', studiengang_kz);
+	req.add('studiengang_kz_berecht', studiengang_kz_berecht);
 	req.add('fachbereich_kurzbz', fachbereich_kurzbz);
 	req.add('uid', FunktionenUID);
 	req.add('neu', neu);

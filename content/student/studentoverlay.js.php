@@ -99,7 +99,7 @@ var StudentDetailRolleTreeSinkObserver =
 	onBeginLoad : function(pSink) {},
 	onInterrupt : function(pSink) {},
 	onResume : function(pSink) {},
-	onError : function(pSink, pStatus, pError) {},
+	onError : function(pSink, pStatus, pError) { },
 	onEndLoad : function(pSink)
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -319,7 +319,6 @@ function StudentTreeKeyPress(event)
 function StudentTreeRefresh()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-
 	//markierten Studenten global speichern damit dieser Student nach dem
 	//refresh wieder markiert werden kann.
 	var tree = document.getElementById('student-tree');
@@ -561,6 +560,10 @@ function StudentDetailSave()
 	verband = document.getElementById('student-detail-textbox-verband').value;
 	gruppe = document.getElementById('student-detail-textbox-gruppe').value;
 
+	//Wenn es noch kein Student ist, dann wird die Studiengang_kz vom Prestudent genommen
+	if(studiengang_kz=='')
+		studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+		
 	if(geburtsdatum!='' && !CheckDatum(geburtsdatum))
 	{
 		alert('Geburtsdatum ist ungueltig');
@@ -839,6 +842,7 @@ function StudentAuswahl()
 	document.getElementById('student-prestudent-textbox-prestudent_id').value=prestudent_id;
 	document.getElementById('student-prestudent-checkbox-new').checked=false;
 	document.getElementById('student-prestudent-menulist-studiengang_kz').value=studiengang_kz_prestudent;
+	
 	document.getElementById('student-prestudent-textbox-anmerkung').value=anmerkung;
 
 	document.getElementById('student-detail-groupbox-caption').label='Zugangsvoraussetzung für '+nachname+' '+vorname;
@@ -1353,6 +1357,7 @@ function StudentPrestudentRolleDelete()
 	var col = tree.columns ? tree.columns["student-prestudent-tree-rolle-ausbildungssemester"] : "student-prestudent-tree-rolle-ausbildungssemester";
 	var ausbildungssemester=tree.view.getCellText(tree.currentIndex,col);
 
+	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 	if(confirm('Diese Rolle wirklich loeschen?'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
@@ -1364,6 +1369,7 @@ function StudentPrestudentRolleDelete()
 		req.add('prestudent_id', prestudent_id);
 		req.add('studiensemester_kurzbz', studiensemester_kurzbz);
 		req.add('ausbildungssemester', ausbildungssemester);
+		req.add('studiengang_kz', studiengang_kz);
 
 		var response = req.executePOST();
 
@@ -1456,7 +1462,7 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 	else
 	{
 		StudentDetailRolleTreeDatasource.Refresh(false);
-		SetStatusBarText('Daten wurden geloescht');
+		SetStatusBarText('Daten wurden gespeichert');
 		return true;
 	}	
 }
@@ -1964,7 +1970,7 @@ function StudentKontoDetailSpeichern()
 	buchungstyp_kurzbz = document.getElementById('student-konto-menulist-buchungstyp').value;
 	buchungsnr = document.getElementById('student-konto-textbox-buchungsnr').value;
 	studiensemester_kurzbz = document.getElementById('student-konto-menulist-studiensemester').value;
-
+	
 	if(buchungsdatum!='' && !CheckDatum(buchungsdatum))
 	{
 		alert('Buchungsdatum ist ungueltig');
@@ -2308,6 +2314,7 @@ function StudentAkteDel()
 		return false;
 	}
 
+	studiengang_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 	//Abfrage ob wirklich geloescht werden soll
 	if (confirm('Zeugnis wirklich entfernen?'))
 	{
@@ -2316,6 +2323,7 @@ function StudentAkteDel()
 
 		req.add('type','deleteAkte');
 		req.add('akte_id',akte_id);
+		req.add('studiengang_kz', studiengang_kz);
 
 		var response = req.executePOST();
 
@@ -2360,7 +2368,8 @@ function StudentZeugnisArchivieren()
 	var req = new phpRequest(url,'','');
 
 	var response = req.execute();
-	
+	if(response!='')
+		alert(response);
 	StudentAkteTreeDatasource.Refresh(false);
     
 }
@@ -2466,6 +2475,8 @@ function StudentIODetailSpeichern()
 	neu = document.getElementById('student-io-detail-checkbox-neu').checked;
 	bisio_id = document.getElementById('student-io-detail-textbox-bisio_id').value;
 
+	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+	
 	if(von!='' && !CheckDatum(von))
 	{
 		alert('VON Datum ist ungueltig');
@@ -2493,6 +2504,7 @@ function StudentIODetailSpeichern()
 	req.add('nation_code', nation_code);
 	req.add('zweck_code', zweck_code);
 	req.add('student_uid', uid);
+	req.add('studiengang_kz', studiengang_kz);
 
 	var response = req.executePOST();
 
@@ -2531,15 +2543,16 @@ function StudentIODelete()
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["student-io-tree-bisio_id"] : "student-io-tree-bisio_id";
 	var bisio_id=tree.view.getCellText(tree.currentIndex,col);
-
+	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+	
 	if(confirm('Diesen Eintrag wirklich loeschen?'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 		var req = new phpRequest(url,'','');
 
 		req.add('type', 'deletebisio');
-
 		req.add('bisio_id', bisio_id);
+		req.add('studiengang_kz', studiengang_kz);
 
 		var response = req.executePOST();
 
@@ -2953,6 +2966,7 @@ function StudentPruefungDelete()
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["student-pruefung-tree-pruefung_id"] : "student-pruefung-tree-pruefung_id";
 	var pruefung_id=tree.view.getCellText(tree.currentIndex,col);
+	studiengang_kz=document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 
 	if(confirm('Diesen Eintrag wirklich loeschen?'))
 	{
@@ -2962,6 +2976,7 @@ function StudentPruefungDelete()
 		req.add('type', 'deletepruefung');
 
 		req.add('pruefung_id', pruefung_id);
+		req.add('studiengang_kz', studiengang_kz);
 
 		var response = req.executePOST();
 
@@ -3122,6 +3137,7 @@ function StudentPruefungDetailSpeichern()
 	anmerkung = document.getElementById('student-pruefung-textbox-anmerkung').value;
 	neu = document.getElementById('student-pruefung-checkbox-neu').checked;
 	pruefung_id = document.getElementById('student-pruefung-textbox-pruefung_id').value;
+	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 
 	if(lehreinheit_id=='')
 	{
@@ -3158,6 +3174,7 @@ function StudentPruefungDetailSpeichern()
 	req.add('neu', neu);
 	req.add('pruefung_id', pruefung_id);
 	req.add('student_uid', student_uid);
+	req.add('studiengang_kz', studiengang_kz);
 
 	var response = req.executePOST();
 
@@ -3322,6 +3339,7 @@ function StudentSuche()
 	{
 		//Bei der Suche wird die Markierung vom Verband Tree entfernt da
 		//es sonst zu Problemen kommen kann
+		document.getElementById('tree-verband').currentIndex=-1;
 		document.getElementById('tree-verband').view.selection.clearSelection();
 		//Export deaktivieren
 		document.getElementById('student-toolbar-export').disabled=true;

@@ -261,7 +261,13 @@ function KontaktAdresseSpeichern(dialog)
 	heimatadresse = dialog.getElementById('adresse-checkbox-heimatadresse').checked;
 	zustelladresse = dialog.getElementById('adresse-checkbox-zustelladresse').checked;
 	firma_id = dialog.getElementById('adresse-menulist-firma').value;
-		
+	
+	//Bei Mitarbeitern wird kein Studiengang mitgeschickt
+	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
+		studiengang_kz='';	
+	else
+		studiengang_kz = window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+	
 	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
 	var req = new phpRequest(url,'','');
 	
@@ -280,6 +286,7 @@ function KontaktAdresseSpeichern(dialog)
 	req.add('heimatadresse', heimatadresse);
 	req.add('zustelladresse', zustelladresse);
 	req.add('firma_id', firma_id);
+	req.add('studiengang_kz', studiengang_kz);
 
 	var response = req.executePOST();
 
@@ -339,6 +346,12 @@ function KontaktAdresseDelete()
     var col = tree.columns ? tree.columns["kontakt-adressen-treecol-adresse_id"] : "kontakt-adressen-treecol-adresse_id";
 	var adresse_id=tree.view.getCellText(tree.currentIndex,col);
 	
+	//Bei Mitarbeitern wird kein Studiengang mitgeschickt
+	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
+		studiengang_kz='';	
+	else
+		studiengang_kz = window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+
 	if(confirm('Diese Adresse wirklich loeschen?'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
@@ -347,6 +360,7 @@ function KontaktAdresseDelete()
 		req.add('type', 'adressedelete');
 		
 		req.add('adresse_id', adresse_id);
+		req.add('studiengang_kz', studiengang_kz);
 	
 		var response = req.executePOST();
 	
@@ -433,6 +447,13 @@ function KontaktKontaktSpeichern(dialog)
 	typ = dialog.getElementById('kontakt-menulist-typ').value;
 	firma_id = dialog.getElementById('kontakt-menulist-firma').value;
 		
+	//Bei Mitarbeitern wird kein Studiengang mitgeschickt
+	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
+		studiengang_kz='';	
+	else
+		studiengang_kz = window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+
+	
 	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
 	var req = new phpRequest(url,'','');
 	
@@ -446,6 +467,7 @@ function KontaktKontaktSpeichern(dialog)
 	req.add('typ', typ);
 	req.add('zustellung', zustellung);
 	req.add('firma_id', firma_id);
+	req.add('studiengang_kz', studiengang_kz);
 
 	var response = req.executePOST();
 
@@ -504,7 +526,13 @@ function KontaktKontaktDelete()
 	//Ausgewaehlte ID holen
     var col = tree.columns ? tree.columns["kontakt-kontakt-treecol-kontakt_id"] : "kontakt-kontakt-treecol-kontakt_id";
 	var kontakt_id=tree.view.getCellText(tree.currentIndex,col);
-	
+
+	//Bei Mitarbeitern wird kein Studiengang mitgeschickt
+	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
+		studiengang_kz='';	
+	else
+		studiengang_kz = window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+
 	if(confirm('Diesen Kontakt wirklich loeschen?'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
@@ -513,6 +541,7 @@ function KontaktKontaktDelete()
 		req.add('type', 'kontaktdelete');
 		
 		req.add('kontakt_id', kontakt_id);
+		req.add('studiengang_kz', studiengang_kz);
 	
 		var response = req.executePOST();
 	
@@ -602,6 +631,12 @@ function KontaktBankverbindungSpeichern(dialog)
 	typ = dialog.getElementById('bankverbindung-menulist-typ').value;
 	verrechnung = dialog.getElementById('bankverbindung-checkbox-verrechnung').checked;
 		
+	//Bei Mitarbeitern wird kein Studiengang mitgeschickt
+	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
+		studiengang_kz='';	
+	else
+		studiengang_kz = window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+
 	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
 	var req = new phpRequest(url,'','');
 	
@@ -618,6 +653,7 @@ function KontaktBankverbindungSpeichern(dialog)
 	req.add('kontonr', kontonr);
 	req.add('typ', typ);
 	req.add('verrechnung', verrechnung);
+	req.add('studiengang_kz', studiengang_kz);
 
 	var response = req.executePOST();
 
@@ -677,6 +713,12 @@ function KontaktBankverbindungDelete()
     var col = tree.columns ? tree.columns["kontakt-bankverbindung-treecol-bankverbindung_id"] : "kontakt-bankverbindung-treecol-bankverbindung_id";
 	var bankverbindung_id=tree.view.getCellText(tree.currentIndex,col);
 	
+	//Bei Mitarbeitern wird kein Studiengang mitgeschickt
+	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
+		studiengang_kz='';	
+	else
+		studiengang_kz = window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+
 	if(confirm('Diese Bankverbindung wirklich loeschen?'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
@@ -685,6 +727,7 @@ function KontaktBankverbindungDelete()
 		req.add('type', 'bankverbindungdelete');
 		
 		req.add('bankverbindung_id', bankverbindung_id);
+		req.add('studiengang_kz', studiengang_kz);
 	
 		var response = req.executePOST();
 	

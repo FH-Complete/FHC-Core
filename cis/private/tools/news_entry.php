@@ -36,12 +36,7 @@
 	if(check_lektor($user,$sql_conn))
        $is_lector=true;
 
-	$sql_query = "SELECT count(*) as anzahl FROM public.tbl_benutzerfunktion WHERE uid='$user' AND funktion_kurzbz='infr'";
-
-	if(!$row=pg_fetch_object(pg_query($sql_conn, $sql_query)))
-		die('Fehler beim lesen aus der Datenbank');
-
-	if($row->anzahl>0 || $rechte->isBerechtigt('admin'))
+	if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz') || $rechte->isBerechtigt('lehre') || $rechte->isBerechtigt('news'))
 		$berechtigt=true;
 	else
 		$berechtigt=false;

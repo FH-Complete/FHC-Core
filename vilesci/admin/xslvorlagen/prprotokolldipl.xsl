@@ -45,7 +45,7 @@
 					<!-- NAME - MATRIKELNUMMER -->
 					<fo:block-container position="absolute" top="45mm" left="15mm" height="10mm">
 						<fo:block text-align="left" line-height="14pt" font-family="sans-serif" font-size="12pt" font-weight="bold">
-							<xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="nachname" />	
+							<xsl:value-of select="titelpre" /><xsl:text> </xsl:text><xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="nachname" /><xsl:text> </xsl:text><xsl:value-of select="titelpost" />
 						</fo:block>
 					</fo:block-container>
 									

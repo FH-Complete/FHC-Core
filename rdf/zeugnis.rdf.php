@@ -232,7 +232,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					if($projektarbeit[$row->lehrveranstaltung_id]['themenbereich']!='')
 					{
 						$xml_fussnote .="       <themenbereich_bezeichnung>Themenbereich: </themenbereich_bezeichnung>";
-						$xml_fussnote .="       <themenbereich>".$projektarbeit[$row->lehrveranstaltung_id]['themenbereich'].'\n</themenbereich>';
+						$xml_fussnote .="       <themenbereich><[!CDATA[".$projektarbeit[$row->lehrveranstaltung_id]['themenbereich'].'\n]]></themenbereich>';
 						$anzahl_nl++;
 						$nl2='\n';
 					}
@@ -245,7 +245,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					$nl='';
 					$nl2='';
 					$xml_fussnote .="      <titel_bezeichnung>$typ</titel_bezeichnung>";
-					$xml_fussnote .="      <titel>".$projektarbeit[$row->lehrveranstaltung_id]['titel'].$nl2."</titel>";
+					$xml_fussnote .="      <titel><![CDATA[".$projektarbeit[$row->lehrveranstaltung_id]['titel'].$nl2."]]></titel>";
 					//$note = $note_arr[$projektarbeit[$row->lehrveranstaltung_id]['note']];
 					$note = $projektarbeit[$row->lehrveranstaltung_id]['note'];
 					//$nl = str_repeat('\n',($anzahl_nl));

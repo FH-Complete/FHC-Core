@@ -107,7 +107,7 @@
 				<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt">
 						Vorname(n), Familienname
 				        <fo:inline font-size="12pt">
-						\n <xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="nachname" />	
+						\n <xsl:value-of select="titelpre" /><xsl:text> </xsl:text><xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="nachname" /><xsl:text> </xsl:text><xsl:value-of select="titelpost" />	
 				        </fo:inline>
 
 

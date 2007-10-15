@@ -408,13 +408,13 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 	<tabbox id="tabbox-left" orient="vertical" flex="1">
 		<tabs id="menu-content-tabs" orient="horizontal">
 		<?php
-			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('lva-verwaltung'))
+			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz'))
 			{
 				echo '<tab id="tab-verband" label="Verband" onclick="ChangeTabVerband()"/>';
 				echo '<tab id="tab-fachbereich" label="Fachbereich" onclick="ChangeTabsToLehrveranstaltung()"/>';
 				echo '<tab id="tab-lektor" label="Lektor" onclick="ChangeTabsToLehrveranstaltung()"/>';
 			}
-			if($rechte->isBerechtigt('admin','0') || $rechte->isBerechtigt('mitarbeiter'))
+			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter'))
 			{
 				echo '<tab id="tab-menu-mitarbeiter" label="Mitarbeiter" onclick="document.getElementById(\'main-content-tabs\').selectedItem=document.getElementById(\'tab-mitarbeiter\');"/>';
 			}
@@ -422,13 +422,13 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 		</tabs>
 		<tabpanels id="tabpanels-left" flex="1">
 		<?php
-			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('lva-verwaltung'))
+			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz'))
 			{
 				echo '<tree id="tree-verband" />';
 				echo '<tree id="tree-fachbereich" />';
 				echo '<tree id="tree-lektor" />';
 			}
-			if($rechte->isBerechtigt('admin','0') || $rechte->isBerechtigt('mitarbeiter'))
+			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter'))
 			{
 				echo '<tree id="tree-menu-mitarbeiter"/>';
 			}
