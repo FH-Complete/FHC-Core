@@ -122,9 +122,23 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$stgl_row = pg_fetch_object($stgl_result);
 		else
 			die('Stgl not found');
+			
+		$sem_qry = "SELECT bezeichnung FROM public.tbl_lehrverband WHERE studiengang_kz='".$row->studiengang_kz."' AND semester = '".$row->semester."'";
+		if($result_sem = pg_query($conn, $sem_qry))
+		{
+			if($row_sem = pg_fetch_object($result_sem))
+			{
+				$bezeichnung = $row_sem->bezeichnung;
+			}
+		}
+		
+		if($bezeichnung=='')
+			$bezeichnung = $row->semester.'. Semester';
+			
 		$xml .= "\n	<zeugnis>";
 		$xml .= "		<studiensemester>".$row->sembezeichnung."</studiensemester>";
 		$xml .=	"		<semester>".$row->semester."</semester>";
+		$xml .=	"		<semester_bezeichnung>".$bezeichnung."</semester_bezeichnung>";
 		$xml .= "		<studiengang>".$row->bezeichnung."</studiengang>";
 		if($row->typ=='b')
 			$bezeichnung='Bachelor-Studiengang';
