@@ -166,9 +166,11 @@ if($result = pg_query($conn, $qry))
 		<pruefungstyp_kurzbz><![CDATA['.$row->pruefungstyp_kurzbz.']]></pruefungstyp_kurzbz>
 		<anrede><![CDATA['.$anrede.']]></anrede>
 		<anrede_engl><![CDATA['.$anrede_engl.']]></anrede_engl>
+		<titelpre><![CDATA['.$student->titelpre.']]></titelpre>
 		<vorname><![CDATA['.$student->vorname.']]></vorname>
 		<vornamen><![CDATA['.$student->vornamen.']]></vornamen>
 		<nachname><![CDATA['.$student->nachname.']]></nachname>
+		<titelpost><![CDATA['.$student->titelpost.']]></titelpost>
 		<matrikelnr><![CDATA['.$student->matrikelnr.']]></matrikelnr>
 		<gebdatum_iso><![CDATA['.$student->gebdatum.']]></gebdatum_iso>
 		<gebdatum><![CDATA['.$datum_obj->convertISODate($student->gebdatum).']]></gebdatum>
