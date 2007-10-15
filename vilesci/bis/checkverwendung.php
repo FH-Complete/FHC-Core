@@ -261,13 +261,31 @@ if($resultall = pg_query($conn, $qryall))
 	}
 }
 //7 - Lehrauftrag aber keine aktuelle Verwendung
-/*$qry_erg="SELECT lehre.tbl_lehreinheitmitarbeiter.mitarbeiter_uid, lehre.tbl_lehrveranstaltung.studiengang_kz, 
-	lehre.tbl_lehreinheit.studiensemester_kurzbz, lehre.tbl_lehreinheitmitarbeiter.semesterstunden, 
-	lehre.tbl_lehrveranstaltung.semester, public.tbl_semesterwochen.wochen 
+$i=0;
+$qryall="SELECT DISTINCT lehre.tbl_lehreinheitmitarbeiter.mitarbeiter_uid, nachname, vorname  
 	FROM lehre.tbl_lehreinheitmitarbeiter join lehre.tbl_lehreinheit USING (lehreinheit_id) 
-	JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
-	JOIN public.tbl_semesterwochen USING(studiengang_kz, semester)
-	WHERE lehre.tbl_lehreinheitmitarbeiter.mitarbeiter_uid='".$row->mitarbeiter_uid."' 
-	AND lehre.tbl_lehreinheit.studiensemester_kurzbz='".$ssem."';";
-*/			
+	JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+        JOIN campus.vw_mitarbeiter ON (tbl_lehreinheitmitarbeiter.mitarbeiter_uid=uid)
+	WHERE lehre.tbl_lehreinheit.studiensemester_kurzbz='WS2007' 
+        AND NOT EXISTS (SELECT * FROM bis.tbl_bisverwendung 
+        WHERE (ende>now() OR ende IS NULL) AND mitarbeiter_uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid)
+        ORDER BY nachname,vorname;";
+if($resultall = pg_query($conn, $qryall))
+{
+	$num_rows_all=pg_num_rows($resultall);
+	echo "<br><br><H2>Bei $num_rows_all Lektoren <u>mit Lehrauftrag</u> sind die Verwendungen nicht plausibel</H2>";
+	while($rowall=pg_fetch_object($resultall))
+	{
+		$i++;
+		echo "<br><u>Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname.":</u><br>";
+		$qry="SELECT * FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid='".$rowall->mitarbeiter_uid."';";
+		if($result = pg_query($conn, $qry))
+		{
+			while($row=pg_fetch_object($result))
+			{
+				echo "Verwendung Code ".$row->verwendung_code.", Beschäftigungscode ".$row->ba1code.", ".$row->ba2code.", ".$row->beginn." - ".$row->ende."<br>";
+			}
+		}
+	}
+}
 ?>
