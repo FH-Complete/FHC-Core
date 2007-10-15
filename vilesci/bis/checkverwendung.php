@@ -61,7 +61,10 @@ if($result = pg_query($conn, $qry))
 	}
 }
 //1 - aktive mitarbeiter und bismelden mit keiner verwendung oder mehr als einer aktuellen verwendung
-$qryall='SELECT uid,nachname,vorname, count(bisverwendung_id)  FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) WHERE aktiv AND (ende>now() OR ende IS NULL) GROUP BY uid,nachname,vorname HAVING count(bisverwendung_id)!=1 ORDER by nachname,vorname;';
+$qryall='SELECT uid,nachname,vorname, count(bisverwendung_id)  
+	FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) 
+	WHERE aktiv AND bismelden AND (ende>now() OR ende IS NULL) 
+	GROUP BY uid,nachname,vorname HAVING count(bisverwendung_id)!=1 ORDER by nachname,vorname;';
 if($resultall = pg_query($conn, $qryall))
 {
 	$num_rows_all=pg_num_rows($resultall);
@@ -96,7 +99,11 @@ if($resultall = pg_query($conn, $qryall))
 	}
 }
 //2 - aktive mitarbeiter mit keiner aktuellen verwendung
-$qryall='SELECT uid,nachname,vorname, count(bisverwendung_id) FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) WHERE aktiv AND NOT ende>now() AND NOT ende IS NULL AND uid NOT IN (SELECT uid FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) WHERE aktiv AND (ende>now() OR ende IS NULL)) GROUP BY uid,nachname,vorname ORDER by nachname,vorname;';
+$qryall='SELECT uid,nachname,vorname, count(bisverwendung_id) 
+	FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) 
+	WHERE aktiv AND NOT ende>now() AND NOT ende IS NULL 
+	AND uid NOT IN (SELECT uid FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) 
+	WHERE aktiv AND (ende>now() OR ende IS NULL)) GROUP BY uid,nachname,vorname ORDER by nachname,vorname;';
 if($resultall = pg_query($conn, $qryall))
 {
 	$num_rows_all=pg_num_rows($resultall);
@@ -188,7 +195,7 @@ if($resultall = pg_query($conn, $qryall))
 //5 - stimmt beschausmasscode mit vertragsstunden überein?
 $qryall="SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter 
 	JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) 
-	WHERE (beschausmasscode='1' AND vertragsstunden<'38.5') 
+	WHERE (beschausmasscode='1' AND vertragsstunden<='35') 
 	OR (beschausmasscode='2' AND vertragsstunden>'15') 
 	OR (beschausmasscode='3' AND vertragsstunden<'16') 
 	OR (beschausmasscode='3' AND vertragsstunden>'25') 
