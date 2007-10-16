@@ -225,11 +225,6 @@ if($studiensemester_kurzbz == '')
 	
 }
 
-//Testphase fix
-if($studiengang_kz!='' && !in_array($studiengang_kz,$dont_sync_php))
-	die('Keine Berechtigung zum Importieren');
-//end Testphase
-
 // *** Speichern der Daten ***
 if(isset($_POST['save']))
 {
