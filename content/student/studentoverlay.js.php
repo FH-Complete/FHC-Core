@@ -45,6 +45,8 @@ var StudentPruefungSelectID=null; //ID der Pruefung die nach dem Refresh markier
 var StudentDetailRolleTreeDatasource=null; //Datasource fuer denn PrestudentRolleTree
 var StudentAkteTreeDatasource=null;
 var doublerebuildkonto='false';
+var StudentNotenTreeloaded=false;
+var StudentGesamtNotenTreeloaded=false;
 // ********** Observer und Listener ************* //
 
 // ****
@@ -60,7 +62,7 @@ var StudentTreeSinkObserver =
 	},
 	onInterrupt : function(pSink) {},
 	onResume : function(pSink) {},
-	onError : function(pSink, pStatus, pError) {},
+	onError : function(pSink, pStatus, pError) { debug('Error StudentTreeSinkObserver:'+pError+':'+pStatus); },
 	onEndLoad : function(pSink)
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -99,7 +101,7 @@ var StudentDetailRolleTreeSinkObserver =
 	onBeginLoad : function(pSink) {},
 	onInterrupt : function(pSink) {},
 	onResume : function(pSink) {},
-	onError : function(pSink, pStatus, pError) { },
+	onError : function(pSink, pStatus, pError) { debug('Error StudentDetailRolleTreeSinkObserver:'+pError+':'+pStatus); },
 	onEndLoad : function(pSink)
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -117,7 +119,7 @@ var StudentKontoTreeSinkObserver =
 	onBeginLoad : function(pSink) {},
 	onInterrupt : function(pSink) {},
 	onResume : function(pSink) {},
-	onError : function(pSink, pStatus, pError) {},
+	onError : function(pSink, pStatus, pError) { debug('Error StudentKontoTreeSinkObserver:'+pError+':'+pStatus); },
 	onEndLoad : function(pSink)
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -189,6 +191,7 @@ var StudentNotenTreeSinkObserver =
 	onError : function(pSink, pStatus, pError) {},
 	onEndLoad : function(pSink)
 	{
+		StudentNotenTreeloaded=false;
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 		document.getElementById('student-noten-tree').builder.rebuild();
 	}
@@ -206,6 +209,7 @@ var StudentNotenTreeListener =
   	  //timeout nur bei Mozilla notwendig da sonst die rows
   	  //noch keine values haben. Ab Seamonkey funktionierts auch
   	  //ohne dem setTimeout
+  	  StudentNotenTreeloaded=true;
       window.setTimeout(StudentNotenTreeSelectID,10);
   }
 };
@@ -223,6 +227,7 @@ var StudentLvGesamtNotenTreeSinkObserver =
 	onError : function(pSink, pStatus, pError) {},
 	onEndLoad : function(pSink)
 	{
+		StudentGesamtNotenTreeloaded=false;
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 		document.getElementById('student-lvgesamtnoten-tree').builder.rebuild();
 	}
@@ -240,6 +245,7 @@ var StudentLvGesamtNotenTreeListener =
   	  //timeout nur bei Mozilla notwendig da sonst die rows
   	  //noch keine values haben. Ab Seamonkey funktionierts auch
   	  //ohne dem setTimeout
+  	  StudentGesamtNotenTreeloaded=true;
       window.setTimeout(StudentLvGesamtNotenTreeSelectID,10);
   }
 };
@@ -655,7 +661,7 @@ function StudentImageUpload()
 // ****
 function StudentAuswahl()
 {
-	
+
 	if(!StudentTreeLoadDataOnSelect)
 	{
 		StudentTreeLoadDataOnSelect=true;
@@ -703,6 +709,9 @@ function StudentAuswahl()
 		return false;
 	}
 	StudentFunktionIFrameUnLoad();
+	
+	StudentNotenTreeloaded=false;
+	StudentGesamtNotenTreeloaded=false;
 	
 	stsem = getStudiensemester();
 	var url = '<?php echo APP_ROOT ?>rdf/student.rdf.php?prestudent_id='+prestudent_id+'&studiensemester_kurzbz='+stsem+'&'+gettimestamp();
@@ -849,6 +858,13 @@ function StudentAuswahl()
 	rollentree = document.getElementById('student-prestudent-tree-rolle');
 	url='<?php echo APP_ROOT;?>rdf/prestudentrolle.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
 
+	try
+	{
+		StudentDetailRolleTreeDatasource.removeXMLSinkObserver(StudentDetailRolleTreeSinkObserver);
+	}
+	catch(e)
+	{}
+	
 	//Alte DS entfernen
 	var oldDatasources = rollentree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -935,6 +951,14 @@ function StudentAuswahl()
 	doctree = document.getElementById('interessent-dokumente-tree-nichtabgegeben');
 	url='<?php echo APP_ROOT;?>rdf/dokument.rdf.php?studiengang_kz='+studiengang_kz_prestudent+'&prestudent_id='+prestudent_id+"&"+gettimestamp();
 
+	try
+	{
+		InteressentDokumentTreeNichtabgegebenDatasource.removeXMLSinkObserver(InteressentDokumentTreeNichtabgegebenSinkObserver);
+		doctree.builder.removeListener(InteressentDokumentTreeNichtabgegebenListener);
+	}
+	catch(e)
+	{}
+	
 	//Alte DS entfernen
 	var oldDatasources = doctree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -943,14 +967,7 @@ function StudentAuswahl()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	doctree.builder.rebuild();
-
-	try
-	{
-		InteressentDokumentTreeNichtabgegebenDatasource.removeXMLSinkObserver(InteressentDokumentTreeNichtabgegebenSinkObserver);
-		doctree.builder.removeListener(InteressentDokumentTreeNichtabgegebenListener);
-	}
-	catch(e)
-	{}
+	
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	InteressentDokumentTreeNichtabgegebenDatasource = rdfService.GetDataSource(url);
 	InteressentDokumentTreeNichtabgegebenDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -963,6 +980,14 @@ function StudentAuswahl()
 	doctree = document.getElementById('interessent-dokumente-tree-abgegeben');
 	url='<?php echo APP_ROOT;?>rdf/dokumentprestudent.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
 
+	try
+	{
+		InteressentDokumentTreeAbgegebenDatasource.removeXMLSinkObserver(InteressentDokumentTreeAbgegebenSinkObserver);
+		doctree.builder.removeListener(InteressentDokumentTreeAbgegebenListener);
+	}
+	catch(e)
+	{}
+	
 	//Alte DS entfernen
 	var oldDatasources = doctree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -971,14 +996,7 @@ function StudentAuswahl()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	doctree.builder.rebuild();
-
-	try
-	{
-		InteressentDokumentTreeAbgegebenDatasource.removeXMLSinkObserver(InteressentDokumentTreeAbgegebenSinkObserver);
-		doctree.builder.removeListener(InteressentDokumentTreeAbgegebenListener);
-	}
-	catch(e)
-	{}
+	
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	InteressentDokumentTreeAbgegebenDatasource = rdfService.GetDataSource(url);
 	InteressentDokumentTreeAbgegebenDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -992,6 +1010,14 @@ function StudentAuswahl()
 	filter = document.getElementById('student-konto-button-filter').value;
 	url='<?php echo APP_ROOT;?>rdf/konto.rdf.php?person_id='+person_id+"&filter="+filter+"&studiengang_kz="+studiengang_kz_prestudent+"&"+gettimestamp();
 
+	try
+	{
+		StudentKontoTreeDatasource.removeXMLSinkObserver(StudentKontoTreeSinkObserver);
+		kontotree.builder.removeListener(StudentKontoTreeListener);
+	}
+	catch(e)
+	{}
+	
 	//Alte DS entfernen
 	var oldDatasources = kontotree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -1000,14 +1026,6 @@ function StudentAuswahl()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	kontotree.builder.rebuild();
-
-	try
-	{
-		StudentKontoTreeDatasource.removeXMLSinkObserver(StudentKontoTreeSinkObserver);
-		kontotree.builder.removeListener(StudentKontoTreeListener);
-	}
-	catch(e)
-	{}
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	StudentKontoTreeDatasource = rdfService.GetDataSource(url);
@@ -1023,6 +1041,13 @@ function StudentAuswahl()
 		zeugnistree = document.getElementById('student-zeugnis-tree');
 		url='<?php echo APP_ROOT;?>rdf/akte.rdf.php?person_id='+person_id+"&dokument_kurzbz=Zeugnis&"+gettimestamp();
 	
+		try
+		{
+			StudentAkteTreeDatasource.removeXMLSinkObserver(StudentAkteTreeSinkObserver);
+		}
+		catch(e)
+		{}
+		
 		//Alte DS entfernen
 		var oldDatasources = zeugnistree.database.GetDataSources();
 		while(oldDatasources.hasMoreElements())
@@ -1047,15 +1072,6 @@ function StudentAuswahl()
 	
 		url='<?php echo APP_ROOT;?>rdf/bisio.rdf.php?uid='+uid+"&"+gettimestamp();
 	
-		//Alte DS entfernen
-		var oldDatasources = bisiotree.database.GetDataSources();
-		while(oldDatasources.hasMoreElements())
-		{
-			bisiotree.database.RemoveDataSource(oldDatasources.getNext());
-		}
-		//Refresh damit die entfernten DS auch wirklich entfernt werden
-		bisiotree.builder.rebuild();
-	
 		try
 		{
 			StudentIOTreeDatasource.removeXMLSinkObserver(StudentIOTreeSinkObserver);
@@ -1063,6 +1079,15 @@ function StudentAuswahl()
 		}
 		catch(e)
 		{}
+		
+		//Alte DS entfernen
+		var oldDatasources = bisiotree.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			bisiotree.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		bisiotree.builder.rebuild();		
 	
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		StudentIOTreeDatasource = rdfService.GetDataSource(url);
@@ -1080,6 +1105,14 @@ function StudentAuswahl()
 	
 		url='<?php echo APP_ROOT;?>rdf/zeugnisnote.rdf.php?uid='+uid+"&"+gettimestamp();
 	
+		try
+		{
+			StudentNotenTreeDatasource.removeXMLSinkObserver(StudentNotenTreeSinkObserver);
+			notentree.builder.removeListener(StudentNotenTreeListener);
+		}
+		catch(e)
+		{}
+		
 		//Alte DS entfernen
 		var oldDatasources = notentree.database.GetDataSources();
 		while(oldDatasources.hasMoreElements())
@@ -1088,15 +1121,7 @@ function StudentAuswahl()
 		}
 		//Refresh damit die entfernten DS auch wirklich entfernt werden
 		notentree.builder.rebuild();
-	
-		try
-		{
-			StudentNotenTreeDatasource.removeXMLSinkObserver(StudentNotenTreeSinkObserver);
-			notentree.builder.removeListener(StudentNotenTreeListener);
-		}
-		catch(e)
-		{}
-	
+				
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		StudentNotenTreeDatasource = rdfService.GetDataSource(url);
 		StudentNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -1110,15 +1135,6 @@ function StudentAuswahl()
 	
 		url='<?php echo APP_ROOT;?>rdf/lvgesamtnote.rdf.php?uid='+uid+"&"+gettimestamp();
 	
-		//Alte DS entfernen
-		var oldDatasources = lvgesamtnotentree.database.GetDataSources();
-		while(oldDatasources.hasMoreElements())
-		{
-			lvgesamtnotentree.database.RemoveDataSource(oldDatasources.getNext());
-		}
-		//Refresh damit die entfernten DS auch wirklich entfernt werden
-		lvgesamtnotentree.builder.rebuild();
-	
 		try
 		{
 			StudentLvGesamtNotenTreeDatasource.removeXMLSinkObserver(StudentLvGesamtNotenTreeSinkObserver);
@@ -1127,6 +1143,15 @@ function StudentAuswahl()
 		catch(e)
 		{}
 
+		//Alte DS entfernen
+		var oldDatasources = lvgesamtnotentree.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			lvgesamtnotentree.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		lvgesamtnotentree.builder.rebuild();
+			
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		StudentLvGesamtNotenTreeDatasource = rdfService.GetDataSource(url);
 		StudentLvGesamtNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -1149,6 +1174,14 @@ function StudentAuswahl()
 	
 		url='<?php echo APP_ROOT;?>rdf/pruefung.rdf.php?student_uid='+uid+"&"+gettimestamp();
 	
+		try
+		{
+			StudentPruefungTreeDatasource.removeXMLSinkObserver(StudentPruefungTreeSinkObserver);
+			pruefungtree.builder.removeListener(StudentPruefungTreeListener);
+		}
+		catch(e)
+		{}
+		
 		//Alte DS entfernen
 		var oldDatasources = pruefungtree.database.GetDataSources();
 		while(oldDatasources.hasMoreElements())
@@ -1157,15 +1190,7 @@ function StudentAuswahl()
 		}
 		//Refresh damit die entfernten DS auch wirklich entfernt werden
 		pruefungtree.builder.rebuild();
-	
-		try
-		{
-			StudentPruefungTreeDatasource.removeXMLSinkObserver(StudentPruefungTreeSinkObserver);
-			pruefungtree.builder.removeListener(StudentPruefungTreeListener);
-		}
-		catch(e)
-		{}
-	
+		
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		StudentPruefungTreeDatasource = rdfService.GetDataSource(url);
 		StudentPruefungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -2647,6 +2672,7 @@ function StudentIOTreeSelectID()
 // ****
 function StudentNotenTreeSelectID()
 {
+	StudentNotenTreeSelectDifferent();
 	var tree=document.getElementById('student-noten-tree');
 	if(tree.view)
 		var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
@@ -2678,11 +2704,68 @@ function StudentNotenTreeSelectID()
 }
 
 // ****
+// * Selectiert die Noten im LVGesamtNoteTree welche nicht gleich denen 
+// * im ZeugnisNoteTree sind
+// ****
+function StudentNotenTreeSelectDifferent()
+{
+	var zeugnistree = document.getElementById("student-noten-tree");
+	var lvgesamttree = document.getElementById("student-lvgesamtnoten-tree");
+	
+	if(StudentNotenTreeloaded && StudentGesamtNotenTreeloaded)
+	{
+		if(lvgesamttree.view)
+			var lvgesamtitems = lvgesamttree.view.rowCount; //Anzahl der Zeilen ermitteln
+		else
+			return false;
+			
+		if(zeugnistree.view)
+			var zeugnisitems = zeugnistree.view.rowCount; //Anzahl der Zeilen ermitteln
+		else
+			return false;
+			
+		for(var i=0;i<lvgesamtitems;i++)
+	   	{
+	   		//Daten aus LVGesamtNotenTree holen
+			col = lvgesamttree.columns ? lvgesamttree.columns["student-lvgesamtnoten-tree-lehrveranstaltung_id"] : "student-lvgesamtnoten-tree-lehrveranstaltung_id";
+			var lvgesamtlehrveranstaltung_id=lvgesamttree.view.getCellText(i,col);
+			col = lvgesamttree.columns ? lvgesamttree.columns["student-lvgesamtnoten-tree-note"] : "student-lvgesamtnoten-tree-note";
+			var lvgesamtnote=lvgesamttree.view.getCellText(i,col);
+
+			found=false;
+			//Schauen ob die gleiche Zeile im Zeugnisnoten Tree vorkommt
+			for(var j=0;j<zeugnisitems;j++)
+			{
+				col = zeugnistree.columns ? zeugnistree.columns["student-noten-tree-lehrveranstaltung_id"] : "student-noten-tree-lehrveranstaltung_id";
+				var zeugnislehrveranstaltung_id=zeugnistree.view.getCellText(j,col);
+				col = zeugnistree.columns ? zeugnistree.columns["student-noten-tree-note"] : "student-noten-tree-note";
+				var zeugnisnote=zeugnistree.view.getCellText(j,col);
+				
+				if(zeugnislehrveranstaltung_id==lvgesamtlehrveranstaltung_id && zeugnisnote==lvgesamtnote)
+				{
+					found=true;
+					break;
+				}
+			}
+			
+			if(!found)
+			{
+				//Zeile markieren
+				lvgesamttree.view.selection.rangedSelect(i,i,true);
+			}
+	   	}
+	}
+}
+
+// ****
 // * Selectiert den Noten Eintrag nachdem der Tree
 // * rebuildet wurde.
 // ****
 function StudentLvGesamtNotenTreeSelectID()
 {
+	StudentNotenTreeSelectDifferent();
+	
+	/*
 	var tree=document.getElementById('student-lvgesamtnoten-tree');
 	if(tree.view)
 		var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
@@ -2710,7 +2793,7 @@ function StudentLvGesamtNotenTreeSelectID()
 				return true;
 			}
 	   	}
-	}
+	}*/
 }
 
 // ***

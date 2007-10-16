@@ -152,7 +152,8 @@ if($lehrveranstaltung_id==null && $filter==null)
 		$bb=new benutzerberechtigung($conn);
 		if($bb->getBerechtigungen(get_uid()))
 		{
-			$stge=$bb->getStgKz();
+			$stge=$bb->getStgKz('admin');
+			$stge=array_merge($stge, $bb->getStgKz('assistenz'));
 			$ma=$mitarbeiter->getMitarbeiterStg($lektor,$fixangestellt,$stge, 'lkt');
 			$laststg=-1;
 			foreach ($ma as $mitarbeiter)

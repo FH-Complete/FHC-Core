@@ -265,6 +265,7 @@ class mitarbeiter extends benutzer
 		$sql_query='SELECT DISTINCT campus.vw_mitarbeiter.* FROM campus.vw_mitarbeiter
 					LEFT OUTER JOIN public.tbl_benutzerfunktion USING (uid)
 					WHERE TRUE';
+		
 		if (!is_null($lektor))
 		{
 			$sql_query.=' AND';
@@ -283,8 +284,8 @@ class mitarbeiter extends benutzer
 
 		if (!is_null($stg_kz))
 			$sql_query.=' AND studiengang_kz='.$stg_kz;
-		if ($fachbereich_id!=null)
-			$sql_query.=' AND fachbereich_id='.$fachbereich_id;
+		//if ($fachbereich_id!=null)
+		//	$sql_query.=' AND fachbereich_id='.$fachbereich_id;
 	    $sql_query.=' ORDER BY nachname, vornamen, kurzbz';
 	    //echo $sql_query;
 		if(!($erg=pg_query($this->conn, $sql_query)))

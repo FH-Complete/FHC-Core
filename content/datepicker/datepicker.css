@@ -1,6 +1,6 @@
 /* ::::: datepicker ::::: */
 /* :::: declarations :::: */
-@IMPORT url("../spinbutton/spinbutton.css");
+/*@IMPORT url("../spinbutton/spinbutton.css");*/
 datepicker {-moz-binding: url("datepicker.xml#datepicker");}
 datepicker-month {-moz-binding: url("datepicker.xml#datepicker-month");}
 datepicker-year {-moz-binding: url("datepicker.xml#datepicker-year");}
