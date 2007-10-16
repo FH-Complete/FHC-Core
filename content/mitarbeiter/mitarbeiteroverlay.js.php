@@ -562,7 +562,15 @@ function MitarbeiterAuswahl()
 	// **** VERWENDUNG ****
 	verwendungtree = document.getElementById('mitarbeiter-tree-verwendung');
 	url='<?php echo APP_ROOT;?>rdf/bisverwendung.rdf.php?uid='+uid+"&"+gettimestamp();
-
+	
+	try
+	{
+		MitarbeiterVerwendungTreeDatasource.removeXMLSinkObserver(MitarbeiterVerwendungTreeSinkObserver);
+		verwendungtree.builder.removeListener(MitarbeiterVerwendungTreeListener);
+	}
+	catch(e)
+	{}
+	
 	//Alte DS entfernen
 	var oldDatasources = verwendungtree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -571,14 +579,7 @@ function MitarbeiterAuswahl()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	verwendungtree.builder.rebuild();
-
-	try
-	{
-		MitarbeiterVerwendungTreeDatasource.removeXMLSinkObserver(MitarbeiterVerwendungTreeSinkObserver);
-		verwendungtree.builder.removeListener(MitarbeiterVerwendungTreeListener);
-	}
-	catch(e)
-	{}
+	
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	MitarbeiterVerwendungTreeDatasource = rdfService.GetDataSource(url);
@@ -594,6 +595,14 @@ function MitarbeiterAuswahl()
 	entwicklungsteamtree = document.getElementById('mitarbeiter-tree-entwicklungsteam');
 	url='<?php echo APP_ROOT;?>rdf/entwicklungsteam.rdf.php?mitarbeiter_uid='+uid+"&"+gettimestamp();
 
+	try
+	{
+		MitarbeiterEntwicklungsteamTreeDatasource.removeXMLSinkObserver(MitarbeiterEntwicklungsteamTreeSinkObserver);
+		entwicklungsteamtree.builder.removeListener(MitarbeiterEntwicklungsteamTreeListener);
+	}
+	catch(e)
+	{}
+	
 	//Alte DS entfernen
 	var oldDatasources = entwicklungsteamtree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -602,14 +611,6 @@ function MitarbeiterAuswahl()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	entwicklungsteamtree.builder.rebuild();
-
-	try
-	{
-		MitarbeiterEntwicklungsteamTreeDatasource.removeXMLSinkObserver(MitarbeiterEntwicklungsteamTreeSinkObserver);
-		entwicklungsteamtree.builder.removeListener(MitarbeiterEntwicklungsteamTreeListener);
-	}
-	catch(e)
-	{}
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	MitarbeiterEntwicklungsteamTreeDatasource = rdfService.GetDataSource(url);
@@ -946,6 +947,14 @@ function MitarbeiterVerwendungSelect()
 	funktiontree = document.getElementById('mitarbeiter-tree-funktion');
 	url='<?php echo APP_ROOT;?>rdf/bisfunktion.rdf.php?bisverwendung_id='+bisverwendung_id+"&"+gettimestamp();
 
+	try
+	{
+		MitarbeiterFunktionTreeDatasource.removeXMLSinkObserver(MitarbeiterFunktionTreeSinkObserver);
+		funktiontree.builder.removeListener(MitarbeiterFunktionTreeListener);
+	}
+	catch(e)
+	{}
+	
 	//Alte DS entfernen
 	var oldDatasources = funktiontree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -954,14 +963,6 @@ function MitarbeiterVerwendungSelect()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	funktiontree.builder.rebuild();
-
-	try
-	{
-		MitarbeiterFunktionTreeDatasource.removeXMLSinkObserver(MitarbeiterFunktionTreeSinkObserver);
-		funktiontree.builder.removeListener(MitarbeiterFunktionTreeListener);
-	}
-	catch(e)
-	{}
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	MitarbeiterFunktionTreeDatasource = rdfService.GetDataSource(url);

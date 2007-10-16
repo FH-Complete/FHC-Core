@@ -586,7 +586,7 @@ if(!$error)
 							else
 							{
 								$return = false;
-								$errormsg = $leDAO->errormsg;
+								$errormsg = 'Fehler beim Loeschen der Lehreinheit '.$leDAO->errormsg;
 							}
 						}
 					}

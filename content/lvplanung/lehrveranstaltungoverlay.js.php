@@ -796,7 +796,14 @@ function LeAuswahl()
 	try
 	{
 		lektortree = document.getElementById('lehrveranstaltung-detail-tree-lehreinheitmitarbeiter');
-
+		
+		try
+		{
+			lektortree.builder.removeListener(LvLektorTreeListener);
+		}
+		catch(e)
+		{}
+		
 		//Alte DS entfernen
 		var oldDatasources = lektortree.database.GetDataSources();
 		while(oldDatasources.hasMoreElements())
@@ -805,13 +812,6 @@ function LeAuswahl()
 		}
 		//Refresh damit die entfernten DS auch wirklich entfernt werden
 		lektortree.builder.rebuild();
-
-		try
-		{
-			lektortree.builder.removeListener(LvLektorTreeListener);
-		}
-		catch(e)
-		{}
 
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		LeDetailLektorDatasource = rdfService.GetDataSource(url);
@@ -1256,6 +1256,14 @@ function LehrveranstaltungNotenLoad(lehrveranstaltung_id)
 
 	url='<?php echo APP_ROOT;?>rdf/zeugnisnote.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+"&"+gettimestamp();
 
+	try
+	{
+		LehrveranstaltungNotenTreeDatasource.removeXMLSinkObserver(LehrveranstaltungNotenTreeSinkObserver);
+		notentree.builder.removeListener(LehrveranstaltungNotenTreeListener);
+	}
+	catch(e)
+	{}
+	
 	//Alte DS entfernen
 	var oldDatasources = notentree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -1264,15 +1272,6 @@ function LehrveranstaltungNotenLoad(lehrveranstaltung_id)
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	notentree.builder.rebuild();
-
-	try
-	{
-		LehrveranstaltungNotenTreeDatasource.removeXMLSinkObserver(LehrveranstaltungNotenTreeSinkObserver);
-		notentree.builder.removeListener(LehrveranstaltungNotenTreeListener);
-	}
-	catch(e)
-	{}
-
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	LehrveranstaltungNotenTreeDatasource = rdfService.GetDataSource(url);
 	LehrveranstaltungNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -1286,15 +1285,6 @@ function LehrveranstaltungNotenLoad(lehrveranstaltung_id)
 
 	url='<?php echo APP_ROOT;?>rdf/lvgesamtnote.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+"&"+gettimestamp();
 
-	//Alte DS entfernen
-	var oldDatasources = lvgesamtnotentree.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
-	{
-		lvgesamtnotentree.database.RemoveDataSource(oldDatasources.getNext());
-	}
-	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	lvgesamtnotentree.builder.rebuild();
-
 	try
 	{
 		LehrveranstaltungLvGesamtNotenTreeDatasource.removeXMLSinkObserver(LehrveranstaltungLvGesamtNotenTreeSinkObserver);
@@ -1303,6 +1293,15 @@ function LehrveranstaltungNotenLoad(lehrveranstaltung_id)
 	catch(e)
 	{}
 
+	//Alte DS entfernen
+	var oldDatasources = lvgesamtnotentree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		lvgesamtnotentree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	lvgesamtnotentree.builder.rebuild();
+	
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	LehrveranstaltungLvGesamtNotenTreeDatasource = rdfService.GetDataSource(url);
 	LehrveranstaltungLvGesamtNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
