@@ -66,6 +66,7 @@ foreach($ps->result as $row)
         	<ROLLE:ausbildungssemester><![CDATA['.$row->ausbildungssemester.']]></ROLLE:ausbildungssemester>
         	<ROLLE:datum><![CDATA['.$datum->convertISODate($row->datum).']]></ROLLE:datum>
         	<ROLLE:datum_iso><![CDATA['.$row->datum.']]></ROLLE:datum_iso>
+        	<ROLLE:orgform_kurzbz><![CDATA['.$row->orgform_kurzbz.']]></ROLLE:orgform_kurzbz>
       	</RDF:Description>
       </RDF:li>
 	';

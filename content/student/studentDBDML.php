@@ -623,6 +623,7 @@ if(!$error)
 						$rolle->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
 						$rolle->studiensemester_old = $_POST['studiensemester_old'];
 						$rolle->datum = $_POST['datum'];
+						$rolle->orgform_kurzbz = $_POST['orgform_kurzbz'];
 						$rolle->new = false;
 						
 						if($rolle->save_rolle())

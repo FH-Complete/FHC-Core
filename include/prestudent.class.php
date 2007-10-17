@@ -52,6 +52,7 @@ class prestudent extends person
 	var $insertvon;
 	var $updateamum;
 	var $updatevon;
+	var $orgform_kurzbz;
 	
 	// ErgebnisArray
 	var $result=array();
@@ -372,6 +373,7 @@ class prestudent extends person
 				$rolle->insertvon = $row->insertvon;
 				$rolle->updateamum = $row->updateamum;
 				$rolle->updatevon = $row->updatevon;
+				$rolle->orgform_kurzbz = $row->orgform_kurzbz;
 				
 				$this->result[] = $rolle;
 			}
@@ -414,6 +416,7 @@ class prestudent extends person
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->ext_id_prestudent = $row->ext_id;
+				$this->orgform_kurzbz = $row->orgform_kurzbz;
 			}
 			return true;
 		}
@@ -537,6 +540,7 @@ class prestudent extends person
 				$ps->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$ps->ausbildungssemester = $row->ausbildungssemester;
 				$ps->datum = $row->datum;
+				$ps->orgform_kurzbz = $row->orgform_kurzbz;
 				
 				$this->result[] = $ps;
 			}
@@ -609,7 +613,7 @@ class prestudent extends person
 	{
 		if($this->new)
 		{
-			$qry = 'INSERT INTO public.tbl_prestudentrolle (prestudent_id, rolle_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id) VALUES('.
+			$qry = 'INSERT INTO public.tbl_prestudentrolle (prestudent_id, rolle_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz) VALUES('.
 			       $this->addslashes($this->prestudent_id).",".
 			       $this->addslashes($this->rolle_kurzbz).",".
 			       $this->addslashes($this->studiensemester_kurzbz).",".
@@ -619,7 +623,8 @@ class prestudent extends person
 			       $this->addslashes($this->insertvon).",".
 			       $this->addslashes($this->updateamum).",".
 			       $this->addslashes($this->updatevon).",".
-			       $this->addslashes($this->ext_id_prestudent).");";
+			       $this->addslashes($this->ext_id_prestudent).",".
+			       $this->addslashes($this->orgform_kurzbz).");";
 		}
 		else
 		{			
@@ -631,7 +636,8 @@ class prestudent extends person
 			$qry = 'UPDATE public.tbl_prestudentrolle SET'.
 			       ' ausbildungssemester='.$this->addslashes($this->ausbildungssemester).",".
 			       ' studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).",".
-			       ' datum='.$this->addslashes($this->datum).
+			       ' datum='.$this->addslashes($this->datum).",".
+			       ' orgform_kurzbz='.$this->addslashes($this->orgform_kurzbz).
 			       " WHERE prestudent_id='".addslashes($this->prestudent_id)."' AND rolle_kurzbz='".addslashes($this->rolle_kurzbz)."' AND studiensemester_kurzbz='".addslashes($this->studiensemester_old)."' AND ausbildungssemester='".addslashes($this->ausbildungssemester_old)."';";
 		}
 		
@@ -674,7 +680,7 @@ class prestudent extends person
 			$log->mitarbeiter_uid = get_uid();
 			$log->sql = $qry;
 			$log->sqlundo = 'INSERT INTO public.tbl_prestudentrolle(prestudent_id, rolle_kurzbz, studiensemester_kurzbz,'.
-							' ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id) VALUES('.
+							' ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz) VALUES('.
 							$this->addslashes($this->prestudent_id).','.
 							$this->addslashes($this->rolle_kurzbz).','.
 							$this->addslashes($this->studiensemester_kurzbz).','.
@@ -684,7 +690,8 @@ class prestudent extends person
 							$this->addslashes($this->insertvon).','.
 							$this->addslashes($this->updateamum).','.
 							$this->addslashes($this->updatevon).','.
-							$this->addslashes($this->ext_id_prestudent).');';
+							$this->addslashes($this->ext_id_prestudent).','.
+							$this->addslashes($this->orgform_kurzbz).');';
 			if($log->save(true))
 			{
 						
@@ -729,6 +736,7 @@ class prestudent extends person
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
+				$this->orgform_kurzbz = $row->orgform_kurzbz;
 				return true;	
 			}
 			else 

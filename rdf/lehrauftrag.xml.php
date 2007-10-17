@@ -130,7 +130,8 @@ if($uid==null)
 						tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND
 						tbl_lehreinheit.studiensemester_kurzbz='".addslashes($ss)."' AND
 						tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
-						tbl_lehrveranstaltung.studiengang_kz=".addslashes($studiengang_kz)."
+						tbl_lehrveranstaltung.studiengang_kz=".addslashes($studiengang_kz)." AND
+						tbl_projektbetreuer.stunden!='0' AND tbl_projektbetreuer.faktor!='0' AND tbl_projektbetreuer.stundensatz!='0'
 					) as mitarbeiter";
 	
 	if($result = pg_query($conn, $qry))

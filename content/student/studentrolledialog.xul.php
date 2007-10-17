@@ -116,6 +116,24 @@ else
 						</menupopup>
 					</menulist>
       			</row>
+      			<?php
+      				$hidden='true';
+      				$qry = "SELECT orgform_kurzbz FROM public.tbl_prestudent JOIN public.tbl_studiengang USING(studiengang_kz) WHERE prestudent_id='$prestudent_id'";
+      				if($result = pg_query($conn, $qry))
+      					if($row = pg_fetch_object($result))
+      						if($row->orgform_kurzbz=='VBB')
+      							$hidden='false';
+      			?>
+      			<row hidden="<?php echo $hidden; ?>">		
+      				<label value="Organisationsform" control="student-rolle-menulist-orgform_kurzbz"/>
+					<menulist id="student-rolle-menulist-orgform_kurzbz" >
+						<menupopup>
+						<menuitem value="" label="-- keine Auswahl --"/>
+						<menuitem value="VZ" label="Vollzeit"/>
+						<menuitem value="BB" label="Berufsbegleitend"/>
+						</menupopup>
+					</menulist>
+      			</row>
 				<row>
 					<label value="Datum" control="student-rolle-datum-datum"/>
 					<box class='Datum' id="student-rolle-datum-datum" />
