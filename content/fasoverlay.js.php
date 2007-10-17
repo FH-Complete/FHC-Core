@@ -48,7 +48,7 @@ function initLektorTree()
 			{
 				LektorTree.database.RemoveDataSource(oldDatasources.getNext());
 			}
-	
+
 			var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 			LektorTreeDatasource = rdfService.GetDataSource(url);
 			LektorTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -208,7 +208,7 @@ function onVerbandSelect(event)
 
 	//Export aktivieren
 	document.getElementById('student-toolbar-export').disabled=false;
-	
+
     // Progressmeter starten. Ab jetzt keine 'return's mehr.
     document.getElementById('statusbar-progressmeter').setAttribute('mode','undetermined');
     //globalProgressmeter.StartPM();
@@ -357,7 +357,7 @@ function onVerbandSelect(event)
 			}
 			catch(e)
 			{}
-			
+
 			var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 			StudentTreeDatasource = rdfService.GetDataSource(url);
 			StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -365,7 +365,7 @@ function onVerbandSelect(event)
 			treeInt.database.AddDataSource(StudentTreeDatasource);
 			StudentTreeDatasource.addXMLSinkObserver(StudentTreeSinkObserver);
 			treeInt.builder.addListener(StudentTreeListener);
-			
+
 			//Detailfelder Deaktivieren
 			StudentDetailReset();
 			StudentDetailDisableFields(true);
@@ -431,7 +431,7 @@ function onFachbereichSelect(event)
 		}
 		catch(e)
 		{}
-			
+
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		LvTreeDatasource = rdfService.GetDataSource(url);
 		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -507,7 +507,7 @@ function onLektorSelect(event)
 		{
 			treeLV.database.RemoveDataSource(oldDatasources.getNext());
 		}
-		
+
 		try
 		{
 			LvTreeDatasource.removeXMLSinkObserver(LvTreeSinkObserver);
@@ -515,7 +515,7 @@ function onLektorSelect(event)
 		}
 		catch(e)
 		{}
-		
+
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		LvTreeDatasource = rdfService.GetDataSource(url);
 		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -615,13 +615,13 @@ function StatistikPrintLVPlanung()
 	if(document.getElementById('menu-content-tabs').selectedItem == document.getElementById('tab-verband'))
 	{
 		tree = document.getElementById('tree-verband');
-	
+
 		if(tree.currentIndex==-1)
 		{
 			alert('Bitte zuerst einen Studiengang auswaehlen');
 			return;
 		}
-	
+
 		//Studiengang und Semester holen
 		var col;
 		col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
@@ -633,13 +633,13 @@ function StatistikPrintLVPlanung()
 	else if(document.getElementById('menu-content-tabs').selectedItem == document.getElementById('tab-fachbereich'))
 	{
 		tree = document.getElementById('tree-fachbereich');
-	
+
 		if(tree.currentIndex==-1)
 		{
 			alert('Bitte zuerst einen Fachbereich auswaehlen');
 			return;
 		}
-	
+
 		//Fachbereich holen
 		var col;
 		col = tree.columns ? tree.columns["kurzbz"] : "kurzbz";
@@ -649,13 +649,13 @@ function StatistikPrintLVPlanung()
 	else if(document.getElementById('menu-content-tabs').selectedItem == document.getElementById('tab-lektor'))
 	{
 		tree = document.getElementById('tree-lektor');
-	
+
 		if(tree.currentIndex==-1)
 		{
 			alert('Bitte zuerst einen Mitarbeiter auswaehlen');
 			return;
 		}
-	
+
 		//UID holen
 		var col;
 		col = tree.columns ? tree.columns["uid"] : "uid";
@@ -840,15 +840,15 @@ function BISStudentenPlausicheck()
 
 	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
 	var stg_kz=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	if(stg_kz!='')
-		window.open('<?php echo APP_ROOT ?>vilesci/bis/bis_datencheck.php?stg_kz='+stg_kz,'Datencheck','');
+		window.open('<?php echo APP_ROOT ?>vilesci/bis/checkstudenten.php?stg_kz='+stg_kz,'Datencheck','');
 	else
 		alert('Bitte einen Studiengang auswaehlen');
 }
 
 // ****
-// * oeffnet Script zum Checken der Studentendaten
+// * oeffnet Script zum BIS-Export der Studentendaten
 // ****
 function BISStudentenExport()
 {
@@ -863,7 +863,7 @@ function BISStudentenExport()
 
 	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
 	var stg_kz=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	if(stg_kz!='')
 		window.open('<?php echo APP_ROOT ?>vilesci/bis/studentenmeldung.php?stg_kz='+stg_kz,'StudentenMeldung','');
 	else
@@ -897,7 +897,7 @@ function ChangeTabsToLehrveranstaltung()
 }
 
 // ****
-// * Wenn der Tab Mitarbeiter Markiert ist, und auf den Tab Verband geklickt wird, 
+// * Wenn der Tab Mitarbeiter Markiert ist, und auf den Tab Verband geklickt wird,
 // * dann wird der StudententTab markiert
 // ****
 function ChangeTabVerband()
@@ -908,7 +908,7 @@ function ChangeTabVerband()
 
 // ****
 // * Aendert die Variable kontofilterstg
-// * Wenn kontofilterstg=true dann werden nur die Buchungen aus dem 
+// * Wenn kontofilterstg=true dann werden nur die Buchungen aus dem
 // * aktuellen Studiengang angezeigt
 // ****
 function EinstellungenKontoFilterStgChange()
@@ -919,18 +919,18 @@ function EinstellungenKontoFilterStgChange()
 		checked='true';
 	else
 		checked='false';
-	
+
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
 	// Request absetzen
-	
+
 	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
 
 	var req = new phpRequest(url,'','');
 
 	req.add('type', 'variablechange');
 	req.add('kontofilterstg', checked);
-	
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
@@ -946,7 +946,7 @@ function EinstellungenKontoFilterStgChange()
 	{
 		//Statusbar setzen
    		document.getElementById("statusbarpanel-text").label = "Variable wurde erfolgreich geaendert";
-   		
+
    		//Ansichten Refreshen
    		try
    		{
@@ -957,7 +957,7 @@ function EinstellungenKontoFilterStgChange()
    			debug('catch: '+e);
    		}
 	}
-   
+
 	return true;
 }
 
@@ -972,13 +972,13 @@ function PrintAccountInfoBlatt()
 		//STUDENTEN
 		var tree = document.getElementById('student-tree');
 		var data='';
-		
+
 		var start = new Object();
 		var end = new Object();
 		var numRanges = tree.view.selection.getRangeCount();
 		var paramList= '';
 		var error=0;
-	
+
 		//alle markierten personen holen
 		for (var t = 0; t < numRanges; t++)
 		{
@@ -999,13 +999,13 @@ function PrintAccountInfoBlatt()
 		//MITARBEITER
 		var tree = document.getElementById('mitarbeiter-tree');
 		var data='';
-		
+
 		var start = new Object();
 		var end = new Object();
 		var numRanges = tree.view.selection.getRangeCount();
 		var paramList= '';
 		var error=0;
-	
+
 		//alle markierten personen holen
 		for (var t = 0; t < numRanges; t++)
 		{
@@ -1020,8 +1020,8 @@ function PrintAccountInfoBlatt()
 					error = error+1;
 			}
 		}
-	}	
-		
+	}
+
 	if(data!='')
 	{
 		if(error>0)

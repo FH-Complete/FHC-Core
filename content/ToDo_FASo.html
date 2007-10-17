@@ -2,35 +2,141 @@
 <html>
 <head>
   <title>ToDo FAS-Online</title>
+  <link href="../skin/vilesci.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-<h1 style="text-align: center;">ToDo Fas-Online</h1>
-Die Liste ist in Module geteilt. Innerhalb eines Moduls erfolgt die
-Auflistung nach Priorit&auml;t (h&ouml;chste oben).<br>
-<h2>Fragen für Assistenzmeeting</h2>
-<h2>&Auml;nderungen</h2>
-<li>Prüfungsprotokoll und Urkunde sollen für mehrere Studenten auf einmal druckbar sein</li>
-<br>
-<h2>Fehler</h2>
-<li>Beim Starten kommt manchmal folgende Fehlermeldung in der Errorconsole: Error: can't decode principals (failure code 8007000e)</li>
-<hr>
+	<h1 style="text-align: center;">ToDo Fas-Online</h1>
+	&nbsp;&nbsp;&nbsp;&nbsp;
+	Priorit&auml;ten gehen von 1-3. &nbsp;&nbsp;&nbsp;&nbsp; 1 bedeuted niedrig, 3 bedeuted hoch!.
+	<br><br>
+	<h2>Fragen f&uuml;r FAS-Meeting</h2>
+	<ul>
+		<li>Sponsionsdatum und Pr&uuml;fungsdatum f&uuml;r mehrere Zuteilen</li>
+		<li>Pr&uuml;fungs-Protokoll f&uuml;r mehrere Drucken</li>
+	</ul>
+	<!-- ********************* Aenderunge und Erweiterungen ******************************************-->
+	<h2>&Auml;nderungen / Erweiterungen</h2>
+	<!-- Studenten -->
+	<table class='liste'>
+		<tr>
+			<th>Studenten-Modul</th>
+			<th>Priorit&auml;t</th>
+		</tr>
+		<tr class='liste0'>
+			<td>Pruefungsprotokoll und Urkunde sollen für mehrere Studenten auf einmal druckbar sein</td>
+			<td align='center'>2</td>
+		<tr>
+		<tr class='liste1'>
+			<td>Studienerfolgsbestaetigung ausdrucken fuer alle Semester die der Student besucht hat</td>
+			<td align='center'>2</td>
+		<tr>
+		<tr class='liste0'>
+			<td>Feld zum &auml;ndern des Alias von Studenten</td>
+			<td align='center'>2</td>
+		<tr>
+		<tr class='liste1'>
+			<td>Bei Notenverwaltung die Unterschiedlichen Noten markieren</td>
+			<td align='center'>2</td>
+		<tr>
+		<tr class='liste0'>
+			<td>Beim Filtern nach bezahlter Studiengebühr sollen Incoming nicht aufscheinen da diese keine Studiengebühr zahlen müssen</td>
+			<td align='center'>1</td>
+		<tr>
+		<tr class='liste1'>
+			<td>Wunsch: SVNR 4stellig: gesamte Nummer wird dann aus dem Geburtsdatum konstruiert. </td>
+			<td align='center'>1</td>
+		<tr>
+		<tr class='liste0'>
+			<td>Wunsch: statt WS2007 soll WS2007/08 stehen</td>
+			<td align='center'>1</td>
+		<tr>
+		<tr class='liste1'>
+			<td>Nach Eingabe einer Nachpr&uuml;fung soll die Zeugnisnote automatisch angepasst werden</td>
+			<td align='center'>2</td>
+		<tr>
+		<tr class='liste0'>
+			<td>Nachpr&uuml;fung (2.Termin) soll auch vom Lektor &uuml;ber das CIS verwaltet werden koennen. Zeugnisnote wird hier nicht automatisch angepasst.</td>
+			<td align='center'>2</td>
+		<tr>
+		<tr class='liste1'>
+			<td>Note automatisch bei Projektarbeit aufgrund der Punkte.</td>
+			<td align='center'>2</td>
+		<tr>
+		<tr class='liste0'>
+			<td>Betreuerdaten &auml;ndern.</td>
+			<td align='center'>2</td>
+		<tr>
+	</table>
+	<br>
+	<!-- Mitarbeiter -->
+	<table class='liste'>
+		<tr>
+			<th>Mitarbeiter-Modul</th>
+			<th>Priorität</th>
+		</tr>
+		<tr class='liste0'>
+			<td>Mail an Mitarbeiter senden wenn das <b>aktiv</b>-Feld veraendert wird</td>
+			<td align='center'>1</td>
+		<tr>
+		<tr class='liste1'>
+			<td></td>
+			<td align='center'>2</td>
+		<tr>
+	</table>
+	<br>
 
-<h2>Studenten-Modul</h2>
-<ul>
-  <li>Studienerfolgsbestaetigung ausdrucken für alle Semester die der Student besucht hat</li>
-  <li>Feld zum ändern des Alias von Studenten</li>
-  <li>Bei Notenverwaltung die Unterschiedlichen Noten markieren</li>
-  <li>Projektarbeit - nach dem ändern der LVA wird das Feld Lehreinheit nicht geleert</li>
-  <li>Beim Filtern nach bezahlter Studiengebühr sollen Incoming nicht aufscheinen da diese keine Studiengebühr zahlen müssen</li>
-  <li> Wunsch: SVNR 4stellig: gesamte Nummer wird dann aus dem Geburtsdatum konstruiert. </li>
-  <li> Wunsch: statt WS2007 soll WS2007/08 stehen</li>
-</ul>
-<hr>
-<h2>Mitarbeiter-Modul</h2>
-<ul>
-	<li>Mail senden wenn das aktiv Feld veraendert wird</li>
-</ul>
+	<!-- ********************* Fehler ******************************************-->
+	<h2>Fehler</h2>
+	<!-- Allgemein -->
+	<table class='liste'>
+		<tr>
+			<th>Allgemein</th>
+			<th>Priorität</th>
+		</tr>
+		<tr class='liste0'>
+			<td>Beim Starten kommt manchmal folgende Fehlermeldung in der Errorconsole: Error: can't decode principals (failure code 8007000e)</td>
+			<td align='center'>1</td>
+		<tr>
+		<tr class='liste1'>
+			<td></td>
+			<td align='center'>2</td>
+		<tr>
+	</table>
+	<br>
+	<!-- Studenten -->
+	<table class='liste'>
+		<tr>
+			<th>Studenten-Modul</th>
+			<th>Priorität</th>
+		</tr>
+		<tr class='liste0'>
+			<td>Projektarbeit - nach dem &auml;ndern der LVA wird das Feld Lehreinheit nicht geleert</td>
+			<td align='center'>2</td>
+		<tr>
+		<tr class='liste1'>
+			<td></td>
+			<td align='center'>2</td>
+		<tr>
+	</table>
+	<br>
+	<!-- Mitarbeiter -->
+	<table class='liste'>
+		<tr>
+			<th>Mitarbeiter-Modul</th>
+			<th>Priorität</th>
+		</tr>
+		<tr class='liste0'>
+			<td> </td>
+			<td align='center'>1</td>
+		<tr>
+		<tr class='liste1'>
+			<td></td>
+			<td align='center'>2</td>
+		<tr>
+	</table>
 <br>
+
+<!-- ********************* Erledigt ******************************************-->
 <hr>
 <h2>Erledigte Anforderungen</h2>
 <ul>
