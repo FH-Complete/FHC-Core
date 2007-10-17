@@ -1,23 +1,22 @@
 <html>
 <head>
-<title>Untitled Document</title>
+	<title>Personen</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 </head>
 
 <body class="background_main">
-
-<h4>Personensuche </h4>
-<form name="search" method="post" action="search_go.php">
-  Bitte Suchbegriff eingeben: 
-  <input type="text" name="searchstr" size="10" maxlength="20">
+<h2>Personensuche</h2>
+<form name="search" method="GET" action="suche.php">
+	Bitte Suchbegriff eingeben:
+  	<input type="text" name="searchstr" size="20" maxlength="20" value="">
   (mind. 3 Zeichen)
-  <input type="submit" name="go" value="go">
-  (Gro&szlig;-/Kleinschreibung wird unterschieden!)
+  <input type="submit" value="Suchen">
 </form>
-<p><br>
-  <br>
-  <a href="studenten_uebersicht.php" class="linkblue">- Studenten&uuml;bersicht</a>
+<p>
+	<br>
+	<br>
+	<a href="studenten_uebersicht.php" class="linkblue">- Studenten&uuml;bersicht</a>
 </p>
 </body>
 </html>
