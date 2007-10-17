@@ -57,6 +57,7 @@ function StudentRolleInit(prestudent_id, rolle_kurzbz, studiensemester_kurzbz, a
 	
 		//RDF parsen	
 		datum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#datum" ));
+		orgform_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#orgform_kurzbz" ));
 		neu = false;
 	}
 	else
@@ -69,6 +70,7 @@ function StudentRolleInit(prestudent_id, rolle_kurzbz, studiensemester_kurzbz, a
 	document.getElementById('student-rolle-menulist-studiensemester').value=studiensemester_kurzbz;
 	document.getElementById('student-rolle-menulist-ausbildungssemester').value=ausbildungssemester;
 	document.getElementById('student-rolle-datum-datum').value=datum;
+	document.getElementById('student-rolle-menulist-orgform_kurzbz').value=orgform_kurzbz;
 }
 
 // ****
