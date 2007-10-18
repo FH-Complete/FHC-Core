@@ -1,6 +1,9 @@
 <!ENTITY window.title			"FASo"> 
-<!ENTITY window.version			"1.1 vom 17.Juli 2007"> 
+<!ENTITY window.version			"1.2 vom 18.Oktober 2007"> 
 
+<!-- MENUE -->
+
+<!-- Datei -->
 <!ENTITY menu-file.label              	"Datei">
 <!ENTITY menu-file.accesskey           	"D">
 
@@ -8,13 +11,7 @@
 <!ENTITY menu-file-close.label         	"Beenden">
 <!ENTITY menu-file-close.accesskey     	"B">
 
-<!ENTITY menu-help.label              	"Hilfe">
-<!ENTITY menu-help.accesskey          	"H">
-
-<!ENTITY menu-help-close.key          	"H">
-<!ENTITY menu-help-close.label        	"Ueber">
-<!ENTITY menu-help-close.accesskey    	"U">
-
+<!-- Bearbeiten -->
 <!ENTITY menu-edit.label              	"Bearbeiten">
 <!ENTITY menu-edit.accesskey          	"B">
 
@@ -22,6 +19,7 @@
 <!ENTITY menu-edit-undo.label         	"Undo">
 <!ENTITY menu-edit-undo.accesskey     	"">
 
+<!-- Einstellungen -->
 <!ENTITY menu-prefs.label              	"Einstellungen">
 <!ENTITY menu-prefs.accesskey          	"E">
 
@@ -40,6 +38,7 @@
 <!ENTITY menu-prefs-kontofilterstg.label    	"Buchungen auf Studiengang filtern">
 <!ENTITY menu-prefs-kontofilterstg.accesskey	"B">
 
+<!-- Berichte -->
 <!ENTITY menu-statistic.label		"Berichte">
 <!ENTITY menu-statistic.accesskey	"R">
 
@@ -83,6 +82,33 @@
 <!ENTITY menu-statistic-bewerberstatistik.label		"Bewerberstatistik">
 <!ENTITY menu-statistic-bewerberstatistik.accesskey	"E">
 
+<!ENTITY menu-statistic-substatistik.key		"S">
+<!ENTITY menu-statistic-substatistik.label		"Statistik">
+<!ENTITY menu-statistic-substatistik.accesskey	"S">
+
+<!ENTITY menu-statistic-substatistik-studentenprosemester.label		"Student/Semester">
+<!ENTITY menu-statistic-substatistik-studentenprosemester.accesskey	"S">
+
+<!ENTITY menu-statistic-substatistik-studentenprosemester-excel.key			"E">
+<!ENTITY menu-statistic-substatistik-studentenprosemester-excel.label		"EXCEL">
+<!ENTITY menu-statistic-substatistik-studentenprosemester-excel.accesskey	"E">
+
+<!ENTITY menu-statistic-substatistik-studentenprosemester-html.key			"H">
+<!ENTITY menu-statistic-substatistik-studentenprosemester-html.label		"HTML">
+<!ENTITY menu-statistic-substatistik-studentenprosemester-html.accesskey	"H">
+
+<!ENTITY menu-statistic-substatistik-alvsstatistik.label		"ALVS-Statistik">
+<!ENTITY menu-statistic-substatistik-alvsstatistik.accesskey	"A">
+
+<!ENTITY menu-statistic-substatistik-alvsstatistik-excel.key		"E">
+<!ENTITY menu-statistic-substatistik-alvsstatistik-excel.label		"EXCEL">
+<!ENTITY menu-statistic-substatistik-alvsstatistik-excel.accesskey	"E">
+
+<!ENTITY menu-statistic-substatistik-alvsstatistik-html.key			"H">
+<!ENTITY menu-statistic-substatistik-alvsstatistik-html.label		"HTML">
+<!ENTITY menu-statistic-substatistik-alvsstatistik-html.accesskey	"H">
+
+<!-- Dokumente -->
 <!ENTITY menu-dokumente.label		"Dokumente">
 <!ENTITY menu-dokumente.accesskey	"D">
 
@@ -110,6 +136,7 @@
 <!ENTITY menu-dokumente-accountinfoblatt.label	"Account InfoBlatt">
 <!ENTITY menu-dokumente-accountinfoblatt.accesskey	"A">
 
+<!-- Extras -->
 <!ENTITY menu-extras.label		"Extras">
 <!ENTITY menu-extras.accesskey	"X">
 
@@ -121,6 +148,7 @@
 <!ENTITY menu-extras-firma.label		"Firmenverwaltung">
 <!ENTITY menu-extras-firma.accesskey	"F">
 
+<!-- BIS -->
 <!ENTITY menu-bis.label		"BIS">
 <!ENTITY menu-bis.accesskey	"I">
 <!ENTITY menu-bis.accesskey	"I">
@@ -156,3 +184,15 @@
 <!ENTITY menu-bis-studenten-export.key		"E">
 <!ENTITY menu-bis-studenten-export.label		"Meldung generieren">
 <!ENTITY menu-bis-studenten-export.accesskey	"E">
+
+<!-- Hilfe -->
+<!ENTITY menu-help.label              	"Hilfe">
+<!ENTITY menu-help.accesskey          	"H">
+
+<!ENTITY menu-help-close.key          	"H">
+<!ENTITY menu-help-close.label        	"Ueber">
+<!ENTITY menu-help-close.accesskey    	"U">
+
+<!ENTITY menu-help-todo.key          	"T">
+<!ENTITY menu-help-todo.label        	"ToDo">
+<!ENTITY menu-help-todo.accesskey    	"T">
