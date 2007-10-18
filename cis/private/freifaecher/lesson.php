@@ -22,6 +22,7 @@
 	require_once('../../config.inc.php');
     require_once('../../../include/functions.inc.php');
     require_once('../../../include/benutzerberechtigung.class.php');
+    require_once('../../../include/lehrveranstaltung.class.php');
 
     //Connection Herstellen
     if(!$sql_conn = pg_pconnect(CONN_STRING))
@@ -55,6 +56,13 @@
 	$rechte=new benutzerberechtigung($sql_conn);
 	$rechte->getBerechtigungen($user);
 	$user_is_allowed_to_upload=false;
+	
+	$lv_obj = new lehrveranstaltung($sql_conn);
+	$lv_obj->load($lvid);
+	$lv=$lv_obj;
+
+	$course_id = $lv->studiengang_kz;
+	$term_id = $lv->semester;
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
@@ -290,6 +298,17 @@
 						echo '<strong>Leistungsbeurteilung</strong>';
 					}*/
 			    ?>
+				
+				
+<?php
+ 			echo '<img src="../../../skin/images/button_lb.jpg" width="67" height="45"><br>';
+          	if($is_lector)
+          	{
+				//Anwesenheitsliste
+
+				echo "<b><a href='../lehre/anwesenheitsliste.php?stg_kz=$course_id&sem=$term_id&lvid=$lvid&stsem=$angezeigtes_stsem' class='Item'>Anwesenheits- und Notenlisten</a></b><br>";
+          	}
+?>				
 				<p>&nbsp;</p>
 				</td>
 
@@ -319,5 +338,6 @@
 		<td class="tdwidth30">&nbsp;</td>
 	</tr>
 </table>
+
 </body>
 </html>
