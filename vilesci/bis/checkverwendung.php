@@ -212,13 +212,13 @@ if($resultall = pg_query($conn, $qryall))
 	{
 		$i=0;
 		$qry="SELECT * FROM bis.tbl_bisverwendung 
-			WHERE (beschausmasscode='1' AND vertragsstunden<'38.5') 
+			WHERE ((beschausmasscode='1' AND vertragsstunden<'38.5') 
 			OR (beschausmasscode='2' AND vertragsstunden>'15') 
 			OR (beschausmasscode='3' AND vertragsstunden<'16') 
 			OR (beschausmasscode='3' AND vertragsstunden>'25') 
 			OR (beschausmasscode='4' AND vertragsstunden<'26') 
 			OR (beschausmasscode='4' AND vertragsstunden>'35') 
-			OR (beschausmasscode='5' AND vertragsstunden>'0')
+			OR (beschausmasscode='5' AND vertragsstunden>'0'))
 			AND mitarbeiter_uid='".$rowall->uid."';";
 		if($result = pg_query($conn, $qry))
 		{
