@@ -271,7 +271,7 @@ if($result_stg = pg_query($conn, $qry_stg))
              $data . "\n\n" .
              "--{$mime_boundary}--\n";
 
-    if(mail(MAIL_GST, $subject, $message, $headers ))
+    if(mail(MAIL_GST.',vilesci@technikum-wien.at', $subject, $message, $headers ))
 		echo 'Email mit Lehrauftragslisten wurde an '.MAIL_GST.' versandt!';
      else
         echo "Fehler beim Versenden der Lehrauftragsliste";
