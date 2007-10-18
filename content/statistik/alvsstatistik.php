@@ -33,7 +33,7 @@ loadVariables($conn, $user);
 
 $stsem = (isset($_GET['stsem'])?$_GET['stsem']:$semester_aktuell);
 
-$typ = (isset($_GET['typ'])?$_GET['typ']:'');
+$format = (isset($_GET['format'])?$_GET['format']:'');
 
 $studiengang = new studiengang($conn);
 $studiengang->getAll('typ, kurzbz', false);
@@ -46,25 +46,25 @@ $fachbereich = new fachbereich($conn);
 $fachbereich->getAll();
 
 $fb_arr = array();
-foreach ($fachbereich->result as $row) 
+foreach ($fachbereich->result as $row)
 	$fb_arr[$row->fachbereich_kurzbz]=$row->bezeichnung;
-	
+
 $qry = "
 SELECT * FROM (
-	SELECT 
-		fachbereich_kurzbz, tbl_lehrveranstaltung.studiengang_kz, sum(tbl_lehreinheitmitarbeiter.semesterstunden) as semesterstunden 
-	FROM 
-		lehre.tbl_lehreinheit, 
-		lehre.tbl_lehrveranstaltung, 
-		lehre.tbl_lehrfach, 
+	SELECT
+		fachbereich_kurzbz, tbl_lehrveranstaltung.studiengang_kz, sum(tbl_lehreinheitmitarbeiter.semesterstunden) as semesterstunden
+	FROM
+		lehre.tbl_lehreinheit,
+		lehre.tbl_lehrveranstaltung,
+		lehre.tbl_lehrfach,
 		lehre.tbl_lehreinheitmitarbeiter
-	WHERE 
-		tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id AND 
-		tbl_lehreinheit.studiensemester_kurzbz='$stsem' AND 
-		tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND 
-		tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND 
-		faktor<>0 AND 
-		stundensatz<>0 AND 
+	WHERE
+		tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id AND
+		tbl_lehreinheit.studiensemester_kurzbz='$stsem' AND
+		tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
+		tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND
+		faktor<>0 AND
+		stundensatz<>0 AND
 		tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id
 	GROUP BY fachbereich_kurzbz, tbl_lehrveranstaltung.studiengang_kz
 	) as a JOIN public.tbl_studiengang USING(studiengang_kz)
@@ -86,20 +86,20 @@ while($row = pg_fetch_object($result))
 sort($fachbereiche);
 
 $qry = "
-SELECT 
+SELECT
 	studiengang_kz, sum(stunden) as stunden
-FROM 
-	lehre.tbl_projektarbeit, 
-	lehre.tbl_lehrveranstaltung, 
-	lehre.tbl_lehreinheit, 
-	lehre.tbl_projektbetreuer 
-WHERE 
-	tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND 
-	tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND 
-	tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND 
-	tbl_projektbetreuer.faktor<>0 AND 
-	tbl_projektbetreuer.stunden<>0 AND 
-	tbl_projektbetreuer.stundensatz<>0 AND 
+FROM
+	lehre.tbl_projektarbeit,
+	lehre.tbl_lehrveranstaltung,
+	lehre.tbl_lehreinheit,
+	lehre.tbl_projektbetreuer
+WHERE
+	tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
+	tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND
+	tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
+	tbl_projektbetreuer.faktor<>0 AND
+	tbl_projektbetreuer.stunden<>0 AND
+	tbl_projektbetreuer.stundensatz<>0 AND
 	tbl_lehreinheit.studiensemester_kurzbz='$stsem'
 GROUP BY studiengang_kz";
 
@@ -109,34 +109,34 @@ if(!$result = pg_query($conn, $qry))
 while($row = pg_fetch_object($result))
 	$data[$row->studiengang_kz]['betreuungen']=$row->stunden;
 
-if($typ=='xls')
+if($format=='xls')
 {
 	// Creating a workbook
 	$workbook = new Spreadsheet_Excel_Writer();
-	
+
 	// sending HTTP headers
 	$workbook->send("ALVSStatistik_".$stsem.".xls");
-	
+
 	// Creating a worksheet
 	$worksheet =& $workbook->addWorksheet("ALVSStatistik");
-	
+
 	//Formate Definieren
 	$format_bold =& $workbook->addFormat();
 	$format_bold->setBold();
 	//$format_bold->setBorder(1);
-	
+
 	$format_border =& $workbook->addFormat();
 	$format_border->setBorder(1);
-		
+
 	$format_rotate =& $workbook->addFormat();
 	$format_rotate->setTextRotation(270);
 	$format_rotate->setAlign('center');
 	$format_rotate->setBold();
-	
+
 	$spalte=0;
 	$zeile=0;
-	
-	
+
+
 	$worksheet->write($zeile,$spalte,$stsem, $format_bold);
 	$maxlength[$spalte]=13;
 	$summe_fb = array();
@@ -151,11 +151,11 @@ if($typ=='xls')
 	$fachbereiche['betreuungen']=$spalte;
 	$maxlength[$spalte]=3;
 	$summe_fb['betreuungen']=0;
-	
+
 	$worksheet->write($zeile,++$spalte,'Summe', $format_rotate);
 	$maxspalten=$spalte;
-	
-	
+
+
 	foreach ($data as $key=>$val)
 	{
 		$zeile++;
@@ -172,8 +172,8 @@ if($typ=='xls')
 		}
 		$worksheet->write($zeile,$maxspalten,$summe, $format_bold);
 	}
-	
-	
+
+
 	$zeile++;
 	$worksheet->write($zeile,0,'Summe', $format_bold);
 	foreach ($summe_fb as $fb=>$summe)
@@ -181,14 +181,14 @@ if($typ=='xls')
 		if(isset($fachbereiche[$fb]))
 			$worksheet->write($zeile,$fachbereiche[$fb],$summe, $format_bold);
 	}
-	
+
 	//Die Breite der Spalten setzen
 	foreach($maxlength as $i=>$breite)
 		$worksheet->setColumn($i, $i, $breite);
-		
+
 	$workbook->close();
 }
-else 
+else
 {
 	echo '
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
@@ -205,14 +205,14 @@ else
 	</style>
 	</head>
 	<body class="Background_main">';
-	
-	
-	
+
+
+
 	echo "<h2>Studenten / Semester</h2>";
-	
+
 	echo '<table class="liste" style="border: 1px solid black" cellspacing="0"><tr class="liste"><th>'.$stsem.'</th>';
 	$summe_fb = array();
-	
+
 	foreach ($fachbereiche as $fb)
 	{
 		echo "<th>".$fb_arr[$fb]."</th>";
@@ -222,7 +222,7 @@ else
 	$summe_fb['betreuungen']=0;
 	echo "<th>Summe</th>";
 	echo "</tr>";
-	
+
 	foreach ($data as $key=>$val)
 	{
 		echo "<tr>";
@@ -237,24 +237,24 @@ else
 				$summe_fb[$fb]+=$data[$key][$fb];
 				echo $data[$key][$fb];
 			}
-			else 
+			else
 				echo "&nbsp;";
 			echo "</td>";
 		}
-		
+
 		echo "<td>";
 		if(isset($data[$key]['betreuungen']))
 		{
 			echo $data[$key]['betreuungen'];
 			$summe_fb['betreuungen']+=$data[$key]['betreuungen'];
 		}
-		else 
+		else
 			echo "&nbsp;";
 		echo "</td>";
 		echo "<td><b>$summe</b></td>";
 		echo "</tr>";
 	}
-		
+
 	echo "<tr>";
 	echo "<td>Summe</td>";
 	foreach ($fachbereiche as $fb)
@@ -262,14 +262,14 @@ else
 		echo "<td><b>";
 		if(isset($summe_fb[$fb]))
 			echo $summe_fb[$fb];
-		else 
+		else
 			echo "&nbsp;";
 		echo "</b></td>";
-	}	
+	}
 	echo "<td><b>";
 		if(isset($summe_fb['betreuungen']))
 			echo $summe_fb['betreuungen'];
-		else 
+		else
 			echo "&nbsp;";
 		echo "</b></td>";
 	echo "</tr>";
