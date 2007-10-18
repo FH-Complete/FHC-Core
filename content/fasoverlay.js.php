@@ -879,6 +879,30 @@ function OpenAboutDialog()
 }
 
 // ****
+// * Oeffnet die ToDo Liste
+// ****
+function OpenToDoDialog()
+{
+	window.open('<?php echo APP_ROOT ?>content/ToDo_FASo.html','ToDo','height=600,width=600,left=150,top=150,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+
+// ****
+// * Oeffnet ALVS-Statistik
+// ****
+function StatistikPrintALVSStatistik(format)
+{
+	window.open('<?php echo APP_ROOT ?>content/statistik/alvsstatistik.php?format='+format,'ALVS-Statistik','');
+}
+
+// ****
+// * Oeffnet Studenten/Semester Statistik
+// ****
+function StatistikPrintStudentenProSemester(format)
+{
+	window.open('<?php echo APP_ROOT ?>content/statistik/studentenprosemester.php?format='+format,'Studenten/Semester','');
+}
+
+// ****
 // * Wenn der Tab Mitarbeiter aktiviert ist und der Prestudent-, Student- oder Lehrveranstaltungstab
 // * markiert wird, dann wird im Menue auf den Verband Tag gewechselt
 // ****

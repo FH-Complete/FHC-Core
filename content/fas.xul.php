@@ -87,6 +87,10 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-statistic-notenspiegel:command" oncommand="StatistikPrintNotenspiegel('html');"/>
   <command id="menu-statistic-notenspiegel-excel:command" oncommand="StatistikPrintNotenspiegel('xls');"/>
   <command id="menu-statistic-bewerberstatistik:command" oncommand="StatistikPrintBewerberstatistik();"/>
+  <command id="menu-statistic-substatistik-studentenprosemester-excel:command" oncommand="StatistikPrintStudentenProSemester('xls');"/>
+  <command id="menu-statistic-substatistik-studentenprosemester-html:command" oncommand="StatistikPrintStudentenProSemester('');"/>
+  <command id="menu-statistic-substatistik-alvsstatistik-excel:command" oncommand="StatistikPrintALVSStatistik('xls');"/>
+  <command id="menu-statistic-substatistik-alvsstatistik-html:command" oncommand="StatistikPrintALVSStatistik('');"/>  
   <command id="menu-dokumente-inskriptionsbestaetigung:command" oncommand="StudentPrintInskriptionsbestaetigung();"/>
   <command id="menu-dokumente-zeugnis:command" oncommand="StudentCreateZeugnis();"/>
   <command id="menu-dokumente-diplsupplement:command" oncommand="StudentCreateDiplSupplement();"/>
@@ -102,6 +106,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-bis-studenten-plausibilitaetspruefung:command" oncommand="BISStudentenPlausicheck();"/>
   <command id="menu-bis-studenten-export:command" oncommand="BISStudentenExport();"/>
   <command id="menu-help-close:command" oncommand="OpenAboutDialog()"/>
+  <command id="menu-help-todo:command" oncommand="OpenToDoDialog()"/>
 </commandset>
 
 <keyset id="mainkeys">
@@ -245,6 +250,42 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 		               label     = "&menu-statistic-notenspiegel.label;"
 		               command   =  "menu-statistic-notenspiegel:command"
 		               accesskey = "&menu-statistic-notenspiegel.accesskey;"/>
+				</menupopup>
+			</menu>
+			<menu id="menu-statistic-substatistik" label="&menu-statistic-substatistik.label;" accesskey="&menu-statistic-substatistik.accesskey;">
+				<menupopup id="menu-statistic-substatistik-popup">
+					<menu id="menu-statistic-substatistik-studentenprosemester" label="&menu-statistic-substatistik-studentenprosemester.label;" accesskey="&menu-statistic-substatistik-studentenprosemester.accesskey;">
+						<menupopup id="menu-statistic-substatistik-studentenprosemester-popup">
+				             <menuitem
+				               id        =  "menu-statistic-substatistik-studentenprosemester-excel"
+				               key       =  "menu-statistic-substatistik-studentenprosemester-excel:key"
+				               label     = "&menu-statistic-substatistik-studentenprosemester-excel.label;"
+				               command   =  "menu-statistic-substatistik-studentenprosemester-excel:command"
+				               accesskey = "&menu-statistic-substatistik-studentenprosemester-excel.accesskey;"/>
+				             <menuitem
+				               id        =  "menu-statistic-substatistik-studentenprosemester-html"
+				               key       =  "menu-statistic-substatistik-studentenprosemester-html:key"
+				               label     = "&menu-statistic-substatistik-studentenprosemester-html.label;"
+				               command   =  "menu-statistic-substatistik-studentenprosemester-html:command"
+				               accesskey = "&menu-statistic-substatistik-studentenprosemester-html.accesskey;"/>
+						</menupopup>
+					</menu>
+					<menu id="menu-statistic-substatistik-alvsstatistik" label="&menu-statistic-substatistik-alvsstatistik.label;" accesskey="&menu-statistic-substatistik-alvsstatistik.accesskey;">
+						<menupopup id="menu-statistic-substatistik-alvsstatistik-popup">
+				             <menuitem
+				               id        =  "menu-statistic-substatistik-alvsstatistik-excel"
+				               key       =  "menu-statistic-substatistik-alvsstatistik-excel:key"
+				               label     = "&menu-statistic-substatistik-alvsstatistik-excel.label;"
+				               command   =  "menu-statistic-substatistik-alvsstatistik-excel:command"
+				               accesskey = "&menu-statistic-substatistik-alvsstatistik-excel.accesskey;"/>
+				             <menuitem
+				               id        =  "menu-statistic-substatistik-alvsstatistik-html"
+				               key       =  "menu-statistic-substatistik-alvsstatistik-html:key"
+				               label     = "&menu-statistic-substatistik-alvsstatistik-html.label;"
+				               command   =  "menu-statistic-substatistik-alvsstatistik-html:command"
+				               accesskey = "&menu-statistic-substatistik-alvsstatistik-html.accesskey;"/>
+						</menupopup>
+					</menu>
 				</menupopup>
 			</menu>
           <!--   <menuitem
@@ -400,6 +441,12 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                label     = "&menu-help-close.label;"
                command   =  "menu-help-close:command"
                accesskey = "&menu-help-close.accesskey;"/>
+            <menuitem
+               id        =  "menu-help-todo"
+               key       =  "menu-help-todo:key"
+               label     = "&menu-help-todo.label;"
+               command   =  "menu-help-todo:command"
+               accesskey = "&menu-help-todo.accesskey;"/>
           </menupopup>
     </menu>
   </menubar>
