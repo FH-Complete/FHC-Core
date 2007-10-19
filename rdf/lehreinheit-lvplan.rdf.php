@@ -18,15 +18,12 @@ echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
 require_once('../vilesci/config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/lehreinheit.class.php');
-require_once('../include/benutzerberechtigung.class.php');
 
 $uid=get_uid();
 $error_msg='';
 
 if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-$berechtigung=new benutzerberechtigung($conn);
-$berechtigung->getBerechtigungen($uid);
 $error_msg.=loadVariables($conn,$uid);
 
 //$semester_aktuell='WS2007';
