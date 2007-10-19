@@ -100,6 +100,37 @@ class benutzergruppe
 		}
 	}
 	
+	// *********************************************************
+	// * Laedt die User in einer Benutzergruppe
+	// * @param gruppe_kurzbz, stsem
+	// * @return true wenn ok, false im Fehlerfall
+	// *********************************************************
+	function load_uids($gruppe_kurzbz, $stsem)
+	{
+		$qry = "SELECT * FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='".addslashes($gruppe_kurzbz)."' and studiensemester_kurzbz = '".$stsem."'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if (pg_num_rows($result) == 0)
+				return false;
+			else
+			{			
+				while($row = pg_fetch_object($result))
+				{
+					$bg_obj = new benutzergruppe($this->conn);
+					$bg_obj->uid = $row->uid;
+					$this->uids[] = $bg_obj;
+				}
+				return true;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim laden des Datensatzes';
+			return false;
+		}
+	}	
+	
 	// *******************************************
 	// * Prueft die Variablen vor dem Speichern 
 	// * auf Gueltigkeit.
