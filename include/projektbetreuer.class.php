@@ -141,35 +141,40 @@ class projektbetreuer
 				
 		//Gesamtlaenge pruefen
 		//$this->errormsg='Eine der Gesamtlaengen wurde ueberschritten';
-	
+
+		if($this->betreuerart_kurzbz=='')
+		{
+			$this->errormsg = 'Betreuerart muss eingegeben werden';
+			return false;
+		}
 		if(strlen($this->betreuerart_kurzbz)>16)
 		{
-			$this->errormsg = 'betreuerart darf nicht länger als 16 Zeichen sein  - person_id/projektarbeit: '.$this->person_id.'/'.$this->projektarbeit_id;
+			$this->errormsg = 'betreuerart darf nicht länger als 16 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->name)>32)
 		{
-			$this->errormsg = 'Name darf nicht länger als 32 Zeichen sein - person_id/projektarbeit: '.$this->person_id.'/'.$this->projektarbeit_id;
+			$this->errormsg = 'Name darf nicht länger als 32 Zeichen sein';
 			return false;
 		}
 		
 		if($this->note!='' && !is_numeric($this->note))
 		{
-			$this->errormsg = 'Note muss ein numerischer Wert sein - person_id/projektarbeit: '.$this->person_id.'/'.$this->projektarbeit_id;
+			$this->errormsg = 'Note muss ein numerischer Wert sein';
 			return false;
 		}
-		if(!is_numeric($this->punkte))
+		if($this->punkte!='' && !is_numeric($this->punkte))
 		{
-			$this->errormsg = 'Punkte muß ein numerischer Wert sein - person_id/projektarbeit: '.$this->person_id.'/'.$this->projektarbeit_id;
+			$this->errormsg = 'Punkte muss ein numerischer Wert sein';
 		}
-		if(!is_numeric($this->faktor))
+		if($this->faktor!='' && !is_numeric($this->faktor))
 		{
-			$this->errormsg = 'Faktor muß ein numerischer Wert sein - person_id/projektarbeit: '.$this->person_id.'/'.$this->projektarbeit_id;
+			$this->errormsg = 'Faktor muss ein numerischer Wert sein';
 			return false;
 		}
-		if(!is_numeric($this->stundensatz))
+		if($this->stundensatz!='' && !is_numeric($this->stundensatz))
 		{
-			$this->errormsg = 'Stundensatz muß ein numerischer Wert sein - person_id/projektarbeit: '.$this->person_id.'/'.$this->projektarbeit_id;
+			$this->errormsg = 'Stundensatz muss ein numerischer Wert sein';
 			return false;
 		}
 		

@@ -453,6 +453,7 @@
 
 	   //FB Leiter auslesen
 	   $qry = "SELECT distinct vorname, nachname FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbl' AND fachbereich_kurzbz in (SELECT distinct fachbereich_kurzbz FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach WHERE lehrveranstaltung_id='$lv' AND studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE tbl_lehreinheit.lehrveranstaltung_id='$lv' ORDER BY ende DESC LIMIT 1) AND tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id)";
+	   
 	   echo "<tr><td class='tdvertical'><b>FB Leiter</b></td><td>";
 	   if($result=pg_query($conn,$qry))
 	   {
@@ -465,8 +466,21 @@
 	   echo "</td></tr>";
 
 	   //FB Koordinator auslesen
-		$qry = "SELECT distinct vorname, nachname FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbk' AND studiengang_kz='$stg' AND fachbereich_kurzbz in (SELECT fachbereich_kurzbz FROM lehre.tbl_lehrfach, lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lv' AND tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND tbl_lehreinheit.studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE tbl_lehreinheit.lehrveranstaltung_id='$lv' ORDER BY ende DESC LIMIT 1))";
-	   echo "<tr><td class='tdvertical'><b>FB Koordinator</b></td><td>";
+		//$qry = "SELECT distinct vorname, nachname FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbk' AND studiengang_kz='$stg' AND fachbereich_kurzbz in (SELECT fachbereich_kurzbz FROM lehre.tbl_lehrfach, lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lv' AND tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND tbl_lehreinheit.studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE tbl_lehreinheit.lehrveranstaltung_id='$lv' ORDER BY ende DESC LIMIT 1))";
+	   $qry = "SELECT 
+				distinct vorname, nachname, tbl_lehrfach.fachbereich_kurzbz
+			FROM
+				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach, public.tbl_benutzerfunktion, campus.vw_mitarbeiter
+			WHERE
+				tbl_lehrveranstaltung.lehrveranstaltung_id='$lv' AND
+				tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
+				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
+				tbl_lehrfach.fachbereich_kurzbz=tbl_benutzerfunktion.fachbereich_kurzbz AND
+				tbl_benutzerfunktion.funktion_kurzbz='fbk' AND 
+				vw_mitarbeiter.uid=COALESCE(koordinator, tbl_benutzerfunktion.uid) AND
+				tbl_benutzerfunktion.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz";
+	   
+		echo "<tr><td class='tdvertical'><b>FB Koordinator</b></td><td>";
 	   if($result=pg_query($conn,$qry))
 	   {
 	   	   while($row=pg_fetch_object($result))

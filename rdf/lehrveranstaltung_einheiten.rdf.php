@@ -133,13 +133,20 @@ if(!$result = pg_query($conn, $qry))
 	while($row_lva = pg_fetch_object($result))
 	{
 		//Fachbereichskoordinatoren laden
-		$qry_fbk = "SELECT distinct tbl_mitarbeiter.kurzbz as kurzbz FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, public.tbl_mitarbeiter, public.tbl_benutzerfunktion
-		WHERE tbl_lehreinheit.lehrveranstaltung_id='$row_lva->lehrveranstaltung_id' AND
-		      tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
-		      tbl_lehrfach.fachbereich_kurzbz = tbl_benutzerfunktion.fachbereich_kurzbz AND
-		      tbl_mitarbeiter.mitarbeiter_uid = tbl_benutzerfunktion.uid AND
-		      tbl_benutzerfunktion.funktion_kurzbz='fbk' AND
-		      tbl_benutzerfunktion.studiengang_kz='$row_lva->studiengang_kz'";
+		$qry_fbk = "SELECT kurzbz FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid =
+						(
+						SELECT 
+							COALESCE(koordinator, uid) as koordinator
+						FROM
+							lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach, public.tbl_benutzerfunktion 
+						WHERE
+							tbl_lehrveranstaltung.lehrveranstaltung_id='$row_lva->lehrveranstaltung_id' AND
+							tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
+							tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
+							tbl_lehrfach.fachbereich_kurzbz=tbl_benutzerfunktion.fachbereich_kurzbz AND
+							tbl_benutzerfunktion.funktion_kurzbz='fbk' AND 
+							tbl_benutzerfunktion.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz LIMIT 1 ) ";
+		
 		$result_fbk = pg_query($conn, $qry_fbk);
 		$fbk='';
 		while($row_fbk = pg_fetch_object($result_fbk))
