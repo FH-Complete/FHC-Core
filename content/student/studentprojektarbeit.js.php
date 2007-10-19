@@ -912,9 +912,10 @@ function StudentProjektbetreuerSpeichern()
 		StudentProjektbetreuerSelectPersonID=person_id;
 		StudentProjektbetreuerSelectProjektarbeitID=projektarbeit_id;
 		StudentProjektbetreuerSelectBetreuerartKurzbz=betreuerart_kurzbz;
+		StudentProjektbetreuerDetailDisableFields(true);
 		StudentProjektbetreuerTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
-		StudentProjektbetreuerDetailDisableFields(true);
+		
 	}
 }
 

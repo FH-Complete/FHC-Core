@@ -45,7 +45,6 @@ class studiengang
 	var $bescheidbgbl2;			// varchar(16)
 	var $bescheidgz;			// varchar(16)
 	var $bescheidvom;			// Date
-	var $organisationsform;		// varchar(1)
 	var $titelbescheidvom;		// Date
 	var $ext_id;				// bigint
 
@@ -124,7 +123,6 @@ class studiengang
 				$this->kuerzel = strtoupper($row->typ.$row->kurzbz);
 
 				$this->telefon=$row->telefon;
-           	 	$this->organisationsform=$row->organisationsform;
             	$this->titelbescheidvom=$row->titelbescheidvom;
             	$this->aktiv=$row->aktiv;
 			}
@@ -182,7 +180,6 @@ class studiengang
 			$stg_obj->kuerzel = strtoupper($row->typ.$row->kurzbz);
 
             $stg_obj->telefon=$row->telefon;
-            $stg_obj->organisationsform=$row->organisationsform;
             $stg_obj->titelbescheidvom=$row->titelbescheidvom;
             $stg_obj->aktiv=$row->aktiv;
 
@@ -265,7 +262,7 @@ class studiengang
 			//Neuen Datensatz anlegen
 			$qry = 'INSERT INTO public.tbl_studiengang (studiengang_kz, kurzbz, kurzbzlang, bezeichnung, english,
 				typ, farbe, email, telefon, max_verband, max_semester, max_gruppe, erhalter_kz, bescheid, bescheidbgbl1,
-				bescheidbgbl2, bescheidgz, bescheidvom, organisationsform, titelbescheidvom, aktiv, ext_id) VALUES ('.
+				bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, aktiv, ext_id) VALUES ('.
 				$this->addslashes($this->studiengang_kz).', '.
 				$this->addslashes($this->kurzbz).', '.
 				$this->addslashes($this->kurzbzlang).', '.
@@ -284,7 +281,6 @@ class studiengang
 				$this->addslashes($this->bescheidbgbl2).', '.
 				$this->addslashes($this->bescheidgz).', '.
 				$this->addslashes($this->bescheidvom).', '.
-				$this->addslashes($this->organisationsform).', '.
 				$this->addslashes($this->titelbescheidvom).', '.
 				$this->addslashes($this->aktiv).', '.
 				$this->addslashes($this->ext_id).');';
@@ -318,7 +314,6 @@ class studiengang
 				'bescheidbgbl2='.$this->addslashes($this->bescheidbgbl2).', '.
 				'bescheidgz='.$this->addslashes($this->bescheidgz).', '.
 				'bescheidvom='.$this->addslashes($this->bescheidvom).', '.
-				'organisationsform='.$this->addslashes($this->organisationsform).', '.
 				'titelbescheidvom='.$this->addslashes($this->titelbescheidvom).', '.
 				'ext_id='.$this->addslashes($this->ext_id).', '.
 				'telefon='.$this->addslashes($this->telefon).', '.

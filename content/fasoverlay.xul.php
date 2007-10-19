@@ -118,7 +118,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 	    <splitter class="tree-splitter"/>
 	    <treecol id="farbe" label="Farbe" flex="1" hidden="true"/>
 	    <splitter class="tree-splitter"/>
-	     <treecol id="stg_kz" label="Stg_kz" flex="1" hidden="true"/>
+	     <treecol id="stg_kz_fb" label="Stg_kz" flex="1" hidden="true"/>
 	</treecols>
 
 	<template>

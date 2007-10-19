@@ -191,6 +191,7 @@
 		$lehrform_kurzbz[] = $row->lehrform_kurzbz;
 	//Fachbereichsleiter fuer alle FB ermitteln
 	$qry="SELECT * FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbl' AND fachbereich_kurzbz in($fachbereiche)";
+	
 	if(!$res=pg_query($conn,$qry))
 		die('Fehler beim herstellen der DB Connection');
 
@@ -199,7 +200,19 @@
 		$fachbereichsleiter[$row->fachbereich_kurzbz] = $row->vorname."&nbsp;".$row->nachname;
 
 	//Fachbereichskoordinatoren fuer alle FB ermitteln
-	$qry="SELECT * FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbk' AND studiengang_kz='$stg' AND fachbereich_kurzbz in($fachbereiche)";
+	//$qry="SELECT * FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbk' AND studiengang_kz='$stg' AND fachbereich_kurzbz in($fachbereiche)";
+	$qry = "SELECT 
+				distinct vorname, nachname, tbl_lehrfach.fachbereich_kurzbz
+			FROM
+				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach, public.tbl_benutzerfunktion, campus.vw_mitarbeiter
+			WHERE
+				tbl_lehrveranstaltung.lehrveranstaltung_id='$lv' AND
+				tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
+				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
+				tbl_lehrfach.fachbereich_kurzbz=tbl_benutzerfunktion.fachbereich_kurzbz AND
+				tbl_benutzerfunktion.funktion_kurzbz='fbk' AND 
+				vw_mitarbeiter.uid=COALESCE(koordinator, tbl_benutzerfunktion.uid) AND
+				tbl_benutzerfunktion.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz ";
 
 	if(!$res=pg_exec($conn,$qry))
 		die('Fehler beim herstellen der DB Connection');
