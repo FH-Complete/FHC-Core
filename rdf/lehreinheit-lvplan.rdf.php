@@ -188,8 +188,7 @@ foreach ($lva as $l)
 	if (count($l->offenestunden)>1)
 		$offenestunden.=' ?';
 
-	if ($berechtigung->isBerechtigt('lvaVerplanung',$l->stg_kz[0]) || $berechtigung->isBerechtigt('admin',0) || $berechtigung->isBerechtigt('admin',$l->stg_kz[0]))
-		echo'<RDF:li>
+	echo'<RDF:li>
       		<RDF:Description  id="lva'.($anz--).'" about="'.$rdf_url.$l->unr.'">
 		   		<LVA:lvnr>'.$lvnr.'</LVA:lvnr>
 				<LVA:unr>'.$l->unr.'</LVA:unr>
