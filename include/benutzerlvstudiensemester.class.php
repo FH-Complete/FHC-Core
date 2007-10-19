@@ -71,7 +71,34 @@ class benutzerlvstudiensemester
 		$this->errormsg = 'Not implemented';
 		return false;
 	}
-
+	
+	//
+	//
+	//
+	//
+	function get_all_uids($studiensemester_kurzbz, $lehrveranstaltung_id)
+	{
+		$qry = "SELECT * FROM campus.tbl_benutzerlvstudiensemester where studiensemester_kurzbz='".$studiensemester_kurzbz."' AND lehrveranstaltung_id = '".$lehrveranstaltung_id."'";
+		if(!$res = pg_query($this->conn, $qry))
+		{
+			$this->errormsg = 'Datensatz konnte nicht geladen werden';
+			return false;
+		}
+		if (pg_num_rows($res) == 0)
+			return false;
+		else
+		{
+			while($row = pg_fetch_object($res))
+			{
+				$lv_obj = new benutzerlvstudiensemester($this->conn);
+				$lv_obj->uid = $row->uid;
+				$this->uids[] = $lv_obj;
+			}
+			return true;
+		}
+	}	
+	
+	
 	// *******************************************
 	// * Prueft die Variablen vor dem Speichern
 	// * auf Gueltigkeit.
