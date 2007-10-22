@@ -197,7 +197,7 @@ function selectAll()
 			
 			foreach ($b->uids as $u)
 			{
-				echo "<br><input type='checkbox' name='anmeldung_".$u->uid."'>".$u->uid;
+				echo "<br><input type='checkbox' name='anmeldung_".$u->uid."'>".$u->uid." - ".$u->nachname." ".$u->vorname;
 				$anz++;				
 				//echo "<br>".$u->uid;
 			}
