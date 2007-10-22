@@ -785,6 +785,29 @@ function ExtrasShowReihungstest()
 }
 
 // ****
+// * Zeut HTML Seite zur Bearbeitung der Lehrveranstaltungen an
+// ****
+function ExtrasShowLVverwaltung()
+{
+	tree = document.getElementById('tree-verband');
+
+	if(tree.currentIndex==-1)
+	{
+		alert('Bitte zuerst einen Studiengang auswaehlen');
+		return;
+	}
+
+	//Studiengang und Semester holen
+	var col;
+	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+	var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["sem"] : "sem";
+	var semester=tree.view.getCellText(tree.currentIndex,col);
+	
+	window.open('<?php echo APP_ROOT ?>vilesci/lehre/lehrveranstaltung.php?stg_kz='+studiengang_kz+'&semester='+semester,'Lehrveranstaltungen','');
+}
+
+// ****
 // * Zeigt HTML Seite zur bearbeitung der Firmen an
 // ****
 function ExtrasShowFirmenverwaltung()
