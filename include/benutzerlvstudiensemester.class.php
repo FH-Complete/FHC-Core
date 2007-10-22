@@ -72,13 +72,13 @@ class benutzerlvstudiensemester
 		return false;
 	}
 	
-	//
-	//
-	//
-	//
+	//**********************************************************
+	//* Laedt alle uids in zu einer lv/szudiensemester - kombination
+	//* gibt auch vor- und Nachname zurueck
+	//**********************************************************
 	function get_all_uids($studiensemester_kurzbz, $lehrveranstaltung_id)
 	{
-		$qry = "SELECT * FROM campus.tbl_benutzerlvstudiensemester where studiensemester_kurzbz='".$studiensemester_kurzbz."' AND lehrveranstaltung_id = '".$lehrveranstaltung_id."'";
+		$qry = "SELECT tbl_benutzerlvstudiensemester.uid, vw_benutzer.nachname, vw_benutzer.vorname FROM campus.tbl_benutzerlvstudiensemester, campus.vw_benutzer where studiensemester_kurzbz='".$studiensemester_kurzbz."' AND lehrveranstaltung_id = '".$lehrveranstaltung_id."' and vw_benutzer.uid = tbl_benutzerlvstudiensemester.uid order by nachname";
 		if(!$res = pg_query($this->conn, $qry))
 		{
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
@@ -92,6 +92,8 @@ class benutzerlvstudiensemester
 			{
 				$lv_obj = new benutzerlvstudiensemester($this->conn);
 				$lv_obj->uid = $row->uid;
+				$lv_obj->nachname = $row->nachname;
+				$lv_obj->vorname = $row->vorname;
 				$this->uids[] = $lv_obj;
 			}
 			return true;
