@@ -99,6 +99,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-dokumente-accountinfoblatt:command" oncommand="PrintAccountInfoBlatt();"/>
   <command id="menu-extras-reihungstest:command" oncommand="ExtrasShowReihungstest();"/>
   <command id="menu-extras-firma:command" oncommand="ExtrasShowFirmenverwaltung();"/>
+  <command id="menu-extras-lvverwaltung:command" oncommand="ExtrasShowLVverwaltung();"/>
   <command id="menu-bis-mitarbeiter-import:command" oncommand="BISMitarbeiterImport();"/>
   <command id="menu-bis-mitarbeiter-export:command" oncommand="BISMitarbeiterExport();"/>
   <command id="menu-bis-mitarbeiter-checkverwendung:command" oncommand="BISMitarbeiterCheckVerwendung();"/>
@@ -383,6 +384,12 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                label     = "&menu-extras-firma.label;"
                command   =  "menu-extras-firma:command"
                accesskey = "&menu-extras-firma.accesskey;"/>
+            <menuitem
+               id        =  "menu-extras-lvverwaltung"
+               key       =  "menu-extras-lvverwaltung:key"
+               label     = "&menu-extras-lvverwaltung.label;"
+               command   =  "menu-extras-lvverwaltung:command"
+               accesskey = "&menu-extras-lvverwaltung.accesskey;"/>
           </menupopup>
     </menu>
     <menu id="menu-bis" label="&menu-bis.label;" accesskey="&menu-bis.accesskey;">

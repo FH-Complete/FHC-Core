@@ -148,6 +148,10 @@
 <!ENTITY menu-extras-firma.label		"Firmenverwaltung">
 <!ENTITY menu-extras-firma.accesskey	"F">
 
+<!ENTITY menu-extras-lvverwaltung.key		"L">
+<!ENTITY menu-extras-lvverwaltung.label		"Lehrveranstaltungsverwaltung">
+<!ENTITY menu-extras-lvverwaltung.accesskey	"L">
+
 <!-- BIS -->
 <!ENTITY menu-bis.label		"BIS">
 <!ENTITY menu-bis.accesskey	"I">

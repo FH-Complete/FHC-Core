@@ -146,7 +146,7 @@ if($result = pg_query($conn, $qry))
 
 //Lehrveranstaltungen holen
 
-//Wenn nicht admin, dann nur die Aktiven anzeigen
+//Wenn nicht admin, dann nur die aktiven anzeigen
 $aktiv='';
 if(!$rechte->isBerechtigt('admin'))
 	$aktiv = ' AND aktiv=true';
