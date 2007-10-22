@@ -85,7 +85,7 @@ if (isset($_REQUEST["grp_in"]) && $gruppe != "")
 	}
 }
 
-	if ($gruppe != "" && isset($_REQUEST["grp_aus"]))
+if ($gruppe != "" && isset($_REQUEST["grp_aus"]))
 	{
 		$gu = new benutzergruppe($conn);
 		if ($gu->load_uids($gruppe, $stsem))
@@ -110,6 +110,22 @@ if (isset($_REQUEST["grp_in"]) && $gruppe != "")
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+<script  type="text/javascript">
+function selectAll()
+{
+	var a = document.getElementById("anmeldungen");
+	var checkboxen = a.getElementsByTagName("input");
+	
+	for (var i = 0; i < checkboxen.length; i++)	
+	{
+		if (document.auswahl.toggle.checked == true)		
+			checkboxen[i].checked = true;
+		else
+			checkboxen[i].checked = false;
+	}
+}
+
+</script>
 </head>
 <body class="Background_main">
 <?php
@@ -170,10 +186,11 @@ if (isset($_REQUEST["grp_in"]) && $gruppe != "")
 	
 	echo "</td></tr>";
 	echo "<tr>";
-	echo "<td valign='top'>";
+	echo "<td valign='top' id='anmeldungen'>";
 	
+	$anz = 0;
 	if ($lvid > 0)
-	{
+	{		
 		$b = new benutzerlvstudiensemester($conn);
 		if ($b->get_all_uids($stsem, $lvid))
 		{
@@ -181,10 +198,17 @@ if (isset($_REQUEST["grp_in"]) && $gruppe != "")
 			foreach ($b->uids as $u)
 			{
 				echo "<br><input type='checkbox' name='anmeldung_".$u->uid."'>".$u->uid;
+				$anz++;				
 				//echo "<br>".$u->uid;
 			}
 		}
 	}
+	if ($anz > 0)
+	{	
+		
+		echo "<br><hr><input type='checkbox' onclick='selectAll();' name='toggle'>de/select all *** Angemeldet: <b>".$anz."</b> Studierende ***";
+		
+	}	
 	echo "</td><td valign='top'>";
 	
 	if ($gruppe != "")
