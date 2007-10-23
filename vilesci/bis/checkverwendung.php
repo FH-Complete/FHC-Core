@@ -295,4 +295,34 @@ if($resultall = pg_query($conn, $qryall))
 		}
 	}
 }
+//8 - Verwendung Habil. und Enticklungsteam Habil.=1
+$i=0;
+$qryall="SELECT DISTINCT mitarbeiter_uid, nachname, vorname  
+	FROM bis.tbl_entwicklungsteam join bis.tbl_bisverwendung USING (mitarbeiter_uid) 
+	JOIN campus.vw_mitarbeiter ON (tbl_entwicklungsteam.mitarbeiter_uid=uid)
+	WHERE ((besqualcode!=1 AND habilitation) OR (besqualcode=1 AND habilitation=false)) 
+        	ORDER BY mitarbeiter_uid;";
+if($resultall = pg_query($conn, $qryall))
+{
+	$num_rows_all=pg_num_rows($resultall);
+	echo "<br><br><H2>Bei $num_rows_all Lektoren sind die Angaben über Habilitationen nicht plausibel</H2>";
+	while($rowall=pg_fetch_object($resultall))
+	{
+		$i++;
+		echo "<br><u>Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname.":</u><br>";
+		$qry="SELECT DISTINCT mitarbeiter_uid, nachname, vorname, besqualbez, habilitation, studiengang_kz, verwendung_code, tbl_bisverwendung.beginn as anfang, tbl_bisverwendung.ende as zuende
+			FROM bis.tbl_entwicklungsteam join bis.tbl_bisverwendung USING (mitarbeiter_uid) 
+		        	JOIN campus.vw_mitarbeiter ON (tbl_entwicklungsteam.mitarbeiter_uid=uid)
+		        	JOIN bis.tbl_besqual USING(besqualcode) 
+			WHERE ((besqualcode!=1 AND habilitation) OR (besqualcode=1 AND habilitation=false)) 
+			AND mitarbeiter_uid='".$rowall->mitarbeiter_uid."';";
+		if($result = pg_query($conn, $qry))
+		{
+			while($row=pg_fetch_object($result))
+			{
+				echo "Verwendung Code ".$row->verwendung_code.", ".$row->anfang." - ".$row->zuende.", Habilitation ".($row->habilitation=='t'?'ja':'nein')." <-> Entwicklungsteam-bes.Qualifikation:(Stg. ".$row->studiengang_kz.") '".$row->besqualbez."'.<br>";
+			}
+		}
+	}
+}
 ?>
