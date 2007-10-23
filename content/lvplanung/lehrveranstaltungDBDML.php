@@ -74,12 +74,18 @@ if(!$error)
 	if(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_save')
 	{
 		//Lehreinheitmitarbeiter Zuteilung
-		$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
+		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz 
+				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach 
+				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
+				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
 		if($result = pg_query($conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
 			{
-				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid'))
+				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') && 
+				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
+				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz) &&
+				   !$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz))
 				{
 					$error = true;
 					$return = false;
@@ -149,12 +155,18 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_add')
 	{
 		//neue Lehreinheitmitarbeiterzuteilung anlegen
-		$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
+		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz 
+				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach 
+				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
+				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
 		if($result = pg_query($conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
 			{
-				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid'))
+				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') && 
+				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
+				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz) &&
+				   !$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz))
 				{
 					$error = true;
 					$return = false;
@@ -269,12 +281,18 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_del')
 	{
-		$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
+		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz 
+				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach 
+				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
+				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
 		if($result = pg_query($conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
 			{
-				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid'))
+				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') && 
+				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
+				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz) &&
+				   !$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz))
 				{
 					$error = true;
 					$return = false;
@@ -340,12 +358,18 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_gruppe_del')
 	{
-		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz FROM lehre.tbl_lehreinheitgruppe JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) WHERE lehreinheitgruppe_id='".addslashes($_POST['lehreinheitgruppe_id'])."'";
+		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz 
+				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach 
+				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
+				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
 		if($result = pg_query($conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
 			{
-				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid'))
+				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') && 
+				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
+				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz) &&
+				   !$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz))
 				{
 					$error = true;
 					$return = false;
@@ -391,12 +415,18 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_gruppe_add')
 	{
-		$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
+		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz 
+				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach 
+				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
+				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
 		if($result = pg_query($conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
 			{
-				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid'))
+				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') && 
+				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
+				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz) &&
+				   !$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz))
 				{
 					$error = true;
 					$return = false;
@@ -453,7 +483,10 @@ if(!$error)
 	{
 		//Lehreinheit anlegen/aktualisieren
 		if($_POST['lehreinheit_id']!='')
-			$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
+			$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz 
+					FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach 
+					WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
+					tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
 		else 
 			$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='".addslashes($_POST['lehrveranstaltung'])."'";
 				
@@ -462,6 +495,9 @@ if(!$error)
 			if($row = pg_fetch_object($result))
 			{
 				$studiengang_kz = $row->studiengang_kz;
+				$fachbereich_kurzbz = 0;
+				if(isset($row->fachbereich_kurzbz))
+					$fachbereich_kurzbz = $row->fachbereich_kurzbz;
 			}
 			else 
 			{
@@ -491,7 +527,10 @@ if(!$error)
 						$errormsg = 'Fehler beim Laden der Lehreinheit';
 					}
 					
-					if(!$rechte->isBerechtigt('admin', $studiengang_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid'))
+					if(!$rechte->isBerechtigt('admin', $studiengang_kz, 'suid') && 
+					   !$rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid') &&
+				       !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz) &&
+				       !$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz))
 					{
 						$error = true;
 						$return = false;

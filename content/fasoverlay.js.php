@@ -407,14 +407,25 @@ function onFachbereichSelect(event)
 	if(row.value!=tree.currentIndex)
 		return;
 
-	col = tree.columns ? tree.columns["kurzbz"] : "kurzbz";
+	col = tree.columns ? tree.columns["fachbereich-treecol-kurzbz"] : "fachbereich-treecol-kurzbz";
 	var kurzbz=tree.view.getCellText(tree.currentIndex,col);
 
+	col = tree.columns ? tree.columns["fachbereich-treecol-uid"] : "fachbereich-treecol-uid";
+	var uid=tree.view.getCellText(tree.currentIndex,col);
+	
+	//Wenn auf einen Mitarbeiter geklickt wird, dann die kurzbz vom uebergeordneten
+	//Fachbereich holen
+	if(uid!='')
+	{
+		idx = tree.view.getParentIndex(tree.currentIndex);
+		col = tree.columns ? tree.columns["fachbereich-treecol-kurzbz"] : "fachbereich-treecol-kurzbz";
+		var kurzbz=tree.view.getCellText(idx,col);
+	}
 	// Lehrveranstaltung
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	try
 	{
-		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?fachbereich_kurzbz='+kurzbz+'&'+gettimestamp();
+		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?fachbereich_kurzbz='+kurzbz+'&uid='+uid+'&'+gettimestamp();
 		var treeLV=document.getElementById('lehrveranstaltung-tree');
 
 		//Alte DS entfernen
@@ -503,11 +514,6 @@ function onLektorSelect(event)
 
 		//Alte DS entfernen
 		var oldDatasources = treeLV.database.GetDataSources();
-		while(oldDatasources.hasMoreElements())
-		{
-			treeLV.database.RemoveDataSource(oldDatasources.getNext());
-		}
-
 		try
 		{
 			LvTreeDatasource.removeXMLSinkObserver(LvTreeSinkObserver);
@@ -515,6 +521,11 @@ function onLektorSelect(event)
 		}
 		catch(e)
 		{}
+		
+		while(oldDatasources.hasMoreElements())
+		{
+			treeLV.database.RemoveDataSource(oldDatasources.getNext());
+		}
 
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		LvTreeDatasource = rdfService.GetDataSource(url);
@@ -1080,4 +1091,27 @@ function PrintAccountInfoBlatt()
 	{
 		alert('Bitte zuerst Personen Auswaehlen');
 	}
+}
+
+// ****
+// * Aktualisiert den Fachbereich Tree
+// ****
+function FachbereichTreeRefresh()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	tree = document.getElementById('tree-fachbereich');
+	
+	var oldDatasources = tree.database.GetDataSources();	
+	while(oldDatasources.hasMoreElements())
+	{
+		tree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	tree.builder.rebuild();
+	
+	url = '<?php echo APP_ROOT; ?>rdf/fachbereich_menue.rdf.php?'+gettimestamp();
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var fb_datasource = rdfService.GetDataSource(url);
+	fb_datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	fb_datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	tree.database.AddDataSource(fb_datasource);
 }
