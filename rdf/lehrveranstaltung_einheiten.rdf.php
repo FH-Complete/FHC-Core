@@ -77,7 +77,7 @@ foreach ($stg_obj->result as $row)
 
 // LVAs holen
 $lvaDAO=new lehrveranstaltung($conn, null, true);
-if($uid!='') // Alle LVs eines Mitarbeiters
+if($uid!='' && $stg_kz!='') // Alle LVs eines Mitarbeiters
 {
 	//$lvaDAO->loadLVAfromMitarbeiter($stg_kz, $uid, $semester_aktuell);
 	$qry = "SELECT distinct on(lehrveranstaltung_id) * FROM campus.vw_lehreinheit WHERE
@@ -92,6 +92,8 @@ elseif($fachbereich_kurzbz!='') // Alle LVs eines Fachbereiches
 	$qry = "SELECT distinct on(lehrveranstaltung_id) * FROM campus.vw_lehreinheit WHERE
 	        studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
 	        fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."'";
+	if($uid!='')
+		$qry.=" AND mitarbeiter_uid='".addslashes($uid)."'";
 }
 else
 {

@@ -479,7 +479,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz'))
 			{
 				echo '<tree id="tree-verband" />';
-				echo '<tree id="tree-fachbereich" />';
+				echo '<vbox id="vbox-fachbereich" />';
 				echo '<tree id="tree-lektor" />';
 			}
 			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter'))

@@ -114,6 +114,11 @@ var studentDDObserver=
   			{
     			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
 				uid = tree.view.getCellText(v,col);
+				if(uid=='')
+				{
+					alert('Es koennen nur Personen mit UID (Studenten/Mitarbeiter) verschoben werden');
+					return false;
+				}
 				paramList += ';'+uid;
   			}
 		}

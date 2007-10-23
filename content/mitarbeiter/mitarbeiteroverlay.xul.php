@@ -165,7 +165,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterfunktionove
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#updateamum_iso"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-updatevonvon" label="Geaendert von" flex="1" persist="hidden, width, ordinal" hidden="true"
+			<treecol id="mitarbeiter-treecol-updatevon" label="Geaendert von" flex="1" persist="hidden, width, ordinal" hidden="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#updatevon"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
