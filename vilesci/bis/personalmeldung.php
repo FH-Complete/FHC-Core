@@ -25,5 +25,9 @@ $v='';
 
 $qry="SELECT * FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid) 
 	JOIN public.tbl_person USING(person_id) 
-	JOIN public.";
+	JOIN bis.tbl_bisverwendung USING (mitarbeiter_uid)  
+	LEFT JOIN bis.tbl_bisfunktion USING(bisverwendung_id) 
+	LEFT JOIN bis.tbl_entwicklungsteam USING(mitarbeiter_uid) 	
+	";
+//
 ?>

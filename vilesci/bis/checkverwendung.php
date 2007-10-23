@@ -310,7 +310,7 @@ if($resultall = pg_query($conn, $qryall))
 	{
 		$i++;
 		echo "<br><u>Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname.":</u><br>";
-		$qry="SELECT DISTINCT mitarbeiter_uid, nachname, vorname, besqualbez, habilitation, studiengang_kz, verwendung_code, tbl_bisverwendung.beginn as anfang, tbl_bisverwendung.ende as zuende
+		$qry="SELECT mitarbeiter_uid, nachname, vorname, besqualbez, habilitation, studiengang_kz, verwendung_code, tbl_bisverwendung.beginn as anfang, tbl_bisverwendung.ende as zuende
 			FROM bis.tbl_entwicklungsteam join bis.tbl_bisverwendung USING (mitarbeiter_uid) 
 		        	JOIN campus.vw_mitarbeiter ON (tbl_entwicklungsteam.mitarbeiter_uid=uid)
 		        	JOIN bis.tbl_besqual USING(besqualcode) 
