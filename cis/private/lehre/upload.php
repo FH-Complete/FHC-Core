@@ -161,7 +161,7 @@ A:hover {
 		            echo '<td align="middle" class="MarkLine" colSpan="5" height="49">';
 					  echo '<form method="post" action="" enctype="multipart/form-data">';
 
-					   if(!($num_rows_lector_dispatch > 0) && !$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('lehre'))
+					   if(!($num_rows_lector_dispatch > 0) && !$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('lehre') && !$rechte->isBerechtigt('assistenz'))
 					   {
 					   		die('<p align="center"><strong>Es konnten keine Studieng&auml;nge definiert werden!</strong></p>');
 					   }
@@ -239,7 +239,36 @@ A:hover {
 										$stg_arr[$row->studiengang_kz]=$row->kurzbz;
 							}
 						}
+						
+						//Assistenz Berechtigungen auf Studiengangsebene
+						if($rechte->isBerechtigt('assistenz'))
+						{
+							$arr = $rechte->getStgKz('assistenz');
 
+							if(isset($arr[0]) && $arr[0]==0) //Berechtigt fuer alle Stg
+							{
+								$sql_query="SELECT studiengang_kz, kurzbzlang, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM public.tbl_studiengang WHERE studiengang_kz<>0 ORDER BY kurzbz";
+								$result_stg=pg_exec($sql_conn,$sql_query);
+
+								while($row = pg_fetch_object($result_stg))
+									if(!array_key_exists($row->studiengang_kz,$stg_arr))
+										$stg_arr[$row->studiengang_kz]=$row->kurzbz;
+							}
+							else //Berechtigt fuer einen Teil der Studiengaenge
+							{
+								$ids='-1';
+								foreach ($arr as $elem)
+									$ids.=",'$elem'";
+
+								$sql_query = "SELECT studiengang_kz, kurzbzlang, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM public.tbl_studiengang WHERE studiengang_kz IN(".$ids.")";
+
+								$result_stg_kurzbzlang=pg_exec($sql_conn, $sql_query);
+								while($row = pg_fetch_object($result_stg_kurzbzlang))
+									if(!array_key_exists($row->studiengang_kz,$stg_arr))
+										$stg_arr[$row->studiengang_kz]=$row->kurzbz;
+							}
+						}
+						
 						//Lehre Berechtigung auf Fachbereichsebnene
 						if($rechte->isBerechtigt('lehre') || $rechte->isBerechtigt('admin'))
 						{
@@ -311,7 +340,7 @@ A:hover {
 
 					   $num_rows_lector_dispatch = pg_num_rows($result_lector_dispatch);
 
-					   if(!($num_rows_lector_dispatch > 0) && !$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('lehre'))
+					   if(!($num_rows_lector_dispatch > 0) && !$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('lehre') && !$rechte->isBerechtigt('assistenz'))
 							die('<p align="center"><strong<font size="2" face="Arial, Helvetica, sans-serif">Es konnten keine Semester definiert werden!</font></p>');
 
 
@@ -325,7 +354,7 @@ A:hover {
 					   		$sem_arr[]=$row->semester;
 
 					   //Alle Semester mit admin oder lehre Rechten
-					   if($rechte->isBerechtigt('admin',$course_id) || $rechte->isBerechtigt('lehre',$course_id))
+					   if($rechte->isBerechtigt('admin',$course_id) || $rechte->isBerechtigt('lehre',$course_id)|| $rechte->isBerechtigt('assistenz',$course_id))
 					   {
 					   		$sql_query= "SELECT max_semester FROM public.tbl_studiengang WHERE studiengang_kz=".$course_id;
 							$result_studiengang_semester=pg_exec($sql_conn, $sql_query);
@@ -397,12 +426,12 @@ A:hover {
 						              tbl_lehrveranstaltung.semester='$term_id' AND
 						              tbl_lehrveranstaltung.studiengang_kz='$course_id' AND tbl_lehrveranstaltung.lehre=true";
 						//Admin und Lehreberechtigung
-						if($rechte->isBerechtigt('admin',$course_id) || $rechte->isBerechtigt('lehre',$course_id) || $rechte->isBerechtigt('lehre',null,null,'0'))
+						if($rechte->isBerechtigt('admin',$course_id) || $rechte->isBerechtigt('lehre',$course_id) || $rechte->isBerechtigt('lehre',null,null,'0') || $rechte->isBerechtigt('assistenz',$course_id))
 						{
 							$sql_query = "SELECT DISTINCT lehreverzeichnis AS kuerzel, bezeichnung FROM lehre.tbl_lehrveranstaltung WHERE studiengang_kz='$course_id' AND semester='$term_id' AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>''";
 						}
 						//Fachbereichsberechtigung
-						if($rechte->isBerechtigt('lehre') || $rechte->isBerechtigt('admin'))
+						if($rechte->isBerechtigt('lehre') || $rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz'))
 						{
 							$arr=$rechte->getFbKz();
 							$ids='-1';

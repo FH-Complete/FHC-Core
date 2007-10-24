@@ -144,7 +144,7 @@
 			    <td class="tdvertical" align="center">
 				  <?php
 				  //Berechtigungen auf Fachbereichsebene
-				  $qry = "SELECT distinct fachbereich_kurzbz FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrfach USING (lehrfach_id) WHERE lehrveranstaltung_id='$lvid'";
+				  $qry = "SELECT distinct fachbereich_kurzbz, studiengang_kz FROM campus.vw_lehreinheit WHERE lehrveranstaltung_id='$lvid'";
 				  if(isset($angezeigtes_stsem) && $angezeigtes_stsem!='')
 				  	$qry .= " AND studiensemester_kurzbz='$angezeigtes_stsem'";
 
@@ -152,7 +152,7 @@
 				  {
 				  	while($row = pg_fetch_object($result))
 				  	{
-				  		if($rechte->isBerechtigt('lehre',null,null,$row->fachbereich_kurzbz))
+				  		if($rechte->isBerechtigt('lehre',null,null,$row->fachbereich_kurzbz) || $rechte->isBerechtigt('assistenz',$row->studiengang_kz))
 				  			$user_is_allowed_to_upload=true;
 				  	}
 				  }

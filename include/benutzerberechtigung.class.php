@@ -302,7 +302,9 @@ class benutzerberechtigung
 			if($fachbereich_kurzbz!=null)
 			{
 				//Wenn Fachbereichs oder Adminberechtigung
-				if(($berechtigung == $b->berechtigung_kurzbz || $b->berechtigung_kurzbz == 'admin') && ($b->fachbereich_kurzbz==$fachbereich_kurzbz || is_null($b->fachbereich_kurzbz)))
+				if(($berechtigung == $b->berechtigung_kurzbz || $b->berechtigung_kurzbz == 'admin') 
+				   && ($b->fachbereich_kurzbz==$fachbereich_kurzbz || is_null($b->fachbereich_kurzbz))
+				   && (is_null($b->studiengang_kz) || $b->studiengang_kz==$studiengang_kz))
 				{
 					if ($b->starttimestamp!=null && $b->endetimestamp!=null)
 					{
@@ -345,7 +347,8 @@ class benutzerberechtigung
 			//Wenn Berechtigung mit Studiengang und der richtigen BerechtigungsArt (suid) vorhanden ist
 			if	($berechtigung==$b->berechtigung_kurzbz
 			     && ($studiengang_kz==$b->studiengang_kz || is_null($b->studiengang_kz))
-			     && strstr($b->art,$art))
+			     && strstr($b->art,$art)
+			     && is_null($b->fachbereich_kurzbz))
 				if ($b->starttimestamp!=null && $b->endetimestamp!=null)
 				{
 					if ($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp)
