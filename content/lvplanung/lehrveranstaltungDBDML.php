@@ -361,7 +361,7 @@ if(!$error)
 		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz 
 				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach 
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
+				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id=(SELECT lehreinheit_id FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id='".addslashes($_POST['lehreinheitgruppe_id'])."')";
 		if($result = pg_query($conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
@@ -512,7 +512,7 @@ if(!$error)
 			$return = false;
 			$errormsg = 'Lehreinheit wurde nicht gefunden';
 		}
-		
+	
 		if(!$error)
 		{
 			$leDAO=new lehreinheit($conn, null, true);
@@ -529,13 +529,13 @@ if(!$error)
 					
 					if(!$rechte->isBerechtigt('admin', $studiengang_kz, 'suid') && 
 					   !$rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid') &&
-				       !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz) &&
-				       !$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz))
+				       !$rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid', $fachbereich_kurzbz)) /*&&
+				       !$rechte->isBerechtigt('admin', $studiengang_kz, 'suid', $fachbereich_kurzbz))*/
 					{
 						$error = true;
 						$return = false;
 						$errormsg = 'Keine Berechtigung';
-					}					
+					}
 				}
 				else 
 				{

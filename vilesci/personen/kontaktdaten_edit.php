@@ -63,7 +63,7 @@ td
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
 
-if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('mitarbeiter'))
+if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('mitarbeiter') && !$rechte->isBerechtigt('assistenz'))
 	die('Sie haben keine Berechtigung fuer diese Seite');
 
 $person_id = (isset($_GET['person_id'])?$_GET['person_id']:'');

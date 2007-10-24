@@ -20,18 +20,9 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-// ****************************************
-// * Insert/Update/Delete
-// * der Lehreinheiten
-// *
-// * Script sorgt fuer den Datenbanzugriff
-// * fuer das XUL - Lehreinheiten-Modul
-// *
-// * Derzeitige Funktionen:
-// * - Lehreinheitmitarbeiter Zuteilung hinzufuegen/bearbeiten/loeschen
-// * - Lehreinheitgruppe Zutelung hinzufuegen/loeschen
-// * - Lehreinheit anlegen/bearbeiten/loeschen
-// ****************************************
+// *********************************************
+// * Datenbankschnittstelle fuer FAS und Tempus
+// *********************************************
 
 require_once('../vilesci/config.inc.php');
 require_once('../include/functions.inc.php');
@@ -55,7 +46,7 @@ $error = false;
 //Berechtigungen laden
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
-if(!$rechte->isBerechtigt('admin'))
+if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz'))
 {
 	$return = false;
 	$errormsg = 'Keine Berechtigung';
@@ -97,23 +88,33 @@ if(!$error)
 		//Fuegt eine Lkt Funktion zu einem Studiengang/Mitarbeiter hinzu
 		if(isset($_POST['uid']) && isset($_POST['studiengang_kz']))
 		{
-			$obj = new benutzerfunktion($conn);
-			$obj->uid = $_POST['uid'];
-			$obj->studiengang_kz = $_POST['studiengang_kz'];
-			$obj->funktion_kurzbz = 'lkt';
-			$obj->updateamum = date('Y-m-d H:i:s');
-			$obj->updatevon = $user;
-			$obj->insertamum = date('Y-m-d H:i:s');
-			$obj->insertvon = $user;
-
-			if($obj->save(true))
+			if(!$rechte->isBerechtigt('admin', $_POST['studiengang_kz'],'suid') &&
+			   !$rechte->isBerechtigt('assistenz', $_POST['studiengang_kz'],'suid'))
 			{
-				$return = true;
+				$return = false;
+				$error = true;
+				$errormsg = 'keine Berechtigung';
 			}
 			else
 			{
-				$return = false;
-				$errormsg = $obj->errormsg;
+				$obj = new benutzerfunktion($conn);
+				$obj->uid = $_POST['uid'];
+				$obj->studiengang_kz = $_POST['studiengang_kz'];
+				$obj->funktion_kurzbz = 'lkt';
+				$obj->updateamum = date('Y-m-d H:i:s');
+				$obj->updatevon = $user;
+				$obj->insertamum = date('Y-m-d H:i:s');
+				$obj->insertvon = $user;
+	
+				if($obj->save(true))
+				{
+					$return = true;
+				}
+				else
+				{
+					$return = false;
+					$errormsg = $obj->errormsg;
+				}
 			}
 		}
 		else
@@ -127,25 +128,36 @@ if(!$error)
 		//Loescht eine Lektorfunktion
 		if(isset($_POST['uid']) && isset($_POST['studiengang_kz']))
 		{
-			$obj = new benutzerfunktion($conn);
-			//Benutzerfunktion suchen
-			if($obj->getBentuzerFunktion($_POST['uid'], 'lkt', $_POST['studiengang_kz']))
+			
+			if(!$rechte->isBerechtigt('admin', $_POST['studiengang_kz'],'suid') &&
+			   !$rechte->isBerechtigt('assistenz', $_POST['studiengang_kz'],'suid'))
 			{
-				//Benutzerfunktion loeschen
-				if($obj->delete($obj->benutzerfunktion_id))
+				$return = false;
+				$error = true;
+				$errormsg = 'keine Berechtigung';
+			}
+			else
+			{
+				$obj = new benutzerfunktion($conn);
+				//Benutzerfunktion suchen
+				if($obj->getBentuzerFunktion($_POST['uid'], 'lkt', $_POST['studiengang_kz']))
 				{
-					$return = true;
+					//Benutzerfunktion loeschen
+					if($obj->delete($obj->benutzerfunktion_id))
+					{
+						$return = true;
+					}
+					else
+					{
+						$return = false;
+						$errormsg = $obj->errormsg;
+					}
 				}
 				else
 				{
 					$return = false;
 					$errormsg = $obj->errormsg;
 				}
-			}
-			else
-			{
-				$return = false;
-				$errormsg = $obj->errormsg;
 			}
 		}
 		else

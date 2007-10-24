@@ -44,7 +44,7 @@ $rechte->getBerechtigungen($user);
 <body>
 <h2>Personal - Funktionen - Import</h2>
 <?php
-if(!$rechte->isBerechtigt('mitarbeiter','0') && !$rechte->isBerechtigt('admin','0'))
+if(!$rechte->isBerechtigt('mitarbeiter') && !$rechte->isBerechtigt('admin'))
 	die('Sie haben nicht die erforderlichen Rechte zum Importieren der Personaldaten');
 	
 $anzahl_personen_gesamt=0;
