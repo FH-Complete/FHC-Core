@@ -25,6 +25,9 @@ $erhalter='';
 $eteam=array();
 $studiensemester=new studiensemester($conn);
 $ssem=$studiensemester->getaktorNext();
+$datei='';
+
+$datumobj=new datum();
 
 if(strstr($ssem,"WS"))
 {
@@ -61,11 +64,13 @@ if($result = pg_query($conn, $qry))
 	}
 }
 
-$qry="SELECT * FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid) 
+$qry="SET client_encoding TO Unicode;SELECT DISTINCT ON (UID) * FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid) 
 	JOIN public.tbl_person USING(person_id)   
-	WHERE aktiv AND bismelden AND (ende>now() OR ende IS NULL)  
+	WHERE tbl_benutzer.aktiv AND bismelden AND personalnummer>0
+	ORDER BY uid, nachname,vorname   
 	";
 /*
+	AND (ende>now() OR ende IS NULL)
 	bis.tbl_bisverwendung USING (mitarbeiter_uid)
 	bis.tbl_bisfunktion USING(bisverwendung_id) 
 	bis.tbl_entwicklungsteam USING(mitarbeiter_uid) 
@@ -77,7 +82,7 @@ if($result = pg_query($conn, $qry))
 	$datei.="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <Erhalter>
    <ErhKz>".$erhalter."</ErhKz>
-   <MeldeDatum>".$bisdatum."</MeldeDatum>
+   <MeldeDatum>".date("dmY", $datumobj->mktime_fromdate($bisdatum))."</MeldeDatum>
    <PersonalMeldung>";
 	while($row = pg_fetch_object($result))
 	{
@@ -89,15 +94,16 @@ if($result = pg_query($conn, $qry))
 				$eteam[$rowet->studiengang_kz]=$rowet->besqualcode;
 			}
 		}
-		$datei.="<Person>
-      <PersonalNummer>".sprintf("%15s",$row->personalnummer)."</PersonalNummer>
-      <GeburtsDatum>".$row->gebdatum."</GeburtsDatum>
-      <Geschlecht>".$row->geschlecht."</Geschlecht>
+		$datei.="
+     <Person>
+      <PersonalNummer>".sprintf("%015s",$row->personalnummer)."</PersonalNummer>
+      <GeburtsDatum>".date("dmY", $datumobj->mktime_fromdate($row->gebdatum))."</GeburtsDatum>
+      <Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>
       <HoechsteAbgeschlosseneAusbildung>".$row->ausbildungcode."</HoechsteAbgeschlosseneAusbildung>";
-		$qryvw="SELECT * FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid='".$row->mitarbeiter_uid."' WHERE habilitation=true;";
+		$qryvw="SELECT * FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid='".$row->mitarbeiter_uid."' AND habilitation=true;";
 		if($resultvw=pg_query($conn,$qryvw))
 		{
-			if(pg_num_rows($result_vw)>0)
+			if(pg_num_rows($resultvw)>0)
 			{
 				$datei.="
        <Habilitation>J</Habilitation>";
@@ -114,11 +120,11 @@ if($result = pg_query($conn, $qry))
 			while($rowvw=pg_fetch_object($resultvw))
 			{
 				$datei.="
-           <Verwendung>
-	   <BeschaeftigungsArt1>".$rowvw->bacode1."</BeschaeftigungsArt1>
-              <BeschaeftigungsArt2>".$rowvw->bacode2."</BeschaeftigungsArt2>
+       <Verwendung>
+              <BeschaeftigungsArt1>".$rowvw->ba1code."</BeschaeftigungsArt1>
+              <BeschaeftigungsArt2>".$rowvw->ba2code."</BeschaeftigungsArt2>
               <BeschaeftigungsAusmass>".$rowvw->beschausmasscode."</BeschaeftigungsAusmass>
-              <VerwendungsCode>".$row->verwendung_code."</VerwendungsCode>";
+              <VerwendungsCode>".$rowvw->verwendung_code."</VerwendungsCode>";
 				//Studiengangsleiter
 				$qryslt="SELECT * FROM public.tbl_benutzerfunktion WHERE uid='".$row->mitarbeiter_uid."' AND funktion_kurzbz='stgl';";
 				if($resultslt=pg_query($conn,$qryslt))
@@ -128,7 +134,7 @@ if($result = pg_query($conn, $qry))
 						$datei.="
                      <StgLeitung>
                           <StgKz>".sprintf("%04s",$rowslt->studiengang_kz)."</StgKz>
-                     <StgLeitung>";
+                     </StgLeitung>";
 					}
 				}
 				//Funktionen
@@ -140,8 +146,18 @@ if($result = pg_query($conn, $qry))
 						$datei.="
                     <Funktion>
                        <StgKz>".sprintf("%04s",$rowfkt->studiengang_kz)."</StgKz>
-                       <SWS>$rowfkt->sws</SWS>
-                       <Hauptberuflich>$rowvw->hauptberuflich=='t'?'J':'N'</Hauptberuflich>";
+                       <SWS>".$rowfkt->sws."</SWS>";
+						if($rowvw->hauptberuflich)
+						{
+							$datei.="
+                       <Hauptberuflich>J</Hauptberuflich>";
+						}
+						else 
+						{
+							$datei.="
+                       <Hauptberuflich>N</Hauptberuflich>
+                       <HauptberufCode>".$rowvw->hauptberufcode."</HauptberufCode>";
+						}
 						if(isset($eteam[$rowfkt->studiengang_kz]))
 						{
 							$datei.="
@@ -157,7 +173,7 @@ if($result = pg_query($conn, $qry))
                     </Funktion>";
 					}
 				}
-				$datei."
+				$datei.="
              </Verwendung>";
 			}
 		}
@@ -172,13 +188,12 @@ echo '	<html><head><title>BIS - Meldung Mitarbeiter</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 	</head><body>';
-echo "<H1>BIS - Mitarbeiterdaten werden überprüft!</H1>\n";
+echo "<H1>BIS - Mitarbeiterdaten werden &uuml;berpr&uuml;ft!</H1>\n";
 //echo "<H2>Nicht plausible BIS-Daten (für Meldung ".$ssem."): </H2><br>";
 echo nl2br($v."\n\n");
 
 //Tabelle mit Ergebnissen ausgeben
 
-	
 $ddd='bisdaten/bismeldung_mitarbeiter.xml';
 	$dateiausgabe=fopen($ddd,'w');
 	fwrite($dateiausgabe,$datei);
