@@ -22,6 +22,7 @@ $stgart='';
 $fehler='';
 $v='';
 $erhalter='';
+$zaehl=0;
 $eteam=array();
 $studiensemester=new studiensemester($conn);
 $ssem=$studiensemester->getaktorNext();
@@ -66,9 +67,10 @@ if($result = pg_query($conn, $qry))
 
 $qry="SET client_encoding TO Unicode;SELECT DISTINCT ON (UID) * FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid) 
 	JOIN public.tbl_person USING(person_id)   
-	WHERE tbl_benutzer.aktiv AND bismelden AND personalnummer>0
+	WHERE tbl_benutzer.aktiv AND bismelden AND personalnummer>1 AND mitarbeiter_uid!='_DummyLektor' 
 	ORDER BY uid, nachname,vorname   
 	";
+
 /*
 	AND (ende>now() OR ende IS NULL)
 	bis.tbl_bisverwendung USING (mitarbeiter_uid)
@@ -76,6 +78,7 @@ $qry="SET client_encoding TO Unicode;SELECT DISTINCT ON (UID) * FROM public.tbl_
 	bis.tbl_entwicklungsteam USING(mitarbeiter_uid) 
 	public.tbl_benutzerfunktion
 */
+
 if($result = pg_query($conn, $qry))
 {
 	
@@ -93,6 +96,39 @@ if($result = pg_query($conn, $qry))
 			{
 				$eteam[$rowet->studiengang_kz]=$rowet->besqualcode;
 			}
+		}
+		if($row->gebdatum=='' || $row->gebdatum==NULL)
+		{
+			if($error_log!='')
+			{
+				$error_log.=", Geburtsdatum ('".$row->gebdatum."')";
+			}
+			else 
+			{
+				$error_log="Geburtsdatum ('".$row->gebdatum."')";
+			} 
+		}
+		if($row->geschlecht=='' || $row->geschlecht==NULL)
+		{
+			if($error_log!='')
+			{
+				$error_log.=", Geschlecht ('".$row->geschlecht."')";
+			}
+			else 
+			{
+				$error_log="Geschlecht ('".$row->geschlecht."')";
+			} 
+		}
+		if($row->ausbildungcode=='' || $row->ausbildungcode==NULL)
+		{
+			if($error_log!='')
+			{
+				$error_log.=", HoechsteAbgeschlosseneAusbildung ('".$row->ausbildungcode."')";
+			}
+			else 
+			{
+				$error_log="HoechsteAbgeschlosseneAusbildung ('".$row->ausbildungcode."')";
+			} 
 		}
 		$datei.="
      <Person>
@@ -119,6 +155,50 @@ if($result = pg_query($conn, $qry))
 		{
 			while($rowvw=pg_fetch_object($resultvw))
 			{
+				if($rowvw->ba1code=='' || $rowvw->ba1code==NULL)
+				{
+					if($error_log!='')
+					{
+						$error_log.=", Beschaeftigungsart1 ('".$rowvw->ba1code."')";
+					}
+					else 
+					{
+						$error_log="Beschaeftigungsart1 ('".$rowvw->ba1code."')";
+					} 
+				}
+				if($rowvw->ba2code=='' || $rowvw->ba2code==NULL)
+				{
+					if($error_log!='')
+					{
+						$error_log.=", Beschaeftigungsart2 ('".$rowvw->ba2code."')";
+					}
+					else 
+					{
+						$error_log="Beschaeftigungsart2 ('".$rowvw->ba2code."')";
+					} 
+				}
+				if($rowvw->beschausmasscode=='' || $rowvw->beschausmasscode==NULL)
+				{
+					if($error_log!='')
+					{
+						$error_log.=", BeschaeftigungsAusmass ('".$rowvw->beschausmasscode."')";
+					}
+					else 
+					{
+						$error_log="BeschaeftigungsAusmass ('".$rowvw->beschausmasscode."')";
+					} 
+				}
+				if($rowvw->verwendung_code=='' || $rowvw->verwendung_code==NULL)
+				{
+					if($error_log!='')
+					{
+						$error_log.=", VerwendungsCode ('".$rowvw->verwendung_code."')";
+					}
+					else 
+					{
+						$error_log="VerwendungsCode ('".$rowvw->verwendung_code."')";
+					} 
+				}
 				$datei.="
        <Verwendung>
               <BeschaeftigungsArt1>".$rowvw->ba1code."</BeschaeftigungsArt1>
@@ -131,6 +211,17 @@ if($result = pg_query($conn, $qry))
 				{
 					while($rowslt=pg_fetch_object($resultslt))
 					{
+						if($rowslt->studiengang_kz=='' || $rowslt->studiengang_kz==NULL)
+						{
+							if($error_log!='')
+							{
+								$error_log.=", StgKz(Leitung) ('".$rowslt->studiengang_kz."')";
+							}
+							else 
+							{
+								$error_log="StgKz(Leitung) ('".$rowslt->studiengang_kz."')";
+							} 
+						}
 						$datei.="
                      <StgLeitung>
                           <StgKz>".sprintf("%04s",$rowslt->studiengang_kz)."</StgKz>
@@ -143,6 +234,64 @@ if($result = pg_query($conn, $qry))
 				{
 					while($rowfkt=pg_fetch_object($resultfkt))
 					{
+						if($rowfkt->studiengang_kz=='' || $rowfkt->studiengang_kz==NULL)
+						{
+							if($error_log!='')
+							{
+								$error_log.=", StgKz(Funktion) ('".$rowfkt->studiengang_kz."')";
+							}
+							else 
+							{
+								$error_log="StgKz(Funktion) ('".$rowfkt->studiengang_kz."')";
+							} 
+						}
+						if($rowfkt->sws=='' || $rowfkt->sws==NULL)
+						{
+							if($error_log!='')
+							{
+								$error_log.=", SWS ('".$rowfkt->sws."')";
+							}
+							else 
+							{
+								$error_log="SWS ('".$rowfkt->sws."')";
+							} 
+						}
+						if($rowvw->hauptberuflich=='' || $rowvw->hauptberuflich==NULL)
+						{
+							if($error_log!='')
+							{
+								$error_log.=", Hauptberuflich ('".$rowvw->hauptberuflich."')";
+							}
+							else 
+							{
+								$error_log="Hauptberuflich ('".$rowvw->hauptberuflich."')";
+							} 
+						}
+						if(($rowvw->hauptberufcode=='' || $rowvw->hauptberufcode==NULL) && $rowvw->hauptberuflich)
+						{
+							if($error_log!='')
+							{
+								$error_log.=", HauptberufCode ('".$rowvw->hauptberufcode."')";
+							}
+							else 
+							{
+								$error_log="HauptberufCode ('".$rowvw->hauptberufcode."')";
+							} 
+						}
+						if (isset($eteam[$rowfkt->studiengang_kz]))
+						{
+							if(($eteam[$rowfkt->studiengang_kz]=='' || $eteam[$rowfkt->studiengang_kz]==NULL))
+							{
+								if($error_log!='')
+								{
+									$error_log.=", BesondereQualifikationCode ('".$eteam[$rowfkt->studiengang_kz]."')";
+								}
+								else 
+								{
+									$error_log="BesondereQualifikationCode ('".$eteam[$rowfkt->studiengang_kz]."')";
+								} 
+							}
+						}
 						$datei.="
                     <Funktion>
                        <StgKz>".sprintf("%04s",$rowfkt->studiengang_kz)."</StgKz>
@@ -179,17 +328,29 @@ if($result = pg_query($conn, $qry))
 		}
 		$datei.="
          </Person>";
+		if($error_log!='' OR $error_log1!='')
+		{
+			$v.="<u>Bei Mitarbeiter (PersNr, UID, Vorname, Nachname) '".$row->personalnummer."','".$row->mitarbeiter_uid."', '".$row->nachname."', '".$row->vorname."': </u>\n";
+			if($error_log!='')
+			{
+				$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Es fehlt: ".$error_log."\n";
+			}
+			$zaehl++;
+			$v.="\n";
+			$error_log='';
+		}
 	}
 	$datei.="
       </PersonalMeldung>
 </Erhalter>";
 }
+
 echo '	<html><head><title>BIS - Meldung Mitarbeiter</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 	</head><body>';
 echo "<H1>BIS - Mitarbeiterdaten werden &uuml;berpr&uuml;ft!</H1>\n";
-//echo "<H2>Nicht plausible BIS-Daten (für Meldung ".$ssem."): </H2><br>";
+echo "<H2>Nicht plausible BIS-Daten (f&uuml;r Meldung ".$ssem."): </H2><br>";
 echo nl2br($v."\n\n");
 
 //Tabelle mit Ergebnissen ausgeben
