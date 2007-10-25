@@ -290,7 +290,24 @@ elseif ($xmlformat=='xml')
 	$pruefung = new abschlusspruefung($conn, null, false);
 	echo "\n<abschlusspruefung>\n";
 
-	if(isset($_GET['student_uid']))
+	if(isset($_GET['uid']))
+	{
+		$uids = explode(';',$_GET['uid']);
+
+		foreach ($uids as $uid) 
+		{
+			if($uid!='')
+			{
+				$pruefung = new abschlusspruefung($conn, null, false);
+				if($pruefung->getAbschlusspruefungen($uid))
+				{
+					foreach ($pruefung->result as $row)
+						draw_content_xml($row);
+				}
+			}
+		}
+	}
+	elseif(isset($_GET['student_uid']))
 	{
 		$pruefung->getAbschlusspruefungen($_GET['student_uid']);
 

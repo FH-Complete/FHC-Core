@@ -542,7 +542,70 @@ function StudentAbschlusspruefungLoeschen()
 }
 
 // ***** AUSDRUCKE ***** //
+// ****
+// * Druckt das Pruefungsprotokoll fuer mehrere Studenten auf einmal aus.
+// * wenn mehrere Abschlusspruefungen angelegt sind, dann wird fuer jede Abschlusspruefung
+// * ein Protokoll gedruckt.
+// * Den Typ (Bakk/Dipl) des Protokolls bestimmt der zuletzt markierte.
+// ****
+function StudentAbschlusspruefungPrintPruefungsprotokollMultiple()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-abschlusspruefung-tree');
 
+	//Typ der ersten Abschlusspruefung des zuletzt markierten Studenten (der von dem die Daten geladen wurden) holen
+	try
+	{
+		var col = tree.columns ? tree.columns["student-abschlusspruefung-treecol-pruefungstyp_kurzbz"] : "student-abschlusspruefung-treecol-pruefungstyp_kurzbz";
+		var pruefungstyp_kurzbz=tree.view.getCellText(0,col);
+	}
+	catch(e)
+	{
+		alert('Der zuletzt markierte Student hat keine Abschlusspruefungen');
+		return false;
+	}
+	
+	if(pruefungstyp_kurzbz=='')
+	{
+		alert('Der zuletzt markierte Student hat keine Abschlusspruefungen');
+		return false;
+	}
+	
+	if(pruefungstyp_kurzbz=='Bachelor')
+		xsl='PrProtokollBakk';
+	else
+		xsl='PrProtokollDipl';
+
+	var tree = document.getElementById('student-tree');
+	
+	if (tree.currentIndex==-1)
+		return;
+
+	//Uids aller markierten Studenten holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
+	var anzahl=0;
+	var uids='';
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+			uid = ';'+tree.view.getCellText(v,col);
+			uids = uids + uid;
+			anzahl++;
+		}
+	}
+
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid='+uids,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+
+// ****
+// * Druckt das Pruefungsprotokoll fuer eine bestimmte Abschlusspruefung
+// ****
 function StudentAbschlusspruefungPrintPruefungsprotokoll()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -569,6 +632,70 @@ function StudentAbschlusspruefungPrintPruefungsprotokoll()
 	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&abschlusspruefung_id='+abschlusspruefung_id,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
+// ****
+// * Druckt das Pruefungszeugnis fuer mehrere Studenten auf einmal aus.
+// * wenn mehrere Abschlusspruefungen angelegt sind, dann wird fuer jede Abschlusspruefung
+// * ein Zeugnis gedruckt.
+// * Den Typ (Bakk/Dipl) des Zeugnisses bestimmt der zuletzt markierte.
+// ****
+function StudentAbschlusspruefungPrintPruefungszeugnisMultiple()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-abschlusspruefung-tree');
+
+	//Typ der ersten Abschlusspruefung des zuletzt markierten Studenten (der von dem die Daten geladen wurden) holen
+	try
+	{
+		var col = tree.columns ? tree.columns["student-abschlusspruefung-treecol-pruefungstyp_kurzbz"] : "student-abschlusspruefung-treecol-pruefungstyp_kurzbz";
+		var pruefungstyp_kurzbz=tree.view.getCellText(0,col);
+	}
+	catch(e)
+	{
+		alert('Der zuletzt markierte Student hat keine Abschlusspruefungen');
+		return false;
+	}
+	
+	if(pruefungstyp_kurzbz=='')
+	{
+		alert('Der zuletzt markierte Student hat keine Abschlusspruefungen');
+		return false;
+	}
+	
+	if(pruefungstyp_kurzbz=='Bachelor')
+		xsl='Bakkzeugnis';
+	else
+		xsl='Diplomzeugnis';
+
+	var tree = document.getElementById('student-tree');
+	
+	if (tree.currentIndex==-1)
+		return;
+
+	//Uids aller markierten Studenten holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
+	var anzahl=0;
+	var uids='';
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+			uid = ';'+tree.view.getCellText(v,col);
+			uids = uids + uid;
+			anzahl++;
+		}
+	}
+
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid='+uids,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+
+// ****
+// * Pruefungszeugnis fuer eine bestimmte Abschlusspruefung drucken
+// ****
 function StudentAbschlusspruefungPrintPruefungszeugnis()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -595,6 +722,75 @@ function StudentAbschlusspruefungPrintPruefungszeugnis()
 	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&abschlusspruefung_id='+abschlusspruefung_id,'PruefungsZeugnis', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
+// ****
+// * Druckt die Urkunde fuer eine Abschlusspruefung fuer mehrere Studenten auf einmal aus.
+// * wenn mehrere Abschlusspruefungen angelegt sind, dann wird fuer jede Abschlusspruefung
+// * eine Urkunde gedruckt.
+// * Den Typ (Bakk/Dipl) der Urkunde bestimmt der zuletzt markierte Student.
+// ****
+function StudentAbschlusspruefungPrintUrkundeMultiple(sprache)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-abschlusspruefung-tree');
+
+	//Typ der ersten Abschlusspruefung des zuletzt markierten Studenten (der von dem die Daten geladen wurden) holen
+	try
+	{
+		var col = tree.columns ? tree.columns["student-abschlusspruefung-treecol-pruefungstyp_kurzbz"] : "student-abschlusspruefung-treecol-pruefungstyp_kurzbz";
+		var pruefungstyp_kurzbz=tree.view.getCellText(0,col);
+	}
+	catch(e)
+	{
+		alert('Der zuletzt markierte Student hat keine Abschlusspruefungen');
+		return false;
+	}
+	
+	if(pruefungstyp_kurzbz=='')
+	{
+		alert('Der zuletzt markierte Student hat keine Abschlusspruefungen');
+		return false;
+	}
+	
+	if(pruefungstyp_kurzbz=='Bachelor' && sprache=='deutsch')
+		xsl='Bakkurkunde';
+	else if(pruefungstyp_kurzbz=='Bachelor' && sprache=='englisch')
+		xsl='BakkurkundeEng';
+	else if(pruefungstyp_kurzbz=='Diplom' && sprache=='deutsch')
+		xsl='Diplomurkunde';
+	else if(pruefungstyp_kurzbz=='Diplom' && sprache=='englisch')
+		xsl='DiplomurkundeEng';
+
+	var tree = document.getElementById('student-tree');
+	
+	if (tree.currentIndex==-1)
+		return;
+
+	//Uids aller markierten Studenten holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
+	var anzahl=0;
+	var uids='';
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+			uid = ';'+tree.view.getCellText(v,col);
+			uids = uids + uid;
+			anzahl++;
+		}
+	}
+
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid='+uids,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+
+// ****
+// * Druckt eine Urkunde zu der ausgewaehlten Abschlusspruefung
+// * die Sprache der Urkunde wird als Parameter uebergeben
+// ****
 function StudentAbschlusspruefungPrintUrkunde(sprache)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
