@@ -136,6 +136,18 @@
 <!ENTITY menu-dokumente-accountinfoblatt.label	"Account InfoBlatt">
 <!ENTITY menu-dokumente-accountinfoblatt.accesskey	"A">
 
+<!ENTITY menu-dokumente-pruefungsprotokoll.label		"Pruefungsprotokoll">
+<!ENTITY menu-dokumente-pruefungsprotokoll.accesskey	"P">
+
+<!ENTITY menu-dokumente-pruefungszeugnis.label		"Pruefungszeugnis">
+<!ENTITY menu-dokumente-pruefungszeugnis.accesskey	"Z">
+
+<!ENTITY menu-dokumente-urkunde_deutsch.label		"Urkunde Deutsch">
+<!ENTITY menu-dokumente-urkunde_deutsch.accesskey	"D">
+
+<!ENTITY menu-dokumente-urkunde_englisch.label		"Urkunde Englisch">
+<!ENTITY menu-dokumente-urkunde_englisch.accesskey	"E">
+
 <!-- Extras -->
 <!ENTITY menu-extras.label		"Extras">
 <!ENTITY menu-extras.accesskey	"X">

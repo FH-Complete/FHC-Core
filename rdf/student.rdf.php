@@ -36,6 +36,7 @@ function convdate($date)
 
 		if($filter2=='dokumente')
 		{
+			// Alle Personen die noch nicht alle Dokumente gebracht haben
 			$qry = "SELECT count(*) as anzahl FROM public.tbl_dokumentstudiengang WHERE
 					dokument_kurzbz NOT IN(
 						SELECT dokument_kurzbz FROM tbl_dokumentprestudent WHERE prestudent_id='$row->prestudent_id')
@@ -47,6 +48,7 @@ function convdate($date)
 		}
 		elseif($filter2=='konto')
 		{
+			// Alle Personen bei die noch offene Buchungen haben
 			$qry = "SELECT sum(betrag) as summe FROM tbl_konto WHERE person_id='$row->person_id'";
 			if($result_filter = pg_query($conn, $qry))
 				if($row_filter = pg_fetch_object($result_filter))
@@ -55,13 +57,18 @@ function convdate($date)
 		}
 		elseif($filter2=='studiengebuehr')
 		{
+			// Alle Personen die keine Studiengebuehrbelastung haben 
+			// Incoming werden nicht beruecksichtigt
+			$prestudent = new prestudent($conn, null, null);
+			$prestudent->getLastStatus($row->prestudent_id);
+			
 			$qry = "SELECT count(*) as anzahl FROM public.tbl_konto WHERE 
 						studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND 
 						person_id='".addslashes($row->person_id)."' AND 
 						buchungstyp_kurzbz='Studiengebuehr'";
 			if($result_filter = pg_query($conn, $qry))
 				if($row_filter = pg_fetch_object($result_filter))
-					if($row_filter->anzahl>0)
+					if($row_filter->anzahl>0 || $prestudent->rolle_kurzbz=='Incoming')
 						return false;
 		}
 		return true;

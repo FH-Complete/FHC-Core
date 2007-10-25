@@ -96,7 +96,11 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-dokumente-diplsupplement:command" oncommand="StudentCreateDiplSupplement();"/>
   <command id="menu-dokumente-studienerfolg-normal:command" oncommand="StudentCreateStudienerfolg();"/>
   <command id="menu-dokumente-studienerfolg-finanzamt:command" oncommand="StudentCreateStudienerfolg('finanzamt');"/>
-  <command id="menu-dokumente-accountinfoblatt:command" oncommand="PrintAccountInfoBlatt();"/>
+  <command id="menu-dokumente-accountinfoblatt:command" oncommand="PrintAccountInfoBlatt();"/>  
+  <command id="menu-dokumente-pruefungsprotokoll:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple();"/>
+  <command id="menu-dokumente-pruefungszeugnis:command" oncommand="StudentAbschlusspruefungPrintPruefungszeugnisMultiple();"/>
+  <command id="menu-dokumente-urkunde_deutsch:command" oncommand="StudentAbschlusspruefungPrintUrkundeMultiple('deutsch')"/>
+  <command id="menu-dokumente-urkunde_englisch:command" oncommand="StudentAbschlusspruefungPrintUrkundeMultiple('englisch')"/>
   <command id="menu-extras-reihungstest:command" oncommand="ExtrasShowReihungstest();"/>
   <command id="menu-extras-firma:command" oncommand="ExtrasShowFirmenverwaltung();"/>
   <command id="menu-extras-lvverwaltung:command" oncommand="ExtrasShowLVverwaltung();"/>
@@ -117,9 +121,10 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
      observes  =  "menu-file-close:command"
      modifiers =  "accel" />
 </keyset>
-
+<!-- MENUE -->
 <toolbox id="main-toolbox">
   <menubar id="menu" >
+  <!-- DATEI -->
     <menu id="menu-file" label="&menu-file.label;" accesskey="&menu-file.accesskey;">
       <menupopup id="menu-file-popup">
         <menuitem
@@ -130,6 +135,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
            accesskey = "&menu-file-close.accesskey;"/>
       </menupopup>
     </menu>
+    <!-- BEARBEITEN -->
     <menu id="menu-edit" label="&menu-edit.label;" accesskey="&menu-edit.accesskey;" onclick="loadUndoList();">
       <menupopup id="menu-edit-popup">
         <menu id="menu-edit-undo" label="&menu-edit-undo.label;"
@@ -148,6 +154,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
         </menu>
       </menupopup>
     </menu>
+    <!-- EINSTELLUNGEN -->
     <menu id="menu-prefs" label="&menu-prefs.label;" accesskey="&menu-prefs.accesskey;">
 		<menupopup id="menu-prefs-popup">
 			<menu id="menu-prefs-stpltable" label="&menu-prefs-stpltable.label;" accesskey="&menu-prefs-stpltable.accesskey;">
@@ -199,6 +206,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
    			 />
 	    </menupopup>
     </menu>
+    <!-- BERICHTE -->
     <menu id="menu-statistic" label="&menu-statistic.label;" accesskey="&menu-statistic.accesskey;">
           <menupopup id="menu-statistic-popup">
             <menuitem
@@ -297,6 +305,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                accesskey = "&menu-statistic-bewerberstatistik.accesskey;"/>-->
           </menupopup>
     </menu>
+    <!-- DOKUMENTE -->
     <menu id="menu-dokumente" label="&menu-dokumente.label;" accesskey="&menu-dokumente.accesskey;">
           <menupopup id="menu-dokumente-popup">
             <menuitem
@@ -368,8 +377,34 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                label     = "&menu-dokumente-accountinfoblatt.label;"
                command   =  "menu-dokumente-accountinfoblatt:command"
                accesskey = "&menu-dokumente-accountinfoblatt.accesskey;"/>
+			<menuseparator/>
+			<menuitem
+               id        =  "menu-dokumente-pruefungsprotokoll"
+               key       =  "menu-dokumente-pruefungsprotokoll:key"
+               label     = "&menu-dokumente-pruefungsprotokoll.label;"
+               command   =  "menu-dokumente-pruefungsprotokoll:command"
+               accesskey = "&menu-dokumente-pruefungsprotokoll.accesskey;"/>
+			<menuitem
+               id        =  "menu-dokumente-pruefungszeugnis"
+               key       =  "menu-dokumente-pruefungszeugnis:key"
+               label     = "&menu-dokumente-pruefungszeugnis.label;"
+               command   =  "menu-dokumente-pruefungszeugnis:command"
+               accesskey = "&menu-dokumente-pruefungszeugnis.accesskey;"/>
+			<menuitem
+               id        =  "menu-dokumente-urkunde_deutsch"
+               key       =  "menu-dokumente-urkunde_deutsch:key"
+               label     = "&menu-dokumente-urkunde_deutsch.label;"
+               command   =  "menu-dokumente-urkunde_deutsch:command"
+               accesskey = "&menu-dokumente-urkunde_deutsch.accesskey;"/>
+			<menuitem
+               id        =  "menu-dokumente-urkunde_englisch"
+               key       =  "menu-dokumente-urkunde_englisch:key"
+               label     = "&menu-dokumente-urkunde_englisch.label;"
+               command   =  "menu-dokumente-urkunde_englisch:command"
+               accesskey = "&menu-dokumente-urkunde_englisch.accesskey;"/>
           </menupopup>
     </menu>
+    <!-- EXTRAS -->
     <menu id="menu-extras" label="&menu-extras.label;" accesskey="&menu-extras.accesskey;">
           <menupopup id="menu-extras-popup">
             <menuitem
@@ -392,6 +427,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                accesskey = "&menu-extras-lvverwaltung.accesskey;"/>
           </menupopup>
     </menu>
+    <!-- BIS -->
     <menu id="menu-bis" label="&menu-bis.label;" accesskey="&menu-bis.accesskey;">
 		<menupopup id="menu-bis-popup">
             <menu id="menu-bis-mitarbeiter" label="&menu-bis-mitarbeiter.label;" accesskey="&menu-bis-mitarbeiter.accesskey;">
@@ -440,6 +476,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 			</menu>
 		</menupopup>
     </menu>
+    <!-- HILFE -->
     <menu id="menu-help" label="&menu-help.label;" accesskey="&menu-help.accesskey;">
           <menupopup id="menu-about-popup">
             <menuitem
@@ -458,6 +495,9 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
     </menu>
   </menubar>
 </toolbox>
+<!-- MENUE ENDE -->
+
+<!-- TABS -->
 <hbox flex="1">
 	<tabbox id="tabbox-left" orient="vertical" flex="1">
 		<tabs id="menu-content-tabs" orient="horizontal">
@@ -494,6 +534,8 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 	</splitter>
 	<vbox id="vbox-main" flex="15" />
 </hbox>
+<!-- TABS ENDE -->
+<!-- STATUSBAR -->
 <statusbar id="status-bar" persist="collapsed">
 	<statusbarpanel class="statusbarpanel-iconic" id="logo-icon" />
 	<statusbarpanel id="statusbarpanel-semester" label="<?php echo $semester_aktuell; ?>"/>
