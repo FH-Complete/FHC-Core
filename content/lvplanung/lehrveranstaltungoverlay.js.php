@@ -41,7 +41,8 @@ var lehrveranstaltungNotenTreeDatasource; //Datasource des Noten Trees
 var lehrveranstaltungNotenSelectUID=null; //UID des Noten Eintrages der nach dem Refresh markiert werden soll
 var lehrveranstaltungLvGesamtNotenTreeDatasource; //Datasource des Noten Trees
 var lehrveranstaltungLvGesamtNotenSelectUID=null; //LehreinheitID des Noten Eintrages der nach dem Refresh markiert werden soll
-
+var lehrveranstaltungNotenTreeloaded=false;
+var lehrveranstaltungGesamtNotenTreeloaded=false;
 // ********** Observer und Listener ************* //
 
 // ****
@@ -153,6 +154,7 @@ var LehrveranstaltungNotenTreeSinkObserver =
 	onError : function(pSink, pStatus, pError) {},
 	onEndLoad : function(pSink)
 	{
+		lehrveranstaltungNotenTreeloaded=false;
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 		document.getElementById('lehrveranstaltung-noten-tree').builder.rebuild();
 	}
@@ -170,6 +172,7 @@ var LehrveranstaltungNotenTreeListener =
   	  //timeout nur bei Mozilla notwendig da sonst die rows
   	  //noch keine values haben. Ab Seamonkey funktionierts auch
   	  //ohne dem setTimeout
+  	  lehrveranstaltungNotenTreeloaded=true;
       window.setTimeout(LehrveranstaltungNotenTreeSelectID,10);
   }
 };
@@ -187,6 +190,7 @@ var LehrveranstaltungLvGesamtNotenTreeSinkObserver =
 	onError : function(pSink, pStatus, pError) {},
 	onEndLoad : function(pSink)
 	{
+		lehrveranstaltungGesamtNotenTreeloaded=false;
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 		document.getElementById('lehrveranstaltung-lvgesamtnoten-tree').builder.rebuild();
 	}
@@ -204,6 +208,7 @@ var LehrveranstaltungLvGesamtNotenTreeListener =
   	  //timeout nur bei Mozilla notwendig da sonst die rows
   	  //noch keine values haben. Ab Seamonkey funktionierts auch
   	  //ohne dem setTimeout
+  	  lehrveranstaltungGesamtNotenTreeloaded=true;
       window.setTimeout(LehrveranstaltungLvGesamtNotenTreeSelectID,10);
   }
 };
@@ -655,7 +660,10 @@ function LeAuswahl()
 	document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe').hidden=false;
 	document.getElementById('lehrveranstaltung-detail-label-lehreinheitgruppe').hidden=false;
 	document.getElementById('lehrveranstaltung-tab-lektor').collapsed=false;
-
+	
+	lehrveranstaltungNotenTreeloaded=false;
+	lehrveranstaltungGesamtNotenTreeloaded=false;
+	
 	if (tree.currentIndex==-1) return;
 	try
 	{
@@ -671,7 +679,7 @@ function LeAuswahl()
 			//Neu Button aktivieren
 			document.getElementById('lehrveranstaltung-toolbar-neu').disabled=false;
 			document.getElementById('lehrveranstaltung-toolbar-del').disabled=true;
-
+			
 			//Noten Tab aktivieren
 			LehrveranstaltungNotenDisableFields(false);
 
@@ -1312,10 +1320,67 @@ function LehrveranstaltungNotenLoad(lehrveranstaltung_id)
 }
 
 // ****
+// * Selectiert die Noten im LVGesamtNoteTree welche nicht gleich denen 
+// * im ZeugnisNoteTree sind
+// ****
+function LehrveranstaltungGesamtNotenTreeSelectDifferent()
+{
+	var zeugnistree = document.getElementById("lehrveranstaltung-noten-tree");
+	var lvgesamttree = document.getElementById("lehrveranstaltung-lvgesamtnoten-tree");
+
+	if(lehrveranstaltungNotenTreeloaded && lehrveranstaltungGesamtNotenTreeloaded)
+	{
+		lvgesamttree.view.selection.clearSelection();
+		if(lvgesamttree.view)
+			var lvgesamtitems = lvgesamttree.view.rowCount; //Anzahl der Zeilen ermitteln
+		else
+			return false;
+			
+		if(zeugnistree.view)
+			var zeugnisitems = zeugnistree.view.rowCount; //Anzahl der Zeilen ermitteln
+		else
+			return false;
+			
+		for(var i=0;i<lvgesamtitems;i++)
+	   	{
+	   		//Daten aus LVGesamtNotenTree holen
+			col = lvgesamttree.columns ? lvgesamttree.columns["lehrveranstaltung-lvgesamtnoten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
+			var lvgesamtuid=lvgesamttree.view.getCellText(i,col);
+			col = lvgesamttree.columns ? lvgesamttree.columns["lehrveranstaltung-lvgesamtnoten-tree-note"] : "lehrveranstaltung-lvgesamtnoten-tree-note";
+			var lvgesamtnote=lvgesamttree.view.getCellText(i,col);
+
+			found=false;
+			//Schauen ob die gleiche Zeile im Zeugnisnoten Tree vorkommt
+			for(var j=0;j<zeugnisitems;j++)
+			{
+				col = zeugnistree.columns ? zeugnistree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-lvgesamtnoten-tree-student_uid";
+				var zeugnisuid=zeugnistree.view.getCellText(j,col);
+				col = zeugnistree.columns ? zeugnistree.columns["lehrveranstaltung-noten-tree-note"] : "lehrveranstaltung-noten-tree-note";
+				var zeugnisnote=zeugnistree.view.getCellText(j,col);
+				debug(zeugnisuid+'=='+lvgesamtuid+' && '+zeugnisnote+'=='+lvgesamtnote);
+				if(zeugnisuid==lvgesamtuid && zeugnisnote==lvgesamtnote)
+				{
+					found=true;
+					break;
+				}
+			}
+			
+			if(!found)
+			{
+				//Zeile markieren
+				lvgesamttree.view.selection.rangedSelect(i,i,true);
+			}
+	   	}
+	}
+}
+
+// ****
 // * Markiert einen Eintrag im LVGesamtNotenTree
 // ****
 function LehrveranstaltungLvGesamtNotenTreeSelectID()
 {
+	LehrveranstaltungGesamtNotenTreeSelectDifferent();
+/*
 	var tree=document.getElementById('lehrveranstaltung-lvgesamtnoten-tree');
 	if(tree.view)
 		var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
@@ -1342,7 +1407,7 @@ function LehrveranstaltungLvGesamtNotenTreeSelectID()
 				return true;
 			}
 	   	}
-	}
+	}*/
 }
 
 // ****
@@ -1350,6 +1415,8 @@ function LehrveranstaltungLvGesamtNotenTreeSelectID()
 // ****
 function LehrveranstaltungNotenTreeSelectID()
 {
+	LehrveranstaltungGesamtNotenTreeSelectDifferent();
+	/*
 	var tree=document.getElementById('lehrveranstaltung-noten-tree');
 	if(tree.view)
 		var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
@@ -1376,7 +1443,7 @@ function LehrveranstaltungNotenTreeSelectID()
 				return true;
 			}
 	   	}
-	}
+	}*/
 }
 
 // ****
