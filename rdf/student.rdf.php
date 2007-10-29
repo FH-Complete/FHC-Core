@@ -67,7 +67,7 @@ function convdate($date)
 		}
 		elseif($filter2=='konto')
 		{
-			// Alle Personen bei die noch offene Buchungen haben
+			// Alle Personen die offene Buchungen haben
 			$qry = "SELECT sum(betrag) as summe FROM tbl_konto WHERE person_id='$row->person_id'";
 			if($result_filter = pg_query($conn, $qry))
 				if($row_filter = pg_fetch_object($result_filter))
