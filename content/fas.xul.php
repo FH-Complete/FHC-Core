@@ -96,6 +96,8 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-dokumente-diplsupplement:command" oncommand="StudentCreateDiplSupplement();"/>
   <command id="menu-dokumente-studienerfolg-normal:command" oncommand="StudentCreateStudienerfolg();"/>
   <command id="menu-dokumente-studienerfolg-finanzamt:command" oncommand="StudentCreateStudienerfolg('finanzamt');"/>
+  <command id="menu-dokumente-studienerfolg-allesemester-normal:command" oncommand="StudentCreateStudienerfolg('', '', 'true');"/>
+  <command id="menu-dokumente-studienerfolg-allesemester-finanzamt:command" oncommand="StudentCreateStudienerfolg('finanzamt', '', 'true');"/>
   <command id="menu-dokumente-accountinfoblatt:command" oncommand="PrintAccountInfoBlatt();"/>  
   <command id="menu-dokumente-pruefungsprotokoll:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple();"/>
   <command id="menu-dokumente-pruefungszeugnis:command" oncommand="StudentAbschlusspruefungPrintPruefungszeugnisMultiple();"/>
@@ -328,6 +330,22 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                accesskey = "&menu-dokumente-diplsupplement.accesskey;"/>
             <menu id="menu-dokumente-studienerfolg" label="&menu-dokumente-studienerfolg.label;" accesskey="&menu-dokumente-studienerfolg.accesskey;">
 	          <menupopup id="menu-dokumente-studienerfolg-popup">
+	          <menu id="menu-dokumente-studienerfolg-allesemester" label="&menu-dokumente-studienerfolg-allesemester.label;">
+				  <menupopup id="menu-dokumente-studienerfolg-allesemester-popup">
+				    <menuitem
+				       id        =  "menu-dokumente-studienerfolg-allesemester-normal"
+				       key       =  "menu-dokumente-studienerfolg-allesemester-normal:key"
+				       label     = "&menu-dokumente-studienerfolg-allesemester-normal.label;"
+				       command   =  "menu-dokumente-studienerfolg-allesemester-normal:command"
+				       accesskey = "&menu-dokumente-studienerfolg-allesemester-normal.accesskey;"/>
+				   	<menuitem
+				       id        =  "menu-dokumente-studienerfolg-allesemester-finanzamt"
+				       key       =  "menu-dokumente-studienerfolg-allesemester-finanzamt:key"
+				       label     = "&menu-dokumente-studienerfolg-allesemester-finanzamt.label;"
+				       command   =  "menu-dokumente-studienerfolg-allesemester-finanzamt:command"
+				       accesskey = "&menu-dokumente-studienerfolg-allesemester-finanzamt.accesskey;"/>
+				    </menupopup>
+				</menu>
 	          <?php
 	          
 	          $qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ende<now() ORDER BY ende DESC LIMIT 5";

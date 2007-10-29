@@ -133,6 +133,14 @@
 <!ENTITY menu-dokumente-studienerfolg-finanzamt.label	"Finanzamt">
 <!ENTITY menu-dokumente-studienerfolg-finanzamt.accesskey	"F">
 
+<!ENTITY menu-dokumente-studienerfolg-allesemester.label	"Alle Semester">
+
+<!ENTITY menu-dokumente-studienerfolg-allesemester-normal.label	"Normal">
+<!ENTITY menu-dokumente-studienerfolg-allesemester-normal.accesskey	"N">
+
+<!ENTITY menu-dokumente-studienerfolg-allesemester-finanzamt.label	"Finanzamt">
+<!ENTITY menu-dokumente-studienerfolg-allesemester-finanzamt.accesskey	"F">
+
 <!ENTITY menu-dokumente-accountinfoblatt.label	"Account InfoBlatt">
 <!ENTITY menu-dokumente-accountinfoblatt.accesskey	"A">
 
