@@ -392,24 +392,50 @@ if(!$error)
 		
 		if(!$error)
 		{
-			//Lehreinheitgruppezuteilung loeschen
-			if(isset($_POST['lehreinheitgruppe_id']) && is_numeric($_POST['lehreinheitgruppe_id']))
-			{			
-				$leg = new lehreinheitgruppe($conn);
-				if($leg->delete($_POST['lehreinheitgruppe_id']))
+			$qry = "SELECT count(*) as anzahl FROM lehre.tbl_lehreinheitgruppe, lehre.tbl_lehreinheit, campus.tbl_uebung WHERE
+					tbl_lehreinheitgruppe.lehreinheitgruppe_id='".addslashes($_POST['lehreinheitgruppe_id'])."' AND
+					tbl_lehreinheitgruppe.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
+					tbl_lehreinheit.lehreinheit_id=tbl_uebung.lehreinheit_id";
+			if($result = pg_query($conn, $qry))
+			{
+				if($row = pg_fetch_object($result))
 				{
-					$return = true;
+					if($row->anzahl>0)	
+					{
+						$error = true;
+						$return = false;
+						$errormsg = 'Diese Gruppe kann nicht geloescht werden da bereits Kreuzerllisten angelegt wurden';
+					}
+				}
+			}
+			else 
+			{
+				$error = true;
+				$retur = false;
+				$errormsg = 'Fehler beim Ermitteln ob eine Kreuzerlliste vorhanden ist';
+			}
+			
+			if(!$error)
+			{
+				//Lehreinheitgruppezuteilung loeschen
+				if(isset($_POST['lehreinheitgruppe_id']) && is_numeric($_POST['lehreinheitgruppe_id']))
+				{			
+					$leg = new lehreinheitgruppe($conn);
+					if($leg->delete($_POST['lehreinheitgruppe_id']))
+					{
+						$return = true;
+					}
+					else
+					{
+						$return = false;
+						$errormsg = $leg->errormsg;
+					}
 				}
 				else
 				{
 					$return = false;
-					$errormsg = $leg->errormsg;
+					$errormsg = 'Fehler beim Loeschen der Zuordnung';
 				}
-			}
-			else
-			{
-				$return = false;
-				$errormsg = 'Fehler beim loeschen der Zuordnung';
 			}
 		}
 	}
