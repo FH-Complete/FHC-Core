@@ -11,8 +11,6 @@ require('../../include/studiensemester.class.php');
 require('../../include/datum.class.php');
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
-$conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
-
 
 
 $error_log='';
