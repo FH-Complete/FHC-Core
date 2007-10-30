@@ -26,6 +26,7 @@ require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerlvstudiensemester.class.php');
 require_once('../../include/gruppe.class.php');
 require_once('../../include/benutzergruppe.class.php');
+require_once('../../include/studiensemester.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
    die("Konnte Verbindung zur Datenbank nicht herstellen");
@@ -37,10 +38,13 @@ if (isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
 	$stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:$_POST['stg_kz']);
 else
 	$stg_kz=0;
+
+$stsem_obj = new studiensemester($conn);
+
 if (isset($_REQUEST["stsem"]))
 	$stsem = $_REQUEST["stsem"];
 else
-	$stsem = "WS2007";
+	$stsem = $stsem_obj->getakt();
 
 if (isset($_REQUEST["lvid"]))
 	$lvid = $_REQUEST["lvid"];
@@ -59,6 +63,9 @@ else
 
 if(!is_numeric($stg_kz))
 	$stg_kz=0;
+
+
+
 
 if (isset($_REQUEST["grp_in"]) && $gruppe != "")
 {
@@ -145,7 +152,7 @@ function selectAll()
 </head>
 <body class="Background_main">
 <?php
-
+	
 	echo "<H2>Freif&auml;cher Teilnehmer-Verwaltung</H2>";
 	echo "<form name='auswahl' method='POST' action='freifach.php'>";
 	echo "<table>";
@@ -200,6 +207,19 @@ function selectAll()
 	}
 	echo "</select>";
 	
+	echo "<select name='stsem' onchange='document.auswahl.submit();'>";;
+	$stsem_obj->getAll();	
+
+	foreach($stsem_obj->studiensemester AS $strow)
+	{
+		if ($stsem == $strow->studiensemester_kurzbz)
+			$sel = " selected";
+		else
+			$sel = "";
+		echo "	 <option value='".$strow->studiensemester_kurzbz."'".$sel.">".$strow->studiensemester_kurzbz."</option>";
+
+	}
+	echo "</select>";
 	echo "</td></tr>";
 	echo "<tr>";
 	echo "<td valign='top' id='anmeldungen'>";
