@@ -5,353 +5,639 @@
   <link href="../skin/vilesci.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-	<h1 style="text-align: center;">ToDo Fas-Online</h1>
-	&nbsp;&nbsp;&nbsp;&nbsp;
-	Priorit&auml;ten gehen von 1-3. &nbsp;&nbsp;&nbsp;&nbsp; 1 bedeuted niedrig, 3 bedeuted hoch!.
-	<br><br>
-	<h2>Themen f&uuml;r das n&auml;chste FAS-Meeting</h2>
-	<ul>
-		<li>Wahlpflichtf&auml;cher</li>
-		<li>Sponsionsdatum und Pr&uuml;fungsdatum f&uuml;r mehrere Zuteilen</li>
-		<li>Bachelorarbeit: 1. und 2. Erkennen (Anmerkung)</li>
-	</ul>
-	<!-- ********************* Aenderunge und Erweiterungen ******************************************-->
-	<h2>&Auml;nderungen / Erweiterungen</h2>
-	<!-- Studenten -->
-	<div style='margin-left:5%;'>
-	<table class='liste'>
-		<tr>
-			<th>Allgemein</th>
-			<th>Priorit&auml;t</th>
-		</tr>
-		<tr class='liste0'>
-			<td>PDF/Excel-Generierung. Open als Vorauswahl an stelle von Speichern.</td>
-			<td align='center'>1</td>
-		<tr>
-		<tr class='liste1'>
-			<td></td>
-			<td align='center'>2</td>
-		<tr>
-	</table>
-	<BR>
-	<table class='liste'>
-		<tr>
-			<th>Studenten-Modul</th>
-			<th>Priorit&auml;t</th>
-		</tr>
-		<tr class='liste0'>
-			<td>Feld zum &Auml;ndern des Alias von Studenten</td>
-			<td align='center'>2</td>
-		<tr>
-		<tr class='liste1'>
-			<td>Wunsch: SVNR 4stellig: gesamte Nummer wird dann aus dem Geburtsdatum konstruiert. </td>
-			<td align='center'>1</td>
-		<tr>
-		<tr class='liste0'>
-			<td>Wunsch: statt WS2007 soll WS2007/08 stehen</td>
-			<td align='center'>1</td>
-		<tr>
-		<tr class='liste1'>
-			<td>Nach Eingabe einer Nachpr&uuml;fung soll die Zeugnisnote automatisch angepasst werden</td>
-			<td align='center'>2</td>
-		<tr>
-		<tr class='liste0'>
-			<td>Nachpr&uuml;fung (2.Termin) soll auch vom Lektor &uuml;ber das CIS verwaltet werden koennen. Zeugnisnote wird hier nicht automatisch angepasst.</td>
-			<td align='center'>2</td>
-		<tr>
-		<tr class='liste1'>
-			<td>Note automatisch bei Projektarbeit aufgrund der Punkte.</td>
-			<td align='center'>2</td>
-		<tr>
-		<tr class='liste0'>
-			<td>Betreuerdaten &auml;ndern.</td>
-			<td align='center'>2</td>
-		<tr>
-		<tr class='liste1'>
-			<td>RT-Punkte in FAS übernehmen.(Button neben Eingabefeld)</td>
-			<td align='center'>1</td>
-		<tr>
-		<tr class='liste0'>
-			<td>autom. Mail an Absolventen und Abbrecher</td>
-			<td align='center'>1</td>
-		<tr>
-		<tr class='liste1'>
-			<td>Prüfungsnote autom. als Zeugnisnote übernehmen. (Nur im FAS, nicht im CIS!)</td>
-			<td align='center'>1</td>
-		<tr>
-		<tr class='liste0'>
-			<td>2. Termin vom Lektor im CIS anlegbar.</td>
-			<td align='center'>1</td>
-		<tr>
-		<tr class='liste1'>
-			<td>Beim Anlegen vom 2. Termin wird automatisch ein 1.Termin mit alter Zeugnisnote angelegt.</td>
-			<td align='center'>1</td>
-		<tr>
-		<tr class='liste0'>
-			<td>LV-Note in der Noten&uuml;bersicht des Studenten nicht sichtbar.(CIS)</td>
-			<td align='center'>1</td>
-		<tr>
-		<tr class='liste1'>
-			<td>Neue Interessentrolle bei bereits vorhandenen PreStudenten anlegbar.</td>
-			<td align='center'>1</td>
-		<tr>
-		<tr class='liste0'>
-			<td></td>
-			<td align='center'>1</td>
-		<tr>
-	</table>
-	<br>
-	<!-- Mitarbeiter -->
-	<table class='liste'>
-		<tr>
-			<th>Mitarbeiter-Modul</th>
-			<th>Priorit&auml;t</th>
-		</tr>
-		<tr class='liste0'>
-			<td></td>
-			<td align='center'>1</td>
-		<tr>
-		<tr class='liste1'>
-			<td></td>
-			<td align='center'>2</td>
-		<tr>
-	</table>
-	<!-- Lehrveranstaltung -->
-	<table class='liste'>
-		<tr>
-			<th>Lehrveranstaltung-Modul</th>
-			<th>Priorit&auml;t</th>
-		</tr>
-		<tr class='liste0'>
-			<td></td>
-			<td align='center'>3</td>
-		<tr>
-		<tr class='liste1'>
-			<td></td>
-			<td align='center'>2</td>
-		<tr>
-	</table>
-	</div>
-	<br>
-
-	<!-- ********************* Fehler ******************************************-->
-	<h2>Fehler</h2>
-	<!-- Allgemein -->
-	<div style='margin-left:5%;'>
-	<table class='liste'>
-		<tr>
-			<th>Allgemein</th>
-			<th>Priorit&auml;t</th>
-		</tr>
-		<tr class='liste0'>
-			<td>Beim Starten kommt manchmal folgende Fehlermeldung in der Errorconsole: Error: can't decode principals (failure code 8007000e)</td>
-			<td align='center'>1</td>
-		<tr>
-		<tr class='liste1'>
-			<td></td>
-			<td align='center'>2</td>
-		<tr>
-	</table>
-	<br>
-	<!-- Studenten -->
-	<table class='liste'>
-		<tr>
-			<th>Studenten-Modul</th>
-			<th>Priorit&auml;t</th>
-		</tr>
-		<tr class='liste0'>
-			<td></td>
-			<td align='center'>2</td>
-		<tr>
-		<tr class='liste1'>
-			<td></td>
-			<td align='center'>2</td>
-		<tr>
-	</table>
-	<br>
-	<!-- Mitarbeiter -->
-	<table class='liste'>
-		<tr>
-			<th>Mitarbeiter-Modul</th>
-			<th>Priorit&auml;t</th>
-		</tr>
-		<tr class='liste0'>
-			<td> </td>
-			<td align='center'>1</td>
-		<tr>
-		<tr class='liste1'>
-			<td></td>
-			<td align='center'>2</td>
-		<tr>
-	</table>
-	</div>
+<h1 style="text-align: center;">ToDo Fas-Online</h1>
 <br>
-
+<h2>Themen f&uuml;r das n&auml;chste FAS-Meeting am 13.Nov um 11:00 Uhr
+im SEM 5.36<br>
+</h2>
+<ul>
+  <li>Wahlpflichtf&auml;cher</li>
+  <li>Sponsionsdatum und Pr&uuml;fungsdatum f&uuml;r mehrere Zuteilen</li>
+  <li>Bachelorarbeit: 1. und 2. Erkennen (&uuml;ber die Anmerkung)</li>
+</ul>
+<!-- ********************* Aenderunge und Erweiterungen ******************************************-->
+<h2>&Auml;nderungen / Erweiterungen</h2>
+<div style="text-align: right;">&nbsp;&nbsp;&nbsp;&nbsp;
+Priorit&auml;ten: low,med,high<br>
+<!-- Studenten -->
+</div>
+<div style="margin-left: 5%;">
+<table class="liste">
+  <tbody>
+    <tr>
+      <th>Allgemein</th>
+      <th>Priorit&auml;t</th>
+    </tr>
+    <tr class="liste0">
+      <td>PDF/Excel-Generierung. Open als Vorauswahl an stelle von
+Speichern.</td>
+      <td align="center">low<br>
+      </td>
+    </tr>
+    <tr>
+    </tr>
+    <tr class="liste1">
+      <td>Rumkugeln in dem FAS-Meetings<br>
+      </td>
+      <td style="font-weight: bold;" align="center">high</td>
+    </tr>
+    <tr>
+    </tr>
+  </tbody>
+</table>
+<br>
+<table class="liste">
+  <tbody>
+    <tr>
+      <th>Studenten-Modul</th>
+      <th>Priorit&auml;t</th>
+    </tr>
+    <tr class="liste0">
+      <td>Feld zum &Auml;ndern des Alias von Studenten</td>
+      <td align="center">low </td>
+    </tr>
+    <tr>
+    </tr>
+    <tr class="liste1">
+      <td>Wunsch: SVNR 4stellig: gesamte Nummer wird dann aus dem
+Geburtsdatum konstruiert. </td>
+      <td align="center">low </td>
+    </tr>
+    <tr>
+    </tr>
+    <tr class="liste0">
+      <td>Wunsch: statt WS2007 soll WS2007/08 stehen</td>
+      <td align="center">med<br>
+      </td>
+    </tr>
+    <tr>
+    </tr>
+    <tr class="liste1">
+      <td>Pr&uuml;fungsnote autom. als Zeugnisnote &uuml;bernehmen.
+(Nur im FAS, nicht im CIS!)</td>
+      <td style="font-weight: bold; color: rgb(0, 0, 0);" align="center">high
+      </td>
+    </tr>
+    <tr>
+    </tr>
+    <tr class="liste0">
+      <td>Nachpr&uuml;fung (2.Termin) soll auch vom Lektor &uuml;ber
+das CIS verwaltet werden koennen. Zeugnisnote wird hier nicht
+automatisch angepasst.</td>
+      <td style="font-weight: bold; color: rgb(0, 0, 0);" align="center">high
+      </td>
+    </tr>
+    <tr>
+    </tr>
+    <tr class="liste1">
+      <td>Beim Anlegen vom 2. Termin wird automatisch ein 1.Termin mit
+alter Zeugnisnote angelegt.</td>
+      <td style="font-weight: bold;" align="center">high</td>
+    </tr>
+    <tr>
+    </tr>
+    <tr class="liste0">
+      <td>Note automatisch bei Projektarbeit aufgrund der Punkte. </td>
+      <td align="center">med<br>
+      </td>
+    </tr>
+    <tr>
+    </tr>
+    <tr class="liste1">
+      <td>RT-Punkte in FAS &uuml;bernehmen.(Button neben Eingabefeld)</td>
+      <td align="center">low </td>
+    </tr>
+    <tr>
+    </tr>
+    <tr class="liste0">
+      <td>autom. Mail an Absolventen und Abbrecher</td>
+      <td align="center">low </td>
+    </tr>
+    <tr>
+    </tr>
+    <tr class="liste1">
+      <td>Interessentenimport: Ab 1. Oktober soll n&auml;chstes WS
+vorgeschlagen werden.<br>
+      </td>
+      <td style="font-weight: bold;" align="center">high</td>
+    </tr>
+    <tr>
+    </tr>
+    <tr class="liste0">
+      <td>Betreuerdaten &auml;ndern. (Update)</td>
+      <td align="center">AG</td>
+    </tr>
+    <tr>
+    </tr>
+    <tr class="liste1">
+      <td>Studienerfolgsbest&auml;tigung &uuml;ber CIS<br>
+      </td>
+      <td align="center"><br>
+      </td>
+    </tr>
+    <tr>
+    </tr>
+    <tr class="liste0">
+      <td>LV-Note in der Noten&uuml;bersicht des Studenten nicht
+sichtbar.(CIS)</td>
+      <td align="center">med<br>
+      </td>
+    </tr>
+    <tr>
+    </tr>
+    <tr class="liste1">
+      <td>Neue Interessentrolle bei bereits vorhandenen PreStudenten
+anlegbar.</td>
+      <td align="center">med </td>
+    </tr>
+    <tr>
+    </tr>
+    <tr class="liste0">
+      <td>mehrere Zeugnise archivieren.<br>
+      </td>
+      <td align="center">med </td>
+    </tr>
+    <tr>
+    </tr>
+    <tr class="liste1">
+      <td>Zahlungsbest&auml;tigung &uuml;ber CIS.<br>
+      </td>
+      <td align="center"><br>
+      </td>
+    </tr>
+    <tr>
+    </tr>
+    <tr class="liste0">
+      <td><br>
+      </td>
+      <td align="center"><br>
+      </td>
+    </tr>
+    <tr>
+    </tr>
+  </tbody>
+</table>
+<br>
+<!-- Mitarbeiter -->
+<table class="liste">
+  <tbody>
+    <tr>
+      <th>Mitarbeiter-Modul</th>
+      <th>Priorit&auml;t</th>
+    </tr>
+    <tr class="liste0">
+      <td>Mitarbeiter: Excel-Export f&uuml;r markierte; wie bei
+Studenten<br>
+      </td>
+      <td align="center"><br>
+      </td>
+    </tr>
+    <tr>
+    </tr>
+    <tr class="liste1">
+      <td><br>
+      </td>
+      <td align="center"><br>
+      </td>
+    </tr>
+    <tr>
+    </tr>
+  </tbody>
+</table>
+<!-- Lehrveranstaltung -->
+<table class="liste">
+  <tbody>
+    <tr>
+      <th>Lehrveranstaltung-Modul</th>
+      <th>Priorit&auml;t</th>
+    </tr>
+    <tr class="liste0">
+      <td>Lehrauftr&auml;ge f&uuml;r Fachbereich.<br>
+      </td>
+      <td align="center"><br>
+      </td>
+    </tr>
+    <tr>
+    </tr>
+    <tr class="liste1">
+      <td><br>
+      </td>
+      <td align="center"><br>
+      </td>
+    </tr>
+    <tr>
+    </tr>
+  </tbody>
+</table>
+</div>
+<br>
+<!-- ********************* Fehler ******************************************-->
+<h2>Fehler</h2>
+<!-- Allgemein -->
+<div style="margin-left: 5%;">
+<table class="liste">
+  <tbody>
+    <tr>
+      <th>Allgemein</th>
+      <th>Priorit&auml;t</th>
+    </tr>
+    <tr class="liste0">
+      <td>Beim Starten kommt manchmal folgende Fehlermeldung in der
+Errorconsole: Error: can't decode principals (failure code 8007000e)</td>
+      <td align="center">low</td>
+    </tr>
+    <tr>
+    </tr>
+    <tr class="liste1">
+      <td><br>
+      </td>
+      <td align="center"><br>
+      </td>
+    </tr>
+    <tr>
+    </tr>
+  </tbody>
+</table>
+<br>
+<!-- Studenten -->
+<table class="liste">
+  <tbody>
+    <tr>
+      <th>Studenten-Modul</th>
+      <th>Priorit&auml;t</th>
+    </tr>
+    <tr class="liste0">
+      <td><br>
+      </td>
+      <td align="center"><br>
+      </td>
+    </tr>
+    <tr>
+    </tr>
+    <tr class="liste1">
+      <td><br>
+      </td>
+      <td align="center"><br>
+      </td>
+    </tr>
+    <tr>
+    </tr>
+  </tbody>
+</table>
+<br>
+<!-- Mitarbeiter -->
+<table class="liste">
+  <tbody>
+    <tr>
+      <th>Mitarbeiter-Modul</th>
+      <th>Priorit&auml;t</th>
+    </tr>
+    <tr class="liste0">
+      <td> <br>
+      </td>
+      <td align="center"><br>
+      </td>
+    </tr>
+    <tr>
+    </tr>
+    <tr class="liste1">
+      <td><br>
+      </td>
+      <td align="center"><br>
+      </td>
+    </tr>
+    <tr>
+    </tr>
+  </tbody>
+</table>
+</div>
+<br>
 <!-- ********************* Erledigt ******************************************-->
 <hr>
 <h2>Erledigte Anforderungen</h2>
 <ul>
-<li>L&ouml;schen der Gruppenzuteilung zu einer Lehreinheit verhindern wenn bereits eine Kreuzerlliste angelegt wurde.<br>
-29.10.2007 oesi<br><br></li>
-<li>Studienerfolgsbestaetigung ausdrucken fuer alle Semester die der Student besucht hat<br>
-29.10.2007 oesi<br><br></li>
-<li>im Filter offene Buchungen scheinen Personen ohne Buchungen (Belastungen) auf<br>
-25.10.2007 oesi<br><br></li>
-<li>Beim Filtern nach bezahlter Studiengebühr sollen Incoming nicht aufscheinen da diese keine Studiengebühr zahlen müssen<br>
-25.10.2007 oesi<br><br></li>
-<li>Pruefungsprotokoll und Urkunde sollen für mehrere Studenten auf einmal druckbar sein<br>
-25.10.2007 oesi<br><br></li>
-<li>Berechtigungsfehler beim Zuordnen eines Lektors zu einem Studiengang und beim Anlegen von Firmenbetreuern<br>
-24.10.2007 oesi<br><br></li>
-<li>Ueberarbeitung des Fachbereichs-Tab und Fachbereichsberechtigungen<br>
-24.10.2007 oesi<br><br></li>
-<li>Beim Zuordnen eines Interessenten/Bewerbers zu einer Spezialgruppe erscheint nun eine Fehlermeldung<br>
-23.10.2007 oesi<br><br></li>
-<li>Fehler beim Export der Mitarbeiterdaten behoben (Fehler beim Export der Spalte "Geaendert Von")<br>
-22.10.2007 oesi<br><br></li>
-<li>Neuer Menüpunkt Extras->Lehrveranstaltungsverwaltung zur Verwaltung der LV-Daten und FBK auf LV-Ebene<br>
-22.10.2007 oesi<br><br></li>
-<li>Mail an Mitarbeiter senden wenn das <b>aktiv</b>-Feld veraendert wird<br>
-19.10.2007 oesi<br><br></li>
-<li>Bei Notenverwaltung die Unterschiedlichen Noten markieren (Studenten und LVA)<br>
-19.10.2007 oesi<br><br></li>
-<li>ALVS Statistik<br>
-18.10.2007 oesi<br><br></li>
-<li>Statistik Student/Semester<br>
-18.10.2007 oesi<br><br></li>
-<li>Projektarbeit: Bei der Auswahl der Lehreinheit wird zusätzlich das Studiensemester angezeigt<br>
-17.10.2007 oesi<br><br></li>
-<li>Bei der Auswahl der Projektbetreuer wird nun zusätzlich der Titel angezeigt<br>
-17.10.2007 oesi<br><br></li>
-<li>Projektarbeit - nach dem &auml;ndern der LVA wird das Feld Lehreinheit nicht geleert<br>
-17.10.2007 oesi<br><br></li>
-<li>Am Zeugnis wird nun statt "x.Semester" die Bezeichnung angezeigt (z.B. "Praxissemester")<br>
-16.10.2007 oesi<br><br></li>
-<li>neues Berechtigungskonzept<br>
-15.10.2007 oesi<br><br></li>
-<li>Titel fehlt auf Prüfungsprotokoll, Prüfungszeugnis und Urkunde<br>
-15.10.2007 oesi<br><br></li>
-<li>Notenspiegel soll alle LVs anzeigen bei denen er mitgemacht hat und nicht nur die des Studienganges<br>
-10.10.2005 oesi<br><br></li>
-<li>Soll am Zeugnis bei einem Berufspraktikum auch die Firma angezeigt werden?<br>
-15.10.2007 oesi - wird nun angezeigt<br><br></li>
-<li>Note mitschicken im autom. Mail von der Notenfreibabe des Lektors.<br>
-05.10.2007 raab<br><br>
-</li>
-<li>ECTS Punkte am Zeugnis nur mit 1er Nachkommastelle<br>
-01.10.2007 oesi<br><br>
-</li>
-<li>Projektarbeit: Gesamtnote statt Note, Gesamtpunkte<br>
-01.10.2007 oesi<br><br>
-</li>
-<li>Stunde bei Projektbetreuer mit nur 1er Nachkommastelle<br>
-01.10.2007 oesi<br><br>
-</li>
-<li>Projektarbeit: Stundensatz, Faktor, Gesamtstunden ausblenden.<br>
-01.10.2007 oesi<br><br>
-</li>
-<li>Export für Studenten mit (offenen) Zahlungen<br>
-01.10.2007 oesi Excel Export exportiert nun die im Tree markierten Studenten und nicht mehr alle<br><br>
-</li>
-<li>
-Lehrauftrag kommt nicht wenn nur eine Betreuung bei einem Studiengang ist aber keine Lehrtätigkeit<br>
-28.09.2007 oesi<br><br>
-</li>
-<li>Status bearbeiten: Semester DropDown sollte soviele Semester enthalten wie in der tbl_lehrverband sind<br>
-28.09.2007 oesi <br><br>
-</li>
-<li>Stundensatz, Faktor und Gesamtstunden bei der Projektarbeit ausblenden<br>
-28.09.2007 oesi<br><br>
-</li>
-</li>
-<li> LV-Planung: HTML mit &Uuml;bersicht der Lehrauftr&auml;ge.
+  <li>L&ouml;schen der Gruppenzuteilung zu einer Lehreinheit verhindern
+wenn bereits eine Kreuzerlliste angelegt wurde.<br>
+29.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>Studienerfolgsbestaetigung ausdrucken fuer alle Semester die der
+Student besucht hat<br>
+29.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>im Filter offene Buchungen scheinen Personen ohne Buchungen
+(Belastungen) auf<br>
+25.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>Beim Filtern nach bezahlter Studiengeb&uuml;hr sollen Incoming
+nicht aufscheinen da diese keine Studiengeb&uuml;hr zahlen m&uuml;ssen<br>
+25.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>Pruefungsprotokoll und Urkunde sollen f&uuml;r mehrere Studenten
+auf einmal druckbar sein<br>
+25.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>Berechtigungsfehler beim Zuordnen eines Lektors zu einem
+Studiengang und beim Anlegen von Firmenbetreuern<br>
+24.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>Ueberarbeitung des Fachbereichs-Tab und Fachbereichsberechtigungen<br>
+24.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>Beim Zuordnen eines Interessenten/Bewerbers zu einer
+Spezialgruppe erscheint nun eine Fehlermeldung<br>
+23.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>Fehler beim Export der Mitarbeiterdaten behoben (Fehler beim
+Export der Spalte "Geaendert Von")<br>
+22.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>Neuer Men&uuml;punkt Extras-&gt;Lehrveranstaltungsverwaltung zur
+Verwaltung der LV-Daten und FBK auf LV-Ebene<br>
+22.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>Mail an Mitarbeiter senden wenn das <b>aktiv</b>-Feld veraendert
+wird<br>
+19.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>Bei Notenverwaltung die Unterschiedlichen Noten markieren
+(Studenten und LVA)<br>
+19.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>ALVS Statistik<br>
+18.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>Statistik Student/Semester<br>
+18.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>Projektarbeit: Bei der Auswahl der Lehreinheit wird
+zus&auml;tzlich das Studiensemester angezeigt<br>
+17.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>Bei der Auswahl der Projektbetreuer wird nun zus&auml;tzlich der
+Titel angezeigt<br>
+17.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>Projektarbeit - nach dem &auml;ndern der LVA wird das Feld
+Lehreinheit nicht geleert<br>
+17.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>Am Zeugnis wird nun statt "x.Semester" die Bezeichnung angezeigt
+(z.B. "Praxissemester")<br>
+16.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>neues Berechtigungskonzept<br>
+15.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>Titel fehlt auf Pr&uuml;fungsprotokoll, Pr&uuml;fungszeugnis und
+Urkunde<br>
+15.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>Notenspiegel soll alle LVs anzeigen bei denen er mitgemacht hat
+und nicht nur die des Studienganges<br>
+10.10.2005 oesi<br>
+    <br>
+  </li>
+  <li>Soll am Zeugnis bei einem Berufspraktikum auch die Firma
+angezeigt werden?<br>
+15.10.2007 oesi - wird nun angezeigt<br>
+    <br>
+  </li>
+  <li>Note mitschicken im autom. Mail von der Notenfreibabe des Lektors.<br>
+05.10.2007 raab<br>
+    <br>
+  </li>
+  <li>ECTS Punkte am Zeugnis nur mit 1er Nachkommastelle<br>
+01.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>Projektarbeit: Gesamtnote statt Note, Gesamtpunkte<br>
+01.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>Stunde bei Projektbetreuer mit nur 1er Nachkommastelle<br>
+01.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>Projektarbeit: Stundensatz, Faktor, Gesamtstunden ausblenden.<br>
+01.10.2007 oesi<br>
+    <br>
+  </li>
+  <li>Export f&uuml;r Studenten mit (offenen) Zahlungen<br>
+01.10.2007 oesi Excel Export exportiert nun die im Tree markierten
+Studenten und nicht mehr alle<br>
+    <br>
+  </li>
+  <li>Lehrauftrag kommt nicht wenn nur eine Betreuung bei einem
+Studiengang
+ist aber keine Lehrt&auml;tigkeit<br>
+28.09.2007 oesi<br>
+    <br>
+  </li>
+  <li>Status bearbeiten: Semester DropDown sollte soviele Semester
+enthalten wie in der tbl_lehrverband sind<br>
+28.09.2007 oesi <br>
+    <br>
+  </li>
+  <li>Stundensatz, Faktor und Gesamtstunden bei der Projektarbeit
+ausblenden<br>
+28.09.2007 oesi<br>
+    <br>
+  </li>
+  <li> LV-Planung: HTML mit &Uuml;bersicht der Lehrauftr&auml;ge.
 Studiengang und optional Semester muss gew&auml;hlt sein. (HTML Seite
 content/statistik/lvplanung.php muss noch erstellt werden)</li>
-<li>Studiengang und Semester bei LV-Ansicht anzeigen<br>
-07.09.2007 oesi<br><br>
-<li>Suche auch für Vorname und UID<br>
-07.09.2007 oesi<br><br>
-<li>Für die Farbe der Noten im Notenspiegel diejenigen aus der Tabelle Note verwenden<br>
-07.09.2007 oesi<br><br></li>
-<li>Notenspiegel als Excel<br>
-07.09.2007 oesi<br><br></li>
-<li>Filter für Studenten die im Aktuellen Studiensemester no keine Studiengebührbelastung haben<br>
-07.09.2007 oesi<br><br></li>
-<li>neue Variable kontofilterstg=false wenn true dann nur die buchungen des jeweiligen Stg anzeigen<br>
-07.09.2007 oesi<br><br></li>
-<li>Excel-Export Bewerberstatistik (Kollmitzerstatistik) erstellen<br>
-07.09.2007 oesi<br><br></li>
-<li>Anrede beim Interessentenimport hinzufügen<br>
-03.09.2007 oesi<br><br></li>
-<li>Reihenfolge der Spalten im Tree "merken"<br>
-03.09.2007 oesi - persist="ordinal"<br><br></li>
-<li>Bei markieren einer Lehreinheit den Noten Tree leeren<br>
-03.09.2007 oesi<br><br></li>
-<li>ZGV MASTER DropDown nach Code Sortieren<br>
-03.09.2007 oesi<br><br></li>
-<li>Excel Export Nachname vor Vornamen anzeigen<br>
-03.09.2007 oesi <br><br></li>
-<li>Namen auf Prestudent Tab anzeigen<br>
-03.09.2007 oesi<br><br></li>
-<li>Bei Statusaenderung auf Student soll aktiv Feld gesetzt werden<br>
-03.09.2007 oesi<br><br></li>
-<li>UID und Personenkennzeichen soll markierbar sein<br>
-03.09.2007 oesi<br><br></li>
-<li>Anmerkung von Prestudent im Tree anzeigen<br>
-03.09.2007 oesi<br><br></li>
-<li>Geburtszeit ein Feld nach unten verschieben und stattdessen die Geburtsnation anzeigen<br>
-03.09.2007 oesi<br><br></li>
-<li>Studiensemester DropDown beim Anlegen von neuen Buchungen<br>
-03.09.2007 oesi<br><br></li>
-<li>Bei Datumsfeld soll aktuelles Datum vormarkiert sein<br>
-03.09.2007 oesi<br><br></li>
-<li>Loeschen von Lehreinheiten mit rechter Maustaste<br>
-03.09.2007 oesi<br><br></li>
-<li>Ansicht fuer alle Gruppen in denen sich der Student befindet<br>
-31.08.2007 oesi<br><br></li>
-<li>Gegenbuchung fuer mehrere Buchungen auf einmal<br>
-22.08.2007<br><br></li>
-<li>Auf Zahlungsbestätigung immer den Absoluten Betrag anzeigen<br>
-22.08.2007 oesi<br><br></li>
-<li>In der Lehrauftragsliste soll Studiensemester/Studiengang/Ausbildungsseemster angezeigt werden<br>
-22.08.2007 oesi<br><br></li>
-<li>Wenn Semesterstunden bei Lektorenzuteilung geändert wird, dann sollen die Planstunden auch geändert werden<br>
-22.08.2007 oesi<br><br></li>
-<li>Emailversand an Privatadressen<br>
-22.08.2007 oesi<br><br></li>
-<li>Filter fuer alle Studenten mit offenen Buchungen<br>
-22.08.2007 oesi<br><br></li>
-<li>Bachelorarbeiten und Themengebiet am Zeugnis anzeigen<br>
-21.08.2007 <br><br></li>
-<li>Studiensemester am Lehrauftrag besser hervorheben<br>
-21.08.2007 oesi<br><br></li>
-<li>Am Lehrauftrag auch die Projektbetreuungen anzeigen<br>
-21.08.2007 oesi <br><br></li>
-<li>Bei Kontaktadressen das Feld Name in Anmerkung umbenennen und ganz unten anzeigen und den Typ ganz oben im Formular<br>
-in der Tabelle den Namen hinten anstellen und den Typ vorne! Typ als Namen anzeigen <br>
-20.08.2007 oesi<br><br></li>
-<li>Studienerfolg soll keine 5er anzeigen<br>
-17.08.2007 oesi<br><br></li>
-<li>Lektor Tab zeigt kurzbz bei inaktiven Studiengaengen nicht an<br>
-17.08.2007 oesi <br><br></li>
-<li>Editieren des Status bei Doppelklick<br>
-17.08.2007 oesi<br><br></li>
-<li>Verwaltung fuer Incoming<br>
-17.08.2007 oesi<br><br></li>
-<li> Anzahl: Anzahl stimmt nicht immer? <br>
-16.08.2007 oesi<br><br></li>
-<li>Betriebsmittel Overlay auch bei den Mitarbeitern Anzeigen<br>
-6.8.2007 oesi<br><br></li>
-<li>Im Filter aufgenommene Bewerber kommen auch abgewiesene vor.<br>
-1.6.2007 oesi<br><br></li>
+  <li>Studiengang und Semester bei LV-Ansicht anzeigen<br>
+07.09.2007 oesi<br>
+    <br>
+  </li>
+  <li>Suche auch f&uuml;r Vorname und UID<br>
+07.09.2007 oesi<br>
+    <br>
+  </li>
+  <li>F&uuml;r die Farbe der Noten im Notenspiegel diejenigen aus der
+Tabelle Note verwenden<br>
+07.09.2007 oesi<br>
+    <br>
+  </li>
+  <li>Notenspiegel als Excel<br>
+07.09.2007 oesi<br>
+    <br>
+  </li>
+  <li>Filter f&uuml;r Studenten die im Aktuellen Studiensemester no
+keine Studiengeb&uuml;hrbelastung haben<br>
+07.09.2007 oesi<br>
+    <br>
+  </li>
+  <li>neue Variable kontofilterstg=false wenn true dann nur die
+buchungen des jeweiligen Stg anzeigen<br>
+07.09.2007 oesi<br>
+    <br>
+  </li>
+  <li>Excel-Export Bewerberstatistik (Kollmitzerstatistik) erstellen<br>
+07.09.2007 oesi<br>
+    <br>
+  </li>
+  <li>Anrede beim Interessentenimport hinzuf&uuml;gen<br>
+03.09.2007 oesi<br>
+    <br>
+  </li>
+  <li>Reihenfolge der Spalten im Tree "merken"<br>
+03.09.2007 oesi - persist="ordinal"<br>
+    <br>
+  </li>
+  <li>Bei markieren einer Lehreinheit den Noten Tree leeren<br>
+03.09.2007 oesi<br>
+    <br>
+  </li>
+  <li>ZGV MASTER DropDown nach Code Sortieren<br>
+03.09.2007 oesi<br>
+    <br>
+  </li>
+  <li>Excel Export Nachname vor Vornamen anzeigen<br>
+03.09.2007 oesi <br>
+    <br>
+  </li>
+  <li>Namen auf Prestudent Tab anzeigen<br>
+03.09.2007 oesi<br>
+    <br>
+  </li>
+  <li>Bei Statusaenderung auf Student soll aktiv Feld gesetzt werden<br>
+03.09.2007 oesi<br>
+    <br>
+  </li>
+  <li>UID und Personenkennzeichen soll markierbar sein<br>
+03.09.2007 oesi<br>
+    <br>
+  </li>
+  <li>Anmerkung von Prestudent im Tree anzeigen<br>
+03.09.2007 oesi<br>
+    <br>
+  </li>
+  <li>Geburtszeit ein Feld nach unten verschieben und stattdessen die
+Geburtsnation anzeigen<br>
+03.09.2007 oesi<br>
+    <br>
+  </li>
+  <li>Studiensemester DropDown beim Anlegen von neuen Buchungen<br>
+03.09.2007 oesi<br>
+    <br>
+  </li>
+  <li>Bei Datumsfeld soll aktuelles Datum vormarkiert sein<br>
+03.09.2007 oesi<br>
+    <br>
+  </li>
+  <li>Loeschen von Lehreinheiten mit rechter Maustaste<br>
+03.09.2007 oesi<br>
+    <br>
+  </li>
+  <li>Ansicht fuer alle Gruppen in denen sich der Student befindet<br>
+31.08.2007 oesi<br>
+    <br>
+  </li>
+  <li>Gegenbuchung fuer mehrere Buchungen auf einmal<br>
+22.08.2007<br>
+    <br>
+  </li>
+  <li>Auf Zahlungsbest&auml;tigung immer den Absoluten Betrag anzeigen<br>
+22.08.2007 oesi<br>
+    <br>
+  </li>
+  <li>In der Lehrauftragsliste soll
+Studiensemester/Studiengang/Ausbildungsseemster angezeigt werden<br>
+22.08.2007 oesi<br>
+    <br>
+  </li>
+  <li>Wenn Semesterstunden bei Lektorenzuteilung ge&auml;ndert wird,
+dann sollen die Planstunden auch ge&auml;ndert werden<br>
+22.08.2007 oesi<br>
+    <br>
+  </li>
+  <li>Emailversand an Privatadressen<br>
+22.08.2007 oesi<br>
+    <br>
+  </li>
+  <li>Filter fuer alle Studenten mit offenen Buchungen<br>
+22.08.2007 oesi<br>
+    <br>
+  </li>
+  <li>Bachelorarbeiten und Themengebiet am Zeugnis anzeigen<br>
+21.08.2007 <br>
+    <br>
+  </li>
+  <li>Studiensemester am Lehrauftrag besser hervorheben<br>
+21.08.2007 oesi<br>
+    <br>
+  </li>
+  <li>Am Lehrauftrag auch die Projektbetreuungen anzeigen<br>
+21.08.2007 oesi <br>
+    <br>
+  </li>
+  <li>Bei Kontaktadressen das Feld Name in Anmerkung umbenennen und
+ganz unten anzeigen und den Typ ganz oben im Formular<br>
+in der Tabelle den Namen hinten anstellen und den Typ vorne! Typ als
+Namen anzeigen <br>
+20.08.2007 oesi<br>
+    <br>
+  </li>
+  <li>Studienerfolg soll keine 5er anzeigen<br>
+17.08.2007 oesi<br>
+    <br>
+  </li>
+  <li>Lektor Tab zeigt kurzbz bei inaktiven Studiengaengen nicht an<br>
+17.08.2007 oesi <br>
+    <br>
+  </li>
+  <li>Editieren des Status bei Doppelklick<br>
+17.08.2007 oesi<br>
+    <br>
+  </li>
+  <li>Verwaltung fuer Incoming<br>
+17.08.2007 oesi<br>
+    <br>
+  </li>
+  <li> Anzahl: Anzahl stimmt nicht immer? <br>
+16.08.2007 oesi<br>
+    <br>
+  </li>
+  <li>Betriebsmittel Overlay auch bei den Mitarbeitern Anzeigen<br>
+6.8.2007 oesi<br>
+    <br>
+  </li>
+  <li>Im Filter aufgenommene Bewerber kommen auch abgewiesene vor.<br>
+1.6.2007 oesi<br>
+    <br>
+  </li>
   <li>Bei "Interessent Neu" wird der Studiengang nicht &uuml;bernommen.<br>
-  25.06.2007 oesi <br><br>
+25.06.2007 oesi <br>
+    <br>
   </li>
   <li>Rolle sollte vom Anleger wieder gel&ouml;scht werden k&ouml;nnen.<br>
-  25.06.2007 oesi <br><br>
+25.06.2007 oesi <br>
+    <br>
   </li>
   <li>LVA Liste fuer Gesch&auml;ftsstelle fehlt noch.<br>
-  20.06.2007 oesi<br><br>
+20.06.2007 oesi<br>
+    <br>
   </li>
   <li> Import: Studiensemester ist ausw&auml;hlbar. Vorgew&auml;hlt ist
 das n&auml;chste. <br>
