@@ -99,7 +99,23 @@ if ($gruppe != "" && isset($_REQUEST["grp_aus"]))
 				}
 			}
 		}
-	}//(uid, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, studiensemester_kurzbz)
+	}
+
+$spezgrp = array();
+$spezgrpstr = "";
+if ($gruppe != "")
+{
+	$gu = new benutzergruppe($conn);
+	if ($gu->load_uids($gruppe, $stsem))
+	{
+		foreach ($gu->uids as $uidliste)
+		{
+			$spezgrp[] = $uidliste->uid;
+			$spezgrpstr .= "<br><input type='checkbox' name='gruppe_".$uidliste->uid."'>".$uidliste->uid;
+			//echo "<br>".$u->uid;
+		}
+	}
+}//(uid, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, studiensemester_kurzbz)
 
 ?>
 
@@ -188,6 +204,7 @@ function selectAll()
 	echo "<tr>";
 	echo "<td valign='top' id='anmeldungen'>";
 	
+	
 	$anz = 0;
 	if ($lvid > 0)
 	{		
@@ -197,8 +214,12 @@ function selectAll()
 			
 			foreach ($b->uids as $u)
 			{
-				echo "<br><input type='checkbox' name='anmeldung_".$u->uid."'>".$u->uid." - ".$u->nachname." ".$u->vorname;
-				$anz++;				
+				if (in_array($u->uid, $spezgrp))
+					echo "<br><input type='checkbox' disabled>".$u->uid." - ".$u->nachname." ".$u->vorname;				
+				else				
+					echo "<br><input type='checkbox' name='anmeldung_".$u->uid."'>".$u->uid." - ".$u->nachname." ".$u->vorname;
+				$anz++;
+							
 				//echo "<br>".$u->uid;
 			}
 		}
@@ -213,6 +234,7 @@ function selectAll()
 	
 	if ($gruppe != "")
 	{
+		/*		
 		$gu = new benutzergruppe($conn);
 		if ($gu->load_uids($gruppe, $stsem))
 		{
@@ -222,6 +244,8 @@ function selectAll()
 				//echo "<br>".$u->uid;
 			}
 		}
+		*/
+		echo $spezgrpstr;
 	}	
 	
 	echo "</td></tr>";
