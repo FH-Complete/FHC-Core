@@ -54,6 +54,7 @@ require_once('../../include/projektarbeit.class.php');
 require_once('../../include/projektbetreuer.class.php');
 require_once('../../include/lehrverband.class.php');
 require_once('../../include/gruppe.class.php');
+require_once('../../include/datum.class.php');
 
 $user = get_uid();
 
@@ -1895,6 +1896,7 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='savepruefung')  // **** PRUEFUNGEN **** //
 	{
+		$datum_obj = new datum();
 		if(!$rechte->isBerechtigt('admin', $_POST['studiengang_kz'], 'suid') && !$rechte->isBerechtigt('assistenz', $_POST['studiengang_kz'], 'suid'))
 		{
 			$return = false;
@@ -1925,28 +1927,182 @@ if(!$error)
 				$pruefung->insertvon = $user;
 			}
 			
-			$pruefung->lehreinheit_id = $_POST['lehreinheit_id'];
-			$pruefung->student_uid = $_POST['student_uid'];
-			$pruefung->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
-			$pruefung->note = $_POST['note'];
-			$pruefung->pruefungstyp_kurzbz = $_POST['pruefungstyp_kurzbz'];
-			$pruefung->datum = $_POST['datum'];
-			$pruefung->anmerkung = $_POST['anmerkung'];
-			$pruefung->updateamum = date('Y-m-d H:i:s');
-			$pruefung->updatevon = $user;
+			pg_query($conn, 'BEGIN');
+			
+			if($_POST['pruefungstyp_kurzbz']=='Termin2')
+			{
+				//Wenn ein 2. Termin angelegt wird, und kein 1. Termin vorhanden ist, 
+				//dann wird auch ein 1. Termin angelegt mit der derzeitigen Zeugnisnote
+				$qry = "SELECT * FROM lehre.tbl_pruefung WHERE 
+						student_uid='".addslashes($_POST['student_uid'])."' AND 
+						lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."' AND
+						pruefungstyp_kurzbz='Termin1'";
+				if($result = pg_query($conn, $qry))
+				{
+					if(pg_num_rows($result)==0)
+					{
+						$qry = "SELECT note, benotungsdatum FROM lehre.tbl_zeugnisnote JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE 
+								student_uid='".addslashes($_POST['student_uid'])."' AND
+								tbl_lehreinheit.lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."' AND
+								tbl_lehreinheit.studiensemester_kurzbz = tbl_zeugnisnote.studiensemester_kurzbz";
+						if($result = pg_query($conn, $qry))
+						{
+							if($row = pg_fetch_object($result))
+							{
+								//Wenn kein Ersttermin existiert, dann wird einer angelegt
+								$ersttermin = new pruefung($conn);
+								$ersttermin->new=true;
+								$ersttermin->insertamum = date('Y-m-d H:i:s');
+								$ersttermin->insertvon = $user;
+								$ersttermin->lehreinheit_id = $_POST['lehreinheit_id'];
+								$ersttermin->student_uid = $_POST['student_uid'];
+								$ersttermin->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
+								$ersttermin->note = $row->note;
+								$ersttermin->pruefungstyp_kurzbz = 'Termin1';
+								$ersttermin->datum = $row->benotungsdatum;
+								$ersttermin->anmerkung = '';
+								
+								if(!$ersttermin->save())
+								{
+									$error = true;
+									$return = false;
+									$errormsg = 'Fehler beim Anlegen des 1.Termin:'.$ersttermin->errormsg;
+								}								
+							}
+						}
+						//Wenn keine Zeugnisnote vorhanden ist, dann wird kein
+						//1.Termin angelegt
+					}
+				}
+				else 
+				{
+					$error = true;
+					$return = false;
+					$errormsg = 'Fehler beim Ermitteln des Ersttermines';
+				}
+				
+			}
 			
 			if(!$error)
 			{
+				$pruefung->lehreinheit_id = $_POST['lehreinheit_id'];
+				$pruefung->student_uid = $_POST['student_uid'];
+				$pruefung->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
+				$pruefung->note = $_POST['note'];
+				$pruefung->pruefungstyp_kurzbz = $_POST['pruefungstyp_kurzbz'];
+				$pruefung->datum = $_POST['datum'];
+				$pruefung->anmerkung = $_POST['anmerkung'];
+				$pruefung->updateamum = date('Y-m-d H:i:s');
+				$pruefung->updatevon = $user;
+				
+				
 				if($pruefung->save())
 				{
 					$return = true;
 					$data = $pruefung->pruefung_id;
+					//Zeugnisnote aktualisieren
+					$qry = "SELECT lehrveranstaltung_id, studiensemester_kurzbz FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
+					if($result_le = pg_query($conn, $qry))
+					{
+						if($row_le = pg_fetch_object($result_le))
+						{
+							$lehrveranstaltung_id = $row_le->lehrveranstaltung_id;
+							$studiensemester_kurzbz = $row_le->studiensemester_kurzbz;
+						}
+						else 
+						{
+							$error = true;
+							$return = false;
+							$errormsg = 'Fehler beim Ermitteln der Lehrveranstaltung';
+						}
+					}
+					else 
+					{
+						$error = true;
+						$return = false;
+						$errormsg = 'Fehler beim Ermitteln der Lehrveranstaltung';
+					}
+					
+					
+					if(!$error)
+					{
+						$zeugnisnote = new zeugnisnote($conn);
+						if($zeugnisnote->load($lehrveranstaltung_id, $_POST['student_uid'], $studiensemester_kurzbz))
+						{
+							if($zeugnisnote->uebernahmedatum=='' || 
+								($datum_obj->mktime_fromtimestamp($zeugnisnote->benotungsdatum) > 
+								 $datum_obj->mktime_fromtimestamp($zeugnisnote->uebernahmedatum)))
+								$checkdatum = $zeugnisnote->benotungsdatum;
+							else 
+								$checkdatum = $zeugnisnote->uebernahmedatum;
+							
+							if($datum_obj->mktime_fromtimestamp($checkdatum)>$datum_obj->mktime_datum($_POST['datum']))
+							{
+								if($zeugnisnote->note!=$_POST['note'])
+								{
+									$error = true;
+									$return = false;
+									$errormsg = 'ACHTUNG! Diese Pruefungsnote wurde nicht ins Zeugnis uebernommen da die Zeugnisnote nach dem Pruefungsdatum veraendert wurde';
+								}
+							}
+							else 
+							{
+								$zeungisnote->new = false;
+							}
+						}
+						else 
+						{
+							$zeugnisnote->new = true;
+							$zeugnisntoe->insertamum = date('Y-m-d H:i:s');
+							$zeugnisnote->insertvon = $user;
+						}
+						
+						if(!$error)
+						{							
+							$zeugnisnote->student_uid = $_POST['student_uid'];
+							$zeugnisnote->lehrveranstaltung_id = $lehrveranstaltung_id;
+							$zeugnisnote->studiensemester_kurzbz = $studiensemester_kurzbz;
+							$zeugnisnote->note = $_POST['note'];
+							$zeugnisnote->uebernahmedatum = date('Y-m-d H:i:s');
+							$zeugnisnote->benotungsdatum = date('Y-m-d',$datum_obj->mktime_datum($_POST['datum']));
+							$zeugnisnote->updateamum = date('Y-m-d H:i:s');
+							$zeugnisnote->updatevon = $user;
+							
+							if(!$zeugnisnote->save())
+							{
+								$return = false;
+								$error = true;
+								$errormsg = 'Fehler beim Speichern der Zeungisnote:'.$zeugnisnote->errormsg;
+								pg_query($conn, 'ROLLBACK');
+							}
+							else 
+							{
+								pg_query($conn, 'COMMIT');
+							}
+						}
+						else 
+						{
+							//Kein Rollback damit die Pruefung gespeichert wird
+							//returnwert ist aber false damit die Meldung angezeigt wird,
+							//dass die Note nicht ins Zeugnis uebernommen wird
+							pg_query($conn, 'COMMIT');
+						}
+					}
+					else 
+					{
+						pg_query($conn, 'ROLLBACK');
+					}
 				}
 				else 
 				{
 					$return = false;
 					$errormsg = $pruefung->errormsg;
+					pg_query($conn, 'ROLLBACK');
 				}
+			}
+			else 
+			{
+				pg_query($conn, 'ROLLBACK');
 			}
 		}
 	}

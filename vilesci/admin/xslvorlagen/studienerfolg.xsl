@@ -303,7 +303,7 @@
 	
 	<xsl:template match="unterrichtsfach">
 		<fo:table-row  line-height="10pt">
-			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"><xsl:text> </xsl:text><xsl:value-of select="bezeichnung" /></fo:block></fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="70mm"><xsl:text> </xsl:text><xsl:value-of select="bezeichnung" /></fo:block></fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="24mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="../studiensemester_kurzbz" /></fo:block></fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="32mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="../semester" /></fo:block></fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="13mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="sws" /></fo:block></fo:table-cell>
