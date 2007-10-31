@@ -24,7 +24,7 @@
 // * Insert/Update/Delete
 // * der Lehreinheiten
 // *
-// * Script sorgt fuer den Datenbanzugriff
+// * Script sorgt fuer den Datenbankzugriff
 // * fuer das XUL - Lehreinheiten-Modul
 // *
 // * Derzeitige Funktionen:

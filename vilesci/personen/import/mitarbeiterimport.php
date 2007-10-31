@@ -193,6 +193,9 @@ if(isset($_POST['save']))
 		$person->svnr = $svnr;
 		$person->ersatzkennzeichen = $ersatzkennzeichen;
 		$person->aktiv = true;
+		$person->geburtsnation = 'A';
+		$person->staatsbuergerschaft = 'A';
+		
 		if($person->save())
 		{
 			$error=false;

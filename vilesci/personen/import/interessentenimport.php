@@ -270,6 +270,8 @@ if(isset($_POST['save']))
 		$person->vorname = $vorname;
 		$person->geschlecht = $geschlecht;
 		$person->gebdatum = $geburtsdatum;
+		$person->geburtsnation = 'A';
+		$person->staatsbuergerschaft = 'A';
 		$person->aktiv = true;
 		if($person->save())
 		{

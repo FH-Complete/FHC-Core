@@ -1534,9 +1534,37 @@ function StudentUnterbrecherZuStudent()
 }
 
 // ****
+// * Fuegt eine neue Rolle zu einer Person hinzu
+// ****
+function StudentRolleAdd()
+{
+	var rolle_kurzbz = document.getElementById('student-prestudent-rolle-menulist-rolle_kurzbz').value;
+	var studiensemester = document.getElementById('student-prestudent-rolle-menulist-studiensemester').value;
+	var ausbildungssemester = document.getElementById('student-prestudent-rolle-menulist-semester').value;
+	
+	if(rolle_kurzbz=='')
+	{
+		alert('Typ muss ausgewaehlt werden');
+		return false;
+	}
+	if(studiensemester=='')
+	{
+		alert('Studiensemester muss ausgwaehlt werden');
+		return false;
+	}
+	if(ausbildungssemester=='')
+	{
+		alert('Semester muss ausgewaehlt werden');
+		return false;
+	}
+	debug('StudentAddRolle('+rolle_kurzbz+','+ ausbildungssemester+','+ studiensemester+');');
+	//StudentAddRolle(rolle_kurzbz, ausbildungssemester, studiensemester);
+}
+
+// ****
 // * Fuegt eine Rolle zu einem Studenten hinzu
 // ****
-function StudentAddRolle(rolle, semester)
+function StudentAddRolle(rolle, semester, studiensemester)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-tree');
@@ -1557,6 +1585,8 @@ function StudentAddRolle(rolle, semester)
 		req.add('prestudent_id', prestudent_id);
 		req.add('rolle_kurzbz', rolle);
 		req.add('semester', semester);
+		if(typeof(studiensemester)!='unknown')
+			req.add('studiensemester_kurzbz', studiensemester);
 
 		var response = req.executePOST();
 
@@ -3205,6 +3235,10 @@ function StudentPruefungLVAChange()
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var datasource = rdfService.GetDataSource(url);
 	MADropDown.database.AddDataSource(datasource);
+	
+	//Lehreinheiten und Mitarbeiter DropDown Auswahl leeren
+	MADropDown.selectedIndex=-1;
+	LEDropDown.selectedIndex=-1;
 }
 
 // ****
@@ -3271,13 +3305,20 @@ function StudentPruefungDetailSpeichern()
 			alert(response)
 		else
 			alert(val.dbdml_errormsg)
+		
+		StudentPruefungSelectID=val.dbdml_data;
+		StudentPruefungTreeDatasource.Refresh(false); //non blocking
 	}
 	else
 	{
 		StudentPruefungSelectID=val.dbdml_data;
 		StudentPruefungTreeDatasource.Refresh(false); //non blocking
+		//Notentree Refreshen
+		StudentNotenTreeDatasource.Refresh(false); //non blocking
+		
 		SetStatusBarText('Daten wurden gespeichert');
 		StudentPruefungDetailDisableFields(true);
+		
 	}
 }
 
