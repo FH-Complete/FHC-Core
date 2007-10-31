@@ -1448,7 +1448,10 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	prestudent_id = dialog.getElementById('student-rolle-textbox-prestudent_id').value;
-	rolle_kurzbz = dialog.getElementById('student-rolle-textbox-rolle_kurzbz').value;
+	if(studiensemester_old=='')
+		rolle_kurzbz = dialog.getElementById('student-rolle-menulist-rolle_kurzbz').value;
+	else
+		rolle_kurzbz = dialog.getElementById('student-rolle-textbox-rolle_kurzbz').value;
 	studiensemester_kurzbz = dialog.getElementById('student-rolle-menulist-studiensemester').value;
 	ausbildungssemester = dialog.getElementById('student-rolle-menulist-ausbildungssemester').value;
 	datum = dialog.getElementById('student-rolle-datum-datum').value;
@@ -1538,27 +1541,8 @@ function StudentUnterbrecherZuStudent()
 // ****
 function StudentRolleAdd()
 {
-	var rolle_kurzbz = document.getElementById('student-prestudent-rolle-menulist-rolle_kurzbz').value;
-	var studiensemester = document.getElementById('student-prestudent-rolle-menulist-studiensemester').value;
-	var ausbildungssemester = document.getElementById('student-prestudent-rolle-menulist-semester').value;
-	
-	if(rolle_kurzbz=='')
-	{
-		alert('Typ muss ausgewaehlt werden');
-		return false;
-	}
-	if(studiensemester=='')
-	{
-		alert('Studiensemester muss ausgwaehlt werden');
-		return false;
-	}
-	if(ausbildungssemester=='')
-	{
-		alert('Semester muss ausgewaehlt werden');
-		return false;
-	}
-	debug('StudentAddRolle('+rolle_kurzbz+','+ ausbildungssemester+','+ studiensemester+');');
-	//StudentAddRolle(rolle_kurzbz, ausbildungssemester, studiensemester);
+	var prestudent_id = document.getElementById('student-prestudent-textbox-prestudent_id').value;
+	window.open('<?php echo APP_ROOT?>content/student/studentrolledialog.xul.php?prestudent_id='+prestudent_id,"","chrome, status=no, width=500, height=300, centerscreen, resizable");
 }
 
 // ****

@@ -38,8 +38,11 @@ function StudentRolleInit(prestudent_id, rolle_kurzbz, studiensemester_kurzbz, a
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	
-	if(prestudent_id!='')
+	if(rolle_kurzbz!='')
 	{
+		document.getElementById('student-rolle-grid-row-textbox').hidden=false;
+		document.getElementById('student-rolle-grid-row-menulist').hidden=true;
+		
 		studiensemester_old=studiensemester_kurzbz;
 		ausbildungssemester_old=ausbildungssemester;
 		
@@ -62,7 +65,18 @@ function StudentRolleInit(prestudent_id, rolle_kurzbz, studiensemester_kurzbz, a
 	}
 	else
 	{
+		studiensemester_old='';
+		ausbildungssemester_old='';
+		
+		document.getElementById('student-rolle-grid-row-textbox').hidden=true;
+		document.getElementById('student-rolle-grid-row-menulist').hidden=false;
+
 		//Defaultwerte bei Neuem Datensatz
+		rolle_kurzbz = 'Interessent';
+		studiensemester_kurzbz=window.opener.getStudiensemester();
+		ausbildungssemester='1';
+		datum = '<?php echo date('d.m.Y') ?>';
+		orgform_kurzbz='';
 	}		
 	
 	document.getElementById('student-rolle-textbox-prestudent_id').value=prestudent_id;
