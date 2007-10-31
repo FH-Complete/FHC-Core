@@ -54,6 +54,9 @@ class prestudent extends person
 	var $updatevon;
 	var $orgform_kurzbz;
 	
+	var $studiensemester_old='';
+	var $ausbildungssemester_old='';
+	
 	// ErgebnisArray
 	var $result=array();
 	var $num_rows=0;

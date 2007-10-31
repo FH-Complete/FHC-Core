@@ -230,6 +230,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <popupset>
 	<popup id="student-prestudent-rolle-tree-popup">
 		<menuitem label="Bearbeiten" oncommand="StudentRolleBearbeiten();" id="student-prestudent-rolle-tree-popup-edit" hidden="false"/>
+		<menuitem label="Neuen Status hinzufuegen" oncommand="StudentRolleAdd();" id="student-prestudent-rolle-tree-popup-add" hidden="false"/>
 		<menuitem label="Entfernen" oncommand="StudentPrestudentRolleDelete();" id="student-prestudent-rolle-tree-popup-delete" hidden="false"/>		
 	</popup>
 </popupset>
@@ -499,43 +500,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							</rule>
 						</template>
 					</tree>
-				<!--<hbox>
-				<menulist id="student-prestudent-rolle-menulist-rolle_kurzbz" disabled="false"
-				          datasources="<?php echo APP_ROOT ?>rdf/rolle.rdf.php"
-			              ref="http://www.technikum-wien.at/rolle/liste" >
-					<template>
-						<menupopup>
-							<menuitem value="rdf:http://www.technikum-wien.at/rolle/rdf#rolle_kurzbz"
-				        		      label="rdf:http://www.technikum-wien.at/rolle/rdf#rolle_kurzbz"
-							  		  uri="rdf:*"/>
-							</menupopup>
-					</template>
-				</menulist>
-				<menulist id="student-prestudent-rolle-menulist-studiensemester" disabled="false"
-				          datasources="<?php echo APP_ROOT ?>rdf/studiensemester.rdf.php"
-			              ref="http://www.technikum-wien.at/studiensemester/liste" >
-					<template>
-						<menupopup>
-							<menuitem value="rdf:http://www.technikum-wien.at/studiensemester/rdf#kurzbz"
-				        		      label="rdf:http://www.technikum-wien.at/studiensemester/rdf#kurzbz"
-							  		  uri="rdf:*"/>
-							</menupopup>
-					</template>
-				</menulist>
-				<menulist id="student-prestudent-rolle-menulist-semester" disabled="false">
-					<menupopup>
-						<menuitem value="1" label="1"/>
-						<menuitem value="2" label="2"/>
-						<menuitem value="3" label="3"/>
-						<menuitem value="4" label="4"/>
-						<menuitem value="5" label="5"/>
-						<menuitem value="6" label="6"/>
-						<menuitem value="7" label="7"/>
-						<menuitem value="8" label="8"/>
-					</menupopup>
-				</menulist>
-				<button id="student-prestudent-rolle-button-save" label="Rolle hinzufuegen" disabled="false" oncommand="StudentRolleAdd()" />
-				</hbox>-->
 			</groupbox>
 			<hbox>
 				<spacer flex="1" />

@@ -612,20 +612,44 @@ if(!$error)
 				
 				if(!$error)
 				{
-					if(!$rolle->load_rolle($_POST['prestudent_id'], $_POST['rolle_kurzbz'], $_POST['studiensemester_old'], $_POST['ausbildungssemester_old']))
+					if(($_POST['studiensemester_old']=='') || (!$rolle->load_rolle($_POST['prestudent_id'], $_POST['rolle_kurzbz'], $_POST['studiensemester_old'], $_POST['ausbildungssemester_old'])))
 					{
-						$errormsg = 'Rolle konnte nicht geladen werden';
-						$return = false;
+						$rolle->new = true;
+						$rolle->insertamum = date('Y-m-d H:i:s');
+						$rolle->insertvon = $user;
+						$rolle->rolle_kurzbz = $_POST['rolle_kurzbz'];
+						
+						if($_POST['rolle_kurzbz']=='Student')
+						{
+							//Die Rolle Student darf nur eingefuegt werden, wenn schon eine Studentenrolle vorhanden ist
+							$qry = "SELECT count(*) as anzahl FROM public.tbl_student WHERE prestudent_id='".addslashes($_POST['prestudent_id'])."'";
+							if($result = pg_query($conn, $qry))
+							{
+								if($row = pg_fetch_object($result))
+								{
+									if($row->anzahl==0)
+									{
+										$error = true;
+										$errormsg = 'Ein Studentenstatus kann hier nur hinzugefuegt werden wenn die Person bereits Student ist. Um einen Bewerber zum Studenten zu machen waehlen Sie bitte unter "Status aendern" den Punkt "Student".';
+										$return = false;
+									}
+								}
+							}								
+						}
 					}
 					else 
-					{				
-						$rolle->ausbildungssemester = $_POST['ausbildungssemester'];
+					{
 						$rolle->ausbildungssemester_old = $_POST['ausbildungssemester_old'];
-						$rolle->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
 						$rolle->studiensemester_old = $_POST['studiensemester_old'];
+						$rolle->new = false;
+					}
+								
+					if(!$error)
+					{	
+						$rolle->ausbildungssemester = $_POST['ausbildungssemester'];					
+						$rolle->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];					
 						$rolle->datum = $_POST['datum'];
 						$rolle->orgform_kurzbz = $_POST['orgform_kurzbz'];
-						$rolle->new = false;
 						
 						if($rolle->save_rolle())
 							$return = true;

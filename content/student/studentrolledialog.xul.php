@@ -75,9 +75,19 @@ else
 				<column flex="5"/>
 			</columns>
 			<rows>
-				<row>
+				<row id="student-rolle-grid-row-textbox" hidden="false">
 					<label value="Rolle"/>
 					<textbox disabled="true" id="student-rolle-textbox-rolle_kurzbz" />
+				</row>
+				<row id="student-rolle-grid-row-menulist" hidden="true">
+					<label value="Rolle"/>
+					<menulist id="student-rolle-menulist-rolle_kurzbz" disabled="false">
+						<menupopup>
+							<menuitem value="Interessent" label="Interessent"/>
+							<menuitem value="Bewerber" label="Bewerber"/>
+							<menuitem value="Student" label="Student"/>
+						</menupopup>
+					</menulist>
 				</row>
 				<row>
 					<label value="Studiensemester" control="student-rolle-menulist-studiensemester"/>
