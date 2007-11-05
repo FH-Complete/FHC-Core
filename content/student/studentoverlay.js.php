@@ -1262,7 +1262,7 @@ function StudentPrestudentDisableFields(val)
 	document.getElementById('student-prestudent-checkbox-bismelden').disabled=val;
 	document.getElementById('student-prestudent-button-anmeldungreihungstest-heute').disabled=val;
 	document.getElementById('student-prestudent-button-save').disabled=val;
-	document.getElementById('student-prestudent-menulist-studiengang_kz').disabled=val;
+	//document.getElementById('student-prestudent-menulist-studiengang_kz').disabled=val;
 	document.getElementById('student-prestudent-textbox-anmerkung').disabled=val;
 }
 
