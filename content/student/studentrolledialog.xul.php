@@ -118,7 +118,7 @@ else
 								}
 							}
 														
-							for($i=1;$i<=$maxsem;$i++)
+							for($i=0;$i<=$maxsem;$i++)
 							{
 								echo '<menuitem value="'.$i.'" label="'.$i.'"/>';
 							}

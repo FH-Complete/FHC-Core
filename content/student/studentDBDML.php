@@ -457,9 +457,10 @@ if(!$error)
 							$studiensemester = $prestd->studiensemester_kurzbz;
 						$hlp = new prestudent($conn);
 						
-						if($_POST['rolle_kurzbz']=='Unterbrecher' || $_POST['rolle_kurzbz']=='Abbrecher')
-							$sem='0';
-						elseif($_POST['rolle_kurzbz']=='Student')
+						//if($_POST['rolle_kurzbz']=='Unterbrecher' || $_POST['rolle_kurzbz']=='Abbrecher')
+						//	$sem='0';
+						//else
+						if($_POST['rolle_kurzbz']=='Student')
 							$sem=$_POST['semester'];
 						else 
 							$sem=$prestd->ausbildungssemester;

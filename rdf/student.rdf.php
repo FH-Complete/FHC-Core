@@ -455,7 +455,8 @@ if($xmlformat=='rdf')
 					WHERE 
 						nachname ~* '".addslashes($filter)."' OR 
 						vorname ~* '".addslashes($filter)."' OR
-						student_uid ~* '".addslashes($filter)."';";
+						student_uid ~* '".addslashes($filter)."' OR
+						matrikelnr = '".addslashes($filter)."';";
 			if($result = pg_query($conn, $qry))
 			{
 				while($row = pg_fetch_object($result))
