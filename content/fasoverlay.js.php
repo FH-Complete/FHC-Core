@@ -653,7 +653,7 @@ function StatistikPrintLVPlanung()
 
 		//Fachbereich holen
 		var col;
-		col = tree.columns ? tree.columns["kurzbz"] : "kurzbz";
+		col = tree.columns ? tree.columns["fachbereich-treecol-kurzbz"] : "fachbereich-treecol-kurzbz";
 		var fachbereich_kurzbz=tree.view.getCellText(tree.currentIndex,col);
 		var url = '<?php echo APP_ROOT ?>content/statistik/lvplanung.php?fachbereich_kurzbz='+fachbereich_kurzbz;
 	}

@@ -173,7 +173,7 @@ var nsDragAndDrop =
         	// cancel the drag. even if it's not, there's not much
         	// we can do, so be silent.
       	}
-      	aEvent.preventBubble();
+      	aEvent.stopPropagation();
 	},
 
   /** 
@@ -205,7 +205,7 @@ var nsDragAndDrop =
               aDragDropObserver.onDragOver(aEvent, 
                                            flavourSet.flavourTable[flavour], 
                                            this.mDragSession);
-              aEvent.preventBubble();
+              aEvent.stopPropagation();
               break;
             }
         }
@@ -243,7 +243,7 @@ var nsDragAndDrop =
         var dropData = multiple ? transferData : transferData.first.first;
         aDragDropObserver.onDrop(aEvent, dropData, this.mDragSession);
       }
-      aEvent.preventBubble();
+      aEvent.stopPropagation();
     },
 
   /** 
