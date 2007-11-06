@@ -157,7 +157,25 @@ else
 				<td class="tdwidth10" nowrap>&nbsp;</td>
 				<td class="tdwrap"><a class="Item" href="lvplan/stpl_week.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;LV-Plan</a></td>
 			</tr>';
-								
+
+			//Projekt-Zeitaufzeichnung
+			$qry = "SELECT count(*) as anzahl FROM fue.tbl_projektbenutzer WHERE uid='$user'";
+			
+			if($result = pg_query($db_conn, $qry))
+			{
+				if($row = pg_fetch_object($result))
+				{
+					if($row->anzahl>0)
+					{
+						echo '
+					  	<tr>
+							<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="tools/zeitaufzeichnung.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Zeitaufzeichnung</a></td>
+						</tr>';
+					}
+				}
+			}
+			
 			if ($is_student)
 			{
 				echo '<tr>
