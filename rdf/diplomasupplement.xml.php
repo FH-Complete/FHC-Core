@@ -69,23 +69,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		}
 		else
 			die('Student not found'.$uid_arr[$i]);
-		$qry = "SELECT * FROM lehre.tbl_akadgrad WHERE studiengang_kz='$row->studiengang_kz'";
-		$titel = '';
-		$titel_kurzbz = '';
-		if($result_titel = pg_query($conn, $qry))
-		{
-			if($row_titel = pg_fetch_object($result_titel))
-			{
-				$titel = $row_titel->titel;
-				$titel_kurzbz = $row_titel->akadgrad_kurzbz;
-			}
-		}
+		
 		echo '	<supplement>';
 		echo '		<nachname><![CDATA['.$row->nachname.']]></nachname>';
 		echo '		<vorname>'.$row->vorname.'</vorname>';
 		echo '		<vornamen>'.$row->vornamen.'</vornamen>';
-		echo '		<titel>'.$titel.'</titel>';
-		echo '		<titel_kurzbz>'.$titel_kurzbz.'</titel_kurzbz>';
 		echo '		<geburtsdatum>'.$datum->convertISODate($row->gebdatum).'</geburtsdatum>';
 		echo '		<matrikelnummer>'.$row->matrikelnr.'</matrikelnummer>';
 		echo '		<studiengang_kz>'.sprintf("%04s",   $row->studiengang_kz).'</studiengang_kz>';
@@ -133,15 +121,30 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			
 		}
 		
-		$qry = "SELECT bezeichnung FROM lehre.tbl_abschlusspruefung JOIN lehre.tbl_abschlussbeurteilung USING(abschlussbeurteilung_kurzbz) WHERE student_uid='".$uid_arr[$i]."' ORDER BY datum DESC LIMIT 1";
+		$qry = "SELECT bezeichnung, akadgrad_id FROM lehre.tbl_abschlusspruefung JOIN lehre.tbl_abschlussbeurteilung USING(abschlussbeurteilung_kurzbz) WHERE student_uid='".$uid_arr[$i]."' ORDER BY datum DESC LIMIT 1";
 		if($result1 = pg_query($conn, $qry))
 		{
 			if($row1 = pg_fetch_object($result1))
 			{
 				echo "		<beurteilung>$row1->bezeichnung</beurteilung>";
+				$akadgrad_id = $row1->akadgrad_id;
 			}
 		}
 		
+		$qry = "SELECT * FROM lehre.tbl_akadgrad WHERE akadgrad_id='$akadgrad_id'";
+		$titel = '';
+		$titel_kurzbz = '';
+		if($result_titel = pg_query($conn, $qry))
+		{
+			if($row_titel = pg_fetch_object($result_titel))
+			{
+				$titel = $row_titel->titel;
+				$titel_kurzbz = $row_titel->akadgrad_kurzbz;
+			}
+		}
+		echo '		<titel>'.$titel.'</titel>';
+		echo '		<titel_kurzbz>'.$titel_kurzbz.'</titel_kurzbz>';
+	
 		$qry = "SELECT projektarbeit_id FROM lehre.tbl_projektarbeit WHERE student_uid='".$uid_arr[$i]."' AND projekttyp_kurzbz='Praxis'";
 		if($result = pg_query($conn, $qry))
 		{
