@@ -577,7 +577,10 @@ if (!isset($_GET["notenuebersicht"]))
 						$anzahl = $row_cnt->anzahl;
 						
 			echo "<script type='text/javascript'>";
-			echo "maxbsp = ".$uebung_obj->maxbsp.";";
+			if ($uebung_obj->maxbsp)
+				echo "maxbsp = ".$uebung_obj->maxbsp.";";
+			else
+				echo "maxbsp = 0;";			
 			echo "aktbsp = ".$anzahl.";";
 			echo "function plus1(id)
 				{
@@ -597,90 +600,96 @@ if (!isset($_GET["notenuebersicht"]))
 				";
 				
 			echo "</script>";
-				
-			echo " <table>";
-			if ($uebung_obj->maxbsp > 0)
-				echo "<tr><td>Maximale Anzahl der Beispiele/Student:</td><td><b>".$uebung_obj->maxbsp."</b></td></tr>";
-			if ($uebung_obj->maxstd > 0)
-				echo "<tr><td>Maximale Anzahl Studenten/Beispiel:</td><td style='background-color:#dddddd;'><b>".$uebung_obj->maxstd."</b></td></tr>";
-			echo "</table>";	
-			echo "
-			<form method='POST' name='bspform' action='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&uid=$user'>
-			<table width='100%'>
-				<tr>
-					<td valign='top'><div style='width: 70%;'>
-					".($anmerkung!=''?'<b>Anmerkungen:</b><br> '.$anmerkung.'<br><br>':'')."
-					</div>
-						<table border='1'>
-						<tr>
-							<td class='ContentHeader2'>Beispiel</td>
-						    <td class='ContentHeader2'>Vorbereitet</td>
-						    <td class='ContentHeader2'>Nicht vorbereitet</td>
-						    <td class='ContentHeader2'>Probleme</td>
-						    <td class='ContentHeader2'>Punkte</td>
-						</tr>";
 			
 			$bsp_obj = new beispiel($conn);
-			$bsp_obj->load_beispiel($uebung_id);
-			
-			foreach ($bsp_obj->beispiele as $row)
+			$bsp_obj->load_beispiel($uebung_id);			
+			if ($bsp_obj->beispiele)
 			{
-				$bsp_voll = false;		
-				$stud_bsp_obj = new beispiel($conn);
-					
+				echo " <table>";
+				if ($uebung_obj->maxbsp > 0)
+					echo "<tr><td>Maximale Anzahl der Beispiele/Student:</td><td><b>".$uebung_obj->maxbsp."</b></td></tr>";
 				if ($uebung_obj->maxstd > 0)
+					echo "<tr><td>Maximale Anzahl Studenten/Beispiel:</td><td style='background-color:#dddddd;'><b>".$uebung_obj->maxstd."</b></td></tr>";
+				echo "</table>";	
+				echo "
+				<form method='POST' name='bspform' action='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&uid=$user'>
+				<table width='100%'>
+					<tr>
+						<td valign='top'><div style='width: 70%;'>
+						".($anmerkung!=''?'<b>Anmerkungen:</b><br> '.$anmerkung.'<br><br>':'')."
+						</div>
+							<table border='1'>
+							<tr>
+								<td class='ContentHeader2'>Beispiel</td>
+							    <td class='ContentHeader2'>Vorbereitet</td>
+							    <td class='ContentHeader2'>Nicht vorbereitet</td>
+							    <td class='ContentHeader2'>Probleme</td>
+							    <td class='ContentHeader2'>Punkte</td>
+							</tr>";
+				
+				
+				
+				foreach ($bsp_obj->beispiele as $row)
 				{
-					$stud_bsp_obj->check_anzahl_studentbeispiel($row->beispiel_id);
-					if ($stud_bsp_obj->anzahl_studentbeispiel >= $uebung_obj->maxstd)
-						$bsp_voll = true;
+					$bsp_voll = false;		
+					$stud_bsp_obj = new beispiel($conn);
+						
+					if ($uebung_obj->maxstd > 0)
+					{
+						$stud_bsp_obj->check_anzahl_studentbeispiel($row->beispiel_id);
+						if ($stud_bsp_obj->anzahl_studentbeispiel >= $uebung_obj->maxstd)
+							$bsp_voll = true;
+					}
+					if($stud_bsp_obj->load_studentbeispiel($user, $row->beispiel_id))
+					{
+						$vorbereitet = $stud_bsp_obj->vorbereitet;
+						$probleme = $stud_bsp_obj->probleme;
+					}
+					else
+					{
+						$vorbereitet = false;
+						$probleme = false;
+					}
+					if ($bsp_voll)
+					{
+						$ro = " disabled";
+						$markiert = " style='background-color:#dddddd;'";		
+					}
+					else
+					{
+						$ro = "";
+						$markiert = "";
+					}
+					echo "<tr$markiert>
+							<td>$row->bezeichnung</td>
+							<td align='center'><input type='radio' onchange='plus1($row->beispiel_id);' name='solved_$row->beispiel_id' value='1' ".($vorbereitet?'checked':'')."$ro></td>
+							<td align='center'><input type='radio' onchange='minus1();' name='solved_$row->beispiel_id' value='0' ".(!$vorbereitet?'checked':'')."></td>
+							<td align='center'><input type='checkbox' name='problem_$row->beispiel_id' ".($probleme?'checked':'')."$ro></td>
+							<td align='center'>$row->punkte</td>
+						</tr>";
+			
+						
 				}
-				if($stud_bsp_obj->load_studentbeispiel($user, $row->beispiel_id))
-				{
-					$vorbereitet = $stud_bsp_obj->vorbereitet;
-					$probleme = $stud_bsp_obj->probleme;
-				}
-				else
-				{
-					$vorbereitet = false;
-					$probleme = false;
-				}
-				if ($bsp_voll)
-				{
-					$ro = " disabled";
-					$markiert = " style='background-color:#dddddd;'";		
-				}
-				else
-				{
-					$ro = "";
-					$markiert = "";
-				}
-				echo "<tr$markiert>
-						<td>$row->bezeichnung</td>
-						<td align='center'><input type='radio' onchange='plus1($row->beispiel_id);' name='solved_$row->beispiel_id' value='1' ".($vorbereitet?'checked':'')."$ro></td>
-						<td align='center'><input type='radio' onchange='minus1();' name='solved_$row->beispiel_id' value='0' ".(!$vorbereitet?'checked':'')."></td>
-						<td align='center'><input type='checkbox' name='problem_$row->beispiel_id' ".($probleme?'checked':'')."$ro></td>
-						<td align='center'>$row->punkte</td>
-					</tr>";
-		
-					
+				
+				//Speichern button nur Anzeigen wenn die Uebung Freigegeben ist
+				if($datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis)>time())
+					echo "<tr><td align='right' colspan=5><input type='submit' value='Speichern' name='submit'></td></form></tr>";
+				
+				echo "</table>";
 			}
-			
-			//Speichern button nur Anzeigen wenn die Uebung Freigegeben ist
-			if($datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis)>time())
-				echo "<tr><td align='right' colspan=5><input type='submit' value='Speichern' name='submit'></td></form></tr>";
-			
-			echo "</table>";
+			else
+				echo "<table><tr><td>Keine Beispiele angelegt</td></tr></table><table width='100%'><tr><td width='70%'></div><table><tr><td>&nbsp;</td></tr></table>";
 			
 			if ($uebung_obj->abgabe)
 			{
 				
-				echo "<br><table>\n";
+				echo "<br><table><tr><td>Abgabedatei:</td></tr>\n";
 				$uebung_obj->load_studentuebung($user, $uebung_id);
 				if ($uebung_obj->abgabe_id)
 				{		
 					$uebung_obj->load_abgabe($uebung_obj->abgabe_id);	
 					echo " <tr>";
-					echo"	<td>Abgabedatei: <a href='studentenansicht.php?uid=$user&lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&download_abgabe=".$uebung_obj->abgabedatei."'>".$uebung_obj->abgabedatei."</a>";
+					echo"	<td><a href='studentenansicht.php?uid=$user&lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&download_abgabe=".$uebung_obj->abgabedatei."'>".$uebung_obj->abgabedatei."</a>";
 					if($datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis)>time())	
 						echo " <a href='studentenansicht.php?uid=$user&lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&deleteabgabe=1'>[del]</a></td>";
 					echo "</tr>";

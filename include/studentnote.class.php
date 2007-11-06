@@ -179,6 +179,8 @@ class studentnote
 						if($result=pg_query($conn, $qry))
 							if($row = pg_fetch_object($result))
 								$punkte_moeglich = $row->punktegesamt_alle;					
+						if ($punkte_moeglich == 0)
+							$punkte_moeglich = 1;						
 						$punkte_ns = $punkte_gesamt/$punkte_moeglich*100;
 					}
 					else
