@@ -214,6 +214,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	      						<label value="Gruppe" control="student-detail-textbox-gruppe"/>
 	      						<hbox><textbox id="student-detail-textbox-gruppe" disabled="true" maxlength="1" size="1"/></hbox>
 	    					</row>
+	    					<row>
+	    						<label value="Alias" control="student-detail-textbox-alias" />
+	    						<textbox id="student-detail-textbox-alias" disabled="true" maxlength="256" />
+	    					</row>
 	    				</rows>
 	    		</grid>
 	    		</groupbox>

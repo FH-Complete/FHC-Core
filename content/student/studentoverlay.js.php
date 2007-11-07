@@ -529,6 +529,7 @@ function StudentDetailDisableFields(val)
 	document.getElementById('student-detail-textbox-semester').disabled=val;
 	document.getElementById('student-detail-textbox-verband').disabled=val;
 	document.getElementById('student-detail-textbox-gruppe').disabled=val;
+	document.getElementById('student-detail-textbox-alias').disabled=val;
 	document.getElementById('student-detail-button-save').disabled=val;
 }
 
@@ -565,6 +566,7 @@ function StudentDetailSave()
 	semester = document.getElementById('student-detail-textbox-semester').value;
 	verband = document.getElementById('student-detail-textbox-verband').value;
 	gruppe = document.getElementById('student-detail-textbox-gruppe').value;
+	alias = document.getElementById('student-detail-textbox-alias').value;
 
 	//Wenn es noch kein Student ist, dann wird die Studiengang_kz vom Prestudent genommen
 	if(studiengang_kz=='')
@@ -620,6 +622,7 @@ function StudentDetailSave()
 	req.add('semester', semester);
 	req.add('verband', verband);
 	req.add('gruppe', gruppe);
+	req.add('alias', alias);
 
 	var response = req.executePOST();
 
@@ -756,6 +759,7 @@ function StudentAuswahl()
 	gruppe=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#gruppe" ));
 	prestudent_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#prestudent_id" ));
 	status=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#status" ));
+	alias=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#alias" ));
 	
 	//Bei Incoming wird das Menue zur Statusaenderung deaktiviert
 	if(status=='Incoming')
@@ -798,6 +802,7 @@ function StudentAuswahl()
 	document.getElementById('student-detail-textbox-verband').value=verband;
 	document.getElementById('student-detail-textbox-gruppe').value=gruppe;
 	document.getElementById('student-detail-textbox-person_id').value = person_id;
+	document.getElementById('student-detail-textbox-alias').value=alias;
 
 	//PreStudent Daten holen
 
@@ -2399,20 +2404,42 @@ function StudentZeugnisArchivieren()
 		alert('Student muss ausgewaehlt sein');
 		return;
 	}
-    var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-	var uid=tree.view.getCellText(tree.currentIndex,col);
+    //var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+	//var uid=tree.view.getCellText(tree.currentIndex,col);
 	
+	
+	var tree=document.getElementById('student-tree');
+	var numRanges = tree.view.selection.getRangeCount();
+	var start = new Object();
+	var end = new Object();
+	var anzfault=0;
+	var uid='';
+	var errormsg = '';
 	var stsem = getStudiensemester();
 	
-	url = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl=Zeugnis&xml=zeugnis.rdf.php&uid='+uid+'&ss='+stsem+'&archive=1';
+	//Zeugnis fuer alle markierten Studenten archivieren
+	for (var t=0; t<numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+  		for (v=start.value; v<=end.value; v++)
+  		{
+  			var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+  			uid = tree.view.getCellText(v,col)
+  			
+  			url = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl=Zeugnis&xml=zeugnis.rdf.php&uid='+uid+'&ss='+stsem+'&archive=1';
 
-	var req = new phpRequest(url,'','');
-
-	var response = req.execute();
-	if(response!='')
-		alert(response);
-	StudentAkteTreeDatasource.Refresh(false);
-    
+			var req = new phpRequest(url,'','');
+		
+			var response = req.execute();
+			if(response!='')
+				errormsg = errormsg + response;
+  		}
+	}
+	
+	if(errormsg!='')
+		alert(errormsg);
+			
+	StudentAkteTreeDatasource.Refresh(false);    
 }
 
 // **************** Incomming/Outgoing ******************

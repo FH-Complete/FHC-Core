@@ -116,7 +116,7 @@ if(!$xml_doc->load($xml_url))
 $qry = "SELECT text FROM public.tbl_vorlagestudiengang WHERE (studiengang_kz=0 OR studiengang_kz='".addslashes($xsl_stg_kz)."') AND vorlage_kurzbz='$xsl' ORDER BY studiengang_kz DESC, version DESC LIMIT 1";
 
 if(!$result = pg_query($conn, $qry))
-	die('Fehler beim laden der Vorlage'.pg_errormessage($conn));
+	die('Fehler beim Laden der Vorlage'.pg_errormessage($conn));
 if(!$row = pg_fetch_object($result))
 	die('Vorlage wurde nicht gefunden'.$qry);
 
@@ -219,9 +219,9 @@ else
 		$akte->insertamum = date('Y-m-d h:m:s');
 		$akte->insertvon = $user;
 	  	$akte->ext_id = "";
-	  	$akte->uid = $_REQUEST["uid"];
+	  	$akte->uid = $uid;
 		$akte->new = true;
-		if (!$akte->save('new'))
+		if (!$akte->save())
 			return true;
 		else
 			return false;
