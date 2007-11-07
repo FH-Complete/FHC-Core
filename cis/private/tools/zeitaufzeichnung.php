@@ -35,6 +35,7 @@ echo '
 <title>Zeitaufzeichnung</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
 <script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
 <script language="JavaScript">
 function setbisdatum()
@@ -102,7 +103,7 @@ $studiengang_kz = (isset($_POST['studiengang'])?$_POST['studiengang']:'');
 $fachbereich_kurzbz = (isset($_POST['fachbereich'])?$_POST['fachbereich']:'');
 $aktivitaet_kurzbz = (isset($_POST['aktivitaet'])?$_POST['aktivitaet']:'');
 $von = (isset($_POST['von'])?$_POST['von']:date('d.m.Y H:i:s'));
-$bis = (isset($_POST['bis'])?$_POST['bis']:date('d.m.Y H:i:s'));
+$bis = (isset($_POST['bis'])?$_POST['bis']:date('d.m.Y H:i:s', mktime(date('H'), date('i')+10, date('s'), date('m'),date('d'),date('Y'))));
 $beschreibung = (isset($_POST['beschreibung'])?$_POST['beschreibung']:'');
 
 //Speichern der Daten
@@ -279,7 +280,7 @@ if($result_projekt = pg_query($conn, $qry_projekt))
 		echo '
 		<tr>
 			<td>Von</td><td><input type="text" name="von" value="'.$von.'"></td>
-			<td>Bis</td><td><input type="text" id="bis" name="bis" value="'.$bis.'"><input type="button" value="now" onclick="setbisdatum()"></td>
+			<td>Bis</td><td><input type="text" id="bis" name="bis" value="'.$bis.'">&nbsp;&nbsp;<img src="../../../skin/images/refresh.png" onclick="setbisdatum()"></td>
 		<tr>';
 		//Beschreibung
 		echo '<tr><td>Beschreibung</td><td colspan="3"><textarea name="beschreibung" cols="60">'.$beschreibung.'</textarea></td></tr>';
@@ -297,7 +298,12 @@ if($result_projekt = pg_query($conn, $qry_projekt))
 		//Uebersichtstabelle
 		echo "<table id='t1' class='liste table-autosort:1 table-stripeclass:alternate table-autostripe'>\n";
 		echo "   <thead><tr class='liste'>\n";
-	    echo "       <th class='table-sortable:numeric'>ID</th><th class='table-sortable:default'>Projekt</th><th class='table-sortable:default'>Aktivitaet</th><th class='table-sortable:default'>Start</th><th class='table-sortable:default'>Ende</th><th class='table-sortable:default'>Dauer</th><th class='table-sortable:default'>Beschreibung</th><th class='table-sortable:default'>Studiengang</th><th class='table-sortable:default'>Fachbereich</th><th colspan='2'>Aktion</th>";
+	    echo "       <th class='table-sortable:numeric'>ID</th><th class='table-sortable:default'>Projekt</th>";
+	    echo "<th class='table-sortable:default'>Aktivitaet</th><th class='table-sortable:default'>Start</th>";
+	    echo "<th class='table-sortable:default'>Ende</th>";
+	    //echo "<th class='table-sortable:default'>Dauer</th>";
+	    echo "<th class='table-sortable:default'>Beschreibung</th><th class='table-sortable:default'>Studiengang</th>";
+	    echo "<th class='table-sortable:default'>Fachbereich</th><th colspan='2'>Aktion</th>";
 	    echo "   </tr></thead><tbody>\n";
 	    
 	    $qry = "SELECT *, ende-start as diff FROM campus.tbl_zeitaufzeichnung WHERE uid='$user' AND ende>(now() - INTERVAL '40 days') ORDER BY ende DESC";
@@ -312,8 +318,8 @@ if($result_projekt = pg_query($conn, $qry_projekt))
 		        echo "       <td>$row->aktivitaet_kurzbz</td>\n";
 		        echo "       <td>".date('d.m.Y H:i:s', $datum->mktime_fromtimestamp($row->start))."</td>\n";
 		        echo "       <td>".date('d.m.Y H:i:s', $datum->mktime_fromtimestamp($row->ende))."</td>\n";
-		        echo "       <td align='right'>".$row->diff."</td>\n";
-		        echo "       <td title='$row->beschreibung'>".(strlen($row->beschreibung)>53?substr($row->beschreibung,0,50).'...':$row->beschreibung)."</td>\n";
+		        //echo "       <td align='right'>".$row->diff."</td>\n";
+		        echo "       <td title='".str_replace("\r\n",' ',$row->beschreibung)."'>".(strlen($row->beschreibung)>33?substr($row->beschreibung,0,30).'...':$row->beschreibung)."</td>\n";
 		        echo "       <td>".(isset($stg_arr[$row->studiengang_kz])?$stg_arr[$row->studiengang_kz]:$row->studiengang_kz)."</td>\n";
 		        echo "       <td>$row->fachbereich_kurzbz</td>\n";
 		        echo "       <td><a href='".$_SERVER['PHP_SELF']."?type=edit&zeitaufzeichnung_id=$row->zeitaufzeichnung_id' class='Item'>edit</a></td>\n";

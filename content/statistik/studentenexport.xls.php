@@ -93,6 +93,8 @@ loadVariables($conn, $user);
 	
 	$worksheet->write($zeile,$i,"UID", $format_bold);
 	$maxlength[$i]=3;
+	$worksheet->write($zeile,++$i,"ANREDE", $format_bold);
+	$maxlength[$i]=6;
 	$worksheet->write($zeile,++$i,"TITELPRE", $format_bold);
 	$maxlength[$i]=8;
 	$worksheet->write($zeile,++$i,"NACHNAME", $format_bold);
@@ -198,6 +200,11 @@ loadVariables($conn, $user);
 				$maxlength[$i] = strlen($row->student_uid);
 			$worksheet->write($zeile,$i, $row->student_uid);
 		}
+		$i++;
+		
+		if(strlen($row->anrede)>$maxlength[$i])
+			$maxlength[$i] = strlen($row->anrede);
+		$worksheet->write($zeile,$i, $row->anrede);
 		$i++;
 		
 		if(strlen($row->titelpre)>$maxlength[$i])

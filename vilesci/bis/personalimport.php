@@ -150,10 +150,10 @@ if(isset($_POST['submitfile']))
 				
 				foreach ($funktionen as $funktion)
 				{
-					$stgkz = (int)getValue($verwendung->getElementsByTagName('StgKz'));
-					$sws = getValue($verwendung->getElementsByTagName('SWS'));
+					$stgkz = (int)getValue($funktion->getElementsByTagName('StgKz'));
+					$sws = getValue($funktion->getElementsByTagName('SWS'));
 					$anzahl_funktionen_gesamt++;
-					
+					//echo "<br>$mitarbeiter_uid: $stgkz/$sws - $bisverwendung_id";
 					//Funktion in der Datenbank suchen
 					$qry = "SELECT sws FROM bis.tbl_bisfunktion WHERE bisverwendung_id='$bisverwendung_id' AND studiengang_kz='$stgkz'";
 					if($result = pg_query($conn, $qry))
