@@ -189,7 +189,7 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 }
 
 //Projekte holen fuer zu denen der Benutzer zugeteilt ist
-$qry_projekt = "SELECT distinct tbl_projekt.* FROM fue.tbl_projektbenutzer JOIN fue.tbl_projekt USING(projekt_kurzbz) WHERE beginn<=now() AND (ende>=now() OR ende is null)";
+$qry_projekt = "SELECT distinct tbl_projekt.* FROM fue.tbl_projektbenutzer JOIN fue.tbl_projekt USING(projekt_kurzbz) WHERE beginn<=now() AND (ende>=now() OR ende is null) AND uid='$user'";
 
 if($result_projekt = pg_query($conn, $qry_projekt))
 {

@@ -222,67 +222,86 @@ if(!$error)
 				$student->updateamum = date('Y-m-d H:i:s');
 				$student->updatevon = $user;
 				
-				$stsem = new studiensemester($conn, null, true);
-				$stsem_kurzbz = $stsem->getaktorNext();
-				//Wenn das ausgewaehlte Semester das aktuelle ist, dann wird auch in der
-				//Tabelle Student der Stg/Semester/Verband/Gruppe geaendert.
-				//Sonst nur in der Tabelle Studentlehrverband
-				if($semester_aktuell == $stsem_kurzbz)
+				if($_POST['alias']!='')
 				{
-					$student->studiengang_kz = $_POST['studiengang_kz'];
-					$student->semester = $_POST['semester'];
-					$student->verband = ($_POST['verband']==''?' ':$_POST['verband']);
-					$student->gruppe = ($_POST['gruppe']==''?' ':$_POST['gruppe']);
+					if(checkalias($_POST['alias']))
+					{
+						$student->alias = $_POST['alias'];
+					}
+					else 
+					{
+						$error = true;
+						$return = false;
+						$errormsg = 'Alias ist ungueltig';
+					}
 				}
-				
-				$student->new=false;				
-
-				$lehrverband = new lehrverband($conn, true);
-				if(!$lehrverband->exists($_POST['studiengang_kz'],$_POST['semester'],$_POST['verband'], $_POST['gruppe']))
-				{
-					$errormsg = 'Die angegebene Lehrverbandsgruppe existiert nicht!';
-					$return = false;
-					$error = true;
-				}
+				else 
+					$student->alias = '';
 				
 				if(!$error)
 				{
-					if($student->save())
+					$stsem = new studiensemester($conn, null, true);
+					$stsem_kurzbz = $stsem->getaktorNext();
+					//Wenn das ausgewaehlte Semester das aktuelle ist, dann wird auch in der
+					//Tabelle Student der Stg/Semester/Verband/Gruppe geaendert.
+					//Sonst nur in der Tabelle Studentlehrverband
+					if($semester_aktuell == $stsem_kurzbz)
 					{
-						$student_lvb = new student($conn, null, true);
-						
-						if($student_lvb->studentlehrverband_exists($_POST['uid'], $semester_aktuell))
-							$student_lvb->new = false;
-						else 
-							$student_lvb->new = true;
-						
-						$student_lvb->uid = $_POST['uid'];
-						$student_lvb->studiensemester_kurzbz = $semester_aktuell;
-						$student_lvb->studiengang_kz = $_POST['studiengang_kz'];
-						$student_lvb->semester = $_POST['semester'];
-						$student_lvb->verband = ($_POST['verband']==''?' ':$_POST['verband']);
-						$student_lvb->gruppe = ($_POST['gruppe']==''?' ':$_POST['gruppe']);
-						$student_lvb->updateamum = date('Y-m-d H:i:s');
-						$student_lvb->updatevon = $user;
-						
-						if($student_lvb->save_studentlehrverband())
-						{
-							$return = true;
-							$error=false;
-							$data = $student->prestudent_id;
-						}
-						else 
-						{
-							$error = true;
-							$errormsg = $student_lvb->errormsg;
-							$return = false;
-						}
+						$student->studiengang_kz = $_POST['studiengang_kz'];
+						$student->semester = $_POST['semester'];
+						$student->verband = ($_POST['verband']==''?' ':$_POST['verband']);
+						$student->gruppe = ($_POST['gruppe']==''?' ':$_POST['gruppe']);
 					}
-					else
+					
+					$student->new=false;				
+	
+					$lehrverband = new lehrverband($conn, true);
+					if(!$lehrverband->exists($_POST['studiengang_kz'],$_POST['semester'],$_POST['verband'], $_POST['gruppe']))
 					{
+						$errormsg = 'Die angegebene Lehrverbandsgruppe existiert nicht!';
 						$return = false;
-						$errormsg  = $student->errormsg;
 						$error = true;
+					}
+					
+					if(!$error)
+					{
+						if($student->save())
+						{
+							$student_lvb = new student($conn, null, true);
+							
+							if($student_lvb->studentlehrverband_exists($_POST['uid'], $semester_aktuell))
+								$student_lvb->new = false;
+							else 
+								$student_lvb->new = true;
+							
+							$student_lvb->uid = $_POST['uid'];
+							$student_lvb->studiensemester_kurzbz = $semester_aktuell;
+							$student_lvb->studiengang_kz = $_POST['studiengang_kz'];
+							$student_lvb->semester = $_POST['semester'];
+							$student_lvb->verband = ($_POST['verband']==''?' ':$_POST['verband']);
+							$student_lvb->gruppe = ($_POST['gruppe']==''?' ':$_POST['gruppe']);
+							$student_lvb->updateamum = date('Y-m-d H:i:s');
+							$student_lvb->updatevon = $user;
+							
+							if($student_lvb->save_studentlehrverband())
+							{
+								$return = true;
+								$error=false;
+								$data = $student->prestudent_id;
+							}
+							else 
+							{
+								$error = true;
+								$errormsg = $student_lvb->errormsg;
+								$return = false;
+							}
+						}
+						else
+						{
+							$return = false;
+							$errormsg  = $student->errormsg;
+							$error = true;
+						}
 					}
 				}
 			}

@@ -121,6 +121,24 @@ class benutzer extends person
 			$this->errormsg = 'aktiv muss ein boolscher wert sein';
 			return false;
 		}
+		
+		if($this->alias!='')
+		{
+			$qry = "SELECT * FROM tbl_benutzer WHERE alias='".addslashes($this->alias)."' AND uid!='".$this->uid."'";
+			if($result = pg_query($this->conn, $qry))
+			{
+				if(pg_num_rows($result)>0)
+				{
+					$this->errormsg = 'Dieser Alias ist bereits vergeben';
+					return false;
+				}
+			}
+			else 
+			{
+				$this->errormsg = 'Fehler beim pruefen des Alias';
+				return false;
+			}
+		}
 		return true;
 	}
 	
