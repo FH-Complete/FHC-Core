@@ -580,7 +580,7 @@ if (!isset($_GET["notenuebersicht"]))
 			if ($uebung_obj->maxbsp)
 				echo "maxbsp = ".$uebung_obj->maxbsp.";";
 			else
-				echo "maxbsp = 0;";			
+				echo "maxbsp = 9999;";			
 			echo "aktbsp = ".$anzahl.";";
 			echo "function plus1(id)
 				{
