@@ -376,5 +376,29 @@ class studiensemester
 			$this->errormsg = 'Fehler beim Ermitteln des vorangegangenen Studiensemesters';
 		}
 	}
+	// ****
+	// * Liefert das vorvorige Studiensemester
+	// ****
+	function getBeforePrevious()
+	{
+		$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ende<now() ORDER BY ende DESC LIMIT 2";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result,1))
+			{
+				return $row->studiensemester_kurzbz;
+			}
+			else 
+			{
+				$this->errormsg = 'Es wurde kein vorjähriges Studiensemester gefunden';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Ermitteln des vorjährigen Studiensemesters';
+		}
+	}
 }
 ?>

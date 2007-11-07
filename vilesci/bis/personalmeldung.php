@@ -23,7 +23,9 @@ $erhalter='';
 $zaehl=0;
 $eteam=array();
 $studiensemester=new studiensemester($conn);
-$ssem=$studiensemester->getaktorNext();
+$ssem=$studiensemester->getaktorNext();		//aktuelles Semester
+$psem=$studiensemester->getPrevious();		//voriges Semester
+$bsem=$studiensemester->getBeforePrevious();		//vorjähriges Semester
 $datei='';
 
 $datumobj=new datum();
@@ -33,14 +35,15 @@ if(strstr($ssem,"WS"))
 	$bisdatum=date("Y-m-d",  mktime(0, 0, 0, 11, 15, date("Y")));
 	$bisprevious=date("Y-m-d",  mktime(0, 0, 0, 04, 15, date("Y")));
 }
-elseif(strstr($ssem,"SS"))
+/*elseif(strstr($ssem,"SS"))
 {
 	$bisdatum=date("Y-m-d",  mktime(0, 0, 0, 04, 15, date("Y")));
 	$bisprevious=date("Y-m-d",  mktime(0, 0, 0, 11, 15, date("Y")-1));
-}
+}*/
 else 
 {
 	echo "Ungültiges Semester!";
+	exit;
 }
 
 $qry="SELECT * FROM public.tbl_erhalter";
@@ -63,7 +66,61 @@ if($result = pg_query($conn, $qry))
 	}
 }
 
-$qry="SET client_encoding TO Unicode;SELECT DISTINCT ON (UID) * FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid) 
+//Check, ob jeder Mitarbeiter nur eine Verwendung hat
+$qryall='SELECT uid,nachname,vorname, count(bisverwendung_id)  
+	FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) 
+	WHERE aktiv AND bismelden AND (ende>now() OR ende IS NULL) 
+	GROUP BY uid,nachname,vorname HAVING count(bisverwendung_id)!=1 ORDER by nachname,vorname;';
+if($resultall = pg_query($conn, $qryall))
+{
+	$num_rows_all=pg_num_rows($resultall);
+	echo "<H2>Bei $num_rows_all aktiven Mitarbeitern sind die aktuellen Verwendungen nicht plausibel</H2>";
+	while($rowall=pg_fetch_object($resultall))
+	{
+		$i=0;
+		$qry="SELECT * FROM bis.tbl_bisverwendung 
+			JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid) 
+			JOIN public.tbl_person USING(person_id) 
+			JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid)
+			WHERE tbl_benutzer.aktiv=TRUE AND bismelden=TRUE 
+			AND (ende>now() OR ende IS NULL) AND mitarbeiter_uid='".$rowall->uid."';";
+		if($result = pg_query($conn, $qry))
+		{
+			$num_rows=pg_num_rows($result);
+			if($num_rows>1)
+			{
+				while($row=pg_fetch_object($result))
+				{
+					if($i==0)
+					{
+						echo "<br><u>Aktiv(e) Mitarbeiter(in) ".$row->nachname." ".$row->vorname." hat ".$num_rows." aktuelle Verwendungen:</u><br>";
+						$i++;
+					}
+					echo "Verwendung Code ".$row->verwendung_code.", Beschäftigungscode ".$row->ba1code.", ".$row->ba2code.", mit Ausmaß ".$row->beschausmasscode.", ".$row->beginn." - ".$row->ende."<br>";
+				}
+			}
+			elseif($num_rows==0)
+				echo "<br><u>Aktiv(e) Mitarbeiter(in): ".$rowall->nachname." ".$rowall->vorname." hat ".$num_rows." aktuelle Verwendungen:</u><br>";
+		}
+	}
+}
+
+
+//Funktionen prüfen
+//	neue Fkt. anlegen
+//	vorhandene auf sws prüfen
+$qry="SET client_encoding TO Unicode;
+	SELECT * FROM lehre.tbl_lehreinheit_mitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
+	JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid) 
+	JOIN public.tbl_person USING(person_id) 
+	WHERE studiensemester_kurzbz='".$psem."' OR studiensemester_kurzbz='".$bsem."'
+	";
+
+
+
+
+
+$qry="SELECT DISTINCT ON (UID) * FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid) 
 	JOIN public.tbl_person USING(person_id)   
 	WHERE tbl_benutzer.aktiv AND bismelden AND personalnummer>1 AND mitarbeiter_uid!='_DummyLektor' 
 	ORDER BY uid, nachname,vorname   
