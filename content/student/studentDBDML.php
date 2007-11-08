@@ -1835,7 +1835,7 @@ if(!$error)
 					else 
 					{
 						$error = true;
-						$errormsg.="\nFehler beim ermitteln der UID";
+						$errormsg.="\nFehler beim Ermitteln der UID";
 					}			
 					
 					//Berechtigung pruefen

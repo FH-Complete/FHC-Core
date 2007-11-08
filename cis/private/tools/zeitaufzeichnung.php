@@ -143,6 +143,7 @@ if(isset($_POST['save']) || isset($_POST['edit']))
 	else 
 	{
 		echo '<b>Daten wurden gespeichert</b><br>';
+		$zeitaufzeichnung_id = $zeit->zeitaufzeichnung_id;
 	}
 }
 
@@ -203,7 +204,7 @@ if($result_projekt = pg_query($conn, $qry_projekt))
 		      <td align='right'><a href='".$_SERVER['PHP_SELF']."' class='Item'>NEU</a></td></tr></table>";
 		
 		//Formular
-		echo '<br><br><form method="POST">';
+		echo '<br><br><form action="'.$_SERVER['PHP_SELF'].'?zeitaufzeichnung_id='.$zeitaufzeichnung_id.'" method="POST">';
 		
 		echo '<table>';
 		//Projekt
@@ -301,12 +302,12 @@ if($result_projekt = pg_query($conn, $qry_projekt))
 	    echo "       <th class='table-sortable:numeric'>ID</th><th class='table-sortable:default'>Projekt</th>";
 	    echo "<th class='table-sortable:default'>Aktivitaet</th><th class='table-sortable:default'>Start</th>";
 	    echo "<th class='table-sortable:default'>Ende</th>";
-	    //echo "<th class='table-sortable:default'>Dauer</th>";
-	    echo "<th class='table-sortable:default'>Beschreibung</th><th class='table-sortable:default'>Studiengang</th>";
+	    echo "<th class='table-sortable:default'>Dauer</th>";
+	    echo "<th class='table-sortable:default'>Beschreibung</th><th class='table-sortable:default'>Stg</th>";
 	    echo "<th class='table-sortable:default'>Fachbereich</th><th colspan='2'>Aktion</th>";
 	    echo "   </tr></thead><tbody>\n";
 	    
-	    $qry = "SELECT *, ende-start as diff FROM campus.tbl_zeitaufzeichnung WHERE uid='$user' AND ende>(now() - INTERVAL '40 days') ORDER BY ende DESC";
+	    $qry = "SELECT *, to_char ((ende-start),'HH24:MI:SS') as diff FROM campus.tbl_zeitaufzeichnung WHERE uid='$user' AND ende>(now() - INTERVAL '40 days') ORDER BY ende DESC";
 	    if($result = pg_query($conn, $qry))
 	    {
 		    $i = 0;
@@ -318,7 +319,7 @@ if($result_projekt = pg_query($conn, $qry_projekt))
 		        echo "       <td>$row->aktivitaet_kurzbz</td>\n";
 		        echo "       <td>".date('d.m.Y H:i:s', $datum->mktime_fromtimestamp($row->start))."</td>\n";
 		        echo "       <td>".date('d.m.Y H:i:s', $datum->mktime_fromtimestamp($row->ende))."</td>\n";
-		        //echo "       <td align='right'>".$row->diff."</td>\n";
+		        echo "       <td align='right'>".$row->diff."</td>\n";
 		        echo "       <td title='".str_replace("\r\n",' ',$row->beschreibung)."'>".(strlen($row->beschreibung)>33?substr($row->beschreibung,0,30).'...':$row->beschreibung)."</td>\n";
 		        echo "       <td>".(isset($stg_arr[$row->studiengang_kz])?$stg_arr[$row->studiengang_kz]:$row->studiengang_kz)."</td>\n";
 		        echo "       <td>$row->fachbereich_kurzbz</td>\n";
