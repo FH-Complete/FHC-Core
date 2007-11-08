@@ -400,5 +400,22 @@ class adresse
 			return false;
 		}
 	}
+
+	// ********************************************************
+	// * Datenbank-Check
+	// * @param $adresse_id ID die geloescht werden soll
+	// * @return true wenn ok, false im Fehlerfall
+	// ********************************************************
+	function check_db($conn)
+	{
+		$qry='SELECT adresse_id,person_id,name,strasse,plz,ort,gemeinde,nation,typ,heimatadresse,zustelladresse,firma_id,updateamum,updatevon,insertamum,insertvon
+			FROM public.tbl_adresse LIMIT 1';
+
+		if(pg_query($conn,$qry))
+			return true;
+		else
+			return false;
+	}
+
 }
 ?>
