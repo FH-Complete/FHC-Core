@@ -422,6 +422,7 @@ if(isset($uid) && $uid!='')
 	
 	
 	echo '<br><a href="../../content/pdfExport.php?xsl=AccountInfo&xml=accountinfoblatt.xml.php&uid='.$uid.'" >AccountInfoBlatt erstellen</a>';
+	echo '<br><a href="betriebsmittel_index.php?search='.$uid.'" >Betriebsmittel (Zutrittskarten) verwalten</a>';
 	
 
 	echo "</fieldset></td></tr>";

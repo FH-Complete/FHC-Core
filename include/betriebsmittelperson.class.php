@@ -45,6 +45,10 @@ class betriebsmittelperson
 	var $updateamum;		// @var timestamp
 	var $updatevon;			// @var bigint
 	
+	var $nummer;
+	var $betriebsmitteltyp;
+	var $beschreibung;
+	
 	// ************************************
 	// * Konstruktor
 	// * @param $conn      Connection
@@ -140,13 +144,15 @@ class betriebsmittelperson
 			return false;
 		}		
 		
-		if($this->ausgegebenam!='' && !ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->ausgegebenam))
+		if($this->ausgegebenam!='' && !ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->ausgegebenam)
+								   && !ereg("([0-9]{2}).([0-9]{2}).([0-9]{4})",$this->ausgegebenam))
 		{
 			$this->errormsg = 'Ausgegeben am Datum ist ungueltig';
 			return false;
 		}
 		
-		if($this->retouram!='' && !ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->retouram))
+		if($this->retouram!='' && !ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->retouram)
+							   && !ereg("([0-9]{2}).([0-9]{2}).([0-9]{4})",$this->retouram))
 		{
 			$this->errormsg = 'Ausgegeben am Datum ist ungueltig';
 			return false;

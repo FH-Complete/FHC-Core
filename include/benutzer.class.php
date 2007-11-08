@@ -84,7 +84,7 @@ class benutzer extends person
 		}
 		else 
 		{
-			$this->errormsg = "Fehler beim laden: $qry";
+			$this->errormsg = "Fehler beim Laden der Benutzerdaten";
 			return false;
 		}		
 	}
@@ -135,7 +135,7 @@ class benutzer extends person
 			}
 			else 
 			{
-				$this->errormsg = 'Fehler beim pruefen des Alias';
+				$this->errormsg = 'Fehler beim Pruefen des Alias';
 				return false;
 			}
 		}

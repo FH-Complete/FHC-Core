@@ -30,7 +30,7 @@ require_once('../../include/lehrveranstaltung.class.php');
 
 //Connection Herstellen
 if(!$db_conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim oeffnen der Datenbankverbindung');
+	die('Fehler beim Oeffnen der Datenbankverbindung');
 
 $user=get_uid();
 
