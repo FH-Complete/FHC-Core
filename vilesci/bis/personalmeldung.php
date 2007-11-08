@@ -67,7 +67,8 @@ if($result = pg_query($conn, $qry))
 }
 
 //Check, ob jeder Mitarbeiter nur eine Verwendung hat
-$qryall='SELECT uid,nachname,vorname, count(bisverwendung_id)  
+$qryall='SET client_encoding TO Unicode;
+	SELECT uid,nachname,vorname, count(bisverwendung_id)  
 	FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) 
 	WHERE aktiv AND bismelden AND (ende>now() OR ende IS NULL) 
 	GROUP BY uid,nachname,vorname HAVING count(bisverwendung_id)!=1 ORDER by nachname,vorname;';
@@ -109,8 +110,7 @@ if($resultall = pg_query($conn, $qryall))
 //Funktionen prüfen
 //	neue Fkt. anlegen
 //	vorhandene auf sws prüfen
-$qry="SET client_encoding TO Unicode;
-	SELECT * FROM lehre.tbl_lehreinheit_mitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
+$qry="SELECT * FROM lehre.tbl_lehreinheit_mitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
 	JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid) 
 	JOIN public.tbl_person USING(person_id) 
 	WHERE studiensemester_kurzbz='".$psem."' OR studiensemester_kurzbz='".$bsem."'
