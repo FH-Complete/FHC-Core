@@ -36,6 +36,7 @@ if(isset($_GET['uid']))
 	$uid = $_GET['uid'];
 else 
 	die('Parameter uid muss uebergeben werden');
+
 ?>
 
 <window id="funktionen-window" title="Funktionen"

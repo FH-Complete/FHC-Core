@@ -99,6 +99,7 @@ function loadFunktionen(uid)
 	FunktionenTreeDatasource.addXMLSinkObserver(FunktionenTreeSinkObserver);
 	tree.builder.addListener(FunktionenTreeListener);
 	FunktionDisableFields(false);
+	
 }
 
 // ****
@@ -141,6 +142,20 @@ function FunktionNeu()
 	FunktionDetailDisableFields(false);
 	document.getElementById('funktion-checkbox-neu').checked=true;
 	document.getElementById('funktion-textbox-benutzerfunktion_id').value='';
+		
+	//Wenn die aktuelle Person ein Student ist,
+	//dann wird Studiengang und 'Studentenvertreter' vorausgewaehlt
+	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
+		studiengang_kz='';	
+	else
+		studiengang_kz = window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+
+	if(studiengang_kz!='')
+	{
+		document.getElementById('funktion-menulist-studiengang').value=studiengang_kz;
+		document.getElementById('funktion-menulist-funktion').value='stdv';
+	}
+	
 	FunktionToggleFachbereich();
 }
 
@@ -329,6 +344,9 @@ function FunktionDetailResetFields()
 	document.getElementById('funktion-menulist-funktion').value='ass';
 }
 
+// ****
+// * FachbereichsDropDown steht nur bei manchen Funktionen zur Verfuegung
+// ****
 function FunktionToggleFachbereich()
 {
 	fkt = document.getElementById('funktion-menulist-funktion').value;

@@ -178,7 +178,7 @@ if($betriebsmittel_id!='' && $person_id!='')
 else 
 {
 	$bm->kaution = '0.0';
-	$bm->ausgegebenam = date('d.m.Y');
+	$bm->ausgegebenam = date('Y-m-d');
 	$bm->betriebsmitteltyp = 'Zutrittskarte';
 }
 
@@ -227,7 +227,8 @@ if($result = pg_query($conn, $qry))
 		echo "<option value='$row->betriebsmitteltyp' $selected>$row->betriebsmitteltyp</option>";
 	}
 }
-echo '</SELECT></td></tr></table></td><td valign="top"><table>';
+echo '</SELECT></td></tr>';
+//</table></td><td valign="top"><table>';
 //Nummer
 echo '<tr><td>Nummer</td><td><input type="text" name="nummer" value="'.htmlentities($nummer).'"><input type="hidden" name="nummerold" value="'.htmlentities($nummer).'"></td></tr>';
 //Beschreibung
@@ -238,7 +239,7 @@ echo '</td><td valign="top">';
 echo '<table><tr><td>Kaution</td><td><input type="text" name="kaution" value="'.htmlentities($kaution).'"></td></tr>';
 //Anmerkung
 echo '<tr><td>Anmerkung</td><td><textarea name="anmerkung">'.htmlentities($anmerkung).'</textarea></td></tr>';
-echo '</table></td><td valign="top"><table>';
+//echo '</table></td><td valign="top"><table>';
 //Ausgegeben am
 echo '<tr><td>Ausgegeben am</td><td><input type="text" name="ausgegebenam" value="'.htmlentities($ausgegebenam).'"></td></tr>';
 //Retour am
