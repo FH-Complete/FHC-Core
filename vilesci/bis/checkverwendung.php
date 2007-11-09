@@ -238,7 +238,7 @@ if($resultall = pg_query($conn, $qryall))
 $qryall="SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter 
 	JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) 
 	WHERE aktiv 	AND lektor AND fixangestellt=false
-	AND verwendung_code NOT IN ('1','2') 
+	AND verwendung_code NOT IN ('1','2') AND (ende>now() OR ende IS NULL)
 	GROUP BY uid,nachname,vorname
 	ORDER by nachname,vorname,uid;";
 if($resultall = pg_query($conn, $qryall))
