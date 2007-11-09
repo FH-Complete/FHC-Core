@@ -96,7 +96,7 @@ if($search!='')
 		echo "<b>Datenbank Result</b><br><table class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>
 				<thead>
 				<tr class='liste'>";
-		echo "<th class='table-sortable:default'>Kartennummer</th>
+		echo "<th class='table-sortable:default'>Nummer</th>
 		  <th class='table-sortable:default'>Typ</th>
 		  <th class='table-sortable:default'>Kaution</th>
 		  <th class='table-sortable:default'>Ausgegeben</th>
