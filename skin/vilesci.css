@@ -2,11 +2,11 @@ body
 {
 	background-color: #F6F7FF;
 	font-family: Arial, Helvetica, Verdana, Geneva, sans-serif;
-	font-size: x-small;
+	font-size: small;
 	/*IE hack*/
 	voice-family: "\"}\"";
 	voice-family: inherit;
-	font-size: small;	
+	font-size: medium;	
 	/*IE hack end*/
 }
 
@@ -19,6 +19,11 @@ table.menue
 table.liste
 {  
 	width:100%;
+	font-size: 100%;
+}
+table.liste th
+{  
+	background-color: #D3DCE3;
 }
 
 tr.liste
@@ -31,7 +36,7 @@ tr.liste0
 }
 tr.liste1
 {
-	background-color: #E6E6CC;
+	background-color: #EFEFDD;
 }
 td.button 
 {
@@ -134,9 +139,9 @@ img
    border:0;
 }
 
-h1 
+h1, h1 td
 {
-	font-size: 14px; 
+	font-size: 150%; 
 	font-style: normal; 
 	line-height: normal; 
 	font-weight: normal; 
@@ -146,9 +151,22 @@ h1
 	#009e84; 
 	text-decoration: none;
 }
-h2 { font-size: 12px; font-style: normal; line-height: normal; font-weight: normal; font-variant: normal; color: #ffffff; background-color: #00a4d2; text-decoration: none;}
-h3 { font-size: x-small; font-style: normal; line-height: normal; font-weight: bold; font-variant: normal; text-transform: none; color: #008E74; cursor: pointer; text-decoration: none; }
-h4 { font-size: medium; font-style: normal; line-height: normal; font-weight: bold; font-variant: normal; text-transform: none; color: #008E74; cursor: pointer; text-decoration: none; }
+h2 { font-size: 140%; font-style: normal; line-height: normal; font-weight: normal; font-variant: normal; color: #ffffff; background-color: #00a4d2; text-decoration: none;}
+h3 { font-size: 130%; font-style: normal; line-height: normal; font-weight: bold; font-variant: normal; text-transform: none; color: #008E74; cursor: pointer; text-decoration: none; }
+h4 
+{ 
+	font-size: 120%; 
+	font-style: normal; 
+	line-height: normal; 
+	font-weight: bold; 
+	font-variant: normal; 
+	text-transform: none; 
+	color: #008E74; 
+	cursor: pointer; 
+	text-decoration: none; 
+}
+
+	
 p.littleblack { font-size: x-small; color: #000000;}
 
 .h1 { font-family: "Bookman Old Style"; font-size: 12px; font-style: normal; line-height: normal; font-weight: normal; font-variant: normal; color: #ffffff; background-color: #009e84; text-decoration: none}
@@ -187,19 +205,6 @@ P.little
 	font-size: xx-small;
 }
 
-
-h1 
-{ 
-	font-size: larger;
-	color: #ffffff; 
-	background-color: #009e84; 
-}
-h1 td
-{ 
-	font-size: larger; 
-	color: #ffffff; 
-	background-color: #009e84;
-}
 h1 a
 {
 	color: #dddddd;
@@ -236,16 +241,7 @@ h3
 	font-weight: bold; 
 	color: #008E74; 
 }
-h4 
-{ 
-	font-size: smaller; 
-	font-style: normal; 
-	line-height: normal; 
-	font-weight: bold; 
-	font-variant: normal; 
-	text-transform: none; 
-	color: #008E74; 
-	text-decoration: none; }
+
 #bgcolor0
 {
 	background-color: #FF0000;

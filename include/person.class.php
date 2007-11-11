@@ -98,7 +98,7 @@ class person
 		if(is_numeric($person_id) && $person_id!='')
 		{
 			$qry = "SELECT person_id, sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen,
-				gebdatum, gebort, gebzeit, foto, anmerkungen, homepage, svnr, ersatzkennzeichen,
+				gebdatum, gebort, gebzeit, foto, anmerkung, homepage, svnr, ersatzkennzeichen,
 				familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon, ext_id,
 				geschlecht, staatsbuergerschaft, geburtsnation
 				FROM public.tbl_person WHERE person_id='$person_id'";
@@ -123,7 +123,7 @@ class person
 				$this->gebort = $row->gebort;
 				$this->gebzeit = $row->gebzeit;
 				$this->foto = $row->foto;
-				$this->anmerkungen = $row->anmerkungen;
+				$this->anmerkungen = $row->anmerkung;
 				$this->homepage = $row->homepage;
 				$this->svnr = $row->svnr;
 				$this->ersatzkennzeichen = $row->ersatzkennzeichen;
@@ -345,7 +345,7 @@ class person
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
 			$qry = 'INSERT INTO public.tbl_person (sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen,
-			                    gebdatum, gebort, gebzeit, foto, anmerkungen, homepage, svnr, ersatzkennzeichen,
+			                    gebdatum, gebort, gebzeit, foto, anmerkung, homepage, svnr, ersatzkennzeichen,
 			                    familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon,
 			                    geschlecht, geburtsnation, staatsbuergerschaft, ext_id)
 			        VALUES('.$this->addslashes($this->sprache).','.
@@ -383,7 +383,7 @@ class person
 				$this->errormsg = "person_id muss eine gueltige Zahl sein\n";
 				return false;
 			}
-						
+
 			$qry = 'UPDATE public.tbl_person SET'.
 			       ' sprache='.$this->addslashes($this->sprache).','.
 			       ' anrede='.$this->addslashes($this->anrede).','.
@@ -396,7 +396,7 @@ class person
 			       ' gebort='.$this->addslashes($this->gebort).','.
 			       ' gebzeit='.$this->addslashes($this->gebzeit).','.
 			       ' foto='.$this->addslashes($this->foto).','.
-			       ' anmerkungen='.$this->addslashes($this->anmerkungen).','.
+			       ' anmerkung='.$this->addslashes($this->anmerkungen).','.
 			       ' homepage='.$this->addslashes($this->homepage).','.
 			       ' svnr='.$this->addslashes($this->svnr).','.
 			       ' ersatzkennzeichen='.$this->addslashes($this->ersatzkennzeichen).','.
@@ -480,7 +480,7 @@ class person
 				$l->gebort = $row->gebort;
 				$l->gebzeit = $row->gebzeit;
 				$l->foto = $row->foto;
-				$l->anmerkungen = $row->anmerkungen;
+				$l->anmerkungen = $row->anmerkung;
 				$l->homepage = $row->homepage;
 				$l->svnr = $row->svnr;
 				$l->ersatzkennzeichen = $row->ersatzkennzeichen;
