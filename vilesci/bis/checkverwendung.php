@@ -39,7 +39,6 @@ function myaddslashes($var)
 }
 
 ?>
-
 <html>
 <head>
 	<title>BIS-Meldung - Überprüfung von Verwendungen</title>
@@ -47,9 +46,9 @@ function myaddslashes($var)
 	<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-<br><H1>BIS-Verwendungen werden &uuml;berpr&uuml;ft</H1><br><br>
+<H1>BIS-Verwendungen werden &uuml;berpr&uuml;ft</H1>
+<br>
 <?php
-
 $qry="SELECT * FROM public.tbl_studiensemester";
 if($result = pg_query($conn, $qry))
 {
@@ -60,9 +59,9 @@ if($result = pg_query($conn, $qry))
 	}
 }
 //1 - aktive mitarbeiter und bismelden mit keiner verwendung oder mehr als einer aktuellen verwendung
-$qryall='SELECT uid,nachname,vorname, count(bisverwendung_id)  
-	FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) 
-	WHERE aktiv AND bismelden AND (ende>now() OR ende IS NULL) 
+$qryall='SELECT uid,nachname,vorname, count(bisverwendung_id)
+	FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid)
+	WHERE aktiv AND bismelden AND (ende>now() OR ende IS NULL)
 	GROUP BY uid,nachname,vorname HAVING count(bisverwendung_id)!=1 ORDER by nachname,vorname;';
 if($resultall = pg_query($conn, $qryall))
 {
@@ -71,11 +70,11 @@ if($resultall = pg_query($conn, $qryall))
 	while($rowall=pg_fetch_object($resultall))
 	{
 		$i=0;
-		$qry="SELECT * FROM bis.tbl_bisverwendung 
-			JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid) 
-			JOIN public.tbl_person USING(person_id) 
+		$qry="SELECT * FROM bis.tbl_bisverwendung
+			JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)
+			JOIN public.tbl_person USING(person_id)
 			JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid)
-			WHERE tbl_benutzer.aktiv=TRUE AND bismelden=TRUE 
+			WHERE tbl_benutzer.aktiv=TRUE AND bismelden=TRUE
 			AND (ende>now() OR ende IS NULL) AND mitarbeiter_uid='".$rowall->uid."';";
 		if($result = pg_query($conn, $qry))
 		{
@@ -98,10 +97,10 @@ if($resultall = pg_query($conn, $qryall))
 	}
 }
 //2 - aktive mitarbeiter mit keiner aktuellen verwendung
-$qryall='SELECT uid,nachname,vorname, count(bisverwendung_id) 
-	FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) 
-	WHERE aktiv AND NOT ende>now() AND NOT ende IS NULL 
-	AND uid NOT IN (SELECT uid FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) 
+$qryall='SELECT uid,nachname,vorname, count(bisverwendung_id)
+	FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid)
+	WHERE aktiv AND NOT ende>now() AND NOT ende IS NULL
+	AND uid NOT IN (SELECT uid FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid)
 	WHERE aktiv AND (ende>now() OR ende IS NULL)) GROUP BY uid,nachname,vorname ORDER by nachname,vorname;';
 if($resultall = pg_query($conn, $qryall))
 {
@@ -129,9 +128,9 @@ if($resultall = pg_query($conn, $qryall))
 }
 
 //3 - nicht aktive mitarbeiter mitarbeiter mit aktueller verwendung
-$qryall='SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter 
-	JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) 
-	WHERE aktiv=false AND (ende>now() OR ende IS NULL) 
+$qryall='SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter
+	JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid)
+	WHERE aktiv=false AND (ende>now() OR ende IS NULL)
 	GROUP BY uid,nachname,vorname
 	ORDER by nachname,vorname;';
 
@@ -144,7 +143,7 @@ if($resultall = pg_query($conn, $qryall))
 	while($rowall=pg_fetch_object($resultall))
 	{
 		$i=0;
-		$qry="SELECT * FROM bis.tbl_bisverwendung 
+		$qry="SELECT * FROM bis.tbl_bisverwendung
 			WHERE (ende>now() OR ende IS NULL) AND mitarbeiter_uid='".$rowall->uid."';";
 		if($result = pg_query($conn, $qry))
 		{
@@ -162,9 +161,9 @@ if($resultall = pg_query($conn, $qryall))
 	}
 }
 //4 - wenn hauptberuf=j dann sollte verwendung=1,5,6 sein - check
-$qryall="SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter 
-	JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) 
-	WHERE verwendung_code NOT IN ('1','5','6') AND hauptberuflich=true 
+$qryall="SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter
+	JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid)
+	WHERE verwendung_code NOT IN ('1','5','6') AND hauptberuflich=true
 	GROUP BY uid,nachname,vorname
 	ORDER by nachname,vorname,uid;";
 if($resultall = pg_query($conn, $qryall))
@@ -174,7 +173,7 @@ if($resultall = pg_query($conn, $qryall))
 	while($rowall=pg_fetch_object($resultall))
 	{
 		$i=0;
-		$qry="SELECT * FROM bis.tbl_bisverwendung 
+		$qry="SELECT * FROM bis.tbl_bisverwendung
 			WHERE verwendung_code NOT IN ('1','5','6') AND hauptberuflich=true AND mitarbeiter_uid='".$rowall->uid."';";
 		if($result = pg_query($conn, $qry))
 		{
@@ -192,14 +191,14 @@ if($resultall = pg_query($conn, $qryall))
 	}
 }
 //5 - stimmt beschausmasscode mit vertragsstunden überein?
-$qryall="SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter 
-	JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) 
-	WHERE (beschausmasscode='1' AND vertragsstunden<='35') 
-	OR (beschausmasscode='2' AND vertragsstunden>'15') 
-	OR (beschausmasscode='3' AND vertragsstunden<'16') 
-	OR (beschausmasscode='3' AND vertragsstunden>'25') 
-	OR (beschausmasscode='4' AND vertragsstunden<'26') 
-	OR (beschausmasscode='4' AND vertragsstunden>'35') 
+$qryall="SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter
+	JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid)
+	WHERE (beschausmasscode='1' AND vertragsstunden<='35')
+	OR (beschausmasscode='2' AND vertragsstunden>'15')
+	OR (beschausmasscode='3' AND vertragsstunden<'16')
+	OR (beschausmasscode='3' AND vertragsstunden>'25')
+	OR (beschausmasscode='4' AND vertragsstunden<'26')
+	OR (beschausmasscode='4' AND vertragsstunden>'35')
 	OR (beschausmasscode='5' AND vertragsstunden>'0')
 	GROUP BY uid,nachname,vorname
 	ORDER by nachname,vorname,uid;";
@@ -210,13 +209,13 @@ if($resultall = pg_query($conn, $qryall))
 	while($rowall=pg_fetch_object($resultall))
 	{
 		$i=0;
-		$qry="SELECT * FROM bis.tbl_bisverwendung 
-			WHERE ((beschausmasscode='1' AND vertragsstunden<'38.5') 
-			OR (beschausmasscode='2' AND vertragsstunden>'15') 
-			OR (beschausmasscode='3' AND vertragsstunden<'16') 
-			OR (beschausmasscode='3' AND vertragsstunden>'25') 
-			OR (beschausmasscode='4' AND vertragsstunden<'26') 
-			OR (beschausmasscode='4' AND vertragsstunden>'35') 
+		$qry="SELECT * FROM bis.tbl_bisverwendung
+			WHERE ((beschausmasscode='1' AND vertragsstunden<'38.5')
+			OR (beschausmasscode='2' AND vertragsstunden>'15')
+			OR (beschausmasscode='3' AND vertragsstunden<'16')
+			OR (beschausmasscode='3' AND vertragsstunden>'25')
+			OR (beschausmasscode='4' AND vertragsstunden<'26')
+			OR (beschausmasscode='4' AND vertragsstunden>'35')
 			OR (beschausmasscode='5' AND vertragsstunden>'0'))
 			AND mitarbeiter_uid='".$rowall->uid."';";
 		if($result = pg_query($conn, $qry))
@@ -235,8 +234,8 @@ if($resultall = pg_query($conn, $qryall))
 	}
 }
 //6 - aktive, freie lektoren auf verwendung 1 oder 2 prüfen
-$qryall="SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter 
-	JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid) 
+$qryall="SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter
+	JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid)
 	WHERE aktiv 	AND lektor AND fixangestellt=false
 	AND verwendung_code NOT IN ('1','2') AND (ende>now() OR ende IS NULL)
 	GROUP BY uid,nachname,vorname
@@ -248,8 +247,8 @@ if($resultall = pg_query($conn, $qryall))
 	while($rowall=pg_fetch_object($resultall))
 	{
 		$i=0;
-		$qry="SELECT * FROM bis.tbl_bisverwendung 
-			WHERE verwendung_code NOT IN ('1','2') 
+		$qry="SELECT * FROM bis.tbl_bisverwendung
+			WHERE verwendung_code NOT IN ('1','2')
 			AND mitarbeiter_uid='".$rowall->uid."';";
 		if($result = pg_query($conn, $qry))
 		{
@@ -268,12 +267,12 @@ if($resultall = pg_query($conn, $qryall))
 }
 //7 - Lehrauftrag aber keine aktuelle Verwendung
 $i=0;
-$qryall="SELECT DISTINCT lehre.tbl_lehreinheitmitarbeiter.mitarbeiter_uid, nachname, vorname  
-	FROM lehre.tbl_lehreinheitmitarbeiter join lehre.tbl_lehreinheit USING (lehreinheit_id) 
+$qryall="SELECT DISTINCT lehre.tbl_lehreinheitmitarbeiter.mitarbeiter_uid, nachname, vorname
+	FROM lehre.tbl_lehreinheitmitarbeiter join lehre.tbl_lehreinheit USING (lehreinheit_id)
 	JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
         	JOIN campus.vw_mitarbeiter ON (tbl_lehreinheitmitarbeiter.mitarbeiter_uid=uid)
-	WHERE lehre.tbl_lehreinheit.studiensemester_kurzbz='WS2007' 
-        	AND NOT EXISTS (SELECT * FROM bis.tbl_bisverwendung 
+	WHERE lehre.tbl_lehreinheit.studiensemester_kurzbz='WS2007'
+        	AND NOT EXISTS (SELECT * FROM bis.tbl_bisverwendung
        	WHERE (ende>now() OR ende IS NULL) AND mitarbeiter_uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid)
         	ORDER BY nachname,vorname;";
 if($resultall = pg_query($conn, $qryall))
@@ -296,10 +295,10 @@ if($resultall = pg_query($conn, $qryall))
 }
 //8 - Verwendung Habil. und Enticklungsteam Habil.=1
 $i=0;
-$qryall="SELECT DISTINCT mitarbeiter_uid, nachname, vorname  
-	FROM bis.tbl_entwicklungsteam join bis.tbl_bisverwendung USING (mitarbeiter_uid) 
+$qryall="SELECT DISTINCT mitarbeiter_uid, nachname, vorname
+	FROM bis.tbl_entwicklungsteam join bis.tbl_bisverwendung USING (mitarbeiter_uid)
 	JOIN campus.vw_mitarbeiter ON (tbl_entwicklungsteam.mitarbeiter_uid=uid)
-	WHERE ((besqualcode!=1 AND habilitation) OR (besqualcode=1 AND habilitation=false)) 
+	WHERE ((besqualcode!=1 AND habilitation) OR (besqualcode=1 AND habilitation=false))
         	ORDER BY mitarbeiter_uid;";
 if($resultall = pg_query($conn, $qryall))
 {
@@ -310,10 +309,10 @@ if($resultall = pg_query($conn, $qryall))
 		$i++;
 		echo "<br><u>Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname.":</u><br>";
 		$qry="SELECT mitarbeiter_uid, nachname, vorname, besqualbez, habilitation, studiengang_kz, verwendung_code, tbl_bisverwendung.beginn as anfang, tbl_bisverwendung.ende as zuende
-			FROM bis.tbl_entwicklungsteam join bis.tbl_bisverwendung USING (mitarbeiter_uid) 
+			FROM bis.tbl_entwicklungsteam join bis.tbl_bisverwendung USING (mitarbeiter_uid)
 		        	JOIN campus.vw_mitarbeiter ON (tbl_entwicklungsteam.mitarbeiter_uid=uid)
-		        	JOIN bis.tbl_besqual USING(besqualcode) 
-			WHERE ((besqualcode!=1 AND habilitation) OR (besqualcode=1 AND habilitation=false)) 
+		        	JOIN bis.tbl_besqual USING(besqualcode)
+			WHERE ((besqualcode!=1 AND habilitation) OR (besqualcode=1 AND habilitation=false))
 			AND mitarbeiter_uid='".$rowall->mitarbeiter_uid."';";
 		if($result = pg_query($conn, $qry))
 		{
