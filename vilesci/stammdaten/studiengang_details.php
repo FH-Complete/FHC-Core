@@ -88,7 +88,7 @@
 		$sg_update->bescheidbgbl2 = $bescheidbgbl1;
 		$sg_update->bescheidgz = $bescheidgz;
 		$sg_update->bescheidvom = $bescheidvom;
-		$sg_update->organisationsform = $organisationsform;
+		$sg_update->orgform_kurzbz = $organisationsform;
 		$sg_update->titelbescheidvom = $titelbescheidvom;
 		$sg_update->aktiv = $aktiv;
 		$sg_update->ext_id = $ext_id;
@@ -131,7 +131,7 @@
 		$bescheidbgbl2 = $sg->bescheidbgbl1;
 		$bescheidgz = $sg->bescheidgz;
 		$bescheidvom = $sg->bescheidvom;
-		$organisationsform = $sg->organisationsform;
+		$organisationsform = $sg->orgform_kurzbz;
 		$titelbescheidvom = $sg->titelbescheidvom;
 		$ext_id = $sg->ext_id;
 		$aktiv = $sg->aktiv;
@@ -181,7 +181,21 @@
 	$htmlstr .= "				</tr>\n";
 	$htmlstr .= "				<tr>\n";
 	$htmlstr .= "					<td>Organisationsform</td>\n";
-	$htmlstr .= "					<td><input class='detail' type='text' name='organisationsform' size='16' maxlength='1' value='".$organisationsform."' onchange='submitable()'></td>\n";
+	$htmlstr .= "					<td><SELECT name='organisationsform' onchange='submitable()'>";
+	$qry = "SELECT orgform_kurzbz FROM bis.tbl_orgform ORDER BY orgform_kurzbz";
+	if($result = pg_query($conn, $qry))
+	{
+		while($row = pg_fetch_object($result))
+		{
+			if($row->orgform_kurzbz == $organisationsform)
+				$selected = 'selected';
+			else 
+				$selected = '';
+			
+			$htmlstr .= "			<option value='$row->orgform_kurzbz' $selected>$row->orgform_kurzbz</option>";
+		}
+	}
+	$htmlstr .= "                  </SELECT></td>\n";
 	$htmlstr .= "				</tr>\n";
 	$htmlstr .= "				<tr>\n";
 	$htmlstr .= "					<td>Ext ID</td>\n";
