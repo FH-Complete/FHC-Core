@@ -581,8 +581,8 @@ class mitarbeiter extends benutzer
 				$obj->gebdatum = $row->gebdatum;
 				$obj->gebort = $row->gebort;
 				$obj->gebzeit = $row->gebzeit;
-				$obj->anmerkungen = $row->anmerkungen;
-				$obj->homepage = $row->anmerkungen;
+				$obj->anmerkungen = $row->anmerkung;
+				$obj->homepage = $row->homepage;
 				$obj->svnr = $row->svnr;
 				$obj->ersatzkennzeichen = $row->ersatzkennzeichen;
 				$obj->familienstand = $row->familienstand;

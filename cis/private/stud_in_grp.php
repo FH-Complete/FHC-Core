@@ -25,7 +25,7 @@
 <?php
 	if(isset($_GET['all']))
 	{
-		$qry = "SELECT vorname, nachname, uid FROM campus.vw_student WHERE studiengang_kz='".addslashes($_GET['kz'])."' AND semester<10 ORDER BY nachname, vorname";
+		$qry = "SELECT vorname, nachname, uid FROM campus.vw_student WHERE studiengang_kz='".addslashes($_GET['kz'])."' AND semester<10 AND semester>0 ORDER BY nachname, vorname";
 	}
 	else
 	{

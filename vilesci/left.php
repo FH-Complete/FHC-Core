@@ -1,9 +1,9 @@
 <?php
-	require("config.inc.php");
- 	require("../include/functions.inc.php");
- 	require("../include/benutzerberechtigung.class.php");
+	require('config.inc.php');
+ 	require('../include/functions.inc.php');
+ 	require('../include/benutzerberechtigung.class.php');
  	$uid=get_uid();
- 	$conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
+ 	$conn=pg_connect(CONN_STRING) or die('Connection zur Portal Datenbank fehlgeschlagen');
 	$berechtigung=new benutzerberechtigung($conn);
 	$berechtigung->getBerechtigungen($uid);
 	if (!($berechtigung->isBerechtigt('admin') || $berechtigung->isBerechtigt('support') || $berechtigung->isBerechtigt('lvplan') ))
