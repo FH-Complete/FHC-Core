@@ -47,6 +47,7 @@ class studiengang
 	var $bescheidvom;			// Date
 	var $titelbescheidvom;		// Date
 	var $ext_id;				// bigint
+	var $orgform_kurzbz;
 
 	var $kuerzel;			// = typ + kurzbz (Bsp: BBE)
 
@@ -121,6 +122,7 @@ class studiengang
 				$this->bescheidvom=$row->bescheidvom;
 				$this->ext_id=$row->ext_id;
 				$this->kuerzel = strtoupper($row->typ.$row->kurzbz);
+				$this->orgform_kurzbz = $row->orgform_kurzbz;
 
 				$this->telefon=$row->telefon;
             	$this->titelbescheidvom=$row->titelbescheidvom;
@@ -178,6 +180,7 @@ class studiengang
 			$stg_obj->bescheidvom=$row->bescheidvom;
 			$stg_obj->ext_id=$row->ext_id;
 			$stg_obj->kuerzel = strtoupper($row->typ.$row->kurzbz);
+			$stg_obj->orgform_kurzbz = $row->orgform_kurzbz;
 
             $stg_obj->telefon=$row->telefon;
             $stg_obj->titelbescheidvom=$row->titelbescheidvom;
@@ -262,7 +265,7 @@ class studiengang
 			//Neuen Datensatz anlegen
 			$qry = 'INSERT INTO public.tbl_studiengang (studiengang_kz, kurzbz, kurzbzlang, bezeichnung, english,
 				typ, farbe, email, telefon, max_verband, max_semester, max_gruppe, erhalter_kz, bescheid, bescheidbgbl1,
-				bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, aktiv, ext_id) VALUES ('.
+				bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, aktiv, ext_id, orgform_kurzbz) VALUES ('.
 				$this->addslashes($this->studiengang_kz).', '.
 				$this->addslashes($this->kurzbz).', '.
 				$this->addslashes($this->kurzbzlang).', '.
@@ -283,7 +286,8 @@ class studiengang
 				$this->addslashes($this->bescheidvom).', '.
 				$this->addslashes($this->titelbescheidvom).', '.
 				$this->addslashes($this->aktiv).', '.
-				$this->addslashes($this->ext_id).');';
+				$this->addslashes($this->ext_id).', '.
+				$this->addslashes($this->orgform_kurzbz).');';
 		}
 		else
 		{
@@ -317,6 +321,7 @@ class studiengang
 				'titelbescheidvom='.$this->addslashes($this->titelbescheidvom).', '.
 				'ext_id='.$this->addslashes($this->ext_id).', '.
 				'telefon='.$this->addslashes($this->telefon).', '.
+				'orgform_kurzbz='.$this->addslashes($this->orgform_kurzbz).', '.
 				'aktiv='.$this->addslashes($this->aktiv).' '.
 				'WHERE studiengang_kz='.$this->addslashes($this->studiengang_kz).';';
 		}
