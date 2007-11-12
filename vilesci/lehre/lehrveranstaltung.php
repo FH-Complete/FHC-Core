@@ -24,6 +24,7 @@ require_once('../config.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/fachbereich.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
    die("Konnte Verbindung zur Datenbank nicht herstellen");
@@ -37,22 +38,29 @@ $user = get_uid();
 if (isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
 	$stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:$_POST['stg_kz']);
 else
-	$stg_kz=0;
+	$stg_kz='';
 if (isset($_GET['semester']) || isset($_POST['semester']))
 	$semester=(isset($_GET['semester'])?$_GET['semester']:$_POST['semester']);
 else
 	$semester=0;
 
-if(!is_numeric($stg_kz))
-	$stg_kz=0;
+if(!is_numeric($stg_kz) && $stg_kz!='')
+	$stg_kz='';
 
 if(!is_numeric($semester))
 	$semester=0;
 
+$fachbereich_kurzbz = (isset($_REQUEST['fachbereich_kurzbz'])?$_REQUEST['fachbereich_kurzbz']:'');
+
+//Wenn kein Fachbereich und kein Studiengang gewaehlt wurde
+//dann wird der Studiengang auf 0 gesetzt da sonst die zu ladende liste zu lang wird
+if($fachbereich_kurzbz=='' && $stg_kz=='')
+	$stg_kz=0;
+
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
 
-if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_kz, 'suid'))
+if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', null, 'suid', $fachbereich_kurzbz))
 	die('Sie haben keine Berechtigung für diesen Studiengang');
 
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
@@ -149,10 +157,20 @@ if($result = pg_query($conn, $qry))
 //Wenn nicht admin, dann nur die aktiven anzeigen
 $aktiv='';
 if(!$rechte->isBerechtigt('admin'))
-	$aktiv = ' AND aktiv=true';
+	$aktiv = ' AND tbl_lehrveranstaltung.aktiv=true';
 
-$sql_query="SELECT * FROM lehre.tbl_lehrveranstaltung
-	WHERE studiengang_kz='$stg_kz' AND semester='$semester' $aktiv ORDER BY bezeichnung";
+if($fachbereich_kurzbz !='')
+	$sql_query="SELECT distinct tbl_lehrveranstaltung.* FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach WHERE 
+	tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND 
+	tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
+	tbl_lehrfach.fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."'";
+else 
+	$sql_query="SELECT * FROM lehre.tbl_lehrveranstaltung WHERE true";
+	
+if($stg_kz!='')
+	$sql_query.= " AND tbl_lehrveranstaltung.studiengang_kz='$stg_kz'";
+
+$sql_query.=" AND tbl_lehrveranstaltung.semester='$semester' $aktiv ORDER BY tbl_lehrveranstaltung.bezeichnung";
 
 if(!$result_lv = pg_query($conn, $sql_query))
 	die("Lehrveranstaltung not found!");
@@ -160,23 +178,51 @@ if(!$result_lv = pg_query($conn, $sql_query))
 //Studiengang DropDown
 $outp='';
 $s=array();
-$outp.="<SELECT name='stg_kz'>";
+$outp.="<form action='".$_SERVER['PHP_SELF']."' method='GET' onsubmit='return checksubmit();'>";
+$outp.="Studiengang <SELECT name='stg_kz' id='select_stg_kz'>";
+$outp.="<OPTION value='' ".($stg_kz==''?'selected':'').">-- Alle --</OPTION>";
 foreach ($studiengang as $stg)
 {
 	if($rechte->isBerechtigt('admin', $stg->studiengang_kz, 'suid') || $rechte->isBerechtigt('assistenz', $stg->studiengang_kz, 'suid'))
 	{
-		$outp.="<OPTION onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$stg->studiengang_kz&semester=$semester'\" ".($stg->studiengang_kz==$stg_kz?'selected':'').">$stg->kuerzel - $stg->bezeichnung</OPTION>";
-		$s[$stg->studiengang_kz]->max_sem=$stg->max_semester;
-		$s[$stg->studiengang_kz]->kurzbz=$stg->kurzbzlang;
+		$outp.="<OPTION value='$stg->studiengang_kz' ".($stg->studiengang_kz==$stg_kz?'selected':'').">$stg->kuerzel - $stg->kurzbzlang</OPTION>";
 	}
+	$s[$stg->studiengang_kz]->max_sem=8; // $stg->max_semester;
+	$s[$stg->studiengang_kz]->kurzbz=$stg->kurzbzlang;
 }
+$s['']->max_sem=8;
 
 $outp.='</SELECT>';
 
-//Semester
-$outp.= '<BR>Semester: -- ';
+//Semester DropDown
+$outp.= 'Semester <SELECT name="semester">';
 for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
-	$outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semester='.$i.'">'.$i.'</A> -- ';
+	$outp.="<OPTION value='$i' ".($i==$semester?'selected':'').">$i</OPTION>";
+$outp.='</SELECT>';
+
+//Fachbereich DropDown
+$outp.= 'Fachbereich <SELECT name="fachbereich_kurzbz" id="select_fachbereich_kurzbz">';
+$fachb = new fachbereich($conn);
+$fachb->getAll();
+$outp.= "<OPTION value='' ".($fachbereich_kurzbz==''?'selected':'').">-- Alle --</OPTION>";
+foreach ($fachb->result as $fb) 
+{
+	if($fachbereich_kurzbz==$fb->fachbereich_kurzbz)
+		$selected = 'selected';
+	else 
+		$selected = '';
+	
+	if($rechte->isBerechtigt('admin', 0, 'suid') || 
+	   $rechte->isBerechtigt('assistenz', null, 'suid', $fb->fachbereich_kurzbz) ||
+	   $rechte->isBerechtigt('admin', null, 'suid', $fb->fachbereich_kurzbz))
+	$outp.= "<OPTION value='$fb->fachbereich_kurzbz' $selected>$fb->fachbereich_kurzbz</OPTION>";
+}
+$outp.= '</SELECT>';
+$outp.= '<input type="submit" value="Anzeigen">';
+$outp .="</form>";
+
+echo "<H2>Lehrveranstaltung Verwaltung (".(isset($s[$stg_kz]->kurzbz)?$s[$stg_kz]->kurzbz:$fachbereich_kurzbz)." - ".$semester.")</H2>";
+
 
 echo '<html>
 	<head>
@@ -185,11 +231,25 @@ echo '<html>
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 	<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+	<script language="Javascript">
+	function checksubmit()
+	{
+		//alert(document.getElementById("select_stg_kz").value+" : "+document.getElementById("select_fachbereich_kurzbz").value);
+		//return false;
+		
+		if(document.getElementById("select_stg_kz").value==\'\' && document.getElementById("select_fachbereich_kurzbz").value==\'\')
+		{
+			alert("Studiengang und Fachbereich dürfen nicht gleichzeitig auf \'Alle\' gesetzt sein");
+			return false;
+		}
+		else
+			return true;
+		
+	}
+	</script>
 	</head>
 	<body class="Background_main">
 	';
-
-echo "<H2>Lehrveranstaltung Verwaltung (".$s[$stg_kz]->kurzbz." - ".$semester.")</H2>";
 
 echo '<table width="100%"><tr><td>';
 echo $outp;
@@ -199,17 +259,17 @@ if($rechte->isBerechtigt('admin'))
 	echo "<input type='button' onclick='parent.detail.location=\"lehrveranstaltung_details.php?neu=true&stg_kz=$stg_kz&semester=$semester\"' value='Neu'/>";
 echo '</td></tr></table>';
 
-echo "<h3>&Uuml;bersicht</h3>
-	<table class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>
-	<thead>
-	<tr class='liste'>";
-
 if ($result_lv!=0)
 {
 	$num_rows=pg_num_rows($result_lv);
+	echo "<h3>&Uuml;bersicht - $num_rows LVAs</h3>
+	<table class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>
+	<thead>
+	<tr class='liste'>";
 	echo "<th class='table-sortable:default'>ID</th>
 		  <th class='table-sortable:default'>Kurzbz</th>
 		  <th class='table-sortable:default'>Bezeichnung</th>
+		  <th class='table-sortable:default'>Stg</th>
 		  <th class='table-sortable:default'>SS</th>
 		  <th class='table-sortable:default'>ECTS</th>
 		  <th class='table-sortable:default'>Lehre</th>
@@ -235,6 +295,7 @@ if ($result_lv!=0)
 		else 
 			echo $row->bezeichnung;
 		echo "</td>";
+		echo "<td>".$s[$row->studiengang_kz]->kurzbz."</td>";
 		//Semesterstunden
 		echo "<td>$row->semesterstunden</td>";
 		//ECTS
