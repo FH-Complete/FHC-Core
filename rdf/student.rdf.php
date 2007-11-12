@@ -348,7 +348,7 @@ if($xmlformat=='rdf')
 					WHERE ";*/
 		$sql_query="SET CLIENT_ENCODING TO 'UNICODE';
 					SELECT p.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,	vorname, vornamen,
-						nachname, gebdatum, anmerkungen,ersatzkennzeichen,svnr, tbl_student.matrikelnr, anmerkung,
+						nachname, gebdatum, tbl_prestudent.anmerkung,ersatzkennzeichen,svnr, tbl_student.matrikelnr, p.anmerkung as anmerkungen,
 						tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 						tbl_studentlehrverband.studiengang_kz,
 						(	SELECT kontakt

@@ -661,6 +661,8 @@ if(!$error)
 					{
 						$rolle->ausbildungssemester_old = $_POST['ausbildungssemester_old'];
 						$rolle->studiensemester_old = $_POST['studiensemester_old'];
+						$rolle->updateamum = date('Y-m-d H:i:s');
+						$rolle->updatevon = $user;
 						$rolle->new = false;
 					}
 								

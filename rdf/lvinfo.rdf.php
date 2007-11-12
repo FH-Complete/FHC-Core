@@ -108,7 +108,7 @@ if($result = pg_query($conn, $qry))
 			<LVINFO:voraussetzungen><![CDATA[<?php echo $row->voraussetzungen; ?>]]></LVINFO:voraussetzungen>
 			<LVINFO:unterlagen><![CDATA[<?php echo $row->unterlagen; ?>]]></LVINFO:unterlagen>
 			<LVINFO:pruefungsordnung><![CDATA[<?php echo $row->pruefungsordnung; ?>]]></LVINFO:pruefungsordnung>
-			<LVINFO:anmerkungen><![CDATA[<?php echo $row->anmerkungen; ?>]]></LVINFO:anmerkungen>
+			<LVINFO:anmerkungen><![CDATA[<?php echo $row->anmerkung; ?>]]></LVINFO:anmerkungen>
 			<LVINFO:kurzbeschreibung><![CDATA[<?php echo $row->kurzbeschreibung; ?>]]></LVINFO:kurzbeschreibung>
       	</RDF:Description>
 

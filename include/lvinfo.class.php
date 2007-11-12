@@ -88,7 +88,7 @@ class lvinfo
 			$lvinfo_obj->voraussetzungen 	= $row->voraussetzungen;
 			$lvinfo_obj->unterlagen 		= $row->unterlagen;
 			$lvinfo_obj->pruefungsordnung 	= $row->pruefungsordnung;
-			$lvinfo_obj->anmerkungen 		= $row->anmerkungen;
+			$lvinfo_obj->anmerkungen 		= $row->anmerkung;
 			$lvinfo_obj->kurzbeschreibung	= $row->kurzbeschreibung;
 			$lvinfo_obj->genehmigt 			= ($row->genehmigt=='t'?true:false);
 			$lvinfo_obj->aktiv 				= ($row->aktiv=='t'?true:false);
@@ -133,7 +133,7 @@ class lvinfo
 			$this->voraussetzungen 		= $row->voraussetzungen;
 			$this->unterlagen 			= $row->unterlagen;
 			$this->pruefungsordnung 	= $row->pruefungsordnung;
-			$this->anmerkungen 			= $row->anmerkungen;
+			$this->anmerkungen 			= $row->anmerkung;
 			$this->kurzbeschreibung		= $row->kurzbeschreibung;
 			$this->genehmigt 			= ($row->genehmigt=='t'?true:false);
 			$this->aktiv 				= ($row->aktiv=='t'?true:false);
@@ -214,7 +214,7 @@ class lvinfo
 		if($this->new)
 		{
 			//Neuen Datensatz anlegen
-			$qry = 'INSERT INTO campus.tbl_lvinfo (lehrveranstaltung_id, sprache, titel, methodik, lehrziele, lehrinhalte, voraussetzungen, unterlagen, pruefungsordnung, anmerkungen,
+			$qry = 'INSERT INTO campus.tbl_lvinfo (lehrveranstaltung_id, sprache, titel, methodik, lehrziele, lehrinhalte, voraussetzungen, unterlagen, pruefungsordnung, anmerkung,
 				kurzbeschreibung, genehmigt, aktiv,  insertamum, insertvon, updateamum,
 				updatevon) VALUES ('.
 				$this->addslashes($this->lehrveranstaltung_id).','.
@@ -254,7 +254,7 @@ class lvinfo
 				'lehrinhalte='.$this->addslashes($this->lehrinhalte).', '.
 				'voraussetzungen='.$this->addslashes($this->voraussetzungen).', '.
 				'pruefungsordnung='.$this->addslashes($this->pruefungsordnung).', '.
-				'anmerkungen='.$this->addslashes($this->anmerkungen).', '.
+				'anmerkung='.$this->addslashes($this->anmerkungen).', '.
 				'kurzbeschreibung='.$this->addslashes($this->kurzbeschreibung).', '.
 				'unterlagen='.$this->addslashes($this->unterlagen).', '.
 				'genehmigt='.($this->genehmigt?'true':'false') .', '.
