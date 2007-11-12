@@ -66,7 +66,7 @@ class datum
 
 	/**
 	 * Liefert einen UNIX Timestamp von einem Datum im
-	 * Format "2007-01-31"
+	 * ISO-Format "2007-01-31"
 	 */
 	function mktime_fromdate($datum)
 	{
@@ -134,7 +134,7 @@ class datum
 	{
 		return (strlen($datum)>0?date('d.m.Y',strtotime($datum)):'');
 	}
-	
+
 
 	/**
 	 * Prueft Uhrzeit auf Gueltigkeit (HH:MM:SS)
@@ -147,7 +147,7 @@ class datum
 		else
 			return false;
 	}
-	
+
 	/**
 	 * Prueft ob das Datum im Format dd.mm.YYYY oder YYYY-mm-dd ist
 	 * @return true wenn ok, false wenn falsches Format
@@ -156,7 +156,7 @@ class datum
 	{
 		if(ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})$",$datum) || ereg("([0-9]{2}).([0-9]{2}).([0-9]{4})$",$datum))
 			return true;
-		else 
+		else
 			return false;
 	}
 }
