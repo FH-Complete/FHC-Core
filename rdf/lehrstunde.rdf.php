@@ -17,7 +17,10 @@ echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
 
 require_once('../cis/config.inc.php');
 require_once('../include/functions.inc.php');
+require_once('../include/datum.class.php');
 require_once('../include/lehrstunde.class.php');
+
+$datumObj=new datum();
 
 function checkID($needle)
 {
@@ -46,10 +49,12 @@ if (isset($_GET['datum']))
 	$datum=$_GET['datum'];
 else
 	$datum=date('Y-m-d',(mktime()));
+
 if (isset($_GET['datum_bis']))
 	$datum_bis=$_GET['datum_bis'];
 else
-	$datum_bis=null;
+	$datum_bis=date('Y-m-d',( jump_day($datumObj->mktime_fromdate($datum),1) ));
+
 if (isset($_GET['stunde']))
 	$stunde=$_GET['stunde'];
 else
