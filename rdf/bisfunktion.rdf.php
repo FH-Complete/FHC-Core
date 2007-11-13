@@ -50,7 +50,7 @@ else
 	
 $datum = new datum();
 $stg = new studiengang($conn, null, null, true);
-$stg->getAll();
+$stg->getAll(null, false);
 $stg_arr = array();
 
 foreach ($stg->result as $row)
