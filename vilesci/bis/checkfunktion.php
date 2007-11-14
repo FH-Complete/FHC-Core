@@ -167,7 +167,9 @@ if($result = pg_query($conn, $qry))
 				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter 
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND 
 				tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND 
-				(tbl_lehreinheit.studiensemester_kurzbz='$stsemprev' OR tbl_lehreinheit.studiensemester_kurzbz='$stsemprevprev')) ORDER BY mitarbeiter_uid, studiengang_kz";
+				(tbl_lehreinheit.studiensemester_kurzbz='$stsemprev' OR tbl_lehreinheit.studiensemester_kurzbz='$stsemprevprev')) 
+				AND (ende>'$lastbismeldung' OR ende is null)
+			ORDER BY mitarbeiter_uid, studiengang_kz";
 	if($result = pg_query($conn, $qry))
 	{
 		$funktion_ohne_lehrauftrag = pg_num_rows($result);
