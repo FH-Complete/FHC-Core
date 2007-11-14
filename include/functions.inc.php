@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -177,9 +177,8 @@ function loadVariables($conn, $user)
 	else
 		$num_rows=pg_numrows($result);
 
-	for ($i=0;$i<$num_rows;$i++)
+	while ($row=pg_fetch_object($result))
 	{
-		$row=pg_fetch_object($result,$i);
 		global ${$row->name};
 		${$row->name}=$row->wert;
 	}
@@ -197,26 +196,29 @@ function loadVariables($conn, $user)
 			}
 		}
 	if (!isset($db_stpl_table))
+	{
+		global $db_stpl_table;
 		$db_stpl_table='stundenplan';
-		
+	}
+
 	if (!isset($kontofilterstg))
 	{
 		global $kontofilterstg;
 		$kontofilterstg='false';
 	}
-	
+
 	if (!isset($ignore_kollision))
 	{
 		global $ignore_kollision;
 		$ignore_kollision='false';
 	}
-	
+
 	if (!isset($ignore_zeitsperre))
 	{
 		global $ignore_zeitsperre;
 		$ignore_zeitsperre='false';
 	}
-	
+
 	if (!isset($ignore_reservierung))
 	{
 		global $ignore_reservierung;
@@ -272,8 +274,8 @@ function getStudiensemesterFromDatum($conn, $datum, $naechstes=true)
 function utf8_strlen($str)
 {
 	$count = 0;
-  	for ($i = 0; $i < strlen($str); ++$i) 
-    	if ((ord($str[$i]) & 0xC0) != 0x80) 
+  	for ($i = 0; $i < strlen($str); ++$i)
+    	if ((ord($str[$i]) & 0xC0) != 0x80)
       		++$count;
 
   	return $count;
@@ -281,15 +283,15 @@ function utf8_strlen($str)
 
 // ****************************************************************
 // * Prueft den uebergebenen Alias auf Gueltigkeit.
-// * Format: mindestens 1 Punkt enhalten, mind. 1 Zeichen vor und 
+// * Format: mindestens 1 Punkt enhalten, mind. 1 Zeichen vor und
 // * 1 Zeichen nach dem Punkt, keine Sonderzeichen
 // ****************************************************************
 function checkalias($alias)
 {
 	if($anz = preg_match("/^[a-z0-9]*[a-z0-9]{1,}\.[a-z0-9]{1,}$/",$alias))
 		return true;
-	else 
+	else
 		return false;
-		
+
 }
 ?>
