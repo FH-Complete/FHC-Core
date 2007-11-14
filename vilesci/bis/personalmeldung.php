@@ -268,7 +268,7 @@ if($result = pg_query($conn, $qry))
 								$error_log="Hauptberuflich ('".$rowvw->hauptberuflich."')";
 							} 
 						}
-						if(($rowvw->hauptberufcode=='' || $rowvw->hauptberufcode==NULL) && $rowvw->hauptberuflich)
+						if(($rowvw->hauptberufcode=='' || $rowvw->hauptberufcode==NULL) && $rowvw->hauptberuflich=='f')
 						{
 							if($error_log!='')
 							{
