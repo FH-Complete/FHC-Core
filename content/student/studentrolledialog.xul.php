@@ -26,7 +26,10 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
-include('../../vilesci/config.inc.php');
+require_once('../../vilesci/config.inc.php');
+require_once('../../include/person.class.php');
+require_once('../../include/prestudent.class.php');
+
 echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
@@ -55,9 +58,21 @@ if(isset($_GET['ausbildungssemester']))
 	$ausbildungssemester=$_GET['ausbildungssemester'];
 else 
 	$ausbildungssemester='';
+
+$vorname = '';
+$nachname = '';
+if($prestudent_id!='')
+{
+	$prestudent = new prestudent($conn);
+	$prestudent->load($prestudent_id);
+	
+	$vorname = $prestudent->vorname;
+	$nachname = $prestudent->nachname;
+}
+
 ?>
 
-<window id="student-rolle-dialog" title="Neu"
+<window id="student-rolle-dialog" title="Status"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         onload="StudentRolleInit(<?php echo "'$prestudent_id','$rolle_kurzbz','$studiensemester_kurzbz','$ausbildungssemester'";?>)"
         >
@@ -68,7 +83,7 @@ else
 <vbox>
 <textbox id="student-rolle-textbox-prestudent_id" value="" hidden="true" />
 <groupbox id="student-rolle-groupbox" flex="1">
-	<caption label="Details"/>
+	<caption label="Details<?php echo ($nachname!=''?" $nachname $vorname":'');?>"/>
 		<grid id="student-rolle-grid-detail" style="margin:4px;" flex="1">
 		  	<columns  >
 				<column flex="1"/>
