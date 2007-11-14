@@ -151,7 +151,7 @@ if($result = pg_query($conn, $qry))
        <Habilitation>N</Habilitation>";
 			}
 		}
-		$qryvw="SELECT * FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid='".$row->mitarbeiter_uid."';";
+		$qryvw="SELECT * FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid='".$row->mitarbeiter_uid."' AND (ende is null OR ende>'$bisprevious') AND beginn<'$bisdatum';";
 		if($resultvw=pg_query($conn,$qryvw))
 		{
 			while($rowvw=pg_fetch_object($resultvw))
@@ -297,7 +297,7 @@ if($result = pg_query($conn, $qry))
                     <Funktion>
                        <StgKz>".sprintf("%04s",$rowfkt->studiengang_kz)."</StgKz>
                        <SWS>".$rowfkt->sws."</SWS>";
-						if($rowvw->hauptberuflich)
+						if($rowvw->hauptberuflich=='t')
 						{
 							$datei.="
                        <Hauptberuflich>J</Hauptberuflich>";
