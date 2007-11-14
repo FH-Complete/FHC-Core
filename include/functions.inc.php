@@ -190,7 +190,7 @@ function loadVariables($conn, $user)
 			$num_rows=pg_numrows($result);
 			if ($num_rows>0)
 			{
-				$row=pg_fetch_object($result,$i);
+				$row=pg_fetch_object($result);
 				global $semester_aktuell;
 				$semester_aktuell=$row->studiensemester_kurzbz;
 			}
