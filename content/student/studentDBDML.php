@@ -498,6 +498,7 @@ if(!$error)
 							$prestd_neu->studiensemester_kurzbz = $studiensemester;
 							$prestd_neu->datum = date('Y-m-d');
 							$prestd_neu->ausbildungssemester = $sem;
+							$prestd_neu->orgform_kurzbz = $prestd->orgform_kurzbz;
 							$prestd_neu->insertamum = date('Y-m-d H:i:s');
 							$prestd_neu->insertvon = $user;
 							$prestd_neu->new = true;
@@ -795,6 +796,7 @@ if(!$error)
 												$rolle->rolle_kurzbz = 'Student';
 												$rolle->studiensemester_kurzbz = $hlp->result[0]->studiensemester_kurzbz;
 												$rolle->ausbildungssemester = $hlp->result[0]->ausbildungssemester;
+												$rolle->orgform_kurzbz = $hlp->result[0]->orgform_kurzbz;
 												$rolle->datum = date('Y-m-d');
 												$rolle->insertamum = date('Y-m-d H:i:s');
 												$rolle->insertvon = $user;

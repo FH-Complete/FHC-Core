@@ -37,7 +37,7 @@ $verwendung_not_found=0;
 $verwendung_multiple=0;
 $funktion_ohne_lehrauftrag=0;
 $user = get_uid();
-$wochen=40;
+$wochen=BIS_SWS_WOCHEN;
 
 $stg_arr = array();
 $stg_obj = new studiengang($conn);
@@ -61,7 +61,9 @@ echo '<html>
 $stsem = new studiensemester($conn);
 $stsemprev = $stsem->getPrevious();
 $stsemprevprev = $stsem->getBeforePrevious();
-echo $stsemprev.' '.$stsemprevprev.'<br>';
+
+echo "Generiere Funktionen für $stsemprevprev/$stsemprev<br>";
+
 $qry =  "SELECT tbl_lehreinheitmitarbeiter.mitarbeiter_uid, tbl_lehrveranstaltung.studiengang_kz, sum(tbl_lehreinheitmitarbeiter.semesterstunden) as semstd 
 		FROM lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung  
 		WHERE 
