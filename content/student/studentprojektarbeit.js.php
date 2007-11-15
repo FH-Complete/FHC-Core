@@ -307,7 +307,7 @@ function StudentProjektarbeitAuswahl()
 	
 	//Lehrveranstaltung DropDown laden
 	var LvDropDown = document.getElementById('student-projektarbeit-menulist-lehrveranstaltung');
-	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&"+gettimestamp();
+	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&projektarbeit=true&withlv="+lehrveranstaltung_id+"&"+gettimestamp();
 
 	//Alte DS entfernen
 	var oldDatasources = LvDropDown.database.GetDataSources();
@@ -544,7 +544,7 @@ function StudentProjektarbeitNeu()
 	
 	//Lehrveranstaltung DropDown laden
 	var LvDropDown = document.getElementById('student-projektarbeit-menulist-lehrveranstaltung');
-	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&"+gettimestamp();
+	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&projektarbeit=true&"+gettimestamp();
 
 	//Alte DS entfernen
 	var oldDatasources = LvDropDown.database.GetDataSources();
@@ -817,7 +817,7 @@ function StudentProjektbetreuerMenulistPersonLoad(menulist, filter)
 
 	if(v.length>2)
 	{		
-		var url = '<?php echo APP_ROOT; ?>rdf/person.rdf.php?filter='+v+'&'+gettimestamp();
+		var url = '<?php echo APP_ROOT; ?>rdf/person.rdf.php?nurmittitel=&filter='+v+'&'+gettimestamp();
 
 		var oldDatasources = menulist.database.GetDataSources();
 		while(oldDatasources.hasMoreElements())

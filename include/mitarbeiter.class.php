@@ -676,5 +676,72 @@ class mitarbeiter extends benutzer
 			return false;
 		}
 	}
+	
+	function searchPersonal($filter)
+	{
+		$qry = "SELECT 
+					distinct on(person_id) *, tbl_benutzer.aktiv as aktiv, tbl_mitarbeiter.insertamum, 
+					tbl_mitarbeiter.insertvon 
+				FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id)) 
+				WHERE nachname ~* '".addslashes($filter)."' OR 
+				      vorname ~* '".addslashes($filter)."' OR 
+				      uid ~* '".addslashes($filter)."'";
+		if(is_numeric($filter))
+			$qry.="OR personalnummer = '".addslashes($filter)."'";
+				
+		//echo $qry;
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$obj = new mitarbeiter($this->conn, null, null);
+				
+				$obj->person_id = $row->person_id;
+				$obj->staatsbuergerschaft = $row->staatsbuergerschaft;
+				$obj->geburtsnation = $row->geburtsnation;
+				$obj->sprache = $row->sprache;
+				$obj->anrede = $row->anrede;
+				$obj->titelpost = $row->titelpost;
+				$obj->titelpre = $row->titelpre;
+				$obj->nachname = $row->nachname;
+				$obj->vorname = $row->vorname;
+				$obj->vornamen = $row->vornamen;
+				$obj->gebdatum = $row->gebdatum;
+				$obj->gebort = $row->gebort;
+				$obj->gebzeit = $row->gebzeit;
+				$obj->anmerkungen = $row->anmerkung;
+				$obj->homepage = $row->homepage;
+				$obj->svnr = $row->svnr;
+				$obj->ersatzkennzeichen = $row->ersatzkennzeichen;
+				$obj->familienstand = $row->familienstand;
+				$obj->geschlecht = $row->geschlecht;
+				$obj->anzahlkinder = $row->anzahlkinder;
+				$obj->bnaktiv = ($row->aktiv=='t'?true:false);
+				$obj->uid = $row->uid;
+				$obj->personalnummer = $row->personalnummer;
+				$obj->telefonklappe = $row->telefonklappe;
+				$obj->kurzbz = $row->kurzbz;
+				$obj->lektor = ($row->lektor=='t'?true:false);
+				$obj->fixangestellt = ($row->fixangestellt=='t'?true:false);
+				$obj->bismelden = ($row->bismelden=='t'?true:false);
+				$obj->stundensatz = $row->stundensatz;
+				$obj->ausbildungcode = $row->ausbildungcode;
+				$obj->ort_kurzbz = $row->ort_kurzbz;
+				$obj->standort_kurzbz = $row->standort_kurzbz;
+				$obj->anmerkung = $row->anmerkung;				
+				$obj->alias = $row->alias;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				
+				$this->result[] = $obj;
+			}
+			return false;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>

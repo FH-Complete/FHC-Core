@@ -267,7 +267,7 @@
 			  <td>Titel:</td>
 			  <td><input type="text" class="TextBox" name="txtTitle" size="30"<?php if(isset($news_id) && $news_id != "") echo ' value="'.$news->betreff.'"'; ?>></td>
 <?php
-			  if($rechte->isBerechtigt('admin','0'))
+			  if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('assistenz',0))
 			  {
 ?>
 			  <td>Senat:</td>

@@ -509,6 +509,7 @@ function onLektorSelect(event)
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	try
 	{
+		//alert(stg_kz);
 		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?stg_kz='+stg_kz+'&uid='+uid+'&'+gettimestamp();
 		var treeLV=document.getElementById('lehrveranstaltung-tree');
 

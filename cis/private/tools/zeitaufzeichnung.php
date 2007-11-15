@@ -66,6 +66,13 @@ function confdel()
 {
 	return confirm("Wollen Sie diesen Datensatz wirklich loeschen?");
 }
+
+function loaduebersicht()
+{
+	projekt = document.getElementById("projekt").value;
+	
+	document.location.href="'.$_SERVER['PHP_SELF'].'?filter="+projekt;
+}
 </script>
 </head>
 <body>
@@ -208,7 +215,7 @@ if($result_projekt = pg_query($conn, $qry_projekt))
 		
 		echo '<table>';
 		//Projekt
-		echo '<tr><td>Projekt</td><td><SELECT name="projekt">';
+		echo '<tr><td>Projekt</td><td><SELECT name="projekt" id="projekt">';
 		while($row_projekt = pg_fetch_object($result_projekt))
 		{
 			if($projekt_kurzbz == $row_projekt->projekt_kurzbz)
@@ -218,7 +225,7 @@ if($result_projekt = pg_query($conn, $qry_projekt))
 			
 			echo "<option value='$row_projekt->projekt_kurzbz' $selected>$row_projekt->titel</option>";
 		}
-		echo '</SELECT></td>';
+		echo '</SELECT><input type="button" value="Uebersicht" onclick="loaduebersicht();"></td>';
 		
 		//Studiengang
 		echo '<td>Studiengang</td><td><SELECT name="studiengang">';
@@ -297,28 +304,43 @@ if($result_projekt = pg_query($conn, $qry_projekt))
 		echo '<br><hr>';
 		
 		//Uebersichtstabelle
-		echo "<table id='t1' class='liste table-autosort:1 table-stripeclass:alternate table-autostripe'>\n";
+		echo "<table id='t1' class='liste table-autosort:4 table-stripeclass:alternate table-autostripe'>\n";
 		echo "   <thead><tr class='liste'>\n";
 	    echo "       <th class='table-sortable:numeric'>ID</th><th class='table-sortable:default'>Projekt</th>";
-	    echo "<th class='table-sortable:default'>Aktivitaet</th><th class='table-sortable:default'>Start</th>";
+	    echo "<th class='table-sortable:default'>Aktivitaet</th><th class='table-sortable:default'>User</th>";
+	    echo "<th class='table-sortable:default'>Start</th>";
 	    echo "<th class='table-sortable:default'>Ende</th>";
 	    echo "<th class='table-sortable:default'>Dauer</th>";
 	    echo "<th class='table-sortable:default'>Beschreibung</th><th class='table-sortable:default'>Stg</th>";
 	    echo "<th class='table-sortable:default'>Fachbereich</th><th colspan='2'>Aktion</th>";
 	    echo "   </tr></thead><tbody>\n";
 	    
-	    $qry = "SELECT *, to_char ((ende-start),'HH24:MI:SS') as diff FROM campus.tbl_zeitaufzeichnung WHERE uid='$user' AND ende>(now() - INTERVAL '40 days') ORDER BY ende DESC";
+	    if(isset($_GET['filter']))
+	    	$where = "projekt_kurzbz='".addslashes($_GET['filter'])."'";
+	    else 
+	    	$where = "uid='$user'";
+	    $qry = "SELECT 
+	    			*, to_char ((ende-start),'HH24:MI:SS') as diff, 
+	    			(SELECT to_char(sum(ende-start),'HH24:MI:SS') 
+	    			 FROM campus.tbl_zeitaufzeichnung 
+	    			 WHERE $where AND ende>(now() - INTERVAL '40 days')) as summe 	    
+	    		FROM campus.tbl_zeitaufzeichnung WHERE $where AND ende>(now() - INTERVAL '40 days') 
+	    		ORDER BY start DESC";
+	    //echo $qry;
 	    if($result = pg_query($conn, $qry))
 	    {
 		    $i = 0;
+		    $summe=0;
 			while($row=pg_fetch_object($result))
 		    {		        
+		    	$summe = $row->summe;
 				echo "   <tr>\n";
 		        echo "       <td>".$row->zeitaufzeichnung_id."</td>\n";
 				echo "       <td>".$row->projekt_kurzbz."</td>\n";
 		        echo "       <td>$row->aktivitaet_kurzbz</td>\n";
-		        echo "       <td>".date('d.m.Y H:i:s', $datum->mktime_fromtimestamp($row->start))."</td>\n";
-		        echo "       <td>".date('d.m.Y H:i:s', $datum->mktime_fromtimestamp($row->ende))."</td>\n";
+		        echo "       <td>$row->uid</td>\n";
+		        echo "       <td><div style='display: none;'>$row->start</div>".date('d.m.Y H:i:s', $datum->mktime_fromtimestamp($row->start))."</td>\n";
+		        echo "       <td><div style='display: none;'>$row->ende</div>".date('d.m.Y H:i:s', $datum->mktime_fromtimestamp($row->ende))."</td>\n";
 		        echo "       <td align='right'>".$row->diff."</td>\n";
 		        echo "       <td title='".str_replace("\r\n",' ',$row->beschreibung)."'>".(strlen($row->beschreibung)>33?substr($row->beschreibung,0,30).'...':$row->beschreibung)."</td>\n";
 		        echo "       <td>".(isset($stg_arr[$row->studiengang_kz])?$stg_arr[$row->studiengang_kz]:$row->studiengang_kz)."</td>\n";
@@ -330,6 +352,7 @@ if($result_projekt = pg_query($conn, $qry_projekt))
 		    }
 	    }
 	    echo "</tbody></table>\n";
+	    echo "Gesamtdauer: $summe";
 	}
 	else 
 	{

@@ -58,6 +58,17 @@ echo '
 
 foreach ($lehrveranstaltung->lehrveranstaltungen as $row)
 {
+	if(isset($_GET['projektarbeit']) && $row->projektarbeit==false)
+	{
+		if(isset($_GET['withlv']) && $_GET['withlv']==$row->lehrveranstaltung_id)
+		{
+			//Diese LV soll zusaetzlich in der liste aufscheinen unabhaengig ob
+			//Projektarbeit gesetzt ist oder nicht
+		}
+		else
+			continue;
+	}
+	
 	echo'<RDF:li>
       		<RDF:Description  id="'.$row->lehrveranstaltung_id.'" about="'.$rdf_url.$row->lehrveranstaltung_id.'">
         		<LVA:lehrveranstaltung_id><![CDATA['.$row->lehrveranstaltung_id.']]></LVA:lehrveranstaltung_id>

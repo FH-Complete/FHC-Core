@@ -135,7 +135,7 @@ if($lehrveranstaltung_id==null && $filter==null)
 				<MITARBEITER:vorname></MITARBEITER:vorname>
 				<MITARBEITER:nachname></MITARBEITER:nachname>
 				<MITARBEITER:kurzbz>Alle</MITARBEITER:kurzbz>
-				<MITARBEITER:studiengang_kz>0</MITARBEITER:studiengang_kz>
+				<MITARBEITER:studiengang_kz></MITARBEITER:studiengang_kz>
 			</RDF:Description>
 	';
 	

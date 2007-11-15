@@ -61,7 +61,7 @@ $einheit_kurzbz=(isset($_GET['einheit'])?$_GET['einheit']:'');
 $grp=(isset($_GET['grp'])?$_GET['grp']:'');
 $ver=(isset($_GET['ver'])?$_GET['ver']:'');
 $sem=(isset($_GET['sem'])?$_GET['sem']:'');
-$stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:'');
+$stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:-1);
 $uid=(isset($_GET['uid'])?$_GET['uid']:'');
 $fachbereich_kurzbz=(isset($_GET['fachbereich_kurzbz'])?$_GET['fachbereich_kurzbz']:'');
 
@@ -77,13 +77,13 @@ foreach ($stg_obj->result as $row)
 
 // LVAs holen
 $lvaDAO=new lehrveranstaltung($conn, null, true);
-if($uid!='' && $stg_kz!='') // Alle LVs eines Mitarbeiters
+if($uid!='' && $stg_kz!=-1) // Alle LVs eines Mitarbeiters
 {
 	//$lvaDAO->loadLVAfromMitarbeiter($stg_kz, $uid, $semester_aktuell);
 	$qry = "SELECT distinct on(lehrveranstaltung_id) * FROM campus.vw_lehreinheit WHERE
 	        studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
 	        mitarbeiter_uid='".addslashes($uid)."'";
-	if($stg_kz!='0')
+	if($stg_kz!='') //$stg_kz!='0'
 		$qry .=" AND studiengang_kz='".addslashes($stg_kz)."'";
 
 }
@@ -102,17 +102,23 @@ else
 				planfaktor as lv_planfaktor, planlektoren as lv_planlektoren, planpersonalkosten as lv_planpersonalkosten,
 				plankostenprolektor as lv_plankostenprolektor
 			FROM lehre.tbl_lehrveranstaltung
-			WHERE aktiv AND	studiengang_kz='".addslashes($stg_kz)."'";
+			WHERE aktiv ";
+	if($stg_kz!='')
+		$qry.=" AND	studiengang_kz='".addslashes($stg_kz)."'";
 	if($sem!='')
 		$qry.=" AND semester='".addslashes($sem)."'";
 
-	$qry.=' UNION SELECT DISTINCT lehrveranstaltung_id, kurzbz as lv_kurzbz, bezeichnung as lv_bezeichnung, studiengang_kz,
+	$qry.=" UNION SELECT DISTINCT lehrveranstaltung_id, kurzbz as lv_kurzbz, bezeichnung as lv_bezeichnung, studiengang_kz,
 				semester, tbl_lehrveranstaltung.sprache, ects as lv_ects, semesterstunden, tbl_lehrveranstaltung.anmerkung,
 				tbl_lehrveranstaltung.lehre, lehreverzeichnis as lv_lehreverzeichnis, aktiv, planfaktor as lv_planfaktor,
 				planlektoren as lv_planlektoren, planpersonalkosten as lv_planpersonalkosten,
 				plankostenprolektor as lv_plankostenprolektor
 			FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING (lehrveranstaltung_id)
-			WHERE NOT aktiv AND studiengang_kz='.addslashes($stg_kz)." AND studiensemester_kurzbz='".addslashes($semester_aktuell)."'";
+			WHERE NOT aktiv ";
+	if($stg_kz!='')
+		$qry.=" AND studiengang_kz='".addslashes($stg_kz)."'";
+
+	$qry.=" AND studiensemester_kurzbz='".addslashes($semester_aktuell)."'";
 	if($sem!='')
 		$qry.=" AND semester='".addslashes($sem)."'";
 }
