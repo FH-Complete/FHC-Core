@@ -318,7 +318,7 @@ class student extends benutzer
 			$l->familienstand = $row->familienstand;
 			$l->svnr=$row->svnr;
 			$l->foto=$row->foto;
-			$l->anmerkungen=$row->anmerkungen;
+			$l->anmerkungen=$row->anmerkung;
 			$l->aktiv=$row->aktiv=='t'?true:false;
 			$l->alias=$row->alias;
 			$l->homepage=$row->homepage;

@@ -60,6 +60,12 @@ echo '
 ';
 
 $qry = "SET CLIENT_ENCODING TO 'UNICODE'; SELECT distinct person_id, vorname, nachname, titelpre, titelpost FROM public.tbl_person WHERE nachname ~* '".addslashes($filter).".*'";
+
+if(isset($_GET['nurmittitel']))
+{
+	$qry.=" AND (titelpre<>'' OR titelpost<>'')";
+}
+
 if($result = pg_query($conn, $qry))
 {
 	while($row = pg_fetch_object($result))

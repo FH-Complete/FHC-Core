@@ -179,6 +179,14 @@ if($result = pg_query($conn, $qry))
 			echo "<br><b>$row->mitarbeiter_uid</b> hat im Studiengang ".$stg_arr[$row->studiengang_kz]." ($row->studiengang_kz) eine Funktion ohne Lehrauftrag";
 		}
 	}
+	echo "Loeschen der Funktionen mit: DELETE FROM bis.tbl_bisfunktion where (studiengang_kz, bisverwendung_id) in (SELECT studiengang_kz, bisverwendung_id FROM bis.tbl_bisfunktion JOIN bis.tbl_bisverwendung USING(bisverwendung_id) 
+			WHERE (mitarbeiter_uid, studiengang_kz) NOT IN (
+				SELECT mitarbeiter_uid, studiengang_kz 
+				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter 
+				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND 
+				tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND 
+				(tbl_lehreinheit.studiensemester_kurzbz='$stsemprevprev' OR tbl_lehreinheit.studiensemester_kurzbz='$stsemprev')) 
+				AND (ende>'2006-11-15' OR ende is null))";
 	echo '<br><br>';
 	echo '<h3>Uebersicht</h3>';
 	echo '<table>';

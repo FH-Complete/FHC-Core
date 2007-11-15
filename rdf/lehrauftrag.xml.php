@@ -90,14 +90,17 @@ $fb_arr = array();
 		
 //Studiengangsleiter holen
 $stgl='';
-$qry = "SELECT titelpre, vorname, nachname, titelpost FROM public.tbl_benutzerfunktion, public.tbl_person, public.tbl_benutzer WHERE
-		funktion_kurzbz='stgl' AND studiengang_kz='".addslashes($studiengang_kz)."'
-		AND tbl_benutzerfunktion.uid=tbl_benutzer.uid AND tbl_benutzer.person_id=tbl_person.person_id";
-if($result = pg_query($conn, $qry))
+if($studiengang_kz!='')
 {
-	if($row = pg_fetch_object($result))
+	$qry = "SELECT titelpre, vorname, nachname, titelpost FROM public.tbl_benutzerfunktion, public.tbl_person, public.tbl_benutzer WHERE
+			funktion_kurzbz='stgl' AND studiengang_kz='".addslashes($studiengang_kz)."'
+			AND tbl_benutzerfunktion.uid=tbl_benutzer.uid AND tbl_benutzer.person_id=tbl_person.person_id";
+	if($result = pg_query($conn, $qry))
 	{
-		$stgl = trim($row->titelpre.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost);
+		if($row = pg_fetch_object($result))
+		{
+			$stgl = trim($row->titelpre.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost);
+		}
 	}
 }
 
@@ -203,7 +206,7 @@ function drawLehrauftrag($uid)
 	//Lehreinheiten
 	$qry = "SELECT * FROM campus.vw_lehreinheit WHERE mitarbeiter_uid='".addslashes($uid)."' AND studiensemester_kurzbz='$ss'";
 
-	if($studiengang_kz!='0' && $studiengang_kz!='')
+	if($studiengang_kz!='') //$studiengang_kz!='0' && 
 		$qry .= "AND lv_studiengang_kz='".addslashes($studiengang_kz)."'";
 	$qry.=" ORDER BY lehreinheit_id";
 	$lv = array();

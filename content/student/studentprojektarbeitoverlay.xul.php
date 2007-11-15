@@ -61,29 +61,25 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					sortDirection="ascending"
 					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#projekttyp_kurzbz"/>
 				<splitter class="tree-splitter"/>
+				<treecol id="student-projektarbeit-tree-studiensemester" label="Studiensemester" flex="1" hidden="false"
+				   class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#lehreinheit_stsem"/>
+				<splitter class="tree-splitter"/>
 				<treecol id="student-projektarbeit-tree-titel" label="Titel" flex="1" hidden="false"
 				   class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#titel"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="student-projektarbeit-tree-note" label="Note" flex="2" hidden="false"
+				<treecol id="student-projektarbeit-tree-note" label="Gesamtnote" flex="2" hidden="false"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#note" />
 				<splitter class="tree-splitter"/>
-				<treecol id="student-projektarbeit-tree-punkte" label="Punkte" flex="2" hidden="false"
-					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#punkte" />
-				<splitter class="tree-splitter"/>
-				<treecol id="student-projektarbeit-tree-beginn" label="Beginn" flex="2" hidden="false"
+				<treecol id="student-projektarbeit-tree-beginn" label="Beginn" flex="2" hidden="true"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#beginn" />
 				<splitter class="tree-splitter"/>
 				<treecol id="student-projektarbeit-tree-ende" label="Ende" flex="2" hidden="true"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#ende" />
-				<splitter class="tree-splitter"/>
-				<treecol id="student-projektarbeit-tree-faktor" label="Faktor" flex="2" hidden="true"
-					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#faktor" />
 				<splitter class="tree-splitter"/>
 				<treecol id="student-projektarbeit-tree-freigegeben" label="Freigegeben" flex="2" hidden="true"
 					class="sortDirectionIndicator"
@@ -92,14 +88,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<treecol id="student-projektarbeit-tree-gesperrtbis" label="Gesperrt bis" flex="2" hidden="true"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#gesperrtbis" />
-				<splitter class="tree-splitter"/>
-				<treecol id="student-projektarbeit-tree-stundensatz" label="stundensatz" flex="2" hidden="true"
-					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#stundensatz" />
-				<splitter class="tree-splitter"/>
-				<treecol id="student-projektarbeit-tree-gesamtstunden" label="Gesamtstunden" flex="2" hidden="true"
-					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#gesamtstunden" />
 				<splitter class="tree-splitter"/>
 				<treecol id="student-projektarbeit-tree-themenbereich" label="Themenbereich" flex="2" hidden="true"
 					class="sortDirectionIndicator"
@@ -132,16 +120,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<treeitem uri="rdf:*">
 						<treerow>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#projekttyp_kurzbz"/>
+							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#lehreinheit_stsem"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#titel"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#note"/>
-							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#punkte"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#beginn"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#ende"/>
-							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#faktor"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#freigegeben"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#gesperrtbis"/>
-							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#stundensatz"/>
-							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#gesamtstunden"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#themenbereich"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#anmerkung"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#projektarbeit_id"/>
@@ -253,8 +238,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					</columns>
 					<rows>
 						<row>
-							<label value="Gesamtpunkte" control="student-projektarbeit-textbox-punkte" />
-							<hbox>
+							<spacer />
+							<spacer />
+							<label value="Gesamtpunkte" control="student-projektarbeit-textbox-punkte" hidden="true"/>
+							<hbox hidden="true">
 								<textbox id="student-projektarbeit-textbox-punkte" maxlength="5" size="5" disabled="true"/>
 							</hbox>
 							<label value="Gesamtnote" control="student-projektarbeit-menulist-note"/>

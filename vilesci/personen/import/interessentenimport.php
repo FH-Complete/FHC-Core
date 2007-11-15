@@ -297,6 +297,7 @@ if(isset($_POST['save']))
 			$adr->new = true;
 			$adr->insertamum = date('Y-m-d H:i:s');
 			$adr->insertvon = $user;
+			$adr->nation = 'A';
 		}
 		else
 		{
@@ -325,6 +326,7 @@ if(isset($_POST['save']))
 				$adr->new = true;
 				$adr->insertamum = date('Y-m-d H:i:s');
 				$adr->insertvon = $user;
+				$adr->nation = 'A';
 			}
 		}
 

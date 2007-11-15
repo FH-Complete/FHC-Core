@@ -3498,19 +3498,12 @@ function StudentSuche()
 		document.getElementById('tree-verband').currentIndex=-1;
 		document.getElementById('tree-verband').view.selection.clearSelection();
 		//Export deaktivieren
-		document.getElementById('student-toolbar-export').disabled=true;
+		//document.getElementById('student-toolbar-export').disabled=true;
 
 		//Datasource setzten und Felder deaktivieren
 		url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?filter="+encodeURIComponent(filter)+"&"+gettimestamp();
 		
 		var treeStudent=document.getElementById('student-tree');
-	
-		//Alte DS entfernen
-		var oldDatasources = treeStudent.database.GetDataSources();
-		while(oldDatasources.hasMoreElements())
-		{
-			treeStudent.database.RemoveDataSource(oldDatasources.getNext());
-		}
 	
 		try
 		{
@@ -3519,6 +3512,14 @@ function StudentSuche()
 		}
 		catch(e)
 		{}
+		
+		//Alte DS entfernen
+		var oldDatasources = treeStudent.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			treeStudent.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		StudentTreeDatasource = rdfService.GetDataSource(url);
 		StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);

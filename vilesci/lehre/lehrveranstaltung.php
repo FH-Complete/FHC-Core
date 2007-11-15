@@ -55,7 +55,7 @@ $fachbereich_kurzbz = (isset($_REQUEST['fachbereich_kurzbz'])?$_REQUEST['fachber
 //Wenn kein Fachbereich und kein Studiengang gewaehlt wurde
 //dann wird der Studiengang auf 0 gesetzt da sonst die zu ladende liste zu lang wird
 if($fachbereich_kurzbz=='' && $stg_kz=='')
-	$stg_kz=0;
+	$stg_kz='0';
 
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
@@ -127,6 +127,17 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 		else
 			echo "Erfolgreich gespeichert";
 	}
+	
+	//Projektarbeit Feld setzen
+	if(isset($_GET['projektarbeit']))
+	{
+		$qry = "UPDATE lehre.tbl_lehrveranstaltung SET projektarbeit=".($_GET['projektarbeit']=='t'?'false':'true')." WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
+		//echo $qry;
+		if(!pg_query($conn, $qry))
+			echo "Fehler beim Speichen!";
+		else
+			echo "Erfolgreich gespeichert";
+	}
 }
 	
 //Fachbereichskoordinatoren holen
@@ -138,9 +149,9 @@ SELECT
 	uid 
 FROM 
 	campus.vw_mitarbeiter JOIN 
-	(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='fbk' AND studiengang_kz='257' 
+	(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='fbk' AND studiengang_kz='$stg_kz' 
 	 UNION 
-	 SELECT koordinator as uid from lehre.tbl_lehrveranstaltung WHERE studiengang_kz='257') as a USING(uid) ORDER BY nachname, vorname";
+	 SELECT koordinator as uid from lehre.tbl_lehrveranstaltung WHERE studiengang_kz='$stg_kz') as a USING(uid) ORDER BY nachname, vorname";
 
 $fbk = array();
 if($result = pg_query($conn, $qry))
@@ -277,6 +288,7 @@ if ($result_lv!=0)
 		  <th class='table-sortable:default'>Aktiv</th>
 		  <th class='table-sortable:numeric'>Sort</th>
 		  <th class='table-sortable:default'>Zeugnis</th>\n
+		  <th class='table-sortable:default'>BA/DA</th>\n
 		  <th class='table-sortable:default'>FBK</th>\n";
 	echo "</tr></thead>";
 	echo "<tbody>";
@@ -323,6 +335,8 @@ if ($result_lv!=0)
 		echo "</td>";
 		//Zeugnis
 		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&zeugnis=$row->zeugnis'><img src='../../skin/images/".($row->zeugnis=='t'?'true.gif':'false.gif')."'></a></td>";
+		//Projektarbeit
+		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&projektarbeit=$row->projektarbeit'><img src='../../skin/images/".($row->projektarbeit=='t'?'true.gif':'false.gif')."'></a></td>";
 		//FBK
 		echo "<td style='white-space:nowrap;'>";
 		echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester' method='POST'><SELECT name='fbk'>";

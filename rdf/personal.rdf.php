@@ -79,6 +79,10 @@ if (isset($_GET['ausgeschieden']))
 else
 	$ausgeschieden=null;
 
+if(isset($_GET['filter']))
+	$filter = $_GET['filter'];
+else
+	$filter = null;
 $rdf_url='http://www.technikum-wien.at/mitarbeiter';
 
 echo '
@@ -97,7 +101,11 @@ $mitarbeiterDAO=new mitarbeiter($conn, null, true);
 
 if($uid==null)
 {
-	$mitarbeiterDAO->getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $ausgeschieden, $semester_aktuell);
+	if($filter!='')
+		$mitarbeiterDAO->searchPersonal($filter);
+	else
+		$mitarbeiterDAO->getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $ausgeschieden, $semester_aktuell);
+	
 	foreach ($mitarbeiterDAO->result as $mitarbeiter)
 		draw_row($mitarbeiter);
 }

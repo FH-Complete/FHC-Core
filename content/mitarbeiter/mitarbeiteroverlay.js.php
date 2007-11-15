@@ -233,6 +233,10 @@ function onMitarbeiterSelect()
 {	
 	var tree=document.getElementById('tree-menu-mitarbeiter');
 	var col = tree.columns ? tree.columns["tree-menu-mitarbeiter-col-filter"] : "tree-menu-mitarbeiter-col-filter";
+	
+	if(tree.currentIndex==-1)
+		return false;
+	
 	var filter=tree.view.getCellText(tree.currentIndex,col);
 	var url = "<?php echo APP_ROOT; ?>rdf/personal.rdf.php";
 	var attributes="?type=unknown";
@@ -296,13 +300,6 @@ function onMitarbeiterSelect()
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	
 	var tree=document.getElementById('mitarbeiter-tree');
-	
-	///Alte DS entfernen
-	var oldDatasources = tree.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
-	{
-		tree.database.RemoveDataSource(oldDatasources.getNext());
-	}
 
 	try
 	{
@@ -311,6 +308,13 @@ function onMitarbeiterSelect()
 	}
 	catch(e)
 	{}
+	
+	///Alte DS entfernen
+	var oldDatasources = tree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		tree.database.RemoveDataSource(oldDatasources.getNext());
+	}
 	
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	MitarbeiterTreeDatasource = rdfService.GetDataSource(url);
@@ -1653,4 +1657,63 @@ function MitarbeiterGenerateGebDatFromSVNR()
 	
 	if(svnr!='' && svnr.length==10)
 		document.getElementById('mitarbeiter-detail-textbox-geburtsdatum').value = svnr.charAt(4) + svnr.charAt(5) + "." + svnr.charAt(6) + svnr.charAt(7) + ".19" + svnr.charAt(8) + svnr.charAt(9);
+}
+
+// ****
+// * Startet die Personensuche
+// ****
+function MitarbeiterSuche()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	filter = document.getElementById('mitarbeiter-toolbar-textbox-suche').value;
+	var treeMitarbeiterMenu=document.getElementById('tree-menu-mitarbeiter');
+	treeMitarbeiterMenu.currentIndex=-1;
+	treeMitarbeiterMenu.view.selection.clearSelection();
+	
+	//Wenn mehr als 2 Zeichen eingegeben wurden, die Personensuche starten
+	if(filter.length>2)
+	{
+		//Datasource setzen und Felder deaktivieren
+		url = "<?php echo APP_ROOT; ?>rdf/personal.rdf.php?filter="+encodeURIComponent(filter)+"&"+gettimestamp();
+		
+		var treeMitarbeiter=document.getElementById('mitarbeiter-tree');
+	
+		try
+		{
+			MitarbeiterTreeDatasource.removeXMLSinkObserver(MitarbeiterTreeSinkObserver);
+			treeMitarbeiter.builder.removeListener(MitarbeiterTreeListener);
+		}
+		catch(e)
+		{}
+		
+		//Alte DS entfernen
+		var oldDatasources = treeMitarbeiter.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			treeMitarbeiter.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		treeMitarbeiter.builder.rebuild();
+		
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		MitarbeiterTreeDatasource = rdfService.GetDataSource(url);
+		MitarbeiterTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		MitarbeiterTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		treeMitarbeiter.database.AddDataSource(MitarbeiterTreeDatasource);
+		MitarbeiterTreeDatasource.addXMLSinkObserver(MitarbeiterTreeSinkObserver);
+		treeMitarbeiter.builder.addListener(MitarbeiterTreeListener);
+	
+		//Detailfelder Deaktivieren
+		MitarbeiterDetailDisableFields(true);
+	}
+	else
+		alert('Es muessen mindestens 3 Zeichen eingegeben werden');		
+}
+
+// ****
+// * Wenn im Suchfeld Enter gedrueckt wird, dann die Suchfunktion starten
+// ****
+function MitarbeiterSearchFieldKeyPress(event)
+{
+	if(event.keyCode==13) //Enter
+		MitarbeiterSuche();
 }

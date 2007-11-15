@@ -81,6 +81,7 @@
 		$lv->updatevon = $user;
 		$lv->sort = $_POST['sort'];
 		$lv->zeugnis = isset($_POST['zeugnis']);
+		$lv->projektarbeit = isset($_POST['projektarbeit']);
 		
 		if(!$lv->save())
 			$errorstr = "Fehler beim Speichern der Daten: $lv->errormsg";
@@ -199,6 +200,10 @@
 		$htmlstr .= "	<td><input type='checkbox' name='aktiv' ".($lv->aktiv?'checked':'')."></td>";			
 		$htmlstr .= "	<td>Zeugnis</td>";
 		$htmlstr .= "	<td><input type='checkbox' name='zeugnis' ".($lv->zeugnis?'checked':'')."></td>";
+		$htmlstr .= "	</tr><tr>\n";
+		
+		$htmlstr .= "	<td>Projektarbeit</td>";
+		$htmlstr .= "	<td><input type='checkbox' name='projektarbeit' ".($lv->projektarbeit?'checked':'')."></td>";
 		
 		$htmlstr .= "	</tr>\n";
 		$htmlstr .= "</table>\n";
