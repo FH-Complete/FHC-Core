@@ -33,13 +33,26 @@ if (!$conn = pg_pconnect(CONN_STRING))
 echo '<H1>Systemcheck!</H1>';
 echo '<H2>DB-Updates!</H2>';
 
-// Newssprache
+/*/ Newssprache
 if (!@pg_query($conn,'SELECT * FROM campus.tbl_newssprache LIMIT 1;'))
 {
 	if (!@pg_query($conn,'DROP TABLE public.tbl_newssprache;'))
 		echo '<strong>campus.tbl_newssprache: '.pg_last_error($conn).' </strong><BR>';
 	else
 		echo 'campus.tbl_newssprache wurde angepasst!<BR>';
+}*/
+
+// lehre.tbl_lehrveranstaltung.projektarbeit
+if (!@pg_query($conn,'SELECT projektarbeit FROM lehre.tbl_lehrveranstaltung LIMIT 1;'))
+{
+	$sql='	ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN projektarbeit boolean;
+			UPDATE lehre.tbl_lehrveranstaltung SET projektarbeit=FALSE;
+			ALTER TABLE lehre.tbl_lehrveranstaltung ALTER COLUMN projektarbeit SET DEFAULT TRUE;
+			ALTER TABLE lehre.tbl_lehrveranstaltung ALTER COLUMN projektarbeit SET NOT NULL;';
+	if (!@pg_query($conn,$sql))
+		echo '<strong>lehre.tbl_lehrveranstaltung: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo 'projektarbeit wurde bei lehre.tbl_lehrveranstaltung hinzugefuegt!<BR>';
 }
 
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
