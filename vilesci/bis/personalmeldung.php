@@ -98,17 +98,6 @@ if($result = pg_query($conn, $qry))
 				$eteam[$rowet->studiengang_kz]=$rowet->besqualcode;
 			}
 		}
-		if(!$row->hauptberuflich && ($row->hauptberufcode=='' || $row->hauptberufcode==NULL))
-		{
-			if($error_log!='')
-			{
-				$error_log.=", Hauptberuf ('".$row->hauptberufcode."')";
-			}
-			else 
-			{
-				$error_log="Hauptberuf ('".$row->hauptberufcode."')";
-			} 
-		}
 		if($row->gebdatum=='' || $row->gebdatum==NULL)
 		{
 			if($error_log!='')
@@ -210,6 +199,17 @@ if($result = pg_query($conn, $qry))
 					{
 						$error_log="VerwendungsCode ('".$rowvw->verwendung_code."')";
 					}
+				}
+				if(!$rowvw->hauptberuflich && ($rowvw->hauptberufcode=='' || $rowvw->hauptberufcode==NULL))
+				{
+					if($error_log!='')
+					{
+						$error_log.=", Hauptberuf ('".$rowvw->hauptberufcode."')";
+					}
+					else 
+					{
+						$error_log="Hauptberuf ('".$rowvw->hauptberufcode."')";
+					} 
 				}
 				$datei.="
        <Verwendung>
