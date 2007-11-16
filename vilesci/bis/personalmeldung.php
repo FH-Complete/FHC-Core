@@ -40,7 +40,7 @@ if(strstr($ssem,"WS"))
 	$bisdatum=date("Y-m-d",  mktime(0, 0, 0, 04, 15, date("Y")));
 	$bisprevious=date("Y-m-d",  mktime(0, 0, 0, 11, 15, date("Y")-1));
 }*/
-else 
+else
 {
 	echo "Ungültiges Semester!";
 	exit;
@@ -59,30 +59,30 @@ if($result = pg_query($conn, $qry))
 		{
 			$erhalter='0'.trim($row->erhalter_kz);
 		}
-		else 
+		else
 		{
 			$erhalter=$row->erhalter_kz;
 		}
 	}
 }
 
-$qry="SELECT DISTINCT ON (UID) * FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid) 
-	JOIN public.tbl_person USING(person_id)   
-	WHERE tbl_benutzer.aktiv AND bismelden AND personalnummer>1 AND mitarbeiter_uid!='_DummyLektor' 
-	ORDER BY uid, nachname,vorname   
+$qry="SELECT DISTINCT ON (UID) * FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)
+	JOIN public.tbl_person USING(person_id)
+	WHERE tbl_benutzer.aktiv AND bismelden AND personalnummer>1 AND mitarbeiter_uid!='_DummyLektor'
+	ORDER BY uid, nachname,vorname
 	";
 
 /*
 	AND (ende>now() OR ende IS NULL)
 	bis.tbl_bisverwendung USING (mitarbeiter_uid)
-	bis.tbl_bisfunktion USING(bisverwendung_id) 
-	bis.tbl_entwicklungsteam USING(mitarbeiter_uid) 
+	bis.tbl_bisfunktion USING(bisverwendung_id)
+	bis.tbl_entwicklungsteam USING(mitarbeiter_uid)
 	public.tbl_benutzerfunktion
 */
 
 if($result = pg_query($conn, $qry))
 {
-	
+
 	$datei.="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <Erhalter>
    <ErhKz>".$erhalter."</ErhKz>
@@ -115,10 +115,10 @@ if($result = pg_query($conn, $qry))
 			{
 				$error_log.=", Geburtsdatum ('".$row->gebdatum."')";
 			}
-			else 
+			else
 			{
 				$error_log="Geburtsdatum ('".$row->gebdatum."')";
-			} 
+			}
 		}
 		if($row->geschlecht=='' || $row->geschlecht==NULL)
 		{
@@ -126,10 +126,10 @@ if($result = pg_query($conn, $qry))
 			{
 				$error_log.=", Geschlecht ('".$row->geschlecht."')";
 			}
-			else 
+			else
 			{
 				$error_log="Geschlecht ('".$row->geschlecht."')";
-			} 
+			}
 		}
 		if($row->ausbildungcode=='' || $row->ausbildungcode==NULL)
 		{
@@ -137,10 +137,10 @@ if($result = pg_query($conn, $qry))
 			{
 				$error_log.=", HoechsteAbgeschlosseneAusbildung ('".$row->ausbildungcode."')";
 			}
-			else 
+			else
 			{
 				$error_log="HoechsteAbgeschlosseneAusbildung ('".$row->ausbildungcode."')";
-			} 
+			}
 		}
 		$datei.="
      <Person>
@@ -156,7 +156,7 @@ if($result = pg_query($conn, $qry))
 				$datei.="
        <Habilitation>J</Habilitation>";
 			}
-			else 
+			else
 			{
 				$datei.="
        <Habilitation>N</Habilitation>";
@@ -173,10 +173,10 @@ if($result = pg_query($conn, $qry))
 					{
 						$error_log.=", Beschaeftigungsart1 ('".$rowvw->ba1code."')";
 					}
-					else 
+					else
 					{
 						$error_log="Beschaeftigungsart1 ('".$rowvw->ba1code."')";
-					} 
+					}
 				}
 				if($rowvw->ba2code=='' || $rowvw->ba2code==NULL)
 				{
@@ -184,10 +184,10 @@ if($result = pg_query($conn, $qry))
 					{
 						$error_log.=", Beschaeftigungsart2 ('".$rowvw->ba2code."')";
 					}
-					else 
+					else
 					{
 						$error_log="Beschaeftigungsart2 ('".$rowvw->ba2code."')";
-					} 
+					}
 				}
 				if($rowvw->beschausmasscode=='' || $rowvw->beschausmasscode==NULL)
 				{
@@ -195,10 +195,10 @@ if($result = pg_query($conn, $qry))
 					{
 						$error_log.=", BeschaeftigungsAusmass ('".$rowvw->beschausmasscode."')";
 					}
-					else 
+					else
 					{
 						$error_log="BeschaeftigungsAusmass ('".$rowvw->beschausmasscode."')";
-					} 
+					}
 				}
 				if($rowvw->verwendung_code=='' || $rowvw->verwendung_code==NULL)
 				{
@@ -206,10 +206,10 @@ if($result = pg_query($conn, $qry))
 					{
 						$error_log.=", VerwendungsCode ('".$rowvw->verwendung_code."')";
 					}
-					else 
+					else
 					{
 						$error_log="VerwendungsCode ('".$rowvw->verwendung_code."')";
-					} 
+					}
 				}
 				$datei.="
        <Verwendung>
@@ -229,10 +229,10 @@ if($result = pg_query($conn, $qry))
 							{
 								$error_log.=", StgKz(Leitung) ('".$rowslt->studiengang_kz."')";
 							}
-							else 
+							else
 							{
 								$error_log="StgKz(Leitung) ('".$rowslt->studiengang_kz."')";
-							} 
+							}
 						}
 						$datei.="
                      <StgLeitung>
@@ -241,7 +241,7 @@ if($result = pg_query($conn, $qry))
 					}
 				}
 				//Funktionen
-				$qryfkt="SELECT * FROM bis.tbl_bisfunktion WHERE bisverwendung_id='".$rowvw->bisverwendung_id."' ;";
+				$qryfkt="SELECT * FROM bis.tbl_bisfunktion WHERE bisverwendung_id='".$rowvw->bisverwendung_id."' AND studiengang_kz>0 AND studiengang_kz<10000;";
 				if($resultfkt=pg_query($conn,$qryfkt))
 				{
 					while($rowfkt=pg_fetch_object($resultfkt))
@@ -252,10 +252,10 @@ if($result = pg_query($conn, $qry))
 							{
 								$error_log.=", StgKz(Funktion) ('".$rowfkt->studiengang_kz."')";
 							}
-							else 
+							else
 							{
 								$error_log="StgKz(Funktion) ('".$rowfkt->studiengang_kz."')";
-							} 
+							}
 						}
 						if($rowfkt->sws=='' || $rowfkt->sws==NULL)
 						{
@@ -263,10 +263,10 @@ if($result = pg_query($conn, $qry))
 							{
 								$error_log.=", SWS ('".$rowfkt->sws."')";
 							}
-							else 
+							else
 							{
 								$error_log="SWS ('".$rowfkt->sws."')";
-							} 
+							}
 						}
 						if($rowvw->hauptberuflich=='' || $rowvw->hauptberuflich==NULL)
 						{
@@ -274,10 +274,10 @@ if($result = pg_query($conn, $qry))
 							{
 								$error_log.=", Hauptberuflich ('".$rowvw->hauptberuflich."')";
 							}
-							else 
+							else
 							{
 								$error_log="Hauptberuflich ('".$rowvw->hauptberuflich."')";
-							} 
+							}
 						}
 						if(($rowvw->hauptberufcode=='' || $rowvw->hauptberufcode==NULL) && $rowvw->hauptberuflich=='f' && in_array($rowvw->verwendung_code,array(1,5,6)))
 						{
@@ -285,10 +285,10 @@ if($result = pg_query($conn, $qry))
 							{
 								$error_log.=", HauptberufCode ('".$rowvw->hauptberufcode."')";
 							}
-							else 
+							else
 							{
 								$error_log="HauptberufCode ('".$rowvw->hauptberufcode."')";
-							} 
+							}
 						}
 						if (isset($eteam[$rowfkt->studiengang_kz]))
 						{
@@ -298,10 +298,10 @@ if($result = pg_query($conn, $qry))
 								{
 									$error_log.=", BesondereQualifikationCode ('".$eteam[$rowfkt->studiengang_kz]."')";
 								}
-								else 
+								else
 								{
 									$error_log="BesondereQualifikationCode ('".$eteam[$rowfkt->studiengang_kz]."')";
-								} 
+								}
 							}
 						}
 						$datei.="
@@ -313,7 +313,7 @@ if($result = pg_query($conn, $qry))
 							$datei.="
                        <Hauptberuflich>J</Hauptberuflich>";
 						}
-						else 
+						else
 						{
 							$datei.="
                        <Hauptberuflich>N</Hauptberuflich>
@@ -325,7 +325,7 @@ if($result = pg_query($conn, $qry))
                        <Entwicklungsteam>J</Entwicklungsteam>
                        <BesondereQualifikationCode>".$eteam[$rowfkt->studiengang_kz]."</BesondereQualifikationCode>";
 						}
-						else 
+						else
 						{
 							$datei.="
                        <Entwicklungsteam>N</Entwicklungsteam>";
