@@ -28,6 +28,8 @@ $psem=$studiensemester->getPrevious();		//voriges Semester
 $bsem=$studiensemester->getBeforePrevious();		//vorjähriges Semester
 $datei='';
 
+$nichtmelden = array(11,91,92,94,999,476,203);
+
 $datumobj=new datum();
 
 if(strstr($ssem,"WS"))
@@ -234,10 +236,13 @@ if($result = pg_query($conn, $qry))
 								$error_log="StgKz(Leitung) ('".$rowslt->studiengang_kz."')";
 							}
 						}
+						if(!in_array($rowslt->studiengang_kz, $nichtmelden))
+						{
 						$datei.="
                      <StgLeitung>
                           <StgKz>".sprintf("%04s",$rowslt->studiengang_kz)."</StgKz>
                      </StgLeitung>";
+						}
 					}
 				}
 				//Funktionen
