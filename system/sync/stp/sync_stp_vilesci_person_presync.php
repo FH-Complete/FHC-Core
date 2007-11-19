@@ -20,19 +20,7 @@ if (!$conn_ext=mssql_connect (STPDB_SERVER, STPDB_USER, STPDB_PASSWD))
 	die('Fehler beim Verbindungsaufbau!');
 mssql_select_db(STPDB_DB, $conn_ext);
 
-//set_time_limit(60);
 
-//$adress='ruhan@technikum-wien.at';
-//$adress='fas_sync@technikum-wien.at';
-
-$error_log='';
-$error_log_fas='';
-$text = '';
-$anzahl_quelle=0;
-$anzahl_eingefuegt=0;
-$anzahl_update=0;
-$anzahl_fehler=0;
-$plausi='';
 
 // Sync-Tabelle fuer Personen checken
 if (!@pg_query($conn,'SELECT * FROM sync.stp_person LIMIT 1;'))
@@ -86,8 +74,8 @@ if (!@pg_query($conn,'SELECT * FROM sync.stp_person LIMIT 1;'))
 			boEMailFHWeb	boolean,
 			_PersonPraxisFirma	integer,
 			_PersonPraxisBetreuer	integer,
-			daPraxisBeginnDat	Timestamp,
-			daPraxisEndeDat	Timestamp,
+			daPraxisBeginnDat	date,
+			daPraxisEndeDat	date,
 			mePraxisBeschreibung	text,
 			inPraxisWochenStd	integer,
 			flPraxisEntgelt	float,
@@ -105,15 +93,15 @@ if (!@pg_query($conn,'SELECT * FROM sync.stp_person LIMIT 1;'))
 			chNachname	Varchar(256),
 			chFirma	Varchar(256),
 			_cxFamilienstand	integer,
-			daGebDat	Timestamp,
+			daGebDat	date,
 			chGebOrt	Varchar(256),
 			chAutoKennzeichen	Varchar(256),
-			NIU_daParkenBis	Timestamp,
+			NIU_daParkenBis	date,
 			meBemerkung	text,
 			chKtoNr	Varchar(256),
 			chBankBezeichnung	Varchar(256),
 			chBLZ	Varchar(256),
-			daEintrittDat	Timestamp,
+			daEintrittDat	date,
 			inPIN	integer,
 			inChipTyp	integer,
 			inChipSerNr	integer,
@@ -123,7 +111,7 @@ if (!@pg_query($conn,'SELECT * FROM sync.stp_person LIMIT 1;'))
 			chSVNr	Varchar(256),
 			chIdentifikationsDokument	Varchar(256),
 			chMatrikelNr	Varchar(256),
-			daMaturaDat	Timestamp,
+			daMaturaDat	date,
 			_cxZugang	integer,
 			_cxBerufstaetigkeit	integer,
 			_cxStudStatus	integer,
@@ -135,37 +123,37 @@ if (!@pg_query($conn,'SELECT * FROM sync.stp_person LIMIT 1;'))
 			_cxThemenQuelle	integer,
 			NIU_chThema	integer,
 			_cxDiplomarbeitMotiv	integer,
-			daPruefungsDat	Timestamp,
+			daPruefungsDat	date,
 			meBeschreibung	text,
 			_PersonLB	integer,
 			_cxBeurteilungsStufeDiplArbeit	integer,
 			meErstbeurteilung	text,
 			meZweitbeurteilung	text,
-			daArbeitsVergabeDat	Timestamp,
+			daArbeitsVergabeDat	date,
 			_LVFachStud	integer,
 			_LVFachLeitung	integer,
 			_cxBeurteilungsStufeGesamt	integer,
 			_cxBeurteilungsStufeLV1	integer,
 			_cxBeurteilungsStufeLV2	integer,
-			daAnmeldeDat	Timestamp,
-			daStudienberechtPruefDat	Timestamp,
+			daAnmeldeDat	date,
+			daStudienberechtPruefDat	date,
 			chStudienberechtPruefFach	Varchar(256),
 			meZusatzQualifikation	text,
 			daTerminAufneVerf	Timestamp,
 			chBemerkungTerminAufnVerf	Varchar(256),
 			inGrp	integer,
 			chGrp	Varchar(256),
-			daSVAnmeldeDat	Timestamp,
-			daSVAbmeldeDat	Timestamp,
+			daSVAnmeldeDat	date,
+			daSVAbmeldeDat	date,
 			chThema	Varchar(256),
-			daPruefTeil1dat	Timestamp,
+			daPruefTeil1dat	date,
 			_cxGebBundesland	integer,
 			_GebLand	integer,
 			_Staatsbuerger	integer,
 			chErsatzKZ	Varchar(256),
 			_cxZugangOld	integer,
 			_cxZugangFHMag	integer,
-			daZugangFHMagDat	Timestamp,
+			daZugangFHMagDat	date,
 			inFachbereich	integer,
 			_PersonLB2	integer,
 			_Vorsitzender	integer,
@@ -189,7 +177,11 @@ if (!@pg_query($conn,'SELECT * FROM sync.stp_person LIMIT 1;'))
 			_cxBeurteilungsStufeKommiPruef	integer,
 			datenquelle	integer,
 			chVertiefungZusatz	Varchar(256),
-			constraint "pk_tbl_sync_stp_person" primary key ("__person"));';
+			constraint "pk_tbl_sync_stp_person" primary key ("__person"));
+		Grant select on sync.stp_person to group "admin";
+		Grant update on sync.stp_person to group "admin";
+		Grant delete on sync.stp_person to group "admin";
+		Grant insert on sync.stp_person to group "admin";';
 	if (!@pg_query($conn,$sql))
 		echo '<strong>sync.stp_person: '.pg_last_error($conn).' </strong><BR>';
 	else
@@ -208,22 +200,31 @@ if (!@pg_query($conn,'SELECT * FROM sync.stp_person LIMIT 1;'))
 <body>
 
 <?php
+$i=0;
 
-$qry=' SELECT TOP 1 bomitgliedentwicklung,boqualnachweis,__person,_cxberufstaetigkeit,_cxbesch1code,_cxbesch2code,_cxbesqual,_cxbundesland,_cxfamilienstand,_cxgebbundesland,_cxgeschlecht,_cxstudstatus,_cxzugang,_cxzugangfhmag,_gebland,_personpraxisbetreuer,_personpraxisfirma,_staat,_staatsbuerger,_stgorgform,_stgvertiefung,bohabilitation,bohauptberuf,briefanrede,chadrbemerkung,chbankbezeichnung,chblz,chemailadresse,chemailbemerkung,chersatzkz,chfirma,chgebort,chhausnr,chhomepage,chkalendersemstataend,chklappe,chktonr,chmatrikelnr,chnachname,chnummer,chort,chplz,chstrasse,chsvnr,chtelbemerkung,chtitel,chusername,chvorname,chvorwahl,daeintrittdat,dagebdat,damaturadat,dapraxisbeginndat,dapraxisendedat,datenquelle,dazugangfhmagdat,flpraxisentgelt,hoechsteausbildung,inausmassbesch,inkinder,inpraxiswochenstd,instudiensemester,mepraxisbeschreibung,personalnr,_cxpersontyp,_cxzugangold,_personschule,aggstg,boanmeldegebuehrbez,bodeutschsehrgut,bodinmgew,bodivmgew,bodonmgew,bodovmgew,boemailfhweb,boformalleinerhalter,boformalleinverdiener,boformfreibetragsbescheid,boformpendlerpauschale,bofrnmgew,bofrvmgew,bominmgew,bomivmgew,bomonmgew,bomovmgew,bopraesenzdienst,bopraxisvollzeit,bostdgeblockt,chautokennzeichen,chberufstitel,chgattin,chidentifikationsdokument,chparkberechtigung,chspindnr,chvenia,chvertiefungzusatz,inchipsernr,inchiptyp,infachbereich,inpin,meausbildung,mebemerkung,meberufstaetigkeit,megewzeit,mekinder,mepublikationen,niu_daparkenbis,olfoto,originalid,position,_cxbeurteilungsstufediplarbeit,_cxbeurteilungsstufegesamt,_cxbeurteilungsstufekommipruef,_cxbeurteilungsstufelv1,_cxbeurteilungsstufelv2,_cxdiplomarbeitmotiv,_cxthemenquelle,_gegenstandnichttech,_gegenstandtech,_lvfachleitung,_lvfachstud,_personlb,_personlb2,_pruefernichttech,_pruefertech,_vorsitzender,chbemerkungterminaufnverf,chgrp,chlfdnr,chpraxisfirmatext,chpraxiskalendersemester,chpraxisortengl,chstudienberechtprueffach,chthema,chthemaengl,daanmeldedat,daarbeitsvergabedat,dapruefteil1dat,dapruefungsdat,dastudienberechtpruefdat,dasvabmeldedat,dasvanmeldedat,daterminaufneverf,ingrp,inpraxisstudiensemester,mebeschreibung,meerstbeurteilung,mepraxisbeschreibungengl,mezusatzqualifikation,mezweitbeurteilung,niu_chthema
-		FROM person;';
-
-if($result_ext = mssql_query($conn_ext, $qry))
+$qry="SELECT TOP 10000 bomitgliedentwicklung,boqualnachweis,__person,_cxberufstaetigkeit,_cxbesch1code,_cxbesch2code,_cxbesqual,_cxbundesland,_cxfamilienstand,_cxgebbundesland,_cxgeschlecht,_cxstudstatus,_cxzugang,_cxzugangfhmag,_gebland,_personpraxisbetreuer,_personpraxisfirma,_staat,_staatsbuerger,_stgorgform,_stgvertiefung,bohabilitation,bohauptberuf,briefanrede,chadrbemerkung,chbankbezeichnung,chblz,chemailadresse,chemailbemerkung,chersatzkz,chfirma,chgebort,chhausnr,chhomepage,chkalendersemstataend,chklappe,chktonr,chmatrikelnr,chnachname,chnummer,chort,chplz,chstrasse,chsvnr,chtelbemerkung,chtitel,chusername,chvorname,chvorwahl,convert(varchar(10),daeintrittdat,121) AS daeintrittdat,convert(varchar(10),dagebdat,121) AS dagebdat,convert(varchar(10),damaturadat,121) AS damaturadat,convert(varchar(10),dapraxisbeginndat,121) AS dapraxisbeginndat,convert(varchar(10),dapraxisendedat,121) AS dapraxisendedat,convert(varchar(10),datenquelle,121) AS datenquelle,convert(varchar(10),dazugangfhmagdat,121) AS dazugangfhmagdat,flpraxisentgelt,hoechsteausbildung,inausmassbesch,inkinder,inpraxiswochenstd,instudiensemester,mepraxisbeschreibung,personalnr,_cxpersontyp,_cxzugangold,_personschule,aggstg,boanmeldegebuehrbez,bodeutschsehrgut,bodinmgew,bodivmgew,bodonmgew,bodovmgew,boemailfhweb,boformalleinerhalter,boformalleinverdiener,boformfreibetragsbescheid,boformpendlerpauschale,bofrnmgew,bofrvmgew,bominmgew,bomivmgew,bomonmgew,bomovmgew,bopraesenzdienst,bopraxisvollzeit,bostdgeblockt,chautokennzeichen,chberufstitel,chgattin,chidentifikationsdokument,chparkberechtigung,chspindnr,chvenia,chvertiefungzusatz,inchipsernr,inchiptyp,infachbereich,inpin,meausbildung,mebemerkung,meberufstaetigkeit,megewzeit,mekinder,mepublikationen,convert(varchar(10),niu_daparkenbis,121) AS niu_daparkenbis,olfoto,originalid,position,_cxbeurteilungsstufediplarbeit,_cxbeurteilungsstufegesamt,_cxbeurteilungsstufekommipruef,_cxbeurteilungsstufelv1,_cxbeurteilungsstufelv2,_cxdiplomarbeitmotiv,_cxthemenquelle,_gegenstandnichttech,_gegenstandtech,_lvfachleitung,_lvfachstud,_personlb,_personlb2,_pruefernichttech,_pruefertech,_vorsitzender,chbemerkungterminaufnverf,chgrp,chlfdnr,chpraxisfirmatext,chpraxiskalendersemester,chpraxisortengl,chstudienberechtprueffach,chthema,chthemaengl,convert(varchar(10),daanmeldedat,121) AS daanmeldedat,convert(varchar(10),daarbeitsvergabedat,121) AS daarbeitsvergabedat,convert(varchar(10),dapruefteil1dat,121) AS dapruefteil1dat,convert(varchar(10),dapruefungsdat,121) AS dapruefungsdat,convert(varchar(10),dastudienberechtpruefdat,121) AS dastudienberechtpruefdat,convert(varchar(10),dasvabmeldedat,121) AS dasvabmeldedat,convert(varchar(10),dasvanmeldedat,121) AS dasvanmeldedat,convert(varchar(23),daterminaufneverf,121) AS daterminaufneverf,ingrp,inpraxisstudiensemester,mebeschreibung,meerstbeurteilung,mepraxisbeschreibungengl,mezusatzqualifikation,mezweitbeurteilung,niu_chthema
+		FROM person;";
+if($result_ext = mssql_query($qry,$conn_ext))
 {
 	while($row=mssql_fetch_object($result_ext))
 	{
+		$row->chemailadresse=trim($row->chemailadresse," \t\n\r\0\x0B'");
+		$row->mePraxisBeschreibung=$row->mePraxisBeschreibung;
 		$qry="INSERT INTO sync.stp_person (bomitgliedentwicklung,boqualnachweis,__person,_cxberufstaetigkeit,_cxbesch1code,_cxbesch2code,_cxbesqual,_cxbundesland,_cxfamilienstand,_cxgebbundesland,_cxgeschlecht,_cxstudstatus,_cxzugang,_cxzugangfhmag,_gebland,_personpraxisbetreuer,_personpraxisfirma,_staat,_staatsbuerger,_stgorgform,_stgvertiefung,bohabilitation,bohauptberuf,briefanrede,chadrbemerkung,chbankbezeichnung,chblz,chemailadresse,chemailbemerkung,chersatzkz,chfirma,chgebort,chhausnr,chhomepage,chkalendersemstataend,chklappe,chktonr,chmatrikelnr,chnachname,chnummer,chort,chplz,chstrasse,chsvnr,chtelbemerkung,chtitel,chusername,chvorname,chvorwahl,daeintrittdat,dagebdat,damaturadat,dapraxisbeginndat,dapraxisendedat,datenquelle,dazugangfhmagdat,flpraxisentgelt,hoechsteausbildung,inausmassbesch,inkinder,inpraxiswochenstd,instudiensemester,mepraxisbeschreibung,personalnr,_cxpersontyp,_cxzugangold,_personschule,aggstg,boanmeldegebuehrbez,bodeutschsehrgut,bodinmgew,bodivmgew,bodonmgew,bodovmgew,boemailfhweb,boformalleinerhalter,boformalleinverdiener,boformfreibetragsbescheid,boformpendlerpauschale,bofrnmgew,bofrvmgew,bominmgew,bomivmgew,bomonmgew,bomovmgew,bopraesenzdienst,bopraxisvollzeit,bostdgeblockt,chautokennzeichen,chberufstitel,chgattin,chidentifikationsdokument,chparkberechtigung,chspindnr,chvenia,chvertiefungzusatz,inchipsernr,inchiptyp,infachbereich,inpin,meausbildung,mebemerkung,meberufstaetigkeit,megewzeit,mekinder,mepublikationen,niu_daparkenbis,originalid,position,_cxbeurteilungsstufediplarbeit,_cxbeurteilungsstufegesamt,_cxbeurteilungsstufekommipruef,_cxbeurteilungsstufelv1,_cxbeurteilungsstufelv2,_cxdiplomarbeitmotiv,_cxthemenquelle,_gegenstandnichttech,_gegenstandtech,_lvfachleitung,_lvfachstud,_personlb,_personlb2,_pruefernichttech,_pruefertech,_vorsitzender,chbemerkungterminaufnverf,chgrp,chlfdnr,chpraxisfirmatext,chpraxiskalendersemester,chpraxisortengl,chstudienberechtprueffach,chthema,chthemaengl,daanmeldedat,daarbeitsvergabedat,dapruefteil1dat,dapruefungsdat,dastudienberechtpruefdat,dasvabmeldedat,dasvanmeldedat,daterminaufneverf,ingrp,inpraxisstudiensemester,mebeschreibung,meerstbeurteilung,mepraxisbeschreibungengl,mezusatzqualifikation,mezweitbeurteilung,niu_chthema)
-				VALUES ('$row->bomitgliedentwicklung','$row->boqualnachweis','$row->__person','$row->_cxberufstaetigkeit','$row->_cxbesch1code','$row->_cxbesch2code','$row->_cxbesqual','$row->_cxbundesland','$row->_cxfamilienstand','$row->_cxgebbundesland','$row->_cxgeschlecht','$row->_cxstudstatus','$row->_cxzugang','$row->_cxzugangfhmag','$row->_gebland','$row->_personpraxisbetreuer','$row->_personpraxisfirma','$row->_staat','$row->_staatsbuerger','$row->_stgorgform','$row->_stgvertiefung','$row->bohabilitation','$row->bohauptberuf','$row->briefanrede','$row->chadrbemerkung','$row->chbankbezeichnung','$row->chblz','$row->chemailadresse','$row->chemailbemerkung','$row->chersatzkz','$row->chfirma','$row->chgebort','$row->chhausnr','$row->chhomepage','$row->chkalendersemstataend','$row->chklappe','$row->chktonr','$row->chmatrikelnr','$row->chnachname','$row->chnummer','$row->chort','$row->chplz','$row->chstrasse','$row->chsvnr','$row->chtelbemerkung','$row->chtitel','$row->chusername','$row->chvorname','$row->chvorwahl','$row->daeintrittdat','$row->dagebdat','$row->damaturadat','$row->dapraxisbeginndat','$row->dapraxisendedat','$row->datenquelle','$row->dazugangfhmagdat','$row->flpraxisentgelt','$row->hoechsteausbildung','$row->inausmassbesch','$row->inkinder','$row->inpraxiswochenstd','$row->instudiensemester','$row->mepraxisbeschreibung','$row->personalnr','$row->_cxpersontyp','$row->_cxzugangold','$row->_personschule','$row->aggstg','$row->boanmeldegebuehrbez','$row->bodeutschsehrgut','$row->bodinmgew','$row->bodivmgew','$row->bodonmgew','$row->bodovmgew','$row->boemailfhweb','$row->boformalleinerhalter','$row->boformalleinverdiener','$row->boformfreibetragsbescheid','$row->boformpendlerpauschale','$row->bofrnmgew','$row->bofrvmgew','$row->bominmgew','$row->bomivmgew','$row->bomonmgew','$row->bomovmgew','$row->bopraesenzdienst','$row->bopraxisvollzeit','$row->bostdgeblockt','$row->chautokennzeichen','$row->chberufstitel','$row->chgattin','$row->chidentifikationsdokument','$row->chparkberechtigung','$row->chspindnr','$row->chvenia','$row->chvertiefungzusatz','$row->inchipsernr','$row->inchiptyp','$row->infachbereich','$row->inpin','$row->meausbildung','$row->mebemerkung','$row->meberufstaetigkeit','$row->megewzeit','$row->mekinder','$row->mepublikationen','$row->niu_daparkenbis','$row->originalid','$row->position','$row->_cxbeurteilungsstufediplarbeit','$row->_cxbeurteilungsstufegesamt','$row->_cxbeurteilungsstufekommipruef','$row->_cxbeurteilungsstufelv1','$row->_cxbeurteilungsstufelv2','$row->_cxdiplomarbeitmotiv','$row->_cxthemenquelle','$row->_gegenstandnichttech','$row->_gegenstandtech','$row->_lvfachleitung','$row->_lvfachstud','$row->_personlb','$row->_personlb2','$row->_pruefernichttech','$row->_pruefertech','$row->_vorsitzender','$row->chbemerkungterminaufnverf','$row->chgrp','$row->chlfdnr','$row->chpraxisfirmatext','$row->chpraxiskalendersemester','$row->chpraxisortengl','$row->chstudienberechtprueffach','$row->chthema','$row->chthemaengl','$row->daanmeldedat','$row->daarbeitsvergabedat','$row->dapruefteil1dat','$row->dapruefungsdat','$row->dastudienberechtpruefdat','$row->dasvabmeldedat','$row->dasvanmeldedat','$row->daterminaufneverf','$row->ingrp','$row->inpraxisstudiensemester','$row->mebeschreibung','$row->meerstbeurteilung','$row->mepraxisbeschreibungengl','$row->mezusatzqualifikation','$row->mezweitbeurteilung','$row->niu_chthema')";
+				VALUES ('$row->bomitgliedentwicklung','$row->boqualnachweis',".($row->__person==''?'NULL':$row->__person).",".($row->_cxberufstaetigkeit==''?'NULL':$row->_cxberufstaetigkeit).",".($row->_cxbesch1code==''?'NULL':$row->_cxbesch1code).",".($row->_cxbesch2code==''?'NULL':$row->_cxbesch2code).",".($row->_cxbesqual==''?'NULL':$row->_cxbesqual).",".($row->_cxbundesland==''?'NULL':$row->_cxbundesland).",".($row->_cxfamilienstand==''?'NULL':$row->_cxfamilienstand).",".($row->_cxgebbundesland==''?'NULL':$row->_cxgebbundesland).",".($row->_cxgeschlecht==''?'NULL':$row->_cxgeschlecht).",".($row->_cxstudstatus==''?'NULL':$row->_cxstudstatus).",".($row->_cxzugang==''?'NULL':$row->_cxzugang).",".($row->_cxzugangfhmag==''?'NULL':$row->_cxzugangfhmag).",".($row->_gebland==''?'NULL':$row->_gebland).",".($row->_personpraxisbetreuer==''?'NULL':$row->_personpraxisbetreuer).",".($row->_personpraxisfirma==''?'NULL':$row->_personpraxisfirma).",".($row->_staat==''?'NULL':$row->_staat).",".($row->_staatsbuerger==''?'NULL':$row->_staatsbuerger).",".($row->_stgorgform==''?'NULL':$row->_stgorgform).",".($row->_stgvertiefung==''?'NULL':$row->_stgvertiefung).",'$row->bohabilitation','$row->bohauptberuf','$row->briefanrede','$row->chadrbemerkung','$row->chbankbezeichnung','$row->chblz','$row->chemailadresse','$row->chemailbemerkung','$row->chersatzkz','$row->chfirma','$row->chgebort','$row->chhausnr','$row->chhomepage','$row->chkalendersemstataend','$row->chklappe','$row->chktonr','$row->chmatrikelnr','$row->chnachname','$row->chnummer','$row->chort','$row->chplz','$row->chstrasse','$row->chsvnr','$row->chtelbemerkung','$row->chtitel','$row->chusername','$row->chvorname','$row->chvorwahl',".($row->daeintrittdat==''?'NULL':"'$row->daeintrittdat'").",".($row->dagebdat==''?'NULL':"'$row->dagebdat'").",".($row->damaturadat==''?'NULL':"'$row->damaturadat'").",".($row->dapraxisbeginndat==''?'NULL':"'$row->dapraxisbeginndat'").",".($row->dapraxisendedat==''?'NULL':"'$row->dapraxisendedat'").",".($row->datenquelle==''?'NULL':"'$row->datenquelle'").",".($row->dazugangfhmagdat==''?'NULL':"'$row->dazugangfhmagdat'").",".($row->flpraxisentgelt==''?'NULL':$row->flpraxisentgelt).",".($row->hoechsteausbildung==''?'NULL':$row->hoechsteausbildung).",".($row->inausmassbesch==''?'NULL':$row->inausmassbesch).",".($row->inkinder==''?'NULL':$row->inkinder).",".($row->inpraxiswochenstd==''?'NULL':$row->inpraxiswochenstd).",".($row->instudiensemester==''?'NULL':$row->instudiensemester).",'$row->mepraxisbeschreibung',".($row->personalnr==''?'NULL':$row->personalnr).",".($row->_cxpersontyp==''?'NULL':$row->_cxpersontyp).",".($row->_cxzugangold==''?'NULL':$row->_cxzugangold).",".($row->_personschule==''?'NULL':$row->_personschule).",".($row->aggstg==''?'NULL':$row->aggstg).",'$row->boanmeldegebuehrbez','$row->bodeutschsehrgut','$row->bodinmgew','$row->bodivmgew','$row->bodonmgew','$row->bodovmgew','$row->boemailfhweb','$row->boformalleinerhalter','$row->boformalleinverdiener','$row->boformfreibetragsbescheid','$row->boformpendlerpauschale','$row->bofrnmgew','$row->bofrvmgew','$row->bominmgew','$row->bomivmgew','$row->bomonmgew','$row->bomovmgew','$row->bopraesenzdienst','$row->bopraxisvollzeit','$row->bostdgeblockt','$row->chautokennzeichen','$row->chberufstitel','$row->chgattin','$row->chidentifikationsdokument','$row->chparkberechtigung','$row->chspindnr','$row->chvenia','$row->chvertiefungzusatz',".($row->inchipsernr==''?'NULL':$row->inchipsernr).",".($row->inchiptyp==''?'NULL':$row->inchiptyp).",".($row->infachbereich==''?'NULL':$row->infachbereich).",".($row->inpin==''?'NULL':$row->inpin).",'$row->meausbildung','$row->mebemerkung','$row->meberufstaetigkeit','$row->megewzeit','$row->mekinder','$row->mepublikationen',".($row->niu_daparkenbis==''?'NULL':"'$row->niu_daparkenbis'").",".($row->originalid==''?'NULL':$row->originalid).",'$row->position',".($row->_cxbeurteilungsstufediplarbeit==''?'NULL':$row->_cxbeurteilungsstufediplarbeit).",".($row->_cxbeurteilungsstufegesamt==''?'NULL':$row->_cxbeurteilungsstufegesamt).",".($row->_cxbeurteilungsstufekommipruef==''?'NULL':$row->_cxbeurteilungsstufekommipruef).",".($row->_cxbeurteilungsstufelv1==''?'NULL':$row->_cxbeurteilungsstufelv1).",".($row->_cxbeurteilungsstufelv2==''?'NULL':$row->_cxbeurteilungsstufelv2).",".($row->_cxdiplomarbeitmotiv==''?'NULL':$row->_cxdiplomarbeitmotiv).",".($row->_cxthemenquelle==''?'NULL':$row->_cxdiplomarbeitmotiv).",".($row->_gegenstandnichttech==''?'NULL':$row->_gegenstandnichttech).",".($row->_gegenstandtech==''?'NULL':$row->_gegenstandtech).",".($row->_lvfachleitung==''?'NULL':$row->_lvfachleitung).",".($row->_lvfachstud==''?'NULL':$row->_lvfachstud).",".($row->_personlb==''?'NULL':$row->_personlb).",".($row->_personlb2==''?'NULL':$row->_personlb2).",".($row->_pruefernichttech==''?'NULL':$row->_pruefernichttech).",".($row->_pruefertech==''?'NULL':$row->_pruefertech).",".($row->_vorsitzender==''?'NULL':$row->_vorsitzender).",'$row->chbemerkungterminaufnverf','$row->chgrp','$row->chlfdnr','$row->chpraxisfirmatext','$row->chpraxiskalendersemester','$row->chpraxisortengl','$row->chstudienberechtprueffach','$row->chthema','$row->chthemaengl',".($row->daanmeldedat==''?'NULL':"'$row->daanmeldedat'").",".($row->daarbeitsvergabedat==''?'NULL':"'$row->daarbeitsvergabedat'").",".($row->dapruefteil1dat==''?'NULL':"'$row->dapruefteil1dat'").",".($row->dapruefungsdat==''?'NULL':"'$row->dapruefungsdat'").",".($row->dastudienberechtpruefdat==''?'NULL':"'$row->dastudienberechtpruefdat'").",".($row->dasvabmeldedat==''?'NULL':"'$row->dasvabmeldedat'").",".($row->dasvanmeldedat==''?'NULL':"'$row->dasvanmeldedat'").",".($row->daterminaufneverf==''?'NULL':"'$row->daterminaufneverf'").",".($row->ingrp==''?'NULL':$row->ingrp).",".($row->inpraxisstudiensemester==''?'NULL':$row->inpraxisstudiensemester).",'$row->mebeschreibung','$row->meerstbeurteilung','$row->mepraxisbeschreibungengl','$row->mezusatzqualifikation','$row->mezweitbeurteilung',".($row->niu_chthema==''?'NULL':$row->niu_chthema).");";
 		if(!$result = pg_query($conn, $qry))
 		{
+			echo $qry.'<BR>'.pg_last_error($conn).' </strong><BR>';
 		}
-
+		if ($i%100==0)
+			echo '<BR>'.$i++;
+		else
+			echo '.';
+		flush();
 	}
 }
+else
+	echo mssql_lasterror($conn_ext);
 
 ?>
 </body>
