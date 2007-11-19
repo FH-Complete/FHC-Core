@@ -11,24 +11,37 @@
 //* Synchronisiert Personendatensaetze von FAS DB in PORTAL DB
 //*
 //*
-//* setzt voraus: sync von tbl_nation, tbl_sprache
-//* benötigt: tbl_syncperson
+//* setzt voraus: sync von sync.stp_person
+//* benoetigt: tbl_syncperson
 
-require_once('../../../vilesci/config.inc.php');
-require_once('../../../include/person.class.php');
-require_once('../sync_config.inc.php');
+require_once('sync_config.inc.php');
 
-$conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
-//$conn_vilesci=pg_connect(CONN_STRING_VILESCI) or die("Connection zur Vilesci Datenbank fehlgeschlagen");
-$conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
+$starttime=time();
+$conn=pg_connect(CONN_STRING)
+	or die("Connection zur FH-Complete Datenbank fehlgeschlagen");
 
-//set_time_limit(60);
+// Sync-Tabelle fuer Personen checken
+if (!@pg_query($conn,'SELECT * FROM sync.tbl_syncperson LIMIT 1;'))
+{
+	$sql='CREATE TABLE sync.tbl_syncperson
+			(
+				person_id	integer NOT NULL,
+				__Person	integer NOT NULL
+			);
+			Grant select on sync.tbl_syncperson to group "admin";
+			Grant update on sync.tbl_syncperson to group "admin";
+			Grant delete on sync.tbl_syncperson to group "admin";
+			Grant insert on sync.tbl_syncperson to group "admin";';
+	if (!@pg_query($conn,$sql))
+		echo '<strong>sync.stp_person: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo 'sync.stp_person wurde angelegt!<BR>';
+}
 
-//$adress='ruhan@technikum-wien.at';
-//$adress='fas_sync@technikum-wien.at';
+
 
 $error_log='';
-$error_log_fas='';
+$error_log_ext='';
 $text = '';
 $anzahl_quelle=0;
 $anzahl_eingefuegt=0;
@@ -49,124 +62,53 @@ $plausi='';
 <body>
 
 <?php
+//*********** Neue Daten holen *****************
+$qry='SELECT __Person,_Staatsbuerger,_GebLand,Briefanrede,chTitel,chNachname,chVorname,daGebDat,chGebOrt,chAdrBemerkung,chHomepage,chSVNr,chErsatzKZ,_cxFamilienstand,_cxGeschlecht,inKinder
+		FROM sync.stp_person
+		WHERE _cxGeschlecht!=3 AND _cxPersonTyp!=5
+			AND __Person NOT IN (SELECT __Person FROM sync.tbl_syncperson) LIMIT 10;';
 
-$qry="
-SELECT
-p1.person_pk AS person1, p1.familienname AS familienname1, p1.vorname AS vorname1, p1.vornamen AS vornamen1, p1.geschlecht AS geschlecht1,
-p1.gebdat AS gebdat1, p1.gebort AS gebort1, p1.staatsbuergerschaft AS staatsbuergerschaft1, p1.familienstand AS familienstand1,
-p1.svnr AS svnr1, p1. ersatzkennzeichen  AS ersatzkennzeichen1, p1.anrede AS anrede1, p1.anzahlderkinder AS anzahlderkinder1,
-p1.titel AS titel1,  p1.gebnation AS gebnation1, p1.postnomentitel AS postnomentitel1, p1.uid as uid1,
-p2.person_pk AS person2, p2.familienname AS familienname2, p2.vorname AS vorname2, p2.vornamen AS vornamen2, p2.geschlecht AS geschlecht2,
-p2.gebdat AS gebdat2, p2.gebort AS gebort2, p2.staatsbuergerschaft AS staatsbuergerschaft2, p2.familienstand AS familienstand2,
-p2.svnr AS svnr2, p2. ersatzkennzeichen  AS ersatzkennzeichen2, p2.anrede AS anrede2, p2.anzahlderkinder AS anzahlderkinder2,
-p2.titel AS titel2,  p2.gebnation AS gebnation2, p2.postnomentitel AS postnomentitel2, p2.uid as uid2
-FROM person AS p1, person AS p2 WHERE
-((p1.svnr=p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'')
-	OR (p1.svnr<>p2.svnr AND p1.svnr IS NOT NULL AND p1.svnr<>'' AND p1.familienname=p2.familienname AND p1.familienname IS NOT NULL AND p1.familienname!=''
-	AND p1.gebdat=p2.gebdat AND p1.gebdat IS NOT NULL AND p1.gebdat>'1935-01-01' AND p1.gebdat<'2000-01-01'))
-AND (p1.person_pk < p2.person_pk)
-AND (p1.familienname<>p2.familienname OR p1.vorname<>p2.vorname OR p1.vornamen<>p2.vornamen OR p1.geschlecht<>p2.geschlecht OR p1.gebdat<>p2.gebdat OR p1.gebort<>p2.gebort OR p1.staatsbuergerschaft<> p2.staatsbuergerschaft OR p1.familienstand<>p2.familienstand OR p1.svnr<>p2.svnr OR p1.ersatzkennzeichen<>p2.ersatzkennzeichen OR p1.anrede<>p2.anrede OR p1.anzahlderkinder<>p2.anzahlderkinder OR p1.titel<>p2.titel OR p1.gebnation<>p2.gebnation OR p1.postnomentitel<> p2.postnomentitel)
-order by p1.familienname;
-";
-//AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400')
+$error_log_ext="Überprüfung Personendaten in EXT-DB:\n\n";
 
-$error_log_fas="Überprüfung Personendaten im FAS:\n\n";
-
-
-if($resultp = pg_query($conn_fas, $qry))
+if($result = pg_query($conn, $qry))
 {
-	$error_log_fas.="Anzahl der Datensätze: ".pg_num_rows($resultp)."\n";
-	echo nl2br($error_log_fas);
-	while($rowp=pg_fetch_object($resultp))
+	$error_log_ext.="Anzahl der Datensätze: ".pg_num_rows($result)."\n";
+	echo nl2br($error_log_ext);
+	while($row=pg_fetch_object($result))
 	{
-		$plausi='';
-		if ($rowp->geschlecht1<>$rowp->geschlecht2)
+		if ($row->_cxgeschlecht==1)
+			$row->_cxgeschlecht='m';
+		elseif ($row->_cxgeschlecht==2)
+			$row->_cxgeschlecht='w';
+		else
+			$row->_cxgeschlecht='';
+		// Check auf Doppelgaenger
+		if ($row->chsvnr!='' || $row->dagebdat!='' )
 		{
-			$plausi="Geschlecht der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->geschlecht1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->geschlecht2."'.\n";
-			$error=true;
-		}
-		if ($rowp->familienname1<>$rowp->familienname2)
-		{
-			$plausi.="Familienname der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->familienname1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.")  aber '".$rowp->familienname2."'.\n";
-			$error=true;
-		}
-		if ($rowp->vorname1<>$rowp->vorname2)
-		{
-			$plausi.="Vorname der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->familienname1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->vorname2."'.\n";
-			$error=true;
-		}
-		if ($rowp->vornamen1<>$rowp->vornamen2)
-		{
-			$plausi.="Vornamen der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->vornamen1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->vornamen2."'.\n";
-			$error=true;
-		}
-		if ($rowp->gebdat1<>$rowp->gebdat2)
-		{
-			$plausi.="Geburtsdatum der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->gebdat1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->gebdat2."'.\n";
-			$error=true;
-		}
-		if ($rowp->gebort1<>$rowp->gebort2)
-		{
-			$plausi.="Geburtsort der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->gebort1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->gebort2."'.\n";
-			$error=true;
-		}
-		if ($rowp->staatsbuergerschaft1<>$rowp->staatsbuergerschaft2)
-		{
-			$plausi.="Staatsbürgerschaft der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->staatsbuergerschaft1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->staatsbuergerschaft2."'.\n";
-			$error=true;
-		}
-		if ($rowp->familienstand1<>$rowp->familienstand2)
-		{
-			$plausi.="Familienstand der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->familienstand1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->familienstand2."'.\n";
-			$error=true;
-		}
-		if ($rowp->svnr1<>$rowp->svnr2)
-		{
-			$plausi.="Sozialversicherung der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->svnr1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->svnr2."'.\n";
-			$error=true;
-		}
-		if ($rowp->ersatzkennzeichen1<>$rowp->ersatzkennzeichen2)
-		{
-			$plausi.="Ersatzkennzeichen der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->ersatzkennzeichen1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->ersatzkennzeichen2."'.\n";
-			$error=true;
-		}
-		if ($rowp->anrede1<>$rowp->anrede2)
-		{
-			$plausi.="Anrede der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->anrede1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->anrede2."'.\n";
-			$error=true;
-		}
-		if ($rowp->anzahlderkinder1<>$rowp->anzahlderkinder2)
-		{
-			$plausi.="Anzahl der Kinder der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->anzahlderkinder1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->anzahlderkinder2."'.\n";
-			$error=true;
-		}
-		if ($rowp->titel1<>$rowp->titel2)
-		{
-			$plausi.="Titel der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->titel1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->titel2."'.\n";
-			$error=true;
-		}
-		if ($rowp->gebnation1<>$rowp->gebnation2)
-		{
-			$plausi.="Geburtsnation der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->gebnation1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->gebnation2."'.\n";
-			$error=true;
-		}
-		if ($rowp->postnomentitel1<>$rowp->postnomentitel2)
-		{
-			$plausi.="Postnomentitel der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->postnomentitel1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->postnomentitel2."'.\n";
-			$error=true;
-		}
-		if ($error)
-		{
-			$plausi="*****\n".$plausi."*****\n";
-			echo nl2br ($plausi);
-			$error_log_fas.=$plausi;
-			//ob_flush();
-			//flush();
-			$error=false;
+			$sql="SELECT * FROM public.tbl_person
+				WHERE
+					(svnr='$row->chsvnr' AND svnr!='' AND svnr IS NOT NULL)
+					OR (nachname='$row->chnachname' AND '$row->chnachname'!='' AND vorname='$row->chvorname' AND '$row->chvorname'!='' AND gebdatum='$row->dagebdat' AND gebdatum IS NOT NULL)";
+			if($result_dubel = pg_query($conn, $sql))
+			{
+				if (pg_num_rows($result_dubel)==0)
+				{
+					//Neue Person anlegen
+					$sql="INSERT INTO public.tbl_person
+							(staatsbuergerschaft,geburtsnation,sprache,anrede,titelpost,titelpre,nachname,vorname,vornamen,gebdatum,gebort,gebzeit,foto,anmerkung,homepage,svnr,ersatzkennzeichen,familienstand,geschlecht,anzahlkinder,aktiv,insertamum,insertvon,updateamum,updatevon,ext_id)
+							VALUES
+							($row->_staatsbuerger,$row->_gebland,NULL,'$row->briefanrede',NULL,'$row->chtitel','$row->chnachname','$row->chvorname',NULL,'$row->dagebdat','$row->chgebort',NULL,NULL,'$row->chadrbemerkung','$row->chhomepage','$row->chsvnr','$row->chersatzkz',$row->_cxfamilienstand,'$row->_cxgeschlecht',$row->inkinder,TRUE,now(),'sync',now(),'sync',NULL);";
+					if(!$result_neu = pg_query($conn, $sql))
+						echo $sql.'<BR>'.pg_last_error($conn).' </strong><BR>';
+				}
+			}
 		}
 	}
 }
-mail($adress, 'Plausicheck von Personen von '.$_SERVER['HTTP_HOST'], $error_log_fas,"From: vilesci@technikum-wien.at");
+
+
+
+/*mail($adress, 'Plausicheck von Personen von '.$_SERVER['HTTP_HOST'], $error_log_fas,"From: vilesci@technikum-wien.at");
 $error_log_fas='';
 exit;
 
@@ -363,6 +305,7 @@ echo nl2br("\nLog:\n".$error_log);
 echo nl2br("\n\nGesamt FAS: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler");
 $error_log="Person Sync\n-------------\n\nGesamt FAS: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n\n".$error_log;
 mail($adress, 'SYNC Personen', $error_log,"From: vilesci@technikum-wien.at");
+*/
 ?>
 </body>
 </html>
