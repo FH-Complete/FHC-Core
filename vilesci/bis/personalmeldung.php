@@ -28,7 +28,7 @@ $psem=$studiensemester->getPrevious();		//voriges Semester
 $bsem=$studiensemester->getBeforePrevious();		//vorjähriges Semester
 $datei='';
 
-$nichtmelden = array(11,91,92,94,999,476,203);
+$nichtmelden = array(11,91,92,94,999,476,203,329,334,331,328,332);
 
 $datumobj=new datum();
 
