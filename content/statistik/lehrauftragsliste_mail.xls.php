@@ -44,6 +44,10 @@ flush();
 $workbook = new Spreadsheet_Excel_Writer($file);
 
 //Studiengaenge ermitteln bei denen sich die lektorzuordnung innerhalb der letzten 31 Tage geaendert haben
+//(tbl_lehreinheitmitarbeiter.updateamum>now()- interval '31 days' OR
+//					tbl_lehreinheitmitarbeiter.insertamum>now()- interval '31 days') AND
+//(tbl_projektbetreuer.updateamum>now()-interval '31 days' OR
+//					tbl_projektbetreuer.insertamum>now()-interval '31 days') AND
 $qry_stg = "SELECT distinct studiengang_kz
 			FROM (
 				SELECT
@@ -52,8 +56,6 @@ $qry_stg = "SELECT distinct studiengang_kz
 					lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
 					JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 				WHERE
-					(tbl_lehreinheitmitarbeiter.updateamum>now()- interval '31 days' OR
-					tbl_lehreinheitmitarbeiter.insertamum>now()- interval '31 days') AND
 					lehre.tbl_lehreinheit.studiensemester_kurzbz='$semester_aktuell' AND
 					tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND
 					tbl_lehreinheitmitarbeiter.semesterstunden is not null AND
@@ -65,8 +67,6 @@ $qry_stg = "SELECT distinct studiengang_kz
 				FROM
 					lehre.tbl_projektbetreuer, lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung
 				WHERE
-					(tbl_projektbetreuer.updateamum>now()-interval '31 days' OR
-					tbl_projektbetreuer.insertamum>now()-interval '31 days') AND
 					lehre.tbl_lehreinheit.studiensemester_kurzbz='$semester_aktuell' AND
 					tbl_projektbetreuer.projektarbeit_id=tbl_projektarbeit.projektarbeit_id AND
 					tbl_projektarbeit.lehreinheit_id = tbl_lehreinheit.lehreinheit_id AND
