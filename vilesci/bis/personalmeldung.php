@@ -313,7 +313,7 @@ if($result = pg_query($conn, $qry))
                     <Funktion>
                        <StgKz>".sprintf("%04s",$rowfkt->studiengang_kz)."</StgKz>
                        <SWS>".$rowfkt->sws."</SWS>";
-						if($rowvw->hauptberuflich)
+						if($rowvw->hauptberuflich=='t')
 						{
 							$datei.="
                        <Hauptberuflich>J</Hauptberuflich>";
