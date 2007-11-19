@@ -213,7 +213,13 @@ while ($row=pg_fetch_object($result))
 		?>
 
 		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$row->semester.'/'.$row->verband.'/'.$row->gruppe; ?>">
-			<VERBAND:name><?php echo $stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe; ?></VERBAND:name>
+			<VERBAND:name>
+				<?php
+					echo $stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe;
+					if ($row->lvb_bezeichnung!='' && $row->lvb_bezeichnung!=null)
+						echo '  ('.$row->lvb_bezeichnung.')';
+				?>
+				</VERBAND:name>
 			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
 			<VERBAND:stg_kz><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
 			<VERBAND:sem><?php echo $row->semester; ?></VERBAND:sem>
