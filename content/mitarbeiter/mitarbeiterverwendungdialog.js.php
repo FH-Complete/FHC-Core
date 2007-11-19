@@ -139,20 +139,5 @@ function MitarbeiterVerwendungDetailSpeichern()
 
 function MitarbeiterVerwendungVerwendungChange()
 {
-	verwendung = document.getElementById('mitarbeiter-verwendung-detail-menulist-verwendung').value;
-	
-	if(verwendung=='1' || verwendung=='5' || verwendung=='6')
-	{
-		document.getElementById('mitarbeiter-verwendung-detail-label-hauptberuflich').hidden=false;
-		document.getElementById('mitarbeiter-verwendung-detail-label-hauptberuf').hidden=false;
-		document.getElementById('mitarbeiter-verwendung-detail-menulist-hauptberuf').hidden=false;
-		document.getElementById('mitarbeiter-verwendung-detail-checkbox-hauptberuflich').hidden=false;
-	}
-	else
-	{
-		document.getElementById('mitarbeiter-verwendung-detail-label-hauptberuflich').hidden=true;
-		document.getElementById('mitarbeiter-verwendung-detail-label-hauptberuf').hidden=true;
-		document.getElementById('mitarbeiter-verwendung-detail-menulist-hauptberuf').hidden=true;
-		document.getElementById('mitarbeiter-verwendung-detail-checkbox-hauptberuflich').hidden=true;
-	}
+
 }

@@ -1058,8 +1058,11 @@ function MitarbeiterVerwendungSpeichern(dialog, bisverwendung_id, mitarbeiter_ui
 	}
 	else
 	{
-		hauptberufcode='';
-		hauptberuflich='';
+		if(hauptberuflich==true)
+		{
+			alert('Hauptberuflich darf bei dieser Verwendung nicht gesetzt sein');
+			return false;
+		}
 	}	
 	
 	if(beginn!='' && !CheckDatum(beginn))
