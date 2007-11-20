@@ -37,6 +37,7 @@ class lehrfach
 	var $aktiv;				// boolean
 	var $semester;			// smallint
 	var $sprache;			// varchar(16)
+	var $ext_id;
 
 	// ***********************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional ein LF
@@ -92,6 +93,7 @@ class lehrfach
 				$this->aktiv = ($row->aktiv=='t'?true:false);
 				$this->semester = $row->semester;
 				$this->sprache = $row->sprache;
+				$this->ext_id = $row->ext_id;
 			}
 			else
 			{
@@ -185,7 +187,7 @@ class lehrfach
 		if($this->new)
 		{
 			$qry = 'INSERT INTO lehre.tbl_lehrfach (lehrfach_id, studiengang_kz, fachbereich_kurzbz, kurzbz,
-			                                  bezeichnung, farbe, aktiv, semester, sprache)
+			                                  bezeichnung, farbe, aktiv, semester, sprache, ext_id)
 			        VALUES('.
 					($this->lehrfach_id!=''?$this->addslashes($this->lehrfach_id):"nextval('lehre.tbl_lehrfach_lehrfach_id_seq')").','. // HuschPfusch 4 Syncro
 					$this->addslashes($this->studiengang_kz).','.
@@ -195,7 +197,8 @@ class lehrfach
 					$this->addslashes($this->farbe).','.
 					($this->aktiv?'true':'false').','.
 					$this->addslashes($this->semester).','.
-					$this->addslashes($this->sprache).');';
+					$this->addslashes($this->sprache).','.
+					$this->addslashes($this->ext_id).');';
 		}
 		else
 		{
@@ -214,6 +217,7 @@ class lehrfach
 			       ' farbe='.$this->addslashes($this->farbe).','.
 			       ' aktiv='.($this->aktiv?'true':'false').','.
 			       ' semester='.$this->semester.','.
+			       ' ext_id='.$this->ext_id.','.
 			       ' sprache='.$this->addslashes($this->sprache).
 			       " WHERE lehrfach_id='$this->lehrfach_id'";
 		}
@@ -284,6 +288,7 @@ class lehrfach
 				$l->updatevon = $row->updatevon;
 				$l->insertamum = $row->insertamum;
 				$l->insertvon = $row->insertvon;
+				$l->ext_id = $row->ext_id;
 				$this->lehrfaecher[]=$l;
 			}
 		}

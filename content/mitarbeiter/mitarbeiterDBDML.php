@@ -54,7 +54,7 @@ $error = false;
 //Berechtigungen laden
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
-if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('mitarbeiter'))
+if(!$rechte->isBerechtigt('admin', null, 'suid') && !$rechte->isBerechtigt('mitarbeiter', null, 'suid'))
 {
 	$return = false;
 	$errormsg = 'Sie haben keine Berechtigung zum Speichern';

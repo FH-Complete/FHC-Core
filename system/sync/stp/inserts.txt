@@ -13,6 +13,7 @@ INSERT INTO bis.tbl_orgform(orgform_kurzbz, code, bezeichnung) VALUES ('ZGS', 4,
 
 -- Studiengang
 
+INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max_semester, max_verband, max_gruppe, erhalter_kz, orgform_kurzbz, ext_id) VALUES('0','fh','d','Fachhochschule','1','A','1','13','VZ',null);
 INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max_semester, max_verband, max_gruppe, erhalter_kz, orgform_kurzbz, ext_id) VALUES('2','sb','d','xxxSozialarbeit- berufsbegleitend','8','C','2','13','VZ','14');
 INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max_semester, max_verband, max_gruppe, erhalter_kz, orgform_kurzbz, ext_id) VALUES('1','vo','d','xxxVerkehrsinformatik und Verkehrsökologie','8','C','2','13','VZ','15');
 INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max_semester, max_verband, max_gruppe, erhalter_kz, orgform_kurzbz, ext_id) VALUES('261','mt','b','Bakkalaureatsstudiengang Medientechnik','6','C','2','13','VZ','16');
@@ -29,3 +30,13 @@ INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max
 INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max_semester, max_verband, max_gruppe, erhalter_kz, orgform_kurzbz, ext_id) VALUES('95','cs','d','Computersimulation','8','C','2','13','VZ','12');
 INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max_semester, max_verband, max_gruppe, erhalter_kz, orgform_kurzbz, ext_id) VALUES('96','so','d','Sozialarbeit','8','C','2','13','VZ','13');
 INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max_semester, max_verband, max_gruppe, erhalter_kz, orgform_kurzbz, ext_id) VALUES('262','ma','m','Masterstudiengang Telekommunikation und Medien','3','C','2','13','VZ','25');
+
+-- Sprache
+
+INSERT INTO public.tbl_sprache(sprache) VALUES('German');
+INSERT INTO public.tbl_sprache(sprache) VALUES('English');
+INSERT INTO public.tbl_sprache(sprache) VALUES('Espanol');
+
+-- Fachbereich
+
+INSERT INTO public.tbl_fachbereich(fachbereich_kurzbz, bezeichnung, farbe, studiengang_kz, ext_id, aktiv) VALUES('Dummy','','','0',null,true);
