@@ -1,0 +1,31 @@
+-- INSERTS fuer St.Poelten DB
+
+-- Erhalter
+
+INSERT INTO public.tbl_erhalter(erhalter_kz, kurzbz, bezeichnung, dvr, logo, zvr) VALUES(13,'FHSTP', 'Fachhochschule St. Pölten', '','','');
+
+-- OrgForm
+
+INSERT INTO bis.tbl_orgform(orgform_kurzbz, code, bezeichnung) VALUES ('VZ', 1, 'Vollzeit');
+INSERT INTO bis.tbl_orgform(orgform_kurzbz, code, bezeichnung) VALUES ('BB', 2, 'Berufsbegleitend');
+INSERT INTO bis.tbl_orgform(orgform_kurzbz, code, bezeichnung) VALUES ('VBB', 3, 'Vollzeit und Berufsbeleitend');
+INSERT INTO bis.tbl_orgform(orgform_kurzbz, code, bezeichnung) VALUES ('ZGS', 4, 'Zielgruppenspezifisch');
+
+-- Studiengang
+
+INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max_semester, max_verband, max_gruppe, erhalter_kz, orgform_kurzbz, ext_id) VALUES('2','sb','d','xxxSozialarbeit- berufsbegleitend','8','C','2','13','VZ','14');
+INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max_semester, max_verband, max_gruppe, erhalter_kz, orgform_kurzbz, ext_id) VALUES('1','vo','d','xxxVerkehrsinformatik und Verkehrsökologie','8','C','2','13','VZ','15');
+INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max_semester, max_verband, max_gruppe, erhalter_kz, orgform_kurzbz, ext_id) VALUES('261','mt','b','Bakkalaureatsstudiengang Medientechnik','6','C','2','13','VZ','16');
+INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max_semester, max_verband, max_gruppe, erhalter_kz, orgform_kurzbz, ext_id) VALUES('323','sa','m','Magisterstudiengang Sozialarbeit','3','C','2','13','VZ','17');
+INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max_semester, max_verband, max_gruppe, erhalter_kz, orgform_kurzbz, ext_id) VALUES('410','is','b','Bakkalaureatsstudiengang IT Security','6','C','2','13','VZ','18');
+INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max_semester, max_verband, max_gruppe, erhalter_kz, orgform_kurzbz, ext_id) VALUES('405','bc','b','Bakkalaureatsstudiengang Computersimulation','6','C','2','13','VZ','19');
+INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max_semester, max_verband, max_gruppe, erhalter_kz, orgform_kurzbz, ext_id) VALUES('403','bm','b','Bachelorstudiengang Medienmanagement','6','C','2','13','VZ','20');
+INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max_semester, max_verband, max_gruppe, erhalter_kz, orgform_kurzbz, ext_id) VALUES('409','mk','b','Bachelorstudiengang Media- und Kommunikationsberatung','6','C','2','13','VZ','21');
+INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max_semester, max_verband, max_gruppe, erhalter_kz, orgform_kurzbz, ext_id) VALUES('407','di','b','Diätologie','6','C','2','13','VZ','23');
+INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max_semester, max_verband, max_gruppe, erhalter_kz, orgform_kurzbz, ext_id) VALUES('408','pt','b','Physiotherapie','6','C','2','13','VZ','24');
+INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max_semester, max_verband, max_gruppe, erhalter_kz, orgform_kurzbz, ext_id) VALUES('406','bs','b','Bachelorstudiengang Soziale Arbeit','6','C','2','13','VZ','22');
+INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max_semester, max_verband, max_gruppe, erhalter_kz, orgform_kurzbz, ext_id) VALUES('38','tm','d','Telekommunikation und Medien','8','C','2','13','VZ','10');
+INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max_semester, max_verband, max_gruppe, erhalter_kz, orgform_kurzbz, ext_id) VALUES('88','mm','d','Medienmanagement','8','C','2','13','VZ','11');
+INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max_semester, max_verband, max_gruppe, erhalter_kz, orgform_kurzbz, ext_id) VALUES('95','cs','d','Computersimulation','8','C','2','13','VZ','12');
+INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max_semester, max_verband, max_gruppe, erhalter_kz, orgform_kurzbz, ext_id) VALUES('96','so','d','Sozialarbeit','8','C','2','13','VZ','13');
+INSERT INTO public.tbl_studiengang(studiengang_kz, kurzbz, typ, bezeichnung, max_semester, max_verband, max_gruppe, erhalter_kz, orgform_kurzbz, ext_id) VALUES('262','ma','m','Masterstudiengang Telekommunikation und Medien','3','C','2','13','VZ','25');
