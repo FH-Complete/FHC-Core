@@ -49,6 +49,7 @@ $error_log='';
 $error_log_ext='';
 $ausgabe="";
 $text = '';
+$error = '';
 $anzahl_quelle=0;
 $anzahl_eingefuegt=0;
 $anzahl_update=0;
@@ -101,6 +102,7 @@ if($result = pg_query($conn, $qry))
 				if (pg_num_rows($result_dubel)==0)
 				{
 					//Neue Person anlegen
+					pg_query($conn, "BEGIN");
 					$sql="INSERT INTO public.tbl_person
 							(staatsbuergerschaft,geburtsnation,sprache,anrede,titelpost,titelpre,nachname,vorname,
 							vornamen,gebdatum,gebort,gebzeit,foto,anmerkung,homepage,svnr,ersatzkennzeichen,
@@ -127,17 +129,58 @@ if($result = pg_query($conn, $qry))
 							myaddslashes($row->_cxfamilienstand).", ".
 							myaddslashes($row->_cxgeschlecht).", ".
 							myaddslashes($row->inkinder).", ".
-							"TRUE, now(), 'sync', now(), 'sync', NULL);";
+							"TRUE, now(), 'sync', now(), 'sync', ".
+							myaddslashes($row->__person).");";
 					if(!$result_neu = pg_query($conn, $sql))
+					{
 						$error_log.= $sql."\n<strong>".pg_last_error($conn)." </strong>\n";
+						pg_query($conn, "ROLLBACK");
+					}
 					else 
-						$ausgabe.="\n------------------\nÜbertragen: ".$row->chtitel." ".$row->chnachname.", ".$row->chvorname;	
+					{
+						//Eintrag Synctabelle
+						$qry_seq = "SELECT currval('public.tbl_person_person_id_seq') AS id;";
+						if($row_seq=pg_fetch_object(pg_query($conn,$qry_seq)))
+						{
+							$person_id=$row_seq->id;
+						}
+						else
+						{
+							$error=true;
+							$error_log.='Person-Sequence konnte nicht ausgelesen werden\n';
+						}
+						if(!$error)
+						{
+							$qryz="SELECT * FROM sync.tbl_syncperson WHERE __person='$row->__person' AND person_id='$person_id'";
+							if($resultz = pg_query($conn, $qryz))
+							{
+								if(pg_num_rows($resultz)==0) //wenn dieser eintrag noch nicht vorhanden ist
+								{
+									$qry='INSERT INTO sync.tbl_syncperson (__person, person_id)'.
+										'VALUES ('.$row->__person.', '.$person_id.');';
+									$resulti = pg_query($conn, $qry);
+								}
+								$ausgabe.="\n------------------\nÜbertragen: ".$row->chtitel." ".$row->chnachname.", ".$row->chvorname;	
+								pg_query($conn, "COMMIT");
+							}
+							else 
+							{
+								$error_log.= $sql."\n<strong>".pg_last_error($conn)." </strong>\n";
+								pg_query($conn, "ROLLBACK");	
+							}
+						}
+						else 
+						{
+							pg_query($conn, "ROLLBACK");
+						}
+						
+					}
 				}
 			}
 		}
 	}
 }
-
+echo "<br><br>";
 echo nl2br($error_log);
 echo nl2br($ausgabe);
 
