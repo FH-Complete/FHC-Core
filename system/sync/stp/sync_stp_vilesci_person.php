@@ -11,7 +11,7 @@
 //* Synchronisiert Personendatensaetze von FAS DB in PORTAL DB
 //*
 //*
-//* setzt voraus: sync von sync.stp_person
+//* setzt voraus: sync von sync.stp_person, sync.stp_staat
 //* benoetigt: tbl_syncperson
 
 require_once('sync_config.inc.php');
@@ -38,14 +38,15 @@ if (!@pg_query($conn,'SELECT * FROM sync.tbl_syncperson LIMIT 1;'))
 			Grant delete on sync.tbl_syncperson to group "admin";
 			Grant insert on sync.tbl_syncperson to group "admin";';
 	if (!@pg_query($conn,$sql))
-		echo '<strong>sync.stp_person: '.pg_last_error($conn).' </strong><BR>';
+		echo '<strong>sync.tbl_syncperson: '.pg_last_error($conn).' </strong><BR>';
 	else
-		echo 'sync.stp_person wurde angelegt!<BR>';
+		echo 'sync.tbl_syncperson wurde angelegt!<BR>';
 }
 
 
 
 $error_log='';
+$error_log1='';
 $error_log_ext='';
 $ausgabe="";
 $text = '';
@@ -55,7 +56,7 @@ $anzahl_eingefuegt=0;
 $anzahl_update=0;
 $anzahl_fehler=0;
 $plausi='';
-
+$staat=array();
 
 /*************************
  * FAS-PORTAL - Synchronisation
@@ -69,6 +70,16 @@ $plausi='';
 <body>
 
 <?php
+//Array für Nationen erzeugen
+$qry_staat="SELECT __staat, chkurzbez from sync.stp_staat";
+if($result_staat = pg_query($conn, $qry_staat))
+{
+	while($row_staat = pg_fetch_object($result_staat))
+	{
+		$staat[$row_staat->__staat]=$row_staat->chkurzbez;
+	}
+}
+
 //*********** Neue Daten holen *****************
 $qry='SELECT __Person,_Staatsbuerger,_GebLand,Briefanrede,chTitel,chNachname,chVorname,daGebDat,chGebOrt,chAdrBemerkung,chHomepage,chSVNr,chErsatzKZ,_cxFamilienstand,_cxGeschlecht,inKinder
 		FROM sync.stp_person
@@ -89,6 +100,23 @@ if($result = pg_query($conn, $qry))
 			$row->_cxgeschlecht='w';
 		else
 			$row->_cxgeschlecht='';
+		if($row->_staatsbuerger==NULL)
+		{
+			$error_log1.="\nKeine Staatsbürgerschaft eingetragen";
+			$error=true;
+		}
+		if($row->_gebland==NULL)
+		{
+			$error_log1.="\nKein Geburtsland eingetragen";
+			$error=true;
+		}
+		if($error)
+		{
+			$error_log.="\n*****\n".$row->chtitel." ".$row->chnachname.", ".$row->chvorname." :".$error_log1;
+			$error_log1='';
+			$error=false;
+			continue;
+		}
 		// Check auf Doppelgaenger
 		if ($row->chsvnr!='' || $row->dagebdat!='' )
 		{
@@ -109,8 +137,8 @@ if($result = pg_query($conn, $qry))
 							familienstand,geschlecht,anzahlkinder,aktiv,insertamum,insertvon,updateamum,updatevon,
 							ext_id)
 							VALUES
-							(".myaddslashes($row->_staatsbuerger).", ".
-							myaddslashes($row->_gebland).", ".
+							(".myaddslashes($staat[$row->_staatsbuerger]).", ".
+							myaddslashes($staat[$row->_gebland]).", ".
 							"NULL, ".
 							myaddslashes($row->briefanrede).", ".
 							"NULL, ".
@@ -160,7 +188,7 @@ if($result = pg_query($conn, $qry))
 										'VALUES ('.$row->__person.', '.$person_id.');';
 									$resulti = pg_query($conn, $qry);
 								}
-								$ausgabe.="\n------------------\nÜbertragen: ".$row->chtitel." ".$row->chnachname.", ".$row->chvorname;	
+								$ausgabe.="\n------------------\nÜbertragen: ".$row->chtitel." ".$row->chnachname.", ".$row->chvorname." / ".$row->_staatsbuerger.", ".$row->_gebland;	
 								pg_query($conn, "COMMIT");
 							}
 							else 
