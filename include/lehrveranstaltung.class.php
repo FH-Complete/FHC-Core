@@ -51,6 +51,7 @@ class lehrveranstaltung
 	var $sort;					//@var smallint
 	var $zeugnis;				//@var boolean
 	var $projektarbeit;			//@var boolean
+	var $koordinator;			//@var varchar(16)
 	
 	/**
 	 * Konstruktor
@@ -125,6 +126,7 @@ class lehrveranstaltung
 			$this->sort=$row->sort;
 			$this->zeugnis=($row->zeugnis=='t'?true:false);
 			$this->projektarbeit=($row->projektarbeit=='t'?true:false);
+			$this->koordinator=$row->koordinator;
 		}
 
 		return true;
@@ -172,6 +174,7 @@ class lehrveranstaltung
 			$lv_obj->sort=$row->sort;
 			$lv_obj->zeugnis=($row->zeugnis=='t'?true:false);
 			$lv_obj->projektarbeit=($row->projektarbeit=='t'?true:false);
+			$lv_obj->koordinator=$row->koordinator;
 
 			$this->lehrveranstaltungen[] = $lv_obj;
 		}
@@ -260,6 +263,7 @@ class lehrveranstaltung
 			$lv_obj->sort=$row->sort;
 			$lv_obj->zeugnis=($row->zeugnis=='t'?true:false);
 			$lv_obj->projektarbeit=($row->projektarbeit=='t'?true:false);
+			$lv_obj->koordinator=$row->koordinator;
 
 			$this->lehrveranstaltungen[] = $lv_obj;
 		}
@@ -355,7 +359,7 @@ class lehrveranstaltung
 			//Neuen Datensatz anlegen
 			$qry = 'BEGIN; INSERT INTO lehre.tbl_lehrveranstaltung (studiengang_kz, bezeichnung, kurzbz,
 				semester, ects, semesterstunden,  anmerkung, lehre, lehreverzeichnis, aktiv, ext_id, insertamum,
-				insertvon, planfaktor, planlektoren, planpersonalkosten, plankostenprolektor, updateamum, updatevon, sort,zeugnis, projektarbeit, sprache) VALUES ('.
+				insertvon, planfaktor, planlektoren, planpersonalkosten, plankostenprolektor, updateamum, updatevon, sort,zeugnis, projektarbeit, sprache, koordinator) VALUES ('.
 				$this->addslashes($this->studiengang_kz).', '.
 				$this->addslashes($this->bezeichnung).', '.
 				$this->addslashes($this->kurzbz).', '.
@@ -378,7 +382,8 @@ class lehrveranstaltung
 				$this->addslashes($this->sort).','.
 				($this->zeugnis?'true':'false').','.
 				($this->projektarbeit?'true':'false').','.
-				$this->addslashes($this->sprache).');';
+				$this->addslashes($this->sprache).','.
+				$this->addslashes($this->koordinator).');';
 		}
 		else
 		{
@@ -415,6 +420,7 @@ class lehrveranstaltung
 				'sort='.$this->addslashes($this->sort) .','.
 				'zeugnis='.($this->zeugnis?'true':'false').','.
 				'projektarbeit='.($this->projektarbeit?'true':'false').','.
+				'koordinator='.($this->koordinator?'true':'false').','.
 				'sprache='.$this->addslashes($this->sprache).' '.
 				'WHERE lehrveranstaltung_id = '.$this->addslashes($this->lehrveranstaltung_id).';';
 		}
@@ -518,6 +524,7 @@ class lehrveranstaltung
 				$lv_obj->sort=$row->sort;
 				$lv_obj->zeugnis=($row->zeugnis=='t'?true:false);
 				$lv_obj->projektarbeit=($row->projektarbeit=='t'?true:false);
+				$lv_obj->zeugnis=$row->koordinator;
 
 				$this->lehrveranstaltungen[] = $lv_obj;
 			}
@@ -588,6 +595,7 @@ class lehrveranstaltung
 				$l->sort = $row->sort;
 				$l->zeugnis = ($row->zeugnis=='t'?true:false);
 				$l->projektarbeit = ($row->projektarbeit=='t'?true:false);
+				$l->koordinator = $row->koordinator;
 				$this->lehrveranstaltungen[]=$l;
 			}
 		}
