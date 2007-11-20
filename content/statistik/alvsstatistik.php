@@ -208,7 +208,7 @@ else
 
 
 
-	echo "<h2>Studenten / Semester</h2>";
+	echo "<h2>ALVS</h2>";
 
 	echo '<table class="liste" style="border: 1px solid black" cellspacing="0"><tr class="liste"><th>'.$stsem.'</th>';
 	$summe_fb = array();

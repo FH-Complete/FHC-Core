@@ -159,7 +159,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
     <!-- EINSTELLUNGEN -->
     <menu id="menu-prefs" label="&menu-prefs.label;" accesskey="&menu-prefs.accesskey;">
 		<menupopup id="menu-prefs-popup">
-			<menu id="menu-prefs-stpltable" label="&menu-prefs-stpltable.label;" accesskey="&menu-prefs-stpltable.accesskey;">
+			<!--<menu id="menu-prefs-stpltable" label="&menu-prefs-stpltable.label;" accesskey="&menu-prefs-stpltable.accesskey;">
 				<menupopup id="menu-prefs-stpltable-popup">
 	        		<menuitem
 	          			 id     	="menu-prefs-stpltable-stundenplan"
@@ -176,7 +176,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 						 command   	="menu-prefs-stpltable-stundenplandev:command"
 	           			 accesskey 	="&menu-prefs-stpltable-stundenplandev.accesskey;"/>
 	      		</menupopup>
-	      	</menu>
+	      	</menu>-->
 	      	<menu
            id        =  "menu-properies-studiensemester"
            label     = "Studiensemester">

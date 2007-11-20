@@ -43,6 +43,9 @@ else
 $semester = isset($_GET['semester'])?$_GET['semester']:'';
 $typ = isset($_GET['typ'])?$_GET['typ']:'';
 
+if($semester=='')
+	die('Bitte ein Semester auswaehlen');
+
 $stg = new studiengang($conn);
 $stg->load($studiengang_kz);
 
