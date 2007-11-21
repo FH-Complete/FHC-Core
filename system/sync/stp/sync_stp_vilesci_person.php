@@ -150,7 +150,7 @@ if($result = pg_query($conn, $qry))
 		}
 		if($error)
 		{
-			$error_log.="\n*****\n".$row->__person." - ".$row->chtitel." ".$row->chnachname.", ".$row->chvorname." :".$error_log1;
+			$error_log.="\n*****\n".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname).": ".$error_log1;
 			$error_log1='';
 			$error=false;
 			if($cont)
@@ -230,7 +230,7 @@ if($result = pg_query($conn, $qry))
 										'VALUES ('.$row->__person.', '.$person_id.');';
 									$resulti = pg_query($conn, $qry);
 								}
-								$ausgabe.="\n------------------\nÜbertragen: ".$row->__person." - ".$row->chtitel." ".$row->chnachname.", ".$row->chvorname;	
+								$ausgabe.="\n------------------\nÜbertragen: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);	
 								$eingefuegt++;
 								pg_query($conn, "COMMIT");
 							}
@@ -272,7 +272,7 @@ mail($adress, 'SYNC-Fehler StP-Student von '.$_SERVER['HTTP_HOST'], $error_log,"
 
 mail($adress, 'SYNC StP-Student  von '.$_SERVER['HTTP_HOST'], "Sync Student\n------------\n\n"
 ."Personen: Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Fehler: ".$fehler." / Doppelt: ".$dublette
-."\n\n".$dateiausgabe."Beginn: ".$start."\nEnde: ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: vilesci@technikum-wien.at");
+."\n\n".$dateiausgabe."Beginn: ".$start."\nEnde:    ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: vilesci@technikum-wien.at");
 
 
 ?>
