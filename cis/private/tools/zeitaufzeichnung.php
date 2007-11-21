@@ -319,9 +319,10 @@ if($result_projekt = pg_query($conn, $qry_projekt))
 	    	$where = "projekt_kurzbz='".addslashes($_GET['filter'])."'";
 	    else 
 	    	$where = "uid='$user'";
+	    	//(SELECT to_char(sum(ende-start),'HH:MI:SS') 
 	    $qry = "SELECT 
 	    			*, to_char ((ende-start),'HH24:MI:SS') as diff, 
-	    			(SELECT to_char(sum(ende-start),'HH24:MI:SS') 
+	    			(SELECT sum(ende-start)
 	    			 FROM campus.tbl_zeitaufzeichnung 
 	    			 WHERE $where AND ende>(now() - INTERVAL '40 days')) as summe 	    
 	    		FROM campus.tbl_zeitaufzeichnung WHERE $where AND ende>(now() - INTERVAL '40 days') 

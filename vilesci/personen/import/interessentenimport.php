@@ -130,7 +130,7 @@ if($studiengang_kz=='' && isset($_GET['studiengang_kz']))
 	$studiengang_kz = $_GET['studiengang_kz'];
 $person_id = (isset($_REQUEST['person_id'])?$_REQUEST['person_id']:'');
 $ueberschreiben = (isset($_REQUEST['ueberschreiben'])?$_REQUEST['ueberschreiben']:'');
-$studiensemester_kurzbz = (isset($_REQUEST['studiensemester_kurzbz'])?$_REQUEST['studiensemester_kurzbz']:$semester_aktuell);
+$studiensemester_kurzbz = (isset($_REQUEST['studiensemester_kurzbz'])?$_REQUEST['studiensemester_kurzbz']:'');
 $ausbildungssemester = (isset($_REQUEST['ausbildungssemester'])?$_REQUEST['ausbildungssemester']:'');
 $incoming = (isset($_REQUEST['incoming'])?true:false);
 //end Parameter
@@ -221,7 +221,13 @@ function clean_string($string)
 if($studiensemester_kurzbz == '')
 {
 	$stsem = new studiensemester($conn);
-	$studiensemester_kurzbz = $stsem->getaktorNext();
+	if(date('m')=='9')
+		$studiensemester_kurzbz = $stsem->getaktorNext();
+	else
+	{
+		$stsem->getNextStudiensemester('WS');
+		$studiensemester_kurzbz = $stsem->studiensemester_kurzbz;
+	}
 	
 }
 

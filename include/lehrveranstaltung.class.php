@@ -420,7 +420,7 @@ class lehrveranstaltung
 				'sort='.$this->addslashes($this->sort) .','.
 				'zeugnis='.($this->zeugnis?'true':'false').','.
 				'projektarbeit='.($this->projektarbeit?'true':'false').','.
-				'koordinator='.($this->koordinator?'true':'false').','.
+				'koordinator='.$this->addslashes($this->koordinator).','.
 				'sprache='.$this->addslashes($this->sprache).' '.
 				'WHERE lehrveranstaltung_id = '.$this->addslashes($this->lehrveranstaltung_id).';';
 		}
