@@ -186,7 +186,7 @@ class lehrfach
 
 		if($this->new)
 		{
-			$qry = 'INSERT INTO lehre.tbl_lehrfach (lehrfach_id, studiengang_kz, fachbereich_kurzbz, kurzbz,
+			$qry = 'BEGIN;INSERT INTO lehre.tbl_lehrfach (lehrfach_id, studiengang_kz, fachbereich_kurzbz, kurzbz,
 			                                  bezeichnung, farbe, aktiv, semester, sprache, ext_id)
 			        VALUES('.
 					($this->lehrfach_id!=''?$this->addslashes($this->lehrfach_id):"nextval('lehre.tbl_lehrfach_lehrfach_id_seq')").','. // HuschPfusch 4 Syncro
@@ -217,13 +217,40 @@ class lehrfach
 			       ' farbe='.$this->addslashes($this->farbe).','.
 			       ' aktiv='.($this->aktiv?'true':'false').','.
 			       ' semester='.$this->semester.','.
-			       ' ext_id='.$this->ext_id.','.
+			       ' ext_id='.$this->addslashes($this->ext_id).','.
 			       ' sprache='.$this->addslashes($this->sprache).
 			       " WHERE lehrfach_id='$this->lehrfach_id'";
 		}
 
 		if(pg_query($this->conn,$qry))
 		{
+			if($this->new)
+			{
+				if($this->lehrfach_id=='')
+				{
+					$qry = "SELECT currval('lehre.tbl_lehrfach_lehrfach_id_seq') as id";
+					if($result = pg_query($this->conn, $qry))
+					{
+						if($row = pg_fetch_object($result))
+						{
+							$this->lehrfach_id = $row->id;
+						}
+						else 
+						{
+							$this->errormsg = 'Fehler beim Auslesen der Sequence';
+							pg_query($this->conn, 'ROLLBACK');
+							return false;
+						}
+					}
+					else 
+					{
+						$this->errormsg = 'Fehler beim Auslesen der Sequence';
+						pg_query($this->conn, 'ROLLBACK');
+						return false;
+					}
+				}
+				pg_query($this->conn, 'COMMIT');
+			}
 			//Log schreiben
 			return true;
 		}

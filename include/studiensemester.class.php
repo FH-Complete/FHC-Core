@@ -327,13 +327,23 @@ class studiensemester
 		}
 	}
 
-	function getNextStudiensemester()
+	// ****
+	// * Liefert das naechste Studiensemester
+	// * Wenn art=WS dann wird das naechste Wintersemester geliefert
+	// * Wenn art=SS dann wird das naechste Sommersemester geliefert
+	// ****
+	function getNextStudiensemester($art='')
 	{
-		$qry = "SELECT * FROM public.tbl_studiensemester where start>now() ORDER BY start LIMIT 1";
+		$qry = "SELECT * FROM public.tbl_studiensemester WHERE start>now() ";
+		
+		if($art!='')
+			$qry.= " AND substring(studiensemester_kurzbz from 1 for 2)='".addslashes($art)."' ";
+		
+		$qry.=" ORDER BY start LIMIT 1";
 
 		if(!$result=pg_query($this->conn,$qry))
 		{
-			$this->errormsg = 'Fehler beim lesen des Studiensemesters';
+			$this->errormsg = 'Fehler beim Lesen des Studiensemesters';
 			return false;
 		}
 
@@ -345,7 +355,7 @@ class studiensemester
 		}
 		else
 		{
-			$this->errormsg = "Es ist kein Studiensemester mit der Kurzbezeichung $studiensemester_kurzbz vorhanden";
+			$this->errormsg = "Es wurde kein entsprechendes Studiensemester gefunden";
 			return false;
 		}
 
