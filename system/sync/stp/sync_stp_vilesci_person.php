@@ -60,6 +60,7 @@ $eingefuegt=0;
 $fehler=0;
 $dublette=0;
 $plausi='';
+$start='';
 $staat=array();
 
 /*************************
@@ -90,8 +91,9 @@ $qry='SELECT __Person,_Staatsbuerger,_GebLand,Briefanrede,chTitel,chNachname,chV
 		WHERE _cxGeschlecht!=3 AND _cxPersonTyp!=5
 			AND __Person NOT IN (SELECT __Person FROM sync.tbl_syncperson) ;';
 
-$error_log_ext="Überprüfung Personendaten in EXT-DB: Beginn - ".$_SERVER['HTTP_HOST']."\n\n";
-
+$error_log_ext="Überprüfung Personendaten in EXT-DB:\n\n";
+$start=date("d.m.Y H:i:s");
+echo $start."<br>";
 if($result = pg_query($conn, $qry))
 {
 	$anzahl_person_gesamt=pg_num_rows($result);
@@ -269,8 +271,8 @@ echo nl2br($ausgabe);
 mail($adress, 'SYNC-Fehler StP-Student von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");
 
 mail($adress, 'SYNC StP-Student  von '.$_SERVER['HTTP_HOST'], "Sync Student\n------------\n\n"
-."Personen:       Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Fehler: ".$fehler." / Doppelt: ".$dublette
-."\n\n".$dateiausgabe."Fertig: ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: vilesci@technikum-wien.at");
+."Personen: Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Fehler: ".$fehler." / Doppelt: ".$dublette
+."\n\n".$dateiausgabe."Beginn: ".$start."\nEnde: ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: vilesci@technikum-wien.at");
 
 
 ?>
