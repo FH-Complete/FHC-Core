@@ -51,10 +51,14 @@ $error_log_ext='';
 $ausgabe="";
 $text = '';
 $error = '';
+$cont='';
 $anzahl_quelle=0;
 $anzahl_eingefuegt=0;
 $anzahl_update=0;
 $anzahl_fehler=0;
+$eingefuegt=0;
+$fehler=0;
+$dublette=0;
 $plausi='';
 $staat=array();
 
@@ -84,46 +88,82 @@ if($result_staat = pg_query($conn, $qry_staat))
 $qry='SELECT __Person,_Staatsbuerger,_GebLand,Briefanrede,chTitel,chNachname,chVorname,daGebDat,chGebOrt,chAdrBemerkung,chHomepage,chSVNr,chErsatzKZ,_cxFamilienstand,_cxGeschlecht,inKinder
 		FROM sync.stp_person
 		WHERE _cxGeschlecht!=3 AND _cxPersonTyp!=5
-			AND __Person NOT IN (SELECT __Person FROM sync.tbl_syncperson) LIMIT 10;';
+			AND __Person NOT IN (SELECT __Person FROM sync.tbl_syncperson) ;';
 
 $error_log_ext="Überprüfung Personendaten in EXT-DB:\n\n";
 
 if($result = pg_query($conn, $qry))
 {
-	$error_log_ext.="Anzahl der Datensätze: ".pg_num_rows($result)."\n";
+	$anzahl_person_gesamt=pg_num_rows($result);
+	$error_log_ext.="Anzahl der Datensätze: ".$anzahl_person_gesamt."\n";
 	echo nl2br($error_log_ext);
 	while($row=pg_fetch_object($result))
 	{
+		$cont='';
 		if ($row->_cxgeschlecht==1)
 			$row->_cxgeschlecht='m';
 		elseif ($row->_cxgeschlecht==2)
 			$row->_cxgeschlecht='w';
 		else
 			$row->_cxgeschlecht='';
+		if($row->chnachname==NULL)
+		{
+			$error_log1.="\nKein Nachname eingetragen";
+			$cont=true;
+			$error=true;
+		}
+		if($row->chvorname==NULL)
+		{
+			$error_log1.="\nKein Vorname eingetragen";
+			$cont=true;
+			$error=true;
+		}
 		if($row->_staatsbuerger==NULL)
 		{
 			$error_log1.="\nKeine Staatsbürgerschaft eingetragen";
+			$cont=true;
 			$error=true;
 		}
 		if($row->_gebland==NULL)
 		{
 			$error_log1.="\nKein Geburtsland eingetragen";
+			$cont=true;
+			$error=true;
+		}
+		if($row->dagebdat=='' || $row->dagebdat==NULL)
+		{
+			$error_log1.="\nKein Geburtsdatum eingetragen";
+			$error=true;
+		}
+		if(($row->chsvnr=='' || $row->chsvnr==NULL) && ($row->chersatzkz=='' || $row->chersatzkz==NULL))
+		{
+			$error_log1.="\nKeine SVNr und kein Ersatzkennzeichen eingetragen";
+			$cont=true;
+			$error=true;
+		}
+		if($row->_cxgeschlecht=='' || $row->_cxgeschlecht==NULL)
+		{
+			$error_log1.="\nKein Familienstand eingetragen";
 			$error=true;
 		}
 		if($error)
 		{
-			$error_log.="\n*****\n".$row->chtitel." ".$row->chnachname.", ".$row->chvorname." :".$error_log1;
+			$error_log.="\n*****\n".$row->__person." - ".$row->chtitel." ".$row->chnachname.", ".$row->chvorname." :".$error_log1;
 			$error_log1='';
 			$error=false;
-			continue;
+			if($cont)
+			{
+				$fehler++;
+				continue;
+			}
 		}
 		// Check auf Doppelgaenger
 		if ($row->chsvnr!='' || $row->dagebdat!='' )
 		{
 			$sql="SELECT * FROM public.tbl_person
 				WHERE
-					(svnr='$row->chsvnr' AND svnr!='' AND svnr IS NOT NULL)
-					OR (ersatzkennzeichen='.myaddslashes($row->chersatzkz).' AND ersatzkennzeichen!='' AND ersatzkennzeichen IS NOT NULL) 
+					(svnr=".myaddslashes($row->chsvnr)." AND svnr!='' AND svnr IS NOT NULL)
+					OR (ersatzkennzeichen=".myaddslashes($row->chersatzkz)." AND ersatzkennzeichen!='' AND ersatzkennzeichen IS NOT NULL) 
 					OR (nachname=".myaddslashes($row->chnachname)." AND ".myaddslashes($row->chnachname)."!='' AND vorname=".myaddslashes($row->chvorname)."AND ".myaddslashes($row->chvorname)."!='' AND gebdatum=".myaddslashes($row->dagebdat)." AND gebdatum IS NOT NULL)";
 			if($result_dubel = pg_query($conn, $sql))
 			{
@@ -188,12 +228,13 @@ if($result = pg_query($conn, $qry))
 										'VALUES ('.$row->__person.', '.$person_id.');';
 									$resulti = pg_query($conn, $qry);
 								}
-								$ausgabe.="\n------------------\nÜbertragen: ".$row->chtitel." ".$row->chnachname.", ".$row->chvorname." / ".$row->_staatsbuerger.", ".$row->_gebland;	
+								$ausgabe.="\n------------------\nÜbertragen: ".$row->__person." - ".$row->chtitel." ".$row->chnachname.", ".$row->chvorname;	
+								$eingefuegt++;
 								pg_query($conn, "COMMIT");
 							}
 							else 
 							{
-								$error_log.= $sql."\n<strong>".pg_last_error($conn)." </strong>\n";
+								$error_log.= "\n".$sql."\n<strong>".pg_last_error($conn)." </strong>\n";
 								pg_query($conn, "ROLLBACK");	
 							}
 						}
@@ -204,13 +245,36 @@ if($result = pg_query($conn, $qry))
 						
 					}
 				}
+				else 
+				{
+					$dublette++;
+				}
+			}
+			else 
+			{
+				$error_log.= "\n".$sql."\n<strong>".pg_last_error($conn)." </strong>\n";
+				pg_query($conn, "ROLLBACK");
 			}
 		}
 	}
 }
+
+echo "<br>Eingefügt:  ".$eingefuegt;
+echo "<br>Doppelt:     ".$dublette;
+echo "<br>Fehler:       ".$fehler;
 echo "<br><br>";
 echo nl2br($error_log);
 echo nl2br($ausgabe);
+
+mail($adress, 'SYNC-Fehler StP-Student von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");
+
+mail($adress, 'SYNC StP-Student  von '.$_SERVER['HTTP_HOST'], "Sync Student\n------------\n\nPersonen ohne Reihungstest: ".$notest." \n\n"
+."Personen:       Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$anzahl_person_insert." / Geändert: ".$anzahl_person_update." / Fehler: ".$anzahl_fehler_person."\n"
+."Prestudenten:   Gesamt: ".$anzahl_pre_gesamt." / Eingefügt: ".$anzahl_pre_insert." / Geändert: ".$anzahl_pre_update." / Fehler: ".$anzahl_fehler_pre."\n"
+."Benutzer:       Gesamt: ".$anzahl_benutzer_gesamt." / Eingefügt: ".$anzahl_benutzer_insert." / Geändert: ".$anzahl_benutzer_update." / Fehler: ".$anzahl_fehler_benutzer."\n"
+."Nicht-Studenten: ".$anzahl_nichtstudenten."\n"
+."Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student."\n\n".$dateiausgabe."Fertig: ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: vilesci@technikum-wien.at");
+
 
 ?>
 </body>
