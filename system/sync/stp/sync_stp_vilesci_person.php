@@ -90,7 +90,7 @@ $qry='SELECT __Person,_Staatsbuerger,_GebLand,Briefanrede,chTitel,chNachname,chV
 		WHERE _cxGeschlecht!=3 AND _cxPersonTyp!=5
 			AND __Person NOT IN (SELECT __Person FROM sync.tbl_syncperson) ;';
 
-$error_log_ext="Überprüfung Personendaten in EXT-DB:\n\n";
+$error_log_ext="Überprüfung Personendaten in EXT-DB: Beginn - ".$_SERVER['HTTP_HOST']."\n\n";
 
 if($result = pg_query($conn, $qry))
 {
@@ -268,12 +268,9 @@ echo nl2br($ausgabe);
 
 mail($adress, 'SYNC-Fehler StP-Student von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");
 
-mail($adress, 'SYNC StP-Student  von '.$_SERVER['HTTP_HOST'], "Sync Student\n------------\n\nPersonen ohne Reihungstest: ".$notest." \n\n"
-."Personen:       Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$anzahl_person_insert." / Geändert: ".$anzahl_person_update." / Fehler: ".$anzahl_fehler_person."\n"
-."Prestudenten:   Gesamt: ".$anzahl_pre_gesamt." / Eingefügt: ".$anzahl_pre_insert." / Geändert: ".$anzahl_pre_update." / Fehler: ".$anzahl_fehler_pre."\n"
-."Benutzer:       Gesamt: ".$anzahl_benutzer_gesamt." / Eingefügt: ".$anzahl_benutzer_insert." / Geändert: ".$anzahl_benutzer_update." / Fehler: ".$anzahl_fehler_benutzer."\n"
-."Nicht-Studenten: ".$anzahl_nichtstudenten."\n"
-."Studenten:      Gesamt: ".$anzahl_student_gesamt." / Eingefügt: ".$anzahl_student_insert." / Geändert: ".$anzahl_student_update." / Fehler: ".$anzahl_fehler_student."\n\n".$dateiausgabe."Fertig: ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: vilesci@technikum-wien.at");
+mail($adress, 'SYNC StP-Student  von '.$_SERVER['HTTP_HOST'], "Sync Student\n------------\n\n"
+."Personen:       Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Fehler: ".$fehler." / Doppelt: ".$dublette
+."\n\n".$dateiausgabe."Fertig: ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: vilesci@technikum-wien.at");
 
 
 ?>
