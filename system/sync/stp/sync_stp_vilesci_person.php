@@ -184,9 +184,9 @@ if($result = pg_query($conn, $qry))
 							"NULL, ".
 							myaddslashes($row->briefanrede).", ".
 							"NULL, ".
-							myaddslashes($row->chtitel).", ".
-							myaddslashes($row->chnachname).", ".
-							myaddslashes($row->chvorname).", ".
+							myaddslashes(trim($row->chtitel)).", ".
+							myaddslashes(trim($row->chnachname)).", ".
+							myaddslashes(trim($row->chvorname)).", ".
 							"NULL, ".
 							myaddslashes($row->dagebdat).", ".
 							myaddslashes($row->chgebort).", ".
