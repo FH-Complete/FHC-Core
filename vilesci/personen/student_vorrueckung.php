@@ -28,6 +28,11 @@ require_once('../../include/functions.inc.php');
 if(!$conn=pg_pconnect(CONN_STRING))
    die("Konnte Verbindung zur Datenbank nicht herstellen");
 
+function myaddslashes($var)
+{
+	return ($var!=''?"'".addslashes($var)."'":'null');
+}
+   
 $s=new studiengang($conn);
 $s->getAll('typ, kurzbz', true);
 $studiengang=$s->result;
@@ -39,7 +44,6 @@ foreach($ss->studiensemester as $studiensemester)
 	$ss_arr[] = $studiensemester->studiensemester_kurzbz;
 }
 
-
 $user = get_uid();
 
 if (isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
@@ -49,22 +53,25 @@ else
 if (isset($_GET['semester']) || isset($_POST['semester']))
 	$semester=(isset($_GET['semester'])?$_GET['semester']:$_POST['semester']);
 else
-	$semester=0;
+	$semester=100;
 if (isset($_GET['studiensemester_kurzbz']) || isset($_POST['studiensemester_kurzbz']))
 	$studiensemester_kurzbz=(isset($_GET['studiensemester_kurzbz'])?$_GET['studiensemester_kurzbz']:$_POST['studiensemester_kurzbz']);
 else
 	$studiensemester_kurzbz=null;
 if (is_null($studiensemester_kurzbz))
-	$studiensemester_kurzbz=$ss->getaktorNext();
-//echo $studiensemester_kurzbz;
-
+{
+	$studiensemester_kurzbz=$ss->getakt();
+	$studiensemester_kurzbz_akt=$ss->getakt();
+}
+$ss->getNextStudiensemester();
+$studiensemester_kurzbz_zk=$ss->studiensemester_kurzbz;
 
 if(!is_numeric($stg_kz))
 	$stg_kz=0;
 if(!is_numeric($semester))
-	$semester=0;
+	$semester=100;
 
-
+/*
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 {
 	//Lehre Feld setzen
@@ -107,12 +114,19 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 			echo "Erfolgreich gespeichert";
 	}
 }
+*/
 
 $sql_query="SELECT tbl_student.*,tbl_person.* FROM tbl_studentlehrverband JOIN tbl_student USING (student_uid)
 				JOIN tbl_benutzer ON (student_uid=uid)
 				JOIN tbl_person USING (person_id)
-			WHERE tbl_studentlehrverband.studiengang_kz='$stg_kz' AND tbl_studentlehrverband.semester='$semester' AND studiensemester_kurzbz='$studiensemester_kurzbz'
-			ORDER BY nachname";
+			WHERE tbl_person.aktiv AND tbl_studentlehrverband.studiengang_kz='$stg_kz' 
+			AND studiensemester_kurzbz='$studiensemester_kurzbz' ";
+if($semester<100)
+{
+	$sql_query.="AND tbl_studentlehrverband.semester='$semester' ";
+}
+$sql_query.="ORDER BY semester, nachname";
+
 //echo $sql_query;
 if (!$result_std=pg_query($conn, $sql_query))
 	error("Studenten not found!");
@@ -121,18 +135,44 @@ $outp='';
 // ****************************** Vorruecken ******************************
 if (isset($_POST['vorr']))
 {
-	$next_ss='WS2007';
+	$next_ss=$studiensemester_kurzbz_zk;
 	while($row=pg_fetch_object($result_std))
 	{
-		$s=$row->semester+1;
-		$sql="INSERT INTO tbl_studentlehrverband
-			VALUES ('$row->student_uid','$next_ss','$row->studiengang_kz',
-			'$s','$row->verband','$row->gruppe',NULL,NULL,now(),'$user',NULL);
-			INSERT INTO tbl_prestudentrolle
-			VALUES ($row->prestudent_id,'Student','$next_ss',$s,now(),now(),'$user',NULL,NULL,NULL);
-			UPDATE tbl_student SET semester=$s WHERE student_uid='$row->student_uid'";
-		if (!$r=pg_query($conn, $sql))
-			die(pg_last_error($conn));
+		$qry_status="SELECT rolle_kurzbz FROM public.tbl_prestudentrolle JOIN public.tbl_prestudent USING(prestudent_id) 
+		WHERE person_id=".myaddslashes($row->person_id)." 
+		AND studiensemester_kurzbz=".myaddslashes($studiensemester_kurzbz_akt)." 
+		ORDER BY datum desc LIMIT 1;";
+		if ($result_status=pg_query($conn, $qry_status))
+		{
+			if($row_status=pg_fetch_object($result_status))
+			{
+				$s=$row->semester+1;
+				//Lehrverbandgruppe anlegen, wenn noch nicht vorhanden
+				$qry_lvb="SELECT * FROM public.tbl_lehrverband 
+				WHERE studiengang_kz=".myaddslashes($row->studiengang_kz)." AND semester=".myaddslashes($s)."
+				AND verband=".myaddslashes($row->verband)." AND gruppe=".myaddslashes($row->gruppe).";";
+				if(pg_num_rows(pg_query($conn, $qry_lvb))<1)
+				{
+					$lvb_ins="INSERT INTO public.tbl_lehrverband VALUES (".
+					myaddslashes($row->studiengang_kz).", ".
+					myaddslashes($s).", ".
+					myaddslashes($row->verband).", ".
+					myaddslashes($row->gruppe).", 
+					TRUE, NULL, NULL);";
+					if (!$r=pg_query($conn, $lvb_ins))
+						die(pg_last_error($conn));
+				}
+				//Eintragen der neuen Gruppe und Rolle
+				$sql="INSERT INTO tbl_studentlehrverband
+					VALUES ('$row->student_uid','$next_ss','$row->studiengang_kz',
+					'$s','$row->verband','$row->gruppe',NULL,NULL,now(),'$user',NULL);
+					INSERT INTO tbl_prestudentrolle
+					VALUES ($row->prestudent_id,'$row_status->rolle_kurzbz','$next_ss',$s,now(),now(),'$user',NULL,NULL,NULL);
+					UPDATE tbl_student SET semester=$s WHERE student_uid='$row->student_uid'";
+				if (!$r=pg_query($conn, $sql))
+					die(pg_last_error($conn));
+			}
+		}
 	}
 
 }
@@ -159,11 +199,13 @@ foreach ($ss_arr AS $sts)
 	$outp.="				<option value='".$sts."' ".$sel."onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&semester=$semester&studiensemester_kurzbz=$sts'\">".$sts."</option>";
 }
 $outp.="		</select>\n";
-
+$outp.="<BR>Vorr&uuml;ckung von ".$studiensemester_kurzbz." -> ".$studiensemester_kurzbz_zk;
 $outp.= '<BR> -- ';
 for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
 	$outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semester='.$i.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'">'.$i.'</A> -- ';
+$outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semester=100&studiensemester_kurzbz='.$studiensemester_kurzbz.'">alle</A> -- ';
 ?>
+
 
 <html>
 <head>
@@ -176,7 +218,7 @@ for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
 <body class="Background_main">
 <?php
 
-echo "<H2>Studenten Vorrueckung (".$s[$stg_kz]->kurzbz." - ".$semester." - ".$studiensemester_kurzbz.")</H2>";
+echo "<H2>Studenten Vorrueckung (".$s[$stg_kz]->kurzbz." - ".$semester." - ".$studiensemester_kurzbz."), DB:".substr(CONN_STRING,strpos(CONN_STRING,'dbname=')+7,strpos(CONN_STRING,'user=')-strpos(CONN_STRING,'dbname=')-7)."</H2>";
 
 echo '<form action="" method="POST">';
 echo '<table width="70%"><tr><td>';
@@ -195,22 +237,33 @@ if ($result_std!=0)
 {
 	$num_rows=pg_num_rows($result_std);
 	echo 'Anzahl: '.$num_rows;
-	echo "<th class='table-sortable:default'>Nachname</th><th class='table-sortable:default'>Vorname</th><th class='table-sortable:default'>STG</th><th class='table-sortable:default'>Sem</th><th class='table-sortable:default'>Ver</th><th class='table-sortable:default'>Grp</th>\n";
+	echo "<th class='table-sortable:default'>Nachname</th><th class='table-sortable:default'>Vorname</th><th class='table-sortable:default'>STG</th><th class='table-sortable:default'>Sem</th><th class='table-sortable:default'>Ver</th><th class='table-sortable:default'>Grp</th><th class='table-sortable:default'>Status</th>\n";
 	echo "</tr></thead>";
 	echo "<tbody>";
 	for($i=0;$i<$num_rows;$i++)
 	{
-	   $row=pg_fetch_object($result_std,$i);
-	   echo "<tr>";
-	   echo "<td>$row->nachname</td><td>$row->vorname</td><td>$row->studiengang_kz</td><td>$row->semester</td><td>$row->verband</td><td>$row->gruppe</td>";
-	   //echo "<td><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&lehre=$row->lehre'><img src='../../skin/images/".($row->lehre=='t'?'true.gif':'false.gif')."'></a></td>";
-	   //echo "<td><form action='?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester' method='POST'><input type='text' value='$row->lehreverzeichnis' size='4' name='lehrevz'><input type='submit' value='ok'></form></td>";
-	   //echo "<td><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&aktiv=$row->aktiv'><img src='../../skin/images/".($row->aktiv=='t'?'true.gif':'false.gif')."'></a></td>";
-	   //echo "<td>$row->sort</td>";
-	   //echo "<td><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&zeugnis=$row->zeugnis'><img src='../../skin/images/".($row->zeugnis=='t'?'true.gif':'false.gif')."'></a></td>";
-	   echo "</tr>\n";
+		$row=pg_fetch_object($result_std,$i);
+		$qry_status="SELECT rolle_kurzbz FROM public.tbl_prestudentrolle JOIN public.tbl_prestudent USING(prestudent_id) WHERE person_id=".myaddslashes($row->person_id)." AND studiensemester_kurzbz=".myaddslashes($studiensemester_kurzbz)." ORDER BY datum desc LIMIT 1;";
+		if ($result_status=pg_query($conn, $qry_status))
+		{
+			if($row_status=pg_fetch_object($result_status))
+			{
+				echo "<tr>";
+				echo "<td>$row->nachname</td><td>$row->vorname</td><td>$row->studiengang_kz</td><td>$row->semester</td><td>$row->verband</td><td>$row->gruppe</td><td>$row_status->rolle_kurzbz</td>";
+				echo "</tr>\n";
+			}
+			else 
+			{
+				echo "<tr>";
+				echo "<td>$row->nachname</td><td>$row->vorname</td><td>$row->studiengang_kz</td><td>$row->semester</td><td>$row->verband</td><td>$row->gruppe</td><td></td>";
+				echo "</tr>\n";
+			}
+		}
+		else 
+		{
+			error("Roles not found!");	
+		}
 	}
-
 }
 else
 	echo "Kein Eintrag gefunden!";
