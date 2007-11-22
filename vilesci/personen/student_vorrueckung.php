@@ -75,7 +75,7 @@ if(!is_numeric($semester))
 $sql_query="SELECT tbl_student.*,tbl_person.* FROM tbl_studentlehrverband JOIN tbl_student USING (student_uid)
 				JOIN tbl_benutzer ON (student_uid=uid)
 				JOIN tbl_person USING (person_id)
-			WHERE tbl_person.aktiv AND tbl_studentlehrverband.studiengang_kz='$stg_kz' 
+			WHERE tbl_benutzer.aktiv AND tbl_studentlehrverband.studiengang_kz='$stg_kz' 
 			AND studiensemester_kurzbz='$studiensemester_kurzbz' ";
 if($semester<100)
 {
@@ -95,7 +95,7 @@ if (isset($_POST['vorr']))
 	$sql_query="SELECT tbl_student.*,tbl_person.* FROM tbl_studentlehrverband JOIN tbl_student USING (student_uid)
 			JOIN tbl_benutzer ON (student_uid=uid)
 			JOIN tbl_person USING (person_id)
-			WHERE tbl_person.aktiv AND tbl_studentlehrverband.studiengang_kz='$stg_kz' 
+			WHERE tbl_benutzer.aktiv AND tbl_studentlehrverband.studiengang_kz='$stg_kz' 
 			AND studiensemester_kurzbz='$studiensemester_kurzbz_akt' ";
 	if($semester<100)
 	{
