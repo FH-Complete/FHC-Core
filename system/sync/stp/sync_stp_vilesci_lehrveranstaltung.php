@@ -391,7 +391,6 @@
 						$update_lf_error++;
 				}
 			}
-			
 		}
 	}
 	else 
@@ -417,7 +416,6 @@
 		echo "Fehler beim Senden an $to<br><br>";
 	
 	echo nl2br($text);
-	
 ?>
 </body>
 </html>

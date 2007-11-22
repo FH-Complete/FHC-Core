@@ -143,8 +143,23 @@
 		<td nowrap><a class="MenuItem1" href="lehre/zeitwuensche.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Zeitw&uuml;nsche</a></td>
   	</tr>
 	<!--Menu Eintrag LV-Verteilung-->
-  	<tr>
-		<td nowrap><a class="MenuItem1" href="lehre/lv_verteilung/lv_verteilung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Lehreinheiten</a></td>
+	<tr>
+       	<td nowrap><a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('Lehreinheiten'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Lehreinheiten</a></td>
+    </tr>
+	<tr>
+       	<td nowrap>
+	  		<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Lehreinheiten" style="display:block;">
+			  	<tr>
+			  		<td width="10" nowrap>&nbsp;</td>
+					<td nowrap><a class="MenuItem1" href="lehre/lv_verteilung/lv_verteilung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Verwaltung</a></td>
+				</tr>
+				<tr>
+			  		<td width="10" nowrap>&nbsp;</td>
+					<td nowrap><a class="MenuItem1" href="lehre/lehreinheiten_vorrueckung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Vorr&uuml;ckung</a></td>
+				</tr>
+
+			</table>
+		</td>
 	</tr>
     <!--Menu Eintrag Lehrveranstaltungen-->
 	<tr>
