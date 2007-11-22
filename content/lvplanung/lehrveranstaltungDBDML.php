@@ -488,14 +488,22 @@ if(!$error)
 				$leg->insertamum = date('Y-m-d H:i:s');
 				$leg->insertvon = $user;
 	
-				if($leg->save(true))
+				if(!$leg->checkVorhanden())
 				{
-					$return = true;
+					if($leg->save(true))
+					{
+						$return = true;
+					}
+					else
+					{
+						$return = false;
+						$errormsg = $leg->errormsg;
+					}
 				}
-				else
+				else 
 				{
 					$return = false;
-					$errormsg = $leg->errormsg;
+					$errormsg = 'Diese Gruppe ist bereits zugeteilt';
 				}
 			}
 			else

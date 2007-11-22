@@ -31,6 +31,7 @@ require_once('../vilesci/config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/lvgesamtnote.class.php');
 require_once('../include/datum.class.php');
+require_once('../include/studiengang.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
@@ -41,6 +42,13 @@ if (!$conn = pg_pconnect(CONN_STRING))
 $user = get_uid();
 loadVariables($conn, $user);
 $datum = new datum();
+
+$stg_arr = array();
+$stg_obj = new studiengang($conn);
+$stg_obj->getAll(null, false);
+
+foreach ($stg_obj->result as $stg) 
+	$stg_arr[$stg->studiengang_kz]=$stg->kuerzel;
 
 if(isset($_GET['uid']))
 	$uid = $_GET['uid'];
@@ -97,6 +105,7 @@ foreach ($obj->result as $row)
 				<NOTE:lehrveranstaltung_bezeichnung><![CDATA['.$row->lehrveranstaltung_bezeichnung.']]></NOTE:lehrveranstaltung_bezeichnung>
 				<NOTE:student_vorname><![CDATA['.$vorname.']]></NOTE:student_vorname>
 				<NOTE:student_nachname><![CDATA['.$nachname.']]></NOTE:student_nachname>
+				<NOTE:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></NOTE:studiengang>
 	         </RDF:Description>
 	      </RDF:li>';
 }

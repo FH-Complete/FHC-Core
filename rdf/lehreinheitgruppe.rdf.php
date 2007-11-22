@@ -32,6 +32,8 @@ echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
 require_once('../vilesci/config.inc.php');
 require_once('../include/lehreinheitgruppe.class.php');
 require_once('../include/studiengang.class.php');
+require_once('../include/gruppe.class.php');
+require_once('../include/lehrverband.class.php');
 
 // Datenbank Verbindung
 if (!$conn = @pg_pconnect(CONN_STRING))
@@ -66,14 +68,26 @@ $rdf_url='http://www.technikum-wien.at/lehreinheitgruppe';
 foreach ($DAO_obj->lehreinheitgruppe as $row)
 {
 	if($row->gruppe_kurzbz!='')
+	{
 		$bezeichnung = $row->gruppe_kurzbz;
+		$gruppe = new gruppe($conn);
+		$gruppe->load($row->gruppe_kurzbz);
+		$beschreibung = $gruppe->bezeichnung;
+		
+	}
 	else
+	{
 		$bezeichnung = $stg[$row->studiengang_kz].$row->semester.$row->verband.$row->gruppe;
+		$gruppe = new lehrverband($conn);
+		$gruppe->load($row->studiengang_kz, $row->semester, $row->verband, $row->gruppe);
+		$beschreibung = $gruppe->bezeichnung;
+	}
 	?>
       <RDF:li>
          <RDF:Description  id="<?php echo $row->lehreinheitgruppe_id; ?>"  about="<?php echo $rdf_url.'/'.$row->lehreinheitgruppe_id; ?>" >
             <LEHREINHEITGRUPPE:lehreinheitgruppe_id><![CDATA[<?php echo $row->lehreinheitgruppe_id; ?>]]></LEHREINHEITGRUPPE:lehreinheitgruppe_id>
             <LEHREINHEITGRUPPE:bezeichnung><![CDATA[<?php echo $bezeichnung; ?>]]></LEHREINHEITGRUPPE:bezeichnung>
+            <LEHREINHEITGRUPPE:beschreibung><![CDATA[<?php echo $beschreibung; ?>]]></LEHREINHEITGRUPPE:beschreibung>
             <LEHREINHEITGRUPPE:studiengang_kz><![CDATA[<?php echo $row->studiengang_kz; ?>]]></LEHREINHEITGRUPPE:studiengang_kz>
             <LEHREINHEITGRUPPE:semester><![CDATA[<?php echo $row->semester; ?>]]></LEHREINHEITGRUPPE:semester>
             <LEHREINHEITGRUPPE:verband><![CDATA[<?php echo $row->verband; ?>]]></LEHREINHEITGRUPPE:verband>

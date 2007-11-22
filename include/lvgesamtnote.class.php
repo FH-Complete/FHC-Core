@@ -274,7 +274,8 @@ class lvgesamtnote
 		$qry = "SELECT 
 					tbl_lvgesamtnote.*,
 					tbl_note.bezeichnung as note_bezeichnung,
-					tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung
+					tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung,
+					tbl_lehrveranstaltung.studiengang_kz
 				FROM 
 					campus.tbl_lvgesamtnote,
 					lehre.tbl_note,
@@ -311,6 +312,7 @@ class lvgesamtnote
 				$obj->note_bezeichnung = $row->note_bezeichnung;
 				$obj->lehrveranstaltung_bezeichnung = $row->lehrveranstaltung_bezeichnung;
 				$obj->bemerkung = $row->bemerkung;
+				$obj->studiengang_kz = $row->studiengang_kz;
 				$this->result[] = $obj;
 			}
 			return true;
