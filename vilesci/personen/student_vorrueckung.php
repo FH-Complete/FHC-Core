@@ -61,60 +61,16 @@ else
 if (is_null($studiensemester_kurzbz))
 {
 	$studiensemester_kurzbz=$ss->getakt();
-	$studiensemester_kurzbz_akt=$ss->getakt();
 }
+$studiensemester_kurzbz_akt=$ss->getakt();
 $ss->getNextStudiensemester();
 $studiensemester_kurzbz_zk=$ss->studiensemester_kurzbz;
+
 
 if(!is_numeric($stg_kz))
 	$stg_kz=0;
 if(!is_numeric($semester))
 	$semester=100;
-
-/*
-if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
-{
-	//Lehre Feld setzen
-	if(isset($_GET['lehre']))
-	{
-		$qry = "UPDATE lehre.tbl_lehrveranstaltung SET lehre=".($_GET['lehre']=='t'?'false':'true')." WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
-		if(!pg_query($conn, $qry))
-			echo "Fehler beim Speichen!";
-		else
-			echo "Erfolgreich gespeichert";
-	}
-
-	//Aktiv Feld setzen
-	if(isset($_GET['aktiv']))
-	{
-		$qry = "UPDATE lehre.tbl_lehrveranstaltung SET aktiv=".($_GET['aktiv']=='t'?'false':'true')." WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
-		if(!pg_query($conn, $qry))
-			echo "Fehler beim Speichen!";
-		else
-			echo "Erfolgreich gespeichert";
-	}
-
-	//Zeugnis Feld setzen
-	if(isset($_GET['zeugnis']))
-	{
-		$qry = "UPDATE lehre.tbl_lehrveranstaltung SET zeugnis=".($_GET['zeugnis']=='t'?'false':'true')." WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
-		if(!pg_query($conn, $qry))
-			echo "Fehler beim Speichen!";
-		else
-			echo "Erfolgreich gespeichert";
-	}
-
-	//Lehrevz Speichern
-	if(isset($_POST['lehrevz']))
-	{
-		$qry = "UPDATE lehre.tbl_lehrveranstaltung SET lehreverzeichnis='".addslashes($_POST['lehrevz'])."' WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
-		if(!pg_query($conn, $qry))
-			echo "Fehler beim Speichern!";
-		else
-			echo "Erfolgreich gespeichert";
-	}
-}
-*/
 
 $sql_query="SELECT tbl_student.*,tbl_person.* FROM tbl_studentlehrverband JOIN tbl_student USING (student_uid)
 				JOIN tbl_benutzer ON (student_uid=uid)
@@ -135,6 +91,21 @@ $outp='';
 // ****************************** Vorruecken ******************************
 if (isset($_POST['vorr']))
 {
+
+	$sql_query="SELECT tbl_student.*,tbl_person.* FROM tbl_studentlehrverband JOIN tbl_student USING (student_uid)
+			JOIN tbl_benutzer ON (student_uid=uid)
+			JOIN tbl_person USING (person_id)
+			WHERE tbl_person.aktiv AND tbl_studentlehrverband.studiengang_kz='$stg_kz' 
+			AND studiensemester_kurzbz='$studiensemester_kurzbz_akt' ";
+	if($semester<100)
+	{
+		$sql_query.="AND tbl_studentlehrverband.semester='$semester' ";
+	}
+	$sql_query.="ORDER BY semester, nachname";
+	
+	//echo $sql_query;
+	if (!$result_std=pg_query($conn, $sql_query))
+		error("Studenten not found!");
 	$next_ss=$studiensemester_kurzbz_zk;
 	while($row=pg_fetch_object($result_std))
 	{
@@ -199,7 +170,7 @@ foreach ($ss_arr AS $sts)
 	$outp.="				<option value='".$sts."' ".$sel."onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&semester=$semester&studiensemester_kurzbz=$sts'\">".$sts."</option>";
 }
 $outp.="		</select>\n";
-$outp.="<BR>Vorr&uuml;ckung von ".$studiensemester_kurzbz." -> ".$studiensemester_kurzbz_zk;
+$outp.="<BR>Vorr&uuml;ckung von ".$studiensemester_kurzbz_akt." / Semester ".($semester<100?$semester:'alle')." -> ".$studiensemester_kurzbz_zk;
 $outp.= '<BR> -- ';
 for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
 	$outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semester='.$i.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'">'.$i.'</A> -- ';
@@ -218,7 +189,7 @@ $outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semester=100&studi
 <body class="Background_main">
 <?php
 
-echo "<H2>Studenten Vorrueckung (".$s[$stg_kz]->kurzbz." - ".$semester." - ".$studiensemester_kurzbz."), DB:".substr(CONN_STRING,strpos(CONN_STRING,'dbname=')+7,strpos(CONN_STRING,'user=')-strpos(CONN_STRING,'dbname=')-7)."</H2>";
+echo "<H2>Studenten Vorr&uuml;ckung (".$s[$stg_kz]->kurzbz." - ".($semester<100?$semester:'alle')." - ".$studiensemester_kurzbz."), DB:".substr(CONN_STRING,strpos(CONN_STRING,'dbname=')+7,strpos(CONN_STRING,'user=')-strpos(CONN_STRING,'dbname=')-7)."</H2>";
 
 echo '<form action="" method="POST">';
 echo '<table width="70%"><tr><td>';
