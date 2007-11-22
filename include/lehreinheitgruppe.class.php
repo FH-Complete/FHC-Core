@@ -387,5 +387,50 @@ class lehreinheitgruppe
 			return false;
 		}
 	}
+
+	// ****
+	// * Prueft ob die Gruppe schon dieser Lehreinheit zugeordnet ist
+	// ****
+	function checkVorhanden()
+	{
+		$qry = "SELECT 
+					count(*) as anzahl 
+				FROM 
+					lehre.tbl_lehreinheitgruppe 
+				WHERE 
+					lehreinheit_id='$this->lehreinheit_id' AND 
+					studiengang_kz='$this->studiengang_kz'";
+		if($this->semester!='')
+			$qry.=" AND trim(semester)='$this->semester'";
+		else 
+			$qry.=" AND (trim(semester)='' OR semester is null)";
+			
+		if($this->verband!='')
+			$qry.=" AND trim(verband)='$this->verband'";
+		else 
+			$qry.=" AND (trim(verband)='' OR verband is null)";
+			
+		if($this->gruppe!='')
+			$qry.=" AND	trim(gruppe)='$this->gruppe'";
+		else 
+			$qry.=" AND (trim(gruppe)='' OR gruppe is null)";
+			
+		if($this->gruppe_kurzbz!='')
+			$qry.=" AND	trim(gruppe_kurzbz)='$this->gruppe_kurzbz'";
+		else 
+			$qry.= " AND (trim(gruppe_kurzbz)='' OR gruppe_kurzbz is null)";
+		
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				if($row->anzahl>0)
+					return true;
+				else 
+					return false;
+			}
+		}
+	}
 }
 ?>

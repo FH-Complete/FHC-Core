@@ -223,11 +223,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				  onkeypress="LvDetailGruppenTreeKeyPress(event)"
 			>
 				<treecols>
-					<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-bezeichnung" label="Bezeichnung" flex="2" hidden="false"
+					<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-bezeichnung" label="Bezeichnung" flex="2" hidden="false"  persist="hidden, width, ordinal"
 							 class="sortDirectionIndicator"
 							 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#bezeichnung" />
 					<splitter class="tree-splitter"/>
-					<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-lehreinheitgruppe_id" label="ID" flex="2" hidden="true"
+					<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-beschreibung" label="Beschreibung" flex="2" hidden="true"  persist="hidden, width, ordinal"
+							 class="sortDirectionIndicator"
+							 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#beschreibung" />
+					<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-lehreinheitgruppe_id" label="ID" flex="2" hidden="true"  persist="hidden, width, ordinal"
 							 class="sortDirectionIndicator"
 							 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#lehreinheitgruppe_id" />
 				</treecols>
@@ -237,6 +240,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<treeitem uri="rdf:*">
 								<treerow>
 									<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#bezeichnung"   />
+									<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#beschreibung"   />
 									<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#lehreinheitgruppe_id"   />
 				 				</treerow>
 				 			</treeitem>

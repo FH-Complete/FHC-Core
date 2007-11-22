@@ -111,6 +111,7 @@ function convdate($date)
 		$prestudent = new prestudent($conn, null, null);
 		$prestudent->getLastStatus($row->prestudent_id);
 		$status = $prestudent->rolle_kurzbz;
+		$orgform = $prestudent->orgform_kurzbz;
 
 		echo '
 		  <RDF:li>
@@ -138,6 +139,7 @@ function convdate($date)
 	    		<STUDENT:anmerkungpre>'.($row->anmerkung==''?'&#xA0;':'<![CDATA['.$row->anmerkung.']]>').'</STUDENT:anmerkungpre>
 	    		<STUDENT:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz>
 				<STUDENT:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></STUDENT:studiengang>
+				<STUDENT:orgform><![CDATA['.$orgform.']]></STUDENT:orgform>
 	      	</RDF:Description>
 	      </RDF:li>';
 	}
@@ -162,6 +164,7 @@ function convdate($date)
 			$prestudent = new prestudent($conn, null, null);
 			$prestudent->getLastStatus($row->prestudent_id);
 			$status = $prestudent->rolle_kurzbz;
+			$orgform = $prestudent->orgform_kurzbz;
 		echo '
 		  <RDF:li>
 	      	<RDF:Description  id="'.$row->prestudent_id.'"  about="'.$rdf_url.'/'.$row->prestudent_id.'" >
@@ -187,6 +190,7 @@ function convdate($date)
 	    		<STUDENT:geburtsnation><![CDATA['.$row->geburtsnation.']]></STUDENT:geburtsnation>
 	    		<STUDENT:sprache><![CDATA['.$row->sprache.']]></STUDENT:sprache>
 	    		<STUDENT:status><![CDATA['.$status.']]></STUDENT:status>
+	    		<STUDENT:orgform><![CDATA['.$orgform.']]></STUDENT:orgform>
 	    		<STUDENT:mail_privat><![CDATA['.$mail_privat.']]></STUDENT:mail_privat>
 	    		<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
 

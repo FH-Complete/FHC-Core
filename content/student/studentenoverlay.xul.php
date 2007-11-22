@@ -205,6 +205,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#anmerkungpre" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
+	    				<treecol id="student-treecol-orgform" label="OrgForm" flex="1" hidden="true" persist="hidden, width, ordinal"
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#orgform" onclick="StudentTreeSort()"/>
+	    				<splitter class="tree-splitter"/>
 					</treecols>
 
 					<template>
@@ -234,6 +238,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#mail_intern" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#anmerkungen" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#anmerkungpre" />
+	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#orgform" />
 	         						</treerow>
 	       						</treeitem>
 	      					</treechildren>

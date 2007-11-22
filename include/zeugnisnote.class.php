@@ -300,7 +300,8 @@ class zeugnisnote
 					   tbl_note.bezeichnung as note_bezeichnung,
 					   tbl_zeugnisnote.bemerkung as bemerkung,
 					   vw_student_lehrveranstaltung.sort,
-					   vw_student_lehrveranstaltung.zeugnis
+					   vw_student_lehrveranstaltung.zeugnis,
+					   vw_student_lehrveranstaltung.studiengang_kz
 				FROM
 				(
 					campus.vw_student_lehrveranstaltung LEFT JOIN lehre.tbl_zeugnisnote
@@ -314,7 +315,7 @@ class zeugnisnote
 				SELECT lehre.tbl_lehrveranstaltung.lehrveranstaltung_id,student_uid AS uid,studiensemester_kurzbz, note,
 					uebernahmedatum, benotungsdatum,lehre.tbl_lehrveranstaltung.ects,lehre.tbl_lehrveranstaltung.semesterstunden, tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum,
 					tbl_zeugnisnote.insertvon, tbl_zeugnisnote.ext_id, lehre.tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung,
-					tbl_note.bezeichnung as note_bezeichnung, tbl_zeugnisnote.bemerkung as bemerkung, tbl_lehrveranstaltung.sort, tbl_lehrveranstaltung.zeugnis
+					tbl_note.bezeichnung as note_bezeichnung, tbl_zeugnisnote.bemerkung as bemerkung, tbl_lehrveranstaltung.sort, tbl_lehrveranstaltung.zeugnis, tbl_lehrveranstaltung.studiengang_kz
 				FROM
 					lehre.tbl_zeugnisnote
 					JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
@@ -345,6 +346,7 @@ class zeugnisnote
 				$obj->semesterstunden = $row->semesterstunden;
 				$obj->ects = $row->ects;
 				$obj->sort = $row->sort;
+				$obj->studiengang_kz = $row->studiengang_kz;
 				$obj->zeugnis = ($row->zeugnis=='t'?true:false);
 
 				$this->result[] = $obj;
