@@ -46,7 +46,7 @@ $datum = new datum();
 function draw_studienerfolg($uid, $studiensemester_kurzbz)
 {
 	global $conn, $xml, $note_arr, $datum;
-	
+
 	$query = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.bezeichnung, tbl_studentlehrverband.semester, tbl_person.titelpre, tbl_person.titelpost, tbl_person.vorname, tbl_person.nachname,tbl_person.gebdatum, tbl_studiensemester.bezeichnung as sembezeichnung FROM public.tbl_person, public.tbl_student, public.tbl_studiengang, public.tbl_benutzer, public.tbl_studentlehrverband, public.tbl_studiensemester WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_student.student_uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id and tbl_student.student_uid = '".$uid."' and tbl_studentlehrverband.student_uid=tbl_student.student_uid and tbl_studiensemester.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz and tbl_studentlehrverband.studiensemester_kurzbz = '".$studiensemester_kurzbz."'";
 
 	if($result = pg_query($conn, $query))
@@ -65,7 +65,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	if($result_semester = pg_query($conn, $qry_semester))
 		if($row_semester = pg_fetch_object($result_semester))
 			$semester_aktuell=$row_semester->semester;
-			
+
 	if($semester_aktuell=='')
 		$studiensemester_aktuell='';
 	$stgl_query = "SELECT titelpre, titelpost, vorname, nachname FROM public.tbl_person, public.tbl_benutzer, public.tbl_benutzerfunktion WHERE tbl_person.person_id = tbl_benutzer.person_id and tbl_benutzer.uid = tbl_benutzerfunktion.uid and tbl_benutzerfunktion.funktion_kurzbz = 'stgl' and tbl_benutzerfunktion.studiengang_kz = '".$row->studiengang_kz."'";
@@ -74,7 +74,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	else
 		die('Studiengangsleiter wurde nicht gefunden');
 	$xml .= "	<studienerfolg>";
-	$xml .= "		<logopath>".XML_ROOT."../skin/images/</logopath>";
+	$xml .= "		<logopath>".DOC_ROOT."skin/images/</logopath>";
 	$xml .= "		<studiensemester>".$row->sembezeichnung."</studiensemester>";
 	$xml .= "		<studiensemester_aktuell>".$studiensemester_aktuell."</studiensemester_aktuell>";
 	$xml .=	"		<semester>".$row->semester."</semester>";
@@ -91,14 +91,14 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	$xml .= "		<studiensemester_kurzbz>".$studiensemester_kurzbz."</studiensemester_kurzbz>";
 	$datum_aktuell = date('d.m.Y');
 	$xml .= "		<datum>".$datum_aktuell."</datum>";
-	
+
 	if(isset($_REQUEST['typ']) && $_REQUEST['typ']=='finanzamt')
 		$xml .= "		<finanzamt>(gem‰ﬂ ß2 Abs. 1 lit.b des Familienlastenausgleichsgesetzes 1967 zur Vorlage beim Wohnsitzfinanzamt)</finanzamt>";
-	else 
+	else
 		$xml .= "		<finanzamt></finanzamt>";
-	
+
 	$obj = new zeugnisnote($conn, null, null, null, false);
-	
+
 	$obj->getZeugnisnoten($lehrveranstaltung_id=null, $uid, $studiensemester_kurzbz);
 
 	$qry = "SELECT wochen FROM public.tbl_semesterwochen WHERE studiengang_kz='$row->studiengang_kz' AND semester='$row->semester'";
@@ -110,12 +110,12 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 			$wochen = $row_wochen->wochen;
 		}
 	}
-	
+
 	$gesamtstunden=0;
 	$gesamtects=0;
 	$notensumme=0;
 	$anzahl=0;
-	foreach ($obj->result as $row)	
+	foreach ($obj->result as $row)
 	{
 		//Note darf nicht teilnote(0), negativ(5), noch nicht eingetragen(7), nicht beurteilt (9), nicht erfolgreich absolviert (13), angerechnet(6) sein
 		if($row->zeugnis && $row->note!=0 && $row->note!=5 && $row->note!=7 && $row->note!=9 && $row->note!=13 && $row->note!=6)
@@ -134,7 +134,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 				if($row->benotungsdatum!='')
 					$xml .= "				<benotungsdatum>".date('d.m.Y',$datum->mktime_fromtimestamp($row->benotungsdatum))."</benotungsdatum>";
 				$xml .= "			</unterrichtsfach>";
-				
+
 				$gesamtstunden +=$row->semesterstunden;
 				$gesamtects += $row->ects;
 				if(is_numeric($note))
@@ -145,28 +145,28 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 			}
 		}
 	}
-	
-	
+
+
 	if($anzahl!=0)
 	{
 		$schnitt = ($notensumme/$anzahl);
 	}
-	else 
+	else
 		$schnitt = 0;
 	$xml .= "		<gesamtstunden>$gesamtstunden</gesamtstunden>";
 	$xml .= "		<gesamtects>$gesamtects</gesamtects>";
 	$xml .= "		<schnitt>".sprintf('%.2f',$schnitt)."</schnitt>";
 	$xml .= "	</studienerfolg>";
 }
-	
+
 if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 {
 
 	if(isset($_GET['uid']))
 		$uid = $_GET['uid'];
-	else 
+	else
 		$uid = null;
-	
+
 	$uid_arr = explode(";",$uid);
 
 	if ($uid_arr[0] == "")
@@ -174,23 +174,23 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		unset($uid_arr[0]);
 		$uid_arr = array_values($uid_arr);
 	}
-	
+
 	$note_arr = array();
 	$note = new note($conn);
 	$note->getAll();
 	foreach ($note->result as $n)
 		$note_arr[$n->note] = $n->anmerkung;
-		
+
 	if(isset($_GET['ss']))
 		$studiensemester_kurzbz = $_GET['ss'];
-	else 
+	else
 		$studiensemester_kurzbz = $semester_aktuell;
-		
+
 	//Daten holen
-	
+
 	$xml = "<?xml version='1.0' encoding='ISO-8859-15' standalone='yes'?>\n";
 	$xml .= "<studienerfolge>";
-	
+
 	if(isset($_GET['all']))
 	{
 		for ($i = 0; $i < sizeof($uid_arr); $i++)
@@ -202,15 +202,15 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					draw_studienerfolg($uid_arr[$i], $row->studiensemester_kurzbz);
 		}
 	}
-	else 
+	else
 	{
 		//Studienbestaetigung fuer ein bestimmtes Semester
 		for ($i = 0; $i < sizeof($uid_arr); $i++)
-		{	
+		{
 			draw_studienerfolg($uid_arr[$i], $studiensemester_kurzbz);
 		}
 	}
-	
+
 	$xml .= "</studienerfolge>";
 	echo $xml;
 }
