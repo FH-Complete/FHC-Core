@@ -77,7 +77,7 @@ if ($result_stg=pg_query($conn, $qry_stg))
 {
 	while($row_stg=pg_fetch_object($result_stg))
 	{
-		$max[$row_stg->studiengang_kz]=$row->max_semester;
+		$max[$row_stg->studiengang_kz]=$row_stg->max_semester;
 	}
 }	
 	
@@ -132,13 +132,13 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 			if($row_status=pg_fetch_object($result_status))
 			{
 				//Studenten im letzten Semester bleiben dort, wenn aktiv
-				if($row->semester_stlv<$max[$stg_kz] || $row->semester_stlv==0)
+				if($row->semester_stlv>$max[$stg_kz] || $row->semester_stlv==0)
 				{
-					$s=$row->semester_stlv+1;
+					$s=$row->semester_stlv;
 				}
 				else
 				{
-					$s=$row->semester_stlv;
+					$s=$row->semester_stlv+1;
 				}
 				//Lehrverbandgruppe anlegen, wenn noch nicht vorhanden
 				$qry_lvb="SELECT * FROM public.tbl_lehrverband 
@@ -158,7 +158,8 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 				//Überprüfen ob Eintrag schon vorhanden
 				$qry_chk="SELECT * FROM public.tbl_studentlehrverband 
 						WHERE student_uid=".myaddslashes($row->student_uid)." 
-						AND studiengang_kz=".myaddslashes($row->studiengang_kz).";";
+						AND studiengang_kz=".myaddslashes($row->studiengang_kz)."
+						AND semester=".$s.";";
 				$sql='';
 				if(pg_num_rows(pg_query($conn, $qry_chk))<1)
 				{
