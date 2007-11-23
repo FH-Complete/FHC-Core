@@ -73,8 +73,10 @@ if(isset($_GET['typ']))
 
 
 $konto = new konto($conn);
-if (($user == $_GET["uid"]) and $konto->checkStudienbeitrag($user, $_GET["ss"]))
+if (($user == $_GET["uid"]))
 {
+	if($xsl=='Inskription' && (!$konto->checkStudienbeitrag($user, $_GET["ss"])))
+		die('Der Studienbeitrag wurde noch nicht bezahlt');		
 
 	//Berechtigung pruefen
 	$rechte = new benutzerberechtigung($conn);

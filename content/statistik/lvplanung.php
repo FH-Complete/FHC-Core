@@ -102,7 +102,7 @@ if($studiengang_kz!='') //Liste nach Studiengang
 				tbl_lehrfach.kurzbz as lf_kurzbz, tbl_lehrfach.bezeichnung as lf_bezeichnung, tbl_lehreinheit.lehreinheit_id as lehreinheit_id,
 				tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz, tbl_lehreinheitmitarbeiter.semesterstunden as lektor_semesterstunden,
 				tbl_lehreinheitmitarbeiter.stundensatz as lektor_stundensatz, tbl_lehreinheitmitarbeiter.faktor as lektor_faktor,
-				tbl_person.vorname, tbl_person.nachname
+				tbl_person.vorname, tbl_person.nachname, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester
 			FROM
 				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter,
 				lehre.tbl_lehrfach, public.tbl_benutzer, public.tbl_person
@@ -126,7 +126,7 @@ $qry = "SELECT
 				tbl_lehrfach.kurzbz as lf_kurzbz, tbl_lehrfach.bezeichnung as lf_bezeichnung, tbl_lehreinheit.lehreinheit_id as lehreinheit_id,
 				tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz, tbl_lehreinheitmitarbeiter.semesterstunden as lektor_semesterstunden,
 				tbl_lehreinheitmitarbeiter.stundensatz as lektor_stundensatz, tbl_lehreinheitmitarbeiter.faktor as lektor_faktor,
-				tbl_person.vorname, tbl_person.nachname
+				tbl_person.vorname, tbl_person.nachname, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester
 			FROM
 				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter,
 				lehre.tbl_lehrfach, public.tbl_benutzer, public.tbl_person
@@ -148,7 +148,7 @@ $qry = "SELECT
 				tbl_lehrfach.kurzbz as lf_kurzbz, tbl_lehrfach.bezeichnung as lf_bezeichnung, tbl_lehreinheit.lehreinheit_id as lehreinheit_id,
 				tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz, tbl_lehreinheitmitarbeiter.semesterstunden as lektor_semesterstunden,
 				tbl_lehreinheitmitarbeiter.stundensatz as lektor_stundensatz, tbl_lehreinheitmitarbeiter.faktor as lektor_faktor,
-				tbl_person.vorname, tbl_person.nachname
+				tbl_person.vorname, tbl_person.nachname, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester
 			FROM
 				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter,
 				lehre.tbl_lehrfach, public.tbl_benutzer, public.tbl_person
@@ -160,7 +160,7 @@ $qry = "SELECT
 				tbl_person.person_id=tbl_benutzer.person_id AND
 				tbl_lehrfach.fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."' AND
 				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."'";
-	$qry.=" ORDER BY tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehreinheit.lehreinheit_id";	
+	$qry.=" ORDER BY tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehreinheit.lehreinheit_id";	
 }
 else 
 	die('Fehlerhafte Parameteruebergabe');
@@ -206,7 +206,7 @@ if($result = pg_query($conn, $qry))
 			}
 			$last_lva=$row->lehrveranstaltung_id;
 			echo '<tr class="liste1">';
-			echo '<td>'.$row->kurzbz.'</td>';
+			echo '<td>'.$stg_arr[$row->studiengang_kz].'-'.$row->semester.' '.$row->kurzbz.'</td>';
 			echo '<td>'.$row->bezeichnung.'</td>';
 			echo '<td>&nbsp;</td>';
 			echo '<td>'.$row->ects.'</td>';

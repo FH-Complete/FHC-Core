@@ -74,6 +74,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	else
 		die('Studiengangsleiter wurde nicht gefunden');
 	$xml .= "	<studienerfolg>";
+	$xml .= "		<logopath>".XML_ROOT."../skin/images/</logopath>";
 	$xml .= "		<studiensemester>".$row->sembezeichnung."</studiensemester>";
 	$xml .= "		<studiensemester_aktuell>".$studiensemester_aktuell."</studiensemester_aktuell>";
 	$xml .=	"		<semester>".$row->semester."</semester>";
