@@ -62,9 +62,9 @@ if (is_null($studiensemester_kurzbz))
 {
 	$studiensemester_kurzbz=$ss->getakt();
 }
-$studiensemester_kurzbz_akt=$ss->getakt();
+$studiensemester_kurzbz_akt=$ss->getakt();			//aktuelles Semester
 $ss->getNextStudiensemester();
-$studiensemester_kurzbz_zk=$ss->studiensemester_kurzbz;
+$studiensemester_kurzbz_zk=$ss->studiensemester_kurzbz;	//nächstes Semester
 
 
 if(!is_numeric($stg_kz))
@@ -72,7 +72,7 @@ if(!is_numeric($stg_kz))
 if(!is_numeric($semester))
 	$semester=100;
 
-
+//select für die Anzeige
 $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester as semester_stlv,  tbl_studentlehrverband.verband as verband_stlv, 
 			tbl_studentlehrverband.gruppe as gruppe_stlv FROM tbl_studentlehrverband JOIN tbl_student USING (student_uid)
 				JOIN tbl_benutzer ON (student_uid=uid)
@@ -81,7 +81,7 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 			AND studiensemester_kurzbz='$studiensemester_kurzbz' ";
 if($semester<100)
 {
-	$sql_query.="AND tbl_studentlehrverband.semester='$semester' ";
+	$sql_query.="AND tbl_studentlehrverband.semester='$semester' "; //semester = 100 wählt alle aus
 }
 $sql_query.="ORDER BY semester, nachname";
 
@@ -90,19 +90,20 @@ if (!$result_std=pg_query($conn, $sql_query))
 	error("Studenten not found!");
 $outp='';
 
-// ****************************** Vorruecken ******************************
+// ****************************** Vorrücken ******************************
 if (isset($_POST['vorr']))
 {
-
+//select für die Vorrückung
 $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester as semester_stlv,  tbl_studentlehrverband.verband as verband_stlv, 
 			tbl_studentlehrverband.gruppe as gruppe_stlv FROM tbl_studentlehrverband JOIN tbl_student USING (student_uid)
 			JOIN tbl_benutzer ON (student_uid=uid)
 			JOIN tbl_person USING (person_id)
 			WHERE tbl_benutzer.aktiv AND tbl_studentlehrverband.studiengang_kz='$stg_kz' 
-			AND studiensemester_kurzbz='$studiensemester_kurzbz_akt' ";
+			AND studiensemester_kurzbz='$studiensemester_kurzbz_akt' 
+			AND semester_stlv>0";
 	if($semester<100)
 	{
-		$sql_query.="AND tbl_studentlehrverband.semester='$semester' ";
+		$sql_query.="AND tbl_studentlehrverband.semester='$semester' "; //semester = 100 wählt alle aus
 	}
 	$sql_query.="ORDER BY semester, nachname";
 	
@@ -112,6 +113,7 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 	$next_ss=$studiensemester_kurzbz_zk;
 	while($row=pg_fetch_object($result_std))
 	{
+		//aktuelle Rolle laden
 		$qry_status="SELECT rolle_kurzbz FROM public.tbl_prestudentrolle JOIN public.tbl_prestudent USING(prestudent_id) 
 		WHERE person_id=".myaddslashes($row->person_id)." 
 		AND studiengang_kz=".$row->studiengang_kz."  
@@ -193,7 +195,9 @@ $outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semester=100&studi
 <body class="Background_main">
 <?php
 
-echo "<H2>Studenten Vorr&uuml;ckung (".$s[$stg_kz]->kurzbz." - ".($semester<100?$semester:'alle')." - ".$studiensemester_kurzbz."), DB:".substr(CONN_STRING,strpos(CONN_STRING,'dbname=')+7,strpos(CONN_STRING,'user=')-strpos(CONN_STRING,'dbname=')-7)."</H2>";
+echo "<H2>Studenten Vorr&uuml;ckung (".$s[$stg_kz]->kurzbz." - ".($semester<100?$semester:'alle')." - ".
+	$studiensemester_kurzbz."), DB:".substr(CONN_STRING,strpos(CONN_STRING,'dbname=')+7,
+	strpos(CONN_STRING,'user=')-strpos(CONN_STRING,'dbname=')-7)."</H2>";
 
 echo '<form action="" method="POST">';
 echo '<table width="70%"><tr><td>';
