@@ -72,7 +72,9 @@ if(!is_numeric($stg_kz))
 if(!is_numeric($semester))
 	$semester=100;
 
-$sql_query="SELECT tbl_student.*,tbl_person.* FROM tbl_studentlehrverband JOIN tbl_student USING (student_uid)
+
+$sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester as semester_stlv,  tbl_studentlehrverband.verband as verband_stlv, 
+			tbl_studentlehrverband.gruppe as gruppe_stlv FROM tbl_studentlehrverband JOIN tbl_student USING (student_uid)
 				JOIN tbl_benutzer ON (student_uid=uid)
 				JOIN tbl_person USING (person_id)
 			WHERE tbl_benutzer.aktiv AND tbl_studentlehrverband.studiengang_kz='$stg_kz' 
@@ -92,7 +94,8 @@ $outp='';
 if (isset($_POST['vorr']))
 {
 
-	$sql_query="SELECT tbl_student.*,tbl_person.* FROM tbl_studentlehrverband JOIN tbl_student USING (student_uid)
+$sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester as semester_stlv,  tbl_studentlehrverband.verband as verband_stlv, 
+			tbl_studentlehrverband.gruppe as gruppe_stlv FROM tbl_studentlehrverband JOIN tbl_student USING (student_uid)
 			JOIN tbl_benutzer ON (student_uid=uid)
 			JOIN tbl_person USING (person_id)
 			WHERE tbl_benutzer.aktiv AND tbl_studentlehrverband.studiengang_kz='$stg_kz' 
@@ -118,18 +121,18 @@ if (isset($_POST['vorr']))
 		{
 			if($row_status=pg_fetch_object($result_status))
 			{
-				$s=$row->semester+1;
+				$s=$row->semester_stlv+1;
 				//Lehrverbandgruppe anlegen, wenn noch nicht vorhanden
 				$qry_lvb="SELECT * FROM public.tbl_lehrverband 
 				WHERE studiengang_kz=".myaddslashes($row->studiengang_kz)." AND semester=".myaddslashes($s)."
-				AND verband=".myaddslashes($row->verband)." AND gruppe=".myaddslashes($row->gruppe).";";
+				AND verband=".myaddslashes($row->verband_stlv)." AND gruppe=".myaddslashes($row->gruppe_stlv).";";
 				if(pg_num_rows(pg_query($conn, $qry_lvb))<1)
 				{
 					$lvb_ins="INSERT INTO public.tbl_lehrverband VALUES (".
 					myaddslashes($row->studiengang_kz).", ".
 					myaddslashes($s).", ".
-					myaddslashes($row->verband).", ".
-					myaddslashes($row->gruppe).", 
+					myaddslashes($row->verband_stlv).", ".
+					myaddslashes($row->gruppe_stlv).", 
 					TRUE, NULL, NULL);";
 					if (!$r=pg_query($conn, $lvb_ins))
 						die(pg_last_error($conn));
@@ -137,10 +140,10 @@ if (isset($_POST['vorr']))
 				//Eintragen der neuen Gruppe und Rolle
 				$sql="INSERT INTO tbl_studentlehrverband
 					VALUES ('$row->student_uid','$next_ss','$row->studiengang_kz',
-					'$s','$row->verband','$row->gruppe',NULL,NULL,now(),'$user',NULL);
+					'$s','$row->verband_stlv','$row->gruppe_stlv',NULL,NULL,now(),'$user',NULL);
 					INSERT INTO tbl_prestudentrolle
-					VALUES ($row->prestudent_id,'$row_status->rolle_kurzbz','$next_ss',$s,now(),now(),'$user',NULL,NULL,NULL);
-					UPDATE tbl_student SET semester=$s WHERE student_uid='$row->student_uid'";
+					VALUES ($row->prestudent_id,'$row_status->rolle_kurzbz','$next_ss',$s,now(),now(),'$user',
+					NULL,NULL,NULL);";
 				if (!$r=pg_query($conn, $sql))
 					die(pg_last_error($conn));
 			}
@@ -221,13 +224,13 @@ if ($result_std!=0)
 			if($row_status=pg_fetch_object($result_status))
 			{
 				echo "<tr>";
-				echo "<td>$row->nachname</td><td>$row->vorname</td><td>$row->studiengang_kz</td><td>$row->semester</td><td>$row->verband</td><td>$row->gruppe</td><td>$row_status->rolle_kurzbz</td>";
+				echo "<td>$row->nachname</td><td>$row->vorname</td><td>$row->studiengang_kz</td><td>$row->semester_stlv</td><td>$row->verband_stlv</td><td>$row->gruppe_stlv</td><td>$row_status->rolle_kurzbz</td>";
 				echo "</tr>\n";
 			}
 			else 
 			{
 				echo "<tr>";
-				echo "<td>$row->nachname</td><td>$row->vorname</td><td>$row->studiengang_kz</td><td>$row->semester</td><td>$row->verband</td><td>$row->gruppe</td><td></td>";
+				echo "<td>$row->nachname</td><td>$row->vorname</td><td>$row->studiengang_kz</td><td>$row->semester_stlv</td><td>$row->verband_stlv</td><td>$row->gruppe_stlv</td><td></td>";
 				echo "</tr>\n";
 			}
 		}
