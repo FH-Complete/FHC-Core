@@ -163,6 +163,7 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 						AND studiensemester_kurzbz=".myaddslashes($next_ss).";";
 				if(pg_num_rows(pg_query($conn, $qry_chk))<1)
 				{
+					//Eintragen des neuen Status
 					$sql.="INSERT INTO tbl_prestudentrolle
 					VALUES ($row->prestudent_id,'$row_status->rolle_kurzbz','$next_ss',$s,now(),now(),'$user',
 					NULL, NULL, NULL);";
