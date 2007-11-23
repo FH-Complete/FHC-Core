@@ -99,8 +99,7 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 			JOIN tbl_benutzer ON (student_uid=uid)
 			JOIN tbl_person USING (person_id)
 			WHERE tbl_benutzer.aktiv AND tbl_studentlehrverband.studiengang_kz='$stg_kz' 
-			AND studiensemester_kurzbz='$studiensemester_kurzbz_akt' 
-			AND semester_stlv>0";
+			AND studiensemester_kurzbz='$studiensemester_kurzbz_akt'";
 	if($semester<100)
 	{
 		$sql_query.="AND tbl_studentlehrverband.semester='$semester' "; //semester = 100 wählt alle aus
@@ -123,7 +122,15 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 		{
 			if($row_status=pg_fetch_object($result_status))
 			{
-				$s=$row->semester_stlv+1;
+				//Studenten im letzten Semester bleiben dort, wenn aktiv
+				if($row->semester_stlv<$s[$stg_kz]->max_sem || $row->semester_stlv==0)
+				{
+					$s=$row->semester_stlv+1;
+				}
+				else
+				{
+					$s=$row->semester_stlv;
+				}
 				//Lehrverbandgruppe anlegen, wenn noch nicht vorhanden
 				$qry_lvb="SELECT * FROM public.tbl_lehrverband 
 				WHERE studiengang_kz=".myaddslashes($row->studiengang_kz)." AND semester=".myaddslashes($s)."
@@ -139,15 +146,34 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 					if (!$r=pg_query($conn, $lvb_ins))
 						die(pg_last_error($conn));
 				}
-				//Eintragen der neuen Gruppe und Rolle
-				$sql="INSERT INTO tbl_studentlehrverband
-					VALUES ('$row->student_uid','$next_ss','$row->studiengang_kz',
-					'$s','$row->verband_stlv','$row->gruppe_stlv',NULL,NULL,now(),'$user',NULL);
-					INSERT INTO tbl_prestudentrolle
+				//Überprüfen ob Eintrag schon vorhanden
+				$qry_chk="SELECT * FROM public.tbl_studentlehrverband 
+						WHERE student_uid=".myaddslashes($row->student_uid)." 
+						AND studiengang_kz=".myaddslashes($row->studiengang_kz).";";
+				$sql='';
+				if(pg_num_rows(pg_query($conn, $qry_chk))<1)
+				{
+					//Eintragen der neuen Gruppe
+					$sql="INSERT INTO tbl_studentlehrverband
+						VALUES ('$row->student_uid','$next_ss','$row->studiengang_kz',
+						'$s','$row->verband_stlv','$row->gruppe_stlv',NULL,NULL,now(),'$user',NULL);";
+				}
+				$qry_chk="SELECT * FROM public.tbl_prestudentrolle
+						WHERE prestudent_id=".myaddslashes($row->prestudent_id)." 
+						AND studiensemester_kurzbz=".myaddslashes($next_ss).";";
+				if(pg_num_rows(pg_query($conn, $qry_chk))<1)
+				{
+					$sql.="INSERT INTO tbl_prestudentrolle
 					VALUES ($row->prestudent_id,'$row_status->rolle_kurzbz','$next_ss',$s,now(),now(),'$user',
-					NULL,NULL,NULL);";
-				if (!$r=pg_query($conn, $sql))
-					die(pg_last_error($conn));
+					NULL, NULL, NULL);";
+				}
+				if($sql!='')
+				{
+					if (!$r=pg_query($conn, $sql))
+					{
+						die(pg_last_error($conn));
+					}
+				}
 			}
 		}
 	}
