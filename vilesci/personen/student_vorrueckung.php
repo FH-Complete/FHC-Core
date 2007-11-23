@@ -132,7 +132,7 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 			if($row_status=pg_fetch_object($result_status))
 			{
 				//Studenten im letzten Semester bleiben dort, wenn aktiv
-				if($row->semester_stlv>$max[$stg_kz] || $row->semester_stlv==0)
+				if($row->semester_stlv>=$max[$stg_kz] || $row->semester_stlv==0)
 				{
 					$s=$row->semester_stlv;
 				}
@@ -158,6 +158,7 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 				//Überprüfen ob Eintrag schon vorhanden
 				$qry_chk="SELECT * FROM public.tbl_studentlehrverband 
 						WHERE student_uid=".myaddslashes($row->student_uid)." 
+						AND studiensemester_kurzbz=".myaddslashes($next_ss)." 
 						AND studiengang_kz=".myaddslashes($row->studiengang_kz)."
 						AND semester=".$s.";";
 				$sql='';
