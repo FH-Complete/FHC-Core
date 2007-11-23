@@ -72,6 +72,15 @@ if(!is_numeric($stg_kz))
 if(!is_numeric($semester))
 	$semester=100;
 
+$qry_stg="SELECT * FROM public.tbl_studiengang";
+if ($result_stg=pg_query($conn, $qry_stg))
+{
+	while($row_stg=pg_fetch_object($result_stg))
+	{
+		$max[$row_stg->studiengang_kz]=$row->max_semester;
+	}
+}	
+	
 //select für die Anzeige
 $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester as semester_stlv,  tbl_studentlehrverband.verband as verband_stlv, 
 			tbl_studentlehrverband.gruppe as gruppe_stlv FROM tbl_studentlehrverband JOIN tbl_student USING (student_uid)
@@ -123,7 +132,7 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 			if($row_status=pg_fetch_object($result_status))
 			{
 				//Studenten im letzten Semester bleiben dort, wenn aktiv
-				if($row->semester_stlv<$s[$stg_kz]->max_sem || $row->semester_stlv==0)
+				if($row->semester_stlv<$max[$stg_kz] || $row->semester_stlv==0)
 				{
 					$s=$row->semester_stlv+1;
 				}
