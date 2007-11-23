@@ -20,7 +20,12 @@
 				
 					<!-- Logo -->
 					<fo:block>
-						<fo:external-graphic src="../skin/images/logo.jpg"  posx="140" posy="15" width="60mm" height="20mm" />
+						<!--<fo:external-graphic src="../skin/images/logo.jpg"  posx="140" posy="15" width="60mm" height="20mm" />-->
+						<fo:external-graphic  posx="140" posy="15" width="60mm" height="20mm" >
+							 <xsl:attribute name="src">
+							  	<xsl:value-of select="logopath" />logo.jpg
+							 </xsl:attribute>
+						</fo:external-graphic>
 					</fo:block>
 					
 					<!-- Titel -->

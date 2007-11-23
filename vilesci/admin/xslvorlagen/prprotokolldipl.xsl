@@ -26,8 +26,8 @@
 
 					<fo:block-container position="absolute" top="35mm" left="15mm">
 						<fo:block text-align="left" line-height="10pt" font-family="sans-serif" font-size="8pt">
-							abgehalten an dem Fachhochschul-Studiengang <xsl:value-of select="stg_bezeichnung" /> gem‰ﬂ (FhStG), BGBl <xsl:value-of select="bescheidbgbl1" /> idgF BGBl. <xsl:value-of select="bescheidbgbl2" /> und dem mit Bescheid des Fachhochschulrates\n
-							GZ: <xsl:value-of select="bescheidgz" /> vom <xsl:value-of select="bescheidvom" /> genehmigten Antrag.
+							abgehalten an dem Fachhochschul-Studiengang <xsl:value-of select="stg_bezeichnung" /> gem‰ﬂ (FhStG), BGBl <xsl:value-of select="bescheidbgbl1" /> idgF BGBl. <xsl:value-of select="bescheidbgbl2" /> und dem mit Bescheid\n 
+							des Fachhochschulrates GZ: <xsl:value-of select="bescheidgz" /> vom <xsl:value-of select="bescheidvom" /> genehmigten Antrag.
 						</fo:block>
 					</fo:block-container>
 					

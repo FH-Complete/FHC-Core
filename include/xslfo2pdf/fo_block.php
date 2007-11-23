@@ -204,7 +204,7 @@ class FO_ExternalGraphic extends FO_Block
                 
     $pdf = $this->getPdf();
     
-    $src = $this->getContext("src");    
+    $src = trim($this->getContext("src"));
     $width = $this->getContext("width");
     $height = $this->getContext("height");
     $x = $this->getContext("posx");
