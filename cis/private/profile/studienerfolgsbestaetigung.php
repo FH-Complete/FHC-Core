@@ -43,8 +43,13 @@
 function createStudienerfolg()
 {
 	var stsem = document.getElementById('stsem').value;
+	var finanzamt = document.getElementById('finanzamt').checked;
 	
-	window.location.href= '../pdfExport.php?xml=studienerfolg.rdf.php&xsl=Studienerfolg&ss='+stsem+'&uid=<?php echo $uid;?>&typ=finanzamt';
+	if(finanzamt)
+		finanzamt = '&typ=finanzamt';
+	else
+		finanzamt = '';
+	window.location.href= '../pdfExport.php?xml=studienerfolg.rdf.php&xsl=Studienerfolg&ss='+stsem+'&uid=<?php echo $uid;?>'+finanzamt;
 }
 </script>
 </head>
@@ -82,8 +87,8 @@ function createStudienerfolg()
 			}
 			
 			echo '</SELECT>';
-			
-			echo '&nbsp;&nbsp;&nbsp;<INPUT type="button" value="Erstellen" onclick="createStudienerfolg()" />';
+			echo '<br><br><INPUT type="checkbox" id="finanzamt">zur Vorlage beim Wohnsitzfinanzamt<br>';
+			echo '<br><br><INPUT type="button" value="Erstellen" onclick="createStudienerfolg()" />';
 		}
 		
 	?>
