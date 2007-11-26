@@ -32,7 +32,8 @@ function myaddslashes($var)
 {
 	return ($var!=''?"'".addslashes($var)."'":'null');
 }
-   
+
+$ausbildungssemester=0;
 $s=new studiengang($conn);
 $s->getAll('typ, kurzbz', true);
 $studiengang=$s->result;
@@ -122,7 +123,7 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 	while($row=pg_fetch_object($result_std))
 	{
 		//aktuelle Rolle laden
-		$qry_status="SELECT rolle_kurzbz FROM public.tbl_prestudentrolle JOIN public.tbl_prestudent USING(prestudent_id) 
+		$qry_status="SELECT rolle_kurzbz,  ausbildungssemester FROM public.tbl_prestudentrolle JOIN public.tbl_prestudent USING(prestudent_id) 
 		WHERE person_id=".myaddslashes($row->person_id)." 
 		AND studiengang_kz=".$row->studiengang_kz."  
 		AND studiensemester_kurzbz=".myaddslashes($studiensemester_kurzbz_akt)." 
@@ -139,6 +140,14 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 				else
 				{
 					$s=$row->semester_stlv+1;
+				}
+				if($row_status->ausbildungssemester>=$max[$stg_kz] || $row_status->rolle_kurzbz=="Unterbrecher")
+				{
+					$ausbildungssemester=$row_status->ausbildungssemester;
+				}
+				else 
+				{
+					$ausbildungssemester=$row_status->ausbildungssemester+1;
 				}
 				//Lehrverbandgruppe anlegen, wenn noch nicht vorhanden
 				$qry_lvb="SELECT * FROM public.tbl_lehrverband 
@@ -176,14 +185,15 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 				{
 					//Eintragen des neuen Status
 					$sql.="INSERT INTO tbl_prestudentrolle
-					VALUES ($row->prestudent_id,'$row_status->rolle_kurzbz','$next_ss',$s,now(),now(),'$user',
-					NULL, NULL, NULL);";
+					VALUES ($row->prestudent_id, '$row_status->rolle_kurzbz', '$next_ss',
+						$ausbildungssemester, now(), now(), '$user',
+					NULL, NULL, NULL, NULL);";
 				}
 				if($sql!='')
 				{
 					if (!$r=pg_query($conn, $sql))
 					{
-						die(pg_last_error($conn));
+						die(pg_last_error($conn)."<br>".$sql);
 					}
 				}
 			}
@@ -254,25 +264,25 @@ if ($result_std!=0)
 {
 	$num_rows=pg_num_rows($result_std);
 	echo 'Anzahl: '.$num_rows;
-	echo "<th class='table-sortable:default'>Nachname</th><th class='table-sortable:default'>Vorname</th><th class='table-sortable:default'>STG</th><th class='table-sortable:default'>Sem</th><th class='table-sortable:default'>Ver</th><th class='table-sortable:default'>Grp</th><th class='table-sortable:default'>Status</th>\n";
+	echo "<th class='table-sortable:default'>Nachname</th><th class='table-sortable:default'>Vorname</th><th class='table-sortable:default'>STG</th><th class='table-sortable:default'>Sem</th><th class='table-sortable:default'>Ver</th><th class='table-sortable:default'>Grp</th><th class='table-sortable:default'>Status</th><th class='table-sortable:default'>AusbSem</th>\n";
 	echo "</tr></thead>";
 	echo "<tbody>";
 	for($i=0;$i<$num_rows;$i++)
 	{
 		$row=pg_fetch_object($result_std,$i);
-		$qry_status="SELECT rolle_kurzbz FROM public.tbl_prestudentrolle JOIN public.tbl_prestudent USING(prestudent_id) WHERE person_id=".myaddslashes($row->person_id)." AND studiengang_kz=".$row->studiengang_kz."  AND studiensemester_kurzbz=".myaddslashes($studiensemester_kurzbz)." ORDER BY datum desc, tbl_prestudentrolle.insertamum desc, tbl_prestudentrolle.ext_id desc LIMIT 1;";
+		$qry_status="SELECT rolle_kurzbz, ausbildungssemester FROM public.tbl_prestudentrolle JOIN public.tbl_prestudent USING(prestudent_id) WHERE person_id=".myaddslashes($row->person_id)." AND studiengang_kz=".$row->studiengang_kz."  AND studiensemester_kurzbz=".myaddslashes($studiensemester_kurzbz)." ORDER BY datum desc, tbl_prestudentrolle.insertamum desc, tbl_prestudentrolle.ext_id desc LIMIT 1;";
 		if ($result_status=pg_query($conn, $qry_status))
 		{
 			if($row_status=pg_fetch_object($result_status))
 			{
 				echo "<tr>";
-				echo "<td>$row->nachname</td><td>$row->vorname</td><td>$row->studiengang_kz</td><td>$row->semester_stlv</td><td>$row->verband_stlv</td><td>$row->gruppe_stlv</td><td>$row_status->rolle_kurzbz</td>";
+				echo "<td>$row->nachname</td><td>$row->vorname</td><td>$row->studiengang_kz</td><td>$row->semester_stlv</td><td>$row->verband_stlv</td><td>$row->gruppe_stlv</td><td>$row_status->rolle_kurzbz</td><td>$row_status->ausbildungssemester</td>";
 				echo "</tr>\n";
 			}
 			else 
 			{
 				echo "<tr>";
-				echo "<td>$row->nachname</td><td>$row->vorname</td><td>$row->studiengang_kz</td><td>$row->semester_stlv</td><td>$row->verband_stlv</td><td>$row->gruppe_stlv</td><td></td>";
+				echo "<td>$row->nachname</td><td>$row->vorname</td><td>$row->studiengang_kz</td><td>$row->semester_stlv</td><td>$row->verband_stlv</td><td>$row->gruppe_stlv</td><td></td><td></td>";
 				echo "</tr>\n";
 			}
 		}
