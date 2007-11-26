@@ -76,7 +76,7 @@ $staat=array();
 
 <?php
 //Array für Nationen erzeugen
-$qry_staat="SELECT __staat, chkurzbez from sync.stp_staat";
+$qry_staat="SELECT __staat, chkurzbez FROM sync.stp_staat";
 if($result_staat = pg_query($conn, $qry_staat))
 {
 	while($row_staat = pg_fetch_object($result_staat))
@@ -265,12 +265,19 @@ echo "<br>Eingefügt:  ".$eingefuegt;
 echo "<br>Doppelt:     ".$dublette;
 echo "<br>Fehler:       ".$fehler;
 echo "<br><br>";
-echo nl2br($error_log);
+if($error_log=='')
+{
+	echo "o.k.<br>";
+}
+else 
+{
+	echo nl2br($error_log);
+}
 echo nl2br($ausgabe);
 
-mail($adress, 'SYNC-Fehler StP-Student von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");
+mail($adress, 'SYNC-Fehler StP-Person von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");
 
-mail($adress, 'SYNC StP-Student  von '.$_SERVER['HTTP_HOST'], "Sync Student\n------------\n\n"
+mail($adress, 'SYNC StP-Person  von '.$_SERVER['HTTP_HOST'], "Sync Person\n------------\n\n"
 ."Personen: Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Fehler: ".$fehler." / Doppelt: ".$dublette
 ."\n\n".$dateiausgabe."Beginn: ".$start."\nEnde:    ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: vilesci@technikum-wien.at");
 
