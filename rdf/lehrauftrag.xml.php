@@ -318,7 +318,7 @@ function drawLehrauftrag($uid)
 	              tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND student_uid=vw_student.uid
 	              AND tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
 	              tbl_lehreinheit.studiensemester_kurzbz='$ss' AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id ";
-	if($studiengang_kz!='0' && $studiengang_kz!='')
+	if($studiengang_kz!='')
 		$qry.=" AND tbl_lehrveranstaltung.studiengang_kz='$studiengang_kz'";
 	if($result = pg_query($conn, $qry))
 	{
