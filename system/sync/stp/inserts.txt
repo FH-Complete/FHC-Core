@@ -40,3 +40,17 @@ INSERT INTO public.tbl_sprache(sprache) VALUES('Espanol');
 -- Fachbereich
 
 INSERT INTO public.tbl_fachbereich(fachbereich_kurzbz, bezeichnung, farbe, studiengang_kz, ext_id, aktiv) VALUES('Dummy','','','0',null,true);
+
+-- Ausbildung
+
+INSERT INTO bis.tbl_ausbildung VALUES (1, 'PhD', 'Universitätsabschluss mit Doktorat als Zweit- oder Drittabschluss oder PhD-Abschluss');
+INSERT INTO bis.tbl_ausbildung VALUES (3, 'FH-Master', 'Fachhochschulabschluss auf Diplom- oder Masterebene');
+INSERT INTO bis.tbl_ausbildung VALUES (4, 'Univ.-Bachelor', 'Universitäts- oder Hochschulabschluss auf Bachelorebene (einschließlich Kurzstudien)');
+INSERT INTO bis.tbl_ausbildung VALUES (5, 'FH-Bachelor', 'Fachhochschulabschluss auf Bachelorebene');
+INSERT INTO bis.tbl_ausbildung VALUES (6, 'Akad-Diplom', 'Diplom einer Akademie für Lehrerbildung, Akademie für Sozialarbeit, Medizinisch-technische Akademie, Hebammenakademie, Militärakademie oder einer anderen anerkannten postsekundären Bildungseinrichtung');
+INSERT INTO bis.tbl_ausbildung VALUES (8, 'AHS', 'Reifeprüfung an einer allgemeinbildenden höheren Schule');
+INSERT INTO bis.tbl_ausbildung VALUES (9, 'BHS', 'Reife- und Diplomprüfung einer berufsbildenden oder lehrer- und erzieherbildenden höheren Schule');
+INSERT INTO bis.tbl_ausbildung VALUES (10, 'Lehrabschluss', 'Lehrabschlussprüfung, berufsbildende mittlere Schule oder vergleichbare Berufsausbildung');
+INSERT INTO bis.tbl_ausbildung VALUES (11, 'Pflichtschule', 'Pflichtschule');
+INSERT INTO bis.tbl_ausbildung VALUES (7, 'tertiär', 'Anderer tertiärer Bildungsabschluss (Kolleg; Meisterprüfung; Universitätslehrgang oder Lehrgang gemäß §14a Abs.3 FHStG, mit dem kein akademischer Grad verbunden war)');
+INSERT INTO bis.tbl_ausbildung VALUES (2, 'Univ.-Master', 'Universitäts- oder Hochschulabschluss auf Diplom- oder Masterebene, Doktorat der Medizin bzw. der Human- oder Zahnmedizin oder Doktorat auf Grund von Studienvorschriften aus der Zeit vor dem Inkrafttretendes AHStG BGBl. Nr. 177/1966 oder Abschluss eines Universitätslehrganges oder Lehrganges universitären Charakters (§51 Abs. 2 Z 23 UG 2002 oder §§26 Abs.1 und 28 Abs.1 UniStG) oder eines Lehrganges zur Weiterbildung (§14a Abs.2 FHStG) mit Mastergrad');

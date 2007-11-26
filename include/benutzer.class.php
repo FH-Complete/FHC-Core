@@ -27,6 +27,7 @@ class benutzer extends person
 	var $uid;		// varchar(16)
 	var $bnaktiv=true;	// boolean
 	var $alias;		// varchar(256)
+	var $bn_ext_id;
 		
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional einen Benutzer
@@ -116,7 +117,7 @@ class benutzer extends person
 			$this->errormsg = 'person_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(!is_bool($this->aktiv))
+		if(!is_bool($this->bnaktiv))
 		{
 			$this->errormsg = 'aktiv muss ein boolscher wert sein';
 			return false;
@@ -166,7 +167,7 @@ class benutzer extends person
 		
 		if($new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = 'INSERT INTO public.tbl_benutzer (uid, aktiv, alias, person_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
+			$qry = 'INSERT INTO public.tbl_benutzer (uid, aktiv, alias, person_id, insertamum, insertvon, updateamum, updatevon, ext_id) VALUES('.
 			       "'".addslashes($this->uid)."',".
 			       ($this->bnaktiv?'true':'false').','.
 			       $this->addslashes($this->alias).",'".
@@ -174,7 +175,8 @@ class benutzer extends person
 			       $this->addslashes($this->insertamum).",".
 			       $this->addslashes($this->insertvon).",".
 			       $this->addslashes($this->updateamum).",".
-			       $this->addslashes($this->updatevon).");";
+			       $this->addslashes($this->updatevon).",".
+			       $this->addslashes($this->bn_ext_id).");";
 		}
 		else
 		{			
