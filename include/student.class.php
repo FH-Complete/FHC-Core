@@ -211,8 +211,8 @@ class student extends benutzer
 					$this->studiengang_kz.','.
 					$this->semester.','.
 					($this->ext_id_student!=''?$this->ext_id_student:'null').','.
-					($this->verband!=''?"'".addslashes($this->verband)."'":' ').','.
-					($this->gruppe!=''?"'".addslashes($this->gruppe)."'":' ').','.
+					($this->verband!=''?"'".addslashes($this->verband)."'":"' '").','.
+					($this->gruppe!=''?"'".addslashes($this->gruppe)."'":"' '").','.
 					$this->addslashes($this->insertamum).','.
 					$this->addslashes($this->insertvon).');';
 		}
@@ -227,8 +227,8 @@ class student extends benutzer
 			       ' studiengang_kz='.$this->studiengang_kz.','.
 			       ' semester='.$this->semester.','.
 			       ' ext_id='.($this->ext_id_student!=''?$this->ext_id_student:'null').','.
-			       ' verband='.$this->addslashes($this->verband).','.
-			       ' gruppe='.$this->addslashes($this->gruppe).
+			       ' verband='.($this->verband!=''?"'".addslashes($this->verband)."'":"' '").','.
+			       ' gruppe='.($this->gruppe!=''?"'".addslashes($this->gruppe)."'":"' '").
 			       " WHERE student_uid='".addslashes($this->uid)."';";
 		}
 		
