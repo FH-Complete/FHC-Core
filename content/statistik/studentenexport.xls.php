@@ -275,7 +275,7 @@ loadVariables($conn, $user);
 		{
 			if(strlen($row->matrikelnr)>$maxlength[$i])
 				$maxlength[$i] = strlen($row->matrikelnr);
-			$worksheet->write($zeile,$i, $row->matrikelnr);
+			$worksheet->writeString($zeile,$i, $row->matrikelnr);
 		}
 		$i++;
 		
@@ -359,7 +359,7 @@ loadVariables($conn, $user);
 				
 				if(strlen($row_1->plz)>$maxlength[$i])
 					$maxlength[$i]=strlen($row_1->plz);
-				$worksheet->write($zeile,$i, $row_1->plz);
+				$worksheet->writeString($zeile,$i, $row_1->plz);
 				$i++;
 				
 				if(strlen($row_1->ort)>$maxlength[$i])
@@ -386,7 +386,7 @@ loadVariables($conn, $user);
 				
 				if(strlen($row_1->plz)>$maxlength[$i])
 					$maxlength[$i]=strlen($row_1->plz);
-				$worksheet->write($zeile,$i, $row_1->plz);
+				$worksheet->writeString($zeile,$i, $row_1->plz);
 				$i++;
 				
 				if(strlen($row_1->ort)>$maxlength[$i])
@@ -407,7 +407,7 @@ loadVariables($conn, $user);
 			{
 				if(strlen($row_1->kontakt)>$maxlength[$i])
 					$maxlength[$i]=strlen($row_1->kontakt);
-				$worksheet->write($zeile,$i, $row_1->kontakt);
+				$worksheet->writeString($zeile,$i, $row_1->kontakt);
 			}
 		}
 		$i++;

@@ -232,7 +232,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					if($projektarbeit[$row->lehrveranstaltung_id]['themenbereich']!='')
 					{
 						$xml_fussnote .="       <themenbereich_bezeichnung>Themenbereich: </themenbereich_bezeichnung>";
-						$xml_fussnote .="       <themenbereich><[!CDATA[".$projektarbeit[$row->lehrveranstaltung_id]['themenbereich'].'\n]]></themenbereich>';
+						$xml_fussnote .="       <themenbereich><![CDATA[".$projektarbeit[$row->lehrveranstaltung_id]['themenbereich'].'\n]]></themenbereich>';
 						$anzahl_nl++;
 						$nl2='\n';
 					}

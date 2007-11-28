@@ -81,7 +81,7 @@ loadVariables($conn, $user);
 			
 	// Daten holen
 	$qry = "SELECT 
-				tbl_projekttyp.bezeichnung, titel, trim(COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || COALESCE(titelpost,'')), tbl_note.anmerkung, punkte, beginn,
+				tbl_projekttyp.bezeichnung, titel, trim(COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'')), tbl_note.anmerkung, punkte, beginn,
 				ende, CASE WHEN freigegeben THEN 'Ja' ELSE 'Nein' END, gesperrtbis, gesamtstunden, themenbereich, tbl_projektarbeit.anmerkung, projektarbeit_id
 			FROM 
 				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, 
