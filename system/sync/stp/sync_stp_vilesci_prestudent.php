@@ -239,13 +239,23 @@ if($result = pg_query($conn, $qry))
 					else 
 					{
 						//Prestudent_id ermitteln
-						
+						$qry_seq = "SELECT currval('public.tbl_prestudent_prestudent_id_seq') AS id;";
+						if($row_seq=pg_fetch_object(pg_query($conn,$qry_seq)))
+						{
+							$prestudent_id=$row_seq->id;
+						}
+						else
+						{
+							$error=true;
+							$error_log.='Prestudent-Sequence konnte nicht ausgelesen werden\n';
+						}
 						
 						$ausgabe.="\n------------------\nÜbertragen: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname).", Stg: ".$row->studiengang_kz;	
-						$qry_ins="INSERT INTO public.tbl_prestudentrolle (rolle_kurzbz, studiensemester_kurzbz, 
-							ausbildungssemester,datum, orgform_kurzbz, insertamum, insertvon, updateamum, 
-							updatevon, ext_id) 
+						$qry_ins="INSERT INTO public.tbl_prestudentrolle (prestudent_id, rolle_kurzbz, 
+							studiensemester_kurzbz, ausbildungssemester,datum, orgform_kurzbz, 
+							insertamum, insertvon, updateamum, updatevon, ext_id) 
 							VALUES (".
+							myaddslashes($row_seq->prestudent_id).", ".
 							myaddslashes($rolle).", ".
 							myaddslashes($Kalender).", ".
 							myaddslashes($row->instudiensemester).", 
