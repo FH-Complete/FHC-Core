@@ -270,7 +270,11 @@ if ($result_std!=0)
 	for($i=0;$i<$num_rows;$i++)
 	{
 		$row=pg_fetch_object($result_std,$i);
-		$qry_status="SELECT rolle_kurzbz, ausbildungssemester FROM public.tbl_prestudentrolle JOIN public.tbl_prestudent USING(prestudent_id) WHERE person_id=".myaddslashes($row->person_id)." AND studiengang_kz=".$row->studiengang_kz."  AND studiensemester_kurzbz=".myaddslashes($studiensemester_kurzbz)." ORDER BY datum desc, tbl_prestudentrolle.insertamum desc, tbl_prestudentrolle.ext_id desc LIMIT 1;";
+		$qry_status="SELECT rolle_kurzbz, ausbildungssemester FROM public.tbl_prestudentrolle 
+			JOIN public.tbl_prestudent USING(prestudent_id) WHERE person_id=".myaddslashes($row->person_id)." 
+			AND studiengang_kz=".$row->studiengang_kz."  
+			AND studiensemester_kurzbz=".myaddslashes($studiensemester_kurzbz)." 
+			ORDER BY datum desc, tbl_prestudentrolle.insertamum desc, tbl_prestudentrolle.ext_id desc LIMIT 1;";
 		if ($result_status=pg_query($conn, $qry_status))
 		{
 			if($row_status=pg_fetch_object($result_status))
