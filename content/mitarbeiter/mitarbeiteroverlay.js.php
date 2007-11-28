@@ -42,6 +42,7 @@ var MitarbeiterEntwicklungsteamSelectMitarbeiterUID=null; // UID des Mitarbeiter
 var MitarbeiterEntwicklungsteamSelectStudiengangID=null; // ID des Stg des Entwicklungsteams das nach dem rebuild markiert werden soll
 var MitarbeiterEntwicklungsteamDoubleRefresh=false; // Wenn auf einen Tree der eine leere Datasource enthaelt eine neue Datasource angehaengt wird, dann muss doppelt refresht werden
 var MitarbeiterTreeLoadDataOnSelect2=true; // Gibt an ob die Details beim markieren eines Mitarbeiters geladen werden sollen
+var MitarbeiterDetailValueChanged=false;
 // ********** Observer und Listener ************* //
 
 
@@ -231,6 +232,15 @@ function MitarbeiterTreeSort()
 // ****
 function onMitarbeiterSelect()
 {	
+	//Warnung falls Daten veraendert wurden aber noch nicht gespeichert
+	if(MitarbeiterDetailValueChanged)
+	{
+		if(!confirm('Achtung! Die Daten wurden veraendert aber noch nicht gespeichert. Neuen Datensatz trotzdem laden? (Die geaenderten Daten gehen dabei verloren)'))
+			return false;
+	}
+	
+	MitarbeiterDetailValueChanged=false;
+	
 	var tree=document.getElementById('tree-menu-mitarbeiter');
 	var col = tree.columns ? tree.columns["tree-menu-mitarbeiter-col-filter"] : "tree-menu-mitarbeiter-col-filter";
 	
@@ -424,6 +434,15 @@ function MitarbeiterAuswahl()
 	}
 	if(!MitarbeiterTreeLoadDataOnSelect2)
 		return true;
+
+	//Warnung falls Daten veraendert aber noch nicht gespeichert wurden
+	if(MitarbeiterDetailValueChanged)
+	{
+		if(!confirm('Achtung! Die Daten wurden veraendert aber noch nicht gespeichert. Neuen Datensatz trotzdem laden? (Die geaenderten Daten gehen dabei verloren)'))
+			return false;
+	}
+	
+	MitarbeiterDetailValueChanged=false;
 	
 	// Trick 17	(sonst gibt's ein Permission denied)
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -754,6 +773,8 @@ function MitarbeiterSave()
 
 	var val =  new ParseReturnValue(response)
 
+	MitarbeiterDetailValueChanged=false;
+	
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -1667,6 +1688,15 @@ function MitarbeiterGenerateGebDatFromSVNR()
 // ****
 function MitarbeiterSuche()
 {
+	//Warnung wenn Daten veraendert aber noch nicht gespeichert wurden
+	if(MitarbeiterDetailValueChanged)
+	{
+		if(!confirm('Achtung! Die Daten wurden veraendert aber noch nicht gespeichert. Neuen Datensatz trotzdem laden? (Die geaenderten Daten gehen dabei verloren)'))
+			return false;
+	}
+	
+	MitarbeiterDetailValueChanged=false;
+	
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	filter = document.getElementById('mitarbeiter-toolbar-textbox-suche').value;
 	var treeMitarbeiterMenu=document.getElementById('tree-menu-mitarbeiter');
@@ -1719,4 +1749,9 @@ function MitarbeiterSearchFieldKeyPress(event)
 {
 	if(event.keyCode==13) //Enter
 		MitarbeiterSuche();
+}
+
+function MitarbeiterDetailValueChange()
+{
+	MitarbeiterDetailValueChanged=true;
 }

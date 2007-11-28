@@ -125,8 +125,11 @@ $statistik .= "Bei $anzahl_gruppenaenderung Studenten wurde die Gruppenzuordnung
 $statistik .= "$anzahl_gruppenaenderung_fehler Fehler sind bei der Korrektur der Gruppenzuordnung aufgetreten\n";
 $statistik .= "\n\n";
 
+if(mail(MAIL_ADMIN, 'CHECK Studentlehrverband', $statistik.$text, "From: vilesci@technikum-wien.at"))
+	echo 'Mail an '.MAIL_ADMIN.' wurde versandt';
+else 
+	echo 'Fehler beim Versenden des Mails an '.MAIL_ADMIN;
 
-//TODO Mailversand
-echo nl2br($statistik.$text);
+echo nl2br("\n\n".$statistik.$text);
 
 ?>
