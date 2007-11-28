@@ -11,7 +11,8 @@
 //* Synchronisiert Prestudentdatensaetze von StP DB in PORTAL DB
 //*
 //*
-//* setzt voraus: sync von sync.stp_person, tbl_syncperson, tbl_zgv, tbl_zgvmaster
+//* setzt voraus: sync von sync.stp_person
+//* benötigt: tbl_syncperson, tbl_zgv, tbl_zgvmaster, tbl_studiensemester
 //* 
 
 require_once('sync_config.inc.php');
@@ -89,7 +90,7 @@ $ststat=array(2=>'Bewerber', 3=>'Student', 4=>'Ausserordentlicher', 5=>'Unterbre
 
 //*********** Neue Daten holen *****************
 $qry="SELECT __Person, datenquelle, inAusmassBesch, HoechsteAusbildung, _cxZugang, daMaturaDat, 
-	_cxZugangFHMag, daZugangFHMagDat, chtitel, chnachname, chvorname, studiengang_kz, 
+	_cxZugangFHMag, daZugangFHMagDat, chtitel, chnachname, chvorname, studiengang_kz, typ, 
 	chKalenderSemStatAend, inStudiensemester, _cxStudStatus, _StgOrgForm  
 		FROM sync.stp_person JOIN sync.stp_stgvertiefung ON (_stgvertiefung=__stgvertiefung) 
 		JOIN public.tbl_studiengang ON (_studiengang=ext_id)   
@@ -132,21 +133,24 @@ if($result = pg_query($conn, $qry))
 			$error_log1.="\nDatum der Zugangsvoraussetzung nicht eingetragen";
 			$error=true;
 		}
-		if($row->_cxzugangfhmag=='' || $row->_cxzugangfhmag==NULL)
+		if($row->typ=="m")
 		{
-			$error_log1.="\nZugangsvoraussetzung Mag. nicht eingetragen";
-			$error=true;
+			if($row->_cxzugangfhmag=='' || $row->_cxzugangfhmag==NULL)
+			{
+				$error_log1.="\nZugangsvoraussetzung Mag. nicht eingetragen";
+				$error=true;
+			}
+			if($row->dazugangfhmagdat=='' || $row->dazugangfhmagdat==NULL)
+			{
+				$error_log1.="\nDatum der Zugangsvoraussetzung Mag. nicht eingetragen";
+				$error=true;
+			}
 		}
-		if($row->dazugangfhmagdat=='' || $row->dazugangfhmagdat==NULL)
-		{
-			$error_log1.="\nDatum der Zugangsvoraussetzung Mag. nicht eingetragen";
-			$error=true;
-		}
-		if($row->_stgorgform=='' || $row->_stgorgform==NULL)
+		/*if($row->_stgorgform=='' || $row->_stgorgform==NULL)
 		{
 			$error_log1.="\nOrganisationsform nicht eingetragen";
 			$error=true;
-		}
+		}*/
 		if($row->_cxstudstatus=='' || $row->_cxstudstatus==NULL)
 		{
 			$error_log1.="\nStudentenstatus nicht eingetragen";
@@ -166,8 +170,13 @@ if($result = pg_query($conn, $qry))
 			$error=false;
 			if($cont)
 			{
+				$error_log.="\n==>nicht übertragen!";
 				$fehler++;
 				continue;
+			}
+			else 
+			{
+				$error_log.="\n==>übertragen!";	
 			}
 		}
 		
@@ -220,7 +229,7 @@ if($result = pg_query($conn, $qry))
 					FALSE, 
 					NULL, 
 					NULL, 
-					FALSE, ".
+					TRUE, ".
 					myaddslashes(0).", 
 					TRUE, 
 					'', 
@@ -249,37 +258,41 @@ if($result = pg_query($conn, $qry))
 							$error=true;
 							$error_log.='Prestudent-Sequence konnte nicht ausgelesen werden\n';
 						}
-						
-						$ausgabe.="\n------------------\nÜbertragen: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname).", Stg: ".$row->studiengang_kz;	
-						$qry_ins="INSERT INTO public.tbl_prestudentrolle (prestudent_id, rolle_kurzbz, 
-							studiensemester_kurzbz, ausbildungssemester,datum, orgform_kurzbz, 
-							insertamum, insertvon, updateamum, updatevon, ext_id) 
-							VALUES (".
-							myaddslashes($row_seq->prestudent_id).", ".
-							myaddslashes($rolle).", ".
-							myaddslashes($Kalender).", ".
-							myaddslashes($row->instudiensemester).", 
-							now(), ".
-							myaddslashes($orgform).", 
-							now(), 
-							'SYNC', 
-							NULL, 
-							NULL, ".
-							myaddslashes($row->__person).")";
-						if(!$result_neu = pg_query($conn, $qry_ins))
+						if(!$error)
 						{
-							$error_log.= $qry_ins."\n<strong>".pg_last_error($conn)." </strong>\n";
-							$fehler++;
-							pg_query($conn, "ROLLBACK");
+							$ausgabe.="\n------------------\nÜbertragen: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname).", Stg: ".$row->studiengang_kz;	
+							$qry_ins="INSERT INTO public.tbl_prestudentrolle (prestudent_id, rolle_kurzbz, 
+								studiensemester_kurzbz, ausbildungssemester,datum, orgform_kurzbz, 
+								insertamum, insertvon, updateamum, updatevon, ext_id) 
+								VALUES (".
+								myaddslashes($prestudent_id).", ".
+								myaddslashes($rolle).", ".
+								myaddslashes($Kalender).", ".
+								myaddslashes($row->instudiensemester).", 
+								now(), ".
+								myaddslashes($orgform).", 
+								now(), 
+								'SYNC', 
+								NULL, 
+								NULL, ".
+								myaddslashes($row->__person).")";
+							if(!$result_neu = pg_query($conn, $qry_ins))
+							{
+								$error_log.= $qry_ins."\n<strong>".pg_last_error($conn)." </strong>\n";
+								$fehler++;
+								pg_query($conn, "ROLLBACK");
+							}
+							else 
+							{
+								pg_query($conn, "COMMIT");
+								$eingefuegt++;
+							}
 						}
 						else 
 						{
-							pg_query($conn, "COMMIT");
-							$eingefuegt++;
+							pg_query($conn, "ROLLBACK");
 						}
-					}
-				
-					
+					}		
 			}
 			else
 			{
@@ -287,8 +300,7 @@ if($result = pg_query($conn, $qry))
 			}
 		}
 		
-	 	//echo "<br>*****<br>".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname).", Studiengang ".$row->studiengang_kz;
-		
+	 	//echo "<br>*****<br>".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname).", Studiengang ".$row->studiengang_kz;	
 	}
 }
 else
@@ -299,18 +311,19 @@ else
 echo "<br>Eingefügt:  ".$eingefuegt;
 echo "<br>Doppelt:     ".$dublette;
 echo "<br>Fehler:       ".$fehler;
+
 echo "<br><br>";
 echo nl2br($error_log);
 echo nl2br($ausgabe);
 
 echo "<br><br>".date("d.m.Y H:i:s")."<br>";
-
+/*
 mail($adress, 'SYNC-Fehler StP-Prestudent von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");
 
 mail($adress, 'SYNC StP-Prestudent  von '.$_SERVER['HTTP_HOST'], "Sync Student\n------------\n\n"
 ."Personen: Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Fehler: ".$fehler." / Doppelt: ".$dublette
-."\n\n".$dateiausgabe."Beginn: ".$start."\nEnde:    ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: vilesci@technikum-wien.at");
-
+."\n\n".$dateiausgabe."Beginn: ".$start."\nEnde:   ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: vilesci@technikum-wien.at");
+*/
 
 ?>
 </body>
