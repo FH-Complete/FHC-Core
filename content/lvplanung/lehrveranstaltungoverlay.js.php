@@ -409,7 +409,7 @@ function LvTreeSelectLehreinheit()
 	   		if(!tree.view.isContainerOpen(i))
 	   			tree.view.toggleOpenState(i);
 	   	}
-
+	   	
 	   	//Jetzt die wirkliche Anzahl (aller) Zeilen holen
 	   	items = tree.view.rowCount;
 	   	for(var i=0;i<items;i++)
@@ -478,6 +478,7 @@ function LeDelete()
 
 		LvTreeRefresh();
 		LeDetailReset();
+		LeDetailDisableFields(true);
 	}
 }
 
@@ -682,6 +683,9 @@ function LeAuswahl()
 			
 			//Noten Tab aktivieren
 			LehrveranstaltungNotenDisableFields(false);
+			
+			//Noten Tab ausblenden
+			//document.getElementById('lehrveranstaltung-tab-noten').collapsed=false;
 
 			//Noten Laden
 			LehrveranstaltungNotenLoad(lehrveranstaltung_id);
@@ -696,6 +700,9 @@ function LeAuswahl()
 			LeDetailDisableFields(false);
 			LehrveranstaltungNotenDisableFields(true);
 			LehrveranstaltungNotenTreeUnload();
+			
+			//Noten Tab einblenden
+			//document.getElementById('lehrveranstaltung-tab-noten').collapsed=true;
 
 			document.getElementById('lehrveranstaltung-toolbar-neu').disabled=true;
 			document.getElementById('lehrveranstaltung-toolbar-del').disabled=false;
