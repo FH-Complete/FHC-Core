@@ -84,6 +84,10 @@ if($result_staat = pg_query($conn, $qry_staat))
 		$staat[$row_staat->__staat]=$row_staat->chkurzbez;
 	}
 }
+else 
+{
+	echo "<br>".$qry_staat."<br><strong>".pg_last_error($conn)." </strong><br>";
+}
 
 //*********** Neue Daten holen *****************
 $qry='SELECT __Person,_Staatsbuerger,_GebLand,Briefanrede,chTitel,chNachname,chVorname,daGebDat,chGebOrt,chAdrBemerkung,chHomepage,chSVNr,chErsatzKZ,_cxFamilienstand,_cxGeschlecht,inKinder
@@ -259,6 +263,10 @@ if($result = pg_query($conn, $qry))
 			}
 		}
 	}
+}
+else 
+{
+	echo "<br>".$qry."<br><strong>".pg_last_error($conn)." </strong><br>";
 }
 
 echo "<br>Eingefügt:  ".$eingefuegt;
