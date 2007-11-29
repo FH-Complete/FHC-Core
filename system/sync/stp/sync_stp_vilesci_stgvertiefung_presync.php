@@ -8,7 +8,7 @@
  */
 
 //*
-//* Kopiert personen TAbelle von FH-DB StPoelten
+//* Kopiert stgvertiefung Tabelle von FH-DB StPoelten
 //*
 //*
 

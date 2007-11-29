@@ -3,6 +3,7 @@
 // Syncronisiert alle Mitarbeiter
 // StPoelten -> VILESCI
 // setzt vorraus: - tbl_benutzer
+//                - tbl_ausbildung
 // **************************************
 	require_once('sync_config.inc.php');
 	require_once('../../../include/functions.inc.php');
