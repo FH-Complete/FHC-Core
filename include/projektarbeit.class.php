@@ -409,5 +409,62 @@ class projektarbeit
 			return false;
 		}
 	}
+	
+	// ********************************************
+	// * Laedt alle Projektarbeiten eines Studienganges/Studiensemesters
+	// * @param studiengang_kz, studiensemester_kurzbz
+	// * @return true wenn ok, false wenn Fehler
+	// ********************************************
+	function getProjektarbeitStudiensemester($studiengang_kz, $studiensemester_kurzbz)
+	{
+		$qry = "SELECT 
+					tbl_projektarbeit.* 
+				FROM 
+					lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung
+				WHERE 
+					tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
+					tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
+					tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND
+					tbl_lehreinheit.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$obj = new projektarbeit($this->conn, null, null);
+				
+				$obj->projektarbeit_id = $row->projektarbeit_id;
+				$obj->projekttyp_kurzbz = $row->projekttyp_kurzbz;
+				$obj->titel = $row->titel;
+				$obj->lehreinheit_id = $row->lehreinheit_id;
+				$obj->student_uid = $row->student_uid;
+				$obj->firma_id = $row->firma_id;
+				$obj->note = $row->note;
+				$obj->punkte = $row->punkte;
+				$obj->beginn = $row->beginn;
+				$obj->ende = $row->ende;
+				$obj->faktor = $row->faktor;
+				$obj->freigegeben = ($row->freigegeben=='t'?true:false);
+				$obj->gesperrtbis = $row->gesperrtbis;
+				$obj->stundensatz = $row->stundensatz;
+				$obj->gesamtstunden = $row->gesamtstunden;
+				$obj->themenbereich = $row->themenbereich;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->ext_id = $row->ext_id;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				
+				$this->result[] = $obj;
+			}
+
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>

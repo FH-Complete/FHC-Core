@@ -820,11 +820,32 @@ function ExtrasShowLVverwaltung()
 }
 
 // ****
-// * Zeigt HTML Seite zur bearbeitung der Firmen an
+// * Zeigt HTML Seite zur Bearbeitung der Firmen an
 // ****
 function ExtrasShowFirmenverwaltung()
 {
 	window.open('<?php echo APP_ROOT ?>vilesci/stammdaten/firma_frameset.html','Firma','');
+}
+
+// ****
+// * Zeigt HTML Seite zum Eintragen von Projektarbeitsnoten an
+// ****
+function ExtrasShowProjektarbeitsBenotung()
+{
+	tree = document.getElementById('tree-verband');
+
+	if(tree.currentIndex==-1)
+	{
+		alert('Bitte zuerst einen Studiengang auswaehlen');
+		return;
+	}
+
+	//Studiengang holen
+	var col;
+	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+	var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
+		
+	window.open('<?php echo APP_ROOT ?>vilesci/lehre/projektarbeitsbenotung.php?stg_kz='+studiengang_kz,'Projektarbeitsbenotung','');
 }
 
 // ****
@@ -927,6 +948,14 @@ function OpenToDoDialog()
 function StatistikPrintALVSStatistik(format)
 {
 	window.open('<?php echo APP_ROOT ?>content/statistik/alvsstatistik.php?format='+format,'ALVS-Statistik','');
+}
+
+// ****
+// * Oeffnet die LVPlanunggesamtSJ Statistik
+// ****
+function StatistikPrintLvPlanungGesamtSJ()
+{
+	window.open('<?php echo APP_ROOT ?>content/statistik/lvplanunggesamtsj.php','LVPlanungGesamtSJ','');
 }
 
 // ****

@@ -108,6 +108,14 @@
 <!ENTITY menu-statistic-substatistik-alvsstatistik-html.label		"HTML">
 <!ENTITY menu-statistic-substatistik-alvsstatistik-html.accesskey	"H">
 
+<!ENTITY menu-statistic-substatistik-lvplanunggesamtsj.key			"L">
+<!ENTITY menu-statistic-substatistik-lvplanunggesamtsj.label		"LV-Planung Gesamt SJ">
+<!ENTITY menu-statistic-substatistik-lvplanunggesamtsj.accesskey	"L">
+
+<!ENTITY menu-statistic-substatistik-lvplanunggesamtsj-excel.key		"E">
+<!ENTITY menu-statistic-substatistik-lvplanunggesamtsj-excel.label		"EXCEL">
+<!ENTITY menu-statistic-substatistik-lvplanunggesamtsj-excel.accesskey	"E">
+
 <!-- Dokumente -->
 <!ENTITY menu-dokumente.label		"Dokumente">
 <!ENTITY menu-dokumente.accesskey	"D">
@@ -171,6 +179,10 @@
 <!ENTITY menu-extras-lvverwaltung.key		"L">
 <!ENTITY menu-extras-lvverwaltung.label		"Lehrveranstaltungsverwaltung">
 <!ENTITY menu-extras-lvverwaltung.accesskey	"L">
+
+<!ENTITY menu-extras-projektarbeitsbenotung.key			"P">
+<!ENTITY menu-extras-projektarbeitsbenotung.label		"Projektarbeitsbenotung">
+<!ENTITY menu-extras-projektarbeitsbenotung.accesskey	"P">
 
 <!-- BIS -->
 <!ENTITY menu-bis.label		"BIS">
