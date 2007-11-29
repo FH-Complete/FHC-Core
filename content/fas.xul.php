@@ -91,6 +91,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-statistic-substatistik-studentenprosemester-html:command" oncommand="StatistikPrintStudentenProSemester('');"/>
   <command id="menu-statistic-substatistik-alvsstatistik-excel:command" oncommand="StatistikPrintALVSStatistik('xls');"/>
   <command id="menu-statistic-substatistik-alvsstatistik-html:command" oncommand="StatistikPrintALVSStatistik('');"/>  
+  <command id="menu-statistic-substatistik-lvplanunggesamtsj-excel:command" oncommand="StatistikPrintLvPlanungGesamtSJ();"/>  
   <command id="menu-dokumente-inskriptionsbestaetigung:command" oncommand="StudentPrintInskriptionsbestaetigung();"/>
   <command id="menu-dokumente-zeugnis:command" oncommand="StudentCreateZeugnis();"/>
   <command id="menu-dokumente-diplsupplement:command" oncommand="StudentCreateDiplSupplement();"/>
@@ -106,6 +107,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-extras-reihungstest:command" oncommand="ExtrasShowReihungstest();"/>
   <command id="menu-extras-firma:command" oncommand="ExtrasShowFirmenverwaltung();"/>
   <command id="menu-extras-lvverwaltung:command" oncommand="ExtrasShowLVverwaltung();"/>
+  <command id="menu-extras-projektarbeitsbenotung:command" oncommand="ExtrasShowProjektarbeitsBenotung();"/>
   <command id="menu-bis-mitarbeiter-import:command" oncommand="BISMitarbeiterImport();"/>
   <command id="menu-bis-mitarbeiter-export:command" oncommand="BISMitarbeiterExport();"/>
   <command id="menu-bis-mitarbeiter-checkverwendung:command" oncommand="BISMitarbeiterCheckVerwendung();"/>
@@ -126,7 +128,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 <!-- MENUE -->
 <toolbox id="main-toolbox">
   <menubar id="menu" >
-  <!-- DATEI -->
+  <!-- ******* DATEI ******* -->
     <menu id="menu-file" label="&menu-file.label;" accesskey="&menu-file.accesskey;">
       <menupopup id="menu-file-popup">
         <menuitem
@@ -137,7 +139,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
            accesskey = "&menu-file-close.accesskey;"/>
       </menupopup>
     </menu>
-    <!-- BEARBEITEN -->
+    <!-- ******** BEARBEITEN ********* -->
     <menu id="menu-edit" label="&menu-edit.label;" accesskey="&menu-edit.accesskey;" onclick="loadUndoList();">
       <menupopup id="menu-edit-popup">
         <menu id="menu-edit-undo" label="&menu-edit-undo.label;"
@@ -156,7 +158,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
         </menu>
       </menupopup>
     </menu>
-    <!-- EINSTELLUNGEN -->
+    <!-- *********** EINSTELLUNGEN ********** -->
     <menu id="menu-prefs" label="&menu-prefs.label;" accesskey="&menu-prefs.accesskey;">
 		<menupopup id="menu-prefs-popup">
 			<!--<menu id="menu-prefs-stpltable" label="&menu-prefs-stpltable.label;" accesskey="&menu-prefs-stpltable.accesskey;">
@@ -208,7 +210,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
    			 />
 	    </menupopup>
     </menu>
-    <!-- BERICHTE -->
+    <!-- ********** BERICHTE ********** -->
     <menu id="menu-statistic" label="&menu-statistic.label;" accesskey="&menu-statistic.accesskey;">
           <menupopup id="menu-statistic-popup">
             <menuitem
@@ -297,6 +299,23 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 				               accesskey = "&menu-statistic-substatistik-alvsstatistik-html.accesskey;"/>
 						</menupopup>
 					</menu>
+					<?php
+					if($rechte->isBerechtigt('admin'))
+					{
+						echo '
+						<menu id="menu-statistic-substatistik-lvplanunggesamtsj" label="&menu-statistic-substatistik-lvplanunggesamtsj.label;" accesskey="&menu-statistic-substatistik-lvplanunggesamtsj.accesskey;">
+							<menupopup id="menu-statistic-substatistik-lvplanunggesamtsj-popup">
+					             <menuitem
+					               id        =  "menu-statistic-substatistik-lvplanunggesamtsj-excel"
+					               key       =  "menu-statistic-substatistik-lvplanunggesamtsj-excel:key"
+					               label     = "&menu-statistic-substatistik-lvplanunggesamtsj-excel.label;"
+					               command   =  "menu-statistic-substatistik-lvplanunggesamtsj-excel:command"
+					               accesskey = "&menu-statistic-substatistik-lvplanunggesamtsj-excel.accesskey;"/>
+							</menupopup>
+						</menu>
+						';
+					}
+					?>
 				</menupopup>
 			</menu>
           <!--   <menuitem
@@ -307,7 +326,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                accesskey = "&menu-statistic-bewerberstatistik.accesskey;"/>-->
           </menupopup>
     </menu>
-    <!-- DOKUMENTE -->
+    <!-- ********** DOKUMENTE ********** -->
     <menu id="menu-dokumente" label="&menu-dokumente.label;" accesskey="&menu-dokumente.accesskey;">
           <menupopup id="menu-dokumente-popup">
             <menuitem
@@ -422,7 +441,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                accesskey = "&menu-dokumente-urkunde_englisch.accesskey;"/>
           </menupopup>
     </menu>
-    <!-- EXTRAS -->
+    <!-- ********** EXTRAS ********* -->
     <menu id="menu-extras" label="&menu-extras.label;" accesskey="&menu-extras.accesskey;">
           <menupopup id="menu-extras-popup">
             <menuitem
@@ -442,10 +461,16 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                key       =  "menu-extras-lvverwaltung:key"
                label     = "&menu-extras-lvverwaltung.label;"
                command   =  "menu-extras-lvverwaltung:command"
-               accesskey = "&menu-extras-lvverwaltung.accesskey;"/>
+               accesskey = "&menu-extras-lvverwaltung.accesskey;"/>               
+             <menuitem
+               id        =  "menu-extras-projektarbeitsbenotung"
+               key       =  "menu-extras-projektarbeitsbenotung:key"
+               label     = "&menu-extras-projektarbeitsbenotung.label;"
+               command   =  "menu-extras-projektarbeitsbenotung:command"
+               accesskey = "&menu-extras-projektarbeitsbenotung.accesskey;"/>
           </menupopup>
     </menu>
-    <!-- BIS -->
+    <!-- ********** BIS ********** -->
     <menu id="menu-bis" label="&menu-bis.label;" accesskey="&menu-bis.accesskey;">
 		<menupopup id="menu-bis-popup">
             <menu id="menu-bis-mitarbeiter" label="&menu-bis-mitarbeiter.label;" accesskey="&menu-bis-mitarbeiter.accesskey;">

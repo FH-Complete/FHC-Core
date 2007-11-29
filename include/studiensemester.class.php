@@ -410,5 +410,61 @@ class studiensemester
 			$this->errormsg = 'Fehler beim Ermitteln des vorjährigen Studiensemesters';
 		}
 	}
+	
+	// ****
+	// * Liefert das Studiensemester vor $studiensemester_kurzbz
+	// ****
+	function getPreviousFrom($studiensemester_kurzbz)
+	{
+		$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester 
+				WHERE ende<(SELECT start FROM public.tbl_studiensemester 
+				            WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."') 
+		        ORDER BY ende DESC LIMIT 1";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				return $row->studiensemester_kurzbz;
+			}
+			else 
+			{
+				$this->errormsg = 'Es wurde kein vorangegangenes Studiensemester gefunden';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Ermitteln des vorangegangenen Studiensemesters';
+		}
+	}
+	
+	// ****
+	// * Liefert das Studiensemester nach $studiensemester_kurzbz
+	// ****
+	function getNextFrom($studiensemester_kurzbz)
+	{
+		$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester 
+				WHERE start>(SELECT ende FROM public.tbl_studiensemester 
+				            WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."') 
+		        ORDER BY start LIMIT 1";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				return $row->studiensemester_kurzbz;
+			}
+			else 
+			{
+				$this->errormsg = 'Es wurde kein folgendes Studiensemester gefunden';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Ermitteln des folgenden Studiensemesters';
+		}
+	}
 }
 ?>
