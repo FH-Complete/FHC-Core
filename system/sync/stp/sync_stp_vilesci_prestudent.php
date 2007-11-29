@@ -66,6 +66,11 @@ $rolle='';
 
 <?php
 
+if (!@pg_query($conn,'SELECT * FROM sync.tbl_syncperson LIMIT 1;'))
+{
+	die("<strong>sync.tbl_syncperson: ".pg_last_error($conn)." </strong><BR>");
+}
+
 $qry="SELECT * FROM public.tbl_aufmerksamdurch";
 if($result = pg_query($conn, $qry))
 {
@@ -74,6 +79,10 @@ if($result = pg_query($conn, $qry))
 		$aufmerksam[$row->ext_id]=$row->aufmerksamdurch_kurzbz;
 	}
 }
+else 
+{
+	echo "<br>".$qry."<br><strong>".pg_last_error($conn)." </strong><br>";
+}
 $qry="SELECT * FROM sync.stp_zugang";
 if($result = pg_query($conn, $qry))
 {
@@ -81,6 +90,10 @@ if($result = pg_query($conn, $qry))
 	{
 		$zgv[$row->cxzugang]=$row->zgv_code;
 	}
+}
+else 
+{
+	echo "<br>".$qry."<br><strong>".pg_last_error($conn)." </strong><br>";
 }
 $zgv[2]=99;
 $zgv['']=99;
@@ -299,13 +312,17 @@ if($result = pg_query($conn, $qry))
 				$dublette++;
 			}
 		}
+		else 
+		{
+			echo "<br>".$qry_chk."<br><strong>".pg_last_error($conn)." </strong><br>";
+		}
 		
 	 	//echo "<br>*****<br>".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname).", Studiengang ".$row->studiengang_kz;	
 	}
 }
 else
 {
-	echo $qry;
+	echo "<br>".$qry."<br><strong>".pg_last_error($conn)." </strong><br>";
 }
 
 echo "<br>Eingefügt:  ".$eingefuegt;
@@ -317,13 +334,13 @@ echo nl2br($error_log);
 echo nl2br($ausgabe);
 
 echo "<br><br>".date("d.m.Y H:i:s")."<br>";
-/*
+
 mail($adress, 'SYNC-Fehler StP-Prestudent von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");
 
 mail($adress, 'SYNC StP-Prestudent  von '.$_SERVER['HTTP_HOST'], "Sync Student\n------------\n\n"
 ."Personen: Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Fehler: ".$fehler." / Doppelt: ".$dublette
 ."\n\n".$dateiausgabe."Beginn: ".$start."\nEnde:   ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: vilesci@technikum-wien.at");
-*/
+
 
 ?>
 </body>
