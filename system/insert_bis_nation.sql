@@ -1,3 +1,4 @@
+SET SESSION AUTHORIZATION 'postgres';
 INSERT INTO tbl_nation VALUES ('A', 'I', true, true, 'EU', 'Österreich', 'Österreich', 'Austria', NULL);
 INSERT INTO tbl_nation VALUES ('ADN', 'E', NULL, NULL, 'AS', 'Jemen (Süd)', 'Jemen (demokrat. VR/Süd)', 'South Yemen', true);
 INSERT INTO tbl_nation VALUES ('AFG', 'E', NULL, NULL, 'AS', 'Afghanistan', 'Afghanistan', 'Afghanistan', NULL);
