@@ -26,7 +26,7 @@
  */
 
 require ('../vilesci/config.inc.php');
-//define("CONN_STRING","host=db.technikum-wien.at dbname=bla user=bla password=bla");
+//define("CONN_STRING","host=db.technikum-wien.at dbname=stp user=bla password=bla");
 
 // Datenbank Verbindung
 if (!$conn = pg_pconnect(CONN_STRING))
@@ -84,6 +84,31 @@ if (!@pg_query($conn,'SELECT projektarbeit FROM lehre.tbl_lehrveranstaltung LIMI
 	else
 		echo 'projektarbeit wurde bei lehre.tbl_lehrveranstaltung hinzugefuegt!<BR>';
 }
+
+// ************** lehre.tbl_lehrveranstaltung.projektarbeit ************************
+if (!@pg_query($conn,'SELECT * FROM bis.tbl_bundesland LIMIT 1;'))
+{
+	$sql='	CREATE TABLE bis.tbl_bundesland
+			(
+				bundesland_code Smallint NOT NULL,
+				kurzbz Varchar(8) UNIQUE,
+				bezeichnung Varchar(64),
+				constraint "pk_tbl_bundesland" primary key ("bundesland_code")
+			);
+			ALTER TABLE public.tbl_person ADD COLUMN bundesland_code smallint;
+			ALTER TABLE public.tbl_person add Constraint "bundesland_person" foreign key ("bundesland_code") references "bis"."tbl_bundesland" ("bundesland_code") on update cascade on delete restrict;
+			GRANT select on bis.tbl_bundesland to group "admin";
+			GRANT update on bis.tbl_bundesland to group "admin";
+			GRANT delete on bis.tbl_bundesland to group "admin";
+			GRANT insert on bis.tbl_bundesland to group "admin";
+			GRANT select on bis.tbl_bundesland to group "web";';
+	if (!@pg_query($conn,$sql))
+		echo '<strong>bis.tbl_bundesland: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo 'Tabelle bis.tbl_bundesland wurde hinzugefuegt!<BR>';
+}
+
+
 
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
