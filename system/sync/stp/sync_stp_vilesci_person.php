@@ -24,7 +24,7 @@ function myaddslashes($var)
 {
 	return ($var!=''?"'".addslashes($var)."'":'null');
 }
-	
+
 // Sync-Tabelle fuer Personen checken
 if (!@pg_query($conn,'SELECT * FROM sync.tbl_syncperson LIMIT 1;'))
 {
@@ -75,6 +75,7 @@ $staat=array();
 <body>
 
 <?php
+
 //Array für Nationen erzeugen
 $qry_staat="SELECT __staat, chkurzbez FROM sync.stp_staat";
 if($result_staat = pg_query($conn, $qry_staat))
@@ -84,13 +85,13 @@ if($result_staat = pg_query($conn, $qry_staat))
 		$staat[$row_staat->__staat]=$row_staat->chkurzbez;
 	}
 }
-else 
+else
 {
 	echo "<br>".$qry_staat."<br><strong>".pg_last_error($conn)." </strong><br>";
 }
 
 //*********** Neue Daten holen *****************
-$qry='SELECT __Person,_Staatsbuerger,_GebLand,Briefanrede,chTitel,chNachname,chVorname,daGebDat,chGebOrt,chAdrBemerkung,chHomepage,chSVNr,chErsatzKZ,_cxFamilienstand,_cxGeschlecht,inKinder
+$qry='SELECT __Person,_Staatsbuerger,_GebLand,Briefanrede,chTitel,chNachname,chVorname,daGebDat,chGebOrt,meBemerkung,chHomepage,chSVNr,chErsatzKZ,_cxFamilienstand,_cxGeschlecht,inKinder
 		FROM sync.stp_person
 		WHERE _cxGeschlecht!=3 AND _cxPersonTyp!=5
 			AND __Person NOT IN (SELECT __Person FROM sync.tbl_syncperson) ;';
@@ -169,7 +170,7 @@ if($result = pg_query($conn, $qry))
 			$sql="SELECT * FROM public.tbl_person
 				WHERE
 					(svnr=".myaddslashes($row->chsvnr)." AND svnr!='' AND svnr IS NOT NULL)
-					OR (ersatzkennzeichen=".myaddslashes($row->chersatzkz)." AND ersatzkennzeichen!='' AND ersatzkennzeichen IS NOT NULL) 
+					OR (ersatzkennzeichen=".myaddslashes($row->chersatzkz)." AND ersatzkennzeichen!='' AND ersatzkennzeichen IS NOT NULL)
 					OR (nachname=".myaddslashes($row->chnachname)." AND ".myaddslashes($row->chnachname)."!='' AND vorname=".myaddslashes($row->chvorname)."AND ".myaddslashes($row->chvorname)."!='' AND gebdatum=".myaddslashes($row->dagebdat)." AND gebdatum IS NOT NULL)";
 			if($result_dubel = pg_query($conn, $sql))
 			{
@@ -187,8 +188,8 @@ if($result = pg_query($conn, $qry))
 							myaddslashes($staat[$row->_gebland]).", ".
 							"NULL, ".
 							myaddslashes($row->briefanrede).", ".
-							"NULL, ".
 							myaddslashes(trim($row->chtitel)).", ".
+							"NULL, ".
 							myaddslashes(trim($row->chnachname)).", ".
 							myaddslashes(trim($row->chvorname)).", ".
 							"NULL, ".
@@ -196,7 +197,7 @@ if($result = pg_query($conn, $qry))
 							myaddslashes($row->chgebort).", ".
 							"NULL, ".
 							"NULL, ".
-							myaddslashes($row->chadrbemerkung).", ".
+							myaddslashes($row->mebemerkung).", ".
 							myaddslashes($row->chhomepage).", ".
 							myaddslashes($row->chsvnr).", ".
 							myaddslashes($row->chersatzkz).", ".
@@ -210,7 +211,7 @@ if($result = pg_query($conn, $qry))
 						$error_log.= $sql."\n<strong>".pg_last_error($conn)." </strong>\n";
 						pg_query($conn, "ROLLBACK");
 					}
-					else 
+					else
 					{
 						//Eintrag Synctabelle
 						$qry_seq = "SELECT currval('public.tbl_person_person_id_seq') AS id;";
@@ -234,29 +235,29 @@ if($result = pg_query($conn, $qry))
 										'VALUES ('.$row->__person.', '.$person_id.');';
 									$resulti = pg_query($conn, $qry);
 								}
-								$ausgabe.="\n------------------\nÜbertragen: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);	
+								$ausgabe.="\n------------------\nÜbertragen: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
 								$eingefuegt++;
 								pg_query($conn, "COMMIT");
 							}
-							else 
+							else
 							{
 								$error_log.= "\n".$sql."\n<strong>".pg_last_error($conn)." </strong>\n";
-								pg_query($conn, "ROLLBACK");	
+								pg_query($conn, "ROLLBACK");
 							}
 						}
-						else 
+						else
 						{
 							pg_query($conn, "ROLLBACK");
 						}
-						
+
 					}
 				}
-				else 
+				else
 				{
 					$dublette++;
 				}
 			}
-			else 
+			else
 			{
 				$error_log.= "\n".$sql."\n<strong>".pg_last_error($conn)." </strong>\n";
 				pg_query($conn, "ROLLBACK");
@@ -264,21 +265,94 @@ if($result = pg_query($conn, $qry))
 		}
 	}
 }
-else 
+else
 {
 	echo "<br>".$qry."<br><strong>".pg_last_error($conn)." </strong><br>";
 }
 
-echo "<br>Eingefügt:  ".$eingefuegt;
+//*********** Updates holen *****************
+// Staatsbuergerschaft, Geburtsnation werden nicht geprueft.
+$updates=0;
+$qry='SELECT __Person,_Staatsbuerger,_GebLand,Briefanrede,chTitel,chNachname,chVorname,daGebDat,chGebOrt,meBemerkung,
+			chHomepage,chSVNr,chErsatzKZ,_cxFamilienstand,_cxGeschlecht,inKinder,_cxBundesland,
+			person_id,staatsbuergerschaft,geburtsnation,anrede,titelpre,nachname,vorname,
+			gebdatum,gebort,anmerkung,homepage,svnr,ersatzkennzeichen,familienstand,geschlecht,anzahlkinder,
+			aktiv,bundesland_code
+		FROM sync.stp_person JOIN sync.tbl_syncperson USING (__Person) JOIN public.tbl_person USING (person_id)
+		WHERE chNachname!=nachname OR anrede!=Briefanrede OR titelpre!=chTitel OR vorname!=chVorname OR gebdatum!=daGebDat
+			OR gebort!=chGebOrt OR anmerkung!=meBemerkung OR homepage!=chHomepage OR svnr!=chSVNr OR ersatzkennzeichen!=chErsatzKZ
+			OR familienstand!=_cxFamilienstand OR anzahlkinder!=inKinder OR bundesland_code!=_cxBundesland;'; // OR geschlecht!=_cxGeschlecht
+
+$error_log_ext="Updates holen:\n\n";
+$start=date("d.m.Y H:i:s");
+echo $start."<br>";
+$log_updates='';
+if($result = pg_query($conn, $qry))
+{
+	$anzahl_person_gesamt=pg_num_rows($result);
+	$error_log_ext.="Anzahl der Datensätze für updates: ".$anzahl_person_gesamt."\n";
+	echo nl2br($error_log_ext);
+	while($row=pg_fetch_object($result))
+	{
+		$cont='';
+		$sql='UPDATE public.tbl_person SET';
+		if ($row->chnachname!=$row->nachname)
+			$sql.=" nachname='$row->chnachname',";
+		if ($row->anrede!=$row->briefanrede)
+			$sql.=" anrede='$row->briefanrede',";
+		if ($row->titelpre!=$row->chtitel)
+			$sql.=" titelpre='$row->chtitel',";
+		if ($row->vorname!=$row->chvorname)
+			$sql.=" vorname='$row->chvorname',";
+		if ($row->gebdatum!=$row->dagebdat)
+			$sql.=" gebdatum='$row->dagebdat',";
+		if ($row->gebort!=$row->chgebort)
+			$sql.=" gebort='$row->chgebort',";
+		if ($row->anmerkung!=$row->mebemerkung)
+			$sql.=" anmerkung='$row->mebemerkung',";
+		if ($row->homepage!=$row->chhomepage)
+			$sql.=" homepage='$row->chhomepage',";
+		if ($row->svnr!=$row->chsvnr)
+			$sql.=" svnr='$row->chsvnr',";
+		if ($row->ersatzkennzeichen!=$row->chersatzkz)
+			$sql.=" ersatzkennzeichen='$row->chersatzkz',";
+		if ($row->familienstand!=$row->_cxfamilienstand)
+			$sql.=" familienstand='$row->_cxfamilienstand',";
+		//if ($row->geschlecht!=$row->_cxgeschlecht)
+		//	$sql.=" geschlecht='$row->_cxgeschlecht',";
+		if ($row->anzahlkinder!=$row->inkinder)
+			$sql.=" anzahlkinder='$row->inkinder',";
+		if ($row->bundesland_code!=$row->_cxbundesland)
+		$sql.=" bundesland_code='$row->_cxbundesland',";
+		$sql=substr($sql,0,-1);
+		$sql.=' WHERE person_id='.$row->person_id.';';
+		//echo $sql;
+		if (!pg_query($conn, $sql))
+			$log_updates.= "\n".$sql."\n<strong>".pg_last_error($conn)." </strong>\n";
+		else
+		{
+			$log_updates.= "\n".$sql;
+			$updates++;
+		}
+	}
+}
+else
+{
+	echo "<br>".$qry."<br><strong>".pg_last_error($conn)." </strong><br>";
+}
+
+echo "<br><br>Eingefügt:  ".$eingefuegt;
+echo "<br>Updates:  ".$updates;
 echo "<br>Doppelt:     ".$dublette;
 echo "<br>Fehler:       ".$fehler;
 echo "<br><br>";
-if($error_log=='')
+if($error_log=='' && $log_updates=='')
 {
 	echo "o.k.<br>";
 }
-else 
+else
 {
+	echo nl2br($log_updates);
 	echo nl2br($error_log);
 }
 echo nl2br($ausgabe);
