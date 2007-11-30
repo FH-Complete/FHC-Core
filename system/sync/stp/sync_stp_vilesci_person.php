@@ -360,8 +360,8 @@ echo nl2br($ausgabe);
 mail($adress, 'SYNC-Fehler StP-Person von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");
 
 mail($adress, 'SYNC StP-Person  von '.$_SERVER['HTTP_HOST'], "Sync Person\n------------\n\n"
-."Personen: Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Fehler: ".$fehler." / Doppelt: ".$dublette
-."\n\nBeginn: ".$start."\nEnde:    ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: vilesci@technikum-wien.at");
+."Personen: Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Updates: ".$updates." / Fehler: ".$fehler." / Doppelt: ".$dublette
+."\n\nBeginn: ".$start."\nEnde:    ".date("d.m.Y H:i:s")."\n\n".$ausgabe.$log_updates, "From: vilesci@technikum-wien.at");
 
 
 ?>
