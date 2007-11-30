@@ -13,19 +13,37 @@
 //*
 //* setzt voraus: sync von sync.stp_person
 //* benötigt: tbl_syncperson, tbl_zgv, tbl_zgvmaster, tbl_studiensemester
-//* 
+//*
 
 require_once('sync_config.inc.php');
 
 $starttime=time();
-	
+
 if (!$conn_ext=mssql_connect (STPDB_SERVER, STPDB_USER, STPDB_PASSWD))
 	die('Fehler beim Verbindungsaufbau!');
 mssql_select_db(STPDB_DB, $conn_ext);
 
 $conn=pg_connect(CONN_STRING)
 	or die("Connection zur FH-Complete Datenbank fehlgeschlagen");
-	
+
+// Sync-Tabelle fuer Zugang checken
+if (!@pg_query($conn,'SELECT * FROM sync.stp_zugang LIMIT 1;'))
+{
+	$sql='	CREATE TABLE sync.stp_zugang
+			(
+    			cxzugang integer NOT NULL,
+    			zgv_code integer NOT NULL
+			);
+			REVOKE ALL ON TABLE stp_zugang FROM PUBLIC;
+			GRANT INSERT,SELECT,UPDATE ON TABLE stp_zugang TO admin;
+		';
+	if (!@pg_query($conn,$sql))
+		echo '<strong>sync.stp_zugang: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo 'sync.stp_zugang wurde angelegt!<BR>';
+}
+
+
 function myaddslashes($var)
 {
 	return ($var!=''?"'".addslashes($var)."'":'null');
@@ -79,7 +97,7 @@ if($result = pg_query($conn, $qry))
 		$aufmerksam[$row->ext_id]=$row->aufmerksamdurch_kurzbz;
 	}
 }
-else 
+else
 {
 	echo "<br>".$qry."<br><strong>".pg_last_error($conn)." </strong><br>";
 }
@@ -91,7 +109,7 @@ if($result = pg_query($conn, $qry))
 		$zgv[$row->cxzugang]=$row->zgv_code;
 	}
 }
-else 
+else
 {
 	echo "<br>".$qry."<br><strong>".pg_last_error($conn)." </strong><br>";
 }
@@ -102,12 +120,12 @@ $ststat=array(2=>'Bewerber', 3=>'Student', 4=>'Ausserordentlicher', 5=>'Unterbre
 	10=>'Diplomand', 11=>'Diplomand', 12=>'Incoming');
 
 //*********** Neue Daten holen *****************
-$qry="SELECT __Person, datenquelle, inAusmassBesch, HoechsteAusbildung, _cxZugang, daMaturaDat, 
-	_cxZugangFHMag, daZugangFHMagDat, chtitel, chnachname, chvorname, studiengang_kz, typ, 
-	chKalenderSemStatAend, inStudiensemester, _cxStudStatus, _StgOrgForm  
-		FROM sync.stp_person JOIN sync.stp_stgvertiefung ON (_stgvertiefung=__stgvertiefung) 
-		JOIN public.tbl_studiengang ON (_studiengang=ext_id)   
-		WHERE __Person IN (SELECT ext_id FROM tbl_person WHERE ext_id IS NOT NULL) AND 
+$qry="SELECT __Person, datenquelle, inAusmassBesch, HoechsteAusbildung, _cxZugang, daMaturaDat,
+	_cxZugangFHMag, daZugangFHMagDat, chtitel, chnachname, chvorname, studiengang_kz, typ,
+	chKalenderSemStatAend, inStudiensemester, _cxStudStatus, _StgOrgForm
+		FROM sync.stp_person JOIN sync.stp_stgvertiefung ON (_stgvertiefung=__stgvertiefung)
+		JOIN public.tbl_studiengang ON (_studiengang=ext_id)
+		WHERE __Person IN (SELECT ext_id FROM tbl_person WHERE ext_id IS NOT NULL) AND
 		(_cxPersonTyp='1' OR _cxPersonTyp='2');";
 
 $error_log_ext="Überprüfung Prestudentdaten in EXT-DB:\n\n";
@@ -126,7 +144,7 @@ if($result = pg_query($conn, $qry))
 		{
 			$datenquelle=0;
 		}
-		else 
+		else
 		{
 			$datenquelle==$row->datenquelle;
 		}
@@ -187,12 +205,12 @@ if($result = pg_query($conn, $qry))
 				$fehler++;
 				continue;
 			}
-			else 
+			else
 			{
-				$error_log.="\n==>übertragen!";	
+				$error_log.="\n==>übertragen!";
 			}
 		}
-		
+
 		if($row->_stgorgform==1)
 		{
 			$orgform="VZ";
@@ -205,60 +223,60 @@ if($result = pg_query($conn, $qry))
 		{
 			$orgform="ZGS";
 		}
-		else 
+		else
 		{
 			$orgform="VZ";
 		}
 		$rolle=$ststat[$row->_cxstudstatus];
 		$Kalender=ucwords(substr($row->chkalendersemstataend,0,1)).'S'.((integer)substr($row->chkalendersemstataend,1,2)<11?'20':'19').substr($row->chkalendersemstataend,1,2);
 		//echo substr($row->chkalendersemstataend,2,2)."/".$row->chkalendersemstataend."--->".$Kalender;
-		
+
 		$qry_synk="SELECT * FROM sync.tbl_syncperson where __person=".$row->__person.";";
 		$row_synk=pg_fetch_object(pg_query($conn, $qry_synk));
 		$qry_chk="SELECT * FROM public.tbl_prestudent WHERE person_id=".myaddslashes($row_synk->person_id)." AND studiengang_kz=".myaddslashes($row->studiengang_kz).";";
 		if($result_chk = pg_query($conn, $qry_chk))
 		{
-			if(pg_num_rows($result_chk)==0)	
+			if(pg_num_rows($result_chk)==0)
 			{
 				pg_query($conn, "BEGIN");
 				$qry_ins="INSERT INTO public.tbl_prestudent (aufmerksamdurch_kurzbz, person_id, studiengang_kz,
-					berufstaetigkeit_code, ausbildungcode, zgv_code, zgvort, zgvdatum, zgvmas_code, zgvmaort, 
-					zgvmadatum, 	aufnahmeschluessel, facheinschlberuf, reihungstest_id, anmeldungreihungstest, 
-					reihungstestangetreten, punkte, bismelden, anmerkung, insertamum, insertvon, updateamum, 
-					updatevon, ext_id) 
+					berufstaetigkeit_code, ausbildungcode, zgv_code, zgvort, zgvdatum, zgvmas_code, zgvmaort,
+					zgvmadatum, 	aufnahmeschluessel, facheinschlberuf, reihungstest_id, anmeldungreihungstest,
+					reihungstestangetreten, punkte, bismelden, anmerkung, insertamum, insertvon, updateamum,
+					updatevon, ext_id)
 					VALUES (".
 					myaddslashes($aufmerksam[$datenquelle]).", ".
 					myaddslashes($row_synk->person_id).", ".
-					myaddslashes($row->studiengang_kz).", 
+					myaddslashes($row->studiengang_kz).",
 					NULL, ".
 					myaddslashes($row->hoechsteausbildung).", ".
-					myaddslashes($zgv[$row->_cxzugang]).", 
+					myaddslashes($zgv[$row->_cxzugang]).",
 					NULL, ".
 					myaddslashes($row->damaturadat).", ".
-					myaddslashes($row->_cxzugangfhmag).", 
+					myaddslashes($row->_cxzugangfhmag).",
 					NULL, ".
-					myaddslashes($row->dazugangfhmagdat).", 
-					NULL, 
-					FALSE, 
-					NULL, 
-					NULL, 
+					myaddslashes($row->dazugangfhmagdat).",
+					NULL,
+					FALSE,
+					NULL,
+					NULL,
 					TRUE, ".
-					myaddslashes(0).", 
-					TRUE, 
-					'', 
-					now(), 
-					'SYNC', 
-					NULL, 
+					myaddslashes(0).",
+					TRUE,
+					'',
+					now(),
+					'SYNC',
+					NULL,
 					NULL, ".
 					myaddslashes($row->__person).");";
-				
+
 					if(!$result_neu = pg_query($conn, $qry_ins))
 					{
 						$error_log.= $qry_ins."\n<strong>".pg_last_error($conn)." </strong>\n";
 						$fehler++;
 						pg_query($conn, "ROLLBACK");
 					}
-					else 
+					else
 					{
 						//Prestudent_id ermitteln
 						$qry_seq = "SELECT currval('public.tbl_prestudent_prestudent_id_seq') AS id;";
@@ -273,20 +291,20 @@ if($result = pg_query($conn, $qry))
 						}
 						if(!$error)
 						{
-							$ausgabe.="\n------------------\nÜbertragen: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname).", Stg: ".$row->studiengang_kz;	
-							$qry_ins="INSERT INTO public.tbl_prestudentrolle (prestudent_id, rolle_kurzbz, 
-								studiensemester_kurzbz, ausbildungssemester,datum, orgform_kurzbz, 
-								insertamum, insertvon, updateamum, updatevon, ext_id) 
+							$ausgabe.="\n------------------\nÜbertragen: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname).", Stg: ".$row->studiengang_kz;
+							$qry_ins="INSERT INTO public.tbl_prestudentrolle (prestudent_id, rolle_kurzbz,
+								studiensemester_kurzbz, ausbildungssemester,datum, orgform_kurzbz,
+								insertamum, insertvon, updateamum, updatevon, ext_id)
 								VALUES (".
 								myaddslashes($prestudent_id).", ".
 								myaddslashes($rolle).", ".
 								myaddslashes($Kalender).", ".
-								myaddslashes($row->instudiensemester).", 
+								myaddslashes($row->instudiensemester).",
 								now(), ".
-								myaddslashes($orgform).", 
-								now(), 
-								'SYNC', 
-								NULL, 
+								myaddslashes($orgform).",
+								now(),
+								'SYNC',
+								NULL,
 								NULL, ".
 								myaddslashes($row->__person).")";
 							if(!$result_neu = pg_query($conn, $qry_ins))
@@ -295,29 +313,29 @@ if($result = pg_query($conn, $qry))
 								$fehler++;
 								pg_query($conn, "ROLLBACK");
 							}
-							else 
+							else
 							{
 								pg_query($conn, "COMMIT");
 								$eingefuegt++;
 							}
 						}
-						else 
+						else
 						{
 							pg_query($conn, "ROLLBACK");
 						}
-					}		
+					}
 			}
 			else
 			{
 				$dublette++;
 			}
 		}
-		else 
+		else
 		{
 			echo "<br>".$qry_chk."<br><strong>".pg_last_error($conn)." </strong><br>";
 		}
-		
-	 	//echo "<br>*****<br>".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname).", Studiengang ".$row->studiengang_kz;	
+
+	 	//echo "<br>*****<br>".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname).", Studiengang ".$row->studiengang_kz;
 	}
 }
 else
