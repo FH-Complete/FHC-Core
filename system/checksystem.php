@@ -25,7 +25,9 @@
  *                - Verzeichnisse (ob vorhanden und beschreibbar falls noetig).
  */
 
-require ('vilesci/config.inc.php');
+require ('../vilesci/config.inc.php');
+//define("CONN_STRING","host=db.technikum-wien.at dbname=bla user=bla password=bla");
+
 // Datenbank Verbindung
 if (!$conn = pg_pconnect(CONN_STRING))
    	die('Es konnte keine Verbindung zum Server aufgebaut werden!'.pg_last_error($conn));
@@ -33,16 +35,44 @@ if (!$conn = pg_pconnect(CONN_STRING))
 echo '<H1>Systemcheck!</H1>';
 echo '<H2>DB-Updates!</H2>';
 
-/*/ Newssprache
+// ************* Newssprache **********************************************************
 if (!@pg_query($conn,'SELECT * FROM campus.tbl_newssprache LIMIT 1;'))
 {
-	if (!@pg_query($conn,'DROP TABLE public.tbl_newssprache;'))
-		echo '<strong>campus.tbl_newssprache: '.pg_last_error($conn).' </strong><BR>';
-	else
-		echo 'campus.tbl_newssprache wurde angepasst!<BR>';
-}*/
+	if (@pg_query($conn,'SELECT * FROM public.tbl_newssprache LIMIT 1;'))
+		if (!@pg_query($conn,'DROP TABLE public.tbl_newssprache;'))
+			echo '<strong>public.tbl_newssprache: '.pg_last_error($conn).' </strong><BR>';
+		else
+			echo 'public.tbl_newssprache wurde geloescht!<BR>';
+	$sql='	CREATE TABLE campus.tbl_newssprache
+			(
+				sprache Varchar(16) NOT NULL,
+				news_id integer NOT NULL,
+				betreff Varchar(128),
+				text Text,
+				updateamum Timestamp,
+				updatevon Varchar(16),
+				insertamum Timestamp,
+				insertvon Varchar(16),
+				constraint "pk_tbl_newssprache" primary key ("sprache","news_id")
+			);
+			ALTER TABLE campus.tbl_newssprache add Constraint "sprache_newssprache" foreign key ("sprache") references public.tbl_sprache ("sprache") on update cascade on delete restrict;
+			ALTER TABLE campus.tbl_newssprache add Constraint "news_newssprache" foreign key ("news_id") references campus.tbl_news ("news_id") on update cascade on delete restrict;
+			GRANT select on campus.tbl_newssprache to group "admin";
+			GRANT update on campus.tbl_newssprache to group "admin";
+			GRANT delete on campus.tbl_newssprache to group "admin";
+			GRANT insert on campus.tbl_newssprache to group "admin";
+			GRANT select on campus.tbl_newssprache to group "web";
+			GRANT update on campus.tbl_newssprache to group "web";
+			GRANT delete on campus.tbl_newssprache to group "web";
+			GRANT insert on campus.tbl_newssprache to group "web";
+		';
+		if (!@pg_query($conn,$sql))
+			echo '<strong>campus.tbl_newssprache: '.pg_last_error($conn).' </strong><BR>';
+		else
+		echo 'Tabelle campus.tbl_newssprache hinzugefuegt!<BR>';
+}
 
-// lehre.tbl_lehrveranstaltung.projektarbeit
+// ************** lehre.tbl_lehrveranstaltung.projektarbeit ************************
 if (!@pg_query($conn,'SELECT projektarbeit FROM lehre.tbl_lehrveranstaltung LIMIT 1;'))
 {
 	$sql='	ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN projektarbeit boolean;
