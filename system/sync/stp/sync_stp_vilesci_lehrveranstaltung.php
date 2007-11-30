@@ -118,19 +118,19 @@
 	// ******** SYNC START ********** //
 		
 	$qry = "SELECT 
-				_LV, SUBSTRING(chLVNr, 0, 200) as chLVNr, SUBSTRING(chBezeichnung, 0, 200) as chBezeichnung, _Studiengang, SUBSTRING(meKommentar, 0, 200) as meKommentar, inSemester, inSWS, ECTS
+				_LV, SUBSTRING(chLVNr_new, 0, 200) as chLVNr, SUBSTRING(chBezeichnung, 0, 200) as chBezeichnung, _Studiengang, SUBSTRING(meKommentar, 0, 200) as meKommentar, inSemester, inSWS, ECTS
 			FROM 
 				lv JOIN studienplaneintrag ON(__LV=_LV)
 			UNION
 			SELECT
-				_LV, SUBSTRING(chLVNr, 0, 200) as chLVNr, SUBSTRING(chBezeichnung, 0, 200) as chBezeichnung, _Studiengang, SUBSTRING(meKommentar, 0, 200) as meKommentar, inSemester, inSWS, ECTS
+				_LV, SUBSTRING(chLVNr_new, 0, 200) as chLVNr, SUBSTRING(chBezeichnung, 0, 200) as chBezeichnung, _Studiengang, SUBSTRING(meKommentar, 0, 200) as meKommentar, inSemester, inSWS, ECTS
 			FROM 
 				lv JOIN semesterplaneintrag on(__LV=_LV)
 			WHERE
 				semesterplaneintrag._lv not in(SELECT _lv FROM studienplaneintrag)
 			UNION
 			SELECT
-				__LV as _LV, SUBSTRING(chLVNr, 0, 200) as chLVNr, SUBSTRING(chBezeichnung, 0, 200) as chBezeichnung, _Studiengang, SUBSTRING(meKommentar, 0, 200) as meKommentar, 0 as inSemester, 0 as inSWS, 0 as ECTS
+				__LV as _LV, SUBSTRING(chLVNr_new, 0, 200) as chLVNr, SUBSTRING(chBezeichnung, 0, 200) as chBezeichnung, _Studiengang, SUBSTRING(meKommentar, 0, 200) as meKommentar, 0 as inSemester, 0 as inSWS, 0 as ECTS
 			FROM 
 				lv
 			WHERE
