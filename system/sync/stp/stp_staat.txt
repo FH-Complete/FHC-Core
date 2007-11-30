@@ -1,3 +1,17 @@
+CREATE TABLE sync.stp_staat 
+(
+    __staat integer NOT NULL,
+    chbezeichnung character varying(256),
+    chkurzbez character varying(8),
+    chvorwahl character varying(16),
+    chkontinent character varying(32),
+    boeu boolean NOT NULL,
+    constraint stp_staat_pkey primary key (__staat)
+);
+
+REVOKE ALL ON TABLE sync.stp_staat FROM PUBLIC;
+GRANT INSERT,SELECT,UPDATE ON TABLE sync.stp_staat TO GROUP admin;
+    
 insert into sync.stp_staat (__staat, chbezeichnung, chkurzbez, chvorwahl, chkontinent, boeu) values ('1', 'Österreich', 'A', '++43', 'Europa', '1');
 insert into sync.stp_staat (__staat, chbezeichnung, chkurzbez, chvorwahl, chkontinent, boeu) values ('2', 'Deutschland', 'D', '++49', 'Europa', '1');
 insert into sync.stp_staat (__staat, chbezeichnung, chkurzbez, chvorwahl, chkontinent, boeu) values ('3', 'Schweiz', 'CH', '++41', 'Europa', '0');
