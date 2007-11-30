@@ -59,6 +59,8 @@ if (!@pg_query($conn,'DELETE FROM sync.stp_stgvertiefung;'))
 else
 	echo 'sync.stp_stgvertiefung wurde geleert!<BR>';
 
+echo 'Daten werden geholt!<BR>';
+
 $i=0;
 
 $qry="SELECT __stgvertiefung, _studiengang, chbezeichnung, chkurzbez	FROM stgvertiefung;";
