@@ -458,6 +458,7 @@ class lehrstunde
 	 *************************************************************************/
 	function kollision($stpl_table='stundenplandev')
 	{
+		$ignore_reservation=false;
 		// Parameter Checken
 		// Bezeichnung der Stundenplan-Tabelle und des Keys
 		$stpl_id=$stpl_table.TABLE_ID;
@@ -486,7 +487,45 @@ class lehrstunde
 		$anz=pg_numrows($erg_stpl);
 		//Check
 		if ($anz==0)
+		{
+			// Reservierungen pruefen?
+			if (!$ignore_reservation)
+			{
+				// Datenbank abfragen  	( studiengang_kz, titel, beschreibung )	 		
+				$sql_query="SELECT reservierung_id AS id, uid AS lektor, stg_kurzbz, ort_kurzbz, semester, verband, gruppe, gruppe_kurzbz, datum, stunde 
+							FROM lehre.vw_reservierung
+							WHERE datum='$this->datum' AND stunde=$this->stunde AND (ort_kurzbz='$this->ort_kurzbz' OR ";
+				if ($this->lektor_uid!='_DummyLektor')
+					$sql_query.="(uid='$this->lektor_uid') AND uid!='_DummyLektor' OR ";
+				$sql_query.="(studiengang_kz=$this->studiengang_kz AND semester=$this->sem";
+				if ($this->ver!=null && $this->ver!='' && $this->ver!=' ')
+					$sql_query.=" AND (verband='$this->ver' OR verband IS NULL OR verband='' OR verband=' ')";
+				if ($this->grp!=null && $this->grp!='' && $this->grp!=' ')
+					$sql_query.=" AND (gruppe='$this->grp' OR gruppe IS NULL OR gruppe='' OR gruppe=' ')";
+				if ($this->gruppe_kurzbz!=null && $this->gruppe_kurzbz!='' && $this->gruppe_kurzbz!=' ')
+					$sql_query.=" AND (gruppe_kurzbz='$this->gruppe_kurzbz')";
+				$sql_query.="))";
+				//echo $sql_query.'<br>';
+				if (! $erg_res=pg_query($this->conn, $sql_query))
+				{
+					$this->errormsg=$sql_query.pg_last_error($this->conn);
+					return true;
+				}
+				$anz_res=pg_numrows($erg_res);
+				//Check
+				if ($anz_res==0)
+				{
+					return false;
+				}
+				else
+				{
+					$row=pg_fetch_object($erg_res);
+					$this->errormsg="Kollision (Reservierung): $row->id|$row->lektor|$row->ort_kurzbz|$row->stg_kurzbz-$row->semester$row->verband$row->gruppe$row->gruppe_kurzbz - $row->datum/$row->stunde";
+					return true;
+				}				
+			}
 			return false;
+		}
 		else
 		{
 			$row=pg_fetch_object($erg_stpl);
