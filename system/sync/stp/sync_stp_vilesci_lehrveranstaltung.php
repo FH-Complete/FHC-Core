@@ -4,6 +4,14 @@
 // StPoelten -> VILESCI
 // setzt vorraus: - tbl_sprache
 //                - tbl_studiengang
+// 
+// Beschreibung:
+// Das Semester der Lehrveranstaltungen wird ueber die Tabelle
+// Studienplaneintrag ermittelt. Bei Lehrveranstaltungen die nicht in der Tabelle
+// Studienplaneintrag vorkommen wird das Semester ueber die Tabelle SemesterplanEintrag
+// ermittelt. 
+// LVs die weder in der Tabelle Studienplaneintrag noch in der Tabelle Semesterplaneintrag
+// vorhanden sind werden im 0ten Semester angelegt.
 // **************************************
 	require_once('sync_config.inc.php');
 	require_once('../../../include/lehrveranstaltung.class.php');
@@ -11,7 +19,7 @@
 	require_once('../../../include/lehrfach.class.php');
 	
 	//$adress='pam@technikum-wien.at';
-	$adress='oesi@technikum-wien.at';
+	//$adress='oesi@technikum-wien.at';
 	//$adress='ruhan@technikum-wien.at';
 
 	//$conn=pg_connect(CONN_STRING);

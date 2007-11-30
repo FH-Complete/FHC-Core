@@ -12,7 +12,7 @@
 	require_once('../../../include/mitarbeiter.class.php');
 	
 	//$adress='pam@technikum-wien.at';
-	$adress='oesi@technikum-wien.at';
+	//$adress='oesi@technikum-wien.at';
 	//$adress='ruhan@technikum-wien.at';
 
 	if(!$conn = pg_pconnect(CONN_STRING))
