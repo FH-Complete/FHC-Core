@@ -54,23 +54,28 @@ if (!@pg_query($conn,'SELECT * FROM sync.stp_stgvertiefung LIMIT 1;'))
 <body>
 
 <?php
+if (!@pg_query($conn,'DELETE FROM sync.stp_stgvertiefung;'))
+	echo '<strong>sync.stp_stgvertiefung: '.pg_last_error($conn).' </strong><BR>';
+else
+	echo 'sync.stp_stgvertiefung wurde geleert!<BR>';
+
 $i=0;
 
 $qry="SELECT __stgvertiefung, _studiengang, chbezeichnung, chkurzbez	FROM stgvertiefung;";
 if($result_ext = mssql_query($qry,$conn_ext))
 {
 	while($row=mssql_fetch_object($result_ext))
-	{		
+	{
 		$qry="INSERT INTO sync.stp_stgvertiefung (__stgvertiefung, _studiengang, chbezeichnung, chkurzbez)
 				VALUES ('$row->__stgvertiefung','$row->_studiengang',".($row->chbezeichnung==''?'NULL':"'".$row->chbezeichnung."'").",".($row->chkurzbez==''?'NULL':"'".$row->chkurzbez."'").");";
 		if(!$result = pg_query($conn, $qry))
 		{
 			echo $qry.'<BR>'.pg_last_error($conn).' </strong><BR>';
 		}
-		
+
 		echo '.';
 		flush();
-		
+
 		$i++;
 	}
 }
