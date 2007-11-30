@@ -187,6 +187,7 @@ if (!@pg_query($conn,'SELECT * FROM sync.stp_person LIMIT 1;'))
 		echo '<strong>sync.stp_person: '.pg_last_error($conn).' </strong><BR>';
 	else
 		echo 'sync.stp_person wurde angelegt!<BR>';
+
 }
 
 /*************************
@@ -201,6 +202,11 @@ if (!@pg_query($conn,'SELECT * FROM sync.stp_person LIMIT 1;'))
 <body>
 
 <?php
+if (!@pg_query($conn,'DELETE FROM sync.stp_person;'))
+	echo '<strong>sync.stp_person: '.pg_last_error($conn).' </strong><BR>';
+else
+	echo 'sync.stp_person wurde geleert!<BR>';
+
 $i=0;
 
 $qry="SELECT bomitgliedentwicklung,boqualnachweis,__person,_cxberufstaetigkeit,_cxbesch1code,_cxbesch2code,_cxbesqual,_cxbundesland,_cxfamilienstand,_cxgebbundesland,_cxgeschlecht,_cxstudstatus,_cxzugang,_cxzugangfhmag,_gebland,_personpraxisbetreuer,_personpraxisfirma,_staat,_staatsbuerger,_stgorgform,_stgvertiefung,bohabilitation,bohauptberuf,briefanrede,chadrbemerkung,chbankbezeichnung,chblz,chemailadresse,chemailbemerkung,chersatzkz,chfirma,chgebort,chhausnr,chhomepage,chkalendersemstataend,chklappe,chktonr,chmatrikelnr,chnachname,chnummer,chort,chplz,chstrasse,chsvnr,chtelbemerkung,chtitel,chusername,chvorname,chvorwahl,convert(varchar(10),daeintrittdat,121) AS daeintrittdat,convert(varchar(10),dagebdat,121) AS dagebdat,convert(varchar(10),damaturadat,121) AS damaturadat,convert(varchar(10),dapraxisbeginndat,121) AS dapraxisbeginndat,convert(varchar(10),dapraxisendedat,121) AS dapraxisendedat,convert(varchar(10),datenquelle,121) AS datenquelle,convert(varchar(10),dazugangfhmagdat,121) AS dazugangfhmagdat,flpraxisentgelt,hoechsteausbildung,inausmassbesch,inkinder,inpraxiswochenstd,instudiensemester,mepraxisbeschreibung,personalnr,_cxpersontyp,_cxzugangold,_personschule,aggstg,boanmeldegebuehrbez,bodeutschsehrgut,bodinmgew,bodivmgew,bodonmgew,bodovmgew,boemailfhweb,boformalleinerhalter,boformalleinverdiener,boformfreibetragsbescheid,boformpendlerpauschale,bofrnmgew,bofrvmgew,bominmgew,bomivmgew,bomonmgew,bomovmgew,bopraesenzdienst,bopraxisvollzeit,bostdgeblockt,chautokennzeichen,chberufstitel,chgattin,chidentifikationsdokument,chparkberechtigung,chspindnr,chvenia,chvertiefungzusatz,inchipsernr,inchiptyp,infachbereich,inpin,meausbildung,mebemerkung,meberufstaetigkeit,megewzeit,mekinder,mepublikationen,convert(varchar(10),niu_daparkenbis,121) AS niu_daparkenbis,olfoto,originalid,position,_cxbeurteilungsstufediplarbeit,_cxbeurteilungsstufegesamt,_cxbeurteilungsstufekommipruef,_cxbeurteilungsstufelv1,_cxbeurteilungsstufelv2,_cxdiplomarbeitmotiv,_cxthemenquelle,_gegenstandnichttech,_gegenstandtech,_lvfachleitung,_lvfachstud,_personlb,_personlb2,_pruefernichttech,_pruefertech,_vorsitzender,chbemerkungterminaufnverf,chgrp,chlfdnr,chpraxisfirmatext,chpraxiskalendersemester,chpraxisortengl,chstudienberechtprueffach,chthema,chthemaengl,convert(varchar(10),daanmeldedat,121) AS daanmeldedat,convert(varchar(10),daarbeitsvergabedat,121) AS daarbeitsvergabedat,convert(varchar(10),dapruefteil1dat,121) AS dapruefteil1dat,convert(varchar(10),dapruefungsdat,121) AS dapruefungsdat,convert(varchar(10),dastudienberechtpruefdat,121) AS dastudienberechtpruefdat,convert(varchar(10),dasvabmeldedat,121) AS dasvabmeldedat,convert(varchar(10),dasvanmeldedat,121) AS dasvanmeldedat,convert(varchar(23),daterminaufneverf,121) AS daterminaufneverf,ingrp,inpraxisstudiensemester,mebeschreibung,meerstbeurteilung,mepraxisbeschreibungengl,mezusatzqualifikation,mezweitbeurteilung,niu_chthema
