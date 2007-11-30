@@ -415,8 +415,8 @@
 	$statistik .="Fehler beim Aktualisieren von LF: $update_lf_error\n\n";
 	
 	$text = $statistik."\n\n".$text;
-	$to = 'oesi@technikum-wien.at';
-	//$to = $adress_ext;
+	//$to = 'oesi@technikum-wien.at';
+	$to = $adress_ext;
 	
 	if(mail($to, 'SYNC Lehrveranstaltung',$head_text.$text, "From: vilesci@technikum-wien.at"))
 		echo "Mail wurde an $to versandt<br><br>";
