@@ -318,7 +318,7 @@
 	<tr>
 		<td nowrap>
 			<a class="MenuItem2" href="personen/funktion.php" target="main">
-			<img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Funtionen</a>
+			<img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Funktionen</a>
 		</td>
 	</tr>
 	</table>

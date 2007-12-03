@@ -511,9 +511,9 @@ if($geburtsdatum!='')
 <?php
 echo '<tr><td>Titel(Pre)</td><td><input type="text" id="titel" name="titel" maxlength="64" value="'.$titel.'" /></td></tr>';
 echo '<tr><td>Vorname</td><td><input type="text" id="vorname" maxlength="32" name="vorname" value="'.$vorname.'" /></td></tr>';
-echo '<tr><td>Nachname</td><td><input type="text" maxlength="64" id="nachname" name="nachname" value="'.$nachname.'" /></td></tr>';
+echo '<tr><td>Nachname *</td><td><input type="text" maxlength="64" id="nachname" name="nachname" value="'.$nachname.'" /></td></tr>';
 echo '<tr><td>Titel(Post)</td><td><input type="text" id="titelpost" name="titelpost" maxlength="64" value="'.$titelpost.'" /></td></tr>';
-echo '<tr><td>Geschlecht</td><td><SELECT id="geschlecht" name="geschlecht">';
+echo '<tr><td>Geschlecht *</td><td><SELECT id="geschlecht" name="geschlecht">';
 echo '<OPTION value="m" '.($geschlecht=='m'?'selected':'').'>m&auml;nnlich</OPTION>';
 echo '<OPTION value="w" '.($geschlecht=='w'?'selected':'').'>weiblich</OPTION>';
 echo '</SELECT>';
@@ -554,7 +554,10 @@ else
 
 echo '
 </table>
+<br><br>
+Felder die mit einem * gekennzeichnet sind müssen ausgefüllt werden!
 </td>
+
 <td valign="top">
 ';
 

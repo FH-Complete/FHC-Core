@@ -67,7 +67,7 @@
 		$lv->studiengang_kz = $_POST['studiengang_kz'];
 		$lv->semester = $_POST['semester'];
 		$lv->sprache = $_POST['sprache'];
-		$lv->ects  = $_POST['ects'];
+		$lv->ects  = str_replace(',','.',$_POST['ects']);
 		$lv->semesterstunden = $_POST['semesterstunden'];
 		$lv->anmerkung = $_POST['anmerkung'];
 		$lv->lehre = isset($_POST['lehre']);
@@ -129,7 +129,7 @@
 		$htmlstr .= "		<td>Kurzbz</td>";
 		$htmlstr .= "		<td><input type='text' name='kurzbz' value='$lv->kurzbz'\n</td>";
 		$htmlstr .= "		<td>Bezeichnung</td>";
-		$htmlstr .= "		<td colspan='3'><input type='text' name='bezeichnung' value='".$lv->bezeichnung."' size='60' maxlength='128'></td>\n";
+		$htmlstr .= "		<td colspan='3'><input type='text' name='bezeichnung' value='".htmlentities($lv->bezeichnung, ENT_QUOTES)."' size='60' maxlength='128'></td>\n";
 					
 		$htmlstr .= "</tr><tr>";
 		$htmlstr .= "		<td>Studiengang</td>";

@@ -49,7 +49,7 @@ function setbisdatum()
 	ret = ret + "." + now.getFullYear();
 	ret = ret + " " + foo(now.getHours());
 	ret = ret + ":" + foo(now.getMinutes());
-	ret = ret + ":" + foo(now.getSeconds());
+	//ret = ret + ":" + foo(now.getSeconds());
 		
 	document.getElementById("bis").value=ret;
 }
@@ -72,6 +72,11 @@ function loaduebersicht()
 	projekt = document.getElementById("projekt").value;
 	
 	document.location.href="'.$_SERVER['PHP_SELF'].'?filter="+projekt;
+}
+
+function uebernehmen()
+{
+	document.getElementById("bis").value=document.getElementById("von").value;
 }
 </script>
 </head>
@@ -109,8 +114,8 @@ $projekt_kurzbz = (isset($_POST['projekt'])?$_POST['projekt']:'');
 $studiengang_kz = (isset($_POST['studiengang'])?$_POST['studiengang']:'');
 $fachbereich_kurzbz = (isset($_POST['fachbereich'])?$_POST['fachbereich']:'');
 $aktivitaet_kurzbz = (isset($_POST['aktivitaet'])?$_POST['aktivitaet']:'');
-$von = (isset($_POST['von'])?$_POST['von']:date('d.m.Y H:i:s'));
-$bis = (isset($_POST['bis'])?$_POST['bis']:date('d.m.Y H:i:s', mktime(date('H'), date('i')+10, date('s'), date('m'),date('d'),date('Y'))));
+$von = (isset($_POST['von'])?$_POST['von']:date('d.m.Y H:i'));
+$bis = (isset($_POST['bis'])?$_POST['bis']:date('d.m.Y H:i', mktime(date('H'), date('i')+10, 0, date('m'),date('d'),date('Y'))));
 $beschreibung = (isset($_POST['beschreibung'])?$_POST['beschreibung']:'');
 
 //Speichern der Daten
@@ -186,12 +191,17 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 		{
 			$uid = $zeit->uid;
 			$aktivitaet_kurzbz = $zeit->aktivitaet_kurzbz;
-			$von = date('d.m.Y H:i:s', $datum->mktime_fromtimestamp($zeit->start));
-			$bis = date('d.m.Y H:i:s', $datum->mktime_fromtimestamp($zeit->ende));
+			$von = date('d.m.Y H:i', $datum->mktime_fromtimestamp($zeit->start));
+			$bis = date('d.m.Y H:i', $datum->mktime_fromtimestamp($zeit->ende));
 			$beschreibung = $zeit->beschreibung;
 			$studiengang_kz = $zeit->studiengang_kz;
 			$fachbereich_kurzbz = $zeit->fachbereich_kurzbz;
 			$projekt_kurzbz = $zeit->projekt_kurzbz;
+		}
+		else 
+		{
+			echo "<b> Keine Berechtigung zum Aendern des Datensatzes</b>";
+			$zeitaufzeichnung_id='';
 		}
 	}
 }
@@ -287,7 +297,7 @@ if($result_projekt = pg_query($conn, $qry_projekt))
 		//Start/Ende
 		echo '
 		<tr>
-			<td>Von</td><td><input type="text" name="von" value="'.$von.'"></td>
+			<td>Von</td><td><input type="text" id="von" name="von" value="'.$von.'"><input type="button" value="->"  onclick="uebernehmen()"></td>
 			<td>Bis</td><td><input type="text" id="bis" name="bis" value="'.$bis.'">&nbsp;&nbsp;<img src="../../../skin/images/refresh.png" onclick="setbisdatum()"></td>
 		<tr>';
 		//Beschreibung
@@ -321,8 +331,8 @@ if($result_projekt = pg_query($conn, $qry_projekt))
 	    	$where = "uid='$user'";
 	    	//(SELECT to_char(sum(ende-start),'HH:MI:SS') 
 	    $qry = "SELECT 
-	    			*, to_char ((ende-start),'HH24:MI:SS') as diff, 
-	    			(SELECT sum(ende-start)
+	    			*, to_char ((ende-start),'HH24:MI') as diff, 
+	    			(SELECT (to_char(sum(ende-start),'DD')::integer)*24+to_char(sum(ende-start),'HH24')::integer || ':' || to_char(sum(ende-start),'MI')
 	    			 FROM campus.tbl_zeitaufzeichnung 
 	    			 WHERE $where AND ende>(now() - INTERVAL '40 days')) as summe 	    
 	    		FROM campus.tbl_zeitaufzeichnung WHERE $where AND ende>(now() - INTERVAL '40 days') 
@@ -340,14 +350,20 @@ if($result_projekt = pg_query($conn, $qry_projekt))
 				echo "       <td>".$row->projekt_kurzbz."</td>\n";
 		        echo "       <td>$row->aktivitaet_kurzbz</td>\n";
 		        echo "       <td>$row->uid</td>\n";
-		        echo "       <td><div style='display: none;'>$row->start</div>".date('d.m.Y H:i:s', $datum->mktime_fromtimestamp($row->start))."</td>\n";
-		        echo "       <td><div style='display: none;'>$row->ende</div>".date('d.m.Y H:i:s', $datum->mktime_fromtimestamp($row->ende))."</td>\n";
+		        echo "       <td><div style='display: none;'>$row->start</div>".date('d.m.Y H:i', $datum->mktime_fromtimestamp($row->start))."</td>\n";
+		        echo "       <td><div style='display: none;'>$row->ende</div>".date('d.m.Y H:i', $datum->mktime_fromtimestamp($row->ende))."</td>\n";
 		        echo "       <td align='right'>".$row->diff."</td>\n";
 		        echo "       <td title='".str_replace("\r\n",' ',$row->beschreibung)."'>".(strlen($row->beschreibung)>33?substr($row->beschreibung,0,30).'...':$row->beschreibung)."</td>\n";
 		        echo "       <td>".(isset($stg_arr[$row->studiengang_kz])?$stg_arr[$row->studiengang_kz]:$row->studiengang_kz)."</td>\n";
 		        echo "       <td>$row->fachbereich_kurzbz</td>\n";
-		        echo "       <td><a href='".$_SERVER['PHP_SELF']."?type=edit&zeitaufzeichnung_id=$row->zeitaufzeichnung_id' class='Item'>edit</a></td>\n";
-		        echo "       <td><a href='".$_SERVER['PHP_SELF']."?type=delete&zeitaufzeichnung_id=$row->zeitaufzeichnung_id' class='Item'  onclick='return confdel()'>delete</a></td>\n";
+		        echo "       <td>";
+		        if(!isset($_GET['filter']) || $row->uid==$user)
+		        	echo "<a href='".$_SERVER['PHP_SELF']."?type=edit&zeitaufzeichnung_id=$row->zeitaufzeichnung_id' class='Item'>edit</a>";
+		        echo "</td>\n";
+		        echo "       <td>";
+		        if(!isset($_GET['filter']) || $row->uid==$user)
+		        	echo "<a href='".$_SERVER['PHP_SELF']."?type=delete&zeitaufzeichnung_id=$row->zeitaufzeichnung_id' class='Item'  onclick='return confdel()'>delete</a>";
+		        echo "</td>\n";
 		        echo "   </tr>\n";
 		        $i++;
 		    }

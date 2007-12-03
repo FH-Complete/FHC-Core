@@ -87,7 +87,7 @@
 		<td class="tdwidth10">&nbsp;</td>
 		<td class="ContentHeader"><font class="ContentHeader">&nbsp;
 		<?php
-		echo $lv_obj->bezeichnung;
+		echo $lv_obj->bezeichnung.' / '.$kurzbz.'-'.$term_id;
 
 		$qry = "SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE lehrveranstaltung_id='$lvid' ORDER BY ende DESC LIMIT 1";
 		$stsem = new studiensemester($sql_conn);
@@ -282,12 +282,13 @@
 						echo '<img src="../../../skin/images/button_dl.jpg" width="67" height="45"><br>';
 						echo '<strong>Download</strong>';
 					}
-
+					
 					//Wenn user eine Lehrfachzuteilung fuer dieses Lehrfach hat wird
 					//Ein Link zum Upload angezeigt und ein Link um das Download-Verzeichnis
 					//als Zip Archiv herunterzuladen
 					if($user_is_allowed_to_upload || $rechte->isBerechtigt('admin',$course_id) || $rechte->isBerechtigt('lehre',$course_id))// || $rechte->isBerechtigt('lehre',null,null,$fachbereich_id))
 					{
+						echo "<br>".strtolower("$kurzbz/$term_id/$short/download");
 						echo '<br>';
 						echo "<a class='Item' target='_blank' href='upload.php?course_id=$course_id&term_id=$term_id&short=$short'>Upload</a>";
 						echo '&nbsp;&nbsp;&nbsp;';
@@ -542,12 +543,16 @@
             <p>&nbsp;</p>
 				</td>
 				<td class="tdvertical" align="center">
-				<a href="<?php
-				  			echo 'news://cis.technikum-wien.at/'.strtolower($stg_obj->kurzbzlang).'.'.$term_id.'sem.'.strtolower($short_short_name);
-				  		   ?>">
-				<img src="../../../skin/images/button_ng.jpg" width="67" height="45"><br>
-				<strong>Newsgroups</strong>
-				</a>
+				<?php
+				//Keine Newsgroups fuer Studiengang '0' (Freifaecher) anzeigen
+				if($course_id!='0')
+				{
+					echo '<a href="news://cis.technikum-wien.at/'.strtolower($stg_obj->kurzbzlang).'.'.$term_id.'sem.'.strtolower($short_short_name).'">
+							<img src="../../../skin/images/button_ng.jpg" width="67" height="45"><br>
+							<strong>Newsgroups</strong>
+						</a>';
+				}
+				?>
 				<p>&nbsp;</p>
 				</td>
 			</tr>
