@@ -117,7 +117,7 @@
 			{
 				echo '<tr>';
 				echo '	<td class="tdwrap">';
-				echo "	  <li><a class=\"Item2\" title=\"".$row->bezeichnung."\" href=\"lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".CutString($row->bezeichnung, 21)."</a></li>";
+				echo "	  <li><a class=\"Item2\" title=\"".$row->bezeichnung."\" href=\"../lehre/lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".CutString($row->bezeichnung, 21)."</a></li>";
 				echo '	</td>';
 				echo '</tr>';
 			}

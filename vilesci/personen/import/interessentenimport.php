@@ -574,15 +574,15 @@ if($geburtsdatum!='')
 <?php
 echo '<tr><td>Anrede</td><td><input type="text" id="anrede" name="anrede" maxlength="64" value="'.$anrede.'"  onblur="AnredeChange()"/></td></tr>';
 echo '<tr><td>Titel(Pre)</td><td><input type="text" id="titel" name="titel" maxlength="64" value="'.$titel.'" /></td></tr>';
-echo '<tr><td>Vorname</td><td><input type="text" id="vorname" maxlength="32" name="vorname" value="'.$vorname.'" /></td></tr>';
-echo '<tr><td>Nachname</td><td><input type="text" maxlength="64" id="nachname" name="nachname" value="'.$nachname.'" /></td></tr>';
+echo '<tr><td>Vorname </td><td><input type="text" id="vorname" maxlength="32" name="vorname" value="'.$vorname.'" /></td></tr>';
+echo '<tr><td>Nachname *</td><td><input type="text" maxlength="64" id="nachname" name="nachname" value="'.$nachname.'" /></td></tr>';
 echo '<tr><td>Titel(Post)</td><td><input type="text" id="titelpost" name="titelpost" maxlength="64" value="'.$titelpost.'" /></td></tr>';
-echo '<tr><td>Geschlecht</td><td><SELECT id="geschlecht" name="geschlecht">';
+echo '<tr><td>Geschlecht *</td><td><SELECT id="geschlecht" name="geschlecht">';
 echo '<OPTION value="m" '.($geschlecht=='m'?'selected':'').'>m&auml;nnlich</OPTION>';
 echo '<OPTION value="w" '.($geschlecht=='w'?'selected':'').'>weiblich</OPTION>';
 echo '</SELECT>';
 echo '</td></tr>';
-echo '<tr><td>Geburtsdatum</td><td><input type="text" id="geburtsdatum" size="10" maxlength="10" name="geburtsdatum" value="'.$geburtsdatum.'" /></td></tr>';
+echo '<tr><td>Geburtsdatum </td><td><input type="text" id="geburtsdatum" size="10" maxlength="10" name="geburtsdatum" value="'.$geburtsdatum.'" /></td></tr>';
 echo '<tr><td colspan="2"><fieldset><legend>Adresse</legend><table>';
 echo '<tr><td>Adresse</td><td><input type="text" id="adresse" maxlength="256" name="adresse" value="'.$adresse.'" /></td></tr>';
 echo '<tr><td>Postleitzahl</td><td><input type="text" maxlength="16" id="plz" name="plz" value="'.$plz.'" /></td></tr>';
@@ -609,21 +609,21 @@ echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><td>Ausbildungsart</td><td><input type="text" id="ausbildungsart" name="ausbildungsart" value="'.$ausbildungsart.'" /></td></tr>';
 echo '<tr><td>Anmerkungen</td><td><textarea id="anmerkung" name="anmerkungen">'.$anmerkungen.'</textarea></td></tr>';
-echo '<tr><td>Studiengang</td><td><SELECT id="studiengang_kz" name="studiengang_kz">';
+echo '<tr><td>Studiengang *</td><td><SELECT id="studiengang_kz" name="studiengang_kz">';
 $stg_obj = new studiengang($conn);
 $stg_obj->getAll('typ, kurzbz');
 foreach ($stg_obj->result as $row)
 	echo '<OPTION value="'.$row->studiengang_kz.'" '.($row->studiengang_kz==$studiengang_kz?'selected':'').'>'.$row->kuerzel.'</OPTION>';
 echo '</SELECT>';
 echo '</td></tr>';
-echo '<tr><td>Studiensemester</td><td><SELECT id="studiensemester_kurzbz" name="studiensemester_kurzbz">';
+echo '<tr><td>Studiensemester *</td><td><SELECT id="studiensemester_kurzbz" name="studiensemester_kurzbz">';
 $stsem = new studiensemester($conn);
 $stsem->getAll();
 foreach ($stsem->studiensemester as $row)
 	echo '<OPTION value="'.$row->studiensemester_kurzbz.'" '.($row->studiensemester_kurzbz==$studiensemester_kurzbz?'selected':'').'>'.$row->studiensemester_kurzbz.'</OPTION>';
 echo '</SELECT>';
 echo '</td></tr>';
-echo '<tr><td>Ausbildungssemester</td><td><SELECT id="ausbildungssemester" name="ausbildungssemester">';
+echo '<tr><td>Ausbildungssemester *</td><td><SELECT id="ausbildungssemester" name="ausbildungssemester">';
 for ($i=1;$i<9;$i++)
 	echo '<OPTION value="'.$i.'" '.($i==$ausbildungssemester?'selected':'').'>'.$i.'. Semester</OPTION>';
 echo '</SELECT>';
@@ -636,8 +636,10 @@ if(($geburtsdatum=='' && $vorname=='' && $nachname=='') || $geburtsdatum_error)
 else
 	echo '<input type="submit" name="save" value="Speichern"</td></tr>';
 ?>
-
 </table>
+<br><br>
+Felder die mit einem * gekennzeichnet sind müssen ausgefüllt werden!
+
 </td>
 <td valign="top">
 <!--Vorschlaege-->

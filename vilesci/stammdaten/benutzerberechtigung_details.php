@@ -142,7 +142,7 @@
 			$htmlstr .= "<br><div class='kopf'>Berechtigungen <b>".$uid."</b></div>\n";
 			$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
 			$htmlstr .= "<tr></tr>\n";
-			$htmlstr .= "<tr><td>Kurzbz</td><td>Art</td><td>Sudiengang</td><td>Fachbereich</td><td>Semester</td><td>Start</td><td>Ende</td><td></td><td></td><td></td></tr>\n";
+			$htmlstr .= "<tr><td>Kurzbz</td><td>Art</td><td>Studiengang</td><td>Fachbereich</td><td>Semester</td><td>Start</td><td>Ende</td><td></td><td></td><td></td></tr>\n";
 			foreach($rights->berechtigungen as $b)
 			{
 				$htmlstr .= "<form action='benutzerberechtigung_details.php' method='POST' name='berechtigung".$b->benutzerberechtigung_id."'>\n";

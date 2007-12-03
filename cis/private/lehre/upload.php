@@ -150,7 +150,8 @@ A:hover {
 			  <?php
 				if($islector)
 				{
-				   $sql_query = "SELECT DISTINCT tbl_studiengang.typ,UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz, tbl_studiengang.kurzbzlang, tbl_studiengang.studiengang_kz FROM public.tbl_studiengang, lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter WHERE tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz AND tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND tbl_lehrveranstaltung.studiengang_kz!=0 AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid='$user' AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>'' ORDER BY typ, kurzbz";
+					//AND tbl_lehrveranstaltung.studiengang_kz!=0
+				   $sql_query = "SELECT DISTINCT tbl_studiengang.typ,UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz, tbl_studiengang.kurzbzlang, tbl_studiengang.studiengang_kz FROM public.tbl_studiengang, lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter WHERE tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz AND tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid='$user' AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>'' ORDER BY typ, kurzbz";
 
 				   if(!$result_lector_dispatch = pg_query($sql_conn, $sql_query))
 				   		die('Fehler beim Lesen aus der Datenbank');
@@ -186,7 +187,7 @@ A:hover {
 
 							if(isset($arr[0]) && $arr[0]==0) //Berechtigt fuer alle Stg
 							{
-								$sql_query="SELECT studiengang_kz, kurzbzlang, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM public.tbl_studiengang WHERE studiengang_kz<>0 ORDER BY kurzbz";
+								$sql_query="SELECT studiengang_kz, kurzbzlang, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM public.tbl_studiengang ORDER BY kurzbz"; // WHERE studiengang_kz<>0
 								$result_stg=pg_query($sql_conn,$sql_query);
 
 								while($row = pg_fetch_object($result_stg))
@@ -218,7 +219,7 @@ A:hover {
 
 							if(isset($arr[0]) && $arr[0]==0) //Berechtigt fuer alle Stg
 							{
-								$sql_query="SELECT studiengang_kz, kurzbzlang, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM public.tbl_studiengang WHERE studiengang_kz<>0 ORDER BY kurzbz";
+								$sql_query="SELECT studiengang_kz, kurzbzlang, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM public.tbl_studiengang ORDER BY kurzbz"; //WHERE studiengang_kz<>0
 								$result_stg=pg_exec($sql_conn,$sql_query);
 
 								while($row = pg_fetch_object($result_stg))
@@ -247,7 +248,7 @@ A:hover {
 
 							if(isset($arr[0]) && $arr[0]==0) //Berechtigt fuer alle Stg
 							{
-								$sql_query="SELECT studiengang_kz, kurzbzlang, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM public.tbl_studiengang WHERE studiengang_kz<>0 ORDER BY kurzbz";
+								$sql_query="SELECT studiengang_kz, kurzbzlang, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM public.tbl_studiengang ORDER BY kurzbz"; //WHERE studiengang_kz<>0
 								$result_stg=pg_exec($sql_conn,$sql_query);
 
 								while($row = pg_fetch_object($result_stg))
@@ -276,7 +277,7 @@ A:hover {
 
 							if(isset($arr[0]) && $arr[0]=='0') //Berechtigt fuer alle Fachbereiche = Alle Studiengaenge
 							{
-								$sql_query="SELECT studiengang_kz, kurzbzlang, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM public.tbl_studiengang WHERE studiengang_kz<>0 ORDER BY kurzbz";
+								$sql_query="SELECT studiengang_kz, kurzbzlang, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM public.tbl_studiengang ORDER BY kurzbz"; //WHERE studiengang_kz<>0
 								$result_stg=pg_exec($sql_conn,$sql_query);
 
 								while($row_stg = pg_fetch_object($result_stg))
@@ -303,7 +304,7 @@ A:hover {
 						foreach ($stg_arr as $stg_id=>$kurzbz)
 						{
 							echo "\n   ";
-							if(isset($course_id) && $course_id && $course_id == $stg_id)
+							if(isset($course_id) && $course_id == $stg_id) //$course_id &&
 							{
 								$course_short = $kurzbz;
 								echo '<option value="upload.php?course_id='.$stg_id.'" selected>'.$kurzbz.'</option>';

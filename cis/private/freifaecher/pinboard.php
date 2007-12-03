@@ -32,9 +32,9 @@
 	{
 		$news_obj = new news($sql_conn);
 		$news_obj->getnews(MAXNEWSALTER,'0','0');
-
+		$open=true;
 		$zaehler=0;
-		echo "<table>";
+		echo "<div id='news'>";
 		foreach ($news_obj->result as $row)
 		{
 			$zaehler++;
@@ -43,7 +43,27 @@
 			else
 				$datum='';
 
-			if($row->semester == 0)
+			echo '<div class="news">';
+			//if($row->semester == '')
+			//{
+			echo '
+			<div class="titel">
+				<table width="100%">
+					<tr>
+						<td width="30%" align="left">'.$row->betreff.'</td>
+						<td width="30%" align="center">'.$datum.'</td>
+						<td width="30%" align="right" style="display: '.($open?'none':'block').'" id="'.$zaehler.'Mehr" ><a href="#" class="Item" onclick="return show(\''.$zaehler.'\')">mehr &gt;&gt;</a></td>
+						<td width="30%" align="right" style="display: '.($open?'block':'none').'" id="'.$zaehler.'Verfasser">'.$row->verfasser.'</td>
+					</tr>
+				</table>
+			</div>
+			<div class="text" style="display: '.($open?'block':'none').';" id="'.$zaehler.'Text">
+			'.str_replace("../../skin","../../../skin","$row->text").'
+			</div>
+			</div>
+			<br>
+			';
+			/*if($row->semester == 0)
 			{
 				echo '<tr><td class="ContentHeader2"><p><small>'.$datum.' - '.$row->verfasser.' - [Allgemein]</small><br><b>'.$row->betreff.'</b><br></td></tr>';
 			}
@@ -52,9 +72,9 @@
 				echo '<tr><td class="ContentHeader2"><p><small>'.$datum.' - '.$row->verfasser.' - </small><br><b>'.$row->betreff.'</b><br></td></tr>';
 			}
 
-			echo "<tr><td class='MarkLine'>".str_replace("../../skin","../../../skin","$row->text")."</p></td></tr>";
+			echo "<tr><td class='MarkLine'>".str_replace("../../skin","../../../skin","$row->text")."</p></td></tr>";*/
 		}
-		echo "</table>";
+		echo "</div>";
 		if($zaehler==0)
 			echo '<p>Zur Zeit gibt es keine aktuellen News!</p>';
 	}
