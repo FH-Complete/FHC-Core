@@ -322,7 +322,7 @@ if($result_projekt = pg_query($conn, $qry_projekt))
 	    echo "<th class='table-sortable:default'>Ende</th>";
 	    echo "<th class='table-sortable:default'>Dauer</th>";
 	    echo "<th class='table-sortable:default'>Beschreibung</th><th class='table-sortable:default'>Stg</th>";
-	    echo "<th class='table-sortable:default'>Fachbereich</th><th colspan='2'>Aktion</th>";
+	    echo "<th class='table-sortable:default'>FB</th><th colspan='2'>Aktion</th>";
 	    echo "   </tr></thead><tbody>\n";
 	    
 	    if(isset($_GET['filter']))

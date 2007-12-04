@@ -19,7 +19,7 @@
 	require_once('../../../include/lehrfach.class.php');
 	
 	//$adress='pam@technikum-wien.at';
-	//$adress='oesi@technikum-wien.at';
+	//$adress_ext='oesi@technikum-wien.at';
 	//$adress='ruhan@technikum-wien.at';
 
 	//$conn=pg_connect(CONN_STRING);
@@ -135,7 +135,7 @@
 			FROM 
 				lv JOIN semesterplaneintrag on(__LV=_LV)
 			WHERE
-				semesterplaneintrag._lv not in(SELECT _lv FROM studienplaneintrag)
+				(CAST(semesterplaneintrag._lv AS varchar(10))+' '+CAST(inSemester AS varchar(10))) not in(SELECT CAST(_lv AS varchar(10))+ ' ' + CAST(insemester AS varchar(10)) FROM studienplaneintrag)
 			UNION
 			SELECT
 				__LV as _LV, SUBSTRING(chLVNr_new, 0, 200) as chLVNr, SUBSTRING(chBezeichnung, 0, 200) as chBezeichnung, _Studiengang, SUBSTRING(meKommentar, 0, 200) as meKommentar, 0 as inSemester, 0 as inSWS, 0 as ECTS
