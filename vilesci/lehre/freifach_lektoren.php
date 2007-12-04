@@ -108,7 +108,7 @@ function selectAll()
 	$emailarr = array();
 
 	$qry = "select tbl_lehreinheitmitarbeiter.mitarbeiter_uid,  tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.bezeichnung, tbl_lehreinheitmitarbeiter.stundensatz, tbl_lehreinheitmitarbeiter.semesterstunden from lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung where tbl_lehreinheitmitarbeiter.lehreinheit_id = tbl_lehreinheit.lehreinheit_id and tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id and tbl_lehrveranstaltung.studiengang_kz = 0 and tbl_lehrveranstaltung.lehre = TRUE and tbl_lehreinheitmitarbeiter.stundensatz > 0 and tbl_lehreinheitmitarbeiter.semesterstunden > 0 and tbl_lehreinheit.studiensemester_kurzbz = '".$stsem."' order by mitarbeiter_uid, lehrveranstaltung_id;";
-
+		//$qry = "select tbl_lehreinheitmitarbeiter.mitarbeiter_uid,  tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.bezeichnung, tbl_lehreinheitmitarbeiter.stundensatz, tbl_lehreinheitmitarbeiter.semesterstunden from lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung where tbl_lehreinheitmitarbeiter.lehreinheit_id = tbl_lehreinheit.lehreinheit_id and tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id and tbl_lehrveranstaltung.studiengang_kz = 0 and tbl_lehrveranstaltung.lehre = TRUE and tbl_lehreinheit.studiensemester_kurzbz = '".$stsem."' order by mitarbeiter_uid, lehrveranstaltung_id;";
 		if($result = pg_query($conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
