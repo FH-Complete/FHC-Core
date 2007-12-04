@@ -310,7 +310,7 @@ class mitarbeiter extends benutzer
 			$l->gebort=$row->gebort;
 			$l->gebzeit=$row->gebzeit;
 			$l->foto=$row->foto;
-			$l->anmerkungen=$row->anmerkungen;
+			$l->anmerkung=$row->anmerkung;
 			$l->aktiv=$row->aktiv=='t'?true:false;
 			$l->homepage=$row->homepage;
 			$l->updateamum=$row->updateamum;
@@ -319,7 +319,7 @@ class mitarbeiter extends benutzer
 			$l->personalnummer=$row->personalnummer;
 			$l->kurzbz=$row->kurzbz;
 			$l->lektor=$row->lektor=='t'?true:false;
-			$l->bismelden=$row->bismelden=='t'?true:false;
+			//$l->bismelden=$row->bismelden=='t'?true:false;
 			$l->fixangestellt=$row->fixangestellt=='t'?true:false;
 			$l->standort_kurzbz = $row->standort_kurzbz;
 			$l->telefonklappe=$row->telefonklappe;
@@ -389,9 +389,9 @@ class mitarbeiter extends benutzer
 			$l->gebort=$row->gebort;
 			$l->gebzeit=$row->gebzeit;
 			$l->foto=$row->foto;
-			$l->anmerkungen=$row->anmerkungen;
+			$l->anmerkung=$row->anmerkung;
 			$l->aktiv=$row->aktiv=='t'?true:false;
-			$l->bismelden=$row->bismelden=='t'?true:false;
+			//$l->bismelden=$row->bismelden=='t'?true:false;
 			$l->homepage=$row->homepage;
 			$l->updateamum=$row->updateamum;
 			$l->updatevon=$row->updatevon;
@@ -439,7 +439,7 @@ class mitarbeiter extends benutzer
 			//$l->gebort=$row->gebort;
 			//$l->gebzeit=$row->gebzeit;
 			//$l->foto=$row->foto;
-			//$l->anmerkungen=$row->anmerkungen;
+			//$l->anmerkung=$row->anmerkung;
 			//$l->aktiv=$row->aktiv=='t'?true:false;
 			//$l->homepage=$row->homepage;
 			//$l->updateamum=$row->updateamum;
@@ -581,7 +581,7 @@ class mitarbeiter extends benutzer
 				$obj->gebdatum = $row->gebdatum;
 				$obj->gebort = $row->gebort;
 				$obj->gebzeit = $row->gebzeit;
-				$obj->anmerkungen = $row->anmerkung;
+				$obj->anmerkung = $row->anmerkung;
 				$obj->homepage = $row->homepage;
 				$obj->svnr = $row->svnr;
 				$obj->ersatzkennzeichen = $row->ersatzkennzeichen;
@@ -709,7 +709,7 @@ class mitarbeiter extends benutzer
 				$obj->gebdatum = $row->gebdatum;
 				$obj->gebort = $row->gebort;
 				$obj->gebzeit = $row->gebzeit;
-				$obj->anmerkungen = $row->anmerkung;
+				$obj->anmerkung = $row->anmerkung;
 				$obj->homepage = $row->homepage;
 				$obj->svnr = $row->svnr;
 				$obj->ersatzkennzeichen = $row->ersatzkennzeichen;

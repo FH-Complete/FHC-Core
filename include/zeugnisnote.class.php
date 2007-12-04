@@ -225,21 +225,15 @@ class zeugnisnote
 				'AND studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).';';
 		}
 
-		if(pg_send_query($this->conn, $qry))
-		//if(pg_query($this->conn, $qry))		
+		//if(pg_send_query($this->conn, $qry))
+		if(pg_query($this->conn, $qry))		
 		{
-			if ($result=pg_get_result($this->conn))
-				return true;
-			else
-			{
-				$this->errormsg='Fehler beim Speichern der Zeugnisnote:'.pg_result_error();
-				return false;
-			}
+			return true;
 		}
 		else
 		{
 			//echo $qry;
-			$this->errormsg='Fehler beim senden der BD-Abfrage (Class: zeugnisnote->save())';
+			$this->errormsg='Fehler beim Speichern der Zeugnisnote';
 			return false;
 		}
 	}

@@ -5,35 +5,27 @@ var menuUndoDatasource=0;
 
 // ----------------------------------------------------------
 // ------- CLASS Progressmeter ------------------------------
-function Progressmeter()
+function Progressmeter(progress_id)
 {
-	var id;
+	var id=progress_id;
+    this.StopPM=StopPM;
     this.StartPM=StartPM;
-    //var m_data = 5;
-    //var m_text = "Hello World";
-    //this.SetText = SetText;
-    //this.ShowData = DisplayData;
-    //this.ShowText = DisplayText;
-
-    Progressmeter.prototype.construct = function(id)
-    {
-    	this.id=id;
-    };
-
+    
     function StartPM()
     {
         // Progressmeter starten.
-		document.getElementById(this.id).setAttribute('mode','undetermined');
+		document.getElementById(id).setAttribute('mode','undetermined');
     }
 
-    //function SetData( myVal )
-    //{
-    //    m_data = myVal;
-    //}
+    function StopPM()
+    {
+        // Progressmeter starten.
+		document.getElementById(id).setAttribute('mode','determined');
+    }
 }
 // ------ EndOf CLASS Progressmeter ------------------------------
 
-//var globalProgressmeter=new Progressmeter('statusbar-progressmeter');
+var globalProgressmeter=new Progressmeter('statusbar-progressmeter');
 //globalProgressmeter.StartPM();
 
 function closeWindow()

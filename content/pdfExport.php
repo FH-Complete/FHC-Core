@@ -95,6 +95,52 @@ if(isset($_GET['typ']))
 if(isset($_GET['all']))
 	$params.='&all='.$_GET['all'];
 
+if($xsl=='AccountInfo')
+{
+	$isberechtigt = false;
+	$rechte = new benutzerberechtigung($conn);
+	$rechte->getBerechtigungen($user);
+	
+	$uids = explode(';',$_GET['uid']);
+	foreach ($uids as $uid)
+	{
+		//Berechtigung fuer das Drucken des Accountinfoblattes pruefen
+		$qry = "SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='".$uid."'";
+		if($result_ma = pg_query($conn, $qry))
+		{
+			if(pg_num_rows($result_ma)==1)
+			{
+				//Mitarbeiterrechte erforderlich
+				if($rechte->isBerechtigt('admin', 0, 'suid') || $rechte->isBerechtigt('mitarbeiter', 0, 'suid'))
+				{
+					$isberechtigt=true;
+				}
+			}
+		}
+		
+		$qry = "SELECT student_uid, studiengang_kz FROM public.tbl_student WHERE student_uid='".$uid."'";
+		if($result_std = pg_query($conn, $qry))
+		{
+			if(pg_num_rows($result_std)==1)
+			{
+				$row_std = pg_fetch_object($result_std);
+				//Mitarbeiterrechte erforderlich
+				if($rechte->isBerechtigt('admin', $row_std->studiengang_kz, 'suid') || 
+				   $rechte->isBerechtigt('admin', 0, 'suid') ||
+				   $rechte->isBerechtigt('assistenz', $row_std->studiengang_kz, 'suid'))
+				{
+					$isberechtigt=true;
+				}
+			}
+		}
+	}
+	
+	if(!$isberechtigt)
+	{
+		echo 'Sie haben keine Berechtigung um dieses AccountInfoBlatt zu drucken';
+		exit;
+	}
+}
 
 //Berechtigung pruefen
 $rechte = new benutzerberechtigung($conn);
