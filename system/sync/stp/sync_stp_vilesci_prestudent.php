@@ -398,7 +398,7 @@ if($result = pg_query($conn, $qry))
 								}
 							}
 						}
-						if($qry_ins='')
+						if($qry_ins!='')
 						{
 							if(!$result_neu = pg_query($conn, $qry_ins))
 							{
@@ -408,14 +408,15 @@ if($result = pg_query($conn, $qry))
 							}
 							else
 							{
-								$ausgabe.="\n---Rolle: ".$rolle." im Studiensemester ".$Kalender." und Ausbildungssemeser ".$row->instudiensemester." (OrgForm ".$orgform.");";
 								pg_query($conn, "COMMIT");
 								if($iu=='i')
 								{
+									$ausgabe.="\n---Rolle eingefügt: ".$rolle." im Studiensemester ".$Kalender." und Ausbildungssemeser ".$row->instudiensemester." (OrgForm ".$orgform.");";
 									$eingefuegt1++;
 								}
 								elseif($iu=='u')
 								{
+									$ausgabe.="\n---Rolle geändert: ".$rolle." im Studiensemester ".$Kalender." und Ausbildungssemeser ".$row->instudiensemester." (OrgForm ".$orgform.");";
 									$update1++;
 								}
 							}
