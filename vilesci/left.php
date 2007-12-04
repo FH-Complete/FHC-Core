@@ -213,11 +213,8 @@
 		 	</table>
 		</td>
 	</tr>
-
-<!--   	<tr>
-		<td nowrap><a class="MenuItem1" href="lehre/freifach.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Freif&auml;cher</a></td>
-  	</tr>
-	</table> -->
+	  	
+	</table>
 </div>
 
 <HR>

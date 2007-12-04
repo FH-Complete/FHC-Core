@@ -134,7 +134,7 @@ function selectAll()
 	foreach ($emailarr as $mail)
 		$emailstr .= $mail."@technikum-wien.at, ";
 		
-	echo "<a href='mailto:".$emailstr."'>Mail an alle Lektoren</a><br>(".$emailstr.")";
+	echo "<a href='mailto:".$emailstr."'>Mail an alle LektorInnen</a><br>(".$emailstr.")";
 	echo "</form>";
 ?>
 
