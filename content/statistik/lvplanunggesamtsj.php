@@ -164,7 +164,7 @@ $workbook = new Spreadsheet_Excel_Writer();
 $workbook->send("LVPlanungGesamtSJ". "_" . date("Y_m_d") . ".xls");
 
 // Creating a worksheet
-$worksheet =& $workbook->addWorksheet("Bewerberstatistik");
+$worksheet =& $workbook->addWorksheet("LV-Planung Gesamt");
 
 $format_bold =& $workbook->addFormat();
 $format_bold->setBold();
