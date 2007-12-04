@@ -199,10 +199,25 @@
 		</td>
 	</tr>
 	<!--Menu Eintrag Freifächer-->
-  	<tr>
+	<tr>
+	  	<td nowrap><a href="?Freifach" class="MenuItem1" onClick="return(js_toggle_container('Freifach'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Freifach</a>
+			<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Freifach" style="display: block;">
+		  	<tr>
+		  		<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a class="MenuItem2" href="lehre/freifach.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Studierende</a></td>
+		  	</tr>
+		  	<tr>
+		  		<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a class="MenuItem2" href="lehre/freifach_lektoren.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;LektorInnen</a></td>
+		  	</tr>
+		 	</table>
+		</td>
+	</tr>
+
+<!--   	<tr>
 		<td nowrap><a class="MenuItem1" href="lehre/freifach.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Freif&auml;cher</a></td>
   	</tr>
-	</table>
+	</table> -->
 </div>
 
 <HR>
