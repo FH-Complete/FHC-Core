@@ -76,7 +76,7 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 			else
 				echo "Erfolgreich gespeichert";
 		}
-		
+
 		//Aktiv Feld setzen
 		if(isset($_GET['aktiv']))
 		{
@@ -87,7 +87,7 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 				echo "Erfolgreich gespeichert";
 		}
 	}
-	
+
 	//Lehre Feld setzen
 	if(isset($_GET['lehre']))
 	{
@@ -97,7 +97,7 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 		else
 			echo "Erfolgreich gespeichert";
 	}
-	
+
 	//Zeugnis Feld setzen
 	if(isset($_GET['zeugnis']))
 	{
@@ -107,7 +107,7 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 		else
 			echo "Erfolgreich gespeichert";
 	}
-		
+
 	//Sort Speichern
 	if(isset($_POST['sort']))
 	{
@@ -117,7 +117,7 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 		else
 			echo "Erfolgreich gespeichert";
 	}
-	
+
 	//FBK Speichern
 	if(isset($_POST['fbk']))
 	{
@@ -127,7 +127,7 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 		else
 			echo "Erfolgreich gespeichert";
 	}
-	
+
 	//Projektarbeit Feld setzen
 	if(isset($_GET['projektarbeit']))
 	{
@@ -139,18 +139,18 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 			echo "Erfolgreich gespeichert";
 	}
 }
-	
+
 //Fachbereichskoordinatoren holen
 $qry = "
-SELECT 
+SELECT
 	distinct
-	vorname, 
-	nachname, 
-	uid 
-FROM 
-	campus.vw_mitarbeiter JOIN 
-	(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='fbk' AND studiengang_kz='$stg_kz' 
-	 UNION 
+	vorname,
+	nachname,
+	uid
+FROM
+	campus.vw_mitarbeiter JOIN
+	(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='fbk' AND studiengang_kz='$stg_kz'
+	 UNION
 	 SELECT koordinator as uid from lehre.tbl_lehrveranstaltung WHERE studiengang_kz='$stg_kz') as a USING(uid) ORDER BY nachname, vorname";
 
 $fbk = array();
@@ -171,13 +171,13 @@ if(!$rechte->isBerechtigt('admin'))
 	$aktiv = ' AND tbl_lehrveranstaltung.aktiv=true';
 
 if($fachbereich_kurzbz !='')
-	$sql_query="SELECT distinct tbl_lehrveranstaltung.* FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach WHERE 
-	tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND 
+	$sql_query="SELECT distinct tbl_lehrveranstaltung.* FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach WHERE
+	tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 	tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
 	tbl_lehrfach.fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."'";
-else 
+else
 	$sql_query="SELECT * FROM lehre.tbl_lehrveranstaltung WHERE true";
-	
+
 if($stg_kz!='')
 	$sql_query.= " AND tbl_lehrveranstaltung.studiengang_kz='$stg_kz'";
 
@@ -216,14 +216,14 @@ $outp.= 'Fachbereich <SELECT name="fachbereich_kurzbz" id="select_fachbereich_ku
 $fachb = new fachbereich($conn);
 $fachb->getAll();
 $outp.= "<OPTION value='' ".($fachbereich_kurzbz==''?'selected':'').">-- Alle --</OPTION>";
-foreach ($fachb->result as $fb) 
+foreach ($fachb->result as $fb)
 {
 	if($fachbereich_kurzbz==$fb->fachbereich_kurzbz)
 		$selected = 'selected';
-	else 
+	else
 		$selected = '';
-	
-	if($rechte->isBerechtigt('admin', 0, 'suid') || 
+
+	if($rechte->isBerechtigt('admin', 0, 'suid') ||
 	   $rechte->isBerechtigt('assistenz', null, 'suid', $fb->fachbereich_kurzbz) ||
 	   $rechte->isBerechtigt('admin', null, 'suid', $fb->fachbereich_kurzbz))
 	$outp.= "<OPTION value='$fb->fachbereich_kurzbz' $selected>$fb->fachbereich_kurzbz</OPTION>";
@@ -247,7 +247,7 @@ echo '<html>
 	{
 		//alert(document.getElementById("select_stg_kz").value+" : "+document.getElementById("select_fachbereich_kurzbz").value);
 		//return false;
-		
+
 		if(document.getElementById("select_stg_kz").value==\'\' && document.getElementById("select_fachbereich_kurzbz").value==\'\')
 		{
 			alert("Studiengang und Fachbereich dürfen nicht gleichzeitig auf \'Alle\' gesetzt sein");
@@ -255,7 +255,7 @@ echo '<html>
 		}
 		else
 			return true;
-		
+
 	}
 	</script>
 	</head>
@@ -267,7 +267,7 @@ echo $outp;
 echo '</td><td>';
 //Neu Button
 if($rechte->isBerechtigt('admin'))
-	echo "<input type='button' onclick='parent.detail.location=\"lehrveranstaltung_details.php?neu=true&stg_kz=$stg_kz&semester=$semester\"' value='Neu'/>";
+	echo "<input type='button' onclick='parent.lv_detail.location=\"lehrveranstaltung_details.php?neu=true&stg_kz=$stg_kz&semester=$semester\"' value='Neu'/>";
 echo '</td></tr></table>';
 
 if ($result_lv!=0)
@@ -303,8 +303,8 @@ if ($result_lv!=0)
 		//Bezeichnung
 		echo "<td>";
 		if($rechte->isBerechtigt('admin'))
-			echo "<a href='lehrveranstaltung_details.php?lv_id=$row->lehrveranstaltung_id' target='detail'>$row->bezeichnung</a>";
-		else 
+			echo "<a href='lehrveranstaltung_details.php?lv_id=$row->lehrveranstaltung_id' target='lv_detail'>$row->bezeichnung</a>";
+		else
 			echo $row->bezeichnung;
 		echo "</td>";
 		echo "<td>".$s[$row->studiengang_kz]->kurzbz."</td>";
@@ -318,14 +318,14 @@ if ($result_lv!=0)
 		echo "<td  style='white-space:nowrap;'>";
 		if($rechte->isBerechtigt('admin'))
 			echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester' method='POST'><input type='text' value='$row->lehreverzeichnis' size='4' name='lehrevz'><input type='submit' value='ok'></form>";
-		else 
+		else
 			echo $row->lehreverzeichnis;
 		echo "</td>";
 		//Aktiv
 		echo "<td align='center'  style='white-space:nowrap;'>";
 		if($rechte->isBerechtigt('admin'))
 			echo "<a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&aktiv=$row->aktiv'><img src='../../skin/images/".($row->aktiv=='t'?'true.gif':'false.gif')."'></a>";
-		else 
+		else
 			echo ($row->aktiv?'Ja':'Nein');
 		echo "</td>";
 		//Sort
@@ -345,7 +345,7 @@ if ($result_lv!=0)
 		{
 			if($fb_uid==$row->koordinator)
 				$selected='selected';
-			else 
+			else
 				$selected='';
 			echo "<option value='$fb_uid' $selected>".$fb_k['nachname']." ".$fb_k['vorname']."</option>";
 		}
