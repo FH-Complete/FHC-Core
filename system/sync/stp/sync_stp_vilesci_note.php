@@ -68,19 +68,20 @@
 						"3"=>"3",
 						"4"=>"4",
 						"5"=>"5",
-						"6"=>"10", //bestanden
-						"7"=>"13", //nicht bestanden->nicht erfolgreich absolviert
-						"8"=>"6", //befreit->angerechnet
-						"9"=>"7", //Nicht beurteilt
-						"10"=>"8", // Teilgenommen
-						"18"=>"12"); //mit Erfolg Teilgenommen->erfolgreich absolviert
+						"6"=>"10",  //bestanden
+						"7"=>"13",  //nicht bestanden->nicht erfolgreich absolviert
+						"8"=>"6",   //befreit->angerechnet
+						"9"=>"7",   //Nicht beurteilt
+						"10"=>"8",  // Teilgenommen
+						"18"=>"12", //mit Erfolg Teilgenommen->erfolgreich absolviert
+						"11"=>"15", //mit ausgezeichnetem erfolg bestanden
+						"14"=>"6",  //anerkannt->angerechnet
+						"16"=>"16", //Ausland
+						"17"=>"17"  // komm. Pruefung
+					   ); 
 	/*Fehlende Notenzuordnungen
-		11	?
 		12	?
 		13	?
-		14	?
-		16	?
-		17	?
 	 */
 
 	
@@ -168,9 +169,9 @@
 						
 			
 			//Nicht zuordenbare Noten entfernen
-			if(!in_array($row_ext->_cxbeurteilungsstufe, $noten_arr))
+			if(!array_key_exists($row_ext->_cxbeurteilungsstufe, $noten_arr))
 			{
-				$text.="Die Note $row_ext->_cxbeurteilungsstufe von $row_ext->_person kann nicht zugeordnet werden\n";
+				$text.="Die Note $row_ext->_cxbeurteilungsstufe von Person $row_ext->_person kann nicht zugeordnet werden\n";
 				$error++;
 				continue;
 			}
