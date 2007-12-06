@@ -93,7 +93,12 @@
 		<td class="tab" id="tabLehre" onClick="js_show_tab('menueLehre');">Lehre</td>
 	</tr>
 </table>-->
-
+<?php
+if ($berechtigung->isBerechtigt('admin'))
+	echo '<div>
+			<a href="admin/menu.html" target="main">Admin</a>
+		</div><hr>';
+?>
 <!-- ******************* Haupt-Menue Lehre *******************************-->
 <a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('menueLehre'));">
 	<img src="../skin/images/menu_item.gif" width="7" height="9" />&nbsp;Lehre
@@ -213,7 +218,7 @@
 		 	</table>
 		</td>
 	</tr>
-	  	
+
 	</table>
 </div>
 
