@@ -35,6 +35,7 @@ var LeDetailLehrfach_label; //Bezeichnung des Lehrfachs das markiert werden soll
 var LeDetailGruppeDatasource; //Datasource fuer Gruppen DropDown
 var LeDetailLektorDatasource; //Datasource fuer Lektren DropDown
 var LvSelectLehreinheit_id; //Lehreinheit_id die nach dem Rebuild des Trees markiert werden soll
+var LvOpenLehrveranstaltung_id; //Lehrveranstaltung_id der Lehreinheit die gerade gespeichert wurde. Diese LV muss vor dem Select im Tree geoeffnet werden
 var leDetailLektorUid; // UID der Lektorzuordnung die nach dem Rebuild markiert werden soll
 var leDetailLektorLehreinheit_id; // Lehreinheit_id der Lektorzuordnung die nach dem Rebuild markiert werden soll
 var lehrveranstaltungNotenTreeDatasource; //Datasource des Noten Trees
@@ -53,11 +54,12 @@ var lehrveranstaltungGesamtNotenTreeloaded=false;
 var LvTreeSinkObserver =
 {
 	onBeginLoad : function(pSink) {},
-	onInterrupt : function(pSink) {},
+	onInterrupt : function(pSink) {debug('oninterrupt');},
 	onResume : function(pSink) {},
-	onError : function(pSink, pStatus, pError) {},
+	onError : function(pSink, pStatus, pError) { debug('onerror:'+pError); },
 	onEndLoad : function(pSink)
 	{
+		//debug('startrebuild');
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 		document.getElementById('lehrveranstaltung-tree').builder.rebuild();
 	}
@@ -74,6 +76,7 @@ var LvTreeListener =
 	},
 	didRebuild : function(builder)
   	{
+  		//debug('didrebuild');
 		//timeout nur bei Mozilla notwendig da sonst die rows
 		//noch keine values haben. Ab Seamonkey funktionierts auch
 		//ohne dem setTimeout
@@ -402,13 +405,20 @@ function LvTreeSelectLehreinheit()
 	//In der globalen Variable ist die zu selektierende Lehreinheit gespeichert
 	if(LvSelectLehreinheit_id!=null)
 	{
-		//Alle subtrees oeffnen weil rowCount nur die Anzahl der sichtbaren
-		//Zeilen zurueckliefert
+		//Den Subtree der Lehrveranstaltung oeffnen zu der zuletzt die Lehreinheit gespeichert/angelegt wurde
+	   	//da diese sonst nicht markiert werden kann
 	   	for(var i=items-1;i>=0;i--)
 	   	{
-	   		if(!tree.view.isContainerOpen(i))
-	   			tree.view.toggleOpenState(i);
+	   		col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung_id";
+			lehrveranstaltung_id=tree.view.getCellText(i,col);
+	   		if(lehrveranstaltung_id == LvOpenLehrveranstaltung_id)
+	   		{
+	   			if(!tree.view.isContainerOpen(i))
+	   				tree.view.toggleOpenState(i);
+	   			break;
+	   		}
 	   	}
+	   	LvOpenLehrveranstaltung_id='';
 	   	
 	   	//Jetzt die wirkliche Anzahl (aller) Zeilen holen
 	   	items = tree.view.rowCount;
@@ -638,6 +648,7 @@ function LeDetailSave()
 		document.getElementById('lehrveranstaltung-detail-checkbox-new').checked=false;
 		//LvTreeRefresh();
 		LvSelectLehreinheit_id=val.dbdml_data;
+		LvOpenLehrveranstaltung_id=lehrveranstaltung;
 		LvTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 	}

@@ -35,9 +35,9 @@ class lehrveranstaltung
 	var $semesterstunden;   	//@var smallint
 
 	var $anmerkung;				//@var string
-	var $lehre;					//@var boolean
+	var $lehre=true;			//@var boolean
 	var $lehreverzeichnis;		//@var string
-	var $aktiv;					//@var boolean
+	var $aktiv=true;			//@var boolean
 	var $ext_id;				//@var bigint
 	var $insertamum;			//@var timestamp
 	var $insertvon;				//@var string
@@ -47,9 +47,9 @@ class lehrveranstaltung
 	var $plankostenprolektor;	//@var numeric(6,2)
 	var $updateamum;			//@var timestamp
 	var $updatevon;				//@var string
-	var $sprache;				//@var varchar(16)
+	var $sprache='German';		//@var varchar(16)
 	var $sort;					//@var smallint
-	var $zeugnis;				//@var boolean
+	var $zeugnis=true;			//@var boolean
 	var $projektarbeit;			//@var boolean
 	var $koordinator;			//@var varchar(16)
 	
