@@ -12,6 +12,8 @@
 require_once('../../config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/wochenplan.class.php');
+require_once('../../../include/datum.class.php');
+require_once('../../../include/studiensemester.class.php');
 
 // Datenbankverbindung
 if (!$conn = pg_pconnect(CONN_STRING))
@@ -46,6 +48,16 @@ $target=(isset($_GET['target'])?$_GET['target']:null);
 if (!isset($REMOTE_USER))
 	$REMOTE_USER='pam';
 $uid=$REMOTE_USER;
+
+// Beginn Ende setzen
+if (!isset($begin))
+{
+	$objSS=new studiensemester($conn);
+	$ss=$objSS->getaktorNext();
+	$objSS->load($ss);
+	$begin=datum::mktime_fromdate($objSS->start);
+	$ende=datum::mktime_fromdate($objSS->ende);
+}
 
 // for spezial friends
 if ($uid=='maderdon')
