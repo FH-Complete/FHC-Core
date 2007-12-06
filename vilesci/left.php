@@ -203,7 +203,7 @@ if ($berechtigung->isBerechtigt('admin'))
 		 	</table>
 		</td>
 	</tr>
-	<!--Menu Eintrag Freifächer-->
+	<!--Menu Eintrag Freifaecher-->
 	<tr>
 	  	<td nowrap><a href="?Freifach" class="MenuItem1" onClick="return(js_toggle_container('Freifach'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Freifach</a>
 			<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Freifach" style="display: block;">
@@ -358,6 +358,10 @@ if ($berechtigung->isBerechtigt('admin'))
 		  	<tr>
 		  		<td width="10" nowrap>&nbsp;</td>
 				<td nowrap><a class="MenuItem2" href="stammdaten/benutzerberechtigung_frameset.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;&Uuml;bersicht</a></td>
+		  	</tr>
+		  	<tr>
+		  		<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a class="MenuItem2" href="stammdaten/variablen_frameset.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Variablen</a></td>
 		  	</tr>
 		  	</table>
 		</td>

@@ -65,7 +65,22 @@ class variable
 	// *********************************************************
 	function load($uid, $name)
 	{
-		return false;
+		$qry = "SELECT wert FROM public.tbl_variable WHERE uid='".addslashes($uid)."' AND name='".addslashes($name)."'";
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$this->uid = $uid;
+				$this->name = $name;
+				$this->wert = $row->wert;
+				
+				return true;
+			}
+			else 
+				return false;
+		}
+		else
+			return false;
 	}
 
 	// *******************************************
@@ -145,5 +160,56 @@ class variable
 			return false;
 		}
 	}
+	
+	// ****
+	// * Loescht einen Variableneintrag
+	// ****
+	function delete($name, $uid)
+	{
+		if($name=='' || $uid == '')
+		{
+			$this->errormsg = 'Name und UID muessen angegeben werden';
+			return false;
+		}
+		
+		$qry = "DELETE FROM public.tbl_variable WHERE name='".addslashes($name)."' AND uid='".addslashes($uid)."'";
+		
+		if(pg_query($this->conn, $qry))
+			return true;
+		else 
+		{
+			$this->errormsg = 'Fehler beim Loeschen';
+			return false;
+		}
+	}
+	
+	// ******
+	// * Liefert alle Variablen eines Benutzers
+	// ******
+	function getVars($uid)
+	{
+		$qry = "SELECT * FROM public.tbl_variable WHERE uid='".addslashes($uid)."' ORDER BY name";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$v = new variable($this->conn, null, null, null);
+				
+				$v->uid = $row->uid;
+				$v->name = $row->name;
+				$v->wert = $row->wert;
+				
+				$this->variables[] = $v;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+		
 }
 ?>
