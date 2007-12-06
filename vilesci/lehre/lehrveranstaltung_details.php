@@ -85,10 +85,13 @@
 		
 		if(!$lv->save())
 			$errorstr = "Fehler beim Speichern der Daten: $lv->errormsg";
-		
-		$reloadstr .= "<script type='text/javascript'>\n";
-		$reloadstr .= "	parent.uebersicht.location.href='lehrveranstaltung.php?stg_kz=$lv->studiengang_kz&semester=$lv->semester';";
-		$reloadstr .= "</script>\n";		
+		else 
+		{
+			$reloadstr .= "<script type='text/javascript'>\n";
+			$reloadstr .= "	parent.uebersicht.location.href='lehrveranstaltung.php?stg_kz=$lv->studiengang_kz&semester=$lv->semester';";
+			$reloadstr .= " window.location.href='".$_SERVER['PHP_SELF']."?stg_kz=$lv->studiengang_kz&semester=$lv->semester&neu=true';";
+			$reloadstr .= "</script>\n";
+		}
 	}
 		
 	$sg = new studiengang($conn);
