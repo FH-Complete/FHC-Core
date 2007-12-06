@@ -22,7 +22,7 @@
 		$htmlstr .= "</div>";
 	    $htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form><table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>\n";
 		$htmlstr .= "   <thead><tr class='liste'>\n";
-	    $htmlstr .= "       <th class='table-sortable:default'>UID</th><th class='table-sortable:default'>Vorname</th><th class='table-sortable:alphanumeric'>Nachname</th><th class='table-sortable:default'>Telefon</th><th class='table-sortable:default'>Email</th>";
+	    $htmlstr .= "       <th class='table-sortable:default'>UID</th><th class='table-sortable:default'>Vorname</th><th class='table-sortable:alphanumeric'>Nachname</th>";
 	    $htmlstr .= "   </tr></thead><tbody>\n";
 	    $i = 0;
 		while($row=pg_fetch_object($erg))
@@ -32,9 +32,6 @@
 	        $htmlstr .= "       <td>".$row->uid."</td>\n";
 			$htmlstr .= "       <td>".$row->vorname."</td>\n";
 	        $htmlstr .= "       <td><a href='benutzerberechtigung_details.php?uid=".$row->uid."' target='detail'>".$row->nachname."</a></td>\n";
-			
-	        $htmlstr .= "       <td></td>\n";
-	        $htmlstr .= "       <td></td>\n";
 	        $htmlstr .= "   </tr>\n";
 	        $i++;
 	    }

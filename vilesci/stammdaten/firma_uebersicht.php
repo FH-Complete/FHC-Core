@@ -26,7 +26,7 @@
 	    {
 	        //$htmlstr .= "   <tr class='liste". ($i%2) ."'>\n";
 			$htmlstr .= "   <tr>\n";
-	        $htmlstr .= "       <td>".$row->firma_id."</td>\n";
+	        $htmlstr .= "       <td><a href='firma_details.php?firma_id=".$row->firma_id."' target='detail'>".$row->firma_id."</a></td>\n";
 			$htmlstr .= "       <td><a href='firma_details.php?firma_id=".$row->firma_id."' target='detail'>".$row->name."</a></td>\n";
 	        $htmlstr .= "       <td>$row->adresse</td>\n";
 	        $htmlstr .= "       <td>$row->email</td>\n";
