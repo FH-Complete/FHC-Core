@@ -91,9 +91,7 @@ loadVariables($conn, $user);
 	$i=0;
 	$zeile=1;
 	
-	$worksheet->write($zeile,$i,"UID", $format_bold);
-	$maxlength[$i]=3;
-	$worksheet->write($zeile,++$i,"ANREDE", $format_bold);
+	$worksheet->write($zeile,$i,"ANREDE", $format_bold);
 	$maxlength[$i]=6;
 	$worksheet->write($zeile,++$i,"TITELPRE", $format_bold);
 	$maxlength[$i]=8;
@@ -101,24 +99,36 @@ loadVariables($conn, $user);
 	$maxlength[$i]=8;
 	$worksheet->write($zeile,++$i,"VORNAME", $format_bold);
 	$maxlength[$i]=7;
-	$worksheet->write($zeile,++$i,"VORNAMEN", $format_bold);
-	$maxlength[$i]=8;
 	$worksheet->write($zeile,++$i,"TITELPOST", $format_bold);
 	$maxlength[$i]=9;
+	$worksheet->write($zeile,++$i,"EMail Privat", $format_bold);
+	$maxlength[$i]=12;
+	$maxlength[$i]=12;
+	$worksheet->write($zeile,++$i,"STRASSE", $format_bold);
+	$maxlength[$i]=7;
+	$worksheet->write($zeile-1,$i,"Zustelladresse", $format_bold);
+	$worksheet->write($zeile,++$i,"PLZ", $format_bold);
+	$maxlength[$i]=3;
+	$worksheet->write($zeile,++$i,"ORT", $format_bold);
+	$maxlength[$i]=3;
+	$worksheet->write($zeile,++$i,"GEBURTSDATUM", $format_bold);
+	$maxlength[$i]=12;
+	$worksheet->write($zeile,++$i,"PERSONENKENNZEICHEN", $format_bold);
+	$maxlength[$i]=19;
+	$worksheet->write($zeile,++$i,"STAATSBÜRGERSCHAFT", $format_bold);
+	$maxlength[$i]=16;
 	$worksheet->write($zeile,++$i,"SVNR", $format_bold);
 	$maxlength[$i]=4;
 	$worksheet->write($zeile,++$i,"ERSATZKENNZEICHEN", $format_bold);
 	$maxlength[$i]=17;
-	$worksheet->write($zeile,++$i,"GEBURTSDATUM", $format_bold);
-	$maxlength[$i]=12;
+	
 	$worksheet->write($zeile,++$i,"SEMESTER", $format_bold);
 	$maxlength[$i]=8;
 	$worksheet->write($zeile,++$i,"VERBAND", $format_bold);
 	$maxlength[$i]=7;
 	$worksheet->write($zeile,++$i,"GRUPPE", $format_bold);
 	$maxlength[$i]=6;
-	$worksheet->write($zeile,++$i,"PERSONENKENNZEICHEN", $format_bold);
-	$maxlength[$i]=19;
+	
 	$worksheet->write($zeile,++$i,"ZGV", $format_bold);
 	$maxlength[$i]=10;
 	$worksheet->write($zeile,++$i,"ZGV Ort", $format_bold);
@@ -131,21 +141,11 @@ loadVariables($conn, $user);
 	$maxlength[$i]=14;
 	$worksheet->write($zeile,++$i,"ZGV Master Datum", $format_bold);
 	$maxlength[$i]=16;
-	$worksheet->write($zeile,++$i,"STAATSBÜRGERSCHAFT", $format_bold);
-	$maxlength[$i]=16;
+	
 	$worksheet->write($zeile,++$i,"STATUS", $format_bold);
 	$maxlength[$i]=6;
 	$worksheet->write($zeile,++$i,"EMail Intern", $format_bold);
 	$maxlength[$i]=12;
-	$worksheet->write($zeile,++$i,"EMail Privat", $format_bold);
-	$maxlength[$i]=12;
-	$worksheet->write($zeile,++$i,"STRASSE", $format_bold);
-	$maxlength[$i]=7;
-	$worksheet->write($zeile-1,$i,"Zustelladresse", $format_bold);
-	$worksheet->write($zeile,++$i,"PLZ", $format_bold);
-	$maxlength[$i]=3;
-	$worksheet->write($zeile,++$i,"ORT", $format_bold);
-	$maxlength[$i]=3;
 	$worksheet->write($zeile,++$i,"STRASSE", $format_bold);
 	$maxlength[$i]=7;
 	$worksheet->write($zeile-1,$i,"Nebenwohnsitz", $format_bold);
@@ -157,6 +157,10 @@ loadVariables($conn, $user);
 	$maxlength[$i]=3;
 	$worksheet->write($zeile,++$i,"GRUPPEN", $format_bold);
 	$maxlength[$i]=3;
+	$worksheet->write($zeile,++$i,"UID", $format_bold);
+	$maxlength[$i]=3;
+	$worksheet->write($zeile,++$i,"VORNAMEN", $format_bold);
+	$maxlength[$i]=8;
 	
 	$zeile++;
 	
@@ -194,145 +198,38 @@ loadVariables($conn, $user);
 		$status = $prestudent->rolle_kurzbz;
 			
 		$i=0;
-		if(isset($row->student_uid))
-		{
-			if(strlen($row->student_uid)>$maxlength[$i])
-				$maxlength[$i] = strlen($row->student_uid);
-			$worksheet->write($zeile,$i, $row->student_uid);
-		}
-		$i++;
 		
+		//Anrede
 		if(strlen($row->anrede)>$maxlength[$i])
 			$maxlength[$i] = strlen($row->anrede);
 		$worksheet->write($zeile,$i, $row->anrede);
 		$i++;
 		
+		//Titelpre
 		if(strlen($row->titelpre)>$maxlength[$i])
 			$maxlength[$i] = strlen($row->titelpre);
 		$worksheet->write($zeile,$i, $row->titelpre);
 		$i++;
 		
+		//Nachname
 		if(strlen($row->nachname)>$maxlength[$i])
 			$maxlength[$i] = strlen($row->nachname);
 		$worksheet->write($zeile,$i, $row->nachname);
 		$i++;
 		
+		//Vorname
 		if(strlen($row->vorname)>$maxlength[$i])
 			$maxlength[$i] = strlen($row->vorname);
 		$worksheet->write($zeile,$i, $row->vorname);
 		$i++;
 		
-		if(strlen($row->vornamen)>$maxlength[$i])
-			$maxlength[$i] = strlen($row->vornamen);
-		$worksheet->write($zeile,$i, $row->vornamen);
-		$i++;
-						
+		//Titelpost
 		if(strlen($row->titelpost)>$maxlength[$i])
 			$maxlength[$i] = strlen($row->titelpost);
 		$worksheet->write($zeile,$i, $row->titelpost);
 		$i++;
 		
-		if(strlen($row->svnr)>$maxlength[$i])
-			$maxlength[$i] = strlen($row->svnr);
-		$worksheet->write($zeile,$i, $row->svnr);
-		$i++;
-		
-		if(strlen($row->ersatzkennzeichen)>$maxlength[$i])
-			$maxlength[$i] = strlen($row->ersatzkennzeichen);
-		$worksheet->write($zeile,$i, $row->ersatzkennzeichen);
-		$i++;
-		
-		if(strlen($row->gebdatum)>$maxlength[$i])
-			$maxlength[$i] = strlen($row->gebdatum);
-		$worksheet->write($zeile,$i, $datum_obj->convertISODate($row->gebdatum));
-		$i++;
-		
-		if(isset($row->semester))
-		{
-			if(strlen($row->semester)>$maxlength[$i])
-				$maxlength[$i] = strlen($row->semester);
-			$worksheet->write($zeile,$i, $row->semester);
-		}
-		$i++;
-		
-		if(isset($row->verband))
-		{
-			if(strlen($row->verband)>$maxlength[$i])
-				$maxlength[$i] = strlen($row->verband);
-			$worksheet->write($zeile,$i, $row->verband);
-		}
-		$i++;
-		
-		if(isset($row->gruppe))
-		{
-			if(strlen($row->gruppe)>$maxlength[$i])
-				$maxlength[$i] = strlen($row->gruppe);
-			$worksheet->write($zeile,$i, $row->gruppe);
-		}
-		$i++;
-		
-		if(isset($row->matrikelnr))
-		{
-			if(strlen($row->matrikelnr)>$maxlength[$i])
-				$maxlength[$i] = strlen($row->matrikelnr);
-			$worksheet->writeString($zeile,$i, $row->matrikelnr);
-		}
-		$i++;
-		
-		if($row->zgv_code!='' && isset($zgv_arr[$row->zgv_code]))
-		{
-			if(strlen($zgv_arr[$row->zgv_code])>$maxlength[$i])
-				$maxlength[$i] = strlen($zgv_arr[$row->zgv_code]);
-			$worksheet->write($zeile,$i, $zgv_arr[$row->zgv_code]);
-		}
-		$i++;
-		
-		if(strlen($row->zgvort)>$maxlength[$i])
-			$maxlength[$i] = strlen($row->zgvort);
-		$worksheet->write($zeile,$i, $row->zgvort);
-		$i++;
-		
-		if(strlen($row->zgvdatum)>$maxlength[$i])
-			$maxlength[$i] = strlen($row->zgvdatum);
-		$worksheet->write($zeile,$i, $row->zgvdatum);
-		$i++;
-		
-		if($row->zgvmas_code!='' && isset($zgvmas_arr[$row->zgvmas_code]))
-		{
-			if(strlen($zgvmas_arr[$row->zgvmas_code])>$maxlength[$i])
-				$maxlength[$i] = strlen($zgvmas_arr[$row->zgvmas_code]);
-			$worksheet->write($zeile,$i, $zgvmas_arr[$row->zgvmas_code]);
-		}
-		$i++;
-		
-		if(strlen($row->zgvmaort)>$maxlength[$i])
-			$maxlength[$i] = strlen($row->zgvmaort);
-		$worksheet->write($zeile,$i, $row->zgvmaort);
-		$i++;
-		
-		if(strlen($row->zgvmadatum)>$maxlength[$i])
-			$maxlength[$i] = strlen($row->zgvmadatum);
-		$worksheet->write($zeile,$i, $row->zgvmadatum);
-		$i++;
-		
-		if(strlen($row->staatsbuergerschaft)>$maxlength[$i])
-			$maxlength[$i] = strlen($row->staatsbuergerschaft);
-		$worksheet->write($zeile,$i, $row->staatsbuergerschaft);
-		$i++;
-		
-		if(strlen($status)>$maxlength[$i])
-			$maxlength[$i] = strlen($status);
-		$worksheet->write($zeile,$i, $status);
-		$i++;
-		
-		if(isset($row->student_uid))
-		{
-			if(strlen($row->student_uid.'@'.DOMAIN)>$maxlength[$i])
-				$maxlength[$i] = strlen($row->student_uid.'@'.DOMAIN);
-			$worksheet->write($zeile,$i, $row->student_uid.'@'.DOMAIN);
-		}
-		$i++;
-		
+		//Email Privat
 		//ZustellEmailAdresse aus der Datenbank holen und dazuhaengen
 		$qry_1 = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id='$row->person_id' AND zustellung=true ORDER BY kontakt_id DESC LIMIT 1";
 		if($result_1 = pg_query($conn, $qry_1))
@@ -346,6 +243,7 @@ loadVariables($conn, $user);
 		}
 		$i++;
 		
+		//Zustelladresse
 		//Zustelladresse aus der Datenbank holen und dazuhaengen
 		$qry_1 = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id' ORDER BY zustelladresse LIMIT 1";
 		if($result_1 = pg_query($conn, $qry_1))
@@ -373,6 +271,124 @@ loadVariables($conn, $user);
 		else 
 			$i+=3;
 		
+		//Geburtsdatum
+		if(strlen($row->gebdatum)>$maxlength[$i])
+			$maxlength[$i] = strlen($row->gebdatum);
+		$worksheet->write($zeile,$i, $datum_obj->convertISODate($row->gebdatum));
+		$i++;
+		
+		//Personenkennzeichen
+		if(isset($row->matrikelnr))
+		{
+			if(strlen($row->matrikelnr)>$maxlength[$i])
+				$maxlength[$i] = strlen($row->matrikelnr);
+			$worksheet->writeString($zeile,$i, $row->matrikelnr);
+		}
+		$i++;
+		
+		//Staatsbuergerschaft
+		if(strlen($row->staatsbuergerschaft)>$maxlength[$i])
+			$maxlength[$i] = strlen($row->staatsbuergerschaft);
+		$worksheet->write($zeile,$i, $row->staatsbuergerschaft);
+		$i++;
+		
+		//SVNR
+		if(strlen($row->svnr)>$maxlength[$i])
+			$maxlength[$i] = strlen($row->svnr);
+		$worksheet->write($zeile,$i, $row->svnr);
+		$i++;
+		
+		//Ersatzkennzeichen
+		if(strlen($row->ersatzkennzeichen)>$maxlength[$i])
+			$maxlength[$i] = strlen($row->ersatzkennzeichen);
+		$worksheet->write($zeile,$i, $row->ersatzkennzeichen);
+		$i++;
+		
+		//Semester		
+		if(isset($row->semester))
+		{
+			if(strlen($row->semester)>$maxlength[$i])
+				$maxlength[$i] = strlen($row->semester);
+			$worksheet->write($zeile,$i, $row->semester);
+		}
+		$i++;
+		
+		//Verband
+		if(isset($row->verband))
+		{
+			if(strlen($row->verband)>$maxlength[$i])
+				$maxlength[$i] = strlen($row->verband);
+			$worksheet->write($zeile,$i, $row->verband);
+		}
+		$i++;
+		
+		//Gruppe
+		if(isset($row->gruppe))
+		{
+			if(strlen($row->gruppe)>$maxlength[$i])
+				$maxlength[$i] = strlen($row->gruppe);
+			$worksheet->write($zeile,$i, $row->gruppe);
+		}
+		$i++;
+		
+		//ZGV		
+		if($row->zgv_code!='' && isset($zgv_arr[$row->zgv_code]))
+		{
+			if(strlen($zgv_arr[$row->zgv_code])>$maxlength[$i])
+				$maxlength[$i] = strlen($zgv_arr[$row->zgv_code]);
+			$worksheet->write($zeile,$i, $zgv_arr[$row->zgv_code]);
+		}
+		$i++;
+		
+		//ZGV Ort
+		if(strlen($row->zgvort)>$maxlength[$i])
+			$maxlength[$i] = strlen($row->zgvort);
+		$worksheet->write($zeile,$i, $row->zgvort);
+		$i++;
+		
+		//ZGV Datum
+		if(strlen($row->zgvdatum)>$maxlength[$i])
+			$maxlength[$i] = strlen($row->zgvdatum);
+		$worksheet->write($zeile,$i, $row->zgvdatum);
+		$i++;
+		
+		//ZGV Master
+		if($row->zgvmas_code!='' && isset($zgvmas_arr[$row->zgvmas_code]))
+		{
+			if(strlen($zgvmas_arr[$row->zgvmas_code])>$maxlength[$i])
+				$maxlength[$i] = strlen($zgvmas_arr[$row->zgvmas_code]);
+			$worksheet->write($zeile,$i, $zgvmas_arr[$row->zgvmas_code]);
+		}
+		$i++;
+		
+		//ZGV Master Ort
+		if(strlen($row->zgvmaort)>$maxlength[$i])
+			$maxlength[$i] = strlen($row->zgvmaort);
+		$worksheet->write($zeile,$i, $row->zgvmaort);
+		$i++;
+		
+		//ZGV Master Datum
+		if(strlen($row->zgvmadatum)>$maxlength[$i])
+			$maxlength[$i] = strlen($row->zgvmadatum);
+		$worksheet->write($zeile,$i, $row->zgvmadatum);
+		$i++;
+		
+		//Status		
+		if(strlen($status)>$maxlength[$i])
+			$maxlength[$i] = strlen($status);
+		$worksheet->write($zeile,$i, $status);
+		$i++;
+		
+		//Email Intern
+		if(isset($row->student_uid))
+		{
+			if(strlen($row->student_uid.'@'.DOMAIN)>$maxlength[$i])
+				$maxlength[$i] = strlen($row->student_uid.'@'.DOMAIN);
+			$worksheet->write($zeile,$i, $row->student_uid.'@'.DOMAIN);
+		}
+		$i++;
+				
+		//Nebenwohnsitz
 		//Nebenwohnsitz aus der Datenbank holen und dazuhaengen
 		$qry_1 = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id' AND typ='n' LIMIT 1";
 		if($result_1 = pg_query($conn, $qry_1))
@@ -400,6 +416,7 @@ loadVariables($conn, $user);
 		else 
 			$i+=3;
 			
+		//Telefon
 		$qry_1 = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp in('mobil','telefon','so.tel') AND person_id='$row->person_id' ORDER BY zustellung DESC LIMIT 1";
 		if($result_1 = pg_query($conn, $qry_1))
 		{
@@ -412,6 +429,7 @@ loadVariables($conn, $user);
 		}
 		$i++;
 		
+		//Spezialgruppen
 		$grps='';
 		$qry_1 = "SELECT gruppe_kurzbz FROM public.tbl_student JOIN public.tbl_benutzergruppe ON (student_uid=uid) WHERE tbl_student.prestudent_id='$row->prestudent_id' AND tbl_benutzergruppe.studiensemester_kurzbz='$studiensemester_kurzbz'";
 		if($result_1 = pg_query($conn, $qry_1))
@@ -429,6 +447,20 @@ loadVariables($conn, $user);
 		$worksheet->write($zeile,$i, $grps);
 		$i++;
 		
+		//UID
+		if(isset($row->student_uid))
+		{
+			if(strlen($row->student_uid)>$maxlength[$i])
+				$maxlength[$i] = strlen($row->student_uid);
+			$worksheet->write($zeile,$i, $row->student_uid);
+		}
+		$i++;
+		
+		//Vornamen
+		if(strlen($row->vornamen)>$maxlength[$i])
+			$maxlength[$i] = strlen($row->vornamen);
+		$worksheet->write($zeile,$i, $row->vornamen);
+		$i++;
 	}
 		
 
