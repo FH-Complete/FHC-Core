@@ -81,3 +81,51 @@ INSERT INTO public.tbl_aufmerksamdurch VALUES ('Tag d.off.Tür', 'Tag der offenen
 INSERT INTO public.tbl_aufmerksamdurch VALUES ('Wien', '20060317 Wien', 1);
 INSERT INTO public.tbl_aufmerksamdurch VALUES ('Messe Klagenfurt', 'Messe Klagenfurt', 3);
 INSERT INTO public.tbl_aufmerksamdurch VALUES ('Best Wien', 'Best Wien', 4);
+
+SET search_path = sync, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = true;
+
+--
+-- Name: stp_zugang; Type: TABLE; Schema: sync; Owner: fas; Tablespace: 
+--
+
+CREATE TABLE stp_zugang (
+    cxzugang integer NOT NULL,
+    zgv_code integer NOT NULL
+);
+
+
+ALTER TABLE sync.stp_zugang OWNER TO fas;
+
+--
+-- Data for Name: stp_zugang; Type: TABLE DATA; Schema: sync; Owner: fas
+--
+
+INSERT INTO stp_zugang VALUES (5, 4);
+INSERT INTO stp_zugang VALUES (6, 5);
+INSERT INTO stp_zugang VALUES (7, 6);
+INSERT INTO stp_zugang VALUES (8, 7);
+INSERT INTO stp_zugang VALUES (9, 8);
+INSERT INTO stp_zugang VALUES (10, 99);
+INSERT INTO stp_zugang VALUES (11, 10);
+INSERT INTO stp_zugang VALUES (12, 9);
+INSERT INTO stp_zugang VALUES (13, 11);
+INSERT INTO stp_zugang VALUES (14, 12);
+INSERT INTO stp_zugang VALUES (15, 13);
+INSERT INTO stp_zugang VALUES (16, 14);
+INSERT INTO stp_zugang VALUES (17, 15);
+INSERT INTO stp_zugang VALUES (18, 16);
+INSERT INTO stp_zugang VALUES (19, 17);
+INSERT INTO stp_zugang VALUES (20, 18);
+INSERT INTO stp_zugang VALUES (21, 19);
+
+
+--
+-- Name: stp_zugang; Type: ACL; Schema: sync; Owner: fas
+--
+
+REVOKE ALL ON TABLE stp_zugang FROM PUBLIC;
+GRANT INSERT,SELECT,UPDATE ON TABLE stp_zugang TO vilesci;
