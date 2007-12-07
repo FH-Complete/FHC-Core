@@ -129,3 +129,49 @@ INSERT INTO stp_zugang VALUES (21, 19);
 
 REVOKE ALL ON TABLE stp_zugang FROM PUBLIC;
 GRANT INSERT,SELECT,UPDATE ON TABLE stp_zugang TO vilesci;
+
+
+-- zgv
+SET search_path = bis, pg_catalog;
+
+--
+-- Data for Name: tbl_zgv; Type: TABLE DATA; Schema: bis; Owner: postgres
+--
+
+INSERT INTO tbl_zgv VALUES (4, 'Anerkannte Studienberechtigungsprüfung', 'Studberprüfung');
+INSERT INTO tbl_zgv VALUES (5, 'Ausländische Universitätsreife', 'Ausl.Univreife');
+INSERT INTO tbl_zgv VALUES (7, 'Lehrabschlussprüfung mit allfälligen Zusatzqualifikationen', 'Lehrabschluss');
+INSERT INTO tbl_zgv VALUES (8, 'Werkmeister', 'Werkmeister');
+INSERT INTO tbl_zgv VALUES (9, 'AHS (langform)', 'AHS-lang');
+INSERT INTO tbl_zgv VALUES (10, 'Oberstufenrealgymnasium', 'OberstufenRG');
+INSERT INTO tbl_zgv VALUES (11, 'AHS (Sonderformen)', 'AHS-sonder');
+INSERT INTO tbl_zgv VALUES (13, 'Handelsakademien', 'Handelsakademien');
+INSERT INTO tbl_zgv VALUES (16, 'Höhere Schulen der Lehrer- und Erzieherbildung', 'Lehrer');
+INSERT INTO tbl_zgv VALUES (17, 'Externistenreifeprüfung', 'Externist');
+INSERT INTO tbl_zgv VALUES (18, 'Berufreifeprüfung', 'Berufsreife');
+INSERT INTO tbl_zgv VALUES (19, 'Inländische postsekundäre Bildungseinrichtung', 'Inl.postsekundär');
+INSERT INTO tbl_zgv VALUES (99, 'Sonstige', 'Sonstige');
+INSERT INTO tbl_zgv VALUES (14, 'Höhere Lehranstalt für wirtschaftliche Berufe', 'HL wirtsch.Ber.');
+INSERT INTO tbl_zgv VALUES (12, 'Höhere technische und gewerbliche Lehranstalten', 'HTBLA');
+INSERT INTO tbl_zgv VALUES (6, 'Abschlusszeugnis einer facheinschlägigen BMS', 'BMS(facheinschl)');
+INSERT INTO tbl_zgv VALUES (15, 'Höhere land- und forstwirtschaftliche Lehranstalten', 'HL Land-u.Forst');
+
+-- zgvmaster
+SET search_path = bis, pg_catalog;
+
+--
+-- Data for Name: tbl_zgvmaster; Type: TABLE DATA; Schema: bis; Owner: postgres
+--
+
+INSERT INTO tbl_zgvmaster VALUES (1, 'FH-Abschluss Bachelor (Inland)', 'FH-Bachelor (I)');
+INSERT INTO tbl_zgvmaster VALUES (2, 'FH-Abschluss Bachelor (Ausland)', 'FH-Bachelor (A)');
+INSERT INTO tbl_zgvmaster VALUES (3, 'Abschluss postsekundäres Studium (Inland)', 'postsek.Inland');
+INSERT INTO tbl_zgvmaster VALUES (4, 'Abschluss postsekundäres Studium (Ausland)', 'postsek.Ausland');
+INSERT INTO tbl_zgvmaster VALUES (5, 'Univ.-Abschluss Bachelor (Inland)', 'Uni-Bachelor (I)');
+INSERT INTO tbl_zgvmaster VALUES (6, 'Univ.-Abschluss Bachelor (Ausland)', 'Uni-Bachelor (A)');
+INSERT INTO tbl_zgvmaster VALUES (11, 'Sonstige', 'Sonstige');
+INSERT INTO tbl_zgvmaster VALUES (9, 'Univ. Abschluss Dipl.-Ing. / Mag. / Master / Dr. (Inland)', 'Uni (I)');
+INSERT INTO tbl_zgvmaster VALUES (10, 'Univ. Abschluss Dipl.-Ing. / Mag. / Master / Dr. / PhD (Ausland)', 'Uni (A)');
+INSERT INTO tbl_zgvmaster VALUES (7, 'FH-Abschluss Dipl.-Ing. / Mag. / Master / Dr. (Inland)', 'FH (I)');
+INSERT INTO tbl_zgvmaster VALUES (8, 'FH-Abschluss Dipl.-Ing. / Mag. / Master / Dr. / PhD (Ausland)', 'FH (A)');
+
