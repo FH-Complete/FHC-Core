@@ -288,33 +288,30 @@ var LektorFunktionDDObserver=
 	    col = tree.columns ? tree.columns["studiengang_kz"] : "studiengang_kz";
 		var stg=tree.view.getCellText(row.value,col);
 
-		if(stg!=0)
+	    uid=dropdata.data;
+
+	    var req = new phpRequest('tempusDBDML.php','','');
+
+	    req.add('type', 'addFunktionToMitarbeiter');
+		req.add('uid', uid);
+		req.add('studiengang_kz', stg);
+
+		var response = req.executePOST();
+
+		var val =  new ParseReturnValue(response)
+
+		if (!val.dbdml_return)
 		{
-		    uid=dropdata.data;
-
-		    var req = new phpRequest('tempusDBDML.php','','');
-
-		    req.add('type', 'addFunktionToMitarbeiter');
-			req.add('uid', uid);
-			req.add('studiengang_kz', stg);
-
-			var response = req.executePOST();
-
-			var val =  new ParseReturnValue(response)
-
-			if (!val.dbdml_return)
-			{
-				alert(val.dbdml_errormsg)
-			}
-			else
-			{
-				//Tree Refreshen
-				//keine Ahnung warum ich da ein setTimeout brauche
-				//aber wenns nicht da ist dann stuerzt Mozilla ab?!
-				//mit seamonkey funktionierts auch ohne!
-				LektorTreeOpenStudiengang = stg;
-				window.setTimeout(RefreshLektorTree,10);
-			}
+			alert(val.dbdml_errormsg)
+		}
+		else
+		{
+			//Tree Refreshen
+			//keine Ahnung warum ich da ein setTimeout brauche
+			//aber wenns nicht da ist dann stuerzt Mozilla ab?!
+			//mit seamonkey funktionierts auch ohne!
+			LektorTreeOpenStudiengang = stg;
+			window.setTimeout(RefreshLektorTree,10);
 		}
   	}
 };

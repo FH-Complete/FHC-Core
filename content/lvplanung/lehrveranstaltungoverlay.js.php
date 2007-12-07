@@ -54,7 +54,7 @@ var lehrveranstaltungGesamtNotenTreeloaded=false;
 var LvTreeSinkObserver =
 {
 	onBeginLoad : function(pSink) {},
-	onInterrupt : function(pSink) {debug('oninterrupt');},
+	onInterrupt : function(pSink) {},
 	onResume : function(pSink) {},
 	onError : function(pSink, pStatus, pError) { debug('onerror:'+pError); },
 	onEndLoad : function(pSink)
