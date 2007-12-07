@@ -142,12 +142,12 @@ if($result = pg_query($conn, $qry))
 			$error_log1.="\nKein Geburtsdatum eingetragen";
 			$error=true;
 		}
-		if(($row->chsvnr=='' || $row->chsvnr==NULL) && ($row->chersatzkz=='' || $row->chersatzkz==NULL))
+		/*if(($row->chsvnr=='' || $row->chsvnr==NULL) && ($row->chersatzkz=='' || $row->chersatzkz==NULL))
 		{
 			$error_log1.="\nKeine SVNr und kein Ersatzkennzeichen eingetragen";
-			$cont=true;
+			//$cont=true;
 			$error=true;
-		}
+		}*/
 		if($row->_cxgeschlecht=='' || $row->_cxgeschlecht==NULL)
 		{
 			$error_log1.="\nKein Familienstand eingetragen";
