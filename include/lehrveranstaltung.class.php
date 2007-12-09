@@ -30,6 +30,7 @@ class lehrveranstaltung
 	var $studiengang_kz;		//@var integer
 	var $bezeichnung;   		//@var string
 	var $kurzbz;   				//@var string
+	var $lehrform_kurzbz;   	//@var string
 	var $semester;  		 	//@var smallint
 	var $ects;   				//@var numeric(5,2)
 	var $semesterstunden;   	//@var smallint
@@ -52,7 +53,7 @@ class lehrveranstaltung
 	var $zeugnis=true;			//@var boolean
 	var $projektarbeit;			//@var boolean
 	var $koordinator;			//@var varchar(16)
-	
+
 	/**
 	 * Konstruktor
 	 * @param $conn Connection zur Datenbank
@@ -106,6 +107,7 @@ class lehrveranstaltung
 			$this->studiengang_kz=$row->studiengang_kz;
 			$this->bezeichnung=$row->bezeichnung;
 			$this->kurzbz=$row->kurzbz;
+			$this->lehrform_kurzbz=$row->lehrform_kurzbz;
 			$this->semester=$row->semester;
 			$this->ects=$row->ects;
 			$this->semesterstunden=$row->semesterstunden;
@@ -154,6 +156,7 @@ class lehrveranstaltung
 			$lv_obj->studiengang_kz=$row->studiengang_kz;
 			$lv_obj->bezeichnung=$row->bezeichnung;
 			$lv_obj->kurzbz=$row->kurzbz;
+			$lv_obj->lehrform_kurzbz=$row->lehrform_kurzbz;
 			$lv_obj->semester=$row->semester;
 			$lv_obj->ects=$row->ects;
 			$lv_obj->semesterstunden=$row->semesterstunden;
@@ -222,9 +225,9 @@ class lehrveranstaltung
 				$qry .= " AND aktiv";
 
 		$qry .= " AND semester is not null AND lehreverzeichnis<>''";
-		
+
 		if ($sort == "bezeichnung")
-			$qry .= " ORDER BY bezeichnung";		
+			$qry .= " ORDER BY bezeichnung";
 		else
 			$qry .= " ORDER BY semester, bezeichnung";
 
@@ -243,6 +246,7 @@ class lehrveranstaltung
 			$lv_obj->studiengang_kz=$row->studiengang_kz;
 			$lv_obj->bezeichnung=$row->bezeichnung;
 			$lv_obj->kurzbz=$row->kurzbz;
+			$lv_obj->lehrform_kurzbz=$row->lehrform_kurzbz;
 			$lv_obj->semester=$row->semester;
 			$lv_obj->ects=$row->ects;
 			$lv_obj->semesterstunden=$row->semesterstunden;
@@ -357,13 +361,17 @@ class lehrveranstaltung
 		if($new)
 		{
 			//Neuen Datensatz anlegen
-			$qry = 'BEGIN; INSERT INTO lehre.tbl_lehrveranstaltung (studiengang_kz, bezeichnung, kurzbz,
+			$qry = 'BEGIN; INSERT INTO lehre.tbl_lehrveranstaltung (studiengang_kz, bezeichnung, kurzbz, lehrform_kurzbz,
 				semester, ects, semesterstunden,  anmerkung, lehre, lehreverzeichnis, aktiv, ext_id, insertamum,
 				insertvon, planfaktor, planlektoren, planpersonalkosten, plankostenprolektor, updateamum, updatevon, sort,zeugnis, projektarbeit, sprache, koordinator) VALUES ('.
 				$this->addslashes($this->studiengang_kz).', '.
 				$this->addslashes($this->bezeichnung).', '.
-				$this->addslashes($this->kurzbz).', '.
-				$this->addslashes($this->semester).', '.
+				$this->addslashes($this->kurzbz).', ';
+			if ($this->lehrform_kurzbz=='NULL')
+				$qry.= 'NULL, ';
+			else
+				$qry.= $this->addslashes($this->lehrform_kurzbz).', ';
+			$qry.= $this->addslashes($this->semester).', '.
 				$this->addslashes($this->ects).', '.
 				$this->addslashes($this->semesterstunden).', '.
 				$this->addslashes($this->anmerkung).', '.
@@ -401,7 +409,12 @@ class lehrveranstaltung
 				'studiengang_kz='.$this->addslashes($this->studiengang_kz) .', '.
 				'bezeichnung='.$this->addslashes($this->bezeichnung) .', '.
 				'kurzbz='.$this->addslashes($this->kurzbz) .', '.
-				'semester='.$this->addslashes($this->semester) .', '.
+				'lehrform_kurzbz=';
+			if ($this->lehrform_kurzbz=='NULL')
+				$qry.= 'NULL, ';
+			else
+				$qry.=$this->addslashes($this->lehrform_kurzbz) .', ';
+			$qry.= 'semester='.$this->addslashes($this->semester) .', '.
 				'ects='.$this->addslashes($this->ects) .', '.
 				'semesterstunden='.$this->addslashes($this->semesterstunden) .', '.
 				'anmerkung='.$this->addslashes($this->anmerkung) .', '.
@@ -504,6 +517,7 @@ class lehrveranstaltung
 				$lv_obj->studiengang_kz=$row->studiengang_kz;
 				$lv_obj->bezeichnung=$row->bezeichnung;
 				$lv_obj->kurzbz=$row->kurzbz;
+				$lv_obj->lehrform_kurzbz=$row->lehrform_kurzbz;
 				$lv_obj->semester=$row->semester;
 				$lv_obj->ects=$row->ects;
 				$lv_obj->semesterstunden=$row->semesterstunden;
@@ -576,6 +590,7 @@ class lehrveranstaltung
 				$l->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 				$l->kurzbz = $row->kurzbz;
 				$l->bezeichnung = $row->bezeichnung;
+				$l->lehrform_kurzbz = $row->lehrform_kurzbz;
 				$l->studiengang_kz = $row->studiengang_kz;
 				$l->sprache = $row->sprache;
 				$l->ects = $row->ects;

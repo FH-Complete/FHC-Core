@@ -85,6 +85,17 @@ if (!@pg_query($conn,'SELECT projektarbeit FROM lehre.tbl_lehrveranstaltung LIMI
 		echo 'projektarbeit wurde bei lehre.tbl_lehrveranstaltung hinzugefuegt!<BR>';
 }
 
+// ************** lehre.tbl_lehrveranstaltung.lehrform_kurzbz ************************
+if (!@pg_query($conn,'SELECT lehrform_kurzbz FROM lehre.tbl_lehrveranstaltung LIMIT 1;'))
+{
+	$sql='	ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN lehrform_kurzbz varchar(8);
+			Alter table lehre.tbl_lehrveranstaltung add Constraint "lehrform_lehrveranstaltung" foreign key ("lehrform_kurzbz") references lehre.tbl_lehrform ("lehrform_kurzbz") on update cascade on delete restrict;';
+	if (!@pg_query($conn,$sql))
+		echo '<strong>lehre.tbl_lehrveranstaltung: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo 'lehrform_kurzbz wurde bei lehre.tbl_lehrveranstaltung hinzugefuegt!<BR>';
+}
+
 // ************** lehre.tbl_lehrveranstaltung.projektarbeit ************************
 if (!@pg_query($conn,'SELECT * FROM bis.tbl_bundesland LIMIT 1;'))
 {
@@ -173,7 +184,7 @@ $tabellen=array(
 	"lehre.tbl_lehrfach"  => array("lehrfach_id","studiengang_kz","fachbereich_kurzbz","kurzbz","bezeichnung","farbe","aktiv","semester","sprache","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_lehrform"  => array("lehrform_kurzbz","bezeichnung","verplanen"),
 	"lehre.tbl_lehrfunktion"  => array("lehrfunktion_kurzbz","beschreibung","standardfaktor"),
-	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe"),
 	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id"),

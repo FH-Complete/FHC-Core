@@ -280,6 +280,7 @@ if ($result_lv!=0)
 	echo "<th class='table-sortable:default'>ID</th>
 		  <th class='table-sortable:default'>Kurzbz</th>
 		  <th class='table-sortable:default'>Bezeichnung</th>
+		  <th class='table-sortable:default'>Lehrform</th>
 		  <th class='table-sortable:default'>Stg</th>
 		  <th class='table-sortable:default'>SS</th>
 		  <th class='table-sortable:default'>ECTS</th>
@@ -307,6 +308,7 @@ if ($result_lv!=0)
 		else
 			echo $row->bezeichnung;
 		echo "</td>";
+		echo "<td>".$row->lehrform_kurzbz."</td>";
 		echo "<td>".$s[$row->studiengang_kz]->kurzbz."</td>";
 		//Semesterstunden
 		echo "<td>$row->semesterstunden</td>";
