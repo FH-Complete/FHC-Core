@@ -279,3 +279,13 @@ INSERT INTO lehre.tbl_note VALUES (9, 'Noch nicht eingetragen', NULL, '90EE90');
 INSERT INTO lehre.tbl_note VALUES (16, 'Ausland', 'al', NULL);
 INSERT INTO lehre.tbl_note VALUES (15, 'mit ausgezeichnetem Erfolg best', '15', NULL);
 INSERT INTO lehre.tbl_note VALUES (17, 'komm. Prüfung', 'kp', NULL);
+
+-- Berechtigung
+
+INSERT INTO tbl_berechtigung VALUES ('admin', 'Super User Rechte');
+INSERT INTO tbl_berechtigung VALUES ('user', 'Normale User ohne besonere Rechte');
+INSERT INTO tbl_berechtigung VALUES ('mitarbeiter', 'FAS Mitarbeitermodul');
+INSERT INTO tbl_berechtigung VALUES ('lehre', 'Berechtigung fuer CIS-Seite');
+INSERT INTO tbl_berechtigung VALUES ('lv-plan', 'Stundenplan');
+INSERT INTO tbl_berechtigung VALUES ('assistenz', 'Assistenz');
+INSERT INTO tbl_berechtigung VALUES ('news', 'News eintragen');
