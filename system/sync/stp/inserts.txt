@@ -196,3 +196,29 @@ INSERT INTO tbl_rolle VALUES ('Incoming', NULL, NULL, 11);
 INSERT INTO tbl_rolle VALUES ('Praktikant', NULL, NULL, 12);
 INSERT INTO tbl_rolle VALUES ('Absolvent', NULL, NULL, 14);
 INSERT INTO tbl_rolle VALUES ('Diplomand', NULL, NULL, 13);
+
+-- Lehrform
+
+INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('0','Sonstige',true);
+INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('BOPR','Berufsorientierungspraktikum',true);
+INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('DLLV','Dislozierte Lehrveranstaltung',true);
+INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('EX','Exkursion',true);
+INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('FUV','Fernlehrunterstützte Vorlesung',true);
+INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('ILV','Integrierte Lehrveranstaltung',true);
+INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('IT','Individualtraining',true);
+INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('LB','Labor, Laborübung',true);
+INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('PBL','Problemorientiertes Lernen',true);
+INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('PS','Proseminar',true);
+INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('PT','Projekt, Projektarbeit, Projektstudien, Projektsem',true);
+INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('RE','Repetitorium',true);
+INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('SE','Seminar, Diplomsem., Praktikumsbegl. Sem.',true);
+INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('TU','Tutorial',true);
+INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('UE','Übung, Konstruktionsübung',true);
+INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('VO','Vorlesung',true);
+INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('WK','Workshop',true);
+INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('WS','Werkstätte',true);
+INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('PL','Praxislabor',true);
+INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('BA','Bakkalaureatsarbeit',true);
+INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('PA','Schwerpunktprojekt',true);
+INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('BP','Berufspraktikum',true);
+INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('WPF','Wahlpflichtfach',true);

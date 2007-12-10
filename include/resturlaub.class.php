@@ -35,6 +35,7 @@ class resturlaub
 	var $mitarbeiter_uid;
 	var $resturlaubstage;
 	var $mehrarbeitsstunden;
+	var $urlaubstageprojahr;
 	var $updateamum;
 	var $updatevon;
 	var $insertamum;
@@ -92,6 +93,7 @@ class resturlaub
 				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$this->resturlaubstage = $row->resturlaubstage;
 				$this->mehrarbeitsstunden = $row->mehrarbeitsstunden;
+				$this->urlaubstageprojahr = $row->urlaubstageprojahr;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->insertamum = $row->insertamum;
@@ -127,6 +129,11 @@ class resturlaub
 			$this->errormsg ='Mehrarbeitsstunden muss eine gueltige Zahl sein';
 			return false;
 		}
+		if($this->urlaubstageprojahr<0)
+		{
+			$this->errormsg = 'Urlaubsanspruch darf nicht negativ sein';
+			return false;
+		}
 		return true;
 	}
 	
@@ -156,10 +163,11 @@ class resturlaub
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-			$qry = 'INSERT INTO campus.tbl_resturlaub  (mitarbeiter_uid, resturlaubstage, mehrarbeitsstunden, insertamum, insertvon, updateamum, updatevon) VALUES('.
+			$qry = 'INSERT INTO campus.tbl_resturlaub  (mitarbeiter_uid, resturlaubstage, mehrarbeitsstunden, urlaubstageprojahr, insertamum, insertvon, updateamum, updatevon) VALUES('.
 			       $this->addslashes($this->mitarbeiter_uid).', '.
 			       $this->addslashes($this->resturlaubstage).', '.
 			       $this->addslashes($this->mehrarbeitsstunden).', '.
+			       $this->addslashes($this->urlaubstageprojahr).', '.
 			       $this->addslashes($this->insertamum).', '.
 			       $this->addslashes($this->insertvon).', '.
 			       $this->addslashes($this->updateamum).', '.
@@ -171,6 +179,7 @@ class resturlaub
 			$qry='UPDATE campus.tbl_resturlaub SET '.
 			'resturlaubstage='.$this->addslashes($this->resturlaubstage).', '.
 			'mehrarbeitsstunden='.$this->addslashes($this->mehrarbeitsstunden).', '.
+			'urlaubstageprojahr='.$this->addslashes($this->urlaubstageprojahr).', '.
  			'updateamum='.$this->addslashes($this->updateamum).', '.
  			'updatevon='.$this->addslashes($this->updatevon).
  			' WHERE mitarbeiter_uid='.$this->addslashes($this->mitarbeiter_uid).';';
@@ -205,6 +214,7 @@ class resturlaub
 				$obj->mitarbeiter_uid = $row->uid;
 				$obj->resturlaubstage = $row->resturlaubstage;
 				$obj->mehrarbeitsstunden = $row->mehrarbeitsstunden;
+				$obj->urlaubstageprojahr = $row->urlaubstageprojahr;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
@@ -219,7 +229,7 @@ class resturlaub
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim laden der Daten';
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}

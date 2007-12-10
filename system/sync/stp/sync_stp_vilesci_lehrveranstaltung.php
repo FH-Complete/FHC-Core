@@ -54,6 +54,31 @@
 	$statistik='';
 	$head_text="Dies ist eine automatische Mail!\n\nFolgende Fehler sind bei der Synchronisation der Lehrveranstaltungen aufgetreten:\n\n";
 	$text='';
+	$typ_lehrform_arr = array(
+							"1"=>"0",
+							"2"=>"BOPR",
+							"3"=>"DLLV",
+							"5"=>"EX",
+							"6"=>"FUV",
+							"7"=>"ILV",
+							"8"=>"IT",
+							"12"=>"LB",
+							"13"=>"PBL",
+							"17"=>"PS",
+							"18"=>"PT",
+							"20"=>"RE",
+							"22"=>"SE",
+							"23"=>"TU",
+							"24"=>"UE",
+							"26"=>"VO",
+							"29"=>"WK",
+							"30"=>"WS",
+							"31"=>"PL",
+							"32"=>"BA",
+							"33"=>"PA",
+							"34"=>"BP",
+							"35"=>"WPF"
+						);
 	
 	$stg_arr = array();
 	$stg_obj = new studiengang($conn);
@@ -126,19 +151,19 @@
 	// ******** SYNC START ********** //
 		
 	$qry = "SELECT 
-				_LV, SUBSTRING(chLVNr_new, 0, 200) as chLVNr, SUBSTRING(chBezeichnung, 0, 200) as chBezeichnung, _Studiengang, SUBSTRING(meKommentar, 0, 200) as meKommentar, inSemester, inSWS, ECTS
+				_LV, SUBSTRING(chLVNr_new, 0, 200) as chLVNr, SUBSTRING(chBezeichnung, 0, 200) as chBezeichnung, _Studiengang, SUBSTRING(meKommentar, 0, 200) as meKommentar, inSemester, inSWS, ECTS, _cxLVTyp
 			FROM 
 				lv JOIN studienplaneintrag ON(__LV=_LV)
 			UNION
 			SELECT
-				_LV, SUBSTRING(chLVNr_new, 0, 200) as chLVNr, SUBSTRING(chBezeichnung, 0, 200) as chBezeichnung, _Studiengang, SUBSTRING(meKommentar, 0, 200) as meKommentar, inSemester, inSWS, ECTS
+				_LV, SUBSTRING(chLVNr_new, 0, 200) as chLVNr, SUBSTRING(chBezeichnung, 0, 200) as chBezeichnung, _Studiengang, SUBSTRING(meKommentar, 0, 200) as meKommentar, inSemester, inSWS, ECTS, _cxLVTyp
 			FROM 
 				lv JOIN semesterplaneintrag on(__LV=_LV)
 			WHERE
 				(CAST(semesterplaneintrag._lv AS varchar(10))+' '+CAST(inSemester AS varchar(10))) not in(SELECT CAST(_lv AS varchar(10))+ ' ' + CAST(insemester AS varchar(10)) FROM studienplaneintrag)
 			UNION
 			SELECT
-				__LV as _LV, SUBSTRING(chLVNr_new, 0, 200) as chLVNr, SUBSTRING(chBezeichnung, 0, 200) as chBezeichnung, _Studiengang, SUBSTRING(meKommentar, 0, 200) as meKommentar, 0 as inSemester, 0 as inSWS, 0 as ECTS
+				__LV as _LV, SUBSTRING(chLVNr_new, 0, 200) as chLVNr, SUBSTRING(chBezeichnung, 0, 200) as chBezeichnung, _Studiengang, SUBSTRING(meKommentar, 0, 200) as meKommentar, 0 as inSemester, 0 as inSWS, 0 as ECTS, _cxLVTyp
 			FROM 
 				lv
 			WHERE
@@ -201,6 +226,12 @@
 				}
 			}
 			
+			if(!array_key_exists($row_ext->_cxLVTyp, $typ_lehrform_arr))
+			{
+				$text.="Es wurde keine passende Lehrform zur ID $row_ext->_cxLVTyp gefunden";
+				continue;
+			}
+			
 			$updtext = '';
 			if(!$lv_obj->new)
 			{
@@ -243,6 +274,8 @@
 					$updtext.="	koordinator wurde von $lv_obj->koordinator auf '' geaendert\n";
 				if($lv_obj->projektarbeit != false)
 					$updtext.="	projektarbeit wurde von $lv_obj->projektarbeit auf false geaendert\n";
+				if($lv_obj->lehrform_kurzbz != $typ_lehrform_arr[$row_ext->_cxLVTyp])
+					$updtext.="	lehrform_kurzbz wurde von $lv_obj->lehrform_kurzbz auf ".$typ_lehrform_arr[$row_ext->_cxLVTyp]." geaendert\n";
 			}
 			$lv_obj->kurzbz = cleankurzbz($row_ext->chLVNr);
 			$lv_obj->bezeichnung = $row_ext->chBezeichnung;
@@ -263,6 +296,7 @@
 			$lv_obj->zeugnis = true;
 			$lv_obj->koordinator = '';
 			$lv_obj->projektarbeit = false;
+			$lv_obj->lehrform_kurzbz = $typ_lehrform_arr[$row_ext->_cxLVTyp];
 			
 			if($updtext!='' || $lv_obj->new)
 			{

@@ -100,7 +100,7 @@ else
 	$qry = "SELECT lehrveranstaltung_id, kurzbz as lv_kurzbz, bezeichnung as lv_bezeichnung, studiengang_kz, semester, sprache,
 				ects as lv_ects, semesterstunden, anmerkung, lehre, lehreverzeichnis as lv_lehreverzeichnis, aktiv,
 				planfaktor as lv_planfaktor, planlektoren as lv_planlektoren, planpersonalkosten as lv_planpersonalkosten,
-				plankostenprolektor as lv_plankostenprolektor
+				plankostenprolektor as lv_plankostenprolektor, lehrform_kurzbz as lv_lehrform_kurzbz
 			FROM lehre.tbl_lehrveranstaltung
 			WHERE aktiv ";
 	if($stg_kz!='')
@@ -112,7 +112,7 @@ else
 				semester, tbl_lehrveranstaltung.sprache, ects as lv_ects, semesterstunden, tbl_lehrveranstaltung.anmerkung,
 				tbl_lehrveranstaltung.lehre, lehreverzeichnis as lv_lehreverzeichnis, aktiv, planfaktor as lv_planfaktor,
 				planlektoren as lv_planlektoren, planpersonalkosten as lv_planpersonalkosten,
-				plankostenprolektor as lv_plankostenprolektor
+				plankostenprolektor as lv_plankostenprolektor, tbl_lehrveranstaltung.lehrform_kurzbz as lv_lehrform_kurzbz
 			FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING (lehrveranstaltung_id)
 			WHERE NOT aktiv ";
 	if($stg_kz!='')
@@ -187,7 +187,7 @@ if(!$result = pg_query($conn, $qry))
 			<LVA:plankostenprolektor>".$row_lva->lv_plankostenprolektor."</LVA:plankostenprolektor>
 
 			<LVA:lehreinheit_id></LVA:lehreinheit_id>
-			<LVA:lehrform_kurzbz></LVA:lehrform_kurzbz>
+			<LVA:lehrform_kurzbz>$row_lva->lv_lehrform_kurzbz</LVA:lehrform_kurzbz>
 			<LVA:stundenblockung></LVA:stundenblockung>
 			<LVA:wochenrythmus></LVA:wochenrythmus>
 			<LVA:startkw></LVA:startkw>
