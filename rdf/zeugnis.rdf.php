@@ -252,6 +252,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					$xml_fussnote .='      <note>'.$note.$nl.'</note>';
 					$xml_fussnote .='      <sws>'.$nl.'</sws>';
 					$xml_fussnote .='      <ects>'.$nl.'</ects>';
+					$xml_fussnote .='      <lv_lehrform_kurzbz>'.$nl.'</lv_lehrform_kurzbz>';
 				
 						
 					
@@ -268,6 +269,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$xml .= "				<note>".$note2."</note>";
 				$xml .= "				<sws>".($row->semesterstunden==0?'':sprintf('%.1f',$row->semesterstunden/$wochen))."</sws>";
 				$xml .= "				<ects>".number_format($row->ects,1)."</ects>";
+				$xml .= "				<lv_lehrform_kurzbz>".$row->lv_lehrform_kurzbz."</lv_lehrform_kurzbz>";
 				$xml .= "			</unterrichtsfach>";
 			}
 		}
