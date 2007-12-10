@@ -258,3 +258,24 @@ INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz, studiengang_kz, versio
 INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz, studiengang_kz, version) VALUES ('DiplomurkundeEng', 0, 1);
 INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz, studiengang_kz, version) VALUES ('Zeugnis', 0, 1);
 INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz, studiengang_kz, version) VALUES ('Zahlung', 0, 1);
+
+
+-- Note
+
+INSERT INTO tbl_note VALUES (1, 'Sehr Gut', '1', NULL);
+INSERT INTO tbl_note VALUES (2, 'Gut', '2', NULL);
+INSERT INTO tbl_note VALUES (3, 'Befriedigend', '3', NULL);
+INSERT INTO tbl_note VALUES (4, 'Genügend', '4', NULL);
+INSERT INTO tbl_note VALUES (7, 'Nicht beurteilt', 'nb', 'FF0000');
+INSERT INTO tbl_note VALUES (6, 'angerechnet', 'ar', NULL);
+INSERT INTO tbl_note VALUES (8, 'Teilgenommen', 'tg', NULL);
+INSERT INTO tbl_note VALUES (10, 'Bestanden', 'b', NULL);
+INSERT INTO tbl_note VALUES (11, 'Approbiert', 'ap', NULL);
+INSERT INTO tbl_note VALUES (12, 'Erfolgreich absolviert', 'ea', NULL);
+INSERT INTO tbl_note VALUES (13, 'Nicht erfolgreich absolviert', 'nea', NULL);
+INSERT INTO tbl_note VALUES (0, 'Teilnote', '0', NULL);
+INSERT INTO tbl_note VALUES (5, 'Nicht Genügend', '5', 'FF0000');
+INSERT INTO tbl_note VALUES (9, 'Noch nicht eingetragen', NULL, '90EE90');
+INSERT INTO tbl_note VALUES (16, 'Ausland', 'al', NULL);
+INSERT INTO tbl_note VALUES (15, 'mit ausgezeichnetem Erfolg best', '15', NULL);
+INSERT INTO tbl_note VALUES (17, 'komm. Prüfung', 'kp', NULL);
