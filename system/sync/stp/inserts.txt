@@ -222,3 +222,39 @@ INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('
 INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('PA','Schwerpunktprojekt',true);
 INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('BP','Berufspraktikum',true);
 INSERT INTO lehre.tbl_lehrform(lehrform_kurzbz, bezeichnung, verplanen) VALUES('WPF','Wahlpflichtfach',true);
+
+-- Vorlagen
+
+INSERT INTO public.tbl_vorlage(vorlage_kurzbz, bezeichnung, anmerkung) VALUES ('Studienerfolg', NULL, NULL);
+INSERT INTO public.tbl_vorlage(vorlage_kurzbz, bezeichnung, anmerkung) VALUES ('AccountInfo', 'AccountInfoBlatt', NULL);
+INSERT INTO public.tbl_vorlage(vorlage_kurzbz, bezeichnung, anmerkung) VALUES ('DiplSupplement', NULL, NULL);
+INSERT INTO public.tbl_vorlage(vorlage_kurzbz, bezeichnung, anmerkung) VALUES ('Diplomurkunde', NULL, NULL);
+INSERT INTO public.tbl_vorlage(vorlage_kurzbz, bezeichnung, anmerkung) VALUES ('Diplomzeugnis', NULL, NULL);
+INSERT INTO public.tbl_vorlage(vorlage_kurzbz, bezeichnung, anmerkung) VALUES ('Bakkurkunde', NULL, NULL);
+INSERT INTO public.tbl_vorlage(vorlage_kurzbz, bezeichnung, anmerkung) VALUES ('BakkurkundeEng', NULL, NULL);
+INSERT INTO public.tbl_vorlage(vorlage_kurzbz, bezeichnung, anmerkung) VALUES ('Bakkzeugnis', NULL, NULL);
+INSERT INTO public.tbl_vorlage(vorlage_kurzbz, bezeichnung, anmerkung) VALUES ('PrProtokollBakk', NULL, NULL);
+INSERT INTO public.tbl_vorlage(vorlage_kurzbz, bezeichnung, anmerkung) VALUES ('PrProtokollDipl', NULL, NULL);
+INSERT INTO public.tbl_vorlage(vorlage_kurzbz, bezeichnung, anmerkung) VALUES ('Lehrauftrag', NULL, 'erledigt');
+INSERT INTO public.tbl_vorlage(vorlage_kurzbz, bezeichnung, anmerkung) VALUES ('Inskription', 'Inskriptionsbestaetigung', 'erledigt');
+INSERT INTO public.tbl_vorlage(vorlage_kurzbz, bezeichnung, anmerkung) VALUES ('DiplomurkundeEng', NULL, NULL);
+INSERT INTO public.tbl_vorlage(vorlage_kurzbz, bezeichnung, anmerkung) VALUES ('Zeugnis', NULL, 'erledigt');
+INSERT INTO public.tbl_vorlage(vorlage_kurzbz, bezeichnung, anmerkung) VALUES ('Zahlung', 'Zahlung', 'erledigt');
+
+-- VorlageStudiengang
+
+INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz, studiengang_kz, version) VALUES ('Studienerfolg', 0, 1);
+INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz, studiengang_kz, version) VALUES ('AccountInfo', 0, 1);
+INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz, studiengang_kz, version) VALUES ('DiplSupplement', 0, 1);
+INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz, studiengang_kz, version) VALUES ('Diplomurkunde', 0, 1);
+INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz, studiengang_kz, version) VALUES ('Diplomzeugnis', 0, 1);
+INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz, studiengang_kz, version) VALUES ('Bakkurkunde', 0, 1);
+INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz, studiengang_kz, version) VALUES ('BakkurkundeEng', 0, 1);
+INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz, studiengang_kz, version) VALUES ('Bakkzeugnis', 0, 1);
+INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz, studiengang_kz, version) VALUES ('PrProtokollBakk', 0, 1);
+INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz, studiengang_kz, version) VALUES ('PrProtokollDipl', 0, 1);
+INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz, studiengang_kz, version) VALUES ('Lehrauftrag', 0, 1);
+INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz, studiengang_kz, version) VALUES ('Inskription', 0, 1);
+INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz, studiengang_kz, version) VALUES ('DiplomurkundeEng', 0, 1);
+INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz, studiengang_kz, version) VALUES ('Zeugnis', 0, 1);
+INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz, studiengang_kz, version) VALUES ('Zahlung', 0, 1);
