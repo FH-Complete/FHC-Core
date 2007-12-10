@@ -85,6 +85,47 @@ if (!@pg_query($conn,'SELECT projektarbeit FROM lehre.tbl_lehrveranstaltung LIMI
 		echo 'projektarbeit wurde bei lehre.tbl_lehrveranstaltung hinzugefuegt!<BR>';
 }
 
+// ************** campus.vw_lehreinheit.lv_lehrform_kurzbz ************************
+if (!@pg_query($conn,'SELECT lv_lehrform_kurzbz FROM campus.vw_lehreinheit LIMIT 1;'))
+{
+	$sql='	DROP VIEW campus.vw_lehreinheit;
+			CREATE  OR REPLACE VIEW campus.vw_lehreinheit AS
+				SELECT tbl_lehrveranstaltung.studiengang_kz AS lv_studiengang_kz, tbl_lehrveranstaltung.kurzbz AS lv_kurzbz, tbl_lehrveranstaltung.bezeichnung AS lv_bezeichnung,
+					tbl_lehrveranstaltung.ects AS lv_ects, tbl_lehrveranstaltung.lehreverzeichnis AS lv_lehreverzeichnis, tbl_lehrveranstaltung.planfaktor AS lv_planfaktor,
+					tbl_lehrveranstaltung.planlektoren AS lv_planlektoren, tbl_lehrveranstaltung.planpersonalkosten AS lv_planpersonalkosten,
+					tbl_lehrveranstaltung.plankostenprolektor AS lv_plankostenprolektor, lehreinheit_id, lehrveranstaltung_id, studiensemester_kurzbz, tbl_lehreinheit.lehrform_kurzbz,
+					stundenblockung, wochenrythmus, start_kw, raumtyp, raumtypalternativ, tbl_lehreinheit.lehre, unr, lvnr, lehrfunktion_kurzbz, tbl_lehreinheit.insertamum,
+					tbl_lehreinheit.insertvon, tbl_lehreinheit.updateamum, tbl_lehreinheit.updatevon, lehrfach_id, fachbereich_kurzbz, tbl_lehrfach.kurzbz AS lehrfach,
+					tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe, tbl_lehrveranstaltung.aktiv, tbl_lehrfach.sprache, mitarbeiter_uid,
+					tbl_lehreinheitmitarbeiter.semesterstunden AS semesterstunden, tbl_lehrveranstaltung.semesterstunden AS lv_semesterstunden, planstunden, tbl_lehreinheitmitarbeiter.stundensatz,
+					faktor, tbl_lehreinheit.anmerkung, tbl_mitarbeiter.kurzbz AS lektor, tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester, verband, gruppe,
+					gruppe_kurzbz, tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang, tbl_studiengang.bezeichnung AS stg_bez,
+					tbl_studiengang.typ AS stg_typ, tbl_lehreinheitmitarbeiter.anmerkung AS anmerkunglektor, tbl_lehrveranstaltung.lehrform_kurzbz AS lv_lehrform_kurzbz
+				FROM ((((((lehre.tbl_lehreinheit JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)) JOIN lehre.tbl_lehrfach USING (lehrfach_id))
+					JOIN lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id)) JOIN tbl_mitarbeiter USING (mitarbeiter_uid)) JOIN lehre.tbl_lehreinheitgruppe USING (lehreinheit_id))
+					JOIN tbl_studiengang ON ((tbl_lehreinheitgruppe.studiengang_kz = tbl_studiengang.studiengang_kz)));
+			GRANT SELECT ON TABLE campus.vw_lehreinheit TO GROUP web;
+			GRANT SELECT ON TABLE campus.vw_lehreinheit TO GROUP admin;';
+	if (!@pg_query($conn,$sql))
+		echo '<strong>campus.vw_lehreinheit: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo 'lv_lehrform_kurzbz wurde bei campus.vw_lehreinheit hinzugefuegt!<BR>';
+}
+
+// ************** campus.tbl_resturlaub.urlaubstageprojahr ************************
+if (!@pg_query($conn,'SELECT urlaubstageprojahr FROM campus.tbl_resturlaub LIMIT 1;'))
+{
+	$sql='	ALTER TABLE campus.tbl_resturlaub ADD COLUMN urlaubstageprojahr smallint;
+			ALTER TABLE campus.tbl_resturlaub ALTER COLUMN urlaubstageprojahr SET DEFAULT 25;
+			UPDATE campus.tbl_resturlaub SET urlaubstageprojahr=25;
+			ALTER TABLE campus.tbl_resturlaub ALTER COLUMN urlaubstageprojahr SET NOT NULL;
+			ALTER TABLE campus.tbl_resturlaub ADD CONSTRAINT tbl_resturlaub_urlaubstageprojahr CHECK (urlaubstageprojahr>=0)';
+	if (!@pg_query($conn,$sql))
+		echo '<strong>campus.tbl_resturlaub: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo 'urlaubstageprojahr wurde bei campus.tbl_resturlaub hinzugefuegt!<BR>';
+}
+
 // ************** lehre.tbl_lehrveranstaltung.lehrform_kurzbz ************************
 if (!@pg_query($conn,'SELECT lehrform_kurzbz FROM lehre.tbl_lehrveranstaltung LIMIT 1;'))
 {
