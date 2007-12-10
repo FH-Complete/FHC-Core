@@ -120,6 +120,10 @@ function checkval()
 	else
 		return true;
 }
+function berechnen()
+{
+	document.getElementById('summe').value = parseInt(document.getElementById('resturlaubstage').value)+parseInt(document.getElementById('anspruch').value);
+}
 </script>
 </head>
 
@@ -422,6 +426,7 @@ $content_form.= '</table></form>';
 $content_resturlaub = '';
 $resturlaubstage = '0';
 $mehrarbeitsstunden = '0';
+$anspruch = '25';
 
 if(isset($_GET['type']) && $_GET['type']=='save_resturlaub')
 {
@@ -442,6 +447,7 @@ if(isset($_GET['type']) && $_GET['type']=='save_resturlaub')
 	$resturlaub->updateamum = date('Y-m-d H:i:s');
 	$resturlaub->updatevon = $uid;
 	$resturlaub->resturlaubstage = $_POST['resturlaubstage'];
+	$resturlaub->urlaubstageprojahr = $_POST['anspruch'];
 	$resturlaub->mehrarbeitsstunden = $_POST['mehrarbeitsstunden'];
 
 	if($resturlaub->save())
@@ -455,6 +461,7 @@ if(isset($_GET['type']) && $_GET['type']=='save_resturlaub')
 
 	$resturlaubstage = htmlspecialchars($_POST['resturlaubstage'],ENT_QUOTES);
 	$mehrarbeitsstunden = htmlspecialchars($_POST['mehrarbeitsstunden'],ENT_QUOTES);
+	$anspruch = htmlspecialchars($_POST['anspruch'],ENT_QUOTES);
 }
 else
 {
@@ -464,10 +471,23 @@ else
 	{
 		$resturlaubstage = $resturlaub->resturlaubstage;
 		$mehrarbeitsstunden = $resturlaub->mehrarbeitsstunden;
+		$anspruch = $resturlaub->urlaubstageprojahr;
 	}
 }
+if($anspruch=='')
+	$anspruch=25;
+	
+//Eingabefelder am 15.12.2007 deaktivieren
+if(date('d')>=15 && date('m')>=12 && date('Y')>=2007)
+	$disabled='disabled="true"';
+else 
+	$disabled='';
+
 $content_resturlaub.='<form method="POST" action="'.$PHP_SELF.'?type=save_resturlaub"><table>';
-$content_resturlaub.='<tr><td>Aktuelle Resturlaubstage:</td><td><input type="text" size="6" name="resturlaubstage" value="'.$resturlaubstage.'" /></td></tr>';
+$content_resturlaub.='<tr><td>Resturlaubstage (31.08.)</td><td><input type="text" size="6" '.$disabled.' id="resturlaubstage" name="resturlaubstage" value="'.$resturlaubstage.'" oninput="berechnen()"/></td></tr>';
+$content_resturlaub.='<tr><td>Anspruch (01.09.)</td><td><input type="text" size="6" '.$disabled.' id="anspruch" name="anspruch" value="'.$anspruch.'" oninput="berechnen()"/></td></tr>';
+$content_resturlaub.='<tr><td>Gesamturlaub</td><td><input type="text" disabled="true" size="6" name="summe" id="summe" value="'.($anspruch+$resturlaubstage).'" /></td></tr>';
+$content_resturlaub.='<tr><td>&nbsp;</td></tr>';
 $content_resturlaub.='<tr><td>Aktuelle Mehrarbeitsstunden:</td><td><input type="text" size="6" name="mehrarbeitsstunden" value="'.$mehrarbeitsstunden.'" /></td></tr>';
 $content_resturlaub.='<tr><td></td><td><input type="submit" name="save_resturlaub" value="Speichern" /></td></tr></table>';
 
@@ -477,7 +497,7 @@ echo "<td class='tdvertical'>";
 echo $content_form;
 echo '</td>';
 echo "<td class='tdvertical'>$content_resturlaub</td>";
-echo '</tr><tr><td>';
+echo '</tr><tr><td colspan=2>';
 echo $content_table;
 echo '</td>';
 echo '</tr>';

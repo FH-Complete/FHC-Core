@@ -318,6 +318,10 @@ function LeNeu()
 	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung_id";
 	var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
 
+	//Lehrform setzen
+	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrform"] : "lehrveranstaltung-treecol-lehrform";
+	var lehrform_kurzbz=tree.view.getCellText(tree.currentIndex,col);
+		
 	//Lehrfach drop down setzen
 
 	//ID in globale Variable speichern
@@ -327,7 +331,7 @@ function LeNeu()
 
 	lehrfachmenulist = document.getElementById('lehrveranstaltung-detail-menulist-lehrfach');
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-
+		
 	//Entfernen der alten Datasources
 	var oldDatasources = lehrfachmenulist.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -352,6 +356,7 @@ function LeNeu()
 	document.getElementById('lehrveranstaltung-detail-checkbox-new').checked=true;
 	document.getElementById('lehrveranstaltung-detail-textbox-stundenblockung').value='2';
 	document.getElementById('lehrveranstaltung-detail-textbox-wochenrythmus').value='1';
+	document.getElementById('lehrveranstaltung-detail-menulist-lehrform').value=lehrform_kurzbz;
 	
 	var stsem = getStudiensemester();
 	document.getElementById('lehrveranstaltung-detail-menulist-studiensemester').value=stsem;

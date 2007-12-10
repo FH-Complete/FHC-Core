@@ -55,7 +55,7 @@
 	{
 		//$htmlstr = "<table class='liste sortable'>\n";
 		$htmlstr .= "<div style='text-align:right'>";
-		$htmlstr .= "<form name='neuform' action='variablen_details.php' target='detail'><input type='text' value='' name='uid'>&nbsp;<input type='submit' name='neuschick' value='go'></form>";
+		$htmlstr .= "<form name='neuform' action='variablen_details.php' target='vilesci_detail'><input type='text' value='' name='uid'>&nbsp;<input type='submit' name='neuschick' value='go'></form>";
 		$htmlstr .= "</div>";
 	    $htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form><table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>\n";
 		$htmlstr .= "   <thead><tr class='liste'>\n";
@@ -68,7 +68,7 @@
 			$htmlstr .= "   <tr>\n";
 	        $htmlstr .= "       <td>".$row->uid."</td>\n";
 			$htmlstr .= "       <td>".$row->vorname."</td>\n";
-	        $htmlstr .= "       <td><a href='variablen_details.php?uid=".$row->uid."' target='detail'>".$row->nachname."</a></td>\n";		
+	        $htmlstr .= "       <td><a href='variablen_details.php?uid=".$row->uid."' target='vilesci_detail'>".$row->nachname."</a></td>\n";		
 	        $htmlstr .= "   </tr>\n";
 	        $i++;
 	    }
