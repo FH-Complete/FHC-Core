@@ -374,6 +374,13 @@
 				}
 			}
 			
+			if(cleankurzbz($row_ext->chLVNr)=='')
+			{
+				$text.="Fehler bei $lf_obj->bezeichnung/$lf_obj->semester (id $row_ext->_LV): chLVNr_new darf nicht leer sein";
+				$anz_lf_insert++;
+				continue;
+			}
+			
 			$updtext = '';
 			if(!$lf_obj->new)
 			{
