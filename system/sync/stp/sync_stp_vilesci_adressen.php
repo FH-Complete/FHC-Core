@@ -59,6 +59,7 @@ $anzahl_fehler=0;
 $eingefuegt=0;
 $fehler=0;
 $dublette=0;
+$updtaes=0;
 $plausi='';
 $start='';
 $staat=array();
@@ -228,7 +229,7 @@ if($result = pg_query($conn, $qry))
 				else
 				{
 					$eingefuegt++;
-	
+					pg_query($conn, "COMMIT");
 				}
 			}
 			else
@@ -310,8 +311,17 @@ if($result = pg_query($conn, $qry))
 					
 					if(strlen(trim($sql))>0)
 					{
-						$sql="UPDATE public.tbl_adresse SET ".$sql.";";
-						
+						$sql="UPDATE public.tbl_adresse SET ".$sql." WHERE person_id='".$person_id."';";
+						if(!$result_neu = pg_query($conn, $sql))
+						{
+							$error_log.= $sql."\n<strong>".pg_last_error($conn)." </strong>\n";
+							pg_query($conn, "ROLLBACK");
+						}
+						else
+						{
+							$updates++;
+							pg_query($conn, "COMMIT");
+						}
 					}
 				}
 			}
