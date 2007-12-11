@@ -12,6 +12,7 @@
 
 include('../../vilesci/config.inc.php');
 include('../../include/functions.inc.php');
+include('../../include/studiensemester.class.php');
 $error_msg='';
 ?>
 
@@ -35,7 +36,14 @@ $error_msg='';
 		$studiensemester=$row->studiensemester_kurzbz;
 	else
 		$error_msg.=pg_errormessage($conn).$sql_query;
-
+	
+	$stsem_obj = new studiensemester($conn);
+	
+	if(substr($studiensemester,0,1)=='W')
+		$stsem2 = $stsem_obj->getNextFrom($studiensemester);
+	else 
+		$stsem2 = $stsem_obj->getPreviousFrom($studiensemester);
+		
    	// **************************************************************
 	// LektorenVerteiler abgleichen
 	$mlist_name='tw_lkt';
@@ -144,7 +152,8 @@ $error_msg='';
 			tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
 			tbl_studiengang.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz AND
-			studiensemester_kurzbz='$studiensemester' AND mitarbeiter_uid NOT LIKE '\\\\_%')";
+			(studiensemester_kurzbz='$studiensemester' OR
+			 studiensemester_kurzbz='$stsem2') AND mitarbeiter_uid NOT LIKE '\\\\_%')";
 	//echo $sql_query;
 	if(!($result=pg_query($conn, $sql_query)))
 		$error_msg.=pg_errormessage($conn).$sql_query;
@@ -158,13 +167,14 @@ $error_msg='';
 	}
 	// Lektoren holen die noch nicht im Verteiler sind
 	echo '<BR>';
-	$sql_query="SELECT mitarbeiter_uid, UPPER(typ::varchar(1) || tbl_studiengang.kurzbz || '_lkt') AS mlist_name, tbl_studiengang.studiengang_kz
+	$sql_query="SELECT distinct mitarbeiter_uid, UPPER(typ::varchar(1) || tbl_studiengang.kurzbz || '_lkt') AS mlist_name, tbl_studiengang.studiengang_kz
 		FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_studiengang
 		WHERE
 		tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 		tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
 		tbl_studiengang.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz AND
-		studiensemester_kurzbz='$studiensemester' AND
+		(studiensemester_kurzbz='$studiensemester' OR
+		 studiensemester_kurzbz='$stsem2') AND
 		mitarbeiter_uid NOT LIKE '\\\\_%' AND tbl_studiengang.studiengang_kz!=0 AND
 		(mitarbeiter_uid,UPPER(typ::varchar(1) || tbl_studiengang.kurzbz || '_lkt')) NOT IN
 		(SELECT uid, UPPER(gruppe_kurzbz) FROM public.tbl_benutzergruppe
