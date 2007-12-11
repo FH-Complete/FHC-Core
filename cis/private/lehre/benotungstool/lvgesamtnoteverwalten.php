@@ -90,7 +90,6 @@ require_once('../../../../include/zeugnisnote.class.php');
 	else
 	{	
 		erzeugeAnfrage(); 
-	    //note = document.getElementById(uid).note.value;
 	    stud_uid = uid;
 	    var jetzt = new Date();
 		var ts = jetzt.getTime();
@@ -389,7 +388,7 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 		$adressen = $sg->email.", ".$user."@technikum-wien.at";
 		
 		$freigeber = "<b>".strtoupper($user)."</b>";
-		mail($adressen,"Notenfreigabe ".$lv->bezeichnung,"<html><body><b>".$lv->bezeichnung."</b><br><br>Benutzer ".$freigeber." hat die LV-Noten f&uuml;r folgende Studenten freigegeben:<br><br>".$studlist."<br>Mail wurde verschickt an: ".$adressen."</body></html>","From: vilesci@technikum-wien.at\nContent-Type: text/html\n");
+		mail($adressen,"Notenfreigabe ".$lv->bezeichnung,"<html><body><b>".$lv->bezeichnung." - ".$stsem."</b><br><br>Benutzer ".$freigeber." hat die LV-Noten f&uuml;r folgende Studenten freigegeben:<br><br>".$studlist."<br>Mail wurde verschickt an: ".$adressen."</body></html>","From: vilesci@technikum-wien.at\nContent-Type: text/html\n");
 	}	
 
 
