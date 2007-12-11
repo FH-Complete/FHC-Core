@@ -199,9 +199,10 @@ if($result = pg_query($conn, $qry))
 		}
 		if($row->chkalendersemstataend=='' || $row->chkalendersemstataend==NULL)
 		{
-			$error_log1.="\nKalenderSemStatAend (Studiensemester) nicht eingetragen";
-			$cont=true;
-			$error=true;
+			$row->chkalendersemstataend='W07';// Standardwert WS2007; von FH-StP gewünscht; 11.12.07
+			//$error_log1.="\nKalenderSemStatAend (Studiensemester) nicht eingetragen";
+			//$cont=true;
+			//$error=true;
 		}
 		if($error)
 		{
