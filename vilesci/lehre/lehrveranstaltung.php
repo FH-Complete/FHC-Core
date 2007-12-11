@@ -288,8 +288,8 @@ if ($result_lv!=0)
 		  <th class='table-sortable:default'>LehreVz</th>
 		  <th class='table-sortable:default'>Aktiv</th>
 		  <th class='table-sortable:numeric'>Sort</th>
-		  <th class='table-sortable:default'>Zeugnis</th>\n
-		  <th class='table-sortable:default'>BA/DA</th>\n
+		  <th class='table-sortable:default'>Zeugnis</th>
+		  <th class='table-sortable:default'>BA/DA</th>
 		  <th class='table-sortable:default'>FBK</th>\n";
 	echo "</tr></thead>";
 	echo "<tbody>";
