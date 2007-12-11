@@ -586,7 +586,7 @@ class lehrveranstaltung
 		{
 			while($row=pg_fetch_object($result))
 			{
-				$l = new lehrveranstaltung($this->conn);
+				$l = new lehrveranstaltung($this->conn, null, null);
 				$l->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 				$l->kurzbz = $row->kurzbz;
 				$l->bezeichnung = $row->bezeichnung;

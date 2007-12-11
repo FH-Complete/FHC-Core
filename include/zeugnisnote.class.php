@@ -257,7 +257,7 @@ class zeugnisnote
 			return true;
 		else
 		{
-			$this->errormsg = 'Fehler beim loeschen der Daten';
+			$this->errormsg = 'Fehler beim Loeschen der Daten';
 			return false;
 		}
 	}
@@ -353,7 +353,7 @@ class zeugnisnote
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden der Daten';
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
