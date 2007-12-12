@@ -29,7 +29,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-semester-overlay.xu
 	seltype="single" hidecolumnpicker="false" flex="1"
 	enableColumnDrag="true"
     ondraggesture="nsDragAndDrop.startDrag(event,lvbgrpDDObserver);"
-	datasources="../rdf/lehrverbandsgruppe.rdf.php" ref="http://www.technikum-wien.at/lehrverbandsgruppe/alle-verbaende"
+	datasources="../rdf/lehrverbandsgruppe.rdf.php?prestudent=false" ref="http://www.technikum-wien.at/lehrverbandsgruppe/alle-verbaende"
 	>
 	<treecols>
 	    <treecol id="bez" label="Bezeichnung" flex="15" primary="true" />
