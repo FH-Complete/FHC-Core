@@ -59,10 +59,11 @@ $anzahl_fehler=0;
 $eingefuegt=0;
 $fehler=0;
 $dublette=0;
-$updtaes=0;
+$updates=0;
 $plausi='';
 $start='';
 $staat=array();
+$person_id='';
 
 /*************************
  * FAS-PORTAL - Synchronisation
@@ -128,12 +129,12 @@ else
 }
 
 //*********** Neue Daten holen *****************
-$qry="(SELECT __Person as _Person, chTitel, chNachname, chVorname, _cxBundesland, 
-	chStrasse, chHausNr,  chPLZ,  chOrt, _Staat,  chAdrBemerkung, NULL as boStandardAdr, NULL as boHeimatAdr, 'h' as typ 
+$qry="(SELECT __person as _person, chtitel, chnachname, chvorname, _cxbundesland, 
+	chstrasse, chhausnr,  chplz,  chort, _staat,  chadrbemerkung, NULL as bostandardadr, NULL as boheimatadr, 'h' as typ 
 	FROM sync.stp_person WHERE  __Person IN (SELECT ext_id FROM public.tbl_person))
 	UNION
-	(SELECT _Person, titelpre, nachname, vorname, NULL, 
-	chStrasse, chHausNr,  chPLZ,  chOrt, _Staat,  chBemerkung, boStandardAdr, boHeimatAdr, 'n' as typ 
+	(SELECT _person, titelpre, nachname, vorname, NULL, 
+	chstrasse, chhausnr,  chplz,  chort, _staat,  chbemerkung, bostandardadr, boheimatadr, 'n' as typ 
 	FROM sync.stp_adresse JOIN public.tbl_person ON(_person=ext_id) WHERE  _Person IN (SELECT ext_id FROM public.tbl_person))
 	ORDER BY _Person;";
 
@@ -148,60 +149,70 @@ if($result = pg_query($conn, $qry))
 	while($row=pg_fetch_object($result))
 	{
 		$cont='';
-		if($row->_chort=='' || $row->_chort==NULL)
+		if($row->chort=='' || $row->chort==NULL)
 		{
 			$error_log1.="\nKein Ort eingetragen";
+			$cont=true;
 			$error=true;
 		}
-		if($row->_chplz=='' || $row->_chplz==NULL)
+		if($row->chplz=='' || $row->chplz==NULL)
 		{
 			$error_log1.="\nKeine Postleitzahl eingetragen";
+			$cont=true;
 			$error=true;
 		}
-		if($row->_chstrasse=='' || $row->_chstrasse==NULL)
+		if($row->chstrasse=='' || $row->chstrasse==NULL)
 		{
 			$error_log1.="\nKeine Straße eingetragen";
+			$cont=true;
 			$error=true;
 		}
-		if($row->_cxbundesland=='' || $row->_cxbundesland==NULL)
+		/*if($row->_cxbundesland=='' || $row->_cxbundesland==NULL)
 		{
 			$error_log1.="\nKein Bundesland eingetragen";
 			$error=true;
+		}*/
+		if(!isset($staat[$row->_staat]))
+		{
+			$error_log1.="\nStaat-Nr.: '".$row->_staat."' in sync.stp_staat nicht gefunden";
+			$error=true;
+			$cont=true;
 		}
 		if($error)
 		{
-			$error_log.="\n*****\n".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname).": ".$error_log1;
+			$error_log.="\n*****\n".$row->_person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname).": ".$error_log1;
 			$error_log1='';
 			$error=false;
 			if($cont)
 			{
 				$fehler++;
+				$error_log.="\n-->nicht eingetragen";
 				continue;
 			}
 		}
 		//Person ermitteln
 		pg_query($conn, "BEGIN");
-		$qry_synk="SELECT * FROM sync.tbl_syncperson where __person=".$row->__person.";";
+		$qry_synk="SELECT * FROM sync.tbl_syncperson where __person=".$row->_person.";";
 		if($result_synk=pg_query($conn, $qry_synk))
 		{
 			if($row_synk=pg_fetch_object($result_synk))
 			{
-				$person_id=$row_synk.person_id;
+				$person_id=$row_synk->person_id;
 			}
 			else 
 			{
-				$error_log.="Person ".$row->__person." in tbl_syncperson nicht gefunden!";
+				$error_log.="Person ".$row->_person." in tbl_syncperson nicht gefunden!";
 				$fehler++;
 				continue;
 			}
 		}
 		
 		// Check auf Doppelgaenger
-		$sql="SELECT * FROM public.tbl_adresse
+		$qry_dubel="SELECT * FROM public.tbl_adresse
 			WHERE person_id='".$person_id."' 
-			AND trim(strasse)='".trim(trim(myaddslashes($row->chstrasse))." ".trim($row->chhausnr))."' 
-			AND plz='".$row->chplz."' AND trim(ort)='".trim(myaddslashes($row->chort))."';";
-		if($result_dubel = pg_query($conn, $sql))
+			AND trim(strasse)='".trim(trim(addslashes($row->chstrasse))." ".trim($row->chhausnr))."' 
+			AND plz='".$row->chplz."' AND trim(ort)='".trim(addslashes($row->chort))."';";
+		if($result_dubel = pg_query($conn, $qry_dubel))
 		{
 			if (pg_num_rows($result_dubel)==0)
 			{
@@ -214,12 +225,12 @@ if($result = pg_query($conn, $qry))
 					myaddslashes($row->chadrbemerkung).", ".
 					myaddslashes(trim(trim($row->chstrasse))." ".trim($row->chhausnr)).", ".
 					myaddslashes($row->chplz).", ".
-					myaddslashes(trim($row->ort)).", ".
-					myaddslashes(trim($row->ort)).", ".
+					myaddslashes(trim($row->chort)).", ".
+					myaddslashes(trim($row->chort)).", ".
 					myaddslashes($staat[$row->_staat]).", ".
 					myaddslashes($row->typ).", ".
-					($boheimatadr?'true':'false').", ".
-					($bostandardadr?'true':'false').", 
+					($row->boheimatadr?'true':'false').", ".
+					($row->bostandardadr?'true':'false').", 
 					NULL, 	now(), 'sync', now(), 'sync', NULL);";
 				if(!$result_neu = pg_query($conn, $sql))
 				{
@@ -228,6 +239,9 @@ if($result = pg_query($conn, $qry))
 				}
 				else
 				{
+					$ausgabe.="\n------------------------------------\nÜbertragen: ".$row->_person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
+					$ausgabe.="\n---Adresse: ".trim(trim($row->chstrasse))." ".trim($row->chhausnr).", ".$row->chplz.", ".$row->chort.", ".$staat[$row->_staat].", Typ: ".$row->typ;
+					$ausgabe.="\n---------Heimatadresse: '".($row->boheimatadr?'Ja':'Nein')."', Standardadresse: '".($row->bostandardadr?'Ja':'Nein')."',\n---------Anmerkung: '".$row->chadrbemerkung."';";
 					$eingefuegt++;
 					pg_query($conn, "COMMIT");
 				}
@@ -237,74 +251,83 @@ if($result = pg_query($conn, $qry))
 				if($row_dubel=pg_fetch_object($result_dubel))
 				{
 					//Update
-					if(name != myaddslashes($row->chadrbemerkung))
+					$sql='';
+					if($row_dubel->name != $row->chadrbemerkung
+						&& $row->chadrbemerkung!='' && $row->chadrbemerkung!=NULL)
 					{
 						$sql="name = ".myaddslashes($row->chadrbemerkung);
 					}
-					if(strasse!=trim(trim($row->chstrasse)." ".trim($row->chhausnr)))
+					if($row_dubel->strasse!=trim(trim($row->chstrasse)." ".trim($row->chhausnr)) 
+						&& trim(trim($row->chstrasse))!='' && trim(trim($row->chstrasse))!=NULL 
+						&& trim($row->chhausnr)!='' && trim($row->chhausnr)!=NULL)
 					{
 						if(strlen(trim($sql))>0)
 						{
-							$sql.=", strasse=".trim(trim($row->chstrasse)." ".trim($row->chhausnr));
+							$sql.=", strasse=".myaddslashes(trim(trim($row->chstrasse)." ".trim($row->chhausnr)));
 						}
 						else 
 						{
-							$sql="strasse=".trim(trim($row->chstrasse)." ".trim($row->chhausnr));
+							$sql="strasse=".myaddslashes(trim(trim($row->chstrasse)." ".trim($row->chhausnr)));
 						}
 					}
-					if(plz!=$row->chplz)
+					if($row_dubel->plz!=$row->chplz
+						&& $row->chplz!='' && $row->chplz!=NULL)
 					{
 						if(strlen(trim($sql))>0)
 						{
-							$sql.=", plz=".$row->chplz;
+							$sql.=", plz='".$row->chplz."'";
 						}
 						else 
 						{
-							$sql="plz=".$row->chplz;
+							$sql="plz='".$row->chplz."'";
 						}
 					}
-					if(ort!=$row->chort)
+					if($row_dubel->ort!=$row->chort
+						&& $row->chort!='' && $row->chort!=NULL)
 					{
 						if(strlen(trim($sql))>0)
 						{
-							$sql.=", ort=".$row->chort;
+							$sql.=", ort='".$row->chort."'";
 						}
 						else 
 						{
-							$sql="ort=".$row->chort;
+							$sql="ort='".$row->chort."'";
 						}
 					}
-					if(gemeinde!=$row->chort)
+					if($row_dubel->gemeinde!=$row->chort
+						&& $row->chort!='' && $row->chort!=NULL)
 					{
 						if(strlen(trim($sql))>0)
 						{
-							$sql.=", gemeinde=".$row->chort;
+							$sql.=", gemeinde='".$row->chort."'";
 						}
 						else 
 						{
-							$sql="gemeinde=".$row->chort;
+							$sql="gemeinde='".$row->chort."'";
 						}
 					}
-					if(nation!=$staat[$row->_staat])
+					if($row_dubel->nation!=$staat[$row->_staat]
+						&& $staat[$row->_staat]!='' && $staat[$row->_staat]!=NULL)
 					{
 						if(strlen(trim($sql))>0)
 						{
-							$sql.=", nation=".$staat[$row->_staat];
+							$sql.=", nation='".$staat[$row->_staat]."'";
 						}
 						else 
 						{
-							$sql="nation=".$staat[$row->_staat];
+							$sql="nation='".$staat[$row->_staat]."'";
 						}
 					}
-					if(typ!=$row->typ)
+					if($row_dubel->typ!=$row->typ && $row_dubel->typ!='h'
+						&& $row->typ!='' && $row->typ!=NULL )
 					{
 						if(strlen(trim($sql))>0)
 						{
-							$sql.=", typ=".$row->typ;
+							$sql.=", typ='".$row->typ."'";
 						}
 						else 
 						{
-							$sql="typ=".$row->typ;
+							$sql="typ='".$row->typ."'";
 						}
 					}
 					
@@ -314,11 +337,14 @@ if($result = pg_query($conn, $qry))
 						$sql="UPDATE public.tbl_adresse SET ".$sql." WHERE person_id='".$person_id."';";
 						if(!$result_neu = pg_query($conn, $sql))
 						{
-							$error_log.= $sql."\n<strong>".pg_last_error($conn)." </strong>\n";
+							$error_log.= "\n".$sql."\n<strong>".pg_last_error($conn)." </strong>\n";
 							pg_query($conn, "ROLLBACK");
 						}
 						else
 						{
+							$ausgabe.="\n------------------------------------\nGeändert: ".$row->_person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
+							$ausgabe.="\n---Adresse: ".$row_dubel->strasse.", ".$row_dubel->plz.", ".$row_dubel->ort.", ".$row_dubel->nation.", Typ: ".$row_dubel->typ;
+							$ausgabe.="\n---Heimatadresse: '".($row_dubel->heimatadresse?'Ja':'Nein')."', Zustelladresse: '".($row_dubel->zustelladresse?'Ja':'Nein')."',\n---name: '".$row_dubel->name."'\n".$sql;
 							$updates++;
 							pg_query($conn, "COMMIT");
 						}
@@ -350,17 +376,17 @@ if($error_log=='' && $log_updates=='')
 }
 else
 {
-	echo nl2br($log_updates);
+	//echo nl2br($log_updates);
 	echo nl2br($error_log);
 }
 echo nl2br($ausgabe);
-
-mail($adress, 'SYNC-Fehler StP-Adresse von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");
+/*
+mail($adress, 'SYNC-Fehler StP-Adresse von '.$_SERVER['HTTP_HOST'], $error_log,"From: nsc@fhstp.ac.at");
 
 mail($adress, 'SYNC StP-Adresse  von '.$_SERVER['HTTP_HOST'], "Sync Person\n------------\n\n"
 ."Personen: Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Updates: ".$updates." / Fehler: ".$fehler
-."\n\nBeginn: ".$start."\nEnde:    ".date("d.m.Y H:i:s")."\n\n".$ausgabe.$log_updates, "From: vilesci@technikum-wien.at");
-
+."\n\nBeginn: ".$start."\nEnde:    ".date("d.m.Y H:i:s")."\n\n".$ausgabe.$log_updates, "From: nsc@fhstp.ac.at");
+*/
 
 ?>
 </body>

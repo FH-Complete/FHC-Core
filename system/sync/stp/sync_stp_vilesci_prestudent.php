@@ -451,12 +451,12 @@ echo nl2br($ausgabe);
 echo "<br><br>".date("d.m.Y H:i:s")."<br>";
 
 mail($adress, 'SYNC-Fehler StP-Prestudent von '.$_SERVER['HTTP_HOST'], $error_log."\n---------------------------------------------------------\n"
-.$error_log2,"From: vilesci@technikum-wien.at");
+.$error_log2,"From: nsc@fhstp.ac.at");
 
 mail($adress, 'SYNC StP-Prestudent  von '.$_SERVER['HTTP_HOST'], "Sync Student\n------------\n\n"
 ."Prestudenten:      Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Fehler: ".$fehler." / Geändert: ".$update
 ."\nPrestudentrollen:  Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt1." / Fehler: ".$fehler1." / Geändert: ".$update1
-."\n\nBeginn: ".$start."\nEnde:   ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: vilesci@technikum-wien.at");
+."\n\nBeginn: ".$start."\nEnde:   ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: nsc@fhstp.ac.at");
 
 
 ?>
