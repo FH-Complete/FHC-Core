@@ -289,3 +289,11 @@ INSERT INTO tbl_berechtigung VALUES ('lehre', 'Berechtigung fuer CIS-Seite');
 INSERT INTO tbl_berechtigung VALUES ('lv-plan', 'Stundenplan');
 INSERT INTO tbl_berechtigung VALUES ('assistenz', 'Assistenz');
 INSERT INTO tbl_berechtigung VALUES ('news', 'News eintragen');
+
+-- buchungstyp
+
+INSERT INTO public.tbl_buchungstyp VALUES ('Lehrmittelbeitrag', 'Lehrmittelbeitrag');
+INSERT INTO public.tbl_buchungstyp VALUES ('Studiengebuehr', 'Studiengebühr');
+INSERT INTO public.tbl_buchungstyp VALUES ('Sonstiges', 'Sonstiges');
+INSERT INTO public.tbl_buchungstyp VALUES ('Unkostenbeitrag', 'Unkostenbeitrag');
+INSERT INTO public.tbl_buchungstyp VALUES ('Kaution', 'Kaution');
