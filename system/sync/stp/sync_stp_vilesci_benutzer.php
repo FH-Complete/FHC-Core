@@ -184,7 +184,7 @@
 		
 	$text = $statistik."\n\n".$text;
 	
-	if(mail($adress, 'SYNC Benutzer',$head_text.$text, "From: vilesci@technikum-wien.at"))
+	if(mail($adress, 'SYNC Benutzer',$head_text.$text, "From: nsc@fhstp.ac.at"))
 		echo "Mail wurde an $adress versandt<br><br>";
 	else 
 		echo "Fehler beim Senden an $adress<br><br>";
