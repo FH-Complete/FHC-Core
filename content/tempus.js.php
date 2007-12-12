@@ -285,3 +285,11 @@ function UnDo(log_id, bezeichnung)
 		}
 	}
 }
+
+// ****
+// * Oeffnet die ToDoListe fuers Tempus
+// ****
+function HelpOpenToDo()
+{
+	window.open('ToDo_Tempus.html','ToDo');
+}

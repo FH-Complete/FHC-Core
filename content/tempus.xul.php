@@ -54,6 +54,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/tempusoverlay.xul.php"?>';
   <command id="menu-prefs-ignore_kollision:command" oncommand="variableChange('ignore_kollision','menu-prefs-ignore_kollision');"/>
   <command id="menu-prefs-ignore_zeitsperre:command" oncommand="variableChange('ignore_zeitsperre','menu-prefs-ignore_zeitsperre');"/>
   <command id="menu-prefs-ignore_reservierung:command" oncommand="variableChange('ignore_reservierung','menu-prefs-ignore_reservierung');"/>
+  <command id="menu-help-todo:command" oncommand="HelpOpenToDo();"/>
 </commandset>
 
 <keyset id="mainkeys">
@@ -178,6 +179,12 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/tempusoverlay.xul.php"?>';
                label     = "&menu-help-close.label;"
                command   =  "menu-help-close:command"
                accesskey = "&menu-help-close.accesskey;"/>
+            <menuitem
+               id        =  "menu-help-todo"
+               key       = "&menu-help-todo.key;"
+               label     = "&menu-help-todo.label;"
+               command   =  "menu-help-todo:command"
+               accesskey = "&menu-help-todo.accesskey;"/>
           </menupopup>
     </menu>
   </menubar>
