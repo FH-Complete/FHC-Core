@@ -297,3 +297,32 @@ INSERT INTO public.tbl_buchungstyp VALUES ('Studiengebuehr', 'Studiengebühr');
 INSERT INTO public.tbl_buchungstyp VALUES ('Sonstiges', 'Sonstiges');
 INSERT INTO public.tbl_buchungstyp VALUES ('Unkostenbeitrag', 'Unkostenbeitrag');
 INSERT INTO public.tbl_buchungstyp VALUES ('Kaution', 'Kaution');
+
+-- bis.tbl_mobilitaetsprogramm
+INSERT INTO bis.tbl_mobilitaetsprogramm VALUES (6, 'CEEPUS', 'CEEPUS');
+INSERT INTO bis.tbl_mobilitaetsprogramm VALUES (7, 'ERASMUS', 'ERASMUS');
+INSERT INTO bis.tbl_mobilitaetsprogramm VALUES (9, 'LEONARDO', 'LEONARDO da VINCI');
+INSERT INTO bis.tbl_mobilitaetsprogramm VALUES (10, 'supranat', 'Praktikum bei einer internationalen oder supranationalen Organisation');
+INSERT INTO bis.tbl_mobilitaetsprogramm VALUES (11, 'DAF', 'Deutsch als Fremdsprache - Praktikum (DAF)');
+INSERT INTO bis.tbl_mobilitaetsprogramm VALUES (12, 'Postgrad', 'Postgraduate - Stipendium (Fulbright, Bundesministerium für Bildung, Wissenschaft und Kultur');
+INSERT INTO bis.tbl_mobilitaetsprogramm VALUES (13, 'Austausch', 'Austauschstipendium (z.B. Kulturabkommen, Aktionen Österreich-...)');
+INSERT INTO bis.tbl_mobilitaetsprogramm VALUES (14, 'Ausland', 'Auslandstipendium für Studierende von Universitäten der Künste');
+INSERT INTO bis.tbl_mobilitaetsprogramm VALUES (20, 'Gödel', 'Kurt Gödl - Stipendium');
+INSERT INTO bis.tbl_mobilitaetsprogramm VALUES (22, 'ALektorat', 'Auslandslektorat');
+INSERT INTO bis.tbl_mobilitaetsprogramm VALUES (30, 'so.Stip.', 'sonstiges Stipendium');
+INSERT INTO bis.tbl_mobilitaetsprogramm VALUES (31, 'EZusS', 'Stipendium der österreichischen Entwicklungszusammenarbeit');
+INSERT INTO bis.tbl_mobilitaetsprogramm VALUES (32, 'ÖStip', 'Österreich - Stipendium');
+INSERT INTO bis.tbl_mobilitaetsprogramm VALUES (33, 'Mach', 'Erst Mach - Stipendium');
+INSERT INTO bis.tbl_mobilitaetsprogramm VALUES (34, 'Werfel', 'Franz Werfel - Stipendium');
+INSERT INTO bis.tbl_mobilitaetsprogramm VALUES (35, 'Suttner', 'Bertha von Suttner - Stipendium');
+INSERT INTO bis.tbl_mobilitaetsprogramm VALUES (37, 'APART', 'APART - Stipendium der Österreichischen Akademie der Wissenschaften');
+INSERT INTO bis.tbl_mobilitaetsprogramm VALUES (41, 'EU3Prog.', 'EU-Drittstaatenprogramm (EU-China, EU-USA, EU-Kanada, usw.)');
+INSERT INTO bis.tbl_mobilitaetsprogramm VALUES (42, 'EUPrak', 'EU-Praktikumstipendium (EU-Kommission, EU-Rat, EU_Parlament)');
+INSERT INTO bis.tbl_mobilitaetsprogramm VALUES (201, 'FH-Mob', 'Von der FH organisierte/r Mobilitätsvereinbarung (Partnerschaftsabkommen, udgl.) bzw. Aufenthalt');
+INSERT INTO bis.tbl_mobilitaetsprogramm VALUES (202, 'selbst', 'Vom Studierenden selbst organisierte/r Mobilitätsvereinbarung bzw. Aufenthalt');
+INSERT INTO bis.tbl_mobilitaetsprogramm VALUES (203, 'FHspez.', 'FH-spezifisches Mobilitätsprogramm mit einem anderen österreichischen FH-Studiengang');
+
+-- bis.tbl_zweck
+INSERT INTO bis.tbl_zweck VALUES ('1', 'S', 'Studium');
+INSERT INTO bis.tbl_zweck VALUES ('2', 'P', 'Praktikum');
+INSERT INTO bis.tbl_zweck VALUES ('3', 'SP', 'Studium und Praktikum');
