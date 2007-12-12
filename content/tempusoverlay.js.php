@@ -34,7 +34,11 @@ function onVerbandSelect()
 	var grp=tree.view.getCellText(tree.currentIndex,col);
 	col=tree.columns ? tree.columns["gruppe"] : "gruppe";
 	var gruppe=tree.view.getCellText(tree.currentIndex,col);
-
+	col = tree.columns ? tree.columns["typ"] : "typ";
+	var typ=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["stsem"] : "stsem";
+	var stsem=tree.view.getCellText(tree.currentIndex,col);
+	
 	var daten=window.TimeTableWeek.document.getElementById('TimeTableWeekData');
 	var datum=parseInt(daten.getAttribute("datum"));
 	var attributes="&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
@@ -85,29 +89,138 @@ function onVerbandSelect()
 	//treeStudenten.setAttribute('datasources',attribute);
 
 	// Studenten
-	try
+	if(typ=='')
 	{
-		url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe+"&"+gettimestamp();
-		var treeStudent=document.getElementById('student-tree');
-
-		//Alte DS entfernen
-		var oldDatasources = treeStudent.database.GetDataSources();
-		while(oldDatasources.hasMoreElements())
+		/*try
 		{
-			treeStudent.database.RemoveDataSource(oldDatasources.getNext());
+			url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe+"&"+gettimestamp();
+			var treeStudent=document.getElementById('student-tree');
+	
+			//Alte DS entfernen
+			var oldDatasources = treeStudent.database.GetDataSources();
+			while(oldDatasources.hasMoreElements())
+			{
+				treeStudent.database.RemoveDataSource(oldDatasources.getNext());
+			}
+	
+			var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+			StudentTreeDatasource = rdfService.GetDataSource(url);
+			StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+			StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+			treeStudent.database.AddDataSource(StudentTreeDatasource);
+			StudentTreeDatasource.addXMLSinkObserver(StudentTreeSinkObserver);
+			treeStudent.builder.addListener(StudentTreeListener);
 		}
+		catch(e)
+		{
+			debug(e);
+		}*/
+		
+		//Bei Ansicht von Ab-/Unterbrecher den Button "->Student" anzeigen
+		if(sem=='0')
+			document.getElementById('student-toolbar-student').hidden=false;
+		else
+			document.getElementById('student-toolbar-student').hidden=true;
 
-		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-		StudentTreeDatasource = rdfService.GetDataSource(url);
-		StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-		StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-		treeStudent.database.AddDataSource(StudentTreeDatasource);
-		StudentTreeDatasource.addXMLSinkObserver(StudentTreeSinkObserver);
-		treeStudent.builder.addListener(StudentTreeListener);
+		//Wenn der Interessenten Tab markiert ist, dann den Studenten Tab markieren
+		//if(document.getElementById('main-content-tabs').selectedItem==document.getElementById('tab-interessenten'))
+		//	document.getElementById('main-content-tabs').selectedItem=document.getElementById('tab-studenten');
+
+		// -------------- Studenten --------------------------
+		try
+		{
+			stsem = getStudiensemester();
+			url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ=student&"+gettimestamp();
+			var treeStudent=document.getElementById('student-tree');
+
+			//Alte DS entfernen
+			var oldDatasources = treeStudent.database.GetDataSources();
+			while(oldDatasources.hasMoreElements())
+			{
+				treeStudent.database.RemoveDataSource(oldDatasources.getNext());
+			}
+
+			try
+			{
+				StudentTreeDatasource.removeXMLSinkObserver(StudentTreeSinkObserver);
+				treeStudent.builder.removeListener(StudentTreeListener);
+			}
+			catch(e)
+			{}
+			var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+			StudentTreeDatasource = rdfService.GetDataSource(url);
+			StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+			StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+			treeStudent.database.AddDataSource(StudentTreeDatasource);
+			StudentTreeDatasource.addXMLSinkObserver(StudentTreeSinkObserver);
+			treeStudent.builder.addListener(StudentTreeListener);
+
+			//Detailfelder Deaktivieren
+			StudentDetailReset();
+			StudentDetailDisableFields(true);
+			StudentPrestudentDisableFields(true);
+			StudentKontoDisableFields(true);
+			StudentAkteDisableFields(true);
+			StudentIODisableFields(true);
+			StudentNoteDisableFields(true);
+			document.getElementById('student-kontakt').setAttribute('src','');
+			document.getElementById('student-betriebsmittel').setAttribute('src','');
+			StudentAbschlusspruefungDisableFields(true);
+		}
+		catch(e)
+		{
+			debug(e);
+		}
 	}
-	catch(e)
+	else
 	{
-		debug(e);
+		// -------------- Interessenten / Bewerber --------------------------
+		try
+		{
+			if(stsem=='' && typ=='')
+				stsem='aktuelles';
+			url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"studiengang_kz="+stg_kz+"&semester="+sem+"&typ="+typ+"&studiensemester_kurzbz="+stsem+"&"+gettimestamp();
+			var treeInt=document.getElementById('student-tree');
+
+			//Alte DS entfernen
+			var oldDatasources = treeInt.database.GetDataSources();
+			while(oldDatasources.hasMoreElements())
+			{
+				treeInt.database.RemoveDataSource(oldDatasources.getNext());
+			}
+
+			try
+			{
+				StudentTreeDatasource.removeXMLSinkObserver(StudentTreeSinkObserver);
+				treeInt.builder.removeListener(StudentTreeListener);
+			}
+			catch(e)
+			{}
+
+			var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+			StudentTreeDatasource = rdfService.GetDataSource(url);
+			StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+			StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+			treeInt.database.AddDataSource(StudentTreeDatasource);
+			StudentTreeDatasource.addXMLSinkObserver(StudentTreeSinkObserver);
+			treeInt.builder.addListener(StudentTreeListener);
+
+			//Detailfelder Deaktivieren
+			StudentDetailReset();
+			StudentDetailDisableFields(true);
+			StudentPrestudentDisableFields(true);
+			StudentKontoDisableFields(true);
+			StudentAkteDisableFields(true);
+			StudentIODisableFields(true);
+			StudentNoteDisableFields(true);
+			document.getElementById('student-kontakt').setAttribute('src','');
+			document.getElementById('student-betriebsmittel').setAttribute('src','');
+			StudentAbschlusspruefungDisableFields(true);
+		}
+		catch(e)
+		{
+			debug(e);
+		}
 	}
 
 	// Lehrveranstaltung
