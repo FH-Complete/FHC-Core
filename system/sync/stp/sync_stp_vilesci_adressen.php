@@ -234,6 +234,7 @@ if($result = pg_query($conn, $qry))
 					NULL, 	now(), 'sync', now(), 'sync', NULL);";
 				if(!$result_neu = pg_query($conn, $sql))
 				{
+					$fehler++;
 					$error_log.= $sql."\n<strong>".pg_last_error($conn)." </strong>\n";
 					pg_query($conn, "ROLLBACK");
 				}
@@ -334,9 +335,13 @@ if($result = pg_query($conn, $qry))
 					
 					if(strlen(trim($sql))>0)
 					{
-						$sql="UPDATE public.tbl_adresse SET ".$sql." WHERE person_id='".$person_id."';";
+						$sql="UPDATE public.tbl_adresse SET ".$sql." 
+						WHERE person_id='".$person_id."' 
+						AND trim(strasse)='".trim(trim(addslashes($row->chstrasse))." ".trim($row->chhausnr))."' 
+						AND plz='".$row->chplz."' AND trim(ort)='".trim(addslashes($row->chort))."';";
 						if(!$result_neu = pg_query($conn, $sql))
 						{
+							$fehler++;
 							$error_log.= "\n".$sql."\n<strong>".pg_last_error($conn)." </strong>\n";
 							pg_query($conn, "ROLLBACK");
 						}
@@ -349,11 +354,19 @@ if($result = pg_query($conn, $qry))
 							pg_query($conn, "COMMIT");
 						}
 					}
+					else 
+					{
+						//$ausgabe.="\n------------------------------------\nGeändert: ".$row->_person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
+						//$ausgabe.="\n---Adresse: ".$row_dubel->strasse.", ".$row_dubel->plz.", ".$row_dubel->ort.", ".$row_dubel->nation.", Typ: ".$row_dubel->typ;
+						//$ausgabe.="\n--->bereits vorhanden. keine Änderung.";
+						$dublette++;
+					}
 				}
 			}
 		}
 		else
 		{
+			$fehler++;
 			$error_log.= "\n".$sql."\n<strong>".pg_last_error($conn)." </strong>\n";
 			pg_query($conn, "ROLLBACK");
 		}
@@ -361,6 +374,7 @@ if($result = pg_query($conn, $qry))
 }
 else
 {
+	$fehler++;
 	echo "<br>".$qry."<br><strong>".pg_last_error($conn)." </strong><br>";
 }
 
@@ -368,7 +382,10 @@ else
 
 echo "<br><br>Eingefügt:  ".$eingefuegt;
 echo "<br>Updates:  ".$updates;
+echo "<br>Doppelt:   ".$dublette; 
 echo "<br>Fehler:       ".$fehler;
+//echo "<br><br>Summe:     ".($eingefuegt+$updates+$dublette+$fehler);
+
 echo "<br><br>";
 if($error_log=='' && $log_updates=='')
 {
