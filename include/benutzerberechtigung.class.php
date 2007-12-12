@@ -304,7 +304,8 @@ class benutzerberechtigung
 				//Wenn Fachbereichs oder Adminberechtigung
 				if(($berechtigung == $b->berechtigung_kurzbz || $b->berechtigung_kurzbz == 'admin') 
 				   && ($b->fachbereich_kurzbz==$fachbereich_kurzbz || is_null($b->fachbereich_kurzbz))
-				   && (is_null($b->studiengang_kz) || $b->studiengang_kz==$studiengang_kz))
+				   && (is_null($b->studiengang_kz) || $b->studiengang_kz==$studiengang_kz)
+				   && ($art==null || strstr($b->art, $art)))
 				{
 					if ($b->starttimestamp!=null && $b->endetimestamp!=null)
 					{
