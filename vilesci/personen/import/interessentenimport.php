@@ -220,6 +220,7 @@ function clean_string($string)
 
 if($studiensemester_kurzbz == '')
 {
+	//Im September wird das Aktuelle Studiensemester vorgeschlagen sonst immer das naechste WS
 	$stsem = new studiensemester($conn);
 	if(date('m')=='9')
 		$studiensemester_kurzbz = $stsem->getaktorNext();
@@ -613,7 +614,10 @@ echo '<tr><td>Studiengang *</td><td><SELECT id="studiengang_kz" name="studiengan
 $stg_obj = new studiengang($conn);
 $stg_obj->getAll('typ, kurzbz');
 foreach ($stg_obj->result as $row)
-	echo '<OPTION value="'.$row->studiengang_kz.'" '.($row->studiengang_kz==$studiengang_kz?'selected':'').'>'.$row->kuerzel.'</OPTION>';
+{
+	if($rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') || $rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid'))
+		echo '<OPTION value="'.$row->studiengang_kz.'" '.($row->studiengang_kz==$studiengang_kz?'selected':'').'>'.$row->kuerzel.'</OPTION>';
+}
 echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><td>Studiensemester *</td><td><SELECT id="studiensemester_kurzbz" name="studiensemester_kurzbz">';

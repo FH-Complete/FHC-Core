@@ -66,7 +66,7 @@ function drawBetreuungen()
 	$gesamtkosten_betreuung=0;
 	if($result_fb = pg_query($conn, $qry_fb))
 	{
-		$spalte=8;
+		$spalte=11;
 		$worksheet->writeNumber($zeile, ++$spalte, $gesamtkosten_lva, $format_number);
 				
 		if(pg_num_rows($result_fb)>0)
@@ -80,7 +80,9 @@ function drawBetreuungen()
 			$worksheet->write($zeile, $spalte, "Titel", $format_colored);
 			$worksheet->write($zeile, ++$spalte, "", $format_colored);
 			$worksheet->write($zeile, ++$spalte, "", $format_colored);
+			$worksheet->write($zeile, ++$spalte, "", $format_colored);
 			$worksheet->write($zeile, ++$spalte, "Stunden", $format_colored);
+			$worksheet->write($zeile, ++$spalte, "Summe", $format_colored);
 			$worksheet->write($zeile, ++$spalte, "Student", $format_colored);
 			$worksheet->write($zeile, ++$spalte, "Lektor", $format_colored);
 			$worksheet->write($zeile, ++$spalte, "Kosten", $format_colored);
@@ -93,7 +95,9 @@ function drawBetreuungen()
 				$spalte=2;
 				$worksheet->write($zeile, $spalte, $row_fb->titel);
 				$spalte+=2;
+				$worksheet->write($zeile, ++$spalte, '');
 				$worksheet->write($zeile, ++$spalte, number_format($row_fb->stunden,2));
+				$worksheet->write($zeile, ++$spalte, '');
 				
 				$benutzer = new benutzer($conn);
 				$benutzer->load($row_fb->student_uid);
@@ -106,12 +110,12 @@ function drawBetreuungen()
 			}
 			
 			$zeile++;
-			$spalte=5;
+			$spalte=7;
 			$worksheet->writeNumber($zeile, $spalte, $stunden_betreuung, $format_number);
-			$spalte=8;
+			$spalte=11;
 			$worksheet->writeNumber($zeile, $spalte, $gesamtkosten_betreuung, $format_number);
 					
-			$spalte=9;
+			$spalte=12;
 			$worksheet->writeNumber($zeile, $spalte, $gesamtkosten_betreuung, $format_number);
 									
 		}
@@ -125,7 +129,7 @@ function drawBetreuungen()
 $stsem1 = $semester_aktuell;
 $stsem_obj = new studiensemester($conn);
 
-if(substr($stsem1,0,1)=='W')
+if(substr($stsem1,0,1)=='S') //Eigentlich gehoert =='W', nur kurzfristige aenderung
 	$stsem2 = $stsem_obj->getNextFrom($stsem1);
 else 
 	$stsem2 = $stsem_obj->getPreviousFrom($stsem1);
@@ -199,10 +203,13 @@ $worksheet->write($zeile, ++$spalte,'Kurzbz', $format_colored1);
 $worksheet->write($zeile, ++$spalte,'Bezeichnung', $format_colored1);
 $worksheet->write($zeile, ++$spalte,'Lehrform', $format_colored1);
 $worksheet->write($zeile, ++$spalte,'ECTS', $format_colored1);
-$worksheet->write($zeile, ++$spalte,'Stunden', $format_colored1);
+$worksheet->write($zeile, ++$spalte,'StudentenStunden', $format_colored1);
+$worksheet->write($zeile, ++$spalte,'LektorenStunden', $format_colored1);
+$worksheet->write($zeile, ++$spalte,'GesamtStunden', $format_colored1);
 $worksheet->write($zeile, ++$spalte,'Gruppen', $format_colored1);
 $worksheet->write($zeile, ++$spalte,'Lektor', $format_colored1);
 $worksheet->write($zeile, ++$spalte,'Kosten', $format_colored1);
+$worksheet->write($zeile, ++$spalte,'Summe', $format_colored1);
 $worksheet->write($zeile, ++$spalte,'Gesamtkosten', $format_colored1);
 
 if($result = pg_query($conn, $qry))
@@ -220,9 +227,9 @@ if($result = pg_query($conn, $qry))
 			if($last_lva!='')
 			{
 				$zeile++;
-				$spalte=5;
+				$spalte=7;
 				$worksheet->write($zeile, $spalte,sprintf('%.2f',$stunden_lv), $format_bold);
-				$spalte=8;
+				$spalte=11;
 				$worksheet->writeNumber($zeile, $spalte, $kosten_lv, $format_number);
 				
 				$gesamtkosten_lva +=$kosten_lv;
@@ -256,6 +263,9 @@ if($result = pg_query($conn, $qry))
 			$worksheet->write($zeile, ++$spalte,"", $format_colored);
 			$worksheet->write($zeile, ++$spalte,"", $format_colored);
 			$worksheet->write($zeile, ++$spalte,"", $format_colored);
+			$worksheet->write($zeile, ++$spalte,"", $format_colored);
+			$worksheet->write($zeile, ++$spalte,"", $format_colored);
+			$worksheet->write($zeile, ++$spalte,"", $format_colored);
 		}
 
 		$gruppen='';
@@ -275,7 +285,9 @@ if($result = pg_query($conn, $qry))
 		$worksheet->write($zeile, ++$spalte, "$row->lf_bezeichnung ($row->lf_kurzbz)");
 		$worksheet->write($zeile, ++$spalte, $row->lehrform_kurzbz);
 		$spalte++;
+		$worksheet->write($zeile, ++$spalte, "");
 		$worksheet->write($zeile, ++$spalte, $row->lektor_semesterstunden);
+		$worksheet->write($zeile, ++$spalte, "");
 		$worksheet->write($zeile, ++$spalte, $gruppen);
 		$worksheet->write($zeile, ++$spalte, "$row->nachname $row->vorname");
 		$worksheet->writeNumber($zeile, ++$spalte, ($row->lektor_stundensatz*$row->lektor_faktor*$row->lektor_semesterstunden), $format_number1);
@@ -284,9 +296,9 @@ if($result = pg_query($conn, $qry))
 		$stunden_lv +=$row->lektor_semesterstunden;
 	}
 	$zeile++;
-	$spalte=5;
+	$spalte=7;
 	$worksheet->write($zeile, $spalte,sprintf('%.2f',$stunden_lv), $format_bold);
-	$spalte=8;
+	$spalte=11;
 	$worksheet->writeNumber($zeile, $spalte, $kosten_lv, $format_number);
 	
 	$gesamtkosten_lva +=$kosten_lv;
@@ -303,19 +315,21 @@ if($result = pg_query($conn, $qry))
 $zeile++;
 $spalte=8;
 $worksheet->write($zeile, $spalte, 'Gesamt:', $format_bold);
-$spalte=9;
+$spalte=12;
 $worksheet->writeNumber($zeile, $spalte, $gesamtkosten_fb, $format_number);
 
-$worksheet->setColumn(0, 0, 30);
-$worksheet->setColumn(0, 1, 15);
-$worksheet->setColumn(0, 2, 40);
-$worksheet->setColumn(0, 3, 5);
-$worksheet->setColumn(0, 4, 5);
-$worksheet->setColumn(0, 5, 10);
-$worksheet->setColumn(0, 6, 10);
-$worksheet->setColumn(0, 7, 10);
-$worksheet->setColumn(0, 8, 10);
-$worksheet->setColumn(0, 9, 20);
+$worksheet->setColumn(0, 0, 30); //FB
+$worksheet->setColumn(0, 1, 15); //Kurzbz
+$worksheet->setColumn(0, 2, 40); //bezeichnung
+$worksheet->setColumn(0, 3, 5); //Lehrform
+$worksheet->setColumn(0, 4, 5); //ECTS
+$worksheet->setColumn(0, 5, 10); //Studentenstuden
+$worksheet->setColumn(0, 6, 10); //LektorStunden
+$worksheet->setColumn(0, 7, 10); //Gesamtstunden
+$worksheet->setColumn(0, 8, 10); //Gruppen
+$worksheet->setColumn(0, 9, 10); //Lektor
+$worksheet->setColumn(0, 10, 10); //Kosten
+$worksheet->setColumn(0, 11, 20); //Gesamtkosten
 
 $workbook->close();
 ?>
