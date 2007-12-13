@@ -73,6 +73,7 @@ $qry_stg = "SELECT distinct studiengang_kz
 					tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
 				) as foo
 				";
+$liste_gesamt = array();
 
 if($result_stg = pg_query($conn, $qry_stg))
 {
@@ -192,7 +193,7 @@ if($result_stg = pg_query($conn, $qry_stg))
 			}
 
 			//Daten ausgeben
-			foreach ($liste as $row)
+			foreach ($liste as $uid=>$row)
 			{
 				$i=0;
 				if(isset($row['geaendert']) && $row['geaendert']==true)
@@ -223,12 +224,86 @@ if($result_stg = pg_query($conn, $qry_stg))
 				//Kosten zu den Gesamtkosten hinzurechnen
 				$gesamtkosten = $gesamtkosten + $row['gesamtkosten'];
 				$zeile++;
+				
+				$liste_gesamt[$uid]['personalnummer']=$row['personalnummer'];
+				$liste_gesamt[$uid]['titelpre']=$row['titelpre'];
+				$liste_gesamt[$uid]['vorname']=$row['vorname'];
+				$liste_gesamt[$uid]['nachname']=$row['nachname'];
+				if(isset($liste_gesamt[$uid]['gesamtstunden']))
+					$liste_gesamt[$uid]['gesamtstunden']+=$row['gesamtstunden'];
+				else 
+					$liste_gesamt[$uid]['gesamtstunden']=$row['gesamtstunden'];
+					
+				if(isset($liste_gesamt[$uid]['gesamtkosten']))
+					$liste_gesamt[$uid]['gesamtkosten']+=$row['gesamtkosten'];
+				else 
+					$liste_gesamt[$uid]['gesamtkosten']=$row['gesamtkosten'];
 			}
 
 			//Gesamtkosten anzeigen
 			$worksheet->writeNumber($zeile,6,$gesamtkosten, $format_number_bold);
 		}
 	}
+	
+	// Gesamtliste ueber alle Studiengaenge
+	$worksheet =& $workbook->addWorksheet('Gesamt');
+	$i=0;
+	$gesamtkosten=0;
+	$zeile=3;
+	
+	$worksheet->write(0,0,'Erstellt am '.date('d.m.Y').' '.$semester_aktuell.' Gesamtliste', $format_bold);
+	//Ueberschriften
+	//$worksheet->write(2,$i,"Studiengang", $format_bold);
+	$worksheet->write(2,++$i,"Personalnr", $format_bold);
+	$worksheet->write(2,++$i,"Titel", $format_bold);
+	$worksheet->write(2,++$i,"Vorname", $format_bold);
+	$worksheet->write(2,++$i,"Familienname", $format_bold);
+	$worksheet->write(2,++$i,"Stunden", $format_bold);
+	$worksheet->write(2,++$i,"Kosten", $format_bold);
+	
+	foreach ($liste_gesamt as $key => $row) 
+	{
+    	$vn[$key]  = $row['vorname'];
+    	$nn[$key] = $row['nachname'];
+	}
+	
+	array_multisort($nn, SORT_ASC, $vn, SORT_ASC, $liste_gesamt);
+
+	//Daten ausgeben
+	foreach ($liste_gesamt as $uid=>$row)
+	{
+		$i=0;
+		if(isset($row['geaendert']) && $row['geaendert']==true)
+		{
+			$format = $format_colored;
+			$formatnb = $format_number_colored;
+		}
+		else
+		{
+			$format = $format_normal;
+			$formatnb = $format_number;
+		}
+		
+		//Personalnummer
+		$worksheet->write($zeile,++$i,$row['personalnummer'], $format);
+		//Titel
+		$worksheet->write($zeile,++$i,$row['titelpre'], $format);
+		//Vorname
+		$worksheet->write($zeile,++$i,$row['vorname'], $format);
+		//Nachname
+		$worksheet->write($zeile,++$i,$row['nachname'], $format);
+		//Stunden
+		$worksheet->write($zeile,++$i,$row['gesamtstunden'], $format);
+		//Kosten
+		$worksheet->writeNumber($zeile,++$i,$row['gesamtkosten'], $formatnb);
+
+		//Kosten zu den Gesamtkosten hinzurechnen
+		$gesamtkosten = $gesamtkosten + $row['gesamtkosten'];
+		$zeile++;
+	}
+
+	//Gesamtkosten anzeigen
+	$worksheet->writeNumber($zeile,6,$gesamtkosten, $format_number_bold);
 
 	$workbook->close();
 
@@ -270,7 +345,7 @@ if($result_stg = pg_query($conn, $qry_stg))
              "Content-Transfer-Encoding: base64\n\n" .
              $data . "\n\n" .
              "--{$mime_boundary}--\n";
-
+	
     if(mail(MAIL_GST.',vilesci@technikum-wien.at', $subject, $message, $headers ))
 		echo 'Email mit Lehrauftragslisten wurde an '.MAIL_GST.' versandt!';
      else

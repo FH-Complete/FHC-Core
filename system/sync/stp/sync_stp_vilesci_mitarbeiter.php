@@ -58,6 +58,17 @@
 					if($row_ext = pg_fetch_object($result_ext))
 					{
 						$uid = $row_ext->mitarbeiter_uid;
+						
+						if($uid!=$row->chusername)
+						{
+							//Username wurde geaendert
+							$qry = "UPDATE public.tbl_benutzer SET uid='$row->chusername' WHERE uid='$uid'";
+							pg_query($conn, $qry);
+							
+							$text.="UID von $uid auf $row->chusername geaendert\n";
+							$uid = $row->chusername;
+							$anzahl_update++;
+						}
 					}
 					else 
 					{

@@ -61,6 +61,16 @@
 				if($row_ext = pg_fetch_object($result_ext))
 				{
 					$student_uid = $row_ext->student_uid;
+					if($student_uid!=$row->chusername)
+					{
+						//Username wurde geaendert
+						$qry = "UPDATE public.tbl_benutzer SET uid='$row->chusername' WHERE uid='$student_uid'";
+						pg_query($conn, $qry);
+						
+						$text.="UID von $student_uid auf $row->chusername geaendert\n";
+						$student_uid = $row->chusername;
+						$anzahl_update++;
+					}
 				}
 				else 
 				{
