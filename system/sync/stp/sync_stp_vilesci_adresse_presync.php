@@ -8,7 +8,7 @@
  */
 
 //*
-//* Kopiert stgvertiefung Tabelle von FH-DB StPoelten
+//* Kopiert adressen Tabelle von FH-DB StPoelten
 //*
 //*
 
