@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE window >
+<window id="fas" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" 
+		title="FASo2" 
+		width="800"
+  		height="600"
+  		persist="screenX screenY width height sizemode"
+		onclose="return document.getElementById('fas_browser').contentWindow.closeWindow()"
+  	>
+	<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+	<browser id="fas_browser" type="content-primary" flex="1" src="http://fas2.fh-intern.ac.at/content/fas.xul.php"/>
+</window>
