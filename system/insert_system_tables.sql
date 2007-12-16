@@ -74,3 +74,56 @@ INSERT INTO public.tbl_studiensemester(studiensemester_kurzbz, start, ende, ext_
 INSERT INTO public.tbl_studiensemester(studiensemester_kurzbz, start, ende, ext_id, bezeichnung) VALUES ('WS2003', '2003-09-02', '2004-02-02', 4, 'Wintersemester 2003/2004');
 INSERT INTO public.tbl_studiensemester(studiensemester_kurzbz, start, ende, ext_id, bezeichnung) VALUES ('WS2002', '2002-09-01', '2003-02-01', 2, 'Wintersemester 2002/2003');
 INSERT INTO public.tbl_studiensemester(studiensemester_kurzbz, start, ende, ext_id, bezeichnung) VALUES ('WS2007', '2007-09-01', '2008-02-01', 12, 'Wintersemester 2007/2008');
+
+
+-- tbl_kontakttyp; Type: TABLE DATA; Schema: public; 
+
+SET search_path = public, pg_catalog;
+INSERT INTO tbl_kontakttyp VALUES ('email', 'E-Mail');
+INSERT INTO tbl_kontakttyp VALUES ('telefon', 'Telefonnummer');
+INSERT INTO tbl_kontakttyp VALUES ('mobil', 'Mobiltelefonnummer');
+INSERT INTO tbl_kontakttyp VALUES ('fax', 'Faxnummer');
+INSERT INTO tbl_kontakttyp VALUES ('so.tel', 'sonstige Telefonnummer');
+
+
+-- tbl_ausbildung; Type: TABLE DATA; Schema: bis; 
+
+SET search_path = bis, pg_catalog;
+INSERT INTO tbl_ausbildung VALUES (1, 'PhD', 'Universitätsabschluss mit Doktorat als Zweit- oder Drittabschluss oder PhD-Abschluss');
+INSERT INTO tbl_ausbildung VALUES (3, 'FH-Master', 'Fachhochschulabschluss auf Diplom- oder Masterebene');
+INSERT INTO tbl_ausbildung VALUES (4, 'Univ.-Bachelor', 'Universitäts- oder Hochschulabschluss auf Bachelorebene (einschließlich Kurzstudien)');
+INSERT INTO tbl_ausbildung VALUES (5, 'FH-Bachelor', 'Fachhochschulabschluss auf Bachelorebene');
+INSERT INTO tbl_ausbildung VALUES (6, 'Akad-Diplom', 'Diplom einer Akademie für Lehrerbildung, Akademie für Sozialarbeit, Medizinisch-technische Akademie, Hebammenakademie, Militärakademie oder einer anderen anerkannten postsekundären Bildungseinrichtung');
+INSERT INTO tbl_ausbildung VALUES (8, 'AHS', 'Reifeprüfung an einer allgemeinbildenden höheren Schule');
+INSERT INTO tbl_ausbildung VALUES (9, 'BHS', 'Reife- und Diplomprüfung einer berufsbildenden oder lehrer- und erzieherbildenden höheren Schule');
+INSERT INTO tbl_ausbildung VALUES (10, 'Lehrabschluss', 'Lehrabschlussprüfung, berufsbildende mittlere Schule oder vergleichbare Berufsausbildung');
+INSERT INTO tbl_ausbildung VALUES (11, 'Pflichtschule', 'Pflichtschule');
+INSERT INTO tbl_ausbildung VALUES (7, 'tertiär', 'Anderer tertiärer Bildungsabschluss (Kolleg; Meisterprüfung; Universitätslehrgang oder Lehrgang gemäß §14a Abs.3 FHStG, mit dem kein akademischer Grad verbunden war)');
+INSERT INTO tbl_ausbildung VALUES (2, 'Univ.-Master', 'Universitäts- oder Hochschulabschluss auf Diplom- oder Masterebene, Doktorat der Medizin bzw. der Human- oder Zahnmedizin oder Doktorat auf Grund von Studienvorschriften aus der Zeit vor dem Inkrafttretendes AHStG BGBl. Nr. 177/1966 oder Abschluss eines Universitätslehrganges oder Lehrganges universitären Charakters (§51 Abs. 2 Z 23 UG 2002 oder §§26 Abs.1 und 28 Abs.1 UniStG) oder eines Lehrganges zur Weiterbildung (§14a Abs.2 FHStG) mit Mastergrad');
+
+
+-- tbl_zeitsperretyp; Type: TABLE DATA; Schema: campus; 
+
+SET search_path = campus, pg_catalog;
+INSERT INTO tbl_zeitsperretyp VALUES ('ReiseAL', 'Dienstreise Ausland', '00BFFF');
+INSERT INTO tbl_zeitsperretyp VALUES ('Amt', 'Behördenweg', 'B3B3B3');
+INSERT INTO tbl_zeitsperretyp VALUES ('Schulung', 'Weiterbildung', '99FF99');
+INSERT INTO tbl_zeitsperretyp VALUES ('Sonstige', 'Sonstiges', '9966CC');
+INSERT INTO tbl_zeitsperretyp VALUES ('Telework', 'Heimarbeit', 'FFCCFF');
+INSERT INTO tbl_zeitsperretyp VALUES ('ReiseIL', 'Diensreise Inland', '00D926');
+INSERT INTO tbl_zeitsperretyp VALUES ('DienstV', 'Dienstverhinderung', 'B3B364');
+INSERT INTO tbl_zeitsperretyp VALUES ('DienstF', 'Dienstfreistellung', '39DFA4');
+INSERT INTO tbl_zeitsperretyp VALUES ('Krank', 'Krankheit/Spitalsaufenthalt', 'B3B300');
+INSERT INTO tbl_zeitsperretyp VALUES ('ZA', 'Zeitausgleich', 'FFA605');
+INSERT INTO tbl_zeitsperretyp VALUES ('Arzt', 'Arztbesuch', '0066FF');
+INSERT INTO tbl_zeitsperretyp VALUES ('Konfernz', 'Konferenz/Tagung/Seminar', 'CC6633');
+INSERT INTO tbl_zeitsperretyp VALUES ('Urlaub', 'Urlaub', 'FF0000');
+
+
+-- tbl_lehrfunktion; Type: TABLE DATA; Schema: lehre; 
+
+SET search_path = lehre, pg_catalog;
+INSERT INTO tbl_lehrfunktion VALUES ('LV-Leitung', 'Lehrveranstaltungsleiter', 1.10);
+INSERT INTO tbl_lehrfunktion VALUES ('Betreuung', 'Betreuer', 0.90);
+INSERT INTO tbl_lehrfunktion VALUES ('Lektor', 'Lektor', 1.00);
+INSERT INTO tbl_lehrfunktion VALUES ('Zweitbetreuung', 'Zweitbetreuung', 0.90);
