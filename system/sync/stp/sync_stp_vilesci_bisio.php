@@ -143,8 +143,8 @@
 	$statistik .="Fehler: $error\n";
 	
 	$text = $statistik."\n\n".$text;
-	$to = 'oesi@technikum-wien.at';
-	//$to = $adress_ext;
+	//$to = 'oesi@technikum-wien.at';
+	$to = $adress_ext;
 	
 	if(mail($to, 'SYNC BisIO',$head_text.$text, "From: nsc@fhstp.ac.at"))
 		echo "Mail wurde an $to versandt<br><br>";
