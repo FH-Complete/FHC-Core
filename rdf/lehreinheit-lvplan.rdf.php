@@ -205,7 +205,7 @@ foreach ($lva as $l)
 				<LVA:verplant>'.$verplant.'</LVA:verplant>
 				<LVA:offenestunden>'.$offenestunden.'</LVA:offenestunden>
 				<LVA:start_kw>'.$start_kw.'</LVA:start_kw>
-				<LVA:anmerkung>'.$l->anmerkung[0].'</LVA:anmerkung>
+				<LVA:anmerkung><![CDATA['.$l->anmerkung[0].']]></LVA:anmerkung>
 				<LVA:studiensemester_kurzbz>'.$l->studiensemester_kurzbz.'</LVA:studiensemester_kurzbz>
 				<LVA:lehrfach>'.$lehrfach.'</LVA:lehrfach>
 				<LVA:lehrform>'.$lehrform.'</LVA:lehrform>
