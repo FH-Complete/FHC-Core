@@ -125,7 +125,7 @@ if($result = pg_query($conn, $qry))
 			$cont=true;
 			$error=true;
 		}
-		if($row->_staatsbuerger==NULL)
+		/*if($row->_staatsbuerger==NULL)
 		{
 			$error_log1.="\nKeine Staatsbürgerschaft eingetragen";
 			$cont=true;
@@ -136,7 +136,7 @@ if($result = pg_query($conn, $qry))
 			$error_log1.="\nKein Geburtsland eingetragen";
 			$cont=true;
 			$error=true;
-		}
+		}*/
 		if($row->dagebdat=='' || $row->dagebdat==NULL)
 		{
 			$error_log1.="\nKein Geburtsdatum eingetragen";
@@ -184,10 +184,10 @@ if($result = pg_query($conn, $qry))
 							familienstand,geschlecht,anzahlkinder,aktiv,insertamum,insertvon,updateamum,updatevon,
 							ext_id)
 							VALUES
-							(".myaddslashes($staat[$row->_staatsbuerger]).", ".
-							myaddslashes($staat[$row->_gebland]).", ".
+							(".($row->_staatsbuerger!=''?myaddslashes($staat[$row->_staatsbuerger]):'null').", ".
+							($row->_gebland!=''?myaddslashes($staat[$row->_gebland]):'null').", ".
 							"NULL, ".
-							myaddslashes($row->briefanrede).", ".
+							myaddslashes(substr($row->briefanrede,0,16)).", ".
 							myaddslashes(trim($row->chtitel)).", ".
 							"NULL, ".
 							myaddslashes(trim($row->chnachname)).", ".
@@ -299,7 +299,7 @@ if($result = pg_query($conn, $qry))
 		if ($row->chnachname!=$row->nachname)
 			$sql.=" nachname='$row->chnachname',";
 		if ($row->anrede!=$row->briefanrede)
-			$sql.=" anrede='$row->briefanrede',";
+			$sql.=" anrede=".myaddslashes(substr($row->briefanrede,0,16)).",";
 		if ($row->titelpre!=$row->chtitel)
 			$sql.=" titelpre='$row->chtitel',";
 		if ($row->vorname!=$row->chvorname)
