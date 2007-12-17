@@ -513,7 +513,43 @@ if(!$error)
 									$student->load($uid);
 									$student->studiensemester_kurzbz=$semester_aktuell;
 									$student->semester = '0';
+									if($_POST['rolle_kurzbz']=='Abbrecher')
+										$student->verband='A';
+									if($_POST['rolle_kurzbz']=='Unterbrecher')
+										$student->verband='B';
+										
+									//Nachschauen ob dieser Lehrverband schon existiert, falls nicht dann anlegen
+									$lehrverband = new lehrverband($conn);
+									if(!$lehrverband->exists($student->studiengang_kz, $student->semester, $student->verband, ''))
+									{
+										//Pruefen ob der uebergeordnete Lehrverband existiert, falls nicht dann anlegen
+										if(!$lehrverband->exists($student->studiengang_kz, $student->semester, '', ''))
+										{
+											$lehrverband->studiengang_kz = $student->studiengang_kz;
+											$lehrverband->semester = $student->semester;
+											$lehrverband->verband = '';
+											$lehrverband->gruppe = '';
+											$lehrverband->aktiv = true;
+											$lehrverband->bezeichnung = 'Ab-/Unterbrecher';
+											
+											$lehrverband->save(true);
+										}
+										
+										$lehrverband->studiengang_kz = $student->studiengang_kz;
+										$lehrverband->semester = $student->semester;
+										$lehrverband->verband = $student->verband;
+										$lehrverband->gruppe = '';
+										$lehrverband->aktiv = true;
+										if($student->verband=='A')
+											$lehrverband->bezeichnung = 'Abbrecher';
+										else 
+											$lehrverband->bezeichnung = 'Unterbrecher';
+										
+										$lehrverband->save(true);
+									}
+									//Student Speichern
 									$student->save(false, false);
+									//Studentlehrverband Eintrag Speichern
 									$student->save_studentlehrverband(false);
 								}
 								
