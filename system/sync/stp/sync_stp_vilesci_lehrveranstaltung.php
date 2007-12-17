@@ -151,19 +151,19 @@
 	// ******** SYNC START ********** //
 		
 	$qry = "SELECT 
-				_LV, SUBSTRING(chLVNr_new, 0, 200) as chLVNr, SUBSTRING(chBezeichnung, 0, 200) as chBezeichnung, _Studiengang, SUBSTRING(meKommentar, 0, 200) as meKommentar, inSemester, inSWS, ECTS, _cxLVTyp
+				_LV, SUBSTRING(chLVNr_new, 0, 200) as chLVNr, SUBSTRING(chLVNr, 0, 200) as chLVNr_old, SUBSTRING(chBezeichnung, 0, 200) as chBezeichnung, _Studiengang, SUBSTRING(meKommentar, 0, 200) as meKommentar, inSemester, inSWS, ECTS, _cxLVTyp
 			FROM 
 				lv JOIN studienplaneintrag ON(__LV=_LV)
 			UNION
 			SELECT
-				_LV, SUBSTRING(chLVNr_new, 0, 200) as chLVNr, SUBSTRING(chBezeichnung, 0, 200) as chBezeichnung, _Studiengang, SUBSTRING(meKommentar, 0, 200) as meKommentar, inSemester, inSWS, ECTS, _cxLVTyp
+				_LV, SUBSTRING(chLVNr_new, 0, 200) as chLVNr, SUBSTRING(chLVNr, 0, 200) as chLVNr_old, SUBSTRING(chBezeichnung, 0, 200) as chBezeichnung, _Studiengang, SUBSTRING(meKommentar, 0, 200) as meKommentar, inSemester, inSWS, ECTS, _cxLVTyp
 			FROM 
 				lv JOIN semesterplaneintrag on(__LV=_LV)
 			WHERE
 				(CAST(semesterplaneintrag._lv AS varchar(10))+' '+CAST(inSemester AS varchar(10))) not in(SELECT CAST(_lv AS varchar(10))+ ' ' + CAST(insemester AS varchar(10)) FROM studienplaneintrag)
 			UNION
 			SELECT
-				__LV as _LV, SUBSTRING(chLVNr_new, 0, 200) as chLVNr, SUBSTRING(chBezeichnung, 0, 200) as chBezeichnung, _Studiengang, SUBSTRING(meKommentar, 0, 200) as meKommentar, 0 as inSemester, 0 as inSWS, 0 as ECTS, _cxLVTyp
+				__LV as _LV, SUBSTRING(chLVNr_new, 0, 200) as chLVNr, SUBSTRING(chLVNr, 0, 200) as chLVNr_old, SUBSTRING(chBezeichnung, 0, 200) as chBezeichnung, _Studiengang, SUBSTRING(meKommentar, 0, 200) as meKommentar, 0 as inSemester, 0 as inSWS, 0 as ECTS, _cxLVTyp
 			FROM 
 				lv
 			WHERE
@@ -250,8 +250,8 @@
 					$updtext.="	ECTS wurde von $lv_obj->ects auf ".round($row_ext->ECTS,2)." geaendert\n";
 				if($lv_obj->semesterstunden!=((int)$row_ext->inSWS*ANZAHL_SEMESTERWOCHEN))
 					$updtext.="	Semesterstunden wurde von $lv_obj->semesterstunden auf ".($row_ext->inSWS*ANZAHL_SEMESTERWOCHEN)." geaendert\n";
-				if($lv_obj->anmerkung!=$row_ext->meKommentar)
-					$updtext.="	Anmerkung wurde von $lv_obj->anmerkung auf $row_ext->meKommentar geaendert\n";
+				if($lv_obj->anmerkung!=$row_ext->chLVNr_old)
+					$updtext.="	Anmerkung wurde von $lv_obj->anmerkung auf $row_ext->chLVNr_old geaendert\n";
 				if($lv_obj->lehre != true)
 					$updtext.="	lehre wurde von $lv_obj->lehre auf true geaendert\n";
 				if($lv_obj->lehreverzeichnis != strtolower(cleankurzbz($row_ext->chLVNr)))
@@ -284,7 +284,7 @@
 			$lv_obj->sprache = 'German';
 			$lv_obj->ects = $row_ext->ECTS;
 			$lv_obj->semesterstunden = (int) $row_ext->inSWS*ANZAHL_SEMESTERWOCHEN;
-			$lv_obj->anmerkung = $row_ext->meKommentar;
+			$lv_obj->anmerkung = $row_ext->chLVNr_old;
 			$lv_obj->lehre = true;
 			$lv_obj->lehreverzeichnis = strtolower(cleankurzbz($row_ext->chLVNr));
 			$lv_obj->aktiv = true;
