@@ -30,6 +30,7 @@
 // ****************************************
 
 require_once('../../vilesci/config.inc.php');
+require_once('../../include/'.EXT_FKT_PATH.'/generateuid.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/benutzergruppe.class.php');
@@ -78,7 +79,7 @@ if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz') && !$r
 	$data = '';
 	$error = true;
 }
-	
+
 // *** FUNKTIONEN ***
 
 // ****
@@ -91,7 +92,7 @@ if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz') && !$r
 // ****
 function generateMatrikelnummer($conn, $studiengang_kz, $studiensemester_kurzbz)
 {
-	$jahr = substr($studiensemester_kurzbz, 4);	
+	$jahr = substr($studiensemester_kurzbz, 4);
 	$art = substr($studiensemester_kurzbz, 0, 2);
 	switch($art)
 	{
@@ -102,50 +103,27 @@ function generateMatrikelnummer($conn, $studiengang_kz, $studiensemester_kurzbz)
 	if($art=='2')
 		$jahr = $jahr-1;
 	$matrikelnummer = sprintf("%02d",$jahr).$art.sprintf("%04d",$studiengang_kz);
-	
+
 	$qry = "SELECT matrikelnr FROM public.tbl_student WHERE matrikelnr LIKE '$matrikelnummer%' ORDER BY matrikelnr DESC LIMIT 1";
-	
+
 	if($result = pg_query($conn, $qry))
 	{
 		if($row = pg_fetch_object($result))
 		{
 			$max = substr($row->matrikelnr,7);
 		}
-		else 
+		else
 			$max = 0;
-		
+
 		$max += 1;
 		return $matrikelnummer.sprintf("%03d",$max);
 	}
-	else 
+	else
 	{
 		return false;
 	}
 }
 
-// ****
-// * Generiert die UID
-// * FORMAT: el07b001
-// * el = studiengangskuerzel
-// * 07 = Jahr
-// * b/m/d/x = Bachelor/Master/Diplom/Incomming
-// * 001 = Laufende Nummer ( Wenn StSem==SS dann wird zur nummer 500 dazugezaehlt)
-// ****
-function generateUID($conn, $matrikelnummer)
-{
-	$jahr = substr($matrikelnummer,0, 2);
-	$art = substr($matrikelnummer, 2, 1);
-	$stg = substr($matrikelnummer, 3, 4);
-	$nr = substr($matrikelnummer, 7);
-	
-	if($art=='2')
-		$nr = $nr+500;
-	
-	$stg_obj = new studiengang($conn);
-	$stg_obj->load(ltrim($stg,'0'));
-	
-	return $stg_obj->kurzbz.$jahr.($art!='0'?$stg_obj->typ:'x').$nr;	
-}
 // ***
 function clean_string($string)
  {
@@ -173,7 +151,7 @@ function clean_string($string)
 
 if(!$error)
 {
-	
+
 	if(isset($_POST['type']) && $_POST['type']=='savestudent')
 	{
 		if(!$rechte->isBerechtigt('assistenz',$_POST['studiengang_kz'],'suid') &&
@@ -182,19 +160,19 @@ if(!$error)
 			$error = true;
 			$errormsg = 'Sie haben keine Schreibrechte fuer diesen Studiengang';
 		}
-		   
+
 		//Studentendaten speichern
 		if(!$error)
 		{
 			$student = new student($conn, null, true);
-			
+
 			if(!$student->load($_POST['uid']))
 			{
 				$return = false;
 				$errormsg = 'Fehler beim Laden:'.$student->errormsg;
 				$error = true;
 			}
-			
+
 			if(!$error)
 			{
 				$student->uid = $_POST['uid'];
@@ -221,23 +199,23 @@ if(!$error)
 				$student->matrikelnr = $_POST['matrikelnummer'];
 				$student->updateamum = date('Y-m-d H:i:s');
 				$student->updatevon = $user;
-				
+
 				if($_POST['alias']!='')
 				{
 					if(checkalias($_POST['alias']))
 					{
 						$student->alias = $_POST['alias'];
 					}
-					else 
+					else
 					{
 						$error = true;
 						$return = false;
 						$errormsg = 'Alias ist ungueltig';
 					}
 				}
-				else 
+				else
 					$student->alias = '';
-				
+
 				if(!$error)
 				{
 					$stsem = new studiensemester($conn, null, true);
@@ -252,9 +230,9 @@ if(!$error)
 						$student->verband = ($_POST['verband']==''?' ':$_POST['verband']);
 						$student->gruppe = ($_POST['gruppe']==''?' ':$_POST['gruppe']);
 					}
-					
-					$student->new=false;				
-	
+
+					$student->new=false;
+
 					$lehrverband = new lehrverband($conn, true);
 					if(!$lehrverband->exists($_POST['studiengang_kz'],$_POST['semester'],$_POST['verband'], $_POST['gruppe']))
 					{
@@ -262,18 +240,18 @@ if(!$error)
 						$return = false;
 						$error = true;
 					}
-					
+
 					if(!$error)
 					{
 						if($student->save())
 						{
 							$student_lvb = new student($conn, null, true);
-							
+
 							if($student_lvb->studentlehrverband_exists($_POST['uid'], $semester_aktuell))
 								$student_lvb->new = false;
-							else 
+							else
 								$student_lvb->new = true;
-							
+
 							$student_lvb->uid = $_POST['uid'];
 							$student_lvb->studiensemester_kurzbz = $semester_aktuell;
 							$student_lvb->studiengang_kz = $_POST['studiengang_kz'];
@@ -282,14 +260,14 @@ if(!$error)
 							$student_lvb->gruppe = ($_POST['gruppe']==''?' ':$_POST['gruppe']);
 							$student_lvb->updateamum = date('Y-m-d H:i:s');
 							$student_lvb->updatevon = $user;
-							
+
 							if($student_lvb->save_studentlehrverband())
 							{
 								$return = true;
 								$error=false;
 								$data = $student->prestudent_id;
 							}
-							else 
+							else
 							{
 								$error = true;
 								$errormsg = $student_lvb->errormsg;
@@ -309,7 +287,7 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='saveperson')
 	{
-		
+
 		if(!$rechte->isBerechtigt('assistenz',$_POST['studiengang_kz'],'suid') &&
 		   !$rechte->isBerechtigt('admin',$_POST['studiengang_kz'], 'suid'))
 		{
@@ -321,14 +299,14 @@ if(!$error)
 		if(!$error)
 		{
 			$person = new person($conn, null, true);
-			
+
 			if(!$person->load($_POST['person_id']))
 			{
 				$return = false;
 				$errormsg = 'Fehler beim Laden:'.$person->errormsg;
 				$error = true;
 			}
-			
+
 			if(!$error)
 			{
 				$person->person_id = $_POST['person_id'];
@@ -354,8 +332,8 @@ if(!$error)
 				$person->sprache = $_POST['sprache'];
 				$person->updateamum = date('Y-m-d H:i:s');
 				$person->updatevon = $user;
-								
-				$person->new=false;				
+
+				$person->new=false;
 
 				if(!$error)
 				{
@@ -384,18 +362,18 @@ if(!$error)
 			$error = true;
 			$errormsg = 'Sie haben keine Schreibrechte fuer diesen Studiengang';
 		}
-		
+
 		if(!$error)
 		{
 			$prestudent = new prestudent($conn, null, true);
-			
+
 			if(!$prestudent->load($_POST['prestudent_id']))
 			{
 				$return = false;
 				$errormsg = 'Fehler beim Laden:'.$prestudent->errormsg;
 				$error = true;
 			}
-			
+
 			if(!$error)
 			{
 				$prestudent->prestudent_id = $_POST['prestudent_id'];
@@ -421,9 +399,9 @@ if(!$error)
 				//$prestudent->insertamum = date('Y-m-d H:i:s');
 				//$prestudent->insertvon = $user;
 				$prestudent->updateamum = date('Y-m-d H:i:s');
-				$prestudent->updatevon = $user;				
-				$prestudent->new=false;	
-				
+				$prestudent->updatevon = $user;
+				$prestudent->new=false;
+
 				if(!$error)
 				{
 					if($prestudent->save())
@@ -456,7 +434,7 @@ if(!$error)
 					$error = true;
 					$errormsg = 'Fehler beim Laden des Prestudenten';
 				}
-				else 
+				else
 				{
 					if(!$rechte->isBerechtigt('assistenz',$prestd->studiengang_kz,'suid') &&
 					   !$rechte->isBerechtigt('admin',$prestd->studiengang_kz, 'suid'))
@@ -465,32 +443,32 @@ if(!$error)
 						$errormsg = 'Sie haben keine Schreibrechte fuer diesen Studiengang';
 					}
 				}
-				
+
 				if(!$error)
 				{
 					if($prestd->getLastStatus($_POST['prestudent_id']))
 					{
 						if($_POST['rolle_kurzbz']=='Absolvent' || $_POST['rolle_kurzbz']=='Diplomand')
 							$studiensemester = $semester_aktuell;
-						else 
+						else
 							$studiensemester = $prestd->studiensemester_kurzbz;
 						$hlp = new prestudent($conn);
-						
+
 						//if($_POST['rolle_kurzbz']=='Unterbrecher' || $_POST['rolle_kurzbz']=='Abbrecher')
 						//	$sem='0';
 						//else
 						if($_POST['rolle_kurzbz']=='Student')
 							$sem=$_POST['semester'];
-						else 
+						else
 							$sem=$prestd->ausbildungssemester;
-							
+
 						$hlp->getPrestudentRolle($_POST['prestudent_id'], $_POST['rolle_kurzbz'], $studiensemester, "datum, insertamum", $sem);
 						if(count($hlp->result)>0)
 						{
 							$errormsg = 'Diese Rolle ist bereits vorhanden';
 							$return = false;
 						}
-						else 
+						else
 						{
 							$prestd_neu = new prestudent($conn);
 							$prestd_neu->prestudent_id = $_POST['prestudent_id'];
@@ -502,7 +480,7 @@ if(!$error)
 							$prestd_neu->insertamum = date('Y-m-d H:i:s');
 							$prestd_neu->insertvon = $user;
 							$prestd_neu->new = true;
-							
+
 							if($prestd_neu->save_rolle())
 							{
 								//Unterbrecher und Abbrecher werden ins 0. Semester verschoben
@@ -552,7 +530,7 @@ if(!$error)
 									//Studentlehrverband Eintrag Speichern
 									$student->save_studentlehrverband(false);
 								}
-								
+
 								//Wenn Unterbrecher zu Studenten werden, dann wird das Semester mituebergeben
 								if($_POST['rolle_kurzbz']=='Student')
 								{
@@ -569,25 +547,25 @@ if(!$error)
 									{
 										$benutzer->bnaktiv=true;
 										$benutzer->save(false, false);
-									}								
+									}
 								}
 								$return = true;
 							}
-							else 
+							else
 							{
 								$return = false;
 								$errormsg = $prestd_neu->errormsg;
 							}
 						}
 					}
-					else 
+					else
 					{
 						$return = false;
 						$errormsg = 'Es ist keine Rolle fuer diesen Prestudent vorhanden';
 					}
 				}
 			}
-			else 
+			else
 			{
 				$return = false;
 				$errormsg = 'Prestudent_id muss angegeben werden';
@@ -597,8 +575,8 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='deleterolle')
 	{
 		//Loescht eine Prestudentrolle
-				
-		if(isset($_POST['studiensemester_kurzbz']) && isset($_POST['rolle_kurzbz']) && 
+
+		if(isset($_POST['studiensemester_kurzbz']) && isset($_POST['rolle_kurzbz']) &&
 		   isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id']) &&
 		   isset($_POST['ausbildungssemester']) && is_numeric($_POST['ausbildungssemester']))
 		{
@@ -607,41 +585,41 @@ if(!$error)
 				$return = false;
 				$errormsg = 'Studentenrolle kann nur durch den Administrator geloescht werden';
 			}
-			else 
+			else
 			{
 				$rolle = new prestudent($conn, null, true);
 				if($rolle->load_rolle($_POST['prestudent_id'],$_POST['rolle_kurzbz'],$_POST['studiensemester_kurzbz'], $_POST['ausbildungssemester']))
-				{				
+				{
 					if($rechte->isBerechtigt('admin', $_POST['studiengang_kz'], 'suid') || $rechte->isBerechtigt('assistenz', $_POST['studiengang_kz'], 'suid'))
 					{
 						if($rolle->delete_rolle($_POST['prestudent_id'],$_POST['rolle_kurzbz'],$_POST['studiensemester_kurzbz'], $_POST['ausbildungssemester']))
 						{
 							$return = true;
 						}
-						else 
+						else
 						{
 							$return = false;
 							$errormsg = $rolle->errormsg;
 						}
 					}
-					else 
+					else
 					{
 						$return = false;
 						$errormsg = 'Sie haben keine Berechtigung zum Loeschen dieser Rolle:'.$_POST['studiengang_kz'];
 					}
 				}
-				else 
+				else
 				{
 					$return = false;
 					$errormsg = $rolle->errormsg;
 				}
 			}
 		}
-		else 
+		else
 		{
 			$return = false;
 			$errormsg = 'Fehlerhafte Parameteruebergabe';
-		}		
+		}
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='saverolle')
 	{
@@ -656,7 +634,7 @@ if(!$error)
 					$error = true;
 					$errormsg = 'Prestudent wurde nicht gefunden';
 				}
-				else 
+				else
 				{
 					//Berechtigung pruefen
 					if(!$rechte->isBerechtigt('assistenz',$rolle->studiengang_kz,'suid') &&
@@ -666,7 +644,7 @@ if(!$error)
 						$errormsg = 'Sie haben keine Schreibrechte fuer diesen Studiengang';
 					}
 				}
-				
+
 				if(!$error)
 				{
 					if(($_POST['studiensemester_old']=='') || (!$rolle->load_rolle($_POST['prestudent_id'], $_POST['rolle_kurzbz'], $_POST['studiensemester_old'], $_POST['ausbildungssemester_old'])))
@@ -675,7 +653,7 @@ if(!$error)
 						$rolle->insertamum = date('Y-m-d H:i:s');
 						$rolle->insertvon = $user;
 						$rolle->rolle_kurzbz = $_POST['rolle_kurzbz'];
-						
+
 						if($_POST['rolle_kurzbz']=='Student')
 						{
 							//Die Rolle Student darf nur eingefuegt werden, wenn schon eine Studentenrolle vorhanden ist
@@ -691,10 +669,10 @@ if(!$error)
 										$return = false;
 									}
 								}
-							}								
+							}
 						}
 					}
-					else 
+					else
 					{
 						$rolle->ausbildungssemester_old = $_POST['ausbildungssemester_old'];
 						$rolle->studiensemester_old = $_POST['studiensemester_old'];
@@ -702,17 +680,17 @@ if(!$error)
 						$rolle->updatevon = $user;
 						$rolle->new = false;
 					}
-								
+
 					if(!$error)
-					{	
-						$rolle->ausbildungssemester = $_POST['ausbildungssemester'];					
-						$rolle->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];					
+					{
+						$rolle->ausbildungssemester = $_POST['ausbildungssemester'];
+						$rolle->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
 						$rolle->datum = $_POST['datum'];
 						$rolle->orgform_kurzbz = $_POST['orgform_kurzbz'];
-						
+
 						if($rolle->save_rolle())
 							$return = true;
-						else 
+						else
 						{
 							$return = false;
 							$errormsg = $rolle->errormsg;
@@ -720,7 +698,7 @@ if(!$error)
 					}
 				}
 			}
-			else 
+			else
 			{
 				$return = false;
 				$errormsg = 'Prestudent_id muss angegeben werden';
@@ -751,25 +729,25 @@ if(!$error)
 						$error = true;
 						$errormsg = 'Sie haben keine Schreibrechte fuer diesen Studiengang';
 					}
-					
+
 					if(!$error)
 					{
 						if($prestd->zgv_code!='')
 						{
 							$stg = new studiengang($conn);
 							$stg->load($prestd->studiengang_kz);
-							
+
 							if($stg->typ=='m' && $prestd->zgvmas_code=='')
 							{
 								$return = false;
 								$errormsg = 'ZGV Master muss eingegeben werden';
 							}
-							else 
+							else
 							{
 								//Pruefen ob die Rolle Bewerber existiert
 								$hlp = new prestudent($conn);
 								$hlp->getPrestudentRolle($_POST['prestudent_id'], 'Bewerber',null,'datum DESC, insertamum DESC');
-							
+
 								if(count($hlp->result)>0)
 								{
 									//pruefen ob schon eine Studentenrolle Existiert
@@ -780,36 +758,40 @@ if(!$error)
 										$return = false;
 										$errormsg = 'Diese Person ist bereits Student';
 									}
-									else 
+									else
 									{
 										//pruefen ob die Kaution bezahlt wurde
 										//??
-										
+
 										pg_query($conn, 'BEGIN;');
-										
+
 										//Matrikelnummer und UID generieren
 										$matrikelnr = generateMatrikelnummer($conn, $prestd->studiengang_kz, $hlp->result[0]->studiensemester_kurzbz);
-										$uid = generateUID($conn, $matrikelnr);
-										
+										$jahr = substr($matrikelnr,0, 2);
+										$stg = substr($matrikelnr, 3, 4);
+										$stg_obj = new studiengang($conn);
+										$stg_obj->load(ltrim($stg,'0'));
+										$uid = generateUID($stg_obj->kurzbz,$jahr,$stg_obj->typ,$matrikelnr);
+
 										$return = false;
 										$errormsg = "Matrikelnummer: $matrikelnr, UID: $uid";
-										
+
 										//Benutzerdatensatz anlegen
 										$benutzer = new benutzer($conn);
 										$benutzer->uid = $uid;
 										$benutzer->person_id = $prestd->person_id;
 										$benutzer->aktiv = true;
-										
+
 										$qry_alias = "SELECT * FROM public.tbl_benutzer WHERE alias=LOWER('".clean_string($prestd->vorname).".".clean_string($prestd->nachname)."')";
 										$result_alias = pg_query($conn, $qry_alias);
-										if(pg_num_rows($result_alias)==0)								
+										if(pg_num_rows($result_alias)==0)
 											$benutzer->alias = strtolower(clean_string($prestd->vorname).'.'.clean_string($prestd->nachname));
-										else 
+										else
 											$benutzer->alias = '';
-										
+
 										$benutzer->insertamum = date('Y-m-d H:i:s');
 										$benutzer->insertvon = $user;
-																		
+
 										if($benutzer->save(true, false))
 										{
 											//Studentendatensatz anlegen
@@ -823,7 +805,7 @@ if(!$error)
 											$student->gruppe = ' ';
 											$student->insertamum = date('Y-m-d H:i:s');
 											$student->insertvon = $user;
-											
+
 											if($student->save(true, false))
 											{
 												//Prestudentrolle hinzugfuegen
@@ -837,7 +819,7 @@ if(!$error)
 												$rolle->insertamum = date('Y-m-d H:i:s');
 												$rolle->insertvon = $user;
 												$rolle->new = true;
-												
+
 												if($rolle->save_rolle())
 												{
 													//StudentLehrverband anlegen
@@ -850,34 +832,34 @@ if(!$error)
 													$studentlehrverband->gruppe = ' ';
 													$studentlehrverband->insertamum = date('Y-m-d H:i:s');
 													$studentlehrverband->insertvon = $user;
-													
+
 													if($studentlehrverband->save_studentlehrverband(true))
 													{
 														$return = true;
 														pg_query($conn, 'COMMIT;');
 													}
-													else 
+													else
 													{
 														$errormsg = 'Fehler beim Speichern des Studentlehrverbandes: '.$studentlehrverband->errormsg;
 														$return = false;
 														pg_query($conn, 'ROLLBACK;');
 													}
 												}
-												else 
+												else
 												{
 													$errormsg = 'Fehler beim Speichern des Rolle: '.$rolle->errormsg;
 													$return = false;
 													pg_query($conn, 'ROLLBACK;');
 												}
 											}
-											else 
+											else
 											{
 												$errormsg = 'Fehler beim Speichern des Studenten: '.$student->errormsg;
 												$return = false;
 												pg_query($conn, 'ROLLBACK;');
 											}
 										}
-										else 
+										else
 										{
 											$errormsg = 'Fehler beim Speichern des Benutzers: '.$benutzer->errormsg;
 											$return = false;
@@ -885,27 +867,27 @@ if(!$error)
 										}
 									}
 								}
-								else 
+								else
 								{
 									$return = false;
 									$errormsg = 'Die Person muss zuerst Bewerber sein bevor Sie zum Studenten gemacht werden kann';
 								}
 							}
 						}
-						else 
+						else
 						{
 							$return = false;
 							$errormsg = 'ZGV muss eingegeben werden';
 						}
 					}
 				}
-				else 
+				else
 				{
 					$return = false;
 					$errormsg = 'Prestudent wurde nicht gefunden';
 				}
 			}
-			else 
+			else
 			{
 				$return = false;
 				$errormsg = 'Prestudent_id muss angegeben werden';
@@ -922,7 +904,7 @@ if(!$error)
 				$error = true;
 				$errormsg='Gruppe wurde nicht gefunden';
 			}
-			else 
+			else
 			{
 				//Berechtigung pruefen
 				if(!$rechte->isBerechtigt('assistenz',$gruppe->studiengang_kz,'suid') &&
@@ -933,7 +915,7 @@ if(!$error)
 				}
 			}
 			$benutzergruppe = new benutzergruppe($conn);
-			
+
 			$uids = explode(';',$_POST['uid']);
 			$errormsg = '';
 			foreach ($uids as $uid)
@@ -946,9 +928,9 @@ if(!$error)
 						$benutzergruppe->gruppe_kurzbz = $_POST['gruppe_kurzbz'];
 						$benutzergruppe->studiensemester_kurzbz = $semester_aktuell;
 						$benutzergruppe->insertamum = date('Y-m-d H:i:s');
-						$benutzergruppe->insertvon = $user;				
+						$benutzergruppe->insertvon = $user;
 						$benutzergruppe->new = true;
-						
+
 						if(!$benutzergruppe->save())
 						{
 							$errormsg .= "$uid konnte nicht hinzugefuegt werden\n";
@@ -960,10 +942,10 @@ if(!$error)
 			}
 			if($errormsg=='')
 				$return = true;
-			else 
+			else
 				$return = false;
 		}
-		else 
+		else
 		{
 			$return = false;
 			$errormsg  = 'Fehlerhafte Parameteruebergabe';
@@ -996,11 +978,11 @@ if(!$error)
 									$error = true;
 									$errormsg = 'Sie haben keine Schreibrechte fuer diesen Studiengang';
 								}
-						
+
 								if(!$error)
 								{
 									$benutzergruppe = new benutzergruppe($conn);
-						
+
 									if(!$benutzergruppe->delete($uid, $_POST['gruppe_kurzbz']))
 									{
 										$errormsg .= "$uid konnte nicht aus der Gruppe geloescht werden\n";
@@ -1010,13 +992,13 @@ if(!$error)
 							else
 								$errormsg .= "Studiengang von $uid konnte nicht ermittelt werden\n";
 						}
-						else 
+						else
 							$errormsg .= "Studiengang von $uid konnte nicht ermittelt werden\n";
 					}
 				}
 				if($errormsg=='')
 					$return = true;
-				else 
+				else
 					$return = false;
 			}
 			else
@@ -1025,7 +1007,7 @@ if(!$error)
 				$errormsg = "Gruppe wurde nicht gefunden";
 			}
 		}
-		else 
+		else
 		{
 			$return = false;
 			$errormsg  = 'Fehlerhafte Parameteruebergabe';
@@ -1046,19 +1028,19 @@ if(!$error)
 			if(!$error)
 			{
 				$akte = new akte($conn);
-	
+
 				if($akte->delete($_POST['akte_id']))
 				{
 					$return = true;
 				}
-				else 
+				else
 				{
 					$return = false;
 					$errormsg = $akte->errormsg;
-				}				
+				}
 			}
 		}
-		else 
+		else
 		{
 			$return = false;
 			$errormsg  = 'Fehlerhafte Parameteruebergabe'.$_POST['akte_id'];
@@ -1080,7 +1062,7 @@ if(!$error)
 					$return = false;
 					$errormsg = 'Sie haben keine Schreibrechte fuer diesen Studiengang';
 				}
-				else 
+				else
 				{
 					$buchung->betrag = $_POST['betrag'];
 					$buchung->buchungsdatum = $_POST['buchungsdatum'];
@@ -1091,25 +1073,25 @@ if(!$error)
 					$buchung->new = false;
 					$buchung->updateamum = date('Y-m-d H:i:s');
 					$buchung->updatevon = $user;
-					
+
 					if($buchung->save())
 					{
 						$return = true;
 					}
-					else 
+					else
 					{
 						$return = false;
 						$errormsg = 'Fehler beim Speichern:'.$buchung->errormsg;
 					}
 				}
 			}
-			else 
+			else
 			{
 				$errormsg = 'Buchung wurde nicht gefunden:'.$_POST['buchungsnr'];
 				$return = false;
 			}
 		}
-		else 
+		else
 		{
 			$return = false;
 			$errormsg  = 'Fehlerhafte Parameteruebergabe'.$_POST['buchungsnr'];
@@ -1127,7 +1109,7 @@ if(!$error)
 				if(is_numeric($buchungsnr))
 				{
 					$buchung = new konto($conn, null, true);
-		
+
 					if($buchung->load($buchungsnr))
 					{
 						//Berechtigung pruefen
@@ -1138,12 +1120,12 @@ if(!$error)
 							$return = false;
 							$errormsg = "\nSie haben keine Schreibrechte fuer diese Buchung: ".$buchung->buchungsnr;
 						}
-						else 
+						else
 						{
 							if($buchung->buchungsnr_verweis=='')
 							{
 								$kto = new konto($conn, null, true);
-								//$buchung->betrag*(-1);					
+								//$buchung->betrag*(-1);
 								$buchung->betrag = $kto->getDifferenz($buchungsnr);
 								$buchung->buchungsdatum = date('Y-m-d');
 								$buchung->mahnspanne = '0';
@@ -1151,26 +1133,26 @@ if(!$error)
 								$buchung->new = true;
 								$buchung->insertamum = date('Y-m-d H:i:s');
 								$buchung->insertvon = $user;
-								
+
 								if($buchung->save())
 								{
 									//$data = $buchung->buchungsnr;
 									$return = true;
 								}
-								else 
+								else
 								{
 									$return = false;
 									$errormsg .= "\n".'Fehler beim Speichern:'.$buchung->errormsg;
 								}
 							}
-							else 
+							else
 							{
 								$return = false;
 								$errormsg .= "\n".'Gegenbuchungen koennen nur auf die obersten Buchungen getaetigt werden';
 							}
 						}
 					}
-					else 
+					else
 					{
 						$errormsg .= "\n".'Buchung wurde nicht gefunden:'.$_POST['buchungsnr'];
 						$return = false;
@@ -1180,13 +1162,13 @@ if(!$error)
 				{
 					$return = false;
 				}
-				else 
+				else
 				{
 					$return = true;
 				}
-			}			
+			}
 		}
-		else 
+		else
 		{
 			$return = false;
 			$errormsg  = 'Fehlerhafte Parameteruebergabe'.$_POST['buchungsnr'];
@@ -1208,26 +1190,26 @@ if(!$error)
 					$return = false;
 					$errormsg = 'Sie haben keine Schreibrechte fuer diesen Studiengang';
 				}
-				else 
+				else
 				{
 					if($buchung->delete($_POST['buchungsnr']))
 					{
 						$return = true;
 					}
-					else 
+					else
 					{
 						$errormsg = $buchung->errormsg;
 						$return = false;
 					}
 				}
 			}
-			else 
+			else
 			{
 				$errormsg = 'Buchung wurde nicht gefunden';
 				$return = false;
 			}
 		}
-		else 
+		else
 		{
 			$return = false;
 			$errormsg  = 'Fehlerhafte Parameteruebergabe'.$_POST['buchungsnr'];
@@ -1247,7 +1229,7 @@ if(!$error)
 			$return = false;
 			$errormsg = 'Sie haben keine Schreibrechte fuer diesen Studiengang';
 		}
-		else 
+		else
 		{
 			foreach ($person_ids as $person_id)
 			{
@@ -1266,12 +1248,12 @@ if(!$error)
 					$buchung->insertamum = date('Y-m-d H:i:s');
 					$buchung->insertvon = $user;
 					$buchung->new = true;
-					
+
 					if($buchung->save())
 					{
 						$data = $buchung->buchungsnr;
 					}
-					else 
+					else
 					{
 						$errormsg .= "Fehler bei $person_id: $buchung->errormsg\n";
 					}
@@ -1280,15 +1262,15 @@ if(!$error)
 		}
 		if($errormsg=='')
 			$return = true;
-		else 
-			$return = false;			
+		else
+			$return = false;
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='dokumentprestudentadd')
 	{
 		//Speichert die Zuordnung von Dokumenten zu einem Prestudent
 		//Gleichzeitiges zuteilen mehrerer Dokumente auf einmal ist moeglich
 		//Dokumente werden durch ';' getrennt uebergeben
-		
+
 		if(!$rechte->isBerechtigt('assistenz',$_POST['studiengang_kz'],'suid') &&
 		   !$rechte->isBerechtigt('admin',$_POST['studiengang_kz'], 'suid'))
 		{
@@ -1310,9 +1292,9 @@ if(!$error)
 					$dok->mitarbeiter_uid = $user;
 					$dok->datum = date('Y-m-d');
 					$dok->insertamum = date('Y-m-d H:i:s');
-					$dok->insertvon = $user;				
+					$dok->insertvon = $user;
 					$dok->new = true;
-					
+
 					if(!$dok->save())
 					{
 						$errormsg .= "Fehler bei $dokument_kurzbz: $dok->errormsg\n";
@@ -1321,7 +1303,7 @@ if(!$error)
 			}
 			if($errormsg=='')
 				$return = true;
-			else 
+			else
 				$return = false;
 		}
 	}
@@ -1355,12 +1337,12 @@ if(!$error)
 								$errormsg .= "Fehler bei $dokument_kurzbz: $dok->errormsg\n";
 							}
 						}
-						else 
+						else
 						{
 							$errormsg.="Fehler bei $dokument_kurzbz: Loeschen nur durch $mitarbeiter_uid moeglich\n";
 						}
 					}
-					else 
+					else
 					{
 						$errormsg.="Dokumentenzuteilung existiert nicht: $dokument_kurzbz\n";
 					}
@@ -1368,7 +1350,7 @@ if(!$error)
 			}
 			if($errormsg=='')
 				$return = true;
-			else 
+			else
 				$return = false;
 		}
 	}
@@ -1377,12 +1359,12 @@ if(!$error)
 		//Loescht ein Betriebsmittel
 		//Wenn studiengang_kz uebergeben wird, dann handelt es sich um die Betriebsmittel eines Studenten
 		//Wenn studiengang_kz='' dann werden Mitarbeiterrechte benoetigt
-		if(($_POST['studiengang_kz']!='' && 
+		if(($_POST['studiengang_kz']!='' &&
 			!$rechte->isBerechtigt('assistenz',$_POST['studiengang_kz'],'suid') &&
 			!$rechte->isBerechtigt('admin',$_POST['studiengang_kz'], 'suid')
-		   ) || 
-		   ($_POST['studiengang_kz']=='' && 
-		    !$rechte->isBerechtigt('admin', null, 'suid') && 
+		   ) ||
+		   ($_POST['studiengang_kz']=='' &&
+		    !$rechte->isBerechtigt('admin', null, 'suid') &&
 		    !$rechte->isBerechtigt('mitarbeiter', null, 'suid')
 		   ))
 		{
@@ -1396,18 +1378,18 @@ if(!$error)
 			   isset($_POST['person_id']) && is_numeric($_POST['person_id']))
 			{
 				$btm = new betriebsmittelperson($conn, null,null, true);
-	
+
 				if($btm->delete($_POST['betriebsmittel_id'], $_POST['person_id']))
 				{
 					$return = true;
 				}
-				else 
+				else
 				{
 					$errormsg = $btm->errormsg;
 					$return = false;
 				}
 			}
-			else 
+			else
 			{
 				$return = false;
 				$errormsg  = 'Fehlerhafte Parameteruebergabe';
@@ -1419,12 +1401,12 @@ if(!$error)
 		//Speichert eine Betriebsmittelzuordnung
 		//Wenn studiengang_kz uebergeben wird, dann handelt es sich um die Betriebsmittel eines Studenten
 		//Wenn studiengang_kz='' dann werden Mitarbeiterrechte benoetigt
-		if(($_POST['studiengang_kz']!='' && 
+		if(($_POST['studiengang_kz']!='' &&
 			!$rechte->isBerechtigt('assistenz',$_POST['studiengang_kz'],'suid') &&
 			!$rechte->isBerechtigt('admin',$_POST['studiengang_kz'], 'suid')
-		   ) || 
-		   ($_POST['studiengang_kz']=='' && 
-		    !$rechte->isBerechtigt('admin', null, 'suid') && 
+		   ) ||
+		   ($_POST['studiengang_kz']=='' &&
+		    !$rechte->isBerechtigt('admin', null, 'suid') &&
 		    !$rechte->isBerechtigt('mitarbeiter', null, 'suid')
 		   ))
 		{
@@ -1435,7 +1417,7 @@ if(!$error)
 		else
 		{
 			$bm = new betriebsmittel($conn, null, true);
-			
+
 			//Nachschauen ob dieses Betriebsmittel schon existiert
 			if($bm->getBetriebsmittel($_POST['betriebsmitteltyp'],$_POST['nummerold']))
 			{
@@ -1452,12 +1434,12 @@ if(!$error)
 							$error = true;
 							$errormsg = 'Fehler beim Speichern des Betriebsmittels';
 						}
-						else 
+						else
 						{
 							$betriebsmittel_id = $bm->betriebsmittel_id;
 						}
 					}
-					else 
+					else
 					{
 						$return = false;
 						$error = true;
@@ -1474,19 +1456,19 @@ if(!$error)
 					$bm->ort_kurzbz = null;
 					$bm->insertamum = date('Y-m-d H:i:s');
 					$bm->insertvon = $user;
-				
+
 					if($bm->save(true))
 					{
 						$betriebsmittel_id = $bm->betriebsmittel_id;
 					}
-					else 
+					else
 					{
 						$error = true;
 						$return = false;
 						$errormsg = 'Fehler beim Anlegen des Betriebsmittels';
 					}
 				}
-							
+
 				//Zuordnung Betriebsmittel-Person anlegen
 				$bmp = new betriebsmittelperson($conn, null, null, true);
 				if($_POST['neu']!='true')
@@ -1497,20 +1479,20 @@ if(!$error)
 						$bmp->updatevon = $user;
 						$bmp->new = false;
 					}
-					else 
+					else
 					{
 						$error = true;
 						$return = false;
 						$errormsg = 'Fehler beim Laden der Betriebmittelperson Zuordnung';
 					}
 				}
-				else 
+				else
 				{
 					$bmp->insertamum = date('Y-m-d H:i:s');
 					$bmp->insertvon = $user;
 					$bmp->new = true;
 				}
-	
+
 				if(!$error)
 				{
 					$bmp->person_id = $_POST['person_id'];
@@ -1519,20 +1501,20 @@ if(!$error)
 					$bmp->kaution = trim(str_replace(',','.',$_POST['kaution']));
 					$bmp->ausgegebenam = $_POST['ausgegebenam'];
 					$bmp->retouram = $_POST['retouram'];
-					
+
 					if($bmp->save())
 					{
 						$return = true;
 						$data = $betriebsmittel_id;
 					}
-					else 
+					else
 					{
 						$return = false;
 						$errormsg = $bmp->errormsg;
 					}
 				}
 			}
-			else 
+			else
 			{
 				$errormsg = 'Fehler:'.$bm->errormsg;
 				$return = false;
@@ -1554,18 +1536,18 @@ if(!$error)
 			if(isset($_POST['bisio_id']) && is_numeric($_POST['bisio_id']))
 			{
 				$bisio = new bisio($conn);
-	
+
 				if($bisio->delete($_POST['bisio_id']))
 				{
 					$return = true;
 				}
-				else 
+				else
 				{
 					$errormsg = $bisio->errormsg;
 					$return = false;
 				}
 			}
-			else 
+			else
 			{
 				$return = false;
 				$errormsg  = 'Fehlerhafte Parameteruebergabe';
@@ -1584,27 +1566,27 @@ if(!$error)
 		}
 		else
 		{
-			
+
 			$bisio = new bisio($conn);
-	
+
 			if($_POST['neu']=='true')
 			{
 				$bisio->insertamum = date('Y-m-d H:i:s');
 				$bisio->insertvon = $user;
 				$bisio->new = true;
 			}
-			else 
+			else
 			{
 				if($bisio->load($_POST['bisio_id']))
 					$bisio->new = false;
-				else 
+				else
 				{
 					$error = true;
 					$errormsg = $bisio->errormsg;
 					$return = false;
-				}				
+				}
 			}
-			
+
 			$bisio->bisio_id = (isset($_POST['bisio_id'])?$_POST['bisio_id']:'');
 			$bisio->mobilitaetsprogramm_code = $_POST['mobilitaetsprogramm_code'];
 			$bisio->nation_code = $_POST['nation_code'];
@@ -1614,7 +1596,7 @@ if(!$error)
 			$bisio->student_uid = $_POST['student_uid'];
 			$bisio->updateamum = date('Y-m-d H:i:s');
 			$bisio->updatevon = $user;
-			
+
 			if(!$error)
 			{
 				if($bisio->save())
@@ -1622,7 +1604,7 @@ if(!$error)
 					$return = true;
 					$data = $bisio->bisio_id;
 				}
-				else 
+				else
 				{
 					$errormsg = $bisio->errormsg;
 					$return = false;
@@ -1633,7 +1615,7 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='savenote')
 	{
 		//Speichert einen Noteneintrag
-		
+
 		$noten = new zeugnisnote($conn);
 
 		if(isset($_POST['lehrveranstaltung_id']) && isset($_POST['student_uid']) && isset($_POST['studiensemester_kurzbz']))
@@ -1646,20 +1628,20 @@ if(!$error)
 				{
 					$stg_lva = $row->studiengang_kz;
 				}
-				else 
+				else
 				{
 					$return = false;
 					$error = true;
 					$errormsg = 'Fehler beim Ermitteln der LVA';
 				}
 			}
-			else 
+			else
 			{
 				$return = false;
 				$error = true;
 				$errormsg = 'Fehler beim Ermitteln der LVA';
 			}
-			
+
 			$qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid='".addslashes($_POST['student_uid'])."'";
 			if($result = pg_query($conn, $qry))
 			{
@@ -1667,22 +1649,22 @@ if(!$error)
 				{
 					$stg_std = $row->studiengang_kz;
 				}
-				else 
+				else
 				{
 					$return = false;
 					$error = true;
 					$errormsg = 'Fehler beim Ermitteln des Studenten';
 				}
 			}
-			else 
+			else
 			{
 				$return = false;
 				$error = true;
 				$errormsg = 'Fehler beim Ermitteln des Studenten';
 			}
-			
+
 			if(!$error)
-			{	
+			{
 				if(!$rechte->isBerechtigt('admin', $stg_lva, 'suid') && !$rechte->isBerechtigt('admin', $stg_std, 'suid') &&
 				   !$rechte->isBerechtigt('assistenz', $stg_lva, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_std, 'suid'))
 				{
@@ -1692,31 +1674,31 @@ if(!$error)
 				}
 				else
 				{
-			   	
+
 					if($noten->load($_POST['lehrveranstaltung_id'], $_POST['student_uid'], $_POST['studiensemester_kurzbz']))
 					{
 						$noten->new = false;
 						$noten->updateamum = date('Y-m-d H:i:s');
 						$noten->updatevon = $user;
 					}
-					else 
+					else
 					{
 						$noten->new = true;
 						$noten->insertamum = date('Y-m-d H:i:s');
 						$noten->insertvon = $user;
 					}
-					
+
 					$noten->lehrveranstaltung_id = $_POST['lehrveranstaltung_id'];
 					$noten->student_uid = $_POST['student_uid'];
 					$noten->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
 					$noten->benotungsdatum = date('Y-m-d H:i:s');
 					$noten->note = $_POST['note'];
-							
+
 					if($noten->save())
 					{
 						$return = true;
 					}
-					else 
+					else
 					{
 						$errormsg = $noten->errormsg;
 						$return = false;
@@ -1724,7 +1706,7 @@ if(!$error)
 				}
 			}
 		}
-		else 
+		else
 		{
 			$return = false;
 			$errormsg = 'Fehlerhafte Parameteruebergabe';
@@ -1736,12 +1718,12 @@ if(!$error)
 		//Die Daten werden per POST uebermittelt. Es wird ein Feld Anzahl mituebergeben
 		//mit der Anzahl der Felder. Die Felder sind durchnummeriert zB lehreinheit_id_0, lehreinheit_id_1, ...
 		$errormsg = '';
-		
+
 		for($i=0;$i<$_POST['anzahl'];$i++)
 		{
 			$lvgesamtnote = new lvgesamtnote($conn, null, true);
 			$zeugnisnote = new zeugnisnote($conn, null, true);
-			
+
 			//Berechtigung pruefen
 			$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='".addslashes($_POST['lehrveranstaltung_id_'.$i])."'";
 			if($result = pg_query($conn, $qry))
@@ -1750,20 +1732,20 @@ if(!$error)
 				{
 					$stg_lva = $row->studiengang_kz;
 				}
-				else 
+				else
 				{
 					$return = false;
 					$error = true;
 					$errormsg = 'Fehler beim Ermitteln der LVA';
 				}
 			}
-			else 
+			else
 			{
 				$return = false;
 				$error = true;
 				$errormsg = 'Fehler beim Ermitteln der LVA';
 			}
-			
+
 			$qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid='".addslashes($_POST['student_uid_'.$i])."'";
 			if($result = pg_query($conn, $qry))
 			{
@@ -1771,22 +1753,22 @@ if(!$error)
 				{
 					$stg_std = $row->studiengang_kz;
 				}
-				else 
+				else
 				{
 					$return = false;
 					$error = true;
 					$errormsg = 'Fehler beim Ermitteln des Studenten';
 				}
 			}
-			else 
+			else
 			{
 				$return = false;
 				$error = true;
 				$errormsg = 'Fehler beim Ermitteln des Studenten';
 			}
-			
+
 			if(!$error)
-			{	
+			{
 				if(!$rechte->isBerechtigt('admin', $stg_lva, 'suid') && !$rechte->isBerechtigt('admin', $stg_std, 'suid') &&
 				   !$rechte->isBerechtigt('assistenz', $stg_lva, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_std, 'suid'))
 				{
@@ -1797,14 +1779,14 @@ if(!$error)
 				else
 				{
 					if($lvgesamtnote->load($_POST['lehrveranstaltung_id_'.$i], $_POST['student_uid_'.$i], $_POST['studiensemester_kurzbz_'.$i]))
-					{					
+					{
 						if($zeugnisnote->load($_POST['lehrveranstaltung_id_'.$i], $_POST['student_uid_'.$i], $_POST['studiensemester_kurzbz_'.$i]))
 						{
 							$zeugnisnote->new = false;
 							$zeugnisnote->updateamum = date('Y-m-d H:i:s');
 							$zeugnisnote->updatevon = $user;
 						}
-						else 
+						else
 						{
 							$zeugnisnote->new = true;
 							$zeugnisnote->insertamum = date('Y-m-d H:i:s');
@@ -1813,18 +1795,18 @@ if(!$error)
 							$zeugnisnote->student_uid = $_POST['student_uid_'.$i];
 							$zeugnisnote->studiensemester_kurzbz = $_POST['studiensemester_kurzbz_'.$i];
 						}
-						
+
 						$zeugnisnote->note = $lvgesamtnote->note;
 						$zeugnisnote->uebernahmedatum = date('Y-m-d H:i:s');
 						$zeugnisnote->benotungsdatum = $lvgesamtnote->benotungsdatum;
 						$zeugnisnote->bemerkung = $lvgesamtnote->bemerkung;
-							
+
 						if(!$zeugnisnote->save())
 						{
 							$errormsg .= "\n".$zeugnisnote->errormsg;
 						}
 					}
-					else 
+					else
 					{
 						$errormsg .= "\nLvGesamtNote wurde nicht gefunden";
 					}
@@ -1833,7 +1815,7 @@ if(!$error)
 		}
 		if($errormsg=='')
 			$return = true;
-		else 
+		else
 			$return = false;
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='importnoten')
@@ -1843,7 +1825,7 @@ if(!$error)
 		//Die Felder sind durchnummeriert zB matrikelnummer_0, matrikelnummer_1, ...
 		//Die Anzahl der Gesamten Daten wird auch als Parameter uebergeben
 		$errormsg = '';
-		
+
 		for($i=0;$i<$_POST['anzahl'];$i++)
 		{
 			if($_POST['matrikelnummer_'.$i]!='')
@@ -1855,7 +1837,7 @@ if(!$error)
 					$error = true;
 					$errormsg = "\nMatrikelnummer oder Note ist ungueltig: ".$_POST['matrikelnummer_'.$i].' - '.$_POST['note_'.$i];
 				}
-				
+
 				if(!$error)
 				{
 					$qry = "SELECT student_uid, studiengang_kz FROM public.tbl_student WHERE trim(matrikelnr)='".trim($_POST['matrikelnummer_'.$i])."'";
@@ -1866,18 +1848,18 @@ if(!$error)
 							$uid = $row->student_uid;
 							$stg_std = $row->studiengang_kz;
 						}
-						else 
+						else
 						{
 							$error = true;
 							$errormsg.="\nMatrikelnummer ".$_POST['matrikelnummer_'.$i]." wurde nicht gefunden";
 						}
 					}
-					else 
+					else
 					{
 						$error = true;
 						$errormsg.="\nFehler beim Ermitteln der UID";
-					}			
-					
+					}
+
 					//Berechtigung pruefen
 					$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='".addslashes($_POST['lehrveranstaltung_id'])."'";
 					if($result = pg_query($conn, $qry))
@@ -1886,20 +1868,20 @@ if(!$error)
 						{
 							$stg_lva = $row->studiengang_kz;
 						}
-						else 
+						else
 						{
 							$return = false;
 							$error = true;
 							$errormsg = 'Fehler beim Ermitteln der LVA';
 						}
 					}
-					else 
+					else
 					{
 						$return = false;
 						$error = true;
 						$errormsg = 'Fehler beim Ermitteln der LVA';
 					}
-					
+
 					if(!$error)
 					{
 						if(!$rechte->isBerechtigt('admin', $stg_lva, 'suid') && !$rechte->isBerechtigt('admin', $stg_std, 'suid') &&
@@ -1926,11 +1908,11 @@ if(!$error)
 								$zeugnisnote->student_uid = $uid;
 								$zeugnisnote->studiensemester_kurzbz = $semester_aktuell;
 							}
-							
+
 							$zeugnisnote->note = $_POST['note_'.$i];
 							$zeugnisnote->uebernahmedatum = date('Y-m-d H:i:s');
 							$zeugnisnote->benotungsdatum = date('Y-m-d H:i:s');
-												
+
 							if(!$zeugnisnote->save())
 							{
 								$errormsg .= "\n".$zeugnisnote->errormsg;
@@ -1940,10 +1922,10 @@ if(!$error)
 				}
 			}
 		}
-		
+
 		if($errormsg=='')
 			$return = true;
-		else 
+		else
 			$return = false;
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='deletepruefung')  // **** PRUEFUNGEN **** //
@@ -1960,19 +1942,19 @@ if(!$error)
 			else
 			{
 				$pruefung = new pruefung($conn);
-	
+
 				if($pruefung->delete($_POST['pruefung_id']))
 				{
 					$return = true;
 				}
-				else 
+				else
 				{
 					$errormsg = $pruefung->errormsg;
 					$return = false;
 				}
 			}
 		}
-		else 
+		else
 		{
 			$return = false;
 			$errormsg  = 'Fehlerhafte Parameteruebergabe';
@@ -1990,42 +1972,42 @@ if(!$error)
 		else
 		{
 			$pruefung = new pruefung($conn, null, true);
-			
+
 			if($_POST['neu']=='false')
 			{
 				if($pruefung->load($_POST['pruefung_id']))
 				{
 					$pruefung->new = false;
 				}
-				else 
+				else
 				{
 					$error = true;
 					$return = false;
 					$errormsg = $pruefung->errormsg;
 				}
 			}
-			else 
+			else
 			{
 				$pruefung->new = true;
 				$pruefung->insertamum = date('Y-m-d H:i:s');
 				$pruefung->insertvon = $user;
 			}
-			
+
 			pg_query($conn, 'BEGIN');
-			
+
 			if($_POST['pruefungstyp_kurzbz']=='Termin2')
 			{
-				//Wenn ein 2. Termin angelegt wird, und kein 1. Termin vorhanden ist, 
+				//Wenn ein 2. Termin angelegt wird, und kein 1. Termin vorhanden ist,
 				//dann wird auch ein 1. Termin angelegt mit der derzeitigen Zeugnisnote
-				$qry = "SELECT * FROM lehre.tbl_pruefung WHERE 
-						student_uid='".addslashes($_POST['student_uid'])."' AND 
+				$qry = "SELECT * FROM lehre.tbl_pruefung WHERE
+						student_uid='".addslashes($_POST['student_uid'])."' AND
 						lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."' AND
 						pruefungstyp_kurzbz='Termin1'";
 				if($result = pg_query($conn, $qry))
 				{
 					if(pg_num_rows($result)==0)
 					{
-						$qry = "SELECT note, benotungsdatum FROM lehre.tbl_zeugnisnote JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE 
+						$qry = "SELECT note, benotungsdatum FROM lehre.tbl_zeugnisnote JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE
 								student_uid='".addslashes($_POST['student_uid'])."' AND
 								tbl_lehreinheit.lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."' AND
 								tbl_lehreinheit.studiensemester_kurzbz = tbl_zeugnisnote.studiensemester_kurzbz";
@@ -2045,28 +2027,28 @@ if(!$error)
 								$ersttermin->pruefungstyp_kurzbz = 'Termin1';
 								$ersttermin->datum = $row->benotungsdatum;
 								$ersttermin->anmerkung = '';
-								
+
 								if(!$ersttermin->save())
 								{
 									$error = true;
 									$return = false;
 									$errormsg = 'Fehler beim Anlegen des 1.Termin:'.$ersttermin->errormsg;
-								}								
+								}
 							}
 						}
 						//Wenn keine Zeugnisnote vorhanden ist, dann wird kein
 						//1.Termin angelegt
 					}
 				}
-				else 
+				else
 				{
 					$error = true;
 					$return = false;
 					$errormsg = 'Fehler beim Ermitteln des Ersttermines';
 				}
-				
+
 			}
-			
+
 			if(!$error)
 			{
 				$pruefung->lehreinheit_id = $_POST['lehreinheit_id'];
@@ -2078,8 +2060,8 @@ if(!$error)
 				$pruefung->anmerkung = $_POST['anmerkung'];
 				$pruefung->updateamum = date('Y-m-d H:i:s');
 				$pruefung->updatevon = $user;
-				
-				
+
+
 				if($pruefung->save())
 				{
 					$return = true;
@@ -2093,33 +2075,33 @@ if(!$error)
 							$lehrveranstaltung_id = $row_le->lehrveranstaltung_id;
 							$studiensemester_kurzbz = $row_le->studiensemester_kurzbz;
 						}
-						else 
+						else
 						{
 							$error = true;
 							$return = false;
 							$errormsg = 'Fehler beim Ermitteln der Lehrveranstaltung';
 						}
 					}
-					else 
+					else
 					{
 						$error = true;
 						$return = false;
 						$errormsg = 'Fehler beim Ermitteln der Lehrveranstaltung';
 					}
-					
-					
+
+
 					if(!$error)
 					{
 						$zeugnisnote = new zeugnisnote($conn);
 						if($zeugnisnote->load($lehrveranstaltung_id, $_POST['student_uid'], $studiensemester_kurzbz))
 						{
-							if($zeugnisnote->uebernahmedatum=='' || 
-								($datum_obj->mktime_fromtimestamp($zeugnisnote->benotungsdatum) > 
+							if($zeugnisnote->uebernahmedatum=='' ||
+								($datum_obj->mktime_fromtimestamp($zeugnisnote->benotungsdatum) >
 								 $datum_obj->mktime_fromtimestamp($zeugnisnote->uebernahmedatum)))
 								$checkdatum = $zeugnisnote->benotungsdatum;
-							else 
+							else
 								$checkdatum = $zeugnisnote->uebernahmedatum;
-							
+
 							if($datum_obj->mktime_fromtimestamp($checkdatum)>$datum_obj->mktime_datum($_POST['datum']))
 							{
 								if($zeugnisnote->note!=$_POST['note'])
@@ -2129,20 +2111,20 @@ if(!$error)
 									$errormsg = 'ACHTUNG! Diese Pruefungsnote wurde nicht ins Zeugnis uebernommen da die Zeugnisnote nach dem Pruefungsdatum veraendert wurde';
 								}
 							}
-							else 
+							else
 							{
 								$zeungisnote->new = false;
 							}
 						}
-						else 
+						else
 						{
 							$zeugnisnote->new = true;
 							$zeugnisntoe->insertamum = date('Y-m-d H:i:s');
 							$zeugnisnote->insertvon = $user;
 						}
-						
+
 						if(!$error)
-						{							
+						{
 							$zeugnisnote->student_uid = $_POST['student_uid'];
 							$zeugnisnote->lehrveranstaltung_id = $lehrveranstaltung_id;
 							$zeugnisnote->studiensemester_kurzbz = $studiensemester_kurzbz;
@@ -2151,7 +2133,7 @@ if(!$error)
 							$zeugnisnote->benotungsdatum = date('Y-m-d',$datum_obj->mktime_datum($_POST['datum']));
 							$zeugnisnote->updateamum = date('Y-m-d H:i:s');
 							$zeugnisnote->updatevon = $user;
-							
+
 							if(!$zeugnisnote->save())
 							{
 								$return = false;
@@ -2159,12 +2141,12 @@ if(!$error)
 								$errormsg = 'Fehler beim Speichern der Zeungisnote:'.$zeugnisnote->errormsg;
 								pg_query($conn, 'ROLLBACK');
 							}
-							else 
+							else
 							{
 								pg_query($conn, 'COMMIT');
 							}
 						}
-						else 
+						else
 						{
 							//Kein Rollback damit die Pruefung gespeichert wird
 							//returnwert ist aber false damit die Meldung angezeigt wird,
@@ -2172,19 +2154,19 @@ if(!$error)
 							pg_query($conn, 'COMMIT');
 						}
 					}
-					else 
+					else
 					{
 						pg_query($conn, 'ROLLBACK');
 					}
 				}
-				else 
+				else
 				{
 					$return = false;
 					$errormsg = $pruefung->errormsg;
 					pg_query($conn, 'ROLLBACK');
 				}
 			}
-			else 
+			else
 			{
 				pg_query($conn, 'ROLLBACK');
 			}
@@ -2201,27 +2183,27 @@ if(!$error)
 		else
 		{
 			$pruefung = new abschlusspruefung($conn, null, true);
-			
+
 			if($_POST['neu']=='false')
 			{
 				if($pruefung->load($_POST['abschlusspruefung_id']))
 				{
 					$pruefung->new = false;
 				}
-				else 
+				else
 				{
 					$error = true;
 					$return = false;
 					$errormsg = $pruefung->errormsg;
 				}
 			}
-			else 
+			else
 			{
 				$pruefung->new = true;
 				$pruefung->insertamum = date('Y-m-d H:i:s');
 				$pruefung->insertvon = $user;
 			}
-					
+
 			$pruefung->student_uid = $_POST['student_uid'];
 			$pruefung->vorsitz = $_POST['vorsitz'];
 			$pruefung->pruefer1 = $_POST['pruefer1'];
@@ -2235,7 +2217,7 @@ if(!$error)
 			$pruefung->anmerkung = $_POST['anmerkung'];
 			$pruefung->updateamum = date('Y-m-d H:i:s');
 			$pruefung->updatevon = $user;
-			
+
 			if(!$error)
 			{
 				if($pruefung->save())
@@ -2243,7 +2225,7 @@ if(!$error)
 					$return = true;
 					$data = $pruefung->abschlusspruefung_id;
 				}
-				else 
+				else
 				{
 					$return = false;
 					$errormsg = $pruefung->errormsg;
@@ -2265,18 +2247,18 @@ if(!$error)
 			if(isset($_POST['abschlusspruefung_id']) && is_numeric($_POST['abschlusspruefung_id']))
 			{
 				$pruefung = new abschlusspruefung($conn);
-	
+
 				if($pruefung->delete($_POST['abschlusspruefung_id']))
 				{
 					$return = true;
 				}
-				else 
+				else
 				{
 					$errormsg = $pruefung->errormsg;
 					$return = false;
 				}
 			}
-			else 
+			else
 			{
 				$return = false;
 				$errormsg  = 'Fehlerhafte Parameteruebergabe';
@@ -2294,27 +2276,27 @@ if(!$error)
 		else
 		{
 			$projektarbeit = new projektarbeit($conn, null, true);
-			
+
 			if($_POST['neu']=='false')
 			{
 				if($projektarbeit->load($_POST['projektarbeit_id']))
 				{
 					$projektarbeit->new = false;
 				}
-				else 
+				else
 				{
 					$error = true;
 					$return = false;
 					$errormsg = $projektarbeit->errormsg;
 				}
 			}
-			else 
+			else
 			{
 				$projektarbeit->new = true;
 				$projektarbeit->insertamum = date('Y-m-d H:i:s');
 				$projektarbeit->insertvon = $user;
 			}
-					
+
 			$projektarbeit->projekttyp_kurzbz = $_POST['projekttyp_kurzbz'];
 			$projektarbeit->titel = $_POST['titel'];
 			$projektarbeit->lehreinheit_id = $_POST['lehreinheit_id'];
@@ -2333,7 +2315,7 @@ if(!$error)
 			$projektarbeit->anmerkung = $_POST['anmerkung'];
 			$projektarbeit->updateamum = date('Y-m-d H:i:s');
 			$projektarbeit->updatevon = $user;
-			
+
 			if(!$error)
 			{
 				if($projektarbeit->save())
@@ -2341,7 +2323,7 @@ if(!$error)
 					$return = true;
 					$data = $projektarbeit->projektarbeit_id;
 				}
-				else 
+				else
 				{
 					$return = false;
 					$errormsg = $projektarbeit->errormsg;
@@ -2363,7 +2345,7 @@ if(!$error)
 			if(isset($_POST['projektarbeit_id']) && is_numeric($_POST['projektarbeit_id']))
 			{
 				$projektarbeit = new projektarbeit($conn);
-	
+
 				$qry = "SELECT count(*) as anzahl FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id='".$_POST['projektarbeit_id']."'";
 				if($result = pg_query($conn, $qry))
 				{
@@ -2397,7 +2379,7 @@ if(!$error)
 				{
 					$errormsg = 'Fehler beim Loeschen';
 					$return = false;
-				}			
+				}
 			}
 			else
 			{
@@ -2417,21 +2399,21 @@ if(!$error)
 		else
 		{
 			$projektbetreuer = new projektbetreuer($conn, null, null, true);
-	
+
 			if($_POST['neu']=='false')
 			{
 				if($projektbetreuer->load($_POST['person_id_old'], $_POST['projektarbeit_id'], $_POST['betreuerart_kurzbz_old']))
 				{
 					$projektbetreuer->new = false;
 				}
-				else 
+				else
 				{
 					$error = true;
 					$return = false;
 					$errormsg = $projektbetreuer->errormsg;
 				}
 			}
-			else 
+			else
 			{
 				if($projektbetreuer->load($_POST['person_id'], $_POST['projektarbeit_id'], $_POST['betreuerart_kurzbz']))
 				{
@@ -2442,7 +2424,7 @@ if(!$error)
 				$projektbetreuer->insertamum = date('Y-m-d H:i:s');
 				$projektbetreuer->insertvon = $user;
 			}
-					
+
 			$projektbetreuer->person_id = $_POST['person_id'];
 			$projektbetreuer->person_id_old = $_POST['person_id_old'];
 			$projektbetreuer->projektarbeit_id = $_POST['projektarbeit_id'];
@@ -2456,14 +2438,14 @@ if(!$error)
 			$projektbetreuer->betreuerart_kurzbz_old = $_POST['betreuerart_kurzbz_old'];
 			$projektbetreuer->updateamum = date('Y-m-d H:i:s');
 			$projektbetreuer->updatevon = $user;
-			
+
 			if(!$error)
 			{
 				if($projektbetreuer->save())
 				{
 					$return = true;
 				}
-				else 
+				else
 				{
 					$return = false;
 					$errormsg = $projektbetreuer->errormsg;
@@ -2485,18 +2467,18 @@ if(!$error)
 			if(isset($_POST['person_id']) && is_numeric($_POST['person_id']))
 			{
 				$projektbetreuer = new projektbetreuer($conn, null, null, true);
-	
+
 				if($projektbetreuer->delete($_POST['person_id'], $_POST['projektarbeit_id'], $_POST['betreuerart_kurzbz']))
 				{
 					$return = true;
 				}
-				else 
+				else
 				{
 					$errormsg = $projektbetreuer->errormsg;
 					$return = false;
 				}
 			}
-			else 
+			else
 			{
 				$return = false;
 				$errormsg  = 'Fehlerhafte Parameteruebergabe';
@@ -2510,7 +2492,7 @@ if(!$error)
 			$pers_arr = explode(';',$_POST['person_ids']);
 			$data='';
 			$anz_error=0;
-			
+
 			foreach ($pers_arr as $person_id)
 			{
 				if(is_numeric($person_id))
@@ -2522,10 +2504,10 @@ if(!$error)
 						{
 							if($data!='')
 								$data.=','.$row->kontakt;
-							else 
+							else
 								$data = $row->kontakt;
 						}
-						else 
+						else
 						{
 							$anz_error++;
 						}
@@ -2536,19 +2518,19 @@ if(!$error)
 			{
 				if($anz_error==0)
 					$return = true;
-				else 
+				else
 				{
 					$return = false;
 					$errormsg = "Bei $anz_error Personen wurde keine Emailadresse gefunden!";
 				}
 			}
-			else 
+			else
 			{
 				$return = false;
 				$errormsg = 'Es wurde keine Privatadresse gefunden';
 			}
 		}
-		else 
+		else
 		{
 			$return = false;
 			$errormsg = 'Fehlerhafte Parameteruebergabe';
@@ -2566,13 +2548,13 @@ if(!$error)
 					$data = $row->stundensatz;
 					$return = true;
 				}
-				else 
+				else
 				{
 					$data = '80.00';
 					$return = true;
 				}
 			}
-			else 
+			else
 			{
 				$return = false;
 				$errormsg = 'Unbekannter Fehler';
