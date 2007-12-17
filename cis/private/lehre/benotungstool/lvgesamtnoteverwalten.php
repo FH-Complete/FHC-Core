@@ -410,9 +410,10 @@ if($result_grp = pg_query($conn, $qry))
 	while($row_grp = pg_fetch_object($result_grp))
 	{
 		echo "<tr>
-				<td colspan='8'>&nbsp;</td>
+				<td colspan='9'>&nbsp;</td>
 			</tr>
 			<tr>
+				<td class='ContentHeader2'></td>
 				<td class='ContentHeader2'>UID</td>
 				<td class='ContentHeader2'>Nachname</td>
 				<td class='ContentHeader2'>Vorname</td>
@@ -425,14 +426,14 @@ if($result_grp = pg_query($conn, $qry))
 				<td class='ContentHeader2'>Zeugnisnote</td>
 			</tr>
 			<tr>
-				<td colspan='8'>&nbsp;</td>
+				<td colspan='9'>&nbsp;</td>
 
 			</tr>";
 		if($row_grp->gruppe_kurzbz!='')
 		{
 				echo "
 				<tr>
-					<td colspan='4' align='center'><b>$row_grp->gruppe_kurzbz</b></td>
+					<td colspan='9' align='center'><b>$row_grp->gruppe_kurzbz</b></td>
 				</tr>";
 				$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row_grp->gruppe_kurzbz)."' AND studiensemester_kurzbz = '".$stsem."' ORDER BY nachname, vorname";
 		}
@@ -440,7 +441,7 @@ if($result_grp = pg_query($conn, $qry))
 		{
 			echo "
 				<tr>
-					<td colspan='5' align='center'><b>Verband $row_grp->verband ".($row_grp->gruppe!=''?"Gruppe $row_grp->gruppe":'')."</b></td>
+					<td colspan='9' align='center'><b>Verband $row_grp->verband ".($row_grp->gruppe!=''?"Gruppe $row_grp->gruppe":'')."</b></td>
 				</tr>";
 				$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student
 				             WHERE studiengang_kz='$row_grp->studiengang_kz' AND
@@ -484,6 +485,7 @@ if($result_grp = pg_query($conn, $qry))
 				
 				echo "
 				<tr class='liste".($i%2)."'>
+					<td><a href='mailto:$row_stud->uid@technikum-wien.at'><img src='../../../../skin/images/button_mail.gif'></a></td>					
 					<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->uid</a></td>
 					<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->nachname</a></td>
 					<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->vorname</a></td>";
