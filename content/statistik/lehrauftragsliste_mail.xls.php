@@ -398,8 +398,8 @@ if($result_stg = pg_query($conn, $qry_stg))
              "Content-Transfer-Encoding: base64\n\n" .
              $data . "\n\n" .
              "--{$mime_boundary}--\n";
-	//MAIL_GST.',
-    if(mail('oesi@technikum-wien.at', $subject, $message, $headers ))
+	
+    if(mail(MAIL_GST.',vilesci@technikum-wien.at', $subject, $message, $headers ))
 		echo 'Email mit Lehrauftragslisten wurde an '.MAIL_GST.' versandt!';
      else
         echo "Fehler beim Versenden der Lehrauftragsliste";
