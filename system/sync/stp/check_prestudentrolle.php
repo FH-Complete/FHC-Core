@@ -26,6 +26,8 @@ function myaddslashes($var)
 }
 
 $error_log='';
+$error_log_ext='';
+$error_log1='';
 $ausgabe="";
 $text = '';
 $error = '';
@@ -56,14 +58,45 @@ $log_qry_ins='';
 <?php
 
 //*********** Neue Daten holen *****************
-$qry="SELECT __Person, daEintrittDat, prestudent_id 
+$qry="SELECT __Person, chtitel, chnachname, chvorname, daEintrittDat, prestudent_id 
 		FROM sync.stp_person JOIN public.tbl_prestudent ON (__Person=ext_id)
 		WHERE (_cxPersonTyp='1' OR _cxPersonTyp='2');";
 
 //alle prestudentrollen sortiert nach datum desc
 //bis zu Semester von daEintrittDat fehlende Rollen eintragen - vergleich studiensemester mit getStudiensemesterFromDatum($conn, $datum, $naechstes=true) von deintrittdat 
-
-
+if($resultall = pg_query($conn,$qry))
+{
+	$anzahl_gesamt=pg_num_rows($resultall);
+	$error_log_ext.="Anzahl der Datensätze: ".$anzahl_gesamt."\n";
+	echo nl2br($error_log_ext);
+	while($rowall=pg_fetch_object($resultall))
+	{
+		$cont='';
+		if($rowall->daeintrittdat==NULL || $rowall->daeintrittdat=='')
+		{
+			$error_log1.="\nKein Eintrittsdatum eingetragen";
+			$cont=true;
+			$error=true;
+		}
+		if($error)
+		{
+			$error_log.="\n*****\n".$rowall->__person." - ".trim($rowall->chtitel)." ".trim($rowall->chnachname).", ".trim($rowall->chvorname).": ".$error_log1;
+			$error_log1='';
+			$error=false;
+			if($cont)
+			{
+				$fehler++;
+				continue;
+			}
+		}
+		
+		
+		
+		
+		
+		
+	}
+}
 ?>
 </body>
 </html>

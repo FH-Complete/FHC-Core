@@ -61,6 +61,8 @@ $fehler=0;
 $dublette=0;
 $plausi='';
 $start='';
+$anzahl_person_gesamt=0;
+$anzahl_person_gesamt2=0;
 $staat=array();
 
 /*************************
@@ -289,8 +291,8 @@ echo $start."<br>";
 $log_updates='';
 if($result = pg_query($conn, $qry))
 {
-	$anzahl_person_gesamt=pg_num_rows($result);
-	$error_log_ext.="Anzahl der Datensätze für updates: ".$anzahl_person_gesamt."\n";
+	$anzahl_person_gesamt2=pg_num_rows($result);
+	$error_log_ext.="Anzahl der Datensätze für updates: ".$anzahl_person_gesamt2."\n";
 	echo nl2br($error_log_ext);
 	while($row=pg_fetch_object($result))
 	{
