@@ -15,6 +15,7 @@
 //* benoetigt: tbl_syncperson
 
 require_once('sync_config.inc.php');
+require_once('../../../include/functions.inc.php');
 
 $starttime=time();
 $conn=pg_connect(CONN_STRING)
@@ -43,6 +44,9 @@ $Kalender='';
 $rolle='';
 $iu='';
 $log_qry_ins='';
+$beginnsem='';
+$semstart=array();
+$semende=array();
 
 /*************************
  * StP-PORTAL - Synchronisation
@@ -57,6 +61,15 @@ $log_qry_ins='';
 
 <?php
 
+$qry="SELECT * FROM public.tbl_studiensemester ORDER BY start;";
+if($result = pg_query($conn,$qry))
+{
+	while($row=pg_fetch_object($result))
+	{
+		$semstart[$row->studiensemester_kurzbz]=$row->start;
+		$semende[$row->studiensemester_kurzbz]=$row->ende;	
+	}
+}
 //*********** Neue Daten holen *****************
 $qry="SELECT __Person, chtitel, chnachname, chvorname, daEintrittDat, prestudent_id 
 		FROM sync.stp_person JOIN public.tbl_prestudent ON (__Person=ext_id)
@@ -90,9 +103,52 @@ if($resultall = pg_query($conn,$qry))
 			}
 		}
 		
+		echo nl2br("\n*****\n".$rowall->__person." - ".trim($rowall->chtitel)." ".trim($rowall->chnachname).", ".trim($rowall->chvorname).": ".$rowall->daeintrittdat);
 		
-		
-		
+		$qry_rl="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id=".myaddslashes($rowall->prestudent_id)." ORDER BY datum desc LIMIT 1";
+		if($resultrl = pg_query($conn,$qry_rl))
+		{
+			if($rowrl=pg_fetch_object($resultrl))
+			{
+				$beginnsem=getStudiensemesterFromDatum($conn, $rowall->daeintrittdat, true);
+				while ($rowrl->studiensemester_kurzbz>$beginnsem) 
+				{
+					$qry_chk="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id=".myaddslashes($rowall->prestudent_id)." AND studiensemester_kurzbz=".myaddslashes($rowrl->studiensemester_kurzbz).";";
+					if($resultchk = pg_query($conn,$qry_chk))
+					{
+						if(pg_num_rows($resultchk)==0)
+						{
+							//INSERT Prestudentrolle
+							$qry_ins="INSERT INTO public.tbl_prestudentrolle (prestudent_id, rolle_kurzbz,
+								studiensemester_kurzbz, ausbildungssemester,datum, orgform_kurzbz,
+								insertamum, insertvon, updateamum, updatevon, ext_id)
+								VALUES (".
+								myaddslashes($prestudent_id).", 
+								'Student', ".
+								myaddslashes($rowrl->studiensemester_kurzbz).", ".
+								myaddslashes($rowrl->ausbildungssemester).",
+								now(), ".
+								myaddslashes($rowrl->orgform).",
+								now(),
+								'SYNC',
+								NULL,
+								NULL, 
+								NULL)";
+							if(!$resultins = pg_query($conn,$qry_ins))
+							{
+								$fehler++;
+								$error_log.= $sql."\n<strong>".pg_last_error($conn)." </strong>\n";	
+							}
+						}
+					}
+				}
+			}
+		}
+		else 
+		{
+			$fehler++;
+			$error_log.= "\n".$sql."\n<strong>".pg_last_error($conn)." </strong>\n";
+		}
 		
 		
 	}
