@@ -28,7 +28,7 @@ header("Pragma: no-cache");
 header("Content-type: application/xhtml+xml");
 // xml
 if(isset($_GET['xmlformat']) && $_GET['xmlformat']=='xml')
-	echo '<?xml version="1.0" encoding="ISO-8859-9" standalone="yes"?>';
+	echo '<?xml version="1.0" encoding="ISO-8859-15" standalone="yes"?>';
 else
 	echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
