@@ -25,6 +25,7 @@ require_once('../vilesci/config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/person.class.php');
 require_once('../include/benutzerberechtigung.class.php');
+require_once('../include/akte.class.php');
 
 $PHP_SELF = $_SERVER['PHP_SELF'];
 echo "<html><body>";
@@ -96,10 +97,29 @@ if(isset($_POST['submitbild']))
 			//groesse auf maximal 827x1063 begrenzen
 			resize($filename, 827, 1063);
 			
-			//im Dateisystem speichern
-			if(!copy($filename, IMAGE_PATH.$_GET['person_id'].'.jpg'))
+			$fp = fopen($filename,'r');
+			//auslesen
+			$content = fread($fp, filesize($filename));
+			fclose($fp);
+			
+			$akte = new akte($conn);
+			$akte->dokument_kurzbz = 'Lichtbil';
+			$akte->person_id = $_GET['person_id'];
+			$akte->inhalt = strhex($content);
+			$akte->mimetype = "image/jpg";
+			$akte->erstelltam = date('Y-m-d H:i:s');
+			$akte->gedruckt = false;
+			$akte->titel = "Lichtbild_".$_GET['person_id'].".jpg";
+			$akte->bezeichnung = "Lichtbild gross";
+			$akte->updateamum = date('Y-m-d H:i:s');
+			$akte->updatevon = $user;
+			$akte->insertamum = date('Y-m-d H:i:s');
+			$akte->insertvon = $user;
+			$akte->uid = '';
+			
+			if(!$akte->save(true))
 			{
-				die( 'copy failed:'.IMAGE_PATH.$_GET['person_id'].'.jpg');
+				echo "<b>Fehler: $akte->errormsg</b>";
 			}
 			
 			//groesse auf maximal 101x130 begrenzen
