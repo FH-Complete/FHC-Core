@@ -166,6 +166,47 @@ if($result_stg = pg_query($conn, $qry_stg))
 					$liste[$row->mitarbeiter_uid]['geaendert']=true;
 			}
 
+			//Alle holen die eine Betreuung aber keinen Lehrauftrag haben
+			$qry = "SELECT 
+						distinct personalnummer, titelpre, vorname, nachname, uid
+					FROM 
+						lehre.tbl_projektbetreuer, public.tbl_person, public.tbl_benutzer, 
+						public.tbl_mitarbeiter, lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, 
+						lehre.tbl_lehrveranstaltung
+					WHERE 
+						tbl_projektbetreuer.person_id=tbl_person.person_id AND
+						tbl_person.person_id=tbl_benutzer.person_id AND
+						tbl_mitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND
+						tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
+						tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
+						tbl_lehreinheit.studiensemester_kurzbz='$semester_aktuell' AND
+						tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
+						tbl_lehrveranstaltung.studiengang_kz='$studiengang_kz' AND 
+						NOT EXISTS (SELECT 
+										mitarbeiter_uid 
+									FROM 
+										lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung
+									WHERE 
+										mitarbeiter_uid=tbl_benutzer.uid AND
+										tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND 
+										tbl_lehrveranstaltung.studiengang_kz='$studiengang_kz' AND
+										tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
+										tbl_lehreinheit.studiensemester_kurzbz='$semester_aktuell');";
+			
+			if($result = pg_query($conn, $qry))
+			{
+				while($row = pg_fetch_object($result))
+				{
+					$liste[$row->uid]['personalnummer'] = $row->personalnummer;
+					$liste[$row->uid]['titelpre'] = $row->titelpre;
+					$liste[$row->uid]['vorname'] = $row->vorname;
+					$liste[$row->uid]['nachname'] = $row->nachname;
+					$liste[$row->uid]['geaendert']=false;
+					$liste[$row->uid]['gesamtstunden'] = 0;
+					$liste[$row->uid]['gesamtkosten'] = 0;
+				}
+			}
+			
 			//Betreuungen fuer Projektarbeiten
 			foreach ($liste as $uid=>$arr)
 			{
@@ -192,6 +233,16 @@ if($result_stg = pg_query($conn, $qry_stg))
 				}
 			}
 
+			$vn = array();
+			$nn = array();
+			foreach ($liste as $key => $row) 
+			{
+		    	$vn[$key]  = $row['vorname'];
+		    	$nn[$key] = $row['nachname'];
+			}
+			
+			array_multisort($nn, SORT_ASC, $vn, SORT_ASC, $liste);
+			
 			//Daten ausgeben
 			foreach ($liste as $uid=>$row)
 			{
@@ -261,6 +312,8 @@ if($result_stg = pg_query($conn, $qry_stg))
 	$worksheet->write(2,++$i,"Stunden", $format_bold);
 	$worksheet->write(2,++$i,"Kosten", $format_bold);
 	
+	$vn = array();
+	$nn = array();
 	foreach ($liste_gesamt as $key => $row) 
 	{
     	$vn[$key]  = $row['vorname'];
@@ -345,8 +398,8 @@ if($result_stg = pg_query($conn, $qry_stg))
              "Content-Transfer-Encoding: base64\n\n" .
              $data . "\n\n" .
              "--{$mime_boundary}--\n";
-	
-    if(mail(MAIL_GST.',vilesci@technikum-wien.at', $subject, $message, $headers ))
+	//MAIL_GST.',
+    if(mail('oesi@technikum-wien.at', $subject, $message, $headers ))
 		echo 'Email mit Lehrauftragslisten wurde an '.MAIL_GST.' versandt!';
      else
         echo "Fehler beim Versenden der Lehrauftragsliste";
