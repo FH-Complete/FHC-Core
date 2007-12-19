@@ -302,9 +302,10 @@ $qry='SELECT __Person,_Staatsbuerger,_GebLand,Briefanrede,chTitel,chNachname,chV
 			gebdatum,gebort,anmerkung,homepage,svnr,ersatzkennzeichen,familienstand,geschlecht,anzahlkinder,
 			aktiv,bundesland_code
 		FROM sync.stp_person JOIN sync.tbl_syncperson USING (__Person) JOIN public.tbl_person USING (person_id)
-		WHERE chNachname!=nachname OR anrede!=Briefanrede OR titelpre!=chTitel OR vorname!=chVorname OR gebdatum!=daGebDat
-			OR gebort!=chGebOrt OR anmerkung!=meBemerkung OR homepage!=chHomepage OR svnr!=chSVNr OR ersatzkennzeichen!=chErsatzKZ
-			OR familienstand!=_cxFamilienstand OR anzahlkinder!=inKinder OR bundesland_code!=_cxBundesland;'; // OR geschlecht!=_cxGeschlecht
+		WHERE chNachname!=nachname OR anrede!=Briefanrede OR titelpre!=chTitel OR vorname!=chVorname 
+			OR gebdatum!=daGebDat OR gebort!=chGebOrt OR anmerkung!=meBemerkung OR homepage!=chHomepage 
+			OR svnr!=chSVNr OR ersatzkennzeichen!=chErsatzKZ OR familienstand!=_cxFamilienstand OR anzahlkinder!=inKinder 
+			OR bundesland_code!=_cxBundesland;'; // OR geschlecht!=_cxGeschlecht
 
 $error_log_ext="Updates holen:\n\n";
 $start=date("d.m.Y H:i:s");
@@ -318,44 +319,48 @@ if($result = pg_query($conn, $qry))
 	while($row=pg_fetch_object($result))
 	{
 		$cont='';
-		$sql='UPDATE public.tbl_person SET';
-		if ($row->chnachname!=$row->nachname)
+		$sql='';
+		//$sql='UPDATE public.tbl_person SET';
+		if ($row->chnachname!=$row->nachname && $row->chnachname!='' && $row->chnachname!=NULL)
 			$sql.=" nachname='$row->chnachname',";
-		if ($row->anrede!=$row->briefanrede)
+		if ($row->anrede!=$row->briefanrede && $row->briefanrede!='' && $row->briefanrede!=NULL)
 			$sql.=" anrede=".myaddslashes(substr($row->briefanrede,0,16)).",";
-		if ($row->titelpre!=$row->chtitel)
+		if ($row->titelpre!=$row->chtitel && $row->chtitel!='' && $row->chtitel!=NULL)
 			$sql.=" titelpre='$row->chtitel',";
-		if ($row->vorname!=$row->chvorname)
+		if ($row->vorname!=$row->chvorname && $row->chvorname!='' && $row->chvorname!=NULL)
 			$sql.=" vorname='$row->chvorname',";
-		if ($row->gebdatum!=$row->dagebdat)
+		if ($row->gebdatum!=$row->dagebdat && $row->dagebdat!='' && $row->dagebdat!=NULL)
 			$sql.=" gebdatum='$row->dagebdat',";
-		if ($row->gebort!=$row->chgebort)
+		if ($row->gebort!=$row->chgebort && $row->chgebort!='' && $row->chgebort!=NULL)
 			$sql.=" gebort='$row->chgebort',";
-		if ($row->anmerkung!=$row->mebemerkung)
+		if ($row->anmerkung!=$row->mebemerkung && $row->mebemerkung!='' && $row->mebemerkung!=NULL)
 			$sql.=" anmerkung='$row->mebemerkung',";
-		if ($row->homepage!=$row->chhomepage)
+		if ($row->homepage!=$row->chhomepage && $row->chhomepage!='' && $row->chhomepage!=NULL)
 			$sql.=" homepage='$row->chhomepage',";
-		if ($row->svnr!=$row->chsvnr)
+		if ($row->svnr!=$row->chsvnr && $row->chsvnr!='' && $row->chsvnr!=NULL)
 			$sql.=" svnr=".myaddslashes($row->chsvnr).",";
-		if ($row->ersatzkennzeichen!=$row->chersatzkz)
+		if ($row->ersatzkennzeichen!=$row->chersatzkz && $row->chersatzkz!='' && $row->chersatzkz!=NULL)
 			$sql.=" ersatzkennzeichen='$row->chersatzkz',";
-		if ($row->familienstand!=$row->_cxfamilienstand)
+		if ($row->familienstand!=$row->_cxfamilienstand && $row->_cxfamilienstand!='' && $row->_cxfamilienstand!=NULL)
 			$sql.=" familienstand='$row->_cxfamilienstand',";
 		//if ($row->geschlecht!=$row->_cxgeschlecht)
 		//	$sql.=" geschlecht='$row->_cxgeschlecht',";
-		if ($row->anzahlkinder!=$row->inkinder)
+		if ($row->anzahlkinder!=$row->inkinder && $row->inkinder!='' && $row->inkinder!=NULL)
 			$sql.=" anzahlkinder='$row->inkinder',";
-		if ($row->bundesland_code!=$row->_cxbundesland)
+		if ($row->bundesland_code!=$row->_cxbundesland && $row->_cxbundesland!='' && $row->_cxbundesland!=NULL)
 		$sql.=" bundesland_code=".myaddslashes($row->_cxbundesland).",";
 		$sql=substr($sql,0,-1);
-		$sql.=' WHERE person_id='.$row->person_id.';';
-		//echo $sql;
-		if (!pg_query($conn, $sql))
-			$log_updates.= "\n".$sql."\n<strong>".pg_last_error($conn)." </strong>\n";
-		else
+		if($sql!='')
 		{
-			$log_updates.= "\n".$sql;
-			$updates++;
+			$sql="UPDATE public.tbl_person SET ".$sql." WHERE person_id=".$row->person_id.";";
+			//echo $sql;
+			if (!pg_query($conn, $sql))
+				$log_updates.= "\n".$sql."\n<strong>".pg_last_error($conn)." </strong>\n";
+			else
+			{
+				$log_updates.= "\n".$sql;
+				$updates++;
+			}
 		}
 	}
 }
