@@ -161,21 +161,21 @@
 			$save_error=false;
 			$save_log_error=false;
 			//Deutsch
-			$lv_obj_sav->lehrziele=str_replace("\r\n", "<br>", $lehrziele_de);
-			$lv_obj_sav->lehrinhalte=str_replace("\r\n", "<br>", $lehrinhalte_de);
-			$lv_obj_sav->voraussetzungen=str_replace("\r\n", "<br>", $voraussetzungen_de);
-			$lv_obj_sav->unterlagen=str_replace("\r\n", "<br>", $unterlagen_de);
-			$lv_obj_sav->pruefungsordnung=str_replace("\r\n", "<br>", $pruefungsordnung_de);
-			$lv_obj_sav->anmerkungen=str_replace("\r\n", "<br>", $anmerkungen_de);
-			$lv_obj_sav->kurzbeschreibung=str_replace("\r\n", "<br>", $kurzbeschreibung_de);
+			$lv_obj_sav->lehrziele=str_replace("", "<br>", str_replace("\r\n", "<br>", $lehrziele_de));
+			$lv_obj_sav->lehrinhalte=str_replace("", "<br>",str_replace("\r\n", "<br>", $lehrinhalte_de));
+			$lv_obj_sav->voraussetzungen=str_replace("", "<br>",str_replace("\r\n", "<br>", $voraussetzungen_de));
+			$lv_obj_sav->unterlagen=str_replace("", "<br>",str_replace("\r\n", "<br>", $unterlagen_de));
+			$lv_obj_sav->pruefungsordnung=str_replace("", "<br>",str_replace("\r\n", "<br>", $pruefungsordnung_de));
+			$lv_obj_sav->anmerkungen=str_replace("", "<br>",str_replace("\r\n", "<br>", $anmerkungen_de));
+			$lv_obj_sav->kurzbeschreibung=str_replace("", "<br>",str_replace("\r\n", "<br>", $kurzbeschreibung_de));
 			$lv_obj_sav->genehmigt = ($freig_de?true:false);
 			$lv_obj_sav->updateamum=date('Y-m-d H:i:s');
 			$lv_obj_sav->updatevon=$user;
 			$lv_obj_sav->aktiv=true;
 			$lv_obj_sav->sprache=ATTR_SPRACHE_DE;
 			$lv_obj_sav->lehrveranstaltung_id=$lv;
-			$lv_obj_sav->methodik = str_replace("\r\n", "<br>", $methodik_de);
-			$lv_obj_sav->titel = str_replace("\r\n", "<br>", $titel_de);
+			$lv_obj_sav->methodik = str_replace("", "<br>",str_replace("\r\n", "<br>", $methodik_de));
+			$lv_obj_sav->titel = str_replace("", "<br>",str_replace("\r\n", "<br>", $titel_de));
 
 			$lv_obj1 = new lvinfo($conn);
 			$vorhanden=$lv_obj1->exists($lv, ATTR_SPRACHE_DE);
@@ -192,21 +192,21 @@
 					$save_log_error=true;
 
 			//Englisch
-			$lv_obj_sav->lehrziele=str_replace("\r\n", "<br>", $lehrziele_en);
-			$lv_obj_sav->lehrinhalte=str_replace("\r\n", "<br>", $lehrinhalte_en);
-			$lv_obj_sav->voraussetzungen=str_replace("\r\n", "<br>", $voraussetzungen_en);
-			$lv_obj_sav->unterlagen=str_replace("\r\n", "<br>", $unterlagen_en);
-			$lv_obj_sav->pruefungsordnung=str_replace("\r\n", "<br>", $pruefungsordnung_en);
-			$lv_obj_sav->anmerkungen=str_replace("\r\n", "<br>", $anmerkungen_en);
-			$lv_obj_sav->kurzbeschreibung=str_replace("\r\n", "<br>", $kurzbeschreibung_en);
+			$lv_obj_sav->lehrziele=str_replace("", "<br>",str_replace("\r\n", "<br>", $lehrziele_en));
+			$lv_obj_sav->lehrinhalte=str_replace("", "<br>",str_replace("\r\n", "<br>", $lehrinhalte_en));
+			$lv_obj_sav->voraussetzungen=str_replace("", "<br>",str_replace("\r\n", "<br>", $voraussetzungen_en));
+			$lv_obj_sav->unterlagen=str_replace("", "<br>",str_replace("\r\n", "<br>", $unterlagen_en));
+			$lv_obj_sav->pruefungsordnung=str_replace("", "<br>",str_replace("\r\n", "<br>", $pruefungsordnung_en));
+			$lv_obj_sav->anmerkungen=str_replace("", "<br>",str_replace("\r\n", "<br>", $anmerkungen_en));
+			$lv_obj_sav->kurzbeschreibung=str_replace("", "<br>",str_replace("\r\n", "<br>", $kurzbeschreibung_en));
 			$lv_obj_sav->genehmigt = ($freig_en?true:false);
 			$lv_obj_sav->aktiv=true;
 			$lv_obj_sav->updateamum=date('Y-m-d H:i:s');
 			$lv_obj_sav->updatevon=$user;
 			$lv_obj_sav->sprache=ATTR_SPRACHE_EN;
 			$lv_obj_sav->lehrveranstaltung_id=$lv;
-			$lv_obj_sav->methodik = str_replace("\r\n", "<br>", $methodik_en);
-			$lv_obj_sav->titel = str_replace("\r\n", "<br>", $titel_en);
+			$lv_obj_sav->methodik = str_replace("", "<br>",str_replace("\r\n", "<br>", $methodik_en));
+			$lv_obj_sav->titel = str_replace("", "<br>",str_replace("\r\n", "<br>", $titel_en));
 
 			$lv_obj1 = new lvinfo($conn);
 			$vorhanden = $lv_obj1->exists($lv, ATTR_SPRACHE_EN);
