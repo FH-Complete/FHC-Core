@@ -169,17 +169,16 @@ if($result = pg_query($conn, $qry))
 		// Check auf Doppelgaenger
 		if ($row->chsvnr!='' || $row->dagebdat!='' )
 		{
+			pg_query($conn, "BEGIN");
 			$sql="SELECT * FROM public.tbl_person
-				WHERE
-					(svnr=".myaddslashes($row->chsvnr)." AND svnr!='' AND svnr IS NOT NULL)
-					OR (ersatzkennzeichen=".myaddslashes($row->chersatzkz)." AND ersatzkennzeichen!='' AND ersatzkennzeichen IS NOT NULL)
-					OR (nachname=".myaddslashes($row->chnachname)." AND ".myaddslashes($row->chnachname)."!='' AND vorname=".myaddslashes($row->chvorname)."AND ".myaddslashes($row->chvorname)."!='' AND gebdatum=".myaddslashes($row->dagebdat)." AND gebdatum IS NOT NULL)";
+				WHERE (svnr=".myaddslashes($row->chsvnr)." AND svnr!='' AND svnr IS NOT NULL)
+				OR (ersatzkennzeichen=".myaddslashes($row->chersatzkz)." AND ersatzkennzeichen!='' AND ersatzkennzeichen IS NOT NULL)
+				OR (nachname=".myaddslashes($row->chnachname)." AND ".myaddslashes($row->chnachname)."!='' AND vorname=".myaddslashes($row->chvorname)."AND ".myaddslashes($row->chvorname)."!='' AND gebdatum=".myaddslashes($row->dagebdat)." AND gebdatum IS NOT NULL)";
 			if($result_dubel = pg_query($conn, $sql))
 			{
 				if (pg_num_rows($result_dubel)==0)
 				{
 					//Neue Person anlegen
-					pg_query($conn, "BEGIN");
 					$sql="INSERT INTO public.tbl_person
 							(staatsbuergerschaft,geburtsnation,sprache,anrede,titelpost,titelpre,nachname,vorname,
 							vornamen,gebdatum,gebort,gebzeit,foto,anmerkung,homepage,svnr,ersatzkennzeichen,
@@ -256,7 +255,29 @@ if($result = pg_query($conn, $qry))
 				}
 				else
 				{
-					$dublette++;
+					if($row_dubel=pg_fetch_object($result_dubel))
+					{
+						$dublette++;
+						//Eintrag Synctabelle
+						$qryz="SELECT * FROM sync.tbl_syncperson WHERE __person='$row->__person' AND person_id='$row_dubel->person_id'";
+						if($resultz = pg_query($conn, $qryz))
+						{
+							if(pg_num_rows($resultz)==0) //wenn dieser eintrag noch nicht vorhanden ist
+							{
+								$qry='INSERT INTO sync.tbl_syncperson (__person, person_id)'.
+									'VALUES ('.$row->__person.', '.$row_dubel->person_id.');';
+								$resulti = pg_query($conn, $qry);
+							}
+							$ausgabe.="\n------------------\nÜbertragen: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
+							$eingefuegt++;
+							pg_query($conn, "COMMIT");
+						}
+						else
+						{
+							$error_log.= "\n".$sql."\n<strong>".pg_last_error($conn)." </strong>\n";
+							pg_query($conn, "ROLLBACK");
+						}
+					}
 				}
 			}
 			else
@@ -363,7 +384,7 @@ mail($adress, 'SYNC-Fehler StP-Person von '.$_SERVER['HTTP_HOST'], $error_log,"F
 
 mail($adress, 'SYNC StP-Person  von '.$_SERVER['HTTP_HOST'], "Sync Person\n------------\n\n"
 ."Personen: Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Updates: ".$updates." / Fehler: ".$fehler." / Doppelt: ".$dublette
-."\n\nBeginn: ".$start."\nEnde:    ".date("d.m.Y H:i:s")."\n\n".$ausgabe.$log_updates, "From: nsc@fhstp.ac.at");
+."\n\nBeginn: ".$start."\nEnde:   ".date("d.m.Y H:i:s")."\n\n".$ausgabe.$log_updates, "From: nsc@fhstp.ac.at");
 
 
 ?>
