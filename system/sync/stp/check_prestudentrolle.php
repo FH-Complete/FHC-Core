@@ -142,6 +142,8 @@ if($resultall = pg_query($conn,$qry))
 						}
 					}
 				}
+				//Interessent (6Mon.) und Bewerber (4Mon.) eintragen
+				
 			}
 		}
 		else 
