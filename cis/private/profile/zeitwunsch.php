@@ -124,6 +124,23 @@ function berechnen()
 {
 	document.getElementById('summe').value = parseInt(document.getElementById('resturlaubstage').value)+parseInt(document.getElementById('anspruch').value);
 }
+
+function checkdatum()
+{
+	if(document.getElementById('vondatum').value.length<10)
+	{
+		alert('Von-Datum ist ungültig. Bitte beachten Sie das führende nullen angegeben werden müssen (Beispiel: 01.01.2008)');
+		return false;
+	}
+	
+	if(document.getElementById('bisdatum').value.length<10)
+	{
+		alert('Bis-Datum ist ungültig. Bitte beachten Sie das führende nullen angegeben werden müssen (Beispiel: 01.01.2008)');
+		return false;
+	}
+	
+	return true;
+}
 </script>
 </head>
 
@@ -320,7 +337,7 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 }
 //formular zum editieren und neu anlegen der zeitsperren
 $content_form='';
-$content_form.= '<form method="POST" action="'.$action.'">';
+$content_form.= '<form method="POST" action="'.$action.'" onsubmit="return checkdatum()">';
 $content_form.= "<table>\n";
 $content_form.= '<tr><td>Grund</td><td><SELECT name="zeitsperretyp_kurzbz">';
 //dropdown fuer zeitsperretyp
@@ -337,7 +354,7 @@ if($result = pg_query($conn, $qry))
 }
 $content_form.= '</SELECT>';
 $content_form.= '<tr><td>Bezeichnung</td><td><input type="text" name="bezeichnung" maxlength="32" value="'.$zeitsperre->bezeichnung.'"></td></tr>';
-$content_form.= '<tr><td>von</td><td><input type="text" size="10" maxlength="10" name="vondatum" value="'.($zeitsperre->vondatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->vondatum)):date('d.m.Y')).'"> ';
+$content_form.= '<tr><td>von</td><td><input type="text" size="10" maxlength="10" name="vondatum" id="vondatum" value="'.($zeitsperre->vondatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->vondatum)):date('d.m.Y')).'"> ';
 //dropdown fuer vonstunde
 $content_form.= "Stunde (inklusive)";
 
@@ -359,7 +376,7 @@ for($i=0;$i<$num_rows_stunde;$i++)
 
 $content_form.= "</SELECT></td></tr>";
 
-$content_form.= '<tr><td>bis</td><td><input type="text" size="10" maxlength="10" name="bisdatum" value="'.($zeitsperre->bisdatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->bisdatum)):date('d.m.Y')).'"> ';
+$content_form.= '<tr><td>bis</td><td><input type="text" size="10" maxlength="10" name="bisdatum" id="bisdatum" value="'.($zeitsperre->bisdatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->bisdatum)):date('d.m.Y')).'"> ';
 //dropdown fuer bisstunde
 $content_form.= "Stunde (inklusive)";
 $content_form.= "<SELECT name='bisstunde'>\n";

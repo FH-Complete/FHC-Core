@@ -162,15 +162,13 @@
 					{
 
 						echo '<tr>';
-						echo '	<td class="ContentHeader"><font class="ContentHeader"><strong>&nbsp;'.$row->betreff.'</font></td>';
-						echo '	<td class="ContentHeader" width="30%"><font class="ContentHeader">'.$row_pers->vorname.' '.$row_pers->nachname.'</font></td>';
-						echo '	<td class="ContentHeader" width="20%"><font class="ContentHeader">'.$row->datum.'</font></td>';
-						echo '	<td class="ContentHeader" width="20%"><font class="ContentHeader">&nbsp;</font></td>';
-						echo '  <td class="ContentHeader" align="right"><font class="ContentHeader">&nbsp;</font></td>';
+						echo '	<td class="ContentHeader" width="90%"><font class="ContentHeader"><strong>&nbsp;'.$row->betreff.'</font></td>';
+						//echo '	<td class="ContentHeader" width="30%"><font class="ContentHeader">&nbsp;</font></td>'; //'.$row_pers->vorname.' '.$row_pers->nachname.'
+						echo '  <td class="ContentHeader" align="right"><font class="ContentHeader">'.$row->datum.'</font></td>';
 
 						echo '</tr>';
 						echo '<tr>';
-						echo '	<td class="MarkLine" colspan=5>'.nl2br($row->text).'</td>';
+						echo '	<td class="MarkLine" colspan=2>'.nl2br($row->text).'</td>';
 						//echo '	<td class="MarkLine">&nbsp;</td>';
 						//echo '	<td class="MarkLine" colspan=2>&nbsp;</td>';
 						//echo '	<td class="MarkLine">&nbsp;</td>';
