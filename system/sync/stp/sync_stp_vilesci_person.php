@@ -346,7 +346,7 @@ if($result = pg_query($conn, $qry))
 		if ($row->anzahlkinder!=$row->inkinder)
 			$sql.=" anzahlkinder='$row->inkinder',";
 		if ($row->bundesland_code!=$row->_cxbundesland)
-		$sql.=" bundesland_code='$row->_cxbundesland',";
+		$sql.=" bundesland_code=".myaddslashes($row->_cxbundesland).",";
 		$sql=substr($sql,0,-1);
 		$sql.=' WHERE person_id='.$row->person_id.';';
 		//echo $sql;
