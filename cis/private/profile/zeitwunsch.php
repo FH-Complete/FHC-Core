@@ -446,8 +446,10 @@ if(isset($_GET['type']) && $_GET['type']=='save_resturlaub')
 	$resturlaub->mitarbeiter_uid = $uid;
 	$resturlaub->updateamum = date('Y-m-d H:i:s');
 	$resturlaub->updatevon = $uid;
-	$resturlaub->resturlaubstage = $_POST['resturlaubstage'];
-	$resturlaub->urlaubstageprojahr = $_POST['anspruch'];
+	if(isset($_POST['resturlaubstage']))
+		$resturlaub->resturlaubstage = $_POST['resturlaubstage'];
+	if(isset($_POST['anspruch']))
+		$resturlaub->urlaubstageprojahr = $_POST['anspruch'];
 	$resturlaub->mehrarbeitsstunden = $_POST['mehrarbeitsstunden'];
 
 	if($resturlaub->save())
@@ -459,9 +461,9 @@ if(isset($_GET['type']) && $_GET['type']=='save_resturlaub')
 		$content_resturlaub .= "<b>Fehler beim Speichern der Daten: $resturlaub->errormsg</b>";
 	}
 
-	$resturlaubstage = htmlspecialchars($_POST['resturlaubstage'],ENT_QUOTES);
-	$mehrarbeitsstunden = htmlspecialchars($_POST['mehrarbeitsstunden'],ENT_QUOTES);
-	$anspruch = htmlspecialchars($_POST['anspruch'],ENT_QUOTES);
+	$resturlaubstage = htmlspecialchars($resturlaub->resturlaubstage,ENT_QUOTES);
+	$mehrarbeitsstunden = htmlspecialchars($resturlaub->mehrarbeitsstunden,ENT_QUOTES);
+	$anspruch = htmlspecialchars($resturlaub->urlaubstageprojahr,ENT_QUOTES);
 }
 else
 {
