@@ -336,7 +336,7 @@ if($result = pg_query($conn, $qry))
 		if ($row->homepage!=$row->chhomepage)
 			$sql.=" homepage='$row->chhomepage',";
 		if ($row->svnr!=$row->chsvnr)
-			$sql.=" svnr='$row->chsvnr',";
+			$sql.=" svnr=".myaddslashes($row->chsvnr).",";
 		if ($row->ersatzkennzeichen!=$row->chersatzkz)
 			$sql.=" ersatzkennzeichen='$row->chersatzkz',";
 		if ($row->familienstand!=$row->_cxfamilienstand)
