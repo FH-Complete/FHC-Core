@@ -2,7 +2,7 @@
 // ***************************************************************
 // * Script zum Zusammenlegen Doppelter Studenten
 // * Es werden zwei Listen mit Studenten angezeigt
-// * Links wird der Student markiert, der mit dem 
+// * Links wird der Student markiert, der mit dem
 // * rechts markierten zusammengelegt werden soll.
 // * Der linke Student wird danach entfernt.
 // ***************************************************************
@@ -47,7 +47,7 @@ if (isset($_GET['order_1']) || isset($_POST['order_1']))
 {
 	$order_1=(isset($_GET['order_1'])?$_GET['order_1']:$_POST['order_1']);
 }
-else 
+else
 {
 	$order_1='person_id';
 }
@@ -55,7 +55,7 @@ if (isset($_GET['order_2']) || isset($_POST['order_2']))
 {
 	$order_2=(isset($_GET['order_2'])?$_GET['order_2']:$_POST['order_2']);
 }
-else 
+else
 {
 	$order_2='person_id';
 }
@@ -63,7 +63,7 @@ if (isset($_GET['radio_1']) || isset($_POST['radio_1']))
 {
 	$radio_1=(isset($_GET['radio_1'])?$_GET['radio_1']:$_POST['radio_1']);
 }
-else 
+else
 {
 	$radio_1=-1;
 }
@@ -71,11 +71,11 @@ if (isset($_GET['radio_2']) || isset($_POST['radio_2']))
 {
 	$radio_2=(isset($_GET['radio_2'])?$_GET['radio_2']:$_POST['radio_2']);
 }
-else 
+else
 {
 	$radio_2=-1;
 }
-	
+
 function kuerze($string)
 {
 	if(strlen($string)>40)
@@ -96,11 +96,12 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 	}
 	else
 	{
+		$msg='';
 		$sql_query_upd1="BEGIN;";
 		$sql_query_upd1.="UPDATE public.tbl_benutzer SET person_id='$radio_2' WHERE person_id='$radio_1';";
 		$sql_query_upd1.="UPDATE public.tbl_konto SET person_id='$radio_2' WHERE person_id='$radio_1';";
 		$sql_query_upd1.="UPDATE public.tbl_prestudent SET person_id='$radio_2' WHERE person_id='$radio_1';";
-		$sql_query_upd1.="UPDATE sync.tbl_syncperson SET person_portal='$radio_2' WHERE person_portal='$radio_1';";
+		//$sql_query_upd1.="UPDATE sync.tbl_syncperson SET person_portal='$radio_2' WHERE person_portal='$radio_1';";
 		$sql_query_upd1.="UPDATE lehre.tbl_abschlusspruefung SET pruefer1='$radio_2' WHERE pruefer1='$radio_1';";
 		$sql_query_upd1.="UPDATE lehre.tbl_abschlusspruefung SET pruefer2='$radio_2' WHERE pruefer2='$radio_1';";
 		$sql_query_upd1.="UPDATE lehre.tbl_abschlusspruefung SET pruefer3='$radio_2' WHERE pruefer3='$radio_1';";
@@ -110,24 +111,37 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 		$sql_query_upd1.="UPDATE public.tbl_bankverbindung SET person_id='$radio_2' WHERE person_id='$radio_1';";
 		$sql_query_upd1.="UPDATE public.tbl_kontakt SET person_id='$radio_2' WHERE person_id='$radio_1';";
 		$sql_query_upd1.="UPDATE public.tbl_betriebsmittelperson SET person_id='$radio_2' WHERE person_id='$radio_1';";
-		
+
 		$sql_query_upd1.="DELETE FROM public.tbl_person WHERE person_id='$radio_1';";
-		
-		$radio_1=0;
-		$radio_2=0;
+
 		if(pg_query($conn,$sql_query_upd1))
 		{
 			$msg = "Daten erfolgreich gespeichert<br>";
 			pg_query($conn,"COMMIT;");
 			$msg .= "<br>".str_replace(';',';<br>',$sql_query_upd1)."COMMIT";
 		}
-		else 
+		else
 		{
 			$msg = "Die Änderung konnte nicht durchgeführt werden!";
 			pg_query($conn,"ROLLBACK;");
-			$msg .= "<br>".str_replace(';',';<br><b>',$sql_query_upd1)."ROLLBACK</b>";
+			$msg.= "<br>".str_replace(';',';<br><b>',$sql_query_upd1)."ROLLBACK</b>";
 		}
-
+		if(@pg_query($conn,'SELECT person_portal FROM sync.tbl_syncperson LIMIT 1'))
+		{
+			$msg.= "Sync-Tabelle wird aktualisiert<br>";
+			$sql_query_upd1="UPDATE sync.tbl_syncperson SET person_portal='$radio_2' WHERE person_portal='$radio_1';";
+			pg_query($conn,$sql_query_upd1);
+			$msg.= "<br>".str_replace(';',';<br>',$sql_query_upd1)."COMMIT";
+		}
+		if(@pg_query($conn,'SELECT person_id FROM sync.tbl_syncperson LIMIT 1'))
+		{
+			$msg.= "Sync-Tabelle wird aktualisiert<br>";
+			$sql_query_upd1="UPDATE sync.tbl_syncperson SET person_id='$radio_2' WHERE person_id='$radio_1';";
+			pg_query($conn,$sql_query_upd1);
+			$msg.= "<br>".str_replace(';',';<br>',$sql_query_upd1)."COMMIT";
+		}
+		$radio_1=0;
+		$radio_2=0;
 	}
 }
 if((isset($radio_1) && !isset($radio_2))||(!isset($radio_1) && isset($radio_2)) || ($radio_1<0 || $radio_2<0))
@@ -169,7 +183,7 @@ echo "</table></form>";
 	echo "<form name='form_table' action='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=$order_2&nn=$nn&vn=$vn' method='POST'>";
 	echo "<table width='100%' border='0' cellspacing='0' cellpadding='0'>";
 	echo "<tr>";
-	
+
 	echo "<td valign='top'>Der wird gelöscht:";
 
 	 //Tabelle 1
@@ -230,7 +244,7 @@ echo "</table></form>";
 	 	echo "<td>$l->gebdatum</td>";
 	 	echo "<td>$l->svnr</td>";
 	 	echo "<td>$l->ersatzkennzeichen</td>";
-	 	echo "<td>$l->ext_id</td>";	 	
+	 	echo "<td>$l->ext_id</td>";
 	 	echo "</tr>";
 	 	$i++;
 	 }
