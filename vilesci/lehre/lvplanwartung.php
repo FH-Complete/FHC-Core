@@ -103,7 +103,7 @@ if (isset($_GET['insert']))
 		}
 	}
 
-$where=" studiensemester_kurzbz='WS2007'";
+$where=" studiensemester_kurzbz='SS2008'";
 if ($semester>0)
 	$where.=" AND semester=$semester";
 if ($stg_kz>0)
