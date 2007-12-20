@@ -246,9 +246,9 @@
 					$updtext.="	Semester wurde von $lv_obj->semester auf $row_ext->inSemester geaendert\n";
 				if($lv_obj->sprache!='German')
 					$updtext.="	Sprache wurde von $lv_obj->sprache auf German geaendert\n";
-				if($lv_obj->ects!=round($row_ext->ECTS,2))
+				if($lv_obj->ects!=round($row_ext->ECTS,2) && $row_ext->ECTS!='' && $row_ext->ECTS!='0')
 					$updtext.="	ECTS wurde von $lv_obj->ects auf ".round($row_ext->ECTS,2)." geaendert\n";
-				if($lv_obj->semesterstunden!=((int)$row_ext->inSWS*ANZAHL_SEMESTERWOCHEN))
+				if($lv_obj->semesterstunden!=((int)$row_ext->inSWS*ANZAHL_SEMESTERWOCHEN) && $row_ext->inSWS!='' && $row_ext->inSWS!='0')
 					$updtext.="	Semesterstunden wurde von $lv_obj->semesterstunden auf ".($row_ext->inSWS*ANZAHL_SEMESTERWOCHEN)." geaendert\n";
 				if($lv_obj->anmerkung!=$row_ext->chLVNr_old)
 					$updtext.="	Anmerkung wurde von $lv_obj->anmerkung auf $row_ext->chLVNr_old geaendert\n";
@@ -282,8 +282,10 @@
 			$lv_obj->studiengang_kz = $stg_arr[$row_ext->_Studiengang];
 			$lv_obj->semester = $row_ext->inSemester;
 			$lv_obj->sprache = 'German';
-			$lv_obj->ects = $row_ext->ECTS;
-			$lv_obj->semesterstunden = (int) $row_ext->inSWS*ANZAHL_SEMESTERWOCHEN;
+			if($row_ext->ECTS!='0' && $row_ext->ECTS!='')
+				$lv_obj->ects = $row_ext->ECTS;
+			if($row_ext->inSWS!='' && $row_ext->inSWS!='0')
+				$lv_obj->semesterstunden = (int) $row_ext->inSWS*ANZAHL_SEMESTERWOCHEN;
 			$lv_obj->anmerkung = $row_ext->chLVNr_old;
 			$lv_obj->lehre = true;
 			$lv_obj->lehreverzeichnis = strtolower(cleankurzbz($row_ext->chLVNr));
