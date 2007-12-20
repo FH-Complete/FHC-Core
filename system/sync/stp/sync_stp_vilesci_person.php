@@ -302,10 +302,10 @@ $qry='SELECT __Person,_Staatsbuerger,_GebLand,Briefanrede,chTitel,chNachname,chV
 			gebdatum,gebort,anmerkung,homepage,svnr,ersatzkennzeichen,familienstand,geschlecht,anzahlkinder,
 			aktiv,bundesland_code
 		FROM sync.stp_person JOIN sync.tbl_syncperson USING (__Person) JOIN public.tbl_person USING (person_id)
-		WHERE chNachname!=nachname OR anrede!=Briefanrede OR titelpre!=chTitel OR vorname!=chVorname 
-			OR gebdatum!=daGebDat OR gebort!=chGebOrt OR anmerkung!=meBemerkung OR homepage!=chHomepage 
-			OR svnr!=chSVNr OR ersatzkennzeichen!=chErsatzKZ OR familienstand!=_cxFamilienstand OR anzahlkinder!=inKinder 
-			OR bundesland_code!=_cxBundesland;'; // OR geschlecht!=_cxGeschlecht
+		WHERE chNachname!=nachname OR anrede!=Briefanrede OR titelpre!=chTitel OR vorname!=chVorname
+			OR gebdatum!=daGebDat OR gebort!=chGebOrt OR anmerkung!=meBemerkung OR homepage!=chHomepage
+			OR svnr!=chSVNr OR ersatzkennzeichen!=chErsatzKZ OR familienstand!=_cxFamilienstand OR anzahlkinder!=inKinder
+			OR bundesland_code!=_cxBundesland;' ORDER BY nachname,vorname; // OR geschlecht!=_cxGeschlecht
 
 $error_log_ext="Updates holen:\n\n";
 $start=date("d.m.Y H:i:s");
@@ -358,7 +358,7 @@ if($result = pg_query($conn, $qry))
 				$log_updates.= "\n".$sql."\n<strong>".pg_last_error($conn)." </strong>\n";
 			else
 			{
-				$log_updates.= "\n".$sql;
+				$log_updates.= "\n".$row->nachname.' '.$row->vorname.' - '.$sql;
 				$updates++;
 			}
 		}
