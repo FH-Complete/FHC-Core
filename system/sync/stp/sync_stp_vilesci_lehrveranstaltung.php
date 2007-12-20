@@ -209,6 +209,7 @@
 			if($lehrveranstaltung_id=='')
 			{
 				$lv_obj->new = true;
+				$lv_obj->aktiv = true;
 				$lv_obj->insertamum = date('Y-m-d H:i:s');
 				$lv_obj->insertvon = 'sync';
 			}
@@ -256,8 +257,8 @@
 					$updtext.="	lehre wurde von $lv_obj->lehre auf true geaendert\n";
 				if($lv_obj->lehreverzeichnis != strtolower(cleankurzbz($row_ext->chLVNr)))
 					$updtext.="	Lehreverzeichnis wurde von $lv_obj->lehreverzeichnis auf ".strtolower(cleankurzbz($row_ext->chLVNr))." geaendert\n";
-				if($lv_obj->aktiv != true)
-					$updtext.="	aktiv wurde von $lv_obj->aktiv auf true geaendert\n";
+				//if($lv_obj->aktiv != true)
+				//	$updtext.="	aktiv wurde von $lv_obj->aktiv auf true geaendert\n";
 				if($lv_obj->planfaktor != '')
 					$updtext.="	planfaktor wurde von $lv_obj->planfaktor auf '' geaendert\n";
 				if($lv_obj->planlektoren != '')
