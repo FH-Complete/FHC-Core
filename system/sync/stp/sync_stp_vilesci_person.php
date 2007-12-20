@@ -305,7 +305,7 @@ $qry='SELECT __Person,_Staatsbuerger,_GebLand,Briefanrede,chTitel,chNachname,chV
 		WHERE chNachname!=nachname OR anrede!=Briefanrede OR titelpre!=chTitel OR vorname!=chVorname
 			OR gebdatum!=daGebDat OR gebort!=chGebOrt OR anmerkung!=meBemerkung OR homepage!=chHomepage
 			OR svnr!=chSVNr OR ersatzkennzeichen!=chErsatzKZ OR familienstand!=_cxFamilienstand OR anzahlkinder!=inKinder
-			OR bundesland_code!=_cxBundesland;' ORDER BY nachname,vorname; // OR geschlecht!=_cxGeschlecht
+			OR bundesland_code!=_cxBundesland ORDER BY nachname,vorname;'; // OR geschlecht!=_cxGeschlecht
 
 $error_log_ext="Updates holen:\n\n";
 $start=date("d.m.Y H:i:s");
