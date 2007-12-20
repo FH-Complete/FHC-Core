@@ -4,12 +4,12 @@
 // StPoelten -> VILESCI
 // setzt vorraus: - tbl_sprache
 //                - tbl_studiengang
-// 
+//
 // Beschreibung:
 // Das Semester der Lehrveranstaltungen wird ueber die Tabelle
 // Studienplaneintrag ermittelt. Bei Lehrveranstaltungen die nicht in der Tabelle
 // Studienplaneintrag vorkommen wird das Semester ueber die Tabelle SemesterplanEintrag
-// ermittelt. 
+// ermittelt.
 // LVs die weder in der Tabelle Studienplaneintrag noch in der Tabelle Semesterplaneintrag
 // vorhanden sind werden im 0ten Semester angelegt.
 // **************************************
@@ -17,7 +17,7 @@
 	require_once('../../../include/lehrveranstaltung.class.php');
 	require_once('../../../include/studiengang.class.php');
 	require_once('../../../include/lehrfach.class.php');
-	
+
 	//$adress='pam@technikum-wien.at';
 	//$adress_ext='oesi@technikum-wien.at';
 	//$adress='ruhan@technikum-wien.at';
@@ -29,7 +29,7 @@
 
 	if(!$conn = pg_pconnect(CONN_STRING))
 		die('Fehler beim Verbindungsaufbau!');
-	
+
 	echo '
 		<html>
 		<head>
@@ -37,7 +37,7 @@
 			<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 		</head>
 		<body>';
-	
+
 	echo 'Starte Lehrveranstaltungs Syncronisation '.date('H:i:s').'<br>';
 	flush();
 
@@ -79,12 +79,12 @@
 							"34"=>"BP",
 							"35"=>"WPF"
 						);
-	
+
 	$stg_arr = array();
 	$stg_obj = new studiengang($conn);
 	$stg_obj->getAll(null, false);
-	
-	foreach ($stg_obj->result as $stg) 
+
+	foreach ($stg_obj->result as $stg)
 		$stg_arr[$stg->ext_id] = $stg->studiengang_kz;
 
 	// ******** FUNKTIONEN ********** //
@@ -94,26 +94,26 @@
 		$kurzbz = str_replace('Ü', 'U', $kurzbz);
 		$kurzbz = str_replace('Ö', 'O', $kurzbz);
 		$kurzbz = str_replace('Ä', 'A', $kurzbz);
-		
+
 		return $kurzbz;
 	}
-	
+
 	function synctabentry_lv($semester, $lv, $lehrveranstaltung_id)
 	{
 		global $conn;
-		
+
 		$qry = "INSERT INTO sync.tbl_synclehrveranstaltung(lv, insemester, lehrveranstaltung_id) VALUES($lv, $semester, $lehrveranstaltung_id);";
 		pg_query($conn, $qry);
 	}
-	
+
 	function synctabentry_lf($semester, $lv, $lehrfach_id)
 	{
 		global $conn;
-		
+
 		$qry = "INSERT INTO sync.tbl_synclehrfach(lv, insemester, lehrfach_id) VALUES($lv, $semester, $lehrfach_id);";
 		pg_query($conn, $qry);
 	}
-	
+
 	if (!@pg_query($conn,'SELECT * FROM sync.tbl_synclehrveranstaltung LIMIT 1;'))
 	{
 		$sql='CREATE TABLE sync.tbl_synclehrveranstaltung (
@@ -130,7 +130,7 @@
 		else
 			$text.= "sync.tbl_synclehrveranstaltung wurde angelegt!\n";
 	}
-	
+
 	if (!@pg_query($conn,'SELECT * FROM sync.tbl_synclehrfach LIMIT 1;'))
 	{
 		$sql='CREATE TABLE sync.tbl_synclehrfach (
@@ -147,72 +147,72 @@
 		else
 			$text.= "sync.tbl_synclehrfach wurde angelegt!\n";
 	}
-	
+
 	// ******** SYNC START ********** //
-		
-	$qry = "SELECT 
+
+	$qry = "SELECT
 				_LV, SUBSTRING(chLVNr_new, 0, 200) as chLVNr, SUBSTRING(chLVNr, 0, 200) as chLVNr_old, SUBSTRING(chBezeichnung, 0, 200) as chBezeichnung, _Studiengang, SUBSTRING(meKommentar, 0, 200) as meKommentar, inSemester, inSWS, ECTS, _cxLVTyp
-			FROM 
+			FROM
 				lv JOIN studienplaneintrag ON(__LV=_LV)
 			UNION
 			SELECT
 				_LV, SUBSTRING(chLVNr_new, 0, 200) as chLVNr, SUBSTRING(chLVNr, 0, 200) as chLVNr_old, SUBSTRING(chBezeichnung, 0, 200) as chBezeichnung, _Studiengang, SUBSTRING(meKommentar, 0, 200) as meKommentar, inSemester, inSWS, ECTS, _cxLVTyp
-			FROM 
+			FROM
 				lv JOIN semesterplaneintrag on(__LV=_LV)
 			WHERE
 				(CAST(semesterplaneintrag._lv AS varchar(10))+' '+CAST(inSemester AS varchar(10))) not in(SELECT CAST(_lv AS varchar(10))+ ' ' + CAST(insemester AS varchar(10)) FROM studienplaneintrag)
 			UNION
 			SELECT
 				__LV as _LV, SUBSTRING(chLVNr_new, 0, 200) as chLVNr, SUBSTRING(chLVNr, 0, 200) as chLVNr_old, SUBSTRING(chBezeichnung, 0, 200) as chBezeichnung, _Studiengang, SUBSTRING(meKommentar, 0, 200) as meKommentar, 0 as inSemester, 0 as inSWS, 0 as ECTS, _cxLVTyp
-			FROM 
+			FROM
 				lv
 			WHERE
 				__LV not in(SELECT _lv FROM studienplaneintrag) AND
-				__LV not in(SELECT _lv FROM semesterplaneintrag)				
+				__LV not in(SELECT _lv FROM semesterplaneintrag)
 			";
-		
+
 	if($result_ext = mssql_query($qry, $conn_ext))
 	{
 		while($row_ext=mssql_fetch_object($result_ext))
 		{
 			$lvs_gesamt++;
 			//Lehrveranstaltung
-			
+
 			//Schauen ob dieser Eintrag schon vorhanden ist
 			$qry = "SELECT lehrveranstaltung_id FROM sync.tbl_synclehrveranstaltung WHERE lv='$row_ext->_LV' AND insemester='$row_ext->inSemester'";
-			
+
 			if($result = pg_query($conn, $qry))
 			{
 				if(pg_num_rows($result)>0)
 				{
 					if($row = pg_fetch_object($result))
 						$lehrveranstaltung_id=$row->lehrveranstaltung_id;
-					else 
+					else
 					{
 						$text.="Fehler beim Auslesen der Lehrveranstaltung_id fuer lv $row_ext->_LV insemester $row_ext->inSemester\n";
 						continue;
 					}
 				}
-				else 
+				else
 				{
 					$lehrveranstaltung_id='';
 				}
 			}
-			else 
+			else
 			{
 				$text.='Fehler beim Ermitteln der Lehrveranstaltung:'.pg_last_error($conn)."\n";
 				continue;
 			}
-			
+
 			$lv_obj = new lehrveranstaltung($conn);
-			
+
 			if($lehrveranstaltung_id=='')
 			{
 				$lv_obj->new = true;
 				$lv_obj->insertamum = date('Y-m-d H:i:s');
 				$lv_obj->insertvon = 'sync';
 			}
-			else 
+			else
 			{
 				if($lv_obj->load($lehrveranstaltung_id))
 				{
@@ -220,18 +220,18 @@
 					$lv_obj->updateamum = date('Y-m-d H:i:s');
 					$lv_obj->updatevon = 'sync';
 				}
-				else 
+				else
 				{
 					$text.="Fehler beim Laden einer gefundenen Lehrveranstaltung?!? Lehrveranstaltung_id:$lehrveranstaltung_id\n";
 				}
 			}
-			
+
 			if(!array_key_exists($row_ext->_cxLVTyp, $typ_lehrform_arr))
 			{
 				$text.="Es wurde keine passende Lehrform zur ID $row_ext->_cxLVTyp gefunden";
 				continue;
 			}
-			
+
 			$updtext = '';
 			if(!$lv_obj->new)
 			{
@@ -287,7 +287,7 @@
 			$lv_obj->anmerkung = $row_ext->chLVNr_old;
 			$lv_obj->lehre = true;
 			$lv_obj->lehreverzeichnis = strtolower(cleankurzbz($row_ext->chLVNr));
-			$lv_obj->aktiv = true;
+			//$lv_obj->aktiv = true;
 			$lv_obj->planfaktor = '';
 			$lv_obj->planlektoren = '';
 			$lv_obj->planpersonalkosten = '';
@@ -297,7 +297,7 @@
 			$lv_obj->koordinator = '';
 			$lv_obj->projektarbeit = false;
 			$lv_obj->lehrform_kurzbz = $typ_lehrform_arr[$row_ext->_cxLVTyp];
-			
+
 			if($updtext!='' || $lv_obj->new)
 			{
 				if($lv_obj->save())
@@ -308,59 +308,59 @@
 						synctabentry_lv($lv_obj->semester, $row_ext->_LV, $lv_obj->lehrveranstaltung_id);
 						$anz_insert++;
 					}
-					else 
+					else
 					{
 						$text.= "Lehrveranstaltung $lv_obj->bezeichnung/$lv_obj->semester wurde aktualisiert\n".$updtext;
 						$anz_update++;
 					}
 				}
-				else 
+				else
 				{
 					$text.= "Fehler beim Speichern von $lv_obj->bezeichnung/$lv_obj->semester/$lv_obj->lehrveranstaltung_id:".$lv_obj->errormsg.' '.pg_last_error($conn);
 					if($lv_obj->new)
 						$insert_error++;
-					else 
+					else
 						$update_error++;
 				}
 			}
-			
-			
+
+
 			// *********** Lehrfach **************
 			//Schauen ob dieser Eintrag schon vorhanden ist
 			$qry = "SELECT lehrfach_id FROM sync.tbl_synclehrfach WHERE lv='$row_ext->_LV' AND insemester='$row_ext->inSemester'";
-			
+
 			if($result = pg_query($conn, $qry))
 			{
 				if(pg_num_rows($result)>0)
 				{
 					if($row = pg_fetch_object($result))
 						$lehrfach_id=$row->lehrfach_id;
-					else 
+					else
 					{
 						$text.="Fehler beim Auslesen der Lehrfach_id bei lv $row_ext->_LV semester $row_ext->inSemester\n";
 						continue;
 					}
 				}
-				else 
+				else
 				{
 					$lehrfach_id='';
 				}
 			}
-			else 
+			else
 			{
 				$text.='Fehler beim Ermitteln der Lehrveranstaltung:'.pg_last_error($conn)."\n";
 				continue;
 			}
-			
+
 			$lf_obj = new lehrfach($conn);
-			
+
 			if($lehrfach_id=='')
 			{
 				$lf_obj->new = true;
 				$lf_obj->insertamum = date('Y-m-d H:i:s');
 				$lf_obj->insertvon = 'sync';
 			}
-			else 
+			else
 			{
 				if($lf_obj->load($lehrfach_id))
 				{
@@ -368,19 +368,19 @@
 					$lf_obj->updateamum = date('Y-m-d H:i:s');
 					$lf_obj->updatevon = 'sync';
 				}
-				else 
+				else
 				{
 					$text.="Fehler beim Laden eines gefundenen Lehrfaches?!? Lehrfach_id:$lehrfach_id\n";
 				}
 			}
-			
+
 			if(cleankurzbz($row_ext->chLVNr)=='')
 			{
 				$text.="Fehler bei $lf_obj->bezeichnung/$lf_obj->semester (id $row_ext->_LV): chLVNr_new darf nicht leer sein";
 				$anz_lf_insert++;
 				continue;
 			}
-			
+
 			$updtext = '';
 			if(!$lf_obj->new)
 			{
@@ -398,13 +398,13 @@
 				if($lf_obj->bezeichnung!=$row_ext->chBezeichnung)
 					$updtext.="	Bezeichnung wurde von $lf_obj->bezeichnung auf $row_ext->chBezeichnung geaendert\n";
 				if($lf_obj->farbe != '')
-					$updtext.="	farbe wurde von $lf_obj->farbe auf '' geaendert\n";				
+					$updtext.="	farbe wurde von $lf_obj->farbe auf '' geaendert\n";
 				if($lf_obj->aktiv != true)
 					$updtext.="	aktiv wurde von $lf_obj->aktiv auf true geaendert\n";
 				//if($lf_obj->ext_id != $row_ext->__StudienplanEintrag)
 				//	$updtext.=" ext_id wurde von $lf_obj->ext_id auf $row_ext->__StudienplanEintrag geaendert\n";
 			}
-			
+
 			$lf_obj->kurzbz = cleankurzbz($row_ext->chLVNr);
 			$lf_obj->bezeichnung = $row_ext->chBezeichnung;
 			$lf_obj->studiengang_kz = $stg_arr[$row_ext->_Studiengang];
@@ -414,7 +414,7 @@
 			$lf_obj->fachbereich_kurzbz = 'Dummy';
 			$lf_obj->farbe = '';
 			$lf_obj->ext_id = '';
-			
+
 			if($updtext!='' || $lf_obj->new)
 			{
 				if($lf_obj->save())
@@ -425,7 +425,7 @@
 						synctabentry_lf($lf_obj->semester, $row_ext->_LV, $lf_obj->lehrfach_id);
 						$anz_lf_insert++;
 					}
-					else 
+					else
 					{
 						$text.= "Lehrfach $lf_obj->bezeichnung/$lf_obj->semester wurde aktualisiert\n".$updtext;
 						$anz_lf_update++;
@@ -436,15 +436,15 @@
 					$text.= "Fehler beim Speichern von $lf_obj->bezeichnung/$lf_obj->semester/$lf_obj->lehrfach_id:".$lf_obj->errormsg.' '.pg_last_error($conn);
 					if($lf_obj->new)
 						$insert_lf_error++;
-					else 
+					else
 						$update_lf_error++;
 				}
 			}
 		}
 	}
-	else 
+	else
 		$text.= "Fehler beim Laden der Lehrveranstaltungen\n\n";
-	
+
 	$statistik .="LVs Import: $lvs_gesamt\n";
 	$statistik .="Neue LVs: $anz_insert\n";
 	$statistik .="Aktualisierte LVs: $anz_update\n";
@@ -454,16 +454,16 @@
 	$statistik .="Aktualisierte LF: $anz_lf_update\n";
 	$statistik .="Fehler beim Anlegen von LF: $insert_lf_error\n";
 	$statistik .="Fehler beim Aktualisieren von LF: $update_lf_error\n\n";
-	
+
 	$text = $statistik."\n\n".$text;
 	//$to = 'oesi@technikum-wien.at';
 	$to = $adress_ext;
-	
+
 	if(mail($to, 'SYNC Lehrveranstaltung',$head_text.$text, "From: nsc@fhstp.ac.at"))
 		echo "Mail wurde an $to versandt<br><br>";
-	else 
+	else
 		echo "Fehler beim Senden an $to<br><br>";
-	
+
 	echo nl2br($text);
 ?>
 </body>
