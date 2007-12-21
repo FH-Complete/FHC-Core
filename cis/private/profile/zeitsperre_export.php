@@ -80,8 +80,8 @@
 	$ss=new studiensemester($conn,$studiensemester);
 	if ($studiensemester==null)
 		$studiensemester=$ss->getAktTillNext();
-	$datum_beginn='2007-07-01';//$ss->start;
-	$datum_ende='2007-09-01';//$ss->ende;
+	$datum_beginn='2007-12-24';//$ss->start;
+	$datum_ende='2008-01-07';//$ss->ende;
 	$ts_beginn=$datum_obj->mktime_fromdate($datum_beginn);
 	$ts_ende=$datum_obj->mktime_fromdate($datum_ende);
 
