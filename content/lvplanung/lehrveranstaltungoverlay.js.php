@@ -356,6 +356,8 @@ function LeNeu()
 	document.getElementById('lehrveranstaltung-detail-checkbox-new').checked=true;
 	document.getElementById('lehrveranstaltung-detail-textbox-stundenblockung').value='2';
 	document.getElementById('lehrveranstaltung-detail-textbox-wochenrythmus').value='1';
+	if(lehrform_kurzbz=='')
+		lehrform_kurzbz='UE';
 	document.getElementById('lehrveranstaltung-detail-menulist-lehrform').value=lehrform_kurzbz;
 	
 	var stsem = getStudiensemester();
@@ -1367,7 +1369,7 @@ function LehrveranstaltungGesamtNotenTreeSelectDifferent()
 		for(var i=0;i<lvgesamtitems;i++)
 	   	{
 	   		//Daten aus LVGesamtNotenTree holen
-			col = lvgesamttree.columns ? lvgesamttree.columns["lehrveranstaltung-lvgesamtnoten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
+			col = lvgesamttree.columns ? lvgesamttree.columns["lehrveranstaltung-lvgesamtnoten-tree-student_uid"] : "lehrveranstaltung-lvgesamtnoten-tree-student_uid";
 			var lvgesamtuid=lvgesamttree.view.getCellText(i,col);
 			col = lvgesamttree.columns ? lvgesamttree.columns["lehrveranstaltung-lvgesamtnoten-tree-note"] : "lehrveranstaltung-lvgesamtnoten-tree-note";
 			var lvgesamtnote=lvgesamttree.view.getCellText(i,col);
@@ -1376,11 +1378,11 @@ function LehrveranstaltungGesamtNotenTreeSelectDifferent()
 			//Schauen ob die gleiche Zeile im Zeugnisnoten Tree vorkommt
 			for(var j=0;j<zeugnisitems;j++)
 			{
-				col = zeugnistree.columns ? zeugnistree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-lvgesamtnoten-tree-student_uid";
+				col = zeugnistree.columns ? zeugnistree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
 				var zeugnisuid=zeugnistree.view.getCellText(j,col);
 				col = zeugnistree.columns ? zeugnistree.columns["lehrveranstaltung-noten-tree-note"] : "lehrveranstaltung-noten-tree-note";
 				var zeugnisnote=zeugnistree.view.getCellText(j,col);
-				debug(zeugnisuid+'=='+lvgesamtuid+' && '+zeugnisnote+'=='+lvgesamtnote);
+				//debug(zeugnisuid+'=='+lvgesamtuid+' && '+zeugnisnote+'=='+lvgesamtnote);
 				if(zeugnisuid==lvgesamtuid && zeugnisnote==lvgesamtnote)
 				{
 					found=true;
@@ -1687,4 +1689,38 @@ function LehrveranstaltungNotenImport()
 		LehrveranstaltungNotenTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 	}
+}
+
+// ****
+// * Erstellt das Zertifikat fuer die Freifaecher
+// ****
+function LehrveranstaltungFFZertifikatPrint()
+{
+	tree = document.getElementById('lehrveranstaltung-noten-tree');
+	//Alle markierten Noten holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
+	var anzahl=0;
+	var lvid='';
+
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
+			uid = tree.view.getCellText(v,col);
+			paramList += ';'+uid;
+			anzahl = anzahl+1;
+			col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
+			lvid = tree.view.getCellText(v,col);
+		}
+	}
+	var ss = getStudiensemester();
+	
+	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat_freifach.rdf.php&xsl=zertifikat_freifach&uid='+paramList+'&ss='+ss+'&lvid='+lvid+'&'+gettimestamp();
+	window.location.href = url;
+	//prompt('test:',url);
 }

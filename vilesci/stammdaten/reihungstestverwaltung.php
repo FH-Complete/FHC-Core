@@ -202,7 +202,7 @@
 		else 
 			$selected='';
 		
-		echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=-1&reihungstest_id=$reihungstest_id' $selected>Alle Studiengaenge</OPTION>";
+		echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=-1' $selected>Alle Studiengaenge</OPTION>";
 		foreach ($studiengang->result as $row) 
 		{
 			$stg_arr[$row->studiengang_kz] = $row->kuerzel;
@@ -213,7 +213,7 @@
 			else 
 				$selected='';
 				
-			echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=$row->studiengang_kz&reihungstest_id=$reihungstest_id' $selected>$row->kuerzel</OPTION>";
+			echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=$row->studiengang_kz' $selected>$row->kuerzel</OPTION>";
 		}
 		echo "</SELECT>";
 		
@@ -224,7 +224,7 @@
 		else
 			$reihungstest->getReihungstest($stg_kz);
 		
-		echo "<SELECT name='reihungstest' onchange='window.location.href=this.value'>";
+		echo "<SELECT name='reihungstest' id='reihungstest' onchange='window.location.href=this.value'>";
 		foreach ($reihungstest->result as $row) 
 		{
 			if($reihungstest_id=='')
@@ -236,7 +236,9 @@
 				
 			echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&reihungstest_id=$row->reihungstest_id' $selected>$row->datum $row->uhrzeit $row->ort_kurzbz $row->anmerkung</OPTION>";
 		}
-		echo "</SELECT></td>";
+		echo "</SELECT>";
+		echo "<INPUT type='button' value='Anzeigen' onclick='window.location.href=document.getElementById(\"reihungstest\").value;'>";
+		echo "</td>";
 		echo "<td align='right'><INPUT type='button' value='Neuen Reihungstesttermin anlegen' onclick='window.location.href=\"".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&neu=true\"' >";
 		
 		echo "</td></tr></table><br><br>";

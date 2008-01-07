@@ -166,6 +166,17 @@ if(!$error)
 			$errormsg = 'Fehler bei Parameteruebergabe';
 		}
 	}
+	elseif(isset($_POST['type']) && $_POST['type']=='deletestundenplaneintrag')
+	{
+		if(isset($_POST['stundenplan_id']) && is_numeric($_POST['stundenplan_id']))
+		{
+			//$stundenplan = new stundenplan($conn);
+			//$stundenplan->delete();
+			$errormsg='Not implemented';
+			$return = false;
+			$data = '';
+		}
+	}
 	else
 	{
 		$return = false;

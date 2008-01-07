@@ -51,7 +51,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<row>	
 					<hbox>
 						<spacer flex="1" />
-						<button id="student-konto-button-filter" value="alle" oncommand="StudentKontoFilter()" label="offene Anzeigen" disabled="true"/>
+						<button id="student-konto-button-filter" value="alle" oncommand="StudentKontoFilter()" label="offene anzeigen" disabled="true"/>
 					</hbox>
 					<hbox>
 						<button id="student-konto-button-filterstudenten" oncommand="StudentKontoFilterStudenten('konto')" label="Studentenliste auf offene Buchungen filtern" tooltiptext="Liste aller Studenten mit offenen Buchungen"/>
