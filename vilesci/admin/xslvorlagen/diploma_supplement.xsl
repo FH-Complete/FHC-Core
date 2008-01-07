@@ -52,7 +52,7 @@
 				<fo:block-container position="absolute" top="25mm" left="20mm" right="200mm" height="0mm">
 					<fo:block text-align="block" line-height="10pt" font-family="sans-serif" font-size="6pt">
 				Dieser Anhang zum Diplom wurde nach dem von der Europäischen Kommission, dem Europarat und UNESCO/CEPES entwickelten Modell erstellt. Mit dem
-				\n Anhang wird das Ziel verfolgt, ausreichend unabhängige Daten zu erfassen, um die internationale "Transparenz" und die angemessene akademische und berufliche \n Anerkennung von Qualifikationen (Diplomen, Abschlüssen, Zeugnissen usw.) zu verbessern. Der Anhang soll eine Beschreibung über Art, Niveau, Kontext, Inhalt \n und Status eines Studiums bieten, den die im Original-Befähigungsnachweis, dem der Anhang beigefügt ist, genannte Person absolviert und erfolgreich abgeschlossen\n hat\n This diploma supplement follows the model developed by the European Commission, Council of Europe and UNESCO/CEPES. The purpose of the supplement \n is to provide sufficient data to improve international transparency and fair academic and professional recognition of qualifications (diplomas, degrees, certificates, etc.). It \n is designed to provide a description of the nature, level, context, content and status of the studies that were pursued and successfully completed by the individual \n named on the original qualification to which this supplement is appended.
+				\n Anhang wird das Ziel verfolgt, ausreichend unabhängige Daten zu erfassen, um die internationale "Transparenz" und die angemessene akademische und berufliche \n Anerkennung von Qualifikationen (Diplomen, Abschlüssen, Zeugnissen usw.) zu verbessern. Der Anhang soll eine Beschreibung über Art, Niveau, Kontext, Inhalt \n und Status eines Studiums bieten, den die im Original-Befähigungsnachweis, dem der Anhang beigefügt ist, genannte Person absolviert und erfolgreich abgeschlossen\n hat\n This diploma supplement follows the model developed by the European Commission, Council of Europe and UNESCO/CEPES. The purpose of the supplement \n is to provide sufficient independent data to improve the international transparency and fair academic and professional recognition of qualifications (diplomas, degrees, certificates, etc.). It \n is designed to provide a description of the nature, level, context, content and status of the studies that were pursued and successfully completed by the individual \n named on the original qualification to which this supplement is appended.
 					</fo:block>
 				</fo:block-container> 
 				
@@ -126,7 +126,7 @@
 						<fo:table-body>
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> 2.1 \n</fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Name der Qualifikation und verliehener Titel \n Name of qualification, title conferred</fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Name der Qualifikation und verliehener Titel \n Name of qualification, in original language (German)</fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"><xsl:value-of select="titel" />\n<xsl:value-of select="titel_kurzbz" /></fo:block></fo:table-cell>
 							</fo:table-row>
 							<fo:table-row  line-height="10pt">
@@ -137,16 +137,16 @@
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> 2.3 \n \n \n</fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Name und Status der Organisation, die die Qualifikation\n verliehen hat \n Name and status of awarding institution \n</fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Fachhochschule Technikum Wien, Verleihung des Status \n "Fachhochschule" im November 2000 \n University of Applied Sciences Fachhochschule Technikum Wien, \n Status University of Applied Science since November 2000</fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Fachhochschule Technikum Wien, Verleihung des Status \n "Fachhochschule" im November 2000 \n University of Applied Sciences Fachhochschule Technikum Wien, \n status University of Applied Science since November 2000</fo:block></fo:table-cell>
 							</fo:table-row>
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> 2.4 \n</fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Name und Status der Einrichtung, die das Studium durchführte \n Name and status of institution administrating studies</fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Name und Status der Einrichtung, die das Studium durchführte \n Name and status of institution administering studies</fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Fachhochschule Technikum Wien \n University of Applied Sciences Fachhochschule Technikum Wien</fo:block></fo:table-cell>
 							</fo:table-row>
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> 2.5 \n</fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Im Unterricht/in den Prüfungen verwendete Sprachen \n Language(s) of instructions/examination</fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Im Unterricht/in den Prüfungen verwendete Sprachen \n Language(s) of instruction/examination</fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Deutsch, Englisch\n German, English</fo:block></fo:table-cell>
 							</fo:table-row>
 						</fo:table-body>
@@ -181,7 +181,7 @@
 							</fo:table-row>
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> 3.2 \n</fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Regelstudiendauer (gesetzliche Studiendauer) \n Official lenght of program</fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Regelstudienzeit (gesetzliche Studiendauer) \n Official length of program</fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"><xsl:value-of select="semester" /> Semester/<xsl:value-of select="jahre" /> Jahr(e)\n<xsl:value-of select="semester" /> semester/<xsl:value-of select="jahre" /> year(s)</fo:block></fo:table-cell>
 							</fo:table-row>
 							<fo:table-row  line-height="10pt">
@@ -247,7 +247,7 @@
 							</fo:table-row>
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> 4.4 \n \n \n \n \n \n \n \n \n \n \n \n \n</fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Notenskala \n Grading scheme, grading translation \n and grade distribution guidance \n \n \n \n \n \n \n \n \n \n \n</fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Notenskala \n Grading scheme, grade translation \n and grade distribution guidance \n \n \n \n \n \n \n \n \n \n \n</fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" >
 									<fo:block font-size="8pt">
 										<fo:inline text-decoration="underline">Einzelbeurteilung/Grades</fo:inline>
@@ -306,7 +306,7 @@
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="10mm"> 5.2 \n \n</fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="80mm"> Beruflicher Status \n Professional status conferred \n</fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="91mm"> Zugang zu akademischen Berufen nach Maßgabe der berufsrechtlichen Vorschriften; Diplom im Sinne der Richtlinie 89/48/EWG Access to academic professions according to the professional regulation; Diploma in the sense of directive RL 89/48/EEC</fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="91mm"> Zugang zu akademischen Berufen nach Maßgabe der berufsrechtlichen Vorschriften; Diplom im Sinne der Richtlinie 89/48/EWG \n Access to academic professions according to the professional regulation; Diploma in the sense of directive RL 89/48/EEC.</fo:block></fo:table-cell>
 							</fo:table-row>
 						</fo:table-body>
 					</fo:table>

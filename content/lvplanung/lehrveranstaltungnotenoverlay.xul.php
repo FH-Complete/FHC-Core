@@ -40,12 +40,13 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 <popupset>
 	<popup id="lehrveranstaltung-noten-tree-popup">
 		<menuitem label="Entfernen" oncommand="LehrveranstaltungNotenDelete();" id="lehrveranstaltung-noten-tree-popup-delete" hidden="false"/>
+		<menuitem label="Freifaecher-Zertifikat erstellen" oncommand="LehrveranstaltungFFZertifikatPrint();" id="lehrveranstaltung-noten-tree-popup-ffzertifikat" hidden="false"/>
 	</popup>
 </popupset>
 <hbox flex="1" style="margin-top: 10px;">
 	<vbox flex="1">
 	<label value="Zeugnis" />
-	<tree id="lehrveranstaltung-noten-tree" seltype="single" hidecolumnpicker="false" flex="1"
+	<tree id="lehrveranstaltung-noten-tree" seltype="multi" hidecolumnpicker="false" flex="1"
 		datasources="rdf:null" ref="http://www.technikum-wien.at/zeugnisnote/liste"
 		style="margin-bottom:5px;" height="100%" enableColumnDrag="true"
 		onselect="LehrveranstaltungNotenAuswahl()"

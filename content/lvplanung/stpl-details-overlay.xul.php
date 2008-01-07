@@ -25,12 +25,19 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 	<!-- *  Stundenplan Details  * -->
 	<!-- ************************* -->
 	<vbox id="vboxSTPLDetailsListe">
+		<popupset>
+				<popup id="stpldetail-treestpldetail-popup">
+					<menuitem label="Bearbeiten" oncommand="STPLDetailEdit()" />
+					<menuitem label="Entfernen" oncommand="STPLDetailDelete()" />
+				</popup>
+		</popupset>
 
 		<tree id="treeStplDetails" seltype="single" hidecolumnpicker="false" flex="1"
 			datasources="../rdf/lehrstunde.rdf.php" ref="http://www.technikum-wien.at/lehrstunde/alle"
 			flags="dont-build-content"
 			enableColumnDrag="true"
 			style="margin:0px;"
+			context="stpldetail-treestpldetail-popup"
 			>
 		<treecols>
 			<treecol id="lehreinheit_id" label="LE_ID" flex="2" primary="false"
@@ -89,7 +96,10 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#unr"  />
 			<splitter class="tree-splitter"/>
-
+			<treecol id="stundenplan_id" label="StundenplanID" flex="2" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#id"  />
+			<splitter class="tree-splitter"/>
 		</treecols>
 
 		<template>
@@ -111,6 +121,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/lfvt.css\" type=\"text/css\" ?
    							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#datum" />
 							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#stunde" />
 							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#unr" />
+							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#id" />
    						</treerow>
 					</treeitem>
 				</treechildren>

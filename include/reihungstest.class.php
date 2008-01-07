@@ -208,7 +208,7 @@ class reihungstest
 		{
 			//Neuen Datensatz einfuegen
 					
-			$qry='INSERT INTO public.tbl_reihungstest (studiengang_kz, ort_kurzbz, anmerkung, datum, uhrzeit, 
+			$qry='BEGIN; INSERT INTO public.tbl_reihungstest (studiengang_kz, ort_kurzbz, anmerkung, datum, uhrzeit, 
 				ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
 			     $this->addslashes($this->studiengang_kz).', '.
 			     $this->addslashes($this->ort_kurzbz).', '.
@@ -260,23 +260,31 @@ class reihungstest
 		{
 			if(pg_query($this->conn, $qry))
 			{
-				//Log schreiben
-				/*$sql = $qry;
-				$qry = "SELECT nextval('log_seq') as id;";
-				if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
+				if($this->new)
 				{
-					$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
-					return false;
+					$qry = "SELECT currval('public.tbl_reihungstest_reihungstest_id_seq') as id";
+					if($result = pg_query($this->conn, $qry))
+					{
+						if($row = pg_fetch_object($result))
+						{
+							$this->reihungstest_id = $row->id;
+							pg_query($this->conn, 'COMMIT');
+							return true;
+						}
+						else 
+						{
+							$this->errormsg = 'Fehler beim Auslesen der Sequence';
+							pg_query($this->conn, 'ROLLBACK');
+							return false;
+						}
+					}
+					else 
+					{
+						$this->errormsg = 'Fehler beim Auslesen der Sequence';
+						pg_query($this->conn, 'ROLLBACK');
+						return false;
+					}							
 				}
-							
-				$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
-				if(pg_query($this->conn, $qry))
-					return true;
-				else 
-				{
-					$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
-					return false;
-				}	*/
 				return true;		
 			}
 			else 

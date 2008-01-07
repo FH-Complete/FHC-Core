@@ -26,31 +26,38 @@ class stundenplan
 	var $errormsg; // string
 	var $new;      // boolean
 	var $stundenplan = array(); // stundenplan Objekt
-
+	var $stpl_table;
+	
 	//Tabellenspalten
-	var $lehreinheit_id;			// integer
-	var $lehrveranstaltung_nr;		// integer
-	var $studiensemester_kurzbz; 	// varchar(16)
-	var $lehrfach_nr;				// integer
-	var $lehrform_kurzbz;			// varchar(8)
-	var $stundenblockung;			// smalint
-	var $wochenrythmus;				// smalint
-	var $start_kw;					// smalint
-	var $raumtyp;					// varchar(8)
-	var $raumtypalternativ;			// varchar(8)
-	var $lehre;						// boolean
-	var $anmerkung;					// varchar(255)
-	var $unr;						// integer
-	var $ext_id;					// bigint
+	var $stundenplan_id;
+	var $unr;
+	var $mitarbeiter_uid;
+	var $datum;
+	var $stunde;
+	var $ort_kurzbz;
+	var $gruppe_kurzbz;
+	var $titel;
+	var $anmerkung;
+	var $lehreinheit_id;
+	var $studiengang_kz;
+	var $semester;
+	var $verband;
+	var $gruppe;
+	var $fix;
+	var $updateamum;
+	var $updatevon;
+	var $insertamum;
+	var $insertvon;
 
 	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine LE
+	// * Konstruktor - Uebergibt die Connection und laedt optional einen Stundenplaneintrag
 	// * @param $conn        	Datenbank-Connection
-	// *        $gruppe_kurzbz
+	// *        $stundenplantabelle
+	// *		$stundenplan_id
 	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
-	function lehreinheit($conn, $lehreinheit_id=null, $unicode=false)
+	function lehreinheit($conn, $stundenplantabelle, $stundenplan_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
 
@@ -65,15 +72,17 @@ class stundenplan
 			return false;
 		}
 
-		if($lehreinheit_id!=null)
-			$this->load($lehreinheit_id);
+		$this->stpl_table = $stundenplantabelle;
+		
+		if($stundenplan_id!=null)
+			$this->load($stundenplan_id);
 	}
 
 	// *********************************************************
-	// * Laedt die LE
-	// * @param lehreinheit_id
+	// * Laedt einen Stundenplaneintrag
+	// * @param stundenplan_id
 	// *********************************************************
-	function load($lehreinheit_id)
+	function load($stundenplan_id)
 	{
 		return false;
 	}
@@ -85,99 +94,7 @@ class stundenplan
 	// *******************************************
 	function validate()
 	{
-		if($this->lehreinheit_id!='' && !is_numeric($this->lehreinheit_id))
-		{
-			$this->errormsg = 'Lehreinheit_id muss eine gueltige Zahl sein';
-			return false;
-		}
-		if(!is_numeric($this->lehrveranstaltung_nr))
-		{
-			$this->errormsg = 'LehrveranstaltungsNr muss eine gueltige Zahl sein';
-			return false;
-		}
-		if(strlen($this->studiensemester_kurzbz)>16)
-		{
-			$this->errormsg = 'Studiensemesterkurzbz darf nicht laenger als 16 Zeichen sein';
-			return false;
-		}
-		if($this->studiensemester_kurzbz=='')
-		{
-			$this->errormsg = 'Studiensemester muss angegeben werden';
-			return false;
-		}
-		if(!is_numeric($this->lehrfach_nr))
-		{
-			$this->errormsg = 'Lehrfach_nr muss eine gueltige Zahl sein';
-			return false;
-		}
-		if(strlen($this->lehrform_kurzbz)>8)
-		{
-			$this->errormsg = 'Lehrform_kurzbz darf nicht laenger als 8 Zeichen sein';
-			return false;
-		}
-		if($this->lehrform_kurzbz=='')
-		{
-			$this->lehrform_kurzbz='SO';
-			//TODO
-			//$this->errormsg = 'Lehrform muss angegeben werden';
-			//return false;
-		}
-		if(!is_numeric($this->stundenblockung))
-		{
-			$this->errormsg = 'Stundenblockung muss eine gueltige Zahl sein';
-			return false;
-		}
-		if(!is_numeric($this->wochenrythmus))
-		{
-			$this->errormsg = 'Wochenrythmus muss eine gueltige Zahl sein';
-			return false;
-		}
-		if($this->start_kw!='' && !is_numeric($this->start_kw))
-		{
-			$this->errormsg = 'StartKW muss eine gueltige Zahl sein';
-			return false;
-		}
-		if($this->start_kw!='' && ($this->start_kw>53 || $this->start_kw<1))
-		{
-			$this->errormsg = 'StartKW muss zwischen 1 und 53 liegen';
-			return false;
-		}
-		if(strlen($this->raumtyp)>8)
-		{
-			$this->errormsg = 'Raumtyp darf nicht laenger als 8 Zeichen sein';
-			return false;
-		}
-		if(strlen($this->raumtypalternativ)>8)
-		{
-			$this->errormsg = 'Raumtypalternativ darf nicht alenger als 8 Zeichen sein';
-			return false;
-		}
-		if($this->raumtypalternativ=='')
-		{
-			//TODO
-			$this->raumtypalternativ='Dummy';
-		}
-		if(!is_bool($this->lehre))
-		{
-			$this->errormsg = 'Lehre muss ein boolscher Wert sein';
-			return false;
-		}
-		if(strlen($this->anmerkung)>255)
-		{
-			$this->errormsg = 'Anmerkung darf nicht laenger als 255 Zeichen sein';
-			return false;
-		}
-		if($this->unr!='' && !is_numeric($this->unr))
-		{
-			$this->errormsg = 'UNR muss eine gueltige Zahl sein';
-			return false;
-		}
-		if($this->ext_id!='' && !is_numeric($this->ext_id))
-		{
-			$this->errormsg = 'Ext_id muss eine gueltige Zahl sein';
-			return false;
-		}
-
+		
 		return true;
 	}
 
@@ -193,7 +110,7 @@ class stundenplan
 	}
 
 	// ************************************************************
-	// * Speichert LE in die Datenbank
+	// * Speichert Stundenplaneintrag in die Datenbank
 	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
 	// * angelegt, ansonsten der Datensatz upgedated
 	// * @return true wenn erfolgreich, false im Fehlerfall
@@ -210,40 +127,48 @@ class stundenplan
 		if($new)
 		{
 			//ToDo ID entfernen
-			$qry = 'INSERT INTO lehre.tbl_lehreinheit (lehrveranstaltung_nr, studiensemester_kurzbz,
-			                                     lehrfach_nr, lehrform_kurzbz, stundenblockung, wochenrythmus,
-			                                     start_kw, raumtyp, raumtypalternativ, lehre, anmerkung, unr, ext_id)
-			        VALUES('.$this->addslashes($this->lehrveranstaltung_nr).','.
-					$this->addslashes($this->studiensemester_kurzbz).','.
-					$this->addslashes($this->lehrfach_nr).','.
-					$this->addslashes($this->lehrform_kurzbz).','.
-					$this->addslashes($this->stundenblockung).','.
-					$this->addslashes($this->wochenrythmus).','.
-					$this->addslashes($this->start_kw).','.
-					$this->addslashes($this->raumtyp).','.
-					$this->addslashes($this->raumtypalternativ).','.
-					($this->lehre?'true':'false').','.
+			$qry = 'INSERT INTO lehre.'.$this->stpl_table.' (unr, mitarbeiter_uid, datum, stunde, ort_kurzbz, gruppe_kurzbz, 
+					titel, anmerkung, lehreinheit_id, studiengang_kz, semester, verband, gruppe, fix, updateamum, updatevon, 
+					insertamum, insertvon)
+			        VALUES('.$this->addslashes($this->unr).','.
+					$this->addslashes($this->mitarbeiter_uid).','.
+					$this->addslashes($this->datum).','.
+					$this->addslashes($this->stunde).','.
+					$this->addslashes($this->ort_kurzbz).','.
+					$this->addslashes($this->gruppe_kurzbz).','.
+					$this->addslashes($this->titel).','.
 					$this->addslashes($this->anmerkung).','.
-					$this->addslashes($this->unr).','.
-					$this->addslashes($this->ext_id).');';
+					$this->addslashes($this->lehreinheit_id).','.
+					$this->addslashes($this->studiengang_kz).','.
+					$this->addslashes($this->semester).','.
+					$this->addslashes($this->verband).','.
+					$this->addslashes($this->gruppe).','.
+					($this->fix?'true':'false').','.
+					$this->addslashes($this->updateamum).','.
+					$this->addslashes($this->updatevon).','.
+					$this->addslashes($this->insertamum).','.
+					$this->addslashes($this->insertvon).');';
 		}
 		else
 		{
-			$qry = 'UPDATE lehre.tbl_lehreinheit SET'.
-			       ' lehrveranstaltung_nr='.$this->addslashes($this->lehrveranstaltung_nr).','.
-			       ' studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).','.
-			       ' lehrfach_nr='.$this->addslashes($this->lehrfach_nr).','.
-			       ' lehrform_kurzbz='.$this->addslashes($this->lehrform_kurzbz).','.
-			       ' stundenblockung='.$this->addslashes($this->stundenblockung).','.
-			       ' wochenrythmus='.$this->addslashes($this->wochenrythmus).','.
-			       ' start_kw='.$this->addslashes($this->start_kw).','.
-			       ' raumtyp='.$this->addslashes($this->raumtyp).','.
-			       ' raumtypalternativ='.$this->addslashes($this->raumtypalternativ).','.
-			       ' lehre='.($this->lehre?'true':'false').','.
-			       ' anmerkung='.$this->addslashes($this->anmerkung).','.
+			$qry = 'UPDATE lehre.'.$this->stpl_table.' SET'.
 			       ' unr='.$this->addslashes($this->unr).','.
-			       ' ext_id='.$this->addslashes($this->ext_id).
-			       " WHERE lehreinheit_id=".$this->addslashes($this->lehreinheit_id).";";
+			       ' mitarbeiter_uid='.$this->addslashes($this->mitarbeiter_uid).','.
+			       ' datum='.$this->addslashes($this->datum).','.
+			       ' stunde='.$this->addslashes($this->stunde).','.
+			       ' ort_kurzbz='.$this->addslashes($this->ort_kurzbz).','.
+			       ' gruppe_kurzbz='.$this->addslashes($this->gruppe_kurzbz).','.
+			       ' titel='.$this->addslashes($this->titel).','.
+			       ' anmerkung='.$this->addslashes($this->anmerkung).','.
+			       ' lehreinheit_id='.$this->addslashes($this->lehreinheit_id).','.
+			       ' studiengang_kz='.$this->addslashes($this->studiengang_kz).','.
+			       ' semester='.$this->addslashes($this->semester).','.
+			       ' verband='.$this->addslashes($this->verband).','.
+			       ' gruppe='.$this->addslashes($this->gruppe).','.			       
+			       ' fix='.($this->fix?'true':'false').','.
+			       ' updateamum='.$this->addslashes($this->updateamum).','.
+			       ' updatevon='.$this->addslashes($this->updatevon).
+			       " WHERE stundenplan".(strstr('dev', $this->stpl_table)?'dev':'')."_id=".$this->addslashes($this->stundenplan_id).";";
 		}
 
 		if(pg_query($this->conn,$qry))

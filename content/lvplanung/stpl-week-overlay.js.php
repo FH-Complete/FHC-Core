@@ -202,3 +202,54 @@ function onStplDetail(event)
 	var treeStplDetails=parent.document.getElementById('treeStplDetails');
 	treeStplDetails.setAttribute('datasources',url);
 }
+
+
+function STPLDetailEdit()
+{
+
+}
+
+
+function STPLDetailDelete()
+{
+	tree = document.getElementById('treeStplDetails');
+	var col = tree.columns ? tree.columns["stundenplan_id"] : "stundenplan_id";
+	
+	if(tree.currentIndex!=-1)
+	{
+		var stundenplanid = tree.view.getCellText(tree.currentIndex,col);
+	}
+	else
+	{
+		alert('Bitte zuerst einen Eintrag markieren!');
+		return false;
+	}
+	
+	if(confirm('Wollen Sie diesen Datensatz wirklich loeschen?'))
+	{
+		var url = '<?php echo APP_ROOT ?>content/tempusDBDML.php';
+		var req = new phpRequest(url,'','');
+		
+		req.add('type', 'deletestundenplaneintrag');
+	
+		req.add('stundenplan_id', stundenplanid);
+		
+		var response = req.executePOST();
+	
+		var val =  new ParseReturnValue(response)
+	
+		if (!val.dbdml_return)
+		{
+			if(val.dbdml_errormsg=='')
+				alert(response)
+			else
+				alert(val.dbdml_errormsg)
+		}
+		else
+		{
+			netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+			var url = '<?php echo APP_ROOT ?>rdf/lehrstunde.rdf.php';
+			document.getElementById('treeStplDetails').setAttribute('src',url);
+		}
+	}
+}
