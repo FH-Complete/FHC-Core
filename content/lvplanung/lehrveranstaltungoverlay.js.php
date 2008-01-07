@@ -1720,7 +1720,7 @@ function LehrveranstaltungFFZertifikatPrint()
 	}
 	var ss = getStudiensemester();
 	
-	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat_freifach.rdf.php&xsl=zertifikat_freifach&uid='+paramList+'&ss='+ss+'&lvid='+lvid+'&'+gettimestamp();
+	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat.rdf.php&xsl=Zertifikat&uid='+paramList+'&ss='+ss+'&lvid='+lvid+'&'+gettimestamp();
 	window.location.href = url;
 	//prompt('test:',url);
 }
