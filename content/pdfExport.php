@@ -94,6 +94,8 @@ if(isset($_GET['typ']))
 	$params.='&typ='.$_GET['typ'];
 if(isset($_GET['all']))
 	$params.='&all='.$_GET['all'];
+if(isset($_GET["lvid"]))
+	$params.='&lvid='.$_GET["lvid"];
 
 if($xsl=='AccountInfo')
 {
