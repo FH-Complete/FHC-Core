@@ -123,7 +123,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		}		
 	}
 	
-	$lehrinhalte = "";
+	$lehrinhalte = '';
 	$infoqry = "SELECT * from campus.tbl_lvinfo where sprache='German' and lehrveranstaltung_id = '".$lehrveranstaltung_id."'";
 	if($infores = pg_query($conn, $infoqry)){
 		if ($inforow = pg_fetch_object($infores)){
@@ -131,7 +131,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			$lehrinhalte_arr = explode("<br>",$inforow->lehrinhalte);			
 			for ($i = 0; $i < sizeof($lehrinhalte_arr); $i++)
 			{
-				$lehrinhalte .= $lehrinhalte_arr[$i]."\\n";			
+				$lehrinhalte .= $lehrinhalte_arr[$i].'\n';			
 			}
 		}		
 	}	
