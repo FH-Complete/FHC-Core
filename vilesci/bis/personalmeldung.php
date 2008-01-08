@@ -27,6 +27,9 @@ $ssem=$studiensemester->getaktorNext();		//aktuelles Semester
 $psem=$studiensemester->getPrevious();		//voriges Semester
 $bsem=$studiensemester->getBeforePrevious();		//vorjähriges Semester
 $datei='';
+$mitarbeiterzahl=0;
+$echt=0;
+$frei=0;
 
 $nichtmelden = array(11,91,92,94,999,476,203,329,334,331,328,332);
 
@@ -213,6 +216,15 @@ if($result = pg_query($conn, $qry))
 						$error_log="Hauptberuf ('".$rowvw->hauptberufcode."')";
 					} 
 				}
+				if($rowvw->ba1code==3)
+				{
+					$echt++;
+				}
+				if($rowvw->ba1code==4)
+				{
+					$frei++;
+				}
+				$mitarbeiterzahl++;
 				$datei.="
        <Verwendung>
               <BeschaeftigungsArt1>".$rowvw->ba1code."</BeschaeftigungsArt1>
@@ -366,9 +378,10 @@ echo '	<html><head><title>BIS - Meldung Mitarbeiter</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 	</head><body>';
-echo "<H1>BIS - Mitarbeiterdaten werden &uuml;berpr&uuml;ft!</H1>\n";
+echo "<H1>BIS - Mitarbeiterdaten werden &uuml;berpr&uuml;ft!</H1><br>";
+echo "Anzahl Mitarbeiter: Gesamt: ".$mitarbeiterzahl." / echter Dienstvertrag: ".$echt." / freier Dienstvertrag: ".$frei."<br>";
 echo "<H2>Nicht plausible BIS-Daten (f&uuml;r Meldung ".$ssem."): </H2><br>";
-echo nl2br($v."\n\n");
+echo nl2br($v."<br><br>");
 
 //Tabelle mit Ergebnissen ausgeben
 
