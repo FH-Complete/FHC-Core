@@ -128,10 +128,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	if($infores = pg_query($conn, $infoqry)){
 		if ($inforow = pg_fetch_object($infores)){
 			//$lehrinhalte = ereg_replace("<br>","<line lineafter='1' />",$inforow->lehrinhalte);	
-			$lehrinhalte_arr = explode("<br>",$inforow->lehrinhalte);
+			$lehrinhalte_arr = explode("<br>",$inforow->lehrinhalte);			
 			for ($i = 0; $i < sizeof($lehrinhalte_arr); $i++)
 			{
-				$lehrinhalte .= $lehrinhalte_arr[$i]."\r\n";			
+				$lehrinhalte .= $lehrinhalte_arr[$i]."\\n";			
 			}
 		}		
 	}	
@@ -222,7 +222,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .= "				<sws>".$sws."</sws>";
 		$xml .= "				<ects>".number_format($ects,1)."</ects>";
 		$xml .= "				<lvleiter>".$leiter_titel." ".$leiter_vorname." ".$leiter_nachname."</lvleiter>";
-		$xml .= "				<lehrinhalte>".$lehrinhalte."</lehrinhalte>";
+		$xml .= "				<lehrinhalte><![CDATA[".$lehrinhalte."]]></lehrinhalte>";
 
 		
 		$xml .= "	</zertifikat>";
