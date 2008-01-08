@@ -134,6 +134,10 @@ if ($berechtigung->isBerechtigt('admin'))
 		  	</tr>
 		  	<tr>
 		  		<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a class="MenuItem2" href="lehre/stpl_benutzer_kollision_frameset.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Kollision Student</a></td>
+		  	</tr>
+		  	<tr>
+		  		<td width="10" nowrap>&nbsp;</td>
 				<td nowrap><a class="MenuItem2" href="lehre/import/index.html" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Import</a></td>
 		  	</tr>
 		  	<tr>

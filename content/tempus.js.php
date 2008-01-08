@@ -22,6 +22,7 @@
 include('../vilesci/config.inc.php');
 ?>
 var menuUndoDatasource=0;
+var STPLlastDetailUrl='leer';
 
 // ----------------------------------------------------------
 // ------- CLASS Progressmeter ------------------------------

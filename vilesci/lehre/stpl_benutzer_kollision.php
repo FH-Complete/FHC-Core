@@ -1,0 +1,133 @@
+<?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
+
+require_once('../config.inc.php');
+require_once('../../include/studiensemester.class.php');
+require_once('../../include/functions.inc.php');
+
+if(!$conn = pg_pconnect(CONN_STRING))
+	die('Fehler beim Herstellen der Datenbankverbindung');
+
+$beginn = (isset($_GET['beginn'])?$_GET['beginn']:'');
+$ende = (isset($_GET['ende'])?$_GET['ende']:'');
+$dontloadcontent=false;
+
+$user = get_uid();
+loadVariables($conn, $user);
+
+echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>Kollision Student</title>
+<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css" />
+<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+<script language="Javascript">
+function changeStudiensemester(dropdown)
+{
+	document.getElementById("beginn").value = dropdown.options[dropdown.selectedIndex].getAttribute("beginn");
+	document.getElementById("ende").value = dropdown.options[dropdown.selectedIndex].getAttribute("ende");
+}
+</script>
+</head>
+<body style="background-color:#eeeeee;">
+<h2>Kollision Student - '.$db_stpl_table.'</h2>
+';
+echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">';
+
+if($beginn=='' || $ende=='')
+{
+	$stsem_obj = new studiensemester($conn);
+	$stsem_akt = $stsem_obj->getaktorNext();
+	$stsem_obj->load($stsem_akt);
+	
+	$beginn = $stsem_obj->start;
+	$ende = $stsem_obj->ende;
+	$dontloadcontent=true;
+}
+
+echo 'Studiensemester <SELECT name="studiensemester_kurzbz" onchange="changeStudiensemester(this)">';
+echo "<option value='' beginn='' ende=''>-- Auswahl --</option>";
+$stsem_obj = new studiensemester($conn);
+$stsem_obj->getAll();
+
+foreach($stsem_obj->studiensemester as $stsem)
+{
+	if(isset($stsem_akt) && $stsem_akt!='' && $stsem_akt==$stsem->studiensemester_kurzbz)
+		$selected='selected';
+	else 
+		$selected='';
+	
+	echo "<option value='$stsem->studiensemester_kurzbz' beginn='$stsem->start' ende='$stsem->ende' $selected>$stsem->studiensemester_kurzbz</option>";
+}
+
+echo '</SELECT>';
+
+echo " Beginn <INPUT type='text' size='10' id='beginn' name='beginn' value='$beginn'>";
+echo " Ende <INPUT type='text' size='10' id='ende' name='ende' value='$ende'>";
+
+echo " <INPUT type='submit' value='OK'>";
+
+echo '</form>';
+
+if($dontloadcontent)
+	exit;
+
+$qry = "SELECT datum, stunde, student_uid, count(student_uid) AS anzahl
+		FROM  lehre.vw_".$db_stpl_table."_student_unr
+		WHERE datum>='$beginn' AND datum<='$ende'
+		GROUP BY datum, stunde, student_uid
+		HAVING count(student_uid)>1
+		ORDER BY datum, stunde, student_uid LIMIT 30; 
+	   ";
+
+//echo $qry;
+echo '<table class="liste table-autosort:0 table-stripeclass:alternate table-autostripe">
+	<thead>';
+echo '<tr class="liste">
+		<th class="table-sortable:default">Datum</th>
+		<th class="table-sortable:default">Stunde</th>
+		<th class="table-sortable:default">UID</th>
+		<th class="table-sortable:default">Anzahl</th>
+		<th class="table-sortable:default">&nbsp;</th>
+		<th class="table-sortable:default">&nbsp;</th>
+	  </tr>
+	 </thead>
+	 <tbody>';
+if($result = pg_query($conn, $qry))
+{
+	while($row = pg_fetch_object($result))
+	{
+		echo "<tr>";
+		echo "<td class='table-sortable:default' align='center'>$row->datum</td>";
+		echo "<td class='table-sortable:default' align='center'>$row->stunde</td>";
+		echo "<td class='table-sortable:default' align='center'>$row->student_uid</td>";
+		echo "<td class='table-sortable:default' align='center'>$row->anzahl</td>";
+		echo "<td class='table-sortable:default' align='center'><a href='stpl_benutzer_kollision_details.php?datum=$row->datum&stunde=$row->stunde' target='kollision_detail'>Stundenplan</a></td>";
+		echo "<td class='table-sortable:default' align='center'><a href='stpl_benutzer_kollision_details.php?datum=$row->datum&stunde=$row->stunde&uid=$row->student_uid' target='kollision_detail'>UNR</a></td>";
+		echo "</tr>";
+	}
+}
+
+echo '</tbody></table>';
+echo '</body></html';
+?>

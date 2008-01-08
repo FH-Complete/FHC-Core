@@ -57,7 +57,7 @@ class stundenplan
 	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
-	function lehreinheit($conn, $stundenplantabelle, $stundenplan_id=null, $unicode=false)
+	function stundenplan($conn, $stundenplantabelle, $stundenplan_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
 
@@ -179,6 +179,30 @@ class stundenplan
 		else
 		{
 			$this->errormsg = 'Fehler beim Speichern der LE:'.$qry;
+			return false;
+		}
+	}
+	
+	// ****
+	// * Loescht einen Eintrag aus der Stundenplantabelle
+	// ****
+	function delete($id)
+	{
+		if(!is_numeric($id))
+		{
+			$this->errormsg = 'ID muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "DELETE FROM lehre.tbl_$this->stpl_table WHERE ".$this->stpl_table."_id='$id'";
+		
+		if(pg_query($this->conn, $qry))
+		{
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Loeschen des Eintrages: '.pg_last_error($this->conn);
 			return false;
 		}
 	}
