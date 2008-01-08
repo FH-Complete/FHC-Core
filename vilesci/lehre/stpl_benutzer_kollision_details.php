@@ -66,6 +66,15 @@ if(isset($_GET['type']) && $_GET['type']=='delete')
 	}
 }
 
+$stg_obj = new studiengang($conn);
+$stg_obj->getAll('typ, kurzbz', false);
+$stg_arr = array();
+
+foreach ($stg_obj->result as $stg)
+{
+	$stg_arr[$stg->studiengang_kz] = $stg->kuerzel;
+}
+	
 if($student_uid!='')
 {
 	echo "<h2>UNR - $db_stpl_table</h2>";
@@ -78,10 +87,10 @@ if($student_uid!='')
 	echo '<table class="liste table-autosort:0 table-stripeclass:alternate table-autostripe">
 		<thead>';
 	echo '<tr class="liste">
+			<th class="table-sortable:default">UNR</th>
 			<th class="table-sortable:default">Datum</th>
 			<th class="table-sortable:default">Stunde</th>
-			<th class="table-sortable:default">UID</th>
-			<th class="table-sortable:default">UNR</th>
+			<th class="table-sortable:default">Gruppen</th>			
 		  </tr>
 		 </thead>
 		 <tbody>';
@@ -90,11 +99,27 @@ if($student_uid!='')
 	{
 		while($row = pg_fetch_object($result))
 		{
+			$gruppen='';
+			$qry = "SELECT distinct studiengang_kz, semester, verband, gruppe, gruppe_kurzbz FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitgruppe USING(lehreinheit_id) 
+			        WHERE unr='$row->unr'";
+			if($result_grp = pg_query($conn, $qry))
+			{
+				while($row_grp = pg_fetch_object($result_grp))
+				{
+					if($row_grp->gruppe_kurzbz!='')
+						$gruppen.="$row_grp->gruppe_kurzbz, ";
+					else 
+						$gruppen.=$stg_arr[$row_grp->studiengang_kz].'-'.$row_grp->semester.$row_grp->verband.$row_grp->gruppe.', ';
+				}
+			}
+			//letzten Beistrich wieder entfernen
+			$gruppen = substr($gruppen, 0, strlen($gruppen)-2);
+			
 			echo "<tr>";
+			echo "<td class='table-sortable:default' align='center'>$row->unr</td>";
 			echo "<td class='table-sortable:default' align='center'>$row->datum</td>";
 			echo "<td class='table-sortable:default' align='center'>$row->stunde</td>";
-			echo "<td class='table-sortable:default' align='center'>$row->student_uid</td>";
-			echo "<td class='table-sortable:default' align='center'>$row->unr</td>";
+			echo "<td class='table-sortable:default' align='center'>$gruppen</td>";			
 			echo "</tr>";
 		}
 	}
@@ -104,14 +129,7 @@ if($student_uid!='')
 else 
 {
 	echo "<h2>Stundenplaneinträge - $db_stpl_table</h2>";
-	$stg_obj = new studiengang($conn);
-	$stg_obj->getAll('typ, kurzbz', false);
-	$stg_arr = array();
 	
-	foreach ($stg_obj->result as $stg)
-	{
-		$stg_arr[$stg->studiengang_kz] = $stg->kuerzel;
-	}
 	
 	$qry = "SELECT * FROM lehre.tbl_$db_stpl_table WHERE datum='$datum' AND stunde='$stunde'";
 	
@@ -122,10 +140,7 @@ else
 			<th class="table-sortable:default">LEID</th>
 			<th class="table-sortable:default">UNR</th>
 			<th class="table-sortable:default">STG</th>
-			<th class="table-sortable:default">S</th>
-			<th class="table-sortable:default">V</th>
-			<th class="table-sortable:default">G</th>
-			<th class="table-sortable:default">GruppeKurzbz</th>
+			<th class="table-sortable:default">Gruppe</th>
 			<th class="table-sortable:default">Lektor</th>
 			<th class="table-sortable:default">Datum</th>
 			<th class="table-sortable:default">Stunde</th>
@@ -138,16 +153,19 @@ else
 	{
 		while($row = pg_fetch_object($result))
 		{
+			$gruppe='';
+			if($row->gruppe_kurzbz!='')
+				$gruppe=$row->gruppe_kurzbz;
+			else 
+				$gruppe=$stg_arr[$row->studiengang_kz].'-'.$row->semester.$row->verband.$row->gruppe;
+				
 			echo "<tr>";
 			$id = ($db_stpl_table."_id");
 			echo "<td class='table-sortable:default' align='center'>".$row->$id."</td>";
 			echo "<td class='table-sortable:default' align='center'>$row->lehreinheit_id</td>";
 			echo "<td class='table-sortable:default' align='center'>$row->unr</td>";
-			echo "<td class='table-sortable:default' align='center'>".$stg_arr[$row->studiengang_kz]."</td>";
-			echo "<td class='table-sortable:default' align='center'>$row->semester</td>";
-			echo "<td class='table-sortable:default' align='center'>$row->verband</td>";
-			echo "<td class='table-sortable:default' align='center'>$row->gruppe</td>";
-			echo "<td class='table-sortable:default' align='center'>$row->gruppe_kurzbz</td>";
+			echo "<td class='table-sortable:default' align='center'>".$stg_arr[$row->studiengang_kz]." - $row->semester</td>";
+			echo "<td class='table-sortable:default' align='center'>$gruppe</td>";
 			echo "<td class='table-sortable:default' align='center'>$row->mitarbeiter_uid</td>";
 			echo "<td class='table-sortable:default' align='center'>$row->datum</td>";
 			echo "<td class='table-sortable:default' align='center'>$row->stunde</td>";
