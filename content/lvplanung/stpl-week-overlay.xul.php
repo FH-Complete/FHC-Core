@@ -155,7 +155,7 @@ $num_rows_stunde=pg_numrows($result_stunde);
 	        				/>
 	        			</hbox>
 	        		</row>
-	    			<row style="background-color^: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrfach_farbe^;">
+	    			<row style="background-color^: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrfach_farbe^;" >
 	    				<label value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrfach rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrform"
 	    					tooltiptext="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrfach_bez" />
 	       				<label align="right" value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#raumtyp"

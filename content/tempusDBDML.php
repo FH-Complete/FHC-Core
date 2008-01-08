@@ -29,6 +29,7 @@ require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/log.class.php');
 require_once('../include/benutzerfunktion.class.php');
+require_once('../include/stundenplan.class.php');
 
 $user = get_uid();
 
@@ -168,13 +169,26 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='deletestundenplaneintrag')
 	{
+		//Loescht einen Eintrag aus der Stundenplantabelle
+		loadVariables($conn, get_uid());
 		if(isset($_POST['stundenplan_id']) && is_numeric($_POST['stundenplan_id']))
 		{
-			//$stundenplan = new stundenplan($conn);
-			//$stundenplan->delete();
-			$errormsg='Not implemented';
+			$stundenplan = new stundenplan($conn, $db_stpl_table);
+			if($stundenplan->delete($_POST['stundenplan_id']))
+			{
+				$return = true;
+			}
+			else 
+			{
+				$errormsg='Fehler beim Loeschen: '.$stundenplan->errormsg;
+				$return = false;
+				$data = '';
+			}
+		}
+		else 
+		{
 			$return = false;
-			$data = '';
+			$errormsg = 'ID ist ungueltig';
 		}
 	}
 	else

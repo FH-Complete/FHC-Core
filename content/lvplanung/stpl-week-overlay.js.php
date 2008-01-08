@@ -198,7 +198,9 @@ function onStplDetail(event)
 	attributes+=idList;
 	var url = "<?php echo APP_ROOT; ?>rdf/lehrstunde.rdf.php";
 	url+=attributes;
-	//alert(url);
+	//alert('first:'+window.parent.STPLlastDetailUrl);
+	window.parent.STPLlastDetailUrl = url;
+	//alert(url+' - '+window.parent.STPLlastDetailUrl);
 	var treeStplDetails=parent.document.getElementById('treeStplDetails');
 	treeStplDetails.setAttribute('datasources',url);
 }
@@ -206,12 +208,15 @@ function onStplDetail(event)
 
 function STPLDetailEdit()
 {
-
+	alert('comming soon');
 }
 
 
 function STPLDetailDelete()
 {
+	//alert('url'+STPLlastDetailUrl);
+	//return false;
+	
 	tree = document.getElementById('treeStplDetails');
 	var col = tree.columns ? tree.columns["stundenplan_id"] : "stundenplan_id";
 	
@@ -248,8 +253,11 @@ function STPLDetailDelete()
 		else
 		{
 			netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-			var url = '<?php echo APP_ROOT ?>rdf/lehrstunde.rdf.php';
-			document.getElementById('treeStplDetails').setAttribute('src',url);
+			
+			var treeStplDetails=parent.document.getElementById('treeStplDetails');
+			//alert('url'+STPLlastDetailUrl);
+			treeStplDetails.setAttribute('datasources', '');
+			treeStplDetails.setAttribute('datasources', STPLlastDetailUrl);
 		}
 	}
 }
