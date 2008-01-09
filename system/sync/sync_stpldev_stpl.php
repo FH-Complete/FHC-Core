@@ -44,30 +44,10 @@ $message_sync='';
 $headers= "MIME-Version: 1.0\r\n";
 $headers.="Content-Type: text/html; charset=iso-8859-1\r\n";
 
-/*
-// Anfangsdatum festlegen
-$datum_begin=date("Y-m-d");
-// Endedatum festlegen
-$sql_query="SET search_path TO lehre; SELECT * FROM public.tbl_studiensemester WHERE ende>=now() ORDER BY start;";
-//echo $sql_query.'<BR>';
-if (!$result=pg_query($conn, $sql_query))
-{
-	echo $sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
-	$message_sync.=$sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
-}
-else
-{
-	if ($row=pg_fetch_object($result))
-		$datum_ende=$row->ende;
-	else
-		$message_sync.='Kein aktuelles Studiensemester gefunden! '.$sql_query.'<BR>';
-}
-*/
-
 $ss=new studiensemester($conn);
 $ss->getAktTillNext();
 $datum_begin=$ss->start;
-$datum_ende='2008-02-09'; //$ss->ende;
+$datum_ende='2008-07-09'; // $ss->ende
 
 
 $message_begin='Dies ist eine automatische Mail!<BR>Es haben sich folgende Aenderungen in Ihrem Stundenplan ergeben:<BR>';
@@ -385,8 +365,8 @@ while ($row=pg_fetch_object($result))
  */
 if ($sendmail)
 	foreach ($message as $msg)
-		//if (mail('pam@technikum-wien.at',"Stundenplan update",$msg->message,$headers."From: stpl@technikum-wien.at"))
-		if (mail($msg->mailadress,"Stundenplan update",$msg->message,$headers."From: stpl@technikum-wien.at"))
+		if (mail('pam@technikum-wien.at',"Stundenplan update",$msg->message,$headers."From: stpl@technikum-wien.at"))
+		//if (mail($msg->mailadress,"Stundenplan update",$msg->message,$headers."From: stpl@technikum-wien.at"))
 		{
 			echo 'Mail an '.$msg->mailadress.' wurde verschickt!<BR>';
 			$message_stpl.='Mail an '.$msg->mailadress.' wurde verschickt!<BR>';
@@ -403,9 +383,9 @@ $message_tmp=$count_upd.' Datens&auml;tze wurden ge&auml;ndert.<BR>
 			'.$count_err.' Fehler sind dabei aufgetreten!<BR><BR>';
 echo '<BR>'.$message_tmp;
 $message_sync='<HTML><BODY>'.$message_tmp.$message_sync.$message_stpl.'</BODY></HTML>';
-mail('pam@technikum-wien.at',"Stundenplan update",$message_sync,$headers."From: stpl@technikum-wien.at");
+mail(MAIL_ADMIN,"Stundenplan update",$message_sync,$headers."From: ".MAIL_LVPLAN);
 $message_stpl='<HTML><BODY>'.$message_tmp.$message_stpl.'</BODY></HTML>';
-mail('stpl@technikum-wien.at',"Stundenplan update",$message_stpl,$headers."From: stpl@technikum-wien.at");
+mail(MAIL_LVPLAN,"Stundenplan update",$message_stpl,$headers."From: ".MAIL_LVPLAN);
 ?>
 </body>
 </html>

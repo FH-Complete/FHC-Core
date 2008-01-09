@@ -61,7 +61,7 @@ function clean_string($string)
     return ereg_replace("[^a-zA-Z0-9]", "", $string);
     //[:space:]
  }
- 
+
 //Parameter holen
 if(isset($_GET['xml']))
 	$xml=$_GET['xml'];
@@ -102,7 +102,7 @@ if($xsl=='AccountInfo')
 	$isberechtigt = false;
 	$rechte = new benutzerberechtigung($conn);
 	$rechte->getBerechtigungen($user);
-	
+
 	$uids = explode(';',$_GET['uid']);
 	foreach ($uids as $uid)
 	{
@@ -119,7 +119,7 @@ if($xsl=='AccountInfo')
 				}
 			}
 		}
-		
+
 		$qry = "SELECT student_uid, studiengang_kz FROM public.tbl_student WHERE student_uid='".$uid."'";
 		if($result_std = pg_query($conn, $qry))
 		{
@@ -127,7 +127,7 @@ if($xsl=='AccountInfo')
 			{
 				$row_std = pg_fetch_object($result_std);
 				//Mitarbeiterrechte erforderlich
-				if($rechte->isBerechtigt('admin', $row_std->studiengang_kz, 'suid') || 
+				if($rechte->isBerechtigt('admin', $row_std->studiengang_kz, 'suid') ||
 				   $rechte->isBerechtigt('admin', 0, 'suid') ||
 				   $rechte->isBerechtigt('assistenz', $row_std->studiengang_kz, 'suid'))
 				{
@@ -136,7 +136,7 @@ if($xsl=='AccountInfo')
 			}
 		}
 	}
-	
+
 	if(!$isberechtigt)
 	{
 		echo 'Sie haben keine Berechtigung um dieses AccountInfoBlatt zu drucken';
@@ -158,7 +158,7 @@ $xml_doc = new DOMDocument;
 
 if(!$xml_doc->load($xml_url))
 	die('unable to load xml');
-//echo ':'.$xml_doc->saveXML().':';
+//echo 'XML:'.$xml_doc->saveXML().':';
 
 //XSL aus der DB holen
 $qry = "SELECT text FROM public.tbl_vorlagestudiengang WHERE (studiengang_kz=0 OR studiengang_kz='".addslashes($xsl_stg_kz)."') AND vorlage_kurzbz='$xsl' ORDER BY studiengang_kz DESC, version DESC LIMIT 1";
@@ -173,6 +173,8 @@ $xsl_doc = new DOMDocument;
 //if(!$xsl_doc->load('../../../../xsl/collection.xsl'))
 if(!$xsl_doc->loadXML($row->text))
 	die('unable to load xsl');
+//echo 'XSL:'.$xsl_doc->saveXML().':';
+
 
 // Configure the transformer
 $proc = new XSLTProcessor;
@@ -180,9 +182,9 @@ $proc->importStyleSheet($xsl_doc); // attach the xsl rules
 
 $buffer = $proc->transformToXml($xml_doc);
 //in $buffer steht nun das xsl-fo file mit den daten
-$buffer = '<?xml version="1.0" encoding="ISO-8859-15" ?>'.substr($buffer, strpos($buffer,"\n"),strlen($buffer));
+/*$buffer = '<?xml version="1.0" encoding="ISO-8859-15" ?>'.substr($buffer, strpos($buffer,"\n"),strlen($buffer));*/
 //$buffer = html_entity_decode($buffer);
-//echo "buffer: $buffer";
+//echo "XSL-FO: $buffer";
 
 //Pdf erstellen
 $fo2pdf = new XslFo2Pdf();
@@ -193,7 +195,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 {
 	$uid = str_replace(';','',$_GET['uid']);
 	$qry = "SELECT nachname FROM campus.vw_benutzer WHERE uid='".addslashes($uid)."'";
-	
+
 	if($result = pg_query($conn, $qry))
 	{
 		if($row = pg_fetch_object($result))
@@ -234,10 +236,10 @@ else
 
 		}
 	}
-	
+
 	if($rechte->isBerechtigt('admin', $studiengang_kz, 'suid') || $rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid'))
 	{
-	
+
 		$filename = $user;
 		if (!$fo2pdf->generatePdf($buffer, $filename, 'F'))
 		{
@@ -248,11 +250,11 @@ else
 		$string = fread($handle, filesize($file));
 		fclose($handle);
 		unlink($file);
-	
+
 		$hex="";
 		for ($i=0;$i<strlen($string);$i++)
 			$hex.=(strlen(dechex(ord($string[$i])))<2)? "0".dechex(ord($string[$i])): dechex(ord($string[$i]));
-	
+
 		$akte = new akte($conn);
 		$akte->person_id = $person_id;
 	  	$akte->dokument_kurzbz = "Zeugnis";
@@ -274,7 +276,7 @@ else
 		else
 			return false;
 	}
-	else 
+	else
 		echo 'Keine Berechtigung zum Speichern';
 }
 ?>
