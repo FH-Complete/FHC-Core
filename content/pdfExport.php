@@ -126,10 +126,12 @@ if($xsl=='AccountInfo')
 			if(pg_num_rows($result_std)==1)
 			{
 				$row_std = pg_fetch_object($result_std);
-				//Mitarbeiterrechte erforderlich
+				//Rechte pruefen
 				if($rechte->isBerechtigt('admin', $row_std->studiengang_kz, 'suid') ||
 				   $rechte->isBerechtigt('admin', 0, 'suid') ||
-				   $rechte->isBerechtigt('assistenz', $row_std->studiengang_kz, 'suid'))
+				   $rechte->isBerechtigt('assistenz', $row_std->studiengang_kz, 'suid') ||
+				   $rechte->isBerechtigt('assistenz', 0, 'suid') ||
+				   $rechte->isBerechtigt('support', 0, 'suid'))
 				{
 					$isberechtigt=true;
 				}

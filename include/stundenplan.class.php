@@ -84,7 +84,46 @@ class stundenplan
 	// *********************************************************
 	function load($stundenplan_id)
 	{
-		return false;
+		$qry = "SELECT * FROM lehre.tbl_$this->stpl_table WHERE ".$this->stpl_table."_id='$stundenplan_id'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$id = $this->stpl_table.'_id';
+				$this->stundenplan_id = $row->$id;
+				$this->lehreinheit_id = $row->lehreinheit_id;
+				$this->unr = $row->unr;
+				$this->studiengang_kz = $row->studiengang_kz;
+				$this->semester = $row->semester;
+				$this->verband = $row->verband;
+				$this->gruppe = $row->gruppe;
+				$this->gruppe_kurzbz = $row->gruppe_kurzbz;
+				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$this->ort_kurzbz = $row->ort_kurzbz;
+				$this->datum = $row->datum;
+				$this->stunde = $row->stunde;
+				$this->titel = $row->titel;
+				$this->anmerkung = $row->anmerkung;
+				$this->fix = ($row->fix=='t'?true:false);
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->insertamum = $row->insertamum;
+				$this->insetvon = $row->insertvon;
+				
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = 'Der Datensatz wurde nicht gefunden';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
+			return false;
+		}
 	}
 
 	// *******************************************

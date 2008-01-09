@@ -191,6 +191,11 @@ if(!$error)
 			$errormsg = 'ID ist ungueltig';
 		}
 	}
+	elseif(isset($_POST['type']) && $_POST['type']=='savestundenplaneintrag')
+	{
+		$errormsg = 'Noch nicht implementiert';
+		$return = false;
+	}
 	else
 	{
 		$return = false;

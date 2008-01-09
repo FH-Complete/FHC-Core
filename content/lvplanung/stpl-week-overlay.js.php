@@ -206,12 +206,89 @@ function onStplDetail(event)
 }
 
 
+// ****
+// * oeffnet einen Dialog zum Bearbeiten der StundenplanDetails
+// ****
 function STPLDetailEdit()
 {
-	alert('comming soon');
+	tree = document.getElementById('treeStplDetails');
+	var col = tree.columns ? tree.columns["stundenplan_id"] : "stundenplan_id";
+	if(tree.currentIndex!=-1)
+	{
+		var id = tree.view.getCellText(tree.currentIndex,col);
+	}
+	else
+	{
+		alert('Bitte zuerst einen Eintrag markieren!');
+		return false;
+	}
+	
+	window.open('<?php echo APP_ROOT; ?>content/lvplanung/stpl-details-dialog.xul.php?id='+id,'Details', 'height=350,width=350,left=100,top=100,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
+// ****
+// * Speichert die Stundenplan-Detail-Daten
+// ****
+function STPLDetailSave(dialog)
+{
+	var id = dialog.getElementById('stpl-details-dialog-textbox-id').value;
+	var unr = dialog.getElementById('stpl-details-dialog-textbox-unr').value;
+	var verband = dialog.getElementById('stpl-details-dialog-textbox-verband').value;
+	var gruppe = dialog.getElementById('stpl-details-dialog-textbox-gruppe').value;
+	var gruppe_kurzbz = dialog.getElementById('stpl-details-dialog-menulist-gruppe_kurzbz').value;
+	var ort_kurzbz = dialog.getElementById('stpl-details-dialog-menulist-ort_kurzbz').value;
+	var datum = dialog.getElementById('stpl-details-dialog-box-datum').value;
+	var stunde = dialog.getElementById('stpl-details-dialog-menulist-stunde').value;
+	var titel = dialog.getElementById('stpl-details-dialog-textbox-titel').value;
+	var anmerkung = dialog.getElementById('stpl-details-dialog-textbox-anmerkung').value;
+	var fix = dialog.getElementById('stpl-details-dialog-checkbox-fix').checked;
+	
+	var url = '<?php echo APP_ROOT ?>content/tempusDBDML.php';
+	var req = new phpRequest(url,'','');
+	
+	req.add('type', 'savestundenplaneintrag');
 
+	req.add('stundenplan_id', id);
+	req.add('unr', unr);
+	req.add('verband', verband);
+	req.add('gruppe', gruppe);
+	req.add('gruppe_kurzbz', gruppe_kurzbz);
+	req.add('ort_kurzbz', ort_kurzbz);
+	req.add('datum', datum);
+	req.add('stunde', stunde);
+	req.add('titel', titel);
+	req.add('anmerkung', anmerkung);
+	req.add('stundenplan_id', id);
+	req.add('fix', fix);
+	
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+		return false;
+	}
+	else
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		
+		var treeStplDetails=parent.document.getElementById('treeStplDetails');
+		//alert('url'+STPLlastDetailUrl);
+		treeStplDetails.setAttribute('datasources', '');
+		treeStplDetails.setAttribute('datasources', STPLlastDetailUrl);
+		return true;
+	}
+	
+}
+
+// ****
+// * Loescht den Eintrag der im Detailfenster markiert ist aus der Stundenplantabelle
+// ****
 function STPLDetailDelete()
 {
 	//alert('url'+STPLlastDetailUrl);
