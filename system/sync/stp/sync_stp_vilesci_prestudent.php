@@ -156,7 +156,7 @@ if($result = pg_query($conn, $qry))
 		}
 		else
 		{
-			$datenquelle==$row->datenquelle;
+			$datenquelle=$row->datenquelle;
 		}
 		if($row->studiengang_kz=='' || $row->studiengang_kz==NULL)
 		{
@@ -323,7 +323,7 @@ if($result = pg_query($conn, $qry))
 					}
 					if($qry_ins!='')
 					{
-						$qry_ins="UPDATE public.tbl_prestudent SET".$qry_ins." updateamum=now(), updatevon='SYNC' WHERE person_id=".myaddslashes($row_synk->person_id)." AND studiengang_kz=".myaddslashes($row->studiengang_kz).";";		
+						$qry_ins="UPDATE public.tbl_prestudent SET".$qry_ins." updateamum=now(), updatevon='SYNC' WHERE person_id=".myaddslashes($row_synk->person_id)." AND studiengang_kz=".myaddslashes($row->studiengang_kz).";";
 					}
 				}
 			}
@@ -361,7 +361,7 @@ if($result = pg_query($conn, $qry))
 						$update++;
 					}
 					$iu='';
-					
+
 					if(!$error)
 					{
 						$qry_ins='';
@@ -386,7 +386,7 @@ if($result = pg_query($conn, $qry))
 								NULL, ".
 								myaddslashes($row->__person).")";
 						}
-						else 
+						else
 						{
 							$iu='u';
 							if($row_status=pg_fetch_object($result_status))
