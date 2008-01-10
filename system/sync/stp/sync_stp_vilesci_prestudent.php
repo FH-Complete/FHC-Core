@@ -19,9 +19,9 @@ require_once('sync_config.inc.php');
 
 $starttime=time();
 
-if (!$conn_ext=mssql_connect (STPDB_SERVER, STPDB_USER, STPDB_PASSWD))
+/*if (!$conn_ext=mssql_connect (STPDB_SERVER, STPDB_USER, STPDB_PASSWD))
 	die('Fehler beim Verbindungsaufbau!');
-mssql_select_db(STPDB_DB, $conn_ext);
+mssql_select_db(STPDB_DB, $conn_ext);*/
 
 $conn=pg_connect(CONN_STRING)
 	or die("Connection zur FH-Complete Datenbank fehlgeschlagen");
@@ -133,7 +133,7 @@ $qry="SELECT __Person, datenquelle, inAusmassBesch, HoechsteAusbildung, _cxZugan
 	chKalenderSemStatAend, inStudiensemester, _cxStudStatus, _StgOrgForm
 		FROM sync.stp_person JOIN sync.stp_stgvertiefung ON (_stgvertiefung=__stgvertiefung)
 		JOIN public.tbl_studiengang ON (_studiengang=ext_id)
-		WHERE __Person IN (__person FROM sync.tbl_syncperson) AND
+		WHERE __Person IN (SELECT __person FROM sync.tbl_syncperson) AND
 		(_cxPersonTyp='1' OR _cxPersonTyp='2');";
 
 //WHERE __Person IN (SELECT ext_id FROM tbl_person WHERE ext_id IS NOT NULL) AND
