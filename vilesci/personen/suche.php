@@ -168,7 +168,7 @@ if($searchstr!='')
 								$content.= "<td>".($row_mitarbeiter->aktiv=='t'?'Ja':'Nein')."</td>";
 								
 								$content.= "<td>";								
-								$sr=ldap_search($ds, "ou=People, dc=technikum-wien, dc=at", "uid=".$row_mitarbeiter->uid);
+								$sr=ldap_search($ds, LDAP_BASE_DN, "uid=".$row_mitarbeiter->uid);
 								$info = ldap_get_entries($ds, $sr);
 								if ($info["count"]==0)
 									$content.="Nein";
@@ -214,7 +214,7 @@ if($searchstr!='')
 								$content.= "<td>".($row_student->aktiv=='t'?'Ja':'Nein')."</td>";
 								
 								$content.= "<td>";
-								$sr=ldap_search($ds, "ou=People, dc=technikum-wien, dc=at", "uid=".$row_student->uid);
+								$sr=ldap_search($ds, LDAP_BASE_DN, "uid=".$row_student->uid);
 								$info = ldap_get_entries($ds, $sr);
 								if ($info["count"]==0)
 									$content.="Nein";
