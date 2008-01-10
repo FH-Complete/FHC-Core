@@ -193,8 +193,38 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='savestundenplaneintrag')
 	{
-		$errormsg = 'Noch nicht implementiert';
-		$return = false;
+		loadVariables($conn, get_uid());
+		$stundenplan = new stundenplan($conn, $db_stpl_table);
+		if($stundenplan->load($_POST['stundenplan_id']))
+		{
+			$stundenplan->unr = $_POST['unr'];
+			$stundenplan->verband = $_POST['verband'];
+			$stundenplan->gruppe = $_POST['gruppe'];
+			$stundenplan->gruppe_kurzbz = $_POST['gruppe_kurzbz;'];
+			$stundenplan->ort_kurzbz = $_POST['ort_kurzbz'];
+			$stundenplan->datum = $_POST['datum'];
+			$stundenplan->stunde = $_POST['stunde'];
+			$stundenplan->titel = $_POST['titel'];
+			$stundenplan->anmerkung = $_POST['anmerkung'];
+			$stundenplan->fix = ($_POST['fix']=='true'?true:false);
+			$stundenplan->updateamum = date('Y-m-d H:i:s');
+			$stundenplan->updatevon = get_uid();
+			
+			if($stundenplan->save(false))
+			{
+				$return = true;
+			}
+			else 
+			{
+				$return = false;
+				$errormsg = 'Fehler beim Speichern der Daten:'.$stundenplan->errormsg;
+			}
+		}
+		else 
+		{
+			$errormsg = 'Fehler beim Laden: '.$stundenplan->errormsg;
+			$return = false;
+		}
 	}
 	else
 	{

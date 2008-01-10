@@ -121,7 +121,7 @@ class stundenplan
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim Laden des Datensatzes';
+			$this->errormsg = 'Fehler beim Laden des Datensatzes'.$qry;
 			return false;
 		}
 	}
@@ -165,8 +165,7 @@ class stundenplan
 
 		if($new)
 		{
-			//ToDo ID entfernen
-			$qry = 'INSERT INTO lehre.'.$this->stpl_table.' (unr, mitarbeiter_uid, datum, stunde, ort_kurzbz, gruppe_kurzbz, 
+			$qry = 'INSERT INTO lehre.tbl_'.$this->stpl_table.' (unr, mitarbeiter_uid, datum, stunde, ort_kurzbz, gruppe_kurzbz, 
 					titel, anmerkung, lehreinheit_id, studiengang_kz, semester, verband, gruppe, fix, updateamum, updatevon, 
 					insertamum, insertvon)
 			        VALUES('.$this->addslashes($this->unr).','.
@@ -180,8 +179,8 @@ class stundenplan
 					$this->addslashes($this->lehreinheit_id).','.
 					$this->addslashes($this->studiengang_kz).','.
 					$this->addslashes($this->semester).','.
-					$this->addslashes($this->verband).','.
-					$this->addslashes($this->gruppe).','.
+					$this->addslashes(($this->verband!=''?$this->verband:' ')).','.
+					$this->addslashes(($this->gruppe!=''?$this->gruppe:' ')).','.
 					($this->fix?'true':'false').','.
 					$this->addslashes($this->updateamum).','.
 					$this->addslashes($this->updatevon).','.
@@ -190,7 +189,7 @@ class stundenplan
 		}
 		else
 		{
-			$qry = 'UPDATE lehre.'.$this->stpl_table.' SET'.
+			$qry = 'UPDATE lehre.tbl_'.$this->stpl_table.' SET'.
 			       ' unr='.$this->addslashes($this->unr).','.
 			       ' mitarbeiter_uid='.$this->addslashes($this->mitarbeiter_uid).','.
 			       ' datum='.$this->addslashes($this->datum).','.
@@ -202,12 +201,12 @@ class stundenplan
 			       ' lehreinheit_id='.$this->addslashes($this->lehreinheit_id).','.
 			       ' studiengang_kz='.$this->addslashes($this->studiengang_kz).','.
 			       ' semester='.$this->addslashes($this->semester).','.
-			       ' verband='.$this->addslashes($this->verband).','.
-			       ' gruppe='.$this->addslashes($this->gruppe).','.			       
+			       ' verband='.$this->addslashes(($this->verband!=''?$this->verband:' ')).','.
+			       ' gruppe='.$this->addslashes(($this->gruppe!=''?$this->gruppe:' ')).','.			       
 			       ' fix='.($this->fix?'true':'false').','.
 			       ' updateamum='.$this->addslashes($this->updateamum).','.
 			       ' updatevon='.$this->addslashes($this->updatevon).
-			       " WHERE stundenplan".(strstr('dev', $this->stpl_table)?'dev':'')."_id=".$this->addslashes($this->stundenplan_id).";";
+			       " WHERE ".$this->stpl_table."_id=".$this->addslashes($this->stundenplan_id).";";
 		}
 
 		if(pg_query($this->conn,$qry))
@@ -217,7 +216,7 @@ class stundenplan
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der LE:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern des Stundenplanes:'.pg_last_error($this->conn);
 			return false;
 		}
 	}
