@@ -25,6 +25,7 @@ function myaddslashes($var)
 	return ($var!=''?"'".addslashes($var)."'":'null');
 }
 
+
 // Sync-Tabelle fuer Personen checken
 if (!@pg_query($conn,'SELECT * FROM sync.tbl_syncperson LIMIT 1;'))
 {
@@ -109,12 +110,15 @@ if($result = pg_query($conn, $qry))
 	while($row=pg_fetch_object($result))
 	{
 		$cont='';
+		// Konvertieren
 		if ($row->_cxgeschlecht==1)
 			$row->_cxgeschlecht='m';
 		elseif ($row->_cxgeschlecht==2)
 			$row->_cxgeschlecht='w';
 		else
 			$row->_cxgeschlecht='';
+
+		// Check
 		if($row->chnachname==NULL)
 		{
 			$error_log1.="\nKein Nachname eingetragen";
