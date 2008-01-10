@@ -137,7 +137,7 @@ if (!@pg_query($conn,'SELECT lehrform_kurzbz FROM lehre.tbl_lehrveranstaltung LI
 		echo 'lehrform_kurzbz wurde bei lehre.tbl_lehrveranstaltung hinzugefuegt!<BR>';
 }
 
-// ************** lehre.tbl_lehrveranstaltung.projektarbeit ************************
+// ************** bis.tbl_bundesland ************************
 if (!@pg_query($conn,'SELECT * FROM bis.tbl_bundesland LIMIT 1;'))
 {
 	$sql='	CREATE TABLE bis.tbl_bundesland
@@ -159,6 +159,38 @@ if (!@pg_query($conn,'SELECT * FROM bis.tbl_bundesland LIMIT 1;'))
 	else
 		echo 'Tabelle bis.tbl_bundesland wurde hinzugefuegt!<BR>';
 }
+
+// ************** lehre.vw_stundenplandev_student_unr ************************
+if (!@pg_query($conn,'SELECT * FROM lehre.vw_stundenplandev_student_unr LIMIT 1;'))
+{
+	$sql="	CREATE OR REPLACE VIEW lehre.vw_stundenplandev_student_unr AS
+				SELECT unr, datum, stunde, student_uid
+				FROM
+				(
+					SELECT stpl.unr, stpl.datum, stpl.stunde, uid AS student_uid
+					FROM lehre.tbl_stundenplandev stpl JOIN tbl_benutzergruppe USING (gruppe_kurzbz)
+					WHERE studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM tbl_studiensemester WHERE stpl.datum<=ende AND stpl.datum>=start)
+					GROUP BY stpl.unr, stpl.datum, stpl.stunde, uid
+					UNION
+					SELECT stpl.unr, stpl.datum, stpl.stunde, student_uid
+					FROM lehre.tbl_stundenplandev stpl JOIN tbl_studentlehrverband
+						ON 	(stpl.gruppe_kurzbz IS NULL AND stpl.studiengang_kz=tbl_studentlehrverband.studiengang_kz AND stpl.semester=tbl_studentlehrverband.semester
+							AND (stpl.verband=tbl_studentlehrverband.verband OR (stpl.verband=' ' AND stpl.verband!=tbl_studentlehrverband.verband))
+							AND (stpl.gruppe=tbl_studentlehrverband.gruppe OR (stpl.gruppe=' ' AND stpl.gruppe!=tbl_studentlehrverband.gruppe))
+							)
+					WHERE studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM tbl_studiensemester WHERE stpl.datum<=ende AND stpl.datum>=start)
+					GROUP BY stpl.unr,stpl.datum,stpl.stunde,student_uid
+				) AS sub_stpl_uid
+				GROUP BY unr, datum, stunde, student_uid;
+			GRANT select on lehre.vw_stundenplandev_student_unr to group admin;
+			GRANT select on lehre.vw_stundenplandev_student_unr to group web;";
+	if (!@pg_query($conn,$sql))
+		echo '<strong>lehre.vw_stundenplandev_student_unr: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo 'VIEW lehre.vw_stundenplandev_student_unr wurde hinzugefuegt!<BR>';
+}
+
+
 
 
 
