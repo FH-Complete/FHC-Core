@@ -135,7 +135,7 @@
 				</head>
 				<body class="Background_main">
 				<h2>Reihungstest - Verwaltung</h2>';
-
+		
 		// Speichern eines Reihungstesttermines
 		if(isset($_POST['speichern']))
 		{
@@ -189,6 +189,7 @@
 					echo 'Fehler beim Speichern der Daten: '.$reihungstest->errormsg;
 				}
 			}
+			$neu=false;
 		}
 		echo '<br><table width="100%"><tr><td>';
 		
@@ -254,7 +255,7 @@
 		{
 			if($stg_kz!=-1 && $stg_kz!='')
 				$reihungstest->studiengang_kz = $stg_kz;
-				
+			$reihungstest_id='';
 			$reihungstest->datum = date('Y-m-d');
 			$reihungstest->uhrzeit = date('H:i:s');
 		}
@@ -286,7 +287,7 @@
 		//Ort DropDown
 		echo "<tr><td>Ort</td><td><SELECT name='ort_kurzbz'>";
 		
-		if($reihungstes->ort_kurzbz=='')
+		if($reihungstest->ort_kurzbz=='')
 			$selected = 'selected';
 		else 
 			$selected = '';
@@ -308,11 +309,17 @@
 		echo '<tr><td>Anmerkung</td><td><input type="input" name="anmerkung" value="'.$reihungstest->anmerkung.'"></td></tr>';
 		echo '<tr><td>Datum</td><td><input type="input" name="datum" value="'.$datum_obj->convertISODate($reihungstest->datum).'"></td></tr>';
 		echo '<tr><td>Uhrzeit</td><td><input type="input" name="uhrzeit" value="'.$reihungstest->uhrzeit.'"></td></tr>';
-		echo '<tr><td></td><td><input type="submit" name="speichern" value="Speichern"></td></tr>';
+		if(!$neu)
+			$val = 'Speichern';
+		else 
+			$val = 'Neu anlegen';
+		
+		echo '<tr><td></td><td><input type="submit" name="speichern" value="'.$val.'"></td></tr>';
 		echo '</table>';
 		echo '</FORM>';
 		
-		echo '<HR>';	
+		echo '<HR>';
+		
 		if($reihungstest_id!='')
 		{
 			echo "<a href='".$_SERVER['PHP_SELF']."?reihungstest_id=$reihungstest_id&excel=true'>Excel Export</a><br><br>";
