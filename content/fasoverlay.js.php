@@ -580,18 +580,26 @@ function StatistikPrintKoordinatorstunden()
 {
 	tree = document.getElementById('tree-fachbereich');
 
-	if(tree.currentIndex==-1)
+	try
 	{
-		alert('Bitte zuerst einen Fachbereich auswaehlen');
-		return;
+		//Fachbereich holen
+		var col;
+		col = tree.columns ? tree.columns["fachbereich-treecol-kurzbz"] : "fachbereich-treecol-kurzbz";
+		var fachbereich_kurzbz=tree.view.getCellText(tree.currentIndex,col);
+		
+		col = tree.columns ? tree.columns["fachbereich-treecol-uid"] : "fachbereich-treecol-uid";
+		var uid=tree.view.getCellText(tree.currentIndex,col);
+	
+		if(uid=='')
+			window.open('<?php echo APP_ROOT ?>content/statistik/koordinatorstunden.php?fachbereich_kurzbz='+fachbereich_kurzbz,'Koordinatorstunden');
+		else
+			alert('Bitte einen Fachbereich auswaehlen');
 	}
-
-	//Fachbereich holen
-	var col;
-	col = tree.columns ? tree.columns["kurzbz"] : "kurzbz";
-	var fachbereich_kurzbz=tree.view.getCellText(tree.currentIndex,col);
-
-	window.open('<?php echo APP_ROOT ?>content/statistik/koordinatorstunden.php?fachbereich_kurzbz='+fachbereich_kurzbz,'Koordinatorstunden');
+	catch(e)
+	{
+		alert('Bitte einen Fachbereich auswaehlen');
+		return false;
+	}
 }
 
 // ****
