@@ -133,9 +133,10 @@ $qry="SELECT __Person, datenquelle, inAusmassBesch, HoechsteAusbildung, _cxZugan
 	chKalenderSemStatAend, inStudiensemester, _cxStudStatus, _StgOrgForm
 		FROM sync.stp_person JOIN sync.stp_stgvertiefung ON (_stgvertiefung=__stgvertiefung)
 		JOIN public.tbl_studiengang ON (_studiengang=ext_id)
-		WHERE __Person IN (SELECT ext_id FROM tbl_person WHERE ext_id IS NOT NULL) AND
+		WHERE __Person IN (__person FROM sync.tbl_syncperson) AND
 		(_cxPersonTyp='1' OR _cxPersonTyp='2');";
 
+//WHERE __Person IN (SELECT ext_id FROM tbl_person WHERE ext_id IS NOT NULL) AND
 $error_log_ext="Überprüfung Prestudentdaten in EXT-DB:\n\n";
 $start=date("d.m.Y H:i:s");
 echo $start."<br>";
