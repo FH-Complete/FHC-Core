@@ -28,8 +28,8 @@ function onJumpNow()
 
 	var d = new Date();
     var datum=0;
-    //Aktuelles Datum ermitteln
-    datum = ((d.getDate()+3)*60*60*24)+((d.getMonth())*31*24*60*60)+((d.getFullYear()-1970)*365*24*60*60);
+    //Sekunden seit 1.1.1970
+    datum = d.getTime()/1000;
 	//alert(datum);
 	var attributes="?type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
 	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
