@@ -70,7 +70,7 @@ $studiengang->load($stundenplan->studiengang_kz);
 
 <vbox>
 
-<textbox id="stpl-details-dialog-textbox-id" hidden="true"/>
+<textbox id="stpl-details-dialog-textbox-id" hidden="true" value="<?php echo $id; ?>"/>
 
 <groupbox id="stpl-details-dialog-groupbox" flex="1">
 	<caption label="Details"/>
