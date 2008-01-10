@@ -177,6 +177,7 @@ if(!$result = pg_query($conn, $qry))
 			<LVA:sprache><![CDATA[".$row_lva->sprache."]]></LVA:sprache>
 			<LVA:ects>".$row_lva->lv_ects."</LVA:ects>
 			<LVA:semesterstunden>".$row_lva->semesterstunden."</LVA:semesterstunden>
+			<LVA:planstunden><![CDATA[]]></LVA:planstunden>
 			<LVA:anmerkung><![CDATA[".$row_lva->anmerkung."]]></LVA:anmerkung>
 			<LVA:lehre>".($row_lva->lehre=='t'?'Ja':'Nein')."</LVA:lehre>
 			<LVA:lehreverzeichnis><![CDATA[".$row_lva->lv_lehreverzeichnis."]]></LVA:lehreverzeichnis>
@@ -226,14 +227,16 @@ if(!$result = pg_query($conn, $qry))
 					$grp.=' '.$row_grp->gruppe_kurzbz;
 			}
 			//Lektoren und Stunden holen
-			$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE lehreinheit_id='$row_le->lehreinheit_id'";
+			$qry = "SELECT kurzbz, semesterstunden, planstunden FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE lehreinheit_id='$row_le->lehreinheit_id'";
 			$result_lkt = pg_query($conn, $qry);
 			$lkt='';
 			$semesterstunden='';
+			$planstunden='';
 			while($row_lkt = pg_fetch_object($result_lkt))
 			{
 				$lkt.=$row_lkt->kurzbz.' ';
 				$semesterstunden.=$row_lkt->semesterstunden.' ';
+				$planstunden.=$row_lkt->planstunden.' ';
 			}
 			$qry = "SELECT tbl_fachbereich.bezeichnung FROM public.tbl_fachbereich, lehre.tbl_lehrfach, lehre.tbl_lehreinheit WHERE tbl_fachbereich.fachbereich_kurzbz=tbl_lehrfach.fachbereich_kurzbz AND tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND tbl_lehreinheit.lehreinheit_id='$row_le->lehreinheit_id'";
 			$fachbereich='';
@@ -252,6 +255,7 @@ if(!$result = pg_query($conn, $qry))
 				<LVA:sprache><![CDATA[".$row_le->sprache."]]></LVA:sprache>
 				<LVA:ects></LVA:ects>
 				<LVA:semesterstunden><![CDATA[".$semesterstunden."]]></LVA:semesterstunden>
+				<LVA:planstunden><![CDATA[".$planstunden."]]></LVA:planstunden>
 				<LVA:anmerkung><![CDATA[".$row_le->anmerkung."]]></LVA:anmerkung>
 				<LVA:lehre>".($row_le->lehre?'Ja':'Nein')."</LVA:lehre>
 				<LVA:lehreverzeichnis></LVA:lehreverzeichnis>

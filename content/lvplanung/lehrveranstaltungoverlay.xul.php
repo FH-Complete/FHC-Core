@@ -94,6 +94,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 				<treecol id="lehrveranstaltung-treecol-semesterstunden" label="Semesterstunden" flex="1" hidden="true" persist="hidden, width, ordinal"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#semesterstunden"/>
+				<treecol id="lehrveranstaltung-treecol-planstunden" label="Planstunden" flex="1" hidden="true" persist="hidden, width, ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#planstunden"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="lehrveranstaltung-treecol-lehre" label="Lehre" flex="2" hidden="false" persist="hidden, width, ordinal"
 					class="sortDirectionIndicator"
@@ -166,6 +169,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#sprache"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#ects"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#semesterstunden"/>
+							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#planstunden"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehre"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrform_kurzbz"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#stundenblockung"/>
