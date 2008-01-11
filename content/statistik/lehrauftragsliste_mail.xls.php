@@ -191,6 +191,10 @@ if($result_stg = pg_query($conn, $qry_stg))
 										tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND 
 										tbl_lehrveranstaltung.studiengang_kz='$studiengang_kz' AND
 										tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
+										tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND
+										tbl_lehreinheitmitarbeiter.semesterstunden is not null AND
+										tbl_lehreinheitmitarbeiter.stundensatz<>0 AND
+										tbl_lehreinheitmitarbeiter.faktor<>0 AND
 										tbl_lehreinheit.studiensemester_kurzbz='$semester_aktuell');";
 			
 			if($result = pg_query($conn, $qry))
