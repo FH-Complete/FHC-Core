@@ -212,6 +212,7 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 // **************** Ausgabe vorbereiten ******************************
 $s=array();
 $outp.="<SELECT name='stg_kz'>";
+//Auswahl Studiengang
 foreach ($studiengang as $stg)
 {
 	$outp.="<OPTION onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$stg->studiengang_kz&semester=$semester&studiensemester_kurzbz=$studiensemester_kurzbz'\" ".($stg->studiengang_kz==$stg_kz?'selected':'').">$stg->kurzbzlang ($stg->kuerzel) - $stg->bezeichnung</OPTION>";
@@ -220,7 +221,7 @@ foreach ($studiengang as $stg)
 	$s[$stg->studiengang_kz]->kurzbz=$stg->kurzbzlang;
 }
 $outp.='</SELECT>';
-
+//Auswahl Studiensemester
 $outp.="<select name='studiensemester_kurzbz'>\n";
 foreach ($ss_arr AS $sts)
 {
@@ -236,9 +237,8 @@ $outp.= '<BR> -- ';
 for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
 	$outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semester='.$i.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'">'.$i.'</A> -- ';
 $outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semester=100&studiensemester_kurzbz='.$studiensemester_kurzbz.'">alle</A> -- ';
+//Aufbau Ausgabe
 ?>
-
-
 <html>
 <head>
 <title>Studenten Vorrueckung</title>
