@@ -20,6 +20,9 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
  *          Gerald Raab <gerald.raab@technikum-wien.at>.
  */
+/*
+Vorrückung aller AKTIVEN Studenten ins nächste Semester.
+*/
 require_once('../config.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/studiensemester.class.php');
@@ -38,6 +41,7 @@ $s=new studiengang($conn);
 $s->getAll('typ, kurzbz', true);
 $studiengang=$s->result;
 
+//Einlesen der studiensemester in einen Array
 $ss = new studiensemester($conn);
 $ss->getAll();
 foreach($ss->studiensemester as $studiensemester)
@@ -47,6 +51,7 @@ foreach($ss->studiensemester as $studiensemester)
 
 $user = get_uid();
 
+//Übergabeparameter
 if (isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
 	$stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:$_POST['stg_kz']);
 else
@@ -70,9 +75,11 @@ $studiensemester_kurzbz_zk=$ss->studiensemester_kurzbz;	//nächstes Semester
 
 if(!is_numeric($stg_kz))
 	$stg_kz=0;
+//semester=100 bedeutet die Auswahl aller Semester
 if(!is_numeric($semester))
 	$semester=100;
 
+//Einlesen der maximalen, regulären Dauer der Studiengänge in einen Array
 $qry_stg="SELECT * FROM public.tbl_studiengang";
 if ($result_stg=pg_query($conn, $qry_stg))
 {
