@@ -46,8 +46,10 @@ $headers.="Content-Type: text/html; charset=iso-8859-1\r\n";
 
 $ss=new studiensemester($conn);
 $ss->getAktTillNext();
-$datum_begin=$ss->start;
-$datum_ende='2008-07-09'; // $ss->ende
+//$datum_begin=$ss->start;
+$datum_begin='2008-01-09';
+//$datum_ende='2008-07-09'; // $ss->ende
+$datum_ende='2008-01-13'; // $ss->ende
 
 
 $message_begin='Dies ist eine automatische Mail!<BR>Es haben sich folgende Aenderungen in Ihrem Stundenplan ergeben:<BR>';
@@ -56,10 +58,11 @@ $message_begin='Dies ist eine automatische Mail!<BR>Es haben sich folgende Aende
 /**************************************************
  * Datensaetze holen die neu sind
  */
-echo 'Neue Datens&auml;tze werden angelegt.<BR>';flush();
+echo 'Neue Datens&auml;tze werden geholt.<BR>';flush();
 $sql_query="SELECT * FROM lehre.vw_stundenplandev WHERE datum>='$datum_begin' AND datum<='$datum_ende' AND
 	stundenplandev_id NOT IN
-	(SELECT stundenplan_id FROM lehre.tbl_stundenplan WHERE datum>='$datum_begin' AND datum<='$datum_ende');";
+	(SELECT stundenplan_id FROM lehre.tbl_stundenplan WHERE datum>='$datum_begin' AND datum<='$datum_ende')
+	ORDER BY datum, stunde;";
 //echo $sql_query.'<BR>';
 if (!$result=pg_query($conn, $sql_query))
 {
@@ -68,9 +71,10 @@ if (!$result=pg_query($conn, $sql_query))
 }
 else
 {
-	flush();
+	echo 'Neue Datens&auml;tze werden angelegt.<BR>';flush();
 	while ($row=pg_fetch_object($result))
 	{
+		echo '.';flush();
 		$sql_query='INSERT INTO lehre.tbl_stundenplan
 			(stundenplan_id,unr,mitarbeiter_uid,datum,stunde,ort_kurzbz,studiengang_kz,semester,verband,gruppe,
 			gruppe_kurzbz,titel,anmerkung,fix,updateamum,updatevon,insertamum,insertvon,lehreinheit_id) VALUES';
@@ -122,7 +126,8 @@ else
 				{
 					$message[$row->uid]->isneu=true;
 					$message[$row->uid]->mailadress=$row->uid.'@technikum-wien.at';
-					$message[$row->uid]->message=$message_begin.'<BR>Neue Stunden:<BR>
+					$message[$row->uid]->message_begin=$message_begin.'<BR>';
+					$message[$row->uid]->message='Neue Stunden:<BR>
 						<TABLE><TR><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
 				}
 				$message[$row->uid]->message.='<TR><TH>'.$row->ort_kurzbz.'</TH>';
@@ -158,7 +163,7 @@ else
 * Datensaetze holen die alt sind
 */
 
-echo '<BR>Alte Datens&auml;tze werden gel&ouml;scht.<BR>';flush();
+echo '<BR>Alte Datens&auml;tze werden geholt.<BR>';flush();
 $sql_query="SELECT * FROM lehre.vw_stundenplan WHERE datum>='$datum_begin' AND datum<='$datum_ende'
 				AND stundenplan_id NOT IN
 				(SELECT stundenplandev_id FROM lehre.tbl_stundenplandev WHERE datum>='$datum_begin' AND datum<='$datum_ende');";
@@ -167,9 +172,11 @@ if (!$result=pg_query($conn, $sql_query))
 	echo $sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
 	$message_sync.=$sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
 }
+echo '<BR>Alte Datens&auml;tze werden gel&ouml;scht.<BR>';flush();
 while ($row=pg_fetch_object($result))
 {
 	$sql_query='DELETE FROM lehre.tbl_stundenplan WHERE stundenplan_id='.$row->stundenplan_id;
+	echo '.';flush();
 	//echo $sql_query.'<BR>';
 	if (!$result_delete=pg_query($conn, $sql_query))
 	{
@@ -193,7 +200,8 @@ while ($row=pg_fetch_object($result))
 			{
 				$message[$row->uid]->isalt=true;
 				$message[$row->uid]->mailadress=$row->uid.'@technikum-wien.at';
-				$message[$row->uid]->message.=$message_begin.'<BR>Gel&ouml;eschte Stunden:<BR>
+				$message[$row->uid]->message_begin=$message_begin.'<BR>';
+				$message[$row->uid]->message.='Gel&ouml;eschte Stunden:<BR>
 					<TABLE><TR><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
 			}
 			$message[$row->uid]->message.='<TR><TH>'.$row->ort_kurzbz.'</TH>';
@@ -219,17 +227,17 @@ while ($row=pg_fetch_object($result))
 		$message[$verband]->message.='<TH>'.$row->datum.'/'.$row->stunde.'</TH>';
 		$message[$verband]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
 	}
-	foreach($message as $msg)
-		if($msg->isalt)
-			$msg->message.='</table>';
 }
+foreach($message as $msg)
+	if(isset($msg->isalt))
+		$msg->message.='</TABLE>';
 
 
 /**************************************************
  * Datensaetze holen die anders sind
  */
 
-echo '<BR>Datens&auml;tze werden ge&auml;ndert.<BR>';flush();
+echo '<BR>Ge&auml;nderte Datens&auml;tze werden geholt.<BR>';flush();
 $sql_query="SELECT vw_stundenplandev.*, vw_stundenplan.datum AS old_datum, vw_stundenplan.stunde AS old_stunde,
 				vw_stundenplan.ort_kurzbz AS old_ort_kurzbz, vw_stundenplan.lektor AS old_lektor
 			FROM lehre.vw_stundenplandev, lehre.vw_stundenplan
@@ -255,8 +263,10 @@ if (!$result=pg_query($conn, $sql_query))
 	echo $sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
 	$message_sync.=$sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
 }
+echo '<BR>Datens&auml;tze werden ge&auml;ndert.<BR>';flush();
 while ($row=pg_fetch_object($result))
 {
+	echo '.';flush();
 	// Alten Eintrag aus tbl_stundenplan holen
 	$sql_query="SELECT * FROM lehre.tbl_stundenplandev WHERE stundenplandev_id=$row->stundenplandev_id;";
 	if (!$result_old=pg_query($conn, $sql_query))
@@ -317,7 +327,8 @@ while ($row=pg_fetch_object($result))
 			{
 				$message[$row->uid]->isset=true;
 				$message[$row->uid]->mailadress=$row->uid.'@technikum-wien.at';
-				$message[$row->uid]->message.=$message_begin.'<BR>Ge&auml;nderte Stunden:<BR>
+				$message[$row->uid]->message_begin=$message_begin.'<BR>';
+				$message[$row->uid]->message.='Ge&auml;nderte Stunden:<BR>
 					<TABLE><TR><TD>Status</TD><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
 			}
 			$message[$row->uid]->message.='<TR><TH>Vorher: </TH><TH>'.$row->old_ort_kurzbz.'</TH>';
@@ -356,7 +367,7 @@ while ($row=pg_fetch_object($result))
 		$message[$verband]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
 	}
 	foreach($message as $msg)
-		if($msg->isset)
+		if(isset($msg->isset))
 			$msg->message.='</table>';
 }
 
@@ -366,7 +377,7 @@ while ($row=pg_fetch_object($result))
 if ($sendmail)
 	foreach ($message as $msg)
 		if (mail('pam@technikum-wien.at',"Stundenplan update",$msg->message,$headers."From: stpl@technikum-wien.at"))
-		//if (mail($msg->mailadress,"Stundenplan update",$msg->message,$headers."From: stpl@technikum-wien.at"))
+		//if (mail($msg->mailadress,"Stundenplan update",$msg->message_begin.$msg->message,$headers."From: stpl@technikum-wien.at"))
 		{
 			echo 'Mail an '.$msg->mailadress.' wurde verschickt!<BR>';
 			$message_stpl.='Mail an '.$msg->mailadress.' wurde verschickt!<BR>';
