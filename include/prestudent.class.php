@@ -723,7 +723,7 @@ class prestudent extends person
 		}			
 	}
 		
-	function getLastStatus($prestudent_id)
+	function getLastStatus($prestudent_id, $studiensemester_kurzbz='')
 	{
 		if($prestudent_id=='' || !is_numeric($prestudent_id))
 		{
@@ -731,7 +731,12 @@ class prestudent extends person
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='$prestudent_id' ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1";
+		$qry = "SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='$prestudent_id'";
+
+		if($studiensemester_kurzbz!='')
+			$qry.=" AND studiensemester_kurzbz='$studiensemester_kurzbz'";
+		
+		$qry.=" ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1";
 		if($result = pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($result))

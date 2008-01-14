@@ -584,31 +584,60 @@ if(!$error)
 			}
 			else
 			{
-				$rolle = new prestudent($conn, null, true);
-				if($rolle->load_rolle($_POST['prestudent_id'],$_POST['rolle_kurzbz'],$_POST['studiensemester_kurzbz'], $_POST['ausbildungssemester']))
+				$qry = "SELECT count(*) as anzahl FROM public.tbl_prestudentrolle WHERE prestudent_id='".addslashes($_POST['prestudent_id'])."'";
+				if($result = pg_query($conn, $qry))
 				{
-					if($rechte->isBerechtigt('admin', $_POST['studiengang_kz'], 'suid') || $rechte->isBerechtigt('assistenz', $_POST['studiengang_kz'], 'suid'))
+					if($row = pg_fetch_object($result))
 					{
-						if($rolle->delete_rolle($_POST['prestudent_id'],$_POST['rolle_kurzbz'],$_POST['studiensemester_kurzbz'], $_POST['ausbildungssemester']))
+						if($row->anzahl<=1)
 						{
-							$return = true;
+							$return = false;
+							$errormsg = 'Die letzte Rolle darf nicht geloescht werden';
+							$error = true;
+						}
+					}
+					else 
+					{
+						$return = false;
+						$errormsg = 'Fehler beim Ermitteln der Rollen';
+						$error = true;
+					}
+				}
+				else 
+				{
+					$return = false;
+					$error = true;
+					$errormsg = 'Fehler beim Ermitteln der Rollen';
+				}
+				
+				if(!$error)
+				{
+					$rolle = new prestudent($conn, null, true);
+					if($rolle->load_rolle($_POST['prestudent_id'],$_POST['rolle_kurzbz'],$_POST['studiensemester_kurzbz'], $_POST['ausbildungssemester']))
+					{
+						if($rechte->isBerechtigt('admin', $_POST['studiengang_kz'], 'suid') || $rechte->isBerechtigt('assistenz', $_POST['studiengang_kz'], 'suid'))
+						{
+							if($rolle->delete_rolle($_POST['prestudent_id'],$_POST['rolle_kurzbz'],$_POST['studiensemester_kurzbz'], $_POST['ausbildungssemester']))
+							{
+								$return = true;
+							}
+							else
+							{
+								$return = false;
+								$errormsg = $rolle->errormsg;
+							}
 						}
 						else
 						{
 							$return = false;
-							$errormsg = $rolle->errormsg;
+							$errormsg = 'Sie haben keine Berechtigung zum Loeschen dieser Rolle:'.$_POST['studiengang_kz'];
 						}
 					}
 					else
 					{
 						$return = false;
-						$errormsg = 'Sie haben keine Berechtigung zum Loeschen dieser Rolle:'.$_POST['studiengang_kz'];
+						$errormsg = $rolle->errormsg;
 					}
-				}
-				else
-				{
-					$return = false;
-					$errormsg = $rolle->errormsg;
 				}
 			}
 		}

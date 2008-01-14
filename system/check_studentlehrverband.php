@@ -8,6 +8,11 @@
 // **********************************
 require_once('../vilesci/config.inc.php');
 require_once('../include/studiensemester.class.php');
+require_once('../include/person.class.php');
+require_once('../include/benutzer.class.php');
+require_once('../include/student.class.php');
+require_once('../include/prestudent.class.php');
+require_once('../include/lehrverband.class.php');
 
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim Hestellen der DB Verbindung');
@@ -18,6 +23,8 @@ $anzahl_gruppenaenderung=0;
 $anzahl_gruppenaenderung_fehler=0;
 $text='';
 $statistik ='';
+$abunterbrecher_verschoben_error=0;
+$abunterbrecher_verschoben=0;
 
 // ****
 // * Bei Studenten mit fehlener Prestudent_id wird die passende id ermittelt und Eingetragen
@@ -69,6 +76,100 @@ if($result = pg_query($conn, $qry))
 }
 
 // *****
+// * Gruppenzuteilung von Abbrechern und Unterbrechern korrigieren.
+// * Abbrecher werden in die Gruppe 0A verschoben
+// * Unterbrecher in die Gruppe 0B
+// *****
+$text.="\n\nKorrigiere Gruppenzuteilungen von Ab-/Unterbrechern\n";
+
+//Alle Ab-/Unterbrecher holen die nicht im 0. Semester sind
+$qry = "SELECT 
+			student_uid,
+			tbl_student.studiengang_kz,
+			tbl_prestudent.prestudent_id,
+			rolle_kurzbz,
+			studiensemester_kurzbz
+		FROM
+			public.tbl_student,
+			public.tbl_prestudent,
+			public.tbl_prestudentrolle
+		WHERE
+			tbl_student.prestudent_id=tbl_prestudent.prestudent_id AND
+			tbl_prestudent.prestudent_id=tbl_prestudentrolle.prestudent_id AND
+			(
+				tbl_prestudentrolle.rolle_kurzbz='Unterbrecher' OR 
+				tbl_prestudentrolle.rolle_kurzbz='Abbrecher'
+			)
+			AND
+			EXISTS (SELECT 
+						* 
+					FROM 
+						public.tbl_studentlehrverband 
+					WHERE 
+			        	student_uid=tbl_student.student_uid AND 
+			        	studiensemester_kurzbz=tbl_prestudentrolle.studiensemester_kurzbz AND 
+			        	semester<>0
+			        )
+		";
+
+if($result = pg_query($conn, $qry))
+{
+	while($row = pg_fetch_object($result))
+	{
+		//Eintrag nur korrigieren wenn der Abbrecher/Unterbrecher Status der letzte in diesem Studiensemester ist
+		$prestd = new prestudent($conn);
+		$prestd->getLastStatus($row->prestudent_id, $row->studiensemester_kurzbz);
+		
+		if($prestd->rolle_kurzbz=='Unterbrecher' || $prestd->rolle_kurzbz=='Abbrecher')
+		{
+			//Studentlehrverbandeintrag aktualisieren
+			$student = new student($conn);
+			if($student->studentlehrverband_exists($row->student_uid, $row->studiensemester_kurzbz))
+				$student->new = false;
+			else 
+			{
+				$student->new = true;
+				$student->insertamum = date('Y-m-d H:i:s');
+				$student->insertvon = 'auto';
+			}
+				
+			$student->uid = $row->student_uid;
+			$student->studiensemester_kurzbz=$row->studiensemester_kurzbz;
+			$student->studiengang_kz = $row->studiengang_kz;
+			$student->semester = '0';
+			$student->verband = ($prestd->rolle_kurzbz=='Unterbrecher'?'B':'A');
+			$student->gruppe = ' ';
+			$student->updateamum = date('Y-m-d H:i:s');
+			$student->updatevon = 'auto';
+			
+			//Pruefen ob der Lehrverband exisitert, wenn nicht dann wird er angelegt
+			$lehrverband = new lehrverband($conn);
+			if(!$lehrverband->exists($student->studiengang_kz, $student->semester, $student->verband, $student->gruppe))
+			{
+				$lehrverband->studiengang_kz = $student->studiengang_kz;
+				$lehrverband->semester = $student->semester;
+				$lehrverband->verband = $student->verband;
+				$lehrverband->gruppe = $student->gruppe;
+				$lehrverband->bezeichnung = ($student->verband=='A'?'Abbrecher':'Unterbrecher');
+								
+				$lehrverband->save(true);		
+			}
+			
+			if($student->save_studentlehrverband())
+			{
+				$text.="Student $student->uid wurde im $row->studiensemester_kurzbz in die Gruppe $student->semester$student->verband verschoben\n";
+				$abunterbrecher_verschoben++;
+			}
+			else 
+			{
+				$text.="Fehler biem Speichern des Lehrverbandeintrages bei $student->student_uid:".$student->errormsg."\n";
+				$abunterbrecher_verschoben_error++;
+			}
+		}
+	}
+}
+
+// *****
 // * Unterschiedliche Gruppenzuteilungen in tbl_studentlehrverband - tbl_student korrigieren
 // *****
 
@@ -111,7 +212,7 @@ if($result = pg_query($conn, $qry))
 		}
 		else 
 		{
-			$text.="Fehler beim aendern der Gruppe: ".pg_last_error($conn)."\n";
+			$text.="Fehler beim Aendern der Gruppe: ".pg_last_error($conn)."\n";
 			$anzahl_gruppenaenderung_fehler++;
 		}
 	}
@@ -121,6 +222,8 @@ else
 
 $statistik .= "Prestudent_id wurde bei $anzahl_neue_prestudent_id Studenten korrigiert\n";
 $statistik .= "$anzahl_fehler_prestudent Fehler sind bei der Korrektur der Prestudent_id aufgetreten\n";
+$statistik .= "$abunterbrecher_verschoben Studenten wurden ins 0. Semester verschoben\n ";
+$statistik .= "$abunterbrecher_verschoben_error Fehler sind beim Verschieben aufgetreten\n ";
 $statistik .= "Bei $anzahl_gruppenaenderung Studenten wurde die Gruppenzuordnung korrigiert\n";
 $statistik .= "$anzahl_gruppenaenderung_fehler Fehler sind bei der Korrektur der Gruppenzuordnung aufgetreten\n";
 $statistik .= "\n\n";

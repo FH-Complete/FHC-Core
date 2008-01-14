@@ -53,3 +53,10 @@
 <!ENTITY menu-help-todo.key          	"T">
 <!ENTITY menu-help-todo.label        	"ToDo">
 <!ENTITY menu-help-todo.accesskey    	"T">
+
+<!ENTITY menu-extras.label              	"Extras">
+<!ENTITY menu-extras.accesskey           	"E">
+
+<!ENTITY menu-extras-kollisionstudent.key		"K">
+<!ENTITY menu-extras-kollisionstudent.label		"Kollision Student">
+<!ENTITY menu-extras-kollisionstudent.accesskey	"K">

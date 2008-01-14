@@ -1945,7 +1945,10 @@ function StudentKontoFilterStudenten(filter)
 
 	//Wenn nichts markiert wurde -> beenden
 	if(tree.currentIndex==-1)
+	{
+		alert('Bitte zuerst einen Studiengang/Semester waehlen');
 		return;
+	}
 	
     // Progressmeter starten. Ab jetzt keine 'return's mehr.
     document.getElementById('statusbar-progressmeter').setAttribute('mode','undetermined');

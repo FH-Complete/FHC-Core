@@ -31,6 +31,8 @@ class student extends benutzer
 	var $verband;
 	var $gruppe;
 	var $ext_id_student;
+	
+	var $studiensemester_kurzbz;
 
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional einen Studenten
