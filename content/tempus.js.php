@@ -133,15 +133,27 @@ function stpltableChange(db_stpl_table)
 	return true;
 }
 
-function studiensemesterChange()
+// ****
+// * Wechselt von Studiensemester 'stsem' um 'wert' Studiensemester vor bzw zurueck
+// ****
+function studiensemesterChange(stsem, wert)
 {
-	var items = document.getElementsByTagName('menuitem');
-	var stsem='';
-	for(i in items)
+	if(typeof(wert)=='undefined')
 	{
-		if(items[i].id=='menu-properies-studiensemester-name' && items[i].getAttribute("checked")=='true')
-			stsem = items[i].label;
+		wert=0;
+		if(typeof(stsem)=='undefined')
+		{
+			var items = document.getElementsByTagName('menuitem');
+			
+			for(i in items)
+			{
+				if(items[i].id=='menu-properies-studiensemester-name' && items[i].getAttribute("checked")=='true')
+					stsem = items[i].label;
+			}
+		}
 	}
+	else
+		stsem = getStudiensemester();
 
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
@@ -153,6 +165,7 @@ function studiensemesterChange()
 
 	req.add('type', 'variablechange');
 	req.add('stsem', stsem);
+	req.add('wert', wert);
 	
 	var response = req.executePOST();
 
@@ -169,18 +182,33 @@ function studiensemesterChange()
 	{
 		//Statusbar setzen
    		document.getElementById("statusbarpanel-text").label = "Studiensemester erfolgreich geaendert";
-   		document.getElementById("statusbarpanel-semester").label = stsem;
+   		document.getElementById("statusbarpanel-semester").label = val.dbdml_data;
+   		//Menue setzen
+   		var items = document.getElementsByTagName('menuitem');
+			
+		for(i in items)
+		{
+			if(items[i].label==val.dbdml_data && items[i].id=='menu-properies-studiensemester-name')
+			{
+				items[i].setAttribute('checked',true);
+				break;
+			}
+		}
    		//MitarbeiterDetailStudiensemester_id = dbdml_errormsg;
    		//Ansichten Refreshen
    		try
    		{
    			StudentTreeRefresh();
+   		}
+   		catch(e)
+   		{}
+   		
+   		try
+   		{
    			LvTreeRefresh();
    		}
    		catch(e)
-   		{
-   			debug('catch: '+e);
-   		}
+   		{}
 	}
    
 	return true;

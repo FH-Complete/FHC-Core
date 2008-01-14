@@ -212,7 +212,19 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 
 <statusbar id="status-bar" persist="collapsed">
 	<statusbarpanel class="statusbarpanel-iconic" id="logo-icon" />
-	<statusbarpanel id="statusbarpanel-semester" label="<?php echo $semester_aktuell; ?>"/>
+	<statusbarpanel>
+		<toolbarbutton id="statusbarpanel-studiensemester-left"
+				tooltiptext="1 Studiensemester zurueck"
+				image="../skin/images/left.png"
+				oncommand="studiensemesterChange('', -1)"
+			/>
+		<toolbarbutton id="statusbarpanel-semester" label="<?php echo $semester_aktuell; ?>"/>
+		<toolbarbutton id="statusbarpanel-studiensemester-right"
+				tooltiptext="1 Studiensemester vor"
+				image="../skin/images/right.png"
+				oncommand="studiensemesterChange('', 1)"
+			/>
+	</statusbarpanel>
 	<statusbarpanel id="statusbarpanel-db_table" label="<?php echo $db_stpl_table; ?>"/>
 	<statusbarpanel id="statusbarpanel-text" label="<?php echo htmlspecialchars($error_msg); ?>" flex="4" crop="right" />
 	<statusbarpanel id="progress-panel" class="statusbarpanel-progress">

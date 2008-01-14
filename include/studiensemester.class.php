@@ -466,5 +466,49 @@ class studiensemester
 			$this->errormsg = 'Fehler beim Ermitteln des folgenden Studiensemesters';
 		}
 	}
+	
+	// ****
+	// * Springt von Studiensemester $studiensemester_kurzbz um $wert Studiensemester vor/zurueck
+	// ****
+	function jump($studiensemester_kurzbz, $wert)
+	{
+		if($wert>0)
+		{
+			$op='>';
+			$sort='ASC';
+		}
+		elseif($wert<0)
+		{
+			$op='<';
+			$sort='DESC';
+		}
+		else 
+		{
+			$op='=';
+			$sort='';
+		}
+		
+		$qry = "SELECT studiensemester_kurzbz 
+				FROM 
+					(
+					SELECT studiensemester_kurzbz, start
+					FROM public.tbl_studiensemester 
+					WHERE start$op(SELECT start FROM public.tbl_studiensemester 
+					               WHERE studiensemester_kurzbz='$studiensemester_kurzbz') 
+					ORDER BY start $sort
+					LIMIT ".abs($wert)."
+					) as foo
+				ORDER BY start DESC LIMIT 1";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				return $row->studiensemester_kurzbz;
+			}
+			else 
+				return $studiensemester_kurzbz;
+		}
+	}
 }
 ?>

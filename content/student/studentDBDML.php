@@ -454,9 +454,6 @@ if(!$error)
 							$studiensemester = $prestd->studiensemester_kurzbz;
 						$hlp = new prestudent($conn);
 
-						//if($_POST['rolle_kurzbz']=='Unterbrecher' || $_POST['rolle_kurzbz']=='Abbrecher')
-						//	$sem='0';
-						//else
 						if($_POST['rolle_kurzbz']=='Student')
 							$sem=$_POST['semester'];
 						else
@@ -508,7 +505,7 @@ if(!$error)
 											$lehrverband->verband = '';
 											$lehrverband->gruppe = '';
 											$lehrverband->aktiv = true;
-											$lehrverband->bezeichnung = 'Ab-/Unterbrecher';
+											$lehrverband->bezeichnung = 'AbUnterbrecher/Incoming';
 											
 											$lehrverband->save(true);
 										}
