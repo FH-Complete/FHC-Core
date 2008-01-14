@@ -580,13 +580,25 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 <!-- TABS ENDE -->
 <!-- STATUSBAR -->
 <statusbar id="status-bar" persist="collapsed">
-	<statusbarpanel class="statusbarpanel-iconic" id="logo-icon" />
-	<statusbarpanel id="statusbarpanel-semester" label="<?php echo $semester_aktuell; ?>"/>
+
+	<statusbarpanel>
+		<toolbarbutton id="statusbarpanel-studiensemester-left"
+				tooltiptext="1 Studiensemester zurueck"
+				image="../skin/images/left.png"
+				oncommand="studiensemesterChange('', -1)"
+			/>
+		<toolbarbutton id="statusbarpanel-semester" label="<?php echo $semester_aktuell; ?>"/>
+		<toolbarbutton id="statusbarpanel-studiensemester-right"
+				tooltiptext="1 Studiensemester vor"
+				image="../skin/images/right.png"
+				oncommand="studiensemesterChange('', 1)"
+			/>
+	</statusbarpanel>
 	<statusbarpanel id="statusbarpanel-db_table" label="<?php echo substr(CONN_STRING,strpos(CONN_STRING,'dbname=')+7,strpos(CONN_STRING,'user=')-strpos(CONN_STRING,'dbname=')-7); ?>"/>
 	<statusbarpanel id="statusbarpanel-text" label="<?php echo htmlspecialchars($error_msg); ?>" flex="4" crop="right" />
 	<statusbarpanel id="progress-panel" class="statusbarpanel-progress">
 		<progressmeter id="statusbar-progressmeter" class="progressmeter-statusbar" mode="determined" value="0%"/>
 	</statusbarpanel>
-	<statusbarpanel class="statusbarpanel-iconic" id="example-status" />
+
 </statusbar>
 </window>

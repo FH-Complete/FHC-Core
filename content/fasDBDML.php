@@ -38,6 +38,7 @@ require_once('../include/kontakt.class.php');
 require_once('../include/bankverbindung.class.php');
 require_once('../include/variable.class.php');
 require_once('../include/benutzerfunktion.class.php');
+require_once('../include/studiensemester.class.php');
 
 $user = get_uid();
 //header("Content-type: application/xhtml+xml");
@@ -444,8 +445,16 @@ if(!$error)
 		// Aendert die Variable Studiensemester		
 		if(isset($_POST['stsem']))
 		{
+			if(isset($_POST['wert']) && $_POST['wert']!=0)
+			{
+				$stsem = new studiensemester($conn);
+				$studiensemester_kurzbz = $stsem->jump($_POST['stsem'], $wert);
+			}
+			else 
+				$studiensemester_kurzbz = $_POST['stsem'];
+				
 			$variable->name = 'semester_aktuell';
-			$variable->wert = $_POST['stsem'];
+			$variable->wert = $studiensemester_kurzbz;
 		}
 		elseif(isset($_POST['kontofilterstg']))
 		{
