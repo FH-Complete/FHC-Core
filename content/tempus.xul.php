@@ -56,6 +56,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-prefs-ignore_kollision:command" oncommand="variableChange('ignore_kollision','menu-prefs-ignore_kollision');"/>
   <command id="menu-prefs-ignore_zeitsperre:command" oncommand="variableChange('ignore_zeitsperre','menu-prefs-ignore_zeitsperre');"/>
   <command id="menu-prefs-ignore_reservierung:command" oncommand="variableChange('ignore_reservierung','menu-prefs-ignore_reservierung');"/>
+  <command id="menu-extras-kollisionstudent:command" oncommand="KollisionStudentShow();"/>
   <command id="menu-help-todo:command" oncommand="HelpOpenToDo();"/>
 </commandset>
 
@@ -172,6 +173,16 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
         }
         ?>
 	    </menupopup>
+    </menu>
+    <menu id="menu-extras" label="&menu-extras.label;" accesskey="&menu-extras.accesskey;">
+          <menupopup id="menu-extras-popup">
+            <menuitem
+               id        =  "menu-extras-kollisionstudent"
+               key       =  "menu-extras-kollisionstudent:key"
+               label     = "&menu-extras-kollisionstudent.label;"
+               command   =  "menu-extras-kollisionstudent:command"
+               accesskey = "&menu-extras-kollisionstudent.accesskey;"/>
+          </menupopup>
     </menu>
     <menu id="menu-help" label="&menu-help.label;" accesskey="&menu-help.accesskey;">
           <menupopup id="menu-about-popup">

@@ -322,3 +322,11 @@ function HelpOpenToDo()
 {
 	window.open('ToDo_Tempus.html','ToDo');
 }
+
+// ****
+// * Zeigt das Fenster zur Kollisionspruefung auf Studentenebene an
+// ****
+function KollisionStudentShow()
+{
+	window.open('<?php echo APP_ROOT;?>vilesci/lehre/stpl_benutzer_kollision_frameset.html', 'Kollision Student');
+}

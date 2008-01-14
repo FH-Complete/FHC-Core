@@ -33,6 +33,7 @@ require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/student.class.php');
+require_once('../../../include/lehrverband.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
 	die('Fehler beim Herstellen der DB Connection');
@@ -94,6 +95,11 @@ function AnredeChange()
 	if(anrede=='Frau')
 		document.getElementById('geschlecht').value='w';
 }
+
+function cmdIncoming()
+{
+	document.getElementById('ausbildungssemester').disabled=document.getElementById('incoming').checked;
+}
 </script>
 </head>
 <body>
@@ -131,7 +137,7 @@ if($studiengang_kz=='' && isset($_GET['studiengang_kz']))
 $person_id = (isset($_REQUEST['person_id'])?$_REQUEST['person_id']:'');
 $ueberschreiben = (isset($_REQUEST['ueberschreiben'])?$_REQUEST['ueberschreiben']:'');
 $studiensemester_kurzbz = (isset($_REQUEST['studiensemester_kurzbz'])?$_REQUEST['studiensemester_kurzbz']:'');
-$ausbildungssemester = (isset($_REQUEST['ausbildungssemester'])?$_REQUEST['ausbildungssemester']:'');
+$ausbildungssemester = (isset($_REQUEST['ausbildungssemester'])?$_REQUEST['ausbildungssemester']:'0');
 $incoming = (isset($_REQUEST['incoming'])?true:false);
 //end Parameter
 $geburtsdatum_error=false;
@@ -490,11 +496,24 @@ if(isset($_POST['save']))
 			$student->matrikelnr = $matrikelnr;
 			$student->prestudent_id = $prestudent->prestudent_id;
 			$student->studiengang_kz = $studiengang_kz;
-			$student->semester = $ausbildungssemester;
-			$student->verband = ' ';
+			$student->semester = '0';
+			$student->verband = 'I';
 			$student->gruppe = ' ';
 			$student->insertamum = date('Y-m-d H:i:s');
 			$student->insertvon = $user;
+
+			$lvb = new lehrverband($conn);
+			if(!$lvb->exists($student->studiengang_kz, $student->semester, $student->verband, $student->gruppe))
+			{
+				$lvb->studiengang_kz = $student->studiengang_kz;
+				$lvb->semester = $student->semester;
+				$lvb->verband = $student->verband;
+				$lvb->gruppe = $student->gruppe;
+				$lvb->bezeichnung = 'Incoming';
+				$lvb->aktiv = true;
+				
+				$lvb->save(true);
+			}
 			
 			if($student->save(true, false))
 			{
@@ -503,8 +522,8 @@ if(isset($_POST['save']))
 				$studentlehrverband->uid = $uid;
 				$studentlehrverband->studiensemester_kurzbz = $studiensemester_kurzbz;
 				$studentlehrverband->studiengang_kz = $studiengang_kz;
-				$studentlehrverband->semester = $ausbildungssemester;
-				$studentlehrverband->verband = ' ';
+				$studentlehrverband->semester = '0';
+				$studentlehrverband->verband = 'I';
 				$studentlehrverband->gruppe = ' ';
 				$studentlehrverband->insertamum = date('Y-m-d H:i:s');
 				$studentlehrverband->insertvon = $user;
@@ -531,7 +550,7 @@ if(isset($_POST['save']))
 	if(!$error)
 	{
 		pg_query($conn, 'COMMIT');
-		die("<b>".($incoming?'Incomming':'Interessent')." $vorname $nachname wurde erfolgreich angelegt</b><br><br><a href='interessentenimport.php?studiengang_kz=$studiengang_kz'>Neue Person Anlegen</a>");
+		die("<b>".($incoming?'Incoming':'Interessent')." $vorname $nachname wurde erfolgreich angelegt</b><br><br><a href='interessentenimport.php?studiengang_kz=$studiengang_kz'>Neue Person Anlegen</a>");
 	}
 	else
 	{
@@ -627,12 +646,12 @@ foreach ($stsem->studiensemester as $row)
 	echo '<OPTION value="'.$row->studiensemester_kurzbz.'" '.($row->studiensemester_kurzbz==$studiensemester_kurzbz?'selected':'').'>'.$row->studiensemester_kurzbz.'</OPTION>';
 echo '</SELECT>';
 echo '</td></tr>';
-echo '<tr><td>Ausbildungssemester *</td><td><SELECT id="ausbildungssemester" name="ausbildungssemester">';
+echo '<tr><td>Ausbildungssemester *</td><td><SELECT id="ausbildungssemester" name="ausbildungssemester" '.($incoming?'disabled':'').'>';
 for ($i=1;$i<9;$i++)
 	echo '<OPTION value="'.$i.'" '.($i==$ausbildungssemester?'selected':'').'>'.$i.'. Semester</OPTION>';
 echo '</SELECT>';
 echo '</td></tr>';
-echo '<tr><td>Incoming:</td><td><input type="checkbox" name="incoming" '.($incoming?'checked':'').' /></td></tr>';
+echo '<tr><td>Incoming:</td><td><input type="checkbox" id="incoming" name="incoming" '.($incoming?'checked':'').' onclick="cmdIncoming()" /></td></tr>';
 echo '<tr><tr><td></td><td>';
 
 if(($geburtsdatum=='' && $vorname=='' && $nachname=='') || $geburtsdatum_error)

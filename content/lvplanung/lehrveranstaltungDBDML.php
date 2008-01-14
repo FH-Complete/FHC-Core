@@ -67,12 +67,20 @@ if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz'))
 	$data = '';
 	$error = true;
 }
-	
+
+
+function check_kollision($lehreinheit_id, $mitarbeiter_uid, $mitarbeiter_uid_old)
+{
+	return true;	
+}
+
 if(!$error)
 {
 	
 	if(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_save')
 	{
+		loadVariables($conn, $user);
+		
 		//Lehreinheitmitarbeiter Zuteilung
 		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz 
 				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach 
@@ -134,7 +142,21 @@ if(!$error)
 			
 				$lem->new=false;
 				
-
+				if(!$ignore_kollision && $lem->mitarbeiter_uid!=$lem->mitarbeiter_uid_old)
+				{
+					//check kollision
+					if(check_kollision($lem->lehreinheit_id, $lem->mitarbeiter_uid, $lem->mitarbeiter_uid_old))
+					{
+						//Update im Stundenplan
+					}
+					else 
+					{
+						$return = false;
+						$errormsg = 'Fehler: Die Aenderung des Lektors fuehrt zu einer Kollision im Stundenplan';
+						$error = true;
+					}
+				}
+				
 				if(!$error)
 				{
 					if($lem->save())
