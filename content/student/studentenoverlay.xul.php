@@ -39,6 +39,11 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentabschlusspruefungov
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentprojektarbeitoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentgruppenoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverlay.xul.php"?>';
+
+if(isset($_GET['xulapp']))
+	$xulapp=$_GET['xulapp'];
+else 
+	$xulapp='';
 ?>
 <!DOCTYPE overlay >
 
@@ -64,6 +69,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 				<hbox>
 					<toolbox flex="1">
 						<toolbar id="student-nav-toolbar">
+						<?php 
+						if($xulapp!='tempus')
+						{
+						?>
 							<toolbarbutton id="interessent-toolbar-neu" label="Neu" oncommand="InteressentNeu()" disabled="false" image="../skin/images/NeuDokument.png" tooltiptext="Interessent neu anlegen" />
 
 							<toolbarbutton id="student-toolbar-buchung" label="Neue Buchung" oncommand="StudentKontoNeu()" disabled="false" tooltiptext="neue Buchung anlegen"/>
@@ -85,9 +94,16 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 						    </toolbarbutton>
 														
 							<toolbarbutton id="student-toolbar-export" label="Export" oncommand="StudentExport()" disabled="false" image="../skin/images/ExcelIcon.png" tooltiptext="Daten ins Excel Exportieren"/>
+						<?php
+						}
+						?>
 							<toolbarbutton id="student-toolbar-refresh" label="Aktualisieren" oncommand="StudentTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 							<textbox id="student-toolbar-textbox-suche" control="student-toolbar-button-search" onkeypress="StudentSearchFieldKeyPress(event)" />
 							<button id="student-toolbar-button-search" oncommand="StudentSuche()" label="Suchen"/>
+						<?php
+						if($xulapp!='tempus')
+						{
+						?>
 							<toolbarbutton label="Filter " id="student-toolbar-filter" type="menu">							
 						      <menupopup id="student-filter-menu-popup" >
 								    <menuitem id="student-toolbar-filter-dokumente" label="fehlende Dokumente" oncommand="InteressentDokumenteFilter()" disabled="false" tooltiptext="Liste aller Studenten mit Fehlenden Dokumenten"/>
@@ -95,6 +111,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 									<menuitem id="student-toolbar-filter-studiengebuehr" label="nicht gebuchte Studiengebuehr" oncommand="StudentKontoFilterStudenten('studiengebuehr')" disabled="false" tooltiptext="Liste aller Studenten die noch nicht mit Studienbebuehr belastet wurden" />
 						      </menupopup>
 						    </toolbarbutton>
+						<?php
+						}
+						?>
 							<spacer flex="1"/>
 							<label id="student-toolbar-label-anzahl"/>
 						</toolbar>
@@ -106,7 +125,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 				<!-- ************* -->
 				<tree id="student-tree" seltype="multi" hidecolumnpicker="false" flex="1"
 						datasources="rdf:null" ref="http://www.technikum-wien.at/student/alle"
-						onselect="StudentAuswahl();"
+						<?php echo ($xulapp!='tempus'?'onselect="StudentAuswahl();"':'') ?>						
 						flags="dont-build-content"
 						enableColumnDrag="true"
 						style="margin:0px;"
@@ -246,6 +265,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
   					</template>
 				</tree>
 
+				<?php
+				if($xulapp!='tempus')
+				{
+				?>
 				<splitter collapse="after" persist="state">
 					<grippy />
 				</splitter>
@@ -289,5 +312,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 						</tabpanels>
 					</tabbox>
 				</vbox>
+				<?php
+				}
+				?>
 			</vbox>
 </overlay>

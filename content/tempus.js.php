@@ -253,6 +253,73 @@ function variableChange(variable, id)
 	}
 }
 
+function getvariable(variable)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	// Request absetzen
+	
+	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
+
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'getvariable');
+	req.add('name', variable);
+	
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+		return false;
+	}
+	else
+	{
+		return val.dbdml_data;
+	}
+}
+
+function getStudiensemesterVariable()
+{
+	if(stsem = getvariable('semester_aktuell'))
+	{
+		//Statusbar setzen
+		document.getElementById("statusbarpanel-text").label = "Studiensemester erfolgreich geaendert";
+		document.getElementById("statusbarpanel-semester").label = stsem;
+		//Menue setzen
+		var items = document.getElementsByTagName('menuitem');
+		
+		for(i in items)
+		{
+			if(items[i].label==stsem && items[i].id=='menu-properies-studiensemester-name')
+			{
+				items[i].setAttribute('checked',true);
+				break;
+			}
+		}
+		
+		//Ansichten Refreshen
+		try
+		{
+			StudentTreeRefresh();
+		}
+		catch(e)
+		{}
+		
+		try
+		{
+			LvTreeRefresh();
+		}
+		catch(e)
+		{}
+	}
+}
+
 // ****
 // * Laedt das Undo Menue Neu
 // ****

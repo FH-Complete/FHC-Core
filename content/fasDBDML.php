@@ -490,6 +490,21 @@ if(!$error)
 			$errormsg = 'Falsche Paramenteruebergabe';
 		}
 	}
+	elseif(isset($_POST['type']) && $_POST['type']=='getvariable')
+	{
+		$variable = new variable($conn, null, null, true);
+		
+		if($variable->load($user, $_POST['name']))
+		{	
+			$return = true;
+			$data = $variable->wert;
+		}
+		else 
+		{
+			$return = false;
+			$errormsg = 'Fehler: '.$variable->errormsg;
+		}
+	}
 	else
 	{
 		$return = false;

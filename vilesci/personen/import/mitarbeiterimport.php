@@ -29,6 +29,7 @@ require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/kontakt.class.php');
 require_once('../../../include/adresse.class.php');
 require_once('../../../include/datum.class.php');
+require_once('../../../include/'.EXT_FKT_PATH.'/generateuid.inc.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
 	die('Fehler beim Herstellen der DB Connection');
@@ -213,18 +214,11 @@ if(isset($_POST['save']))
 		$nachname_clean = strtolower(clean_string($nachname));
 		$vorname_clean = strtolower(clean_string($vorname));
 		$uid='';
+		
+		$uid = generateMitarbeiterUID($conn, $vorname_clean, $nachname_clean);
+			
 		$bn = new benutzer($conn);
-	
-		for($nn=8,$vn=0;$nn!=0;$nn--,$vn++)
-		{
-			$uid = substr($nachname_clean,0,$nn);
-			$uid .= substr($vorname_clean,0,$vn);
-	
-			if(!$bn->uid_exists($uid))
-				if($bn->errormsg=='')
-					break;
-		}
-	
+		
 		if($bn->uid_exists($uid))
 		{
 			$error = true;

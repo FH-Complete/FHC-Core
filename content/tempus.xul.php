@@ -229,7 +229,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 				image="../skin/images/left.png"
 				oncommand="studiensemesterChange('', -1)"
 			/>
-		<toolbarbutton id="statusbarpanel-semester" label="<?php echo $semester_aktuell; ?>"/>
+		<toolbarbutton id="statusbarpanel-semester" label="<?php echo $semester_aktuell; ?>" oncommand="getStudiensemesterVariable()"/>
 		<toolbarbutton id="statusbarpanel-studiensemester-right"
 				tooltiptext="1 Studiensemester vor"
 				image="../skin/images/right.png"
