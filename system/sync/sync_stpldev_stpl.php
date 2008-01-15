@@ -46,10 +46,10 @@ $headers.="Content-Type: text/html; charset=iso-8859-1\r\n";
 
 $ss=new studiensemester($conn);
 $ss->getAktTillNext();
-//$datum_begin=$ss->start;
-$datum_begin='2008-01-09';
-//$datum_ende='2008-07-09'; // $ss->ende
-$datum_ende='2008-01-13'; // $ss->ende
+$datum_begin=$ss->start;
+//$datum_begin='2008-01-07';
+$datum_ende='2008-07-09'; // $ss->ende
+//$datum_ende='2008-01-18'; // $ss->ende
 
 
 $message_begin='Dies ist eine automatische Mail!<BR>Es haben sich folgende Aenderungen in Ihrem Stundenplan ergeben:<BR>';
@@ -74,7 +74,7 @@ else
 	echo 'Neue Datens&auml;tze werden angelegt.<BR>';flush();
 	while ($row=pg_fetch_object($result))
 	{
-		echo '.';flush();
+		//echo '.';flush();
 		$sql_query='INSERT INTO lehre.tbl_stundenplan
 			(stundenplan_id,unr,mitarbeiter_uid,datum,stunde,ort_kurzbz,studiengang_kz,semester,verband,gruppe,
 			gruppe_kurzbz,titel,anmerkung,fix,updateamum,updatevon,insertamum,insertvon,lehreinheit_id) VALUES';
@@ -122,7 +122,7 @@ else
 			// Lektoren
 			if (substr($row->uid,0,1)!='_')
 			{
-				if (!isset($message[$row->uid]->isneu));
+				if (!isset($message[$row->uid]->isneu))
 				{
 					$message[$row->uid]->isneu=true;
 					$message[$row->uid]->mailadress=$row->uid.'@technikum-wien.at';
@@ -140,7 +140,7 @@ else
 			$verband=$row->stg_typ.$row->stg_kurzbz.$row->semester.$row->verband.$row->gruppe;
 			$verband=trim($verband);
 			$verband=strtolower($verband);
-			if (!isset($message[$verband]->isneu));
+			if (!isset($message[$verband]->isneu))
 			{
 				$message[$verband]->isneu=true;
 				$message[$verband]->mailadress=$verband.'@technikum-wien.at';
@@ -172,66 +172,69 @@ if (!$result=pg_query($conn, $sql_query))
 	echo $sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
 	$message_sync.=$sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
 }
-echo '<BR>Alte Datens&auml;tze werden gel&ouml;scht.<BR>';flush();
-while ($row=pg_fetch_object($result))
+else
 {
-	$sql_query='DELETE FROM lehre.tbl_stundenplan WHERE stundenplan_id='.$row->stundenplan_id;
-	echo '.';flush();
-	//echo $sql_query.'<BR>';
-	if (!$result_delete=pg_query($conn, $sql_query))
+	echo '<BR>Alte Datens&auml;tze werden gel&ouml;scht.<BR>';flush();
+	while ($row=pg_fetch_object($result))
 	{
-		echo $sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
-		$message_sync.=$sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
-		$count_err++;
-	}
-	else
-	{
-		$count_del++;
-		if ($count_del%10==0)
+		$sql_query='DELETE FROM lehre.tbl_stundenplan WHERE stundenplan_id='.$row->stundenplan_id;
+		//echo '.';flush();
+		//echo $sql_query.'<BR>';
+		//var_dump($message);
+		if (!$result_delete=pg_query($conn, $sql_query))
 		{
-			echo '-';
-			flush();
+			echo $sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
+			$message_sync.=$sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
+			$count_err++;
 		}
-		// Mails vorbereiten
-		// Lektoren
-		if (substr($row->uid,0,1)!='_')
+		else
 		{
-			if (!isset($message[$row->uid]->isalt));
+			$count_del++;
+			if ($count_del%10==0)
 			{
-				$message[$row->uid]->isalt=true;
-				$message[$row->uid]->mailadress=$row->uid.'@technikum-wien.at';
-				$message[$row->uid]->message_begin=$message_begin.'<BR>';
-				$message[$row->uid]->message.='Gel&ouml;eschte Stunden:<BR>
-					<TABLE><TR><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
+				echo '-';
+				flush();
 			}
-			$message[$row->uid]->message.='<TR><TH>'.$row->ort_kurzbz.'</TH>';
-			$message[$row->uid]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
-			$message[$row->uid]->message.='<TH>'.$row->lektor.'</TH>';
-			$message[$row->uid]->message.='<TH>'.$row->datum.'/'.$row->stunde.'</TH>';
-			$message[$row->uid]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
+			// Mails vorbereiten
+			// Lektoren
+			if (substr($row->uid,0,1)!='_')
+			{
+				if (!isset($message[$row->uid]->isalt))
+				{
+					$message[$row->uid]->isalt=true;
+					$message[$row->uid]->mailadress=$row->uid.'@technikum-wien.at';
+					$message[$row->uid]->message_begin=$message_begin.'<BR>';
+					$message[$row->uid]->message.='Gel&ouml;eschte Stunden:<BR>
+						<TABLE><TR><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
+				}
+				$message[$row->uid]->message.='<TR><TH>'.$row->ort_kurzbz.'</TH>';
+				$message[$row->uid]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
+				$message[$row->uid]->message.='<TH>'.$row->lektor.'</TH>';
+				$message[$row->uid]->message.='<TH>'.$row->datum.'/'.$row->stunde.'</TH>';
+				$message[$row->uid]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
+			}
+			// Verband
+			$verband=$row->stg_typ.$row->stg_kurzbz.$row->semester.$row->verband.$row->gruppe;
+			$verband=trim($verband);
+			$verband=strtolower($verband);
+			if (!isset($message[$verband]->isalt))
+			{
+				$message[$verband]->isalt=true;
+				$message[$verband]->mailadress=$verband.'@technikum-wien.at';
+				$message[$verband]->message.=$message_begin.'<BR>Geaenderte Stunden:<BR>
+						<TABLE><TR><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
+			}
+			$message[$verband]->message.='<TR><TH>'.$row->ort_kurzbz.'</TH>';
+			$message[$verband]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
+			$message[$verband]->message.='<TH>'.$row->lektor.'</TH>';
+			$message[$verband]->message.='<TH>'.$row->datum.'/'.$row->stunde.'</TH>';
+			$message[$verband]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
 		}
-		// Verband
-		$verband=$row->stg_typ.$row->stg_kurzbz.$row->semester.$row->verband.$row->gruppe;
-		$verband=trim($verband);
-		$verband=strtolower($verband);
-		if (!isset($message[$verband]->isalt));
-		{
-			$message[$verband]->isalt=true;
-			$message[$verband]->mailadress=$verband.'@technikum-wien.at';
-			$message[$verband]->message.=$message_begin.'<BR>Geaenderte Stunden:<BR>
-					<TABLE><TR><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
-		}
-		$message[$verband]->message.='<TR><TH>'.$row->ort_kurzbz.'</TH>';
-		$message[$verband]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
-		$message[$verband]->message.='<TH>'.$row->lektor.'</TH>';
-		$message[$verband]->message.='<TH>'.$row->datum.'/'.$row->stunde.'</TH>';
-		$message[$verband]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
 	}
+	foreach($message as $msg)
+		if(isset($msg->isalt))
+			$msg->message.='</TABLE>';
 }
-foreach($message as $msg)
-	if(isset($msg->isalt))
-		$msg->message.='</TABLE>';
-
 
 /**************************************************
  * Datensaetze holen die anders sind
@@ -263,108 +266,111 @@ if (!$result=pg_query($conn, $sql_query))
 	echo $sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
 	$message_sync.=$sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
 }
-echo '<BR>Datens&auml;tze werden ge&auml;ndert.<BR>';flush();
-while ($row=pg_fetch_object($result))
+else
 {
-	echo '.';flush();
-	// Alten Eintrag aus tbl_stundenplan holen
-	$sql_query="SELECT * FROM lehre.tbl_stundenplandev WHERE stundenplandev_id=$row->stundenplandev_id;";
-	if (!$result_old=pg_query($conn, $sql_query))
+	echo '<BR>Datens&auml;tze werden ge&auml;ndert.<BR>';flush();
+	while ($row=pg_fetch_object($result))
 	{
-		echo $sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
-		$message_sync.=$sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
-	}
-	else
-		$row_old=pg_fetch_object($result_old);
-
-	// Datensaetze aendern
-	$sql_query="UPDATE lehre.tbl_stundenplan SET
-		unr=$row->unr,mitarbeiter_uid='$row->uid',datum='$row->datum',stunde=$row->stunde,
-		ort_kurzbz='$row->ort_kurzbz',studiengang_kz=$row->studiengang_kz,semester=$row->semester";
-	if ($row->verband==null)
-		$sql_query.=',verband=NULL';
-	else
-		$sql_query.=",verband='$row->verband'";
-	if ($row->gruppe==null)
-		$sql_query.=',gruppe=NULL';
-	else
-		$sql_query.=",gruppe='$row->gruppe'";
-	if ($row->gruppe_kurzbz==null)
-		$sql_query.=',gruppe_kurzbz=NULL';
-	else
-		$sql_query.=",gruppe_kurzbz='$row->gruppe_kurzbz'";
-	$sql_query.=",titel='$row->titel',anmerkung='$row->anmerkung'";
-	if ($row->fix=='t')
-		$sql_query.=',fix=TRUE';
-	else
-		$sql_query.=',fix=FALSE';
-	$sql_query.=",updateamum='$row->updateamum',updatevon='$row->updatevon'";
-	if ($row->lehreinheit_id==null)
-		$sql_query.=',lehreinheit_id=NULL';
-	else
-		$sql_query.=",lehreinheit_id=$row->lehreinheit_id";
-	$sql_query.=" WHERE stundenplan_id=$row->stundenplandev_id;";
-	echo $sql_query.'<BR>';
-	if (!$result_update=pg_query($conn, $sql_query))
-	{
-		echo $sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
-		$message_sync.=$sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
-		$count_err++;
-	}
-	else
-	{
-		$count_upd++;
-		if ($count_upd%10==0)
+		//echo '.';flush();
+		// Alten Eintrag aus tbl_stundenplan holen
+		$sql_query="SELECT * FROM lehre.tbl_stundenplandev WHERE stundenplandev_id=$row->stundenplandev_id;";
+		if (!$result_old=pg_query($conn, $sql_query))
 		{
-			echo '-';
-			flush();
+			echo $sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
+			$message_sync.=$sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
 		}
-		// Mails vorbereiten
-		// Lektoren
-		if (substr($row->uid,0,1)!='_')
+		else
+			$row_old=pg_fetch_object($result_old);
+
+		// Datensaetze aendern
+		$sql_query="UPDATE lehre.tbl_stundenplan SET
+			unr=$row->unr,mitarbeiter_uid='$row->uid',datum='$row->datum',stunde=$row->stunde,
+			ort_kurzbz='$row->ort_kurzbz',studiengang_kz=$row->studiengang_kz,semester=$row->semester";
+		if ($row->verband==null)
+			$sql_query.=',verband=NULL';
+		else
+			$sql_query.=",verband='$row->verband'";
+		if ($row->gruppe==null)
+			$sql_query.=',gruppe=NULL';
+		else
+			$sql_query.=",gruppe='$row->gruppe'";
+		if ($row->gruppe_kurzbz==null)
+			$sql_query.=',gruppe_kurzbz=NULL';
+		else
+			$sql_query.=",gruppe_kurzbz='$row->gruppe_kurzbz'";
+		$sql_query.=",titel='$row->titel',anmerkung='$row->anmerkung'";
+		if ($row->fix=='t')
+			$sql_query.=',fix=TRUE';
+		else
+			$sql_query.=',fix=FALSE';
+		$sql_query.=",updateamum='$row->updateamum',updatevon='$row->updatevon'";
+		if ($row->lehreinheit_id==null)
+			$sql_query.=',lehreinheit_id=NULL';
+		else
+			$sql_query.=",lehreinheit_id=$row->lehreinheit_id";
+		$sql_query.=" WHERE stundenplan_id=$row->stundenplandev_id;";
+		echo $sql_query.'<BR>';
+		if (!$result_update=pg_query($conn, $sql_query))
 		{
-			if (!isset($message[$row->uid]->isset));
+			echo $sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
+			$message_sync.=$sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
+			$count_err++;
+		}
+		else
+		{
+			$count_upd++;
+			if ($count_upd%10==0)
 			{
-				$message[$row->uid]->isset=true;
-				$message[$row->uid]->mailadress=$row->uid.'@technikum-wien.at';
-				$message[$row->uid]->message_begin=$message_begin.'<BR>';
-				$message[$row->uid]->message.='Ge&auml;nderte Stunden:<BR>
-					<TABLE><TR><TD>Status</TD><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
+				echo '-';
+				flush();
 			}
-			$message[$row->uid]->message.='<TR><TH>Vorher: </TH><TH>'.$row->old_ort_kurzbz.'</TH>';
-			$message[$row->uid]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
-			$message[$row->uid]->message.='<TH>'.$row->old_lektor.'</TH>';
-			$message[$row->uid]->message.='<TH>'.$row->old_datum.'/'.$row->old_stunde.'</TH>';
-			$message[$row->uid]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
+			// Mails vorbereiten
+			// Lektoren
+			if (substr($row->uid,0,1)!='_')
+			{
+				if (!isset($message[$row->uid]->isset))
+				{
+					$message[$row->uid]->isset=true;
+					$message[$row->uid]->mailadress=$row->uid.'@technikum-wien.at';
+					$message[$row->uid]->message_begin=$message_begin.'<BR>';
+					$message[$row->uid]->message.='Ge&auml;nderte Stunden:<BR>
+						<TABLE><TR><TD>Status</TD><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
+				}
+				$message[$row->uid]->message.='<TR><TH>Vorher: </TH><TH>'.$row->old_ort_kurzbz.'</TH>';
+				$message[$row->uid]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
+				$message[$row->uid]->message.='<TH>'.$row->old_lektor.'</TH>';
+				$message[$row->uid]->message.='<TH>'.$row->old_datum.'/'.$row->old_stunde.'</TH>';
+				$message[$row->uid]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
 
-			$message[$row->uid]->message.='<TR><TH>Jetzt: </TH><TH>'.$row->ort_kurzbz.'</TH>';
-			$message[$row->uid]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
-			$message[$row->uid]->message.='<TH>'.$row->lektor.'</TH>';
-			$message[$row->uid]->message.='<TH>'.$row->datum.'/'.$row->stunde.'</TH>';
-			$message[$row->uid]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
-		}
-		// Verband
-		$verband=$row->stg_typ.$row->stg_kurzbz.$row->semester.$row->verband.$row->gruppe;
-		$verband=trim($verband);
-		$verband=strtolower($verband);
-		if (!isset($message[$verband]->isset));
-		{
-			$message[$verband]->isset=true;
-			$message[$verband]->mailadress=$verband.'@technikum-wien.at';
-			$message[$verband]->message.=$message_begin.'<BR>Ge&auml;nderte Stunden:<BR>
-					<TABLE><TR><TD>Status</TD><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
-		}
-		$message[$verband]->message.='<TR><TH>Vorher: </TH><TH>'.$row->old_ort_kurzbz.'</TH>';
-		$message[$verband]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
-		$message[$verband]->message.='<TH>'.$row->old_lektor.'</TH>';
-		$message[$verband]->message.='<TH>'.$row->old_datum.'/'.$row->old_stunde.'</TH>';
-		$message[$verband]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
+				$message[$row->uid]->message.='<TR><TH>Jetzt: </TH><TH>'.$row->ort_kurzbz.'</TH>';
+				$message[$row->uid]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
+				$message[$row->uid]->message.='<TH>'.$row->lektor.'</TH>';
+				$message[$row->uid]->message.='<TH>'.$row->datum.'/'.$row->stunde.'</TH>';
+				$message[$row->uid]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
+			}
+			// Verband
+			$verband=$row->stg_typ.$row->stg_kurzbz.$row->semester.$row->verband.$row->gruppe;
+			$verband=trim($verband);
+			$verband=strtolower($verband);
+			if (!isset($message[$verband]->isset))
+			{
+				$message[$verband]->isset=true;
+				$message[$verband]->mailadress=$verband.'@technikum-wien.at';
+				$message[$verband]->message.=$message_begin.'<BR>Ge&auml;nderte Stunden:<BR>
+						<TABLE><TR><TD>Status</TD><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
+			}
+			$message[$verband]->message.='<TR><TH>Vorher: </TH><TH>'.$row->old_ort_kurzbz.'</TH>';
+			$message[$verband]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
+			$message[$verband]->message.='<TH>'.$row->old_lektor.'</TH>';
+			$message[$verband]->message.='<TH>'.$row->old_datum.'/'.$row->old_stunde.'</TH>';
+			$message[$verband]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
 
-		$message[$verband]->message.='<TR><TH>Jetzt: </TH><TH>'.$row->ort_kurzbz.'</TH>';
-		$message[$verband]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
-		$message[$verband]->message.='<TH>'.$row->lektor.'</TH>';
-		$message[$verband]->message.='<TH>'.$row->datum.'/'.$row->stunde.'</TH>';
-		$message[$verband]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
+			$message[$verband]->message.='<TR><TH>Jetzt: </TH><TH>'.$row->ort_kurzbz.'</TH>';
+			$message[$verband]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
+			$message[$verband]->message.='<TH>'.$row->lektor.'</TH>';
+			$message[$verband]->message.='<TH>'.$row->datum.'/'.$row->stunde.'</TH>';
+			$message[$verband]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
+		}
 	}
 	foreach($message as $msg)
 		if(isset($msg->isset))
@@ -376,8 +382,8 @@ while ($row=pg_fetch_object($result))
  */
 if ($sendmail)
 	foreach ($message as $msg)
-		if (mail('pam@technikum-wien.at',"Stundenplan update",$msg->message,$headers."From: stpl@technikum-wien.at"))
-		//if (mail($msg->mailadress,"Stundenplan update",$msg->message_begin.$msg->message,$headers."From: stpl@technikum-wien.at"))
+		//if (mail('pam@technikum-wien.at',"Stundenplan update",$msg->message,$headers."From: stpl@technikum-wien.at"))
+		if (mail($msg->mailadress,"Stundenplan update",$msg->message_begin.$msg->message,$headers."From: stpl@technikum-wien.at"))
 		{
 			echo 'Mail an '.$msg->mailadress.' wurde verschickt!<BR>';
 			$message_stpl.='Mail an '.$msg->mailadress.' wurde verschickt!<BR>';
