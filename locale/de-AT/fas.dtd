@@ -184,6 +184,10 @@
 <!ENTITY menu-extras-projektarbeitsbenotung.label		"Projektarbeitsbenotung">
 <!ENTITY menu-extras-projektarbeitsbenotung.accesskey	"P">
 
+<!ENTITY menu-extras-gruppenverwaltung.key			"G">
+<!ENTITY menu-extras-gruppenverwaltung.label		"Gruppenverwaltung">
+<!ENTITY menu-extras-gruppenverwaltung.accesskey	"G">
+
 <!-- BIS -->
 <!ENTITY menu-bis.label		"BIS">
 <!ENTITY menu-bis.accesskey	"I">
