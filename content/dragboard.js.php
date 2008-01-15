@@ -585,16 +585,28 @@ var verbandtreeDDObserver=
 		    //Ziel holen
 		    col = tree.columns ? tree.columns["gruppe"] : "gruppe";
 			gruppe_kurzbz=tree.view.getCellText(row.value,col);
+			
+			col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+			stg_kz=tree.view.getCellText(row.value,col);
+			
+			col = tree.columns ? tree.columns["sem"] : "sem";
+			sem=tree.view.getCellText(row.value,col);
+			
+			col = tree.columns ? tree.columns["ver"] : "ver";
+			ver=tree.view.getCellText(row.value,col);
+			
+			col = tree.columns ? tree.columns["grp"] : "grp";
+			grp=tree.view.getCellText(row.value,col);
 	    }
 	    else
 	    	return false;
 	    
-	    if(gruppe_kurzbz=='')
+	    if(gruppe_kurzbz=='' && sem=='')
 	    {
-	    	alert('Zuteilung derzeit nur zu Spezialgruppen moeglich');
+	    	alert('Zuteilung ist nur zu Spezial- oder Lehrverbandsgruppen moeglich');
 	    	return false;
 	    }
-	    	
+	    
 	    uid=dropdata.data;
 	    
 	    var req = new phpRequest('student/studentDBDML.php','','');
@@ -603,6 +615,10 @@ var verbandtreeDDObserver=
 
 		req.add('uid', uid);
 		req.add('gruppe_kurzbz', gruppe_kurzbz);
+		req.add('stg_kz', stg_kz);
+		req.add('semester', sem);
+		req.add('verband', ver);
+		req.add('gruppe', grp);
 		
 		var response = req.executePOST();
 
@@ -610,7 +626,10 @@ var verbandtreeDDObserver=
 
 		if (!val.dbdml_return)
 		{
-			alert(val.dbdml_errormsg)
+			if(val.dbdml_errormsg=='')
+				alert(response);
+			else
+				alert(val.dbdml_errormsg)
 		}
 		else
 		{
