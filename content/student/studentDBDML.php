@@ -948,22 +948,104 @@ if(!$error)
 			{
 				if($uid!='')
 				{
-					if(!$benutzergruppe->load($uid, $_POST['gruppe_kurzbz']))
+					if($_POST['gruppe_kurzbz']!='')
 					{
-						$benutzergruppe->uid = $uid;
-						$benutzergruppe->gruppe_kurzbz = $_POST['gruppe_kurzbz'];
-						$benutzergruppe->studiensemester_kurzbz = $semester_aktuell;
-						$benutzergruppe->insertamum = date('Y-m-d H:i:s');
-						$benutzergruppe->insertvon = $user;
-						$benutzergruppe->new = true;
-
-						if(!$benutzergruppe->save())
+						//Zuteilung zu einer Spezialgruppe
+						
+						if(!$benutzergruppe->load($uid, $_POST['gruppe_kurzbz']))
 						{
-							$errormsg .= "$uid konnte nicht hinzugefuegt werden\n";
+							$benutzergruppe->uid = $uid;
+							$benutzergruppe->gruppe_kurzbz = $_POST['gruppe_kurzbz'];
+							$benutzergruppe->studiensemester_kurzbz = $semester_aktuell;
+							$benutzergruppe->insertamum = date('Y-m-d H:i:s');
+							$benutzergruppe->insertvon = $user;
+							$benutzergruppe->new = true;
+	
+							if(!$benutzergruppe->save())
+							{
+								$errormsg .= "$uid konnte nicht hinzugefuegt werden\n";
+							}
+						}
+						else
+							$errormsg .= "Der Student $uid ist bereits in dieser Gruppe\n";
+					}
+					else 
+					{
+						//Zuteilung zu einer Lehrverbandsgruppe
+						$error = false;	
+						$stsem = new studiensemester($conn, null, true);
+						$stsem_kurzbz = $stsem->getaktorNext();
+						
+						//Schauen ob die Lehrverbandsgruppe existiert						
+						$lehrverband = new lehrverband($conn, true);
+						if(!$lehrverband->exists($_POST['stg_kz'],$_POST['semester'],$_POST['verband'], $_POST['gruppe']))
+						{
+							$errormsg .= 'Die angegebene Lehrverbandsgruppe existiert nicht!';
+							$return = false;
+							$error = true;
+						}
+
+						//Wenn das ausgewaehlte Semester das aktuelle ist, dann wird auch in der
+						//Tabelle Student der Stg/Semester/Verband/Gruppe geaendert.
+						//Sonst nur in der Tabelle Studentlehrverband
+						if($semester_aktuell == $stsem_kurzbz)
+						{
+							//Eintrag in der Tabelle Student aendern
+							$student = new student($conn, true);
+							
+							if(!$student->load($uid))
+							{
+								$errormsg .= 'Fehler beim Laden des Studenten';
+								$error = true;
+								$return = false;
+							}
+							
+							$student->studiengang_kz = $_POST['stg_kz'];
+							$student->semester = $_POST['semester'];
+							$student->verband = ($_POST['verband']==''?' ':$_POST['verband']);
+							$student->gruppe = ($_POST['gruppe']==''?' ':$_POST['gruppe']);
+							$student->new=false;	
+							
+							if(!$student->save())
+							{
+								$errormsg .= 'Fehler beim Speichern des Studenteneintrages';
+								$return = false;
+								$error = true;
+							}
+						}
+						
+						if(!$error)
+						{
+							//Eintrag in der Tabelle Studentlehrverband aendern
+							$student_lvb = new student($conn, null, true);
+	
+							if($student_lvb->studentlehrverband_exists($uid, $semester_aktuell))
+								$student_lvb->new = false;
+							else
+								$student_lvb->new = true;
+
+							$student_lvb->uid = $uid;
+							$student_lvb->studiensemester_kurzbz = $semester_aktuell;
+							$student_lvb->studiengang_kz = $_POST['stg_kz'];
+							$student_lvb->semester = $_POST['semester'];
+							$student_lvb->verband = ($_POST['verband']==''?' ':$_POST['verband']);
+							$student_lvb->gruppe = ($_POST['gruppe']==''?' ':$_POST['gruppe']);
+							$student_lvb->updateamum = date('Y-m-d H:i:s');
+							$student_lvb->updatevon = $user;
+
+							if($student_lvb->save_studentlehrverband())
+							{
+								$return = true;
+								$error=false;
+							}
+							else
+							{
+								$error = true;
+								$errormsg .= $student_lvb->errormsg;
+								$return = false;
+							}
 						}
 					}
-					else
-						$errormsg .= "Der Student $uid ist bereits in dieser Gruppe\n";
 				}
 			}
 			if($errormsg=='')

@@ -30,6 +30,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-semester-overlay.xu
 	enableColumnDrag="true"
     ondraggesture="nsDragAndDrop.startDrag(event,lvbgrpDDObserver);"
 	datasources="../rdf/lehrverbandsgruppe.rdf.php?prestudent=false" ref="http://www.technikum-wien.at/lehrverbandsgruppe/alle-verbaende"
+	ondragdrop="nsDragAndDrop.drop(event,verbandtreeDDObserver)"
+	ondragover="nsDragAndDrop.dragOver(event,verbandtreeDDObserver)"
+	ondragenter="nsDragAndDrop.dragEnter(event,verbandtreeDDObserver)"
+	ondragexit="nsDragAndDrop.dragExit(event,verbandtreeDDObserver)"
 	>
 	<treecols>
 	    <treecol id="bez" label="Bezeichnung" flex="15" primary="true" />
