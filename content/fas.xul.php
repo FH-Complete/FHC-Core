@@ -108,6 +108,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-extras-firma:command" oncommand="ExtrasShowFirmenverwaltung();"/>
   <command id="menu-extras-lvverwaltung:command" oncommand="ExtrasShowLVverwaltung();"/>
   <command id="menu-extras-projektarbeitsbenotung:command" oncommand="ExtrasShowProjektarbeitsBenotung();"/>
+  <command id="menu-extras-gruppenverwaltung:command" oncommand="ExtrasShowGruppenverwaltung();"/>
   <command id="menu-bis-mitarbeiter-import:command" oncommand="BISMitarbeiterImport();"/>
   <command id="menu-bis-mitarbeiter-export:command" oncommand="BISMitarbeiterExport();"/>
   <command id="menu-bis-mitarbeiter-checkverwendung:command" oncommand="BISMitarbeiterCheckVerwendung();"/>
@@ -468,6 +469,12 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                label     = "&menu-extras-projektarbeitsbenotung.label;"
                command   =  "menu-extras-projektarbeitsbenotung:command"
                accesskey = "&menu-extras-projektarbeitsbenotung.accesskey;"/>
+             <menuitem
+               id        =  "menu-extras-gruppenverwaltung"
+               key       =  "menu-extras-gruppenverwaltung:key"
+               label     = "&menu-extras-gruppenverwaltung.label;"
+               command   =  "menu-extras-gruppenverwaltung:command"
+               accesskey = "&menu-extras-gruppenverwaltung.accesskey;"/>
           </menupopup>
     </menu>
     <!-- ********** BIS ********** -->

@@ -25,6 +25,7 @@
 	require_once('../../include/studiengang.class.php');
 	require_once('../../include/lehrverband.class.php');
 	require_once('../../include/gruppe.class.php');
+	require_once('../../include/benutzerberechtigung.class.php');
 ?>
 <html>
 <head>
@@ -46,7 +47,7 @@ if(isset($_GET['studiengang_kz']) && is_numeric($_GET['studiengang_kz']))
 	$studiengang_kz=$_GET['studiengang_kz'];
 else 
 	$studiengang_kz='';
-	
+
 $user = get_uid();
 $aktiv = (isset($_GET['aktiv'])?$_GET['aktiv']:'');
 $type = (isset($_GET['type'])?$_GET['type']:'');
@@ -58,7 +59,10 @@ $gruppe_kurzbz = (isset($_GET['gruppe_kurzbz'])?$_GET['gruppe_kurzbz']:'');
 //Connection zur Datenbank herstellen
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Es konnte keine Verbindung zur Datenbank hergestellt werden');
-	
+
+$rechte = new benutzerberechtigung($conn);
+$rechte->getBerechtigungen($user);
+
 //Studiengang Drop Down anzeigen
 $stud = new studiengang($conn);
 if(!$stud->getAll('typ, kurzbzlang'))
@@ -69,13 +73,30 @@ echo 'Studiengang: <SELECT name="studiengang_kz"  onchange="document.frm_studien
 
 foreach($stud->result as $row)
 {
-	if($studiengang_kz=='')
-		$studiengang_kz=$row->studiengang_kz;
-	
-	echo '<OPTION value="'.$row->studiengang_kz.'"'.($studiengang_kz==$row->studiengang_kz?'selected':'').'>'.$row->kuerzel.'</OPTION>';
+	if($rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') || 
+	   $rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid'))
+	{
+		if($studiengang_kz=='')
+			$studiengang_kz=$row->studiengang_kz;
+		
+		echo '<OPTION value="'.$row->studiengang_kz.'"'.($studiengang_kz==$row->studiengang_kz?'selected':'').'>'.$row->kuerzel.'</OPTION>';
+	}
 }
 echo '</SELECT>';
 echo '</form>';
+
+if($rechte->isBerechtigt('admin', $studiengang_kz, 'suid'))
+	$admin=true;
+else 
+	$admin=false;
+
+if($rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid'))
+	$assistenz=true;
+else 
+	$assistenz=false;
+
+if(!$admin && !$assistenz)
+	die('Sie haben keine Berechtigung für diesen Studiengang');
 
 $studiengang = new studiengang($conn);
 $studiengang->load($studiengang_kz);
@@ -83,6 +104,9 @@ $studiengang->load($studiengang_kz);
 //Anlegen einer neuen Gruppe
 if($type=='neu')
 {
+	if(!$admin)
+		die('Sie haben keine Berechtigung zum Speichern');
+	
 	if(isset($_POST['spzgruppe_neu']))
 	{
 		//neue Spezialgruppe anlegen
@@ -171,6 +195,9 @@ if($type=='neu')
 //Aenderung des Aktiv Status
 if($aktiv!='')
 {
+	if(!$admin)
+		die('Sie haben keine Berechtigung zum Speichern');
+	
 	if($gruppe_kurzbz!='')
 	{
 		$gruppe = new gruppe($conn);
@@ -224,13 +251,16 @@ if($type=='save')
 		if($gruppe->load($gruppe_kurzbz))
 		{
 			$gruppe->bezeichnung = $_POST['bezeichnung'];
-			$gruppe->beschreibung = $_POST['beschreibung'];
-			$gruppe->sichtbar = isset($_POST['sichtbar']);
-			$gruppe->lehre = isset($_POST['sichtbar']);
-			$gruppe->aktiv = isset($_POST['aktiv']);
-			$gruppe->sort = $_POST['sort'];
-			$gruppe->mailgrp = isset($_POST['mailgrp']);
-			$gruppe->generiert = isset($_POST['generiert']);
+			if($admin)
+			{
+				$gruppe->beschreibung = $_POST['beschreibung'];
+				$gruppe->sichtbar = isset($_POST['sichtbar']);
+				$gruppe->lehre = isset($_POST['sichtbar']);
+				$gruppe->aktiv = isset($_POST['aktiv']);
+				$gruppe->sort = $_POST['sort'];
+				$gruppe->mailgrp = isset($_POST['mailgrp']);
+				$gruppe->generiert = isset($_POST['generiert']);
+			}
 			$gruppe->updateamum = date('Y-m-d H:i:s');
 			$gruppe->updatevon = $user;
 			
@@ -242,6 +272,7 @@ if($type=='save')
 			{
 				echo "Fehler beim Speichern der Daten: $gruppe->errormsg";
 			}
+			$semester = $gruppe->semester;
 		}
 		else 
 			echo "Gruppe konnte nicht geladen werden";
@@ -253,7 +284,8 @@ if($type=='save')
 		if($lvb->load($studiengang_kz, $semester, $verband, $gruppe))
 		{
 			$lvb->bezeichnung = $_POST['bezeichnung'];
-			$lvb->aktiv = isset($_POST['aktiv']);
+			if($admin)
+				$lvb->aktiv = isset($_POST['aktiv']);
 			
 			if($lvb->save(false))
 			{
@@ -274,8 +306,13 @@ if($type=='save')
 
 //Tree der Gruppen
 echo '<table style="font-size:large" width="100%"><tr><td>';
+if(!$admin)
+	$where = ' AND aktiv=true';
+else 
+	$where = '';
 
-$qry = "SELECT * FROM public.tbl_lehrverband WHERE studiengang_kz='$studiengang_kz' ORDER BY studiengang_kz, semester, verband, gruppe";
+$qry = "SELECT * FROM public.tbl_lehrverband WHERE studiengang_kz='$studiengang_kz' $where ORDER BY studiengang_kz, semester, verband, gruppe";
+
 if($result = pg_query($conn, $qry))
 {
 	$lastsemester='';
@@ -291,24 +328,40 @@ if($result = pg_query($conn, $qry))
 				{
 					if($lastverband!='')
 					{
-						//Formular zum Anlegen einer neuen Gruppe
-						echo "<form action='".$_SERVER['PHP_SELF']."?type=neu&studiengang_kz=$row->studiengang_kz&semester=$lastsemester&verband=$lastverband' method='POST'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-<input type='text' name='gruppe_neu' size='1' maxlength='1' /> <input type='submit' value='Neu' /></form>";
+						if($admin)
+						{
+							//Formular zum Anlegen einer neuen Gruppe
+							echo "<form action='".$_SERVER['PHP_SELF']."?type=neu&studiengang_kz=$row->studiengang_kz&semester=$lastsemester&verband=$lastverband' method='POST'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-<input type='text' name='gruppe_neu' size='1' maxlength='1' /> <input type='submit' value='Neu' /></form>";
+						}
 					}
-					//Formular zum Anlegen eines neuen Verbandes
-					echo "<form action='".$_SERVER['PHP_SELF']."?type=neu&studiengang_kz=$row->studiengang_kz&semester=$lastsemester' method='POST'>&nbsp;&nbsp;&nbsp;&nbsp;|-<input type='text' name='verband_neu' size='1' maxlength='1' /> <input type='submit' value='Neuer Verband' /></form>";
+					if($admin)
+					{
+						//Formular zum Anlegen eines neuen Verbandes
+						echo "<form action='".$_SERVER['PHP_SELF']."?type=neu&studiengang_kz=$row->studiengang_kz&semester=$lastsemester' method='POST'>&nbsp;&nbsp;&nbsp;&nbsp;|-<input type='text' name='verband_neu' size='1' maxlength='1' /> <input type='submit' value='Neuer Verband' /></form>";
+					}
 					
+					if(!$admin)
+						$where=' AND aktiv AND lehre';
+					else 
+						$where='';
 					//Spezialgruppen des vorherigen Semesters
-					$qry_gruppe = "SELECT * FROM public.tbl_gruppe WHERE studiengang_kz='$studiengang_kz' AND semester='$lastsemester' ORDER BY sort, gruppe_kurzbz";
+					$qry_gruppe = "SELECT * FROM public.tbl_gruppe WHERE studiengang_kz='$studiengang_kz' AND semester='$lastsemester' $where ORDER BY sort, gruppe_kurzbz";
 					if($result_gruppe = pg_query($conn, $qry_gruppe))
 					{
 						while($row_gruppe = pg_fetch_object($result_gruppe))
 						{
-							echo "&nbsp;&nbsp;&nbsp;&nbsp;|- <a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&gruppe_kurzbz=$row_gruppe->gruppe_kurzbz&aktiv=".($row_gruppe->aktiv=='t'?'false':'true')."' class='Item'><img src='../../skin/images/".($row_gruppe->aktiv=='t'?'true.gif':'false.gif')."'></a><a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$lastsemester&gruppe_kurzbz=$row_gruppe->gruppe_kurzbz&type=edit' class='Item'>$row_gruppe->gruppe_kurzbz</a><br>";
+							echo "&nbsp;&nbsp;&nbsp;&nbsp;|-";
+							if($admin)
+								echo " <a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&gruppe_kurzbz=$row_gruppe->gruppe_kurzbz&aktiv=".($row_gruppe->aktiv=='t'?'false':'true')."' class='Item'><img src='../../skin/images/".($row_gruppe->aktiv=='t'?'true.gif':'false.gif')."'></a>";
+							echo " <a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$lastsemester&gruppe_kurzbz=$row_gruppe->gruppe_kurzbz&type=edit' class='Item'>$row_gruppe->gruppe_kurzbz ($row_gruppe->bezeichnung)</a><br>";
 						}
 					}
-					
-					//Formular zum Anlegen einer neuen Spezialgruppe
-					echo "<form action='".$_SERVER['PHP_SELF']."?type=neu&studiengang_kz=$row->studiengang_kz&semester=$lastsemester' method='POST'>&nbsp;&nbsp;&nbsp;&nbsp;|- $studiengang->kuerzel-$lastsemester<input type='text' name='spzgruppe_neu' size='11' maxlength='11' /> <input type='submit' value='Neue SpzGrp' /></form>";
+
+					if($admin)
+					{
+						//Formular zum Anlegen einer neuen Spezialgruppe
+						echo "<form action='".$_SERVER['PHP_SELF']."?type=neu&studiengang_kz=$row->studiengang_kz&semester=$lastsemester' method='POST'>&nbsp;&nbsp;&nbsp;&nbsp;|- $studiengang->kuerzel-$lastsemester<input type='text' name='spzgruppe_neu' size='11' maxlength='11' /> <input type='submit' value='Neue SpzGrp' /></form>";
+					}
 	
 				}
 				$lastverband='';
@@ -316,7 +369,10 @@ if($result = pg_query($conn, $qry))
 			}
 			
 			//Semester ausgeben
-			echo "<a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$row->semester&verband=$row->verband&gruppe=$row->gruppe&aktiv=".($row->aktiv=='t'?'false':'true')."' class='Item'><img src='../../skin/images/".($row->aktiv=='t'?'true.gif':'false.gif')."'></a><b><a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$row->semester&verband=$row->verband&gruppe=$row->gruppe&type=edit' class='Item'>$row->semester</a></b>";
+			echo '<a name="'.$row->semester.'" />';
+			if($admin)
+				echo "<a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$row->semester&verband=$row->verband&gruppe=$row->gruppe&aktiv=".($row->aktiv=='t'?'false':'true')."' class='Item'><img src='../../skin/images/".($row->aktiv=='t'?'true.gif':'false.gif')."'></a>";
+			echo "<b><a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$row->semester&verband=$row->verband&gruppe=$row->gruppe&type=edit' class='Item'>$row->semester ($row->bezeichnung)</a></b>";
 		}
 		elseif(trim($row->gruppe)=='')
 		{
@@ -324,18 +380,27 @@ if($result = pg_query($conn, $qry))
 			{
 				if($lastverband!='')
 				{
-					//Formular zum Anlegen einer neuen Gruppe
-					echo "<form action='".$_SERVER['PHP_SELF']."?type=neu&studiengang_kz=$row->studiengang_kz&semester=$row->semester&verband=$lastverband' method='POST'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-<input type='text' name='gruppe_neu' size='1' maxlength='1' /> <input type='submit' value='Neu' /></form>";
+					if($admin)
+					{
+						//Formular zum Anlegen einer neuen Gruppe
+						echo "<form action='".$_SERVER['PHP_SELF']."?type=neu&studiengang_kz=$row->studiengang_kz&semester=$row->semester&verband=$lastverband' method='POST'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-<input type='text' name='gruppe_neu' size='1' maxlength='1' /> <input type='submit' value='Neu' /></form>";
+					}
 				}	
 				$lastverband=$row->verband;
 			}
 			//Verband
-			echo "&nbsp;&nbsp;&nbsp;&nbsp;|- <a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$row->semester&verband=$row->verband&gruppe=$row->gruppe&aktiv=".($row->aktiv=='t'?'false':'true')."' class='Item'><img src='../../skin/images/".($row->aktiv=='t'?'true.gif':'false.gif')."'></a><b><a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$row->semester&verband=$row->verband&gruppe=$row->gruppe&type=edit' class='Item'>$row->verband</a></b>";
+			echo "&nbsp;&nbsp;&nbsp;&nbsp;|- ";
+			if($admin)
+				echo "<a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$row->semester&verband=$row->verband&gruppe=$row->gruppe&aktiv=".($row->aktiv=='t'?'false':'true')."' class='Item'><img src='../../skin/images/".($row->aktiv=='t'?'true.gif':'false.gif')."'></a>";
+			echo "<b><a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$row->semester&verband=$row->verband&gruppe=$row->gruppe&type=edit' class='Item'>$row->verband ($row->bezeichnung)</a></b> ";
 		}
 		else
 		{
 			//Gruppe
-			echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|- <a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$row->semester&verband=$row->verband&gruppe=$row->gruppe&aktiv=".($row->aktiv=='t'?'false':'true')."' class='Item'><img src='../../skin/images/".($row->aktiv=='t'?'true.gif':'false.gif')."'></a><b><a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$row->semester&verband=$row->verband&gruppe=$row->gruppe&type=edit' class='Item'>$row->gruppe</a></b>";
+			echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|- ";
+			if($admin)
+				echo "<a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$row->semester&verband=$row->verband&gruppe=$row->gruppe&aktiv=".($row->aktiv=='t'?'false':'true')."' class='Item'><img src='../../skin/images/".($row->aktiv=='t'?'true.gif':'false.gif')."'></a>";
+			echo "<b><a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$row->semester&verband=$row->verband&gruppe=$row->gruppe&type=edit' class='Item'>$row->gruppe ($row->bezeichnung)</a></b>";
 		}
 		
 		
@@ -345,14 +410,24 @@ if($result = pg_query($conn, $qry))
 	{
 		if($lastverband!='')
 		{
-			//Formular zum Anlegen einer neuen Gruppe
-			echo "<form action='".$_SERVER['PHP_SELF']."?type=neu&studiengang_kz=$studiengang_kz&semester=$lastsemester&verband=$lastverband' method='POST'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-<input type='text' name='gruppe_neu' size='1' maxlength='1' /> <input type='submit' value='Neu' /></form>";
+			if($admin)
+			{
+				//Formular zum Anlegen einer neuen Gruppe
+				echo "<form action='".$_SERVER['PHP_SELF']."?type=neu&studiengang_kz=$studiengang_kz&semester=$lastsemester&verband=$lastverband' method='POST'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-<input type='text' name='gruppe_neu' size='1' maxlength='1' /> <input type='submit' value='Neu' /></form>";
+			}
 		}
-		//Formular zum Anlegen eines neuen Verbandes
-		echo "<form action='".$_SERVER['PHP_SELF']."?type=neu&studiengang_kz=$studiengang_kz&semester=$lastsemester' method='POST'>&nbsp;&nbsp;&nbsp;&nbsp;|-<input type='text' name='verband_neu' size='1' maxlength='1' /> <input type='submit' value='Neuer Verband' /></form>";
+		if($admin)
+		{
+			//Formular zum Anlegen eines neuen Verbandes
+			echo "<form action='".$_SERVER['PHP_SELF']."?type=neu&studiengang_kz=$studiengang_kz&semester=$lastsemester' method='POST'>&nbsp;&nbsp;&nbsp;&nbsp;|-<input type='text' name='verband_neu' size='1' maxlength='1' /> <input type='submit' value='Neuer Verband' /></form>";
+		}
 		
+		if(!$admin)
+			$where=' AND aktiv AND lehre';
+		else 
+			$where='';
 		//Spezialgruppen des vorherigen Semesters
-		$qry_gruppe = "SELECT * FROM public.tbl_gruppe WHERE studiengang_kz='$studiengang_kz' AND semester='$lastsemester' ORDER BY sort, gruppe_kurzbz";
+		$qry_gruppe = "SELECT * FROM public.tbl_gruppe WHERE studiengang_kz='$studiengang_kz' AND semester='$lastsemester' $where ORDER BY sort, gruppe_kurzbz";
 		if($result_gruppe = pg_query($conn, $qry_gruppe))
 		{
 			while($row_gruppe = pg_fetch_object($result_gruppe))
@@ -361,12 +436,14 @@ if($result = pg_query($conn, $qry))
 			}
 		}
 		
-		//Formular zum Anlegen einer neuen Spezialgruppe
-		echo "<form action='".$_SERVER['PHP_SELF']."?type=neu&studiengang_kz=$studiengang_kz&semester=$lastsemester' method='POST'>&nbsp;&nbsp;&nbsp;&nbsp;|- $studiengang->kuerzel-$lastsemester<input type='text' name='spzgruppe_neu' size='11' maxlength='11' /> <input type='submit' value='Neue SpzGrp' /></form>";
-		
-		//Formular zum Anlegen eines neuen Semesters
-		echo "<form action='".$_SERVER['PHP_SELF']."?type=neu&studiengang_kz=$studiengang_kz' method='POST'><input type='text' name='semester_neu' size='2' maxlength='2' /> <input type='submit' value='Neu' /></form>";
-
+		if($admin)
+		{
+			//Formular zum Anlegen einer neuen Spezialgruppe
+			echo "<form action='".$_SERVER['PHP_SELF']."?type=neu&studiengang_kz=$studiengang_kz&semester=$lastsemester' method='POST'>&nbsp;&nbsp;&nbsp;&nbsp;|- $studiengang->kuerzel-$lastsemester<input type='text' name='spzgruppe_neu' size='11' maxlength='11' /> <input type='submit' value='Neue SpzGrp' /></form>";
+			
+			//Formular zum Anlegen eines neuen Semesters
+			echo "<form action='".$_SERVER['PHP_SELF']."?type=neu&studiengang_kz=$studiengang_kz' method='POST'><input type='text' name='semester_neu' size='2' maxlength='2' /> <input type='submit' value='Neu' /></form>";
+		}
 	}
 }
 
@@ -379,13 +456,19 @@ if($type=='edit')
 		$gruppe = new gruppe($conn);
 		if($gruppe->load($gruppe_kurzbz))
 		{
+			echo '<div style="position:fixed;
+ 							  left:450px; top:50px;">';
+			
 			echo "Details von $gruppe_kurzbz<br><br>";
 			echo "<form action='".$_SERVER['PHP_SELF']."?type=save&studiengang_kz=$studiengang_kz&gruppe_kurzbz=$gruppe_kurzbz' method='POST'>
 				  <table>
 				  	<tr>
 				  		<td>Bezeichnung:</td>
 				  		<td><input type='text' name='bezeichnung' size='30' maxlength='32' value='$gruppe->bezeichnung'/></td>
-				  	</tr>
+				  	</tr>";
+			if($admin)
+			{
+			echo "
 				  	<tr>
 				  		<td>Beschreibung:</td>
 				  		<td><input type='text' name='beschreibung' size='30' maxlength='128' value='$gruppe->beschreibung'/></td>
@@ -413,7 +496,9 @@ if($type=='edit')
 				  	<tr>
 				  		<td>Generiert:</td>
 				  		<td><input type='checkbox' name='generiert' ".($gruppe->generiert?'checked':'')." /></td>
-				  	</tr>
+				  	</tr>";
+			}
+			echo "
 				  	<tr>
 				  		<td>&nbsp;</td>
 				  		<td>&nbsp;</td>
@@ -424,6 +509,7 @@ if($type=='edit')
 				  	</tr>
 				  </table>			
 				  </form>";
+			echo '</div>';
 		}
 	}
 	else 
@@ -431,17 +517,24 @@ if($type=='edit')
 		$lvb = new lehrverband($conn);
 		if($lvb->load($studiengang_kz, $semester, $verband, $gruppe))
 		{
+			echo '<div style="position:fixed;
+ 							  left:450px; top:50px;">';
 			echo "Details von $studiengang->kuerzel - $semester$verband$gruppe<br><br>";
 			echo "<form action='".$_SERVER['PHP_SELF']."?type=save&studiengang_kz=$studiengang_kz&semester=$semester&verband=$verband&gruppe=$gruppe' method='POST'>
 				  <table>
 				  	<tr>
 				  		<td>Bezeichnung:</td>
 				  		<td><input type='text' name='bezeichnung' size='16' maxlength='16' value='$lvb->bezeichnung'/></td>
-				  	</tr>
+				  	</tr>";
+			if($admin)
+			{
+				echo "
 				  	<tr>
 				  		<td>Aktiv:</td>
 				  		<td><input type='checkbox' name='aktiv' ".($lvb->aktiv?'checked':'')." /></td>
-				  	</tr>
+				  	</tr>";
+			}
+			echo "
 				  	<tr>
 				  		<td>&nbsp;</td>
 				  		<td>&nbsp;</td>
@@ -452,12 +545,17 @@ if($type=='edit')
 				  	</tr>
 				  </table>			
 				  </form>";
+			echo '</div>';
 		}
 		else 
 			echo "Gruppe wurde nicht gefunden";
 	}
 }
 echo '</td></tr></table>';
+if(isset($semester) || is_numeric($semester)) //Zum Anker hüpfen
+{
+	echo "<script language='JavaScript'>this.location.hash='#".$semester."'</script>";
+}
 ?>
 
 </body>

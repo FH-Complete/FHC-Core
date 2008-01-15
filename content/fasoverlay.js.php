@@ -894,6 +894,15 @@ function ExtrasShowProjektarbeitsBenotung()
 	window.open('<?php echo APP_ROOT ?>vilesci/lehre/projektarbeitsbenotung.php?stg_kz='+studiengang_kz,'Projektarbeitsbenotung','');
 }
 
+
+// ****
+// * Zeigt HTML Seite zur Bearbeitung der Gruppen an
+// ****
+function ExtrasShowGruppenverwaltung()
+{
+	window.open('<?php echo APP_ROOT ?>vilesci/stammdaten/lvbgruppenverwaltung.php','Gruppen','');
+}
+
 // ****
 // * Zeigt eine Seite zum Importieren der Funktionen aus der vorherigen BISMeldung
 // ****
