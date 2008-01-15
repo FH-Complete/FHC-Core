@@ -22,6 +22,7 @@
 
 require_once('../../config.inc.php');
 require_once('../../../system/sync/sync_config.inc.php');
+require_once('../../../include/'.EXT_FKT_PATH.'/generateuid.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/studiengang.class.php');
@@ -177,29 +178,6 @@ function generateMatrikelnummer($conn, $studiengang_kz, $studiensemester_kurzbz)
 	}
 }
 
-// ****
-// * Generiert die UID
-// * FORMAT: el07b001
-// * el = studiengangskuerzel
-// * 07 = Jahr
-// * b/m/d/x = Bachelor/Master/Diplom/incoming
-// * 001 = Laufende Nummer ( Wenn StSem==SS dann wird zur nummer 500 dazugezaehlt)
-// ****
-function generateUID($conn, $matrikelnummer)
-{
-	$jahr = substr($matrikelnummer,0, 2);
-	$art = substr($matrikelnummer, 2, 1);
-	$stg = substr($matrikelnummer, 3, 4);
-	$nr = substr($matrikelnummer, 7);
-	
-	if($art=='2')
-		$nr = $nr+500;
-	
-	$stg_obj = new studiengang($conn);
-	$stg_obj->load(ltrim($stg,'0'));
-	
-	return $stg_obj->kurzbz.$jahr.($art!='0'?$stg_obj->typ:'x').$nr;	
-}
 function clean_string($string)
  {
  	$trans = array("ä" => "ae",
@@ -470,7 +448,14 @@ if(isset($_POST['save']))
 	{
 		//Matrikelnummer und UID generieren
 		$matrikelnr = generateMatrikelnummer($conn, $studiengang_kz, $studiensemester_kurzbz);
-		$uid = generateUID($conn, $matrikelnr);
+				
+		$jahr = substr($matrikelnr,0, 2);
+		$stg = substr($matrikelnr, 3, 4);
+		
+		$stg_obj = new studiengang($conn);
+		$stg_obj->load(ltrim($stg,'0'));
+		
+		$uid = generateUID($stg_obj->kurzbz,$jahr, $stg_obj->typ, $matrikelnr);
 						
 		//Benutzerdatensatz anlegen
 		$benutzer = new benutzer($conn);

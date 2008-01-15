@@ -141,6 +141,21 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 }
 
 //Fachbereichskoordinatoren holen
+if($stg_kz!='')
+{
+	$where = "studiengang_kz='$stg_kz'";
+	$where2=$where;
+	$tables='lehre.tbl_lehrveranstaltung';
+}
+else 
+{
+	$where = "fachbereich_kurzbz='$fachbereich_kurzbz'";
+	$where2 = $where." AND 
+	          tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND 
+	          tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id";
+	$tables='lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach';
+}
+	
 $qry = "
 SELECT
 	distinct
@@ -149,9 +164,9 @@ SELECT
 	uid
 FROM
 	campus.vw_mitarbeiter JOIN
-	(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='fbk' AND studiengang_kz='$stg_kz'
+	(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='fbk' AND $where
 	 UNION
-	 SELECT koordinator as uid from lehre.tbl_lehrveranstaltung WHERE studiengang_kz='$stg_kz') as a USING(uid) ORDER BY nachname, vorname";
+	 SELECT koordinator as uid from $tables WHERE $where2) as a USING(uid) ORDER BY nachname, vorname";
 
 $fbk = array();
 if($result = pg_query($conn, $qry))

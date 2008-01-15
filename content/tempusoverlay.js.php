@@ -91,41 +91,17 @@ function onVerbandSelect()
 	// Studenten
 	if(typ=='')
 	{
-		/*try
-		{
-			url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe+"&"+gettimestamp();
-			var treeStudent=document.getElementById('student-tree');
-	
-			//Alte DS entfernen
-			var oldDatasources = treeStudent.database.GetDataSources();
-			while(oldDatasources.hasMoreElements())
-			{
-				treeStudent.database.RemoveDataSource(oldDatasources.getNext());
-			}
-	
-			var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-			StudentTreeDatasource = rdfService.GetDataSource(url);
-			StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-			StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-			treeStudent.database.AddDataSource(StudentTreeDatasource);
-			StudentTreeDatasource.addXMLSinkObserver(StudentTreeSinkObserver);
-			treeStudent.builder.addListener(StudentTreeListener);
-		}
-		catch(e)
-		{
-			debug(e);
-		}*/
 		
-		//Bei Ansicht von Ab-/Unterbrecher den Button "->Student" anzeigen
-		if(sem=='0')
-			document.getElementById('student-toolbar-student').hidden=false;
-		else
-			document.getElementById('student-toolbar-student').hidden=true;
-
-		//Wenn der Interessenten Tab markiert ist, dann den Studenten Tab markieren
-		//if(document.getElementById('main-content-tabs').selectedItem==document.getElementById('tab-interessenten'))
-		//	document.getElementById('main-content-tabs').selectedItem=document.getElementById('tab-studenten');
-
+		try
+		{
+			//Bei Ansicht von Ab-/Unterbrecher den Button "->Student" anzeigen
+			if(sem=='0')
+				document.getElementById('student-toolbar-student').hidden=false;
+			else
+				document.getElementById('student-toolbar-student').hidden=true;
+		}
+		catch(e){}
+	
 		// -------------- Studenten --------------------------
 		try
 		{
@@ -167,10 +143,7 @@ function onVerbandSelect()
 			document.getElementById('student-betriebsmittel').setAttribute('src','');
 			StudentAbschlusspruefungDisableFields(true);
 		}
-		catch(e)
-		{
-			debug(e);
-		}
+		catch(e){}
 	}
 	else
 	{
@@ -218,9 +191,7 @@ function onVerbandSelect()
 			StudentAbschlusspruefungDisableFields(true);
 		}
 		catch(e)
-		{
-			debug(e);
-		}
+		{}
 	}
 
 	// Lehrveranstaltung

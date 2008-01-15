@@ -149,7 +149,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 </vbox>
 
 <tree id="tree-lektor" onmouseup="onLektorSelect(event);"
-	seltype="single" hidecolumnpicker="false" flex="1"
+	seltype="multi" hidecolumnpicker="false" flex="1"
 	enableColumnDrag="true"
     ondraggesture="nsDragAndDrop.startDrag(event,mitarbeiterDDObserver);"
 	ondragdrop="nsDragAndDrop.drop(event,LektorFunktionDDObserver)"
@@ -278,7 +278,9 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 <vbox id="vbox-main">
 <popupset>
 		<popup id="fasoverlay-lektor-tree-popup">
-			<menuitem label="Entfernen" oncommand="LektorFunktionDel();" />
+			<menuitem label="Mail senden" oncommand="LektorFunktionMail();" />
+			<menuseparator />
+			<menuitem label="Entfernen" oncommand="LektorFunktionDel();" />			
 		</popup>
 </popupset>
 	<tabbox id="tabbox-main" flex="3" orient="vertical">

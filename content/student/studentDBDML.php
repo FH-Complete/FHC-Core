@@ -1826,7 +1826,8 @@ if(!$error)
 		//Die Daten werden per POST uebermittelt. Es wird ein Feld Anzahl mituebergeben
 		//mit der Anzahl der Felder. Die Felder sind durchnummeriert zB lehreinheit_id_0, lehreinheit_id_1, ...
 		$errormsg = '';
-
+		$angerechnet=false;
+		
 		for($i=0;$i<$_POST['anzahl'];$i++)
 		{
 			$lvgesamtnote = new lvgesamtnote($conn, null, true);
@@ -1893,6 +1894,12 @@ if(!$error)
 							$zeugnisnote->new = false;
 							$zeugnisnote->updateamum = date('Y-m-d H:i:s');
 							$zeugnisnote->updatevon = $user;
+							//Angerechnete Noten werden nicht ueberschrieben
+							if($zeugnisnote->note=='6') //Angerechnet
+							{
+								$angerechnet=true;
+								continue;
+							}
 						}
 						else
 						{
@@ -1921,6 +1928,11 @@ if(!$error)
 				}
 			}
 		}
+		if($angerechnet)
+		{
+			$errormsg.="\nAngerechnete Noten wurden nicht ueberschrieben";
+		}
+		
 		if($errormsg=='')
 			$return = true;
 		else
@@ -2006,6 +2018,12 @@ if(!$error)
 								$zeugnisnote->new = false;
 								$zeugnisnote->updateamum = date('Y-m-d H:i:s');
 								$zeugnisnote->updatevon = $user;
+								//Angerechnete Noten werden nicht ueberschrieben
+								if($zeugnisnote->note=='6') //Angerechnet
+								{
+									$angerechnet=true;
+									continue;
+								}
 							}
 							else
 							{
@@ -2030,7 +2048,11 @@ if(!$error)
 				}
 			}
 		}
-
+		if($angerechnet)
+		{
+			$errormsg.="\nAngerechnete Noten wurden nicht ueberschrieben";
+		}
+		
 		if($errormsg=='')
 			$return = true;
 		else

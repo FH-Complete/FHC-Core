@@ -3532,7 +3532,11 @@ function StudentSuche()
 		treeStudent.builder.addListener(StudentTreeListener);
 	
 		//Detailfelder Deaktivieren
-		StudentDisableDetails();
+		try
+		{
+			StudentDisableDetails();
+		}
+		catch(e){}
 	}
 	else
 		alert('Es muessen mindestens 3 Zeichen eingegeben werden');		

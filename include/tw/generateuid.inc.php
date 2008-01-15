@@ -39,4 +39,22 @@ function generateUID($stgkzl,$jahr, $stgtyp, $matrikelnummer)
 		$nr = $nr+500;
 	return $stgkzl.$jahr.($art!='0'?$stgtyp:'x').$nr;
 }
+
+// ****
+// * Gerneriert die Mitarbeiter UID
+// ****
+function generateMitarbeiterUID($conn, $vorname, $nachname)
+{
+	$bn = new benutzer($conn);
+	
+	for($nn=8,$vn=0;$nn!=0;$nn--,$vn++)
+	{
+		$uid = substr($nachname,0,$nn);
+		$uid .= substr($vorname,0,$vn);
+
+		if(!$bn->uid_exists($uid))
+			if($bn->errormsg=='')
+				return $uid;
+	}
+}
 ?>
