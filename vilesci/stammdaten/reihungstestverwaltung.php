@@ -260,7 +260,7 @@
 			$reihungstest->uhrzeit = date('H:i:s');
 		}
 	
-		//Formular zum bearbeiten des Reihungstests
+		//Formular zum Bearbeiten des Reihungstests
 		echo '<HR>';
 		echo "<FORM method='POST'>";
 		echo "<input type='hidden' value='$reihungstest->reihungstest_id' name='reihungstest_id' />";
@@ -310,7 +310,7 @@
 		echo '<tr><td>Datum</td><td><input type="input" name="datum" value="'.$datum_obj->convertISODate($reihungstest->datum).'"></td></tr>';
 		echo '<tr><td>Uhrzeit</td><td><input type="input" name="uhrzeit" value="'.$reihungstest->uhrzeit.'"></td></tr>';
 		if(!$neu)
-			$val = 'Speichern';
+			$val = 'Änderung Speichern';
 		else 
 			$val = 'Neu anlegen';
 		

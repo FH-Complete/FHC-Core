@@ -63,9 +63,16 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					</xsl:text></fo:block>
 					<fo:block><xsl:text>
 					</xsl:text></fo:block>
-					<!-- ZahlungsbestÃ¤tigung -->
+					<!-- Zahlungsbestaetigung -->
 					<fo:block text-align="center" font-size="20pt">
-							ZAHLUNGSBESTÄTIGUNG
+					<xsl:choose>
+					  <xsl:when test="buchung/rueckerstattung">
+					    AUSZAHLUNGSBESTÄTIGUNG
+					  </xsl:when>
+					  <xsl:otherwise>
+					   ZAHLUNGSBESTÄTIGUNG
+					  </xsl:otherwise>
+					</xsl:choose>
 					</fo:block>
 					<fo:block><xsl:text>
 					</xsl:text></fo:block>
@@ -82,8 +89,15 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					<fo:block><xsl:text>
 					</xsl:text></fo:block>
 					<fo:block text-align="left" font-size="10pt">
-						\nDie Studiengangsleitung bestätigt hiermit, dass <xsl:value-of select="person/name_gesamt" />, geboren am <xsl:value-of select="person/geburtsdatum" />, folgende Einzahlungen getätigt hat:
-						</fo:block>
+					<xsl:choose>
+					  <xsl:when test="buchung/rueckerstattung">
+					    \n <xsl:value-of select="person/name_gesamt" />, geboren am <xsl:value-of select="person/geburtsdatum" /> bestätigt hiermit, dass die Studiengangsleitung, folgende Auszahlungen getätigt hat:
+					  </xsl:when>
+					  <xsl:otherwise>
+					   \n Die Studiengangsleitung bestätigt hiermit, dass <xsl:value-of select="person/name_gesamt" />, geboren am <xsl:value-of select="person/geburtsdatum" />, folgende Einzahlungen getätigt hat:
+					  </xsl:otherwise>
+					</xsl:choose>
+					</fo:block>						
 					<fo:block><xsl:text>
 					</xsl:text></fo:block>
 					<fo:block><xsl:text>
@@ -145,9 +159,27 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 					<!-- Unterschrift -->
 					
-					<fo:block text-align="left" font-size="10pt">
-					\nFachhochschule Technikum\nWien\nHöchstädtplatz 5\nA-1200 Wien\nZVR-Nr.: 074476526\nDVR-Nr.: 0928381
-					</fo:block>
+					<fo:table table-layout="fixed" border-collapse="separate">
+						<fo:table-column column-width="50mm"/>
+						<fo:table-column column-width="50mm"/>
+
+						<fo:table-body>
+							<fo:table-row line-height="10pt">
+								<fo:table-cell>
+									<fo:block text-align="left" font-size="10pt">
+									Fachhochschule Technikum\n Wien\n Höchstädtplatz 5\n A-1200 Wien\n ZVR-Nr.: 074476526\n DVR-Nr.: 0928381
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell>
+									<fo:block text-align="right" font-size="10pt">
+									<xsl:value-of select="person/name_gesamt" />\ngeboren am <xsl:value-of select="person/geburtsdatum" />
+									</fo:block>
+								</fo:table-cell>
+							</fo:table-row>
+						</fo:table-body>
+					</fo:table>
+					
+					
 				</fo:flow>
 			</fo:page-sequence>
 		</fo:root>

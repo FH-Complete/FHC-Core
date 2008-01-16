@@ -201,14 +201,45 @@ $error_msg='';
 		else
 			echo "<br>Fehler:$sql_query";
 
-     	$sql_query="INSERT INTO public.tbl_benutzergruppe VALUES ('$row->mitarbeiter_uid','".strtoupper($row->mlist_name)."', now(), 'mlists_generate')";
+     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, updateamum, updatevon) VALUES ('$row->mitarbeiter_uid','".strtoupper($row->mlist_name)."', now(), 'mlists_generate')";
 		if(!pg_query($conn, $sql_query))
 			$error_msg.=pg_errormessage($conn).$sql_query;
 		echo '-';
 		flush();
 	}
 
-
+	// **************************************************************
+	// StudentenvertreterVerteiler abgleichen
+	// Studenten holen die nicht mehr in den Verteiler gehoeren
+	echo 'Studentenvertreterverteiler werden abgeglichen!<BR>';
+	flush();
+	$sql_query="SELECT gruppe_kurzbz, uid FROM public.tbl_benutzergruppe JOIN public.tbl_gruppe USING(gruppe_kurzbz) WHERE gruppe_kurzbz LIKE '%_STDV' AND uid not in (SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='stdv' AND studiengang_kz=tbl_gruppe.studiengang_kz)";
+	if(!($result=pg_query($conn, $sql_query)))
+		$error_msg.=pg_errormessage($conn);
+	while($row=pg_fetch_object($result))
+	{
+     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$row->gruppe_kurzbz') AND uid='$row->uid'";
+		if(!pg_query($conn, $sql_query))
+			$error_msg.=pg_errormessage($conn).$sql_query;
+		echo '-';
+		flush();
+	}
+	// Studenten holen die nicht im Verteiler sind
+	echo '<BR>';
+	$sql_query="SELECT uid, (Select gruppe_kurzbz from public.tbl_gruppe where studiengang_kz=tbl_benutzerfunktion.studiengang_kz AND gruppe_kurzbz like '%_STDV') as gruppe_kurzbz FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='stdv' AND uid NOT in(Select uid from public.tbl_benutzergruppe JOIN public.tbl_gruppe USING(gruppe_kurzbz) WHERE studiengang_kz=tbl_benutzerfunktion.studiengang_kz AND gruppe_kurzbz Like '%_STDV')";
+	if(!($result=pg_query($conn, $sql_query)))
+		$error_msg.=pg_errormessage($conn);
+	while($row=pg_fetch_object($result))
+	{
+		if($row->gruppe_kurzbz!='')
+		{
+	     	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, updateamum, updatevon) VALUES ('$row->uid','".strtoupper($row->gruppe_kurzbz)."', now(), 'mlists_generate')";
+			if(!pg_query($conn, $sql_query))
+				$error_msg.=pg_errormessage($conn).$sql_query;
+			echo '-';
+			flush();
+		}
+	}
 	// **************************************************************
 	// Studentenverteiler abgleichen
 	// Studenten holen die nicht mehr in den Verteiler gehoeren
