@@ -208,7 +208,10 @@ elseif ($xmlformat=='xml')
 			<studiengang_kz><![CDATA[".$row->studiengang_kz."]]></studiengang_kz>
 			<studiensemester_kurzbz><![CDATA[".$row->studiensemester_kurzbz."]]></studiensemester_kurzbz>
 			<buchungsnr_verweis><![CDATA[".$row->buchungsnr_verweis."]]></buchungsnr_verweis>
-			<betrag><![CDATA[".sprintf('%.2f',abs($row->betrag))."]]></betrag>
+			<betrag><![CDATA[".sprintf('%.2f',abs($row->betrag))."]]></betrag>";
+		if($row->betrag<0)
+			echo "<rueckerstattung><![CDATA[true]]></rueckerstattung>";
+		echo "
 			<buchungsdatum><![CDATA[".$datum->convertISODate($row->buchungsdatum)."]]></buchungsdatum>
 			<buchungstext><![CDATA[".$row->buchungstext."]]></buchungstext>
 			<mahnspanne><![CDATA[".$row->mahnspanne."]]></mahnspanne>
