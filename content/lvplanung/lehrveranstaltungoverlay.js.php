@@ -1517,9 +1517,13 @@ function LehrveranstaltungNotenMove()
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
-			alert(response)
+			alert(response);
 		else
-			alert(val.dbdml_errormsg)
+			alert(val.dbdml_errormsg);
+			
+		LehrveranstaltungNotenTreeDatasource.Refresh(false); //non blocking
+		SetStatusBarText('Daten wurden gespeichert');
+		LehrveranstaltungNotenDetailDisableFields(true);
 	}
 	else
 	{
@@ -1683,9 +1687,12 @@ function LehrveranstaltungNotenImport()
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
-			alert(response)
+			alert(response);
 		else
-			alert(val.dbdml_errormsg)
+			alert(val.dbdml_errormsg);
+			
+		LehrveranstaltungNotenTreeDatasource.Refresh(false); //non blocking
+		SetStatusBarText('Daten wurden gespeichert');
 	}
 	else
 	{
@@ -1726,4 +1733,54 @@ function LehrveranstaltungFFZertifikatPrint()
 	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat.rdf.php&xsl=Zertifikat&uid='+paramList+'&ss='+ss+'&lvid='+lvid+'&'+gettimestamp();
 	window.location.href = url;
 	//prompt('test:',url);
+}
+
+// ****
+// * Loescht die markierte Note
+// ****
+function LehrveranstaltungNotenDelete()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	tree = document.getElementById('lehrveranstaltung-noten-tree');
+			
+	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
+	uid = tree.view.getCellText(tree.currentIndex,col);
+	
+	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
+	lvid = tree.view.getCellText(tree.currentIndex,col);
+	
+	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiensemester_kurzbz"] : "lehrveranstaltung-noten-tree-studiensemester_kurzbz";
+	stsem = tree.view.getCellText(tree.currentIndex,col);
+	
+	if(confirm('Wollen Sie diese Note wirklich löschen'))
+	{
+		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+		var req = new phpRequest(url,'','');
+	
+		req.add('type', 'deletenote');
+	
+		req.add('lehrveranstaltung_id', lvid);
+		req.add('student_uid', uid);
+		req.add('studiensemester_kurzbz', stsem);
+			
+		var response = req.executePOST();
+	
+		var val =  new ParseReturnValue(response)
+	
+		if (!val.dbdml_return)
+		{
+			if(val.dbdml_errormsg=='')
+				alert(response);
+			else
+				alert(val.dbdml_errormsg);
+				
+			LehrveranstaltungNotenTreeDatasource.Refresh(false); //non blocking
+		}
+		else
+		{
+			LehrveranstaltungNotenTreeDatasource.Refresh(false); //non blocking
+			LehrveranstaltungNotenDetailDisableFields(true);
+			SetStatusBarText('Eintrag wurde geloescht');
+		}
+	}
 }
