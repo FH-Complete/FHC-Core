@@ -1945,6 +1945,7 @@ if(!$error)
 		//Die Felder sind durchnummeriert zB matrikelnummer_0, matrikelnummer_1, ...
 		//Die Anzahl der Gesamten Daten wird auch als Parameter uebergeben
 		$errormsg = '';
+		$angerechnet=false;
 
 		for($i=0;$i<$_POST['anzahl'];$i++)
 		{
