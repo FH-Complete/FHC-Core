@@ -3021,9 +3021,13 @@ function StudentNotenMove()
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
-			alert(response)
+			alert(response);
 		else
-			alert(val.dbdml_errormsg)
+			alert(val.dbdml_errormsg);
+			
+		StudentNotenTreeDatasource.Refresh(false); //non blocking
+		SetStatusBarText('Daten wurden gespeichert');
+		StudentNoteDetailDisableFields(true);
 	}
 	else
 	{
@@ -3032,6 +3036,58 @@ function StudentNotenMove()
 		StudentNoteDetailDisableFields(true);
 	}
 }
+
+// ****
+// * Loescht die markierte Note
+// ****
+function StudentNotenDelete()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-noten-tree');
+			
+	col = tree.columns ? tree.columns["student-noten-tree-student_uid"] : "student-noten-tree-student_uid";
+	uid = tree.view.getCellText(tree.currentIndex,col);
+	
+	col = tree.columns ? tree.columns["student-noten-tree-lehrveranstaltung_id"] : "student-noten-tree-lehrveranstaltung_id";
+	lvid = tree.view.getCellText(tree.currentIndex,col);
+	
+	col = tree.columns ? tree.columns["student-noten-tree-studiensemester_kurzbz"] : "student-noten-tree-studiensemester_kurzbz";
+	stsem = tree.view.getCellText(tree.currentIndex,col);
+	
+	if(confirm('Wollen Sie diese Note wirklich löschen'))
+	{
+		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+		var req = new phpRequest(url,'','');
+	
+		req.add('type', 'deletenote');
+	
+		req.add('lehrveranstaltung_id', lvid);
+		req.add('student_uid', uid);
+		req.add('studiensemester_kurzbz', stsem);
+		
+		var response = req.executePOST();
+	
+		var val =  new ParseReturnValue(response)
+	
+		if (!val.dbdml_return)
+		{
+			if(val.dbdml_errormsg=='')
+				alert(response);
+			else
+				alert(val.dbdml_errormsg);
+				
+			StudentNotenTreeDatasource.Refresh(false); //non blocking
+			StudentNoteDetailDisableFields(true);
+		}
+		else
+		{
+			StudentNotenTreeDatasource.Refresh(false); //non blocking
+			SetStatusBarText('Eintrag wurde geloescht');
+			StudentNoteDetailDisableFields(true);
+		}
+	}
+}
+
 
 // **************** PRUEFUNG ************** //
 

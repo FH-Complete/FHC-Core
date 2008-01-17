@@ -303,7 +303,8 @@ class zeitsperre
 		{
 			$beginn=$datum_obj->mktime_fromdate($zs->vondatum);
 			$ende=$datum_obj->mktime_fromdate($zs->bisdatum);
-			if ($datum>=$beginn && (int)($datum/60/60/24)<=(int)($ende/60/60/24))
+
+			if ($datum>=$beginn && ((int)($datum/60/60/24)<=(int)($ende/60/60/24) || date('Y-m-d', $datum)==date('Y-m-d', $ende)))
 				$typ.=$zs->zeitsperretyp_kurzbz;
 		}
 		return $typ;
@@ -321,7 +322,7 @@ class zeitsperre
 		{
 			$beginn=$datum_obj->mktime_fromdate($zs->vondatum);
 			$ende=$datum_obj->mktime_fromdate($zs->bisdatum);
-			if ($datum>=$beginn && (int)($datum/60/60/24)<=(int)($ende/60/60/24))
+			if ($datum>=$beginn && ((int)($datum/60/60/24)<=(int)($ende/60/60/24) || date('Y-m-d', $datum)==date('Y-m-d', $ende)))
 				$erbk.=$zs->erreichbarkeit;
 		}
 		return $erbk;

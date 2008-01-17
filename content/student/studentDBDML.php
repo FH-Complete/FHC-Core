@@ -2059,6 +2059,87 @@ if(!$error)
 		else
 			$return = false;
 	}
+	elseif(isset($_POST['type']) && $_POST['type']=='deletenote')
+	{
+		//Loescht einen Noteneintrag
+
+		$noten = new zeugnisnote($conn);
+
+		if(isset($_POST['lehrveranstaltung_id']) && isset($_POST['student_uid']) && isset($_POST['studiensemester_kurzbz']))
+		{
+			//Berechtigung pruefen
+			$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='".addslashes($_POST['lehrveranstaltung_id'])."'";
+			if($result = pg_query($conn, $qry))
+			{
+				if($row = pg_fetch_object($result))
+				{
+					$stg_lva = $row->studiengang_kz;
+				}
+				else
+				{
+					$return = false;
+					$error = true;
+					$errormsg = 'Fehler beim Ermitteln der LVA';
+				}
+			}
+			else
+			{
+				$return = false;
+				$error = true;
+				$errormsg = 'Fehler beim Ermitteln der LVA';
+			}
+
+			$qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid='".addslashes($_POST['student_uid'])."'";
+			if($result = pg_query($conn, $qry))
+			{
+				if($row = pg_fetch_object($result))
+				{
+					$stg_std = $row->studiengang_kz;
+				}
+				else
+				{
+					$return = false;
+					$error = true;
+					$errormsg = 'Fehler beim Ermitteln des Studenten';
+				}
+			}
+			else
+			{
+				$return = false;
+				$error = true;
+				$errormsg = 'Fehler beim Ermitteln des Studenten';
+			}
+
+			if(!$error)
+			{
+				if(!$rechte->isBerechtigt('admin', $stg_lva, 'suid') && !$rechte->isBerechtigt('admin', $stg_std, 'suid') &&
+				   !$rechte->isBerechtigt('assistenz', $stg_lva, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_std, 'suid'))
+				{
+					$return = false;
+					$error = true;
+					$errormsg = 'Sie haben keine Berechtigung';
+				}
+				else
+				{
+
+					if($noten->delete($_POST['lehrveranstaltung_id'], $_POST['student_uid'], $_POST['studiensemester_kurzbz']))
+					{
+						$return = true;
+					}
+					else
+					{
+						$return = false;
+						$errormsg = $noten->errormsg;
+					}
+				}
+			}
+		}
+		else
+		{
+			$return = false;
+			$errormsg = 'Fehlerhafte Parameteruebergabe';
+		}
+	}
 	elseif(isset($_POST['type']) && $_POST['type']=='deletepruefung')  // **** PRUEFUNGEN **** //
 	{
 		//Loescht einen Pruefungs Eintrag

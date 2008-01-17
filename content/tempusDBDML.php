@@ -200,7 +200,7 @@ if(!$error)
 			$stundenplan->unr = $_POST['unr'];
 			$stundenplan->verband = $_POST['verband'];
 			$stundenplan->gruppe = $_POST['gruppe'];
-			$stundenplan->gruppe_kurzbz = $_POST['gruppe_kurzbz;'];
+			$stundenplan->gruppe_kurzbz = $_POST['gruppe_kurzbz'];
 			$stundenplan->ort_kurzbz = $_POST['ort_kurzbz'];
 			$stundenplan->datum = $_POST['datum'];
 			$stundenplan->stunde = $_POST['stunde'];
