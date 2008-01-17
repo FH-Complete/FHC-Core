@@ -1666,9 +1666,12 @@ function LehrveranstaltungNotenImport()
 	{
 		zeile = rows[row].split("	");
 
-		req.add('matrikelnummer_'+i, zeile[0]);
-		req.add('note_'+i, zeile[1]);
-		i++;
+		if(zeile[0]!='' && zeile[1]!='')
+		{
+			req.add('matrikelnummer_'+i, zeile[0]);
+			req.add('note_'+i, zeile[1]);
+			i++;
+		}
 	}
 
 	req.add('anzahl', i);
