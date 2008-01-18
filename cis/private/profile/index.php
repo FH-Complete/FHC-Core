@@ -248,6 +248,8 @@
 				else
 					$mail = 'vilesci@technikum-wien.at';
 			}
+			if($stg=='0')
+				$mail = MAIL_GST;
 
 
 			?>
