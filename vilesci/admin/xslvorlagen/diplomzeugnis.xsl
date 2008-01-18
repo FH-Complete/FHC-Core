@@ -162,7 +162,7 @@
 
 				<fo:block-container position="absolute" top="243pt" left="62pt" height="0pt">
 				<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt">
-						Diplom-Studiengang
+						<xsl:value-of select="stg_art" />
 
 				                 <fo:inline font-size="12pt" font-weight="900" text-align="center" >                    \n
 				                    \n
