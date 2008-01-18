@@ -43,7 +43,7 @@
 <fo:block text-align="center" line-height="14pt" font-family="sans-serif" font-size="12pt">
 geboren am <xsl:value-of select="gebdatum" /> in <xsl:value-of select="gebort"  />,<xsl:text> </xsl:text><xsl:value-of select="geburtsnation"  />,
 \nStaatsbürgerschaft <xsl:value-of select="staatsbuergerschaft" />,
-\ndie/der den Fachhochschul-Diplomstudiengang,
+\ndie/der den Fachhochschul-<xsl:value-of select="stg_art" />,
 \nStudiengangskennzahl <xsl:value-of select="studiengang_kz" />, 
 							   
                 </fo:block>

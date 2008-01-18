@@ -146,6 +146,22 @@ if($result = pg_query($conn, $qry))
 		if($row->sponsion=='')
 			$row->sponsion=$row->datum;
 			
+		if($studiengang->typ=='m')
+		{
+			$stg_art='Master-Studiengang';
+			$stg_art_engl='master';
+		}
+		elseif($studiengang->typ=='b')
+		{
+			$stg_art='Bachelor-Studiengang';
+			$stg_art_engl='bachelor';
+		}
+		else
+		{
+			$stg_art='Diplom-Studiengang';
+			$stg_art_engl='diploma';
+		}
+		
 		echo "\t<pruefung>".'
 		<abschlusspruefung_id><![CDATA['.$row->abschlusspruefung_id.']]></abschlusspruefung_id>
 		<student_uid><![CDATA['.$row->student_uid.']]></student_uid>
@@ -181,6 +197,8 @@ if($result = pg_query($conn, $qry))
 		<geburtsnation_engl><![CDATA['.$geburtsnation_engl.']]></geburtsnation_engl>
 		<studiengang_kz><![CDATA['.sprintf('%04s',$student->studiengang_kz).']]></studiengang_kz>
 		<stg_bezeichnung><![CDATA['.$studiengang->bezeichnung.']]></stg_bezeichnung>
+		<stg_art><![CDATA['.$stg_art.']]></stg_art>
+		<stg_art_engl><![CDATA['.$stg_art_engl.']]></stg_art_engl>
 		<akadgrad_kurzbz><![CDATA['.$akadgrad->akadgrad_kurzbz.']]></akadgrad_kurzbz>
 		<titel><![CDATA['.$akadgrad->titel.']]></titel>
 		<datum_aktuell><![CDATA['.date('d.m.Y').']]></datum_aktuell>

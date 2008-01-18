@@ -43,7 +43,7 @@
 <fo:block text-align="center" line-height="14pt" font-family="sans-serif" font-size="12pt">
 born <xsl:value-of select="gebdatum" /> in <xsl:value-of select="gebort"  />,<xsl:text> </xsl:text><xsl:value-of select="geburtsnation_engl"  />,
 \ncitizen of <xsl:value-of select="staatsbuergerschaft_engl" />,
-\nstudent of the FH diploma degree programme
+\nstudent of the FH <xsl:value-of select="stg_art_engl" /> degree programme
 \nprogramme classification number <xsl:value-of select="studiengang_kz" />, 
 							   
                 </fo:block>
