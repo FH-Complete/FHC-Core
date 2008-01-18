@@ -46,7 +46,16 @@
 		
 	// ******** SYNC START ********** //
 		
-	$qry = "SELECT __person, studiengang_kz, instudiensemester, chusername, chmatrikelnr, chkalendersemstataend FROM sync.stp_person JOIN sync.stp_stgvertiefung ON(_stgvertiefung=__stgvertiefung) JOIN public.tbl_studiengang ON(_studiengang=ext_id) WHERE chusername<>'' AND chusername is not null AND _cxPersonTyp in(1, 2) AND chmatrikelnr!='' AND chmatrikelnr is not null";
+	//$qry = "SELECT __person, studiengang_kz, instudiensemester, chusername, chmatrikelnr, chkalendersemstataend FROM sync.stp_person JOIN sync.stp_stgvertiefung ON(_stgvertiefung=__stgvertiefung) JOIN public.tbl_studiengang ON(_studiengang=ext_id) WHERE chusername<>'' AND chusername is not null AND _cxPersonTyp in(1, 2) AND chmatrikelnr!='' AND chmatrikelnr is not null";
+	$qry = "SELECT __person, studiengang_kz, instudiensemester, chusername, chmatrikelnr, chkalendersemstataend 
+			FROM sync.stp_person JOIN sync.stp_stgvertiefung ON(_stgvertiefung=__stgvertiefung) JOIN public.tbl_studiengang ON(_studiengang=ext_id) 
+			WHERE 
+				chusername<>'' AND 
+				chusername is not null AND 
+				_cxPersonTyp in(1, 2) AND 
+				chmatrikelnr!='' AND 
+				chmatrikelnr is not null AND
+				_cxstudstatus in(3,4,9,10,11)";
 		
 	if($result = pg_query($conn, $qry))
 	{
@@ -212,11 +221,15 @@
 					continue;
 				}
 			}
+			
+			/* 18.01.2008 Studiensemester immer WS2007
 			if($row->chkalendersemstataend=='')
 				$row->chkalendersemstataend='W07';
 			
 			$studiensemester=ucwords(substr($row->chkalendersemstataend,0,1)).'S'.((integer)substr($row->chkalendersemstataend,1,2)<11?'20':'19').substr($row->chkalendersemstataend,1,2);
-
+			*/
+			$studiensemester = 'WS2007';
+			
 			$student->studiensemester_kurzbz = $studiensemester;
 			if($student->studentlehrverband_exists($student->uid, $student->studiensemester_kurzbz))
 				$student->new = false;
