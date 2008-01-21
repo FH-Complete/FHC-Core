@@ -48,6 +48,10 @@ $beginnsem='';
 $semstart=array();
 $semende=array();
 $studiensemester=array();
+$maxsemester=array();
+$semdiff=0;
+$instg='';
+
 $i=0;
 /*************************
  * StP-PORTAL - Synchronisation
@@ -64,6 +68,7 @@ $i=0;
 
 
 $start=date("d.m.Y H:i:s");
+//einlesen von studiensemesterdaten in arrays
 $qry="SELECT * FROM public.tbl_studiensemester ORDER BY start;";
 if($result = pg_query($conn,$qry))
 {
@@ -75,6 +80,17 @@ if($result = pg_query($conn,$qry))
 		$i++;	
 	}
 }
+//einlesen von studiendauer der stg in array
+$qry="SELECT * FROM public.tbl_studiengang;";
+if($result = pg_query($conn,$qry))
+{
+	while($row=pg_fetch_object($result))
+	{
+		$maxsemester[$row->studiengang_kz]=$row->max_semester;	
+	}
+}
+
+//$adress="ruhan@technikum-wien.at";
 
 //*********** Neue Daten holen *****************
 $qry="SELECT __Person, chtitel, chnachname, chvorname, daEintrittDat, prestudent_id 
@@ -109,13 +125,27 @@ if($resultall = pg_query($conn,$qry))
 				continue;
 			}
 		}
-		
+		$qry_pre="SELECT * FROM public.tbl_prestudent WHERE prestudent_id=".myaddslashes($rowall->prestudent_id).";";
+		if($resultpre = pg_query($conn,$qry_pre))
+		{
+			if($rowpre=pg_fetch_object($resultpre))
+			{
+				//Studiengang des aktuellen prestudenten
+				$instg=$rowpre->studiengang_kz;
+			}
+		}
+		else 
+		{
+			$fehler++;
+			$error_log.= "\n".$qry_rl."\n".pg_last_error($conn)."\n";
+		}
 		$qry_rl="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id=".myaddslashes($rowall->prestudent_id)." ORDER BY datum desc LIMIT 1";
 		if($resultrl = pg_query($conn,$qry_rl))
 		{
 			if($rowrl=pg_fetch_object($resultrl))
 			{
-				if($rowrl->ausbildungssemester==NULL || $rowrl->ausbildungssemester=='' || $rowrl->ausbildungssemester>49)
+				$beginnsem=getStudiensemesterFromDatum($conn, $rowall->daeintrittdat, true);
+				if($rowrl->ausbildungssemester==NULL || $rowrl->ausbildungssemester=='')
 				{
 					$error_log.="\n*****\n".$rowall->__person." - ".trim($rowall->chtitel)." ".trim($rowall->chnachname).", ".trim($rowall->chvorname)." (Prestudent ".$rowall->prestudent_id.")";
 					$error_log.="\nAusbildungssemester = ".$rowrl->ausbildungssemester." !";
@@ -123,8 +153,14 @@ if($resultall = pg_query($conn,$qry))
 				}
 				else 
 				{
-					$beginnsem=getStudiensemesterFromDatum($conn, $rowall->daeintrittdat, true);
+					//wieviele semester seit studienbeginn
+					$semdiff=array_search($rowrl->studiensemester_kurzbz, $studiensemester)-array_search($beginnsem, $studiensemester)+1;	
+					if($semdiff<1)
+					{
+						$semdiff=1;
+					}
 					$ausgabe.="\n*****\n".$rowall->__person." - ".trim($rowall->chtitel)." ".trim($rowall->chnachname).", ".trim($rowall->chvorname).": ".$rowall->daeintrittdat."/".$beginnsem." (Prestudent ".$rowall->prestudent_id.")";
+					$ausgabe.="\nAusbildungssemester = ".$rowrl->ausbildungssemester." / semdiff= ".$semdiff.".";
 					while (array_search($rowrl->studiensemester_kurzbz, $studiensemester)>=array_search($beginnsem, $studiensemester))
 					{
 						$qry_chk="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id=".myaddslashes($rowall->prestudent_id)." AND studiensemester_kurzbz=".myaddslashes($rowrl->studiensemester_kurzbz).";";
@@ -141,11 +177,27 @@ if($resultall = pg_query($conn,$qry))
 									studiensemester_kurzbz, ausbildungssemester,datum, orgform_kurzbz,
 									insertamum, insertvon, updateamum, updatevon, ext_id)
 									VALUES (".
-									myaddslashes($rowall->prestudent_id).", 
-									'Student', ".
-									myaddslashes($rowrl->studiensemester_kurzbz).", ".
-									myaddslashes($rowrl->ausbildungssemester).", ".
-									myaddslashes($rowrl->datum).", ".
+									myaddslashes($rowall->prestudent_id).", ";
+									//status diplomand für letztes ausbildungssemester
+									if($semdiff>=$maxsemester[$instg])
+									{
+										$qry_ins.="'Diplomand', ";
+									}
+									else
+									{
+										$qry_ins.="'Student', ";
+									}
+									$qry_ins.=myaddslashes($rowrl->studiensemester_kurzbz).", ";
+									//wenn semdiff>maxsemester dann maxsemester sonst semdiff
+									if($semdiff>$maxsemester[$instg])
+									{
+										$qry_ins.=myaddslashes($maxsemester[$instg]).", ";
+									}
+									else 
+									{
+										$qry_ins.=myaddslashes($semdiff).", ";
+									}
+									$qry_ins.=myaddslashes($rowrl->datum).", ".
 									myaddslashes($rowrl->orgform_kurzbz).",
 									now(), 	'SYNC', NULL, NULL, NULL)";
 								if(!$resultins = pg_query($conn,$qry_ins))
@@ -157,23 +209,29 @@ if($resultall = pg_query($conn,$qry))
 								else 
 								{
 									$eingefuegt++;
-									$ausgabe.="\n---".$rowrl->studiensemester_kurzbz.", ".$rowrl->ausbildungssemester.". Semester, Student, ".$rowrl->datum;
+									//$ausgabe.="\n---".$qry_ins;
+									$ausgabe.="\n---".$rowrl->studiensemester_kurzbz.": ".($semdiff>=$maxsemester[$instg]?'Diplomand':'Student').", ".($semdiff>$maxsemester[$instg]?$maxsemester[$instg]:$semdiff).".Semester, Datum: ".$rowrl->datum.", Orgform: ".$rowrl->orgform_kurzbz.";";
 								}
 							}
+							else 
+							{
+								$ausgabe.="\nEintrag in Semester ".$rowrl->studiensemester_kurzbz." bereits vorhanden!";
+							}
 						}
-						//werte für voriges semester ändern!!!
 						//studiensemester, ausbildungssemester, datum
 						if(array_search($rowrl->studiensemester_kurzbz, $studiensemester)-1>=array_search($beginnsem,$studiensemester))
 						{
 							$rowrl->studiensemester_kurzbz=$studiensemester[array_search($rowrl->studiensemester_kurzbz, $studiensemester)-1];
 							//ausbildungssemester nicht kleiner als 1
-							if($rowrl->ausbildungssemester>1)
+							if($semdiff>1)
 							{
-								$rowrl->ausbildungssemester=$rowrl->ausbildungssemester-1;
+								//$rowrl->ausbildungssemester=$rowrl->ausbildungssemester-1;
+								$semdiff=$semdiff-1;
 							}
 							else 
 							{
-								$rowrl->ausbildungssemester=1;
+								//$rowrl->ausbildungssemester=1;
+								$semdiff=1;
 							}
 							$rowrl->datum=$semstart[$rowrl->studiensemester_kurzbz];
 						}
@@ -199,8 +257,8 @@ if($resultall = pg_query($conn,$qry))
 								myaddslashes($rowall->prestudent_id).", 
 								'Bewerber', ".
 								myaddslashes($rowrl->studiensemester_kurzbz).", ".
-								myaddslashes($rowrl->ausbildungssemester).", ".
-								myaddslashes($new_date = date('Y-m-d', strtotime($rowrl->datum.' -4 months'))).", ".
+								myaddslashes($semdiff).", ".
+								myaddslashes(date('Y-m-d', strtotime($rowrl->datum.' -4 months'))).", ".
 								myaddslashes($rowrl->orgform_kurzbz).",
 								now(), 	'SYNC', NULL, NULL, NULL)";
 							if(!$resultins = pg_query($conn,$qry_ins))
@@ -212,7 +270,8 @@ if($resultall = pg_query($conn,$qry))
 							else 
 							{
 								$eingefuegt++;
-								$ausgabe.="\n---".$rowrl->studiensemester_kurzbz.", ".$rowrl->ausbildungssemester.". Semester, Bewerber, ".$new_date = date('Y-m-d', strtotime($rowrl->datum.' -4 months'));
+								$ausgabe.="\n---".$rowrl->studiensemester_kurzbz.": Bewerber, ".$semdiff.".Semester , Datum: ".date('Y-m-d', strtotime($rowrl->datum.' -4 months')).", Orgform: ".$rowrl->orgform_kurzbz.";";
+								//$ausgabe.="\n".$qry_ins;
 							}
 						}
 					}
@@ -228,8 +287,8 @@ if($resultall = pg_query($conn,$qry))
 									myaddslashes($rowall->prestudent_id).", 
 									'Interessent', ".
 									myaddslashes($rowrl->studiensemester_kurzbz).", ".
-									myaddslashes($rowrl->ausbildungssemester).", ".
-									myaddslashes($new_date = date('Y-m-d', strtotime($rowrl->datum.' -6 months'))).", ".
+									myaddslashes($semdiff).", ".
+									myaddslashes(date('Y-m-d', strtotime($rowrl->datum.' -6 months'))).", ".
 									myaddslashes($rowrl->orgform_kurzbz).",
 									now(), 	'SYNC', NULL, NULL, NULL)";
 							if(!$resultins = pg_query($conn,$qry_ins))
@@ -241,7 +300,8 @@ if($resultall = pg_query($conn,$qry))
 							else 
 							{
 								$eingefuegt++;
-								$ausgabe.="\n---".$rowrl->studiensemester_kurzbz.", ".$rowrl->ausbildungssemester.". Semester, Interessent, ".$new_date = date('Y-m-d', strtotime($rowrl->datum.' -6 months'));
+								$ausgabe.="\n---".$rowrl->studiensemester_kurzbz.": Interessent, ".$semdiff.".Semester , Datum: ".$new_date = date('Y-m-d', strtotime($rowrl->datum.' -6 months')).", Orgform: ".$rowrl->orgform_kurzbz.";";
+
 							}
 						}
 					}
