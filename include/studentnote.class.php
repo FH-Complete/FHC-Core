@@ -200,8 +200,9 @@ class studentnote
 							$note = 5;
 					}
 					if ($ueb1->positiv && ($note == 5))
-						$negativ = true;
-					$l1_note = ($note * $ueb1->gewicht);
+						$negativ = true;					
+					$l1_note = $note;					
+					//$l1_note = ($note * $ueb1->gewicht);
 					if ($note != null)					
 						$l1_gewicht = $ueb1->gewicht;
 					else
