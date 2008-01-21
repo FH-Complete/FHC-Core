@@ -49,7 +49,7 @@
 	
 	$qry = "SELECT __person, studiengang_kz, instudiensemester, chusername, chmatrikelnr, chkalendersemstataend FROM sync.stp_person JOIN sync.stp_stgvertiefung ON(_stgvertiefung=__stgvertiefung) JOIN public.tbl_studiengang ON(_studiengang=ext_id) WHERE chusername<>'' AND chusername is not null AND _cxPersonTyp in(1, 2) AND chmatrikelnr!='' AND chmatrikelnr is not null
 			UNION
-			SELECT __person, studiengang_kz, instudiensemester, chusername, chmatrikelnr, 'W07' as chkalendersemstataend, 
+			SELECT __person, studiengang_kz, instudiensemester, chusername, chmatrikelnr, 'W07' as chkalendersemstataend
 			FROM sync.stp_person JOIN sync.stp_stgvertiefung ON(_stgvertiefung=__stgvertiefung) JOIN public.tbl_studiengang ON(_studiengang=ext_id) 
 			WHERE 
 				chusername<>'' AND 
