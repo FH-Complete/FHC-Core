@@ -26,9 +26,9 @@
  */
 
 require ('../vilesci/config.inc.php');
-//define("CONN_STRING","host=db.technikum-wien.at dbname=stp user=bla password=bla");
 
 // Datenbank Verbindung
+//if (!$conn = pg_pconnect("host=.technikum-wien.at dbname=devvilesci user= password="))
 if (!$conn = pg_pconnect(CONN_STRING))
    	die('Es konnte keine Verbindung zum Server aufgebaut werden!'.pg_last_error($conn));
 
@@ -111,6 +111,21 @@ if (!@pg_query($conn,'SELECT lv_lehrform_kurzbz FROM campus.vw_lehreinheit LIMIT
 	else
 		echo 'lv_lehrform_kurzbz wurde bei campus.vw_lehreinheit hinzugefuegt!<BR>';
 }
+
+// ************** bis.tbl_bisio.ort,uni,lehreinheit_id ************************
+if (!@pg_query($conn,'SELECT ort,universitaet,lehreinheit_id FROM bis.tbl_bisio LIMIT 1;'))
+{
+	$sql='	ALTER TABLE bis.tbl_bisio ADD COLUMN ort varchar(128);
+			ALTER TABLE bis.tbl_bisio ADD COLUMN universitaet varchar(256);
+			ALTER TABLE bis.tbl_bisio ADD COLUMN lehreinheit_id integer;
+			ALTER TABLE bis.tbl_bisio ADD CONSTRAINT lehreinheit_bisio FOREIGN KEY (lehreinheit_id)
+				REFERENCES lehre.tbl_lehreinheit (lehreinheit_id) on update cascade on delete restrict;';
+	if (!@pg_query($conn,$sql))
+		echo '<strong>bis.tbl_bisio: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo 'ort,uni,lehreinheit_id wurde bei bis.tbl_bisio hinzugefuegt!<BR>';
+}
+
 
 // ************** campus.tbl_resturlaub.urlaubstageprojahr ************************
 if (!@pg_query($conn,'SELECT urlaubstageprojahr FROM campus.tbl_resturlaub LIMIT 1;'))
