@@ -251,7 +251,7 @@
 								<fo:table-cell border-width="0.2mm" border-style="solid" >
 									<fo:block font-size="8pt">
 										<fo:inline text-decoration="underline">Einzelbeurteilung/Grades</fo:inline>
-										\n 1=Sehr gut/Excellent  \n 2=Gut/Good  \n 3=Befriedigend/Satisfactory  \n 4=Genügend/Sufficient \n 5=Nicht Genügend/Unsatisfactory \n \n TG=Teilgenommen/Participated \n AR=Angerechnet/Credited \n \n Gesamtbeurteilung/Overall assessment: \n -Bestanden/pass \n -Mit gutem Erfolg bestanden (pass with merit) \n -Mit ausgezeichnetem Erfolg bestanden (pass with distinction)
+										\n 1=Sehr gut/Excellent  \n 2=Gut/Good  \n 3=Befriedigend/Satisfactory  \n 4=Genügend/Sufficient \n 5=Nicht Genügend/Unsatisfactory \n \n TG=Teilgenommen/Participated \n AR=Angerechnet/Credited \n \n Gesamtbeurteilung/Overall assessment: \n -Bestanden (pass) \n -Mit gutem Erfolg bestanden (pass with merit) \n -Mit ausgezeichnetem Erfolg bestanden (pass with distinction)
 									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
