@@ -382,6 +382,47 @@ class student extends benutzer
 	}
 	
 	// ****
+	// * Prueft ob die StudentLehrverband Zuteilung
+	// * bereits existiert
+	// * @param student_uid
+	// *        studiensemester_kurzbz
+	// * @return true wenn vorhanden, false wenn nicht
+	// ****
+	function load_studentlehrverband($student_uid, $studiensemester_kurzbz)
+	{
+		$qry = "SELECT * FROM public.tbl_studentlehrverband WHERE student_uid='".addslashes($student_uid)."' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$this->uid = $row->student_uid;
+				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$this->studiengang_kz = $row->studiengang_kz;
+				$this->semester = $row->semester;
+				$this->verband = $row->verband;
+				$this->gruppe = $row->gruppe;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = 'Fehler beim Ermitteln des Lehrverbandes';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg ='Fehler beim Ermitteln des Lehrverbandes';
+			return false;
+		}
+	}
+	
+	// ****
 	// * Speichert die Zuteilung von Student zu Lehrverband
 	// ****
 	function save_studentlehrverband($new=null)
