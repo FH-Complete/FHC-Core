@@ -116,42 +116,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				      		<textbox id="student-io-detail-textbox-bisio_id" disabled="true"/>
 						</vbox>
 						<groupbox id="student-io-groupbox" flex="1">
-						<caption label="Details"/>
+						<caption label="BIS"/>
 							<grid id="student-io-grid-detail" style="overflow:auto;margin:4px;" flex="1">
 							  	<columns  >
 									<column flex="1"/>
 									<column flex="5"/>
 								</columns>
 								<rows>
-									<row>
-										<label value="Lehrveranstaltung" control="student-io-menulist-lehrveranstaltung"/>
-										<menulist id="student-io-menulist-lehrveranstaltung" disabled="true"
-										          datasources="rdf:null" flex="1"
-										          ref="http://www.technikum-wien.at/lehrveranstaltung/liste" 
-										          oncommand="StudentIOLVAChange()">
-											<template>
-												<menupopup>
-													<menuitem value="rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#lehrveranstaltung_id"
-										        		      label="rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#bezeichnung Semester rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#semester"
-													  		  uri="rdf:*"/>
-													</menupopup>
-											</template>
-										</menulist>
-									</row>
-									<row>
-										<label value="Lehreinheit" control="student-io-menulist-lehreinheit"/>
-										<menulist id="student-io-menulist-lehreinheit" disabled="true"
-										          datasources="rdf:null" flex="1"
-										          ref="http://www.technikum-wien.at/lehreinheit/liste" >
-											<template>
-												<menupopup>
-													<menuitem value="rdf:http://www.technikum-wien.at/lehreinheit/rdf#lehreinheit_id"
-										        		      label="rdf:http://www.technikum-wien.at/lehreinheit/rdf#bezeichnung"
-													  		  uri="rdf:*"/>
-													</menupopup>
-											</template>
-										</menulist>
-									</row>
 									<row>
 										<label value="Von" control="student-io-textbox-von"/>
 										<hbox>
@@ -209,6 +180,47 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 											</template>
 										</menulist>
 									</row>
+									
+								</rows>
+							</grid>
+						</groupbox>
+						<groupbox id="student-io-groupbox" flex="1">
+						<caption label="Outgoing (Zeugnis)"/>
+							<grid id="student-io-grid-detail" style="overflow:auto;margin:4px;" flex="1">
+							  	<columns  >
+									<column flex="1"/>
+									<column flex="5"/>
+								</columns>
+								<rows>
+									<row>
+										<label value="Lehrveranstaltung" control="student-io-menulist-lehrveranstaltung"/>
+										<menulist id="student-io-menulist-lehrveranstaltung" disabled="true"
+										          datasources="rdf:null" flex="1"
+										          ref="http://www.technikum-wien.at/lehrveranstaltung/liste" 
+										          oncommand="StudentIOLVAChange()">
+											<template>
+												<menupopup>
+													<menuitem value="rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#lehrveranstaltung_id"
+										        		      label="rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#bezeichnung Semester rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#semester"
+													  		  uri="rdf:*"/>
+													</menupopup>
+											</template>
+										</menulist>
+									</row>
+									<row>
+										<label value="Lehreinheit" control="student-io-menulist-lehreinheit"/>
+										<menulist id="student-io-menulist-lehreinheit" disabled="true"
+										          datasources="rdf:null" flex="1"
+										          ref="http://www.technikum-wien.at/lehreinheit/liste" >
+											<template>
+												<menupopup>
+													<menuitem value="rdf:http://www.technikum-wien.at/lehreinheit/rdf#lehreinheit_id"
+										        		      label="rdf:http://www.technikum-wien.at/lehreinheit/rdf#bezeichnung"
+													  		  uri="rdf:*"/>
+													</menupopup>
+											</template>
+										</menulist>
+									</row>
 									<row>
 										<label value="Ort" control="student-io-textbox-ort"/>
 										<textbox id="student-io-textbox-ort" disabled="true" />
@@ -219,11 +231,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									</row>
 								</rows>
 							</grid>
-							<hbox>
-								<spacer flex="1" />
-								<button id="student-io-button-speichern" oncommand="StudentIODetailSpeichern()" label="Speichern" disabled="true"/>
-							</hbox>
-						</groupbox>
+						</groupbox>	
+						<hbox>
+							<spacer flex="1" />
+							<button id="student-io-button-speichern" oncommand="StudentIODetailSpeichern()" label="Speichern" disabled="true"/>
+						</hbox>
 					</vbox>
 				</row>
 		</rows>
