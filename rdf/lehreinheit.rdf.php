@@ -54,6 +54,32 @@ echo '
    <RDF:Seq about="'.$rdf_url.'/liste">
 ';
 
+if(isset($_GET['optional']) && $_GET['optional']=='true')
+{
+	echo '
+      <RDF:li>
+         <RDF:Description  id=""  about="" >
+            <LEHREINHEIT:lehreinheit_id><![CDATA[]]></LEHREINHEIT:lehreinheit_id>
+            <LEHREINHEIT:lehrveranstaltung_id><![CDATA[]]></LEHREINHEIT:lehrveranstaltung_id>
+            <LEHREINHEIT:studiensemester_kurzbz><![CDATA[]]></LEHREINHEIT:studiensemester_kurzbz>
+            <LEHREINHEIT:lehrfach_id><![CDATA[]]></LEHREINHEIT:lehrfach_id>
+            <LEHREINHEIT:lehrform_kurzbz><![CDATA[]]></LEHREINHEIT:lehrform_kurzbz>
+            <LEHREINHEIT:stundenblockung><![CDATA[]]></LEHREINHEIT:stundenblockung>
+            <LEHREINHEIT:wochenrythmus><![CDATA[]]></LEHREINHEIT:wochenrythmus>
+            <LEHREINHEIT:start_kw><![CDATA[]]></LEHREINHEIT:start_kw>
+            <LEHREINHEIT:raumtyp><![CDATA[]]></LEHREINHEIT:raumtyp>
+            <LEHREINHEIT:raumtypalternativ><![CDATA[]]></LEHREINHEIT:raumtypalternativ>
+            <LEHREINHEIT:sprache><![CDATA[]]></LEHREINHEIT:sprache>
+            <LEHREINHEIT:lehre><![CDATA[]]></LEHREINHEIT:lehre>
+            <LEHREINHEIT:anmerkung><![CDATA[]]></LEHREINHEIT:anmerkung>
+            <LEHREINHEIT:unr><![CDATA[]]></LEHREINHEIT:unr>
+            <LEHREINHEIT:lvnr><![CDATA[]]></LEHREINHEIT:lvnr>
+            <LEHREINHEIT:bezeichnung><![CDATA[-- keine Auswahl --]]></LEHREINHEIT:bezeichnung>
+         </RDF:Description>
+      </RDF:li>
+      ';
+}
+
 if($lehreinheit_id!='')
 {	
 	$lehreinheit->load($lehreinheit_id);

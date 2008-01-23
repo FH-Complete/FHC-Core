@@ -35,6 +35,11 @@ if (!$conn = pg_pconnect(CONN_STRING))
 
 $user = get_uid();
 
+if(isset($_GET['details']))
+	$details = true;
+else 
+	$details = false;
+
 loadVariables($conn, $user);
 	
 	//Parameter holen
@@ -189,19 +194,22 @@ loadVariables($conn, $user);
 			{
 				case 'Interessent': 
 								$kuerzel = 'i'; 
-								/*$kuerzel2='';
-								//Bei Interessenten wir zusaetzlich nach den stati zgv, reihungstest, und nicht rt
-								$qry2 = "SELECT anmeldungreihungstest, zgvmas_code, zgv_code FROM public.tbl_prestudent WHERE person_id='$row->person_id' AND studiengang_kz='$row->studiengang_kz'";
-								if($result2 = pg_query($conn, $qry2))
+								if($details)
 								{
-									if($row2 = pg_fetch_object($result2))
+									$kuerzel2='';
+									//Bei Interessenten wir zusaetzlich nach den stati zgv, reihungstest, und nicht rt
+									$qry2 = "SELECT anmeldungreihungstest, zgvmas_code, zgv_code FROM public.tbl_prestudent WHERE person_id='$row->person_id' AND studiengang_kz='$row->studiengang_kz'";
+									if($result2 = pg_query($conn, $qry2))
 									{
-										if($row2->anmeldungreihungstest!='')
-											$kuerzel2 = 'r';
-										if($row2->zgvmas_code!='' || $row2->zgv_code!='')
-											$kuerzel2.= 'z';
+										if($row2 = pg_fetch_object($result2))
+										{
+											if($row2->anmeldungreihungstest!='')
+												$kuerzel2 = 'r';
+											if($row2->zgvmas_code!='' || $row2->zgv_code!='')
+												$kuerzel2.= 'z';
+										}
 									}
-								}*/						
+								}
 								break;
 				case 'Bewerber': $kuerzel='b'; break;
 				case 'Student': $kuerzel='s'; break;
@@ -224,11 +232,14 @@ loadVariables($conn, $user);
 				$rollen[$row->studiengang_kz] = $kuerzel.$row->ausbildungssemester;
 			
 				
-			/*if($kuerzel2!='')
+			if($details)
 			{
-				$rollen[$row->studiengang_kz].=$kuerzel2;
-				$kuerzel2='';
-			}*/
+				if(isset($kuerzel2) && $kuerzel2!='')
+				{
+					$rollen[$row->studiengang_kz].=$kuerzel2;
+					$kuerzel2='';
+				}
+			}
 		}
 		$anzahl_bewerbung=-1;
 		foreach ($rollen as $stg=>$status)

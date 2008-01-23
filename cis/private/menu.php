@@ -182,7 +182,10 @@ else
 					  	<td class="tdwidth10" nowrap>&nbsp;</td>
 						<td class="tdwrap"><a class="Item" href="lehre/notenliste.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Leistungsbeurteilung</a></td>
 					  </tr>';
-				
+				echo '<tr>
+					  	<td class="tdwidth10" nowrap>&nbsp;</td>
+						<td class="tdwrap"><a class="Item" href="profile/zahlungen.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Zahlungen</a></td>
+					  </tr>';
 				echo '	<tr>
 					<td class="tdwidth10" nowrap>&nbsp;</td>
 				    <td class="tdwrap">

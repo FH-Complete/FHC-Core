@@ -88,7 +88,22 @@ else
 
 function draw_content($row)
 {		
-	global $rdf_url, $datum;
+	global $rdf_url, $datum, $conn;
+	$lehrveranstaltung_id='';
+	$studiensemester_kurzbz = '';
+	
+	if($row->lehreinheit_id!='')
+	{
+		$qry = "SELECT lehrveranstaltung_id, studiensemester_kurzbz FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$row->lehreinheit_id'";
+		if($result = pg_query($conn, $qry))
+		{
+			if($row_lv = pg_fetch_object($result))
+			{
+				$lehrveranstaltung_id = $row_lv->lehrveranstaltung_id;
+				$studiensemester_kurzbz = $row_lv->studiensemester_kurzbz;
+			}
+		}
+	}
 	
 	echo '
 		  <RDF:li>
@@ -104,6 +119,11 @@ function draw_content($row)
 	            <IO:zweck_code><![CDATA['.$row->zweck_code.']]></IO:zweck_code>
 	            <IO:zweck_bezeichnung><![CDATA['.$row->zweck_bezeichnung.']]></IO:zweck_bezeichnung>
 	            <IO:student_uid><![CDATA['.$row->student_uid.']]></IO:student_uid>
+	            <IO:lehreinheit_id><![CDATA['.$row->lehreinheit_id.']]></IO:lehreinheit_id>
+	            <IO:ort><![CDATA['.$row->ort.']]></IO:ort>
+	            <IO:universitaet><![CDATA['.$row->universitaet.']]></IO:universitaet>
+	            <IO:lehrveranstaltung_id><![CDATA['.$lehrveranstaltung_id.']]></IO:lehrveranstaltung_id>
+	            <IO:studiensemester_kurzbz><![CDATA['.$studiensemester_kurzbz.']]></IO:studiensemester_kurzbz>
 	         </RDF:Description>
 	      </RDF:li>';
 }

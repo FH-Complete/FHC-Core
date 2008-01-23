@@ -199,7 +199,8 @@ elseif ($xmlformat=='xml')
 	echo "<konto>\n";
 	function drawrow_xml($row)
 	{
-		global $datum, $btyp;
+		global $datum, $btyp, $conn;
+		$rueckerstattung=false;
 		
 		echo "
   		<buchung>
@@ -209,8 +210,21 @@ elseif ($xmlformat=='xml')
 			<studiensemester_kurzbz><![CDATA[".$row->studiensemester_kurzbz."]]></studiensemester_kurzbz>
 			<buchungsnr_verweis><![CDATA[".$row->buchungsnr_verweis."]]></buchungsnr_verweis>
 			<betrag><![CDATA[".sprintf('%.2f',abs($row->betrag))."]]></betrag>";
-		if($row->betrag<0)
-			echo "<rueckerstattung><![CDATA[true]]></rueckerstattung>";
+		if($row->buchungsnr_verweis!='')
+		{
+			$parent = new konto($conn);
+			$parent->load($row->buchungsnr_verweis);
+			if($parent->betrag>0)
+				$rueckerstattung=true;
+		}
+		else 
+		{
+			if($row->betrag>0)
+				$rueckerstattung=true;
+		}
+		
+		if($rueckerstattung)			
+				echo "<rueckerstattung><![CDATA[true]]></rueckerstattung>";
 		echo "
 			<buchungsdatum><![CDATA[".$datum->convertISODate($row->buchungsdatum)."]]></buchungsdatum>
 			<buchungstext><![CDATA[".$row->buchungstext."]]></buchungstext>
@@ -245,6 +259,7 @@ elseif ($xmlformat=='xml')
 			<sozialversicherungsnummer><![CDATA[".$pers->svnr."]]></sozialversicherungsnummer>
 			<ersatzkennzeichen><![CDATA[".$pers->ersatzkennzeichen."]]></ersatzkennzeichen>
 			<tagesdatum><![CDATA[".date('d.m.Y')."]]></tagesdatum>
+			<logopath>".DOC_ROOT."skin/images/</logopath>
 			<studiengang><![CDATA[".$stg->bezeichnung."]]></studiengang>
 		</person>";
 	}

@@ -1702,6 +1702,9 @@ if(!$error)
 			$bisio->bis = $_POST['bis'];
 			$bisio->zweck_code = $_POST['zweck_code'];
 			$bisio->student_uid = $_POST['student_uid'];
+			$bisio->lehreinheit_id = $_POST['lehreinheit_id'];
+			$bisio->ort = $_POST['ort'];
+			$bisio->universitaet = $_POST['universitaet'];
 			$bisio->updateamum = date('Y-m-d H:i:s');
 			$bisio->updatevon = $user;
 

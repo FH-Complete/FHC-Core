@@ -15,7 +15,12 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 				<fo:flow flow-name="xsl-region-body" >
 					<!-- Logo -->
 					<fo:block>
-						<fo:external-graphic src="../skin/images/logo.jpg"  posx="140" posy="15" width="60mm" height="20mm"/>
+						<!--<fo:external-graphic src="../skin/images/logo.jpg"  posx="140" posy="15" width="60mm" height="20mm"/>-->
+						<fo:external-graphic  posx="140" posy="15" width="60mm" height="20mm" >
+							 <xsl:attribute name="src">
+							  	<xsl:value-of select="person/logopath" />logo.jpg
+							 </xsl:attribute>
+						</fo:external-graphic>
 					</fo:block>
 					<fo:block><xsl:text>
 					</xsl:text></fo:block>
@@ -91,7 +96,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					<fo:block text-align="left" font-size="10pt">
 					<xsl:choose>
 					  <xsl:when test="buchung/rueckerstattung">
-					    \n <xsl:value-of select="person/name_gesamt" />, geboren am <xsl:value-of select="person/geburtsdatum" /> bestätigt hiermit, dass die Studiengangsleitung, folgende Auszahlungen getätigt hat:
+					    \n <xsl:value-of select="person/name_gesamt" />, geboren am <xsl:value-of select="person/geburtsdatum" />, bestätigt hiermit, dass die Studiengangsleitung folgende Auszahlungen getätigt hat:
 					  </xsl:when>
 					  <xsl:otherwise>
 					   \n Die Studiengangsleitung bestätigt hiermit, dass <xsl:value-of select="person/name_gesamt" />, geboren am <xsl:value-of select="person/geburtsdatum" />, folgende Einzahlungen getätigt hat:

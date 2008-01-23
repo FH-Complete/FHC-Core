@@ -56,6 +56,30 @@ echo '
 <RDF:Seq about="'.$rdf_url.'liste">
 ';
 
+if(isset($_GET['optional']) && $_GET['optional']=='true')
+{
+	echo'<RDF:li>
+      		<RDF:Description  id="" about="">
+        		<LVA:lehrveranstaltung_id><![CDATA[]]></LVA:lehrveranstaltung_id>
+        		<LVA:kurzbz><![CDATA[]]></LVA:kurzbz>
+        		<LVA:bezeichnung><![CDATA[-- keine Auswahl --]]></LVA:bezeichnung>
+        		<LVA:studiengang_kz><![CDATA[]]></LVA:studiengang_kz>
+        		<LVA:semester><![CDATA[0]]></LVA:semester>
+        		<LVA:sprache><![CDATA[]]></LVA:sprache>
+        		<LVA:ects><![CDATA[]]></LVA:ects>
+        		<LVA:semesterstunden><![CDATA[]]></LVA:semesterstunden>
+        		<LVA:anmerkung><![CDATA[]]></LVA:anmerkung>
+        		<LVA:lehre><![CDATA[]]></LVA:lehre>
+        		<LVA:lehreverzeichnis><![CDATA[]]></LVA:lehreverzeichnis>
+        		<LVA:aktiv><![CDATA[]]></LVA:aktiv>
+        		<LVA:planfaktor><![CDATA[]]></LVA:planfaktor>
+        		<LVA:planlektoren><![CDATA[]]></LVA:planlektoren>
+        		<LVA:planpersonalkosten><![CDATA[]]></LVA:planpersonalkosten>
+        		<LVA:plankostenprolektor><![CDATA[]]></LVA:plankostenprolektor>
+      		</RDF:Description>
+		</RDF:li>';
+}
+
 foreach ($lehrveranstaltung->lehrveranstaltungen as $row)
 {
 	if(isset($_GET['projektarbeit']) && $row->projektarbeit==false)

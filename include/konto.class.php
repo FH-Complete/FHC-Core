@@ -472,9 +472,9 @@ class konto
 
 
 	// ******************************
-	// * Überprüft, ob studiengebühr gebucht ist für  
+	// * ueberprueft, ob studiengebuehr gebucht ist fuer  
 	// * student_uid und studiensemester
-	// * gibt true/false zurück und setzt bei true das buchungsdatum $this->buchungsdatum
+	// * gibt true/false zurueck und setzt bei true das buchungsdatum $this->buchungsdatum
 	// ******************************
 	function checkStudienbeitrag($uid, $stsem)
 	{

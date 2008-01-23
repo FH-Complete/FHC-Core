@@ -46,6 +46,9 @@ class bisio
 	var $insertamum; 				// timestamp
 	var $insertvon; 				// varchar(16) 
 	var $ext_id;					// bigint
+	var $ort;
+	var $universitaet;
+	var $lehreinheit_id;
 
 	// **************************************************************************
 	// * Konstruktor
@@ -108,6 +111,9 @@ class bisio
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
+				$this->ort = $row->ort;
+				$this->universitaet = $row->universitaet;
+				$this->lehreinheit_id = $row->lehreinheit_id;
 				
 				return true;
 			}
@@ -200,7 +206,7 @@ class bisio
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry='BEGIN;INSERT INTO bis.tbl_bisio (mobilitaetsprogramm_code, nation_code, von, bis, zweck_code, student_uid, updateamum, updatevon, insertamum, insertvon, ext_id) VALUES('.
+			$qry='BEGIN;INSERT INTO bis.tbl_bisio (mobilitaetsprogramm_code, nation_code, von, bis, zweck_code, student_uid, updateamum, updatevon, insertamum, insertvon, ext_id, ort, universitaet, lehreinheit_id) VALUES('.
 			     $this->addslashes($this->mobilitaetsprogramm_code).', '.
 			     $this->addslashes($this->nation_code).', '.
 			     $this->addslashes($this->von).', '.
@@ -211,7 +217,10 @@ class bisio
 			     $this->addslashes($this->updatevon).', '.
 			     $this->addslashes($this->insertamum).', '.
 			     $this->addslashes($this->insertvon).', '.
-			     $this->addslashes($this->ext_id).');';
+			     $this->addslashes($this->ext_id).','.
+			     $this->addslashes($this->ort).', '.
+			     $this->addslashes($this->universitaet).', '.
+			     $this->addslashes($this->lehreinheit_id).');';
 		}
 		else
 		{
@@ -225,7 +234,10 @@ class bisio
 				   ' student_uid='.$this->addslashes($this->student_uid).','.
 				   ' updateamum='.$this->addslashes($this->updateamum).','.
 				   ' updatevon='.$this->addslashes($this->updatevon).','.
-				   ' ext_id='.$this->addslashes($this->ext_id).
+				   ' ext_id='.$this->addslashes($this->ext_id).','.
+				   ' ort='.$this->addslashes($this->ort).','.
+				   ' universitaet='.$this->addslashes($this->universitaet).','.
+				   ' lehreinheit_id='.$this->addslashes($this->lehreinheit_id).
 				   " WHERE bisio_id='".addslashes($this->bisio_id)."';";
 		}
 		//echo $qry;
@@ -330,6 +342,9 @@ class bisio
 				$io->insertamum = $row->insertamum;
 				$io->insertvon = $row->insertvon;
 				$io->ext_id = $row->ext_id;
+				$io->ort = $row->ort;
+				$io->universitaet = $row->universitaet;
+				$io->lehreinheit_id = $row->lehreinheit_id;
 				
 				$this->result[] = $io;
 			}
