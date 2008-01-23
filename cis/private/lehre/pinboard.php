@@ -69,6 +69,7 @@
 		$stg_obj = new studiengang($sql_conn, $_GET['course_id']);
 		$short = $stg_obj->kuerzel;
 		$short_long = $stg_obj->kurzbzlang;
+		$stg_bezeichnung = $stg_obj->bezeichnung;
 		$course_id = $_GET['course_id'];
 		$term_id = $_GET['term_id'];
 	}
@@ -257,12 +258,12 @@ function show(id)
 	{
 		echo '<td class="ContentHeader" width="70%"><font class="ContentHeader">&nbsp;Pinboard ';
 
-		if(isset($short))
-			echo $short;
+		if(isset($stg_bezeichnung))
+			echo ' - '.$stg_bezeichnung;
 
 		echo '</font></td>';
 
-		if(!isset($short))
+		if(!isset($stg_bezeichnung))
 			exit;
 
 		echo '
