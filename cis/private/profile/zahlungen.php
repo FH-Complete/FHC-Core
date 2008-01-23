@@ -95,8 +95,10 @@
 				}
 			}
 			
-			if($betrag!=0)
+			if($betrag<0)
 				$style='style="background-color: #FF8888;"';
+			elseif($betrag>0)
+				$style='style="background-color: #88DD88;"';
 			else 
 			{
 				$style='class="liste'.($i%2).'"';
@@ -109,11 +111,15 @@
 			echo '<td>'.$row['parent']->studiensemester_kurzbz.'</td>';			
 			
 			echo '<td>'.$row['parent']->buchungstext.'</td>';
-			echo '<td align="right">'.abs($row['parent']->betrag).' &euro;</td>';
+			echo '<td align="right">'.sprintf('%.2f',abs($row['parent']->betrag)).' &euro;</td>';
 			echo '<td align="center">';
-			if($betrag==0)
-				echo '<a href="../pdfExport.php?xml=konto.rdf.php&xsl=Zahlung&uid='.$uid.'&buchungsnummern='.$row['parent']->buchungsnr.'&zahlung=true" title="Bestaetigung drucken"><img src="../../../skin/images/pdfpic.gif" alt="Bestaetigung drucken"></a>';
-			else 
+			if($betrag==0 && $row['parent']->betrag<0)
+				echo '<a href="../pdfExport.php?xml=konto.rdf.php&xsl=Zahlung&uid='.$uid.'&buchungsnummern='.$row['parent']->buchungsnr.'" title="Bestaetigung drucken"><img src="../../../skin/images/pdfpic.gif" alt="Bestaetigung drucken"></a>';
+			elseif($row['parent']->betrag>0)
+			{
+				//Auszahlung
+			}
+			else
 				echo 'offen';
 			echo '</td>';
 			echo '</tr>';
