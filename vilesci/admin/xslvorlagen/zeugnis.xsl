@@ -234,7 +234,21 @@
 	
 	<xsl:template match="unterrichtsfach">
 		<fo:table-row  line-height="16pt">
-			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="11pt" content-width="85mm"><xsl:text> </xsl:text><xsl:value-of select="bezeichnung" /></fo:block></fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" >
+				<fo:block font-size="11pt" content-width="85mm"><xsl:text> </xsl:text>
+					<xsl:choose>
+					  <xsl:when test="bisio_von">
+					    Auslandsaufenthalt: <xsl:value-of select="bisio_von" />-<xsl:value-of select="bisio_bis" />, <xsl:value-of select="bisio_ort" />, <xsl:value-of select="bisio_universitaet" />
+						\n Die im Ausland absolvierten Lehrveranstaltungen werden für das <xsl:value-of select="../semester" />. Semester des Studiums an der Fachhochschule Technikum Wien angerechnet  (Details siehe Transcript of Records der Gasthochschule).
+					  </xsl:when>
+					  <xsl:otherwise>
+					    <xsl:value-of select="bezeichnung" />
+					  </xsl:otherwise>
+					</xsl:choose>
+					
+						
+				</fo:block>
+			</fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="11pt" content-width="30mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="note" /></fo:block></fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="11pt" content-width="25mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="sws" /></fo:block></fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="11pt" content-width="25mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="ects" /></fo:block></fo:table-cell>

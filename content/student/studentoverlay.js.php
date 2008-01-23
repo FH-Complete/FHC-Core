@@ -2098,11 +2098,6 @@ function StudentKontoGegenbuchung()
   		tree.view.selection.getRangeAt(t,start,end);
 			for (var v = start.value; v <= end.value; v++)
 			{
-				if(!tree.view.getParentIndex(v))
-				{
-					alert('Zum Drucken der Bestaetigung bitte die oberste Buchung waehlen');
-					return false;
-				}
 				var col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
 				var buchungsnr=tree.view.getCellText(v,col);
 				paramList += ';'+buchungsnr;
@@ -2269,11 +2264,13 @@ function StudentKontoZahlungsbestaetigung()
   		tree.view.selection.getRangeAt(t,start,end);
 			for (var v = start.value; v <= end.value; v++)
 			{
+				/*
 				if(!tree.view.getParentIndex(v))
 				{
 					alert('Zum Drucken der Bestaetigung bitte die oberste Buchung waehlen');
 					return false;
 				}
+				*/
 				var col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
 				var buchungsnr=tree.view.getCellText(v,col);
 				paramList += ';'+buchungsnr;
@@ -2503,7 +2500,76 @@ function StudentIOAuswahl()
 	bis = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bis" ));
 	zweck_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zweck_code" ));
 	student_uid = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#student_uid" ));
+	lehreinheit_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehreinheit_id" ));
+	lehrveranstaltung_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehrveranstaltung_id" ));
+	studiensemester_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiensemester_kurzbz" ));
+	ort = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ort" ));
+	universitaet = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#universitaet" ));
 
+	try
+	{
+		//Wenn nach dem Personen gesucht wurde, ist es moeglich, dass kein Studiengang gewaehlt ist.
+		//Dann wird der Studiengang/Semester des Studenten genommen
+		var verband_tree=document.getElementById('tree-verband');
+		var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
+		var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+		
+		col = verband_tree.columns ? verband_tree.columns["sem"] : "sem";
+		var sem=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+	}
+	catch(e)
+	{	
+		var stg_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;	
+		var sem = document.getElementById('student-detail-textbox-semester').value;
+	}
+
+	//Lehrveranstaltung Drop Down laden
+	var LVDropDown = document.getElementById('student-io-menulist-lehrveranstaltung');
+	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&optional=true&"+gettimestamp();
+
+	//Alte DS entfernen
+	var oldDatasources = LVDropDown.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		LVDropDown.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	LVDropDown.builder.rebuild();
+
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var datasource = rdfService.GetDataSourceBlocking(url);
+	datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	LVDropDown.database.AddDataSource(datasource);
+	
+	LVDropDown.builder.rebuild();
+
+
+	//Lehreinheiten Drop Down laden
+	var LEDropDown = document.getElementById('student-io-menulist-lehreinheit');
+	url='<?php echo APP_ROOT;?>rdf/lehreinheit.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+"&studiensemester_kurzbz="+studiensemester_kurzbz+"&optional=true&"+gettimestamp();
+
+	//Alte DS entfernen
+	var oldDatasources = LEDropDown.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		LEDropDown.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	LEDropDown.builder.rebuild();
+	LEDropDown.selectedItem='';
+	LEDropDown.value='';
+	if(lehreinheit_id!='')
+	{
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		var datasource = rdfService.GetDataSourceBlocking(url);
+		datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		LEDropDown.database.AddDataSource(datasource);
+	
+		LEDropDown.builder.rebuild();
+	}
+		
 	document.getElementById('student-io-menulist-mobilitaetsprogramm').value=mobilitaetsprogramm_code;
 	document.getElementById('student-io-menulist-nation').value=nation_code;
 	document.getElementById('student-io-textbox-von').value=von;
@@ -2512,6 +2578,10 @@ function StudentIOAuswahl()
 	document.getElementById('student-io-detail-textbox-uid').value=student_uid;
 	document.getElementById('student-io-detail-checkbox-neu').checked=false;
 	document.getElementById('student-io-detail-textbox-bisio_id').value=bisio_id;
+	document.getElementById('student-io-textbox-ort').value=ort;
+	document.getElementById('student-io-textbox-universitaet').value=universitaet;
+	document.getElementById('student-io-menulist-lehreinheit').value=lehreinheit_id;
+	document.getElementById('student-io-menulist-lehrveranstaltung').value=lehrveranstaltung_id;
 }
 
 // ****
@@ -2535,6 +2605,10 @@ function StudentIODetailDisableFields(val)
 	document.getElementById('student-io-menulist-nation').disabled=val;
 	document.getElementById('student-io-menulist-zweck').disabled=val;
 	document.getElementById('student-io-button-speichern').disabled=val;
+	document.getElementById('student-io-menulist-lehrveranstaltung').disabled=val;
+	document.getElementById('student-io-menulist-lehreinheit').disabled=val;
+	document.getElementById('student-io-textbox-ort').disabled=val;
+	document.getElementById('student-io-textbox-universitaet').disabled=val;
 }
 
 // *****
@@ -2547,6 +2621,8 @@ function StudentIOResetFileds()
 	document.getElementById('student-io-menulist-mobilitaetsprogramm').value='6';
 	document.getElementById('student-io-menulist-zweck').value='2';
 	document.getElementById('student-io-menulist-nation').value='A';
+	document.getElementById('student-io-textbox-ort').value='';
+	document.getElementById('student-io-textbox-universitaet').value='';
 }
 
 // ****
@@ -2564,6 +2640,9 @@ function StudentIODetailSpeichern()
 	uid = document.getElementById('student-io-detail-textbox-uid').value;
 	neu = document.getElementById('student-io-detail-checkbox-neu').checked;
 	bisio_id = document.getElementById('student-io-detail-textbox-bisio_id').value;
+	lehreinheit_id = document.getElementById('student-io-menulist-lehreinheit').value;
+	ort = document.getElementById('student-io-textbox-ort').value;
+	universitaet = document.getElementById('student-io-textbox-universitaet').value;
 
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 	
@@ -2595,6 +2674,9 @@ function StudentIODetailSpeichern()
 	req.add('zweck_code', zweck_code);
 	req.add('student_uid', uid);
 	req.add('studiengang_kz', studiengang_kz);
+	req.add('lehreinheit_id', lehreinheit_id);
+	req.add('ort', ort);
+	req.add('universitaet', universitaet);
 
 	var response = req.executePOST();
 
@@ -2671,6 +2753,8 @@ function StudentIODelete()
 // ****
 function StudentIONeu()
 {
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	
 	//Felder Resetten und Aktivieren
 	StudentIOResetFileds();
 	StudentIODetailDisableFields(false);
@@ -2691,10 +2775,60 @@ function StudentIONeu()
 	document.getElementById('student-io-detail-checkbox-neu').checked=true;
 	document.getElementById('student-io-textbox-von').value=tag+'.'+monat+'.'+jahr;
 	document.getElementById('student-io-textbox-bis').value=tag+'.'+monat+'.'+jahr;
+	
+	try
+	{
+		//Wenn nach dem Personen gesucht wurde, ist es moeglich, dass kein Studiengang gewaehlt ist.
+		//Dann wird der Studiengang/Semester des Studenten genommen
+		var verband_tree=document.getElementById('tree-verband');
+		var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
+		var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+		
+		col = verband_tree.columns ? verband_tree.columns["sem"] : "sem";
+		var sem=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+	}
+	catch(e)
+	{	
+		var stg_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;	
+		var sem = document.getElementById('student-detail-textbox-semester').value;
+	}
+	
+	//Lehrveranstaltung Drop Down laden
+	var LVDropDown = document.getElementById('student-io-menulist-lehrveranstaltung');
+	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&sem="+sem+"&optional=true&"+gettimestamp();
+
+	//Alte DS entfernen
+	var oldDatasources = LVDropDown.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		LVDropDown.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	LVDropDown.builder.rebuild();
+
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var datasource = rdfService.GetDataSource(url);
+	LVDropDown.database.AddDataSource(datasource);
+	LVDropDown.value='';
+	//LVDropDown.selectedItem='';
+	
+	var LEDropDown = document.getElementById('student-io-menulist-lehreinheit');
+	
+	//Alte DS entfernen
+	var oldDatasources = LEDropDown.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		LEDropDown.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	LEDropDown.builder.rebuild();
+	
+	LEDropDown.value='';
+	LEDropDown.selectedItem='';
 }
 
 // ****
-// * Selectiert den Incomming/Outgoing Eintrag nachdem der Tree
+// * Selectiert den Incoming/Outgoing Eintrag nachdem der Tree
 // * rebuildet wurde.
 // ****
 function StudentIOTreeSelectID()
@@ -2728,6 +2862,42 @@ function StudentIOTreeSelectID()
 	}
 }
 
+
+// ****
+// * Wenn die Lehrvernastaltung des IO Eintrages geaendert wird, dann wird die Liste der Lehreinheiten neu geladen
+// ****
+function StudentIOLVAChange()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	var lvid = document.getElementById('student-io-menulist-lehrveranstaltung').value;
+	var stsem = getStudiensemester();
+
+
+	//Lehreinheiten Drop Down laden
+	var LEDropDown = document.getElementById('student-io-menulist-lehreinheit');
+	url='<?php echo APP_ROOT;?>rdf/lehreinheit.rdf.php?lehrveranstaltung_id='+lvid+"&studiensemester_kurzbz="+stsem+"&"+gettimestamp();
+
+	//Alte DS entfernen
+	var oldDatasources = LEDropDown.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		LEDropDown.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	LEDropDown.builder.rebuild();
+	
+	if(lvid!='')
+	{
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		var datasource = rdfService.GetDataSource(url);
+		LEDropDown.database.AddDataSource(datasource);
+	}	
+	
+	//Lehreinheiten DropDown Auswahl leeren
+	LEDropDown.selectedIndex=-1;
+	
+}
 
 // **************** NOTEN ************** //
 
@@ -3729,11 +3899,6 @@ function StudentCreateDiplSupplement()
   		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{
-			if(!tree.view.getParentIndex(v))
-			{
-				alert('Zum Drucken der Bestaetigung bitte die oberste Buchung waehlen');
-				return false;
-			}
 			var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
 			var uid=tree.view.getCellText(v,col);
 			paramList += ';'+uid;
@@ -3770,11 +3935,6 @@ function StudentCreateStudienerfolg(finanzamt, studiensemester, all)
   		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{
-			if(!tree.view.getParentIndex(v))
-			{
-				alert('Zum Drucken der Bestaetigung bitte die oberste Buchung waehlen');
-				return false;
-			}
 			var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
 			var uid=tree.view.getCellText(v,col);
 			paramList += ';'+uid;

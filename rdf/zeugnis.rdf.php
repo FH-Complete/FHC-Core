@@ -149,6 +149,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		else 
 			$bezeichnung='Studiengang';
 		$studiengang_typ=$row->typ;
+		$semester = $row->semester;
 		
 		$xml .= "		<studiengang_art>".$bezeichnung."</studiengang_art>";
 		$xml .= "		<studiengang_kz>".sprintf('%04s', $row->studiengang_kz)."</studiengang_kz>";
@@ -263,6 +264,27 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				else 
 					$bezeichnung = $row->lehrveranstaltung_bezeichnung.$firma;
 				
+					
+				$bisio_von = '';
+				$bisio_bis = '';
+				$bisio_ort = '';
+				$bisio_universitaet = '';
+				$auslandssemester=false;
+				
+				$qry = "SELECT tbl_bisio.* FROM bis.tbl_bisio JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) WHERE tbl_lehreinheit.lehrveranstaltung_id='$row->lehrveranstaltung_id'";
+				if($result_bisio = pg_query($conn, $qry))
+				{
+					if($row_bisio = pg_fetch_object($result_bisio))
+					{
+						//$bezeichnung = "Auslandsaufenthalt: $row_bisio->von-$row_bisio->bis, $row_bisio->ort, $row_bisio->universitaet\nDie im Ausland absolvierten Lehrveranstaltungen werden für das $semester. Semester des Studiums n der Fachhochschule Technikum Wien angerechnet (Details siehe Transcript of Records der Gasthochschule).";
+						$bisio_von = $row_bisio->von;
+						$bisio_bis = $row_bisio->bis;
+						$bisio_ort = $row_bisio->ort;
+						$bisio_universitaet = $row_bisio->universitaet;
+						$auslandssemester=true;
+						$note2 = 'ar';
+					}
+				}
 				
 				$xml .= "\n			<unterrichtsfach>";
 				$xml .= "				<bezeichnung><![CDATA[".$bezeichnung."]]></bezeichnung>";
@@ -270,6 +292,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$xml .= "				<sws>".($row->semesterstunden==0?'':sprintf('%.1f',$row->semesterstunden/$wochen))."</sws>";
 				$xml .= "				<ects>".number_format($row->ects,1)."</ects>";
 				$xml .= "				<lv_lehrform_kurzbz>".$row->lv_lehrform_kurzbz."</lv_lehrform_kurzbz>";
+				if($auslandssemester)
+				{
+					$xml .= "			<bisio_von>".date('d.m.Y', $datum->mktime_fromdate($bisio_von))."</bisio_von>";
+					$xml .= "			<bisio_bis>".date('d.m.Y', $datum->mktime_fromdate($bisio_bis))."</bisio_bis>";
+					$xml .= "			<bisio_ort>$bisio_ort</bisio_ort>";
+					$xml .= "			<bisio_universitaet>$bisio_universitaet</bisio_universitaet>";
+				}
 				$xml .= "			</unterrichtsfach>";
 			}
 		}

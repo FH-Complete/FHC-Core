@@ -334,9 +334,10 @@ if($result_projekt = pg_query($conn, $qry_projekt))
 	    			*, to_char ((ende-start),'HH24:MI') as diff, 
 	    			(SELECT (to_char(sum(ende-start),'DD')::integer)*24+to_char(sum(ende-start),'HH24')::integer || ':' || to_char(sum(ende-start),'MI')
 	    			 FROM campus.tbl_zeitaufzeichnung 
-	    			 WHERE $where AND ende>(now() - INTERVAL '40 days')) as summe 	    
+	    			 WHERE $where ) as summe 	    
 	    		FROM campus.tbl_zeitaufzeichnung WHERE $where
 	    		ORDER BY start DESC";
+	    //AND ende>(now() - INTERVAL '40 days')
 	    //echo $qry;
 	    if($result = pg_query($conn, $qry))
 	    {
@@ -350,8 +351,8 @@ if($result_projekt = pg_query($conn, $qry_projekt))
 				echo "       <td>".$row->projekt_kurzbz."</td>\n";
 		        echo "       <td>$row->aktivitaet_kurzbz</td>\n";
 		        echo "       <td>$row->uid</td>\n";
-		        echo "       <td><div style='display: none;'>$row->start</div>".date('d.m.Y H:i', $datum->mktime_fromtimestamp($row->start))."</td>\n";
-		        echo "       <td><div style='display: none;'>$row->ende</div>".date('d.m.Y H:i', $datum->mktime_fromtimestamp($row->ende))."</td>\n";
+		        echo "       <td nowrap><div style='display: none;'>$row->start</div>".date('d.m.Y H:i', $datum->mktime_fromtimestamp($row->start))."</td>\n";
+		        echo "       <td nowrap><div style='display: none;'>$row->ende</div>".date('d.m.Y H:i', $datum->mktime_fromtimestamp($row->ende))."</td>\n";
 		        echo "       <td align='right'>".$row->diff."</td>\n";
 		        echo "       <td title='".str_replace("\r\n",' ',$row->beschreibung)."'>".$row->beschreibung."</td>\n";
 		        echo "       <td>".(isset($stg_arr[$row->studiengang_kz])?$stg_arr[$row->studiengang_kz]:$row->studiengang_kz)."</td>\n";
