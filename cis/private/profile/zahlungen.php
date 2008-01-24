@@ -111,7 +111,7 @@
 			echo '<td>'.$row['parent']->studiensemester_kurzbz.'</td>';			
 			
 			echo '<td>'.$row['parent']->buchungstext.'</td>';
-			echo '<td align="right">'.sprintf('%.2f',abs($row['parent']->betrag)).' &euro;</td>';
+			echo '<td align="right">'.($betrag<0?'-':($betrag>0?'+':'')).sprintf('%.2f',abs($row['parent']->betrag)).' &euro;</td>';
 			echo '<td align="center">';
 			if($betrag==0 && $row['parent']->betrag<0)
 				echo '<a href="../pdfExport.php?xml=konto.rdf.php&xsl=Zahlung&uid='.$uid.'&buchungsnummern='.$row['parent']->buchungsnr.'" title="Bestaetigung drucken"><img src="../../../skin/images/pdfpic.gif" alt="Bestaetigung drucken"></a>';
