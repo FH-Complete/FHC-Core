@@ -126,6 +126,28 @@ if (!@pg_query($conn,'SELECT ort,universitaet,lehreinheit_id FROM bis.tbl_bisio 
 		echo 'ort,uni,lehreinheit_id wurde bei bis.tbl_bisio hinzugefuegt!<BR>';
 }
 
+ // ************** lehre.tbl_lehrveranstaltung.bezeichnung_english ************************
+if (!@pg_query($conn,'SELECT bezeichnung_english FROM lehre.tbl_lehrveranstaltung LIMIT 1;'))
+{
+	$sql="	ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN bezeichnung_english varchar(256);
+			UPDATE lehre.tbl_lehrveranstaltung SET bezeichnung_english=titel FROM campus.tbl_lvinfo
+				WHERE tbl_lvinfo.sprache='English' AND tbl_lvinfo.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id;";
+	if (!@pg_query($conn,$sql))
+		echo '<strong>lehre.tbl_lehrveranstaltung: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo 'bezeichnung_english wurde bei lehre.tbl_lehrveranstaltung hinzugefuegt!<BR>';
+}
+
+// ************** public.tbl_studiengang.zusatzinfo_html ************************
+if (!@pg_query($conn,'SELECT bezeichnung_english FROM public.tbl_studiengang LIMIT 1;'))
+{
+	$sql="	ALTER TABLE public.tbl_studiengang ADD COLUMN zusatzinfo_html text;
+			Comment on column public.tbl_studiengang.zusatzinfo_html Is 'Zusatzinfo fuers CIS in HTML';";
+	if (!@pg_query($conn,$sql))
+		echo '<strong>public.tbl_studiengang: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo 'zusatzinfo_html wurde bei public.tbl_studiengang hinzugefuegt!<BR>';
+}
 
 // ************** campus.tbl_resturlaub.urlaubstageprojahr ************************
 if (!@pg_query($conn,'SELECT urlaubstageprojahr FROM campus.tbl_resturlaub LIMIT 1;'))
@@ -176,7 +198,7 @@ if (!@pg_query($conn,'SELECT * FROM bis.tbl_bundesland LIMIT 1;'))
 }
 
 // ************** lehre.vw_stundenplandev_student_unr ************************
-if (!@pg_query($conn,'SELECT * FROM lehre.vw_stundenplandev_student_unr LIMIT 1;'))
+if (!@pg_query($conn,'SELECT * FROM lehre.vw_stundenplandev_student_unr WHERE unr=0 LIMIT 1;'))
 {
 	$sql="	CREATE OR REPLACE VIEW lehre.vw_stundenplandev_student_unr AS
 				SELECT unr, datum, stunde, student_uid
@@ -272,7 +294,7 @@ $tabellen=array(
 	"lehre.tbl_lehrfach"  => array("lehrfach_id","studiengang_kz","fachbereich_kurzbz","kurzbz","bezeichnung","farbe","aktiv","semester","sprache","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_lehrform"  => array("lehrform_kurzbz","bezeichnung","verplanen"),
 	"lehre.tbl_lehrfunktion"  => array("lehrfunktion_kurzbz","beschreibung","standardfaktor"),
-	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english"),
 	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe"),
 	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id"),
@@ -328,7 +350,7 @@ $tabellen=array(
 	"public.tbl_standort"  => array("standort_kurzbz","adresse_id"),
 	"public.tbl_student"  => array("student_uid","matrikelnr","prestudent_id","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id"),
+	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html"),
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","ext_id"),
 	"public.tbl_variable"  => array("name","uid","wert"),
 	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung"),
