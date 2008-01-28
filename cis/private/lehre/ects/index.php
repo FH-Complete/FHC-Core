@@ -118,7 +118,7 @@
 	$kurzbeschreibung_de = (isset($_POST['kurzbeschreibung_de'])?$_POST['kurzbeschreibung_de']:'');
 	$freig_de = (isset($_POST['freig_de'])?($_POST['freig_de']=='on'?true:false):'');
 	$methodik_de = (isset($_POST['methodik_de'])?$_POST['methodik_de']:'');
-	$titel_de = (isset($_POST['titel_de'])?$_POST['titel_de']:'');
+	//$titel_de = (isset($_POST['titel_de'])?$_POST['titel_de']:'');
 
 	$lehrziele_en = (isset($_POST['lehrziele_en'])?$_POST['lehrziele_en']:'');
 	$lehrinhalte_en = (isset($_POST['lehrinhalte_en'])?$_POST['lehrinhalte_en']:'');
@@ -129,7 +129,7 @@
 	$kurzbeschreibung_en = (isset($_POST['kurzbeschreibung_en'])?$_POST['kurzbeschreibung_en']:'');
 	$freig_en = (isset($_POST['freig_en'])?($_POST['freig_en']=='on'?true:false):'');
 	$methodik_en = (isset($_POST['methodik_en'])?$_POST['methodik_en']:'');
-	$titel_en = (isset($_POST['titel_en'])?$_POST['titel_en']:'');
+	//$titel_en = (isset($_POST['titel_en'])?$_POST['titel_en']:'');
 
 	/* WriteLog($qry,$uid)
 	* @brief Schreib die Querys im format: uid - datum - qry ins LogFile
@@ -175,7 +175,7 @@
 			$lv_obj_sav->sprache=ATTR_SPRACHE_DE;
 			$lv_obj_sav->lehrveranstaltung_id=$lv;
 			$lv_obj_sav->methodik = str_replace("", "<br>",str_replace("\r\n", "<br>", $methodik_de));
-			$lv_obj_sav->titel = str_replace("", "<br>",str_replace("\r\n", "<br>", $titel_de));
+			//$lv_obj_sav->titel = str_replace("", "<br>",str_replace("\r\n", "<br>", $titel_de));
 
 			$lv_obj1 = new lvinfo($conn);
 			$vorhanden=$lv_obj1->exists($lv, ATTR_SPRACHE_DE);
@@ -206,7 +206,7 @@
 			$lv_obj_sav->sprache=ATTR_SPRACHE_EN;
 			$lv_obj_sav->lehrveranstaltung_id=$lv;
 			$lv_obj_sav->methodik = str_replace("", "<br>",str_replace("\r\n", "<br>", $methodik_en));
-			$lv_obj_sav->titel = str_replace("", "<br>",str_replace("\r\n", "<br>", $titel_en));
+			//$lv_obj_sav->titel = str_replace("", "<br>",str_replace("\r\n", "<br>", $titel_en));
 
 			$lv_obj1 = new lvinfo($conn);
 			$vorhanden = $lv_obj1->exists($lv, ATTR_SPRACHE_EN);
@@ -515,12 +515,16 @@
          <td colspan="2"><b><u>ENGLISH</u></b></td>
          </tr>
 
-       <tr class="liste1">
+       ';
+	   /* 28.01.2008 - Titel kommt jetzt aus tbl_lehrveranstaltung
+	   <tr class="liste1">
          <td><i>Lehrveranstaltungstitel</i> </td>
          <td align="right"><textarea rows="5" cols="40" name="titel_de">'. (isset($titel_de)?stripslashes(str_replace("<br>","\r\n", $titel_de)):'').'</textarea></td>
          <td><i>Course Title</i> </td>
          <td align="right"><textarea rows="5" cols="40" name="titel_en">'. (isset($titel_en)?stripslashes(str_replace("<br>","\r\n",$titel_en)):'').'</textarea></td>
        </tr>
+       */
+       echo '
        <tr class="liste0">
          <td><i>Kurzbeschreibung</i> </td>
          <td align="right"><textarea rows="5" cols="40" name="kurzbeschreibung_de">'. (isset($kurzbeschreibung_de)?stripslashes(str_replace("<br>","\r\n",$kurzbeschreibung_de)):'').'</textarea></td>

@@ -8,36 +8,37 @@
 	if (!$conn = @pg_pconnect(CONN_STRING))
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
-	$reloadstr = "";  // neuladen der liste im oberen frame
-	$htmlstr = "";
-	$errorstr = ""; //fehler beim insert
-	$sel = "";
-	$chk = "";
+	$reloadstr = '';  // neuladen der liste im oberen frame
+	$htmlstr = '';
+	$errorstr = ''; //fehler beim insert
+	$sel = '';
+	$chk = '';
 
 	$sg_var = new studiengang($conn);
 	$studiengang_typ_arr = $sg_var->studiengang_typ_arr;
 	
-	$studiengang_kz = "";
-	$kurzbz = "";
-	$kurzbzlang = "";
-	$typ = "";
-	$bezeichnung = "";
-	$english = "";
-	$farbe = "";
-	$email = "";
-	$telefon = "";
-	$max_semester = "";
-	$max_verband = "";
-	$max_gruppe = "";
-	$erhalter_kz = "";
-	$bescheid = "";
-	$bescheidbgbl1 = "";
-	$bescheidbgbl2 = "";
-	$bescheidgz = "";
-	$bescheidvom = "";
-	$organisationsform = "";
-	$titelbescheidvom = "";
-	$ext_id = "";
+	$studiengang_kz = '';
+	$kurzbz = '';
+	$kurzbzlang = '';
+	$typ = '';
+	$bezeichnung = '';
+	$english = '';
+	$farbe = '';
+	$email = '';
+	$telefon = '';
+	$max_semester = '';
+	$max_verband = '';
+	$max_gruppe = '';
+	$erhalter_kz = '';
+	$bescheid = '';
+	$bescheidbgbl1 = '';
+	$bescheidbgbl2 = '';
+	$bescheidgz = '';
+	$bescheidvom = '';
+	$organisationsform = '';
+	$titelbescheidvom = '';
+	$zusatzinfo_html = '';
+	$ext_id = '';
 	$aktiv = "t";
 	$neu = "true";
 	
@@ -63,6 +64,7 @@
 		$bescheidvom = $_POST["bescheidvom"];
 		$organisationsform = $_POST["organisationsform"];
 		$titelbescheidvom = $_POST["titelbescheidvom"];
+		$zusatzinfo_html = $_POST['zusatzinfo_html'];
 		if(isset($_POST["aktiv"]))
 			$aktiv = $_POST["aktiv"];
 		else
@@ -90,6 +92,7 @@
 		$sg_update->bescheidvom = $bescheidvom;
 		$sg_update->orgform_kurzbz = $organisationsform;
 		$sg_update->titelbescheidvom = $titelbescheidvom;
+		$sg_update->zusatzinfo_html = $zusatzinfo_html;
 		$sg_update->aktiv = $aktiv;
 		$sg_update->ext_id = $ext_id;
 
@@ -133,6 +136,7 @@
 		$bescheidvom = $sg->bescheidvom;
 		$organisationsform = $sg->orgform_kurzbz;
 		$titelbescheidvom = $sg->titelbescheidvom;
+		$zusatzinfo_html = $sg->zusatzinfo_html;
 		$ext_id = $sg->ext_id;
 		$aktiv = $sg->aktiv;
 		$neu = "false";
@@ -207,7 +211,7 @@
 	if($aktiv == 't')
 		$chk = "checked";
 	else
-		$chk = "";
+		$chk = '';
 	$htmlstr .= "						<input type='checkbox' name='aktiv' value='t'".$chk." onchange='submitable()'>";
 	$htmlstr .= " 					</td>\n";
 	$htmlstr .= "				</tr>\n";
@@ -229,7 +233,7 @@
 		if ($erhalter_kz == $erhalter->erhalter_kz)
 			$sel = " selected";
 		else
-			$sel = "";
+			$sel = '';
 		$htmlstr .= "							<option value='".$erhalter->erhalter_kz."'".$sel.">".$erhalter->bezeichnung."</option>\n";
 	}
 	$htmlstr .= "						</select>\n";
@@ -248,12 +252,11 @@
 		if ($typ == $typkey)
 			$sel = " selected";
 		else
-			$sel = "";
+			$sel = '';
 		$htmlstr .= "							<option value='".$typkey."'".$sel.">".$studiengang_typ_arr[$typkey]."</option>\n";
 	}
 	$htmlstr .= "						</select>\n";
 	$htmlstr .= "					</td>\n";
-	
 	$htmlstr .= "				</tr>\n";
 
 
@@ -315,6 +318,16 @@
 	$htmlstr .= "		</td>\n";
 
 	$htmlstr .= "	</tr>";
+	$htmlstr .= "	<tr>";
+	$htmlstr .= "		<td colspan='3'>";
+	$htmlstr .= "			<table>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td valign='top'>Bescheid</td>\n";
+	$htmlstr .= " 					<td><textarea name='zusatzinfo_html' cols='50' rows='4' onchange='submitable()'>".$zusatzinfo_html."</textarea></td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "			</table>\n";
+	$htmlstr .= "		</td>";
+	$htmlstr .= "	</tr>";
 	$htmlstr .= "</table>\n";
 	$htmlstr .= "<br>\n";
 	$htmlstr .= "<div align='right' id='sub'>\n";
@@ -354,7 +367,7 @@ function unchanged()
 
 function checkmail()
 {
-	if((document.studiengangform.email.value != "")&&(!emailCheck(document.studiengangform.email.value)))
+	if((document.studiengangform.email.value != '')&&(!emailCheck(document.studiengangform.email.value)))
 	{
 		//document.studiengangform.schick.disabled = true;
 		document.studiengangform.email.className="input_error";
@@ -372,7 +385,7 @@ function checkmail()
 
 function checkdate(feld)
 {
-	if ((feld.value != "") && (!dateCheck(feld)))
+	if ((feld.value != '') && (!dateCheck(feld)))
 	{
 		//document.studiengangform.schick.disabled = true;
 		feld.className = "input_error";
@@ -380,7 +393,7 @@ function checkdate(feld)
 	}
 	else
 	{
-		if(feld.value != "")
+		if(feld.value != '')
 			feld.value = dateCheck(feld);
 
 		feld.className = "input_ok";
@@ -390,7 +403,7 @@ function checkdate(feld)
 
 function checkrequired(feld)
 {
-	if(feld.value == "")
+	if(feld.value == '')
 	{
 		feld.className = "input_error";
 		return false;

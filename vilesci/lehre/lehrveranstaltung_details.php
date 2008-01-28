@@ -65,6 +65,7 @@
 
 		$lv->kurzbz = $_POST['kurzbz'];
 		$lv->bezeichnung = $_POST['bezeichnung'];
+		$lv->bezeichnung_english = $_POST['bezeichnung_english'];
 		$lv->lehrform_kurzbz = $_POST['lehrform'];
 		$lv->studiengang_kz = $_POST['studiengang_kz'];
 		$lv->semester = $_POST['semester'];
@@ -145,7 +146,25 @@
 		$htmlstr .= "		<td>Bezeichnung</td>";
 		$htmlstr .= "		<td colspan='3'><input type='text' name='bezeichnung' value='".htmlentities($lv->bezeichnung, ENT_QUOTES)."' size='60' maxlength='128'></td>\n";
 
-		$htmlstr .= "</tr><tr>";
+		$htmlstr .= "</tr>";
+		$htmlstr .= "<tr>";
+		$htmlstr .= "		<td>Sprache</td>";
+		$htmlstr .= "		<td><select name='sprache'>\n";
+
+		foreach ($sprache_arr as $sprache)
+		{
+			if ($lv->sprache == $sprache)
+				$sel = " selected";
+			else
+				$sel = "";
+			$htmlstr .= "				<option value='".$sprache."' ".$sel.">".$sprache."</option>";
+		}
+		$htmlstr .= "		</select></td>\n";
+		$htmlstr .= "		<td>Bezeichnung English</td>";
+		$htmlstr .= "		<td colspan='3'><input type='text' name='bezeichnung_english' value='".htmlentities($lv->bezeichnung_english, ENT_QUOTES)."' size='60' maxlength='256'></td>\n";
+
+		$htmlstr .= "</tr>";
+		$htmlstr .= "<tr>";
 		$htmlstr .= "		<td>Studiengang</td>";
 		$htmlstr .= "		<td><select name='studiengang_kz'>\n";
 
@@ -183,18 +202,7 @@
 		}
 		$htmlstr .= "		</select></td>\n";
 
-		$htmlstr .= "		<td>Sprache</td>";
-		$htmlstr .= "		<td><select name='sprache'>\n";
-
-		foreach ($sprache_arr as $sprache)
-		{
-			if ($lv->sprache == $sprache)
-				$sel = " selected";
-			else
-				$sel = "";
-			$htmlstr .= "				<option value='".$sprache."' ".$sel.">".$sprache."</option>";
-		}
-		$htmlstr .= "		</select></td>\n";
+		
 		$htmlstr .= "	</tr><tr>\n";
 
 		$htmlstr .= "	<td>ECTS</td>";

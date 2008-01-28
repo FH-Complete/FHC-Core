@@ -31,6 +31,7 @@ class studiensemester
 	var $studiensemester_kurzbz; // varchar(16)
 	var $start; // date
 	var $ende;  // date
+	var $bezeichnung;
 
 	// ***********************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional ein LF
@@ -77,6 +78,7 @@ class studiensemester
 			$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 			$this->start = $row->start;
 			$this->ende = $row->ende;
+			$this->bezeichnung = $row->bezeichnung;
 		}
 		else
 		{

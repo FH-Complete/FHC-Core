@@ -424,76 +424,85 @@ function show(id)
 				}
 
 			  	echo "</p>";
-			  	echo "<p>Sekretariat:</font><font face='Arial, Helvetica, sans-serif' size='2'><br>";
-                //Sektritariat auslesen
+			  	echo "<p>Sekretariat:</font><font face='Arial, Helvetica, sans-serif' size='2'>";
+                //Sekritariat auslesen
 
-				$sql_query = "SELECT * FROM campus.vw_mitarbeiter WHERE uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$course_id' AND funktion_kurzbz='ass' LIMIT 1)";
+				$sql_query = "SELECT distinct * FROM campus.vw_mitarbeiter WHERE uid in (SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$course_id' AND funktion_kurzbz='ass')";
 
 				if($result_course_secretary = pg_query($sql_conn, $sql_query))
 				{
 					$num_rows_course_secretary = pg_numrows($result_course_secretary);
 
-					if($num_rows_course_secretary > 0)
+					while($row_course_secretary = pg_fetch_object($result_course_secretary))
 					{
-						$row_course_secretary = pg_fetch_object($result_course_secretary, 0);
+		                echo "<br><b>";
+		
+		                if(isset($row_course_secretary) && $row_course_secretary != "")
+						{
+							if(!($row_course_secretary->vorname == "" && $row_course_secretary->nachname == ""))
+							{
+								echo $row_course_secretary->titelpre.' '.$row_course_secretary->vorname.' '.$row_course_secretary->nachname.' '.$row_course_secretary->titelpost;
+							}
+							else
+							{
+								echo "Nicht definiert";
+							}
+						}
+						else
+						{
+							echo "Nicht definiert";
+						}
+		
+		                echo "</b><br>";
+		
+						if(isset($row_course_secretary) && $row_course_secretary != "")
+						{
+							if($row_course_secretary->uid != "")
+							{
+								echo "<a href=\"mailto:$row_course_secretary->uid@technikum-wien.at\" class=\"Item\">$row_course_secretary->uid@technikum-wien.at</a>";
+							}
+							else
+							{
+								echo "E-Mail nicht definiert";
+							}
+						}
+						else
+						{
+							echo "E-Mail nicht definiert";
+						}
+		
+		                echo "<br>";
+		  				echo "Tel.:";
+		
+		  				if(isset($row_course_secretary) && $row_course_secretary != "")
+						{
+							if($row_course_secretary->telefonklappe != "")
+							{
+								echo '01 333 40 77 - '.$row_course_secretary->telefonklappe;
+							}
+							else
+							{
+								echo "Nicht vorhanden";
+							}
+						}
+						else
+						{
+							echo "Nicht vorhanden";
+						}
+						echo "<br>";
 					}
 				}
-
-                echo "<b>";
-
-                if(isset($row_course_secretary) && $row_course_secretary != "")
+				
+				$qry = "SELECT zusatzinfo_html FROM public.tbl_studiengang WHERE studiengang_kz='$course_id'";
+				
+				if($result = pg_query($sql_conn, $qry))
 				{
-					if(!($row_course_secretary->vorname == "" && $row_course_secretary->nachname == ""))
+					if($row = pg_fetch_object($result))
 					{
-						echo $row_course_secretary->titelpre.' '.$row_course_secretary->vorname.' '.$row_course_secretary->nachname.' '.$row_course_secretary->titelpost;
-					}
-					else
-					{
-						echo "Nicht definiert";
+						echo $row->zusatzinfo_html;
 					}
 				}
-				else
-				{
-					echo "Nicht definiert";
-				}
-
-                echo "</b><br>";
-
-				if(isset($row_course_secretary) && $row_course_secretary != "")
-				{
-					if($row_course_secretary->uid != "")
-					{
-						echo "<a href=\"mailto:$row_course_secretary->uid@technikum-wien.at\" class=\"Item\">$row_course_secretary->uid@technikum-wien.at</a>";
-					}
-					else
-					{
-						echo "E-Mail nicht definiert";
-					}
-				}
-				else
-				{
-					echo "E-Mail nicht definiert";
-				}
-
-                echo "<br>";
-  				echo "Tel.:";
-
-  				if(isset($row_course_secretary) && $row_course_secretary != "")
-				{
-					if($row_course_secretary->telefonklappe != "")
-					{
-						echo '01 333 40 77 - '.$row_course_secretary->telefonklappe;
-					}
-					else
-					{
-						echo "Nicht vorhanden";
-					}
-				}
-				else
-				{
-					echo "Nicht vorhanden";
-				}
-
+				
 				echo "<p>Studentenvertreter:</font><font face='Arial, Helvetica, sans-serif' size='2'><br>";
 
 				$sql_query = "SELECT tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre, tbl_person.titelpost, tbl_benutzer.uid FROM public.tbl_person, public.tbl_benutzer,public.tbl_benutzerfunktion WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stdv' AND tbl_person.person_id=public.tbl_benutzer.person_id AND tbl_benutzerfunktion.uid=tbl_benutzer.uid";
@@ -514,6 +523,8 @@ function show(id)
 						echo "<b>Nicht vorhanden</b>";
 					}
 				}
+				
+				
 ?>
 
             	<table border="0" width="100%" cellpadding="0" cellspacing="0">

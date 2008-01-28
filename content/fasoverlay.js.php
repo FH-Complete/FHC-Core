@@ -904,6 +904,14 @@ function ExtrasShowGruppenverwaltung()
 }
 
 // ****
+// * Zeigt HTML Seite zur Bearbeitung der Lehrfaecher an
+// ****
+function ExtrasShowLehrfachverwaltung()
+{
+	window.open('<?php echo APP_ROOT ?>vilesci/lehre/lehrfach.php','Lehrfach','');
+}
+
+// ****
 // * Zeigt eine Seite zum Importieren der Funktionen aus der vorherigen BISMeldung
 // ****
 function BISMitarbeiterImport()

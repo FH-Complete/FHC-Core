@@ -188,6 +188,10 @@
 <!ENTITY menu-extras-gruppenverwaltung.label		"Gruppenverwaltung">
 <!ENTITY menu-extras-gruppenverwaltung.accesskey	"G">
 
+<!ENTITY menu-extras-lehrfachverwaltung.key			"E">
+<!ENTITY menu-extras-lehrfachverwaltung.label		"Lehrfachverwaltung">
+<!ENTITY menu-extras-lehrfachverwaltung.accesskey	"E">
+
 <!-- BIS -->
 <!ENTITY menu-bis.label		"BIS">
 <!ENTITY menu-bis.accesskey	"I">
