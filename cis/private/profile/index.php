@@ -2,6 +2,7 @@
 	require_once('../../config.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/globals.inc.php');
+	require_once('../../../include/studiengang.class.php');
 
 	//if (!isset($REMOTE_USER))
 	//	$REMOTE_USER='pam';
@@ -12,10 +13,18 @@
 		$uid=stripslashes($_GET['uid']);
 		$ansicht=true;
 	}
-
+		
 	$stg = '';
 	if (!$conn = @pg_pconnect(CONN_STRING))
 	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
+	   	
+	$stg_obj = new studiengang($conn);
+	$stg_obj->getAll('typ, kurzbz', false);
+	
+	$stg_arr = array();
+	foreach ($stg_obj->result as $row)
+		$stg_arr[$row->studiengang_kz]=$row->kuerzel;
+	
 	if(!($erg=pg_exec($conn, "SET search_path TO campus;SELECT * FROM vw_benutzer WHERE uid='$uid'")))
 		die(pg_last_error($conn));
 	$num_rows=pg_num_rows($erg);
@@ -135,7 +144,7 @@
 
         	<br>
     		</td>
-    		<td colspan="2">
+    		<td rowspan="2">
       			<?php
       			echo '<P>';
 				if ($stud_num_rows==1)
@@ -176,6 +185,23 @@
 				}
 				if(!$ansicht)
 				{
+					//Funktionen
+					$qry = "SELECT * FROM public.tbl_benutzerfunktion JOIN public.tbl_funktion USING(funktion_kurzbz) WHERE uid='$uid'";
+					if($result_funktion = pg_query($conn, $qry))
+					{
+						if(pg_num_rows($result_funktion)>0)
+						{
+							echo '<br><br><b>Funktionen</b><table><tr class="liste"><th>Funktion</th><th>Studiengang</th><th>Institut</th></tr>';
+
+							while($row_funktion = pg_fetch_object($result_funktion))
+							{
+								echo "<tr class='liste1'><td>$row_funktion->beschreibung</td><td>".$stg_arr[$row_funktion->studiengang_kz]."</td><td>$row_funktion->fachbereich_kurzbz</td></tr>";
+							}
+							echo '</table>';
+						}
+					}
+					
+					//Betriebsmittel
 					$qry = "SELECT tbl_betriebsmittel.betriebsmitteltyp as betriebsmitteltyp, tbl_betriebsmittel.beschreibung as beschreibung, tbl_betriebsmittel.nummer as nummer, tbl_betriebsmittelperson.ausgegebenam as ausgegebenam FROM public.tbl_betriebsmittelperson JOIN public.tbl_betriebsmittel USING(betriebsmittel_id) WHERE person_id=(SELECT person_id FROM public.tbl_benutzer WHERE uid='$uid' LIMIT 1)";
 					if($result_betriebsmittel = pg_query($conn, $qry))
 					{

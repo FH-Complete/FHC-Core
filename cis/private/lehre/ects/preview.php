@@ -72,14 +72,14 @@
 		echo "<li><a class='Item' href=\"#en\">Englische Version</a></li><br>";
 	}
 
-	if(isset($_POST['titel_de'])) //Alle Variablen werden per POST Methode uebergeben (zB bei Voransicht)
+	if(isset($_POST['methodik_de'])) //Alle Variablen werden per POST Methode uebergeben (zB bei Voransicht)
 	{
 		//$sprache = stripslashes($_POST['sprache']);
 		//$semstunden = stripslashes($_POST["semstunden"]);
 		$lehrveranstaltung_id = $_POST['lv'];
 
 		// german content variables
-		$titel_de = str_replace("\r\n","<br>",stripslashes($_POST['titel_de']));
+		//$titel_de = str_replace("\r\n","<br>",stripslashes($_POST['titel_de']));
 		$methodik_de = str_replace("\r\n","<br>",stripslashes($_POST['methodik_de']));
 		$kurzbeschreibung_de = str_replace("\r\n","<br>",stripslashes($_POST['kurzbeschreibung_de']));
 		$lehrziele_de = str_replace("\r\n","<br>",stripslashes($_POST['lehrziele_de']));
@@ -90,7 +90,7 @@
 		$anmerkungen_de = str_replace("\r\n","<br>",stripslashes($_POST['anmerkungen_de']));
 
 		// Englisch content variables
-		$titel_en = str_replace("\r\n","<br>",stripslashes($_POST['titel_en']));
+		//$titel_en = str_replace("\r\n","<br>",stripslashes($_POST['titel_en']));
 		$methodik_en = str_replace("\r\n","<br>",stripslashes($_POST['methodik_en']));
 		$kurzbeschreibung_en = str_replace("\r\n","<br>",stripslashes($_POST['kurzbeschreibung_en']));
 		$lehrziele_en = str_replace("\r\n","<br>",stripslashes($_POST['lehrziele_en']));
@@ -111,7 +111,7 @@
   	  	if($lvinfo_obj->load($lehrveranstaltung_id, ATTR_SPRACHE_DE))
   	  	{
 			// german content variables
-			$titel_de = $lvinfo_obj->titel;
+			//$titel_de = $lvinfo_obj->titel;
 			$methodik_de = $lvinfo_obj->methodik;
 			$kurzbeschreibung_de = $lvinfo_obj->kurzbeschreibung;
 			$lehrziele_de = $lvinfo_obj->lehrziele;
@@ -125,7 +125,7 @@
 		if($lvinfo_obj->load($lehrveranstaltung_id, ATTR_SPRACHE_EN))
 		{
 			// Englisch content variables
-			$titel_en = $lvinfo_obj->titel;
+			//$titel_en = $lvinfo_obj->titel;
 			$methodik_en = $lvinfo_obj->methodik;
 			$kurzbeschreibung_en = $lvinfo_obj->kurzbeschreibung;
 			$lehrziele_en = $lvinfo_obj->lehrziele;
@@ -150,6 +150,8 @@
 	$stg = $lv_obj->studiengang_kz;
 	$sem = $lv_obj->semester;
 	$lang = $lv_obj->sprache;
+	$titel_de = $lv_obj->bezeichnung;
+	$titel_en = $lv_obj->bezeichnung_english;
 
 	//Zugeteilte Fachbereiche auslesen
 	$qry = "SELECT distinct tbl_fachbereich.bezeichnung as bezeichnung, tbl_fachbereich.fachbereich_kurzbz as fachbereich_kurzbz

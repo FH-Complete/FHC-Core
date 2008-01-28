@@ -313,7 +313,14 @@ if ($result_lv!=0)
 		$row=pg_fetch_object($result_lv);
 		echo "<tr>";
 		//ID
-		echo "<td align='right'>$row->lehrveranstaltung_id</td>";
+		echo "<td align='right'>";
+		
+		if($rechte->isBerechtigt('admin'))		
+			echo "<a href='lehrveranstaltung_details.php?lv_id=$row->lehrveranstaltung_id' target='lv_detail'>$row->lehrveranstaltung_id</a>";
+		else		
+			echo "$row->lehrveranstaltung_id";
+		
+		echo "</td>";
 		//Kurzbz
 		echo "<td>$row->kurzbz</td>";
 		//Bezeichnung

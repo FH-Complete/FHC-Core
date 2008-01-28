@@ -177,7 +177,9 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 								</fo:table-cell>
 								<fo:table-cell>
 									<fo:block text-align="right" font-size="10pt">
-									<xsl:value-of select="person/name_gesamt" />\ngeboren am <xsl:value-of select="person/geburtsdatum" />
+									<xsl:if test="buchung/rueckerstattung">
+										<xsl:value-of select="person/name_gesamt" />
+									</xsl:if>
 									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>

@@ -400,7 +400,7 @@ class benutzerberechtigung
 			{
 				if($b->fachbereich_kurzbz!='' && !in_array($b->fachbereich_kurzbz,$fachbereichs_kz))
 					$fachbereichs_kz[] = $b->fachbereich_kurzbz;
-				if($b->fachbereich_kurzbz=='' && ($b->studiengang_kz==0 || $b->studiengang_kz=''))
+				if($b->fachbereich_kurzbz=='' && ($b->studiengang_kz==0 || $b->studiengang_kz==''))
 					$fachbereichs_kz[] = '0';
 			}
 		}

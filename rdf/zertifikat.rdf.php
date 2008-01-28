@@ -33,6 +33,7 @@ require_once('../include/functions.inc.php');
 require_once('../include/zeugnisnote.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/note.class.php');
+require_once('../include/studiensemester.class.php');
 
 // Datenbank Verbindung
 if (!$conn = pg_pconnect(CONN_STRING))
@@ -139,13 +140,17 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	$xml = "<?xml version='1.0' encoding='ISO-8859-15' standalone='yes'?>";
 	$xml .= "<zertifikate>";
 	
+	$studiensemester = new studiensemester($conn);
+	$studiensemester->load($studiensemester_kurzbz);
+		
+		
 	for ($i = 0; $i < sizeof($uid_arr); $i++)
 	{	
 		$anzahl_fussnoten=0;
 		$studiengang_typ='';
 		$xml_fussnote='';
 		
-		$query = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.typ, tbl_studiengang.bezeichnung, tbl_studentlehrverband.semester, tbl_person.vorname, tbl_person.nachname,tbl_person.gebdatum,tbl_person.titelpre, tbl_person.titelpost, tbl_studiensemester.bezeichnung as sembezeichnung FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer, tbl_studentlehrverband, tbl_studiensemester WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_student.student_uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id and tbl_student.student_uid = '".$uid_arr[$i]."' and tbl_studentlehrverband.student_uid=tbl_student.student_uid and tbl_studiensemester.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz and tbl_studentlehrverband.studiensemester_kurzbz = '".$studiensemester_kurzbz."'";
+		$query = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.typ, tbl_studiengang.bezeichnung, tbl_person.vorname, tbl_person.nachname,tbl_person.gebdatum,tbl_person.titelpre, tbl_person.titelpost FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_student.student_uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id and tbl_student.student_uid = '".$uid_arr[$i]."'";
 		//echo $query;
 		if($result = pg_query($conn, $query))
 		{
@@ -160,7 +165,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$stgl_row = pg_fetch_object($stgl_result);
 		else
 			die('Stgl not found');
-			
+		/*
 		$sem_qry = "SELECT bezeichnung FROM public.tbl_lehrverband WHERE studiengang_kz='".$row->studiengang_kz."' AND semester = '".$row->semester."'";
 		if($result_sem = pg_query($conn, $sem_qry))
 		{
@@ -172,13 +177,15 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		
 		if($bezeichnung=='')
 			$bezeichnung = $row->semester.'. Semester';
+		*/
 			
+		
 		$xml .= "\n	<zertifikat>";
-		$xml .= "		<studiensemester>".$row->sembezeichnung."</studiensemester>";
-		$xml .=	"		<semester>".$row->semester."</semester>";
-		$xml .=	"		<semester_bezeichnung>".$bezeichnung."</semester_bezeichnung>";
-		$xml .= "		<studiengang>".$row->bezeichnung."</studiengang>";
-		if($row->typ=='b')
+		$xml .= "		<studiensemester>".$studiensemester->bezeichnung."</studiensemester>";
+		//$xml .=	"		<semester>".$row->semester."</semester>";
+		//$xml .=	"		<semester_bezeichnung>".$bezeichnung."</semester_bezeichnung>";
+		//$xml .= "		<studiengang>".$row->bezeichnung."</studiengang>";
+		/*if($row->typ=='b')
 			$bezeichnung='Bachelor-Studiengang';
 		elseif($row->typ=='m')
 			$bezeichnung='Master-Studiengang';
@@ -187,9 +194,9 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		else 
 			$bezeichnung='Studiengang';
 		$studiengang_typ=$row->typ;
-		
-		$xml .= "		<studiengang_art>".$bezeichnung."</studiengang_art>";
-		$xml .= "		<studiengang_kz>".sprintf('%04s', $row->studiengang_kz)."</studiengang_kz>";
+		*/
+		//$xml .= "		<studiengang_art>".$bezeichnung."</studiengang_art>";
+		//$xml .= "		<studiengang_kz>".sprintf('%04s', $row->studiengang_kz)."</studiengang_kz>";
 		$xml .= "\n		<vorname>".$row->vorname."</vorname>";
 		$xml .= "		<nachname>".$row->nachname."</nachname>";
 		$xml .= "		<name>".trim($row->titelpre.' '.$row->vorname.' '.strtoupper($row->nachname).' '.$row->titelpost)."</name>";
