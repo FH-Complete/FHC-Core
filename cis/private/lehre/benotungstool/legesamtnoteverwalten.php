@@ -334,12 +334,12 @@ echo "
 <table>
 ";
 
-$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id' ORDER BY semester, verband, gruppe, gruppe_kurzbz";
+//$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id' ORDER BY semester, verband, gruppe, gruppe_kurzbz";
 
-if($result_grp = pg_query($conn, $qry))
-{
-	while($row_grp = pg_fetch_object($result_grp))
-	{
+//if($result_grp = pg_query($conn, $qry))
+//{
+//	while($row_grp = pg_fetch_object($result_grp))
+//	{
 		echo "<tr>
 				<td>&nbsp;</td>
 				<td>&nbsp;</td>
@@ -370,13 +370,14 @@ if($result_grp = pg_query($conn, $qry))
 				<td>&nbsp;</td>
 				<td>&nbsp;</td>
 			</tr>";
+/*
 		if($row_grp->gruppe_kurzbz!='')
 		{
 				echo "
 				<tr>
 					<td colspan='8' align='center'><b>$row_grp->gruppe_kurzbz</b></td>
 				</tr>";
-				$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row_grp->gruppe_kurzbz)."' AND studiensemester_kurzbz = '".$stsem."' ORDER BY nachname, vorname";
+				$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row_grp->gruppe_kurzbz)."' AND studiensemester_kurzbz = '".$stsem."' ORDER BY nachname, vorname";
 		}
 		else
 		{
@@ -384,14 +385,15 @@ if($result_grp = pg_query($conn, $qry))
 				<tr>
 					<td colspan='8' align='center'><b>Verband $row_grp->verband ".($row_grp->gruppe!=''?"Gruppe $row_grp->gruppe":'')."</b></td>
 				</tr>";
-				$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student
+				$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung
 				             WHERE studiengang_kz='$row_grp->studiengang_kz' AND
 				             semester='$row_grp->semester' ".
 							 ($row_grp->verband!=''?" AND trim(verband)=trim('$row_grp->verband')":'').
 							 ($row_grp->gruppe!=''?" AND trim(gruppe)=trim('$row_grp->gruppe')":'').
 				            " ORDER BY nachname, vorname";
-		}
-		
+		}*/
+		// studentenquery		
+		$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".$stsem."' and lehreinheit_id = '".$lehreinheit_id."' ORDER BY nachname, vorname";
         if($result_stud = pg_query($conn, $qry_stud))
 		{
 			$i=1;
@@ -446,14 +448,18 @@ if($result_grp = pg_query($conn, $qry))
 					}
 				}
 				echo "<form name='$row_stud->uid' id='$row_stud->uid' method='POST' action='legesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_final' name='note'><input type='button' value='->' onclick='saveLENote(\"$row_stud->uid\")'></td></form>";
+				if ($note == 5)
+					$negmarkier = " style='color:red; font-weight:bold;'";
+				else
+					$negmarkier = "";	
 					
-				echo "<td align='center' id='note_$row_stud->uid'>$note</td>";				
+				echo "<td align='center' id='note_$row_stud->uid'><span".$negmarkier.">$note</span></td>";				
 				echo "</tr>";
 				$i++;
 			}
 		}
-	}
-}
+//	}
+//}
 echo "</table>";
 
 ?>

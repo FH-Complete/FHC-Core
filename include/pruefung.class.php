@@ -320,7 +320,7 @@ class pruefung
 	// * @param student_uid
 	// * @return true wenn ok, false wenn Fehler
 	// *****************************************
-	function getPruefungen($student_uid)
+	function getPruefungen($student_uid, $pruefungstyp=null,$lv_id=null)
 	{
 		$qry = "SELECT tbl_pruefung.*, tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
 				tbl_note.bezeichnung as note_bezeichnung, tbl_pruefungstyp.beschreibung as typ_beschreibung, tbl_lehreinheit.studiensemester_kurzbz as studiensemester_kurzbz
@@ -329,8 +329,63 @@ class pruefung
 				AND tbl_pruefung.lehreinheit_id=tbl_lehreinheit.lehreinheit_id
 				AND tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
 				AND tbl_pruefung.note = tbl_note.note
-				AND tbl_pruefung.pruefungstyp_kurzbz=tbl_pruefungstyp.pruefungstyp_kurzbz
-				ORDER BY datum DESC";
+				AND tbl_pruefung.pruefungstyp_kurzbz=tbl_pruefungstyp.pruefungstyp_kurzbz";
+		if ($pruefungstyp != null)
+			$qry .= " AND tbl_pruefungstyp.pruefungstyp_kurzbz = '".$pruefungstyp."'";
+		if ($lv_id != null)
+			$qry .= " AND tbl_lehrveranstaltung.lehrveranstaltung_id = '".$lv_id."'";
+			
+		$qry .= " ORDER BY datum DESC";
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$obj = new pruefung($this->conn, null, null);
+
+				$obj->pruefung_id = $row->pruefung_id;
+				$obj->lehreinheit_id = $row->lehreinheit_id;
+				$obj->student_uid = $row->student_uid;
+				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$obj->note = $row->note;
+				$obj->note_bezeichnung = $row->note_bezeichnung;
+				$obj->pruefungstyp_kurzbz = $row->pruefungstyp_kurzbz;
+				$obj->pruefungstyp_beschreibung = $row->typ_beschreibung;
+				$obj->datum = $row->datum;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->lehrveranstaltung_bezeichnung = $row->lehrveranstaltung_bezeichnung;
+				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	function getPruefungenLV($lv_id, $pruefungstyp=null)
+	{
+		$qry = "SELECT tbl_pruefung.*, tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
+				tbl_note.bezeichnung as note_bezeichnung, tbl_pruefungstyp.beschreibung as typ_beschreibung, tbl_lehreinheit.studiensemester_kurzbz as studiensemester_kurzbz
+				FROM lehre.tbl_pruefung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_note, lehre.tbl_pruefungstyp
+				WHERE tbl_pruefung.lehreinheit_id=tbl_lehreinheit.lehreinheit_id
+				AND tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
+				AND tbl_pruefung.note = tbl_note.note
+				AND tbl_pruefung.pruefungstyp_kurzbz=tbl_pruefungstyp.pruefungstyp_kurzbz";
+		if ($pruefungstyp != null)
+			$qry .= " AND tbl_pruefungstyp.pruefungstyp_kurzbz = '".$pruefungstyp."'";
+		if ($lv_id != null)
+			$qry .= " AND tbl_lehrveranstaltung.lehrveranstaltung_id = '".$lv_id."'";
+			
+		$qry .= " ORDER BY datum DESC";
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
