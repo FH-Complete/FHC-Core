@@ -105,9 +105,12 @@ if(!$error)
 			$mitarbeiter->ort_kurzbz = $_POST['ort_kurzbz'];
 			$mitarbeiter->standort_kurzbz = $_POST['standort_kurzbz'];
 			$mitarbeiter->alias = $_POST['alias'];
+			$mitarbeiter->updateamum = date('Y-m-d H:i:s');
+			$mitarbeiter->updatevon = $user;
 			
 			if($mitarbeiter->save())
 			{
+				/* 29.01.2007 - Benachrichtigungen werden ueber extra Script versendet
 				if($aktiv_alt==true && $_POST['aktiv']=='false')
 				{
 					$message = "Dies ist eine automatische Mail!\n";
@@ -129,6 +132,7 @@ if(!$error)
 					//$to = $_POST['uid'].'@'.DOMAIN;
 					mail($to,'Ihr Datensatz wurde deaktiviert! '.$_POST['uid'], $message, 'From: vilesci@'.DOMAIN);
 				}
+				*/
 				$return = true;
 			}
 			else 

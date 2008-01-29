@@ -180,11 +180,25 @@ class benutzer extends person
 		}
 		else
 		{			
+			//Wenn der Aktiv Status geaendert wurde, dann auch updateaktivamum und updateaktivvon setzen
+			$upd='';
+			$qry = "SELECT aktiv FROM public.tbl_benutzer WHERE uid='".addslashes($this->uid)."'";
+			if($result = pg_query($this->conn, $qry))
+			{
+				if($row = pg_fetch_object($result))
+				{
+					$aktiv = ($row->aktiv=='t'?true:false);
+					
+					if($aktiv!=$this->bnaktiv)
+						$upd =" updateaktivamum='".$this->updateamum."', updateaktivvon='".$this->updatevon."',";
+				}
+			}
+					
 			$qry = 'UPDATE public.tbl_benutzer SET'.
 			       ' aktiv='.($this->bnaktiv?'true':'false').','.
 			       ' alias='.$this->addslashes($this->alias).','.
 			       " person_id='".$this->person_id."',".
-			       ' updateamum='.$this->addslashes($this->updateamum).','.
+			       ' updateamum='.$this->addslashes($this->updateamum).','.$upd.
 			       ' updatevon='.$this->addslashes($this->updatevon).
 			       " WHERE uid='".addslashes($this->uid)."';";
 		}

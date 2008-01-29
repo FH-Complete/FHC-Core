@@ -103,7 +103,7 @@ if(!$result = pg_query($conn, $qry))
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
 	
-if(!(pg_num_rows($result)>0 || $rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lehreinheit_obj->studiengang_kz)))
+if(!(pg_num_rows($result)>0 || $rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lehreinheit_obj->studiengang_kz) || $rechte->isBerechtigt('lehre',$lehreinheit_obj->studiengang_kz)))
 	die('Sie haben keine Berechtigung f&uuml;r diesen Bereich');
 	
 if(isset($_GET['output']) && $_GET['output']=='xls')
@@ -763,7 +763,8 @@ function addUser(student_uid)
 					echo "<td align='center'><input type='checkbox' name='update_".$row_stud->uid."_".$row_bsp->beispiel_id."' onClick=\"addUser('$row_stud->uid');\" ".($studentbeispiel_obj->vorbereitet?'checked':'').">".($studentbeispiel_obj->probleme?'<i><small>P</small></i>':'')."</td>\n";
 				}
 			}
-			echo "<td>&nbsp;</td>";
+			echo "<td>&nbsp;</td>";
+
 			if ($filename != "")			
 				echo "<td><a href='anwesenheitsliste.php?uid=$row_stud->uid&output=html&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id&stsem=$stsem&download_abgabe=$filename'>Abgabe</a></td>\n";
 			else if ($uebung_obj->abgabe)

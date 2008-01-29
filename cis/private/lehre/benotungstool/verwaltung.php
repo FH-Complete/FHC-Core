@@ -177,7 +177,7 @@ foreach($stsem_obj->studiensemester as $studiensemester)
 $stsem_content.= "</SELECT>\n";
 
 //Lehreinheiten laden
-if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lv_obj->studiengang_kz))
+if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lv_obj->studiengang_kz) || $rechte->isBerechtigt('lehre',$lv_obj->studiengang_kz))
 {
 	$qry = "SELECT distinct tbl_lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehreinheitmitarbeiter
 			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND
@@ -266,7 +266,8 @@ else
 echo $stsem_content;
 echo '</td><tr></table>';
 
-echo '<table width="100%"><tr>';echo '<td class="tdwidth10">&nbsp;</td>';
+echo '<table width="100%"><tr>';
+echo '<td class="tdwidth10">&nbsp;</td>';
 echo "<td>\n";
 
 echo "<b>$lv_obj->bezeichnung</b><br>";
@@ -650,7 +651,8 @@ if(isset($_GET['kopieren']) && $_GET['kopieren']=='true')
 				{
 					if(pg_num_rows($row_berechtigt)>0 ||
 					   $rechte->isBerechtigt('admin',0) ||
-					   $rechte->isBerechtigt('admin',$lv_obj->studiengang_kz))
+					   $rechte->isBerechtigt('admin',$lv_obj->studiengang_kz)
+					    || $rechte->isBerechtigt('lehre',$lv_obj->studiengang_kz))
 					{
 						//Schauen ob bereits eine uebung mit diesem Namen vorhanden ist
 						$qry = "SELECT * FROM campus.tbl_uebung WHERE lehreinheit_id='".$_POST['lehreinheit_copy_id']."' AND bezeichnung='".addslashes($row_source->bezeichnung)."'";
