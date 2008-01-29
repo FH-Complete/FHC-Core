@@ -34,6 +34,7 @@ require_once('../include/datum.class.php');
 require_once('../include/person.class.php');
 require_once('../include/benutzer.class.php');
 require_once('../include/studiengang.class.php');
+require_once('../include/lehrveranstaltung.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
@@ -86,6 +87,9 @@ $benutzer = new benutzer($conn, null, null);
 foreach ($obj->result as $row)	
 {
 	$benutzer->load($row->student_uid);
+	$lv_obj = new lehrveranstaltung($conn);
+	$lv_obj->load($row->lehrveranstaltung_id);
+	
 	echo '
 		  <RDF:li>
 	         <RDF:Description  id="'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'"  about="'.$rdf_url.'/'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'" >
@@ -99,6 +103,8 @@ foreach ($obj->result as $row)
 				<NOTE:benotungsdatum><![CDATA['.$datum->convertISODate($row->benotungsdatum).']]></NOTE:benotungsdatum>
 				<NOTE:note_bezeichnung><![CDATA['.$row->note_bezeichnung.']]></NOTE:note_bezeichnung>
 				<NOTE:lehrveranstaltung_bezeichnung><![CDATA['.$row->lehrveranstaltung_bezeichnung.']]></NOTE:lehrveranstaltung_bezeichnung>
+				<NOTE:lehrveranstaltung_lehrform><![CDATA['.$lv_obj->lehrform_kurzbz.']]></NOTE:lehrveranstaltung_lehrform>
+				<NOTE:lehrveranstaltung_kurzbz><![CDATA['.$lv_obj->kurzbz.']]></NOTE:lehrveranstaltung_kurzbz>
 				<NOTE:student_nachname><![CDATA['.$benutzer->nachname.']]></NOTE:student_nachname>
 				<NOTE:student_vorname><![CDATA['.$benutzer->vorname.']]></NOTE:student_vorname>
 				<NOTE:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></NOTE:studiengang>
