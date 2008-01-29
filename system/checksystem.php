@@ -163,15 +163,15 @@ if (!@pg_query($conn,'SELECT urlaubstageprojahr FROM campus.tbl_resturlaub LIMIT
 		echo 'urlaubstageprojahr wurde bei campus.tbl_resturlaub hinzugefuegt!<BR>';
 }
 
-// ************** public.tbl_benutzer.updateaktivamum,updateaktivvon ************************
-if (!@pg_query($conn,'SELECT updateaktivamum,updateaktivvon FROM public.tbl_benutzer LIMIT 1;'))
+// ************** public.tbl_benutzer.updateaktivam,updateaktivvon ************************
+if (!@pg_query($conn,'SELECT updateaktivam,updateaktivvon FROM public.tbl_benutzer LIMIT 1;'))
 {
-	$sql='	ALTER TABLE public.tbl_benutzer ADD COLUMN updateaktivamum Timestamp;
+	$sql='	ALTER TABLE public.tbl_benutzer ADD COLUMN updateaktivam Date;
 			ALTER TABLE public.tbl_benutzer ADD COLUMN updateaktivvon Varchar(16);';
 	if (!@pg_query($conn,$sql))
 		echo '<strong>public.tbl_benutzer: '.pg_last_error($conn).' </strong><BR>';
 	else
-		echo 'updateaktivamum und updateaktivvon wurden bei public.tbl_benutzer hinzugefuegt!<BR>';
+		echo 'updateaktivam und updateaktivvon wurden bei public.tbl_benutzer hinzugefuegt!<BR>';
 }
 
 // ************** lehre.tbl_lehrveranstaltung.lehrform_kurzbz ************************
