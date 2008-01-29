@@ -163,7 +163,7 @@ if(!$result = pg_query($conn, $qry))
 		}
 
 		if($fbk!='')
-			$fbk='FBK: '.$fbk;
+			$fbk='Koordinator: '.$fbk;
 
 		//Lehrveranstaltung
 		echo "

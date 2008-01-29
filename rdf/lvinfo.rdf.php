@@ -64,6 +64,7 @@ tbl_lehrveranstaltung.lehrveranstaltung_id as lv_lehrveranstaltung_id,
 tbl_lehrveranstaltung.kurzbz as lv_kurzbz,
 tbl_lehrveranstaltung.lehreverzeichnis as lv_lehrevz,
 tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung,
+tbl_lehrveranstaltung.bezeichnung_english as lv_bezeichnung_english,
 tbl_lehrveranstaltung.studiengang_kz as lv_studiengang_kz,
 tbl_lehrveranstaltung.semester as lv_semester,
 tbl_lehrveranstaltung.sprache as unterrichtssprache,
@@ -101,7 +102,7 @@ if($result = pg_query($conn, $qry))
 			<LVINFO:ects><![CDATA[<?php echo $row->ects; ?>]]></LVINFO:ects>
 			<LVINFO:semesterstunden><![CDATA[<?php echo $row->lv_semesterstunden; ?>]]></LVINFO:semesterstunden>
 			<LVINFO:sprache><![CDATA[<?php echo $row->sprache; ?>]]></LVINFO:sprache>
-			<LVINFO:titel><![CDATA[<?php echo $row->titel; ?>]]></LVINFO:titel>
+			<LVINFO:titel><![CDATA[<?php echo ($row->sprache=='German'?$row->lv_bezeichnung:$row->lv_bezeichnung_english); ?>]]></LVINFO:titel>
 			<LVINFO:lehrziele><![CDATA[<?php echo $row->lehrziele; ?>]]></LVINFO:lehrziele>
 			<LVINFO:lehrinhalte><![CDATA[<?php echo $row->lehrinhalte; ?>]]></LVINFO:lehrinhalte>
 			<LVINFO:methodik><![CDATA[<?php echo $row->methodik; ?>]]></LVINFO:methodik>

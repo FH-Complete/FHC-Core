@@ -342,6 +342,11 @@ if($rechte->isBerechtigt('admin',0))
 	}
 }
 
+if($rechte->isBerechtigt('admin'))
+	$where = ' AND aktiv=true';
+else 
+	$where = '';
+
 $sql_query="SELECT 
 				tbl_lehrfach.lehrfach_id AS Nummer, tbl_lehrfach.kurzbz AS Fach, tbl_lehrfach.bezeichnung AS Bezeichnung,
 				tbl_lehrfach.farbe AS Farbe, fachbereich_kurzbz as fachbereich,	tbl_lehrfach.aktiv, tbl_lehrfach.sprache AS Sprache,
@@ -352,6 +357,7 @@ $sql_query="SELECT
 			".($stg_kz!=''?"AND tbl_lehrfach.studiengang_kz='$stg_kz'":'')."
 			".($semester!=''?"AND semester='$semester'":'')."
 			".($fachbereich_kurzbz!=''?"AND fachbereich_kurzbz = '$fachbereich_kurzbz'":'')."
+			$where
 			ORDER BY tbl_lehrfach.kurzbz";
 
 //echo $sql_query;
