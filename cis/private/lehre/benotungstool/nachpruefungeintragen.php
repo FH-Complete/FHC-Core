@@ -136,16 +136,22 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  ){
 			{
 				$lvnote = new lvgesamtnote($conn);
 				if ($lvnote->load($lvid, $student_uid, $stsem))
+				{
 					$pr_note = $lvnote->note;
+					$benotungsdatum = $lvnote->benotungsdatum;
+				}
 				else
+				{
 					$pr_note = 9;
+					$benotungsdatum = $jetzt;
+				}
 				$pr_1 = new Pruefung($conn);
 				$pr_1->lehreinheit_id = $lehreinheit_id;
 				$pr_1->student_uid = $student_uid;
 				$pr_1->mitarbeiter_uid = $user;
 				$pr_1->note = $pr_note;
 				$pr_1->pruefungstyp_kurzbz = "Termin1";
-				$pr_1->datum = $datum;
+				$pr_1->datum = $benotungsdatum;
 				$pr_1->anmerkung = "";
 				$pr_1->insertamum = $jetzt;
 				$pr_1->insertvon = $user;
