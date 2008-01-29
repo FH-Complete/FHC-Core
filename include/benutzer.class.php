@@ -190,7 +190,7 @@ class benutzer extends person
 					$aktiv = ($row->aktiv=='t'?true:false);
 					
 					if($aktiv!=$this->bnaktiv)
-						$upd =" updateaktivamum='".$this->updateamum."', updateaktivvon='".$this->updatevon."',";
+						$upd =" updateaktivam='".$this->updateamum."', updateaktivvon='".$this->updatevon."',";
 				}
 			}
 					
