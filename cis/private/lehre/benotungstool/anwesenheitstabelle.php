@@ -367,10 +367,11 @@ $uebung_obj->load($uebung_id);
 echo "<h3><u>$uebung_obj->bezeichnung</u></h3>";
 
 echo '<table width="100%"><tr><td>';
-echo "<ul><li><a href='anwesenheitsliste.php?output=html&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id&stsem=$stsem' target='_blank'>Alle Studierende</a>&nbsp;";
+echo "<ul><li><a href='anwesenheitsliste.php?output=html&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id&stsem=$stsem' target='_blank'>Alle Studierenden</a>&nbsp;";
 if ($show_excel_link)
-	echo "<a href='anwesenheitsliste.php?output=xls&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id'><img src='../../../../skin/images/excel.gif' width=16 height=16></a></li>";
-
+	echo "<a href='anwesenheitsliste.php?output=xls&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id'><img src='../../../../skin/images/excel.gif' width=16 height=16></a>";
+echo "</li>";
+/*
 $qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id' ORDER BY semester, verband, gruppe, gruppe_kurzbz";
 if($result = pg_query($conn, $qry))
 {
@@ -387,6 +388,7 @@ if($result = pg_query($conn, $qry))
 			echo "</a>&nbsp;<a href='anwesenheitsliste.php?output=xls&uebung_id=$uebung_id&gruppe=$row->lehreinheitgruppe_id'><img src='../../../../skin/images/excel.gif' width=16 height=16></a></li>";
 	}
 }
+*/
 echo '</ul>';
 
 echo "</td><!--<td valign='top'>

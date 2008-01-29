@@ -34,7 +34,7 @@ require_once('../../../../include/datum.class.php');
 require_once('../../../../include/legesamtnote.class.php');
 require_once('../../../../include/lvgesamtnote.class.php');
 require_once('../../../../include/zeugnisnote.class.php');
-
+require_once('../../../../include/pruefung.class.php');
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -43,6 +43,19 @@ require_once('../../../../include/zeugnisnote.class.php');
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="../../../../skin/cis.css" rel="stylesheet" type="text/css">
 <title>Kreuzerltool</title>
+<STYLE TYPE="text/css">
+
+.td_datum 
+{
+	width:70px;
+	text-align: left;
+}
+.td_note{
+	width:50px;
+	text-align:center;
+}
+
+</STYLE>
 <script language="JavaScript">
 <!--
 	function MM_jumpMenu(targ, selObj, restore)
@@ -59,6 +72,27 @@ require_once('../../../../include/zeugnisnote.class.php');
 		return confirm('Wollen Sie die markierten Einträge wirklich löschen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
 	}
   //-->
+function getTopOffset(){  
+		  var x,y;
+		if (self.pageYOffset) // all except Explorer
+		{
+			x = self.pageXOffset;
+			y = self.pageYOffset;
+		}
+		else if (document.documentElement && document.documentElement.scrollTop)
+			// Explorer 6 Strict
+		{
+			x = document.documentElement.scrollLeft;
+			y = document.documentElement.scrollTop;
+		}
+		else if (document.body) // all other Explorers
+		{
+			x = document.body.scrollLeft;
+			y = document.body.scrollTop;
+		}
+		return y;
+ }
+  
   
     var anfrage = null;
 
@@ -129,9 +163,131 @@ require_once('../../../../include/zeugnisnote.class.php');
 	        } else alert("Request status:" + anfrage.status);
 	    }
 	}
+	
+	function pruefungAnlegen(uid,datum,note,lehreinheit_id)
+	{
+	
+		var str = "<form name='nachpruefung_form'><center><table style='width:95%'><tr><td colspan='2' align='right'><a href='#' onclick='closeDiv();'>X</a></td></tr>";
+		
+		var anlegendiv = document.getElementById("nachpruefung_div");
+		var y = getTopOffset();
+		y = y+50;		
+		anlegendiv.style.top = y+"px";
+		//var anlegendiv = document.getElementById("span_"+uid);
 
-  
+		str += "<tr><td colspan='2'><b>Prüfung für "+uid+" anlegen:</b></td></tr>";
+		//if (lehreinheit_id != "")		
+		//	str += "<tr><td>Lehreinheit:</td><td>"+lehreinheit_id+"</td></tr>";
+		str += "<tr><td>Datum:</td>";
+		str += "<td><input type='hidden' name='uid' value='"+uid+"'><input type='hidden' name='le_id' value='"+lehreinheit_id+"'><input type='text' name='datum' value='"+datum+"'> [YYYY-MM-DD]</td>";
+		str += "</tr><tr><td>Note:</td>";
+		str += "<td><input type='text' name='note' value='"+note+"'></td>";
+		str += "</tr><tr><td colspan='2' align='center'><input type='button' name='speichern' value='speichern' onclick='pruefungSpeichern();'></td></tr>";
+		//str += "</table></center></form>";
+		str += "</table></cehter></form>";		
+		//str = "foo";
+		anlegendiv.innerHTML = str;	
+		anlegendiv.style.visibility = "visible";	
+	}
+	
+	function pruefungSpeichern()
+	{
+		var note = document.nachpruefung_form.note.value;
+		if ((note < 0) || (note > 5 && note != 8 && note != 7 && note != 9 && note != ""))
+		{
+			alert("Bitte geben Sie eine Note von 1 - 5 bzw. 7 (nicht beurteilt), 8 (teilgenommen), 9 (noch nicht eingetragen) ein oder lassen Sie das Feld leer!");
+			document.getElementById(uid).note.value="";
+		}		
+		var datum = 	document.nachpruefung_form.datum.value;		
+		var datum_test = datum.split("-");
+		if (datum_test[0].length != 4 || datum_test[1].length!=2 || datum_test[2].length!=2 || isNaN(datum_test[0]) || datum_test[1]>12 || datum_test[2]>31)
+			alert("Invalid Date. Format: YYYY-MM-DD");
+		else
+		{
+			var anlegendiv = document.getElementById("nachpruefung_div");			
+			
+			var note = document.nachpruefung_form.note.value;
+			if (note == "" || isNaN(note))
+			{
+					document.nachpruefung_form.note.value = "9";
+					note = "9";
+			}		
+			var uid = document.nachpruefung_form.uid.value;
+			var lehreinheit_id = document.nachpruefung_form.le_id.value;
+			
+			erzeugeAnfrage(); 
+		    var jetzt = new Date();
+			var ts = jetzt.getTime();
+		    var url= '<?php echo "nachpruefungeintragen.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem"; ?>';
+		    url += '&submit=1&student_uid='+uid+'&note='+note+'&datum='+datum+'&lehreinheit_id_pr='+lehreinheit_id+'&'+ts;
+		    //alert(url);
+		    anfrage.open("GET", url, true);
+		    anfrage.onreadystatechange = updateSeitePruefung;
+		    anfrage.send(null);
+	    }
+		
+	}
+
+    function updateSeitePruefung(){
+	    if (anfrage.readyState == 4){
+	        if (anfrage.status == 200) {
+	        	var anlegendiv = document.getElementById("nachpruefung_div");	
+				var datum = 	document.nachpruefung_form.datum.value;
+				var note = document.nachpruefung_form.note.value;
+				var uid = document.nachpruefung_form.uid.value;
+				var lehreinheit_id = document.nachpruefung_form.le_id.value;
+				//var note = document.getElementById(uid).note.value;
+	            var resp = anfrage.responseText;
+	            
+	            if (resp == "neu" || resp == "update" || resp == "update_f" || resp == "update_pr")
+	            {
+		     	
+	            	if (resp != "update_pr")
+	            	{
+		                notentd = document.getElementById("note_"+uid);	            	
+		            	while (notentd.childNodes.length>0)
+		            	{
+							notentd.removeChild(notentd.lastChild);
+		            	}
+		            	notenode = document.createTextNode(note);
+	                    notentd.appendChild(notenode);
+					}					
+					notenstatus = document.getElementById("status_"+uid);
+					if (resp == "update_f")
+                    	notenstatus.innerHTML = "<img src='../../../../skin/images/changed.png'>";
+                    document.getElementById("lvnoteneingabe_"+uid).style.visibility = "hidden";
+                    
+   			 		anlegendiv.innerHTML = "";
+					anlegendiv.style.visibility = "hidden";
+					//if (note == 9)
+					//	note = " ";
+					document.getElementById("span_"+uid).innerHTML = "<table><tr><td class='td_datum'>"+datum+"</td><td class='td_note'>"+note+"<td><input type='button' name='anlegen' value='ändern' onclick='pruefungAnlegen(\""+uid+"\",\""+datum+"\",\""+note+"\",\""+lehreinheit_id+"\")'></td></tr></table>"
+                 }
+                 else
+             		{
+                 		alert(resp);
+                 		document.getElementById(uid).note.value="";
+             		}
+	        } else alert("Request status:" + anfrage.status);
+	    }
+	}
+
+ 	function closeDiv()
+ 	{
+ 		var anlegendiv = document.getElementById("nachpruefung_div");
+ 		anlegendiv.innerHTML = "";
+ 		anlegendiv.style.visibility = "hidden";
+ 	}
+ 
+ 
 </script>
+<style type="text/css">
+.transparent {
+    filter:alpha(opacity=90);
+    -moz-opacity:0.9;
+    -khtml-opacity: 0.9;
+    opacity: 0.9;
+</style>        
 </head>
 
 <body>
@@ -335,13 +491,14 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 	$jetzt = date("Y-m-d H:i:s");
 	$neuenoten = 0;
 	$studlist = "<table border='1'><tr><td><b>Mat. Nr.</b></td><td><b>Nachname</b></td><td><b>Vorname</b></td><td><b>Note</b></td></tr>";
-	$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id' ORDER BY semester, verband, gruppe, gruppe_kurzbz";
+
+//	$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id' ORDER BY semester, verband, gruppe, gruppe_kurzbz";
 	
-	if($result_grp = pg_query($conn, $qry))
-	{
-		while($row_grp = pg_fetch_object($result_grp))
-		{
-			
+//	if($result_grp = pg_query($conn, $qry))
+//	{
+//		while($row_grp = pg_fetch_object($result_grp))
+//		{
+/*		
 			if($row_grp->gruppe_kurzbz!='')
 			{
 					$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row_grp->gruppe_kurzbz)."' AND studiensemester_kurzbz = '".$stsem."' ORDER BY nachname, vorname";
@@ -355,7 +512,9 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 								 ($row_grp->gruppe!=''?" AND trim(gruppe)=trim('$row_grp->gruppe')":'').
 					            " ORDER BY nachname, vorname";
 			}
-			
+*/
+			// studentenquery					
+			$qry_stud = "SELECT DISTINCT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".$stsem."' and lehrveranstaltung_id = '".$lvid."' ORDER BY nachname, vorname ";
 	        if($result_stud = pg_query($conn, $qry_stud))
 			{
 				$i=1;
@@ -376,8 +535,8 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 	    			}
 				}	
 			}
-		}
-	}
+//		}
+//	}
 	$studlist .= "</table>";
 	//mail an assistentin und den user selber verschicken	
 	if ($neuenoten > 0)
@@ -398,19 +557,39 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 echo "<h3>LV Gesamtnote verwalten</h3>";
 echo "Noten: 1-5, 7 (nicht beurteilt), 8 (teilgenommen)";
 
+// alle pruefungen für die LV holen
+$studpruef_arr = array();
+$pr_all = new Pruefung($conn);
+if ($pr_all->getPruefungenLV($lvid,"Termin2"))
+{
+	if ($pr_all->result)
+	{
+		foreach ($pr_all->result as $pruefung)
+		{		
+			$studpruef_arr[$pruefung->student_uid][$pruefung->lehreinheit_id]["note"] = $pruefung->note;
+			$studpruef_arr[$pruefung->student_uid][$pruefung->lehreinheit_id]["datum"] = $pruefung->datum;
+			//echo print_r($studpruef_arr[$pruefung->student_uid]);
+		}	
+	}
+}
+
+
+
+
+
 //Studentenliste
 echo "
 <table>
 ";
 
-$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id' ORDER BY semester, verband, gruppe, gruppe_kurzbz";
+//$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id' ORDER BY semester, verband, gruppe, gruppe_kurzbz";
 
-if($result_grp = pg_query($conn, $qry))
-{
-	while($row_grp = pg_fetch_object($result_grp))
-	{
+//if($result_grp = pg_query($conn, $qry))
+//{
+//	while($row_grp = pg_fetch_object($result_grp))
+//	{
 		echo "<tr>
-				<td colspan='9'>&nbsp;</td>
+				<td colspan='11'>&nbsp;</td>
 			</tr>
 			<tr>
 				<td class='ContentHeader2'></td>
@@ -421,19 +600,24 @@ if($result_grp = pg_query($conn, $qry))
 				<td class='ContentHeader2'></td>
 				<td class='ContentHeader2'>LV-Note</td>
 				<form name='freigabeform' action='lvgesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem' method='POST'><input type='hidden' name='freigabe' value='1'>
-				<td class='ContentHeader2'><input type='submit' name='frei' value='Freigabe'></a></td>
+				<td class='ContentHeader2'><input type='submit' name='frei' value='Freigabe'></td>
 				</form>
 				<td class='ContentHeader2'>Zeugnisnote</td>
+				<td class='ContentHeader2' colspan='2'>Nachprüfung</td>
 			</tr>
 			<tr>
 				<td colspan='9'>&nbsp;</td>
-
+				<td coslspan='2'><table><tr><td class='td_datum'>Datum</td><td class='td_note'>Note</td></td></td></tr></table></td>
+			</tr>
+			<tr>
+				<td colspan='11'>&nbsp;</td>
 			</tr>";
+/*
 		if($row_grp->gruppe_kurzbz!='')
 		{
 				echo "
 				<tr>
-					<td colspan='9' align='center'><b>$row_grp->gruppe_kurzbz</b></td>
+					<td colspan='11' align='center'><b>$row_grp->gruppe_kurzbz</b></td>
 				</tr>";
 				$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row_grp->gruppe_kurzbz)."' AND studiensemester_kurzbz = '".$stsem."' ORDER BY nachname, vorname";
 		}
@@ -441,7 +625,7 @@ if($result_grp = pg_query($conn, $qry))
 		{
 			echo "
 				<tr>
-					<td colspan='9' align='center'><b>Verband $row_grp->verband ".($row_grp->gruppe!=''?"Gruppe $row_grp->gruppe":'')."</b></td>
+					<td colspan='11' align='center'><b>Verband $row_grp->verband ".($row_grp->gruppe!=''?"Gruppe $row_grp->gruppe":'')."</b></td>
 				</tr>";
 				$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student
 				             WHERE studiengang_kz='$row_grp->studiengang_kz' AND
@@ -450,7 +634,9 @@ if($result_grp = pg_query($conn, $qry))
 							 ($row_grp->gruppe!=''?" AND trim(gruppe)=trim('$row_grp->gruppe')":'').
 				            " ORDER BY nachname, vorname";
 		}
-		
+*/
+		// studentenquery					
+		$qry_stud = "SELECT DISTINCT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".$stsem."' and lehrveranstaltung_id = '".$lvid."' ORDER BY nachname, vorname ";	
         if($result_stud = pg_query($conn, $qry_stud))
 		{
 			$i=1;
@@ -508,7 +694,11 @@ if($result_grp = pg_query($conn, $qry))
 	    			{
 	    				$note_le += $legesamtnote->note;
 	    				$le_anz += 1;
-	    				$note_les_str .= $legesamtnote->note." (".$l->lehreinheit_id.") ";
+	    				if ($legesamtnote->note == 5)
+	    					$leneg = " style='color:red; font-weight:bold'";
+	    				else
+	    					$leneg = "";
+	    				$note_les_str .= "<span".$leneg.">".$legesamtnote->note."</span> (".$l->lehreinheit_id.") ";
 	    			}
 	    		}
 	    			
@@ -532,11 +722,20 @@ if($result_grp = pg_query($conn, $qry))
 								
 				
 				echo "<td>$note_les_str</td>";
-				echo "<form name='$row_stud->uid' id='$row_stud->uid' method='POST' action='lvgesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_vorschlag' name='note'><input type='button' value='->' onclick='saveLVNote(\"$row_stud->uid\")'></td></form>";
-					
-				echo "<td align='center' id='note_$row_stud->uid'>$note_lv</td>";
+				if (key_exists($row_stud->uid,$studpruef_arr))	
+					$hide = "style='visibility:hidden;'";
+				else
+					$hide = "style='visibility:visible;'";				
+				echo "<form name='$row_stud->uid' id='$row_stud->uid' method='POST' action='lvgesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td><span id='lvnoteneingabe_".$row_stud->uid."' ".$hide."><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_vorschlag' name='note'><input type='button' value='->' onclick='saveLVNote(\"$row_stud->uid\")'></span></td></form>";
+
+				if ($note_lv == 5)
+					$negmarkier = " style='color:red; font-weight:bold;'";
+				else
+					$negmarkier = "";			
 				
-				//status
+				echo "<td align='center' id='note_$row_stud->uid'><span".$negmarkier.">$note_lv</span></td>";
+				
+				//status //////////////////////////////////////////////////////////////////////////////////
 				echo "<td align='center' id='status_$row_stud->uid'>";				
 				if (!$lvgesamtnote->freigabedatum)
 					echo "<img src='../../../../skin/images/offen.png'>";				
@@ -551,16 +750,64 @@ if($result_grp = pg_query($conn, $qry))
 				else
 					$stylestr ="";
 				echo "<td".$stylestr." align='center'>".$znote."</td>";
+				
+				// prüfungen ///////////////////////////////////////////////////////////////////////////
+				//$pr = new pruefung($conn);
+				//$pr->getPruefungen($row_stud->uid, "Termin2", null);
+				//if (count($pr->result)>0)
+				if (key_exists($row_stud->uid,$studpruef_arr))			
+				{
+
+					//$pr_datum = $pr->result[0]->datum;
+					//$pr_note = $pr->result[0]->note;
+					//$pr_le_id = $pr->result[0]->lehreinheit_id;
+					
+					//echo "<td>".$pr_datum."</td>";
+					//echo "<form name='nachpruefung_".$row_stud->uid."'>";
+					echo "<td colspan='2'>";
+					echo "<span id='span_".$row_stud->uid."'>";
+					echo "<table>";
+					$le_id_arr = array();					
+					$le_id_arr = array_keys($studpruef_arr[$row_stud->uid]);
+					foreach ($le_id_arr as $le_id_stud)
+					{					
+						$pr_note = $studpruef_arr[$row_stud->uid][$le_id_stud]["note"];
+						$pr_datum = $studpruef_arr[$row_stud->uid][$le_id_stud]["datum"];
+						$pr_le_id = $le_id_stud;
+						
+						echo "<tr><td class='td_datum'>";
+						echo $pr_datum."</td><td class='td_note'>".$pr_note."</td><td>";
+						echo "<input type='button' name='anlegen' value='ändern' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"".$pr_datum."\",\"".$pr_note."\",\"".$pr_le_id."\")'>";					
+						echo "</td></tr>";
+					}
+					echo "</table>";			
+					echo "</span>";
+					//echo "<div id='nachpruefung_div_".$row_stud->uid."' style='position:relative; top:0px; left 5px; background-color:#cccccc; visibility:collapse;' class='transparent'></div>";
+					echo "</td>";
+					//echo "</form>";
+				}
+				else
+				{
+					if ($note_lv)				
+						echo "<td colspan='2'><span id='span_".$row_stud->uid."'><input type='button' name='anlegen' value='anlegen' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"\",\"\",\"\")'></span></td>";
+					else
+						echo "<td colspan='2'></td>";	
+				}
+				
+				
 				echo "</tr>";
 				$i++;
 			}
 		}
-	}
-}
+//	}
+//}
 echo "</table>";
 
 ?>
 </td></tr>
 </table>
+
+<div id="nachpruefung_div" style="position:absolute; top:100px; left:200px; width:400px; height:150px; background-color:#cccccc; visibility:hidden; border-style:solid; border-width:1px; border-color:#333333;" class="transparent"></div>
+
 </body>
 </html>

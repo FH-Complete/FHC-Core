@@ -669,6 +669,9 @@ function addUser(student_uid)
 			$lehreinheit_id = $_GET['lehreinheit_id'];
 			$gruppe_bez = 'Alle Studienrende';
 			//Alle Studenten die dieser lehreinheit zugeordnet sind
+			// studentenquery		
+			$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".$stsem."' and lehreinheit_id = '".$lehreinheit_id."' ORDER BY nachname, vorname";
+			/*		
 			$qry_stud = "SELECT vw_student.uid, vorname, nachname FROM campus.vw_student, public.tbl_benutzergruppe, lehre.tbl_lehreinheitgruppe 
 						WHERE tbl_lehreinheitgruppe.lehreinheit_id='$lehreinheit_id' AND 
 						vw_student.uid = tbl_benutzergruppe.uid AND
@@ -692,6 +695,7 @@ function addUser(student_uid)
 						  OR (tbl_lehreinheitgruppe.verband is null AND tbl_lehreinheitgruppe.gruppe is null)
 						  )
 						 ORDER BY nachname, vorname";
+		*/
 		}
 		else 
 			die('Fehler bei der Parameteruebergabe');
