@@ -357,7 +357,7 @@ foreach($stsem_obj->studiensemester as $studiensemester)
 $stsem_content.= "</SELECT>\n";
 
 //Lehreinheiten laden
-if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lv_obj->studiengang_kz) || $rechte->isBerechtigt('lehre',$lv_obj->studiengang_kz))
+if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lv_obj->studiengang_kz))
 {
 	$qry = "SELECT distinct tbl_lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehreinheitmitarbeiter
 			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND
@@ -560,7 +560,7 @@ echo "Noten: 1-5, 7 (nicht beurteilt), 8 (teilgenommen)";
 // alle pruefungen für die LV holen
 $studpruef_arr = array();
 $pr_all = new Pruefung($conn);
-if ($pr_all->getPruefungenLV($lvid,"Termin2"))
+if ($pr_all->getPruefungenLV($lvid,"Termin2",$stsem))
 {
 	if ($pr_all->result)
 	{

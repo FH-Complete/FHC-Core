@@ -128,7 +128,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  ){
 
 	$pr = new Pruefung($conn);
 
-	if($pr->getPruefungen($student_uid, "Termin1", $lvid))
+	if($pr->getPruefungen($student_uid, "Termin1", $lvid, $stsem))
 	{
 		if ($pr->result)
 			$termin1 = 1;
@@ -166,7 +166,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  ){
 	$prTermin2 = new Pruefung($conn);
 	$pr_2 = new Pruefung($conn);
 
-	if ($prTermin2->getPruefungen($student_uid, "Termin2", $lvid))
+	if ($prTermin2->getPruefungen($student_uid, "Termin2", $lvid, $stsem))
 	{
 		if	($prTermin2->result)
 		{
