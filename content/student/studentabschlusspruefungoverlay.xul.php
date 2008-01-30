@@ -184,7 +184,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</menupopup>
 					</template>
 				</menulist>
-				<label value="Pruefer1" id="student-abschlusspruefung-label-pruefer1" control="student-abschlusspruefung-menulist-pruefer1" />
+				<label value="Pruefer 1" id="student-abschlusspruefung-label-pruefer1" control="student-abschlusspruefung-menulist-pruefer1" />
     			<menulist id="student-abschlusspruefung-menulist-pruefer1"
 						  editable="true" disabled="true"
 				          datasources="rdf:null" flex="1"
@@ -214,7 +214,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</menupopup>
 					</template>
 				</menulist>
-				<label value="Pruefer2" id="student-abschlusspruefung-label-pruefer2" control="student-abschlusspruefung-menulist-pruefer2" />
+				<label value="Pruefer 2" id="student-abschlusspruefung-label-pruefer2" control="student-abschlusspruefung-menulist-pruefer2" />
     			<menulist id="student-abschlusspruefung-menulist-pruefer2"
 						  editable="true" disabled="true"
 				          datasources="rdf:null" flex="1"
@@ -244,7 +244,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							</menupopup>
 					</template>
 				</menulist>
-				<label value="Pruefer3" id="student-abschlusspruefung-label-pruefer3" control="student-abschlusspruefung-menulist-pruefer3" />
+				<label value="Pruefer 3" id="student-abschlusspruefung-label-pruefer3" control="student-abschlusspruefung-menulist-pruefer3" />
     			<menulist id="student-abschlusspruefung-menulist-pruefer3"
 						  editable="true" disabled="true"
 				          datasources="rdf:null" flex="1"

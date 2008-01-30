@@ -23,7 +23,7 @@
 	
 	$stg_arr = array();
 	foreach ($stg_obj->result as $row)
-		$stg_arr[$row->studiengang_kz]=$row->kuerzel;
+		$stg_arr[$row->studiengang_kz]=$row->kurzbzlang;
 	
 	if(!($erg=pg_exec($conn, "SET search_path TO campus;SELECT * FROM vw_benutzer WHERE uid='$uid'")))
 		die(pg_last_error($conn));
@@ -186,7 +186,7 @@
 				if(!$ansicht)
 				{
 					//Funktionen
-					$qry = "SELECT * FROM public.tbl_benutzerfunktion JOIN public.tbl_funktion USING(funktion_kurzbz) WHERE uid='$uid'";
+					$qry = "SELECT *, tbl_benutzerfunktion.studiengang_kz as studiengang_kz FROM public.tbl_benutzerfunktion JOIN public.tbl_funktion USING(funktion_kurzbz) LEFT JOIN public.tbl_fachbereich USING(fachbereich_kurzbz) WHERE uid='$uid'";
 					if($result_funktion = pg_query($conn, $qry))
 					{
 						if(pg_num_rows($result_funktion)>0)
@@ -195,7 +195,7 @@
 
 							while($row_funktion = pg_fetch_object($result_funktion))
 							{
-								echo "<tr class='liste1'><td>$row_funktion->beschreibung</td><td>".$stg_arr[$row_funktion->studiengang_kz]."</td><td>$row_funktion->fachbereich_kurzbz</td></tr>";
+								echo "<tr class='liste1'><td>$row_funktion->beschreibung</td><td>".($row_funktion->studiengang_kz!=0?$stg_arr[$row_funktion->studiengang_kz]:'')."</td><td>$row_funktion->bezeichnung</td></tr>";
 							}
 							echo '</table>';
 						}

@@ -53,6 +53,7 @@ class studiengang
 	var $kuerzel;			// = typ + kurzbz (Bsp: BBE)
 
 	var $studiengang_typ_arr = array();
+	var $kuerzel_arr = array();
 
 	
 	// **************************************************************
@@ -188,9 +189,9 @@ class studiengang
             $stg_obj->telefon=$row->telefon;
             $stg_obj->titelbescheidvom=$row->titelbescheidvom;
             $stg_obj->aktiv=$row->aktiv;
-
-
+			
 			$this->result[] = $stg_obj;
+			$this->kuerzel_arr[$row->studiengang_kz]=$stg_obj->kuerzel;
 		}
 
 		return true;
