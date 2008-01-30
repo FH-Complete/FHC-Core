@@ -320,7 +320,7 @@ class pruefung
 	// * @param student_uid
 	// * @return true wenn ok, false wenn Fehler
 	// *****************************************
-	function getPruefungen($student_uid, $pruefungstyp=null,$lv_id=null)
+	function getPruefungen($student_uid, $pruefungstyp=null,$lv_id=null,$stsem=null)
 	{
 		$qry = "SELECT tbl_pruefung.*, tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
 				tbl_note.bezeichnung as note_bezeichnung, tbl_pruefungstyp.beschreibung as typ_beschreibung, tbl_lehreinheit.studiensemester_kurzbz as studiensemester_kurzbz
@@ -334,7 +334,9 @@ class pruefung
 			$qry .= " AND tbl_pruefungstyp.pruefungstyp_kurzbz = '".$pruefungstyp."'";
 		if ($lv_id != null)
 			$qry .= " AND tbl_lehrveranstaltung.lehrveranstaltung_id = '".$lv_id."'";
-			
+		if ($stsem != null)
+			$qry .= " AND tbl_lehreinheit.studiensemester_kurzbz = '".$stsem."'";
+					
 		$qry .= " ORDER BY datum DESC";
 		if($result = pg_query($this->conn, $qry))
 		{
@@ -371,7 +373,7 @@ class pruefung
 		}
 	}
 	
-	function getPruefungenLV($lv_id, $pruefungstyp=null)
+	function getPruefungenLV($lv_id, $pruefungstyp=null, $stsem=null)
 	{
 		$qry = "SELECT tbl_pruefung.*, tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
 				tbl_note.bezeichnung as note_bezeichnung, tbl_pruefungstyp.beschreibung as typ_beschreibung, tbl_lehreinheit.studiensemester_kurzbz as studiensemester_kurzbz
@@ -384,6 +386,8 @@ class pruefung
 			$qry .= " AND tbl_pruefungstyp.pruefungstyp_kurzbz = '".$pruefungstyp."'";
 		if ($lv_id != null)
 			$qry .= " AND tbl_lehrveranstaltung.lehrveranstaltung_id = '".$lv_id."'";
+		if ($stsem != null)
+			$qry .= " AND tbl_lehreinheit.studiensemester_kurzbz = '".$stsem."'";
 			
 		$qry .= " ORDER BY datum DESC";
 		if($result = pg_query($this->conn, $qry))
