@@ -599,8 +599,9 @@ function StudentAbschlusspruefungPrintPruefungsprotokollMultiple()
 			anzahl++;
 		}
 	}
-
-	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid='+uids,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	var stg_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
+	
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid='+uids+'&xsl_stg_kz='+stg_kz,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
@@ -624,12 +625,14 @@ function StudentAbschlusspruefungPrintPruefungsprotokoll()
 	var col = tree.columns ? tree.columns["student-abschlusspruefung-treecol-pruefungstyp_kurzbz"] : "student-abschlusspruefung-treecol-pruefungstyp_kurzbz";
 	var pruefungstyp_kurzbz=tree.view.getCellText(tree.currentIndex,col);
 	
+	var stg_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
+	
 	if(pruefungstyp_kurzbz=='Bachelor')
 		xsl='PrProtokollBakk';
 	else
 		xsl='PrProtokollDipl';
 			
-	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&abschlusspruefung_id='+abschlusspruefung_id,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&abschlusspruefung_id='+abschlusspruefung_id+'&xsl_stg_kz='+stg_kz,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****

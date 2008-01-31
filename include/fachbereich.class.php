@@ -39,6 +39,7 @@ class fachbereich
 	var $aktiv;			// @var boolean
 	var $ext_id;			// @var bigint
 
+	var $bezeichnung_arr = array();
 
 	/**
 	 * Konstruktor
@@ -79,6 +80,7 @@ class fachbereich
 			$fachb_obj->ext_id = $row->ext_id;
 
 			$this->result[] = $fachb_obj;
+			$this->bezeichnung_arr[$row->fachbereich_kurzbz] = $row->bezeichnung;
 		}
 		return true;
 	}

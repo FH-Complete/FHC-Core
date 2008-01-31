@@ -30,6 +30,7 @@
 	$num_rows=pg_num_rows($erg);
 	if ($num_rows==1)
 	{
+		$person_id=pg_result($erg,0,"person_id");
 		$vorname=pg_result($erg,0,"vorname");
 		$vornamen=pg_result($erg,0,"vornamen");
 		$nachname=pg_result($erg,0,"nachname");
@@ -100,7 +101,7 @@
 		?>
 		<table class="tabcontent">
   		<tr>
-    		<td colspan="2" class="MarkLine">
+    		<td colspan="2" class="MarkLine" width="60%">
       		<P><br>
       			Titel: <?php echo $titelpre; ?> <br>
         		Vornamen: <?php echo $vorname.'  '.$vornamen; ?> <br>
@@ -118,6 +119,7 @@
         		<!--<b>Passwort</b><br>
         		<a href="password.php">Passwort &auml;ndern</a></FONT><br>-->
       		</P>
+      		
       		<P>
       			<b>eMail</b><br>
         		Technikum: <a class='Item' href='mailto:<?php echo $uid; ?>@technikum-wien.at'> <?php echo $uid; ?>@technikum-wien.at</a><br>
@@ -141,7 +143,21 @@
         	if($hp!='')
         		echo "<P><b>Homepage</b><br><a href='$hp' target='_blank'>$hp</a></p>";
         	?>
-
+			<p>
+      		<?php
+      		$qry = "SELECT kompetenzen FROM public.tbl_person WHERE person_id='$person_id'";
+      		if($result = pg_query($conn, $qry))
+      		{
+      			if($row = pg_fetch_object($result))
+      			{
+      				if($row->kompetenzen!='')
+      				{
+      					echo "<b>Kompetenzen</b><br>".str_replace(';','<br>', $row->kompetenzen);
+      				}
+      			}
+      		}
+      		?>
+      		</p>
         	<br>
     		</td>
     		<td rowspan="2">

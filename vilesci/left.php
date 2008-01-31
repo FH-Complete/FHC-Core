@@ -332,6 +332,10 @@ if ($berechtigung->isBerechtigt('admin'))
 				<td width="10" nowrap>&nbsp;</td>
 		    	<td nowrap><a class="MenuItem2" href="personen/lektor_edit.php?new=1" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Neu</a></td>
 			</tr>
+			<tr>
+				<td width="10" nowrap>&nbsp;</td>
+		    	<td nowrap><a class="MenuItem2" href="personen/institutsliste.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Institute</a></td>
+			</tr>
 			</table>
 		</td>
 	</tr>
