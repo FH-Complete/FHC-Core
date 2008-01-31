@@ -164,7 +164,7 @@ if(!$xml_doc->load($xml_url))
 
 //XSL aus der DB holen
 $qry = "SELECT text FROM public.tbl_vorlagestudiengang WHERE (studiengang_kz=0 OR studiengang_kz='".addslashes($xsl_stg_kz)."') AND vorlage_kurzbz='$xsl' ORDER BY studiengang_kz DESC, version DESC LIMIT 1";
-
+//echo $qry;
 if(!$result = pg_query($conn, $qry))
 	die('Fehler beim Laden der Vorlage'.pg_errormessage($conn));
 if(!$row = pg_fetch_object($result))
