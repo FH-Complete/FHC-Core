@@ -310,7 +310,7 @@ function drawLehrauftrag($uid)
 				$gesamtstunden = $gesamtstunden + $stunden;
 		}
 	}
-	$qry = "SELECT tbl_projektarbeit.projektarbeit_id, tbl_projektbetreuer.faktor, tbl_projektbetreuer.stunden, tbl_projektbetreuer.stundensatz, vw_student.semester, 
+	$qry = "SELECT tbl_projektarbeit.projektarbeit_id, tbl_projektbetreuer.faktor, tbl_projektbetreuer.stunden, tbl_projektbetreuer.stundensatz, tbl_lehrveranstaltung.semester, 
 	               vorname, nachname, vw_student.studiengang_kz, projekttyp_kurzbz, tbl_lehrfach.fachbereich_kurzbz
 	        FROM lehre.tbl_projektbetreuer, lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehrveranstaltung, 
 	               public.tbl_benutzer, lehre.tbl_projektarbeit, campus.vw_student 
