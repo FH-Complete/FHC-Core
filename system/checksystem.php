@@ -72,6 +72,16 @@ if (!@pg_query($conn,'SELECT * FROM campus.tbl_newssprache LIMIT 1;'))
 		echo 'Tabelle campus.tbl_newssprache hinzugefuegt!<BR>';
 }
 
+// ************** public.tbl_person.kompetenzen ************************
+if (!@pg_query($conn,'SELECT kompetenzen FROM public.tbl_person LIMIT 1;'))
+{
+	$sql='	ALTER TABLE public.tbl_person ADD COLUMN kompetenzen text;';
+	if (!@pg_query($conn,$sql))
+		echo '<strong>public.tbl_person: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo 'kompetenzen wurde bei public.tbl_person hinzugefuegt!<BR>';
+}
+
 // ************** lehre.tbl_lehrveranstaltung.projektarbeit ************************
 if (!@pg_query($conn,'SELECT projektarbeit FROM lehre.tbl_lehrveranstaltung LIMIT 1;'))
 {
