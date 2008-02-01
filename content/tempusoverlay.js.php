@@ -244,7 +244,14 @@ function onLektorSelect()
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
 	var treeLektor=document.getElementById('tree-lektor');
 	var col=treeLektor.columns ? treeLektor.columns["uid"] : "uid";
-	var uid=treeLektor.view.getCellText(treeLektor.currentIndex,col);
+	//debug(col+'-'+treeLektor.currentIndex);
+	try
+	{
+		var uid=treeLektor.view.getCellText(treeLektor.currentIndex,col);
+	}
+	catch(e)
+	{
+	}
 	if(uid=='')
 		return;
 	//var treeVerband=document.getElementById('tree-verband');
