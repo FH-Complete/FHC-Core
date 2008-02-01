@@ -288,6 +288,12 @@ var LektorFunktionDDObserver=
 	    col = tree.columns ? tree.columns["studiengang_kz"] : "studiengang_kz";
 		var stg=tree.view.getCellText(row.value,col);
 
+		if(stg=='')
+		{
+			alert('Mitarbeiter kann nur auf einen Studiengang gezogen werden');
+			return false;
+		}
+		
 	    uid=dropdata.data;
 
 	    var req = new phpRequest('tempusDBDML.php','','');

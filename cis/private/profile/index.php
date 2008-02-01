@@ -145,6 +145,7 @@
         	?>
 			<p>
       		<?php
+      		/*
       		$qry = "SELECT kompetenzen FROM public.tbl_person WHERE person_id='$person_id'";
       		if($result = pg_query($conn, $qry))
       		{
@@ -156,6 +157,7 @@
       				}
       			}
       		}
+      		*/
       		?>
       		</p>
         	<br>

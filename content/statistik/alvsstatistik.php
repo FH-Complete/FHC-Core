@@ -156,21 +156,24 @@ if($format=='xls')
 	$maxspalten=$spalte;
 
 
-	foreach ($data as $key=>$val)
+	if(isset($data))
 	{
-		$zeile++;
-		$spalte=0;
-		$worksheet->write($zeile,$spalte,$stg_arr[$key], $format_bold);
-		$summe=0;
-		foreach ($data[$key] as $fb=>$stunden)
+		foreach ($data as $key=>$val)
 		{
-			$summe+=$stunden;
-			$summe_fb[$fb]+=$stunden;
-			$worksheet->write($zeile,$fachbereiche[$fb],$stunden);
-			if($maxlength[$fachbereiche[$fb]]<strlen($stunden))
-				$maxlength[$fachbereiche[$fb]]=strlen($stunden);
+			$zeile++;
+			$spalte=0;
+			$worksheet->write($zeile,$spalte,$stg_arr[$key], $format_bold);
+			$summe=0;
+			foreach ($data[$key] as $fb=>$stunden)
+			{
+				$summe+=$stunden;
+				$summe_fb[$fb]+=$stunden;
+				$worksheet->write($zeile,$fachbereiche[$fb],$stunden);
+				if($maxlength[$fachbereiche[$fb]]<strlen($stunden))
+					$maxlength[$fachbereiche[$fb]]=strlen($stunden);
+			}
+			$worksheet->write($zeile,$maxspalten,$summe, $format_bold);
 		}
-		$worksheet->write($zeile,$maxspalten,$summe, $format_bold);
 	}
 
 

@@ -76,7 +76,7 @@ function onLoad()
 	{
   		initLektorTree();
   		//Studenten Tab beim starten markieren
-  		document.getElementById('main-content-tabs').selectedItem=document.getElementById('tab-studenten');
+  		//document.getElementById('main-content-tabs').selectedItem=document.getElementById('tab-studenten');
 
   		//Funktion ueberschreiben damit sie nicht nochmal aufgerufen wird
   		//wenn zb ein IFrame geladen wird
@@ -84,6 +84,7 @@ function onLoad()
 	}
 	catch(e)
 	{
+		debug('catched'+e);
 		onLoad=function() {return false};
 	}
 }
