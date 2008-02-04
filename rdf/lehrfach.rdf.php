@@ -59,43 +59,64 @@ if(isset($_GET['lehrveranstaltung_id']) && is_numeric($_GET['lehrveranstaltung_i
 		$sem = $row->semester;
 	}
 	else
-		die('Fehler beim laden der Daten');
+		die('Fehler beim Laden der Daten');
 }
-
-
-// Einheiten holen
-$lehrfachDAO=new lehrfach($conn);
-$lehrfachDAO->getTab($stg, $sem);
 
 $rdf_url='http://www.technikum-wien.at/lehrfach';
-?>
 
+echo '
 <RDF:RDF
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:LEHRFACH="<?php echo $rdf_url; ?>/rdf#"
+	xmlns:LEHRFACH="'.$rdf_url.'/rdf#"
 >
 
-   <RDF:Seq about="<?php echo $rdf_url ?>/liste">
+   <RDF:Seq about="'.$rdf_url.'/liste">
+';
 
-<?php
-foreach ($lehrfachDAO->lehrfaecher as $lehrfach)
+if(isset($_GET['lehrfach_id']) && is_numeric($_GET['lehrfach_id']))
 {
-	?>
-      <RDF:li>
-         <RDF:Description  id="<?php echo $lehrfach->lehrfach_id; ?>"  about="<?php echo $rdf_url.'/'.$lehrfach->lehrfach_id; ?>" >
-            <LEHRFACH:lehrfach_id><?php echo $lehrfach->lehrfach_id  ?></LEHRFACH:lehrfach_id>
-            <LEHRFACH:studiengang_kz><?php echo $lehrfach->studiengang_kz  ?></LEHRFACH:studiengang_kz>
-            <LEHRFACH:fachbereich_kurzbz><![CDATA[<?php echo $lehrfach->fachbereich_kurzbz ?>]]></LEHRFACH:fachbereich_kurzbz>
-            <LEHRFACH:kurzbz><![CDATA[<?php echo $lehrfach->kurzbz ?>]]></LEHRFACH:kurzbz>
-            <LEHRFACH:bezeichnung><![CDATA[<?php echo $lehrfach->bezeichnung ?>]]></LEHRFACH:bezeichnung>
-            <LEHRFACH:farbe><![CDATA[<?php echo $lehrfach->farbe ?>]]></LEHRFACH:farbe>
-            <LEHRFACH:aktiv><?php echo $lehrfach->aktiv ?></LEHRFACH:aktiv>
-            <LEHRFACH:semester><?php echo $lehrfach->semester ?></LEHRFACH:semester>
-            <LEHRFACH:sprache><?php echo $lehrfach->sprache ?></LEHRFACH:sprache>
-         </RDF:Description>
-      </RDF:li>
-<?php
+	$lehrfach_id = $_GET['lehrfach_id'];
+	$where =" OR lehrfach_id='$lehrfach_id'";
 }
+else 
+	$where = '';
+	
+//Alle Lehrfaecher mit Entsprechendem Studiengang und Semester holen bei 
+//denen sowohl das Lehrfach als auch der Fachbereich aktiv ist und
+//zusaetzlich das Lehrfach das uebergeben wurde
+$qry = "SELECT 
+			tbl_lehrfach.* 
+		FROM 
+			lehre.tbl_lehrfach JOIN public.tbl_fachbereich USING(fachbereich_kurzbz) 
+		WHERE tbl_lehrfach.aktiv AND tbl_fachbereich.aktiv";
+if($stg!='')
+	$qry.=" AND tbl_lehrfach.studiengang_kz='$stg'";
+if($sem!='')
+	$qry.=" AND tbl_lehrfach.semester='$sem'";
+	
+$qry.=$where;
+
+if($result = pg_query($conn, $qry))
+{
+	while($lehrfach = pg_fetch_object($result))
+	{
+		echo '
+      <RDF:li>
+         <RDF:Description  id="'.$lehrfach->lehrfach_id.'"  about="'.$rdf_url.'/'.$lehrfach->lehrfach_id.'" >
+            <LEHRFACH:lehrfach_id>'.$lehrfach->lehrfach_id.'</LEHRFACH:lehrfach_id>
+            <LEHRFACH:studiengang_kz>'.$lehrfach->studiengang_kz.'</LEHRFACH:studiengang_kz>
+            <LEHRFACH:fachbereich_kurzbz><![CDATA['.$lehrfach->fachbereich_kurzbz.']]></LEHRFACH:fachbereich_kurzbz>
+            <LEHRFACH:kurzbz><![CDATA['.$lehrfach->kurzbz.']]></LEHRFACH:kurzbz>
+            <LEHRFACH:bezeichnung><![CDATA['.$lehrfach->bezeichnung.']]></LEHRFACH:bezeichnung>
+            <LEHRFACH:farbe><![CDATA['.$lehrfach->farbe.']]></LEHRFACH:farbe>
+            <LEHRFACH:aktiv>'.$lehrfach->aktiv.'</LEHRFACH:aktiv>
+            <LEHRFACH:semester>'.$lehrfach->semester.'</LEHRFACH:semester>
+            <LEHRFACH:sprache>'.$lehrfach->sprache.'</LEHRFACH:sprache>
+         </RDF:Description>
+      </RDF:li>';
+	}
+}
+
 ?>
    </RDF:Seq>
 

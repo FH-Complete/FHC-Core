@@ -105,6 +105,7 @@ $qry = "SELECT
 				WHERE
 					uid=tbl_mitarbeiter.mitarbeiter_uid AND
 					funktion_kurzbz='Institut'
+				LIMIT 1
 			) as hauptzuteilung
 		FROM 
 			public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid) 

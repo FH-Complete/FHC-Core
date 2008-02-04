@@ -42,34 +42,32 @@ $user = get_uid();
 $rechte =  new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
 
-if (isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
-	$stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:$_POST['stg_kz']);
+if (isset($_GET['filter_stg_kz']) || isset($_POST['filter_stg_kz']))
+	$filter_stg_kz=(isset($_GET['filter_stg_kz'])?$_GET['filter_stg_kz']:$_POST['filter_stg_kz']);
 else
-	$stg_kz='';
-if (isset($_GET['semester']) || isset($_POST['semester']))
-	$semester=(isset($_GET['semester'])?$_GET['semester']:$_POST['semester']);
+	$filter_stg_kz='';
+if (isset($_GET['filter_semester']) || isset($_POST['filter_semester']))
+	$filter_semester=(isset($_GET['filter_semester'])?$_GET['filter_semester']:$_POST['filter_semester']);
 else
-	$semester='';
-	
-$fachbereich_kurzbz = (isset($_GET['fachbereich_kurzbz'])?$_GET['fachbereich_kurzbz']:'');
+	$filter_semester='';
 
-/*
-if(!is_numeric($stg_kz))
-	$stg_kz=0;
-if(!is_numeric($semester))
-	$semester=0;
-*/
+if (isset($_GET['filter_fachbereich_kurzbz']) || isset($_POST['filter_fachbereich_kurzbz']))
+	$filter_fachbereich_kurzbz=(isset($_GET['filter_fachbereich_kurzbz'])?$_GET['filter_fachbereich_kurzbz']:$_POST['filter_fachbereich_kurzbz']);
+else
+	$filter_fachbereich_kurzbz='';
+	
+
 if (isset($_POST['neu']))
 {
 	$lf = new lehrfach($conn);
 	$lf->new=true;
-	$lf->studiengang_kz=$stg_kz;
+	$lf->studiengang_kz=$_POST['stg_kz'];
 	$lf->fachbereich_kurzbz=$_POST['fachbereich_kurzbz'];
 	$lf->kurzbz=$_POST['kurzbz'];
 	$lf->bezeichnung = $_POST['bezeichnung'];
 	$lf->farbe = $_POST['farbe'];
 	$lf->aktiv = true;
-	$lf->semester = $semester;
+	$lf->semester = $_POST['semester'];
 	$lf->sprache = $_POST['sprache'];
 	$lf->updateamum = date('Y-m-d H:i:s');
 	$lf->updatevon = $user;
@@ -87,13 +85,13 @@ if (isset($_POST['type']) && $_POST['type']=='editsave')
 	$lf = new lehrfach($conn);
 	$lf->new=false;
 	$lf->lehrfach_id = $_POST['lehrfach_id'];
-	$lf->studiengang_kz=$stg_kz;
+	$lf->studiengang_kz=$_POST['stg_kz'];
 	$lf->fachbereich_kurzbz=$_POST['fachbereich_kurzbz'];
 	$lf->kurzbz=$_POST['kurzbz'];
 	$lf->bezeichnung = $_POST['bezeichnung'];
 	$lf->farbe = $_POST['farbe'];
 	$lf->aktiv = isset($_POST['aktiv']);
-	$lf->semester = $semester;
+	$lf->semester = $_POST['semester'];
 	$lf->sprache = $_POST['sprache'];
 	$lf->updateamum = date('Y-m-d H:i:s');
 	$lf->updatevon = $user;
@@ -107,7 +105,7 @@ if (isset($_POST['type']) && $_POST['type']=='editsave')
 $outp='<form method="GET" action="'.$_SERVER['PHP_SELF'].'">';
 
 $s=array();
-$outp.= " Studiengang: <SELECT name='stg_kz'>";
+$outp.= " Studiengang: <SELECT name='filter_stg_kz'>";
 
 if(count($rechte->getFbKz())>0)
 	$outp.= '<option value="" >-- Alle --</option>';
@@ -119,10 +117,10 @@ foreach ($studiengang as $stg)
 	if($rechte->isBerechtigt('assistenz', $stg->studiengang_kz) || $rechte->isBerechtigt('admin', $stg->studiengang_kz) ||
 		$rechte->isBerechtigt('assistenz', 0) || $rechte->isBerechtigt('admin', 0))
 	{
-		if(count($rechte->getFbKz())==0 && $stg_kz=='')
-			$stg_kz=$stg->studiengang_kz;
+		if(count($rechte->getFbKz())==0 && $filter_stg_kz=='')
+			$filter_stg_kz=$stg->studiengang_kz;
 		
-		if($stg->studiengang_kz==$stg_kz)
+		if($stg->studiengang_kz==$filter_stg_kz)
 			$selected='selected';
 		else 	
 			$selected='';
@@ -132,14 +130,13 @@ foreach ($studiengang as $stg)
 	
 	$s[$stg->studiengang_kz]->max_sem=$stg->max_semester;
 	$s[$stg->studiengang_kz]->kurzbz=$stg->kuerzel;
-		
 }
 $outp.="</SELECT>";
-$outp.=" Semester: <SELECT name='semester'>";
+$outp.=" Semester: <SELECT name='filter_semester'>";
 $outp.= '<option value="" >-- Alle --</option>';
-for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
+for ($i=0;$i<=$s[$filter_stg_kz]->max_sem;$i++)
 {
-	if($semester!='' && $i==$semester)
+	if($filter_semester!='' && $i==$filter_semester)
 		$selected='selected';
 	else 
 		$selected='';
@@ -148,7 +145,7 @@ for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
 }
 $outp.="</SELECT>";
 
-$outp.= " Institut: <SELECT name='fachbereich_kurzbz'>";
+$outp.= " Institut: <SELECT name='filter_fachbereich_kurzbz'>";
 
 $outp.= '<option value="">-- Alle --</option>';
 
@@ -158,7 +155,7 @@ foreach ($fachbereiche as $fb)
 	if($rechte->isBerechtigt('assistenz', null, null, $fb->fachbereich_kurzbz) || $rechte->isBerechtigt('admin', null, null, $fb->fachbereich_kurzbz) ||
 		$rechte->isBerechtigt('assistenz', 0) || $rechte->isBerechtigt('admin', 0))
 	{*/
-		if($fb->fachbereich_kurzbz==$fachbereich_kurzbz)
+		if($fb->fachbereich_kurzbz==$filter_fachbereich_kurzbz)
 			$selected='selected';
 		else 
 			$selected='';
@@ -183,10 +180,13 @@ echo '
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 </head>
 <body>
-<H2>Lehrfach Verwaltung ('.$s[$stg_kz]->kurzbz.' '.$semester.' '.$fachbereich_kurzbz.')</H2>
+<H2>Lehrfach Verwaltung ('.$s[$filter_stg_kz]->kurzbz.' '.$filter_semester.' '.$filter_fachbereich_kurzbz.')</H2>
 ';
 
 echo $outp;
+
+if($filter_stg_kz=='' && $filter_fachbereich_kurzbz=='' && !isset($_GET['type']))
+	die('Bitte einen Studiengang oder Fachbereich auswaehlen');
 
 if($rechte->isBerechtigt('admin',0))
 {
@@ -194,11 +194,11 @@ if($rechte->isBerechtigt('admin',0))
 	{
 		$lf=new lehrfach($conn);
 		$lf->load($_GET['lehrfach_nr']);
-		echo '<form name="lehrfach_edit" method="post" action="lehrfach.php">';
+		echo '<form name="lehrfach_edit" method="post" action="lehrfach.php?filter_stg_kz='.$filter_stg_kz.'&filter_semester='.$filter_semester.'&filter_fachbereich_kurzbz='.$filter_fachbereich_kurzbz.'">';
 		echo '<p><b>Edit Lehrfach: '.$_GET['lehrfach_nr'].'</b>';
 		echo '<table>';
 		echo '<tr><td>';
-		echo " Studiengang:</td><td> <SELECT name='stg_kz'>";
+		echo " Studiengang:</td><td>\n <SELECT name='stg_kz'>";
 		
 		foreach ($studiengang as $stg)
 		{
@@ -207,14 +207,14 @@ if($rechte->isBerechtigt('admin',0))
 				else 
 					$selected='';
 
-				echo '<option value="'.$stg->studiengang_kz.'" '.$selected.'>'.$stg->kuerzel.'</option>';
+				echo "\n".'<option value="'.$stg->studiengang_kz.'" '.$selected.'>'.$stg->kuerzel.'</option>';
 		}
 		echo "</SELECT></td></tr>";
 		
 		echo "<tr><td>Semester:</td><td> <SELECT name='semester'>";
 		for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
 		{
-			if($semester!='' && $i==$lf->semester)
+			if($i==$lf->semester)
 				$selected='selected';
 			else 
 				$selected='';
@@ -266,15 +266,15 @@ if($rechte->isBerechtigt('admin',0))
 		echo '</table>';
 		echo '<input type="hidden" name="type" value="editsave">';
 		echo '<input type="hidden" name="lehrfach_id" value="'.$lf->lehrfach_id.'">';
-		echo '<input type="hidden" name="stg_kz" value="'.$stg_kz.'">';
-		echo '<input type="hidden" name="semester" value="'.$semester.'">';
+		//echo '<input type="hidden" name="stg_kz" value="'.$stg_kz.'">';
+		//echo '<input type="hidden" name="semester" value="'.$semester.'">';
 		echo '<input type="submit" name="save" value="Speichern">';
 		echo '</p><hr></form>';
 	}
 	else
 	{
 		echo '
-				<form action="lehrfach.php" method="post" name="lehrfach_neu" id="lehrfach_neu">
+				<form action="lehrfach.php?filter_stg_kz='.$filter_stg_kz.'&filter_semester='.$filter_semester.'&filter_fachbereich_kurzbz='.$filter_fachbereich_kurzbz.'" method="post" name="lehrfach_neu" id="lehrfach_neu">
 				  <p><b>Neues Lehrfach</b>: <br/>';
 		echo '<table>';
 		echo '<tr><td>';
@@ -282,7 +282,7 @@ if($rechte->isBerechtigt('admin',0))
 		
 		foreach ($studiengang as $stg)
 		{
-				if($stg->studiengang_kz==$stg_kz)
+				if($stg->studiengang_kz==$filter_stg_kz)
 					$selected='selected';
 				else 
 					$selected='';
@@ -292,9 +292,9 @@ if($rechte->isBerechtigt('admin',0))
 		echo "</SELECT></td></tr>";
 		
 		echo "<tr><td>Semester:</td><td> <SELECT name='semester'>";
-		for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
+		for ($i=0;$i<=$s[$filter_stg_kz]->max_sem;$i++)
 		{
-			if($semester!='' && $i==$semester)
+			if($filter_semester!='' && $i==$filter_semester)
 				$selected='selected';
 			else 
 				$selected='';
@@ -329,8 +329,8 @@ if($rechte->isBerechtigt('admin',0))
 		   echo "<option value='$row1->sprache'>$row1->sprache</option>";
 	
 		echo '</select></td></tr>	</table>';
-			echo '<input type="hidden" name="stg_kz" value="'.$stg_kz.'">';
-		echo '<input type="hidden" name="semester" value="'.$semester.'">';
+		//echo '<input type="hidden" name="stg_kz" value="'.$stg_kz.'">';
+		//echo '<input type="hidden" name="semester" value="'.$semester.'">';
 	
 	
 		echo '
@@ -342,30 +342,32 @@ if($rechte->isBerechtigt('admin',0))
 	}
 }
 
-if($rechte->isBerechtigt('admin'))
-	$where = ' AND aktiv=true';
-else 
-	$where = '';
-
-$sql_query="SELECT 
-				tbl_lehrfach.lehrfach_id AS Nummer, tbl_lehrfach.kurzbz AS Fach, tbl_lehrfach.bezeichnung AS Bezeichnung,
-				tbl_lehrfach.farbe AS Farbe, fachbereich_kurzbz as fachbereich,	tbl_lehrfach.aktiv, tbl_lehrfach.sprache AS Sprache,
-				tbl_lehrfach.studiengang_kz, tbl_lehrfach.semester
-			FROM 
-				lehre.tbl_lehrfach
-			WHERE true
-			".($stg_kz!=''?"AND tbl_lehrfach.studiengang_kz='$stg_kz'":'')."
-			".($semester!=''?"AND semester='$semester'":'')."
-			".($fachbereich_kurzbz!=''?"AND fachbereich_kurzbz = '$fachbereich_kurzbz'":'')."
-			$where
-			ORDER BY tbl_lehrfach.kurzbz";
-
-//echo $sql_query;
-$result_lehrfach=pg_query($conn, $sql_query);
-if(!$result_lehrfach) error("Lehrfach not found!");
-
 if(!isset($_GET['type']))
 {
+	if($rechte->isBerechtigt('admin'))
+		$where = '';
+	else
+		$where = ' AND aktiv=true'; 
+		
+	
+	$sql_query="SELECT 
+					tbl_lehrfach.lehrfach_id AS Nummer, tbl_lehrfach.kurzbz AS Fach, tbl_lehrfach.bezeichnung AS Bezeichnung,
+					tbl_lehrfach.farbe AS Farbe, fachbereich_kurzbz as fachbereich,	tbl_lehrfach.aktiv, tbl_lehrfach.sprache AS Sprache,
+					tbl_lehrfach.studiengang_kz, tbl_lehrfach.semester
+				FROM 
+					lehre.tbl_lehrfach
+				WHERE true
+				".($filter_stg_kz!=''?"AND tbl_lehrfach.studiengang_kz='$filter_stg_kz'":'')."
+				".($filter_semester!=''?"AND semester='$filter_semester'":'')."
+				".($filter_fachbereich_kurzbz!=''?"AND fachbereich_kurzbz = '$filter_fachbereich_kurzbz'":'')."
+				$where
+				ORDER BY tbl_lehrfach.kurzbz";
+	
+	//echo $sql_query;
+	$result_lehrfach=pg_query($conn, $sql_query);
+	if(!$result_lehrfach) error("Lehrfach not found!");
+
+
 	if ($result_lehrfach!=0)
 	{
 		echo '
@@ -406,7 +408,7 @@ if(!isset($_GET['type']))
 				<td>$row->sprache</td>
 				<td>";
 		   if($rechte->isBerechtigt('admin', 0))
-				echo "<a href=\"lehrfach.php?lehrfach_nr=$row->nummer&type=edit&stg_kz=$stg_kz&semester=$semester\">Edit</a>";
+				echo "<a href=\"lehrfach.php?lehrfach_nr=$row->nummer&type=edit&filter_stg_kz=$filter_stg_kz&filter_semester=$filter_semester&filter_fachbereich_kurzbz=$filter_fachbereich_kurzbz\">Edit</a>";
 			echo "</td></tr>";
 		}
 		

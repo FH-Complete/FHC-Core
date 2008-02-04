@@ -204,7 +204,7 @@
 				if(!$ansicht)
 				{
 					//Funktionen
-					$qry = "SELECT *, tbl_benutzerfunktion.studiengang_kz as studiengang_kz FROM public.tbl_benutzerfunktion JOIN public.tbl_funktion USING(funktion_kurzbz) LEFT JOIN public.tbl_fachbereich USING(fachbereich_kurzbz) WHERE uid='$uid'";
+					$qry = "SELECT *, tbl_benutzerfunktion.studiengang_kz as studiengang_kz, tbl_fachbereich.bezeichnung as bezeichnung FROM public.tbl_benutzerfunktion JOIN public.tbl_funktion USING(funktion_kurzbz) LEFT JOIN public.tbl_fachbereich USING(fachbereich_kurzbz) LEFT JOIN public.tbl_studiengang ON(tbl_benutzerfunktion.studiengang_kz=tbl_studiengang.studiengang_kz) WHERE uid='$uid' AND (tbl_fachbereich.aktiv=true OR fachbereich_kurzbz is null) AND (tbl_studiengang.aktiv=true OR tbl_benutzerfunktion.studiengang_kz is null)";
 					if($result_funktion = pg_query($conn, $qry))
 					{
 						if(pg_num_rows($result_funktion)>0)
