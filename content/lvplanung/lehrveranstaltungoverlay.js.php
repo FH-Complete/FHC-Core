@@ -789,7 +789,7 @@ function LeAuswahl()
 	lehrfachmenulist.builder.rebuild();
 
 	//Url zusammenbauen
-	var url = '<?php echo APP_ROOT;?>rdf/lehrfach.rdf.php?lehrveranstaltung_id='+lehrveranstaltung+'&'+gettimestamp();
+	var url = '<?php echo APP_ROOT;?>rdf/lehrfach.rdf.php?lehrveranstaltung_id='+lehrveranstaltung+'&lehrfach_id='+lehrfach+'&'+gettimestamp();
 
 	//RDF holen
 	var newDs  = rdfService.GetDataSourceBlocking(url);

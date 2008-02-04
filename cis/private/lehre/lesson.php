@@ -91,7 +91,10 @@
 
 		$qry = "SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE lehrveranstaltung_id='$lvid' ORDER BY ende DESC LIMIT 1";
 		$stsem = new studiensemester($sql_conn);
-		$angezeigtes_stsem = $stsem->getNearest($term_id);
+		if($lv->studiengang_kz==0)
+			$angezeigtes_stsem = $stsem->getNearest();
+		else
+			$angezeigtes_stsem = $stsem->getNearest($term_id);
 						
 	    echo "&nbsp;($angezeigtes_stsem)";
 	    echo '</font></td>
