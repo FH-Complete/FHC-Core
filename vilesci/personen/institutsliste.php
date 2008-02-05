@@ -56,7 +56,7 @@ $stsem = new studiensemester($conn);
 $ws = $stsem->getNearest(1);
 $ss = $stsem->getNearest(2);
 
-if($rechte->isBerechtigt('admin', 0))
+if($rechte->isBerechtigt('admin', 0) || $rechte->isBerechtigt('mitarbeiter', 0))
 	$where = '';
 else 
 {
