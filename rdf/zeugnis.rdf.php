@@ -252,7 +252,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					//$note = $note_arr[$projektarbeit[$row->lehrveranstaltung_id]['note']];
 					$note = $projektarbeit[$row->lehrveranstaltung_id]['note'];
 					//$nl = str_repeat('\n',($anzahl_nl));
-					$xml_fussnote .='      <note>'.$note.$nl.'</note>';
+					$xml_fussnote .='      <note>'.(isset($note_arr[$note])?$note_arr[$note]:$note).$nl.'</note>';
 					$xml_fussnote .='      <sws>'.$nl.'</sws>';
 					$xml_fussnote .='      <ects>'.$nl.'</ects>';
 					$xml_fussnote .='      <lv_lehrform_kurzbz>'.$nl.'</lv_lehrform_kurzbz>';
