@@ -322,7 +322,7 @@
 	$htmlstr .= "		<td colspan='3'>";
 	$htmlstr .= "			<table>\n";
 	$htmlstr .= "				<tr>\n";
-	$htmlstr .= "					<td valign='top'>Bescheid</td>\n";
+	$htmlstr .= "					<td valign='top'>Zusatzinfo</td>\n";
 	$htmlstr .= " 					<td><textarea name='zusatzinfo_html' cols='50' rows='4' onchange='submitable()'>".$zusatzinfo_html."</textarea></td>\n";
 	$htmlstr .= "				</tr>\n";
 	$htmlstr .= "			</table>\n";

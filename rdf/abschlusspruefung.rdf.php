@@ -59,9 +59,15 @@ if($result = pg_query($conn, $qry))
 	while($row = pg_fetch_object($result))
 		$abschlussbeurteilung_arr[$row->abschlussbeurteilung_kurzbz]=$row->bezeichnung;
 
+$note_arr = array();
+$qry = "SELECT * FROM lehre.tbl_note";
+if($result = pg_query($conn, $qry))
+	while($row = pg_fetch_object($result))
+		$note_arr[$row->note]=$row->anmerkung;
+		
 	function draw_content_xml($row)
 	{
-		global $conn, $rdf_url, $datum_obj, $abschlussbeurteilung_arr;
+		global $conn, $rdf_url, $datum_obj, $abschlussbeurteilung_arr, $note_arr;
 		$vorsitz = '';
 		$pruefer1= '';
 		$pruefer2= '';
@@ -114,7 +120,7 @@ if($result = pg_query($conn, $qry))
 						$betreuer = $row_bet->titelpre.' '.$row_bet->vorname.' '.$row_bet->nachname.' '.$row_bet->titelpost;
 
 				$themenbereich = $row_proj->themenbereich;
-				$note = $row_proj->note;
+				$note = (isset($note_arr[$row_proj->note])?$note_arr[$row_proj->note]:$row_proj->note);
 				$datum_projekt = $datum_obj->convertISODate($row_proj->ende);
 			}
 			
