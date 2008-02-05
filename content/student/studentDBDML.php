@@ -2718,7 +2718,7 @@ if(!$error)
 						if($row = pg_fetch_object($result))
 						{
 							if($data!='')
-								$data.=','.$row->kontakt;
+								$data.=$emailadressentrennzeichen.$row->kontakt;
 							else
 								$data = $row->kontakt;
 						}

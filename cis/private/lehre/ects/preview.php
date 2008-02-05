@@ -298,7 +298,7 @@
 		//Fachbereiche und Leiter/Koordinatoren anzeigen
 		if (count($fachbereich['bezeichnung'])>0)
 		{
-			echo '<tr><td>Fachbereich:&nbsp;</td><td>';
+			echo '<tr><td>Institut:&nbsp;</td><td>';
 			//Fachbereiche durchlaufen
 			for($i=0;$i<count($fachbereich['kurzbz']);$i++)
 			{

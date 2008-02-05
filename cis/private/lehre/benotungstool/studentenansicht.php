@@ -48,7 +48,9 @@ $user = get_uid();
 
 if(check_lektor($user, $conn) and $_GET["uid"] != "")
 {
-	if(!check_lektor_lehreinheit($conn, $user, $_GET["lehreinheit_id"]))
+	$rights = new benutzerberechtigung($conn);
+	$rights->getBerechtigungen($user); 
+	if(!check_lektor_lehreinheit($conn, $user, $_GET["lehreinheit_id"]) && !$rights->isBerechtigt('admin',0))
 		die("Sie haben keine Berechtigung für diese Lehreinheit");
 	$user = $_GET["uid"];
 }
@@ -949,7 +951,7 @@ else
 		echo "		<th>Note</th>";
 		echo "	</tr>\n";
 		foreach ($uebung_obj->uebungen as $row)
-		{	
+		{	
 			
 			$subuebung_obj = new uebung($conn);
 			$subuebung_obj->load_uebung($lehreinheit_id,2,$row->uebung_id);
@@ -1011,7 +1013,7 @@ else
 						echo "		<td align='center'>".$l1note->note."</td>";	
 						echo "		<td align='center'></td>\n";		
 					}
-					echo "	</tr>\n";					/*
+					echo "	</tr>\n";					/*
 					if($datum_obj->mktime_fromtimestamp($subrow->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($subrow->freigabebis)>time())
 						echo ' + ';
 					else

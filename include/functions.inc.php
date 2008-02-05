@@ -225,6 +225,11 @@ function loadVariables($conn, $user)
 		$ignore_reservierung='false';
 	}
 
+	if (!isset($emailadressentrennzeichen))
+	{
+		global $emailadressentrennzeichen;
+		$emailadressentrennzeichen=',';
+	}
 	return $error_msg;
 }
 
