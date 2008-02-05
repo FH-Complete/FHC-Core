@@ -355,7 +355,7 @@ function unchanged()
 		document.studiengangform.reset();
 		document.studiengangform.schick.disabled = true;
 		document.getElementById("submsg").style.visibility="hidden";
-		checkmail();
+		//checkmail();
 		checkdate(document.studiengangform.bescheidvom);
 		checkdate(document.studiengangform.titelbescheidvom);
 		checkrequired(document.studiengangform.kurzbz);
