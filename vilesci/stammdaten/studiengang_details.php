@@ -323,7 +323,7 @@
 	$htmlstr .= "			<table>\n";
 	$htmlstr .= "				<tr>\n";
 	$htmlstr .= "					<td valign='top'>Zusatzinfo</td>\n";
-	$htmlstr .= " 					<td><textarea name='zusatzinfo_html' cols='50' rows='4' onchange='submitable()'>".$zusatzinfo_html."</textarea></td>\n";
+	$htmlstr .= " 					<td><textarea name='zusatzinfo_html' cols='50' rows='4' onchange='submitable()'>".htmlentities($zusatzinfo_html)."</textarea></td>\n";
 	$htmlstr .= "				</tr>\n";
 	$htmlstr .= "			</table>\n";
 	$htmlstr .= "		</td>";
@@ -355,7 +355,7 @@ function unchanged()
 		document.studiengangform.reset();
 		document.studiengangform.schick.disabled = true;
 		document.getElementById("submsg").style.visibility="hidden";
-		//checkmail();
+		checkmail();
 		checkdate(document.studiengangform.bescheidvom);
 		checkdate(document.studiengangform.titelbescheidvom);
 		checkrequired(document.studiengangform.kurzbz);
@@ -367,6 +367,7 @@ function unchanged()
 
 function checkmail()
 {
+	/*
 	if((document.studiengangform.email.value != '')&&(!emailCheck(document.studiengangform.email.value)))
 	{
 		//document.studiengangform.schick.disabled = true;
@@ -380,7 +381,8 @@ function checkmail()
 		//document.studiengangform.schick.disabled = false;
 		//document.getElementById("submsg").style.visibility="visible";
 		return true;
-	}
+	}*/
+	return true;
 }
 
 function checkdate(feld)
