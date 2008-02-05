@@ -19,7 +19,13 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-include('../vilesci/config.inc.php');
+require_once('../vilesci/config.inc.php');
+require_once('../include/functions.inc.php');
+
+if(!$conn = pg_pconnect(CONN_STRING))
+	die('Fehler beim Connecten zur DB');
+
+loadVariables($conn, get_uid());
 ?>
 
 var currentAuswahl=new auswahlValues();
@@ -189,7 +195,7 @@ function LektorFunktionMail()
   			if(tree.view.getCellText(v,col).length>1)
   			{
   				if(mailempfaenger!='')
-					mailempfaenger=mailempfaenger+','+tree.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
+					mailempfaenger=mailempfaenger+'<?php echo $emailadressentrennzeichen; ?>'+tree.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
 				else
 					mailempfaenger='mailto:'+tree.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
   			}

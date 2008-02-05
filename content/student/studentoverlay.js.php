@@ -3813,7 +3813,7 @@ function StudentSendMail()
   			if(tree.view.getCellText(v,col).length>1)
   			{
   				if(mailempfaenger!='')
-					mailempfaenger=mailempfaenger+','+tree.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
+					mailempfaenger=mailempfaenger+'<?php echo $emailadressentrennzeichen; ?>'+tree.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
 				else
 					mailempfaenger='mailto:'+tree.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
   			}
