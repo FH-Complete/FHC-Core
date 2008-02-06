@@ -21,7 +21,7 @@
  *          Gerald Raab <gerald.raab@technikum-wien.at>.
  */
 /*
-Vorrückung aller AKTIVEN Studenten ins nächste Semester.
+Vorrückung aller AKTIVEN Studenten.
 */
 require_once('../config.inc.php');
 require_once('../../include/studiengang.class.php');
