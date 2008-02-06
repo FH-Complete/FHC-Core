@@ -321,7 +321,7 @@ function LeNeu()
 	//Lehrform setzen
 	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrform"] : "lehrveranstaltung-treecol-lehrform";
 	var lehrform_kurzbz=tree.view.getCellText(tree.currentIndex,col);
-		
+
 	//Lehrfach drop down setzen
 
 	//ID in globale Variable speichern
@@ -331,7 +331,7 @@ function LeNeu()
 
 	lehrfachmenulist = document.getElementById('lehrveranstaltung-detail-menulist-lehrfach');
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-		
+
 	//Entfernen der alten Datasources
 	var oldDatasources = lehrfachmenulist.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -359,7 +359,7 @@ function LeNeu()
 	if(lehrform_kurzbz=='')
 		lehrform_kurzbz='UE';
 	document.getElementById('lehrveranstaltung-detail-menulist-lehrform').value=lehrform_kurzbz;
-	
+
 	var stsem = getStudiensemester();
 	document.getElementById('lehrveranstaltung-detail-menulist-studiensemester').value=stsem;
 }
@@ -426,7 +426,7 @@ function LvTreeSelectLehreinheit()
 	   		}
 	   	}
 	   	LvOpenLehrveranstaltung_id='';
-	   	
+
 	   	//Jetzt die wirkliche Anzahl (aller) Zeilen holen
 	   	items = tree.view.rowCount;
 	   	for(var i=0;i<items;i++)
@@ -479,7 +479,7 @@ function LeDelete()
 	}
 
 	//Abfrage ob wirklich geloescht werden soll
-	if (confirm('Wollen Sie diese Lehreinheit wirklich löschen?'))
+	if (confirm('Wollen Sie diese Lehreinheit wirklich loeschen?'))
 	{
 		//Script zum loeschen der Lehreinheit aufrufen
 		var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
@@ -564,7 +564,7 @@ function LeDetailDisableFields(val)
 	document.getElementById('lehrveranstaltung-detail-menulist-lehrform').disabled=val;
 	document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe').disabled=val;
 	document.getElementById('lehrveranstaltung-detail-button-save').disabled=val;
-	
+
 	document.getElementById('lehrveranstaltung-detail-textbox-unr').disabled=val;
 }
 
@@ -591,25 +591,25 @@ function LeDetailSave()
 
 	if(lehrveranstaltung=='')
 		return false;
-		
+
 	if(raumtyp=='')
 	{
 		alert('Raumtyp muss ausgewaehlt werden');
 		return false;
 	}
-	
+
 	if(raumtypalternativ=='')
 	{
 		alert('RaumtypAlternativ muss ausgewaehlt werden');
 		return false;
 	}
-	
+
 	if(sprache=='')
 	{
 		alert('Sprache muss ausgewaehlt werden');
 		return false;
 	}
-	
+
 
 	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
 	neu = document.getElementById('lehrveranstaltung-detail-checkbox-new').checked;
@@ -647,7 +647,7 @@ function LeDetailSave()
 
 	if (!val.dbdml_return)
 	{
-		alert(val.dbdml_errormsg)		
+		alert(val.dbdml_errormsg)
 	}
 	else
 	{
@@ -679,10 +679,10 @@ function LeAuswahl()
 	document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe').hidden=false;
 	document.getElementById('lehrveranstaltung-detail-label-lehreinheitgruppe').hidden=false;
 	document.getElementById('lehrveranstaltung-tab-lektor').collapsed=false;
-	
+
 	lehrveranstaltungNotenTreeloaded=false;
 	lehrveranstaltungGesamtNotenTreeloaded=false;
-	
+
 	if (tree.currentIndex==-1) return;
 	try
 	{
@@ -698,10 +698,10 @@ function LeAuswahl()
 			//Neu Button aktivieren
 			document.getElementById('lehrveranstaltung-toolbar-neu').disabled=false;
 			document.getElementById('lehrveranstaltung-toolbar-del').disabled=true;
-			
+
 			//Noten Tab aktivieren
 			LehrveranstaltungNotenDisableFields(false);
-			
+
 			//Noten Tab ausblenden
 			//document.getElementById('lehrveranstaltung-tab-noten').collapsed=false;
 
@@ -718,7 +718,7 @@ function LeAuswahl()
 			LeDetailDisableFields(false);
 			LehrveranstaltungNotenDisableFields(true);
 			LehrveranstaltungNotenTreeUnload();
-			
+
 			//Noten Tab einblenden
 			//document.getElementById('lehrveranstaltung-tab-noten').collapsed=true;
 
@@ -829,14 +829,14 @@ function LeAuswahl()
 	try
 	{
 		lektortree = document.getElementById('lehrveranstaltung-detail-tree-lehreinheitmitarbeiter');
-		
+
 		try
 		{
 			lektortree.builder.removeListener(LvLektorTreeListener);
 		}
 		catch(e)
 		{}
-		
+
 		//Alte DS entfernen
 		var oldDatasources = lektortree.database.GetDataSources();
 		while(oldDatasources.hasMoreElements())
@@ -1005,13 +1005,13 @@ function LeMitarbeiterValueChanged()
 function LeMitarbeiterLektorChange()
 {
 	mitarbeiter_uid = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor').value;
-	
+
 	var url = '<?php echo APP_ROOT ?>content/lvplanung/lehrveranstaltungDBDML.php';
 	var req = new phpRequest(url,'','');
 
 	req.add('type', 'getstundensatz');
 	req.add('mitarbeiter_uid', mitarbeiter_uid);
-	
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response);
@@ -1027,7 +1027,7 @@ function LeMitarbeiterLektorChange()
 	{
 		stundensatz = val.dbdml_data;
 	}
-	
+
 	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz').value=stundensatz;
 }
 
@@ -1259,7 +1259,7 @@ function LehrveranstaltungNotenDetailDisableFields(val)
 function LehrveranstaltungNotenTreeUnload()
 {
  	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-   
+
 	notentree = document.getElementById('lehrveranstaltung-noten-tree');
 	var oldDatasources = notentree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -1268,7 +1268,7 @@ function LehrveranstaltungNotenTreeUnload()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	notentree.builder.rebuild();
-	
+
 	var lvgesamtnotentree = document.getElementById('lehrveranstaltung-lvgesamtnoten-tree');
 	var oldDatasources = lvgesamtnotentree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -1296,7 +1296,7 @@ function LehrveranstaltungNotenLoad(lehrveranstaltung_id)
 	}
 	catch(e)
 	{}
-	
+
 	//Alte DS entfernen
 	var oldDatasources = notentree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -1334,7 +1334,7 @@ function LehrveranstaltungNotenLoad(lehrveranstaltung_id)
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	lvgesamtnotentree.builder.rebuild();
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	LehrveranstaltungLvGesamtNotenTreeDatasource = rdfService.GetDataSource(url);
 	LehrveranstaltungLvGesamtNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -1345,7 +1345,7 @@ function LehrveranstaltungNotenLoad(lehrveranstaltung_id)
 }
 
 // ****
-// * Selectiert die Noten im LVGesamtNoteTree welche nicht gleich denen 
+// * Selectiert die Noten im LVGesamtNoteTree welche nicht gleich denen
 // * im ZeugnisNoteTree sind
 // ****
 function LehrveranstaltungGesamtNotenTreeSelectDifferent()
@@ -1360,12 +1360,12 @@ function LehrveranstaltungGesamtNotenTreeSelectDifferent()
 			var lvgesamtitems = lvgesamttree.view.rowCount; //Anzahl der Zeilen ermitteln
 		else
 			return false;
-			
+
 		if(zeugnistree.view)
 			var zeugnisitems = zeugnistree.view.rowCount; //Anzahl der Zeilen ermitteln
 		else
 			return false;
-			
+
 		for(var i=0;i<lvgesamtitems;i++)
 	   	{
 	   		//Daten aus LVGesamtNotenTree holen
@@ -1389,7 +1389,7 @@ function LehrveranstaltungGesamtNotenTreeSelectDifferent()
 					break;
 				}
 			}
-			
+
 			if(!found)
 			{
 				//Zeile markieren
@@ -1520,7 +1520,7 @@ function LehrveranstaltungNotenMove()
 			alert(response);
 		else
 			alert(val.dbdml_errormsg);
-			
+
 		LehrveranstaltungNotenTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 		LehrveranstaltungNotenDetailDisableFields(true);
@@ -1690,7 +1690,7 @@ function LehrveranstaltungNotenImport()
 			alert(response);
 		else
 			alert(val.dbdml_errormsg);
-			
+
 		LehrveranstaltungNotenTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 	}
@@ -1729,7 +1729,7 @@ function LehrveranstaltungFFZertifikatPrint()
 		}
 	}
 	var ss = getStudiensemester();
-	
+
 	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat.rdf.php&xsl=Zertifikat&uid='+paramList+'&ss='+ss+'&lvid='+lvid+'&'+gettimestamp();
 	window.location.href = url;
 	//prompt('test:',url);
@@ -1742,38 +1742,38 @@ function LehrveranstaltungNotenDelete()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	tree = document.getElementById('lehrveranstaltung-noten-tree');
-			
+
 	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
 	uid = tree.view.getCellText(tree.currentIndex,col);
-	
+
 	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
 	lvid = tree.view.getCellText(tree.currentIndex,col);
-	
+
 	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiensemester_kurzbz"] : "lehrveranstaltung-noten-tree-studiensemester_kurzbz";
 	stsem = tree.view.getCellText(tree.currentIndex,col);
-	
+
 	if(confirm('Wollen Sie diese Note wirklich löschen'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 		var req = new phpRequest(url,'','');
-	
+
 		req.add('type', 'deletenote');
-	
+
 		req.add('lehrveranstaltung_id', lvid);
 		req.add('student_uid', uid);
 		req.add('studiensemester_kurzbz', stsem);
-			
+
 		var response = req.executePOST();
-	
+
 		var val =  new ParseReturnValue(response)
-	
+
 		if (!val.dbdml_return)
 		{
 			if(val.dbdml_errormsg=='')
 				alert(response);
 			else
 				alert(val.dbdml_errormsg);
-				
+
 			LehrveranstaltungNotenTreeDatasource.Refresh(false); //non blocking
 		}
 		else

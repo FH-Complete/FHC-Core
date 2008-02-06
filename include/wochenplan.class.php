@@ -933,7 +933,7 @@ class wochenplan
 						echo $lf;
 						echo $lvb;
 						if ($this->type!='lektor')
-							echo $lkt;
+							echo utf8_encode($lkt);
 						if ($this->type!='ort')
 							echo  utf8_encode($orte);
 						echo $blink_aus.'</label></button>';
