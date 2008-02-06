@@ -914,9 +914,9 @@ class wochenplan
 							tooltiptext="'.$titel.' - '.$anmerkung.' ('.$updatevonam.')"
 							style="border-width:1px;background-color:#'.$farbe.';"
 							styleOrig="border-width:1px;background-color:#'.$farbe.';" ';
-						if ($berechtigung->isBerechtigt('stplVerschieben',$stg_kz) || $berechtigung->isBerechtigt('admin',0) || $berechtigung->isBerechtigt('admin',$stg_kz))
+						if ($berechtigung->isBerechtigt('lv-plan',$stg_kz) || $berechtigung->isBerechtigt('admin',0) || $berechtigung->isBerechtigt('admin',$stg_kz))
 							echo ' context="stplPopupMenue" ';
-						if ($berechtigung->isBerechtigt('stplVerschieben',$stg_kz) || $berechtigung->isBerechtigt('admin',0) || $berechtigung->isBerechtigt('admin',$stg_kz))
+						if ($berechtigung->isBerechtigt('lv-plan',$stg_kz) || $berechtigung->isBerechtigt('admin',0) || $berechtigung->isBerechtigt('admin',$stg_kz))
 							echo 'ondraggesture="nsDragAndDrop.startDrag(event,listObserver)" ';
 						echo 'ondragdrop="nsDragAndDrop.drop(event,boardObserver)"
 							ondragover="nsDragAndDrop.dragOver(event,boardObserver)"
