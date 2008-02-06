@@ -47,7 +47,7 @@ $error = false;
 //Berechtigungen laden
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
-if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz'))
+if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz') && !$rechte->isBerechtigt('lv-plan'))
 {
 	$return = false;
 	$errormsg = 'Keine Berechtigung';
@@ -207,6 +207,7 @@ if(!$error)
 			$stundenplan->titel = $_POST['titel'];
 			$stundenplan->anmerkung = $_POST['anmerkung'];
 			$stundenplan->fix = ($_POST['fix']=='true'?true:false);
+			$stundenplan->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
 			$stundenplan->updateamum = date('Y-m-d H:i:s');
 			$stundenplan->updatevon = get_uid();
 			

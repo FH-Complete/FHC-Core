@@ -32,9 +32,10 @@ loadVariables($conn, $user);
 // ****
 // * Laedt die zu bearbeitenden Daten
 // ****
-function StplDetailsInit(datum)
+function StplDetailsInit(datum, mitarbeiter_uid)
 {
 	document.getElementById('stpl-details-dialog-box-datum').value=datum;
+	document.getElementById('stpl-details-dialog-menulist-lektor').value=mitarbeiter_uid;
 }
 
 // ****

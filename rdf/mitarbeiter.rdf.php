@@ -40,7 +40,12 @@ if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 if (isset($_GET['lektor']))
-	$lektor=$_GET['lektor'];
+{
+	if($_GET['lektor']=='true')
+		$lektor=true;
+	else 
+		$lektor=false;
+}
 else
 	$lektor=null;
 
@@ -68,6 +73,11 @@ if(isset($_GET['filter']))
 	$filter = $_GET['filter'];
 else 
 	$filter=null;
+	
+if(isset($_GET['mitarbeiter_uid']))
+	$mitarbeiter_uid=$_GET['mitarbeiter_uid'];
+else 
+	$mitarbeiter_uid=null;
 
 if(isset($_GET['lehrveranstaltung_id']) && is_numeric($_GET['lehrveranstaltung_id']))
 {
@@ -111,7 +121,7 @@ function draw_row($mitarbeiter)
   	';
 }
 
-if($lehrveranstaltung_id==null && $filter==null)
+if($lehrveranstaltung_id==null && $filter==null && $mitarbeiter_uid==null)
 {
 	$ma=$mitarbeiter->getMitarbeiter($lektor,$fixangestellt,$stg_kz,$fachbereich_id);
 	
@@ -208,20 +218,36 @@ else
 	  	';
 	}
 	
-	if($filter==null)
+	if($mitarbeiter_uid!=null)
 	{
-		$mitarbeiter->getMitarbeiterFromLehrveranstaltung($lehrveranstaltung_id);
+		$mitarbeiter->load($mitarbeiter_uid);
+		echo " 
+		<RDF:li>
+			<RDF:Seq about=\"".$rdf_url."_alle\" >
+      			<RDF:li>";
+		draw_row($mitarbeiter);
+		echo "
+				</RDF:li>
+			</RDF:Seq>
+		</RDF:li>";
 	}
 	else 
 	{
-		$mitarbeiter->getMitarbeiterFilter($filter);		
-	}
-	
-	foreach ($mitarbeiter->result as $row)
-	{
-		echo '<RDF:li>';
-		draw_row($row);
-		echo '</RDF:li>';
+		if($filter==null)
+		{
+			$mitarbeiter->getMitarbeiterFromLehrveranstaltung($lehrveranstaltung_id);
+		}
+		else 
+		{
+			$mitarbeiter->getMitarbeiterFilter($filter);		
+		}
+		
+		foreach ($mitarbeiter->result as $row)
+		{
+			echo '<RDF:li>';
+			draw_row($row);
+			echo '</RDF:li>';
+		}
 	}
 }
 
