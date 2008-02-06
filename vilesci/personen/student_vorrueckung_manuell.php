@@ -77,7 +77,7 @@ else
 /*$ss->getNextStudiensemester();
 $studiensemester_kurzbz_zk=$ss->studiensemester_kurzbz;	//nächstes Semester*/
 if (isset($_GET['studiensemester_kurzbz_zk']) || isset($_POST['studiensemester_kurzbz_zk']))
-	$studiensemester_kurzbz_zk=(isset($_GET['studiensemester_kurzbz_zk'])?$_GET['studiensemester_kurzbz_zk']:$_POST['studiensemester_kurzbz_zk']);
+	$studiensemester_kurzbz_zk=(isset($_GET['studiensemester_kurzbz_zk'])?$_GET['studiensemester_kurzbz_zk']:$_POST['studiensemester_kurzbz_zk_']);
 else
 	die("Nächstes Studiensemester wurde nicht übergeben.");
 
