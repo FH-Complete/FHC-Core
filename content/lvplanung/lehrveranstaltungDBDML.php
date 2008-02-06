@@ -60,7 +60,7 @@ $error = false;
 //Berechtigungen laden
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
-if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz'))
+if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz') && !$rechte->isBerechtigt('lv-plan'))
 {
 	$return = false;
 	$errormsg = 'Keine Berechtigung';
@@ -92,6 +92,7 @@ if(!$error)
 			{
 				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') && 
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
+				   !$rechte->isBerechtigt('lv-plan', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz) &&
 				   !$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz))
 				{
@@ -187,6 +188,7 @@ if(!$error)
 			{
 				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') && 
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
+				   !$rechte->isBerechtigt('lv-plan', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz) &&
 				   !$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz))
 				{
@@ -313,6 +315,7 @@ if(!$error)
 			{
 				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') && 
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
+				   !$rechte->isBerechtigt('lv-plan', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz) &&
 				   !$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz))
 				{
@@ -390,6 +393,7 @@ if(!$error)
 			{
 				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') && 
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
+				   !$rechte->isBerechtigt('lv-plan', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz) &&
 				   !$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz))
 				{
@@ -473,6 +477,7 @@ if(!$error)
 			{
 				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') && 
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
+				   !$rechte->isBerechtigt('lv-plan', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz) &&
 				   !$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz))
 				{
@@ -585,6 +590,7 @@ if(!$error)
 					
 					if(!$rechte->isBerechtigt('admin', $studiengang_kz, 'suid') && 
 					   !$rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid') &&
+					   !$rechte->isBerechtigt('lv-plan', $studiengang_kz, 'suid') &&
 				       !$rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid', $fachbereich_kurzbz)) /*&&
 				       !$rechte->isBerechtigt('admin', $studiengang_kz, 'suid', $fachbereich_kurzbz))*/
 					{
@@ -596,7 +602,7 @@ if(!$error)
 				else 
 				{
 					if(!$rechte->isBerechtigt('admin', $studiengang_kz, 'si') && !$rechte->isBerechtigt('assistenz', $studiengang_kz, 'si') &&
-					   !$rechte->isBerechtigt('admin', $studiengang_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid'))
+					   !$rechte->isBerechtigt('admin', $studiengang_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid') && !$rechte->isBerechtigt('lv-plan', $studiengang_kz, 'suid'))
 					{
 						$error = true;
 						$return = false;
@@ -653,7 +659,7 @@ if(!$error)
 			}
 			else if ($_POST['do']=='delete') //Lehreinheit loeschen
 			{
-				if(!$rechte->isBerechtigt('admin', $studiengang_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid'))
+				if(!$rechte->isBerechtigt('admin', $studiengang_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid') && !$rechte->isBerechtigt('lv-plan', $studiengang_kz, 'suid'))
 				{
 					$return = false;
 					$error = true;

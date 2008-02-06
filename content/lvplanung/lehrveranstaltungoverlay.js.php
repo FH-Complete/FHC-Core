@@ -647,7 +647,7 @@ function LeDetailSave()
 
 	if (!val.dbdml_return)
 	{
-		alert(val.dbdml_errormsg)
+		alert(val.dbdml_errormsg)		
 	}
 	else
 	{
