@@ -285,7 +285,7 @@ for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
 $outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semesterv='.$semesterv.'&semester=100&studiensemester_kurzbz='.$studiensemester_kurzbz.'&studiensemester_kurzbz_akt='.$studiensemester_kurzbz_akt.'&studiensemester_kurzbz_zk='.$studiensemester_kurzbz_zk.'">alle</A> -- ';
 //Auswahl Studiensemester von dem weg vorgerückt werden soll
 $outp.="<br>-----Vorr&uuml;ckung Studiengang ".$s[$stg_kz]->kurzbz."----------------------------------------------------------------------------------------------------------";
-$outp.="<br>Ausgangs-Studiensemester: &nbsp;&nbsp;&nbsp;<select name='studiensemester_kurzbz_akt'>\n";
+$outp.="<br>Ausgangs-Studiensemester: &nbsp;&nbsp;&nbsp;&nbsp;<select name='studiensemester_kurzbz_akt'>\n";
 foreach ($ss_arr AS $sts2)
 {
 	if ($studiensemester_kurzbz_akt == $sts2)
@@ -303,7 +303,7 @@ for ($j=0;$j<=$s[$stg_kz]->max_sem;$j++)
 $outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semester='.$semester.'&semesterv=100&studiensemester_kurzbz='.$studiensemester_kurzbz.'&studiensemester_kurzbz_akt='.$studiensemester_kurzbz_akt.'&studiensemester_kurzbz_zk='.$studiensemester_kurzbz_zk.'">alle</A> -- ';
 
 //Auswahl Studiensemester in das vorgerückt werden soll
-$outp.="<br>Ziel-Studiensemester: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<select name='studiensemester_kurzbz_zk'>\n";
+$outp.="<br>Ziel-Studiensemester: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<select name='studiensemester_kurzbz_zk'>\n";
 foreach ($ss_arr AS $sts3)
 {
 	if ($studiensemester_kurzbz_zk == $sts3)
