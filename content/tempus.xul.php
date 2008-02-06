@@ -121,7 +121,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
       		</menupopup>
         </menu>
         <?php
-        if($rechte->isBerechtigt('admin'))
+        if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('lv-plan'))
         {
         ?>	
         <menu id="menu-prefs-stpltable" label="&menu-prefs-stpltable.label;" accesskey="&menu-prefs-stpltable.accesskey;">

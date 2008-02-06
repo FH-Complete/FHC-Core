@@ -242,6 +242,7 @@ function STPLDetailSave(dialog)
 	var titel = dialog.getElementById('stpl-details-dialog-textbox-titel').value;
 	var anmerkung = dialog.getElementById('stpl-details-dialog-textbox-anmerkung').value;
 	var fix = dialog.getElementById('stpl-details-dialog-checkbox-fix').checked;
+	var mitarbeiter_uid = dialog.getElementById('stpl-details-dialog-menulist-lektor').value;
 	
 	var url = '<?php echo APP_ROOT ?>content/tempusDBDML.php';
 	var req = new phpRequest(url,'','');
@@ -260,6 +261,7 @@ function STPLDetailSave(dialog)
 	req.add('anmerkung', anmerkung);
 	req.add('stundenplan_id', id);
 	req.add('fix', fix);
+	req.add('mitarbeiter_uid', mitarbeiter_uid);
 	
 	var response = req.executePOST();
 

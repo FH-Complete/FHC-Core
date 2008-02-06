@@ -56,7 +56,7 @@ $error = false;
 //Berechtigungen laden
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
-if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('mitarbeiter') && !$rechte->isBerechtigt('assistenz'))
+if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('mitarbeiter') && !$rechte->isBerechtigt('assistenz') && !$rechte->isBerechtigt('lv-plan'))
 {
 	$return = false;
 	$errormsg = 'Keine Berechtigung';

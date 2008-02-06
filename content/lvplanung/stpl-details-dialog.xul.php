@@ -62,7 +62,7 @@ $studiengang->load($stundenplan->studiengang_kz);
 
 <window id="stpl-details-dialog" title="Details"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        onload="StplDetailsInit('<?php echo $datum_obj->convertISODate($stundenplan->datum); ?>')"
+        onload="StplDetailsInit('<?php echo $datum_obj->convertISODate($stundenplan->datum); ?>','<?php echo $stundenplan->mitarbeiter_uid; ?>')"
         >
 
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/lvplanung/stpl-details-dialog.js.php" />
@@ -204,6 +204,20 @@ $studiengang->load($stundenplan->studiengang_kz);
 							</menupopup>
 					</menulist>
       			</row>
+      			<row>
+      				<label value="Lektor" control="stpl-details-dialog-menulist-lektor"/>
+					<menulist id="stpl-details-dialog-menulist-lektor"
+							datasources="<?php echo APP_ROOT.'rdf/mitarbeiter.rdf.php?stg_kz='.$stundenplan->studiengang_kz.'&amp;lektor=true'.
+							                    ' '.APP_ROOT.'rdf/mitarbeiter.rdf.php?mitarbeiter_uid='.$stundenplan->mitarbeiter_uid;?>"
+							ref="http://www.technikum-wien.at/mitarbeiter/_alle" flex="1">
+						<template>
+							<menupopup>
+								<menuitem uri="rdf:*" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname"
+									value="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"/>
+							</menupopup>
+						</template>
+					</menulist>
+				</row>
 				<row>
 					<label value="Datum" control="stpl-details-dialog-box-datum"/>
 					<hbox>

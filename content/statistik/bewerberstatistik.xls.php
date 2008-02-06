@@ -81,8 +81,8 @@ loadVariables($conn, $user);
 	$studiengang->getAll('typ, kurzbzlang', false);
 	foreach ($studiengang->result as $row)
 	{
-		//btec, tw und LLLC nicht anzeigen
-		if($row->studiengang_kz!='0' && $row->studiengang_kz!='203' && $row->studiengang_kz!='10001')
+		//btec, tw, LLLC und eak nicht anzeigen
+		if($row->studiengang_kz!='0' && $row->studiengang_kz!='203' && $row->studiengang_kz!='10001' && $row->studiengang_kz!='10002')
 		{
 			if(isset($stg_arr_2[$row->studiengang_kz]))
 				$worksheet->write(0,$i,$stg_arr_2[$row->studiengang_kz], $format_bold);
@@ -93,7 +93,7 @@ loadVariables($conn, $user);
 			$i++;
 		}
 	}
-			
+	
 	// Daten holen
 	$qry = "SELECT *, tbl_person.person_id 
 			FROM 
@@ -103,7 +103,7 @@ loadVariables($conn, $user);
 				tbl_prestudent.person_id=tbl_person.person_id AND
 				studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
 				rolle_kurzbz in('Interessent','Bewerber','Student','Abbrecher','Unterbrecher','Diplomand','Incoming', 'Praktikant') AND
-				studiengang_kz not in(0, 203, 10001)
+				studiengang_kz not in(0, 203, 10001, 10002)
 			ORDER BY nachname, vorname, tbl_prestudentrolle.datum, tbl_prestudentrolle.insertamum, tbl_prestudentrolle.ext_id";
 	//'Outgoing',
 	
