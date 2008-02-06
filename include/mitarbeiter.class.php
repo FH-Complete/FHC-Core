@@ -330,14 +330,19 @@ class mitarbeiter extends benutzer
 		return $result;
 	}
 
-	function getMitarbeiterStg($lektor,$fixangestellt, $stge, $fkt_kurzbz)
+	function getMitarbeiterStg($lektor=true,$fixangestellt, $stge, $fkt_kurzbz)
 	{
 		$sql_query='SELECT DISTINCT campus.vw_mitarbeiter.*, tbl_benutzerfunktion.studiengang_kz FROM campus.vw_mitarbeiter
 					JOIN public.tbl_benutzerfunktion USING (uid)
-					WHERE';
-		if (!$lektor)
-			$sql_query.=' NOT';
-		$sql_query.=' lektor';
+					WHERE true';
+		if(!is_null($lektor))
+		{
+			$sql_query.=' AND';
+			if (!$lektor)
+				$sql_query.=' NOT';
+			$sql_query.=' lektor';
+		}
+		
 		if ($fixangestellt!=null)
 		{
 			$sql_query.=' AND';

@@ -357,6 +357,7 @@ class benutzerberechtigung
 				}
 				else
 					return true;
+					
 		}
 		return false;
 	}
