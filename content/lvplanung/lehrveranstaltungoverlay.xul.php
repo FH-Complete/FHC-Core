@@ -54,7 +54,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 		<toolbox>
 			<toolbar id="lehrveranstaltung-nav-toolbar">
 			<toolbarbutton id="lehrveranstaltung-toolbar-neu" label="Neue Lehreinheit" oncommand="LeNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Neue Lehreinheit anlegen" />
-			<toolbarbutton id="lehrveranstaltung-toolbar-del" label="Löschen" oncommand="LeDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Lehreinheiten löschen"/>
+			<toolbarbutton id="lehrveranstaltung-toolbar-del" label="Loeschen" oncommand="LeDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Lehreinheiten löschen"/>
 			<toolbarbutton id="lehrveranstaltung-toolbar-refresh" label="Aktualisieren" oncommand="LvTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 			<toolbarbutton id="lehrveranstaltung-toolbar-lehrauftrag" label="Lehrauftrag" oncommand="LvCreateLehrauftrag()" disabled="false" image="../skin/images/person.gif" tooltiptext="Lehrauftrag ausdrucken" hidden="true"/>
 			<!--<toolbarbutton id="lehrveranstaltung-toolbar-refresh" label="Load" oncommand="debugload()" disabled="false"/>-->
@@ -184,7 +184,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#studiengang"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#semester"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrveranstaltung_id"  />
-							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehreinheit_id"/>							
+							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehreinheit_id"/>
 						</treerow>
 					</treeitem>
 				</treechildren>

@@ -69,28 +69,40 @@ if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz') && !$r
 }
 
 
-function check_kollision($lehreinheit_id, $mitarbeiter_uid, $mitarbeiter_uid_old)
+function kollision($lehreinheit_id, $mitarbeiter_uid, $mitarbeiter_uid_old)
 {
-	return true;	
+	loadVariables($conn, $user);
+	//Lehrstunden laden
+	$lehrstunden=new lehrstunde($conn);
+	$lehrstunde=new lehrstunde($conn);
+	$lehrstunden->load_lehrstunden_le($lehreinheit_id,$mitarbeiter_uid_old);
+	foreach ($lehrstunden->lehrstunden as $ls)
+	{
+		$lehrstunde->load($ls->stundenplan_id);
+		$lehrstunde->lektor_uid=$mitarbeiter_uid;
+		if ($lehrstunde->kollision)
+			return true;
+	}
+	return false;
 }
 
 if(!$error)
 {
-	
+
 	if(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_save')
 	{
 		loadVariables($conn, $user);
-		
+
 		//Lehreinheitmitarbeiter Zuteilung
-		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz 
-				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach 
+		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz
+				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
 		if($result = pg_query($conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
 			{
-				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') && 
+				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('lv-plan', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz) &&
@@ -101,24 +113,24 @@ if(!$error)
 					$errormsg = 'Keine Berechtigung';
 				}
 			}
-			else 
+			else
 			{
 				$error = true;
 				$return = false;
 				$errormsg = 'Lehreinheit wurde nicht gefunden';
 			}
 		}
-		else 
+		else
 		{
 			$error = true;
 			$return = false;
 			$errormsg = 'Lehreinheit wurde nicht gefunden';
 		}
-		
+
 		if(!$error)
 		{
 			$lem = new lehreinheitmitarbeiter($conn, null, null, true);
-			
+
 			if(!$lem->load($_POST['lehreinheit_id'],$_POST['mitarbeiter_uid_old']))
 			{
 				$return = false;
@@ -140,24 +152,24 @@ if(!$error)
 				$lem->bismelden = ($_POST['bismelden']=='true'?true:false);
 				$lem->updateamum = date('Y-m-d H:i:s');
 				$lem->updatevon = $user;
-			
+
 				$lem->new=false;
-				
+
 				if(!$ignore_kollision && $lem->mitarbeiter_uid!=$lem->mitarbeiter_uid_old)
 				{
 					//check kollision
-					if(check_kollision($lem->lehreinheit_id, $lem->mitarbeiter_uid, $lem->mitarbeiter_uid_old))
+					if(!kollision($lem->lehreinheit_id, $lem->mitarbeiter_uid, $lem->mitarbeiter_uid_old))
 					{
 						//Update im Stundenplan
 					}
-					else 
+					else
 					{
 						$return = false;
 						$errormsg = 'Fehler: Die Aenderung des Lektors fuehrt zu einer Kollision im Stundenplan';
 						$error = true;
 					}
 				}
-				
+
 				if(!$error)
 				{
 					if($lem->save())
@@ -178,15 +190,15 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_add')
 	{
 		//neue Lehreinheitmitarbeiterzuteilung anlegen
-		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz 
-				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach 
+		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz
+				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
 		if($result = pg_query($conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
 			{
-				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') && 
+				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('lv-plan', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz) &&
@@ -197,30 +209,30 @@ if(!$error)
 					$errormsg = 'Keine Berechtigung';
 				}
 			}
-			else 
+			else
 			{
 				$error = true;
 				$return = false;
 				$errormsg = 'Lehreinheit wurde nicht gefunden';
 			}
 		}
-		else 
+		else
 		{
 			$error = true;
 			$return = false;
 			$errormsg = 'Lehreinheit wurde nicht gefunden';
 		}
-		
+
 		if(!$error)
 		{
 			if(isset($_POST['lehreinheit_id']) && isset($_POST['mitarbeiter_uid']))
 			{
 				$lem = new lehreinheitmitarbeiter($conn, null, null, true);
-				
+
 				$lem->lehreinheit_id = $_POST['lehreinheit_id'];
 				$lem->lehrfunktion_kurzbz = 'Lektor';
 				$lem->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
-				
+
 				$lem->semesterstunden = '0';
 				$lem->planstunden = '0';
 				$lem->anmerkung = '';
@@ -230,7 +242,7 @@ if(!$error)
 				$lem->insertamum = date('Y-m-d H:i:s');
 				$lem->insertvon = $user;
 				$lem->new=true;
-				
+
 				//Stundensatz aus tbl_mitarbeiter holen
 				$qry = "SELECT stundensatz FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='".addslashes($_POST['mitarbeiter_uid'])."'";
 				if($result = pg_query($conn, $qry))
@@ -239,23 +251,23 @@ if(!$error)
 					{
 						if($row->stundensatz!='')
 							$lem->stundensatz = $row->stundensatz;
-						else 
+						else
 							$lem->stundensatz = '0';
 					}
-					else 
+					else
 					{
 						$error=true;
 						$return=false;
 						$errormsg='Mitarbeiter '.addslashes($_POST['mitarbeiter_uid']).' wurde nicht gefunden';
 					}
 				}
-				else 
+				else
 				{
 					$error=true;
 					$return=false;
 					$errormsg='Fehler bei einer Datenbankabfrage:'.pg_errormessage($conn);
 				}
-	
+
 				//Faktor aus tbl_lehrveranstaltung holen
 				$qry = "SELECT planfaktor FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE lehreinheit_id='".$_POST['lehreinheit_id']."';";
 				if($result = pg_query($conn, $qry))
@@ -264,23 +276,23 @@ if(!$error)
 					{
 						if($row->planfaktor!='')
 							$lem->faktor = $row->planfaktor;
-						else 
+						else
 							$lem->faktor = '0';
 					}
-					else 
+					else
 					{
 						$error = true;
 						$return = false;
 						$errormsg = 'Lehrveranstaltung wurde nicht gefunden';
 					}
 				}
-				else 
+				else
 				{
 					$error = true;
 					$return = false;
 					$errormsg = 'Fehler in einer Datenbankabfrage:'.pg_errormessage($conn);
 				}
-				
+
 				if(!$error)
 				{
 					if($lem->save())
@@ -296,7 +308,7 @@ if(!$error)
 					}
 				}
 			}
-			else 
+			else
 			{
 				$return = false;
 				$errormsg = 'Fehlerhafte Parameteruebergabe';
@@ -305,15 +317,15 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_del')
 	{
-		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz 
-				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach 
+		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz
+				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
 		if($result = pg_query($conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
 			{
-				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') && 
+				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('lv-plan', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz) &&
@@ -324,27 +336,27 @@ if(!$error)
 					$errormsg = 'Keine Berechtigung';
 				}
 			}
-			else 
+			else
 			{
 				$error = true;
 				$return = false;
 				$errormsg = 'Lehreinheit wurde nicht gefunden';
 			}
 		}
-		else 
+		else
 		{
 			$error = true;
 			$return = false;
 			$errormsg = 'Lehreinheit wurde nicht gefunden';
 		}
-		
+
 		if(!$error)
 		{
 			//Lehreinheitmitarbeiterzuteilung loeschen
 			if(isset($_POST['lehreinheit_id']) && is_numeric($_POST['lehreinheit_id']) && isset($_POST['mitarbeiter_uid']))
 			{
 				//Wenn der Mitarbeiter im Stundenplan verplant ist, dann wird das Loeschen verhindert
-				$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev WHERE lehreinheit_id='".$_POST['lehreinheit_id']."' AND mitarbeiter_uid='".addslashes($_POST['mitarbeiter_uid'])."' 
+				$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev WHERE lehreinheit_id='".$_POST['lehreinheit_id']."' AND mitarbeiter_uid='".addslashes($_POST['mitarbeiter_uid'])."'
 						UNION
 						SELECT stundenplan_id as id FROM lehre.tbl_stundenplan WHERE lehreinheit_id='".$_POST['lehreinheit_id']."' AND mitarbeiter_uid='".addslashes($_POST['mitarbeiter_uid'])."'";
 				if($result = pg_query($conn, $qry))
@@ -354,8 +366,8 @@ if(!$error)
 						$return = false;
 						$errormsg = 'Dieser Lektor kann nicht geloescht werden da er schon verplant ist';
 					}
-					else 
-					{			
+					else
+					{
 						$leg = new lehreinheitmitarbeiter($conn);
 						if($leg->delete($_POST['lehreinheit_id'], $_POST['mitarbeiter_uid']))
 						{
@@ -368,7 +380,7 @@ if(!$error)
 						}
 					}
 				}
-				else 
+				else
 				{
 					$return = false;
 					$errormsg = 'Fehler:'.$qry;
@@ -383,15 +395,15 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_gruppe_del')
 	{
-		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz 
-				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach 
+		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz
+				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id=(SELECT lehreinheit_id FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id='".addslashes($_POST['lehreinheitgruppe_id'])."')";
 		if($result = pg_query($conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
 			{
-				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') && 
+				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('lv-plan', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz) &&
@@ -402,20 +414,20 @@ if(!$error)
 					$errormsg = 'Keine Berechtigung';
 				}
 			}
-			else 
+			else
 			{
 				$error = true;
 				$return = false;
 				$errormsg = 'Lehreinheit wurde nicht gefunden';
 			}
 		}
-		else 
+		else
 		{
 			$error = true;
 			$return = false;
 			$errormsg = 'Lehreinheit wurde nicht gefunden';
 		}
-		
+
 		if(!$error)
 		{
 			$qry = "SELECT count(*) as anzahl FROM lehre.tbl_lehreinheitgruppe, lehre.tbl_lehreinheit, campus.tbl_uebung WHERE
@@ -426,7 +438,7 @@ if(!$error)
 			{
 				if($row = pg_fetch_object($result))
 				{
-					if($row->anzahl>0)	
+					if($row->anzahl>0)
 					{
 						$error = true;
 						$return = false;
@@ -434,18 +446,18 @@ if(!$error)
 					}
 				}
 			}
-			else 
+			else
 			{
 				$error = true;
 				$retur = false;
 				$errormsg = 'Fehler beim Ermitteln ob eine Kreuzerlliste vorhanden ist';
 			}
-			
+
 			if(!$error)
 			{
 				//Lehreinheitgruppezuteilung loeschen
 				if(isset($_POST['lehreinheitgruppe_id']) && is_numeric($_POST['lehreinheitgruppe_id']))
-				{			
+				{
 					$leg = new lehreinheitgruppe($conn);
 					if($leg->delete($_POST['lehreinheitgruppe_id']))
 					{
@@ -467,15 +479,15 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_gruppe_add')
 	{
-		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz 
-				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach 
+		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz
+				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
 		if($result = pg_query($conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
 			{
-				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') && 
+				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('lv-plan', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz) &&
@@ -486,20 +498,20 @@ if(!$error)
 					$errormsg = 'Keine Berechtigung';
 				}
 			}
-			else 
+			else
 			{
 				$error = true;
 				$return = false;
 				$errormsg = 'Lehreinheit wurde nicht gefunden';
 			}
 		}
-		else 
+		else
 		{
 			$error = true;
 			$return = false;
 			$errormsg = 'Lehreinheit wurde nicht gefunden';
 		}
-		
+
 		if(!$error)
 		{
 			//Lehreinheitgruppezuteilung anlegen
@@ -514,7 +526,7 @@ if(!$error)
 				$leg->gruppe_kurzbz = $_POST['gruppe_kurzbz'];
 				$leg->insertamum = date('Y-m-d H:i:s');
 				$leg->insertvon = $user;
-	
+
 				if(!$leg->checkVorhanden())
 				{
 					if($leg->save(true))
@@ -527,7 +539,7 @@ if(!$error)
 						$errormsg = $leg->errormsg;
 					}
 				}
-				else 
+				else
 				{
 					$return = false;
 					$errormsg = 'Diese Gruppe ist bereits zugeteilt';
@@ -544,13 +556,13 @@ if(!$error)
 	{
 		//Lehreinheit anlegen/aktualisieren
 		if($_POST['lehreinheit_id']!='')
-			$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz 
-					FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach 
+			$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz
+					FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach
 					WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 					tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
-		else 
+		else
 			$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='".addslashes($_POST['lehrveranstaltung'])."'";
-				
+
 		if($result = pg_query($conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
@@ -560,20 +572,20 @@ if(!$error)
 				if(isset($row->fachbereich_kurzbz))
 					$fachbereich_kurzbz = $row->fachbereich_kurzbz;
 			}
-			else 
+			else
 			{
 				$error = true;
 				$return = false;
 				$errormsg = 'Lehreinheit wurde nicht gefunden';
 			}
 		}
-		else 
+		else
 		{
 			$error = true;
 			$return = false;
 			$errormsg = 'Lehreinheit wurde nicht gefunden';
 		}
-	
+
 		if(!$error)
 		{
 			$leDAO=new lehreinheit($conn, null, true);
@@ -587,8 +599,8 @@ if(!$error)
 						$error = true;
 						$errormsg = 'Fehler beim Laden der Lehreinheit';
 					}
-					
-					if(!$rechte->isBerechtigt('admin', $studiengang_kz, 'suid') && 
+
+					if(!$rechte->isBerechtigt('admin', $studiengang_kz, 'suid') &&
 					   !$rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid') &&
 					   !$rechte->isBerechtigt('lv-plan', $studiengang_kz, 'suid') &&
 				       !$rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid', $fachbereich_kurzbz)) /*&&
@@ -599,7 +611,7 @@ if(!$error)
 						$errormsg = 'Keine Berechtigung';
 					}
 				}
-				else 
+				else
 				{
 					if(!$rechte->isBerechtigt('admin', $studiengang_kz, 'si') && !$rechte->isBerechtigt('assistenz', $studiengang_kz, 'si') &&
 					   !$rechte->isBerechtigt('admin', $studiengang_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid') && !$rechte->isBerechtigt('lv-plan', $studiengang_kz, 'suid'))
@@ -607,9 +619,9 @@ if(!$error)
 						$error = true;
 						$return = false;
 						$errormsg = 'Keine Berechtigung';
-					}					
+					}
 				}
-	
+
 				if(!$error)
 				{
 					$leDAO->lehrveranstaltung_id=$_POST['lehrveranstaltung'];
@@ -632,7 +644,7 @@ if(!$error)
 					}
 					$leDAO->updateamum=date('Y-m-d H:i:s');
 					$leDAO->updatevon=$user;
-	
+
 					if ($_POST['do']=='create')
 					{
 						// LE neu anlegen
@@ -665,10 +677,10 @@ if(!$error)
 					$error = true;
 					$errormsg = 'Keine Berechtigung';
 				}
-				else 
+				else
 				{
 					// LE loeschen
-					$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev WHERE lehreinheit_id='".$_POST['lehreinheit_id']."' 
+					$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev WHERE lehreinheit_id='".$_POST['lehreinheit_id']."'
 							UNION
 							SELECT stundenplan_id as id FROM lehre.tbl_stundenplan WHERE lehreinheit_id='".$_POST['lehreinheit_id']."'";
 					if($result = pg_query($conn, $qry))
@@ -678,7 +690,7 @@ if(!$error)
 							$return = false;
 							$errormsg = 'Diese Lehreinheit ist bereits im LV-Plan verplant und kann daher nicht geloescht werden!';
 						}
-						else 
+						else
 						{
 							if ($leDAO->delete($_POST['lehreinheit_id']))
 							{
@@ -691,7 +703,7 @@ if(!$error)
 							}
 						}
 					}
-					else 
+					else
 					{
 						$return = false;
 						$errormsg = 'unbekannter Fehler';
@@ -710,13 +722,13 @@ if(!$error)
 				$data = $mitarbeiter->stundensatz;
 				$return = true;
 			}
-			else 
+			else
 			{
 				$errormsg = 'Fehler beim Laden des Mitarbeiters';
 				$return = false;
 			}
 		}
-		else 
+		else
 		{
 			$errormsg = 'MitarbeiterUID muss uebergeben werden';
 			$return = false;

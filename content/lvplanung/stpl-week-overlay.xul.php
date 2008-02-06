@@ -108,6 +108,7 @@ $num_rows_stunde=pg_numrows($result_stunde);
 		/>
 		</toolbar>
 </toolbox>
+
 <vbox id="vboxLehrveranstalungPlanung" style="overflow:auto;margin:0px;" flex="1"
 	datasources="../rdf/lehreinheit-lvplan.rdf.php"
 	ref="http://www.technikum-wien.at/lehreinheit-lvplan/alle">
@@ -144,14 +145,14 @@ $num_rows_stunde=pg_numrows($result_stunde);
 	        					onclick="onLVAdoStpl(event);"
 	       						idList="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lva_ids"
 	       						aktion="lva_stpl_del_single"
-	       						tooltiptext="Löschen SingleWeek"
+	       						tooltiptext="Loeschen SingleWeek"
 	        				/>
 	        				<toolbarbutton
 		        				image="../skin/images/lvaMultiDel.png"
 	        					onclick="onLVAdoStpl(event);"
 	       						idList="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lva_ids"
 	       						aktion="lva_stpl_del_multi"
-	       						tooltiptext="Löschen MultiWeek"
+	       						tooltiptext="Loeschen MultiWeek"
 	        				/>
 	        			</hbox>
 	        		</row>

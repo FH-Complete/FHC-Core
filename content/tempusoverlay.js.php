@@ -38,7 +38,7 @@ function onVerbandSelect()
 	var typ=tree.view.getCellText(tree.currentIndex,col);
 	col = tree.columns ? tree.columns["stsem"] : "stsem";
 	var stsem=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	var daten=window.TimeTableWeek.document.getElementById('TimeTableWeekData');
 	var datum=parseInt(daten.getAttribute("datum"));
 	var attributes="&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
@@ -65,7 +65,7 @@ function onVerbandSelect()
 	var panelIndex=semesterplan.getAttribute("selectedIndex");
 	if (panelIndex==1)
 	{
-		alert (url);
+		//alert (url);
 		var contentFrame=document.getElementById('iframeTimeTableSemester');
 		var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 		if (gruppe!=null && gruppe!=0 &gruppe!='')
@@ -91,7 +91,7 @@ function onVerbandSelect()
 	// Studenten
 	if(typ=='')
 	{
-		
+
 		try
 		{
 			//Bei Ansicht von Ab-/Unterbrecher den Button "->Student" anzeigen
@@ -101,7 +101,7 @@ function onVerbandSelect()
 				document.getElementById('student-toolbar-student').hidden=true;
 		}
 		catch(e){}
-	
+
 		// -------------- Studenten --------------------------
 		try
 		{

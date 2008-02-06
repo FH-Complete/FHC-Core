@@ -33,7 +33,7 @@ class lehrstunde
 	var $datum;			// @brief Datum
 	var $stunde;		// @brief Unterrichts-Stunde des Tages
 	var $ort_kurzbz;	// @brief Ort in dem der Unterricht stattfindet
-	var $lehrfach_nr;	// @brief Nummer des Lehrfachs
+	var $lehrfach_id;	// @brief Nummer des Lehrfachs
 	var $lehrfach;		// @brief Name des Lehrfachs
 	var $lehrfach_bez;	// @brief Voller Name des Lehrfachs
 	var $lehrform;		// @brief Lehrform des Lehrfachs (Vorlesung, ...)
@@ -112,7 +112,7 @@ class lehrstunde
 			$this->ort_kurzbz=$row->ort_kurzbz;
 			$this->lehrfach=$row->lehrfach;
 			$this->lehrfach_bez=$row->lehrfach_bez;
-			$this->lehrfach_nr=$row->lehrfach_nr;
+			$this->lehrfach_id=$row->lehrfach_id;
 			$this->lehrform=$row->lehrform;
 			$this->studiengang_kz=$row->studiengang_kz;
 			$this->studiengang=$row->stg_kurzbz;
@@ -427,7 +427,7 @@ class lehrstunde
 				$stunde->datum=$row->datum;
 				$stunde->stunde=$row->stunde;
 				$stunde->ort_kurzbz=$row->ort_kurzbz;
-				//$stunde->lehrfach_nr=$row->lehrfach_nr;
+				//$stunde->lehrfach_id=$row->lehrfach_id;
 				$stunde->lehrfach=$row->titel;
 				$stunde->lehrfach_bez=$row->beschreibung;
 				$stunde->studiengang_kz=$row->studiengang_kz;
@@ -446,6 +446,66 @@ class lehrstunde
 		//echo $this->anzahl;
 		return $this->anzahl;
 	}
+
+	/**
+	 * @param lehreinheit_id
+	 * @param uid (mitarbeiter)
+	 *
+	 */
+	function load_lehrstunden_le($lehreinheit_id, $uid=null, $stpl_table='stundenplandev')
+	{
+		///////////////////////////////////////////////////////////////////////
+		// Parameter Checken
+		// Bezeichnung der Stundenplan-Tabelle und des Keys
+		$stpl_id=$stpl_table.TABLE_ID;
+		$stpl_table='lehre.'.TABLE_BEGIN.$stpl_table;
+
+		///////////////////////////////////////////////////////////////////////
+		// Stundenplandaten ermitteln
+		// Abfrage generieren
+		$sql="SELECT * FROM ".$stpl_table." WHERE lehreinheit_id=$lehreinheit_id";
+		if ($uid!=null && !is_null($uid))
+			$sql.=" AND mitarbeiter_uid='$uid'";
+		//echo $sql;
+		//Datenbankabfrage
+		if (!$result=pg_query($this->conn, $sql))
+		{
+			$this->errormsg=pg_last_error($this->conn);
+			//echo $this->errormsg;
+			return -1;
+		}
+		$num_rows=pg_numrows($result);
+		$this->anzahl=$num_rows;
+		//Daten uebernehmen
+		for ($i=0;$i<$num_rows;$i++)
+		{
+			$row=pg_fetch_object ($result, $i);
+			$stunde=new lehrstunde($this->conn);
+			$stunde->stundenplan_id=$row->{$stpl_id};
+			$stunde->lehreinheit_id=$row->lehreinheit_id;
+			$stunde->unr=$row->unr;
+			$stunde->studiengang_kz=$row->studiengang_kz;
+			$stunde->sem=$row->semester;
+			$stunde->ver=$row->verband;
+			$stunde->grp=$row->gruppe;
+			$stunde->gruppe_kurzbz=$row->gruppe_kurzbz;
+			$stunde->lektor_uid=$row->mitarbeiter_uid;
+			$stunde->ort_kurzbz=$row->ort_kurzbz;
+			$stunde->datum=$row->datum;
+			$stunde->stunde=$row->stunde;
+			$stunde->titel=$row->titel;
+			$stunde->anmerkung=$row->anmerkung;
+			$stunde->fix=$row->fix;
+			$stunde->insertamum=$row->insertamum;
+			$stunde->insertvon=$row->insertvon;
+			$stunde->updateamum=$row->updateamum;
+			$stunde->updatevon=$row->updatevon;
+			$stunde->reservierung=false;
+			$this->lehrstunden[$i]=$stunde;
+		}
+		return $this->anzahl;
+	}
+
 
 	/*************************************************************************
 	 * Prueft die geladene Lehrveranstaltung auf Kollisionen im Stundenplan.
@@ -491,25 +551,26 @@ class lehrstunde
 			// Zeitsperren pruefen
 			if ($this->lektor_uid!='_DummyLektor')
 			{
-				/*// Datenbank abfragen  	( studiengang_kz, titel, beschreibung )
-				$sql_query="SELECT 	zeitsperre_id,zeitsperretyp_kurzbz,mitarbeiter_uid AS lektor,vondatum,vonstunde,bisdatum,bisstunde
+				// Datenbank abfragen  	( studiengang_kz, titel, beschreibung )
+				$sql_query="SELECT zeitsperre_id,zeitsperretyp_kurzbz,mitarbeiter_uid AS lektor,vondatum,vonstunde,bisdatum,bisstunde
 							FROM campus.tbl_zeitsperre
-							WHERE datum='$this->datum' AND stunde=$this->stunde AND (ort_kurzbz='$this->ort_kurzbz' OR ";
-				$sql_query.="))";
+							WHERE mitarbeiter_uid='$this->lektor_uid'
+								AND (vondatum<'$this->datum' OR (vondatum='$this->datum' AND (vonstunde<=$this->stunde OR vonstunde IS NULL)))
+								AND (bisdatum>'$this->datum' OR (bisdatum='$this->datum' AND (bisstunde>=$this->stunde OR vonstunde IS NULL)));";
 				//echo $sql_query.'<br>';
 				if (! $erg_zs=pg_query($this->conn, $sql_query))
 				{
 					$this->errormsg=$sql_query.pg_last_error($this->conn);
 					return true;
 				}
-				$anz_zs=pg_numrows($erg_res);
+				$anz_zs=pg_numrows($erg_zs);
 				//Check
-				if ($anz_res!=0)
+				if ($anz_zs!=0)
 				{
-					$row=pg_fetch_object($erg_res);
+					$row=pg_fetch_object($erg_zs);
 					$this->errormsg="Kollision (Zeitsperre): $row->zeitsperre_id|$row->lektor|$row->zeitsperretyp_kurzbz - $row->vondatum/$row->vonstunde|$row->bisdatum/$row->bisstunde";
 					return true;
-				}*/
+				}
 			}
 			// Reservierungen pruefen?
 			if (!$ignore_reservation)
