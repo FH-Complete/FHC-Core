@@ -54,34 +54,70 @@ $user = get_uid();
 //Übergabeparameter
 //studiengang
 if (isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
+{
 	$stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:$_POST['stg_kz']);
+}
 else
+{
 	$stg_kz=0;
-//semester
+}
+//semester anzeige
 if (isset($_GET['semester']) || isset($_POST['semester']))
+{
 	$semester=(isset($_GET['semester'])?$_GET['semester']:$_POST['semester']);
+}
 else
+{
 	$semester=100;
+}
+//semester vorrückung
+if (isset($_GET['semesterv']) || isset($_POST['semesterv']))
+{
+	$semesterv=(isset($_GET['semesterv'])?$_GET['semesterv']:$_POST['semesterv']);
+}
+else
+{
+	$semesterv=100;
+}
 //angezeigtes studiensemester
 if (isset($_GET['studiensemester_kurzbz']) || isset($_POST['studiensemester_kurzbz']))
+{
 	$studiensemester_kurzbz=(isset($_GET['studiensemester_kurzbz'])?$_GET['studiensemester_kurzbz']:$_POST['studiensemester_kurzbz']);
+}
 else
+{
 	$studiensemester_kurzbz=$ss->getakt();
+}
 //ausgangssemester für vorrückung
 if (isset($_GET['studiensemester_kurzbz_akt']) || isset($_POST['studiensemester_kurzbz_akt']))
+{
 	$studiensemester_kurzbz_akt=(isset($_GET['studiensemester_kurzbz_akt'])?$_GET['studiensemester_kurzbz_akt']:$_POST['studiensemester_kurzbz_akt']);
+}
 else
+{
 	$studiensemester_kurzbz_akt=$studiensemester_kurzbz;
-//zielsemester für vorrückung - nachfolgend ausgangssemester
-$studiensemester_kurzbz_zk=$ss->getNextFrom($studiensemester_kurzbz_akt);
+}
+//zielsemester für vorrückung
+if (isset($_GET['studiensemester_kurzbz_zk']) || isset($_POST['studiensemester_kurzbz_zk']))
+{
+	$studiensemester_kurzbz_zk=(isset($_GET['studiensemester_kurzbz_zk'])?$_GET['studiensemester_kurzbz_zk']:$_POST['studiensemester_kurzbz_zk']);
+}
+else
+{
+	$studiensemester_kurzbz_zk=$ss->getNextFrom($studiensemester_kurzbz_akt);
+}
 
 
 
 if(!is_numeric($stg_kz))
+{
 	$stg_kz=0;
+}
 //semester=100 bedeutet die Auswahl aller Semester
 if(!is_numeric($semester))
+{
 	$semester=100;
+}
 
 //Einlesen der maximalen, regulären Dauer der Studiengänge in einen Array
 $qry_stg="SELECT * FROM public.tbl_studiengang";
@@ -108,7 +144,9 @@ $sql_query.="ORDER BY semester, nachname";
 
 //echo $sql_query;
 if (!$result_std=pg_query($conn, $sql_query))
+{
 	error("Studenten not found!");
+}
 $outp='';
 
 // ****************************** Vorrücken ******************************
@@ -123,13 +161,15 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 			AND studiensemester_kurzbz='$studiensemester_kurzbz_akt'";
 	if($semester<100)
 	{
-		$sql_query.="AND tbl_studentlehrverband.semester='$semester' "; //semester = 100 wählt alle aus
+		$sql_query.="AND tbl_studentlehrverband.semester='$semesterv' "; //semester = 100 wählt alle aus
 	}
 	$sql_query.="ORDER BY semester, nachname";
 	
 	//echo $sql_query;
 	if (!$result_std=pg_query($conn, $sql_query))
+	{
 		error("Studenten not found!");
+	}
 	$next_ss=$studiensemester_kurzbz_zk;
 	while($row=pg_fetch_object($result_std))
 	{
@@ -166,7 +206,7 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 				AND verband=".myaddslashes($row->verband_stlv)." AND gruppe=".myaddslashes($row->gruppe_stlv).";";
 				if(pg_num_rows(pg_query($conn, $qry_lvb))<1)
 				{
-					$lvb_ins="INSERT INTO public.tbl_lehrverband VALUES (".
+					$lvb_ins="INSERT INTO public.tbl_lehrverband (studiengang_kz, semester, verband, gruppe, aktiv, bezeichnung, ext_id) VALUES (".
 					myaddslashes($row->studiengang_kz).", ".
 					myaddslashes($s).", ".
 					myaddslashes($row->verband_stlv).", ".
@@ -185,7 +225,7 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 				if(pg_num_rows(pg_query($conn, $qry_chk))<1)
 				{
 					//Eintragen der neuen Gruppe
-					$sql="INSERT INTO tbl_studentlehrverband
+					$sql="INSERT INTO tbl_studentlehrverband (student_uid, studiensemester_kurzbz, studiengang_kz, semester, verband, gruppe, updateamum, updatevon, insertamum, insertvon, ext_id) 
 						VALUES ('$row->student_uid','$next_ss','$row->studiengang_kz',
 						'$s','$row->verband_stlv','$row->gruppe_stlv',NULL,NULL,now(),'$user',NULL);";
 				}
@@ -195,7 +235,7 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 				if(pg_num_rows(pg_query($conn, $qry_chk))<1)
 				{
 					//Eintragen des neuen Status
-					$sql.="INSERT INTO tbl_prestudentrolle
+					$sql.="INSERT INTO tbl_prestudentrolle (prestudent_id, rolle_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz)
 					VALUES ($row->prestudent_id, '$row_status->rolle_kurzbz', '$next_ss',
 						$ausbildungssemester, now(), now(), '$user',
 					NULL, NULL, NULL, NULL);";
@@ -215,11 +255,12 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 
 // **************** Ausgabe vorbereiten ******************************
 $s=array();
-$outp.="Studiengang: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<SELECT name='stg_kz'>";
+$outp.="-----Anzeige------------------------------------------------------------------------------------------------------------------------------------------";
+$outp.="<br>Studiengang: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<SELECT name='stg_kz'>";
 //Auswahl Studiengang
 foreach ($studiengang as $stg)
 {
-	$outp.="<OPTION onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$stg->studiengang_kz&semester=$semester&studiensemester_kurzbz=$studiensemester_kurzbz&studiensemester_kurzbz_akt=$studiensemester_kurzbz_akt'\" ".($stg->studiengang_kz==$stg_kz?'selected':'').">$stg->kurzbzlang ($stg->kuerzel) - $stg->bezeichnung</OPTION>";
+	$outp.="<OPTION onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$stg->studiengang_kz&semester=$semester&semesterv=$semesterv&studiensemester_kurzbz=$studiensemester_kurzbz&studiensemester_kurzbz_akt=$studiensemester_kurzbz_akt&studiensemester_kurzbz_zk=$studiensemester_kurzbz_zk'\" ".($stg->studiengang_kz==$stg_kz?'selected':'').">$stg->kurzbzlang ($stg->kuerzel) - $stg->bezeichnung</OPTION>";
 	//$outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg->studiengang_kz.'&semester='.$semester.'">'.$stg->kuerzel.'</A> - ';
 	$s[$stg->studiengang_kz]->max_sem=$stg->max_semester;
 	$s[$stg->studiengang_kz]->kurzbz=$stg->kurzbzlang;
@@ -233,25 +274,46 @@ foreach ($ss_arr AS $sts)
 		$sel = " selected ";
 	else
 		$sel = '';
-	$outp.="				<option value='".$sts."' ".$sel."onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&semester=$semester&studiensemester_kurzbz=$sts&studiensemester_kurzbz_akt=$studiensemester_kurzbz_akt'\">".$sts."</option>";
+	$outp.="				<option value='".$sts."' ".$sel."onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&semester=$semester&semesterv=$semesterv&studiensemester_kurzbz=$sts&studiensemester_kurzbz_akt=$studiensemester_kurzbz_akt&studiensemester_kurzbz_zk=$studiensemester_kurzbz_zk'\">".$sts."</option>";
 }
 $outp.="		</select>";
+$outp.= '<BR>Ausbildungssemester der Anzeige: -- ';
+for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
+{
+	$outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semester='.$i.'&semesterv='.$semesterv.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'&studiensemester_kurzbz_akt='.$studiensemester_kurzbz_akt.'&studiensemester_kurzbz_zk='.$studiensemester_kurzbz_zk.'">'.$i.'</A> -- ';
+}
+$outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semesterv='.$semesterv.'&semester=100&studiensemester_kurzbz='.$studiensemester_kurzbz.'&studiensemester_kurzbz_akt='.$studiensemester_kurzbz_akt.'&studiensemester_kurzbz_zk='.$studiensemester_kurzbz_zk.'">alle</A> -- ';
 //Auswahl Studiensemester von dem weg vorgerückt werden soll
-$outp.="<br>Ausgangs-Studiensemester: &nbsp;&nbsp;&nbsp;&nbsp;<select name='studiensemester_kurzbz_akt'>\n";
+$outp.="<br>-----Vorr&uuml;ckung Studiengang ".$s[$stg_kz]->kurzbz."----------------------------------------------------------------------------------------------------------";
+$outp.="<br>Ausgangs-Studiensemester: &nbsp;&nbsp;&nbsp;<select name='studiensemester_kurzbz_akt'>\n";
 foreach ($ss_arr AS $sts2)
 {
 	if ($studiensemester_kurzbz_akt == $sts2)
 		$sel2 = " selected ";
 	else
 		$sel2 = '';
-	$outp.="				<option value='".$sts2."' ".$sel2."onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&semester=$semester&studiensemester_kurzbz=$studiensemester_kurzbz&studiensemester_kurzbz_akt=$sts2'\">".$sts2."</option>";
+	$outp.="				<option value='".$sts2."' ".$sel2."onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&semester=$semester&semesterv=$semesterv&studiensemester_kurzbz=$studiensemester_kurzbz&studiensemester_kurzbz_akt=$sts2&studiensemester_kurzb_zk=$studiensemester_kurzbz_zk'\">".$sts2."</option>";
 }
 $outp.="		</select>\n";
-$outp.="<BR>Vorr&uuml;ckung von ".$studiensemester_kurzbz_akt." / ".($semester<100?$semester.".":'alle')." Semester  -> ".$studiensemester_kurzbz_zk;
-$outp.= '<BR> -- ';
-for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
-	$outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semester='.$i.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'&studiensemester_kurzbz_akt='.$studiensemester_kurzbz_akt.'">'.$i.'</A> -- ';
-$outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semester=100&studiensemester_kurzbz='.$studiensemester_kurzbz.'&studiensemester_kurzbz_akt='.$studiensemester_kurzbz_akt.'">alle</A> -- ';
+$outp.= '<BR>Ausgangs-Ausbildungssemester: &nbsp;&nbsp;-- ';
+for ($j=0;$j<=$s[$stg_kz]->max_sem;$j++)
+{
+	$outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semester='.$semester.'&semesterv='.$j.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'&studiensemester_kurzbz_akt='.$studiensemester_kurzbz_akt.'&studiensemester_kurzbz_zk='.$studiensemester_kurzbz_zk.'">'.$j.'</A> -- ';
+}
+$outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semester='.$semester.'&semesterv=100&studiensemester_kurzbz='.$studiensemester_kurzbz.'&studiensemester_kurzbz_akt='.$studiensemester_kurzbz_akt.'&studiensemester_kurzbz_zk='.$studiensemester_kurzbz_zk.'">alle</A> -- ';
+
+//Auswahl Studiensemester in das vorgerückt werden soll
+$outp.="<br>Ziel-Studiensemester: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<select name='studiensemester_kurzbz_zk'>\n";
+foreach ($ss_arr AS $sts3)
+{
+	if ($studiensemester_kurzbz_zk == $sts3)
+		$sel3 = " selected ";
+	else
+		$sel3 = '';
+	$outp.="				<option value='".$sts3."' ".$sel3."onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&semester=$semester&semesterv=$semesterv&studiensemester_kurzbz=$studiensemester_kurzbz&studiensemester_kurzbz_akt=$studiensemester_kurzbz_akt&studiensemester_kurzbz_zk=$sts3'\">".$sts3."</option>";
+}
+$outp.="		</select>\n";
+$outp.="<BR>Vorr&uuml;ckung von ".$studiensemester_kurzbz_akt." / ".($semesterv<100?$semesterv.".":'alle')." Semester  -> ".$studiensemester_kurzbz_zk;
 //Aufbau Ausgabe
 ?>
 <html>
@@ -273,7 +335,7 @@ echo '<form action="" method="POST">';
 echo '<table width="70%"><tr><td>';
 echo $outp;
 echo '</td><td>';
-echo '<input type="submit" name="vorr" value="Vorruecken" />';
+echo '<br><br><br><input type="submit" name="vorr" value="Vorruecken" />';
 echo '</td><td>&nbsp;</td></tr></table>';
 echo '</form>';
 
