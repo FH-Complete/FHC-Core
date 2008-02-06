@@ -173,7 +173,7 @@ if(!$error)
 		loadVariables($conn, get_uid());
 		if(isset($_POST['stundenplan_id']) && is_numeric($_POST['stundenplan_id']))
 		{
-			$stundenplan = new stundenplan($conn, $db_stpl_table);
+			$stundenplan = new stundenplan($conn, $db_stpl_table, null, true);
 			if($stundenplan->delete($_POST['stundenplan_id']))
 			{
 				$return = true;
@@ -194,7 +194,7 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='savestundenplaneintrag')
 	{
 		loadVariables($conn, get_uid());
-		$stundenplan = new stundenplan($conn, $db_stpl_table);
+		$stundenplan = new stundenplan($conn, $db_stpl_table, null, true);
 		if($stundenplan->load($_POST['stundenplan_id']))
 		{
 			$stundenplan->unr = $_POST['unr'];
