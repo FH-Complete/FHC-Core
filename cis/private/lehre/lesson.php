@@ -221,7 +221,10 @@
 						echo "Upload</a>";
 
 						echo '&nbsp;&nbsp;&nbsp;<a class="Item" href="semdownhlp.php" >';
-					    echo 'Vorlage';
+					    echo 'Vorlage [hml]';
+					    echo '</a>';
+					    echo '&nbsp;<a class="Item" href="semdownhlp.php?format=doc" >';
+					    echo '[doc]';
 					    echo '</a>';
 					}
 

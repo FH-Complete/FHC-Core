@@ -85,8 +85,14 @@
 					{
 						if (is_dir($dir.$f) && $f != "." && $f != "..")
 						{
-							if (!key_exists($f, $lv_arr[$row->studiengang_kz][$i]))
-								$text .= $f."<br>";
+							 if ($row->studiengang_kz == 999) 
+                                    $text .= $f."<br>";
+                            else if (!key_exists($f, $lv_arr[$row->studiengang_kz][$i]))
+                            {
+                                    //echo $row->studiengang_kz."/".$i."<br>";
+                                    $text .= $f."<br>";
+                            }
+							
 						}
 					}
 				}
