@@ -163,7 +163,7 @@ if(!$error)
 					if(!kollision($lem->lehreinheit_id, $lem->mitarbeiter_uid, $lem->mitarbeiter_uid_old))
 					{
 						//Update im Stundenplan
-						$stpl_table='lehre.'.TABLE_BEGIN.$stpl_table;
+						$stpl_table='lehre.'.TABLE_BEGIN.$db_stpl_table;
 						$qry = "UPDATE $stpl_table SET mitarbeiter_uid='$lem->mitarbeiter_uid' WHERE lehreinheit_id='$lem->lehreinheit_id' AND mitarbeiter_uid='$lem->mitarbeiter_uid_old'";
 						if(pg_query($conn, $qry))
 						{
@@ -173,7 +173,7 @@ if(!$error)
 						{
 							$error = true;
 							$return = false;
-							$errormsg = 'Fehler beim Update im Stundenplan';
+							$errormsg = 'Fehler beim Update im Stundenplan'.$qry;
 						}
 					}
 					else
