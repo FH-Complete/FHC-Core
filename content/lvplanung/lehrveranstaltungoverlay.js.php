@@ -933,12 +933,12 @@ function LeMitarbeiterSave()
 		else
 			alert(val.dbdml_errormsg)
 	}
-	else
-	{
+	//else
+	//{
 		leDetailLektorUid = lektor;
 		leDetailLektorLehreinheit_id = lehreinheit_id;
 		LeLektorTreeRefresh();
-	}
+	//}
 }
 
 // ****
