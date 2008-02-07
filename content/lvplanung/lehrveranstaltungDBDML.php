@@ -58,6 +58,8 @@ $errormsg = 'unknown';
 $data = '';
 $error = false;
 
+loadVariables($conn, $user);
+
 //Berechtigungen laden
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
@@ -72,17 +74,18 @@ if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz') && !$r
 
 function kollision($lehreinheit_id, $mitarbeiter_uid, $mitarbeiter_uid_old)
 {
-	global $conn;
-	loadVariables($conn, $user);
+	global $conn, $db_stpl_table;
+	
 	//Lehrstunden laden
 	$lehrstunden=new lehrstunde($conn);
 	$lehrstunde=new lehrstunde($conn);
 	$lehrstunden->load_lehrstunden_le($lehreinheit_id,$mitarbeiter_uid_old);
+	
 	foreach ($lehrstunden->lehrstunden as $ls)
 	{
 		$lehrstunde->load($ls->stundenplan_id);
 		$lehrstunde->lektor_uid=$mitarbeiter_uid;
-		if ($lehrstunde->kollision)
+		if ($lehrstunde->kollision($db_stpl_table))
 			return true;
 	}
 	return false;
@@ -93,7 +96,7 @@ if(!$error)
 
 	if(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_save')
 	{
-		loadVariables($conn, $user);
+		//loadVariables($conn, $user);
 
 		//Lehreinheitmitarbeiter Zuteilung
 		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz
@@ -156,12 +159,12 @@ if(!$error)
 				$lem->updatevon = $user;
 
 				$lem->new=false;
-
+				
 				if($ignore_kollision=='false' && $lem->mitarbeiter_uid!=$lem->mitarbeiter_uid_old)
 				{
 					//check kollision
 					if(!kollision($lem->lehreinheit_id, $lem->mitarbeiter_uid, $lem->mitarbeiter_uid_old))
-					{
+					{						
 						//Update im Stundenplan
 						$stpl_table='lehre.'.TABLE_BEGIN.$db_stpl_table;
 						$qry = "UPDATE $stpl_table SET mitarbeiter_uid='$lem->mitarbeiter_uid' WHERE lehreinheit_id='$lem->lehreinheit_id' AND mitarbeiter_uid='$lem->mitarbeiter_uid_old'";
