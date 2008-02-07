@@ -43,6 +43,7 @@ require_once('../../include/log.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/mitarbeiter.class.php');
+require_once('../../include/lehrstunde.class.php');
 
 $user = get_uid();
 
@@ -71,6 +72,7 @@ if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz') && !$r
 
 function kollision($lehreinheit_id, $mitarbeiter_uid, $mitarbeiter_uid_old)
 {
+	global $conn;
 	loadVariables($conn, $user);
 	//Lehrstunden laden
 	$lehrstunden=new lehrstunde($conn);
@@ -155,12 +157,24 @@ if(!$error)
 
 				$lem->new=false;
 
-				if(!$ignore_kollision && $lem->mitarbeiter_uid!=$lem->mitarbeiter_uid_old)
+				if($ignore_kollision=='false' && $lem->mitarbeiter_uid!=$lem->mitarbeiter_uid_old)
 				{
 					//check kollision
 					if(!kollision($lem->lehreinheit_id, $lem->mitarbeiter_uid, $lem->mitarbeiter_uid_old))
 					{
 						//Update im Stundenplan
+						$stpl_table='lehre.'.TABLE_BEGIN.$stpl_table;
+						$qry = "UPDATE $stpl_table SET mitarbeiter_uid='$lem->mitarbeiter_uid' WHERE lehreinheit_id='$lem->lehreinheit_id' AND mitarbeiter_uid='$lem->mitarbeiter_uid_old'";
+						if(pg_query($conn, $qry))
+						{
+							$error = false;
+						}
+						else 
+						{
+							$error = true;
+							$return = false;
+							$errormsg = 'Fehler beim Update im Stundenplan';
+						}
 					}
 					else
 					{
