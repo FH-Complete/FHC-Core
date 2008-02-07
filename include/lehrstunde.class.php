@@ -538,7 +538,7 @@ class lehrstunde
 			$sql_query.=" AND (gruppe_kurzbz='$this->gruppe_kurzbz')";
 		$sql_query.=")) AND unr!=$this->unr";
 
-		//echo $sql_query.'<br>';
+		//(echo $sql_query.'<br>';
 		if (! $erg_stpl=pg_query($this->conn, $sql_query))
 		{
 			$this->errormsg=$sql_query.pg_last_error($this->conn);

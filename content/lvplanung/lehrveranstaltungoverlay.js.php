@@ -928,7 +928,10 @@ function LeMitarbeiterSave()
 
 	if (!val.dbdml_return)
 	{
-		alert(val.dbdml_errormsg)
+		if(val.dbdml_errormsg=='')
+			alert(response);
+		else
+			alert(val.dbdml_errormsg)
 	}
 	else
 	{

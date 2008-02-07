@@ -130,7 +130,7 @@ if($result = pg_query($conn, $qry))
 			{
 				$student->new = true;
 				$student->insertamum = date('Y-m-d H:i:s');
-				$student->insertvon = 'auto';
+				$student->insertvon = 'chkstudentlvb';
 			}
 				
 			$student->uid = $row->student_uid;
@@ -140,7 +140,7 @@ if($result = pg_query($conn, $qry))
 			$student->verband = ($prestd->rolle_kurzbz=='Unterbrecher'?'B':'A');
 			$student->gruppe = ' ';
 			$student->updateamum = date('Y-m-d H:i:s');
-			$student->updatevon = 'auto';
+			$student->updatevon = 'chkstudentlvb';
 			
 			//Pruefen ob der Lehrverband exisitert, wenn nicht dann wird er angelegt
 			$lehrverband = new lehrverband($conn);
