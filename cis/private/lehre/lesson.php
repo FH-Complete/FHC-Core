@@ -79,9 +79,44 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
+<style type="text/css">
+.transparent {
+    filter:alpha(opacity=90);
+    -moz-opacity:0.9;
+    -khtml-opacity: 0.9;
+    opacity: 0.9;
+</style> 
+
+<script language="JavaScript">
+function showSemPlanHelp(){
+	document.getElementById("semplanhelp").style.visibility = "visible";
+}
+function hideSemPlanHelp(){
+	document.getElementById("semplanhelp").style.visibility = "hidden";
+}
+
+</script>   
 </head>
 
 <body>
+<div id="semplanhelp" style="position:absolute; top:200px; left:200px; width:500px; height:250px; background-color:#cccccc; visibility:hidden; border-style:solid; border-width:1px; border-color:#333333;" class="transparent">
+<table width="100%">
+<tr><td valign="top"><h2>&nbsp;Erstellung des Semesterplanes</h2></td><td align="right" valign="top"><a href="#" onclick="hideSemPlanHelp();">X</a>&nbsp;</td></tr>
+<tr>
+<td coslspan="2">
+<ol style="font-size:8pt;">
+	<li>Speichern Sie die Vorlage (html oder doc - Version) auf Ihrem Computer.</li>
+	<li>&Ouml;ffnen Sie die gespeicherte Datei mit ihrem Textverarbeitungsprogramm (MS Word, OpenOffice ...) bzw die html-Vorlage auch mit einem geeigneten Editor.</li>
+	<li>Erstellen Sie Ihren Semesterplan.</li>
+	<li>Speichern Sie das Dokument als 'Webseite' mit dem Namen 'index.html'<br>(In MS Word: 'Datei' -> 'Speichern unter' -> Dateiname: index.html, Dateityp: Webseite )</li>
+	<li>Laden Sie diese Datei nun &uuml;ber den 'Upload'-Knopf hoch.</li>
+	<li>Fertig!</li>
+<ol>
+</td>
+</tr>
+<tr><td colspan="2" align="center"><a href="#" onClick="hideSemPlanHelp();">schlie&szlig;en</a></td></tr>
+</table>
+</div>
 <table class="tabcontent" height="100%" id="inhalt">
 	<tr>
 		<td class="tdwidth10">&nbsp;</td>
@@ -226,6 +261,7 @@
 					    echo '&nbsp;<a class="Item" href="semdownhlp.php?format=doc" >';
 					    echo '[doc]';
 					    echo '</a>';
+					    echo '&nbsp;<a href="#" onClick="showSemPlanHelp()";>(hilfe)</a>';
 					}
 
 
