@@ -96,8 +96,6 @@ if(!$error)
 
 	if(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_save')
 	{
-		//loadVariables($conn, $user);
-
 		//Lehreinheitmitarbeiter Zuteilung
 		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz
 				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach
@@ -160,6 +158,8 @@ if(!$error)
 
 				$lem->new=false;
 				
+				//Wenn sich der Lektor aendert und keine Kollision dadurch entsteht, dann werden die 
+				//Daten automatisch im Stundenplan geaendert
 				if($ignore_kollision=='false' && $lem->mitarbeiter_uid!=$lem->mitarbeiter_uid_old)
 				{
 					//check kollision
@@ -191,8 +191,63 @@ if(!$error)
 				{
 					if($lem->save())
 					{
-						$return = true;
-						$error=false;
+						//Pruefen ob die erlaubte Semesterstundenanzahl ueberschritten wurde.
+						//Wenn ja dann ein Warning zurueckliefern
+
+						//Maximale Stundenanzahl ermitteln					
+						$ma = new mitarbeiter($conn);
+						$ma->load($lem->mitarbeiter_uid);
+						
+						if($ma->fixangestellt)
+							$max_stunden = WARN_SEMESTERSTD_FIX;
+						else
+							$max_stunden = WARN_SEMESTERSTD_FREI;
+							
+						//Summer der Stunden ermitteln
+						$le = new lehreinheit($conn);
+						$le->load($lem->lehreinheit_id);
+						
+						$qry = "SELECT 
+									sum(semesterstunden) as summe
+								FROM 
+									lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+								WHERE 
+									mitarbeiter_uid='$lem->mitarbeiter_uid' AND
+									studiensemester_kurzbz='$le->studiensemester_kurzbz' AND
+									faktor>0 AND
+									stundensatz>0 AND
+									bismelden";
+																		
+						if($result = pg_query($conn, $qry))
+						{
+							if($row = pg_fetch_object($result))
+							{
+								if($row->summe>=$max_stunden)
+								{
+									//Warnung wenn die Stundenzahl ueberschritten wurde
+									$return = false;
+									$error = true;
+									$errormsg = "Daten wurden gespeichert.\n\nWarnung: Die maximal erlaubte Semesterstundenanzahl von $max_stunden Stunden wurde ueberschritten";
+								}
+								else 
+								{
+									$return = true;
+									$error=false;
+								}
+							}
+							else 
+							{
+								$return = false;
+								$error=true;
+								$errormsg='Fehler beim Ermitteln der Gesamtstunden';
+							}
+						}
+						else 
+						{
+							$return = false;
+							$error=true;
+							$errormsg='Fehler beim Ermitteln der Gesamtstunden';
+						}
 					}
 					else
 					{
