@@ -281,6 +281,7 @@ for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
 	$outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semester='.$i.'&semesterv='.$semesterv.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'&studiensemester_kurzbz_akt='.$studiensemester_kurzbz_akt.'&studiensemester_kurzbz_zk='.$studiensemester_kurzbz_zk.'">'.$i.'</A> -- ';
 }
 $outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semesterv='.$semesterv.'&semester=100&studiensemester_kurzbz='.$studiensemester_kurzbz.'&studiensemester_kurzbz_akt='.$studiensemester_kurzbz_akt.'&studiensemester_kurzbz_zk='.$studiensemester_kurzbz_zk.'">alle</A> -- ';
+
 //Auswahl Studiensemester von dem weg vorgerückt werden soll
 $outp.="<br>-----Vorr&uuml;ckung Studiengang ".$s[$stg_kz]->kurzbz."----------------------------------------------------------------------------------------------------------";
 $outp.="<br>Ausgangs-Studiensemester: &nbsp;&nbsp;&nbsp;&nbsp;<select name='studiensemester_kurzbz_akt'>\n";
@@ -299,7 +300,6 @@ for ($j=0;$j<=$s[$stg_kz]->max_sem;$j++)
 	$outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semester='.$semester.'&semesterv='.$j.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'&studiensemester_kurzbz_akt='.$studiensemester_kurzbz_akt.'&studiensemester_kurzbz_zk='.$studiensemester_kurzbz_zk.'">'.$j.'</A> -- ';
 }
 $outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semester='.$semester.'&semesterv=100&studiensemester_kurzbz='.$studiensemester_kurzbz.'&studiensemester_kurzbz_akt='.$studiensemester_kurzbz_akt.'&studiensemester_kurzbz_zk='.$studiensemester_kurzbz_zk.'">alle</A> -- ';
-
 //Auswahl Studiensemester in das vorgerückt werden soll
 $outp.="<br>Ziel-Studiensemester: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<select name='studiensemester_kurzbz_zk'>\n";
 foreach ($ss_arr AS $sts3)
@@ -312,6 +312,7 @@ foreach ($ss_arr AS $sts3)
 }
 $outp.="		</select>\n";
 $outp.="<BR>Vorr&uuml;ckung von ".$studiensemester_kurzbz_akt." / ".($semesterv<100?$semesterv.".":'alle')." Semester  -> ".$studiensemester_kurzbz_zk;
+
 //Aufbau Ausgabe
 ?>
 <html>
@@ -324,24 +325,25 @@ $outp.="<BR>Vorr&uuml;ckung von ".$studiensemester_kurzbz_akt." / ".($semesterv<
 </head>
 <body class="Background_main">
 <?php
-
+//Überschrift
 echo "<H2>Studenten Vorr&uuml;ckung (".$s[$stg_kz]->kurzbz." - ".($semester<100?$semester:'alle')." - ".
 	$studiensemester_kurzbz."), DB:".substr(CONN_STRING,strpos(CONN_STRING,'dbname=')+7,
 	strpos(CONN_STRING,'user=')-strpos(CONN_STRING,'dbname=')-7)."</H2>";
 
 echo '<form action="" method="POST">';
 echo '<table width="70%"><tr><td>';
+//Ausgabe der Auswahl
 echo $outp;
 echo '</td><td>';
 echo '<br><br><br><input type="submit" name="vorr" value="Vorruecken" />';
 echo '</td><td>&nbsp;</td></tr></table>';
 echo '</form>';
-
+//Überschrift Anzeige
 echo "<h3>&Uuml;bersicht (".$studiensemester_kurzbz."/".($semester<100?$semester.".":'alle')." Semester )</h3>
 	<table class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>
 	<thead>
 	<tr class='liste'>";
-
+//Anzeige Tabelle
 if ($result_std!=0)
 {
 	$num_rows=pg_num_rows($result_std);
