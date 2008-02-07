@@ -114,19 +114,6 @@ _staat 			integer
 chadrbemerkung 	character varying(256) 
 */
 
-//Array für Nationen erzeugen
-$qry_staat="SELECT __staat, chkurzbez FROM sync.stp_staat";
-if($result_staat = pg_query($conn, $qry_staat))
-{
-	while($row_staat = pg_fetch_object($result_staat))
-	{
-		$staat[$row_staat->__staat]=$row_staat->chkurzbez;
-	}
-}
-else
-{
-	echo "<br>".$qry_staat."<br><strong>".pg_last_error($conn)." </strong><br>";
-}
 
 //*********** Neue Daten holen *****************
 $qry="(SELECT __person as _person, chtitel, chnachname, chvorname, _cxbundesland, 
