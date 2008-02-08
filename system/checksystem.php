@@ -159,6 +159,16 @@ if (!@pg_query($conn,'SELECT zusatzinfo_html FROM public.tbl_studiengang LIMIT 1
 		echo 'zusatzinfo_html wurde bei public.tbl_studiengang hinzugefuegt!<BR>';
 }
 
+// ************** public.tbl_ort.stockwerk ************************
+if (!@pg_query($conn,'SELECT stockwerk FROM public.tbl_ort LIMIT 1;'))
+{
+	$sql="	ALTER TABLE public.tbl_ort ADD COLUMN stockwerk smallint;";
+	if (!@pg_query($conn,$sql))
+		echo '<strong>public.tbl_ort: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo 'stockwerk wurde bei public.tbl_ort hinzugefuegt!<BR>';
+}
+
 // ************** campus.tbl_resturlaub.urlaubstageprojahr ************************
 if (!@pg_query($conn,'SELECT urlaubstageprojahr FROM campus.tbl_resturlaub LIMIT 1;'))
 {
