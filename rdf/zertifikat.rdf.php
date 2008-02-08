@@ -106,7 +106,21 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	
 	//Daten holen
 
-	$lqry = "select tbl_person.* from public.tbl_benutzer join public.tbl_person using (person_id) where tbl_benutzer.uid = (select tbl_lehreinheitmitarbeiter.mitarbeiter_uid from lehre.tbl_lehreinheitmitarbeiter join lehre.tbl_lehrfunktion using(lehrfunktion_kurzbz), lehre.tbl_lehreinheit join lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id) where tbl_lehreinheitmitarbeiter.lehreinheit_id = tbl_lehreinheit.lehreinheit_id and tbl_lehrveranstaltung.lehrveranstaltung_id = '".$lehrveranstaltung_id."' order by tbl_lehrfunktion.standardfaktor desc limit 1)";
+	$lqry = "SELECT 
+				tbl_person.* 
+			FROM 
+				public.tbl_benutzer JOIN public.tbl_person using (person_id) 
+			WHERE 
+				tbl_benutzer.uid = (SELECT 
+										tbl_lehreinheitmitarbeiter.mitarbeiter_uid 
+									FROM 
+										lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehrfunktion USING(lehrfunktion_kurzbz), 
+										lehre.tbl_lehreinheit JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
+									WHERE 
+										tbl_lehreinheitmitarbeiter.lehreinheit_id = tbl_lehreinheit.lehreinheit_id AND
+										tbl_lehrveranstaltung.lehrveranstaltung_id = '".$lehrveranstaltung_id."' AND
+										tbl_lehreinheit.studiensemester_kurzbz='$studiensemester_kurzbz'
+									ORDER BY tbl_lehrfunktion.standardfaktor desc limit 1)";
 	if($lres = pg_query($conn, $lqry)){
 		if ($lrow = pg_fetch_object($lres)){	
 			$leiter_titel = $lrow->titelpre;			
