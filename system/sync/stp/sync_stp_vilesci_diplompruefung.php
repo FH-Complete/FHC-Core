@@ -100,7 +100,7 @@ $staat=array();
 <?php
 
 //*********** Neue Daten holen *****************
-$qry="SELECT _vorsitzender, _cxbeurteilungsstufegesamt,_gegenstandtech, _gegenstandnichttech, _pruefertech, _pruefernichttech, 
+$qry="SELECT _vorsitzender, _cxbeurteilungsstufegesamt,_gegenstandtech, _gegenstandnichttech, _pruefertech, _pruefernichttech, chLfdNr, 
 	__person, _cxgeschlecht, chtitel, chvorname, chnachname, studiengang_kz,  tbl_studiengang.typ, COALESCE(dapruefungsdat,dapruefteil1dat) as pruefdat FROM sync.stp_person 
 	JOIN sync.stp_stgvertiefung ON (_stgvertiefung=__stgvertiefung)
 	JOIN public.tbl_studiengang ON (_studiengang=ext_id) 
@@ -282,7 +282,7 @@ if($result = pg_query($conn, $qry))
 					$sql.=myaddslashes($row->pruefdat).",  
 					NULL, ";
 					//myaddslashes('Technisch: '.$row->_gegenstandtech.' Nicht technisch: '.$row->_gegenstandnichttech).", 
-					$sql.="NULL, 
+					$sql.=myaddslashes($row->chlfdnr).", 
 					now(), 'sync', NULL, NULL, NULL);";
 				if(!$result_neu = pg_query($conn, $sql))
 				{
