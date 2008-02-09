@@ -9,6 +9,16 @@
 	if (!($berechtigung->isBerechtigt('admin') || $berechtigung->isBerechtigt('support') || $berechtigung->isBerechtigt('lvplan') ))
 		die ('Keine Berechtigung!');
 
+	$menu=array
+	(
+		'Admin' => 		array('name'=>'Admin', 'link'=>'admin/menu.html', 'target'=>'main'),
+		'Lehre' => 		array('name'=>'Admin', 'link'=>'admin/menu.html', 'target'=>'main'),
+		'Personen' => 	array('name'=>'Admin', 'link'=>'admin/menu.html', 'target'=>'main'),
+		'Stammdaten' => array('name'=>'Admin', 'link'=>'admin/menu.html', 'target'=>'main'),
+		'Vorrueckung'=> array('name'=>'Admin', 'link'=>'admin/menu.html', 'target'=>'main'),
+		'Auswertung' => array('name'=>'Admin', 'link'=>'admin/menu.html', 'target'=>'main')
+	);
+
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
