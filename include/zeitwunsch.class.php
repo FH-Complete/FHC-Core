@@ -179,11 +179,40 @@ class zeitwunsch
 			return false;
 		}
 		else
-		{
 			while ($row=pg_fetch_object($result))
 				$this->zeitwunsch[$row->tag][$row->stunde]=$row->gewicht;
-			return true;
+
+		if (!is_null($datum))
+		{
+			$beginn=montag($datum);
+			$start=date('Y-m-d',$beginn);
+			$ende=date('Y-m-d',jump_day($beginn,7));
+
+			$erstestunde=1;
+			$letztestunde=16;
+			// Zeitsperren abfragen
+			$sql="SELECT vondatum,vonstunde,bisdatum,bisstunde
+				FROM campus.tbl_zeitsperre
+				WHERE mitarbeiter_uid='$uid' AND vondatum<='$ende' AND bisdatum>'$start'";
+			if(!$result=pg_query($this->conn, $sql))
+			{
+				$this->errormsg=pg_last_error($this->conn);
+				return false;
+			}
+			else
+			{
+				while ($row=pg_fetch_object($result))
+					for ($i=1;$i<=7;$i++)
+					{
+						$date_iso=date('Y-m-d',$beginn);
+						if ($date_iso>$row->vondatum && $date_iso<$row->bisdatum)
+							for ($j=$erstestunde;$j<=letztestunde;$j++)
+								$this->zeitwunsch[$i][$j]=-3;
+						$beginn=jump_day($beginn,1);
+					}
+			}
 		}
+		return true;
 	}
 
 
