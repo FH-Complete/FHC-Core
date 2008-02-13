@@ -28,7 +28,7 @@
 require ('../vilesci/config.inc.php');
 
 // Datenbank Verbindung
-//if (!$conn = pg_pconnect("host=.technikum-wien.at dbname=devvilesci user= password="))
+//if (!$conn = pg_pconnect("host=.technikum-wien.at dbname=devvilesci user=pam password="))
 if (!$conn = pg_pconnect(CONN_STRING))
    	die('Es konnte keine Verbindung zum Server aufgebaut werden!'.pg_last_error($conn));
 
@@ -122,6 +122,19 @@ if (!@pg_query($conn,'SELECT lv_lehrform_kurzbz FROM campus.vw_lehreinheit LIMIT
 		echo 'lv_lehrform_kurzbz wurde bei campus.vw_lehreinheit hinzugefuegt!<BR>';
 }
 
+// ************** lehre.tbl_abschlusspruefung.note ************************
+if (!@pg_query($conn,'SELECT note FROM lehre.tbl_abschlusspruefung LIMIT 1;'))
+{
+	$sql="	ALTER TABLE lehre.tbl_abschlusspruefung ADD COLUMN note smallint;
+			Comment on column lehre.tbl_abschlusspruefung.note Is 'Note der komm. Pruefung';
+			Alter table lehre.tbl_abschlusspruefung add Constraint note_abschlusspruefung foreign key (note)
+				references lehre.tbl_note (note) on update cascade on delete restrict;";
+	if (!@pg_query($conn,$sql))
+		echo '<strong>lehre.tbl_abschlusspruefung: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo 'note wurde bei lehre.tbl_abschlusspruefung hinzugefuegt!<BR>';
+}
+
 // ************** bis.tbl_bisio.ort,uni,lehreinheit_id ************************
 if (!@pg_query($conn,'SELECT ort,universitaet,lehreinheit_id FROM bis.tbl_bisio LIMIT 1;'))
 {
@@ -146,6 +159,17 @@ if (!@pg_query($conn,'SELECT bezeichnung_english FROM lehre.tbl_lehrveranstaltun
 		echo '<strong>lehre.tbl_lehrveranstaltung: '.pg_last_error($conn).' </strong><BR>';
 	else
 		echo 'bezeichnung_english wurde bei lehre.tbl_lehrveranstaltung hinzugefuegt!<BR>';
+}
+
+// ************** lehre.tbl_projektarbeit.titel_english ************************
+if (!@pg_query($conn,'SELECT titel_english FROM lehre.tbl_projektarbeit LIMIT 1;'))
+{
+	$sql="	ALTER TABLE lehre.tbl_projektarbeit ADD COLUMN titel_english varchar(256);
+			Comment on column lehre.tbl_projektarbeit.titel_english Is 'Englischer Titel';";
+	if (!@pg_query($conn,$sql))
+		echo '<strong>lehre.tbl_projektarbeit: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo 'titel_english wurde bei lehre.tbl_projektarbeit hinzugefuegt!<BR>';
 }
 
 // ************** public.tbl_studiengang.zusatzinfo_html ************************
