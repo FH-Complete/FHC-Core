@@ -163,6 +163,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<textbox id="student-projektarbeit-textbox-titel" disabled="true" maxlength="256" />
 						</row>
 						<row>
+							<label value="Titel English" control="student-projektarbeit-textbox-titel_english"/>
+							<textbox id="student-projektarbeit-textbox-titel_english" disabled="true" maxlength="256" />
+						</row>
+						<row>
 							<label value="Themenbereich" control="student-projektarbeit-textbox-themenbereich"/>
 							<textbox id="student-projektarbeit-textbox-themenbereich" disabled="true" maxlength="64"/>
 						</row>

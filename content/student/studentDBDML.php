@@ -2425,6 +2425,7 @@ if(!$error)
 			$pruefung->pruefer2 = $_POST['pruefer2'];
 			$pruefung->pruefer3 = $_POST['pruefer3'];
 			$pruefung->abschlussbeurteilung_kurzbz = $_POST['abschlussbeurteilung_kurzbz'];
+			$pruefung->note = $_POST['notekommpruef'];
 			$pruefung->akadgrad_id = $_POST['akadgrad_id'];
 			$pruefung->pruefungstyp_kurzbz = $_POST['pruefungstyp_kurzbz'];
 			$pruefung->datum = $_POST['datum'];
@@ -2514,6 +2515,7 @@ if(!$error)
 
 			$projektarbeit->projekttyp_kurzbz = $_POST['projekttyp_kurzbz'];
 			$projektarbeit->titel = $_POST['titel'];
+			$projektarbeit->titel_english = $_POST['titel_english'];
 			$projektarbeit->lehreinheit_id = $_POST['lehreinheit_id'];
 			$projektarbeit->student_uid = $_POST['student_uid'];
 			$projektarbeit->firma_id = $_POST['firma_id'];

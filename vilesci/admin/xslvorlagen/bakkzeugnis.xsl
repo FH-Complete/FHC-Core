@@ -284,7 +284,7 @@
 
 				<fo:block-container position="absolute" top="575pt" left="206pt" height="0pt">
 				<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt">
-						Vorsitzender des Prüfungssenats
+						Vorsitz des Prüfungssenats
 				                 \n
 				                 \n
 				                 \n

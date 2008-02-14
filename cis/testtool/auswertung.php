@@ -1,12 +1,37 @@
 <?php
-require('../config.inc.php');
-require('../../include/functions.inc.php');
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
+
+require_once('../config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/studiengang.class.php');
 
 function sortByField($multArray,$sortField,$desc=true)
 {
 	$tmpKey='';
     $ResArray=array();
 
+    if(!is_array($multArray))
+    	return array();
+    
     $maIndex=array_keys($multArray);
     $maSize=count($multArray)-1;
 
@@ -41,12 +66,17 @@ function sortByField($multArray,$sortField,$desc=true)
 if (!$conn = pg_connect(CONN_STRING))
 	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
 
+$ergebnis='';
+$kategorie=array();
+$erg_kat=array();
+
 // Reihungstests laden
 $sql_query=";
 		SELECT * FROM public.tbl_reihungstest WHERE date_part('year',datum)=date_part('year',now()) ORDER BY datum,uhrzeit";
 //echo $sql_query;
 if(!($result=pg_query($conn, $sql_query)))
     die(pg_errormessage($conn));
+
 while ($row=pg_fetch_object($result))
 {
 	$rtest[$row->reihungstest_id]->reihungstest_id=$row->reihungstest_id;
@@ -59,100 +89,115 @@ while ($row=pg_fetch_object($result))
 
 if (isset($_POST['reihungstest']))
 {
-// Vorkommende Gebiete laden
-$sql_query="SELECT DISTINCT gebiet_id, gebiet FROM testtool.vw_auswertung";
-//echo $sql_query;
-if(!($result=pg_query($conn, $sql_query)))
-    die(pg_errormessage($conn));
-while ($row=pg_fetch_object($result))
-{
-	$gebiet[$row->gebiet_id]->name=$row->gebiet;
-	$gebiet[$row->gebiet_id]->gebiet_id=$row->gebiet_id;
+	// Vorkommende Gebiete laden
+	$sql_query="SELECT DISTINCT gebiet_id, gebiet FROM testtool.vw_auswertung";
+	//echo $sql_query;
+	if(!($result=pg_query($conn, $sql_query)))
+	    die(pg_errormessage($conn));
+	while ($row=pg_fetch_object($result))
+	{
+		$gebiet[$row->gebiet_id]->name=$row->gebiet;
+		$gebiet[$row->gebiet_id]->gebiet_id=$row->gebiet_id;
+	}
+	
+	// Ergebnisse laden
+	$sql_query="SELECT vw_auswertung.* FROM testtool.vw_auswertung";
+	if (isset($_POST['reihungstest']))
+		$sql_query.=' JOIN public.tbl_prestudent USING (prestudent_id) WHERE reihungstest_id='.$_POST['reihungstest'];
+	if(isset($_POST['studiengang']) && $_POST['studiengang']!='')
+		$sql_query.=" AND tbl_prestudent.studiengang_kz='".$_POST['studiengang']."'";
+	
+	//echo $sql_query;
+	if(!($result=pg_query($conn, $sql_query)))
+	    die(pg_errormessage($conn));
+	
+	while ($row=pg_fetch_object($result))
+	{
+		$ergebnis[$row->pruefling_id]->pruefling_id=$row->pruefling_id;
+		$ergebnis[$row->pruefling_id]->nachname=$row->nachname;
+		$ergebnis[$row->pruefling_id]->vorname=$row->vorname;
+		$ergebnis[$row->pruefling_id]->gebdatum=$row->gebdatum;
+		$ergebnis[$row->pruefling_id]->geschlecht=$row->geschlecht;
+		$ergebnis[$row->pruefling_id]->idnachweis=$row->idnachweis;
+		$ergebnis[$row->pruefling_id]->registriert=$row->registriert;
+		$ergebnis[$row->pruefling_id]->stg_kurzbz=$row->stg_kurzbz;
+		$ergebnis[$row->pruefling_id]->stg_bez=$row->stg_bez;
+		$ergebnis[$row->pruefling_id]->gruppe=$row->gruppe_kurzbz;
+		$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->name=$row->gebiet;
+		$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->anz_fragen=$row->anz_fragen;
+		$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->abzug=$row->abzug;
+		$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->anz_richtig=$row->anz_richtig;
+		$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->anz_antworten=$row->anz_antworten;
+		$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->anz_falsch=$row->anz_falsch;
+		$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->punkte=$row->punkte;
+		$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->prozent=$row->prozent;
+		if (isset($ergebnis[$row->pruefling_id]->gesamt))
+			$ergebnis[$row->pruefling_id]->gesamt+=$row->prozent;
+		else
+			$ergebnis[$row->pruefling_id]->gesamt=$row->prozent;
+	}
+	
+	$ergb=sortByField($ergebnis,'gesamt');
+	
+	// Vorkommende Kategorien laden
+	$sql_query="SELECT DISTINCT kategorie_kurzbz FROM testtool.vw_auswertung_kategorie";
+	if (isset($_POST['reihungstest']))
+		$sql_query.=' JOIN public.tbl_prestudent USING (prestudent_id) WHERE reihungstest_id='.$_POST['reihungstest'];
+	if(isset($_POST['studiengang']) && $_POST['studiengang']!='')
+		$sql_query.=" AND tbl_prestudent.studiengang_kz='".$_POST['studiengang']."'";
+	
+	//echo $sql_query;
+	if(!($result=pg_query($conn, $sql_query)))
+	    die(pg_errormessage($conn));
+	while ($row=pg_fetch_object($result))
+		$kategorie[$row->kategorie_kurzbz]->name=$row->kategorie_kurzbz;
+	
+	// Ergebnisse laden
+	$sql_query="SELECT vw_auswertung_kategorie.*, tbl_kriterien.typ
+		FROM (testtool.vw_auswertung_kategorie JOIN testtool.tbl_kriterien USING (kategorie_kurzbz))";
+	if (isset($_POST['reihungstest']))
+		$sql_query.=' JOIN public.tbl_prestudent USING (prestudent_id)';
+	$sql_query.=" WHERE vw_auswertung_kategorie.gebiet_id=tbl_kriterien.gebiet_id AND tbl_kriterien.punkte=vw_auswertung_kategorie.richtig";
+	if (isset($_POST['reihungstest']))
+		$sql_query.=' AND reihungstest_id='.$_POST['reihungstest'];
+	if(isset($_POST['studiengang']) && $_POST['studiengang']!='')
+		$sql_query.=" AND tbl_prestudent.studiengang_kz='".$_POST['studiengang']."'";
+	
+	$sql_query.=" ORDER BY pruefling_id, kategorie_kurzbz";
+	//echo $sql_query;
+	if(!($result=pg_query($conn, $sql_query)))
+	    die(pg_errormessage($conn));
+	
+	while ($row=pg_fetch_object($result))
+	{
+		$erg_kat[$row->pruefling_id]->pruefling_id=$row->pruefling_id;
+		$erg_kat[$row->pruefling_id]->nachname=$row->nachname;
+		$erg_kat[$row->pruefling_id]->vorname=$row->vorname;
+		$erg_kat[$row->pruefling_id]->gebdatum=$row->gebdatum;
+		$erg_kat[$row->pruefling_id]->geschlecht=$row->geschlecht;
+		$erg_kat[$row->pruefling_id]->idnachweis=$row->idnachweis;
+		$erg_kat[$row->pruefling_id]->registriert=$row->registriert;
+		$erg_kat[$row->pruefling_id]->stg_kurzbz=$row->stg_kurzbz;
+		$erg_kat[$row->pruefling_id]->stg_bez=$row->stg_bez;
+		$erg_kat[$row->pruefling_id]->gruppe=$row->gruppe_kurzbz;
+		$erg_kat[$row->pruefling_id]->kategorie[$row->kategorie_kurzbz]->name=$row->kategorie_kurzbz;
+		$erg_kat[$row->pruefling_id]->kategorie[$row->kategorie_kurzbz]->richtig=$row->richtig;
+		$erg_kat[$row->pruefling_id]->kategorie[$row->kategorie_kurzbz]->falsch=$row->falsch;
+		$erg_kat[$row->pruefling_id]->kategorie[$row->kategorie_kurzbz]->gesamt=$row->gesamt;
+		$erg_kat[$row->pruefling_id]->kategorie[$row->kategorie_kurzbz]->typ=$row->typ;
+		$erg_kat[$row->pruefling_id]->kategorie[$row->kategorie_kurzbz]->punkte=$row->richtig.'/'.$row->gesamt;
+	}
 }
 
-// Ergebnisse laden
-$sql_query="SELECT vw_auswertung.* FROM testtool.vw_auswertung";
-if (isset($_POST['reihungstest']))
-	$sql_query.=' JOIN public.tbl_prestudent USING (prestudent_id) WHERE TRUE OR reihungstest_id='.$_POST['reihungstest'];
+//Studiengaenge laden
+$stg_obj = new studiengang($conn);
+$stg_obj->getAll(null, false);
+$stg_arr = array();
 
-//echo $sql_query;
-if(!($result=pg_query($conn, $sql_query)))
-    die(pg_errormessage($conn));
+foreach($stg_obj->result as $row)
+	$stg_arr[$row->studiengang_kz]=$row->kuerzel;
 
-while ($row=pg_fetch_object($result))
-{
-	$ergebnis[$row->pruefling_id]->pruefling_id=$row->pruefling_id;
-	$ergebnis[$row->pruefling_id]->nachname=$row->nachname;
-	$ergebnis[$row->pruefling_id]->vorname=$row->vorname;
-	$ergebnis[$row->pruefling_id]->gebdatum=$row->gebdatum;
-	$ergebnis[$row->pruefling_id]->geschlecht=$row->geschlecht;
-	$ergebnis[$row->pruefling_id]->idnachweis=$row->idnachweis;
-	$ergebnis[$row->pruefling_id]->registriert=$row->registriert;
-	$ergebnis[$row->pruefling_id]->stg_kurzbz=$row->stg_kurzbz;
-	$ergebnis[$row->pruefling_id]->stg_bez=$row->stg_bez;
-	$ergebnis[$row->pruefling_id]->gruppe=$row->gruppe_kurzbz;
-	$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->name=$row->gebiet;
-	$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->anz_fragen=$row->anz_fragen;
-	$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->abzug=$row->abzug;
-	$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->anz_richtig=$row->anz_richtig;
-	$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->anz_antworten=$row->anz_antworten;
-	$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->anz_falsch=$row->anz_falsch;
-	$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->punkte=$row->punkte;
-	$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->prozent=$row->prozent;
-	if (isset($ergebnis[$row->pruefling_id]->gesamt))
-		$ergebnis[$row->pruefling_id]->gesamt+=$row->prozent;
-	else
-		$ergebnis[$row->pruefling_id]->gesamt=$row->prozent;
-}
-$ergb=sortByField($ergebnis,'gesamt');
-
-
-// Vorkommende Kategorien laden
-$sql_query="SELECT DISTINCT kategorie_kurzbz FROM testtool.vw_auswertung_kategorie";
-if (isset($_POST['reihungstest']))
-	$sql_query.=' JOIN public.tbl_prestudent USING (prestudent_id) WHERE reihungstest_id='.$_POST['reihungstest'];
-//echo $sql_query;
-if(!($result=pg_query($conn, $sql_query)))
-    die(pg_errormessage($conn));
-while ($row=pg_fetch_object($result))
-	$kategorie[$row->kategorie_kurzbz]->name=$row->kategorie_kurzbz;
-
-// Ergebnisse laden
-$sql_query="SELECT vw_auswertung_kategorie.*, tbl_kriterien.typ
-	FROM (testtool.vw_auswertung_kategorie JOIN testtool.tbl_kriterien USING (kategorie_kurzbz))";
-if (isset($_POST['reihungstest']))
-	$sql_query.=' JOIN public.tbl_prestudent USING (prestudent_id)';
-$sql_query.=" WHERE vw_auswertung_kategorie.gebiet_id=tbl_kriterien.gebiet_id AND tbl_kriterien.punkte=vw_auswertung_kategorie.richtig";
-if (isset($_POST['reihungstest']))
-	$sql_query.=' AND reihungstest_id='.$_POST['reihungstest'];
-
-$sql_query.=" ORDER BY pruefling_id, kategorie_kurzbz";
-//echo $sql_query;
-if(!($result=pg_query($conn, $sql_query)))
-    die(pg_errormessage($conn));
-
-while ($row=pg_fetch_object($result))
-{
-	$erg_kat[$row->pruefling_id]->pruefling_id=$row->pruefling_id;
-	$erg_kat[$row->pruefling_id]->nachname=$row->nachname;
-	$erg_kat[$row->pruefling_id]->vorname=$row->vorname;
-	$erg_kat[$row->pruefling_id]->gebdatum=$row->gebdatum;
-	$erg_kat[$row->pruefling_id]->geschlecht=$row->geschlecht;
-	$erg_kat[$row->pruefling_id]->idnachweis=$row->idnachweis;
-	$erg_kat[$row->pruefling_id]->registriert=$row->registriert;
-	$erg_kat[$row->pruefling_id]->stg_kurzbz=$row->stg_kurzbz;
-	$erg_kat[$row->pruefling_id]->stg_bez=$row->stg_bez;
-	$erg_kat[$row->pruefling_id]->gruppe=$row->gruppe_kurzbz;
-	$erg_kat[$row->pruefling_id]->kategorie[$row->kategorie_kurzbz]->name=$row->kategorie_kurzbz;
-	$erg_kat[$row->pruefling_id]->kategorie[$row->kategorie_kurzbz]->richtig=$row->richtig;
-	$erg_kat[$row->pruefling_id]->kategorie[$row->kategorie_kurzbz]->falsch=$row->falsch;
-	$erg_kat[$row->pruefling_id]->kategorie[$row->kategorie_kurzbz]->gesamt=$row->gesamt;
-	$erg_kat[$row->pruefling_id]->kategorie[$row->kategorie_kurzbz]->typ=$row->typ;
-	$erg_kat[$row->pruefling_id]->kategorie[$row->kategorie_kurzbz]->punkte=$row->richtig.'/'.$row->gesamt;
-}
-}
 ?>
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 
@@ -165,15 +210,37 @@ while ($row=pg_fetch_object($result))
 <body>
 
 <h1>Auswertung Reihungstest</h1>
-Reihungstest w&auml;hlen:&nbsp;
 <form method="POST">
+Reihungstest w&auml;hlen:&nbsp;
 	<SELECT name="reihungstest">';
 		<?php
 		foreach($rtest as $rt)
-				echo '<OPTION value="'.$rt->reihungstest_id.'">'.$rt->studiengang_kz.' '.$rt->ort_kurzbz.' '.$rt->anmerkung.' '.$rt->datum.' '.$prestd->rt."</OPTION>\n";
+		{
+			if(isset($_POST['reihungstest']) && $rt->reihungstest_id==$_POST['reihungstest'])
+				$selected = 'selected';
+			else 
+				$selected = '';
+				
+			echo '<OPTION value="'.$rt->reihungstest_id.'" '.$selected.'>'.(isset($stg_arr[$rt->studiengang_kz])?$stg_arr[$rt->studiengang_kz]:'').' '.$rt->ort_kurzbz.' '.$rt->anmerkung.' '.$rt->datum.' '.$prestd->rt."</OPTION>\n";
+		}
 		?>
 	</SELECT>
-	<INPUT type="submit" value="select" />
+Studiengang:
+	<SELECT name="studiengang">
+		<OPTION value=''>Alle</OPTION>
+		<?php
+		foreach ($stg_arr as $kz=>$kurzbz)
+		{
+			if(isset($_POST['studiengang']) && $_POST['studiengang']==$kz)
+				$selected='selected';
+			else 
+				$selected='';
+			
+			echo '<OPTION value="'.$kz.'" '.$selected.'>'.$kurzbz.'</OPTION>';
+		}
+		?>
+	</SELECT>
+	<INPUT type="submit" value="Auswerten" />
 </form>
 
 <?php
@@ -201,10 +268,9 @@ if (isset($_POST['reihungstest']))
 		?>
 		<th><small>Prozentpunkte</small></th>
   </tr>
-  <tr>
-  	</th><th>
-  </tr>
   <?php
+  if(isset($ergb))
+  {
   	foreach ($ergb AS $erg)
   	{
   		echo "<tr><td>$erg->pruefling_id</td><td>$erg->nachname</td><td>$erg->vorname</td><td>$erg->gebdatum</td><td>$erg->geschlecht</td>
@@ -217,6 +283,7 @@ if (isset($_POST['reihungstest']))
 		echo '<td>'.number_format($erg->gesamt,2,',',' ').'</td>';
   		echo '</tr>';
   	}
+  }
   ?>
 </table>
 
@@ -238,9 +305,6 @@ if (isset($_POST['reihungstest']))
 		foreach ($kategorie AS $gbt)
 			echo "<th><small>Punkte</small></th><th><small>Typ</small></th>";
 		?>
-  </tr>
-  <tr>
-  	</th><th>
   </tr>
   <?php
    	foreach ($erg_kat AS $erg)
