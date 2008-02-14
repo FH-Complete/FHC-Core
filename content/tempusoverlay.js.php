@@ -72,7 +72,7 @@ function onVerbandSelect()
 			var type="?type=gruppe";
 		else
 			var type="?type=verband";
-		url+=type+attributes+"&semesterplan=true";
+		url+=type+attributes+"&semesterplan=true&"+gettimestamp();
 		if (url)
 			contentFrame.setAttribute('src', url);
 	}
@@ -233,9 +233,22 @@ function onOrtSelect()
 
 	var attributes="?type=ort&ort="+ort+"&datum="+datum;
 	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
-	url+=attributes;
+	url+=attributes+'&'+gettimestamp();
 	if (url)
 		contentFrame.setAttribute('src', url);
+		
+	// Semesterplan
+	var semesterplan=document.getElementById('tabpanels-main');
+	var panelIndex=semesterplan.getAttribute("selectedIndex");
+	if (panelIndex==1)
+	{
+		//alert (url);
+		var contentFrame=document.getElementById('iframeTimeTableSemester');
+		var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
+		url+=attributes+"&semesterplan=true&"+gettimestamp();
+		if (url)
+			contentFrame.setAttribute('src', url);
+	}
 }
 
 function onLektorSelect()
@@ -261,12 +274,26 @@ function onLektorSelect()
 
 	var attributes="?type=lektor&pers_uid="+uid+"&datum="+datum;
 	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
-	url+=attributes;
+	url+=attributes+'&'+gettimestamp();
 	if (url)
 		contentFrame.setAttribute('src', url);
+		
+	// Semesterplan
+	var semesterplan=document.getElementById('tabpanels-main');
+	var panelIndex=semesterplan.getAttribute("selectedIndex");
+	if (panelIndex==1)
+	{
+		//alert (url);
+		var contentFrame=document.getElementById('iframeTimeTableSemester');
+		var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
+		url+=attributes+"&semesterplan=true&"+gettimestamp();
+		if (url)
+			contentFrame.setAttribute('src', url);
+	}
+	
 	// LVAs
 	var vboxLehrveranstalungPlanung=document.getElementById('vboxLehrveranstalungPlanung');
-	vboxLehrveranstalungPlanung.setAttribute('datasources','../rdf/lehreinheit-lvplan.rdf.php?'+"type=lektor&lektor="+uid);
+	vboxLehrveranstalungPlanung.setAttribute('datasources','../rdf/lehreinheit-lvplan.rdf.php?'+"type=lektor&lektor="+uid+"&"+gettimestamp());
 
 	// Lehrveranstaltung
 	try
