@@ -167,6 +167,20 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</menupopup>
 					</template>
 				</menulist>
+				<label value="Note komm. Pruefung" control="student-abschlusspruefung-menulist-notekommpruef" />
+    			<menulist id="student-abschlusspruefung-menulist-notekommpruef"
+						  disabled="true"
+				          datasources="<?php echo APP_ROOT;?>rdf/note.rdf.php?optional=true" flex="1"
+				          ref="http://www.technikum-wien.at/note/liste" 
+					>
+					<template>
+						<menupopup>
+							<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
+				        		      label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
+							  		  uri="rdf:*"/>
+						</menupopup>
+					</template>
+				</menulist>
   			</row>
     		<row>
     			<label value="Vorsitz" control="student-abschlusspruefung-menulist-vorsitz" />
@@ -272,7 +286,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		    	<label value="Anmerkung" control="student-abschlusspruefung-textbox-anmerkung" />
     			<textbox id="student-abschlusspruefung-textbox-anmerkung" multiline="true" maxlength="256" disabled="true"/>
     		</row>
-    		
+    	    		
     		<row>
     			<spacer />
     			<spacer />

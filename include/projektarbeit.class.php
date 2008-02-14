@@ -34,26 +34,27 @@ class projektarbeit
 	//Tabellenspalten
 	var $projektarbeit_id;	// @var integer
 	var $projekttyp_kurzbz;	// @var string
-	var $titel;			// @var string
-	var $lehreinheit_id;		// @var integer
+	var $titel;				// @var string
+	var $titel_english;		// @var string
+	var $lehreinheit_id;	// @var integer
 	var $student_uid;		// @var integer
 	var $firma_id;			// @var integer
-	var $note;			// @var integer
+	var $note;				// @var integer
 	var $punkte;			// @var numeric(6,2)
 	var $beginn;			// @var date
-	var $ende;			// @var date
+	var $ende;				// @var date
 	var $faktor;			// @var numeric(3,2)
 	var $freigegeben;		// @var boolean
 	var $gesperrtbis;		// @var date
 	var $stundensatz;		// @var numeric(6,2)
-	var $gesamtstunden;	// @var numeric(8,2)
+	var $gesamtstunden;		// @var numeric(8,2)
 	var $themenbereich;		// @var sting
-	var $anmerkung;		// @var string
+	var $anmerkung;			// @var string
 	var $ext_id;			// @var integer
 	var $insertamum;		// @var timestamp
-	var $insertvon;		// @var bigint
+	var $insertvon;			// @var bigint
 	var $updateamum;		// @var timestamp
-	var $updatevon;		// @var bigint
+	var $updatevon;			// @var bigint
 
 
 	/**
@@ -107,6 +108,7 @@ class projektarbeit
 				$this->projektarbeit_id = $row->projektarbeit_id;
 				$this->projekttyp_kurzbz = $row->projekttyp_kurzbz;
 				$this->titel = $row->titel;
+				$this->titel_english = $row->titel_english;
 				$this->lehreinheit_id = $row->lehreinheit_id;
 				$this->student_uid = $row->student_uid;
 				$this->firma_id = $row->firma_id;
@@ -243,7 +245,7 @@ class projektarbeit
 
 			$qry='BEGIN; INSERT INTO lehre.tbl_projektarbeit (projekttyp_kurzbz, titel, lehreinheit_id, student_uid, firma_id, note, punkte, 
 				beginn, ende, faktor, freigegeben, gesperrtbis, stundensatz, gesamtstunden, themenbereich, anmerkung, 
-				ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
+				ext_id, insertamum, insertvon, updateamum, updatevon, titel_english) VALUES('.
 			     $this->addslashes($this->projekttyp_kurzbz).', '.
 			     $this->addslashes($this->titel).', '.
 			     $this->addslashes($this->lehreinheit_id).', '.
@@ -262,7 +264,8 @@ class projektarbeit
 			     $this->addslashes($this->anmerkung).', '.
 			     $this->addslashes($this->ext_id).',  now(), '.
 			     $this->addslashes($this->insertvon).', now(), '.
-			     $this->addslashes($this->updatevon).');';
+			     $this->addslashes($this->updatevon).','.
+			     $this->addslashes($this->titel_english).');';
 		}
 		else
 		{
@@ -278,6 +281,7 @@ class projektarbeit
 			$qry='UPDATE lehre.tbl_projektarbeit SET '.
 				'projekttyp_kurzbz='.$this->addslashes($this->projekttyp_kurzbz).', '.
 				'titel='.$this->addslashes($this->titel).', '.
+				'titel_english='.$this->addslashes($this->titel_english).', '.
 				'lehreinheit_id='.$this->addslashes($this->lehreinheit_id).', '.
 				'student_uid='.$this->addslashes($this->student_uid).', '.
 				'firma_id='.$this->addslashes($this->firma_id).', '.
@@ -379,6 +383,7 @@ class projektarbeit
 				$obj->projektarbeit_id = $row->projektarbeit_id;
 				$obj->projekttyp_kurzbz = $row->projekttyp_kurzbz;
 				$obj->titel = $row->titel;
+				$obj->titel_english = $row->titel_english;
 				$obj->lehreinheit_id = $row->lehreinheit_id;
 				$obj->student_uid = $row->student_uid;
 				$obj->firma_id = $row->firma_id;
@@ -436,6 +441,7 @@ class projektarbeit
 				$obj->projektarbeit_id = $row->projektarbeit_id;
 				$obj->projekttyp_kurzbz = $row->projekttyp_kurzbz;
 				$obj->titel = $row->titel;
+				$obj->titel_english = $row->titel_english;
 				$obj->lehreinheit_id = $row->lehreinheit_id;
 				$obj->student_uid = $row->student_uid;
 				$obj->firma_id = $row->firma_id;

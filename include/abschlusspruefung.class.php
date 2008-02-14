@@ -35,6 +35,7 @@ class abschlusspruefung
 	var $pruefer2;
 	var $pruefer3;
 	var $abschlussbeurteilung_kurzbz;
+	var $note;
 	var $akadgrad_id;
 	var $datum;
 	var $sponsion;
@@ -99,6 +100,7 @@ class abschlusspruefung
 				$this->pruefer2 = $row->pruefer2;
 				$this->pruefer3 = $row->pruefer3;
 				$this->abschlussbeurteilung_kurzbz = $row->abschlussbeurteilung_kurzbz;
+				$this->note = $row->note;
 				$this->akadgrad_id = $row->akadgrad_id;
 				$this->datum = $row->datum;
 				$this->sponsion = $row->sponsion;
@@ -185,7 +187,7 @@ class abschlusspruefung
 		{
 			//Neuen Datensatz anlegen	
 			$qry = "BEGIN;INSERT INTO lehre.tbl_abschlusspruefung (student_uid, vorsitz, pruefer1, pruefer2, pruefer3, abschlussbeurteilung_kurzbz, akadgrad_id,
-					datum, sponsion, pruefungstyp_kurzbz, anmerkung, updateamum, updatevon, insertamum, insertvon, ext_id) VALUES (".
+					datum, sponsion, pruefungstyp_kurzbz, anmerkung, updateamum, updatevon, insertamum, insertvon, ext_id, note) VALUES (".
 			       $this->addslashes($this->student_uid).', '.
 			       $this->addslashes($this->vorsitz).', '.
 			       $this->addslashes($this->pruefer1).', '.
@@ -201,7 +203,8 @@ class abschlusspruefung
 			       $this->addslashes($this->updatevon).', '.
 			       $this->addslashes($this->insertamum).', '.
 			       $this->addslashes($this->insertvon).', '.
-			       $this->addslashes($this->ext_id).');';
+			       $this->addslashes($this->ext_id).','.
+			       $this->addslashes($this->note).');';
 			       
 		}
 		else 
@@ -214,6 +217,7 @@ class abschlusspruefung
 				  " pruefer2=".$this->addslashes($this->pruefer2).",".
 				  " pruefer3=".$this->addslashes($this->pruefer3).",".
 				  " abschlussbeurteilung_kurzbz=".$this->addslashes($this->abschlussbeurteilung_kurzbz).",".
+				  " note=".$this->addslashes($this->note).",".
 				  " akadgrad_id=".$this->addslashes($this->akadgrad_id).",".
 				  " datum=".$this->addslashes($this->datum).",".
 				  " sponsion=".$this->addslashes($this->sponsion).",".
@@ -284,6 +288,7 @@ class abschlusspruefung
 				$obj->pruefer2 = $row->pruefer2;
 				$obj->pruefer3 = $row->pruefer3;
 				$obj->abschlussbeurteilung_kurzbz = $row->abschlussbeurteilung_kurzbz;
+				$obj->note = $row->note;
 				$obj->akadgrad_id = $row->akadgrad_id;
 				$obj->datum = $row->datum;
 				$obj->sponsion = $row->sponsion;

@@ -80,6 +80,7 @@ function draw_content($row)
             <PROJEKTARBEIT:projektarbeit_id><![CDATA['.$row->projektarbeit_id.']]></PROJEKTARBEIT:projektarbeit_id>
             <PROJEKTARBEIT:projekttyp_kurzbz><![CDATA['.$row->projekttyp_kurzbz.']]></PROJEKTARBEIT:projekttyp_kurzbz>
             <PROJEKTARBEIT:titel><![CDATA['.$row->titel.']]></PROJEKTARBEIT:titel>
+            <PROJEKTARBEIT:titel_english><![CDATA['.$row->titel_english.']]></PROJEKTARBEIT:titel_english>
             <PROJEKTARBEIT:lehreinheit_id><![CDATA['.$row->lehreinheit_id.']]></PROJEKTARBEIT:lehreinheit_id>
             <PROJEKTARBEIT:lehreinheit_stsem><![CDATA['.$lehreinheit->studiensemester_kurzbz.']]></PROJEKTARBEIT:lehreinheit_stsem>
             <PROJEKTARBEIT:lehrveranstaltung_id><![CDATA['.$lehreinheit->lehrveranstaltung_id.']]></PROJEKTARBEIT:lehrveranstaltung_id>

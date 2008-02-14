@@ -8,5 +8,5 @@
 		onclose="return document.getElementById('fas_browser').contentWindow.closeWindow()"
   	>
 	<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
-	<browser id="tempus_browser" type="content-primary" flex="1" src="https://tempus.fhstp.ac.at:80/content/tempus.xul.php"/>
+	<browser id="tempus_browser" type="content-primary" flex="1" src="https://tempus.fhstp.ac.at:81/content/tempus.xul.php"/>
 </window>

@@ -180,6 +180,7 @@ function StudentProjektarbeitDetailDisableFields(val)
 	document.getElementById('student-projektarbeit-menulist-firma').disabled=val;
 	document.getElementById('student-projektarbeit-menulist-note').disabled=val;
 	document.getElementById('student-projektarbeit-textbox-titel').disabled=val;
+	document.getElementById('student-projektarbeit-textbox-titel_english').disabled=val;
 	document.getElementById('student-projektarbeit-textbox-punkte').disabled=val;
 	document.getElementById('student-projektarbeit-datum-beginn').disabled=val;
 	document.getElementById('student-projektarbeit-datum-ende').disabled=val;
@@ -201,6 +202,7 @@ function StudentProjektarbeitDetailDisableFields(val)
 function StudentProjektarbeitResetFields()
 {
 	document.getElementById('student-projektarbeit-textbox-titel').value='';
+	document.getElementById('student-projektarbeit-textbox-titel_english').value='';
 	document.getElementById('student-projektarbeit-textbox-punkte').value='0.0';
 	document.getElementById('student-projektarbeit-datum-beginn').value='';
 	document.getElementById('student-projektarbeit-datum-ende').value='';
@@ -283,6 +285,7 @@ function StudentProjektarbeitAuswahl()
 
 	projekttyp_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#projekttyp_kurzbz" ));
 	titel = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#titel" ));
+	titel_english = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#titel_english" ));
 	lehreinheit_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehreinheit_id" ));
 	lehrveranstaltung_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehrveranstaltung_id" ));
 	lehreinheit_stsem = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehreinheit_stsem" ));
@@ -353,6 +356,7 @@ function StudentProjektarbeitAuswahl()
 	document.getElementById('student-projektarbeit-menulist-lehrveranstaltung').value=lehrveranstaltung_id;
 	document.getElementById('student-projektarbeit-menulist-lehreinheit').value=lehreinheit_id;
 	document.getElementById('student-projektarbeit-textbox-titel').value=titel;
+	document.getElementById('student-projektarbeit-textbox-titel_english').value=titel_english;
 	document.getElementById('student-projektarbeit-menulist-firma').value=firma_id;
 	document.getElementById('student-projektarbeit-menulist-note').value=note;
 	document.getElementById('student-projektarbeit-textbox-punkte').value=punkte;
@@ -429,6 +433,7 @@ function StudentProjektarbeitSpeichern()
 	lehrveranstaltung_id = document.getElementById('student-projektarbeit-menulist-lehrveranstaltung').value;
 	lehreinheit_id = document.getElementById('student-projektarbeit-menulist-lehreinheit').value;
 	titel = document.getElementById('student-projektarbeit-textbox-titel').value;
+	titel_english = document.getElementById('student-projektarbeit-textbox-titel_english').value;
 	firma_id = document.getElementById('student-projektarbeit-menulist-firma').value;
 	note = document.getElementById('student-projektarbeit-menulist-note').value;
 	punkte = document.getElementById('student-projektarbeit-textbox-punkte').value;
@@ -488,6 +493,7 @@ function StudentProjektarbeitSpeichern()
 	req.add('projektarbeit_id', projektarbeit_id);
 	req.add('projekttyp_kurzbz', projekttyp_kurzbz );
 	req.add('titel', titel);
+	req.add('titel_english', titel_english);
 	req.add('lehreinheit_id', lehreinheit_id);
 	req.add('student_uid', student_uid);
 	req.add('firma_id', firma_id);

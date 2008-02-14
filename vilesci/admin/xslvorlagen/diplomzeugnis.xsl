@@ -305,7 +305,7 @@
 
 				<fo:block-container position="absolute" top="475pt" left="432pt" height="0pt">
 				<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt">
-						<xsl:value-of select="datum_projekt" />
+						<xsl:value-of select="datum" />
 
 				</fo:block>
 				</fo:block-container>
@@ -398,7 +398,7 @@
 
 				<fo:block-container position="absolute" top="586pt" left="236pt" height="1pt">
 				<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt">
-						Vorsitzender des Prüfungssenats
+						Vorsitz des Prüfungssenats
 				                 \n
 				                 \n
 				                 \n

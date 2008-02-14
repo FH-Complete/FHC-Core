@@ -33,6 +33,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 require_once('../vilesci/config.inc.php');
 require_once('../include/lehreinheit.class.php');
 require_once('../include/lehreinheitgruppe.class.php');
+require_once('../include/lehrfach.class.php');
 
 // Datenbank Verbindung
 if (!$conn = @pg_pconnect(CONN_STRING))
@@ -125,6 +126,9 @@ function draw_row($row)
 	}
 	$mitarbeiter = '('.$mitarbeiter.')';
 	
+	$lehrfach = new lehrfach($conn, null, true);
+	$lehrfach->load($row->lehrfach_id);
+	
 	echo '
       <RDF:li>
          <RDF:Description  id="'.$row->lehreinheit_id.'"  about="'.$rdf_url.'/'.$row->lehreinheit_id.'" >
@@ -143,7 +147,7 @@ function draw_row($row)
             <LEHREINHEIT:anmerkung><![CDATA['.$row->anmerkung.']]></LEHREINHEIT:anmerkung>
             <LEHREINHEIT:unr><![CDATA['.$row->unr.']]></LEHREINHEIT:unr>
             <LEHREINHEIT:lvnr><![CDATA['.$row->lvnr.']]></LEHREINHEIT:lvnr>
-            <LEHREINHEIT:bezeichnung><![CDATA['.$row->lehrform_kurzbz.$grp.' '.$mitarbeiter.']]></LEHREINHEIT:bezeichnung>
+            <LEHREINHEIT:bezeichnung><![CDATA['.$lehrfach->kurzbz.'-'.$row->lehrform_kurzbz.' '.$lehrfach->bezeichnung.' '.$grp.' '.$mitarbeiter.']]></LEHREINHEIT:bezeichnung>
          </RDF:Description>
       </RDF:li>
       ';
