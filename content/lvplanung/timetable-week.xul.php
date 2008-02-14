@@ -477,7 +477,7 @@ while ($begin<=$ende)
 	//echo 'load_stpl_search'.$error_msg;
 
 	// Stundenplan der Woche drucken
-	$stdplan->draw_week_xul($semesterplan,$uid,$zeitwunsch);
+	$stdplan->draw_week_xul($semesterplan,$uid,$zeitwunsch, $ignore_kollision);
 }
 //echo $error_msg;.$_SERVER["REQUEST_URI"]
 ?>
