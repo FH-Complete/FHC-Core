@@ -305,7 +305,7 @@ class wochenplan
 			{
 				$this->std_plan[$tag][$stunde][$idx]->lehrfach=$this->wochenplan->lehrstunden[$i]->lehrfach;
 				$this->std_plan[$tag][$stunde][$idx]->lehrform=$this->wochenplan->lehrstunden[$i]->lehrform;
-				$this->std_plan[$tag][$stunde][$idx]->lehrfach_nr=$this->wochenplan->lehrstunden[$i]->lehrfach_nr;
+				$this->std_plan[$tag][$stunde][$idx]->lehrfach_id=$this->wochenplan->lehrstunden[$i]->lehrfach_id;
 				$this->std_plan[$tag][$stunde][$idx]->farbe=$this->wochenplan->lehrstunden[$i]->farbe;
 				//$this->std_plan[$tag][$stunde][$idx]->titel=$this->wochenplan->lehrstunden[$i]->titel;
 			}
@@ -657,7 +657,7 @@ class wochenplan
 	 * @return true oder false
 	 *
 	 */
-	function draw_week_xul($semesterplan,$uid, $wunsch=null)
+	function draw_week_xul($semesterplan, $uid, $wunsch=null, $ignore_kollision=false)
 	{
 		//echo $wunsch;
 		global $cfgStdBgcolor;
@@ -800,7 +800,9 @@ class wochenplan
 													$kollision++;
 									}
 					}
-
+					// Kollision anzeigen?
+					if ($ignore_kollision)
+						$kollision=0;
 					//Daten aufbereiten
 					foreach ($a_unr as $unr)
 					{
