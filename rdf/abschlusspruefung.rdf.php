@@ -221,6 +221,7 @@ if($result = pg_query($conn, $qry))
 		<betreuer><![CDATA['.$betreuer.']]></betreuer>
 		<betreuer_2><![CDATA['.$betreuer_2.']]></betreuer_2>
 		<note><![CDATA['.$note.']]></note>
+		<notekommpruef><![CDATA['.$row->note.']]></notekommpruef>
 		<datum_projekt><![CDATA['.$datum_projekt.']]></datum_projekt>';
 		
 	 	echo "\n\t</pruefung>";
