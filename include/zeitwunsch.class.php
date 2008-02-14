@@ -202,14 +202,41 @@ class zeitwunsch
 			else
 			{
 				while ($row=pg_fetch_object($result))
+				{
+					$beginn=montag($datum);
 					for ($i=1;$i<=7;$i++)
 					{
 						$date_iso=date('Y-m-d',$beginn);
+						echo "\n".$date_iso."\n".$row->vondatum."\n";
 						if ($date_iso>$row->vondatum && $date_iso<$row->bisdatum)
-							for ($j=$erstestunde;$j<=letztestunde;$j++)
+							for ($j=$erstestunde;$j<=$letztestunde;$j++)
 								$this->zeitwunsch[$i][$j]=-3;
+						if ($date_iso==$row->vondatum && $date_iso<$row->bisdatum)
+						{
+							if (is_null($row->vonstunde))
+								$row->vonstunde=$erstestunde;
+							for ($j=$row->vonstunde;$j<=$letztestunde;$j++)
+								$this->zeitwunsch[$i][$j]=-3;
+						}
+						if ($date_iso>$row->vondatum && $date_iso==$row->bisdatum)
+						{
+							if (is_null($row->bisstunde))
+								$row->bisstunde=$letztestunde;
+							for ($j=$erstestunde;$j<=$row->bisstunde;$j++)
+								$this->zeitwunsch[$i][$j]=-3;
+						}
+						if ($date_iso==$row->vondatum && $date_iso==$row->bisdatum)
+						{
+							if (is_null($row->vonstunde))
+								$row->vonstunde=$erstestunde;
+							if (is_null($row->bisstunde))
+								$row->bisstunde=$letztestunde;
+							for ($j=$row->vonstunde;$j<=$row->bisstunde;$j++)
+								$this->zeitwunsch[$i][$j]=-3;
+						}
 						$beginn=jump_day($beginn,1);
 					}
+				}
 			}
 		}
 		return true;

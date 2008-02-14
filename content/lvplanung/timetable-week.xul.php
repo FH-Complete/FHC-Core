@@ -443,9 +443,13 @@ if ($type=='lektor' || $aktion=='lva_single_search'	|| $aktion=='lva_multi_searc
 	if ($type=='lektor')
 		if ($wunsch->loadPerson($pers_uid,$datum))
 			$zeitwunsch=$wunsch->zeitwunsch;
+		else
+			$error_msg.=$wunsch->errormsg;
 	if ($aktion=='lva_single_search' || $aktion=='lva_multi_search')
 		if ($wunsch->loadZwLE($lva_id,$datum))
 			$zeitwunsch=$wunsch->zeitwunsch;
+		else
+			$error_msg.=$wunsch->errormsg;
 }
 
 // Zusaetzliche Daten laden
