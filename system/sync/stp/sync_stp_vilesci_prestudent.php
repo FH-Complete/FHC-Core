@@ -379,6 +379,10 @@ if($result = pg_query($conn, $qry))
 
 					if(!$error)
 					{
+						if($row->instudiensemester>$maxsemester[$row->studiengang_kz])
+						{
+							$row->instudiensemester=$maxsemester[$row->studiengang_kz];
+						}
 						$qry_ins='';
 						$qry_status="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='".$prestudent_id."' AND rolle_kurzbz='".$rolle."' AND studiensemester_kurzbz='".$Kalender."' AND ausbildungssemester='".$row->instudiensemester."';";
 						$result_status=pg_query($conn,$qry_status);
