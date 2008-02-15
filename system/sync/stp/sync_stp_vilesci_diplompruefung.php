@@ -281,7 +281,6 @@ if($result = pg_query($conn, $qry))
 					}
 					$sql.=myaddslashes($row->pruefdat).",  
 					NULL, ";
-					//myaddslashes('Technisch: '.$row->_gegenstandtech.' Nicht technisch: '.$row->_gegenstandnichttech).", 
 					$sql.=myaddslashes($row->chlfdnr).", 
 					now(), 'sync', NULL, NULL, NULL);";
 				if(!$result_neu = pg_query($conn, $sql))
@@ -409,8 +408,8 @@ echo nl2br($ausgabe);
 
 mail($adress, 'SYNC-Fehler StP-Abschlusspruefung von '.$_SERVER['HTTP_HOST'], $error_log,"From: nsc@fhstp.ac.at");
 
-mail($adress, 'SYNC StP-Abschlusspruefung  von '.$_SERVER['HTTP_HOST'], "Sync Person\n------------\n\n"
-."Personen: Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Updates: ".$updates." / Fehler: ".$fehler." / Doppelt: ".$dublette
+mail($adress, 'SYNC StP-Abschlusspruefung  von '.$_SERVER['HTTP_HOST'], "Sync Abschlussprüfung\n---------------------\n\n"
+."Abschlussprüfung: Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Updates: ".$updates." / Fehler: ".$fehler." / Doppelt: ".$dublette
 ."\n\nBeginn: ".$start."\nEnde:   ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: nsc@fhstp.ac.at");
 
 
