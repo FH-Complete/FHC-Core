@@ -48,6 +48,7 @@ class zeitwunsch
 	{
 		$this->conn = $conn;
 
+		// Encoding
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else
@@ -59,17 +60,29 @@ class zeitwunsch
 			return false;
 		}
 
+		// ggf Mitarbeiter laden
 		if($mitarbeiter_uid != null && $tag!=null && $stunde!=null)
 			$this->load($mitarbeiter_uid, $tag, $stunde);
+
+		$this->init();
 	}
 
 	function init()
 	{
-		$sql_query='SELECT min(stunde),max(stunde) FROM lehre.tbl_stunde';
-		if(!$result_stunde=pg_query($this->conn, $sql_query))
-			die(pg_last_error($this->conn));
-		$this->min_stunde=pg_result($result_stunde,0,'min');
-		$this->max_stunde=pg_result($result_stunde,0,'max');
+		// Stundenraster abfragen
+		$sql='SELECT min(stunde) AS min_stunde,max(stunde) AS max_stunde FROM lehre.tbl_stunde;';
+		if(!$result=pg_query($this->conn, $sql))
+		{
+			$this->errormsg=pg_last_error($this->conn);
+			return false;
+		}
+		else
+		{
+			$row=pg_fetch_object($result);
+			$this->min_stunde=$row->min_stunde;
+			$this->max_stunde=$row->max_stunde;
+		}
+		return true;
 	}
 
 	// *********************************************************
@@ -188,8 +201,6 @@ class zeitwunsch
 			$start=date('Y-m-d',$beginn);
 			$ende=date('Y-m-d',jump_day($beginn,7));
 
-			$erstestunde=1;
-			$letztestunde=16;
 			// Zeitsperren abfragen
 			$sql="SELECT vondatum,vonstunde,bisdatum,bisstunde
 				FROM campus.tbl_zeitsperre
@@ -207,30 +218,30 @@ class zeitwunsch
 					for ($i=1;$i<=7;$i++)
 					{
 						$date_iso=date('Y-m-d',$beginn);
-						echo "\n".$date_iso."\n".$row->vondatum."\n";
+						//echo "\n".$date_iso."\n".$row->vondatum."\n";
 						if ($date_iso>$row->vondatum && $date_iso<$row->bisdatum)
-							for ($j=$erstestunde;$j<=$letztestunde;$j++)
+							for ($j=$this->min_stunde;$j<=$this->max_stunde;$j++)
 								$this->zeitwunsch[$i][$j]=-3;
 						if ($date_iso==$row->vondatum && $date_iso<$row->bisdatum)
 						{
 							if (is_null($row->vonstunde))
-								$row->vonstunde=$erstestunde;
-							for ($j=$row->vonstunde;$j<=$letztestunde;$j++)
+								$row->vonstunde=$this->min_stunde;
+							for ($j=$row->vonstunde;$j<=$this->max_stunde;$j++)
 								$this->zeitwunsch[$i][$j]=-3;
 						}
 						if ($date_iso>$row->vondatum && $date_iso==$row->bisdatum)
 						{
 							if (is_null($row->bisstunde))
-								$row->bisstunde=$letztestunde;
-							for ($j=$erstestunde;$j<=$row->bisstunde;$j++)
+								$row->bisstunde=$this->max_stunde;
+							for ($j=$this->min_stunde;$j<=$row->bisstunde;$j++)
 								$this->zeitwunsch[$i][$j]=-3;
 						}
 						if ($date_iso==$row->vondatum && $date_iso==$row->bisdatum)
 						{
 							if (is_null($row->vonstunde))
-								$row->vonstunde=$erstestunde;
+								$row->vonstunde=$this->min_stunde;
 							if (is_null($row->bisstunde))
-								$row->bisstunde=$letztestunde;
+								$row->bisstunde=$this->max_stunde;
 							for ($j=$row->vonstunde;$j<=$row->bisstunde;$j++)
 								$this->zeitwunsch[$i][$j]=-3;
 						}
@@ -245,11 +256,11 @@ class zeitwunsch
 
 	/**
 	 * Zeitwunsch der Personen in Lehreinheiten laden
-	 * @return array mit Fachbereichen oder false=fehler
+	 * @return true oder false
 	 */
 	function loadZwLE($le_id,$datum=null)
 	{
-		$this->init();
+		//$this->init();
 		// SUB-Select fuer LVAs
 		$sql_query_leid='';
 		$sql_query_le='SELECT DISTINCT mitarbeiter_uid FROM campus.vw_lehreinheit WHERE ';
@@ -272,85 +283,59 @@ class zeitwunsch
 			while ($row=pg_fetch_object($result))
 				$this->zeitwunsch[$row->tag][$row->stunde]=$row->gewicht;
 
+		// ***********************************************************
 		// Zeitsperren fuer die aktuelle Woche holen
-		if ($datum!=null)
+
+		if (!is_null($datum))
 		{
 			$beginn=montag($datum);
-			$ende=jump_day($beginn,7);
-			$beginniso=date("Y-m-d",$beginn);
-			$endeiso=date("Y-m-d",$ende);
-			$sql_query="SELECT vondatum,vonstunde,bisdatum,bisstunde
-						FROM campus.tbl_zeitsperre
-						WHERE mitarbeiter_uid IN ($sql_query_le)
-							AND vondatum<='$endeiso' AND bisdatum>'$beginniso'";
-			//echo $sql_query;
+			$start=date('Y-m-d',$beginn);
+			$ende=date('Y-m-d',jump_day($beginn,7));
+
 			// Zeitsperren abfragen
-			if(!$result=pg_query($this->conn, $sql_query))
+			$sql="SELECT vondatum,vonstunde,bisdatum,bisstunde
+				FROM campus.tbl_zeitsperre
+				WHERE mitarbeiter_uid IN ($sql_query_le) AND vondatum<='$ende' AND bisdatum>'$start'";
+			if(!$result=pg_query($this->conn, $sql))
 			{
 				$this->errormsg=pg_last_error($this->conn);
 				return false;
 			}
 			while ($row=pg_fetch_object($result))
 			{
-				echo "\nTagBeginn: ".$row->vondatum;
-				echo "\nTagEnde: ".$row->bisdatum;
-				echo "\nStundeBeginn: ".$row->vonstunde;
-				echo "\nStundeEnde: ".$row->bisstunde;
-				if ($row->vonstunde==null || $row->vondatum==null)
-					return true;
-				$stundebeginn=$row->vonstunde;
-				$stundeende=$row->bisstunde;
-				$beginnDB=mktime(0,0,0,substr($row->vondatum,5,2),substr($row->vondatum,8,2),substr($row->vondatum,0,4));
-				$endeDB=mktime(0,0,0,substr($row->bisdatum,5,2),substr($row->bisdatum,8,2),substr($row->bisdatum,0,4));
-				echo "\nTagBeginnDB: ".$beginnDB;
-				echo "\nTagEndeDB: ".$endeDB;
-				echo "\nTagBeginn: ".$beginn;
-				echo "\nTagEnde: ".$ende;
-				if ($beginn<$beginnDB)
-					$beginn=$beginnDB;
-				else
-					$stundebeginn=$this->min_stunde;
-				if ($ende>$endeDB)
-					$ende=$endeDB;
-				else
-					$stundeende=$this->max_stunde;
-				$tagbeginn=date("w",$beginn);
-				$tagende=date("w",$ende);
-				if ($tagende==0)
+				$beginn=montag($datum);
+				for ($i=1;$i<=7;$i++)
 				{
-					$tagende=6;
-					$stundeende=$this->max_stunde;
-				}
-				echo "\nTagBeginn: ".$tagbeginn;
-				echo "\nTagEnde: ".$tagende;
-				echo "\nStundeBeginn: ".$stundebeginn;
-				echo "\nStundeEnde: ".$stundeende;
-				$first=false;
-				for ($t=1;$t<=6;$t++)
-					for ($h=$this->min_stunde;$h<=$this->max_stunde;$h++)
+					$date_iso=date('Y-m-d',$beginn);
+					//echo "\n".$date_iso."\n".$row->vondatum."\n";
+					if ($date_iso>$row->vondatum && $date_iso<$row->bisdatum)
+						for ($j=$this->min_stunde;$j<=$this->max_stunde;$j++)
+							$this->zeitwunsch[$i][$j]=-3;
+					if ($date_iso==$row->vondatum && $date_iso<$row->bisdatum)
 					{
-						if ($first)
-						{
-							$h=$stundebeginn;
-							$first=false;
-						}
-						if ($t>=$tagbeginn && $t<=$tagende)
-							if ($t==$tagbeginn && $h>=$stundebeginn && ($t<$tagende || $h<=$stundeende))
-							{
-								$this->zeitwunsch[$t][$h]=-3;
-								echo 'Zeitsperre eingetragen:'.$t.$h;
-							}
-							elseif($t==$tagende && $h<=$stundeende && ($t>$tagbeginn || $h>=$stundebeginn))
-							{
-								$this->zeitwunsch[$t][$h]=-3;
-								echo 'Zeitsperre eingetragen:'.$t.$h;
-							}
-							elseif ($t>$tagbeginn && $t<$tagende)
-							{
-								$this->zeitwunsch[$t][$h]=-3;
-								echo 'Zeitsperre eingetragen:'.$t.$h;
-							}
+						if (is_null($row->vonstunde))
+							$row->vonstunde=$this->min_stunde;
+						for ($j=$row->vonstunde;$j<=$this->max_stunde;$j++)
+							$this->zeitwunsch[$i][$j]=-3;
 					}
+					if ($date_iso>$row->vondatum && $date_iso==$row->bisdatum)
+					{
+						if (is_null($row->bisstunde))
+							$row->bisstunde=$this->max_stunde;
+						for ($j=$this->min_stunde;$j<=$row->bisstunde;$j++)
+							$this->zeitwunsch[$i][$j]=-3;
+					}
+					if ($date_iso==$row->vondatum && $date_iso==$row->bisdatum)
+					{
+						if (is_null($row->vonstunde))
+							$row->vonstunde=$this->min_stunde;
+						if (is_null($row->bisstunde))
+							$row->bisstunde=$this->max_stunde;
+						for ($j=$row->vonstunde;$j<=$row->bisstunde;$j++)
+							$this->zeitwunsch[$i][$j]=-3;
+					}
+					$beginn=jump_day($beginn,1);
+				}
 			}
 		}
 		return true;
