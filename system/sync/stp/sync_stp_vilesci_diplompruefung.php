@@ -100,7 +100,7 @@ $staat=array();
 <?php
 
 //*********** Neue Daten holen *****************
-$qry="SELECT _vorsitzender, _cxbeurteilungsstufegesamt,_gegenstandtech, _gegenstandnichttech, _pruefertech, _pruefernichttech, chLfdNr, 
+$qry="SELECT _vorsitzender, _cxbeurteilungsstufegesamt,_gegenstandtech, _gegenstandnichttech, _pruefertech, _pruefernichttech, chLfdNr, _cxbeurteilungsstufekommipruef, 
 	__person, _cxgeschlecht, chtitel, chvorname, chnachname, studiengang_kz,  tbl_studiengang.typ, COALESCE(dapruefungsdat,dapruefteil1dat) as pruefdat FROM sync.stp_person 
 	JOIN sync.stp_stgvertiefung ON (_stgvertiefung=__stgvertiefung)
 	JOIN public.tbl_studiengang ON (_studiengang=ext_id) 
@@ -128,7 +128,7 @@ if($result = pg_query($conn, $qry))
 			}
 			else 
 			{
-				$error_log1.="\nStudent ".$row->__person." (ext_id) in tbl_student nicht gefunden!";
+				$error_log1.="\nStudent ".$row->__person." (ext_id) ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname)." in tbl_student nicht gefunden!";
 				$fehler++;
 				continue;
 			}
@@ -149,7 +149,20 @@ if($result = pg_query($conn, $qry))
 				}
 				else 
 				{
-					$error_log2.="\nVorsitzender ".$row->_vorsitzender." in tbl_benutzer nicht gefunden!";
+					$qry_err="SELECT chtitel, chvorname, chnachname FROM sync.stp_person 
+						WHERE __person=".myaddslashes($row->_vorsitzender).";";
+					if($result_err=pg_query($conn,$qry_err))
+					{
+						if($row_err=pg_fetch_object($result_err))
+						{
+							$error_log2.="\nVorsitzender ".$row->_vorsitzender.", ".trim($row_err->chtitel)." ".trim($row_err->chnachname).", ".trim($row_err->chvorname)." in tbl_benutzer nicht gefunden!";
+						}
+						else 
+						{
+							$error_log2.="\nVorsitzender ".$row->_vorsitzender." in tbl_benutzer nicht gefunden!";						
+						}
+					}
+					//$error_log2.="\nVorsitzender ".$row->_vorsitzender." in tbl_benutzer nicht gefunden!";
 					$fehler++;
 					continue;
 				}
@@ -159,7 +172,20 @@ if($result = pg_query($conn, $qry))
 			{
 				if(pg_num_rows($result_synk)==0)
 				{
-					$error_log2.="\nVorsitzender ".$vorsitzender." in tbl_mitarbeiter nicht gefunden!";
+					$qry_err="SELECT chtitel, chvorname, chnachname FROM sync.stp_person 
+						WHERE __person=".myaddslashes($row->_vorsitzender).";";
+					if($result_err=pg_query($conn,$qry_err))
+					{
+						if($row_err=pg_fetch_object($result_err))
+						{
+							$error_log2.="\nVorsitzender ".$row->_vorsitzender.", ".trim($row_err->chtitel)." ".trim($row_err->chnachname).", ".trim($row_err->chvorname)." in tbl_mitarbeiter nicht gefunden!";
+						}
+						else 
+						{
+							$error_log2.="\nVorsitzender ".$row->_vorsitzender." in tbl_mitarbeiter nicht gefunden!";						
+						}
+					}
+					//$error_log2.="\nVorsitzender ".$vorsitzender." in tbl_mitarbeiter nicht gefunden!";
 					$fehler++;
 					continue;
 				}
@@ -180,7 +206,20 @@ if($result = pg_query($conn, $qry))
 				}
 				else 
 				{
-					$error_log3.="\nTechn. Prüfer ".$row->_pruefertech." in tbl_syncperson nicht gefunden!";
+					$qry_err="SELECT chtitel, chvorname, chnachname FROM sync.stp_person 
+						WHERE __person=".myaddslashes($row->_pruefertech).";";
+					if($result_err=pg_query($conn,$qry_err))
+					{
+						if($row_err=pg_fetch_object($result_err))
+						{
+							$error_log3.="\nTechn. Prüfer ".$row->_pruefertech.", ".trim($row_err->chtitel)." ".trim($row_err->chnachname).", ".trim($row_err->chvorname)." in tbl_syncperson nicht gefunden!";
+						}
+						else 
+						{
+							$error_log3.="\nTechn. Prüfer ".$row->_pruefertech." in tbl_syncperson nicht gefunden!";						
+						}
+					}
+					//$error_log3.="\nTechn. Prüfer ".$row->_pruefertech." in tbl_syncperson nicht gefunden!";
 					$fehler++;
 					continue;
 				}
@@ -201,7 +240,20 @@ if($result = pg_query($conn, $qry))
 				}
 				else 
 				{
-					$error_log4.="\nNicht-Techn. Prüfer ".$row->_pruefernichttech." in tbl_syncperson nicht gefunden!";
+					$qry_err="SELECT chtitel, chvorname, chnachname FROM sync.stp_person 
+						WHERE __person=".myaddslashes($row->_pruefernichttech).";";
+					if($result_err=pg_query($conn,$qry_err))
+					{
+						if($row_err=pg_fetch_object($result_err))
+						{
+							$error_log4.="\nNicht-Techn. Prüfer ".$row->_pruefernichttech.", ".trim($row_err->chtitel)." ".trim($row_err->chnachname).", ".trim($row_err->chvorname)." in tbl_syncperson nicht gefunden!";
+						}
+						else 
+						{
+							$error_log4.="\nNicht-Techn. Prüfer ".$row->_pruefernichttech." in tbl_syncperson nicht gefunden!";						
+						}
+					}
+					//$error_log4.="\nNicht-Techn. Prüfer ".$row->_pruefernichttech." in tbl_syncperson nicht gefunden!";
 					$fehler++;
 					continue;
 				}
@@ -261,7 +313,7 @@ if($result = pg_query($conn, $qry))
 			{
 				//Neue Abschlussprüfung anlegen
 				$sql="INSERT INTO lehre.tbl_abschlusspruefung
-					(student_uid, vorsitz, pruefer1, pruefer2, pruefer3, abschlussbeurteilung_kurzbz, akadgrad_id, pruefungstyp_kurzbz, datum, sponsion, anmerkung, 
+					(student_uid, vorsitz, pruefer1, pruefer2, pruefer3, abschlussbeurteilung_kurzbz, akadgrad_id, pruefungstyp_kurzbz, datum, sponsion, anmerkung, note, 
 					insertamum,insertvon,updateamum,updatevon, ext_id)
 					VALUES
 					(".myaddslashes($uid).", ".
@@ -280,8 +332,9 @@ if($result = pg_query($conn, $qry))
 						$sql.=myaddslashes('Bachelor').", ";
 					}
 					$sql.=myaddslashes($row->pruefdat).",  
-					NULL, ";
-					$sql.=myaddslashes($row->chlfdnr).", 
+					NULL, ".
+					myaddslashes($row->chlfdnr).", ".
+					myaddslashes($row->_cxbeurteilungsstufekommipruef).", 
 					now(), 'sync', NULL, NULL, NULL);";
 				if(!$result_neu = pg_query($conn, $sql))
 				{
@@ -292,7 +345,7 @@ if($result = pg_query($conn, $qry))
 				else
 				{
 					$ausgabe.="\n------------------------------------\nÜbertragen: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
-					$ausgabe.="\n---Abschlussprüfung (".$row->typ."): am ".$row->pruefdat.", Vorsitz:".trim($vorsitzender).", Prüfer: ".$pruefertech." / ".$pruefernichttech;
+					$ausgabe.="\n---Abschlussprüfung (".$row->typ."): am ".$row->pruefdat.", Vorsitz:".trim($vorsitzender).", Prüfer: ".$pruefertech." / ".$pruefernichttech.", Note: ".$row->_cxbeurteilungsstufekommipruef;
 					$eingefuegt++;
 					pg_query($conn, "COMMIT");
 				}
@@ -347,10 +400,21 @@ if($result = pg_query($conn, $qry))
 							$sql="abschlussbeurteilung_kurzbz=".myaddslashes(trim($row->_cxbeurteilungsstufegesamt));
 						}
 					}
+					if($row_dubel->note!=$row->_cxbeurteilungsstufekommipruef && $row->_cxbeurteilungsstufekommipruef!=NULL && $row->_cxbeurteilungsstufekommipruef!='')
+					{
+						if(strlen(trim($sql))>0)
+						{
+							$sql.=", note=".myaddslashes(trim($row->_cxbeurteilungsstufekommipruef));
+						}
+						else 
+						{
+							$sql="note=".myaddslashes(trim($row->_cxbeurteilungsstufekommipruef));
+						}
+					}
 					
 					if(strlen(trim($sql))>0)
 					{
-						//update nur mit änderungen bei vorsitz,prüfer oder note
+						//update nur mit änderungen bei vorsitz,prüfer oder noten
 						$sql="UPDATE lehre.tbl_abschlusspruefung SET ".$sql." 
 						WHERE student_uid='".$uid."' AND datum='".$row->pruefdat."';";
 						if(!$result_neu = pg_query($conn, $sql))
@@ -361,8 +425,8 @@ if($result = pg_query($conn, $qry))
 						}
 						else
 						{
-							$ausgabe.="\n------------------------------------\nÜbertragen: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
-							$ausgabe.="\n---Abschlussprüfung (".$row->typ."): am ".$row->pruefdat.", Vorsitz:".trim($vorsitzender).", Prüfer: ".$pruefertech." / ".$pruefernichttech;
+							$ausgabe.="\n------------------------------------\nGeändert: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
+							$ausgabe.="\n---Abschlussprüfung (".$row->typ."): am ".$row->pruefdat.", Vorsitz:".trim($vorsitzender).", Prüfer: ".$pruefertech." / ".$pruefernichttech.", Note: ".$row->_cxbeurteilungsstufekommipruef;
 							$updates++;
 							pg_query($conn, "COMMIT");
 						}
@@ -392,7 +456,7 @@ else
 echo "Datensätze ohne Prüfungsdatum werden nicht berücksichtigt.";
 echo "<br><br>Eingefügt: ".$eingefuegt;
 echo "<br>Updates: ".$updates;
-echo "<br>bereits vorhanden:      ".$dublette;
+echo "<br>Bereits vorhanden:      ".$dublette;
 echo "<br>Fehler: ".$fehler;
 echo "<br><br>";
 $error_log=$error_log1.$error_log2.$error_log3.$error_log4.$error_log5.$error_log;
@@ -409,7 +473,7 @@ echo nl2br($ausgabe);
 mail($adress, 'SYNC-Fehler StP-Abschlusspruefung von '.$_SERVER['HTTP_HOST'], $error_log,"From: nsc@fhstp.ac.at");
 
 mail($adress, 'SYNC StP-Abschlusspruefung  von '.$_SERVER['HTTP_HOST'], "Sync Abschlussprüfung\n---------------------\n\n"
-."Abschlussprüfung: Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Updates: ".$updates." / Fehler: ".$fehler." / Doppelt: ".$dublette
+."Abschlussprüfung: Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Updates: ".$updates." / Fehler: ".$fehler." / Bereits vorhanden: ".$dublette
 ."\n\nBeginn: ".$start."\nEnde:   ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: nsc@fhstp.ac.at");
 
 
