@@ -3,11 +3,11 @@
      xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 	<Description about="urn:mozilla:install-manifest">
 		<em:id>{84cb81c9-6c90-4654-b2c4-87cdaa829281}</em:id>
-		<em:name>TempusExtern</em:name>
+		<em:name>TempusExtern81</em:name>
 		<em:version>2.0</em:version>
-		<em:description>TempusExtern</em:description>
+		<em:description>TempusExtern81</em:description>
 		<em:file>
-			<Description about="urn:mozilla:extension:file:tempusextern.jar">
+			<Description about="urn:mozilla:extension:file:tempusextern81.jar">
 			<em:package>content/</em:package>
 			<em:skin>skin/</em:skin>
 			</Description>

@@ -1,12 +1,12 @@
 /* !!!
  * DIESE WERTE MUESSEN GEAENDERT WERDEN
  */
-const APP_DISPLAY_NAME = "TempusExtern";
-const APP_NAME = "TempusExtern";
-const APP_PACKAGE = "/tw/tempusextern";
+const APP_DISPLAY_NAME = "TempusExtern81";
+const APP_NAME = "TempusExtern81";
+const APP_PACKAGE = "/tw/tempusextern81";
 const APP_VERSION = "V2.0";
 
-const APP_JAR_FILE = "tempusextern.jar";
+const APP_JAR_FILE = "tempusextern81.jar";
 const APP_CONTENT_FOLDER = "content/";
 const APP_LOCALE_FOLDER  = "locale/de-AT/Tempus/";
 const APP_SKIN_FOLDER  = "skin/";
