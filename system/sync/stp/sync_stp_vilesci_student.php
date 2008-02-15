@@ -226,7 +226,12 @@
 			
 			
 			if($row->chkalendersemstataend=='')
-				$row->chkalendersemstataend='W07';
+			{
+				//$row->chkalendersemstataend='W07';
+				$text.="Student $student->uid hat chkalendersemstataend nicht gesetzt\n";
+				$anzahl_fehler++;
+				continue;
+			}
 			
 			$studiensemester=ucwords(substr($row->chkalendersemstataend,0,1)).'S'.((integer)substr($row->chkalendersemstataend,1,2)<11?'20':'19').substr($row->chkalendersemstataend,1,2);
 			
