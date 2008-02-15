@@ -374,6 +374,7 @@ if($result = pg_query($conn, $qry))
 						if($row_seq=pg_fetch_object(pg_query($conn,$qry_seq)))
 						{
 							$prestudent_id=$row_seq->id;
+							pg_query($conn, "COMMIT");
 						}
 						else
 						{
@@ -387,99 +388,105 @@ if($result = pg_query($conn, $qry))
 						$ausgabe.="\n------------------\nGeändert: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname).", Stg: ".$row->studiengang_kz."\n---".$qry_ins."\n---".$log_qry_ins;
 						$prestudent_id=$row_chk->prestudent_id;
 						$update++;
+						pg_query($conn, "COMMIT");
 					}
 					$iu='';
-
-					if(!$error)
-					{
-						if($row->instudiensemester>$maxsemester[$row->studiengang_kz])
-						{
-							$row->instudiensemester=$maxsemester[$row->studiengang_kz];
-						}
-						$qry_ins='';
-						$qry_status="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='".$prestudent_id."' AND rolle_kurzbz='".$rolle."' AND studiensemester_kurzbz='".$Kalender."' AND ausbildungssemester='".$row->instudiensemester."';";
-						$result_status=pg_query($conn,$qry_status);
-						if(pg_num_rows($result_status)==0)
-						{
-							$iu='i';
-							$qry_ins="INSERT INTO public.tbl_prestudentrolle (prestudent_id, rolle_kurzbz,
-								studiensemester_kurzbz, ausbildungssemester,datum, orgform_kurzbz,
-								insertamum, insertvon, updateamum, updatevon, ext_id)
-								VALUES (".
-								myaddslashes($prestudent_id).", ".
-								myaddslashes($rolle).", ".
-								myaddslashes($Kalender).", ";
-								//max.studiendauer wenn ausbildungssemester größer (v.a. für 50er und 60er)
-								if($row->instudiensemester>$maxsemester[$row->studiengang_kz])
-								{
-									$qry_ins.=myaddslashes($maxsemester[$row->studiengang_kz]);
-								}
-								else 
-								{
-									$qry_ins.=myaddslashes($row->instudiensemester);
-								}
-								$qry_ins.=", ".myaddslashes($semstart[$Kalender]).", ".
-								myaddslashes($orgform).",
-								now(),
-								'SYNC',
-								NULL,
-								NULL, ".
-								myaddslashes($row->__person).")";
-						}
-						else
-						{
-							$iu='u';
-							if($row_status=pg_fetch_object($result_status))
-							{
-								$qry_ins='';
-								if ($row_status->orgform_kurzbz!=$orgform)
-									$qry_ins.="orgform_kurzbz=".myaddslashes($orgform).", ";
-									
-								if($row->instudiensemester>$maxsemester[$row->studiengang_kz])
-									$row->instudiensemester=$maxsemester[$row->studiengang_kz];
-								if ($row_status->ausbildungssemester!=$row->instudiensemester)
-									$qry_ins.="ausbildungssemester=".myaddslashes($row->instudiensemester).", ";
-								if($row_status->datum!=($semstart[$Kalender]))
-								{
-									$qry_ins.="datum=".myaddslashes($semstart[$Kalender]).", ";
-								}
-								if($qry_ins!='')
-								{
-									$qry_ins="UPDATE public.tbl_prestudentrolle SET ".$qry_ins."updateamum=now(), updatevon='SYNC' 
-									WHERE prestudent_id='".$prestudent_id."' AND rolle_kurzbz='".$rolle."' AND studiensemester_kurzbz='".$Kalender."';";
-								}
-							}
-						}
-						if($qry_ins!='')
-						{
-							if(!$result_neu = pg_query($conn, $qry_ins))
-							{
-								$error_log.= $qry_ins."\n<strong>".pg_last_error($conn)." </strong>\n";
-								$fehler1++;
-								pg_query($conn, "ROLLBACK");
-							}
-							else
-							{
-								pg_query($conn, "COMMIT");
-								if($iu=='i')
-								{
-									$ausgabe.="\n---Rolle eingefügt: ".$rolle." im Studiensemester ".$Kalender." und Ausbildungssemeser ".$row->instudiensemester." (OrgForm ".$orgform.");";
-									$eingefuegt1++;
-								}
-								elseif($iu=='u')
-								{
-									$ausgabe.="\n---Rolle geändert: ".$rolle." im Studiensemester ".$Kalender." und Ausbildungssemeser ".$row->instudiensemester." (OrgForm ".$orgform.");";
-									$update1++;
-								}
-							}
-						}
-					}
 				}
 			}
 		}
 		else
 		{
 			echo "<br>".$qry_chk."<br><strong>".pg_last_error($conn)." </strong><br>";
+		}
+		
+		$qry_chk="SELECT * FROM public.tbl_prestudent WHERE person_id=".myaddslashes($row_synk->person_id)." AND studiengang_kz=".myaddslashes($row->studiengang_kz).";";
+		if($result_chk = pg_query($conn, $qry_chk))
+		{
+			if($row_chk=pg_fetch_object($result_chk))
+			{
+				$prestudent_id=$row_chk->prestudent_id;
+			}
+		}
+		if($row->instudiensemester>$maxsemester[$row->studiengang_kz])
+		{
+			$row->instudiensemester=$maxsemester[$row->studiengang_kz];
+		}
+		$qry_ins='';
+		$qry_status="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='".$prestudent_id."' AND rolle_kurzbz='".$rolle."' AND studiensemester_kurzbz='".$Kalender."' AND ausbildungssemester='".$row->instudiensemester."';";
+		$result_status=pg_query($conn,$qry_status);
+		if(pg_num_rows($result_status)==0)
+		{
+			$iu='i';
+			$qry_ins="INSERT INTO public.tbl_prestudentrolle (prestudent_id, rolle_kurzbz,
+				studiensemester_kurzbz, ausbildungssemester,datum, orgform_kurzbz,
+				insertamum, insertvon, updateamum, updatevon, ext_id)
+				VALUES (".
+				myaddslashes($prestudent_id).", ".
+				myaddslashes($rolle).", ".
+				myaddslashes($Kalender).", ";
+				//max.studiendauer wenn ausbildungssemester größer (v.a. für 50er und 60er)
+				if($row->instudiensemester>$maxsemester[$row->studiengang_kz])
+				{
+					$qry_ins.=myaddslashes($maxsemester[$row->studiengang_kz]);
+				}
+				else 
+				{
+					$qry_ins.=myaddslashes($row->instudiensemester);
+				}
+				$qry_ins.=", ".myaddslashes($semstart[$Kalender]).", ".
+				myaddslashes($orgform).",
+				now(),
+				'SYNC',
+				NULL,
+				NULL, ".
+				myaddslashes($row->__person).")";
+		}
+		else
+		{
+			$iu='u';
+			if($row_status=pg_fetch_object($result_status))
+			{
+				$qry_ins='';
+				if ($row_status->orgform_kurzbz!=$orgform)
+					$qry_ins.="orgform_kurzbz=".myaddslashes($orgform).", ";
+					
+				if($row->instudiensemester>$maxsemester[$row->studiengang_kz])
+					$row->instudiensemester=$maxsemester[$row->studiengang_kz];
+				if ($row_status->ausbildungssemester!=$row->instudiensemester)
+					$qry_ins.="ausbildungssemester=".myaddslashes($row->instudiensemester).", ";
+				if($row_status->datum!=($semstart[$Kalender]))
+				{
+					$qry_ins.="datum=".myaddslashes($semstart[$Kalender]).", ";
+				}
+				if($qry_ins!='')
+				{
+					$qry_ins="UPDATE public.tbl_prestudentrolle SET ".$qry_ins."updateamum=now(), updatevon='SYNC' 
+					WHERE prestudent_id='".$prestudent_id."' AND rolle_kurzbz='".$rolle."' AND studiensemester_kurzbz='".$Kalender."';";
+				}
+			}
+		}
+		if($qry_ins!='')
+		{
+			if(!$result_neu = pg_query($conn, $qry_ins))
+			{
+				$error_log.= $qry_ins."\n<strong>".pg_last_error($conn)." </strong>\n";
+				$fehler1++;
+				pg_query($conn, "ROLLBACK");
+			}
+			else
+			{
+				pg_query($conn, "COMMIT");
+				if($iu=='i')
+				{
+					$ausgabe.="\n---Rolle eingefügt: ".$rolle." im Studiensemester ".$Kalender." und Ausbildungssemeser ".$row->instudiensemester." (OrgForm ".$orgform.");";
+					$eingefuegt1++;
+				}
+				elseif($iu=='u')
+				{
+					$ausgabe.="\n---Rolle geändert: ".$rolle." im Studiensemester ".$Kalender." und Ausbildungssemeser ".$row->instudiensemester." (OrgForm ".$orgform.");";
+					$update1++;
+				}
+			}
 		}
 	}
 }
