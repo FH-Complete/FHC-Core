@@ -363,7 +363,7 @@ if ($result_lv!=0)
 		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&projektarbeit=$row->projektarbeit'><img src='../../skin/images/".($row->projektarbeit=='t'?'true.gif':'false.gif')."'></a></td>";
 		//FBK
 		echo "<td style='white-space:nowrap;'>";
-		echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester' method='POST'><SELECT name='fbk'>";
+		echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&fachbereich_kurzbz=$fachbereich_kurzbz' method='POST'><SELECT name='fbk'>";
 		echo "<option value=''>-- Keine Auswahl --</option>";
 		foreach ($fbk as $fb_uid=>$fb_k)
 		{
