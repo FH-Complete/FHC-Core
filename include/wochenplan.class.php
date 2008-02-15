@@ -887,7 +887,7 @@ class wochenplan
 						// Update Von
 						$updatevon=array_unique($updatevon);
 						sort($updatevon);
-						$updatevonam='Ge??ndert von ';
+						$updatevonam='Geaendert von ';
 						foreach ($updatevon as $u)
 							$updatevonam.=$u.', ';
 
@@ -897,7 +897,7 @@ class wochenplan
 						$updatevonam.='am ';
 						foreach ($updateamum as $u)
 							$updatevonam.=$u.' ';
-						//$updatevonam='Ge??ndert von '.$updatevon.', am '.$updateamum;
+						//$updatevonam='Geaendert von '.$updatevon.', am '.$updateamum;
 
 						// Blinken oder nicht ?
 						if ($kollision)
@@ -1464,7 +1464,7 @@ class wochenplan
 
 
 	/**************************************************************************
-	 * @brief Funktion draw_week_csv Stundenplan im XUL-Format
+	 * @brief Funktion draw_week_csv Stundenplan im CSV-Format
 	 *
 	 * @param target Ziel-System zB Outlook
 	 *
