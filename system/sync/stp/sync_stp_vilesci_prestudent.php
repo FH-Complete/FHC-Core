@@ -445,7 +445,7 @@ if($result = pg_query($conn, $qry))
 								}
 								if($qry_ins!='')
 								{
-									$qry_ins.="UPDATE public.tbl_prestudentrolle SET ".$qry_ins."updateamum=now(), updatevon='SYNC' 
+									$qry_ins="UPDATE public.tbl_prestudentrolle SET ".$qry_ins."updateamum=now(), updatevon='SYNC' 
 									WHERE prestudent_id='".$prestudent_id."' AND rolle_kurzbz='".$rolle."' AND studiensemester_kurzbz='".$Kalender."';";
 								}
 							}
