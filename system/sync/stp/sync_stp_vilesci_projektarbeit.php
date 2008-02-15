@@ -604,7 +604,7 @@ else
 echo "<br><br><b>Projektarbeiten:</b>";
 echo "<br>Eingefügt: ".$eingefuegt;
 echo "<br>Updates: ".$updates;
-echo "<br>bereits vorhanden:      ".$dublette;
+echo "<br>Bereits vorhanden:      ".$dublette;
 echo "<br>Fehler: ".$fehler;
 echo "<br>-----------------------------------";
 echo "<br>Betreuer1: ".$b1angelegt." / Fehler: ".$fehler1;
