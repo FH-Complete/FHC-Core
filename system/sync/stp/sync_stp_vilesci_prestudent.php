@@ -127,10 +127,21 @@ $zgv['']=99;
 $ststat=array(2=>'Bewerber', 3=>'Student', 4=>'Ausserordentlicher', 5=>'Unterbrecher', 6=>'Absolvent', 7=>'Abbrecher', 8=>'Abgewiesener',
 	10=>'Diplomand', 11=>'Diplomand', 12=>'Incoming');
 
+//einlesen von studiendauer der stg in array
+$qry="SELECT * FROM public.tbl_studiengang;";
+if($result = pg_query($conn,$qry))
+{
+	while($row=pg_fetch_object($result))
+	{
+		$maxsemester[$row->studiengang_kz]=$row->max_semester;	
+	}
+}
+	
+	
 //*********** Neue Daten holen *****************
 $qry="SELECT __Person, datenquelle, inAusmassBesch, HoechsteAusbildung, _cxZugang, daMaturaDat,
 	_cxZugangFHMag, daZugangFHMagDat, chtitel, chnachname, chvorname, studiengang_kz, typ,
-	chKalenderSemStatAend, inStudiensemester, _cxStudStatus, _StgOrgForm
+	chKalenderSemStatAend, inStudiensemester, _cxstudstatus, _StgOrgForm
 		FROM sync.stp_person JOIN sync.stp_stgvertiefung ON (_stgvertiefung=__stgvertiefung)
 		JOIN public.tbl_studiengang ON (_studiengang=ext_id)
 		WHERE __Person IN (SELECT __person FROM sync.tbl_syncperson) AND
@@ -198,12 +209,16 @@ if($result = pg_query($conn, $qry))
 			$cont=true;
 			$error=true;
 		}
+		//$row->chkalendersemstataend='W07';
 		if($row->chkalendersemstataend=='' || $row->chkalendersemstataend==NULL)
 		{
+			$error_log1.="\nchkalendersemstataend nicht eingetragen !";//Fehlerausgabe, wenn kein wert eingetragen, da vor ws1999 wert noch nicht in db//15.02.2008
+			$cont=true;
+			$error=true;
+		}
+		if($row->_cxstudstatus=='3' || $row->_cxstudstatus=='4' || $row->_cxstudstatus=='9' || $row->_cxstudstatus=='10' || $row->_cxstudstatus=='11')
+		{
 			$row->chkalendersemstataend='W07';// Standardwert WS2007; von FH-StP gewünscht; 11.12.07
-			//$error_log1.="\nKalenderSemStatAend (Studiensemester) nicht eingetragen";
-			//$cont=true;
-			//$error=true;
 		}
 		if($error)
 		{
@@ -376,9 +391,17 @@ if($result = pg_query($conn, $qry))
 								VALUES (".
 								myaddslashes($prestudent_id).", ".
 								myaddslashes($rolle).", ".
-								myaddslashes($Kalender).", ".
-								myaddslashes($row->instudiensemester).",
-								now(), ".
+								myaddslashes($Kalender).", ";
+								//max.studiendauer wenn ausbildungssemester größer (v.a. für 50er und 60er)
+								if($row->instudiensemester>$maxsemester[$row->studiengang_kz])
+								{
+									$qry_ins.=myaddslashes($maxsemester[$row->studiengang_kz]);
+								}
+								else 
+								{
+									$qry_ins.=myaddslashes($row->instudiensemester);
+								}
+								$qry_ins.=", now(), ".
 								myaddslashes($orgform).",
 								now(),
 								'SYNC',
@@ -394,9 +417,14 @@ if($result = pg_query($conn, $qry))
 								$qry_ins='';
 								if ($row_status->orgform_kurzbz!=$orgform)
 									$qry_ins.="orgform_kurzbz=".myaddslashes($orgform).", ";
+									
+								if($row->instudiensemester>$maxsemester[$row->studiengang_kz])
+									$row->instudiensemester=$maxsemester[$row->studiengang_kz];
+								if ($row_status->ausbildungssemester!=$row->instudiensemester)
+									$qry_ins.="ausbildungssemester=".myaddslashes($row->instudiensemester).", ";
 								if($qry_ins!='')
 								{
-									$qry_ins.="UPDATE public.tbl_prestudentrolle SET ".$qry_ins."updateamum=now(), updatevon='SYNC' WHERE prestudent_id='".$prestudent_id."' AND rolle_kurzbz='".$rolle."' AND studiensemester_kurzbz='".$Kalender."' AND ausbildungssemester='".$row->instudiensemester."';";
+									$qry_ins.="UPDATE public.tbl_prestudentrolle SET ".$qry_ins."updateamum=now(), updatevon='SYNC' WHERE prestudent_id='".$prestudent_id."' AND rolle_kurzbz='".$rolle."' AND studiensemester_kurzbz='".$Kalender."';";
 								}
 							}
 						}

@@ -51,6 +51,7 @@ $studiensemester=array();
 $maxsemester=array();
 $semdiff=0;
 $instg='';
+$rolle_kurzbz='';
 
 $i=0;
 /*************************
@@ -163,7 +164,28 @@ if($resultall = pg_query($conn,$qry))
 					$ausgabe.="\nAusbildungssemester = ".$rowrl->ausbildungssemester." / semdiff= ".$semdiff.".";
 					while (array_search($rowrl->studiensemester_kurzbz, $studiensemester)>=array_search($beginnsem, $studiensemester))
 					{
-						$qry_chk="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id=".myaddslashes($rowall->prestudent_id)." AND studiensemester_kurzbz=".myaddslashes($rowrl->studiensemester_kurzbz).";";
+						if($semdiff>=$maxsemester[$instg])
+						{
+							$rolle_kurzbz="Diplomand";
+						}
+						else
+						{
+							$rolle_kurzbz="Student";
+						}
+						if($semdiff>$maxsemester[$instg])
+						{
+							$ausbsem=$maxsemester[$instg];
+						}
+						else 
+						{
+							$ausbsem=$semdiff;
+						}
+						$qry_chk="SELECT * FROM public.tbl_prestudentrolle 
+						WHERE prestudent_id=".myaddslashes($rowall->prestudent_id)." 
+						AND studiensemester_kurzbz=".myaddslashes($rowrl->studiensemester_kurzbz)." 
+						AND rolle_kurzbz=".myaddslashes($rolle_kurzbz)." 
+						AND ausbildungssemester=".myaddslashes($ausbsem).";";
+						
 						if($resultchk = pg_query($conn,$qry_chk))
 						{
 							if(pg_num_rows($resultchk)==0)
@@ -177,17 +199,9 @@ if($resultall = pg_query($conn,$qry))
 									studiensemester_kurzbz, ausbildungssemester,datum, orgform_kurzbz,
 									insertamum, insertvon, updateamum, updatevon, ext_id)
 									VALUES (".
-									myaddslashes($rowall->prestudent_id).", ";
-									//status diplomand für letztes ausbildungssemester
-									if($semdiff>=$maxsemester[$instg])
-									{
-										$qry_ins.="'Diplomand', ";
-									}
-									else
-									{
-										$qry_ins.="'Student', ";
-									}
-									$qry_ins.=myaddslashes($rowrl->studiensemester_kurzbz).", ";
+									myaddslashes($rowall->prestudent_id).", ".
+									myaddslashes($rolle_kurzbz).", ".
+									myaddslashes($rowrl->studiensemester_kurzbz).", ";
 									//wenn semdiff>maxsemester dann maxsemester sonst semdiff
 									if($semdiff>$maxsemester[$instg])
 									{
@@ -215,7 +229,70 @@ if($resultall = pg_query($conn,$qry))
 							}
 							else 
 							{
-								$ausgabe.="\nEintrag in Semester ".$rowrl->studiensemester_kurzbz." bereits vorhanden!";
+								$qry_chk='';
+								if($row_chk=pg_fetch_object($resultchk))
+								{
+									if($semdiff>=$maxsemester[$instg])
+									{
+										if($row_chk->rolle_kurzbz!='Diplomand')
+										{
+											$qry_chk="rolle_kurzbz='Diplomand', ";
+										}
+									}
+									else
+									{
+										if($row_chk->rolle_kurzbz!='Student')
+										{
+											$qry_chk="rolle_kurzbz='Student', ";
+										}
+									}
+									if($semdiff>$maxsemester[$instg])
+									{
+										if($row_chk->ausbildungssemester!=$maxsemester[$instg])
+										{
+											$qry_chk.="ausbildungssemester=".myaddslashes($maxsemester[$instg]).", ";
+										}
+									}
+									else 
+									{
+										if($row_chk->ausbildungssemester!=$semdiff)
+										{
+											$qry_chk.="ausbildungssemester=".myaddslashes($semdiff).", ";
+										}
+									}
+									if($row_chk->datum!=$rowrl->datum)
+									{
+										$qry_chk.="datum=".myaddslashes($rowrl->datum).", ";
+									}
+									if($row_chk->orgform_kurzbz!=$rowrl->orgform_kurzbz)
+									{
+										$qry_chk.="orgform_kurzbz=".myaddslashes($rowrl->orgform_kurzbz).", ";
+									}
+									if($qry_chk!='')
+									{
+										$qry_upd="UPDATE public.tbl_prestudentrolle SET ".$qry_chk."updateamum=now(), updatevon='sync' 
+										WHERE  prestudent_id=".myaddslashes($rowall->prestudent_id)." 
+										AND studiensemester_kurzbz=".myaddslashes($rowrl->studiensemester_kurzbz)." 
+										AND rolle_kurzbz=".myaddslashes($rolle_kurzbz)." 
+										AND ausbildungssemester=".$ausbsem.";";
+										if(!$resultins = pg_query($conn,$qry_upd))
+										{
+											$fehler++;
+											$error_log.="\n*****\n".$rowall->__person." - ".trim($rowall->chtitel)." ".trim($rowall->chnachname).", ".trim($rowall->chvorname).": ".$rowall->daeintrittdat;
+											$error_log.= "\n".$qry_upd."\n".pg_last_error($conn)."\n";	
+										}
+										else 
+										{
+											$eingefuegt++;
+											//$ausgabe.="\n---".$qry_ins;
+											$ausgabe.="\n---".$qry_chk.";";
+										}
+									}
+									else 
+									{
+										$ausgabe.="\nEintrag in Semester ".$rowrl->studiensemester_kurzbz." bereits vorhanden!";
+									}
+								}
 							}
 						}
 						//studiensemester, ausbildungssemester, datum
@@ -299,7 +376,7 @@ if($resultall = pg_query($conn,$qry))
 							}
 							else 
 							{
-								$eingefuegt++;
+								$update++;
 								$ausgabe.="\n---".$rowrl->studiensemester_kurzbz.": Interessent, ".$semdiff.".Semester , Datum: ".$new_date = date('Y-m-d', strtotime($rowrl->datum.' -6 months')).", Orgform: ".$rowrl->orgform_kurzbz.";";
 
 							}
@@ -320,7 +397,7 @@ echo nl2br($ausgabe);
 mail($adress, 'SYNC-Fehler StP-Prestudentrollen von '.$_SERVER['HTTP_HOST'], $error_log,"From: nsc@fhstp.ac.at");
 
 mail($adress, 'SYNC StP-Prestudentrollen  von '.$_SERVER['HTTP_HOST'], "Sync Person\n------------\n\n"
-."Personen: Gesamt: ".$anzahl_gesamt." / Fehler: ".$fehler." / Eingefügte Rollen: ".$eingefuegt
+."Personen: Gesamt: ".$anzahl_gesamt." / Fehler: ".$fehler." / Eingefügte Rollen: ".$eingefuegt." Geändert: ".$update
 ."\n\nBeginn:  ".$start."\nEnde:    ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: nsc@fhstp.ac.at");
 ?>
 </body>
