@@ -51,7 +51,6 @@ $error_log1='';
 $error_log2='';
 $error_log3='';
 $error_log4='';
-$error_log5='';
 $error_log_ext='';
 $ausgabe="";
 $text = '';
@@ -91,7 +90,7 @@ $b2angelegt=0;
 <?php
 
 //*********** Neue Daten holen *****************
-$qry="SELECT _vorsitzender, chthema, chthemaengl, _cxbeurteilungsstufediplarbeit, COALESCE(dapruefungsdat,dapruefteil1dat) as pruefdat, _personlb, _personlb2, 
+$qry="SELECT chthema, chthemaengl, _cxbeurteilungsstufediplarbeit, COALESCE(dapruefungsdat,dapruefteil1dat) as pruefdat, _personlb, _personlb2, 
 	__person, _cxgeschlecht, chtitel, chvorname, chnachname, studiengang_kz,  tbl_studiengang.typ, max_semester FROM sync.stp_person 
 	JOIN sync.stp_stgvertiefung ON (_stgvertiefung=__stgvertiefung)
 	JOIN public.tbl_studiengang ON (_studiengang=ext_id) 
@@ -131,7 +130,7 @@ if($result = pg_query($conn, $qry))
 			}
 			else 
 			{
-				$error_log1.="\nStudent ".$row->__person." (ext_id) in tbl_student nicht gefunden!";
+				$error_log1.="\nStudent ".$row->__person." (ext_id) ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname)." in tbl_student nicht gefunden!";
 				$fehler++;
 				pg_query($conn, "ROLLBACK");
 				continue;
@@ -199,6 +198,7 @@ if($result = pg_query($conn, $qry))
 				}
 				else 
 				{
+					pg_query($conn, "ROLLBACK");
 					exit("<br>Konnte Lehrveranstaltung nicht anlegen!<br>".$ins_lv);
 				}
 			}
@@ -465,7 +465,19 @@ if($result = pg_query($conn, $qry))
 				}
 				else 
 				{
-					$error_log3.="\nBetreuer1 ".$row->_personlb." in tbl_syncperson nicht gefunden!";
+					$qry_err="SELECT chtitel, chvorname, chnachname FROM sync.stp_person 
+						WHERE __person=".myaddslashes($row->_personlb).";";
+					if($result_err=pg_query($conn,$qry_err))
+					{
+						if($row_err=pg_fetch_object($result_err))
+						{
+							$error_log3.="\nBetreuer1 ".$row->_personlb.", ".trim($row_err->chtitel)." ".trim($row_err->chnachname).", ".trim($row_err->chvorname)." in tbl_syncperson nicht gefunden!";
+						}
+						else 
+						{
+							$error_log3.="\nBetreuer1 ".$row->_personlb." in tbl_syncperson nicht gefunden!";						
+						}
+					}
 					$fehler1++;
 					$betreuer1=NULL;
 				}
@@ -486,7 +498,19 @@ if($result = pg_query($conn, $qry))
 				}
 				else 
 				{
-					$error_log3.="\nBetreuer2 ".$row->_personlb2." in tbl_syncperson nicht gefunden!";
+					$qry_err="SELECT chtitel, chvorname, chnachname FROM sync.stp_person 
+						WHERE __person=".myaddslashes($row->_personlb2).";";
+					if($result_err=pg_query($conn,$qry_err))
+					{
+						if($row_err=pg_fetch_object($result_err))
+						{
+							$error_log4.="\nBetreuer2 ".$row->_personlb2.", ".trim($row_err->chtitel)." ".trim($row_err->chnachname).", ".trim($row_err->chvorname)." in tbl_syncperson nicht gefunden!";
+						}
+						else 
+						{
+							$error_log4.="\nBetreuer2 ".$row->_personlb2." in tbl_syncperson nicht gefunden!";						
+						}
+					}
 					$fehler2++;
 					$betreuer2=NULL;
 				}
@@ -517,7 +541,7 @@ if($result = pg_query($conn, $qry))
 					if(!pg_query($conn, $qry_ins))
 					{
 						$fehler1++;
-						$error_log.="\nBetreuer1 ".$betreuer1." konnte für Projektarbeit ID ".$projektarbeit_id." nicht eingetragen werden!";
+						$error_log3.="\nBetreuer1 ".$betreuer1." konnte für Projektarbeit ID ".$projektarbeit_id." nicht eingetragen werden!";
 					}
 					else 
 					{
@@ -556,7 +580,7 @@ if($result = pg_query($conn, $qry))
 					if(!pg_query($conn, $qry_ins)) 
 					{
 						$fehler2++;
-						$error_log.="\nBetreuer2 ".$betreuer2." konnte für Projektarbeit ID ".$projektarbeit_id." nicht eingetragen werden!";
+						$error_log4.="\nBetreuer2 ".$betreuer2." konnte für Projektarbeit ID ".$projektarbeit_id." nicht eingetragen werden!";
 					}
 					else
 					{
@@ -586,9 +610,9 @@ echo "<br>-----------------------------------";
 echo "<br>Betreuer1: ".$b1angelegt." / Fehler: ".$fehler1;
 echo "<br>Betreuer2: ".$b2angelegt." / Fehler: ".$fehler2;
 $ende=date("d.m.Y H:i:s");
-echo $ende."<br>";
-echo "<br><br>";
-$error_log=$error_log1.$error_log2.$error_log3.$error_log4.$error_log5.$error_log;
+echo "<br><br>".$ende."<br>";
+echo "<br>";
+$error_log=$error_log1.$error_log2."\n--------------\n".$error_log3.$error_log4."\n--------------\n".$error_log;
 if($error_log=='' )
 {
 	echo "o.k.<br>";
@@ -602,7 +626,7 @@ echo nl2br("\n\n".$ausgabe);
 mail($adress, 'SYNC-Fehler StP-Projektarbeit von '.$_SERVER['HTTP_HOST'], $error_log,"From: nsc@fhstp.ac.at");
 
 mail($adress, 'SYNC StP-Projektarbeit  von '.$_SERVER['HTTP_HOST'], "Sync Projektarbeit\n------------------\n\n"
-."Projektarbeiten: Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Updates: ".$updates." / Fehler: ".$fehler." / Doppelt: ".$dublette
+."Projektarbeiten: Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Updates: ".$updates." / Fehler: ".$fehler." / Bereits vorhanden: ".$dublette
 ."\n\nBeginn: ".$start."\nEnde:   ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: nsc@fhstp.ac.at");
 
 
