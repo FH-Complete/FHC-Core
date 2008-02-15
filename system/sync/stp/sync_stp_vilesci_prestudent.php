@@ -138,6 +138,7 @@ if($result = pg_query($conn,$qry))
 	}
 }
 //einlesen von studiensemesterdaten in arrays
+$i=0;
 $qry="SELECT * FROM public.tbl_studiensemester ORDER BY start;";
 if($result = pg_query($conn,$qry))
 {
@@ -438,7 +439,7 @@ if($result = pg_query($conn, $qry))
 									$row->instudiensemester=$maxsemester[$row->studiengang_kz];
 								if ($row_status->ausbildungssemester!=$row->instudiensemester)
 									$qry_ins.="ausbildungssemester=".myaddslashes($row->instudiensemester).", ";
-								if($row->datum!=($semstart[$Kalender]))
+								if($row_status->datum!=($semstart[$Kalender]))
 								{
 									$qry_ins.="datum=".myaddslashes($semstart[$Kalender]).", ";
 								}
