@@ -74,6 +74,7 @@ $start='';
 $stg='';
 $aufmerksam=array();
 $zgv=array();
+$semstart=array();
 $Kalender='';
 $rolle='';
 $iu='';
@@ -136,7 +137,18 @@ if($result = pg_query($conn,$qry))
 		$maxsemester[$row->studiengang_kz]=$row->max_semester;	
 	}
 }
-	
+//einlesen von studiensemesterdaten in arrays
+$qry="SELECT * FROM public.tbl_studiensemester ORDER BY start;";
+if($result = pg_query($conn,$qry))
+{
+	while($row=pg_fetch_object($result))
+	{
+		//$studiensemester[$i]=$row->studiensemester_kurzbz;
+		$semstart[$row->studiensemester_kurzbz]=$row->start;
+		//$semende[$row->studiensemester_kurzbz]=$row->ende;
+		$i++;	
+	}
+}	
 	
 //*********** Neue Daten holen *****************
 $qry="SELECT __Person, datenquelle, inAusmassBesch, HoechsteAusbildung, _cxZugang, daMaturaDat,
@@ -405,7 +417,7 @@ if($result = pg_query($conn, $qry))
 								{
 									$qry_ins.=myaddslashes($row->instudiensemester);
 								}
-								$qry_ins.=", now(), ".
+								$qry_ins.=", ".myaddslashes($semstart[$Kalender]).", ".
 								myaddslashes($orgform).",
 								now(),
 								'SYNC',
@@ -426,9 +438,14 @@ if($result = pg_query($conn, $qry))
 									$row->instudiensemester=$maxsemester[$row->studiengang_kz];
 								if ($row_status->ausbildungssemester!=$row->instudiensemester)
 									$qry_ins.="ausbildungssemester=".myaddslashes($row->instudiensemester).", ";
+								if($row->datum!=($semstart[$Kalender]))
+								{
+									$qry_ins.="datum=".myaddslashes($semstart[$Kalender]).", ";
+								}
 								if($qry_ins!='')
 								{
-									$qry_ins.="UPDATE public.tbl_prestudentrolle SET ".$qry_ins."updateamum=now(), updatevon='SYNC' WHERE prestudent_id='".$prestudent_id."' AND rolle_kurzbz='".$rolle."' AND studiensemester_kurzbz='".$Kalender."';";
+									$qry_ins.="UPDATE public.tbl_prestudentrolle SET ".$qry_ins."updateamum=now(), updatevon='SYNC' 
+									WHERE prestudent_id='".$prestudent_id."' AND rolle_kurzbz='".$rolle."' AND studiensemester_kurzbz='".$Kalender."';";
 								}
 							}
 						}
