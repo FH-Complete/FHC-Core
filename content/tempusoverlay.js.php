@@ -231,6 +231,9 @@ function onOrtSelect()
 	var daten=window.TimeTableWeek.document.getElementById('TimeTableWeekData');
 	var datum=parseInt(daten.getAttribute("datum"));
 
+	if(ort=='')
+		return false;
+
 	var attributes="?type=ort&ort="+ort+"&datum="+datum;
 	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 	url+=attributes+'&'+gettimestamp();

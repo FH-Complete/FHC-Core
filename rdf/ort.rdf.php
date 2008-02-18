@@ -1,4 +1,24 @@
 <?php
+/* Copyright (C) 2007 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
 /*
  * Created on 02.12.2004
  *
@@ -46,6 +66,18 @@ for ($i=0;$i<$num_rows;$i++)
 	$lastTYP=($i>0?$ortLAST->raumtyp_kurzbz:null);
 	$nextTYP=(($i<$num_rows-1)?$ortNEXT->raumtyp_kurzbz:null);
 	//echo "current:$currentTYP last:$lastTYP next:$nextTYP";
+	$raumtypen='';
+	$qry = "SELECT raumtyp_kurzbz FROM public.tbl_ortraumtyp WHERE ort_kurzbz='$ort->ort_kurzbz'";
+	if($result_rt = pg_query($conn, $qry))
+	{
+		while($row_rt = pg_fetch_object($result_rt))
+		{
+			if($raumtypen!='')
+				$raumtypen.=', ';
+			
+			$raumtypen.=$row_rt->raumtyp_kurzbz;
+		}
+	}
 	if ($lastTYP!=$currentTYP || $i==0)
 		$descr.='<RDF:Description RDF:about="'.$rdf_url.$ort->raumtyp_kurzbz.'" >
         			<ORT:raumtyp>'.$ort->raumtyp_kurzbz.'</ORT:raumtyp>
@@ -53,14 +85,18 @@ for ($i=0;$i<$num_rows;$i++)
     				<ORT:ort_kurzbz></ORT:ort_kurzbz>
     				<ORT:ort_bezeichnung></ORT:ort_bezeichnung>
     				<ORT:max_person></ORT:max_person>
+    				<ORT:stockwerk></ORT:stockwerk>
+    				<ORT:raumtypen>'.$ort->raumtyp_kurzbz.'</ORT:raumtypen>
       			</RDF:Description>';
 	$descr.='<RDF:Description RDF:about="'.$rdf_url.$ort->raumtyp_kurzbz.'/'.$ort->ort_kurzbz.'" >
         			<ORT:raumtyp>'.$ort->ort_kurzbz."</ORT:raumtyp>
     				<ORT:hierarchie>".$ort->hierarchie."</ORT:hierarchie>
     				<ORT:ort_kurzbz>".$ort->ort_kurzbz."</ORT:ort_kurzbz>
     				<ORT:ort_bezeichnung>".$ort->bezeichnung."</ORT:ort_bezeichnung>
-    				<ORT:max_person>".$ort->max_person.'</ORT:max_person>
-      			</RDF:Description>'."\n";
+    				<ORT:max_person>".$ort->max_person."</ORT:max_person>
+        			<ORT:stockwerk>".$ort->stockwerk."</ORT:stockwerk>
+        			<ORT:raumtypen>".$raumtypen."</ORT:raumtypen>
+      			</RDF:Description>\n";
 
 	if ($lastTYP!=$currentTYP)
 		$sequenz.='<RDF:li RDF:resource="'.$rdf_url.$ort->raumtyp_kurzbz.'" />

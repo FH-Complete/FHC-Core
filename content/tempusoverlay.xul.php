@@ -88,6 +88,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-semester-overlay.xu
 	     <treecol id="ort_bezeichnung" label="Bezeichnung" flex="3" hidden="true"/>
 	    <splitter class="tree-splitter"/>
 	    <treecol id="max_person" label="MaxP" flex="1" hidden="true"/>
+	    <splitter class="tree-splitter"/>
+	    <treecol id="raumtypen" label="Raumtypen" flex="1" hidden="true"/>
+	    <splitter class="tree-splitter"/>
+	    <treecol id="stockwerk" label="Stockwerk" flex="1" hidden="true"/>
 	</treecols>
 
 	<template>
@@ -100,6 +104,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-semester-overlay.xu
 	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#hierarchie"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#ort_bezeichnung"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#max_person"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#stockwerk"/>
 	         </treerow>
 	       </treeitem>
 	      </treechildren>
