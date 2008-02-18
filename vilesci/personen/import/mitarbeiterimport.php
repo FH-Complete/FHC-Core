@@ -196,6 +196,7 @@ if(isset($_POST['save']))
 		$person->aktiv = true;
 		$person->geburtsnation = 'A';
 		$person->staatsbuergerschaft = 'A';
+		$person->familienstand = 'l';
 		
 		if($person->save())
 		{
@@ -324,6 +325,7 @@ if(isset($_POST['save']))
 		$mtiarbeiter->aktiv = true;
 		$mitarbeiter->fixangestellt = true;
 		$mitarbeiter->stundensatz = 0;
+		$mitarbeiter->bismelden = true;
 		$mitarbeiter->anmerkung = $anmerkungen;
 		$mitarbeiter->ausbildungcode = $letzteausbildung;
 		$mitarbeiter->insertamum = date('Y-m-d H:i:s');

@@ -847,7 +847,8 @@ class wochenplan
 								$updateamum[]=substr($lehrstunde->updateamum,0,16);
 								$updatevon[]=$lehrstunde->updatevon;
 								$paramList.='&amp;stundenplan_id'.$z++.'='.$lehrstunde->stundenplan_id;
-								$farbe=$lehrstunde->farbe;
+								if(isset($lehrstunde->farbe))
+									$farbe=$lehrstunde->farbe;
 								$titel=$lehrstunde->titel;
 								$anmerkung=$lehrstunde->anmerkung;
 							}
@@ -914,7 +915,7 @@ class wochenplan
 						// Ausgabe
 						echo '<button id="buttonSTPL'.$count++.'"
 							tooltiptext="'.$titel.' - '.$anmerkung.' ('.$updatevonam.')"
-							style="border-width:1px;background-color:#'.$farbe.';"
+							style="border-width:1px;'.((isset($farbe) && $farbe!='')?'background-color:#'.$farbe:'').';"
 							styleOrig="border-width:1px;background-color:#'.$farbe.';" ';
 						if ($berechtigung->isBerechtigt('lv-plan',$stg_kz) || $berechtigung->isBerechtigt('admin',0) || $berechtigung->isBerechtigt('admin',$stg_kz))
 							echo ' context="stplPopupMenue" ';

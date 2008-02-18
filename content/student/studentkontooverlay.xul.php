@@ -59,12 +59,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					</hbox>
 				</row>
 				
-				<row>
-					<vbox>
+				<row flex="1">
+					<vbox flex="1">
 						<label id="student-konto-label-filter" value="alle Buchungen:"/>
 						<tree id="student-konto-tree" seltype="multi" hidecolumnpicker="false" flex="1"
 							datasources="rdf:null" ref="http://www.technikum-wien.at/konto/liste"
-							style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100px" enableColumnDrag="true"
+							style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" enableColumnDrag="true"
 							onselect="StudentKontoAuswahl()"
 							context="student-konto-tree-popup"
 							flags="dont-build-content"
@@ -115,7 +115,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							</template>
 						</tree>
 					</vbox>
-					<vbox>
+					<vbox flex="1">
 						<hbox>
 							<button id="student-konto-button-neu" label="Neu" oncommand="StudentKontoNeu();" disabled="true"/>
 							<button id="student-konto-button-gegenbuchung" label="Gegenbuchung" oncommand="StudentKontoGegenbuchung();" disabled="true"/>
@@ -127,7 +127,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<label value="Buchungsnr" control="student-konto-textbox-buchungsnr"/>
 							<textbox id="student-konto-textbox-buchungsnr" disabled="true"/>
 						</vbox>
-						<groupbox id="student-konto-groupbox" flex="1">
+						<groupbox id="student-konto-groupbox">
 						<caption label="Details"/>
 							<grid id="student-konto-grid-detail" style="overflow:auto;margin:4px;" flex="1">
 							  	<columns  >
@@ -201,6 +201,5 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		</rows>
 </grid>
 </hbox>
-<spacer flex="1" />
 </vbox>
 </overlay>
