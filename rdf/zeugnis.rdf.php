@@ -157,11 +157,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .= "		<studiengang_kz>".sprintf('%04s', $row->studiengang_kz)."</studiengang_kz>";
 		$xml .= "\n		<vorname>".$row->vorname."</vorname>";
 		$xml .= "		<nachname>".$row->nachname."</nachname>";
-		$xml .= "		<name>".trim($row->titelpre.' '.trim($row->vorname.' '.$row->vornamen).' '.strtoupper($row->nachname).' '.$row->titelpost)."</name>";
+		$xml .= "		<name>".trim($row->titelpre.' '.trim($row->vorname.' '.$row->vornamen).' '.strtoupper($row->nachname).($row->titelpost!=''?', '.$row->titelpost:''))."</name>";
 		$gebdatum = date('d.m.Y',strtotime($row->gebdatum));
 		$xml .= "		<gebdatum>".$gebdatum."</gebdatum>";
 		$xml .= "		<matrikelnr>".$row->matrikelnr."</matrikelnr>";
-		$xml .= "		<studiengangsleiter>".$stgl_row->titelpre." ".$stgl_row->vorname." ".$stgl_row->nachname."</studiengangsleiter>";
+		$xml .= "		<studiengangsleiter>".$stgl_row->titelpre." ".$stgl_row->vorname." ".$stgl_row->nachname.($stgl_row->titelpost!=''?", ".$stgl_row->titelpost:'')."</studiengangsleiter>";
 		$datum_aktuell = date('d.m.Y');
 		$xml .= "		<ort_datum>Wien, am ".$datum_aktuell."</ort_datum>";
 		

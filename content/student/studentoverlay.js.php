@@ -3983,6 +3983,9 @@ function StudentFunktionIFrameUnLoad()
 	document.getElementById('student-funktionen').setAttribute('src','');
 }
 
+// ****
+// * Laedt das Reihungstest DropDown neu
+// ****
 function StudentReihungstestDropDownRefresh()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -4002,4 +4005,14 @@ function StudentReihungstestDropDownRefresh()
 	var myDatasource = rdfService.GetDataSource(url);
 	tree.database.AddDataSource(myDatasource);
 	SetStatusBarText('Reihungstest Liste wurde aktualisiert')
+}
+
+// *****
+// * Wenn ein Reihungstest ausgewaehlt wurde und noch kein Anmeldedatum fuer den Reihungstest
+// * eingetragen ist, dann das aktuelle Datum einfuegen
+// *****
+function StudentReihungstestDropDownSelect()
+{
+	if(document.getElementById('student-prestudent-textbox-anmeldungreihungstest').value=='')
+		StudentAnmeldungreihungstestHeute();
 }

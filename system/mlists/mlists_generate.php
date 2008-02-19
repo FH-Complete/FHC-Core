@@ -240,6 +240,34 @@ $error_msg='';
 			flush();
 		}
 	}
+	
+	//tw_stdv abgleichen
+    flush();
+	$sql_query="SELECT gruppe_kurzbz, uid FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='TW_STDV' AND uid not in (SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='stdv')";
+	if(!($result=pg_query($conn, $sql_query)))
+		$error_msg.=pg_errormessage($conn);
+	while($row=pg_fetch_object($result))
+	{
+     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('tw_stdv') AND uid='$row->uid'";
+		if(!pg_query($conn, $sql_query))
+			$error_msg.=pg_errormessage($conn).$sql_query;
+		echo '-';
+		flush();
+	}
+	
+	// Studenten holen die nicht im Verteiler sind
+	echo '<BR>';
+	$sql_query="SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='stdv' AND uid NOT in(Select uid from public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)= UPPER('TW_STDV'))";
+	if(!($result=pg_query($conn, $sql_query)))
+		$error_msg.=pg_errormessage($conn);
+	while($row=pg_fetch_object($result))
+	{
+	   	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, updateamum, updatevon) VALUES ('$row->uid','TW_STDV', now(), 'mlists_generate')";
+		if(!pg_query($conn, $sql_query))
+			$error_msg.=pg_errormessage($conn).$sql_query;
+		echo '-';
+		flush();
+	}
 	// **************************************************************
 	// Studentenverteiler abgleichen
 	// Studenten holen die nicht mehr in den Verteiler gehoeren
