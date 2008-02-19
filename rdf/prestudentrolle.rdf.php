@@ -53,7 +53,7 @@ else
 	$ausbildungssemester=null;
 	
 $ps = new prestudent($conn);
-$ps->getPrestudentRolle($prestudent_id, $rolle_kurzbz, $studiensemester_kurzbz, 'datum, insertamum', $ausbildungssemester);
+$ps->getPrestudentRolle($prestudent_id, $rolle_kurzbz, $studiensemester_kurzbz, 'datum desc, insertamum desc', $ausbildungssemester);
 
 foreach($ps->result as $row)
 {

@@ -329,13 +329,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       						<hbox>
 	      						<menulist id="student-prestudent-menulist-reihungstest" disabled="true"
 								          datasources="<?php echo APP_ROOT ?>rdf/reihungstest.rdf.php?optional=true" flex="1"
-							              ref="http://www.technikum-wien.at/reihungstest/alle" >
+							              ref="http://www.technikum-wien.at/reihungstest/alle" 
+							              oncommand="StudentReihungstestDropDownSelect()">
 									<template>
 										<menupopup>
 											<menuitem value="rdf:http://www.technikum-wien.at/reihungstest/rdf#reihungstest_id"
 								        		      label="rdf:http://www.technikum-wien.at/reihungstest/rdf#bezeichnung"
 											  		  uri="rdf:*"/>
-											</menupopup>
+										</menupopup>
 									</template>
 								</menulist>
 							
