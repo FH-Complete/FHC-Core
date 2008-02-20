@@ -917,9 +917,9 @@ class wochenplan
 							tooltiptext="'.$titel.' - '.$anmerkung.' ('.$updatevonam.')"
 							style="border-width:1px;'.((isset($farbe) && $farbe!='')?'background-color:#'.$farbe:'').';"
 							styleOrig="border-width:1px;background-color:#'.$farbe.';" ';
-						if ($berechtigung->isBerechtigt('lv-plan',$stg_kz) || $berechtigung->isBerechtigt('admin',0) || $berechtigung->isBerechtigt('admin',$stg_kz))
+						if ($berechtigung->isBerechtigt('lv-plan',$stg_kz,'suid') || $berechtigung->isBerechtigt('lv-plan',0,'suid') || $berechtigung->isBerechtigt('admin',0,'suid') || $berechtigung->isBerechtigt('admin',$stg_kz,'suid'))
 							echo ' context="stplPopupMenue" ';
-						if ($berechtigung->isBerechtigt('lv-plan',$stg_kz) || $berechtigung->isBerechtigt('admin',0) || $berechtigung->isBerechtigt('admin',$stg_kz))
+						if ($berechtigung->isBerechtigt('lv-plan',$stg_kz,'ui') || $berechtigung->isBerechtigt('lv-plan',0,'ui') || $berechtigung->isBerechtigt('admin',0,'ui') || $berechtigung->isBerechtigt('admin',$stg_kz,'ui'))
 							echo 'ondraggesture="nsDragAndDrop.startDrag(event,listObserver)" ';
 						echo 'ondragdrop="nsDragAndDrop.drop(event,boardObserver)"
 							ondragover="nsDragAndDrop.dragOver(event,boardObserver)"
