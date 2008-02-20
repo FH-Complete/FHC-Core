@@ -90,6 +90,22 @@ function convdate($date)
 					if($row_filter->anzahl>0 || $prestudent->rolle_kurzbz=='Incoming')
 						return false;
 		}
+		elseif($filter2=='zgvohnedatum')
+		{
+			//Alle Personen die den ZGV Typ eingetragen haben aber noch kein Datum
+			$qry = "SELECT zgv_code, zgvdatum, zgvmas_code, zgvmadatum FROM public.tbl_prestudent WHERE prestudent_id='$row->prestudent_id'";
+			if($result_filter = pg_query($conn, $qry))
+			{
+				if($row_filter = pg_fetch_object($result_filter))
+				{
+					if(($row_filter->zgv_code!='' && $row_filter->zgvdatum=='') ||
+					   ($row_filter->zgvmas_code!='' && $row_filter->zgvmadatum==''))
+					   	return true;
+					else 
+						return false;
+				}
+			}			
+		}
 		return true;
 	}
 

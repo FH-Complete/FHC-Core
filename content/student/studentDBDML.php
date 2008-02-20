@@ -1000,49 +1000,79 @@ if(!$error)
 								$return = false;
 							}
 							
-							$student->studiengang_kz = $_POST['stg_kz'];
-							$student->semester = $_POST['semester'];
-							$student->verband = ($_POST['verband']==''?' ':$_POST['verband']);
-							$student->gruppe = ($_POST['gruppe']==''?' ':$_POST['gruppe']);
-							$student->new=false;	
-							
-							if(!$student->save())
+							if($student->studiengang_kz!=$_POST['stg_kz'])
 							{
-								$errormsg .= 'Fehler beim Speichern des Studenteneintrages';
+								$errormsg.='Ein Student kann nicht in eine Lehrverbandsgruppe eines anderen Studienganges verschoben werden';
 								$return = false;
 								$error = true;
+							}
+														
+							if(!$error)
+							{
+								$student->studiengang_kz = $_POST['stg_kz'];
+								$student->semester = $_POST['semester'];
+								$student->verband = ($_POST['verband']==''?' ':$_POST['verband']);
+								$student->gruppe = ($_POST['gruppe']==''?' ':$_POST['gruppe']);
+								$student->new=false;	
+								
+								if(!$student->save())
+								{
+									$errormsg .= 'Fehler beim Speichern des Studenteneintrages';
+									$return = false;
+									$error = true;
+								}
 							}
 						}
 						
 						if(!$error)
 						{
-							//Eintrag in der Tabelle Studentlehrverband aendern
-							$student_lvb = new student($conn, null, true);
-	
-							if($student_lvb->studentlehrverband_exists($uid, $semester_aktuell))
-								$student_lvb->new = false;
-							else
-								$student_lvb->new = true;
-
-							$student_lvb->uid = $uid;
-							$student_lvb->studiensemester_kurzbz = $semester_aktuell;
-							$student_lvb->studiengang_kz = $_POST['stg_kz'];
-							$student_lvb->semester = $_POST['semester'];
-							$student_lvb->verband = ($_POST['verband']==''?' ':$_POST['verband']);
-							$student_lvb->gruppe = ($_POST['gruppe']==''?' ':$_POST['gruppe']);
-							$student_lvb->updateamum = date('Y-m-d H:i:s');
-							$student_lvb->updatevon = $user;
-
-							if($student_lvb->save_studentlehrverband())
+							//Eintrag in der Tabelle Student aendern
+							$student = new student($conn, true);
+							
+							if(!$student->load($uid))
 							{
-								$return = true;
-								$error=false;
-							}
-							else
-							{
+								$errormsg .= 'Fehler beim Laden des Studenten';
 								$error = true;
-								$errormsg .= $student_lvb->errormsg;
 								$return = false;
+							}
+							
+							if($student->studiengang_kz!=$_POST['stg_kz'])
+							{
+								$errormsg.='Ein Student kann nicht in eine Lehrverbandsgruppe eines anderen Studienganges verschoben werden';
+								$return = false;
+								$error = true;
+							}
+														
+							if(!$error)
+							{
+								//Eintrag in der Tabelle Studentlehrverband aendern
+								$student_lvb = new student($conn, null, true);
+		
+								if($student_lvb->studentlehrverband_exists($uid, $semester_aktuell))
+									$student_lvb->new = false;
+								else
+									$student_lvb->new = true;
+	
+								$student_lvb->uid = $uid;
+								$student_lvb->studiensemester_kurzbz = $semester_aktuell;
+								$student_lvb->studiengang_kz = $_POST['stg_kz'];
+								$student_lvb->semester = $_POST['semester'];
+								$student_lvb->verband = ($_POST['verband']==''?' ':$_POST['verband']);
+								$student_lvb->gruppe = ($_POST['gruppe']==''?' ':$_POST['gruppe']);
+								$student_lvb->updateamum = date('Y-m-d H:i:s');
+								$student_lvb->updatevon = $user;
+	
+								if($student_lvb->save_studentlehrverband())
+								{
+									$return = true;
+									$error=false;
+								}
+								else
+								{
+									$error = true;
+									$errormsg .= $student_lvb->errormsg;
+									$return = false;
+								}
 							}
 						}
 					}
