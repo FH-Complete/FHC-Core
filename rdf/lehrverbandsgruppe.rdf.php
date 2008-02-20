@@ -16,8 +16,9 @@ if (!$conn = pg_pconnect(CONN_STRING))
 // Berechtigungen ermitteln
 $berechtigung=new benutzerberechtigung($conn);
 $berechtigung->getBerechtigungen($uid);
-$berechtigt_studiengang=$berechtigung->getStgKz('admin');
-$berechtigt_studiengang = array_merge($berechtigt_studiengang, $berechtigung->getStgKz('assistenz'));
+$berechtigt_studiengang=$berechtigung->getStgKz();
+//$berechtigt_studiengang=$berechtigung->getStgKz('admin');
+//$berechtigt_studiengang = array_merge($berechtigt_studiengang, $berechtigung->getStgKz('assistenz'));
 
 //var_dump($berechtigung);
 $stg_kz_query='';
