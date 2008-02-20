@@ -319,10 +319,10 @@ class lehrstunde
 			else
 			{
 				$sql_query.=' AND ( (studiengang_kz='.$studiengang_kz;
-				if ($sem!='0' && $sem!=null && $sem!=0  && $sem!='')
+				if ($sem!=null && $sem>=0  && $sem!='')
 				{
 					$sql_query.=" AND (semester=$sem OR semester IS NULL";
-					if ($type=='student')
+					if ($type=='student' && $sem>0)
 						$sql_query.=' OR semester='.($sem+1);
 					$sql_query.=')';
 				}
