@@ -917,9 +917,9 @@ class wochenplan
 							tooltiptext="'.$titel.' - '.$anmerkung.' ('.$updatevonam.')"
 							style="border-width:1px;'.((isset($farbe) && $farbe!='')?'background-color:#'.$farbe:'').';"
 							styleOrig="border-width:1px;background-color:#'.$farbe.';" ';
-						if ($berechtigung->isBerechtigt('lv-plan',$stg_kz,'suid') || $berechtigung->isBerechtigt('lv-plan',0,'suid') || $berechtigung->isBerechtigt('admin',0,'suid') || $berechtigung->isBerechtigt('admin',$stg_kz,'suid'))
+						if ($berechtigung->isBerechtigt('lv-plan',$stg_kz,'uid') || $berechtigung->isBerechtigt('lv-plan',0,'uid') || $berechtigung->isBerechtigt('admin',0,'uid') || $berechtigung->isBerechtigt('admin',$stg_kz,'uid'))
 							echo ' context="stplPopupMenue" ';
-						if ($berechtigung->isBerechtigt('lv-plan',$stg_kz,'ui') || $berechtigung->isBerechtigt('lv-plan',0,'ui') || $berechtigung->isBerechtigt('admin',0,'ui') || $berechtigung->isBerechtigt('admin',$stg_kz,'ui'))
+						if ($berechtigung->isBerechtigt('lv-plan',$stg_kz,'u') || $berechtigung->isBerechtigt('lv-plan',0,'u') || $berechtigung->isBerechtigt('admin',0,'u') || $berechtigung->isBerechtigt('admin',$stg_kz,'u'))
 							echo 'ondraggesture="nsDragAndDrop.startDrag(event,listObserver)" ';
 						echo 'ondragdrop="nsDragAndDrop.drop(event,boardObserver)"
 							ondragover="nsDragAndDrop.dragOver(event,boardObserver)"
