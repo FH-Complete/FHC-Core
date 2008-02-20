@@ -154,6 +154,9 @@ $geburtsdatum_error=false;
 function generateMatrikelnummer($conn, $studiengang_kz, $studiensemester_kurzbz)
 {
 	$jahr = substr($studiensemester_kurzbz, 4);	
+	$sem = substr($studiensemester_kurzbz, 0, 2);
+	if($sem=='SS')
+		$jahr = $jahr-1;
 	$art =0;
 	
 	$matrikelnummer = sprintf("%02d",$jahr).$art.sprintf("%04d",$studiengang_kz);

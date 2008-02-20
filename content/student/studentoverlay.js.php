@@ -1936,7 +1936,7 @@ function StudentKontoFilter()
 }
 
 // ****
-// * Zeigt im Studententree nur diejenigen Studenten an die noch nicht alle Dokumente abgegeben haben
+// * Setzt im Studententree einen vordefinierten Filter
 // ****
 function StudentKontoFilterStudenten(filter)
 {
@@ -1954,24 +1954,17 @@ function StudentKontoFilterStudenten(filter)
     document.getElementById('statusbar-progressmeter').setAttribute('mode','undetermined');
     //globalProgressmeter.StartPM();
 
-	var col;
-	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
-	var stg_kz=tree.view.getCellText(tree.currentIndex,col);
-	col = tree.columns ? tree.columns["sem"] : "sem";
-	var sem=tree.view.getCellText(tree.currentIndex,col);
-	col = tree.columns ? tree.columns["ver"] : "ver";
-	var ver=tree.view.getCellText(tree.currentIndex,col);
-	col = tree.columns ? tree.columns["grp"] : "grp";
-	var grp=tree.view.getCellText(tree.currentIndex,col);
-	col = tree.columns ? tree.columns["gruppe"] : "gruppe";
-	var gruppe=tree.view.getCellText(tree.currentIndex,col);
-	col = tree.columns ? tree.columns["typ"] : "typ";
-	var typ=tree.view.getCellText(tree.currentIndex,col);
-	col = tree.columns ? tree.columns["stsem"] : "stsem";
-	var stsem=tree.view.getCellText(tree.currentIndex,col);
-	
-	stsem = getStudiensemester();
-	url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ=student&filter2="+filter+"&"+gettimestamp();
+	var stg_kz = getTreeCellText(tree, 'stg_kz', tree.currentIndex);
+	var sem = getTreeCellText(tree, 'sem', tree.currentIndex);
+	var ver = getTreeCellText(tree, 'ver', tree.currentIndex);
+	var grp = getTreeCellText(tree, 'grp', tree.currentIndex);
+	var gruppe = getTreeCellText(tree, 'gruppe', tree.currentIndex);
+	var typ = getTreeCellText(tree, 'typ', tree.currentIndex);
+	var stsem = getTreeCellText(tree, 'stsem', tree.currentIndex);
+		
+	if(stsem=='')
+		stsem = getStudiensemester();
+	url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ="+typ+"&filter2="+filter+"&"+gettimestamp();
 	var treeStudent=document.getElementById('student-tree');
 
 	//Alte DS entfernen
