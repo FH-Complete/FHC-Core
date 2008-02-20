@@ -273,7 +273,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$bisio_universitaet = '';
 				$auslandssemester=false;
 				
-				$qry = "SELECT tbl_bisio.* FROM bis.tbl_bisio JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) WHERE tbl_lehreinheit.lehrveranstaltung_id='$row->lehrveranstaltung_id'";
+				$qry = "SELECT tbl_bisio.* FROM bis.tbl_bisio JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) WHERE tbl_lehreinheit.lehrveranstaltung_id='$row->lehrveranstaltung_id' AND student_uid='".$uid_arr[$i]."'";
 				if($result_bisio = pg_query($conn, $qry))
 				{
 					if($row_bisio = pg_fetch_object($result_bisio))
