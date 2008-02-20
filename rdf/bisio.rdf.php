@@ -60,7 +60,7 @@ echo '
 ';
    
 //Daten holen
-$ioobj = new bisio($conn);
+$ioobj = new bisio($conn, null, true);
 
 //Wenn die UID uebergeben wurde, dann werden alle
 //Eintraege dieser Person geladen
