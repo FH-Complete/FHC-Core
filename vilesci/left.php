@@ -11,14 +11,58 @@
 
 	$menu=array
 	(
-		'Admin' => 		array('name'=>'Admin', 'link'=>'admin/menu.html', 'target'=>'main'),
-		'Lehre' => 		array('name'=>'Admin', 'link'=>'admin/menu.html', 'target'=>'main'),
-		'Personen' => 	array('name'=>'Admin', 'link'=>'admin/menu.html', 'target'=>'main'),
-		'Stammdaten' => array('name'=>'Admin', 'link'=>'admin/menu.html', 'target'=>'main'),
-		'Vorrueckung'=> array('name'=>'Admin', 'link'=>'admin/menu.html', 'target'=>'main'),
-		'Auswertung' => array('name'=>'Admin', 'link'=>'admin/menu.html', 'target'=>'main')
+		//'Admin'=> 		array('name'=>'Admin', 'link'=>'admin/menu.html', 'target'=>'main'),
+		'Lehre'=> 		array
+		(
+			'name'=>'Lehre',
+			'Lehrveranstaltung'=>array
+			(
+				'name'=>'Lehrveranstaltung',
+				'Verwaltung'=>array('name'=>'Verwaltung', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
+				'Wartung'=>array('name'=>'Wartung', 'link'=>'stammdaten/lv_wartung.php', 'target'=>'main')
+			),
+			'Lehrfach'=>array
+			(
+				'name'=>'Lehrfach',
+				'Verwaltung'=>array('name'=>'Verwaltung', 'link'=>'lehre/lehrfach.php', 'target'=>'main'),
+				'Wartung'=>array('name'=>'Wartung', 'link'=>'lehre/lehrfach/wartung.php', 'target'=>'main')
+			),
+			'Lehreinheit'=>array
+			(
+				'name'=>'Lehreinheit',
+				'Verwaltung'=>array('name'=>'Verwaltung', 'link'=>'lehre/lv_verteilung/lv_verteilung.php', 'target'=>'main'),
+				'Wartung'=>array('name'=>'Wartung', 'link'=>'stammdaten/le_wartung.php', 'target'=>'main'),
+				'Vorrueckung'=>array('name'=>'Vorrueckung', 'link'=>'lehre/lehreinheiten_vorrueckung.php', 'target'=>'main')
+			),
+			'Freifach'=>array
+			(
+				'name'=>'Freifach',
+				'Studenten'=>array('name'=>'Studenten', 'link'=>'lehre/freifach.php', 'target'=>'main'),
+				'Lektoren'=>array('name'=>'Lektoren', 'link'=>'lehre/freifach_lektoren.php', 'target'=>'main')
+			),
+			'LV-Planung'=>array
+			(
+				'name'=>'LV-Planung',
+				'Wartung'=>array('name'=>'Verwaltung', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
+				'Check'=>array('name'=>'Studenten', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
+				'Kollision'=>array('name'=>'Studenten', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
+				'Stundenplan'=>array('name'=>'Studenten', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
+				'Studenten'=>array('name'=>'Studenten', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
+				'Studenten'=>array('name'=>'Studenten', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main')
+			)
+		),
+		'Personen'=> 	array
+		(
+			'name'=>'Personen', 'link'=>'admin/menu.html', 'target'=>'main', 'opener'=>'true', 'hide'=>'true',
+			'Personen'=>array('name'=>'Personen', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
+			'Benutzer'=>array('name'=>'Benutzer', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
+			'Mitarbeiter'=>array('name'=>'Mitarbeiter', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
+			'Studenten'=>array('name'=>'Studenten', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main')
+		),
+		'Stammdaten'=>	array('name'=>'Stammdaten', 'link'=>'admin/menu.html', 'target'=>'main'),
+		'Vorrueckung'=>	array('name'=>'Vorrueckung', 'link'=>'admin/menu.html', 'target'=>'main', 'opener'=>'true', 'hide'=>'true'),
+		'Auswertung'=>	array('name'=>'Auswertung', 'link'=>'admin/menu.html', 'target'=>'main')
 	);
-
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
@@ -27,60 +71,26 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<title>VileSci Men&uuml;</title>
 	<link href="../skin/vilesci.css" rel="stylesheet" type="text/css">
+	<style type="text/css">
+	</style>
 
 	<script language="JavaScript" type="text/javascript">
 	<!--
-		__js_page_array = new Array();
-		__js_tab_array= new Array();
-		__js_menu_array= new Array();
-		__js_menu_array[0]='menueStammdaten';
-		__js_tab_array[0]='tabStammdaten';
-		__js_menu_array[1]='menuePersonen';
-		__js_tab_array[1]='tabPersonen';
-		__js_menu_array[2]='menueLehre';
-		__js_tab_array[2]='tabLehre';
-
-   	function js_toggle_container(conid)
+		function js_toggle_container(conid)
    	{
-			if (document.getElementById)
+   		//alert(conid);
+   		//var display = document.getElementById(conid).style.display;
+			if (document.getElementById(conid).style.display=='none')
 			{
-      	  	var block = "table-row";
-				if (navigator.appName.indexOf('Microsoft') > -1)
-					block = 'block';
-      	   var status = __js_page_array[conid];
-         	if (status == null)
-            	status = "none";
- 				if (status == "none")
- 			   {
-         	  	document.getElementById(conid).style.display = 'block';
-            	__js_page_array[conid] = "visible";
-         	}
-         	else
-           	{
-           		document.getElementById(conid).style.display = 'none';
-            	__js_page_array[conid] = "none";
-      		}
-      	   return false;
-     		}
-     		else
-     			return true;
+				document.getElementById(conid).style.display='block';
+				document.getElementById(conid+'_dot').innerHTML='&#8211; ';
+			}
+        	else
+        	{
+				document.getElementById(conid).style.display='none';
+				document.getElementById(conid+'_dot').innerHTML='+ ';
+			}
   		}
-
-	function js_show_tab(tabid)
-   	{
-		for(i=0;i<(__js_menu_array.length);i++)
-			if (__js_menu_array[i]==tabid)
-			{
-				document.getElementById(__js_menu_array[i]).style.display = 'block';
-				//document.getElementById(__js_tab_array[i]).class = 'tab active';
-			}
-       		else
-       		{
-       			document.getElementById(__js_menu_array[i]).style.display = 'none';
-       			//document.getElementById(__js_tab_array[i]).class = 'tab';
-			}
-        return true;
-  	}
 	//-->
 	</script>
 </head>
@@ -92,23 +102,110 @@
 	</a>
 </div>
 
-<!-- <table class="tabs">
-	<tr>
-		<td class="tab" id="tabStammdaten" onClick="js_show_tab('menueStammdaten');">Stammdaten</td>
-	</tr>
-	<tr>
-		<td class="tab" id="tabPersonen" onClick="js_show_tab('menuePersonen');">Personen</a></td>
-	</tr>
-	<tr>
-		<td class="tab" id="tabLehre" onClick="js_show_tab('menueLehre');">Lehre</td>
-	</tr>
-</table>-->
 <?php
 if ($berechtigung->isBerechtigt('admin'))
 	echo '<div>
 			<a href="admin/menu.html" target="main">Admin</a>
 		</div><hr>';
+
+/*foreach($menu AS $m)
+{
+	$opener=false;
+	$hide=false;
+	if (isset($m['opener']))
+		if ($m['opener']=='true')
+			$opener=true;
+	if (isset($m['hide']))
+		if ($m['hide']=='true')
+			$hide=true;
+
+	if ($opener)
+	{
+		echo '<SPAN id="'.$m['name'].'_dot" onclick="js_toggle_container('."'".$m['name']."'".')" style="font-weight:bold">';
+		if ($hide)
+			echo '+ ';
+		else
+			echo '&#8211; ';
+		echo '</SPAN>';
+	}
+	else
+		echo '&curren; ';
+
+	if (isset($m['link']))
+		echo '<a href="'.$m['link'].'" ';
+	if (isset($m['target']))
+		echo 'target="'.$m['target'].'" ';
+	if (isset($m['link']))
+		echo '>';
+	if (isset($m['name']))
+		echo '<u><strong>'.$m['name'].'</strong></u>';
+	if (isset($m['link']))
+		echo '</a>';
+	if ($hide)
+		$display='none';
+	else
+		$display='block';
+	echo "\n<DIV>\n".'<SPAN id="'.$m['name'].'" style="display:'.$display.'">';
+	foreach($m AS $m1)
+		if (is_array($m1))
+		{
+			$opener=false;
+			$hide=false;
+			if (isset($m1['opener']))
+				if ($m1['opener']=='true')
+					$opener=true;
+			if (isset($m1['hide']))
+				if ($m1['hide']=='true')
+					$hide=true;
+
+			if ($opener)
+			{
+				echo "\n\t".'<SPAN onclick="js_toggle_container('."'".$m1['name']."'".')">';
+				if ($hide)
+					echo '+ ';
+				else
+					echo '&#8211; ';
+				echo "\n\t\t</SPAN>";
+			}
+			else
+				echo "\t &nbsp;&nbsp;&nbsp;&nbsp;&middot; ";
+
+			if (isset($m1['link']))
+				echo '<a href="'.$m1['link'].'" ';
+			if (isset($m1['target']))
+				echo 'target="'.$m1['target'].'" ';
+			if (isset($m1['link']))
+				echo '>';
+			if (isset($m1['name']))
+				echo '<strong>'.$m1['name'].'</strong>';
+			if (isset($m1['link']))
+				echo '</a>';
+			if ($hide)
+				$display='none';
+			else
+				$display='block';
+			echo "\n\t<DIV>\n\t".'<SPAN id="'.$m1['name'].'" style="display:'.$display.'">';
+			foreach($m1 AS $m2)
+				if (is_array($m2))
+				{
+					if (isset($m2['link']))
+						echo "\n\t\t".'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&middot; <a href="'.$m2['link'].'" ';
+					if (isset($m2['target']))
+						echo 'target="'.$m2['target'].'" ';
+					if (isset($m2['link']))
+						echo '>';
+					if (isset($m2['name']))
+						echo $m2['name'];
+					if (isset($m2['link']))
+						echo '</a><BR />';
+				}
+			echo "\n\t</SPAN>\n\t</DIV>\n";
+		}
+	echo "\n</SPAN>\n</DIV>\n";
+}*/
 ?>
+
+
 <!-- ******************* Haupt-Menue Lehre *******************************-->
 <a href="?Lehre" class="MenuItem1" onClick="return(js_toggle_container('menueLehre'));">
 	<img src="../skin/images/menu_item.gif" width="7" height="9" />&nbsp;Lehre
