@@ -210,7 +210,7 @@ class lehreinheit
 			$qry .= " AND lehrfach_id IN ( SELECT lehrfach_id FROM lehre.tbl_lehrfach WHERE fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."')";
 
 		$qry.= "ORDER BY lehreinheit_id";
-
+		
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
