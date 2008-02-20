@@ -1675,7 +1675,7 @@ if(!$error)
 		else
 		{
 
-			$bisio = new bisio($conn);
+			$bisio = new bisio($conn, null, true);
 
 			if($_POST['neu']=='true')
 			{
