@@ -16,13 +16,18 @@ if (!$conn = pg_pconnect(CONN_STRING))
 // Berechtigungen ermitteln
 $berechtigung=new benutzerberechtigung($conn);
 $berechtigung->getBerechtigungen($uid);
-$berechtigt_studiengang=$berechtigung->getStgKz();
-//$berechtigt_studiengang=$berechtigung->getStgKz('admin');
-//$berechtigt_studiengang = array_merge($berechtigt_studiengang, $berechtigung->getStgKz('assistenz'));
+//$berechtigt_studiengang=$berechtigung->getStgKz();
+$berechtigt_studiengang=$berechtigung->getStgKz('admin');
+
+if(isset($_GET['prestudent']) && $_GET['prestudent']=='false')
+	$berechtigt_studiengang = array_merge($berechtigt_studiengang, $berechtigung->getStgKz('lv-plan'));
+else 
+	$berechtigt_studiengang = array_merge($berechtigt_studiengang, $berechtigung->getStgKz('assistenz'));	
 
 //var_dump($berechtigung);
 $stg_kz_query='';
 if (count($berechtigt_studiengang)>0)
+{
 	if ($berechtigt_studiengang[0]!=0)
 	{
 		foreach ($berechtigt_studiengang as $b_stg)
@@ -30,16 +35,20 @@ if (count($berechtigt_studiengang)>0)
 		$stg_kz_query='AND ('.substr($stg_kz_query,3).')';
 	}
 
-if (isset($_GET['studiengang_kz']))
-	$stg_kz_query='AND tbl_lehrverband.studiengang_kz='.$_GET['studiengang_kz'];
-
-$sql_query="SET search_path TO public;
-			SELECT tbl_lehrverband.studiengang_kz, tbl_studiengang.bezeichnung, kurzbz,kurzbzlang, typ, tbl_lehrverband.semester, verband, gruppe, gruppe_kurzbz, tbl_lehrverband.bezeichnung AS lvb_bezeichnung, tbl_gruppe.bezeichnung AS grp_bezeichnung
-			FROM (tbl_studiengang JOIN tbl_lehrverband USING (studiengang_kz))
-				LEFT OUTER JOIN tbl_gruppe  ON (tbl_lehrverband.studiengang_kz=tbl_gruppe.studiengang_kz AND tbl_lehrverband.semester=tbl_gruppe.semester AND (tbl_lehrverband.verband='') AND tbl_gruppe.lehre AND tbl_gruppe.aktiv)
-			WHERE tbl_lehrverband.aktiv AND tbl_studiengang.aktiv $stg_kz_query
-			ORDER BY erhalter_kz,typ, kurzbz, semester,verband,gruppe, gruppe_kurzbz;";
-
+	if (isset($_GET['studiengang_kz']))
+		$stg_kz_query='AND tbl_lehrverband.studiengang_kz='.$_GET['studiengang_kz'];
+	
+	$sql_query="SET search_path TO public;
+				SELECT tbl_lehrverband.studiengang_kz, tbl_studiengang.bezeichnung, kurzbz,kurzbzlang, typ, tbl_lehrverband.semester, verband, gruppe, gruppe_kurzbz, tbl_lehrverband.bezeichnung AS lvb_bezeichnung, tbl_gruppe.bezeichnung AS grp_bezeichnung
+				FROM (tbl_studiengang JOIN tbl_lehrverband USING (studiengang_kz))
+					LEFT OUTER JOIN tbl_gruppe  ON (tbl_lehrverband.studiengang_kz=tbl_gruppe.studiengang_kz AND tbl_lehrverband.semester=tbl_gruppe.semester AND (tbl_lehrverband.verband='') AND tbl_gruppe.lehre AND tbl_gruppe.aktiv)
+				WHERE tbl_lehrverband.aktiv AND tbl_studiengang.aktiv $stg_kz_query
+				ORDER BY erhalter_kz,typ, kurzbz, semester,verband,gruppe, gruppe_kurzbz;";
+}
+else 
+{
+	die('Keine Berechtigung');
+}
 //echo $sql_query;
 if(!$result=pg_query($conn, $sql_query))
 	$error_msg.=pg_errormessage($conn);
