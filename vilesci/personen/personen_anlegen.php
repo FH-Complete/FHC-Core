@@ -25,6 +25,7 @@ require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/datum.class.php');
+require_once('../../include/kontakt.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
 	die('Fehler beim Herstellen der DB Connection');
@@ -331,7 +332,7 @@ if($geburtsdatum!='')
 <!--Formularfelder-->
 <table>
 <?php
-echo '<tr><td>Titel(Pre)</td><td><input type="text" id="titel" name="titel" maxlength="64" value="'.$titel.'" /></td></tr>';
+echo '<tr><td>Titel(Pre) *</td><td><input type="text" id="titel" name="titel" maxlength="64" value="'.$titel.'" /></td></tr>';
 echo '<tr><td>Vorname</td><td><input type="text" id="vorname" maxlength="32" name="vorname" value="'.$vorname.'" /></td></tr>';
 echo '<tr><td>Nachname *</td><td><input type="text" maxlength="64" id="nachname" name="nachname" value="'.$nachname.'" /></td></tr>';
 echo '<tr><td>Titel(Post)</td><td><input type="text" id="titelpost" name="titelpost" maxlength="64" value="'.$titelpost.'" /></td></tr>';

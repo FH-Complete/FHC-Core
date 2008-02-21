@@ -212,7 +212,7 @@ while ($begin<$ende)
 
 	// Stundenplan der Woche drucken
 	if ($format=='csv' || $format=='ical')
-		$stdplan->draw_week_csv($target);
+		$stdplan->draw_week_csv($target, LVPLAN_KATEGORIE);
 	//else if ($format=='ical')
 	//	$stdplan->draw_week_ical($target);
 	else
