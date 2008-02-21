@@ -287,6 +287,26 @@ function utf8_strlen($str)
 }
 
 // ****************************************************************
+// * strtoupper das auch Umlaute und andere Sonderzeichen 
+// * in Grossbuchstaben umwandelt
+// ****************************************************************
+function strtoupperFULL($str)
+{
+   // convert to entities
+   $subject = htmlentities($str,ENT_QUOTES);
+   $pattern = '/&([a-z])(uml|acute|circ';
+   $pattern.= '|tilde|ring|elig|grave|slash|horn|cedil|th);/e';
+   $replace = "'&'.strtoupper('\\1').'\\2'.';'";
+   $result = preg_replace($pattern, $replace, $subject);
+   // convert from entities back to characters
+   $htmltable = get_html_translation_table(HTML_ENTITIES);
+   foreach($htmltable as $key => $value) {
+      $result = ereg_replace(addslashes($value),$key,$result);
+   }
+   return(strtoupper($result));
+}
+
+// ****************************************************************
 // * Prueft den uebergebenen Alias auf Gueltigkeit.
 // * Format: mindestens 1 Punkt enhalten, mind. 1 Zeichen vor und
 // * 1 Zeichen nach dem Punkt, keine Sonderzeichen

@@ -1472,7 +1472,7 @@ class wochenplan
 	 * @return true oder false
 	 *
 	 */
-	function draw_week_csv($target)
+	function draw_week_csv($target, $lvplan_kategorie)
 	{
 		if (!date("w",$this->datum))
 			$this->datum=jump_day($this->datum,1);
@@ -1590,14 +1590,14 @@ class wochenplan
 							.'SUMMARY:'.$lehrfach[0].'  '.$this->std_plan[$i][$j][0]->ort.' - '.$lvb.$this->crlf
 							.'DESCRIPTION:'.$lehrfach[0].'\n'.$this->std_plan[$i][$j][0]->lektor.'\n'.$lvb.'\n'.$this->std_plan[$i][$j][0]->ort.$this->crlf
 							.'LOCATION:'.$this->std_plan[$i][$j][0]->ort.$this->crlf
-							.'CATEGORIES:StundenplanTW'.$this->crlf
+							.'CATEGORIES:'.$lvplan_kategorie.$this->crlf
 							.'DTSTART:'.$start_date_time_ical.$this->crlf
 							.'DTEND:'.$end_date_time_ical.$this->crlf
 							.'END:VEVENT';
 					}
 					else
 					{
-						echo $this->crlf.'"'.$lehrfach[0].'","StundenplanTW","'.$this->std_plan[$i][$j][0]->ort.'","Stundenplan'.$this->crlf.$this->std_plan[$i][$j][0]->lehrfach.$this->crlf;
+						echo $this->crlf.'"'.$lehrfach[0].'","'.$lvplan_kategorie.'","'.$this->std_plan[$i][$j][0]->ort.'","Stundenplan'.$this->crlf.$this->std_plan[$i][$j][0]->lehrfach.$this->crlf;
 						echo $this->std_plan[$i][$j][0]->lektor.$this->crlf.$lvb.$this->crlf.$this->std_plan[$i][$j][0]->ort.'","Stundenplan",';
 						echo '"'.$start_date.'","'.$start_time.'","'.$end_date.'","'.$end_time.'",,,,,';
 					}

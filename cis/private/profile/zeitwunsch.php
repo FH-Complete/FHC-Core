@@ -21,7 +21,7 @@
  */
 // **
 // * @brief bietet die Moeglichkeit zur Anzeige und
-// * Aenderung der Zeitwuensche und Zeitsperren
+// * Aenderung der Zeitwuensche
 
 	require_once('../../config.inc.php');
 	require_once('../../../include/functions.inc.php');
@@ -105,41 +105,28 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 <script language="Javascript">
-function conf_del()
+// Pruefen ob nur die erlaubten Werte verwendet wurden
+function checkvalues()
 {
-	return confirm('Wollen Sie diesen Eintrag wirklich löschen?');
-}
-
-function checkval()
-{
-	if(document.getElementById('vertretung_uid').value=='')
+	var elem = document.getElementsByTagName('input');
+	var error=false;
+	
+	for (var i = 0;i<elem.length;i++)
 	{
-		alert('Bitte zuerst eine Vertretung auswählen');
+	  if(elem[i].name.match("^wunsch"))
+	  {
+			if(!elem[i].value.match("[12]"))
+				error=true;
+	  }
+	}
+	
+	if(error)
+	{
+		alert('Es duerfen nur die Werte -2, -1, 1 und 2 eingetragen werden');
 		return false;
 	}
 	else
 		return true;
-}
-function berechnen()
-{
-	document.getElementById('summe').value = parseInt(document.getElementById('resturlaubstage').value)+parseInt(document.getElementById('anspruch').value);
-}
-
-function checkdatum()
-{
-	if(document.getElementById('vondatum').value.length<10)
-	{
-		alert('Von-Datum ist ungültig. Bitte beachten Sie das führende nullen angegeben werden müssen (Beispiel: 01.01.2008)');
-		return false;
-	}
-	
-	if(document.getElementById('bisdatum').value.length<10)
-	{
-		alert('Bis-Datum ist ungültig. Bitte beachten Sie das führende nullen angegeben werden müssen (Beispiel: 01.01.2008)');
-		return false;
-	}
-	
-	return true;
 }
 </script>
 </head>
@@ -159,7 +146,7 @@ function checkdatum()
 <H3>
 	Zeitw&uuml;nsche von <?php echo $person->titelpre.' '.$person->vorname.' '.$person->nachname; ?>
 </H3>
-<FORM name="zeitwunsch" method="post" action="zeitwunsch.php?type=save">
+<FORM name="zeitwunsch" method="post" action="zeitwunsch.php?type=save" onsubmit="return checkvalues()">
   <TABLE>
     <TR>
     	<?php
@@ -221,12 +208,12 @@ Das Formular zum Eintragen der Zeitsperren finden Sie <a href='zeitsperre_restur
     </TD>
     <TD>Hier kann ich unterrichten</TD>
   </TR>
-  <TR>
+  <!--<TR>
     <TD>
       <DIV align="right">0</DIV>
     </TD>
     <TD>keine Bedeutung</TD>
-  </TR>
+  </TR>-->
   <TR>
     <TD>
       <DIV align="right">-1</DIV>
