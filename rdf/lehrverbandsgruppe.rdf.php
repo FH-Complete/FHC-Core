@@ -25,6 +25,7 @@ else
 	$berechtigt_studiengang = array_merge($berechtigt_studiengang, $berechtigung->getStgKz('assistenz'));	
 
 //var_dump($berechtigung);
+sort($berechtigt_studiengang);
 $stg_kz_query='';
 if (count($berechtigt_studiengang)>0)
 {
