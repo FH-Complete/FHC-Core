@@ -682,11 +682,8 @@ function StudentAuswahl()
 
 	try
 	{
-		//Ausgewaehlte UID holen
-        //var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-		//var uid=tree.view.getCellText(tree.currentIndex,col);
-		 var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
-		var prestudent_id=tree.view.getCellText(tree.currentIndex,col);
+		//Ausgewaehlte prestudent_id holen
+		var prestudent_id = getTreeCellText(tree, 'student-treecol-prestudent_id', tree.currentIndex);
 		
 		if(prestudent_id!='')
 		{
@@ -1386,6 +1383,9 @@ function StudentPrestudentSave()
 	}
 }
 
+// ****
+// * Loescht eine Prestudentrolle
+// ****
 function StudentPrestudentRolleDelete()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -1393,18 +1393,11 @@ function StudentPrestudentRolleDelete()
 
 	if (tree.currentIndex==-1) return;
 
-	//Ausgewaehlte Nr holen
-    var col = tree.columns ? tree.columns["student-prestudent-tree-rolle-rolle_kurzbz"] : "student-prestudent-tree-rolle-rolle_kurzbz";
-	var rolle_kurzbz=tree.view.getCellText(tree.currentIndex,col);
-
-	var col = tree.columns ? tree.columns["student-prestudent-tree-rolle-studiensemester_kurzbz"] : "student-prestudent-tree-rolle-studiensemester_kurzbz";
-	var studiensemester_kurzbz=tree.view.getCellText(tree.currentIndex,col);
-	
-	var col = tree.columns ? tree.columns["student-prestudent-tree-rolle-prestudent_id"] : "student-prestudent-tree-rolle-prestudent_id";
-	var prestudent_id=tree.view.getCellText(tree.currentIndex,col);
-
-	var col = tree.columns ? tree.columns["student-prestudent-tree-rolle-ausbildungssemester"] : "student-prestudent-tree-rolle-ausbildungssemester";
-	var ausbildungssemester=tree.view.getCellText(tree.currentIndex,col);
+	//markierte Rolle holen
+	var rolle_kurzbz = getTreeCellText(tree, 'student-prestudent-tree-rolle-rolle_kurzbz', tree.currentIndex);
+	var studiensemester_kurzbz = getTreeCellText(tree, 'student-prestudent-tree-rolle-studiensemester_kurzbz', tree.currentIndex);
+	var prestudent_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-prestudent_id', tree.currentIndex);	
+	var ausbildungssemester = getTreeCellText(tree, 'student-prestudent-tree-rolle-ausbildungssemester', tree.currentIndex);
 
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 	if(confirm('Diese Rolle wirklich loeschen?'))
@@ -1450,17 +1443,10 @@ function StudentRolleBearbeiten()
 	if (tree.currentIndex==-1) return;
 
 	//Ausgewaehlte Nr holen
-    var col = tree.columns ? tree.columns["student-prestudent-tree-rolle-rolle_kurzbz"] : "student-prestudent-tree-rolle-rolle_kurzbz";
-	var rolle_kurzbz=tree.view.getCellText(tree.currentIndex,col);
-
-	var col = tree.columns ? tree.columns["student-prestudent-tree-rolle-studiensemester_kurzbz"] : "student-prestudent-tree-rolle-studiensemester_kurzbz";
-	var studiensemester_kurzbz=tree.view.getCellText(tree.currentIndex,col);
-	
-	var col = tree.columns ? tree.columns["student-prestudent-tree-rolle-prestudent_id"] : "student-prestudent-tree-rolle-prestudent_id";
-	var prestudent_id=tree.view.getCellText(tree.currentIndex,col);
-
-	var col = tree.columns ? tree.columns["student-prestudent-tree-rolle-ausbildungssemester"] : "student-prestudent-tree-rolle-ausbildungssemester";
-	var ausbildungssemester=tree.view.getCellText(tree.currentIndex,col);
+	var rolle_kurzbz = getTreeCellText(tree, 'student-prestudent-tree-rolle-rolle_kurzbz', tree.currentIndex);
+	var studiensemester_kurzbz = getTreeCellText(tree, 'student-prestudent-tree-rolle-studiensemester_kurzbz', tree.currentIndex);
+	var prestudent_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-prestudent_id', tree.currentIndex);	
+	var ausbildungssemester = getTreeCellText(tree, 'student-prestudent-tree-rolle-ausbildungssemester', tree.currentIndex);
 
 	window.open('<?php echo APP_ROOT?>content/student/studentrolledialog.xul.php?prestudent_id='+prestudent_id+'&rolle_kurzbz='+rolle_kurzbz+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&ausbildungssemester='+ausbildungssemester,"Status","chrome, status=no, width=500, height=300, centerscreen, resizable");
 }
@@ -1580,8 +1566,7 @@ function StudentAddRolle(rolle, semester, studiensemester)
 	if (tree.currentIndex==-1) return;
 
 	//Ausgewaehlte ID holen
-    var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
-	var prestudent_id=tree.view.getCellText(tree.currentIndex,col);
+	var prestudent_id = getTreeCellText(tree, 'student-treecol-prestudent_id', tree.currentIndex);
 
 	if(semester!='0' || confirm('Diesen Studenten zum '+rolle+' machen?'))
 	{
@@ -1631,13 +1616,12 @@ function StudentPrintInskriptionsbestaetigung()
 	for (var t = 0; t < numRanges; t++)
 	{
   		tree.view.selection.getRangeAt(t,start,end);
-			for (var v = start.value; v <= end.value; v++)
-			{
-			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-			uid = tree.view.getCellText(v,col);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			uid = getTreeCellText(tree, 'student-treecol-uid', v);
 			paramList += ';'+uid;
 			anzahl = anzahl+1;
-			}
+		}
 	}
 
 	var stsem = getStudiensemester();
@@ -1670,8 +1654,7 @@ function StudentExport()
 			
 		for (var v=0; v < items; v++)
 		{
-			col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
-			prestudent_id = tree.view.getCellText(v,col);
+			prestudent_id = getTreeCellText(tree, 'student-treecol-prestudent_id', v);
 			data = data+';'+prestudent_id;
 		}
 	}
@@ -1689,8 +1672,7 @@ function StudentExport()
 	  		tree.view.selection.getRangeAt(t,start,end);
 			for (var v = start.value; v <= end.value; v++)
 			{
-				col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
-				prestudent_id = tree.view.getCellText(v,col);
+				prestudent_id = getTreeCellText(tree, 'student-treecol-prestudent_id', v);
 				data = data+';'+prestudent_id;
 			}
 		}
@@ -1699,40 +1681,6 @@ function StudentExport()
 	stsem = getStudiensemester();
 	action = '<?php echo APP_ROOT; ?>content/statistik/studentenexport.xls.php?studiensemester_kurzbz='+stsem;
 	OpenWindowPost(action, data);
-	
-/*
-	var tree=document.getElementById('tree-verband');
-
-	//Wenn nichts markiert wurde -> beenden
-	if(tree.currentIndex==-1)
-		return;
-
-	var col;
-	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
-	var stg_kz=tree.view.getCellText(tree.currentIndex,col);
-	col = tree.columns ? tree.columns["sem"] : "sem";
-	var sem=tree.view.getCellText(tree.currentIndex,col);
-	col = tree.columns ? tree.columns["ver"] : "ver";
-	var ver=tree.view.getCellText(tree.currentIndex,col);
-	col = tree.columns ? tree.columns["grp"] : "grp";
-	var grp=tree.view.getCellText(tree.currentIndex,col);
-	col = tree.columns ? tree.columns["gruppe"] : "gruppe";
-	var gruppe=tree.view.getCellText(tree.currentIndex,col);
-	col = tree.columns ? tree.columns["typ"] : "typ";
-	var typ=tree.view.getCellText(tree.currentIndex,col);
-	col = tree.columns ? tree.columns["stsem"] : "stsem";
-	var stsem=tree.view.getCellText(tree.currentIndex,col);
-	if(typ=='')
-		typ='student';
-	
-	if(typ=='student')
-		stsem = getStudiensemester();
-	url = "<?php echo APP_ROOT; ?>content/statistik/studentenexport.xls.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ="+typ+"&"+gettimestamp();
-	
-	//alert(url);
-	window.open(url,"","chrome,status=no, modal, width=400, height=250, centerscreen, resizable");
-	//window.location.href=url;	
-	*/
 }
 
 // **************** KONTO ******************
@@ -1765,8 +1713,7 @@ function StudentKontoTreeSelectBuchung()
 	   	for(var i=0;i<items;i++)
 	   	{
 	   		//buchungsnr der row holen
-			col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
-			buchungsnr=tree.view.getCellText(i,col);
+			buchungsnr = getTreeCellText(tree, 'student-konto-tree-buchungsnr', i);
 
 			//wenn dies die zu selektierende Zeile
 			if(buchungsnr == StudentKontoSelectBuchung)
@@ -1782,6 +1729,9 @@ function StudentKontoTreeSelectBuchung()
 	}
 }
 
+// ****
+// * Laedt die Buchungen der markierten Person
+// ****
 function StudentKontoLoad()
 {
 	person_id = document.getElementById('student-detail-textbox-person_id').value;
@@ -1830,8 +1780,7 @@ function StudentKontoAuswahl()
 	StudentKontoDetailDisableFields(false);
 
 	//Ausgewaehlte Nr holen
-    var col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
-	var buchungsnr=tree.view.getCellText(tree.currentIndex,col);
+	var buchungsnr = getTreeCellText(tree, 'student-konto-tree-buchungsnr', tree.currentIndex);
 
 	//Daten holen
 	var url = '<?php echo APP_ROOT ?>rdf/konto.rdf.php?buchungsnr='+buchungsnr+'&'+gettimestamp();
@@ -1900,8 +1849,7 @@ function StudentKontoFilter()
 		if(kontotree.currentIndex!='-1')
 		{
 			//Ausgewaehlte Nr holen
-		    var col = kontotree.columns ? kontotree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
-			buchungsnr=kontotree.view.getCellText(kontotree.currentIndex,col);
+			buchungsnr = getTreeCellText(kontotree, 'student-konto-tree-buchungsnr', kontotree.currentIndex);
 		}
 	}
 	catch(e)
@@ -1964,6 +1912,8 @@ function StudentKontoFilterStudenten(filter)
 		
 	if(stsem=='')
 		stsem = getStudiensemester();
+	if(typ=='')
+		typ='student';
 	url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ="+typ+"&filter2="+filter+"&"+gettimestamp();
 	var treeStudent=document.getElementById('student-tree');
 
@@ -2091,16 +2041,11 @@ function StudentKontoGegenbuchung()
   		tree.view.selection.getRangeAt(t,start,end);
 			for (var v = start.value; v <= end.value; v++)
 			{
-				var col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
-				var buchungsnr=tree.view.getCellText(v,col);
+				var buchungsnr = getTreeCellText(tree, 'student-konto-tree-buchungsnr', v);
 				paramList += ';'+buchungsnr;
 			}
 	}
-	
-	//Ausgewaehlte Nr holen
-    //var col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
-	//var buchungsnr=tree.view.getCellText(tree.currentIndex,col);
-
+		
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 
@@ -2145,8 +2090,7 @@ function StudentKontoDelete()
 	StudentKontoDetailDisableFields(false);
 
 	//Ausgewaehlte Nr holen
-    var col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
-	var buchungsnr=tree.view.getCellText(tree.currentIndex,col);
+	var buchungsnr = getTreeCellText(tree, 'student-konto-tree-buchungsnr', tree.currentIndex);
 
 	if(confirm('Diese Buchung wirklich loeschen?'))
 	{
@@ -2257,15 +2201,7 @@ function StudentKontoZahlungsbestaetigung()
   		tree.view.selection.getRangeAt(t,start,end);
 			for (var v = start.value; v <= end.value; v++)
 			{
-				/*
-				if(!tree.view.getParentIndex(v))
-				{
-					alert('Zum Drucken der Bestaetigung bitte die oberste Buchung waehlen');
-					return false;
-				}
-				*/
-				var col = tree.columns ? tree.columns["student-konto-tree-buchungsnr"] : "student-konto-tree-buchungsnr";
-				var buchungsnr=tree.view.getCellText(v,col);
+				var buchungsnr = getTreeCellText(tree, 'student-konto-tree-buchungsnr', v);
 				paramList += ';'+buchungsnr;
 			}
 	}
@@ -2299,8 +2235,7 @@ function StudentCreateZeugnis()
   		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{			
-			var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-			var uid=tree.view.getCellText(v,col);
+			var uid = getTreeCellText(tree, 'student-treecol-uid', v);
 			paramList += ';'+uid;
 		}
 	}
@@ -2329,12 +2264,11 @@ function StudentZeugnisAnzeigen()
 	try
 	{
 		//Ausgewaehlte ID holen
-        var col = tree.columns ? tree.columns["student-zeugnis-tree-akte_id"] : "student-zeugnis-tree-akte_id";
-		var akte_id=tree.view.getCellText(tree.currentIndex,col);
+		var akte_id = getTreeCellText(tree, 'student-zeugnis-tree-akte_id', tree.currentIndex);
+		
 		if(akte_id!='')
 		{
 			window.open('<?php echo APP_ROOT;?>content/akte.php?id='+akte_id,'File');
-			//document.location.href='<?php echo APP_ROOT;?>content/akte.php?id='+akte_id;
 		}
 		else
 		{
@@ -2363,8 +2297,7 @@ function StudentAkteDel()
 	try
 	{
 		//Ausgewaehlte Akte holen
-        var col = tree.columns ? tree.columns["student-zeugnis-tree-akte_id"] : "student-zeugnis-tree-akte_id";
-		var akte_id=tree.view.getCellText(tree.currentIndex,col);
+		var akte_id = getTreeCellText(tree, 'student-zeugnis-tree-akte_id', tree.currentIndex);
 	}
 	catch(e)
 	{
@@ -2416,10 +2349,7 @@ function StudentZeugnisArchivieren()
 		alert('Student muss ausgewaehlt sein');
 		return;
 	}
-    //var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-	//var uid=tree.view.getCellText(tree.currentIndex,col);
-	
-	
+    	
 	var tree=document.getElementById('student-tree');
 	var numRanges = tree.view.selection.getRangeCount();
 	var start = new Object();
@@ -2435,8 +2365,7 @@ function StudentZeugnisArchivieren()
   		tree.view.selection.getRangeAt(t,start,end);
   		for (v=start.value; v<=end.value; v++)
   		{
-  			var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-  			uid = tree.view.getCellText(v,col)
+  			uid = getTreeCellText(tree, 'student-treecol-uid', v);
   			
   			url = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl=Zeugnis&xml=zeugnis.rdf.php&uid='+uid+'&ss='+stsem+'&archive=1';
 
@@ -2469,9 +2398,8 @@ function StudentIOAuswahl()
 
 	StudentIODetailDisableFields(false);
 
-	//Ausgewaehlte Nr holen
-    var col = tree.columns ? tree.columns["student-io-tree-bisio_id"] : "student-io-tree-bisio_id";
-	var bisio_id=tree.view.getCellText(tree.currentIndex,col);
+	//Ausgewaehlte ID holen
+	var bisio_id = getTreeCellText(tree, 'student-io-tree-bisio_id', tree.currentIndex);
 
 	//Daten holen
 	var url = '<?php echo APP_ROOT ?>rdf/bisio.rdf.php?bisio_id='+bisio_id+'&'+gettimestamp();
@@ -2504,11 +2432,8 @@ function StudentIOAuswahl()
 		//Wenn nach dem Personen gesucht wurde, ist es moeglich, dass kein Studiengang gewaehlt ist.
 		//Dann wird der Studiengang/Semester des Studenten genommen
 		var verband_tree=document.getElementById('tree-verband');
-		var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
-		var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
-		
-		col = verband_tree.columns ? verband_tree.columns["sem"] : "sem";
-		var sem=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+		var stg_kz = getTreeCellText(verband_tree, 'stg_kz', verband_tree.currentIndex);
+		var sem = getTreeCellText(verband_tree, 'sem', verband_tree.currentIndex);
 	}
 	catch(e)
 	{	
@@ -2706,8 +2631,8 @@ function StudentIODelete()
 	StudentIODetailDisableFields(false);
 
 	//Ausgewaehlte Nr holen
-    var col = tree.columns ? tree.columns["student-io-tree-bisio_id"] : "student-io-tree-bisio_id";
-	var bisio_id=tree.view.getCellText(tree.currentIndex,col);
+	var bisio_id = getTreeCellText(tree, 'student-io-tree-bisio_id', tree.currentIndex);
+	
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 	
 	if(confirm('Diesen Eintrag wirklich loeschen?'))
@@ -2774,11 +2699,9 @@ function StudentIONeu()
 		//Wenn nach dem Personen gesucht wurde, ist es moeglich, dass kein Studiengang gewaehlt ist.
 		//Dann wird der Studiengang/Semester des Studenten genommen
 		var verband_tree=document.getElementById('tree-verband');
-		var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
-		var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
 		
-		col = verband_tree.columns ? verband_tree.columns["sem"] : "sem";
-		var sem=verband_tree.view.getCellText(verband_tree.currentIndex,col);
+		var stg_kz = getTreeCellText(verband_tree, 'stg_kz', verband_tree.currentIndex);
+		var sem = getTreeCellText(verband_tree, 'sem', verband_tree.currentIndex);
 	}
 	catch(e)
 	{	
@@ -2838,8 +2761,7 @@ function StudentIOTreeSelectID()
 	   	for(var i=0;i<items;i++)
 	   	{
 	   		//ID der row holen
-			col = tree.columns ? tree.columns["student-io-tree-bisio_id"] : "student-io-tree-bisio_id";
-			var bisio_id=tree.view.getCellText(i,col);
+			var bisio_id = getTreeCellText(tree, 'student-io-tree-bisio_id', i);
 
 			//wenn dies die zu selektierende Zeile
 			if(bisio_id == StudentIOSelectID)
