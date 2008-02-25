@@ -918,6 +918,14 @@ function ExtrasShowLehrfachverwaltung()
 }
 
 // ****
+// * Zeigt HTML Seite mit Lektorenzuordnung zu Instituten
+// ****
+function ExtrasShowLektorenzuordnunginstitute()
+{
+	window.open('<?php echo APP_ROOT ?>vilesci/personen/institutsliste.php','Lektorenzuordnung-Institute','');
+}
+
+// ****
 // * Zeigt eine Seite zum Importieren der Funktionen aus der vorherigen BISMeldung
 // ****
 function BISMitarbeiterImport()
