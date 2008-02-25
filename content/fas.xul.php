@@ -110,6 +110,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-extras-projektarbeitsbenotung:command" oncommand="ExtrasShowProjektarbeitsBenotung();"/>
   <command id="menu-extras-gruppenverwaltung:command" oncommand="ExtrasShowGruppenverwaltung();"/>
   <command id="menu-extras-lehrfachverwaltung:command" oncommand="ExtrasShowLehrfachverwaltung();"/>
+  <command id="menu-extras-lektorenzuordnunginstitute:command" oncommand="ExtrasShowLektorenzuordnunginstitute();"/>
   <command id="menu-bis-mitarbeiter-import:command" oncommand="BISMitarbeiterImport();"/>
   <command id="menu-bis-mitarbeiter-export:command" oncommand="BISMitarbeiterExport();"/>
   <command id="menu-bis-mitarbeiter-checkverwendung:command" oncommand="BISMitarbeiterCheckVerwendung();"/>
@@ -482,6 +483,12 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                label     = "&menu-extras-lehrfachverwaltung.label;"
                command   =  "menu-extras-lehrfachverwaltung:command"
                accesskey = "&menu-extras-lehrfachverwaltung.accesskey;"/>
+             <menuitem
+               id        =  "menu-extras-lektorenzuordnunginstitute"
+               key       =  "menu-extras-lektorenzuordnunginstitute:key"
+               label     = "&menu-extras-lektorenzuordnunginstitute.label;"
+               command   =  "menu-extras-lektorenzuordnunginstitute:command"
+               accesskey = "&menu-extras-lektorenzuordnunginstitute.accesskey;"/>
           </menupopup>
     </menu>
     <!-- ********** BIS ********** -->

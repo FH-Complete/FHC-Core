@@ -192,6 +192,10 @@
 <!ENTITY menu-extras-lehrfachverwaltung.label		"Lehrfachverwaltung">
 <!ENTITY menu-extras-lehrfachverwaltung.accesskey	"E">
 
+<!ENTITY menu-extras-lektorenzuordnunginstitute.key			"L">
+<!ENTITY menu-extras-lektorenzuordnunginstitute.label		"Lektorenzuordnung-Institute">
+<!ENTITY menu-extras-lektorenzuordnunginstitute.accesskey	"L">
+
 <!-- BIS -->
 <!ENTITY menu-bis.label		"BIS">
 <!ENTITY menu-bis.accesskey	"I">
