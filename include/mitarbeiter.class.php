@@ -748,5 +748,60 @@ class mitarbeiter extends benutzer
 			return false;
 		}
 	}
+	
+	/**
+	 * gibt array mit allen Mitarbeitern zurueck
+	 * @return array mit Mitarbeitern
+	 */
+	function getMitarbeiterInstitut($institut)
+	{
+		$sql_query="SELECT DISTINCT campus.vw_mitarbeiter.* FROM campus.vw_mitarbeiter
+					JOIN public.tbl_benutzerfunktion USING (uid)
+					WHERE funktion_kurzbz='Institut' AND fachbereich_kurzbz='$institut' ORDER BY nachname, vorname";
+		
+		if($erg=pg_query($this->conn, $sql_query))
+		{					
+			$num_rows=pg_numrows($erg);
+			$result=array();
+			for($i=0;$i<$num_rows;$i++)
+			{
+	   			$row=pg_fetch_object($erg,$i);
+				$l=new mitarbeiter($this->conn);
+				// Personendaten
+				$l->uid=$row->uid;
+				$l->titelpre=$row->titelpre;
+				$l->titelpost=$row->titelpost;
+				$l->vorname=$row->vorname;
+				$l->vornamen=$row->vornamen;
+				$l->nachname=$row->nachname;
+				$l->gebdatum=$row->gebdatum;
+				$l->gebort=$row->gebort;
+				$l->gebzeit=$row->gebzeit;
+				$l->foto=$row->foto;
+				$l->anmerkung=$row->anmerkung;
+				$l->aktiv=$row->aktiv=='t'?true:false;
+				$l->homepage=$row->homepage;
+				$l->updateamum=$row->updateamum;
+				$l->updatevon=$row->updatevon;
+				// Lektorendaten
+				$l->personalnummer=$row->personalnummer;
+				$l->kurzbz=$row->kurzbz;
+				$l->lektor=$row->lektor=='t'?true:false;
+				//$l->bismelden=$row->bismelden=='t'?true:false;
+				$l->fixangestellt=$row->fixangestellt=='t'?true:false;
+				$l->standort_kurzbz = $row->standort_kurzbz;
+				$l->telefonklappe=$row->telefonklappe;
+				//$l->ort_kurzbz=$row->ort_kurzbz;
+				// Lektor in Array speichern
+				$result[]=$l;
+			}
+			return $result;
+		}
+		else 
+		{
+			$this->errormsg=pg_errormessage($this->conn);
+			return false;
+		}
+	}
 }
 ?>

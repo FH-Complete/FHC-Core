@@ -325,6 +325,7 @@ else
 							{
 								echo '<li><a class="Item2" href="profile/zeitsperre.php?fix=true" target="content">Fix-Angestellte</a></li>';
 								echo '<li><a class="Item2" href="profile/zeitsperre.php?fix=true&lektor=true" target="content">Fixe Lektoren</a></li>';
+								echo '<li><a class="Item2" href="profile/zeitsperre.php?institut=" target="content">Institut</a></li>';
 							}
 							$stge=$rechte->getStgKz('admin');
 							foreach($stg_obj->result as $row)

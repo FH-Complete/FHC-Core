@@ -202,7 +202,8 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 	<label value="Note" control="student-noten-menulist-note"/>
 	<menulist id="student-noten-menulist-note" disabled="true"
 	          datasources="<?php echo APP_ROOT ?>rdf/note.rdf.php" flex="1"
-	          ref="http://www.technikum-wien.at/note/liste" >
+	          ref="http://www.technikum-wien.at/note/liste" 
+	          oncommand="StudentNoteSpeichern()">
 		<template>
 			<menupopup>
 				<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
@@ -211,7 +212,9 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				</menupopup>
 		</template>
 	</menulist>
-	<button id="student-noten-button-speichern" oncommand="StudentNoteSpeichern()" label="Speichern" disabled="true"/>
+	
+	<button id="student-noten-button-speichern" oncommand="StudentNoteSpeichern()" label="Speichern" disabled="true" hidden="true"/>
+	
 	<spacer flex="1" />
 </hbox>
 </vbox>

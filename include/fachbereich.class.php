@@ -78,6 +78,7 @@ class fachbereich
 			$fachb_obj->farbe = $row->farbe;
 			$fachb_obj->studiengang_kz = $row->studiengang_kz;
 			$fachb_obj->ext_id = $row->ext_id;
+			$fachb_obj->aktiv = ($row->aktiv=='t'?true:false);
 
 			$this->result[] = $fachb_obj;
 			$this->bezeichnung_arr[$row->fachbereich_kurzbz] = $row->bezeichnung;
@@ -113,6 +114,7 @@ class fachbereich
 			$this->farbe = $row->farbe;
 			$this->studiengang_kz = $row->studiengang_kz;
 			$this->ext_id = $row->ext_id;
+			$this->aktiv = ($row->aktiv=='t'?true:false);
 		}
 		else
 		{
