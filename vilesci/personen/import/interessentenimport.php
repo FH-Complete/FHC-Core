@@ -412,6 +412,25 @@ if(isset($_POST['save']))
 		$prestudent->anmerkung = $anmerkungen .($ausbildungsart!=''?' Ausbildungsart:'.$ausbildungsart:'');
 		$prestudent->reihungstestangetreten = false;
 		$prestudent->bismelden = true;
+		
+		//Wenn die Person schon im System erfasst ist, dann die ZGV des Datensatzes uebernehmen
+		$qry_zgv = "SELECT * FROM public.tbl_prestudent WHERE person_id='$person->person_id' AND zgv_code is not null ORDER BY zgvmas_code, zgv_code DESC LIMIT 1";
+		if($result_zgv = pg_query($conn, $qry_zgv))
+		{
+			if($row_zgv = pg_fetch_object($result_zgv))
+			{
+				if($row_zgv->zgv_code!='')
+				{
+					$prestudent->zgv_code = $row_zgv->zgv_code;
+					$prestudent->zgvort = $row_zgv->zgvort;
+					$prestudent->zgvdatum = $row_zgv->zgvdatum;
+					
+					$prestudent->zgvmas_code = $row_zgv->zgvmas_code;
+					$prestudent->zgvmaort = $row_zgv->zgvmaort;
+					$prestudent->zgvmadatum = $row_zgv->zgvmadatum;
+				}
+			}
+		}
 
 		if(!$prestudent->save())
 		{

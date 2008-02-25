@@ -467,91 +467,110 @@ if(!$error)
 						}
 						else
 						{
-							$prestd_neu = new prestudent($conn);
-							$prestd_neu->prestudent_id = $_POST['prestudent_id'];
-							$prestd_neu->rolle_kurzbz = $_POST['rolle_kurzbz'];
-							$prestd_neu->studiensemester_kurzbz = $studiensemester;
-							$prestd_neu->datum = date('Y-m-d');
-							$prestd_neu->ausbildungssemester = $sem;
-							$prestd_neu->orgform_kurzbz = $prestd->orgform_kurzbz;
-							$prestd_neu->insertamum = date('Y-m-d H:i:s');
-							$prestd_neu->insertvon = $user;
-							$prestd_neu->new = true;
-
-							if($prestd_neu->save_rolle())
+							//Wenn der Status auf Aufgenommener oder Wartender geaendert wird,
+							//muss ein Bewerberstatus vorhanden sein
+							if($_POST['rolle_kurzbz']=='Aufgenommener' || $_POST['rolle_kurzbz']=='Wartender')
 							{
-								//Unterbrecher und Abbrecher werden ins 0. Semester verschoben
-								if($_POST['rolle_kurzbz']=='Unterbrecher' || $_POST['rolle_kurzbz']=='Abbrecher')
+								$qry = "SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='".$_POST['prestudent_id']."' AND rolle_kurzbz='Bewerber'";
+								if($result_bw = pg_query($conn, $qry))
 								{
-									$student = new student($conn);
-									$uid = $student->getUid($_POST['prestudent_id']);
-									$student->load($uid);
-									$student->studiensemester_kurzbz=$semester_aktuell;
-									$student->semester = '0';
-									if($_POST['rolle_kurzbz']=='Abbrecher')
-										$student->verband='A';
-									if($_POST['rolle_kurzbz']=='Unterbrecher')
-										$student->verband='B';
-										
-									//Nachschauen ob dieser Lehrverband schon existiert, falls nicht dann anlegen
-									$lehrverband = new lehrverband($conn);
-									if(!$lehrverband->exists($student->studiengang_kz, $student->semester, $student->verband, ''))
+									if(pg_num_rows($result_bw)==0)
 									{
-										//Pruefen ob der uebergeordnete Lehrverband existiert, falls nicht dann anlegen
-										if(!$lehrverband->exists($student->studiengang_kz, $student->semester, '', ''))
+										$return = false;
+										$error = true;
+										$errormsg = 'Person muss zuerst zum Bewerber gemacht werden!';
+									}
+								}
+							}
+							
+							if(!$error)
+							{
+								$prestd_neu = new prestudent($conn);
+								$prestd_neu->prestudent_id = $_POST['prestudent_id'];
+								$prestd_neu->rolle_kurzbz = $_POST['rolle_kurzbz'];
+								$prestd_neu->studiensemester_kurzbz = $studiensemester;
+								$prestd_neu->datum = date('Y-m-d');
+								$prestd_neu->ausbildungssemester = $sem;
+								$prestd_neu->orgform_kurzbz = $prestd->orgform_kurzbz;
+								$prestd_neu->insertamum = date('Y-m-d H:i:s');
+								$prestd_neu->insertvon = $user;
+								$prestd_neu->new = true;
+	
+								if($prestd_neu->save_rolle())
+								{
+									//Unterbrecher und Abbrecher werden ins 0. Semester verschoben
+									if($_POST['rolle_kurzbz']=='Unterbrecher' || $_POST['rolle_kurzbz']=='Abbrecher')
+									{
+										$student = new student($conn);
+										$uid = $student->getUid($_POST['prestudent_id']);
+										$student->load($uid);
+										$student->studiensemester_kurzbz=$semester_aktuell;
+										$student->semester = '0';
+										if($_POST['rolle_kurzbz']=='Abbrecher')
+											$student->verband='A';
+										if($_POST['rolle_kurzbz']=='Unterbrecher')
+											$student->verband='B';
+											
+										//Nachschauen ob dieser Lehrverband schon existiert, falls nicht dann anlegen
+										$lehrverband = new lehrverband($conn);
+										if(!$lehrverband->exists($student->studiengang_kz, $student->semester, $student->verband, ''))
 										{
+											//Pruefen ob der uebergeordnete Lehrverband existiert, falls nicht dann anlegen
+											if(!$lehrverband->exists($student->studiengang_kz, $student->semester, '', ''))
+											{
+												$lehrverband->studiengang_kz = $student->studiengang_kz;
+												$lehrverband->semester = $student->semester;
+												$lehrverband->verband = '';
+												$lehrverband->gruppe = '';
+												$lehrverband->aktiv = true;
+												$lehrverband->bezeichnung = 'AbUnterbrecher/Incoming';
+												
+												$lehrverband->save(true);
+											}
+											
 											$lehrverband->studiengang_kz = $student->studiengang_kz;
 											$lehrverband->semester = $student->semester;
-											$lehrverband->verband = '';
+											$lehrverband->verband = $student->verband;
 											$lehrverband->gruppe = '';
 											$lehrverband->aktiv = true;
-											$lehrverband->bezeichnung = 'AbUnterbrecher/Incoming';
+											if($student->verband=='A')
+												$lehrverband->bezeichnung = 'Abbrecher';
+											else 
+												$lehrverband->bezeichnung = 'Unterbrecher';
 											
 											$lehrverband->save(true);
 										}
-										
-										$lehrverband->studiengang_kz = $student->studiengang_kz;
-										$lehrverband->semester = $student->semester;
-										$lehrverband->verband = $student->verband;
-										$lehrverband->gruppe = '';
-										$lehrverband->aktiv = true;
-										if($student->verband=='A')
-											$lehrverband->bezeichnung = 'Abbrecher';
-										else 
-											$lehrverband->bezeichnung = 'Unterbrecher';
-										
-										$lehrverband->save(true);
+										//Student Speichern
+										$student->save(false, false);
+										//Studentlehrverband Eintrag Speichern
+										$student->save_studentlehrverband(false);
 									}
-									//Student Speichern
-									$student->save(false, false);
-									//Studentlehrverband Eintrag Speichern
-									$student->save_studentlehrverband(false);
-								}
-
-								//Wenn Unterbrecher zu Studenten werden, dann wird das Semester mituebergeben
-								if($_POST['rolle_kurzbz']=='Student')
-								{
-									$student = new student($conn);
-									$uid = $student->getUid($_POST['prestudent_id']);
-									$student->load($uid);
-									$student->studiensemester_kurzbz=$semester_aktuell;
-									$student->semester = $_POST['semester'];
-									$student->save(false, false);
-									$student->save_studentlehrverband(false);
-									//Aktiv Status setzen
-									$benutzer = new benutzer($conn);
-									if($benutzer->load($uid))
+	
+									//Wenn Unterbrecher zu Studenten werden, dann wird das Semester mituebergeben
+									if($_POST['rolle_kurzbz']=='Student')
 									{
-										$benutzer->bnaktiv=true;
-										$benutzer->save(false, false);
+										$student = new student($conn);
+										$uid = $student->getUid($_POST['prestudent_id']);
+										$student->load($uid);
+										$student->studiensemester_kurzbz=$semester_aktuell;
+										$student->semester = $_POST['semester'];
+										$student->save(false, false);
+										$student->save_studentlehrverband(false);
+										//Aktiv Status setzen
+										$benutzer = new benutzer($conn);
+										if($benutzer->load($uid))
+										{
+											$benutzer->bnaktiv=true;
+											$benutzer->save(false, false);
+										}
 									}
+									$return = true;
 								}
-								$return = true;
-							}
-							else
-							{
-								$return = false;
-								$errormsg = $prestd_neu->errormsg;
+								else
+								{
+									$return = false;
+									$errormsg = $prestd_neu->errormsg;
+								}
 							}
 						}
 					}

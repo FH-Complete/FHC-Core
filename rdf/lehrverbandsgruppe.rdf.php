@@ -29,7 +29,7 @@ sort($berechtigt_studiengang);
 $stg_kz_query='';
 if (count($berechtigt_studiengang)>0)
 {
-	if ($berechtigt_studiengang[0]!=0)
+	if ($berechtigt_studiengang[0]!='')
 	{
 		foreach ($berechtigt_studiengang as $b_stg)
 			$stg_kz_query.=' OR tbl_lehrverband.studiengang_kz='.$b_stg;

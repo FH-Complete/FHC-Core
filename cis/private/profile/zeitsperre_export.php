@@ -57,6 +57,11 @@
 		$funktion=null;
 	if ($funktion=='true' || $funktion=='1') $funktion=true;
 	if ($funktion=='false' || $funktion=='') $funktion=false;
+	
+	if(isset($_GET['institut']))
+		$institut = $_GET['institut'];
+	else 
+		$institut = null;
 
 	$stge=array();
 	if(isset($_GET['stg_kz']))
@@ -79,18 +84,29 @@
 	// Studiensemester setzen
 	$ss=new studiensemester($conn,$studiensemester);
 	if ($studiensemester==null)
-		$studiensemester=$ss->getAktTillNext();
-	$datum_beginn='2007-12-24';//$ss->start;
-	$datum_ende='2008-01-07';//$ss->ende;
+	{
+		$studiensemester = $ss->getaktorNext();
+		$ss->load($studiensemester);
+		//$studiensemester=$ss->getAktTillNext();
+	}
+	$datum_beginn=$ss->start;
+	$datum_ende=$ss->ende;
 	$ts_beginn=$datum_obj->mktime_fromdate($datum_beginn);
 	$ts_ende=$datum_obj->mktime_fromdate($datum_ende);
 
 	// Lektoren holen
 	$ma=new mitarbeiter($conn);
-	//if (!is_null($funktion))
-	//	$mitarbeiter=$ma->getMitarbeiterStg(true,null,$stge,$funktion);
-	//else
-		$mitarbeiter=$ma->getMitarbeiter(null,true);//($lektor,$fix);
+	if(!is_null($institut))
+	{
+		$mitarbeiter = $ma->getMitarbeiterInstitut($institut);	
+	}
+	else 
+	{
+		//if (!is_null($funktion))
+		//	$mitarbeiter=$ma->getMitarbeiterStg(true,null,$stge,$funktion);
+		//else
+			$mitarbeiter=$ma->getMitarbeiter(null,true);//($lektor,$fix);
+	}
 
 //EXPORT
 	header("Content-type: application/vnd.ms-excel");

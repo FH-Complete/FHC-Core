@@ -31,6 +31,7 @@
 	require_once('../../../include/studiensemester.class.php');
 	require_once('../../../include/zeitsperre.class.php');
 	require_once('../../../include/datum.class.php');
+	require_once('../../../include/fachbereich.class.php');
 
 	$uid = get_uid();
 
@@ -51,6 +52,11 @@
 	else
 		$funktion=null;
 
+	if(isset($_GET['institut']))
+		$institut = $_GET['institut'];
+	else 
+		$institut = null;
+	
 	$stge=array();
 	if(isset($_GET['stg_kz']))
 	{
@@ -65,10 +71,15 @@
 
 	// Link fuer den Export
 	$export_link='zeitsperre_export.php?';
-	if ($fix==true)
-		$export_link.='fix=true';
-		//&lektor=$lektor&funktion=$funktion";
-
+	
+	if(!is_null($institut))
+		$export_link.="institut=$institut";
+	else 
+	{
+		if ($fix==true)
+			$export_link.='fix=true';
+			//&lektor=$lektor&funktion=$funktion";
+	}
 
 
 	if (!$conn = pg_pconnect(CONN_STRING))
@@ -91,11 +102,18 @@
 
 	// Lektoren holen
 	$ma=new mitarbeiter($conn);
-	if (is_null($funktion))
-		$mitarbeiter=$ma->getMitarbeiter($lektor,$fix);
-	else
-		$mitarbeiter=$ma->getMitarbeiterStg(true,null,$stge,$funktion);
-
+	
+	if(!is_null($institut))
+	{
+		$mitarbeiter = $ma->getMitarbeiterInstitut($institut);
+	}
+	else 
+	{
+		if (is_null($funktion))
+			$mitarbeiter=$ma->getMitarbeiter($lektor,$fix);
+		else
+			$mitarbeiter=$ma->getMitarbeiterStg(true,null,$stge,$funktion);
+	}
 
 ?>
 
@@ -119,6 +137,30 @@
 	</H2>
 
 	<H3>Zeitsperren von <?php echo $datum_beginn.' bis '.$datum_ende; ?></H3>
+	<?php
+		if(isset($_GET['institut']))
+		{
+			echo '<br>';
+			echo '<FORM action="'.$_SERVER['PHP_SELF'].'" method="GET">Institut: <SELECT name="institut">';
+			$fachbereich = new fachbereich($conn);
+			$fachbereich->getAll();
+			echo "<option value='' ".(is_null($institut)?'selected':'').">-- Auswahl --</option>";
+			foreach ($fachbereich->result as $fb)
+			{
+				if($fb->aktiv)
+				{
+					if($fb->fachbereich_kurzbz==$institut)
+						$selected='selected';
+					else 
+						$selected='';
+					
+					echo "<option value='$fb->fachbereich_kurzbz' $selected>$fb->bezeichnung</option>";
+				}
+			}
+			echo '</SELECT><input type="submit" value="Anzeigen"></FORM>';
+			echo '<br>';		
+		}
+	?>
 	<a class="Item" href="<?php echo $export_link; ?>">Excel</a>
 	<TABLE id="zeitsperren">
     <TR>
