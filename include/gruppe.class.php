@@ -340,7 +340,7 @@ class gruppe
 	// * angelegt, ansonsten der Datensatz upgedated
 	// * @return true wenn erfolgreich, false im Fehlerfall
 	// ************************************************************
-	function save($new=null)
+	function save($new=null, $upper=true)
 	{
 		if(is_null($new))
 			$new = $this->new;
@@ -351,10 +351,15 @@ class gruppe
 
 		if($new)
 		{
+			if ($upper)			
+				$kurzbz = strtoupper($this->gruppe_kurzbz);
+			else
+				$kurzbz = $this->gruppe_kurzbz;
+			
 			$qry = 'INSERT INTO public.tbl_gruppe (gruppe_kurzbz, studiengang_kz, bezeichnung, semester, sort,
 			                                mailgrp, beschreibung, sichtbar, generiert, aktiv, lehre,
 			                                updateamum, updatevon, insertamum, insertvon)
-			        VALUES('.$this->addslashes(strtoupper($this->gruppe_kurzbz)).','.
+			        VALUES('.$this->addslashes($kurzbz).','.
 					$this->addslashes($this->studiengang_kz).','.
 					$this->addslashes($this->bezeichnung).','.
 					$this->addslashes($this->semester).','.
