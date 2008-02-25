@@ -33,7 +33,12 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <script language="JavaScript">
-
+function replicateKurzbz()
+{
+	var kurzbz = document.copygroup.gruppe_kurzbz_copy.value;
+	document.copygroup.bezeichnung_copy.value = kurzbz;
+	document.copygroup.beschreibung_copy.value = kurzbz;
+}
 </script>
 
 </head>
@@ -191,6 +196,64 @@ if($type=='neu')
 		}
 	}
 }
+
+// kopieren einer Spez-Gruppe
+if($type=='copy')
+{
+	if(!$admin)
+		die('Sie haben keine Berechtigung zum Speichern');
+	
+	if(isset($_POST['copynew']))
+	{
+		//neue Spezialgruppe anlegen
+
+		$bezeichnung = $_POST['bezeichnung_copy'];
+
+		$gruppe_kurzbz = $_POST["gruppe_kurzbz_copy"];		
+		$beschreibung = $_POST['beschreibung_copy'];
+		$sichtbar = isset($_POST['sichtbar_copy']);
+		$lehre = isset($_POST['sichtbar_copy']);
+		$aktiv = isset($_POST['aktiv_copy']);
+		$sort = $_POST['sort_copy'];
+		$mailgrp = isset($_POST['mailgrp_copy']);
+		$generiert = isset($_POST['generiert_copy']);
+		
+		$gruppe = new gruppe($conn);
+		
+		if(!$gruppe->exists($gruppe_kurzbz))
+		{
+			$gruppe->gruppe_kurzbz = $gruppe_kurzbz;
+			$gruppe->studiengang_kz = $studiengang_kz;
+			$gruppe->semester = $semester;
+			$gruppe->bezeichnung = $gruppe_kurzbz;
+			$gruppe->beschreibung = $gruppe_kurzbz;
+			$gruppe->aktiv = true;
+			$gruppe->sichtbar = true;
+			$gruppe->lehre = true;
+			$gruppe->sort = '';
+			$gruppe->mailgrp = true;
+			$gruppe->generiert = false;
+			$gruppe->insertamum = date('Y-m-d H:i:s');
+			$gruppe->insertvon = $user;
+			
+			if($gruppe->save(true,false))
+			{
+				echo "Gruppe wurde angelegt";
+			}
+			else 
+			{
+				echo "<span class='error'>Fehler beim anlegen der Gruppe:$gruppe->errormsg</span>";
+			}
+		}
+		else 
+		{
+			echo "<span class='error'>Diese Gruppe Existiert bereits: $gruppe_kurzbz</span>";
+		}			
+	}
+}
+
+
+
 
 //Aenderung des Aktiv Status
 if($aktiv!='')
@@ -509,6 +572,65 @@ if($type=='edit')
 				  	</tr>
 				  </table>			
 				  </form>";
+				  
+			if($admin)
+			{
+			echo "Als neue Gruppe speichern<br><br>";
+			echo "<form name='copygroup' action='".$_SERVER['PHP_SELF']."?type=copy&studiengang_kz=$studiengang_kz&semester=$semester' method='POST'>
+				  <table>
+				  <tr>
+				  		<td>Kurzbz:</td>
+				  		<td><input type='text' name='gruppe_kurzbz_copy' size='30' maxlength='128' value='$gruppe->gruppe_kurzbz' onkeyup='replicateKurzbz();'/></td>
+				  	</tr>
+				  	<tr>
+				  		<td>Bezeichnung:</td>
+				  		<td><input type='text' name='bezeichnung_copy' size='30' maxlength='32' value='$gruppe->bezeichnung'/></td>
+				  	</tr>";
+
+			echo "
+				  	<tr>
+				  		<td>Beschreibung:</td>
+				  		<td><input type='text' name='beschreibung_copy' size='30' maxlength='128' value='$gruppe->beschreibung'/></td>
+				  	</tr>
+				  	<tr>
+				  		<td>Sichtbar:</td>
+				  		<td><input type='checkbox' name='sichtbar_copy' ".($gruppe->sichtbar?'checked':'')." /></td>
+				  	</tr>
+				  	<tr>
+				  		<td>Lehre:</td>
+				  		<td><input type='checkbox' name='lehre_copy' ".($gruppe->lehre?'checked':'')." /></td>
+				  	</tr>
+				  	<tr>
+				  		<td>Aktiv:</td>
+				  		<td><input type='checkbox' name='aktiv_copy' ".($gruppe->aktiv?'checked':'')." /></td>
+				  	</tr>				  	
+				  	<tr>
+				  		<td>Sort:</td>
+				  		<td><input type='text' name='sort_copy' size='2' maxlength='2' value='$gruppe->sort' /></td>
+				  	</tr>
+					<tr>
+				  		<td>Mailgrp:</td>
+				  		<td><input type='checkbox' name='mailgrp_copy' ".($gruppe->mailgrp?'checked':'')." /></td>
+				  	</tr>
+				  	<tr>
+				  		<td>Generiert:</td>
+				  		<td><input type='checkbox' name='generiert_copy' ".($gruppe->generiert?'checked':'')." /></td>
+				  	</tr>";
+			
+			echo "
+				  	<tr>
+				  		<td>&nbsp;</td>
+				  		<td>&nbsp;</td>
+				  	</tr>
+				  	<tr>
+				  		<td></td>
+				  		<td><input type='submit' name='copynew' value='Speichern' /></td>
+				  	</tr>
+				  </table>			
+				  </form>";				  
+			  
+			}  
+			
 			echo '</div>';
 		}
 	}
