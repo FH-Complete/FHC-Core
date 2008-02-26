@@ -44,7 +44,7 @@ $stsem_obj = new studiensemester($conn);
 if (isset($_REQUEST["stsem"]))
 	$stsem = $_REQUEST["stsem"];
 else
-	$stsem = $stsem_obj->getakt();
+	$stsem = $stsem_obj->getPrevious();
 
 if (isset($_REQUEST["lvid"]))
 	$lvid = $_REQUEST["lvid"];
@@ -276,7 +276,7 @@ function checkSubmit()
 	echo "</select>";
 	
 	echo "<select name='stsem_neu' onchange='document.auswahl.submit();'>";;
-	$stsem_obj->getAll();	
+	//$stsem_obj->getAll();	
 
 	foreach($stsem_obj->studiensemester AS $strow)
 	{
