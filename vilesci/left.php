@@ -324,6 +324,10 @@ if ($berechtigung->isBerechtigt('admin'))
 		  	</tr>
 		  	<tr>
 		  		<td width="10" nowrap>&nbsp;</td>
+				<td nowrap><a class="MenuItem2" href="lehre/freifach_studentenvorrueckung.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Studierende vorr&uuml;cken</a></td>
+		  	</tr>
+		  	<tr>
+		  		<td width="10" nowrap>&nbsp;</td>
 				<td nowrap><a class="MenuItem2" href="lehre/freifach_lektoren.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;LektorInnen</a></td>
 		  	</tr>
 		 	</table>
