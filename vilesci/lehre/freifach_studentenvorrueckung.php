@@ -87,13 +87,13 @@ if (isset($_REQUEST["move"]) && $gruppe != "" && $_REQUEST["move"]== "=>" && $gr
 	{
 		
 		foreach ($b->uids as $u)
-		{
+		{			
 				$bg = new benutzergruppe($conn);
 				$bg->uid = $u->uid;
 				$bg->gruppe_kurzbz = $gruppe_neu;
 				$bg->updateamum = null;
 				$bg->updatevon=null;
-				$bg->insertamum = null;
+				$bg->insertamum = date('Y-m-d H:i:s');
 				$bg->insertvon = $user;
 				$bg->studiensemester_kurzbz = $stsem_neu;
 				$bg->new = 1;
