@@ -261,7 +261,7 @@
 
 				<fo:block-container position="absolute" top="460pt" left="432pt" height="0pt">
 				<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt">
-						Datum
+						<!--Datum-->
 
 				</fo:block>
 				</fo:block-container>
@@ -305,7 +305,7 @@
 
 				<fo:block-container position="absolute" top="475pt" left="432pt" height="0pt">
 				<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt">
-						<xsl:value-of select="datum" />
+						<!--<xsl:value-of select="datum" />-->
 
 				</fo:block>
 				</fo:block-container>
