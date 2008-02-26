@@ -71,9 +71,12 @@ $qry_stg = "SELECT distinct studiengang_kz
 					tbl_projektbetreuer.projektarbeit_id=tbl_projektarbeit.projektarbeit_id AND
 					tbl_projektarbeit.lehreinheit_id = tbl_lehreinheit.lehreinheit_id AND
 					tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
-				) as foo
+				) as foo WHERE studiengang_kz<10000
 				";
 $liste_gesamt = array();
+
+$gesamt =& $workbook->addWorksheet('Gesamt');
+$gesamtsheet_row=1;
 
 if($result_stg = pg_query($conn, $qry_stg))
 {
@@ -108,15 +111,25 @@ if($result_stg = pg_query($conn, $qry_stg))
 		$format_normal = & $workbook->addFormat();
 
 		$i=0;
+		$gesamtsheet_row++;
 		$worksheet->write(0,0,'Erstellt am '.date('d.m.Y').' '.$semester_aktuell.' '.$studiengang->kuerzel, $format_bold);
+		$gesamt->write($gesamtsheet_row,0,'Erstellt am '.date('d.m.Y').' '.$semester_aktuell.' '.$studiengang->kuerzel, $format_bold);
+		$gesamtsheet_row+=2;
 		//Ueberschriften
 		$worksheet->write(2,$i,"Studiengang", $format_bold);
+		$gesamt->write($gesamtsheet_row,$i,"Studiengang", $format_bold);
 		$worksheet->write(2,++$i,"Personalnr", $format_bold);
+		$gesamt->write($gesamtsheet_row,$i,"Personalnr", $format_bold);
 		$worksheet->write(2,++$i,"Titel", $format_bold);
+		$gesamt->write($gesamtsheet_row,$i,"Titel", $format_bold);
 		$worksheet->write(2,++$i,"Vorname", $format_bold);
+		$gesamt->write($gesamtsheet_row,$i,"Vorname", $format_bold);
 		$worksheet->write(2,++$i,"Familienname", $format_bold);
+		$gesamt->write($gesamtsheet_row,$i,"Familienname", $format_bold);
 		$worksheet->write(2,++$i,"Stunden", $format_bold);
+		$gesamt->write($gesamtsheet_row,$i,"Stunden", $format_bold);
 		$worksheet->write(2,++$i,"Kosten", $format_bold);
+		$gesamt->write($gesamtsheet_row,$i,"Kosten", $format_bold);
 
 		//Daten holen
 		$qry = "SELECT
@@ -144,7 +157,7 @@ if($result_stg = pg_query($conn, $qry_stg))
 			$zeile=3;
 			$gesamtkosten = 0;
 			$liste=array();
-
+			$gesamtsheet_row++;
 			while($row=pg_fetch_object($result))
 			{
 				//Gesamtstunden und Kosten ermitteln
@@ -263,22 +276,30 @@ if($result_stg = pg_query($conn, $qry_stg))
 				}
 				//Studiengang
 				$worksheet->write($zeile,$i,$studiengang->kuerzel, $format);
+				$gesamt->write($gesamtsheet_row,$i,$studiengang->kuerzel, $format);
 				//Personalnummer
 				$worksheet->write($zeile,++$i,$row['personalnummer'], $format);
+				$gesamt->write($gesamtsheet_row,$i,$row['personalnummer'], $format);
 				//Titel
 				$worksheet->write($zeile,++$i,$row['titelpre'], $format);
+				$gesamt->write($gesamtsheet_row,$i,$row['titelpre'], $format);
 				//Vorname
 				$worksheet->write($zeile,++$i,$row['vorname'], $format);
+				$gesamt->write($gesamtsheet_row,$i,$row['vorname'], $format);
 				//Nachname
 				$worksheet->write($zeile,++$i,$row['nachname'], $format);
+				$gesamt->write($gesamtsheet_row,$i,$row['nachname'], $format);
 				//Stunden
 				$worksheet->write($zeile,++$i,$row['gesamtstunden'], $format);
+				$gesamt->write($gesamtsheet_row,$i,$row['gesamtstunden'], $format);
 				//Kosten
 				$worksheet->writeNumber($zeile,++$i,$row['gesamtkosten'], $formatnb);
+				$gesamt->writeNumber($gesamtsheet_row,$i,$row['gesamtkosten'], $formatnb);
 
 				//Kosten zu den Gesamtkosten hinzurechnen
 				$gesamtkosten = $gesamtkosten + $row['gesamtkosten'];
 				$zeile++;
+				$gesamtsheet_row++;
 				
 				$liste_gesamt[$uid]['personalnummer']=$row['personalnummer'];
 				$liste_gesamt[$uid]['titelpre']=$row['titelpre'];
@@ -297,9 +318,11 @@ if($result_stg = pg_query($conn, $qry_stg))
 
 			//Gesamtkosten anzeigen
 			$worksheet->writeNumber($zeile,6,$gesamtkosten, $format_number_bold);
+			$gesamt->writeNumber($gesamtsheet_row,6,$gesamtkosten, $format_number_bold);
 		}
 	}
 	
+	/*
 	// Gesamtliste ueber alle Studiengaenge
 	$worksheet =& $workbook->addWorksheet('Gesamt');
 	$i=0;
@@ -361,7 +384,7 @@ if($result_stg = pg_query($conn, $qry_stg))
 
 	//Gesamtkosten anzeigen
 	$worksheet->writeNumber($zeile,6,$gesamtkosten, $format_number_bold);
-
+	*/
 	$workbook->close();
 
 	//Mail versenden mit Excel File im Anhang
