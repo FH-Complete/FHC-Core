@@ -234,7 +234,7 @@ function js_toggle_container(conid)
 				<?php
 
 					$stg_obj=new studiengang($sql_conn,$course_id);
-
+					$short = $stg_obj->kuerzel;
 				    $max = $stg_obj->max_semester;
 
 				    if($term_id>$max)
@@ -373,6 +373,28 @@ function js_toggle_container(conid)
 		<tr>
           <td class="tdwrap"><a class="MenuItem" href="pinboard.php?course_id=<?php echo $course_id; ?>&term_id=<?php echo $term_id; ?>" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Pinboard</a></td>
   		</tr>
+  		<tr>
+  			<td class="tdwrap">
+  		<?php
+                	$path = '../../../documents/'.strtolower($short).'/download';
+					if(!$dest_dir = is_dir($path))
+					{
+
+						if(!is_dir($path))
+						{
+							if(!is_dir('../../../documents/'.strtolower($short)))
+								exec('mkdir -m 775 "../../../documents/'.strtolower($short).'"');
+							exec('mkdir -m 775 "../../../documents/'.strtolower($short).'/download"');
+							exec('sudo chgrp teacher ../../../documents/'.strtolower($short).'/download');
+						}
+
+					}
+					$dest_dir = @dir($path);
+					echo '<a href="'.$dest_dir->path.'/" class="MenuItem" target="_blank"><img src="../../../skin/images/seperator.gif">&nbsp;Allgemeiner Download</a>';
+
+				?>
+			</td>
+		
 		<tr>
           <td class="tdwrap"><a href="?Info &amp; Kommunikation" class="MenuItem" onClick="return(js_toggle_container('Info &amp; Kommunikation'));"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Info &amp; Kommunikation</a></td>
   		</tr>
