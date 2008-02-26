@@ -495,7 +495,7 @@ class wochenplan
 		$datum_res_lektor_ende=$o_datum->mktime_fromdate(RES_TAGE_LEKTOR_BIS); //jump_day($datum_now,RES_TAGE_LEKTOR_MAX);
 		if (!date("w",$this->datum))
 			$this->datum=jump_day($this->datum,1);
-		$datum=$this->datum;
+		$datum=$datum_mon=$this->datum;
 		for ($i=1; $i<7; $i++)
 		{
 	  		echo '		<tr><td>'.date("l",$datum).'<br>'.date("j. M y",$datum).'<br></td>'.$this->crlf; //.strftime("%A %d %B %Y",$this->datum)
@@ -638,7 +638,7 @@ class wochenplan
 			$datum=jump_day($datum, 1);
 		}
 		echo '	</table>'.$this->crlf;
-		if ($this->user=='lektor' && $this->type=='ort' && ($datum>=$datum_now && $datum>=$datum_res_lektor_start && $datum<=$datum_res_lektor_ende))
+		if ($this->user=='lektor' && $this->type=='ort' && ($datum>=$datum_now && $datum>=$datum_res_lektor_start && $datum_mon<=$datum_res_lektor_ende))
 		{
 				echo '	<br />Titel: <input type="text" name="titel" size="10" maxlength="10" /> '.$this->crlf;
 				echo '	Beschreibung: <input type="text" name="beschreibung" size="20" maxlength="20" /> '.$this->crlf;
