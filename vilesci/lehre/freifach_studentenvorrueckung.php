@@ -64,49 +64,45 @@ else
 if(!is_numeric($stg_kz))
 	$stg_kz=0;
 
+if (isset($_REQUEST["stsem_neu"]))
+	$stsem_neu = $_REQUEST["stsem_neu"];
+else
+	$stsem_neu = $stsem_obj->getakt();
+
+if (isset($_REQUEST["gruppe_neu"]))
+	$gruppe_neu = $_REQUEST["gruppe_neu"];
+else
+	$gruppe_neu = "";
+
+if (isset($_REQUEST["semester_neu"]))
+	$semester_neu = $_REQUEST["semester_neu"];
+else
+	$semester_neu = 1;
 
 
-
-if (isset($_REQUEST["grp_in"]) && $gruppe != "")
+if (isset($_REQUEST["move"]) && $gruppe != "" && $_REQUEST["move"]== "=>" && $gruppe_neu!="")
 {
-	$b = new benutzerlvstudiensemester($conn);
-	if ($b->get_all_uids($stsem, $lvid))
+	$b = new benutzergruppe($conn);
+	if ($b->load_uids($gruppe, $stsem))
 	{
 		
 		foreach ($b->uids as $u)
 		{
-			if (isset($_REQUEST["anmeldung_".$u->uid]))
-			{
 				$bg = new benutzergruppe($conn);
 				$bg->uid = $u->uid;
-				$bg->gruppe_kurzbz = $gruppe;
+				$bg->gruppe_kurzbz = $gruppe_neu;
 				$bg->updateamum = null;
 				$bg->updatevon=null;
 				$bg->insertamum = null;
 				$bg->insertvon = $user;
-				$bg->studiensemester_kurzbz = $stsem;
+				$bg->studiensemester_kurzbz = $stsem_neu;
 				$bg->new = 1;
 				$bg->save(1);
-			}
 		}
 	}
 }
 
-if ($gruppe != "" && isset($_REQUEST["grp_aus"]))
-	{
-		$gu = new benutzergruppe($conn);
-		if ($gu->load_uids($gruppe, $stsem))
-		{
-			foreach ($gu->uids as $uidliste)
-			{
-				if (isset($_REQUEST["gruppe_".$uidliste->uid]))
-				{
-					$bg = new benutzergruppe($conn);
-					$bg->delete($uidliste->uid, $gruppe);
-				}
-			}
-		}
-	}
+
 
 $spezgrp = array();
 $spezgrpstr = "";
@@ -118,8 +114,24 @@ if ($gruppe != "")
 		foreach ($gu->uids as $uidliste)
 		{
 			$spezgrp[] = $uidliste->uid;
-			$spezgrpstr .= "<br><input type='checkbox' name='gruppe_".$uidliste->uid."'>".$uidliste->uid;
-			//echo "<br>".$u->uid;
+			//$spezgrpstr .= "<br><input type='checkbox' name='gruppe_".$uidliste->uid."'>".$uidliste->uid;
+			$spezgrpstr .= "<br>".$uidliste->uid;
+		}
+	}
+}
+
+$spezgrp_neu = array();
+$spezgrpstr_neu = "";
+if ($gruppe_neu != "")
+{
+	$gu = new benutzergruppe($conn);
+	if ($gu->load_uids($gruppe_neu, $stsem_neu))
+	{
+		foreach ($gu->uids as $uidliste)
+		{
+			$spezgrp_neu[] = $uidliste->uid;
+			//$spezgrpstr_neu .= "<br><input type='checkbox' name='gruppe_".$uidliste->uid."'>".$uidliste->uid;
+			$spezgrpstr_neu .= "<br>".$uidliste->uid;
 		}
 	}
 }//(uid, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, studiensemester_kurzbz)
@@ -134,6 +146,11 @@ if ($gruppe != "")
 <link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 <script  type="text/javascript">
+
+var count_neu = "<?php echo $spezgrpstr_neu; ?>";
+var gruppe = "<?php echo $gruppe; ?>";
+var gruppe_neu = "<?php echo $gruppe_neu; ?>";
+
 function selectAll()
 {
 	var a = document.getElementById("anmeldungen");
@@ -148,36 +165,38 @@ function selectAll()
 	}
 }
 
+function checkSubmit()
+{
+	if (count_neu != "")
+	{
+		alert("target group not empty!");		
+		return false;
+	}	
+	if (gruppe == gruppe_neu)
+	{
+		alert("insert in same group not possible!");
+		return false;	
+	}
+	if ((gruppe == "") || (gruppe_neu == ""))
+	{
+		alert("please choose group!");
+		return false;	
+	}
+	else
+		return true;
+}
+
 </script>
 </head>
 <body class="Background_main">
 <?php
 	
 	echo "<H2>Freif&auml;cher Teilnehmer-Verwaltung</H2>";
-	echo "<form name='auswahl' method='POST' action='freifach.php'>";
+	echo "<form name='auswahl' method='POST' action='freifach_studentenvorrueckung.php' onSubmit='return checkSubmit();'>";
 	echo "<table>";
-	echo "<tr><td><b>Freif&auml;cher</b></td><td><b>Gruppen</b></td></tr>";	
+	echo "<tr><td colspan='3'><b>Studenten in andere Gruppen kopieren</b></td></tr>";	
 	echo "<tr>";
 	echo "<td>";
-	echo "<select name='lvid' onchange='document.auswahl.submit();'>";
-	echo "<option></option>";
-	$lv_obj = new lehrveranstaltung($conn);
-	if(!$lv_obj->load_lva('0',null, null, true,null,'bezeichnung'))
-		echo "$lv_obj->errormsg";
-
-	foreach($lv_obj->lehrveranstaltungen AS $row)
-	{
-		if ($lvid == $row->lehrveranstaltung_id)
-			$sel = " selected";
-		else
-			$sel = "";
-		echo "	 <option value='".$row->lehrveranstaltung_id."'".$sel.">".$row->kurzbz." - ".$row->bezeichnung."</option>";
-
-	}
-	echo "</select>";
-	
-	
-	echo "</td><td>";	
 	
 	echo "<select name='semester' onchange='document.auswahl.submit();'>";
 	for ($i=0; $i<=10; $i++)
@@ -220,61 +239,72 @@ function selectAll()
 
 	}
 	echo "</select>";
-	echo "</td></tr>";
-	echo "<tr>";
-	echo "<td valign='top' id='anmeldungen'>";
+	echo "</td>";
+
+	echo "<td>";
+	echo "<input type='submit' name='move' value='=>'>";
+	echo "</td>";
+
+	echo "<td>";
 	
-	
-	$anz = 0;
-	if ($lvid > 0)
-	{		
-		$b = new benutzerlvstudiensemester($conn);
-		if ($b->get_all_uids($stsem, $lvid))
-		{
-			
-			foreach ($b->uids as $u)
-			{
-				if (in_array($u->uid, $spezgrp))
-					echo "<br><input type='checkbox' disabled>".$u->uid." - ".$u->nachname." ".$u->vorname;				
-				else				
-					echo "<br><input type='checkbox' name='anmeldung_".$u->uid."'>".$u->uid." - ".$u->nachname." ".$u->vorname;
-				$anz++;
-							
-				//echo "<br>".$u->uid;
-			}
-		}
+	echo "<select name='semester_neu' onchange='document.auswahl.submit();'>";
+	for ($i=0; $i<=10; $i++)
+	{
+		if ($semester_neu == $i)
+			$sel = " selected";
+		else
+			$sel = "";		
+		echo "<option value='".$i."'".$sel.">".$i."</option>";
 	}
-	if ($anz > 0)
-	{	
-		
-		echo "<br><hr><input type='checkbox' onclick='selectAll();' name='toggle'>de/select all *** Angemeldet: <b>".$anz."</b> Studierende ***";
-		
-	}	
-	echo "</td><td valign='top'>";
+	echo "</select>";	
+	
+	echo "<select name='gruppe_neu' onchange='document.auswahl.submit();'>";
+	echo "<option></option>";
+	$grp_obj = new gruppe($conn);
+	if(!$grp_obj->getgruppe('0',$semester_neu,null,'true'))
+		echo "$lv_obj->errormsg";
+
+	foreach($grp_obj->result AS $row)
+	{
+		if ($gruppe_neu == $row->gruppe_kurzbz)
+			$sel = " selected";
+		else
+			$sel = "";
+		echo "	 <option value='".$row->gruppe_kurzbz."'".$sel.">".$row->gruppe_kurzbz."</option>";
+
+	}
+	echo "</select>";
+	
+	echo "<select name='stsem_neu' onchange='document.auswahl.submit();'>";;
+	$stsem_obj->getAll();	
+
+	foreach($stsem_obj->studiensemester AS $strow)
+	{
+		if ($stsem_neu == $strow->studiensemester_kurzbz)
+			$sel = " selected";
+		else
+			$sel = "";
+		echo "	 <option value='".$strow->studiensemester_kurzbz."'".$sel.">".$strow->studiensemester_kurzbz."</option>";
+
+	}
+	echo "</select>";
+	echo "</td>";	
+	
+	echo "</tr>";
+	echo "<tr><td>";
 	
 	if ($gruppe != "")
 	{
-		/*		
-		$gu = new benutzergruppe($conn);
-		if ($gu->load_uids($gruppe, $stsem))
-		{
-			foreach ($gu->uids as $uidliste)
-			{
-				echo "<br><input type='checkbox' name='gruppe_".$uidliste->uid."'>".$uidliste->uid;
-				//echo "<br>".$u->uid;
-			}
-		}
-		*/
 		echo $spezgrpstr;
-	}	
+	}
+	echo "</td><td></td><td>";
 	
-	echo "</td></tr>";
-	echo "<tr><td>";
-	echo "<br><input type='submit' name='grp_in' value='Auswahl in Gruppe einf&uuml;gen =>'>";
-	echo "</td><td>";
-	echo "<br><input type='submit' name='grp_aus' value=' <= Auswahl aus Gruppe l&ouml;schen'>";
-	echo "</td></tr>";
-	echo "</table>";
+	if ($gruppe_neu != "")
+	{
+		echo $spezgrpstr_neu;
+	}	
+	echo "</td>";
+	echo "</tr></table>";
 	echo "</form>";
 ?>
 
