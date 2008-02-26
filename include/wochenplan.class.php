@@ -21,6 +21,7 @@
 require_once('lehrstunde.class.php');
 require_once('ferien.class.php');
 require_once('benutzerberechtigung.class.php');
+require_once('datum.class.php');
 
 class wochenplan
 {
@@ -462,6 +463,7 @@ class wochenplan
 	 */
 	function draw_week($user_uid='')
 	{
+		$o_datum=new datum();
 		// Stundentafel abfragen
 		$sql_query="SELECT stunde, beginn, ende FROM lehre.tbl_stunde ORDER BY stunde";
 		if(!$result_stunde=pg_exec($this->conn, $sql_query))
@@ -489,8 +491,8 @@ class wochenplan
 		echo '		</tr>'.$this->crlf;
 		// Von Montag bis Samstag
 		$datum_now=mktime();
-		$datum_res_lektor_start=jump_day($datum_now,RES_TAGE_LEKTOR_MIN);
-		$datum_res_lektor_ende=jump_day($datum_now,RES_TAGE_LEKTOR_MAX);
+		$datum_res_lektor_start=jump_day($datum_now,(RES_TAGE_LEKTOR_MIN)-1);
+		$datum_res_lektor_ende=$o_datum->mktime_fromdate(RES_TAGE_LEKTOR_BIS); //jump_day($datum_now,RES_TAGE_LEKTOR_MAX);
 		if (!date("w",$this->datum))
 			$this->datum=jump_day($this->datum,1);
 		$datum=$this->datum;
@@ -627,7 +629,7 @@ class wochenplan
 				else
 				{
 					echo '				<td align="center"><br>';
-					if ($this->user=='lektor' && $this->type=='ort' && ($datum>$datum_res_lektor_start && $datum<=$datum_res_lektor_ende))
+					if ($this->user=='lektor' && $this->type=='ort' && ($datum>=$datum_res_lektor_start && $datum<=$datum_res_lektor_ende))
 						echo '<INPUT type="checkbox" name="reserve'.$i.'_'.$j.'" value="'.date("Y-m-d",$datum).'">'; //&& $datum>=$datum_now
 					echo '</td>'.$this->crlf;
 				}
@@ -636,7 +638,7 @@ class wochenplan
 			$datum=jump_day($datum, 1);
 		}
 		echo '	</table>'.$this->crlf;
-		if ($this->user=='lektor' && $this->type=='ort' && ($datum>=$datum_now && $datum>$datum_res_lektor_start && $datum<=$datum_res_lektor_ende))
+		if ($this->user=='lektor' && $this->type=='ort' && ($datum>=$datum_now && $datum>=$datum_res_lektor_start && $datum<=$datum_res_lektor_ende))
 		{
 				echo '	<br />Titel: <input type="text" name="titel" size="10" maxlength="10" /> '.$this->crlf;
 				echo '	Beschreibung: <input type="text" name="beschreibung" size="20" maxlength="20" /> '.$this->crlf;
