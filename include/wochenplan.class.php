@@ -840,7 +840,7 @@ class wochenplan
 									$lvb=$lehrstunde->gruppe_kurzbz;
 								$lehrverband[]=$lvb;
 								// Lehrfach
-								$lf=$lehrstunde->lehrfach;
+								$lf=htmlspecialchars($lehrstunde->lehrfach);
 								if (isset($lehrstunde->lehrform))
 									$lf.='-'.$lehrstunde->lehrform;
 								$lehrfach[]=$lf;
@@ -851,8 +851,8 @@ class wochenplan
 								$paramList.='&amp;stundenplan_id'.$z++.'='.$lehrstunde->stundenplan_id;
 								if(isset($lehrstunde->farbe))
 									$farbe=$lehrstunde->farbe;
-								$titel=$lehrstunde->titel;
-								$anmerkung=$lehrstunde->anmerkung;
+								$titel=htmlspecialchars($lehrstunde->titel);
+								$anmerkung=htmlspecialchars($lehrstunde->anmerkung);
 							}
 
 						// Lektoren
