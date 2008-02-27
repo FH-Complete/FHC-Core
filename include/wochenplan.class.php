@@ -90,7 +90,7 @@ class wochenplan
 	{
 		//Stundenplan Array initialisieren (Anzahl auf 0 setzten)
 		unset($this->std_plan);
-		for ($i=1; $i<7; $i++)
+		for ($i=1; $i<=TAGE_PRO_WOCHE; $i++)
 			for ($j=0; $j<20; $j++)
 			{
 				$this->std_plan[$i][$j][0]->anz=0;
@@ -293,6 +293,8 @@ class wochenplan
 			$month=substr($this->wochenplan->lehrstunden[$i]->datum, 5,2);
 			$jahr=substr($this->wochenplan->lehrstunden[$i]->datum, 0,4);
 			$tag=date("w",mktime(12,0,0,$month,$mtag,$jahr));
+			if ($tag==0)
+				$tag=7; //Sonntag
 			//echo $tag.':'.$this->wochenplan->lehrstunden[$i]->datum.'<BR>';
 			$stunde=$this->wochenplan->lehrstunden[$i]->stunde;
 			// naechste freie Stelle im Array suchen
@@ -496,7 +498,7 @@ class wochenplan
 		if (!date("w",$this->datum))
 			$this->datum=jump_day($this->datum,1);
 		$datum=$datum_mon=$this->datum;
-		for ($i=1; $i<7; $i++)
+		for ($i=1; $i<=TAGE_PRO_WOCHE; $i++)
 		{
 	  		echo '		<tr><td>'.date("l",$datum).'<br>'.date("j. M y",$datum).'<br></td>'.$this->crlf; //.strftime("%A %d %B %Y",$this->datum)
 			for ($k=0; $k<$num_rows_stunde; $k++)
@@ -730,7 +732,7 @@ class wochenplan
 			$ferien->getAll($this->stg_kz);
 		else
 			$ferien->getAll();
-		for ($i=1; $i<7; $i++)
+		for ($i=1; $i<=TAGE_PRO_WOCHE; $i++)
 		{
 			$isferien=$ferien->isferien($datum);
 			echo '<row><vbox>';
@@ -1101,7 +1103,7 @@ class wochenplan
 			$orte[]=pg_fetch_result($result,$i,"ort_kurzbz");
 
 		// Raster vorbereiten
-		for ($t=1;$t<7;$t++)
+		for ($t=1;$t<=TAGE_PRO_WOCHE;$t++)
 			for ($s=$min_stunde;$s<=$max_stunde;$s++)
 			{
 				$raster[$t][$s]->ort=array();
@@ -1144,7 +1146,7 @@ class wochenplan
 		}
 
 		// freie Plaetze in den Stundenplan eintragen.
-		for ($t=1;$t<7;$t++)
+		for ($t=1;$t<=TAGE_PRO_WOCHE;$t++)
 			for ($s=1;$s<=$max_stunde;$s++)
 				if (!$raster[$t][$s]->kollision && ($s+$block)<=($max_stunde+1))
 				{
@@ -1356,7 +1358,7 @@ class wochenplan
 		$datum_begin=$this->datum_begin;
 		$datum_end=$this->datum_end;
 		// Raster vorbereiten
-		for ($t=1;$t<7;$t++)
+		for ($t=1;$t<=TAGE_PRO_WOCHE;$t++)
 			for ($s=$min_stunde;$s<=$max_stunde;$s++)
 			{
 				$raster[$t][$s]->ort=array();
@@ -1365,7 +1367,7 @@ class wochenplan
 		do
 		{
 			// Raster vorbereiten
-			for ($t=1;$t<7;$t++)
+			for ($t=1;$t<=TAGE_PRO_WOCHE;$t++)
 				for ($s=$min_stunde;$s<=$max_stunde;$s++)
 				{
 					if (isset($raster[$t][$s]))
@@ -1429,7 +1431,7 @@ class wochenplan
 			}
 
 			// freie Plaetze in den Stundenplan eintragen.
-			for ($t=1;$t<7;$t++)
+			for ($t=1;$t<=TAGE_PRO_WOCHE;$t++)
 				for ($s=1;$s<=$max_stunde;$s++)
 					if (!$raster[$t][$s]->kollision && ($s+$block)<=($max_stunde+1))
 					{
@@ -1479,7 +1481,7 @@ class wochenplan
 		if (!date("w",$this->datum))
 			$this->datum=jump_day($this->datum,1);
 		$num_rows_stunde=pg_numrows($this->stunde);
-		for ($i=1; $i<7; $i++)
+		for ($i=1; $i<=TAGE_PRO_WOCHE; $i++)
 		{
   			for ($k=0; $k<$num_rows_stunde; $k++)
 			{
