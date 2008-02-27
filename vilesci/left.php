@@ -77,19 +77,24 @@
 	<script language="JavaScript" type="text/javascript">
 	<!--
 		function js_toggle_container(conid)
-   	{
+   		{
    		//alert(conid);
    		//var display = document.getElementById(conid).style.display;
-			if (document.getElementById(conid).style.display=='none')
-			{
-				document.getElementById(conid).style.display='block';
-				document.getElementById(conid+'_dot').innerHTML='&#8211; ';
-			}
-        	else
-        	{
-				document.getElementById(conid).style.display='none';
-				document.getElementById(conid+'_dot').innerHTML='+ ';
-			}
+   			try
+   			{
+				if (document.getElementById(conid).style.display=='none')
+				{
+					document.getElementById(conid).style.display='block';
+					//document.getElementById(conid+'_dot').innerHTML='&#8211; ';
+				}
+	        	else
+	        	{
+					document.getElementById(conid).style.display='none';
+					//document.getElementById(conid+'_dot').innerHTML='+ ';
+				}
+   			}
+   			catch(e){alert(e)}
+   			return false;
   		}
 	//-->
 	</script>
@@ -446,6 +451,10 @@ if ($berechtigung->isBerechtigt('admin'))
 			<tr>
 				<td width="10" nowrap>&nbsp;</td>
 		    	<td nowrap><a class="MenuItem2" href="personen/institutsliste.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Institute</a></td>
+			</tr>
+			<tr>
+				<td width="10" nowrap>&nbsp;</td>
+		    	<td nowrap><a class="MenuItem2" href="personen/resturlaub.php" target="main"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Urlaub</a></td>
 			</tr>
 			</table>
 		</td>
