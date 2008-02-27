@@ -31,9 +31,9 @@ function db_query($conn, $sql_query)
 // Auth: Benutzer des Webportals
 function get_uid()
 {
-	//return strtolower(trim($_SERVER['REMOTE_USER']));
+	return strtolower(trim($_SERVER['REMOTE_USER']));
 	// fuer Testzwecke
-	return 'pam';
+	//return 'pam';
 }
 
 function crlf()
@@ -287,7 +287,7 @@ function utf8_strlen($str)
 }
 
 // ****************************************************************
-// * strtoupper das auch Umlaute und andere Sonderzeichen 
+// * strtoupper das auch Umlaute und andere Sonderzeichen
 // * in Grossbuchstaben umwandelt
 // ****************************************************************
 function strtoupperFULL($str)
