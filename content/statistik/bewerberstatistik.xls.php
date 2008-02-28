@@ -102,7 +102,7 @@ loadVariables($conn, $user);
 				tbl_prestudentrolle.prestudent_id=tbl_prestudent.prestudent_id AND
 				tbl_prestudent.person_id=tbl_person.person_id AND
 				studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
-				rolle_kurzbz in('Interessent','Bewerber','Student','Abbrecher','Unterbrecher','Diplomand','Incoming', 'Praktikant') AND
+				rolle_kurzbz in('Interessent','Bewerber','Student','Abbrecher','Unterbrecher','Diplomand','Incoming', 'Praktikant', 'Abgewiesener') AND
 				studiengang_kz not in(0, 203, 10001, 10002)
 			ORDER BY nachname, vorname, tbl_prestudentrolle.datum, tbl_prestudentrolle.insertamum, tbl_prestudentrolle.ext_id";
 	//'Outgoing',
@@ -219,6 +219,7 @@ loadVariables($conn, $user);
 				case 'Incoming': $kuerzel='s'; break;
 				//case 'Outgoing': $kuerzel='s'; break;
 				case 'Praktikant': $kuerzel='s'; break;
+				case 'Abgewiesener': $kuerzel='x'; break;
 				default: $kuerzel=''; break;
 			}
 			if(isset($rollen[$row->studiengang_kz]))

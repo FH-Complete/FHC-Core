@@ -134,8 +134,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		}
 		*/
 		
-		//if($bezeichnung=='')
-		$bezeichnung = $row->semester.'. Semester';
+		if($row->semester!=0)
+			$bezeichnung = $row->semester.'. Semester';
+		else 
+			$bezeichnung = '';
 			
 		$xml .= "\n	<zeugnis>";
 		$xml .= "		<studiensemester>".$row->sembezeichnung."</studiensemester>";
