@@ -385,7 +385,8 @@ function InteressentDokumenteFilter()
 	var stsem=tree.view.getCellText(tree.currentIndex,col);
 	if(typ=='')
 		typ='student';
-	stsem = getStudiensemester();
+	if(stsem=='')
+		stsem = getStudiensemester();
 	url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ="+typ+"&filter2=dokumente&"+gettimestamp();
 	var treeStudent=document.getElementById('student-tree');
 
