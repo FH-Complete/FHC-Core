@@ -124,8 +124,12 @@ var LeDetailLehrfachSinkObserver =
 				found=false;
 			   	for(i in items)
 				{
-					//Richtigen eintrag suchen
-					if(items[i].label==LeDetailLehrfach_label)
+					//Vom Label des DropDowns den Fachbereich abschneiden
+					//der dahinter in Klammer steht
+					lflabel = items[i].label.substr(0, items[i].label.lastIndexOf('(')).trim();
+					
+					//Richtigen Eintrag suchen
+					if(lflabel==LeDetailLehrfach_label)
 					{
 						//Eintrag markieren
 						menulist.selectedIndex=i;

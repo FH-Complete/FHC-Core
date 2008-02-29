@@ -102,7 +102,7 @@
 
 	  	echo "</table>";
 
-	  	$qry = "SELECT *, tbl_lehreinheitgruppe.studiengang_kz FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitgruppe USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
+	  	$qry = "SELECT *, tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitgruppe USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
 	  			WHERE lehrveranstaltung_id='$lvid' AND studiensemester_kurzbz='".addslashes($stsem)."'";
 	  		  	
 	  	if($result = pg_query($conn, $qry))

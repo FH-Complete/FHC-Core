@@ -114,7 +114,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<template>
 							<menupopup>
 							<menuitem value="rdf:http://www.technikum-wien.at/lehrfach/rdf#lehrfach_id"
-						              label="rdf:http://www.technikum-wien.at/lehrfach/rdf#bezeichnung"
+						              label="rdf:http://www.technikum-wien.at/lehrfach/rdf#bezeichnung ( rdf:http://www.technikum-wien.at/lehrfach/rdf#fachbereich_kurzbz )"
 									  uri="rdf:*"/>
 							</menupopup>
 						</template>

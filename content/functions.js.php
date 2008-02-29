@@ -232,3 +232,10 @@ function getTreeCellText(tree, col, idx)
 	col = tree.columns ? tree.columns[col] : col;
 	return tree.view.getCellText(idx, col);
 }
+
+// ****
+// * Trim Member Function fuer Strings
+// ****
+String.prototype.trim = function() {
+	return this.replace(/^\s+|\s+$/g,"");
+}
