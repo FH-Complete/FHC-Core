@@ -76,6 +76,7 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
         		<LVA:planlektoren><![CDATA[]]></LVA:planlektoren>
         		<LVA:planpersonalkosten><![CDATA[]]></LVA:planpersonalkosten>
         		<LVA:plankostenprolektor><![CDATA[]]></LVA:plankostenprolektor>
+        		<LVA:lehrform_kurzbz><![CDATA[]]></LVA:lehrform_kurzbz>
       		</RDF:Description>
 		</RDF:li>';
 }
@@ -111,6 +112,7 @@ foreach ($lehrveranstaltung->lehrveranstaltungen as $row)
         		<LVA:planlektoren><![CDATA['.$row->planlektoren.']]></LVA:planlektoren>
         		<LVA:planpersonalkosten><![CDATA['.$row->planpersonalkosten.']]></LVA:planpersonalkosten>
         		<LVA:plankostenprolektor><![CDATA['.$row->plankostenprolektor.']]></LVA:plankostenprolektor>
+        		<LVA:lehrform_kurzbz><![CDATA['.$row->lehrform_kurzbz.']]></LVA:lehrform_kurzbz>
       		</RDF:Description>
 		</RDF:li>';
 }
