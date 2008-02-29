@@ -127,3 +127,158 @@ INSERT INTO tbl_lehrfunktion VALUES ('LV-Leitung', 'Lehrveranstaltungsleiter', 1
 INSERT INTO tbl_lehrfunktion VALUES ('Betreuung', 'Betreuer', 0.90);
 INSERT INTO tbl_lehrfunktion VALUES ('Lektor', 'Lektor', 1.00);
 INSERT INTO tbl_lehrfunktion VALUES ('Zweitbetreuung', 'Zweitbetreuung', 0.90);
+
+
+-- tbl_betriebsmitteltyp; Type: TABLE DATA; Schema: public;
+SET search_path = public, pg_catalog;
+INSERT INTO tbl_betriebsmitteltyp VALUES ('Zutrittskarte', 'Zutrittskarte', NULL, NULL);
+INSERT INTO tbl_betriebsmitteltyp VALUES ('Schluessel', NULL, NULL, NULL);
+INSERT INTO tbl_betriebsmitteltyp VALUES ('Laptop', NULL, NULL, NULL);
+
+
+-- tbl_firmentyp; Type: TABLE DATA; Schema: public;
+SET search_path = public, pg_catalog;
+INSERT INTO tbl_firmentyp VALUES ('Partnerfirma', '');
+INSERT INTO tbl_firmentyp VALUES ('Partneruniversität', '');
+INSERT INTO tbl_firmentyp VALUES ('Fachhochschule', 'Fachhochschule');
+
+
+-- tbl_projekttyp; Type: TABLE DATA; Schema: lehre;
+SET search_path = lehre, pg_catalog;
+INSERT INTO tbl_projekttyp VALUES ('Bachelor', 'Bachelorarbeit');
+INSERT INTO tbl_projekttyp VALUES ('Diplom', 'Diplomarbeit');
+INSERT INTO tbl_projekttyp VALUES ('Projekt', 'Projektarbeit');
+INSERT INTO tbl_projekttyp VALUES ('Praktikum', 'Berufspraktikum');
+INSERT INTO tbl_projekttyp VALUES ('Praxis', 'Praxissemester');
+
+
+-- tbl_pruefungstyp; Type: TABLE DATA; Schema: lehre;
+SET search_path = lehre, pg_catalog;
+INSERT INTO tbl_pruefungstyp VALUES ('undefiniert', NULL, false);
+INSERT INTO tbl_pruefungstyp VALUES ('Bachelor', 'Bachelorprüfung', true);
+INSERT INTO tbl_pruefungstyp VALUES ('Diplom', 'Diplomprüfung', true);
+INSERT INTO tbl_pruefungstyp VALUES ('Termin1', '1. Termin', false);
+INSERT INTO tbl_pruefungstyp VALUES ('Termin2', '2. Termin', false);
+INSERT INTO tbl_pruefungstyp VALUES ('kommPruef', 'kommissionelle Prüfung', false);
+
+
+-- tbl_erreichbarkeit; Type: TABLE DATA; Schema: campus;
+SET search_path = campus, pg_catalog;
+INSERT INTO tbl_erreichbarkeit VALUES ('t', 'telefonisch', NULL);
+INSERT INTO tbl_erreichbarkeit VALUES ('e', 'eMail', NULL);
+INSERT INTO tbl_erreichbarkeit VALUES ('et', 'eMail oder Telefon', NULL);
+INSERT INTO tbl_erreichbarkeit VALUES ('n', 'Nicht erreichbar!', 'FF0000');
+
+
+-- tbl_zeitsperretyp; Type: TABLE DATA; Schema: campus;
+SET search_path = campus, pg_catalog;
+INSERT INTO tbl_zeitsperretyp VALUES ('ReiseAL', 'Dienstreise Ausland', '00BFFF');
+INSERT INTO tbl_zeitsperretyp VALUES ('Amt', 'Behördenweg', 'B3B3B3');
+INSERT INTO tbl_zeitsperretyp VALUES ('Schulung', 'Weiterbildung', '99FF99');
+INSERT INTO tbl_zeitsperretyp VALUES ('Sonstige', 'Sonstiges', '9966CC');
+INSERT INTO tbl_zeitsperretyp VALUES ('Telework', 'Heimarbeit', 'FFCCFF');
+INSERT INTO tbl_zeitsperretyp VALUES ('ReiseIL', 'Diensreise Inland', '00D926');
+INSERT INTO tbl_zeitsperretyp VALUES ('DienstV', 'Dienstverhinderung', 'B3B364');
+INSERT INTO tbl_zeitsperretyp VALUES ('DienstF', 'Dienstfreistellung', '39DFA4');
+INSERT INTO tbl_zeitsperretyp VALUES ('Krank', 'Krankheit/Spitalsaufenthalt', 'B3B300');
+INSERT INTO tbl_zeitsperretyp VALUES ('ZA', 'Zeitausgleich', 'FFA605');
+INSERT INTO tbl_zeitsperretyp VALUES ('Arzt', 'Arztbesuch', '0066FF');
+INSERT INTO tbl_zeitsperretyp VALUES ('Konfernz', 'Konferenz/Tagung/Seminar', 'CC6633');
+INSERT INTO tbl_zeitsperretyp VALUES ('Urlaub', 'Urlaub', 'FF0000');
+
+
+-- tbl_berufstaetigkeit Type: TABLE DATA; Schema: bis;
+SET search_path = bis, pg_catalog;
+INSERT INTO tbl_berufstaetigkeit VALUES (0, 'nicht berufstätig', 'n.berufstätig');
+INSERT INTO tbl_berufstaetigkeit VALUES (2, 'arbeitslos gemeldet mit facheinschlägiger Berufserfahrung', 'fach.arbeitslos');
+INSERT INTO tbl_berufstaetigkeit VALUES (3, 'arbeitslos gemeldet sonstige', 'so.arbeitslos');
+INSERT INTO tbl_berufstaetigkeit VALUES (6, 'Vollzeit facheinschlägig berufstätig', 'Vz fach');
+INSERT INTO tbl_berufstaetigkeit VALUES (7, 'Teilzeit facheinschlägig berufstätig', 'Tz fach');
+INSERT INTO tbl_berufstaetigkeit VALUES (9, 'Vollzeit nicht facheinschlägig berufstätig', 'Vz sonst');
+INSERT INTO tbl_berufstaetigkeit VALUES (10, 'Teilzeit nicht facheinschlägig berufstätig', 'Tz sonst');
+
+
+-- tbl_beschaeftigungsart1; Type: TABLE DATA; Schema: bis;
+SET search_path = bis, pg_catalog;
+INSERT INTO tbl_beschaeftigungsart1 VALUES (4, 'Dienstverhältnis zur Bildungseinrichtung oder deren Träger (Freier Dienstvertrag)', 'Freier Dienstvertrag');
+INSERT INTO tbl_beschaeftigungsart1 VALUES (3, 'Dienstverhältnis zur Bildungseinrichtung oder deren Träger (Echter Dienstvertrag)', 'Echter Dienstvertrag');
+INSERT INTO tbl_beschaeftigungsart1 VALUES (1, 'Dienstverhältnis zum Bund', 'DV zum Bund');
+INSERT INTO tbl_beschaeftigungsart1 VALUES (6, 'Sonstiges Beschäftigungsverhältnis (inkludiert z.B. Werkverträge)', 'Sonstiges (Werkvertrag)');
+INSERT INTO tbl_beschaeftigungsart1 VALUES (5, 'Lehr- oder Ausbildungsverhältnis', 'Lehr-oder Ausbildungsverhältnis');
+INSERT INTO tbl_beschaeftigungsart1 VALUES (2, 'Dienstverhältnis zu einer anderen Gebietskörperschaft', 'DV anderen Gebietskörperschaft');
+
+
+-- tbl_beschaeftigungsart2; Type: TABLE DATA; Schema: bis;
+SET search_path = bis, pg_catalog;
+INSERT INTO tbl_beschaeftigungsart2 VALUES (2, 'unbefristet');
+INSERT INTO tbl_beschaeftigungsart2 VALUES (1, 'befristet');
+
+
+-- tbl_beschaeftigungsausmass; Type: TABLE DATA; Schema: bis;
+SET search_path = bis, pg_catalog;
+INSERT INTO tbl_beschaeftigungsausmass VALUES (1, 'Vollzeit', 36, 168);
+INSERT INTO tbl_beschaeftigungsausmass VALUES (2, '0-15', 0, 15);
+INSERT INTO tbl_beschaeftigungsausmass VALUES (3, '16-25', 16, 25);
+INSERT INTO tbl_beschaeftigungsausmass VALUES (4, '26-35', 26, 35);
+INSERT INTO tbl_beschaeftigungsausmass VALUES (5, 'Karenz', 0, 0);
+
+
+-- tbl_besqual; Type: TABLE DATA; Schema: bis;
+SET search_path = bis, pg_catalog;
+INSERT INTO tbl_besqual VALUES (0, 'Keine');
+INSERT INTO tbl_besqual VALUES (1, 'Habilitation');
+INSERT INTO tbl_besqual VALUES (2, 'der Habilitation gleichwertige Qualifikation');
+INSERT INTO tbl_besqual VALUES (3, 'berufliche Tätigkeit');
+
+
+-- tbl_hauptberuf; Type: TABLE DATA; Schema: bis;
+SET search_path = bis, pg_catalog;
+INSERT INTO tbl_hauptberuf VALUES (0, 'Universität');
+INSERT INTO tbl_hauptberuf VALUES (1, 'Fachhochschule');
+INSERT INTO tbl_hauptberuf VALUES (2, 'Andere postsekundäre Bildungseinrichtung');
+INSERT INTO tbl_hauptberuf VALUES (3, 'Allgemeinbildende höhere Schule');
+INSERT INTO tbl_hauptberuf VALUES (4, 'Berufsbildende höhere Schule');
+INSERT INTO tbl_hauptberuf VALUES (5, 'Andere Schule');
+INSERT INTO tbl_hauptberuf VALUES (6, 'Öffentlicher Sektor');
+INSERT INTO tbl_hauptberuf VALUES (7, 'Unternehmenssektor');
+INSERT INTO tbl_hauptberuf VALUES (8, 'Freiberuflich tätig');
+INSERT INTO tbl_hauptberuf VALUES (9, 'Privater gemeinnütziger Sektor');
+INSERT INTO tbl_hauptberuf VALUES (10, 'Außerhochschulische Forschungseinrichtung');
+INSERT INTO tbl_hauptberuf VALUES (11, 'Internationale Organisation');
+INSERT INTO tbl_hauptberuf VALUES (12, 'Sonstiges');
+
+
+
+-- tbl_verwendung; Type: TABLE DATA; Schema: bis;
+SET search_path = bis, pg_catalog;
+INSERT INTO tbl_verwendung VALUES (1, 'Lehr- und Forschungspersonal (Academic staff)');
+INSERT INTO tbl_verwendung VALUES (2, 'Lehr- und Forschungshilfspersonal (Teaching and Research assistants)');
+INSERT INTO tbl_verwendung VALUES (3, 'Akademische Dienste für Studierende(Academic Support');
+INSERT INTO tbl_verwendung VALUES (5, 'Studiengangsleiter/in');
+INSERT INTO tbl_verwendung VALUES (6, 'Leiter/in FH-Kollegium');
+INSERT INTO tbl_verwendung VALUES (7, 'Management (School Level Management)');
+INSERT INTO tbl_verwendung VALUES (8, 'Verwaltung (School Level Administrative Personnel)');
+INSERT INTO tbl_verwendung VALUES (9, 'Hauspersonal, Gebäude-/Haustechnik (Maintainance and Operations Personnel)');
+INSERT INTO tbl_verwendung VALUES (4, 'Soziale Dienste und Gesundheitsdienste (Health and Social Support)');
+
+
+-- tbl_aktivitaet; Type: TABLE DATA; Schema: fue;
+SET search_path = fue, pg_catalog;
+INSERT INTO tbl_aktivitaet VALUES ('ServiceVO', 'Service (VorOrt)');
+INSERT INTO tbl_aktivitaet VALUES ('Service', 'Service');
+INSERT INTO tbl_aktivitaet VALUES ('Schulung', 'Schulung die gegeben wird.');
+INSERT INTO tbl_aktivitaet VALUES ('Arbeit', 'Arbeit (allgemein)');
+INSERT INTO tbl_aktivitaet VALUES ('Besprechung', 'Besprechung');
+INSERT INTO tbl_aktivitaet VALUES ('Workshop', 'Workshop');
+INSERT INTO tbl_aktivitaet VALUES ('TelefonSupport', 'TelefonSupport');
+INSERT INTO tbl_aktivitaet VALUES ('eMailSupport', 'eMailSupport');
+
+
+-- tbl_projekt; Type: TABLE DATA; Schema: fue;
+SET search_path = fue, pg_catalog;
+INSERT INTO tbl_projekt VALUES ('Tempus', NULL, 'Tempus', NULL, '2005-09-01', NULL);
+INSERT INTO tbl_projekt VALUES ('StPoelten', NULL, 'FH-Complete StPoelten', NULL, '2007-09-01', NULL);
+INSERT INTO tbl_projekt VALUES ('FASo', NULL, 'FASonline', NULL, '2007-02-01', NULL);
+
+
+-- 
