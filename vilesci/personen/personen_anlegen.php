@@ -26,6 +26,7 @@ require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/kontakt.class.php');
+require_once('../../include/adresse.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
 	die('Fehler beim Herstellen der DB Connection');
