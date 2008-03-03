@@ -75,11 +75,11 @@
 			$maxlength[$i] = 12;
 			$worksheet->write(2,++$i,"Studiengang", $format_bold);
 			$maxlength[$i] = 11;
-			//$worksheet->write(2,++$i,"EMail", $format_bold);
-			//$maxlength[$i] = 5;
+			$worksheet->write(2,++$i,"EMail", $format_bold);
+			$maxlength[$i] = 5;
 			
-			$qry = "SELECT * FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE reihungstest_id='$reihungstest->reihungstest_id' ORDER BY nachname, vorname";
-			//, (SELECT kontakt FROM tbl_kontakt WHERE kontakttyp='email' AND person_id=tbl_prestudent.person_id ORDER BY zustellung LIMIT 1) as email
+			$qry = "SELECT *, (SELECT kontakt FROM tbl_kontakt WHERE kontakttyp='email' AND person_id=tbl_prestudent.person_id ORDER BY zustellung LIMIT 1) as email FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE reihungstest_id='$reihungstest->reihungstest_id' ORDER BY nachname, vorname";
+
 			if($result = pg_query($conn, $qry))
 			{
 				$zeile=3;
@@ -103,9 +103,9 @@
 					if(strlen($stg_arr[$row->studiengang_kz])>$maxlength[$i])
 						$maxlength[$i] = strlen($stg_arr[$row->studiengang_kz]);
 					
-					//$worksheet->write($zeile,++$i,$row->email);
-					//if(strlen($row->email)>$maxlength[$i])
-					//	$maxlength[$i] = strlen($row->email);
+					$worksheet->write($zeile,++$i,$row->email);
+					if(strlen($row->email)>$maxlength[$i])
+						$maxlength[$i] = strlen($row->email);
 					
 					$zeile++;					
 				}

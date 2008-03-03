@@ -823,8 +823,8 @@ function StudentProjektbetreuerMenulistPersonLoad(menulist, filter)
 
 	if(v.length>2)
 	{		
-		var url = '<?php echo APP_ROOT; ?>rdf/person.rdf.php?nurmittitel=&filter='+v+'&'+gettimestamp();
-
+		var url = '<?php echo APP_ROOT; ?>rdf/person.rdf.php?filter='+v+'&'+gettimestamp();
+		//nurmittitel=&
 		var oldDatasources = menulist.database.GetDataSources();
 		while(oldDatasources.hasMoreElements())
 		{
