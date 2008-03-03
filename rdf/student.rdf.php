@@ -91,6 +91,23 @@ function checkfilter($row, $filter2)
 				if($row_filter->anzahl>0 || $prestudent->rolle_kurzbz=='Incoming')
 					return false;
 	}
+	elseif(strstr($filter2,'buchungstyp;'))
+	{
+		// Alle Personen die keine Belastung auf den uebergebenen Buchungstyp haben 
+		// Incoming werden nicht beruecksichtigt
+		list($filter, $buchungstyp) = split(';',$filter2);
+		$prestudent = new prestudent($conn, null, null);
+		$prestudent->getLastStatus($row->prestudent_id);
+		
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_konto WHERE 
+					studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND 
+					person_id='".addslashes($row->person_id)."' AND 
+					buchungstyp_kurzbz='$buchungstyp'";
+		if($result_filter = pg_query($conn, $qry))
+			if($row_filter = pg_fetch_object($result_filter))
+				if($row_filter->anzahl>0 || $prestudent->rolle_kurzbz=='Incoming')
+					return false;
+	}
 	elseif($filter2=='zgvohnedatum')
 	{
 		//Alle Personen die den ZGV Typ eingetragen haben aber noch kein Datum

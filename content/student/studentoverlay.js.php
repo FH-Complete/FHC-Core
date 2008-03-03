@@ -1941,6 +1941,65 @@ function StudentKontoFilterStudenten(filter)
 }
 
 // ****
+// * Setzt im Studententree einen Filter auf die Buchungstypen
+// ****
+function StudentKontoFilterBuchungstyp()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree=document.getElementById('tree-verband');
+
+	//Wenn nichts markiert wurde -> beenden
+	if(tree.currentIndex==-1)
+	{
+		alert('Bitte zuerst einen Studiengang/Semester waehlen');
+		return;
+	}
+
+	filter = document.getElementById('student-konto-menulist-filter-buchungstyp').value;
+	
+    // Progressmeter starten. Ab jetzt keine 'return's mehr.
+    document.getElementById('statusbar-progressmeter').setAttribute('mode','undetermined');
+    //globalProgressmeter.StartPM();
+
+	var stg_kz = getTreeCellText(tree, 'stg_kz', tree.currentIndex);
+	var sem = getTreeCellText(tree, 'sem', tree.currentIndex);
+	var ver = getTreeCellText(tree, 'ver', tree.currentIndex);
+	var grp = getTreeCellText(tree, 'grp', tree.currentIndex);
+	var gruppe = getTreeCellText(tree, 'gruppe', tree.currentIndex);
+	var typ = getTreeCellText(tree, 'typ', tree.currentIndex);
+	var stsem = getTreeCellText(tree, 'stsem', tree.currentIndex);
+		
+	if(stsem=='')
+		stsem = getStudiensemester();
+	if(typ=='')
+		typ='student';
+	url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ="+typ+"&filter2=buchungstyp;"+filter+"&"+gettimestamp();
+	var treeStudent=document.getElementById('student-tree');
+
+	//Alte DS entfernen
+	var oldDatasources = treeStudent.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		treeStudent.database.RemoveDataSource(oldDatasources.getNext());
+	}
+
+	try
+	{
+		StudentTreeDatasource.removeXMLSinkObserver(StudentTreeSinkObserver);
+		treeStudent.builder.removeListener(StudentTreeListener);
+	}
+	catch(e)
+	{}
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	StudentTreeDatasource = rdfService.GetDataSource(url);
+	StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	treeStudent.database.AddDataSource(StudentTreeDatasource);
+	StudentTreeDatasource.addXMLSinkObserver(StudentTreeSinkObserver);
+	treeStudent.builder.addListener(StudentTreeListener);
+}
+
+// ****
 // * Aktiviert / Deaktiviert die Konto Felder
 // ****
 function StudentKontoDisableFields(val)
