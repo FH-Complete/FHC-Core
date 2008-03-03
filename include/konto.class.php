@@ -370,7 +370,7 @@ class konto
 			$qry = "SELECT tbl_konto.*, anrede, titelpost, titelpre, nachname, vorname, vornamen
 					FROM public.tbl_konto JOIN public.tbl_person USING (person_id)
 					WHERE person_id='".$person_id."' $stgwhere ORDER BY buchungsdatum";
-
+		
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
