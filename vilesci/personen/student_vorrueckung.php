@@ -174,7 +174,7 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 	while($row=pg_fetch_object($result_std))
 	{
 		//aktuelle Rolle laden
-		$qry_status="SELECT rolle_kurzbz,  ausbildungssemester FROM public.tbl_prestudentrolle JOIN public.tbl_prestudent USING(prestudent_id) 
+		$qry_status="SELECT * FROM public.tbl_prestudentrolle JOIN public.tbl_prestudent USING(prestudent_id) 
 		WHERE person_id=".myaddslashes($row->person_id)." 
 		AND studiengang_kz=".$row->studiengang_kz."  
 		AND studiensemester_kurzbz=".myaddslashes($studiensemester_kurzbz_akt)." 
@@ -236,7 +236,7 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 					$sql.="INSERT INTO tbl_prestudentrolle (prestudent_id, rolle_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz)
 					VALUES ($row->prestudent_id, '$row_status->rolle_kurzbz', '$next_ss',
 						$ausbildungssemester, now(), now(), '$user',
-					NULL, NULL, NULL, NULL);";
+					NULL, NULL, NULL, $row_status->orgform_kurzbz);";
 				}
 				if($sql!='')
 				{
