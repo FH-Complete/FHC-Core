@@ -462,27 +462,27 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							ondblclick="StudentRolleBearbeiten()"
 					>
 						<treecols>
-							<treecol id="student-prestudent-tree-rolle-rolle_kurzbz" label="Kurzbz" flex="2" hidden="false" primary="true"
+							<treecol id="student-prestudent-tree-rolle-rolle_kurzbz" label="Kurzbz" flex="2" hidden="false" primary="true" persist="hidden, width, ordinal"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#rolle_kurzbz"/>
 							<splitter class="tree-splitter"/>
-							<treecol id="student-prestudent-tree-rolle-studiensemester_kurzbz" label="StSem" flex="5" hidden="false"
+							<treecol id="student-prestudent-tree-rolle-studiensemester_kurzbz" label="StSem" flex="5" hidden="false" persist="hidden, width, ordinal"
 							   class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studiensemester_kurzbz"/>
 							<splitter class="tree-splitter"/>
-							<treecol id="student-prestudent-tree-rolle-ausbildungssemester" label="Semester" flex="2" hidden="false"
+							<treecol id="student-prestudent-tree-rolle-ausbildungssemester" label="Semester" flex="2" hidden="false" persist="hidden, width, ordinal"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#ausbildungssemester" />
 							<splitter class="tree-splitter"/>
-							<treecol id="student-prestudent-tree-rolle-datum" label="Datum" flex="2" hidden="false"
+							<treecol id="student-prestudent-tree-rolle-datum" label="Datum" flex="2" hidden="false" persist="hidden, width, ordinal"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#datum" />									
 							<splitter class="tree-splitter"/>
-							<treecol id="student-prestudent-tree-rolle-orgform_kurzbz" label="Organisationsform" flex="2" hidden="true"
+							<treecol id="student-prestudent-tree-rolle-orgform_kurzbz" label="Organisationsform" flex="2" hidden="true" persist="hidden, width, ordinal"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#orgform_kurzbz" />
 							<splitter class="tree-splitter"/>
-							<treecol id="student-prestudent-tree-rolle-prestudent_id" label="PrestudentID" flex="2" hidden="true"
+							<treecol id="student-prestudent-tree-rolle-prestudent_id" label="PrestudentID" flex="2" hidden="true" persist="hidden, width, ordinal"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#prestudent_id" />
 							<splitter class="tree-splitter"/>

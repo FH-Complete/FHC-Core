@@ -192,7 +192,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<template>
 						<menupopup>
 							<menuitem value="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"
-				        		      label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname"
+				        		      label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpre rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpost"
 				        		      myvalue="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"
 							  		  uri="rdf:*"/>
 						</menupopup>
