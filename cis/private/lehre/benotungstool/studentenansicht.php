@@ -153,10 +153,12 @@ if (isset($_REQUEST["deleteabgabe"]))
 
 }
 //echo $_FILES["abgabedatei"];
-if (isset($_FILES["abgabedatei"]))
+//if (isset($_FILES["abgabedatei"]))
+if (isset($_POST["abgabe"]))
 {
 	$abgabedatei_up = $_FILES["abgabedatei"]["tmp_name"];
-					
+	$abgabe_anmerkung = $_POST["abgabe_anmerkung"];
+	
 	if ($abgabedatei_up)
 	{
 		//echo $abgabedatei_up;
@@ -169,7 +171,6 @@ if (isset($_FILES["abgabedatei"]))
 			
 		$uebung_obj = new uebung($conn);
 		$uebung_obj->load_studentuebung($user, $uebung_id);
-	
 			
 		if ($uebung_obj->errormsg != "")
 		{
@@ -197,19 +198,35 @@ if (isset($_FILES["abgabedatei"]))
 			unlink(BENOTUNGSTOOL_PATH."abgabe/".$uebung_obj->abgabedatei);			
 			$uebung_obj->abgabedatei = $abgabedatei;
 			$uebung_obj->abgabezeit = 	$datum;
-			$uebung_obj->abgabe_anmerkung = "";
+			$uebung_obj->abgabe_anmerkung = $abgabe_anmerkung;
 			$uebung_obj->abgabe_save(false);
 		}
 		else
 		{
 			$uebung_obj->abgabedatei = $abgabedatei;
 			$uebung_obj->abgabezeit = 	$datum;
-			$uebung_obj->abgabe_anmerkung = "";
+			$uebung_obj->abgabe_anmerkung = $abgabe_anmerkung;
 			$uebung_obj->abgabe_save(true);
 		}
 		$uebung_obj->studentuebung_save(false);
 		//Abgabedatei ablegen				
 		move_uploaded_file($_FILES['abgabedatei']['tmp_name'], $abgabepfad);
+	}
+	
+	else
+	{
+		$abgabe_anmerkung = $_POST["abgabe_anmerkung"];
+		$uebung_obj2 = new uebung($conn);
+		$uebung_obj2->load_studentuebung($user, $uebung_id);
+		if ($uebung_obj2->errormsg == "")
+		{
+			if ($uebung_obj2->abgabe_id != null)
+			{	
+				$uebung_obj2->load_abgabe($uebung_obj2->abgabe_id);
+				$uebung_obj2->abgabe_anmerkung = $abgabe_anmerkung;
+				$uebung_obj2->abgabe_save(false);
+			}
+		}
 	}
 }
 else
@@ -911,7 +928,7 @@ if (!isset($_GET["notenuebersicht"]))
 				echo " <tr>";
 				echo"	<td>Abgabedatei: <a href='studentenansicht.php?uid=$user&lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&download_abgabe=".$uebung_obj->abgabedatei."'>".$uebung_obj->abgabedatei."</a>";
 				if($datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis)>time())	
-					echo " <a href='studentenansicht.php?uid=$user&lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&deleteabgabe=1'>[del]</a></td>";
+					echo " <a href='studentenansicht.php?uid=$user&lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&deleteabgabe=1'>[del]</a><br></td>";
 				echo "</tr>";
 			}
 			if($datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis)>time())
@@ -919,7 +936,8 @@ if (!isset($_GET["notenuebersicht"]))
 				echo "	<tr>\n";
 				echo "	<form method='POST' action='studentenansicht.php?uid=$user&lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem' enctype='multipart/form-data'>\n";
 				echo "		<td>\n";
-				echo "			<input type='file' name='abgabedatei'> <input type='submit' name='abgabe' value='Abgeben'>";
+				echo "			<br>Anmerkung:<br><textarea name='abgabe_anmerkung' rows='3' cols='50'>".$uebung_obj->abgabe_anmerkung."</textarea><br>";				
+				echo "			<br>Datei:<br><input type='file' name='abgabedatei'> <input type='submit' name='abgabe' value='Abgeben'>";
 				echo "		</td>\n";	
 				echo "	</form>\n";
 				echo "</tr>\n";

@@ -205,7 +205,7 @@ class uebung
 				$this->abgabe_id = $row->abgabe_id;
 				$this->abgabedatei = $row->abgabedatei;
 				$this->abgabezeit = $row->abgabezeit;
-				$this->anmerkung = $row->anmerkung;
+				$this->abgabe_anmerkung = $row->anmerkung;
 				return true;
 			}
 			else
