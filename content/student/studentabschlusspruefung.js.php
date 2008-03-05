@@ -402,6 +402,12 @@ function StudentAbschlusspruefungSpeichern()
 		return false;
 	}
 	
+	if(akadgrad_id=='')
+	{
+		alert('Akademischer Grad muss angegeben werden');
+		return false;
+	}
+	
     var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
 	var student_uid=tree.view.getCellText(tree.currentIndex,col);
 

@@ -284,11 +284,15 @@ function onMitarbeiterSelect()
 	}
 	if (filter=="Karenziert")
 	{
-		attributes+="&karenziert=true";
+		attributes+="&karenziert=true&aktiv=true";
 	}
-	if (filter=="Ausgeschieden")
+	if (filter=="ohneVerwendung")
 	{
-		attributes+="&ausgeschieden=true";
+		attributes+="&verwendung=false&aktiv=true";
+	}
+	if (filter=="mitVerwendung")
+	{
+		attributes+="&verwendung=true&aktiv=false";
 	}
 	if (filter=="FreiAngestellte")
 	{

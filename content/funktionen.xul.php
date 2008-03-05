@@ -68,7 +68,7 @@ else
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#studiengang" onclick="FunktionTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="funktion-treecol-fachbereich" label="Fachbereich" flex="1" hidden="false"
+			<treecol id="funktion-treecol-fachbereich" label="Institut" flex="1" hidden="false"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#fachbereich_kurzbz" onclick="FunktionTreeSort()"/>
 			<splitter class="tree-splitter"/>
@@ -158,7 +158,7 @@ else
 						</menulist>
 					</row>
 					<row>
-						<label value="Fachbereich" id="funktion-label-fachbereich" control="funktion-menulist-fachbereich"/>
+						<label value="Institut" id="funktion-label-fachbereich" control="funktion-menulist-fachbereich"/>
 						<menulist id="funktion-menulist-fachbereich" disabled="true"
 						          datasources="<?php echo APP_ROOT;?>/rdf/fachbereich.rdf.php?optional=true" flex="1"
 						          ref="http://www.technikum-wien.at/fachbereich/liste" >

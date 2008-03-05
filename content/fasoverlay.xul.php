@@ -245,8 +245,20 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 				</treeitem>
 				<treeitem>
 					<treerow>
+					   	<treecell label="Institutsleiter"/>
 					   	<treecell label="Fachbereichsleiter"/>
-					   	<treecell label="Fachbereichsleiter"/>
+					</treerow>
+				</treeitem>
+				<treeitem>
+					<treerow>
+					   	<treecell label="Karenziert"/>
+					   	<treecell label="Karenziert"/>
+					</treerow>
+				</treeitem>
+				<treeitem>
+					<treerow>
+					   	<treecell label="ohne Verwendung"/>
+					   	<treecell label="ohneVerwendung"/>
 					</treerow>
 				</treeitem>
 			</treechildren>
@@ -260,14 +272,8 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 			<treechildren>
 				<treeitem>
 					<treerow>
-					   	<treecell label="Karenziert"/>
-					   	<treecell label="Karenziert"/>
-					</treerow>
-				</treeitem>
-				<treeitem>
-					<treerow>
-					   	<treecell label="Ausgeschieden"/>
-					   	<treecell label="Ausgeschieden"/>
+					   	<treecell label="mit Verwendung"/>
+					   	<treecell label="mitVerwendung"/>
 					</treerow>
 				</treeitem>
 			</treechildren>

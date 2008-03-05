@@ -544,7 +544,7 @@ class mitarbeiter extends benutzer
 		}
 	}
 	
-	function getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $ausgeschieden, $studiensemester_kurzbz)
+	function getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $verwendung, $studiensemester_kurzbz)
 	{
 		$qry = "SELECT distinct on(person_id) *, tbl_benutzer.aktiv as aktiv, tbl_mitarbeiter.insertamum, tbl_mitarbeiter.insertvon FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id)) LEFT JOIN public.tbl_benutzerfunktion USING(uid) WHERE true";
 		
@@ -562,9 +562,13 @@ class mitarbeiter extends benutzer
 			$qry .= " AND tbl_benutzer.aktiv=false";
 		if($karenziert)
 			$qry .= " AND uid IN (SELECT mitarbeiter_uid FROM bis.tbl_bisverwendung WHERE beschausmasscode='5' AND (ende>now() OR ende is null))"; //beginn<(SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='$studiensemester_kurzbz') AND ende<(SELECT ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='$studiensemester_kurzbz')
-		if($ausgeschieden)
+		if($verwendung=='true')
 		{
-			$qry.=" AND tbl_benutzer.aktiv=false"; // AND NOT EXISTS(SELECT * FROM bis.tbl_bisverwendung WHERE (ende>now() or ende is null) AND tbl_bisverwendung.mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid)
+			$qry.=" AND EXISTS(SELECT * FROM bis.tbl_bisverwendung WHERE (ende>now() or ende is null) AND tbl_bisverwendung.mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid)";
+		}
+		if($verwendung=='false')
+		{
+			$qry.=" AND NOT EXISTS(SELECT * FROM bis.tbl_bisverwendung WHERE (ende>now() or ende is null) AND tbl_bisverwendung.mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid)";
 		}
 		//echo $qry;
 		if($result = pg_query($this->conn, $qry))
