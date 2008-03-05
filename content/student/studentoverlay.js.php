@@ -1524,6 +1524,17 @@ function StudentAnmeldungreihungstestHeute()
 }
 
 // ****
+// * Wenn Reihungstestpunkte eingetragen werden automatisch das
+// * Hackerl 'zum Reihungstest angetreten' setzen
+// ****
+function StudentReihungstestPunkteChange()
+{
+	if(document.getElementById('student-prestudent-textbox-punkte').value!='' 
+	&& document.getElementById('student-prestudent-checkbox-reihungstestangetreten').checked==false)
+		document.getElementById('student-prestudent-checkbox-reihungstestangetreten').checked=true;
+}
+
+// ****
 // * Einen Ab-/Unterbrecher wieder zum Studenten machen
 // ****
 function StudentUnterbrecherZuStudent()

@@ -84,9 +84,9 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-statistic-lehrauftragsliste:command" oncommand="StatistikPrintLehrauftragsliste();"/>
   <command id="menu-statistic-projektarbeit:command" oncommand="StatistikPrintProjektarbeit();"/>
   <command id="menu-statistic-abschlusspruefung:command" oncommand="StatistikPrintAbschlusspruefung();"/>
+  <command id="menu-statistic-bewerberstatistik:command" oncommand="StatistikPrintBewerberstatistik();"/>
   <command id="menu-statistic-notenspiegel:command" oncommand="StatistikPrintNotenspiegel('html');"/>
   <command id="menu-statistic-notenspiegel-excel:command" oncommand="StatistikPrintNotenspiegel('xls');"/>
-  <command id="menu-statistic-bewerberstatistik:command" oncommand="StatistikPrintBewerberstatistik();"/>
   <command id="menu-statistic-substatistik-studentenprosemester-excel:command" oncommand="StatistikPrintStudentenProSemester('xls');"/>
   <command id="menu-statistic-substatistik-studentenprosemester-html:command" oncommand="StatistikPrintStudentenProSemester('');"/>
   <command id="menu-statistic-substatistik-alvsstatistik-excel:command" oncommand="StatistikPrintALVSStatistik('xls');"/>
@@ -252,6 +252,12 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                label     = "&menu-statistic-abschlusspruefung.label;"
                command   =  "menu-statistic-abschlusspruefung:command"
                accesskey = "&menu-statistic-abschlusspruefung.accesskey;"/>
+             <menuitem
+               id        =  "menu-statistic-bewerberstatistik"
+               key       =  "menu-statistic-bewerberstatistik:key"
+               label     = "&menu-statistic-bewerberstatistik.label;"
+               command   =  "menu-statistic-bewerberstatistik:command"
+               accesskey = "&menu-statistic-bewerberstatistik.accesskey;"/>
              <menu id="menu-statistic-subnotenspiegel" label="&menu-statistic-subnotenspiegel.label;" accesskey="&menu-statistic-subnotenspiegel.accesskey;">
 				<menupopup id="menu-statistic-subnotenspiegel-popup">
 		             <menuitem
@@ -321,12 +327,6 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 					?>
 				</menupopup>
 			</menu>
-          <!--   <menuitem
-               id        =  "menu-statistic-bewerberstatistik"
-               key       =  "menu-statistic-bewerberstatistik:key"
-               label     = "&menu-statistic-bewerberstatistik.label;"
-               command   =  "menu-statistic-bewerberstatistik:command"
-               accesskey = "&menu-statistic-bewerberstatistik.accesskey;"/>-->
           </menupopup>
     </menu>
     <!-- ********** DOKUMENTE ********** -->
@@ -569,7 +569,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz'))
 			{
 				echo '<tab id="tab-verband" label="Verband" onclick="ChangeTabVerband()"/>';
-				echo '<tab id="tab-fachbereich" label="Fachbereich" onclick="ChangeTabsToLehrveranstaltung()"/>';
+				echo '<tab id="tab-fachbereich" label="Institut" onclick="ChangeTabsToLehrveranstaltung()"/>';
 				echo '<tab id="tab-lektor" label="Lektor" onclick="ChangeTabsToLehrveranstaltung()"/>';
 			}
 			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter'))

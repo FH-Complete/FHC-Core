@@ -29,14 +29,18 @@
 // * $jahr: 07 = Jahr
 // * $stgtyp: b/m/d/x = Bachelor/Master/Diplom/Incomming
 // * $matrikelnummer
-// * 001 = Laufende Nummer ( Wenn StSem==SS dann wird zur nummer 500 dazugezaehlt)
+// * 001 = Laufende Nummer  Wenn StSem==SS dann wird zur Nummer 500 dazugezaehlt
+// *                        Bei Incoming im Masterstudiengang wird auch 500 dazugezaehlt
 // ****
 function generateUID($stgkzl,$jahr, $stgtyp, $matrikelnummer)
 {
 	$art = substr($matrikelnummer, 2, 1);
 	$nr = substr($matrikelnummer, 7);
-	if($art=='2')
+	if($art=='2') //Sommersemester
 		$nr = $nr+500;
+	elseif($art=='0' && $stgtyp=='m') //Incoming im Masterstudiengang
+		$nr = $nr+500;
+		
 
 	return $stgkzl.$jahr.($art!='0'?$stgtyp:'x').$nr;
 }

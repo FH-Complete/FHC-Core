@@ -348,7 +348,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       						<label value="Zum Reihungstest angetreten" control="student-prestudent-checkbox-reihungstestangetreten"/>
       						<checkbox id="student-prestudent-checkbox-reihungstestangetreten" checked="true" disabled="true"/>
       						<label value="Reihungstestpunkte" control="student-prestudent-textbox-punkte"/>
-      						<hbox><textbox id="student-prestudent-textbox-punkte" disabled="true" maxlength="9" size="9"/></hbox>
+      						<hbox><textbox id="student-prestudent-textbox-punkte" disabled="true" maxlength="9" size="9" onchange="StudentReihungstestPunkteChange();"/></hbox>
     					</row>
     				</rows>
     			</grid>

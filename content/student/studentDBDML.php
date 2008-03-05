@@ -393,7 +393,7 @@ if(!$error)
 				$prestudent->reihungstest_id = $_POST['reihungstest_id'];
 				$prestudent->anmeldungreihungstest = $_POST['anmeldungreihungstest'];
 				$prestudent->reihungstestangetreten = ($_POST['reihungstestangetreten']=='true'?true:false);
-				$prestudent->punkte = $_POST['punkte'];
+				$prestudent->punkte = str_replace(',','.',$_POST['punkte']);
 				$prestudent->bismelden = ($_POST['bismelden']=='true'?true:false);
 				$prestudent->anmerkung = $_POST['anmerkung'];
 				//$prestudent->insertamum = date('Y-m-d H:i:s');

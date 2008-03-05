@@ -74,10 +74,10 @@ if (isset($_GET['karenziert']))
 else
 	$karenziert=null;
 
-if (isset($_GET['ausgeschieden']))
-	$ausgeschieden = $_GET['ausgeschieden'];
+if (isset($_GET['verwendung']))
+	$verwendung = $_GET['verwendung'];
 else
-	$ausgeschieden=null;
+	$verwendung=null;
 
 if(isset($_GET['filter']))
 	$filter = $_GET['filter'];
@@ -104,7 +104,7 @@ if($uid==null)
 	if($filter!='')
 		$mitarbeiterDAO->searchPersonal($filter);
 	else
-		$mitarbeiterDAO->getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $ausgeschieden, $semester_aktuell);
+		$mitarbeiterDAO->getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $verwendung, $semester_aktuell);
 	
 	foreach ($mitarbeiterDAO->result as $mitarbeiter)
 		draw_row($mitarbeiter);
