@@ -101,7 +101,7 @@ loadVariables($conn, $user);
 
 	if($semester!='')
 		$qry.= " AND tbl_studentlehrverband.semester='".addslashes($semester)."'";
-	echo $qry;
+	
 	$zeile=1;
 	if($result = pg_query($conn, $qry))
 	{
