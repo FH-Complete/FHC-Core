@@ -975,7 +975,7 @@ function BISStudentenPlausicheck()
 	var stg_kz=tree.view.getCellText(tree.currentIndex,col);
 
 	if(stg_kz!='')
-		window.open('<?php echo APP_ROOT ?>vilesci/bis/checkstudenten.php?stg_kz='+stg_kz,'Datencheck','');
+		window.open('<?php echo APP_ROOT ?>vilesci/bis/studentenmeldung.php?plausi=J&stg_kz='+stg_kz,'Datencheck','');
 	else
 		alert('Bitte einen Studiengang auswaehlen');
 }
