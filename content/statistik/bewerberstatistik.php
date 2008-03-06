@@ -22,6 +22,8 @@
 
 require_once('../../vilesci/config.inc.php');
 require_once('../../include/studiensemester.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/functions.inc.php');
 
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim Connecten zur DB');
@@ -30,6 +32,9 @@ if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
 else
 	$stsem = '';
+	
+$rechte = new benutzerberechtigung($conn);
+$rechte->getBerechtigungen(get_uid());
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 	<html>
@@ -58,6 +63,19 @@ if($stsem=='')
 }
 else
 {
+	$stgs = $rechte->getStgKz();
+	
+	if($stgs[0]=='')
+		$stgwhere='';
+	else 
+	{
+		$stgwhere=' AND studiengang_kz in(';
+		foreach ($stgs as $stg)
+			$stgwhere.="'$stg',";
+		$stgwhere = substr($stgwhere,0, strlen($stgwhere)-1);
+		$stgwhere.=' )';
+	}
+	
 	// SELECT count(*) FROM public.tbl_prestudent WHERE studiengang_kz=stg.studiengang_kz) AS prestd,
 	$qry = "SELECT studiengang_kz, kurzbz, typ, kurzbzlang, bezeichnung,
 
@@ -88,7 +106,7 @@ else
 			FROM
 				public.tbl_studiengang stg
 			WHERE
-				studiengang_kz>0 AND studiengang_kz<10000 AND aktiv
+				studiengang_kz>0 AND studiengang_kz<10000 AND aktiv $stgwhere
 			ORDER BY kurzbzlang; ";
 
 	if($result = pg_query($conn, $qry))

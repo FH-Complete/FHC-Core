@@ -252,12 +252,6 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                label     = "&menu-statistic-abschlusspruefung.label;"
                command   =  "menu-statistic-abschlusspruefung:command"
                accesskey = "&menu-statistic-abschlusspruefung.accesskey;"/>
-             <menuitem
-               id        =  "menu-statistic-bewerberstatistik"
-               key       =  "menu-statistic-bewerberstatistik:key"
-               label     = "&menu-statistic-bewerberstatistik.label;"
-               command   =  "menu-statistic-bewerberstatistik:command"
-               accesskey = "&menu-statistic-bewerberstatistik.accesskey;"/>
              <menu id="menu-statistic-subnotenspiegel" label="&menu-statistic-subnotenspiegel.label;" accesskey="&menu-statistic-subnotenspiegel.accesskey;">
 				<menupopup id="menu-statistic-subnotenspiegel-popup">
 		             <menuitem
@@ -325,6 +319,12 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 						';
 					}
 					?>
+					 <menuitem
+		               id        =  "menu-statistic-bewerberstatistik"
+		               key       =  "menu-statistic-bewerberstatistik:key"
+		               label     = "&menu-statistic-bewerberstatistik.label;"
+		               command   =  "menu-statistic-bewerberstatistik:command"
+		               accesskey = "&menu-statistic-bewerberstatistik.accesskey;"/>
 				</menupopup>
 			</menu>
           </menupopup>
