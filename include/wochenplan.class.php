@@ -850,7 +850,10 @@ class wochenplan
 								$stg_kz=$lehrstunde->stg_kz;
 								$updateamum[]=substr($lehrstunde->updateamum,0,16);
 								$updatevon[]=$lehrstunde->updatevon;
-								$paramList.='&amp;stundenplan_id'.$z++.'='.$lehrstunde->stundenplan_id;
+								if ($lehrstunde->reservierung)
+									$paramList.='&amp;reservierung_id'.$z++.'='.$lehrstunde->stundenplan_id;
+								else
+									$paramList.='&amp;stundenplan_id'.$z++.'='.$lehrstunde->stundenplan_id;
 								if(isset($lehrstunde->farbe))
 									$farbe=$lehrstunde->farbe;
 								$titel=htmlspecialchars($lehrstunde->titel);
