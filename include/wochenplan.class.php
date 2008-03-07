@@ -302,6 +302,7 @@ class wochenplan
 				$idx++;
 			//echo $idx.'<BR>';
 			$this->std_plan[$tag][$stunde][$idx]->unr=$this->wochenplan->lehrstunden[$i]->unr;
+			$this->std_plan[$tag][$stunde][$idx]->reservierung=$this->wochenplan->lehrstunden[$i]->reservierung;
 			if ($this->wochenplan->lehrstunden[$idx]->reservierung)
 				$this->std_plan[$tag][$stunde][$idx]->lehrfach=$this->wochenplan->lehrstunden[$i]->titel;
 			else
