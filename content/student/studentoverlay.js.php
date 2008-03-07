@@ -525,6 +525,7 @@ function StudentDetailDisableFields(val)
 	document.getElementById('student-detail-menulist-sprache').disabled=val;
 	//document.getElementById('student-detail-textbox-matrikelnummer').disabled=val;
 	document.getElementById('student-detail-button-image-upload').disabled=val;
+	document.getElementById('student-detail-button-image-delete').disabled=val;
 	//document.getElementById('student-detail-menulist-studiengang_kz').disabled=val;
 	document.getElementById('student-detail-textbox-semester').disabled=val;
 	document.getElementById('student-detail-textbox-verband').disabled=val;
@@ -646,12 +647,54 @@ function StudentDetailSave()
 	}
 }
 
+// ****
+// * Ladt ein Script zum Upload des Bildes
+// ****
 function StudentImageUpload()
 {
 	person_id = document.getElementById('student-detail-textbox-person_id').value;
 	if(person_id!='')
 	{
 		window.open('<?php echo APP_ROOT; ?>content/bildupload.php?person_id='+person_id,'Bild Upload', 'height=10,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	}
+	else
+		alert('Es wurde keine Person ausgewaehlt');
+}
+
+// ****
+// * Loescht das Bild aus der DB
+// ****
+function StudentImageDelete()
+{
+	person_id = document.getElementById('student-detail-textbox-person_id').value;
+	if(person_id!='')
+	{
+		var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
+		var req = new phpRequest(url,'','');
+		var studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+		
+		req.add('type', 'imagedelete');
+		req.add('person_id', person_id);
+		req.add('studiengang_kz', studiengang_kz);
+	
+		var response = req.executePOST();
+	
+		var val =  new ParseReturnValue(response)
+	
+		if (!val.dbdml_return)
+		{
+			if(val.dbdml_errormsg=='')
+				alert(response)
+			else
+				alert(val.dbdml_errormsg)
+		}
+		else
+		{
+			netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+			StudentSelectID=document.getElementById('student-prestudent-textbox-prestudent_id').value;
+			StudentTreeDatasource.Refresh(false); //non blocking
+			SetStatusBarText('Bild wurde geloescht');
+		}
 	}
 	else
 		alert('Es wurde keine Person ausgewaehlt');

@@ -156,6 +156,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       							<label value="Foto" />
       							<hbox>
       								<button id="student-detail-button-image-upload" label="Upload" oncommand="StudentImageUpload();" disabled="true"/>
+      								<button id="student-detail-button-image-delete" label="Delete" oncommand="StudentImageDelete();" disabled="true"/>
       								<spacer flex="1" />
       							</hbox>
       						</vbox>
