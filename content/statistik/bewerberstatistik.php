@@ -45,7 +45,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 	<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 	</head>
 	<body>
-	<h2>Bewerberstatistik '.$stsem.'</h2><br>
+	<h2>Bewerberstatistik '.$stsem.'<span style="position:absolute; right:15px;">'.date('d.m.Y').'</span></h2><br>
 	';
 
 if($stsem=='')
@@ -143,6 +143,47 @@ else
 		}
 		echo '</tbody></table>';
 	}
+	
+	//Verteilung
+	echo '<br><h2>Verteilung</h2><br>';
+	$qry = "SELECT 
+				count(anzahl) AS anzahlpers,anzahl AS anzahlstg 
+			FROM
+			(
+				SELECT 
+					count(*) AS anzahl
+				FROM 
+					public.tbl_person JOIN public.tbl_prestudent USING (person_id) 
+					JOIN public.tbl_prestudentrolle USING (prestudent_id)
+				WHERE 
+					true $stgwhere
+				GROUP BY 
+					person_id,rolle_kurzbz,studiensemester_kurzbz
+				HAVING 
+					rolle_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
+			) AS prestd
+			GROUP BY anzahl; ";
+
+	echo "<table class='liste table-stripeclass:alternate table-autostripe' style='width:auto'>
+				<thead>
+					<tr>
+						<th>Personen</th>
+						<th>Stg</th>
+					</tr>
+				</thead>
+				<tbody>";
+	if($result = pg_query($conn, $qry))
+	{
+		$summestudenten=0;
+		
+		while($row = pg_fetch_object($result))
+		{
+			$summestudenten += $row->anzahlpers;
+			echo "<tr><td>$row->anzahlpers</td><td>$row->anzahlstg</td></tr>";
+		}
+		echo "<tr><td style='border-top: 1px solid black;'><b>$summestudenten</b></td><td></td></tr>";
+	}
+	echo '</tbody></table>';
 }
 ?>
 </body>

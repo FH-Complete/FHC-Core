@@ -490,6 +490,49 @@ if(!$error)
 			$errormsg = 'Falsche Paramenteruebergabe';
 		}
 	}
+	elseif(isset($_POST['type']) && $_POST['type']=='imagedelete')
+	{
+		if(isset($_POST['person_id']) && is_numeric($_POST['person_id']))
+		{
+			if(($_POST['studiengang_kz']!='' && !$rechte->isBerechtigt('admin', $_POST['studiengang_kz'],'suid') && 
+		   !$rechte->isBerechtigt('assistenz', $_POST['studiengang_kz'], 'suid')) ||
+		   ($_POST['studiengang_kz']=='' && !$rechte->isBerechtigt('admin', null, 'suid') && 
+		   !$rechte->isBerechtigt('mitarbeiter', null, 'suid')))
+			{
+				$return = false;
+				$errormsg = 'Keine Berechtigung';
+				$data = '';
+				$error = true;
+			}
+			else
+			{
+				$qry = "UPDATE public.tbl_person SET foto=null WHERE person_id='".$_POST['person_id']."'";
+				if(pg_query($conn, $qry))
+				{
+					$qry = "DELETE FROM public.tbl_akte WHERE person_id='".$_POST['person_id']."' AND dokument_kurzbz='Lichtbil'";
+					if(pg_query($conn, $qry))
+					{
+						$return = true;
+					}
+					else 
+					{
+						$return = false;
+						$errormsg = 'Fehler beim Loeschen des grossen Bildes';
+					}
+				}
+				else 
+				{
+					$return = false;
+					$errormsg = 'Fehler beim Loeschen des Bildes';
+				}
+			}
+		}
+		else 
+		{
+			$return = false;
+			$errormsg = 'Falsche Parameteruebergabe'.$_POST['person_id'].'x';
+		}
+	}
 	elseif(isset($_POST['type']) && $_POST['type']=='getvariable')
 	{
 		$variable = new variable($conn, null, null, true);

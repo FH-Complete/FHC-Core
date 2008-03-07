@@ -45,6 +45,7 @@ function resize($filename, $width, $height)
 
 	// Hoehe und Breite neu berechnen
 	list($width_orig, $height_orig) = getimagesize($filename);
+
 	if ($width && ($width_orig < $height_orig)) 
 	{
 	   $width = ($height / $height_orig) * $width_orig;
@@ -55,11 +56,15 @@ function resize($filename, $width, $height)
 	}
 	
 	$image_p = imagecreatetruecolor($width, $height);                       
-	
-	//Bilder vergroessern/verkleinern und wieder zurueckschreiben
-	
+			
 	$image = imagecreatefromjpeg($filename);
-	imagecopyresampled($image_p, $image, 0, 0, 0, 0, $width, $height, $width_orig, $height_orig);
+	
+	//Bild nur verkleinern aber nicht vergroessern
+	if($width_orig>$width || $height_orig>$height)
+		imagecopyresampled($image_p, $image, 0, 0, 0, 0, $width, $height, $width_orig, $height_orig);
+	else 
+		$image_p = $image;
+		
 	imagejpeg($image_p, $filename, 80);
 		
 	imagedestroy($image_p);
@@ -89,7 +94,7 @@ if(isset($_POST['submitbild']))
         $width=101;
 		$height=130;
 		
-        //--check that it's a jpeg or gif or png
+        //--check that it's a jpeg
         if ($ext=='jpg' || $ext=='jpeg')
         {
 			$filename = $_FILES['bild']['tmp_name'];
@@ -103,6 +108,22 @@ if(isset($_POST['submitbild']))
 			fclose($fp);
 			
 			$akte = new akte($conn);
+			
+			if($akte->getAkten($_GET['person_id'], 'Lichtbil'))
+			{
+				if(count($akte->result)>0)
+				{
+					$akte = $akte->result[0];
+					$akte->new = false;
+				}
+				else 
+					$akte->new = true;
+			}
+			else 
+			{
+				$akte->new = true;
+			}
+			
 			$akte->dokument_kurzbz = 'Lichtbil';
 			$akte->person_id = $_GET['person_id'];
 			$akte->inhalt = strhex($content);
@@ -117,7 +138,7 @@ if(isset($_POST['submitbild']))
 			$akte->insertvon = $user;
 			$akte->uid = '';
 			
-			if(!$akte->save(true))
+			if(!$akte->save())
 			{
 				echo "<b>Fehler: $akte->errormsg</b>";
 			}
@@ -149,7 +170,7 @@ if(isset($_POST['submitbild']))
 				echo '<b>'.$person->errormsg.'</b><br />';
 		}
 		else
-			echo "<b>File ist kein gueltiges Bild</b><br />";
+			echo "<b>Derzeit koennen nur Bilder im JPG Format hochgeladen werden</b><br />";
 	}
 }
 
