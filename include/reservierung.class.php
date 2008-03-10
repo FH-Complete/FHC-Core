@@ -212,5 +212,29 @@ class reservierung
 			return false;
 		}
 	}
+	
+	// ************************************************************
+	// * Loescht eine Reservierung
+	// * @param reservierung_id ID der zu leoschenden Reservierung
+	// * @return true wenn ok, false im Fehlerfall
+	// ************************************************************
+	function delete($reservierung_id)
+	{
+		if(!is_numeric($reservierung_id))
+		{
+			$this->errormsg = 'Reservierung_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "DELETE FROM campus.tbl_reservierung WHERE reservierung_id='$reservierung_id'";
+		
+		if(pg_query($this->conn, $qry))
+			return true;
+		else
+		{
+			$this->errormsg = 'Fehler beim Loeschen der Reservierung';
+			return false;
+		}
+	}
 }
 ?>

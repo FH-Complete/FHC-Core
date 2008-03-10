@@ -403,8 +403,8 @@ class person
 			       ' familienstand='.$this->addslashes($this->familienstand).','.
 			       ' anzahlkinder='.$this->addslashes($this->anzahlkinder).','.
 			       ' aktiv='.($this->aktiv?'true':'false').','.
-			       ' insertamum=now(),'.
-			       ' insertvon='.$this->addslashes($this->insertvon).','.
+			       //' insertamum='.$this->addslashes($this->insertamum).','.
+			       //' insertvon='.$this->addslashes($this->insertvon).','.
 			       ' updateamum=now(),'.
 			       ' updatevon='.$this->addslashes($this->updatevon).','.
 			       ' geschlecht='.$this->addslashes($this->geschlecht).','.

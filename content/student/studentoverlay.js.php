@@ -185,13 +185,15 @@ var StudentIOTreeListener =
 // ****
 var StudentNotenTreeSinkObserver =
 {
-	onBeginLoad : function(pSink) {},
+	onBeginLoad : function(pSink) 
+	{
+		StudentNotenTreeloaded=false;
+	},
 	onInterrupt : function(pSink) {},
 	onResume : function(pSink) {},
 	onError : function(pSink, pStatus, pError) {},
 	onEndLoad : function(pSink)
 	{
-		StudentNotenTreeloaded=false;
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 		document.getElementById('student-noten-tree').builder.rebuild();
 	}
@@ -3081,6 +3083,13 @@ function StudentNoteDetailDisableFields(val)
 // ***
 function StudentNotenAuswahl()
 {
+	//Beim Refresh des Trees wird das onselect event ausgeloest wenn der 
+	//vorher markierte Eintrag nach dem Refresh nicht mehr in der Liste ist
+	//daher soll die funktion nur ausgefuehrt werden, wenn der tree 
+	//tatsaechlich fertig geladen wurde
+	if(!StudentNotenTreeloaded)
+		return false;
+	
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-noten-tree');
 
@@ -3096,6 +3105,14 @@ function StudentNotenAuswahl()
 	var col = tree.columns ? tree.columns["student-noten-tree-studiensemester_kurzbz"] : "student-noten-tree-studiensemester_kurzbz";
 	var studiensemester_kurzbz=tree.view.getCellText(tree.currentIndex,col);
 
+	//Falls einer der Parameter leer ist wird abgebrochen da sonst ein sehr grosses rdf geladen wird
+	//Sollte eigentlich nie eintreffen, tut es aber trotzdem
+	if(lehrveranstaltung_id=='' || student_uid=='' || studiensemester_kurzbz=='')
+	{
+		debug('unerwarteter Fehler in StudentNotenAuswahl() in studentoverlay.js.php');
+		return false;
+	}
+	
 	//Daten holen
 	var url = '<?php echo APP_ROOT ?>rdf/zeugnisnote.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+'&uid='+student_uid+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&'+gettimestamp();
 

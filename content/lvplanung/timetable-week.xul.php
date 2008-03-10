@@ -8,6 +8,7 @@ include('../../include/berechtigung.class.php');
 include('../../include/lehreinheit.class.php');
 include('../../include/zeitwunsch.class.php');
 include('../../include/wochenplan.class.php');
+include('../../include/reservierung.class.php'); 
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 echo '<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>';
@@ -173,6 +174,15 @@ if ($aktion=='stpl_move' || $aktion=='stpl_single_search' || $aktion=='stpl_set'
 		}
 		$name_stpl_idx='x'.++$j.'stundenplan_id0';
 	}
+	
+	//ReservierungsIDs
+	$i=0;
+	$name_res_id='reservierung_id'.$i;
+	while ($i<100 && isset($_GET[$name_res_id]))
+	{
+		$res_id[]=$_GET[$name_res_id];
+		$name_res_id='reservierung_id'.++$i;
+	}
 }
 
 // ****************************************************************************
@@ -231,6 +241,13 @@ elseif ($aktion=='stpl_delete_single' || $aktion=='stpl_delete_block')
 	{
 		$lehrstunde->delete($stundenplan_id,$db_stpl_table);
 		$error_msg.=$lehrstunde->errormsg;
+	}
+	
+	$reservierung=new reservierung($conn);
+	foreach ($res_id as $reservierung_id)
+	{
+		$reservierung->delete($reservierung_id);
+		$error_msg.=$reservierung->errormsg;
 	}
 }
 // ******************** Lehrveranstaltung setzen ******************************

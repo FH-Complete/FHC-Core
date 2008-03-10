@@ -162,7 +162,7 @@ if(isset($_POST['submitbild']))
 				$person->foto = $content;
 				$person->new = false;				
 				if($person->save())
-					echo "<b>Bild wurde erfolgreich gespeichert</b><script language='Javascript'>opener.StudentAuswahl(); window.close();</script><br />";
+					echo "<b>Bild wurde erfolgreich gespeichert</b><script language='Javascript'>opener.StudentAuswahl(); opener.MitarbeiterAuswahl(); window.close();</script><br />";
 				else
 					echo '<b>'.$person->errormsg.'</b><br />';
 			}
