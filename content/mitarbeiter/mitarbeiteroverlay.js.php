@@ -411,6 +411,7 @@ function MitarbeiterDetailDisableFields(val)
 	document.getElementById('mitarbeiter-detail-menulist-familienstand').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-anzahlderkinder').disabled=val;
 	document.getElementById('mitarbeiter-detail-button-image-upload').disabled=val;
+	document.getElementById('mitarbeiter-detail-button-image-delete').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-anmerkung').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-homepage').disabled=val;
 	
@@ -682,6 +683,45 @@ function MitarbeiterImageUpload()
 	if(person_id!='')
 	{
 		window.open('<?php echo APP_ROOT; ?>content/bildupload.php?person_id='+person_id,'Bild Upload', 'height=10,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	}
+	else
+		alert('Es wurde keine Person ausgewaehlt');
+}
+
+// ****
+// * Loescht das Bild aus der DB
+// ****
+function MitarbeiterImageDelete()
+{
+	person_id = document.getElementById('mitarbeiter-detail-textbox-person_id').value;
+	if(person_id!='')
+	{
+		var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
+		var req = new phpRequest(url,'','');
+		
+		req.add('type', 'imagedelete');
+		req.add('person_id', person_id);
+		req.add('studiengang_kz', '');
+	
+		var response = req.executePOST();
+	
+		var val =  new ParseReturnValue(response)
+	
+		if (!val.dbdml_return)
+		{
+			if(val.dbdml_errormsg=='')
+				alert(response)
+			else
+				alert(val.dbdml_errormsg)
+		}
+		else
+		{
+			netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+			uid = document.getElementById('mitarbeiter-detail-textbox-uid').value;
+			MitarbeiterSelectUid=uid;
+			MitarbeiterTreeDatasource.Refresh(false); //non blocking
+			SetStatusBarText('Bild wurde geloescht');
+		}
 	}
 	else
 		alert('Es wurde keine Person ausgewaehlt');

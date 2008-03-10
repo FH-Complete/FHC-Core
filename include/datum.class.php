@@ -159,5 +159,55 @@ class datum
 		else
 			return false;
 	}
+	
+	/**
+	 * Liefert ein Datum im angegeben Format
+	 * ToDo: Liefert aktuellen Timestamp wenn Sonderzeichen uebergeben werden
+	 *       zB '---'
+	 * @param $datum
+	 * @param $format
+	 * @return Formatierten Timestamp wenn ok, false im Fehlerfall
+	 */
+	function formatDatum($datum, $format='Y-m-d H:i:s')
+	{
+		if(trim($datum)=='')
+			return '';
+		
+		$ts='';
+		
+		//2008-12-31
+		if(ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$datum, $regs))
+			$ts = mktime(0,0,0,$regs[2],$regs[3],$regs[1]);
+		
+		//2008-12-31 12:30
+		if(ereg("([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2})",$datum, $regs))
+			$ts = mktime($regs[4],$regs[5],0,$regs[2],$regs[3],$regs[1]);
+		
+		//2008-12-31 12:30:15
+		if(ereg("([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})",$datum, $regs))
+			$ts = mktime($regs[4],$regs[5],$regs[6],$regs[2],$regs[3],$regs[1]);
+			
+		//1.12.2008
+		if(ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4})",$datum, $regs))
+			$ts = mktime(0,0,0,$regs[2],$regs[1],$regs[3]);
+			
+		//1.12.2008 12:30
+		if(ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4}) ([0-9]{2}):([0-9]{2})",$datum, $regs))
+			$ts = mktime($regs[4],$regs[5],0,$regs[2],$regs[1],$regs[3]);
+				
+		//1.12.2008 12:30:15
+		if(ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})",$datum, $regs))
+			$ts = mktime($regs[4],$regs[5],$regs[6],$regs[2],$regs[1],$regs[3]);
+		
+		if($ts=='')
+		{
+			$ts = strtotime($datum);
+		}
+		
+		if($ts!='' && $ts>0)
+			return date($format, $ts);
+			
+		return false;
+	}
 }
 ?>

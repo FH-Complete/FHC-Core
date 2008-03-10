@@ -146,14 +146,15 @@ if(!$result = pg_query($conn, $qry))
 						SELECT 
 							COALESCE(koordinator, uid) as koordinator
 						FROM
-							lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach, public.tbl_benutzerfunktion 
+							lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach, public.tbl_benutzerfunktion, public.tbl_studiensemester 
 						WHERE
 							tbl_lehrveranstaltung.lehrveranstaltung_id='$row_lva->lehrveranstaltung_id' AND
 							tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 							tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
 							tbl_lehrfach.fachbereich_kurzbz=tbl_benutzerfunktion.fachbereich_kurzbz AND
 							tbl_benutzerfunktion.funktion_kurzbz='fbk' AND 
-							tbl_benutzerfunktion.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz LIMIT 1 ) ";
+							tbl_lehreinheit.studiensemester_kurzbz=tbl_studiensemester.studiensemester_kurzbz AND
+							tbl_benutzerfunktion.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz ORDER BY tbl_studiensemester.ende DESC LIMIT 1 ) ";
 		
 		$result_fbk = pg_query($conn, $qry_fbk);
 		$fbk='';

@@ -49,6 +49,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		<grid align="end" flex="1"
 				 flags="dont-build-content"
 				enableColumnDrag="true"
+				style="margin:4px;"
 				>
 			<columns  >
     					<column flex="1"/>
@@ -163,11 +164,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       							<label value="Foto" />
       							<hbox>
       								<button id="mitarbeiter-detail-button-image-upload" label="Upload" oncommand="MitarbeiterImageUpload();" disabled="true"/>
+      								<button id="mitarbeiter-detail-button-image-delete" label="Delete" oncommand="MitarbeiterImageDelete();" disabled="true"/>
       								<spacer flex="1" />
       							</hbox>
       						</vbox>
    							<hbox>
-   								<image src='' id="mitarbeiter-detail-image" width="60" height="60" style="margin-left:5px;"/>
+   								<image src='' id="mitarbeiter-detail-image" style="margin-left:5px;"/> <!-- width="60" height="60" -->
    								<spacer flex="1"/>
    							</hbox>
       						<label value="Anmerkung" control="mitarbeiter-detail-textbox-anmerkung"/>
