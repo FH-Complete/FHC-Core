@@ -85,19 +85,20 @@ loadVariables($conn, $user);
 				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id=pruefer1),
 				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id=pruefer2),
 				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id=pruefer3),  
-				tbl_abschlussbeurteilung.bezeichnung, tbl_pruefungstyp.beschreibung, datum, sponsion, tbl_abschlusspruefung.anmerkung
+				(SELECT bezeichnung FROM lehre.tbl_abschlussbeurteilung WHERE tbl_abschlussbeurteilung.abschlussbeurteilung_kurzbz=tbl_abschlusspruefung.abschlussbeurteilung_kurzbz) as bezeichnung, tbl_pruefungstyp.beschreibung, datum, sponsion, tbl_abschlusspruefung.anmerkung
 			FROM 
 				lehre.tbl_abschlusspruefung, public.tbl_studentlehrverband, public.tbl_benutzer, public.tbl_person, 
-				lehre.tbl_abschlussbeurteilung, lehre.tbl_pruefungstyp
+				lehre.tbl_pruefungstyp
 			WHERE
 				tbl_abschlusspruefung.student_uid=public.tbl_studentlehrverband.student_uid AND
 				tbl_studentlehrverband.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
 				tbl_studentlehrverband.studiengang_kz='".addslashes($studiengang_kz)."' AND
 				tbl_benutzer.uid = tbl_abschlusspruefung.student_uid AND
 				tbl_person.person_id = tbl_benutzer.person_id AND
-				tbl_abschlussbeurteilung.abschlussbeurteilung_kurzbz = tbl_abschlusspruefung.abschlussbeurteilung_kurzbz AND
-				tbl_abschlusspruefung.pruefungstyp_kurzbz = tbl_pruefungstyp.pruefungstyp_kurzbz AND
-				datum>='".$stsem->start."' AND datum<='".$stsem->ende."'";
+				tbl_abschlusspruefung.pruefungstyp_kurzbz = tbl_pruefungstyp.pruefungstyp_kurzbz
+			ORDER BY nachname, vorname";
+				//tbl_abschlussbeurteilung.abschlussbeurteilung_kurzbz = tbl_abschlusspruefung.abschlussbeurteilung_kurzbz AND
+				//AND	datum>='".$stsem->start."' AND datum<='".$stsem->ende."'";
 
 	if($semester!='')
 		$qry.= " AND tbl_studentlehrverband.semester='".addslashes($semester)."'";

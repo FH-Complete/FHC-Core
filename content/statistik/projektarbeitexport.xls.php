@@ -81,18 +81,18 @@ loadVariables($conn, $user);
 			
 	// Daten holen
 	$qry = "SELECT 
-				tbl_projekttyp.bezeichnung, titel, trim(COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'')), tbl_note.anmerkung, punkte, beginn,
+				tbl_projekttyp.bezeichnung, titel, trim(COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'')), 
+				(SELECT anmerkung FROM lehre.tbl_note WHERE note=tbl_projektarbeit.note) as anmerkung, punkte, beginn,
 				ende, CASE WHEN freigegeben THEN 'Ja' ELSE 'Nein' END, gesperrtbis, gesamtstunden, themenbereich, tbl_projektarbeit.anmerkung, projektarbeit_id
 			FROM 
 				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, 
-				public.tbl_benutzer, public.tbl_person, lehre.tbl_projekttyp, lehre.tbl_note
+				public.tbl_benutzer, public.tbl_person, lehre.tbl_projekttyp
 			WHERE
 				tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 				tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				tbl_projektarbeit.student_uid=tbl_benutzer.uid AND
 				tbl_benutzer.person_id=tbl_person.person_id AND
 				tbl_projektarbeit.projekttyp_kurzbz=tbl_projekttyp.projekttyp_kurzbz AND
-				tbl_projektarbeit.note=tbl_note.note AND
 				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
 				tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND
 				tbl_projektarbeit.projekttyp_kurzbz IN ('Bachelor','Diplom','Projekt')";
