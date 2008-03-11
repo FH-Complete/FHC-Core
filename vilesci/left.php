@@ -1,4 +1,25 @@
 <?php
+/* Copyright (C) 2007 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>
+ */
+
 	require('config.inc.php');
  	require('../include/functions.inc.php');
  	require('../include/benutzerberechtigung.class.php');
@@ -14,7 +35,8 @@
 		//'Admin'=> 		array('name'=>'Admin', 'link'=>'admin/menu.html', 'target'=>'main'),
 		'Lehre'=> 		array
 		(
-			'name'=>'Lehre',
+			'name'=>'Lehre', 'opener'=>'true', 'hide'=>'false',
+			'Gruppenverwaltung'=>array('name'=>'Gruppenverwaltung', 'link'=>'stammdaten/lvbgruppenverwaltung.php', 'target'=>'main'),
 			'Lehrveranstaltung'=>array
 			(
 				'name'=>'Lehrveranstaltung',
@@ -43,25 +65,77 @@
 			'LV-Planung'=>array
 			(
 				'name'=>'LV-Planung',
-				'Wartung'=>array('name'=>'Verwaltung', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
-				'Check'=>array('name'=>'Studenten', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
-				'Kollision'=>array('name'=>'Studenten', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
-				'Stundenplan'=>array('name'=>'Studenten', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
+				'Wartung'=>array('name'=>'Wartung', 'link'=>'lehre/lvplanwartung.php', 'target'=>'main'),
+				'Check'=>array('name'=>'Checken', 'link'=>'lehre/check/index.html', 'target'=>'main'),
+				'Kollision'=>array('name'=>'Kollision Student', 'link'=>'lehre/stpl_benutzer_kollision_frameset.html', 'target'=>'main'),
+				'Stundenplan'=>array('name'=>'Stundenplan', 'link'=>'../cis/private/lvplan/index.html', 'target'=>'main'),
+				'Zeitwuensche'=>array('name'=>'Zeitwünsche', 'link'=>'lehre/zeitwuensche.php', 'target'=>'main'),
 				'Studenten'=>array('name'=>'Studenten', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
-				'Studenten'=>array('name'=>'Studenten', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main')
+				'Insert'=>array('name'=>'Insert', 'link'=>'lehre/stdplan_insert.php', 'target'=>'main'),
+				'Delete'=>array('name'=>'Delete', 'link'=>'lehre/stdplan_delete.php', 'target'=>'main'),
+				'Import'=>array('name'=>'Import', 'link'=>'lehre/import/index.hml', 'target'=>'main'),
+				'Export'=>array('name'=>'Export', 'link'=>'lehre/export/index.html', 'target'=>'main')
 			)
 		),
 		'Personen'=> 	array
 		(
-			'name'=>'Personen', 'link'=>'admin/menu.html', 'target'=>'main', 'opener'=>'true', 'hide'=>'true',
-			'Personen'=>array('name'=>'Personen', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
-			'Benutzer'=>array('name'=>'Benutzer', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
-			'Mitarbeiter'=>array('name'=>'Mitarbeiter', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
-			'Studenten'=>array('name'=>'Studenten', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main')
+			'name'=>'Personen', 'opener'=>'true', 'hide'=>'true',
+			'Suche'=>array('name'=>'Suche', 'link'=>'personen/suche.php', 'target'=>'main'),
+			'Personen zusammenlegen'=>array('name'=>'Personen zusammenlegen', 'link'=>'stammdaten/personen_wartung.php', 'target'=>'main'),
+			'Gruppen'=>array
+			(
+				'name'=>'Gruppen',
+				'Übersicht'=>array('name'=>'Übersicht', 'link'=>'lehre/einheit_menu.php', 'target'=>'main'),
+				'Neu'=>array('name'=>'Neu', 'link'=>'lehre/einheit_menu.php?newFrm=true', 'target'=>'main')
+			),
+			'Benutzer'=>array
+			(
+				'name'=>'Benutzer',
+				'LDAPCheck'=>array('name'=>'LDAPCheck', 'link'=>'personen/ldap_check.php', 'target'=>'main')
+			),
+			'Mitarbeiter'=>array
+			(
+				'name'=>'Mitarbeiter',
+				'Übersicht'=>array('name'=>'Übersicht', 'link'=>'personen/lektor_uebersicht.php', 'target'=>'main'),
+				'Neu'=>array('name'=>'Neu', 'link'=>'personen/lektor_edit.php?new=1', 'target'=>'main'),
+				'Institute'=>array('name'=>'Institute', 'link'=>'personen/institutsliste.php', 'target'=>'main'),
+				'Urlaub'=>array('name'=>'Urlaub', 'link'=>'personen/resturlaub.php', 'target'=>'main')
+			),
+			'Studenten'=>array
+			(
+				'name'=>'Studenten',
+				'Übersicht'=>array('name'=>'Übersicht', 'link'=>'personen/studenten_uebersicht.php', 'target'=>'main'),
+				'Neu'=>array('name'=>'Neu', 'link'=>'personen/student_edit.php?new=1', 'target'=>'main'),
+				'Vorrückung'=>array('name'=>'Vorrückung', 'link'=>'personen/student_vorrueckung.php', 'target'=>'main'),
+			)
 		),
-		'Stammdaten'=>	array('name'=>'Stammdaten', 'link'=>'admin/menu.html', 'target'=>'main'),
-		'Vorrueckung'=>	array('name'=>'Vorrueckung', 'link'=>'admin/menu.html', 'target'=>'main', 'opener'=>'true', 'hide'=>'true'),
-		'Auswertung'=>	array('name'=>'Auswertung', 'link'=>'admin/menu.html', 'target'=>'main')
+		'Stammdaten'=>	array
+		(
+			'name'=>'Stammdaten', 'opener'=>'true', 'hide'=>'true',
+			'Berechtigungen'=>array('name'=>'Berechtigungen', 'link'=>'stammdaten/benutzerberechtigung_frameset.html', 'target'=>'main'),
+			'Variablen'=>array('name'=>'Variablen', 'link'=>'stammdaten/variablen_frameset.html', 'target'=>'main'),
+			'Studiengang'=>array('name'=>'Studiengang', 'link'=>'stammdaten/studiengang_frameset.html', 'target'=>'main'),
+			'Kommunikation'=>array
+			(
+				'name'=>'Kommunikation',
+				'Kontakte'=>array('name'=>'Kontakte', 'link'=>'kommunikation/kontakt.php', 'target'=>'main'),
+				'Mail-Verteiler'=>array('name'=>'Mail-Verteiler', 'link'=>'kommunikation/index.html', 'target'=>'main'),
+			),
+			'Reihungstest'=>array('name'=>'Reihungstest', 'link'=>'stammdaten/reihungstestverwaltung.php', 'target'=>'main'),
+			'Firmen'=>array('name'=>'Firmen', 'link'=>'stammdaten/firma_frameset.html', 'target'=>'main')
+		),
+		'Vorrueckung'=>	array
+		(
+			'name'=>'Vorrueckung', 'opener'=>'true', 'hide'=>'true',
+			'Lehreinheiten'=>array('name'=>'Lehreinheiten', 'link'=>'lehre/lehreinheiten_vorrueckung.php', 'target'=>'main'),
+			'Studenten'=>array('name'=>'Studenten', 'link'=>'personen/student_vorrueckung.php', 'target'=>'main')			
+		),
+		'Auswertung'=>	array
+		(
+			'name'=>'Auswertung', 'opener'=>'true', 'hide'=>'true',
+			'Raumauslastung'=>array('name'=>'Raumauslastung', 'link'=>'lehre/raumauslastung.php', 'target'=>'main'),
+			'Zeitwünsche'=>array('name'=>'Zeitwünsche', 'link'=>'lehre/zeitwuensche.php', 'target'=>'main')
+		)
 	);
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -78,19 +152,17 @@
 	<!--
 		function js_toggle_container(conid)
    		{
-   		//alert(conid);
-   		//var display = document.getElementById(conid).style.display;
    			try
    			{
 				if (document.getElementById(conid).style.display=='none')
 				{
 					document.getElementById(conid).style.display='block';
-					//document.getElementById(conid+'_dot').innerHTML='&#8211; ';
+					document.getElementById(conid+'_dot').innerHTML='&#8211; ';
 				}
 	        	else
 	        	{
 					document.getElementById(conid).style.display='none';
-					//document.getElementById(conid+'_dot').innerHTML='+ ';
+					document.getElementById(conid+'_dot').innerHTML='+ ';
 				}
    			}
    			catch(e){alert(e)}
@@ -109,11 +181,15 @@
 
 <?php
 if ($berechtigung->isBerechtigt('admin'))
+{
 	echo '<div>
 			<a href="admin/menu.html" target="main">Admin</a>
+		</div>
+		<div>
+			<a href="https://sdtools.technikum-wien.at" target="main">SDTools</a>
 		</div><hr>';
-
-/*foreach($menu AS $m)
+}
+foreach($menu AS $m)
 {
 	$opener=false;
 	$hide=false;
@@ -126,7 +202,7 @@ if ($berechtigung->isBerechtigt('admin'))
 
 	if ($opener)
 	{
-		echo '<SPAN id="'.$m['name'].'_dot" onclick="js_toggle_container('."'".$m['name']."'".')" style="font-weight:bold">';
+		echo '<SPAN style="cursor: pointer;" id="'.$m['name'].'_dot" onclick="js_toggle_container('."'".$m['name']."'".')" style="font-weight:bold">';
 		if ($hide)
 			echo '+ ';
 		else
@@ -165,7 +241,7 @@ if ($berechtigung->isBerechtigt('admin'))
 
 			if ($opener)
 			{
-				echo "\n\t".'<SPAN onclick="js_toggle_container('."'".$m1['name']."'".')">';
+				echo "\n\t".'<SPAN style="cursor: pointer;" onclick="js_toggle_container('."'".$m1['name']."'".')">';
 				if ($hide)
 					echo '+ ';
 				else
@@ -207,7 +283,8 @@ if ($berechtigung->isBerechtigt('admin'))
 			echo "\n\t</SPAN>\n\t</DIV>\n";
 		}
 	echo "\n</SPAN>\n</DIV>\n";
-}*/
+}
+exit;
 ?>
 
 
