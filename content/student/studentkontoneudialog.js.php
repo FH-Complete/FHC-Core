@@ -91,3 +91,17 @@ function StudentKontoNeuSpeichern()
 	if(window.opener.StudentKontoNeuSpeichern(document, person_ids, studiengang_kz))
 		window.close();
 }
+
+// ****
+// * Setzt den Standardbetrag fuer den ausgewaehlten Buchungstyp
+// * oder -0.0 wenn kein Standardbetrag vorhanden ist
+// ****
+function StudentKontoNeuDefaultBetrag()
+{
+	var typmenulist = document.getElementById('student-konto-neu-menulist-buchungstyp');
+	betrag = typmenulist.selectedItem.getAttribute('betrag');
+	if(betrag=='')
+		betrag='-0.0';
+		
+	document.getElementById('student-konto-neu-textbox-betrag').value=betrag;
+}

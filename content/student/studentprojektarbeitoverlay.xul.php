@@ -49,10 +49,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		<tree id="student-projektarbeit-tree" seltype="single" hidecolumnpicker="false" flex="1"
 			datasources="rdf:null" ref="http://www.technikum-wien.at/projektarbeit/liste"
 			style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100px" enableColumnDrag="true"
-			onselect="StudentProjektarbeitAuswahl()"
 			context="student-projektarbeit-tree-popup"
 			flags="dont-build-content"
 		>
+		<!-- onselect="StudentProjektarbeitAuswahl()" - wird jetzt per JS gesetzt -->
 		
 			<treecols>
 				<treecol id="student-projektarbeit-tree-projekttyp_kurzbz" label="Typ" flex="2" hidden="false"
@@ -309,10 +309,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<tree id="student-projektbetreuer-tree" seltype="single" hidecolumnpicker="false" flex="1"
 						  datasources="rdf:null" ref="http://www.technikum-wien.at/projektbetreuer/liste"
 						  style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100px" enableColumnDrag="true"
-						  onselect="StudentProjektbetreuerAuswahl()"
 						  context="student-projektbetreuer-tree-popup"
 						  flags="dont-build-content"
-					>					
+					>		
+					<!--onselect="StudentProjektbetreuerAuswahl()" - wird jetzt per JS gesetzt-->
 							<treecols>
 								<treecol id="student-projektbetreuer-tree-nachname" label="Nachname" flex="2" hidden="false"
 									class="sortDirectionIndicator"

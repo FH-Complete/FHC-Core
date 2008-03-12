@@ -156,6 +156,14 @@ function loadKontakte(person_id)
 	url = "<?php echo APP_ROOT; ?>rdf/adresse.rdf.php?person_id="+person_id+"&"+gettimestamp();	
 	var treeAdressen=document.getElementById('kontakt-adressen-tree');
 	
+	try
+	{
+		AdressenTreeDatasource.removeXMLSinkObserver(KontaktAdressenTreeSinkObserver);
+		treeAdressen.builder.removeListener(KontaktAdressenTreeListener);
+	}
+	catch(e)
+	{}
+	
 	//Alte DS entfernen
 	var oldDatasources = treeAdressen.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -175,6 +183,14 @@ function loadKontakte(person_id)
 	url = "<?php echo APP_ROOT; ?>rdf/kontakt.rdf.php?person_id="+person_id+"&"+gettimestamp();	
 	var treeKontakt=document.getElementById('kontakt-kontakt-tree');
 	
+	try
+	{
+		KontaktTreeDatasource.removeXMLSinkObserver(KontaktKontaktTreeSinkObserver);
+		treeKontakt.builder.removeListener(KontaktKontaktTreeListener);
+	}
+	catch(e)
+	{}
+	
 	//Alte DS entfernen
 	var oldDatasources = treeKontakt.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -193,6 +209,14 @@ function loadKontakte(person_id)
 	//Bankverbindungen laden
 	url = "<?php echo APP_ROOT; ?>rdf/bankverbindung.rdf.php?person_id="+person_id+"&"+gettimestamp();	
 	var treeBankverbindung=document.getElementById('kontakt-bankverbindung-tree');
+	
+	try
+	{
+		BankverbindungTreeDatasource.removeXMLSinkObserver(KontaktBankverbindungTreeSinkObserver);
+		treeBankverbindung.builder.removeListener(KontaktBankverbindungTreeListener);
+	}
+	catch(e)
+	{}
 	
 	//Alte DS entfernen
 	var oldDatasources = treeBankverbindung.database.GetDataSources();

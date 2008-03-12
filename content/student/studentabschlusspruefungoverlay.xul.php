@@ -55,13 +55,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	<hbox>
 		<tree id="student-abschlusspruefung-tree" seltype="single" hidecolumnpicker="false" flex="1"
 				datasources="rdf:null" ref="http://www.technikum-wien.at/abschlusspruefung/liste"
-				onselect="StudentAbschlusspruefungAuswahl();"
 				flags="dont-build-content"
 				enableColumnDrag="true"
 				style="margin:0px;"
 				persist="hidden, height"
 				context="student-abschlusspruefung-tree-popup"
 		>
+		<!-- onselect="StudentAbschlusspruefungAuswahl();" - wird jetzt per JS gesetzt -->
 			<treecols>
 				<treecol id="student-abschlusspruefung-treecol-student_uid" label="UID" flex="1" persist="hidden, width" hidden="true"
 					class="sortDirectionIndicator"

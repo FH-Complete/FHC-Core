@@ -44,7 +44,13 @@ var StudentProjektbetreuerSelectBetreuerartKurzbz=null;
 // ****
 var StudentProjektarbeitTreeSinkObserver =
 {
-	onBeginLoad : function(pSink) {},
+	onBeginLoad : function(pSink) 
+	{
+		//Eventlistener waehrend des Ladevorganges deaktivieren da es sonst
+		//zu Problemen kommt
+		tree = document.getElementById('student-projektarbeit-tree');
+		tree.removeEventListener('select', StudentProjektarbeitAuswahl, false);
+	},
 	onInterrupt : function(pSink) {},
 	onResume : function(pSink) {},
 	onError : function(pSink, pStatus, pError) {},
@@ -61,14 +67,16 @@ var StudentProjektarbeitTreeSinkObserver =
 // ****
 var StudentProjektarbeitTreeListener =
 {
-  willRebuild : function(builder) {  },
-  didRebuild : function(builder)
-  {
-  	  //timeout nur bei Mozilla notwendig da sonst die rows
-  	  //noch keine values haben. Ab Seamonkey funktionierts auch
-  	  //ohne dem setTimeout
-      window.setTimeout(StudentProjektarbeitTreeSelectID,10);
-  }
+	willRebuild : function(builder) {  },
+	didRebuild : function(builder)
+	{
+		tree = document.getElementById('student-projektarbeit-tree');
+		tree.addEventListener('select', StudentProjektarbeitAuswahl, false);
+		//timeout nur bei Mozilla notwendig da sonst die rows
+		//noch keine values haben. Ab Seamonkey funktionierts auch
+		//ohne dem setTimeout
+		window.setTimeout(StudentProjektarbeitTreeSelectID,10);
+	}
 };
 
 // ****
@@ -78,7 +86,13 @@ var StudentProjektarbeitTreeListener =
 // ****
 var StudentProjektbetreuerTreeSinkObserver =
 {
-	onBeginLoad : function(pSink) {},
+	onBeginLoad : function(pSink) 
+	{ 
+		//Eventlistener waehrend des Ladevorganges deaktivieren da es sonst
+		//zu Problemen kommt
+		tree = document.getElementById('student-projektbetreuer-tree');
+		tree.removeEventListener('select', StudentProjektbetreuerAuswahl, false);
+	},
 	onInterrupt : function(pSink) {},
 	onResume : function(pSink) {},
 	onError : function(pSink, pStatus, pError) {},
@@ -95,14 +109,16 @@ var StudentProjektbetreuerTreeSinkObserver =
 // ****
 var StudentProjektbetreuerTreeListener =
 {
-  willRebuild : function(builder) {  },
-  didRebuild : function(builder)
-  {
-  	  //timeout nur bei Mozilla notwendig da sonst die rows
-  	  //noch keine values haben. Ab Seamonkey funktionierts auch
-  	  //ohne dem setTimeout
-      window.setTimeout(StudentProjektbetreuerTreeSelectID,10);
-  }
+	willRebuild : function(builder) {  },
+	didRebuild : function(builder)
+	{
+		tree = document.getElementById('student-projektbetreuer-tree');
+		tree.addEventListener('select', StudentProjektbetreuerAuswahl, false);
+		//timeout nur bei Mozilla notwendig da sonst die rows
+		//noch keine values haben. Ab Seamonkey funktionierts auch
+		//ohne dem setTimeout
+		window.setTimeout(StudentProjektbetreuerTreeSelectID,10);
+	}
 };
 // ****************** FUNKTIONEN ************************** //
 
@@ -114,6 +130,15 @@ function StudentProjektarbeitTreeLoad(uid)
 	var tree = document.getElementById('student-projektarbeit-tree');
 	var url='<?php echo APP_ROOT;?>rdf/projektarbeit.rdf.php?student_uid='+uid+"&"+gettimestamp();
 
+	//Alte Observer entfernen
+	try
+	{
+		StudentProjektarbeitTreeDatasource.removeXMLSinkObserver(StudentProjektarbeitTreeSinkObserver);
+		tree.builder.removeListener(StudentProjektarbeitTreeListener);
+	}
+	catch(e)
+	{}
+	
 	//Alte DS entfernen
 	var oldDatasources = tree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -377,6 +402,14 @@ function StudentProjektarbeitAuswahl()
 	// **** BETREUER **** //
 	var tree = document.getElementById('student-projektbetreuer-tree');
 	var url='<?php echo APP_ROOT;?>rdf/projektbetreuer.rdf.php?projektarbeit_id='+projektarbeit_id+"&"+gettimestamp();
+	
+	try
+	{
+		StudentProjektbetreuerTreeDatasource.removeXMLSinkObserver(StudentProjektbetreuerTreeSinkObserver);
+		tree.builder.removeListener(StudentProjektbetreuerTreeListener);
+	}
+	catch(e)
+	{}
 	
 	//Alte DS entfernen
 	var oldDatasources = tree.database.GetDataSources();
@@ -714,6 +747,12 @@ function StudentProjektbetreuerAuswahl()
 	var col = tree.columns ? tree.columns["student-projektbetreuer-tree-betreuerart_kurzbz"] : "student-projektbetreuer-treecol-betreuerart_kurzbz";
 	var betreuerart_kurzbz=tree.view.getCellText(tree.currentIndex,col);
 
+	if(projektarbeit_id=='' || person_id=='' || betreuerart_kurzbz=='')
+	{
+		debug('StudentProjektbetreuerAuswahl: Fehler beim Laden');
+		return false;
+	}
+	
 	//Daten holen
 	var url = '<?php echo APP_ROOT ?>rdf/projektbetreuer.rdf.php?projektarbeit_id='+projektarbeit_id+'&person_id='+person_id+'&betreuerart_kurzbz='+betreuerart_kurzbz+'&'+gettimestamp();
 
@@ -736,7 +775,7 @@ function StudentProjektbetreuerAuswahl()
 	stundensatz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#stundensatz" ));
 	betreuerart_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#betreuerart_kurzbz" ));
 	person_nachname = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#person_nachname" ));
-			
+	
 	StudentProjektbetreuerMenulistPersonLoad(document.getElementById('student-projektbetreuer-menulist-person'), person_nachname);
 	
 	//Werte setzen

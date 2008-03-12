@@ -48,10 +48,10 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 	<tree id="student-noten-tree" seltype="single" hidecolumnpicker="false" flex="1"
 		datasources="rdf:null" ref="http://www.technikum-wien.at/zeugnisnote/liste"
 		style="margin-bottom:5px;" height="100%" enableColumnDrag="true"
-		onselect="StudentNotenAuswahl()"
 		context="student-noten-tree-popup"
 		flags="dont-build-content"
 	>
+	<!-- onselect="StudentNotenAuswahl()" - wird jetzt per JS gesetzt -->
 	
 		<treecols>
 			<treecol id="student-noten-tree-lehrveranstaltung_bezeichnung" label="Lehrveranstaltung" flex="2" hidden="false" primary="true" persist="hidden, width, ordinal"
