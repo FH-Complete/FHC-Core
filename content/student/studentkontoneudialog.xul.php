@@ -53,6 +53,22 @@ echo '<?xml-stylesheet href="../datepicker/datepicker.css" type="text/css"?>';
 			</columns>
 			<rows>
 				<row>
+					<label value="Typ" control="student-konto-neu-menulist-buchungstyp"/>
+					<menulist id="student-konto-neu-menulist-buchungstyp" 
+					          datasources="<?php echo APP_ROOT ?>rdf/buchungstyp.rdf.php?1" flex="1"
+					          ref="http://www.technikum-wien.at/buchungstyp/liste"
+					          oncommand="StudentKontoNeuDefaultBetrag()" >
+						<template>
+							<menupopup>
+								<menuitem value="rdf:http://www.technikum-wien.at/buchungstyp/rdf#buchungstyp_kurzbz"
+					        		      label="rdf:http://www.technikum-wien.at/buchungstyp/rdf#beschreibung"
+					        		      betrag="rdf:http://www.technikum-wien.at/buchungstyp/rdf#betrag"
+								  		  uri="rdf:*"/>
+								</menupopup>
+						</template>
+					</menulist>
+				</row>
+				<row>
 					<label value="Betrag" control="student-konto-neu-textbox-betrag"/>
 					<hbox>
       					<textbox id="student-konto-neu-textbox-betrag" value="-0.0" maxlength="9" size="9"/>
@@ -76,20 +92,6 @@ echo '<?xml-stylesheet href="../datepicker/datepicker.css" type="text/css"?>';
 						<textbox id="student-konto-neu-textbox-mahnspanne" value="30" maxlength="4" size="4"/>
 						<spacer flex="1" />			
       				</hbox>
-				</row>
-				<row>
-					<label value="Typ" control="student-konto-neu-menulist-buchungstyp"/>
-					<menulist id="student-konto-neu-menulist-buchungstyp" 
-					          datasources="<?php echo APP_ROOT ?>rdf/buchungstyp.rdf.php" flex="1"
-					          ref="http://www.technikum-wien.at/buchungstyp/liste" >
-						<template>
-							<menupopup>
-								<menuitem value="rdf:http://www.technikum-wien.at/buchungstyp/rdf#buchungstyp_kurzbz"
-					        		      label="rdf:http://www.technikum-wien.at/buchungstyp/rdf#beschreibung"
-								  		  uri="rdf:*"/>
-								</menupopup>
-						</template>
-					</menulist>
 				</row>
 				<row>
 					<label value="Studiensemester" control="student-konto-neu-menulist-studiensemester"/>

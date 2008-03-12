@@ -41,7 +41,13 @@ var StudentAbschlusspruefungTreeDatasource=null; //Datasource des Abschlusspruef
 // ****
 var StudentAbschlusspruefungTreeSinkObserver =
 {
-	onBeginLoad : function(pSink) {},
+	onBeginLoad : function(pSink) 
+	{
+		//Eventlistener waehrend des Ladevorganges deaktivieren da es sonst
+		//zu Problemen kommt
+		tree = document.getElementById('student-abschlusspruefung-tree');
+		tree.removeEventListener('select', StudentAbschlusspruefungAuswahl, false);
+	},
 	onInterrupt : function(pSink) {},
 	onResume : function(pSink) {},
 	onError : function(pSink, pStatus, pError) {},
@@ -58,14 +64,16 @@ var StudentAbschlusspruefungTreeSinkObserver =
 // ****
 var StudentAbschlusspruefungTreeListener =
 {
-  willRebuild : function(builder) {  },
-  didRebuild : function(builder)
-  {
-  	  //timeout nur bei Mozilla notwendig da sonst die rows
-  	  //noch keine values haben. Ab Seamonkey funktionierts auch
-  	  //ohne dem setTimeout
-      window.setTimeout(StudentAbschlusspruefungTreeSelectID,10);
-  }
+	willRebuild : function(builder) {  },
+	didRebuild : function(builder)
+	{
+  		tree = document.getElementById('student-abschlusspruefung-tree');
+		tree.addEventListener('select', StudentAbschlusspruefungAuswahl, false);
+		//timeout nur bei Mozilla notwendig da sonst die rows
+		//noch keine values haben. Ab Seamonkey funktionierts auch
+		//ohne dem setTimeout
+		window.setTimeout(StudentAbschlusspruefungTreeSelectID,10);
+	}
 };
 
 // ****************** FUNKTIONEN ************************** //
@@ -78,6 +86,15 @@ function StudentAbschlusspruefungTreeLoad(uid)
 	tree = document.getElementById('student-abschlusspruefung-tree');
 	url='<?php echo APP_ROOT;?>rdf/abschlusspruefung.rdf.php?student_uid='+uid+"&"+gettimestamp();
 
+	//Alte Observer entfernen
+	try
+	{
+		StudentAbschlusspruefungTreeDatasource.removeXMLSinkObserver(StudentAbschlusspruefungTreeSinkObserver);
+		tree.builder.removeListener(StudentAbschlusspruefungTreeListener);
+	}
+	catch(e)
+	{}
+		
 	//Alte DS entfernen
 	var oldDatasources = tree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -248,9 +265,8 @@ function StudentAbschlusspruefungTreeSelectID()
 	   	for(var i=0;i<items;i++)
 	   	{
 	   		//ID der row holen
-			col = tree.columns ? tree.columns["student-abschlusspruefung-treecol-abschlusspruefung_id"] : "student-abschlusspruefung-treecol-abschlusspruefung_id";
-			var id=tree.view.getCellText(i,col);
-
+	   		var id = getTreeCellText(tree, "student-abschlusspruefung-treecol-abschlusspruefung_id", i);
+			
 			//wenn dies die zu selektierende Zeile
 			if(id == StudentAbschlusspruefungSelectID)
 			{
@@ -278,9 +294,8 @@ function StudentAbschlusspruefungAuswahl()
 	StudentAbschlusspruefungDetailDisableFields(false);
 	
 	//Ausgewaehlte Nr holen
-    var col = tree.columns ? tree.columns["student-abschlusspruefung-treecol-abschlusspruefung_id"] : "student-abschlusspruefung-treecol-abschlusspruefung_id";
-	var abschlusspruefung_id=tree.view.getCellText(tree.currentIndex,col);
-
+	var abschlusspruefung_id = getTreeCellText(tree, "student-abschlusspruefung-treecol-abschlusspruefung_id", tree.currentIndex)
+    
 	//Daten holen
 	var url = '<?php echo APP_ROOT ?>rdf/abschlusspruefung.rdf.php?abschlusspruefung_id='+abschlusspruefung_id+'&'+gettimestamp();
 
@@ -312,9 +327,6 @@ function StudentAbschlusspruefungAuswahl()
 	pruefungstyp_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#pruefungstyp_kurzbz" ));
 	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
 	
-	//var verband_tree=document.getElementById('tree-verband');
-	//var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
-	//var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
 	stg_kz = studiengang_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 	
 	//Akadgrad DropDown laden
@@ -408,9 +420,8 @@ function StudentAbschlusspruefungSpeichern()
 		return false;
 	}
 	
-    var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-	var student_uid=tree.view.getCellText(tree.currentIndex,col);
-
+	var student_uid = getTreeCellText(tree, "student-treecol-uid", tree.currentIndex);
+    
 	//Datum pruefen
 	if(datum!='' && !CheckDatum(datum))
 	{
@@ -445,7 +456,6 @@ function StudentAbschlusspruefungSpeichern()
 	req.add('neu', neu);
 	req.add('studiengang_kz', studiengang_kz);
 	
-
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
@@ -477,11 +487,7 @@ function StudentAbschlusspruefungNeu()
 	document.getElementById('student-abschlusspruefung-textbox-abschlusspruefung_id').value='';
 	StudentAbschlusspruefungResetFields();
 	StudentAbschlusspruefungDetailDisableFields(false);
-	
-	//var verband_tree=document.getElementById('tree-verband');
-	//var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
-	//var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
-	
+		
 	var stg_kz = studiengang_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 	
 	//Akadgrad DropDown laden
@@ -521,9 +527,9 @@ function StudentAbschlusspruefungLoeschen()
 
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 	
-	//Ausgewaehlte Nr holen
-    var col = tree.columns ? tree.columns["student-abschlusspruefung-treecol-abschlusspruefung_id"] : "student-abschlusspruefung-treecol-abschlusspruefung_id";
-	var abschlusspruefung_id=tree.view.getCellText(tree.currentIndex,col);
+	//Ausgewaehlte ID holen
+	var abschlusspruefung_id = getTreeCellText(tree, "student-abschlusspruefung-treecol-abschlusspruefung_id", tree.currentIndex);
+	
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	
 	var req = new phpRequest(url,'','');
@@ -566,10 +572,12 @@ function StudentAbschlusspruefungPrintPruefungsprotokollMultiple()
 	var tree = document.getElementById('student-abschlusspruefung-tree');
 
 	//Typ der ersten Abschlusspruefung des zuletzt markierten Studenten (der von dem die Daten geladen wurden) holen
+	//ToDo: Wenn zuerst alle Studenten markiert werden und dann diejenigen abmarkiert werden die nicht gedruckt werden sollen,
+	//dann funktioniert diese Methode nicht da die Daten desjenigen geladen sind der abmarkiert wurde und dieser moeglicherweise 
+	//keine Abschlusspruefung eingetragen hat
 	try
 	{
-		var col = tree.columns ? tree.columns["student-abschlusspruefung-treecol-pruefungstyp_kurzbz"] : "student-abschlusspruefung-treecol-pruefungstyp_kurzbz";
-		var pruefungstyp_kurzbz=tree.view.getCellText(0,col);
+		var pruefungstyp_kurzbz = getTreeCellText(tree, "student-abschlusspruefung-treecol-pruefungstyp_kurzbz", 0);
 	}
 	catch(e)
 	{
@@ -605,8 +613,7 @@ function StudentAbschlusspruefungPrintPruefungsprotokollMultiple()
   		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{
-			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-			uid = ';'+tree.view.getCellText(v,col);
+			uid = ';'+getTreeCellText(tree,"student-treecol-uid", v);
 			uids = uids + uid;
 			anzahl++;
 		}
@@ -631,11 +638,8 @@ function StudentAbschlusspruefungPrintPruefungsprotokoll()
 	}
 
 	//Ausgewaehlte Nr holen
-    var col = tree.columns ? tree.columns["student-abschlusspruefung-treecol-abschlusspruefung_id"] : "student-abschlusspruefung-treecol-abschlusspruefung_id";
-	var abschlusspruefung_id=tree.view.getCellText(tree.currentIndex,col);
-	
-	var col = tree.columns ? tree.columns["student-abschlusspruefung-treecol-pruefungstyp_kurzbz"] : "student-abschlusspruefung-treecol-pruefungstyp_kurzbz";
-	var pruefungstyp_kurzbz=tree.view.getCellText(tree.currentIndex,col);
+	var abschlusspruefung_id = getTreeCellText(tree,"student-abschlusspruefung-treecol-abschlusspruefung_id", tree.currentIndex);
+	var pruefungstyp_kurzbz = getTreeCellText(tree,"student-abschlusspruefung-treecol-pruefungstyp_kurzbz", tree.currentIndex);
 	
 	var stg_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 	
@@ -661,8 +665,7 @@ function StudentAbschlusspruefungPrintPruefungszeugnisMultiple()
 	//Typ der ersten Abschlusspruefung des zuletzt markierten Studenten (der von dem die Daten geladen wurden) holen
 	try
 	{
-		var col = tree.columns ? tree.columns["student-abschlusspruefung-treecol-pruefungstyp_kurzbz"] : "student-abschlusspruefung-treecol-pruefungstyp_kurzbz";
-		var pruefungstyp_kurzbz=tree.view.getCellText(0,col);
+		var pruefungstyp_kurzbz = getTreeCellText(tree,"student-abschlusspruefung-treecol-pruefungstyp_kurzbz", 0);
 	}
 	catch(e)
 	{
@@ -698,8 +701,7 @@ function StudentAbschlusspruefungPrintPruefungszeugnisMultiple()
   		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{
-			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-			uid = ';'+tree.view.getCellText(v,col);
+			uid = ';'+getTreeCellText(tree,"student-treecol-uid", v);
 			uids = uids + uid;
 			anzahl++;
 		}
@@ -723,11 +725,8 @@ function StudentAbschlusspruefungPrintPruefungszeugnis()
 	}
 
 	//Ausgewaehlte Nr holen
-    var col = tree.columns ? tree.columns["student-abschlusspruefung-treecol-abschlusspruefung_id"] : "student-abschlusspruefung-treecol-abschlusspruefung_id";
-	var abschlusspruefung_id=tree.view.getCellText(tree.currentIndex,col);
-	
-	var col = tree.columns ? tree.columns["student-abschlusspruefung-treecol-pruefungstyp_kurzbz"] : "student-abschlusspruefung-treecol-pruefungstyp_kurzbz";
-	var pruefungstyp_kurzbz=tree.view.getCellText(tree.currentIndex,col);
+	var abschlusspruefung_id = getTreeCellText(tree,"student-abschlusspruefung-treecol-abschlusspruefung_id", tree.currentIndex);
+	var pruefungstyp_kurzbz = getTreeCellText(tree,"student-abschlusspruefung-treecol-pruefungstyp_kurzbz", tree.currentIndex);
 	
 	if(pruefungstyp_kurzbz=='Bachelor')
 		xsl='Bakkzeugnis';
@@ -751,8 +750,7 @@ function StudentAbschlusspruefungPrintUrkundeMultiple(sprache)
 	//Typ der ersten Abschlusspruefung des zuletzt markierten Studenten (der von dem die Daten geladen wurden) holen
 	try
 	{
-		var col = tree.columns ? tree.columns["student-abschlusspruefung-treecol-pruefungstyp_kurzbz"] : "student-abschlusspruefung-treecol-pruefungstyp_kurzbz";
-		var pruefungstyp_kurzbz=tree.view.getCellText(0,col);
+		var pruefungstyp_kurzbz = getTreeCellText(tree,"student-abschlusspruefung-treecol-pruefungstyp_kurzbz", 0);
 	}
 	catch(e)
 	{
@@ -791,9 +789,8 @@ function StudentAbschlusspruefungPrintUrkundeMultiple(sprache)
 	{
   		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
-		{
-			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-			uid = ';'+tree.view.getCellText(v,col);
+		{		
+			uid = ';'+getTreeCellText(tree,"student-treecol-uid", v);
 			uids = uids + uid;
 			anzahl++;
 		}
@@ -818,11 +815,8 @@ function StudentAbschlusspruefungPrintUrkunde(sprache)
 	}
 
 	//Ausgewaehlte Nr holen
-    var col = tree.columns ? tree.columns["student-abschlusspruefung-treecol-abschlusspruefung_id"] : "student-abschlusspruefung-treecol-abschlusspruefung_id";
-	var abschlusspruefung_id=tree.view.getCellText(tree.currentIndex,col);
-	
-	var col = tree.columns ? tree.columns["student-abschlusspruefung-treecol-pruefungstyp_kurzbz"] : "student-abschlusspruefung-treecol-pruefungstyp_kurzbz";
-	var pruefungstyp_kurzbz=tree.view.getCellText(tree.currentIndex,col);
+	var abschlusspruefung_id = getTreeCellText(tree,"student-abschlusspruefung-treecol-abschlusspruefung_id", tree.currentIndex);
+	var pruefungstyp_kurzbz = getTreeCellText(tree,"student-abschlusspruefung-treecol-pruefungstyp_kurzbz", tree.currentIndex);
 	
 	if(pruefungstyp_kurzbz=='Bachelor' && sprache=='deutsch')
 		xsl='Bakkurkunde';

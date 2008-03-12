@@ -84,6 +84,14 @@ function loadFunktionen(uid)
 	url = "<?php echo APP_ROOT; ?>rdf/benutzerfunktion.rdf.php?uid="+uid+"&"+gettimestamp();	
 	var tree=document.getElementById('funktion-tree');
 	
+	try
+	{
+		FunktionenTreeDatasource.removeXMLSinkObserver(FunktionenTreeSinkObserver);
+		tree.builder.removeListener(FunktionenTreeListener);
+	}
+	catch(e)
+	{}
+	
 	//Alte DS entfernen
 	var oldDatasources = tree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())

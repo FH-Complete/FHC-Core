@@ -116,7 +116,7 @@ var InteressentDokumentTreeAbgegebenListener =
 // ****************** FUNKTIONEN ************************** //
 
 // ****
-// * Weisst dem Prestudenten Dokumente zu die er bereits abgegeben hat
+// * Teilt dem Prestudenten Dokumente zu die er bereits abgegeben hat
 // ****
 function InteressentDokumenteAdd()
 {
@@ -133,8 +133,7 @@ function InteressentDokumenteAdd()
   		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{
-			col = tree.columns ? tree.columns["interessent-dokumente-tree-nichtabgegeben-dokument_kurzbz"] : "interessent-dokumente-tree-nichtabgegeben-dokument_kurzbz";
-			dok = tree.view.getCellText(v,col);
+			dok = getTreeCellText(tree, "interessent-dokumente-tree-nichtabgegeben-dokument_kurzbz", v);			
 			paramList += ';'+dok;
 		}
 	}

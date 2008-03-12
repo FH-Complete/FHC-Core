@@ -116,7 +116,11 @@ var StudentDetailRolleTreeSinkObserver =
 // ****
 var StudentKontoTreeSinkObserver =
 {
-	onBeginLoad : function(pSink) {},
+	onBeginLoad : function(pSink) 
+	{
+		tree = document.getElementById('student-konto-tree');
+		tree.removeEventListener('select', StudentKontoAuswahl, false);
+	},
 	onInterrupt : function(pSink) {},
 	onResume : function(pSink) {},
 	onError : function(pSink, pStatus, pError) { debug('Error StudentKontoTreeSinkObserver:'+pError+':'+pStatus); },
@@ -133,14 +137,16 @@ var StudentKontoTreeSinkObserver =
 // ****
 var StudentKontoTreeListener =
 {
-  willRebuild : function(builder) {  },
-  didRebuild : function(builder)
-  {
-  	  //timeout nur bei Mozilla notwendig da sonst die rows
-  	  //noch keine values haben. Ab Seamonkey funktionierts auch
-  	  //ohne dem setTimeout
-  	  window.setTimeout(StudentKontoTreeSelectBuchung,10);
-  }
+	willRebuild : function(builder) {  },
+	didRebuild : function(builder)
+	{
+  		tree = document.getElementById('student-konto-tree');
+		tree.addEventListener('select', StudentKontoAuswahl, false);
+		//timeout nur bei Mozilla notwendig da sonst die rows
+		//noch keine values haben. Ab Seamonkey funktionierts auch
+		//ohne dem setTimeout
+		window.setTimeout(StudentKontoTreeSelectBuchung,10);
+	}
 };
 
 // ****
@@ -150,7 +156,11 @@ var StudentKontoTreeListener =
 // ****
 var StudentIOTreeSinkObserver =
 {
-	onBeginLoad : function(pSink) {},
+	onBeginLoad : function(pSink) 
+	{
+		tree = document.getElementById('student-io-tree');
+		tree.removeEventListener('select', StudentIOAuswahl, false);
+	},
 	onInterrupt : function(pSink) {},
 	onResume : function(pSink) {},
 	onError : function(pSink, pStatus, pError) {},
@@ -167,14 +177,16 @@ var StudentIOTreeSinkObserver =
 // ****
 var StudentIOTreeListener =
 {
-  willRebuild : function(builder) {  },
-  didRebuild : function(builder)
-  {
-  	  //timeout nur bei Mozilla notwendig da sonst die rows
-  	  //noch keine values haben. Ab Seamonkey funktionierts auch
-  	  //ohne dem setTimeout
-      window.setTimeout(StudentIOTreeSelectID,10);
-  }
+	willRebuild : function(builder) {  },
+	didRebuild : function(builder)
+	{
+  		tree = document.getElementById('student-io-tree');
+		tree.addEventListener('select', StudentIOAuswahl, false);
+		//timeout nur bei Mozilla notwendig da sonst die rows
+		//noch keine values haben. Ab Seamonkey funktionierts auch
+		//ohne dem setTimeout
+		window.setTimeout(StudentIOTreeSelectID,10);
+	}
 };
 
 
@@ -188,6 +200,8 @@ var StudentNotenTreeSinkObserver =
 	onBeginLoad : function(pSink) 
 	{
 		StudentNotenTreeloaded=false;
+		tree = document.getElementById('student-noten-tree');
+		tree.removeEventListener('select', StudentNotenAuswahl, false);
 	},
 	onInterrupt : function(pSink) {},
 	onResume : function(pSink) {},
@@ -205,15 +219,17 @@ var StudentNotenTreeSinkObserver =
 // ****
 var StudentNotenTreeListener =
 {
-  willRebuild : function(builder) {  },
-  didRebuild : function(builder)
-  {
-  	  //timeout nur bei Mozilla notwendig da sonst die rows
-  	  //noch keine values haben. Ab Seamonkey funktionierts auch
-  	  //ohne dem setTimeout
-  	  StudentNotenTreeloaded=true;
-      window.setTimeout(StudentNotenTreeSelectID,10);
-  }
+	willRebuild : function(builder) {  },
+	didRebuild : function(builder)
+	{
+		tree = document.getElementById('student-noten-tree');
+		tree.addEventListener('select', StudentNotenAuswahl, false);
+		//timeout nur bei Mozilla notwendig da sonst die rows
+		//noch keine values haben. Ab Seamonkey funktionierts auch
+		//ohne dem setTimeout
+		StudentNotenTreeloaded=true;
+		window.setTimeout(StudentNotenTreeSelectID,10);
+	}
 };
 
 // ****
@@ -259,7 +275,11 @@ var StudentLvGesamtNotenTreeListener =
 // ****
 var StudentPruefungTreeSinkObserver =
 {
-	onBeginLoad : function(pSink) {},
+	onBeginLoad : function(pSink) 
+	{
+		tree = document.getElementById('student-pruefung-tree');
+		tree.removeEventListener('select', StudentPruefungAuswahl, false);
+	},
 	onInterrupt : function(pSink) {},
 	onResume : function(pSink) {},
 	onError : function(pSink, pStatus, pError) {},
@@ -276,14 +296,17 @@ var StudentPruefungTreeSinkObserver =
 // ****
 var StudentPruefungTreeListener =
 {
-  willRebuild : function(builder) {  },
-  didRebuild : function(builder)
-  {
-  	  //timeout nur bei Mozilla notwendig da sonst die rows
-  	  //noch keine values haben. Ab Seamonkey funktionierts auch
-  	  //ohne dem setTimeout
-      window.setTimeout(StudentPruefungTreeSelectID,10);
-  }
+	willRebuild : function(builder) {  },
+	didRebuild : function(builder)
+	{
+  		tree = document.getElementById('student-pruefung-tree');
+		tree.addEventListener('select', StudentPruefungAuswahl, false);
+		
+		//timeout nur bei Mozilla notwendig da sonst die rows
+		//noch keine values haben. Ab Seamonkey funktionierts auch
+		//ohne dem setTimeout
+		window.setTimeout(StudentPruefungTreeSelectID,10);
+	}
 };
 
 // ****
@@ -709,7 +732,6 @@ function StudentImageDelete()
 // ****
 function StudentAuswahl()
 {
-
 	if(!StudentTreeLoadDataOnSelect)
 	{
 		StudentTreeLoadDataOnSelect=true;
@@ -719,7 +741,7 @@ function StudentAuswahl()
 	if(!StudentTreeLoadDataOnSelect2)
 		return true;
 
-		// Trick 17	(sonst gibt's ein Permission denied)
+	// Trick 17	(sonst gibt's ein Permission denied)
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-tree');
 
@@ -1796,6 +1818,14 @@ function StudentKontoLoad()
 	studienang_kz_prestudent = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 	url='<?php echo APP_ROOT;?>rdf/konto.rdf.php?person_id='+person_id+"&filter="+filter+"&studiengang_kz="+studiengang_kz_prestudent+"&"+gettimestamp();
 
+	try
+	{
+		StudentKontoTreeDatasource.removeXMLSinkObserver(StudentKontoTreeSinkObserver);
+		kontotree.builder.removeListener(StudentKontoTreeListener);
+	}
+	catch(e)
+	{}
+	
 	//Alte DS entfernen
 	var oldDatasources = kontotree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -1804,14 +1834,6 @@ function StudentKontoLoad()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	kontotree.builder.rebuild();
-
-	try
-	{
-		StudentKontoTreeDatasource.removeXMLSinkObserver(StudentKontoTreeSinkObserver);
-		kontotree.builder.removeListener(StudentKontoTreeListener);
-	}
-	catch(e)
-	{}
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	StudentKontoTreeDatasource = rdfService.GetDataSource(url);
@@ -1911,6 +1933,14 @@ function StudentKontoFilter()
 	catch(e)
 	{}
 
+	try
+	{
+		StudentKontoTreeDatasource.removeXMLSinkObserver(StudentKontoTreeSinkObserver);
+		kontotree.builder.removeListener(StudentKontoTreeListener);
+	}
+	catch(e)
+	{}
+	
 	//Alte DS entfernen
 	var oldDatasources = kontotree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -1921,14 +1951,6 @@ function StudentKontoFilter()
 	kontotree.builder.rebuild();
 
 	StudentKontoSelectBuchung = buchungsnr;
-
-	try
-	{
-		StudentKontoTreeDatasource.removeXMLSinkObserver(StudentKontoTreeSinkObserver);
-		kontotree.builder.removeListener(StudentKontoTreeListener);
-	}
-	catch(e)
-	{}
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	StudentKontoTreeDatasource = rdfService.GetDataSource(url);
@@ -1973,13 +1995,6 @@ function StudentKontoFilterStudenten(filter)
 	url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ="+typ+"&filter2="+filter+"&"+gettimestamp();
 	var treeStudent=document.getElementById('student-tree');
 
-	//Alte DS entfernen
-	var oldDatasources = treeStudent.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
-	{
-		treeStudent.database.RemoveDataSource(oldDatasources.getNext());
-	}
-
 	try
 	{
 		StudentTreeDatasource.removeXMLSinkObserver(StudentTreeSinkObserver);
@@ -1987,6 +2002,14 @@ function StudentKontoFilterStudenten(filter)
 	}
 	catch(e)
 	{}
+	
+	//Alte DS entfernen
+	var oldDatasources = treeStudent.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		treeStudent.database.RemoveDataSource(oldDatasources.getNext());
+	}
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	StudentTreeDatasource = rdfService.GetDataSource(url);
 	StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -2032,13 +2055,6 @@ function StudentKontoFilterBuchungstyp()
 	url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ="+typ+"&filter2=buchungstyp;"+filter+"&"+gettimestamp();
 	var treeStudent=document.getElementById('student-tree');
 
-	//Alte DS entfernen
-	var oldDatasources = treeStudent.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
-	{
-		treeStudent.database.RemoveDataSource(oldDatasources.getNext());
-	}
-
 	try
 	{
 		StudentTreeDatasource.removeXMLSinkObserver(StudentTreeSinkObserver);
@@ -2046,6 +2062,14 @@ function StudentKontoFilterBuchungstyp()
 	}
 	catch(e)
 	{}
+	
+	//Alte DS entfernen
+	var oldDatasources = treeStudent.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		treeStudent.database.RemoveDataSource(oldDatasources.getNext());
+	}
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	StudentTreeDatasource = rdfService.GetDataSource(url);
 	StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -3083,13 +3107,6 @@ function StudentNoteDetailDisableFields(val)
 // ***
 function StudentNotenAuswahl()
 {
-	//Beim Refresh des Trees wird das onselect event ausgeloest wenn der 
-	//vorher markierte Eintrag nach dem Refresh nicht mehr in der Liste ist
-	//daher soll die funktion nur ausgefuehrt werden, wenn der tree 
-	//tatsaechlich fertig geladen wurde
-	if(!StudentNotenTreeloaded)
-		return false;
-	
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-noten-tree');
 

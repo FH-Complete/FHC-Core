@@ -48,6 +48,14 @@ function initLektorTree()
 
 		if(LektorTree)
 		{
+			try
+			{
+				LektorTreeDatasource.removeXMLSinkObserver(LektorTreeSinkObserver);
+				LektorTree.builder.removeListener(LektorTreeListener);
+			}
+			catch(e)
+			{}
+			
 			//Alte DS entfernen
 			var oldDatasources = LektorTree.database.GetDataSources();
 			while(oldDatasources.hasMoreElements())
@@ -343,13 +351,6 @@ function onVerbandSelect(event)
 			url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?stg_kz='+stg_kz+'&sem='+sem+'&ver='+ver+'&grp='+grp+'&gruppe='+gruppe+'&'+gettimestamp();
 			var treeLV=document.getElementById('lehrveranstaltung-tree');
 
-			//Alte DS entfernen
-			var oldDatasources = treeLV.database.GetDataSources();
-			while(oldDatasources.hasMoreElements())
-			{
-				treeLV.database.RemoveDataSource(oldDatasources.getNext());
-			}
-
 			try
 			{
 				LvTreeDatasource.removeXMLSinkObserver(LvTreeSinkObserver);
@@ -357,6 +358,14 @@ function onVerbandSelect(event)
 			}
 			catch(e)
 			{}
+			
+			//Alte DS entfernen
+			var oldDatasources = treeLV.database.GetDataSources();
+			while(oldDatasources.hasMoreElements())
+			{
+				treeLV.database.RemoveDataSource(oldDatasources.getNext());
+			}
+
 			var rdfService1 = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 
 			LvTreeDatasource = rdfService1.GetDataSource(url);
@@ -387,13 +396,6 @@ function onVerbandSelect(event)
 			url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"studiengang_kz="+stg_kz+"&semester="+sem+"&typ="+typ+"&studiensemester_kurzbz="+stsem+"&"+gettimestamp();
 			var treeInt=document.getElementById('student-tree');
 
-			//Alte DS entfernen
-			var oldDatasources = treeInt.database.GetDataSources();
-			while(oldDatasources.hasMoreElements())
-			{
-				treeInt.database.RemoveDataSource(oldDatasources.getNext());
-			}
-
 			try
 			{
 				StudentTreeDatasource.removeXMLSinkObserver(StudentTreeSinkObserver);
@@ -401,6 +403,13 @@ function onVerbandSelect(event)
 			}
 			catch(e)
 			{}
+			
+			//Alte DS entfernen
+			var oldDatasources = treeInt.database.GetDataSources();
+			while(oldDatasources.hasMoreElements())
+			{
+				treeInt.database.RemoveDataSource(oldDatasources.getNext());
+			}
 
 			var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 			StudentTreeDatasource = rdfService.GetDataSource(url);
@@ -472,13 +481,6 @@ function onFachbereichSelect(event)
 		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?fachbereich_kurzbz='+kurzbz+'&uid='+uid+'&'+gettimestamp();
 		var treeLV=document.getElementById('lehrveranstaltung-tree');
 
-		//Alte DS entfernen
-		var oldDatasources = treeLV.database.GetDataSources();
-		while(oldDatasources.hasMoreElements())
-		{
-			treeLV.database.RemoveDataSource(oldDatasources.getNext());
-		}
-
 		try
 		{
 			LvTreeDatasource.removeXMLSinkObserver(LvTreeSinkObserver);
@@ -486,6 +488,13 @@ function onFachbereichSelect(event)
 		}
 		catch(e)
 		{}
+		
+		//Alte DS entfernen
+		var oldDatasources = treeLV.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			treeLV.database.RemoveDataSource(oldDatasources.getNext());
+		}
 
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		LvTreeDatasource = rdfService.GetDataSource(url);

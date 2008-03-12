@@ -52,10 +52,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<tree id="student-pruefung-tree" seltype="multi" hidecolumnpicker="false" flex="1"
 						datasources="rdf:null" ref="http://www.technikum-wien.at/pruefung/liste"
 						style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100px" enableColumnDrag="true"
-						onselect="StudentPruefungAuswahl()"
 						context="student-pruefung-tree-popup"
 						flags="dont-build-content"
 					>
+					<!-- onselect="StudentPruefungAuswahl()" - wird jetzt per JS gesetzt -->
 					
 						<treecols>
 							<treecol id="student-pruefung-tree-datum" label="Datum" flex="2" hidden="false" primary="true"
