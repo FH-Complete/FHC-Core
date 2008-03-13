@@ -28,7 +28,7 @@
 require ('../vilesci/config.inc.php');
 
 // Datenbank Verbindung
-//if (!$conn = pg_pconnect("host=.technikum-wien.at dbname=devvilesci user=pam password="))
+//if (!$conn = pg_pconnect("host=.technikum-wien.at dbname= user= password="))
 if (!$conn = pg_pconnect(CONN_STRING))
    	die('Es konnte keine Verbindung zum Server aufgebaut werden!'.pg_last_error($conn));
 
@@ -80,6 +80,16 @@ if (!@pg_query($conn,'SELECT kompetenzen FROM public.tbl_person LIMIT 1;'))
 		echo '<strong>public.tbl_person: '.pg_last_error($conn).' </strong><BR>';
 	else
 		echo 'kompetenzen wurde bei public.tbl_person hinzugefuegt!<BR>';
+}
+
+// ************** public.tbl_buchungstyp.standardbetrag ************************
+if (!@pg_query($conn,'SELECT standardbetrag FROM public.tbl_buchungstyp LIMIT 1;'))
+{
+	$sql='	ALTER TABLE public.tbl_buchungstyp ADD COLUMN standardbetrag numeric(8,2);';
+	if (!@pg_query($conn,$sql))
+		echo '<strong>public.tbl_buchungstyp: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo 'standardbetrag wurde bei public.tbl_buchungstyp hinzugefuegt!<BR>';
 }
 
 // ************** lehre.tbl_lehrveranstaltung.projektarbeit ************************
