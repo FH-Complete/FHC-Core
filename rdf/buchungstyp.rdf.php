@@ -58,7 +58,8 @@ foreach ($typ->result as $row)
          <RDF:Description  id="<?php echo $row->buchungstyp_kurzbz; ?>"  about="<?php echo $rdf_url.'/'.$row->buchungstyp_kurzbz; ?>" >
             <TYP:buchungstyp_kurzbz><![CDATA[<?php echo $row->buchungstyp_kurzbz ?>]]></TYP:buchungstyp_kurzbz>
             <TYP:beschreibung><![CDATA[<?php echo $row->beschreibung ?>]]></TYP:beschreibung>
-            <TYP:betrag><![CDATA[<?php echo '-0.00'; ?>]]></TYP:betrag>
+            <TYP:standardbetrag><![CDATA[<?php echo ($row->standardbetrag!=''?$row->standardbetrag:'-0.00'); ?>]]></TYP:standardbetrag>
+            <TYP:standardtext><![CDATA[<?php echo $row->standardtext; ?>]]></TYP:standardtext>
          </RDF:Description>
       </RDF:li>
 <?php

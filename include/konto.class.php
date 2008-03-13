@@ -55,6 +55,8 @@ class konto
 	var $nachname;
 	var $vorname;
 	var $vornamen;
+	var $standardbetrag;
+	var $standardtext;
 
 	//var $beschreibung;
 
@@ -433,6 +435,8 @@ class konto
 
 				$typ->buchungstyp_kurzbz = $row->buchungstyp_kurzbz;
 				$typ->beschreibung = $row->beschreibung;
+				$typ->standardbetrag = $row->standardbetrag;
+				$typ->standardtext = $row->standardtext;
 
 				$this->result[] = $typ;
 			}

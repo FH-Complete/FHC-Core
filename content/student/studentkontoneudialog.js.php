@@ -99,9 +99,15 @@ function StudentKontoNeuSpeichern()
 function StudentKontoNeuDefaultBetrag()
 {
 	var typmenulist = document.getElementById('student-konto-neu-menulist-buchungstyp');
-	betrag = typmenulist.selectedItem.getAttribute('betrag');
+	var betrag = typmenulist.selectedItem.getAttribute('standardbetrag');
+	var text = typmenulist.selectedItem.getAttribute('standardtext');
 	if(betrag=='')
-		betrag='-0.0';
+		betrag='-0.00';
 		
-	document.getElementById('student-konto-neu-textbox-betrag').value=betrag;
+	if(document.getElementById('student-konto-neu-textbox-betrag').value=='' ||
+	   document.getElementById('student-konto-neu-textbox-betrag').value=='-0.00')
+		document.getElementById('student-konto-neu-textbox-betrag').value=betrag;
+		
+	if(document.getElementById('student-konto-neu-textbox-buchungstext').value=='')
+		document.getElementById('student-konto-neu-textbox-buchungstext').value=text;
 }
