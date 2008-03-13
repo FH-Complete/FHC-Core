@@ -92,6 +92,16 @@ if (!@pg_query($conn,'SELECT standardbetrag FROM public.tbl_buchungstyp LIMIT 1;
 		echo 'standardbetrag wurde bei public.tbl_buchungstyp hinzugefuegt!<BR>';
 }
 
+// ************** public.tbl_buchungstyp.standardtext ************************
+if (!@pg_query($conn,'SELECT standardtext FROM public.tbl_buchungstyp LIMIT 1;'))
+{
+	$sql='	ALTER TABLE public.tbl_buchungstyp ADD COLUMN standardtext varchar(256);';
+	if (!@pg_query($conn,$sql))
+		echo '<strong>public.tbl_buchungstyp: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo 'standardtext wurde bei public.tbl_buchungstyp hinzugefuegt!<BR>';
+}
+
 // ************** lehre.tbl_lehrveranstaltung.projektarbeit ************************
 if (!@pg_query($conn,'SELECT projektarbeit FROM lehre.tbl_lehrveranstaltung LIMIT 1;'))
 {
