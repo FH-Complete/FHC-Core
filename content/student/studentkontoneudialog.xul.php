@@ -62,7 +62,8 @@ echo '<?xml-stylesheet href="../datepicker/datepicker.css" type="text/css"?>';
 							<menupopup>
 								<menuitem value="rdf:http://www.technikum-wien.at/buchungstyp/rdf#buchungstyp_kurzbz"
 					        		      label="rdf:http://www.technikum-wien.at/buchungstyp/rdf#beschreibung"
-					        		      betrag="rdf:http://www.technikum-wien.at/buchungstyp/rdf#betrag"
+					        		      standardbetrag="rdf:http://www.technikum-wien.at/buchungstyp/rdf#standardbetrag"
+					        		      standardtext="rdf:http://www.technikum-wien.at/buchungstyp/rdf#standardtext"
 								  		  uri="rdf:*"/>
 								</menupopup>
 						</template>
@@ -71,7 +72,7 @@ echo '<?xml-stylesheet href="../datepicker/datepicker.css" type="text/css"?>';
 				<row>
 					<label value="Betrag" control="student-konto-neu-textbox-betrag"/>
 					<hbox>
-      					<textbox id="student-konto-neu-textbox-betrag" value="-0.0" maxlength="9" size="9"/>
+      					<textbox id="student-konto-neu-textbox-betrag" value="-0.00" maxlength="9" size="9"/>
       					<spacer flex="1" />			
       				</hbox>
 				</row>
