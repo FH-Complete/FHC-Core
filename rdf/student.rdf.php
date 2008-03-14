@@ -268,7 +268,7 @@ function draw_prestudent($row)
 			<STUDENT:reihungstestangetreten><![CDATA['.($row->reihungstestangetreten?'true':'false').']]></STUDENT:reihungstestangetreten>
 			<STUDENT:punkte><![CDATA['.$row->punkte.']]></STUDENT:punkte>
 			<STUDENT:bismelden><![CDATA['.($row->bismelden?'true':'false').']]></STUDENT:bismelden>
-			<STUDENT:anmerkung><![CDATA['.$row->anmerkung.']]></STUDENT:anmerkung>
+			<STUDENT:anmerkungpre><![CDATA['.$row->anmerkung.']]></STUDENT:anmerkungpre>
       	</RDF:Description>
       </RDF:li>';
 	}

@@ -254,7 +254,7 @@ function onOrtSelect()
 	}
 }
 
-function onLektorSelect()
+function onLektorSelect(event)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
@@ -298,18 +298,54 @@ function onLektorSelect()
 	var vboxLehrveranstalungPlanung=document.getElementById('vboxLehrveranstalungPlanung');
 	vboxLehrveranstalungPlanung.setAttribute('datasources','../rdf/lehreinheit-lvplan.rdf.php?'+"type=lektor&lektor="+uid+"&"+gettimestamp());
 
-	// Lehrveranstaltung
+	var tree=document.getElementById('tree-lektor');
+	//Wenn nichts markiert wurde -> beenden
+	if(tree.currentIndex==-1)
+		return;
+
+	var row = { };
+    var col = { };
+    var child = { };
+
+    tree.treeBoxObject.getCellAt(event.pageX, event.pageY, row, col, child)
+
+    //Wenn es keine Row ist sondern ein Header oder Scrollbar dann abbrechen
+    if (!col.value)
+       	return false;
+
+    //Wenn eine andere row markiert ist als angeklickt wurde -> beenden.
+	//Dies kommt vor wenn ein Subtree geoeffnet wird
+	if(row.value!=tree.currentIndex)
+		return;
+
+	col = tree.columns ? tree.columns["uid"] : "uid";
+	var uid=tree.view.getCellText(tree.currentIndex,col);
+
+	var stg_idx = tree.view.getParentIndex(tree.currentIndex);
+	var col = tree.columns ? tree.columns["studiengang_kz"] : "studiengang_kz";
+	var stg_kz=tree.view.getCellText(stg_idx,col);
+
+	document.getElementById('LehrveranstaltungEditor').setAttribute('stg_kz',stg_kz);
+	document.getElementById('LehrveranstaltungEditor').setAttribute('uid',uid);
+
+	// Lehrveranstaltung des Lektors laden
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	try
 	{
-		//var stg_idx = treeLektor.view.getParentIndex(tree.currentIndex);
-		//var col = tree.columns ? tree.columns["studiengang_kz"] : "studiengang_kz";
-		//var stg_kz=tree.view.getCellText(stg_idx,col);
-
-		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?stg_kz=0&uid='+uid+'&'+gettimestamp();
+		//alert(stg_kz);
+		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?stg_kz='+stg_kz+'&uid='+uid+'&'+gettimestamp();
 		var treeLV=document.getElementById('lehrveranstaltung-tree');
 
 		//Alte DS entfernen
 		var oldDatasources = treeLV.database.GetDataSources();
+		try
+		{
+			LvTreeDatasource.removeXMLSinkObserver(LvTreeSinkObserver);
+			treeLV.builder.removeListener(LvTreeListener);
+		}
+		catch(e)
+		{}
+		
 		while(oldDatasources.hasMoreElements())
 		{
 			treeLV.database.RemoveDataSource(oldDatasources.getNext());
@@ -322,6 +358,7 @@ function onLektorSelect()
 		treeLV.database.AddDataSource(LvTreeDatasource);
 		LvTreeDatasource.addXMLSinkObserver(LvTreeSinkObserver);
 		treeLV.builder.addListener(LvTreeListener);
+		document.getElementById('lehrveranstaltung-toolbar-lehrauftrag').hidden=false;
 	}
 	catch(e)
 	{
