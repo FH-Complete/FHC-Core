@@ -75,6 +75,14 @@ else
 		}
 	}
 
+$qry = "SELECT aktiv FROM campus.vw_benutzer WHERE uid='$user'";
+if($result = pg_query($db_conn, $qry))
+{
+	if($row = pg_fetch_object($result))
+	{
+		$aktiv = ($row->aktiv=='t'?true:false);
+	}
+}
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -137,7 +145,7 @@ else
 		  	<table class="tabcontent" id="MeineCIS" style="display: visible;">
 		  	<tr>
 			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class='tdwrap'><a class="Item" href="profile/index.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Profil</a></td>
+				<td class='tdwrap' ><a class="Item" href="profile/index.php" target="content" <?php echo (!$aktiv?'style="color: red;"':''); ?>><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Profil</a></td>
 			</tr>
 			<tr>
 			  	<td class="tdwidth10" nowrap>&nbsp;</td>

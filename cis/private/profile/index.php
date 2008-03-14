@@ -41,6 +41,7 @@
 		$email=pg_result($erg,0,"uid").'@technikum-wien.at';
 		$email_alias=pg_result($erg,0,"alias");
 		$hp=pg_result($erg,0,"homepage");
+		$aktiv=pg_result($erg,0,"aktiv");
 	}
 	if(!($erg_stud=pg_exec($conn, "SELECT studiengang_kz, semester, verband, gruppe, matrikelnr, typ::varchar(1) || kurzbz AS stgkz, tbl_studiengang.bezeichnung AS stgbz FROM public.tbl_student JOIN public.tbl_studiengang USING(studiengang_kz) WHERE student_uid='$uid'")))
 		die(pg_last_error($conn));
@@ -94,6 +95,20 @@
 
 	Results: <?php echo $num_rows; ?><br>
 	Username: <?php echo $uid; ?><br><br>
+	<?php
+	if($aktiv=='f')
+	{
+		$message = "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun für Sie?<br><br>";
+		$message .= "Vorerst werden Sie aus allen Mail-Verteilern gelöscht.<br>";
+		$message .= "Wenn der Datensatz in den nächsten Tagen nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:<br>";
+		$message .= "- Ihr Account wird gelöscht.<br>";
+		$message .= "- Ihre Mailbox mit sämtlichen Mails wird gelöscht.<br>";
+		$message .= "- Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht.<br><br>";
+		$message .= "Sollte es sich hierbei um einen Irrtum handeln, wenden sie sich bitte an ihre Studiengangsassistenz.<br>";
+
+		echo "<span style='color: red;'>Achtung!<br>$message</span>";
+	}
+	?>
 	<HR>
 	<?php
 	if ($num_rows==1)

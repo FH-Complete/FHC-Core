@@ -437,10 +437,16 @@ class prestudent extends person
 	// *******************************************************************************
 	function loadIntessentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester=nulll, $typ=null)
 	{
-		$qry = "SELECT *, tbl_person.anmerkung as anmerkungen FROM (
-					SELECT *, (
-							SELECT rolle_kurzbz FROM tbl_prestudentrolle WHERE prestudent_id=prestudent.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) AS rolle 
-					FROM tbl_prestudent prestudent ORDER BY prestudent_id) a, tbl_prestudentrolle, tbl_person
+		$qry = "SELECT 
+					*, a.anmerkung, tbl_person.anmerkung as anmerkungen 
+				FROM 
+					(
+						SELECT 
+							*, (SELECT rolle_kurzbz FROM tbl_prestudentrolle 
+							    WHERE prestudent_id=prestudent.prestudent_id 
+							    ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) AS rolle 
+						FROM tbl_prestudent prestudent ORDER BY prestudent_id
+					) a, tbl_prestudentrolle, tbl_person
 				WHERE a.rolle=tbl_prestudentrolle.rolle_kurzbz AND 
 					a.person_id=tbl_person.person_id AND
 					a.prestudent_id = tbl_prestudentrolle.prestudent_id AND
