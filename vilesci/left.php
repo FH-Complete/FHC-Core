@@ -92,7 +92,8 @@
 			'Benutzer'=>array
 			(
 				'name'=>'Benutzer',
-				'LDAPCheck'=>array('name'=>'LDAPCheck', 'link'=>'personen/ldap_check.php', 'target'=>'main')
+				'LDAPCheck'=>array('name'=>'LDAPCheck', 'link'=>'personen/ldap_check.php', 'target'=>'main'),
+				'Funktionen'=>array('name'=>'Funktionen', 'link'=>'personen/funktion.php', 'target'=>'main')
 			),
 			'Mitarbeiter'=>array
 			(
