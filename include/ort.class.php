@@ -36,14 +36,14 @@ class ort
 	var $bezeichnung;		// @var string
 	var $planbezeichnung;	// @var string
 	var $max_person;		// @var integer
-	var $aktiv;			// @var boolean
 	var $lehre;			// @var boolean
+	var $reservieren;		// @var boolean
+	var $aktiv;			// @var boolean
 	var $lageplan;		// @var oid
 	var $dislozierung;		// @var smallint
 	var $kosten;			// @var numeric(8,2)
-	var $reservieren;
 	var $ausstattung;
-
+	var $stockwerk;		// @var integer
 
 	/**
 	 * Konstruktor
@@ -101,6 +101,7 @@ class ort
 			$ort_obj->kosten 			= $row->kosten;
 			$ort_obj->reservieren		= ($row->reservieren=='t'?true:false);
 			$ort_obj->ausstattung		= $row->ausstattung;
+			$ort_obj->stockwerk			= $row->stockwerk;
 
 			$this->result[] = $ort_obj;
 		}
@@ -135,12 +136,13 @@ class ort
 			$this->planbezeichnung 	= $row->planbezeichnung;
 			$this->max_person 		= $row->max_person;
 			$this->aktiv 			= ($row->aktiv=='t'?true:false);
-			$ort_obj->lehre 		= ($row->lehre=='t'?true:false);
+			$this->lehre 			= ($row->lehre=='t'?true:false);
 			$this->lageplan 		= $row->lageplan;
-			$this->dislozierung 	= $row->dislozierung;
-			$this->kosten 			= $row->kosten;
+			$this->dislozierung 		= $row->dislozierung;
+			$this->kosten 		= $row->kosten;
 			$this->reservieren		= ($row->reservieren=='t'?true:false);
 			$this->ausstattung		= $row->ausstattung;
+			$this->stockwerk		= $row->stockwerk;
 		}
 		else
 		{
@@ -214,17 +216,19 @@ class ort
 				return false;
 			}
 			//Neuen Datensatz anlegen
-			$qry = 'INSERT INTO public.tbl_ort (ort_kurzbz, bezeichnung, planbezeichnung, max_person, aktiv, lehre, lageplan,
-				dislozierung, kosten) VALUES ('.
+			$qry = 'INSERT INTO public.tbl_ort (ort_kurzbz, bezeichnung, planbezeichnung, max_person, aktiv, lehre, reservieren, lageplan,
+				dislozierung, kosten, stockwerk) VALUES ('.
 				$this->addslashes($this->ort_kurzbz).', '.
 				$this->addslashes($this->bezeichnung).', '.
 				$this->addslashes($this->planbezeichnung).', '.
 				$this->addslashes($this->max_person).', '.
 				($this->aktiv?'true':'false').', '.
 				($this->lehre?'true':'false').', '.
+				($this->reservieren?'true':'false').', '.
 				$this->addslashes($this->lageplan).', '.
 				$this->addslashes($this->dislozierung).', '.
-				$this->addslashes($this->kosten).');';
+				$this->addslashes(str_replace(",",".",$this->kosten)).', ';
+				$this->addslashes($this->stockwerk).');';
 		}
 		else
 		{
@@ -243,9 +247,11 @@ class ort
 				'max_person='.$this->addslashes($this->max_person).', '.
 				'aktiv='.($this->aktiv?'true':'false') .', '.
 				'lehre='.($this->lehre?'true':'false') .', '.
+				'reservieren='.($this->reservieren?'true':'false') .', '.
 				'lageplan='.$this->addslashes($this->lageplan).', '.
 				'dislozierung='.$this->addslashes($this->dislozierung).', '.
-				'kosten='.$this->addslashes($this->kosten).' '.
+				'kosten='.$this->addslashes(str_replace(",",".",$this->kosten)).', '.
+				'stockwerk='.$this->addslashes($this->stockwerk).' '.
 				'WHERE ort_kurzbz = '.$this->addslashes($this->ort_kurzbz).';';
 		}
 
