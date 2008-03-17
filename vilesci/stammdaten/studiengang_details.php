@@ -131,7 +131,7 @@
 		$erhalter_kz = $sg->erhalter_kz;
 		$bescheid = $sg->bescheid;
 		$bescheidbgbl1 = $sg->bescheidbgbl1;
-		$bescheidbgbl2 = $sg->bescheidbgbl1;
+		$bescheidbgbl2 = $sg->bescheidbgbl2;
 		$bescheidgz = $sg->bescheidgz;
 		$bescheidvom = $sg->bescheidvom;
 		$organisationsform = $sg->orgform_kurzbz;
