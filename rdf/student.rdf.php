@@ -132,8 +132,8 @@ function draw_content_liste($row)
 	global $rdf_url, $datum_obj, $conn, $stg_arr;
 	$status='';
 
-	$mail_privat = '';
-	/*$qry_mail = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id='$row->person_id' AND zustellung=true ORDER BY kontakt_id DESC LIMIT 1";
+	/*$mail_privat = '';
+	$qry_mail = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id='$row->person_id' AND zustellung=true ORDER BY kontakt_id DESC LIMIT 1";
 	if($result_mail = pg_query($conn, $qry_mail))
 	{
 		if($row_mail = pg_fetch_object($result_mail))
@@ -174,6 +174,7 @@ function draw_content_liste($row)
     		<STUDENT:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz>
 			<STUDENT:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></STUDENT:studiengang>
 			<STUDENT:orgform><![CDATA['.$orgform.']]></STUDENT:orgform>
+			<STUDENT:aufmerksamdurch_kurzbz><![CDATA['.$row->aufmerksamdurch_kurzbz.']]></STUDENT:aufmerksamdurch_kurzbz>
       	</RDF:Description>
       </RDF:li>';
 }
@@ -184,14 +185,14 @@ function draw_content($row)
 	$status='';
 
 	$mail_privat = '';
-	/*$qry_mail = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id='$row->person_id' AND zustellung=true ORDER BY kontakt_id DESC LIMIT 1";
+	$qry_mail = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id='$row->person_id' AND zustellung=true ORDER BY kontakt_id DESC LIMIT 1";
 	if($result_mail = pg_query($conn, $qry_mail))
 	{
 		if($row_mail = pg_fetch_object($result_mail))
 		{
 			$mail_privat = $row_mail->kontakt;
 		}
-	}*/
+	}
 
 	if($row->prestudent_id!='')
 	{
@@ -367,7 +368,7 @@ if($xmlformat=='rdf')
 					SELECT p.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,	vorname, vornamen,
 						nachname, gebdatum, tbl_prestudent.anmerkung,ersatzkennzeichen,svnr, tbl_student.matrikelnr, p.anmerkung as anmerkungen,
 						tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
-						tbl_studentlehrverband.studiengang_kz,
+						tbl_studentlehrverband.studiengang_kz, aufmerksamdurch_kurzbz, 
 						(	SELECT kontakt
 							FROM public.tbl_kontakt
 							WHERE kontakttyp='email' AND person_id=p.person_id AND zustellung
