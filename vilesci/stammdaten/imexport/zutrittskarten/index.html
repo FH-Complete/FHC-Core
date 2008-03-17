@@ -11,7 +11,8 @@
 	<h1>Zutrittskarten</h1>
 	Hier werden die gesamten Daten des Zutrittskartensystem importiert und ein entsprechendes File für den Datenableich exportiert.
 	<BR/>
-	<h2>Import</h2>
+	<h2>Cerpass</h2>
+	<h3>Import</h3>
 	Das File f&uuml;r den Import muss folgende Attribute beinhalten (Reihenfolge beachten):<BR>
 	(Key)	(Name)	(FirstName)	(Group)	(LogAswNumber)	(PhysAswNumber)	(ValidStart)	(ValidEnd)	(Text1)	(Text2)	(Text3)	(Text4)	(Text5)	(Text6)	(PIN)<BR><BR>
 	<form action="import.php" method="POST" enctype="multipart/form-data">
@@ -19,11 +20,14 @@
 	<input type="submit" value="importieren">
 	</form>
 	<BR/>
-	<h2>Export</h2>
+	<h3>Export</h3>
 	Der Export geschieht im Format:<BR/>
 	(Command)	(Key)	(Name)	(FirstName)	(Group)	(LogAswNumber)	(PhysAswNumber)	(ValidStart)	(ValidEnd)	(UID)	(SVNR)	(Kurzbezeichnung)	(Semester)	(Text5)	(Titel)	(PIN)	(CardState)
 	<BR/><BR/>
 	<a href="export.php">CerpassUpdateFile</a>
+	<hr><BR><BR>
+	<h2>SiPass</h2>
+	<a href="generatefromsipass.php">Generate SiPass-UpdateFile</a>
 </BODY>
 
 </HTML>
