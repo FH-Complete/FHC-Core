@@ -116,6 +116,7 @@
 			'Berechtigungen'=>array('name'=>'Berechtigungen', 'link'=>'stammdaten/benutzerberechtigung_frameset.html', 'target'=>'main'),
 			'Variablen'=>array('name'=>'Variablen', 'link'=>'stammdaten/variablen_frameset.html', 'target'=>'main'),
 			'Studiengang'=>array('name'=>'Studiengang', 'link'=>'stammdaten/studiengang_frameset.html', 'target'=>'main'),
+			'Ort'=>array('name'=>'Ort (Raum)', 'link'=>'stammdaten/raum_frameset.html', 'target'=>'main'),
 			'Kommunikation'=>array
 			(
 				'name'=>'Kommunikation',
@@ -123,13 +124,18 @@
 				'Mail-Verteiler'=>array('name'=>'Mail-Verteiler', 'link'=>'kommunikation/index.html', 'target'=>'main'),
 			),
 			'Reihungstest'=>array('name'=>'Reihungstest', 'link'=>'stammdaten/reihungstestverwaltung.php', 'target'=>'main'),
-			'Firmen'=>array('name'=>'Firmen', 'link'=>'stammdaten/firma_frameset.html', 'target'=>'main')
+			'Firmen'=>array('name'=>'Firmen', 'link'=>'stammdaten/firma_frameset.html', 'target'=>'main'),
+			'ImExport'=>array
+			(
+				'name'=>'ImExport',
+				'Zuttritskarten'=>array('name'=>'Zuttritskarten', 'link'=>'stammdaten/imexport/zutrittskarten/index.html', 'target'=>'main')
+			)
 		),
 		'Vorrueckung'=>	array
 		(
 			'name'=>'Vorrueckung', 'opener'=>'true', 'hide'=>'true',
 			'Lehreinheiten'=>array('name'=>'Lehreinheiten', 'link'=>'lehre/lehreinheiten_vorrueckung.php', 'target'=>'main'),
-			'Studenten'=>array('name'=>'Studenten', 'link'=>'personen/student_vorrueckung.php', 'target'=>'main')			
+			'Studenten'=>array('name'=>'Studenten', 'link'=>'personen/student_vorrueckung.php', 'target'=>'main')
 		),
 		'Auswertung'=>	array
 		(
