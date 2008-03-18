@@ -94,7 +94,7 @@ if($result = pg_query($conn, $qry))
       	<RDF:Description  id="<?php echo $row->lv_lehrveranstaltung_id.'/'.$row->sprache; ?>"  about="<?php echo $rdf_url.'/'.$row->lv_lehrveranstaltung_id.'/'.$row->sprache; ?>" >
 			<LVINFO:lehrveranstaltung_id><![CDATA[<?php echo $row->lv_lehrveranstaltung_id; ?>]]></LVINFO:lehrveranstaltung_id>
 			<LVINFO:kurzbz><![CDATA[<?php echo $row->lv_kurzbz; ?>]]></LVINFO:kurzbz>
-			<LVINFO:bezeichnung><![CDATA[<?php echo $row->lv_bezeichnung; ?>]]></LVINFO:bezeichnung>
+			<LVINFO:bezeichnung><![CDATA[<?php echo ($row->sprache=='English'?$row->lv_bezeichnung_english:$row->lv_bezeichnung); ?>]]></LVINFO:bezeichnung>
 			<LVINFO:studiengang_kz><![CDATA[<?php echo $row->lv_studiengang_kz; ?>]]></LVINFO:studiengang_kz>
 			<LVINFO:semester><![CDATA[<?php echo $row->lv_semester; ?>]]></LVINFO:semester>
 			<LVINFO:lehreverzeichnis>cis.technikum-wien.at/documents/<?php echo $row->stg_kuerzel.'/'.$row->lv_semester.'/'.$row->lv_lehrevz;?></LVINFO:lehreverzeichnis>

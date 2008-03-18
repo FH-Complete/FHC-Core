@@ -48,7 +48,7 @@ function generateUID($stgkzl,$jahr, $stgtyp, $matrikelnummer)
 // ****
 // * Gerneriert die Mitarbeiter UID
 // ****
-function generateMitarbeiterUID($conn, $vorname, $nachname)
+function generateMitarbeiterUID($conn, $vorname, $nachname, $lektor)
 {
 	$bn = new benutzer($conn);
 	

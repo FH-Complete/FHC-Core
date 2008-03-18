@@ -292,7 +292,7 @@ if(isset($_POST['save']))
 				window.opener.StudentProjektbetreuerMenulistPersonLoad(window.opener.document.getElementById('student-projektbetreuer-menulist-person'), '$nachname');
 				window.opener.MenulistSelectItemOnValue('student-projektbetreuer-menulist-person', $person->person_id);
 			</script>
-			<b>Person $vorname $nachname wurde erfolgreich angelegt</b><br>");
+			<b>Person $vorname $nachname wurde erfolgreich angelegt</b><br><br><a href='personen_anlegen.php>Neue Person Anlegen</a><br>");
 	}
 	else
 	{
@@ -344,7 +344,7 @@ echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><td>SVNR</td><td><input type="text" id="svnr" size="10" maxlength="10" name="svnr" value="'.$svnr.'" onblur="GeburtsdatumEintragen()" /></td></tr>';
 echo '<tr><td>Ersatzkennzeichen</td><td><input type="text" id="ersatzkennzeichen" size="10" maxlength="10" name="ersatzkennzeichen" value="'.$ersatzkennzeichen.'" /></td></tr>';
-echo '<tr><td>Geburtsdatum</td><td><input type="text" id="geburtsdatum" size="10" maxlength="10" name="geburtsdatum" value="'.$geburtsdatum.'" /></td></tr>';
+echo '<tr><td>Geburtsdatum</td><td><input type="text" id="geburtsdatum" size="10" maxlength="10" name="geburtsdatum" value="'.$geburtsdatum.'" /> (Format dd.mm.JJJJ)</td></tr>';
 echo '<tr><td colspan="2"><fieldset><legend>Adresse</legend><table>';
 echo '<tr><td>Adresse</td><td><input type="text" id="adresse" maxlength="256" name="adresse" value="'.$adresse.'" /></td></tr>';
 echo '<tr><td>Postleitzahl</td><td><input type="text" maxlength="16" id="plz" name="plz" value="'.$plz.'" /></td></tr>';

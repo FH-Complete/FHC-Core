@@ -23,6 +23,8 @@
 require_once('../config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/bisverwendung.class.php');
+require_once('../../include/studiensemester.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
 	die('Fehler beim Herstellen der DB Connection');
@@ -80,6 +82,7 @@ if(isset($_POST['submitfile']))
 		{
 			//Personalnummer ermitteln
 			$persnr = $person->getElementsByTagName('PersonalNummer');
+			$habilitation = $person->getElementsByTagName('Habilitation');
 			$personalnummer = (int)getValue($persnr);
 			
 			$anzahl_personen_gesamt++;
@@ -133,9 +136,40 @@ if(isset($_POST['submitfile']))
 					}
 					else 
 					{
-						echo "<br>$mitarbeiter_uid: BisVerwendung (ba1code: $beschart1, ba2code: $beschart2, ausmass: $ausmass, verwendungscode: $verwendungscode) wurde nicht gefunden";
-						$anzahl_verwendungen_failed++;
-						continue;
+						//echo "<br>$mitarbeiter_uid: BisVerwendung (ba1code: $beschart1, ba2code: $beschart2, ausmass: $ausmass, verwendungscode: $verwendungscode) wurde nicht gefunden";
+						//$anzahl_verwendungen_failed++;
+						//Anlegen wenn Verwendung nicht gefunden wird
+						$bisverwendung = new bisverwendung($conn);
+						$bisverwendung->ba1code = $beschart1;
+						$bisverwendung->ba2code = $beschart2;
+						$bisverwendung->vertragsstunden = 0;
+						$bisverwendung->beschausmasscode = $ausmass;
+						$bisverwendung->verwendung_code = $verwendungscode;
+						$bisverwendung->mitarbeiter_uid = $mitarbeiter_uid;
+						$bisverwendung->hauptberufcode = '';
+						$bisverwendung->hauptberuflich = true;
+						$bisverwendung->habilitation = ($habilitation=='J' || $habilitation=='j'?true:false);
+						$studiensemester = new studiensemester($conn);
+						$stsem = $studiensemester->getPrevious();
+						$studiensemester->load($stsem);
+						$bisverwendung->beginn = $studiensemester->start;
+						$bisverwendung->ende = '';
+						$bisverwendung->updateamum = date('Y-m-d H:i:s');
+						$bisverwendung->updatevon = 'bisimport';
+						$bisverwendung->insertamum = date('Y-m-d H:i:s');
+						$bisverwendung->insertvon = 'bisimport';
+						
+						if($bisverwendung->save(true))
+						{
+							echo "<br>$mitarbeiter_uid: BisVerwendung (ba1code: $beschart1, ba2code: $beschart2, ausmass: $ausmass, verwendungscode: $verwendungscode) wurde neu angelegt";	
+							$bisverwendung_id = $bisverwendung->bisverwendung_id;
+						}
+						else 
+						{
+							echo "<br>$mitarbeiter_uid: BisVerwendung (ba1code: $beschart1, ba2code: $beschart2, ausmass: $ausmass, verwendungscode: $verwendungscode) konnte nicht angelegt werden: $bisverwendung->errormsg";
+							$anzahl_verwendungen_failed++;
+							continue;
+						}						
 					}
 				}
 				else 
@@ -167,7 +201,7 @@ if(isset($_POST['submitfile']))
 										WHERE bisverwendung_id='$bisverwendung_id' AND studiengang_kz='$stgkz'";
 								if(pg_query($conn, $qry))
 								{
-									echo "<br>$mitarbeiter_uid: SWS der  Funktion (id: $bisverwendung_id, stg: $stg_kz) wurde von $row->sws auf $sws geaendert";
+									echo "<br>$mitarbeiter_uid: SWS der  Funktion (id: $bisverwendung_id, stg: $stgkz) wurde von $row->sws auf $sws geaendert";
 								}
 								else 
 								{

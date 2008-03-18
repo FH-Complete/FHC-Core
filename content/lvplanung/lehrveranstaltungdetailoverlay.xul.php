@@ -230,6 +230,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-beschreibung" label="Beschreibung" flex="2" hidden="true"  persist="hidden, width, ordinal"
 							 class="sortDirectionIndicator"
 							 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#beschreibung" />
+					<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-studiengang" label="Studiengang" flex="2" hidden="true"  persist="hidden, width, ordinal"
+							 class="sortDirectionIndicator"
+							 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#studiengang_bezeichnung" />
+					<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-semester" label="Semester" flex="2" hidden="true"  persist="hidden, width, ordinal"
+							 class="sortDirectionIndicator"
+							 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#semester" />
 					<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-lehreinheitgruppe_id" label="ID" flex="2" hidden="true"  persist="hidden, width, ordinal"
 							 class="sortDirectionIndicator"
 							 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#lehreinheitgruppe_id" />
@@ -241,6 +247,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<treerow>
 									<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#bezeichnung"   />
 									<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#beschreibung"   />
+									<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#studiengang_bezeichnung"   />
+									<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#semester"   />
 									<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#lehreinheitgruppe_id"   />
 				 				</treerow>
 				 			</treeitem>
