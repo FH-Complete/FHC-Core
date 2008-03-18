@@ -159,7 +159,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterfunktionove
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#insertvon"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-insertamum_iso" label="Angelegt am (ISO)" flex="1" persist="hidden, width, ordinal" hidden="true"
+			<treecol id="mitarbeiter-treecol-insertamum_iso" label="Angelegt am (ISO)" flex="1" persist="hidden, width, ordinal" hidden="true" ignoreincolumnpicker="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#insertamum_iso"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
@@ -171,7 +171,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterfunktionove
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#updatevon"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-updateamum_iso" label="Geaendert am (ISO)" flex="1" persist="hidden, width, ordinal" hidden="true"
+			<treecol id="mitarbeiter-treecol-updateamum_iso" label="Geaendert am (ISO)" flex="1" persist="hidden, width, ordinal" hidden="true" ignoreincolumnpicker="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#updateamum_iso"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>

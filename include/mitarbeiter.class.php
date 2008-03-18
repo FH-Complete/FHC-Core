@@ -546,7 +546,7 @@ class mitarbeiter extends benutzer
 	
 	function getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $verwendung, $studiensemester_kurzbz)
 	{
-		$qry = "SELECT distinct on(person_id) *, tbl_benutzer.aktiv as aktiv, tbl_mitarbeiter.insertamum, tbl_mitarbeiter.insertvon FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id)) LEFT JOIN public.tbl_benutzerfunktion USING(uid) WHERE true";
+		$qry = "SELECT distinct on(mitarbeiter_uid) *, tbl_benutzer.aktiv as aktiv, tbl_mitarbeiter.insertamum, tbl_mitarbeiter.insertvon FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id)) LEFT JOIN public.tbl_benutzerfunktion USING(uid) WHERE true";
 		
 		if($fix=='true')
 			$qry .= " AND fixangestellt=true";
@@ -689,7 +689,7 @@ class mitarbeiter extends benutzer
 	function searchPersonal($filter)
 	{
 		$qry = "SELECT 
-					distinct on(person_id) *, tbl_benutzer.aktiv as aktiv, tbl_mitarbeiter.insertamum, 
+					distinct on(mitarbeiter_uid) *, tbl_benutzer.aktiv as aktiv, tbl_mitarbeiter.insertamum, 
 					tbl_mitarbeiter.insertvon 
 				FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id)) 
 				WHERE nachname ~* '".addslashes($filter)."' OR 

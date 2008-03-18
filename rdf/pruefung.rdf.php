@@ -57,6 +57,7 @@ echo '
 <RDF:RDF
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	xmlns:PRUEFUNG="'.$rdf_url.'/rdf#"
+	xmlns:NC="http://home.netscape.com/NC-rdf#" 
 >
 
    <RDF:Seq about="'.$rdf_url.'/liste">
@@ -85,7 +86,7 @@ function draw_rdf($row)
             <PRUEFUNG:lehreinheit_id><![CDATA['.$row->lehreinheit_id.']]></PRUEFUNG:lehreinheit_id>
             <PRUEFUNG:student_uid><![CDATA['.$row->student_uid.']]></PRUEFUNG:student_uid>
             <PRUEFUNG:mitarbeiter_uid><![CDATA['.$row->mitarbeiter_uid.']]></PRUEFUNG:mitarbeiter_uid>
-            <PRUEFUNG:note><![CDATA['.$row->note.']]></PRUEFUNG:note>
+            <PRUEFUNG:note NC:parseType="Integer"><![CDATA['.$row->note.']]></PRUEFUNG:note>
             <PRUEFUNG:pruefungstyp_kurzbz><![CDATA['.$row->pruefungstyp_kurzbz.']]></PRUEFUNG:pruefungstyp_kurzbz>
             <PRUEFUNG:datum><![CDATA['.$datum_obj->convertISODate($row->datum).']]></PRUEFUNG:datum>
             <PRUEFUNG:datum_iso><![CDATA['.$row->datum.']]></PRUEFUNG:datum_iso>
