@@ -19,7 +19,12 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-
+// ****
+// * Importiert die BIS Meldung der Mitarbeiter
+// * - Funktionen werden ins System importiert
+// * - Verwendungen werden nur ins System importiert wenn KEINE Verwendung
+// *   fuer die Person vorhanden ist.
+// ****
 require_once('../config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
@@ -136,9 +141,22 @@ if(isset($_POST['submitfile']))
 					}
 					else 
 					{
-						//echo "<br>$mitarbeiter_uid: BisVerwendung (ba1code: $beschart1, ba2code: $beschart2, ausmass: $ausmass, verwendungscode: $verwendungscode) wurde nicht gefunden";
-						//$anzahl_verwendungen_failed++;
-						//Anlegen wenn Verwendung nicht gefunden wird
+						//Wenn eine verwendung vorhanden ist, dann ueberspringen
+						$qry = "SELECT count(*) as anzahl FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid='$mitarbeiter_uid'";
+						if($result_vw = pg_query($conn, $qry))
+						{
+							if($row_vw = pg_fetch_object($result_vw))
+							{
+								if($row_vw->anzahl>0)
+								{
+									echo "<br>$mitarbeiter_uid: BisVerwendung (ba1code: $beschart1, ba2code: $beschart2, ausmass: $ausmass, verwendungscode: $verwendungscode) wurde nicht gefunden";
+									$anzahl_verwendungen_failed++;
+									continue;
+								}
+							}
+						}
+						
+						//Wenn keine Verwendung vorhanden ist, dann diese anlegen
 						$bisverwendung = new bisverwendung($conn);
 						$bisverwendung->ba1code = $beschart1;
 						$bisverwendung->ba2code = $beschart2;

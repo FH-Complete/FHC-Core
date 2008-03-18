@@ -1799,3 +1799,18 @@ function MitarbeiterDetailValueChange()
 {
 	MitarbeiterDetailValueChanged=true;
 }
+
+function MitarbeiterTreeFunktionSort()
+{
+	debug('ToDo: MitarbeiterTreeFunktionSort');
+}
+
+function MitarbeiterTreeEntwicklungsteamSort()
+{
+	debug('ToDo: MitarbeiterTreeEntwicklungsteamSort');
+}
+
+function MitarbeiterTreeVerwendungSort()
+{
+	debug('ToDo: MitarbeiterTreeVerwendungSort');
+}

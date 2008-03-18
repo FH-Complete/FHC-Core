@@ -62,13 +62,17 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/pruefung/rdf#datum_iso"/>
 							<splitter class="tree-splitter"/>
-							<treecol id="student-pruefung-tree-lehreinheit_bezeichnung" label="Lehreinheit" flex="5" hidden="false"
+							<treecol id="student-pruefung-tree-datumISO" label="DatumISO" flex="2" hidden="true" ignoreincolumnpicker="true"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/pruefung/rdf#datum_iso"/>
+							<splitter class="tree-splitter"/>
+							<treecol id="student-pruefung-tree-lehrveranstaltung_bezeichnung" label="Lehrveranstaltung" flex="5" hidden="false"
 							   class="sortDirectionIndicator"
-								sort="rdf:http://www.technikum-wien.at/pruefung/rdf#lehreinheit_bezeichnung"/>
+								sort="rdf:http://www.technikum-wien.at/pruefung/rdf#lehrveranstaltung_bezeichnung"/>
 							<splitter class="tree-splitter"/>
 							<treecol id="student-pruefung-tree-note_bezeichnung" label="Note" flex="2" hidden="false"
 								class="sortDirectionIndicator"
-								sort="rdf:http://www.technikum-wien.at/konto/rdf#note_bezeichnung" />
+								sort="rdf:http://www.technikum-wien.at/pruefung/rdf#note_bezeichnung" />
 							<splitter class="tree-splitter"/>
 							<treecol id="student-pruefung-tree-anmerkung" label="Anmerkung" flex="2" hidden="false"
 								class="sortDirectionIndicator"
@@ -101,6 +105,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<treeitem uri="rdf:*">
 									<treerow>
 										<treecell label="rdf:http://www.technikum-wien.at/pruefung/rdf#datum"/>
+										<treecell label="rdf:http://www.technikum-wien.at/pruefung/rdf#datum_iso"/>
 										<treecell label="rdf:http://www.technikum-wien.at/pruefung/rdf#lehrveranstaltung_bezeichnung"/>
 										<treecell label="rdf:http://www.technikum-wien.at/pruefung/rdf#note_bezeichnung"/>
 										<treecell label="rdf:http://www.technikum-wien.at/pruefung/rdf#anmerkung"/>
