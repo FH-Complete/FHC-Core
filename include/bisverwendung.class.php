@@ -287,14 +287,14 @@ class bisverwendung
 					}
 					else 
 					{
-						$this->errormsg = 'Fehler beim auslesen der Sequence';
+						$this->errormsg = 'Fehler beim Auslesen der Sequence';
 						pg_query($this->conn, 'ROLLBACK');
 						return false;
 					}
 				}
 				else 
 				{
-					$this->errormsg = 'Fehler beim auslesen der Sequence';
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
 					pg_query($this->conn, 'ROLLBACK');
 					return false;
 				}

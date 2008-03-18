@@ -89,6 +89,7 @@ foreach ($DAO_obj->lehreinheitgruppe as $row)
             <LEHREINHEITGRUPPE:bezeichnung><![CDATA[<?php echo $bezeichnung; ?>]]></LEHREINHEITGRUPPE:bezeichnung>
             <LEHREINHEITGRUPPE:beschreibung><![CDATA[<?php echo $beschreibung; ?>]]></LEHREINHEITGRUPPE:beschreibung>
             <LEHREINHEITGRUPPE:studiengang_kz><![CDATA[<?php echo $row->studiengang_kz; ?>]]></LEHREINHEITGRUPPE:studiengang_kz>
+            <LEHREINHEITGRUPPE:studiengang_bezeichnung><![CDATA[<?php echo $stg[$row->studiengang_kz]; ?>]]></LEHREINHEITGRUPPE:studiengang_bezeichnung>
             <LEHREINHEITGRUPPE:semester><![CDATA[<?php echo $row->semester; ?>]]></LEHREINHEITGRUPPE:semester>
             <LEHREINHEITGRUPPE:verband><![CDATA[<?php echo $row->verband; ?>]]></LEHREINHEITGRUPPE:verband>
             <LEHREINHEITGRUPPE:gruppe><![CDATA[<?php echo $row->gruppe; ?>]]></LEHREINHEITGRUPPE:gruppe>

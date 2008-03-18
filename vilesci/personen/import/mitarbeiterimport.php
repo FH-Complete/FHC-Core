@@ -78,6 +78,7 @@ function disablefields(obj)
 		val=true;
 
 	document.getElementById('titel').disabled=val;
+	document.getElementById('titelpost').disabled=val;
 	document.getElementById('nachname').disabled=val;
 	document.getElementById('vorname').disabled=val;
 	document.getElementById('geschlecht').disabled=val;
@@ -125,7 +126,7 @@ function GeburtsdatumEintragen()
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
 
-if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('mitarbeiter'))
+if(!$rechte->isBerechtigt('admin', null, 'suid') && !$rechte->isBerechtigt('mitarbeiter', null, 'suid'))
 	die('Sie haben keine Berechtigung fuer diese Seite');
 
 $where = '';
@@ -148,6 +149,9 @@ $anmerkungen = (isset($_POST['anmerkungen'])?$_POST['anmerkungen']:'');
 $person_id = (isset($_POST['person_id'])?$_POST['person_id']:'');
 $ueberschreiben = (isset($_POST['ueberschreiben'])?$_POST['ueberschreiben']:'');
 $svnr = (isset($_POST['svnr'])?$_POST['svnr']:'');
+$lektor = (isset($_POST['lektor'])?true:false);
+if(!isset($_POST['svnr']))
+	$lektor = true;
 $ersatzkennzeichen = (isset($_POST['ersatzkennzeichen'])?$_POST['ersatzkennzeichen']:'');
 //end Parameter
 $geburtsdatum_error=false;
@@ -216,7 +220,7 @@ if(isset($_POST['save']))
 		$vorname_clean = strtolower(clean_string($vorname));
 		$uid='';
 		
-		$uid = generateMitarbeiterUID($conn, $vorname_clean, $nachname_clean);
+		$uid = generateMitarbeiterUID($conn, $vorname_clean, $nachname_clean, $lektor);
 			
 		$bn = new benutzer($conn);
 		
@@ -321,7 +325,7 @@ if(isset($_POST['save']))
 		$mitarbeiter->uid = $uid;
 		$mitarbeiter->personalnummer = $personalnummer;
 		$mitarbeiter->kurzbz = $kurzbz;
-		$mitarbeiter->lektor = true;
+		$mitarbeiter->lektor = $lektor;
 		$mtiarbeiter->aktiv = true;
 		$mitarbeiter->fixangestellt = true;
 		$mitarbeiter->stundensatz = 0;
@@ -464,7 +468,7 @@ if(isset($_POST['save']))
 	if(!$error)
 	{
 		pg_query($conn, 'COMMIT');
-		die("<b>Mitarbeiter $vorname $nachname wurde erfolgreich angelegt</b><br>");
+		die("<b>Mitarbeiter $vorname $nachname wurde erfolgreich angelegt</b><br><br><a href='mitarbeiterimport.php'>Neue Person Anlegen</a><br>");
 	}
 	else
 	{
@@ -516,7 +520,7 @@ echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><td>SVNR</td><td><input type="text" id="svnr" size="10" maxlength="10" name="svnr" value="'.$svnr.'" onblur="GeburtsdatumEintragen()" /></td></tr>';
 echo '<tr><td>Ersatzkennzeichen</td><td><input type="text" id="ersatzkennzeichen" size="10" maxlength="10" name="ersatzkennzeichen" value="'.$ersatzkennzeichen.'" /></td></tr>';
-echo '<tr><td>Geburtsdatum</td><td><input type="text" id="geburtsdatum" size="10" maxlength="10" name="geburtsdatum" value="'.$geburtsdatum.'" /></td></tr>';
+echo '<tr><td>Geburtsdatum</td><td><input type="text" id="geburtsdatum" size="10" maxlength="10" name="geburtsdatum" value="'.$geburtsdatum.'" /> (Format: dd.mm.JJJJ)</td></tr>';
 echo '<tr><td colspan="2"><fieldset><legend>Adresse</legend><table>';
 echo '<tr><td>Adresse</td><td><input type="text" id="adresse" maxlength="256" name="adresse" value="'.$adresse.'" /></td></tr>';
 echo '<tr><td>Postleitzahl</td><td><input type="text" maxlength="16" id="plz" name="plz" value="'.$plz.'" /></td></tr>';
@@ -540,6 +544,7 @@ if($result = pg_query($conn, $qry))
 }
 echo '</SELECT>';
 echo '</td></tr>';
+echo '<tr><td>Lektor</td><td><input type="checkbox" name="lektor" '.($lektor?'checked':'').' /></td></tr>';
 echo '<tr><td>Anmerkungen</td><td><textarea id="anmerkung" name="anmerkungen">'.$anmerkungen.'</textarea></td></tr>';
 echo '<tr><td></td><td>';
 
