@@ -61,7 +61,7 @@ $qry="SELECT DISTINCT vorname as FirstName,nachname as LastName, nummer as CardN
 			FROM public.vw_betriebsmittelperson
 				 LEFT OUTER JOIN (public.tbl_student JOIN public.tbl_studiengang USING (studiengang_kz)) ON (uid=student_uid)
 			WHERE betriebsmitteltyp='Zutrittskarte' AND benutzer_aktiv AND retouram IS NULL;";
-
+//abhanden gekommene karten???
 
 if($result = pg_query($conn, $qry))
 {
