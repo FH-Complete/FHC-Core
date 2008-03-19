@@ -71,12 +71,14 @@ function disablefields(obj)
 		document.getElementById('ueb1').style.display = 'block';
 		document.getElementById('ueb2').style.display = 'block';
 		document.getElementById('ueb3').style.display = 'block';
+		document.getElementById('ueberschreiben3').checked = true;
 	}
 	else
 	{
 		document.getElementById('ueb1').style.display = 'none';
 		document.getElementById('ueb2').style.display = 'none';
 		document.getElementById('ueb3').style.display = 'none';
+		document.getElementById('ueberschreiben1').checked = true;
 	}
 }
 
