@@ -117,11 +117,11 @@ class mitarbeiter extends benutzer
 	// ************************************************
 	function validate()
 	{
-		if(utf8_strlen($this->uid)>16)
-		{
-			$this->errormsg = "ID darf nicht laenger als 16 Zeichen sein\n";
-			return false;
-		}
+		//if(utf8_strlen($this->uid)>16)
+		//{
+		//	$this->errormsg = "ID darf nicht laenger als 16 Zeichen sein\n";
+		//	return false;
+		//}
 		if($this->uid=='')
 		{
 			$this->errormsg = "UID muss eingegeben werden ".$this->personalnummer."\n";
@@ -199,14 +199,69 @@ class mitarbeiter extends benutzer
 
 		if($new)
 		{
-
+			if($this->personalnummer=='')
+			{
+				do
+				{
+					//Wenn keine Personalnummer angegeben wurde, dann die naechste freie Suchen
+					$qry = "SELECT nextval('public.tbl_mitarbeiter_personalnummer_seq') as id";
+					if($result = pg_query($this->conn, $qry))
+					{
+						if($row = pg_fetch_object($result))
+						{
+							$personalnummer = $row->id;
+						}
+						else 
+						{
+							$this->errormsg = 'Fehler beim Ermitteln der Personalnummer';
+							return false;
+						}
+					}
+					else 
+					{
+						$this->errormsg = 'Fehler beim Ermitteln der Personalnummer';
+						return false;
+					}
+					
+					//Da die Personalnummer auch direkt uebergeben werden kann, ist es moeglich, dass die Personalnummer
+					//aus dem Serial schon vergeben ist. Deshalb wird zur sicherheit nochmal ueberprueft ob die Nr 
+					//noch frei ist.
+					$qry = "SELECT personalnummer FROM public.tbl_mitarbeiter WHERE personalnummer='$personalnummer'";
+					if($result = pg_query($this->conn, $qry))
+					{
+						if(pg_num_rows($result)==0)
+							$this->personalnummer = $personalnummer;
+					}
+					
+				} while($this->personalnummer=='');
+			}
+			else 
+			{
+				//Pruefen ob Personalnummer eine gueltige Zahl ist
+				if(!is_numeric($this->personalnummer))
+				{
+					$this->errormsg = 'Personalnummer muss eine gueltige Zahl sein';
+					return false;
+				}
+				
+				//Preufen ob die Personalnummer schon vergeben ist
+				$qry = "SELECT personalnummer FROM public.tbl_mitarbeiter WHERE personalnummer='$this->personalnummer'";
+				if($result = pg_query($this->conn, $qry))
+				{
+					if(pg_num_rows($result)!=0)
+					{
+						$this->errormsg = 'Personalnummer ist bereits vergeben!';
+						return false;
+					}
+				}
+			}
 			//Neuen Datensatz anlegen
 			$qry = "INSERT INTO public.tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz,
 			                    fixangestellt, standort_kurzbz, telefonklappe, anmerkung, stundensatz, updateamum, updatevon, insertamum, insertvon, ext_id, bismelden)
 
 			        VALUES('".addslashes($this->uid)."',".
 			 	 	$this->addslashes($this->ausbildungcode).",".
-			 	 	$this->addslashes($this->personalnummer).",". //TODO: in Produktivversion nicht angeben
+			 	 	$this->addslashes($this->personalnummer).",".
 			 	 	$this->addslashes($this->kurzbz).','.
 			 	 	($this->lektor?'true':'false').','.
 			 	 	$this->addslashes($this->ort_kurzbz).','.

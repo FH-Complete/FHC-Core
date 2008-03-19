@@ -93,12 +93,14 @@ function disablefields(obj)
 		document.getElementById('ueb1').style.display = 'block';
 		document.getElementById('ueb2').style.display = 'block';
 		document.getElementById('ueb3').style.display = 'block';
+		document.getElementById('ueberschreiben3').checked = true;
 	}
 	else
 	{
 		document.getElementById('ueb1').style.display = 'none';
 		document.getElementById('ueb2').style.display = 'none';
 		document.getElementById('ueb3').style.display = 'none';
+		document.getElementById('ueberschreiben1').checked = true;
 	}
 }
 
@@ -155,6 +157,7 @@ if(!isset($_POST['svnr']))
 $ersatzkennzeichen = (isset($_POST['ersatzkennzeichen'])?$_POST['ersatzkennzeichen']:'');
 //end Parameter
 $geburtsdatum_error=false;
+$personalnummer = (isset($_POST['personalnummer'])?trim($_POST['personalnummer']):'');
 
 // *** Speichern der Daten ***
 if(isset($_POST['save']))
@@ -291,32 +294,7 @@ if(isset($_POST['save']))
 			$errormsg = 'Fehler beim Speichern des Benutzers:'.$benutzer->errormsg;
 		}
 	}
-	
-	//Personalnummer ermitteln
-	//ToDo: Wenn alle Syncscripte abgeschalten sind, dann kann in der Klasse beim Insert die 
-	// Personalnummer entfernt werden. Dann ist dieser Teil nicht mehr noetig
-	if(!$error)
-	{
-		$qry = "SELECT nextval('public.tbl_mitarbeiter_personalnummer_seq') as id";
-		if($result = pg_query($conn, $qry))
-		{
-			if($row = pg_fetch_object($result))
-			{
-				$personalnummer = $row->id;
-			}
-			else 
-			{
-				$error = true;
-				$errormsg = 'Fehler beim Ermitteln der Personalnummer';
-			}
-		}
-		else 
-		{
-			$error = true;
-			$errormsg = 'Fehler beim Ermitteln der Personalnummer';
-		}
-	}
-	
+			
 	//Mitarbeiter anlegen
 	if(!$error)
 	{
@@ -378,7 +356,7 @@ if(isset($_POST['save']))
 				else
 				{
 					$error = true;
-					$errormsg = 'Fehler beim laden der Adresse';
+					$errormsg = 'Fehler beim Laden der Adresse';
 				}
 			}
 			else
@@ -473,7 +451,7 @@ if(isset($_POST['save']))
 	else
 	{
 		pg_query($conn, 'ROLLBACK');
-		echo '<span class="error">'.$errormsg.'</span>';
+		echo '<font class="error">'.$errormsg.'</font>';
 	}
 }
 // *** SAVE ENDE ***
@@ -545,6 +523,7 @@ if($result = pg_query($conn, $qry))
 echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><td>Lektor</td><td><input type="checkbox" name="lektor" '.($lektor?'checked':'').' /></td></tr>';
+echo '<tr><td>Personalnummer</td><td><input type="text" name="personalnummer" size="4" value="'.$personalnummer.'" /> (optional)</td></tr>';
 echo '<tr><td>Anmerkungen</td><td><textarea id="anmerkung" name="anmerkungen">'.$anmerkungen.'</textarea></td></tr>';
 echo '<tr><td></td><td>';
 
