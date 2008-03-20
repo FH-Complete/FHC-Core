@@ -1643,17 +1643,40 @@ function StudentAddRolle(rolle, semester, studiensemester)
 
 	if (tree.currentIndex==-1) return;
 
-	//Ausgewaehlte ID holen
-	var prestudent_id = getTreeCellText(tree, 'student-treecol-prestudent_id', tree.currentIndex);
+	//Alle markierten Personen holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
+	var anzahl=0;
 
-	if(semester!='0' || confirm('Diesen Studenten zum '+rolle+' machen?'))
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			prestudent_id = getTreeCellText(tree, 'student-treecol-prestudent_id', v);
+			paramList += ';'+prestudent_id;
+			anzahl = anzahl+1;
+		}
+	}
+	
+	//Ausgewaehlte ID holen
+	//var prestudent_id = getTreeCellText(tree, 'student-treecol-prestudent_id', tree.currentIndex);
+
+	if(anzahl>1)
+		conf = 'Diese '+anzahl+' Studenten';
+	else
+		conf = 'Diesen Studenten';		
+	
+	if(semester!='0' || confirm(conf+' zum '+rolle+' machen?'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 		var req = new phpRequest(url,'','');
 
 		req.add('type', 'addrolle');
 
-		req.add('prestudent_id', prestudent_id);
+		req.add('prestudent_id', paramList);
 		req.add('rolle_kurzbz', rolle);
 		req.add('semester', semester);
 		if(typeof(studiensemester)!='unknown')
@@ -1669,6 +1692,7 @@ function StudentAddRolle(rolle, semester, studiensemester)
 				alert(response)
 			else
 				alert(val.dbdml_errormsg)
+			StudentTreeRefresh();
 		}
 		else
 		{

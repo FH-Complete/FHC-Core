@@ -176,23 +176,23 @@ function InteressentzuBewerber()
 	//Wenn kein Interessent ausgewaehlt ist, dann abbrechen
 	if (tree.currentIndex==-1) return;
 
-	//Voraussetzungen pruefen
-	anmeldungreihungstest = document.getElementById('student-prestudent-textbox-anmeldungreihungstest').value;
-	reihungstestangetreten = document.getElementById('student-prestudent-checkbox-reihungstestangetreten').checked;
+	//Alle markierten Personen holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
+	var anzahl=0;
 
-	if(anmeldungreihungstest=='')
+	for (var t = 0; t < numRanges; t++)
 	{
-		alert('Um einen Interessenten zum Bewerber zu machen, muss das Reihungstestdatum gesetzt sein');
-		return false;
+  		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			prestudent_id = getTreeCellText(tree, 'student-treecol-prestudent_id', v);
+			paramList += ';'+prestudent_id;
+			anzahl = anzahl+1;
+		}
 	}
-
-	if(reihungstestangetreten==false)
-	{
-		alert('Um einen Interessenten zum Bewerber zu machen, muss das Feld "Zum Reihungstest angetreten" gesetzt sein');
-		return false;
-	}
-
-	prestudent_id = document.getElementById('student-prestudent-textbox-prestudent_id').value;
 
 	//Rolle Bewerber hinzufuegen
 
@@ -201,7 +201,7 @@ function InteressentzuBewerber()
 
 	req.add('type', 'addrolle');
 
-	req.add('prestudent_id', prestudent_id);
+	req.add('prestudent_id', paramList);
 	req.add('rolle_kurzbz', 'Bewerber');
 
 	var response = req.executePOST();
@@ -241,14 +241,30 @@ function InteressentzuStudent()
 	//Wenn kein Interessent ausgewaehlt ist, dann abbrechen
 	if (tree.currentIndex==-1) return;
 
-	prestudent_id = document.getElementById('student-prestudent-textbox-prestudent_id').value;
+	//Alle markierten Personen holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
+	var anzahl=0;
 
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			prestudent_id = getTreeCellText(tree, 'student-treecol-prestudent_id', v);
+			paramList += ';'+prestudent_id;
+			anzahl = anzahl+1;
+		}
+	}
+	
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 
 	req.add('type', 'BewerberZuStudent');
 
-	req.add('prestudent_id', prestudent_id);
+	req.add('prestudent_id', paramList);
 
 	var response = req.executePOST();
 
@@ -279,19 +295,38 @@ function InteressentAddRolle(rolle)
 	var tree = document.getElementById('student-tree');
 
 	if (tree.currentIndex==-1) return;
+	
+	//Alle markierten Personen holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
+	var anzahl=0;
 
-	//Ausgewaehlte ID holen
-    var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
-	var prestudent_id=tree.view.getCellText(tree.currentIndex,col);
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			prestudent_id = getTreeCellText(tree, 'student-treecol-prestudent_id', v);
+			paramList += ';'+prestudent_id;
+			anzahl = anzahl+1;
+		}
+	}
 
-	if(confirm('Diesen Studenten zum '+rolle+' machen?'))
+	if(anzahl>1)
+		conf = 'Diese '+anzahl+' Studenten';
+	else
+		conf = 'Diesen Studenten';
+	
+	if(confirm(conf+' zum '+rolle+' machen?'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 		var req = new phpRequest(url,'','');
 
 		req.add('type', 'addrolle');
 
-		req.add('prestudent_id', prestudent_id);
+		req.add('prestudent_id', paramList);
 		req.add('rolle_kurzbz', rolle);
 
 		var response = req.executePOST();
@@ -304,6 +339,7 @@ function InteressentAddRolle(rolle)
 				alert(response)
 			else
 				alert(val.dbdml_errormsg)
+			StudentTreeRefresh();
 		}
 		else
 		{			

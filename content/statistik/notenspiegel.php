@@ -47,24 +47,40 @@ if($semester=='')
 	die('Bitte ein Semester auswaehlen');
 
 $stg = new studiengang($conn);
+$stg_arr = array();
+$stg->getAll(false);
+foreach ($stg->result as $studiengang)
+	$stg_arr[$studiengang->studiengang_kz]=$studiengang->kuerzel;
+
+$stg = new studiengang($conn);
 $stg->load($studiengang_kz);
 
 $student = new student($conn);
 $result_student = $student->getStudents($studiengang_kz,$semester,null,null,null, $semester_aktuell);
 
-$lehrveranstaltung = new lehrveranstaltung($conn);
-$lehrveranstaltung->load_lva($studiengang_kz, $semester, null, null, true);
+//$lehrveranstaltung = new lehrveranstaltung($conn);
+//$lehrveranstaltung->load_lva($studiengang_kz, $semester, null, null, true);
 $qry = "SELECT 
-			lehrveranstaltung_id, bezeichnung 
+			lehrveranstaltung_id, bezeichnung, studiengang_kz, semester
 		FROM 
 			lehre.tbl_lehrveranstaltung 
         WHERE 
         	lehrveranstaltung_id IN 
         	(
-				SELECT distinct lehrveranstaltung_id FROM campus.vw_student_lehrveranstaltung 
-	        	WHERE studiengang_kz='$studiengang_kz' AND semester='$semester' AND studiensemester_kurzbz='$semester_aktuell'
+				SELECT 
+					distinct lehrveranstaltung_id 
+				FROM 
+					campus.vw_student_lehrveranstaltung, public.tbl_studentlehrverband
+	        	WHERE 
+	        		tbl_studentlehrverband.studiengang_kz='$studiengang_kz' AND 
+	        		tbl_studentlehrverband.semester='$semester' AND 
+	        		vw_student_lehrveranstaltung.studiensemester_kurzbz='$semester_aktuell' AND
+	        		uid=student_uid AND 
+	        		vw_student_lehrveranstaltung.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz
 	        ) 
+	        AND studiengang_kz<>0
 		ORDER BY bezeichnung";
+//echo $qry;
 if(!$result_lva = pg_query($conn, $qry))
 	die('Fehler beim Ermitteln der Lehrveranstaltungen');
 
@@ -132,7 +148,7 @@ if($typ=='xls')
 	
 	while($row_lva = pg_fetch_object($result_lva))
 	{
-		$worksheet->write($zeile,++$spalte,$row_lva->bezeichnung, $format_rotate);
+		$worksheet->write($zeile,++$spalte,$stg_arr[$row_lva->studiengang_kz].$row_lva->semester.' '.$row_lva->bezeichnung, $format_rotate);
 		$maxlength[$spalte]=3;
 	}
 	$worksheet->write($zeile,++$spalte,'Notendurchschnitt', $format_bold);
@@ -279,7 +295,7 @@ else
 	echo '<table class="liste" style="border: 1px solid black" cellspacing="0"><tr class="liste"><th>Nr</th><th>Name</th><th>Personenkennzeichen</th>';
 	while($row_lva = pg_fetch_object($result_lva))
 	{
-		echo "<th>$row_lva->bezeichnung</th>";
+		echo "<th>".$stg_arr[$row_lva->studiengang_kz]."$row_lva->semester $row_lva->bezeichnung</th>";
 	}
 	echo '<th>Notendurchschnitt</td>';
 	echo '</tr>';
