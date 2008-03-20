@@ -21,18 +21,16 @@ $update=false;
 if (!$conn=pg_pconnect(CONN_STRING))
 	die(pg_last_error($conn));
 	
-	ini_set('display_errors','1');
-	error_reporting(E_ALL);
-putenv('TDSVER=82');
-define("STPDB_SERVER","192.168.101.230:5432");
-define("STPDB_USER","sa");
-define("STPDB_PASSWD","P1ss0ff");
-define("STPDB_DB","asco4");
+
+define("DB_SERVER","192.168.101.230:1433");
+define("DB_USER","sa");
+define("DB_PASSWD","P1ss0ff");
+define("DB_DB","asco4");
 		
 // zugriff auf mssql-datenbank ----------------------- DB-Zugriff ändern !!!!!!
-if (!$conn_ext=mssql_connect (STPDB_SERVER, STPDB_USER, STPDB_PASSWD))
+if (!$conn_ext=mssql_connect (DB_SERVER, DB_USER, DB_PASSWD))
 	die('Fehler beim Verbindungsaufbau!');
-mssql_select_db(STPDB_DB, $conn_ext);
+mssql_select_db(DB_DB, $conn_ext);
 
 /*
 //letzte Nummer
@@ -46,23 +44,26 @@ else
 	die('Letzte Nummer konnte nicht eruiert werden!');*/
 	
 //einlesen der daten von sipass
-/*
-$qry="SELECT ID, LastName, FirstName, CardNumber, StartDate, EndDate  FROM **************;";
+
+$qry="SELECT * FROM asco.cardholder 
+JOIN asco.card_physical ON(asco.card_physical.cardholder_id=asco.cardholder.cardholder_id) 
+JOIN asco.card_logical ON(asco.card_physical.card_physical_id=asco.card_logical.card_physical_id);";
 if($result_ext = mssql_query($qry,$conn_ext))
 {
 	while($row=mssql_fetch_object($result_ext))
 	{
-		$sipass[$i][1]=$result_ext->ID;
-		$sipass[$i][2]=$result_ext->LastName;
-		$sipass[$i][3]=$result_ext->FirstName;
-		$sipass[$i][4]=$result_ext->CardNumber;
-		$sipass[$i][5]=$result_ext->StartDate;
-		$sipass[$i][6]=$result_ext->EndDate;
+		$sipass[$i][0]='';
+		$sipass[$i][1]=$row->card_logical_id;
+		$sipass[$i][2]=$row->last_name;
+		$sipass[$i][3]=$row->first_name;
+		$sipass[$i][4]=$row->number;
+		$sipass[$i][5]=date('d.m.Y',strtotime($row->start_date));
+		$sipass[$i][6]=date('d.m.Y',strtotime($row->end_date));
 		$i++;
 	}
-}*/
+}
 
-$qry="SELECT DISTINCT vorname as FirstName,nachname as LastName, nummer as CardNumber, 
+$qry="SELECT DISTINCT nachname as LastName, vorname as FirstName,nummer as CardNumber, 
 				EXTRACT(DAY FROM vw_betriebsmittelperson.insertamum) AS tag,
 				EXTRACT(MONTH FROM vw_betriebsmittelperson.insertamum) AS monat,
 				EXTRACT(YEAR FROM vw_betriebsmittelperson.insertamum) AS jahr
@@ -81,11 +82,16 @@ if($result = pg_query($conn, $qry))
 			//überprüfen, ob bereits vorhanden
 			if($sipass[$j][4]==$row->cardnumber)
 			{
-				$sipass[$j][0]="U";
-				$sipass[$j][2]=$row->lastname;
-				$sipass[$j][3]=$row->firstname;
-				$sipass[$j][5]=$row->tag.'.'.$row->monat.'.'.$row->jahr;
-				$sipass[$j][6]=$row->tag.'.'.$row->monat.'.'.($row->jahr+5);
+				if(($sipass[$j][2]!=$row->lastname&&$row->lastname!='')
+				||($sipass[$j][3]!=$row->firstname&&$row->firstname!='')
+				||($sipass[$j][5]!=$row->tag.'.'.$row->monat.'.'.$row->jahr&&$row->tag!=''&&$row->monat!=''&&$row->jahr!=''))
+				{
+					$sipass[$j][0]="U";
+					$sipass[$j][2]=$row->lastname;
+					$sipass[$j][3]=$row->firstname;
+					$sipass[$j][5]=date('d.m.Y',strtotime($row->tag.'.'.$row->monat.'.'.$row->jahr));
+					$sipass[$j][6]=date('d.m.Y',strtotime($row->tag.'.'.$row->monat.'.'.($row->jahr+5)));
+				}
 				$update=true;
 				break;
 			}
@@ -93,19 +99,40 @@ if($result = pg_query($conn, $qry))
 		if(!$update)
 		{
 			//wenn nicht gefunden, dann append
-			$sipass[$i][0]="A";
-			$sipass[$i][1]='';
-			$sipass[$i][2]=$row->lastname;
-			$sipass[$i][3]=$row->firstname;
-			$sipass[$i][4]=$row->cardnumber;
-			$sipass[$i][5]=$row->tag.'.'.$row->monat.'.'.$row->jahr;
-			$sipass[$i][6]=$row->tag.'.'.$row->monat.'.'.($row->jahr+5);
-			$i++;
+			if($row->lastname!='' && $row->firstname!='' && $row->cardnumber!='' &&$row->tag!='' && $row->monat!='' && $row->jahr!='')
+			{
+				$sipass[$i][0]="A";
+				$sipass[$i][1]='';
+				$sipass[$i][2]=$row->lastname;
+				$sipass[$i][3]=$row->firstname;
+				$sipass[$i][4]=str_replace(" ","",$row->cardnumber);
+				$sipass[$i][5]=$row->tag.'.'.$row->monat.'.'.$row->jahr;
+				$sipass[$i][6]=$row->tag.'.'.$row->monat.'.'.($row->jahr+5);
+				$i++;
+			}
 		}
 	}
 }
+$ausdruck='';
+for($j=0;$j<$i;$j++)
+{
+	if(trim($sipass[$j][0]!=''))
+	{
+		$ausdruck.=$sipass[$j][0]."\t";
+		$ausdruck.=$sipass[$j][1]."\t";
+		$ausdruck.=$sipass[$j][2]."\t";
+		$ausdruck.=$sipass[$j][3]."\t";
+		$ausdruck.=$sipass[$j][4]."\t";
+		$ausdruck.=$sipass[$j][5]."\t";
+		$ausdruck.=$sipass[$j][6]."\n";
+	}
+}
+header("Content-Type: text/plain");
+header("Content-Disposition: attachment; filename=\"SiPassZutrittskartenUpdate". "_" . date("d_m_Y") . ".txt\"");
+echo $ausdruck;
 
 
+/*
 //------------ Excel init --------------------------
 
 // Creating a workbook
@@ -129,15 +156,19 @@ $z=0; 							// Start bei Zeile 0
 
 for($j=0;$j<$i;$j++)
 {
-	$worksheet->write($z,0, $sipass[$j][0]);
-	$worksheet->write($z,1, $sipass[$j][1]);					
-	$worksheet->write($z,2, $sipass[$j][2]);
-	$worksheet->write($z,3, $sipass[$j][3]);
-	$worksheet->write($z,4, $sipass[$j][4]);
-	$worksheet->write($z,5, $sipass[$j][5]);				
-	$worksheet->write($z,6, $sipass[$j][6]);
-	$z++;
+	if(trim($sipass[$j][0]!=''))
+	{
+		$worksheet->write($z,0, $sipass[$j][0]);
+		$worksheet->write($z,1, $sipass[$j][1]);					
+		$worksheet->write($z,2, $sipass[$j][2]);
+		$worksheet->write($z,3, $sipass[$j][3]);
+		$worksheet->write($z,4, $sipass[$j][4]);
+		$worksheet->write($z,5, $sipass[$j][5]);				
+		$worksheet->write($z,6, $sipass[$j][6]);
+		$z++;
+	}
 }
 
 $workbook->close();
+*/
 ?>
