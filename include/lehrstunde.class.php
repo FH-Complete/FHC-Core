@@ -528,7 +528,7 @@ class lehrstunde
 		$sql_query="SELECT $stpl_id AS id, lektor, stg_kurzbz, ort_kurzbz, semester, verband, gruppe, gruppe_kurzbz, datum, stunde FROM $stpl_table
 				WHERE datum='$this->datum' AND stunde=$this->stunde AND (ort_kurzbz='$this->ort_kurzbz' OR ";
 		if ($this->lektor_uid!='_DummyLektor')
-			$sql_query.="(uid='$this->lektor_uid') AND uid!='_DummyLektor' OR ";
+			$sql_query.="(uid='$this->lektor_uid' AND uid!='_DummyLektor') OR ";
 		$sql_query.="(studiengang_kz=$this->studiengang_kz AND semester=$this->sem";
 		if ($this->ver!=null && $this->ver!='' && $this->ver!=' ')
 			$sql_query.=" AND (verband='$this->ver' OR verband IS NULL OR verband='' OR verband=' ')";
@@ -580,7 +580,7 @@ class lehrstunde
 							FROM lehre.vw_reservierung
 							WHERE datum='$this->datum' AND stunde=$this->stunde AND (ort_kurzbz='$this->ort_kurzbz' OR ";
 				if ($this->lektor_uid!='_DummyLektor')
-					$sql_query.="(uid='$this->lektor_uid') AND uid!='_DummyLektor' OR ";
+					$sql_query.="(uid='$this->lektor_uid' AND uid!='_DummyLektor') OR ";
 				$sql_query.="(studiengang_kz=$this->studiengang_kz AND semester=$this->sem";
 				if ($this->ver!=null && $this->ver!='' && $this->ver!=' ')
 					$sql_query.=" AND (verband='$this->ver' OR verband IS NULL OR verband='' OR verband=' ')";
@@ -613,7 +613,7 @@ class lehrstunde
 		else
 		{
 			$row=pg_fetch_object($erg_stpl);
-			$this->errormsg="Kollision ($stpl_table): $row->id|$row->lektor|$row->ort_kurzbz|$row->stg_kurzbz-$row->semester$row->verband$row->gruppe$row->gruppe_kurzbz - $row->datum/$row->stunde";
+			$this->errormsg="Kollision ($stpl_table): $row->id|$row->lektor|$row->ort_kurzbz|$row->stg_kurzbz-$row->semester$row->verband$row->gruppe$row->gruppe_kurzbz - $row->datum/$row->stunde"; //\n".$sql_query
 			return true;
 		}
 	}
