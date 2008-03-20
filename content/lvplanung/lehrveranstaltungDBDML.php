@@ -74,19 +74,22 @@ if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz') && !$r
 
 function kollision($lehreinheit_id, $mitarbeiter_uid, $mitarbeiter_uid_old)
 {
-	global $conn, $db_stpl_table;
-	
+	global $conn, $db_stpl_table,$errormsg;
+
 	//Lehrstunden laden
 	$lehrstunden=new lehrstunde($conn);
 	$lehrstunde=new lehrstunde($conn);
 	$lehrstunden->load_lehrstunden_le($lehreinheit_id,$mitarbeiter_uid_old);
-	
+
 	foreach ($lehrstunden->lehrstunden as $ls)
 	{
 		$lehrstunde->load($ls->stundenplan_id);
 		$lehrstunde->lektor_uid=$mitarbeiter_uid;
 		if ($lehrstunde->kollision($db_stpl_table))
+		{
+			$errormsg=$lehrstunde->errormsg;
 			return true;
+		}
 	}
 	return false;
 }
@@ -157,14 +160,14 @@ if(!$error)
 				$lem->updatevon = $user;
 
 				$lem->new=false;
-				
-				//Wenn sich der Lektor aendert und keine Kollision dadurch entsteht, dann werden die 
+
+				//Wenn sich der Lektor aendert und keine Kollision dadurch entsteht, dann werden die
 				//Daten automatisch im Stundenplan geaendert
 				if($ignore_kollision=='false' && $lem->mitarbeiter_uid!=$lem->mitarbeiter_uid_old)
 				{
 					//check kollision
 					if(!kollision($lem->lehreinheit_id, $lem->mitarbeiter_uid, $lem->mitarbeiter_uid_old))
-					{						
+					{
 						//Update im Stundenplan
 						$stpl_table='lehre.'.TABLE_BEGIN.$db_stpl_table;
 						$qry = "UPDATE $stpl_table SET mitarbeiter_uid='$lem->mitarbeiter_uid' WHERE lehreinheit_id='$lem->lehreinheit_id' AND mitarbeiter_uid='$lem->mitarbeiter_uid_old'";
@@ -172,7 +175,7 @@ if(!$error)
 						{
 							$error = false;
 						}
-						else 
+						else
 						{
 							$error = true;
 							$return = false;
@@ -182,7 +185,7 @@ if(!$error)
 					else
 					{
 						$return = false;
-						$errormsg = 'Fehler: Die Aenderung des Lektors fuehrt zu einer Kollision im Stundenplan';
+						$errormsg = "Fehler: Die Aenderung des Lektors fuehrt zu einer Kollision im Stundenplan!\n".$errormsg;
 						$error = true;
 					}
 				}
@@ -194,30 +197,30 @@ if(!$error)
 						//Pruefen ob die erlaubte Semesterstundenanzahl ueberschritten wurde.
 						//Wenn ja dann ein Warning zurueckliefern
 
-						//Maximale Stundenanzahl ermitteln					
+						//Maximale Stundenanzahl ermitteln
 						$ma = new mitarbeiter($conn);
 						$ma->load($lem->mitarbeiter_uid);
-						
+
 						if($ma->fixangestellt)
 							$max_stunden = WARN_SEMESTERSTD_FIX;
 						else
 							$max_stunden = WARN_SEMESTERSTD_FREI;
-							
+
 						//Summer der Stunden ermitteln
 						$le = new lehreinheit($conn);
 						$le->load($lem->lehreinheit_id);
-						
-						$qry = "SELECT 
+
+						$qry = "SELECT
 									sum(semesterstunden) as summe
-								FROM 
+								FROM
 									lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
-								WHERE 
+								WHERE
 									mitarbeiter_uid='$lem->mitarbeiter_uid' AND
 									studiensemester_kurzbz='$le->studiensemester_kurzbz' AND
 									faktor>0 AND
 									stundensatz>0 AND
 									bismelden";
-																		
+
 						if($result = pg_query($conn, $qry))
 						{
 							if($row = pg_fetch_object($result))
@@ -229,20 +232,20 @@ if(!$error)
 									$error = true;
 									$errormsg = "Daten wurden gespeichert.\n\nWarnung: Die maximal erlaubte Semesterstundenanzahl von $max_stunden Stunden wurde ueberschritten";
 								}
-								else 
+								else
 								{
 									$return = true;
 									$error=false;
 								}
 							}
-							else 
+							else
 							{
 								$return = false;
 								$error=true;
 								$errormsg='Fehler beim Ermitteln der Gesamtstunden';
 							}
 						}
-						else 
+						else
 						{
 							$return = false;
 							$error=true;
