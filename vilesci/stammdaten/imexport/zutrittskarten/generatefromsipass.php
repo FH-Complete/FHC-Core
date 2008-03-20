@@ -20,7 +20,15 @@ $update=false;
 
 if (!$conn=pg_pconnect(CONN_STRING))
 	die(pg_last_error($conn));
-/*	
+	
+	ini_set('display_errors','1');
+	error_reporting(E_ALL);
+putenv('TDSVER=82');
+define("STPDB_SERVER","192.168.101.230:5432");
+define("STPDB_USER","sa");
+define("STPDB_PASSWD","P1ss0ff");
+define("STPDB_DB","asco4");
+		
 // zugriff auf mssql-datenbank ----------------------- DB-Zugriff ändern !!!!!!
 if (!$conn_ext=mssql_connect (STPDB_SERVER, STPDB_USER, STPDB_PASSWD))
 	die('Fehler beim Verbindungsaufbau!');
