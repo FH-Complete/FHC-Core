@@ -20,6 +20,8 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 	require_once('../config.inc.php');
+	require_once('../../include/betriebsmittel.class.php');
+	require_once('../../include/betriebsmittelperson.class.php');
 	require_once('../../include/globals.inc.php');
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/benutzerberechtigung.class.php');
@@ -34,6 +36,8 @@
 	$user = get_uid();
 	$rechte = new benutzerberechtigung($conn);
 	$rechte->getBerechtigungen($user);
+	
+	
 	
 	if(!$rechte->isBerechtigt('admin'))
 		die('Sie haben keine Rechte für diese Seite');
@@ -56,13 +60,13 @@
 		$stsem = $stsem_obj->getaktorNext();
 		
 		$qrys = array(
-					"Insert into public.tbl_variable(name, uid, wert) values('semester_aktuell','$uid','$stsem');",
-					"Insert into public.tbl_variable(name, uid, wert) values('db_stpl_table','$uid','stundenplandev');",
-					"Insert into public.tbl_variable(name, uid, wert) values('ignore_kollision','$uid','false');",
-					"Insert into public.tbl_variable(name, uid, wert) values('kontofilterstg','$uid','false');",
-					"Insert into public.tbl_variable(name, uid, wert) values('ignore_zeitsperre','$uid','false');",
-					"Insert into public.tbl_variable(name, uid, wert) values('ignore_reservierung','$uid','false');"
-					);
+			"Insert into public.tbl_variable(name, uid, wert) values('semester_aktuell','$uid','$stsem');",
+			"Insert into public.tbl_variable(name, uid, wert) values('db_stpl_table','$uid','stundenplandev');",
+			"Insert into public.tbl_variable(name, uid, wert) values('ignore_kollision','$uid','false');",
+			"Insert into public.tbl_variable(name, uid, wert) values('kontofilterstg','$uid','false');",
+			"Insert into public.tbl_variable(name, uid, wert) values('ignore_zeitsperre','$uid','false');",
+			"Insert into public.tbl_variable(name, uid, wert) values('ignore_reservierung','$uid','false');"
+			);
 					
 		$error = false;
 		foreach ($qrys as $qry)
@@ -74,7 +78,9 @@
 		}
 		
 		if($error)
+		{
 			$errorstr.="Es konnten nicht alle Werte angelegt werden";
+		}
 		
 		$reloadstr .= "<script type='text/javascript'>\n";
 		$reloadstr .= "	parent.uebersicht.location.href='variablen_uebersicht.php';";
@@ -106,7 +112,7 @@
 		$variable=new variable($conn);
 		
 		if($variable->load($uid, $name))
-			$varialbe->new = false;
+			$variable->new = false;
 		else 
 			$variable->new = true;
 		
@@ -117,7 +123,7 @@
 		if ($variable->save())
 		{
 			$reloadstr .= "<script type='text/javascript'>\n";
-			$reloadstr .= "	parent.uebersicht.location.href='variablen_uebersicht.php';";
+			$reloadstr .= "parent.uebersicht.location.href='variablen_uebersicht.php';";
 			$reloadstr .= "</script>\n";
 		}
 	}
@@ -125,32 +131,40 @@
 	
 	if (isset($person_id) && isset($betriebsmittel_id))
 	{
-		$qry = "SELECT * FROM public.tbl_betriebsmittelperson 
+		/*$qry = "SELECT * FROM public.tbl_betriebsmittelperson 
 				WHERE betriebsmittel_id=$betriebsmittel_id AND person_id=$person_id";
 		if($result = pg_query($conn, $qry))
 			$bmp = pg_fetch_object($result);
 		$qry = "SELECT * FROM public.tbl_betriebsmittel 
 				WHERE betriebsmittel_id=$betriebsmittel_id";
 		if($result = pg_query($conn, $qry))
-			$bm = pg_fetch_object($result);
+			$bm = pg_fetch_object($result);*/
+		$bm=new betriebsmittel($conn);
+		$bm->load($betriebsmittel_id);
+		$bmp=new betriebsmittelperson($conn);
+		$bmp->load($betriebsmittel_id,$person_id);
 	
 		$htmlstr .= "<table style='padding-top:10px;'>\n";
-		$htmlstr .= "<tr><th>BMid</th><th>betriebsmitteltyp</th><th>nummer</th><th>nummerintern</th>
-						<th>beschreibung</th><th>ort_kurzbz</th><th>reservieren</th><th>insertvon</th><th>updateamum</th><th>updatevon</th><th>ext_id</th></tr>\n";
+		/*$htmlstr .= "<tr><th>BMid</th><th>betriebsmitteltyp</th><th>nummer</th><th>nummerintern</th>
+						<th>beschreibung</th><th>ort_kurzbz</th><th>reservieren</th><th>insertvon</th><th>updateamum</th><th>updatevon</th><th>ext_id</th></tr>\n";*/
 		$htmlstr .= "<form action='' method='POST'>\n";
 		$htmlstr .= "	<tr>\n";
-		$htmlstr .= "		<td>".$bm->betriebsmittel_id."</td>\n";
-		$htmlstr .= "		<td><input type='text' name='wert' value='".$bm->betriebsmitteltyp."' size='15' maxlength='64'></td>\n";
-		$htmlstr .= "		<td><input type='text' name='wert' value='".$bm->nummer."' size='15' maxlength='64'></td>\n";
-		$htmlstr .= "		<td><input type='text' name='wert' value='".$bm->nummerintern."' size='15' maxlength='64'></td>\n";
-		$htmlstr .= "		<td><input type='text' name='wert' value='".$bm->beschreibung."' size='15' maxlength='64'></td>\n";
-		$htmlstr .= "		<td><input type='text' name='wert' value='".$bm->ort_kurzbz."' size='15' maxlength='64'></td>\n";
-		$htmlstr .= "		<td><input type='text' name='wert' value='".$bm->reservieren."' size='15' maxlength='64'></td>\n";
-		$htmlstr .= "		<td>".$bm->insertamum."</td>\n";
-		$htmlstr .= "		<td>".$bm->insertvon."</td>\n";
-		$htmlstr .= "		<td>".$bm->updateamum."</td>\n";
-		$htmlstr .= "		<td>".$bm->updatevon."</td>\n";
-		$htmlstr .= "		<td>".$bm->ext_id."</td>\n";
+		$htmlstr .= "		<td><b>BM-ID </b>".$bm->betriebsmittel_id."</td>\n";
+		$htmlstr .= "		<td><b>Betriebsmitteltyp </b><input type='text' name='wert' value='".$bm->betriebsmitteltyp."' size='15' maxlength='64'></td>\n";
+		$htmlstr .= "		<td><b>Nummer &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b><input type='text' name='wert' value='".$bm->nummer."' size='15' maxlength='64'></td>\n";
+		$htmlstr .= "		<td><b>Nummer intern </b><input type='text' name='wert' value='".$bm->nummerintern."' size='15' maxlength='64'></td>\n";
+		$htmlstr .= "		</tr><tr>";
+		$htmlstr .= "		<td><b>Beschreibung </b><input type='text' name='wert' value='".$bm->beschreibung."' size='15' maxlength='64'></td>\n";
+		$htmlstr .= "		<td><b>Ort Kurzbz &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b>
+					<input type='text' name='wert' value='".$bm->ort_kurzbz."' size='15' maxlength='64'></td>\n";
+		$htmlstr .= "		<td><b>reservieren </b><input type='text' name='wert' value='".$bm->reservieren."' size='15' maxlength='64'></td>\n";
+		$htmlstr .= "		</tr><tr>";
+		$htmlstr .= "		<td><b>insertamum </b>".$bm->insertamum."</td>\n";
+		$htmlstr .= "		<td><b>insertvon </b>".$bm->insertvon."</td>\n";
+		$htmlstr .= "		<td><b>updateamum </b>".$bm->updateamum."</td>\n";
+		$htmlstr .= "		<td><b>updatevon </b>".$bm->updatevon."</td>\n";
+		$htmlstr .= "		<td><b>ext_id </b>".$bm->ext_id."</td>\n";
+		$htmlstr .= "		</tr><tr>";
 		$htmlstr .= "		<td><input type='submit' name='schick' value='speichern'></td>";
 		$htmlstr .= "		<td><input type='submit' name='del' value='l&ouml;schen'></td>";
 		$htmlstr .= "	</tr>\n";
@@ -158,21 +172,23 @@
 		$htmlstr .= "</table>\n";
 
 		$htmlstr .= "<table style='padding-top:10px;'>\n";
-		$htmlstr .= "<tr><th>BMid</th><th>Pid</th><th>kaution</th><th>ausgegebenam</th><th>retouram</th>
-						<th>anmerkung</th><th>insertamum</th><th>insertvon</th><th>updateamum</th><th>updatevon</th><th>ext_id</th></tr>\n";
+		/*$htmlstr .= "<tr><th>BMid</th><th>Pid</th><th>kaution</th><th>ausgegebenam</th><th>retouram</th>
+						<th>anmerkung</th><th>insertamum</th><th>insertvon</th><th>updateamum</th><th>updatevon</th><th>ext_id</th></tr>\n";*/
 		$htmlstr .= "<form action='' method='POST'>\n";
 		$htmlstr .= "	<tr>\n";
-		$htmlstr .= "		<td>".$bmp->betriebsmittel_id."</td>\n";
-		$htmlstr .= "		<td>".$bmp->person_id."</td>\n";
-		$htmlstr .= "		<td><input type='text' name='wert' value='".$bmp->kaution."' size='15' maxlength='64'></td>\n";
-		$htmlstr .= "		<td><input type='text' name='wert' value='".$bmp->ausgegebenam."' size='15' maxlength='64'></td>\n";
-		$htmlstr .= "		<td><input type='text' name='wert' value='".$bmp->retouram."' size='15' maxlength='64'></td>\n";
-		$htmlstr .= "		<td><input type='text' name='wert' value='".$bmp->anmerkung."' size='15' maxlength='64'></td>\n";
-		$htmlstr .= "		<td>".$bmp->insertamum."</td>\n";
-		$htmlstr .= "		<td>".$bmp->insertvon."</td>\n";
-		$htmlstr .= "		<td>".$bmp->updateamum."</td>\n";
-		$htmlstr .= "		<td>".$bmp->updatevon."</td>\n";
-		$htmlstr .= "		<td>".$bmp->ext_id."</td>\n";
+		$htmlstr .= "		<td><b>BM-ID </b>".$bmp->betriebsmittel_id."</td>\n";
+		$htmlstr .= "		<td><b>P-ID </b>".$bmp->person_id."</td>\n";
+		$htmlstr .= "		<td><b>Kaution </b><input type='text' name='wert' value='".$bmp->kaution."' size='15' maxlength='64'></td>\n";
+		$htmlstr .= "		<td><b>ausgegeben am </b><input type='text' name='wert' value='".$bmp->ausgegebenam."' size='15' maxlength='64'></td>\n";
+		$htmlstr .= "		<td><b>retour am </b><input type='text' name='wert' value='".$bmp->retouram."' size='15' maxlength='64'></td>\n";
+		$htmlstr .= "		</tr><tr>";
+		$htmlstr .= "		<td><b>Anmerkung </b><input type='text' name='wert' value='".$bmp->anmerkung."' size='15' maxlength='64'></td>\n";
+		$htmlstr .= "		<td><b>insertamum </b>".$bmp->insertamum."</td>\n";
+		$htmlstr .= "		<td><b>insertvon </b>".$bmp->insertvon."</td>\n";
+		$htmlstr .= "		<td><b>updateamum </b>".$bmp->updateamum."</td>\n";
+		$htmlstr .= "		<td><b>updatevon </b>".$bmp->updatevon."</td>\n";
+		$htmlstr .= "		<td><b>ext_id </b>".$bmp->ext_id."</td>\n";
+		$htmlstr .= "		</tr><tr>";
 		$htmlstr .= "		<td><input type='submit' name='schick' value='speichern'></td>";
 		$htmlstr .= "		<td><input type='submit' name='del' value='l&ouml;schen'></td>";
 		$htmlstr .= "	</tr>\n";
