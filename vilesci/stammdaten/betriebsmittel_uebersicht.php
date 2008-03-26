@@ -26,17 +26,17 @@
 
 	if (!$conn = @pg_pconnect(CONN_STRING))
 	   	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-
+	
 	$user = get_uid();
-
+	
 	$rechte = new benutzerberechtigung($conn);
 	$rechte->getBerechtigungen($user);
-
+	
 	if(!$rechte->isBerechtigt('admin'))
 		die('Sie haben keine Berechtigung für diese Seite');
-
+	
 	$htmlstr = "";
-
+	
 	if (isset($_POST['bmsuche']))
 	{
 		$bmsuche=strtoupper($_POST['bmsuche']);
@@ -62,29 +62,29 @@
 							<input type='submit' name='submit' value='BM-Suche'>
 						</form>";
 		$htmlstr .= "</div>";
-	    $htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form><table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>\n";
+	    	$htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form><table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>\n";
 		$htmlstr .= "   <thead><tr class='liste'>\n";
-	    $htmlstr .= "       <th class='table-sortable:default'>Typ</th><th class='table-sortable:default'>Nummer</th>
+	    	$htmlstr .= "       <th class='table-sortable:default'>Typ</th><th class='table-sortable:default'>Nummer</th>
 	    						<th class='table-sortable:default'>NrIntern</th><th class='table-sortable:default'>Person (UID)</th>
 	    						<th class='table-sortable:default'>Ausgabe</th><th class='table-sortable:alphanumeric'>Retour</th>";
-	    $htmlstr .= "   </tr></thead><tbody>\n";
-	    $i = 0;
+	    	$htmlstr .= "   </tr></thead><tbody>\n";
+	    	$i = 0;
 		while($row=pg_fetch_object($erg))
-	    {
-	        //$htmlstr .= "   <tr class='liste". ($i%2) ."'>\n";
+		{
+			//$htmlstr .= "   <tr class='liste". ($i%2) ."'>\n";
 			$htmlstr .= "   <tr>\n";
-	        $htmlstr .= "       <td>".$row->betriebsmitteltyp."</td>\n";
+		    	$htmlstr .= "       <td>".$row->betriebsmitteltyp."</td>\n";
 			$htmlstr .= '       <td>
 									<a href="betriebsmittel_details.php?betriebsmittel_id='.$row->betriebsmittel_id.'&person_id='.$row->person_id.'" 
 										target="betriebsmittel_details">'.$row->nummer."</a></td>\n";
 			$htmlstr .= "       <td>".$row->nummerintern."</td>\n";
 			$htmlstr .= "       <td>$row->nachname $row->vorname &nbsp; ( $row->uid )</td>\n";
-	        $htmlstr .= "       <td>".$row->ausgegebenam."</td>\n";
+		    	$htmlstr .= "       <td>".$row->ausgegebenam."</td>\n";
 			$htmlstr .= "       <td>$row->retouram</td>\n";
-	        $htmlstr .= "   </tr>\n";
-	        $i++;
-	    }
-	    $htmlstr .= "</tbody></table>\n";
+		    	$htmlstr .= "   </tr>\n";
+		    	$i++;
+		}
+	    	$htmlstr .= "</tbody></table>\n";
 	}
 ?>
 <html>

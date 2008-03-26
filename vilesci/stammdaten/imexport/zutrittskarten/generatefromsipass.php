@@ -16,6 +16,7 @@ require_once('../../../../include/Excel/Validator.php');*/
 
 $sipass=array(array());
 $i=0;
+$key_nummer=0;
 $update=false;
 
 if (!$conn=pg_pconnect(CONN_STRING))
@@ -32,16 +33,16 @@ if (!$conn_ext=mssql_connect (DB_SERVER, DB_USER, DB_PASSWD))
 	die('Fehler beim Verbindungsaufbau!');
 mssql_select_db(DB_DB, $conn_ext);
 
-/*
+
 //letzte Nummer
-$sql_query="SELECT max(key) AS last_keynr FROM ***************;";
+$sql_query="SELECT max(asco.cardholder.cardholder_id) AS last_keynr FROM asco.cardholder;";
 //echo $sql_query;
 if(!$result=mssql_query($qry,$conn_ext))
 	die(mssql_get_last_message().'<BR>'.$sql_query);
 if ($row=pg_fetch_object($result))
 	$key_nummer=$row->last_keynr+1;
 else
-	die('Letzte Nummer konnte nicht eruiert werden!');*/
+	die('Letzte Nummer konnte nicht eruiert werden!');
 	
 //einlesen der daten von sipass
 
@@ -53,7 +54,7 @@ if($result_ext = mssql_query($qry,$conn_ext))
 	while($row=mssql_fetch_object($result_ext))
 	{
 		$sipass[$i][0]='';
-		$sipass[$i][1]=$row->card_logical_id;
+		$sipass[$i][1]=$row->cardholder_id;
 		$sipass[$i][2]=$row->last_name;
 		$sipass[$i][3]=$row->first_name;
 		$sipass[$i][4]=$row->number;
@@ -83,6 +84,7 @@ if($result = pg_query($conn, $qry))
 			if($sipass[$j][4]==$row->cardnumber)
 			{
 				$sipass[$j][0]="U";
+				$sipass[$i][1]=$row->cardholder_id;
 				$sipass[$j][2]=trim($row->lastname);
 				$sipass[$j][3]=trim($row->firstname);
 				$sipass[$j][5]=date('d.m.Y',strtotime($row->tag.'.'.$row->monat.'.'.$row->jahr));
@@ -97,13 +99,14 @@ if($result = pg_query($conn, $qry))
 			if($row->lastname!='' && $row->firstname!='' && $row->cardnumber!='' &&$row->tag!='' && $row->monat!='' && $row->jahr!='')
 			{
 				$sipass[$i][0]="A";
-				$sipass[$i][1]='';
+				$sipass[$i][1]=$key_nummer;
 				$sipass[$i][2]=trim($row->lastname);
 				$sipass[$i][3]=trim($row->firstname);
 				$sipass[$i][4]=str_replace(" ","",$row->cardnumber);
 				$sipass[$i][5]=$row->tag.'.'.$row->monat.'.'.$row->jahr;
 				$sipass[$i][6]=$row->tag.'.'.$row->monat.'.'.($row->jahr+5);
 				$i++;
+				$key_nummer++;
 			}
 		}
 	}
@@ -121,7 +124,8 @@ for($j=0;$j<$i;$j++)
 	$ausdruck.=$sipass[$j][3]."\t";
 	$ausdruck.=$sipass[$j][4]."\t";
 	$ausdruck.=$sipass[$j][5]."\t";
-	$ausdruck.=$sipass[$j][6]."\n";
+	$ausdruck.=$sipass[$j][6]."\t";
+	$ausdruck.="<Keine>\n";
 }
 header("Content-Type: text/plain");
 header("Content-Disposition: attachment; filename=\"SiPassZutrittskartenUpdate". "_" . date("d_m_Y") . ".txt\"");
