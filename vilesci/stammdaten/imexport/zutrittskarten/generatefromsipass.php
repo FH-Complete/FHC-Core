@@ -1,7 +1,7 @@
 <?php
 require('../../../config.inc.php');
 //include('../../../include/functions.inc.php');
-require_once('../../../../include/Excel/PEAR.php');
+/*require_once('../../../../include/Excel/PEAR.php');
 require_once('../../../../include/Excel/BIFFwriter.php');
 require_once('../../../../include/Excel/Workbook.php');
 require_once('../../../../include/Excel/Format.php');
@@ -12,7 +12,7 @@ require_once('../../../../include/Excel/PPS.php');
 require_once('../../../../include/Excel/Root.php');
 require_once('../../../../include/Excel/File.php');
 require_once('../../../../include/Excel/Writer.php');
-require_once('../../../../include/Excel/Validator.php');
+require_once('../../../../include/Excel/Validator.php');*/
 
 $sipass=array(array());
 $i=0;
@@ -27,7 +27,7 @@ define("DB_USER","sa");
 define("DB_PASSWD","P1ss0ff");
 define("DB_DB","asco4");
 		
-// zugriff auf mssql-datenbank ----------------------- DB-Zugriff ändern !!!!!!
+// zugriff auf mssql-datenbank 
 if (!$conn_ext=mssql_connect (DB_SERVER, DB_USER, DB_PASSWD))
 	die('Fehler beim Verbindungsaufbau!');
 mssql_select_db(DB_DB, $conn_ext);
@@ -82,16 +82,11 @@ if($result = pg_query($conn, $qry))
 			//überprüfen, ob bereits vorhanden
 			if($sipass[$j][4]==$row->cardnumber)
 			{
-				if(($sipass[$j][2]!=$row->lastname&&$row->lastname!='')
-				||($sipass[$j][3]!=$row->firstname&&$row->firstname!='')
-				||($sipass[$j][5]!=$row->tag.'.'.$row->monat.'.'.$row->jahr&&$row->tag!=''&&$row->monat!=''&&$row->jahr!=''))
-				{
-					$sipass[$j][0]="U";
-					$sipass[$j][2]=$row->lastname;
-					$sipass[$j][3]=$row->firstname;
-					$sipass[$j][5]=date('d.m.Y',strtotime($row->tag.'.'.$row->monat.'.'.$row->jahr));
-					$sipass[$j][6]=date('d.m.Y',strtotime($row->tag.'.'.$row->monat.'.'.($row->jahr+5)));
-				}
+				$sipass[$j][0]="U";
+				$sipass[$j][2]=trim($row->lastname);
+				$sipass[$j][3]=trim($row->firstname);
+				$sipass[$j][5]=date('d.m.Y',strtotime($row->tag.'.'.$row->monat.'.'.$row->jahr));
+				$sipass[$j][6]=date('d.m.Y',strtotime($row->tag.'.'.$row->monat.'.'.($row->jahr+5)));
 				$update=true;
 				break;
 			}
@@ -103,8 +98,8 @@ if($result = pg_query($conn, $qry))
 			{
 				$sipass[$i][0]="A";
 				$sipass[$i][1]='';
-				$sipass[$i][2]=$row->lastname;
-				$sipass[$i][3]=$row->firstname;
+				$sipass[$i][2]=trim($row->lastname);
+				$sipass[$i][3]=trim($row->firstname);
 				$sipass[$i][4]=str_replace(" ","",$row->cardnumber);
 				$sipass[$i][5]=$row->tag.'.'.$row->monat.'.'.$row->jahr;
 				$sipass[$i][6]=$row->tag.'.'.$row->monat.'.'.($row->jahr+5);
@@ -116,16 +111,17 @@ if($result = pg_query($conn, $qry))
 $ausdruck='';
 for($j=0;$j<$i;$j++)
 {
-	if(trim($sipass[$j][0]!=''))
+	if(trim($sipass[$j][0]==''))
 	{
-		$ausdruck.=$sipass[$j][0]."\t";
-		$ausdruck.=$sipass[$j][1]."\t";
-		$ausdruck.=$sipass[$j][2]."\t";
-		$ausdruck.=$sipass[$j][3]."\t";
-		$ausdruck.=$sipass[$j][4]."\t";
-		$ausdruck.=$sipass[$j][5]."\t";
-		$ausdruck.=$sipass[$j][6]."\n";
+		$sipass[$j][0]='D';
 	}
+	$ausdruck.=$sipass[$j][0]."\t";
+	$ausdruck.=$sipass[$j][1]."\t";
+	$ausdruck.=$sipass[$j][2]."\t";
+	$ausdruck.=$sipass[$j][3]."\t";
+	$ausdruck.=$sipass[$j][4]."\t";
+	$ausdruck.=$sipass[$j][5]."\t";
+	$ausdruck.=$sipass[$j][6]."\n";
 }
 header("Content-Type: text/plain");
 header("Content-Disposition: attachment; filename=\"SiPassZutrittskartenUpdate". "_" . date("d_m_Y") . ".txt\"");
