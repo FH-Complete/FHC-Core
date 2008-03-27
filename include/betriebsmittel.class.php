@@ -36,6 +36,7 @@ class betriebsmittel
 	var $betriebsmittel_id;	// @var integer
 	var $betriebsmitteltyp;	// @var string
 	var $nummer;			// @var string
+	var $nummerintern;		// @var string
 	var $reservieren;		// @var boolean
 	var $ort_kurzbz;		// @var string
 	var $ext_id;			// @var integer
@@ -93,6 +94,7 @@ class betriebsmittel
 				$this->beschreibung = $row->beschreibung;
 				$this->betriebsmitteltyp = $row->betriebsmitteltyp;
 				$this->nummer = $row->nummer;
+				$this->nummerintern = $row->nummerintern;
 				$this->reservieren = ($row->reservieren=='t'?true:false);
 				$this->ort_kurzbz = $row->ort_kurzbz;
 				$this->updateamum = $row->updateamum;
@@ -152,11 +154,12 @@ class betriebsmittel
 		if($new)
 		{
 			//Neuen Datensatz einfuegen					
-			$qry='INSERT INTO public.tbl_betriebsmittel (beschreibung, betriebsmitteltyp, nummer, reservieren, ort_kurzbz,
+			$qry='INSERT INTO public.tbl_betriebsmittel (beschreibung, betriebsmitteltyp, nummer, nummerintern, reservieren, ort_kurzbz,
 				ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
 			     $this->addslashes($this->beschreibung).', '.
 			     $this->addslashes($this->betriebsmitteltyp).', '.
 			     $this->addslashes($this->nummer).', '.
+			     $this->addslashes($this->nummerintern).', '.
 			     ($this->reservieren?'true':'false').', '. 
 			     $this->addslashes($this->ort_kurzbz).', '.
 			     $this->addslashes($this->ext_id).',  now(), '.
@@ -176,6 +179,7 @@ class betriebsmittel
 				'betriebsmitteltyp='.$this->addslashes($this->betriebsmitteltyp).', '. 
 				'beschreibung='.$this->addslashes($this->beschreibung).', '. 
 				'nummer='.$this->addslashes($this->nummer).', '.  
+				'nummerintern='.$this->addslashes($this->nummerintern).', '.  
 				'reservieren='.($this->reservieren?'true':'false').', '.
 				'ort_kurzbz='.$this->addslashes($this->ort_kurzbz).', '.
 				'ext_id='.$this->addslashes($this->ext_id).', '. 
@@ -240,6 +244,7 @@ class betriebsmittel
 				$bm->beschreibung = $row->beschreibung;
 				$bm->betriebsmitteltyp = $row->betriebsmitteltyp;
 				$bm->nummer = $row->nummer;
+				$bm->nummerintern = $row->nummerintern;
 				$bm->reservieren = $row->reservieren;
 				$bm->ort_kurzbz = $row->ort_kurzbz;
 				$bm->updateamum = $row->updateamum;
