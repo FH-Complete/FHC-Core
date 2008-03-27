@@ -37,9 +37,9 @@ mssql_select_db(DB_DB, $conn_ext);
 //letzte Nummer
 $sql_query="SELECT max(asco.cardholder.cardholder_id) AS last_keynr FROM asco.cardholder;";
 //echo $sql_query;
-if(!$result=mssql_query($qry,$conn_ext))
+if(!$result=mssql_query($sql_query,$conn_ext))
 	die(mssql_get_last_message().'<BR>'.$sql_query);
-if ($row=pg_fetch_object($result))
+if ($row=mssql_fetch_object($result))
 	$key_nummer=$row->last_keynr+1;
 else
 	die('Letzte Nummer konnte nicht eruiert werden!');
@@ -84,7 +84,6 @@ if($result = pg_query($conn, $qry))
 			if($sipass[$j][4]==$row->cardnumber)
 			{
 				$sipass[$j][0]="U";
-				$sipass[$i][1]=$row->cardholder_id;
 				$sipass[$j][2]=trim($row->lastname);
 				$sipass[$j][3]=trim($row->firstname);
 				$sipass[$j][5]=date('d.m.Y',strtotime($row->tag.'.'.$row->monat.'.'.$row->jahr));
