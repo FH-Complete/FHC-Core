@@ -116,15 +116,19 @@ for($j=0;$j<$i;$j++)
 	if(trim($sipass[$j][0]==''))
 	{
 		$sipass[$j][0]='D';
+		$ausdruck.=$sipass[$j][1]."\n";
 	}
-	$ausdruck.=$sipass[$j][0]."\t";
-	$ausdruck.=$sipass[$j][1]."\t";
-	$ausdruck.=$sipass[$j][2]."\t";
-	$ausdruck.=$sipass[$j][3]."\t";
-	$ausdruck.=$sipass[$j][4]."\t";
-	$ausdruck.=$sipass[$j][5]."\t";
-	$ausdruck.=$sipass[$j][6]."\t";
-	$ausdruck.="<Keine>\n";
+	else 
+	{
+		$ausdruck.=$sipass[$j][0]."\t";
+		$ausdruck.=$sipass[$j][1]."\t";
+		$ausdruck.=$sipass[$j][2]."\t";
+		$ausdruck.=$sipass[$j][3]."\t";
+		$ausdruck.=$sipass[$j][4]."\t";
+		$ausdruck.=$sipass[$j][5]."\t";
+		$ausdruck.=$sipass[$j][6]."\t";
+		$ausdruck.="<Keine>\n";
+	}
 }
 header("Content-Type: text/plain");
 header("Content-Disposition: attachment; filename=\"SiPassZutrittskartenUpdate". "_" . date("d_m_Y") . ".txt\"");
