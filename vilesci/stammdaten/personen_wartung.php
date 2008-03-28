@@ -118,6 +118,7 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 		{
 			$msg = "Daten erfolgreich gespeichert<br>";
 			$msg .= "<br>".str_replace(';',';<br>',$sql_query_upd1);
+			pg_query($conn,"COMMIT;");
 			if(@pg_query($conn,'SELECT person_portal FROM sync.tbl_syncperson LIMIT 1'))
 			{
 				$msg.= "<br><br>Sync-Tabelle wird aktualisiert";
@@ -132,7 +133,6 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 				pg_query($conn,$sql_query_upd1);
 				$msg.= "<br>".str_replace(';',';<br>',$sql_query_upd1)."COMMIT";
 			}
-			pg_query($conn,"COMMIT;");
 		}
 		else
 		{
