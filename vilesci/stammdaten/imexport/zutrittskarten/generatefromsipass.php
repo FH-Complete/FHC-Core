@@ -116,6 +116,7 @@ for($j=0;$j<$i;$j++)
 	if(trim($sipass[$j][0]==''))
 	{
 		$sipass[$j][0]='D';
+		$ausdruck.=$sipass[$j][0]."\t";
 		$ausdruck.=$sipass[$j][1]."\n";
 	}
 	else 
