@@ -201,13 +201,13 @@ class betriebsmittel
 					}
 					else 
 					{
-						$this->errormsg = 'Fehler beim lesen der Sequence';
+						$this->errormsg = 'Fehler beim Lesen der Sequence';
 						return false;
 					}
 				}
 				else 
 				{
-					$this->errormsg = 'Fehler beim lesen der Sequence';
+					$this->errormsg = 'Fehler beim Lesen der Sequence';
 					return false;
 				}
 			}
