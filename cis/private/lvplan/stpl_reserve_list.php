@@ -1,7 +1,28 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
 	require_once('../../config.inc.php');
+	require_once('../../../include/functions.inc.php');
 
-	$uid=$REMOTE_USER;
+	$uid=get_uid();
 	//$uid='pam';
 
 	if (isset($_GET['id']))
@@ -20,13 +41,7 @@
 		$erg=pg_exec($conn, $sql_query);
 	}
 
-	//Aktuelle Reservierungen abfragen.
-	$datum=mktime();
-	$datum=date("Y-m-d",$datum);
-	$sql_query="SELECT * FROM vw_reservierung WHERE datum>='$datum' ";
-	$sql_query.=" ORDER BY  datum, titel, ort_kurzbz, stunde";
-	$erg_res=pg_exec($conn, $sql_query);
-	$num_rows_res=pg_numrows($erg_res);
+	
 ?>
 <html>
 <head>
@@ -43,6 +58,53 @@
 		</table>
 	</H2>
 	<?php
+	//Aktuelle Reservierungen abfragen.
+	$datum=mktime();
+	$datum=date("Y-m-d",$datum);
+	
+	//EIGENE
+	$sql_query="SELECT * FROM vw_reservierung WHERE datum>='$datum' AND uid='$uid'";
+	$sql_query.=" ORDER BY  datum, titel, ort_kurzbz, stunde";
+	$erg_res=pg_query($conn, $sql_query);
+	$num_rows_res=pg_numrows($erg_res);
+	
+	if ($num_rows_res>0)
+	{
+		echo '<table border="0">';
+		echo '<tr class="liste"><th>Datum</th><th>Titel</th><th>Stunde</th><th>Ort</th><th>Person</th><th>Beschreibung</th></tr>';
+		for ($i=0; $i<$num_rows_res; $i++)
+		{
+			$zeile=$i % 2;
+			$id=pg_result($erg_res,$i,"reservierung_id");
+			$datum=pg_result($erg_res,$i,"datum");
+			$titel=pg_result($erg_res,$i,"titel");
+			$stunde=pg_result($erg_res,$i,"stunde");
+			$ort_kurzbz=pg_result($erg_res,$i,"ort_kurzbz");
+			$pers_uid=pg_result($erg_res,$i,"uid");
+			//$lektor_kurzbz=pg_result($erg_res,$i,"lektor_kurzbz");
+			$beschreibung=pg_result($erg_res,$i,"beschreibung");
+			echo '<tr class="liste'.$zeile.'">';
+			echo '<td>'.$datum.'</td>';
+			echo '<td>'.$titel.'</td>';
+			echo '<td>'.$stunde.'</td>';
+			echo '<td>'.$ort_kurzbz.'</td>';
+			echo '<td>'.$pers_uid.'</td>';
+			echo '<td>'.$beschreibung.'<a  name="liste'.$i.'">&nbsp;</a></td>';
+			$z=$i-1;
+			if (($pers_uid==$uid)||($uid=='pam')||($uid=='kindlm')||($uid=='dvorak')||($uid=='betty'))
+				echo '<td><A class="Item" href="stpl_reserve_list.php?id='.$id.'#liste'.$z.'">Delete</A></td>';
+			echo '</tr>';
+		}
+		echo '</table>';
+	}
+	
+	echo '<br><br>';
+	//ALLE
+	$sql_query="SELECT * FROM vw_reservierung WHERE datum>='$datum' ";
+	$sql_query.=" ORDER BY  datum, titel, ort_kurzbz, stunde";
+	$erg_res=pg_query($conn, $sql_query);
+	$num_rows_res=pg_numrows($erg_res);
+	
 	if ($num_rows_res>0)
 	{
 		echo '<table border="0">';

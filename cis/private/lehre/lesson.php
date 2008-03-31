@@ -122,7 +122,7 @@ function hideSemPlanHelp(){
 		<td class="tdwidth10">&nbsp;</td>
 		<td class="ContentHeader"><font class="ContentHeader">&nbsp;
 		<?php
-		echo $lv_obj->bezeichnung.' / '.$kurzbz.'-'.$term_id;
+		echo $lv_obj->bezeichnung.' '.$lv_obj->lehrform_kurzbz.' / '.$kurzbz.'-'.$term_id;
 
 		$qry = "SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE lehrveranstaltung_id='$lvid' ORDER BY ende DESC LIMIT 1";
 		$stsem = new studiensemester($sql_conn);
