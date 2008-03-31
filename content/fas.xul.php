@@ -209,7 +209,8 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 			 label     	="&menu-prefs-kontofilterstg.label;"
 			 command   	="menu-prefs-kontofilterstg:command"
    			 accesskey 	="&menu-prefs-kontofilterstg.accesskey;"
-   			 checkbox   ="<?php echo $kontofilterstg;?>"
+   			 checkbox   ="true"
+   			 checked   ="<?php echo $kontofilterstg;?>"
    			 />
 	    </menupopup>
     </menu>

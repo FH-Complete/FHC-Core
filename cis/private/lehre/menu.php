@@ -271,7 +271,7 @@ function js_toggle_container(conid)
 			{
 				echo '<tr>';
 				echo '	<td class="tdwrap"><ul style="margin: 0px; padding: 0px; padding-left: 20px;">';
-				echo "<li><a class=\"Item2\" title=\"".$row->bezeichnung."\" href=\"lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".CutString($row->bezeichnung, 21)."</a></li>";
+				echo "<li><a class=\"Item2\" title=\"".$row->bezeichnung."\" href=\"lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".CutString($row->bezeichnung, 21).' '.$row->lehrform_kurzbz."</a></li>";
 				echo '	</ul></td>';
 				echo '</tr>';
 			}

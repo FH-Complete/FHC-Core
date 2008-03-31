@@ -119,7 +119,7 @@
 					if($is_lector)
 					{
 						/* open a popup containing the final dispatcher address */
-						echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row1->gruppe_kurzbz).'&desc='.$row1->beschreibung.'\',\'_blank\',\'width=500,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes\');return false;" class="Item"><img src="../../skin/images/open.gif" title="Verteiler &ouml;ffnen"></a>';
+						echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row1->gruppe_kurzbz).'&desc='.$row1->beschreibung.'\',\'_blank\',\'width=500,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item"><img src="../../skin/images/open.gif" title="Verteiler &ouml;ffnen"></a>';
 				    	echo "</td>";
 					 	echo " <td width='200'>";
 					 	echo "<a href='mailto:".$row1->gruppe_kurzbz."@technikum-wien.at' class='Item'>".strtolower($row1->gruppe_kurzbz)."@technikum-wien.at</a></td>";
@@ -142,7 +142,7 @@
 				if(strtolower($row1->gruppe_kurzbz)=='tw_std')
 					echo '<td width=\"100\" align="right">&nbsp;</td>';
 				else
-					echo ' <td width=\"100\" align="right"><a href="#" onClick="javascript:window.open(\'pers_in_grp.php?grp='.$row1->gruppe_kurzbz.'\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes\');return false;" class="Item">Personen</a>';
+					echo ' <td width=\"100\" align="right"><a href="#" onClick="javascript:window.open(\'pers_in_grp.php?grp='.$row1->gruppe_kurzbz.'\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item">Personen</a>';
 
 				echo "</tr>\n";
 	  		}
@@ -167,7 +167,7 @@
 						if($is_lector || $std_obj->studiengang_kz==$row->studiengang_kz)
 						{
 							echo " <td width=\"20\">";
-							echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row->kuerzel).'_std&desc=Alle Studenten von '.strtolower($row->kuerzel).'\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes\');return false;" class="Item"><img src="../../skin/images/open.gif" title="Verteiler &ouml;ffnen"></a></td>';
+							echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row->kuerzel).'_std&desc=Alle Studenten von '.strtolower($row->kuerzel).'\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item"><img src="../../skin/images/open.gif" title="Verteiler &ouml;ffnen"></a></td>';
 							/* open a popup containing the final dispatcher address */
 						    echo " <td width=\"200\" ><a href=\"mailto:".strtolower($row->kuerzel)."_std@technikum-wien.at\" class=\"Item\">".strtolower($row->kuerzel)."_std@technikum-wien.at</a></td>";
 						}
@@ -178,7 +178,7 @@
 				  			echo " <td width=\"200\" >gesperrt</td>";
 						}
 
-					    echo ' <td width=\"100\" align="right"><a href="#" onClick="javascript:window.open(\'stud_in_grp.php?kz='.$row->studiengang_kz.'&all=true\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes\');return false;" class="Item">Personen</a>';
+					    echo ' <td width=\"100\" align="right"><a href="#" onClick="javascript:window.open(\'stud_in_grp.php?kz='.$row->studiengang_kz.'&all=true\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item">Personen</a>';
 						echo "</tr>\n";
 			  		}
 		  			echo "\n";
@@ -228,7 +228,7 @@
 						  			echo "</td>";
 						  			echo "  <td width='20'></td>";
 						  			echo "  <td width=\"200\"><a href='mailto:$strhelp@technikum-wien.at' class=\"Item\">$strhelp@technikum-wien.at</a></td>";
-						  			echo "  <td width=\"100\" align=\"right\"><a class=\"Item\" href=\"#\" onClick='javascript:window.open(\"stud_in_grp.php?".$param."\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes\");return false;'>Personen</a></td>";
+						  			echo "  <td width=\"100\" align=\"right\"><a class=\"Item\" href=\"#\" onClick='javascript:window.open(\"stud_in_grp.php?".$param."\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes,resizable=1\");return false;'>Personen</a></td>";
 						  			echo "</tr>";
 						  			$zeilenzaehler++;
 

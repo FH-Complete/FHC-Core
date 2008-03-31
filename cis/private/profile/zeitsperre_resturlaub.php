@@ -42,7 +42,7 @@
 	$datum_obj = new datum();
 	
 	//Stundentabelleholen
-	if(! $result_stunde=pg_query($conn, "SET search_path TO campus; SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
+	if(! $result_stunde=pg_query($conn, "SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
 		die(pg_last_error($conn));
 	$num_rows_stunde=pg_num_rows($result_stunde);
 
@@ -275,9 +275,9 @@ for($i=0;$i<$num_rows_stunde;$i++)
 	$row = pg_fetch_object($result_stunde, $i);
 
 	if($zeitsperre->vonstunde==$row->stunde)
-		$content_form.= "<OPTION value='$row->stunde' selected>$row->stunde</OPTION>\n";
+		$content_form.= "<OPTION value='$row->stunde' selected>$row->stunde (".date('H:i',strtotime($row->beginn)).' - '.date('H:i',strtotime($row->ende))." Uhr)</OPTION>\n";
 	else
-		$content_form.= "<OPTION value='$row->stunde'>$row->stunde</OPTION>\n";
+		$content_form.= "<OPTION value='$row->stunde'>$row->stunde (".date('H:i',strtotime($row->beginn)).' - '.date('H:i',strtotime($row->ende))." Uhr)</OPTION>\n";
 }
 
 $content_form.= "</SELECT></td></tr>";
@@ -296,9 +296,9 @@ for($i=0;$i<$num_rows_stunde;$i++)
 {
 	$row = pg_fetch_object($result_stunde, $i);
 	if($zeitsperre->bisstunde==$row->stunde)
-		$content_form.= "<OPTION value='$row->stunde' selected>$row->stunde</OPTION>\n";
+		$content_form.= "<OPTION value='$row->stunde' selected>$row->stunde (".date('H:i',strtotime($row->beginn)).' - '.date('H:i',strtotime($row->ende))." Uhr)</OPTION>\n";
 	else
-		$content_form.= "<OPTION value='$row->stunde'>$row->stunde</OPTION>\n";
+		$content_form.= "<OPTION value='$row->stunde'>$row->stunde (".date('H:i',strtotime($row->beginn)).' - '.date('H:i',strtotime($row->ende))." Uhr)</OPTION>\n";
 }
 
 $content_form.= "</SELECT></td></tr>";
