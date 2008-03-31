@@ -227,7 +227,21 @@ class betriebsmittel
 	 */
 	function delete($betriebsmittel_id)
 	{
-		//noch nicht implementiert!	
+		if(!is_numeric($betriebsmittel_id))
+		{
+			$this->errormsg = 'Betriebsmittel_id ist ungueltig';
+			return false;
+		}
+		
+		$qry = "DELETE FROM public.tbl_betriebsmittel WHERE betriebsmittel_id='$betriebsmittel_id'";
+		
+		if(pg_query($this->conn, $qry))
+			return true;
+		else 
+		{
+			$this->errormsg = 'Fehler beim loeschen der Daten';
+			return false;
+		}
 	}
 	
 	function getBetriebsmittel($betriebsmitteltyp, $nummer)
