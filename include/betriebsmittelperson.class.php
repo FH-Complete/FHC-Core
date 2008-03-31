@@ -226,8 +226,8 @@ class betriebsmittelperson
 				'ausgegebenam='.$this->addslashes($this->ausgegebenam).', '.
 				'retouram='.$this->addslashes($this->retouram).', '.
 				'ext_id='.$this->addslashes($this->ext_id).', '. 
-			    'updateamum= now(), '.
-			    'updatevon='.$this->addslashes($this->updatevon).' '.
+			    	'updateamum= now(), '.
+			    	'updatevon='.$this->addslashes($this->updatevon).' '.
 				'WHERE betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).
 				' AND person_id='.$this->addslashes($this->person_id).";";
 		}
