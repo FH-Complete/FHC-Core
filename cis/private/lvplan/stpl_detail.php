@@ -104,7 +104,7 @@ for ($i=0; $i<$num_rows_stpl; $i++)
     $titelpre=pg_result($erg_stpl,$i,"titelpre");
     $pers_vorname=pg_result($erg_stpl,$i,"vorname");
     $pers_nachname=pg_result($erg_stpl,$i,"nachname");
-    $pers_email=pg_result($erg_stpl,$i,"uid").'@technikum-wien.at';
+    $pers_email=pg_result($erg_stpl,$i,"uid").'@'.DOMAIN;
     $stgkurzbz=strtoupper(trim(pg_result($erg_stpl,$i,"stg_typ").pg_result($erg_stpl,$i,"stg_kurzbz")));
     $semester=trim(pg_result($erg_stpl,$i,"semester"));
     $verband=trim(pg_result($erg_stpl,$i,"verband"));
@@ -117,9 +117,9 @@ for ($i=0; $i<$num_rows_stpl; $i++)
         <td><?php echo $ortkurzbz; ?></td>
         <td><?php echo $lehrfachkurzbz; ?></td>
         <td><?php echo $bezeichnung; ?></td>
-        <td><A class="Item" href="mailto:<?php echo $stgkurzbz.$semester.strtolower($verband).$gruppe; ?>@technikum-wien.at">
+        <td><A class="Item" href="mailto:<?php echo $stgkurzbz.$semester.strtolower($verband).$gruppe.'@'.DOMAIN; ?>">
         <?php echo $stgkurzbz.'-'.$semester.$verband.$gruppe; ?></A></td>
-        <td><A class="Item" href="mailto:<?php echo strtolower($gruppe_kurzbz); ?>@technikum-wien.at">
+        <td><A class="Item" href="mailto:<?php echo strtolower($gruppe_kurzbz).'@'.DOMAIN; ?>">
         <?php echo $gruppe_kurzbz; ?></A></td>
     </tr>
     <?php
@@ -139,7 +139,7 @@ if ($num_rows_repl>0)
         $titelpre=pg_result($erg_repl,$i,"titelpre");
    		$pers_vorname=pg_result($erg_repl,$i,"vorname");
    		$pers_nachname=pg_result($erg_repl,$i,"nachname");
-    	$pers_email=pg_result($erg_repl,$i,"uid").'@technikum-wien.at';
+    	$pers_email=pg_result($erg_repl,$i,"uid").'@'.DOMAIN;
     	$beschreibung=pg_result($erg_repl,$i,"beschreibung");
         echo '<tr class="liste'.($i%2).'">';
         echo '<td >'.$titel.'</td>';
@@ -150,5 +150,5 @@ if ($num_rows_repl>0)
     echo '</table>';
 }
 ?>
-<P>Fehler und Feedback bitte an <A class="Item" href="mailto:lvplan@technikum-wien.at">LV-Koordinationsstelle</A>.</P>
+<P>Fehler und Feedback bitte an <A class="Item" href="mailto:lvplan@<?php echo DOMAIN;?>">LV-Koordinationsstelle</A>.</P>
 </body></html>

@@ -149,7 +149,8 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 			 label     	="&menu-prefs-ignore_kollision.label;"
 			 command   	="menu-prefs-ignore_kollision:command"
    			 accesskey 	="&menu-prefs-ignore_kollision.accesskey;"
-   			 checkbox   ="<?php echo $ignore_kollision;?>"
+   			 checkbox   ="true"
+   			 checked    ="<?php echo $ignore_kollision;?>"
    			 />
    		<menuitem
 			 id        	="menu-prefs-ignore_zeitsperre"
@@ -158,7 +159,8 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 			 label     	="&menu-prefs-ignore_zeitsperre.label;"
 			 command   	="menu-prefs-ignore_zeitsperre:command"
    			 accesskey 	="&menu-prefs-ignore_zeitsperre.accesskey;"
-   			 checkbox   ="<?php echo $ignore_zeitsperre;?>"
+   			 checkbox   ="true"
+   			 checked   ="<?php echo $ignore_zeitsperre;?>"
    			 />
    		<menuitem
 			 id        	="menu-prefs-ignore_reservierung"
@@ -167,7 +169,8 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 			 label     	="&menu-prefs-ignore_reservierung.label;"
 			 command   	="menu-prefs-ignore_reservierung:command"
    			 accesskey 	="&menu-prefs-ignore_reservierung.accesskey;"
-   			 checkbox   ="<?php echo $ignore_reservierung;?>"
+   			 checkbox   ="true"
+   			 checked   ="<?php echo $ignore_reservierung;?>"
    			 />
    		<?php
         }

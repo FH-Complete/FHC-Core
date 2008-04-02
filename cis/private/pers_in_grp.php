@@ -41,7 +41,7 @@
 		  	echo "<tr>";
 	      	echo "  <td>$row->nachname</td>";
 	      	echo "  <td>$row->vorname</td>";
-	      	echo "  <td><a href='mailto:$row->uid@technikum-wien.at' class='Item'>$row->uid@technikum-wien.at</a></td>";
+	      	echo "  <td><a href='mailto:$row->uid@".DOMAIN."' class='Item'>$row->uid@".DOMAIN."</a></td>";
 	      	echo "</tr>";
 		}
 	  }

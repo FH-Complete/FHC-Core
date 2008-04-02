@@ -220,6 +220,6 @@ if (isset($count))
 	echo "Es wurden $count Stunden reserviert!<BR>";
 ?>
 <HR>
-<P>Fehler und Feedback bitte an <A class="Item" href="mailto:lvplan@technikum-wien.at">LV-Koordinationsstelle</A>.</P>
+<P>Fehler und Feedback bitte an <A class="Item" href="mailto:<?php echo MAIL_LVPLAN?>">LV-Koordinationsstelle</A>.</P>
 </BODY>
 </HTML>
