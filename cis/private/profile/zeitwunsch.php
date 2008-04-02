@@ -237,7 +237,7 @@ Das Formular zum Eintragen der Zeitsperren finden Sie <a href='zeitsperre_restur
     Beispiel: Sie unterrichten 4 Stunden/Woche, dann sollten Sie mindestens
     12 Stunden im Raster mit positiven Werten ausf&uuml;llen.</LI>
 </OL>
-<P>Bei Problemen wenden Sie sich bitte an die <A class="Item" href="mailto:lvplan@technikum-wien.at">LV-Koordinationsstelle</A>.</P>
+<P>Bei Problemen wenden Sie sich bitte an die <A class="Item" href="mailto:<?php echo MAIL_LVPLAN;?>">LV-Koordinationsstelle</A>.</P>
 
 </body>
 </html>

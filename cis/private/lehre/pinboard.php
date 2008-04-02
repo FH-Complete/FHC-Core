@@ -320,7 +320,7 @@ function show(id)
 				{
 					if($row_course_leader->uid != "")
 					{
-						echo "<a href=\"mailto:$row_course_leader->uid@technikum-wien.at\" class=\"Item\">$row_course_leader->uid@technikum-wien.at</a>";
+						echo "<a href=\"mailto:$row_course_leader->uid@".DOMAIN."\" class=\"Item\">$row_course_leader->uid@".DOMAIN."</a>";
 					}
 					else
 					{
@@ -392,7 +392,7 @@ function show(id)
 				{
 					if($row_course_leader_deputy->uid != "")
 					{
-						echo "<a href=\"mailto:$row_course_leader_deputy->uid@technikum-wien.at\" class=\"Item\">$row_course_leader_deputy->uid@technikum-wien.at</a>";
+						echo "<a href=\"mailto:$row_course_leader_deputy->uid@".DOMAIN."\" class=\"Item\">$row_course_leader_deputy->uid@".DOMAIN."</a>";
 					}
 					else
 					{
@@ -459,7 +459,7 @@ function show(id)
 						{
 							if($row_course_secretary->uid != "")
 							{
-								echo "<a href=\"mailto:$row_course_secretary->uid@technikum-wien.at\" class=\"Item\">$row_course_secretary->uid@technikum-wien.at</a>";
+								echo "<a href=\"mailto:$row_course_secretary->uid@".DOMAIN."\" class=\"Item\">$row_course_secretary->uid@".DOMAIN."</a>";
 							}
 							else
 							{
@@ -515,7 +515,7 @@ function show(id)
 					{
 						while($row_stdv = pg_fetch_object($result_course_stdv))
 						{
-							echo "<a class='Item' href='mailto:".$row_stdv->uid."@technikum-wien.at'>$row_stdv->titelpre $row_stdv->vorname $row_stdv->nachname $row_stdv->titelpost</a><br>";
+							echo "<a class='Item' href='mailto:".$row_stdv->uid."@".DOMAIN."'>$row_stdv->titelpre $row_stdv->vorname $row_stdv->nachname $row_stdv->titelpost</a><br>";
 						}
 					}
 					else

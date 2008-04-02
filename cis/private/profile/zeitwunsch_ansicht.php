@@ -73,7 +73,7 @@ Username: <?php echo $uid; ?><br>
 <hr>
 <H3>Ekl&auml;rung:</H3>
 <P>Bitte kontrollieren Sie Ihre Zeitw&uuml;nsche, &auml;nderungen per Mail bitte
-  an <A class="Item" href="mailto:stpl@technikum-wien.at">Stundenplan</A>!<BR>
+  an <A class="Item" href="mailto:<?php echo MAIL_LVPLAN;?>">Stundenplan</A>!<BR>
   <BR>
 </P>
 <TABLE width="35%" border="1" cellspacing="0" name="Zeitwerte">
@@ -130,7 +130,7 @@ Username: <?php echo $uid; ?><br>
     Beispiel: Sie unterrichten 4Stunden/Woche, dann m&uuml;ssen Sie mindesten
     6 Stunden im Raster mit positiven Werten ausf&uuml;llen.</LI>
 </OL>
-<P>Bei Problemen wenden Sie sich bitte an die <A class="Item" href="mailto:stpl@technikum-wien.at">Stundenplanstelle</A>.</P>
+<P>Bei Problemen wenden Sie sich bitte an die <A class="Item" href="mailto:<?php echo MAIL_LVPLAN;?>">Stundenplanstelle</A>.</P>
 <P>&nbsp;</P>
 </body>
 </html>

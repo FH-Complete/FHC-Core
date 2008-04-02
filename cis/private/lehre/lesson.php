@@ -161,7 +161,7 @@ function hideSemPlanHelp(){
 					if($user==$row_lector->uid)
 						$user_is_allowed_to_upload=true;
 
-					echo '<a class="Item2" href="mailto:'.$row_lector->uid.'@technikum-wien.at">'.$row_lector->vorname.' '.$row_lector->nachname.'</a>';
+					echo '<a class="Item2" href="mailto:'.$row_lector->uid.'@'.DOMAIN.'">'.$row_lector->vorname.' '.$row_lector->nachname.'</a>';
 					if($i!=$num_rows_result)
 						echo ', ';
 				}

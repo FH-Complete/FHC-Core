@@ -36,9 +36,9 @@
 <?php
 	if(isset($feedback_submit) && (!isset($message_sent) || $message_sent == "no"))
 	{
-		$destination = 'cis@technikum-wien.at';
+		$destination = MAIL_CIS;
 
-		$sql_query = "SELECT DISTINCT vorname, nachname, (uid || '@technikum-wien.at') AS emailtw FROM campus.vw_benutzer WHERE uid='$user' LIMIT 1";
+		$sql_query = "SELECT DISTINCT vorname, nachname, (uid || '@".DOMAIN."') AS emailtw FROM campus.vw_benutzer WHERE uid='$user' LIMIT 1";
 
 		$feedback_message = chop($txtFeedbackMessage);
 
@@ -48,7 +48,7 @@
 			{
 				if($row = pg_fetch_object($result))
 				{
-					if(mail($destination, "[CIS-Feedback]", $feedback_message, "FROM: feedback@technikum-wien.at\nREPLY-TO: $row->emailtw\n\n"))
+					if(mail($destination, "[CIS-Feedback]", $feedback_message, "FROM: feedback@".DOMAIN."\nREPLY-TO: $row->emailtw\n\n"))
 					{
 						echo '<script language="JavaScript">';
 						echo '	document.location.href = document.location.href + "?message_sent=yes";';

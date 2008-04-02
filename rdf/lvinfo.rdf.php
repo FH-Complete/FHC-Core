@@ -48,7 +48,7 @@ $rdf_url='http://www.technikum-wien.at/lvinfo';
 if(isset($_GET['stg_kz']) && is_numeric($_GET['stg_kz']))
 	$stg_kz=$_GET['stg_kz'];
 else 
-	die('Studiengang ist ungueltig');
+	unset($stg_kz);
 
 if(isset($_GET['semester']))
 	if(is_numeric($_GET['semester']))
@@ -77,8 +77,10 @@ WHERE
 tbl_lehrveranstaltung.aktiv=true AND
 tbl_lehrveranstaltung.lehre=true AND
 tbl_lvinfo.aktiv=true AND
-tbl_lvinfo.genehmigt=true AND
-tbl_lehrveranstaltung.studiengang_kz='$stg_kz'";
+tbl_lvinfo.genehmigt=true ";
+
+if(isset($stg_kz))
+	$qry.= " AND tbl_lehrveranstaltung.studiengang_kz='$stg_kz'";
 
 if(isset($sem))
 	$qry .= " AND tbl_lehrveranstaltung.semester='$sem'";

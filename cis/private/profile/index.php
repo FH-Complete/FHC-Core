@@ -38,7 +38,7 @@
 		$gebort=pg_result($erg,0,"gebort");
 		$titelpre=pg_result($erg,0,"titelpre");
 		$titelpost=pg_result($erg,0,"titelpost");
-		$email=pg_result($erg,0,"uid").'@technikum-wien.at';
+		$email=pg_result($erg,0,"uid").'@'.DOMAIN;
 		$email_alias=pg_result($erg,0,"alias");
 		$hp=pg_result($erg,0,"homepage");
 		$aktiv=pg_result($erg,0,"aktiv");
@@ -137,13 +137,13 @@
       		
       		<P>
       			<b>eMail</b><br>
-        		Technikum: <a class='Item' href='mailto:<?php echo $uid; ?>@technikum-wien.at'> <?php echo $uid; ?>@technikum-wien.at</a><br>
+        		Technikum: <a class='Item' href='mailto:<?php echo $uid.'@'.DOMAIN; ?>'> <?php echo $uid.'@'.DOMAIN; ?></a><br>
 
         		<?php
         		if($email_alias!='' && !in_array($stg,$noalias))
         		{
         		?>
-        			Alias: <a class='Item' href='mailto:<?php echo $email_alias; ?>@technikum-wien.at'><?php echo $email_alias; ?>@technikum-wien.at</a>
+        			Alias: <a class='Item' href='mailto:<?php echo $email_alias.'@'.DOMAIN; ?>'><?php echo $email_alias.'@'.DOMAIN; ?></a>
         		<?php
 				}
 				?>
@@ -276,23 +276,23 @@
   		for($i=0;$i<$nr_mg;$i++)
 		{
 			$row=pg_fetch_object($erg_mg,$i);
-			echo '<TR><TD><A class="Item" href="mailto:'.strtolower($row->gruppe_kurzbz).'@technikum-wien.at">'.strtolower($row->gruppe_kurzbz).'&nbsp;</TD>';
+			echo '<TR><TD><A class="Item" href="mailto:'.strtolower($row->gruppe_kurzbz).'@'.DOMAIN.'">'.strtolower($row->gruppe_kurzbz).'&nbsp;</TD>';
     		echo "<TD>&nbsp;$row->beschreibung</TD><TD></TD></TR>";
 		}
 		if (isset($matrikelnr))
 		{
-			echo '<TR><TD><A class="Item" href="mailto:'.strtolower($stgkz).'_std@technikum-wien.at">'.strtolower($stgkz).'_std&nbsp;</TD>';
+			echo '<TR><TD><A class="Item" href="mailto:'.strtolower($stgkz).'_std@'.DOMAIN.'">'.strtolower($stgkz).'_std&nbsp;</TD>';
     		echo "<TD>&nbsp;Alle Studenten von $stgbez</TD><TD></TD></TR>";
-			echo '<TR><TD><A class="Item" href="mailto:'.strtolower($stgkz).$semester.'@technikum-wien.at">'.strtolower($stgkz).$semester.'&nbsp;</TD>';
+			echo '<TR><TD><A class="Item" href="mailto:'.strtolower($stgkz).$semester.'@'.DOMAIN.'">'.strtolower($stgkz).$semester.'&nbsp;</TD>';
     		echo "<TD>&nbsp;Alle Studenten von $stgkz $semester</TD><TD></TD></TR>";
-			echo '<TR><TD><A class="Item" href="mailto:'.strtolower($stgkz).$semester.strtolower($verband).'@technikum-wien.at">'.strtolower($stgkz).$semester.strtolower($verband).'&nbsp;</TD>';
+			echo '<TR><TD><A class="Item" href="mailto:'.strtolower($stgkz).$semester.strtolower($verband).'@'.DOMAIN.'">'.strtolower($stgkz).$semester.strtolower($verband).'&nbsp;</TD>';
     		echo "<TD>&nbsp;Alle Studenten von $stgkz $semester$verband</TD><TD></TD></TR>";
-			echo '<TR><TD><A class="Item" href="mailto:'.strtolower($stgkz).$semester.strtolower($verband).$gruppe.'@technikum-wien.at">'.strtolower($stgkz).$semester.strtolower($verband).$gruppe.'&nbsp;</TD>';
+			echo '<TR><TD><A class="Item" href="mailto:'.strtolower($stgkz).$semester.strtolower($verband).$gruppe.'@'.DOMAIN.'">'.strtolower($stgkz).$semester.strtolower($verband).$gruppe.'&nbsp;</TD>';
     		echo "<TD>&nbsp;Alle Studenten von $stgkz $semester$verband$gruppe</TD><TD></TD></TR>";
 		}
 
 
-		$mail = 'vilesci@technikum-wien.at';
+		$mail = MAIL_ADMIN;
 		if($stg=='')
 		{
 			$stg = 0;
@@ -305,7 +305,7 @@
 				if($row->email!='')
 					$mail = $row->email;
 				else
-					$mail = 'vilesci@technikum-wien.at';
+					$mail = MAIL_ADMIN;
 			}
 			if($stg=='0')
 				$mail = MAIL_GST;
@@ -326,7 +326,7 @@
 		<br><br>
 		Es wurden keine oder mehrere Profile f&uuml;r ihren Useraccount gefunden.
 		<br>
-		Bitte wenden sie sich an die <a class='Item' href="mailto:vilesci@technikum-wien.at?subject=Profilfehler&body=Es wurden zuviele oder zuwenige Profile fuer User <?php echo $uid; ?> gefunden. %0DBitte kontrollieren sie die Datenbank!%0D%0DMeine Daten sind:%0DNachname:%0DVornamen:%0D...">Administration</a>
+		Bitte wenden sie sich an die <a class='Item' href="mailto:".MAIL_ADMIN."?subject=Profilfehler&body=Es wurden zuviele oder zuwenige Profile fuer User <?php echo $uid; ?> gefunden. %0DBitte kontrollieren sie die Datenbank!%0D%0DMeine Daten sind:%0DNachname:%0DVornamen:%0D...">Administration</a>
 		<?php
 	}
 	?>

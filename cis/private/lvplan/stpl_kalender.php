@@ -232,7 +232,7 @@ else if ($format=='ical')
 // Print in HTML-File
 else
 {
-	echo '<P>Fehler und Feedback bitte an <A class="Item" href="mailto:stpl@technikum-wien.at">Stundenplan</A></P>';
+	echo '<P>Fehler und Feedback bitte an <A class="Item" href="mailto:'.MAIL_LVPLAN.'">Stundenplan</A></P>';
 	echo '</body></html>';
 }
 ?>

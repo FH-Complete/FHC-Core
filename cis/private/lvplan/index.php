@@ -63,7 +63,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 		if (isset($uid))
 			echo $uid;
 		else
-			echo 'nicht vorhanden! Bitte wenden Sie sich an den <A href="mailto:vilesci@technikum-wien.at">Admin</A>!';
+			echo 'nicht vorhanden! Bitte wenden Sie sich an den <A href="mailto:'.MAIL_ADMIN.'">Admin</A>!';
 	?><BR>
   	<DIV align="left">
   		<a class="Item" href="stpl_week.php?pers_uid=<?php echo $uid; ?>"><?php echo $vornamen." ".$nachname;?></a>
@@ -173,7 +173,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 	</form>
 	<a class="Item" href="verband_uebersicht.php">Lehrverb&auml;nde</a> -> &Uuml;bersicht der Lehrverb&auml;nde<BR>
 <BR><BR><HR>
-<P>Fehler und Feedback bitte an <A class="Item" href="mailto:lvplan@technikum-wien.at">LV-Koordinationsstelle</A>.</P>
+<P>Fehler und Feedback bitte an <A class="Item" href="mailto:<?php echo MAIL_LVPLAN?>">LV-Koordinationsstelle</A>.</P>
 <!--
 <P class=little>
     Erstellt am 24.8.2001 von <A href="mailto:pam@technikum-wien.at">Christian Paminger</A>.<BR>
