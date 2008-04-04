@@ -184,7 +184,7 @@ function js_toggle_container(conid)
 	  <table class="tabcontent" frame="rhs">
 	    <form method="post" action="menu.php">
 		<tr>
-          <td class="tdwrap"><a class="HyperItem" href="../../index.html" target="_top">&lt;&lt; HOME</a></td>
+          <td class="tdwrap"><a class="HyperItem" href="../../index.php" target="_top">&lt;&lt; HOME</a></td>
   		</tr>
 		<tr>
           <td class="tdwrap">&nbsp;</td>
@@ -280,183 +280,189 @@ function js_toggle_container(conid)
 			echo '	<td class="tdwrap">&nbsp;</td>';
 			echo '</tr>';
 			
-			if(!$is_lector)
+			//Zusatzmenue nur Anzeigen wenn im Config angegeben
+			if(CIS_EXT_MENU)
 			{
-				echo '	<tr>
-				    <td class="tdwrap">
-				    	<a href="?Location" class="MenuItem" onClick="return(js_toggle_container(\'MeineLVs\'));">
-				    		<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Meine LV
-				    	</a>
-				    </td>
-				</tr>
-				<tr>
-					<td class="tdwrap">
-		  			<table class="tabcontent" id="MeineLVs" style="display: none;">
-					<tr>
-					  	<td class="tdwrap">
-							<ul style="margin-top: 0px; margin-bottom: 0px;">';
-							
-							$stsemobj = new studiensemester($sql_conn);
-							$stsem = $stsemobj->getAktorNext();
-							$qry = "SELECT distinct lehrveranstaltung_id, bezeichnung, studiengang_kz, semester, lehre, lehreverzeichnis from campus.vw_student_lehrveranstaltung WHERE uid='$user' AND studiensemester_kurzbz='$stsem' AND lehre=true AND lehreverzeichnis<>'' ORDER BY studiengang_kz, semester, bezeichnung";
-
-							if($result = pg_query($sql_conn,$qry))
-							{
-								while($row = pg_fetch_object($result))
-								{
-									if($row->studiengang_kz==0 && $row->semester==0)
-										echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="../freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">FF '.CutString($row->bezeichnung, $cutlength).'</a></li>';
-									else
-										echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">'.$stg[$row->studiengang_kz].$row->semester.' '.CutString($row->bezeichnung, $cutlength).'</a></li>';
-								}
-							}
-							else
-								echo "Fehler beim Auslesen der LV";
-				echo '
-							</ul>
-						</td>
-					</tr>
-					</table>
-		  			</td>
-				</tr>';
-			}
-
-			//Eigenen LV des eingeloggten Lektors anzeigen
-			if($is_lector || $rechte->isBerechtigt('admin'))
-			{
-		?>
-		<tr>
-          <td class="tdwrap"><a href="?Eigene" class="MenuItem" onClick="return(js_toggle_container('Eigene'));"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Meine LV</a></td>
-  		</tr>
-		<tr>
-          <td class="tdwrap">
-		  	<table class="tabcontent" id="Eigene" style="display: none;">
-			  <tr>
-			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap">
-				<ul style="margin-top: 0px; margin-bottom: 0px;">
-				<?php
-				$stsemobj = new studiensemester($sql_conn);
-				$stsem = $stsemobj->getAktorNext();
-
-				
-
-				//$qry = "SELECT * FROM tbl_lehrfach WHERE lehrfach_nr IN (SELECT distinct lehrfach_nr FROM tbl_lehrveranstaltung WHERE lektor='$user' AND studiensemester_kurzbz='$stsem') AND studiengang_kz!=0";
-				$qry = "SELECT distinct bezeichnung, studiengang_kz, semester, lehreverzeichnis, tbl_lehrveranstaltung.lehrveranstaltung_id  FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter
-				        WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-				        tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-				        mitarbeiter_uid='$user' AND tbl_lehreinheit.studiensemester_kurzbz='$stsem'";
-
-				if($result = pg_query($sql_conn,$qry))
+				if(!$is_lector)
 				{
-						while($row = pg_fetch_object($result))
-						{
-							if($row->studiengang_kz==0 AND $row->semester==0)
-								echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="../freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">FF '.CutString($row->lehreverzeichnis, $cutlength).'</a></li>';
-							else
-								echo "<li><a class=\"Item2\" title=\"".$row->bezeichnung."\" href=\"lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".$stg[$row->studiengang_kz].$row->semester.' '.CutString($row->bezeichnung, $cutlength)."</a></li>";
-						}
+					echo '	<tr>
+					    <td class="tdwrap">
+					    	<a href="?Location" class="MenuItem" onClick="return(js_toggle_container(\'MeineLVs\'));">
+					    		<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Meine LV
+					    	</a>
+					    </td>
+					</tr>
+					<tr>
+						<td class="tdwrap">
+			  			<table class="tabcontent" id="MeineLVs" style="display: none;">
+						<tr>
+						  	<td class="tdwrap">
+								<ul style="margin-top: 0px; margin-bottom: 0px;">';
+								
+								$stsemobj = new studiensemester($sql_conn);
+								$stsem = $stsemobj->getAktorNext();
+								$qry = "SELECT distinct lehrveranstaltung_id, bezeichnung, studiengang_kz, semester, lehre, lehreverzeichnis from campus.vw_student_lehrveranstaltung WHERE uid='$user' AND studiensemester_kurzbz='$stsem' AND lehre=true AND lehreverzeichnis<>'' ORDER BY studiengang_kz, semester, bezeichnung";
+	
+								if($result = pg_query($sql_conn,$qry))
+								{
+									while($row = pg_fetch_object($result))
+									{
+										if($row->studiengang_kz==0 && $row->semester==0)
+											echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="../freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">FF '.CutString($row->bezeichnung, $cutlength).'</a></li>';
+										else
+											echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">'.$stg[$row->studiengang_kz].$row->semester.' '.CutString($row->bezeichnung, $cutlength).'</a></li>';
+									}
+								}
+								else
+									echo "Fehler beim Auslesen der LV";
+					echo '
+								</ul>
+							</td>
+						</tr>
+						</table>
+			  			</td>
+					</tr>';
 				}
-				else
-					echo "Fehler beim Auslesen des Lehrfaches";
-
-				?>
-				</ul>
-				</td>
-			  </tr>
-			</table>
-		  </td>
-		</tr>
-		<?php
-			}
-		?>
-		<tr>
-          <td class="tdwrap"><a class="MenuItem" href="pinboard.php?course_id=<?php echo $course_id; ?>&term_id=<?php echo $term_id; ?>" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Pinboard</a></td>
-  		</tr>
-  		<tr>
-  			<td class="tdwrap">
-  		<?php
-                	$path = '../../../documents/'.strtolower($short).'/download';
-					if(!$dest_dir = is_dir($path))
+	
+				//Eigenen LV des eingeloggten Lektors anzeigen
+				if($is_lector || $rechte->isBerechtigt('admin'))
+				{
+			?>
+			<tr>
+	          <td class="tdwrap"><a href="?Eigene" class="MenuItem" onClick="return(js_toggle_container('Eigene'));"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Meine LV</a></td>
+	  		</tr>
+			<tr>
+	          <td class="tdwrap">
+			  	<table class="tabcontent" id="Eigene" style="display: none;">
+				  <tr>
+				  	<td class="tdwidth10" nowrap>&nbsp;</td>
+					<td class="tdwrap">
+					<ul style="margin-top: 0px; margin-bottom: 0px;">
+					<?php
+					$stsemobj = new studiensemester($sql_conn);
+					$stsem = $stsemobj->getAktorNext();
+	
+					
+	
+					//$qry = "SELECT * FROM tbl_lehrfach WHERE lehrfach_nr IN (SELECT distinct lehrfach_nr FROM tbl_lehrveranstaltung WHERE lektor='$user' AND studiensemester_kurzbz='$stsem') AND studiengang_kz!=0";
+					$qry = "SELECT distinct bezeichnung, studiengang_kz, semester, lehreverzeichnis, tbl_lehrveranstaltung.lehrveranstaltung_id  FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter
+					        WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
+					        tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
+					        mitarbeiter_uid='$user' AND tbl_lehreinheit.studiensemester_kurzbz='$stsem'";
+	
+					if($result = pg_query($sql_conn,$qry))
 					{
-
-						if(!is_dir($path))
-						{
-							if(!is_dir('../../../documents/'.strtolower($short)))
-								exec('mkdir -m 775 "../../../documents/'.strtolower($short).'"');
-							exec('mkdir -m 775 "../../../documents/'.strtolower($short).'/download"');
-							exec('sudo chgrp teacher ../../../documents/'.strtolower($short).'/download');
-						}
-
+							while($row = pg_fetch_object($result))
+							{
+								if($row->studiengang_kz==0 AND $row->semester==0)
+									echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="../freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">FF '.CutString($row->lehreverzeichnis, $cutlength).'</a></li>';
+								else
+									echo "<li><a class=\"Item2\" title=\"".$row->bezeichnung."\" href=\"lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".$stg[$row->studiengang_kz].$row->semester.' '.CutString($row->bezeichnung, $cutlength)."</a></li>";
+							}
 					}
-					$dest_dir = @dir($path);
-					echo '<a href="'.$dest_dir->path.'/" class="MenuItem" target="_blank"><img src="../../../skin/images/seperator.gif">&nbsp;Allgemeiner Download</a>';
-
-				?>
-			</td>
-		
-		<tr>
-          <td class="tdwrap"><a href="?Info &amp; Kommunikation" class="MenuItem" onClick="return(js_toggle_container('Info &amp; Kommunikation'));"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Info &amp; Kommunikation</a></td>
-  		</tr>
-		<tr>
-          <td class="tdwrap">
-		  	<table class="tabcontent" id="Info &amp; Kommunikation" style="display: none;">
-			  <tr>
-			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a class="Item" href="../lvplan/" target="_blank"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Stundenplan</a></td>
-			  </tr>
-	    	  <tr>
-			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a class="Item" href="https://webmail.technikum-wien.at" target="_blank"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Webmail</a></td>
-			  </tr>
-			  <tr>
-			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a class="Item" href="../../public/faq_upload.html" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;FAQ</a></td>
-			  </tr>
-			</table>
-		  </td>
-  		</tr>
-		<?php
-			if($is_lector || $rechte->isBerechtigt('admin'))
-			{
-				echo '<tr>';
-				echo '  <td class="tdwrap"><a href="?Lektorenbereich" class="MenuItem" onClick="return(js_toggle_container(\'Lektorenbereich\'));"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Lektorenbereich</a></td>';
-				echo '</tr>';
-				echo '<tr>';
-				echo '  <td class="tdwrap">';
-				echo '  	<table class="tabcontent" id="Lektorenbereich" style="display: none;">';
-
-
-				echo '	  <tr>';
-				echo '	  	<td class="tdwidth10" nowrap>&nbsp;</td>';
-				echo '		<td class="tdwrap"><a class="Item" href="ects/index.php?stg='.$course_id.'&sem='.$term_id.'" target="_blank"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;LV Info</a></td>';
-				echo '	  </tr>';
-
-
-				echo '	  <tr>';
-				echo '	  	<td class="tdwidth10" nowrap>&nbsp;</td>';
-				echo '		<td class="tdwrap"><a class="Item" href="fernlehrunterlagen.html" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Fernlehrunterlagen</a></td>';
-				echo '	  </tr>';
-				echo '	  <tr>';
-				echo '	  	<td class="tdwidth10" nowrap>&nbsp;</td>';
-				echo '		<td class="tdwrap"><a class="Item" href="dokumentenvorlagen.html" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Vorlagen f&uuml;r die<br>&nbsp;&nbsp;&nbsp;Dokumentenerstellung</a></td>';
-				echo '	  </tr>';
-				echo '	  <tr>';
-				echo '	  	<td class="tdwidth10" nowrap>&nbsp;</td>';
-				echo '		<td class="tdwrap"><a class="Item" href="pinboardverwaltung.php?course_id='.$course_id.'&term_id='.$term_id.'" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Pinboardverwaltung</a></td>';
-				echo '	  </tr>';
-				echo '	  <tr>';
-				echo '	  	<td class="tdwidth10" nowrap>&nbsp;</td>';
-				echo '		<td class="tdwrap"><a class="Item" href="upload.php" target="_blank"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Webupload</a></td>';
-				echo '	  </tr>';
-				echo '	</table>';
-				echo '  </td>';
-				echo '</tr>';
+					else
+						echo "Fehler beim Auslesen des Lehrfaches";
+	
+					?>
+					</ul>
+					</td>
+				  </tr>
+				</table>
+			  </td>
+			</tr>
+			<?php
+				}
+			?>
+			<tr>
+	          <td class="tdwrap"><a class="MenuItem" href="pinboard.php?course_id=<?php echo $course_id; ?>&term_id=<?php echo $term_id; ?>" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Pinboard</a></td>
+	  		</tr>
+	  		<tr>
+	  			<td class="tdwrap">
+	  		<?php
+	                	$path = '../../../documents/'.strtolower($short).'/download';
+						if(!$dest_dir = is_dir($path))
+						{
+	
+							if(!is_dir($path))
+							{
+								if(!is_dir('../../../documents/'.strtolower($short)))
+									exec('mkdir -m 775 "../../../documents/'.strtolower($short).'"');
+								exec('mkdir -m 775 "../../../documents/'.strtolower($short).'/download"');
+								exec('sudo chgrp teacher ../../../documents/'.strtolower($short).'/download');
+							}
+	
+						}
+						$dest_dir = @dir($path);
+						echo '<a href="'.$dest_dir->path.'/" class="MenuItem" target="_blank"><img src="../../../skin/images/seperator.gif">&nbsp;Allgemeiner Download</a>';
+	
+					?>
+				</td>
+			
+			<tr>
+	          <td class="tdwrap"><a href="?Info &amp; Kommunikation" class="MenuItem" onClick="return(js_toggle_container('Info &amp; Kommunikation'));"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Info &amp; Kommunikation</a></td>
+	  		</tr>
+			<tr>
+	          <td class="tdwrap">
+			  	<table class="tabcontent" id="Info &amp; Kommunikation" style="display: none;">
+				  <tr>
+				  	<td class="tdwidth10" nowrap>&nbsp;</td>
+					<td class="tdwrap"><a class="Item" href="../lvplan/" target="_blank"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Stundenplan</a></td>
+				  </tr>
+		    	  <tr>
+				  	<td class="tdwidth10" nowrap>&nbsp;</td>
+					<td class="tdwrap"><a class="Item" href="https://webmail.technikum-wien.at" target="_blank"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Webmail</a></td>
+				  </tr>
+				  <tr>
+				  	<td class="tdwidth10" nowrap>&nbsp;</td>
+					<td class="tdwrap"><a class="Item" href="../../public/faq_upload.html" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;FAQ</a></td>
+				  </tr>
+				</table>
+			  </td>
+	  		</tr>
+			<?php
+				if($is_lector || $rechte->isBerechtigt('admin'))
+				{
+					echo '<tr>';
+					echo '  <td class="tdwrap"><a href="?Lektorenbereich" class="MenuItem" onClick="return(js_toggle_container(\'Lektorenbereich\'));"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Lektorenbereich</a></td>';
+					echo '</tr>';
+					echo '<tr>';
+					echo '  <td class="tdwrap">';
+					echo '  	<table class="tabcontent" id="Lektorenbereich" style="display: none;">';
+	
+	
+					echo '	  <tr>';
+					echo '	  	<td class="tdwidth10" nowrap>&nbsp;</td>';
+					echo '		<td class="tdwrap"><a class="Item" href="ects/index.php?stg='.$course_id.'&sem='.$term_id.'" target="_blank"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;LV Info</a></td>';
+					echo '	  </tr>';
+	
+	
+					echo '	  <tr>';
+					echo '	  	<td class="tdwidth10" nowrap>&nbsp;</td>';
+					echo '		<td class="tdwrap"><a class="Item" href="fernlehrunterlagen.html" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Fernlehrunterlagen</a></td>';
+					echo '	  </tr>';
+					echo '	  <tr>';
+					echo '	  	<td class="tdwidth10" nowrap>&nbsp;</td>';
+					echo '		<td class="tdwrap"><a class="Item" href="dokumentenvorlagen.html" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Vorlagen f&uuml;r die<br>&nbsp;&nbsp;&nbsp;Dokumentenerstellung</a></td>';
+					echo '	  </tr>';
+					echo '	  <tr>';
+					echo '	  	<td class="tdwidth10" nowrap>&nbsp;</td>';
+					echo '		<td class="tdwrap"><a class="Item" href="pinboardverwaltung.php?course_id='.$course_id.'&term_id='.$term_id.'" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Pinboardverwaltung</a></td>';
+					echo '	  </tr>';
+					echo '	  <tr>';
+					echo '	  	<td class="tdwidth10" nowrap>&nbsp;</td>';
+					echo '		<td class="tdwrap"><a class="Item" href="upload.php" target="_blank"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Webupload</a></td>';
+					echo '	  </tr>';
+					echo '	</table>';
+					echo '  </td>';
+					echo '</tr>';
+				}
+			?>
+			<tr>
+	          <td class="tdwrap"><a class="MenuItem" href="../mailverteiler.php?kbzl=<?php echo $sel_kurzbzlang.'#'.$course_id; ?>" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Mailverteiler</a></td>
+	  		</tr>
+	  		<?php
 			}
 		?>
-		<tr>
-          <td class="tdwrap"><a class="MenuItem" href="../mailverteiler.php?kbzl=<?php echo $sel_kurzbzlang.'#'.$course_id; ?>" target="content"><img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Mailverteiler</a></td>
-  		</tr>
 	  </table>
 	</td>
   </tr>

@@ -66,10 +66,10 @@
 					<div class="titel">
 					<table width="100%">
 						<tr>
-							<td width="30%" align="left">'.$row->betreff.'</td>
-							<td width="30%" align="center">'.$datum.'</td>
+							<td width="60%" align="left">'.$row->betreff.'</td>
+							<!--<td width="30%" align="center"></td>-->
 							<td width="30%" align="right" style="display: '.($open?'none':'block').'" id="'.$zaehler.'Mehr" ><a href="#" class="Item" onclick="return show(\''.$zaehler.'\')">mehr &gt;&gt;</a></td>
-							<td width="30%" align="right" style="display: '.($open?'block':'none').'" id="'.$zaehler.'Verfasser">'.$row->verfasser.'</td>
+							<td width="30%" align="right" style="display: '.($open?'block':'none').'" id="'.$zaehler.'Verfasser">'.$row->verfasser.' <span style="font-weight: normal">( '.$datum.' )</span></td>
 						</tr>
 					</table>
 					</div>

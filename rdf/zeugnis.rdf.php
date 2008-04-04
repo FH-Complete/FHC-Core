@@ -178,16 +178,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$projektarbeit[$row_proj->lehrveranstaltung_id]['note']=$row_proj->note;
 			}
 		}
-		
-		$qry = "SELECT wochen FROM public.tbl_semesterwochen WHERE studiengang_kz='$row->studiengang_kz' AND semester='$row->semester'";
-		$wochen = 15;
-		if($result_wochen = pg_query($conn, $qry))
-		{
-			if($row_wochen = pg_fetch_object($result_wochen))
-			{
-				$wochen = $row_wochen->wochen;
-			}
-		}
+				
 		$obj = new zeugnisnote($conn, null, null, null, false);
 		
 		$obj->getZeugnisnoten($lehrveranstaltung_id=null, $uid_arr[$i], $studiensemester_kurzbz);
@@ -291,6 +282,15 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					}
 				}
 				
+				$qry = "SELECT wochen FROM public.tbl_semesterwochen WHERE (studiengang_kz, semester) in (SELECT studiengang_kz, semester FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=$row->lehrveranstaltung_id)";
+				$wochen = 15;
+				if($result_wochen = pg_query($conn, $qry))
+				{
+					if($row_wochen = pg_fetch_object($result_wochen))
+					{
+						$wochen = $row_wochen->wochen;
+					}
+				}
 				$xml .= "\n			<unterrichtsfach>";
 				$xml .= "				<bezeichnung><![CDATA[".$bezeichnung."]]></bezeichnung>";
 				$xml .= "				<note>".$note2."</note>";
