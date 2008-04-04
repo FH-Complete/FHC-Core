@@ -505,6 +505,7 @@ if(!$error)
 
 		if(!$error)
 		{
+			//Pruefen ob bereits eine Kreuzerlliste vorhanden ist
 			$qry = "SELECT count(*) as anzahl FROM lehre.tbl_lehreinheitgruppe, lehre.tbl_lehreinheit, campus.tbl_uebung WHERE
 					tbl_lehreinheitgruppe.lehreinheitgruppe_id='".addslashes($_POST['lehreinheitgruppe_id'])."' AND
 					tbl_lehreinheitgruppe.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
@@ -524,10 +525,53 @@ if(!$error)
 			else
 			{
 				$error = true;
-				$retur = false;
+				$return = false;
 				$errormsg = 'Fehler beim Ermitteln ob eine Kreuzerlliste vorhanden ist';
 			}
 
+			//Pruefen ob diese Gruppe im Stundenplan schon verplant wurde
+			if(!$error)
+			{
+				$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev 
+						WHERE 
+							(lehreinheit_id, studiengang_kz, semester, trim(COALESCE(verband)), trim(COALESCE(gruppe)), trim(COALESCE(gruppe_kurzbz))) =
+							(SELECT 
+								lehreinheit_id, studiengang_kz, semester, trim(COALESCE(verband)), trim(COALESCE(gruppe)), trim(COALESCE(gruppe_kurzbz))
+							 FROM 
+							 	lehre.tbl_lehreinheitgruppe 
+							WHERE 
+								lehreinheitgruppe_id='".$_POST['lehreinheitgruppe_id']."'
+							)
+						UNION
+						SELECT stundenplan_id as id FROM lehre.tbl_stundenplan 
+						WHERE 
+							(lehreinheit_id, studiengang_kz, semester, trim(COALESCE(verband,'')), trim(COALESCE(gruppe,'')), trim(COALESCE(gruppe_kurzbz,''))) =
+							(SELECT 
+								lehreinheit_id, studiengang_kz, semester, trim(COALESCE(verband,'')), trim(COALESCE(gruppe,'')), trim(COALESCE(gruppe_kurzbz,''))
+							 FROM 
+							 	lehre.tbl_lehreinheitgruppe 
+							WHERE 
+								lehreinheitgruppe_id='".$_POST['lehreinheitgruppe_id']."'
+							)
+						";
+				if($result = pg_query($conn, $qry))
+				{
+					if(pg_num_rows($result)>0)
+					{
+						$error = true;
+						$return = false;
+						$errormsg = 'Diese Gruppe kann nicht geloescht werden da sie bereits im LV-Plan verplant ist. Bitte wenden Sie sich an die Stundenplanstelle';
+					}
+				}
+				else 
+				{
+					$errormsg = 'Fehler beim Pruefen des Stundenplanes: '.pg_last_error($conn);
+					$return = false;
+					$error = true;
+				}
+
+			}
+			
 			if(!$error)
 			{
 				//Lehreinheitgruppezuteilung loeschen
