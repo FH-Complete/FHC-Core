@@ -385,6 +385,61 @@ if($result_stg = pg_query($conn, $qry_stg))
 	//Gesamtkosten anzeigen
 	$worksheet->writeNumber($zeile,6,$gesamtkosten, $format_number_bold);
 	*/
+	
+	//Betreuerstunden
+	$worksheet =& $workbook->addWorksheet('Betreuerstunden');
+	$qry = "SELECT 
+				studiensemester_kurzbz, nachname, vorname, sum(stunden) AS stunden, titelpre,
+				sum(tbl_projektbetreuer.stundensatz*stunden*tbl_projektbetreuer.faktor)::numeric(6,2) AS euro, person_id 
+			FROM 
+				public.tbl_person JOIN lehre.tbl_projektbetreuer USING (person_id) 
+				JOIN lehre.tbl_projektarbeit USING (projektarbeit_id) 
+				JOIN lehre.tbl_lehreinheit USING (lehreinheit_id) 
+			WHERE 
+				studiensemester_kurzbz='$semester_aktuell' AND
+				stunden>0
+			GROUP BY 
+				studiensemester_kurzbz,person_id,nachname,vorname, titelpre
+			ORDER BY 
+				nachname,vorname 
+			";
+	$i=0;
+	$gesamtkosten=0;
+	
+	$worksheet->write(0,0,'Erstellt am '.date('d.m.Y').' '.$semester_aktuell.' Betreuerstunden', $format_bold);
+	//Ueberschriften
+	//$worksheet->write(2,$i,"Studiengang", $format_bold);
+	$worksheet->write(2,++$i,"Titel", $format_bold);
+	$worksheet->write(2,++$i,"Familienname", $format_bold);
+	$worksheet->write(2,++$i,"Vorname", $format_bold);
+	$worksheet->write(2,++$i,"Stunden", $format_bold);
+	$worksheet->write(2,++$i,"Kosten", $format_bold);
+		
+	if($result = pg_query($conn, $qry))
+	{
+		$zeile=3;
+		while($row = pg_fetch_object($result))
+		{
+			$i=0;
+			//Studiensemester
+			$worksheet->write($zeile,++$i,$row->titelpre, $format);
+			//Vorname
+			$worksheet->write($zeile,++$i,$row->nachname, $format);
+			//Nachname
+			$worksheet->write($zeile,++$i,$row->vorname, $format);
+			//Stunden
+			$worksheet->writeNumber($zeile,++$i,$row->stunden, $formatnb);
+			//Kosten
+			$worksheet->writeNumber($zeile,++$i,$row->euro, $formatnb);
+			$zeile++;
+			
+			$gesamtkosten = $gesamtkosten + $row->euro;
+		}
+		
+		//Gesamtkosten anzeigen
+		$worksheet->writeNumber($zeile,5,$gesamtkosten, $format_number_bold);
+	}
+	
 	$workbook->close();
 
 	//Mail versenden mit Excel File im Anhang
@@ -425,8 +480,8 @@ if($result_stg = pg_query($conn, $qry_stg))
              "Content-Transfer-Encoding: base64\n\n" .
              $data . "\n\n" .
              "--{$mime_boundary}--\n";
-	
-    if(mail(MAIL_GST.',vilesci@technikum-wien.at', $subject, $message, $headers ))
+	//.',vilesci@technikum-wien.at'
+    if(mail(MAIL_GST, $subject, $message, $headers ))
 		echo 'Email mit Lehrauftragslisten wurde an '.MAIL_GST.' versandt!';
      else
         echo "Fehler beim Versenden der Lehrauftragsliste";

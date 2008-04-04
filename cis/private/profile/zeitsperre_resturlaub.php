@@ -407,15 +407,19 @@ if((date('d')>=15 && date('m')>=12 && date('Y')>=2007) || date('Y')>2007)
 	$disabled='disabled="true"';
 else 
 	$disabled='';
-
-$content_resturlaub.='<form method="POST" action="'.$PHP_SELF.'?type=save_resturlaub"><table>';
-$content_resturlaub.='<tr><td>Resturlaubstage (31.08.)</td><td><input type="text" size="6" '.$disabled.' id="resturlaubstage" name="resturlaubstage" value="'.$resturlaubstage.'" oninput="berechnen()"/></td></tr>';
-$content_resturlaub.='<tr><td>Anspruch (01.09.)</td><td><input type="text" size="6" '.$disabled.' id="anspruch" name="anspruch" value="'.$anspruch.'" oninput="berechnen()"/></td></tr>';
-$content_resturlaub.='<tr><td>Gesamturlaub</td><td><input type="text" disabled="true" size="6" name="summe" id="summe" value="'.($anspruch+$resturlaubstage).'" /></td></tr>';
-$content_resturlaub.='<tr><td>&nbsp;</td></tr>';
-$content_resturlaub.='<tr><td>Aktuelle Mehrarbeitsstunden:</td><td><input type="text" size="6" name="mehrarbeitsstunden" value="'.$mehrarbeitsstunden.'" /></td></tr>';
-$content_resturlaub.='<tr><td></td><td><input type="submit" name="save_resturlaub" value="Speichern" /></td></tr></table>';
-
+	
+//Den Bereich fuer die Resturlaubstage nur anzeigen wenn dies
+//im config angegeben ist
+if(URLAUB_TOOLS)
+{
+	$content_resturlaub.='<form method="POST" action="'.$PHP_SELF.'?type=save_resturlaub"><table>';
+	$content_resturlaub.='<tr><td>Resturlaubstage (31.08.)</td><td><input type="text" size="6" '.$disabled.' id="resturlaubstage" name="resturlaubstage" value="'.$resturlaubstage.'" oninput="berechnen()"/></td></tr>';
+	$content_resturlaub.='<tr><td>Anspruch (01.09.)</td><td><input type="text" size="6" '.$disabled.' id="anspruch" name="anspruch" value="'.$anspruch.'" oninput="berechnen()"/></td></tr>';
+	$content_resturlaub.='<tr><td>Gesamturlaub</td><td><input type="text" disabled="true" size="6" name="summe" id="summe" value="'.($anspruch+$resturlaubstage).'" /></td></tr>';
+	$content_resturlaub.='<tr><td>&nbsp;</td></tr>';
+	$content_resturlaub.='<tr><td>Aktuelle Mehrarbeitsstunden:</td><td><input type="text" size="6" name="mehrarbeitsstunden" value="'.$mehrarbeitsstunden.'" /></td></tr>';
+	$content_resturlaub.='<tr><td></td><td><input type="submit" name="save_resturlaub" value="Speichern" /></td></tr></table>';
+}
 echo '<table width="100%">';
 echo '<tr>';
 echo "<td class='tdvertical'>";

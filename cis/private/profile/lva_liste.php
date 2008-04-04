@@ -1,8 +1,29 @@
 <?php
-	include('../../config.inc.php');
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
+
+	require_once('../../config.inc.php');
 	require_once('../../../include/functions.inc.php');
 
-	$adress='pam@technikum-wien.at';
+	$adress=MAIL_ADMIN;
 
 	$user=get_uid();
 
@@ -15,7 +36,7 @@
 	{
 		mail($adress,"Unerlaubter Zugriff auf Lehrveranstaltungen",
 			"User $user hat versucht die LVAs von User $uid zu betrachten!",
-			"From: vilesci@technikum-wien.at");
+			"From: vilesci@".DOMAIN);
 		die("Keine Berechtigung!");
 	}
 
@@ -24,8 +45,8 @@
 
 	//Studiensemester abfragen.
 	$sql_query='SELECT * FROM public.tbl_studiensemester WHERE ende>=now() ORDER BY start';
-	$result_stdsem=pg_exec($conn, $sql_query);
-	$num_rows_stdsem=pg_numrows($result_stdsem);
+	$result_stdsem=pg_query($conn, $sql_query);
+	$num_rows_stdsem=pg_num_rows($result_stdsem);
 	if (!isset($stdsem))
 		$stdsem=pg_result($result_stdsem,0,"studiensemester_kurzbz");
 
@@ -34,8 +55,8 @@
 	$sql_query="SELECT * FROM campus.vw_lehreinheit
 		WHERE studiensemester_kurzbz='$stdsem' AND mitarbeiter_uid='$uid'";
 	$sql_query.=" ORDER BY stg_kurzbz,semester,verband,gruppe";
-	$result=pg_exec($conn, $sql_query);
-	$num_rows=pg_numrows($result);
+	$result=pg_query($conn, $sql_query);
+	$num_rows=pg_num_rows($result);
 ?>
 <html>
 <head>
@@ -51,7 +72,7 @@
 				&nbsp;<a class="Item" href="index.php">Userprofil</a> &gt;&gt;
 				&nbsp;Lehrveranstaltungen (<?php echo $stdsem;?>)
 			</td>
-			<td align="right"><A href="../help/index.html" class="hilfe" target="_blank">HELP&nbsp;</A></td>
+			<td align="right"></td>
 		</tr>
 		</table>
 	</H2>
@@ -106,7 +127,7 @@ Sonderauftr&auml;ge wie zum Beispiel Praktikums- und Diplomandenbetreuung werden
 <H3>Erkl&auml;rung</H3>
 	&nbsp;&nbsp;<strong> LVNR: </strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Interne FAS-Nummer der Lehrveranstaltung<BR>
 	&nbsp;&nbsp;<strong> STG-S-V-G: </strong>Studiengang-Semester-Verband-Gruppe<BR>
-	&nbsp;&nbsp;<strong> Einheit: </strong>&nbsp;&nbsp;Spezialgruppen (Module, Projektgruppen, Spezialisierungsgruppen)<BR>
+	&nbsp;&nbsp;<strong> Gruppe: </strong>&nbsp;&nbsp;Spezialgruppen (Module, Projektgruppen, Spezialisierungsgruppen)<BR>
 	&nbsp;&nbsp;<strong> Block: </strong>&nbsp;&nbsp;&nbsp;&nbsp;Stundenblockung (1->Einzelstunden; 2->Doppelstunden; ...)<BR>
 	&nbsp;&nbsp;<strong> WR: </strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wochenrythmus (1->jede Woche; 2->jede 2. Woche; ...)<BR>
 	&nbsp;&nbsp;<strong> Std: </strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gesamte Semesterstunden<BR>

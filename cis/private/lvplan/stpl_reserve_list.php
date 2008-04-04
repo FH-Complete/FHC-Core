@@ -21,16 +21,20 @@
  */
 	require_once('../../config.inc.php');
 	require_once('../../../include/functions.inc.php');
+	require_once('../../../include/benutzerberechtigung.class.php');
 
 	$uid=get_uid();
-	//$uid='pam';
-
+	
 	if (isset($_GET['id']))
 		$id=$_GET['id'];
 
 	// Datenbankverbindung
 	if (!$conn = pg_pconnect(CONN_STRING))
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+		
+	$rechte = new benutzerberechtigung($conn);
+	$rechte->getBerechtigungen($uid);
+	
 	// Datums Format und search_path
 	if(!$erg_std=pg_query($conn, "SET datestyle TO ISO; SET search_path TO campus;"))
 		die(pg_last_error($conn));
@@ -91,7 +95,7 @@
 			echo '<td>'.$pers_uid.'</td>';
 			echo '<td>'.$beschreibung.'<a  name="liste'.$i.'">&nbsp;</a></td>';
 			$z=$i-1;
-			if (($pers_uid==$uid)||($uid=='pam')||($uid=='kindlm')||($uid=='dvorak')||($uid=='betty'))
+			if (($pers_uid==$uid)|| $rechte->isBerechtigt('admin', 0, 'suid'))
 				echo '<td><A class="Item" href="stpl_reserve_list.php?id='.$id.'#liste'.$z.'">Delete</A></td>';
 			echo '</tr>';
 		}
@@ -128,7 +132,7 @@
 			echo '<td>'.$pers_uid.'</td>';
 			echo '<td>'.$beschreibung.'<a  name="liste'.$i.'">&nbsp;</a></td>';
 			$z=$i-1;
-			if (($pers_uid==$uid)||($uid=='pam')||($uid=='kindlm')||($uid=='dvorak')||($uid=='betty'))
+			if (($pers_uid==$uid) || $rechte->isBerechtigt('admin', 0, 'suid'))
 				echo '<td><A class="Item" href="stpl_reserve_list.php?id='.$id.'#liste'.$z.'">Delete</A></td>';
 			echo '</tr>';
 		}
