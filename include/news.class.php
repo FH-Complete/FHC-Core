@@ -41,6 +41,7 @@ class news
 	var $updatevon=0;		// @var string
 	var $insertamum;		// @var timestamp
 	var $insertvon=0;		// @var string
+	var $datum_bis;			// @date
 	
 	
 	/**
@@ -81,6 +82,7 @@ class news
 			$news_obj->studiengang_kz=$row->studiengang_kz;
 			$news_obj->verfasser = $row->verfasser;
 			$news_obj->datum = $row->datum;
+			$news_obj->datum_bis = $row->datum_bis;
 			$news_obj->insertamum=$row->insertamum;
 			$news_obj->insertvon=$row->insertvon;
 			$news_obj->updateamum=$row->updateamum;
@@ -96,7 +98,7 @@ class news
 	// * als $maxalter Tage sind
 	// * @param $maxalter
 	// **********************************
-	function getnews($maxalter, $studiengang_kz, $semester, $all=false, $fachbereich_kurzbz=null)
+	function getnews($maxalter, $studiengang_kz, $semester, $all=false, $fachbereich_kurzbz=null, $maxnews)
 	{
 		//if(!is_numeric($maxalter) || !is_numeric($studiengang_kz) || ($semester!='' && !is_numeric($semester)))
 		//{
@@ -111,7 +113,7 @@ class news
 		}
 				
 		if(!$all)
-			$qry.=' AND datum<=now()';
+			$qry.=' AND datum<=now() AND (datum_bis>= now()::date OR datum_bis is null)';
 			
 		if($fachbereich_kurzbz!='*')
 		{
@@ -122,13 +124,16 @@ class news
 		}
 				
 		if($studiengang_kz=='0')
-			$qry.=" AND studiengang_kz='".$studiengang_kz."' ".($semester!=''?"":'AND semester is null');
+			$qry.=" AND studiengang_kz='".$studiengang_kz."' ".($semester!=''?($semester=='0'?' AND semester=0':''):'AND semester is null');
 		else if($studiengang_kz=='')
 			$qry.='';
 		else
 			$qry.=" AND ((studiengang_kz='$studiengang_kz' AND semester='$semester') OR (studiengang_kz='$studiengang_kz' AND semester=0) OR (studiengang_kz=0 AND semester='$semester') OR (studiengang_kz=0 and semester is null))";
 			
 		$qry.=' ORDER BY datum DESC, updateamum DESC';
+		if($maxnews!=0)
+			$qry.= " LIMIT $maxnews";
+		
 		//echo $qry;
 		if($result = pg_query($this->conn, $qry))
 		{
@@ -144,6 +149,7 @@ class news
 				$newsobj->text = $row->text;
 				$newsobj->verfasser = $row->verfasser;
 				$newsobj->datum		= $row->datum;
+				$newsobj->datum_bis = $row->datum_bis;
 				$newsobj->updateamum = $row->updateamum;
 				$newsobj->updatevon = $row->updateamum;
 				$newsobj->insertamum = $row->insertamum;
@@ -181,6 +187,7 @@ class news
 				$newsobj->text = $row->text;
 				$newsobj->verfasser = $row->verfasser;
 				$newsobj->datum		= $row->datum;
+				$newsobj->datum_bis = $row->datum_bis;
 				$newsobj->updateamum = $row->updateamum;
 				$newsobj->updatevon = $row->updateamum;
 				$newsobj->insertamum = $row->insertamum;
@@ -230,6 +237,7 @@ class news
 			$this->studiengang_kz	= $row->studiengang_kz;
 			$this->verfasser		= $row->verfasser;
 			$this->datum			= $row->datum;
+			$this->datum_bis		= $row->datum_bis;
 			$this->insertamum		= $row->insertamum;
 			$this->insertvon		= $row->insertvon;
 			$this->updateamum		= $row->updateamum;
@@ -313,7 +321,7 @@ class news
 		{
 			//Neuen Datensatz anlegen	
 						
-			$qry = 'INSERT INTO campus.tbl_news (betreff, text, semester, fachbereich_kurzbz, uid, studiengang_kz, verfasser,datum, insertamum, insertvon, 
+			$qry = 'INSERT INTO campus.tbl_news (betreff, text, semester, fachbereich_kurzbz, uid, studiengang_kz, verfasser, datum, datum_bis, insertamum, insertvon, 
 				updateamum, updatevon) VALUES ('.
 				$this->addslashes($this->betreff).', '.
 				$this->addslashes($this->text).', '.
@@ -323,6 +331,7 @@ class news
 				$this->addslashes($this->studiengang_kz).', '.
 				$this->addslashes($this->verfasser).', '.
 				$this->addslashes($this->datum).', '.
+				$this->addslashes($this->datum_bis).', '.
 				$this->addslashes($this->insertamum).', '.
 				$this->addslashes($this->insertvon).', '.
 				$this->addslashes($this->updateamum).', '.
@@ -349,6 +358,7 @@ class news
 				'studiengang_kz='.$this->addslashes($this->studiengang_kz).', '.
 				'verfasser='.$this->addslashes($this->verfasser).', '.
 				'datum='.$this->addslashes($this->datum).', '.
+				'datum_bis='.$this->addslashes($this->datum_bis).', '.
 				'insertamum='.$this->addslashes($this->insertamum).', '.
 				'insertvon='.$this->addslashes($this->insertvon).', '.
 				'updateamum='.$this->addslashes($this->updateamum).', '.

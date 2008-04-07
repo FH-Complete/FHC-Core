@@ -51,7 +51,7 @@
 
 		  	$news = new news($conn);
 
-		  	$news->getnews(MAXNEWSALTER,0,null);
+		  	$news->getnews(MAXNEWSALTER,0,null, false, null, MAXNEWS);
 		  	$zaehler=0;
 		  	$open=true;
 		  	foreach ($news->result as $row)

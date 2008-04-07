@@ -98,7 +98,7 @@
 			  <?php
 
 				$news = new news($sql_conn);
-				$news->getnews(MAXNEWSALTER,0,null, true, '*');
+				$news->getnews(0,0,null, true, '*', 0);
 
 				$zaehler=0;
 				$i=0;

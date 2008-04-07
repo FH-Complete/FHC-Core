@@ -1,4 +1,24 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
 	require_once('../config.inc.php');
 	require_once('../../include/globals.inc.php');
 	require_once('../../include/functions.inc.php');
@@ -27,6 +47,8 @@
 	$kosten = '';
 	$ausstattung = '';
 	$stockwerk = '';
+	$standort_kurzbz = '';
+	$telefonklappe = '';
 	
 	$neu = "true";
 	
@@ -41,6 +63,8 @@
 		$kosten = $_POST["kosten"];
 		$ausstattung = $_POST["ausstattung"];
 		$stockwerk = $_POST["stockwerk"];
+		$standort_kurzbz = $_POST["standort_kurzbz"];
+		$telefonklappe = $_POST["telefonklappe"];
 
 		
 		$sg_update = new ort($conn);
@@ -56,6 +80,8 @@
 		$sg_update->kosten = $kosten;
 		$sg_update->ausstattung = $ausstattung;
 		$sg_update->stockwerk = $stockwerk;
+		$sg_update->telefonklappe = $telefonklappe;
+		$sg_update->standort_kurzbz = $standort_kurzbz;
 
 		
 		if ($_POST["neu"] == "true")
@@ -90,6 +116,8 @@
 		$kosten = $sg->kosten;
 		$ausstattung = $sg->ausstattung;
 		$stockwerk = $sg->stockwerk;
+		$standort_kurzbz = $sg->standort_kurzbz;
+		$telefonklappe = $sg->telefonklappe;
 		$neu = "false";
 	}
 		
@@ -124,6 +152,27 @@
 	$htmlstr .= "				<tr>\n";
 	$htmlstr .= "					<td>Stockwerk</td>\n";
 	$htmlstr .= "					<td><input class='detail' type='text' name='stockwerk' size='8' maxlength='5' value='".$stockwerk."' onchange='submitable()'></td>\n";
+	$htmlstr .= "					<td>Standort</td>\n";
+	$htmlstr .= "					<td>";
+	$htmlstr .= "					<SELECT name='standort_kurzbz'>";
+	$htmlstr.="				<OPTION value=''>-- keine Auswahl --</OPTION>\n";
+	$qry = 'SELECT * FROM public.tbl_standort ORDER BY standort_kurzbz';
+	if($result = pg_query($conn, $qry))
+	{
+		while($row = pg_fetch_object($result))
+		{
+			if($row->standort_kurzbz==$standort_kurzbz)
+				$selected='selected';
+			else 
+				$selected='';
+			
+			$htmlstr.="				<OPTION value='$row->standort_kurzbz' $selected>$row->standort_kurzbz</OPTION>\n";
+		}
+	}
+	$htmlstr .= "					</SELECT>";
+	$htmlstr .= "					</td>\n";
+	$htmlstr .= "					<td>Telefonklappe</td>\n";
+	$htmlstr .= "					<td><input class='detail' type='text' name='telefonklappe' size='3' maxlength='8' value='".$telefonklappe."' onchange='submitable()'></td>\n";
 	$htmlstr .= "				</tr>\n";
 	$htmlstr .= "				<tr>\n";
 	$htmlstr .= "					<td valign='top'>Lehre</td>\n";

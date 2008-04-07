@@ -93,9 +93,10 @@
 	function print_STGnews($stg_id, $semester, $sql_conn, $showall=false, $fachbereich_kurzbz)
 	{
 		$alter = ($showall?0:MAXNEWSALTER);
+		$maxnews = ($showall?0:MAXNEWS);
 		$news_obj = new news($sql_conn);
 
-		if($news_obj->getnews($alter, $stg_id, $semester, $showall, $fachbereich_kurzbz))
+		if($news_obj->getnews($alter, $stg_id, $semester, $showall, $fachbereich_kurzbz, $maxnews))
 		{
 			$zaehler = print_news($news_obj);
 		}

@@ -56,6 +56,7 @@
 			$news_obj->betreff = $title;
 			$news_obj->text = $news_message;
 			$news_obj->datum = $datum;
+			$news_obj->datum_bis = $datum_bis;
 			$news_obj->updatevon = $user;
 
 			if(isset($news_id) && $news_id != "")
@@ -182,6 +183,7 @@
 				$betreff = $news_obj->betreff;
 				$text = $news_obj->text;
 				$datum = $news_obj->datum;
+				$datum_bis = $news_obj->datum_bis;
 
 				echo 'Eintrag &auml;ndern';
 			}
@@ -203,23 +205,27 @@
 			  <td width="65">Verfasser:</td>
 			  <td width="218"><input type="text" class="TextBox" name="txtAuthor" size="30"<?php if(isset($news_id) && $news_id != "") echo ' value="'.$verfasser.'"'; ?>>
 			  </td>
-			  <td width="60">&nbsp;</td>
-			  <td>&nbsp;Sichtbar ab <input type="text" class="TextBox" name="datum" size="10" value="<?php if(isset($news_id) && $news_id != "") echo date('d.m.Y',strtotime(strftime($datum))); else echo date('d.m.Y'); ?>"></td>
+			  <td width="80">Sichtbar ab</td>
+			  <td><input type="text" class="TextBox" name="datum" size="10" value="<?php if(isset($news_id) && $news_id != "") echo date('d.m.Y',strtotime(strftime($datum))); else echo date('d.m.Y'); ?>"></td>
 		    </tr>
 			<tr>
 			  <td>Titel:</td>
 			  <td><input type="text" class="TextBox" name="txtTitle" size="30"<?php if(isset($news_id) && $news_id != "") echo ' value="'.$betreff.'"'; ?>></td>
-			  <td><strong><font class="error">Hinweis:</font></strong></td>
-			  <td>Bitte beachten Sie, dass im Titel auch das jeweilige Freifach genannt wird. </td>
+			  <td width="80">Sichtbar bis</td>
+			  <td><input type="text" class="TextBox" name="datum_bis" size="10" value="<?php if(isset($news_id) && $news_id != "" && $datum_bis!='') echo date('d.m.Y',strtotime(strftime($datum_bis))); else echo ''; ?>"></td>
 		    </tr>
+		    <tr>
+			  	<td colspan='2'>Bitte geben Sie hier Ihre Nachricht ein:</td>
+				<td colspan='2'><strong><font class="error">Hinweis:</font></strong>
+					Bitte beachten Sie, dass im Titel auch das jeweilige Freifach genannt wird. 
+			</td>
+	  </tr>
 		</table>
 		</td>
 	  </tr>
+	
 	  <tr>
-	  	<td>&nbsp;</td>
-	  </tr>
-	  <tr>
-	  	<td>Bitte geben Sie hier Ihre Nachricht ein:<br>
+	  	<td>
 			<textarea class="TextBox" style="width: 99%; heigth: 166px" name="txtNewsMessage" rows="10" cols="70" maxlength="2000"><?php if(isset($news_id) && $news_id != "") echo str_replace("<br>", "\r\n", $text); ?></textarea></td>
 	  </tr>
 	  <tr>

@@ -91,7 +91,7 @@
 			<?php
 
 			$news_obj = new news($conn);
-			$news_obj->getnews(MAXNEWSALTER,$course_id, $term_id, true);
+			$news_obj->getnews(MAXNEWSALTER,$course_id, $term_id, true, null, MAXNEWS);
 
 			$i=0;
 			foreach($news_obj->result as $row)
