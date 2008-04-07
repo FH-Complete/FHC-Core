@@ -72,6 +72,28 @@ if (!@pg_query($conn,'SELECT * FROM campus.tbl_newssprache LIMIT 1;'))
 		echo 'Tabelle campus.tbl_newssprache hinzugefuegt!<BR>';
 }
 
+// ************** campus.tbl_news.datum_bis ************************
+if (!@pg_query($conn,'SELECT datum_bis FROM campus.tbl_news LIMIT 1;'))
+{
+	$sql='	ALTER TABLE campus.tbl_news ADD COLUMN datum_bis date;';
+	if (!@pg_query($conn,$sql))
+		echo '<strong>campus.tbl_news: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo 'datum_bis wurde bei campus.tbl_news hinzugefuegt!<BR>';
+}
+
+// ************** public.tbl_ort.standort_kurzbz,telefonklappe ************************
+if (!@pg_query($conn,'SELECT standort_kurzbz,telefonklappe FROM public.tbl_ort LIMIT 1;'))
+{
+	$sql='	ALTER TABLE public.tbl_ort ADD COLUMN standort_kurzbz varchar(16);
+			ALTER TABLE public.tbl_ort ADD COLUMN telefonklappe varchar(8);
+			ALTER TABLE public.tbl_ort ADD Constraint "standort_ort" foreign key ("standort_kurzbz") references public.tbl_standort ("standort_kurzbz") on update cascade on delete restrict;';
+	if (!@pg_query($conn,$sql))
+		echo '<strong>public.tbl_ort: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo 'standort_kurzbz wurde bei public.tbl_ort hinzugefuegt!<BR>telefonklappe wurde bei public.tbl_ort hinzugefuegt!<BR>';
+}
+
 // ************** public.tbl_person.kompetenzen ************************
 if (!@pg_query($conn,'SELECT kompetenzen FROM public.tbl_person LIMIT 1;'))
 {
