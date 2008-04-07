@@ -57,6 +57,8 @@
 		$txtAuthor=$_POST['txtAuthor'];
 	if(isset($_POST['datum']))
 		$datum=$_POST['datum'];
+	if(isset($_POST['datum_bis']))
+		$datum_bis=$_POST['datum_bis'];
 	if(isset($_POST['txtTitle']))
 		$txtTitle=$_POST['txtTitle'];
 	if(isset($_POST['btnSend']))
@@ -92,6 +94,7 @@
 				else
 					$news->fachbereich_kurzbz = '';
 				$news->datum = $datum;
+				$news->datum_bis = $datum_bis;
 				$news->uid=$user;
 				$news->updatevon=$user;
 				$news->updateamum=date('Y-m-d H:i:s');
@@ -128,6 +131,7 @@
 				$news->uid = $user;
 				$news->updateamum=date('Y-m-d H:i:s');
 				$news->datum=$datum;
+				$news->datum_bis=$datum_bis;
 				$news->new=true;
 
 				if($news->save())
@@ -266,6 +270,12 @@
 			<tr>
 			  <td>Titel:</td>
 			  <td><input type="text" class="TextBox" name="txtTitle" size="30"<?php if(isset($news_id) && $news_id != "") echo ' value="'.$news->betreff.'"'; ?>></td>
+			  <td>Sichtbar bis (optional):</td>
+			  <td><input type="text" class="TextBox" name="datum_bis" size="10" value="<?php if(isset($news_id) && $news_id != "" && $news->datum_bis!='') echo date('d.m.Y',strtotime(strftime($news->datum_bis))); else echo ''; ?>"></td>
+			</tr>
+			<tr>
+				<td colspan='2'>Bitte geben Sie hier Ihre Nachricht ein:</td>
+				
 <?php
 			  if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('assistenz',0))
 			  {
@@ -279,11 +289,11 @@
 		</table>
 		</td>
 	  </tr>
-	  <tr>
+<!--	<tr>
 	  	<td>&nbsp;</td>
-	  </tr>
+	  </tr>-->
 	  <tr>
-	  	<td>Bitte geben Sie hier Ihre Nachricht ein:<br>
+	  	<td><!--Bitte geben Sie hier Ihre Nachricht ein:<br>-->
 			<textarea class="TextBox" style="width: 99%; heigth: 166px" name="txtNewsMessage" rows="10" cols="70" maxlength="2000"><?php if(isset($news_id) && $news_id != "") echo str_replace("<br>", "\r\n", $news->text); ?></textarea></td>
 	  </tr>
 	  <tr>

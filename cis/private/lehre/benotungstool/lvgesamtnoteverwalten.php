@@ -228,9 +228,12 @@ function getTopOffset(){
 		
 	}
 
-    function updateSeitePruefung(){
-	    if (anfrage.readyState == 4){
-	        if (anfrage.status == 200) {
+    function updateSeitePruefung()
+    {
+	    if (anfrage.readyState == 4)
+	    {
+	        if (anfrage.status == 200) 
+	        {
 	        	var anlegendiv = document.getElementById("nachpruefung_div");	
 				var datum = 	document.nachpruefung_form.datum.value;
 				var note = document.nachpruefung_form.note.value;
@@ -262,13 +265,15 @@ function getTopOffset(){
 					//if (note == 9)
 					//	note = " ";
 					document.getElementById("span_"+uid).innerHTML = "<table><tr><td class='td_datum'>"+datum+"</td><td class='td_note'>"+note+"<td><input type='button' name='anlegen' value='ändern' onclick='pruefungAnlegen(\""+uid+"\",\""+datum+"\",\""+note+"\",\""+lehreinheit_id+"\")'></td></tr></table>"
-                 }
-                 else
-             		{
-                 		alert(resp);
-                 		document.getElementById(uid).note.value="";
-             		}
-	        } else alert("Request status:" + anfrage.status);
+                }
+                else
+         		{
+             		alert(resp);
+             		document.getElementById(uid).note.value="";
+         		}
+	        } 
+	        else 
+	        	alert("Request status:" + anfrage.status);
 	    }
 	}
 
@@ -279,7 +284,15 @@ function getTopOffset(){
  		anlegendiv.style.visibility = "hidden";
  	}
  
- 
+ 	function OnFreigabeSubmit()
+	{
+		if(document.getElementById('textbox-freigabe-passwort').value.length==0)
+		{
+			alert('Bitte geben Sie zuerst Ihr Passwort ein!');
+			return false;
+		}
+		return true;
+	}
 </script>
 <style type="text/css">
 .transparent {
@@ -445,8 +458,11 @@ echo "<b>$lv_obj->bezeichnung</b><br>";
 if($lehreinheit_id=='')
 	die('Es wurde keine passende Lehreinheit in diesem Studiensemester gefunden');
 
-//Menue
-include("menue.inc.php");
+if(!isset($_GET['standalone']))
+{
+	//Menue
+	include("menue.inc.php");
+}
 
 
 // lvgesamtnote für studenten speichern
@@ -488,70 +504,77 @@ if (isset($_REQUEST["submit"]) && ($_POST["student_uid"] != '')){
 // eingetragene lv-gesamtnoten freigeben
 if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 {
-	$jetzt = date("Y-m-d H:i:s");
-	$neuenoten = 0;
-	$studlist = "<table border='1'><tr><td><b>Mat. Nr.</b></td><td><b>Nachname</b></td><td><b>Vorname</b></td><td><b>Note</b></td></tr>";
-
-//	$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id' ORDER BY semester, verband, gruppe, gruppe_kurzbz";
-	
-//	if($result_grp = pg_query($conn, $qry))
-//	{
-//		while($row_grp = pg_fetch_object($result_grp))
-//		{
-/*		
-			if($row_grp->gruppe_kurzbz!='')
-			{
-					$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row_grp->gruppe_kurzbz)."' AND studiensemester_kurzbz = '".$stsem."' ORDER BY nachname, vorname";
-			}
-			else
-			{
-					$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student
-					             WHERE studiengang_kz='$row_grp->studiengang_kz' AND
-					             semester='$row_grp->semester' ".
-								 ($row_grp->verband!=''?" AND trim(verband)=trim('$row_grp->verband')":'').
-								 ($row_grp->gruppe!=''?" AND trim(gruppe)=trim('$row_grp->gruppe')":'').
-					            " ORDER BY nachname, vorname";
-			}
-*/
-			// studentenquery					
-			$qry_stud = "SELECT DISTINCT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".$stsem."' and lehrveranstaltung_id = '".$lvid."' ORDER BY nachname, vorname ";
-	        if($result_stud = pg_query($conn, $qry_stud))
-			{
-				$i=1;
-				
-				while($row_stud = pg_fetch_object($result_stud))
-				{	
-					$lvgesamtnote = new lvgesamtnote($conn);
-	    			if ($lvgesamtnote->load($lvid,$row_stud->uid,$stsem))
-	    			{
-						if ($lvgesamtnote->benotungsdatum > $lvgesamtnote->freigabedatum)	    				
-						{	    				
-	    					$lvgesamtnote->freigabedatum = $jetzt;
-	    					$lvgesamtnote->freigabevon_uid = $user;
-	    					$lvgesamtnote->save($new=null);
-	    					$studlist .= "<tr><td>".$row_stud->matrikelnr."</td><td>".$row_stud->nachname."</td><td>".$row_stud->vorname."</td><td>".$lvgesamtnote->note."</td></tr>";
-	    					$neuenoten++;
-	    				}
-	    			}
-				}	
-			}
-//		}
-//	}
-	$studlist .= "</table>";
-	//mail an assistentin und den user selber verschicken	
-	if ($neuenoten > 0)
+	//Passwort pruefen
+	if(checkldapuser($user, $_REQUEST['passwort']))
 	{
-		$lv = new lehrveranstaltung($conn, $lvid);
-		$sg = new studiengang($conn, $lv->studiengang_kz);
-		$debug_adressen = $user."@technikum-wien.at";
-		$adressen = $sg->email.", ".$user."@technikum-wien.at";
+		$jetzt = date("Y-m-d H:i:s");
+		$neuenoten = 0;
+		$studlist = "<table border='1'><tr><td><b>Mat. Nr.</b></td><td><b>Nachname</b></td><td><b>Vorname</b></td><td><b>Note</b></td></tr>";
+
+		//	$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id' ORDER BY semester, verband, gruppe, gruppe_kurzbz";
+			
+		//	if($result_grp = pg_query($conn, $qry))
+		//	{
+		//		while($row_grp = pg_fetch_object($result_grp))
+		//		{
+		/*		
+					if($row_grp->gruppe_kurzbz!='')
+					{
+							$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row_grp->gruppe_kurzbz)."' AND studiensemester_kurzbz = '".$stsem."' ORDER BY nachname, vorname";
+					}
+					else
+					{
+							$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student
+							             WHERE studiengang_kz='$row_grp->studiengang_kz' AND
+							             semester='$row_grp->semester' ".
+										 ($row_grp->verband!=''?" AND trim(verband)=trim('$row_grp->verband')":'').
+										 ($row_grp->gruppe!=''?" AND trim(gruppe)=trim('$row_grp->gruppe')":'').
+							            " ORDER BY nachname, vorname";
+					}
+		*/
+		// studentenquery					
+		$qry_stud = "SELECT DISTINCT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".$stsem."' and lehrveranstaltung_id = '".$lvid."' ORDER BY nachname, vorname ";
+        if($result_stud = pg_query($conn, $qry_stud))
+		{
+			$i=1;
+			
+			while($row_stud = pg_fetch_object($result_stud))
+			{	
+				$lvgesamtnote = new lvgesamtnote($conn);
+    			if ($lvgesamtnote->load($lvid,$row_stud->uid,$stsem))
+    			{
+					if ($lvgesamtnote->benotungsdatum > $lvgesamtnote->freigabedatum)	    				
+					{	    				
+    					$lvgesamtnote->freigabedatum = $jetzt;
+    					$lvgesamtnote->freigabevon_uid = $user;
+    					$lvgesamtnote->save($new=null);
+    					$studlist .= "<tr><td>".$row_stud->matrikelnr."</td><td>".$row_stud->nachname."</td><td>".$row_stud->vorname."</td><td>".$lvgesamtnote->note."</td></tr>";
+    					$neuenoten++;
+    				}
+    			}
+			}	
+		}
 		
-		$freigeber = "<b>".strtoupper($user)."</b>";
-		mail($adressen,"Notenfreigabe ".$lv->bezeichnung,"<html><body><b>".$lv->bezeichnung." - ".$stsem."</b> (".$lv->semester.". Sem.) <br><br>Benutzer ".$freigeber." hat die LV-Noten f&uuml;r folgende Studenten freigegeben:<br><br>".$studlist."<br>Mail wurde verschickt an: ".$adressen."</body></html>","From: vilesci@technikum-wien.at\nContent-Type: text/html\n");
-	}	
-
-
-
+		//		}
+		//	}
+		
+		$studlist .= "</table>";
+		//mail an assistentin und den user selber verschicken	
+		if ($neuenoten > 0)
+		{
+			$lv = new lehrveranstaltung($conn, $lvid);
+			$sg = new studiengang($conn, $lv->studiengang_kz);
+			$debug_adressen = $user."@".DOMAIN;
+			$adressen = $sg->email.", ".$user."@".DOMAIN;
+			
+			$freigeber = "<b>".strtoupper($user)."</b>";
+			mail($adressen,"Notenfreigabe ".$lv->bezeichnung,"<html><body><b>".$lv->bezeichnung." - ".$stsem."</b> (".$lv->semester.". Sem.) <br><br>Benutzer ".$freigeber." hat die LV-Noten f&uuml;r folgende Studenten freigegeben:<br><br>".$studlist."<br>Mail wurde verschickt an: ".$adressen."</body></html>","From: vilesci@".DOMAIN."\nContent-Type: text/html\n");
+		}	
+	}
+	else 
+	{
+		echo '<span><font class="error">Fehler beim Freigeben der Noten: Das Uebergebene Passwort ist falsch</font></span>';
+	}
 }
 
 echo "<h3>LV Gesamtnote verwalten</h3>";
@@ -599,9 +622,11 @@ echo "
 				<td class='ContentHeader2'>LE-Noten (LE-ID)</td>
 				<td class='ContentHeader2'></td>
 				<td class='ContentHeader2'>LV-Note</td>
-				<form name='freigabeform' action='lvgesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem' method='POST'><input type='hidden' name='freigabe' value='1'>
-				<td class='ContentHeader2'><input type='submit' name='frei' value='Freigabe'></td>
+				<td class='ContentHeader2' align='right'>
+				<form name='freigabeform' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem".(isset($_GET['standalone'])?'&standalone=true':'')."' method='POST' onsubmit='return OnFreigabeSubmit()'><input type='hidden' name='freigabe' value='1'>
+				Passwort: <input type='password' size='8' id='textbox-freigabe-passwort' name='passwort'><br><input type='submit' name='frei' value='Freigabe'>
 				</form>
+				</td>
 				<td class='ContentHeader2'>Zeugnisnote</td>
 				<td class='ContentHeader2' colspan='2'>Nachprüfung</td>
 			</tr>
@@ -671,7 +696,7 @@ echo "
 				
 				echo "
 				<tr class='liste".($i%2)."'>
-					<td><a href='mailto:$row_stud->uid@technikum-wien.at'><img src='../../../../skin/images/button_mail.gif'></a></td>					
+					<td><a href='mailto:$row_stud->uid@".DOMAIN."'><img src='../../../../skin/images/button_mail.gif'></a></td>					
 					<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->uid</a></td>
 					<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->nachname</a></td>
 					<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->vorname</a></td>";
@@ -726,7 +751,7 @@ echo "
 					$hide = "style='visibility:hidden;'";
 				else
 					$hide = "style='visibility:visible;'";				
-				echo "<form name='$row_stud->uid' id='$row_stud->uid' method='POST' action='lvgesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td><span id='lvnoteneingabe_".$row_stud->uid."' ".$hide."><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_vorschlag' name='note'><input type='button' value='->' onclick='saveLVNote(\"$row_stud->uid\")'></span></td></form>";
+				echo "<form name='$row_stud->uid' id='$row_stud->uid' method='POST' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem".(isset($_GET['standalone'])?'&standalone=true':'')."'><td><span id='lvnoteneingabe_".$row_stud->uid."' ".$hide."><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_vorschlag' name='note'><input type='button' value='->' onclick='saveLVNote(\"$row_stud->uid\")'></span></td></form>";
 
 				if ($note_lv == 5)
 					$negmarkier = " style='color:red; font-weight:bold;'";

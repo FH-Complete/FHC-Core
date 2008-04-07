@@ -28,7 +28,7 @@ class ort
 {
 	var $conn;   			// @var resource DB-Handle
 	var $new;     			// @var boolean
-	var $errormsg; 		// @var string
+	var $errormsg; 			// @var string
 	var $result = array(); 	// @var fachbereich Objekt
 
 	//Tabellenspalten
@@ -36,14 +36,16 @@ class ort
 	var $bezeichnung;		// @var string
 	var $planbezeichnung;	// @var string
 	var $max_person;		// @var integer
-	var $lehre;			// @var boolean
+	var $lehre;				// @var boolean
 	var $reservieren;		// @var boolean
-	var $aktiv;			// @var boolean
-	var $lageplan;		// @var oid
+	var $aktiv;				// @var boolean
+	var $lageplan;			// @var oid
 	var $dislozierung;		// @var smallint
 	var $kosten;			// @var numeric(8,2)
 	var $ausstattung;
-	var $stockwerk;		// @var integer
+	var $stockwerk;			// @var integer
+	var $standort_kurzbz; 	// @var varchar(16)
+	var $telefonklappe;		// @var varchar(8)
 
 	/**
 	 * Konstruktor
@@ -102,6 +104,8 @@ class ort
 			$ort_obj->reservieren		= ($row->reservieren=='t'?true:false);
 			$ort_obj->ausstattung		= $row->ausstattung;
 			$ort_obj->stockwerk			= $row->stockwerk;
+			$ort_obj->standort_kurzbz	= $row->standort_kurzbz;
+			$ort_obj->telefonklappe		= $row->telefonklappe;
 
 			$this->result[] = $ort_obj;
 		}
@@ -143,6 +147,8 @@ class ort
 			$this->reservieren		= ($row->reservieren=='t'?true:false);
 			$this->ausstattung		= $row->ausstattung;
 			$this->stockwerk		= $row->stockwerk;
+			$this->standort_kurzbz	= $row->standort_kurzbz;
+			$this->telefonklappe	= $row->telefonklappe;
 		}
 		else
 		{
@@ -217,7 +223,7 @@ class ort
 			}
 			//Neuen Datensatz anlegen
 			$qry = 'INSERT INTO public.tbl_ort (ort_kurzbz, bezeichnung, planbezeichnung, max_person, aktiv, lehre, reservieren, lageplan,
-				dislozierung, kosten, stockwerk) VALUES ('.
+				dislozierung, kosten, stockwerk, standort_kurzbz, telefonklappe) VALUES ('.
 				$this->addslashes($this->ort_kurzbz).', '.
 				$this->addslashes($this->bezeichnung).', '.
 				$this->addslashes($this->planbezeichnung).', '.
@@ -227,8 +233,10 @@ class ort
 				($this->reservieren?'true':'false').', '.
 				$this->addslashes($this->lageplan).', '.
 				$this->addslashes($this->dislozierung).', '.
-				$this->addslashes(str_replace(",",".",$this->kosten)).', ';
-				$this->addslashes($this->stockwerk).');';
+				$this->addslashes(str_replace(",",".",$this->kosten)).', '.
+				$this->addslashes($this->stockwerk).','.
+				$this->addslashes($this->standort_kurzbz).','.
+				$this->addslashes($this->telefonklappe).');';
 		}
 		else
 		{
@@ -251,6 +259,8 @@ class ort
 				'lageplan='.$this->addslashes($this->lageplan).', '.
 				'dislozierung='.$this->addslashes($this->dislozierung).', '.
 				'kosten='.$this->addslashes(str_replace(",",".",$this->kosten)).', '.
+				'standort_kurzbz='.$this->addslashes($this->standort_kurzbz).', '.
+				'telefonklappe='.$this->addslashes($this->telefonklappe).', '.
 				'stockwerk='.$this->addslashes($this->stockwerk).' '.
 				'WHERE ort_kurzbz = '.$this->addslashes($this->ort_kurzbz).';';
 		}

@@ -86,7 +86,7 @@
 		  	<table class="tabcontent">
 			  <?php
 				$news_obj = new news($sql_conn);
-				$news_obj->getnews(MAXNEWSALTER,'0','0',true);
+				$news_obj->getnews(MAXNEWSALTER,'0','0',true, null, MAXNEWS);
 
 				$zaehler =0;
 				$i=0;

@@ -26,7 +26,7 @@
 
     //Connection Herstellen
     if(!$conn = pg_pconnect(CONN_STRING))
-       die('Fehler beim oeffnen der Datenbankverbindung');
+       die('Fehler beim Oeffnen der Datenbankverbindung');
 
 	$user = get_uid();
 
@@ -43,6 +43,11 @@
 		$term_id = $_GET['term_id'];
 	}
 
+	if(isset($_GET['datum']))
+		$datum = $_GET['datum'];
+	if(isset($_GET['datum_bis']))
+		$datum_bis = $_GET['datum_bis'];
+	
 	$stg_obj = new studiengang($conn, $course_id);
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -67,6 +72,7 @@
 				$news_obj->semester = $term_id;
 				$news_obj->betreff = $title;
 				$news_obj->datum = $datum;
+				$news_obj->datum_bis = $datum_bis;
 				$news_obj->text = $news_message;
 				$news_obj->updatevon = $user;
 				$news_obj->updateamum = date('Y-m-d H:i:s');
@@ -96,6 +102,7 @@
 				$news_obj->semester = $term_id;
 				$news_obj->betreff = $title;
 				$news_obj->datum = $datum;
+				$news_obj->datum_bis = $datum_bis;
 				$news_obj->text = $news_message;
 				$news_obj->updatevon = $user;
 				$news_obj->updateamum = date('Y-m-d H:i:s');
@@ -270,6 +277,7 @@
 			$betreff = '';
 			$text = '';
 			$datum = '';
+			$datum_bis = '';
 
 			if(isset($news_id) && $news_id != "")
 			{
@@ -278,6 +286,7 @@
 				$betreff = $news_obj->betreff;
 				$text = $news_obj->text;
 				$datum = $news_obj->datum;
+				$datum_bis = $news_obj->datum_bis;
 				echo 'Eintrag &auml;ndern';
 			}
 			else
@@ -311,7 +320,7 @@
 			  <td width="218"><input type="text" class="TextBox" name="txtAuthor" size="30" <?php echo $value; ?>>
 			  </td>
 			  <td width="81">Studiengang: </td>
-			  <td>
+			  <td width="130">
 			  	<select name="course" onChange="MM_jumpMenu('self',this,0)" class="TextBox">
 			  	<?php
 			  		$studiengaenge = new studiengang($conn);
@@ -351,7 +360,10 @@
 					}
 				?>
 			  	</select>
-			  	Sichtbar ab <input type="text" class="TextBox" name="datum" size="10" value="<?php if(isset($news_id) && $news_id != "") echo date('d.m.Y',strtotime(strftime($datum))); else echo date('d.m.Y'); ?>"></td>
+			  </td>
+			  <td width="81">Sichtbar ab:</td>
+			  <td>
+			  	<input type="text" class="TextBox" name="datum" size="10" value="<?php if(isset($news_id) && $news_id != "") echo date('d.m.Y',strtotime(strftime($datum))); else echo date('d.m.Y'); ?>">
 			  </td>
 		    </tr>
 			<tr>
@@ -369,7 +381,7 @@
 			   ?>
 			  <td><input type="text" class="TextBox" name="txtTitle" size="30" <?php echo $value; ?>></td>
 			  <td>Semester: </td>
-			  <td>
+			  <td width="130">
 			  	<select name="term" onChange="MM_jumpMenu('self',this,0)" class="TextBox">
 				<?php
 					echo '<option value="pinboard_entry.php?course_id='.$course_id.'&term_id=1" '.($term_id==1?'selected':'').'>1. Semester</option>';
@@ -383,6 +395,10 @@
 					echo '<option value="pinboard_entry.php?course_id='.$course_id.'&term_id=0" '.($term_id==0?'selected':'').'>Alle Semester</option>';
 				?>
 			  	</select>
+			  </td>
+			  <td width="81">Sichtbar bis:</td>
+			  <td>
+			  	<input type="text" class="TextBox" name="datum_bis" size="10" value="<?php if(isset($news_id) && $news_id != "" && $datum_bis!='') echo date('d.m.Y',strtotime(strftime($datum_bis))); else echo ''; ?>">
 			  </td>
 		    </tr>
 		</table>

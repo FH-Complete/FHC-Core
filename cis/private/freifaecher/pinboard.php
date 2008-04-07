@@ -31,7 +31,7 @@
 	function print_news($sql_conn)
 	{
 		$news_obj = new news($sql_conn);
-		$news_obj->getnews(MAXNEWSALTER,'0','0');
+		$news_obj->getnews(MAXNEWSALTER,'0','0', false, null, MAXNEWS);
 		$open=true;
 		$zaehler=0;
 		echo "<div id='news'>";
