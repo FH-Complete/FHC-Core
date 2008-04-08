@@ -38,7 +38,7 @@ if (!$conn_ext=mssql_connect (DB_SERVER, DB_USER, DB_PASSWD))
 mssql_select_db(DB_DB, $conn_ext);
 
 //letzte Nummer
-$sql_query="SELECT max(asco.employee.emp_no) AS last_keynr FROM asco.employee;";
+$sql_query="SELECT max(asco.employee.emp_id) AS last_keynr FROM asco.employee;";
 //echo $sql_query;
 if(!$result=mssql_query($sql_query,$conn_ext))
 	die(mssql_get_last_message().'<BR>'.$sql_query);
@@ -62,7 +62,7 @@ if($result_ext = mssql_query($qry,$conn_ext))
 	while($row=mssql_fetch_object($result_ext))
 	{
 		$sipass[$i][0]='';
-		$sipass[$i][1]=$row->emp_no;
+		$sipass[$i][1]=$row->emp_id;
 		$sipass[$i][2]=$row->last_name;
 		$sipass[$i][3]=$row->first_name;
 		$sipass[$i][4]=$row->card_no;
@@ -99,7 +99,8 @@ if($result_ext = mssql_query($qry,$conn_ext))
 //mehrfach vergebene karten
 $qry="SELECT bmp.person_id as person2, bmp.nachname as nachname2,bmp.nummer as nummer2, bmp.vorname as vorname2,
 		public.vw_betriebsmittelperson.person_id AS person1, public.vw_betriebsmittelperson.nachname as nachname1, public.vw_betriebsmittelperson.nummer as nummer1, 
-		public.vw_betriebsmittelperson.vorname as vorname1, public.vw_betriebsmittelperson.gebdatum as gebdatum1, public.vw_betriebsmittelperson.* FROM public.vw_betriebsmittelperson bmp 
+		public.vw_betriebsmittelperson.vorname as vorname1, public.vw_betriebsmittelperson.gebdatum as gebdatum1, public.vw_betriebsmittelperson.* 
+	 FROM public.vw_betriebsmittelperson bmp 
 	 JOIN public.vw_betriebsmittelperson ON (bmp.nummer=public.vw_betriebsmittelperson.nummer) 
 	 WHERE (trim(bmp.nachname)!=trim(public.vw_betriebsmittelperson.nachname) OR (trim(bmp.vorname)!=trim(public.vw_betriebsmittelperson.vorname))) 
 	 AND public.vw_betriebsmittelperson.betriebsmitteltyp='Zutrittskarte' AND bmp.betriebsmitteltyp='Zutrittskarte'
@@ -226,8 +227,8 @@ if($result = pg_query($conn, $qry))
 				{
 					$sipass[$j][9]=trim($row->kurzbzlang);
 				}
-				$i++;
 				$key_nummer++;
+				$i++;
 			}
 		}
 	}
