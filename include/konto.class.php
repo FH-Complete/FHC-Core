@@ -347,6 +347,7 @@ class konto
 			$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
 			return false;
 		}
+		
 		if($studiengang_kz!='')
 			$stgwhere = " AND tbl_konto.studiengang_kz='$studiengang_kz' ";
 		else 
@@ -357,7 +358,7 @@ class konto
 			//Alle Buchungen und 'darunterliegende' holen die noch offen sind
 			$qry = "SELECT tbl_konto.*, anrede, titelpost, titelpre, nachname, vorname, vornamen
 					FROM public.tbl_konto JOIN public.tbl_person USING (person_id)
-					WHERE buchungsnr in (SELECT buchungsnr FROM public.tbl_konto as konto_a WHERE
+					WHERE (buchungsnr in (SELECT buchungsnr FROM public.tbl_konto as konto_a WHERE
 									(betrag + (SELECT CASE WHEN sum(betrag) is null THEN 0
 											            ELSE sum(betrag) END
 										         FROM public.tbl_konto WHERE buchungsnr_verweis=konto_a.buchungsnr))<>0
@@ -366,13 +367,13 @@ class konto
 									(betrag + (SELECT CASE WHEN sum(betrag) is null THEN 0
 														ELSE sum(betrag) END
 												 FROM public.tbl_konto WHERE buchungsnr_verweis=konto_a.buchungsnr))<>0
-									AND person_id='$person_id') $stgwhere ORDER BY buchungsdatum";
+									AND person_id='$person_id')) $stgwhere ORDER BY buchungsdatum";
 		}
 		else
 			$qry = "SELECT tbl_konto.*, anrede, titelpost, titelpre, nachname, vorname, vornamen
 					FROM public.tbl_konto JOIN public.tbl_person USING (person_id)
 					WHERE person_id='".$person_id."' $stgwhere ORDER BY buchungsdatum";
-		
+		//echo $qry;
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))

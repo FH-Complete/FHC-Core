@@ -92,7 +92,7 @@
 			$errorstr .= $sg_update->errormsg;
 		}
 		$reloadstr .= "<script type='text/javascript'>\n";
-		$reloadstr .= "	parent.uebersicht.location.href='raum_uebersicht.php';";
+		$reloadstr .= "	parent.uebersicht_raum.location.href='raum_uebersicht.php';";
 		$reloadstr .= "</script>\n";
 	}
 

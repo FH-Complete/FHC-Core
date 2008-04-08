@@ -63,7 +63,7 @@ foreach ($sg->result as $twraum)
 {
     //$htmlstr .= "   <tr class='liste". ($i%2) ."'>\n";
 	$htmlstr .= "   <tr>\n";
-	$htmlstr .= "       <td><a href='raum_details.php?ort_kurzbz=".$twraum->ort_kurzbz."' target='detail'>".$twraum->ort_kurzbz."</a></td>\n";
+	$htmlstr .= "       <td><a href='raum_details.php?ort_kurzbz=".$twraum->ort_kurzbz."' target='detail_raum'>".$twraum->ort_kurzbz."</a></td>\n";
 	$htmlstr .= "       <td>".$twraum->bezeichnung."</td>\n";
 	$htmlstr .= "       <td>".$twraum->planbezeichnung."</td>\n";
 	$htmlstr .= "       <td>".$twraum->max_person."</td>\n";
