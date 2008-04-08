@@ -47,7 +47,7 @@ if ($row=mssql_fetch_object($result))
 else
 	die('Letzte Nummer konnte nicht eruiert werden!');
 	
-//einlesen der daten von sipass
+//einlesen der custom. daten von sipass
 $qry="SELECT * FROM asco.employee_custom_data";
 if($result = mssql_query($qry,$conn_ext))
 {
