@@ -19,12 +19,12 @@ $i=0;
 $key_nummer=0;
 $update=false;
 $custom=array(array());
+$doppelte=array();
 $error=false;
 
 if (!$conn=pg_pconnect(CONN_STRING))
 	die(pg_last_error($conn));
 	
-
 define("DB_SERVER","192.168.101.230:1433");
 define("DB_USER","sa");
 define("DB_PASSWD","P1ss0ff");
@@ -37,7 +37,7 @@ mssql_select_db(DB_DB, $conn_ext);
 
 
 //letzte Nummer
-$sql_query="SELECT max(asco.cardholder.cardholder_id) AS last_keynr FROM asco.cardholder;";
+$sql_query="SELECT max(asco.employee.emp_no) AS last_keynr FROM asco.employee;";
 //echo $sql_query;
 if(!$result=mssql_query($sql_query,$conn_ext))
 	die(mssql_get_last_message().'<BR>'.$sql_query);
@@ -113,7 +113,7 @@ if($result = pg_query($conn, $qry))
 		$error=true;
 	}
 }
-if($error) die("");
+//if($error) die("");
 
 $qry="SELECT DISTINCT ON (person_id, nummer) nachname as LastName, vorname as FirstName,nummer as CardNumber, matrikelnr, uid, kurzbzlang, personalnummer, lektor, 
 		EXTRACT(DAY FROM vw_betriebsmittelperson.insertamum) AS tag,
