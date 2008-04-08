@@ -16,11 +16,13 @@ require_once('../../../../include/Excel/Validator.php');*/
 
 $sipass=array(array());
 $i=0;
+$k=0;
 $key_nummer=0;
 $update=false;
 $custom=array(array());
 $doppelte=array();
 $error=false;
+$fausgabe='';
 
 if (!$conn=pg_pconnect(CONN_STRING))
 	die(pg_last_error($conn));
@@ -34,7 +36,6 @@ define("DB_DB","asco4");
 if (!$conn_ext=mssql_connect (DB_SERVER, DB_USER, DB_PASSWD))
 	die('Fehler beim Verbindungsaufbau!');
 mssql_select_db(DB_DB, $conn_ext);
-
 
 //letzte Nummer
 $sql_query="SELECT max(asco.employee.emp_no) AS last_keynr FROM asco.employee;";
@@ -95,7 +96,7 @@ if($result_ext = mssql_query($qry,$conn_ext))
 	}
 }
 
-//
+//mehrfach vergebene karten
 $qry="SELECT bmp.person_id as person2, bmp.nachname as nachname2,bmp.nummer as nummer2, bmp.vorname as vorname2,
 		public.vw_betriebsmittelperson.person_id AS person1, public.vw_betriebsmittelperson.nachname as nachname1, public.vw_betriebsmittelperson.nummer as nummer1, 
 		public.vw_betriebsmittelperson.vorname as vorname1, public.vw_betriebsmittelperson.gebdatum as gebdatum1, public.vw_betriebsmittelperson.* FROM public.vw_betriebsmittelperson bmp 
@@ -109,11 +110,14 @@ if($result = pg_query($conn, $qry))
 {
 	while($row=pg_fetch_object($result))
 	{
-		echo "<br>".$row->person2.", ".$row->nachname2.", ".$row->vorname2.", ".$row->nummer2.", ".$row->person1.", ".$row->nachname1.", ".$row->vorname1.", ".$row->nummer1;
-		$error=true;
+		//echo "<br>".$row->person2.", ".$row->nachname2.", ".$row->vorname2.", ".$row->nummer2.", ".$row->person1.", ".$row->nachname1.", ".$row->vorname1.", ".$row->nummer1;
+		//$error=true;
+		$doppelte[$k]=$row->nummer1;
+		$fausgabe.="\n".$row->nummer1.", ";
+		$k++;
 	}
 }
-//if($error) die("");
+
 
 $qry="SELECT DISTINCT ON (person_id, nummer) nachname as LastName, vorname as FirstName,nummer as CardNumber, matrikelnr, uid, kurzbzlang, personalnummer, lektor, 
 		EXTRACT(DAY FROM vw_betriebsmittelperson.insertamum) AS tag,
@@ -130,6 +134,11 @@ if($result = pg_query($conn, $qry))
 	while($row=pg_fetch_object($result))
 	{
 		$update=false;
+		//doppelte ueberspringen
+		if(in_array($row->cardnumber,$doppelte))
+		{
+			continue;
+		}
 		for($j=0;$j<$i;$j++)
 		{
 			//überprüfen, ob bereits vorhanden
@@ -253,6 +262,8 @@ header("Content-Type: text/plain");
 header("Content-Disposition: attachment; filename=\"SiPassZutrittskartenUpdate". "_" . date("d_m_Y") . ".txt\"");
 echo $ausdruck;
 
+mail('ruhan@technikum-wien.at', 'Mehrfach eingetragenen Zutrittskarten', "<html><body>".$fausgabe."</body></html>",
+	"From: vilesci@technikum-wien.at\nX-Mailer: PHP 5.x\nContent-type: text/html; charset=utf-8");
 
 /*
 //------------ Excel init --------------------------
