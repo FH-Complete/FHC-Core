@@ -26,8 +26,8 @@
 	    {
 	        //$htmlstr .= "   <tr class='liste". ($i%2) ."'>\n";
 			$htmlstr .= "   <tr>\n";
-	        $htmlstr .= "       <td><a href='firma_details.php?firma_id=".$row->firma_id."' target='detail'>".$row->firma_id."</a></td>\n";
-			$htmlstr .= "       <td><a href='firma_details.php?firma_id=".$row->firma_id."' target='detail'>".$row->name."</a></td>\n";
+	        $htmlstr .= "       <td><a href='firma_details.php?firma_id=".$row->firma_id."' target='detail_firma'>".$row->firma_id."</a></td>\n";
+			$htmlstr .= "       <td><a href='firma_details.php?firma_id=".$row->firma_id."' target='detail_firma'>".$row->name."</a></td>\n";
 	        $htmlstr .= "       <td>$row->adresse</td>\n";
 	        $htmlstr .= "       <td>$row->email</td>\n";
 	        $htmlstr .= "       <td>$row->telefon</td>\n";
@@ -62,7 +62,7 @@
 	echo '<table width="100%"><tr><td>';
 	echo '<h3>Übersicht</h3>';
 	echo '</td><td align="right">';
-	echo "<input type='button' onclick='parent.detail.location=\"firma_details.php?neu=true\"' value='Neue Firma anlegen'/>";
+	echo "<input type='button' onclick='parent.detail_firma.location=\"firma_details.php?neu=true\"' value='Neue Firma anlegen'/>";
 	echo '</td></tr></table><br />';
 	
 	echo $htmlstr;

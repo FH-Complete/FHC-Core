@@ -32,7 +32,7 @@
         $htmlstr .= "       <td>".$stg->kurzbz."</td>\n";
         $htmlstr .= "       <td>".$stg->kurzbzlang."</td>\n";
 		$htmlstr .= "       <td>".$stg->typ."</td>\n";
-        $htmlstr .= "       <td><a href='studiengang_details.php?studiengang_kz=".$stg->studiengang_kz."' target='detail'>".$stg->bezeichnung."</a></td>\n";
+        $htmlstr .= "       <td><a href='studiengang_details.php?studiengang_kz=".$stg->studiengang_kz."' target='detail_studiengang'>".$stg->bezeichnung."</a></td>\n";
 		
 		if($stg->aktiv=='t')
 			$aktivbild = "true.gif";	

@@ -52,7 +52,7 @@ function convdate($date)
 
 function checkfilter($row, $filter2)
 {
-	global $conn, $studiensemester_kurzbz;
+	global $conn, $studiensemester_kurzbz, $kontofilterstg;
 
 	if($filter2=='dokumente')
 	{
@@ -70,6 +70,9 @@ function checkfilter($row, $filter2)
 	{
 		// Alle Personen die offene Buchungen haben
 		$qry = "SELECT sum(betrag) as summe FROM tbl_konto WHERE person_id='$row->person_id'";
+		if($kontofilterstg=='true')
+			$qry.=" AND studiengang_kz='$row->studiengang_kz'";
+		//echo $qry;
 		if($result_filter = pg_query($conn, $qry))
 			if($row_filter = pg_fetch_object($result_filter))
 				if($row_filter->summe=='0.00' || $row_filter->summe=='' || $row_filter->summe=='0')

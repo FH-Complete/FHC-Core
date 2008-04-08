@@ -99,6 +99,7 @@ if(isset($_SERVER['REMOTE_USER']))
 	if($kontofilterstg=='false')
 		$studiengang_kz='';
 }
+
 if($person_id!='')
 {
 	$konto->getBuchungen($person_id, $filter, $studiengang_kz);
