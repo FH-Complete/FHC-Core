@@ -101,6 +101,8 @@ if($prestudent_id!='')
 							<menuitem value="Interessent" label="Interessent"/>
 							<menuitem value="Bewerber" label="Bewerber"/>
 							<menuitem value="Student" label="Student"/>
+							<menuitem value="Unterbrecher" label="Unterbrecher"/>
+							<menuitem value="Diplomand" label="Diplomand"/>
 						</menupopup>
 					</menulist>
 				</row>

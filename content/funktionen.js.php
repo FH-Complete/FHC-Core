@@ -274,6 +274,8 @@ function FunktionDetailSpeichern()
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 		FunktionenSelectID=val.dbdml_data;
 		FunktionenTreeDatasource.Refresh(false);
+		document.getElementById('funktion-checkbox-neu').checked=false;
+		document.getElementById('funktion-textbox-benutzerfunktion_id').value=FunktionenSelectID;
 		return true;
 	}
 }

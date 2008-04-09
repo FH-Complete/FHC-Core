@@ -29,7 +29,7 @@ class ort
 	var $conn;   			// @var resource DB-Handle
 	var $new;     			// @var boolean
 	var $errormsg; 			// @var string
-	var $result = array(); 	// @var fachbereich Objekt
+	var $result = array(); 	// @var ort Objekt
 
 	//Tabellenspalten
 	var $ort_kurzbz;		// @var string
@@ -289,6 +289,98 @@ class ort
 		else
 		{
 			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
+			return false;
+		}
+	}
+	
+	// ****
+	// * Sucht nach freien Raeumen
+	// * @param datum    ... Datum fuer das der Raum gesucht wird
+	// *        zeit_von ... Zeit ab wann soll der Raum frei sein
+	// *        zeit_bis ... Zeit bis wann soll der Raum frei sein
+	// *        raumtyp  ... Art des Raumes (optional)
+	// *        anzpersonen ... Anzahl der Personen die mindestens Platz haben sollen (optional)
+	// *        reservierung ... true wenn nur Raeume aufscheinen sollen die auch Reservierbar sind
+	// *        db_table ... Stundenplantabelle die geprueft werden soll
+	// * @return true wenn ok, false im Fehlerfall
+	// ****
+	function search($datum, $zeit_von, $zeit_bis, $raumtyp=null, $anzpersonen=null, $reservierung=true, $db_table='stundenplandev')
+	{
+		$stundevon = 1;
+		$stundebis = 1;
+		
+		//stundevon ermitteln
+		$qry = "SELECT stunde FROM (
+				SELECT stunde, extract(epoch from (beginn-('$zeit_von'::time))) AS delta FROM lehre.tbl_stunde
+				UNION
+				SELECT stunde, extract(epoch from (ende-('$zeit_von'::time))) AS delta FROM lehre.tbl_stunde
+				) foo WHERE delta>=0 ORDER BY delta LIMIT 1;";
+		
+		if($result = pg_query($this->conn, $qry))
+			if($row = pg_fetch_object($result))
+				$stundevon = $row->stunde;
+
+		//stundebis ermitteln
+		$qry = "SELECT stunde FROM (
+				SELECT stunde, extract(epoch from (beginn-('$zeit_bis'::time))) AS delta FROM lehre.tbl_stunde
+				UNION
+				SELECT stunde, extract(epoch from (ende-('$zeit_bis'::time))) AS delta FROM lehre.tbl_stunde
+				) foo WHERE delta>=0 ORDER BY delta LIMIT 1;";
+		
+		if($result = pg_query($this->conn, $qry))
+			if($row = pg_fetch_object($result))
+				$stundebis = $row->stunde;
+		
+		//Freie Raeume suchen
+		$qry = "SELECT 
+			DISTINCT tbl_ort.* 
+		FROM 
+			public.tbl_ort JOIN public.tbl_ortraumtyp USING(ort_kurzbz) 
+		WHERE 
+			aktiv AND ort_kurzbz NOT LIKE '\\\\_%'";
+		if($reservierung)
+			$qry.=" AND reservieren";
+		if($raumtyp!=null)
+			$qry.=" AND raumtyp_kurzbz='$raumtyp'";
+		if($anzpersonen!=null)
+			$qry.=" AND (max_person>='$anzpersonen' OR max_person is null)";
+		 
+		$qry.="	AND ort_kurzbz NOT IN 
+			(
+				SELECT ort_kurzbz FROM lehre.tbl_$db_table WHERE datum='$datum' AND stunde>='$stundevon' AND stunde<='$stundebis'
+				UNION
+				SELECT ort_kurzbz FROM campus.tbl_reservierung WHERE datum='$datum' AND stunde>='$stundevon' AND stunde<='$stundebis'
+			)
+		";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$ort_obj = new ort($this->conn);
+	
+				$ort_obj->ort_kurzbz 		= $row->ort_kurzbz;
+				$ort_obj->bezeichnung 		= $row->bezeichnung;
+				$ort_obj->planbezeichnung 	= $row->planbezeichnung;
+				$ort_obj->max_person 		= $row->max_person;
+				$ort_obj->aktiv 			= ($row->aktiv=='t'?true:false);
+				$ort_obj->lehre 			= ($row->lehre=='t'?true:false);
+				$ort_obj->lageplan 			= $row->lageplan;
+				$ort_obj->dislozierung 		= $row->dislozierung;
+				$ort_obj->kosten 			= $row->kosten;
+				$ort_obj->reservieren		= ($row->reservieren=='t'?true:false);
+				$ort_obj->ausstattung		= $row->ausstattung;
+				$ort_obj->stockwerk			= $row->stockwerk;
+				$ort_obj->standort_kurzbz	= $row->standort_kurzbz;
+				$ort_obj->telefonklappe		= $row->telefonklappe;
+	
+				$this->result[] = $ort_obj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Ermitteln eines Raumes';
 			return false;
 		}
 	}
