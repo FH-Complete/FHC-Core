@@ -203,6 +203,11 @@ function draw_content($row)
 		$prestudent->getLastStatus($row->prestudent_id);
 		$status = $prestudent->rolle_kurzbz;
 		$orgform = $prestudent->orgform_kurzbz;
+		
+		if($status=='Aufgenommener' || $status=='Bewerber' || $status=='Wartender')
+			$semester_prestudent = $prestudent->ausbildungssemester;
+		else 
+			$semester_prestudent = '';
 	echo '
 	  <RDF:li>
       	<RDF:Description  id="'.$row->prestudent_id.'"  about="'.$rdf_url.'/'.$row->prestudent_id.'" >
@@ -236,7 +241,7 @@ function draw_content($row)
     		<STUDENT:uid><![CDATA['.(isset($row->uid)?$row->uid:'').']]></STUDENT:uid>
     		<STUDENT:matrikelnummer><![CDATA['.(isset($row->matrikelnr)?$row->matrikelnr:'').']]></STUDENT:matrikelnummer>
 			<STUDENT:alias><![CDATA['.(isset($row->alias)?$row->alias:'').']]></STUDENT:alias>
-    		<STUDENT:semester><![CDATA['.(isset($row->semester)?$row->semester:'').']]></STUDENT:semester>
+    		<STUDENT:semester><![CDATA['.(isset($row->semester)?$row->semester:$semester_prestudent).']]></STUDENT:semester>
     		<STUDENT:verband><![CDATA['.(isset($row->verband)?$row->verband:'').']]></STUDENT:verband>
     		<STUDENT:gruppe><![CDATA['.(isset($row->gruppe)?$row->gruppe:'').']]></STUDENT:gruppe>
 			<STUDENT:studiengang_kz_student><![CDATA['.(is_a($row,'student')?$row->studiengang_kz:'').']]></STUDENT:studiengang_kz_student>';

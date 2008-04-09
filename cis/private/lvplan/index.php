@@ -98,6 +98,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 			</select>
 			(Saalreservierung)<BR><BR>
 			<A class="Item" href="stpl_reserve_list.php">Reservierungsliste</A> (Reservierungen l&ouml;schen)<BR>
+			<A class="Item" href="raumsuche.php">Raumsuche</A><BR>
 			</td>
 
 			<td>
