@@ -19,7 +19,13 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-
+/*
+ * - Dieses Script versendet automatisch Mails an Accounts die Deaktiviert wurden.
+ *   und informiert die Benutzer ueber die Folgen der Deaktivierung
+ *
+ * - Accounts die laenger als 3 Tage deaktiviert sind, werden per Mail an die 
+ *   Bibliothek gemeldet.
+ */
 require_once('../vilesci/config.inc.php');
 
 if(!$conn = pg_pconnect(CONN_STRING))
@@ -36,6 +42,32 @@ echo '
 		<body class="Background_main">
 		<h2>Check</h2>';
 $text='';
+
+//Information an Bibliothek wenn ein Account deaktiviert wurde
+$qry = "SELECT uid, (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=uid) as mitarbeiter, titelpre, vorname, nachname, titelpost FROM public.tbl_benutzer JOIN public.tbl_person USING(person_id) WHERE tbl_benutzer.aktiv=false AND updateaktivam=CURRENT_DATE- interval '3 days'";
+
+if($result = pg_query($conn, $qry))
+{
+	if(pg_num_rows($result)>0)
+	{
+		$message = "Dies ist eine automatische Mail!\n";
+		$message .= "Folgende Studenten/Mitarbeiter wurden im FAS deaktiviert: \n\n";
+		while($row = pg_fetch_object($result))
+		{
+			$message .= " - $row->titelpre $row->vorname $row->nachname $row->titelpost ( $row->uid )\n";
+		}
+		
+		$message .= "\nMit freundlichen Grüßen,\n";
+		$message .= "FACHHOCHSCHULE TECHNIKUM WIEN\n";
+		$message .= "Höchstädtplatz 5\n";
+		$message .= "A-1200 Wien \n";
+			
+		$to = 'oesi@technikum-wien.at';
+		//$to = 'bibliothek@'.DOMAIN;
+		mail($to,'Account Deaktivierung ', $message, 'From: vilesci@'.DOMAIN);
+		$text.= "Warnung fuer Bibliothek wurde an $to verschickt\n";
+	}
+}
 
 //Alle die vor einer Woche inaktiv gesetzt wurden darueber informieren
 $qry = "SELECT uid, (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=uid) as mitarbeiter FROM public.tbl_benutzer WHERE aktiv=false AND updateaktivam=CURRENT_DATE- interval '1 week'";

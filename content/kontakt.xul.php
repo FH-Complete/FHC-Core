@@ -78,7 +78,7 @@ else
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/adresse/rdf#ort" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
-					<treecol id="kontakt-adressen-treecol-gemeinde" label="Gemeinde" flex="1" hidden="true"
+					<treecol id="kontakt-adressen-treecol-gemeinde" label="Gemeinde" flex="1" hidden="false"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/adresse/rdf#gemeinde" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
@@ -86,7 +86,7 @@ else
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/adresse/rdf#nation" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
-					<treecol id="kontakt-adressen-treecol-heimatadresse" label="Heimatadresse" flex="1" hidden="true"
+					<treecol id="kontakt-adressen-treecol-heimatadresse" label="Heimatadresse" flex="1" hidden="false"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/adresse/rdf#heimatadresse" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
