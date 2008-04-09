@@ -253,7 +253,7 @@ class person
 				{
 					if($row->person_id!=$this->person_id)
 					{
-						$this->errormsg = 'Es existiert bereits eine Person mit dieser SVNR';
+						$this->errormsg = 'Es existiert bereits eine Person mit dieser SVNR! Daten wurden NICHT gepeichert.';
 						return false;
 					}
 				}
