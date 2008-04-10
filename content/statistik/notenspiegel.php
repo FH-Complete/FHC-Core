@@ -79,6 +79,15 @@ $qry = "SELECT
 	        		vw_student_lehrveranstaltung.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz
 	        ) 
 	        AND studiengang_kz<>0
+	    UNION
+	    SELECT
+	    	lehrveranstaltung_id, bezeichnung, studiengang_kz, semester
+	    FROM
+	    	lehre.tbl_lehrveranstaltung JOIN lehre.tbl_zeugnisnote USING(lehrveranstaltung_id)
+	    WHERE
+	    	tbl_lehrveranstaltung.studiengang_kz='$studiengang_kz' AND
+	    	tbl_lehrveranstaltung.semester='$semester' AND
+	    	tbl_zeugnisnote.studiensemester_kurzbz='$semester_aktuell'
 		ORDER BY bezeichnung";
 //echo $qry;
 if(!$result_lva = pg_query($conn, $qry))
