@@ -53,7 +53,7 @@ $rechte->getBerechtigungen($user);
 <?php
 if(!$rechte->isBerechtigt('mitarbeiter') && !$rechte->isBerechtigt('admin'))
 	die('Sie haben nicht die erforderlichen Rechte zum Importieren der Personaldaten');
-	
+
 $anzahl_personen_gesamt=0;
 $anzahl_verwendungen_gesamt=0;
 $anzahl_funktionen_gesamt=0;
@@ -64,9 +64,9 @@ $anzahl_funktionen_insert=0;
 
 function getValue($obj)
 {
-	foreach ($obj as $row) 
+	foreach ($obj as $row)
 	{
-		return $row->nodeValue;	
+		return $row->nodeValue;
 	}
 }
 
@@ -76,20 +76,20 @@ if(isset($_POST['submitfile']))
 	{
 		$filename = $_FILES['datei']['tmp_name'];
 		//File oeffnen
-		
+
 		$doc = new DOMDocument;
 		if(!$doc->load($filename))
 			die('XML konnte nicht geladen werden');
-			
+
 		$personen = $doc->getElementsByTagName('Person');
-		
+
 		foreach ($personen as $person)
 		{
 			//Personalnummer ermitteln
 			$persnr = $person->getElementsByTagName('PersonalNummer');
 			$habilitation = $person->getElementsByTagName('Habilitation');
 			$personalnummer = (int)getValue($persnr);
-			
+
 			$anzahl_personen_gesamt++;
 			//Mitarbeiter mit dieser Personalnummer holen
 			$qry = "SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE personalnummer='$personalnummer'";
@@ -99,7 +99,7 @@ if(isset($_POST['submitfile']))
 				{
 					$mitarbeiter_uid = $row->mitarbeiter_uid;
 				}
-				else 
+				else
 				{
 					echo "<br>Mitarbeiter mit der Personalnummer $personalnummer wurde nicht gefunden.";
 					$anzahl_personen_failed++;
@@ -112,10 +112,10 @@ if(isset($_POST['submitfile']))
 				echo "<br>Fehlerhafte qry:".$qry;
 				continue;
 			}
-			
+
 			//Verwendungen durchgehen
 			$verwendungen = $person->getElementsByTagName('Verwendung');
-			
+
 			foreach ($verwendungen as $verwendung)
 			{
 				$beschart1 = getValue($verwendung->getElementsByTagName('BeschaeftigungsArt1'));
@@ -123,14 +123,14 @@ if(isset($_POST['submitfile']))
 				$ausmass = getValue($verwendung->getElementsByTagName('BeschaeftigungsAusmass'));
 				$verwendungscode = getValue($verwendung->getElementsByTagName('VerwendungsCode'));
 				$anzahl_verwendungen_gesamt++;
-				
+
 				//Verwendung in der Datenbank suchen
-				$qry = "SELECT bisverwendung_id FROM bis.tbl_bisverwendung 
-						WHERE 
-							ba1code='$beschart1' AND 
-							ba2code='$beschart2' AND 
-							beschausmasscode='$ausmass' AND 
-							verwendung_code='$verwendungscode' AND 
+				$qry = "SELECT bisverwendung_id FROM bis.tbl_bisverwendung
+						WHERE
+							ba1code='$beschart1' AND
+							ba2code='$beschart2' AND
+							beschausmasscode='$ausmass' AND
+							verwendung_code='$verwendungscode' AND
 							mitarbeiter_uid='$mitarbeiter_uid'
 						ORDER BY beginn DESC LIMIT 1";
 				if($result = pg_query($conn, $qry))
@@ -139,7 +139,7 @@ if(isset($_POST['submitfile']))
 					{
 						$bisverwendung_id = $row->bisverwendung_id;
 					}
-					else 
+					else
 					{
 						//Wenn eine verwendung vorhanden ist, dann ueberspringen
 						$qry = "SELECT count(*) as anzahl FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid='$mitarbeiter_uid'";
@@ -155,7 +155,7 @@ if(isset($_POST['submitfile']))
 								}
 							}
 						}
-						
+
 						//Wenn keine Verwendung vorhanden ist, dann diese anlegen
 						$bisverwendung = new bisverwendung($conn);
 						$bisverwendung->ba1code = $beschart1;
@@ -176,30 +176,30 @@ if(isset($_POST['submitfile']))
 						$bisverwendung->updatevon = 'bisimport';
 						$bisverwendung->insertamum = date('Y-m-d H:i:s');
 						$bisverwendung->insertvon = 'bisimport';
-						
+
 						if($bisverwendung->save(true))
 						{
-							echo "<br>$mitarbeiter_uid: BisVerwendung (ba1code: $beschart1, ba2code: $beschart2, ausmass: $ausmass, verwendungscode: $verwendungscode) wurde neu angelegt";	
+							echo "<br>$mitarbeiter_uid: BisVerwendung (ba1code: $beschart1, ba2code: $beschart2, ausmass: $ausmass, verwendungscode: $verwendungscode) wurde neu angelegt";
 							$bisverwendung_id = $bisverwendung->bisverwendung_id;
 						}
-						else 
+						else
 						{
 							echo "<br>$mitarbeiter_uid: BisVerwendung (ba1code: $beschart1, ba2code: $beschart2, ausmass: $ausmass, verwendungscode: $verwendungscode) konnte nicht angelegt werden: $bisverwendung->errormsg";
 							$anzahl_verwendungen_failed++;
 							continue;
-						}						
+						}
 					}
 				}
-				else 
+				else
 				{
 					$anzahl_verwendungen_failed++;
 					echo "<br>Fehlerhafte qry:".$qry;
 					continue;
 				}
-				
+
 				//Funktionen
 				$funktionen = $verwendung->getElementsByTagName('Funktion');
-				
+
 				foreach ($funktionen as $funktion)
 				{
 					$stgkz = (int)getValue($funktion->getElementsByTagName('StgKz'));
@@ -214,21 +214,21 @@ if(isset($_POST['submitfile']))
 						{
 							if($row->sws!=$sws)
 							{
-								$qry = "UPDATE bis.tbl_bisfunktion 
-										SET sws='$sws', updateamum=now(), updatevon='$user'										
+								$qry = "UPDATE bis.tbl_bisfunktion
+										SET sws='$sws', updateamum=now(), updatevon='$user'
 										WHERE bisverwendung_id='$bisverwendung_id' AND studiengang_kz='$stgkz'";
 								if(pg_query($conn, $qry))
 								{
 									echo "<br>$mitarbeiter_uid: SWS der  Funktion (id: $bisverwendung_id, stg: $stgkz) wurde von $row->sws auf $sws geaendert";
 								}
-								else 
+								else
 								{
 									$anzahl_funktionen_failed++;
 									echo "<br>Fehler bei qry:".$qry;
 								}
 							}
 						}
-						else 
+						else
 						{
 							$qry = "INSERT INTO bis.tbl_bisfunktion(bisverwendung_id, studiengang_kz, sws, updateamum, updatevon, insertamum, insertvon)
 									VALUES('$bisverwendung_id','$stgkz','$sws',null, null, now(),'$user');";
@@ -237,14 +237,14 @@ if(isset($_POST['submitfile']))
 								$anzahl_funktionen_insert++;
 								echo "<br>$mitarbeiter_uid: Neue Funktion wurde angelegt (id: $bisverwendung_id, stg: $stgkz, sws: $sws)";
 							}
-							else 
+							else
 							{
 								echo "<br>$mitarbeiter_uid: Fehler beim Anlegen der Funktion: $qry";
 								$anzahl_funktionen_failed++;
 							}
 						}
 					}
-					else 
+					else
 					{
 						$anzahl_funktionen_failed++;
 						echo "<br>Fehlerhafte qry:".$qry;
@@ -252,7 +252,7 @@ if(isset($_POST['submitfile']))
 				}
 			}
 		}
-		
+
 		echo '<br><br> ------------------- ';
 		echo "<br>Anzahl der Personen im XML-File: $anzahl_personen_gesamt";
 		echo "<br>Anzahl der Verwendungen im XML-File: $anzahl_verwendungen_gesamt";
@@ -261,10 +261,10 @@ if(isset($_POST['submitfile']))
 		echo "<br>Anzahl der Verwendungen die nicht gefunden wurden: $anzahl_verwendungen_failed";
 		echo "<br>Anzahl der Fehler bei Funktionen: $anzahl_funktionen_failed";
 		echo "<br>Anzahl der eingefuegten Funktionen: $anzahl_funktionen_insert";
-		
+
 	}
 }
-else 
+else
 {
 	//Formular zum Hochladen der XML Datei
 	echo "	<form method='POST' enctype='multipart/form-data' action='".$_SERVER['PHP_SELF']."'>

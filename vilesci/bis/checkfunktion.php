@@ -64,12 +64,12 @@ $stsemprevprev = $stsem->getBeforePrevious();
 
 echo "Generiere Funktionen für $stsemprevprev/$stsemprev<br>";
 
-$qry =  "SELECT tbl_lehreinheitmitarbeiter.mitarbeiter_uid, tbl_lehrveranstaltung.studiengang_kz, sum(tbl_lehreinheitmitarbeiter.semesterstunden) as semstd 
-		FROM lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung  
-		WHERE 
+$qry =  "SELECT tbl_lehreinheitmitarbeiter.mitarbeiter_uid, tbl_lehrveranstaltung.studiengang_kz, sum(tbl_lehreinheitmitarbeiter.semesterstunden) as semstd
+		FROM lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung
+		WHERE
 		tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 		tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
-		(studiensemester_kurzbz='$stsemprev' OR studiensemester_kurzbz='$stsemprevprev') AND 
+		(studiensemester_kurzbz='$stsemprev' OR studiensemester_kurzbz='$stsemprevprev') AND
 		bismelden=true AND tbl_lehreinheitmitarbeiter.semesterstunden>0 GROUP BY mitarbeiter_uid, studiengang_kz";
 
 if($result = pg_query($conn, $qry))
@@ -91,42 +91,42 @@ if($result = pg_query($conn, $qry))
 					$person_error = true;
 					$verwendung_not_found++;
 				}
-				else 
+				else
 				{
 					if($row_verw = pg_fetch_object($result_verw))
 						$verwendung_id = $row_verw->bisverwendung_id;
-					else 
+					else
 					{
 						echo "<br>Fehler beim Holen der Verwendung von $row->mitarbeiter_uid";
 						$person_error = true;
 					}
 				}
-				
+
 				if(pg_num_rows($result_verw)>1)
 				{
 					echo "<br>Es wurde mehr als eine Verwendung bei $row->mitarbeiter_uid gefunden - es wird die Verwendung $verwendung_id verwendet";
 					$verwendung_multiple++;
 				}
 			}
-			else 
+			else
 			{
 				echo "<br>Fehler beim Ermitteln der Verwendung ".pg_last_error($conn);
 				$person_error = true;
 			}
 		}
-		
+
 		if(!$person_error)
 		{
 			//SWS berechnen
 			$swsneu = round($row->semstd/$wochen, 2);
-			
+
 			//Funktion fuer diesen Studiengang suchen
 			$bisfunktion = new bisfunktion($conn);
-			
+
 			if($bisfunktion->load($verwendung_id, $row->studiengang_kz))
 			{
 				$bisfunktion->new = false;
-								
+
 				if($bisfunktion->sws!=$swsneu)
 				{
 					echo "<br>$row->mitarbeiter_uid: Funktion bei Studiengang ".$stg_arr[$row->studiengang_kz]." ($row->studiengang_kz) wird von $bisfunktion->sws auf $swsneu geaendert";
@@ -134,7 +134,7 @@ if($result = pg_query($conn, $qry))
 					$funktion_geaendert++;
 				}
 			}
-			else 
+			else
 			{
 				$bisfunktion->insertamum = date('Y-m-d H:i:s');
 				$bisfunktion->insertvon = $user;
@@ -146,46 +146,46 @@ if($result = pg_query($conn, $qry))
 			}
 			$bisfunktion->updateamum = date('Y-m-d H:i:s');
 			$bisfunktion->updatevon = $user;
-			
+
 			if(!$bisfunktion->save())
 			{
 				echo "<br>$row->mitarbeiter_uid: Fehler beim Anlegen der Funktion ".$bisfunktion->errormsg;
 				if($bisfunktion->new)
 					$funktion_hinzugefuegt--;
-				else 
+				else
 					$funktion_geaendert--;
 				$funktion_error++;
 			}
 		}
 	}
-	
+
 	echo '<br><br>';
 	echo '<b>Check fuer nicht benoetigte Funktionen</b>';
-	$qry = "SELECT * FROM bis.tbl_bisfunktion JOIN bis.tbl_bisverwendung USING(bisverwendung_id) 
+	$qry = "SELECT * FROM bis.tbl_bisfunktion JOIN bis.tbl_bisverwendung USING(bisverwendung_id)
 			WHERE (mitarbeiter_uid, studiengang_kz) NOT IN (
-				SELECT mitarbeiter_uid, studiengang_kz 
-				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter 
-				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND 
-				tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND 
-				(tbl_lehreinheit.studiensemester_kurzbz='$stsemprev' OR tbl_lehreinheit.studiensemester_kurzbz='$stsemprevprev')) 
+				SELECT mitarbeiter_uid, studiengang_kz
+				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter
+				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
+				tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
+				(tbl_lehreinheit.studiensemester_kurzbz='$stsemprev' OR tbl_lehreinheit.studiensemester_kurzbz='$stsemprevprev'))
 				AND (ende>'$lastbismeldung' OR ende is null)
 			ORDER BY mitarbeiter_uid, studiengang_kz";
 	if($result = pg_query($conn, $qry))
 	{
 		$funktion_ohne_lehrauftrag = pg_num_rows($result);
-		
+
 		while($row = pg_fetch_object($result))
 		{
 			echo "<br><b>$row->mitarbeiter_uid</b> hat im Studiengang ".$stg_arr[$row->studiengang_kz]." ($row->studiengang_kz) eine Funktion ohne Lehrauftrag";
 		}
 	}
-	echo "Loeschen der Funktionen mit: DELETE FROM bis.tbl_bisfunktion where (studiengang_kz, bisverwendung_id) in (SELECT studiengang_kz, bisverwendung_id FROM bis.tbl_bisfunktion JOIN bis.tbl_bisverwendung USING(bisverwendung_id) 
+	echo "Loeschen der Funktionen mit: DELETE FROM bis.tbl_bisfunktion where (studiengang_kz, bisverwendung_id) in (SELECT studiengang_kz, bisverwendung_id FROM bis.tbl_bisfunktion JOIN bis.tbl_bisverwendung USING(bisverwendung_id)
 			WHERE (mitarbeiter_uid, studiengang_kz) NOT IN (
-				SELECT mitarbeiter_uid, studiengang_kz 
-				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter 
-				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND 
-				tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND 
-				(tbl_lehreinheit.studiensemester_kurzbz='$stsemprevprev' OR tbl_lehreinheit.studiensemester_kurzbz='$stsemprev')) 
+				SELECT mitarbeiter_uid, studiengang_kz
+				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter
+				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
+				tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
+				(tbl_lehreinheit.studiensemester_kurzbz='$stsemprevprev' OR tbl_lehreinheit.studiensemester_kurzbz='$stsemprev'))
 				AND (ende>'2006-11-15' OR ende is null))";
 	echo '<br><br>';
 	echo '<h3>Uebersicht</h3>';
