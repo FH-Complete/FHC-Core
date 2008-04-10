@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -75,7 +75,7 @@ $menu=array
 	(
 		'name'=>'Personen', 'opener'=>'true', 'hide'=>'true',
 		'Suche'=>array('name'=>'Suche', 'link'=>'personen/suche.php', 'target'=>'main'),
-		'Personen zusammenlegen'=>array('name'=>'Personen zusammenlegen', 'link'=>'stammdaten/personen_wartung.php', 'target'=>'main'),
+		'Zusammenlegen'=>array('name'=>'Zusammenlegen', 'link'=>'stammdaten/personen_wartung.php', 'target'=>'main'),
 		'Gruppen'=>array
 		(
 			'name'=>'Gruppen',

@@ -211,10 +211,10 @@ if($result = pg_query($conn, $qry))
 					{
 						$error_log.=", Hauptberuf ('".$rowvw->hauptberufcode."')";
 					}
-					else 
+					else
 					{
 						$error_log="Hauptberuf ('".$rowvw->hauptberufcode."')";
-					} 
+					}
 				}
 				if($rowvw->ba1code==3)
 				{

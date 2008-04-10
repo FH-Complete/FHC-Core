@@ -40,7 +40,7 @@ function generateUID($stgkzl,$jahr, $stgtyp, $matrikelnummer)
 		$nr = $nr+500;
 	elseif($art=='0' && $stgtyp=='m') //Incoming im Masterstudiengang
 		$nr = $nr+500;
-		
+
 
 	return $stgkzl.$jahr.($art!='0'?$stgtyp:'x').$nr;
 }
@@ -51,7 +51,7 @@ function generateUID($stgkzl,$jahr, $stgtyp, $matrikelnummer)
 function generateMitarbeiterUID($conn, $vorname, $nachname, $lektor)
 {
 	$bn = new benutzer($conn);
-	
+
 	for($nn=8,$vn=0;$nn!=0;$nn--,$vn++)
 	{
 		$uid = substr($nachname,0,$nn);
