@@ -165,6 +165,7 @@ echo "<table class='liste table-autosort:0 table-stripeclass:alternate table-aut
 echo "<th class='table-sortable:default'>Student</th>
 	  <th class='table-sortable:default'>Typ</th>
 	  <th class='table-sortable:default'>Titel</th>
+	  <th class='table-sortable:default'>Themenbereich</th>
 	  <th class='table-sortable:default'>Betreuer</th>
 	  <th class='table-sortable:default'>Beginn</th>
 	  <th class='table-sortable:default'>Ende</th>
@@ -180,15 +181,23 @@ foreach ($projekt->result as $row)
 	$student->load($row->student_uid);
 	echo "<td nowrap>$student->nachname $student->vorname $student->titelpre $student->titelpost</td>";
 	echo "<td>$row->projekttyp_kurzbz</td>";
-	echo "<td>$row->titel</td>";
+	echo "<td>$row->titel".($row->titel_english!=''?'<br>'.$row->titel_english:'')."</td>";
+	echo "<td>$row->themenbereich</td>";
 	
 	echo '<td nowrap>';
-	$qry = "SELECT distinct vorname, nachname, titelpre, titelpost FROM public.tbl_person JOIN lehre.tbl_projektbetreuer USING(person_id) WHERE projektarbeit_id='".$row->projektarbeit_id."'";
+	$qry = "SELECT distinct vorname, nachname, titelpre, titelpost, (SELECT uid FROM public.tbl_benutzer JOIN public.tbl_mitarbeiter on(uid=mitarbeiter_uid) WHERE person_id=tbl_person.person_id LIMIT 1) as uid, betreuerart_kurzbz FROM public.tbl_person JOIN lehre.tbl_projektbetreuer USING(person_id) WHERE projektarbeit_id='".$row->projektarbeit_id."'";
 	if($result_betreuer = pg_query($conn, $qry))
 	{
 		while($row_betreuer = pg_fetch_object($result_betreuer))
 		{
-			echo trim($row_betreuer->titelpre.' '.$row_betreuer->vorname.' '.$row_betreuer->nachname.' '.$row_betreuer->titelpost);
+			if($row_betreuer->uid!='')
+				echo "<a href='mailto:$row_betreuer->uid@".DOMAIN."' class='Item'>";
+				
+			echo trim($row_betreuer->titelpre.' '.$row_betreuer->vorname.' '.$row_betreuer->nachname.' '.$row_betreuer->titelpost).' ('.$row_betreuer->betreuerart_kurzbz.')';
+			
+			if($row_betreuer->uid!='')
+				echo '</a>';
+			
 			echo '<br>';
 		}
 	}

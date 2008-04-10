@@ -361,15 +361,15 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					</row>
 			    	<row>
     					<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden" value="Semesterstunden: "/>
-    					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden" disabled="true" maxlength="6" flex="1" oninput="LeMitarbeiterValueChanged(); if(parseInt(this.value)) document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-planstunden').value= parseInt(this.value)"/>
+    					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden" disabled="true" maxlength="6" flex="1" oninput="LeMitarbeiterValueChanged();LeMitarbeiterGesamtkosten(); if(parseInt(this.value)) document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-planstunden').value= parseInt(this.value)"/>
     					<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-planstunden" value="Planstunden: "/>
     					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-planstunden" disabled="true" maxlength="3" flex="1" oninput="LeMitarbeiterValueChanged();"/>
     				</row>
 			    	<row>
 			    		<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz" value="Stundensatz: "/>
-    					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz" disabled="true" maxlength="6" flex="1" oninput="LeMitarbeiterValueChanged();"/>
+    					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz" disabled="true" maxlength="6" flex="1" oninput="LeMitarbeiterValueChanged();LeMitarbeiterGesamtkosten()"/>
     					<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-faktor" value="Faktor: "/>
-    					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-faktor" disabled="true" maxlength="3" flex="1" oninput="LeMitarbeiterValueChanged();"/>
+    					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-faktor" disabled="true" maxlength="3" flex="1" oninput="LeMitarbeiterValueChanged();LeMitarbeiterGesamtkosten()"/>
 					</row>
 					<row>
 			    		<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-anmerkung" value="Anmerkung: "/>
@@ -380,7 +380,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     			</rows>
     			</grid>
     			<hbox flex="1">
-    				<spacer flex="1" />
+    				<!--<spacer flex="1" />-->
+    				<hbox flex="1">
+    					<label value='Gesamtkosten:' />
+    					<label id="lehrveranstaltung-lehreinheitmitarbeiter-label-gesamtkosten" value='' />
+    				</hbox>
 					<button label="Speichern" disabled="true" id="lehrveranstaltung-lehreinheitmitarbeiter-button-save" oncommand="LeMitarbeiterSave();"/>
 				</hbox>
 			</vbox>

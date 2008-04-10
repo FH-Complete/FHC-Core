@@ -315,6 +315,38 @@ class person
 			$this->errormsg = "*****\nGeschlecht muß entweder w oder m sein!: ".$this->nachname.", ".$this->vorname."\n*****\n";
 			return false;
 		}
+		
+		//Pruefen ob das Geburtsdatum mit der SVNR uebereinstimmt.
+		if($this->svnr!='' && $this->gebdatum!='')
+		{
+			if(ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4})",$this->gebdatum, $regs))
+			{
+				$day = sprintf('%02s',$regs[1]);
+				$month = sprintf('%02s',$regs[2]);
+				$year = substr($regs[3],2,2);
+			}
+			elseif(ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->gebdatum, $regs))
+			{
+				$day = sprintf('%02s',$regs[3]);
+				$month = sprintf('%02s',$regs[2]);
+				$year = substr($regs[1],2,2);
+			}
+			else 
+			{
+				$this->errormsg = 'Format des Geburtsdatums ist ungueltig';
+				return false;
+			}
+			
+			$day_svnr = substr($this->svnr, 4, 2);
+			$month_svnr = substr($this->svnr, 6, 2);
+			$year_svnr = substr($this->svnr, 8, 2);
+		
+			if($day_svnr!=$day || $month_svnr!=$month || $year_svnr!=$year)
+			{
+				$this->errormsg = 'SVNR und Geburtsdatum passen nicht zusammen';
+				return false;
+			}
+		}
 
 		return true;
 	}

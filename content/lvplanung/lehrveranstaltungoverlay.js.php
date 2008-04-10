@@ -1146,6 +1146,8 @@ function LeMitarbeiterAuswahl()
 		document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden').checked=true;
 	else
 		document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden').checked=false;
+		
+	LeMitarbeiterGesamtkosten();
 }
 
 // ****
@@ -1790,4 +1792,23 @@ function LehrveranstaltungNotenDelete()
 			SetStatusBarText('Eintrag wurde geloescht');
 		}
 	}
+}
+
+function LeMitarbeiterGesamtkosten()
+{
+	semesterstunden = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden').value
+	faktor = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-faktor').value
+	stundensatz = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz').value
+	
+	if(!isNaN(semesterstunden) && !isNaN(faktor) && !isNaN(stundensatz))
+		gesamtkosten = semesterstunden*faktor*stundensatz;
+	else
+		gesamtkosten = 0;
+	
+	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-gesamtkosten').value=gesamtkosten.toFixed(2)+' €';
+	
+	if(gesamtkosten<=0)
+		document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-gesamtkosten').setAttribute("style",'color: red');
+	else
+		document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-gesamtkosten').setAttribute("style",'color: black');
 }
