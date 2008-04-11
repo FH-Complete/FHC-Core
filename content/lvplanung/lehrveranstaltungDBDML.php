@@ -352,7 +352,7 @@ if(!$error)
 						if($row->planfaktor!='')
 							$lem->faktor = $row->planfaktor;
 						else
-							$lem->faktor = '0';
+							$lem->faktor = '1.0';
 					}
 					else
 					{
