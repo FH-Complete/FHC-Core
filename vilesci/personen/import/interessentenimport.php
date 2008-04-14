@@ -103,6 +103,26 @@ function cmdIncoming()
 {
 	document.getElementById('ausbildungssemester').disabled=document.getElementById('incoming').checked;
 }
+
+function checkVorschlag()
+{
+	var elems = document.getElementsByName('person_id');
+	
+	for(i=0;i<=elems.length;i++)
+	{
+		try
+		{
+			//alert(elems[i].name+elems[i].checked+elems[i].value);
+			if(elems[i].checked)
+				return true;
+		}
+		catch(e)
+		{}
+	}
+	
+	alert('Bitte wählen Sie einen der Vorschläge aus');
+	return false;
+}
 </script>
 </head>
 <body>
@@ -294,6 +314,12 @@ if(isset($_POST['save']))
 			$adr->insertamum = date('Y-m-d H:i:s');
 			$adr->insertvon = $user;
 			$adr->nation = 'A';
+			//Wenn die Person neu angelegt wird, dann ist die neue Adresse die Heimatadresse
+			//sonst nicht
+			if($person_id=='0')
+				$adr->heimatadresse = true;
+			else
+				$adr->heimatadresse = false;
 		}
 		else
 		{
@@ -323,6 +349,7 @@ if(isset($_POST['save']))
 				$adr->insertamum = date('Y-m-d H:i:s');
 				$adr->insertvon = $user;
 				$adr->nation = 'A';
+				$adr->heimatadresse = true;
 			}
 		}
 
@@ -334,7 +361,6 @@ if(isset($_POST['save']))
 			$adr->plz = $plz;
 			$adr->ort = $ort;
 			$adr->typ = 'h';
-			$adr->heimatadresse = true;
 			$adr->zustelladresse = true;
 			if(!$adr->save())
 			{
@@ -569,6 +595,7 @@ if(isset($_POST['save']))
 }
 // *** SAVE ENDE ***
 
+$geburtsdatum_orig = $geburtsdatum;
 if($geburtsdatum!='')
 {
 	//Wenn das Datum im Format d.m.Y ist dann in Y-m-d umwandeln
@@ -592,8 +619,11 @@ if($geburtsdatum!='')
 	if($geburtsdatum_error)
 		echo "Format des Geburtsdatums ist ungueltig!";
 }
+if(($geburtsdatum=='' && $vorname=='' && $nachname=='') || $geburtsdatum_error)
+	echo "<form method='POST'>";
+else 
+	echo "<form method='POST' onsubmit='return checkVorschlag()'>";
 ?>
-<form method='POST'>
 <table width="100%">
 
 <tr>
@@ -611,7 +641,7 @@ echo '<OPTION value="m" '.($geschlecht=='m'?'selected':'').'>m&auml;nnlich</OPTI
 echo '<OPTION value="w" '.($geschlecht=='w'?'selected':'').'>weiblich</OPTION>';
 echo '</SELECT>';
 echo '</td></tr>';
-echo '<tr><td>Geburtsdatum </td><td><input type="text" id="geburtsdatum" size="10" maxlength="10" name="geburtsdatum" value="'.$geburtsdatum.'" /> (Format: dd.mm.JJJJ)</td></tr>';
+echo '<tr><td>Geburtsdatum </td><td><input type="text" id="geburtsdatum" size="10" maxlength="10" name="geburtsdatum" value="'.$geburtsdatum_orig.'" /> (Format: dd.mm.JJJJ)</td></tr>';
 echo '<tr><td colspan="2"><fieldset><legend>Adresse</legend><table>';
 echo '<tr><td>Adresse</td><td><input type="text" id="adresse" maxlength="256" name="adresse" value="'.$adresse.'" /></td></tr>';
 echo '<tr><td>Postleitzahl</td><td><input type="text" maxlength="16" id="plz" name="plz" value="'.$plz.'" /></td></tr>';
@@ -664,9 +694,9 @@ echo '<tr><td>Incoming:</td><td><input type="checkbox" id="incoming" name="incom
 echo '<tr><tr><td></td><td>';
 
 if(($geburtsdatum=='' && $vorname=='' && $nachname=='') || $geburtsdatum_error)
-	echo '<input type="submit" name="showagain" value="Vorschlag laden"</td></tr>';
+	echo '<input type="submit" name="showagain" value="Vorschlag laden"></td></tr>';
 else
-	echo '<input type="submit" name="save" value="Speichern"</td></tr>';
+	echo '<input type="submit" name="save" value="Speichern"></td></tr>';
 ?>
 </table>
 <br><br>
@@ -708,7 +738,7 @@ if($where!='')
 					echo "$row_adr->plz $row_adr->ort, $row_adr->strasse<br>";
 			echo "</td></tr>";
 		}
-		echo '<tr><td><input type="radio" name="person_id" value="0" checked onclick="disablefields(this)"></td><td>Neue Person anlegen</td></tr>';
+		echo '<tr><td><input type="radio" name="person_id" value="0" onclick="disablefields(this)"></td><td>Neue Person anlegen</td></tr>';
 		echo '</table>';
 	}
 }
