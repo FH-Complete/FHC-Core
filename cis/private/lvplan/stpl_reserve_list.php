@@ -74,6 +74,7 @@
 	
 	if ($num_rows_res>0)
 	{
+		echo 'Eigene Reservierungen:<br>';
 		echo '<table border="0">';
 		echo '<tr class="liste"><th>Datum</th><th>Titel</th><th>Stunde</th><th>Ort</th><th>Person</th><th>Beschreibung</th></tr>';
 		for ($i=0; $i<$num_rows_res; $i++)
@@ -111,6 +112,7 @@
 	
 	if ($num_rows_res>0)
 	{
+		echo 'Alle Reservierungen:<br>';
 		echo '<table border="0">';
 		echo '<tr class="liste"><th>Datum</th><th>Titel</th><th>Stunde</th><th>Ort</th><th>Person</th><th>Beschreibung</th></tr>';
 		for ($i=0; $i<$num_rows_res; $i++)

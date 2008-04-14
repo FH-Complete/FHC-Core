@@ -57,20 +57,30 @@ function StudentKontoNeuInit()
 			}
 	}
 
-	tree_vb=window.opener.document.getElementById('tree-verband');
-
-	//Wenn nichts markiert wurde -> beenden
-	if(tree_vb.currentIndex==-1)
+	//Wenn nur ein Student markiert wurde, den Studiengang des Studenten nehmen
+	//Wenn mehrere Studenten markiert wurden, dann den Studiengang nehmen der im Verbandstree markiert ist
+	if(anzahl>1)
 	{
-		alert('Es muss ein Studiengang markiert sein!');
-		window.close();
-		return;
+		tree_vb=window.opener.document.getElementById('tree-verband');
+	
+		//Wenn nichts markiert wurde -> beenden
+		if(tree_vb.currentIndex==-1)
+		{
+			alert('Es muss ein Studiengang markiert sein!');
+			window.close();
+			return;
+		}
+	
+		col = tree_vb.columns ? tree_vb.columns["stg_kz"] : "stg_kz";
+		//var stg_kz=tree_vb.view.getCellText(tree_vb.currentIndex,col);
+		studiengang_kz=tree_vb.view.getCellText(tree_vb.currentIndex,col);
+		//debug('kz:'+studiengang_kz);
 	}
-
-	col = tree_vb.columns ? tree_vb.columns["stg_kz"] : "stg_kz";
-	//var stg_kz=tree_vb.view.getCellText(tree_vb.currentIndex,col);
-	studiengang_kz=tree_vb.view.getCellText(tree_vb.currentIndex,col);
-	//debug('kz:'+studiengang_kz);
+	else
+	{
+		studiengang_kz = window.opener.document.getElementById('student-detail-menulist-studiengang_kz').value;
+	}
+	
 	person_ids = paramList;
 
 	if(anzahl>1)
