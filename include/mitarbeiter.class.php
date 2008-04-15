@@ -79,7 +79,7 @@ class mitarbeiter extends benutzer
 		if(!benutzer::load($uid))
 			return false;
 
-		$qry = "SELECT * FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='$uid'";
+		$qry = "SELECT * FROM public.tbl_mitarbeiter LEFT JOIN campus.tbl_resturlaub USING(mitarbeiter_uid) WHERE mitarbeiter_uid='$uid'";
 		if($result = pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
@@ -96,6 +96,9 @@ class mitarbeiter extends benutzer
 				$this->anmerkung = $row->anmerkung;
 				$this->ext_id_mitarbeiter = $row->ext_id;
 				$this->bismelden = ($row->bismelden=='t'?true:false);
+				
+				$this->urlaubstageprojahr = $row->urlaubstageprojahr;
+				$this->resturlaubstage = $row->resturlaubstage;
 				return true;
 			}
 			else
@@ -601,7 +604,7 @@ class mitarbeiter extends benutzer
 	
 	function getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $verwendung, $studiensemester_kurzbz)
 	{
-		$qry = "SELECT distinct on(mitarbeiter_uid) *, tbl_benutzer.aktiv as aktiv, tbl_mitarbeiter.insertamum, tbl_mitarbeiter.insertvon FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id)) LEFT JOIN public.tbl_benutzerfunktion USING(uid) WHERE true";
+		$qry = "SELECT distinct on(mitarbeiter_uid) *, tbl_benutzer.aktiv as aktiv, tbl_mitarbeiter.insertamum, tbl_mitarbeiter.insertvon FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id)) LEFT JOIN public.tbl_benutzerfunktion USING(uid) LEFT JOIN campus.tbl_resturlaub USING(mitarbeiter_uid) WHERE true";
 		
 		if($fix=='true')
 			$qry .= " AND fixangestellt=true";
@@ -668,6 +671,9 @@ class mitarbeiter extends benutzer
 				$obj->alias = $row->alias;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
+				
+				$obj->urlaubstageprojahr = $row->urlaubstageprojahr;
+				$obj->resturlaubstage = $row->resturlaubstage;
 				
 				$this->result[] = $obj;
 			}
@@ -746,7 +752,7 @@ class mitarbeiter extends benutzer
 		$qry = "SELECT 
 					distinct on(mitarbeiter_uid) *, tbl_benutzer.aktiv as aktiv, tbl_mitarbeiter.insertamum, 
 					tbl_mitarbeiter.insertvon 
-				FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id)) 
+				FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id))  LEFT JOIN campus.tbl_resturlaub USING(mitarbeiter_uid)
 				WHERE nachname ~* '".addslashes($filter)."' OR 
 				      vorname ~* '".addslashes($filter)."' OR 
 				      uid ~* '".addslashes($filter)."'";
@@ -796,6 +802,9 @@ class mitarbeiter extends benutzer
 				$obj->alias = $row->alias;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
+				
+				$obj->urlaubstageprojahr = $row->urlaubstageprojahr;
+				$obj->resturlaubstage = $row->resturlaubstage;
 				
 				$this->result[] = $obj;
 			}

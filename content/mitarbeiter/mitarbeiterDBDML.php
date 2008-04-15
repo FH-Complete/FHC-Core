@@ -39,6 +39,7 @@ require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/bisverwendung.class.php');
 require_once('../../include/bisfunktion.class.php');
 require_once('../../include/entwicklungsteam.class.php');
+require_once('../../include/resturlaub.class.php');
 
 $user = get_uid();
 
@@ -110,30 +111,33 @@ if(!$error)
 			
 			if($mitarbeiter->save())
 			{
-				/* 29.01.2007 - Benachrichtigungen werden ueber extra Script versendet
-				if($aktiv_alt==true && $_POST['aktiv']=='false')
+				$resturlaub = new resturlaub($conn, null, true);
+				if($resturlaub->load($_POST['uid']))
 				{
-					$message = "Dies ist eine automatische Mail!\n";
-					$message .= "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun für Sie?\n\n";
-					$message .= "Vorerst werden Sie aus allen Mail-Verteilern gelöscht.\n";
-					$message .= "Wenn der Datensatz in den nächsten 12 Monaten nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:\n";
-					$message .= "- Ihr Account wird gelöscht.\n";
-					$message .= "- Ihre Mailbox mit sämtlichen Mails wird gelöscht.\n";
-					$message .= "- Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht.\n\n";
-					$message .= "Sollte es sich hierbei um einen Irrtum handeln, wenden sie sich bitte an die Mitarbeiter unserer Personalabteillung.\n";
-					$message .= "Adelheit Schaaf  - schaaf@technikum-wien.at\n";
-					$message .= "Orestis Kazamias - kazamias@technikum-wien.at\n\n";
-					$message .= "Mit freundlichen Grüßen,\n";
-					$message .= "FACHHOCHSCHULE TECHNIKUM WIEN\n";
-					$message .= "Höchstädtplatz 5\n";
-					$message .= "A-1200 Wien \n";
-					
-					$to = 'oesi@technikum-wien.at';
-					//$to = $_POST['uid'].'@'.DOMAIN;
-					mail($to,'Ihr Datensatz wurde deaktiviert! '.$_POST['uid'], $message, 'From: vilesci@'.DOMAIN);
+					$resturlaub->new = false;
 				}
-				*/
-				$return = true;
+				else 
+				{
+					$resturlaub->new = true;
+					$resturlaub->insertamum = date('Y-m-d H:i:s');
+					$resturlaub->insertvon = $user;
+					$resturlaub->mitarbeiter_uid = $_POST['uid'];
+				}
+				
+				$resturlaub->updateamum = date('Y-m-d H:i:s');
+				$resturlaub->updatevon = $user;
+				$resturlaub->urlaubstageprojahr = $_POST['urlaubsanspruch'];
+				$resturlaub->resturlaubstage = $_POST['resturlaubstage'];
+				
+				if($resturlaub->save())
+				{
+					$return = true;
+				}
+				else 
+				{
+					$return = false;
+					$errormsg = 'Fehler beim Speichern der Resturlaubstage/Urlaubsanspruch'.$resturlaub->errormsg;
+				}
 			}
 			else 
 			{

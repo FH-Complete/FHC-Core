@@ -202,9 +202,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 			<rows>
 		    	<row>
-					<label align="end" control="mitarbeiter-detail-textbox-personalnummer" value="Personalnummer:"/>
+					<label align="end" control="mitarbeiter-detail-textbox-personalnummer" value="Personalnummer"/>
 		    		<textbox id="mitarbeiter-detail-textbox-personalnummer" size="10" maxlength="10" disabled="true" oninput="MitarbeiterDetailValueChange()"/>
-		    		<label align="end" control="mitarbeiter-detail-textbox-kurzbezeichnung" value="Kurzbezeichnung:"/>
+		    		<label align="end" control="mitarbeiter-detail-textbox-kurzbezeichnung" value="Kurzbezeichnung"/>
 					<hbox>
 						<textbox id="mitarbeiter-detail-textbox-kurzbezeichnung"  class="pflichtfeld" size="10" maxlength="10" disabled="true" oninput="MitarbeiterDetailValueChange()"/>
 						<spacer />
@@ -213,9 +213,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		    		<checkbox label="Lektor" id="mitarbeiter-detail-checkbox-lektor" checked="false" disabled="true" onchange="MitarbeiterDetailValueChange()"/>
 		    	</row>
 		    	<row>
-		    	    <label align="end" control="mitarbeiter-detail-textbox-stundensatz" value="Stundensatz:"/>
+		    	    <label align="end" control="mitarbeiter-detail-textbox-stundensatz" value="Stundensatz"/>
 		    		<textbox id="mitarbeiter-detail-textbox-stundensatz" size="10" maxlength="10" disabled="true" oninput="MitarbeiterDetailValueChange()"/>
-		    		<label align="end" control="mitarbeiter-detail-textbox-telefonklappe" value="Telefonklappe:"/>
+		    		<label align="end" control="mitarbeiter-detail-textbox-telefonklappe" value="Telefonklappe"/>
 		    		<hbox>
 	    				<textbox id="mitarbeiter-detail-textbox-telefonklappe" size="10" maxlength="10" disabled="true" oninput="MitarbeiterDetailValueChange()"/>
 	    				<spacer />
@@ -259,12 +259,18 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		    	<row>
 		    		<label value="Anmerkung" control="mitarbeiter-detail-textbox-mitarbeiteranmerkung"/>
       				<textbox id="mitarbeiter-detail-textbox-mitarbeiteranmerkung" disabled="true" multiline="true" oninput="MitarbeiterDetailValueChange()"/>
-      				<label value="Alias" control="mitarbeiter-detail-textbox-alias"/>
+      				<vbox>
+      					<label value="Alias" control="mitarbeiter-detail-textbox-alias"/>
+      					<label value="Urlaubsanspruch" control="mitarbeiter-detail-textbox-urlaubsanspruch" style="margin-top: 10px;" />
+      				</vbox>
       				<vbox>
       					<textbox id="mitarbeiter-detail-textbox-alias" disabled="true" oninput="MitarbeiterDetailValueChange()"/>
-      					<spacer />
+      					<textbox id="mitarbeiter-detail-textbox-urlaubsanspruch" disabled="true" oninput="MitarbeiterDetailValueChange()" />
       				</vbox>
-      				<label align="end" control="mitarbeiter-detail-menulist-ausbildung" value="Ausbildung:"/>
+      				<vbox>
+      					<label align="end" control="mitarbeiter-detail-menulist-ausbildung" value="Ausbildung"/>
+      					<label control="mitarbeiter-detail-textbox-resturlaubstage" value="Resturlaubstage" style="margin-top: 10px;"/>
+      				</vbox>
       				<vbox>
 				 	<menulist id="mitarbeiter-detail-menulist-ausbildung" disabled="true"
 				              datasources="<?php echo APP_ROOT; ?>rdf/ausbildung.rdf.php?optional=true"
@@ -276,7 +282,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						      </menupopup>
 						</template>
 					</menulist>
-					<spacer flex="1"/>
+					<textbox id="mitarbeiter-detail-textbox-resturlaubstage" disabled="true" oninput="MitarbeiterDetailValueChange()" />
 					</vbox>
 		    	</row>
 		  	</rows>

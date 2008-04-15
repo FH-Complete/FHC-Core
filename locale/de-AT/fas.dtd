@@ -66,6 +66,10 @@
 <!ENTITY menu-statistic-abschlusspruefung.label		"Abschlusspruefung">
 <!ENTITY menu-statistic-abschlusspruefung.accesskey	"B">
 
+<!ENTITY menu-statistic-fehlendedokumente.key		"D">
+<!ENTITY menu-statistic-fehlendedokumente.label		"Fehlende Dokumente">
+<!ENTITY menu-statistic-fehlendedokumente.accesskey	"D">
+
 <!ENTITY menu-statistic-subnotenspiegel.key			"N">
 <!ENTITY menu-statistic-subnotenspiegel.label		"Notenspiegel">
 <!ENTITY menu-statistic-subnotenspiegel.accesskey	"N">

@@ -816,6 +816,31 @@ function StatistikPrintAbschlusspruefung()
 }
 
 // ****
+// * Liefert eine Excel Checkliste fuer die Fehlenden Dokumente
+// * Studiengang muss gewaehlt sein.
+// ****
+function StatistikPrintFehlendeDokumente()
+{
+	tree = document.getElementById('tree-verband');
+
+	if(tree.currentIndex==-1)
+	{
+		alert('Bitte zuerst einen Studiengang auswaehlen');
+		return;
+	}
+
+	//Studiengang holen
+	var col;
+	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+	var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
+
+	if(studiengang_kz!='')
+		window.open('<?php echo APP_ROOT ?>content/statistik/dokumente.xls.php?studiengang_kz='+studiengang_kz+'&studiensemester_kurzbz='+getStudiensemester(),'Excel');
+	else
+		alert('Bitte zuerst Studiengang auswaehlen');
+}
+
+// ****
 // * Liefert eine HTML Liste mit Uebersicht ueber die eingetragenen Noten
 // * Studiengang und optional Semester muss gewaehlt sein.
 // ****
