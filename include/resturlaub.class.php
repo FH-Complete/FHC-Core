@@ -119,12 +119,12 @@ class resturlaub
 	// **
 	function validate()
 	{
-		if(!is_numeric($this->resturlaubstage))
+		if($this->resturlaubstage!='' && !is_numeric($this->resturlaubstage))
 		{
 			$this->errormsg ='Resturlaubstage muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(!is_numeric($this->mehrarbeitsstunden))
+		if($this->mehrarbeitsstunden!='' && !is_numeric($this->mehrarbeitsstunden))
 		{
 			$this->errormsg ='Mehrarbeitsstunden muss eine gueltige Zahl sein';
 			return false;
@@ -134,6 +134,8 @@ class resturlaub
 			$this->errormsg = 'Urlaubsanspruch darf nicht negativ sein';
 			return false;
 		}
+		if($this->urlaubstageprojahr=='')
+			$this->urlaubstageprojahr='0';
 		return true;
 	}
 	

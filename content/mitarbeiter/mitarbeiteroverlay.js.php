@@ -428,6 +428,8 @@ function MitarbeiterDetailDisableFields(val)
 	document.getElementById('mitarbeiter-detail-menulist-ausbildung').disabled=val;
 	document.getElementById('mitarbeiter-detail-button-speichern').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-alias').disabled=val;
+	document.getElementById('mitarbeiter-detail-textbox-urlaubsanspruch').disabled=val;
+	document.getElementById('mitarbeiter-detail-textbox-resturlaubstage').disabled=val;
 }
 
 function MitarbeiterAuswahl()
@@ -511,7 +513,7 @@ function MitarbeiterAuswahl()
 	geburtsnation=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#geburtsnation" ));
 	sprache=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#sprache" ));
 	person_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#person_id" ));
-		
+			
 	personalnummer=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#personalnummer" ));
 	kurzbezeichnung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#kurzbz" ));
 	stundensatz=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#stundensatz" ));
@@ -524,6 +526,8 @@ function MitarbeiterAuswahl()
 	ort_kurzbz=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ort_kurzbz" ));
 	standort_kurzbz=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#standort_kurzbz" ));
 	alias=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#alias" ));
+	urlaubstageprojahr=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#urlaubstageprojahr" ));
+	resturlaubstage=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#resturlaubstage" ));
 	
 	//Daten den Feldern zuweisen
 
@@ -580,7 +584,8 @@ function MitarbeiterAuswahl()
 	document.getElementById('mitarbeiter-detail-menulist-ort_kurzbz').value=ort_kurzbz;
 	document.getElementById('mitarbeiter-detail-menulist-standort').value=standort_kurzbz;
 	document.getElementById('mitarbeiter-detail-textbox-alias').value=alias;
-	
+	document.getElementById('mitarbeiter-detail-textbox-urlaubsanspruch').value=urlaubstageprojahr;
+	document.getElementById('mitarbeiter-detail-textbox-resturlaubstage').value=resturlaubstage;
 	// ***** KONTAKTE *****
 	document.getElementById('mitarbeiter-kontakt').setAttribute('src','kontakt.xul.php?person_id='+person_id);
 
@@ -769,6 +774,9 @@ function MitarbeiterSave()
 	standort_kurzbz = document.getElementById('mitarbeiter-detail-menulist-standort').value;
 	alias = document.getElementById('mitarbeiter-detail-textbox-alias').value;
 	
+	urlaubsanspruch = document.getElementById('mitarbeiter-detail-textbox-urlaubsanspruch').value;
+	resturlaubstage = document.getElementById('mitarbeiter-detail-textbox-resturlaubstage').value;
+	
 	if(geburtsdatum!='' && !CheckDatum(geburtsdatum))
 	{
 		alert('Geburtsdatum ist ungueltig');
@@ -812,6 +820,8 @@ function MitarbeiterSave()
 	req.add('ort_kurzbz', ort_kurzbz);
 	req.add('standort_kurzbz', standort_kurzbz);
 	req.add('alias', alias);
+	req.add('urlaubsanspruch', urlaubsanspruch);
+	req.add('resturlaubstage', resturlaubstage);
 	
 	var response = req.executePOST();
 

@@ -109,7 +109,7 @@ class dokument
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden der Daten';
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
@@ -223,7 +223,7 @@ class dokument
 			return true;
 		else 	
 		{
-			$this->errormsg = 'Fehler beim loeschen der Zuteilung';
+			$this->errormsg = 'Fehler beim Loeschen der Zuteilung';
 			return false;
 		}
 	}
@@ -267,7 +267,7 @@ class dokument
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden der Daten';
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
@@ -317,7 +317,36 @@ class dokument
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim laden der Daten';
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	// ************************************************
+	// * Liefert die Dokumente eines Studienganges
+	// * @param $studiengang_kz
+	// * @return true wenn ok false im Fehlerfall
+	// ************************************************
+	function getDokumente($studiengang_kz)
+	{
+		$qry = "SELECT * FROM public.tbl_dokumentstudiengang JOIN public.tbl_dokument USING(dokument_kurzbz) WHERE studiengang_kz='$studiengang_kz'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$dok = new dokument($this->conn, null, null, null);
+				
+				$dok->dokument_kurzbz = $row->dokument_kurzbz;
+				$dok->bezeichnung = $row->bezeichnung;
+				
+				$this->result[] = $dok;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
