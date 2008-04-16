@@ -855,7 +855,7 @@ if(!$error)
 												//Matrikelnummer und UID generieren
 												$matrikelnr = generateMatrikelnummer($conn, $prestd->studiengang_kz, $hlp->result[0]->studiensemester_kurzbz);
 												$jahr = substr($matrikelnr,0, 2);
-												$stg = substr($matrikelnr, 3, 4);
+												$stg = $prestd->studiengang_kz;
 												$stg_obj = new studiengang($conn);
 												$stg_obj->load(ltrim($stg,'0'));
 												$uid = generateUID($stg_obj->kurzbz,$jahr,$stg_obj->typ,$matrikelnr);

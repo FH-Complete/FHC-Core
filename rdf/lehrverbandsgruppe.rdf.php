@@ -60,8 +60,10 @@ $stsem_obj = new studiensemester($conn);
 $stsem_obj->getAll();
 ?>
 
-<RDF:RDF	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-		xmlns:VERBAND="<?php echo $rdf_url; ?>rdf#" >
+<RDF:RDF	
+	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:VERBAND="<?php echo $rdf_url; ?>rdf#" 
+	xmlns:NC="http://home.netscape.com/NC-rdf#">
 
 <?php
 $stg_kz=null;
@@ -76,7 +78,7 @@ while ($row=pg_fetch_object($result))
 		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz; ?>" >
 			<VERBAND:name><?php echo $row->kurzbzlang.' ('.$stg_kurzbz.') - '.$row->bezeichnung; ?></VERBAND:name>
 			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
-			<VERBAND:stg_kz><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
+			<VERBAND:stg_kz NC:parseType="Integer"><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
 		</RDF:Description>
 
 		<?php 

@@ -111,6 +111,8 @@ loadVariables($conn, $user);
 	$maxlength[$i]=3;
 	$worksheet->write($zeile,++$i,"ORT", $format_bold);
 	$maxlength[$i]=3;
+	$worksheet->write($zeile,++$i,"NATION", $format_bold);
+	$maxlength[$i]=6;
 	$worksheet->write($zeile,++$i,"GEBURTSDATUM", $format_bold);
 	$maxlength[$i]=12;
 	$worksheet->write($zeile,++$i,"PERSONENKENNZEICHEN", $format_bold);
@@ -121,6 +123,8 @@ loadVariables($conn, $user);
 	$maxlength[$i]=4;
 	$worksheet->write($zeile,++$i,"ERSATZKENNZEICHEN", $format_bold);
 	$maxlength[$i]=17;
+	$worksheet->write($zeile,++$i,"GESCHLECHT", $format_bold);
+	$maxlength[$i]=10;
 	
 	$worksheet->write($zeile,++$i,"SEMESTER", $format_bold);
 	$maxlength[$i]=8;
@@ -177,7 +181,7 @@ loadVariables($conn, $user);
 		}
 	}
 	// Student holen
-	$qry = "SELECT * FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) LEFT JOIN public.tbl_student USING(prestudent_id) LEFT JOIN public.tbl_studentlehrverband USING(student_uid) WHERE (studiensemester_kurzbz='$studiensemester_kurzbz' OR studiensemester_kurzbz is null) AND prestudent_id in($prestudent_ids) ORDER BY nachname, vorname";
+	$qry = "SELECT * FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) LEFT JOIN public.tbl_student USING(prestudent_id) WHERE prestudent_id in($prestudent_ids) ORDER BY nachname, vorname";
 
 	if($result = pg_query($conn, $qry))
 		while($row = pg_fetch_object($result))
@@ -264,6 +268,11 @@ loadVariables($conn, $user);
 					$maxlength[$i]=strlen($row_1->ort);
 				$worksheet->write($zeile,$i, $row_1->ort);
 				$i++;
+				
+				if(strlen($row_1->nation)>$maxlength[$i])
+					$maxlength[$i]=strlen($row_1->nation);
+				$worksheet->write($zeile,$i, $row_1->nation);
+				$i++;
 			}
 			else 
 				$i+=3;
@@ -304,30 +313,52 @@ loadVariables($conn, $user);
 		$worksheet->write($zeile,$i, $row->ersatzkennzeichen);
 		$i++;
 		
-		//Semester		
-		if(isset($row->semester))
+		//Geschlecht
+		if(strlen($row->geschlecht)>$maxlength[$i])
+			$maxlength[$i] = strlen($row->geschlecht);
+		$worksheet->write($zeile,$i, $row->geschlecht);
+		$i++;
+		
+		$qry = "SELECT * FROM public.tbl_studentlehrverband JOIN public.tbl_student USING(student_uid) WHERE prestudent_id='$row->prestudent_id' AND studiensemester_kurzbz='$studiensemester_kurzbz'";
+		if($result_sem = pg_query($conn, $qry))
 		{
-			if(strlen($row->semester)>$maxlength[$i])
-				$maxlength[$i] = strlen($row->semester);
-			$worksheet->write($zeile,$i, $row->semester);
+			if($row_sem = pg_fetch_object($result_sem))
+			{
+				$semester = $row_sem->semester;
+				$verband = $row_sem->verband;
+				$gruppe = $row_sem->gruppe;
+			}
+			else 
+			{
+				$semester = '';
+				$verband = '';
+				$gruppe = '';
+			}
+		}
+		//Semester		
+		if(isset($semester))
+		{
+			if(strlen($semester)>$maxlength[$i])
+				$maxlength[$i] = strlen($semester);
+			$worksheet->write($zeile,$i, $semester);
 		}
 		$i++;
 		
 		//Verband
-		if(isset($row->verband))
+		if(isset($verband))
 		{
-			if(strlen($row->verband)>$maxlength[$i])
-				$maxlength[$i] = strlen($row->verband);
-			$worksheet->write($zeile,$i, $row->verband);
+			if(strlen($verband)>$maxlength[$i])
+				$maxlength[$i] = strlen($verband);
+			$worksheet->write($zeile,$i, $verband);
 		}
 		$i++;
 		
 		//Gruppe
-		if(isset($row->gruppe))
+		if(isset($gruppe))
 		{
-			if(strlen($row->gruppe)>$maxlength[$i])
-				$maxlength[$i] = strlen($row->gruppe);
-			$worksheet->write($zeile,$i, $row->gruppe);
+			if(strlen($gruppe)>$maxlength[$i])
+				$maxlength[$i] = strlen($gruppe);
+			$worksheet->write($zeile,$i, $gruppe);
 		}
 		$i++;
 		

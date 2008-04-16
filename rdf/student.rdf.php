@@ -204,7 +204,7 @@ function draw_content($row)
 		$status = $prestudent->rolle_kurzbz;
 		$orgform = $prestudent->orgform_kurzbz;
 		
-		if($status=='Aufgenommener' || $status=='Bewerber' || $status=='Wartender')
+		if($status=='Aufgenommener' || $status=='Bewerber' || $status=='Wartender' || $status=='Interessent')
 			$semester_prestudent = $prestudent->ausbildungssemester;
 		else 
 			$semester_prestudent = '';
