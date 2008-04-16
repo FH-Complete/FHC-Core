@@ -337,7 +337,7 @@ class ort
 		FROM 
 			public.tbl_ort JOIN public.tbl_ortraumtyp USING(ort_kurzbz) 
 		WHERE 
-			aktiv AND ort_kurzbz NOT LIKE '\\\\_%'";
+			aktiv AND lehre AND ort_kurzbz NOT LIKE '\\\\_%'";
 		if($reservierung)
 			$qry.=" AND reservieren";
 		if($raumtyp!=null)

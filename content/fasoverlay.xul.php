@@ -58,7 +58,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/dragboard.js.php"/>
 
 <tree id="tree-verband" onmouseup="onVerbandSelect(event);"
-	seltype="single" hidecolumnpicker="false" flex="1"
+	seltype="single" hidecolumnpicker="false" flex="1" flags="dont-build-content"
 	enableColumnDrag="true"
     ondraggesture="nsDragAndDrop.startDrag(event,lvbgrpDDObserver);"
 	datasources="../rdf/lehrverbandsgruppe.rdf.php" ref="http://www.technikum-wien.at/lehrverbandsgruppe/alle-verbaende"
@@ -68,23 +68,43 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 	ondragexit="nsDragAndDrop.dragExit(event,verbandtreeDDObserver)"
 	>
 	<treecols>
-	    <treecol id="bez" label="Bezeichnung" persist="hidden, width, ordinal" flex="15" primary="true" />
+	    <treecol id="bez" label="Bezeichnung" persist="hidden, width, ordinal" flex="15" primary="true" 
+	    sortActive="true"
+	    sortDirection="ascending"
+	    class="sortDirectionIndicator"
+	    sort="rdf:http://www.technikum-wien.at/lehrverbandsgruppe/rdf#name"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="stg" label="STG" flex="2" persist="hidden, width, ordinal" hidden="true"/>
+	    <treecol id="stg" label="STG" flex="2" persist="hidden, width, ordinal" hidden="true"
+	    class="sortDirectionIndicator"
+	    sort="rdf:http://www.technikum-wien.at/lehrverbandsgruppe/rdf#stg"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="stg_kz" label="KZ" flex="2" persist="hidden, width, ordinal" hidden="true"/>
+	    <treecol id="stg_kz" label="KZ" flex="2" persist="hidden, width, ordinal" hidden="true"
+	    class="sortDirectionIndicator"
+	    sort="rdf:http://www.technikum-wien.at/lehrverbandsgruppe/rdf#stg_kz"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="sem" label="Sem" flex="1" persist="hidden, width, ordinal" hidden="true"/>
+	    <treecol id="sem" label="Sem" flex="1" persist="hidden, width, ordinal" hidden="true"
+	    class="sortDirectionIndicator"
+	    sort="rdf:http://www.technikum-wien.at/lehrverbandsgruppe/rdf#sem"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="ver" label="Ver" flex="1" persist="hidden, width, ordinal" hidden="true"/>
+	    <treecol id="ver" label="Ver" flex="1" persist="hidden, width, ordinal" hidden="true"
+	    class="sortDirectionIndicator"
+	    sort="rdf:http://www.technikum-wien.at/lehrverbandsgruppe/rdf#ver"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="grp" label="Grp" flex="1" persist="hidden, width, ordinal" hidden="true"/>
+	    <treecol id="grp" label="Grp" flex="1" persist="hidden, width, ordinal" hidden="true"
+	    class="sortDirectionIndicator"
+	    sort="rdf:http://www.technikum-wien.at/lehrverbandsgruppe/rdf#grp"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="gruppe" label="SpzGruppe" persist="hidden, width, ordinal" flex="1" hidden="true"/>
+	    <treecol id="gruppe" label="SpzGruppe" persist="hidden, width, ordinal" flex="1" hidden="true"
+	    class="sortDirectionIndicator"
+	    sort="rdf:http://www.technikum-wien.at/lehrverbandsgruppe/rdf#gruppe"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="typ" label="Typ" flex="1" persist="hidden, width, ordinal" hidden="true"/>
+	    <treecol id="typ" label="Typ" flex="1" persist="hidden, width, ordinal" hidden="true"
+	    class="sortDirectionIndicator"
+	    sort="rdf:http://www.technikum-wien.at/lehrverbandsgruppe/rdf#typ"/>
 		<splitter class="tree-splitter"/>
-	    <treecol id="stsem" label="StSem" flex="1" persist="hidden, width, ordinal" hidden="true"/>
+	    <treecol id="stsem" label="StSem" flex="1" persist="hidden, width, ordinal" hidden="true"
+	    class="sortDirectionIndicator"
+	    sort="rdf:http://www.technikum-wien.at/lehrverbandsgruppe/rdf#stsem"/>
 	</treecols>
 
 	<template>
