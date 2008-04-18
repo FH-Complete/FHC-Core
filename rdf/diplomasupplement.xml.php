@@ -69,7 +69,12 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		}
 		else
 			die('Student not found'.$uid_arr[$i]);
-		
+			
+		//Bei DEW und DPW werden 60 ECTS angerechnet
+		if($row->studiengang_kz==92 || $row->studiengang_kz==91)
+			$angerechnete_sws=60;
+		else 
+			$angerechnete_sws=0;
 		echo '	<supplement>';
 		echo '		<nachname><![CDATA['.$row->nachname.']]></nachname>';
 		echo '		<vorname>'.$row->vorname.'</vorname>';
@@ -81,7 +86,12 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		echo '		<studiengang_bezeichnung_englisch>'.$row->english.'</studiengang_bezeichnung_englisch>';
 		echo '		<semester>'.$row->max_semester.'</semester>';
 		echo '		<jahre>'.($row->max_semester/2.0).'</jahre>';
-		echo '		<ects>'.($row->max_semester*30).'</ects>';
+		echo '		<ects>'.($row->max_semester*30+$angerechnete_sws).'</ects>';
+		if($angerechnete_sws!=0)
+			echo '		<ects_angerechnet>('.$angerechnete_sws.' ECTS angerechnet/credited)</ects_angerechnet>';
+		else
+			echo '		<ects_angerechnet></ects_angerechnet>';
+			
 		if($row->organisationsform=='b')
 			echo '		<studienart>Berufbegleitendes Studium/Part-time degree programm</studienart>';
 		else 

@@ -1,14 +1,42 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *			Gerald Raab <gerald.raab@technikum-wien.at>.
+ */
+
 	require_once('../config.inc.php');
 	require_once('../../include/functions.inc.php');
     require_once('../../include/firma.class.php');
+    
 	if (!$conn = pg_pconnect(CONN_STRING))
 	   	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
     
+	$filter = (isset($_GET['filter'])?$_GET['filter']:'');
+	
 	$htmlstr = "";
-	
-	$sql_query = "SELECT * FROM public.tbl_firma";
-	
+
+	if($filter=='')
+		$sql_query = "SELECT * FROM public.tbl_firma";
+	else 
+		$sql_query = "SELECT * FROM public.tbl_firma WHERE lower(name) like lower('%$filter%') OR lower(adresse) like lower('%$filter%') OR lower(anmerkung) like lower('%$filter%')";
+		
     if(!$erg=pg_query($conn, $sql_query))
 	{
 		$errormsg='Fehler beim Laden der Firma';
@@ -63,7 +91,12 @@
 	echo '<h3>Übersicht</h3>';
 	echo '</td><td align="right">';
 	echo "<input type='button' onclick='parent.detail_firma.location=\"firma_details.php?neu=true\"' value='Neue Firma anlegen'/>";
-	echo '</td></tr></table><br />';
+	echo '</td></tr></table>';
+	//Suche
+	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">';
+	echo '<input type="text" name="filter" value="'.$filter.'">';
+	echo '<input type="submit" value="Suchen">';
+	echo '</form>';
 	
 	echo $htmlstr;
 ?>
