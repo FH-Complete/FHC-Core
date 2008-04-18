@@ -243,14 +243,14 @@
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> 4.3 \n \n \n</fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Angaben zum Studium (z.B absolvierte Module und Einheiten) \n und erzielte Noten/Bewertungen/ECTS Anrechnungspunkte \n Program details (courses, modules or units studied, individual \n grades obtained)</fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"><xsl:value-of select="ects" /> ECTS \n Siehe "Semesterzeugnisse" \n See "semester transcripts" \n</fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> <xsl:value-of select="ects" /> ECTS <xsl:value-of select="ects_angerechnet" />\n Siehe "Semesterzeugnisse" \n See "semester transcripts" \n</fo:block></fo:table-cell>
 							</fo:table-row>
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> 4.4 \n \n \n \n \n \n \n \n \n \n \n \n \n</fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Notenskala \n Grading scheme, grade translation \n and grade distribution guidance \n \n \n \n \n \n \n \n \n \n \n</fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" >
 									<fo:block font-size="8pt">
-										<fo:inline text-decoration="underline">Einzelbeurteilung/Grades</fo:inline>
+										<fo:inline text-decoration="underline"> Einzelbeurteilung/Grades</fo:inline>
 										\n 1=Sehr gut/Excellent  \n 2=Gut/Good  \n 3=Befriedigend/Satisfactory  \n 4=Genügend/Sufficient \n 5=Nicht Genügend/Unsatisfactory \n \n TG=Teilgenommen/Participated \n AR=Angerechnet/Credited \n \n Gesamtbeurteilung/Overall assessment: \n -Bestanden (pass) \n -Mit gutem Erfolg bestanden (pass with merit) \n -Mit ausgezeichnetem Erfolg bestanden (pass with distinction)
 									</fo:block>
 								</fo:table-cell>
