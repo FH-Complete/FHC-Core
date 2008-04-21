@@ -78,9 +78,8 @@ function StudentKontoNeuInit()
 	}
 	else
 	{
-		studiengang_kz = window.opener.document.getElementById('student-detail-menulist-studiengang_kz').value;
+		studiengang_kz = window.opener.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 	}
-	
 	person_ids = paramList;
 
 	if(anzahl>1)
