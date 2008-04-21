@@ -73,8 +73,18 @@
 	// ******* FORMULAR **********
 	$firma = new firma($conn);
 	if($firma_id!='')
+	{
 		if (!$firma->load($firma_id))
+		{
 			$htmlstr .= "<br><div class='kopf'>Firma mit der ID <b>".$firma_id."</b> existiert nicht</div>";
+		}
+	}
+	else 
+	{
+		//Bei neuen Firmen wird standardmaessig Partnerfirma ausgewaehlt
+		$firma->firmentyp_kurzbz='Partnerfirma';
+	}
+		
 
 	$htmlstr .= "<form action='firma_details.php' method='POST' name='firma'>\n";
 	$htmlstr .= "<input type='hidden' name='firma_id' value='".$firma->firma_id."'>\n";
