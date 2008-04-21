@@ -1469,7 +1469,7 @@ if(!$error)
 					}
 					else
 					{
-						$errormsg .= "Fehler bei $person_id: $buchung->errormsg\n";
+						$errormsg .= "Fehler beim Speichern: $buchung->errormsg\n";
 					}
 				}
 			}

@@ -154,31 +154,31 @@ class konto
 		$this->betrag = str_replace(',','.',$this->betrag);
 		if(!is_numeric($this->betrag))
 		{
-			$this->errormsg = "Betrag ('".$this->betrag."') ist ungueltig bei Person '".$this->person_id."'";
+			$this->errormsg = "Betrag muss eine gueltige Zahl sein";
 			return false;
 		}
 
 		if(!is_numeric($this->studiengang_kz))
 		{
-			$this->errormsg = "'Studiengang_kz ('".$this->studiengang_kz."') ist ungueltig bei Person '".$this->person_id."'";
+			$this->errormsg = "Die Studiengangskennzahl ist ungueltig";
 			return false;
 		}
 
 		if($this->buchungstyp_kurzbz=='')
 		{
-			$this->errormsg = "Typ muss angegeben werden bei Person '".$this->person_id."'";
+			$this->errormsg = "Es wurde kein Buchungstyp angegeben";
 			return false;
 		}
 
 		if(!is_numeric($this->person_id))
 		{
-			$this->errormsg = "'Person_id ('".$this->person_id."') ist ungueltig";
+			$this->errormsg = "Person_id ist ungueltig";
 			return false;
 		}
 
 		if(!is_numeric($this->mahnspanne))
 		{
-			$this->errormsg = "Mahnspanne ('".$this->mahnspanne."') muss eine gueltige Zahl sein bei Person '".$this->person_id."'";
+			$this->errormsg = "Die Mahnspanne muss eine gueltige Zahl sein";
 			return false;
 		}
 
