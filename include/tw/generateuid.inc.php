@@ -35,7 +35,7 @@
 function generateUID($stgkzl,$jahr, $stgtyp, $matrikelnummer)
 {
 	$art = substr($matrikelnummer, 2, 1);
-	$nr = substr($matrikelnummer, 7);
+	$nr = substr($matrikelnummer, strlen(trim($matrikelnummer))-3);
 	if($art=='2') //Sommersemester
 		$nr = $nr+500;
 	elseif($art=='0' && $stgtyp=='m') //Incoming im Masterstudiengang
