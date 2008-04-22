@@ -110,7 +110,7 @@ function generateMatrikelnummer($conn, $studiengang_kz, $studiensemester_kurzbz)
 	{
 		if($row = pg_fetch_object($result))
 		{
-			$max = substr($row->matrikelnr,7);
+			$max = substr($row->matrikelnr, (strlen(trim($row->matrikelnr))-3));
 		}
 		else
 			$max = 0;
@@ -890,41 +890,68 @@ if(!$error)
 													$student->insertamum = date('Y-m-d H:i:s');
 													$student->insertvon = $user;
 		
-													if($student->save(true, false))
+													//Pruefen ob der Lehrverband exisitert, falls nicht dann anlegen
+													$lehrverband = new lehrverband($conn);
+													if(!$lehrverband->load($student->studiengang_kz, $student->semester, $student->verband, $student->gruppe))
 													{
-														//Prestudentrolle hinzugfuegen
-														$rolle = new prestudent($conn);
-														$rolle->prestudent_id = $prestd->prestudent_id;
-														$rolle->rolle_kurzbz = 'Student';
-														$rolle->studiensemester_kurzbz = $hlp->result[0]->studiensemester_kurzbz;
-														$rolle->ausbildungssemester = $hlp->result[0]->ausbildungssemester;
-														$rolle->orgform_kurzbz = $hlp->result[0]->orgform_kurzbz;
-														$rolle->datum = date('Y-m-d');
-														$rolle->insertamum = date('Y-m-d H:i:s');
-														$rolle->insertvon = $user;
-														$rolle->new = true;
-		
-														if($rolle->save_rolle())
+														$lehrverband->studiengang_kz = $student->studiengang_kz;
+														$lehrverband->semester = $student->semester;
+														$lehrverband->verband = $student->verband;
+														$lehrverband->gruppe = $student->gruppe;
+														$lehrverband->aktiv = true;
+														if(!$lehrverband->save(true))
 														{
-															//StudentLehrverband anlegen
-															$studentlehrverband = new student($conn);
-															$studentlehrverband->uid = $uid;
-															$studentlehrverband->studiensemester_kurzbz = $hlp->result[0]->studiensemester_kurzbz;
-															$studentlehrverband->studiengang_kz = $prestd->studiengang_kz;
-															$studentlehrverband->semester = $hlp->result[0]->ausbildungssemester;
-															$studentlehrverband->verband = ' ';
-															$studentlehrverband->gruppe = ' ';
-															$studentlehrverband->insertamum = date('Y-m-d H:i:s');
-															$studentlehrverband->insertvon = $user;
-		
-															if($studentlehrverband->save_studentlehrverband(true))
+															$error = true; 
+															$errormsg = 'Fehler beim Speichern des Lehrverbandes';
+															$return = false;
+														}
+													}
+													
+													if(!$error)
+													{
+														if($student->save(true, false))
+														{
+															//Prestudentrolle hinzugfuegen
+															$rolle = new prestudent($conn);
+															$rolle->prestudent_id = $prestd->prestudent_id;
+															$rolle->rolle_kurzbz = 'Student';
+															$rolle->studiensemester_kurzbz = $hlp->result[0]->studiensemester_kurzbz;
+															$rolle->ausbildungssemester = $hlp->result[0]->ausbildungssemester;
+															$rolle->orgform_kurzbz = $hlp->result[0]->orgform_kurzbz;
+															$rolle->datum = date('Y-m-d');
+															$rolle->insertamum = date('Y-m-d H:i:s');
+															$rolle->insertvon = $user;
+															$rolle->new = true;
+			
+															if($rolle->save_rolle())
 															{
-																$return = true;
-																pg_query($conn, 'COMMIT;');
+																//StudentLehrverband anlegen
+																$studentlehrverband = new student($conn);
+																$studentlehrverband->uid = $uid;
+																$studentlehrverband->studiensemester_kurzbz = $hlp->result[0]->studiensemester_kurzbz;
+																$studentlehrverband->studiengang_kz = $prestd->studiengang_kz;
+																$studentlehrverband->semester = $hlp->result[0]->ausbildungssemester;
+																$studentlehrverband->verband = ' ';
+																$studentlehrverband->gruppe = ' ';
+																$studentlehrverband->insertamum = date('Y-m-d H:i:s');
+																$studentlehrverband->insertvon = $user;
+			
+																if($studentlehrverband->save_studentlehrverband(true))
+																{
+																	$return = true;
+																	pg_query($conn, 'COMMIT;');
+																}
+																else
+																{
+																	$errormsg .= "\n$prestd->vorname $prestd->nachname: Fehler beim Speichern des Studentlehrverbandes: ".$studentlehrverband->errormsg;
+																	$return = false;
+																	$anzahl_fehler++;
+																	pg_query($conn, 'ROLLBACK;');
+																}
 															}
 															else
 															{
-																$errormsg .= "\n$prestd->vorname $prestd->nachname: Fehler beim Speichern des Studentlehrverbandes: ".$studentlehrverband->errormsg;
+																$errormsg .= "\n$prestd->vorname $prestd->nachname: Fehler beim Speichern des Rolle: ".$rolle->errormsg;
 																$return = false;
 																$anzahl_fehler++;
 																pg_query($conn, 'ROLLBACK;');
@@ -932,23 +959,16 @@ if(!$error)
 														}
 														else
 														{
-															$errormsg .= "\n$prestd->vorname $prestd->nachname: Fehler beim Speichern des Rolle: ".$rolle->errormsg;
+															$errormsg .= "\n$prestd->vorname $prestd->nachname: Fehler beim Speichern des Studenten: ".$student->errormsg;
 															$return = false;
 															$anzahl_fehler++;
 															pg_query($conn, 'ROLLBACK;');
 														}
 													}
-													else
-													{
-														$errormsg .= "\n$prestd->vorname $prestd->nachname: Fehler beim Speichern des Studenten: ".$student->errormsg;
-														$return = false;
-														$anzahl_fehler++;
-														pg_query($conn, 'ROLLBACK;');
-													}
 												}
 												else
 												{
-													$errormsg .= "\n$prestd->vorname $prestd->nachname: Fehler beim Speichern des Benutzers: ".$benutzer->errormsg;
+													$errormsg .= "\n$prestd->vorname $prestd->nachname $matrikelnr: Fehler beim Speichern des Benutzers: ".$benutzer->errormsg;
 													$return = false;
 													$anzahl_fehler++;
 													pg_query($conn, 'ROLLBACK;');
