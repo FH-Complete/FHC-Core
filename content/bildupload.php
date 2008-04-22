@@ -80,7 +80,7 @@ $user = get_uid();
 
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
-if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz'))
+if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz') && !$rechte->isBerechtigt('mitarbeiter'))
 	die('Keine Berechtigung');
 //Bei Upload des Bildes
 if(isset($_POST['submitbild']))
