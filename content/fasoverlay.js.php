@@ -875,6 +875,16 @@ function StatistikPrintBewerberstatistik()
 }
 
 // ****
+// * Liefert eine statistik ueber die Anzahl der Abgewiesenen, Abbrecher, Unterbrecher und Absolventen
+// ****
+function StatistikPrintAbgaengerstatistik()
+{
+	var stsem = getStudiensemester();
+
+	window.open('<?php echo APP_ROOT ?>content/statistik/abgaengerstatistik.php?stsem='+stsem,'Abgaengerstatistik');
+}
+
+// ****
 // * Zeigt HTML Seite zur Bearbeitung der Reihungstests an
 // ****
 function ExtrasShowReihungstest()

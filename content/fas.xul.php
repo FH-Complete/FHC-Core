@@ -85,6 +85,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-statistic-projektarbeit:command" oncommand="StatistikPrintProjektarbeit();"/>
   <command id="menu-statistic-abschlusspruefung:command" oncommand="StatistikPrintAbschlusspruefung();"/>
   <command id="menu-statistic-bewerberstatistik:command" oncommand="StatistikPrintBewerberstatistik();"/>
+  <command id="menu-statistic-abgaengerstatistik:command" oncommand="StatistikPrintAbgaengerstatistik();"/>
   <command id="menu-statistic-fehlendedokumente:command" oncommand="StatistikPrintFehlendeDokumente();"/>
   <command id="menu-statistic-notenspiegel:command" oncommand="StatistikPrintNotenspiegel('html');"/>
   <command id="menu-statistic-notenspiegel-excel:command" oncommand="StatistikPrintNotenspiegel('xls');"/>
@@ -333,6 +334,13 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 		               label     = "&menu-statistic-bewerberstatistik.label;"
 		               command   =  "menu-statistic-bewerberstatistik:command"
 		               accesskey = "&menu-statistic-bewerberstatistik.accesskey;"/>
+					<menuitem
+		               id        =  "menu-statistic-abgaengerstatistik"
+		               key       =  "menu-statistic-abgaengerstatistik:key"
+		               label     = "&menu-statistic-abgaengerstatistik.label;"
+		               command   =  "menu-statistic-abgaengerstatistik:command"
+		               accesskey = "&menu-statistic-abgaengerstatistik.accesskey;"/>
+
 				</menupopup>
 			</menu>
           </menupopup>
