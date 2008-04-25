@@ -48,20 +48,24 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 	<h2>Bewerberstatistik '.$stsem.'<span style="position:absolute; right:15px;">'.date('d.m.Y').'</span></h2><br>
 	';
 
-if($stsem=='')
-{
-	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">Studiensemester: <SELECT name="stsem">';
-	$stsem = new studiensemester($conn);
-	$stsem->getAll();
 
-	foreach ($stsem->studiensemester as $stsemester)
+	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">Studiensemester: <SELECT name="stsem">';
+	$studsem = new studiensemester($conn);
+	$studsem->getAll();
+
+	foreach ($studsem->studiensemester as $stsemester)
 	{
-		echo '<option value="'.$stsemester->studiensemester_kurzbz.'">'.$stsemester->studiensemester_kurzbz.'</option>';
+		if($stsemester->studiensemester_kurzbz==$stsem)
+			$selected='selected';
+		else 
+			$selected='';
+		
+		echo '<option value="'.$stsemester->studiensemester_kurzbz.'" '.$selected.'>'.$stsemester->studiensemester_kurzbz.'</option>';
 	}
 	echo '</SELECT>
-		<input type="submit" value="Anzeigen" />';
-}
-else
+		<input type="submit" value="Anzeigen" /></form><br><br>';
+
+if($stsem!='')
 {
 	$stgs = $rechte->getStgKz();
 	
@@ -126,8 +130,6 @@ else
 						<th class='table-sortable:numeric'>Interessenten</th>
 						<th class='table-sortable:numeric'>Interessenten mit ZGV</th>
 						<th class='table-sortable:numeric'>Interessenten mit RT Anmeldung</th>
-						<th class='table-sortable:numeric'>Interessenten mit RT Termin</th>
-						<th class='table-sortable:numeric'>Interessenten mit absolviertem RT</th>
 						<th class='table-sortable:numeric'>Bewerber</th>
 						<th class='table-sortable:numeric'>Aufgenommener</th>
 						<th class='table-sortable:numeric'>Student 1S</th>
@@ -135,6 +137,9 @@ else
 				</thead>
 				<tbody>
 			 ";
+		//<th class='table-sortable:numeric'>Interessenten mit RT Termin</th>
+		//<th class='table-sortable:numeric'>Interessenten mit absolviertem RT</th>
+		
 		while($row = pg_fetch_object($result))
 		{
 			echo '<tr>';
@@ -142,8 +147,8 @@ else
 			echo "<td align='center'>$row->interessenten</td>";
 			echo "<td align='center'>$row->interessentenzgv</td>";
 			echo "<td align='center'>$row->interessentenrtanmeldung</td>";
-			echo "<td align='center'>$row->interessentenrttermin</td>";
-			echo "<td align='center'>$row->interessentenrtabsolviert</td>";
+			//echo "<td align='center'>$row->interessentenrttermin</td>";
+			//echo "<td align='center'>$row->interessentenrtabsolviert</td>";
 			echo "<td align='center'>$row->bewerber</td>";
 			echo "<td align='center'>$row->aufgenommener</td>";
 			echo "<td align='center'>$row->student1sem</td>";
@@ -224,8 +229,6 @@ else
 							<th class='table-sortable:numeric'>Interessenten VZ / BB</th>
 							<th class='table-sortable:numeric'>Interessenten mit ZGV VZ / BB</th>
 							<th class='table-sortable:numeric'>Interessenten mit RT Anmeldung VZ / BB</th>
-							<th class='table-sortable:numeric'>Interessenten mit RT Termin VZ / BB</th>
-							<th class='table-sortable:numeric'>Interessenten mit absolviertem RT VZ / BB</th>
 							<th class='table-sortable:numeric'>Bewerber VZ / BB</th>
 							<th class='table-sortable:numeric'>Aufgenommener VZ / BB</th>
 							<th class='table-sortable:numeric'>Student 1S VZ / BB</th>
@@ -233,6 +236,8 @@ else
 					</thead>
 					<tbody>
 				 ";
+			//<th class='table-sortable:numeric'>Interessenten mit RT Termin VZ / BB</th>
+			//<th class='table-sortable:numeric'>Interessenten mit absolviertem RT VZ / BB</th>
 			while($row = pg_fetch_object($result))
 			{
 				echo '<tr>';
@@ -240,8 +245,8 @@ else
 				echo "<td align='center'>$row->interessenten_vz / $row->interessenten_bb</td>";
 				echo "<td align='center'>$row->interessentenzgv_vz / $row->interessentenzgv_bb</td>";
 				echo "<td align='center'>$row->interessentenrtanmeldung_vz / $row->interessentenrtanmeldung_bb</td>";
-				echo "<td align='center'>$row->interessentenrttermin_vz / $row->interessentenrttermin_bb</td>";
-				echo "<td align='center'>$row->interessentenrtabsolviert_vz / $row->interessentenrtabsolviert_bb</td>";
+				//echo "<td align='center'>$row->interessentenrttermin_vz / $row->interessentenrttermin_bb</td>";
+				//echo "<td align='center'>$row->interessentenrtabsolviert_vz / $row->interessentenrtabsolviert_bb</td>";
 				echo "<td align='center'>$row->bewerber_vz / $row->bewerber_bb</td>";
 				echo "<td align='center'>$row->aufgenommener_vz / $row->aufgenommener_bb</td>";
 				echo "<td align='center'>$row->student1sem_vz / $row->student1sem_bb</td>";

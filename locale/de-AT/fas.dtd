@@ -120,6 +120,10 @@
 <!ENTITY menu-statistic-substatistik-lvplanunggesamtsj-excel.label		"EXCEL">
 <!ENTITY menu-statistic-substatistik-lvplanunggesamtsj-excel.accesskey	"E">
 
+<!ENTITY menu-statistic-abgaengerstatistik.key			"A">
+<!ENTITY menu-statistic-abgaengerstatistik.label		"Abgaengerstatistik">
+<!ENTITY menu-statistic-abgaengerstatistik.accesskey	"A">
+
 <!-- Dokumente -->
 <!ENTITY menu-dokumente.label		"Dokumente">
 <!ENTITY menu-dokumente.accesskey	"D">
