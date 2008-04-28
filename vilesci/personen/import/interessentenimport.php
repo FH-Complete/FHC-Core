@@ -123,6 +123,16 @@ function checkVorschlag()
 	alert('Bitte wählen Sie einen der Vorschläge aus');
 	return false;
 }
+
+function checkInput1()
+{
+	if(document.getElementById('nachname').value=='')
+	{
+		alert('Nachname muss eingetragen werden');
+		return false;
+	}
+	return true;
+}
 </script>
 </head>
 <body>
@@ -250,6 +260,9 @@ if(isset($_POST['save']))
 	//		anmerkungen: $anmerkungen | studiengang_kz: $studiengang_kz | person_id: $person_id<br><br>";
 	$person = new person($conn);
 	$prestudent = new prestudent($conn);
+	
+	$prestudent_vorhanden=false;
+	
 	pg_query($conn, 'BEGIN');
 	//Wenn die person_id=0 dann wird eine neue Person angelegt
 	//Ansosnsten wird es an die Person mit $person_id angehaengt
@@ -268,11 +281,53 @@ if(isset($_POST['save']))
 			$titel = $person->titelpre;
 			$titelpost = $person->titelpost;
 			$geschlecht = $person->geschlecht;
+			$anrede = $person->anrede;
 			//Wenn Prestudent bereits existiert, dann abbrechen
 			if($prestudent->exists($person_id, $studiengang_kz))
 			{
-				$error=true;
-				$errormsg = 'Prestudent existiert bereits!';
+				//Prestudent ID holen
+				$qry = "SELECT prestudent_id FROM public.tbl_prestudent WHERE person_id='$person_id' AND studiengang_kz='$studiengang_kz'";
+				if($result = pg_query($conn, $qry))
+				{
+					if(pg_num_rows($result)>1)
+					{
+						// Wenn bereits mehrere Prestudenten in diesem Studingang vorhanden sind, dann abbrechen
+						$error=true;
+						$errormsg = 'Der Interessent konnte nicht angelegt werden, da dieser Student bereits mehr als einen Prestudenten in diesem Studiengang hat.';
+					}
+					else 
+					{
+						$row = pg_fetch_object($result);
+						$prestudent_id=$row->prestudent_id;
+
+						//Wenn der Prestudent noch keinen Studenten eintrag hat, dann wird die neue
+						//Rolle hinzugefuegt, sonst wird abgebrochen
+						$qry = "SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='$prestudent_id' AND rolle_kurzbz='Student'";
+						if($result = pg_query($conn, $qry))
+						{
+							if(pg_num_rows($result)>0)
+							{
+								$error=true;
+								$errormsg = 'Der Interessent konnte nicht angelegt werden, da diese Person bereits als Student in diesem Studiengang angelegt ist.';
+							}
+							else 
+							{
+								$prestudent_vorhanden=true;
+								$prestudent->load($prestudent_id);
+							}
+						}
+						else 
+						{
+							$error=true;
+							$errormsg = 'Fehler beim Ermitteln der Prestudentrollen!';
+						}
+					}
+				}
+				else 
+				{
+					$error = true;
+					$errormsg = 'Fehler beim Suchen der PrestudentID';
+				}
 			}
 		}
 	}
@@ -430,7 +485,7 @@ if(isset($_POST['save']))
 	}
 
 	//Prestudent Anlegen
-	if(!$error)
+	if(!$error && !$prestudent_vorhanden)
 	{
 		$prestudent->new = true;
 		$prestudent->aufmerksamdurch_kurzbz = 'k.A.';
@@ -466,7 +521,7 @@ if(isset($_POST['save']))
 			$errormsg = $prestudent->errormsg;
 		}
 	}
-
+	
 	if(!$error)
 	{
 		//Prestudent Rolle Anlegen			
@@ -620,7 +675,7 @@ if($geburtsdatum!='')
 		echo "Format des Geburtsdatums ist ungueltig!";
 }
 if(($geburtsdatum=='' && $vorname=='' && $nachname=='') || $geburtsdatum_error)
-	echo "<form method='POST'>";
+	echo "<form method='POST' onsubmit='return checkInput1();'>";
 else 
 	echo "<form method='POST' onsubmit='return checkVorschlag()'>";
 ?>
@@ -720,6 +775,12 @@ if($vorname!='' && $nachname!='')
 	if($where!='')
 		$where.=' OR';
 	$where.=" (LOWER(vorname)=LOWER('".$vorname."') AND LOWER(nachname)=LOWER('".$nachname."'))";
+}
+elseif($nachname!='')
+{
+	if($where!='')
+		$where.=' OR';
+	$where.=" LOWER(nachname)=LOWER('".$nachname."')";
 }
 
 if($where!='')
