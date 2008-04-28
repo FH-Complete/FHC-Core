@@ -34,7 +34,8 @@ require_once('../../../../include/datum.class.php');
 require_once('../../../../include/legesamtnote.class.php');
 require_once('../../../../include/lvgesamtnote.class.php');
 require_once('../../../../include/zeugnisnote.class.php');
-
+
+
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim oeffnen der Datenbankverbindung');
 
@@ -50,11 +51,6 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id
 	$lvid = $_GET['lvid'];
 else
 	die('Fehlerhafte Parameteruebergabe');
-
-if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id'])) //Lehreinheit_id
-	$lehreinheit_id = $_GET['lehreinheit_id'];
-else
-	$lehreinheit_id = '';
 
 //Laden der Lehrveranstaltung
 $lv_obj = new lehrveranstaltung($conn);
@@ -82,12 +78,6 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 $stsem_obj = new studiensemester($conn);
 if($stsem=='')
 	$stsem = $stsem_obj->getaktorNext();
-
-
-
-
-if($lehreinheit_id=='')
-	die('Es wurde keine passende Lehreinheit in diesem Studiensemester gefunden');
 
 $note = $_REQUEST["note"];
 

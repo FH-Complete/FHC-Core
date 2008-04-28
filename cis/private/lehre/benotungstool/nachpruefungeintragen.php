@@ -34,7 +34,8 @@ require_once('../../../../include/datum.class.php');
 require_once('../../../../include/legesamtnote.class.php');
 require_once('../../../../include/lvgesamtnote.class.php');
 require_once('../../../../include/zeugnisnote.class.php');
-require_once('../../../../include/pruefung.class.php');
+require_once('../../../../include/pruefung.class.php');
+
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim oeffnen der Datenbankverbindung');
 
@@ -46,6 +47,8 @@ if(!check_lektor($user, $conn))
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
 
+$lehreinheit_id='';
+
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id
 	$lvid = $_GET['lvid'];
 else
@@ -53,14 +56,13 @@ else
 
 if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id'])) //Lehreinheit_id
 	$lehreinheit_id = $_GET['lehreinheit_id'];
-else
-	die('Fehlerhafte Parameteruebergabe');
+//else
+//	die('Fehlerhafte Parameteruebergabe');
 
 if(isset($_GET['lehreinheit_id_pr']) && is_numeric($_GET['lehreinheit_id_pr'])) //Lehreinheit_id der pruefung
 	$lehreinheit_id = $_GET['lehreinheit_id_pr'];
-
 	
-if(isset($_GET['datum'])) //Lehreinheit_id
+if(isset($_GET['datum']))
 	$datum = $_GET['datum'];
 	
 else
@@ -96,8 +98,8 @@ if($stsem=='')
 $student_uid = $_REQUEST["student_uid"];
 
 
-if($lehreinheit_id=='')
-	die('Es wurde keine passende Lehreinheit in diesem Studiensemester gefunden');
+//if($lehreinheit_id=='')
+//	die('Es wurde keine passende Lehreinheit in diesem Studiensemester gefunden');
 
 $note = $_REQUEST["note"];
 if ( (($note>0) && ($note < 6)) || ($note == 7) || ($note==8) )

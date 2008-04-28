@@ -127,7 +127,7 @@ function getTopOffset(){
 	    stud_uid = uid;
 	    var jetzt = new Date();
 		var ts = jetzt.getTime();
-	    var url= '<?php echo "lvgesamtnoteeintragen.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem"; ?>';
+	    var url= '<?php echo "lvgesamtnoteeintragen.php?lvid=$lvid&stsem=$stsem"; ?>';
 	    url += '&submit=1&student_uid='+uid+"&note="+note+"&"+ts;
 	    anfrage.open("GET", url, true);
 	    anfrage.onreadystatechange = updateSeite;
@@ -218,7 +218,8 @@ function getTopOffset(){
 			erzeugeAnfrage(); 
 		    var jetzt = new Date();
 			var ts = jetzt.getTime();
-		    var url= '<?php echo "nachpruefungeintragen.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem"; ?>';
+		    var url= '<?php echo "nachpruefungeintragen.php?lvid=$lvid&stsem=$stsem"; ?>';
+		    //&lehreinheit_id=$lehreinheit_id
 		    url += '&submit=1&student_uid='+uid+'&note='+note+'&datum='+datum+'&lehreinheit_id_pr='+lehreinheit_id+'&'+ts;
 		    //alert(url);
 		    anfrage.open("GET", url, true);
@@ -365,11 +366,12 @@ $stsem_content = "Studiensemester: <SELECT name='stsem' onChange=\"MM_jumpMenu('
 foreach($stsem_obj->studiensemester as $studiensemester)
 {
 	$selected = ($stsem == $studiensemester->studiensemester_kurzbz?'selected':'');
-	$stsem_content.= "<OPTION value='studentenpunkteverwalten.php?lvid=$lvid&stsem=$studiensemester->studiensemester_kurzbz' $selected>$studiensemester->studiensemester_kurzbz</OPTION>\n";
+	$stsem_content.= "<OPTION value='lvgesamtnoteverwalten.php?lvid=$lvid&stsem=$studiensemester->studiensemester_kurzbz' $selected>$studiensemester->studiensemester_kurzbz</OPTION>\n";
 }
 $stsem_content.= "</SELECT>\n";
 
 //Lehreinheiten laden
+/*
 if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lv_obj->studiengang_kz) || $rechte->isBerechtigt('lehre',$lv_obj->studiengang_kz))
 {
 	$qry = "SELECT distinct tbl_lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehreinheitmitarbeiter
@@ -447,14 +449,14 @@ if($result = pg_query($conn, $qry))
 else
 {
 	echo 'Fehler beim Auslesen der Lehreinheiten';
-}
+}*/
 echo $stsem_content;
 echo '</td><tr></table>';
 echo '<table width="100%"><tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
 echo "<td>\n";
 echo "<b>$lv_obj->bezeichnung</b><br>";
-
+/*
 if($lehreinheit_id=='')
 	die('Es wurde keine passende Lehreinheit in diesem Studiensemester gefunden');
 
@@ -462,7 +464,7 @@ if(!isset($_GET['standalone']))
 {
 	//Menue
 	include("menue.inc.php");
-}
+}*/
 
 
 // lvgesamtnote für studenten speichern
@@ -568,7 +570,7 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 			$adressen = $sg->email.", ".$user."@".DOMAIN;
 			
 			$freigeber = "<b>".strtoupper($user)."</b>";
-			mail($adressen,"Notenfreigabe ".$lv->bezeichnung,"<html><body><b>".$lv->bezeichnung." - ".$stsem."</b> (".$lv->semester.". Sem.) <br><br>Benutzer ".$freigeber." hat die LV-Noten f&uuml;r folgende Studenten freigegeben:<br><br>".$studlist."<br>Mail wurde verschickt an: ".$adressen."</body></html>","From: vilesci@".DOMAIN."\nContent-Type: text/html\n");
+			//mail($adressen,"Notenfreigabe ".$lv->bezeichnung,"<html><body><b>".$lv->bezeichnung." - ".$stsem."</b> (".$lv->semester.". Sem.) <br><br>Benutzer ".$freigeber." hat die LV-Noten f&uuml;r folgende Studenten freigegeben:<br><br>".$studlist."<br>Mail wurde verschickt an: ".$adressen."</body></html>","From: vilesci@".DOMAIN."\nContent-Type: text/html\n");
 		}	
 	}
 	else 
@@ -577,6 +579,7 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 	}
 }
 
+echo "<h3><a href='javascript:window.history.back()'>Zurück</a></h3>";
 echo "<h3>LV Gesamtnote verwalten</h3>";
 echo "Noten: 1-5, 7 (nicht beurteilt), 8 (teilgenommen)";
 
@@ -623,7 +626,7 @@ echo "
 				<td class='ContentHeader2'></td>
 				<td class='ContentHeader2'>LV-Note</td>
 				<td class='ContentHeader2' align='right'>
-				<form name='freigabeform' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem".(isset($_GET['standalone'])?'&standalone=true':'')."' method='POST' onsubmit='return OnFreigabeSubmit()'><input type='hidden' name='freigabe' value='1'>
+				<form name='freigabeform' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem' method='POST' onsubmit='return OnFreigabeSubmit()'><input type='hidden' name='freigabe' value='1'>
 				Passwort: <input type='password' size='8' id='textbox-freigabe-passwort' name='passwort'><br><input type='submit' name='frei' value='Freigabe'>
 				</form>
 				</td>
@@ -696,11 +699,14 @@ echo "
 				
 				echo "
 				<tr class='liste".($i%2)."'>
-					<td><a href='mailto:$row_stud->uid@".DOMAIN."'><img src='../../../../skin/images/button_mail.gif'></a></td>					
-					<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->uid</a></td>
-					<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->nachname</a></td>
-					<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->vorname</a></td>";
-					
+					<td><a href='mailto:$row_stud->uid@".DOMAIN."'><img src='../../../../skin/images/button_mail.gif'></a></td>";
+					//<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->uid</a></td>
+					//<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->nachname</a></td>
+					//<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->vorname</a></td>";
+				echo "
+					<td>$row_stud->uid</td>
+					<td>$row_stud->nachname</td>
+					<td>$row_stud->vorname</td>";
 				
 				$note_les_str = '';
 				$le_anz = 0;
@@ -751,7 +757,7 @@ echo "
 					$hide = "style='visibility:hidden;'";
 				else
 					$hide = "style='visibility:visible;'";				
-				echo "<form name='$row_stud->uid' id='$row_stud->uid' method='POST' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem".(isset($_GET['standalone'])?'&standalone=true':'')."'><td><span id='lvnoteneingabe_".$row_stud->uid."' ".$hide."><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_vorschlag' name='note'><input type='button' value='->' onclick='saveLVNote(\"$row_stud->uid\")'></span></td></form>";
+				echo "<form name='$row_stud->uid' id='$row_stud->uid' method='POST' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td><span id='lvnoteneingabe_".$row_stud->uid."' ".$hide."><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_vorschlag' name='note'><input type='button' value='->' onclick='saveLVNote(\"$row_stud->uid\")'></span></td></form>";
 
 				if ($note_lv == 5)
 					$negmarkier = " style='color:red; font-weight:bold;'";
