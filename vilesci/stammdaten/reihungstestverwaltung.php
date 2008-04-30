@@ -77,6 +77,12 @@
 			$maxlength[$i] = 11;
 			$worksheet->write(2,++$i,"EMail", $format_bold);
 			$maxlength[$i] = 5;
+			$worksheet->write(2,++$i,"STRASSE", $format_bold);
+			$maxlength[$i] = 6;
+			$worksheet->write(2,++$i,"PLZ", $format_bold);
+			$maxlength[$i] = 3;
+			$worksheet->write(2,++$i,"ORT", $format_bold);
+			$maxlength[$i] = 3;
 			
 			$qry = "SELECT *, (SELECT kontakt FROM tbl_kontakt WHERE kontakttyp='email' AND person_id=tbl_prestudent.person_id ORDER BY zustellung LIMIT 1) as email FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE reihungstest_id='$reihungstest->reihungstest_id' ORDER BY nachname, vorname";
 
@@ -107,6 +113,24 @@
 					if(strlen($row->email)>$maxlength[$i])
 						$maxlength[$i] = strlen($row->email);
 					
+					$qry = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id' ORDER BY zustelladresse LIMIT 1";
+					if($result_adresse = pg_query($conn, $qry))
+					{
+						if($row_adresse = pg_fetch_object($result_adresse))
+						{
+							$worksheet->write($zeile,++$i,$row_adresse->strasse);
+							if(strlen($row_adresse->strasse)>$maxlength[$i])
+								$maxlength[$i] = strlen($row_adresse->strasse);
+								
+							$worksheet->write($zeile,++$i,$row_adresse->plz);
+							if(strlen($row_adresse->plz)>$maxlength[$i])
+								$maxlength[$i] = strlen($row_adresse->plz);
+							
+							$worksheet->write($zeile,++$i,$row_adresse->ort);
+							if(strlen($row_adresse->ort)>$maxlength[$i])
+								$maxlength[$i] = strlen($row_adresse->ort);						
+						}
+					}
 					$zeile++;					
 				}
 			}
