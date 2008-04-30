@@ -68,13 +68,13 @@ input.TextBox
 }
 .home_logo
 {
-	background-image:url(styles/tw_green/tw_gr_logo.jpg);
+	background-image:url(styles/twgreen/tw_gr_logo.jpg);
 	width:182px;
 	height:120px;
 }
 .header_line
 {
-	background-image:url(styles/tw_green/tw_gr_header.jpg);
+	background-image:url(styles/twgreen/tw_gr_header.jpg);
 	background-repeat:repeat-x;
 	width:100%;
 	height:120px;
@@ -86,7 +86,7 @@ input.TextBox
 /* Vor IE/Mac verstecken*/
 #footer /*Menu Balken*/
 {
-	background-image:url(styles/tw_green/menu.jpg);
+	background-image:url(styles/twgreen/menu.jpg);
 	width:182px;
 	height:37px;
 	background-repeat:no-repeat;

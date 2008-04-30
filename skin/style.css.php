@@ -9,8 +9,11 @@
 		$path='../';
 	require ($path.'cis/config.inc.php');
 	//setcookie('stylesheet', DEFAULT_STYLE);
-	if (isset($_COOKIE['stylesheet']))
+	//Name des Stylesheets darf nur buchstaben von A-Z enthalten (ohne umlaute)
+	if (isset($_COOKIE['stylesheet']) && preg_match('/^[a-zA-Z]+$/', $_COOKIE['stylesheet']))
+	{
 		$stylesheet=$_COOKIE['stylesheet'];
+	}
 	else
 		$stylesheet=DEFAULT_STYLE;
 	//setcookie('stylesheet', DEFAULT_STYLE);
