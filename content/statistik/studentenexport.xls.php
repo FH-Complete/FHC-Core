@@ -163,6 +163,8 @@ loadVariables($conn, $user);
 	$maxlength[$i]=3;
 	$worksheet->write($zeile,++$i,"UID", $format_bold);
 	$maxlength[$i]=3;
+	$worksheet->write($zeile,++$i,"ORGFORM", $format_bold);
+	$maxlength[$i]=7;
 	$worksheet->write($zeile,++$i,"VORNAMEN", $format_bold);
 	$maxlength[$i]=8;
 	
@@ -200,6 +202,7 @@ loadVariables($conn, $user);
 		$prestudent = new prestudent($conn, null, null);
 		$prestudent->getLastStatus($row->prestudent_id);
 		$status = $prestudent->rolle_kurzbz;
+		$orgform = $prestudent->orgform_kurzbz;
 			
 		$i=0;
 		
@@ -485,6 +488,12 @@ loadVariables($conn, $user);
 				$maxlength[$i] = strlen($row->student_uid);
 			$worksheet->write($zeile,$i, $row->student_uid);
 		}
+		$i++;
+		
+		//Orgform
+		if(strlen($orgform)>$maxlength[$i])
+			$maxlength[$i] = strlen($orgform);
+		$worksheet->write($zeile,$i, $orgform);
 		$i++;
 		
 		//Vornamen
