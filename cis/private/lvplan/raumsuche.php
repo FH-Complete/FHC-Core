@@ -41,6 +41,35 @@ echo '
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<title>Reservierungsliste</title>
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
+	<script language="Javascript">
+	function checkdata()
+	{
+		if(document.getElementById("datum").value=="")
+		{
+			alert("Es muss ein Datum eingegeben werden");
+			return false;
+		}
+		datum = document.getElementById("datum").value
+		if(datum.length!=10)
+		{
+			alert("Das angegebene Datum ist ungueltig! Bitte geben Sie das Datum im Format dd.mm.YYYY (31.12.2008) ein");
+			return false;
+		}
+		
+		if(document.getElementById("vonzeit").value=="")
+		{
+			alert("VON-Zeit muss eingegeben werden");
+			return false;
+		}
+				
+		if(document.getElementById("biszeit").value=="")
+		{
+			alert("BIS-Zeit muss eingegeben werden");
+			return false;
+		}
+		return true;
+	}
+	</script>
 </head>
 <body id="inhalt">
 	<H2><table class="tabcontent">
@@ -52,10 +81,10 @@ echo '
 	</H2>
 ';
 
-echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
-		Datum* <input type="text" name="datum" size="10" value="'.$datum.'">
-		Von* <input type="text" name="vonzeit" size="5" value="'.$vonzeit.'">
-		Bis* <input type="text" name="biszeit" size="5" value="'.$biszeit.'">
+echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST" onsubmit="return checkdata()">
+		Datum* <input type="text" name="datum" id="datum" size="10" value="'.$datum.'">
+		Von* <input type="text" name="vonzeit" id="vonzeit" size="5" value="'.$vonzeit.'">
+		Bis* <input type="text" name="biszeit" id="biszeit" size="5" value="'.$biszeit.'">
 		Raumtyp: <SELECT name="raumtyp">
 		<OPTION value="">Alle</OPTION>';
 $raumtyp_obj = new raumtyp($conn);
@@ -76,24 +105,65 @@ echo '	</SELECT>
 	  </form>';
 if($sent)
 {
-	$ort = new ort($conn);
-	$ort->search($datum, $vonzeit, $biszeit, $raumtyp, $anzahlpersonen, true);
-	
-	echo '<br><table>';
-	echo '<tr class="liste"><td>Raum</td><td>Bezeichnung</td><td>Nummer</td><td>Personen</td><td>Reservieren</td></tr>';
-	$i=0;
-	$datum_sec = $datum_obj->mktime_datum($datum);
-	foreach ($ort->result as $row)
+	$error=false;
+	if($datum=='')
 	{
-		$i++;
-		echo '<tr class="liste'.($i%2).'">';
-		echo "<td>$row->ort_kurzbz</td>";
-		echo "<td>$row->bezeichnung</td>";
-		echo "<td>$row->planbezeichnung</td>";
-		echo "<td>$row->max_person</td>";
-		echo "<td><a href='stpl_week.php?type=ort&ort_kurzbz=$row->ort_kurzbz&datum=".$datum_sec."' class='Item'>Reservieren</a></td>";
-		echo '</tr>';
+		echo "<br>Es muss ein Datum angegeben werden";
+		$error = true;
 	}
-	echo '</table>';
+	if($vonzeit=='')
+	{
+		echo "<br>VON-Zeit muss angegeben werden";
+		$error = true;
+	}
+	if($biszeit=='')
+	{
+		echo "<br>BIS-Zeit muss angegeben werden";
+		$error = true;
+	}
+	
+	if(!$error)
+	{
+		//Von Zeit pruefen
+		if(!preg_match('/^[1-9]{2}:[0-9]{2}$/', $vonzeit))
+		{
+			echo "<br>VON-Zeit muss im Format hh:mm (12:30) angegeben werden";
+			$error = true;
+		}
+		//Bis Zeit pruefen
+		if(!preg_match('/^[1-9]{2}:[0-9]{2}$/', $biszeit))
+		{
+			echo "<br>BIS-Zeit muss im Format hh:mm (12:30) angegeben werden";
+			$error = true;
+		}
+		//Datum pruefen
+		if(!preg_match('/^([0-9]){2}\.([0-9]){2}\.([0-9]){4}$/', $datum))
+		{
+			echo "<br>Das angegebene Datum ist ungueltig! Bitte geben Sie das Datum im Format dd.mm.YYYY (31.12.2008) ein";
+			$error = true;
+		}
+	}
+	if(!$error)
+	{
+		$ort = new ort($conn);
+		$ort->search($datum, $vonzeit, $biszeit, $raumtyp, $anzahlpersonen, true);
+		
+		echo '<br><table>';
+		echo '<tr class="liste"><td>Raum</td><td>Bezeichnung</td><td>Nummer</td><td>Personen</td><td>Reservieren</td></tr>';
+		$i=0;
+		$datum_sec = $datum_obj->mktime_datum($datum);
+		foreach ($ort->result as $row)
+		{
+			$i++;
+			echo '<tr class="liste'.($i%2).'">';
+			echo "<td>$row->ort_kurzbz</td>";
+			echo "<td>$row->bezeichnung</td>";
+			echo "<td>$row->planbezeichnung</td>";
+			echo "<td>$row->max_person</td>";
+			echo "<td><a href='stpl_week.php?type=ort&ort_kurzbz=$row->ort_kurzbz&datum=".$datum_sec."' class='Item'>Reservieren</a></td>";
+			echo '</tr>';
+		}
+		echo '</table>';
+	}
 }
 ?>

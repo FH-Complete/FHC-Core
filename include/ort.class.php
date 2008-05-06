@@ -311,9 +311,9 @@ class ort
 		
 		//stundevon ermitteln
 		$qry = "SELECT stunde FROM (
-				SELECT stunde, extract(epoch from (beginn-('$zeit_von'::time))) AS delta FROM lehre.tbl_stunde
+				SELECT stunde, extract(epoch from (beginn-('".addslashes($zeit_von)."'::time))) AS delta FROM lehre.tbl_stunde
 				UNION
-				SELECT stunde, extract(epoch from (ende-('$zeit_von'::time))) AS delta FROM lehre.tbl_stunde
+				SELECT stunde, extract(epoch from (ende-('".addslashes($zeit_von)."'::time))) AS delta FROM lehre.tbl_stunde
 				) foo WHERE delta>=0 ORDER BY delta LIMIT 1;";
 		
 		if($result = pg_query($this->conn, $qry))
@@ -322,9 +322,9 @@ class ort
 
 		//stundebis ermitteln
 		$qry = "SELECT stunde FROM (
-				SELECT stunde, extract(epoch from (beginn-('$zeit_bis'::time))) AS delta FROM lehre.tbl_stunde
+				SELECT stunde, extract(epoch from (beginn-('".addslashes($zeit_bis)."'::time))) AS delta FROM lehre.tbl_stunde
 				UNION
-				SELECT stunde, extract(epoch from (ende-('$zeit_bis'::time))) AS delta FROM lehre.tbl_stunde
+				SELECT stunde, extract(epoch from (ende-('".addslashes($zeit_bis)."'::time))) AS delta FROM lehre.tbl_stunde
 				) foo WHERE delta>=0 ORDER BY delta LIMIT 1;";
 		
 		if($result = pg_query($this->conn, $qry))
@@ -338,21 +338,22 @@ class ort
 			public.tbl_ort JOIN public.tbl_ortraumtyp USING(ort_kurzbz) 
 		WHERE 
 			aktiv AND lehre AND ort_kurzbz NOT LIKE '\\\\_%'";
-		if($reservierung)
-			$qry.=" AND reservieren";
+		//derzeit noch nicht in verwendung
+		//if($reservierung)
+		//	$qry.=" AND reservieren";
 		if($raumtyp!=null)
-			$qry.=" AND raumtyp_kurzbz='$raumtyp'";
+			$qry.=" AND raumtyp_kurzbz='".addslashes($raumtyp)."'";
 		if($anzpersonen!=null)
-			$qry.=" AND (max_person>='$anzpersonen' OR max_person is null)";
+			$qry.=" AND (max_person>='".addslashes($anzpersonen)."' OR max_person is null)";
 		 
 		$qry.="	AND ort_kurzbz NOT IN 
 			(
-				SELECT ort_kurzbz FROM lehre.tbl_$db_table WHERE datum='$datum' AND stunde>='$stundevon' AND stunde<='$stundebis'
+				SELECT ort_kurzbz FROM lehre.tbl_$db_table WHERE datum='".addslashes($datum)."' AND stunde>='".addslashes($stundevon)."' AND stunde<='".addslashes($stundebis)."'
 				UNION
-				SELECT ort_kurzbz FROM campus.tbl_reservierung WHERE datum='$datum' AND stunde>='$stundevon' AND stunde<='$stundebis'
+				SELECT ort_kurzbz FROM campus.tbl_reservierung WHERE datum='".addslashes($datum)."' AND stunde>='".addslashes($stundevon)."' AND stunde<='".addslashes($stundebis)."'
 			)
 		";
-		
+		//echo $qry;
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
