@@ -314,14 +314,20 @@
 			?>
 			</table>
 			<BR><HR>
+			<?php
+			if(!$ansicht)
+			{
+				?>
 			Sollten ihre Daten nicht stimmen, wenden sie sich bitte an die <a class='Item' href="mailto:<?php echo $mail ?>?subject=Datenkorrektur&body=Die%20Profildaten%20fuer%20User%20'<?php echo $uid; ?>'%20sind%20nicht%20korrekt.%0D
 				Hier die richtigen Daten:%0DNachname:%20<?php echo $nachname;?>%0DVorname:%20<?php echo $vorname;?>%0DGeburtsdatum:%20<?php echo $gebdatum;?>
 				%0DGeburtsort:%20<?php echo $gebort;?>%0DTitelPre:%20<?php echo $titelpre;?>%0DTitelPost:%20<?php echo $titelpost;?>
 				%0D%0D***%0DPlatz fuer weitere (nicht angefuehrte Daten)%0D***">zuständige Assistentin</a>
 			<?php
+			}
 	}
 	else
 	{
+		
 		?>
 		<br><br>
 		Es wurden keine oder mehrere Profile f&uuml;r ihren Useraccount gefunden.
