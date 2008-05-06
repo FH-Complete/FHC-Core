@@ -101,7 +101,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 			<A class="Item" href="raumsuche.php">Raumsuche</A><BR>
 			</td>
 
-			<td>
+			<td valign="top">
+			<br>
 			Lektor:
 	  		<select name="lektor" onChange="MM_jumpMenu('self',this,0)">
 			    	<option value="stpl_week.php" selected>... ??? ...</option>
