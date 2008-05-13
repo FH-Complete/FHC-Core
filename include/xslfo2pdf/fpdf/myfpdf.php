@@ -225,7 +225,7 @@ class MyPdf extends FPDF {
 			$showLine = substr($line, 0, $noc);
 			$textWidth = $this->GetStringWidth($showLine);
 			//echo "showline: $showLine<br>";
-			//	    echo "wmax:$nb:$x:$w:$textWidth:$showLine<br>";
+			//echo "nb:$nb x:$x w:$w textwidth:$textWidth showline:$showLine<br>";
 			switch ($align) 
 			{
 				case "R":
