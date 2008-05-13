@@ -26,6 +26,7 @@ require_once('../../vilesci/config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/studiengang.class.php');
+require_once('../../include/akte.class.php');
 
 if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
@@ -89,11 +90,11 @@ if(isset($_GET['prestudent_id']))
 			$idstring.=',';
 		$idstring.="'$id'";	
 	}
-	$qry = "SELECT * FROM (SELECT distinct on(person_id) foto, vorname, nachname, person_id, prestudent_id, tbl_prestudent.studiengang_kz, semester, verband, gruppe FROM public.tbl_person JOIN public.tbl_prestudent USING(person_id) LEFT JOIN public.tbl_student USING(prestudent_id) WHERE prestudent_id in($idstring)) foo ORDER BY nachname, vorname";
+	$qry = "SELECT distinct on(person_id) foto, vorname, nachname, person_id, prestudent_id, tbl_prestudent.studiengang_kz, semester, verband, gruppe FROM public.tbl_person JOIN public.tbl_prestudent USING(person_id) LEFT JOIN public.tbl_student USING(prestudent_id) WHERE prestudent_id in($idstring)";
 }
 else
 {
-	$qry = "SELECT * FROM (SELECT 
+	$qry = "SELECT 
 			distinct on(person_id) foto, vorname, nachname, person_id, tbl_studentlehrverband.studiengang_kz, tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe
 		FROM 
 			campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid) 
@@ -106,35 +107,38 @@ else
 
 	if($lehreinheit_id!='')
 		$qry.=" AND lehreinheit_id='".addslashes($lehreinheit_id)."'";
-		
-	$qry.=' ORDER BY person_id) foo ORDER BY nachname, vorname';
 }
 
 echo '<html><head>
 <title>Anwesenheitsliste</title>
-<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
-</head><body>';
+<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+</head><body><h2>Studentenliste - '.date('d.m.Y').'</h2><br>';
 
 if($result = pg_query($conn, $qry))
 {
-	echo '<table>';
-	echo '<tr class="liste"><th>Foto</th><th>Nachname</th><th>Vorname</th><th>Gruppe</th></tr>';
-	$i=0;
+	echo "<table class='liste table-autosort:1 table-stripeclass:alternate table-autostripe'>";
+	echo '<thead><tr class="liste"><th>Foto</th><th class="table-sortable:default">Nachname</th><th class="table-sortable:default">Vorname</th><th class="table-sortable:default">Gruppe</th></tr></thead><tbody>';
 	while($row = pg_fetch_object($result))
 	{
-		$i++;
-		echo '<tr class="liste'.($i%2).'">';
+		echo '<tr>';
 		if($row->foto!='')
-			echo "<td><img src='../bild.php?src=person&person_id=$row->person_id'></td>";
+		{
+			$akte = new akte($conn);
+			$akte->getAkten($row->person_id, 'Lichtbil');
+			
+			echo "<td><a href='../akte.php?id=".$akte->result[0]->akte_id."'><img src='../bild.php?src=person&person_id=$row->person_id'></a></td>";
+		}
 		else 
 			echo "<td></td>";
 		echo "<td>$row->nachname</td>";
-		echo "<td>$row->vorname</td>";	
-		echo "<td>".$stg_obj->kuerzel_arr[$row->studiengang_kz]."-$row->semester$row->verband$row->gruppe</td>";	
+		echo "<td class='table-sortable:default'>$row->vorname</td>";	
+		echo "<td class='table-sortable:default'>".$stg_obj->kuerzel_arr[$row->studiengang_kz]."-$row->semester$row->verband$row->gruppe</td>";	
 		
 		echo '</tr>';
 	}
-	echo '</table>';
+	echo '</tbody></table>';
 }
 
 echo '</body></html>';
