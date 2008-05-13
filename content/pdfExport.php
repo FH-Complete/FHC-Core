@@ -82,6 +82,8 @@ if(isset($_GET['uid']))
 	$params.='&uid='.$_GET['uid'];
 if(isset($_GET['person_id']))
 	$params.='&person_id='.$_GET['person_id'];
+if(isset($_GET['prestudent_id']))
+	$params.='&prestudent_id='.$_GET['prestudent_id'];
 if(isset($_GET['buchungsnummern']))
 	$params.='&buchungsnummern='.$_GET['buchungsnummern'];
 if(isset($_GET['stg_kz']))

@@ -209,7 +209,10 @@ class FO_ExternalGraphic extends FO_Block
     $height = $this->getContext("height");
     $x = $this->getContext("posx");
     $y = $this->getContext("posy");
-        
+    if($x=='')
+    	$x = $this->getContext("x")+1;
+    if($y=='')
+    	$y = $this->getContext("y")+1;
      $pdf->Image($src, $x, $y, $width, $height, "jpg","");
  }
 }
