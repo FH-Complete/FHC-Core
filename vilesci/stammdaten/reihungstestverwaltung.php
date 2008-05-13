@@ -84,7 +84,7 @@
 			$worksheet->write(2,++$i,"ORT", $format_bold);
 			$maxlength[$i] = 3;
 			
-			$qry = "SELECT *, (SELECT kontakt FROM tbl_kontakt WHERE kontakttyp='email' AND person_id=tbl_prestudent.person_id ORDER BY zustellung LIMIT 1) as email FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE reihungstest_id='$reihungstest->reihungstest_id' ORDER BY nachname, vorname";
+			$qry = "SELECT *, (SELECT kontakt FROM tbl_kontakt WHERE kontakttyp='email' AND person_id=tbl_prestudent.person_id ORDER BY zustellung desc, insertamum desc LIMIT 1) as email FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE reihungstest_id='$reihungstest->reihungstest_id' ORDER BY nachname, vorname";
 
 			if($result = pg_query($conn, $qry))
 			{
@@ -348,7 +348,7 @@
 		{
 			echo "<a href='".$_SERVER['PHP_SELF']."?reihungstest_id=$reihungstest_id&excel=true'>Excel Export</a><br><br>";
 			//Liste der Interessenten die zum Reihungstest angemeldet sind
-			$qry = "SELECT *, (SELECT kontakt FROM tbl_kontakt WHERE kontakttyp='email' AND person_id=tbl_prestudent.person_id ORDER BY zustellung LIMIT 1) as email FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE reihungstest_id='$reihungstest_id' ORDER BY nachname, vorname";
+			$qry = "SELECT *, (SELECT kontakt FROM tbl_kontakt WHERE kontakttyp='email' AND person_id=tbl_prestudent.person_id ORDER BY zustellung desc, insertamum desc LIMIT 1) as email FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE reihungstest_id='$reihungstest_id' ORDER BY nachname, vorname";
 			$mailto = '';
 			if($result = pg_query($conn, $qry))
 			{
