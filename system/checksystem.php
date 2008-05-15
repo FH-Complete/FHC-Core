@@ -294,6 +294,67 @@ if (!@pg_query($conn,'SELECT * FROM bis.tbl_bundesland LIMIT 1;'))
 		echo 'Tabelle bis.tbl_bundesland wurde hinzugefuegt!<BR>';
 }
 
+// ************** public.tbl_preinteressent ************************
+if (!@pg_query($conn,'SELECT * FROM public.tbl_preinteressent LIMIT 1;'))
+{
+	$sql='	Create table tbl_preinteressent
+		(
+			preinteressent_id Serial NOT NULL,
+			person_id integer NOT NULL,
+			studiensemester_kurzbz Varchar(16) NOT NULL,
+			aufmerksamdurch_kurzbz Varchar(16) NOT NULL,
+			firma_id integer NOT NULL,
+			erfassungsdatum Date,
+			einverstaendnis Boolean,
+			absagedatum Timestamp,
+			anmerkung Text,
+			insertamum Timestamp,
+			insertvon Varchar(16),
+			updateamum Timestamp,
+			updatevon Varchar(16),
+			maturajahr Numeric(4,0),
+			infozusendung Date,
+		constraint pk_tbl_preinteressent primary key (preinteressent_id)
+		);
+		Create table tbl_preinteressentstudiengang
+		(
+			studiengang_kz integer NOT NULL,
+			preinteressent_id integer NOT NULL,
+			prioritaet Smallint,
+			freigabedatum Timestamp,
+			uebernahmedatum Timestamp,
+			insertamum Timestamp,
+			insertvon Varchar(16),
+			updateamum Timestamp,
+			updatevon Varchar(16),
+		constraint pk_tbl_preinteressentstudiengang primary key (studiengang_kz,preinteressent_id)
+		);
+		Comment on column "tbl_preinteressent"."firma_id" Is \'Schule\';
+		Comment on column "tbl_preinteressent"."einverstaendnis" Is \'Einverstaendniserklaerung\';
+		Comment on column "tbl_preinteressentstudiengang"."prioritaet" Is \'1 .. normal, 2. .. mittel, 3 ...\';
+		Alter table "tbl_preinteressentstudiengang" add Constraint "studiengang_preinteressentstudiengang" foreign key ("studiengang_kz") references "public"."tbl_studiengang" ("studiengang_kz") on update cascade on delete restrict;
+		Alter table "tbl_preinteressent" add Constraint "studiensemester_preinteressent" foreign key ("studiensemester_kurzbz") references "public"."tbl_studiensemester" ("studiensemester_kurzbz") on update cascade on delete restrict;
+		Alter table "tbl_preinteressent" add Constraint "person_preinteressent" foreign key ("person_id") references "public"."tbl_person" ("person_id") on update cascade on delete restrict;
+		Alter table "tbl_preinteressent" add Constraint "firma_preinteressent" foreign key ("firma_id") references "public"."tbl_firma" ("firma_id") on update cascade on delete restrict;
+		Alter table "tbl_preinteressent" add Constraint "aufmerksamdurch_preinteressent" foreign key ("aufmerksamdurch_kurzbz") references "public"."tbl_aufmerksamdurch" ("aufmerksamdurch_kurzbz") on update cascade on delete restrict;
+		Alter table "tbl_preinteressentstudiengang" add Constraint "preinteressent_preinteressentstudiengang" foreign key ("preinteressent_id") references "tbl_preinteressent" ("preinteressent_id") on update cascade on delete restrict;
+		Grant select on "tbl_preinteressent" to group "admin";
+		Grant update on "tbl_preinteressent" to group "admin";
+		Grant delete on "tbl_preinteressent" to group "admin";
+		Grant insert on "tbl_preinteressent" to group "admin";
+		Grant select on "tbl_preinteressentstudiengang" to group "admin";
+		Grant update on "tbl_preinteressentstudiengang" to group "admin";
+		Grant delete on "tbl_preinteressentstudiengang" to group "admin";
+		Grant insert on "tbl_preinteressentstudiengang" to group "admin";
+		Grant all on public.tbl_preinteressent_preinteressent_id_seq to group "admin";';
+
+	if (!@pg_query($conn,$sql))
+		echo '<strong>public.tbl_preinteressent: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo 'Tabelle public.tbl_preinteressent wurde hinzugefuegt!<BR>';
+}
+
+
 // ************** lehre.vw_stundenplandev_student_unr ************************
 if (!@pg_query($conn,'SELECT * FROM lehre.vw_stundenplandev_student_unr WHERE unr=0 LIMIT 1;'))
 {
