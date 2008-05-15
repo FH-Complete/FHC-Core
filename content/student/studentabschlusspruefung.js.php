@@ -31,7 +31,7 @@ loadVariables($conn, $user);
 // *********** Globale Variablen *****************//
 var StudentAbschlusspruefungSelectID=null; //Id der Abschlusspruefung die nach dem Rebuild markiert werden soll
 var StudentAbschlusspruefungTreeDatasource=null; //Datasource des Abschlusspruefung Trees
-
+var StudentAbschlusspruefungAkadgradDDDatasource=null; //Datasource des Akadgrad DropDowns
 // ********** Observer und Listener ************* //
 
 // ****
@@ -76,6 +76,36 @@ var StudentAbschlusspruefungTreeListener =
 	}
 };
 
+// ****
+// * Observer fuer Akadgrad DropDown
+// ****
+var StudentAbschlusspruefungAkadgradDDSinkObserver =
+{
+	onBeginLoad : function(pSink) 
+	{},
+	onInterrupt : function(pSink) {},
+	onResume : function(pSink) {},
+	onError : function(pSink, pStatus, pError) {},
+	onEndLoad : function(pSink)
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		document.getElementById('student-abschlusspruefung-menulist-akadgrad').builder.rebuild();
+	}
+};
+
+// ****
+// * Nach dem Rebuild wird der Akadgrad markiert
+// ****
+var StudentAbschlusspruefungAkadgradDDListener =
+{
+	willRebuild : function(builder) {  },
+	didRebuild : function(builder)
+	{
+  		dd = document.getElementById('student-abschlusspruefung-menulist-akadgrad');
+		//ersten Eintrag im DD markieren
+		dd.selectedIndex=0;
+	}
+};
 // ****************** FUNKTIONEN ************************** //
 
 // ****
@@ -333,6 +363,15 @@ function StudentAbschlusspruefungAuswahl()
 	var AkadgradDropDown = document.getElementById('student-abschlusspruefung-menulist-akadgrad');
 	url='<?php echo APP_ROOT;?>rdf/akadgrad.rdf.php?studiengang_kz='+stg_kz+"&"+gettimestamp();
 
+	//Alte Observer entfernen
+	try
+	{
+		StudentAbschlusspruefungAkadgradDDDatasource.removeXMLSinkObserver(StudentAbschlusspruefungAkadgradDDSinkObserver);
+		AkadgradDropDown.builder.removeListener(StudentAbschlusspruefungAkadgradDDListener);
+	}
+	catch(e)
+	{}
+	
 	//Alte DS entfernen
 	var oldDatasources = AkadgradDropDown.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -343,10 +382,10 @@ function StudentAbschlusspruefungAuswahl()
 	AkadgradDropDown.builder.rebuild();
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-	var datasource = rdfService.GetDataSourceBlocking(url);
-	datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-	datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-	AkadgradDropDown.database.AddDataSource(datasource);
+	StudentAbschlusspruefungAkadgradDDDatasource = rdfService.GetDataSourceBlocking(url);
+	StudentAbschlusspruefungAkadgradDDDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	StudentAbschlusspruefungAkadgradDDDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	AkadgradDropDown.database.AddDataSource(StudentAbschlusspruefungAkadgradDDDatasource);
 	
 	AkadgradDropDown.builder.rebuild();
 
@@ -493,8 +532,19 @@ function StudentAbschlusspruefungNeu()
 	//Akadgrad DropDown laden
 	var AkadgradDropDown = document.getElementById('student-abschlusspruefung-menulist-akadgrad');
 	url='<?php echo APP_ROOT;?>rdf/akadgrad.rdf.php?studiengang_kz='+stg_kz+"&"+gettimestamp();
+	
+	//Alte Observer entfernen
+	try
+	{
+		StudentAbschlusspruefungAkadgradDDDatasource.removeXMLSinkObserver(StudentAbschlusspruefungAkadgradDDSinkObserver);
+		AkadgradDropDown.builder.removeListener(StudentAbschlusspruefungAkadgradDDListener);
+	}
+	catch(e)
+	{}
+	
 	//Alte DS entfernen
 	var oldDatasources = AkadgradDropDown.database.GetDataSources();
+	
 	while(oldDatasources.hasMoreElements())
 	{
 		AkadgradDropDown.database.RemoveDataSource(oldDatasources.getNext());
@@ -503,10 +553,14 @@ function StudentAbschlusspruefungNeu()
 	AkadgradDropDown.builder.rebuild();
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-	var datasource = rdfService.GetDataSourceBlocking(url);
-	datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-	datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-	AkadgradDropDown.database.AddDataSource(datasource);
+	StudentAbschlusspruefungAkadgradDDDatasource = rdfService.GetDataSourceBlocking(url);
+	StudentAbschlusspruefungAkadgradDDDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	StudentAbschlusspruefungAkadgradDDDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	StudentAbschlusspruefungAkadgradDDDatasource.addXMLSinkObserver(StudentAbschlusspruefungAkadgradDDSinkObserver);
+	AkadgradDropDown.builder.addListener(StudentAbschlusspruefungAkadgradDDListener);
+	
+	AkadgradDropDown.database.AddDataSource(StudentAbschlusspruefungAkadgradDDDatasource);
+	
 	
 	AkadgradDropDown.builder.rebuild();
 }
