@@ -508,6 +508,10 @@
 			<td class="tdwrap">
 				<a href="?FAQ" class="MenuItem" onClick="return(js_toggle_container('FAQ'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;FAQ</a>
 				<table class="tabcontent" id="FAQ" style="display: none">
+				<tr>
+		  			<td class="tdwidth10" nowrap>&nbsp;</td>
+					<td class="tdwrap"><a class="Item" href="public/faq_systeminfo.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;allgem. Systeminfo</a></td>
+		  		</tr>
 		  		<tr>
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" href="public/faq_lan.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;LAN FAQ</a></td>

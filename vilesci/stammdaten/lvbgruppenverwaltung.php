@@ -205,7 +205,8 @@ if($type=='copy')
 	
 	if(isset($_POST['copynew']))
 	{
-		//neue Spezialgruppe anlegen
+		//neue Spezialgruppe anlegen
+
 
 		$bezeichnung = $_POST['bezeichnung_copy'];
 
@@ -318,7 +319,7 @@ if($type=='save')
 			{
 				$gruppe->beschreibung = $_POST['beschreibung'];
 				$gruppe->sichtbar = isset($_POST['sichtbar']);
-				$gruppe->lehre = isset($_POST['sichtbar']);
+				$gruppe->lehre = isset($_POST['lehre']);
 				$gruppe->aktiv = isset($_POST['aktiv']);
 				$gruppe->sort = $_POST['sort'];
 				$gruppe->mailgrp = isset($_POST['mailgrp']);
@@ -522,7 +523,7 @@ if($type=='edit')
 			echo '<div style="position:fixed;
  							  left:450px; top:50px;">';
 			
-			echo "Details von $gruppe_kurzbz<br><br>";
+			echo "<div style='background-color: #E0E0E0'>Details von $gruppe_kurzbz<br><br>";
 			echo "<form action='".$_SERVER['PHP_SELF']."?type=save&studiengang_kz=$studiengang_kz&gruppe_kurzbz=$gruppe_kurzbz' method='POST'>
 				  <table>
 				  	<tr>
@@ -571,7 +572,7 @@ if($type=='edit')
 				  		<td><input type='submit' value='Speichern' /></td>
 				  	</tr>
 				  </table>			
-				  </form>";
+				  </form></div>";
 				  
 			if($admin)
 			{
@@ -630,7 +631,6 @@ if($type=='edit')
 				  </form>";				  
 			  
 			}  
-			
 			echo '</div>';
 		}
 	}
