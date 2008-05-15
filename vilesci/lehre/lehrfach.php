@@ -190,6 +190,22 @@ if($filter_stg_kz=='' && $filter_fachbereich_kurzbz=='' && !isset($_GET['type'])
 
 if($rechte->isBerechtigt('admin',0))
 {
+	if (isset($_GET['type']) && $_GET['type']=='aktiv')
+	{
+		$lf = new lehrfach($conn);
+		$lf->load($_GET['lehrfach_nr']);
+		if ($lf->aktiv)
+			$lf->aktiv=false;
+		else 
+			$lf->aktiv=true;
+		$lf->updatevon = $user;
+	
+		if(!$lf->save())
+		{
+			echo "<br>$lf->errormsg<br>";
+		}
+		unset($_GET['type']);	
+	}
 	if (isset($_GET['type']) && $_GET['type']=='edit')
 	{
 		$lf=new lehrfach($conn);
@@ -361,7 +377,7 @@ if(!isset($_GET['type']))
 				".($filter_semester!=''?"AND semester='$filter_semester'":'')."
 				".($filter_fachbereich_kurzbz!=''?"AND fachbereich_kurzbz = '$filter_fachbereich_kurzbz'":'')."
 				$where
-				ORDER BY tbl_lehrfach.kurzbz";
+				ORDER BY tbl_lehrfach.kurzbz, tbl_lehrfach.lehrfach_id";
 	
 	//echo $sql_query;
 	$result_lehrfach=pg_query($conn, $sql_query);
@@ -402,9 +418,10 @@ if(!isset($_GET['type']))
 				<td>$row->semester</td>
 				<td>$row->fach</td>
 				<td>$row->bezeichnung</td>
-				<td>$row->farbe</td>
-				<td>".($row->aktiv=='t'?'Ja':'Nein')."</td>
-				<td>$row->fachbereich</td>
+				<td>$row->farbe</td>".
+				//"<td>".($row->aktiv=='t'?'Ja':'Nein')."</td>".
+				"<td><form action=\"lehrfach.php?lehrfach_nr=$row->nummer&type=aktiv&filter_stg_kz=$filter_stg_kz&filter_semester=$filter_semester&filter_fachbereich_kurzbz=$filter_fachbereich_kurzbz\" method='POST'><input type='image' src='../../skin/images/".($row->aktiv=='t'?'true.gif':'false.gif')."'></form></td>".
+				"<td>$row->fachbereich</td>
 				<td>$row->sprache</td>
 				<td>";
 		   if($rechte->isBerechtigt('admin', 0))
