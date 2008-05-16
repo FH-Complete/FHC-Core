@@ -1657,8 +1657,16 @@ if(!$error)
 			{
 				if(count($bm->result)>0)
 				{
+					//Wenn die Nummer gleich bleibt dann die alte ID verwenden da es
+					//unterschiedliche Schluessel gibt die die gleiche nummer haben ?!?
+					if($_POST['nummer']==$_POST['nummerold'])
+					{
+						$betriebsmittel_id = $_POST['betriebsmittel_id'];
+					}
+					else 
+						$betriebsmittel_id = $bm->result[0]->betriebsmittel_id;
 					//Wenn ein Eintrag gefunden wurde, dann wird die Beschreibung aktualisiert
-					if($bm->load($bm->result[0]->betriebsmittel_id))
+					if($bm->load($betriebsmittel_id))
 					{
 						$bm->beschreibung = $_POST['beschreibung'];
 						$bm->nummer = $_POST['nummer'];
@@ -1667,10 +1675,6 @@ if(!$error)
 							$return = false;
 							$error = true;
 							$errormsg = 'Fehler beim Speichern des Betriebsmittels';
-						}
-						else
-						{
-							$betriebsmittel_id = $bm->betriebsmittel_id;
 						}
 					}
 					else
@@ -1717,7 +1721,7 @@ if(!$error)
 					{
 						$error = true;
 						$return = false;
-						$errormsg = 'Fehler beim Laden der Betriebmittelperson Zuordnung';
+						$errormsg = 'Fehler beim Laden der Betriebmittelperson Zuordnung'.$betriebsmittel_id.'-'.$_POST['person_id'];
 					}
 				}
 				else

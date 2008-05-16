@@ -131,7 +131,7 @@ class betriebsmittelperson
 		}	
 		else 
 		{
-			$this->errormsg = 'Fehler beim laden der Daten';
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}		
 	}
@@ -269,7 +269,7 @@ class betriebsmittelperson
 			return true;
 		else 
 		{
-			$this->errormsg = 'Fehler beim loeschen der Daten';
+			$this->errormsg = 'Fehler beim Loeschen der Daten';
 			return false;
 		}
 	}
@@ -322,7 +322,7 @@ class betriebsmittelperson
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim laden der Daten';
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
