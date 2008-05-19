@@ -1,0 +1,224 @@
+<?php
+/* Copyright (C) 2007 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Gerald Raab <gerald.raab@technikum-wien.at>.
+ */
+require_once('../config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/studiengang.class.php');
+require_once('../../include/preinteressent.class.php');
+require_once('../../include/person.class.php');
+require_once('../../include/datum.class.php');
+require_once('../../include/prestudent.class.php');
+
+if(!$conn=pg_pconnect(CONN_STRING))
+   die("Konnte Verbindung zur Datenbank nicht herstellen");
+
+$user = get_uid();
+
+$rechte = new benutzerberechtigung($conn);
+$rechte->getBerechtigungen($user);
+
+$datum_obj = new datum();
+
+if(isset($_GET['studiengang_kz']))
+	$studiengang_kz = $_GET['studiengang_kz'];
+else 
+	$studiengang_kz = '';
+
+echo '<html>
+	<head>
+		<title>PreInteressenten</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+	</head>
+	<body class="Background_main">
+	<h2>PreInteressenten</h2>
+	';
+
+$stg_admin = $rechte->getStgKz('admin');
+$stg_assistenz = $rechte->getStgKz('assistenz');
+$stgs = array_merge($stg_admin, $stg_assistenz);
+sort($stgs);
+//Wenn keine Berechtigung vorhanden ist beenden
+if(count($stgs)==0)
+	die('Sie haben keine Studiengangsberechtigung');
+
+//alle Studiengaenge holen fuer die eine berechtigung vorhanden ist
+$qry = "SELECT UPPER(typ::varchar(1) || kurzbz) as kuerzel, studiengang_kz FROM public.tbl_studiengang";
+
+if($stgs[0]!=0)
+{
+	$stgwhere = '';
+	foreach ($stgs as $stg)
+	{
+		if($stgwhere!='')
+			$stgwhere.=',';
+		$stgwhere .=$stg;
+	}
+	
+	$qry.=" WHERE studiengang_kz in ($stgwhere)";
+}
+$qry.=" ORDER by kuerzel";
+
+//Drop Down fuer Studiengaenge anzeigen
+echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">Studiengang: <select name="studiengang_kz">';
+if($result = pg_query($conn, $qry))
+{
+	while($row = pg_fetch_object($result))
+	{
+		//wenn kein Studiengang uebergeben wurde dann den ersten nehmen fuer den eine Berechtigung vorhanden ist
+		if($studiengang_kz=='')
+			$studiengang_kz = $row->studiengang_kz;
+		
+		if($row->studiengang_kz == $studiengang_kz)
+			$selected = 'selected';
+		else 
+			$selected = '';
+		echo "<option value='$row->studiengang_kz' $selected>$row->kuerzel</option>";
+	}
+}
+echo '</select></form>';
+
+if(!$rechte->isBerechtigt('admin', $studiengang_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid'))
+	die('Sie haben keine Berechtigung fuer diese Seite');
+
+if(isset($_POST['uebertragen']))
+{
+	$anzahl_fehler=0;
+	$anzahl_uebernommen=0;
+	
+	foreach ($_POST as $param)
+	{
+		if(strstr($param, 'chk_'))
+		{
+			pg_query($conn, 'BEGIN;');
+			
+			$id = substr($param, 3);
+			$preinteressent = new preinteressent($conn);
+			if($preinteressent->load($id))
+			{
+				//Prestudent anlegen
+				$prestudent = new prestudent($conn);
+				$prestudent->new = true;
+				$prestudent->aufmerksamdurch_kurzbz = $preinteressent->aufmerksamdurch_kurzbz;
+				$prestudent->person_id = $preinteressent->person_id;
+				$prestudent->studiengang_kz = $studiengang_kz;
+				$prestudent->reihungstestangetreten = false;
+				$prestudent->bismelden = true;
+				$prestudent->insertamum = date('Y-m-d H:i:s');
+				$prestudent->insertvon = $user;
+				
+				if($prestudent->save())
+				{
+					//Rolle anlegen	
+					$prestudent->studiensemester_kurzbz = $preinteressent->studiensemester_kurzbz;
+					
+					$preinteressent1 = new preinteressent($conn);
+					$preinteressent1->loadStudiengangszuteilung($preinteressent_id, $studiengang_kz);
+					
+					$prestudent->ausbildungssemester = 1;
+					$prestudent->rolle_kurzbz = 'Interessent';
+					$prestudent->datum = date('Y-m-d');
+					$prestudent->insertamum = date('Y-m-d H:i:s');
+					$prestudent->inservon = $user;
+					
+					if($prestudent->save_rolle(true))
+					{
+						//Uebernahme Datum setzen						 
+						$qry = "UPDATE public.tbl_preinteressentstudiengang SET 
+								uebernahmedatum='".date('Y-m-d H:i:s')."', 
+								updateamum='".date('Y-m-d H:i:s')."', 
+								updatevon='".$user."'
+								WHERE studiengang_kz='$studiengang_kz' AND preinteressent_id='$preinteressent_id'";
+						if(pg_query($conn, $qry))
+						{
+							$anzahl_uebernommen++;
+							pg_query($conn, 'COMMIT');
+						}
+						else 
+						{
+							echo "<br>Fehler beim Eintragen des Uebernahmedatums";
+							$anzahl_fehler++;
+							pg_query($conn, 'ROLLBACK');
+						}
+					}
+					else 
+					{
+						echo "<br>Fehler beim Anlegen der Rolle: $prestudent->errormsg";
+						pg_query($conn, 'ROLLBACK');
+						$anzahl_fehler++;
+					}
+				}
+				else 
+				{
+					echo "<br>Fehler beim Speichern des Prestudenteintrages: $prestudent->errormsg";
+					pg_query($conn, 'ROLLBACK');
+					$anzahl_fehler++;
+				}
+			}
+			else 
+			{
+				echo "<br>PreInteressent mit der ID $id konnte nicht geladen werden";
+				pg_query($conn, 'ROLLBACK');
+				$anzahl_fehler++;
+			}
+		}
+	}
+	echo "<br>Es wurden <b>$anzahl_uebernommen Personen uebernommen</b>";
+	if($anzahl_fehler>0)
+		echo "<br>Es sind <b>$anzahl_fehler Fehler aufgetreten</b>";
+}
+echo '<br><br>';	
+echo "<form action='".$_SERVER['PHP_SELF']."?studiengang_kz=$studiengang_kz' method='POST'>";
+echo "<table class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>
+	<thead>
+		<tr>
+		<th class='table-sortable:default'>Nachname</th>
+		<th class='table-sortable:default'>Vorname</th>
+		<th class='table-sortable:default'>GebDatum</th>
+		<th class='table-sortable:default'>Studiensemester</th>
+		<th class='table-sortable:default'>Anmerkung</th>
+		<th>&nbsp;</th>
+		</tr>
+	</thead>
+	<tbody>";
+$preinteressent = new preinteressent($conn);
+$preinteressent->loadFreigegebene($studiengang_kz);
+
+foreach ($preinteressent->result as $row)
+{
+	echo '<tr>';
+	$person = new person($conn);
+	$person->load($row->person_id);
+	echo "<td>$person->nachname</td>";
+	echo "<td>$person->vorname</td>";
+	echo "<td>$person->gebdatum</td>";
+	echo "<td>$preinteressent->studiensemester_kurzbz</td>";
+	echo "<td>$preinteressent->anmerkung</td>";
+	echo "<td><input type='checkbox' name='chk_$preinteressent->preinteressent_id' checked></td>";
+	echo '</tr>';
+}
+echo '</tbody></table><br>';
+echo '<input type="submit" value="Uebertragen" name="uebertragen"></form>';
+?>
