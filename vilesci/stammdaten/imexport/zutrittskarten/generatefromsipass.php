@@ -113,9 +113,12 @@ if($result = pg_query($conn, $qry))
 	{
 		//echo "<br>".$row->person2.", ".$row->nachname2.", ".$row->vorname2.", ".$row->nummer2.", ".$row->person1.", ".$row->nachname1.", ".$row->vorname1.", ".$row->nummer1;
 		//$error=true;
-		$doppelte[$k]=$row->nummer1;
-		$fausgabe.="\n".$row->nummer1.", ";
-		$k++;
+		if(!in_array($row->nummer1,$doppelte))
+		{
+			$doppelte[$k]=$row->nummer1;
+			$fausgabe.="\n".$row->nummer1.", ";
+			$k++;
+		}
 	}
 }
 
