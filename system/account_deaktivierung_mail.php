@@ -62,8 +62,8 @@ if($result = pg_query($conn, $qry))
 		$message .= "Höchstädtplatz 5\n";
 		$message .= "A-1200 Wien \n";
 			
-		$to = 'oesi@technikum-wien.at';
-		//$to = 'bibliothek@'.DOMAIN;
+		//$to = 'oesi@technikum-wien.at';
+		$to = 'bibliothek@'.DOMAIN;
 		mail($to,'Account Deaktivierung ', $message, 'From: vilesci@'.DOMAIN);
 		$text.= "Warnung fuer Bibliothek wurde an $to verschickt\n";
 	}
@@ -100,8 +100,8 @@ if($result = pg_query($conn, $qry))
 		$message .= "Höchstädtplatz 5\n";
 		$message .= "A-1200 Wien \n";
 		
-		$to = 'oesi@technikum-wien.at';
-		//$to = $row->uid.'@'.DOMAIN;
+		//$to = 'oesi@technikum-wien.at';
+		$to = $row->uid.'@'.DOMAIN;
 		mail($to,'Ihr Datensatz wurde deaktiviert! '.$row->uid, $message, 'From: vilesci@'.DOMAIN);
 		$text.= "Warnung zur Accountloeschung wurde an $row->uid verschickt\n";
 	}
@@ -129,8 +129,8 @@ if($result = pg_query($conn, $qry))
 		$message .= "Höchstädtplatz 5\n";
 		$message .= "A-1200 Wien \n";
 		
-		$to = 'oesi@technikum-wien.at';
-		//$to = $row->uid.'@'.DOMAIN;
+		//$to = 'oesi@technikum-wien.at';
+		$to = $row->uid.'@'.DOMAIN;
 		mail($to,'Ihr Datensatz wurde deaktiviert! Letzte Warnung '.$row->uid, $message, 'From: vilesci@'.DOMAIN);
 		$text.= "Letzte Warnung zur Accountloeschung wurde an $row->uid verschickt\n";
 	}
@@ -157,8 +157,8 @@ if($result = pg_query($conn, $qry))
 		$message .= "Höchstädtplatz 5\n";
 		$message .= "A-1200 Wien \n";
 		
-		$to = 'oesi@technikum-wien.at';
-		//$to = $row->uid.'@'.DOMAIN;
+		//$to = 'oesi@technikum-wien.at';
+		$to = $row->uid.'@'.DOMAIN;
 		mail($to,'Ihr Datensatz wurde deaktiviert! Letzte Warnung '.$row->uid, $message, 'From: vilesci@'.DOMAIN);
 		$text.= "Letzte Warnung zur Accountloeschung wurde an $row->uid verschickt\n";
 	}
@@ -186,8 +186,8 @@ if($result = pg_query($conn, $qry))
 		$message .= "Höchstädtplatz 5\n";
 		$message .= "A-1200 Wien \n";
 		
-		$to = 'oesi@technikum-wien.at';
-		//$to = $row->uid.'@'.DOMAIN;
+		//$to = 'oesi@technikum-wien.at';
+		$to = $row->uid.'@'.DOMAIN;
 		mail($to,'Ihr Datensatz wurde deaktiviert! Letzte Warnung '.$row->uid, $message, 'From: vilesci@'.DOMAIN);
 		$text.= "Letzte Warnung zur Accountloeschung wurde an $row->uid verschickt\n";
 	}
@@ -196,7 +196,7 @@ if($result = pg_query($conn, $qry))
 echo nl2br($text);
 if($text!='')
 {
-	mail(MAIL_IT, 'Account Deaktivierung', "Dies ist eine automatische Mail!\nFolgende Warnungen zur Accountloeschung wurden versandt:\n\n".$text, 'From: vilesci@'.DOMAIN);
+	mail(MAIL_IT.', tw_ht@technikum-wien.at, schmuderm@technikum-wien.at, vilesci@technikum-wien.at' , 'Account Deaktivierung', "Dies ist eine automatische Mail!\nFolgende Warnungen zur Accountloeschung wurden versandt:\n\n".$text, 'From: vilesci@'.DOMAIN);
 }
 
 echo '</body></html>';
