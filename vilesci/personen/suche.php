@@ -70,6 +70,7 @@ if($searchstr!='')
 			SELECT distinct person_id FROM public.tbl_person LEFT JOIN public.tbl_benutzer USING(person_id) WHERE
 			nachname ~* '".addslashes($searchstr)."' OR 
 			vorname ~* '".addslashes($searchstr)."' OR
+			alias ~* '".addslashes($searchstr)."' OR
 			nachname || ' ' || vorname = '".addslashes($searchstr)."' OR 
 			vorname || ' ' || nachname = '".addslashes($searchstr)."' OR 
 			uid ~* '".addslashes($searchstr)."'
