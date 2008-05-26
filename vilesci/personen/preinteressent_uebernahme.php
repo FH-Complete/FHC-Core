@@ -98,7 +98,7 @@ if($result = pg_query($conn, $qry))
 		echo "<option value='$row->studiengang_kz' $selected>$row->kuerzel</option>";
 	}
 }
-echo '</select></form>';
+echo '</select><input type="submit" value="Anzeigen"></form>';
 
 if(!$rechte->isBerechtigt('admin', $studiengang_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid'))
 	die('Sie haben keine Berechtigung fuer diese Seite');
@@ -107,14 +107,13 @@ if(isset($_POST['uebertragen']))
 {
 	$anzahl_fehler=0;
 	$anzahl_uebernommen=0;
-	
-	foreach ($_POST as $param)
+	foreach ($_POST as $param=>$val)
 	{
 		if(strstr($param, 'chk_'))
 		{
 			pg_query($conn, 'BEGIN;');
 			
-			$id = substr($param, 3);
+			$id = substr($param, 4);
 			$preinteressent = new preinteressent($conn);
 			if($preinteressent->load($id))
 			{
@@ -134,8 +133,8 @@ if(isset($_POST['uebertragen']))
 					//Rolle anlegen	
 					$prestudent->studiensemester_kurzbz = $preinteressent->studiensemester_kurzbz;
 					
-					$preinteressent1 = new preinteressent($conn);
-					$preinteressent1->loadStudiengangszuteilung($preinteressent_id, $studiengang_kz);
+					//$preinteressent1 = new preinteressent($conn);
+					//$preinteressent1->loadStudiengangszuteilung($preinteressent_id, $studiengang_kz);
 					
 					$prestudent->ausbildungssemester = 1;
 					$prestudent->rolle_kurzbz = 'Interessent';
@@ -150,7 +149,7 @@ if(isset($_POST['uebertragen']))
 								uebernahmedatum='".date('Y-m-d H:i:s')."', 
 								updateamum='".date('Y-m-d H:i:s')."', 
 								updatevon='".$user."'
-								WHERE studiengang_kz='$studiengang_kz' AND preinteressent_id='$preinteressent_id'";
+								WHERE studiengang_kz='$studiengang_kz' AND preinteressent_id='$id'";
 						if(pg_query($conn, $qry))
 						{
 							$anzahl_uebernommen++;
@@ -185,7 +184,7 @@ if(isset($_POST['uebertragen']))
 			}
 		}
 	}
-	echo "<br>Es wurden <b>$anzahl_uebernommen Personen uebernommen</b>";
+	echo "<br>Es wurde(n) <b>$anzahl_uebernommen Person(en) uebernommen</b>";
 	if($anzahl_fehler>0)
 		echo "<br>Es sind <b>$anzahl_fehler Fehler aufgetreten</b>";
 }
@@ -214,9 +213,9 @@ foreach ($preinteressent->result as $row)
 	echo "<td>$person->nachname</td>";
 	echo "<td>$person->vorname</td>";
 	echo "<td>$person->gebdatum</td>";
-	echo "<td>$preinteressent->studiensemester_kurzbz</td>";
-	echo "<td>$preinteressent->anmerkung</td>";
-	echo "<td><input type='checkbox' name='chk_$preinteressent->preinteressent_id' checked></td>";
+	echo "<td>$row->studiensemester_kurzbz</td>";
+	echo "<td>$row->anmerkung</td>";
+	echo "<td><input type='checkbox' name='chk_$row->preinteressent_id' checked></td>";
 	echo '</tr>';
 }
 echo '</tbody></table><br>';

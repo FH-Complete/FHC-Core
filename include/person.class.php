@@ -476,23 +476,22 @@ class person
 	 *		$order Sortierkriterium
 	 * @return array mit LPersonen oder false=fehler
 	 */
-	function getTab($nn=null,$vn=null, $order='person_id')
+	function getTab($filter, $order='person_id')
 	{
-		$sql_query = "SELECT * FROM public.tbl_person";
-
-		if($nn!=null || $vn!=null)
-		   $sql_query .= " WHERE true";
-
-		if($nn!=null)
-		   $sql_query .= " AND nachname='$nn'";
-
-		if($vn!=null)
-			$sql_query .= " AND vorname='$vn'";
+		$sql_query = "SELECT * FROM public.tbl_person WHERE true ";
+		
+		if($filter!='')
+		{
+			$sql_query.=" AND 	nachname ~* '".addslashes($filter)."' OR 
+								vorname ~* '".addslashes($filter)."' OR
+								(nachname || ' ' || vorname) ~* '".addslashes($filter)."' OR
+								(vorname || ' ' || nachname) ~* '".addslashes($filter)."'";
+		}
 
 		$sql_query .= " ORDER BY $order";
-		if($nn==null || $nn==null)
+		if($filter=='')
 		   $sql_query .= " LIMIT 30";
-
+		
 		if($result=pg_query($this->conn,$sql_query))
 		{
 			while($row=pg_fetch_object($result))

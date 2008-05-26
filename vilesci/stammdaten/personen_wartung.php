@@ -18,22 +18,9 @@ if (!$conn = @pg_pconnect(CONN_STRING))
 
 $msg='';
 $outp='';
-if (isset($_GET['nn']) || isset($_POST['nn']))
-{
-	$nn=(isset($_GET['nn'])?$_GET['nn']:$_POST['nn']);
-}
-else
-{
-	$nn=NULL;
-}
-if (isset($_GET['vn']) || isset($_POST['vn']))
-{
-	$vn=(isset($_GET['vn'])?$_GET['vn']:$_POST['vn']);
-}
-else
-{
-	$vn=NULL;
-}
+
+$filter = isset($_REQUEST['filter'])?$_REQUEST['filter']:'';
+
 if (isset($_GET['person_id']) || isset($_POST['person_id']))
 {
 	$person_id=(isset($_GET['person_id'])?$_GET['person_id']:$_POST['person_id']);
@@ -165,13 +152,9 @@ if((isset($radio_1) && !isset($radio_2))||(!isset($radio_1) && isset($radio_2)) 
 <?php
 echo $outp;
 echo "<form name='suche' action='personen_wartung.php' method='POST'>";
-echo "<table><tr>";
-echo "<th>Nachname</th><th>Vorname</th><th>&nbsp;</th>";
-echo "<tr>";
-echo "<td><input name=\"nn\" type=\"text\" value=\"$nn\" size=\"64\" maxlength=\"64\"></td>";
-echo "<td><input name='vn' type='text' value=\"$vn\" size='32' maxlength='32'></td>";
-echo "<td><input type='submit' value=' suchen '></td></tr>";
-echo "</table></form>";
+echo "<input name=\"filter\" type=\"text\" value=\"$filter\" size=\"64\" maxlength=\"64\">";
+echo "<input type='submit' value=' suchen '>";
+echo "</form>";
 
 //aufruf
 ?>
@@ -180,7 +163,7 @@ echo "</table></form>";
 <br>
 <?php
 	//Tabellen anzeigen
-	echo "<form name='form_table' action='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=$order_2&nn=$nn&vn=$vn' method='POST'>";
+	echo "<form name='form_table' action='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=$order_2&filter=$filter' method='POST'>";
 	echo "<table width='100%' border='0' cellspacing='0' cellpadding='0'>";
 	echo "<tr>";
 
@@ -188,17 +171,17 @@ echo "</table></form>";
 
 	 //Tabelle 1
 	 echo "<table class='liste'><tr class='liste'>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=person_id&order_2=$order_2&nn=$nn&vn=$vn'>ID</a></th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=nachname&order_2=$order_2&nn=$nn&vn=$vn'>Nachname</a></th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=vorname&order_2=$order_2&nn=$nn&vn=$vn'>Vorname</a></th>";
+	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=person_id&order_2=$order_2&filter=$filter'>ID</a></th>";
+	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=nachname&order_2=$order_2&filter=$filter'>Nachname</a></th>";
+	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=vorname&order_2=$order_2&filter=$filter'>Vorname</a></th>";
 	 echo "<th>Geburtsdatum</th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=svnr&order_2=$order_2&nn=$nn&vn=$vn'>SVNr</a></th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=ersatzkennzeichen&order_2=$order_2&nn=$nn&vn=$vn'>Ersatzkennz.</a></th>";
+	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=svnr&order_2=$order_2&filter=$filter'>SVNr</a></th>";
+	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=ersatzkennzeichen&order_2=$order_2&filter=$filter'>Ersatzkennz.</a></th>";
 	 echo "<th>Ext-ID</th>";
 	 echo "<th>&nbsp;</th></tr>";
 
 	 $lf  = new person($conn);
-	 $lf->getTab($nn,$vn, $order_1);
+	 $lf->getTab($filter, $order_1);
 	 $i=0;
 	 foreach($lf->personen as $l)
 	 {
@@ -222,17 +205,17 @@ echo "</table></form>";
 	 //Tabelle 2
 	 echo "<table class='liste'><tr class='liste'>";
 	 echo "<th>&nbsp;</th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=person_id&nn=$nn&vn=$vn'>ID</a></th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=nachname&nn=$nn&vn=$vn'>Nachname</a></th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=vorname&nn=$nn&vn=$vn'>Vorname</a></th>";
+	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=person_id&filter=$filter'>ID</a></th>";
+	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=nachname&filter=$filter'>Nachname</a></th>";
+	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=vorname&filter=$filter'>Vorname</a></th>";
 	 echo "<th>Geburtsdatum</th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=svnr&nn=$nn&vn=$vn'>SVNr</a></th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=ersatzkennzeichen&nn=$nn&vn=$vn'>Ersatzkennz.</a></th>";
+	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=svnr&filter=$filter'>SVNr</a></th>";
+	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=ersatzkennzeichen&filter=$filter'>Ersatzkennz.</a></th>";
 	 echo "<th>Ext-ID</th>";
 	 echo "</tr>";
 
 	 $lf  = new person($conn);
-	 $lf->getTab($nn, $vn, $order_2);
+	 $lf->getTab($filter, $order_2);
 	 $i=0;
 	 foreach($lf->personen as $l)
 	 {
