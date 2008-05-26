@@ -771,5 +771,57 @@ class prestudent extends person
 			return false;
 		}
 	}
+	
+	// **********************************************
+	// * Laedt alle Prestudenten der Person
+	// * @return true wenn ok, false wenn Fehler
+	// **********************************************
+	function getPrestudenten($person_id)
+	{
+		if(!is_numeric($person_id) || $person_id=='')
+		{
+			$this->errormsg='ID ist ungueltig';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM public.tbl_prestudent WHERE person_id='$person_id'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$obj = new prestudent($this->conn, null, null);
+				
+				$obj->prestudent_id = $row->prestudent_id;
+				$obj->aufmerksamdurch_kurzbz = $row->aufmerksamdurch_kurzbz;
+				$obj->studiengang_kz = $row->studiengang_kz;
+				$obj->berufstaetigkeit_code = $row->berufstaetigkeit_code;
+				$obj->ausbildungcode = $row->ausbildungcode;
+				$obj->zgv_code = $row->zgv_code;
+				$obj->zgvort = $row->zgvort;
+				$obj->zgvdatum = $row->zgvdatum;
+				$obj->zgvmas_code = $row->zgvmas_code;
+				$obj->zgvmaort = $row->zgvmaort;
+				$obj->zgvmadatum = $row->zgvmadatum;
+				$obj->aufnahmeschluessel = $row->aufnahmeschluessel;
+				$obj->facheinschlberuf = ($row->facheinschlberuf=='t'?true:false);
+				$obj->anmeldungreihungstest = $row->anmeldungreihungstest;
+				$obj->reihungstestangetreten = ($row->reihungstestangetreten=='t'?true:false);
+				$obj->reihungstest_id = $row->reihungstest_id;
+				$obj->punkte = $row->punkte;
+				$obj->bismelden = ($row->bismelden=='t'?true:false);
+				$obj->person_id = $row->person_id;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->ext_id_prestudent = $row->ext_id;
+				
+				$this->result[] = $obj;
+			}
+		}
+		else 
+		{
+			$this->errormsg = "Fehler beim Laden: $qry";
+			return false;
+		}
+	}
 }
 ?>

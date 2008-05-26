@@ -118,10 +118,10 @@ echo '</SELECT>';
 echo '&nbsp;&nbsp;&nbsp;<input type="submit" value="Anzeigen">';
 echo '</form></td><td>';
 echo "<form action='".$_SERVER['PHP_SELF']."' method='GET'>";
-echo "<input type='text' value='$filter' name='filter'>&nbsp;";
+echo "<input type='text' value='".htmlentities($filter,ENT_QUOTES)."' name='filter'>&nbsp;";
 echo "<input type='submit' size='10' value='Suchen'>";
 echo '</form></td>';
-echo '<td>NEU</td></tr></table>';
+echo '<td align="right"><a href="preinteressent_anlegen.php" target="_blank">neuen Preinteressenten anlegen</a></td></tr></table>';
 
 //FREIGEBEN / LOESCHEN
 if(isset($_GET['action']))

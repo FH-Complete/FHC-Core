@@ -124,7 +124,7 @@ $menu=array
 		'ImExport'=>array
 		(
 			'name'=>'ImExport',
-			'Zuttritskarten'=>array('name'=>'Zuttritskarten', 'link'=>'stammdaten/imexport/zutrittskarten/index.html', 'target'=>'main')
+			'Zutrittskarten'=>array('name'=>'Zutrittskarten', 'link'=>'stammdaten/imexport/zutrittskarten/index.html', 'target'=>'main')
 		)
 	),
 	'Vorrueckung'=>	array

@@ -31,6 +31,7 @@ require_once('../../include/prestudent.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/aufmerksamdurch.class.php');
 require_once('../../include/firma.class.php');
+require_once('../../include/nation.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
    die("Konnte Verbindung zur Datenbank nicht herstellen");
@@ -119,6 +120,8 @@ echo "<h2>Details - $person->nachname $person->vorname</h2>";
 
 if(isset($_POST['save_preinteressent']))
 {
+	//Speichern der Preinteressentdaten
+	
 	$preinteressent->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
 	$preinteressent->aufmerksamdurch_kurzbz = $_POST['aufmerksamdurch_kurzbz'];
 	$preinteressent->firma_id = $_POST['firma'];
@@ -140,9 +143,46 @@ if(isset($_POST['save_preinteressent']))
 		echo "<b>Daten wurden gespeichert</b>";
 }
 
+if(isset($_POST['saveperson']))
+{
+	//Speichern der Personendaten
+	
+	$person->staatsbuergerschaft = $_POST['staatsbuergerschaft'];
+	$person->geburtsnation = $_POST['geburtsnation'];
+	$person->sprache = $_POST['sprache'];
+	$person->anrede = $_POST['anrede'];
+	$person->titelpost = $_POST['titelpost'];
+	$person->titelpre = $_POST['titelpre'];
+	$person->nachname = $_POST['nachname'];
+	$person->vorname = $_POST['vorname'];
+	$person->vornamen = $_POST['vornamen'];
+	$person->gebdatum = $_POST['gebdatum'];
+	$person->gebort = $_POST['gebort'];
+	$person->gebzeit = $_POST['gebzeit'];
+	$person->anmerkungen = $_POST['anmerkungen'];
+	$person->homepage = $_POST['homepage'];
+	$person->svnr = $_POST['svnr'];
+	$person->ersatzkennzeichen = $_POST['ersatzkennzeichen'];
+	$person->familienstand = $_POST['familienstand'];
+	$person->geschlecht = $_POST['geschlecht'];
+	$person->anzahlkinder = $_POST['anzahlkinder'];
+	$person->aktiv = isset($_POST['aktiv']);
+	$person->updateamum = date('Y-m-d H:i:s');
+	$person->updatevon = $user;
+	
+	if($person->save(false))
+	{
+		echo '<b>Daten wurden erfolgreich gespeichert</b>';
+	}
+	else 
+	{
+		echo "<b>Fehler beim Speichern der Daten: $person->errormsg</b>";
+	}
+	
+}
 if(isset($_GET['action']) && $_GET['action']=='neuezuordnung')
 {
-	//Speichern eine neue Studiengangszuordnung
+	//speichern einer neue Studiengangszuordnung
 	$zuordnung = new preinteressent($conn);
 
 	if(!$zuordnung->loadZuordnung($preinteressent->preinteressent_id, $_POST['studiengang_kz']))
@@ -162,7 +202,7 @@ if(isset($_GET['action']) && $_GET['action']=='neuezuordnung')
 
 if(isset($_POST['savezuordnung']))
 {
-	//Zuordnung Speichern
+	//bestehende Zuordnung speichern
 	$zuordnung = new preinteressent($conn);	
 	
 	if($zuordnung->loadZuordnung($preinteressent->preinteressent_id, $_GET['studiengang_kz']))
@@ -180,6 +220,7 @@ if(isset($_POST['savezuordnung']))
 
 if(isset($_POST['freigabe']))
 {
+	//freigabe einer zuordnung
 	$zuordnung = new preinteressent($conn);
 	if($zuordnung->loadZuordnung($preinteressent->preinteressent_id, $_GET['studiengang_kz']))
 	{
@@ -202,6 +243,7 @@ if(isset($_POST['freigabe']))
 }
 if(isset($_POST['freigabe_rueckgaengig']))
 {
+	//studiengangsfreigabe zurueckziehen
 	$zuordnung = new preinteressent($conn);
 	if($zuordnung->loadZuordnung($preinteressent->preinteressent_id, $_GET['studiengang_kz']))
 	{
@@ -231,6 +273,7 @@ if(isset($_POST['freigabe_rueckgaengig']))
 }
 if(isset($_POST['zuordnungloeschen']))
 {
+	//zuordnung zu einem studiengang loeschen
 	$zuordnung = new preinteressent($conn);
 	if($zuordnung->loadZuordnung($preinteressent->preinteressent_id, $_GET['studiengang_kz']))
 	{
@@ -255,7 +298,132 @@ echo '<a id="personendaten_label" href="javascript: changeTo(\'personendaten\');
 
 // ----- PERSON -----
 echo "<div id='personendaten' style='display: ".($selection=='personendaten'?'block':'none')."'>";
-echo "<a href='kontaktdaten_edit.php?person_id=$person->person_id' target='_blank'>Kontaktdaten bearbeiten</a>";
+
+$disabled=true;
+$qry = "SELECT count(*) as anzahl FROM (
+		SELECT 1 FROM public.tbl_prestudent WHERE person_id='$person->person_id' UNION 
+		SELECT 1 FROM public.tbl_benutzer WHERE person_id='$person->person_id') as foo";
+if($result = pg_query($conn, $qry))
+{
+	if($row = pg_fetch_object($result))
+	{
+		if($row->anzahl==0)
+			$disabled=false;
+	}
+}
+
+echo "<form action='".$_SERVER['PHP_SELF']."?id=$preinteressent->preinteressent_id&selection=personendaten' method='POST'>";
+echo "<table><tr>";
+
+//Anrede
+echo "<td>Anrede:</td><td><input type='text' name='anrede' ".($disabled?'disabled':'')." value='".htmlentities($person->anrede, ENT_QUOTES)."'></td>";
+//Titelpre
+echo "<td>Titelpre:</td><td><input type='text' name='titelpre' ".($disabled?'disabled':'')." value='".htmlentities($person->titelpre, ENT_QUOTES)."'></td>";
+//Titelpost
+echo "<td>Titelpost:</td><td><input type='text' name='titelpost' ".($disabled?'disabled':'')." value='".htmlentities($person->titelpost, ENT_QUOTES)."'></td>";
+echo '<td width="100%" align="right"><a href="personendetails.php?id='.$person->person_id.'" target="_blank">Gesamtübersicht über diese Person</a></td>';
+echo '</tr><tr>';
+//Nachname
+echo "<td>Nachname:</td><td><input type='text' name='nachname' ".($disabled?'disabled':'')." value='".htmlentities($person->nachname, ENT_QUOTES)."'></td>";
+//Vorname
+echo "<td>Vorname:</td><td><input type='text' name='vorname' ".($disabled?'disabled':'')." value='".htmlentities($person->vorname, ENT_QUOTES)."'></td>";
+//Vornamen
+echo "<td>2. Vorname:</td><td><input type='text' name='vornamen' ".($disabled?'disabled':'')." value='".htmlentities($person->vornamen, ENT_QUOTES)."'></td>";
+echo '<td width="100%" align="right">';
+if(!$disabled)
+	echo "<a href='kontaktdaten_edit.php?person_id=$person->person_id' target='_blank'>Kontaktdaten bearbeiten</a>";
+else 
+	echo "Kontaktdaten bearbeiten";
+echo '</td>';
+echo '</tr><tr>';
+//Geburtsdatum
+echo "<td>Geburtsdatum:</td><td><input type='text' name='gebdatum' ".($disabled?'disabled':'')." value='".htmlentities($datum_obj->formatDatum($person->gebdatum, 'd.m.Y'), ENT_QUOTES)."'></td>";
+//Geburtsort
+echo "<td>Geburtsort:</td><td><input type='text' name='gebort' ".($disabled?'disabled':'')." value='".htmlentities($person->gebort, ENT_QUOTES)."'></td>";
+//Geburtszeit
+echo "<td>Geburtszeit:</td><td><input type='text' name='gebzeit' size='5' ".($disabled?'disabled':'')." value='".htmlentities($person->gebzeit, ENT_QUOTES)."'></td>";
+echo '</tr><tr>';
+//Staatsbuergerschaft
+echo "<td>Staatsb&uuml;rgerschaft:</td><td><SELECT ".($disabled?'disabled':'')." name='staatsbuergerschaft'>";
+echo "<option value=''>-- Keine Auswahl --</option>";
+$nation = new nation($conn);
+$nation->getAll();
+
+foreach ($nation->nation as $row)
+{
+	if($row->code==$person->staatsbuergerschaft)
+		$selected='selected';
+	else 
+		$selected='';
+	
+	echo "<option value='$row->code' $selected>$row->kurztext</option>";
+}
+echo "</SELECTED>";
+echo "</td>";
+//Geburtsnation
+echo "<td>Geburtsnation:</td><td><SELECT ".($disabled?'disabled':'')." name='geburtsnation'>";
+echo "<option value=''>-- Keine Auswahl --</option>";
+$nation = new nation($conn);
+$nation->getAll();
+
+foreach ($nation->nation as $row)
+{
+	if($row->code==$person->geburtsnation)
+		$selected='selected';
+	else 
+		$selected='';
+	
+	echo "<option value='$row->code' $selected>$row->kurztext</option>";
+}
+echo "</SELECTED>";
+echo "</td>";
+//Sprache
+echo "<td>Sprache:</td><td><SELECT ".($disabled?'disabled':'')." name='sprache'>";
+echo "<option value=''>-- keine Auswahl --</option>";
+$qry = "SELECT * FROM public.tbl_sprache ORDER BY sprache";
+if($result = pg_query($conn, $qry))
+{
+	while($row = pg_fetch_object($result))
+	{
+		if($row->sprache==$person->sprache)
+			$selected='selected';
+		else 
+			$selected='';
+		
+		echo "<option value='$row->sprache' $selected>$row->sprache</option>";
+	}
+}
+echo '</SELECT></td>';
+echo '</tr><tr>';
+//SVNR
+echo "<td>SVNR:</td><td><input type='text' name='svnr' ".($disabled?'disabled':'')." value='".htmlentities($person->svnr, ENT_QUOTES)."'></td>";
+//Ersatzkennzeichen
+echo "<td>Ersatzkennzeichen</td><td><input type='text' name='ersatzkennzeichen' ".($disabled?'disabled':'')." value='".htmlentities($person->ersatzkennzeichen, ENT_QUOTES)."'></td>";
+//Geschlecht
+echo "<td>Geschlecht</td><td><SELECT ".($disabled?'disabled':'')." name='geschlecht'>";
+echo '<option value="m" '.($person->geschlecht=='m'?'selected':'').'>männlich</option>';
+echo '<option value="w" '.($person->geschlecht=='w'?'selected':'').'>weiblich</option>';
+echo '</SELECT></td>';
+echo '</tr><tr>';
+
+//Anzahlkinder
+echo "<td>Anzahl der Kinder</td><td><input type='text' name='anzahlkinder' ".($disabled?'disabled':'')." value='".htmlentities($person->anzahlkinder, ENT_QUOTES)."'></td>";
+//Aktiv
+echo "<td>Aktiv:</td><td><input type='checkbox' ".($disabled?'disabled':'')." name='aktiv' ".($person->aktiv==false?'':'checked')."></td>";
+echo '</tr><tr valign="top">';
+//Anmerkung
+echo "<td>Anmerkung:</td><td><textarea ".($disabled?'disabled':'')." name='anmerkungen'>".htmlentities($person->anmerkungen)."</textarea></td>";
+//Homepage
+echo "<td>Homepage:</td><td><input type='text' name='homepage' ".($disabled?'disabled':'')." value='".htmlentities($person->homepage, ENT_QUOTES)."'></td>";
+//Familienstand
+echo "<td>Familienstand:</td><td><SELECT ".($disabled?'disabled':'')." name='familienstand'>";
+echo '<option value="l" '.($person->familienstand=='l'?'selected':'').'>ledig</option>';
+echo '<option value="v" '.($person->familienstand=='v'?'selected':'').'>verheiratet</option>';
+echo '<option value="g" '.($person->familienstand=='g'?'selected':'').'>geschieden</option>';
+echo '<option value="w" '.($person->familienstand=='w'?'selected':'').'>verwitwert</option>';
+echo '</SELECT></td>';
+echo "</tr><tr><td></td><td></td><td></td><td></td><td></td><td><input ".($disabled?'disabled':'')." type='submit' value='Speichern' name='saveperson'></td>";
+echo "</tr></table></form>";
 echo "</div>";
 
 // ----- PREINTERESSENT -----
@@ -381,7 +549,22 @@ foreach ($zuordnung->result as $row)
 	//Wenn noch nicht freigegeben - Freigabe Button anzeigen
 	if($row->freigabedatum=='')
 	{
-		echo '<input type="submit" name="freigabe" value="Freigeben">';
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_prestudent WHERE person_id='$person->person_id' AND studiengang_kz='$row->studiengang_kz'";
+		if($result_check = pg_query($conn, $qry))
+		{
+			if($row_check = pg_fetch_object($result_check))
+			{
+				if($row_check->anzahl==0)
+				{
+					echo '<input type="submit" name="freigabe" value="Freigeben">';			
+				}
+				else 
+				{
+					echo 'ist bereits im Studiengang erfasst';
+				}
+			}
+		}
+		
 	}
 	else
 	{

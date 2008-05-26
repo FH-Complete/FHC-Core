@@ -46,6 +46,7 @@ class preinteressent
 		
 	var $studiengang_kz;
 	var $prioritaet;		// smallint
+	var $prioritaet_arr = array('1'=>'niedrg', '2'=>'mittel', '3'=>'hoch');
 	var $freigabedatum;		// timestamp
 	var $uebernahmedatum;	// timestamp
 		
@@ -429,12 +430,12 @@ class preinteressent
 		$qry = "SELECT distinct tbl_preinteressent.* FROM public.tbl_preinteressent JOIN public.tbl_person USING(person_id) LEFT JOIN public.tbl_preinteressentstudiengang USING(preinteressent_id) LEFT JOIN public.tbl_kontakt USING(person_id) WHERE true";
 				
 		if($studiengang_kz!='')
-			$qry.="tbl_preinteressentstudiengang.studiengang_kz='$studiengang_kz'";
+			$qry.=" AND tbl_preinteressentstudiengang.studiengang_kz='$studiengang_kz'";
 		
 		if($studiensemester_kurzbz!='')
 			$qry.=" AND tbl_preinteressent.studiensemester_kurzbz='$studiensemester_kurzbz'";
 		if($filter!='')
-			$qry.=" AND lower(nachname) like '%$filter%' OR lower(vorname) like '%$filter%' OR erfassungsdatum like '$filter' OR lower(kontakt) like '%$filter%'";
+			$qry.=" AND lower(nachname) like '%".addslashes($filter)."%' OR lower(vorname) like '%".addslashes($filter)."%' OR erfassungsdatum like '".addslashes($filter)."' OR lower(kontakt) like '%".addslashes($filter)."%'";
 		
 		if($result = pg_query($this->conn, $qry))
 		{
@@ -628,6 +629,53 @@ class preinteressent
 		else 
 		{
 			$this->errormsg = 'Fehler beim Loeschen der Daten';
+			return false;
+		}
+	}
+	
+	// ******************************************
+	// * Laedt alle Preinteressenten einer Person
+	// * @return true wenn ok, false wenn Fehler
+	// ******************************************
+	function getPreinteressenten($person_id)
+	{
+		if(!is_numeric($person_id) || $person_id=='')
+		{
+			$this->errormsg = 'ID ist ungueltig';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM public.tbl_preinteressent WHERE person_id='$person_id'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$obj = new preinteressent($this->conn, null, null);
+				
+				$obj->preinteressent_id = $row->preinteressent_id;
+				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$obj->aufmerksamdurch_kurzbz = $row->aufmerksamdurch_kurzbz;
+				$obj->firma_id = $row->firma_id;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->erfassungsdatum = $row->erfassungsdatum;
+				$obj->einverstaendnis = ($row->einverstaendnis=='t'?true:false);
+				$obj->maturajahr = $row->maturajahr;
+				$obj->infozusendung = $row->infozusendung;
+				$obj->absagedatum = $row->absagedatum;
+				$obj->person_id = $row->person_id;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Zuordnung';
 			return false;
 		}
 	}

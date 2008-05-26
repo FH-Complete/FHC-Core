@@ -200,7 +200,7 @@ if((isset($radio_1) && !isset($radio_2))||(!isset($radio_1) && isset($radio_2)) 
 </head>
 <body>
 
-<H1>Zusammenlegen von Lehreinheiten (<?php echo $s[$stg_kz]->kurzbz.' - '.$semester; ?>)</H1>
+<H1>Zusammenlegen von Lehrveranstaltungen (<?php echo $s[$stg_kz]->kurzbz.' - '.$semester; ?>)</H1>
 
 <?php
 echo $outp;
@@ -223,7 +223,7 @@ $smax=$s[$stg_kz]->max_sem;
 	 echo "<th><a href='lv_wartung.php?stg_kz=$stg_kz&semester=$semester&max=$smax&order_1=kurzbz&order_2=$order_2'>Kurzbz</a></th>";
 	 echo "<th><a href='lv_wartung.php?stg_kz=$stg_kz&semester=$semester&max=$smax&order_1=bezeichnung&order_2=$order_2'>Bezeichnung</a></th>";
 	 echo "<th>ECTS</th>";
-	 echo "<th>SWS</th>";
+	 echo "<th>SS</th>";
 	 echo "<th>&nbsp;</th></tr>";
 
 	 $lf  = new lehrveranstaltung($conn);
@@ -253,7 +253,7 @@ $smax=$s[$stg_kz]->max_sem;
 	 echo "<th><a href='lv_wartung.php?stg_kz=$stg_kz&semester=$semester&max=$smax&order_1=$order_1&order_2=kurzbz'>Kurzbz</a></th>";
 	 echo "<th><a href='lv_wartung.php?stg_kz=$stg_kz&semester=$semester&max=$smax&order_1=$order_1&order_2=bezeichnung'>Bezeichnung</a></th>";
 	 echo "<th>ECTS</th>";
-	 echo "<th>SWS</th></tr>";
+	 echo "<th>SS</th></tr>";
 
 	 $lf  = new lehrveranstaltung($conn);
 	 $lf->getTab($stg_kz,$semester, $order_2);
