@@ -294,7 +294,7 @@ if(isset($_POST['zuordnungloeschen']))
 // ----- TABS ------
 echo '<h3><a id="preinteressent_label" href="javascript: changeTo(\'preinteressent\');" '.($selection=='preinteressent'?'style="text-decoration:underline"':'').'>PreInteressent</a> - ';
 echo '<a id="studiengangszuordnung_label" href="javascript: changeTo(\'studiengangszuordnung\');"'.($selection=='studiengangszuordnung'?'style="text-decoration:underline"':'').'>Studiengangszuordnung</a> - ';
-echo '<a id="personendaten_label" href="javascript: changeTo(\'personendaten\');"'.($selection=='personendaten'?'style="text-decoration:underline"':'').'>PersonenDaten</a></h3>';
+echo '<a id="personendaten_label" href="javascript: changeTo(\'personendaten\');"'.($selection=='personendaten'?'style="text-decoration:underline"':'').'>Personendaten</a></h3>';
 
 // ----- PERSON -----
 echo "<div id='personendaten' style='display: ".($selection=='personendaten'?'block':'none')."'>";
@@ -324,7 +324,7 @@ echo "<td>Titelpost:</td><td><input type='text' name='titelpost' ".($disabled?'d
 echo '<td width="100%" align="right"><a href="personendetails.php?id='.$person->person_id.'" target="_blank">Gesamtübersicht über diese Person</a></td>';
 echo '</tr><tr>';
 //Nachname
-echo "<td>Nachname:</td><td><input type='text' name='nachname' ".($disabled?'disabled':'')." value='".htmlentities($person->nachname, ENT_QUOTES)."'></td>";
+echo "<td>Nachname*:</td><td><input type='text' name='nachname' ".($disabled?'disabled':'')." value='".htmlentities($person->nachname, ENT_QUOTES)."'></td>";
 //Vorname
 echo "<td>Vorname:</td><td><input type='text' name='vorname' ".($disabled?'disabled':'')." value='".htmlentities($person->vorname, ENT_QUOTES)."'></td>";
 //Vornamen
@@ -400,7 +400,7 @@ echo "<td>SVNR:</td><td><input type='text' name='svnr' ".($disabled?'disabled':'
 //Ersatzkennzeichen
 echo "<td>Ersatzkennzeichen</td><td><input type='text' name='ersatzkennzeichen' ".($disabled?'disabled':'')." value='".htmlentities($person->ersatzkennzeichen, ENT_QUOTES)."'></td>";
 //Geschlecht
-echo "<td>Geschlecht</td><td><SELECT ".($disabled?'disabled':'')." name='geschlecht'>";
+echo "<td>Geschlecht*</td><td><SELECT ".($disabled?'disabled':'')." name='geschlecht'>";
 echo '<option value="m" '.($person->geschlecht=='m'?'selected':'').'>männlich</option>';
 echo '<option value="w" '.($person->geschlecht=='w'?'selected':'').'>weiblich</option>';
 echo '</SELECT></td>';
@@ -478,7 +478,7 @@ foreach ($firma->result as $row)
 		
 	echo "<option value='$row->firma_id' $selected>$row->name</option>";
 }
-echo "</SELECT></td>";
+echo "</SELECT> <a href='../stammdaten/firma_frameset.html' target='_blank'>Schulverwaltung</a></td>";
 
 echo '</tr><tr>';
 
