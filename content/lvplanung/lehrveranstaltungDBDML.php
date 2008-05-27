@@ -308,8 +308,6 @@ if(!$error)
 				$lem->lehrfunktion_kurzbz = 'Lektor';
 				$lem->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
 
-				$lem->semesterstunden = '0';
-				$lem->planstunden = '0';
 				$lem->anmerkung = '';
 				$lem->bismelden = true;
 				$lem->updateamum = date('Y-m-d H:i:s');
@@ -343,8 +341,8 @@ if(!$error)
 					$errormsg='Fehler bei einer Datenbankabfrage:'.pg_errormessage($conn);
 				}
 
-				//Faktor aus tbl_lehrveranstaltung holen
-				$qry = "SELECT planfaktor FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE lehreinheit_id='".$_POST['lehreinheit_id']."';";
+				//Faktor und Semesterstunden aus tbl_lehrveranstaltung holen
+				$qry = "SELECT planfaktor, semesterstunden FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE lehreinheit_id='".$_POST['lehreinheit_id']."';";
 				if($result = pg_query($conn, $qry))
 				{
 					if($row = pg_fetch_object($result))
@@ -353,6 +351,17 @@ if(!$error)
 							$lem->faktor = $row->planfaktor;
 						else
 							$lem->faktor = '1.0';
+						
+						if($row->semesterstunden!='')
+						{
+							$lem->semesterstunden = $row->semesterstunden;
+							$lem->planstunden = $row->semesterstunden;
+						}
+						else	
+						{
+							$lem->planstunden = '0';
+							$lem->semesterstunden = '0';
+						}
 					}
 					else
 					{
