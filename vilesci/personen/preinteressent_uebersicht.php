@@ -128,7 +128,53 @@ if(isset($_GET['action']))
 {
 	if($_GET['action']=='freigabe')
 	{
-		echo '<br><b>Freigabe ist noch nicht implementiert</b>';
+		$errormsg = '';
+		$anzahl_freigegeben=0;
+		$anzahl_fehler=0;
+		$qry = "SELECT * FROM public.tbl_preinteressentstudiengang 
+				WHERE preinteressent_id='".addslashes($_GET['id'])."' 
+					  AND prioritaet = (SELECT max(prioritaet) 
+					  					FROM public.tbl_preinteressentstudiengang 
+					  					WHERE preinteressent_id='".addslashes($_GET['id'])."')
+					  AND freigabedatum is null";
+		//Zuordnungen holen die noch nicht freigegeben wurden und die hoechste Prioritaet haben
+		if($result = pg_query($conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				//Nur diejenigen nehmen die noch nicht als Prestudent vorhanden sind
+				$qry = "SELECT count(*) as anzahl FROM public.tbl_preinteressent JOIN public.tbl_prestudent USING(person_id) WHERE preinteressent_id='$row->preinteressent_id' AND studiengang_kz='$row->studiengang_kz'";
+				if($result_std = pg_query($conn, $qry))
+				{
+					if($row_std = pg_fetch_object($result_std))
+					{
+						if($row_std->anzahl==0)
+						{
+							$preinteressent = new preinteressent($conn);
+							$preinteressent->loadZuordnung($row->preinteressent_id, $row->studiengang_kz);
+							
+							$preinteressent->freigabedatum = date('Y-m-d H:i:s');
+							$preinteressent->updateamum = date('Y-m-d H:i:s');
+							$preinteressent->updatevon = $user;
+							
+							if($preinteressent->saveZuordnung(false))
+							{
+								$anzahl_freigegeben++;
+							}
+							else 
+							{
+								$anzahl_fehler++;
+								$errormsg.="<br>Fehler bei der Freigabe von ".$studiengang->kuerzel_arr[$row->studiengang_kz].": $preinteressent->errormsg";
+							}
+						}
+					}
+				}
+			}
+		}
+		echo "<br><b>Es wurden $anzahl_freigegeben Studiengänge freigegeben<br>";
+		if($anzahl_fehler>0)
+			echo "Es sind $anzahl_fehler Fehler aufgetreten: $errormsg";
+		echo '</b>';
 	}
 	elseif($_GET['action']=='loeschen')
 	{
@@ -185,9 +231,9 @@ foreach ($preinteressent->result as $row)
 	echo "<td>".$datum_obj->convertISODate($person->gebdatum)."</td>";
 	echo "<td>$row->studiensemester_kurzbz</td>";
 	echo "<td>$row->anmerkung</td>";
-	echo "<td><input type='button' onclick='parent.preinteressent_detail.location.href = \"preinteressent_detail.php?id=$row->preinteressent_id&selection=\"+parent.preinteressent_detail.selection; return false;' value='Bearbeiten'></td>";
-	echo "<td><input type='button' onclick=\"window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=freigabe&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'\" value='Freigeben'></td>";
-	echo "<td><input type='button' onclick=\"if(confdel()) {window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=loeschen&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'}\" value='Löschen'></td>";
+	echo "<td><input type='button' onclick='parent.preinteressent_detail.location.href = \"preinteressent_detail.php?id=$row->preinteressent_id&selection=\"+parent.preinteressent_detail.selection; return false;' value='Bearbeiten' title='Zeigt die Details dieser Person an'></td>";
+	echo "<td><input type='button' onclick=\"window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=freigabe&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'\" value='Freigeben' title='Gibt alle Studiengänge mit der höchsten Priorität frei'></td>";
+	echo "<td><input type='button' onclick=\"if(confdel()) {window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=loeschen&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'}\" value='Löschen' title='Löscht diesen Preinteressenten'></td>";
 	echo '</tr>';
 }
 echo '</tbody></table><br>';
