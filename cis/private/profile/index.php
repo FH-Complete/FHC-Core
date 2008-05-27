@@ -137,7 +137,7 @@
       		
       		<P>
       			<b>eMail</b><br>
-        		Technikum: <a class='Item' href='mailto:<?php echo $uid.'@'.DOMAIN; ?>'> <?php echo $uid.'@'.DOMAIN; ?></a><br>
+        		Intern: <a class='Item' href='mailto:<?php echo $uid.'@'.DOMAIN; ?>'> <?php echo $uid.'@'.DOMAIN; ?></a><br>
 
         		<?php
         		if($email_alias!='' && !in_array($stg,$noalias))
