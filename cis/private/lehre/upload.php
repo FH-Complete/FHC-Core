@@ -118,6 +118,21 @@
 			return confirm("Wollen Sie die ausgewaehlten Dateien wirklich loeschen? Dieser Vorgang ist unwiderruflich!");
 		}
 	}
+	
+	function checkvz(id)
+	{
+		vz = document.getElementById(id).value;
+		if(vz.indexOf('.')>0)
+		{
+			alert('Der Verzeichnisname darf keinen Punkt beinhalten');
+			return false;
+		}
+		if(vz.indexOf('&')>0)
+		{
+			alert('Der Verzeichnisname darf kein "&" beinhalten');
+			return false;
+		}
+	}
 </script>
 
 <style type=text/css>A:link {
@@ -839,7 +854,7 @@ A:hover {
 					}
 
 					echo "<b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\">&nbsp;Verzeichnisname:&nbsp;";
-					echo "<input type=\"text\" name=\"new_dir_name_text\" size=\"30\">&nbsp;<input type=\"submit\" value=\"Verzeichnis erstellen\" name=\"create_dir\">";
+					echo "<input id='new_dir_name_text' type=\"text\" name=\"new_dir_name_text\" size=\"30\">&nbsp;<input type=\"submit\" value=\"Verzeichnis erstellen\" name=\"create_dir\" onclick='return checkvz(\"new_dir_name_text\")'>";
 					echo "</font></b>";
 					echo "</td>";
 
@@ -855,7 +870,6 @@ A:hover {
 					if(!@is_dir($upload_root.'/'.$uploaddir.'/'.$subdir))
 					{
 						unset($subdir);
-
 						echo '<img src="../../../skin/images/folderup.gif" border="0">';
 					}
 					else
@@ -1017,7 +1031,7 @@ A:hover {
 
 									if(isset($rename_dir) && isset($$check_state))
 									{
-										echo "</b></td><td align=\"middle\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><input type=\"text\" name=\"new_dir_name$dir_count\" value=\"$entry\">&nbsp;<input type=\"submit\" name=\"confirm_rename\" value=\"OK\"></font>";
+										echo "</b></td><td align=\"middle\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><input type=\"text\" name=\"new_dir_name$dir_count\" id='dir_rename_text' value=\"$entry\">&nbsp;<input type=\"submit\" name=\"confirm_rename\" value=\"OK\" onclick=\"return checkvz('dir_rename_text')\"></font>";
 									}
 									else if(isset($confirm_rename) && isset($$check_state))
 									{
