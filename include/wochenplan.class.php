@@ -464,7 +464,7 @@ class wochenplan
 	/**************************************************************************
 	 * Zeichnen der Stundenplanwoche in HTML
 	 */
-	function draw_week($user_uid='')
+	function draw_week($raumres, $user_uid='')
 	{
 		$o_datum=new datum();
 		// Stundentafel abfragen
@@ -632,7 +632,7 @@ class wochenplan
 				else
 				{
 					echo '				<td align="center"><br>';
-					if ($this->user=='lektor' && $this->type=='ort' && ($datum>=$datum_res_lektor_start && $datum<=$datum_res_lektor_ende))
+					if (($raumres || $this->user=='lektor') && $this->type=='ort' && ($datum>=$datum_res_lektor_start && $datum<=$datum_res_lektor_ende))
 						echo '<INPUT type="checkbox" name="reserve'.$i.'_'.$j.'" value="'.date("Y-m-d",$datum).'">'; //&& $datum>=$datum_now
 					echo '</td>'.$this->crlf;
 				}
