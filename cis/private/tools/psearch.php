@@ -59,7 +59,7 @@
     <td class="tdwidth10">&nbsp;</td>
     <td><table class="tabcontent">
       <tr>
-        <td class="ContentHeader"><font class="ContentHeader">&nbsp;Personensuche Technikum Wien</font></td>
+        <td class="ContentHeader"><font class="ContentHeader">&nbsp;Personensuche <?php echo CAMPUS_NAME;?></font></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
