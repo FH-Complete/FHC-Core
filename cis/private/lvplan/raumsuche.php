@@ -125,13 +125,13 @@ if($sent)
 	if(!$error)
 	{
 		//Von Zeit pruefen
-		if(!preg_match('/^[1-9]{2}:[0-9]{2}$/', $vonzeit))
+		if(!preg_match('/^[0-9]{2}:[0-9]{2}$/', $vonzeit))
 		{
 			echo "<br>VON-Zeit muss im Format hh:mm (12:30) angegeben werden";
 			$error = true;
 		}
 		//Bis Zeit pruefen
-		if(!preg_match('/^[1-9]{2}:[0-9]{2}$/', $biszeit))
+		if(!preg_match('/^[0-9]{2}:[0-9]{2}$/', $biszeit))
 		{
 			echo "<br>BIS-Zeit muss im Format hh:mm (12:30) angegeben werden";
 			$error = true;
@@ -149,9 +149,9 @@ if($sent)
 		$ort->search($datum, $vonzeit, $biszeit, $raumtyp, $anzahlpersonen, true);
 		
 		echo '<br><table>';
-		echo '<tr class="liste"><td>Raum</td><td>Bezeichnung</td><td>Nummer</td><td>Personen</td><td>Reservieren</td></tr>';
+		echo '<tr class="liste"><td>Raum</td><td>Bezeichnung</td><td>Nummer</td><td>Personen</td></tr>';
 		$i=0;
-		$datum_sec = $datum_obj->mktime_datum($datum);
+		$datum_sec = $datum_obj->mktime_datum($datum)-1;
 		foreach ($ort->result as $row)
 		{
 			$i++;
@@ -160,7 +160,7 @@ if($sent)
 			echo "<td>$row->bezeichnung</td>";
 			echo "<td>$row->planbezeichnung</td>";
 			echo "<td>$row->max_person</td>";
-			echo "<td><a href='stpl_week.php?type=ort&ort_kurzbz=$row->ort_kurzbz&datum=".$datum_sec."' class='Item'>Reservieren</a></td>";
+			echo "<td><a href='stpl_week.php?type=ort&ort_kurzbz=$row->ort_kurzbz&datum=".$datum_sec."' class='Item'>zur Reservierung</a></td>";
 			echo '</tr>';
 		}
 		echo '</table>';
