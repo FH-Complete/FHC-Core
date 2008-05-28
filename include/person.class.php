@@ -337,6 +337,7 @@ class person
 				return false;
 			}
 			
+			/* das muss nicht immer so sein
 			$day_svnr = substr($this->svnr, 4, 2);
 			$month_svnr = substr($this->svnr, 6, 2);
 			$year_svnr = substr($this->svnr, 8, 2);
@@ -346,6 +347,7 @@ class person
 				$this->errormsg = 'SVNR und Geburtsdatum passen nicht zusammen';
 				return false;
 			}
+			*/
 		}
 
 		return true;
