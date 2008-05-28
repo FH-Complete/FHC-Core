@@ -46,9 +46,9 @@ require_once('../../config.inc.php');
 //require_once('../../../include/globals.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/wochenplan.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
 $uid=get_uid();
-
 
 // Deutsche Umgebung
 //$loc_de=setlocale(LC_ALL, 'de_AT@euro', 'de_AT','de_DE@euro', 'de_DE');
@@ -123,6 +123,13 @@ if (!$conn = pg_pconnect(CONN_STRING))
 {
 	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
 }
+
+$berechtigung=new benutzerberechtigung($conn);
+$berechtigung->getBerechtigungen($uid);
+if ($berechtigung->isBerechtigt('raumres'))
+	$raumres=true;
+else
+	$raumres=false;
 
 // Datums Format
 if(!$erg_std=pg_query($conn, "SET datestyle TO ISO; SET search_path TO campus;"))
@@ -214,7 +221,7 @@ if (! $stdplan->draw_header())
 }
 
 // Stundenplan der Woche drucken
-$stdplan->draw_week($uid);
+$stdplan->draw_week($raumres,$uid);
 
 if (isset($count))
 	echo "Es wurden $count Stunden reserviert!<BR>";
