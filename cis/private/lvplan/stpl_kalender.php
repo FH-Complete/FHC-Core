@@ -216,7 +216,7 @@ while ($begin<$ende)
 	//else if ($format=='ical')
 	//	$stdplan->draw_week_ical($target);
 	else
-		$stdplan->draw_week();
+		$stdplan->draw_week(false);
 }
 
 // Print in csv-file
