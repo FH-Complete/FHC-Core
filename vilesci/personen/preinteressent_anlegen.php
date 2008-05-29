@@ -156,6 +156,9 @@ if(isset($_POST['save']))
 		$person->svnr = $svnr;
 		$person->ersatzkennzeichen = $ersatzkennzeichen;
 		$person->aktiv = true;
+		$person->insertamum = date('Y-m-d H:i:s');
+		$person->insertvon = $user;
+		
 		if($person->save())
 		{
 			$error=false;
@@ -164,6 +167,14 @@ if(isset($_POST['save']))
 		{
 			$error=true;
 			$errormsg = "Person konnte nicht gespeichert werden: $person->errormsg";
+		}
+	}
+	else 
+	{
+		if(!$person->load($person_id))
+		{
+			$error = true;
+			$errormsg = "Person konnte nicht geladen werden";
 		}
 	}
 	
@@ -296,6 +307,9 @@ if(isset($_POST['save']))
 		$preinteressent->studiensemester_kurzbz = $studiensemester_kurzbz;
 		$preinteressent->aufmerksamdurch_kurzbz = 'k.A.';
 		$preinteressent->firma_id = 1; //TW
+		$preinteressent->insertamum = date('Y-m-d H:i:s');
+		$preinteressent->insertvon = $user;
+		
 		if(!$preinteressent->save(true))
 		{
 			$error = true;
@@ -305,11 +319,11 @@ if(isset($_POST['save']))
 	if(!$error)
 	{
 		pg_query($conn, 'COMMIT');
-		die("<script language='Javascript'>
+		/*<script language='Javascript'>
 				window.opener.StudentProjektbetreuerMenulistPersonLoad(window.opener.document.getElementById('student-projektbetreuer-menulist-person'), '$nachname');
 				window.opener.MenulistSelectItemOnValue('student-projektbetreuer-menulist-person', $person->person_id);
-			</script>
-			<b>Person $vorname $nachname wurde erfolgreich angelegt</b><br><br><a href='preinteressent_anlegen.php>Neuen Preinteressenten anlegen</a><br>");
+			</script>*/
+		die("<b>Person $vorname $nachname wurde erfolgreich angelegt</b><br><br><a href='preinteressent_anlegen.php'>Neuen Preinteressenten anlegen</a><br>");
 	}
 	else
 	{
@@ -342,7 +356,7 @@ if($geburtsdatum!='')
 		echo "Format des Geburtsdatums ist ungueltig!";
 }
 ?>
-<form method='POST'>
+<form action="<?php echo $_SERVER['PHP_SELF'];?>" method='POST'>
 <table width="100%">
 
 <tr>
