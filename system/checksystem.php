@@ -94,6 +94,17 @@ if (!@pg_query($conn,'SELECT standort_kurzbz,telefonklappe FROM public.tbl_ort L
 		echo 'standort_kurzbz wurde bei public.tbl_ort hinzugefuegt!<BR>telefonklappe wurde bei public.tbl_ort hinzugefuegt!<BR>';
 }
 
+// ************** campus.tbl_zeitsperre ************************
+if (!@pg_query($conn,'SELECT standort_kurzbz,telefonklappe FROM campus.tbl_zeitsperre LIMIT 1;'))
+{
+	$sql='	ALTER TABLE campus.tbl_zeitsperre ADD COLUMN freigabeamum Timestamp;
+			ALTER TABLE campus.tbl_zeitsperre ADD COLUMN freigabevon varchar(16);';
+	if (!@pg_query($conn,$sql))
+		echo '<strong>public.tbl_ort: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo 'freigabevon,freigabeamum wurde bei campus.tbl_zeitsperre hinzugefuegt!<BR>';
+}
+
 // ************** public.tbl_person.kompetenzen ************************
 if (!@pg_query($conn,'SELECT kompetenzen FROM public.tbl_person LIMIT 1;'))
 {
