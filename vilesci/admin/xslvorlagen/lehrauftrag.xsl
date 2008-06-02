@@ -36,6 +36,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						\n<xsl:value-of select="mitarbeiter/anschrift" />		
 						\n<xsl:value-of select="mitarbeiter/plz" /><xsl:text> </xsl:text>
 						<xsl:value-of select="mitarbeiter/ort" />
+						\n<xsl:value-of select="mitarbeiter/zuhanden" />
 					</fo:inline>				
 					\n\n<fo:block font-size="7pt">
 						Abs.: Fachhochschule Technikum Wien, Höchstädtplatz 5, A-1200 Wien

@@ -221,6 +221,92 @@
 				</tr>
 
 			<?php
+				//URLAUBE
+				//Untergebene holen
+				$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE (funktion_kurzbz='fbl' OR funktion_kurzbz='stgl') AND uid='".addslashes($user)."'";
+				
+				if($result = pg_query($db_conn, $qry))
+				{
+					$institut='';
+					$stge='';
+					while($row = pg_fetch_object($result))
+					{
+						if($row->funktion_kurzbz=='fbl')
+						{
+							if($institut!='')
+								$institut.=',';
+							
+							$institut.="'".addslashes($row->fachbereich_kurzbz)."'";
+						}
+						elseif($row->funktion_kurzbz=='stgl')
+						{
+							if($stge!='')
+								$stge.=',';
+							$stge.="'".$row->studiengang_kz."'";
+						}
+							
+					}
+				}
+				
+				$qry = "SELECT distinct uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='Institut' AND (false ";
+				
+				if($institut!='')
+					$qry.=" OR fachbereich_kurzbz in($institut)"; 
+				if($stge!='')
+					$qry.=" OR studiengang_kz in($stge)";
+				
+				$qry.=")";
+				
+				$untergebene='';
+				if($result = pg_query($db_conn, $qry))
+				{
+					
+					
+					while($row = pg_fetch_object($result))
+					{
+						if($untergebene!='')
+							$untergebene.=',';
+						$untergebene.="'".addslashes($row->uid)."'";
+					}
+				}
+				
+				if($untergebene!='')
+				{
+					$qry = "SELECT * FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid in($untergebene) ORDER BY nachname, vorname";
+										
+					if($result = pg_query($db_conn, $qry))
+					{
+						echo '
+						<tr>
+							<td class="tdwidth10" nowrap>&nbsp;</td>
+						    <td class="tdwrap">
+						    	<a href="profile/urlaubsfreigabe.php" target="content" class="MenuItem" onClick="js_toggle_container(\'urlaub\');">
+						    		<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Urlaube
+						    	</a>
+						    </td>
+						</tr>
+						<tr>
+		          			<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td nowrap>
+				  			<table class="tabcontent" id="urlaub" style="display: none;">
+							<tr>
+							  	<td class="tdwrap">
+									<ul style="margin-top: 0px; margin-bottom: 0px;">';
+						echo '<li><a class="Item2" href="profile/urlaubsfreigabe.php" target="content">Alle</a></li>';
+									
+						while($row = pg_fetch_object($result))
+						{
+								echo '<li><a class="Item2" href="profile/urlaubsfreigabe.php?uid='.$row->uid.'" target="content">'."$row->nachname $row->vorname $row->titelpre $row->titelpost".'</a></li>';
+						}
+						echo '</ul>
+								</td>
+							</tr>
+							</table>
+				  			</td>
+						</tr>';
+					}
+					
+				}
 			}
 			?>
 			</table>

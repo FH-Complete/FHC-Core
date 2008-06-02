@@ -81,6 +81,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-statistic-koordinatorstunden:command" oncommand="StatistikPrintKoordinatorstunden();"/>
   <command id="menu-statistic-lehrauftraege:command" oncommand="StatistikPrintLehrauftraege();"/>
   <command id="menu-statistic-lvplanung:command" oncommand="StatistikPrintLVPlanung();"/>
+  <command id="menu-statistic-lvplanungexcel:command" oncommand="StatistikPrintLVPlanungExcel();"/>
   <command id="menu-statistic-lehrauftragsliste:command" oncommand="StatistikPrintLehrauftragsliste();"/>
   <command id="menu-statistic-projektarbeit:command" oncommand="StatistikPrintProjektarbeit();"/>
   <command id="menu-statistic-abschlusspruefung:command" oncommand="StatistikPrintAbschlusspruefung();"/>
@@ -231,12 +232,22 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                label     = "&menu-statistic-lehrauftraege.label;"
                command   =  "menu-statistic-lehrauftraege:command"
                accesskey = "&menu-statistic-lehrauftraege.accesskey;"/>
-            <menuitem
-               id        =  "menu-statistic-lvplanung"
-               key       =  "menu-statistic-lvplanung:key"
-               label     = "&menu-statistic-lvplanung.label;"
-               command   =  "menu-statistic-lvplanung:command"
-               accesskey = "&menu-statistic-lvplanung.accesskey;"/>
+            <menu id="menu-statistic-sublvplanung" label="&menu-statistic-sublvplanung.label;" accesskey="&menu-statistic-sublvplanung.accesskey;">
+				<menupopup id="menu-statistic-substatistik-popup">
+		            <menuitem
+		               id        =  "menu-statistic-lvplanung"
+		               key       =  "menu-statistic-lvplanung:key"
+		               label     = "&menu-statistic-lvplanung.label;"
+		               command   =  "menu-statistic-lvplanung:command"
+		               accesskey = "&menu-statistic-lvplanung.accesskey;"/>
+		            <menuitem
+		               id        =  "menu-statistic-lvplanungexcel"
+		               key       =  "menu-statistic-lvplanungexcel:key"
+		               label     = "&menu-statistic-lvplanungexcel.label;"
+		               command   =  "menu-statistic-lvplanungexcel:command"
+		               accesskey = "&menu-statistic-lvplanungexcel.accesskey;"/>
+		        </menupopup>
+		    </menu>
              <menuitem
                id        =  "menu-statistic-lehrauftragsliste"
                key       =  "menu-statistic-lehrauftragsliste:key"

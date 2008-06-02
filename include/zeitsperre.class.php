@@ -42,6 +42,8 @@ class zeitsperre
 	var $updatevon;				// string
 	var $insertamum;			// timestamp
 	var $insertvon;				// string
+	var $freigabeamum;
+	var $freigabevon;
 
 
 	/**
@@ -70,9 +72,14 @@ class zeitsperre
 				WHERE mitarbeiter_uid='".addslashes($uid)."'";
 
 		if($bisgrenze)
-			$qry.=" AND bisdatum>=now()::date";
+			$qry.=" AND (
+							(date_part('month',vondatum)>=9 AND date_part('year', vondatum)>='".(date('Y')-1)."')
+							OR
+							(date_part('month',vondatum)<9 AND date_part('year', vondatum)>='".(date('Y'))."')
+						)";
+			//$qry.=" AND bisdatum>=now()::date";
 
-		$qry.= " ORDER BY vondatum";
+		$qry.= " ORDER BY vondatum DESC";
 		//echo $qry;
 		if($result = pg_query($this->conn, $qry))
 		{
@@ -100,6 +107,8 @@ class zeitsperre
 				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
+				$obj->freigabeamum = $row->freigabeamum;
+				$obj->freigabevon = $row->freigabevon;
 
 				$this->result[] = $obj;
 
@@ -151,6 +160,8 @@ class zeitsperre
 			$this->updatevon = $row->updatevon;
 			$this->insertamum = $row->insertamum;
 			$this->insertvon = $row->insertvon;
+			$this->freigabeamum = $row->freigabeamum;
+			$this->freigabevon = $row->freigabevon;
 		}
 		else
 		{
@@ -237,7 +248,7 @@ class zeitsperre
 
 			$qry = 'INSERT INTO campus.tbl_zeitsperre (zeitsperretyp_kurzbz, mitarbeiter_uid, bezeichnung,'.
 			       ' vondatum ,vonstunde, bisdatum, bisstunde, erreichbarkeit_kurzbz, vertretung_uid, insertamum,'.
-			       ' insertvon, updateamum, updatevon) VALUES ('.
+			       ' insertvon, updateamum, updatevon, freigabeamum, freigabevon) VALUES ('.
 					$this->addslashes($this->zeitsperretyp_kurzbz).', '.
 					$this->addslashes($this->mitarbeiter_uid).', '.
 					$this->addslashes($this->bezeichnung).', '.
@@ -250,7 +261,9 @@ class zeitsperre
 					$this->addslashes($this->insertamum).', '.
 					$this->addslashes($this->insertvon).', '.
 					$this->addslashes($this->updateamum).', '.
-					$this->addslashes($this->updatevon).'); ';
+					$this->addslashes($this->updatevon).','.
+					$this->addslashes($this->freigabeamum).','.
+					$this->addslashes($this->freigabevon).'); ';
 		}
 		else
 		{
@@ -275,6 +288,8 @@ class zeitsperre
 				'vertretung_uid='.$this->addslashes($this->vertretung_uid).', '.
 				'insertamum='.$this->addslashes($this->insertamum).', '.
 				'insertvon='.$this->addslashes($this->insertvon).', '.
+				'freigabeamum='.$this->addslashes($this->freigabeamum).', '.
+				'freigabevon='.$this->addslashes($this->freigabevon).', '.
 				'updateamum='.$this->addslashes($this->updateamum).', '.
 				'updatevon='.$this->addslashes($this->updatevon).'  '.
 				'WHERE zeitsperre_id = '.$this->addslashes($this->zeitsperre_id).';';
