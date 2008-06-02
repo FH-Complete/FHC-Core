@@ -28,7 +28,7 @@
 
     //Connection Herstellen
     if(!$sql_conn = pg_pconnect(CONN_STRING))
-       die('Fehler beim oeffnen der Datenbankverbindung');
+       die('Fehler beim Oeffnen der Datenbankverbindung');
 
      $cutlength=10;
 	// Variablen setzen

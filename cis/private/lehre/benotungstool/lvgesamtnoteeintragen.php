@@ -81,6 +81,25 @@ if($stsem=='')
 
 $note = $_REQUEST["note"];
 
+if(!$rechte->isBerechtigt('admin',0) &&
+   !$rechte->isBerechtigt('admin',$lv_obj->studiengang_kz) &&
+   !$rechte->isBerechtigt('lehre',$lv_obj->studiengang_kz))
+{
+	$qry = "SELECT lehreinheit_id FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id)
+			JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) 
+			WHERE tbl_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lvid)."' AND
+			tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stsem)."' AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid='".addslashes($user)."'";
+	if($result = pg_query($conn, $qry))
+	{
+		if(pg_num_rows($result)==0)
+			die('Sie haben keine Berechtigung für diese Seite');
+	}
+	else 
+	{
+		die('Fehler beim Pruefen der Rechte');
+	}
+}
+
 // lvgesamtnote für studenten speichern
 if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '') && ((($note>0) && ($note < 6)) || ($note == 7) || ($note==8))  ){
 	

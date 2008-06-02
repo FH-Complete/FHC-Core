@@ -150,5 +150,5 @@ if ($num_rows_repl>0)
     echo '</table>';
 }
 ?>
-<P>Fehler und Feedback bitte an <A class="Item" href="mailto:lvplan@<?php echo DOMAIN;?>">LV-Koordinationsstelle</A>.</P>
+<P>Fehler und Feedback bitte an <A class="Item" href="mailto:<?php echo MAIL_LVPLAN;?>">LV-Koordinationsstelle</A>.</P>
 </body></html>
