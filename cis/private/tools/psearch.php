@@ -373,11 +373,11 @@
 								$verband=strtolower($verband);
 								if($i % 2 == 0)
 								{
-									echo "	<td align=\"center\" class='tdwrap'>&nbsp;<a class='Item' href='mailto:$kurzbz$row->semester$verband$gruppe@".DOMAIN."'>$kurzbz$row->semester$verband$gruppe@".DOMAIN."</td>";
+									echo "	<td align=\"center\" class='tdwrap'>&nbsp;<a class='Item' href='mailto:".trim($kurzbz.$row->semester.$verband.$gruppe)."@".DOMAIN."'>".trim($kurzbz.$row->semester.$verband.$gruppe)."@".DOMAIN."</td>";
 								}
 								else
 								{
-									echo "	<td align=\"center\" class=\"MarkLine\" class='tdwrap'>&nbsp;<a class='Item' href='mailto:$kurzbz$row->semester$verband$gruppe@".DOMAIN."'>$kurzbz$row->semester$verband$gruppe@".DOMAIN."</td>";
+									echo "	<td align=\"center\" class=\"MarkLine\" class='tdwrap'>&nbsp;<a class='Item' href='mailto:".trim($kurzbz.$row->semester.$verband.$gruppe)."@".DOMAIN."'>".trim($kurzbz.$row->semester.$verband.$gruppe)."@".DOMAIN."</td>";
 								}
 							}
 							else

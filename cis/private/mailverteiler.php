@@ -1,4 +1,25 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
+
    require_once('../config.inc.php');
    require_once('../../include/functions.inc.php');
    require_once('../../include/studiengang.class.php');
@@ -79,7 +100,10 @@
 	      </table><br><br>
 		   	<strong><font class="error">Hinweis: </font></strong>Diese Verteiler d&uuml;rfen nur f&uuml;r Fachhochschul-relevante Zwecke verwendet werden!
 		   		<br>
-            <strong><font class="error">Info: </font></strong>Infos bez&uuml;glich  <a class="Item" href="../cisdocs/Mailverteiler.pdf" target="_blank">Berechtigungskonzept</a> Mailverteiler, <a class="Item" href="../cisdocs/bedienung_mailverteiler.pdf" target="_blank">Bedienungsanleitung</a> Mailverteiler
+		   	<?php
+		   	if(MAILVERTEILER_SPERRE)
+		   		echo '<strong><font class="error">Info: </font></strong>Infos bez&uuml;glich  <a class="Item" href="../cisdocs/Mailverteiler.pdf" target="_blank">Berechtigungskonzept</a> Mailverteiler, <a class="Item" href="../cisdocs/bedienung_mailverteiler.pdf" target="_blank">Bedienungsanleitung</a> Mailverteiler';
+		   	?>
             <br>
 <?php
 		$stg_obj = new studiengang($conn);
@@ -114,7 +138,7 @@
 				// display the open-link only when its a closed dispatcher and if the user has status lector
 				// if dispatcher has attribute aktiv=true no opening action is needed
 				echo "<td width=\"20\">";
-				if(!$row1->aktiv)
+				if(!$row1->aktiv && MAILVERTEILER_SPERRE)
 				{
 					if($is_lector)
 					{
@@ -164,7 +188,7 @@
 			  			echo "<tr><td width=\"390\" >&#8226; Alle Studenten dieses Studiengangs</td>";
 
 						// ffe, 20060508: Display the opening link for department dispatchers only for students of the particular department
-						if($is_lector || $std_obj->studiengang_kz==$row->studiengang_kz)
+						if($is_lector || $std_obj->studiengang_kz==$row->studiengang_kz || !MAILVERTEILER_SPERRE)
 						{
 							echo " <td width=\"20\">";
 							echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row->kuerzel).'_std&desc=Alle Studenten von '.strtolower($row->kuerzel).'\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item"><img src="../../skin/images/open.gif" title="Verteiler &ouml;ffnen"></a></td>';

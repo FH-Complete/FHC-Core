@@ -370,6 +370,25 @@ foreach($stsem_obj->studiensemester as $studiensemester)
 }
 $stsem_content.= "</SELECT>\n";
 
+if(!$rechte->isBerechtigt('admin',0) &&
+   !$rechte->isBerechtigt('admin',$lv_obj->studiengang_kz) &&
+   !$rechte->isBerechtigt('lehre',$lv_obj->studiengang_kz))
+{
+	$qry = "SELECT lehreinheit_id FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id)
+			JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) 
+			WHERE tbl_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lvid)."' AND
+			tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stsem)."' AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid='".addslashes($user)."'";
+	if($result = pg_query($conn, $qry))
+	{
+		if(pg_num_rows($result)==0)
+			die('Sie haben keine Berechtigung für diese Seite');
+	}
+	else 
+	{
+		die('Fehler beim Pruefen der Rechte');
+	}
+}
+
 //Lehreinheiten laden
 /*
 if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lv_obj->studiengang_kz) || $rechte->isBerechtigt('lehre',$lv_obj->studiengang_kz))
@@ -570,7 +589,7 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 			$adressen = $sg->email.", ".$user."@".DOMAIN;
 			
 			$freigeber = "<b>".strtoupper($user)."</b>";
-			//mail($adressen,"Notenfreigabe ".$lv->bezeichnung,"<html><body><b>".$lv->bezeichnung." - ".$stsem."</b> (".$lv->semester.". Sem.) <br><br>Benutzer ".$freigeber." hat die LV-Noten f&uuml;r folgende Studenten freigegeben:<br><br>".$studlist."<br>Mail wurde verschickt an: ".$adressen."</body></html>","From: vilesci@".DOMAIN."\nContent-Type: text/html\n");
+			mail($adressen,"Notenfreigabe ".$lv->bezeichnung,"<html><body><b>".$lv->bezeichnung." - ".$stsem."</b> (".$lv->semester.". Sem.) <br><br>Benutzer ".$freigeber." hat die LV-Noten f&uuml;r folgende Studenten freigegeben:<br><br>".$studlist."<br>Mail wurde verschickt an: ".$adressen."</body></html>","From: vilesci@".DOMAIN."\nContent-Type: text/html\n");
 		}	
 	}
 	else 

@@ -41,10 +41,10 @@
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" target="_blank" href="http://www.technikum-wien.at/service/intern"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Newsletter</a></td>
 		  		</tr>
-		  		<tr>
+<!--		  		<tr>
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" target="content" href="private/lehre/pinboard.php?fachbereich_kurzbz=Senat"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Senatsbeschl&uuml;sse</a></td>
-		  		</tr>
+		  		</tr>-->
 		  		<tr>
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" target="_blank" href="http://www.technikum-wien.at/service/termine/"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Veranstaltungen</a></td>
