@@ -50,9 +50,17 @@
 <!ENTITY menu-statistic-lehrauftraege.label		"Lehrauftraege">
 <!ENTITY menu-statistic-lehrauftraege.accesskey	"L">
 
-<!ENTITY menu-statistic-lvplanung.key		"V">
-<!ENTITY menu-statistic-lvplanung.label		"LV-Planung">
-<!ENTITY menu-statistic-lvplanung.accesskey	"V">
+<!ENTITY menu-statistic-sublvplanung.key		"V">
+<!ENTITY menu-statistic-sublvplanung.label		"LV-Planung">
+<!ENTITY menu-statistic-sublvplanung.accesskey	"V">
+
+<!ENTITY menu-statistic-lvplanung.key		"H">
+<!ENTITY menu-statistic-lvplanung.label		"HTML">
+<!ENTITY menu-statistic-lvplanung.accesskey	"H">
+
+<!ENTITY menu-statistic-lvplanungexcel.key			"E">
+<!ENTITY menu-statistic-lvplanungexcel.label		"EXCEL">
+<!ENTITY menu-statistic-lvplanungexcel.accesskey	"E">
 
 <!ENTITY menu-statistic-lehrauftragsliste.key		"A">
 <!ENTITY menu-statistic-lehrauftragsliste.label		"Lehrauftragsliste">

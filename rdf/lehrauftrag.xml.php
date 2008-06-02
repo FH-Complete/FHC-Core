@@ -181,22 +181,44 @@ function drawLehrauftrag($uid)
 		<studiensemester>$studiensemester</studiensemester>";
 	
 	//Lektor
-	$qry = "SELECT * FROM campus.vw_mitarbeiter LEFT JOIN public.tbl_adresse USING(person_id) WHERE uid='".addslashes($uid)."' ORDER BY zustelladresse LIMIT 1";
+	$qry = "SELECT * FROM campus.vw_mitarbeiter LEFT JOIN public.tbl_adresse USING(person_id) WHERE uid='".addslashes($uid)."'
+			ORDER BY zustelladresse DESC LIMIT 1";
 	
 	if($result = pg_query($conn, $qry))
 	{
 		if($row = pg_fetch_object($result))
 		{
+			if($row->firma_id!='')
+			{
+				$qry ="SELECT * FROM public.tbl_firma JOIN public.tbl_adresse USING(firma_id) 
+						WHERE tbl_firma.firma_id='$row->firma_id' LIMIT 1";
+				$result_firma = pg_query($conn, $qry);
+				$row_firma = pg_fetch_object($result_firma);
+				$name_gesamt = $row_firma->name;
+				$strasse = $row_firma->strasse;
+				$plz = $row_firma->plz;
+				$ort = $row_firma->ort;
+				$zuhanden = "zu Handen ".trim($row->titelpre.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost);
+			}
+			else 
+			{
+				$strasse = $row->strasse;
+				$plz = $row->plz;
+				$ort = $row->ort;
+				$name_gesamt = trim($row->titelpre.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost);
+				$zuhanden='';
+			}
 			$xml.='
 		<mitarbeiter>
 			<titelpre>'.$row->titelpre.'</titelpre>
 			<vorname>'.$row->vorname.'</vorname>
 			<familienname>'.$row->nachname.'</familienname>
 			<titelpost>'.$row->titelpost.'</titelpost>
-			<anschrift>'.$row->strasse.'</anschrift>
-			<name_gesamt>'.trim($row->titelpre.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost).'</name_gesamt>
-			<plz>'.$row->plz.'</plz>
-			<ort>'.$row->ort.'</ort>
+			<anschrift>'.$strasse.'</anschrift>
+			<name_gesamt>'.$name_gesamt.'</name_gesamt>
+			<zuhanden>'.$zuhanden.'</zuhanden>
+			<plz>'.$plz.'</plz>
+			<ort>'.$ort.'</ort>
 			<svnr>'.$row->svnr.'</svnr>
 			<personalnummer>'.$row->personalnummer.'</personalnummer>
 		</mitarbeiter>';
