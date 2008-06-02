@@ -143,7 +143,8 @@
 					if($is_lector)
 					{
 						/* open a popup containing the final dispatcher address */
-						echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row1->gruppe_kurzbz).'&desc='.$row1->beschreibung.'\',\'_blank\',\'width=500,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item"><img src="../../skin/images/open.gif" title="Verteiler &ouml;ffnen"></a>';
+						if(MAILVERTEILER_SPERRE)
+							echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row1->gruppe_kurzbz).'&desc='.$row1->beschreibung.'\',\'_blank\',\'width=500,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item"><img src="../../skin/images/open.gif" title="Verteiler &ouml;ffnen"></a>';
 				    	echo "</td>";
 					 	echo " <td width='200'>";
 					 	echo "<a href='mailto:".$row1->gruppe_kurzbz."@".DOMAIN."' class='Item'>".strtolower($row1->gruppe_kurzbz)."@".DOMAIN."</a></td>";
@@ -191,7 +192,8 @@
 						if($is_lector || $std_obj->studiengang_kz==$row->studiengang_kz || !MAILVERTEILER_SPERRE)
 						{
 							echo " <td width=\"20\">";
-							echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row->kuerzel).'_std&desc=Alle Studenten von '.strtolower($row->kuerzel).'\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item"><img src="../../skin/images/open.gif" title="Verteiler &ouml;ffnen"></a></td>';
+							if(MAILVERTEILER_SPERRE)
+								echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row->kuerzel).'_std&desc=Alle Studenten von '.strtolower($row->kuerzel).'\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item"><img src="../../skin/images/open.gif" title="Verteiler &ouml;ffnen"></a></td>';
 							/* open a popup containing the final dispatcher address */
 						    echo " <td width=\"200\" ><a href=\"mailto:".strtolower($row->kuerzel)."_std@".DOMAIN."\" class=\"Item\">".strtolower($row->kuerzel)."_std@".DOMAIN."</a></td>";
 						}
