@@ -64,8 +64,9 @@ else
 					<menuitem label="Student aus dieser Gruppe entfernen" oncommand="StudentGruppeDel();" id="student-tree-popup-gruppedel" hidden="false"/>
 					<menuitem label="EMail senden (intern)" oncommand="StudentSendMail();" id="student-tree-popup-mail" hidden="false"/>
 					<menuitem label="EMail senden (privat)" oncommand="StudentSendMailPrivat();" id="student-tree-popup-mailprivat" hidden="false"/>
-					<!--
 					<menuseparator />
+					<menuitem label="Personendetails anzeigen" oncommand="StudentShowPersonendetails();" id="student-tree-popup-personendetails" hidden="false"/>
+					<!--					
 					<menuitem label="Interessenten löschen" oncommand="StudentDeleteInteressent();" id="student-tree-popup-deleteinteressent" hidden="false"/>
 					-->
 				</menupopup>

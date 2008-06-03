@@ -200,7 +200,7 @@ if(isset($_GET['action']) && $_GET['action']=='neuezuordnung')
 		echo "<b>Es besteht bereits eine Zuordnung zu diesem Studiengang</b>";
 }
 
-if(isset($_POST['savezuordnung']))
+if(isset($_GET['savezuordnung']))
 {
 	//bestehende Zuordnung speichern
 	$zuordnung = new preinteressent($conn);	
@@ -231,7 +231,28 @@ if(isset($_POST['freigabe']))
 			$zuordnung->updatevon = $user;
 		
 			if(!$zuordnung->saveZuordnung(false))
-				echo "<b>Fehler beim Speichern der Daten: $zuordnung->errormsg</b>";	
+				echo "<b>Fehler beim Speichern der Daten: $zuordnung->errormsg</b>";
+			else 
+			{
+				//MAIL an Assistenz verschicken
+				$qry_person = "SELECT vorname, nachname 
+								FROM public.tbl_person JOIN public.tbl_preinteressent USING(person_id) 
+								WHERE preinteressent_id='$preinteressent->preinteressent_id'";
+				$name='';
+				if($result_person = pg_query($conn, $qry_person))
+					if($row_person = pg_fetch_object($result_person))
+						$name = $row_person->nachname.' '.$row_person->vorname;
+				$stg_obj = new studiengang($conn);
+				$stg_obj->load($zuordnung->studiengang_kz);
+				$to = $stg_obj->email;
+				$to = 'oesi@technikum-wien.at';
+				$message = "Dies ist eine automatische Mail! $stg_obj->email\n\n".
+							"Der Preinteressent $name wurde zur Übernahme freigegeben. \nSie können diesen ".
+							"im FAS unter 'Extras->Preinteressenten übernehmen' oder unter folgendem Link\n\n".
+							APP_ROOT."vilesci/personen/preinteressent_uebernahme.php?studiengang_kz=$zuordnung->studiengang_kz \n".
+							"ins FAS übertragen";
+				mail($to, 'Preinteressent Freigabe', $message, 'FROM: vilesci@'.DOMAIN);
+			}
 		}
 		else 
 		{
@@ -539,7 +560,7 @@ foreach ($zuordnung->result as $row)
 	echo "$studiengang->kuerzel - $studiengang->bezeichnung";
 	echo '</td>';
 	echo '<td>';
-	echo '<SELECT name="prioritaet">';
+	echo '<SELECT name="prioritaet" onchange="this.form.action=this.form.action+\'&savezuordnung\';this.form.submit();">';
 	echo '<option value="1" '.($row->prioritaet==1?'selected':'').'>niedrig (1)</option>';
 	echo '<option value="2" '.($row->prioritaet==2?'selected':'').'>mittel (2)</option>';
 	echo '<option value="3" '.($row->prioritaet==3?'selected':'').'>hoch (3)</option>';
@@ -585,7 +606,7 @@ foreach ($zuordnung->result as $row)
 	echo $datum_obj->formatDatum($row->uebernahmedatum, 'd.m.Y H:i:s');
 	echo '</td>';
 	echo '<td>';
-	echo '<input type="submit" value="Speichern" name="savezuordnung">';
+	//echo '<input type="submit" value="Speichern" name="savezuordnung">';
 	echo '</td>';
 	echo '<td>';
 	if($row->uebernahmedatum=='')
