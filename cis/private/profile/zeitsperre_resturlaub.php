@@ -201,33 +201,36 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		if($zeitsperre->save())
 		{
 			echo "Daten wurden erfolgreich gespeichert";
-			if($zeitsperre->new && $zeitsperre->zeitsperretyp_kurzbz=='Urlaub')
+			if(URLAUB_TOOLS)
 			{
-				//Beim Anlegen von neuen Urlauben wird ein Mail an den Vorgesetzten versendet um diesen Freizugeben
-				$vorgesetzter = getVorgesetzten($uid);
-				if($vorgesetzter!='')
+				if($zeitsperre->new && $zeitsperre->zeitsperretyp_kurzbz=='Urlaub')
 				{
-					$to = $vorgesetzter.'@'.DOMAIN;
-					//$to = 'oesi@technikum-wien.at';
-					$benutzer = new benutzer($conn);
-					$benutzer->load($uid);
-					$message = "Dies ist eine automatische Mail! \n".
-							   "$benutzer->nachname $benutzer->vorname hat einen neuen Urlaub eingetragen:\n".
-							   "$zeitsperre->bezeichnung von $zeitsperre->vondatum bis $zeitsperre->bisdatum\n\n".
-							   "Sie können diesen unter folgender Adresse freigeben:\n".
-							   "https://cis.technikum-wien.at/cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".$datum_obj->formatDatum($zeitsperre->vondatum, 'Y');
-					if(mail($to, 'Freigabeansuchen', $message,'From: vilesci@'.DOMAIN))
+					//Beim Anlegen von neuen Urlauben wird ein Mail an den Vorgesetzten versendet um diesen Freizugeben
+					$vorgesetzter = getVorgesetzten($uid);
+					if($vorgesetzter!='')
 					{
-						echo "<br><b>Freigabemail wurde an $to versandt</b>";
+						$to = $vorgesetzter.'@'.DOMAIN;
+						//$to = 'oesi@technikum-wien.at';
+						$benutzer = new benutzer($conn);
+						$benutzer->load($uid);
+						$message = "Dies ist eine automatische Mail! \n".
+								   "$benutzer->nachname $benutzer->vorname hat einen neuen Urlaub eingetragen:\n".
+								   "$zeitsperre->bezeichnung von $zeitsperre->vondatum bis $zeitsperre->bisdatum\n\n".
+								   "Sie können diesen unter folgender Adresse freigeben:\n".
+								   "https://cis.technikum-wien.at/cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".$datum_obj->formatDatum($zeitsperre->vondatum, 'Y');
+						if(mail($to, 'Freigabeansuchen', $message,'From: vilesci@'.DOMAIN))
+						{
+							echo "<br><b>Freigabemail wurde an $to versandt</b>";
+						}
+						else 
+						{
+							echo "<br><span class='error'>Fehler beim Senden des Freigabemails an $to</span>";
+						}
 					}
 					else 
 					{
-						echo "<br><span class='error'>Fehler beim Senden des Freigabemails an $to</span>";
+						echo "<br><span class='error'>Es konnte keine Freigabemail versendet werden da kein Vorgesetzter eingetragen ist</span>";
 					}
-				}
-				else 
-				{
-					echo "<br><span class='error'>Es konnte keine Freigabemail versendet werden da kein Vorgesetzter eingetragen ist</span>";
 				}
 			}
 		}
