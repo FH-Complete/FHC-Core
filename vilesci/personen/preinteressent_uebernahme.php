@@ -193,12 +193,12 @@ echo "<form action='".$_SERVER['PHP_SELF']."?studiengang_kz=$studiengang_kz' met
 echo "<table class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>
 	<thead>
 		<tr>
+		<th>&nbsp;</th>
 		<th class='table-sortable:default'>Nachname</th>
 		<th class='table-sortable:default'>Vorname</th>
 		<th class='table-sortable:default'>GebDatum</th>
 		<th class='table-sortable:default'>Studiensemester</th>
 		<th class='table-sortable:default'>Anmerkung</th>
-		<th>&nbsp;</th>
 		</tr>
 	</thead>
 	<tbody>";
@@ -210,12 +210,12 @@ foreach ($preinteressent->result as $row)
 	echo '<tr>';
 	$person = new person($conn);
 	$person->load($row->person_id);
+	echo "<td><input type='checkbox' name='chk_$row->preinteressent_id' checked></td>";
 	echo "<td>$person->nachname</td>";
 	echo "<td>$person->vorname</td>";
 	echo "<td>$person->gebdatum</td>";
 	echo "<td>$row->studiensemester_kurzbz</td>";
-	echo "<td>$row->anmerkung</td>";
-	echo "<td><input type='checkbox' name='chk_$row->preinteressent_id' checked></td>";
+	echo "<td>$row->anmerkung</td>";	
 	echo '</tr>';
 }
 echo '</tbody></table><br>';

@@ -1031,6 +1031,14 @@ function ExtrasShowLektorenzuordnunginstitute()
 }
 
 // ****
+// * Zeigt HTML Seite zur Uebernahme der Preinteressenten
+// ****
+function ExtrasShowPreinteressentenuebernahme()
+{
+	window.open('<?php echo APP_ROOT ?>vilesci/personen/preinteressent_uebernahme.php','PreinteressentUebernahme','');
+}
+
+// ****
 // * Zeigt eine Seite zum Importieren der Funktionen aus der vorherigen BISMeldung
 // ****
 function BISMitarbeiterImport()

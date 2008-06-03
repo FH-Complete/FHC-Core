@@ -29,6 +29,7 @@ require_once('../../include/kontakt.class.php');
 require_once('../../include/adresse.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/preinteressent.class.php');
+require_once('../../include/studiengang.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
 	die('Fehler beim Herstellen der DB Connection');
@@ -306,6 +307,7 @@ if(isset($_POST['save']))
 		$preinteressent->person_id = $person->person_id;
 		$preinteressent->studiensemester_kurzbz = $studiensemester_kurzbz;
 		$preinteressent->aufmerksamdurch_kurzbz = 'k.A.';
+		$preinteressent->erfassungsdatum = date('Y-m-d');
 		$preinteressent->firma_id = 1; //TW
 		$preinteressent->insertamum = date('Y-m-d H:i:s');
 		$preinteressent->insertvon = $user;
@@ -314,6 +316,26 @@ if(isset($_POST['save']))
 		{
 			$error = true;
 			$errormsg = "Fehler beim Anlegen des Preinteressenten: $preinteressent->errormsg";
+		}
+		
+		foreach ($_POST as $key=>$param)
+		{
+			if(substr($key,0,4)=='stg_')
+			{
+				$stg_kz = substr($key, 4);
+				$zuordnung = new preinteressent($conn);
+				$zuordnung->preinteressent_id = $preinteressent->preinteressent_id;
+				$zuordnung->studiengang_kz = $stg_kz;
+				$zuordnung->prioritaet = 1;
+				$zuordnung->insertamum = date('Y-m-d H:i:s');
+				$zuordnung->insertvon = $user;
+				
+				if(!$zuordnung->saveZuordnung(true))
+				{
+					$errormsg.="Fehler beim Speichern der Zuordnung zum Studiengang $stg_kz";
+					$error=true;
+				}
+			}
 		}
 	}
 	if(!$error)
@@ -360,7 +382,7 @@ if($geburtsdatum!='')
 <table width="100%">
 
 <tr>
-<td>
+<td valign="top">
 <!--Formularfelder-->
 <table>
 <?php
@@ -446,6 +468,9 @@ if($where!='')
 	
 	if($result = pg_query($conn, $qry))
 	{
+		$stg_obj = new studiengang($conn);
+		$stg_obj->getAll('typ, kurzbz', false);
+		
 		echo '<table><tr><th></th><th>Nachname</th><th>Vorname</th><th>GebDatum</th><th>SVNR</th><th>Geschlecht</th><th>Adresse</th><th>Status</th></tr>';
 		while($row = pg_fetch_object($result))
 		{
@@ -454,10 +479,21 @@ if($where!='')
 			if($result_ma = pg_query($conn, $qry_ma))
 				if($row_ma=pg_fetch_object($result_ma))
 					$status.=' Mitarbeiter';
-			$qry_ma = "SELECT * FROM campus.vw_student WHERE person_id='$row->person_id'";
-			if($result_ma = pg_query($conn, $qry_ma))
-				if($row_ma=pg_fetch_object($result_ma))
+			$qry_std = "SELECT * FROM campus.vw_student WHERE person_id='$row->person_id'";
+			if($result_std = pg_query($conn, $qry_std))
+			{
+				if(pg_num_rows($result_std)>0)
+				{
 					$status.=' Student';
+			
+					while($row_std=pg_fetch_object($result_std))
+					{
+						$status.=' '.$stg_obj->kuerzel_arr[$row_std->studiengang_kz].',';
+					}
+					$status = substr($status, 0, strlen($status)-1);
+				}
+			}
+					
 			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->gebdatum</td><td>$row->svnr</td><td>".($row->geschlecht=='m'?'männlich':'weiblich')."</td><td>";
 			$qry_adr = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id'";
 			if($result_adr = pg_query($conn, $qry_adr))
@@ -467,6 +503,16 @@ if($where!='')
 			echo "</td></tr>";
 		}
 		echo '<tr><td><input type="radio" name="person_id" value="0" checked onclick="disablefields(this)"></td><td>Neue Person anlegen</td></tr>';
+		echo '</table>';
+		echo '<hr>';
+		//Studiengaenge anzeigen
+		$studiengang = new studiengang($conn);
+		$studiengang->getAll('typ, bezeichnung');
+		echo '<table>';
+		foreach ($studiengang->result as $row)
+		{
+			echo "<tr><td><input type='checkbox' name='stg_$row->studiengang_kz'></td><td>$row->kuerzel</td><td>$row->bezeichnung</td></tr>";
+		}
 		echo '</table>';
 	}
 }

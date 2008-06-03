@@ -3967,6 +3967,15 @@ function StudentSendMailPrivat()
 }
 
 // ****
+// * Oeffnet ein Fenster mit den Details der gesamten Person
+// ****
+function StudentShowPersonendetails()
+{
+	person_id = document.getElementById('student-detail-textbox-person_id').value;
+	window.open('<?php echo APP_ROOT ?>vilesci/personen/personendetails.php?id='+person_id,'Personendetails','');
+}
+
+// ****
 // * Erstellt das Diploma Supplement fuer einen oder mehrere Studenten
 // ****
 function StudentCreateDiplSupplement()

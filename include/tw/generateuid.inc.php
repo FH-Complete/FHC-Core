@@ -42,7 +42,7 @@ function generateUID($stgkzl,$jahr, $stgtyp, $matrikelnummer)
 		$nr = $nr+500;
 
 
-	return $stgkzl.$jahr.($art!='0'?$stgtyp:'x').$nr;
+	return strtolower($stgkzl.$jahr.($art!='0'?$stgtyp:'x').$nr);
 }
 
 // ****

@@ -212,6 +212,10 @@
 <!ENTITY menu-extras-lektorenzuordnunginstitute.label		"Lektorenzuordnung-Institute">
 <!ENTITY menu-extras-lektorenzuordnunginstitute.accesskey	"L">
 
+<!ENTITY menu-extras-preinteressentenuebernahme.key			"I">
+<!ENTITY menu-extras-preinteressentenuebernahme.label		"Preinteressenten uebernehmen">
+<!ENTITY menu-extras-preinteressentenuebernahme.accesskey	"I">
+
 <!-- BIS -->
 <!ENTITY menu-bis.label		"BIS">
 <!ENTITY menu-bis.accesskey	"I">
