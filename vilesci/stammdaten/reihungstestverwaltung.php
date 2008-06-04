@@ -26,6 +26,7 @@
 	require_once('../../include/reihungstest.class.php');
 	require_once('../../include/ort.class.php');
 	require_once('../../include/datum.class.php');
+	require_once('../../include/benutzerberechtigung.class.php');
 	
 	require_once('../../include/Excel/excel.php');
 	
@@ -40,6 +41,8 @@
 	$stg_arr = array();
 	$error = false;
 	
+	$rechte = new benutzerberechtigung($conn);
+	$rechte->getBerechtigungen($user);
 	
 	if(isset($_GET['excel']))
 	{
@@ -266,7 +269,7 @@
 		echo "</td>";
 		echo "<td align='right'><INPUT type='button' value='Neuen Reihungstesttermin anlegen' onclick='window.location.href=\"".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&neu=true\"' >";
 		
-		echo "</td></tr></table><br><br>";
+		echo "</td></tr></table><br>";
 		
 		$reihungstest = new reihungstest($conn);
 		
@@ -284,6 +287,11 @@
 			$reihungstest->uhrzeit = date('H:i:s');
 		}
 	
+		if($rechte->isBerechtigt('admin',0, 'suid'))
+		{
+			echo '<a href="reihungstest_administration.php">Administration</a>';
+		}
+		
 		//Formular zum Bearbeiten des Reihungstests
 		echo '<HR>';
 		echo "<FORM method='POST'>";
