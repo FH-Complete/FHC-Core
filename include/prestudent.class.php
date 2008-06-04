@@ -435,7 +435,7 @@ class prestudent extends person
 	// * @param $studiensemester_kurzbz Studiensemester fuer das die Int. und Bewerber
 	// *                                geladen werden sollen
 	// *******************************************************************************
-	function loadIntessentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester=nulll, $typ=null)
+	function loadIntessentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester=nulll, $typ=null, $orgform=null)
 	{
 		$qry = "SELECT 
 					*, a.anmerkung, tbl_person.anmerkung as anmerkungen 
@@ -457,6 +457,8 @@ class prestudent extends person
 			
 		if($semester!=null)
 			$qry.=" AND ausbildungssemester='$semester'";
+		if($orgform!=null && $orgform!='')
+			$qry.=" AND tbl_prestudentrolle.orgform_kurzbz='$orgform'";
 		
 		switch ($typ)
 		{

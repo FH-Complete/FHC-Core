@@ -147,6 +147,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 	{
 		echo '<form method="post">
 				<SELECT name="prestudent">';
+		echo '<OPTION value="13478">Dummy Dieter</OPTION>\n';
 		foreach($ps->result as $prestd)
 			echo '<OPTION value="'.$prestd->prestudent_id.'">'.$prestd->nachname.' '.$prestd->vorname."</OPTION>\n";
 		echo '</SELECT>';
