@@ -77,37 +77,40 @@ $obj->getLvGesamtNoten($lehrveranstaltung_id, $uid, $semester_aktuell);
 
 foreach ($obj->result as $row)	
 {
-	$vorname = '';
-	$nachname = '';
-	$qry_name = "SELECT vorname, nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid='$row->student_uid'";
-	if($result_name = pg_query($conn, $qry_name))
+	if($row->freigabedatum!='')
 	{
-		if($row_name = pg_fetch_object($result_name))
+		$vorname = '';
+		$nachname = '';
+		$qry_name = "SELECT vorname, nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid='$row->student_uid'";
+		if($result_name = pg_query($conn, $qry_name))
 		{
-			$vorname = $row_name->vorname;
-			$nachname = $row_name->nachname;
+			if($row_name = pg_fetch_object($result_name))
+			{
+				$vorname = $row_name->vorname;
+				$nachname = $row_name->nachname;
+			}
 		}
+		
+		echo '
+			  <RDF:li>
+		         <RDF:Description  id="'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'"  about="'.$rdf_url.'/'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'" >
+					<NOTE:lehrveranstaltung_id><![CDATA['.$row->lehrveranstaltung_id.']]></NOTE:lehrveranstaltung_id>
+					<NOTE:student_uid><![CDATA['.$row->student_uid.']]></NOTE:student_uid>
+					<NOTE:mitarbeiter_uid><![CDATA['.$row->mitarbeiter_uid.']]></NOTE:mitarbeiter_uid>
+					<NOTE:studiensemester_kurzbz><![CDATA['.$row->studiensemester_kurzbz.']]></NOTE:studiensemester_kurzbz>
+					<NOTE:note><![CDATA['.$row->note.']]></NOTE:note>
+					<NOTE:freigabedatum_iso><![CDATA['.$row->freigabedatum.']]></NOTE:freigabedatum_iso>
+					<NOTE:freigabedatum><![CDATA['.$datum->convertISODate($row->freigabedatum).']]></NOTE:freigabedatum>
+					<NOTE:benotungsdatum_iso><![CDATA['.$row->benotungsdatum.']]></NOTE:benotungsdatum_iso>
+					<NOTE:benotungsdatum><![CDATA['.$datum->convertISODate($row->benotungsdatum).']]></NOTE:benotungsdatum>
+					<NOTE:note_bezeichnung><![CDATA['.$row->note_bezeichnung.']]></NOTE:note_bezeichnung>
+					<NOTE:lehrveranstaltung_bezeichnung><![CDATA['.$row->lehrveranstaltung_bezeichnung.']]></NOTE:lehrveranstaltung_bezeichnung>
+					<NOTE:student_vorname><![CDATA['.$vorname.']]></NOTE:student_vorname>
+					<NOTE:student_nachname><![CDATA['.$nachname.']]></NOTE:student_nachname>
+					<NOTE:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></NOTE:studiengang>
+		         </RDF:Description>
+		      </RDF:li>';
 	}
-	
-	echo '
-		  <RDF:li>
-	         <RDF:Description  id="'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'"  about="'.$rdf_url.'/'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'" >
-				<NOTE:lehrveranstaltung_id><![CDATA['.$row->lehrveranstaltung_id.']]></NOTE:lehrveranstaltung_id>
-				<NOTE:student_uid><![CDATA['.$row->student_uid.']]></NOTE:student_uid>
-				<NOTE:mitarbeiter_uid><![CDATA['.$row->mitarbeiter_uid.']]></NOTE:mitarbeiter_uid>
-				<NOTE:studiensemester_kurzbz><![CDATA['.$row->studiensemester_kurzbz.']]></NOTE:studiensemester_kurzbz>
-				<NOTE:note><![CDATA['.$row->note.']]></NOTE:note>
-				<NOTE:freigabedatum_iso><![CDATA['.$row->freigabedatum.']]></NOTE:freigabedatum_iso>
-				<NOTE:freigabedatum><![CDATA['.$datum->convertISODate($row->freigabedatum).']]></NOTE:freigabedatum>
-				<NOTE:benotungsdatum_iso><![CDATA['.$row->benotungsdatum.']]></NOTE:benotungsdatum_iso>
-				<NOTE:benotungsdatum><![CDATA['.$datum->convertISODate($row->benotungsdatum).']]></NOTE:benotungsdatum>
-				<NOTE:note_bezeichnung><![CDATA['.$row->note_bezeichnung.']]></NOTE:note_bezeichnung>
-				<NOTE:lehrveranstaltung_bezeichnung><![CDATA['.$row->lehrveranstaltung_bezeichnung.']]></NOTE:lehrveranstaltung_bezeichnung>
-				<NOTE:student_vorname><![CDATA['.$vorname.']]></NOTE:student_vorname>
-				<NOTE:student_nachname><![CDATA['.$nachname.']]></NOTE:student_nachname>
-				<NOTE:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></NOTE:studiengang>
-	         </RDF:Description>
-	      </RDF:li>';
 }
 ?>
    </RDF:Seq>
