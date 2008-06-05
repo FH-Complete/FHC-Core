@@ -280,6 +280,8 @@ function onVerbandSelect(event)
 	var typ=tree.view.getCellText(tree.currentIndex,col);
 	col = tree.columns ? tree.columns["stsem"] : "stsem";
 	var stsem=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["tree-verband-col-orgform"] : "tree-verband-col-orgform";
+	var orgform=tree.view.getCellText(tree.currentIndex,col);
 
 	currentAuswahl.stg_kz=stg_kz;
 	currentAuswahl.sem=sem;
@@ -303,7 +305,7 @@ function onVerbandSelect(event)
 		try
 		{
 			stsem = getStudiensemester();
-			url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ=student&"+gettimestamp();
+			url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ=student&orgform="+orgform+"&"+gettimestamp();
 			var treeStudent=document.getElementById('student-tree');
 
 			//Alte DS entfernen
@@ -348,7 +350,7 @@ function onVerbandSelect(event)
 		// -------------- Lehrveranstaltung --------------------------
 		try
 		{
-			url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?stg_kz='+stg_kz+'&sem='+sem+'&ver='+ver+'&grp='+grp+'&gruppe='+gruppe+'&'+gettimestamp();
+			url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?stg_kz='+stg_kz+'&sem='+sem+'&ver='+ver+'&grp='+grp+'&gruppe='+gruppe+'&orgform='+orgform+"&"+gettimestamp();
 			var treeLV=document.getElementById('lehrveranstaltung-tree');
 
 			try
@@ -393,7 +395,7 @@ function onVerbandSelect(event)
 		{
 			if(stsem=='' && typ=='')
 				stsem='aktuelles';
-			url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"studiengang_kz="+stg_kz+"&semester="+sem+"&typ="+typ+"&studiensemester_kurzbz="+stsem+"&"+gettimestamp();
+			url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"studiengang_kz="+stg_kz+"&semester="+sem+"&typ="+typ+"&studiensemester_kurzbz="+stsem+"&orgform="+orgform+"&"+gettimestamp();
 			var treeInt=document.getElementById('student-tree');
 
 			try

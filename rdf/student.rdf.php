@@ -178,6 +178,7 @@ function draw_content_liste($row)
 			<STUDENT:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></STUDENT:studiengang>
 			<STUDENT:orgform><![CDATA['.$orgform.']]></STUDENT:orgform>
 			<STUDENT:aufmerksamdurch_kurzbz><![CDATA['.$row->aufmerksamdurch_kurzbz.']]></STUDENT:aufmerksamdurch_kurzbz>
+			<STUDENT:punkte><![CDATA['.$row->punkte.']]></STUDENT:punkte>
       	</RDF:Description>
       </RDF:li>';
 }
@@ -307,6 +308,7 @@ $prestudent_id = (isset($_GET['prestudent_id'])?$_GET['prestudent_id']:null);
 $filter = (isset($_GET['filter'])?$_GET['filter']:null);
 $ss = (isset($_GET['ss'])?$_GET['ss']:null);
 $filter2 = (isset($_GET['filter2'])?$_GET['filter2']:null);
+$orgform = (isset($_GET['orgform'])?$_GET['orgform']:null);
 
 if($studiensemester_kurzbz=='aktuelles')
 	$studiensemester_kurzbz = $semester_aktuell;
@@ -368,6 +370,17 @@ if($xmlformat=='rdf')
 				$where.=" AND tbl_studentlehrverband.verband='".$verband."'";
 			if ($gruppe!=null)
 				$where.=" AND tbl_studentlehrverband.gruppe='".$gruppe."'";
+				
+			//Wenn eine Orgform uebergeben wird nur das Semester ausgewaehlt ist, dann
+			//nach der Orgform filtern. Bei Verbaenden, Gruppen und Spezialgruppen wird auf
+			//die Orgform keine ruecksicht genommen
+			if($verband=='' && $gruppe=='' && $orgform!='')
+			{
+				$where.=" AND EXISTS(SELECT prestudent_id FROM public.tbl_prestudentrolle WHERE prestudent_id=tbl_prestudent.prestudent_id AND orgform_kurzbz='$orgform'";
+				if($studiensemester_kurzbz!=null)
+					$where.=" AND studiensemester_kurzbz='$studiensemester_kurzbz'";
+				$where.=")";
+			}
 		}
 
 		$where.=" AND tbl_studentlehrverband.studiensemester_kurzbz='$studiensemester_kurzbz'";
@@ -382,7 +395,8 @@ if($xmlformat=='rdf')
 							WHERE kontakttyp='email' AND person_id=p.person_id AND zustellung
 							LIMIT 1
 						)
-						AS email_privat
+						AS email_privat,
+						(SELECT punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as punkte
 						FROM public.tbl_studentlehrverband JOIN public.tbl_student USING (student_uid)
 							JOIN public.tbl_benutzer ON (student_uid=uid) JOIN public.tbl_person p USING (person_id)  JOIN public.tbl_prestudent USING(prestudent_id) ";
 		if($gruppe_kurzbz!=null)
@@ -434,7 +448,7 @@ if($xmlformat=='rdf')
 
 		if($studiengang_kz!=null)
 		{
-			if($prestd->loadIntessentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester, $typ))
+			if($prestd->loadIntessentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester, $typ, $orgform))
 			{
 				foreach ($prestd->result as $row)
 				{

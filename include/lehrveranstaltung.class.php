@@ -278,6 +278,64 @@ class lehrveranstaltung
 
 		return true;
 	}
+	
+	/**
+	 * Liefert alle Lehrveranstaltungen eines Studenten (alle SemesteR)
+	 * @param $student_uid
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	function load_lva_student($student_uid)
+	{
+		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung 
+				WHERE lehrveranstaltung_id IN(SELECT lehrveranstaltung_id FROM campus.vw_student_lehrveranstaltung 
+											  WHERE uid='".addslashes($student_uid)."')
+				ORDER BY semester, bezeichnung";
+		
+		//Datensaetze laden
+		if(!$res = pg_query($this->conn, $qry))
+		{
+			$this->errormsg = 'Datensatz konnte nicht geladen werden';
+			return false;
+		}
+		while($row = pg_fetch_object($res))
+		{
+			$lv_obj = new lehrveranstaltung($this->conn, null, null);
+
+			$lv_obj->lehrveranstaltung_id=$row->lehrveranstaltung_id;
+			$lv_obj->studiengang_kz=$row->studiengang_kz;
+			$lv_obj->bezeichnung=$row->bezeichnung;
+			$lv_obj->kurzbz=$row->kurzbz;
+			$lv_obj->lehrform_kurzbz=$row->lehrform_kurzbz;
+			$lv_obj->semester=$row->semester;
+			$lv_obj->ects=$row->ects;
+			$lv_obj->semesterstunden=$row->semesterstunden;
+			$lv_obj->anmerkung=$row->anmerkung;
+			$lv_obj->lehre=($row->lehre=='t'?true:false);
+			$lv_obj->lehreverzeichnis=$row->lehreverzeichnis;
+			$lv_obj->aktiv=($row->aktiv=='t'?true:false);
+			$lv_obj->ext_id=$row->ext_id;
+			$lv_obj->insertamum=$row->insertamum;
+			$lv_obj->insertvon=$row->insertvon;
+			$lv_obj->planfaktor=$row->planfaktor;
+			$lv_obj->planlektoren=$row->planlektoren;
+			$lv_obj->planpersonalkosten=$row->planpersonalkosten;
+			$lv_obj->plankostenprolektor=$row->plankostenprolektor;
+			$lv_obj->updateamum=$row->updateamum;
+			$lv_obj->updatevon=$row->updatevon;
+			$lv_obj->sprache=$row->sprache;
+			$lv_obj->sort=$row->sort;
+			$lv_obj->zeugnis=($row->zeugnis=='t'?true:false);
+			$lv_obj->projektarbeit=($row->projektarbeit=='t'?true:false);
+			$lv_obj->koordinator=$row->koordinator;
+			$lv_obj->bezeichnung_english = $row->bezeichnung_english;
+
+			$this->lehrveranstaltungen[] = $lv_obj;
+		}
+
+		return true;
+	}
+	
+		
 	function addslashes($var)
 	{
 		return ($var!=''?"'".addslashes($var)."'":'null');

@@ -3469,70 +3469,74 @@ function StudentPruefungNeu()
 	
 	document.getElementById('student-pruefung-checkbox-neu').checked=true;
 
-	try
+	//wenn im Tree eine pruefung markiert ist, und auf neu gedrueckt wird,
+	//dann wird die LV/LE und der Mitarbeiter dieser Pruefung schon vorausgewaehlt
+	//ist keiner markiert werden alle eingabefelder geloescht/neu geladen
+	var tree = document.getElementById('student-pruefung-tree');
+	if (tree.currentIndex!=-1)
+		vorlage=true;
+	else
+		vorlage=false;
+
+	if(!vorlage)
 	{
-		//Wenn nach dem Personen gesucht wurde, ist es moeglich, dass kein Studiengang gewaehlt ist.
-		//Dann wird der Studiengang/Semester des Studenten genommen
-		var verband_tree=document.getElementById('tree-verband');
-		var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
-		var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
-		
-		col = verband_tree.columns ? verband_tree.columns["sem"] : "sem";
-		var sem=verband_tree.view.getCellText(verband_tree.currentIndex,col);
-	}
-	catch(e)
-	{	
-		var stg_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;	
-		var sem = document.getElementById('student-detail-textbox-semester').value;
-	}
+		//Lehrveranstaltung Drop Down laden
+		var LVDropDown = document.getElementById('student-pruefung-menulist-lehrveranstaltung');
+		var uid = document.getElementById('student-detail-textbox-uid').value;
+		url="<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?uid="+uid+"&"+gettimestamp();
 	
-	//Lehrveranstaltung Drop Down laden
-	var LVDropDown = document.getElementById('student-pruefung-menulist-lehrveranstaltung');
-	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&sem="+sem+"&"+gettimestamp();
-
-	//Alte DS entfernen
-	var oldDatasources = LVDropDown.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
-	{
-		LVDropDown.database.RemoveDataSource(oldDatasources.getNext());
+		//Alte DS entfernen
+		var oldDatasources = LVDropDown.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			LVDropDown.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		LVDropDown.builder.rebuild();
+	
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		var datasource = rdfService.GetDataSource(url);
+		LVDropDown.database.AddDataSource(datasource);
+		LVDropDown.value='';
+		LVDropDown.selectedItem='';
 	}
-	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	LVDropDown.builder.rebuild();
-
-	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-	var datasource = rdfService.GetDataSource(url);
-	LVDropDown.database.AddDataSource(datasource);
-	LVDropDown.value='';
-	LVDropDown.selectedItem='';
 	
 	var LEDropDown = document.getElementById('student-pruefung-menulist-lehreinheit');
 	
-	//Alte DS entfernen
-	var oldDatasources = LEDropDown.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
+	if(!vorlage)
 	{
-		LEDropDown.database.RemoveDataSource(oldDatasources.getNext());
-	}
-	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	LEDropDown.builder.rebuild();
-	
-	LEDropDown.value='';
-	LEDropDown.selectedItem='';
+		//Alte DS entfernen
+		var oldDatasources = LEDropDown.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			LEDropDown.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		LEDropDown.builder.rebuild();
 		
-	var MADropDown = document.getElementById('student-pruefung-menulist-mitarbeiter');
-	
-	//Alte DS entfernen
-	var oldDatasources = MADropDown.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
-	{
-		MADropDown.database.RemoveDataSource(oldDatasources.getNext());
+		LEDropDown.value='';
+		LEDropDown.selectedItem='';
 	}
-	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	MADropDown.builder.rebuild();
+
+	var MADropDown = document.getElementById('student-pruefung-menulist-mitarbeiter');
+
+	if(!vorlage)
+	{
+		//Alte DS entfernen
+		var oldDatasources = MADropDown.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			MADropDown.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		MADropDown.builder.rebuild();
+		
+		MADropDown.value='';
+		MADropDown.selectedItem='';
+	}
 	
-	MADropDown.value='';
-	MADropDown.selectedItem='';
-	
+	document.getElementById('student-pruefung-menulist-typ').value='';
+	document.getElementById('student-pruefung-menulist-typ').selectedItem='';
 	document.getElementById('student-pruefung-menulist-note').value='9';
 	document.getElementById('student-pruefung-textbox-datum').value='<?php echo date('d.m.Y');?>';
 	document.getElementById('student-pruefung-textbox-anmerkung').value='';
@@ -3547,7 +3551,7 @@ function StudentPruefungLVAChange()
 
 	var lvid = document.getElementById('student-pruefung-menulist-lehrveranstaltung').value;
 	var stsem = getStudiensemester();
-
+	
 	//Lehreinheiten Drop Down laden
 	var LEDropDown = document.getElementById('student-pruefung-menulist-lehreinheit');
 	url='<?php echo APP_ROOT;?>rdf/lehreinheit.rdf.php?lehrveranstaltung_id='+lvid+"&studiensemester_kurzbz="+stsem+"&"+gettimestamp();
@@ -3622,6 +3626,12 @@ function StudentPruefungDetailSpeichern()
 	if(datum!='' && !CheckDatum(datum))
 	{
 		alert('Datum ist ungueltig');
+		return false;
+	}
+	
+	if(pruefungstyp_kurzbz=='')
+	{
+		alert('Pruefungstyp muss eingetragen werden');
 		return false;
 	}
 
@@ -3726,7 +3736,10 @@ function StudentPruefungAuswahl()
 
 	//Lehrveranstaltung Drop Down laden
 	var LVDropDown = document.getElementById('student-pruefung-menulist-lehrveranstaltung');
-	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&"+gettimestamp();
+	//url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&"+gettimestamp();
+	var uid = document.getElementById('student-detail-textbox-uid').value;
+	url="<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?uid="+uid+"&"+gettimestamp();
+
 
 	//Alte DS entfernen
 	var oldDatasources = LVDropDown.database.GetDataSources();

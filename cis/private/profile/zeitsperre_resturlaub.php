@@ -217,7 +217,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 								   "$benutzer->nachname $benutzer->vorname hat einen neuen Urlaub eingetragen:\n".
 								   "$zeitsperre->bezeichnung von $zeitsperre->vondatum bis $zeitsperre->bisdatum\n\n".
 								   "Sie können diesen unter folgender Adresse freigeben:\n".
-								   "https://cis.technikum-wien.at/cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".$datum_obj->formatDatum($zeitsperre->vondatum, 'Y');
+								   APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".$datum_obj->formatDatum($zeitsperre->vondatum, 'Y');
 						if(mail($to, 'Freigabeansuchen', $message,'From: vilesci@'.DOMAIN))
 						{
 							echo "<br><b>Freigabemail wurde an $to versandt</b>";
@@ -515,6 +515,8 @@ if(URLAUB_TOOLS)
 	$result = pg_query($conn, $qry);
 	$row = pg_fetch_object($result);
 	$gebuchterurlaub = $row->anzahltage;
+	if($gebuchterurlaub=='')
+		$gebuchterurlaub=0;
 	$content_resturlaub.="<tr><td>- aktuell gebuchter Urlaub&nbsp;</td><td align='right'>$gebuchterurlaub Tage</td></tr>";
 	$content_resturlaub.="<tr><td style='border-top: 1px solid black;'>aktueller Stand</td><td style='border-top: 1px solid black;' align='right'>".($anspruch+$resturlaubstage-$gebuchterurlaub)." Tage</td></tr>";
 	$content_resturlaub.="</table>";
