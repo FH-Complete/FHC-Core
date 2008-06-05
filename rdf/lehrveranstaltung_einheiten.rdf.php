@@ -64,6 +64,7 @@ $sem=(isset($_GET['sem'])?$_GET['sem']:'');
 $stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:-1);
 $uid=(isset($_GET['uid'])?$_GET['uid']:'');
 $fachbereich_kurzbz=(isset($_GET['fachbereich_kurzbz'])?$_GET['fachbereich_kurzbz']:'');
+$orgform=(isset($_GET['orgform'])?$_GET['orgform']:'');
 
 loadVariables($conn, $user);
 
@@ -107,6 +108,8 @@ else
 		$qry.=" AND	studiengang_kz='".addslashes($stg_kz)."'";
 	if($sem!='')
 		$qry.=" AND semester='".addslashes($sem)."'";
+	if($orgform!='')
+		$qry.=" AND orgform_kurzbz='".addslashes($orgform)."'";
 
 	$qry.=" UNION SELECT DISTINCT lehrveranstaltung_id, kurzbz as lv_kurzbz, bezeichnung as lv_bezeichnung, studiengang_kz,
 				semester, tbl_lehrveranstaltung.sprache, ects as lv_ects, semesterstunden, tbl_lehrveranstaltung.anmerkung,
@@ -121,6 +124,8 @@ else
 	$qry.=" AND studiensemester_kurzbz='".addslashes($semester_aktuell)."'";
 	if($sem!='')
 		$qry.=" AND semester='".addslashes($sem)."'";
+	if($orgform!='')
+		$qry.=" AND orgform_kurzbz='".addslashes($orgform)."'";
 }
 
 //echo $qry;

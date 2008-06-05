@@ -238,6 +238,10 @@ else
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#orgform" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
+	    				<treecol id="student-treecol-punkte" label="Reihungstestpunkte" flex="1" hidden="true" persist="hidden, width, ordinal"
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#punkte" onclick="StudentTreeSort()"/>
+	    				<splitter class="tree-splitter"/>
 					</treecols>
 
 					<template>
@@ -269,6 +273,7 @@ else
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#anmerkungpre" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#orgform" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#aufmerksamdurch_kurzbz" />
+	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#punkte" />
 	         						</treerow>
 	       						</treeitem>
 	      					</treechildren>

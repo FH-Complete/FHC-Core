@@ -168,6 +168,7 @@ function draw_monat($monat)
 	echo '<td style="border: 1px solid black; height:100px; width: 30%" valign="top">';
 	echo '<center><b>';
 	echo date('F',mktime(0,0,0,$monat,1,date('Y')));
+	echo " ".($monat>8?$year-1:$year);
 	echo '</b></center>';
 	//Alle Anzeigen bei denen das von- oder bisdatum in dieses monat fallen
 	$qry = "SELECT * FROM campus.tbl_zeitsperre WHERE zeitsperretyp_kurzbz='Urlaub' 
@@ -187,10 +188,16 @@ function draw_monat($monat)
 	{
 		while($row = pg_fetch_object($result))
 		{
+			$freigabe='';
+			if($row->freigabeamum!='')
+			{
+				$freigabe = "Freigabe am ".$datum_obj->formatDatum($row->freigabeamum, 'd.m.Y')." von Benutzer $row->freigabevon";
+			}
+			echo "<span title='$freigabe'>";
 			echo $mitarbeiter[$row->mitarbeiter_uid]['nachname'].' '.$datum_obj->formatDatum($row->vondatum,'d.m.Y')." - ".$datum_obj->formatDatum($row->bisdatum,'d.m.Y');
 			if($row->freigabeamum=='')
 				echo " <a href='".$_SERVER['PHP_SELF']."?action=freigabe&id=$row->zeitsperre_id&year=$year&uid=$uid' class='Item'>Freigabe</a>";
-				
+			echo "</span>";
 			echo '<br>';
 		}
 	}

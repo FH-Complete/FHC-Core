@@ -41,10 +41,17 @@ if (isset($_GET['sem']) && is_numeric($_GET['sem']))
 	$sem=$_GET['sem'];
 else
 	$sem=null;
-
+if(isset($_GET['uid']))
+	$student_uid = $_GET['uid'];
+else 
+	$student_uid=null;
 
 $lehrveranstaltung=new lehrveranstaltung($conn);
-$lehrveranstaltung->load_lva($stg_kz,$sem);
+
+if($student_uid!='')
+	$lehrveranstaltung->load_lva_student($student_uid);
+else
+	$lehrveranstaltung->load_lva($stg_kz,$sem);
 
 $rdf_url='http://www.technikum-wien.at/lehrveranstaltung/';
 

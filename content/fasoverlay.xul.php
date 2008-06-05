@@ -85,6 +85,8 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 	    <treecol id="typ" label="Typ" flex="1" persist="hidden, width, ordinal" hidden="true"/>
 		<splitter class="tree-splitter"/>
 	    <treecol id="stsem" label="StSem" flex="1" persist="hidden, width, ordinal" hidden="true"/>
+	    <splitter class="tree-splitter"/>
+	    <treecol id="tree-verband-col-orgform" label="orgform" flex="1" persist="hidden, width, ordinal" hidden="true"/>
 	</treecols>
 
 	<template>
@@ -101,6 +103,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 	           <treecell label="rdf:http://www.technikum-wien.at/lehrverbandsgruppe/rdf#gruppe"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/lehrverbandsgruppe/rdf#typ"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/lehrverbandsgruppe/rdf#stsem"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/lehrverbandsgruppe/rdf#orgform"/>
 	         </treerow>
 	       </treeitem>
 	      </treechildren>
