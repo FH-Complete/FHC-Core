@@ -35,6 +35,9 @@ require_once('../../../../include/legesamtnote.class.php');
 require_once('../../../../include/lvgesamtnote.class.php');
 require_once('../../../../include/zeugnisnote.class.php');
 require_once('../../../../include/pruefung.class.php');
+require_once('../../../../include/person.class.php');
+require_once('../../../../include/benutzer.class.php');
+require_once('../../../../include/mitarbeiter.class.php');
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
