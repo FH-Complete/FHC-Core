@@ -116,7 +116,10 @@ function getTopOffset(){
    
    function saveLVNote(uid){
 	note = document.getElementById(uid).note.value;	
-	if ((note < 0) || (note > 5 && note != 8 && note != 7))
+	note_orig = document.getElementById(uid).note_orig.value;
+	if 	(note == note_orig && note != "")
+		alert("Note unverändert!");
+	else if ((note < 0) || (note > 5 && note != 8 && note != 7))
 	{
 		alert("Bitte geben Sie eine Note von 1 - 5 bzw. 7 (nicht beurteilt) oder 8 (teilgenommen) ein!");
 		document.getElementById(uid).note.value="";
@@ -132,6 +135,7 @@ function getTopOffset(){
 	    anfrage.open("GET", url, true);
 	    anfrage.onreadystatechange = updateSeite;
 	    anfrage.send(null);
+	    document.getElementById(uid).note_orig.value=note;
     }
    }
    
@@ -780,7 +784,7 @@ echo "
 					$hide = "style='visibility:hidden;'";
 				else
 					$hide = "style='visibility:visible;'";				
-				echo "<form name='$row_stud->uid' id='$row_stud->uid' method='POST' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td><span id='lvnoteneingabe_".$row_stud->uid."' ".$hide."><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_vorschlag' name='note'><input type='button' value='->' onclick='saveLVNote(\"$row_stud->uid\")'></span></td></form>";
+				echo "<form name='$row_stud->uid' id='$row_stud->uid' method='POST' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td><span id='lvnoteneingabe_".$row_stud->uid."' ".$hide."><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_vorschlag' name='note'><input type='hidden' name='note_orig' value='$note_lv'><input type='button' value='->' onclick='saveLVNote(\"$row_stud->uid\")'></span></td></form>";
 
 				if ($note_lv == 5)
 					$negmarkier = " style='color:red; font-weight:bold;'";
