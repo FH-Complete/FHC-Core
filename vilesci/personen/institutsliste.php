@@ -55,6 +55,8 @@ echo '
 $stsem = new studiensemester($conn);
 $ws = $stsem->getNearest(1);
 $ss = $stsem->getNearest(2);
+$ws = 'WS2007';
+$ss = 'SS2008';
 
 if($rechte->isBerechtigt('admin', 0) || $rechte->isBerechtigt('mitarbeiter', 0))
 	$where = '';
