@@ -101,7 +101,7 @@ else
 	$qry = "SELECT lehrveranstaltung_id, kurzbz as lv_kurzbz, bezeichnung as lv_bezeichnung, studiengang_kz, semester, sprache,
 				ects as lv_ects, semesterstunden, anmerkung, lehre, lehreverzeichnis as lv_lehreverzeichnis, aktiv,
 				planfaktor as lv_planfaktor, planlektoren as lv_planlektoren, planpersonalkosten as lv_planpersonalkosten,
-				plankostenprolektor as lv_plankostenprolektor, lehrform_kurzbz as lv_lehrform_kurzbz
+				plankostenprolektor as lv_plankostenprolektor, lehrform_kurzbz as lv_lehrform_kurzbz, tbl_lehrveranstaltung.orgform_kurzbz
 			FROM lehre.tbl_lehrveranstaltung
 			WHERE aktiv ";
 	if($stg_kz!='')
@@ -109,13 +109,13 @@ else
 	if($sem!='')
 		$qry.=" AND semester='".addslashes($sem)."'";
 	if($orgform!='')
-		$qry.=" AND orgform_kurzbz='".addslashes($orgform)."'";
+		$qry.=" AND (orgform_kurzbz='".addslashes($orgform)."' OR orgform_kurzbz is null)";
 
 	$qry.=" UNION SELECT DISTINCT lehrveranstaltung_id, kurzbz as lv_kurzbz, bezeichnung as lv_bezeichnung, studiengang_kz,
 				semester, tbl_lehrveranstaltung.sprache, ects as lv_ects, semesterstunden, tbl_lehrveranstaltung.anmerkung,
 				tbl_lehrveranstaltung.lehre, lehreverzeichnis as lv_lehreverzeichnis, aktiv, planfaktor as lv_planfaktor,
 				planlektoren as lv_planlektoren, planpersonalkosten as lv_planpersonalkosten,
-				plankostenprolektor as lv_plankostenprolektor, tbl_lehrveranstaltung.lehrform_kurzbz as lv_lehrform_kurzbz
+				plankostenprolektor as lv_plankostenprolektor, tbl_lehrveranstaltung.lehrform_kurzbz as lv_lehrform_kurzbz, tbl_lehrveranstaltung.orgform_kurzbz
 			FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING (lehrveranstaltung_id)
 			WHERE NOT aktiv ";
 	if($stg_kz!='')
@@ -125,7 +125,7 @@ else
 	if($sem!='')
 		$qry.=" AND semester='".addslashes($sem)."'";
 	if($orgform!='')
-		$qry.=" AND orgform_kurzbz='".addslashes($orgform)."'";
+		$qry.=" AND (orgform_kurzbz='".addslashes($orgform)."' OR orgform_kurzbz is null)";
 }
 
 //echo $qry;
@@ -192,6 +192,7 @@ if(!$result = pg_query($conn, $qry))
 			<LVA:planlektoren>".$row_lva->lv_planlektoren."</LVA:planlektoren>
 			<LVA:planpersonalkosten>".$row_lva->lv_planpersonalkosten."</LVA:planpersonalkosten>
 			<LVA:plankostenprolektor>".$row_lva->lv_plankostenprolektor."</LVA:plankostenprolektor>
+			<LVA:orgform_kurzbz>".(isset($row_lva->orgform_kurzbz)?$row_lva->orgform_kurzbz:'')."</LVA:orgform_kurzbz>
 
 			<LVA:lehreinheit_id></LVA:lehreinheit_id>
 			<LVA:lehrform_kurzbz>$row_lva->lv_lehrform_kurzbz</LVA:lehrform_kurzbz>
@@ -270,6 +271,7 @@ if(!$result = pg_query($conn, $qry))
 				<LVA:planlektoren></LVA:planlektoren>
 				<LVA:planpersonalkosten></LVA:planpersonalkosten>
 				<LVA:plankostenprolektor></LVA:plankostenprolektor>
+				<LVA:orgform_kurzbz></LVA:orgform_kurzbz>
 
 				<LVA:lehreinheit_id>$row_le->lehreinheit_id</LVA:lehreinheit_id>
 				<LVA:studiensemester_kurzbz>$row_le->studiensemester_kurzbz</LVA:studiensemester_kurzbz>
