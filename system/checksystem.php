@@ -72,6 +72,38 @@ if (!@pg_query($conn,'SELECT * FROM campus.tbl_newssprache LIMIT 1;'))
 		echo 'Tabelle campus.tbl_newssprache hinzugefuegt!<BR>';
 }
 
+// ************** public.tbl_gruppe.orgform_kurzbz ************************
+if (!@pg_query($conn,'SELECT orgform_kurzbz FROM public.tbl_gruppe LIMIT 1;'))
+{
+	$sql='	ALTER TABLE public.tbl_gruppe ADD COLUMN orgform_kurzbz varchar(3);
+			ALTER TABLE public.tbl_lehrverband ADD COLUMN orgform_kurzbz varchar(3);
+			ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN orgform_kurzbz varchar(3);
+			ALTER TABLE lehre.tbl_lehrveranstaltung ADD Constraint "orgform_lehrveranstaltung" foreign key ("orgform_kurzbz") references bis.tbl_orgform ("orgform_kurzbz") on update cascade on delete restrict;
+			ALTER TABLE public.tbl_gruppe ADD Constraint "orgform_gruppe" foreign key ("orgform_kurzbz") references bis.tbl_orgform ("orgform_kurzbz") on update cascade on delete restrict;
+			ALTER TABLE public.tbl_lehrverband ADD Constraint "orgform_lehrverband" foreign key ("orgform_kurzbz") references bis.tbl_orgform ("orgform_kurzbz") on update cascade on delete restrict;
+		';
+	if (!@pg_query($conn,$sql))
+		echo '<strong>orgform_kurzbz: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo '	orgform_kurzbz wurde bei public.tbl_gruppe hinzugefuegt!<BR>
+				orgform_kurzbz wurde bei public.tbl_lehrverband hinzugefuegt!<BR>
+				orgform_kurzbz wurde bei lehre.tbl_lehrveranstaltung hinzugefuegt!<BR>';
+}
+
+// ************** public.tbl_firma.schule ************************
+if (!@pg_query($conn,'SELECT schule FROM public.tbl_firma LIMIT 1;'))
+{
+	$sql='	ALTER TABLE public.tbl_firma ADD COLUMN schule boolean;
+			UPDATE public.tbl_firma SET schule=FALSE;
+			ALTER TABLE public.tbl_firma ALTER COLUMN schule SET NOT NULL;
+			ALTER TABLE public.tbl_firma ALTER COLUMN schule SET DEFAULT FALSE;
+		';
+	if (!@pg_query($conn,$sql))
+		echo '<strong>public.tbl_firma: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo 'schule wurde bei public.tbl_firma hinzugefuegt!<BR>';
+}
+
 // ************** campus.tbl_news.datum_bis ************************
 if (!@pg_query($conn,'SELECT datum_bis FROM campus.tbl_news LIMIT 1;'))
 {
@@ -94,13 +126,13 @@ if (!@pg_query($conn,'SELECT standort_kurzbz,telefonklappe FROM public.tbl_ort L
 		echo 'standort_kurzbz wurde bei public.tbl_ort hinzugefuegt!<BR>telefonklappe wurde bei public.tbl_ort hinzugefuegt!<BR>';
 }
 
-// ************** campus.tbl_zeitsperre ************************
-if (!@pg_query($conn,'SELECT standort_kurzbz,telefonklappe FROM campus.tbl_zeitsperre LIMIT 1;'))
+// ************** campus.tbl_zeitsperre.freigabeamum ************************
+if (!@pg_query($conn,'SELECT freigabeamum FROM campus.tbl_zeitsperre LIMIT 1;'))
 {
 	$sql='	ALTER TABLE campus.tbl_zeitsperre ADD COLUMN freigabeamum Timestamp;
 			ALTER TABLE campus.tbl_zeitsperre ADD COLUMN freigabevon varchar(16);';
 	if (!@pg_query($conn,$sql))
-		echo '<strong>public.tbl_ort: '.pg_last_error($conn).' </strong><BR>';
+		echo '<strong>campus.tbl_zeitsperre: '.pg_last_error($conn).' </strong><BR>';
 	else
 		echo 'freigabevon,freigabeamum wurde bei campus.tbl_zeitsperre hinzugefuegt!<BR>';
 }
