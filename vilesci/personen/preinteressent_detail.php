@@ -251,7 +251,7 @@ if(isset($_POST['freigabe']))
 							"im FAS unter 'Extras->Preinteressenten übernehmen' oder unter folgendem Link\n\n".
 							APP_ROOT."vilesci/personen/preinteressent_uebernahme.php?studiengang_kz=$zuordnung->studiengang_kz \n".
 							"ins FAS übertragen";
-				mail($to, 'Preinteressent Freigabe', $message, 'FROM: vilesci@'.DOMAIN);
+				//mail($to, 'Preinteressent Freigabe', $message, 'FROM: vilesci@'.DOMAIN);
 			}
 		}
 		else 
