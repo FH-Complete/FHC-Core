@@ -34,6 +34,7 @@ class lehrverband
 	var $gruppe;			// integer
 	var $aktiv;				// boolean
 	var $bezeichnung;		// varchar(16)
+	var $orgform_kurzbz;
 
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional einen Lehrverband
@@ -102,6 +103,7 @@ class lehrverband
 				$this->gruppe = $row->gruppe;
 				$this->aktiv = ($row->aktiv=='t'?true:false);
 				$this->bezeichnung = $row->bezeichnung;
+				$this->orgform_kurzbz = $row->orgform_kurzbz;
 				return true;
 			}
 			else 
@@ -168,6 +170,7 @@ class lehrverband
 				$lv_obj->gruppe = $row->gruppe;
 				$lv_obj->aktiv = $row->aktiv;
 				$lv_obj->bezeichnung = $row->bezeichnung;
+				$lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
 
 				$this->result[] = $lv_obj;
 			}
@@ -208,19 +211,21 @@ class lehrverband
 
 		if($new)
 		{
-			$qry = 'INSERT INTO public.tbl_lehrverband (studiengang_kz, semester, verband, gruppe, aktiv, bezeichnung)
+			$qry = 'INSERT INTO public.tbl_lehrverband (studiengang_kz, semester, verband, gruppe, aktiv, bezeichnung, orgform_kurzbz)
 			        VALUES('.$this->addslashes($this->studiengang_kz).','.
 					$this->addslashes($this->semester).','.
 					$this->addslashes($this->verband).','.
 					$this->addslashes($this->gruppe).','.
 					($this->aktiv?'true':'false').','.
-					$this->addslashes($this->bezeichnung).');';
+					$this->addslashes($this->bezeichnung).','.
+					$this->addslashes($this->orgform_kurzbz).');';
 		}
 		else 
 		{
 			$qry = "UPDATE public.tbl_lehrverband SET ".
 				   " aktiv=".($this->aktiv?'true':'false').", ".
-				   " bezeichnung='".addslashes($this->bezeichnung)."'".
+				   " bezeichnung='".addslashes($this->bezeichnung)."',".
+				   " orgform_kurzbz=".$this->addslashes($this->orgform_kurzbz).
 				   " WHERE studiengang_kz='".addslashes($this->studiengang_kz)."'".
 				   " AND semester='".addslashes($this->semester)."'".
 				   " AND verband='".addslashes($this->verband)."'".

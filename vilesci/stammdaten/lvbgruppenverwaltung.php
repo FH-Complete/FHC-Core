@@ -218,7 +218,7 @@ if($type=='copy')
 		$sort = $_POST['sort_copy'];
 		$mailgrp = isset($_POST['mailgrp_copy']);
 		$generiert = isset($_POST['generiert_copy']);
-		
+				
 		$gruppe = new gruppe($conn);
 		
 		if(!$gruppe->exists($gruppe_kurzbz))
@@ -236,6 +236,8 @@ if($type=='copy')
 			$gruppe->generiert = false;
 			$gruppe->insertamum = date('Y-m-d H:i:s');
 			$gruppe->insertvon = $user;
+			if(isset($_POST['orgform_kurzbz_copy']))
+				$gruppe->orgform_kurzbz = $_POST['orgform_kurzbz_copy'];
 			
 			if($gruppe->save(true,false))
 			{
@@ -243,7 +245,7 @@ if($type=='copy')
 			}
 			else 
 			{
-				echo "<span class='error'>Fehler beim anlegen der Gruppe:$gruppe->errormsg</span>";
+				echo "<span class='error'>Fehler beim Anlegen der Gruppe:$gruppe->errormsg</span>";
 			}
 		}
 		else 
@@ -324,6 +326,8 @@ if($type=='save')
 				$gruppe->sort = $_POST['sort'];
 				$gruppe->mailgrp = isset($_POST['mailgrp']);
 				$gruppe->generiert = isset($_POST['generiert']);
+				if(isset($_POST['orgform_kurzbz']))
+					$gruppe->orgform_kurzbz = $_POST['orgform_kurzbz'];
 			}
 			$gruppe->updateamum = date('Y-m-d H:i:s');
 			$gruppe->updatevon = $user;
@@ -349,7 +353,11 @@ if($type=='save')
 		{
 			$lvb->bezeichnung = $_POST['bezeichnung'];
 			if($admin)
+			{
 				$lvb->aktiv = isset($_POST['aktiv']);
+				if(isset($_POST['orgform_kurzbz']))
+					$lvb->orgform_kurzbz = $_POST['orgform_kurzbz'];
+			}
 			
 			if($lvb->save(false))
 			{
@@ -512,7 +520,7 @@ if($result = pg_query($conn, $qry))
 }
 
 echo '</td><td valign="top" align="center">';
-//Formular zum bearbeiten der Daten
+//Formular zum Bearbeiten der Daten
 if($type=='edit')
 {
 	if($gruppe_kurzbz!='')
@@ -532,27 +540,53 @@ if($type=='edit')
 				  	</tr>";
 			if($admin)
 			{
+				echo "
+					  	<tr>
+					  		<td>Beschreibung:</td>
+					  		<td><input type='text' name='beschreibung' size='30' maxlength='128' value='$gruppe->beschreibung'/></td>
+					  	</tr>
+					  	<tr>
+					  		<td>Sichtbar:</td>
+					  		<td><input type='checkbox' name='sichtbar' ".($gruppe->sichtbar?'checked':'')." /></td>
+					  	</tr>
+					  	<tr>
+					  		<td>Lehre:</td>
+					  		<td><input type='checkbox' name='lehre' ".($gruppe->lehre?'checked':'')." /></td>
+					  	</tr>
+					  	<tr>
+					  		<td>Aktiv:</td>
+					  		<td><input type='checkbox' name='aktiv' ".($gruppe->aktiv?'checked':'')." /></td>
+					  	</tr>				  	
+					  	<tr>
+					  		<td>Sort:</td>
+					  		<td><input type='text' name='sort' size='2' maxlength='2' value='$gruppe->sort' /></td>
+					  	</tr>";
+				$stg_obj = new studiengang($conn, $studiengang_kz);
+				if($stg_obj->orgform_kurzbz=='VBB')
+				{
+					echo "
+					  	<tr>
+					  		<td>OrgForm</td>
+					  		<td>";
+					echo "	<SELECT name='orgform_kurzbz'>";
+					echo "		<OPTION value=''>-- keine Auswahl --</OPTION>";
+					$qry_orgform = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz NOT IN ('VBB', 'ZGS') ORDER BY orgform_kurzbz";
+					if($result_orgform = pg_query($conn, $qry_orgform))
+					{
+						while($row_orgform = pg_fetch_object($result_orgform))
+						{
+							if($row_orgform->orgform_kurzbz==$gruppe->orgform_kurzbz)
+								$selected='selected';
+							else 
+								$selected='';
+								
+							echo "		<OPTION value='$row_orgform->orgform_kurzbz' $selected>$row_orgform->bezeichnung</OPTION>";
+						}
+					}
+					echo "</SELECT></td>
+							</tr>";
+				}
 			echo "
-				  	<tr>
-				  		<td>Beschreibung:</td>
-				  		<td><input type='text' name='beschreibung' size='30' maxlength='128' value='$gruppe->beschreibung'/></td>
-				  	</tr>
-				  	<tr>
-				  		<td>Sichtbar:</td>
-				  		<td><input type='checkbox' name='sichtbar' ".($gruppe->sichtbar?'checked':'')." /></td>
-				  	</tr>
-				  	<tr>
-				  		<td>Lehre:</td>
-				  		<td><input type='checkbox' name='lehre' ".($gruppe->lehre?'checked':'')." /></td>
-				  	</tr>
-				  	<tr>
-				  		<td>Aktiv:</td>
-				  		<td><input type='checkbox' name='aktiv' ".($gruppe->aktiv?'checked':'')." /></td>
-				  	</tr>				  	
-				  	<tr>
-				  		<td>Sort:</td>
-				  		<td><input type='text' name='sort' size='2' maxlength='2' value='$gruppe->sort' /></td>
-				  	</tr>
 					<tr>
 				  		<td>Mailgrp:</td>
 				  		<td><input type='checkbox' name='mailgrp' ".($gruppe->mailgrp?'checked':'')." /></td>
@@ -608,7 +642,34 @@ if($type=='edit')
 				  	<tr>
 				  		<td>Sort:</td>
 				  		<td><input type='text' name='sort_copy' size='2' maxlength='2' value='$gruppe->sort' /></td>
-				  	</tr>
+				  	</tr>";
+			
+			$stg_obj = new studiengang($conn, $studiengang_kz);
+			if($stg_obj->orgform_kurzbz=='VBB')
+			{
+				echo "
+					  	<tr>
+					  		<td>OrgForm</td>
+					  		<td>";
+				echo "	<SELECT name='orgform_kurzbz_copy'>";
+				echo "		<OPTION value=''>-- keine Auswahl --</OPTION>";
+				$qry_orgform = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz NOT IN ('VBB', 'ZGS') ORDER BY orgform_kurzbz";
+				if($result_orgform = pg_query($conn, $qry_orgform))
+				{
+					while($row_orgform = pg_fetch_object($result_orgform))
+					{
+						if($row_orgform->orgform_kurzbz==$gruppe->orgform_kurzbz)
+							$selected='selected';
+						else 
+							$selected='';
+							
+						echo "		<OPTION value='$row_orgform->orgform_kurzbz' $selected>$row_orgform->bezeichnung</OPTION>";
+					}
+				}
+				echo "</SELECT></td>
+						</tr>";
+			}
+			echo "
 					<tr>
 				  		<td>Mailgrp:</td>
 				  		<td><input type='checkbox' name='mailgrp_copy' ".($gruppe->mailgrp?'checked':'')." /></td>
@@ -655,6 +716,31 @@ if($type=='edit')
 				  		<td>Aktiv:</td>
 				  		<td><input type='checkbox' name='aktiv' ".($lvb->aktiv?'checked':'')." /></td>
 				  	</tr>";
+				$stg_obj = new studiengang($conn, $studiengang_kz);
+				if($stg_obj->orgform_kurzbz=='VBB')
+				{ 	
+					echo "
+				  	<tr>
+				  		<td>OrgForm</td>
+				  		<td>";
+					echo "	<SELECT name='orgform_kurzbz'>";
+					echo "		<OPTION value=''>-- keine Auswahl --</OPTION>";
+					$qry_orgform = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz NOT IN ('VBB', 'ZGS') ORDER BY orgform_kurzbz";
+					if($result_orgform = pg_query($conn, $qry_orgform))
+					{
+						while($row_orgform = pg_fetch_object($result_orgform))
+						{
+							if($row_orgform->orgform_kurzbz==$lvb->orgform_kurzbz)
+								$selected='selected';
+							else 
+								$selected='';
+								
+							echo "		<OPTION value='$row_orgform->orgform_kurzbz' $selected>$row_orgform->bezeichnung</OPTION>";
+						}
+					}
+					echo "</SELECT></td>
+							</tr>";
+				}
 			}
 			echo "
 				  	<tr>

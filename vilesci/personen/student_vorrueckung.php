@@ -236,7 +236,7 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 					$sql.="INSERT INTO tbl_prestudentrolle (prestudent_id, rolle_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz)
 					VALUES ($row->prestudent_id, '$row_status->rolle_kurzbz', '$next_ss',
 						$ausbildungssemester, now(), now(), '$user',
-					NULL, NULL, NULL, $row_status->orgform_kurzbz);";
+					NULL, NULL, NULL, ".myaddslashes($row_status->orgform_kurzbz).");";
 				}
 				if($sql!='')
 				{
