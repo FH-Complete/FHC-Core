@@ -217,7 +217,7 @@ class zeitsperre
 			$this->errormsg = "Zeitsperretyp_kurzbz darf nicht laenger als 8 Zeichen sein";
 			return false;
 		}
-		if(strlen($this->mitarbeiter_uid)>16)
+		if(strlen($this->mitarbeiter_uid)>32)
 		{
 			$this->errormsg = "Mitarbeiter_uid darf nicht laenger als 8 Zeichen sein";
 			return false;
