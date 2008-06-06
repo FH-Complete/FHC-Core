@@ -43,6 +43,7 @@ class gruppe
 	var $updatevon;				// varchar(16)
 	var $insertamum;			// timestamp
 	var $insertvon;				// varchar(16)
+	var $orgform_kurzbz;
 
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine Gruppe
@@ -137,6 +138,7 @@ class gruppe
 				$this->updatevon = $row->updatevon;
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
+				$this->orgform_kurzbz = $row->orgform_kurzbz;
 				return true;
 			}
 			else
@@ -176,6 +178,7 @@ class gruppe
 				$grp_obj->updatevon = $row->updatevon;
 				$grp_obj->insertamum = $row->insertamum;
 				$grp_obj->insertvon = $row->insertvon;
+				$grp_obj->orgform_kurzbz = $row->orgform_kurzbz;
 
 				$this->result[] = $grp_obj;
 			}
@@ -240,6 +243,7 @@ class gruppe
 				$grp_obj->updatevon = $row->updatevon;
 				$grp_obj->insertamum = $row->insertamum;
 				$grp_obj->insertvon = $row->insertvon;
+				$grp_obj->orgform_kurzbz = $row->orgform_kurzbz;
 
 				$this->result[] = $grp_obj;
 			}
@@ -358,7 +362,7 @@ class gruppe
 			
 			$qry = 'INSERT INTO public.tbl_gruppe (gruppe_kurzbz, studiengang_kz, bezeichnung, semester, sort,
 			                                mailgrp, beschreibung, sichtbar, generiert, aktiv, lehre,
-			                                updateamum, updatevon, insertamum, insertvon)
+			                                updateamum, updatevon, insertamum, insertvon, orgform_kurzbz)
 			        VALUES('.$this->addslashes($kurzbz).','.
 					$this->addslashes($this->studiengang_kz).','.
 					$this->addslashes($this->bezeichnung).','.
@@ -373,7 +377,8 @@ class gruppe
 					$this->addslashes($this->updateamum).','.
 					$this->addslashes($this->updatevon).','.
 					$this->addslashes($this->insertamum).','.
-					$this->addslashes($this->insertvon).');';
+					$this->addslashes($this->insertvon).','.
+					$this->addslashes($this->orgform_kurzbz).');';
 		}
 		else
 		{
@@ -389,7 +394,8 @@ class gruppe
 			       ' aktiv='.($this->aktiv?'true':'false').','.
 			       ' lehre='.($this->lehre?'true':'false').','.
 			       ' updateamum='.$this->addslashes($this->updateamum).','.
-			       ' updatevon='.$this->addslashes($this->updatevon).
+			       ' updatevon='.$this->addslashes($this->updatevon).','.
+			       ' orgform_kurzbz='.$this->addslashes($this->orgform_kurzbz).
 			       " WHERE gruppe_kurzbz=".$this->addslashes(strtoupper($this->gruppe_kurzbz)).";";
 		}
 

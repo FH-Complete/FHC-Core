@@ -85,6 +85,7 @@
 		$lv->sort = $_POST['sort'];
 		$lv->zeugnis = isset($_POST['zeugnis']);
 		$lv->projektarbeit = isset($_POST['projektarbeit']);
+		$lv->orgform_kurzbz = $_POST['orgform_kurzbz'];
 
 		if(!$lv->save())
 			$errorstr = "Fehler beim Speichern der Daten: $lv->errormsg";
@@ -239,8 +240,25 @@
 
 		$htmlstr .= "	<td>Projektarbeit</td>";
 		$htmlstr .= "	<td><input type='checkbox' name='projektarbeit' ".($lv->projektarbeit?'checked':'')."></td>";
-		$htmlstr .= "	<td></td>";
-		$htmlstr .= "	<td></td>";
+		$htmlstr .= "	<td>Organisationsform</td>";
+		$htmlstr .= "	<td>";
+		$htmlstr .= "	<SELECT name='orgform_kurzbz'>";
+		$htmlstr .= "		<OPTION value=''>-- keine Auswahl --</OPTION>";
+		$qry_orgform = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz NOT IN ('VBB', 'ZGS') ORDER BY orgform_kurzbz";
+		if($result_orgform = pg_query($conn, $qry_orgform))
+		{
+			while($row_orgform = pg_fetch_object($result_orgform))
+			{
+				if($row_orgform->orgform_kurzbz==$lv->orgform_kurzbz)
+					$selected='selected';
+				else 
+					$selected='';
+					
+				$htmlstr .= "		<OPTION value='$row_orgform->orgform_kurzbz' $selected>$row_orgform->bezeichnung</OPTION>";
+			}
+		}
+		$htmlstr .= "</SELECT>";
+		$htmlstr .= "	</td>";
 		$htmlstr .= "	<td></td>";
 		$htmlstr .= "	<td><input type='submit' value='Speichern' name='schick'></td>";
 
