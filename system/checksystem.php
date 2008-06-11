@@ -428,10 +428,7 @@ if (!@pg_query($conn,'SELECT * FROM lehre.vw_stundenplandev_student_unr WHERE un
 		echo 'VIEW lehre.vw_stundenplandev_student_unr wurde hinzugefuegt!<BR>';
 }
 
-
-
-
-
+// ********************** Pruefungen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
 $tabellen=array(
@@ -579,12 +576,39 @@ foreach ($tabellen AS $attribute)
 	$sql_attr=substr($sql_attr, 0, -1);
 
 	if (!@pg_query($conn,'SELECT '.$sql_attr.' FROM '.$tabs[$i].' LIMIT 1;'))
-		echo '<strong>'.$tabs[$i].': '.pg_last_error($conn).' </strong><BR>';
+		echo '<BR><strong>'.$tabs[$i].': '.pg_last_error($conn).' </strong><BR>';
 	else
-		echo $tabs[$i].': OK<BR>';
+		echo $tabs[$i].': OK - ';
 	flush();
 	$i++;
 }
 
-
+echo '<H2>Gegenpruefung!</H2>';
+$sql_query="SELECT schemaname,tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema' AND schemaname != 'sync';";
+if (!$result=@pg_query($conn,$sql_query))
+		echo '<BR><strong>'.pg_last_error($conn).' </strong><BR>';
+	else
+		while ($row=pg_fetch_object($result))
+		{
+			$fulltablename=$row->schemaname.'.'.$row->tablename;
+			if (!isset($tabellen[$fulltablename]))
+				echo 'Tabelle '.$fulltablename.' existiert in der DB, aber nicht in diesem Skript!<BR>';
+			else
+				if (!$result_fields=@pg_query($conn,"SELECT * FROM $fulltablename LIMIT 1;"))
+					echo '<BR><strong>'.pg_last_error($conn).' </strong><BR>';
+				else
+					for ($i=0; $i<pg_num_fields($result_fields); $i++)
+					{
+						$found=false;
+						$fieldnameDB=pg_field_name($result_fields,$i);
+						foreach ($tabellen[$fulltablename] AS $fieldnameARRAY)
+							if ($fieldnameDB==$fieldnameARRAY)
+							{
+								$found=true;
+								break;
+							}
+						if (!$found)
+							echo 'Attribut '.$fulltablename.'.<strong>'.$fieldnameDB.'</strong> existiert in der DB, aber nicht in diesem Skript!<BR>';
+					}
+		}
 ?>
