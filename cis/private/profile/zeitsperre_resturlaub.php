@@ -424,6 +424,7 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 else
 	$content_form.= "<input type='submit' name='submit_zeitsperre' value='Hinzufügen'>";
 $content_form.= '</td></tr>';
+$content_form.= "<tr><td>&nbsp;</td><td style='color:red'>Achtung: Mehrtägige Zeitsperren müssen an Unterbrechungen wie Wochenenden<br>oder Feiertagen unterteilt werden!</td</tr>";
 $content_form.= '</table></form>';
 
 // ******* RESTURLAUB ******** //
@@ -512,6 +513,7 @@ if(URLAUB_TOOLS)
 					(date_part('month', vondatum)>9 AND date_part('year', vondatum)='".(date('Y')-1)."') OR
 					(date_part('month', vondatum)<9 AND date_part('year', vondatum)='".date('Y')."')
 				)";
+	$tttt="\n";	
 	$result = pg_query($conn, $qry);
 	$row = pg_fetch_object($result);
 	$gebuchterurlaub = $row->anzahltage;
@@ -519,6 +521,7 @@ if(URLAUB_TOOLS)
 		$gebuchterurlaub=0;
 	$content_resturlaub.="<tr><td>- aktuell gebuchter Urlaub&nbsp;</td><td align='right'>$gebuchterurlaub Tage</td></tr>";
 	$content_resturlaub.="<tr><td style='border-top: 1px solid black;'>aktueller Stand</td><td style='border-top: 1px solid black;' align='right'>".($anspruch+$resturlaubstage-$gebuchterurlaub)." Tage</td></tr>";
+	$content_resturlaub .="<tr><td><button type='button' name='hilfe' value='Hilfe' onclick='alert(\"Anspruch: Anzahl der Urlaubstage, auf die in diesem Arbeitsjahr ein Anrecht ensteht. \\nResturlaub: Anzahl der Urlaubstage, aus vergangenen Arbeitsjahren, die noch nicht verbraucht wurden. \\naktuell gebuchter Urlaub: Anzahl aller eingetragenen Urlaubstage. \\nAchtung: Als Urlaubstag gelten ALLE Tage zwischen von-Datum und bis-Datum d.h. auch alle Wochenenden, Feiertage und arbeitsfreie Tage. Beispiel: Ein Kurzurlaub beginnt mit einem Donnerstag und endet am darauffolgenden Dienstag, so wird zuerst eine Eintragung mit dem Datum des Donnerstags im von-Feld und dem Datum des letzten Urlaubstag vor dem Wochenende, meistens der Freitag, eingegeben. Danach wird eine Eintagung des zweiten Teils, von Montag bis Dienstag vorgenommen.\\naktueller Stand: Die zur Zeit noch verfügbaren Urlaubstage.\");'>Hilfe</button></td></tr>";
 	$content_resturlaub.="</table>";
 }
 echo '<table width="100%">';
