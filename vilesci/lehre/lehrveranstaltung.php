@@ -86,16 +86,17 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 			else
 				echo "Erfolgreich gespeichert";
 		}
+		//Organisationsform Speichern
+		if(isset($_POST['orgform']))
+		{
+			$qry = "UPDATE lehre.tbl_lehrveranstaltung SET orgform_kurzbz=".($_POST['orgform']==''?'null':"'".addslashes($_POST['orgform'])."'")." WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
+			if(!pg_query($conn, $qry))
+				echo "Fehler beim Speichern!";
+			else
+				echo "Erfolgreich gespeichert";
+		}
 	}
-	//Organisationsform Speichern
-	if(isset($_POST['orgform']))
-	{
-		$qry = "UPDATE lehre.tbl_lehrveranstaltung SET orgform_kurzbz=".($_POST['orgform']==''?'null':"'".addslashes($_POST['orgform'])."'")." WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
-		if(!pg_query($conn, $qry))
-			echo "Fehler beim Speichern!";
-		else
-			echo "Erfolgreich gespeichert";
-	}
+	
 	
 	//Lehre Feld setzen
 	if(isset($_GET['lehre']))
@@ -343,29 +344,36 @@ if ($result_lv!=0)
 		echo "<td>".$s[$row->studiengang_kz]->kurzbz."</td>";
 		//Organisationsform
 		echo "<td style='white-space:nowrap;'>";
-		echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&fachbereich_kurzbz=$fachbereich_kurzbz' method='POST'>";
-		echo "<SELECT name='orgform'>";
-		echo "<option value=''>-- Keine Auswahl --</option>";
-		if($row->orgform_kurzbz=='BB')
+		if($rechte->isBerechtigt('admin'))
 		{
-			echo "<option value='BB' selected='selected'>Berufsbegleitend</option>";
+			echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&fachbereich_kurzbz=$fachbereich_kurzbz' method='POST'>";
+			echo "<SELECT name='orgform'>";
+			echo "<option value=''>-- Keine Auswahl --</option>";
+			if($row->orgform_kurzbz=='BB')
+			{
+				echo "<option value='BB' selected='selected'>Berufsbegleitend</option>";
+			}
+			else 
+			{
+				echo "<option value='BB'>Berufsbegleitend</option>";
+			}
+			if($row->orgform_kurzbz=='VZ')
+			{
+				echo "<option value='VZ' selected='selected'>Vollzeit</option>";
+			}
+			else 
+			{
+				echo "<option value='VZ'>Vollzeit</option>";
+			}
+			
+			echo "</SELECT><input type='submit' value='ok' name='submitorg'></form>";
+
 		}
 		else 
 		{
-			echo "<option value='BB'>Berufsbegleitend</option>";
+			echo $row->orgform_kurzbz;
 		}
-		if($row->orgform_kurzbz=='VZ')
-		{
-			echo "<option value='VZ' selected='selected'>Vollzeit</option>";
-		}
-		else 
-		{
-			echo "<option value='VZ'>Vollzeit</option>";
-		}
-		
-		echo "</SELECT><input type='submit' value='ok' name='submitorg'></form>";
 		echo "</td>";
-		
 		//Semesterstunden
 		echo "<td>$row->semesterstunden</td>";
 		//ECTS
