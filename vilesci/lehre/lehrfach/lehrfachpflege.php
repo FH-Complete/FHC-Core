@@ -96,7 +96,7 @@ if($result = pg_query($conn, $qry))
 		echo "<td>".$row->studiengang_kz."</td>";
 		echo "<td>".$row->semester."</td";
 		echo "<td>".$row->kurzbz."</td>";
-		echo "<td>".$row->bezeichnung."</td>";
+		echo "<td>".$row->bezeichnung."(".$row->fachbereich_kurzbz.")</td>";
 		echo '<td><SELECT name="lf_id">';
 		$qry_lf="SELECT * FROM lehre.tbl_lehrfach WHERE aktiv AND studiengang_kz='".$row->studiengang_kz."' AND semester='".$row->semester."' ORDER BY bezeichnung;";
 		if($result_lf = pg_query($conn, $qry_lf))
