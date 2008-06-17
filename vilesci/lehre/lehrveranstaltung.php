@@ -329,7 +329,6 @@ if ($result_lv!=0)
 			echo "<a href='lehrveranstaltung_details.php?lv_id=$row->lehrveranstaltung_id' target='lv_detail'>$row->lehrveranstaltung_id</a>";
 		else		
 			echo "$row->lehrveranstaltung_id";
-		
 		echo "</td>";
 		//Kurzbz
 		echo "<td>$row->kurzbz</td>";
