@@ -16,7 +16,6 @@
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 		
 $studiensemester_kurzbz = (isset($_GET['studiensemester_kurzbz'])?$_GET['studiensemester_kurzbz']:'');
-
 $i=0;
 
 ?>
@@ -75,12 +74,14 @@ echo '</SELECT>';
 echo " <INPUT type='submit' value='OK'>";
 
 echo '</form>';
+
 $qry="SELECT tbl_lehrveranstaltung.bezeichnung as lvbez, tbl_lehrveranstaltung.kurzbz as lvkurzbz, tbl_lehrfach.*, tbl_lehreinheit.lehreinheit_id  
 	FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrfach USING (lehrfach_id) JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id) 
-	WHERE NOT tbl_lehrfach.aktiv AND studiensemester_kurzbz='".$studiensemester_kurzbz."' ORDER BY studiengang_kz,semester LIMIT 20;";
+	WHERE NOT tbl_lehrfach.aktiv AND studiensemester_kurzbz='".$studiensemester_kurzbz."' ORDER BY studiengang_kz,semester;";
 
 if($result = pg_query($conn, $qry))
 {
+	echo "<br>Anzahl der Datensätze: ".pg_num_rows($result);
 	echo "<table class='liste'><tr><th>ID</th><th>LV-Kürzel</th><th>LV-Bezeichnung</th><th>Stg-Kz</th><th>Sem.</th><th>LF-Kürzel</th><th>LF-Bezeichnung</th><th>Lehrfach-Auswahl</th><th></th></tr>";
 	while($row = pg_fetch_object($result))
 	{
@@ -117,6 +118,8 @@ if($result = pg_query($conn, $qry))
 		}		
 		echo "<td><input type='submit' value='Speichern'></td>";
 		echo "</form>";
+		if($i==20)
+			break;
 	}
 }
 ?>
