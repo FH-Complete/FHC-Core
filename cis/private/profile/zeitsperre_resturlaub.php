@@ -424,7 +424,7 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 else
 	$content_form.= "<input type='submit' name='submit_zeitsperre' value='Hinzufügen'>";
 $content_form.= '</td></tr>';
-$content_form.= "<tr><td>&nbsp;</td><td style='color:red'>Achtung: Es werden alle eingegeben Tage berücksichtigt dahe müssen mehrtägige Zeitsperren an Unterbrechungen wie Wochenenden<br>oder Feiertagen unterteilt werden!</td</tr>";
+$content_form.= "<tr><td>&nbsp;</td><td style='color:red'>Achtung: Es werden alle eingegeben Tage berücksichtigt daher müssen mehrtägige Zeitsperren an Unterbrechungen wie Wochenenden<br>oder Feiertagen unterteilt werden!</td</tr>";
 $content_form.= '</table></form>';
 
 // ******* RESTURLAUB ******** //
