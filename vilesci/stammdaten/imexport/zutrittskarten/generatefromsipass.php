@@ -266,7 +266,7 @@ header("Content-Type: text/plain");
 header("Content-Disposition: attachment; filename=\"SiPassZutrittskartenUpdate". "_" . date("d_m_Y") . ".txt\"");
 echo $ausdruck;
 
-mail('ruhan@technikum-wien.at', 'Mehrfach eingetragenen Zutrittskarten', "<html><body>".$fausgabe."</body></html>",
+mail(MAIL_ADMIN, 'Mehrfach eingetragenen Zutrittskarten', "<html><body>".$fausgabe."</body></html>",
 	"From: vilesci@technikum-wien.at\nX-Mailer: PHP 5.x\nContent-type: text/html; charset=utf-8");
 
 /*
