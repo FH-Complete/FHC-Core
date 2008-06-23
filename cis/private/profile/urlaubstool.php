@@ -56,6 +56,10 @@ for($i=0;$i<5;$i++)
 	$jahre[$i]="$t[year]"+$i;
 }
 
+if (isset($_GET['wtag']) || isset($_POST['wtag']))
+	$wtag=(isset($_GET['wtag'])?$_GET['wtag']:$_POST['wtag']);
+else 
+	$wtag=date("d.m.Y");
 
 if (isset($_GET['wmonat']) || isset($_POST['wmonat']))
 	$wmonat=(isset($_GET['wmonat'])?$_GET['wmonat']:$_POST['wmonat']);
@@ -110,7 +114,7 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 	$wvon=date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , 1, $jahre[$wjahr]));
 	$wbis=date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $mende, $jahre[$wjahr]));
 	$qry="SELECT * FROM campus.tbl_zeitsperre WHERE zeitsperretyp_kurzbz='Urlaub' AND mitarbeiter_uid='".$uid."' AND (vondatum<='".$wbis."' AND bisdatum>='".$wvon."') ";
-	//echo "<br>"."db:".$qry;
+	echo "<br>"."db:".$qry;
 	if($result = pg_query($conn, $qry))
 	{
 		while($row = pg_fetch_object($result))
@@ -133,7 +137,7 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 		}
 	}
 }
-
+/*
 if(isset($_GET['spmonat']) || isset($_POST['spmonat']))
 {
 	$spmonat=explode(",",$_GET['spmonat']);
@@ -288,7 +292,7 @@ if(isset($_GET['spmonat']) || isset($_POST['spmonat']))
 	}
 	$hgfarbe=explode(",",$_GET['spmonat']);
 }
-
+*/
 
 
 
@@ -436,7 +440,9 @@ for ($i=0;$i<6;$i++)
 	$content.='<tr height="80" style="font-family:Arial,sans-serif; font-size:52px; color:blue">';
 	for ($j=1;$j<8;$j++)
 	{
-		$content.='<td align="center" valign="center" style="background-color: '.$hgfarbe[$j+7*$i].'"><a href="'.$PHP_SELF.'?kastl='.($j+7*$i).'&wmonat='.$wmonat.'&wjahr='.$wjahr.'&hgfarbe='.implode(",",$hgfarbe).'"><b>'.$tage[$j+7*$i].'</b></a></td>'; //style="background-color:lime"
+		$content.='<td align="center" valign="center" style="background-color: '.$hgfarbe[$j+7*$i].'">
+		<a href="'.$PHP_SELF.'?kastl='.($j+7*$i).'&wmonat='.$wmonat.'&wjahr='.$wjahr.'&wtag="'.date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $tage[$j+7*$i], $jahre[$wjahr])).'"><b>'.$tage[$j+7*$i].'</b></a>
+		<form action="'.$_SERVER['PHP_SELF'].'" method="GET"><input type="checkbox" name="wtag" onclick="                        "></form></td>'; //style="background-color:lime"
 	}
 	$content.='</tr>';
 }
