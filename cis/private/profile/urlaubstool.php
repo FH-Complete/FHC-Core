@@ -41,7 +41,7 @@ $zaehl=1;
 $tage=array();	//Array Tage für Kalenderanzeige
 $hgfarbe=array_fill(0,44,'white'); 	//Array mit Hintegrundfarben der Kalenderfelder
 $monatsname = array("Januar", "Februar", "M&auml;rz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember");
-$jahre = array();	//Array mit Jahreszahlen für Auswahl
+$jahre = array();	//Array Jahreszahlen für Auswahl (immer aktuelles Jahr und die 4 nächsten Jahre)
 $akette=array_fill(0,2,0);
 $ekette=array_fill(0,2,0);
 $spmonat=array();
@@ -162,7 +162,7 @@ if(isset($_GET['spmonat']) || isset($_POST['spmonat']))
 						zeitsperretyp_kurzbz,mitarbeiter_uid,bezeichnung,vondatum,vonstunde,bisdatum,bisstunde,vertretung_uid,
 						updateamum,updatevon,insertamum,insertvon, erreichbarkeit_kurzbz, freigabeamum, freigabevon) VALUES (
 						'Urlaub','".$uid."', 'Urlaub', '".date("Y-m-d",mktime(0, 0, 0, ($wmonat+2) , 1, $jahre[$wjahr]))."',
-						NULL,'".$row->bisdatum."',NULL,NULL,NULL,NULL,now(),'".$uid."','e',NULL,NULL
+						NULL,'".$row->bisdatum."',NULL,NULL,NULL,NULL,now(),'".$uid."','n',NULL,NULL
 						)";
 				$result = pg_query($conn, $qryins);
 				//echo "<br>".$qryupd;
@@ -176,7 +176,7 @@ if(isset($_GET['spmonat']) || isset($_POST['spmonat']))
 						zeitsperretyp_kurzbz,mitarbeiter_uid,bezeichnung,vondatum,vonstunde,bisdatum,bisstunde,vertretung_uid,
 						updateamum,updatevon,insertamum,insertvon, erreichbarkeit_kurzbz, freigabeamum, freigabevon) VALUES (
 						'Urlaub','".$uid."', 'Urlaub', '".date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $akette[$i], $jahre[$wjahr]))."',
-						NULL,'".date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $ekette[$i], $jahre[$wjahr]))."',NULL,NULL,NULL,NULL,now(),'".$uid."','e',NULL,NULL
+						NULL,'".date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $ekette[$i], $jahre[$wjahr]))."',NULL,NULL,NULL,NULL,now(),'".$uid."','n',NULL,NULL
 						)";
 						$result = pg_query($conn, $qryins);
 						//echo "<br>"."2-".$qryins;
@@ -196,7 +196,7 @@ if(isset($_GET['spmonat']) || isset($_POST['spmonat']))
 				zeitsperretyp_kurzbz,mitarbeiter_uid,bezeichnung,vondatum,vonstunde,bisdatum,bisstunde,vertretung_uid,
 				updateamum,updatevon,insertamum,insertvon, erreichbarkeit_kurzbz, freigabeamum, freigabevon) VALUES (
 				'Urlaub','".$uid."', 'Urlaub', '".date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $akette[$i], $jahre[$wjahr]))."',
-				NULL,'".date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $ekette[$i], $jahre[$wjahr]))."',NULL,NULL,NULL,NULL,now(),'".$uid."','e',NULL,NULL
+				NULL,'".date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $ekette[$i], $jahre[$wjahr]))."',NULL,NULL,NULL,NULL,now(),'".$uid."','n',NULL,NULL
 				)";
 				$result = pg_query($conn, $qryins);
 				//echo "<br>"."3-".$qryins;
