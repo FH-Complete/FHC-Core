@@ -332,7 +332,12 @@ $content_resturlaub.="</table>";
 //Formular Auswahl Monat und Jahr für Kalender
 echo '<table width="80%" align="center">';
 echo "<td class='tdvertical' align='center' >$content_resturlaub</td>";
-echo "<td class='tdvertical' align='right' colspan='2'><img src='../../../skin/images/TWLogo_klein.jpg' height='53' width='170' alt='twlogo'></td>";
+echo "<td class='tdvertical' align='right' colspan='2'>";
+if(CAMPUS_NAME=='FH Technikum Wien')
+{
+	echo "<img src='../../../skin/images/TWLogo_klein.jpg' height='53' width='170' alt='twlogo'></td>";
+}
+
 echo '</td></tr><tr height=20></tr>';
 echo '<tr><td>';
 $content= '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">';
