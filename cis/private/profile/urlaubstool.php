@@ -140,7 +140,7 @@ if (isset($_GET['rechts']) || isset($_POST['rechts']))
 		$wjahr=$wjahr;
 	}
 }
-
+//Eintragung löschen
 if((isset($_GET['delete']) || isset($_POST['delete'])))
 {
 	//echo "delete".$_GET['delete'];
@@ -148,7 +148,7 @@ if((isset($_GET['delete']) || isset($_POST['delete'])))
 	$result = pg_query($conn, $qry);
 }
 
-
+//Eintragung speichern
 if(isset($_GET['speichern']) && isset($_GET['wtag']))
 {
 	$vertretung=$_GET['vertretung_uid'];
@@ -179,17 +179,29 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 	//print_r($ekette);
 	FOR($i=0;$i<count($akette);$i++)
 	{	
-		$qryins="INSERT INTO campus.tbl_zeitsperre (
-			zeitsperretyp_kurzbz,mitarbeiter_uid,bezeichnung,vondatum,vonstunde,bisdatum,bisstunde,vertretung_uid,
-			updateamum,updatevon,insertamum,insertvon, erreichbarkeit_kurzbz, freigabeamum, freigabevon) VALUES (
-			'Urlaub','".$uid."', 'Urlaub', '".date("Y-m-d",strtotime($akette[$i]))."',
-			NULL,'".date("Y-m-d", strtotime($ekette[$i]))."',NULL,'".$vertretung."',NULL,NULL,now(),'".$uid."','".$erreichbar."',NULL,NULL
-			)";
+		if($vertretung!='')
+		{
+			$qryins="INSERT INTO campus.tbl_zeitsperre (
+				zeitsperretyp_kurzbz,mitarbeiter_uid,bezeichnung,vondatum,vonstunde,bisdatum,bisstunde,vertretung_uid,
+				updateamum,updatevon,insertamum,insertvon, erreichbarkeit_kurzbz, freigabeamum, freigabevon) VALUES (
+				'Urlaub','".$uid."', 'Urlaub', '".date("Y-m-d",strtotime($akette[$i]))."',
+				NULL,'".date("Y-m-d", strtotime($ekette[$i]))."',NULL,'".$vertretung."',NULL,NULL,now(),'".$uid."','".$erreichbar."',NULL,NULL
+				)";
+		}
+		else 
+		{
+			$qryins="INSERT INTO campus.tbl_zeitsperre (
+				zeitsperretyp_kurzbz,mitarbeiter_uid,bezeichnung,vondatum,vonstunde,bisdatum,bisstunde,vertretung_uid,
+				updateamum,updatevon,insertamum,insertvon, erreichbarkeit_kurzbz, freigabeamum, freigabevon) VALUES (
+				'Urlaub','".$uid."', 'Urlaub', '".date("Y-m-d",strtotime($akette[$i]))."',
+				NULL,'".date("Y-m-d", strtotime($ekette[$i]))."',NULL,NULL,NULL,NULL,now(),'".$uid."','".$erreichbar."',NULL,NULL
+				)";
+		}
 		$result = pg_query($conn, $qryins);
-		//echo $qryins;
 	}
 }
 
+//Eintragungen laden
 if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 {
 	//Urlaubstageage markieren
@@ -228,11 +240,6 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 					if($row->freigabevon!='')
 					{
 						$hgfarbe[$i]='green';
-						$datensatz[$i]=$row->zeitsperre_id;
-						$freigabevon[$i]=$row->freigabevon;
-						$freigabeamum[$i]=$row->freigabeamum;
-						$vertretung_uid[$i]=$row->vertretung_uid;
-						$erreichbarkeit_kurzbz[$i]=$row->erreichbarkeit_kurzbz;
 					}
 					else 
 					{
@@ -248,6 +255,7 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 				{
 					if($hgfarbe[$i]!='lime' && $hgfarbe[$i]!='green')
 					{
+						
 						$hgfarbe[$i]='white';
 						$datensatz[$i]=0;
 						$freigabevon[$i]=$row->freigabevon;
@@ -257,7 +265,7 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 					}
 				}
 			}
-			for($i=$mende;$i<44;$i++)
+			for($i=$mende+$wotag;$i<44;$i++)
 			{
 				$hgfarbe[$i]='white';
 				$datensatz[$i]=0;
@@ -387,7 +395,7 @@ $content.= "&nbsp;<SELECT name='erreichbar' id='erreichbarkeit_kurzbz'>";
 //dropdown fuer vertretung
 $qry = "SELECT * FROM campus.tbl_erreichbarkeit ORDER BY erreichbarkeit_kurzbz";
 
-$content.= "<OPTION value=''>-- Erreichbar --</OPTION>\n";
+$content.= "<OPTION value=''>-- Erreichbarkeit --</OPTION>\n";
 
 if($result = pg_query($conn, $qry))
 {
