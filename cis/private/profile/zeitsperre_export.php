@@ -57,10 +57,10 @@
 		$funktion=null;
 	if ($funktion=='true' || $funktion=='1') $funktion=true;
 	if ($funktion=='false' || $funktion=='') $funktion=false;
-	
+
 	if(isset($_GET['institut']))
 		$institut = $_GET['institut'];
-	else 
+	else
 		$institut = null;
 
 	$stge=array();
@@ -90,7 +90,7 @@
 		//$studiensemester=$ss->getAktTillNext();
 	}
 	$datum_beginn=$ss->start;
-	$datum_ende=$ss->ende;
+	$datum_ende='2008-09-01';//$ss->ende;
 	$ts_beginn=$datum_obj->mktime_fromdate($datum_beginn);
 	$ts_ende=$datum_obj->mktime_fromdate($datum_ende);
 
@@ -98,9 +98,9 @@
 	$ma=new mitarbeiter($conn);
 	if(!is_null($institut))
 	{
-		$mitarbeiter = $ma->getMitarbeiterInstitut($institut);	
+		$mitarbeiter = $ma->getMitarbeiterInstitut($institut);
 	}
-	else 
+	else
 	{
 		//if (!is_null($funktion))
 		//	$mitarbeiter=$ma->getMitarbeiterStg(true,null,$stge,$funktion);

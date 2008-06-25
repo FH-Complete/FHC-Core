@@ -27,6 +27,32 @@ require_once('../../include/functions.inc.php');
 if(!$conn=pg_pconnect(CONN_STRING))
    die("Konnte Verbindung zur Datenbank nicht herstellen");
 
+// Variablen checken
+		if (isset($_GET['studiengang_kz']))
+			$studiengang_kz=$_GET['studiengang_kz'];
+		if (isset($_GET['semester']))
+			$semester=$_GET['semester'];
+		if (isset($_GET['verband']))
+			$verband=$_GET['verband'];
+		else
+			$verband=' ';
+		if ($verband=='')
+			$verband=' ';
+		if (isset($_GET['gruppe']))
+			$gruppe=$_GET['gruppe'];
+		else
+			$gruppe=' ';
+		if ($gruppe=='')
+			$gruppe=' ';
+		if (isset($_GET['gruppe_kurzbz']))
+			$gruppe_kurzbz=$_GET['gruppe_kurzbz'];
+		else
+			$gruppe_kurzbz='';
+		if (isset($_GET['leid']))
+			$leid=$_GET['leid'];
+		else
+			$leid=0;
+
 $s=new studiengang($conn);
 $s->getAll('typ, kurzbz', false);
 $studiengang=$s->result;
@@ -52,31 +78,7 @@ else
 if (isset($_GET['insert']))
 	if ($_GET['insert']=='true')
 	{
-		// Variablen checken
-		if (isset($_GET['studiengang_kz']))
-			$studiengang_kz=$_GET['studiengang_kz'];
-		if (isset($_GET['semester']))
-			$semester=$_GET['semester'];
-		if (isset($_GET['verband']))
-			$verband=$_GET['verband'];
-		else
-			$verband=' ';
-		if ($verband=='')
-			$verband=' ';
-		if (isset($_GET['gruppe']))
-			$gruppe=$_GET['gruppe'];
-		else
-			$gruppe=' ';
-		if ($gruppe=='')
-			$gruppe=' ';
-		if (isset($_GET['gruppe_kurzbz']))
-			$gruppe_kurzbz=$_GET['gruppe_kurzbz'];
-		else
-			$gruppe_kurzbz='';
-		if (isset($_GET['leid']))
-			$leid=$_GET['leid'];
-		else
-			$leid=0;
+
 		// Termine holen
 		$qry = "SELECT DISTINCT datum, stunde FROM lehre.$stpl_table WHERE lehreinheit_id=$leid";
 		//echo $qry.'<BR>';

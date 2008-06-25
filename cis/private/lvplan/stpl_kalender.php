@@ -24,7 +24,10 @@ if(!$erg_std=pg_query($conn, "SET datestyle TO ISO; SET search_path TO campus;")
 
 
 //Startwerte setzen
-$db_stpl_table='stundenplan';
+if (!isset($_GET['db_stpl_table']))
+	$db_stpl_table='stundenplan';
+else
+	$db_stpl_table=$_GET['db_stpl_table'];
 if (isset($_GET['type']))
 	$type=$_GET['type'];
 if (isset($_GET['pers_uid']))

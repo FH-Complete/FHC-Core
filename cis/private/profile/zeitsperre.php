@@ -54,9 +54,9 @@
 
 	if(isset($_GET['institut']))
 		$institut = $_GET['institut'];
-	else 
+	else
 		$institut = null;
-	
+
 	$stge=array();
 	if(isset($_GET['stg_kz']))
 	{
@@ -71,10 +71,10 @@
 
 	// Link fuer den Export
 	$export_link='zeitsperre_export.php?';
-	
+
 	if(!is_null($institut))
 		$export_link.="institut=$institut";
-	else 
+	else
 	{
 		if ($fix==true)
 			$export_link.='fix=true';
@@ -94,20 +94,20 @@
 		$studiensemester = $ss->getaktorNext();
 		$ss->load($studiensemester);
 	}
-	
-	$datum_beginn=$ss->start;
-	$datum_ende=$ss->ende;
+
+	$datum_beginn='2008-06-01'; // $ss->start;
+	$datum_ende='2008-08-31';	//$ss->ende;
 	$ts_beginn=$datum_obj->mktime_fromdate($datum_beginn);
 	$ts_ende=$datum_obj->mktime_fromdate($datum_ende);
 
 	// Lektoren holen
 	$ma=new mitarbeiter($conn);
-	
+
 	if(!is_null($institut))
 	{
 		$mitarbeiter = $ma->getMitarbeiterInstitut($institut);
 	}
-	else 
+	else
 	{
 		if (is_null($funktion))
 			$mitarbeiter=$ma->getMitarbeiter($lektor,$fix);
@@ -151,14 +151,14 @@
 				{
 					if($fb->fachbereich_kurzbz==$institut)
 						$selected='selected';
-					else 
+					else
 						$selected='';
-					
+
 					echo "<option value='$fb->fachbereich_kurzbz' $selected>$fb->bezeichnung</option>";
 				}
 			}
 			echo '</SELECT><input type="submit" value="Anzeigen"></FORM>';
-			echo '<br>';		
+			echo '<br>';
 		}
 	?>
 	<a class="Item" href="<?php echo $export_link; ?>">Excel</a>

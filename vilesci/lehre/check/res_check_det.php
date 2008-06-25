@@ -3,7 +3,7 @@
 	$conn=pg_connect(CONN_STRING);
 
 	//Stundenplandaten ermitteln welche mehrfach vorkommen
-	$sql_query="SELECT * FROM vw_reservierung WHERE datum='$datum' AND stunde=$stunde AND ort_kurzbz='$ort_kurzbz'";
+	$sql_query="SELECT * FROM lehre.vw_reservierung WHERE datum='$datum' AND stunde=$stunde AND ort_kurzbz='$ort_kurzbz'";
 	//echo $sql_query."<br>";
 	$result=pg_exec($conn, $sql_query);
 	$num_rows=pg_numrows($result);
