@@ -384,7 +384,7 @@ h4
 	cursor: hand; 
 	text-decoration: none; 
 }
-font.error
+.error
 {
 	color: #ff0000;
 }
