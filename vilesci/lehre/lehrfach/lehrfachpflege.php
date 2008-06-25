@@ -4,17 +4,17 @@
 // * die keinem aktiven Lehrfach zu-
 // * geteilt sind. Mittels einer Combo-
 // * box kann ein aktives Lehrfach
-// * zugewiesen werden. 
+// * zugewiesen werden.
 // *********************************************
 	//DB Verbindung herstellen
 	require_once('../../config.inc.php');
 	require_once('../../../include/studiensemester.class.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/lehrfach.class.php');
-	
+
 	if (!$conn = @pg_pconnect(CONN_STRING))
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-		
+
 $studiensemester_kurzbz = (isset($_GET['studiensemester_kurzbz'])?$_GET['studiensemester_kurzbz']:'');
 $i=0;
 
@@ -46,7 +46,7 @@ if(isset($_GET['lf_id']))
 	else
 	{
 		echo nl2br("<span style='font-color: Red;'>\nFehler beim Speichern Student</span>");
-	}	
+	}
 }
 
 echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">';
@@ -62,11 +62,11 @@ foreach($stsem_obj->studiensemester as $stsem)
 	{
 		$selected='selected';
 	}
-	else 
+	else
 	{
 		$selected='';
 	}
-	
+
 	echo "<option value='$stsem->studiensemester_kurzbz' $selected>$stsem->studiensemester_kurzbz</option>";
 }
 
@@ -75,9 +75,9 @@ echo " <INPUT type='submit' value='OK'>";
 
 echo '</form>';
 
-$qry="SELECT tbl_lehrveranstaltung.bezeichnung as lvbez, tbl_lehrveranstaltung.kurzbz as lvkurzbz, tbl_lehrfach.*, tbl_lehreinheit.lehreinheit_id  
-	FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrfach USING (lehrfach_id) JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id) 
-	WHERE NOT tbl_lehrfach.aktiv AND studiensemester_kurzbz='".$studiensemester_kurzbz."' ORDER BY studiengang_kz,semester;";
+$qry="SELECT tbl_lehrveranstaltung.bezeichnung as lvbez, tbl_lehrveranstaltung.kurzbz as lvkurzbz, tbl_lehrfach.*, tbl_lehreinheit.lehreinheit_id
+	FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrfach USING (lehrfach_id) JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id) JOIN tbl_fachbereich USING (fachbereich_kurzbz)
+	WHERE (NOT tbl_lehrfach.aktiv OR NOT tbl_fachbereich.aktiv) AND studiensemester_kurzbz='".$studiensemester_kurzbz."' ORDER BY studiengang_kz,semester;";
 
 if($result = pg_query($conn, $qry))
 {
@@ -107,15 +107,15 @@ if($result = pg_query($conn, $qry))
 				{
 					$selected='selected';
 				}
-				else 
+				else
 				{
 					$selected='';
 				}
 				$row_lf->bezeichnung=trim($row_lf->bezeichnung);
 				echo "<option value='$row_lf->lehrfach_id' $selected>$row_lf->kurzbz - $row_lf->bezeichnung ($row_lf->fachbereich_kurzbz)</option>";
-			}	
+			}
 			echo "</SELECT>";
-		}		
+		}
 		echo "<td><input type='submit' value='Speichern'></td>";
 		echo "</form>";
 		if($i==20)
