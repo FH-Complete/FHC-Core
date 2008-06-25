@@ -49,9 +49,12 @@ $monatsname = array("Januar", "Februar", "M&auml;rz", "April", "Mai", "Juni", "J
 $jahre = array();			//Array Jahreszahlen für Auswahl (immer aktuelles Jahr und die 4 nächsten Jahre)
 $akette=array_fill(0,1,0);
 $ekette=array_fill(0,1,0);
+$links='';
+$rechts='';
 $tag=array();
 $vertretung='';
 $erreichbar='';
+$vgmail='';
 $spmonat=array();
 $hgchange=false;
 $wvon='';
@@ -59,6 +62,20 @@ $wbis='';
 $datensatz='';
 $t=getdate();
 $uid = get_uid();
+
+function getVorgesetzten($uid)
+{
+	global $conn;
+	$qry = "SELECT CASE WHEN fachbereich_kurzbz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND funktion_kurzbz='fbl' LIMIT 1) 
+					    WHEN studiengang_kz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz=a.studiengang_kz AND funktion_kurzbz='stgl' LIMIT 1)
+					    ELSE ''
+				   END as vorgesetzter
+	FROM public.tbl_benutzerfunktion a WHERE funktion_kurzbz='Institut' AND uid='$uid'";
+	$result = pg_query($conn, $qry);
+	$row = pg_fetch_object($result);
+	return (isset($row->vorgesetzter)?$row->vorgesetzter:'');
+}
+
 
 for($i=0;$i<6;$i++)
 {
@@ -108,7 +125,7 @@ else
 	}	
 }
 
-if (isset($_GET['links']) || isset($_POST['links']))
+if (isset($_GET['links_x']) || isset($_POST['links_x']))
 {
 	if ($wmonat==0)
 	{
@@ -124,7 +141,7 @@ if (isset($_GET['links']) || isset($_POST['links']))
 		$wjahr=$wjahr;
 	}
 }
-if (isset($_GET['rechts']) || isset($_POST['rechts']))
+if (isset($_GET['rechts_x']) || isset($_POST['rechts_x']))
 {
 	if($wmonat==11)
 	{
@@ -199,6 +216,35 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 		}
 		$result = pg_query($conn, $qryins);
 	}
+	$vorgesetzter = getVorgesetzten($uid);
+	if($vorgesetzter!='')
+	{
+		$to = $vorgesetzter.'@'.DOMAIN;
+		//$to = 'ruhan@technikum-wien.at';
+		$benutzer = new benutzer($conn);
+		$benutzer->load($uid);
+		$message = "Dies ist eine automatische Mail! \n".
+				   "$benutzer->nachname $benutzer->vorname hat neuen Urlaub eingetragen:\n";
+				   for($i=0;$i<count($akette);$i++)
+				   {
+				   	$message.="Von ".date("d-m-Y", strtotime($akette[$i]))." bis ".date("d-m-Y", strtotime($ekette[$i]))."\n";
+				   }
+				   $message.="\nSie können diesen unter folgender Adresse freigeben:\n".
+				   APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".date("Y", strtotime($akette[0]));
+		if(mail($to, 'Freigabeansuchen', $message,'From: vilesci@'.DOMAIN))
+		{
+			$vgmail="<br><b>Freigabemail wurde an $to versandt!</b>";
+		}
+		else 
+		{
+			$vgmail="<br><span class='error'>Fehler beim Senden des Freigabemails an $to!</span>";
+		}
+	}
+	else 
+	{
+		$vgmail="<br><span class='error'>Es konnte keine Freigabemail versendet werden, da kein Vorgesetzter eingetragen ist!</span>";
+	}
+	
 }
 
 //Eintragungen laden
@@ -280,14 +326,30 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 
 $PHP_SELF = $_SERVER['PHP_SELF'];
 $datum_obj = new datum();
-
-echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd"><html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+<script language="Javascript">
+function conf_del()
+{
+	return confirm('Wollen Sie diesen Eintrag wirklich löschen?');
+}
 
+function checkval()
+{
+	if(document.getElementById('vertretung_uid').value=='')
+	{
+		alert('Bitte zuerst eine Vertretung auswählen');
+		return false;
+	}
+	else
+		return true;
+}
+</script>
 <style type="text/css">
 a:link { text-decoration:none; font-weight:bold; color:blue; }
 a:visited { text-decoration:none; font-weight:bold; color:blue; }
@@ -295,7 +357,8 @@ a:visited { text-decoration:none; font-weight:bold; color:blue; }
 </style>
 <title>Urlaubstool</title>
 </head>
-<body>';
+<body>
+<?php
 //alert("Ich bin auf Tag " + kastl);
 echo "<H1>Urlaubstool (".$uid.")</H1>";
 //Anzeige Resturlaubsberechnung
@@ -309,8 +372,8 @@ if($resturlaub->load($uid))
 	$mehrarbeitsstunden = $resturlaub->mehrarbeitsstunden;
 	$anspruch = $resturlaub->urlaubstageprojahr;
 }
-$content_resturlaub.="<table><tr><td>Anspruch</td><td align='right'>$anspruch Tage</td></tr>";
-$content_resturlaub.="<tr><td>+ Resturlaub</td><td align='right'>$resturlaubstage Tage</td></tr>";
+$content_resturlaub.="<table><tr><td align='left'>Anspruch</td><td align='right'>$anspruch Tage</td></tr>";
+$content_resturlaub.="<tr><td align='left'>+ Resturlaub</td><td align='right'>$resturlaubstage Tage</td></tr>";
 $gebuchterurlaub=0;
 //Urlaub berechnen
 $qry = "SELECT sum(bisdatum-vondatum+1) as anzahltage FROM campus.tbl_zeitsperre 
@@ -324,24 +387,18 @@ $row = pg_fetch_object($result);
 $gebuchterurlaub = $row->anzahltage;
 if($gebuchterurlaub=='')
 	$gebuchterurlaub=0;
-$content_resturlaub.="<tr><td>- aktuell gebuchter Urlaub&nbsp;</td><td align='right'>$gebuchterurlaub Tage</td></tr>";
-$content_resturlaub.="<tr><td style='border-top: 1px solid black;'>aktueller Stand</td><td style='border-top: 1px solid black;' align='right'>".($anspruch+$resturlaubstage-$gebuchterurlaub)." Tage</td></tr>";
+$content_resturlaub.="<tr><td align='left'>- aktuell gebuchter Urlaub&nbsp;</td><td align='right'>$gebuchterurlaub Tage</td></tr>";
+$content_resturlaub.="<tr><td style='border-top: 1px solid black;' align='left'>aktueller Stand</td><td style='border-top: 1px solid black;' align='right'>".($anspruch+$resturlaubstage-$gebuchterurlaub)." Tage</td></tr>";
 $content_resturlaub .="<tr><td><button type='button' name='hilfe' value='Hilfe' onclick='alert(\"Anspruch: Anzahl der Urlaubstage, auf die in diesem Geschäftsjahr (1.9. bis 31.8) ein Anrecht ensteht. \\nResturlaub: Anzahl der Urlaubstage, aus vergangenen Geschäftsjahren, die noch nicht verbraucht wurden. \\naktuell gebuchter Urlaub: Anzahl aller eingetragenen Urlaubstage. \\nAchtung: Als Urlaubstag gelten ALLE Tage zwischen von-Datum und bis-Datum d.h. auch alle Wochenenden, Feiertage und arbeitsfreie Tage. Beispiel: Ein Kurzurlaub beginnt mit einem Donnerstag und endet am darauffolgenden Dienstag, so wird zuerst eine Eintragung mit dem Datum des Donnerstags im von-Feld und dem Datum des letzten Urlaubstag vor dem Wochenende, meistens der Freitag, eingegeben. Danach wird eine Eintagung des zweiten Teils, von Montag bis Dienstag vorgenommen.\\naktueller Stand: Die zur Zeit noch verfügbaren Urlaubstage.\");'>Hilfe</button></td></tr>";
 $content_resturlaub.="</table>";
 
 //Formular Auswahl Monat und Jahr für Kalender
 echo '<table width="80%" align="center">';
 echo "<td class='tdvertical' align='center' >$content_resturlaub</td>";
-echo "<td class='tdvertical' align='right' colspan='2'>";
-if(CAMPUS_NAME=='FH Technikum Wien')
-{
-	echo "<img src='../../../skin/images/TWLogo_klein.jpg' height='53' width='170' alt='twlogo'></td>";
-}
-
 echo '</td></tr><tr height=20></tr>';
 echo '<tr><td>';
 $content= '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">';
-$content.='<INPUT name="links"  value="links" type="image" src="../../../skin/images/left.gif" alt="links">';
+$content.='<INPUT name="links" type="image" src="../../../skin/images/left.gif" alt="links">';
 $content.='<SELECT name="wmonat">';
 for($i=0;$i<12;$i++)
 {
@@ -358,7 +415,7 @@ for($i=0;$i<12;$i++)
 $content.='</SELECT>';
 
 
-$content.='<INPUT name="rechts" value="rechts" type="image" src="../../../skin/images/right.gif" alt="rechts">';
+$content.='<INPUT name="rechts" type="image" src="../../../skin/images/right.gif" alt="rechts">';
 $content.='&nbsp;<SELECT name="wjahr">';
 for($i=0;$i<5;$i++)
 {
@@ -373,7 +430,8 @@ for($i=0;$i<5;$i++)
 	$content.="<option value='$i' $selected>$jahre[$i]</option>";
 }	
 $content.='</SELECT>';
-$content.="&nbsp;<INPUT type='submit' name='ok' value='OK'></td></form>";
+$content.="&nbsp;<INPUT type='submit' name='ok' value='OK'>";
+$content.='</td></form>';
 $content.='<form action="'.$_SERVER['PHP_SELF'].'" method="GET">';
 $content.= "<td align='center'><SELECT name='vertretung_uid' id='vertretung_uid'>";
 //dropdown fuer vertretung
@@ -442,11 +500,10 @@ for($i=1;$i<43;$i++)
 	}
 }
 
-$content.='<td align="right">';
-$content.='<input type="hidden" name="wmonat" value="'.$wmonat.'"';
-$content.='<input type="hidden" name="wjahr" value="'.$wjahr.'"';
+$content.='<td>';
 $content.='<input type="submit" name="speichern" value="Eintragungen speichern">';
-//$content.='</form>';
+$content.='<input type="hidden" name="wmonat" value="'.$wmonat.'">';
+$content.='<input type="hidden" name="wjahr" value="'.$wjahr.'">';
 $content.='</td></tr>';
 $content.='</table>';
 $content.='<table border=1 width="80%" align="center">';
@@ -462,8 +519,10 @@ for ($i=0;$i<6;$i++)
 		{
 			if($hgfarbe[$j+7*$i]=='lime')
 			{
+				$content.='<input type="hidden" name="delete" value="'.$datensatz[$j+7*$i].'">';
 				$content.='<b title="Vertretung: '.$vertretung_uid[$j+7*$i].' - erreichbar: '.$erreichbarkeit_kurzbz[$j+7*$i].'">'.$tage[$j+7*$i].'</b><br>';
-				$content.='<INPUT name="delete" value="'.$datensatz[$j+7*$i].'" type="image" src="../../../skin/images/DeleteIcon.png" alt="loeschen" title="Eintragung löschen">';
+				$content.='<INPUT  type="image" src="../../../skin/images/DeleteIcon.png" alt="loeschen" title="Eintragung löschen" onclick="return conf_del()">';
+				//name="delete" value="'.$datensatz[$j+7*$i].'"
 			}
 			elseif($hgfarbe[$j+7*$i]=='white') 
 			{
@@ -476,11 +535,16 @@ for ($i=0;$i<6;$i++)
 				$content.='<img src="../../../skin/images/person.gif" alt="freigegeben" title="Freigegeben durch '.$freigabevon[$j+7*$i].' am '.date("d-m-Y",strtotime($freigabeamum[$j+7*$i])).'"></td>'; 		
 			}
 		}
+		else 
+		{
+			$content.='<b>&nbsp;</b><br>';
+		}
 	}
 	$content.='</tr>';
 }
 $content.='</table></form>';
 echo $content;
+echo "<b style='font-family:Arial,sans-serif; font-size:18px; color:red'>".$vgmail."</b>";
 ?>
 </body>
 </html>
