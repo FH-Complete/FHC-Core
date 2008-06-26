@@ -226,8 +226,8 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 	$vorgesetzter = getVorgesetzten($uid);
 	if($vorgesetzter!='')
 	{
-		$to = $vorgesetzter.'@'.DOMAIN;
-		//$to = 'ruhan@technikum-wien.at';
+		//$to = $vorgesetzter.'@'.DOMAIN;
+		$to = 'ruhan@technikum-wien.at';
 		$benutzer = new benutzer($conn);
 		$benutzer->load($uid);
 		$message = "Dies ist eine automatische Mail! \n".
@@ -290,7 +290,7 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 				if(date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $i-$wotag+1, $jahre[$wjahr]))>=$row->vondatum 
 				&& date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $i-$wotag+1, $jahre[$wjahr]))<=$row->bisdatum)
 				{
-					if($row->freigabevon!='')
+					if($row->freigabevon!='' || $row->bisdatum<date("Y-m-d",time()))
 					{
 						$hgfarbe[$i]='green';
 					}
@@ -378,8 +378,8 @@ if($resturlaub->load($uid))
 	$mehrarbeitsstunden = $resturlaub->mehrarbeitsstunden;
 	$anspruch = $resturlaub->urlaubstageprojahr;
 }
-$content_resturlaub.="<table><tr><td align='left'>Anspruch</td><td align='right'>$anspruch Tage</td></tr>";
-$content_resturlaub.="<tr><td align='left'>+ Resturlaub</td><td align='right'>$resturlaubstage Tage</td></tr>";
+$content_resturlaub.="<table><tr><td align='left' nowrap>Anspruch</td><td align='right' nowrap>$anspruch Tage</td><td width='200'></tr>";
+$content_resturlaub.="<tr><td align='left' nowrap>+ Resturlaub</td><td align='right' nowrap>$resturlaubstage Tage</td></tr>";
 $gebuchterurlaub=0;
 //Urlaub berechnen
 $qry = "SELECT sum(bisdatum-vondatum+1) as anzahltage FROM campus.tbl_zeitsperre 
@@ -393,15 +393,15 @@ $row = pg_fetch_object($result);
 $gebuchterurlaub = $row->anzahltage;
 if($gebuchterurlaub=='')
 	$gebuchterurlaub=0;
-$content_resturlaub.="<tr><td align='left'>- aktuell gebuchter Urlaub&nbsp;</td><td align='right'>$gebuchterurlaub Tage</td></tr>";
-$content_resturlaub.="<tr><td style='border-top: 1px solid black;' align='left'>aktueller Stand</td><td style='border-top: 1px solid black;' align='right'>".($anspruch+$resturlaubstage-$gebuchterurlaub)." Tage</td></tr>";
-$content_resturlaub .="<tr><td><button type='button' name='hilfe' value='Hilfe' onclick='alert(\"Anspruch: Anzahl der Urlaubstage, auf die in diesem Geschäftsjahr (1.9. bis 31.8) ein Anrecht ensteht. \\nResturlaub: Anzahl der Urlaubstage, aus vergangenen Geschäftsjahren, die noch nicht verbraucht wurden. \\naktuell gebuchter Urlaub: Anzahl aller eingetragenen Urlaubstage. \\nAchtung: Als Urlaubstag gelten ALLE Tage zwischen von-Datum und bis-Datum d.h. auch alle Wochenenden, Feiertage und arbeitsfreie Tage. Beispiel: Ein Kurzurlaub beginnt mit einem Donnerstag und endet am darauffolgenden Dienstag, so wird zuerst eine Eintragung mit dem Datum des Donnerstags im von-Feld und dem Datum des letzten Urlaubstag vor dem Wochenende, meistens der Freitag, eingegeben. Danach wird eine Eintagung des zweiten Teils, von Montag bis Dienstag vorgenommen.\\naktueller Stand: Die zur Zeit noch verfügbaren Urlaubstage.\");'>Hilfe</button></td></tr>";
+$content_resturlaub.="<tr><td align='left' nowrap>- aktuell gebuchter Urlaub&nbsp;</td><td align='right' nowrap>$gebuchterurlaub Tage</td>";
+$content_resturlaub .="<td align='center'><button type='button' name='hilfe' value='Hilfe' onclick='alert(\"Anspruch: Anzahl der Urlaubstage, auf die in diesem Geschäftsjahr (1.9. bis 31.8) ein Anrecht ensteht. \\nResturlaub: Anzahl der Urlaubstage, aus vergangenen Geschäftsjahren, die noch nicht verbraucht wurden. \\naktuell gebuchter Urlaub: Anzahl aller eingetragenen Urlaubstage. \\nAchtung: Als Urlaubstag gelten ALLE Tage zwischen von-Datum und bis-Datum d.h. auch alle Wochenenden, Feiertage und arbeitsfreie Tage. Beispiel: Ein Kurzurlaub beginnt mit einem Donnerstag und endet am darauffolgenden Dienstag, so wird zuerst eine Eintragung mit dem Datum des Donnerstags im von-Feld und dem Datum des letzten Urlaubstag vor dem Wochenende, meistens der Freitag, eingegeben. Danach wird eine Eintagung des zweiten Teils, von Montag bis Dienstag vorgenommen.\\naktueller Stand: Die zur Zeit noch verfügbaren Urlaubstage.\");'>Hilfe</button></td></tr>";
+$content_resturlaub.="<tr><td style='border-top: 1px solid black;' align='left' nowrap>aktueller Stand</td><td style='border-top: 1px solid black;' align='right' nowrap>".($anspruch+$resturlaubstage-$gebuchterurlaub)." Tage</td></tr>";
 $content_resturlaub.="</table>";
 
 //Formular Auswahl Monat und Jahr für Kalender
-echo '<table width="80%" align="center">';
+echo '<table width="95%" align="center">';
 echo "<td class='tdvertical' align='center' >$content_resturlaub</td>";
-echo '</td></tr><tr height=20></tr>';
+echo '</td></tr><tr height=5></tr>';
 echo '<tr><td>';
 $content= '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">';
 $content.='<INPUT name="links" type="image" src="../../../skin/images/left.gif" alt="links">';
@@ -439,7 +439,7 @@ $content.='</SELECT>';
 $content.="&nbsp;<INPUT type='submit' name='ok' value='OK'>";
 $content.='</td></form>';
 $content.='<form action="'.$_SERVER['PHP_SELF'].'" method="GET">';
-$content.= "<td align='center'><SELECT name='vertretung_uid' id='vertretung_uid'>";
+$content.= "<td align='center' nowrap><SELECT name='vertretung_uid' id='vertretung_uid'>";
 //dropdown fuer vertretung
 $qry = "SELECT * FROM campus.vw_mitarbeiter WHERE uid not LIKE '\\\_%' ORDER BY nachname, vorname";
 
@@ -512,12 +512,12 @@ $content.='<input type="hidden" name="wmonat" value="'.$wmonat.'">';
 $content.='<input type="hidden" name="wjahr" value="'.$wjahr.'">';
 $content.='</td></tr>';
 $content.='</table>';
-$content.='<table border=1 width="80%" align="center">';
+$content.='<table border=1 width="95%" align="center">';
 
 $content.='<th width="14%">Montag</th><th width="14%">Dienstag</th><th width="14%">Mittwoch</th><th width="15%">Donnerstag</th><th width="14%">Freitag</th><th width="14%">Samstag</th><th width="14%">Sonntag</th>';
 for ($i=0;$i<6;$i++)
 {
-	$content.='<tr height="90" style="font-family:Arial,sans-serif; font-size:50px; color:blue">';
+	$content.='<tr height="50" style="font-family:Arial,sans-serif; font-size:34px; color:blue">';
 	for ($j=1;$j<8;$j++)
 	{
 		$content.='<td align="center" valign="center" style="background-color: '.$hgfarbe[$j+7*$i].'">';
@@ -538,8 +538,15 @@ for ($i=0;$i<6;$i++)
 			}
 			else 
 			{
-				$content.='<b title="Vertretung: '.$vertretung_uid[$j+7*$i].' - erreichbar: '.$erreichbarkeit_kurzbz[$j+7*$i].'">'.$tage[$j+7*$i].'</b><br>';	
-				$content.='<img src="../../../skin/images/person.gif" alt="freigegeben" title="Freigegeben durch '.$freigabevon[$j+7*$i].' am '.date("d-m-Y",strtotime($freigabeamum[$j+7*$i])).'"></td>'; 		
+				$content.='<b title="Vertretung: '.$vertretung_uid[$j+7*$i].' - erreichbar: '.$erreichbarkeit_kurzbz[$j+7*$i].'">'.$tage[$j+7*$i].'</b><br>';
+				if(isset($freigabeamum[$j+7*$i]))
+				{	
+					$content.='<img src="../../../skin/images/person.gif" alt="freigegeben" title="Freigegeben durch '.$freigabevon[$j+7*$i].' am '.date("d-m-Y",strtotime($freigabeamum[$j+7*$i])).'"></td>'; 		
+				}
+				else 
+				{
+					$content.='<img src="../../../skin/images/person.gif" alt="freigegeben" title="Freigegeben durch '.$freigabevon[$j+7*$i].'"></td>'; 		
+				}
 			}
 		}
 		else 
