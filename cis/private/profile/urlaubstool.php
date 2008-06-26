@@ -545,7 +545,7 @@ for ($i=0;$i<6;$i++)
 				}
 				else 
 				{
-					$content.='<img src="../../../skin/images/person.gif" alt="freigegeben" title="Freigegeben durch '.$freigabevon[$j+7*$i].'"></td>'; 		
+					$content.='<img src="../../../skin/images/person.gif" alt="freigegeben" title="Freigegeben durch: '.$freigabevon[$j+7*$i].'"></td>'; 		
 				}
 			}
 		}
