@@ -45,13 +45,14 @@ if(!$conn = pg_pconnect(CONN_STRING))
 $user = get_uid();
 //$user = 'if06b172';
 //$user = 'if06b144';
-
+$lektorenansicht = 0;
 if(check_lektor($user, $conn) and $_GET["uid"] != "")
 {
 	$rights = new benutzerberechtigung($conn);
 	$rights->getBerechtigungen($user); 
 	if(!check_lektor_lehreinheit($conn, $user, $_GET["lehreinheit_id"]) && !$rights->isBerechtigt('admin',0))
 		die("Sie haben keine Berechtigung für diese Lehreinheit");
+	$lektorenansicht = 1;
 	$user = $_GET["uid"];
 }
 
@@ -951,6 +952,48 @@ if (!isset($_GET["notenuebersicht"]))
 //notenübersicht
 else
 {
+	if ($lektorenansicht == 1)
+	{
+		$uid_arr = Array();
+		$vorname_arr = Array();
+		$nachname_arr = Array();
+				
+			$qry_stud_dd = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".$stsem."' and lehreinheit_id = '".$lehreinheit_id."'  ORDER BY nachname, vorname";			
+            if($result_stud_dd = pg_query($conn, $qry_stud_dd))
+			{
+				$i=1;
+				while($row_stud_dd = pg_fetch_object($result_stud_dd))
+				{
+					$uid_arr[] = $row_stud_dd->uid;
+					$vorname_arr[] = $row_stud_dd->vorname;
+					$nachname_arr[] = $row_stud_dd->nachname;				
+
+				}
+			}
+
+		echo "<br><hr><br>";	
+		echo "Bitte Wählen Sie eine/n Studierende/n aus: ";
+		$key = array_search($uid,$uid_arr);
+		$prev = $key-1;
+		$next = $key+1;
+		if ($key > 0)
+			echo "<a href='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid_arr[$prev]&stsem=$stsem&notenuebersicht=1'> &lt;&lt; </a>";	
+		echo "<SELECT name='stud_dd' onChange=\"MM_jumpMenu('self',this,0)\">\n";	
+		for ($j = 0; $j < count($uid_arr); $j++)
+		{						
+				if ($uid_arr[$j] == $uid)
+					$selected = " selected";
+				else
+					$selected = "";
+			
+				echo "<option value='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid_arr[$j]&stsem=$stsem&notenuebersicht=1'$selected>$vorname_arr[$j] $nachname_arr[$j]</option>";
+		}
+		echo "</select>";
+		if ($key < count($uid_arr)-1)
+			echo "<a href='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid_arr[$next]&stsem=$stsem&notenuebersicht=1'> &gt;&gt; </a>";		
+	
+		echo "<br><hr><br>";
+	}
 	
 	echo "<br><b><a href='studentenansicht.php?uid=$user&lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id'>Leistungsuebersicht</a> / Notenübersicht f&uuml;r $name</b><br><br>";	
 	echo "<table><tr><td>";
