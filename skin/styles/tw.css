@@ -439,6 +439,10 @@ img#layout
 }
 
 /*Farben*/
+.grey
+{
+	color: #999999;
+}
 #bgcolor0					
 {
 	background-color: #CC0000;
