@@ -62,6 +62,7 @@ $wbis='';
 $datensatz='';
 $t=getdate();
 $uid = get_uid();
+$taste=0;
 
 function getVorgesetzten($uid)
 {
@@ -164,7 +165,9 @@ if (isset($_GET['rechts_x']) || isset($_POST['rechts_x']))
 //Eintragung löschen
 if((isset($_GET['delete']) || isset($_POST['delete'])))
 {
-	$qry="DELETE FROM campus.tbl_zeitsperre WHERE zeitsperre_id=".$_GET['delete'];
+	//print_r($_GET['delete']);
+	//echo "<br>";
+	$qry="DELETE FROM campus.tbl_zeitsperre WHERE zeitsperre_id=".$_GET['delete']." AND (freigabevon!='' OR freigabevon IS NULL)";
 	$result = pg_query($conn, $qry);
 }
 
@@ -223,8 +226,8 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 	$vorgesetzter = getVorgesetzten($uid);
 	if($vorgesetzter!='')
 	{
-		$to = $vorgesetzter.'@'.DOMAIN;
-		//$to = 'ruhan@technikum-wien.at';
+		//$to = $vorgesetzter.'@'.DOMAIN;
+		$to = 'ruhan@technikum-wien.at';
 		$benutzer = new benutzer($conn);
 		$benutzer->load($uid);
 		$message = "Dies ist eine automatische Mail! \n".
@@ -235,7 +238,7 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 				   }
 				   $message.="\nSie können diesen unter folgender Adresse freigeben:\n".
 				   APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".date("Y", strtotime($akette[0]));
-		if(mail($to, 'Freigabeansuchen', $message,'From: vilesci@'.DOMAIN))
+		if(mail($to, 'Freigabeansuchen Urlaub', $message,'From: vilesci@'.DOMAIN))
 		{
 			$vgmail="<br><b>Freigabemail wurde an $to versandt!</b>";
 		}
@@ -522,9 +525,11 @@ for ($i=0;$i<6;$i++)
 		{
 			if($hgfarbe[$j+7*$i]=='lime')
 			{
-				$content.='<input type="hidden" name="delete" value="'.$datensatz[$j+7*$i].'">';
 				$content.='<b title="Vertretung: '.$vertretung_uid[$j+7*$i].' - erreichbar: '.$erreichbarkeit_kurzbz[$j+7*$i].'">'.$tage[$j+7*$i].'</b><br>';
-				$content.='<INPUT  type="image" src="../../../skin/images/DeleteIcon.png" alt="loeschen" title="Eintragung löschen" onclick="return conf_del()">';
+				//$content.='<INPUT  type="image" src="../../../skin/images/DeleteIcon.png" alt="loeschen" title="Eintragung löschen" onclick="return conf_del()"></td>';
+				$k=$j+7*$i;
+				$content.="<a href='$PHP_SELF?wmonat=$wmonat&wjahr=$wjahr&delete=$datensatz[$k]'>";
+				$content.='<img src="../../../skin/images/DeleteIcon.png" alt="loeschen" title="Eintragung löschen"></a></td>';
 			}
 			elseif($hgfarbe[$j+7*$i]=='white') 
 			{
