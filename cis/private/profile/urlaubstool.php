@@ -76,38 +76,43 @@ function getVorgesetzten($uid)
 	return (isset($row->vorgesetzter)?$row->vorgesetzter:'');
 }
 
-
 for($i=0;$i<6;$i++)
 {
 	$jahre[$i]="$t[year]"+($i-1);
 }
 
 if (isset($_GET['wtag']) || isset($_POST['wtag']))
+{
 	$wtag=(isset($_GET['wtag'])?$_GET['wtag']:$_POST['wtag']);
+}
 else 
+{
 	$wtag=date("d.m.Y");
-
+}
 if (isset($_GET['wmonat']) || isset($_POST['wmonat']))
+{
 	$wmonat=(isset($_GET['wmonat'])?$_GET['wmonat']:$_POST['wmonat']);
+}
 else
 {
 	$wmonat="$t[mon]"-1;
 }
-
 if (isset($_GET['wjahr']) || isset($_POST['wjahr']))
+{
 	$wjahr=(isset($_GET['wjahr'])?$_GET['wjahr']:$_POST['wjahr']);
+}
 else
 {
 	$wjahr=1;
 }
-
 if (isset($_GET['kastl']) || isset($_POST['kastl']))
+{
 	$kastl=(isset($_GET['kastl'])?$_GET['kastl']:$_POST['kastl']);
+}
 else
 {
 	$kastl=0;
 }
-
 if (isset($_GET['hgfarbe']))
 {
 	$hgfarbe=explode(",",$_GET['hgfarbe']);
@@ -124,7 +129,6 @@ else
 		}
 	}	
 }
-
 if (isset($_GET['links_x']) || isset($_POST['links_x']))
 {
 	if ($wmonat==0)
@@ -160,7 +164,6 @@ if (isset($_GET['rechts_x']) || isset($_POST['rechts_x']))
 //Eintragung löschen
 if((isset($_GET['delete']) || isset($_POST['delete'])))
 {
-	//echo "delete".$_GET['delete'];
 	$qry="DELETE FROM campus.tbl_zeitsperre WHERE zeitsperre_id=".$_GET['delete'];
 	$result = pg_query($conn, $qry);
 }
@@ -216,6 +219,7 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 		}
 		$result = pg_query($conn, $qryins);
 	}
+	//Mail an Vorgesetzten
 	$vorgesetzter = getVorgesetzten($uid);
 	if($vorgesetzter!='')
 	{
@@ -353,7 +357,6 @@ function checkval()
 <style type="text/css">
 a:link { text-decoration:none; font-weight:bold; color:blue; }
 a:visited { text-decoration:none; font-weight:bold; color:blue; }
-
 </style>
 <title>Urlaubstool</title>
 </head>
@@ -522,7 +525,6 @@ for ($i=0;$i<6;$i++)
 				$content.='<input type="hidden" name="delete" value="'.$datensatz[$j+7*$i].'">';
 				$content.='<b title="Vertretung: '.$vertretung_uid[$j+7*$i].' - erreichbar: '.$erreichbarkeit_kurzbz[$j+7*$i].'">'.$tage[$j+7*$i].'</b><br>';
 				$content.='<INPUT  type="image" src="../../../skin/images/DeleteIcon.png" alt="loeschen" title="Eintragung löschen" onclick="return conf_del()">';
-				//name="delete" value="'.$datensatz[$j+7*$i].'"
 			}
 			elseif($hgfarbe[$j+7*$i]=='white') 
 			{
