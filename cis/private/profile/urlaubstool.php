@@ -226,8 +226,8 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 	$vorgesetzter = getVorgesetzten($uid);
 	if($vorgesetzter!='')
 	{
-		//$to = $vorgesetzter.'@'.DOMAIN;
-		$to = 'ruhan@technikum-wien.at';
+		$to = $vorgesetzter.'@'.DOMAIN;
+		//$to = 'ruhan@technikum-wien.at';
 		$benutzer = new benutzer($conn);
 		$benutzer->load($uid);
 		$message = "Dies ist eine automatische Mail! \n".
