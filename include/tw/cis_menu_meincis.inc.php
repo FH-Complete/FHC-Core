@@ -123,6 +123,14 @@
 				<tr>
 					<td class="tdwidth10" nowrap>&nbsp;</td>
 				    <td class='tdwrap'>
+				    	<a href="profile/urlaubstool.php" class="Item" target="content">
+				    		<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Urlaubstool
+				    	</a>
+				    </td>
+				</tr>
+				<tr>
+					<td class="tdwidth10" nowrap>&nbsp;</td>
+				    <td class='tdwrap'>
 				    	<a href="profile/zeitsperre_resturlaub.php" class="Item" target="content">
 				    		<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Zeitsperre
 				    	</a>
@@ -193,7 +201,7 @@
 				    </td>
 				</tr>
 				<tr>
-          			<td class="tdwidth10" nowrap>&nbsp;</td>
+          					<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td nowrap>
 		  			<table class="tabcontent" id="Zeitsperren" style="display: none;">
 					<tr>
