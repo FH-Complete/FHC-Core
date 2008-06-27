@@ -43,6 +43,7 @@ class mitarbeiter extends benutzer
 	var $stundensatz;
 	var $anmerkung;
 	var $bismelden;
+	var $vorgesetzte=array();
 
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional einen Mitarbeiter
@@ -61,7 +62,7 @@ class mitarbeiter extends benutzer
 				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 			else
 				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-	
+
 			if(!pg_query($conn,$qry))
 			{
 				$this->errormsg= "Encoding konnte nicht gesetzt werden\n";
@@ -96,7 +97,7 @@ class mitarbeiter extends benutzer
 				$this->anmerkung = $row->anmerkung;
 				$this->ext_id_mitarbeiter = $row->ext_id;
 				$this->bismelden = ($row->bismelden=='t'?true:false);
-				
+
 				$this->urlaubstageprojahr = $row->urlaubstageprojahr;
 				$this->resturlaubstage = $row->resturlaubstage;
 				return true;
@@ -186,10 +187,10 @@ class mitarbeiter extends benutzer
 			return false;
 
 		pg_query($this->conn,'BEGIN;');
-		
+
 		if($new==null)
 			$new = $this->new;
-			
+
 		if($savebenutzer)
 		{
 			//Basisdaten speichern
@@ -198,7 +199,7 @@ class mitarbeiter extends benutzer
 				pg_query($this->conn,'ROLLBACK;');
 				return false;
 			}
-		}		
+		}
 
 		if($new)
 		{
@@ -214,20 +215,20 @@ class mitarbeiter extends benutzer
 						{
 							$personalnummer = $row->id;
 						}
-						else 
+						else
 						{
 							$this->errormsg = 'Fehler beim Ermitteln der Personalnummer';
 							return false;
 						}
 					}
-					else 
+					else
 					{
 						$this->errormsg = 'Fehler beim Ermitteln der Personalnummer';
 						return false;
 					}
-					
+
 					//Da die Personalnummer auch direkt uebergeben werden kann, ist es moeglich, dass die Personalnummer
-					//aus dem Serial schon vergeben ist. Deshalb wird zur sicherheit nochmal ueberprueft ob die Nr 
+					//aus dem Serial schon vergeben ist. Deshalb wird zur sicherheit nochmal ueberprueft ob die Nr
 					//noch frei ist.
 					$qry = "SELECT personalnummer FROM public.tbl_mitarbeiter WHERE personalnummer='$personalnummer'";
 					if($result = pg_query($this->conn, $qry))
@@ -235,10 +236,10 @@ class mitarbeiter extends benutzer
 						if(pg_num_rows($result)==0)
 							$this->personalnummer = $personalnummer;
 					}
-					
+
 				} while($this->personalnummer=='');
 			}
-			else 
+			else
 			{
 				//Pruefen ob Personalnummer eine gueltige Zahl ist
 				if(!is_numeric($this->personalnummer))
@@ -246,7 +247,7 @@ class mitarbeiter extends benutzer
 					$this->errormsg = 'Personalnummer muss eine gueltige Zahl sein';
 					return false;
 				}
-				
+
 				//Preufen ob die Personalnummer schon vergeben ist
 				$qry = "SELECT personalnummer FROM public.tbl_mitarbeiter WHERE personalnummer='$this->personalnummer'";
 				if($result = pg_query($this->conn, $qry))
@@ -323,7 +324,7 @@ class mitarbeiter extends benutzer
 		$sql_query='SELECT DISTINCT campus.vw_mitarbeiter.* FROM campus.vw_mitarbeiter
 					LEFT OUTER JOIN public.tbl_benutzerfunktion USING (uid)
 					WHERE TRUE';
-		
+
 		if (!is_null($lektor))
 		{
 			$sql_query.=' AND';
@@ -400,7 +401,7 @@ class mitarbeiter extends benutzer
 				$sql_query.=' NOT';
 			$sql_query.=' lektor';
 		}
-		
+
 		if ($fixangestellt!=null)
 		{
 			$sql_query.=' AND';
@@ -519,7 +520,7 @@ class mitarbeiter extends benutzer
 		}
 		return $result;
 	}
-	
+
 	// ******************************************
 	// * Laedt alle Mitarbeiter einer Lehreinheit
 	// * @param lehreinheit_id
@@ -532,16 +533,16 @@ class mitarbeiter extends benutzer
 			$this->errormsg = 'Lehreinheit_id ist ungueltig';
 			return false;
 		}
-		
-		$qry = "SELECT uid, vorname, vornamen, nachname, titelpre, titelpost, kurzbz FROM lehre.tbl_lehreinheitmitarbeiter JOIN campus.vw_mitarbeiter ON(mitarbeiter_uid=uid) 
+
+		$qry = "SELECT uid, vorname, vornamen, nachname, titelpre, titelpost, kurzbz FROM lehre.tbl_lehreinheitmitarbeiter JOIN campus.vw_mitarbeiter ON(mitarbeiter_uid=uid)
 				WHERE lehreinheit_id='$lehreinheit_id'";
-		
+
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
 			{
 				$obj = new mitarbeiter($this->conn, null, null);
-				
+
 				$obj->uid = $row->uid;
 				$obj->vorname = $row->vorname;
 				$obj->nachname = $row->nachname;
@@ -549,7 +550,7 @@ class mitarbeiter extends benutzer
 				$obj->titelpost = $row->titelpost;
 				$obj->kurzbz = $row->kurzbz;
 				$obj->vornamen = $row->vornamen;
-				
+
 				$this->result[] = $obj;
 			}
 			return true;
@@ -560,7 +561,7 @@ class mitarbeiter extends benutzer
 			return false;
 		}
 	}
-	
+
 	// *************************************************
 	// * Laedt alle Mitarbeiter einer Lehrveranstaltung
 	// * @param lehrveranstaltung_id
@@ -573,16 +574,16 @@ class mitarbeiter extends benutzer
 			$this->errormsg = 'Lehrveranstaltung_id ist ungueltig';
 			return false;
 		}
-		
+
 		$qry = "SELECT uid, vorname, vornamen, nachname, titelpre, titelpost, kurzbz FROM lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter, lehre.tbl_lehreinheit
 				WHERE lehrveranstaltung_id='$lehrveranstaltung_id' AND mitarbeiter_uid=uid AND tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id";
-		
+
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
 			{
 				$obj = new mitarbeiter($this->conn, null, null);
-				
+
 				$obj->uid = $row->uid;
 				$obj->vorname = $row->vorname;
 				$obj->nachname = $row->nachname;
@@ -590,7 +591,7 @@ class mitarbeiter extends benutzer
 				$obj->titelpost = $row->titelpost;
 				$obj->kurzbz = $row->kurzbz;
 				$obj->vornamen = $row->vornamen;
-				
+
 				$this->result[] = $obj;
 			}
 			return true;
@@ -601,11 +602,11 @@ class mitarbeiter extends benutzer
 			return false;
 		}
 	}
-	
+
 	function getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $verwendung, $studiensemester_kurzbz)
 	{
 		$qry = "SELECT distinct on(mitarbeiter_uid) *, tbl_benutzer.aktiv as aktiv, tbl_mitarbeiter.insertamum, tbl_mitarbeiter.insertvon FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id)) LEFT JOIN public.tbl_benutzerfunktion USING(uid) LEFT JOIN campus.tbl_resturlaub USING(mitarbeiter_uid) WHERE true";
-		
+
 		if($fix=='true')
 			$qry .= " AND fixangestellt=true";
 		if($fix=='false')
@@ -634,7 +635,7 @@ class mitarbeiter extends benutzer
 			while($row = pg_fetch_object($result))
 			{
 				$obj = new mitarbeiter($this->conn, null, null);
-				
+
 				$obj->person_id = $row->person_id;
 				$obj->staatsbuergerschaft = $row->staatsbuergerschaft;
 				$obj->geburtsnation = $row->geburtsnation;
@@ -667,32 +668,32 @@ class mitarbeiter extends benutzer
 				$obj->ausbildungcode = $row->ausbildungcode;
 				$obj->ort_kurzbz = $row->ort_kurzbz;
 				$obj->standort_kurzbz = $row->standort_kurzbz;
-				$obj->anmerkung = $row->anmerkung;				
+				$obj->anmerkung = $row->anmerkung;
 				$obj->alias = $row->alias;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
-				
+
 				$obj->urlaubstageprojahr = $row->urlaubstageprojahr;
 				$obj->resturlaubstage = $row->resturlaubstage;
-				
+
 				$this->result[] = $obj;
 			}
 			return false;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
-	
+
 	// ****
 	// * Prueft ob die Kurzbz bereits existiert
 	// ****
 	function kurzbz_exists($kurzbz)
 	{
 		$qry = "SELECT * FROM public.tbl_mitarbeiter WHERE kurzbz='".addslashes($kurzbz)."'";
-		
+
 		if($result = pg_query($this->conn, $qry))
 		{
 			if(pg_num_rows($result)>0)
@@ -700,21 +701,21 @@ class mitarbeiter extends benutzer
 				$this->errormsg = '';
 				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = '';
 				return false;
 			}
-				
+
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler bei DatenbankAbfrage';
 			return false;
 		}
-		
+
 	}
-	
+
 	// *************************************
 	// * Laedt die Mitarbeiter deren
 	// * Nachname mit $filter beginnt
@@ -727,7 +728,7 @@ class mitarbeiter extends benutzer
 			while($row = pg_fetch_object($result))
 			{
 				$obj = new mitarbeiter($this->conn, null, null);
-				
+
 				$obj->uid = $row->uid;
 				$obj->vorname = $row->vorname;
 				$obj->nachname = $row->nachname;
@@ -735,7 +736,7 @@ class mitarbeiter extends benutzer
 				$obj->titelpost = $row->titelpost;
 				$obj->kurzbz = $row->kurzbz;
 				$obj->vornamen = $row->vornamen;
-				
+
 				$this->result[] = $obj;
 			}
 			return true;
@@ -746,26 +747,26 @@ class mitarbeiter extends benutzer
 			return false;
 		}
 	}
-	
+
 	function searchPersonal($filter)
 	{
-		$qry = "SELECT 
-					distinct on(mitarbeiter_uid) *, tbl_benutzer.aktiv as aktiv, tbl_mitarbeiter.insertamum, 
-					tbl_mitarbeiter.insertvon 
+		$qry = "SELECT
+					distinct on(mitarbeiter_uid) *, tbl_benutzer.aktiv as aktiv, tbl_mitarbeiter.insertamum,
+					tbl_mitarbeiter.insertvon
 				FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id))  LEFT JOIN campus.tbl_resturlaub USING(mitarbeiter_uid)
-				WHERE nachname ~* '".addslashes($filter)."' OR 
-				      vorname ~* '".addslashes($filter)."' OR 
+				WHERE nachname ~* '".addslashes($filter)."' OR
+				      vorname ~* '".addslashes($filter)."' OR
 				      uid ~* '".addslashes($filter)."'";
 		if(is_numeric($filter))
 			$qry.="OR personalnummer = '".addslashes($filter)."'";
-				
+
 		//echo $qry;
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
 			{
 				$obj = new mitarbeiter($this->conn, null, null);
-				
+
 				$obj->person_id = $row->person_id;
 				$obj->staatsbuergerschaft = $row->staatsbuergerschaft;
 				$obj->geburtsnation = $row->geburtsnation;
@@ -798,25 +799,25 @@ class mitarbeiter extends benutzer
 				$obj->ausbildungcode = $row->ausbildungcode;
 				$obj->ort_kurzbz = $row->ort_kurzbz;
 				$obj->standort_kurzbz = $row->standort_kurzbz;
-				$obj->anmerkung = $row->anmerkung;				
+				$obj->anmerkung = $row->anmerkung;
 				$obj->alias = $row->alias;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
-				
+
 				$obj->urlaubstageprojahr = $row->urlaubstageprojahr;
 				$obj->resturlaubstage = $row->resturlaubstage;
-				
+
 				$this->result[] = $obj;
 			}
 			return false;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * gibt array mit allen Mitarbeitern zurueck
 	 * @return array mit Mitarbeitern
@@ -826,9 +827,9 @@ class mitarbeiter extends benutzer
 		$sql_query="SELECT DISTINCT campus.vw_mitarbeiter.* FROM campus.vw_mitarbeiter
 					JOIN public.tbl_benutzerfunktion USING (uid)
 					WHERE funktion_kurzbz='Institut' AND fachbereich_kurzbz='$institut' ORDER BY nachname, vorname";
-		
+
 		if($erg=pg_query($this->conn, $sql_query))
-		{					
+		{
 			$num_rows=pg_numrows($erg);
 			$result=array();
 			for($i=0;$i<$num_rows;$i++)
@@ -865,11 +866,37 @@ class mitarbeiter extends benutzer
 			}
 			return $result;
 		}
-		else 
+		else
 		{
 			$this->errormsg=pg_errormessage($this->conn);
 			return false;
 		}
+	}
+
+	/**
+	 * gibt UID des Vorgesetzten zurueck
+	 * @return uid
+	 */
+	function getVorgesetzte($uid=null)
+	{
+		global $conn;
+		$return=false;
+		if (is_null($uid))
+			$uid=$this->uid;
+		// Suche in Instituten
+		$qry = "SELECT CASE WHEN fachbereich_kurzbz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND funktion_kurzbz='fbl' LIMIT 1)
+						    WHEN studiengang_kz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz=a.studiengang_kz AND funktion_kurzbz='stgl' LIMIT 1)
+						    ELSE ''
+					   END as vorgesetzter
+						FROM public.tbl_benutzerfunktion a WHERE funktion_kurzbz='Institut' AND uid='$uid'";
+		$result = pg_query($conn, $qry);
+		while($row = pg_fetch_object($result))
+		{
+			$this->vorgesetzte[]=$row->vorgesetzter;
+			$return=true;
+		}
+		if ($return)
+			return true;
 	}
 }
 ?>
