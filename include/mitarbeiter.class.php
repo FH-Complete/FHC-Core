@@ -895,6 +895,8 @@ class mitarbeiter extends benutzer
 			$this->vorgesetzte[]=$row->vorgesetzter;
 			$return=true;
 		}
+		if ($return)
+			return $return;
 		// Suche nach Assistenz
 		$qry = "SELECT CASE WHEN fachbereich_kurzbz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND funktion_kurzbz='fbl' LIMIT 1)
 								    WHEN studiengang_kz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz=a.studiengang_kz AND funktion_kurzbz='stgl' LIMIT 1)
