@@ -27,6 +27,7 @@
 	require_once('../../../include/resturlaub.class.php');
 	require_once('../../../include/person.class.php');
 	require_once('../../../include/benutzer.class.php');
+	require_once('../../../include/mitarbeiter.class.php');
 
 	//DB Verbindung herstellen
 	if (!$conn = @pg_pconnect(CONN_STRING))
@@ -77,6 +78,7 @@ function getVorgesetzten($uid)
 	return (isset($row->vorgesetzter)?$row->vorgesetzter:'');
 }
 
+$ma= new mitarbeiter($conn);
 for($i=0;$i<6;$i++)
 {
 	$jahre[$i]="$t[year]"+($i-1);
@@ -223,10 +225,21 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 		$result = pg_query($conn, $qryins);
 	}
 	//Mail an Vorgesetzten
-	$vorgesetzter = getVorgesetzten($uid);
-	if($vorgesetzter!='')
+	$vorgesetzter = $ma->getVorgesetzte($uid);
+	if($vorgesetzter)
 	{
-		$to = $vorgesetzter.'@'.DOMAIN;
+		$to='';
+		foreach($ma->vorgesetzte as $vg)
+		{
+			if($to!='')
+			{
+				$to.=', '.$vg.'@'.DOMAIN;
+			}
+			else 
+			{
+				$to.=$vg.'@'.DOMAIN;
+			}
+		}
 		//$to = 'ruhan@technikum-wien.at';
 		$benutzer = new benutzer($conn);
 		$benutzer->load($uid);
@@ -332,6 +345,7 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 }
 
 $PHP_SELF = $_SERVER['PHP_SELF'];
+
 $datum_obj = new datum();
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -365,7 +379,6 @@ a:visited { text-decoration:none; font-weight:bold; color:blue; }
 </head>
 <body>
 <?php
-	//alert("Ich bin auf Tag " + kastl);
 	echo "<H1>Urlaubstool (".$uid.")</H1>";
 	//Anzeige Resturlaubsberechnung
 	echo '<table width="100%">';
@@ -410,19 +423,19 @@ a:visited { text-decoration:none; font-weight:bold; color:blue; }
 	if($gebuchterurlaub=='')
 		$gebuchterurlaub=0;
 
-$content_resturlaub.="<table><tr><td><h3>Urlaub im Gesch&auml;ftsjahr $geschaeftsjahr</h3></td><td></td><td><a href='../../cisdocs/AblaufUrlaubserfassung.pdf'> [AblaufUrlaubserfassung.pdf] </a></td></tr>";
-$content_resturlaub.="<tr><td nowrap>Anspruch</td><td align='right'  nowrap>$anspruch Tage</td><td class='grey'>&nbsp;&nbsp;&nbsp( j&auml;hrlich )</td></tr>";
-$content_resturlaub.="<tr><td nowrap>+ Resturlaub</td><td align='right'  nowrap>$resturlaubstage Tage</td><td class='grey'>&nbsp;&nbsp;&nbsp;( Stichtag: $datum_beginn )</td></tr>";
-$content_resturlaub.="<tr><td nowrap>- aktuell gebuchter Urlaub&nbsp;</td><td align='right'  nowrap>$gebuchterurlaub Tage</td><td class='grey'>&nbsp;&nbsp;&nbsp;( $datum_beginn - $datum_ende )</td></tr>";
-$content_resturlaub.="<tr><td style='border-top: 1px solid black;'  nowrap>aktueller Stand</td><td style='border-top: 1px solid black;' align='right' nowrap>".($anspruch+$resturlaubstage-$gebuchterurlaub)." Tage</td><td class='grey'>&nbsp;&nbsp;&nbsp;( Stichtag: $datum_ende )</td></tr>";
-$content_resturlaub .="<tr></tr><tr><td><button type='button' name='hilfe' value='Hilfe' onclick='alert(\"Anspruch: Anzahl der Urlaubstage, auf die in diesem Geschäftsjahr (1.9. bis 31.8) ein Anrecht ensteht. \\nResturlaub: Anzahl der Urlaubstage, aus vergangenen Geschäftsjahren, die noch nicht verbraucht wurden. \\naktuell gebuchter Urlaub: Anzahl aller eingetragenen Urlaubstage. \\nAchtung: Als Urlaubstag gelten ALLE Tage zwischen von-Datum und bis-Datum d.h. auch alle Wochenenden, Feiertage und arbeitsfreie Tage. Beispiel: Ein Kurzurlaub beginnt mit einem Donnerstag und endet am darauffolgenden Dienstag, so wird zuerst eine Eintragung mit dem Datum des Donnerstags im von-Feld und dem Datum des letzten Urlaubstag vor dem Wochenende, meistens der Freitag, eingegeben. Danach wird eine Eintagung des zweiten Teils, von Montag bis Dienstag vorgenommen.\\naktueller Stand: Die zur Zeit noch verfügbaren Urlaubstage.\");'>Hilfe</button></td></tr>";
-$content_resturlaub .='<tr><td></td></tr>';
+$content_resturlaub.="<table><tr><td   nowrap><h3>Urlaub im Gesch&auml;ftsjahr $geschaeftsjahr</h3></td><td></td><td><a href='../../cisdocs/AblaufUrlaubserfassung.pdf'> [AblaufUrlaubserfassung.pdf] </a></td></tr>";
+$content_resturlaub.="<tr><td nowrap>Anspruch</td><td align='right'  nowrap>$anspruch Tage</td><td class='grey'   nowrap>&nbsp;&nbsp;&nbsp( j&auml;hrlich )</td></tr>";
+$content_resturlaub.="<tr><td nowrap>+ Resturlaub</td><td align='right'  nowrap>$resturlaubstage Tage</td><td class='grey'   nowrap>&nbsp;&nbsp;&nbsp;( Stichtag: $datum_beginn )</td>";
+$content_resturlaub.="<tr><td nowrap>- aktuell gebuchter Urlaub&nbsp;</td><td align='right'  nowrap>$gebuchterurlaub Tage</td><td class='grey'  nowrap>&nbsp;&nbsp;&nbsp;( $datum_beginn - $datum_ende )</td>";
+$content_resturlaub .="<td><button type='button' name='hilfe' value='Hilfe' onclick='alert(\"Anspruch: Anzahl der Urlaubstage, auf die in diesem Geschäftsjahr (1.9. bis 31.8) ein Anrecht ensteht. \\nResturlaub: Anzahl der Urlaubstage, aus vergangenen Geschäftsjahren, die noch nicht verbraucht wurden. \\naktuell gebuchter Urlaub: Anzahl aller eingetragenen Urlaubstage. \\nAchtung: Als Urlaubstag gelten ALLE Tage zwischen von-Datum und bis-Datum d.h. auch alle Wochenenden, Feiertage und arbeitsfreie Tage. Beispiel: Ein Kurzurlaub beginnt mit einem Donnerstag und endet am darauffolgenden Dienstag, so wird zuerst eine Eintragung mit dem Datum des Donnerstags im von-Feld und dem Datum des letzten Urlaubstag vor dem Wochenende, meistens der Freitag, eingegeben. Danach wird eine Eintagung des zweiten Teils, von Montag bis Dienstag vorgenommen.\\naktueller Stand: Die zur Zeit noch verfügbaren Urlaubstage.\");'>Hilfe</button></td></tr>";
+$content_resturlaub.="<tr><td style='border-top: 1px solid black;'  nowrap>aktueller Stand</td><td style='border-top: 1px solid black;' align='right' nowrap>".($anspruch+$resturlaubstage-$gebuchterurlaub)." Tage</td><td class='grey'  nowrap>&nbsp;&nbsp;&nbsp;( Stichtag: $datum_ende )</td></tr>";
 $content_resturlaub.="</table>";
 
 //Formular Auswahl Monat und Jahr für Kalender
 echo '<table width="95%" align="center">';
-echo "<td class='tdvertical' align='center' >$content_resturlaub</td>";
-echo '</td></tr><tr height=5></tr>';
+echo "<td class='tdvertical' align='left' colspan='2'>$content_resturlaub</td>";
+echo '</td></tr>';
+//echo '<tr height=5></tr>';
 echo '<tr><td>';
 $content= '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">';
 $content.='<INPUT name="links" type="image" src="../../../skin/images/left.gif" alt="links">';
@@ -579,7 +592,7 @@ for ($i=0;$i<6;$i++)
 }
 $content.='</table></form>';
 echo $content;
-echo "<b style='font-family:Arial,sans-serif; font-size:18px; color:red'>".$vgmail."</b>";
+echo "<b style='font-family:Arial,sans-serif; font-size:12px; color:red'>".$vgmail."</b>";
 ?>
 </body>
 </html>
