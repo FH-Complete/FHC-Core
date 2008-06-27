@@ -31,7 +31,7 @@
 	//DB Verbindung herstellen
 	if (!$conn = @pg_pconnect(CONN_STRING))
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-		
+
 $content_resturlaub = '';
 $content = '';
 $resturlaubstage = '0';
@@ -67,7 +67,7 @@ $taste=0;
 function getVorgesetzten($uid)
 {
 	global $conn;
-	$qry = "SELECT CASE WHEN fachbereich_kurzbz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND funktion_kurzbz='fbl' LIMIT 1) 
+	$qry = "SELECT CASE WHEN fachbereich_kurzbz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND funktion_kurzbz='fbl' LIMIT 1)
 					    WHEN studiengang_kz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz=a.studiengang_kz AND funktion_kurzbz='stgl' LIMIT 1)
 					    ELSE ''
 				   END as vorgesetzter
@@ -86,7 +86,7 @@ if (isset($_GET['wtag']) || isset($_POST['wtag']))
 {
 	$wtag=(isset($_GET['wtag'])?$_GET['wtag']:$_POST['wtag']);
 }
-else 
+else
 {
 	$wtag=date("d.m.Y");
 }
@@ -120,15 +120,15 @@ if (isset($_GET['hgfarbe']))
 }
 else
 {
-	
+
 	if (!isset($_GET['spmonat']))
 	{
 		for($i=0;$i<44;$i++)
-		{	
+		{
 			if(!isset($hgfarbe[$i]) || $hgfarbe[$i]!='lime')
 				$hgfarbe[$i]='white';
 		}
-	}	
+	}
 }
 if (isset($_GET['links_x']) || isset($_POST['links_x']))
 {
@@ -138,9 +138,9 @@ if (isset($_GET['links_x']) || isset($_POST['links_x']))
 		{
 			$wmonat=11;
 			$wjahr=$wjahr-1;
-		}	
+		}
 	}
-	else 
+	else
 	{
 		$wmonat=$wmonat-1;
 		$wjahr=$wjahr;
@@ -154,9 +154,9 @@ if (isset($_GET['rechts_x']) || isset($_POST['rechts_x']))
 		{
 			$wmonat=0;
 			$wjahr=$wjahr+1;
-		}	
+		}
 	}
-	else 
+	else
 	{
 		$wmonat=$wmonat+1;
 		$wjahr=$wjahr;
@@ -184,7 +184,7 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 	$akette[0]=date("Y-m-d",strtotime($wtag[0]));
 	$ekette[0]=date("Y-m-d",strtotime($wtag[0]));
 	for($i=1,$j=0;$i<count($wtag);$i++)
-	{	
+	{
 		//ketten bilden
 		if(date("Y-m-d",strtotime($wtag[$i]))==date("Y-m-d",strtotime("+1 Day",strtotime($wtag[$i-1]))))
 		{
@@ -196,12 +196,12 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 			$akette[$j]=date("Y-m-d",strtotime($wtag[$i]));
 			$ekette[$j]=date("Y-m-d",strtotime($wtag[$i]));
 		}
-		
+
 	}
 	//print_r($akette);
 	//print_r($ekette);
 	FOR($i=0;$i<count($akette);$i++)
-	{	
+	{
 		if($vertretung!='')
 		{
 			$qryins="INSERT INTO campus.tbl_zeitsperre (
@@ -211,7 +211,7 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 				NULL,'".date("Y-m-d", strtotime($ekette[$i]))."',NULL,'".$vertretung."',NULL,NULL,now(),'".$uid."','".$erreichbar."',NULL,NULL
 				)";
 		}
-		else 
+		else
 		{
 			$qryins="INSERT INTO campus.tbl_zeitsperre (
 				zeitsperretyp_kurzbz,mitarbeiter_uid,bezeichnung,vondatum,vonstunde,bisdatum,bisstunde,vertretung_uid,
@@ -242,16 +242,16 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 		{
 			$vgmail="<br><b>Freigabemail wurde an $to versandt!</b>";
 		}
-		else 
+		else
 		{
 			$vgmail="<br><span class='error'>Fehler beim Senden des Freigabemails an $to!</span>";
 		}
 	}
-	else 
+	else
 	{
 		$vgmail="<br><span class='error'>Es konnte keine Freigabemail versendet werden, da kein Vorgesetzter eingetragen ist!</span>";
 	}
-	
+
 }
 
 //Eintragungen laden
@@ -287,14 +287,14 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 			//echo "-".$row->bisdatum;
 			for($i=$wotag;$i<$mende+$wotag;$i++)
 			{
-				if(date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $i-$wotag+1, $jahre[$wjahr]))>=$row->vondatum 
+				if(date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $i-$wotag+1, $jahre[$wjahr]))>=$row->vondatum
 				&& date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $i-$wotag+1, $jahre[$wjahr]))<=$row->bisdatum)
 				{
 					if($row->freigabevon!='' || $row->bisdatum<date("Y-m-d",time()))
 					{
 						$hgfarbe[$i]='green';
 					}
-					else 
+					else
 					{
 						$hgfarbe[$i]='lime';
 					}
@@ -304,11 +304,11 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 					$vertretung_uid[$i]=$row->vertretung_uid;
 					$erreichbarkeit_kurzbz[$i]=$row->erreichbarkeit_kurzbz;
 				}
-				else 
+				else
 				{
 					if($hgfarbe[$i]!='lime' && $hgfarbe[$i]!='green')
 					{
-						
+
 						$hgfarbe[$i]='white';
 						$datensatz[$i]=0;
 						$freigabevon[$i]=$row->freigabevon;
@@ -365,37 +365,58 @@ a:visited { text-decoration:none; font-weight:bold; color:blue; }
 </head>
 <body>
 <?php
-//alert("Ich bin auf Tag " + kastl);
-echo "<H1>Urlaubstool (".$uid.")</H1>";
-//Anzeige Resturlaubsberechnung
-echo '<table width="100%">';
-echo '<tr><td colspan=2>';
-$resturlaub = new resturlaub($conn);
+	//alert("Ich bin auf Tag " + kastl);
+	echo "<H1>Urlaubstool (".$uid.")</H1>";
+	//Anzeige Resturlaubsberechnung
+	echo '<table width="100%">';
+	echo '<tr><td colspan=2>';
+	$resturlaub = new resturlaub($conn);
 
-if($resturlaub->load($uid))
-{
-	$resturlaubstage = $resturlaub->resturlaubstage;
-	$mehrarbeitsstunden = $resturlaub->mehrarbeitsstunden;
-	$anspruch = $resturlaub->urlaubstageprojahr;
-}
-$content_resturlaub.="<table><tr><td align='left' nowrap>Anspruch</td><td align='right' nowrap>$anspruch Tage</td></tr>";
-$content_resturlaub.="<tr><td align='left' nowrap>+ Resturlaub</td><td align='right' nowrap>$resturlaubstage Tage</td></tr>";
-$gebuchterurlaub=0;
-//Urlaub berechnen
-$qry = "SELECT sum(bisdatum-vondatum+1) as anzahltage FROM campus.tbl_zeitsperre 
-			WHERE zeitsperretyp_kurzbz='Urlaub' AND mitarbeiter_uid='$uid' AND
-			(
-				(date_part('month', vondatum)>9 AND date_part('year', vondatum)='".(date('Y')-1)."') OR
-				(date_part('month', vondatum)<9 AND date_part('year', vondatum)='".date('Y')."')
-			)";	
-$result = pg_query($conn, $qry);
-$row = pg_fetch_object($result);
-$gebuchterurlaub = $row->anzahltage;
-if($gebuchterurlaub=='')
+	if($resturlaub->load($uid))
+	{
+		$resturlaubstage = $resturlaub->resturlaubstage;
+		$mehrarbeitsstunden = $resturlaub->mehrarbeitsstunden;
+		$anspruch = $resturlaub->urlaubstageprojahr;
+	}
+
+	$jahr=date('Y');
+	if (date('M')>8)
+	{
+		$datum_beginn_iso=$jahr.'-09-01';
+		$datum_beginn='1.Sept.'.$jahr;
+		$datum_ende_iso=($jahr+1).'-08-31';
+		$datum_ende='31.Aug.'.($jahr+1);
+		$geschaeftsjahr=$jahr.'/'.($jahr+1);
+	}
+	else
+	{
+		$datum_beginn_iso=($jahr-1).'-09-01';
+		$datum_beginn='1.Sept.'.($jahr-1);
+		$datum_ende_iso=$jahr.'-08-31';
+		$datum_ende='31.Aug.'.$jahr;
+		$geschaeftsjahr=($jahr-1).'/'.$jahr;
+	}
+
+	//Urlaub berechnen
 	$gebuchterurlaub=0;
-$content_resturlaub.="<tr><td align='left' nowrap>- aktuell gebuchter Urlaub&nbsp;</td><td align='right' nowrap>$gebuchterurlaub Tage</td>";
-$content_resturlaub .="<td align='center' width='100' nowrap><button type='button' name='hilfe' value='Hilfe' onclick='alert(\"Anspruch: Anzahl der Urlaubstage, auf die in diesem Geschäftsjahr (1.9. bis 31.8) ein Anrecht ensteht. \\nResturlaub: Anzahl der Urlaubstage, aus vergangenen Geschäftsjahren, die noch nicht verbraucht wurden. \\naktuell gebuchter Urlaub: Anzahl aller eingetragenen Urlaubstage. \\nAchtung: Als Urlaubstag gelten ALLE Tage zwischen von-Datum und bis-Datum d.h. auch alle Wochenenden, Feiertage und arbeitsfreie Tage. Beispiel: Ein Kurzurlaub beginnt mit einem Donnerstag und endet am darauffolgenden Dienstag, so wird zuerst eine Eintragung mit dem Datum des Donnerstags im von-Feld und dem Datum des letzten Urlaubstag vor dem Wochenende, meistens der Freitag, eingegeben. Danach wird eine Eintagung des zweiten Teils, von Montag bis Dienstag vorgenommen.\\naktueller Stand: Die zur Zeit noch verfügbaren Urlaubstage.\");'>Hilfe</button></td></tr>";
-$content_resturlaub.="<tr><td style='border-top: 1px solid black;' align='left' nowrap>aktueller Stand</td><td style='border-top: 1px solid black;' align='right' nowrap>".($anspruch+$resturlaubstage-$gebuchterurlaub)." Tage</td></tr>";
+	$qry = "SELECT sum(bisdatum-vondatum+1) as anzahltage FROM campus.tbl_zeitsperre
+				WHERE zeitsperretyp_kurzbz='Urlaub' AND mitarbeiter_uid='$uid' AND
+				(
+					vondatum>='$datum_beginn_iso' AND bisdatum<='$datum_ende_iso'
+				)";
+	$result = pg_query($conn, $qry);
+	$row = pg_fetch_object($result);
+	$gebuchterurlaub = $row->anzahltage;
+	if($gebuchterurlaub=='')
+		$gebuchterurlaub=0;
+
+$content_resturlaub.="<table><tr><td><h3>Urlaub im Gesch&auml;ftsjahr $geschaeftsjahr</h3></td><td></td><td><a href='../../cisdocs/AblaufUrlaubserfassung.pdf'> [AblaufUrlaubserfassung.pdf] </a></td></tr>";
+$content_resturlaub.="<tr><td nowrap>Anspruch</td><td align='right'  nowrap>$anspruch Tage</td><td class='grey'>&nbsp;&nbsp;&nbsp( j&auml;hrlich )</td></tr>";
+$content_resturlaub.="<tr><td nowrap>+ Resturlaub</td><td align='right'  nowrap>$resturlaubstage Tage</td><td class='grey'>&nbsp;&nbsp;&nbsp;( Stichtag: $datum_beginn )</td></tr>";
+$content_resturlaub.="<tr><td nowrap>- aktuell gebuchter Urlaub&nbsp;</td><td align='right'  nowrap>$gebuchterurlaub Tage</td><td class='grey'>&nbsp;&nbsp;&nbsp;( $datum_beginn - $datum_ende )</td></tr>";
+$content_resturlaub.="<tr><td style='border-top: 1px solid black;'  nowrap>aktueller Stand</td><td style='border-top: 1px solid black;' align='right' nowrap>".($anspruch+$resturlaubstage-$gebuchterurlaub)." Tage</td><td class='grey'>&nbsp;&nbsp;&nbsp;( Stichtag: $datum_ende )</td></tr>";
+$content_resturlaub .="<tr></tr><tr><td><button type='button' name='hilfe' value='Hilfe' onclick='alert(\"Anspruch: Anzahl der Urlaubstage, auf die in diesem Geschäftsjahr (1.9. bis 31.8) ein Anrecht ensteht. \\nResturlaub: Anzahl der Urlaubstage, aus vergangenen Geschäftsjahren, die noch nicht verbraucht wurden. \\naktuell gebuchter Urlaub: Anzahl aller eingetragenen Urlaubstage. \\nAchtung: Als Urlaubstag gelten ALLE Tage zwischen von-Datum und bis-Datum d.h. auch alle Wochenenden, Feiertage und arbeitsfreie Tage. Beispiel: Ein Kurzurlaub beginnt mit einem Donnerstag und endet am darauffolgenden Dienstag, so wird zuerst eine Eintragung mit dem Datum des Donnerstags im von-Feld und dem Datum des letzten Urlaubstag vor dem Wochenende, meistens der Freitag, eingegeben. Danach wird eine Eintagung des zweiten Teils, von Montag bis Dienstag vorgenommen.\\naktueller Stand: Die zur Zeit noch verfügbaren Urlaubstage.\");'>Hilfe</button></td></tr>";
+$content_resturlaub .='<tr><td></td></tr>';
 $content_resturlaub.="</table>";
 
 //Formular Auswahl Monat und Jahr für Kalender
@@ -412,7 +433,7 @@ for($i=0;$i<12;$i++)
 	{
 		$selected='selected';
 	}
-	else 
+	else
 	{
 		$selected='';
 	}
@@ -429,12 +450,12 @@ for($i=0;$i<5;$i++)
 	{
 		$selected='selected';
 	}
-	else 
+	else
 	{
 		$selected='';
 	}
 	$content.="<option value='$i' $selected>$jahre[$i]</option>";
-}	
+}
 $content.='</SELECT>';
 $content.="&nbsp;<INPUT type='submit' name='ok' value='OK'>";
 $content.='</td></form>';
@@ -453,7 +474,7 @@ if($result = pg_query($conn, $qry))
 		{
 			$content.= "<OPTION value='$row->uid' selected>$row->nachname $row->vorname ($row->uid)</OPTION>\n";
 		}
-		else 
+		else
 		{
 			$content.= "<OPTION value='$row->uid'>$row->nachname $row->vorname ($row->uid)</OPTION>\n";
 		}
@@ -474,7 +495,7 @@ if($result = pg_query($conn, $qry))
 		{
 			$content.= "<OPTION value='$row->erreichbarkeit_kurzbz' selected>$row->beschreibung</OPTION>\n";
 		}
-		else 
+		else
 		{
 			$content.= "<OPTION value='$row->erreichbarkeit_kurzbz'>$row->beschreibung</OPTION>\n";
 		}
@@ -483,7 +504,7 @@ if($result = pg_query($conn, $qry))
 $content.= '</SELECT>';
 $content.='</td>';
 
-//Tage 
+//Tage
 $mbeginn=mktime(0, 0, 0, ($wmonat+1) , 1, $jahre[$wjahr]);
 $ttt=getdate($mbeginn);
 $wotag="$ttt[wday]";
@@ -499,7 +520,7 @@ for($i=1;$i<43;$i++)
 	{
 		$tage[$i]='';
 	}
-	else 
+	else
 	{
 		$tage[$i]=$zaehl;
 		$zaehl++;
@@ -531,25 +552,25 @@ for ($i=0;$i<6;$i++)
 				$content.="<a href='$PHP_SELF?wmonat=$wmonat&wjahr=$wjahr&delete=$datensatz[$k]'>";
 				$content.='<img src="../../../skin/images/DeleteIcon.png" alt="loeschen" title="Eintragung löschen"></a></td>';
 			}
-			elseif($hgfarbe[$j+7*$i]=='white') 
+			elseif($hgfarbe[$j+7*$i]=='white')
 			{
 				$content.='<b>'.$tage[$j+7*$i].'</b><br>';
 				$content.='<input type="checkbox" name="wtag[]" value="'.date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $tage[$j+7*$i], $jahre[$wjahr])).'"></td>';
 			}
-			else 
+			else
 			{
 				$content.='<b title="Vertretung: '.$vertretung_uid[$j+7*$i].' - erreichbar: '.$erreichbarkeit_kurzbz[$j+7*$i].'">'.$tage[$j+7*$i].'</b><br>';
 				if(isset($freigabeamum[$j+7*$i]))
-				{	
-					$content.='<img src="../../../skin/images/person.gif" alt="freigegeben" title="Freigegeben durch '.$freigabevon[$j+7*$i].' am '.date("d-m-Y",strtotime($freigabeamum[$j+7*$i])).'"></td>'; 		
-				}
-				else 
 				{
-					$content.='<img src="../../../skin/images/person.gif" alt="freigegeben" title="Freigegeben durch: '.$freigabevon[$j+7*$i].'"></td>'; 		
+					$content.='<img src="../../../skin/images/person.gif" alt="freigegeben" title="Freigegeben durch '.$freigabevon[$j+7*$i].' am '.date("d-m-Y",strtotime($freigabeamum[$j+7*$i])).'"></td>';
+				}
+				else
+				{
+					$content.='<img src="../../../skin/images/person.gif" alt="freigegeben" title="Freigegeben durch: '.$freigabevon[$j+7*$i].'"></td>';
 				}
 			}
 		}
-		else 
+		else
 		{
 			$content.='<b>&nbsp;</b><br>';
 		}

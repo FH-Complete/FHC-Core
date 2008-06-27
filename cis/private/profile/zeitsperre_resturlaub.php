@@ -30,6 +30,7 @@
 	require_once('../../../include/resturlaub.class.php');
 	require_once('../../../include/person.class.php');
 	require_once('../../../include/benutzer.class.php');
+	require_once('../../../include/mitarbeiter.class.php');
 
 	$uid = get_uid();
 
@@ -42,6 +43,7 @@
 	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
 
 	$datum_obj = new datum();
+	$ma= new mitarbeiter($conn);
 
 	//Stundentabelleholen
 	if(! $result_stunde=pg_query($conn, "SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
@@ -120,18 +122,6 @@ function checkdatum()
 <!-- ************* ZEITSPERREN *****************-->
 
 <?php
-function getVorgesetzten($uid)
-{
-	global $conn;
-	$qry = "SELECT CASE WHEN fachbereich_kurzbz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND funktion_kurzbz='fbl' LIMIT 1)
-					    WHEN studiengang_kz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz=a.studiengang_kz AND funktion_kurzbz='stgl' LIMIT 1)
-					    ELSE ''
-				   END as vorgesetzter
-	FROM public.tbl_benutzerfunktion a WHERE funktion_kurzbz='Institut' AND uid='$uid'";
-	$result = pg_query($conn, $qry);
-	$row = pg_fetch_object($result);
-	return (isset($row->vorgesetzter)?$row->vorgesetzter:'');
-}
 
 //Zeitsperre Speichern
 if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_sperre'))
@@ -206,10 +196,12 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 				if($zeitsperre->new && $zeitsperre->zeitsperretyp_kurzbz=='Urlaub')
 				{
 					//Beim Anlegen von neuen Urlauben wird ein Mail an den Vorgesetzten versendet um diesen Freizugeben
-					$vorgesetzter = getVorgesetzten($uid);
-					if($vorgesetzter!='')
+					$vorgesetzter = $ma->getVorgesetzte($uid);
+					if($vorgesetzter)
 					{
-						$to = $vorgesetzter.'@'.DOMAIN;
+						$to='';
+						foreach($ma->vorgesetzte as $vg)
+							$to.=$vg.'@'.DOMAIN.',';
 						//$to = 'oesi@technikum-wien.at';
 						$benutzer = new benutzer($conn);
 						$benutzer->load($uid);
@@ -534,11 +526,12 @@ if(URLAUB_TOOLS)
 	$gebuchterurlaub = $row->anzahltage;
 	if($gebuchterurlaub=='')
 		$gebuchterurlaub=0;
-	$content_resturlaub.="<table><tr><td nowrap>Anspruch</td><td align='right'  nowrap>$anspruch Tage</td><td class='grey'>&nbsp;&nbsp;&nbsp( j&auml;hrlich )</td></tr>";
-	$content_resturlaub.="<tr><td nowrap>+ Resturlaub</td><td align='right'  nowrap>$resturlaubstage Tage</td><td class='grey'>&nbsp;&nbsp;&nbsp;( Stichtag: $datum_beginn )</td></tr>";
-	$content_resturlaub.="<tr><td nowrap>- aktuell gebuchter Urlaub&nbsp;</td><td align='right'  nowrap>$gebuchterurlaub Tage</td><td class='grey'>&nbsp;&nbsp;&nbsp;( $datum_beginn - $datum_ende )</td></tr>";
-	$content_resturlaub.="<tr><td style='border-top: 1px solid black;'  nowrap>aktueller Stand</td><td style='border-top: 1px solid black;' align='right' nowrap>".($anspruch+$resturlaubstage-$gebuchterurlaub)." Tage</td><td class='grey'>&nbsp;&nbsp;&nbsp;( Stichtag: $datum_ende )</td></tr>";
-	$content_resturlaub .="<tr><td><button type='button' name='hilfe' value='Hilfe' onclick='alert(\"Anspruch: Anzahl der Urlaubstage, auf die in diesem Geschäftsjahr (1.9. bis 31.8) ein Anrecht ensteht. \\nResturlaub: Anzahl der Urlaubstage, aus vergangenen Geschäftsjahren, die noch nicht verbraucht wurden. \\naktuell gebuchter Urlaub: Anzahl aller eingetragenen Urlaubstage. \\nAchtung: Als Urlaubstag gelten ALLE Tage zwischen von-Datum und bis-Datum d.h. auch alle Wochenenden, Feiertage und arbeitsfreie Tage. Beispiel: Ein Kurzurlaub beginnt mit einem Donnerstag und endet am darauffolgenden Dienstag, so wird zuerst eine Eintragung mit dem Datum des Donnerstags im von-Feld und dem Datum des letzten Urlaubstag vor dem Wochenende, meistens der Freitag, eingegeben. Danach wird eine Eintagung des zweiten Teils, von Montag bis Dienstag vorgenommen.\\naktueller Stand: Die zur Zeit noch verfügbaren Urlaubstage.\");'>Hilfe</button></td></tr>";
+	$content_resturlaub.="<table><tr><td nowrap>Anspruch</td><td align='right'  nowrap>$anspruch Tage</td><td nowrap class='grey'>&nbsp;&nbsp;&nbsp( j&auml;hrlich )</td></tr>";
+	$content_resturlaub.="<tr><td nowrap>+ Resturlaub</td><td align='right'  nowrap>$resturlaubstage Tage</td><td nowrap class='grey'>&nbsp;&nbsp;&nbsp;( Stichtag: $datum_beginn )</td></tr>";
+	$content_resturlaub.="<tr><td nowrap>- aktuell gebuchter Urlaub&nbsp;</td><td align='right'  nowrap>$gebuchterurlaub Tage</td><td nowrap class='grey'>&nbsp;&nbsp;&nbsp;( $datum_beginn - $datum_ende )</td></tr>";
+	$content_resturlaub.="<tr><td style='border-top: 1px solid black;'  nowrap>aktueller Stand</td><td style='border-top: 1px solid black;' align='right' nowrap>".($anspruch+$resturlaubstage-$gebuchterurlaub)." Tage</td><td nowrap class='grey'>&nbsp;&nbsp;&nbsp;( Stichtag: $datum_ende )</td></tr>";
+	$content_resturlaub .="<tr></tr><tr><td><a href='../../cisdocs/AblaufUrlaubserfassung.pdf'> [AblaufUrlaubserfassung.pdf] </a></td><td><button type='button' name='hilfe' value='Hilfe' onclick='alert(\"Anspruch: Anzahl der Urlaubstage, auf die in diesem Geschäftsjahr (1.9. bis 31.8) ein Anrecht ensteht. \\nResturlaub: Anzahl der Urlaubstage, aus vergangenen Geschäftsjahren, die noch nicht verbraucht wurden. \\naktuell gebuchter Urlaub: Anzahl aller eingetragenen Urlaubstage. \\nAchtung: Als Urlaubstag gelten ALLE Tage zwischen von-Datum und bis-Datum d.h. auch alle Wochenenden, Feiertage und arbeitsfreie Tage. Beispiel: Ein Kurzurlaub beginnt mit einem Donnerstag und endet am darauffolgenden Dienstag, so wird zuerst eine Eintragung mit dem Datum des Donnerstags im von-Feld und dem Datum des letzten Urlaubstag vor dem Wochenende, meistens der Freitag, eingegeben. Danach wird eine Eintagung des zweiten Teils, von Montag bis Dienstag vorgenommen.\\naktueller Stand: Die zur Zeit noch verfügbaren Urlaubstage.\");'>Hilfe</button></td></tr>";
+	$content_resturlaub .='<tr><td></td></tr>';
 	$content_resturlaub.="</table>";
 }
 echo '<table width="100%">';
