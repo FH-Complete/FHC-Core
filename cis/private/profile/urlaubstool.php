@@ -229,7 +229,7 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 	if($vorgesetzter)
 	{
 		$to='';
-		/*foreach($ma->vorgesetzte as $vg)
+		foreach($ma->vorgesetzte as $vg)
 		{
 			if($to!='')
 			{
@@ -239,8 +239,8 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 			{
 				$to.=$vg.'@'.DOMAIN;
 			}
-		}*/
-		$to = 'ruhan@technikum-wien.at';
+		}
+		//$to = 'ruhan@technikum-wien.at';
 		$benutzer = new benutzer($conn);
 		$benutzer->load($uid);
 		$message = "Dies ist eine automatische Mail! \n".
