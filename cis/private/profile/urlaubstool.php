@@ -278,8 +278,11 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 	{
 		$wotag=7;
 	}
-	$mendev=cal_days_in_month(CAL_GREGORIAN, ($wmonat), $jahre[$wjahr]);
 	$mende=cal_days_in_month(CAL_GREGORIAN, ($wmonat+1), $jahre[$wjahr]);
+	if($wmonat==0)
+		$mendev = cal_days_in_month(CAL_GREGORIAN, 12, $jahre[$wjahr]-1);
+	else
+		$mendev = cal_days_in_month(CAL_GREGORIAN, ($wmonat), $jahre[$wjahr]);
 	//$wvon=date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , 1, $jahre[$wjahr]));
 	//$wbis=date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $mende, $jahre[$wjahr]));
 	$ttt=getdate(mktime(0, 0, 0, ($wmonat+1) , $mende, $jahre[$wjahr]));
@@ -293,7 +296,7 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 	}
 	if($wmonat==11)
 	{
-		$wbis=date("Y-m-d",mktime(0, 0, 0, 1 , (7-($ttt['wday']==0?7:$ttt['wday'])), $jahre[$wjahr]));
+		$wbis=date("Y-m-d",mktime(0, 0, 0, 1 , (7-($ttt['wday']==0?7:$ttt['wday'])), $jahre[$wjahr]+1));
 	}
 	else 
 	{
@@ -306,15 +309,6 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 	{
 		while($row = pg_fetch_object($result))
 		{
-			/*for($i=0;$i<$wotag;$i++)
-			{
-				$hgfarbe[$i]='white';
-				$datensatz[$i]=0;
-				$freigabevon[$i]=$row->freigabevon;
-				$freigabeamum[$i]=$row->freigabeamum;
-				$vertretung_uid[$i]=$row->vertretung_uid;
-				$erreichbarkeit_kurzbz[$i]=$row->erreichbarkeit_kurzbz;
-			}*/
 			//echo " ".$row->vondatum;
 			//echo "-".$row->bisdatum;
 			for($i=1;$i<=$mende+($wotag-1)+(7-($ttt['wday']==0?7:$ttt['wday']));$i++)
@@ -544,8 +538,12 @@ if ($wotag==0)
 {
 	$wotag=7;
 }
-$mendev = cal_days_in_month(CAL_GREGORIAN, ($wmonat), $jahre[$wjahr]);
+
 $mende = cal_days_in_month(CAL_GREGORIAN, ($wmonat+1), $jahre[$wjahr]);
+if($wmonat==0)
+	$mendev = cal_days_in_month(CAL_GREGORIAN, 12, $jahre[$wjahr]-1);
+else
+	$mendev = cal_days_in_month(CAL_GREGORIAN, ($wmonat), $jahre[$wjahr]);
 $ttt=getdate(mktime(0, 0, 0, ($wmonat+1) , $mende, $jahre[$wjahr]));
 //echo "monatsende:".$mende;
 for($i=1;$i<43;$i++)
@@ -559,22 +557,22 @@ for($i=1;$i<43;$i++)
 	{
 		if($wmonat==0)
 		{
-			$tage[$i]=date("d.m.", mktime(0, 0, 0, 12 , $mendev+$i-($wotag-1), $jahre[$wjahr]));
+			$tage[$i]=date("d.m.Y", mktime(0, 0, 0, 12 , $mendev+$i-($wotag-1), $jahre[$wjahr]-1));
 		}
 		else 
 		{
-			$tage[$i]=date("d.m.", mktime(0, 0, 0, ($wmonat) , $mendev+$i-($wotag-1), $jahre[$wjahr]));
+			$tage[$i]=date("d.m.Y", mktime(0, 0, 0, ($wmonat) , $mendev+$i-($wotag-1), $jahre[$wjahr]));
 		}
 	}
 	elseif ($i>$mende && $i<=$mende+($wotag-1)+(7-($ttt['wday']==0?7:$ttt['wday'])))
 	{
 		if($wmonat==11)
 		{
-			$tage[$i]=date("d.m.", mktime(0, 0, 0, 1 , 1, $jahre[$wjahr+1]));
+			$tage[$i]=date("d.m.Y", mktime(0, 0, 0, 1 , $i-$mende-$wotag+1, $jahre[$wjahr+1]));
 		}
 		else 
 		{
-			$tage[$i]=date("d.m.", mktime(0, 0, 0, ($wmonat+2) , $i-$mende-$wotag+1, $jahre[$wjahr]));
+			$tage[$i]=date("d.m.Y", mktime(0, 0, 0, ($wmonat+2) , $i-$mende-$wotag+1, $jahre[$wjahr]));
 		}
 	}
 	else 
@@ -620,7 +618,7 @@ for ($i=0;$i<6;$i++)
 				$content.='<b>'.$tage[$j+7*$i].'</b><br>';
 				if(strlen(stristr($tage[$j+7*$i],"."))>0)
 				{
-					$content.='<input type="checkbox" name="wtag[]" value="'.date("Y-m-d",mktime(0, 0, 0, substr($tage[$j+7*$i],3,2) , substr($tage[$j+7*$i],0,2), $jahre[$wjahr])).'"></td>';
+					$content.='<input type="checkbox" name="wtag[]" value="'.date("Y-m-d",mktime(0, 0, 0, substr($tage[$j+7*$i],3,2) , substr($tage[$j+7*$i],0,2), substr($tage[$j+7*$i],6,4))).'"></td>';
 				}
 				else 
 				{
