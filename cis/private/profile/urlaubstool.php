@@ -229,7 +229,7 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 	if($vorgesetzter)
 	{
 		$to='';
-		foreach($ma->vorgesetzte as $vg)
+		/*foreach($ma->vorgesetzte as $vg)
 		{
 			if($to!='')
 			{
@@ -239,15 +239,15 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 			{
 				$to.=$vg.'@'.DOMAIN;
 			}
-		}
-		//$to = 'ruhan@technikum-wien.at';
+		}*/
+		$to = 'ruhan@technikum-wien.at';
 		$benutzer = new benutzer($conn);
 		$benutzer->load($uid);
 		$message = "Dies ist eine automatische Mail! \n".
 				   "$benutzer->nachname $benutzer->vorname hat neuen Urlaub eingetragen:\n";
 				   for($i=0;$i<count($akette);$i++)
 				   {
-				   	$message.="Von ".date("d-m-Y", strtotime($akette[$i]))." bis ".date("d-m-Y", strtotime($ekette[$i]))."\n";
+				   	$message.="Von ".date("d.m.Y", strtotime($akette[$i]))." bis ".date("d.m.Y", strtotime($ekette[$i]))."\n";
 				   }
 				   $message.="\nSie können diesen unter folgender Adresse freigeben:\n".
 				   APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".date("Y", strtotime($akette[0]));
@@ -278,16 +278,35 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 	{
 		$wotag=7;
 	}
+	$mendev=cal_days_in_month(CAL_GREGORIAN, ($wmonat), $jahre[$wjahr]);
 	$mende=cal_days_in_month(CAL_GREGORIAN, ($wmonat+1), $jahre[$wjahr]);
-	$wvon=date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , 1, $jahre[$wjahr]));
-	$wbis=date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $mende, $jahre[$wjahr]));
-	$qry="SELECT * FROM campus.tbl_zeitsperre WHERE zeitsperretyp_kurzbz='Urlaub' AND mitarbeiter_uid='".$uid."' AND (vondatum<='".$wbis."' AND bisdatum>='".$wvon."') ";
+	//$wvon=date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , 1, $jahre[$wjahr]));
+	//$wbis=date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $mende, $jahre[$wjahr]));
+	$ttt=getdate(mktime(0, 0, 0, ($wmonat+1) , $mende, $jahre[$wjahr]));
+	if($wmonat==0)
+	{
+		$wvon=date("Y-m-d",mktime(0, 0, 0, 12 , $mendev-($wotag-1), ($jahre[$wjahr])-1));
+	}
+	else 
+	{
+		$wvon=date("Y-m-d",mktime(0, 0, 0, ($wmonat) , $mendev-($wotag-1), ($jahre[$wjahr])));
+	}
+	if($wmonat==11)
+	{
+		$wbis=date("Y-m-d",mktime(0, 0, 0, 1 , (7-($ttt['wday']==0?7:$ttt['wday'])), $jahre[$wjahr]));
+	}
+	else 
+	{
+		$wbis=date("Y-m-d",mktime(0, 0, 0, ($wmonat+2) , (7-($ttt['wday']==0?7:$ttt['wday'])), $jahre[$wjahr]));
+	}
+	$qry="SELECT * FROM campus.tbl_zeitsperre WHERE zeitsperretyp_kurzbz='Urlaub' AND mitarbeiter_uid='".$uid."' AND (vondatum<='".$wbis."' AND bisdatum>'".$wvon."') ";
+	//$qry="SELECT * FROM campus.tbl_zeitsperre WHERE zeitsperretyp_kurzbz='Urlaub' AND mitarbeiter_uid='".$uid."' AND (vondatum<='".$wbis."' AND bisdatum>='".date("Y-m-d", mktime(0, 0, 0, 12 , $mendev-($wotag-1), $jahre[$wjahr]))."') ";
 	//echo "<br>"."db:".$qry;
 	if($result = pg_query($conn, $qry))
 	{
 		while($row = pg_fetch_object($result))
 		{
-			for($i=0;$i<$wotag;$i++)
+			/*for($i=0;$i<$wotag;$i++)
 			{
 				$hgfarbe[$i]='white';
 				$datensatz[$i]=0;
@@ -295,10 +314,10 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 				$freigabeamum[$i]=$row->freigabeamum;
 				$vertretung_uid[$i]=$row->vertretung_uid;
 				$erreichbarkeit_kurzbz[$i]=$row->erreichbarkeit_kurzbz;
-			}
+			}*/
 			//echo " ".$row->vondatum;
 			//echo "-".$row->bisdatum;
-			for($i=$wotag;$i<$mende+$wotag;$i++)
+			for($i=1;$i<=$mende+($wotag-1)+(7-($ttt['wday']==0?7:$ttt['wday']));$i++)
 			{
 				if(date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $i-$wotag+1, $jahre[$wjahr]))>=$row->vondatum
 				&& date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $i-$wotag+1, $jahre[$wjahr]))<=$row->bisdatum)
@@ -331,7 +350,7 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 					}
 				}
 			}
-			for($i=$mende+$wotag;$i<44;$i++)
+			for($i=$mende+$wotag+(7-($ttt['wday']==0?7:$ttt['wday']));$i<44;$i++)
 			{
 				$hgfarbe[$i]='white';
 				$datensatz[$i]=0;
@@ -525,18 +544,42 @@ if ($wotag==0)
 {
 	$wotag=7;
 }
+$mendev = cal_days_in_month(CAL_GREGORIAN, ($wmonat), $jahre[$wjahr]);
 $mende = cal_days_in_month(CAL_GREGORIAN, ($wmonat+1), $jahre[$wjahr]);
+$ttt=getdate(mktime(0, 0, 0, ($wmonat+1) , $mende, $jahre[$wjahr]));
 //echo "monatsende:".$mende;
 for($i=1;$i<43;$i++)
 {
-	if($i<$wotag || $zaehl>$mende)
-	{
-		$tage[$i]='';
-	}
-	else
+	if($i>=$wotag && $zaehl<=$mende)
 	{
 		$tage[$i]=$zaehl;
 		$zaehl++;
+	}
+	elseif ($i<$wotag)
+	{
+		if($wmonat==0)
+		{
+			$tage[$i]=date("d.m.", mktime(0, 0, 0, 12 , $mendev+$i-($wotag-1), $jahre[$wjahr]));
+		}
+		else 
+		{
+			$tage[$i]=date("d.m.", mktime(0, 0, 0, ($wmonat) , $mendev+$i-($wotag-1), $jahre[$wjahr]));
+		}
+	}
+	elseif ($i>$mende && $i<=$mende+($wotag-1)+(7-($ttt['wday']==0?7:$ttt['wday'])))
+	{
+		if($wmonat==11)
+		{
+			$tage[$i]=date("d.m.", mktime(0, 0, 0, 1 , 1, $jahre[$wjahr+1]));
+		}
+		else 
+		{
+			$tage[$i]=date("d.m.", mktime(0, 0, 0, ($wmonat+2) , $i-$mende-$wotag+1, $jahre[$wjahr]));
+		}
+	}
+	else 
+	{
+		$tage[$i]='';	
 	}
 }
 
@@ -554,7 +597,14 @@ for ($i=0;$i<6;$i++)
 	$content.='<tr height="50" style="font-family:Arial,sans-serif; font-size:34px; color:blue">';
 	for ($j=1;$j<8;$j++)
 	{
-		$content.='<td align="center" valign="center" style="background-color: '.$hgfarbe[$j+7*$i].'">';
+		if(strlen(stristr($tage[$j+7*$i],"."))>0)
+		{
+			$content.='<td align="center" valign="center" style="font-size:16px; color:grey;background-color: '.$hgfarbe[$j+7*$i].'">';
+		}
+		else 
+		{
+			$content.='<td align="center" valign="center" style="background-color: '.$hgfarbe[$j+7*$i].'">';
+		}
 		if($tage[$j+7*$i]!='')
 		{
 			if($hgfarbe[$j+7*$i]=='lime')
@@ -568,7 +618,14 @@ for ($i=0;$i<6;$i++)
 			elseif($hgfarbe[$j+7*$i]=='white')
 			{
 				$content.='<b>'.$tage[$j+7*$i].'</b><br>';
-				$content.='<input type="checkbox" name="wtag[]" value="'.date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $tage[$j+7*$i], $jahre[$wjahr])).'"></td>';
+				if(strlen(stristr($tage[$j+7*$i],"."))>0)
+				{
+					$content.='<input type="checkbox" name="wtag[]" value="'.date("Y-m-d",mktime(0, 0, 0, substr($tage[$j+7*$i],3,2) , substr($tage[$j+7*$i],0,2), $jahre[$wjahr])).'"></td>';
+				}
+				else 
+				{
+					$content.='<input type="checkbox" name="wtag[]" value="'.date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $tage[$j+7*$i], $jahre[$wjahr])).'"></td>';
+				}
 			}
 			else
 			{
