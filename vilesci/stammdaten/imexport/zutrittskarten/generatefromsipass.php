@@ -258,7 +258,7 @@ for($j=0;$j<$i;$j++)
 	if(trim($sipass[$j]->command==''))
 	{
 		$sipass[$j]->command='D';
-		/*if ($sipass[$j]->acc_grp_name!='Extern1' && $sipass[$j]->acc_grp_name!='Extern2' && $sipass[$j]->acc_grp_name!='Extern3' && $sipass[$j]->acc_grp_name!='Extern4' && $sipass[$j]->acc_grp_name!='Extern5')
+		if (substr($sipass[$j]->acc_grp_name,0,1)!='#')
 		{
 			$ausdruck.=$sipass[$j]->command."\t"; // Command
 			$ausdruck.=$sipass[$j]->reference."\t";	// ID
@@ -266,7 +266,7 @@ for($j=0;$j<$i;$j++)
 			$ausdruck.=$sipass[$j]->first_name."\t";	// Firstname
 			$ausdruck.=$sipass[$j]->acc_grp_name."\t";	// Access Group
 			$ausdruck.=$sipass[$j]->card_no."\n";	// Cardnumber
-		}*/
+		}
 	}
 	else
 	{
