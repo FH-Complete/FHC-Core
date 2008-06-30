@@ -118,7 +118,8 @@ if($result = pg_query($conn, $qry))
 		if(!in_array($row->nummer1,$doppelte))
 		{
 			$doppelte[$k]=$row->nummer1;
-			$fausgabe.="\n".$row->nummer1.", ";
+			$fausgabe.="\n\nUID:".$row->person1.", Name:".$row->nachname1.", ".$row->vorname1.", Betriebsmittelnr.:".$row->nummer1.", ";
+			$fausgabe.="\nUID:".$row->person2.", Name:".$row->nachname2.", ".$row->vorname2.", Betriebsmittelnr.:".$row->nummer2.", ";
 			$k++;
 		}
 	}
