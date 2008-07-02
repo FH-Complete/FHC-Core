@@ -155,7 +155,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		echo '		<titel>'.$titel.'</titel>';
 		echo '		<titel_kurzbz>'.$titel_kurzbz.'</titel_kurzbz>';
 	
-		$qry = "SELECT projektarbeit_id FROM lehre.tbl_projektarbeit WHERE student_uid='".$uid_arr[$i]."' AND projekttyp_kurzbz='Praxis'";
+		$qry = "SELECT projektarbeit_id FROM lehre.tbl_projektarbeit WHERE student_uid='".$uid_arr[$i]."' AND (projekttyp_kurzbz='Praxis' OR projekttyp_kurzbz='Praktikum')";
 		if($result = pg_query($conn, $qry))
 		{
 			if($row1 = pg_fetch_object($result))
