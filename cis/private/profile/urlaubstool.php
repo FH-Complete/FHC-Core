@@ -280,9 +280,13 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 	}
 	$mende=cal_days_in_month(CAL_GREGORIAN, ($wmonat+1), $jahre[$wjahr]);
 	if($wmonat==0)
+	{
 		$mendev = cal_days_in_month(CAL_GREGORIAN, 12, $jahre[$wjahr]-1);
+	}
 	else
+	{
 		$mendev = cal_days_in_month(CAL_GREGORIAN, ($wmonat), $jahre[$wjahr]);
+	}
 	//$wvon=date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , 1, $jahre[$wjahr]));
 	//$wbis=date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $mende, $jahre[$wjahr]));
 	$ttt=getdate(mktime(0, 0, 0, ($wmonat+1) , $mende, $jahre[$wjahr]));
@@ -303,7 +307,6 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 		$wbis=date("Y-m-d",mktime(0, 0, 0, ($wmonat+2) , (7-($ttt['wday']==0?7:$ttt['wday'])), $jahre[$wjahr]));
 	}
 	$qry="SELECT * FROM campus.tbl_zeitsperre WHERE zeitsperretyp_kurzbz='Urlaub' AND mitarbeiter_uid='".$uid."' AND (vondatum<='".$wbis."' AND bisdatum>'".$wvon."') ";
-	//$qry="SELECT * FROM campus.tbl_zeitsperre WHERE zeitsperretyp_kurzbz='Urlaub' AND mitarbeiter_uid='".$uid."' AND (vondatum<='".$wbis."' AND bisdatum>='".date("Y-m-d", mktime(0, 0, 0, 12 , $mendev-($wotag-1), $jahre[$wjahr]))."') ";
 	//echo "<br>"."db:".$qry;
 	if($result = pg_query($conn, $qry))
 	{
@@ -448,7 +451,6 @@ $content_resturlaub.="</table>";
 echo '<table width="95%" align="center">';
 echo "<td class='tdvertical' align='left' colspan='2'>$content_resturlaub</td>";
 echo '</td></tr>';
-//echo '<tr height=5></tr>';
 echo '<tr><td>';
 $content= '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">';
 $content.='<INPUT name="links" type="image" src="../../../skin/images/left.gif" alt="links">';
@@ -541,9 +543,13 @@ if ($wotag==0)
 
 $mende = cal_days_in_month(CAL_GREGORIAN, ($wmonat+1), $jahre[$wjahr]);
 if($wmonat==0)
+{
 	$mendev = cal_days_in_month(CAL_GREGORIAN, 12, $jahre[$wjahr]-1);
+}
 else
+{
 	$mendev = cal_days_in_month(CAL_GREGORIAN, ($wmonat), $jahre[$wjahr]);
+}
 $ttt=getdate(mktime(0, 0, 0, ($wmonat+1) , $mende, $jahre[$wjahr]));
 //echo "monatsende:".$mende;
 for($i=1;$i<43;$i++)
@@ -607,8 +613,7 @@ for ($i=0;$i<6;$i++)
 		{
 			if($hgfarbe[$j+7*$i]=='lime')
 			{
-				$content.='<b title="Vertretung: '.$vertretung_uid[$j+7*$i].' - erreichbar: '.$erreichbarkeit_kurzbz[$j+7*$i].'">'.$tage[$j+7*$i].'</b><br>';
-				//$content.='<INPUT  type="image" src="../../../skin/images/DeleteIcon.png" alt="loeschen" title="Eintragung löschen" onclick="return conf_del()"></td>';
+				$content.='<b title="Vertretung: '.$vertretung_uid[$j+7*$i].' - erreichbar: '.$erreichbarkeit_kurzbz[$j+7*$i].'">'.$tage[$j+7*$i].'</b><br>';;
 				$k=$j+7*$i;
 				$content.="<a href='$PHP_SELF?wmonat=$wmonat&wjahr=$wjahr&delete=$datensatz[$k]'>";
 				$content.='<img src="../../../skin/images/DeleteIcon.png" alt="loeschen" title="Eintragung löschen"></a></td>';
