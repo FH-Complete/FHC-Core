@@ -26,6 +26,7 @@ require_once('../../include/benutzer.class.php');
 require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/resturlaub.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
 	die("Fehler beim Connecten zur Datenbank");
@@ -53,9 +54,16 @@ function gesamt()
 
 $user = get_uid();
 
-
 if(isset($_GET['type']) && $_GET['type']=='edit' && isset($_GET['uid']))
 {
+	if(isset($_GET['del']) && isset($_GET['zeitsperre_id']))
+	{
+		$qry="DELETE FROM campus.tbl_zeitsperre WHERE mitarbeiter_uid='".$_GET['uid']."' AND zeitsperre_id='".$_GET['zeitsperre_id']."' ;";
+		if(!pg_query($conn, $qry))
+		{
+			die("Zeitsperren konnte nicht gelo&uml;scht werden!");
+		}
+	}
 	$ma = new mitarbeiter($conn);
 	$ma->load($_GET['uid']);
 	
@@ -87,6 +95,56 @@ if(isset($_GET['type']) && $_GET['type']=='edit' && isset($_GET['uid']))
 				</tr>
 			</table>
 		  </form>';
+	$rechte = new benutzerberechtigung($conn);
+	$rechte->getBerechtigungen($user);
+	if($rechte->isBerechtigt('admin', '0', 'suid'))
+	{
+		echo "<input type='button' onclick='parent.lv_detail.location=\"resturlaub_details.php?neu=true&uid=$uid\"' value='Neu'/>";
+		echo"<table class='liste table-autosort:5 table-stripeclass:alternate table-autostripe'>
+		<thead>
+		<tr class='liste'>";
+		echo "<th>&nbsp;</th>
+			<th>&nbsp;</th>
+			<th class='table-sortable:default'>ID</th>
+			  <th class='table-sortable:default'>Kurzbz</th>
+			  <th class='table-sortable:default'>Bezeichnung</th>
+			  <th class='table-sortable:default'>Von-Datum</th>
+			  <th class='table-sortable:default'>Von-Stunde</th>
+			  <th class='table-sortable:default'>Bis-Datum</th>
+			  <th class='table-sortable:default'>Bis-Stunde</th>
+			  <th class='table-sortable:default'>Vertretung</th>
+			  <th class='table-sortable:default'>Erreichbarkeit</th>
+			  <th class='table-sortable:default'>Freigabe</th>
+			  <th class='table-sortable:default'>Freigabedatum</th>\n";
+		echo "</tr></thead>";
+		echo "<tbody>";
+		$qry="SELECT * FROM campus.tbl_zeitsperre WHERE mitarbeiter_uid='".$uid."' ORDER BY vondatum DESC";
+		if(!$result_urlaub = pg_query($conn, $qry))
+			die("Zeitsperren nicht gefunden!");
+		$num_rows=pg_num_rows($result_urlaub);
+		if ($result_urlaub!=0)
+		{
+			for($i=0;$i<$num_rows;$i++)
+			{
+				$row_urlaub=pg_fetch_object($result_urlaub);
+				echo "<tr>";
+				echo "<td><a href='resturlaub_details.php?zeitsperre_id=$row_urlaub->zeitsperre_id' target='lv_detail'>edit</a></td>";
+				echo "<td><a href='".$_SERVER['PHP_SELF']."?type=edit&del=true&uid=$uid&zeitsperre_id=$row_urlaub->zeitsperre_id' target='uebersicht'>delete</a></td>";
+				echo "<td>".$row_urlaub->zeitsperre_id."</td>";
+				echo "<td>".$row_urlaub->zeitsperretyp_kurzbz."</td>";
+				echo "<td>".$row_urlaub->bezeichnung."</td>";
+				echo "<td>".$row_urlaub->vondatum."</td>";
+				echo "<td>".$row_urlaub->vonstunde."</td>";
+				echo "<td>".$row_urlaub->bisdatum."</td>";
+				echo "<td>".$row_urlaub->bisstunde."</td>";
+				echo "<td>".$row_urlaub->vertretung_uid."</td>";
+				echo "<td>".$row_urlaub->erreichbarkeit_kurzbz."</td>";
+				echo "<td>".$row_urlaub->freigabevon."</td>";
+				echo "<td>".$row_urlaub->freigabeamum."</td>";
+				echo "</td>";
+			}
+		}
+	}
 	exit;
 }
 
