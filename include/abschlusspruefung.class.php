@@ -273,7 +273,7 @@ class abschlusspruefung
 	// ************************************************
 	function getAbschlusspruefungen($student_uid)
 	{
-		$qry = "SELECT * FROM lehre.tbl_abschlusspruefung WHERE student_uid='".addslashes($student_uid)."' ORDER BY datum";
+		$qry = "SELECT * FROM lehre.tbl_abschlusspruefung WHERE student_uid='".addslashes($student_uid)."' ORDER BY datum DESC";
 		
 		if($result = pg_query($this->conn, $qry))
 		{
