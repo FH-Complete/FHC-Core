@@ -44,6 +44,10 @@ function gesamt()
 {
 	document.getElementById("gesamturlaub").value=parseInt(document.getElementById("resturlaubstage").value)+parseInt(document.getElementById("anspruch").value);
 }
+function conf_del()
+{
+	return confirm("Wollen Sie diesen Eintrag wirklich löschen?");
+}
 </script>
 </head>
 
@@ -58,6 +62,7 @@ if(isset($_GET['type']) && $_GET['type']=='edit' && isset($_GET['uid']))
 {
 	if(isset($_GET['del']) && isset($_GET['zeitsperre_id']))
 	{
+		//echo "<script type='text/javascript'>check=confirm('Wollen Sie diesen Eintrag wirklich löschen?');</script>";
 		$qry="DELETE FROM campus.tbl_zeitsperre WHERE mitarbeiter_uid='".$_GET['uid']."' AND zeitsperre_id='".$_GET['zeitsperre_id']."' ;";
 		if(!pg_query($conn, $qry))
 		{
@@ -69,7 +74,7 @@ if(isset($_GET['type']) && $_GET['type']=='edit' && isset($_GET['uid']))
 	
 	$resturlaub = new resturlaub($conn);
 	$resturlaub->load($_GET['uid']);
-	echo 'Resturlaubstabe von <b>'.$ma->nachname.' '.$ma->vorname.'</b>:<br><br>';
+	echo 'Resturlaubstage von <b>'.$ma->nachname.' '.$ma->vorname.'</b>:<br><br>';
 	echo '<form action="'.$_SERVER['PHP_SELF'].'?type=save&uid='.$ma->uid.'" method="POST">
 			<table>
 				<tr>
@@ -99,6 +104,7 @@ if(isset($_GET['type']) && $_GET['type']=='edit' && isset($_GET['uid']))
 	$rechte->getBerechtigungen($user);
 	if($rechte->isBerechtigt('admin', '0', 'suid'))
 	{
+		echo "<h3>Übersicht Zeitsperren</h3>";
 		echo "<input type='button' onclick='parent.lv_detail.location=\"resturlaub_details.php?neu=true&uid=$uid\"' value='Neu'/>";
 		echo"<table class='liste table-autosort:5 table-stripeclass:alternate table-autostripe'>
 		<thead>
@@ -122,14 +128,14 @@ if(isset($_GET['type']) && $_GET['type']=='edit' && isset($_GET['uid']))
 		if(!$result_urlaub = pg_query($conn, $qry))
 			die("Zeitsperren nicht gefunden!");
 		$num_rows=pg_num_rows($result_urlaub);
-		if ($result_urlaub!=0)
+		if ($num_rows>0)
 		{
 			for($i=0;$i<$num_rows;$i++)
 			{
 				$row_urlaub=pg_fetch_object($result_urlaub);
 				echo "<tr>";
 				echo "<td><a href='resturlaub_details.php?zeitsperre_id=$row_urlaub->zeitsperre_id' target='lv_detail'>edit</a></td>";
-				echo "<td><a href='".$_SERVER['PHP_SELF']."?type=edit&del=true&uid=$uid&zeitsperre_id=$row_urlaub->zeitsperre_id' target='uebersicht'>delete</a></td>";
+				echo "<td><a href='".$_SERVER['PHP_SELF']."?type=edit&del=true&uid=$uid&zeitsperre_id=$row_urlaub->zeitsperre_id' onclick='return conf_del()' target='uebersicht'>delete</a></td>";
 				echo "<td>".$row_urlaub->zeitsperre_id."</td>";
 				echo "<td>".$row_urlaub->zeitsperretyp_kurzbz."</td>";
 				echo "<td>".$row_urlaub->bezeichnung."</td>";
@@ -141,9 +147,11 @@ if(isset($_GET['type']) && $_GET['type']=='edit' && isset($_GET['uid']))
 				echo "<td>".$row_urlaub->erreichbarkeit_kurzbz."</td>";
 				echo "<td>".$row_urlaub->freigabevon."</td>";
 				echo "<td>".$row_urlaub->freigabeamum."</td>";
-				echo "</td>";
+				echo "</td></tr>";
 			}
 		}
+		else
+			echo "<tr><td colspan=5>Kein Eintrag gefunden!</td></tr>";
 	}
 	exit;
 }
