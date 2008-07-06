@@ -41,7 +41,7 @@ var StudentAbschlusspruefungAkadgradDDDatasource=null; //Datasource des Akadgrad
 // ****
 var StudentAbschlusspruefungTreeSinkObserver =
 {
-	onBeginLoad : function(pSink) 
+	onBeginLoad : function(pSink)
 	{
 		//Eventlistener waehrend des Ladevorganges deaktivieren da es sonst
 		//zu Problemen kommt
@@ -81,7 +81,7 @@ var StudentAbschlusspruefungTreeListener =
 // ****
 var StudentAbschlusspruefungAkadgradDDSinkObserver =
 {
-	onBeginLoad : function(pSink) 
+	onBeginLoad : function(pSink)
 	{},
 	onInterrupt : function(pSink) {},
 	onResume : function(pSink) {},
@@ -124,7 +124,7 @@ function StudentAbschlusspruefungTreeLoad(uid)
 	}
 	catch(e)
 	{}
-		
+
 	//Alte DS entfernen
 	var oldDatasources = tree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -141,7 +141,7 @@ function StudentAbschlusspruefungTreeLoad(uid)
 	tree.database.AddDataSource(StudentAbschlusspruefungTreeDatasource);
 	StudentAbschlusspruefungTreeDatasource.addXMLSinkObserver(StudentAbschlusspruefungTreeSinkObserver);
 	tree.builder.addListener(StudentAbschlusspruefungTreeListener);
-	
+
 	StudentAbschlusspruefungDisableFields(false);
 }
 
@@ -152,7 +152,7 @@ function StudentAbschlusspruefungDisableFields(val)
 {
 	document.getElementById('student-abschlusspruefung-button-neu').disabled=val;
 	document.getElementById('student-abschlusspruefung-button-loeschen').disabled=val;
-	
+
 	if(val)
 		StudentAbschlusspruefungDetailDisableFields(val);
 }
@@ -174,7 +174,7 @@ function StudentAbschlusspruefungDetailDisableFields(val)
 	document.getElementById('student-abschlusspruefung-datum-sponsion').disabled=val;
 	document.getElementById('student-abschlusspruefung-textbox-anmerkung').disabled=val;
 	document.getElementById('student-abschlusspruefung-button-speichern').disabled=val;
-	
+
 	if(val)
 		StudentAbschlusspruefungResetFields();
 }
@@ -211,7 +211,7 @@ function StudentAbschlusspruefungMenulistPersonLoad(menulist, filter)
 		v = filter;
 
 	if(v.length>2)
-	{		
+	{
 		var url = '<?php echo APP_ROOT; ?>rdf/person.rdf.php?filter='+v+'&'+gettimestamp();
 
 		var oldDatasources = menulist.database.GetDataSources();
@@ -221,7 +221,7 @@ function StudentAbschlusspruefungMenulistPersonLoad(menulist, filter)
 		}
 		//Refresh damit die entfernten DS auch wirklich entfernt werden
 		menulist.builder.rebuild();
-	
+
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		if(typeof(filter)=='undefined')
 			var datasource = rdfService.GetDataSource(url);
@@ -247,7 +247,7 @@ function StudentAbschlusspruefungMenulistMitarbeiterLoad(menulist, filter)
 		v = menulist.value;
 	else
 		v = filter;
-		
+
 	if(v.length>2)
 	{
 		if(filter=='')
@@ -255,7 +255,7 @@ function StudentAbschlusspruefungMenulistMitarbeiterLoad(menulist, filter)
 		else
 			filter1 = filter;
 		var url = '<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php?filter='+v+'&'+gettimestamp();
-		
+
 		var oldDatasources = menulist.database.GetDataSources();
 		while(oldDatasources.hasMoreElements())
 		{
@@ -263,7 +263,7 @@ function StudentAbschlusspruefungMenulistMitarbeiterLoad(menulist, filter)
 		}
 		//Refresh damit die entfernten DS auch wirklich entfernt werden
 		menulist.builder.rebuild();
-	
+
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		if(typeof(filter)=='undefined')
 			var datasource = rdfService.GetDataSource(url);
@@ -274,7 +274,7 @@ function StudentAbschlusspruefungMenulistMitarbeiterLoad(menulist, filter)
 		menulist.database.AddDataSource(datasource);
 		if(typeof(filter)!='undefined')
 			menulist.builder.rebuild();
-		
+
 	}
 }
 
@@ -296,7 +296,7 @@ function StudentAbschlusspruefungTreeSelectID()
 	   	{
 	   		//ID der row holen
 	   		var id = getTreeCellText(tree, "student-abschlusspruefung-treecol-abschlusspruefung_id", i);
-			
+
 			//wenn dies die zu selektierende Zeile
 			if(id == StudentAbschlusspruefungSelectID)
 			{
@@ -322,10 +322,10 @@ function StudentAbschlusspruefungAuswahl()
 	if (tree.currentIndex==-1) return;
 
 	StudentAbschlusspruefungDetailDisableFields(false);
-	
+
 	//Ausgewaehlte Nr holen
 	var abschlusspruefung_id = getTreeCellText(tree, "student-abschlusspruefung-treecol-abschlusspruefung_id", tree.currentIndex)
-    
+
 	//Daten holen
 	var url = '<?php echo APP_ROOT ?>rdf/abschlusspruefung.rdf.php?abschlusspruefung_id='+abschlusspruefung_id+'&'+gettimestamp();
 
@@ -356,9 +356,9 @@ function StudentAbschlusspruefungAuswahl()
 	sponsion = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#sponsion" ));
 	pruefungstyp_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#pruefungstyp_kurzbz" ));
 	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
-	
+
 	stg_kz = studiengang_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
-	
+
 	//Akadgrad DropDown laden
 	var AkadgradDropDown = document.getElementById('student-abschlusspruefung-menulist-akadgrad');
 	url='<?php echo APP_ROOT;?>rdf/akadgrad.rdf.php?studiengang_kz='+stg_kz+"&"+gettimestamp();
@@ -371,7 +371,7 @@ function StudentAbschlusspruefungAuswahl()
 	}
 	catch(e)
 	{}
-	
+
 	//Alte DS entfernen
 	var oldDatasources = AkadgradDropDown.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -386,17 +386,17 @@ function StudentAbschlusspruefungAuswahl()
 	StudentAbschlusspruefungAkadgradDDDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 	StudentAbschlusspruefungAkadgradDDDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	AkadgradDropDown.database.AddDataSource(StudentAbschlusspruefungAkadgradDDDatasource);
-	
+
 	AkadgradDropDown.builder.rebuild();
 
 	// Vorsitz Drop Down laden
 	StudentAbschlusspruefungMenulistMitarbeiterLoad(document.getElementById('student-abschlusspruefung-menulist-vorsitz'), vorsitz_nachname);
-	
+
 	// Pruefer Drop Down laden
 	StudentAbschlusspruefungMenulistPersonLoad(document.getElementById('student-abschlusspruefung-menulist-pruefer1'), pruefer1_nachname);
 	StudentAbschlusspruefungMenulistPersonLoad(document.getElementById('student-abschlusspruefung-menulist-pruefer2'), pruefer2_nachname);
 	StudentAbschlusspruefungMenulistPersonLoad(document.getElementById('student-abschlusspruefung-menulist-pruefer3'), pruefer3_nachname);
-			
+
 	MenulistSelectItemOnValue('student-abschlusspruefung-menulist-vorsitz', vorsitz)
 	MenulistSelectItemOnValue('student-abschlusspruefung-menulist-pruefer1', pruefer1);
 	MenulistSelectItemOnValue('student-abschlusspruefung-menulist-pruefer2', pruefer2);
@@ -410,7 +410,7 @@ function StudentAbschlusspruefungAuswahl()
 	document.getElementById('student-abschlusspruefung-textbox-anmerkung').value=anmerkung;
 	document.getElementById('student-abschlusspruefung-textbox-abschlusspruefung_id').value=abschlusspruefung_id;
 	document.getElementById('student-abschlusspruefung-checkbox-neu').checked=false;
-	
+
 	StudentAbschlusspruefungTypChange();
 }
 
@@ -423,7 +423,7 @@ function StudentAbschlusspruefungSpeichern()
 
 	//der Value einer Editable Menulist muss mittels dieser Funktion geholt werden
 	//da sonst der Text der Menulist geliefert wird und nicht der dahinterliegene Wert
-	vorsitz = MenulistGetSelectedValue('student-abschlusspruefung-menulist-vorsitz');	
+	vorsitz = MenulistGetSelectedValue('student-abschlusspruefung-menulist-vorsitz');
 	pruefer1 = MenulistGetSelectedValue('student-abschlusspruefung-menulist-pruefer1');
 	pruefer2 = MenulistGetSelectedValue('student-abschlusspruefung-menulist-pruefer2');
 	pruefer3 = MenulistGetSelectedValue('student-abschlusspruefung-menulist-pruefer3');
@@ -438,7 +438,7 @@ function StudentAbschlusspruefungSpeichern()
 	neu = document.getElementById('student-abschlusspruefung-checkbox-neu').checked;
 
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
-	
+
 	var tree = document.getElementById('student-tree');
 
 	if (tree.currentIndex==-1)
@@ -446,21 +446,21 @@ function StudentAbschlusspruefungSpeichern()
 		alert('Student muss ausgewaehlt sein');
 		return;
 	}
-	
+
 	if(pruefungstyp_kurzbz=='')
 	{
 		alert('Bitte den Pruefungstyp auswaehlen');
 		return false;
 	}
-	
+
 	if(akadgrad_id=='')
 	{
 		alert('Akademischer Grad muss angegeben werden');
 		return false;
 	}
-	
+
 	var student_uid = getTreeCellText(tree, "student-treecol-uid", tree.currentIndex);
-    
+
 	//Datum pruefen
 	if(datum!='' && !CheckDatum(datum))
 	{
@@ -478,7 +478,7 @@ function StudentAbschlusspruefungSpeichern()
 	var req = new phpRequest(url,'','');
 
 	req.add('type', 'saveabschlusspruefung');
-	
+
 	req.add('student_uid', student_uid);
 	req.add('vorsitz', vorsitz);
 	req.add('pruefer1', pruefer1);
@@ -494,7 +494,7 @@ function StudentAbschlusspruefungSpeichern()
 	req.add('abschlusspruefung_id', abschlusspruefung_id);
 	req.add('neu', neu);
 	req.add('studiengang_kz', studiengang_kz);
-	
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
@@ -526,13 +526,13 @@ function StudentAbschlusspruefungNeu()
 	document.getElementById('student-abschlusspruefung-textbox-abschlusspruefung_id').value='';
 	StudentAbschlusspruefungResetFields();
 	StudentAbschlusspruefungDetailDisableFields(false);
-		
+
 	var stg_kz = studiengang_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
-	
+
 	//Akadgrad DropDown laden
 	var AkadgradDropDown = document.getElementById('student-abschlusspruefung-menulist-akadgrad');
 	url='<?php echo APP_ROOT;?>rdf/akadgrad.rdf.php?studiengang_kz='+stg_kz+"&"+gettimestamp();
-	
+
 	//Alte Observer entfernen
 	try
 	{
@@ -541,10 +541,10 @@ function StudentAbschlusspruefungNeu()
 	}
 	catch(e)
 	{}
-	
+
 	//Alte DS entfernen
 	var oldDatasources = AkadgradDropDown.database.GetDataSources();
-	
+
 	while(oldDatasources.hasMoreElements())
 	{
 		AkadgradDropDown.database.RemoveDataSource(oldDatasources.getNext());
@@ -558,10 +558,10 @@ function StudentAbschlusspruefungNeu()
 	StudentAbschlusspruefungAkadgradDDDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	StudentAbschlusspruefungAkadgradDDDatasource.addXMLSinkObserver(StudentAbschlusspruefungAkadgradDDSinkObserver);
 	AkadgradDropDown.builder.addListener(StudentAbschlusspruefungAkadgradDDListener);
-	
+
 	AkadgradDropDown.database.AddDataSource(StudentAbschlusspruefungAkadgradDDDatasource);
-	
-	
+
+
 	AkadgradDropDown.builder.rebuild();
 }
 
@@ -573,26 +573,26 @@ function StudentAbschlusspruefungLoeschen()
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-abschlusspruefung-tree');
 
-	if (tree.currentIndex==-1) 
+	if (tree.currentIndex==-1)
 	{
 		alert('Bitte zuerst einen Eintrag markieren');
 		return false;
 	}
 
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
-	
+
 	//Ausgewaehlte ID holen
 	var abschlusspruefung_id = getTreeCellText(tree, "student-abschlusspruefung-treecol-abschlusspruefung_id", tree.currentIndex);
-	
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
-	
+
 	var req = new phpRequest(url,'','');
 
 	req.add('type', 'deleteabschlusspruefung');
-		
+
 	req.add('abschlusspruefung_id', abschlusspruefung_id);
 	req.add('studiengang_kz', studiengang_kz);
-	
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
@@ -627,7 +627,7 @@ function StudentAbschlusspruefungPrintPruefungsprotokollMultiple()
 
 	//Typ der ersten Abschlusspruefung des zuletzt markierten Studenten (der von dem die Daten geladen wurden) holen
 	//ToDo: Wenn zuerst alle Studenten markiert werden und dann diejenigen abmarkiert werden die nicht gedruckt werden sollen,
-	//dann funktioniert diese Methode nicht da die Daten desjenigen geladen sind der abmarkiert wurde und dieser moeglicherweise 
+	//dann funktioniert diese Methode nicht da die Daten desjenigen geladen sind der abmarkiert wurde und dieser moeglicherweise
 	//keine Abschlusspruefung eingetragen hat
 	try
 	{
@@ -638,20 +638,20 @@ function StudentAbschlusspruefungPrintPruefungsprotokollMultiple()
 		alert('Der zuletzt markierte Student hat keine Abschlusspruefungen');
 		return false;
 	}
-	
+
 	if(pruefungstyp_kurzbz=='')
 	{
 		alert('Der zuletzt markierte Student hat keine Abschlusspruefungen');
 		return false;
 	}
-	
+
 	if(pruefungstyp_kurzbz=='Bachelor')
 		xsl='PrProtokollBakk';
 	else
 		xsl='PrProtokollDipl';
 
 	var tree = document.getElementById('student-tree');
-	
+
 	if (tree.currentIndex==-1)
 		return;
 
@@ -673,7 +673,7 @@ function StudentAbschlusspruefungPrintPruefungsprotokollMultiple()
 		}
 	}
 	var stg_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
-	
+
 	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid='+uids+'&xsl_stg_kz='+stg_kz,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
@@ -685,7 +685,7 @@ function StudentAbschlusspruefungPrintPruefungsprotokoll()
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-abschlusspruefung-tree');
 
-	if (tree.currentIndex==-1) 
+	if (tree.currentIndex==-1)
 	{
 		alert('Bitte zuerst einen Eintrag markieren');
 		return false;
@@ -694,14 +694,14 @@ function StudentAbschlusspruefungPrintPruefungsprotokoll()
 	//Ausgewaehlte Nr holen
 	var abschlusspruefung_id = getTreeCellText(tree,"student-abschlusspruefung-treecol-abschlusspruefung_id", tree.currentIndex);
 	var pruefungstyp_kurzbz = getTreeCellText(tree,"student-abschlusspruefung-treecol-pruefungstyp_kurzbz", tree.currentIndex);
-	
+
 	var stg_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
-	
+
 	if(pruefungstyp_kurzbz=='Bachelor')
 		xsl='PrProtokollBakk';
 	else
 		xsl='PrProtokollDipl';
-			
+
 	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&abschlusspruefung_id='+abschlusspruefung_id+'&xsl_stg_kz='+stg_kz,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
@@ -726,20 +726,20 @@ function StudentAbschlusspruefungPrintPruefungszeugnisMultiple()
 		alert('Der zuletzt markierte Student hat keine Abschlusspruefungen');
 		return false;
 	}
-	
+
 	if(pruefungstyp_kurzbz=='')
 	{
 		alert('Der zuletzt markierte Student hat keine Abschlusspruefungen');
 		return false;
 	}
-	
+
 	if(pruefungstyp_kurzbz=='Bachelor')
 		xsl='Bakkzeugnis';
 	else
 		xsl='Diplomzeugnis';
 
 	var tree = document.getElementById('student-tree');
-	
+
 	if (tree.currentIndex==-1)
 		return;
 
@@ -772,7 +772,7 @@ function StudentAbschlusspruefungPrintPruefungszeugnis()
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-abschlusspruefung-tree');
 
-	if (tree.currentIndex==-1) 
+	if (tree.currentIndex==-1)
 	{
 		alert('Bitte zuerst einen Eintrag markieren');
 		return false;
@@ -781,12 +781,12 @@ function StudentAbschlusspruefungPrintPruefungszeugnis()
 	//Ausgewaehlte Nr holen
 	var abschlusspruefung_id = getTreeCellText(tree,"student-abschlusspruefung-treecol-abschlusspruefung_id", tree.currentIndex);
 	var pruefungstyp_kurzbz = getTreeCellText(tree,"student-abschlusspruefung-treecol-pruefungstyp_kurzbz", tree.currentIndex);
-	
+
 	if(pruefungstyp_kurzbz=='Bachelor')
 		xsl='Bakkzeugnis';
 	else
 		xsl='Diplomzeugnis';
-			
+
 	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&abschlusspruefung_id='+abschlusspruefung_id,'PruefungsZeugnis', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
@@ -811,13 +811,13 @@ function StudentAbschlusspruefungPrintUrkundeMultiple(sprache)
 		alert('Der zuletzt markierte Student hat keine Abschlusspruefungen');
 		return false;
 	}
-	
+
 	if(pruefungstyp_kurzbz=='')
 	{
 		alert('Der zuletzt markierte Student hat keine Abschlusspruefungen');
 		return false;
 	}
-	
+
 	if(pruefungstyp_kurzbz=='Bachelor' && sprache=='deutsch')
 		xsl='Bakkurkunde';
 	else if(pruefungstyp_kurzbz=='Bachelor' && sprache=='englisch')
@@ -828,7 +828,7 @@ function StudentAbschlusspruefungPrintUrkundeMultiple(sprache)
 		xsl='DiplomurkundeEng';
 
 	var tree = document.getElementById('student-tree');
-	
+
 	if (tree.currentIndex==-1)
 		return;
 
@@ -839,18 +839,20 @@ function StudentAbschlusspruefungPrintUrkundeMultiple(sprache)
 	var paramList= '';
 	var anzahl=0;
 	var uids='';
+	var stg_kz=0;
 	for (var t = 0; t < numRanges; t++)
 	{
   		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
-		{		
+		{
 			uid = ';'+getTreeCellText(tree,"student-treecol-uid", v);
 			uids = uids + uid;
+			stg_kz=getTreeCellText(tree,"student-treecol-studiengang_kz", v);
 			anzahl++;
 		}
 	}
 
-	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid='+uids,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl_stg_kz='+stg_kz+'&xsl='+xsl+'&uid='+uids,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
@@ -862,7 +864,7 @@ function StudentAbschlusspruefungPrintUrkunde(sprache)
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-abschlusspruefung-tree');
 
-	if (tree.currentIndex==-1) 
+	if (tree.currentIndex==-1)
 	{
 		alert('Bitte zuerst einen Eintrag markieren');
 		return false;
@@ -871,7 +873,8 @@ function StudentAbschlusspruefungPrintUrkunde(sprache)
 	//Ausgewaehlte Nr holen
 	var abschlusspruefung_id = getTreeCellText(tree,"student-abschlusspruefung-treecol-abschlusspruefung_id", tree.currentIndex);
 	var pruefungstyp_kurzbz = getTreeCellText(tree,"student-abschlusspruefung-treecol-pruefungstyp_kurzbz", tree.currentIndex);
-	
+	var uid = getTreeCellText(tree,"student-abschlusspruefung-treecol-student_uid", tree.currentIndex);
+
 	if(pruefungstyp_kurzbz=='Bachelor' && sprache=='deutsch')
 		xsl='Bakkurkunde';
 	else if(pruefungstyp_kurzbz=='Bachelor' && sprache=='englisch')
@@ -880,8 +883,8 @@ function StudentAbschlusspruefungPrintUrkunde(sprache)
 		xsl='Diplomurkunde';
 	else if(pruefungstyp_kurzbz=='Diplom' && sprache=='englisch')
 		xsl='DiplomurkundeEng';
-			
-	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&abschlusspruefung_id='+abschlusspruefung_id,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid=;'+uid+'&abschlusspruefung_id='+abschlusspruefung_id,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 function StudentAbschlusspruefungTypChange()
