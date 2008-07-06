@@ -71,10 +71,27 @@ if(isset($_GET['xsl']))
 	$xsl=$_GET['xsl'];
 else
 	die('Fehlerhafte Parameteruebergabe');
+
+$xsl_stg_kz=0;
 if(isset($_GET['xsl_stg_kz']))
 	$xsl_stg_kz=$_GET['xsl_stg_kz'];
 else
-	$xsl_stg_kz=0;
+	if(isset($_GET['stg_kz']))
+		$xsl_stg_kz=$_GET['stg_kz'];
+	else
+		if(isset($_GET['uid']))
+		{
+			$uids = explode(';',$_GET['uid']);
+			//var_dump($uids);
+			$qry = "SELECT student_uid, studiengang_kz FROM public.tbl_student WHERE student_uid='".$uids[1]."'";
+			if($result_std = pg_query($conn, $qry))
+				if(pg_num_rows($result_std)==1)
+				{
+					$row_std = pg_fetch_object($result_std);
+					$xsl_stg_kz=$row_std->studiengang_kz;
+				}
+		}
+
 
 //Parameter setzen
 $params='?xmlformat=xml';
