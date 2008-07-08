@@ -1,3 +1,8 @@
+<?php
+	$stsemobj = new studiensemester($db_conn);
+	//$stsem = $stsemobj->getAktorNext();
+	$stsem = $stsemobj->getNearest();
+?>
 <table class="tabcontent">
 <tr>
 	<td width="159" class='tdvertical' nowrap>
@@ -24,7 +29,7 @@
 			  	<td class="tdwidth10" nowrap>&nbsp;</td>
 				<td class='tdwrap'><a class="Item" href="https://webmail.technikum-wien.at" target="_blank"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Webmail</a></td>
 			</tr>
-			<?php			
+			<?php
 			if ($is_student)
 			{
 					echo '<tr>
@@ -32,7 +37,7 @@
 					<td class="tdwrap"><a class="Item" href="profile/dokumente.php" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Dokumente</a></td>
 				</tr>';
 			}
-			
+
 			echo '
 		  	<tr>
 				<td class="tdwidth10" nowrap>&nbsp;</td>
@@ -41,7 +46,7 @@
 
 			//Projekt-Zeitaufzeichnung
 			$qry = "SELECT count(*) as anzahl FROM fue.tbl_projektbenutzer WHERE uid='$user'";
-			
+
 			if($result = pg_query($db_conn, $qry))
 			{
 				if($row = pg_fetch_object($result))
@@ -56,7 +61,7 @@
 					}
 				}
 			}
-			
+
 			if ($is_student)
 			{
 				echo '<tr>
@@ -82,9 +87,7 @@
 					<tr>
 					  	<td class="tdwrap">
 							<ul style="margin-top: 0px; margin-bottom: 0px;">';
-							
-							$stsemobj = new studiensemester($db_conn);
-							$stsem = $stsemobj->getAktorNext();
+
 							$qry = "SELECT distinct lehrveranstaltung_id, bezeichnung, studiengang_kz, semester, lehre, lehreverzeichnis from campus.vw_student_lehrveranstaltung WHERE uid='$user' AND studiensemester_kurzbz='$stsem' AND lehre=true AND lehreverzeichnis<>'' ORDER BY studiengang_kz, semester, bezeichnung";
 
 							if($result = pg_query($db_conn,$qry))
@@ -107,7 +110,7 @@
 		  			</td>
 				</tr>';
 			}
-			
+
 			//Eigene LVs des eingeloggten Lektors anzeigen
 			if($is_lector)
 			{
@@ -160,8 +163,6 @@
 					  	<td class='tdwrap'>
 							<ul style="margin-top: 0px; margin-bottom: 0px;">
 							<?php
-							$stsemobj = new studiensemester($db_conn);
-							$stsem = $stsemobj->getAktorNext();
 							$qry = "SELECT distinct tbl_lehrveranstaltung.bezeichnung,typ, tbl_studiengang.kurzbz, tbl_lehrveranstaltung.studiengang_kz, semester, lehreverzeichnis, tbl_lehrveranstaltung.lehrveranstaltung_id
 										FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_studiengang
 								        WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
@@ -232,7 +233,7 @@
 				//URLAUBE
 				//Untergebene holen
 				$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE (funktion_kurzbz='fbl' OR funktion_kurzbz='stgl') AND uid='".addslashes($user)."'";
-				
+
 				if($result = pg_query($db_conn, $qry))
 				{
 					$institut='';
@@ -243,7 +244,7 @@
 						{
 							if($institut!='')
 								$institut.=',';
-							
+
 							$institut.="'".addslashes($row->fachbereich_kurzbz)."'";
 						}
 						elseif($row->funktion_kurzbz=='stgl')
@@ -252,24 +253,24 @@
 								$stge.=',';
 							$stge.="'".$row->studiengang_kz."'";
 						}
-							
+
 					}
 				}
-				
+
 				$qry = "SELECT distinct uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='Institut' AND (false ";
-				
+
 				if($institut!='')
-					$qry.=" OR fachbereich_kurzbz in($institut)"; 
+					$qry.=" OR fachbereich_kurzbz in($institut)";
 				if($stge!='')
 					$qry.=" OR studiengang_kz in($stge)";
-				
+
 				$qry.=")";
-				
+
 				$untergebene='';
 				if($result = pg_query($db_conn, $qry))
 				{
-					
-					
+
+
 					while($row = pg_fetch_object($result))
 					{
 						if($untergebene!='')
@@ -277,11 +278,11 @@
 						$untergebene.="'".addslashes($row->uid)."'";
 					}
 				}
-				
+
 				if($untergebene!='')
 				{
 					$qry = "SELECT * FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid in($untergebene) ORDER BY nachname, vorname";
-										
+
 					if($result = pg_query($db_conn, $qry))
 					{
 						echo '
@@ -301,7 +302,7 @@
 							  	<td class="tdwrap">
 									<ul style="margin-top: 0px; margin-bottom: 0px;">';
 						echo '<li><a class="Item2" href="profile/urlaubsfreigabe.php" target="content">Alle</a></li>';
-									
+
 						while($row = pg_fetch_object($result))
 						{
 								echo '<li><a class="Item2" href="profile/urlaubsfreigabe.php?uid='.$row->uid.'" target="content">'."$row->nachname $row->vorname $row->titelpre $row->titelpost".'</a></li>';
@@ -313,7 +314,7 @@
 				  			</td>
 						</tr>';
 					}
-					
+
 				}
 			}
 			?>
