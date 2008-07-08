@@ -166,7 +166,7 @@ class studiensemester
 	function getakt()
 	{
 		$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE start <= now() AND ende >= now()";
-		
+
 		if(!$res=pg_query($this->conn,$qry))
 		{
 			$this->errormsg = pg_errormessage($this->conn);
@@ -248,7 +248,7 @@ class studiensemester
 				$qry.= " AND substring(studiensemester_kurzbz from 1 for 2)='$ss' ";
 			}
 			$qry.= " AND ende >= now() ORDER BY ende LIMIT 1";
-			
+
 			if(!$res=pg_query($this->conn,$qry))
 		    {
 				$this->errormsg = pg_errormessage($this->conn);
@@ -285,7 +285,8 @@ class studiensemester
 			$qry.= " WHERE substring(studiensemester_kurzbz from 1 for 2)='$ss' ";
 		}
 		$qry.=' ORDER BY delta LIMIT 1';
-		
+		//echo $qry;
+
 		if(!$res=pg_query($this->conn,$qry))
 		{
 			$this->errormsg = pg_errormessage($this->conn);
@@ -337,10 +338,10 @@ class studiensemester
 	function getNextStudiensemester($art='')
 	{
 		$qry = "SELECT * FROM public.tbl_studiensemester WHERE start>now() ";
-		
+
 		if($art!='')
 			$qry.= " AND substring(studiensemester_kurzbz from 1 for 2)='".addslashes($art)."' ";
-		
+
 		$qry.=" ORDER BY start LIMIT 1";
 
 		if(!$result=pg_query($this->conn,$qry))
@@ -363,27 +364,27 @@ class studiensemester
 
 		return true;
 	}
-	
+
 	// ****
 	// * Liefert das vorige Studiensemester
 	// ****
 	function getPrevious()
 	{
 		$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ende<now() ORDER BY ende DESC LIMIT 1";
-		
+
 		if($result = pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
 			{
 				return $row->studiensemester_kurzbz;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Es wurde kein vorangegangenes Studiensemester gefunden';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Ermitteln des vorangegangenen Studiensemesters';
 		}
@@ -394,81 +395,81 @@ class studiensemester
 	function getBeforePrevious()
 	{
 		$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ende<now() ORDER BY ende DESC LIMIT 2";
-		
+
 		if($result = pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($result,1))
 			{
 				return $row->studiensemester_kurzbz;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Es wurde kein vorjähriges Studiensemester gefunden';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Ermitteln des vorjährigen Studiensemesters';
 		}
 	}
-	
+
 	// ****
 	// * Liefert das Studiensemester vor $studiensemester_kurzbz
 	// ****
 	function getPreviousFrom($studiensemester_kurzbz)
 	{
-		$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester 
-				WHERE ende<(SELECT start FROM public.tbl_studiensemester 
-				            WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."') 
+		$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester
+				WHERE ende<(SELECT start FROM public.tbl_studiensemester
+				            WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."')
 		        ORDER BY ende DESC LIMIT 1";
-		
+
 		if($result = pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
 			{
 				return $row->studiensemester_kurzbz;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Es wurde kein vorangegangenes Studiensemester gefunden';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Ermitteln des vorangegangenen Studiensemesters';
 		}
 	}
-	
+
 	// ****
 	// * Liefert das Studiensemester nach $studiensemester_kurzbz
 	// ****
 	function getNextFrom($studiensemester_kurzbz)
 	{
-		$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester 
-				WHERE start>(SELECT ende FROM public.tbl_studiensemester 
-				            WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."') 
+		$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester
+				WHERE start>(SELECT ende FROM public.tbl_studiensemester
+				            WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."')
 		        ORDER BY start LIMIT 1";
-		
+
 		if($result = pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
 			{
 				return $row->studiensemester_kurzbz;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Es wurde kein folgendes Studiensemester gefunden';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Ermitteln des folgenden Studiensemesters';
 		}
 	}
-	
+
 	// ****
 	// * Springt von Studiensemester $studiensemester_kurzbz um $wert Studiensemester vor/zurueck
 	// ****
@@ -484,31 +485,31 @@ class studiensemester
 			$op='<';
 			$sort='DESC';
 		}
-		else 
+		else
 		{
 			$op='=';
 			$sort='';
 		}
-		
-		$qry = "SELECT studiensemester_kurzbz 
-				FROM 
+
+		$qry = "SELECT studiensemester_kurzbz
+				FROM
 					(
 					SELECT studiensemester_kurzbz, start
-					FROM public.tbl_studiensemester 
-					WHERE start$op(SELECT start FROM public.tbl_studiensemester 
-					               WHERE studiensemester_kurzbz='$studiensemester_kurzbz') 
+					FROM public.tbl_studiensemester
+					WHERE start$op(SELECT start FROM public.tbl_studiensemester
+					               WHERE studiensemester_kurzbz='$studiensemester_kurzbz')
 					ORDER BY start $sort
 					LIMIT ".abs($wert)."
 					) as foo
 				ORDER BY start DESC LIMIT 1";
-		
+
 		if($result = pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
 			{
 				return $row->studiensemester_kurzbz;
 			}
-			else 
+			else
 				return $studiensemester_kurzbz;
 		}
 	}
