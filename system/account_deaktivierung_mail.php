@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -23,7 +23,7 @@
  * - Dieses Script versendet automatisch Mails an Accounts die Deaktiviert wurden.
  *   und informiert die Benutzer ueber die Folgen der Deaktivierung
  *
- * - Accounts die laenger als 3 Tage deaktiviert sind, werden per Mail an die 
+ * - Accounts die laenger als 3 Tage deaktiviert sind, werden per Mail an die
  *   Bibliothek gemeldet.
  */
 require_once('../vilesci/config.inc.php');
@@ -56,12 +56,12 @@ if($result = pg_query($conn, $qry))
 		{
 			$message .= " - $row->titelpre $row->vorname $row->nachname $row->titelpost ( $row->uid )\n";
 		}
-		
+
 		$message .= "\nMit freundlichen Grüßen,\n";
 		$message .= "FACHHOCHSCHULE TECHNIKUM WIEN\n";
 		$message .= "Höchstädtplatz 5\n";
 		$message .= "A-1200 Wien \n";
-			
+
 		//$to = 'oesi@technikum-wien.at';
 		$to = 'bibliothek@'.DOMAIN;
 		mail($to,'Account Deaktivierung ', $message, 'From: vilesci@'.DOMAIN);
@@ -79,10 +79,14 @@ if($result = pg_query($conn, $qry))
 		$message = "Dies ist eine automatische Mail!\n";
 		$message .= "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun für Sie?\n\n";
 		$message .= "Vorerst werden Sie aus allen Mail-Verteilern gelöscht.\n";
-		$message .= "Wenn der Datensatz in den nächsten Wochen nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:\n";
+		$message .= "Wenn der Datensatz in den nächsten Wochen/Monaten nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:\n";
 		$message .= "- Ihr Account wird gelöscht.\n";
 		$message .= "- Ihre Mailbox mit sämtlichen Mails wird gelöscht.\n";
 		$message .= "- Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht.\n\n";
+		$message .= "Folgende Fristen gelten derzeit an der FH:\n";
+		$message .= "- Mitarbeiter: 12 Monate nach Deaktivierung.\n";
+		$message .= "- Student:      6 Monate nach Deaktivierung.\n";
+		$message .= "- Abbrecher:    3 Wochen nach Deaktivierung.\n\n";
 		if($row->mitarbeiter!='')
 		{
 			//Mitarbeiter
@@ -90,7 +94,7 @@ if($result = pg_query($conn, $qry))
 			$message .= "Adelheit Schaaf  - schaaf@technikum-wien.at\n";
 			$message .= "Orestis Kazamias - kazamias@technikum-wien.at\n\n";
 		}
-		else 
+		else
 		{
 			//Student
 			$message .= "Sollte es sich hierbei um einen Irrtum handeln, wenden sie sich bitte an ihre Studiengangsassistenz.\n";
@@ -99,7 +103,7 @@ if($result = pg_query($conn, $qry))
 		$message .= "FACHHOCHSCHULE TECHNIKUM WIEN\n";
 		$message .= "Höchstädtplatz 5\n";
 		$message .= "A-1200 Wien \n";
-		
+
 		//$to = 'oesi@technikum-wien.at';
 		$to = $row->uid.'@'.DOMAIN;
 		mail($to,'Ihr Datensatz wurde deaktiviert! '.$row->uid, $message, 'From: vilesci@'.DOMAIN);
@@ -109,7 +113,7 @@ if($result = pg_query($conn, $qry))
 
 //Letzte Warnung vor Accountloeschung verschicken
 //Abbrecher
-$qry = "SELECT uid FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) WHERE 
+$qry = "SELECT uid FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) WHERE
 		aktiv=false AND updateaktivam=CURRENT_DATE- interval '".DEL_ABBRECHER_WEEKS." week'
 		AND get_rolle_prestudent (prestudent_id, NULL)='Abbrecher'";
 if($result = pg_query($conn, $qry))
@@ -128,7 +132,7 @@ if($result = pg_query($conn, $qry))
 		$message .= "FACHHOCHSCHULE TECHNIKUM WIEN\n";
 		$message .= "Höchstädtplatz 5\n";
 		$message .= "A-1200 Wien \n";
-		
+
 		//$to = 'oesi@technikum-wien.at';
 		$to = $row->uid.'@'.DOMAIN;
 		mail($to,'Ihr Datensatz wurde deaktiviert! Letzte Warnung '.$row->uid, $message, 'From: vilesci@'.DOMAIN);
@@ -137,7 +141,7 @@ if($result = pg_query($conn, $qry))
 }
 
 //Studenten
-$qry = "SELECT uid FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) WHERE 
+$qry = "SELECT uid FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) WHERE
 		aktiv=false AND updateaktivam=CURRENT_DATE- interval '".DEL_STUDENT_WEEKS." week'
 		AND get_rolle_prestudent (prestudent_id, NULL)<>'Abbrecher'";
 if($result = pg_query($conn, $qry))
@@ -156,7 +160,7 @@ if($result = pg_query($conn, $qry))
 		$message .= "FACHHOCHSCHULE TECHNIKUM WIEN\n";
 		$message .= "Höchstädtplatz 5\n";
 		$message .= "A-1200 Wien \n";
-		
+
 		//$to = 'oesi@technikum-wien.at';
 		$to = $row->uid.'@'.DOMAIN;
 		mail($to,'Ihr Datensatz wurde deaktiviert! Letzte Warnung '.$row->uid, $message, 'From: vilesci@'.DOMAIN);
@@ -165,7 +169,7 @@ if($result = pg_query($conn, $qry))
 }
 
 //Mitarbeiter
-$qry = "SELECT uid FROM public.tbl_benutzer JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid) WHERE 
+$qry = "SELECT uid FROM public.tbl_benutzer JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid) WHERE
 		aktiv=false AND updateaktivam=CURRENT_DATE- interval '".DEL_MITARBEITER_WEEKS." week'";
 if($result = pg_query($conn, $qry))
 {
@@ -185,7 +189,7 @@ if($result = pg_query($conn, $qry))
 		$message .= "FACHHOCHSCHULE TECHNIKUM WIEN\n";
 		$message .= "Höchstädtplatz 5\n";
 		$message .= "A-1200 Wien \n";
-		
+
 		//$to = 'oesi@technikum-wien.at';
 		$to = $row->uid.'@'.DOMAIN;
 		mail($to,'Ihr Datensatz wurde deaktiviert! Letzte Warnung '.$row->uid, $message, 'From: vilesci@'.DOMAIN);
