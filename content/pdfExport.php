@@ -81,7 +81,10 @@ else
 	else
 		if(isset($_GET['uid']))
 		{
-			$uids = explode(';',$_GET['uid']);
+			if(strstr(';',$_GET['uid']))
+				$uids = explode(';',$_GET['uid']);
+			else 
+				$uids = $_GET['uid'];
 			//var_dump($uids);
 			$qry = "SELECT student_uid, studiengang_kz FROM public.tbl_student WHERE student_uid='".$uids[1]."'";
 			if($result_std = pg_query($conn, $qry))
