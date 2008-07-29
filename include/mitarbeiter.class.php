@@ -44,6 +44,7 @@ class mitarbeiter extends benutzer
 	var $anmerkung;
 	var $bismelden;
 	var $vorgesetzte=array();
+	var $untergebene=array();
 
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional einen Mitarbeiter
@@ -879,7 +880,6 @@ class mitarbeiter extends benutzer
 	 */
 	function getVorgesetzte($uid=null)
 	{
-		global $conn;
 		$return=false;
 		if (is_null($uid))
 			$uid=$this->uid;
@@ -889,7 +889,7 @@ class mitarbeiter extends benutzer
 						    ELSE ''
 					   END as vorgesetzter
 						FROM public.tbl_benutzerfunktion a WHERE funktion_kurzbz='Institut' AND uid='$uid'";
-		$result = pg_query($conn, $qry);
+		$result = pg_query($this->conn, $qry);
 		while($row = pg_fetch_object($result))
 		{
 			if ($row->vorgesetzter!='')
@@ -898,6 +898,9 @@ class mitarbeiter extends benutzer
 				$return=true;
 			}
 		}
+		
+		$this->vorgesetzte = array_unique($this->vorgesetzte);
+	
 		if ($return)
 			return $return;
 		// Suche nach Assistenz
@@ -906,7 +909,7 @@ class mitarbeiter extends benutzer
 					    ELSE ''
 						END as vorgesetzter
 				FROM public.tbl_benutzerfunktion a WHERE funktion_kurzbz='ass' AND uid='$uid'";
-		$result = pg_query($conn, $qry);
+		$result = pg_query($this->conn, $qry);
 		while($row = pg_fetch_object($result))
 		{
 			if ($row->vorgesetzter!='')
@@ -915,7 +918,72 @@ class mitarbeiter extends benutzer
 				$return=true;
 			}
 		}
+		$this->vorgesetzte = array_unique($this->vorgesetzte);
 		return $return;
+	}
+	
+	// ************************
+	// * gibt die UIDs der Untergebenen zurück
+	// ************************
+	function getUntergebene($uid=null)
+	{
+		if (is_null($uid))
+			$uid=$this->uid;
+		
+		//Alle Studiengänge und Fachbereiche holen bei denen die Person die Leitung hat
+		$qry = "SELECT * FROM public.tbl_benutzerfunktion 
+				WHERE (funktion_kurzbz='fbl' OR funktion_kurzbz='stgl') AND uid='".addslashes($uid)."'";
+
+		if($result = pg_query($this->conn, $qry))
+		{
+			$institut='';
+			$stge='';
+			while($row = pg_fetch_object($result))
+			{
+				if($row->funktion_kurzbz=='fbl')
+				{
+					if($institut!='')
+						$institut.=',';
+					
+					$institut.="'".addslashes($row->fachbereich_kurzbz)."'";
+				}
+				elseif($row->funktion_kurzbz=='stgl')
+				{
+					if($stge!='')
+						$stge.=',';
+					$stge.="'".$row->studiengang_kz."'";
+				}
+					
+			}
+		}
+		
+		//Alle Personen holen die diesen Studiengaengen/Fachbereichen untergeordnet sind
+		$qry = "SELECT distinct uid FROM public.tbl_benutzerfunktion WHERE (funktion_kurzbz='Institut' AND (false ";
+		
+		if($institut!='')
+			$qry.=" OR fachbereich_kurzbz in($institut)"; 
+		if($stge!='')
+			$qry.=" OR studiengang_kz in($stge)";
+		
+		$qry.=")) ";
+		
+		if($stge!='')
+			$qry.=" OR (funktion_kurzbz='ass' AND studiengang_kz in($stge))";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$this->untergebene[]=$row->uid;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Ermitteln der Untergebenen';
+			return false;
+		}
+		
 	}
 }
 ?>

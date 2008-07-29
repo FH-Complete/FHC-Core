@@ -24,6 +24,9 @@ require_once('../../config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/zeitsperre.class.php');
+require_once('../../../include/person.class.php');
+require_once('../../../include/benutzer.class.php');
+require_once('../../../include/mitarbeiter.class.php');
 
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim Connecten zur Datenbank');
@@ -69,56 +72,18 @@ echo '<html>
 	<br>
 ';
 //Untergebene holen
-$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE (funktion_kurzbz='fbl' OR funktion_kurzbz='stgl') AND uid='".addslashes($user)."'";
+$mitarbeiter = new mitarbeiter($conn);
+$mitarbeiter->getUntergebene($user);
 
-if($result = pg_query($conn, $qry))
-{
-	$institut='';
-	$stge='';
-	while($row = pg_fetch_object($result))
-	{
-		if($row->funktion_kurzbz=='fbl')
-		{
-			if($institut!='')
-				$institut.=',';
-			
-			$institut.="'".addslashes($row->fachbereich_kurzbz)."'";
-		}
-		elseif($row->funktion_kurzbz=='stgl')
-		{
-			if($stge!='')
-				$stge.=',';
-			$stge.="'".$row->studiengang_kz."'";
-		}
-			
-	}
-}
-
-$qry = "SELECT distinct uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='Institut' AND (false ";
-
-if($institut!='')
-	$qry.=" OR fachbereich_kurzbz in($institut)"; 
-if($stge!='')
-	$qry.=" OR studiengang_kz in($stge)";
-
-$qry.=")";
-
-$untergebene='';
-if($result = pg_query($conn, $qry))
-{
-	
-	
-	while($row = pg_fetch_object($result))
-	{
-		if($untergebene!='')
-			$untergebene.=',';
-		$untergebene.="'".addslashes($row->uid)."'";
-	}
-}
-
-if($untergebene=='')
+if(count($mitarbeiter->untergebene)==0)
 	die('Es sind Ihnen keine Mitarbeiter zugeteilt für die sie den Urlaub freigeben dürfen');
-
+$untergebene = '';
+foreach ($mitarbeiter->untergebene as $row)
+{
+	if($untergebene!='')
+		$untergebene.=',';
+	$untergebene .= "'".$row."'";
+}
 $qry = "SELECT * FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid in($untergebene)";
 
 $mitarbeiter = array();

@@ -65,19 +65,6 @@ $t=getdate();
 $uid = get_uid();
 $taste=0;
 
-function getVorgesetzten($uid)
-{
-	global $conn;
-	$qry = "SELECT CASE WHEN fachbereich_kurzbz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND funktion_kurzbz='fbl' LIMIT 1)
-					    WHEN studiengang_kz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz=a.studiengang_kz AND funktion_kurzbz='stgl' LIMIT 1)
-					    ELSE ''
-				   END as vorgesetzter
-	FROM public.tbl_benutzerfunktion a WHERE funktion_kurzbz='Institut' AND uid='$uid'";
-	$result = pg_query($conn, $qry);
-	$row = pg_fetch_object($result);
-	return (isset($row->vorgesetzter)?$row->vorgesetzter:'');
-}
-
 $ma= new mitarbeiter($conn);
 for($i=0;$i<6;$i++)
 {
@@ -240,7 +227,7 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 				$to.=$vg.'@'.DOMAIN;
 			}
 		}
-		//$to = 'ruhan@technikum-wien.at';
+		//$to = 'oesi@technikum-wien.at';
 		$benutzer = new benutzer($conn);
 		$benutzer->load($uid);
 		$message = "Dies ist eine automatische Mail! \n".
