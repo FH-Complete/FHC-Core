@@ -23,6 +23,7 @@
 require_once('../config.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/functions.inc.php');
+require_once('../../include/studiensemester.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
    die("Konnte Verbindung zur Datenbank nicht herstellen");
@@ -105,15 +106,17 @@ if (isset($_GET['insert']))
 		}
 	}
 
-$where=" studiensemester_kurzbz='SS2008'";
-if ($semester>0)
+$stsem_obj = new studiensemester($conn);
+$studiensemester = $stsem_obj->getNearest();
+$where=" studiensemester_kurzbz='".$studiensemester."'";
+if (isset($semester) && $semester>0)
 	$where.=" AND semester=$semester";
 if ($stg_kz>0)
 	$where.=" AND studiengang_kz='$stg_kz'";
 
 if(!is_numeric($stg_kz))
 	$stg_kz=0;
-if(!is_numeric($semester))
+if(!isset($semester) || !is_numeric($semester))
 	$semester=0;
 
 
