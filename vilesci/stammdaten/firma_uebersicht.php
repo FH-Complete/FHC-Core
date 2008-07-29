@@ -47,7 +47,7 @@
 		
 	    $htmlstr .= "</form><table id='t1' class='liste table-autosort:1 table-stripeclass:alternate table-autostripe'>\n";
 		$htmlstr .= "   <thead><tr class='liste'>\n";
-	    $htmlstr .= "       <th class='table-sortable:numeric'>ID</th><th class='table-sortable:default'>Name</th><th class='table-sortable:default'>Adresse</th><th class='table-sortable:default'>Email</th><th class='table-sortable:default'>Telefon</th><th class='table-sortable:default'>Fax</th><th class='table-sortable:default'>Anmerkung</th><th class='table-sortable:default'>Typ</th>";
+	    $htmlstr .= "       <th class='table-sortable:numeric'>ID</th><th class='table-sortable:default'>Name</th><th class='table-sortable:default'>Adresse</th><th class='table-sortable:default'>Email</th><th class='table-sortable:default'>Telefon</th><th class='table-sortable:default'>Fax</th><th class='table-sortable:default'>Anmerkung</th><th class='table-sortable:default'>Typ</th><th class='table-sortable:default'>Schule</th>";
 	    $htmlstr .= "   </tr></thead><tbody>\n";
 	    $i = 0;
 		while($row=pg_fetch_object($erg))
@@ -60,8 +60,9 @@
 	        $htmlstr .= "       <td>$row->email</td>\n";
 	        $htmlstr .= "       <td>$row->telefon</td>\n";
 	        $htmlstr .= "       <td>$row->fax</td>\n";
-	        $htmlstr .= "       <td>$row->anmerkung</td>\n";
+	        $htmlstr .= "       <td title='".htmlentities($row->anmerkung, ENT_QUOTES)."'>".(strlen($row->anmerkung)>30?substr($row->anmerkung,0,27).'...':$row->anmerkung)."</td>\n";
 	        $htmlstr .= "       <td>$row->firmentyp_kurzbz</td>\n";
+			$htmlstr .= "       <td>".($row->schule=='t'?'Ja':'Nein')."</td>\n";
 	        $htmlstr .= "   </tr>\n";
 	        $i++;
 	    }

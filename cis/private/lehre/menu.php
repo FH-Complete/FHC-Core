@@ -264,16 +264,29 @@ function js_toggle_container(conid)
 		<?php
 			$lv_obj = new lehrveranstaltung($sql_conn);
 
-			if(!$lv_obj->load_lva($course_id,$term_id, null, true, true))
-				echo "<tr><td>$lv_obj->errormsg</td></tr>";
+			//if(!$lv_obj->load_lva($course_id,$term_id, null, true, true))
+			//	echo "<tr><td>$lv_obj->errormsg</td></tr>";
+			$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung where studiengang_kz='".addslashes($course_id)."' AND semester='".addslashes($term_id)."' AND aktiv AND lehre ORDER BY orgform_kurzbz DESC, bezeichnung";
 
-			foreach($lv_obj->lehrveranstaltungen as $row)
+			$lastform='';
+			if($result = pg_query($sql_conn, $qry))
 			{
-				echo '<tr>';
-				echo '	<td class="tdwrap"><ul style="margin: 0px; padding: 0px; padding-left: 20px;">';
-				echo "<li><a class=\"Item2\" title=\"".$row->bezeichnung."\" href=\"lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".CutString($row->bezeichnung, 21).' '.$row->lehrform_kurzbz."</a></li>";
-				echo '	</ul></td>';
-				echo '</tr>';
+				while($row = pg_fetch_object($result))
+				{
+					if($row->orgform_kurzbz!=$lastform)
+					{
+						$qry_orgform = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz='$row->orgform_kurzbz'";
+						if($result_orgform = pg_query($sql_conn, $qry_orgform))
+							if($row_orgform = pg_fetch_object($result_orgform))
+								echo "<tr><td><b>$row_orgform->bezeichnung</b></td></tr>";			
+						$lastform=$row->orgform_kurzbz;
+					}
+					echo '<tr>';
+					echo '	<td class="tdwrap"><ul style="margin: 0px; padding: 0px; padding-left: 20px;">';
+					echo "<li><a class=\"Item2\" title=\"".$row->bezeichnung."\" href=\"lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".CutString($row->bezeichnung, 21).' '.$row->lehrform_kurzbz."</a></li>";
+					echo '	</ul></td>';
+					echo '</tr>';
+				}
 			}
 
 			echo '<tr>';

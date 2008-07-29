@@ -472,6 +472,10 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                accesskey = "&menu-dokumente-urkunde_englisch.accesskey;"/>
           </menupopup>
     </menu>
+    <!-- ***** Zusatzmenues inkludieren ***** -->
+    <?php
+    include('../include/'.EXT_FKT_PATH.'/fas_zusatzmenues.inc.php');
+    ?>
     <!-- ********** EXTRAS ********* -->
     <menu id="menu-extras" label="&menu-extras.label;" accesskey="&menu-extras.accesskey;">
           <menupopup id="menu-extras-popup">

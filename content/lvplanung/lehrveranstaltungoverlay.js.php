@@ -366,6 +366,9 @@ function LeNeu()
 
 	var stsem = getStudiensemester();
 	document.getElementById('lehrveranstaltung-detail-menulist-studiensemester').value=stsem;
+	
+	//Defaultwert fuer Anmerkung
+	document.getElementById('lehrveranstaltung-detail-textbox-anmerkung').value='<?php echo str_replace("'","\'",LEHREINHEIT_ANMERKUNG_DEFAULT);?>';
 }
 // ****
 // * Selectiert die Lektorzuordnung nachdem der Tree

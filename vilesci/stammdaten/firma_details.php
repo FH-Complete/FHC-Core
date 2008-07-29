@@ -40,6 +40,7 @@
 	$fax = (isset($_POST['fax'])?$_POST['fax']:'');
 	$anmerkung = (isset($_POST['anmerkung'])?$_POST['anmerkung']:'');
 	$firmentyp_kurzbz = (isset($_POST['typ'])?$_POST['typ']:'');
+	$schule = isset($_POST['schule']);
 	
 	// ******* SPEICHERN ********
 	if(isset($_POST['save']))
@@ -75,6 +76,7 @@
 			$firma->firmentyp_kurzbz = $firmentyp_kurzbz;
 			$firma->updateamum = date('Y-m-d H:i:s');
 			$firma->updatevon = $user;
+			$firma->schule = $schule;
 			
 			if($firma->save())
 			{
@@ -145,8 +147,8 @@
 	$htmlstr .= "		<td><input type='text' name='adresse' value='".htmlentities($firma->adresse)."' maxlength='256'></td>\n";
 	$htmlstr .= "		<td>Anmerkung: </td>";
 	$htmlstr .= "		<td><textarea name='anmerkung'/>".htmlentities($firma->anmerkung)."</textarea></td>\n";
-	
-	$htmlstr .= "		<td valign='bottom'><input type='submit' name='save' value='speichern'></td>";
+	$htmlstr .= "		<td>Schule: </td>";
+	$htmlstr .= "		<td><input type='checkbox' name='schule' ".($firma->schule?'checked':'')."<br><input type='submit' name='save' value='speichern'></td>";
 	$htmlstr .= "	</tr></table>\n";
 	$htmlstr .= "</form>\n";
 				

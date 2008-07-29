@@ -45,6 +45,7 @@ class firma
 	var $updateamum;		// @var timestamp
 	var $updatevon;		// @var bigint
 	var $firmentyp_kurzbz;	// @var
+	var $schule; // @var boolean
 
 	/**
 	 * Konstruktor
@@ -107,6 +108,7 @@ class firma
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
+				$this->schule = ($row->schule=='t'?true:false);
 				return true;
 			}
 			else 
@@ -172,7 +174,7 @@ class firma
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-			$qry='INSERT INTO public.tbl_firma (name, adresse, email, telefon, fax, anmerkung, firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id) VALUES('.
+			$qry='INSERT INTO public.tbl_firma (name, adresse, email, telefon, fax, anmerkung, firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id, schule) VALUES('.
 			     $this->addslashes($this->name).', '.
 			     $this->addslashes($this->adresse).', '.
 			     $this->addslashes($this->email).', '.
@@ -184,7 +186,8 @@ class firma
 			     $this->addslashes($this->updatevon).', '.
 			     $this->addslashes($this->insertamum).', '.
 			     $this->addslashes($this->insertvon).', '.
-			     $this->addslashes($this->ext_id).'); ';
+			     $this->addslashes($this->ext_id).','.
+			     ($this->schule?'true':'false').'); ';
 		}
 		else
 		{
@@ -206,8 +209,9 @@ class firma
 				'fax='.$this->addslashes($this->fax).', '.
 				'anmerkung='.$this->addslashes($this->anmerkung).', '.
 				'updateamum= now(), '.
-		     		'updatevon='.$this->addslashes($this->updatevon).', '.
-		     		'firmentyp_kurzbz='.$this->addslashes($this->firmentyp_kurzbz).' '.
+		     	'updatevon='.$this->addslashes($this->updatevon).', '.
+		     	'firmentyp_kurzbz='.$this->addslashes($this->firmentyp_kurzbz).', '.
+		     	'schule='.($this->schule?'true':'false').' '.
 				'WHERE firma_id='.$this->addslashes($this->firma_id).';';
 		}
 		//echo $qry;
@@ -299,7 +303,7 @@ class firma
 				$fa->insertamum = $row->insertamum;
 				$fa->insertvon = $row->insertvon;
 				$fa->ext_id = $row->ext_id;
-				
+				$fa->schule = ($row->schule=='t'?true:false);
 				$this->result[] = $fa;
 			}
 			return true;

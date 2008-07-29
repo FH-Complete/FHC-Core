@@ -428,6 +428,22 @@ if (!@pg_query($conn,'SELECT * FROM lehre.vw_stundenplandev_student_unr WHERE un
 		echo 'VIEW lehre.vw_stundenplandev_student_unr wurde hinzugefuegt!<BR>';
 }
 
+// ************** Leserechte auf bis.tbl_orgform fuer web user *****************
+if($result =pg_query($conn, "SELECT has_table_privilege('web','bis.tbl_orgform','select') as bool"))
+{
+	if($row = pg_fetch_object($result))
+	{
+		if($row->bool=='f')
+		{
+			$sql="GRANT SELECT ON bis.tbl_orgform TO GROUP web;";
+			if (!@pg_query($conn,$sql))
+				echo '<strong>bis.tbl_orgform Rechte: '.pg_last_error($conn).' </strong><BR>';
+			else
+				echo 'User web erhaelt Leserechte auf die Tabelle bis.tbl_orgform<BR>';
+		}
+	}
+}
+
 // ********************** Pruefungen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
