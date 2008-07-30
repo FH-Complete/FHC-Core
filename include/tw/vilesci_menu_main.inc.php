@@ -28,7 +28,7 @@ $menu=array
 	//'Admin'=> 		array('name'=>'Admin', 'link'=>'admin/menu.html', 'target'=>'main'),
 	'Lehre'=> 		array
 	(
-		'name'=>'Lehre', 'opener'=>'true', 'hide'=>'false',
+		'name'=>'Lehre', 'opener'=>'true', 'hide'=>'false', 'permissions'=>array('admin','lv-plan','support'),
 		'Gruppenverwaltung'=>array('name'=>'Gruppenverwaltung', 'link'=>'stammdaten/lvbgruppenverwaltung.php', 'target'=>'main'),
 		'Lehrveranstaltung'=>array
 		(
@@ -75,23 +75,23 @@ $menu=array
 	'Personen'=> 	array
 	(
 		'name'=>'Personen', 'opener'=>'true', 'hide'=>'true',
-		'Suche'=>array('name'=>'Suche', 'link'=>'personen/suche.php', 'target'=>'main'),
-		'Zusammenlegen'=>array('name'=>'Zusammenlegen', 'link'=>'stammdaten/personen_wartung.php', 'target'=>'main'),
+		'Suche'=>array('name'=>'Suche', 'link'=>'personen/suche.php', 'target'=>'main','permissions'=>array('admin','lv-plan','support')),
+		'Zusammenlegen'=>array('name'=>'Zusammenlegen', 'link'=>'stammdaten/personen_wartung.php', 'target'=>'main', 'permissions'=>array('admin','lv-plan','support')),
 		'Gruppen'=>array
 		(
-			'name'=>'Gruppen',
+			'name'=>'Gruppen', 'permissions'=>array('admin','lv-plan','support'),
 			'Übersicht'=>array('name'=>'Übersicht', 'link'=>'lehre/einheit_menu.php', 'target'=>'main'),
 			'Neu'=>array('name'=>'Neu', 'link'=>'lehre/einheit_menu.php?newFrm=true', 'target'=>'main')
 		),
 		'Benutzer'=>array
 		(
-			'name'=>'Benutzer',
+			'name'=>'Benutzer','permissions'=>array('admin','lv-plan','support'),
 			'LDAPCheck'=>array('name'=>'LDAPCheck', 'link'=>'personen/ldap_check.php', 'target'=>'main'),
 			'Funktionen'=>array('name'=>'Funktionen', 'link'=>'personen/funktion.php', 'target'=>'main')
 		),
 		'Mitarbeiter'=>array
 		(
-			'name'=>'Mitarbeiter',
+			'name'=>'Mitarbeiter','permissions'=>array('admin','lv-plan','support'),
 			'Übersicht'=>array('name'=>'Übersicht', 'link'=>'personen/lektor_uebersicht.php', 'target'=>'main'),
 			'Neu'=>array('name'=>'Neu', 'link'=>'personen/lektor_edit.php?new=1', 'target'=>'main'),
 			'Institute'=>array('name'=>'Institute', 'link'=>'personen/institutsliste.php', 'target'=>'main'),
@@ -99,16 +99,17 @@ $menu=array
 		),
 		'Studenten'=>array
 		(
-			'name'=>'Studenten',
+			'name'=>'Studenten','permissions'=>array('admin','lv-plan','support'),
 			'Übersicht'=>array('name'=>'Übersicht', 'link'=>'personen/studenten_uebersicht.php', 'target'=>'main'),
 			'Neu'=>array('name'=>'Neu', 'link'=>'personen/student_edit.php?new=1', 'target'=>'main'),
 			'Vorrückung'=>array('name'=>'Vorrückung', 'link'=>'personen/student_vorrueckung.php', 'target'=>'main'),
 		),
-		'Betriebsmittel'=>array('name'=>'Betriebsmittel', 'link'=>'stammdaten/betriebsmittel_frameset.html', 'target'=>'main')
+		'Betriebsmittel'=>array('name'=>'Betriebsmittel', 'link'=>'stammdaten/betriebsmittel_frameset.html', 'target'=>'main','permissions'=>array('admin','lv-plan','support')),
+		'Preinteressenten'=>array('name'=>'Preinteressenten', 'link'=>'personen/preinteressent_frameset.html', 'target'=>'_blank','permissions'=>array('admin','lv-plan','support','preinteressent'))
 	),
 	'Stammdaten'=>	array
 	(
-		'name'=>'Stammdaten', 'opener'=>'true', 'hide'=>'true',
+		'name'=>'Stammdaten', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'),
 		'Berechtigungen'=>array('name'=>'Berechtigungen', 'link'=>'stammdaten/benutzerberechtigung_frameset.html', 'target'=>'main'),
 		'Variablen'=>array('name'=>'Variablen', 'link'=>'stammdaten/variablen_frameset.html', 'target'=>'main'),
 		'Studiengang'=>array('name'=>'Studiengang', 'link'=>'stammdaten/studiengang_frameset.html', 'target'=>'main'),
@@ -130,13 +131,13 @@ $menu=array
 	),
 	'Vorrueckung'=>	array
 	(
-		'name'=>'Vorrueckung', 'opener'=>'true', 'hide'=>'true',
+		'name'=>'Vorrueckung', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'),
 		'Lehreinheiten'=>array('name'=>'Lehreinheiten', 'link'=>'lehre/lehreinheiten_vorrueckung.php', 'target'=>'main'),
 		'Studenten'=>array('name'=>'Studenten', 'link'=>'personen/student_vorrueckung.php', 'target'=>'main')
 	),
 	'Auswertung'=>	array
 	(
-		'name'=>'Auswertung', 'opener'=>'true', 'hide'=>'true',
+		'name'=>'Auswertung', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'),
 		'Raumauslastung'=>array('name'=>'Raumauslastung', 'link'=>'lehre/raumauslastung.php', 'target'=>'main'),
 		'Zeitwünsche'=>array('name'=>'Zeitwünsche', 'link'=>'lehre/zeitwuensche.php', 'target'=>'main')
 	)
