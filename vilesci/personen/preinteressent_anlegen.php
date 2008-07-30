@@ -99,6 +99,25 @@ function disablefields2(val)
 	document.getElementById('plz').disabled=val;
 	document.getElementById('ort').disabled=val;
 }
+
+function checkschulid(schuleid)
+{
+	if(schuleid!='')
+	{
+		dd = document.getElementById('schuledd')
+		//preufen ob die id im DD vorhanden ist
+		myoptions = dd.getElementsByTagName('option');
+		id='';
+		for each (var node in myoptions)
+		{
+			if(node.value==schuleid)
+				id=schuleid;
+		}
+		
+		document.getElementById('schuledd').value=id;
+	}
+	return true;
+}
 </script>
 </head>
 <body>
@@ -131,6 +150,16 @@ $svnr = (isset($_POST['svnr'])?$_POST['svnr']:'');
 $ersatzkennzeichen = (isset($_POST['ersatzkennzeichen'])?$_POST['ersatzkennzeichen']:'');
 $ueberschreiben = (isset($_REQUEST['ueberschreiben'])?$_REQUEST['ueberschreiben']:'');
 $studiensemester_kurzbz = (isset($_POST['studiensemester_kurzbz'])?$_POST['studiensemester_kurzbz']:'');
+if(isset($_POST['schule_id']) && $_POST['schule_id']!='')
+{
+	$schule = $_POST['schule_id'];
+}
+elseif(isset($_POST['schule']))
+{
+	$schule = $_POST['schule'];
+}
+else 
+	$schule='';
 //end Parameter
 $geburtsdatum_error=false;
 
@@ -308,7 +337,7 @@ if(isset($_POST['save']))
 		$preinteressent->studiensemester_kurzbz = $studiensemester_kurzbz;
 		$preinteressent->aufmerksamdurch_kurzbz = 'k.A.';
 		$preinteressent->erfassungsdatum = date('Y-m-d');
-		$preinteressent->firma_id = 1; //TW
+		$preinteressent->firma_id = ($schule!=''?$schule:0); //default TW
 		$preinteressent->insertamum = date('Y-m-d H:i:s');
 		$preinteressent->insertvon = $user;
 		
@@ -428,8 +457,37 @@ foreach ($stsem->studiensemester as $row)
 	echo "<option value='$row->studiensemester_kurzbz' $selected>$row->studiensemester_kurzbz</option>";
 }
 echo '</SELECT></td></tr>';
-echo '<tr><td></td><td>';
+echo '<tr><td>Schule: </td><td><SELECT id="schuledd" name="schule">';
+echo "<option value=''>-- keine Auswahl --</option>";
+$qry = "SELECT * FROM public.tbl_firma WHERE schule ORDER BY name";
 
+//bei namen die laenger als 40 zeichen sind wird ein teil aus der mitte
+//herausgeschnitten damit das DD nicht zu gross wird
+function shortname($name)
+{
+	if(strlen($name)>40)
+	{
+		return substr($name, 0, 20).' ... '.substr($name, strlen($name)-20);
+	}
+	else 
+		return $name;
+}
+
+if($result = pg_query($conn, $qry))
+{
+	while($row = pg_fetch_object($result))
+	{
+		if($schule==$row->firma_id)
+			$selected='selected';
+		else 
+			$selected='';
+			
+		echo "<option value='$row->firma_id' title='$row->name' $selected>".shortname($row->name)." ( $row->firma_id )</option>";
+	}
+}
+echo '</SELECT></td></tr>';
+echo '</tr><td>Schule ID:</td><td><input type="text" size="3" name="schule_id" value="'.$schule.'" oninput="checkschulid(this.value)"></td></tr>';
+echo '<tr><td></td><td>';
 if(($geburtsdatum=='' && $vorname=='' && $nachname=='') || $geburtsdatum_error)
 	echo '<input type="submit" name="showagain" value="Vorschlag laden">';
 else

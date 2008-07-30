@@ -33,7 +33,10 @@
  	$conn=pg_connect(CONN_STRING) or die('Connection zur Portal Datenbank fehlgeschlagen');
 	$berechtigung=new benutzerberechtigung($conn);
 	$berechtigung->getBerechtigungen($uid);
-	if (!($berechtigung->isBerechtigt('admin') || $berechtigung->isBerechtigt('support') || $berechtigung->isBerechtigt('lvplan') ))
+	if (!($berechtigung->isBerechtigt('admin') || 
+		  $berechtigung->isBerechtigt('support') || 
+		  $berechtigung->isBerechtigt('preinteressent') || 
+		  $berechtigung->isBerechtigt('lv-plan') ))
 		die ('Keine Berechtigung!');
 
 	
@@ -80,6 +83,21 @@
 </div>
 
 <?php
+function checkpermission($permissions)
+{
+	global $berechtigung;
+	
+	$permission=false;
+	foreach ($permissions as $perm)
+	{
+		if($berechtigung->isBerechtigt($perm))
+		{
+			$permission=true;
+		}
+	}
+	return $permission;
+}
+
 if ($berechtigung->isBerechtigt('admin'))
 {
 	echo '<div>
@@ -100,6 +118,9 @@ foreach($menu AS $m)
 		if ($m['hide']=='true')
 			$hide=true;
 
+	if (isset($m['permissions']) && !checkpermission($m['permissions']))
+		continue;
+	
 	if ($opener)
 	{
 		echo '<SPAN style="cursor: pointer;" id="'.$m['name'].'_dot" onclick="js_toggle_container('."'".$m['name']."'".')" style="font-weight:bold">';
@@ -128,7 +149,7 @@ foreach($menu AS $m)
 		$display='block';
 	echo "\n<DIV>\n".'<SPAN id="'.$m['name'].'" style="display:'.$display.'">';
 	foreach($m AS $m1)
-		if (is_array($m1))
+		if (is_array($m1) && isset($m1['name']))
 		{
 			$opener=false;
 			$hide=false;
@@ -138,7 +159,10 @@ foreach($menu AS $m)
 			if (isset($m1['hide']))
 				if ($m1['hide']=='true')
 					$hide=true;
-
+					
+			if (isset($m1['permissions']) && !checkpermission($m1['permissions']))
+				continue;
+				
 			if ($opener)
 			{
 				echo "\n\t".'<SPAN style="cursor: pointer;" onclick="js_toggle_container('."'".$m1['name']."'".')">';
@@ -165,10 +189,13 @@ foreach($menu AS $m)
 				$display='none';
 			else
 				$display='block';
+						
 			echo "\n\t<DIV>\n\t".'<SPAN id="'.$m1['name'].'" style="display:'.$display.'">';
 			foreach($m1 AS $m2)
-				if (is_array($m2))
+				if (is_array($m2)  && isset($m2['name']))
 				{
+					if (isset($m2['permissions']) && !checkpermission($m2['permissions']))
+						continue;
 					if (isset($m2['link']))
 						echo "\n\t\t".'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&middot; <a href="'.$m2['link'].'" ';
 					if (isset($m2['target']))
