@@ -183,7 +183,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		$zeitsperre->vonstunde = $_POST['vonstunde'];
 		$zeitsperre->bisdatum = $_POST['bisdatum'];
 		$zeitsperre->bisstunde = $_POST['bisstunde'];
-		$zeitsperre->erreichbarkeit = $_POST['erreichbarkeit'];
+		$zeitsperre->erreichbarkeit_kurzbz = $_POST['erreichbarkeit'];
 		$zeitsperre->vertretung_uid = $_POST['vertretung_uid'];
 		$zeitsperre->updateamum = date('Y-m-d H:i:s');
 		$zeitsperre->updatevon = $uid;
@@ -384,7 +384,7 @@ $content_form.= "</SELECT></td></tr>";
 $content_form.= "<tr><td>Erreichbarkeit</td><td><SELECT name='erreichbarkeit'>";
 foreach ($erreichbarkeit_arr as $erreichbarkeit_key=>$erreichbarkeit_beschreibung)
 {
-	if($zeitsperre->erreichbarkeit == $erreichbarkeit_key)
+	if($zeitsperre->erreichbarkeit_kurzbz == $erreichbarkeit_key)
 		$content_form.= "<OPTION value='$erreichbarkeit_key' selected>$erreichbarkeit_beschreibung</OPTION>\n";
 	else
 		$content_form.= "<OPTION value='$erreichbarkeit_key'>$erreichbarkeit_beschreibung</OPTION>\n";
