@@ -51,18 +51,84 @@ $datum_begin=$ss->start;
 $datum_ende='2008-07-09'; // $ss->ende
 //$datum_ende='2008-01-18'; // $ss->ende
 
+// ************* FUNCTIONS **************** //
 
-$message_begin='Dies ist eine automatische Mail!<BR>Es haben sich folgende Aenderungen in Ihrem Stundenplan ergeben:<BR>';
+function getStudentsFromGroup($studiengang_kz, $semester, $verband, $gruppe, $gruppe_kurzbz, $studiensemester_kurzbz)
+{
+	global $conn;
+	
+	$students = array();
+	if($gruppe_kurzbz=='')
+	{
+		$qry = "SELECT 
+					distinct student_uid 
+				FROM 
+					public.tbl_studentlehrverband 
+				WHERE 
+					studiensemester_kurzbz='$studiensemester_kurzbz' AND
+					studiengang_kz = '$studiengang_kz' AND
+					semester = '$semester'";
+		if(trim($verband)!='')
+		{
+			$qry.=" AND verband = '$verband'";
+			if(trim($gruppe)!='')
+			{
+				$qry.=" AND gruppe = '$gruppe'";
+			}
+		}
+	}
+	else 
+	{
+		$qry = "SELECT 
+					distinct uid as student_uid 
+				FROM 
+					public.tbl_benutzergruppe
+				WHERE
+					gruppe_kurzbz='$gruppe_kurzbz' AND
+					studiensemester_kurzbz='$studiensemester_kurzbz'
+				";
+					
+	}
+	
+	if($result = pg_query($conn, $qry))
+	{
+		while($row = pg_fetch_object($result))
+		{
+			$students[]=$row->student_uid;
+		}
+	}
+	//echo "students $qry:";
+	//var_dump($students);
+	return $students;	
+}
 
+// **************************************** //
+$message_begin='
+<style>
+.marked
+{
+	color:red;
+}
+.unmarked
+{
+}
+</style>
+Dies ist eine automatische Mail!<BR>Es haben sich folgende Aenderungen in Ihrem Stundenplan ergeben:<BR>';
 
 /**************************************************
  * Datensaetze holen die neu sind
  */
-echo 'Neue Datens&auml;tze werden geholt.<BR>';flush();
+echo 'Neue Datens&auml;tze werden geholt. ('.date('H:i:s').')<BR>';flush();
+$message_stpl .= 'Neue Datens&auml;tze werden geholt. ('.date('H:i:s').')';
+//$sql_query="SELECT * FROM lehre.vw_stundenplandev WHERE datum>='$datum_begin' AND datum<='$datum_ende' AND
+//	stundenplandev_id NOT IN
+//	(SELECT stundenplan_id FROM lehre.tbl_stundenplan WHERE datum>='$datum_begin' AND datum<='$datum_ende')
+//	ORDER BY datum, stunde;";
 $sql_query="SELECT * FROM lehre.vw_stundenplandev WHERE datum>='$datum_begin' AND datum<='$datum_ende' AND
-	stundenplandev_id NOT IN
-	(SELECT stundenplan_id FROM lehre.tbl_stundenplan WHERE datum>='$datum_begin' AND datum<='$datum_ende')
+	NOT EXISTS
+	(SELECT stundenplan_id FROM lehre.tbl_stundenplan WHERE datum>='$datum_begin' AND datum<='$datum_ende' AND stundenplan_id=stundenplandev_id)
 	ORDER BY datum, stunde;";
+
 //echo $sql_query.'<BR>';
 if (!$result=pg_query($conn, $sql_query))
 {
@@ -131,27 +197,31 @@ else
 						<TABLE><TR><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
 				}
 				$message[$row->uid]->message.='<TR><TH>'.$row->ort_kurzbz.'</TH>';
-				$message[$row->uid]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
+				$message[$row->uid]->message.='<TH>'.strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
 				$message[$row->uid]->message.='<TH>'.$row->lektor.'</TH>';
 				$message[$row->uid]->message.='<TH>'.$row->datum.'/'.$row->stunde.'</TH>';
 				$message[$row->uid]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
 			}
 			// Verband
-			$verband=$row->stg_typ.$row->stg_kurzbz.$row->semester.$row->verband.$row->gruppe;
-			$verband=trim($verband);
-			$verband=strtolower($verband);
-			if (!isset($message[$verband]->isneu))
+			$studenten = getStudentsFromGroup($row->studiengang_kz, $row->semester, $row->verband, $row->gruppe, $row->gruppe_kurzbz, $ss->studiensemester_kurzbz);
+			//$verband=$row->stg_typ.$row->stg_kurzbz.$row->semester.$row->verband.$row->gruppe;
+			//$verband=trim($verband);
+			//$verband=strtolower($verband);
+			foreach ($studenten as $student)
 			{
-				$message[$verband]->isneu=true;
-				$message[$verband]->mailadress=$verband.'@technikum-wien.at';
-				$message[$verband]->message=$message_begin.'<BR>Neue Stunden:<BR>
-						<TABLE><TR><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
+				if (!isset($message[$student]->isneu))
+				{
+					$message[$student]->isneu=true;
+					$message[$student]->mailadress=$student.'@technikum-wien.at';
+					$message[$student]->message=$message_begin.'<BR>Neue Stunden:<BR>
+							<TABLE><TR><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
+				}
+				$message[$student]->message.='<TR><TH>'.$row->ort_kurzbz.'</TH>';
+				$message[$student]->message.='<TH>'.strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
+				$message[$student]->message.='<TH>'.$row->lektor.'</TH>';
+				$message[$student]->message.='<TH>'.$row->datum.'/'.$row->stunde.'</TH>';
+				$message[$student]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
 			}
-			$message[$verband]->message.='<TR><TH>'.$row->ort_kurzbz.'</TH>';
-			$message[$verband]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
-			$message[$verband]->message.='<TH>'.$row->lektor.'</TH>';
-			$message[$verband]->message.='<TH>'.$row->datum.'/'.$row->stunde.'</TH>';
-			$message[$verband]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
 		}
 	}
 	foreach($message as $msg)
@@ -163,10 +233,14 @@ else
 * Datensaetze holen die alt sind
 */
 
-echo '<BR>Alte Datens&auml;tze werden geholt.<BR>';flush();
+echo '<BR>Alte Datens&auml;tze werden geholt.('.date('H:i:s').')<BR>';flush();
+$message_stpl .='<BR>Alte Datens&auml;tze werden geholt.('.date('H:i:s').')<BR>';
+//$sql_query="SELECT * FROM lehre.vw_stundenplan WHERE datum>='$datum_begin' AND datum<='$datum_ende'
+//				AND stundenplan_id NOT IN
+//				(SELECT stundenplandev_id FROM lehre.tbl_stundenplandev WHERE datum>='$datum_begin' AND datum<='$datum_ende');";
 $sql_query="SELECT * FROM lehre.vw_stundenplan WHERE datum>='$datum_begin' AND datum<='$datum_ende'
-				AND stundenplan_id NOT IN
-				(SELECT stundenplandev_id FROM lehre.tbl_stundenplandev WHERE datum>='$datum_begin' AND datum<='$datum_ende');";
+				AND NOT EXISTS
+				(SELECT stundenplandev_id FROM lehre.tbl_stundenplandev WHERE datum>='$datum_begin' AND datum<='$datum_ende' AND stundenplandev_id=stundenplan_id);";
 if (!$result=pg_query($conn, $sql_query))
 {
 	echo $sql_query.' fehlgeschlagen!<BR>'.pg_last_error($conn);
@@ -208,27 +282,32 @@ else
 						<TABLE><TR><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
 				}
 				$message[$row->uid]->message.='<TR><TH>'.$row->ort_kurzbz.'</TH>';
-				$message[$row->uid]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
+				$message[$row->uid]->message.='<TH>'.strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
 				$message[$row->uid]->message.='<TH>'.$row->lektor.'</TH>';
 				$message[$row->uid]->message.='<TH>'.$row->datum.'/'.$row->stunde.'</TH>';
 				$message[$row->uid]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
 			}
 			// Verband
-			$verband=$row->stg_typ.$row->stg_kurzbz.$row->semester.$row->verband.$row->gruppe;
-			$verband=trim($verband);
-			$verband=strtolower($verband);
-			if (!isset($message[$verband]->isalt))
+			$studenten = getStudentsFromGroup($row->studiengang_kz, $row->semester, $row->verband, $row->gruppe, $row->gruppe_kurzbz, $ss->studiensemester_kurzbz);
+			//$verband=$row->stg_typ.$row->stg_kurzbz.$row->semester.$row->verband.$row->gruppe;
+			//$verband=trim($verband);
+			//$verband=strtolower($verband);
+			foreach ($studenten as $student)
 			{
-				$message[$verband]->isalt=true;
-				$message[$verband]->mailadress=$verband.'@technikum-wien.at';
-				$message[$verband]->message.=$message_begin.'<BR>Geaenderte Stunden:<BR>
-						<TABLE><TR><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
+				if (!isset($message[$student]->isalt))
+				{
+					$message[$student]->isalt=true;
+					$message[$student]->mailadress=$student.'@technikum-wien.at';
+					$message[$student]->message_begin=$message_begin.'<BR>';
+					$message[$student]->message.='Geaenderte Stunden:<BR>
+							<TABLE><TR><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
+				}
+				$message[$student]->message.='<TR><TH>'.$row->ort_kurzbz.'</TH>';
+				$message[$student]->message.='<TH>'.strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
+				$message[$student]->message.='<TH>'.$row->lektor.'</TH>';
+				$message[$student]->message.='<TH>'.$row->datum.'/'.$row->stunde.'</TH>';
+				$message[$student]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
 			}
-			$message[$verband]->message.='<TR><TH>'.$row->ort_kurzbz.'</TH>';
-			$message[$verband]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
-			$message[$verband]->message.='<TH>'.$row->lektor.'</TH>';
-			$message[$verband]->message.='<TH>'.$row->datum.'/'.$row->stunde.'</TH>';
-			$message[$verband]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
 		}
 	}
 	foreach($message as $msg)
@@ -240,9 +319,10 @@ else
  * Datensaetze holen die anders sind
  */
 
-echo '<BR>Ge&auml;nderte Datens&auml;tze werden geholt.<BR>';flush();
+echo '<BR>Ge&auml;nderte Datens&auml;tze werden geholt.('.date('H:i:s').')<BR>';flush();
+$message_stpl.='<BR>Ge&auml;nderte Datens&auml;tze werden geholt.('.date('H:i:s').')<BR>';
 $sql_query="SELECT vw_stundenplandev.*, vw_stundenplan.datum AS old_datum, vw_stundenplan.stunde AS old_stunde,
-				vw_stundenplan.ort_kurzbz AS old_ort_kurzbz, vw_stundenplan.lektor AS old_lektor
+				vw_stundenplan.ort_kurzbz AS old_ort_kurzbz, vw_stundenplan.lektor AS old_lektor, vw_stundenplan.uid AS old_uid
 			FROM lehre.vw_stundenplandev, lehre.vw_stundenplan
 			WHERE vw_stundenplan.stundenplan_id=vw_stundenplandev.stundenplandev_id AND (
 				vw_stundenplandev.unr!=vw_stundenplan.unr OR
@@ -334,42 +414,96 @@ else
 					$message[$row->uid]->mailadress=$row->uid.'@technikum-wien.at';
 					$message[$row->uid]->message_begin=$message_begin.'<BR>';
 					$message[$row->uid]->message.='Ge&auml;nderte Stunden:<BR>
-						<TABLE><TR><TD>Status</TD><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
+						<TABLE><TR><TH>Status</TH><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum/Std</TH><TH>Lehrfach</TH></TR>';
 				}
-				$message[$row->uid]->message.='<TR><TH>Vorher: </TH><TH>'.$row->old_ort_kurzbz.'</TH>';
-				$message[$row->uid]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
-				$message[$row->uid]->message.='<TH>'.$row->old_lektor.'</TH>';
-				$message[$row->uid]->message.='<TH>'.$row->old_datum.'/'.$row->old_stunde.'</TH>';
-				$message[$row->uid]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
+				$message[$row->uid]->message.='<TR><TD>Vorher: </TD>';
+				$message[$row->uid]->message.='<TD>'.$row->old_ort_kurzbz.'</TD>';
+				$message[$row->uid]->message.='<TD>'.strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TD>';
+				$message[$row->uid]->message.='<TD>'.$row->old_lektor.'</TD>';
+				$message[$row->uid]->message.='<TD>'.$row->old_datum.'/'.$row->old_stunde.'</TD>';
+				$message[$row->uid]->message.='<TD>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TD></TR>';
 
-				$message[$row->uid]->message.='<TR><TH>Jetzt: </TH><TH>'.$row->ort_kurzbz.'</TH>';
-				$message[$row->uid]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
-				$message[$row->uid]->message.='<TH>'.$row->lektor.'</TH>';
-				$message[$row->uid]->message.='<TH>'.$row->datum.'/'.$row->stunde.'</TH>';
-				$message[$row->uid]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
+				$message[$row->uid]->message.='<TR><TD>Jetzt: </TD>';
+				$myclass=($row->ort_kurzbz!=$row->old_ort_kurzbz?'marked':'unmarked');
+				$message[$row->uid]->message.='<TD><span class="'.$myclass.'">'.$row->ort_kurzbz.'</span></TD>';
+				$myclass='unmarked';
+				$message[$row->uid]->message.='<TD><span class="'.$myclass.'">'.strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</span></TD>';
+				$myclass=($row->lektor!=$row->old_lektor?'marked':'unmarked');
+				$message[$row->uid]->message.='<TD><span class="'.$myclass.'">'.$row->lektor.'</span></TD>';
+				$myclass=(($row->datum!=$row->old_datum) || ($row->stunde!=$row->old_stunde)?'marked':'unmarked');
+				$message[$row->uid]->message.='<TD><span class="'.$myclass.'">'.$row->datum.'/'.$row->stunde.'</span></TD>';
+				$myclass='unmarked';
+				$message[$row->uid]->message.='<TD><span class="'.$myclass.'">'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</span></TD></TR>';
+			}
+			
+			//wenn sich der Lektor geaendert hat dann auch den vorherigen lektor informieren
+			//sofern es kein dummylektor ist
+			if($row->uid!=$row->old_uid)
+			{
+				if (substr($row->old_uid,0,1)!='_')
+				{
+					if (!isset($message[$row->old_uid]->isset))
+					{
+						$message[$row->old_uid]->isset=true;
+						$message[$row->old_uid]->mailadress=$row->old_uid.'@technikum-wien.at';
+						$message[$row->old_uid]->message_begin=$message_begin.'<BR>';
+						$message[$row->old_uid]->message.='Ge&auml;nderte Stunden:<BR>
+							<TABLE><TR><TH>Status</TH><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum/Std</TH><TH>Lehrfach</TH></TR>';
+					}
+					$message[$row->old_uid]->message.='<TR><TD>Vorher: </TD>';
+					$message[$row->old_uid]->message.='<TD>'.$row->old_ort_kurzbz.'</TD>';
+					$message[$row->old_uid]->message.='<TD>'.strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TD>';
+					$message[$row->old_uid]->message.='<TD>'.$row->old_lektor.'</TD>';
+					$message[$row->old_uid]->message.='<TD>'.$row->old_datum.'/'.$row->old_stunde.'</TD>';
+					$message[$row->old_uid]->message.='<TD>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TD></TR>';
+	
+					$message[$row->old_uid]->message.='<TR><TD>Jetzt: </TD>';
+					$myclass=($row->ort_kurzbz!=$row->old_ort_kurzbz?'marked':'unmarked');
+					$message[$row->old_uid]->message.='<TD><span class="'.$myclass.'">'.$row->ort_kurzbz.'</span></TD>';
+					$myclass='unmarked';
+					$message[$row->old_uid]->message.='<TD><span class="'.$myclass.'">'.strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</span></TD>';
+					$myclass=($row->lektor!=$row->old_lektor?'marked':'unmarked');
+					$message[$row->old_uid]->message.='<TD><span class="'.$myclass.'">'.$row->lektor.'</span></TD>';
+					$myclass=(($row->datum!=$row->old_datum) || ($row->stunde!=$row->old_stunde)?'marked':'unmarked');
+					$message[$row->old_uid]->message.='<TD><span class="'.$myclass.'">'.$row->datum.'/'.$row->stunde.'</span></TD>';
+					$myclass='unmarked';
+					$message[$row->old_uid]->message.='<TD><span class="'.$myclass.'">'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</span></TD></TR>';
+				}
 			}
 			// Verband
-			$verband=$row->stg_typ.$row->stg_kurzbz.$row->semester.$row->verband.$row->gruppe;
-			$verband=trim($verband);
-			$verband=strtolower($verband);
-			if (!isset($message[$verband]->isset))
+			$studenten = getStudentsFromGroup($row->studiengang_kz, $row->semester, $row->verband, $row->gruppe, $row->gruppe_kurzbz, $ss->studiensemester_kurzbz);
+			//$verband=$row->stg_typ.$row->stg_kurzbz.$row->semester.$row->verband.$row->gruppe;
+			//$verband=trim($verband);
+			foreach ($studenten as $student)
 			{
-				$message[$verband]->isset=true;
-				$message[$verband]->mailadress=$verband.'@technikum-wien.at';
-				$message[$verband]->message.=$message_begin.'<BR>Ge&auml;nderte Stunden:<BR>
-						<TABLE><TR><TD>Status</TD><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
+				//$verband=strtolower($verband);
+				if (!isset($message[$student]->isset))
+				{
+					$message[$student]->isset=true;
+					$message[$student]->mailadress=$student.'@technikum-wien.at';
+					$message[$student]->message_begin=$message_begin.'<BR>';
+					$message[$student]->message.='Ge&auml;nderte Stunden:<BR>
+							<TABLE><TR><TH>Status</TH><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum/Std</TH><TH>Lehrfach</TH></TR>';
+				}
+				$message[$student]->message.='<TR><TD>Vorher: </TD>';
+				$message[$student]->message.='<TD>'.$row->old_ort_kurzbz.'</TD>';
+				$message[$student]->message.='<TD>'.strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TD>';
+				$message[$student]->message.='<TD>'.$row->old_lektor.'</TD>';
+				$message[$student]->message.='<TD>'.$row->old_datum.'/'.$row->old_stunde.'</TD>';
+				$message[$student]->message.='<TD>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TD></TR>';
+	
+				$message[$student]->message.='<TR><TD>Jetzt: </TD>';
+				$myclass=($row->ort_kurzbz!=$row->old_ort_kurzbz?'marked':'unmarked');
+				$message[$student]->message.='<TD><span class="'.$myclass.'">'.$row->ort_kurzbz.'</span></TD>';
+				$myclass='unmarked';
+				$message[$student]->message.='<TD><span class="'.$myclass.'">'.strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</span></TD>';
+				$myclass=($row->lektor!=$row->old_lektor?'marked':'unmarked');
+				$message[$student]->message.='<TD><span class="'.$myclass.'">'.$row->lektor.'</span></TD>';
+				$myclass=(($row->datum!=$row->old_datum) || ($row->stunde!=$row->old_stunde)?'marked':'unmarked');
+				$message[$student]->message.='<TD><span class="'.$myclass.'">'.$row->datum.'/'.$row->stunde.'</span></TD>';
+				$myclass='unmarked';
+				$message[$student]->message.='<TD><span class="'.$myclass.'">'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</span></TD></TR>';
 			}
-			$message[$verband]->message.='<TR><TH>Vorher: </TH><TH>'.$row->old_ort_kurzbz.'</TH>';
-			$message[$verband]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
-			$message[$verband]->message.='<TH>'.$row->old_lektor.'</TH>';
-			$message[$verband]->message.='<TH>'.$row->old_datum.'/'.$row->old_stunde.'</TH>';
-			$message[$verband]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
-
-			$message[$verband]->message.='<TR><TH>Jetzt: </TH><TH>'.$row->ort_kurzbz.'</TH>';
-			$message[$verband]->message.='<TH>'.$row->stg_typ.$row->stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TH>';
-			$message[$verband]->message.='<TH>'.$row->lektor.'</TH>';
-			$message[$verband]->message.='<TH>'.$row->datum.'/'.$row->stunde.'</TH>';
-			$message[$verband]->message.='<TH>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TH></TR>';
 		}
 	}
 	foreach($message as $msg)
@@ -378,11 +512,11 @@ else
 }
 
 /**************************************************
- * Mails an Lektoren und Verbaende schicken
+ * Mails an Lektoren und Studenten schicken
  */
 if ($sendmail)
 	foreach ($message as $msg)
-		//if (mail('pam@technikum-wien.at',"Stundenplan update",$msg->message,$headers."From: stpl@technikum-wien.at"))
+		//if (mail('oesi@technikum-wien.at',"Stundenplan update - ".$msg->mailadress,$msg->message_begin.$msg->message,$headers."From: stpl@technikum-wien.at"))
 		if (mail($msg->mailadress,"Stundenplan update",$msg->message_begin.$msg->message,$headers."From: stpl@technikum-wien.at"))
 		{
 			echo 'Mail an '.$msg->mailadress.' wurde verschickt!<BR>';
@@ -401,8 +535,10 @@ $message_tmp=$count_upd.' Datens&auml;tze wurden ge&auml;ndert.<BR>
 echo '<BR>'.$message_tmp;
 $message_sync='<HTML><BODY>'.$message_tmp.$message_sync.$message_stpl.'</BODY></HTML>';
 mail(MAIL_ADMIN,"Stundenplan update",$message_sync,$headers."From: ".MAIL_LVPLAN);
+//mail('oesi@technikum-wien.at',"Stundenplan update",$message_sync,$headers."From: ".MAIL_LVPLAN);
 $message_stpl='<HTML><BODY>'.$message_tmp.$message_stpl.'</BODY></HTML>';
 mail(MAIL_LVPLAN,"Stundenplan update",$message_stpl,$headers."From: ".MAIL_LVPLAN);
+//mail('oesi@technikum-wien.at',"Stundenplan update",$message_stpl,$headers."From: ".MAIL_LVPLAN);
 ?>
 </body>
 </html>
