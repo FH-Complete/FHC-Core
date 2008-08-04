@@ -4011,6 +4011,7 @@ function StudentCreateDiplSupplement()
 			var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
 			var uid=tree.view.getCellText(v,col);
 			paramList += ';'+uid;
+			stg_kz=getTreeCellText(tree,"student-treecol-studiengang_kz", v);
 		}
 	}
 	
@@ -4021,7 +4022,7 @@ function StudentCreateDiplSupplement()
 	}
 	
 	//PDF erzeugen
-	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=diplomasupplement.xml.php&xsl=DiplSupplement&uid='+paramList,'DiplomaSupplement', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=diplomasupplement.xml.php&xsl=DiplSupplement&xsl_stg_kz='+stg_kz+'&uid='+paramList,'DiplomaSupplement', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
