@@ -155,6 +155,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 			<option value="B">B</option>
 			<option value="C">C</option>
 			<option value="D">D</option>
+			<option value="F">F</option>
+			<option value="V">V</option>
 			</select>
 		</td>
 		<td valign="middle" >
