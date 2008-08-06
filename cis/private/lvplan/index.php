@@ -11,8 +11,14 @@
 	//echo $sql_query;
 	$result=pg_query($conn, $sql_query);
 
-	if(!$result)
-		echo "User not found!";
+	if(pg_num_rows($result)==0)
+	{
+		//GastAccount
+		$uid='';
+		$nachname='';
+		$vornamen='';
+		//echo "User not found!";
+	}
 	else
 	{
 		$uid=pg_result($result,0,'"uid"');

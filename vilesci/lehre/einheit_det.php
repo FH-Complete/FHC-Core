@@ -1,4 +1,24 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
 require_once('../config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
@@ -12,7 +32,7 @@ if(!$conn=pg_pconnect(CONN_STRING))
    die('Fehler beim Aufbau der Datenbankconnection');
    
 $user=get_uid();
-$kurzbz=(isset($_GET['kurzbz'])?$_GET['kurzbz']:$_POST['einheit_id']);
+$kurzbz=(isset($_GET['kurzbz'])?$_GET['kurzbz']:$_POST['kurzbz']);
 
 if (isset($_POST['new'])) 
 {
@@ -33,7 +53,7 @@ else if (isset($_GET['type']) && $_GET['type']=='delete')
 }
 $gruppe = new gruppe($conn);
 if(!$gruppe->load($kurzbz))
-	die('Gruppe wurde nicht gefunden');
+	die('Gruppe wurde nicht gefunden:'+$kurzbz);
 
 ?>
 <html>
@@ -44,7 +64,10 @@ if(!$gruppe->load($kurzbz))
 </head>
 <body>
 <H1>Gruppe <?php echo $kurzbz ?></H1>
+
 <?php
+echo "<a href='einheit_menu.php?studiengang_kz=$gruppe->studiengang_kz'>Zurück zur &Uuml;bersicht</a><br><br>";
+
 if(!$gruppe->generiert)
 {
 	echo '
@@ -54,7 +77,7 @@ if(!$gruppe->generiert)
   	<SELECT name="uid">';
    
 	$qry = "SELECT * FROM campus.vw_benutzer ORDER BY nachname, vorname";
-	echo $qry;
+
 	$result = pg_query($conn, $qry);
 			
 	for ($i=0;$row = pg_fetch_object($result);$i++)
@@ -65,7 +88,7 @@ if(!$gruppe->generiert)
 	echo '
 	  </SELECT>
 	  
-	  <INPUT type="hidden" name="einheit_id" value="<?php echo $kurzbz; ?>">
+	  <INPUT type="hidden" name="kurzbz" value="'.$kurzbz.'">
 	  <INPUT type="submit" name="new" value="Hinzuf&uuml;gen">
 	</FORM>
 	<HR>';
@@ -93,7 +116,7 @@ if(!$gruppe->generiert)
 		}
 	}
 	else 
-		die('Fehler beim laden der Benutzer');
+		die('Fehler beim Laden der Benutzer');
 
 ?>
 </table>

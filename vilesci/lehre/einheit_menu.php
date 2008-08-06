@@ -1,4 +1,24 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
 require_once('../config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
@@ -28,7 +48,7 @@ else
 ?>
 <html>
 <head>
-<title>Einheiten Verwaltung</title>
+<title>Gruppe-Verwaltung</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <script language="JavaScript">
@@ -41,6 +61,9 @@ function conf_del()
 <body>
 <H1>Gruppen Verwaltung</H1>
 <?php
+if($studiengang_kz==null && isset($_POST['studiengang_kz']))
+	$studiengang_kz = $_POST['studiengang_kz'];
+
 // Studiengang AuswahlFilter
 $stg=new studiengang($conn);
 if ($stg->getAll('kurzbzlang'))
@@ -181,10 +204,6 @@ function doEdit($conn,$kurzbz,$new=false)
 		<input type="hidden" name="pk" value="<?php echo $e->gruppe_kurzbz ?>" />
 		<input type="hidden" name="new" value="<?php echo ($new?'true':'false') ?>" />
     	<input type="hidden" name="type" value="save">
-		<?php
-		if ($new)
-			echo '<input type="hidden" name="new" value="1">';
-		?>
     	<input type="submit" name="save" value="Speichern">
   	</p>
   	<hr>
@@ -200,12 +219,6 @@ function getUebersicht()
 	$gruppeen=$gruppe->getgruppe($studiengang_kz,$semester);
 	//print_r($gruppeen);
 	?>
-	<!--
-</form>
-<form name="stdplan" method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>">
-<input type="submit" name="newFrm" value="Neue Einheit anlegen"> <br/>
-</form>
--->
 <h3>&Uuml;bersicht</h3>
 
 <table class='liste'>
@@ -220,7 +233,7 @@ function getUebersicht()
 	$qry = "SELECT studiengang_kz, UPPER(typ::varchar(1) || kurzbz) as kuerzel FROM public.tbl_studiengang";
 	$stg = array();
 	if(!$result = pg_query($conn, $qry))
-		die('Fehler beim laden der Studiengaenge');
+		die('Fehler beim Laden der Studiengaenge');
 	while($row = pg_fetch_object($result))
 		$stg[$row->studiengang_kz] = $row->kuerzel;
 
@@ -239,7 +252,7 @@ function getUebersicht()
 		echo "<td>".$gruppe->countStudenten($e->gruppe_kurzbz)."</td>";
 		echo "<td class='button'><a href='einheit_det.php?kurzbz=$e->gruppe_kurzbz'>Details</a></td>";
 		echo "<td class='button'><a href=\"einheit_menu.php?edit=1&kurzbz=$e->gruppe_kurzbz\">Edit</a></td>";
-	   	echo "<td class='button'><a href=\"einheit_menu.php?einheit_id=$e->gruppe_kurzbz&type=delete\" onclick='return conf_del()'>Delete</a></td>";
+	   	echo "<td class='button'><a href=\"einheit_menu.php?einheit_id=$e->gruppe_kurzbz&studiengang_kz=$e->studiengang_kz&type=delete\" onclick='return conf_del()'>Delete</a></td>";
 	   	echo "</tr>\n";
 	}
 ?>

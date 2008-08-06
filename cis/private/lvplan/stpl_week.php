@@ -144,7 +144,9 @@ elseif (check_lektor($uid, $conn))
 	$user='lektor';
 else
 {
-	die("Cannot set usertype!");
+	//die("Cannot set usertype!");
+	//GastAccountHack
+	$user='student';
 }
 
     // User bestimmen
