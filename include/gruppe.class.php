@@ -84,7 +84,7 @@ class gruppe
 			return true;
 		else
 		{
-			$this->errormsg = 'Fehler beim loeschen der Gruppe';
+			$this->errormsg = 'Fehler beim Loeschen der Gruppe';
 			return false;
 		}
 	}
@@ -143,13 +143,13 @@ class gruppe
 			}
 			else
 			{
-				$this->errormsg = 'Fehler beim laden der Daten';
+				$this->errormsg = 'Fehler beim Laden der Daten';
 				return false;
 			}
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden der Daten';
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
@@ -186,7 +186,7 @@ class gruppe
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden der Gruppen';
+			$this->errormsg = 'Fehler beim Laden der Gruppen';
 			return false;
 		}
 	}
@@ -200,13 +200,13 @@ class gruppe
 				return $row->anzahl;
 			else
 			{
-				$this->errormsg = 'Fehler beim lesen der benutzergruppe';
+				$this->errormsg = 'Fehler beim Lesen der benutzergruppe';
 				return false;
 			}
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim lesen der benutzergruppe';
+			$this->errormsg = 'Fehler beim Lesen der benutzergruppe';
 			return false;
 		}
 	}
@@ -214,11 +214,11 @@ class gruppe
 	function getgruppe($studiengang_kz=null, $semester=null, $mailgrp=null, $sichtbar=null)
 	{
 		$qry = 'SELECT * FROM public.tbl_gruppe WHERE 1=1';
-		if(!is_null($studiengang_kz))
+		if(!is_null($studiengang_kz) && $studiengang_kz!='')
 			$qry .= " AND studiengang_kz='$studiengang_kz'";
-		if(!is_null($semester))
+		if(!is_null($semester) && $semester!='')
 			$qry .= " AND semester='$semester'";
-		if(!is_null($mailgrp))
+		if(!is_null($mailgrp) && $mailgrp!='')
 			$qry .= " AND mailgrp=".($mailgrp?'true':'false');
 		if(!is_null($sichtbar))
 			$qry .= " AND sichtbar=".($sichtbar?'true':'false');
@@ -251,7 +251,7 @@ class gruppe
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden der Gruppen'.$qry;
+			$this->errormsg = 'Fehler beim Laden der Gruppen'.$qry;
 			return false;
 		}
 	}
