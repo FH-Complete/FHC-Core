@@ -1652,110 +1652,123 @@ if(!$error)
 		{
 			$bm = new betriebsmittel($conn, null, true);
 
-			//Nachschauen ob dieses Betriebsmittel schon existiert
-			if($bm->getBetriebsmittel($_POST['betriebsmitteltyp'],$_POST['nummerold']))
+			//Das speichern von Zutrittskarten ohne Nummern verhindern
+			if($_POST['betriebsmitteltyp']=='Zutrittskarte' && $_POST['nummer']=='')
 			{
-				if(count($bm->result)>0)
+				$error = true;
+				$return = false;
+				$errormsg = 'Eine Zutrittskarte muss eine Nummer haben. Um die Zuordnung zu dieser Karte zu loeschen entfernen Sie bitte den ganzen Datensatz';
+			}
+			else 
+			{
+				//Nachschauen ob dieses Betriebsmittel schon existiert
+				if($bm->getBetriebsmittel($_POST['betriebsmitteltyp'],$_POST['nummerold']))
 				{
-					//Wenn die Nummer gleich bleibt dann die alte ID verwenden da es
-					//unterschiedliche Schluessel gibt die die gleiche nummer haben ?!?
-					if($_POST['nummer']==$_POST['nummerold'])
+					if(count($bm->result)>0)
 					{
-						$betriebsmittel_id = $_POST['betriebsmittel_id'];
-					}
-					else 
-						$betriebsmittel_id = $bm->result[0]->betriebsmittel_id;
-					//Wenn ein Eintrag gefunden wurde, dann wird die Beschreibung aktualisiert
-					if($bm->load($betriebsmittel_id))
-					{
-						$bm->beschreibung = $_POST['beschreibung'];
-						$bm->nummer = $_POST['nummer'];
-						if(!$bm->save(false))
+						//Wenn die Nummer gleich bleibt dann die alte ID verwenden da es
+						//unterschiedliche Schluessel gibt die die gleiche nummer haben ?!?
+						if($_POST['nummer']==$_POST['nummerold'])
+						{
+							$betriebsmittel_id = $_POST['betriebsmittel_id'];
+						}
+						else 
+							$betriebsmittel_id = $bm->result[0]->betriebsmittel_id;
+						//Wenn ein Eintrag gefunden wurde, dann wird die Beschreibung aktualisiert
+						if($bm->load($betriebsmittel_id))
+						{
+							$bm->beschreibung = $_POST['beschreibung'];
+							$bm->nummer = $_POST['nummer'];
+							if(!$bm->save(false))
+							{
+								$return = false;
+								$error = true;
+								$errormsg = 'Fehler beim Speichern des Betriebsmittels';
+							}
+						}
+						else
 						{
 							$return = false;
 							$error = true;
-							$errormsg = 'Fehler beim Speichern des Betriebsmittels';
+							$errormsg = 'Gefundener Eintrag konnte nicht geladen werden!?!?';
 						}
 					}
 					else
 					{
-						$return = false;
-						$error = true;
-						$errormsg = 'Gefundener Eintrag konnte nicht geladen werden!?!?';
+						//Wenn kein Eintrag gefunden wurde, dann wird ein neuer Eintrag angelegt
+						$bm->betriebsmitteltyp = $_POST['betriebsmitteltyp'];
+						$bm->nummer = $_POST['nummer'];
+						$bm->beschreibung = $_POST['beschreibung'];
+						$bm->reservieren = false;
+						$bm->ort_kurzbz = null;
+						$bm->insertamum = date('Y-m-d H:i:s');
+						$bm->insertvon = $user;
+	
+						if($bm->save(true))
+						{
+							$betriebsmittel_id = $bm->betriebsmittel_id;
+						}
+						else
+						{
+							$error = true;
+							$return = false;
+							$errormsg = 'Fehler beim Anlegen des Betriebsmittels';
+						}
+					}
+	
+					//Zuordnung Betriebsmittel-Person anlegen
+					$bmp = new betriebsmittelperson($conn, null, null, true);
+					if($_POST['neu']!='true')
+					{
+						if($bmp->load($betriebsmittel_id, $_POST['person_id']))
+						{
+							$bmp->updateamum = date('Y-m-d H:i:s');
+							$bmp->updatevon = $user;
+							$bmp->new = false;
+						}
+						else
+						{
+							//$error = true;
+							//$return = false;
+							//$errormsg = 'Fehler beim Laden der Betriebmittelperson Zuordnung'.$betriebsmittel_id.'-'.$_POST['person_id'];
+							$bmp->insertamum = date('Y-m-d H:i:s');
+							$bmp->insertvon = $user;
+							$bmp->new = true;
+						}
+					}
+					else
+					{
+						$bmp->insertamum = date('Y-m-d H:i:s');
+						$bmp->insertvon = $user;
+						$bmp->new = true;
+					}
+	
+					if(!$error)
+					{
+						$bmp->person_id = $_POST['person_id'];
+						$bmp->betriebsmittel_id=$betriebsmittel_id;
+						$bmp->anmerkung = $_POST['anmerkung'];
+						$bmp->kaution = trim(str_replace(',','.',$_POST['kaution']));
+						$bmp->ausgegebenam = $_POST['ausgegebenam'];
+						$bmp->retouram = $_POST['retouram'];
+	
+						if($bmp->save())
+						{
+							$return = true;
+							$data = $betriebsmittel_id;
+						}
+						else
+						{
+							$return = false;
+							$errormsg = $bmp->errormsg;
+						}
 					}
 				}
 				else
 				{
-					//Wenn kein Eintrag gefunden wurde, dann wird ein neuer Eintrag angelegt
-					$bm->betriebsmitteltyp = $_POST['betriebsmitteltyp'];
-					$bm->nummer = $_POST['nummer'];
-					$bm->beschreibung = $_POST['beschreibung'];
-					$bm->reservieren = false;
-					$bm->ort_kurzbz = null;
-					$bm->insertamum = date('Y-m-d H:i:s');
-					$bm->insertvon = $user;
-
-					if($bm->save(true))
-					{
-						$betriebsmittel_id = $bm->betriebsmittel_id;
-					}
-					else
-					{
-						$error = true;
-						$return = false;
-						$errormsg = 'Fehler beim Anlegen des Betriebsmittels';
-					}
+					$errormsg = 'Fehler:'.$bm->errormsg;
+					$return = false;
 				}
-
-				//Zuordnung Betriebsmittel-Person anlegen
-				$bmp = new betriebsmittelperson($conn, null, null, true);
-				if($_POST['neu']!='true')
-				{
-					if($bmp->load($betriebsmittel_id, $_POST['person_id']))
-					{
-						$bmp->updateamum = date('Y-m-d H:i:s');
-						$bmp->updatevon = $user;
-						$bmp->new = false;
-					}
-					else
-					{
-						$error = true;
-						$return = false;
-						$errormsg = 'Fehler beim Laden der Betriebmittelperson Zuordnung'.$betriebsmittel_id.'-'.$_POST['person_id'];
-					}
-				}
-				else
-				{
-					$bmp->insertamum = date('Y-m-d H:i:s');
-					$bmp->insertvon = $user;
-					$bmp->new = true;
-				}
-
-				if(!$error)
-				{
-					$bmp->person_id = $_POST['person_id'];
-					$bmp->betriebsmittel_id=$betriebsmittel_id;
-					$bmp->anmerkung = $_POST['anmerkung'];
-					$bmp->kaution = trim(str_replace(',','.',$_POST['kaution']));
-					$bmp->ausgegebenam = $_POST['ausgegebenam'];
-					$bmp->retouram = $_POST['retouram'];
-
-					if($bmp->save())
-					{
-						$return = true;
-						$data = $betriebsmittel_id;
-					}
-					else
-					{
-						$return = false;
-						$errormsg = $bmp->errormsg;
-					}
-				}
-			}
-			else
-			{
-				$errormsg = 'Fehler:'.$bm->errormsg;
-				$return = false;
 			}
 		}
 	}
