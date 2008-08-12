@@ -98,7 +98,6 @@ function LektorTreeSelectMitarbeiter()
 {
 	var tree=document.getElementById('tree-lektor');
 	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
-
 	if(LektorTreeOpenStudiengang!=null)
 	{
 	   	for(var i=0;i<items;i++)
@@ -112,6 +111,10 @@ function LektorTreeSelectMitarbeiter()
 				break;
 			}
 	   	}
+	   	//nach dem laden der daten wieder ganz oben im tree positionieren da es sonst vorkommt, dass
+	   	//der scrollbalken unterhalb aller eintraege rutscht und dann nichts mehr im tree sichtbar ist.
+	   	//(funktioniert anscheinend auch nur mit setTimeout)
+	   	window.setTimeout("document.getElementById('tree-lektor').treeBoxObject.scrollToRow(0)",10);
 	}
 }
 
@@ -551,9 +554,14 @@ function onLektorSelect(event)
 		return;
 
 	col = tree.columns ? tree.columns["uid"] : "uid";
+	
 	var uid=tree.view.getCellText(tree.currentIndex,col);
 
 	var stg_idx = tree.view.getParentIndex(tree.currentIndex);
+	//wenn direkt ein studiengang markiert wurde dann abbrechen
+	if(stg_idx==-1)
+		return;
+		
 	var col = tree.columns ? tree.columns["studiengang_kz"] : "studiengang_kz";
 	var stg_kz=tree.view.getCellText(stg_idx,col);
 
