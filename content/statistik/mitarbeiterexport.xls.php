@@ -92,6 +92,21 @@ $zustelladresse=true;
 $mitarbeiterDAO=new mitarbeiter($conn);
 $mitarbeiterDAO->getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $ausgeschieden, $semester_aktuell);
 
+//Sortieren der Eintraege nach Nachname, Vorname
+//Umlaute werden ersetzt damit diese nicht unten angereiht werden
+//sondern richtig mitsortiert
+$vorname=array();
+$nachname=array();
+	
+$umlaute = array('ö','Ö','ü','Ü','ä','Ä');
+$umlauterep = array('o','O','u','U','a','A');
+foreach ($mitarbeiterDAO->result as $key=>$foo)
+{
+	$vorname[$key]=str_replace($umlaute, $umlauterep, $foo->vorname);
+	$nachname[$key]=str_replace($umlaute, $umlauterep, $foo->nachname);
+}
+array_multisort($nachname, SORT_ASC, $vorname, SORT_ASC, $mitarbeiterDAO->result);
+	
 	// Creating a workbook
 	$workbook = new Spreadsheet_Excel_Writer();
 
