@@ -1,18 +1,10 @@
 <?php
 require('../../../config.inc.php');
-//include('../../../include/functions.inc.php');
-/*require_once('../../../../include/Excel/PEAR.php');
-//require_once('../../../../include/Excel/BIFFwriter.php');
-//require_once('../../../../include/Excel/Workbook.php');
-//require_once('../../../../include/Excel/Format.php');
-//require_once('../../../../include/Excel/Worksheet.php');
-//require_once('../../../../include/Excel/Parser.php');
-//require_once('../../../../include/Excel/OLE.php');
-//require_once('../../../../include/Excel/PPS.php');
-//require_once('../../../../include/Excel/Root.php');
-//require_once('../../../../include/Excel/File.php');
-//require_once('../../../../include/Excel/Writer.php');
-//require_once('../../../../include/Excel/Validator.php');*/
+
+// Mail Headers festlegen
+$headers= "MIME-Version: 1.0\r\n";
+$headers.="Content-Type: text/html; charset=iso-8859-1\r\n";
+
 
 $sipass=array();
 $i=0;
@@ -22,7 +14,7 @@ $update=false;
 $custom=array(array());
 $doppelte=array();
 $error=false;
-$fausgabe='';
+$fausgabe='<table>';
 
 if (!$conn=pg_pconnect(CONN_STRING))
 	die(pg_last_error($conn));
@@ -99,9 +91,9 @@ if($result_ext = mssql_query($qry,$conn_ext))
 }
 
 //mehrfach vergebene karten
-$qry="SELECT bmp.person_id as person2, bmp.nachname as nachname2,bmp.nummer as nummer2, bmp.vorname as vorname2,
+$qry="SELECT bmp.person_id as person2, bmp.nachname as nachname2,bmp.nummer as nummer2, bmp.vorname as vorname2, bmp.ausgegebenam as ausgegebenam2, bmp.insertamum AS insertamum2,
 		public.vw_betriebsmittelperson.person_id AS person1, public.vw_betriebsmittelperson.nachname as nachname1, public.vw_betriebsmittelperson.nummer as nummer1,
-		public.vw_betriebsmittelperson.vorname as vorname1, public.vw_betriebsmittelperson.gebdatum as gebdatum1, public.vw_betriebsmittelperson.*
+		public.vw_betriebsmittelperson.vorname as vorname1, public.vw_betriebsmittelperson.ausgegebenam as ausgegebenam1, public.vw_betriebsmittelperson.insertamum AS insertamum1
 	 FROM public.vw_betriebsmittelperson bmp
 	 JOIN public.vw_betriebsmittelperson ON (bmp.nummer=public.vw_betriebsmittelperson.nummer)
 	 WHERE (trim(bmp.nachname)!=trim(public.vw_betriebsmittelperson.nachname) OR (trim(bmp.vorname)!=trim(public.vw_betriebsmittelperson.vorname)))
@@ -111,6 +103,7 @@ $qry="SELECT bmp.person_id as person2, bmp.nachname as nachname2,bmp.nummer as n
 	 ORDER BY bmp.nachname;";
 if($result = pg_query($conn, $qry))
 {
+	$fausgabe.='<tr><th>PersonID</th><th>Nachname</th><th>vorname</th><th>BetriebsmittelNr</th><th>AusgabeAm</th><th>InsertAmUm</th></tr>';
 	while($row=pg_fetch_object($result))
 	{
 		//echo "<br>".$row->person2.", ".$row->nachname2.", ".$row->vorname2.", ".$row->nummer2.", ".$row->person1.", ".$row->nachname1.", ".$row->vorname1.", ".$row->nummer1;
@@ -118,11 +111,12 @@ if($result = pg_query($conn, $qry))
 		if(!in_array($row->nummer1,$doppelte))
 		{
 			$doppelte[$k]=$row->nummer1;
-			$fausgabe.="\n\nUID:".$row->person1.", Name:".$row->nachname1.", ".$row->vorname1.", Betriebsmittelnr.:".$row->nummer1.", ";
-			$fausgabe.="\nUID:".$row->person2.", Name:".$row->nachname2.", ".$row->vorname2.", Betriebsmittelnr.:".$row->nummer2.", ";
+			$fausgabe.='<tr><td>'.$row->person1.'</td><td>'.$row->nachname1.'</td><td>'.$row->vorname1.'</td><td>'.$row->nummer1.'</td><td>'.$row->ausgegebenam1.'</td><td>'.$row->insertamum1.'</td></tr>';
+			$fausgabe.='<tr><td>'.$row->person2.'</td><td>'.$row->nachname2.'</td><td>'.$row->vorname2.'</td><td>'.$row->nummer2.'</td><td>'.$row->ausgegebenam2.'</td><td>'.$row->insertamum2.'</td></tr><tr></tr>';
 			$k++;
 		}
 	}
+	$fausgabe.='</table>';
 }
 
 
@@ -154,7 +148,7 @@ if($result = pg_query($conn, $qry))
 			if($sipass[$j]->card_no==$row->cardnumber)
 			{
 				$upd=FALSE;
-				if($sipass[$j]->last_name!=trim($row->lastname))
+				if($sipass[$j]->last_name!=trim($row->lastname) && !strchr($row->lastname,'ß'))
 				{
 					$sipass[$j]->last_name_old=$sipass[$j]->last_name;
 					$sipass[$j]->last_name=trim($row->lastname);
@@ -211,7 +205,8 @@ if($result = pg_query($conn, $qry))
 						$upd=TRUE;
 					}
 				}
-				if($upd)
+				// Update nur wenn Gruppe nicht mit # beginnt
+				if($upd && substr($sipass[$j]->acc_grp_name,0,1)!='#')
 				{
 					$sipass[$j]->command="U";
 				}
@@ -257,7 +252,7 @@ for($j=0;$j<$i;$j++)
 {
 	if(trim($sipass[$j]->command==''))
 	{
-		$sipass[$j]->command='D';
+		/*$sipass[$j]->command='D';
 		if (substr($sipass[$j]->acc_grp_name,0,1)!='#')
 		{
 			$ausdruck.=$sipass[$j]->command."\t"; // Command
@@ -266,7 +261,7 @@ for($j=0;$j<$i;$j++)
 			$ausdruck.=$sipass[$j]->first_name."\t";	// Firstname
 			$ausdruck.=$sipass[$j]->acc_grp_name."\t";	// Access Group
 			$ausdruck.=$sipass[$j]->card_no."\n";	// Cardnumber
-		}
+		}*/
 	}
 	else
 	{
@@ -302,7 +297,7 @@ header("Content-Type: text/plain");
 header("Content-Disposition: attachment; filename=\"SiPassZutrittskartenUpdate". "_" . date("d_m_Y") . ".txt\"");
 echo $ausdruck;
 
-mail(MAIL_ADMIN, 'Mehrfach eingetragenen Zutrittskarten', "<html><body>".$fausgabe."</body></html>",
+mail(MAIL_SUPPORT, 'Mehrfach eingetragenen Zutrittskarten', "<html><body>".$fausgabe.$ausdruck."</body></html>",
 	"From: vilesci@technikum-wien.at\nX-Mailer: PHP 5.x\nContent-type: text/html; charset=utf-8");
 
 /*
