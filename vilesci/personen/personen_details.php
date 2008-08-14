@@ -363,6 +363,7 @@ echo "
 	<td><SELECT name='geschlecht'>
 			<option value='m' ".($geschlecht=='m'?'selected':'').">maennlich</option>
 			<option value='w' ".($geschlecht=='w'?'selected':'').">weiblich</option>
+			<option value='u' ".($geschlecht=='u'?'selected':'').">unbekannt</option>
 		</SELECT>
 	</td>
 	<td>Familienstand</td>

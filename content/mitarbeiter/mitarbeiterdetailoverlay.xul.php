@@ -145,6 +145,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<menupopup>
 										<menuitem value="m" label="maennlich"/>
 										<menuitem value="w" label="weiblich"/>
+										<menuitem value="u" label="unbekannt"/>
 								</menupopup>								
 							</menulist>
 							<label value="Familienstand" control="mitarbeiter-detail-menulist-familienstand"/>

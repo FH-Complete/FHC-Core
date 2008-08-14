@@ -583,9 +583,27 @@ if(!$error)
 											$benutzer = new benutzer($conn);
 											if($benutzer->load($uid))
 											{
+												$benutzer->updateamum = date('Y-m-d H:i:s');
+												$benutzer->updatevon = $user;
 												$benutzer->bnaktiv=true;
 												$benutzer->save(false, false);
 											}
+										}
+										
+										//bei Abbrechern und Absolventen wird der Aktiv Status auf false gesetzt
+										if($_POST['rolle_kurzbz']=='Abbrecher' || $_POST['rolle_kurzbz']=='Absolvent')
+										{
+											$student = new student($conn);
+											$uid = $student->getUid($prestudent_id);
+											
+											$benutzer = new benutzer($conn);
+											if($benutzer->load($uid))
+											{
+												$benutzer->updateamum = date('Y-m-d H:i:s');
+												$benutzer->updatevon = $user;
+												$benutzer->bnaktiv=false;
+												$benutzer->save(false, false);
+											}											
 										}
 										$return = true;
 									}
