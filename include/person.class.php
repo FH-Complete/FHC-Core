@@ -105,7 +105,7 @@ class person
 
 			if(!$result=pg_query($this->conn,$qry))
 			{
-				$this->errormsg = "Fehler beim lesen der Personendaten\n";
+				$this->errormsg = "Fehler beim Lesen der Personendaten\n";
 				return false;
 			}
 
@@ -163,43 +163,43 @@ class person
 	{
 		if(utf8_strlen($this->sprache)>16)
 		{
-			$this->errormsg = "*****\nSprache darf nicht laenger als 16 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
+			$this->errormsg = 'Sprache darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
 		if(utf8_strlen($this->anrede)>16)
 		{
-			$this->errormsg = "*****\nAnrede darf nicht laenger als 16 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
+			$this->errormsg = 'Anrede darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
 		if(utf8_strlen($this->titelpost)>32)
 		{
-			$this->errormsg = "*****\nTitelpost darf nicht laenger als 32 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
+			$this->errormsg = 'Titelpost darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
 		if(utf8_strlen($this->titelpre)>64)
 		{
-			$this->errormsg = "*****\nTitelpre darf nicht laenger als 64 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
+			$this->errormsg = 'Titelpre darf nicht laenger als 64 Zeichen sein';
 			return false;
 		}
 		if(utf8_strlen($this->nachname)>64)
 		{
-			$this->errormsg = "*****\nNachname darf nicht laenger als 64 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
+			$this->errormsg = 'Nachname darf nicht laenger als 64 Zeichen sein';
 			return false;
 		}
 		if($this->nachname=='' || is_null($this->nachname))
 		{
-			$this->errormsg = "*****\nNachname muss eingegeben werden: ".$this->ext_id.", ".$this->nachname.", ".$this->vorname."\n*****\n";
+			$this->errormsg = 'Nachname muss eingegeben werden';
 			return false;
 		}
 
 		if(utf8_strlen($this->vorname)>32)
 		{
-			$this->errormsg = "*****\nVorname darf nicht laenger als 32 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
+			$this->errormsg = 'Vorname darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
 		if(utf8_strlen($this->vornamen)>128)
 		{
-			$this->errormsg = "*****\nVornamen darf nicht laenger als 128 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
+			$this->errormsg = 'Vornamen darf nicht laenger als 128 Zeichen sein';
 			return false;
 		}
 		//ToDo Gebdatum pruefen -> laut bis muss student aelter als 10 Jahre sein
@@ -210,18 +210,18 @@ class person
 		}*/
 		if(utf8_strlen($this->gebort)>128)
 		{
-			$this->errormsg = "*****\nGeburtsort darf nicht laenger als 128 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
+			$this->errormsg = 'Geburtsort darf nicht laenger als 128 Zeichen sein';
 			return false;
 		}
 
 		if(utf8_strlen($this->homepage)>256)
 		{
-			$this->errormsg = "*****\nHomepage darf nicht laenger als 256 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
+			$this->errormsg = 'Homepage darf nicht laenger als 256 Zeichen sein';
 			return false;
 		}
 		if(utf8_strlen($this->svnr)>10)
 		{
-			$this->errormsg = "*****\nSVNR darf nicht laenger als 10 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
+			$this->errormsg = 'SVNR darf nicht laenger als 10 Zeichen sein';
 			return false;
 		}
 		if($this->svnr!='')
@@ -262,57 +262,57 @@ class person
 
 		if(utf8_strlen($this->ersatzkennzeichen)>10)
 		{
-			$this->errormsg = "*****\nErsatzkennzeichen darf nicht laenger als 10 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
+			$this->errormsg = 'Ersatzkennzeichen darf nicht laenger als 10 Zeichen sein';
 			return false;
 		}
 		if(utf8_strlen($this->familienstand)>1)
 		{
-			$this->errormsg = "*****\nFamilienstand ist ungueltig: ".$this->nachname.", ".$this->vorname."\n*****\n";
+			$this->errormsg = 'Familienstand ist ungueltig';
 			return false;
 		}
 		if($this->anzahlkinder!='' && !is_numeric($this->anzahlkinder))
 		{
-			$this->errormsg = "*****\nAnzahl der Kinder ist ungueltig: ".$this->nachname.", ".$this->vorname."\n*****\n";
+			$this->errormsg = 'Anzahl der Kinder ist ungueltig';
 			return false;
 		}
 		if(!is_bool($this->aktiv))
 		{
-			$this->errormsg = "*****\nAktiv ist ungueltig: ".$this->nachname.", ".$this->vorname."\n*****\n";
+			$this->errormsg = 'Aktiv ist ungueltig';
 			return false;
 		}
 		if(utf8_strlen($this->insertvon)>16)
 		{
-			$this->errormsg = "*****\nInsertvon darf nicht laenger als 16 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
+			$this->errormsg = 'Insertvon darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
 		if(utf8_strlen($this->updatevon)>16)
 		{
-			$this->errormsg = "*****\nUpdatevon darf nicht laenger als 16 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
+			$this->errormsg = 'Updatevon darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
 		if($this->ext_id!='' && !is_numeric($this->ext_id))
 		{
-			$this->errormsg = "*****\nExt_ID ist keine gueltige Zahl: ".$this->nachname.", ".$this->vorname."\n*****\n";
+			$this->errormsg = 'Ext_ID ist keine gueltige Zahl';
 			return false;
 		}
 		if(utf8_strlen($this->geschlecht)>1)
 		{
-			$this->errormsg = "*****\ngeschlecht darf nicht laenger als 1 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
+			$this->errormsg = 'Geschlecht darf nicht laenger als 1 Zeichen sein';
 			return false;
 		}
 		if(utf8_strlen($this->geburtsnation)>3)
 		{
-			$this->errormsg = "*****\nGeburtsnation darf nicht laenger als 3 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
+			$this->errormsg = 'Geburtsnation darf nicht laenger als 3 Zeichen sein';
 			return false;
 		}
 		if(utf8_strlen($this->staatsbuergerschaft)>3)
 		{
-			$this->errormsg = "*****\nStaatsbuergerschaft darf nicht laenger als 3 Zeichen sein: ".$this->nachname.", ".$this->vorname."\n*****\n";
+			$this->errormsg = 'Staatsbuergerschaft darf nicht laenger als 3 Zeichen sein';
 			return false;
 		}
-		if($this->geschlecht!='m' && $this->geschlecht!='w')
+		if($this->geschlecht!='m' && $this->geschlecht!='w' && $this->geschlecht!='u')
 		{
-			$this->errormsg = "*****\nGeschlecht muß entweder w oder m sein!: ".$this->nachname.", ".$this->vorname."\n*****\n";
+			$this->errormsg = 'Geschlecht muß w, m oder u sein!';
 			return false;
 		}
 		

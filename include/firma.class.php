@@ -314,5 +314,75 @@ class firma
 			return false;
 		}
 	}
+	
+	// *******************************************
+	// * Liefert alle vorhandenen Firmentypen
+	// * @return true wenn ok, false im Fehlerfall
+	// *******************************************
+	function getFirmenTypen()
+	{
+		$qry = "SELECT * FROM public.tbl_firmentyp ORDER BY firmentyp_kurzbz";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$fa = new firma($this->conn, null, null);
+				$fa->firmentyp_kurzbz = $row->firmentyp_kurzbz;
+				$fa->beschreibung = $row->beschreibung;
+				
+				$this->result[] = $fa;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Auslesen der Firmentypen';
+			return false;
+		}
+	}
+	
+	// *********************************************
+	// * Laedt alle Firmen eines bestimmen Firmentyps
+	// * @return true wenn ok, false im Fehlerfall
+	// *********************************************
+	function getFirmen($firmentyp_kurzbz='')
+	{
+		$qry = "SElECT * FROM public.tbl_firma";
+		
+		if($firmentyp_kurzbz!='')
+			$qry.=" WHERE firmentyp_kurzbz='".addslashes($firmentyp_kurzbz)."'";
+		$qry.=" ORDER BY name";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$fa = new firma($this->conn, null, null);
+				
+				$fa->firma_id = $row->firma_id;
+				$fa->name = $row->name;
+				$fa->adresse = $row->adresse;
+				$fa->email  = $row->email;
+				$fa->telefon = $row->telefon;
+				$fa->fax = $row->fax;
+				$fa->anmerkung = $row->anmerkung;
+				$fa->firmentyp_kurzbz = $row->firmentyp_kurzbz;
+				$fa->updateamum = $row->updateamum;
+				$fa->updatevon = $row->updatevon;
+				$fa->insertamum = $row->insertamum;
+				$fa->insertvon = $row->insertvon;
+				$fa->ext_id = $row->ext_id;
+				$fa->schule = ($row->schule=='t'?true:false);
+				$this->result[] = $fa;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
+			return false;
+		}
+	}
 }
 ?>

@@ -47,6 +47,19 @@ $stsem_aktuell = $stsem->getaktorNext();
 
 $selection = (isset($_GET['selection'])?$_GET['selection']:'preinteressent');
 
+//wenn der parameter type=firmenrequest uebergeben wird
+//dann eine Liste aller firmen zurueckliefern die dem ueberbenen firmentyp entsprechen
+if(isset($_GET['type']) && $_GET['type']=='firmenrequest')
+{
+	header('Content-Type: text/html; charset=ISO-8859-15');
+	$firmentyp_kurzbz = (isset($_GET['firmentyp_kurzbz'])?$_GET['firmentyp_kurzbz']:'');
+	$firma = new firma($conn);
+	$firma->getFirmen($firmentyp_kurzbz);
+	foreach ($firma->result as $row)
+		echo $row->firma_id.' '.$row->name."\n";
+	exit();
+}
+
 echo '<html>
 	<head>
 		<title>PreInteressenten</title>
@@ -90,6 +103,146 @@ echo '<html>
 		function confdel()
 		{
 			return confirm("Wollen Sie diesen Eintrag wirklich loeschen?");
+		}
+				
+		var anfrage = null;
+
+	    function erzeugeAnfrage()
+	    {
+	        try 
+	        {
+	        	anfrage = new XMLHttpRequest();
+	        } 
+	        catch (versuchmicrosoft) 
+	        {
+				try 
+				{
+					anfrage = new ActiveXObject("Msxml12.XMLHTTP");
+	            } 
+	            catch (anderesmicrosoft)
+	            {
+					try 
+					{
+						anfrage = new ActiveXObject("Microsoft.XMLHTTP");
+	                } 
+	                catch (fehlschlag)
+	                {
+						anfrage = null;
+	                }
+	            }
+	        }
+	        if (anfrage == null) 
+	        	alert("Fehler beim Erstellen des Anfrageobjekts!");
+	    }
+      
+		function reloadSchulen()
+		{
+			schultyp = document.getElementById("schultyp").value;
+			
+			erzeugeAnfrage(); 
+		    var jetzt = new Date();
+			var ts = jetzt.getTime();
+		    var url= "preinteressent_detail.php?type=firmenrequest";
+		    url += "&firmentyp_kurzbz="+schultyp+"&"+ts;
+		    anfrage.open("GET", url, true);
+		    anfrage.onreadystatechange = updateSeite;
+		    anfrage.send(null);
+		}
+   
+		function updateSeite()
+		{
+	    	if (anfrage.readyState == 4)
+	    	{
+	        	if (anfrage.status == 200) 
+	        	{
+					var resp = anfrage.responseText;
+	            	firma = document.getElementById("firma");
+	            	while (firma.childNodes.length>0)
+	            	{
+						firma.removeChild(firma.lastChild);
+	            	}
+	            	
+	            	var zeilen = resp.split("\n");
+	            	var items="";
+	            	for(i=0;i<zeilen.length-1;i++)
+	            	{
+	            		spalten = zeilen[i].split(" ",1);
+	            		var opt = document.createElement("option");
+						opt.setAttribute("value", spalten[0]);
+						var txt = document.createTextNode(utf(zeilen[i].substring(zeilen[i].indexOf(" ")+1)));
+						opt.appendChild(txt); 
+						firma.appendChild(opt);
+	            	}
+				}
+				else
+				{
+					alert(resp);
+				}
+			}
+	    }
+	    
+	    function utf(txt)
+	    {
+	    	txt=encode_utf8(txt);
+	    	txt=decode_utf8(txt);
+	    	
+	    	return txt;
+	    }
+	    
+        function encode_utf8(rohtext) {
+             // dient der Normalisierung des Zeilenumbruchs
+             rohtext = rohtext.replace(/\r\n/g,"\n");
+             var utftext = "";
+             for(var n=0; n<rohtext.length; n++)
+                 {
+                 // ermitteln des Unicodes des  aktuellen Zeichens
+                 var c=rohtext.charCodeAt(n);
+                 // alle Zeichen von 0-127 => 1byte
+                 if (c<128)
+                     utftext += String.fromCharCode(c);
+                 // alle Zeichen von 127 bis 2047 => 2byte
+                 else if((c>127) && (c<2048)) {
+                  utftext += String.fromCharCode((c>>6)|192);
+                     utftext += String.fromCharCode((c&63)|128);}
+                 // alle Zeichen von 2048 bis 66536 => 3byte
+                 else {
+                     utftext += String.fromCharCode((c>>12)|224);
+                     utftext += String.fromCharCode(((c>>6)&63)|128);
+                     utftext += String.fromCharCode((c&63)|128);}
+                 }
+             return utftext;
+         }
+		function decode_utf8(utftext) 
+		{
+			var string = "";
+        var i = 0;
+        var c = c1 = c2 = 0;
+
+        while ( i < utftext.length ) {
+
+            c = utftext.charCodeAt(i);
+
+            if (c < 128) {
+                string += String.fromCharCode(c);
+                i++;
+            }
+            else if((c > 191) && (c < 224)) {
+                c2 = utftext.charCodeAt(i+1);
+                string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+                i += 2;
+            }
+            else {
+                c2 = utftext.charCodeAt(i+1);
+                c3 = utftext.charCodeAt(i+2);
+                string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+                i += 3;
+            }
+
+        }
+
+        return string;
+    
+			
 		}
 		-->
 		</script>
@@ -424,6 +577,7 @@ echo "<td>Ersatzkennzeichen</td><td><input type='text' name='ersatzkennzeichen' 
 echo "<td>Geschlecht*</td><td><SELECT ".($disabled?'disabled':'')." name='geschlecht'>";
 echo '<option value="m" '.($person->geschlecht=='m'?'selected':'').'>männlich</option>';
 echo '<option value="w" '.($person->geschlecht=='w'?'selected':'').'>weiblich</option>';
+echo '<option value="u" '.($person->geschlecht=='u'?'selected':'').'>unbekannt</option>';
 echo '</SELECT></td>';
 echo '</tr><tr>';
 
@@ -451,7 +605,7 @@ echo "</div>";
 echo "<div id='preinteressent' style='display: ".($selection=='preinteressent'?'block':'none')."'>";
 echo "<form action='".$_SERVER['PHP_SELF']."?id=$preinteressent->preinteressent_id&selection=preinteressent' method='POST'>";
 
-echo '<table width="100%"><tr>';
+echo '<table width="100%" ><tr>';
 
 //STUDIENSEMESTER
 echo "<td>Studiensemester:</td><td><SELECT name='studiensemester_kurzbz'>";
@@ -485,11 +639,51 @@ foreach ($aufmerksam->result as $row)
 }
 echo "</SELECT>";
 echo '</td>';
+//Einverstaendnis
+echo "<td>Einverst&auml;ndnis:</td><td><input type='checkbox' ".($preinteressent->einverstaendnis?'checked':'')." name='einverstaendnis'></td>";
+
+//Absagedatum
+echo "<td>Absage</td><td><input type='checkbox' ".($preinteressent->absagedatum!=''?'checked':'')." name='absagedatum'></td>";
+
+
+echo '</tr><tr>';
+
+//Erfassungsdatum
+echo "<td>Erfassungsdatum:</td><td> <input type='text' size='10' maxlength='10' name='erfassungsdatum' value='".$datum_obj->formatDatum($preinteressent->erfassungsdatum,'d.m.Y')."'></td>";
+
+//Infozusendung
+echo "<td>Infozusendung am</td><td><input type='text' name='infozusendung' size='10' maxlength='10' value='".$datum_obj->formatDatum($preinteressent->infozusendung,'d.m.Y')."'></td>";
+
+
+//Maturajahr
+echo "<td>Maturajahr</td><td><input type='text' name='maturajahr' size='4' maxlength='4' value='$preinteressent->maturajahr'></td>";
+
+
+echo '</tr><tr>';
+
+$schule = new firma($conn);
+if($preinteressent->firma_id!='')
+	$schule->load($preinteressent->firma_id);
+//SCHULTYP
+echo "<td>Schultyp:</td><td> <SELECT name='schultyp' id='schultyp' onchange='reloadSchulen()'>";
+echo "<option value=''>-- Alle --</option>";
+$firmentyp = new firma($conn);
+$firmentyp->getFirmenTypen();
+foreach ($firmentyp->result as $row)
+{
+	if($row->firmentyp_kurzbz==$schule->firmentyp_kurzbz)
+		$selected='selected';
+	else
+		$selected='';
+		
+	echo "<option value='$row->firmentyp_kurzbz' $selected>$row->beschreibung</option>";
+}
+echo "</SELECT></td>";
 
 //SCHULE
-echo "<td>Schule:</td><td> <SELECT name='firma'>";
+echo "<td>Schule:</td><td colspan='5'> <SELECT id='firma' name='firma'>";
 $firma = new firma($conn);
-$firma->getAll();
+$firma->getFirmen($schule->firmentyp_kurzbz);
 foreach ($firma->result as $row)
 {
 	if($row->firma_id==$preinteressent->firma_id)
@@ -503,35 +697,16 @@ echo "</SELECT> <a href='../stammdaten/firma_frameset.html' target='_blank'>Schu
 
 echo '</tr><tr>';
 
-//Erfassungsdatum
-echo "<td>Erfassungsdatum:</td><td> <input type='text' size='10' maxlength='10' name='erfassungsdatum' value='".$datum_obj->formatDatum($preinteressent->erfassungsdatum,'d.m.Y')."'></td>";
-
-//Einverstaendnis
-echo "<td>Einverst&auml;ndnis:</td><td><input type='checkbox' ".($preinteressent->einverstaendnis?'checked':'')." name='einverstaendnis'></td>";
-
-//Absagedatum
-echo "<td>Absage</td><td><input type='checkbox' ".($preinteressent->absagedatum!=''?'checked':'')." name='absagedatum'></td>";
-
-echo '</tr><tr>';
-
-//Infozusendung
-echo "<td>Infozusendung am</td><td><input type='text' name='infozusendung' size='10' maxlength='10' value='".$datum_obj->formatDatum($preinteressent->infozusendung,'d.m.Y')."'></td>";
-
-
-//Maturajahr
-echo "<td>Maturajahr</td><td><input type='text' name='maturajahr' size='4' maxlength='4' value='$preinteressent->maturajahr'></td>";
-
-
-echo '</tr><tr>';
-
 //Anmerkung
 echo '<td>Anmerkungen:</td>';
-echo '<td colspan="5">';
+echo '<td colspan="7">';
 echo "<textarea rows='4' style='width: 100%' name='anmerkung'>".htmlentities($preinteressent->anmerkung)."</textarea>";
 echo '</td>';
 
 echo '</tr><tr>';
 echo '<td></td>
+		<td></td>
+		<td></td>
 		<td></td>
 		<td></td>
 		<td></td>

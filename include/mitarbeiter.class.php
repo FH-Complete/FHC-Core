@@ -679,7 +679,7 @@ class mitarbeiter extends benutzer
 
 				$this->result[] = $obj;
 			}
-			return false;
+			return true;
 		}
 		else
 		{
