@@ -188,6 +188,19 @@ if(isset($_POST['uebertragen']))
 	if($anzahl_fehler>0)
 		echo "<br>Es sind <b>$anzahl_fehler Fehler aufgetreten</b>";
 }
+
+if(isset($_GET['type']) && $_GET['type']=='zusammenlegung')
+{
+	if(isset($_GET['preinteressent_id']) && isset($_GET['personneu_id']))
+	{
+		$preinteressent_id = $_GET['preinteressent_id'];
+		$person_id_neu = $_GET['personneu_id'];
+		
+		echo "<b>Zusammenlegung noch nicht implementiert</b>";
+	}
+	else 
+		die('Preinteressent_id und personneu_id muss uebergeben werden');
+}
 echo '<br><br>';	
 echo "<form action='".$_SERVER['PHP_SELF']."?studiengang_kz=$studiengang_kz' method='POST'>";
 echo "<table class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>
@@ -199,6 +212,7 @@ echo "<table class='liste table-autosort:0 table-stripeclass:alternate table-aut
 		<th class='table-sortable:default'>GebDatum</th>
 		<th class='table-sortable:default'>Studiensemester</th>
 		<th class='table-sortable:default'>Anmerkung</th>
+		<th class='table-sortable:default'>Zusammenlegung</th>
 		</tr>
 	</thead>
 	<tbody>";
@@ -216,6 +230,26 @@ foreach ($preinteressent->result as $row)
 	echo "<td>$person->gebdatum</td>";
 	echo "<td>$row->studiensemester_kurzbz</td>";
 	echo "<td>$row->anmerkung</td>";	
+	$qry = "SELECT distinct * FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE 
+				(vorname='$person->vorname' AND nachname='$person->nachname') ";
+	if($person->gebdatum!='')
+		$qry.=" OR (nachname='$person->nachname' AND gebdatum='$person->gebdatum')";
+	echo "<td>";
+	if($result_double = pg_query($conn, $qry))
+	{
+		if(pg_num_rows($result_double)>0)
+		{
+			echo '<SELECT name="person_id" id="person_id_'.$row->preinteressent_id.'">';
+			while($row_double=pg_fetch_object($result_double))
+			{
+				echo "<OPTION value='$row_double->person_id'>$row_double->nachname $row_double->vorname $row_double->gebdatum ($row_double->person_id)</OPTION>";
+			}
+			echo '</SELECT>';
+			
+			echo '<INPUT type="button" value="Zusammenlegen" onclick="window.location.href= \''.$_SERVER['PHP_SELF'].'?type=zusammenlegung&studiengang_kz='.$studiengang_kz.'&preinteressent_id='.$row->preinteressent_id.'&personneu_id=\'+document.getElementById(\'person_id_'.$row->preinteressent_id.'\').value;">';
+		}
+	}
+	echo "</td>";
 	echo '</tr>';
 }
 echo '</tbody></table><br>';
