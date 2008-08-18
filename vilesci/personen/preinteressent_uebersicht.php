@@ -53,6 +53,16 @@ if(isset($_GET['studiensemester_kurzbz']))
 else 
 	$studiensemester_kurzbz = $stsem_aktuell;
 
+if(isset($_GET['bool_nichtfreigegeben']))
+	$bool_nichtfreigegeben = true;
+else 
+	$bool_nichtfreigegeben = null;
+	
+if(isset($_GET['bool_uebernommen']))
+	$bool_uebernommen = true;
+else 
+	$bool_uebernommen = null;
+
 if(isset($_GET['filter']))
 	$filter = $_GET['filter'];
 else 
@@ -87,7 +97,7 @@ if(!$rechte->isBerechtigt('admin', null, 'suid') &&
 
 //DROP DOWNs anzeigen
 echo "<table width='100%'><tr><td><form action='".$_SERVER['PHP_SELF']."' method='GET'>";
-echo 'Studiensemester: <SELECT name="studiensemester_kurzbz">';
+echo '<table><tr><td>Studiensemester: <SELECT name="studiensemester_kurzbz">';
 $stsem = new studiensemester($conn);
 $stsem->getAll();
 foreach ($stsem->studiensemester as $row)	
@@ -114,8 +124,10 @@ foreach ($stg->result as $row)
 		
 	echo "<option value='$row->studiengang_kz' $selected>$row->kuerzel</option>";
 }
-echo '</SELECT>';
-echo '&nbsp;&nbsp;&nbsp;<input type="submit" value="Anzeigen">';
+echo '</SELECT></td><td>';
+echo '<input type="checkbox" name="bool_nichtfreigegeben" '.($bool_nichtfreigegeben?'checked':'').'> nicht freigegeben<br>';
+echo '<input type="checkbox" name="bool_uebernommen" '.($bool_uebernommen?'checked':'').'> freigegeben aber nicht &uuml;bernommen</td><td>';
+echo '&nbsp;&nbsp;&nbsp;<input type="submit" value="Anzeigen"></td></tr></table>';
 echo '</form></td><td>';
 echo "<form action='".$_SERVER['PHP_SELF']."' method='GET'>";
 echo "<input type='text' value='".htmlentities($filter,ENT_QUOTES)."' name='filter'>&nbsp;";
@@ -170,13 +182,13 @@ if(isset($_GET['action']))
 								$stg_obj = new studiengang($conn);
 								$stg_obj->load($row->studiengang_kz);
 								$to = $stg_obj->email;
-								$to = 'oesi@technikum-wien.at';
+								//$to = 'oesi@technikum-wien.at';
 								$message = "Dies ist eine automatische Mail! $stg_obj->email\n\n".
 											"Der Preinteressent $name wurde zur Übernahme freigegeben. \nSie können diesen ".
 											"im FAS unter 'Extras->Preinteressenten übernehmen' oder unter folgendem Link\n\n".
 											APP_ROOT."vilesci/personen/preinteressent_uebernahme.php?studiengang_kz=$row->studiengang_kz \n".
 											"ins FAS übertragen";
-								//mail($to, 'Preinteressent Freigabe', $message, 'FROM: vilesci@'.DOMAIN);
+								mail($to, 'Preinteressent Freigabe', $message, 'FROM: vilesci@'.DOMAIN);
 								$anzahl_freigegeben++;
 							}
 							else 
@@ -231,6 +243,8 @@ echo "<table class='liste table-autosort:0 table-stripeclass:alternate table-aut
 		<th class='table-sortable:default'>Studiensemester</th>
 		<th class='table-sortable:default'>Erfassungsdatum</th>
 		<th class='table-sortable:default'>Status</th>
+		<th class='table-sortable:default'>Freigabe</th>
+		<th class='table-sortable:default'>&Uuml;bernahme</th>
 		<th class='table-sortable:default'>Anmerkung</th>
 		<th colspan=3>Aktion</th>
 		</tr>
@@ -240,9 +254,14 @@ echo "<table class='liste table-autosort:0 table-stripeclass:alternate table-aut
 
 $preinteressent = new preinteressent($conn);
 if($filter=='')
-	$preinteressent->loadPreinteressenten($studiengang_kz, $studiensemester_kurzbz);
+	$preinteressent->loadPreinteressenten($studiengang_kz, $studiensemester_kurzbz, null, $bool_nichtfreigegeben, $bool_uebernommen);
 else 
+{
+	//Falls im Filter-Feld ein Datum steht dann wird dieses umformatiert
+	if($datum_obj->formatDatum($filter, 'Y-m-d'))
+		$filter = $datum_obj->formatDatum($filter, 'Y-m-d');
 	$preinteressent->loadPreinteressenten(null, null, $filter);
+}
 $stg_obj = new studiengang($conn);
 $stg_obj->getAll('typ, kurzbz', false);
 
@@ -284,6 +303,34 @@ foreach ($preinteressent->result as $row)
 	if($status=='')
 		$status='Preinteressent';
 	echo "<td>$status</td>";
+	
+	//Zuordnungen laden und freigegebene Eintraege farblich markieren
+	$freigaben = new preinteressent($conn);
+	$freigaben->loadZuordnungen($row->preinteressent_id);
+	$freigabe='';
+	$uebernahme='';
+	foreach ($freigaben->result as $row_freigaben)
+	{
+		if($row_freigaben->freigabedatum!='')
+			$freigabe.="<font color='#00FF00'>";
+		else 
+			$freigabe.="<font color='#FF0000'>";
+		$freigabe.=$stg_obj->kuerzel_arr[$row_freigaben->studiengang_kz];
+		$freigabe.='</font> ';
+		
+		if($row_freigaben->freigabedatum!='')
+		{
+			if($row_freigaben->uebernahmedatum!='')
+				$uebernahme.="<font color='#00FF00'>";
+			else 
+				$uebernahme.="<font color='#FF0000'>";
+			$uebernahme.=$stg_obj->kuerzel_arr[$row_freigaben->studiengang_kz];
+			$uebernahme.='</font> ';
+		}
+	}
+	
+	echo "<td>$freigabe</td>";
+	echo "<td>$uebernahme</td>";
 	echo "<td title='".htmlentities($row->anmerkung,ENT_QUOTES)."'>".htmlentities(CutString($row->anmerkung, 30),ENT_QUOTES)."</td>";
 	echo "<td><input type='button' onclick='parent.preinteressent_detail.location.href = \"preinteressent_detail.php?id=$row->preinteressent_id&selection=\"+parent.preinteressent_detail.selection; return false;' value='Bearbeiten' title='Zeigt die Details dieser Person an'></td>";
 	echo "<td><input type='button' onclick=\"window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=freigabe&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'\" value='Freigeben' title='Gibt alle Studiengänge mit der höchsten Priorität frei'></td>";

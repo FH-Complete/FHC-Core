@@ -398,13 +398,13 @@ if(isset($_POST['freigabe']))
 				$stg_obj = new studiengang($conn);
 				$stg_obj->load($zuordnung->studiengang_kz);
 				$to = $stg_obj->email;
-				$to = 'oesi@technikum-wien.at';
+				//$to = 'oesi@technikum-wien.at';
 				$message = "Dies ist eine automatische Mail! $stg_obj->email\n\n".
 							"Der Preinteressent $name wurde zur Übernahme freigegeben. \nSie können diesen ".
 							"im FAS unter 'Extras->Preinteressenten übernehmen' oder unter folgendem Link\n\n".
 							APP_ROOT."vilesci/personen/preinteressent_uebernahme.php?studiengang_kz=$zuordnung->studiengang_kz \n".
 							"ins FAS übertragen";
-				//mail($to, 'Preinteressent Freigabe', $message, 'FROM: vilesci@'.DOMAIN);
+				mail($to, 'Preinteressent Freigabe', $message, 'FROM: vilesci@'.DOMAIN);
 			}
 		}
 		else 
@@ -635,7 +635,7 @@ foreach ($aufmerksam->result as $row)
 	else
 		$selected='';
 		
-	echo "<option value='$row->aufmerksamdurch_kurzbz' $selected>$row->aufmerksamdurch_kurzbz</option>";
+	echo "<option value='$row->aufmerksamdurch_kurzbz' $selected>$row->beschreibung</option>";
 }
 echo "</SELECT>";
 echo '</td>';
