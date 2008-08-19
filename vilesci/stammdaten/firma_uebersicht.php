@@ -29,14 +29,17 @@
 	   	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
     
 	$filter = (isset($_GET['filter'])?$_GET['filter']:'');
+	$firmentypfilter = (isset($_GET['firmentypfilter'])?$_GET['firmentypfilter']:'');
 	
 	$htmlstr = "";
 
 	if($filter=='')
-		$sql_query = "SELECT * FROM public.tbl_firma";
+		$sql_query = "SELECT * FROM public.tbl_firma WHERE true";
 	else 
 		$sql_query = "SELECT * FROM public.tbl_firma WHERE lower(name) like lower('%$filter%') OR lower(adresse) like lower('%$filter%') OR lower(anmerkung) like lower('%$filter%')";
-		
+	if($firmentypfilter!='')
+		$sql_query.=" AND firmentyp_kurzbz='".addslashes($firmentypfilter)."'";
+	//echo $sql_query;
     if(!$erg=pg_query($conn, $sql_query))
 	{
 		$errormsg='Fehler beim Laden der Firma';
@@ -79,7 +82,10 @@
 <link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 <script language="JavaScript">
-
+<!--
+var firmentypfilter='<?php echo htmlentities($firmentypfilter)?>';
+var filter = '<?php echo htmlentities($filter)?>';
+-->
 </script>
 
 </head>
@@ -96,6 +102,19 @@
 	//Suche
 	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">';
 	echo '<input type="text" name="filter" value="'.$filter.'">';
+	echo 'Typ: <SELECT name="firmentypfilter">
+			<option value="">-- Alle --</option>';
+	$firma = new firma($conn);
+	$firma->getFirmenTypen();
+	foreach ($firma->result as $row)
+	{
+		if($row->firmentyp_kurzbz==$firmentypfilter)
+			$selected='selected';
+		else 
+			$selected='';
+		echo "<option value='$row->firmentyp_kurzbz' $selected>$row->firmentyp_kurzbz</option>";
+	}
+	echo '</SELECT>';
 	echo '<input type="submit" value="Suchen">';
 	echo '</form>';
 	

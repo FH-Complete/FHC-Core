@@ -81,7 +81,7 @@
 			if($firma->save())
 			{
 				$reloadstr .= "<script type='text/javascript'>\n";
-				$reloadstr .= "	parent.uebersicht_firma.location.href='firma_uebersicht.php';";
+				$reloadstr .= "	parent.uebersicht_firma.location.href='firma_uebersicht.php?filter='+parent.uebersicht_firma.filter+'&firmentypfilter='+parent.uebersicht_firma.firmentypfilter;";
 				$reloadstr .= " window.top.opener.StudentProjektarbeitFirmaRefresh();";
 				$reloadstr .= "</script>\n";
 			}

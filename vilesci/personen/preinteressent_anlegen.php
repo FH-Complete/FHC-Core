@@ -108,8 +108,10 @@ function checkschulid(schuleid)
 		//preufen ob die id im DD vorhanden ist
 		myoptions = dd.getElementsByTagName('option');
 		id='';
-		for each (var node in myoptions)
+		for(i=0;i<myoptions.length;i++)
 		{
+
+			node = myoptions[i];
 			if(node.value==schuleid)
 				id=schuleid;
 		}
@@ -487,7 +489,7 @@ if($result = pg_query($conn, $qry))
 	}
 }
 echo '</SELECT></td></tr>';
-echo '</tr><td>Schule ID:</td><td><input type="text" size="3" name="schule_id" value="'.$schule.'" oninput="checkschulid(this.value)"></td></tr>';
+echo '</tr><td>Schule ID:</td><td><input type="text" size="3" name="schule_id" value="'.$schule.'" onkeyup="checkschulid(this.value)"></td></tr>';
 echo '<tr><td></td><td>';
 if(($geburtsdatum=='' && $vorname=='' && $nachname=='') || $geburtsdatum_error)
 	echo '<input type="submit" name="showagain" value="Vorschlag laden">';
