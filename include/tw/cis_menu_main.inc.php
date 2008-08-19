@@ -87,9 +87,32 @@
 	  			</tr>
 
 				<tr>
-	          		<td class="tdwidth10" nowrap>&nbsp;</td>
-	          		<td class="tdwrap"><a class="MenuItem" href="public/library.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Bibliothek</a></td>
-  				</tr>
+					<td class="tdwrap"></td>
+					<td><a href="public/bibliothek_allgemein.html" target="content" class="MenuItem" onClick="js_toggle_container('Bibliothek');"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Bibliothek</a>
+				  	<table class="tabcontent" id="Bibliothek" style="display: none">
+						<tr>
+							<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="public/bibliothek_allgemein.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Allgemein</a></td>
+						</tr>
+						<tr>
+							<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="public/bibliothek_onlinekatalog.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Online-Katalog und Medienverzeichnisse</a></td>
+						</tr>
+						<tr>
+							<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="public/bibliothek_elektronischeressourcen.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Elektronische Ressourcen</a></td>
+						</tr>
+						<tr>
+							<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="public/bibliothek_recherche.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Recherche-Links</a></td>
+						</tr>
+						<tr>
+							<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="public/bibliothek_bestellung.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Bestellung von Medien</a></td>
+						</tr>
+					</table>
+					</td>
+				</tr>	
 				</table>
 				&nbsp;
 		  	</td>

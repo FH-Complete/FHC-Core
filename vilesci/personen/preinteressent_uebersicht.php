@@ -188,7 +188,11 @@ if(isset($_GET['action']))
 											"im FAS unter 'Extras->Preinteressenten übernehmen' oder unter folgendem Link\n\n".
 											APP_ROOT."vilesci/personen/preinteressent_uebernahme.php?studiengang_kz=$row->studiengang_kz \n".
 											"ins FAS übertragen";
-								mail($to, 'Preinteressent Freigabe', $message, 'FROM: vilesci@'.DOMAIN);
+								if(mail($to, 'Preinteressent Freigabe', $message, 'FROM: vilesci@'.DOMAIN))
+									echo "<br><b>Freigabemail wurde an $to versendet</b>";
+								else 
+									echo "<br><b>Fehler beim Versenden des Freigabemails an $to</b>";
+								
 								$anzahl_freigegeben++;
 							}
 							else 
@@ -311,17 +315,22 @@ foreach ($preinteressent->result as $row)
 	$uebernahme='';
 	foreach ($freigaben->result as $row_freigaben)
 	{
-		if($row_freigaben->freigabedatum!='')
-			$freigabe.="<font color='#00FF00'>";
+		//auch jene als freigegeben anzeigen die schon im studiengang angelegt sind 
+		//obwohl der preinteressent nicht freigegeben wurde. (bewerbung direkt beim studiengang)
+		$qry = "SELECT prestudent_id FROM public.tbl_prestudent WHERE person_id='$row->person_id' AND studiengang_kz='$row_freigaben->studiengang_kz'";
+		$result_chkstg = pg_query($conn, $qry);
+		
+		if($row_freigaben->freigabedatum!='' || pg_num_rows($result_chkstg)>0)
+			$freigabe.="<font color='#009900'>";
 		else 
 			$freigabe.="<font color='#FF0000'>";
-		$freigabe.=$stg_obj->kuerzel_arr[$row_freigaben->studiengang_kz];
+		$freigabe.=$stg_obj->kuerzel_arr[$row_freigaben->studiengang_kz]."($row_freigaben->prioritaet)";
 		$freigabe.='</font> ';
 		
 		if($row_freigaben->freigabedatum!='')
 		{
 			if($row_freigaben->uebernahmedatum!='')
-				$uebernahme.="<font color='#00FF00'>";
+				$uebernahme.="<font color='#009900'>";
 			else 
 				$uebernahme.="<font color='#FF0000'>";
 			$uebernahme.=$stg_obj->kuerzel_arr[$row_freigaben->studiengang_kz];
