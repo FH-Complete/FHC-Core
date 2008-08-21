@@ -48,7 +48,7 @@ $ss=new studiensemester($conn);
 $ss->getAktTillNext();
 $datum_begin=$ss->start;
 //$datum_begin='2008-01-07';
-$datum_ende='2008-07-09'; // $ss->ende
+$datum_ende='2009-02-09'; // $ss->ende
 //$datum_ende='2008-01-18'; // $ss->ende
 
 // ************* FUNCTIONS **************** //
@@ -56,15 +56,15 @@ $datum_ende='2008-07-09'; // $ss->ende
 function getStudentsFromGroup($studiengang_kz, $semester, $verband, $gruppe, $gruppe_kurzbz, $studiensemester_kurzbz)
 {
 	global $conn;
-	
+
 	$students = array();
 	if($gruppe_kurzbz=='')
 	{
-		$qry = "SELECT 
-					distinct student_uid 
-				FROM 
-					public.tbl_studentlehrverband 
-				WHERE 
+		$qry = "SELECT
+					distinct student_uid
+				FROM
+					public.tbl_studentlehrverband
+				WHERE
 					studiensemester_kurzbz='$studiensemester_kurzbz' AND
 					studiengang_kz = '$studiengang_kz' AND
 					semester = '$semester'";
@@ -77,19 +77,19 @@ function getStudentsFromGroup($studiengang_kz, $semester, $verband, $gruppe, $gr
 			}
 		}
 	}
-	else 
+	else
 	{
-		$qry = "SELECT 
-					distinct uid as student_uid 
-				FROM 
+		$qry = "SELECT
+					distinct uid as student_uid
+				FROM
 					public.tbl_benutzergruppe
 				WHERE
 					gruppe_kurzbz='$gruppe_kurzbz' AND
 					studiensemester_kurzbz='$studiensemester_kurzbz'
 				";
-					
+
 	}
-	
+
 	if($result = pg_query($conn, $qry))
 	{
 		while($row = pg_fetch_object($result))
@@ -99,7 +99,7 @@ function getStudentsFromGroup($studiengang_kz, $semester, $verband, $gruppe, $gr
 	}
 	//echo "students $qry:";
 	//var_dump($students);
-	return $students;	
+	return $students;
 }
 
 // **************************************** //
@@ -435,7 +435,7 @@ else
 				$myclass='unmarked';
 				$message[$row->uid]->message.='<TD><span class="'.$myclass.'">'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</span></TD></TR>';
 			}
-			
+
 			//wenn sich der Lektor geaendert hat dann auch den vorherigen lektor informieren
 			//sofern es kein dummylektor ist
 			if($row->uid!=$row->old_uid)
@@ -456,7 +456,7 @@ else
 					$message[$row->old_uid]->message.='<TD>'.$row->old_lektor.'</TD>';
 					$message[$row->old_uid]->message.='<TD>'.$row->old_datum.'/'.$row->old_stunde.'</TD>';
 					$message[$row->old_uid]->message.='<TD>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TD></TR>';
-	
+
 					$message[$row->old_uid]->message.='<TR><TD>Jetzt: </TD>';
 					$myclass=($row->ort_kurzbz!=$row->old_ort_kurzbz?'marked':'unmarked');
 					$message[$row->old_uid]->message.='<TD><span class="'.$myclass.'">'.$row->ort_kurzbz.'</span></TD>';
@@ -491,7 +491,7 @@ else
 				$message[$student]->message.='<TD>'.$row->old_lektor.'</TD>';
 				$message[$student]->message.='<TD>'.$row->old_datum.'/'.$row->old_stunde.'</TD>';
 				$message[$student]->message.='<TD>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TD></TR>';
-	
+
 				$message[$student]->message.='<TR><TD>Jetzt: </TD>';
 				$myclass=($row->ort_kurzbz!=$row->old_ort_kurzbz?'marked':'unmarked');
 				$message[$student]->message.='<TD><span class="'.$myclass.'">'.$row->ort_kurzbz.'</span></TD>';
