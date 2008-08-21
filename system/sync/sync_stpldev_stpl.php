@@ -213,7 +213,8 @@ else
 				{
 					$message[$student]->isneu=true;
 					$message[$student]->mailadress=$student.'@technikum-wien.at';
-					$message[$student]->message=$message_begin.'<BR>Neue Stunden:<BR>
+					$message[$student]->message_begin=$message_begin.'<BR>';
+					$message[$student]->message='Neue Stunden:<BR>
 							<TABLE><TR><TD>Ort</TD><TD>Verband</TD><TD>Lektor</TD><TD>Datum/Std</TD><TD>Lehrfach</TD></TR>';
 				}
 				$message[$student]->message.='<TR><TH>'.$row->ort_kurzbz.'</TH>';
