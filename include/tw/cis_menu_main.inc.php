@@ -92,11 +92,11 @@
 				  	<table class="tabcontent" id="Bibliothek" style="display: none">
 						<tr>
 							<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a class="Item" href="public/bibliothek_allgemein.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Allgemein</a></td>
+							<td class="tdwrap"><a class="Item" href="public/bibliothek_allgemein.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Allgemeines</a></td>
 						</tr>
 						<tr>
 							<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a class="Item" href="public/bibliothek_onlinekatalog.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Online-Katalog und Medienverzeichnisse</a></td>
+							<td class="tdwrap"><a class="Item" href="public/bibliothek_onlinekatalog.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Online-Katalog / Recherche</a></td>
 						</tr>
 						<tr>
 							<td class="tdwidth10" nowrap>&nbsp;</td>
@@ -104,11 +104,11 @@
 						</tr>
 						<tr>
 							<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a class="Item" href="public/bibliothek_recherche.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Recherche-Links</a></td>
+							<td class="tdwrap"><a class="Item" href="public/bibliothek_bestellung.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Bestellung von Medien</a></td>
 						</tr>
 						<tr>
 							<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a class="Item" href="public/bibliothek_bestellung.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Bestellung von Medien</a></td>
+							<td class="tdwrap"><a class="Item" href="public/bibliothek_aktuelles.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Aktuelles</a></td>
 						</tr>
 					</table>
 					</td>
