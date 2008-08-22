@@ -31,6 +31,9 @@ require_once('../../include/mitarbeiter.class.php');
 if(!$conn=pg_pconnect(CONN_STRING))
 	die('Fehler biem Connecten zur DB');
 
+$user = get_uid();
+loadVariables($conn, $user);
+
 if(isset($_GET['studiensemester_kurzbz']))
 	$studiensemester_kurzbz = $_GET['studiensemester_kurzbz'];
 else 
@@ -237,6 +240,100 @@ if($result = pg_query($conn, $qry))
 		if($maxlength[$spalte]<strlen($row->anmerkung))
 			$maxlength[$spalte]=strlen($row->anmerkung);
 	}
+	
+	//Betreuungen
+	$qry = "SELECT
+				tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz, 
+				(SELECT nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) 
+		 		 WHERE uid=COALESCE(koordinator, (SELECT uid FROM public.tbl_benutzerfunktion 
+		  								  WHERE fachbereich_kurzbz=tbl_lehrfach.fachbereich_kurzbz AND 
+		  								        studiengang_kz=tbl_lehrveranstaltung.studiengang_kz AND 
+		  								        funktion_kurzbz='fbk' LIMIT 1
+		  								   )
+							)
+				) as koordinator, nachname, tbl_lehrfach.bezeichnung, 
+				tbl_lehrveranstaltung.semester, student_uid, stunden, tbl_projektbetreuer.stundensatz, 
+				tbl_projektbetreuer.faktor
+			FROM
+				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, 
+				lehre.tbl_projektbetreuer, public.tbl_person, lehre.tbl_lehrfach
+			WHERE
+				tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
+				tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
+				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
+				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
+				tbl_person.person_id=tbl_projektbetreuer.person_id AND
+				tbl_lehreinheit.studiensemester_kurzbz='$semester_aktuell' AND
+				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0
+				";
+	if($uid!=='')
+	{
+		$mitarbeiter = new mitarbeiter($conn, $uid);
+		$qry.=" AND tbl_projektbetreuer.person_id='$mitarbeiter->person_id'";
+	}
+
+	if($institut!='')
+		$qry.=" AND tbl_lehrfach.fachbereich_kurzbz='".addslashes($institut)."'";
+		
+	if($studiengang_kz!='')
+		$qry.=" AND tbl_lehrveranstaltung.studiengang_kz='$studiengang_kz'";
+		
+	if($result = pg_query($conn, $qry))
+	{
+		$spalte=0;
+		$zeile++;
+		$zeile++;
+		$worksheet->write($zeile,$spalte,"Betreuungen", $format_bold);
+
+		while($row = pg_fetch_object($result))
+		{
+			$spalte=0;
+			$zeile++;
+						
+			//Studiengang
+			$worksheet->write($zeile,$spalte,$stg_obj->kuerzel_arr[$row->studiengang_kz]);
+			if($maxlength[$spalte]<strlen($stg_obj->kuerzel_arr[$row->studiengang_kz]))
+				$maxlength[$spalte]=strlen($stg_obj->kuerzel_arr[$row->studiengang_kz]);
+				
+			//Fachbereich
+			$worksheet->write($zeile,++$spalte,$row->fachbereich_kurzbz);
+			if($maxlength[$spalte]<strlen($row->fachbereich_kurzbz))
+				$maxlength[$spalte]=strlen($row->fachbereich_kurzbz);
+			//Koordinator
+			$worksheet->write($zeile,++$spalte,$row->koordinator);
+			if($maxlength[$spalte]<strlen($row->koordinator))
+				$maxlength[$spalte]=strlen($row->koordinator);
+			//Lektor
+			$worksheet->write($zeile,++$spalte,$row->nachname);
+			if($maxlength[$spalte]<strlen($row->nachname))
+				$maxlength[$spalte]=strlen($row->nachname);
+			//Lehrfach
+			$worksheet->write($zeile,++$spalte,$row->bezeichnung);
+			if($maxlength[$spalte]<strlen($row->bezeichnung))
+				$maxlength[$spalte]=strlen($row->bezeichnung);
+			//Semester
+			$worksheet->write($zeile,++$spalte,$row->semester);
+			if($maxlength[$spalte]<strlen($row->semester))
+				$maxlength[$spalte]=strlen($row->semester);
+				
+			$benutzer = new benutzer($conn);
+			$benutzer->load($row->student_uid);
+			//Student
+			$worksheet->write($zeile,++$spalte,$benutzer->nachname.' '.$benutzer->vorname);
+			if($maxlength[$spalte]<strlen($benutzer->nachname.' '.$benutzer->vorname))
+				$maxlength[$spalte]=strlen($benutzer->nachname.' '.$benutzer->vorname);
+			//Stunden
+			$worksheet->write($zeile,++$spalte,$row->stunden);
+			if($maxlength[$spalte]<strlen($row->stunden))
+				$maxlength[$spalte]=strlen($row->stunden);
+			//Kosten
+			$worksheet->write($zeile,++$spalte,$row->stunden*$row->stundensatz*$row->faktor);
+			if($maxlength[$spalte]<strlen($row->stunden*$row->stundensatz*$row->faktor))
+				$maxlength[$spalte]=strlen($row->stunden*$row->stundensatz*$row->faktor);
+				
+		}
+	}
+	
 	//Die Breite der Spalten setzen
 	foreach($maxlength as $i=>$breite)
 		$worksheet->setColumn($i, $i, $breite+2);

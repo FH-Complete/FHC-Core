@@ -22,6 +22,9 @@
 
 	require_once('../../config.inc.php');
 	require_once('../../../include/functions.inc.php');
+	require_once('../../../include/studiengang.class.php');
+	require_once('../../../include/person.class.php');
+	require_once('../../../include/benutzer.class.php');
 
 	$adress=MAIL_ADMIN;
 
@@ -63,6 +66,21 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<title>Reservierungsliste</title>
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
+	<script language="Javascript">
+	<!--
+	function printhelp()
+	{
+		alert('Erklärung\n'+
+			'LVNR: Interne FAS-Nummer der Lehrveranstaltung\n'+
+			'STG-S-V-G: Studiengang-Semester-Verband-Gruppe\n'+
+			'Gruppe: Spezialgruppen (Module, Projektgruppen, Spezialisierungsgruppen)\n'+
+			'Block: blockung (1->Einzelstunden; 2->Doppelstunden; ...)\n'+
+			'WR: Wochenrythmus (1->jede Woche; 2->jede 2. Woche; ...)\n'+
+			'Std: gesamte Semesterstunden\n'+
+			'KW: Kalenderwoche in der die Lehrveranstaltung startet');
+	}
+	-->
+	</script>
 </head>
 <body id="inhalt">
 	<H2>
@@ -84,7 +102,7 @@
 	}
 	if ($num_rows>0)
 	{
-		echo '<BR><BR><table border="0">';
+		echo '<BR><BR><H3>Lehrveranstaltungen - <a href="#" onclick="printhelp()" class="Item">Hilfe</a></H3><table border="0">';
 		echo '<tr class="liste"><th>LVNR</th><th>Lehrfach</th><th>Lehrform</th><th>LV Bezeichnung</th><th>Lehrfach Bezeichnung</th><th>Lektor</th><th>STG</th><th>S</th><th>V</th><th>G</th><th>Gruppe</th><th>Raumtyp</th><th>Alternativ</th><th>Block</th><th>WR</th><th>Std</th><th>KW</th><th>Anmerkung</th></tr>';
 		for ($i=0; $i<$num_rows; $i++)
 		{
@@ -119,18 +137,128 @@
 	}
 	else
 		echo 'Keine Datens&auml;tze vorhanden!<BR>';
+		
+	//Betreuungen
+
+	$mitarbeiter = new benutzer($conn);
+	$mitarbeiter->load($uid);
+	
+	$qry = "SELECT 
+				tbl_lehrveranstaltung.bezeichnung, tbl_projektarbeit.titel, 
+				(SELECT nachname || ' ' || vorname FROM public.tbl_benutzer JOIN public.tbl_person USING(person_id) 
+				 WHERE uid=student_uid) as student, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester
+			FROM 
+				lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektarbeit, lehre.tbl_projektbetreuer
+			WHERE
+				tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND
+				tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
+				tbl_lehreinheit.studiensemester_kurzbz='$stdsem' AND
+				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
+				tbl_projektbetreuer.person_id='$mitarbeiter->person_id'";
+	
+	$stg_obj = new studiengang($conn);
+	$stg_obj->getAll();
+	
+	if($result = pg_query($conn, $qry))
+	{
+		if(pg_num_rows($result)>0)
+		{
+			echo '<H3>Betreuungen</H3>';
+			echo '<table>';
+			echo '<tr class="liste">';
+			echo '<th>Stg</th>';
+			echo '<th>Sem</th>';
+			echo '<th>Lehrveranstaltung</th>';
+			echo '<th>Student</th>';
+			echo '<th>Titel der Projektarbeit</th>';
+			echo '</tr>';
+			
+			while($row = pg_fetch_object($result))
+			{
+				echo '<tr>';
+				
+				echo '<td>'.$stg_obj->kuerzel_arr[$row->studiengang_kz].'</td>';
+				echo '<td>'.$row->semester.'</td>';
+				echo '<td>'.$row->bezeichnung.'</td>';
+				echo '<td>'.$row->student.'</td>';
+				echo '<td>'.$row->titel.'</td>';
+				
+				echo '</tr>';
+			}
+			echo '</table>';
+		}
+	}
+	
+	
+	//Koordination
+	
+	$qry = "SELECT 
+				distinct
+				tbl_lehrveranstaltung.studiengang_kz, tbl_lehrfach.fachbereich_kurzbz, tbl_lehrveranstaltung.bezeichnung, 
+				tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.semester
+			FROM 
+				lehre.tbl_lehrveranstaltung, 
+				lehre.tbl_lehreinheit,
+				lehre.tbl_lehrfach
+			WHERE
+				tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
+				tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
+				tbl_lehreinheit.studiensemester_kurzbz='$stdsem' AND
+				(tbl_lehrveranstaltung.koordinator='$user' OR 
+				 (tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz) IN (SELECT studiengang_kz, fachbereich_kurzbz FROM public.tbl_benutzerfunktion 
+				 										  WHERE funktion_kurzbz='fbk' AND uid='$uid')
+				 )";
+	if($result = pg_query($conn, $qry))
+	{
+		if(pg_num_rows($result)>0)
+		{
+			echo '<H3>Koordination</H3>';
+			echo '<table>';
+			echo '<tr class="liste">';
+			echo '<th>Stg</th>';
+			echo '<th>Sem</th>';
+			echo '<th>Institut</th>';
+			echo '<th>LV</th>';
+			echo '<th>Lektoren</th>';
+			echo '</tr>';
+			while($row = pg_fetch_object($result))
+			{
+				echo '<tr>';
+				echo '<td>'.$stg_obj->kuerzel_arr[$row->studiengang_kz].'</td>';
+				echo '<td>'.$row->semester.'</td>';
+				echo '<td>'.$row->fachbereich_kurzbz.'</td>';
+				echo '<td>'.$row->bezeichnung.'</td>';
+				$qry = "SELECT 
+							titelpre, titelpost, vorname, nachname
+						FROM 
+							lehre.tbl_lehreinheitmitarbeiter,
+							public.tbl_benutzer,
+							public.tbl_person,
+							lehre.tbl_lehreinheit
+						WHERE 
+							tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
+							tbl_lehreinheit.lehrveranstaltung_id='$row->lehrveranstaltung_id' AND
+							tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND
+							tbl_benutzer.person_id=tbl_person.person_id AND
+							tbl_lehreinheit.studiensemester_kurzbz='$stdsem'";
+				$lektoren='';
+				if($result_lkt = pg_query($conn, $qry))
+				{
+					while($row_lkt = pg_fetch_object($result_lkt))
+					{
+						if($lektoren!='')
+							$lektoren.=',';
+						$lektoren.=trim($row_lkt->titelpre.' '.$row_lkt->vorname.' '.$row_lkt->nachname.' '.$row_lkt->titelpost);
+					}
+				}
+				echo '<td>'.$lektoren.'</td>';
+				echo '</tr>';
+			}
+			echo '</table>';
+		}
+	}
+echo "<BR>Fehler und Feedback bitte an den betreffenden Studiengang!<BR>
+		 <HR>";
 ?>
-<BR>Fehler und Feedback bitte an den betreffenden Studiengang!<BR>
-<HR>
-<H3>Hinweis</H3>
-Sonderauftr&auml;ge wie zum Beispiel Praktikums- und Diplomandenbetreuung werden hier nicht angezeigt!<BR>
-<H3>Erkl&auml;rung</H3>
-	&nbsp;&nbsp;<strong> LVNR: </strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Interne FAS-Nummer der Lehrveranstaltung<BR>
-	&nbsp;&nbsp;<strong> STG-S-V-G: </strong>Studiengang-Semester-Verband-Gruppe<BR>
-	&nbsp;&nbsp;<strong> Gruppe: </strong>&nbsp;&nbsp;Spezialgruppen (Module, Projektgruppen, Spezialisierungsgruppen)<BR>
-	&nbsp;&nbsp;<strong> Block: </strong>&nbsp;&nbsp;&nbsp;&nbsp;Stundenblockung (1->Einzelstunden; 2->Doppelstunden; ...)<BR>
-	&nbsp;&nbsp;<strong> WR: </strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wochenrythmus (1->jede Woche; 2->jede 2. Woche; ...)<BR>
-	&nbsp;&nbsp;<strong> Std: </strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gesamte Semesterstunden<BR>
-	&nbsp;&nbsp;<strong> KW: </strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Kalenderwoche in der die Lehrveranstaltung startet<BR>
 </body>
 </html>
