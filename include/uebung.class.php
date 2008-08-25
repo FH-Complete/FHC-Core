@@ -265,7 +265,7 @@ class uebung
 			while($row = pg_fetch_object($result))
 			{
 				$uebung_obj = new uebung($this->conn);
-
+				
 				$uebung_obj->uebung_id = $row->uebung_id;
 				$uebung_obj->gewicht = $row->gewicht;
 				$uebung_obj->punkte = $row->punkte;
@@ -660,7 +660,8 @@ function abgabe_save($new=null)
 				
 														
 					if(file_exists(BENOTUNGSTOOL_PATH."abgabe/".$row->abgabedatei))
-						unlink(BENOTUNGSTOOL_PATH."abgabe/".$row->abgabedatei);
+						unlink(BENOTUNGSTOOL_PATH."abgabe/".$row->abgabedatei);
+
 					$qry = "UPDATE campus.tbl_studentuebung set abgabe_id = null where abgabe_id = '$abgabe_id';
 							DELETE FROM campus.tbl_abgabe WHERE abgabe_id = '$abgabe_id'";
 			
