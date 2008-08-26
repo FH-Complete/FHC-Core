@@ -163,7 +163,7 @@
 					  	<td class='tdwrap'>
 							<ul style="margin-top: 0px; margin-bottom: 0px;">
 							<?php
-							$qry = "SELECT distinct tbl_lehrveranstaltung.bezeichnung,typ, tbl_studiengang.kurzbz, tbl_lehrveranstaltung.studiengang_kz, semester, lehreverzeichnis, tbl_lehrveranstaltung.lehrveranstaltung_id
+							$qry = "SELECT distinct tbl_lehrveranstaltung.bezeichnung,typ, tbl_studiengang.kurzbz, tbl_lehrveranstaltung.studiengang_kz, semester, lehreverzeichnis, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.orgform_kurzbz
 										FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_studiengang
 								        WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 									        tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz AND
@@ -173,10 +173,10 @@
 							{
 								while($row = pg_fetch_object($result))
 								{
-									if($row->studiengang_kz==0 AND $row->semester==0)
+									if($row->studiengang_kz==0 && $row->semester==0)
 										echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">FF '.CutString($row->bezeichnung,$cutlength).'</a></li>';
 									else
-										echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="lehre/lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">'.$stg[$row->studiengang_kz].$row->semester.' '.CutString($row->bezeichnung, $cutlength).'</a></li>';
+										echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="lehre/lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">'.$stg[$row->studiengang_kz].$row->semester.' '.$row->orgform_kurzbz.' '.CutString($row->bezeichnung, $cutlength).'</a></li>';
 								}
 							}
 							else
