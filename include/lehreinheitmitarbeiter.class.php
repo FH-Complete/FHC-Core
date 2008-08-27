@@ -244,6 +244,14 @@ class lehreinheitmitarbeiter
 		{
 			if($this->mitarbeiter_uid_old=='')
 				$this->mitarbeiter_uid_old = $this->mitarbeiter_uid;
+				
+			//Wenn der Lektor geaendert wird, dann wird insertamum und insertvon neu gesetzt
+			//damit in den Chronjobs erkannt wird welche Lektoren an diesem Tag geaendert wurden.
+			$setinsert='';
+			if($this->mitarbeiter_uid_old!=$this->mitarbeiter_uid)
+			{
+				$setinsert=", insertamum='".date('Y-m-d H:i:s')."', insertvon=".$this->addslashes($this->updatevon);
+			}
 
 			$qry = 'UPDATE lehre.tbl_lehreinheitmitarbeiter SET'.
 			       ' semesterstunden='.$this->addslashes($this->semesterstunden).','.
@@ -257,6 +265,7 @@ class lehreinheitmitarbeiter
 			       ' updateamum='.$this->addslashes($this->updateamum).','.
 			       ' updatevon='.$this->addslashes($this->updatevon).','.
 			       ' ext_id = '.$this->addslashes($this->ext_id).
+			       $setinsert.
 			       " WHERE lehreinheit_id=".$this->addslashes($this->lehreinheit_id)." AND
 			               mitarbeiter_uid=".$this->addslashes($this->mitarbeiter_uid_old).";";
 		}
