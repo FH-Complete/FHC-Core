@@ -28,12 +28,45 @@
 require ('../vilesci/config.inc.php');
 
 // Datenbank Verbindung
-//if (!$conn = pg_pconnect("host=.technikum-wien.at dbname= user= password="))
-if (!$conn = pg_pconnect(CONN_STRING))
+if (!$conn = pg_pconnect("host=calva.technikum-wien.at dbname=vilesci user=pam password=jfie02"))
+//if (!$conn = pg_pconnect(CONN_STRING))
    	die('Es konnte keine Verbindung zum Server aufgebaut werden!'.pg_last_error($conn));
 
 echo '<H1>Systemcheck!</H1>';
 echo '<H2>DB-Updates!</H2>';
+
+// ************* Moodle **********************************************************
+if (!@pg_query($conn,'SELECT * FROM lehre.tbl_moodle LIMIT 1;'))
+{
+	$sql='	CREATE TABLE lehre.tbl_moodle
+			(
+				"moodle_id" Serial NOT NULL,
+				"mdl_course_id" bigint NOT NULL,
+				"lehreinheit_id" integer,
+				"lehrveranstaltung_id" integer ,
+				"studiensemester_kurzbz" Varchar(16) ,
+				"insertamum" Timestamp Default now(),
+				"insertvon" Varchar(16),
+				constraint "pk_tbl_moodle" primary key ("moodle_id")
+			);
+
+			Alter table lehre.tbl_moodle add Constraint "lehreinheit_moodle" foreign key ("lehreinheit_id") references "lehre"."tbl_lehreinheit" ("lehreinheit_id") on update cascade on delete restrict;
+			Alter table lehre.tbl_moodle add Constraint "studiensemester_moodle" foreign key ("studiensemester_kurzbz") references "public"."tbl_studiensemester" ("studiensemester_kurzbz") on update cascade on delete restrict;
+			Alter table lehre.tbl_moodle add Constraint "lehrveranstaltung_moodle" foreign key ("lehrveranstaltung_id") references "lehre"."tbl_lehrveranstaltung" ("lehrveranstaltung_id") on update cascade on delete restrict;
+
+			Grant select on lehre.tbl_moodle to group "admin";
+			Grant update on lehre.tbl_moodle to group "admin";
+			Grant delete on lehre.tbl_moodle to group "admin";
+			Grant insert on lehre.tbl_moodle to group "admin";
+			Grant select on lehre.tbl_moodle to group "web";
+			Grant update on lehre.tbl_moodle to group "web";
+			Grant insert on lehre.tbl_moodle to group "web";
+		';
+		if (!pg_query($conn,$sql))
+			echo '<strong>lehre.tbl_moodle: '.pg_last_error($conn).' </strong><BR>';
+		else
+			echo 'Tabelle lehre.tbl_moodle hinzugefuegt!<BR>';
+}
 
 // ************* Newssprache **********************************************************
 if (!@pg_query($conn,'SELECT * FROM campus.tbl_newssprache LIMIT 1;'))
@@ -102,6 +135,20 @@ if (!@pg_query($conn,'SELECT schule FROM public.tbl_firma LIMIT 1;'))
 		echo '<strong>public.tbl_firma: '.pg_last_error($conn).' </strong><BR>';
 	else
 		echo 'schule wurde bei public.tbl_firma hinzugefuegt!<BR>';
+}
+
+// ************** public.tbl_studiengang.moodle ************************
+if (!@pg_query($conn,'SELECT moodle FROM public.tbl_studiengang LIMIT 1;'))
+{
+	$sql='	ALTER TABLE public.tbl_studiengang ADD COLUMN moodle boolean;
+			UPDATE public.tbl_studiengang SET moodle=TRUE;
+			ALTER TABLE public.tbl_studiengang ALTER COLUMN moodle SET NOT NULL;
+			ALTER TABLE public.tbl_studiengang ALTER COLUMN moodle SET DEFAULT TRUE;
+		';
+	if (!@pg_query($conn,$sql))
+		echo '<strong>public.tbl_studiengang: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo 'moodle wurde bei public.tbl_studiengang hinzugefuegt!<BR>';
 }
 
 // ************** campus.tbl_news.datum_bis ************************
