@@ -147,7 +147,7 @@
 				</tr>
 				<tr>
 					<td class="tdwidth10" nowrap>&nbsp;</td>
-					<td class="tdwrap"><a class="Item" href="private/info/weiterbildung/aktuelles/aktuelles.html" target="content" style="font-weight: bold;"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Programm 2007/08</a></td>
+					<td class="tdwrap"><a class="Item" href="private/info/weiterbildung/aktuelles/aktuelles.html" target="content" style="font-weight: bold;"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Programm 2008/09</a></td>
 				</tr>
 				<tr>
 					<td class="tdwidth10" nowrap>&nbsp;</td>
