@@ -40,6 +40,8 @@
 	if (isset($_POST['bmsuche']))
 	{
 		$bmsuche=strtoupper($_POST['bmsuche']);
+		$bmsuche = ereg_replace("^0*", "", $bmsuche);
+		
 		$sql_query="SELECT * FROM public.vw_betriebsmittelperson
 					WHERE upper(uid) LIKE '%$bmsuche%' OR upper(nachname) LIKE '%$bmsuche%' OR upper(vorname) LIKE '%$bmsuche%' 
 						OR upper(nummer) LIKE '%$bmsuche%' OR upper(nummerintern) LIKE '%$bmsuche%'
@@ -58,7 +60,7 @@
 		//$htmlstr = "<table class='liste sortable'>\n";
 		$htmlstr .= "<div style='text-align:right'>";
 		$htmlstr .= "<form name='suche' method='POST' action=''>
-							<input type='text' value=''id='bmsuche' name='bmsuche' tabindex='1'/>&nbsp;
+							<input type='text' value=''id='bmsuche' maxlength=12 size=12 name='bmsuche' tabindex='1'/>&nbsp;
 							<input type='submit' name='submit' value='BM-Suche'>
 						</form>";
 		$htmlstr .= "</div>";
