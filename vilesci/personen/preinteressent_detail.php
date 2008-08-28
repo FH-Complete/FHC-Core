@@ -652,7 +652,7 @@ echo "<td>Absage</td><td><input type='checkbox' ".($preinteressent->absagedatum!
 echo '</tr><tr>';
 
 //Erfassungsdatum
-echo "<td>Erfassungsdatum:</td><td> <input type='text' size='10' maxlength='10' name='erfassungsdatum' value='".$datum_obj->formatDatum($preinteressent->erfassungsdatum,'d.m.Y')."'></td>";
+echo "<td>Erfassungsdatum:</td><td> <input type='text' size='10' maxlength='10' name='erfassungsdatum' value='".$datum_obj->formatDatum($preinteressent->erfassungsdatum,'d.m.Y')."'> (31.12.2008)</td>";
 
 //Infozusendung
 echo "<td>Infozusendung am</td><td><input type='text' name='infozusendung' size='10' maxlength='10' value='".$datum_obj->formatDatum($preinteressent->infozusendung,'d.m.Y')."'></td>";
