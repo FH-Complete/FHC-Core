@@ -301,7 +301,7 @@ A:hover {
 							}
 							else //Berechtigt fuer einen Teil der Fachbereiche
 							{
-								$ids='-1';
+								$ids="'-1'";
 								foreach ($arr as $elem)
 									$ids.=",'$elem'";
 
@@ -399,7 +399,7 @@ A:hover {
 							}
 							else //Berechtigt fuer einen Teil der Fachbereiche
 							{
-								$ids='-1';
+								$ids="'-1'";
 								foreach ($arr as $elem)
 									$ids.=",'$elem'";
 
@@ -450,7 +450,7 @@ A:hover {
 						if($rechte->isBerechtigt('lehre') || $rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz'))
 						{
 							$arr=$rechte->getFbKz();
-							$ids='-1';
+							$ids="'-1'";
 								foreach ($arr as $elem)
 									$ids.=",'$elem'";
 							$sql_query = $sql_query . " UNION SELECT DISTINCT lehreverzeichnis AS kuerzel, tbl_lehrveranstaltung.bezeichnung

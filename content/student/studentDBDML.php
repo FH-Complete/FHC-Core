@@ -1591,7 +1591,7 @@ if(!$error)
 						}
 						else
 						{
-							$errormsg.="Fehler bei $dokument_kurzbz: Loeschen nur durch $mitarbeiter_uid moeglich\n";
+							$errormsg.="Fehler bei $dokument_kurzbz: Loeschen nur durch $dok->mitarbeiter_uid moeglich\n";
 						}
 					}
 					else
