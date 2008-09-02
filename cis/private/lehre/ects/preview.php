@@ -166,7 +166,7 @@
 	if(!$result=pg_query($conn, $qry))
 		die('Fehler beim Lesen aus der Datenbank');
 
-	$fachbereiche='1';
+	$fachbereiche="'1'";
 	$fachbereich['kurzbz']=array();
 	$fachbereich['bezeichnung']=array();
 
@@ -188,7 +188,7 @@
 	$qry = "Select distinct lehrform_kurzbz FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lv' AND studiensemester_kurzbz='$stsem'";
 	if(!$res = pg_query($conn,$qry))
 		die('Fehler beim Lesen aus der Datenbank');
-
+	//echo $fachbereiche;
 	while($row = pg_fetch_object($res))
 		$lehrform_kurzbz[] = $row->lehrform_kurzbz;
 	//Fachbereichsleiter fuer alle FB ermitteln
