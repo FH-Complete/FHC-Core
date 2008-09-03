@@ -241,11 +241,12 @@ echo '<br>';
 echo "<table class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>
 	<thead>
 		<tr>
+		<th class='table-sortable:default'>PersonID</th>
 		<th class='table-sortable:default'>Nachname</th>
 		<th class='table-sortable:default'>Vorname</th>
-		<th class='table-sortable:default'>Geburtsdatum</th>
 		<th class='table-sortable:default'>Studiensemester</th>
 		<th class='table-sortable:default'>Erfassungsdatum</th>
+		<th class='table-sortable:default'>E-Mail</th>
 		<th class='table-sortable:default'>Status</th>
 		<th class='table-sortable:default'>Freigabe</th>
 		<th class='table-sortable:default'>&Uuml;bernahme</th>
@@ -286,11 +287,25 @@ foreach ($preinteressent->result as $row)
 	echo '<tr>';
 	$person = new person($conn);
 	$person->load($row->person_id);
+	echo "<td>$person->person_id</td>";
 	echo "<td>$person->nachname</td>";
 	echo "<td>$person->vorname</td>";
-	echo "<td>".$datum_obj->convertISODate($person->gebdatum)."</td>";
+	//echo "<td>".$datum_obj->convertISODate($person->gebdatum)."</td>";
 	echo "<td>$row->studiensemester_kurzbz</td>";
 	echo "<td>".$datum_obj->formatDatum($row->erfassungsdatum,'d.m.Y')."</td>";
+	//EMail
+	$qry = "SELECT kontakt FROM public.tbl_kontakt WHERE person_id='$person->person_id' AND kontakttyp='email' 
+			ORDER BY zustellung DESC LIMIT 1";
+	echo '<td>';
+	if($result_mail = pg_query($conn, $qry))
+	{
+		if($row_mail = pg_fetch_object($result_mail))
+		{
+			echo '<a href="mailto:'.$row_mail->kontakt.'" class="Item">'.$row_mail->kontakt.'</a>';
+		}
+	}
+	echo '</td>';
+	//Status
 	$status='';
 	$prestudent = new prestudent($conn);
 	if($prestudent->getPrestudenten($row->person_id))

@@ -807,7 +807,7 @@ if(!$error)
 				}
 				else
 				{
-					// LE loeschen
+					// Loeschen verhindern wenn diese Lehreinheit schon verplant ist
 					$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev WHERE lehreinheit_id='".$_POST['lehreinheit_id']."'
 							UNION
 							SELECT stundenplan_id as id FROM lehre.tbl_stundenplan WHERE lehreinheit_id='".$_POST['lehreinheit_id']."'";
@@ -820,14 +820,27 @@ if(!$error)
 						}
 						else
 						{
-							if ($leDAO->delete($_POST['lehreinheit_id']))
+							//Loeschen verhindern wenn ein MoodleKurs existiert
+							$qry = "SELECT 1 FROM lehre.tbl_moodle WHERE lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
+							if($result = pg_query($conn, $qry))
 							{
-								$return = true;
-							}
-							else
-							{
-								$return = false;
-								$errormsg = 'Fehler beim Loeschen der Lehreinheit '.$leDAO->errormsg;
+								if(pg_num_rows($result)>0)
+								{
+									$return = false;
+									$errormsg = 'Lehreinheit kann nicht geloescht werden, da dazu bereits ein Moodle-Kurs angelegt wurde';
+								}
+								else 
+								{
+									if ($leDAO->delete($_POST['lehreinheit_id']))
+									{
+										$return = true;
+									}
+									else
+									{
+										$return = false;
+										$errormsg = 'Fehler beim Loeschen der Lehreinheit '.$leDAO->errormsg;
+									}
+								}
 							}
 						}
 					}
