@@ -141,6 +141,7 @@ $nachname = (isset($_POST['nachname'])?$_POST['nachname']:'');
 $vorname = (isset($_POST['vorname'])?$_POST['vorname']:'');
 $geschlecht = (isset($_POST['geschlecht'])?$_POST['geschlecht']:'');
 $geburtsdatum = (isset($_POST['geburtsdatum'])?$_POST['geburtsdatum']:'');
+$nation = (isset($_POST['nation'])?$_POST['nation']:'A');
 $adresse = (isset($_POST['adresse'])?$_POST['adresse']:'');
 $plz = (isset($_POST['plz'])?$_POST['plz']:'');
 $ort = (isset($_POST['ort'])?$_POST['ort']:'');
@@ -185,6 +186,7 @@ if(isset($_POST['save']))
 		$person->titelpost = $titelpost;
 		$person->geschlecht = $geschlecht;
 		$person->gebdatum = $geburtsdatum;
+		$person->staatsbuergerschaft = $nation;
 		$person->svnr = $svnr;
 		$person->ersatzkennzeichen = $ersatzkennzeichen;
 		$person->aktiv = true;
@@ -349,22 +351,25 @@ if(isset($_POST['save']))
 			$errormsg = "Fehler beim Anlegen des Preinteressenten: $preinteressent->errormsg";
 		}
 		
-		foreach ($_POST as $key=>$param)
+		if(!$error)
 		{
-			if(substr($key,0,4)=='stg_')
+			foreach ($_POST as $key=>$param)
 			{
-				$stg_kz = substr($key, 4);
-				$zuordnung = new preinteressent($conn);
-				$zuordnung->preinteressent_id = $preinteressent->preinteressent_id;
-				$zuordnung->studiengang_kz = $stg_kz;
-				$zuordnung->prioritaet = 1;
-				$zuordnung->insertamum = date('Y-m-d H:i:s');
-				$zuordnung->insertvon = $user;
-				
-				if(!$zuordnung->saveZuordnung(true))
+				if(substr($key,0,4)=='stg_')
 				{
-					$errormsg.="Fehler beim Speichern der Zuordnung zum Studiengang $stg_kz";
-					$error=true;
+					$stg_kz = substr($key, 4);
+					$zuordnung = new preinteressent($conn);
+					$zuordnung->preinteressent_id = $preinteressent->preinteressent_id;
+					$zuordnung->studiengang_kz = $stg_kz;
+					$zuordnung->prioritaet = 1;
+					$zuordnung->insertamum = date('Y-m-d H:i:s');
+					$zuordnung->insertvon = $user;
+					
+					if(!$zuordnung->saveZuordnung(true))
+					{
+						$errormsg.="Fehler beim Speichern der Zuordnung zum Studiengang $stg_kz";
+						$error=true;
+					}
 				}
 			}
 		}
@@ -426,6 +431,22 @@ echo '<OPTION value="m" '.($geschlecht=='m'?'selected':'').'>m&auml;nnlich</OPTI
 echo '<OPTION value="w" '.($geschlecht=='w'?'selected':'').'>weiblich</OPTION>';
 echo '<OPTION value="u" '.($geschlecht=='w'?'selected':'').'>unbekannt</OPTION>';
 echo '</SELECT>';
+echo '</td></tr>';
+echo '<tr><td>Staatsbuergerschaft</td><td><SELECT name="nation">';
+$qry = "SELECT nation_code, kurztext FROM bis.tbl_nation ORDER BY kurztext";
+if($result = pg_query($conn, $qry))
+{
+	while($row = pg_fetch_object($result))
+	{
+		if($row->nation_code==$nation)
+			$selected='selected';
+		else 
+			$selected='';
+		
+		echo "<option value='$row->nation_code' $selected>$row->kurztext</option>";
+	}
+}
+echo '</SELECT';
 echo '</td></tr>';
 echo '<tr><td>SVNR</td><td><input type="text" id="svnr" size="10" maxlength="10" name="svnr" value="'.$svnr.'" onblur="GeburtsdatumEintragen()" /></td></tr>';
 echo '<tr><td>Ersatzkennzeichen</td><td><input type="text" id="ersatzkennzeichen" size="10" maxlength="10" name="ersatzkennzeichen" value="'.$ersatzkennzeichen.'" /></td></tr>';
@@ -491,10 +512,18 @@ if($result = pg_query($conn, $qry))
 echo '</SELECT></td></tr>';
 echo '</tr><td>Schule ID:</td><td><input type="text" size="3" name="schule_id" value="'.$schule.'" onkeyup="checkschulid(this.value)"></td></tr>';
 echo '<tr><td></td><td>';
-if(($geburtsdatum=='' && $vorname=='' && $nachname=='') || $geburtsdatum_error)
+if(($vorname!='' && $geburtsdatum=='' && $nachname=='') 
+   //|| ($vorname=='' && $geburtsdatum=='' && $nachname!='') 
+   || ($nachname=='' && $geburtsdatum=='')
+   || ($geburtsdatum=='' && $nachname=='' && $vorname=='') 
+   || $geburtsdatum_error)
 	echo '<input type="submit" name="showagain" value="Vorschlag laden">';
 else
+{
+	echo '<input type="submit" name="showagain" value="Vorschlag laden">';
 	echo '<input type="submit" name="save" value="Speichern">';
+}
+	
 
 echo '</td></tr>';
 echo '</table>';
@@ -521,6 +550,13 @@ if($vorname!='' && $nachname!='')
 	if($where!='')
 		$where.=' OR';
 	$where.=" (LOWER(vorname)=LOWER('".$vorname."') AND LOWER(nachname)=LOWER('".$nachname."'))";
+}
+
+if($vorname=='' && $nachname!='')
+{
+	if($where!='')
+		$where.=' OR';
+	$where.=" (LOWER(nachname)=LOWER('".$nachname."'))";
 }
 
 if($where!='')
@@ -567,18 +603,36 @@ if($where!='')
 		echo '</table>';
 		echo '<hr>';
 		//Studiengaenge anzeigen
-		$studiengang = new studiengang($conn);
-		$studiengang->getAll('typ, bezeichnung');
-		echo '<table>';
+		$qry = "SELECT *, UPPER(typ::varchar(1) || kurzbz) as kuerzel FROM public.tbl_studiengang 
+				WHERE aktiv AND typ in('b','m') ORDER BY typ, bezeichnung";
+		if($result = pg_query($conn, $qry))
+		{
+			echo '<table><tr><td valign="top">';
+			echo '<table>';
+			$lasttyp='';
+			while($row = pg_fetch_object($result))
+			{
+				if($lasttyp!=$row->typ)
+				{
+					if($lasttyp!='')
+						echo '</table></td><td><table>';	
+					$lasttyp = $row->typ;
+				}
+				echo "<tr><td><input type='checkbox' name='stg_$row->studiengang_kz'></td><td>$row->kuerzel</td><td>$row->bezeichnung</td></tr>";
+			}
+			echo '</table></td></tr></table>';
+		}
+
+		/*
 		foreach ($studiengang->result as $row)
 		{
 			echo "<tr><td><input type='checkbox' name='stg_$row->studiengang_kz'></td><td>$row->kuerzel</td><td>$row->bezeichnung</td></tr>";
-		}
-		echo '</table>';
+		}*/
+		
 	}
 }
-//else
-//	echo 'Zum Erstellen des Vorschlags bitte Geburtsdatum oder Vorname und Nachname eingeben';
+else
+	echo '<b>Zum Erstellen des Vorschlags bitte Geburtsdatum oder Vorname und Nachname eingeben</b>';
 
 ?>
 </td>

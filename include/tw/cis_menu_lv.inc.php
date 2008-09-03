@@ -26,6 +26,46 @@
 ?>
 <table class="tabcontent">
 	<tr>
+	<td class="tdvertical" align="center">
+
+		<?php
+
+		//Lehrveranstaltungsinformation
+
+		   echo "<img src=\"../../../skin/images/button_i.jpg\" width=\"67\" height=\"45\"><br><strong>Lehrveranstaltungsinformation</strong><br>";
+
+		   $qry = "SELECT * FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$lvid' AND genehmigt=true AND sprache='German' AND aktiv=true";
+		   $need_br=false;
+
+		   if($result=pg_query($sql_conn,$qry))
+		   {
+		      if(pg_num_rows($result)>0)
+		      {
+			     echo "<a href=\"#\" class='Item' onClick=\"javascript:window.open('ects/preview.php?lv=$lvid&language=de','Lehrveranstaltungsinformation','width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes');\">Deutsch&nbsp;</a>";
+			     $need_br=true;
+		      }
+		   }
+		   $qry = "SELECT * FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$lvid' AND genehmigt=true AND sprache='English' AND aktiv=true";
+		   if($result=pg_query($sql_conn,$qry))
+		   {
+		      if(pg_num_rows($result)>0)
+		      {
+		      	 $row1=pg_fetch_object($result);
+			     echo "<a href=\"#\" class='Item' onClick=\"javascript:window.open('ects/preview.php?lv=$lvid&language=en','Lehrveranstaltungsinformation','width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes');\">Englisch</a>";
+			     $need_br=true;
+		      }
+		   }
+
+		   if($user_is_allowed_to_upload || $rechte->isBerechtigt('admin',$course_id) || $rechte->isBerechtigt('lehre',$course_id))
+		   {
+		   		if($need_br)
+		   			echo "<br>";
+		   		echo "<a href='ects/index.php?lvid=$lvid' target='_blank' class='Item'>Bearbeiten</a>";
+		   }
+		?>
+
+    <p>&nbsp;</p>
+		</td>
 	    <td class="tdvertical" align="center">
 		  <?php
 		  
@@ -149,7 +189,7 @@
 
 			if(isset($dir_empty) && $dir_empty == false)
 			{
-				echo '<a href="'.$dest_dir->path.'/" target="_blank">';
+				echo '<a href="'.$dest_dir->path.'/" target="_blank" class="Item">';
 				echo '<img src="../../../skin/images/button_dl.jpg" width="67" height="45"><br>';
 				echo '<strong>Download</strong>';
 				echo '</a>';
@@ -249,8 +289,23 @@
 
   <p>&nbsp;</p>
 	  </td>
-		<td class="tdvertical" align="center">
+	  <td class="tdvertical" align="center">
 		<?php
+		//Keine Newsgroups fuer Studiengang '0' (Freifaecher) anzeigen
+		if($course_id!='0')
+		{
+			echo '<a href="news://cis.technikum-wien.at/'.strtolower($stg_obj->kurzbzlang).'.'.$term_id.'sem.'.strtolower($short_short_name).'" class="Item">
+					<img src="../../../skin/images/button_ng.jpg" width="67" height="45"><br>
+					<strong>Newsgroups</strong>
+				</a>';
+		}
+		?>
+		<p>&nbsp;</p>
+		</td>
+		
+		<?php
+		/*
+			echo '<td class="tdvertical" align="center">'
 		//Studentenabgabe
 			$dest_dir = @dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/upload');
 
@@ -343,95 +398,70 @@
 						  </a>";
 				}
 			}
+			echo '<p>&nbsp;</p>
+				</td>';
+			*/
 		  ?>
-		  <p>&nbsp;</p>
-		</td>
-	</tr>
-	<tr>
-		<td class="tdvertical" align="center">
+		  <td class="tdvertical" align="center">
 		<?php
 		//FEEDBACK
-		echo '<a href="feedback.php?lvid='.$lvid.'" target="_blank"><img border="0" src="../../../skin/images/button_fb.jpg" width="67" height="45"><br><strong>Feedback</strong></a>';
+		echo '<a href="feedback.php?lvid='.$lvid.'" target="_blank" class="Item"><img border="0" src="../../../skin/images/button_fb.jpg" width="67" height="45"><br><strong>Feedback</strong></a>';
 		?>
 
 		<p>&nbsp;</p>
-		</td>
-
-  <td class="tdvertical" align="center">
-<?php if($is_lector)
-		{
-			if(isset($angezeigtes_stsem))
-				$studiensem = '&stsem='.$angezeigtes_stsem;
-			else
-				$studiensem = '';
-	?>
-<a href="benotungstool/verwaltung.php?<?php echo "lvid=$lvid$studiensem"?>" >
-    <img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
-    <strong>Benotungstool<br>("Kreuzerl"-Tool)</strong></a><br>
-    <a href="lesson.php?handbuch=1&<?php echo "lvid=$lvid$studiensem"?>">Handbuch [PDF]</a>
-<?php } else { ?>
-<a href="benotungstool/studentenansicht.php?<?php echo "lvid=$lvid"?>" >
-    <img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
-    <strong>"Kreuzerl"-Tool</strong></a>
-
-<?php } ?>
-    <p>&nbsp;</p>
 		</td>
 	</tr>
 	<tr>
-		<td class="tdvertical" align="center">
+		
 
-		<?php
+  <td class="tdvertical" align="center">
+<?php 
+	//Kreuzerltool
+	if($is_lector)
+	{
+		if(isset($angezeigtes_stsem))
+			$studiensem = '&stsem='.$angezeigtes_stsem;
+		else
+			$studiensem = '';
+	
+			echo '<a href="benotungstool/verwaltung.php?lvid='.$lvid.$studiensem.'" class="Item">
+    			<img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
+    			<strong>Benotungstool<br>("Kreuzerl"-Tool)</strong></a><br>
+    			<a href="lesson.php?handbuch=1&lvid='.$lvid.$studiensem.'" class="Item">Handbuch [PDF]</a>';
+	} 
+	else 
+	{
+		echo '<a href="benotungstool/studentenansicht.php?lvid='.$lvid.'" >
+    			<img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
+    			<strong>"Kreuzerl"-Tool</strong></a>';
 
-		//Lehrveranstaltungsinformation
-
-		   echo "<img src=\"../../../skin/images/button_i.jpg\" width=\"67\" height=\"45\"><br><strong>Lehrveranstaltungsinformation</strong><br>";
-
-		   $qry = "SELECT * FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$lvid' AND genehmigt=true AND sprache='German' AND aktiv=true";
-		   $need_br=false;
-
-		   if($result=pg_query($sql_conn,$qry))
-		   {
-		      if(pg_num_rows($result)>0)
-		      {
-			     echo "<a href=\"#\" class='Item' onClick=\"javascript:window.open('ects/preview.php?lv=$lvid&language=de','Lehrveranstaltungsinformation','width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes');\">Deutsch&nbsp;</a>";
-			     $need_br=true;
-		      }
-		   }
-		   $qry = "SELECT * FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$lvid' AND genehmigt=true AND sprache='English' AND aktiv=true";
-		   if($result=pg_query($sql_conn,$qry))
-		   {
-		      if(pg_num_rows($result)>0)
-		      {
-		      	 $row1=pg_fetch_object($result);
-			     echo "<a href=\"#\" class='Item' onClick=\"javascript:window.open('ects/preview.php?lv=$lvid&language=en','Lehrveranstaltungsinformation','width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes');\">Englisch</a>";
-			     $need_br=true;
-		      }
-		   }
-
-		   if($user_is_allowed_to_upload || $rechte->isBerechtigt('admin',$course_id) || $rechte->isBerechtigt('lehre',$course_id))
-		   {
-		   		if($need_br)
-		   			echo "<br>";
-		   		echo "<a href='ects/index.php?lvid=$lvid' target='_blank' class='Item'>Bearbeiten</a>";
-		   }
-		?>
-
+	}
+	?>
     <p>&nbsp;</p>
-		</td>
-		<td class="tdvertical" align="center">
-		<?php
-		//Keine Newsgroups fuer Studiengang '0' (Freifaecher) anzeigen
-		if($course_id!='0')
-		{
-			echo '<a href="news://cis.technikum-wien.at/'.strtolower($stg_obj->kurzbzlang).'.'.$term_id.'sem.'.strtolower($short_short_name).'">
-					<img src="../../../skin/images/button_ng.jpg" width="67" height="45"><br>
-					<strong>Newsgroups</strong>
-				</a>';
-		}
-		?>
-		<p>&nbsp;</p>
-		</td>
+	</td>
+	<td class="tdvertical" align="center">
+<?php 
+	//Moodle
+	echo '<a href="'.MOODLE_PATH.'" target="_blank" class="Item" >
+    	<img src="../../../skin/images/button_moodle.jpg" width="68" height="45"><br>
+    	<strong>Moodle</strong></a><br>';
+    if($is_lector)
+    	echo '<a href="moodle_wartung.php?lvid='.$lvid.'&stsem='.$angezeigtes_stsem.'" class="Item">Wartung</a>';
+	
+	?>
+    <p>&nbsp;</p>
+	</td>
+	<td class="tdvertical" align="center">
+<?php 
+	//Gesamtnote
+	if($is_lector)
+	{
+		echo '<a href="benotungstool/lvgesamtnoteverwalten.php?lvid='.$lvid.'&stsem='.$angezeigtes_stsem.'" class="Item" >
+    		<img src="../../../skin/images/button_endnote.jpg" width="68" height="45"><br>
+    		<strong>Gesamtnote</strong></a><br>';
+	}
+	?>
+    <p>&nbsp;</p>
+	</td>
 	</tr>
-
 </table>

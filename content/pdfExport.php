@@ -29,6 +29,7 @@ require_once('../vilesci/config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/xslfo2pdf/xslfo2pdf.php');
+require_once('../include/fop.class.php');
 require_once('../include/akte.class.php');
 
 // Datenbank Verbindung
@@ -176,7 +177,7 @@ $rechte->getBerechtigungen($user);
 //	die("Keine Berechtigung");
 
 $xml_url=XML_ROOT.$xml.$params;
-//echo $xml_url;
+
 // Load the XML source
 $xml_doc = new DOMDocument;
 
@@ -195,26 +196,9 @@ if(!$result = pg_query($conn, $qry))
 if(!$row = pg_fetch_object($result))
 	die('Vorlage wurde nicht gefunden'.$qry);
 
-// Load the XSL source
-$xsl_doc = new DOMDocument;
-//if(!$xsl_doc->load('../../../../xsl/collection.xsl'))
-if(!$xsl_doc->loadXML($row->text))
-	die('unable to load xsl');
-//echo 'XSL:'.$xsl_doc->saveXML().':';
-
-
-// Configure the transformer
-$proc = new XSLTProcessor;
-$proc->importStyleSheet($xsl_doc); // attach the xsl rules
-
-$buffer = $proc->transformToXml($xml_doc);
-//in $buffer steht nun das xsl-fo file mit den daten
-/*$buffer = '<?xml version="1.0" encoding="ISO-8859-15" ?>'.substr($buffer, strpos($buffer,"\n"),strlen($buffer));*/
-//$buffer = html_entity_decode($buffer);
-//echo "XSL-FO: $buffer";
+$xsl_content = $row->text;
 
 //Pdf erstellen
-$fo2pdf = new XslFo2Pdf();
 
 //wenn uid gefunden wird, dann den Nachnamen zum Dateinamen dazuhaengen
 $nachname='';
@@ -235,10 +219,35 @@ $filename=$xsl.$nachname;
 
 if (!isset($_REQUEST["archive"]))
 {
- if (!$fo2pdf->generatePdf($buffer, $filename, "D"))
- {
-     echo('Failed to generate PDF');
- }
+	if(PDF_CREATE_FUNCTION=='FOP')
+	{
+		$fop = new fop();
+		$xml = $xml_doc->saveXML();
+		//$xml = '<personen></personen>';
+		//$xsl='foobar';
+		$fop->generatePdf($xml, $xsl_content, $filename, "D");
+	}
+	else 
+	{
+		$fo2pdf = new XslFo2Pdf();
+			
+		// Load the XSL source
+		$xsl_doc = new DOMDocument;
+		
+		if(!$xsl_doc->loadXML($xsl_content))
+			die('unable to load xsl');
+		
+		// Configure the transformer
+		$proc = new XSLTProcessor;
+		$proc->importStyleSheet($xsl_doc); // attach the xsl rules
+		
+		$buffer = $proc->transformToXml($xml_doc);
+		
+		if (!$fo2pdf->generatePdf($buffer, $filename, "D"))
+		{
+			echo('Failed to generate PDF');
+		}
+	}
 }
 else
 {
@@ -267,12 +276,35 @@ else
 	if($rechte->isBerechtigt('admin', $studiengang_kz, 'suid') || $rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid'))
 	{
 
-		$filename = $user;
-		if (!$fo2pdf->generatePdf($buffer, $filename, 'F'))
+		
+		if(PDF_CREATE_FUNCTION=='FOP')
 		{
-			echo('Failed to generate PDF');
+			$fop = new fop();
+			$file = $fop->generatePdf($xml_doc->saveXML(), $xsl_content, $filename, "F");
 		}
-		$file = "/tmp/".$filename.".pdf";
+		else 
+		{
+			$filename = $user;
+			$fo2pdf = new XslFo2Pdf();
+			
+			// Load the XSL source
+			$xsl_doc = new DOMDocument;
+			//if(!$xsl_doc->load('../../../../xsl/collection.xsl'))
+			if(!$xsl_doc->loadXML($xsl_content))
+				die('unable to load xsl');
+			//echo 'XSL:'.$xsl_doc->saveXML().':';
+	
+			// Configure the transformer
+			$proc = new XSLTProcessor;
+			$proc->importStyleSheet($xsl_doc); // attach the xsl rules
+			
+			$buffer = $proc->transformToXml($xml_doc);
+			if (!$fo2pdf->generatePdf($buffer, $filename, 'F'))
+			{
+				echo('Failed to generate PDF');
+			}
+			$file = "/tmp/".$filename.".pdf";
+		}
 		$handle = fopen($file, "rb");
 		$string = fread($handle, filesize($file));
 		fclose($handle);
