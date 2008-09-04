@@ -513,7 +513,7 @@ echo '</SELECT></td></tr>';
 echo '</tr><td>Schule ID:</td><td><input type="text" size="3" name="schule_id" value="'.$schule.'" onkeyup="checkschulid(this.value)"></td></tr>';
 echo '<tr><td></td><td>';
 if(($vorname!='' && $geburtsdatum=='' && $nachname=='') 
-   //|| ($vorname=='' && $geburtsdatum=='' && $nachname!='') 
+   || ($vorname=='' && $geburtsdatum=='' && $nachname!='') 
    || ($nachname=='' && $geburtsdatum=='')
    || ($geburtsdatum=='' && $nachname=='' && $vorname=='') 
    || $geburtsdatum_error)
@@ -552,12 +552,14 @@ if($vorname!='' && $nachname!='')
 	$where.=" (LOWER(vorname)=LOWER('".$vorname."') AND LOWER(nachname)=LOWER('".$nachname."'))";
 }
 
+/*
 if($vorname=='' && $nachname!='')
 {
 	if($where!='')
 		$where.=' OR';
 	$where.=" (LOWER(nachname)=LOWER('".$nachname."'))";
 }
+*/
 
 if($where!='')
 {
