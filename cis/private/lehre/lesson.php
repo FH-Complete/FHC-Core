@@ -26,6 +26,7 @@
     require_once('../../../include/studiensemester.class.php');
     require_once('../../../include/lehrveranstaltung.class.php');
     require_once('../../../include/studiengang.class.php');
+    require_once('../../../include/moodle_course.class.php');
 
     //Connection Herstellen
     if(!$sql_conn = pg_pconnect(CONN_STRING))

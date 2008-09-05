@@ -649,4 +649,40 @@ class moodle_course
 			return false;
 		}
 	}
+	
+	// ****************************************************
+	// * Liefert alle Kurse dieser LV in denen der Student 
+	// * zugeteilt ist
+	// ****************************************************
+	function getCourse($lehrveranstaltung_id, $studiensemester_kurzbz, $student_uid)
+	{
+		//alle betreffenden Kurse holen
+		$qry = "SELECT lehreinheit_id, mdl_course_id FROM lehre.tbl_moodle JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id, studiensemester_kurzbz)
+				WHERE tbl_moodle.lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."' 
+				AND tbl_moodle.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'
+				UNION 
+				SELECT lehreinheit_id, mdl_course_id FROM lehre.tbl_moodle JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
+				WHERE tbl_lehreinheit.lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."' AND 
+				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+		
+		$courses = array();
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				//schauen in welchen der Student ist
+				$qry = "SELECT 1 FROM campus.vw_student_lehrveranstaltung 
+						WHERE uid='".addslashes($student_uid)."' AND lehreinheit_id='".addslashes($row->lehreinheit_id)."'";
+				if($result_vw = pg_query($this->conn, $qry))
+				{
+					if(pg_num_rows($result_vw)>0)
+					{
+						if(!array_key_exists($row->mdl_course_id, $courses))
+							$courses[]=$row->mdl_course_id;						
+					}
+				}
+			}
+		}
+		return $courses;
+	}
 }

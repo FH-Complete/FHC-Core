@@ -478,12 +478,47 @@
 	if($result = pg_query($sql_conn, $qry))
 		if(pg_num_rows($result)>0)
 			$showmoodle=false;
-		
+	
+	if(!$conn_moodle = pg_pconnect(CONN_STRING_MOODLE))
+		die('Fehler beim Verbinden zur MoodleDB');
+	$mdlcourse = new moodle_course($sql_conn, $conn_moodle);
+	$mdlcourse->getAll($lvid, $angezeigtes_stsem);
+	if(count($mdlcourse->result)>0)
+		$showmoodle=true;
+	
 	if($showmoodle)
 	{
-		echo '<a href="'.MOODLE_PATH.'" target="_blank" class="Item" >
+		$link = "moodle_choice.php?lvid=$lvid&stsem=$angezeigtes_stsem";
+		
+		
+		if(count($mdlcourse->result)>0)
+		{
+			if(!$is_lector)
+			{
+				$course = $mdlcourse->getCourse($lvid, $angezeigtes_stsem, $user);
+				if(count($course)==1)
+					$link = MOODLE_PATH.'course/view.php?id='.$course[0];
+				else 
+					$link = "moodle_choice.php?lvid=$lvid&stsem=$angezeigtes_stsem";
+			}
+			else 
+			{
+				//$mdlcourse->getAll($lvid, $angezeigtes_stsem);
+				if(count($mdlcourse->result)==1)
+					$link = MOODLE_PATH.'course/view.php?id='.$mdlcourse->result[0]->mdl_course_id;
+				else 
+					$link = "moodle_choice.php?lvid=$lvid&stsem=$angezeigtes_stsem";
+			}
+			
+			echo '<a href="'.$link.'" target="_blank" class="Item" >
 			    	<img src="../../../skin/images/button_moodle.jpg" width="68" height="45"><br>
 			    	<strong>Moodle</strong></a><br>';
+		}
+		else 
+		{
+			echo '<img src="../../../skin/images/button_moodle.jpg" width="68" height="45"><br>
+			    	<strong>Moodle</strong><br>';
+		}
 	    if($is_lector)
 	    	echo '<a href="moodle_wartung.php?lvid='.$lvid.'&stsem='.$angezeigtes_stsem.'" class="Item">Wartung</a>';			
 	}
