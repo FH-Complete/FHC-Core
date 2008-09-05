@@ -398,3 +398,11 @@ function KollisionStudentShow()
 {
 	window.open('<?php echo APP_ROOT;?>vilesci/lehre/stpl_benutzer_kollision_frameset.html', 'Kollision Student');
 }
+
+// ****
+// * Oeffnet das Handbuch
+// ****
+function OpenManualTempus()
+{
+	window.open('<?php echo APP_ROOT ?>content/Tempus.pdf','Manual');
+}

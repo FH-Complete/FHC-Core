@@ -313,7 +313,7 @@ function strtoupperFULL($str)
 // ****************************************************************
 function checkalias($alias)
 {
-	if($anz = preg_match("/^[a-z0-9]*[a-z0-9]{1,}\.[a-z0-9]{1,}$/",$alias))
+	if($anz = preg_match("/^[-a-z0-9]*[a-z0-9]{1,}\.[-a-z0-9]{1,}$/",$alias))
 		return true;
 	else
 		return false;

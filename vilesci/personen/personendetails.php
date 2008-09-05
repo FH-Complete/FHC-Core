@@ -28,6 +28,9 @@ require_once('../../include/preinteressent.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/datum.class.php');
+require_once('../../include/kontakt.class.php');
+require_once('../../include/adresse.class.php');
+require_once('../../include/nation.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
    die("Konnte Verbindung zur Datenbank nicht herstellen");
@@ -74,6 +77,62 @@ echo "ID: $person->person_id<br>";
 echo "Name: $person->titelpre $person->nachname $person->vorname $person->titelpost<br>";
 echo "Geburtsdatum: ".$datum_obj->formatDatum($person->gebdatum,'d.m.Y')."<br>";
 
+$kontakt = new kontakt($conn);
+$kontakt->load_pers($person->person_id);
+echo '<h3>Kontaktdaten</h3>';
+echo '<table class="liste table-autosort:0 table-stripeclass:alternate table-autostripe">
+		<thead>
+			<tr>
+				<th>Typ</th>
+				<th>Kontakt</th>
+				<th>Zustellung</th>
+				<th>Anmerkung</th>
+			</tr>
+		</thead>
+		<tbody>';
+foreach ($kontakt->result as $row)
+{
+	echo '<tr>';
+	echo "<td>$row->kontakttyp</td>";
+	echo "<td>$row->kontakt</td>";
+	echo "<td>".($row->zustellung?'Ja':'Nein')."</td>";
+	echo "<td>$row->anmerkung</td>";
+	echo '<tr>';
+}
+echo '</tbody></table>';
+
+//Nationen laden
+$nation_arr = array();
+$nation = new nation($conn);
+$nation->getAll();
+
+$nation_arr['']='';
+foreach($nation->nation as $row)
+	$nation_arr[$row->code]=$row->kurztext;
+	
+$adresstyp_arr = array('h'=>'Hauptwohnsitz','n'=>'Nebenwohnsitz','f'=>'Firma');
+
+// *** ADRESSEN ***
+echo "<h3>Adressen:</h3>";
+echo "<table class='liste'><tr><th>Strasse</th><th>Plz</th><th>Ort</th><th>Gemeinde</th><th>Nation</th><th>Typ</th><th>Heimat</th><th>Zustellung</th><th>Firma</th></tr>";
+$adresse_obj = new adresse($conn);
+$adresse_obj->load_pers($person->person_id);
+
+
+foreach ($adresse_obj->result as $row)
+{
+	echo '<tr class="liste1">';
+	echo "<td>$row->strasse</td>";
+	echo "<td>$row->plz</td>";
+	echo "<td>$row->ort</td>";
+	echo "<td>$row->gemeinde</td>";
+	echo "<td>".$nation_arr[$row->nation]."</td>";
+	echo "<td>".$adresstyp_arr[$row->typ]."</td>";
+	echo "<td>".($row->heimatadresse?'Ja':'Nein')."</td>";
+	echo "<td>".($row->zustelladresse?'Ja':'Nein')."</td>";
+	echo "<td>".($row->firma_id!=''?$firma_arr[$row->firma_id]:'')."</td>";
+}
+echo '</table>';
 //PREINTERESSENT
 
 $preinteressent = new preinteressent($conn);

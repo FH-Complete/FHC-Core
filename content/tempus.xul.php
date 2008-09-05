@@ -58,6 +58,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-prefs-ignore_reservierung:command" oncommand="variableChange('ignore_reservierung','menu-prefs-ignore_reservierung');"/>
   <command id="menu-extras-kollisionstudent:command" oncommand="KollisionStudentShow();"/>
   <command id="menu-help-todo:command" oncommand="HelpOpenToDo();"/>
+  <command id="menu-help-manual:command" oncommand="OpenManualTempus();"/>
 </commandset>
 
 <keyset id="mainkeys">
@@ -195,6 +196,12 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                label     = "&menu-help-close.label;"
                command   =  "menu-help-close:command"
                accesskey = "&menu-help-close.accesskey;"/>
+            <menuitem
+               id        =  "menu-help-manual"
+               key       =  "menu-help-manual:key"
+               label     = "&menu-help-manual.label;"
+               command   =  "menu-help-manual:command"
+               accesskey = "&menu-help-manual.accesskey;"/>
             <menuitem
                id        =  "menu-help-todo"
                key       = "&menu-help-todo.key;"

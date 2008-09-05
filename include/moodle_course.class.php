@@ -339,9 +339,9 @@ class moodle_course
 		$this->getContext(40, $id_sem);
 		
 		//Eintrag in tbl_mdl_course
-		$qry = "INSERT INTO public.mdl_course(category, sortorder, fullname, shortname, format, showgrades, newsitems)
+		$qry = "INSERT INTO public.mdl_course(category, sortorder, fullname, shortname, format, showgrades, newsitems, enrollable)
 				VALUES (".$this->addslashes($id_sem).", (SELECT max(sortorder)+1 FROM public.mdl_course), ".$this->addslashes($this->mdl_fullname).", ".
-				$this->addslashes($this->mdl_shortname).",'weeks', 1, 5);";
+				$this->addslashes($this->mdl_shortname).",'weeks', 1, 5, 0);";
 		
 		if($result = pg_query($this->conn_moodle, $qry))
 		{

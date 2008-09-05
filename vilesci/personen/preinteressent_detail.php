@@ -373,50 +373,57 @@ if(isset($_GET['savezuordnung']))
 
 if(isset($_POST['freigabe']))
 {
-	//freigabe einer zuordnung
-	$zuordnung = new preinteressent($conn);
-	if($zuordnung->loadZuordnung($preinteressent->preinteressent_id, $_GET['studiengang_kz']))
+	if($preinteressent->studiensemester_kurzbz!='')
 	{
-		if($zuordnung->freigabedatum=='')
+		//freigabe einer zuordnung
+		$zuordnung = new preinteressent($conn);
+		if($zuordnung->loadZuordnung($preinteressent->preinteressent_id, $_GET['studiengang_kz']))
 		{
-			$zuordnung->freigabedatum = date('Y-m-d H:i:s');
-			$zuordnung->updateamum = date('Y-m-d H:i:s');
-			$zuordnung->updatevon = $user;
-		
-			if(!$zuordnung->saveZuordnung(false))
-				echo "<b>Fehler beim Speichern der Daten: $zuordnung->errormsg</b>";
+			if($zuordnung->freigabedatum=='')
+			{
+				$zuordnung->freigabedatum = date('Y-m-d H:i:s');
+				$zuordnung->updateamum = date('Y-m-d H:i:s');
+				$zuordnung->updatevon = $user;
+			
+				if(!$zuordnung->saveZuordnung(false))
+					echo "<b>Fehler beim Speichern der Daten: $zuordnung->errormsg</b>";
+				else 
+				{
+					//MAIL an Assistenz verschicken
+					$qry_person = "SELECT vorname, nachname 
+									FROM public.tbl_person JOIN public.tbl_preinteressent USING(person_id) 
+									WHERE preinteressent_id='$preinteressent->preinteressent_id'";
+					$name='';
+					if($result_person = pg_query($conn, $qry_person))
+						if($row_person = pg_fetch_object($result_person))
+							$name = $row_person->nachname.' '.$row_person->vorname;
+					$stg_obj = new studiengang($conn);
+					$stg_obj->load($zuordnung->studiengang_kz);
+					$to = $stg_obj->email;
+					//$to = 'oesi@technikum-wien.at';
+					$message = "Dies ist eine automatische Mail! $stg_obj->email\n\n".
+								"Der Preinteressent $name wurde zur Übernahme freigegeben. \nSie können diesen ".
+								"im FAS unter 'Extras->Preinteressenten übernehmen' oder unter folgendem Link\n\n".
+								APP_ROOT."vilesci/personen/preinteressent_uebernahme.php?studiengang_kz=$zuordnung->studiengang_kz \n".
+								"ins FAS übertragen";
+					if(mail($to, 'Preinteressent Freigabe', $message, 'FROM: vilesci@'.DOMAIN))
+						echo "<br><b>Freigabemail wurde an $to versendet</b>";
+					else 
+						echo "<br><b>Fehler beim Versenden des Freigabemails an $to</b>";
+				}
+			}
 			else 
 			{
-				//MAIL an Assistenz verschicken
-				$qry_person = "SELECT vorname, nachname 
-								FROM public.tbl_person JOIN public.tbl_preinteressent USING(person_id) 
-								WHERE preinteressent_id='$preinteressent->preinteressent_id'";
-				$name='';
-				if($result_person = pg_query($conn, $qry_person))
-					if($row_person = pg_fetch_object($result_person))
-						$name = $row_person->nachname.' '.$row_person->vorname;
-				$stg_obj = new studiengang($conn);
-				$stg_obj->load($zuordnung->studiengang_kz);
-				$to = $stg_obj->email;
-				//$to = 'oesi@technikum-wien.at';
-				$message = "Dies ist eine automatische Mail! $stg_obj->email\n\n".
-							"Der Preinteressent $name wurde zur Übernahme freigegeben. \nSie können diesen ".
-							"im FAS unter 'Extras->Preinteressenten übernehmen' oder unter folgendem Link\n\n".
-							APP_ROOT."vilesci/personen/preinteressent_uebernahme.php?studiengang_kz=$zuordnung->studiengang_kz \n".
-							"ins FAS übertragen";
-				if(mail($to, 'Preinteressent Freigabe', $message, 'FROM: vilesci@'.DOMAIN))
-					echo "<br><b>Freigabemail wurde an $to versendet</b>";
-				else 
-					echo "<br><b>Fehler beim Versenden des Freigabemails an $to</b>";
+				echo '<b>Diese Zuteilung ist bereits freigegeben</b>';
 			}
 		}
 		else 
-		{
-			echo '<b>Diese Zuteilung ist bereits freigegeben</b>';
-		}
+			echo '<b>Fehler beim Speichern der Daten: Datensatz wurde nicht gefunden</b>';	
 	}
 	else 
-		echo '<b>Fehler beim Speichern der Daten: Datensatz wurde nicht gefunden</b>';	
+	{
+		echo '<b>Es muss ein Studiensemester eingetragen sein damit diese Person freigegeben werden kann</b>';
+	}
 }
 if(isset($_POST['freigabe_rueckgaengig']))
 {
@@ -614,6 +621,7 @@ echo '<table width="100%" ><tr>';
 echo "<td>Studiensemester:</td><td><SELECT name='studiensemester_kurzbz'>";
 $stsem = new studiensemester($conn);
 $stsem->getAll();
+echo "<option value='' >-- offen --</option>";
 foreach ($stsem->studiensemester as $row)
 {
 	if($row->studiensemester_kurzbz==$preinteressent->studiensemester_kurzbz)
