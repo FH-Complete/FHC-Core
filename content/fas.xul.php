@@ -122,6 +122,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-bis-studenten-plausibilitaetspruefung:command" oncommand="BISStudentenPlausicheck();"/>
   <command id="menu-bis-studenten-export:command" oncommand="BISStudentenExport();"/>
   <command id="menu-help-close:command" oncommand="OpenAboutDialog()"/>
+  <command id="menu-help-manual:command" oncommand="OpenManual()"/>
   <command id="menu-help-todo:command" oncommand="OpenToDoDialog()"/>
 </commandset>
 
@@ -587,6 +588,12 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                label     = "&menu-help-close.label;"
                command   =  "menu-help-close:command"
                accesskey = "&menu-help-close.accesskey;"/>
+            <menuitem
+               id        =  "menu-help-manual"
+               key       =  "menu-help-manual:key"
+               label     = "&menu-help-manual.label;"
+               command   =  "menu-help-manual:command"
+               accesskey = "&menu-help-manual.accesskey;"/>
             <menuitem
                id        =  "menu-help-todo"
                key       =  "menu-help-todo:key"

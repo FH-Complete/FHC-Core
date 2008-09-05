@@ -125,7 +125,15 @@ if(isset($_POST['neu']))
 		$studiengang = new studiengang($conn);
 		$studiengang->load($lehrveranstaltung->studiengang_kz);
 		
+		//Kurzbezeichnung generieren Format: STSEM-STG-SEM-LV/LEID/LEID/LEID...
 		$shortname = $stsem.'-'.$studiengang->kuerzel.'-'.$lehrveranstaltung->semester.'-'.$lehrveranstaltung->kurzbz;
+		foreach ($_POST as $key=>$value)
+		{
+			if(strstr($key, 'lehreinheit_'))
+			{
+				$shortname.='/'.$value;
+			}
+		}
 		//Gesamte LV zu einem Moodle Kurs zusammenlegen
 		if($art=='lv')
 		{

@@ -1135,6 +1135,14 @@ function OpenAboutDialog()
 }
 
 // ****
+// * Oeffnet das Handbuch
+// ****
+function OpenManual()
+{
+	window.open('<?php echo APP_ROOT ?>content/FASo.pdf','Manual');
+}
+
+// ****
 // * Oeffnet die ToDo Liste
 // ****
 function OpenToDoDialog()

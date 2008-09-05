@@ -100,6 +100,7 @@ echo "<table width='100%'><tr><td><form action='".$_SERVER['PHP_SELF']."' method
 echo '<table><tr><td>Studiensemester: <SELECT name="studiensemester_kurzbz">';
 $stsem = new studiensemester($conn);
 $stsem->getAll();
+echo "<option value=''>-- offen --</option>";
 foreach ($stsem->studiensemester as $row)	
 {
 	if($row->studiensemester_kurzbz==$studiensemester_kurzbz)
@@ -140,78 +141,88 @@ if(isset($_GET['action']))
 {
 	if($_GET['action']=='freigabe')
 	{
-		$errormsg = '';
-		$anzahl_freigegeben=0;
-		$anzahl_fehler=0;
-		$qry = "SELECT * FROM public.tbl_preinteressentstudiengang 
-				WHERE preinteressent_id='".addslashes($_GET['id'])."' 
-					  AND prioritaet = (SELECT max(prioritaet) 
-					  					FROM public.tbl_preinteressentstudiengang 
-					  					WHERE preinteressent_id='".addslashes($_GET['id'])."')
-					  AND freigabedatum is null";
-		//Zuordnungen holen die noch nicht freigegeben wurden und die hoechste Prioritaet haben
-		if($result = pg_query($conn, $qry))
+		$preinteressent = new preinteressent($conn);
+		$preinteressent->load($_GET['id']);
+		
+		if($preinteressent->studiensemester_kurzbz!='')
 		{
-			while($row = pg_fetch_object($result))
+			$errormsg = '';
+			$anzahl_freigegeben=0;
+			$anzahl_fehler=0;
+			$qry = "SELECT * FROM public.tbl_preinteressentstudiengang 
+					WHERE preinteressent_id='".addslashes($_GET['id'])."' 
+						  AND prioritaet = (SELECT max(prioritaet) 
+						  					FROM public.tbl_preinteressentstudiengang 
+						  					WHERE preinteressent_id='".addslashes($_GET['id'])."')
+						  AND freigabedatum is null";
+			//Zuordnungen holen die noch nicht freigegeben wurden und die hoechste Prioritaet haben
+			if($result = pg_query($conn, $qry))
 			{
-				//Nur diejenigen nehmen die noch nicht als Prestudent vorhanden sind
-				$qry = "SELECT count(*) as anzahl FROM public.tbl_preinteressent JOIN public.tbl_prestudent USING(person_id) WHERE preinteressent_id='$row->preinteressent_id' AND studiengang_kz='$row->studiengang_kz'";
-				if($result_std = pg_query($conn, $qry))
+				while($row = pg_fetch_object($result))
 				{
-					if($row_std = pg_fetch_object($result_std))
+					//Nur diejenigen nehmen die noch nicht als Prestudent vorhanden sind
+					$qry = "SELECT count(*) as anzahl FROM public.tbl_preinteressent JOIN public.tbl_prestudent USING(person_id) WHERE preinteressent_id='$row->preinteressent_id' AND studiengang_kz='$row->studiengang_kz'";
+					if($result_std = pg_query($conn, $qry))
 					{
-						if($row_std->anzahl==0)
+						if($row_std = pg_fetch_object($result_std))
 						{
-							$preinteressent = new preinteressent($conn);
-							$preinteressent->loadZuordnung($row->preinteressent_id, $row->studiengang_kz);
-							
-							$preinteressent->freigabedatum = date('Y-m-d H:i:s');
-							$preinteressent->updateamum = date('Y-m-d H:i:s');
-							$preinteressent->updatevon = $user;
-							
-							if($preinteressent->saveZuordnung(false))
+							if($row_std->anzahl==0)
 							{
-								//MAIL an Assistenz verschicken
-								$qry_person = "SELECT vorname, nachname 
-												FROM public.tbl_person JOIN public.tbl_preinteressent USING(person_id) 
-												WHERE preinteressent_id='$row->preinteressent_id'";
-								$name='';
-								if($result_person = pg_query($conn, $qry_person))
-									if($row_person = pg_fetch_object($result_person))
-										$name = $row_person->nachname.' '.$row_person->vorname;
-								$stg_obj = new studiengang($conn);
-								$stg_obj->load($row->studiengang_kz);
-								$to = $stg_obj->email;
-								//$to = 'oesi@technikum-wien.at';
-								$message = "Dies ist eine automatische Mail! $stg_obj->email\n\n".
-											"Der Preinteressent $name wurde zur Übernahme freigegeben. \nSie können diesen ".
-											"im FAS unter 'Extras->Preinteressenten übernehmen' oder unter folgendem Link\n\n".
-											APP_ROOT."vilesci/personen/preinteressent_uebernahme.php?studiengang_kz=$row->studiengang_kz \n".
-											"ins FAS übertragen";
-								if(mail($to, 'Preinteressent Freigabe', $message, 'FROM: vilesci@'.DOMAIN))
-									echo "<br><b>Freigabemail wurde an $to versendet</b>";
-								else 
-									echo "<br><b>Fehler beim Versenden des Freigabemails an $to</b>";
+								$preinteressent = new preinteressent($conn);
+								$preinteressent->loadZuordnung($row->preinteressent_id, $row->studiengang_kz);
 								
-								$anzahl_freigegeben++;
-							}
-							else 
-							{
-								$anzahl_fehler++;
-								$errormsg.="<br>Fehler bei der Freigabe von ".$studiengang->kuerzel_arr[$row->studiengang_kz].": $preinteressent->errormsg";
+								$preinteressent->freigabedatum = date('Y-m-d H:i:s');
+								$preinteressent->updateamum = date('Y-m-d H:i:s');
+								$preinteressent->updatevon = $user;
+								
+								if($preinteressent->saveZuordnung(false))
+								{
+									//MAIL an Assistenz verschicken
+									$qry_person = "SELECT vorname, nachname 
+													FROM public.tbl_person JOIN public.tbl_preinteressent USING(person_id) 
+													WHERE preinteressent_id='$row->preinteressent_id'";
+									$name='';
+									if($result_person = pg_query($conn, $qry_person))
+										if($row_person = pg_fetch_object($result_person))
+											$name = $row_person->nachname.' '.$row_person->vorname;
+									$stg_obj = new studiengang($conn);
+									$stg_obj->load($row->studiengang_kz);
+									$to = $stg_obj->email;
+									//$to = 'oesi@technikum-wien.at';
+									$message = "Dies ist eine automatische Mail! $stg_obj->email\n\n".
+												"Der Preinteressent $name wurde zur Übernahme freigegeben. \nSie können diesen ".
+												"im FAS unter 'Extras->Preinteressenten übernehmen' oder unter folgendem Link\n\n".
+												APP_ROOT."vilesci/personen/preinteressent_uebernahme.php?studiengang_kz=$row->studiengang_kz \n".
+												"ins FAS übertragen";
+									if(mail($to, 'Preinteressent Freigabe', $message, 'FROM: vilesci@'.DOMAIN))
+										echo "<br><b>Freigabemail wurde an $to versendet</b>";
+									else 
+										echo "<br><b>Fehler beim Versenden des Freigabemails an $to</b>";
+									
+									$anzahl_freigegeben++;
+								}
+								else 
+								{
+									$anzahl_fehler++;
+									$errormsg.="<br>Fehler bei der Freigabe von ".$studiengang->kuerzel_arr[$row->studiengang_kz].": $preinteressent->errormsg";
+								}
 							}
 						}
 					}
 				}
 			}
+			echo "<br><b>Es wurden $anzahl_freigegeben Studiengänge freigegeben<br>";
+			echo "<script language='Javascript'>
+					parent.preinteressent_detail.location.href = \"preinteressent_detail.php?id=".$_GET['id']."&selection=\"+parent.preinteressent_detail.selection; 
+				 </script>";
+			if($anzahl_fehler>0)
+				echo "Es sind $anzahl_fehler Fehler aufgetreten: $errormsg";
+			echo '</b>';
 		}
-		echo "<br><b>Es wurden $anzahl_freigegeben Studiengänge freigegeben<br>";
-		echo "<script language='Javascript'>
-				parent.preinteressent_detail.location.href = \"preinteressent_detail.php?id=".$_GET['id']."&selection=\"+parent.preinteressent_detail.selection; 
-			 </script>";
-		if($anzahl_fehler>0)
-			echo "Es sind $anzahl_fehler Fehler aufgetreten: $errormsg";
-		echo '</b>';
+		else 
+		{
+			echo '<b>Es können nur Preinteressenten freigegeben werden, bei denen ein Studiensemester angegeben wurde</b>';
+		}
 	}
 	elseif($_GET['action']=='loeschen')
 	{
@@ -241,17 +252,17 @@ echo '<br>';
 echo "<table class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>
 	<thead>
 		<tr>
-		<th class='table-sortable:default'>PersonID</th>
+		<th class='table-sortable:default'>ID</th>
 		<th class='table-sortable:default'>Nachname</th>
 		<th class='table-sortable:default'>Vorname</th>
-		<th class='table-sortable:default'>Studiensemester</th>
+		<th class='table-sortable:default'>StSem</th>
 		<th class='table-sortable:default'>Erfassungsdatum</th>
 		<th class='table-sortable:default'>E-Mail</th>
 		<th class='table-sortable:default'>Status</th>
 		<th class='table-sortable:default'>Freigabe</th>
 		<th class='table-sortable:default'>&Uuml;bernahme</th>
 		<th class='table-sortable:default'>Anmerkung</th>
-		<th colspan=3>Aktion</th>
+		<th colspan=4>Aktion</th>
 		</tr>
 	</thead>
 	<tbody>";
@@ -356,6 +367,7 @@ foreach ($preinteressent->result as $row)
 	echo "<td>$freigabe</td>";
 	echo "<td>$uebernahme</td>";
 	echo "<td title='".htmlentities($row->anmerkung,ENT_QUOTES)."'>".htmlentities(CutString($row->anmerkung, 30),ENT_QUOTES)."</td>";
+	echo "<td><input type='button' onclick=\"window.open('personendetails.php?id=$row->person_id','_blank')\" value='Gesamtübersicht' title='Zeigt die Details dieser Person an'></td>";
 	echo "<td><input type='button' onclick='parent.preinteressent_detail.location.href = \"preinteressent_detail.php?id=$row->preinteressent_id&selection=\"+parent.preinteressent_detail.selection; return false;' value='Bearbeiten' title='Zeigt die Details dieser Person an'></td>";
 	echo "<td><input type='button' onclick=\"window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=freigabe&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'\" value='Freigeben' title='Gibt alle Studiengänge mit der höchsten Priorität frei'></td>";
 	echo "<td><input type='button' onclick=\"if(confdel()) {window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=loeschen&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'}\" value='Löschen' title='Löscht diesen Preinteressenten'></td>";

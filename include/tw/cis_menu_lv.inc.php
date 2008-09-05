@@ -416,38 +416,77 @@
 
   <td class="tdvertical" align="center">
 <?php 
-	//Kreuzerltool
-	if($is_lector)
+	$qry = "SELECT 1 FROM lehre.tbl_moodle WHERE 
+			(lehrveranstaltung_id='".addslashes($lvid)."' AND studiensemester_kurzbz='".addslashes($angezeigtes_stsem)."')
+			OR
+			(lehreinheit_id IN (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit 
+								WHERE lehrveranstaltung_id='".addslashes($lvid)."' AND 
+								studiensemester_kurzbz='".addslashes($angezeigtes_stsem)."'))";
+	if($result = pg_query($sql_conn, $qry))
 	{
-		if(isset($angezeigtes_stsem))
-			$studiensem = '&stsem='.$angezeigtes_stsem;
-		else
-			$studiensem = '';
+		if(pg_num_rows($result)==0)
+		{
 	
-			echo '<a href="benotungstool/verwaltung.php?lvid='.$lvid.$studiensem.'" class="Item">
-    			<img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
-    			<strong>Benotungstool<br>("Kreuzerl"-Tool)</strong></a><br>
-    			<a href="lesson.php?handbuch=1&lvid='.$lvid.$studiensem.'" class="Item">Handbuch [PDF]</a>';
-	} 
-	else 
-	{
-		echo '<a href="benotungstool/studentenansicht.php?lvid='.$lvid.'" >
-    			<img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
-    			<strong>"Kreuzerl"-Tool</strong></a>';
-
+			//Kreuzerltool
+			if($is_lector)
+			{
+				if(isset($angezeigtes_stsem))
+					$studiensem = '&stsem='.$angezeigtes_stsem;
+				else
+					$studiensem = '';
+			
+					echo '<a href="benotungstool/verwaltung.php?lvid='.$lvid.$studiensem.'" class="Item">
+		    			<img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
+		    			<strong>Benotungstool<br>("Kreuzerl"-Tool)</strong></a><br>
+		    			<a href="lesson.php?handbuch=1&lvid='.$lvid.$studiensem.'" class="Item">Handbuch [PDF]</a>';
+			} 
+			else 
+			{
+				echo '<a href="benotungstool/studentenansicht.php?lvid='.$lvid.'" >
+		    			<img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
+		    			<strong>"Kreuzerl"-Tool</strong></a>';
+		
+			}
+		}
 	}
-	?>
+?>
     <p>&nbsp;</p>
 	</td>
 	<td class="tdvertical" align="center">
 <?php 
 	//Moodle
-	echo '<a href="'.MOODLE_PATH.'" target="_blank" class="Item" >
-    	<img src="../../../skin/images/button_moodle.jpg" width="68" height="45"><br>
-    	<strong>Moodle</strong></a><br>';
-    if($is_lector)
-    	echo '<a href="moodle_wartung.php?lvid='.$lvid.'&stsem='.$angezeigtes_stsem.'" class="Item">Wartung</a>';
+	$showmoodle=false;
+	//Schauen ob Moodle fuer diesen Studiengang freigeschaltet ist
+	$qry = "SELECT moodle FROM public.tbl_studiengang JOIN lehre.tbl_lehrveranstaltung USING(studiengang_kz) WHERE lehrveranstaltung_id='".addslashes($lvid)."'";
+	if($result = pg_query($sql_conn, $qry))
+	{
+		if($row = pg_fetch_object($result))
+		{
+			if($row->moodle=='t')
+			{
+				$showmoodle=true;
+			}
+		}
+	}
 	
+	//wenn bereits eine Kreuzerlliste existiert, dann den Moodle link nicht anzeigen
+	$qry = "SELECT * FROM campus.tbl_uebung WHERE 
+			lehreinheit_id IN(SELECT lehreinheit_id FROM lehre.tbl_lehreinheit 
+								WHERE lehrveranstaltung_id='".addslashes($lvid)."' 
+								AND studiensemester_kurzbz='".addslashes($angezeigtes_stsem)."')";
+	
+	if($result = pg_query($sql_conn, $qry))
+		if(pg_num_rows($result)>0)
+			$showmoodle=false;
+		
+	if($showmoodle)
+	{
+		echo '<a href="'.MOODLE_PATH.'" target="_blank" class="Item" >
+			    	<img src="../../../skin/images/button_moodle.jpg" width="68" height="45"><br>
+			    	<strong>Moodle</strong></a><br>';
+	    if($is_lector)
+	    	echo '<a href="moodle_wartung.php?lvid='.$lvid.'&stsem='.$angezeigtes_stsem.'" class="Item">Wartung</a>';			
+	}
 	?>
     <p>&nbsp;</p>
 	</td>

@@ -246,11 +246,13 @@ class preinteressent
 			$this->errormsg = 'Person_id muss angegeben werden';
 			return false;
 		}
+		/*
 		if($this->studiensemester_kurzbz=='')
 		{
 			$this->errormsg = 'Studiensemester_kurzbz muss angegeben werden';
 			return false;
 		}
+		*/
 		if($this->aufmerksamdurch_kurzbz=='')
 		{
 			$this->errormsg = 'Aufmerksamdurch muss angegeben werden';
@@ -425,14 +427,14 @@ class preinteressent
 	// *        $studiensemester_kurzbz
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
-	function loadPreinteressenten($studiengang_kz='', $studiensemester_kurzbz='', $filter='', $nichtfreigegeben=null, $uebernommen=null)
+	function loadPreinteressenten($studiengang_kz='', $studiensemester_kurzbz=null, $filter='', $nichtfreigegeben=null, $uebernommen=null)
 	{
 		$qry = "SELECT distinct tbl_preinteressent.* FROM public.tbl_preinteressent JOIN public.tbl_person USING(person_id) LEFT JOIN public.tbl_preinteressentstudiengang USING(preinteressent_id) LEFT JOIN public.tbl_kontakt USING(person_id) WHERE true";
 				
 		if($studiengang_kz!='')
 			$qry.=" AND tbl_preinteressentstudiengang.studiengang_kz='$studiengang_kz'";
 		
-		if($studiensemester_kurzbz!='')
+		if(!is_null($studiensemester_kurzbz))
 			$qry.=" AND tbl_preinteressent.studiensemester_kurzbz='$studiensemester_kurzbz'";
 		if($filter!='')
 		{

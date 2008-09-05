@@ -152,7 +152,11 @@ $person_id = (isset($_POST['person_id'])?$_POST['person_id']:'');
 $svnr = (isset($_POST['svnr'])?$_POST['svnr']:'');
 $ersatzkennzeichen = (isset($_POST['ersatzkennzeichen'])?$_POST['ersatzkennzeichen']:'');
 $ueberschreiben = (isset($_REQUEST['ueberschreiben'])?$_REQUEST['ueberschreiben']:'');
-$studiensemester_kurzbz = (isset($_POST['studiensemester_kurzbz'])?$_POST['studiensemester_kurzbz']:'');
+
+$stsem = new studiensemester($conn);
+$stsem->getNextStudiensemester('WS');
+$studiensemester_kurzbz = (isset($_POST['studiensemester_kurzbz'])?$_POST['studiensemester_kurzbz']:$stsem->studiensemester_kurzbz);
+
 if(isset($_POST['schule_id']) && $_POST['schule_id']!='')
 {
 	$schule = $_POST['schule_id'];
@@ -341,7 +345,7 @@ if(isset($_POST['save']))
 		$preinteressent->studiensemester_kurzbz = $studiensemester_kurzbz;
 		$preinteressent->aufmerksamdurch_kurzbz = 'k.A.';
 		$preinteressent->erfassungsdatum = date('Y-m-d');
-		$preinteressent->firma_id = ($schule!=''?$schule:0); //default TW
+		$preinteressent->firma_id = $schule;
 		$preinteressent->insertamum = date('Y-m-d H:i:s');
 		$preinteressent->insertvon = $user;
 		
@@ -466,14 +470,16 @@ echo '<tr><td>Mobil</td><td><input type="text" id="mobil" maxlength="128" name="
 //Preinteressentdaten
 echo '<tr><td>Studiensemester: </td><td><SELECT name="studiensemester_kurzbz">';
 $stsem = new studiensemester($conn);
-$stsem->getNextStudiensemester('WS');
-$akt = $stsem->studiensemester_kurzbz;
 
 $stsem->getAll();
-
+if($studiensemester_kurzbz=='')
+	$selected='selected';
+else 
+	$selected='';
+echo "<option value='' $selected>-- offen --</option>";
 foreach ($stsem->studiensemester as $row) 
 {
-	if($row->studiensemester_kurzbz==$akt)
+	if($row->studiensemester_kurzbz==$studiensemester_kurzbz)
 		$selected='selected';
 	else 
 		$selected='';

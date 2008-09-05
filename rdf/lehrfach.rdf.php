@@ -95,7 +95,7 @@ if($sem!='')
 	$qry.=" AND tbl_lehrfach.semester='$sem'";
 	
 $qry.=$where;
-
+$qry.=" ORDER BY bezeichnung";
 if($result = pg_query($conn, $qry))
 {
 	while($lehrfach = pg_fetch_object($result))
