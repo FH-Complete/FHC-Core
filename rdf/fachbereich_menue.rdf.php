@@ -57,7 +57,7 @@ if(count($fb)>0 && !in_array('0',$fb))
 {
 	foreach($fb as $fbbz)
 		$in = ", '".addslashes($fbbz)."'";
-	$qry.=" WHERE fachbereich_kurzbz in (1$in)";
+	$qry.=" WHERE fachbereich_kurzbz in ('1'$in)";
 }
 
 $qry.=" ORDER BY bezeichnung";
