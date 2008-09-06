@@ -28,12 +28,78 @@
 require ('../vilesci/config.inc.php');
 
 // Datenbank Verbindung
-if (!$conn = pg_pconnect("host=calva.technikum-wien.at dbname=vilesci user=pam password=jfie02"))
-//if (!$conn = pg_pconnect(CONN_STRING))
+//if (!$conn = pg_pconnect("host=.technikum-wien.at dbname= user= password="))
+if (!$conn = pg_pconnect(CONN_STRING))
    	die('Es konnte keine Verbindung zum Server aufgebaut werden!'.pg_last_error($conn));
 
 echo '<H1>Systemcheck!</H1>';
 echo '<H2>DB-Updates!</H2>';
+
+// ************* Wettbewerbstyp **********************************************************
+if (!@pg_query($conn,'SELECT * FROM kommune.tbl_wettbewerbtyp LIMIT 1;'))
+{
+	$sql='	Create table kommune.tbl_wettbewerbtyp
+			(
+				wbtyp_kurzbz Varchar(16) NOT NULL,
+				bezeichnung Varchar(256),
+				constraint pk_tbl_wettbewerbtyp primary key (wbtyp_kurzbz)
+			);
+			Grant select on kommune.tbl_wettbewerbtyp to group "admin";
+			Grant update on kommune.tbl_wettbewerbtyp to group "admin";
+			Grant delete on kommune.tbl_wettbewerbtyp to group "admin";
+			Grant insert on kommune.tbl_wettbewerbtyp to group "admin";
+			Grant select on kommune.tbl_wettbewerbtyp to group "web";
+			Grant update on kommune.tbl_wettbewerbtyp to group "web";
+			Grant insert on kommune.tbl_wettbewerbtyp to group "web";
+		';
+		if (!pg_query($conn,$sql))
+			echo '<strong>kommune.tbl_wettbewerbtyp: '.pg_last_error($conn).' </strong><BR>';
+		else
+			echo 'Tabelle kommune.tbl_wettbewerbtyp hinzugefuegt!<BR>';
+
+}
+
+// ************** kommune.tbl_wettbewerb.wbtyp_kurzbz, uid ************************
+if (!@pg_query($conn,'SELECT wbtyp_kurzbz, uid FROM kommune.tbl_wettbewerb LIMIT 1;'))
+{
+	$sql="	ALTER TABLE kommune.tbl_wettbewerb ADD COLUMN wbtyp_kurzbz Varchar(16);
+			ALTER TABLE kommune.tbl_wettbewerb ADD COLUMN uid Varchar(16);
+			ALTER TABLE kommune.tbl_wettbewerb ADD COLUMN icon Text;
+			COMMENT ON COLUMN kommune.tbl_wettbewerb.uid IS 'Moderator';
+			ALTER TABLE kommune.tbl_wettbewerb add Constraint wettbewerbtyp_wettbewerb foreign key (wbtyp_kurzbz) references kommune.tbl_wettbewerbtyp (wbtyp_kurzbz) on update cascade on delete restrict;
+		";
+	if (!@pg_query($conn,$sql))
+		echo '<strong>kommune.tbl_wettbewerb: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo '	wbtyp_kurzbz wurde bei kommune.tbl_wettbewerb hinzugefuegt!<BR>
+				icon wurde bei kommune.tbl_wettbewerb hinzugefuegt!<BR>
+				uid wurde bei kommune.tbl_wettbewerb hinzugefuegt!<BR>';
+}
+
+// ************** Constraint:tbl_person_geschlecht ************************
+$result=pg_query($conn,"SELECT consrc FROM pg_catalog.pg_constraint WHERE conname='tbl_person_geschlecht';");
+if ($row=pg_fetch_object($result))
+{
+	if ($row->consrc=="((geschlecht = 'm'::bpchar) OR (geschlecht = 'w'::bpchar))")
+	{
+		$sql="	ALTER TABLE public.tbl_person DROP CONSTRAINT tbl_person_geschlecht;
+				ALTER TABLE public.tbl_person ADD CONSTRAINT tbl_person_geschlecht CHECK ((geschlecht = 'm'::bpchar) OR (geschlecht = 'w'::bpchar) OR (geschlecht = 'u'::bpchar));
+			";
+		if (!@pg_query($conn,$sql))
+			echo '<strong>CONSTRAINT tbl_person_geschlecht: '.pg_last_error($conn).' </strong><BR>';
+		else
+			echo '	CONSTRAINT tbl_person_geschlecht wurde geaendert!<BR>';
+	}
+}
+else
+{
+	$sql="	ALTER TABLE public.tbl_person ADD CONSTRAINT tbl_person_geschlecht CHECK ((geschlecht = 'm'::bpchar) OR (geschlecht = 'w'::bpchar) OR (geschlecht = 'u'::bpchar));
+		";
+	if (!@pg_query($conn,$sql))
+		echo '<strong>CONSTRAINT tbl_person_geschlecht: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo '	CONSTRAINT tbl_person_geschlecht wurde hinzugefuegt!<BR>';
+}
 
 // ************* Moodle **********************************************************
 if (!@pg_query($conn,'SELECT * FROM lehre.tbl_moodle LIMIT 1;'))
@@ -502,8 +568,9 @@ $tabellen=array(
 	"bis.tbl_beschaeftigungsausmass"  => array("beschausmasscode","beschausmassbez","min","max"),
 	"bis.tbl_besqual"  => array("besqualcode","besqualbez"),
 	"bis.tbl_bisfunktion"  => array("bisverwendung_id","studiengang_kz","sws","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"bis.tbl_bisio"  => array("bisio_id","mobilitaetsprogramm_code","nation_code","von","bis","zweck_code","student_uid","updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"bis.tbl_bisio"  => array("bisio_id","mobilitaetsprogramm_code","nation_code","von","bis","zweck_code","student_uid","updateamum","updatevon","insertamum","insertvon","ext_id","ort","universitaet","lehreinheit_id"),
 	"bis.tbl_bisverwendung"  => array("bisverwendung_id","ba1code","ba2code","vertragsstunden","beschausmasscode","verwendung_code","mitarbeiter_uid","hauptberufcode","hauptberuflich","habilitation","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"bis.tbl_bundesland"  => array("bundesland_code","kurzbz","bezeichnung"),
 	"bis.tbl_entwicklungsteam"  => array("mitarbeiter_uid","studiengang_kz","besqualcode","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"bis.tbl_gemeinde"  => array("gemeinde_id","plz","name","ortschaftskennziffer","ortschaftsname","bulacode","bulabez","kennziffer"),
 	"bis.tbl_hauptberuf"  => array("hauptberufcode","bezeichnung"),
@@ -523,17 +590,17 @@ $tabellen=array(
 	"campus.tbl_legesamtnote"  => array("student_uid","lehreinheit_id","note","benotungsdatum","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_lvgesamtnote"  => array("lehrveranstaltung_id","studiensemester_kurzbz","student_uid","note","mitarbeiter_uid","benotungsdatum","freigabedatum","freigabevon_uid","bemerkung","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_lvinfo"  => array("lehrveranstaltung_id","sprache","titel","lehrziele","lehrinhalte","methodik","voraussetzungen","unterlagen","pruefungsordnung","anmerkung","kurzbeschreibung","genehmigt","aktiv","updateamum","updatevon","insertamum","insertvon"),
-	"campus.tbl_news"  => array("news_id","uid","studiengang_kz","fachbereich_kurzbz","semester","betreff","text","datum","verfasser","updateamum","updatevon","insertamum","insertvon"),
+	"campus.tbl_news"  => array("news_id","uid","studiengang_kz","fachbereich_kurzbz","semester","betreff","text","datum","verfasser","updateamum","updatevon","insertamum","insertvon","datum_bis"),
 	"campus.tbl_newssprache"  => array("sprache","news_id","betreff","text","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_notenschluessel"  => array("lehreinheit_id","note","punkte"),
 	"campus.tbl_notenschluesseluebung"  => array("uebung_id","note","punkte"),
 	"campus.tbl_reservierung"  => array("reservierung_id","ort_kurzbz","studiengang_kz","uid","stunde","datum","titel","beschreibung","semester","verband","gruppe","gruppe_kurzbz"),
-	"campus.tbl_resturlaub"  => array("mitarbeiter_uid","resturlaubstage","mehrarbeitsstunden","updateamum","updatevon","insertamum","insertvon"),
+	"campus.tbl_resturlaub"  => array("mitarbeiter_uid","resturlaubstage","mehrarbeitsstunden","updateamum","updatevon","insertamum","insertvon","urlaubstageprojahr"),
 	"campus.tbl_studentbeispiel"  => array("student_uid","beispiel_id","vorbereitet","probleme","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_studentuebung"  => array("student_uid","mitarbeiter_uid","abgabe_id","uebung_id","note","mitarbeitspunkte","punkte","anmerkung","benotungsdatum","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_uebung"  => array("uebung_id","gewicht","punkte","angabedatei","freigabevon","freigabebis","abgabe","beispiele","statistik","bezeichnung","positiv","defaultbemerkung","lehreinheit_id","maxstd","maxbsp","liste_id","prozent","nummer","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_zeitaufzeichnung"  => array("zeitaufzeichnung_id","uid","aktivitaet_kurzbz","projekt_kurzbz","start","ende","beschreibung","studiengang_kz","fachbereich_kurzbz","insertamum","insertvon","updateamum","updatevon"),
-	"campus.tbl_zeitsperre"  => array("zeitsperre_id","zeitsperretyp_kurzbz","mitarbeiter_uid","bezeichnung","vondatum","vonstunde","bisdatum","bisstunde","vertretung_uid","updateamum","updatevon","insertamum","insertvon","erreichbarkeit_kurzbz"),
+	"campus.tbl_zeitsperre"  => array("zeitsperre_id","zeitsperretyp_kurzbz","mitarbeiter_uid","bezeichnung","vondatum","vonstunde","bisdatum","bisstunde","vertretung_uid","updateamum","updatevon","insertamum","insertvon","erreichbarkeit_kurzbz","freigabeamum","freigabevon"),
 	"campus.tbl_zeitsperretyp"  => array("zeitsperretyp_kurzbz","beschreibung","farbe"),
 	"campus.tbl_zeitwunsch"  => array("stunde","mitarbeiter_uid","tag","gewicht","updateamum","updatevon","insertamum","insertvon"),
 	"fue.tbl_aktivitaet"  => array("aktivitaet_kurzbz","beschreibung"),
@@ -542,10 +609,11 @@ $tabellen=array(
 	"kommune.tbl_match"  => array("match_id","team_sieger","wettbewerb_kurzbz","team_gefordert","team_forderer","gefordertvon","gefordertam","matchdatumzeit","matchort","ergebniss","bestaetigtvon","bestaetigtamum"),
 	"kommune.tbl_team"  => array("team_kurzbz","bezeichnung","beschreibung","logo"),
 	"kommune.tbl_teambenutzer"  => array("uid","team_kurzbz"),
-	"kommune.tbl_wettbewerb"  => array("wettbewerb_kurzbz","regeln","forderungstage","einzel"),
+	"kommune.tbl_wettbewerb"  => array("wettbewerb_kurzbz","regeln","forderungstage","einzel","wbtyp_kurzbz","uid","icon"),
 	"kommune.tbl_wettbewerbteam"  => array("team_kurzbz","wettbewerb_kurzbz","rang","punkte"),
+	"kommune.tbl_wettbewerbtyp"  => array("wbtyp_kurzbz","bezeichnung"),
 	"lehre.tbl_abschlussbeurteilung"  => array("abschlussbeurteilung_kurzbz","bezeichnung"),
-	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note"),
 	"lehre.tbl_akadgrad"  => array("akadgrad_id","akadgrad_kurzbz","studiengang_kz","titel","geschlecht"),
 	"lehre.tbl_betreuerart"  => array("betreuerart_kurzbz","beschreibung"),
 	"lehre.tbl_ferien"  => array("bezeichnung","studiengang_kz","vondatum","bisdatum"),
@@ -555,13 +623,14 @@ $tabellen=array(
 	"lehre.tbl_lehrfach"  => array("lehrfach_id","studiengang_kz","fachbereich_kurzbz","kurzbz","bezeichnung","farbe","aktiv","semester","sprache","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_lehrform"  => array("lehrform_kurzbz","bezeichnung","verplanen"),
 	"lehre.tbl_lehrfunktion"  => array("lehrfunktion_kurzbz","beschreibung","standardfaktor"),
-	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english"),
+	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english","orgform_kurzbz"),
+	"lehre.tbl_moodle"  => array("lehrveranstaltung_id","lehreinheit_id","moodle_id","mdl_course_id","studiensemester_kurzbz","insertamum","insertvon"),
 	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe"),
-	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","titel_english"),
 	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung"),
 	"lehre.tbl_pruefung"  => array("pruefung_id","lehreinheit_id","student_uid","mitarbeiter_uid","note","pruefungstyp_kurzbz","datum","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id"),
-	"lehre.tbl_pruefungstyp"  => array("pruefungstyp_kurzbz","beschreibung"),
+	"lehre.tbl_pruefungstyp"  => array("pruefungstyp_kurzbz","beschreibung","abschluss"),
 	"lehre.tbl_stunde"  => array("stunde","beginn","ende"),
 	"lehre.tbl_stundenplan"  => array("stundenplan_id","unr","mitarbeiter_uid","datum","stunde","ort_kurzbz","gruppe_kurzbz","titel","anmerkung","lehreinheit_id","studiengang_kz","semester","verband","gruppe","fix","updateamum","updatevon","insertamum","insertvon"),
 	"lehre.tbl_stundenplandev"  => array("stundenplandev_id","lehreinheit_id","unr","studiengang_kz","semester","verband","gruppe","gruppe_kurzbz","mitarbeiter_uid","ort_kurzbz","datum","stunde","titel","anmerkung","fix","updateamum","updatevon","insertamum","insertvon"),
@@ -573,7 +642,7 @@ $tabellen=array(
 	"public.tbl_aufmerksamdurch"  => array("aufmerksamdurch_kurzbz","beschreibung","ext_id"),
 	"public.tbl_aufnahmeschluessel"  => array("aufnahmeschluessel"),
 	"public.tbl_bankverbindung"  => array("bankverbindung_id","person_id","name","anschrift","bic","blz","iban","kontonr","typ","verrechnung","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_benutzer"  => array("uid","person_id","aktiv","alias","insertamum","insertvon","updateamum","updatevon","ext_id"),
+	"public.tbl_benutzer"  => array("uid","person_id","aktiv","alias","insertamum","insertvon","updateamum","updatevon","ext_id","updateaktivvon","updateaktivam"),
 	"public.tbl_benutzerberechtigung"  => array("benutzerberechtigung_id","art","fachbereich_kurzbz","studiengang_kz","berechtigung_kurzbz","uid","studiensemester_kurzbz","start","ende","updateamum","updatevon","insertamum","insertvon"),
 	"public.tbl_benutzerfunktion"  => array("benutzerfunktion_id","fachbereich_kurzbz","uid","studiengang_kz","funktion_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_benutzergruppe"  => array("uid","gruppe_kurzbz","studiensemester_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
@@ -581,26 +650,28 @@ $tabellen=array(
 	"public.tbl_betriebsmittel"  => array("betriebsmittel_id","beschreibung","betriebsmitteltyp","nummer","nummerintern","reservieren","ort_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_betriebsmittelperson"  => array("betriebsmittel_id","person_id","anmerkung","kaution","ausgegebenam","retouram","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_betriebsmitteltyp"  => array("betriebsmitteltyp","beschreibung","anzahl","kaution"),
-	"public.tbl_buchungstyp"  => array("buchungstyp_kurzbz","beschreibung"),
+	"public.tbl_buchungstyp"  => array("buchungstyp_kurzbz","beschreibung","standardbetrag","standardtext"),
 	"public.tbl_dokument"  => array("dokument_kurzbz","bezeichnung","ext_id"),
 	"public.tbl_dokumentprestudent"  => array("dokument_kurzbz","prestudent_id","mitarbeiter_uid","datum","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_dokumentstudiengang"  => array("dokument_kurzbz","studiengang_kz","ext_id"),
 	"public.tbl_erhalter"  => array("erhalter_kz","kurzbz","bezeichnung","dvr","logo","zvr"),
 	"public.tbl_fachbereich"  => array("fachbereich_kurzbz","bezeichnung","farbe","studiengang_kz","aktiv","ext_id"),
-	"public.tbl_firma"  => array("firma_id","name","adresse","email","telefon","fax","anmerkung","firmentyp_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"public.tbl_firma"  => array("firma_id","name","adresse","email","telefon","fax","anmerkung","firmentyp_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id","schule"),
 	"public.tbl_firmentyp"  => array("firmentyp_kurzbz","beschreibung"),
 	"public.tbl_funktion"  => array("funktion_kurzbz","beschreibung","aktiv"),
-	"public.tbl_gruppe"  => array("gruppe_kurzbz","studiengang_kz","semester","bezeichnung","beschreibung","sichtbar","lehre","aktiv","sort","mailgrp","generiert","updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"public.tbl_gruppe"  => array("gruppe_kurzbz","studiengang_kz","semester","bezeichnung","beschreibung","sichtbar","lehre","aktiv","sort","mailgrp","generiert","updateamum","updatevon","insertamum","insertvon","ext_id","orgform_kurzbz"),
 	"public.tbl_kontakt"  => array("kontakt_id","person_id","firma_id","kontakttyp","anmerkung","kontakt","zustellung","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_kontakttyp"  => array("kontakttyp","beschreibung"),
 	"public.tbl_konto"  => array("buchungsnr","person_id","studiengang_kz","studiensemester_kurzbz","buchungstyp_kurzbz","buchungsnr_verweis","betrag","buchungsdatum","buchungstext","mahnspanne","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_lehrverband"  => array("studiengang_kz","semester","verband","gruppe","aktiv","bezeichnung","ext_id"),
+	"public.tbl_lehrverband"  => array("studiengang_kz","semester","verband","gruppe","aktiv","bezeichnung","ext_id","orgform_kurzbz"),
 	"public.tbl_log"  => array("log_id","executetime","mitarbeiter_uid","beschreibung","sql","sqlundo"),
 	"public.tbl_mitarbeiter"  => array("mitarbeiter_uid","personalnummer","telefonklappe","kurzbz","lektor","fixangestellt","bismelden","stundensatz","ausbildungcode","ort_kurzbz","standort_kurzbz","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id"),
-	"public.tbl_ort"  => array("ort_kurzbz","bezeichnung","planbezeichnung","max_person","lehre","reservieren","aktiv","lageplan","dislozierung","kosten","ausstattung","updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"public.tbl_ort"  => array("ort_kurzbz","bezeichnung","planbezeichnung","max_person","lehre","reservieren","aktiv","lageplan","dislozierung","kosten","ausstattung","updateamum","updatevon","insertamum","insertvon","ext_id","stockwerk","standort_kurzbz","telefonklappe"),
 	"public.tbl_ortraumtyp"  => array("ort_kurzbz","hierarchie","raumtyp_kurzbz"),
-	"public.tbl_person"  => array("person_id","staatsbuergerschaft","geburtsnation","sprache","anrede","titelpost","titelpre","nachname","vorname","vornamen","gebdatum","gebort","gebzeit","foto","anmerkung","homepage","svnr","ersatzkennzeichen","familienstand","geschlecht","anzahlkinder","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id"),
+	"public.tbl_person"  => array("person_id","staatsbuergerschaft","geburtsnation","sprache","anrede","titelpost","titelpre","nachname","vorname","vornamen","gebdatum","gebort","gebzeit","foto","anmerkung","homepage","svnr","ersatzkennzeichen","familienstand","geschlecht","anzahlkinder","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","bundesland_code","kompetenzen"),
 	"public.tbl_personfunktionfirma"  => array("personfunktionfirma_id","funktion_kurzbz","person_id","firma_id","position","anrede"),
+	"public.tbl_preinteressent"  => array("preinteressent_id","person_id","studiensemester_kurzbz","firma_id","erfassungsdatum","einverstaendnis","absagedatum","anmerkung","maturajahr","infozusendung","aufmerksamdurch_kurzbz","insertamum","insertvon","updateamum","updatevon"),
+	"public.tbl_preinteressentstudiengang"  => array("studiengang_kz","preinteressent_id","freigabedatum","uebernahmedatum","prioritaet","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","punkte","bismelden","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_prestudentrolle"  => array("prestudent_id","rolle_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung"),
@@ -611,7 +682,7 @@ $tabellen=array(
 	"public.tbl_standort"  => array("standort_kurzbz","adresse_id"),
 	"public.tbl_student"  => array("student_uid","matrikelnr","prestudent_id","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html"),
+	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","organisationsform","moodle"),
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","ext_id"),
 	"public.tbl_variable"  => array("name","uid","wert"),
 	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung"),
