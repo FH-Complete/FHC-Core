@@ -222,7 +222,7 @@ class gruppe
 			$qry .= " AND mailgrp=".($mailgrp?'true':'false');
 		if(!is_null($sichtbar))
 			$qry .= " AND sichtbar=".($sichtbar?'true':'false');
-
+		$qry.=" ORDER BY beschreibung";
 		if($result=pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))

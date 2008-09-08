@@ -415,7 +415,11 @@
 		
 
   <td class="tdvertical" align="center">
-<?php 
+<?php
+
+	$show=false;
+	
+	//wenn kein Moodle Kurs existiert dann KT anzeigen
 	$qry = "SELECT 1 FROM lehre.tbl_moodle WHERE 
 			(lehrveranstaltung_id='".addslashes($lvid)."' AND studiensemester_kurzbz='".addslashes($angezeigtes_stsem)."')
 			OR
@@ -426,29 +430,55 @@
 	{
 		if(pg_num_rows($result)==0)
 		{
-	
-			//Kreuzerltool
-			if($is_lector)
-			{
-				if(isset($angezeigtes_stsem))
-					$studiensem = '&stsem='.$angezeigtes_stsem;
-				else
-					$studiensem = '';
-			
-					echo '<a href="benotungstool/verwaltung.php?lvid='.$lvid.$studiensem.'" class="Item">
-		    			<img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
-		    			<strong>Benotungstool<br>("Kreuzerl"-Tool)</strong></a><br>
-		    			<a href="lesson.php?handbuch=1&lvid='.$lvid.$studiensem.'" class="Item">Handbuch [PDF]</a>';
-			} 
-			else 
-			{
-				echo '<a href="benotungstool/studentenansicht.php?lvid='.$lvid.'" >
-		    			<img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
-		    			<strong>"Kreuzerl"-Tool</strong></a>';
-		
-			}
+			$show=true;
 		}
 	}
+	//wenn eine Kreuzerlliste existiert dann den Link immer anzeigen
+	$qry = "SELECT 1 FROM campus.tbl_uebung 
+			WHERE lehreinheit_id IN (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit 
+									WHERE lehrveranstaltung_id='".addslashes($lvid)."' AND
+									studiensemester_kurzbz='".addslashes($angezeigtes_stsem)."')";
+	if($result = pg_query($sql_conn, $qry))
+	{
+		if(pg_num_rows($result)>0)
+		{
+			$show=true;
+		}
+	}
+	
+	if($show)
+	{
+		//Kreuzerltool
+		if($is_lector)
+		{
+			if(isset($angezeigtes_stsem))
+				$studiensem = '&stsem='.$angezeigtes_stsem;
+			else
+				$studiensem = '';
+		
+				echo '<a href="benotungstool/verwaltung.php?lvid='.$lvid.$studiensem.'" class="Item">
+	    			<img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
+	    			<strong>&Uuml;bungstool<br>("Kreuzerl"-Tool)</strong></a><br>
+	    			<a href="lesson.php?handbuch=1&lvid='.$lvid.$studiensem.'" class="Item">Handbuch [PDF]</a>';
+		} 
+		else 
+		{
+			echo '<a href="benotungstool/studentenansicht.php?lvid='.$lvid.'" class="Item">
+	    			<img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
+	    			<strong>&Uuml;bungstool<br>("Kreuzerl"-Tool)</strong></a>';
+	
+		}
+	}
+	else 
+	{
+		if($is_lector)
+		{
+			echo '<a href="#" onclick="alert(\'Das Übungstool kann nicht gleichzeitig mit Moodle verwendet werden.\nWenn Sie das Übungstool verwenden wollen, müssen Sie den Moodle Kurs entfernen. Wenden Sie sich hierzu bitte an den Lektorensupport\');" class="Item">
+	    			<img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
+	    			<strong>&Uuml;bungstool<br>("Kreuzerl"-Tool)</strong></a>';
+		}
+	}
+	
 ?>
     <p>&nbsp;</p>
 	</td>
@@ -521,6 +551,13 @@
 		}
 	    if($is_lector)
 	    	echo '<a href="moodle_wartung.php?lvid='.$lvid.'&stsem='.$angezeigtes_stsem.'" class="Item">Wartung</a>';			
+	}
+	else 
+	{
+		if($is_lector)
+			echo '<a href="#" onclick="alert(\'Moodle kann nicht gleichzeitig mit dem Übungstool verwendet werden.\nWenn Sie Moodle verwenden wollen, müssen Sie die Übungen im Übungstool entfernen\'); return false"  class="Item" >
+			    	<img src="../../../skin/images/button_moodle.jpg" width="68" height="45"><br>
+			    	<strong>Moodle</strong></a><br>';
 	}
 	?>
     <p>&nbsp;</p>
