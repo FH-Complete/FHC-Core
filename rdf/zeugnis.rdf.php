@@ -108,7 +108,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml_fussnote='';
 		$projektarbeit=array();
 		
-		$query = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.typ, tbl_studiengang.bezeichnung, tbl_studentlehrverband.semester, tbl_person.vorname, tbl_person.vornamen, tbl_person.nachname,tbl_person.gebdatum,tbl_person.titelpre, tbl_person.titelpost, tbl_studiensemester.bezeichnung as sembezeichnung FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer, tbl_studentlehrverband, tbl_studiensemester WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_student.student_uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id and tbl_student.student_uid = '".$uid_arr[$i]."' and tbl_studentlehrverband.student_uid=tbl_student.student_uid and tbl_studiensemester.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz and tbl_studentlehrverband.studiensemester_kurzbz = '".$studiensemester_kurzbz."'";
+		$query = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.typ, tbl_studiengang.bezeichnung, tbl_studentlehrverband.semester, tbl_person.vorname, tbl_person.vornamen, tbl_person.nachname,tbl_person.gebdatum,tbl_person.titelpre, tbl_person.titelpost, tbl_studiensemester.bezeichnung as sembezeichnung, tbl_student.prestudent_id FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer, tbl_studentlehrverband, tbl_studiensemester WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_student.student_uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id and tbl_student.student_uid = '".$uid_arr[$i]."' and tbl_studentlehrverband.student_uid=tbl_student.student_uid and tbl_studiensemester.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz and tbl_studentlehrverband.studiensemester_kurzbz = '".$studiensemester_kurzbz."'";
 		//echo $query;
 		if($result = pg_query($conn, $query))
 		{
@@ -138,7 +138,27 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		if($row->semester!=0)
 			$bezeichnung = $row->semester.'. Semester';
 		else 
-			$bezeichnung = '';
+		{
+			//Wenn das Semester 0 ist, dann wird das Semester aus der Rolle geholt. (Ausnahme: Incoming)
+			//damit bei Outgoing Studenten die im 0. Semester angelegt sind das richtige Semester aufscheint
+			$qry ="SELECT ausbildungssemester as semester FROM public.tbl_prestudentrolle 
+					WHERE 
+					prestudent_id='".addslashes($row->prestudent_id)."' AND 
+					studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
+					rolle_kurzbz!='Incoming' LIMIT 1";
+			if($result_sem = pg_query($conn, $qry))
+			{
+				if($row_sem = pg_fetch_object($result_sem))
+				{
+					$row->semester = $row_sem->semester;
+					$bezeichnung = $row_sem->semester.'. Semester';
+				}
+				else 
+					$bezeichnung = '';
+			}
+			else
+				$bezeichnung = '';
+		}
 			
 		$xml .= "\n	<zeugnis>";
 		$xml .= "		<studiensemester>".$row->sembezeichnung."</studiensemester>";
