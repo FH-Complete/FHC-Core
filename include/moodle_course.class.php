@@ -492,7 +492,7 @@ class moodle_course
 		}
 		//Parent laden
 		$qry = "SELECT * FROM public.mdl_course_categories WHERE id='".addslashes($parent)."'";
-		echo $qry;
+		//echo $qry;
 		if($result = pg_query($this->conn_moodle, $qry))
 		{
 			if($row = pg_fetch_object($result))
@@ -657,7 +657,7 @@ class moodle_course
 	function getCourse($lehrveranstaltung_id, $studiensemester_kurzbz, $student_uid)
 	{
 		//alle betreffenden Kurse holen
-		$qry = "SELECT lehreinheit_id, mdl_course_id FROM lehre.tbl_moodle JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id, studiensemester_kurzbz)
+		$qry = "SELECT tbl_moodle.lehreinheit_id, mdl_course_id FROM lehre.tbl_moodle JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id, studiensemester_kurzbz)
 				WHERE tbl_moodle.lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."' 
 				AND tbl_moodle.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'
 				UNION 

@@ -51,23 +51,8 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
-<script language="Javascript">
-<!--
-function togglediv()
-{
-	var block = "table-row";
-	if (navigator.appName.indexOf("Microsoft") > -1)
-		block = "block";
-	
-	if(document.getElementById("radiole").checked)
-		document.getElementById("lehreinheitencheckboxen").style.display = block;
-	else
-		document.getElementById("lehreinheitencheckboxen").style.display = "none";
-}
--->
-</script>
 </head>
-<body onload="togglediv()">
+<body>
 <table class="tabcontent" height="100%" id="inhalt">
 	<tr>
 		<td class="tdwidth10">&nbsp;</td>
