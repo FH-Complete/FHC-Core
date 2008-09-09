@@ -188,19 +188,26 @@ function drawLehrauftrag($uid)
 	{
 		if($row = pg_fetch_object($result))
 		{
+			$firmenanschrift=false;
 			if($row->firma_id!='')
 			{
 				$qry ="SELECT * FROM public.tbl_firma JOIN public.tbl_adresse USING(firma_id) 
-						WHERE tbl_firma.firma_id='$row->firma_id' LIMIT 1";
-				$result_firma = pg_query($conn, $qry);
-				$row_firma = pg_fetch_object($result_firma);
-				$name_gesamt = $row_firma->name;
-				$strasse = $row_firma->strasse;
-				$plz = $row_firma->plz;
-				$ort = $row_firma->ort;
-				$zuhanden = "zu Handen ".trim($row->titelpre.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost);
+						WHERE tbl_firma.firma_id='$row->firma_id' AND person_id is null LIMIT 1";
+				if($result_firma = pg_query($conn, $qry))
+				{
+					if($row_firma = pg_fetch_object($result_firma))
+					{
+						$name_gesamt = $row_firma->name;
+						$strasse = $row_firma->strasse;
+						$plz = $row_firma->plz;
+						$ort = $row_firma->ort;
+						$zuhanden = "zu Handen ".trim($row->titelpre.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost);
+						$firmenanschrift=true;
+					}
+				}
 			}
-			else 
+			
+			if(!$firmenanschrift)
 			{
 				$strasse = $row->strasse;
 				$plz = $row->plz;

@@ -396,7 +396,7 @@ a:visited { text-decoration:none; font-weight:bold; color:blue; }
 	}
 
 	$jahr=date('Y');
-	if (date('M')>8)
+	if (date('m')>8)
 	{
 		$datum_beginn_iso=$jahr.'-09-01';
 		$datum_beginn='1.Sept.'.$jahr;

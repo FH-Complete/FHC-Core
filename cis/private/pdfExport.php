@@ -39,6 +39,9 @@ if (!$conn = pg_pconnect(CONN_STRING))
 $user = get_uid();
 loadVariables($conn, $user);
 
+$rechte = new benutzerberechtigung($conn);
+$rechte->getBerechtigungen($user);
+
 //Parameter holen
 if(isset($_GET['xml']))
 	$xml=$_GET['xml'];
@@ -73,17 +76,14 @@ if(isset($_GET['typ']))
 
 
 $konto = new konto($conn);
-if (($user == $_GET["uid"]))
+if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 {
+	//Admins duerfen Dokumente anderer Personen drucken
+	if($rechte->isBerechtigt('admin'))
+		$user = $_GET['uid'];
+		
 	if($xsl=='Inskription' && (!$konto->checkStudienbeitrag($user, $_GET["ss"])))
 		die('Der Studienbeitrag wurde noch nicht bezahlt');		
-
-	//Berechtigung pruefen
-	$rechte = new benutzerberechtigung($conn);
-	$rechte->getBerechtigungen($user);
-	
-	//if(!$rechte->isBerechtigt('admin',$stg_kz))
-	//	die("Keine Berechtigung");
 	
 	$xml_url=XML_ROOT.$xml.$params;
 	//echo $xml_url;
@@ -142,10 +142,10 @@ if (($user == $_GET["uid"]))
 	
 	if (!isset($_REQUEST["archive"]))
 	{
-	 if (!$fo2pdf->generatePdf($buffer, $filename, "D"))
-	 {
-	     echo('Failed to generate PDF');
-	 }
+		if (!$fo2pdf->generatePdf($buffer, $filename, "D"))
+		{
+		 echo('Failed to generate PDF');
+		}
 	}
 	else
 	{
@@ -209,10 +209,9 @@ if (($user == $_GET["uid"]))
 			return false;
 	}
 }
-
 else
-// kein berechtigung
 {
-echo "<html><body><h3>Sie haben keine Bereichtigung zum Anzeigen dieser Seite</h3></body></html>";
+	// kein berechtigung
+	echo "<html><body><h3>Sie haben keine Berechtigung zum Anzeigen dieser Seite</h3></body></html>";
 }
 ?>
