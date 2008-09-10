@@ -186,42 +186,51 @@ class studiensemester
 	}
 
 	// ******************************************************************
-	// * Liefert das Aktuelle Studiensemester
-	// * @return aktuelles Studiensemester oder false wenn es keines gibt
+	// * Liefert ein Studiensemester mit Startdatum vom naechstgelegenen Studiensemester und
+	// * dem Startdatum vom folgeden Studiensemester als Endedatum
+	// * @return boolean
 	// ******************************************************************
-	function getAktTillNext()
+	function getNearestTillNext()
 	{
-		$qry = "SELECT * FROM public.vw_studiensemester ORDER BY delta LIMIT 2";
+		/*$qry = "SELECT * FROM public.vw_studiensemester ORDER BY delta LIMIT 1";
 		if(!$res=pg_query($this->conn,$qry))
 		{
 			$this->errormsg = pg_errormessage($this->conn);
 			return false;
 		}
 
-		if(pg_num_rows($res)>1)
+		if(!$erg1 = pg_fetch_object($res))
 		{
-		   $erg1 = pg_fetch_object($res);
-		   $erg2 = pg_fetch_object($res);
-		   //var_dump($erg1);
-		   if ($erg1->start < $erg2->start)
-		   {
-		   		$this->studiensemester_kurzbz=$erg1->studiensemester_kurzbz;
-		   		$this->start=$erg1->start;
-		   		$this->ende=$erg2->start;
-		   	}
-		   	else
-		   	{
-		   		$this->studiensemester_kurzbz=$erg2->studiensemester_kurzbz;
-				$this->start=$erg2->start;
-		   		$this->ende=$erg1->start;
-		   	}
-		   return true;
-		}
-		else
-		{
-			$this->errormsg = "Kein aktuelles oder folgendes Studiensemester vorhanden";
+			$this->errormsg = pg_errormessage($this->conn);
 			return false;
 		}
+
+		$qry = "SELECT * FROM public.vw_studiensemester WHERE ORDER BY delta LIMIT 1";
+		if(!$res=pg_query($this->conn,$qry))
+		{
+			$this->errormsg = pg_errormessage($this->conn);
+			return false;
+		}
+
+		if(!$erg2 = pg_fetch_object($res))
+		{
+			$this->errormsg = pg_errormessage($this->conn);
+			return false;
+		}*/
+
+		if(!$nearest=$this->getNearest())
+			return false;
+		$start=$this->start;
+		$studiensemester_kurzbz=$this->studiensemester_kurzbz;
+		if (!$next=$this->getNextFrom($this->studiensemester_kurzbz))
+			return false;
+		$ende=$this->start;
+
+		$this->studiensemester_kurzbz=$studiensemester_kurzbz;
+		$this->start=$start;
+		$this->ende=$ende;
+
+		return true;
 	}
 
 	/**
@@ -295,8 +304,11 @@ class studiensemester
 
 		if(pg_num_rows($res)>0)
 		{
-		   $erg = pg_fetch_object($res);
-		   return $erg->studiensemester_kurzbz;
+			$erg = pg_fetch_object($res);
+			$this->studiensemester_kurzbz=$erg->studiensemester_kurzbz;
+			$this->start=$erg->start;
+			$this->ende=$erg->ende;
+			return $erg->studiensemester_kurzbz;
 		}
 		else
 		{
