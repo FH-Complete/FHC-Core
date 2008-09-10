@@ -283,7 +283,7 @@ class studiensemester
 	 */
 	function getNearest($semester='')
 	{
-		$qry = "SELECT studiensemester_kurzbz FROM public.vw_studiensemester ";
+		$qry = "SELECT studiensemester_kurzbz, start, ende FROM public.vw_studiensemester ";
 		if($semester!='')
 		{
 			if($semester%2==0)
