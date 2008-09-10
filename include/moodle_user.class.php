@@ -21,6 +21,7 @@
  */
 /*
  * requires moodle_course.class.php
+ * studiengang.class.php
  */
 class moodle_user
 {
@@ -241,6 +242,9 @@ class moodle_user
 							$qry.=" AND gruppe = '$row_std->gruppe'";
 						}
 					}
+					$studiengang_obj = new studiengang($this->conn);
+					$studiengang_obj->load($row_std->studiengang_kz);
+					$gruppenbezeichnung = $studiengang_obj->kuerzel.'-'.trim($row_std->semester).trim($row_std->verband).trim($row_std->gruppe);
 				}
 				else //Spezialgruppe
 				{
@@ -252,6 +256,7 @@ class moodle_user
 								gruppe_kurzbz='$row_std->gruppe_kurzbz' AND
 								studiensemester_kurzbz='$row_std->studiensemester_kurzbz'
 							";
+					$gruppenbezeichnung = $row_std->gruppe_kurzbz;
 				}
 
 				if($result_user = pg_query($this->conn, $qry))
@@ -301,6 +306,23 @@ class moodle_user
 							$this->errormsg = 'Fehler beim Auslesen der Rollen';
 							return false;
 						}
+					
+						//Gruppenzuteilung
+						//Schauen ob die Gruppe vorhanden ist
+						if(!$groupid = $this->getGroup($mdl_course_id, $gruppenbezeichnung))
+						{
+							//wenn nicht dann anlegen
+							if(!$groupid = $this->createGroup($mdl_course_id, $gruppenbezeichnung))
+								continue;
+						}
+						
+						//Schauen ob eine Zuteilung zu dieser Gruppe vorhanden ist
+						if(!$this->getGroupMember($groupid, $this->mdl_user_id))
+						{
+							//wenn nicht dann zuteilen
+							$this->createGroupMember($groupid, $this->mdl_user_id);
+						}
+						
 					}
 				}
 			}
@@ -334,6 +356,146 @@ class moodle_user
 		}
 	}
 	
+	// ************************************************
+	// * Schaut ob eine Zuteilung von Person zu Gruppe
+	// * existiert
+	// * @param grouid ID der Gruppe
+	// *        userid ID des Users
+	// * @return ID der Zuteilung
+	// ************************************************
+	function getGroupMember($groupid, $userid)
+	{
+		$qry = "SELECT id FROM public.mdl_groups_members WHERE groupid='".addslashes($groupid)."' AND userid='".addslashes($userid)."'";
+		if($result = pg_query($this->conn_moodle, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				return $row->id;
+			}
+			else 
+			{
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Ermitteln der Gruppe';
+			return false;
+		}
+	}
+	
+	// ***************************************************
+	// * Legt eine Zuteilung eines Users zu 
+	// * einer Gruppe an
+	// * @param groupid ID der Gruppe
+	// *        userid ID des Users
+	// * @return ID der Zuteilung oder false im Fehlerfall
+	// ***************************************************
+	function createGroupMember($groupid, $userid)
+	{
+		$qry = 'BEGIN; INSERT INTO public.mdl_groups_members(groupid, userid) VALUES('.
+				$this->addslashes($groupid).','.$this->addslashes($userid).');';
+		if(pg_query($this->conn_moodle, $qry))
+		{
+			$qry = "SELECT currval('mdl_groups_members_id_seq') as id";
+			if($result = pg_query($this->conn_moodle, $qry))
+			{
+				if($row = pg_fetch_object($result))
+				{
+					pg_query($this->conn_moodle, 'COMMIT;');
+					return $row->id;
+				}
+				else 
+				{
+					pg_query($this->conn_moodle, 'ROLLBACK;');
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+					return false;
+				}
+			}
+			else 
+			{
+				pg_query($this->conn_moodle, 'ROLLBACK;');
+				$this->errormsg = 'Fehler beim Auslesen der Sequence';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Anlegen der Zuteilung';
+			return false;
+		}
+	}
+	// ************************************************
+	// * Holt die ID einer MoodleGruppe
+	// * @param $mdl_course_id ID des Kurses
+	// *        $gruppenbezeichnung Name der Gruppe
+	// * @return GruppenID wenn ok, false im Fehlerfall
+	// ************************************************
+	function getGroup($mdl_course_id, $gruppenbezeichnung)
+	{
+		$qry = "SELECT id FROM public.mdl_groups WHERE courseid='".addslashes($mdl_course_id)."' AND name='".addslashes($gruppenbezeichnung)."'";
+		
+		if($result = pg_query($this->conn_moodle, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				return $row->id;
+			}
+			else 
+			{
+				$this->errormsg = "Gruppe wurde nciht gefunden $gruppenbezeichnung";
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden einer Gruppe';
+			return false;
+		}
+	}
+	
+	// ****************************************************
+	// * Legt eine MoodleGruppe zu einem Kurs an
+	// * @param mdl_course_id ID des MoodleKuses
+	// *        gruppenbezeichnung Bezeichnung der Gruppe
+	// * @return ID der Gruppe wenn ok, false im Fehlerfall
+	// ****************************************************
+	function createGroup($mdl_course_id,  $gruppenbezeichnung)
+	{
+		$qry = 'BEGIN;INSERT INTO public.mdl_groups(courseid, name, description) VALUES('.
+				$this->addslashes($mdl_course_id).','.
+				$this->addslashes($gruppenbezeichnung).','.
+				$this->addslashes($gruppenbezeichnung).');';
+		if(pg_query($this->conn_moodle, $qry))
+		{
+			$qry = "SELECT currval('mdl_groups_id_seq') as id";
+			if($result = pg_query($this->conn_moodle, $qry))
+			{
+				if($row = pg_fetch_object($result))
+				{
+					pg_query($this->conn_moodle, 'COMMIT;');
+					return $row->id;
+				}
+				else 
+				{
+					pg_query($this->conn_moodle, 'ROLLBACK;');
+					$this->errormsg = 'Fehler beim Auslesen der GruppenSequence';
+					return false;
+				}
+			}
+			else 
+			{
+				pg_query($this->conn_moodle, 'ROLLBACK;');
+				$this->errormsg = 'Fehler beim Auslesen der GruppenSequence';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsgr ='Fehler beim Anlegen der Gruppe';
+			return false;
+		}
+	}
 	// ************************************************
 	// * wenn $var '' ist wird "null" zurueckgegeben
 	// * wenn $var !='' ist werden datenbankkritische
