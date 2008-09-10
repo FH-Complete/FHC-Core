@@ -45,11 +45,11 @@ $headers= "MIME-Version: 1.0\r\n";
 $headers.="Content-Type: text/html; charset=iso-8859-1\r\n";
 
 $ss=new studiensemester($conn);
-$ss->getAktTillNext();
+$ss->getNearestTillNext();
 $datum_begin=$ss->start;
+$datum_ende=$ss->ende;
 //$datum_begin='2008-01-07';
-$datum_ende='2009-02-09'; // $ss->ende
-//$datum_ende='2008-01-18'; // $ss->ende
+//$datum_ende='2009-02-09'; // $ss->ende
 
 // ************* FUNCTIONS **************** //
 
