@@ -27,6 +27,7 @@ require_once('../vilesci/config.inc.php');
 require_once('../include/moodle_course.class.php');
 require_once('../include/moodle_user.class.php');
 require_once('../include/studiensemester.class.php');
+require_once('../include/studiengang.class.php');
 
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim Connecten zur DB');

@@ -320,7 +320,8 @@ class moodle_course
 		//Studiensemester Categorie holen
 		if(!$id_stsem = $this->getCategorie($this->studiensemester_kurzbz, '0'))
 		{
-			$id_stsem = $this->createCategorie($this->studiensemester_kurzbz, '0');
+			if(!$id_stsem = $this->createCategorie($this->studiensemester_kurzbz, '0'))
+				echo "<br>Fehler beim Anlegen des Studiensemesters";
 		}
 		//Studiengang Categorie holen
 		if(!$id_stg = $this->getCategorie($stg, $id_stsem))
@@ -487,18 +488,26 @@ class moodle_course
 		}
 		if($parent=='')
 		{
-			$this->errormsg = 'createCategorie: parent wurde nicht uebergeben';
+			$this->errormsg = 'createCategorie: parent wurde nicht uebergeben: '.$bezeichnung.' '.$parent;
 			return false;
 		}
-		//Parent laden
-		$qry = "SELECT * FROM public.mdl_course_categories WHERE id='".addslashes($parent)."'";
-		//echo $qry;
-		if($result = pg_query($this->conn_moodle, $qry))
+		if($parent!='0')
 		{
-			if($row = pg_fetch_object($result))
+			//Parent laden
+			$qry = "SELECT * FROM public.mdl_course_categories WHERE id='".addslashes($parent)."'";
+			//echo $qry;
+			if($result = pg_query($this->conn_moodle, $qry))
 			{
-				$depth = $row->depth;
-				$path = $row->path;
+				if($row = pg_fetch_object($result))
+				{
+					$depth = $row->depth;
+					$path = $row->path;
+				}
+				else 
+				{
+					$this->errormsg = 'Fehler beim Laden der KursKategorie';
+					return false;
+				}
 			}
 			else 
 			{
@@ -508,8 +517,8 @@ class moodle_course
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim Laden der KursKategorie';
-			return false;
+			$depth=0;
+			$path='';
 		}
 		
 		//KursKategorie anlegen
@@ -657,11 +666,11 @@ class moodle_course
 	function getCourse($lehrveranstaltung_id, $studiensemester_kurzbz, $student_uid)
 	{
 		//alle betreffenden Kurse holen
-		$qry = "SELECT tbl_moodle.lehreinheit_id, mdl_course_id FROM lehre.tbl_moodle JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id, studiensemester_kurzbz)
+		$qry = "SELECT tbl_lehreinheit.lehreinheit_id, mdl_course_id FROM lehre.tbl_moodle JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id, studiensemester_kurzbz)
 				WHERE tbl_moodle.lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."' 
 				AND tbl_moodle.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'
 				UNION 
-				SELECT lehreinheit_id, mdl_course_id FROM lehre.tbl_moodle JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
+				SELECT tbl_lehreinheit.lehreinheit_id, mdl_course_id FROM lehre.tbl_moodle JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
 				WHERE tbl_lehreinheit.lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."' AND 
 				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 		
@@ -673,6 +682,7 @@ class moodle_course
 				//schauen in welchen der Student ist
 				$qry = "SELECT 1 FROM campus.vw_student_lehrveranstaltung 
 						WHERE uid='".addslashes($student_uid)."' AND lehreinheit_id='".addslashes($row->lehreinheit_id)."'";
+
 				if($result_vw = pg_query($this->conn, $qry))
 				{
 					if(pg_num_rows($result_vw)>0)

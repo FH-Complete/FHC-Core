@@ -49,7 +49,7 @@ if(isset($_GET['stsem']))
 else 
 	die('Es wurde kein Studiensemester uebergeben');
 
-$art = (isset($_POST['art'])?$_POST['art']:'le');
+$art = (isset($_POST['art'])?$_POST['art']:'lv');
 
 $berechtigt = false;
 
@@ -234,8 +234,14 @@ else
 	$disable_lv='';
 	if($result = pg_query($conn, $qry))
 		if(pg_num_rows($result)>0)
+		{
 			$disable_lv='disabled="true"';
-			
+			//wenn schon ein Moodle Kurs zu einer Lehreinheit angelegt wurde,
+			//dann ist standardmaessig die Lehreinheit markiert
+			if($art=='lv')
+				$art='le';
+		}
+	
 	echo 'Moodle Kurs anlegen: <br><br>
 			<form action="'.$_SERVER['PHP_SELF'].'?lvid='.$lvid.'&stsem='.$stsem.'" method="POST">
 			<input type="radio" '.$disable_lv.' name="art" value="lv" onclick="togglediv()" '.($art=='lv'?'checked':'').'>einen Moodle Kurs f&uuml;r die gesamte LV anlegen<br>
