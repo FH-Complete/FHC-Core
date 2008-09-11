@@ -120,14 +120,14 @@ if($result = pg_query($conn, $qry))
 }
 
 
-$qry="SELECT DISTINCT ON (person_id, nummer) nachname as LastName, vorname as FirstName,nummer as CardNumber, matrikelnr, uid, kurzbzlang,tbl_studiengang.kurzbz,typ, personalnummer, lektor,
+$qry="SELECT DISTINCT ON (vw_betriebsmittelperson.person_id, nummer) nachname as LastName, vorname as FirstName,nummer as CardNumber, matrikelnr, uid, kurzbzlang,tbl_studiengang.kurzbz,typ, personalnummer, lektor,
 		EXTRACT(DAY FROM vw_betriebsmittelperson.insertamum) AS tag,
 		EXTRACT(MONTH FROM vw_betriebsmittelperson.insertamum) AS monat,
 		EXTRACT(YEAR FROM vw_betriebsmittelperson.insertamum) AS jahr
 	FROM public.vw_betriebsmittelperson
 		 LEFT OUTER JOIN (public.tbl_student JOIN public.tbl_studiengang USING (studiengang_kz)) ON (uid=student_uid)
 		 LEFT OUTER JOIN public.tbl_mitarbeiter ON (uid=mitarbeiter_uid)
-	WHERE betriebsmitteltyp='Zutrittskarte' AND benutzer_aktiv AND retouram IS NULL;";
+	WHERE betriebsmitteltyp='Zutrittskarte' AND benutzer_aktiv AND retouram IS NULL ORDER  BY vw_betriebsmittelperson.person_id,nummer,personalnummer";
 //abhanden gekommene karten???
 
 if($result = pg_query($conn, $qry))
