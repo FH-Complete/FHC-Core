@@ -134,6 +134,17 @@ foreach ($adresse_obj->result as $row)
 }
 echo '</table>';
 //PREINTERESSENT
+function CutString($strVal, $limit)
+{
+	if(strlen($strVal) > $limit+3)
+	{
+		return substr($strVal, 0, $limit) . "...";
+	}
+	else
+	{
+		return $strVal;
+	}
+}
 
 $preinteressent = new preinteressent($conn);
 $preinteressent->getPreinteressenten($person->person_id);
@@ -147,7 +158,7 @@ if(count($preinteressent->result)>0)
 		echo "<td>$row->preinteressent_id</td>";
 		echo "<td>$row->studiensemester_kurzbz</td>";
 		echo "<td>".$datum_obj->formatDatum($row->erfassungsdatum, 'd.m.Y')."</td>";
-		echo "<td>$row->anmerkung</td>";
+		echo "<td>".htmlentities(CutString($row->anmerkung, 50),ENT_QUOTES)."</td>";
 		echo '<td>';
 		$preinteressent1 = new preinteressent($conn);
 		$preinteressent1->loadZuordnungen($row->preinteressent_id);

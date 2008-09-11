@@ -100,7 +100,8 @@ echo "<table width='100%'><tr><td><form action='".$_SERVER['PHP_SELF']."' method
 echo '<table><tr><td>Studiensemester: <SELECT name="studiensemester_kurzbz">';
 $stsem = new studiensemester($conn);
 $stsem->getAll();
-echo "<option value=''>-- offen --</option>";
+echo "<option value='-1' ".($studiensemester_kurzbz=='-1'?'selected':'').">-- alle --</option>";
+echo "<option value='' ".($studiensemester_kurzbz==''?'selected':'').">-- offen --</option>";
 foreach ($stsem->studiensemester as $row)	
 {
 	if($row->studiensemester_kurzbz==$studiensemester_kurzbz)
@@ -270,7 +271,7 @@ echo "<table class='liste table-autosort:0 table-stripeclass:alternate table-aut
 
 $preinteressent = new preinteressent($conn);
 if($filter=='')
-	$preinteressent->loadPreinteressenten($studiengang_kz, $studiensemester_kurzbz, null, $bool_nichtfreigegeben, $bool_uebernommen);
+	$preinteressent->loadPreinteressenten($studiengang_kz, ($studiensemester_kurzbz!='-1'?$studiensemester_kurzbz:null), null, $bool_nichtfreigegeben, $bool_uebernommen);
 else 
 {
 	//Falls im Filter-Feld ein Datum steht dann wird dieses umformatiert
@@ -303,7 +304,7 @@ foreach ($preinteressent->result as $row)
 	echo "<td>$person->vorname</td>";
 	//echo "<td>".$datum_obj->convertISODate($person->gebdatum)."</td>";
 	echo "<td>$row->studiensemester_kurzbz</td>";
-	echo "<td>".$datum_obj->formatDatum($row->erfassungsdatum,'d.m.Y')."</td>";
+	echo "<td><span style='display: none'>$row->erfassungsdatum</span>".$datum_obj->formatDatum($row->erfassungsdatum,'d.m.Y')."</td>";
 	//EMail
 	$qry = "SELECT kontakt FROM public.tbl_kontakt WHERE person_id='$person->person_id' AND kontakttyp='email' 
 			ORDER BY zustellung DESC LIMIT 1";
@@ -366,7 +367,7 @@ foreach ($preinteressent->result as $row)
 	
 	echo "<td>$freigabe</td>";
 	echo "<td>$uebernahme</td>";
-	echo "<td title='".htmlentities($row->anmerkung,ENT_QUOTES)."'>".htmlentities(CutString($row->anmerkung, 30),ENT_QUOTES)."</td>";
+	echo "<td title='".htmlentities($row->anmerkung,ENT_QUOTES)."'>".htmlentities(CutString($row->anmerkung, 20),ENT_QUOTES)."</td>";
 	echo "<td><input type='button' onclick=\"window.open('personendetails.php?id=$row->person_id','_blank')\" value='Gesamtübersicht' title='Zeigt die Details dieser Person an'></td>";
 	echo "<td><input type='button' onclick='parent.preinteressent_detail.location.href = \"preinteressent_detail.php?id=$row->preinteressent_id&selection=\"+parent.preinteressent_detail.selection; return false;' value='Bearbeiten' title='Zeigt die Details dieser Person an'></td>";
 	echo "<td><input type='button' onclick=\"window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=freigabe&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'\" value='Freigeben' title='Gibt alle Studiengänge mit der höchsten Priorität frei'></td>";

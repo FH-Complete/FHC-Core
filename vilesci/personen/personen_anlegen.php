@@ -153,6 +153,9 @@ if(isset($_POST['save']))
 		$person->svnr = $svnr;
 		$person->ersatzkennzeichen = $ersatzkennzeichen;
 		$person->aktiv = true;
+		$person->insertamum = date('Y-m-d H:i:s');
+		$person->insertvon = $user;
+		
 		if($person->save())
 		{
 			$error=false;
