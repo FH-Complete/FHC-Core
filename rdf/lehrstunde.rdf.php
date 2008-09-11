@@ -15,7 +15,7 @@ header("Content-type: application/vnd.mozilla.xul+xml");
 // xml
 echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
 
-require_once('../cis/config.inc.php');
+require_once('../vilesci/config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/datum.class.php');
 require_once('../include/lehrstunde.class.php');
