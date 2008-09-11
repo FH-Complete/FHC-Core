@@ -638,7 +638,7 @@ echo '</td>';
 //AUFMERKSAMDURCH
 echo "<td>Aufmerksam durch:</td><td> <SELECT name='aufmerksamdurch_kurzbz'>";
 $aufmerksam = new aufmerksamdurch($conn);
-$aufmerksam->getAll();
+$aufmerksam->getAll('beschreibung');
 foreach ($aufmerksam->result as $row)
 {
 	if($row->aufmerksamdurch_kurzbz==$preinteressent->aufmerksamdurch_kurzbz)

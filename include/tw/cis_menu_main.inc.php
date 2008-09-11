@@ -85,6 +85,10 @@
 					<td class="tdwidth10" nowrap>&nbsp;</td>
 	          		<td class="tdwrap"><a class="Item" href="public/tw_international.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;TW International</a></td>
 	  			</tr>
+	  			<tr>
+					<td class="tdwidth10" nowrap>&nbsp;</td>
+	          		<td class="tdwrap"><a class="Item" href="http://student.ephorus.de" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Plagiatspr&uuml;fung</a></td>
+	  			</tr>
 
 				<tr>
 					<td class="tdwrap"></td>

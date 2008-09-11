@@ -78,9 +78,11 @@ class aufmerksamdurch
 	// * Laedt alle Datansaetze
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
-	function getAll()
+	function getAll($orderby='aufmerksamdurch_kurzbz')
 	{
-		$qry = "SELECT * FROM public.tbl_aufmerksamdurch ORDER BY aufmerksamdurch_kurzbz";
+		$qry = "SELECT * FROM public.tbl_aufmerksamdurch";
+		if($orderby!='')
+			$qry .= " ORDER BY ".$orderby;
 		if($result = pg_query($this->conn, $qry))
 		{
 			while($row = pg_fetch_object($result))

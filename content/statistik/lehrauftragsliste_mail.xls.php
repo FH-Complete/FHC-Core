@@ -126,11 +126,19 @@ if($result_stg = pg_query($conn, $qry_stg))
 		$gesamt->write($gesamtsheet_row,$i,"Vorname", $format_bold);
 		$worksheet->write(2,++$i,"Familienname", $format_bold);
 		$gesamt->write($gesamtsheet_row,$i,"Familienname", $format_bold);
-		$worksheet->write(2,++$i,"Stunden", $format_bold);
-		$gesamt->write($gesamtsheet_row,$i,"Stunden", $format_bold);
-		$worksheet->write(2,++$i,"Kosten", $format_bold);
-		$gesamt->write($gesamtsheet_row,$i,"Kosten", $format_bold);
-
+		$worksheet->write(2,++$i,"LV-Stunden", $format_bold);
+		$gesamt->write($gesamtsheet_row,$i,"LV-Stunden", $format_bold);
+		$worksheet->write(2,++$i,"LV-Kosten", $format_bold);
+		$gesamt->write($gesamtsheet_row,$i,"LV-Kosten", $format_bold);
+		$worksheet->write(2,++$i,"Betreuerstunden", $format_bold);
+		$gesamt->write($gesamtsheet_row,$i,"Betreuerstunden", $format_bold);
+		$worksheet->write(2,++$i,"Betreuerkosten", $format_bold);
+		$gesamt->write($gesamtsheet_row,$i,"Betreuer-Kosten", $format_bold);
+		$worksheet->write(2,++$i,"Gesamtstunden", $format_bold);
+		$gesamt->write($gesamtsheet_row,$i,"Gesamtstunden", $format_bold);
+		$worksheet->write(2,++$i,"Gesamtkosten", $format_bold);
+		$gesamt->write($gesamtsheet_row,$i,"Gesamtkosten", $format_bold);
+		
 		//Daten holen
 		$qry = "SELECT
 					tbl_lehreinheit.*, tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre,
@@ -163,11 +171,15 @@ if($result_stg = pg_query($conn, $qry_stg))
 				//Gesamtstunden und Kosten ermitteln
 				if(array_key_exists($row->mitarbeiter_uid, $liste))
 				{
+					$liste[$row->mitarbeiter_uid]['lvstunden'] = $liste[$row->mitarbeiter_uid]['lvstunden'] + $row->semesterstunden;
+					$liste[$row->mitarbeiter_uid]['lvkosten'] = $liste[$row->mitarbeiter_uid]['lvkosten'] + ($row->semesterstunden*$row->stundensatz*$row->faktor);
 					$liste[$row->mitarbeiter_uid]['gesamtstunden'] = $liste[$row->mitarbeiter_uid]['gesamtstunden'] + $row->semesterstunden;
 					$liste[$row->mitarbeiter_uid]['gesamtkosten'] = $liste[$row->mitarbeiter_uid]['gesamtkosten'] + ($row->semesterstunden*$row->stundensatz*$row->faktor);
 				}
 				else
 				{
+					$liste[$row->mitarbeiter_uid]['lvstunden'] = $row->semesterstunden;
+					$liste[$row->mitarbeiter_uid]['lvkosten'] = $row->semesterstunden*$row->stundensatz*$row->faktor;
 					$liste[$row->mitarbeiter_uid]['gesamtstunden'] = $row->semesterstunden;
 					$liste[$row->mitarbeiter_uid]['gesamtkosten'] = $row->semesterstunden*$row->stundensatz*$row->faktor;
 				}
@@ -175,6 +187,8 @@ if($result_stg = pg_query($conn, $qry_stg))
 				$liste[$row->mitarbeiter_uid]['titelpre'] = $row->titelpre;
 				$liste[$row->mitarbeiter_uid]['vorname'] = $row->vorname;
 				$liste[$row->mitarbeiter_uid]['nachname'] = $row->nachname;
+				$liste[$row->mitarbeiter_uid]['betreuergesamtstunden'] = 0;
+				$liste[$row->mitarbeiter_uid]['betreuergesamtkosten'] = 0;
 				if($row->geaendert=='t')
 					$liste[$row->mitarbeiter_uid]['geaendert']=true;
 			}
@@ -221,6 +235,10 @@ if($result_stg = pg_query($conn, $qry_stg))
 					$liste[$row->uid]['geaendert']=false;
 					$liste[$row->uid]['gesamtstunden'] = 0;
 					$liste[$row->uid]['gesamtkosten'] = 0;
+					$liste[$row->uid]['lvstunden'] = 0;
+					$liste[$row->uid]['lvkosten'] = 0;
+					$liste[$row->uid]['betreuergesamtstunden'] = 0;
+					$liste[$row->uid]['betreuergesamtkosten'] = 0;
 				}
 			}
 			
@@ -242,6 +260,8 @@ if($result_stg = pg_query($conn, $qry_stg))
 					{
 						$liste[$uid]['gesamtstunden'] = $liste[$uid]['gesamtstunden'] + $row->stunden;
 						$liste[$uid]['gesamtkosten'] = $liste[$uid]['gesamtkosten'] + ($row->stunden*$row->stundensatz*$row->faktor);
+						$liste[$uid]['betreuergesamtstunden'] = $liste[$uid]['betreuergesamtstunden'] + $row->stunden;
+						$liste[$uid]['betreuergesamtkosten'] = $liste[$uid]['betreuergesamtkosten'] + ($row->stunden*$row->stundensatz*$row->faktor);
 						if($row->geaendert=='t')
 						{
 							$liste[$uid]['geaendert']=true;
@@ -289,13 +309,26 @@ if($result_stg = pg_query($conn, $qry_stg))
 				//Nachname
 				$worksheet->write($zeile,++$i,$row['nachname'], $format);
 				$gesamt->write($gesamtsheet_row,$i,$row['nachname'], $format);
-				//Stunden
+				//LVStunden
+				$worksheet->write($zeile,++$i,$row['lvstunden'], $format);
+				$gesamt->write($gesamtsheet_row,$i,$row['lvstunden'], $format);
+				//LVKosten
+				$worksheet->writeNumber($zeile,++$i,$row['lvkosten'], $formatnb);
+				$gesamt->writeNumber($gesamtsheet_row,$i,$row['lvkosten'], $formatnb);
+				//Betreuerstunden
+				$worksheet->write($zeile,++$i,$row['betreuergesamtstunden'], $format);
+				$gesamt->write($gesamtsheet_row,$i,$row['betreuergesamtstunden'], $format);
+				//Betreuerkosten
+				$worksheet->write($zeile,++$i,$row['betreuergesamtkosten'], $formatnb);
+				$gesamt->write($gesamtsheet_row,$i,$row['betreuergesamtkosten'], $formatnb);
+				//Gesamtstunden
 				$worksheet->write($zeile,++$i,$row['gesamtstunden'], $format);
 				$gesamt->write($gesamtsheet_row,$i,$row['gesamtstunden'], $format);
-				//Kosten
+				//Gesamtkosten
 				$worksheet->writeNumber($zeile,++$i,$row['gesamtkosten'], $formatnb);
 				$gesamt->writeNumber($gesamtsheet_row,$i,$row['gesamtkosten'], $formatnb);
-
+				
+				
 				//Kosten zu den Gesamtkosten hinzurechnen
 				$gesamtkosten = $gesamtkosten + $row['gesamtkosten'];
 				$zeile++;
@@ -317,8 +350,8 @@ if($result_stg = pg_query($conn, $qry_stg))
 			}
 
 			//Gesamtkosten anzeigen
-			$worksheet->writeNumber($zeile,6,$gesamtkosten, $format_number_bold);
-			$gesamt->writeNumber($gesamtsheet_row,6,$gesamtkosten, $format_number_bold);
+			$worksheet->writeNumber($zeile,10,$gesamtkosten, $format_number_bold);
+			$gesamt->writeNumber($gesamtsheet_row,10,$gesamtkosten, $format_number_bold);
 		}
 	}
 	

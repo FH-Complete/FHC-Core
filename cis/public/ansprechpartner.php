@@ -43,7 +43,7 @@ else
 		  	  <td class='tdwrap'>&nbsp;</td>
 		  	</tr>
 		  	<tr>
-		  	  <td width="260" class='tdwrap'>Mag. Dietmar Nestlang</td>
+		  	  <td width="260" class='tdwrap'>Mag. Nestlang Dietmar</td>
 		  	  <td width="50" class='tdwrap'>215</td>
 		  	  <td class='tdwrap'><?php echo ($visible?'<a class="Item" href="mailto:nestlang@technikum-wien.at">nestlang@technikum-wien.at</a>':'')?></td>
 		  	  <td class='tdwrap'>&nbsp;</td>
@@ -68,7 +68,7 @@ else
 		  	  <td class='tdwrap'>&nbsp;</td>
 		  	</tr>
 		  	<tr>
-		  	  <td width="260" class='tdwrap'>Mag. Gerald Raab (Leitung)</td>
+		  	  <td width="260" class='tdwrap'>Mag. Raab Gerald (Leitung)</td>
 		  	  <td width="50" class='tdwrap'>342</td>
 		  	  <td class='tdwrap'><?php echo ($visible?'<a class="Item" href="mailto:nestlang@technikum-wien.at">nestlang@technikum-wien.at</a>':'')?></td>
 		  	  <td class='tdwrap'>&nbsp;</td>
@@ -129,7 +129,7 @@ else
 			  <td class='tdwrap'>&nbsp;</td>
 			</tr>
 			<tr>
-			  <td width="260" class='tdwrap'>DI Kata Papp </td>
+			  <td width="260" class='tdwrap'>DI Papp Kata</td>
 			  <td width="50" class='tdwrap'>247</td>
 			  <td  class='tdwrap'><?php echo ($visible?'<a class="Item" href="mailto:kata.papp@technikum-wien.at">kata.papp@technikum-wien.at</a>':'')?></td>
 			  <td width="56" class='tdwrap'>&nbsp;</td>
@@ -188,7 +188,7 @@ else
 			  <td class='tdwrap'>Termin nach Vereinbarung</td>
 			</tr>
 			<tr>
-		      <td width="260" class='tdwrap'>Harald Weigl </td>
+		      <td width="260" class='tdwrap'>Weigl Harald</td>
 		      <td width="50" class='tdwrap'>253</td>
 			  <td  class='tdwrap'><?php echo ($visible?'<a class="Item" href="mailto:weigl@technikum-wien.at">weigl@technikum-wien.at</a>':'')?></td>
 			  <td width="56" class='tdwrap'>&nbsp;</td>
@@ -261,6 +261,13 @@ else
 			  <td class='tdwrap'>Termin nach Vereinbarung</td>
 			</tr>
 			<tr>
+			  <td width="260" class='tdwrap'>Simane-Sequens Gerald</td>
+			  <td width="50" class='tdwrap'>258</td>
+			  <td  class='tdwrap'></td>
+			  <td width="56" class='tdwrap'>&nbsp;</td>
+			  <td class='tdwrap'>Termin nach Vereinbarung</td>
+			</tr>
+			<tr>
 		  	  <td colspan="2" class='tdwrap'>&nbsp;</td>
 		  	  <td class='tdwrap'>&nbsp;</td>
 		  	  <td class='tdwrap'>&nbsp;</td>
@@ -327,14 +334,7 @@ else
               <td width="56" class='tdwrap'>&nbsp;</td>
               <td class='tdwrap'>Termin nach Vereinbarung</td>
           	</tr>
-          	<tr> 
-              <td width="260" class='tdwrap'>Dipl. Ing. (FH) Esberger Franz Ferdinand</td>
-              <td width="50" class='tdwrap'>346</td>
-              <td class='tdwrap'><?php echo ($visible?'<a class="Item" href="mailto:ffe@technikum-wien.at">ferdinand.esberger@technikum-wien.at</a>':'')?></td>
-              <td width="56" class='tdwrap'>&nbsp;</td>
-              <td class='tdwrap'>Termin nach Vereinbarung</td>
-          	</tr>
-			
+          				
 			<tr>
 		  	  <td colspan="2" class='tdwrap'>&nbsp;</td>
 		  	  <td class='tdwrap'>&nbsp;</td>

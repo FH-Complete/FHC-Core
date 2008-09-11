@@ -344,6 +344,8 @@ if(isset($_POST['save']))
 		$person->geburtsnation = 'A';
 		$person->staatsbuergerschaft = 'A';
 		$person->aktiv = true;
+		$person->insertamum = date('Y-m-d H:i:s');
+		$person->insertvon = $user;
 		if($person->save())
 		{
 			$error=false;
