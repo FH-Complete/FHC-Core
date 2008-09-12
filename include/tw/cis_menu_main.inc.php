@@ -160,6 +160,10 @@
 		  			<table class="tabcontent" id="WeiterbildungArchiv" style="display: none;">
 		  				<tr>
 						  	<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="private/info/weiterbildung/archiv/archiv_08-09.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;2008/09</a></td>
+						</tr>
+		  				<tr>
+						  	<td class="tdwidth10" nowrap>&nbsp;</td>
 							<td class="tdwrap"><a class="Item" href="private/info/weiterbildung/archiv/archiv_07-08.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;2007/08</a></td>
 						</tr>
 						<tr>

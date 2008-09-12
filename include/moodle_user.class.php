@@ -28,11 +28,15 @@ class moodle_user
 	var $conn;
 	var $conn_moodle;
 	var $errormsg;
-	var $log=''; 		//log message fuer Syncro
-	var $sync_create=0; //anzahl der durchgefuehrten zuteilungen beim syncro
+	var $log=''; 			//log message fuer Syncro
+	var $log_public='';		//log message fuer Syncro
+	var $sync_create=0; 	//anzahl der durchgefuehrten zuteilungen beim syncro
+	var $group_update=0;	//anzahl der updates an gruppen
 	
 	var $mdl_user_id;
 	var $mdl_user_username;
+	var $mdl_user_firstname;
+	var $mdl_user_lastname;
 	
 	
 	// **********************************************
@@ -59,6 +63,8 @@ class moodle_user
 			{
 				$this->mdl_user_id = $row->id;
 				$this->mdl_user_username = $row->username;
+				$this->mdl_user_firstname = $row->firstname;
+				$this->mdl_user_lastname = $row->lastname;
 				return true;
 			}
 			else 
@@ -74,6 +80,38 @@ class moodle_user
 		}
 	}
 	
+	// ***********************************************
+	// * Liefert ein Array mit allen Lektoren die
+	// * zu dem Moodle Kurs zugeteilt sind 
+	// ***********************************************
+	function getMitarbeiter($mdl_course_id)
+	{
+		//Mitarbeiter laden die zu diesem Kurs zugeteilt sind
+		$qry = "SELECT 
+					mitarbeiter_uid
+				FROM 
+					lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_moodle USING(lehreinheit_id) 
+				WHERE 
+					mdl_course_id='".addslashes($mdl_course_id)."'
+				UNION
+				SELECT 
+					mitarbeiter_uid 
+				FROM 
+					lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+					JOIN lehre.tbl_moodle USING(lehrveranstaltung_id) 
+				WHERE 
+					tbl_lehreinheit.studiensemester_kurzbz=tbl_moodle.studiensemester_kurzbz
+					AND mdl_course_id='".addslashes($mdl_course_id)."'";
+		$mitarbeiter=array();
+		if($result_ma = pg_query($this->conn, $qry))
+		{
+			while($row_ma = pg_fetch_object($result_ma))
+			{
+				$mitarbeiter[] = $row_ma->mitarbeiter_uid;
+			}
+			return $mitarbeiter;
+		}
+	}
 	// ************************************************
 	// * Synchronisiert die Lektoren der Lehreinheiten
 	// * mit denen des Moodle Kurses
@@ -141,7 +179,8 @@ class moodle_user
 						
 						if($this->createZuteilung($this->mdl_user_id, $mdlcourse->mdl_context_id, 3))
 						{
-							$this->log.="\nerzeuge Lektoren-Zuteilung für User $this->mdl_user_id zum Context $mdlcourse->mdl_context_id";
+							$this->log.="\nder Lektor $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
+							$this->log_public.="\nder Lektor $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
 							$this->sync_create++;
 						}
 						else 
@@ -294,7 +333,8 @@ class moodle_user
 								
 								if($this->createZuteilung($this->mdl_user_id, $mdlcourse->mdl_context_id, 5))
 								{
-									$this->log.="\nerzeuge Studenten-Zuteilung für User $this->mdl_user_id zum Context $mdlcourse->mdl_context_id";
+									$this->log.="\nder Student $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
+									$this->log_public.="\nder Student $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
 									$this->sync_create++;
 								}
 								else 
@@ -314,6 +354,9 @@ class moodle_user
 							//wenn nicht dann anlegen
 							if(!$groupid = $this->createGroup($mdl_course_id, $gruppenbezeichnung))
 								continue;
+							$this->group_update++;
+							$this->log.="\nes wurde eine neue Gruppe angelgt: $gruppenbezeichnung";
+							$this->log_public.="\nes wurde eine neue Gruppe angelgt: $gruppenbezeichnung";
 						}
 						
 						//Schauen ob eine Zuteilung zu dieser Gruppe vorhanden ist
@@ -321,6 +364,9 @@ class moodle_user
 						{
 							//wenn nicht dann zuteilen
 							$this->createGroupMember($groupid, $this->mdl_user_id);
+							$this->group_update++;
+							$this->log.="\nder Student $this->mdl_user_firstname $this->mdl_user_lastname wurde der Gruppe $gruppenbezeichnung zugeordnet";
+							$this->log_public.="\nder Student $this->mdl_user_firstname $this->mdl_user_lastname wurde der Gruppe $gruppenbezeichnung zugeordnet";
 						}
 						
 					}

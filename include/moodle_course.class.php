@@ -61,6 +61,36 @@ class moodle_course
 		$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
 		pg_query($this->conn_moodle, $qry);
 	}
+	
+	// **********************************************
+	// * Laedt einen MoodleKurs
+	// * @param mdl_course_id ID des Moodle Kurses
+	// * @return true wenn ok, false im Fehlerfall
+	// **********************************************
+	function load($mdl_course_id)
+	{
+		$qry = "SELECT * FROM public.mdl_course WHERE id='".addslashes($mdl_course_id)."'";
+		if($result = pg_query($this->conn_moodle, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$this->mdl_fullname = $row->fullname;
+				$this->mdl_shortname = $row->shortname;
+				$this->mdl_course_id = $row->id;
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = 'Kurs wurde nicht gefunden';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden des Kurses';
+			return false;
+		}
+	}
 
 	// **********************************************
 	// * Laedt alle MoodleKurse die zu einer LV/Stsem
@@ -342,7 +372,7 @@ class moodle_course
 		//Eintrag in tbl_mdl_course
 		$qry = "INSERT INTO public.mdl_course(category, sortorder, fullname, shortname, format, showgrades, newsitems, enrollable)
 				VALUES (".$this->addslashes($id_sem).", (SELECT max(sortorder)+1 FROM public.mdl_course), ".$this->addslashes($this->mdl_fullname).", ".
-				$this->addslashes($this->mdl_shortname).",'weeks', 1, 5, 0);";
+				$this->addslashes($this->mdl_shortname).",'topics', 1, 5, 0);";
 		
 		if($result = pg_query($this->conn_moodle, $qry))
 		{

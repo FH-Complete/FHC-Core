@@ -37,8 +37,11 @@ if(!$conn_moodle = pg_pconnect(CONN_STRING_MOODLE))
 	
 $sync_lektoren_gesamt=0;
 $sync_studenten_gesamt=0;
+$group_updates=0;
 $fehler=0;
 $message='';
+$message_lkt='';
+$lektoren=array();
 
 //nur Synchronisieren wenn ein aktuelles Studiensemester existiert damit keine 
 //Probleme durch die Vorrueckung entstehen
@@ -51,41 +54,82 @@ if($stsem_kurzbz=$stsem->getakt())
 	{
 		while($row = pg_fetch_object($result))
 		{
-			//Lektoren
-			$mdluser = new moodle_user($conn, $conn_moodle);
-			if($mdluser->sync_lektoren($row->mdl_course_id))
+			$course = new moodle_course($conn, $conn_moodle);
+			if($course->load($row->mdl_course_id))
 			{
-				$sync_lektoren_gesamt+=$mdluser->sync_create;
-				if($mdluser->sync_create>0)
+				$message_lkt='';
+				//Lektoren
+				$mdluser = new moodle_user($conn, $conn_moodle);
+				$mitarbeiter = $mdluser->getMitarbeiter($row->mdl_course_id);
+				
+				if($mdluser->sync_lektoren($row->mdl_course_id))
 				{
-					$message.="\nCourse $row->mdl_course_id:\n".$mdluser->log."\n";
+					$sync_lektoren_gesamt+=$mdluser->sync_create;
+					$group_updates+=$mdluser->group_update;
+					if($mdluser->sync_create>0 || $mdluser->group_update>0)
+					{
+						$message.="\nKurs: $course->mdl_fullname ($course->mdl_shortname):\n".$mdluser->log."\n";
+						$message_lkt.="\nKurs: $course->mdl_fullname ($course->mdl_shortname):\n".$mdluser->log_public."\n";
+					}
+				}
+				else 
+				{
+					$message.="\nFehler: $mdluser->errormsg";
+					$fehler++;
+				}
+				
+				//Studenten
+				$mdluser = new moodle_user($conn, $conn_moodle);
+				if($mdluser->sync_studenten($row->mdl_course_id))
+				{
+					$sync_studenten_gesamt+=$mdluser->sync_create;
+					$group_updates+=$mdluser->group_update;
+					if($mdluser->sync_create>0 || $mdluser->group_update>0)
+					{
+						$message.="\nKurs: $course->mdl_fullname ($course->mdl_shortname):\n".$mdluser->log."\n";
+						$message_lkt.="\nKurs: $course->mdl_fullname ($course->mdl_shortname):\n".$mdluser->log_public."\n";
+					}
+				}
+				else
+				{
+					$message.="\nFehler: $mdluser->errormsg";
+					$fehler++;
+				}
+				
+				foreach ($mitarbeiter as $uid)
+				{
+					if(!isset($lektoren[$uid]))
+						$lektoren[$uid]='';
+					$lektoren[$uid].=$message_lkt;
 				}
 			}
 			else 
 			{
-				$message.="\nFehler: $mdluser->errormsg";
+				$message.="\nFehler: in der Tabelle lehre.tbl_moodle wird auf den Kurs $row->mdl_course_id verwiesen, dieser existiert jedoch nicht im Moodle!";
 				$fehler++;
 			}
-			
-			//Studenten
-			$mdluser = new moodle_user($conn, $conn_moodle);
-			if($mdluser->sync_studenten($row->mdl_course_id))
-			{
-				$sync_studenten_gesamt+=$mdluser->sync_create;
-				if($mdluser->sync_create>0)
-				{
-					$message.="\nCourse $row->mdl_course_id:\n".$mdluser->log."\n";
-				}
-			}
-			else
-			{
-				$message.="\nFehler: $mdluser->errormsg";
-				$fehler++;
-			}		
 		}
 		
-		if($sync_lektoren_gesamt>0 || $sync_studenten_gesamt>0 || $fehler>0)
+		if($sync_lektoren_gesamt>0 || $sync_studenten_gesamt>0 || $fehler>0 || $group_updates>0)
 		{
+			//Mail an die Lektoren
+			foreach ($lektoren as $uid=>$message_lkt)
+			{
+				if($message_lkt!='')
+				{
+					$header = "Dies ist eine automatische Mail!\n";
+					$header.= "Es wurden folgende Aktualisierungen an Ihren Moodle-Kursen durchgeführt:\n\n";
+	
+					$to = "$uid@".DOMAIN;
+					//$to = 'oesi@technikum-wien.at';
+					
+					if(mail($to,'Moodle - Aktualisierungen', $header.$message_lkt, 'From: vilesci@'.DOMAIN))
+						echo "Mail wurde an $to versandt<br>";
+					else 
+						echo "Fehler beim Senden des Mails an $to<br>";
+				}
+			}
+			//Mail an Admin
 			$header = "Dies ist eine automatische Mail!\n";
 			$header.= "Folgende Syncros mit den MoodleKursen wurde durchgeführt:\n\n";
 			$header.= "Anzahl der aktualisierten Lektoren: $sync_lektoren_gesamt\n";

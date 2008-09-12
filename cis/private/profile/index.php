@@ -235,7 +235,7 @@
 					}
 					
 					//Betriebsmittel
-					$qry = "SELECT tbl_betriebsmittel.betriebsmitteltyp as betriebsmitteltyp, tbl_betriebsmittel.beschreibung as beschreibung, tbl_betriebsmittel.nummer as nummer, tbl_betriebsmittelperson.ausgegebenam as ausgegebenam FROM public.tbl_betriebsmittelperson JOIN public.tbl_betriebsmittel USING(betriebsmittel_id) WHERE person_id=(SELECT person_id FROM public.tbl_benutzer WHERE uid='$uid' LIMIT 1)";
+					$qry = "SELECT tbl_betriebsmittel.betriebsmitteltyp as betriebsmitteltyp, tbl_betriebsmittel.beschreibung as beschreibung, tbl_betriebsmittel.nummer as nummer, tbl_betriebsmittelperson.ausgegebenam as ausgegebenam FROM public.tbl_betriebsmittelperson JOIN public.tbl_betriebsmittel USING(betriebsmittel_id) WHERE person_id=(SELECT person_id FROM public.tbl_benutzer WHERE uid='$uid' LIMIT 1) AND retouram is null";
 					if($result_betriebsmittel = pg_query($conn, $qry))
 					{
 						if(pg_num_rows($result_betriebsmittel)>0)
