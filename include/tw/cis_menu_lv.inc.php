@@ -303,105 +303,7 @@
 		<p>&nbsp;</p>
 		</td>
 		
-		<?php
-		/*
-			echo '<td class="tdvertical" align="center">'
-		//Studentenabgabe
-			$dest_dir = @dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/upload');
-
-			if(!@is_dir($dest_dir->path))
-			{
-				if(!is_dir('../../../documents/'.strtolower($kurzbz)))
-				{
-					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'"');
-					exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'"');
-				}
-				if(!is_dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id))
-				{
-					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'/'.$term_id.'"');
-					exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'/'.$term_id.'"');
-				}
-				if(!is_dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name)))
-				{
-					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'"');
-					exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'"');
-				}
-				if(!is_dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/upload'))
-				{
-					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/upload"');
-					exec('sudo chown www-data:mysql "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/upload"');
-				}
-			}
-
-			if($dest_dir)
-			{
-				$dir_empty = true;
-
-				while($entry = $dest_dir->read())
-				{
-					if($entry != "." && $entry != "..")
-					{
-						$dir_empty = false;
-
-						break;
-					}
-				}
-			}
-
-			if(isset($dir_empty) && $dir_empty == false)
-			{
-				if($is_lector > 0)
-				{
-					$islector = true;
-				}
-				else
-				{
-					$islector = false;
-				}
-
-				if($islector == true)
-				{
-					echo "<a href=\"lector_choice.php?lvid=$lvid\" target=\"_blank\">";
-					echo "<img src=\"../../../skin/images/button_ul.jpg\" width=\"67\" height=\"45\"><br>
-						  <strong>Studenten Abgabe</strong>
-						  </a>";
-				}
-				else
-				{
-					echo "<a href=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short\" target=\"_blank\">";
-					echo "<img src=\"../../../skin/images/button_ul.jpg\" width=\"67\" height=\"45\"><br>
-						  <strong>Studenten Abgabe</strong>
-						  </a>";
-				}
-			}
-			else
-			{
-				if($is_lector > 0)
-				{
-					$islector = true;
-				}
-				else
-				{
-					$islector = false;
-				}
-
-				if($islector == true)
-				{
-					echo "<img src=\"../../../skin/images/button_ul.jpg\" width=\"67\" height=\"45\"><br>
-						  <strong>Studenten Abgabe</strong>";
-				}
-				else
-				{
-					echo "<a href=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short\" target=\"_blank\">";
-					echo "<img src=\"../../../skin/images/button_ul.jpg\" width=\"67\" height=\"45\"><br>
-						  <strong>Studenten Abgabe</strong>
-						  </a>";
-				}
-			}
-			echo '<p>&nbsp;</p>
-				</td>';
-			*/
-		  ?>
+		
 		  <td class="tdvertical" align="center">
 		<?php
 		//FEEDBACK
@@ -562,17 +464,123 @@
 	?>
     <p>&nbsp;</p>
 	</td>
-	<td class="tdvertical" align="center">
+	
 <?php 
 	//Gesamtnote
 	if($is_lector)
 	{
+		echo '<td class="tdvertical" align="center">';
 		echo '<a href="benotungstool/lvgesamtnoteverwalten.php?lvid='.$lvid.'&stsem='.$angezeigtes_stsem.'" class="Item" >
     		<img src="../../../skin/images/button_endnote.jpg" width="68" height="45"><br>
     		<strong>Gesamtnote</strong></a><br>';
+		echo '<p>&nbsp;</p>
+			</td>';
 	}
 	?>
-    <p>&nbsp;</p>
-	</td>
+    
+	<?php
+		//Studentenupload 
+		//Sichtbar nur fuer MUT(332)
+		if($course_id==332) 
+		{
+			if($is_lector)
+				echo '</tr><tr>';
+			echo '<td class="tdvertical" align="center">';
+			//Studentenabgabe
+			$dest_dir = @dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/upload');
+
+			if(!@is_dir($dest_dir->path))
+			{
+				if(!is_dir('../../../documents/'.strtolower($kurzbz)))
+				{
+					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'"');
+					exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'"');
+				}
+				if(!is_dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id))
+				{
+					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'/'.$term_id.'"');
+					exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'/'.$term_id.'"');
+				}
+				if(!is_dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name)))
+				{
+					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'"');
+					exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'"');
+				}
+				if(!is_dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/upload'))
+				{
+					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/upload"');
+					exec('sudo chown www-data:mysql "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/upload"');
+				}
+			}
+
+			if($dest_dir)
+			{
+				$dir_empty = true;
+
+				while($entry = $dest_dir->read())
+				{
+					if($entry != "." && $entry != "..")
+					{
+						$dir_empty = false;
+
+						break;
+					}
+				}
+			}
+
+			if(isset($dir_empty) && $dir_empty == false)
+			{
+				if($is_lector > 0)
+				{
+					$islector = true;
+				}
+				else
+				{
+					$islector = false;
+				}
+
+				if($islector == true)
+				{
+					echo "<a href=\"lector_choice.php?lvid=$lvid\" target=\"_blank\">";
+					echo "<img src=\"../../../skin/images/button_ul.jpg\" width=\"67\" height=\"45\"><br>
+						  <strong>Studenten Abgabe</strong>
+						  </a>";
+				}
+				else
+				{
+					echo "<a href=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short\" target=\"_blank\">";
+					echo "<img src=\"../../../skin/images/button_ul.jpg\" width=\"67\" height=\"45\"><br>
+						  <strong>Studenten Abgabe</strong>
+						  </a>";
+				}
+			}
+			else
+			{
+				if($is_lector > 0)
+				{
+					$islector = true;
+				}
+				else
+				{
+					$islector = false;
+				}
+
+				if($islector == true)
+				{
+					echo "<img src=\"../../../skin/images/button_ul.jpg\" width=\"67\" height=\"45\"><br>
+						  <strong>Studenten Abgabe</strong>";
+				}
+				else
+				{
+					echo "<a href=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short\" target=\"_blank\">";
+					echo "<img src=\"../../../skin/images/button_ul.jpg\" width=\"67\" height=\"45\"><br>
+						  <strong>Studenten Abgabe</strong>
+						  </a>";
+				}
+			}
+			echo '<p>&nbsp;</p>
+				</td>';
+		}
+		  ?>
 	</tr>
 </table>

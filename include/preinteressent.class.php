@@ -427,7 +427,7 @@ class preinteressent
 	// *        $studiensemester_kurzbz
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
-	function loadPreinteressenten($studiengang_kz='', $studiensemester_kurzbz=null, $filter='', $nichtfreigegeben=null, $uebernommen=null)
+	function loadPreinteressenten($studiengang_kz='', $studiensemester_kurzbz=null, $filter='', $nichtfreigegeben=null, $uebernommen=null, $aufmerksamdurch=null)
 	{
 		$qry = "SELECT distinct tbl_preinteressent.* FROM public.tbl_preinteressent JOIN public.tbl_person USING(person_id) LEFT JOIN public.tbl_preinteressentstudiengang USING(preinteressent_id) LEFT JOIN public.tbl_kontakt USING(person_id) WHERE true";
 				
@@ -444,6 +444,8 @@ class preinteressent
 			$qry.=" AND tbl_preinteressentstudiengang.freigabedatum is null";
 		if($uebernommen==true)
 			$qry.=" AND tbl_preinteressentstudiengang.freigabedatum is not null AND tbl_preinteressentstudiengang.uebernahmedatum is null";
+		if(!is_null($aufmerksamdurch))
+			$qry.=" AND tbl_preinteressent.aufmerksamdurch_kurzbz='".addslashes($aufmerksamdurch)."'";
 		
 		if($result = pg_query($this->conn, $qry))
 		{

@@ -27,6 +27,7 @@ require_once('../../include/benutzerlvstudiensemester.class.php');
 require_once('../../include/gruppe.class.php');
 require_once('../../include/benutzergruppe.class.php');
 require_once('../../include/studiensemester.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
    die("Konnte Verbindung zur Datenbank nicht herstellen");
@@ -34,7 +35,11 @@ if(!$conn=pg_pconnect(CONN_STRING))
 
 $user = get_uid();
 
+$rechte = new benutzerberechtigung($conn);
+$rechte->getBerechtigungen($user);
 
+if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('lehre',0))
+	die('Sie haben keine Berechtigung für diese Seite');
 
 $stsem_obj = new studiensemester($conn);
 

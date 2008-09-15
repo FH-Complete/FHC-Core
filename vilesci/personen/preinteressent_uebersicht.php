@@ -30,6 +30,7 @@ require_once('../../include/datum.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/log.class.php');
+require_once('../../include/aufmerksamdurch.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
    die("Konnte Verbindung zur Datenbank nicht herstellen");
@@ -67,7 +68,14 @@ if(isset($_GET['filter']))
 	$filter = $_GET['filter'];
 else 
 	$filter = '';
-
+if(isset($_GET['aufmerksamdurch']))
+{
+	$aufmerksamdurch = $_GET['aufmerksamdurch'];
+	if($aufmerksamdurch=='')
+		$aufmerksamdurch=null;
+}
+else 
+	$aufmerksamdurch = null;
 echo '<html>
 	<head>
 		<title>PreInteressenten</title>
@@ -129,7 +137,21 @@ foreach ($stg->result as $row)
 echo '</SELECT></td><td>';
 echo '<input type="checkbox" name="bool_nichtfreigegeben" '.($bool_nichtfreigegeben?'checked':'').'> nicht freigegeben<br>';
 echo '<input type="checkbox" name="bool_uebernommen" '.($bool_uebernommen?'checked':'').'> freigegeben aber nicht &uuml;bernommen</td><td>';
-echo '&nbsp;&nbsp;&nbsp;<input type="submit" value="Anzeigen"></td></tr></table>';
+echo '&nbsp;&nbsp;&nbsp;<input type="submit" value="Anzeigen"></td></tr>';
+echo '<tr><td>Aufmerksam durch: <SELECT name="aufmerksamdurch">';
+$aufmerksam_obj = new aufmerksamdurch($conn);
+$aufmerksam_obj->getAll('beschreibung');
+echo "<option value='' >-- Alle --</option>";
+foreach ($aufmerksam_obj->result as $row)
+{
+	if($row->aufmerksamdurch_kurzbz==$aufmerksamdurch)
+		$selected='selected';
+	else 
+		$selected='';
+	echo "<option value='$row->aufmerksamdurch_kurzbz' $selected>$row->beschreibung</option>";
+}
+echo '</SELECT></td></tr>';
+echo '</table>';
 echo '</form></td><td>';
 echo "<form action='".$_SERVER['PHP_SELF']."' method='GET'>";
 echo "<input type='text' value='".htmlentities($filter,ENT_QUOTES)."' name='filter'>&nbsp;";
@@ -271,7 +293,7 @@ echo "<table class='liste table-autosort:0 table-stripeclass:alternate table-aut
 
 $preinteressent = new preinteressent($conn);
 if($filter=='')
-	$preinteressent->loadPreinteressenten($studiengang_kz, ($studiensemester_kurzbz!='-1'?$studiensemester_kurzbz:null), null, $bool_nichtfreigegeben, $bool_uebernommen);
+	$preinteressent->loadPreinteressenten($studiengang_kz, ($studiensemester_kurzbz!='-1'?$studiensemester_kurzbz:null), null, $bool_nichtfreigegeben, $bool_uebernommen, $aufmerksamdurch);
 else 
 {
 	//Falls im Filter-Feld ein Datum steht dann wird dieses umformatiert
