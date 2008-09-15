@@ -35,6 +35,23 @@ if (!$conn = pg_pconnect(CONN_STRING))
 echo '<H1>Systemcheck!</H1>';
 echo '<H2>DB-Updates!</H2>';
 
+
+
+// ************** lehre.tbl_moodle.gruppen ************************
+if (!@pg_query($conn,'SELECT gruppen FROM lehre.tbl_moodle LIMIT 1;'))
+{
+	$sql="	ALTER TABLE lehre.tbl_moodle ADD COLUMN gruppen boolean;
+			COMMENT ON COLUMN lehre.tbl_moodle.gruppen IS 'Soll beim Sync die Gruppenzuordnung uebernommen werden?';
+			UPDATE lehre.tbl_moodle SET gruppen=TRUE;
+			ALTER TABLE lehre.tbl_moodle ALTER COLUMN gruppen SET NOT NULL;
+			ALTER TABLE lehre.tbl_moodle ALTER COLUMN gruppen SET DEFAULT TRUE;
+		";
+	if (!@pg_query($conn,$sql))
+		echo '<strong>lehre.tbl_moodle: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo '	gruppen wurde bei lehre.tbl_moodle hinzugefuegt!<BR>';
+}
+
 // ************* Wettbewerbstyp **********************************************************
 if (!@pg_query($conn,'SELECT * FROM kommune.tbl_wettbewerbtyp LIMIT 1;'))
 {
@@ -624,7 +641,7 @@ $tabellen=array(
 	"lehre.tbl_lehrform"  => array("lehrform_kurzbz","bezeichnung","verplanen"),
 	"lehre.tbl_lehrfunktion"  => array("lehrfunktion_kurzbz","beschreibung","standardfaktor"),
 	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english","orgform_kurzbz"),
-	"lehre.tbl_moodle"  => array("lehrveranstaltung_id","lehreinheit_id","moodle_id","mdl_course_id","studiensemester_kurzbz","insertamum","insertvon"),
+	"lehre.tbl_moodle"  => array("lehrveranstaltung_id","lehreinheit_id","moodle_id","mdl_course_id","studiensemester_kurzbz","gruppen","insertamum","insertvon"),
 	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe"),
 	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","titel_english"),
 	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id"),
