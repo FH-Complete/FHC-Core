@@ -28,38 +28,38 @@ $menu=array
 	//'Admin'=> 		array('name'=>'Admin', 'link'=>'admin/menu.html', 'target'=>'main'),
 	'Lehre'=> 		array
 	(
-		'name'=>'Lehre', 'opener'=>'true', 'hide'=>'false', 'permissions'=>array('admin','lv-plan','support'),
-		'Gruppenverwaltung'=>array('name'=>'Gruppenverwaltung', 'link'=>'stammdaten/lvbgruppenverwaltung.php', 'target'=>'main'),
+		'name'=>'Lehre', 'opener'=>'true', 'hide'=>'false', 'permissions'=>array('admin','lv-plan','support', 'lehre'),
+		'Gruppenverwaltung'=>array('name'=>'Gruppenverwaltung', 'permissions'=>array('admin','lv-plan','support'), 'link'=>'stammdaten/lvbgruppenverwaltung.php', 'target'=>'main'),
 		'Lehrveranstaltung'=>array
 		(
-			'name'=>'Lehrveranstaltung',
+			'name'=>'Lehrveranstaltung', 'permissions'=>array('admin','lv-plan','support'),
 			'Verwaltung'=>array('name'=>'Verwaltung', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
 			'Wartung'=>array('name'=>'Wartung', 'link'=>'stammdaten/lv_wartung.php', 'target'=>'main')
 		),
 		'Lehrfach'=>array
 		(
-			'name'=>'Lehrfach',
+			'name'=>'Lehrfach', 'permissions'=>array('admin','lv-plan','support'),
 			'Verwaltung'=>array('name'=>'Verwaltung', 'link'=>'lehre/lehrfach.php', 'target'=>'main'),
 			'Wartung'=>array('name'=>'Wartung', 'link'=>'lehre/lehrfach/wartung.php', 'target'=>'main'),
 			'Lehrfachpflege'=>array('name'=>'Lehrfachpflege', 'link'=>'lehre/lehrfach/lehrfachpflege.php', 'target'=>'main')
 		),
 		'Lehreinheit'=>array
 		(
-			'name'=>'Lehreinheit',
+			'name'=>'Lehreinheit', 'permissions'=>array('admin','lv-plan','support'),
 			'Verwaltung'=>array('name'=>'Verwaltung', 'link'=>'lehre/lv_verteilung/lv_verteilung.php', 'target'=>'main'),
 			'Wartung'=>array('name'=>'Wartung', 'link'=>'stammdaten/le_wartung.php', 'target'=>'main'),
 			'Vorrueckung'=>array('name'=>'Vorrueckung', 'link'=>'lehre/lehreinheiten_vorrueckung.php', 'target'=>'main')
 		),
 		'Freifach'=>array
 		(
-			'name'=>'Freifach',
+			'name'=>'Freifach', 'permissions'=>array('admin','lv-plan','support', 'lehre'),
 			'Studenten'=>array('name'=>'Studenten', 'link'=>'lehre/freifach.php', 'target'=>'main'),
 			'Lektoren'=>array('name'=>'Lektoren', 'link'=>'lehre/freifach_lektoren.php', 'target'=>'main'),
 			'Studenten Vorrücken'=>array('name'=>'Studenten Vorrücken', 'link'=>'lehre/freifach_studentenvorrueckung.php', 'target'=>'main')
 		),
 		'LV-Planung'=>array
 		(
-			'name'=>'LV-Planung',
+			'name'=>'LV-Planung', 'permissions'=>array('admin','lv-plan','support'),
 			'Wartung'=>array('name'=>'Wartung', 'link'=>'lehre/lvplanwartung.php', 'target'=>'main'),
 			'Check'=>array('name'=>'Checken', 'link'=>'lehre/check/index.html', 'target'=>'main'),
 			'Kollision'=>array('name'=>'Kollision Student', 'link'=>'lehre/stpl_benutzer_kollision_frameset.html', 'target'=>'main'),

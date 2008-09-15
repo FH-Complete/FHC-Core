@@ -27,12 +27,19 @@ require_once('../../include/benutzerlvstudiensemester.class.php');
 require_once('../../include/gruppe.class.php');
 require_once('../../include/benutzergruppe.class.php');
 require_once('../../include/studiensemester.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
    die("Konnte Verbindung zur Datenbank nicht herstellen");
 
 
 $user = get_uid();
+
+$rechte = new benutzerberechtigung($conn);
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('lehre',0))
+	die('Sie haben keine Berechtigung für diese Seite');
 
 if (isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
 	$stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:$_POST['stg_kz']);
@@ -134,7 +141,8 @@ if ($gruppe_neu != "")
 			$spezgrpstr_neu .= "<br>".$uidliste->uid;
 		}
 	}
-}//(uid, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, studiensemester_kurzbz)
+}
+//(uid, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, studiensemester_kurzbz)
 
 ?>
 
