@@ -112,30 +112,45 @@ class moodle_user
 			return $mitarbeiter;
 		}
 	}
+	
 	// ************************************************
 	// * Synchronisiert die Lektoren der Lehreinheiten
 	// * mit denen des Moodle Kurses
 	// * @param $mdl_course_id ID des MoodleKurses
+	// *        lehrveranstaltung_id wird nur angegeben beim Syncro von Testkursen
+	// *        studiensemester_kurzbz wird nur angegeben beim Syncro von Testkursen
 	// * @return true wenn ok, false wenn Fehler
 	// ************************************************
-	function sync_lektoren($mdl_course_id)
+	function sync_lektoren($mdl_course_id, $lehrveranstaltung_id=null, $studiensemester_kurzbz=null)
 	{
 		//Mitarbeiter laden die zu diesem Kurs zugeteilt sind
-		$qry = "SELECT 
-					mitarbeiter_uid
-				FROM 
-					lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_moodle USING(lehreinheit_id) 
-				WHERE 
-					mdl_course_id='".addslashes($mdl_course_id)."'
-				UNION
-				SELECT 
-					mitarbeiter_uid 
-				FROM 
-					lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
-					JOIN lehre.tbl_moodle USING(lehrveranstaltung_id) 
-				WHERE 
-					tbl_lehreinheit.studiensemester_kurzbz=tbl_moodle.studiensemester_kurzbz
-					AND mdl_course_id='".addslashes($mdl_course_id)."'";
+		if(!is_null($lehrveranstaltung_id) && !is_null($studiensemester_kurzbz))
+		{
+			//Bei Testkursen werden alle Lektoren einer Lehrveranstaltung zugeteilt
+			//da hier kein Eintrag in der tbl_moodle vorhanden ist, werden die Lektoren direkt aus
+			//der tbl_lehreinheitmitarbeiter geholt.
+			$qry = "SELECT mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+					WHERE lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."' 
+					AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";	
+		}
+		else 
+		{
+			$qry = "SELECT 
+						mitarbeiter_uid
+					FROM 
+						lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_moodle USING(lehreinheit_id) 
+					WHERE 
+						mdl_course_id='".addslashes($mdl_course_id)."'
+					UNION
+					SELECT 
+						mitarbeiter_uid 
+					FROM 
+						lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+						JOIN lehre.tbl_moodle USING(lehrveranstaltung_id) 
+					WHERE 
+						tbl_lehreinheit.studiensemester_kurzbz=tbl_moodle.studiensemester_kurzbz
+						AND mdl_course_id='".addslashes($mdl_course_id)."'";
+		}
 		$mitarbeiter='';
 		if($result_ma = pg_query($this->conn, $qry))
 		{
@@ -234,14 +249,14 @@ class moodle_user
 	{
 		//Studentengruppen laden die zu diesem Kurs zugeteilt sind
 		$qry = "SELECT 
-					studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, tbl_moodle.studiensemester_kurzbz
+					studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, tbl_moodle.studiensemester_kurzbz, tbl_moodle.gruppen
 				FROM 
 					lehre.tbl_lehreinheitgruppe JOIN lehre.tbl_moodle USING(lehreinheit_id) 
 				WHERE 
 					mdl_course_id='".addslashes($mdl_course_id)."'
 				UNION
 				SELECT 
-					studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, tbl_moodle.studiensemester_kurzbz
+					studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, tbl_moodle.studiensemester_kurzbz, tbl_moodle.gruppen
 				FROM 
 					lehre.tbl_lehreinheitgruppe JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 					JOIN lehre.tbl_moodle USING(lehrveranstaltung_id) 
@@ -261,6 +276,9 @@ class moodle_user
 			
 			while($row_std = pg_fetch_object($result_std))
 			{
+				//Schauen ob fuer diesen Kurs die Gruppen mitgesynct werden sollen
+				$gruppensync = $row_std->gruppen=='t'?true:false;
+				
 				//Studenten dieser Gruppe holen
 
 				if($row_std->gruppe_kurzbz=='') //LVB Gruppe
@@ -348,27 +366,29 @@ class moodle_user
 						}
 					
 						//Gruppenzuteilung
-						//Schauen ob die Gruppe vorhanden ist
-						if(!$groupid = $this->getGroup($mdl_course_id, $gruppenbezeichnung))
+						if($gruppensync)
 						{
-							//wenn nicht dann anlegen
-							if(!$groupid = $this->createGroup($mdl_course_id, $gruppenbezeichnung))
-								continue;
-							$this->group_update++;
-							$this->log.="\nes wurde eine neue Gruppe angelgt: $gruppenbezeichnung";
-							$this->log_public.="\nes wurde eine neue Gruppe angelgt: $gruppenbezeichnung";
-						}
-						
-						//Schauen ob eine Zuteilung zu dieser Gruppe vorhanden ist
-						if(!$this->getGroupMember($groupid, $this->mdl_user_id))
-						{
-							//wenn nicht dann zuteilen
-							$this->createGroupMember($groupid, $this->mdl_user_id);
-							$this->group_update++;
-							$this->log.="\nder Student $this->mdl_user_firstname $this->mdl_user_lastname wurde der Gruppe $gruppenbezeichnung zugeordnet";
-							$this->log_public.="\nder Student $this->mdl_user_firstname $this->mdl_user_lastname wurde der Gruppe $gruppenbezeichnung zugeordnet";
-						}
-						
+							//Schauen ob die Gruppe vorhanden ist
+							if(!$groupid = $this->getGroup($mdl_course_id, $gruppenbezeichnung))
+							{
+								//wenn nicht dann anlegen
+								if(!$groupid = $this->createGroup($mdl_course_id, $gruppenbezeichnung))
+									continue;
+								$this->group_update++;
+								$this->log.="\nes wurde eine neue Gruppe angelgt: $gruppenbezeichnung";
+								$this->log_public.="\nes wurde eine neue Gruppe angelgt: $gruppenbezeichnung";
+							}
+							
+							//Schauen ob eine Zuteilung zu dieser Gruppe vorhanden ist
+							if(!$this->getGroupMember($groupid, $this->mdl_user_id))
+							{
+								//wenn nicht dann zuteilen
+								$this->createGroupMember($groupid, $this->mdl_user_id);
+								$this->group_update++;
+								$this->log.="\nder Student $this->mdl_user_firstname $this->mdl_user_lastname wurde der Gruppe $gruppenbezeichnung zugeordnet";
+								$this->log_public.="\nder Student $this->mdl_user_firstname $this->mdl_user_lastname wurde der Gruppe $gruppenbezeichnung zugeordnet";
+							}
+						}						
 					}
 				}
 			}
@@ -668,4 +688,57 @@ class moodle_user
 		}		
 	}
 
+	// *******************************************************
+	// * Teilt die TestStudenten zu einem Testkurs zu
+	// * @param mdl_course_id ID des Moodle Kurses
+	// *******************************************************
+	function createTestStudentenZuordnung($mdl_course_id)
+	{
+		//Context des Kurses holen
+		$mdlcourse = new moodle_course($this->conn, $this->conn_moodle);
+		if(!$mdlcourse->getContext(50, $mdl_course_id))
+		{
+			$this->errormsg = 'Fehler beim Laden des Contexts';
+			return false;
+		}
+		
+		$users = array('student1', 'student2', 'student3');
+		foreach ($users as $row_user)
+		{
+			//MoodleID des Users holen
+			if(!$this->loaduser($row_user))
+			{
+				$this->errormsg = "Fehler beim Laden des Users $row_user: $this->errormsg";
+				return false;				
+			}
+					
+			//Nachschauen ob dieser Student bereits zugeteilt ist
+			$qry = "SELECT 1 FROM public.mdl_role_assignments 
+					WHERE 
+						userid='".addslashes($this->mdl_user_id)."' AND 
+						contextid='".addslashes($mdlcourse->mdl_context_id)."'";
+
+			if($result = pg_query($this->conn_moodle, $qry))
+			{
+				if(pg_num_rows($result)==0)
+				{
+					//Student ist noch nicht zugeteilt.
+					if($this->createZuteilung($this->mdl_user_id, $mdlcourse->mdl_context_id, 5))
+					{
+						$this->log.="\nder Student $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
+						$this->log_public.="\nder Student $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
+						$this->sync_create++;
+					}
+					else 
+						$this->log.="\nFehler beim Anlegen der Studenten-Zuteilung: $this->errormsg";
+				}
+			}
+			else 
+			{
+				$this->errormsg = 'Fehler beim Auslesen der Rollen';
+				return false;
+			}
+		}
+		return true;
+	}
 }
