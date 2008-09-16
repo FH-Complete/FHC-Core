@@ -459,7 +459,7 @@ class studiensemester
 	// ****
 	function getNextFrom($studiensemester_kurzbz)
 	{
-		$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester
+		$qry = "SELECT studiensemester_kurzbz, start, ende FROM public.tbl_studiensemester
 				WHERE start>(SELECT ende FROM public.tbl_studiensemester
 				            WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."')
 		        ORDER BY start LIMIT 1";
@@ -468,6 +468,9 @@ class studiensemester
 		{
 			if($row = pg_fetch_object($result))
 			{
+				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$this->start = $row->start;
+				$this->ende = $row->ende;
 				return $row->studiensemester_kurzbz;
 			}
 			else
