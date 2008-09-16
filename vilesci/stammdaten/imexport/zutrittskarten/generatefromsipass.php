@@ -119,7 +119,7 @@ if($result = pg_query($conn, $qry))
 	$fausgabe.='</table>';
 }
 
-
+//Osobsky Michael studiert BEE und MIE - wird daher nicht synchronisiert
 $qry="SELECT DISTINCT ON (vw_betriebsmittelperson.person_id, nummer) nachname as LastName, vorname as FirstName,nummer as CardNumber, matrikelnr, uid, kurzbzlang,tbl_studiengang.kurzbz,typ, personalnummer, lektor,
 		EXTRACT(DAY FROM vw_betriebsmittelperson.insertamum) AS tag,
 		EXTRACT(MONTH FROM vw_betriebsmittelperson.insertamum) AS monat,
@@ -127,7 +127,9 @@ $qry="SELECT DISTINCT ON (vw_betriebsmittelperson.person_id, nummer) nachname as
 	FROM public.vw_betriebsmittelperson
 		 LEFT OUTER JOIN (public.tbl_student JOIN public.tbl_studiengang USING (studiengang_kz)) ON (uid=student_uid)
 		 LEFT OUTER JOIN public.tbl_mitarbeiter ON (uid=mitarbeiter_uid)
-	WHERE betriebsmitteltyp='Zutrittskarte' AND benutzer_aktiv AND retouram IS NULL ORDER  BY vw_betriebsmittelperson.person_id,nummer,personalnummer";
+	WHERE betriebsmitteltyp='Zutrittskarte' AND benutzer_aktiv AND retouram IS NULL 
+	AND !(trim(upper(nachname))='OSOBSKY' AND trim(upper(vorname))='MICHAEL')
+	ORDER  BY vw_betriebsmittelperson.person_id,nummer,personalnummer";
 //abhanden gekommene karten???
 
 if($result = pg_query($conn, $qry))
