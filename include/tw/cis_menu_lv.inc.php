@@ -480,8 +480,8 @@
     
 	<?php
 		//Studentenupload 
-		//Sichtbar nur fuer MUT(332)
-		if($course_id==332) 
+		//Sichtbar nur fuer MUT(332) und MBE (228)
+		if($course_id==332 || $course_id==228) 
 		{
 			if($is_lector)
 				echo '</tr><tr>';

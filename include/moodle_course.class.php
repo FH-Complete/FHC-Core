@@ -37,6 +37,7 @@ class moodle_course
 	var $studiensemester_kurzbz;
 	var $insertamum;
 	var $insertvon;
+	var $gruppen;
 	
 	//Moodle Attribute
 	var $mdl_fullname;
@@ -124,6 +125,7 @@ class moodle_course
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
+				$obj->gruppen = ($row->gruppen=='t'?true:false);
 
 				$qry_mdl = "SELECT * FROM public.mdl_course WHERE id='".addslashes($row->mdl_course_id)."'";
 				if($result_mdl = pg_query($this->conn_moodle, $qry_mdl))
@@ -244,14 +246,15 @@ class moodle_course
 		}
 		
 		$qry = 'BEGIN; INSERT INTO lehre.tbl_moodle(mdl_course_id, lehreinheit_id, lehrveranstaltung_id, 
-											studiensemester_kurzbz, insertamum, insertvon)
+											studiensemester_kurzbz, insertamum, insertvon, gruppen)
 				VALUES('.
 				$this->addslashes($this->mdl_course_id).','.
 				$this->addslashes($this->lehreinheit_id).','.
 				$this->addslashes($this->lehrveranstaltung_id).','.
 				$this->addslashes($this->studiensemester_kurzbz).','.
 				$this->addslashes($this->insertamum).','.
-				$this->addslashes($this->insertvon).');';
+				$this->addslashes($this->insertvon).','.
+				($this->gruppen?'true':'false').');';
 				
 		if(pg_query($this->conn, $qry))
 		{
@@ -724,5 +727,253 @@ class moodle_course
 			}
 		}
 		return $courses;
+	}
+	
+	// ***************************************************
+	// * Aktualisiert die Spalte gruppen in der tbl_moodle
+	// * @param moodle_id ID der MoodleZuteilung
+	// *        gruppen boolean true wenn syncronisiert 
+	// *                werden soll, false wenn nicht
+	// * @return true wenn ok, false im Fehlerfall
+	// ***************************************************
+	function updateGruppenSync($moodle_id, $gruppen)
+	{
+		if(!is_numeric($moodle_id))
+		{
+			$this->errormsg = 'Moodle_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "UPDATE lehre.tbl_moodle SET gruppen=".($gruppen?'true':'false')." WHERE moodle_id='".addslashes($moodle_id)."'";
+		
+		if(pg_query($this->conn, $qry))
+		{
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Update';
+			return false;
+		}
+	}
+	
+	// ********************************
+	// * Legt einen Testkurs an
+	// ********************************
+	function createTestkurs($lehrveranstaltung_id, $studiensemester_kurzbz)
+	{
+		pg_query($this->conn_moodle, 'BEGIN;');
+		
+		//CourseCategorie ermitteln
+				
+		//Studiengang und Semester holen
+		$qry = "SELECT tbl_lehrveranstaltung.semester, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg FROM lehre.tbl_lehrveranstaltung JOIN public.tbl_studiengang USING(studiengang_kz)
+				WHERE lehrveranstaltung_id='$lehrveranstaltung_id'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$semester = $row->semester;
+				$stg = $row->stg;
+			}
+			else 
+			{
+				pg_query($this->conn_moodle, 'ROLLBACK');
+				$this->errormsg = 'Fehler beim Ermitteln von Studiengang und Semester';
+				return false;
+			}
+		}
+		else 
+		{
+			pg_query($this->conn_moodle, 'ROLLBACK');
+			$this->errormsg = 'Fehler beim Ermitteln von Studiengang und Semester';
+			return false;
+		}
+		
+		//Testkurs Categorie holen
+		if(!$id_testkurs = $this->getCategorie('Testkurse', '0'))
+		{
+			if(!$id_testkurs = $this->createCategorie('Testkurse', '0'))
+				echo "<br>Fehler beim Anlegen der Testkurskategorie";
+		}
+		//StSem Categorie holen
+		if(!$id_stsem = $this->getCategorie($studiensemester_kurzbz, $id_testkurs))
+		{
+			if(!$id_stsem = $this->createCategorie($studiensemester_kurzbz, $id_testkurs))
+				echo "<br>$this->errormsg";
+		}
+				
+		//CourseCategorie Context holen
+		$this->getContext(40, $id_stsem);
+		
+		//Eintrag in tbl_mdl_course
+		$qry = "INSERT INTO public.mdl_course(category, sortorder, fullname, shortname, format, showgrades, newsitems, enrollable)
+				VALUES (".$this->addslashes($id_stsem).", (SELECT max(sortorder)+1 FROM public.mdl_course), ".$this->addslashes($this->mdl_fullname).", ".
+				$this->addslashes($this->mdl_shortname).",'topics', 1, 5, 0);";
+		
+		if($result = pg_query($this->conn_moodle, $qry))
+		{
+			$qry = "SELECT currval('mdl_course_id_seq') as id";
+			if($result = pg_query($this->conn_moodle, $qry))
+			{
+				if($row = pg_fetch_object($result))
+				{
+					$this->mdl_course_id = $row->id;
+				}
+				else 
+				{
+					pg_query($this->conn_moodle, 'ROLLBACK');
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+					return false;
+				}
+			}
+			else 
+			{	
+				pg_query($this->conn_moodle, 'ROLLBACK');
+				$this->errormsg = 'Fehler beim Auslesen der Sequence';
+				return false;
+			}
+		}
+		else 
+		{
+			pg_query($this->conn_moodle, 'ROLLBACK');
+			$this->errormsg = 'Fehler beim INSERT';
+			return false;
+		}
+				
+		//zum vorherigen Pfad die aktuelle id hinzufuegen
+		$path = "(SELECT '$this->mdl_context_path' || '/' || currval('mdl_context_id_seq'))";
+		//vorherige tiefe um 1 erhoehen
+		$depth = $this->mdl_context_depth+1;
+		
+		//Context eintragen
+		$qry = "INSERT INTO public.mdl_context(contextlevel, instanceid, path, depth) VALUES('50', ".
+		$this->addslashes($this->mdl_course_id).",".$path.",".$this->addslashes($depth).");";
+		
+		if(pg_query($this->conn_moodle, $qry))
+		{
+			$qry = "SELECT currval('mdl_context_id_seq') as id";
+			if($result = pg_query($this->conn_moodle, $qry))
+			{
+				if($row = pg_fetch_object($result))
+				{
+					$this->mdl_context_id = $row->id;
+				}
+				else 
+				{
+					pg_query($this->conn_moodle, 'ROLLBACK');
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+					return false;
+				}
+			}
+			else 
+			{	
+				pg_query($this->conn_moodle, 'ROLLBACK');
+				$this->errormsg = 'Fehler beim Auslesen der Sequence';
+				return false;
+			}
+		}
+		else 
+		{
+			pg_query($this->conn_moodle, 'ROLLBACK');
+			$this->errormsg = 'Fehler beim INSERT';
+			return false;
+		}
+		
+		//Bloecke hinzufuegen
+		$qry = 
+		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(20, $this->mdl_course_id, 'course-view', 'l', 0, 1);". //Teilnehmer
+		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(1, $this->mdl_course_id, 'course-view', 'l', 1, 1);". //Aktivitäten
+		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(25, $this->mdl_course_id, 'course-view', 'l', 2, 1);". //Forumssuche
+		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(2, $this->mdl_course_id, 'course-view', 'l', 3, 1);". //Admin
+		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(9, $this->mdl_course_id, 'course-view', 'l', 4, 1);". //Kursliste
+		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(18, $this->mdl_course_id, 'course-view', 'r', 0, 1);". //Neueste Nachrichten
+		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(8, $this->mdl_course_id, 'course-view', 'r', 1, 1);". //Kalender / Bald aktuell...
+		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(22, $this->mdl_course_id, 'course-view', 'r', 2, 1);"; //Neueste Aktivitäten
+
+		if(!pg_query($this->conn_moodle, $qry))
+		{
+			pg_query($this->conn_moodle, 'ROLLBACK');
+			$this->errormsg = 'Fehler beim INSERT der Bloecke';
+			return false;
+		}
+		else 
+		{
+			pg_query($this->conn_moodle, 'COMMIT');
+			return true;
+		}
+	}
+	
+	// ******************************************************
+	// * Laedt den Testkurs zu dieser Lehrveranstaltung
+	// * @param lehrveranstaltung_id
+	// *        studiensemester_kurzbz
+	// * @return ID wenn gefunden, false wenn nicht vorhanden
+	// ******************************************************
+	function loadTestkurs($lehrveranstaltung_id, $studiensemester_kurzbz)
+	{
+		$qry = "SELECT
+					UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kuerzel,
+					tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.kurzbz
+				FROM
+					lehre.tbl_lehrveranstaltung JOIN public.tbl_studiengang USING(studiengang_kz)
+				WHERE
+					lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$shortname = strtoupper($studiensemester_kurzbz.'-'.$row->kuerzel.'-'.$row->semester.'-'.$row->kurzbz);
+			}
+			else 
+			{
+				$this->errormsg = 'Fehler beim Laden des Testkurses';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden des Testkurses';
+			return false;
+		}
+		
+		//Testkurs Categorie holen
+		if(!$id_testkurs = $this->getCategorie('Testkurse', '0'))
+		{
+			$this->errormsg = 'Categorie nicht gefunden';
+			return false;
+		}
+		
+		//StSem Categorie holen
+		if(!$id_stsem = $this->getCategorie($studiensemester_kurzbz, $id_testkurs))
+		{
+			$this->errormsg = 'Categorie nicht gefunden';
+			return false;
+		}
+		
+		$qry = "SELECT id, fullname, shortname FROM public.mdl_course WHERE shortname='".addslashes($shortname)."' AND category='$id_stsem' LIMIT 1";
+		
+		if($result = pg_query($this->conn_moodle, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$this->mdl_fullname = $row->fullname;
+				$this->mdl_shortname = $row->shortname;
+				$this->mdl_course_id = $row->id;
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = 'Es wurde kein Testkurs gefunden';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Abfragen der Kurse'; 
+			return false;
+		}
 	}
 }
