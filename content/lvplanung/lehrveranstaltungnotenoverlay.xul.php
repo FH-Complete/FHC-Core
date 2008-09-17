@@ -79,6 +79,10 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#benotungsdatum_iso" />
 			<splitter class="tree-splitter"/>
+			<treecol id="lehrveranstaltung-noten-tree-benotungsdatum-iso" label="BenotungsdatumISO" flex="2" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#benotungsdatum_iso" />
+			<splitter class="tree-splitter"/>
 			<treecol id="lehrveranstaltung-noten-tree-studiensemester_kurzbz" label="Studiensemester" flex="2" hidden="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiensemester_kurzbz" />
@@ -107,6 +111,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#note_bezeichnung"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#uebernahmedatum"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#benotungsdatum"/>
+						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#benotungsdatum_iso"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiensemester_kurzbz"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#note"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#student_uid"/>
@@ -156,6 +161,10 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#benotungsdatum_iso" />
 			<splitter class="tree-splitter"/>
+			<treecol id="lehrveranstaltung-lvgesamtnoten-tree-benotungsdatum-iso" label="BenotungsdatumISO" flex="2" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#benotungsdatum_iso" />
+			<splitter class="tree-splitter"/>
 			<treecol id="lehrveranstaltung-lvgesamtnoten-tree-freigabedatum" label="Freigabedatum" flex="2" hidden="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#freigabedatum_iso" />
@@ -188,6 +197,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#note_bezeichnung"/>
 						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#mitarbeiter_uid"/>
 						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#benotungsdatum"/>
+						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#benotungsdatum_iso"/>
 						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#freigabedatum"/>
 						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#studiensemester_kurzbz"/>
 						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#note"/>
