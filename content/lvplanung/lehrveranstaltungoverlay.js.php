@@ -1385,6 +1385,8 @@ function LehrveranstaltungGesamtNotenTreeSelectDifferent()
 			var lvgesamtuid=lvgesamttree.view.getCellText(i,col);
 			col = lvgesamttree.columns ? lvgesamttree.columns["lehrveranstaltung-lvgesamtnoten-tree-note"] : "lehrveranstaltung-lvgesamtnoten-tree-note";
 			var lvgesamtnote=lvgesamttree.view.getCellText(i,col);
+			col = lvgesamttree.columns ? lvgesamttree.columns["lehrveranstaltung-lvgesamtnoten-tree-benotungsdatum-iso"] : "lehrveranstaltung-lvgesamtnoten-tree-benotungsdatum-iso";
+			var lvgesamtbenotungsdatum=lvgesamttree.view.getCellText(i,col);
 
 			found=false;
 			//Schauen ob die gleiche Zeile im Zeugnisnoten Tree vorkommt
@@ -1394,8 +1396,23 @@ function LehrveranstaltungGesamtNotenTreeSelectDifferent()
 				var zeugnisuid=zeugnistree.view.getCellText(j,col);
 				col = zeugnistree.columns ? zeugnistree.columns["lehrveranstaltung-noten-tree-note"] : "lehrveranstaltung-noten-tree-note";
 				var zeugnisnote=zeugnistree.view.getCellText(j,col);
+				col = zeugnistree.columns ? zeugnistree.columns["lehrveranstaltung-noten-tree-benotungsdatum-iso"] : "lehrveranstaltung-noten-tree-benotungsdatum-iso";
+				var zeugnisbenotungsdatum=zeugnistree.view.getCellText(j,col);
+				
 				//debug(zeugnisuid+'=='+lvgesamtuid+' && '+zeugnisnote+'=='+lvgesamtnote);
 				if(zeugnisuid==lvgesamtuid && zeugnisnote==lvgesamtnote)
+				{
+					found=true;
+					break;
+				}
+				
+				//Wenn die Noten unterschiedlich sind, aber das benotungsdatum im Zeugnis
+				//nach dem benotungsdatum des lektors liegt, dann wird die zeile auch nicht markiert.
+				//damit wird verhindert, dass pruefungsnoten die nur von der assistenz eingetragen wurden,
+				//durch den alten eintrag des lektors wieder ueberschrieben werden
+				if(zeugnisuid==lvgesamtuid
+				   && zeugnisnote!=lvgesamtnote
+				   && zeugnisbenotungsdatum>lvgesamtbenotungsdatum)
 				{
 					found=true;
 					break;
