@@ -530,9 +530,15 @@ if(!$error)
 											$student->studiensemester_kurzbz=$semester_aktuell;
 											$student->semester = '0';
 											if($_POST['rolle_kurzbz']=='Abbrecher')
+											{
 												$student->verband='A';
+												$student->gruppe='';
+											}
 											if($_POST['rolle_kurzbz']=='Unterbrecher')
+											{
 												$student->verband='B';
+												$student->gruppe='';
+											}
 												
 											//Nachschauen ob dieser Lehrverband schon existiert, falls nicht dann anlegen
 											$lehrverband = new lehrverband($conn);
@@ -570,6 +576,7 @@ if(!$error)
 										}
 		
 										//Wenn Unterbrecher zu Studenten werden, dann wird das Semester mituebergeben
+										//Verband und Gruppe wird entfernt.
 										if($_POST['rolle_kurzbz']=='Student')
 										{
 											$student = new student($conn);
@@ -577,6 +584,8 @@ if(!$error)
 											$student->load($uid);
 											$student->studiensemester_kurzbz=$semester_aktuell;
 											$student->semester = $_POST['semester'];
+											$student->verband = '';
+											$student->gruppe = '';
 											$student->save(false, false);
 											$student->save_studentlehrverband(false);
 											//Aktiv Status setzen

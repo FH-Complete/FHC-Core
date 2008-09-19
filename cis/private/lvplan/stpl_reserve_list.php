@@ -81,7 +81,7 @@
 		{
 			$zeile=$i % 2;
 			$id=pg_result($erg_res,$i,"reservierung_id");
-			$datum=pg_result($erg_res,$i,"datum");
+			$datum1=pg_result($erg_res,$i,"datum");
 			$titel=pg_result($erg_res,$i,"titel");
 			$stunde=pg_result($erg_res,$i,"stunde");
 			$ort_kurzbz=pg_result($erg_res,$i,"ort_kurzbz");
@@ -89,7 +89,7 @@
 			//$lektor_kurzbz=pg_result($erg_res,$i,"lektor_kurzbz");
 			$beschreibung=pg_result($erg_res,$i,"beschreibung");
 			echo '<tr class="liste'.$zeile.'">';
-			echo '<td>'.$datum.'</td>';
+			echo '<td>'.$datum1.'</td>';
 			echo '<td>'.$titel.'</td>';
 			echo '<td>'.$stunde.'</td>';
 			echo '<td>'.$ort_kurzbz.'</td>';

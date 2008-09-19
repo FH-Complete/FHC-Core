@@ -1,4 +1,24 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
 /****************************************************************************
  * Script: 			stpl_kalender.php
  * Descr:  			Das Script dient zum Darstellung des Stundenplans
@@ -48,9 +68,7 @@ $version=(isset($_GET['version'])?$_GET['version']:2);
 $target=(isset($_GET['target'])?$_GET['target']:null);
 
 // UID bestimmen
-if (!isset($REMOTE_USER))
-	$REMOTE_USER='pam';
-$uid=$REMOTE_USER;
+$uid = get_uid();
 
 // Beginn Ende setzen
 if (!isset($begin))
@@ -123,7 +141,6 @@ if (!isset($begin) || !isset($ende))
 	// datum holen falls nicht gesetzt
 	if (!isset($_GET['semesterplan']))
 	{
-		writeCISlog('STOP');
 		die("Datum ist nicht gesetzt!");
 	}
 	else
@@ -136,7 +153,6 @@ if (!isset($begin) || !isset($ende))
 		}
 		else
 		{
-			writeCISlog('STOP');
 			die('Studiensemester konnte nicht gefunden werden!');
 		}
 		$result_semester=@pg_query($conn,"SELECT wert FROM tbl_variable WHERE uid='$uid' AND name='db_stpl_table';");
@@ -144,13 +160,11 @@ if (!isset($begin) || !isset($ende))
 			$db_stpl_table=pg_result($result_semester,0,'wert');
 		else
 		{
-			writeCISlog('STOP');
 			die('User nicht vorhanden!');
 		}
 	}
 if ($ende-$begin>31536000)
 {
-	writeCISlog('STOP');
 	die("Datumsbereich ist zu grosz!");
 }
 
@@ -161,7 +175,6 @@ if (!isset($type))
 		$type='lektor';
     else
     {
-    	writeCISlog('STOP');
         die("Cannot set type!");
     }
 if (!isset($pers_uid))
@@ -177,7 +190,6 @@ $stdplan->crlf=$crlf;
 // Zusaetzliche Daten laden
 if (! $stdplan->load_data($type,$pers_uid,$ort_kurzbz,$stg_kz,$sem,$ver,$grp,$gruppe_kurzbz) )
 {
-		writeCISlog('STOP');
 		die($stdplan->errormsg);
 }
 
@@ -209,7 +221,6 @@ while ($begin<$ende)
 	// Stundenplan einer Woche laden
 	if (! $stdplan->load_week($datum,$db_stpl_table))
 	{
-		writeCISlog('STOP');
 		die($stdplan->errormsg);
 	}
 
