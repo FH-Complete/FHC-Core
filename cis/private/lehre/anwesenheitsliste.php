@@ -84,6 +84,7 @@
 	if($error==0)
 	{
 	  	$aw_content='';
+	  	$awbild_content='';
 	  	$nt_content='';
 
 	  	//Content fuer Anwesenheitslisten erstellen
@@ -97,6 +98,7 @@
 	  	$lv = new lehrveranstaltung($conn, $lvid);
 	  	  	
 	  	$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>Gesamtliste $lv->bezeichnung</a></td></tr>";
+	  	$awbild_content .= "<tr><td><a class='Item' href='anwesenheitsliste_bilder.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>Gesamtliste $lv->bezeichnung</a></td></tr>";
 	  	$nt_content .= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>Gesamtliste $lv->bezeichnung</a></td></tr>";
 	  	
 
@@ -132,6 +134,7 @@
 			  				}
 			  				
 			  				$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
+			  				$awbild_content .= "<tr><td><a class='Item' href='anwesenheitsliste_bilder.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
 			  				$nt_content .= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
 			  
 			  				$lastlehreinheit = $row->lehreinheit_id;
@@ -166,6 +169,7 @@
 				}
 				
 				$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
+				$awbild_content .= "<tr><td><a class='Item' href='anwesenheitsliste_bilder.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
 				$nt_content .= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
 	  		}
 	  	}
@@ -180,6 +184,11 @@
 				$aw_content = "<table border='0'><tr class='liste'><td><b>Anwesenheitslisten</b></td></tr>".$aw_content."</table>";
 		  	else
 		  		$aw_content = "Derzeit sind in diesem Studiengang / Semester keine Studenten vorhanden";
+		  	
+		  	if($awbild_content!='')
+				$awbild_content = "<table border='0'><tr class='liste'><td><b>Anwesenheitslisten mit Bildern</b></td></tr>".$awbild_content."</table>";
+		  	else
+		  		$awbild_content = "Derzeit sind in diesem Studiengang / Semester keine Studenten vorhanden";
 
 		  	if($nt_content!='')
 				$nt_content = "<table border='0'><tr class='liste'><td><b>Notenlisten</b></td></tr>".$nt_content."</table>";
@@ -192,6 +201,14 @@
 		  		<tr>
 		  		   <td>$aw_content</td>
 		  		   <td>$nt_content</td>
+		  		</tr>
+		  		<tr>
+		  			<td>&nbsp;</td>
+		  			<td></td>
+		  		</tr>
+		  		<tr>
+		  			<td>$awbild_content</td>
+		  			<td></td>
 		  		</tr>
 		  		</table>";
 	  	}
