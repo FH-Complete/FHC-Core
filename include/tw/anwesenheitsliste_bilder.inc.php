@@ -70,11 +70,8 @@ if($result = pg_query($conn, $qry))
 			$gruppen.=$row->gruppe_kurzbz;
 	}
 }
-if(strlen($gruppen)>50)
-	$linebreak="\n";
-else 
-	$linebreak=' ';
-$pdf->MultiCell(0,15,'Gruppe: '.$gruppen.$linebreak.'Studiensemester: '.$stsem);
+$pdf->MultiCell(0,20,'Gruppe: '.$gruppen);
+$pdf->MultiCell(0,20,'Studiensemester: '.$stsem);
 	
 $maxY=$pdf->GetY();
 $maxY=getmax($maxY,$pdf->GetY());
@@ -82,128 +79,22 @@ $maxY=getmax($maxY,$pdf->GetY());
 
 $pdf->SetFont('Arial','B',12);
 
-$pdf->SetXY(30,90);
-$pdf->MultiCell(0,20,'Monat _________');
-
-//Anfang Tabelle
-$pdf->SetFont('Arial','',8);
-$lineheight=12;
-//Datum
-$maxY=$pdf->GetY()+10;
-$maxX=30;
-$pdf->SetXY($maxX,$maxY);
-$pdf->MultiCell(280,$lineheight,'Datum',1,'L',0);
-$maxX +=280;
-$pdf->SetXY($maxX,$maxY);
-$pdf->MultiCell(40,$lineheight,'',1,'L',0);
-$maxX +=40;
-$pdf->SetXY($maxX,$maxY);
-$pdf->MultiCell(40,$lineheight,'',1,'L',0);
-$maxX +=40;
-$pdf->SetXY($maxX,$maxY);
-$pdf->MultiCell(40,$lineheight,'',1,'L',0);
-$maxX +=40;
-$pdf->SetXY($maxX,$maxY);
-$pdf->MultiCell(40,$lineheight,'',1,'L',0);
-$maxX +=40;
-$pdf->SetXY($maxX,$maxY);
-$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
-$maxX +=40;
-$pdf->SetXY($maxX,$maxY);
-$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
-	
-//Anzahl der abgehaltenen Stunden
-$maxY=$pdf->GetY();
-$maxX=30;
-$pdf->SetXY($maxX,$maxY);
-$pdf->MultiCell(280,$lineheight,'Anzahl der abgehaltenen Stunden',1,'L',0);
-$maxX +=280;
-$pdf->SetXY($maxX,$maxY);
-$pdf->MultiCell(40,$lineheight,'',1,'L',0);
-$maxX +=40;
-$pdf->SetXY($maxX,$maxY);
-$pdf->MultiCell(40,$lineheight,'',1,'L',0);
-$maxX +=40;
-$pdf->SetXY($maxX,$maxY);
-$pdf->MultiCell(40,$lineheight,'',1,'L',0);
-$maxX +=40;
-$pdf->SetXY($maxX,$maxY);
-$pdf->MultiCell(40,$lineheight,'',1,'L',0);
-$maxX +=40;
-$pdf->SetXY($maxX,$maxY);
-$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
-$maxX +=40;
-$pdf->SetXY($maxX,$maxY);
-$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
-
-//Lektoren
-$pdf->SetFont('Arial','B',10);
-$maxY=$pdf->GetY();
-$maxX=30;
-$pdf->SetXY($maxX,$maxY);
-$pdf->MultiCell(520,$lineheight+2,'Lektoren',1,'L',1);
-
-//Schleife aller lektoren
-
-$qry = "SELECT 
-			distinct vorname, nachname 
-		FROM campus.vw_benutzer, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter 
-		WHERE 
-			uid=mitarbeiter_uid AND 
-			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND 
-			lehrveranstaltung_id='".addslashes($lvid)."' AND 
-			studiensemester_kurzbz='$stsem' ";
-if($lehreinheit_id!='')
-	$qry.=" AND tbl_lehreinheit.lehreinheit_id='".addslashes($lehreinheit_id)."'";
-$qry.=" ORDER BY nachname, vorname;";
-
-if($result = pg_query($conn,$qry))
-{
-	while($row=pg_fetch_object($result))
-	{
-		$pdf->SetFont('Arial','',8);
-		$maxY=$pdf->GetY();
-		$maxX=30;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(280,$lineheight,"$row->vorname $row->nachname",1,'L',0);
-		$maxX +=280;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',0);
-		$maxX +=40;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',0);
-		$maxX +=40;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',0);
-		$maxX +=40;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',0);
-		$maxX +=40;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
-		$maxX +=40;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
-	}
-}
 //Studenten
 $pdf->SetFont('Arial','B',10);
 $maxY=$pdf->GetY();
 $maxX=30;
 $pdf->SetXY($maxX,$maxY);
-$pdf->MultiCell(520,$lineheight+2,'Studenten',1,'L',1);
 
 $maxY=$pdf->GetY();
-$pdf->tablewidths = array(20,140,60,60,40,40,40,40,40,40); //Spaltenbreiten setzen
+$pdf->tablewidths = array(20,140,60,60,60); //Spaltenbreiten setzen
 $pdf->SetLeftMargin(30);
 $pdf->SetTopMargin(100); // Auch in der Funktion Header umstellen!!!
 
-$aligns = array('R','L','C','C','L','L','L','L','L','L'); //Ausrichtung der Tabellen festlegen
-
+$aligns = array('R','L','C','C','C'); //Ausrichtung der Tabellen festlegen
+$maxY+=10;
 $pdf->SetFont('Arial','',8);
 $pdf->SetXY(30,$maxY);
-$inhalt[]=array(' ','Hörer/Name','Kennzeichen','Gruppe','','','','','',''); //Spaltenueberschriften
-
+$lineheight=10;
 //Studenten holen
 
 
@@ -223,26 +114,11 @@ $pdf->SetFont('Arial','',8);
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(65,$lineheight,'Gruppe',1,'C',0);
 		$maxX +=65;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',0);
-		$maxX +=40;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
-		$maxX +=40;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
-		$maxX +=40;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
-		$maxX +=40;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
-		$maxX +=40;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
+		//$pdf->SetXY($maxX,$maxY);
+		//$pdf->MultiCell(80,$lineheight,'Foto',1,'C',0);
 
 $qry = "SELECT 
-			distinct vorname, nachname, matrikelnr, 
+			distinct vorname, nachname, matrikelnr, person_id,
 			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 			(SELECT rolle_kurzbz FROM public.tbl_prestudentrolle WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status 
 		FROM 
@@ -258,7 +134,7 @@ if($lehreinheit_id!='')
 	$qry.=" AND lehreinheit_id='".addslashes($lehreinheit_id)."'";
 	
 $qry.=' ORDER BY nachname, vorname';
-
+$lineheight=80;
 if($result = pg_query($conn, $qry))
 {
 	$i=0;
@@ -273,9 +149,9 @@ if($result = pg_query($conn, $qry))
 			else 
 				$pdf->SetFillColor(255,255,255);
 				
-			$pdf->SetFont('Arial','',8);
+			$pdf->SetFont('Arial','',10);
 			$maxY=$pdf->GetY();
-			if($maxY>770)
+			if($maxY>660)
 			{
 				$pdf->AddPage();
 				$maxY=$pdf->GetY();
@@ -286,10 +162,10 @@ if($result = pg_query($conn, $qry))
 			$pdf->MultiCell(20,$lineheight,$i,1,'R',1);
 			$maxX +=20;
 			$pdf->SetXY($maxX,$maxY);
-			$pdf->SetFont('Courier','B',8);
+			$pdf->SetFont('Courier','B',10);
 			$pdf->MultiCell(130,$lineheight,$elem->nachname,1,'L',1);
-			$pdf->SetFont('Arial','',8);
-			$pdf->SetXY($maxX+strlen($elem->nachname)*5+1,$maxY);
+			$pdf->SetFont('Arial','',10);
+			$pdf->SetXY($maxX+strlen($elem->nachname)*6+2,$maxY);
 			if($elem->status=='Incoming')
 				$inc=' (i)';
 			else 
@@ -297,33 +173,21 @@ if($result = pg_query($conn, $qry))
 			$pdf->MultiCell(130,$lineheight,$elem->vorname.$inc,0,'L',0);
 			$maxX +=130;
 			$pdf->SetXY($maxX,$maxY);
-			$pdf->SetFont('Arial','',8);
+			$pdf->SetFont('Arial','',10);
 			$pdf->MultiCell(65,$lineheight,trim($elem->matrikelnr),1,'C',1);
 			$maxX +=65;
 			$pdf->SetXY($maxX,$maxY);
 			$pdf->MultiCell(65,$lineheight,$elem->semester.$elem->verband.$elem->gruppe,1,'C',1);
 			$maxX +=65;
-			$pdf->SetXY($maxX,$maxY);
-			$pdf->MultiCell(40,$lineheight,'',1,'L',1);
-			$maxX +=40;
-			$pdf->SetXY($maxX,$maxY);
-			$pdf->MultiCell(40,$lineheight,'',1,'L',1);	
-			$maxX +=40;
-			$pdf->SetXY($maxX,$maxY);
-			$pdf->MultiCell(40,$lineheight,'',1,'L',1);	
-			$maxX +=40;
-			$pdf->SetXY($maxX,$maxY);
-			$pdf->MultiCell(40,$lineheight,'',1,'L',1);	
-			$maxX +=40;
-			$pdf->SetXY($maxX,$maxY);
-			$pdf->MultiCell(40,$lineheight,'',1,'L',1);	
-			$maxX +=40;
-			$pdf->SetXY($maxX,$maxY);
-			$pdf->MultiCell(40,$lineheight,'',1,'L',1);	
-		   $inhalt[]=array($i,$elem->nachname.' '.$elem->vorname,trim($elem->matrikelnr),$elem->semester.$elem->verband.$elem->gruppe,'','','','','','');
+//			$pdf->SetXY($maxX,$maxY);
+//			$pdf->MultiCell(80,$lineheight,'',0,'L',1);
+			$pdf->Image(APP_ROOT."cis/public/bild.php?src=person&person_id=$elem->person_id",$maxX+1,$maxY+1,0,"78","jpg","");
+
+		   $inhalt[]=array($i,$elem->nachname.' '.$elem->vorname,trim($elem->matrikelnr),$elem->semester.$elem->verband.$elem->gruppe,'');
 		}
    }
 }
+$lineheight=10;
 //Fussnote
 $maxY=$pdf->GetY()+5;
 $maxX=30;

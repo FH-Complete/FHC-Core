@@ -505,7 +505,7 @@ class konto
 			{
 				if ($row->differenz == 0)
 				{
-					$this->buchungsdatum = $buch_date[1];
+					$this->buchungsdatum = isset($buch_date[1])?$buch_date[1]:'';
 					return true;	
 				}				
 				else

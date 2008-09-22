@@ -244,9 +244,17 @@ if($uid!='')
 	echo "<table ><tr><td   nowrap><h3>Urlaub im Gesch&auml;ftsjahr $geschaeftsjahr</h3></td></tr>";
 	echo "<tr><td nowrap>Anspruch</td><td align='right'  nowrap>$anspruch Tage</td><td class='grey'   nowrap>&nbsp;&nbsp;&nbsp( j&auml;hrlich )</td></tr>";
 	echo "<tr><td nowrap>+ Resturlaub</td><td align='right'  nowrap>";
-	echo "<form action='".$_SERVER['PHP_SELF']."?uid=$uid' method='POST' style='margin:0px'>";
-	echo "<input type='text' size='2' value='$resturlaubstage' name='resturlaubstage'> Tage";
-	echo "<input type='submit' value='OK' name='saveresturlaub'>";
+	if(date('m')>8 && date('m')<11)
+	{
+		echo "<form action='".$_SERVER['PHP_SELF']."?uid=$uid' method='POST' style='margin:0px'>";
+		echo "<input type='text' size='2' value='$resturlaubstage' name='resturlaubstage'> Tage";
+		echo "<input type='submit' value='OK' name='saveresturlaub'>";
+		echo "</form>";
+	}
+	else 
+	{
+		echo "$resturlaubstage Tage";
+	}
 	echo "</td><td class='grey'   nowrap>&nbsp;&nbsp;&nbsp;( Stichtag: $datum_beginn )</td>";
 	echo "<tr><td nowrap>- aktuell gebuchter Urlaub&nbsp;</td><td align='right'  nowrap>$gebuchterurlaub Tage</td><td class='grey'  nowrap>&nbsp;&nbsp;&nbsp;( $datum_beginn - $datum_ende )</td></tr>";
 	echo "<tr><td style='border-top: 1px solid black;'  nowrap>aktueller Stand</td><td style='border-top: 1px solid black;' align='right' nowrap>".($anspruch+$resturlaubstage-$gebuchterurlaub)." Tage</td><td class='grey'  nowrap>&nbsp;&nbsp;&nbsp;( Stichtag: $datum_ende )</td></tr>";
