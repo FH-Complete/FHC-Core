@@ -466,7 +466,7 @@
 		  		<table class="tabcontent" id="Kollegium" style="display: none;">
 				<tr>
 					<td class="tdwidth10" nowrap>&nbsp;</td>
-					<td class="tdwrap"><a class="Item" href="public/kollegiumswahl.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Kollegiumswahl 2006/2007</a></td>
+					<td class="tdwrap"><a class="Item" href="private/info/kollegiumswahl.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Kollegiumswahl 2008</a></td>
 				</tr>
 				</table>
 				</td>
