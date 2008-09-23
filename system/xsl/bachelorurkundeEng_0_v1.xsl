@@ -52,7 +52,7 @@ born <xsl:value-of select="gebdatum" /> in <xsl:value-of select="gebort"  />,<xs
 
 <fo:block-container position="absolute" top="108mm" left="25mm" height="10mm">
 <fo:block text-align="center" line-height="14pt" font-family="sans-serif" font-size="14pt">
-	"<xsl:value-of select="stg_bezeichnung" />"
+	"<xsl:value-of select="stg_bezeichnung_engl" />"
 	</fo:block>
 </fo:block-container> 
 
