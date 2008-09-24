@@ -254,43 +254,43 @@ for($j=0;$j<$i;$j++)
 {
 	if(trim($sipass[$j]->command==''))
 	{
-		/*$sipass[$j]->command='D';
+		$sipass[$j]->command='D';
 		if (substr($sipass[$j]->acc_grp_name,0,1)!='#')
 		{
-			$ausdruck.=$sipass[$j]->command."\t"; // Command
-			$ausdruck.=$sipass[$j]->reference."\t";	// ID
-			$ausdruck.=$sipass[$j]->last_name."\t";	// Lastname
-			$ausdruck.=$sipass[$j]->first_name."\t";	// Firstname
+			$ausdruck.=$sipass[$j]->command."\t"; 		// Command
+			$ausdruck.=$sipass[$j]->reference."\t";		// ID
+			$ausdruck.=$sipass[$j]->last_name."\t";		// Lastname
+			$ausdruck.=$sipass[$j]->first_name."\t";		// Firstname
 			$ausdruck.=$sipass[$j]->acc_grp_name."\t";	// Access Group
-			$ausdruck.=$sipass[$j]->card_no."\n";	// Cardnumber
-		}*/
+			$ausdruck.=$sipass[$j]->card_no."\n";		// Cardnumber
+		}
 	}
 	else
 	{
 		if(trim($sipass[$j]->command!='V'))
 		{
-			$ausdruck.=$sipass[$j]->command."\t"; // Command
-			$ausdruck.=$sipass[$j]->reference."\t";	// ID
-			$ausdruck.=$sipass[$j]->last_name."\t";	// Lastname
-			$ausdruck.=$sipass[$j]->first_name."\t";	// Firstname
-			$ausdruck.=$sipass[$j]->acc_grp_name."\t";	// Access Group
-			$ausdruck.=$sipass[$j]->card_no."\t";	// Cardnumber
-			$ausdruck.=$sipass[$j]->start_date."\t";	// Valid From
-			$ausdruck.=$sipass[$j]->end_date."\t";	// Valid till
-			$ausdruck.="0\t";				// CardState
-			$ausdruck.=$sipass[$j]->uid."\t";	// Text1 UID
-			$ausdruck.=$sipass[$j]->matrikelnr."\t";	// Text2 Matrikelnummer
+			$ausdruck.=$sipass[$j]->command."\t"; 			// Command
+			$ausdruck.=$sipass[$j]->reference."\t";			// ID
+			$ausdruck.=$sipass[$j]->last_name."\t";			// Lastname
+			$ausdruck.=$sipass[$j]->first_name."\t";			// Firstname
+			$ausdruck.=$sipass[$j]->acc_grp_name."\t";		// Access Group
+			$ausdruck.=$sipass[$j]->card_no."\t";			// Cardnumber
+			$ausdruck.=$sipass[$j]->start_date."\t";			// Valid From
+			$ausdruck.=$sipass[$j]->end_date."\t";			// Valid till
+			$ausdruck.="0\t";						// CardState
+			$ausdruck.=$sipass[$j]->uid."\t";				// Text1 UID
+			$ausdruck.=$sipass[$j]->matrikelnr."\t";			// Text2 Matrikelnummer
 			if (isset($sipass[$j]->last_name_old))
-				$ausdruck.=$sipass[$j]->last_name_old;	// Text3 // alter Vorname
+				$ausdruck.=$sipass[$j]->last_name_old;		// Text3 // alter Vorname
 			$ausdruck.="\t";
 			if (isset($sipass[$j]->fist_name_old))
-				$ausdruck.=$sipass[$j]->fist_name_old;	// Text4 // alter Nachname
+				$ausdruck.=$sipass[$j]->fist_name_old;		// Text4 // alter Nachname
 			$ausdruck.="\t";
 			if (isset($sipass[$j]->acc_grp_name_old))
 				$ausdruck.=$sipass[$j]->acc_grp_name_old;	// Text5 // alte Accessgroup
 			$ausdruck.="\t";
 			if (isset($sipass[$j]->update))
-				$ausdruck.=$sipass[$j]->update;	// Text6 // alte Accessgroup
+				$ausdruck.=$sipass[$j]->update;			// Text6 // alte Accessgroup
 			$ausdruck.="\n";
 		}
 	}
