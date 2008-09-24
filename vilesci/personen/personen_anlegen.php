@@ -405,14 +405,20 @@ if($where!='')
 		while($row = pg_fetch_object($result))
 		{
 			$status = '';
-			$qry_ma = "SELECT * FROM campus.vw_mitarbeiter WHERE person_id='$row->person_id'";
-			if($result_ma = pg_query($conn, $qry_ma))
-				if($row_ma=pg_fetch_object($result_ma))
-					$status.=' Mitarbeiter';
-			$qry_ma = "SELECT * FROM campus.vw_student WHERE person_id='$row->person_id'";
-			if($result_ma = pg_query($conn, $qry_ma))
-				if($row_ma=pg_fetch_object($result_ma))
-					$status.=' Student';
+			$qry_stati = "SELECT 'Mitarbeiter' as rolle FROM campus.vw_mitarbeiter WHERE person_id='$row->person_id'
+							UNION
+							SELECT (get_rolle_prestudent(prestudent_id, null) || ' ' || UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz)) as rolle FROM public.tbl_prestudent JOIN public.tbl_studiengang USING(studiengang_kz) WHERE person_id='$row->person_id'
+							UNION
+							SELECT 'PreInteressent' as rolle FROM public.tbl_preinteressent WHERE person_id='$row->person_id'";
+			if($result_stati = pg_query($conn, $qry_stati))
+			{
+				while($row_stati=pg_fetch_object($result_stati))
+				{
+					$status.=$row_stati->rolle.', ';
+				}
+			}
+			$status = substr($status, 0, strlen($status)-2);
+					
 			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->gebdatum</td><td>$row->svnr</td><td>".($row->geschlecht=='m'?'männlich':'weiblich')."</td><td>";
 			$qry_adr = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id'";
 			if($result_adr = pg_query($conn, $qry_adr))

@@ -55,6 +55,7 @@ if(isset($_GET['type']) && $_GET['type']=='firmenrequest')
 	$firmentyp_kurzbz = (isset($_GET['firmentyp_kurzbz'])?$_GET['firmentyp_kurzbz']:'');
 	$firma = new firma($conn);
 	$firma->getFirmen($firmentyp_kurzbz);
+	echo " -- keine Angabe --\n";
 	foreach ($firma->result as $row)
 		echo $row->firma_id.' '.$row->name."\n";
 	exit();
@@ -695,6 +696,7 @@ echo "</SELECT></td>";
 echo "<td>Schule:</td><td colspan='5'> <SELECT id='firma' name='firma'>";
 $firma = new firma($conn);
 $firma->getFirmen($schule->firmentyp_kurzbz);
+echo "<option value='' >-- keine Angabe --</option>";
 foreach ($firma->result as $row)
 {
 	if($row->firma_id==$preinteressent->firma_id)

@@ -258,11 +258,13 @@ class preinteressent
 			$this->errormsg = 'Aufmerksamdurch muss angegeben werden';
 			return false;
 		}
+		/*
 		if($this->firma_id=='')
 		{
 			$this->errormsg = 'Es muss eine Schule angegeben werden';
 			return false;
 		}
+		*/
 		return true;
 	}
 	
@@ -435,7 +437,13 @@ class preinteressent
 			$qry.=" AND tbl_preinteressentstudiengang.studiengang_kz='$studiengang_kz'";
 		
 		if(!is_null($studiensemester_kurzbz))
-			$qry.=" AND tbl_preinteressent.studiensemester_kurzbz='$studiensemester_kurzbz'";
+		{
+			if($studiensemester_kurzbz=='')
+				$qry.=" AND tbl_preinteressent.studiensemester_kurzbz is null";
+			else
+				$qry.=" AND tbl_preinteressent.studiensemester_kurzbz='$studiensemester_kurzbz'";
+		}
+		
 		if($filter!='')
 		{
 			$qry.=" AND lower(nachname) like '%".addslashes($filter)."%' OR lower(vorname) like '%".addslashes($filter)."%' OR erfassungsdatum like '".addslashes($filter)."' OR lower(kontakt) like '%".addslashes($filter)."%'";

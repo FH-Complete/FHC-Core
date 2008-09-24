@@ -279,13 +279,13 @@ echo "<table class='liste table-autosort:0 table-stripeclass:alternate table-aut
 		<th class='table-sortable:default'>Nachname</th>
 		<th class='table-sortable:default'>Vorname</th>
 		<th class='table-sortable:default'>StSem</th>
-		<th class='table-sortable:default'>Erfassungsdatum</th>
+		<th class='table-sortable:default'>Erf.datum</th>
 		<th class='table-sortable:default'>E-Mail</th>
 		<th class='table-sortable:default'>Status</th>
 		<th class='table-sortable:default'>Freigabe</th>
 		<th class='table-sortable:default'>&Uuml;bernahme</th>
 		<th class='table-sortable:default'>Anmerkung</th>
-		<th colspan=4>Aktion</th>
+		<th>Aktion</th>
 		</tr>
 	</thead>
 	<tbody>";
@@ -390,10 +390,12 @@ foreach ($preinteressent->result as $row)
 	echo "<td>$freigabe</td>";
 	echo "<td>$uebernahme</td>";
 	echo "<td title='".htmlentities($row->anmerkung,ENT_QUOTES)."'>".htmlentities(CutString($row->anmerkung, 20),ENT_QUOTES)."</td>";
-	echo "<td><input type='button' onclick=\"window.open('personendetails.php?id=$row->person_id','_blank')\" value='Gesamtübersicht' title='Zeigt die Details dieser Person an'></td>";
-	echo "<td><input type='button' onclick='parent.preinteressent_detail.location.href = \"preinteressent_detail.php?id=$row->preinteressent_id&selection=\"+parent.preinteressent_detail.selection; return false;' value='Bearbeiten' title='Zeigt die Details dieser Person an'></td>";
-	echo "<td><input type='button' onclick=\"window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=freigabe&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'\" value='Freigeben' title='Gibt alle Studiengänge mit der höchsten Priorität frei'></td>";
-	echo "<td><input type='button' onclick=\"if(confdel()) {window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=loeschen&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'}\" value='Löschen' title='Löscht diesen Preinteressenten'></td>";
+	echo '<td>';
+	echo "<input type='button' onclick=\"window.open('personendetails.php?id=$row->person_id','_blank')\" value='Gesamtübersicht' title='Zeigt die Details dieser Person an'>";
+	echo "<input type='button' onclick='parent.preinteressent_detail.location.href = \"preinteressent_detail.php?id=$row->preinteressent_id&selection=\"+parent.preinteressent_detail.selection; return false;' value='Bearbeiten' title='Zeigt die Details dieser Person an'>";
+	echo "<input type='button' onclick=\"window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=freigabe&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'\" value='Freigeben' title='Gibt alle Studiengänge mit der höchsten Priorität frei'>";
+	echo "<input type='button' onclick=\"if(confdel()) {window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=loeschen&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'}\" value='Löschen' title='Löscht diesen Preinteressenten'>";
+	echo '</td>';
 	echo '</tr>';
 }
 echo '</tbody></table><br>';
