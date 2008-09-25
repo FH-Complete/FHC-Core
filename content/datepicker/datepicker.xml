@@ -15,7 +15,7 @@
 				<body><![CDATA[
 					var date = new Date(this.view.currentYear, this.view.currentMonth, 1, 0, 0, 0, 0);
 					var rows = document.getAnonymousElementByAttribute(this.selection ,"anonid", "datepicker-rows");
-					var days = rows.getElementsByTagName("datepicker-day");
+					var days = rows.getElementsByTagNameNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "datepicker-day");
 					for(var i=0; i<days.length; i++) days[i].setAttribute("value", "");
 					var sem = 0, j =0, d = 0;
 					var month = date.getMonth();
@@ -102,7 +102,7 @@
 				var j;
 				var rows = document.getAnonymousElementByAttribute(this ,"anonid", "datepicker-rows");
 				var title = rows.firstChild;
-				var labels = title.getElementsByTagName("label");
+				var labels = title.getElementsByTagNameNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "label");
 				for(var i=0; i<7; i++) {
 					j = today.toLocaleString().split(" ")[0];
 					labels[today.getDay()].setAttribute("value", j.substring(0, 1).toUpperCase()+j.substring(1, 2)); 
@@ -184,7 +184,7 @@
 	<binding id="datepicker-view">
 		<content orient="vertical" today="" currentmonth="" currentyear="" ismonth="false" isyear="false">
 			<xul:toolbox>
-				<xul:toolbar anonid="datepicker-month-toolbar" grippyhidden="true">
+				<xul:toolbar anonid="datepicker-month-toolbar">
 					<xul:datepicker-button class="previous-month" oncommand="this.parentNode.parentNode.parentNode.currentMonth--"/>
 					<xul:datepicker-button class="today" oncommand="this.parentNode.parentNode.parentNode.setDate(new Date())"/>
 					<xul:toolbaritem orient="vertical">
@@ -222,7 +222,7 @@
 				// mise a jour des label des mois
 				var m = "";
 				var tlbritem = document.getAnonymousElementByAttribute(this ,"anonid", "datepicker-month-toolbar");
-				var months = tlbritem.getElementsByTagName("datepicker-month");
+				var months = tlbritem.getElementsByTagNameNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "datepicker-month");
 				var idx = 1;
 				today.setDate(15);
 				var fields = today.toLocaleString().split(" ");
