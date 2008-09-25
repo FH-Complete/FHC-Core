@@ -128,7 +128,8 @@ $qry="SELECT DISTINCT ON (vw_betriebsmittelperson.person_id, nummer) nachname as
 		 LEFT OUTER JOIN (public.tbl_student JOIN public.tbl_studiengang USING (studiengang_kz)) ON (uid=student_uid)
 		 LEFT OUTER JOIN public.tbl_mitarbeiter ON (uid=mitarbeiter_uid)
 	WHERE betriebsmitteltyp='Zutrittskarte' AND benutzer_aktiv AND retouram IS NULL 
-	AND NOT(trim(upper(nachname))='OSOBSKY' AND trim(upper(vorname))='MICHAEL')
+	AND NOT(trim(upper(nachname))='OSOBSKY' AND trim(upper(vorname))='MICHAEL') 
+	AND NOT(trim(upper(nachname))='PARK' AND trim(upper(vorname))='DAH-WE') 
 	ORDER  BY vw_betriebsmittelperson.person_id,nummer,personalnummer";
 //abhanden gekommene karten???
 
