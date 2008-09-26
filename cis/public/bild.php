@@ -21,7 +21,7 @@
  */
 // Holt den Hexcode eines Bildes aus der DB wandelt es in Zeichen
 // um und gibt das ein Bild zurueck.
-// Aufruf mit <img src='bild.php?src=frage&frage_id=1
+// Aufruf mit <img src='bild.php?src=person&person_id=1>
 require_once('../config.inc.php');
 
 //Hexcode in String umwandeln
@@ -37,27 +37,45 @@ function hexstr($hex)
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim oeffnen der Datenbankverbindung');
 
+//default bild (ein weisser pixel)
+$cTmpHEX='ffd8ffe000104a46494600010101004800480000ffe100164578696600004d4d002a00000008000000000000fffe0017437265617465642077697468205468652047494d50ffdb0043000503040404030504040405050506070c08070707070f0b0b090c110f1212110f111113161c1713141a1511111821181a1d1d1f1f1f13172224221e241c1e1f1effdb0043010505050706070e08080e1e1411141e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1effc00011080001000103012200021101031101ffc4001500010100000000000000000000000000000008ffc40014100100000000000000000000000000000000ffc40014010100000000000000000000000000000000ffc40014110100000000000000000000000000000000ffda000c03010002110311003f00b2c007ffd9';
 //Hex Dump aus der DB holen
 $qry = '';
 if(isset($_GET['src']) && $_GET['src']=='person' && isset($_GET['person_id']))
 {
-	$qry = "SELECT foto FROM public.tbl_person WHERE person_id='".addslashes($_GET['person_id'])."'";
+	//$qry = "SELECT foto FROM public.tbl_person WHERE person_id='".addslashes($_GET['person_id'])."'";
+	$qry = "SELECT inhalt as foto FROM public.tbl_akte WHERE person_id='".addslashes($_GET['person_id'])."' AND dokument_kurzbz='Lichtbil'";
 }
-else 
-	echo 'Unkown type';
+else
+{
+	exit;
+}
 
 if($qry!='')
 {
-	//Header fuer Bild schicken
-	header("Content-type: image/gif");
-	$result = pg_query($conn, $qry);
-	//HEX Werte in Zeichen umwandeln und ausgeben
-	if($row = pg_fetch_object($result))
+	if($result = pg_query($conn, $qry))
 	{
-		if($row->foto=='')
-			echo hexstr('ffd8ffe000104a46494600010101004800480000ffe100164578696600004d4d002a00000008000000000000fffe0017437265617465642077697468205468652047494d50ffdb0043000503040404030504040405050506070c08070707070f0b0b090c110f1212110f111113161c1713141a1511111821181a1d1d1f1f1f13172224221e241c1e1f1effdb0043010505050706070e08080e1e1411141e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1effc00011080001000103012200021101031101ffc4001500010100000000000000000000000000000008ffc40014100100000000000000000000000000000000ffc40014010100000000000000000000000000000000ffc40014110100000000000000000000000000000000ffda000c03010002110311003f00b2c007ffd9');
-		else
-			echo hexstr($row->foto);
+		if($row = pg_fetch_object($result))
+		{
+			if($row->foto!='')
+				$cTmpHEX=$row->foto;
+		}
 	}
+}
+
+ob_clean();
+header("Content-type: image/jpeg");
+//die bilder werden, sofern es funktioniert, in jpg umgewandelt da es sonst zu fehlern beim erstellen
+//von pdfs kommen kann.
+$im = @imagecreatefromstring (hexstr($cTmpHEX));
+if($im!==false)
+{
+	exit(imagejpeg($im));
+}
+else
+{
+	//bei manchen Bildern funktioniert die konvertierung nicht
+	//diese werden dann einfach so angezeigt.
+	echo hexstr($cTmpHEX);
 }
 ?>
