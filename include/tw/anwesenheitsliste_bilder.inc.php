@@ -203,12 +203,13 @@ $pdf->SetFont('Arial','B',8);
 $pdf->MultiCell(520,$lineheight,'Fachhochschulstudiengang ('.strtoupper($stgobj->typ).') '.$stgobj->bezeichnung,0,'L',0);
 
 //FHStg
+/*
 $maxY=$pdf->GetY();
 $maxX=30;
 $pdf->SetXY($maxX,$maxY);
 $pdf->SetFont('Arial','',8);
 $pdf->MultiCell(520,$lineheight,'Fehlt ein Student länger als 2 Wochen, bitte um einen deutlichen Vermerk auf der Anwesenheitsliste. Die Anwesenheitsliste bitte am Ende des Monats im Sekretariat abgeben! Bitte achten Sie darauf, dass Sie nur VOLLSTÄNDIG AUSGEFÜLLTE LISTEN abgeben!',0,'L',0);
-
+*/
 
 $pdf->Output('anwesenheitsliste.pdf','I');
 ?>
