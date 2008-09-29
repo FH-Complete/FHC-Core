@@ -415,6 +415,83 @@
   		</tr>
 
   		<!--QM-->
+  		<!--QM-->
+
+  		<tr> 
+			<td class="tdwrap"><a href="private/info/qm/info.html" target="content" class="MenuItem" onClick="js_toggle_container('QM');"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Qualit&auml;tsmanagement</a>
+				<!--QM Language Deutsch -->				
+				<tr>
+        		<td class="tdwrap">
+		  		<table class="tabcontent" id="QM" style="display: none">
+						
+				<tr>
+  					<td class="tdwidth10" nowrap>&nbsp;</td>
+				    <td class="tdwrap"><a href="private/info/qm/info.html" target="content" class="MenuItem" onClick="return(js_toggle_container('QM_DE'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Deutsch</a>
+					<table class="tabcontent" id="QM_DE" style="display: none">
+				  		<tr>
+				  			<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a target="_blank" class="Item" href="private/info/qm/Qualitätsmanagementhandbuch_V3_Sept. 08.pdf"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;QM-Handbuch</a></td>
+			  			</tr>
+						<tr>
+				  			<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="private/info/qm/organigramm.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Organigramm</a></td>
+			  			</tr>
+						<tr>
+			  				<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="private/info/qm/prozesse/prozessmodell.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Prozesse</a></td>
+				  		</tr>
+						<tr>
+				  			<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="private/info/qm/dokumente/dokumente.php" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Dokumente</a></td>
+			  			</tr>
+				  		<tr>
+				  			<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a target="_blank" class="Item" href="private/info/qm/vorlagen/Ground_Rules.pdf"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Ground Rules</a></td>
+			  			</tr>
+			  			<tr>
+				  			<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="private/info/qm/dokumente/beschluesse_regelungen.php?lang=" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Beschl&uuml;sse und Regelungen </a></td>
+				  		</tr>
+					</table>
+				</td>
+			</tr>
+			<!--QM Language English -->				
+			<tr>
+  					<td class="tdwidth10" nowrap>&nbsp;</td>
+				    <td class="tdwrap"><a href="private/info/qm/info.html" target="content"  class="MenuItem" onClick="return(js_toggle_container('QM_EN'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;English</a>
+					<table class="tabcontent" id="QM_EN" style="display:none">
+				  		<tr>
+				  			<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a target="_blank" class="Item" href="private/info/qm/Quality management Handbook.pdf" ><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;QM-Handbook</a></td>
+			  			</tr>
+						<tr>
+				  			<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="private/info/qm/organigramm_en.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Organigram</a></td>
+			  			</tr>
+						<tr>
+			  				<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="private/info/qm/prozesse_en/prozessmodell.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Processes</a></td>
+				  		</tr>
+						<tr>
+				  			<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="private/info/qm/dokumente/dokumente.php?lang=en" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Documents</a></td>
+			  			</tr>
+				  		<tr>
+				  			<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a target="_blank" class="Item" href="private/info/qm/vorlagen_en/Ground Rules.pdf"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Ground Rules</a></td>
+			  			</tr>
+			  			<tr>
+				  			<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="private/info/qm/dokumente/beschluesse_regelungen.php?lang=en" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Resolutions and Regulations</a></td>
+				  		</tr>
+				</table>
+				</td>
+			</tr>
+			</table>
+		  	</td>
+  		</tr>
+		
+		<!-- QM OLD 
   		<tr>
 
 			<td class="tdwrap">
@@ -444,7 +521,10 @@
 				</table>
 			</td>
 		</tr>
-
+		-->
+		
+		
+		
 		<!-- Hauptmenue Rektor -->
 		<tr>
           <td class="tdwrap"><a href="public/rektorat.html" class="MenuItem" target="content" onClick="js_toggle_container('Infos');"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Rektorat</a></td>
