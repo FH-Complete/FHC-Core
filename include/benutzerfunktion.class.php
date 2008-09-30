@@ -26,15 +26,15 @@
 
 class benutzerfunktion
 {
-	var $conn;   			// @var resource DB-Handle
-	var $new;     			// @var boolean
+	var $conn;   		// @var resource DB-Handle
+	var $new;     		// @var boolean
 	var $errormsg; 		// @var string
 	var $result = array(); 	// @var benutzerfunktion Objekt
 
 	//Tabellenspalten
 	var $benutzerfunktion_id;	// @var serial
-	var $fachbereich_kurzbz;		// @var integer
-	var $uid;			// @var varchar(16)
+	var $fachbereich_kurzbz;	// @var integer
+	var $uid;				// @var varchar(16)
 	var $studiengang_kz;	// @var integer
 	var $funktion_kurzbz;	// @var varchar(16)
 	var $updateamum;		// @var timestamp
@@ -42,13 +42,14 @@ class benutzerfunktion
 	var $insertamum;		// @var timestamp
 	var $insertvon=0;		// @var string
 	var $ext_id;			// @var bigint
+	var $semester;			// @var smallint
 
 
-	/**
-	 * Konstruktor
-	 * @param $conn Connection zur DB
-	 *        $benutzerfunktion_id ID der zu ladenden Funktion
-	 */
+	// **********************************************************
+	// * Konstruktor
+	// * @param $conn Connection zur DB
+	// *        $benutzerfunktion_id ID der zu ladenden Funktion
+	// **********************************************************
 	function benutzerfunktion($conn, $benutzerfunktion_id=null)
 	{
 		$this->conn = $conn;
@@ -56,10 +57,10 @@ class benutzerfunktion
 			$this->load($benutzerfunktion_id);
 	}
 
-	/**
-	 * Laedt alle verfuegbaren Benutzerfunktionen
-	 * @return true wenn ok, false im Fehlerfall
-	 */
+	// *********************************************
+	// * Laedt alle verfuegbaren Benutzerfunktionen
+	// * @return true wenn ok, false im Fehlerfall
+	// *********************************************
 	function getAll()
 	{
 		$qry = 'SELECT * FROM public.tbl_benutzerfunktion ORDER BY benutzerfunktion_id;';
@@ -74,15 +75,16 @@ class benutzerfunktion
 		{
 			$pfunktion_obj = new benutzerfunktion($this->conn);
 
-			$pfunktion_obj->benutzerfunktion_id 	= $row->benutzerfunktion_id;
-			$pfunktion_obj->fachbereich_kurzbz 		= $row->fachbereich_kurzbz;
-			$pfunktion_obj->uid 				= $row->uid;
-			$pfunktion_obj->studiengang_kz		= $row->studiengang_kz;
-			$pfunktion_obj->funktion_kurzbz		= $row->funtion_kurzbz;
-			$pfunktion_obj->insertamum		= $row->insertamum;
-			$pfunktion_obj->insertvon			= $row->insertvon;
-			$pfunktion_obj->updateamum		= $row->updateamum;
-			$pfunktion_obj->updatevon			= $row->updatevon;
+			$pfunktion_obj->benutzerfunktion_id = $row->benutzerfunktion_id;
+			$pfunktion_obj->fachbereich_kurzbz = $row->fachbereich_kurzbz;
+			$pfunktion_obj->uid = $row->uid;
+			$pfunktion_obj->studiengang_kz = $row->studiengang_kz;
+			$pfunktion_obj->funktion_kurzbz = $row->funtion_kurzbz;
+			$pfunktion_obj->insertamum = $row->insertamum;
+			$pfunktion_obj->insertvon = $row->insertvon;
+			$pfunktion_obj->updateamum = $row->updateamum;
+			$pfunktion_obj->updatevon = $row->updatevon;
+			$pfunktion_obj->semester = $row->semester;
 
 			$this->result[] = $pfunktion_obj;
 		}
@@ -106,7 +108,7 @@ class benutzerfunktion
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden der Bentuzerfunktionen';
+			$this->errormsg = 'Fehler beim Laden der Bentuzerfunktionen';
 			return false;
 		}
 	}
@@ -117,7 +119,7 @@ class benutzerfunktion
 	// * @return false wenn nicht vorhanden oder fehler
 	// *         sonst true
 	// *********************************
-	function getBentuzerFunktion($uid, $funktion_kurzbz, $studiengang_kz)
+	function getBenutzerFunktion($uid, $funktion_kurzbz, $studiengang_kz)
 	{
 		$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE uid='".addslashes($uid)."' AND funktion_kurzbz='".addslashes($funktion_kurzbz)."' AND studiengang_kz='".addslashes($studiengang_kz)."'";
 
@@ -125,15 +127,16 @@ class benutzerfunktion
 		{
 			if($row = pg_fetch_object($result))
 			{
-				$this->benutzerfunktion_id	= $row->benutzerfunktion_id;
-				$this->fachbereich_kurzbz	= $row->fachbereich_kurzbz;
-				$this->uid			= $row->uid;
-				$this->studiengang_kz	= $row->studiengang_kz;
-				$this->funktion_kurzbz	= $row->funktion_kurzbz;
-				$this->insertamum		= $row->insertamum;
-				$this->insertvon		= $row->insertvon;
-				$this->updateamum		= $row->updateamum;
-				$this->updatevon		= $row->updatevon;
+				$this->benutzerfunktion_id = $row->benutzerfunktion_id;
+				$this->fachbereich_kurzbz = $row->fachbereich_kurzbz;
+				$this->uid = $row->uid;
+				$this->studiengang_kz = $row->studiengang_kz;
+				$this->funktion_kurzbz = $row->funktion_kurzbz;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->semester = $row->semester;
 				return true;
 			}
 			else
@@ -144,16 +147,62 @@ class benutzerfunktion
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden der Bentuzerfunktionen';
+			$this->errormsg = 'Fehler beim Laden der Bentuzerfunktionen';
+			return false;
+		}
+	}
+	
+	// *********************************
+	// * Laedt mehrere BenutzerFunktionen
+	// * @param funktion_kurzbz, studiengang_kz, semester
+	// * @return false wenn nicht vorhanden oder fehler
+	// *         sonst true
+	// *********************************
+	function getBenutzerFunktionen($funktion_kurzbz, $studiengang_kz='', $semester='')
+	{
+		$qry = "SELECT * FROM public.tbl_benutzerfunktion 
+				WHERE funktion_kurzbz='".addslashes($funktion_kurzbz)."'";
+
+		if($studiengang_kz!='')
+			$qry.=" AND studiengang_kz='".addslashes($studiengang_kz)."'";
+		if($semester!='')
+			$qry.=" AND semester='".addslashes($semester)."'";
+
+		$qry.=" ORDER BY funktion_kurzbz, studiengang_kz, semester";
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				$obj = new benutzerfunktion($this->conn,  null, null);
+				
+				$obj->benutzerfunktion_id = $row->benutzerfunktion_id;
+				$obj->fachbereich_kurzbz = $row->fachbereich_kurzbz;
+				$obj->uid = $row->uid;
+				$obj->studiengang_kz = $row->studiengang_kz;
+				$obj->funktion_kurzbz = $row->funktion_kurzbz;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->semester = $row->semester;
+				
+				$this->result[] = $obj;
+				
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Bentuzerfunktionen';
 			return false;
 		}
 	}
 
-	/**
-	 * Laedt eine Benutzerfunktion
-	 * @param $bnutzerfunktion_id ID der zu ladenden Funktion
-	 * @return true wenn ok, false im Fehlerfall
-	 */
+	// *********************************************************
+	// * Laedt eine Benutzerfunktion
+	// * @param $bnutzerfunktion_id ID der zu ladenden Funktion
+	// * @return true wenn ok, false im Fehlerfall
+	// *********************************************************
 	function load($benutzerfunktion_id)
 	{
 		if($benutzerfunktion_id == '')
@@ -172,15 +221,16 @@ class benutzerfunktion
 
 		if($row=pg_fetch_object($res))
 		{
-			$this->benutzerfunktion_id	= $row->benutzerfunktion_id;
-			$this->fachbereich_kurzbz	= $row->fachbereich_kurzbz;
-			$this->uid			= $row->uid;
-			$this->studiengang_kz	= $row->studiengang_kz;
-			$this->funktion_kurzbz	= $row->funktion_kurzbz;
-			$this->insertamum		= $row->insertamum;
-			$this->insertvon		= $row->insertvon;
-			$this->updateamum		= $row->updateamum;
-			$this->updatevon		= $row->updatevon;
+			$this->benutzerfunktion_id = $row->benutzerfunktion_id;
+			$this->fachbereich_kurzbz = $row->fachbereich_kurzbz;
+			$this->uid = $row->uid;
+			$this->studiengang_kz = $row->studiengang_kz;
+			$this->funktion_kurzbz = $row->funktion_kurzbz;
+			$this->insertamum = $row->insertamum;
+			$this->insertvon = $row->insertvon;
+			$this->updateamum = $row->updateamum;
+			$this->updatevon = $row->updatevon;
+			$this->semester = $row->semester;
 		}
 		else
 		{
@@ -191,11 +241,11 @@ class benutzerfunktion
 		return true;
 	}
 
-	/**
-	 * Loescht einen Datensatz
-	 * @param $fbenutzerfunktion_id id des Datensatzes der geloescht werden soll
-	 * @return true wenn ok, false im Fehlerfall
-	 */
+	// ****************************************************************************
+	// * Loescht einen Datensatz
+	// * @param $fbenutzerfunktion_id id des Datensatzes der geloescht werden soll
+	// * @return true wenn ok, false im Fehlerfall
+	// ****************************************************************************
 	function delete($benutzerfunktion_id)
 	{
 		$qry = "DELETE FROM public.tbl_benutzerfunktion WHERE benutzerfunktion_id='$benutzerfunktion_id'";
@@ -207,19 +257,20 @@ class benutzerfunktion
 		else
 			return true;
 	}
+	
+	// *******************************************
+	// * Prueft die Gueltigkeit der Variablen
+	// * @return true wenn ok, false im Fehlerfall
+	// *******************************************
 	function addslashes($var)
 	{
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
-	/**
-	 * Speichert den aktuellen Datensatz
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	/**
-	 * Prueft die Gueltigkeit der Variablen
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-
+	
+	// *******************************************
+	// * Speichert den aktuellen Datensatz
+	// * @return true wenn ok, false im Fehlerfall
+	// *******************************************
 	function save($new=null)
 	{
 		//Gueltigkeit der Variablen pruefen
@@ -247,7 +298,7 @@ class benutzerfunktion
 				}
 			}
 			$qry = 'BEGIN;INSERT INTO public.tbl_benutzerfunktion (fachbereich_kurzbz, uid, studiengang_kz, funktion_kurzbz, insertamum, insertvon,
-				updateamum, updatevon) VALUES ('.
+				updateamum, updatevon, semester) VALUES ('.
 				$this->addslashes($this->fachbereich_kurzbz).', '.
 				$this->addslashes($this->uid).', '.
 				$this->addslashes($this->studiengang_kz).', '.
@@ -255,7 +306,8 @@ class benutzerfunktion
 				$this->addslashes($this->insertamum).', '.
 				$this->addslashes($this->insertvon).', '.
 				$this->addslashes($this->updateamum).', '.
-				$this->addslashes($this->updatevon).'); ';
+				$this->addslashes($this->updatevon).', '.
+				$this->addslashes($this->semester).'); ';
 		}
 		else
 		{
@@ -277,7 +329,8 @@ class benutzerfunktion
 				'insertamum='.$this->addslashes($this->insertamum).', '.
 				'insertvon='.$this->addslashes($this->insertvon).', '.
 				'updateamum='.$this->addslashes($this->updateamum).', '.
-				'updatevon='.$this->addslashes($this->updatevon).'  '.
+				'updatevon='.$this->addslashes($this->updatevon).',  '.
+				'semester='.$this->addslashes($this->semester).'  '.
 				'WHERE benutzerfunktion_id = '.$this->addslashes($this->benutzerfunktion_id).';';
 		}
 

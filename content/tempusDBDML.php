@@ -141,7 +141,7 @@ if(!$error)
 			{
 				$obj = new benutzerfunktion($conn);
 				//Benutzerfunktion suchen
-				if($obj->getBentuzerFunktion($_POST['uid'], 'lkt', $_POST['studiengang_kz']))
+				if($obj->getBenutzerFunktion($_POST['uid'], 'lkt', $_POST['studiengang_kz']))
 				{
 					//Benutzerfunktion loeschen
 					if($obj->delete($obj->benutzerfunktion_id))

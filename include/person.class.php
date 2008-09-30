@@ -59,6 +59,7 @@ class person
 	var $staatsbuergerschaft;	// varchar(3)
 	var $geburtsnation;		// varchar(3);
 	var $ext_id;            		// bigint
+	var $kurzbeschreibung; 	// text
 
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine Person
@@ -100,7 +101,7 @@ class person
 			$qry = "SELECT person_id, sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen,
 				gebdatum, gebort, gebzeit, foto, anmerkung, homepage, svnr, ersatzkennzeichen,
 				familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon, ext_id,
-				geschlecht, staatsbuergerschaft, geburtsnation
+				geschlecht, staatsbuergerschaft, geburtsnation, kurzbeschreibung
 				FROM public.tbl_person WHERE person_id='$person_id'";
 
 			if(!$result=pg_query($this->conn,$qry))
@@ -138,6 +139,7 @@ class person
 				$this->geschlecht = $row->geschlecht;
 				$this->staatsbuergerschaft = $row->staatsbuergerschaft;
 				$this->geburtsnation = $row->geburtsnation;
+				$this->kurzbeschreibung = $row->kurzbeschreibung;
 			}
 			else
 			{
@@ -381,7 +383,7 @@ class person
 			$qry = 'INSERT INTO public.tbl_person (sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen,
 			                    gebdatum, gebort, gebzeit, foto, anmerkung, homepage, svnr, ersatzkennzeichen,
 			                    familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon,
-			                    geschlecht, geburtsnation, staatsbuergerschaft, ext_id)
+			                    geschlecht, geburtsnation, staatsbuergerschaft, ext_id, kurzbeschreibung)
 			        VALUES('.$this->addslashes($this->sprache).','.
 					$this->addslashes($this->anrede).','.
 					$this->addslashes($this->titelpost).','.
@@ -407,7 +409,8 @@ class person
 				        $this->addslashes($this->geschlecht).','.
 				        $this->addslashes($this->geburtsnation).','.
 				        $this->addslashes($this->staatsbuergerschaft).','.
-				        $this->addslashes($this->ext_id).');';
+				        $this->addslashes($this->ext_id).','.
+				        $this->addslashes($this->kurzbeschreibung).');';
 		}
 		else
 		{
@@ -444,7 +447,8 @@ class person
 			       ' geschlecht='.$this->addslashes($this->geschlecht).','.
 			       ' geburtsnation='.$this->addslashes($this->geburtsnation).','.
 			       ' staatsbuergerschaft='.$this->addslashes($this->staatsbuergerschaft).','.
-			       ' ext_id='.$this->addslashes($this->ext_id).
+			       ' ext_id='.$this->addslashes($this->ext_id).','.
+			       ' kurzbeschreibung='.$this->addslashes($this->kurzbeschreibung).
 			       ' WHERE person_id='.$this->person_id.';';
 		}
 
@@ -526,6 +530,7 @@ class person
 				$l->insertamum = $row->insertamum;
 				$l->insertvon = $row->insertvon;
 				$l->ext_id = $row->ext_id;
+				$l->kurzbeschreibung = $row->kurzbeschreibung;
 				$this->personen[]=$l;
 			}
 		}
