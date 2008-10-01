@@ -33,6 +33,7 @@ require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/nation.class.php');
 require_once('../../include/ort.class.php');
+require_once('../../include/fckeditor/fckeditor.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
 	die("Fehler beim Connecten zur Datenbank");
@@ -43,6 +44,28 @@ echo '
 <title>Details</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+<script language="javascript">
+// ****
+// * Liefert einen Timestamp in Sekunden
+// * zum anhaengen an eine URL um Caching zu verhindern
+// ****
+function gettimestamp()
+{
+	var now = new Date();
+	var ret = now.getHours()*60*60*60;
+	ret = ret + now.getMinutes()*60*60;
+	ret = ret + now.getSeconds()*60;
+	ret = ret + now.getMilliseconds();
+	return ret;
+}
+
+function RefreshImage()
+{
+	path=document.getElementById("personimage").src;
+	document.getElementById("personimage").src="";
+	document.getElementById("personimage").src=path+"&"+gettimestamp();
+}
+</script>
 </head>
 
 <body class="background_main">
@@ -92,7 +115,8 @@ $ort_kurzbz = (isset($_POST['ort_kurzbz'])?$_POST['ort_kurzbz']:'');
 $standort_kurzbz = (isset($_POST['standort_kurzbz'])?$_POST['standort_kurzbz']:'');
 $anmerkung = (isset($_POST['anmerkung'])?$_POST['anmerkung']:'');
 $bismelden = (isset($_POST['bismelden'])?$_POST['bismelden']:'');
-	
+$kurzbeschreibung = (isset($_POST['kurzbeschreibung'])?$_POST['kurzbeschreibung']:'');
+
 if($uid!='')
 {
 	$qry = "SELECT person_id, true as mitarbeiter FROM campus.vw_mitarbeiter WHERE uid='".addslashes($uid)."'
@@ -140,6 +164,7 @@ if(isset($_POST['saveperson']))
 	$person->homepage = $homepage;
 	$person->updateamum = date('Y-m-d H:i:s');
 	$person->updatevon = $user;
+	$person->kurzbeschreibung = $kurzbeschreibung;
 	$person->new = false;
 	
 	if($person->save())
@@ -264,6 +289,7 @@ if(!$error_person_save)
 	$anzahlderkinder = $person->anzahlkinder;
 	$anmerkungen = $person->anmerkungen;
 	$homepage = $person->homepage;
+	$kurzbeschreibung = $person->kurzbeschreibung;
 }
 
 // PERSON
@@ -357,6 +383,8 @@ if($result_sprache = pg_query($conn, $qry))
 echo "
 	</SELECT>
 	</td>
+	<td valign='top'>Homepage</td>
+	<td valign='top'><input type='text' name='homepage' value='".htmlentities($homepage)."'/></td>
 </tr>
 <tr>
 	<td>Geschlecht</td>
@@ -380,9 +408,33 @@ echo "
 </tr>
 <tr>
 	<td valign='top'>Anmerkungen</td>
-	<td><textarea name='anmerkungen'>".htmlentities($anmerkungen)."</textarea></td>
-	<td valign='top'>Homepage</td>
-	<td valign='top'><input type='text' name='homepage' value='".htmlentities($homepage)."'/></td>
+	<td valign='top'><textarea name='anmerkungen'>".htmlentities($anmerkungen)."</textarea></td>
+	<td></td>
+	<td><img id='personimage' src='../../content/bild.php?src=person&person_id=$person_id' height='100'></td>
+	<td>
+		<a href='#foo' onclick='window.open(\"../../content/bildupload.php?person_id=$person_id\",\"BildUpload\", \"height=50,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\"); return false;'>Bild hochladen</a>
+		<br><br>
+		<a href='#foo' onclick='RefreshImage(); return false;'>Bild aktualisieren</a>
+	</td>
+</tr>
+<tr>
+	<td colspan=6>
+	";
+$oFCKeditor = new FCKeditor('kurzbeschreibung') ;
+$sBasePath = '../../include/fckeditor/';
+
+$oFCKeditor->BasePath	= $sBasePath ;
+$oFCKeditor->Value		= $kurzbeschreibung;
+$oFCKeditor->Create() ;
+
+echo "
+	</td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+	<td></td>
 	<td></td>
 	<td valign='bottom' align='right'><input type='submit' name='saveperson' value='Speichern'></td>
 </tr>

@@ -113,11 +113,11 @@
 					{
 						if($cmbChoice == "all")
 						{
-							$sql_query = "SELECT uid, titelpre, titelpost, nachname, vorname, vornamen, standort_kurzbz, telefonklappe as teltw,(uid || '@".DOMAIN."') AS emailtw, foto,-1 AS studiengang_kz, -1 AS semester, ort_kurzbz as ort FROM campus.vw_mitarbeiter UNION SELECT DISTINCT uid, titelpre, titelpost, nachname, vorname, vornamen,(''::varchar) AS standort_kurzbz, (''::varchar) AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, studiengang_kz, semester, ''::varchar as ort FROM campus.vw_student WHERE semester<10 ORDER BY nachname, vorname";
+							$sql_query = "SELECT uid, titelpre, titelpost, nachname, vorname, vornamen, standort_kurzbz, telefonklappe as teltw,(uid || '@".DOMAIN."') AS emailtw, foto,-1 AS studiengang_kz, -1 AS semester, ort_kurzbz as ort, alias FROM campus.vw_mitarbeiter UNION SELECT DISTINCT uid, titelpre, titelpost, nachname, vorname, vornamen,(''::varchar) AS standort_kurzbz, (''::varchar) AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, studiengang_kz, vw_student.semester, ''::varchar as ort, alias FROM campus.vw_student WHERE vw_student.semester<10 ORDER BY nachname, vorname";
 						}
 						else
 						{
-							$sql_query = "SELECT DISTINCT uid, titelpre, titelpost, nachname, vorname, vornamen, standort_kurzbz, telefonklappe AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, -1 AS studiengang_kz, -1 AS semester, ort_kurzbz as ort FROM campus.vw_mitarbeiter JOIN public.tbl_benutzerfunktion using(uid) WHERE funktion_kurzbz='$cmbChoice' AND aktiv UNION SELECT DISTINCT uid, titelpre,titelpost, nachname, vorname, vornamen,(''::varchar) AS standort_kurzbz, (''::varchar) AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, vw_student.studiengang_kz, semester, ''::varchar as ort FROM campus.vw_student JOIN public.tbl_benutzerfunktion using(uid) WHERE semester<10 AND funktion_kurzbz='$cmbChoice' AND aktiv ORDER BY nachname, vorname";
+							$sql_query = "SELECT DISTINCT uid, titelpre, titelpost, nachname, vorname, vornamen, standort_kurzbz, telefonklappe AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, -1 AS studiengang_kz, -1 AS semester, ort_kurzbz as ort, alias FROM campus.vw_mitarbeiter JOIN public.tbl_benutzerfunktion using(uid) WHERE funktion_kurzbz='$cmbChoice' AND aktiv UNION SELECT DISTINCT uid, titelpre,titelpost, nachname, vorname, vornamen,(''::varchar) AS standort_kurzbz, (''::varchar) AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, vw_student.studiengang_kz, vw_student.semester, ''::varchar as ort, alias FROM campus.vw_student JOIN public.tbl_benutzerfunktion using(uid) WHERE vw_student.semester<10 AND funktion_kurzbz='$cmbChoice' AND aktiv ORDER BY nachname, vorname";
 						}
 					}
 					else
@@ -125,11 +125,11 @@
 						$txtSearchQuery = addslashes($txtSearchQuery);
 						if($cmbChoice == "all")
 						{
-							$sql_query = "SELECT DISTINCT uid, titelpre, titelpost, nachname, vorname, vornamen, standort_kurzbz, telefonklappe AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, -1 AS studiengang_kz, -1 AS semester, ort_kurzbz as ort FROM campus.vw_mitarbeiter WHERE  (LOWER(nachname) LIKE LOWER('%$txtSearchQuery%') OR uid LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(nachname || ' ' || vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname || ' ' || nachname) LIKE LOWER('%$txtSearchQuery%')) AND aktiv=TRUE UNION SELECT DISTINCT uid, titelpre, titelpost, nachname, vorname, vornamen,(''::varchar) AS standort_kurzbz, (''::varchar) AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, studiengang_kz, semester, ''::varchar as ort FROM campus.vw_student WHERE semester<10 AND (LOWER(nachname) LIKE LOWER('%$txtSearchQuery%') OR uid LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(nachname || ' ' || vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname || ' ' || nachname) LIKE LOWER('%$txtSearchQuery%')) ORDER BY nachname, vorname";
+							$sql_query = "SELECT DISTINCT uid, titelpre, titelpost, nachname, vorname, vornamen, standort_kurzbz, telefonklappe AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, -1 AS studiengang_kz, -1 AS semester, ort_kurzbz as ort, alias FROM campus.vw_mitarbeiter WHERE  (LOWER(nachname) LIKE LOWER('%$txtSearchQuery%') OR uid LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(nachname || ' ' || vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname || ' ' || nachname) LIKE LOWER('%$txtSearchQuery%')) AND aktiv=TRUE UNION SELECT DISTINCT uid, titelpre, titelpost, nachname, vorname, vornamen,(''::varchar) AS standort_kurzbz, (''::varchar) AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, studiengang_kz, semester, ''::varchar as ort, alias FROM campus.vw_student WHERE semester<10 AND (LOWER(nachname) LIKE LOWER('%$txtSearchQuery%') OR uid LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(nachname || ' ' || vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname || ' ' || nachname) LIKE LOWER('%$txtSearchQuery%')) ORDER BY nachname, vorname";
 						}
 						else
 						{
-							$sql_query = "SELECT DISTINCT uid, titelpre, titelpost, nachname, vorname, vornamen, standort_kurzbz, telefonklappe AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, -1 AS studiengang_kz, -1 AS semester, ort_kurzbz as ort FROM campus.vw_mitarbeiter JOIN public.tbl_benutzerfunktion USING(uid) WHERE ((LOWER(nachname) LIKE LOWER('%$txtSearchQuery%') OR uid LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(nachname || ' ' || vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname || ' ' || nachname) LIKE LOWER('%$txtSearchQuery%')) AND funktion_kurzbz='$cmbChoice') AND aktiv=TRUE UNION SELECT DISTINCT uid, titelpre, titelpost, nachname, vorname, vornamen,(''::varchar) AS standort_kurzbz, (''::varchar) AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, vw_student.studiengang_kz, semester, ''::varchar as ort FROM campus.vw_student JOIN public.tbl_benutzerfunktion USING(uid) WHERE semester <10 AND ((LOWER(nachname) LIKE LOWER('%$txtSearchQuery%') OR uid LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(nachname || ' ' || vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname || ' ' || nachname) LIKE LOWER('%$txtSearchQuery%')) AND funktion_kurzbz='$cmbChoice') AND aktiv=TRUE ORDER BY nachname, vorname";
+							$sql_query = "SELECT DISTINCT uid, titelpre, titelpost, nachname, vorname, vornamen, standort_kurzbz, telefonklappe AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, -1 AS studiengang_kz, -1 AS semester, ort_kurzbz as ort, alias FROM campus.vw_mitarbeiter JOIN public.tbl_benutzerfunktion USING(uid) WHERE ((LOWER(nachname) LIKE LOWER('%$txtSearchQuery%') OR uid LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(nachname || ' ' || vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname || ' ' || nachname) LIKE LOWER('%$txtSearchQuery%')) AND funktion_kurzbz='$cmbChoice') AND aktiv=TRUE UNION SELECT DISTINCT uid, titelpre, titelpost, nachname, vorname, vornamen,(''::varchar) AS standort_kurzbz, (''::varchar) AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, vw_student.studiengang_kz, vw_student.semester, ''::varchar as ort, alias FROM campus.vw_student JOIN public.tbl_benutzerfunktion USING(uid) WHERE vw_student.semester <10 AND ((LOWER(nachname) LIKE LOWER('%$txtSearchQuery%') OR uid LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(nachname || ' ' || vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname || ' ' || nachname) LIKE LOWER('%$txtSearchQuery%')) AND funktion_kurzbz='$cmbChoice') AND aktiv=TRUE ORDER BY nachname, vorname";
 						}
 					}
 
@@ -149,7 +149,8 @@
 								<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Raum</font></td>
 								<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Studiengang</font></td>
 								<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Semester</font></td>
-								<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Hauptverteiler</font></td>";
+								<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Hauptverteiler</font></td>
+								<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Alias</font></td>";
 
 
 						echo "</tr>
@@ -270,7 +271,11 @@
 							{
 								if($i % 2 == 0)
 								{
-									echo "	<td align=\"left\" class='tdwrap'>&nbsp;<a href=\"mailto:$row->emailtw\" class=\"Item\">$row->emailtw</a></td>";
+									echo "	<td align=\"left\" class='tdwrap'>&nbsp;";
+									echo "<a href=\"mailto:$row->emailtw\" class=\"Item\">$row->emailtw</a>";
+									//if($row->alias!='')
+									//	echo "<br>&nbsp;<a href=\"mailto:$row->alias@".DOMAIN."\" class=\"Item\">$row->alias@".DOMAIN."</a>";
+									echo "</td>";
 								}
 								else
 								{
@@ -392,7 +397,26 @@
 								}
 							}
 
-
+							if($row->alias!='')
+							{
+								if($i%2==0)
+									echo "<td class='tdwrap'>";
+								else 
+									echo '<td class="MarkLine">';
+									
+								echo "<a href='mailto:$row->alias@".DOMAIN."' class='Item'>$row->alias@".DOMAIN."</a></td>";
+							}
+							else
+							{
+								if($i % 2 == 0)
+								{
+									echo "	<td align=\"center\" class='tdwrap'>&nbsp;</td>";
+								}
+								else
+								{
+									echo "	<td align=\"center\" class=\"MarkLine\" class='tdwrap'>&nbsp;</td>";
+								}
+							}
 							echo "</tr>";
 						}
 

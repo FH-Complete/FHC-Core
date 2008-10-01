@@ -158,6 +158,7 @@ if($result_stg = pg_query($conn, $qry_stg))
 					studiengang_kz='$studiengang_kz' AND studiensemester_kurzbz='$semester_aktuell' AND
 					tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND tbl_lehreinheitmitarbeiter.semesterstunden is not null
 					AND tbl_lehreinheitmitarbeiter.stundensatz<>0 AND tbl_lehreinheitmitarbeiter.faktor<>0
+					AND EXISTS (SELECT lehreinheit_id FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=tbl_lehreinheit.lehreinheit_id)
 					ORDER BY nachname, vorname, tbl_mitarbeiter.mitarbeiter_uid";
 
 		if($result = pg_query($conn, $qry))
@@ -222,23 +223,27 @@ if($result_stg = pg_query($conn, $qry_stg))
 										tbl_lehreinheitmitarbeiter.semesterstunden is not null AND
 										tbl_lehreinheitmitarbeiter.stundensatz<>0 AND
 										tbl_lehreinheitmitarbeiter.faktor<>0 AND
+										EXISTS (SELECT lehreinheit_id FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=tbl_lehreinheit.lehreinheit_id) AND
 										tbl_lehreinheit.studiensemester_kurzbz='$semester_aktuell');";
 			
 			if($result = pg_query($conn, $qry))
 			{
 				while($row = pg_fetch_object($result))
 				{
-					$liste[$row->uid]['personalnummer'] = $row->personalnummer;
-					$liste[$row->uid]['titelpre'] = $row->titelpre;
-					$liste[$row->uid]['vorname'] = $row->vorname;
-					$liste[$row->uid]['nachname'] = $row->nachname;
-					$liste[$row->uid]['geaendert']=false;
-					$liste[$row->uid]['gesamtstunden'] = 0;
-					$liste[$row->uid]['gesamtkosten'] = 0;
-					$liste[$row->uid]['lvstunden'] = 0;
-					$liste[$row->uid]['lvkosten'] = 0;
-					$liste[$row->uid]['betreuergesamtstunden'] = 0;
-					$liste[$row->uid]['betreuergesamtkosten'] = 0;
+					if(!isset($liste[$row->uid]))
+					{
+						$liste[$row->uid]['personalnummer'] = $row->personalnummer;
+						$liste[$row->uid]['titelpre'] = $row->titelpre;
+						$liste[$row->uid]['vorname'] = $row->vorname;
+						$liste[$row->uid]['nachname'] = $row->nachname;
+						$liste[$row->uid]['geaendert']=false;
+						$liste[$row->uid]['gesamtstunden'] = 0;
+						$liste[$row->uid]['gesamtkosten'] = 0;
+						$liste[$row->uid]['lvstunden'] = 0;
+						$liste[$row->uid]['lvkosten'] = 0;
+						$liste[$row->uid]['betreuergesamtstunden'] = 0;
+						$liste[$row->uid]['betreuergesamtkosten'] = 0;
+					}
 				}
 			}
 			
