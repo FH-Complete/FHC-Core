@@ -42,6 +42,7 @@ class akte
 	var $insertamum;
 	var $insertvon;
 	var $uid;	
+	var $ext_id;
 	
 	// ***********************************************
 	// * Konstruktor
