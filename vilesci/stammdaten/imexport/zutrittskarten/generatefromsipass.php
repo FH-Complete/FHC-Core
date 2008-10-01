@@ -191,7 +191,7 @@ if($result = pg_query($conn, $qry))
 				}
 				if($row->personalnummer!='' && $row->personalnummer!= NULL)
 				{
-					if($sipass[$j]->acc_grp_name!="Verwaltung")
+					if($sipass[$j]->acc_grp_name!="Verwaltung" && substr($sipass[$j]->acc_grp_name,0,1)!='#')
 					{
 						$sipass[$j]->acc_grp_name="Verwaltung";
 						$sipass[$j]->update=' acc_grp_name';
@@ -200,7 +200,7 @@ if($result = pg_query($conn, $qry))
 				}
 				else
 				{
-					if($sipass[$j]->acc_grp_name!=trim($stg_kurzbz))
+					if($sipass[$j]->acc_grp_name!=trim($stg_kurzbz) &&  substr($sipass[$j]->acc_grp_name,0,1)!='#')
 					{
 						$sipass[$j]->acc_grp_name_old=$sipass[$j]->acc_grp_name;
 						$sipass[$j]->acc_grp_name=trim($stg_kurzbz);
