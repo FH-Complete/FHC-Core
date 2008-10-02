@@ -215,14 +215,27 @@ function studiensemesterChange(stsem, wert)
 	return true;
 }
 
-function variableChange(variable, id)
+function toggleIgnoreKollision()
+{
+	if(getvariable('ignore_kollision')=='true')
+		variableChange('ignore_kollision','menu-prefs-ignore_kollision', 'false');
+	else
+		variableChange('ignore_kollision','menu-prefs-ignore_kollision', 'true');
+}
+
+function variableChange(variable, id, wert)
 {
 	item = document.getElementById(id);
 	
-	if(item.getAttribute('checked')=='true')
-		checked='true';
+	if(typeof(wert)==='undefined')
+	{
+		if(item.getAttribute('checked')=='true')
+			checked='true';
+		else
+			checked='false';
+	}
 	else
-		checked='false';
+		checked=wert;
 	
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
@@ -249,9 +262,30 @@ function variableChange(variable, id)
 	}
 	else
 	{
+		if(variable=='ignore_kollision')
+			updateignorekollision();
 		//Statusbar setzen
    		document.getElementById("statusbarpanel-text").label = "Variable erfolgreich geaendert";
 	}
+}
+
+// Aktualisiert die IngnoreKollision Anzeige
+// sowohl in der Toolbar als auch im Menue
+function updateignorekollision()
+{
+	var panel = document.getElementById('statusbarpanel-ignore_kollision');
+	if(getvariable('ignore_kollision')=='true')
+	{
+		panel.label='Kollisionscheck AUS';
+		panel.style.backgroundColor='red';
+		document.getElementById('menu-prefs-ignore_kollision').setAttribute('checked','true');
+	}
+	else
+	{
+		panel.label='Kollisionscheck AN';
+		panel.style.backgroundColor='';
+		document.getElementById('menu-prefs-ignore_kollision').setAttribute('checked','false');
+	}		
 }
 
 function getvariable(variable)
