@@ -508,7 +508,7 @@ var boardObserver=
 				var grp=stplData.getAttribute("grp");
 				var pers_uid=stplData.getAttribute("pers_uid");
     			var ort=stplData.getAttribute("ort");
-				var einheit=stplData.getAttribute("einheit");
+				var einheit=stplData.getAttribute("gruppe");
 
     			var stunde=evt.target.getAttribute("stunde");
     			var new_datum=evt.target.getAttribute("datum");
@@ -521,7 +521,7 @@ var boardObserver=
     			var url="<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 				url+=dropdata.data+"&new_stunde="+stunde+"&new_datum="+new_datum;
 				url+="&type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid;
-				url+="&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&einheit="+einheit;
+				url+="&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+einheit;
 				if (evt.target.tagName=="label" || dropdata.flavour.contentType=="application/tempus-lehrveranstaltung")
 					url+="&new_ort="+new_ort;
 				else
@@ -531,7 +531,7 @@ var boardObserver=
 				// Mehrfachauswahl anhaengen
 				for (var i=0;i<lehrstunden.length;i++)
     				url+=lehrstunden[i].idList.replace(/&/g,"&x"+i);
-
+				//alert(url);
     			//var BoxTimeTableWeek=document.getElementById('boxTimeTableWeek');
 				//var ScrollX=BoxTimeTableWeek.contentWindow.scrollX;
 				//var ScrollY=BoxTimeTableWeek.contentWindow.scrollY;

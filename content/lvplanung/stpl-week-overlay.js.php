@@ -128,29 +128,34 @@ function onStplSearchRoom(event)
 	//alert ("clickCount="+event.clickCount+" button="+event.button);
 	if (event.button == 1)
 	{
-		var contentFrame=document.getElementById('iframeTimeTableWeek');
-		var daten=document.getElementById('TimeTableWeekData');
-		var datum=parseInt(daten.getAttribute("datum"));
-		var type=daten.getAttribute("stpl_type");
-		var	stg_kz=daten.getAttribute("stg_kz");
-		var sem=daten.getAttribute("sem");
-		var ver=daten.getAttribute("ver");
-		var grp=daten.getAttribute("grp");
-		var gruppe=daten.getAttribute("gruppe");
-		var ort=daten.getAttribute("ort");
-		var pers_uid=daten.getAttribute("pers_uid");
-		var aktion=event.target.getAttribute("aktion");
-		aktion+="_single_search";
-		var idList=event.target.getAttribute("idList");
-
-		var attributes="\n?type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid+"\n&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"\n&gruppe="+gruppe;
-		attributes+=idList+"&aktion="+aktion;
-		var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
-		url+=attributes;
-		//alert(url);
-		if (url)
-			location.href=url;
+		StplSearchRoom(event);
 	}
+}
+
+function StplSearchRoom(event)
+{
+	var contentFrame=document.getElementById('iframeTimeTableWeek');
+	var daten=document.getElementById('TimeTableWeekData');
+	var datum=parseInt(daten.getAttribute("datum"));
+	var type=daten.getAttribute("stpl_type");
+	var	stg_kz=daten.getAttribute("stg_kz");
+	var sem=daten.getAttribute("sem");
+	var ver=daten.getAttribute("ver");
+	var grp=daten.getAttribute("grp");
+	var gruppe=daten.getAttribute("gruppe");
+	var ort=daten.getAttribute("ort");
+	var pers_uid=daten.getAttribute("pers_uid");
+	var aktion=document.popupNode.getAttribute("aktion");
+	aktion+="_single_search";
+	var idList=document.popupNode.getAttribute("idList");
+	
+	var attributes="\n?type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid+"\n&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"\n&gruppe="+gruppe;
+	attributes+=idList+"&aktion="+aktion;
+	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
+	url+=attributes;
+	//alert(url);
+	if (url)
+		location.href=url;
 }
 
 function onStplDelete(aktion)

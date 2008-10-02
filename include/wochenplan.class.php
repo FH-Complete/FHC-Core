@@ -680,7 +680,7 @@ class wochenplan
 		// Kontext Menue
 		echo '<popupset>
   				<popup id="stplPopupMenue">
-					<menuitem label="Raumvorschlag" oncommand="alert(\'Mittlere Taste!\');" />
+					<menuitem label="Raumvorschlag" oncommand="StplSearchRoom(event);" />
     				<menuitem label="Entfernen" oncommand="onStplDelete(\'stpl_delete_single\');" />
   				</popup>
 			</popupset>';
@@ -924,7 +924,7 @@ class wochenplan
 
 						// Ausgabe
 						echo '<button id="buttonSTPL'.$count++.'"
-							tooltiptext="'.$titel.' - '.$anmerkung.' ('.$updatevonam.')"
+							tooltiptext="('.$updatevonam.') '.$titel.' - '.$anmerkung.'"
 							style="border-width:1px;'.((isset($farbe) && $farbe!='')?'background-color:#'.$farbe:'').';"
 							styleOrig="border-width:1px;'.((isset($farbe) && $farbe!='')?'background-color:#'.$farbe:'').'" ';
 						if ($berechtigung->isBerechtigt('lv-plan',$stg_kz,'uid') || $berechtigung->isBerechtigt('lv-plan',0,'uid') || $berechtigung->isBerechtigt('admin',0,'uid') || $berechtigung->isBerechtigt('admin',$stg_kz,'uid'))
