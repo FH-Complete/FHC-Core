@@ -127,9 +127,9 @@ $qry="SELECT DISTINCT ON (vw_betriebsmittelperson.person_id, nummer) nachname as
 	FROM public.vw_betriebsmittelperson
 		 LEFT OUTER JOIN (public.tbl_student JOIN public.tbl_studiengang USING (studiengang_kz)) ON (uid=student_uid)
 		 LEFT OUTER JOIN public.tbl_mitarbeiter ON (uid=mitarbeiter_uid)
-	WHERE betriebsmitteltyp='Zutrittskarte' AND benutzer_aktiv AND retouram IS NULL 
-	AND NOT(trim(upper(nachname))='OSOBSKY' AND trim(upper(vorname))='MICHAEL') 
-	AND NOT(trim(upper(nachname))='PARK' AND trim(upper(vorname))='DAH-WE') 
+	WHERE betriebsmitteltyp='Zutrittskarte' AND benutzer_aktiv AND retouram IS NULL
+	AND NOT(trim(upper(nachname))='OSOBSKY' AND trim(upper(vorname))='MICHAEL')
+	AND NOT(trim(upper(nachname))='PARK' AND trim(upper(vorname))='DAH-WE')
 	ORDER  BY vw_betriebsmittelperson.person_id,nummer,personalnummer";
 //abhanden gekommene karten???
 
@@ -195,12 +195,12 @@ if($result = pg_query($conn, $qry))
 					{
 						$sipass[$j]->acc_grp_name="Verwaltung";
 						$sipass[$j]->update=' acc_grp_name';
-					$upd=TRUE;
+						$upd=TRUE;
 					}
 				}
 				else
 				{
-					if($sipass[$j]->acc_grp_name!=trim($stg_kurzbz) &&  substr($sipass[$j]->acc_grp_name,0,1)!='#')
+					if($sipass[$j]->acc_grp_name!=trim($stg_kurzbz) && substr($sipass[$j]->acc_grp_name,0,1)!='#')
 					{
 						$sipass[$j]->acc_grp_name_old=$sipass[$j]->acc_grp_name;
 						$sipass[$j]->acc_grp_name=trim($stg_kurzbz);
