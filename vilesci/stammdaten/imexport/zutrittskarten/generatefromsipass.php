@@ -120,6 +120,7 @@ if($result = pg_query($conn, $qry))
 }
 
 //Osobsky Michael studiert BEE und MIE - wird daher nicht synchronisiert
+//Incoming Park Dah-We belegt LVs im Haus und in BEE - keine Synchronisation
 $qry="SELECT DISTINCT ON (vw_betriebsmittelperson.person_id, nummer) nachname as LastName, vorname as FirstName,nummer as CardNumber, matrikelnr, uid, kurzbzlang,tbl_studiengang.kurzbz,typ, personalnummer, lektor,
 		EXTRACT(DAY FROM vw_betriebsmittelperson.insertamum) AS tag,
 		EXTRACT(MONTH FROM vw_betriebsmittelperson.insertamum) AS monat,
