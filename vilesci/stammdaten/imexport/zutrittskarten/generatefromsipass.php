@@ -95,7 +95,7 @@ $qry="SELECT bmp.person_id as person2, bmp.nachname as nachname2,bmp.nummer as n
 		public.vw_betriebsmittelperson.person_id AS person1, public.vw_betriebsmittelperson.nachname as nachname1, public.vw_betriebsmittelperson.nummer as nummer1,
 		public.vw_betriebsmittelperson.vorname as vorname1, public.vw_betriebsmittelperson.ausgegebenam as ausgegebenam1, public.vw_betriebsmittelperson.insertamum AS insertamum1
 	 FROM public.vw_betriebsmittelperson bmp
-	 JOIN public.vw_betriebsmittelperson ON (bmp.nummer=public.vw_betriebsmittelperson.nummer)
+	 JOIN public.vw_betriebsmittelperson ON (intbmp.nummer::bigint=public.vw_betriebsmittelperson.nummer::bigint)
 	 WHERE (trim(bmp.nachname)!=trim(public.vw_betriebsmittelperson.nachname) OR (trim(bmp.vorname)!=trim(public.vw_betriebsmittelperson.vorname)))
 	 AND public.vw_betriebsmittelperson.betriebsmitteltyp='Zutrittskarte' AND bmp.betriebsmitteltyp='Zutrittskarte'
 	 AND public.vw_betriebsmittelperson.benutzer_aktiv AND public.vw_betriebsmittelperson.retouram IS NULL AND bmp.benutzer_aktiv AND bmp.retouram IS NULL
