@@ -134,14 +134,16 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 	          			 key       	="menu-prefs-stpltable-stundenplan:key"
 	         			 label     	="&menu-prefs-stpltable-stundenplan.label;"
 	         			 command   	="menu-prefs-stpltable-stundenplan:command"
-	           			 accesskey 	="&menu-prefs-stpltable-stundenplan.accesskey;"/>
+	           			 accesskey 	="&menu-prefs-stpltable-stundenplan.accesskey;"
+	           			 checked	="<?php echo ($db_stpl_table=='stundenplan'?'true':'false');?>" />
 	           		<menuitem
 						 id        	="menu-prefs-stpltable-stundenplandev"
 						 type		="radio"
 	          			 key       	="menu-prefs-stpltable-stundenplandev:key"
 						 label     	="&menu-prefs-stpltable-stundenplandev.label;"
 						 command   	="menu-prefs-stpltable-stundenplandev:command"
-	           			 accesskey 	="&menu-prefs-stpltable-stundenplandev.accesskey;"/>
+	           			 accesskey 	="&menu-prefs-stpltable-stundenplandev.accesskey;"
+	           			 checked	="<?php echo ($db_stpl_table=='stundenplandev'?'true':'false');?>" />
 	      		</menupopup>
 	      	</menu>
         <menuitem

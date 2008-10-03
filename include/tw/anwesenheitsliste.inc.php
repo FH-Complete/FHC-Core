@@ -240,25 +240,35 @@ $pdf->SetFont('Arial','',8);
 		$maxX +=40;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
+$stsem_obj = new studiensemester($conn);
+$stsem_obj->load($stsem);
+$stsemdatumvon = $stsem_obj->start;
+$stsemdatumbis = $stsem_obj->ende;
 
 $qry = "SELECT 
-			distinct vorname, nachname, matrikelnr, 
+			distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr, 
 			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
-			(SELECT rolle_kurzbz FROM public.tbl_prestudentrolle WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status 
+			(SELECT rolle_kurzbz FROM public.tbl_prestudentrolle WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
+			tbl_bisio.bisio_id, 
+			tbl_zeugnisnote.note 
 		FROM 
 			campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid) 
 			JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid) 
 			LEFT JOIN public.tbl_studentlehrverband USING(student_uid)
+			LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.student_uid=tbl_student.student_uid)
+			LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
 		WHERE 
-			lehrveranstaltung_id='".addslashes($lvid)."' AND 
+			vw_student_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lvid)."' AND 
+			(tbl_zeugnisnote.studiensemester_kurzbz='".addslashes($stsem)."' OR tbl_zeugnisnote.studiensemester_kurzbz is null) AND
+			((tbl_bisio.von<'".$stsemdatumbis."' AND (tbl_bisio.bis>'".$stsemdatumvon."' OR tbl_bisio.bis is null)) OR tbl_bisio.von is null) AND
 			vw_student_lehrveranstaltung.studiensemester_kurzbz='".addslashes($stsem)."' AND
 			tbl_studentlehrverband.studiensemester_kurzbz='".addslashes($stsem)."'";
 
 if($lehreinheit_id!='')
-	$qry.=" AND lehreinheit_id='".addslashes($lehreinheit_id)."'";
+	$qry.=" AND vw_student_lehrveranstaltung.lehreinheit_id='".addslashes($lehreinheit_id)."'";
 	
 $qry.=' ORDER BY nachname, vorname';
-
+//echo $qry;
 if($result = pg_query($conn, $qry))
 {
 	$i=0;
@@ -290,10 +300,17 @@ if($result = pg_query($conn, $qry))
 			$pdf->MultiCell(130,$lineheight,$elem->nachname,1,'L',1);
 			$pdf->SetFont('Arial','',8);
 			$pdf->SetXY($maxX+strlen($elem->nachname)*5+1,$maxY);
-			if($elem->status=='Incoming')
+			if($elem->status=='Incoming') //Incoming
 				$inc=' (i)';
 			else 
 				$inc='';
+			
+			if($elem->bisio_id!='' && $elem->status!='Incoming') //Outgoing
+				$inc.=' (o)';
+				
+			if($elem->note==6) //angerechnet
+				$inc.=' (ar)';
+			
 			$pdf->MultiCell(130,$lineheight,$elem->vorname.$inc,0,'L',0);
 			$maxX +=130;
 			$pdf->SetXY($maxX,$maxY);
@@ -329,7 +346,9 @@ $maxY=$pdf->GetY()+5;
 $maxX=30;
 $pdf->SetXY($maxX,$maxY);
 $pdf->SetFont('Arial','',8);
-$pdf->MultiCell(520,$lineheight,'(i) ... Incoming',0,'L',0);
+$pdf->MultiCell(520,$lineheight,'(i)  ... Incoming',0,'L',0);
+$pdf->MultiCell(520,$lineheight,'(o)  ... Outgoing',0,'L',0);
+$pdf->MultiCell(520,$lineheight,'(ar) ... angerechnet',0,'L',0);
 
 //FHStg
 $maxY=$pdf->GetY()+5;

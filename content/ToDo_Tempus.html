@@ -29,7 +29,7 @@ Priorit&auml;ten: <span style="font-style: italic;">low</span>,med,<span
       <td>Reservierungen im Tempus verschieben ---&gt;
 ABER NUR F&Uuml;R ADMINS!!<br>
       </td>
-      <td align="center"><span style="font-weight: bold;">high</span><br>
+      <td align="center"><i>low</i><br>
       </td>
       <td align="center">?<br>
       </td>
@@ -46,7 +46,8 @@ Verplanung und gibt keine Kollisionsmeldung zur&uuml;ck.<br>
     </tr>
     <tr class="liste0">
       <td>Bei der Verplanung von partizipierenden Lektoren aus
-Lektorensicht immer nur DIESEN Lektor verplanen<br>
+Lektorensicht immer nur DIESEN Lektor verplanen (lektoren_splitting =
+false)<br>
       </td>
       <td style="font-weight: bold;" align="center">high<br>
       </td>
@@ -54,8 +55,8 @@ Lektorensicht immer nur DIESEN Lektor verplanen<br>
       </td>
     </tr>
     <tr class="liste1">
-      <td>Buttons "ignore_kollision" und aktuelle Stundenplantabelle in
-allen ge&ouml;ffneten Fenstern und bei Tempus-Start aktualisieren<br>
+      <td>Wenn rechts auf eine Lehreinheit geklickt wird, unten das
+Detailfenster f&uuml;r diese Lehreinheit anzeigen.<br>
       </td>
       <td align="center">med<br>
       </td>
@@ -91,7 +92,7 @@ tbl_stundenplan</span> einbauen<br>
       </td>
     </tr>
     <tr class="liste1">
-      <td>Undo-Funktion implementieren<br>
+      <td>Undo-Funktion implementieren ( f&uuml;rs L&ouml;schen )<br>
       </td>
       <td style="font-style: italic;" align="center">low<br>
       </td>
@@ -134,18 +135,10 @@ einschr&auml;nken (Liste derzeit unbrauchbar weil viel zu lang)<br>
       </td>
     </tr>
     <tr class="liste0">
-      <td>Button "Raumvorschlag" im Kontextmen&uuml; aktivieren<br>
+      <td>Beim Raumvorschlag f&uuml;r Studentenverschiebung (mittlere
+Taste) Raumtypen ber&uuml;cksichtigen<br>
       </td>
-      <td style="font-style: italic;" align="center">low<br>
-      </td>
-      <td align="center">?<br>
-      </td>
-    </tr>
-    <tr class="liste1">
-      <td>Quickinfos mehrzeilig anzeigen (Oft sind lange
-Anmerkungstexte nicht vollst&auml;ndig lesbar)<br>
-      </td>
-      <td align="center">med<br>
+      <td style="font-style: italic;" align="center">med<br>
       </td>
       <td align="center">?<br>
       </td>
@@ -215,8 +208,7 @@ Stunden aus der LFVT verplanen<br>
       </td>
     </tr>
     <tr class="liste0">
-      <td>Aktivieren/Deaktivieren von Funktionen (zB. Ignore Kollision)
-mittels Shortcut oder Funktionstaste<br>
+      <td><br>
       </td>
       <td align="center">med<br>
       </td>
@@ -246,9 +238,7 @@ mittels Shortcut oder Funktionstaste<br>
       <th>Aufwand [h] </th>
     </tr>
     <tr class="liste0">
-      <td>Aktualisieren des Hauptfensters bei Klick auf Lektorenname
-bzw. Raum (vor allem nach Wechsel des Karteireiters praktisch)<br>
-Funktioniert derzeit nur bei der Auswahl eines Verbandes<br>
+      <td><br>
       </td>
       <td style="font-style: italic;" align="center">low<br>
       </td>
@@ -270,94 +260,7 @@ Funktioniert derzeit nur bei der Auswahl eines Verbandes<br>
   </tbody>
 </table>
 <br>
-<br>
-<!-- Semesterplan -->
-<table class="liste">
-  <tbody>
-    <tr>
-      <th>CIS-Seite</th>
-      <th>Priorit&auml;t</th>
-      <th>Aufwand [h] </th>
-    </tr>
-    <tr class="liste0">
-      <td><span style="color: rgb(255, 0, 0);"><span
- text-decoration="blink;">Checkboxen
-bei
-Reservierungen auf der CIS sollen
-tbl_stundenplan<span style="font-weight: bold;">DEV</span> abfragen</span><br>
-      </span></td>
-      <td style="text-align: center; font-weight: bold;">high<br>
-      </td>
-      <td style="text-align: center;">?<br>
-      </td>
-    </tr>
-    <tr class="liste1">
-      <td>Reservierungen auf der CIS auch auf Lektor, Studiengang und
-Semester speichern (zus&auml;tzliche Drop-Downs) --&gt; Nur Admins!<br>
-      </td>
-      <td style="font-style: italic;" align="center">low<br>
-      </td>
-      <td style="text-align: center;">?<br>
-      </td>
-    </tr>
-    <tr class="liste0">
-      <td>Das Feld "Beschreibung" bei den Reservierungen ist auf nur 20
-Zeichen beschr&auml;nkt. In der Datenbank sind 32 vorgesehen.<br>
-      </td>
-      <td align="center">low<br>
-      </td>
-      <td style="text-align: center;"><br>
-      </td>
-    </tr>
-    <tr class="liste1">
-      <td>Lektoren sollen Zeitsperren im LV-Plan angezeigt bekommen.
-(Anregung eines Lektors) (Erleichtert die &Uuml;bersicht und Wartung
-der Zeitsperren)<br>
-      </td>
-      <td style="font-style: italic;" align="center">low<br>
-      </td>
-      <td style="text-align: center;">?<br>
-      </td>
-    </tr>
-    <tr class="liste0">
-      <td>H&auml;kchen bei den Reservierungen nur, wenn Stunde auch auf
-tbl_stundenplandev frei ist<br>
-      </td>
-      <td align="center">high<br>
-      </td>
-      <td style="text-align: center;"><br>
-      </td>
-    </tr>
-    <tr class="liste1">
-      <td>Attribute "Insertamum" und "Insertvon" in die DAtenbank
-integrieren<br>
-      </td>
-      <td style="font-style: italic;" align="center">med<br>
-      </td>
-      <td style="text-align: center;">?<br>
-      </td>
-    </tr>
-    <tr class="liste0">
-      <td><br>
-      </td>
-      <td align="center"><br>
-      </td>
-      <td style="text-align: center;"><br>
-      </td>
-    </tr>
-    <tr class="liste1">
-      <td><br>
-      </td>
-      <td style="font-style: italic;" align="center"><br>
-      </td>
-      <td style="text-align: center;"><br>
-      </td>
-    </tr>
-    <tr>
-    </tr>
-  </tbody>
-</table>
-<br>
+<!-- Semesterplan --><br>
 <br>
 <!-- Lehreinheiten -->
 <table class="liste">
@@ -413,16 +316,6 @@ XML-Verarbeitungsfehler<br>
       <td style="text-align: center;">?<br>
       </td>
     </tr>
-    <tr>
-    </tr>
-    <tr class="liste1">
-      <td><br>
-      </td>
-      <td align="center"><br>
-      </td>
-      <td style="text-align: center;"><br>
-      </td>
-    </tr>
     <tr class="liste0">
       <td>Zeichensatz &uuml;berarbeiten (Sonderzeichen u. Umlaute
 korrekt anzeigen)<br>
@@ -461,8 +354,6 @@ korrekt anzeigen)<br>
       <td style="text-align: center;"><br>
       </td>
     </tr>
-    <tr>
-    </tr>
     <tr class="liste1">
       <td> <br>
       </td>
@@ -492,8 +383,6 @@ ist fehlerhaft<br>
       </td>
       <td align="center"><br>
       </td>
-    </tr>
-    <tr>
     </tr>
     <tr class="liste1">
       <td><br>
@@ -542,8 +431,6 @@ ist fehlerhaft<br>
 <br>
 <!-- ********************* Abgewiesen *******************-->
 <h2>ad acta gelegte &Auml;nderungen / Erweiterungen</h2>
-<div style="text-align: right;">&nbsp;<!-- Studenten -->
-</div>
 <div style="margin-left: 5%;">
 <table class="liste">
   <tbody>
@@ -560,8 +447,6 @@ wenn "Raumtyp" und "Raumtyp alternativ" belegt sind </td>
       <td align="center"><br>
       </td>
     </tr>
-    <tr>
-    </tr>
     <tr class="liste1">
       <td>Schriftgr&ouml;&szlig;e &auml;ndern </td>
       <td style="font-weight: bold;" align="center"><br>
@@ -576,7 +461,7 @@ wenn "Raumtyp" und "Raumtyp alternativ" belegt sind </td>
       <td><br>
       </td>
     </tr>
-    <tr>
+    <tr class="liste0">
       <td valign="top">Bei Verplanung aus einer Spezialgruppe, nur
 DIESE
 Spezialgruppe verplanen (Auch wenn mehrere in der Lehreinheit
@@ -588,22 +473,57 @@ zugeordnet sind)</td>
     </tr>
   </tbody>
 </table>
+</div>
 <br>
 <!-- ********************* Erledigt ******************************************-->
 <hr>
-<h2>Erledigte Anforderungen</h2>
+<h2 align="left">Erledigte Anforderungen</h2>
 <ul>
-  <li>Die Einstellungen f&uuml;r Ignore_kollision etc werden jetzt nach
-einem Neustart korrekt angezeigt<br>
-01.04.2008<br>
-    <br>
-  </li>
+  <li>Aktivieren/Deaktivieren von Funktionen (zB. Ignore Kollision)
+mittels Shortcut oder Funktionstaste</li>
+  <ul>
+    <li>03.10.2008 - ignore_kollision=F9</li>
+  </ul>
+  <li>Buttons "ignore_kollision" und aktuelle Stundenplantabelle in
+allen ge&ouml;ffneten Fenstern und bei Tempus-Start aktualisieren</li>
+  <ul>
+    <li>02.10.2008 automatische aktualisierung in alle Fenstern ist
+nicht m&ouml;glich. Der Status von ignore_kollision wird jetzt in der
+Statusleiste angezeigt.<br>
+wenn auf diesen Button in der Statusleiste geklickt wirde, dann wird
+die Anzeige aktualisiert. Wenn ignore_kollsion=true dann wird der
+Button in der Statusleiste rot hinterlegt.<br>
+    </li>
+  </ul>
+  <li>Button "Raumvorschlag" im Kontextmen&uuml; aktivieren</li>
+  <ul>
+    <li>02.10.2008</li>
+  </ul>
+  <li>Quickinfos mehrzeilig anzeigen (Oft sind lange
+Anmerkungstexte nicht vollst&auml;ndig lesbar)</li>
+  <ul>
+    <li>02.10.2008 funktioniert nicht - insertamum und insertvon wird
+jetzt am Anfang angezeigt</li>
+  </ul>
+  <li>Fehler beim Verplanen von Spezialgruppen in der LVB Ansicht</li>
+  <ul>
+    <li>02.10.2008<br>
+    </li>
+  </ul>
+  <li>Die Einstellungen f&uuml;r Ignore_kollision und db_stpl_table
+werden jetzt nach
+einem Neustart korrekt angezeigt</li>
+  <ul>
+    <li>01.04.2008<br>
+    </li>
+  </ul>
   <li>Eintragen von Anmerkungen zu einzelnen (verplanten)
-Lehreinheiten direkt im Tempus<br>
-12.01.2008<br>
-    <br>
-  </li>
+Lehreinheiten direkt im Tempus</li>
+  <ul>
+    <li>12.01.2008<br>
+      <br>
+    </li>
+  </ul>
 </ul>
-</div>
 </body>
 </html>
