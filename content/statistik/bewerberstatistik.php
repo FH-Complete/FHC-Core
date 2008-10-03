@@ -105,7 +105,7 @@ if($stsem!='')
 	   			 	AND reihungstestangetreten) AS interessentenrtabsolviert,
 	   			 
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
-	   				WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Bewerber' AND studiensemester_kurzbz='$stsem'
+	   				WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Bewerber' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1
 					) AS bewerber,
 				
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
@@ -130,7 +130,7 @@ if($stsem!='')
 						<th class='table-sortable:numeric'>Interessenten</th>
 						<th class='table-sortable:numeric'>Interessenten mit ZGV</th>
 						<th class='table-sortable:numeric'>Interessenten mit RT Anmeldung</th>
-						<th class='table-sortable:numeric'>Bewerber</th>
+						<th class='table-sortable:numeric'>Bewerber 1S</th>
 						<th class='table-sortable:numeric'>Aufgenommener</th>
 						<th class='table-sortable:numeric'>Student 1S</th>
 					</tr>
@@ -193,10 +193,10 @@ if($stsem!='')
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
 	   			 	AND reihungstestangetreten AND orgform_kurzbz='BB') AS interessentenrtabsolviert_bb,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
-	   				WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Bewerber' AND studiensemester_kurzbz='$stsem'
+	   				WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Bewerber' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1
 					AND orgform_kurzbz='BB') AS bewerber_bb,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
-	   				WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Bewerber' AND studiensemester_kurzbz='$stsem'
+	   				WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Bewerber' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1
 					AND orgform_kurzbz='VZ') AS bewerber_vz,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
 					WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem'
@@ -229,7 +229,7 @@ if($stsem!='')
 							<th class='table-sortable:numeric'>Interessenten VZ / BB</th>
 							<th class='table-sortable:numeric'>Interessenten mit ZGV VZ / BB</th>
 							<th class='table-sortable:numeric'>Interessenten mit RT Anmeldung VZ / BB</th>
-							<th class='table-sortable:numeric'>Bewerber VZ / BB</th>
+							<th class='table-sortable:numeric'>Bewerber 1S VZ / BB</th>
 							<th class='table-sortable:numeric'>Aufgenommener VZ / BB</th>
 							<th class='table-sortable:numeric'>Student 1S VZ / BB</th>
 						</tr>
