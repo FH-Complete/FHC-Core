@@ -161,8 +161,6 @@ if (!isset($pers_uid))
 // Reservieren
 if (isset($reserve) && $user=='lektor')
 {
-	//echo 'test';
-	echo 'test';
 	if(!$erg_std=pg_query($conn, "SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
 	{
 		die(pg_last_error($conn));

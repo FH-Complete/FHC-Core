@@ -165,23 +165,32 @@ if (!$conn = pg_pconnect(CONN_STRING))
 	$worksheet->write($lines,3,"Gruppe");
 	$worksheet->write($lines,4,"Kennzeichen");
 	$worksheet->write($lines,5,"Note");
+$stsem_obj = new studiensemester($conn);
+$stsem_obj->load($stsem);
+$stsemdatumvon = $stsem_obj->start;
+$stsemdatumbis = $stsem_obj->ende;	
 	
-	
-	$qry = "SELECT 
-				distinct vorname, nachname, matrikelnr, student_uid as uid, 
-				tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
-				(SELECT rolle_kurzbz FROM public.tbl_prestudentrolle WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status 
-			FROM 
-				campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid) 
-				JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid) 
-				LEFT JOIN public.tbl_studentlehrverband USING(student_uid)
-			WHERE 
-				lehrveranstaltung_id='".addslashes($lvid)."' AND 
-				vw_student_lehrveranstaltung.studiensemester_kurzbz='".addslashes($stsem)."' AND
-				tbl_studentlehrverband.studiensemester_kurzbz='".addslashes($stsem)."'";
+$qry = "SELECT 
+			distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr, person_id, tbl_student.student_uid as uid,
+			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
+			(SELECT rolle_kurzbz FROM public.tbl_prestudentrolle WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
+			tbl_bisio.bisio_id, 
+			tbl_zeugnisnote.note 
+		FROM 
+			campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid) 
+			JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid) 
+			LEFT JOIN public.tbl_studentlehrverband USING(student_uid)
+			LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.student_uid=tbl_student.student_uid)
+			LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
+		WHERE 
+			vw_student_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lvid)."' AND 
+			(tbl_zeugnisnote.studiensemester_kurzbz='".addslashes($stsem)."' OR tbl_zeugnisnote.studiensemester_kurzbz is null) AND
+			((tbl_bisio.von<'".$stsemdatumbis."' AND (tbl_bisio.bis>'".$stsemdatumvon."' OR tbl_bisio.bis is null)) OR tbl_bisio.von is null) AND
+			vw_student_lehrveranstaltung.studiensemester_kurzbz='".addslashes($stsem)."' AND
+			tbl_studentlehrverband.studiensemester_kurzbz='".addslashes($stsem)."'";
 
 	if($lehreinheit_id!='')
-		$qry.=" AND lehreinheit_id='".addslashes($lehreinheit_id)."'";
+		$qry.=" AND vw_student_lehrveranstaltung.lehreinheit_id='".addslashes($lehreinheit_id)."'";
 	
 	$qry.=' ORDER BY nachname, vorname';
 	
@@ -200,11 +209,21 @@ if (!$conn = pg_pconnect(CONN_STRING))
 						$inc=' (i)';
 					else 
 						$inc='';
+					if($elem->bisio_id!='' && $elem->status!='Incoming') //Outgoing
+						$inc.=' (o)';
+						
+					if($elem->note==6) //angerechnet
+					{
+						$inc.=' (ar)';
+						$note='6';
+					}
+					else 
+						$note='';
 					$worksheet->write($lines,1,$elem->nachname.$inc);
 					$worksheet->write($lines,2,$elem->vorname);
 					$worksheet->write($lines,3,$elem->semester.$elem->verband.$elem->gruppe);
 					$worksheet->write($lines,4,'="'.trim($elem->matrikelnr).'"');
-					$worksheet->write($lines,5,'');
+					$worksheet->write($lines,5,$note);
 					$i++;
 					$lines++;
 	   			}
@@ -218,7 +237,9 @@ if (!$conn = pg_pconnect(CONN_STRING))
 	$worksheet->write(++$lines,0,'8-teilgenommen, 9-noch nicht eingetragen, 10-bestanden,');
 	$worksheet->write(++$lines,0,'11-approbiert, 12-erfolgreich absolviert, 13-nicht erfolgreich absolviert');	
 	$lines++;
-	$worksheet->write(++$lines,0,'(i) ... Incoming');	
+	$worksheet->write(++$lines,0,'(i)  ... Incoming');	
+	$worksheet->write(++$lines,0,'(o)  ... Outgoing');
+	$worksheet->write(++$lines,0,'(ar) ... angerechnet');
 	
 	$worksheet->setColumn(0, 0, 5);
 	$worksheet->setColumn(1, 1, 25);

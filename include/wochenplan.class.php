@@ -646,7 +646,7 @@ class wochenplan
 		if ($this->user=='lektor' && $this->type=='ort' && ($datum>=$datum_now && $datum>=$datum_res_lektor_start && $datum_mon<=$datum_res_lektor_ende))
 		{
 				echo '	<br />Titel: <input type="text" name="titel" size="10" maxlength="10" /> '.$this->crlf;
-				echo '	Beschreibung: <input type="text" name="beschreibung" size="20" maxlength="20" /> '.$this->crlf;
+				echo '	Beschreibung: <input type="text" name="beschreibung" size="20" maxlength="32" /> '.$this->crlf;
 				echo '	<input type="submit" name="reserve" value="Reservieren" />'.$this->crlf;
 				echo '	<input type="hidden" name="user_uid" value="'.$this->user_uid.'" />'.$this->crlf;
 				echo '	<input type="hidden" name="ort_kurzbz" value="'.$this->ort_kurzbz.'" />'.$this->crlf;
