@@ -35,9 +35,42 @@ if (!$conn = pg_pconnect(CONN_STRING))
 echo '<H1>Systemcheck!</H1>';
 echo '<H2>DB-Updates!</H2>';
 
+// ************** kommune.tbl_wettbewerbtyp.farbe **********************************************
+if (!@pg_query($conn,'SELECT farbe FROM kommune.tbl_wettbewerbtyp LIMIT 1;'))
+{
+	$sql="	ALTER TABLE kommune.tbl_wettbewerbtyp ADD COLUMN farbe char(6);
+		";
+	if (!@pg_query($conn,$sql))
+		echo '<strong>kommune.tbl_wettbewerbtyp: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo '	farbe wurde bei kommune.tbl_wettbewerbtyp hinzugefuegt!<BR>';
+}
+
+// ************** public.tbl_person.kurzbeschreibung **********************************************
+if (!@pg_query($conn,'SELECT kurzbeschreibung FROM public.tbl_person LIMIT 1;'))
+{
+	$sql="	ALTER TABLE public.tbl_person ADD COLUMN kurzbeschreibung text;
+			COMMENT ON COLUMN public.tbl_person.kurzbeschreibung IS 'Lebenslauf, OEH-Kandidatur, Kollegiumswahl, etc. ';
+		";
+	if (!@pg_query($conn,$sql))
+		echo '<strong>public.tbl_person: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo '	kurzbeschreibung wurde bei public.tbl_person hinzugefuegt!<BR>';
+}
+
+// ************** public.tbl_benutzerfunktion.semester **********************************************
+if (!@pg_query($conn,'SELECT semester FROM public.tbl_benutzerfunktion LIMIT 1;'))
+{
+	$sql="	ALTER TABLE public.tbl_benutzerfunktion ADD COLUMN semester smallint;
+		";
+	if (!@pg_query($conn,$sql))
+		echo '<strong>public.tbl_benutzerfunktion: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo '	semester wurde bei public.tbl_benutzerfunktion hinzugefuegt!<BR>';
+}
 
 
-// ************** lehre.tbl_moodle.gruppen ************************
+// ************** lehre.tbl_moodle.gruppen **********************************************
 if (!@pg_query($conn,'SELECT gruppen FROM lehre.tbl_moodle LIMIT 1;'))
 {
 	$sql="	ALTER TABLE lehre.tbl_moodle ADD COLUMN gruppen boolean;
@@ -623,12 +656,12 @@ $tabellen=array(
 	"fue.tbl_aktivitaet"  => array("aktivitaet_kurzbz","beschreibung"),
 	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende"),
 	"fue.tbl_projektbenutzer"  => array("projektbenutzer_id","uid","funktion_kurzbz","projekt_kurzbz"),
-	"kommune.tbl_match"  => array("match_id","team_sieger","wettbewerb_kurzbz","team_gefordert","team_forderer","gefordertvon","gefordertam","matchdatumzeit","matchort","ergebniss","bestaetigtvon","bestaetigtamum"),
+	"kommune.tbl_match"  => array("match_id","team_sieger","wettbewerb_kurzbz","team_gefordert","team_forderer","gefordertvon","gefordertamum","matchdatumzeit","matchort","matchbestaetigtvon","matchbestaetigtamum","ergebniss","bestaetigtvon","bestaetigtamum"),
 	"kommune.tbl_team"  => array("team_kurzbz","bezeichnung","beschreibung","logo"),
 	"kommune.tbl_teambenutzer"  => array("uid","team_kurzbz"),
 	"kommune.tbl_wettbewerb"  => array("wettbewerb_kurzbz","regeln","forderungstage","einzel","wbtyp_kurzbz","uid","icon"),
 	"kommune.tbl_wettbewerbteam"  => array("team_kurzbz","wettbewerb_kurzbz","rang","punkte"),
-	"kommune.tbl_wettbewerbtyp"  => array("wbtyp_kurzbz","bezeichnung"),
+	"kommune.tbl_wettbewerbtyp"  => array("wbtyp_kurzbz","bezeichnung","farbe"),
 	"lehre.tbl_abschlussbeurteilung"  => array("abschlussbeurteilung_kurzbz","bezeichnung"),
 	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note"),
 	"lehre.tbl_akadgrad"  => array("akadgrad_id","akadgrad_kurzbz","studiengang_kz","titel","geschlecht"),
@@ -661,7 +694,7 @@ $tabellen=array(
 	"public.tbl_bankverbindung"  => array("bankverbindung_id","person_id","name","anschrift","bic","blz","iban","kontonr","typ","verrechnung","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_benutzer"  => array("uid","person_id","aktiv","alias","insertamum","insertvon","updateamum","updatevon","ext_id","updateaktivvon","updateaktivam"),
 	"public.tbl_benutzerberechtigung"  => array("benutzerberechtigung_id","art","fachbereich_kurzbz","studiengang_kz","berechtigung_kurzbz","uid","studiensemester_kurzbz","start","ende","updateamum","updatevon","insertamum","insertvon"),
-	"public.tbl_benutzerfunktion"  => array("benutzerfunktion_id","fachbereich_kurzbz","uid","studiengang_kz","funktion_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"public.tbl_benutzerfunktion"  => array("benutzerfunktion_id","fachbereich_kurzbz","uid","studiengang_kz","funktion_kurzbz","semester","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_benutzergruppe"  => array("uid","gruppe_kurzbz","studiensemester_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_berechtigung"  => array("berechtigung_kurzbz","beschreibung"),
 	"public.tbl_betriebsmittel"  => array("betriebsmittel_id","beschreibung","betriebsmitteltyp","nummer","nummerintern","reservieren","ort_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
@@ -685,7 +718,7 @@ $tabellen=array(
 	"public.tbl_mitarbeiter"  => array("mitarbeiter_uid","personalnummer","telefonklappe","kurzbz","lektor","fixangestellt","bismelden","stundensatz","ausbildungcode","ort_kurzbz","standort_kurzbz","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_ort"  => array("ort_kurzbz","bezeichnung","planbezeichnung","max_person","lehre","reservieren","aktiv","lageplan","dislozierung","kosten","ausstattung","updateamum","updatevon","insertamum","insertvon","ext_id","stockwerk","standort_kurzbz","telefonklappe"),
 	"public.tbl_ortraumtyp"  => array("ort_kurzbz","hierarchie","raumtyp_kurzbz"),
-	"public.tbl_person"  => array("person_id","staatsbuergerschaft","geburtsnation","sprache","anrede","titelpost","titelpre","nachname","vorname","vornamen","gebdatum","gebort","gebzeit","foto","anmerkung","homepage","svnr","ersatzkennzeichen","familienstand","geschlecht","anzahlkinder","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","bundesland_code","kompetenzen"),
+	"public.tbl_person"  => array("person_id","staatsbuergerschaft","geburtsnation","sprache","anrede","titelpost","titelpre","nachname","vorname","vornamen","gebdatum","gebort","gebzeit","foto","anmerkung","homepage","svnr","ersatzkennzeichen","familienstand","geschlecht","anzahlkinder","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","bundesland_code","kompetenzen","kurzbeschreibung"),
 	"public.tbl_personfunktionfirma"  => array("personfunktionfirma_id","funktion_kurzbz","person_id","firma_id","position","anrede"),
 	"public.tbl_preinteressent"  => array("preinteressent_id","person_id","studiensemester_kurzbz","firma_id","erfassungsdatum","einverstaendnis","absagedatum","anmerkung","maturajahr","infozusendung","aufmerksamdurch_kurzbz","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preinteressentstudiengang"  => array("studiengang_kz","preinteressent_id","freigabedatum","uebernahmedatum","prioritaet","insertamum","insertvon","updateamum","updatevon"),
