@@ -7,13 +7,15 @@
 
 	// Verbindung aufbauen
 	$conn=pg_pconnect(CONN_STRING) or die ("Unable to connect to SQL-Server");
-	$sql_query="SET search_path TO campus; SELECT uid, nachname, vorname FROM vw_benutzer WHERE uid LIKE '$uid'";
+	$sql_query="SET search_path TO campus; SELECT titelpre, titelpost, uid, nachname, vorname FROM vw_benutzer WHERE uid LIKE '$uid'";
 	//echo $sql_query;
 	$result=pg_query($conn, $sql_query);
 
 	if(pg_num_rows($result)==0)
 	{
 		//GastAccount
+		$titelpre='';
+		$titelpost='';
 		$uid='';
 		$nachname='';
 		$vornamen='';
@@ -21,6 +23,8 @@
 	}
 	else
 	{
+		$titelpre=pg_result($result,0,'"titelpre"');
+		$titelpost=pg_result($result,0,'"titelpost"');
 		$uid=pg_result($result,0,'"uid"');
 		$nachname=pg_result($result,0,'"nachname"');
 		$vornamen=pg_result($result,0,'"vorname"');
@@ -73,7 +77,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 			echo 'nicht vorhanden! Bitte wenden Sie sich an den <A href="mailto:'.MAIL_ADMIN.'">Admin</A>!';
 	?><BR>
   	<DIV align="left">
-  		<a class="Item" href="stpl_week.php?pers_uid=<?php echo $uid; ?>"><?php echo $vornamen." ".$nachname;?></a>
+  		<a class="Item" href="stpl_week.php?pers_uid=<?php echo $uid; ?>"><?php echo $titelpre.' '.$vornamen." ".$nachname.' '.$titelpost;?></a>
 		&nbsp; -> Ihr pers&ouml;nlicher Lehrveranstaltungsplan<BR>
 		<a class="Item" href="../profile/index.php">PROFIL</a>
 		&nbsp; -> Hier k&ouml;nnen Sie Ihre Stammdaten kontrollieren.<BR>
