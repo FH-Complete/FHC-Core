@@ -68,6 +68,10 @@ else
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#studiengang" onclick="FunktionTreeSort()"/>
 			<splitter class="tree-splitter"/>
+			<treecol id="funktion-treecol-semester" label="Semester" flex="1" hidden="false"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#semester" onclick="FunktionTreeSort()"/>
+			<splitter class="tree-splitter"/>
 			<treecol id="funktion-treecol-fachbereich" label="Institut" flex="1" hidden="false"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#fachbereich_kurzbz" onclick="FunktionTreeSort()"/>
@@ -97,6 +101,7 @@ else
 						<treerow>
 							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#funktion" />
 							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#studiengang" />
+							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#semester" />
 							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#fachbereich_kurzbz" />
 							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#uid" />
 							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#benutzerfunktion_id" />
@@ -155,6 +160,23 @@ else
 									  		  uri="rdf:*"/>
 									</menupopup>
 							</template>
+						</menulist>
+					</row>
+					<row>
+						<label value="Semester" control="funktion-menulist-semester"/>
+						<menulist id="funktion-menulist-semester" disabled="true">
+							<menupopup>
+								<menuitem value="" label="-- Keine Auswahl --"/>
+								<menuitem value="1" label="1"/>
+								<menuitem value="2" label="2"/>
+								<menuitem value="3" label="3"/>
+								<menuitem value="4" label="4"/>
+								<menuitem value="5" label="5"/>
+								<menuitem value="6" label="6"/>
+								<menuitem value="7" label="7"/>
+								<menuitem value="8" label="8"/>
+								<menuitem value="9" label="9"/>
+							</menupopup>
 						</menulist>
 					</row>
 					<row>

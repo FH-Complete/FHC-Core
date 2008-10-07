@@ -387,6 +387,7 @@ if(!$error)
 			if(!$error)
 			{
 				$benutzerfunktion->studiengang_kz = $_POST['studiengang_kz'];
+				$benutzerfunktion->semester = $_POST['semester'];
 				$benutzerfunktion->fachbereich_kurzbz = $_POST['fachbereich_kurzbz'];
 				$benutzerfunktion->uid = $_POST['uid'];
 				$benutzerfunktion->funktion_kurzbz = $_POST['funktion_kurzbz'];

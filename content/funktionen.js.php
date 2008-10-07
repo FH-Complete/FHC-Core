@@ -230,6 +230,7 @@ function FunktionDetailSpeichern()
 {
 	funktion_kurzbz = document.getElementById('funktion-menulist-funktion').value;
 	studiengang_kz = document.getElementById('funktion-menulist-studiengang').value;
+	semester = document.getElementById('funktion-menulist-semester').value;
 	fachbereich_kurzbz = document.getElementById('funktion-menulist-fachbereich').value;
 	neu = document.getElementById('funktion-checkbox-neu').checked;
 	benutzerfunktion_id = document.getElementById('funktion-textbox-benutzerfunktion_id').value;
@@ -251,6 +252,7 @@ function FunktionDetailSpeichern()
 
 	req.add('funktion_kurzbz', funktion_kurzbz);
 	req.add('studiengang_kz', studiengang_kz);
+	req.add('semester', semester);
 	req.add('studiengang_kz_berecht', studiengang_kz_berecht);
 	req.add('fachbereich_kurzbz', fachbereich_kurzbz);
 	req.add('uid', FunktionenUID);
@@ -309,10 +311,12 @@ function FunktionBearbeiten()
 	fachbereich_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#fachbereich_kurzbz" ));
 	uid = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#uid" ));
 	studiengang_kz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiengang_kz" ));
+	semester = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#semester" ));
 	funktion_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#funktion_kurzbz" ));
 	
 	document.getElementById('funktion-menulist-fachbereich').value=fachbereich_kurzbz;
 	document.getElementById('funktion-menulist-studiengang').value=studiengang_kz;
+	document.getElementById('funktion-menulist-semester').value=semester;
 	document.getElementById('funktion-menulist-funktion').value=funktion_kurzbz;
 	document.getElementById('funktion-textbox-benutzerfunktion_id').value=benutzerfunktion_id;
 	document.getElementById('funktion-checkbox-neu').checked = false;
@@ -340,6 +344,7 @@ function FunktionDetailDisableFields(val)
 {
 	document.getElementById('funktion-menulist-fachbereich').disabled=val;
 	document.getElementById('funktion-menulist-studiengang').disabled=val;
+	document.getElementById('funktion-menulist-semester').disabled=val;
 	document.getElementById('funktion-menulist-funktion').disabled=val;
 	document.getElementById('funktion-button-speichern').disabled=val;
 }
@@ -351,6 +356,7 @@ function FunktionDetailResetFields()
 {
 	document.getElementById('funktion-menulist-fachbereich').value='';
 	document.getElementById('funktion-menulist-studiengang').value='0';
+	document.getElementById('funktion-menulist-semester').value='';
 	document.getElementById('funktion-menulist-funktion').value='ass';
 }
 
@@ -375,6 +381,7 @@ function FunktionToggleFachbereich()
 		case 'vrek':
 		case 'stud':
 		case 'prl':
+		case 'oeh-kandidatur':
 					hidd = true;
 					break;
 		
