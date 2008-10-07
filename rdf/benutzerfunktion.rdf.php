@@ -85,6 +85,7 @@ if($result = pg_query($conn, $qry))
 		        <BNFUNKTION:uid><![CDATA['.$row->uid.']]></BNFUNKTION:uid>
 		        <BNFUNKTION:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></BNFUNKTION:studiengang_kz>
 		        <BNFUNKTION:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></BNFUNKTION:studiengang>
+		        <BNFUNKTION:semester><![CDATA['.$row->semester.']]></BNFUNKTION:semester>
 		        <BNFUNKTION:funktion_kurzbz><![CDATA['.$row->funktion_kurzbz.']]></BNFUNKTION:funktion_kurzbz>
 		        <BNFUNKTION:funktion><![CDATA['.$fkt_arr[$row->funktion_kurzbz].']]></BNFUNKTION:funktion>
 		     </RDF:Description>
