@@ -174,7 +174,7 @@ $qry = "SELECT
 			distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr, person_id, tbl_student.student_uid as uid,
 			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 			(SELECT rolle_kurzbz FROM public.tbl_prestudentrolle WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
-			tbl_bisio.bisio_id, 
+			tbl_bisio.bisio_id, tbl_bisio.bis, tbl_bisio.von,
 			tbl_zeugnisnote.note 
 		FROM 
 			campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid) 
@@ -185,14 +185,13 @@ $qry = "SELECT
 		WHERE 
 			vw_student_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lvid)."' AND 
 			(tbl_zeugnisnote.studiensemester_kurzbz='".addslashes($stsem)."' OR tbl_zeugnisnote.studiensemester_kurzbz is null) AND
-			((tbl_bisio.von<'".$stsemdatumbis."' AND (tbl_bisio.bis>'".$stsemdatumvon."' OR tbl_bisio.bis is null)) OR tbl_bisio.von is null) AND
 			vw_student_lehrveranstaltung.studiensemester_kurzbz='".addslashes($stsem)."' AND
 			tbl_studentlehrverband.studiensemester_kurzbz='".addslashes($stsem)."'";
 
 	if($lehreinheit_id!='')
 		$qry.=" AND vw_student_lehrveranstaltung.lehreinheit_id='".addslashes($lehreinheit_id)."'";
 	
-	$qry.=' ORDER BY nachname, vorname';
+	$qry.=' ORDER BY nachname, vorname, person_id, tbl_bisio.bis DESC';
 	
 	if($result = pg_query($conn, $qry))
 	{
@@ -209,7 +208,7 @@ $qry = "SELECT
 						$inc=' (i)';
 					else 
 						$inc='';
-					if($elem->bisio_id!='' && $elem->status!='Incoming') //Outgoing
+					if($elem->bisio_id!='' && $elem->status!='Incoming' && ($elem->bis > $stsemdatumvon || $elem->bis=='') && $elem->von < $stsemdatumbis) //Outgoing
 						$inc.=' (o)';
 						
 					if($elem->note==6) //angerechnet

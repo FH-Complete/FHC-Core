@@ -182,9 +182,9 @@ class betriebsmittel
 				'nummerintern='.$this->addslashes($this->nummerintern).', '.  
 				'reservieren='.($this->reservieren?'true':'false').', '.
 				'ort_kurzbz='.$this->addslashes($this->ort_kurzbz).', '.
-				'ext_id='.$this->addslashes($this->ext_id).', '. 
-			     	'updateamum= now(), '.
-			     	'updatevon='.$this->addslashes($this->updatevon).' '.
+				'ext_id='.$this->addslashes($this->ext_id).', '.
+				'updateamum= now(), '.
+				'updatevon='.$this->addslashes($this->updatevon).' '.
 				'WHERE betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).';';
 		}
 		
