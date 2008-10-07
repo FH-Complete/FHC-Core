@@ -1689,7 +1689,7 @@ if(!$error)
 			else 
 			{
 				//Nachschauen ob dieses Betriebsmittel schon existiert
-				if($bm->getBetriebsmittel($_POST['betriebsmitteltyp'],$_POST['nummerold']))
+				if($bm->getBetriebsmittel($_POST['betriebsmitteltyp'],$_POST['nummer']))
 				{
 					if(count($bm->result)>0)
 					{
@@ -1742,52 +1742,77 @@ if(!$error)
 							$errormsg = 'Fehler beim Anlegen des Betriebsmittels';
 						}
 					}
-	
-					//Zuordnung Betriebsmittel-Person anlegen
-					$bmp = new betriebsmittelperson($conn, null, null, true);
-					if($_POST['neu']!='true')
+					
+					if($_POST['betriebsmitteltyp']=='Zutrittskarte')
 					{
-						if($bmp->load($betriebsmittel_id, $_POST['person_id']))
+						//Bei Zutrittskarten schauen ob diese schon vergeben sind
+						$qry = "SELECT vorname, nachname, uid 
+								FROM public.vw_betriebsmittelperson 
+								WHERE betriebsmitteltyp='Zutrittskarte' AND 
+									nummer::bigint='".$_POST['nummer']."'::bigint AND 
+									person_id<>'".$_POST['person_id']."' AND
+									retouram is null";
+						if($result_bmp = pg_query($conn, $qry))
 						{
-							$bmp->updateamum = date('Y-m-d H:i:s');
-							$bmp->updatevon = $user;
-							$bmp->new = false;
+							if(pg_num_rows($result_bmp)>0)
+							{
+								$row_bmp = pg_fetch_object($result_bmp);
+								$error = true;
+								$return = false;
+								$errormsg = "Diese Zutrittskarte ist bereits ausgegeben an: $row_bmp->vorname $row_bmp->nachname ($row_bmp->uid)";
+							}
+						}
+					}
+					
+					if(!$error)
+					{
+						//Zuordnung Betriebsmittel-Person anlegen
+						$bmp = new betriebsmittelperson($conn, null, null, true);
+						if($_POST['neu']!='true')
+						{
+							if($bmp->load($_POST['betriebsmittel_id'], $_POST['person_id']))
+							{
+								$bmp->updateamum = date('Y-m-d H:i:s');
+								$bmp->updatevon = $user;
+								$bmp->betriebsmittel_id_old = $_POST['betriebsmittel_id'];
+								$bmp->new = false;
+							}
+							else
+							{
+								//$error = true;
+								//$return = false;
+								//$errormsg = 'Fehler beim Laden der Betriebmittelperson Zuordnung'.$betriebsmittel_id.'-'.$_POST['person_id'];
+								$bmp->insertamum = date('Y-m-d H:i:s');
+								$bmp->insertvon = $user;
+								$bmp->new = true;
+							}
 						}
 						else
 						{
-							//$error = true;
-							//$return = false;
-							//$errormsg = 'Fehler beim Laden der Betriebmittelperson Zuordnung'.$betriebsmittel_id.'-'.$_POST['person_id'];
 							$bmp->insertamum = date('Y-m-d H:i:s');
 							$bmp->insertvon = $user;
 							$bmp->new = true;
 						}
-					}
-					else
-					{
-						$bmp->insertamum = date('Y-m-d H:i:s');
-						$bmp->insertvon = $user;
-						$bmp->new = true;
-					}
-	
-					if(!$error)
-					{
-						$bmp->person_id = $_POST['person_id'];
-						$bmp->betriebsmittel_id=$betriebsmittel_id;
-						$bmp->anmerkung = $_POST['anmerkung'];
-						$bmp->kaution = trim(str_replace(',','.',$_POST['kaution']));
-						$bmp->ausgegebenam = $_POST['ausgegebenam'];
-						$bmp->retouram = $_POST['retouram'];
-	
-						if($bmp->save())
+		
+						if(!$error)
 						{
-							$return = true;
-							$data = $betriebsmittel_id;
-						}
-						else
-						{
-							$return = false;
-							$errormsg = $bmp->errormsg;
+							$bmp->person_id = $_POST['person_id'];
+							$bmp->betriebsmittel_id=$betriebsmittel_id;
+							$bmp->anmerkung = $_POST['anmerkung'];
+							$bmp->kaution = trim(str_replace(',','.',$_POST['kaution']));
+							$bmp->ausgegebenam = $_POST['ausgegebenam'];
+							$bmp->retouram = $_POST['retouram'];
+		
+							if($bmp->save())
+							{
+								$return = true;
+								$data = $betriebsmittel_id;
+							}
+							else
+							{
+								$return = false;
+								$errormsg = $bmp->errormsg;
+							}
 						}
 					}
 				}

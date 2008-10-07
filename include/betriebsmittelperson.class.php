@@ -33,8 +33,10 @@ class betriebsmittelperson
 	var $done=false;		// @var boolean
 	
 	//Tabellenspalten
-	Var $betriebsmittel_id;	// @var integer
+	var $betriebsmittel_id;	// @var integer
 	var $person_id;			// @var integer
+	var $betriebsmittel_id_old;	// @var integer
+	var $person_id_old;			// @var integer
 	var $anmerkung;			// @var string
 	var $kaution;			// @var numeric(5,2)
 	var $ausgegebenam;		// @var date
@@ -193,6 +195,19 @@ class betriebsmittelperson
 		if($new==null)
 			$new = $this->new;
 
+		//Pruefen ob dieses Betriebsmittel dieser Person schon zugeordnet ist
+		$qry = "SELECT 1 FROM public.tbl_betriebsmittelperson 
+				WHERE person_id='".addslashes($this->person_id)."' AND 
+					betriebsmittel_id='".addslashes($this->betriebsmittel_id)."'";
+		if($result = pg_query($this->conn, $qry))
+		{
+			if(pg_num_rows($result)>0)
+			{
+				$this->errormsg = 'Dieses Betriebsmittel ist der Person bereits zugeordnet';
+				return false;
+			}
+		}
+		
 		if($new)
 		{
 			//Neuen Datensatz einfuegen
@@ -217,6 +232,10 @@ class betriebsmittelperson
 				$this->errormsg = "betriebsmittel_id und Person_id muessen gueltige Zahlen sein: ".$this->betriebsmittel_id." (".$this->person_id.")\n";
 				return false;
 			}
+			if($this->betriebsmittel_id_old=='')
+				$this->betriebsmittel_id_old = $this->betriebsmittel_id;
+			if($this->person_id_old=='')
+				$this->person_id_old = $this->person_id;
 			
 			$qry='UPDATE public.tbl_betriebsmittelperson SET '.
 				'betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).', '. 
@@ -226,10 +245,10 @@ class betriebsmittelperson
 				'ausgegebenam='.$this->addslashes($this->ausgegebenam).', '.
 				'retouram='.$this->addslashes($this->retouram).', '.
 				'ext_id='.$this->addslashes($this->ext_id).', '. 
-			    	'updateamum= now(), '.
-			    	'updatevon='.$this->addslashes($this->updatevon).' '.
-				'WHERE betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).
-				' AND person_id='.$this->addslashes($this->person_id).";";
+				'updateamum= now(), '.
+				'updatevon='.$this->addslashes($this->updatevon).' '.
+				'WHERE betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id_old).
+				' AND person_id='.$this->addslashes($this->person_id_old).";";
 		}
 		
 		if(pg_query($this->conn, $qry))
