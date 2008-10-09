@@ -1,4 +1,25 @@
 <?php
+/* Copyright (C) 2008 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>.
+ */
 header("Content-type: application/vnd.mozilla.xul+xml");
 
 include('../../vilesci/config.inc.php');
@@ -19,9 +40,7 @@ $db_stpl_table=null;
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 //echo $_SERVER[REQUEST_URI];
 
-if (!isset($REMOTE_USER))
-	$REMOTE_USER='pam';
-$uid=$REMOTE_USER;
+$uid = get_uid();
 
 $error_msg='';
 if (!$conn = pg_pconnect(CONN_STRING))
@@ -485,6 +504,9 @@ while ($begin<=$ende)
 	// Stundenplan einer Woche laden
 	if (! $stdplan->load_week($datum,$db_stpl_table))
 		$error_msg.=$stdplan->errormsg;
+		
+	//Raumvorschlag setzen
+	
 	//echo 'load_week'.$error_msg;
 	if ($aktion=='lva_single_search' || $aktion=='lva_multi_search')
 		if (! $stdplan->load_lva_search($datum,$lva_id,$db_stpl_table, $aktion))
@@ -493,8 +515,15 @@ while ($begin<=$ende)
 			$error_msg.=$stdplan->errormsg;
 	//echo 'load_lva_search'.$error_msg;
 	if ($aktion=='stpl_single_search')
-		if (! $stdplan->load_stpl_search($datum,$stpl_id,$db_stpl_table))
-			$error_msg.=$stdplan->errormsg;
+	{
+		if(isset($stpl_id))
+		{
+			if (! $stdplan->load_stpl_search($datum,$stpl_id,$db_stpl_table))
+				$error_msg.=$stdplan->errormsg;
+		}
+		else 
+			$error_msg.='Derzeit gibt es keinen Raumvorschlag fuer Reservierungen';
+	}
 	//echo 'load_stpl_search'.$error_msg;
 
 	// Stundenplan der Woche drucken
