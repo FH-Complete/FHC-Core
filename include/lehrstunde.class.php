@@ -556,7 +556,7 @@ class lehrstunde
 							FROM campus.tbl_zeitsperre
 							WHERE mitarbeiter_uid='$this->lektor_uid'
 								AND (vondatum<'$this->datum' OR (vondatum='$this->datum' AND (vonstunde<=$this->stunde OR vonstunde IS NULL)))
-								AND (bisdatum>'$this->datum' OR (bisdatum='$this->datum' AND (bisstunde>=$this->stunde OR vonstunde IS NULL)));";
+								AND (bisdatum>'$this->datum' OR (bisdatum='$this->datum' AND (bisstunde>=$this->stunde OR bisstunde IS NULL)));";
 				//echo $sql_query.'<br>';
 				if (! $erg_zs=pg_query($this->conn, $sql_query))
 				{

@@ -12,8 +12,8 @@
 	$cfgStdBgcolor[1]="#FF2200";
 	$cfgStdBgcolor[2]="#FF9922";
 	$cfgStdBgcolor[3]="#FFFF55";
-	$cfgStdBgcolor[4]="#88FF88";
-	$cfgStdBgcolor[5]="#AAFFAA";
+	$cfgStdBgcolor[4]="#C0ECC3";
+	$cfgStdBgcolor[5]="#48FA66";
 	$cfgStdBgcolor[6]="#CCFFCC";
 
 	// Wochentage auf Deutsch (Zeitwunsch)
