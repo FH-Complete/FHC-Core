@@ -945,7 +945,7 @@ class wochenplan
 							datum="'.date("Y-m-d",$datum).'" stunde="'.$j.'"
 							pers_uid="'.$this->pers_uid.'" ort_kurzbz="'.utf8_encode($this->ort_kurzbz).'">';
 						echo '<label align="center">'.$blink_ein;
-						echo $lf;
+						echo utf8_encode($lf);
 						echo $lvb;
 						if ($this->type!='lektor')
 							echo utf8_encode($lkt);
@@ -1043,6 +1043,7 @@ class wochenplan
 			die(pg_last_error($this->conn));
 		$num_rows_stpl=pg_numrows($result_stpl);
 		// Daten aufbereiten
+		$leids='';
 		for ($i=0;$i<$num_rows_stpl;$i++)
 		{
 			$row=pg_fetch_object($result_stpl,$i);
@@ -1057,18 +1058,28 @@ class wochenplan
 			$lehrverband[$i]->sem=$row->semester;
 			$lehrverband[$i]->ver=$row->verband;
 			$lehrverband[$i]->grp=$row->gruppe;
+			$leids.="$row->lehreinheit_id,";
 			$lektor[$i]=$row->uid;
 			$unr=$row->unr;
 		}
-		// Raumtypen
-		//$raumtyp=array_unique($raumtyp);
-		//$rtype='';
-		//foreach ($raumtyp as $r)
-		//	$rtype.=" OR raumtyp_kurzbz='$r'";
-		//$raumtypalt=array_unique($raumtypalt);
-		//foreach ($raumtypalt as $r)
-		//	$rtype.=" OR raumtyp_kurzbz='$r'";
-		//$rtype=substr($rtype,3);
+		if($leids!='')
+		{
+			// Raumtypen
+			$leids = substr($leids, 0, strlen($leids)-1);
+			$qry = "SELECT raumtyp, raumtypalternativ FROM lehre.tbl_lehreinheit WHERE lehreinheit_id IN ($leids)";
+			if($result = pg_query($this->conn, $qry)){
+				while($row = pg_fetch_object($result))
+				{
+					$raumtyp[]=$row->raumtyp;
+					$raumtyp[]=$row->raumtypalternativ;
+				}
+			}
+		}
+		$raumtyp=array_unique($raumtyp);
+		$rtype='';
+		foreach ($raumtyp as $r)
+			$rtype.=" OR raumtyp_kurzbz='$r'";
+		$rtype=substr($rtype,3);
 		//Lektor
 		$lektor=array_unique($lektor);
 		$lkt='';
@@ -1099,10 +1110,12 @@ class wochenplan
 			$lvb.=')';
 		}
 		$lvb=substr($lvb,3);
-
+		//if($rtype=='')
+		//	$rtype='1=1';
 		// Raeume die in Frage kommen, aufgrund der Raumtypen
-		$sql_query="SELECT DISTINCT ort_kurzbz FROM public.tbl_ort
-			 WHERE aktiv AND lehre AND ort_kurzbz NOT LIKE '\\\\_%' ORDER BY ort_kurzbz"; // NATURAL JOIN tbl_ortraumtyp WHERE $rtype  hierarchie
+		$sql_query="SELECT DISTINCT ort_kurzbz, hierarchie FROM public.tbl_ort
+			JOIN public.tbl_ortraumtyp USING (ort_kurzbz) WHERE ($rtype) AND aktiv AND ort_kurzbz NOT LIKE '\\\\_%' ORDER BY hierarchie,ort_kurzbz"; 
+			// WHERE aktiv AND lehre AND ort_kurzbz NOT LIKE '\\\\_%' ORDER BY ort_kurzbz"; // NATURAL JOIN tbl_ortraumtyp WHERE $rtype  hierarchie
 		//echo $sql_query;
 		if(!$result=pg_exec($this->conn, $sql_query))
 			die(pg_last_error($this->conn));
