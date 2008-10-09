@@ -128,12 +128,15 @@ function onStplSearchRoom(event)
 	//alert ("clickCount="+event.clickCount+" button="+event.button);
 	if (event.button == 1)
 	{
-		StplSearchRoom(event);
+		StplSearchRoom(event.target);
 	}
 }
 
-function StplSearchRoom(event)
+function StplSearchRoom(target)
 {
+	if(typeof(target)==='undefined')
+		target = document.popupNode;
+	
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
 	var daten=document.getElementById('TimeTableWeekData');
 	var datum=parseInt(daten.getAttribute("datum"));
@@ -145,9 +148,9 @@ function StplSearchRoom(event)
 	var gruppe=daten.getAttribute("gruppe");
 	var ort=daten.getAttribute("ort");
 	var pers_uid=daten.getAttribute("pers_uid");
-	var aktion=document.popupNode.getAttribute("aktion");
+	var aktion=target.getAttribute("aktion");
 	aktion+="_single_search";
-	var idList=document.popupNode.getAttribute("idList");
+	var idList=target.getAttribute("idList");
 	
 	var attributes="\n?type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid+"\n&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"\n&gruppe="+gruppe;
 	attributes+=idList+"&aktion="+aktion;

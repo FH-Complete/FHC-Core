@@ -682,7 +682,7 @@ class wochenplan
 		// Kontext Menue
 		echo '<popupset>
   				<popup id="stplPopupMenue">
-					<menuitem label="Raumvorschlag" oncommand="StplSearchRoom(event);" />
+					<menuitem label="Raumvorschlag" oncommand="StplSearchRoom(document.popupNode);" />
     				<menuitem label="Entfernen" oncommand="onStplDelete(\'stpl_delete_single\');" />
   				</popup>
 			</popupset>';
@@ -1102,7 +1102,7 @@ class wochenplan
 
 		// Raeume die in Frage kommen, aufgrund der Raumtypen
 		$sql_query="SELECT DISTINCT ort_kurzbz FROM public.tbl_ort
-			 WHERE aktiv AND ort_kurzbz NOT LIKE '\\\\_%' ORDER BY ort_kurzbz"; // NATURAL JOIN tbl_ortraumtyp WHERE $rtype  hierarchie
+			 WHERE aktiv AND lehre AND ort_kurzbz NOT LIKE '\\\\_%' ORDER BY ort_kurzbz"; // NATURAL JOIN tbl_ortraumtyp WHERE $rtype  hierarchie
 		//echo $sql_query;
 		if(!$result=pg_exec($this->conn, $sql_query))
 			die(pg_last_error($this->conn));

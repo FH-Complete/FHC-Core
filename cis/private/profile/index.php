@@ -395,7 +395,7 @@ function RefreshImage()
 					$person = new person($conn);
 					$person->load($person_id);
 					echo '<hr>';
-					echo 'Kurzbeschreibung für die &Ouml;H-Kandidatur:<br>';
+					echo '<b>Kurzbeschreibung für die &Ouml;H-Kandidatur:</b><br>';
 					echo '<form action="'.$_SERVER['PHP_SELF'].'" method="post">';
 					
 					// Automatically calculates the editor base path based on the _samples directory.

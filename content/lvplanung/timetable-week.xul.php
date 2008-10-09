@@ -203,12 +203,12 @@ if ($aktion=='stpl_move' || $aktion=='stpl_set')
 		if ($aktion=='stpl_set')
 			$lehrstunde->ort_kurzbz=$new_ort;
 		$kollision=$lehrstunde->kollision($db_stpl_table);
-		if ($kollision)
+		if ($kollision && !$ignore_kollision)
 			$error_msg.=$lehrstunde->errormsg;
 		if (!$kollision || $ignore_kollision)
 		{
-			$lehrstunde->save($uid,$db_stpl_table);
-			$error_msg.=$lehrstunde->errormsg;
+			if(!$lehrstunde->save($uid,$db_stpl_table))
+				$error_msg.=$lehrstunde->errormsg;
 		}
 	}
 	// Mehrfachauswahl
@@ -224,12 +224,12 @@ if ($aktion=='stpl_move' || $aktion=='stpl_set')
 			if ($aktion=='stpl_set')
 				$lehrstunde->ort_kurzbz=$new_ort;
 			$kollision=$lehrstunde->kollision($db_stpl_table);
-			if ($kollision)
+			if ($kollision && !$ignore_kollision)
 				$error_msg.=$lehrstunde->errormsg;
 			if (!$kollision || $ignore_kollision)
 			{
-				$lehrstunde->save($uid,$db_stpl_table);
-				$error_msg.=$lehrstunde->errormsg;
+				if(!$lehrstunde->save($uid,$db_stpl_table))
+					$error_msg.=$lehrstunde->errormsg;
 			}
 		}
 }
