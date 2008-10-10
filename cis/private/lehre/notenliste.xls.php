@@ -179,13 +179,12 @@ $qry = "SELECT
 		FROM 
 			campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid) 
 			JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid) 
-			LEFT JOIN public.tbl_studentlehrverband USING(student_uid)
+			LEFT JOIN public.tbl_studentlehrverband USING(student_uid,studiensemester_kurzbz)
 			LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.student_uid=tbl_student.student_uid AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
 			LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
 		WHERE 
 			vw_student_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lvid)."' AND 
-			vw_student_lehrveranstaltung.studiensemester_kurzbz='".addslashes($stsem)."' AND
-			tbl_studentlehrverband.studiensemester_kurzbz='".addslashes($stsem)."'";
+			vw_student_lehrveranstaltung.studiensemester_kurzbz='".addslashes($stsem)."'";
 
 	if($lehreinheit_id!='')
 		$qry.=" AND vw_student_lehrveranstaltung.lehreinheit_id='".addslashes($lehreinheit_id)."'";
