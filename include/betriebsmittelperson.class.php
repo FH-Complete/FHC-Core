@@ -194,22 +194,21 @@ class betriebsmittelperson
 			
 		if($new==null)
 			$new = $this->new;
-
-		//Pruefen ob dieses Betriebsmittel dieser Person schon zugeordnet ist
-		$qry = "SELECT 1 FROM public.tbl_betriebsmittelperson 
-				WHERE person_id='".addslashes($this->person_id)."' AND 
-					betriebsmittel_id='".addslashes($this->betriebsmittel_id)."'";
-		if($result = pg_query($this->conn, $qry))
-		{
-			if(pg_num_rows($result)>0)
-			{
-				$this->errormsg = 'Dieses Betriebsmittel ist der Person bereits zugeordnet';
-				return false;
-			}
-		}
-		
+				
 		if($new)
 		{
+			//Pruefen ob dieses Betriebsmittel dieser Person schon zugeordnet ist
+			$qry = "SELECT 1 FROM public.tbl_betriebsmittelperson 
+					WHERE person_id='".addslashes($this->person_id)."' AND 
+						betriebsmittel_id='".addslashes($this->betriebsmittel_id)."'";
+			if($result = pg_query($this->conn, $qry))
+			{
+				if(pg_num_rows($result)>0)
+				{
+					$this->errormsg = 'Dieses Betriebsmittel ist der Person bereits zugeordnet';
+					return false;
+				}
+			}
 			//Neuen Datensatz einfuegen
 					
 			$qry='INSERT INTO public.tbl_betriebsmittelperson (betriebsmittel_id, person_id, anmerkung, kaution, 
