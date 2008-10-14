@@ -97,6 +97,21 @@
 
 	$datum_beginn='2008-06-01'; // $ss->start;
 	$datum_ende='2008-08-31';	//$ss->ende;
+
+	$dTmpCheck=date("Y.m.d", mktime(0,0,0,date("m"),date("d"),date("y")));
+	if ($datum_ende<$dTmpCheck)
+	{
+
+		$dTmpAktuellerMontag=date("Y-m-d",strtotime(date('Y')."W".date('W')."1")); // Montag der Aktuellen Woche
+		$dTmpAktuellesDatum=explode("-",$dTmpAktuellerMontag);
+		$dTmpMontagPlus=date("Y-m-d", mktime(0,0,0,date($dTmpAktuellesDatum[1]),date($dTmpAktuellesDatum[2])+14,date($dTmpAktuellesDatum[0])));
+
+		$datum_beginn=$dTmpAktuellerMontag; 
+		$datum_ende=$dTmpMontagPlus;
+	
+	}	
+
+
 	$ts_beginn=$datum_obj->mktime_fromdate($datum_beginn);
 	$ts_ende=$datum_obj->mktime_fromdate($datum_ende);
 
