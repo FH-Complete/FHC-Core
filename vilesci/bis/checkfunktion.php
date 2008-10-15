@@ -186,7 +186,7 @@ if($result = pg_query($conn, $qry))
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
 				(tbl_lehreinheit.studiensemester_kurzbz='$stsemprevprev' OR tbl_lehreinheit.studiensemester_kurzbz='$stsemprev'))
-				AND (ende>'2006-11-15' OR ende is null))";
+				AND (ende>'$lastbismeldung' OR ende is null))";
 	echo '<br><br>';
 	echo '<h3>Uebersicht</h3>';
 	echo '<table>';
