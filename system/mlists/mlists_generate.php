@@ -50,7 +50,7 @@ $error_msg='';
 	// Lektoren holen die nicht mehr in den Verteiler gehoeren
 	echo $mlist_name.' wird abgeglichen!<BR>';
 	flush();
-	$sql_query="SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter JOIN tbl_benutzer ON (mitarbeiter_uid=uid) WHERE lektor AND aktiv)";
+	$sql_query="SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) WHERE lektor AND aktiv)";
 	if(!($result=pg_query($conn, $sql_query)))
 		$error_msg.=pg_errormessage($conn);
 	while($row=pg_fetch_object($result))
@@ -63,18 +63,80 @@ $error_msg='';
 	}
 	// Lektoren holen die nicht im Verteiler sind
 	echo '<BR>';
-	$sql_query="SELECT mitarbeiter_uid AS uid FROM public.tbl_mitarbeiter JOIN tbl_benutzer ON (mitarbeiter_uid=uid) WHERE lektor AND aktiv AND mitarbeiter_uid NOT LIKE '\\\\_%' AND mitarbeiter_uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name'))";
+	$sql_query="SELECT mitarbeiter_uid AS uid FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) WHERE lektor AND aktiv AND mitarbeiter_uid NOT LIKE '\\\\_%' AND mitarbeiter_uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name'))";
 	if(!($result=pg_query($conn, $sql_query)))
 		$error_msg.=pg_errormessage($conn);
 	while($row=pg_fetch_object($result))
 	{
-     	$sql_query="INSERT INTO public.tbl_benutzergruppe VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
+     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
 		if(!pg_query($conn, $sql_query))
 			$error_msg.=pg_errormessage($conn).$sql_query;
 		echo '-';
 		flush();
 	}
 
+	// **************************************************************
+	// Sekretariats-Verteiler abgleichen
+	$mlist_name='tw_sek';
+	// Personen holen die nicht mehr in den Verteiler gehoeren
+	echo $mlist_name.' wird abgeglichen!<BR>';
+	flush();
+	$sql_query="SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) JOIN public.tbl_benutzerfunktion USING(uid) WHERE aktiv AND funktion_kurzbz='ass')";
+	if(!($result=pg_query($conn, $sql_query)))
+		$error_msg.=pg_errormessage($conn);
+	while($row=pg_fetch_object($result))
+	{
+     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
+		if(!pg_query($conn, $sql_query))
+			$error_msg.=pg_errormessage($conn).$sql_query;
+		echo '-';
+		flush();
+	}
+	// Personen holen die nicht im Verteiler sind
+	echo '<BR>';
+	$sql_query="SELECT distinct mitarbeiter_uid AS uid FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) JOIN public.tbl_benutzerfunktion USING(uid) WHERE aktiv AND tbl_benutzerfunktion.funktion_kurzbz='ass' AND mitarbeiter_uid NOT LIKE '\\\\_%' AND mitarbeiter_uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name'))";
+	if(!($result=pg_query($conn, $sql_query)))
+		$error_msg.=pg_errormessage($conn);
+	while($row=pg_fetch_object($result))
+	{
+     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, studiensemester_kurzbz, updateamum, updatevon, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."',null, null, null, now(), 'mlists_generate')";
+		if(!pg_query($conn, $sql_query))
+			$error_msg.=pg_errormessage($conn).$sql_query;
+		echo '-';
+		flush();
+	}
+	
+	// **************************************************************
+	// Studiengangsleiter-Verteiler abgleichen
+	$mlist_name='tw_stgl';
+	// Personen holen die nicht mehr in den Verteiler gehoeren
+	echo $mlist_name.' wird abgeglichen!<BR>';
+	flush();
+	$sql_query="SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) JOIN public.tbl_benutzerfunktion USING(uid) WHERE aktiv AND funktion_kurzbz='stgl')";
+	if(!($result=pg_query($conn, $sql_query)))
+		$error_msg.=pg_errormessage($conn);
+	while($row=pg_fetch_object($result))
+	{
+     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
+		if(!pg_query($conn, $sql_query))
+			$error_msg.=pg_errormessage($conn).$sql_query;
+		echo '-';
+		flush();
+	}
+	// Personen holen die nicht im Verteiler sind
+	echo '<BR>';
+	$sql_query="SELECT mitarbeiter_uid AS uid FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) JOIN public.tbl_benutzerfunktion USING(uid) WHERE aktiv AND tbl_benutzerfunktion.funktion_kurzbz='stgl' AND mitarbeiter_uid NOT LIKE '\\\\_%' AND mitarbeiter_uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name'))";
+	if(!($result=pg_query($conn, $sql_query)))
+		$error_msg.=pg_errormessage($conn);
+	while($row=pg_fetch_object($result))
+	{
+     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, studiensemester_kurzbz, updateamum, updatevon, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."',null, null, null, now(), 'mlists_generate')";
+		if(!pg_query($conn, $sql_query))
+			$error_msg.=pg_errormessage($conn).$sql_query;
+		echo '-';
+		flush();
+	}
+	
 	// **************************************************************
 	// Verteiler fuer alle fixAngestellten abgleichen
 	$mlist_name='tw_fix';
@@ -99,7 +161,7 @@ $error_msg='';
 		$error_msg.=pg_errormessage($conn);
 	while($row=pg_fetch_object($result))
 	{
-     	$sql_query="INSERT INTO public.tbl_benutzergruppe VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
+     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
 		if(!pg_query($conn, $sql_query))
 			$error_msg.=pg_errormessage($conn).$sql_query;
 		echo '-';
@@ -130,7 +192,7 @@ $error_msg='';
 		$error_msg.=pg_errormessage($conn);
 	while($row=pg_fetch_object($result))
 	{
-     	$sql_query="INSERT INTO public.tbl_benutzergruppe VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
+     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
 		if(!pg_query($conn, $sql_query))
 			$error_msg.=pg_errormessage($conn).$sql_query;
 		echo '-';
@@ -201,19 +263,19 @@ $error_msg='';
 		else
 			echo "<br>Fehler:$sql_query";
 
-     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, updateamum, updatevon) VALUES ('$row->mitarbeiter_uid','".strtoupper($row->mlist_name)."', now(), 'mlists_generate')";
+     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->mitarbeiter_uid','".strtoupper($row->mlist_name)."', now(), 'mlists_generate')";
 		if(!pg_query($conn, $sql_query))
 			$error_msg.=pg_errormessage($conn).$sql_query;
 		echo '-';
 		flush();
 	}
-
+	
 	// **************************************************************
 	// StudentenvertreterVerteiler abgleichen
 	// Studenten holen die nicht mehr in den Verteiler gehoeren
 	echo 'Studentenvertreterverteiler werden abgeglichen!<BR>';
 	flush();
-	$sql_query="SELECT gruppe_kurzbz, uid FROM public.tbl_benutzergruppe JOIN public.tbl_gruppe USING(gruppe_kurzbz) WHERE gruppe_kurzbz LIKE '%_STDV' AND uid not in (SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='stdv' AND studiengang_kz=tbl_gruppe.studiengang_kz)";
+	$sql_query="SELECT gruppe_kurzbz, uid FROM public.tbl_benutzergruppe JOIN public.tbl_gruppe USING(gruppe_kurzbz) WHERE gruppe_kurzbz LIKE '%_STDV' AND uid not in (SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='stdv' AND studiengang_kz=tbl_gruppe.studiengang_kz) AND tbl_gruppe.studiengang_kz!='0'";
 	if(!($result=pg_query($conn, $sql_query)))
 		$error_msg.=pg_errormessage($conn);
 	while($row=pg_fetch_object($result))
@@ -226,14 +288,14 @@ $error_msg='';
 	}
 	// Studenten holen die nicht im Verteiler sind
 	echo '<BR>';
-	$sql_query="SELECT uid, (Select gruppe_kurzbz from public.tbl_gruppe where studiengang_kz=tbl_benutzerfunktion.studiengang_kz AND gruppe_kurzbz like '%_STDV') as gruppe_kurzbz FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='stdv' AND uid NOT in(Select uid from public.tbl_benutzergruppe JOIN public.tbl_gruppe USING(gruppe_kurzbz) WHERE studiengang_kz=tbl_benutzerfunktion.studiengang_kz AND gruppe_kurzbz Like '%_STDV')";
+	$sql_query="SELECT uid, (SELECT gruppe_kurzbz FROM public.tbl_gruppe WHERE studiengang_kz=tbl_benutzerfunktion.studiengang_kz AND gruppe_kurzbz like '%_STDV') as gruppe_kurzbz FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='stdv' AND uid NOT in(Select uid from public.tbl_benutzergruppe JOIN public.tbl_gruppe USING(gruppe_kurzbz) WHERE studiengang_kz=tbl_benutzerfunktion.studiengang_kz AND gruppe_kurzbz Like '%_STDV')";
 	if(!($result=pg_query($conn, $sql_query)))
 		$error_msg.=pg_errormessage($conn);
 	while($row=pg_fetch_object($result))
 	{
 		if($row->gruppe_kurzbz!='')
 		{
-	     	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, updateamum, updatevon) VALUES ('$row->uid','".strtoupper($row->gruppe_kurzbz)."', now(), 'mlists_generate')";
+	     	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($row->gruppe_kurzbz)."', now(), 'mlists_generate')";
 			if(!pg_query($conn, $sql_query))
 				$error_msg.=pg_errormessage($conn).$sql_query;
 			echo '-';
@@ -262,51 +324,12 @@ $error_msg='';
 		$error_msg.=pg_errormessage($conn);
 	while($row=pg_fetch_object($result))
 	{
-	   	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, updateamum, updatevon) VALUES ('$row->uid','TW_STDV', now(), 'mlists_generate')";
+	   	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','TW_STDV', now(), 'mlists_generate')";
 		if(!pg_query($conn, $sql_query))
 			$error_msg.=pg_errormessage($conn).$sql_query;
 		echo '-';
 		flush();
 	}
-	// **************************************************************
-	// Studentenverteiler abgleichen
-	// Studenten holen die nicht mehr in den Verteiler gehoeren
-	/*
-	echo '<BR>Studenten-Verteiler werden abgeglichen!<BR>';
-	flush();
-	$sql_query="SELECT gruppe_kurzbz, uid FROM public.tbl_benutzergruppe NATURAL JOIN tbl_einheit
-	            WHERE (uid, mailgrp_kurzbz) NOT IN
-	            (SELECT uid, mailgrp_kurzbz FROM tbl_einheitstudent NATURAL JOIN tbl_einheit
-	            	WHERE mailgrp_kurzbz IS NOT NULL)";
-
-
-	//echo $sql_query;
-	if(!($result=@pg_query($conn, $sql_query)))
-		$error_msg.=pg_errormessage($conn).$sql_query;
-	while($row=pg_fetch_object($result))
-	{
-     	$sql_query="DELETE FROM tbl_personmailgrp WHERE mailgrp_kurzbz='$row->mailgrp_kurzbz' AND uid='$row->uid'";
-		if(!@pg_query($conn, $sql_query))
-			$error_msg.=pg_errormessage($conn).$sql_query;
-		echo '-';
-		flush();
-	}
-	// Studenten holen die noch nicht im Verteiler sind
-	echo '<BR>';
-	$sql_query="SELECT * FROM tbl_einheitstudent NATURAL JOIN tbl_einheit WHERE  mailgrp_kurzbz IS NOT NULL
-	            AND (uid,mailgrp_kurzbz) NOT IN (SELECT uid,mailgrp_kurzbz FROM tbl_personmailgrp)";
-	//echo $sql_query;
-	if(!($result=pg_query($conn, $sql_query)))
-		$error_msg.=pg_errormessage($conn).$sql_query;
-	while($row=pg_fetch_object($result))
-	{
-     	$sql_query="INSERT INTO tbl_personmailgrp VALUES ('$row->uid','$row->mailgrp_kurzbz', now(), 'mlists_generate.php')";
-		if(!pg_query($conn, $sql_query))
-			$error_msg.=pg_errormessage($conn).$sql_query;
-		echo '-';
-		flush();
-	}
-	*/
 
 	echo $error_msg;
 	?>
