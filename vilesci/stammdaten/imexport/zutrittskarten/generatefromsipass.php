@@ -131,7 +131,7 @@ $qry="SELECT DISTINCT ON (vw_betriebsmittelperson.person_id, nummer) nachname as
 	WHERE betriebsmitteltyp='Zutrittskarte' AND benutzer_aktiv AND retouram IS NULL
 	AND NOT(trim(upper(nachname))='OSOBSKY' AND trim(upper(vorname))='MICHAEL')
 	AND NOT(trim(upper(nachname))='PARK' AND trim(upper(vorname))='DAH-WE')
-	ORDER  BY vw_betriebsmittelperson.person_id,nummer,personalnummer";
+	ORDER  BY vw_betriebsmittelperson.person_id,nummer,personalnummer,matrikelnr";
 //abhanden gekommene karten???
 
 if($result = pg_query($conn, $qry))
