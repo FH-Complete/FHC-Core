@@ -122,7 +122,7 @@ else
 		  	  <td class='tdwrap'>&nbsp;</td>
 		  	</tr>
 			<tr>
-		      	  <td width="260" class='tdwrap'><strong>Lehre/Lektorensupport</strong></td>
+		      <td width="260" class='tdwrap'><strong>Lehre/Lektorensupport</strong></td>
 			  <td width="50" class='tdwrap'>&nbsp;</td>
 			  <td  class='tdwrap'>&nbsp;</td>
 			  <td width="56" class='tdwrap'>&nbsp;</td>
@@ -132,6 +132,26 @@ else
 			  <td width="260" class='tdwrap'>DI Papp Kata</td>
 			  <td width="50" class='tdwrap'>247</td>
 			  <td  class='tdwrap'><?php echo ($visible?'<a class="Item" href="mailto:kata.papp@technikum-wien.at">kata.papp@technikum-wien.at</a>':'')?></td>
+			  <td width="56" class='tdwrap'>&nbsp;</td>
+			  <td class='tdwrap'>Termin nach Vereinbarung</td>
+			</tr>
+			<tr>
+		  	  <td colspan="2" class='tdwrap'>&nbsp;</td>
+		  	  <td class='tdwrap'>&nbsp;</td>
+		  	  <td class='tdwrap'>&nbsp;</td>
+		  	  <td class='tdwrap'>&nbsp;</td>
+		  	</tr>
+		  	<tr>
+		      <td width="260" class='tdwrap'><strong>e-learning Kompetenzcenter</strong></td>
+			  <td width="50" class='tdwrap'>&nbsp;</td>
+			  <td  class='tdwrap'>&nbsp;</td>
+			  <td width="56" class='tdwrap'>&nbsp;</td>
+			  <td class='tdwrap'>&nbsp;</td>
+			</tr>
+			<tr>
+			  <td width="260" class='tdwrap'>Krösl Katharina</td>
+			  <td width="50" class='tdwrap'>249</td>
+			  <td  class='tdwrap'><?php echo ($visible?'<a class="Item" href="mailto:katharina.kroesl@technikum-wien.at">kata.papp@technikum-wien.at</a>':'')?></td>
 			  <td width="56" class='tdwrap'>&nbsp;</td>
 			  <td class='tdwrap'>Termin nach Vereinbarung</td>
 			</tr>
