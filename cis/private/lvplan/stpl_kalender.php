@@ -93,12 +93,18 @@ if ($uid=='maderdon')
 
 $jahr=date("Y",$begin);
 $mon=date("m",$begin);
-$name='TW-Kalender_'.$mon.'_'.$jahr;
+$name='FH-Kalender_'.$mon.'_'.$jahr;
 if (isset($target))
 	$name.='_'.$target;
 
 // doing some DOS-CRLF magic...
 $crlf=crlf();
+
+// Funktion zum Konvertieren des gesamten Outputs nach UTF8
+function converttoutf8($buffer)
+{
+	return utf8_encode($buffer);
+}
 
 // Check Type
 // Print in csv-file
@@ -117,6 +123,8 @@ if ($format=='csv')
 // Print in ical-file - MR
 else if ($format=='ical')
 {
+	//Bei icals den output buffern und am ende den gesamten output auf utf8 codieren
+	ob_start("converttoutf8");
 	$name.='.ics';
 	header("Content-disposition: filename=$name");
 	header("Content-type: text/calendar");
@@ -226,9 +234,9 @@ while ($begin<$ende)
 
 	// Stundenplan der Woche drucken
 	if ($format=='csv' || $format=='ical')
+	{		
 		$stdplan->draw_week_csv($target, LVPLAN_KATEGORIE);
-	//else if ($format=='ical')
-	//	$stdplan->draw_week_ical($target);
+	}
 	else
 		$stdplan->draw_week(false);
 }
@@ -242,6 +250,7 @@ if ($format=='csv')
 else if ($format=='ical')
 {
 	echo $crlf.'END:VCALENDAR';
+	ob_end_flush();
 }
 // Print in HTML-File
 else
