@@ -1109,6 +1109,7 @@ class moodle_course
 			$this->errormsg = 'Fehler beim Lesen der Noten ';
 			return false;
 		}	
+
 		$mdl_grade_letters_first=null;
 		// Init
 		$mdl_grade_letters=array(); 
@@ -1120,9 +1121,13 @@ class moodle_course
 		}	
 		asort($mdl_grade_letters);
 		reset($mdl_grade_letters);
+		
+		
+
+		
 		if (!isset($mdl_grade_letters[$mdl_grade_letters_first]))
 		{
-			$this->errormsg = 'Fehler beim Lesen der Notenskala eins !';
+			$this->errormsg = ' Keinen Notenschluessel gefunden! ( Tabelle: mdl_grade_letters ist leer. )';
 			return false;
 		}	
 		// --------------------------------------------------------------------
@@ -1184,13 +1189,24 @@ class moodle_course
 			if (empty($mdl_finalgrade))
 				continue; // Keine Notenfindung 
 			
+			
 			// Vergleichswerte fuer die Noten aus der Tabelle mdl_grade_letters suchen
-			$arrTmpDefaultNoten=$mdl_grade_letters[$mdl_grade_letters_first];						
-			if (isset($mdl_grade_letters[$mdl_course_id]))
+			$arrTmpDefaultNoten=array();
+			$mdl_grade_letters_first=1; // Es muss einen Default geben (Administrator Noten)
+			if (isset($mdl_grade_letters[$mdl_grade_letters_first]))
+				$arrTmpDefaultNoten=$mdl_grade_letters[$mdl_grade_letters_first];						
+			elseif (isset($mdl_grade_letters[$mdl_course_id]))
 			{
-				$arrTmpDefaultNoten=$mdl_grade_letters[$mdl_course_id];
+				$mdl_grade_letters_first=$mdl_course_id;
+				$arrTmpDefaultNoten=$mdl_grade_letters[$mdl_grade_letters_first];
 			}	
-			$row->TabellezurNotenermittlung=$arrTmpDefaultNoten;
+			if (!is_array($arrTmpDefaultNoten) || count($arrTmpDefaultNoten)<1)		
+			{
+				$this->errormsg = 'Keinen Notenschluessel gefunden! ( Tabelle: mdl_grade_letters ist leer, oder kein Eintrag zu Kurs '.$mdl_course_id.'. ) ';
+				return false;
+			}	
+			$row->NotenermittlungTabIndex=$mdl_grade_letters_first;
+			$row->NotenermittlungTab=$arrTmpDefaultNoten;
 			$row->note=0;
 		    for ($iTmpIndex=0;$iTmpIndex<count($arrTmpDefaultNoten);$iTmpIndex++)
 			{
@@ -1212,8 +1228,14 @@ class moodle_course
 								$row->note=3;
 							elseif (substr($arrTmpDefaultNoten[$iTmpIndex]->letter,0,1)=="D")
 								$row->note=4;
-							else
+							elseif (substr($arrTmpDefaultNoten[$iTmpIndex]->letter,0,1)=="E" 
+								|| substr($arrTmpDefaultNoten[$iTmpIndex]->letter,0,1)=="F" )
 								$row->note=5;
+							else
+							{
+								$this->errormsg = ' Unbekannter Notenschluessel ( Erlaubt sind 1 bis 5, oder A bis F ) ! ';
+								return false;
+							}	
 						}		
 						break;
 					}
