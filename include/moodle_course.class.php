@@ -1233,7 +1233,7 @@ class moodle_course
 								$row->note=5;
 							else
 							{
-								$this->errormsg = ' Unbekannter Notenschluessel ( Erlaubt sind 1 bis 5, oder A bis F ) ! ';
+								$this->errormsg = ' Unbekannter Notenschluessel "'.$arrTmpDefaultNoten[$iTmpIndex]->letter.'" ( Erlaubt sind 1 bis 5, oder A bis F ) ! ';
 								return false;
 							}	
 						}		
