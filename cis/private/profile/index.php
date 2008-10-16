@@ -26,6 +26,7 @@
 	require_once('../../../include/studiengang.class.php');
 	require_once('../../../include/fckeditor/fckeditor.php');
 	require_once('../../../include/person.class.php');
+	require_once('../../../include/safehtml/safehtml.class.php');
 		
 	$uid=get_uid();
 	$ansicht=false; //Wenn ein anderer User sich das Profil ansieht (Bei Personensuche)
@@ -133,7 +134,12 @@ function RefreshImage()
 	{
 		$person = new person($conn);
 		$person->load($person_id);
-		$person->kurzbeschreibung = $_POST['kurzbeschreibung'];
+		
+		//Remove Script Tags and other stuff
+		$parser = new SafeHTML();
+		$result = $parser->parse($_POST['kurzbeschreibung']);
+		
+		$person->kurzbeschreibung = $result;
 		$person->updateamum = date('Y-m-d H:i:s');
 		$person->udpatevon = $uid;
 		if($person->save())
