@@ -56,10 +56,8 @@ if(check_lektor($user, $conn) and $_GET["uid"] != "")
 	$user = $_GET["uid"];
 }
 
-
-
-$rechte = new benutzerberechtigung($conn);
-$rechte->getBerechtigungen($user);
+#$rechte = new benutzerberechtigung($conn);
+#$rechte->getBerechtigungen($user);
 
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id
 	$lvid = $_GET['lvid'];
