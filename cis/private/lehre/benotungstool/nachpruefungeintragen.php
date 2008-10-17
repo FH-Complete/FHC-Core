@@ -26,7 +26,6 @@ require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/studiengang.class.php');
 require_once('../../../../include/studiensemester.class.php');
 require_once('../../../../include/lehreinheit.class.php');
-require_once('../../../../include/benutzerberechtigung.class.php');
 require_once('../../../../include/uebung.class.php');
 require_once('../../../../include/beispiel.class.php');
 require_once('../../../../include/studentnote.class.php');
@@ -44,8 +43,6 @@ $user = get_uid();
 if(!check_lektor($user, $conn))
 	die('Sie haben keine Berechtigung fuer diesen Bereich');
 
-$rechte = new benutzerberechtigung($conn);
-$rechte->getBerechtigungen($user);
 
 $lehreinheit_id='';
 
