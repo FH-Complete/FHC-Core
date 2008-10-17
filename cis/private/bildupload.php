@@ -25,7 +25,7 @@ require_once('../config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
-require_once('../../include/benutzerberechtigung.class.php');
+#gss 17.10.2008 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/akte.class.php');
 
 $PHP_SELF = $_SERVER['PHP_SELF'];
