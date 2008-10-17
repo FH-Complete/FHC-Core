@@ -252,7 +252,7 @@ loadVariables($conn, $user);
 		
 		//Zustelladresse
 		//Zustelladresse aus der Datenbank holen und dazuhaengen
-		$qry_1 = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id' ORDER BY zustelladresse LIMIT 1";
+		$qry_1 = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id' ORDER BY zustelladresse DESC LIMIT 1";
 		if($result_1 = pg_query($conn, $qry_1))
 		{
 			if($row_1 = pg_fetch_object($result_1))
