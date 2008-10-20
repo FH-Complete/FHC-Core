@@ -275,11 +275,12 @@ echo '<br>';
 echo "<table class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>
 	<thead>
 		<tr>
-		<th class='table-sortable:default'>ID</th>
+		<th class='table-sortable:numeric'>ID</th>
 		<th class='table-sortable:default'>Nachname</th>
 		<th class='table-sortable:default'>Vorname</th>
 		<th class='table-sortable:default'>StSem</th>
 		<th class='table-sortable:default'>Erf.datum</th>
+		<th class='table-sortable:default'>Geschlecht</th>
 		<th class='table-sortable:default'>E-Mail</th>
 		<th class='table-sortable:default'>Status</th>
 		<th class='table-sortable:default'>Freigabe</th>
@@ -327,6 +328,13 @@ foreach ($preinteressent->result as $row)
 	//echo "<td>".$datum_obj->convertISODate($person->gebdatum)."</td>";
 	echo "<td>$row->studiensemester_kurzbz</td>";
 	echo "<td><span style='display: none'>$row->erfassungsdatum</span>".$datum_obj->formatDatum($row->erfassungsdatum,'d.m.Y')."</td>";
+	switch ($person->geschlecht)
+	{
+		case 'm': $geschlecht='männlich'; break;
+		case 'w': $geschlecht='weiblich'; break;
+		default: $geschlecht='';
+	}
+	echo "<td>$geschlecht</td>";
 	//EMail
 	$qry = "SELECT kontakt FROM public.tbl_kontakt WHERE person_id='$person->person_id' AND kontakttyp='email' 
 			ORDER BY zustellung DESC LIMIT 1";

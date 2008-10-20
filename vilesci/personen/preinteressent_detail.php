@@ -290,6 +290,7 @@ if(isset($_POST['save_preinteressent']))
 	$preinteressent->updatevon = $user;
 	$preinteressent->maturajahr = $_POST['maturajahr'];
 	$preinteressent->infozusendung = $_POST['infozusendung'];
+	$preinteressent->kontaktmedium_kurzbz = $_POST['kontaktmedium_kurzbz'];
 
 	if(!$preinteressent->save(false))
 		echo "<b>Fehler beim Speichern der Daten: $preinteressent->errormsg</b>";
@@ -651,12 +652,28 @@ foreach ($aufmerksam->result as $row)
 }
 echo "</SELECT>";
 echo '</td>';
-//Einverstaendnis
-echo "<td>Einverst&auml;ndnis:</td><td><input type='checkbox' ".($preinteressent->einverstaendnis?'checked':'')." name='einverstaendnis'></td>";
+
+echo "<td>Kontaktmedium (Woher)</td><td><SELECT name='kontaktmedium_kurzbz'>";
+
+echo "<option value=''>-- keine Auswahl --</option>";
+$qry = "SELECT * FROM public.tbl_kontaktmedium ORDER BY beschreibung";
+
+if($result = pg_query($conn, $qry))
+{
+	while($row = pg_fetch_object($result))
+	{
+		if($preinteressent->kontaktmedium_kurzbz==$row->kontaktmedium_kurzbz)
+			$selected='selected';
+		else 
+			$selected='';
+		
+		echo "<option value='$row->kontaktmedium_kurzbz' $selected>$row->beschreibung</option>";
+	}
+}
+echo "</SELECT></td>";
 
 //Absagedatum
 echo "<td>Absage</td><td><input type='checkbox' ".($preinteressent->absagedatum!=''?'checked':'')." name='absagedatum'></td>";
-
 
 echo '</tr><tr>';
 
@@ -670,6 +687,8 @@ echo "<td>Infozusendung am</td><td><input type='text' name='infozusendung' size=
 //Maturajahr
 echo "<td>Maturajahr</td><td><input type='text' name='maturajahr' size='4' maxlength='4' value='$preinteressent->maturajahr'></td>";
 
+//Einverstaendnis
+echo "<td>Einverst&auml;ndnis:</td><td><input type='checkbox' ".($preinteressent->einverstaendnis?'checked':'')." name='einverstaendnis'></td>";
 
 echo '</tr><tr>';
 

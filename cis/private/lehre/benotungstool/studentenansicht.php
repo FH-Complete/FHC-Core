@@ -799,7 +799,7 @@ if (!isset($_GET["notenuebersicht"]))
 				<br><br>
 				<table border='1' width='210'>
 				<tr>
-					<td colspan='2' class='ContentHeader2'>Alle Kreuzerllisten bisher:</td>
+					<td colspan='2' class='ContentHeader2'>Alle Kreuzerllisten dieser Übung:</td>
 				</tr>
 				<tr>
 					<td width='180'>Punkte insgesamt m&ouml;glich:</td>
