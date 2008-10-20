@@ -43,6 +43,7 @@ class preinteressent
 	var $updatevon;					// varchar(16)
 	var $maturajahr;				// numeric(4,0)
 	var $infozusendung;				// date
+	var $kontaktmedium_kurzbz;		// varchar(32)
 		
 	var $studiengang_kz;
 	var $prioritaet;		// smallint
@@ -111,6 +112,7 @@ class preinteressent
 				$this->updatevon = $row->updatevon;
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
+				$this->kontaktmedium_kurzbz = $row->kontaktmedium_kurzbz;
 				return true;		
 			}
 			else 
@@ -151,7 +153,7 @@ class preinteressent
 			{
 				$undo.=" INSERT INTO public.tbl_preinteressent(preinteressent_id, person_id, studiensemester_kurzbz, 
 						aufmerksamdurch_kurzbz, firma_id, erfassungsdatum, einverstaendnis, absagedatum, anmerkung, 
-						insertamum, insertvon, updateamum, updatevon, maturajahr, infozusendung) VALUES (".
+						insertamum, insertvon, updateamum, updatevon, maturajahr, infozusendung, kontaktmedium_kurzbz) VALUES (".
 				 		$this->addslashes($row->preinteressent_id).', '.
 				 		$this->addslashes($row->person_id).', '.
 						$this->addslashes($row->studiensemester_kurzbz).', '.
@@ -166,7 +168,8 @@ class preinteressent
 						$this->addslashes($row->updateamum).', '.
 						$this->addslashes($row->updatevon).', '.
 						$this->addslashes($row->maturajahr).', '.
-						$this->addslashes($row->infozusendung).');';						
+						$this->addslashes($row->infozusendung).', '.
+						$this->addslashes($row->kontaktmedium_kurzbz).');';
 			}
 		}
 		else 
@@ -297,7 +300,7 @@ class preinteressent
 			//Neuen Datensatz anlegen	
 			$qry = "BEGIN;INSERT INTO public.tbl_preinteressent (studiensemester_kurzbz, 
 					aufmerksamdurch_kurzbz, firma_id, anmerkung, erfassungsdatum, einverstaendnis, absagedatum,
-					maturajahr, infozusendung, person_id, updateamum, updatevon, insertamum, insertvon) VALUES (".
+					maturajahr, infozusendung, person_id, updateamum, updatevon, insertamum, insertvon, kontaktmedium_kurzbz) VALUES (".
 			       $this->addslashes($this->studiensemester_kurzbz).', '.
 			       $this->addslashes($this->aufmerksamdurch_kurzbz).', '.
 			       $this->addslashes($this->firma_id).', '.
@@ -311,7 +314,8 @@ class preinteressent
 			       $this->addslashes($this->updateamum).', '.
 			       $this->addslashes($this->updatevon).', '.
 			       $this->addslashes($this->insertamum).', '.
-			       $this->addslashes($this->insertvon).');';
+			       $this->addslashes($this->insertvon).', '.
+			       $this->addslashes($this->kontaktmedium_kurzbz).');';
 		}
 		else 
 		{
@@ -328,7 +332,8 @@ class preinteressent
 				  " infozusendung=".$this->addslashes($this->infozusendung).",".
 				  " person_id=".$this->addslashes($this->person_id).",".
 				  " updatevon=".$this->addslashes($this->updatevon).",".
-				  " updateamum=".$this->addslashes($this->updateamum).
+				  " updateamum=".$this->addslashes($this->updateamum).','.
+				  " kontaktmedium_kurzbz=".$this->addslashes($this->kontaktmedium_kurzbz).
 				  " WHERE preinteressent_id='".addslashes($this->preinteressent_id)."'";
 		}
 		
@@ -409,6 +414,7 @@ class preinteressent
 				$obj->prioritaet = $row->prioritaet;
 				$obj->freigabedatum = $row->freigabedatum;
 				$obj->uebernahmedatum = $row->uebernahmedatum;
+				$obj->kontaktmedium_kurzbz = $row->kontaktmedium_kurzbz;
 				
 				$this->result[] = $obj;
 			}
@@ -475,6 +481,7 @@ class preinteressent
 				$obj->maturajahr = $row->maturajahr;
 				$obj->infozusendung = $row->infozusendung;
 				$obj->person_id = $row->person_id;
+				$obj->kontaktmedium_kurzbz = $row->kontaktmedium_kurzbz;
 				
 				$this->result[] = $obj;
 			}
@@ -686,6 +693,7 @@ class preinteressent
 				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
+				$obj->kontaktmedium_kurzbz = $row->kontaktmedium_kurzbz;
 				
 				$this->result[] = $obj;
 			}
