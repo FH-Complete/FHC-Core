@@ -35,6 +35,31 @@ if (!$conn = pg_pconnect(CONN_STRING))
 echo '<H1>Systemcheck!</H1>';
 echo '<H2>DB-Updates!</H2>';
 
+// ************* Kontaktmedium **********************************************************
+if (!@pg_query($conn,'SELECT * FROM public.tbl_kontaktmedium LIMIT 1;'))
+{
+	$sql='	ALTER TABLE tbl_preinteressent ADD COLUMN kontaktmedium_kurzbz varchar(32);
+			Create table public.tbl_kontaktmedium
+			(
+				kontaktmedium_kurzbz Varchar(32) NOT NULL,
+				beschreibung Varchar(256),
+				constraint pk_tbl_kontaktmedium primary key (kontaktmedium_kurzbz)
+			);
+			Grant select on public.tbl_kontaktmedium to group "admin";
+			Grant update on public.tbl_kontaktmedium to group "admin";
+			Grant delete on public.tbl_kontaktmedium to group "admin";
+			Grant insert on public.tbl_kontaktmedium to group "admin";
+			Grant select on public.tbl_kontaktmedium to group "web";
+			Alter table tbl_preinteressent add Constraint "kontaktmedium_preinteressent" foreign key ("kontaktmedium_kurzbz")
+				references public.tbl_kontaktmedium ("kontaktmedium_kurzbz") on update cascade on delete restrict;
+		';
+		if (!pg_query($conn,$sql))
+			echo '<strong>public.tbl_kontaktmedium: '.pg_last_error($conn).' </strong><BR>';
+		else
+			echo 'Tabelle public.tbl_kontaktmedium hinzugefuegt!<BR>Tabelle public.tbl_preinteressent.kontaktmedium_kurzbz hinzugefuegt!<BR>';
+
+}
+
 // ************** kommune.tbl_wettbewerbtyp.farbe **********************************************
 if (!@pg_query($conn,'SELECT farbe FROM kommune.tbl_wettbewerbtyp LIMIT 1;'))
 {
@@ -711,6 +736,7 @@ $tabellen=array(
 	"public.tbl_funktion"  => array("funktion_kurzbz","beschreibung","aktiv"),
 	"public.tbl_gruppe"  => array("gruppe_kurzbz","studiengang_kz","semester","bezeichnung","beschreibung","sichtbar","lehre","aktiv","sort","mailgrp","generiert","updateamum","updatevon","insertamum","insertvon","ext_id","orgform_kurzbz"),
 	"public.tbl_kontakt"  => array("kontakt_id","person_id","firma_id","kontakttyp","anmerkung","kontakt","zustellung","updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"public.tbl_kontaktmedium"  => array("kontaktmedium_kurzbz","beschreibung"),
 	"public.tbl_kontakttyp"  => array("kontakttyp","beschreibung"),
 	"public.tbl_konto"  => array("buchungsnr","person_id","studiengang_kz","studiensemester_kurzbz","buchungstyp_kurzbz","buchungsnr_verweis","betrag","buchungsdatum","buchungstext","mahnspanne","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_lehrverband"  => array("studiengang_kz","semester","verband","gruppe","aktiv","bezeichnung","ext_id","orgform_kurzbz"),
@@ -720,7 +746,7 @@ $tabellen=array(
 	"public.tbl_ortraumtyp"  => array("ort_kurzbz","hierarchie","raumtyp_kurzbz"),
 	"public.tbl_person"  => array("person_id","staatsbuergerschaft","geburtsnation","sprache","anrede","titelpost","titelpre","nachname","vorname","vornamen","gebdatum","gebort","gebzeit","foto","anmerkung","homepage","svnr","ersatzkennzeichen","familienstand","geschlecht","anzahlkinder","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","bundesland_code","kompetenzen","kurzbeschreibung"),
 	"public.tbl_personfunktionfirma"  => array("personfunktionfirma_id","funktion_kurzbz","person_id","firma_id","position","anrede"),
-	"public.tbl_preinteressent"  => array("preinteressent_id","person_id","studiensemester_kurzbz","firma_id","erfassungsdatum","einverstaendnis","absagedatum","anmerkung","maturajahr","infozusendung","aufmerksamdurch_kurzbz","insertamum","insertvon","updateamum","updatevon"),
+	"public.tbl_preinteressent"  => array("preinteressent_id","person_id","studiensemester_kurzbz","firma_id","erfassungsdatum","einverstaendnis","absagedatum","anmerkung","maturajahr","infozusendung","aufmerksamdurch_kurzbz","kontaktmedium_kurzbz","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preinteressentstudiengang"  => array("studiengang_kz","preinteressent_id","freigabedatum","uebernahmedatum","prioritaet","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","punkte","bismelden","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_prestudentrolle"  => array("prestudent_id","rolle_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id"),
