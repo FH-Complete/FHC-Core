@@ -1014,23 +1014,17 @@ class moodle_course
 		//		und der lehrveranstaltung_id aus FAS ( bsp 23802 )
 		// --------------------------------------------------------------------
 		$qry = "
-		select lehreinheit_id, mdl_course_id,studiensemester_kurzbz,lehrveranstaltung_id
-		from (
 		SELECT tbl_lehreinheit.lehreinheit_id, mdl_course_id,studiensemester_kurzbz,tbl_moodle.lehrveranstaltung_id
 			FROM lehre.tbl_moodle 
 			JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id, studiensemester_kurzbz)
 		WHERE tbl_moodle.lehrveranstaltung_id like E'".addslashes($lehrveranstaltung_id)."' 
 		AND tbl_moodle.studiensemester_kurzbz like E'".addslashes($studiensemester_kurzbz)."'
-
 		UNION 
 			SELECT tbl_lehreinheit.lehreinheit_id, mdl_course_id,tbl_lehreinheit.studiensemester_kurzbz,tbl_moodle.lehrveranstaltung_id
 			FROM lehre.tbl_moodle
 			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
 			WHERE tbl_lehreinheit.lehrveranstaltung_id like E'".addslashes($lehrveranstaltung_id)."' 
 			  AND tbl_lehreinheit.studiensemester_kurzbz like E'".addslashes($studiensemester_kurzbz)."'
-		) as foo	  
-		WHERE lehrveranstaltung_id like E'".addslashes($lehrveranstaltung_id)."' 
-		  AND studiensemester_kurzbz like E'".addslashes($studiensemester_kurzbz)."'
 		;";
 		
 		if(!$result = @pg_query($this->conn, $qry))
@@ -1041,16 +1035,20 @@ class moodle_course
 		// init
 		$lehreinheit_kpl = array(); // Gesamte Information der Lehreinheit und Moodle IDs
 		$lehreinheit=array();	// Lehreinheiten zum lesen Studenten im Campus (Student und LE im FAS) 
-		while($row = @pg_fetch_object($result))
+		//echo $qry;
+		while($row = pg_fetch_object($result))
 		{
 			$row->lehreinheit_id=trim($row->lehreinheit_id);
 			$lehreinheit[$row->lehreinheit_id]=$row->lehreinheit_id; // Fuer Select Campus
 			$lehreinheit_kpl[$row->lehreinheit_id]=$row; // Fuer GesamtDaten wird Ergaenzt von Campus,
 		}	
-		@pg_free_result($result);	
+		@pg_free_result($result);
 		if (count($lehreinheit)<1) // Es gibt keine Lehreinheiten
+		{
+			$this->errormsg='Es wurde kein passender Moodle-Kurs gefunden';
 			return false;
-
+		}
+		
 		// Fuer die naechste Verarbeitung die Array Sortieren 
 		asort($lehreinheit);
 		reset($lehreinheit);
@@ -1103,7 +1101,7 @@ class moodle_course
 		// --------------------------------------------------------------------
 		// Moodle Noten - Uebersetztungstabellen einlesen (min. ein Record )
 		// --------------------------------------------------------------------
-		$qry = "select * from mdl_grade_letters order by contextid; ";
+		$qry = "select * from mdl_grade_letters order by contextid, lowerboundary desc; ";
 		if(!$result = @pg_query($this->conn_moodle, $qry))
 		{
 			$this->errormsg = 'Fehler beim Lesen der Noten ';
@@ -1195,9 +1193,12 @@ class moodle_course
 			$mdl_grade_letters_first=1; // Es muss einen Default geben (Administrator Noten)
 			if (isset($mdl_grade_letters[$mdl_grade_letters_first]))
 				$arrTmpDefaultNoten=$mdl_grade_letters[$mdl_grade_letters_first];						
-			elseif (isset($mdl_grade_letters[$mdl_course_id]))
+				
+			if($this->getContext(50, $mdl_course_id))
+				$mdl_grade_letters_first = $this->mdl_context_id;
+						
+			if (isset($mdl_grade_letters[$mdl_grade_letters_first]))
 			{
-				$mdl_grade_letters_first=$mdl_course_id;
 				$arrTmpDefaultNoten=$mdl_grade_letters[$mdl_grade_letters_first];
 			}	
 			if (!is_array($arrTmpDefaultNoten) || count($arrTmpDefaultNoten)<1)		
@@ -1214,10 +1215,19 @@ class moodle_course
 				// Vergleichsoperatoren fuer Noten
 				$iTmpVergl=$arrTmpDefaultNoten[$iTmpIndex]->lowerboundary;
 				$iTmpFaktor=(!empty($row->rawgrademax)?(int)(100/$row->rawgrademax):1);
+					//echo "<br>::$iTmpIndex $mdl_finalgrade>=( $iTmpVergl / $iTmpFaktor)::<br>";
 					if ($mdl_finalgrade>=( $iTmpVergl / $iTmpFaktor) )
 					{
 						if (is_numeric($arrTmpDefaultNoten[$iTmpIndex]->letter)) 
+						{
 							$row->note=($iTmpIndex + 1);
+							if($row->note>5 || $row->note<1)
+							{
+								echo "FOOOO";
+								$this->errormsg = 'Unbekannter Notenschluessel';
+								return false;
+							}
+						}
 						else
 						{
 							if ( substr($arrTmpDefaultNoten[$iTmpIndex]->letter,0,1)=="A")
@@ -1281,7 +1291,7 @@ class moodle_course
 		if (!is_array($mdl_course) || count($mdl_course)<1)
 		{
 			$this->errormsg = ' keine Informationen gefunden'. count($mdl_course) ;
-			return false;
+			return true;
 		}	
 
 		if($bDetailinfo) // Alle Informationen Retour
