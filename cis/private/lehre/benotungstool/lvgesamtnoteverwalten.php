@@ -38,6 +38,7 @@ require_once('../../../../include/pruefung.class.php');
 require_once('../../../../include/person.class.php');
 require_once('../../../../include/benutzer.class.php');
 require_once('../../../../include/mitarbeiter.class.php');
+require_once('../../../../include/moodle_course.class.php');
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -316,6 +317,9 @@ function getTopOffset(){
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim oeffnen der Datenbankverbindung');
 
+if(!$conn_moodle = pg_pconnect(CONN_STRING_MOODLE))
+	die('Fehler beim oeffnen der Datenbankverbindung');
+
 $user = get_uid();
 
 if(!check_lektor($user, $conn))
@@ -352,6 +356,25 @@ $datum_obj = new datum();
 
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 $uid = (isset($_GET['uid'])?$_GET['uid']:'');
+
+$qry = "SELECT 
+			* 
+		FROM 
+			lehre.tbl_lehrveranstaltung 
+			JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id)
+			JOIN campus.tbl_uebung USING(lehreinheit_id)
+		WHERE 
+			studiensemester_kurzbz='".addslashes($stsem)."' AND
+			lehrveranstaltung_id='".addslashes($lvid)."'";
+if($result = pg_query($conn, $qry))
+{
+	if(pg_num_rows($result)>0)
+		$grade_from_moodle=false;
+	else 
+		$grade_from_moodle=true;
+}
+else 
+	die('Fehler');
 
 //Kopfzeile
 echo '<table class="tabcontent" height="100%">';
@@ -630,9 +653,6 @@ if ($pr_all->getPruefungenLV($lvid,"Termin2",$stsem))
 }
 
 
-
-
-
 //Studentenliste
 echo "
 <table>
@@ -652,7 +672,7 @@ echo "
 				<td class='ContentHeader2'>UID</td>
 				<td class='ContentHeader2'>Nachname</td>
 				<td class='ContentHeader2'>Vorname</td>
-				<td class='ContentHeader2'>LE-Noten (LE-ID)</td>
+				<td class='ContentHeader2'>".($grade_from_moodle?'Moodle-Note':'LE-Noten (LE-ID)')."</td>
 				<td class='ContentHeader2'></td>
 				<td class='ContentHeader2'>LV-Note</td>
 				<td class='ContentHeader2' align='right'>
@@ -698,6 +718,7 @@ echo "
         if($result_stud = pg_query($conn, $qry_stud))
 		{
 			$i=1;
+			$errorshown=false;
 			while($row_stud = pg_fetch_object($result_stud))
 			{
     				
@@ -741,28 +762,60 @@ echo "
 				$note_les_str = '';
 				$le_anz = 0;
 				$note_le = 0;
-				$le = new lehreinheit($conn);
-				$le->load_lehreinheiten($lvid, $stsem);
-				foreach($le->lehreinheiten as $l)				
-				{				
-					$legesamtnote = new legesamtnote($conn, $l->lehreinheit_id);
-	    			
-	    			if (!$legesamtnote->load($row_stud->uid,$l->lehreinheit_id))
-					{    				
-	    				//$note_les_str .= "- (".$l->lehreinheit_id.")";
-	    			}
-	    			else
-	    			{
-	    				$note_le += $legesamtnote->note;
-	    				$le_anz += 1;
-	    				if ($legesamtnote->note == 5)
-	    					$leneg = " style='color:red; font-weight:bold'";
-	    				else
-	    					$leneg = "";
-	    				$note_les_str .= "<span".$leneg.">".$legesamtnote->note."</span> (".$l->lehreinheit_id.") ";
-	    			}
-	    		}
-	    			
+				if($grade_from_moodle)
+				{
+					//Noten aus Moodle
+					$moodle_course = new moodle_course($conn, $conn_moodle);
+					$mdldata = $moodle_course->loadNoten($lvid, $stsem, $row_stud->uid, true);
+					
+					if(is_array($mdldata))
+					{
+						foreach ($mdldata as $elem)
+						{
+							$note_le += $elem[0]->note;
+		    				$le_anz += 1;
+		    				if ($elem[0]->note == 5)
+		    					$leneg = " style='color:red; font-weight:bold'";
+		    				else
+		    					$leneg = " style='font-weight:bold'";
+		    				$note_les_str .= "<span".$leneg.">".$elem[0]->note."</span> <span style='font-size:10px'>(".$elem[0]->shortname.")</span> ";
+						}
+					}
+					elseif(!$mdldata)
+					{
+						//den Error nur einmal anzeigen und nicht für jeden Studenten
+						if(!$errorshown)
+						{
+							echo '<br><b>'.$moodle_course->errormsg.'</b><br>';
+							$errorshown=true;
+						}
+					}
+				}
+				else 
+				{
+					//Noten aus Uebungstool
+					$le = new lehreinheit($conn);
+					$le->load_lehreinheiten($lvid, $stsem);
+					foreach($le->lehreinheiten as $l)				
+					{				
+						$legesamtnote = new legesamtnote($conn, $l->lehreinheit_id);
+		    			
+		    			if (!$legesamtnote->load($row_stud->uid,$l->lehreinheit_id))
+						{    				
+		    				//$note_les_str .= "- (".$l->lehreinheit_id.")";
+		    			}
+		    			else
+		    			{
+		    				$note_le += $legesamtnote->note;
+		    				$le_anz += 1;
+		    				if ($legesamtnote->note == 5)
+		    					$leneg = " style='color:red; font-weight:bold'";
+		    				else
+		    					$leneg = "";
+		    				$note_les_str .= "<span".$leneg.">".$legesamtnote->note."</span> (".$l->lehreinheit_id.") ";
+		    			}
+		    		}
+				}	    			
     			if ($lvgesamtnote = new lvgesamtnote($conn, $lvid,$row_stud->uid,$stsem))
     			{
     				$note_lv = $lvgesamtnote->note;
@@ -787,7 +840,7 @@ echo "
 					$hide = "style='visibility:hidden;'";
 				else
 					$hide = "style='visibility:visible;'";				
-				echo "<form name='$row_stud->uid' id='$row_stud->uid' method='POST' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td><span id='lvnoteneingabe_".$row_stud->uid."' ".$hide."><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_vorschlag' name='note'><input type='hidden' name='note_orig' value='$note_lv'><input type='button' value='->' onclick='saveLVNote(\"$row_stud->uid\")'></span></td></form>";
+				echo "<form name='$row_stud->uid' id='$row_stud->uid' method='POST' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td nowrap><span id='lvnoteneingabe_".$row_stud->uid."' ".$hide."><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_vorschlag' name='note'><input type='hidden' name='note_orig' value='$note_lv'><input type='button' value='->' onclick='saveLVNote(\"$row_stud->uid\")'></span></td></form>";
 
 				if ($note_lv == 5)
 					$negmarkier = " style='color:red; font-weight:bold;'";
