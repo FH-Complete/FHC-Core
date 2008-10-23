@@ -394,6 +394,12 @@ a:visited { text-decoration:none; font-weight:bold; color:blue; }
 		$mehrarbeitsstunden = $resturlaub->mehrarbeitsstunden;
 		$anspruch = $resturlaub->urlaubstageprojahr;
 	}
+	else 
+	{
+		$resturlaubstage=0;
+		$mehrarbeitsstunden=0;
+		$anspruch=25;
+	}
 
 	$jahr=date('Y');
 	if (date('m')>8)
