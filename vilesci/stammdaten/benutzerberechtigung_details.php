@@ -128,7 +128,6 @@
 	
 	if (isset($_REQUEST["uid"]))
 	{
-		
 		$uid = $_REQUEST["uid"];
 		
 		$ben = new benutzer($conn);
@@ -305,17 +304,15 @@ function unmarkier(id)
 
 function unchanged()
 {
-		document.studiengangform.reset();
-		document.studiengangform.schick.disabled = true;
-		document.getElementById("submsg").style.visibility="hidden";
-		checkmail();
-		checkdate(document.studiengangform.bescheidvom);
-		checkdate(document.studiengangform.titelbescheidvom);
-		checkrequired(document.studiengangform.kurzbz);
-		checkrequired(document.studiengangform.bezeichnung);
-		checkrequired(document.studiengangform.studiengang_kz);
-		
-
+	document.studiengangform.reset();
+	document.studiengangform.schick.disabled = true;
+	document.getElementById("submsg").style.visibility="hidden";
+	checkmail();
+	checkdate(document.studiengangform.bescheidvom);
+	checkdate(document.studiengangform.titelbescheidvom);
+	checkrequired(document.studiengangform.kurzbz);
+	checkrequired(document.studiengangform.bezeichnung);
+	checkrequired(document.studiengangform.studiengang_kz);
 }
 
 function checkmail()
@@ -325,7 +322,6 @@ function checkmail()
 		//document.studiengangform.schick.disabled = true;
 		document.studiengangform.email.className="input_error";
 		return false;
-
 	}
 	else
 	{
