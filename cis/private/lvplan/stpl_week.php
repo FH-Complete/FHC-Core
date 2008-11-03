@@ -159,7 +159,7 @@ if (!isset($pers_uid))
 //var_dump($_POST);
 
 // Reservieren
-if (isset($reserve) && $user=='lektor')
+if (isset($reserve) && ($user=='lektor' || $raumres))
 {
 	if(!$erg_std=pg_query($conn, "SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
 	{

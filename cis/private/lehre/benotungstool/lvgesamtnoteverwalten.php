@@ -302,6 +302,59 @@ function getTopOffset(){
 		}
 		return true;
 	}
+	
+	// ****
+	// * Liefert die Daten aus der Zwischenablage
+	// ****
+	function getDataFromClipboard()
+	{	
+		if (navigator.appName.indexOf('Microsoft') > -1) 
+		{
+			return clipboardData.getData("Text");
+		}
+		else
+		{
+			netscape.security.PrivilegeManager.enablePrivilege('UniversalXPConnect');
+			var clip = Components.classes["@mozilla.org/widget/clipboard;1"].getService(Components.interfaces.nsIClipboard); 
+			if (!clip) 
+				return false; 
+			var trans = Components.classes["@mozilla.org/widget/transferable;1"].createInstance(Components.interfaces.nsITransferable); 
+			if (!trans) 
+				return false; 
+			
+			trans.addDataFlavor("text/unicode");
+			
+			clip.getData(trans,clip.kGlobalClipboard); 
+			var str = new Object(); 
+			var strLength = new Object(); 
+			trans.getTransferData("text/unicode",str,strLength);
+		
+			if (str) str = str.value.QueryInterface(Components.interfaces.nsISupportsString); 
+			if (str) pastetext = str.data.substring(0,strLength.value / 2);
+			
+			return pastetext;
+		}
+	}
+	function readNotenAusZwischenablage()
+	{
+		var data = getDataFromClipboard()
+		
+		//Reihen ermitteln
+		var rows = data.split("\n");
+		var i=0;
+		for(row in rows)
+		{
+			zeile = rows[row].split("	");
+	
+			if(zeile[0]!='' && zeile[1]!='')
+			{
+				alert('Matrikelnummer:'+zeile[0]+' Note:'+zeile[1]);
+				//data[]['nummer']=zeile[0];
+				//data[]['note']=zeile[1];
+				i++;
+			}
+		}
+	}
 </script>
 <style type="text/css">
 .transparent {
@@ -316,10 +369,11 @@ function getTopOffset(){
 <?php
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim oeffnen der Datenbankverbindung');
-
-if(!$conn_moodle = pg_pconnect(CONN_STRING_MOODLE))
-	die('Fehler beim oeffnen der Datenbankverbindung');
-
+if(MOODLE)
+{
+	if(!$conn_moodle = pg_pconnect(CONN_STRING_MOODLE))
+		die('Fehler beim oeffnen der Datenbankverbindung');
+}
 $user = get_uid();
 
 if(!check_lektor($user, $conn))
@@ -371,7 +425,12 @@ if($result = pg_query($conn, $qry))
 	if(pg_num_rows($result)>0)
 		$grade_from_moodle=false;
 	else 
-		$grade_from_moodle=true;
+	{
+		if(MOODLE)
+			$grade_from_moodle=true;
+		else 
+			$grade_from_moodle=false;
+	}
 }
 else 
 	die('Fehler');
@@ -674,7 +733,7 @@ echo "
 				<td class='ContentHeader2'>Vorname</td>
 				<td class='ContentHeader2'>".($grade_from_moodle?'Moodle-Note':'LE-Noten (LE-ID)')."</td>
 				<td class='ContentHeader2'></td>
-				<td class='ContentHeader2'>LV-Note</td>
+				<td class='ContentHeader2'>LV-Note<br><!--<input type='button' onclick='readNotenAusZwischenablage()' value='Import'>--></td>
 				<td class='ContentHeader2' align='right'>
 				<form name='freigabeform' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem' method='POST' onsubmit='return OnFreigabeSubmit()'><input type='hidden' name='freigabe' value='1'>
 				Passwort: <input type='password' size='8' id='textbox-freigabe-passwort' name='passwort'><br><input type='submit' name='frei' value='Freigabe'>
