@@ -401,6 +401,8 @@
 		}
 	}
 	
+	if(MOODLE)
+	{
 	//wenn bereits eine Kreuzerlliste existiert, dann den Moodle link nicht anzeigen
 	$qry = "SELECT * FROM campus.tbl_uebung WHERE 
 			lehreinheit_id IN(SELECT lehreinheit_id FROM lehre.tbl_lehreinheit 
@@ -417,7 +419,9 @@
 	$mdlcourse->getAll($lvid, $angezeigtes_stsem);
 	if(count($mdlcourse->result)>0)
 		$showmoodle=true;
-	
+	}
+	else 
+		$showmoodle=false;
 	if($showmoodle)
 	{
 		$link = "moodle_choice.php?lvid=$lvid&stsem=$angezeigtes_stsem";
