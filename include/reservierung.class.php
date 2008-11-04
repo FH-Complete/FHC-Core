@@ -31,7 +31,7 @@ class reservierung
 	var $reservierung_id;	// int
 	var $ort_kurzbz;		// varchar(8)
 	var $studiengang_kz;	// int
-	var $uid;				// varchar(16)
+	var $uid;				// varchar(32)
 	var $stunde;			// smalint
 	var $datum;				// date
 	var $titel;				// varchar(10)
@@ -96,9 +96,9 @@ class reservierung
 			$this->errormsg = 'Studiengang_kz muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(strlen($this->uid)>16)
+		if(strlen($this->uid)>32)
 		{
-			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg = 'UID darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
 		if(!is_numeric($this->stunde))

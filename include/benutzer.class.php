@@ -24,7 +24,7 @@
 class benutzer extends person
 {
 	//Tabellenspalten
-	var $uid;		// varchar(16)
+	var $uid;		// varchar(32)
 	var $bnaktiv=true;	// boolean
 	var $alias;		// varchar(256)
 	var $bn_ext_id;
@@ -97,9 +97,9 @@ class benutzer extends person
 	// *******************************************
 	function validate()
 	{
-		if(strlen($this->uid)>16)
+		if(strlen($this->uid)>32)
 		{
-			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg = 'UID darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
 		if($this->uid == '')

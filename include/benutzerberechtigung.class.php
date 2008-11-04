@@ -33,7 +33,7 @@ class benutzerberechtigung
 	var $fachbereich_kurzbz;		// int
 	var $studiengang_kz;			// int
 	var $berechtigung_kurzbz;		// varchar(16)
-	var $uid;						// varchar(16)
+	var $uid;						// varchar(32)
 	var $studiensemester_kurzbz;	// varchar(16)
 	var $start;						// date
 	var $ende;						// date
@@ -112,9 +112,9 @@ class benutzerberechtigung
 			$this->errormsg = 'Berechtigung_kurzbz muss angegeben werden';
 			return false;
 		}
-		if(strlen($this->uid)>16)
+		if(strlen($this->uid)>32)
 		{
-			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg = 'UID darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
 		if($this->uid=='')

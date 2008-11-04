@@ -55,9 +55,21 @@
 
 
 	//Lehrveranstaltungen abfragen.
-	$sql_query="SELECT * FROM campus.vw_lehreinheit
+	$sql_query="
+		SELECT 
+			*, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg_kurzbz, 
+			tbl_lehrveranstaltung.semester as lv_semester,
+			tbl_lehrfach.kurzbz as lehrfach,
+			tbl_lehrfach.bezeichnung as lehrfach_bez,
+			tbl_lehreinheitmitarbeiter.semesterstunden as semesterstunden,
+			(SELECT kurzbz FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid) as lektor
+		FROM 
+		lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) 
+		JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+		JOIN public.tbl_studiengang USING(studiengang_kz)
+		JOIN lehre.tbl_lehrfach USING(lehrfach_id)
 		WHERE studiensemester_kurzbz='$stdsem' AND mitarbeiter_uid='$uid'";
-	$sql_query.=" ORDER BY stg_kurzbz,semester,verband,gruppe";
+	$sql_query.=" ORDER BY stg_kurzbz,lv_semester";
 	$result=pg_query($conn, $sql_query);
 	$num_rows=pg_num_rows($result);
 ?>
@@ -103,7 +115,10 @@
 	if ($num_rows>0)
 	{
 		echo '<BR><BR><H3>Lehrveranstaltungen - <a href="#" onclick="printhelp()" class="Item">Hilfe</a></H3><table border="0">';
-		echo '<tr class="liste"><th>LVNR</th><th>Lehrfach</th><th>Lehrform</th><th>LV Bezeichnung</th><th>Lehrfach Bezeichnung</th><th>Lektor</th><th>STG</th><th>S</th><th>V</th><th>G</th><th>Gruppe</th><th>Raumtyp</th><th>Alternativ</th><th>Block</th><th>WR</th><th>Std</th><th>KW</th><th>Anmerkung</th></tr>';
+		echo '<tr class="liste"><th>LVNR</th><th>Lehrfach</th><th>Lehrform</th><th>LV Bezeichnung</th><th>Lehrfach Bezeichnung</th><th>Lektor</th><th>STG</th><th>S</th><th>Gruppen</th><th>Raumtyp</th><th>Alternativ</th><th>Block</th><th>WR</th><th>Std</th><th>KW</th><th>Anmerkung</th></tr>';
+		$stg_obj = new studiengang($conn);
+		$stg_obj->getAll();
+		
 		for ($i=0; $i<$num_rows; $i++)
 		{
 			$zeile=$i % 2;
@@ -119,11 +134,22 @@
 			echo '<td>'.$row_lv->bezeichnung.'</td>';
 			echo '<td>'.$row->lehrfach_bez.'</td>';
 			echo '<td>'.$row->lektor.'</td>';
-			echo '<td>'.strtoupper($row->stg_typ.$row->stg_kurzbz).'</td>';
+			echo '<td>'.$row->stg_kurzbz.'</td>';
 			echo '<td>'.$row->semester.'</td>';
-			echo '<td>'.$row->verband.'</td>';
-			echo '<td>'.$row->gruppe.'</td>';
-			echo '<td>'.$row->gruppe_kurzbz.'</td>';
+			
+			$qry ="SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
+			$gruppe='';
+			if($result_grp = pg_query($conn, $qry))
+			{
+				while($row_grp = pg_fetch_object($result_grp))
+				{
+					if($row_grp->gruppe_kurzbz!='')
+						$gruppe.= $row_grp->gruppe_kurzbz.'<br>';
+					else 
+						$gruppe.= $stg_obj->kuerzel_arr[$row->studiengang_kz].'-'.$row_grp->semester.$row_grp->verband.$row_grp->gruppe.'<br>';
+				}
+			}
+			echo '<td>'.$gruppe.'</td>';
 			echo '<td>'.$row->raumtyp.'</td>';
 			echo '<td>'.$row->raumtypalternativ.'</td>';
 			echo '<td>'.$row->stundenblockung.'</td>';

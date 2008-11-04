@@ -32,7 +32,7 @@ class feedback
 	var $betreff;		// varchar(128)
 	var $text;			// text
 	var $datum;			// date
-	var $uid;			// varchar(16)
+	var $uid;			// varchar(32)
 	var $lehrveranstaltung_id; // integer
 
 	// *************************************************************************
@@ -103,9 +103,9 @@ class feedback
 			$this->errormsg = 'Betreff darf nicht laenger als 128 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->uid)>16)
+		if(strlen($this->uid)>32)
 		{
-			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg = 'UID darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
 

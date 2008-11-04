@@ -40,9 +40,9 @@ $error_msg='';
 	$stsem_obj = new studiensemester($conn);
 	
 	if(substr($studiensemester,0,1)=='W')
-		$stsem2 = $stsem_obj->getNextFrom($studiensemester);
-	else 
 		$stsem2 = $stsem_obj->getPreviousFrom($studiensemester);
+	else 
+		$stsem2 = $stsem_obj->getNextFrom($studiensemester);		
 		
    	// **************************************************************
 	// LektorenVerteiler abgleichen

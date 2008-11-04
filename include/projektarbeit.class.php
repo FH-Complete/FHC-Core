@@ -165,9 +165,9 @@ class projektarbeit
 			$this->errormsg = 'Projektyp_kurzbz darf nicht länger als 16 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->titel)>256)
+		if(strlen($this->titel)>1024)
 		{
-			$this->errormsg = 'Titel darf nicht länger als 256 Zeichen sein';
+			$this->errormsg = 'Titel darf nicht länger als 1024 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->themenbereich)>64)
