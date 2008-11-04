@@ -28,7 +28,7 @@ class variable
 	var $variables = array(); // variable Objekt
 
 	//Tabellenspalten
-	var $uid;	// varchar(16)
+	var $uid;	// varchar(32)
 	var $name;	// varchar(64)
 	var $wert;	// varchar(64)
 
@@ -90,9 +90,9 @@ class variable
 	// *******************************************
 	function validate()
 	{
-		if(strlen($this->uid)>16)
+		if(strlen($this->uid)>32)
 		{
-			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg = 'UID darf nicht laenger als 32 Zeichen sein';
 			return true;
 		}
 		if(strlen($this->name)>64)

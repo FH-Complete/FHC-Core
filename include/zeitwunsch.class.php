@@ -29,7 +29,7 @@ class zeitwunsch
 
 	//Tabellenspalten
 	var $stunde;			// smalint
-	var $mitarbeiter_uid;	// varchar(16)
+	var $mitarbeiter_uid;	// varchar(32)
 	var $tag;				// smalint
 	var $gewicht;			// smalint
 	var $min_stunde;
@@ -101,9 +101,9 @@ class zeitwunsch
 	// *******************************************
 	function validate()
 	{
-		if(strlen($this->mitarbeiter_uid)>16)
+		if(strlen($this->mitarbeiter_uid)>32)
 		{
-			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein.';
+			$this->errormsg = 'UID darf nicht laenger als 32 Zeichen sein.';
 			return false;
 		}
 		if($this->mitarbeiter_uid == '')
