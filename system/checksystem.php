@@ -35,6 +35,90 @@ if (!$conn = pg_pconnect(CONN_STRING))
 echo '<H1>Systemcheck!</H1>';
 echo '<H2>DB-Updates!</H2>';
 
+// ************** public.tbl_prestudent.dual **********************************************
+if (!@pg_query($conn,'SELECT dual FROM public.tbl_prestudent LIMIT 1;'))
+{
+	$sql="	ALTER TABLE public.tbl_prestudent ADD COLUMN dual boolean;
+			COMMENT ON COLUMN public.tbl_prestudent.dual IS 'Dual bedeutet 2. Bildungsweg.';
+			UPDATE public.tbl_prestudent SET dual=FALSE;
+			ALTER TABLE public.tbl_prestudent ALTER COLUMN dual SET NOT NULL;
+			ALTER TABLE public.tbl_prestudent ALTER COLUMN dual SET DEFAULT FALSE;
+		";
+	if (!@pg_query($conn,$sql))
+		echo '<strong>public.tbl_prestudent: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo '	dual wurde bei public.tbl_prestudent hinzugefuegt!<BR>';
+}
+
+
+// ************** campus.tbl_veranstaltung **********************************************
+if (!@pg_query($conn,'SELECT veranstaltung_id FROM campus.tbl_reservierung LIMIT 1;'))
+{
+	$sql="	ALTER TABLE campus.tbl_reservierung ADD COLUMN veranstaltung_id integer;
+			Create table campus.tbl_veranstaltung
+			(
+				veranstaltung_id Serial NOT NULL,
+				veranstaltungskategorie_kurzbz Varchar(16) NOT NULL,
+				titel Varchar(32),
+				beschreibung Varchar(256),
+				inhalt Text,
+				start Timestamp,
+				ende Timestamp,
+				insertamum Timestamp,
+				insertvon Varchar(16),
+				updateamum Timestamp,
+				updatevon Varchar(16),
+				freigabeamum Timestamp,
+				freigabevon Varchar(16),
+				constraint pk_tbl_veranstaltung primary key (veranstaltung_id)
+			);
+
+			Create table campus.tbl_veranstaltungskategorie
+			(
+				veranstaltungskategorie_kurzbz Varchar(16) NOT NULL,
+				bezeichnung Varchar(64),
+				farbe Char(6),
+				bild Text,
+				constraint pk_tbl_veranstaltungskategorie primary key (veranstaltungskategorie_kurzbz)
+			);
+
+			Alter table campus.tbl_veranstaltung add Constraint benutzer_veranstaltung foreign key (freigabevon) references public.tbl_benutzer (uid) on update cascade on delete restrict;
+			Alter table campus.tbl_reservierung add Constraint veranstaltung_reservierung foreign key (veranstaltung_id) references campus.tbl_veranstaltung (veranstaltung_id) on update cascade on delete restrict;
+			Alter table campus.tbl_veranstaltung add Constraint veranstaltungskategorie_veranstaltung foreign key (veranstaltungskategorie_kurzbz) references campus.tbl_veranstaltungskategorie (veranstaltungskategorie_kurzbz) on update cascade on delete restrict;
+
+			Grant select on campus.tbl_veranstaltung to group admin;
+			Grant update on campus.tbl_veranstaltung to group admin;
+			Grant delete on campus.tbl_veranstaltung to group admin;
+			Grant insert on campus.tbl_veranstaltung to group admin;
+			Grant select on campus.tbl_veranstaltungskategorie to group admin;
+			Grant update on campus.tbl_veranstaltungskategorie to group admin;
+			Grant delete on campus.tbl_veranstaltungskategorie to group admin;
+			Grant insert on campus.tbl_veranstaltungskategorie to group admin;
+
+		";
+	if (!@pg_query($conn,$sql))
+		echo '<strong>campus.tbl_veranstaltung: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo '	Veranstaltungen wurden bei campus hinzugefuegt!<BR>';
+}
+
+
+
+
+// ************** kommune.tbl_wettbewerb.einzel -> teamgroesse **********************************************
+if (@pg_query($conn,'SELECT einzel FROM kommune.tbl_wettbewerb LIMIT 1;'))
+{
+	$sql="	ALTER TABLE kommune.tbl_wettbewerb DROP COLUMN einzel;
+			ALTER TABLE kommune.tbl_wettbewerb ADD COLUMN teamgroesse smallint DEFAULT 1;
+			UPDATE kommune.tbl_wettbewerb SET teamgroesse=1;
+			ALTER TABLE kommune.tbl_wettbewerb ALTER COLUMN teamgroesse SET NOT NULL;
+		";
+	if (!@pg_query($conn,$sql))
+		echo '<strong>kommune.tbl_wettbewerb: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo '	teamgroesse wurde bei kommune.tbl_wettbewerb hinzugefuegt!<BR>';
+}
+
 // ************* Kontaktmedium **********************************************************
 if (!@pg_query($conn,'SELECT * FROM public.tbl_kontaktmedium LIMIT 1;'))
 {
@@ -669,11 +753,13 @@ $tabellen=array(
 	"campus.tbl_newssprache"  => array("sprache","news_id","betreff","text","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_notenschluessel"  => array("lehreinheit_id","note","punkte"),
 	"campus.tbl_notenschluesseluebung"  => array("uebung_id","note","punkte"),
-	"campus.tbl_reservierung"  => array("reservierung_id","ort_kurzbz","studiengang_kz","uid","stunde","datum","titel","beschreibung","semester","verband","gruppe","gruppe_kurzbz"),
+	"campus.tbl_reservierung"  => array("reservierung_id","ort_kurzbz","studiengang_kz","uid","stunde","datum","titel","beschreibung","semester","verband","gruppe","gruppe_kurzbz","veranstaltung_id"),
 	"campus.tbl_resturlaub"  => array("mitarbeiter_uid","resturlaubstage","mehrarbeitsstunden","updateamum","updatevon","insertamum","insertvon","urlaubstageprojahr"),
 	"campus.tbl_studentbeispiel"  => array("student_uid","beispiel_id","vorbereitet","probleme","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_studentuebung"  => array("student_uid","mitarbeiter_uid","abgabe_id","uebung_id","note","mitarbeitspunkte","punkte","anmerkung","benotungsdatum","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_uebung"  => array("uebung_id","gewicht","punkte","angabedatei","freigabevon","freigabebis","abgabe","beispiele","statistik","bezeichnung","positiv","defaultbemerkung","lehreinheit_id","maxstd","maxbsp","liste_id","prozent","nummer","updateamum","updatevon","insertamum","insertvon"),
+	"campus.tbl_veranstaltung"  => array("veranstaltung_id","titel","beschreibung","veranstaltungskategorie_kurzbz","inhalt","start","ende","freigabevon","freigabeamum","updateamum","updatevon","insertamum","insertvon"),
+	"campus.tbl_veranstaltungskategorie"  => array("veranstaltungskategorie_kurzbz","bezeichnung","bild","farbe"),
 	"campus.tbl_zeitaufzeichnung"  => array("zeitaufzeichnung_id","uid","aktivitaet_kurzbz","projekt_kurzbz","start","ende","beschreibung","studiengang_kz","fachbereich_kurzbz","insertamum","insertvon","updateamum","updatevon"),
 	"campus.tbl_zeitsperre"  => array("zeitsperre_id","zeitsperretyp_kurzbz","mitarbeiter_uid","bezeichnung","vondatum","vonstunde","bisdatum","bisstunde","vertretung_uid","updateamum","updatevon","insertamum","insertvon","erreichbarkeit_kurzbz","freigabeamum","freigabevon"),
 	"campus.tbl_zeitsperretyp"  => array("zeitsperretyp_kurzbz","beschreibung","farbe"),
@@ -684,7 +770,7 @@ $tabellen=array(
 	"kommune.tbl_match"  => array("match_id","team_sieger","wettbewerb_kurzbz","team_gefordert","team_forderer","gefordertvon","gefordertamum","matchdatumzeit","matchort","matchbestaetigtvon","matchbestaetigtamum","ergebniss","bestaetigtvon","bestaetigtamum"),
 	"kommune.tbl_team"  => array("team_kurzbz","bezeichnung","beschreibung","logo"),
 	"kommune.tbl_teambenutzer"  => array("uid","team_kurzbz"),
-	"kommune.tbl_wettbewerb"  => array("wettbewerb_kurzbz","regeln","forderungstage","einzel","wbtyp_kurzbz","uid","icon"),
+	"kommune.tbl_wettbewerb"  => array("wettbewerb_kurzbz","regeln","forderungstage","teamgroesse","wbtyp_kurzbz","uid","icon"),
 	"kommune.tbl_wettbewerbteam"  => array("team_kurzbz","wettbewerb_kurzbz","rang","punkte"),
 	"kommune.tbl_wettbewerbtyp"  => array("wbtyp_kurzbz","bezeichnung","farbe"),
 	"lehre.tbl_abschlussbeurteilung"  => array("abschlussbeurteilung_kurzbz","bezeichnung"),
@@ -748,7 +834,7 @@ $tabellen=array(
 	"public.tbl_personfunktionfirma"  => array("personfunktionfirma_id","funktion_kurzbz","person_id","firma_id","position","anrede"),
 	"public.tbl_preinteressent"  => array("preinteressent_id","person_id","studiensemester_kurzbz","firma_id","erfassungsdatum","einverstaendnis","absagedatum","anmerkung","maturajahr","infozusendung","aufmerksamdurch_kurzbz","kontaktmedium_kurzbz","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preinteressentstudiengang"  => array("studiengang_kz","preinteressent_id","freigabedatum","uebernahmedatum","prioritaet","insertamum","insertvon","updateamum","updatevon"),
-	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","punkte","bismelden","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id"),
+	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","punkte","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_prestudentrolle"  => array("prestudent_id","rolle_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung"),
 	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id"),
