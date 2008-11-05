@@ -284,7 +284,7 @@ class lehrveranstaltung
 	}
 	
 	/**
-	 * Liefert alle Lehrveranstaltungen eines Studenten (alle SemesteR)
+	 * Liefert alle Lehrveranstaltungen eines Studenten (alle Semester)
 	 * @param $student_uid
 	 * @return true wenn ok, false im Fehlerfall
 	 */

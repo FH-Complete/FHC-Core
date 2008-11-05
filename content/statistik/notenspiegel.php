@@ -61,7 +61,7 @@ $result_student = $student->getStudents($studiengang_kz,$semester,null,null,null
 //$lehrveranstaltung = new lehrveranstaltung($conn);
 //$lehrveranstaltung->load_lva($studiengang_kz, $semester, null, null, true);
 $qry = "SELECT 
-			lehrveranstaltung_id, bezeichnung, studiengang_kz, semester
+			lehrveranstaltung_id, bezeichnung, studiengang_kz, semester, ects
 		FROM 
 			lehre.tbl_lehrveranstaltung 
         WHERE 
@@ -81,7 +81,7 @@ $qry = "SELECT
 	        AND studiengang_kz<>0
 	    UNION
 	    SELECT
-	    	lehrveranstaltung_id, bezeichnung, studiengang_kz, semester
+	    	lehrveranstaltung_id, bezeichnung, studiengang_kz, semester, ects
 	    FROM
 	    	lehre.tbl_lehrveranstaltung JOIN lehre.tbl_zeugnisnote USING(lehrveranstaltung_id)
 	    WHERE
@@ -157,7 +157,7 @@ if($typ=='xls')
 	
 	while($row_lva = pg_fetch_object($result_lva))
 	{
-		$worksheet->write($zeile,++$spalte,$stg_arr[$row_lva->studiengang_kz].$row_lva->semester.' '.$row_lva->bezeichnung, $format_rotate);
+		$worksheet->write($zeile,++$spalte,$stg_arr[$row_lva->studiengang_kz].$row_lva->semester.' '.$row_lva->bezeichnung.' ('.$row_lva->ects.' ECTS)', $format_rotate);
 		$maxlength[$spalte]=3;
 	}
 	$worksheet->write($zeile,++$spalte,'Notendurchschnitt', $format_bold);
@@ -165,7 +165,8 @@ if($typ=='xls')
 	
 	$anzahl_lv=array();
 	$summe_lv=array();
-	
+	$summegewichtet=0;
+	$anzahlgewichtet=0;
 	foreach ($result_student as $row_student)
 	{
 		$zeile++;
@@ -188,6 +189,8 @@ if($typ=='xls')
 		$anzahl=0;
 		$summe=0;
 		$rowcount=0;
+		$summeects=0;
+		$gewichtetenote=0;
 		while($rowcount<pg_num_rows($result_lva))
 		{
 			$row_lva = pg_fetch_object($result_lva,$rowcount);
@@ -215,6 +218,11 @@ if($typ=='xls')
 					$summe_lv[$row_lva->lehrveranstaltung_id] += $noten[$row_lva->lehrveranstaltung_id];
 					$anzahl_lv[$row_lva->lehrveranstaltung_id]++;
 					$summe+=$noten[$row_lva->lehrveranstaltung_id];
+					if(is_numeric($row_lva->ects))
+					{
+						$gewichtetenote += $noten[$row_lva->lehrveranstaltung_id]*$row_lva->ects;
+						$summeects+=$row_lva->ects;
+					}
 					$anzahl++;
 				}
 			}
@@ -235,7 +243,13 @@ if($typ=='xls')
 		else
 			$schnitt=0;
 			
+		if($summeects!=0)
+			$gewichtetenote /= $summeects;
+		
 		$worksheet->write($zeile,++$spalte,$schnitt, $format_number);
+		$worksheet->write($zeile,++$spalte,$gewichtetenote, $format_number);
+		$summegewichtet+=$gewichtetenote;
+		$anzahlgewichtet++;
 	}
 	
 	$zeile++;
@@ -271,6 +285,9 @@ if($typ=='xls')
 	else 
 		$schnitt=0;
 	$worksheet->write($zeile,++$spalte,$schnitt, $format_number);
+	if($anzahlgewichtet!=0)
+		$summegewichtet = $summegewichtet/$anzahlgewichtet;
+	$worksheet->write($zeile,++$spalte,$summegewichtet, $format_number);
 	
 	//Die Breite der Spalten setzen
 	foreach($maxlength as $i=>$breite)
@@ -304,14 +321,16 @@ else
 	echo '<table class="liste" style="border: 1px solid black" cellspacing="0"><tr class="liste"><th>Nr</th><th>Name</th><th>Personenkennzeichen</th>';
 	while($row_lva = pg_fetch_object($result_lva))
 	{
-		echo "<th>".$stg_arr[$row_lva->studiengang_kz]."$row_lva->semester $row_lva->bezeichnung</th>";
+		echo "<th>".$stg_arr[$row_lva->studiengang_kz]."$row_lva->semester $row_lva->bezeichnung ($row_lva->ects ECTS)</th>";
 	}
-	echo '<th>Notendurchschnitt</td>';
+	echo '<th>Notendurchschnitt</th>';
+	echo '<th>Gewichteter Notendurchschnitt</th>';
 	echo '</tr>';
 	$i=0;
 	$anzahl_lv=array();
 	$summe_lv=array();
-	
+	$summegewichtet=0;
+	$anzahlgewichtet=0;
 	foreach ($result_student as $row_student)
 	{
 		$i++;
@@ -326,6 +345,8 @@ else
 		$anzahl=0;
 		$summe=0;
 		$rowcount=0;
+		$summeects=0;
+		$gewichtetenote=0;
 		while($rowcount<pg_numrows($result_lva))
 		{
 			$row_lva =  pg_fetch_object($result_lva, $rowcount);
@@ -349,6 +370,11 @@ else
 					$summe_lv[$row_lva->lehrveranstaltung_id] += $noten[$row_lva->lehrveranstaltung_id];
 					$anzahl_lv[$row_lva->lehrveranstaltung_id]++;
 					$summe+=$noten[$row_lva->lehrveranstaltung_id];
+					if(is_numeric($row_lva->ects))
+					{
+						$gewichtetenote += $noten[$row_lva->lehrveranstaltung_id]*$row_lva->ects;
+						$summeects+=$row_lva->ects;
+					}
 					$anzahl++;
 				}
 			}
@@ -361,7 +387,13 @@ else
 			$schnitt = $summe/$anzahl;
 		else
 			$schnitt=0;
+			
+		if($summeects!=0)
+			$gewichtetenote /= $summeects;
 		echo "<td>".($schnitt==0?'&nbsp;':sprintf("%.2f", $schnitt))."</td>";
+		echo "<td>".($gewichtetenote==0?'&nbsp;':sprintf("%.2f", $gewichtetenote))."</td>";
+		$summegewichtet+=$gewichtetenote;
+		$anzahlgewichtet++;
 		echo '</tr>';
 	}
 	
@@ -394,7 +426,10 @@ else
 		$schnitt = $summe_schnitt/$anzahl_schnitt;
 	else 
 		$schnitt=0;
+	if($anzahlgewichtet!=0)
+		$summegewichtet = $summegewichtet/$anzahlgewichtet;
 	echo "<td>".($schnitt==0?'&nbsp;':sprintf("%.2f",$schnitt))."</td>";
+	echo "<td>".($summegewichtet==0?'&nbsp;':sprintf("%.2f",$summegewichtet))."</td>";
 	
 	echo '</table>';
 	echo '</body>

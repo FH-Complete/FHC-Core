@@ -33,6 +33,7 @@ require_once('../include/zeugnisnote.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/person.class.php');
 require_once('../include/benutzer.class.php');
+require_once('../include/student.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/lehrveranstaltung.class.php');
 
@@ -82,7 +83,7 @@ echo '
 $obj = new zeugnisnote($conn, null, null, null, true);
 
 $obj->getZeugnisnoten($lehrveranstaltung_id, $uid, $studiensemester_kurzbz);
-$benutzer = new benutzer($conn, null, null);
+$benutzer = new student($conn, null, null);
 
 foreach ($obj->result as $row)	
 {
@@ -107,7 +108,8 @@ foreach ($obj->result as $row)
 				<NOTE:lehrveranstaltung_kurzbz><![CDATA['.$lv_obj->kurzbz.']]></NOTE:lehrveranstaltung_kurzbz>
 				<NOTE:student_nachname><![CDATA['.$benutzer->nachname.']]></NOTE:student_nachname>
 				<NOTE:student_vorname><![CDATA['.$benutzer->vorname.']]></NOTE:student_vorname>
-				<NOTE:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></NOTE:studiengang>
+				<NOTE:studiengang><![CDATA['.$stg_arr[$benutzer->studiengang_kz].']]></NOTE:studiengang>
+				<NOTE:student_semester><![CDATA['.$benutzer->semester.']]></NOTE:student_semester>
 	         </RDF:Description>
 	      </RDF:li>';
 }

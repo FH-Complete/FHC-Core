@@ -55,49 +55,57 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 	>
 	
 		<treecols>
-			<treecol id="lehrveranstaltung-noten-tree-student_vorname" label="Vorname" flex="2" hidden="false"
+			<treecol id="lehrveranstaltung-noten-tree-student_vorname" label="Vorname" flex="2" hidden="false" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#student_vorname" />
 			<splitter class="tree-splitter"/>
-			<treecol id="lehrveranstaltung-noten-tree-student_nachname" label="Nachname" flex="2" hidden="false"
+			<treecol id="lehrveranstaltung-noten-tree-student_nachname" label="Nachname" flex="2" hidden="false" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#student_nachname" />
 			<splitter class="tree-splitter"/>
-			<treecol id="lehrveranstaltung-noten-tree-lehrveranstaltung_bezeichnung" label="Lehrveranstaltung" flex="2" hidden="true"
+			<treecol id="lehrveranstaltung-noten-tree-lehrveranstaltung_bezeichnung" label="Lehrveranstaltung" flex="2" hidden="true" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#lehrveranstaltung_bezeichnung"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="lehrveranstaltung-noten-tree-note_bezeichnung" label="Note" flex="5" hidden="false"
+			<treecol id="lehrveranstaltung-noten-tree-note_bezeichnung" label="Note" flex="5" hidden="false" persist="hidden, width, ordinal"
 			   class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#note_bezeichnung"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="lehrveranstaltung-noten-tree-uebernahmedatum" label="Uebernahmedatum" flex="2" hidden="true"
+			<treecol id="lehrveranstaltung-noten-tree-uebernahmedatum" label="Uebernahmedatum" flex="2" hidden="true" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#uebernahmedatum_iso" />
 			<splitter class="tree-splitter"/>
-			<treecol id="lehrveranstaltung-noten-tree-benotungsdatum" label="Benotungsdatum" flex="2" hidden="true"
+			<treecol id="lehrveranstaltung-noten-tree-benotungsdatum" label="Benotungsdatum" flex="2" hidden="true" persist="hidden, width, ordinal"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#benotungsdatum_iso" />
+			<splitter class="tree-splitter"/> 
+			<treecol id="lehrveranstaltung-noten-tree-benotungsdatum-iso" label="BenotungsdatumISO" flex="2" hidden="true" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#benotungsdatum_iso" />
 			<splitter class="tree-splitter"/>
-			<treecol id="lehrveranstaltung-noten-tree-benotungsdatum-iso" label="BenotungsdatumISO" flex="2" hidden="true"
-				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#benotungsdatum_iso" />
-			<splitter class="tree-splitter"/>
-			<treecol id="lehrveranstaltung-noten-tree-studiensemester_kurzbz" label="Studiensemester" flex="2" hidden="true"
+			<treecol id="lehrveranstaltung-noten-tree-studiensemester_kurzbz" label="Studiensemester" flex="2" hidden="true" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiensemester_kurzbz" />
 			<splitter class="tree-splitter"/>
-			<treecol id="lehrveranstaltung-noten-tree-note" label="Note" flex="2" hidden="true"
+			<treecol id="lehrveranstaltung-noten-tree-note" label="Note" flex="2" hidden="true" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#note" />
 			<splitter class="tree-splitter"/>
-			<treecol id="lehrveranstaltung-noten-tree-student_uid" label="Uid" flex="2" hidden="true"
+			<treecol id="lehrveranstaltung-noten-tree-student_uid" label="Uid" flex="2" hidden="true" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#student_uid" />
 			<splitter class="tree-splitter"/>
-			<treecol id="lehrveranstaltung-noten-tree-lehrveranstaltung_id" label="LehrveranstaltungID" flex="2" hidden="true"
+			<treecol id="lehrveranstaltung-noten-tree-lehrveranstaltung_id" label="LehrveranstaltungID" flex="2" hidden="true" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#lehrveranstaltung_id" />
+			<splitter class="tree-splitter"/>
+			<treecol id="lehrveranstaltung-noten-tree-studiengang" label="Studiengang" flex="2" hidden="true" persist="hidden, width, ordinal"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang" />
+			<splitter class="tree-splitter"/>
+			<treecol id="lehrveranstaltung-noten-tree-student_semester" label="Semester" flex="2" hidden="true" persist="hidden, width, ordinal"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#student_semester" />
 			<splitter class="tree-splitter"/>
 		</treecols>
 	
@@ -116,6 +124,8 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#note"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#student_uid"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#lehrveranstaltung_id"/>
+						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang"/>
+						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#student_semester"/>
 					</treerow>
 				</treeitem>
 			</treechildren>
