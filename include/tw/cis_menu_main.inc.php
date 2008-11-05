@@ -627,6 +627,10 @@
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" href="private/info/betriebsrat/dokumente.php" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Dokumente</a></td>
 		  		</tr>
+		  		<tr>
+		  			<td class="tdwidth10" nowrap>&nbsp;</td>
+					<td class="tdwrap"><a class="Item" href="private/info/betriebsrat/betriebsratswahl.php" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Betriebsratswahl</a></td>
+		  		</tr>
 			  	</table>
 			</td>
 		</tr>

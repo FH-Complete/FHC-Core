@@ -490,7 +490,35 @@ class student extends benutzer
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim laden der Daten';
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	// ****************************************
+	// * Laedt die UID anhand der Matrikelnummer
+	// * @param matrikelnummer
+	// * @return uid wenn ok, false wenn Fehler
+	// ****************************************
+	function getUidFromMatrikelnummer($matrikelnummer)
+	{
+		$qry = "SELECT student_uid FROM public.tbl_student WHERE matrikelnummer='".addslashes($matrikelnummer)."'";
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				return $row->student_uid;
+			}
+			else 
+			{
+				$this->errormsg = 'Student nicht gefunden';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
