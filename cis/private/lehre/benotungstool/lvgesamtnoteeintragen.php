@@ -34,7 +34,9 @@ require_once('../../../../include/datum.class.php');
 require_once('../../../../include/legesamtnote.class.php');
 require_once('../../../../include/lvgesamtnote.class.php');
 require_once('../../../../include/zeugnisnote.class.php');
-
+require_once('../../../../include/person.class.php');
+require_once('../../../../include/benutzer.class.php');
+require_once('../../../../include/student.class.php');
 
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim oeffnen der Datenbankverbindung');
@@ -67,7 +69,7 @@ else
 
 //Vars
 $datum_obj = new datum();
-
+$response='';
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 
@@ -79,7 +81,7 @@ $stsem_obj = new studiensemester($conn);
 if($stsem=='')
 	$stsem = $stsem_obj->getaktorNext();
 
-$note = $_REQUEST["note"];
+//$note = $_REQUEST["note"];
 
 if(!$rechte->isBerechtigt('admin',0) &&
    !$rechte->isBerechtigt('admin',$lv_obj->studiengang_kz) &&
@@ -100,19 +102,27 @@ if(!$rechte->isBerechtigt('admin',0) &&
 	}
 }
 
-// lvgesamtnote für studenten speichern
-if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '') && ((($note>0) && ($note < 6)) || ($note == 7) || ($note==8))  ){
+function savenote($lvid, $student_uid, $note)
+{
+	global $conn, $stsem, $user;
+	$jetzt = date("Y-m-d H:i:s");
+	//Ermitteln ob der Student diesem Kurs zugeteilt ist
+	$qry = "SELECT 1 FROM campus.vw_student_lehrveranstaltung WHERE uid='".addslashes($student_uid)."' AND lehrveranstaltung_id='".addslashes($lvid)."'";
+	if($result = pg_query($conn, $qry))
+		if(pg_num_rows($result)==0)
+		{
+			$student = new student($conn);
+			$student->load($student_uid);
+			die('Der Student '.$student->nachname.' '.$student->vorname.' ('.trim($student->matrikelnr).') ist dieser Lehrveranstaltung nicht zugeordnet. Die Note wird nicht uebernommen');
+		}
 	
-	$jetzt = date("Y-m-d H:i:s");	
-	$student_uid = $_REQUEST["student_uid"];
-	$lvid = $_REQUEST["lvid"];
 	$lvgesamtnote = new lvgesamtnote($conn);
     if (!$lvgesamtnote->load($lvid, $student_uid, $stsem))
     {
 		$lvgesamtnote->student_uid = $student_uid;
 		$lvgesamtnote->lehrveranstaltung_id = $lvid;
 		$lvgesamtnote->studiensemester_kurzbz = $stsem;
-		$lvgesamtnote->note = $_REQUEST["note"];
+		$lvgesamtnote->note = $note;
 		$lvgesamtnote->mitarbeiter_uid = $user;
 		$lvgesamtnote->benotungsdatum = $jetzt;
 		$lvgesamtnote->freigabedatum = null;
@@ -127,7 +137,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '') && ((($note>0
     }
     else
     {
-		$lvgesamtnote->note = $_REQUEST["note"];
+		$lvgesamtnote->note = trim($note);
 		$lvgesamtnote->benotungsdatum = $jetzt;
 		$lvgesamtnote->updateamum = $jetzt;
 		$lvgesamtnote->updatevon = $user;
@@ -138,15 +148,64 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '') && ((($note>0
 			$response = "update";
 	}
 	if (!$lvgesamtnote->save($new))
-		echo "<span class='error'>".$lvgesamtnote->errormsg."</span>";
+		return "<span class='error'>".$lvgesamtnote->errormsg."</span>";
 	else 
-		echo $response;
+		return $response;
 }
-else
-	echo "Bitte geben Sie eine Note von 1 - 5 bzw. 7 (nicht beurteilt) oder 8 (teilgenommen) ein!";
 
-
-
-
-
+// lvgesamtnote für studenten speichern
+if (isset($_REQUEST["submit"]))
+{
+	$lvid = $_REQUEST["lvid"];
+	if(isset($_REQUEST["student_uid"]) && $_REQUEST["student_uid"] != '')
+	{
+		$student_uid = $_REQUEST["student_uid"];
+		$note = $_REQUEST["note"];
+		if((($note>0) && ($note < 6)) || ($note == 7) || ($note==8))
+			$response = savenote($lvid, $student_uid, $note);
+		else
+			$response = "Bitte geben Sie eine Note von 1 - 5 bzw. 7 (nicht beurteilt) oder 8 (teilgenommen) ein!";
+		
+		echo $response;
+	}
+	else
+	{
+		foreach ($_POST as $row=>$val)
+		{
+			if(strstr($row, 'matrikelnr_'))
+			{
+				$id=substr($row, strlen('matrikelnr_'));
+				if(isset($_POST['matrikelnr_'.$id]) && isset($_POST['note_'.$id]))
+				{
+					$matrikelnummer = $_POST['matrikelnr_'.$id];
+					$note = $_POST['note_'.$id];
+					
+					//UID ermitteln
+					$student = new student($conn);
+					if(!$student_uid = $student->getUidFromMatrikelnummer($matrikelnummer))
+					{
+						$response.="\nStudent mit der Matrikelnummer ".$matrikelnummer.' existiert nicht';
+						continue;
+					}
+					if((($note>0) && ($note < 6)) || ($note == 7) || ($note==8))
+					{
+						$val=savenote($lvid, $student_uid, $note);
+						if($val!='neu' && $val!='update' && $val!='update_f')
+							$response.=$val;
+					}
+					else
+					{
+						$student->load($student_uid);
+						$response .= "\nFehlerhafte Note bei Student $student->nachname $student->vorname. Bitte geben Sie eine Note von 1 - 5 bzw. 7 (nicht beurteilt) oder 8 (teilgenommen) ein!";
+					}
+				}
+				else 
+				{
+					$response.="\nFehler bei der Parameteruebergabe";					
+				}
+			}
+		}
+		echo $response;
+	}	
+}
 ?>

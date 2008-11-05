@@ -153,7 +153,7 @@ class lvgesamtnote
 		}
 		if($this->note!='' && !is_numeric($this->note))
 		{
-			$this->errormsg = 'Note ist ungueltig';
+			$this->errormsg = 'Note ist ungueltig: '.$this->note;
 			return false;
 		}
 		if($this->freigabedatum!='' && !ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->freigabedatum))

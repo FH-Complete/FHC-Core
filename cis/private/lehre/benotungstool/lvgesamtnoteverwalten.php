@@ -64,20 +64,22 @@ require_once('../../../../include/moodle_course.class.php');
 <!--
 	function MM_jumpMenu(targ, selObj, restore)
 	{
-	  eval(targ + ".location='" + selObj.options[selObj.selectedIndex].value + "'");
+		eval(targ + ".location='" + selObj.options[selObj.selectedIndex].value + "'");
 
-	  if(restore)
-	  {
-	  	selObj.selectedIndex = 0;
-	  }
+		if(restore)
+		{
+			selObj.selectedIndex = 0;
+		}
 	}
+	
 	function confirmdelete()
 	{
 		return confirm('Wollen Sie die markierten Einträge wirklich löschen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
 	}
-  //-->
-function getTopOffset(){  
-		  var x,y;
+
+	function getTopOffset()
+	{
+		var x,y;
 		if (self.pageYOffset) // all except Explorer
 		{
 			x = self.pageXOffset;
@@ -95,57 +97,84 @@ function getTopOffset(){
 			y = document.body.scrollTop;
 		}
 		return y;
- }
-  
-  
+	}
+
+	// **************************************
+	// * XMLHttpRequest Objekt erzeugen
+	// **************************************
     var anfrage = null;
 
-    function erzeugeAnfrage(){
-        try {
-        anfrage = new XMLHttpRequest();
-        } catch (versuchmicrosoft) {
-            try {
-                anfrage = new ActiveXObject("Msxml12.XMLHTTP");
-            } catch (anderesmicrosoft){
-                try {
-                    anfrage = new ActiveXObject("Microsoft.XMLHTTP");
-                } catch (fehlschlag){
-                    anfrage = null;
+	function erzeugeAnfrage()
+	{
+		try
+		{
+			anfrage = new XMLHttpRequest();
+		}
+		catch (versuchmicrosoft)
+		{
+			try
+			{
+				anfrage = new ActiveXObject("Msxml12.XMLHTTP");
+			}
+			catch (anderesmicrosoft)
+			{
+				try
+				{
+					anfrage = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+				catch (fehlschlag)
+				{
+					anfrage = null;
                 }
-
             }
         }
-        if (anfrage == null) alert("Fehler beim Erstellen des Anfrageobjekts!");
+		if (anfrage == null)
+			alert("Fehler beim Erstellen des Anfrageobjekts!");
     }
-   
-   function saveLVNote(uid){
-	note = document.getElementById(uid).note.value;	
-	note_orig = document.getElementById(uid).note_orig.value;
-	if 	(note == note_orig && note != "")
-		alert("Note unverändert!");
-	else if ((note < 0) || (note > 5 && note != 8 && note != 7))
+
+    // ******************************************
+    // * Note eines Studenten Speichern
+    // ******************************************
+	function saveLVNote(uid)
 	{
-		alert("Bitte geben Sie eine Note von 1 - 5 bzw. 7 (nicht beurteilt) oder 8 (teilgenommen) ein!");
-		document.getElementById(uid).note.value="";
+		note = document.getElementById(uid).note.value;	
+		note_orig = document.getElementById(uid).note_orig.value;
+		//wenn die Note gleich bleibt dann abbrechen
+		if 	(note == note_orig && note != "")
+		{
+			alert("Note unverändert!");
+			return true;
+		}
+		else if ((note < 0) || (note > 5 && note != 8 && note != 7))
+		{
+			alert("Bitte geben Sie eine Note von 1 - 5 bzw. 7 (nicht beurteilt) oder 8 (teilgenommen) ein!");
+			document.getElementById(uid).note.value="";
+		}
+		else
+		{	
+			//Request erzeugen und die Note speichern
+			erzeugeAnfrage(); 
+		    stud_uid = uid;
+		    var jetzt = new Date();
+			var ts = jetzt.getTime();
+		    var url= '<?php echo "lvgesamtnoteeintragen.php?lvid=$lvid&stsem=$stsem"; ?>';
+		    url += '&submit=1&student_uid='+uid+"&note="+note+"&"+ts;
+		    anfrage.open("GET", url, true);
+		    anfrage.onreadystatechange = updateSeite;
+		    anfrage.send(null);
+		    document.getElementById(uid).note_orig.value=note;
+	    }
 	}
-	else
-	{	
-		erzeugeAnfrage(); 
-	    stud_uid = uid;
-	    var jetzt = new Date();
-		var ts = jetzt.getTime();
-	    var url= '<?php echo "lvgesamtnoteeintragen.php?lvid=$lvid&stsem=$stsem"; ?>';
-	    url += '&submit=1&student_uid='+uid+"&note="+note+"&"+ts;
-	    anfrage.open("GET", url, true);
-	    anfrage.onreadystatechange = updateSeite;
-	    anfrage.send(null);
-	    document.getElementById(uid).note_orig.value=note;
-    }
-   }
-   
-   function updateSeite(){
-	    if (anfrage.readyState == 4){
-	        if (anfrage.status == 200) {
+	
+	// *****************************************************
+	// * Update der Seite nachdem die Note gespeichert wurde
+	// *****************************************************
+	function updateSeite()
+	{
+	    if (anfrage.readyState == 4)
+	    {
+	        if (anfrage.status == 200) 
+	        {
 	        	uid = stud_uid;
 				var note = document.getElementById(uid).note.value;
 	            var resp = anfrage.responseText;
@@ -162,42 +191,43 @@ function getTopOffset(){
 					notenstatus = document.getElementById("status_"+uid);
 					if (resp == "update_f")
                     	notenstatus.innerHTML = "<img src='../../../../skin/images/changed.png'>";
-                 }
-                 else
-             		{
-                 		alert(resp);
-                 		document.getElementById(uid).note.value="";
-             		}
-	        } else alert("Request status:" + anfrage.status);
+                }
+                else
+         		{
+             		alert(resp);
+             		document.getElementById(uid).note.value="";
+         		}
+	        } 
+	        else alert("Request status:" + anfrage.status);
 	    }
 	}
 	
+	// *************************************************
+	// * Formular zum Eintragen einer Pruefung erstellen
+	// *************************************************
 	function pruefungAnlegen(uid,datum,note,lehreinheit_id)
 	{
-	
 		var str = "<form name='nachpruefung_form'><center><table style='width:95%'><tr><td colspan='2' align='right'><a href='#' onclick='closeDiv();'>X</a></td></tr>";
 		
 		var anlegendiv = document.getElementById("nachpruefung_div");
 		var y = getTopOffset();
 		y = y+50;		
 		anlegendiv.style.top = y+"px";
-		//var anlegendiv = document.getElementById("span_"+uid);
-
+	
 		str += "<tr><td colspan='2'><b>Prüfung für "+uid+" anlegen:</b></td></tr>";
-		//if (lehreinheit_id != "")		
-		//	str += "<tr><td>Lehreinheit:</td><td>"+lehreinheit_id+"</td></tr>";
 		str += "<tr><td>Datum:</td>";
 		str += "<td><input type='hidden' name='uid' value='"+uid+"'><input type='hidden' name='le_id' value='"+lehreinheit_id+"'><input type='text' name='datum' value='"+datum+"'> [YYYY-MM-DD]</td>";
 		str += "</tr><tr><td>Note:</td>";
 		str += "<td><input type='text' name='note' value='"+note+"'></td>";
 		str += "</tr><tr><td colspan='2' align='center'><input type='button' name='speichern' value='speichern' onclick='pruefungSpeichern();'></td></tr>";
-		//str += "</table></center></form>";
 		str += "</table></cehter></form>";		
-		//str = "foo";
 		anlegendiv.innerHTML = str;	
 		anlegendiv.style.visibility = "visible";	
 	}
 	
+	// **********************************************
+	// * Speichern der Pruefung
+	// **********************************************
 	function pruefungSpeichern()
 	{
 		var note = document.nachpruefung_form.note.value;
@@ -234,9 +264,11 @@ function getTopOffset(){
 		    anfrage.onreadystatechange = updateSeitePruefung;
 		    anfrage.send(null);
 	    }
-		
 	}
 
+	// ***********************************************************
+	// * Nach dem Eintragen einer Pruefung die Seite aktualisieren
+	// ***********************************************************
     function updateSeitePruefung()
     {
 	    if (anfrage.readyState == 4)
@@ -304,37 +336,63 @@ function getTopOffset(){
 	}
 	
 	// ****
-	// * Liefert die Daten aus der Zwischenablage
+	// * Liefert die Daten aus der Zwischenablage fuer IE und Firefox
+	// * Opera und Safari unterstuetzen dies nicht
 	// ****
 	function getDataFromClipboard()
 	{	
 		if (navigator.appName.indexOf('Microsoft') > -1) 
 		{
+			//IE
 			return clipboardData.getData("Text");
 		}
 		else
 		{
-			netscape.security.PrivilegeManager.enablePrivilege('UniversalXPConnect');
-			var clip = Components.classes["@mozilla.org/widget/clipboard;1"].getService(Components.interfaces.nsIClipboard); 
-			if (!clip) 
-				return false; 
-			var trans = Components.classes["@mozilla.org/widget/transferable;1"].createInstance(Components.interfaces.nsITransferable); 
-			if (!trans) 
-				return false; 
+			if(!!window.Components)
+			{
+				//Firefox, Mozilla, Gecko
+				try
+				{
+					netscape.security.PrivilegeManager.enablePrivilege('UniversalXPConnect');
+				}
+				catch(e)
+				{
+					alert('Um den Import nutzen zu können müssen sie Ihre Sicherheitseinstellungen ändern!\n Geben Sie hierzu in der Adresszeile ihres Browsers "about:config" ein und setzen sie, in der angezeigten Liste, den Eintrag "signed.applets.codebase_pricipal_support" auf true.');
+				}
+				var clip = Components.classes["@mozilla.org/widget/clipboard;1"].getService(Components.interfaces.nsIClipboard); 
+				if (!clip) 
+					return false; 
+				var trans = Components.classes["@mozilla.org/widget/transferable;1"].createInstance(Components.interfaces.nsITransferable); 
+				if (!trans) 
+					return false; 
+				
+				trans.addDataFlavor("text/unicode");
+				
+				clip.getData(trans,clip.kGlobalClipboard); 
+				var str = new Object(); 
+				var strLength = new Object(); 
+				trans.getTransferData("text/unicode",str,strLength);
 			
-			trans.addDataFlavor("text/unicode");
-			
-			clip.getData(trans,clip.kGlobalClipboard); 
-			var str = new Object(); 
-			var strLength = new Object(); 
-			trans.getTransferData("text/unicode",str,strLength);
-		
-			if (str) str = str.value.QueryInterface(Components.interfaces.nsISupportsString); 
-			if (str) pastetext = str.data.substring(0,strLength.value / 2);
-			
-			return pastetext;
+				if (str) str = str.value.QueryInterface(Components.interfaces.nsISupportsString); 
+				if (str) pastetext = str.data.substring(0,strLength.value / 2);
+				
+				return pastetext;
+			}
+			else
+			{
+				//Safari, Opera, etc
+				alert("Ihr Browser unterstuetzt diese Funktion nicht. Bitte verwenden Sie Firefox oder IE");
+			}
 		}
 	}
+	
+	// *******************************************************************************
+	// * holt die Daten aus der Zwischenablage parst diese und speichert sie in der DB
+	// * Ablauf fuer den Import:
+	// * - die Spalten Matrikelnummer und Note im Excel markieren
+	// * - in die Zwischenablage kopieren (strg-c)
+	// * - auf import klicken
+	// *******************************************************************************
 	function readNotenAusZwischenablage()
 	{
 		var data = getDataFromClipboard()
@@ -342,19 +400,61 @@ function getTopOffset(){
 		//Reihen ermitteln
 		var rows = data.split("\n");
 		var i=0;
+		var params='';
 		for(row in rows)
 		{
 			zeile = rows[row].split("	");
 	
 			if(zeile[0]!='' && zeile[1]!='')
 			{
-				alert('Matrikelnummer:'+zeile[0]+' Note:'+zeile[1]);
-				//data[]['nummer']=zeile[0];
-				//data[]['note']=zeile[1];
+				params=params+'&matrikelnr_'+i+'='+zeile[0]+'&note_'+i+'='+zeile[1];
 				i++;
 			}
 		}
+		
+		if(i>0)
+		{
+			erzeugeAnfrage(); 
+		    var jetzt = new Date();
+			var ts = jetzt.getTime();
+		    var url= '<?php echo "lvgesamtnoteeintragen.php?lvid=$lvid&stsem=$stsem"; ?>';
+		    url += '&submit=1&'+ts;
+		    anfrage.open("POST", url, true);
+		    anfrage.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		    anfrage.setRequestHeader("Connection", "close");
+		    anfrage.onreadystatechange = updateSeiteMatrikelnr;
+		    anfrage.send('test='+params);
+		}
+		else
+		{
+			alert('Zum Importieren der Noten markieren sie die Spalten Kennzeichen und Note im Excel-File und kopieren sie diese in die zwischenablage. Drücken sie danach diesen Knopf erneut um die Noten zu importieren');
+		}
 	}
+
+	// **************************************************************
+	// * Seite neu laden nachdem der Request gesendet wurde und ggf 
+	// * Errormsg ausgeben
+	// **************************************************************
+	function updateSeiteMatrikelnr()
+	{
+	    if (anfrage.readyState == 4)
+	    {
+	        if (anfrage.status == 200) 
+	        {
+	            var resp = anfrage.responseText;
+	            if (resp!='')
+	            {
+					alert(resp);
+                }
+                //QuickNDirty
+                //ToDo: Aktualisierung der geaenderten Felder per JS anstatt reload
+         		//window.location.reload();
+         		window.location.href=window.location.href;
+	        } 
+	        else alert("Request status:" + anfrage.status);
+	    }
+	}
+-->
 </script>
 <style type="text/css">
 .transparent {
@@ -733,7 +833,7 @@ echo "
 				<td class='ContentHeader2'>Vorname</td>
 				<td class='ContentHeader2'>".($grade_from_moodle?'Moodle-Note':'LE-Noten (LE-ID)')."</td>
 				<td class='ContentHeader2'></td>
-				<td class='ContentHeader2'>LV-Note<br><!--<input type='button' onclick='readNotenAusZwischenablage()' value='Import'>--></td>
+				<td class='ContentHeader2'>LV-Note<br><input type='button' onclick='readNotenAusZwischenablage()' value='Import'></td>
 				<td class='ContentHeader2' align='right'>
 				<form name='freigabeform' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem' method='POST' onsubmit='return OnFreigabeSubmit()'><input type='hidden' name='freigabe' value='1'>
 				Passwort: <input type='password' size='8' id='textbox-freigabe-passwort' name='passwort'><br><input type='submit' name='frei' value='Freigabe'>
