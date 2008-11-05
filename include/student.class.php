@@ -502,7 +502,7 @@ class student extends benutzer
 	// ****************************************
 	function getUidFromMatrikelnummer($matrikelnummer)
 	{
-		$qry = "SELECT student_uid FROM public.tbl_student WHERE matrikelnummer='".addslashes($matrikelnummer)."'";
+		$qry = "SELECT student_uid FROM public.tbl_student WHERE matrikelnr='".addslashes($matrikelnummer)."'";
 		
 		if($result = pg_query($this->conn, $qry))
 		{
