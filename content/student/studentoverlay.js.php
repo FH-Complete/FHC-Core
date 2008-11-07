@@ -888,6 +888,7 @@ function StudentAuswahl()
 	punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
 	bismelden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bismelden" ));
 	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkungpre" ));
+	dual = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#dual" ));
 
 	document.getElementById('student-prestudent-menulist-aufmerksamdurch').value=aufmerksamdurch_kurzbz;
 	document.getElementById('student-prestudent-menulist-berufstaetigkeit').value=berufstaetigkeit_code;
@@ -915,6 +916,11 @@ function StudentAuswahl()
 		document.getElementById('student-prestudent-checkbox-bismelden').checked=true;
 	else
 		document.getElementById('student-prestudent-checkbox-bismelden').checked=false;
+		
+	if(dual=='true')
+		document.getElementById('student-prestudent-checkbox-dual').checked=true;
+	else
+		document.getElementById('student-prestudent-checkbox-dual').checked=false;
 
 	document.getElementById('student-prestudent-textbox-person_id').value=person_id;
 	document.getElementById('student-prestudent-textbox-prestudent_id').value=prestudent_id;
@@ -1329,6 +1335,7 @@ function StudentPrestudentDisableFields(val)
 	document.getElementById('student-prestudent-checkbox-reihungstestangetreten').disabled=val;
 	document.getElementById('student-prestudent-textbox-punkte').disabled=val;
 	document.getElementById('student-prestudent-checkbox-bismelden').disabled=val;
+	document.getElementById('student-prestudent-checkbox-dual').disabled=val;
 	document.getElementById('student-prestudent-button-anmeldungreihungstest-heute').disabled=val;
 	document.getElementById('student-prestudent-button-save').disabled=val;
 	//document.getElementById('student-prestudent-menulist-studiengang_kz').disabled=val;
@@ -1375,6 +1382,7 @@ function StudentPrestudentSave()
 	reihungstestangetreten = document.getElementById('student-prestudent-checkbox-reihungstestangetreten').checked;
 	punkte = document.getElementById('student-prestudent-textbox-punkte').value;
 	bismelden = document.getElementById('student-prestudent-checkbox-bismelden').checked;
+	dual = document.getElementById('student-prestudent-checkbox-dual').checked;
 	person_id = document.getElementById('student-prestudent-textbox-person_id').value;
 	prestudent_id = document.getElementById('student-prestudent-textbox-prestudent_id').value;
 	neu = document.getElementById('student-prestudent-checkbox-new').checked;
@@ -1424,6 +1432,7 @@ function StudentPrestudentSave()
 	req.add('reihungstestangetreten', reihungstestangetreten);
 	req.add('punkte', punkte);
 	req.add('bismelden', bismelden);
+	req.add('dual', dual);
 	req.add('person_id', person_id);
 	req.add('prestudent_id', prestudent_id);
 	req.add('studiengang_kz', studiengang_kz);

@@ -162,6 +162,8 @@ if($typ=='xls')
 	}
 	$worksheet->write($zeile,++$spalte,'Notendurchschnitt', $format_bold);
 	$maxlength[$spalte]=15;
+	$worksheet->write($zeile,++$spalte,'Gewichteter Notendurchschnitt', $format_bold);
+	$maxlength[$spalte]=15;
 	
 	$anzahl_lv=array();
 	$summe_lv=array();
