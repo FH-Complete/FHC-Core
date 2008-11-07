@@ -395,6 +395,7 @@ if(!$error)
 				$prestudent->reihungstestangetreten = ($_POST['reihungstestangetreten']=='true'?true:false);
 				$prestudent->punkte = str_replace(',','.',$_POST['punkte']);
 				$prestudent->bismelden = ($_POST['bismelden']=='true'?true:false);
+				$prestudent->dual = ($_POST['dual']=='true'?true:false);
 				$prestudent->anmerkung = $_POST['anmerkung'];
 				//$prestudent->insertamum = date('Y-m-d H:i:s');
 				//$prestudent->insertvon = $user;

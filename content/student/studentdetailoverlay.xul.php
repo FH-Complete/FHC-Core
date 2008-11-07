@@ -440,16 +440,22 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     			<grid style="margin:4px;" flex="1">
 				  	<columns  >
     					<column flex="1"/>
-    					<column flex="11"/>
-    					<column flex="1"/>
-    					<column flex="5"/>    					
+    					<column flex="12"/>
+    					<column flex="3"/>
+    					<column flex="3"/>
   					</columns>
   					<rows>
   						<row>
 		    				<label value="Anmerkung" control="student-prestudent-textbox-anmerkung"/>
 		      				<textbox id="student-prestudent-textbox-anmerkung" disabled="true"/>
-		      				<label value="Bismelden" control="student-prestudent-checkbox-bismelden"/>
-		      				<checkbox id="student-prestudent-checkbox-bismelden" checked="true" disabled="true"/>
+		      				<hbox>
+		      					<label value="Bismelden" control="student-prestudent-checkbox-bismelden"/>
+		      					<checkbox id="student-prestudent-checkbox-bismelden" checked="true" disabled="true"/>
+		      				</hbox>
+		      				<hbox>
+		      					<label value="Dual" control="student-prestudent-checkbox-dual"/>
+		      					<checkbox id="student-prestudent-checkbox-dual" checked="false" disabled="true"/>
+		      				</hbox>
 						</row>
 					</rows>
 				</grid>      			

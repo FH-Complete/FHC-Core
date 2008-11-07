@@ -43,6 +43,7 @@ class prestudent extends person
 	var $bismelden;
 	var $anmerkung;
 	var $ext_id_prestudent;
+	var $dual;
 	
 	var $rolle_kurzbz;
 	var $studiensemester_kurzbz;
@@ -122,6 +123,7 @@ class prestudent extends person
 				$this->person_id = $row->person_id;
 				$this->anmerkung = $row->anmerkung;
 				$this->ext_id_prestudent = $row->ext_id;
+				$this->dual = ($row->dual=='t'?true:false);
 				
 				if(!person::load($row->person_id))
 					return false;
@@ -169,7 +171,7 @@ class prestudent extends person
 		
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = 'BEGIN;INSERT INTO public.tbl_prestudent (aufmerksamdurch_kurzbz, person_id, studiengang_kz, berufstaetigkeit_code, ausbildungcode, zgv_code, zgvort, zgvdatum, zgvmas_code, zgvmaort, zgvmadatum, aufnahmeschluessel, facheinschlberuf, reihungstest_id, anmeldungreihungstest, reihungstestangetreten, punkte, bismelden, insertamum, insertvon, updateamum, updatevon, ext_id, anmerkung) VALUES('.
+			$qry = 'BEGIN;INSERT INTO public.tbl_prestudent (aufmerksamdurch_kurzbz, person_id, studiengang_kz, berufstaetigkeit_code, ausbildungcode, zgv_code, zgvort, zgvdatum, zgvmas_code, zgvmaort, zgvmadatum, aufnahmeschluessel, facheinschlberuf, reihungstest_id, anmeldungreihungstest, reihungstestangetreten, punkte, bismelden, insertamum, insertvon, updateamum, updatevon, ext_id, anmerkung, dual) VALUES('.
 			       $this->addslashes($this->aufmerksamdurch_kurzbz).",".
 			       $this->addslashes($this->person_id).",".
 			       $this->addslashes($this->studiengang_kz).",".
@@ -193,10 +195,11 @@ class prestudent extends person
 			       $this->addslashes($this->updateamum).",".
 			       $this->addslashes($this->updatevon).",".
 			       $this->addslashes($this->ext_id_prestudent).",".
-			       $this->addslashes($this->anmerkung).");";
+			       $this->addslashes($this->anmerkung).",".
+			       ($this->dual?'true':'false').");";
 		}
 		else
-		{			
+		{
 			$qry = 'UPDATE public.tbl_prestudent SET'.
 			       ' aufmerksamdurch_kurzbz='.$this->addslashes($this->aufmerksamdurch_kurzbz).",".
 			       ' person_id='.$this->addslashes($this->person_id).",".
@@ -219,7 +222,8 @@ class prestudent extends person
 			       ' updateamum='.$this->addslashes($this->updateamum).",".
 			       ' updatevon='.$this->addslashes($this->updatevon).",".
 			       ' ext_id='.$this->addslashes($this->ext_id_prestudent).",".
-			       ' anmerkung='.$this->addslashes($this->anmerkung).
+			       ' anmerkung='.$this->addslashes($this->anmerkung).",".
+			       ' dual='.($this->dual?'true':'false').
 			       " WHERE prestudent_id='".addslashes($this->prestudent_id)."';";
 		}
 		
@@ -545,6 +549,7 @@ class prestudent extends person
 				$ps->punkte = $row->punkte;
 				$ps->bismelden = ($row->bismelden=='t'?true:false);
 				$ps->anmerkung = $row->anmerkung;
+				$ps->dual = ($row->dual=='t'?true:false);
 				
 				$ps->rolle_kurzbz = $row->rolle_kurzbz;
 				$ps->studiensemester_kurzbz = $row->studiensemester_kurzbz;
@@ -814,6 +819,7 @@ class prestudent extends person
 				$obj->person_id = $row->person_id;
 				$obj->anmerkung = $row->anmerkung;
 				$obj->ext_id_prestudent = $row->ext_id;
+				$obj->dual = ($row->dual=='t'?true:false);
 				
 				$this->result[] = $obj;
 			}
