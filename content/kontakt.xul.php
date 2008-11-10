@@ -114,6 +114,10 @@ else
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/adresse/rdf#updateamum" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
+					<treecol id="kontakt-adressen-treecol-firma_name" label="Firma" flex="1" hidden="false"
+						class="sortDirectionIndicator"
+						sort="rdf:http://www.technikum-wien.at/adresse/rdf#firma_name" onclick="KontaktAdresseTreeSort()"/>
+					<splitter class="tree-splitter"/>
 				</treecols>
 			
 				<template>
@@ -134,6 +138,7 @@ else
 									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#person_id" />
 									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#name" />
 									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#updateamum" />
+									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#firma_name" />
 								</treerow>
 							</treeitem>
 						</treechildren>

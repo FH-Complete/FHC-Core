@@ -76,7 +76,7 @@ else
 
 function draw_rdf($row)
 {
-	global $rdf_url;
+	global $rdf_url, $conn;
 	
 	$typ='';
 	switch ($row->typ)
@@ -84,6 +84,19 @@ function draw_rdf($row)
 		case 'h': $typ='Hauptwohnsitz'; break;
 		case 'n': $typ='Nebenwohnsitz'; break;
 		case 'f': $typ='Firma'; break;
+	}
+	
+	$firma_name='';
+	if($row->firma_id!='')
+	{
+		$qry="SELECT * FROM public.tbl_firma WHERE firma_id='".addslashes($row->firma_id)."'";
+		if($result_firma=pg_query($conn, $qry))
+		{
+			if($row_firma = pg_fetch_object($result_firma))
+			{
+				$firma_name = $row_firma->name;
+			}
+		}
 	}
 	echo '
       <RDF:li>
@@ -101,6 +114,7 @@ function draw_rdf($row)
             <ADRESSE:heimatadresse><![CDATA['.($row->heimatadresse?'Ja':'Nein').']]></ADRESSE:heimatadresse>
             <ADRESSE:zustelladresse><![CDATA['.($row->zustelladresse?'Ja':'Nein').']]></ADRESSE:zustelladresse>
             <ADRESSE:firma_id><![CDATA['.$row->firma_id.']]></ADRESSE:firma_id>
+            <ADRESSE:firma_name><![CDATA['.$firma_name.']]></ADRESSE:firma_name>
             <ADRESSE:updateamum><![CDATA['.date('d.m.Y H:i:s',strtotime($row->updateamum)).']]></ADRESSE:updateamum>
          </RDF:Description>
       </RDF:li>
