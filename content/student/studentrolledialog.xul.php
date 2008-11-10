@@ -63,7 +63,7 @@ $vorname = '';
 $nachname = '';
 if($prestudent_id!='')
 {
-	$prestudent = new prestudent($conn);
+	$prestudent = new prestudent($conn, null, true);
 	$prestudent->load($prestudent_id);
 	
 	$vorname = $prestudent->vorname;
