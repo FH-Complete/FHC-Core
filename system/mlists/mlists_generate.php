@@ -42,11 +42,19 @@ $error_msg='';
 	if(substr($studiensemester,0,1)=='W')
 		$stsem2 = $stsem_obj->getPreviousFrom($studiensemester);
 	else 
-		$stsem2 = $stsem_obj->getNextFrom($studiensemester);		
-		
+		$stsem2 = $stsem_obj->getNextFrom($studiensemester);
+	
+	function setGeneriert($gruppe)
+	{
+		global $conn;
+		$qry = "UPDATE public.tbl_gruppe SET generiert=true WHERE UPPER(gruppe_kurzbz)=UPPER('".addslashes($gruppe)."')";
+		@pg_query($conn, $qry);
+	}
+	
    	// **************************************************************
 	// LektorenVerteiler abgleichen
 	$mlist_name='tw_lkt';
+	setGeneriert($mlist_name);
 	// Lektoren holen die nicht mehr in den Verteiler gehoeren
 	echo $mlist_name.' wird abgeglichen!<BR>';
 	flush();
@@ -78,6 +86,7 @@ $error_msg='';
 	// **************************************************************
 	// Sekretariats-Verteiler abgleichen
 	$mlist_name='tw_sek';
+	setGeneriert($mlist_name);
 	// Personen holen die nicht mehr in den Verteiler gehoeren
 	echo $mlist_name.' wird abgeglichen!<BR>';
 	flush();
@@ -109,6 +118,7 @@ $error_msg='';
 	// **************************************************************
 	// Studiengangsleiter-Verteiler abgleichen
 	$mlist_name='tw_stgl';
+	setGeneriert($mlist_name);
 	// Personen holen die nicht mehr in den Verteiler gehoeren
 	echo $mlist_name.' wird abgeglichen!<BR>';
 	flush();
@@ -140,6 +150,7 @@ $error_msg='';
 	// **************************************************************
 	// Verteiler fuer alle fixAngestellten abgleichen
 	$mlist_name='tw_fix';
+	setGeneriert($mlist_name);
 	// Lektoren holen die nicht mehr in den Verteiler gehoeren
 	echo '<BR>'.$mlist_name.' wird abgeglichen!<BR>';
 	flush();
@@ -171,6 +182,7 @@ $error_msg='';
 	// **************************************************************
 	// Verteiler fuer alle fixen Lektoren abgleichen
 	$mlist_name='tw_fix_lkt';
+	setGeneriert($mlist_name);
 	// Lektoren holen die nicht mehr in den Verteiler gehoeren
 	echo '<BR>'.$mlist_name.' wird abgeglichen!<BR>';
 	flush();
@@ -251,6 +263,7 @@ $error_msg='';
 		{
 			if(pg_num_rows($res)<=0)
 			{
+				setGeneriert($row->mlist_name);
 				$sql_query="INSERT INTO public.tbl_gruppe(gruppe_kurzbz, studiengang_kz, semester, bezeichnung,
 							beschreibung, mailgrp, sichtbar, generiert, aktiv, updateamum, updatevon,
 							insertamum, insertvon)
@@ -295,6 +308,7 @@ $error_msg='';
 	{
 		if($row->gruppe_kurzbz!='')
 		{
+			setGeneriert($row->gruppe_kurzbz);
 	     	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($row->gruppe_kurzbz)."', now(), 'mlists_generate')";
 			if(!pg_query($conn, $sql_query))
 				$error_msg.=pg_errormessage($conn).$sql_query;
@@ -305,6 +319,7 @@ $error_msg='';
 	
 	//tw_stdv abgleichen
     flush();
+    setGeneriert('TW_STDV');
 	$sql_query="SELECT gruppe_kurzbz, uid FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='TW_STDV' AND uid not in (SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='stdv')";
 	if(!($result=pg_query($conn, $sql_query)))
 		$error_msg.=pg_errormessage($conn);
