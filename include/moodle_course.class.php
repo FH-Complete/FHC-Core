@@ -929,7 +929,7 @@ class moodle_course
 		{
 			if($row = pg_fetch_object($result))
 			{
-				$shortname = strtoupper($studiensemester_kurzbz.'-'.$row->kuerzel.'-'.$row->semester.'-'.$row->kurzbz);
+				$shortname = strtoupper('TK-'.$studiensemester_kurzbz.'-'.$row->kuerzel.'-'.$row->semester.'-'.$row->kurzbz);
 			}
 			else 
 			{

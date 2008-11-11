@@ -247,11 +247,11 @@ if(isset($_GET['action']) && $_GET['action']=='createtestkurs')
 		$studiengang->load($lehrveranstaltung->studiengang_kz);
 		
 		//Kurzbezeichnung generieren Format: STSEM-STG-SEM-LV/LEID/LEID/LEID...
-		$shortname = $stsem.'-'.$studiengang->kuerzel.'-'.$lehrveranstaltung->semester.'-'.$lehrveranstaltung->kurzbz;
+		$shortname = 'TK-'.$stsem.'-'.$studiengang->kuerzel.'-'.$lehrveranstaltung->semester.'-'.$lehrveranstaltung->kurzbz;
 		
 		$mdl_course->lehrveranstaltung_id = $lvid;
 		$mdl_course->studiensemester_kurzbz = $stsem;
-		$mdl_course->mdl_fullname = $lehrveranstaltung->bezeichnung;
+		$mdl_course->mdl_fullname = 'Testkurs - '.$lehrveranstaltung->bezeichnung;
 		$mdl_course->mdl_shortname = $shortname;
 
 		//TestKurs erstellen
