@@ -64,3 +64,11 @@
 <!ENTITY menu-extras-kollisionstudent.key		"K">
 <!ENTITY menu-extras-kollisionstudent.label		"Kollision Student">
 <!ENTITY menu-extras-kollisionstudent.accesskey	"K">
+
+<!ENTITY menu-extras-lvplanwartung.key		"W">
+<!ENTITY menu-extras-lvplanwartung.label		"LVPlan Wartung">
+<!ENTITY menu-extras-lvplanwartung.accesskey	"W">
+
+<!ENTITY menu-extras-rescheck.key		"R">
+<!ENTITY menu-extras-rescheck.label		"Kollisionspruefung mit Reservierungen">
+<!ENTITY menu-extras-rescheck.accesskey	"R">

@@ -432,6 +432,22 @@ function KollisionStudentShow()
 {
 	window.open('<?php echo APP_ROOT;?>vilesci/lehre/stpl_benutzer_kollision_frameset.html', 'Kollision Student');
 }
+// ****
+// * Zeigt das Fenster zur LVPlanWartung
+// ****
+function LVPlanWartungShow()
+{
+	window.open('<?php echo APP_ROOT;?>vilesci/lehre/lvplanwartung.php', 'LVPLanWartung');
+}
+
+// ****
+// * Zeigt das Fenster zur Kollisionspruefung mit Reservierungen
+// ****
+function ResCheckShow()
+{
+	window.open('<?php echo APP_ROOT;?>vilesci/lehre/check/res_check.php', 'KollisionReservierung');
+}
+
 
 // ****
 // * Oeffnet das Handbuch
