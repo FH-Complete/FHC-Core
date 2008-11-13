@@ -174,6 +174,7 @@ class datum
 			return '';
 		
 		$ts='';
+		$error=false;
 		
 		//2008-12-31
 		if(ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$datum, $regs))
@@ -202,9 +203,14 @@ class datum
 		if($ts=='')
 		{
 			$ts = strtotime($datum);
+			if(!$ts || $ts==-1)
+			{
+				//wenn strtotime fehlschlaegt liefert diese -1 zurueck, ab php5.1.0 jedoch false
+				$error = true;
+			}
 		}
 		
-		if($ts!='' && $ts>0)
+		if($ts!='' && !$error)
 			return date($format, $ts);
 			
 		return false;

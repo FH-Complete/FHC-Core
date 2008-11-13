@@ -57,6 +57,8 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-prefs-ignore_zeitsperre:command" oncommand="variableChange('ignore_zeitsperre','menu-prefs-ignore_zeitsperre');"/>
   <command id="menu-prefs-ignore_reservierung:command" oncommand="variableChange('ignore_reservierung','menu-prefs-ignore_reservierung');"/>
   <command id="menu-extras-kollisionstudent:command" oncommand="KollisionStudentShow();"/>
+  <command id="menu-extras-lvplanwartung:command" oncommand="LVPlanWartungShow();"/>
+  <command id="menu-extras-rescheck:command" oncommand="ResCheckShow();"/>
   <command id="menu-help-todo:command" oncommand="HelpOpenToDo();"/>
   <command id="menu-help-manual:command" oncommand="OpenManualTempus();"/>
 </commandset>
@@ -189,6 +191,18 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                label     = "&menu-extras-kollisionstudent.label;"
                command   =  "menu-extras-kollisionstudent:command"
                accesskey = "&menu-extras-kollisionstudent.accesskey;"/>
+            <menuitem
+               id        =  "menu-extras-lvplanwartung"
+               key       =  "menu-extras-lvplanwartung:key"
+               label     = "&menu-extras-lvplanwartung.label;"
+               command   =  "menu-extras-lvplanwartung:command"
+               accesskey = "&menu-extras-lvplanwartung.accesskey;"/>
+            <menuitem
+               id        =  "menu-extras-rescheck"
+               key       =  "menu-extras-rescheck:key"
+               label     = "&menu-extras-rescheck.label;"
+               command   =  "menu-extras-rescheck:command"
+               accesskey = "&menu-extras-rescheck.accesskey;"/>
           </menupopup>
     </menu>
     <menu id="menu-help" label="&menu-help.label;" accesskey="&menu-help.accesskey;">
