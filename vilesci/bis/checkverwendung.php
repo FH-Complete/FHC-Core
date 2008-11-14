@@ -1,13 +1,27 @@
 <?php
-/* Copyright (C) 2007 Technikum-Wien
+/* Copyright (C) 2008 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
  */
-
 //*
-//* Überprüfung der Verwendungsdatensätze im FASonline
+//* Überprüfung der Verwendungsdatensaetze im FASonline
 //*
 //*
 
@@ -15,9 +29,6 @@ require('../config.inc.php');
 require('../../include/studiensemester.class.php');
 
 $conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
-
-//$adress='ruhan@technikum-wien.at';
-//$adress='fas_sync@technikum-wien.at';
 
 $error_log='';
 $fehler=0;
@@ -30,8 +41,6 @@ $anzahl_fehler=0;
 $ausgabe='';
 $error_log_fas='';
 $update=false;
-$studiensemester=new studiensemester($conn);
-$ssem=$studiensemester->getaktorNext();
 
 function myaddslashes($var)
 {
@@ -41,8 +50,8 @@ function myaddslashes($var)
 ?>
 <html>
 <head>
-	<title>BIS-Meldung - Überprüfung von Verwendungen</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>BIS-Meldung - &Uuml;berpr&uuml;fung von Verwendungen</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
 	<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 </head>
 <body>
@@ -58,6 +67,10 @@ if($result = pg_query($conn, $qry))
 		$ende[$row->studiensemester_kurzbz]=$row->ende;
 	}
 }
+$stsem_obj = new studiensemester($conn);
+$lastss = $stsem_obj->getPrevious();
+$lastws = $stsem_obj->getBeforePrevious();
+
 //1 - aktive mitarbeiter und bismelden mit keiner verwendung oder mehr als einer aktuellen verwendung
 $qryall='SELECT uid,nachname,vorname, count(bisverwendung_id)
 	FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid)
@@ -85,14 +98,14 @@ if($resultall = pg_query($conn, $qryall))
 				{
 					if($i==0)
 					{
-						echo "<br><u>Aktiv(e) Mitarbeiter(in) ".$row->nachname." ".$row->vorname." hat ".$num_rows." aktuelle Verwendungen:</u><br>";
+						echo "<br><u>Aktive(r) Mitarbeiter(in) ".$row->nachname." ".$row->vorname." hat ".$num_rows." aktuelle Verwendungen (m&ouml;glicherweise korrekt):</u><br>";
 						$i++;
 					}
 					echo "Verwendung Code ".$row->verwendung_code.", Beschäftigungscode ".$row->ba1code.", ".$row->ba2code.", mit Ausmaß ".$row->beschausmasscode.", ".$row->beginn." - ".$row->ende."<br>";
 				}
 			}
 			elseif($num_rows==0)
-				echo "<br><u>Aktiv(e) Mitarbeiter(in): ".$rowall->nachname." ".$rowall->vorname." hat ".$num_rows." aktuelle Verwendungen:</u><br>";
+				echo "<br><u>Aktive(r) Mitarbeiter(in): ".$rowall->nachname." ".$rowall->vorname." hat ".$num_rows." aktuelle Verwendungen:</u><br>";
 		}
 	}
 }
@@ -118,7 +131,7 @@ if($resultall = pg_query($conn, $qryall))
 			{
 				if($i==0)
 				{
-					echo "<br><u>Aktiv(e) Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname." hat keine aktuelle Verwendungen:</u><br>";
+					echo "<br><u>Aktive(r) Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname." hat keine aktuellen Verwendungen:</u><br>";
 					$i++;
 				}
 				echo "Verwendung Code ".$row->verwendung_code.", Beschäftigungscode ".$row->ba1code.", ".$row->ba2code.", mit Ausmaß ".$row->beschausmasscode.", ".$row->beginn." - ".$row->ende."<br>";
@@ -133,8 +146,6 @@ $qryall='SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter
 	WHERE aktiv=false AND (ende>now() OR ende IS NULL)
 	GROUP BY uid,nachname,vorname
 	ORDER by nachname,vorname;';
-
-
 
 if($resultall = pg_query($conn, $qryall))
 {
@@ -271,10 +282,11 @@ $qryall="SELECT DISTINCT lehre.tbl_lehreinheitmitarbeiter.mitarbeiter_uid, nachn
 	FROM lehre.tbl_lehreinheitmitarbeiter join lehre.tbl_lehreinheit USING (lehreinheit_id)
 	JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
         	JOIN campus.vw_mitarbeiter ON (tbl_lehreinheitmitarbeiter.mitarbeiter_uid=uid)
-	WHERE lehre.tbl_lehreinheit.studiensemester_kurzbz='WS2007'
+	WHERE (lehre.tbl_lehreinheit.studiensemester_kurzbz='$lastss' OR lehre.tbl_lehreinheit.studiensemester_kurzbz='$lastws')
         	AND NOT EXISTS (SELECT * FROM bis.tbl_bisverwendung
-       	WHERE (ende>now() OR ende IS NULL) AND mitarbeiter_uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid)
+       	WHERE ((beginn<'".$ende[$lastss]."') AND (ende>'".$beginn[$lastws]."') OR ende is null) AND mitarbeiter_uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid)
         	ORDER BY nachname,vorname;";
+
 if($resultall = pg_query($conn, $qryall))
 {
 	$num_rows_all=pg_num_rows($resultall);
@@ -293,7 +305,7 @@ if($resultall = pg_query($conn, $qryall))
 		}
 	}
 }
-//8 - Verwendung Habil. und Enticklungsteam Habil.=1
+//8 - Verwendung Habil. und Entwicklungsteam Habil.=1
 $i=0;
 $qryall="SELECT DISTINCT mitarbeiter_uid, nachname, vorname
 	FROM bis.tbl_entwicklungsteam join bis.tbl_bisverwendung USING (mitarbeiter_uid)
@@ -324,3 +336,5 @@ if($resultall = pg_query($conn, $qryall))
 	}
 }
 ?>
+</body>
+</html>
