@@ -35,6 +35,7 @@ require_once('../../../include/datum.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/student.class.php');
 require_once('../../../include/lehrverband.class.php');
+require_once('../../../include/nation.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
 	die('Fehler beim Herstellen der DB Connection');
@@ -42,6 +43,79 @@ if(!$conn=pg_pconnect(CONN_STRING))
 $user=get_uid();
 $datum_obj = new datum();
 loadVariables($conn, $user);
+
+function getGemeindeDropDown($postleitzahl)
+{
+	global $conn, $_REQUEST, $gemeinde;
+	$found=false;
+	$firstentry='';
+	$gemeinde_x = (isset($_REQUEST['gemeinde'])?$_REQUEST['gemeinde']:'');
+	$qry = "SELECT distinct name FROM bis.tbl_gemeinde WHERE plz='".addslashes($postleitzahl)."'";
+	echo '<SELECT id="gemeinde" name="gemeinde" onchange="loadOrtData()">';
+	if($result = pg_query($conn, $qry))
+	{
+		while($row = pg_fetch_object($result))
+		{
+			if($firstentry=='')
+				$firstentry=$row->name;
+			if($gemeinde_x=='')
+				$gemeinde_x=$row->name;
+			
+			if($row->name==$gemeinde_x)
+			{
+				$selected='selected';
+				$found=true;
+			}
+			else
+				$selected='';
+			echo "<option value='$row->name' $selected>$row->name</option>";
+		}
+	}
+	
+	echo '</SELECT>';
+	if(!$found && (isset($importort) && $importort!=''))
+	{
+		echo $importort;
+	}
+	$gemeinde = $gemeinde_x;
+}
+
+if(isset($_GET['type']) && $_GET['type']=='getgemeindecontent' && isset($_GET['plz']))
+{
+	header('Content-Type: text/html; charset=iso-8859-15');
+
+	echo getGemeindeDropDown($_GET['plz']);
+	exit;
+}
+
+function getOrtDropDown($postleitzahl, $gemeindename)
+{
+	global $conn, $_REQUEST;
+	$ort = (isset($_REQUEST['ort'])?$_REQUEST['ort']:'');
+	$qry = "SELECT distinct ortschaftsname FROM bis.tbl_gemeinde 
+			WHERE plz='".addslashes($postleitzahl)."' AND name='".addslashes($gemeindename)."'";
+	echo '<SELECT id="ort" name="ort">';
+	if($result = pg_query($conn, $qry))
+	{
+		while($row = pg_fetch_object($result))
+		{
+			if($row->ortschaftsname==$ort)
+				$selected='selected';
+			else 
+				$selected='';
+			echo "<option value='$row->ortschaftsname' $selected>$row->ortschaftsname</option>";
+		}
+	}
+	
+	echo '</SELECT>';
+}
+if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz']) && isset($_GET['gemeinde']))
+{
+	header('Content-Type: text/html; charset=iso-8859-15');
+	
+	echo getOrtDropDown($_GET['plz'], utf8_decode($_GET['gemeinde']));
+	exit;
+}
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -133,6 +207,116 @@ function checkInput1()
 	}
 	return true;
 }
+
+// **************************************
+// * XMLHttpRequest Objekt erzeugen
+// **************************************
+var anfrage = null;
+
+function erzeugeAnfrage()
+{
+	try
+	{
+		anfrage = new XMLHttpRequest();
+	}
+	catch (versuchmicrosoft)
+	{
+		try
+		{
+			anfrage = new ActiveXObject("Msxml12.XMLHTTP");
+		}
+		catch (anderesmicrosoft)
+		{
+			try
+			{
+				anfrage = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			catch (fehlschlag)
+			{
+				anfrage = null;
+            }
+        }
+    }
+	if (anfrage == null)
+		alert("Fehler beim Erstellen des Anfrageobjekts!");
+}
+
+//Gemeinde DropDown holen wenn Nation Oesterreich
+function loadGemeindeData()
+{
+	if(document.getElementById('adresse_nation').value=='A')
+	{
+		anfrage=null;
+		//Request erzeugen und die Note speichern
+		erzeugeAnfrage(); 
+	    var jetzt = new Date();
+		var ts = jetzt.getTime();
+		var plz = document.getElementById('plz').value;
+	    var url= '<?php echo $_SERVER['PHP_SELF']."?type=getgemeindecontent"?>';
+	    url += '&plz='+plz+"&"+ts;
+	    anfrage.open("GET", url, true);
+	    anfrage.onreadystatechange = setGemeindeData;
+	    anfrage.send(null);
+	    document.getElementById('adresse-gemeinde-textfeld').type='hidden';
+		document.getElementById('adresse-ort-textfeld').type='hidden';
+	}
+	else
+	{
+		document.getElementById('adresse-gemeinde-textfeld').type='text';
+		document.getElementById('adresse-ort-textfeld').type='text';
+		document.getElementById('gemeindediv').innerHTML='';
+		document.getElementById('ortdiv').innerHTML='';
+	}
+}
+
+function setGemeindeData()
+{
+	if (anfrage.readyState == 4)
+	{
+		if (anfrage.status == 200) 
+		{
+			var resp = anfrage.responseText;
+            var gemeindediv = document.getElementById('gemeindediv');
+			gemeindediv.innerHTML = resp;
+			loadOrtData();
+        } 
+        else alert("Request status:" + anfrage.status);
+    }
+}
+
+function loadOrtData()
+{
+	if(document.getElementById('gemeinde'))
+	{
+		anfrage=null;
+		//Request erzeugen und die Note speichern
+		erzeugeAnfrage(); 
+	    var jetzt = new Date();
+		var ts = jetzt.getTime();
+		var plz = document.getElementById('plz').value;
+		var gemeinde = document.getElementById('gemeinde').value;
+	    var url= '<?php echo $_SERVER['PHP_SELF']."?type=getortcontent"?>';
+	    url += '&plz='+plz+"&gemeinde="+encodeURIComponent(gemeinde)+"&"+ts;
+	    anfrage.open("GET", url, true);
+	    anfrage.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+	    anfrage.onreadystatechange = setOrtData;
+	    anfrage.send(null);
+	}
+}
+
+function setOrtData()
+{
+	if (anfrage.readyState == 4)
+	{
+		if (anfrage.status == 200) 
+		{
+			var resp = anfrage.responseText;
+            var ortdiv = document.getElementById('ortdiv');
+			ortdiv.innerHTML = resp;
+        } 
+        else alert("Request status:" + anfrage.status);
+    }
+}	
 </script>
 </head>
 <body>
@@ -147,6 +331,7 @@ if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz'))
 
 $where = '';
 $error = false;
+$importort='';
 //Parameter
 $titel = (isset($_REQUEST['titel'])?$_REQUEST['titel']:'');
 $titelpost = (isset($_REQUEST['titelpost'])?$_REQUEST['titelpost']:'');
@@ -156,8 +341,26 @@ $vorname = (isset($_REQUEST['vorname'])?$_REQUEST['vorname']:'');
 $geschlecht = (isset($_REQUEST['geschlecht'])?$_REQUEST['geschlecht']:'');
 $geburtsdatum = (isset($_REQUEST['geburtsdatum'])?$_REQUEST['geburtsdatum']:'');
 $adresse = (isset($_REQUEST['adresse'])?$_REQUEST['adresse']:'');
+$adresse_nation = (isset($_REQUEST['adresse_nation'])?$_REQUEST['adresse_nation']:'A');
 $plz = (isset($_REQUEST['plz'])?$_REQUEST['plz']:'');
-$ort = (isset($_REQUEST['ort'])?$_REQUEST['ort']:'');
+if($adresse_nation=='A')
+{
+	$ort = (isset($_REQUEST['ort'])?$_REQUEST['ort']:'');
+	$gemeinde = (isset($_REQUEST['gemeinde'])?$_REQUEST['gemeinde']:'');
+}
+else 
+{
+	$ort = (isset($_REQUEST['ort_txt'])?$_REQUEST['ort_txt']:'');
+	$gemeinde = (isset($_REQUEST['gemeinde_txt'])?$_REQUEST['gemeinde_txt']:'');
+}
+//wenn die Gemeinde leer ist und im Ort etwas steht
+//dann umdrehen (Das passiert wenn die Daten aus dem Mail von der www importiert werden)
+if($gemeinde=='' && $ort!='')
+{
+	$importort=$ort;
+	$gemeinde=$ort;
+	$ort='';
+}
 $email = (isset($_REQUEST['email'])?$_REQUEST['email']:'');
 $telefon = (isset($_REQUEST['telefon'])?$_REQUEST['telefon']:'');
 $mobil = (isset($_REQUEST['mobil'])?$_REQUEST['mobil']:'');
@@ -370,7 +573,7 @@ if(isset($_POST['save']))
 			$adr->new = true;
 			$adr->insertamum = date('Y-m-d H:i:s');
 			$adr->insertvon = $user;
-			$adr->nation = 'A';
+			$adr->nation = $adresse_nation;
 			//Wenn die Person neu angelegt wird, dann ist die neue Adresse die Heimatadresse
 			//sonst nicht
 			if($person_id=='0')
@@ -405,7 +608,7 @@ if(isset($_POST['save']))
 				$adr->new = true;
 				$adr->insertamum = date('Y-m-d H:i:s');
 				$adr->insertvon = $user;
-				$adr->nation = 'A';
+				$adr->nation = $adresse_nation;
 				$adr->heimatadresse = true;
 			}
 		}
@@ -417,6 +620,7 @@ if(isset($_POST['save']))
 			$adr->strasse = $adresse;
 			$adr->plz = $plz;
 			$adr->ort = $ort;
+			$adr->gemeinde = $gemeinde;
 			$adr->typ = 'h';
 			$adr->zustelladresse = true;
 			if(!$adr->save())
@@ -701,9 +905,47 @@ echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><td>Geburtsdatum </td><td><input type="text" id="geburtsdatum" size="10" maxlength="10" name="geburtsdatum" value="'.$geburtsdatum_orig.'" /> (Format: dd.mm.JJJJ)</td></tr>';
 echo '<tr><td colspan="2"><fieldset><legend>Adresse</legend><table>';
-echo '<tr><td>Adresse</td><td><input type="text" id="adresse" maxlength="256" name="adresse" value="'.$adresse.'" /></td></tr>';
-echo '<tr><td>Postleitzahl</td><td><input type="text" maxlength="16" id="plz" name="plz" value="'.$plz.'" /></td></tr>';
-echo '<tr><td>Ort</td><td><input type="text" id="ort" maxlength="256" name="ort" value="'.$ort.'" /></td></tr>';
+echo '<tr><td>Nation</td><td><SELECT name="adresse_nation" id="adresse_nation" onchange="loadGemeindeData()">';
+$nation =  new nation($conn);
+$nation->getAll();
+foreach ($nation->nation as $row)
+{
+	if($row->code==$adresse_nation)
+		$selected='selected';
+	else 
+		$selected='';
+	echo "<option value='$row->code' $selected>$row->langtext</option>";
+}
+echo '</SELECT></td></tr>';
+echo '<tr><td>Postleitzahl</td><td><input type="text" size="5" maxlength="16" id="plz" name="plz" value="'.$plz.'" onblur="loadGemeindeData()" /></td></tr>';
+echo '<tr><td>Adresse</td><td><input type="text" id="adresse" maxlength="256"  size="40" name="adresse" value="'.$adresse.'" /></td></tr>';
+echo '<tr><td>Gemeinde</td><td><div id="gemeindediv">';
+//wenn die Nation Oesterreich ist, dann wird ein DropDown fuer Gemeinde und Ort angezeigt.
+//wenn die Nation nicht Oesterreich ist, werden nur textfelder angezeigt
+if($adresse_nation=='A' && $plz!='')
+{
+	echo getGemeindeDropDown($plz);
+}
+else 
+{
+	echo '<font color="gray">Bitte zuerst eine Postleitzahl eintragen</font>';
+}	
+
+//wenn der Ort per EMail-Import von der www kommt und der Ort in der Gemeindetabelle
+//nicht gefunden wird, dann wird der Ort in Klammer neben dem DropDown angezeigt
+if($importort!='' && $gemeinde!=$importort)
+	echo ' ( '.$importort.' )';
+
+echo '</div><input type="'.($adresse_nation=='A'?'hidden':'text').'" id="adresse-gemeinde-textfeld" maxlength="256" name="gemeinde_txt" value="'.$gemeinde.'" />';
+
+echo '</td></tr>';
+echo '<tr><td>Ort</td><td><div id="ortdiv">';
+if($adresse_nation=='A' && $plz!='')
+{
+	echo getOrtDropDown($plz, $gemeinde);
+}
+echo '</div><input type="'.($adresse_nation=='A'?'hidden':'text').'" id="adresse-ort-textfeld" maxlength="256" name="ort_txt" value="'.$ort.'"/></td></tr>';
+
 echo '</table>';
 echo '<div style="display: none;" id="ueb1"><input type="radio" id="ueberschreiben1" name="ueberschreiben" value="Ja" onclick="disablefields2(false)">Bestehende Adresse überschreiben</div>';
 echo '<div style="display: none;" id="ueb2"><input type="radio" id="ueberschreiben2" name="ueberschreiben" value="Nein" onclick="disablefields2(false)" checked>Adresse hinzufügen</div>';
