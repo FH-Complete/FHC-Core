@@ -179,7 +179,8 @@ function draw_content_liste($row)
 			<STUDENT:orgform><![CDATA['.$orgform.']]></STUDENT:orgform>
 			<STUDENT:aufmerksamdurch_kurzbz><![CDATA['.$row->aufmerksamdurch_kurzbz.']]></STUDENT:aufmerksamdurch_kurzbz>
 			<STUDENT:punkte><![CDATA['.$row->punkte.']]></STUDENT:punkte>
-			<STUDENT:dual><![CDATA['.($row->dual=='t'?'Ja':'Nein').']]></STUDENT:dual>
+			<STUDENT:dual><![CDATA['.($row->dual=='t'?'true':'false').']]></STUDENT:dual>
+			<STUDENT:dual_bezeichnung><![CDATA['.($row->dual=='t'?'Ja':'Nein').']]></STUDENT:dual_bezeichnung>
       	</RDF:Description>
       </RDF:li>';
 }
@@ -280,6 +281,7 @@ function draw_prestudent($row)
 			<STUDENT:punkte><![CDATA['.$row->punkte.']]></STUDENT:punkte>
 			<STUDENT:bismelden><![CDATA['.($row->bismelden?'true':'false').']]></STUDENT:bismelden>
 			<STUDENT:dual><![CDATA['.($row->dual?'true':'false').']]></STUDENT:dual>
+			<STUDENT:dual_bezeichnung><![CDATA['.($row->dual?'Ja':'Nein').']]></STUDENT:dual_bezeichnung>
 			<STUDENT:anmerkungpre><![CDATA['.$row->anmerkung.']]></STUDENT:anmerkungpre>
       	</RDF:Description>
       </RDF:li>';
