@@ -94,6 +94,9 @@ if (!@pg_query($conn,'SELECT veranstaltung_id FROM campus.tbl_reservierung LIMIT
 			Grant update on campus.tbl_veranstaltungskategorie to group admin;
 			Grant delete on campus.tbl_veranstaltungskategorie to group admin;
 			Grant insert on campus.tbl_veranstaltungskategorie to group admin;
+			GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE campus.tbl_veranstaltung TO web;
+			GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE campus.tbl_veranstaltungskategorie TO web;
+			GRANT SELECT, UPDATE ON campus.tbl_veranstaltung_veranstaltung_id_seq to web;
 
 		";
 	if (!@pg_query($conn,$sql))
