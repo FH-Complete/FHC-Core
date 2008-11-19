@@ -390,13 +390,13 @@ class beispiel
 			}
 			else
 			{
-				$this->errormsg = 'Fehler beim laden der Anzahl der Einträge in Student_Beispiel';
+				$this->errormsg = 'Fehler beim Laden der Anzahl der Eintraege in Student_Beispiel';
 				return false;
 			}
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden der Anzahl der Einträge in Student_Beispiel';
+			$this->errormsg = 'Fehler beim Laden der Anzahl der Eintraege in Student_Beispiel';
 			return false;
 		}
 	}
