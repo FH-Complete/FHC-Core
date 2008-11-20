@@ -18,7 +18,7 @@ else if ($pfile == 'statistik.php')
 	$class_statistik = 'benotungstool_tabs_active';
 	
 echo "\n\n<!--Menue-->\n";
-echo "<br><div><ul><li><a href='lvgesamtnoteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'>Lehrveranstaltung benoten</font></a></li><li><a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&handbuch=1' target='_blank'><font size='3'>Handbuch Benotungstool (PDF)</font></a></li></ul></div>";
+echo "<br><div><ul><li><a href='lvgesamtnoteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'>Lehrveranstaltung benoten</font></a></li><li><a href='".APP_ROOT."cis/cisdocs/handbuch_benotungstool.pdf' class='Item' target='_blank'><font size='3'>Handbuch Benotungstool (PDF)</font></a></li></ul></div>";
 echo "<br>\n";
 echo "<table cellpadding='3' width='100%'>\n";
 echo "	<tr>\n";

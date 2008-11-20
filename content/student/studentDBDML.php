@@ -749,6 +749,9 @@ if(!$error)
 					}
 				}
 
+				$rolle = new prestudent($conn);
+				$rolle->prestudent_id = $_POST['prestudent_id'];
+				
 				if(!$error)
 				{
 					if(($_POST['studiensemester_old']=='') || (!$rolle->load_rolle($_POST['prestudent_id'], $_POST['rolle_kurzbz'], $_POST['studiensemester_old'], $_POST['ausbildungssemester_old'])))
@@ -791,7 +794,7 @@ if(!$error)
 						$rolle->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
 						$rolle->datum = $_POST['datum'];
 						$rolle->orgform_kurzbz = $_POST['orgform_kurzbz'];
-
+						
 						if($rolle->save_rolle())
 							$return = true;
 						else

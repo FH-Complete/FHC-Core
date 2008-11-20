@@ -118,13 +118,8 @@
 	}
 	
 	$sg = new studiengang($conn);
-	$sg->getAll('kurzbzlang', $aktiv=false);
-	foreach($sg->result as $studiengang)
-	{
-		$sg_arr[$studiengang->studiengang_kz] = $studiengang->kurzbzlang;
-	}
-	$sgkeys_arr = array_keys($sg_arr);
-	
+	$sg->getAll('kurzbzlang', false);
+		
 	
 	if (isset($_REQUEST["uid"]))
 	{
@@ -166,13 +161,13 @@
 				$htmlstr .= "		<td><select name='studiengang_kz' onchange='markier(\"".$b->benutzerberechtigung_id."\")'>\n";
 				$htmlstr .= "			<option value=''></option>\n";
 				
-				foreach ($sgkeys_arr as $sgkey)
+				foreach ($sg->result as $sgkey)
 				{
-					if ($b->studiengang_kz == $sgkey && $b->studiengang_kz != null)
+					if ($b->studiengang_kz == $sgkey->studiengang_kz && $b->studiengang_kz != null)
 						$sel = " selected";
 					else
 						$sel = "";
-					$htmlstr .= "				<option value='".$sgkey."' ".$sel.">".$sg_arr[$sgkey]."</option>";
+					$htmlstr .= "				<option value='".$sgkey->studiengang_kz."' ".$sel.">".$sg->kuerzel_arr[$sgkey->studiengang_kz]." (".$sgkey->kurzbzlang.")</option>";
 				}
 				$htmlstr .= "		</select></td>\n";
 				
@@ -233,10 +228,10 @@
 			$htmlstr .= "		<td><select name='studiengang_kz' onchange='markier(\"neu\")'>\n";
 			$htmlstr .= "			<option value=''></option>\n";
 			
-			foreach ($sgkeys_arr as $sgkey)
+			foreach ($sg->result as $sgkey)
 			{
 				$sel = "";
-				$htmlstr .= "				<option value='".$sgkey."' ".$sel.">".$sg_arr[$sgkey]."</option>";
+				$htmlstr .= "				<option value='".$sgkey->studiengang_kz."' ".$sel.">".$sg->kuerzel_arr[$sgkey->studiengang_kz]." (".$sgkey->kurzbzlang.")</option>";
 			}
 			$htmlstr .= "		</select></td>\n";
 			
