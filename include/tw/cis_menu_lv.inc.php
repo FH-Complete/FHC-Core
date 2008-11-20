@@ -361,7 +361,7 @@
 				echo '<a href="benotungstool/verwaltung.php?lvid='.$lvid.$studiensem.'" class="Item">
 	    			<img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
 	    			<strong>&Uuml;bungstool<br>("Kreuzerl"-Tool)</strong></a><br>
-	    			<a href="lesson.php?handbuch=1&lvid='.$lvid.$studiensem.'" class="Item">Handbuch [PDF]</a>';
+	    			<a href="'.APP_ROOT.'cis/cisdocs/handbuch_benotungstool.pdf" class="Item" target="_blank">Handbuch [PDF]</a>';
 		} 
 		else 
 		{
@@ -377,7 +377,8 @@
 		{
 			echo '<a href="#" onclick="alert(\'Das Übungstool kann nicht gleichzeitig mit Moodle verwendet werden.\nWenn Sie das Übungstool verwenden wollen, müssen Sie den Moodle Kurs entfernen. Wenden Sie sich hierzu bitte an den Lektorensupport\');" class="Item">
 	    			<img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
-	    			<strong>&Uuml;bungstool<br>("Kreuzerl"-Tool)</strong></a>';
+	    			<strong>&Uuml;bungstool<br>("Kreuzerl"-Tool)</strong></a><br>
+	    			<a href="'.APP_ROOT.'cis/cisdocs/handbuch_benotungstool.pdf" class="Item" target="_blank">Handbuch [PDF]</a>';
 		}
 	}
 	

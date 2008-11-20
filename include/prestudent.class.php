@@ -398,7 +398,7 @@ class prestudent extends person
 	// ********
 	function load_rolle($prestudent_id, $rolle_kurzbz, $studiensemester_kurzbz, $ausbildungssemester)
 	{
-		if(!is_numeric($prestudent_id))
+		if(!is_numeric($prestudent_id) || $prestudent_id=='')
 		{
 			$this->errormsg = 'Prestudent_id muss eine gueltige Zahl sein';
 			return false;
@@ -424,8 +424,13 @@ class prestudent extends person
 				$this->updatevon = $row->updatevon;
 				$this->ext_id_prestudent = $row->ext_id;
 				$this->orgform_kurzbz = $row->orgform_kurzbz;
+				return true;
 			}
-			return true;
+			else 
+			{
+				$this->errormsg = 'Rolle existiert nicht';
+				return false;
+			}
 		}
 		else 
 		{
@@ -628,6 +633,13 @@ class prestudent extends person
 	{
 		if($this->new)
 		{
+			//pruefen ob die Rolle schon vorhanden ist
+			if($this->load_rolle($this->prestudent_id, $this->rolle_kurzbz, $this->studiensemester_kurzbz, $this->ausbildungssemester))
+			{
+				$this->errormsg = 'Diese Rolle existiert bereits';
+				return false;
+			}
+
 			$qry = 'INSERT INTO public.tbl_prestudentrolle (prestudent_id, rolle_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz) VALUES('.
 			       $this->addslashes($this->prestudent_id).",".
 			       $this->addslashes($this->rolle_kurzbz).",".
@@ -648,6 +660,15 @@ class prestudent extends person
 			if($this->ausbildungssemester_old=='')
 				$this->ausbildungssemester_old = $this->ausbildungssemester;
 			
+			//wenn der PrimaryKey geaendert wird, schauen ob schon ein Eintrag mit diesem Key vorhanden ist
+			if($this->studiensemester_old!=$this->studiensemester_kurzbz || $this->ausbildungssemester_old!=$this->ausbildungssemester)
+			{
+				if($this->load_rolle($this->prestudent_id, $this->rolle_kurzbz, $this->studiensemester_kurzbz, $this->ausbildungssemester))
+				{
+					$this->errormsg = 'Diese Rolle existiert bereits';
+					return false;
+				}
+			}
 			$qry = 'UPDATE public.tbl_prestudentrolle SET'.
 			       ' ausbildungssemester='.$this->addslashes($this->ausbildungssemester).",".
 			       ' studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).",".

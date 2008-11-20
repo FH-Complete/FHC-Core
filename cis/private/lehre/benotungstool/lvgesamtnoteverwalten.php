@@ -794,7 +794,7 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 echo '<table width="100%"><tr><td>';
 echo "<h3><a href='javascript:window.history.back()'>Zurück</a></h3>";
 echo '</td><td align="right">';
-echo '<a href="/cis/cisdocs/handbuch_benotungstool.pdf" class="Item" target="_blank">Handbuch (PDF)</a>';
+echo '<a href="'.APP_ROOT.'cis/cisdocs/handbuch_benotungstool.pdf" class="Item" target="_blank">Handbuch (PDF)</a>';
 echo '</td></tr></table>';
 
 
