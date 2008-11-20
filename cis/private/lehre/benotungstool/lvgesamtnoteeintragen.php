@@ -122,7 +122,7 @@ function savenote($lvid, $student_uid, $note)
 		$lvgesamtnote->student_uid = $student_uid;
 		$lvgesamtnote->lehrveranstaltung_id = $lvid;
 		$lvgesamtnote->studiensemester_kurzbz = $stsem;
-		$lvgesamtnote->note = $note;
+		$lvgesamtnote->note = trim($note);
 		$lvgesamtnote->mitarbeiter_uid = $user;
 		$lvgesamtnote->benotungsdatum = $jetzt;
 		$lvgesamtnote->freigabedatum = null;
