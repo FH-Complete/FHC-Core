@@ -31,14 +31,14 @@ $mitarbeiterzahl=0;
 $echt=0;
 $frei=0;
 
-$nichtmelden = array(11,91,92,94,999,476,203,329,334,331,328,332);
+$nichtmelden = array(11,91,92,94,999,203);
 
 $datumobj=new datum();
 
 if(strstr($ssem,"WS"))
 {
 	$bisdatum=date("Y-m-d",  mktime(0, 0, 0, 11, 15, date("Y")));
-	$bisprevious=date("Y-m-d",  mktime(0, 0, 0, 04, 15, date("Y")));
+	$bisprevious=date("Y-m-d",  mktime(0, 0, 0, 11, 15, date("Y")));
 }
 /*elseif(strstr($ssem,"SS"))
 {
@@ -232,7 +232,7 @@ if($result = pg_query($conn, $qry))
               <BeschaeftigungsAusmass>".$rowvw->beschausmasscode."</BeschaeftigungsAusmass>
               <VerwendungsCode>".$rowvw->verwendung_code."</VerwendungsCode>";
 				//Studiengangsleiter
-				$qryslt="SELECT * FROM public.tbl_benutzerfunktion WHERE uid='".$row->mitarbeiter_uid."' AND funktion_kurzbz='stgl';";
+				$qryslt="SELECT * FROM public.tbl_benutzerfunktion WHERE uid='".$row->mitarbeiter_uid."' AND funktion_kurzbz='stgl' AND studiengang_kz<10000;";
 				if($resultslt=pg_query($conn,$qryslt))
 				{
 					while($rowslt=pg_fetch_object($resultslt))
