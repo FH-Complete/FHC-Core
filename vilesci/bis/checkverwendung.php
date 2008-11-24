@@ -41,6 +41,8 @@ $anzahl_fehler=0;
 $ausgabe='';
 $error_log_fas='';
 $update=false;
+$bismeldedatum=date("Y-m-d",  mktime(0, 0, 0, 11, 15, date("Y")));
+$bismeldedatumvorjahr=date("Y-m-d",  mktime(0, 0, 0, 11, 15, date("Y")-1));
 
 function myaddslashes($var)
 {
@@ -333,6 +335,32 @@ if($resultall = pg_query($conn, $qryall))
 				echo "Verwendung Code ".$row->verwendung_code.", ".$row->anfang." - ".$row->zuende.", Habilitation ".($row->habilitation=='t'?'ja':'nein')." <-> Entwicklungsteam-bes.Qualifikation:(Stg. ".$row->studiengang_kz.") '".$row->besqualbez."'.<br>";
 			}
 		}
+	}
+}
+
+//9 - 2 gleiche aktive Verwendungen
+$qryall="
+		SELECT distinct vorname, nachname, personalnummer, ba1code, ba2code FROM campus.vw_mitarbeiter JOIN (
+		SELECT a.mitarbeiter_uid, a.ba1code, a.ba2code FROM bis.tbl_bisverwendung a, bis.tbl_bisverwendung b WHERE
+		a.bisverwendung_id<>b.bisverwendung_id AND
+		a.ba1code=b.ba1code AND
+		a.ba2code=b.ba2code AND
+		a.mitarbeiter_uid=b.mitarbeiter_uid AND
+		(a.ende is null OR a.ende>'$bismeldedatumvorjahr') AND
+		(b.ende is null OR b.ende>'$bismeldedatumvorjahr') AND
+		a.beschausmasscode=b.beschausmasscode AND
+		a.verwendung_code=b.verwendung_code
+		) c ON(mitarbeiter_uid=uid)";
+
+if($resultall = pg_query($conn, $qryall))
+{
+	$num_rows_all=pg_num_rows($resultall);
+	echo "<br><br><H2>Bei $num_rows_all Lektoren sind mehrere gleiche aktive Verwendungen vorhanden</H2>";
+	while($rowall=pg_fetch_object($resultall))
+	{
+		$i++;
+		echo "<br><u>Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname.":</u><br>";
+		echo "(ba1code: $rowall->ba1code, ba2code: $rowall->ba2code)";		
 	}
 }
 ?>
