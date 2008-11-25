@@ -48,6 +48,11 @@ hr
 }
 
 @media screen {
+iframe
+{
+ overflow: auto;
+}
+
 #menue
 {
 	top:49px;
