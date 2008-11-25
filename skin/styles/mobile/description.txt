@@ -1,0 +1,3 @@
+Das ist das Mobile Layout <br>vom Technikum Wien.<br><br>
+
+<i><small>copyright by FH Technikum Wien</small></i>
