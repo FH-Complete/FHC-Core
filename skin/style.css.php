@@ -15,10 +15,35 @@
 		$stylesheet=$_COOKIE['stylesheet'];
 	}
 	else
-		$stylesheet=DEFAULT_STYLE;
+	{
+		if (jahresplan_check_mobile())
+			$stylesheet="mobile";
+		else
+			$stylesheet=DEFAULT_STYLE;
+	}	
 	//setcookie('stylesheet', DEFAULT_STYLE);
 	header("Content-Type: text/css");
 	//echo $_COOKIE['stylesheet'];
 	readfile ($path.'skin/styles/'.$stylesheet.'.css');
+#--------------------------------------------------------------------------------------------------
+#	$const=@get_defined_constants();
+#	@reset($const);	
+#	print_r($const);   
+function jahresplan_check_mobile() {
+  $agents = array(
+    'Windows CE', 'Pocket', 'Mobile',
+    'Portable', 'Smartphone', 'SDA',
+    'PDA', 'Handheld', 'Symbian',
+    'WAP', 'Palm', 'Avantgo',
+    'cHTML', 'BlackBerry', 'Opera Mini',
+    'Nokia'
+  );
+  // Prüfen der Browserkennung
+  for ($i=0; $i<count($agents); $i++) {
+    if(isset($_SERVER["HTTP_USER_AGENT"]) && strpos($_SERVER["HTTP_USER_AGENT"], $agents[$i]) !== false)
+      return true;
+  }
+  return false;
+}
 ?>
 
