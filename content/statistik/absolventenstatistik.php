@@ -19,7 +19,15 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-
+/*
+ * Erstellt eine Liste mit den Absolventen eines Studiensemesters
+ * Aufteilung in 
+ * - Anzahl Gesamt
+ * - Prozent Anteil
+ * - Vollzeit/Berufsbegleitend
+ * - Geschlecht
+ * - Herkunft (AT/EU/Nicht EU)
+ */
 require_once('../../vilesci/config.inc.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/benutzerberechtigung.class.php');

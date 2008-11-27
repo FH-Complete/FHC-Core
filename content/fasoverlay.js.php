@@ -956,6 +956,46 @@ function StatistikPrintAbgaengerstatistik()
 }
 
 // ****
+// * Liefert eine statistik ueber die Anzahl der Absolventen pro Studiengang
+// ****
+function StatistikPrintAbsolventenstatistik()
+{
+	var stsem = getStudiensemester();
+
+	window.open('<?php echo APP_ROOT ?>content/statistik/absolventenstatistik.php?stsem='+stsem,'Absolventenstatistik');
+}
+
+// ****
+// * Liefert eine statistik ueber die Anzahl und Verteilung der Studenten auf die Studiengaenge
+// ****
+function StatistikPrintStudentenstatistik()
+{
+	var stsem = getStudiensemester();
+
+	window.open('<?php echo APP_ROOT ?>content/statistik/studentenstatistik.php?stsem='+stsem,'Studentenstatistik');
+}
+
+// ****
+// * Liefert eine statistik ueber die Lektorenverteilung auf die Institute
+// ****
+function StatistikPrintLektorenstatistik()
+{
+	var stsem = getStudiensemester();
+
+	window.open('<?php echo APP_ROOT ?>content/statistik/lektorenstatistik.php?stsem='+stsem,'Lektorenstatistik');
+}
+
+// ****
+// * Liefert eine statistik ueber die Institutszuordnungen und Aufteilung auf intern/extern
+// ****
+function StatistikPrintMitarbeiterstatistik()
+{
+	var stsem = getStudiensemester();
+
+	window.open('<?php echo APP_ROOT ?>content/statistik/mitarbeiterstatistik.php?stsem='+stsem,'Mitarbeiterstatistik');
+}
+
+// ****
 // * Zeigt HTML Seite zur Bearbeitung der Reihungstests an
 // ****
 function ExtrasShowReihungstest()

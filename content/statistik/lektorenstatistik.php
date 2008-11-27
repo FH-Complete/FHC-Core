@@ -19,7 +19,11 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-
+/*
+ * Erstellt eine Tablle mit der Anzahl der Lektoren die im angegebenen
+ * StudienJAHR einen Lehrauftrag im jeweiligen Institut haben, getrennt nach Fixangestellten und Freien
+ * und der Anzahl der Stunden die in diesem Institut gehalten wurden
+ */
 require_once('../../vilesci/config.inc.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
