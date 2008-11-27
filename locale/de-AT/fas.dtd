@@ -132,6 +132,22 @@
 <!ENTITY menu-statistic-abgaengerstatistik.label		"Abgaengerstatistik">
 <!ENTITY menu-statistic-abgaengerstatistik.accesskey	"A">
 
+<!ENTITY menu-statistic-absolventenstatistik.key		"B">
+<!ENTITY menu-statistic-absolventenstatistik.label		"Absolventenstatistik">
+<!ENTITY menu-statistic-absolventenstatistik.accesskey	"B">
+
+<!ENTITY menu-statistic-lektorenstatistik.key		"L">
+<!ENTITY menu-statistic-lektorenstatistik.label		"Lektorenstatistik">
+<!ENTITY menu-statistic-lektorenstatistik.accesskey	"L">
+
+<!ENTITY menu-statistic-studentenstatistik.key			"S">
+<!ENTITY menu-statistic-studentenstatistik.label		"Studentenstatistik">
+<!ENTITY menu-statistic-studentenstatistik.accesskey	"S">
+
+<!ENTITY menu-statistic-mitarbeiterstatistik.key		"M">
+<!ENTITY menu-statistic-mitarbeiterstatistik.label		"Mitarbeiterstatistik">
+<!ENTITY menu-statistic-mitarbeiterstatistik.accesskey	"M">
+
 <!-- Dokumente -->
 <!ENTITY menu-dokumente.label		"Dokumente">
 <!ENTITY menu-dokumente.accesskey	"D">

@@ -19,6 +19,10 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+/*
+ * Erstellt eine Liste der Koordinatoren eines Instituts und der Anzahl der Stunden
+ * die er in den jeweiligen Studiengaengen unterrichtet
+ */
 require_once('../../vilesci/config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
@@ -27,7 +31,7 @@ echo '
 <html>
 <head>
 <title>Koordinatorstunden</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">';
 
 // Datenbank Verbindung
