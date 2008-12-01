@@ -32,6 +32,8 @@ require_once('../../include/functions.inc.php');
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim Connecten zur DB');
 
+$ws='';
+$ss='';
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
 else
@@ -49,28 +51,6 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 	</head>
 	<body>';
 
-
-	echo "<h2>Lektorenstatistik $stsem";
-	echo '<span style="position:absolute; right:15px;">'.date('d.m.Y').'</span></h2><br>';
-	echo '</h2>';
-	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">Studiensemester: <SELECT name="stsem">';
-	$studsem = new studiensemester($conn);
-	$studsem->getAll();
-
-	foreach ($studsem->studiensemester as $stsemester)
-	{
-		if($stsemester->studiensemester_kurzbz==$stsem)
-			$selected='selected';
-		else 
-			$selected='';
-		
-		echo '<option value="'.$stsemester->studiensemester_kurzbz.'" '.$selected.'>'.$stsemester->studiensemester_kurzbz.'</option>';
-	}
-	echo '</SELECT>
-		<input type="submit" value="Anzeigen" /></form><br><br>';
-
-if($stsem!='')
-{
 	if(substr($stsem, 0, 2)=='WS')
 	{
 		$stsem_obj = new studiensemester($conn);
@@ -83,6 +63,35 @@ if($stsem!='')
 		$ws = $stsem_obj->getPreviousFrom($stsem);
 		$ss = $stsem;
 	}
+	
+	echo "<h2>Lektorenstatistik (Lehrauftrag) $ws / $ss";
+	echo '<span style="position:absolute; right:15px;">'.date('d.m.Y').'</span></h2><br>';
+	echo '</h2>';
+	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">Studiensemester: <SELECT name="stsem">';
+	$studsem = new studiensemester($conn);
+	$studsem->getAll();
+
+	foreach ($studsem->studiensemester as $stsemester)
+	{
+		if($stsemester->studiensemester_kurzbz==$ws)
+			$selected='selected';
+		else 
+			$selected='';
+		if(substr($stsemester->studiensemester_kurzbz, 0, 2)=='WS')
+		{
+			$stsem_obj = new studiensemester($conn);
+			$ss1 = $stsem_obj->getNextFrom($stsemester->studiensemester_kurzbz);
+			$ws1 = $stsemester->studiensemester_kurzbz;
+			echo '<option value="'.$stsemester->studiensemester_kurzbz.'" '.$selected.'>'.$ws1.'/'.$ss1.'</option>';			
+		}
+		
+	}
+	echo '</SELECT>
+		<input type="submit" value="Anzeigen" /></form><br><br>';
+
+if($stsem!='')
+{
+	
 	echo "<table class='liste table-stripeclass:alternate table-autostripe'>
 				<thead>
 					<tr>
