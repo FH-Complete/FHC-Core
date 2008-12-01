@@ -36,13 +36,14 @@ require_once('../../include/functions.inc.php');
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim Connecten zur DB');
 
+$stsem_obj = new studiensemester($conn);
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
 else
 {
-	$stsem_obj = new studiensemester($conn);
 	$stsem = $stsem_obj->getaktorNext();
 }
+$stsem_obj->load($stsem);
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 	<html>
 	<head>
@@ -81,6 +82,7 @@ if($stsem!='')
 						<th></th>
 						<th></th>
 						<th>Anteil an Gesamt</th>
+						<th>Extern</th>
 						<th>Studienart</th>
 						<th>Geschlecht</th>
 						<th colspan=3>Staatsb&uuml;rgerschaft</th>
@@ -91,6 +93,7 @@ if($stsem!='')
 						<th>Bachelor</th>
 						<th>Studiengänge</th>
 						<th>Absolut / %</th>
+						<th>In / Out</th>
 						<th>BB / VZ</th>
 						<th>m / w</th>
 						<th>&Ouml;sterreich</th>
@@ -107,7 +110,12 @@ if($stsem!='')
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id) JOIN public.tbl_studiengang USING(studiengang_kz)
 	   			 	WHERE rolle_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND typ='b'
 					) a) AS gesamt_alle,
-					
+				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Incoming' AND studiensemester_kurzbz='$stsem'
+					) a) AS inc,
+				(SELECT count(*) FROM (SELECT distinct student_uid FROM public.tbl_student JOIN bis.tbl_bisio USING (student_uid)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND (bis>='$stsem_obj->start' OR bis is null) AND von<='$stsem_obj->ende'
+					) a) AS out,
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND orgform_kurzbz='BB'
 					) a) AS bb,
@@ -148,6 +156,8 @@ if($stsem!='')
 		$gesamt_at=0;
 		$gesamt_eu=0;
 		$gesamt_noteu=0;
+		$gesamt_inc=0;
+		$gesamt_out=0;
 		while($row = pg_fetch_object($result))
 		{
 			echo '<tr>';
@@ -155,6 +165,7 @@ if($stsem!='')
 			echo "<td>".strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
 			$prozent = ($row->gesamt_alle!=0?$row->gesamt_stg/$row->gesamt_alle*100:0);
 			echo "<td align='center'>$row->gesamt_stg / ".sprintf('%0.2f', $prozent)." %</td>";
+			echo "<td align='center'>$row->inc / $row->out</td>";
 			echo "<td align='center'>$row->bb / $row->vz</td>";
 			echo "<td align='center'>$row->m / $row->w</td>";
 			echo "<td align='center'>$row->herkunft_at</td>";
@@ -170,11 +181,14 @@ if($stsem!='')
 			$gesamt_at += $row->herkunft_at;
 			$gesamt_eu += $row->herkunft_eu;
 			$gesamt_noteu += $row->herkunft_noteu;
+			$gesamt_inc+=$row->inc;
+			$gesamt_out+=$row->out;
 		}
 		echo '<tr>';
 		echo '<td><b>SUMME</b></td>';
 		echo "<td>&nbsp;</td>";
 		echo "<td align='center'><b>$gesamt / ".sprintf('%0.2f', $gesamt_prozent)." %</b></td>";
+		echo "<td align='center'><b>$gesamt_inc / $gesamt_out</b></td>";
 		echo "<td align='center'><b>$gesamt_bb / $gesamt_vz</b></td>";
 		echo "<td align='center'><b>$gesamt_m / $gesamt_w</b></td>";
 		echo "<td align='center'><b>$gesamt_at</b></td>";
@@ -190,6 +204,7 @@ if($stsem!='')
 		<th>Master</th>
 		<th>Studiengänge</th>
 		<th>Absolut / %</th>
+		<th>In / Out</th>
 		<th>BB / VZ</th>
 		<th>m / w</th>
 		<th>&Ouml;sterreich</th>
@@ -204,7 +219,12 @@ if($stsem!='')
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id) JOIN public.tbl_studiengang USING(studiengang_kz)
 	   			 	WHERE rolle_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND typ='m'
 					) AS gesamt_alle,
-					
+				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Incoming' AND studiensemester_kurzbz='$stsem'
+					) a) AS inc,
+				(SELECT count(*) FROM (SELECT distinct student_uid FROM public.tbl_student JOIN bis.tbl_bisio USING (student_uid)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND (bis>='$stsem_obj->start' OR bis is null) AND von<='$stsem_obj->ende'
+					) a) AS out,
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND orgform_kurzbz='BB'
 					) a) AS bb,
@@ -245,6 +265,8 @@ if($stsem!='')
 		$gesamt_at=0;
 		$gesamt_eu=0;
 		$gesamt_noteu=0;
+		$gesamt_inc=0;
+		$gesamt_out=0;
 		while($row = pg_fetch_object($result))
 		{
 			echo '<tr>';
@@ -252,6 +274,7 @@ if($stsem!='')
 			echo "<td>".strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
 			$prozent = ($row->gesamt_alle!=0?$row->gesamt_stg/$row->gesamt_alle*100:0);
 			echo "<td align='center'>$row->gesamt_stg / ".sprintf('%0.2f', $prozent)." %</td>";
+			echo "<td align='center'>$row->inc / $row->out</td>";
 			echo "<td align='center'>$row->bb / $row->vz</td>";
 			echo "<td align='center'>$row->m / $row->w</td>";
 			echo "<td align='center'>$row->herkunft_at</td>";
@@ -267,11 +290,14 @@ if($stsem!='')
 			$gesamt_at += $row->herkunft_at;
 			$gesamt_eu += $row->herkunft_eu;
 			$gesamt_noteu += $row->herkunft_noteu;
+			$gesamt_inc+=$row->inc;
+			$gesamt_out+=$row->out;
 		}
 		echo '<tr>';
 		echo '<td><b>SUMME</b></td>';
 		echo "<td>&nbsp;</td>";
 		echo "<td align='center'><b>$gesamt / ".sprintf('%0.2f', $gesamt_prozent)." %</b></td>";
+		echo "<td align='center'><b>$gesamt_inc / $gesamt_out</b></td>";
 		echo "<td align='center'><b>$gesamt_bb / $gesamt_vz</b></td>";
 		echo "<td align='center'><b>$gesamt_m / $gesamt_w</b></td>";
 		echo "<td align='center'><b>$gesamt_at</b></td>";
