@@ -43,6 +43,10 @@ if (isset($_GET['semester']) || isset($_POST['semester']))
 	$semester=(isset($_GET['semester'])?$_GET['semester']:$_POST['semester']);
 else
 	$semester=0;
+if (isset($_GET['isaktiv']) || isset($_POST['isaktiv']))
+	$isaktiv=(isset($_GET['isaktiv'])?$_GET['isaktiv']:$_POST['isaktiv']);
+else
+	$isaktiv='';
 
 if(!is_numeric($stg_kz) && $stg_kz!='')
 	$stg_kz='';
@@ -192,8 +196,24 @@ if($result = pg_query($conn, $qry))
 
 //Wenn nicht admin, dann nur die aktiven anzeigen
 $aktiv='';
+$isaktiv=trim($isaktiv);
 if(!$rechte->isBerechtigt('admin'))
 	$aktiv = ' AND tbl_lehrveranstaltung.aktiv=true';
+else 
+{
+	if($isaktiv=='aktiv')
+	{
+		$aktiv = ' AND tbl_lehrveranstaltung.aktiv=true';	
+	}
+	elseif($isaktiv=='naktiv')
+	{
+		$aktiv = ' AND tbl_lehrveranstaltung.aktiv=false';
+	}
+	else
+	{
+		$aktiv='';
+	}
+}
 
 if($fachbereich_kurzbz !='')
 	$sql_query="SELECT distinct tbl_lehrveranstaltung.* FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach WHERE
@@ -253,7 +273,22 @@ foreach ($fachb->result as $fb)
 	   $rechte->isBerechtigt('admin', null, 'suid', $fb->fachbereich_kurzbz))
 	$outp.= "<OPTION value='$fb->fachbereich_kurzbz' $selected>$fb->fachbereich_kurzbz</OPTION>";
 }
+
 $outp.= '</SELECT>';
+
+if($rechte->isBerechtigt('admin'))
+{
+	//Aktiv DropDown
+	$outp.= 'Aktiv <SELECT name="isaktiv" id="isaktiv">';
+	$outp.= "<OPTION value=''".($isaktiv==''?' selected':'').">-- Alle --</OPTION>";
+	$outp.= "<OPTION value='aktiv '".($isaktiv=='aktiv'?'selected':'').">-- Aktiv --</OPTION>";
+	$outp.= "<OPTION value='naktiv '".($isaktiv=='naktiv'?'selected':'').">-- Nicht aktiv --</OPTION>";
+	$outp.= '</SELECT>';
+}
+else 
+{
+	$isaktiv='aktiv';
+}
 $outp.= '<input type="submit" value="Anzeigen">';
 $outp .="</form>";
 
@@ -289,6 +324,7 @@ echo '<html>
 
 echo '<table width="100%"><tr><td>';
 echo $outp;
+
 echo '</td><td>';
 //Neu Button
 if($rechte->isBerechtigt('admin'))
@@ -405,7 +441,7 @@ if ($result_lv!=0)
 		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&projektarbeit=$row->projektarbeit'><img src='../../skin/images/".($row->projektarbeit=='t'?'true.gif':'false.gif')."'></a></td>";
 		//FBK
 		echo "<td style='white-space:nowrap;'>";
-		echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&fachbereich_kurzbz=$fachbereich_kurzbz' method='POST'><SELECT name='fbk'>";
+		echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&fachbereich_kurzbz=$fachbereich_kurzbz&isaktiv=$isaktiv' method='POST'><SELECT name='fbk'>";
 		echo "<option value=''>-- Keine Auswahl --</option>";
 		foreach ($fbk as $fb_uid=>$fb_k)
 		{
