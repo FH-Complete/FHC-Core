@@ -35,6 +35,56 @@ if (!$conn = pg_pconnect(CONN_STRING))
 echo '<H1>Systemcheck!</H1>';
 echo '<H2>DB-Updates!</H2>';
 
+// ************** campus.vw_lehreinheit.lv_semester **********************************************
+if (!@pg_query($conn,'SELECT lv_semester FROM campus.vw_lehreinheit LIMIT 1;'))
+{
+	$sql="	DROP VIEW campus.vw_lehreinheit;
+			CREATE OR REPLACE VIEW campus.vw_lehreinheit AS
+			SELECT
+			    tbl_lehrveranstaltung.studiengang_kz AS lv_studiengang_kz,
+			    tbl_lehrveranstaltung.semester AS lv_semester,
+			    tbl_lehrveranstaltung.kurzbz AS lv_kurzbz,
+			    tbl_lehrveranstaltung.bezeichnung AS lv_bezeichnung,
+			    tbl_lehrveranstaltung.ects AS lv_ects,
+			    tbl_lehrveranstaltung.lehreverzeichnis AS lv_lehreverzeichnis,
+			    tbl_lehrveranstaltung.planfaktor AS lv_planfaktor,
+			    tbl_lehrveranstaltung.planlektoren AS lv_planlektoren,
+			    tbl_lehrveranstaltung.planpersonalkosten AS lv_planpersonalkosten,
+			    tbl_lehrveranstaltung.plankostenprolektor AS lv_plankostenprolektor,
+			    tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrveranstaltung_id,
+			    tbl_lehreinheit.studiensemester_kurzbz, tbl_lehreinheit.lehrform_kurzbz,
+			    tbl_lehreinheit.stundenblockung, tbl_lehreinheit.wochenrythmus,
+			    tbl_lehreinheit.start_kw, tbl_lehreinheit.raumtyp, tbl_lehreinheit.raumtypalternativ,
+			    tbl_lehreinheit.lehre, tbl_lehreinheit.unr, tbl_lehreinheit.lvnr,
+			    tbl_lehreinheitmitarbeiter.lehrfunktion_kurzbz, tbl_lehreinheit.insertamum,
+			    tbl_lehreinheit.insertvon, tbl_lehreinheit.updateamum, tbl_lehreinheit.updatevon,
+			    tbl_lehreinheit.lehrfach_id, tbl_lehrfach.fachbereich_kurzbz,
+			    tbl_lehrfach.kurzbz AS lehrfach, tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe,
+			    tbl_lehrveranstaltung.aktiv, tbl_lehrfach.sprache, tbl_lehreinheitmitarbeiter.mitarbeiter_uid,
+			    tbl_lehreinheitmitarbeiter.semesterstunden, tbl_lehrveranstaltung.semesterstunden AS lv_semesterstunden,
+			    tbl_lehreinheitmitarbeiter.planstunden, tbl_lehreinheitmitarbeiter.stundensatz, tbl_lehreinheitmitarbeiter.faktor,
+			    tbl_lehreinheit.anmerkung, tbl_mitarbeiter.kurzbz AS lektor, tbl_lehreinheitgruppe.studiengang_kz,
+			    tbl_lehreinheitgruppe.semester, tbl_lehreinheitgruppe.verband, tbl_lehreinheitgruppe.gruppe,
+			    tbl_lehreinheitgruppe.gruppe_kurzbz, tbl_studiengang.kurzbz AS stg_kurzbz,
+			    tbl_studiengang.kurzbzlang AS stg_kurzbzlang, tbl_studiengang.bezeichnung AS stg_bez,
+			    tbl_studiengang.typ AS stg_typ, tbl_lehreinheitmitarbeiter.anmerkung AS anmerkunglektor,
+			    tbl_lehrveranstaltung.lehrform_kurzbz AS lv_lehrform_kurzbz
+			FROM lehre.tbl_lehreinheit
+			   JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
+			   JOIN lehre.tbl_lehrfach USING (lehrfach_id)
+			   JOIN lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id)
+			   JOIN tbl_mitarbeiter USING (mitarbeiter_uid)
+			   JOIN lehre.tbl_lehreinheitgruppe USING (lehreinheit_id)
+			   JOIN tbl_studiengang ON tbl_lehreinheitgruppe.studiengang_kz = tbl_studiengang.studiengang_kz; 
+			GRANT SELECT ON campus.vw_lehreinheit TO 'admin';
+			GRANT SELECT ON campus.vw_lehreinheit TO 'web';
+		";
+	if (!@pg_query($conn,$sql))
+		echo '<strong>campus.vw_lehreinheit: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo '	lv_semester wurde bei campus.vw_lehreinheit hinzugefuegt!<BR>';
+}
+
 // ************** public.tbl_prestudent.dual **********************************************
 if (!@pg_query($conn,'SELECT dual FROM public.tbl_prestudent LIMIT 1;'))
 {
