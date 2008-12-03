@@ -73,7 +73,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						<fo:table-row  line-height="10pt">
 							<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" font-weight="bold"> Nummer</fo:block></fo:table-cell>
 							<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" font-weight="bold"> Lehrveranstaltung</fo:block></fo:table-cell>
-							<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" font-weight="bold"> Fachbereich</fo:block></fo:table-cell>
+							<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" font-weight="bold"> Institut</fo:block></fo:table-cell>
 							<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" font-weight="bold"> Gruppe</fo:block></fo:table-cell>
 							<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" font-weight="bold"> Stunden</fo:block></fo:table-cell>
 							<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" font-weight="bold"> Satz</fo:block></fo:table-cell>

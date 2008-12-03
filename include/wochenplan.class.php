@@ -1597,7 +1597,9 @@ class wochenplan
 					$end_date=$start_date;
 					if ($target=='outlook')
 					{
-						echo $this->crlf.'"'.$this->std_plan[$i][$j][0]->lehrfach.'","'.$start_date.'","'.$start_time.'","'.$end_date.'","'.$end_time.'","Aus","Aus",,,,,,,,"Stundenplan';
+						//"Betreff","Beginnt am","Beginnt um","Endet am","Endet um","Ganztaegiges Ereignis","Erinnerung Ein/Aus","Erinnerung am","Erinnerung um","Besprechungsplanung","Erforderliche Teilnehmer","Optionale Teilnehmer","Besprechungsressourcen","Abrechnungsinformationen","Beschreibung",
+						//"Kategorien","Ort","Prioritaet","Privat","Reisekilometer","Vertraulichkeit","Zeitspanne zeigen als"
+						echo $this->crlf.'"'.$this->std_plan[$i][$j][0]->lehrfach.($this->std_plan[$i][$j][0]->lehrform!=''?'-'.$this->std_plan[$i][$j][0]->lehrform:'').($lvb!=''?' - '.$lvb:'').'","'.$start_date.'","'.$start_time.'","'.$end_date.'","'.$end_time.'","Aus","Aus",,,,,,,,"Stundenplan';
 						echo $this->crlf.$this->std_plan[$i][$j][0]->lehrfach.$this->crlf.$this->std_plan[$i][$j][0]->lektor.$this->crlf.$lvb.$this->crlf.$this->std_plan[$i][$j][0]->ort.'","StundenplanFH","'.$this->std_plan[$i][$j][0]->ort.'","Normal","Aus",,"Normal","2"';
 					}
 					else if ($target=='ical')
@@ -1611,7 +1613,7 @@ class wochenplan
 						$end_date_time_ical = $eda[2].$eda[1].$eda[0].'T'.$eta[0].$eta[1].$eta[2]; //.'Z';  //neu gruppieren der Startzeit und des Startdatums
 
 						echo $this->crlf.'BEGIN:VEVENT'.$this->crlf
-							.'UID:'.'TW'.$lvb.$this->std_plan[$i][$j][0]->ort.$this->std_plan[$i][$j][0]->lektor.$lehrfach[0].$start_date_time_ical.$this->crlf
+							.'UID:'.'FH'.$lvb.$this->std_plan[$i][$j][0]->ort.$this->std_plan[$i][$j][0]->lektor.$lehrfach[0].$start_date_time_ical.$this->crlf
 							.'SUMMARY:'.$lehrfach[0].'  '.$this->std_plan[$i][$j][0]->ort.' - '.$lvb.$this->crlf
 							.'DESCRIPTION:'.$lehrfach[0].'\n'.$this->std_plan[$i][$j][0]->lektor.'\n'.$lvb.'\n'.$this->std_plan[$i][$j][0]->ort.$this->crlf
 							.'LOCATION:'.$this->std_plan[$i][$j][0]->ort.$this->crlf

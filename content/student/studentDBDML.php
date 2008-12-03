@@ -466,6 +466,23 @@ if(!$error)
 						$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss das Feld 'Zum Reihungstest angetreten' gesetzt sein.";
 						$anzahl_fehler++;
 					}
+					
+					if($_POST['rolle_kurzbz']=='Bewerber' && $prestd->zgv_code=='')
+					{
+						$error = true;
+						$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung eingetragen sein.";
+						$anzahl_fehler++;
+					}
+										
+					$stg_obj = new studiengang($conn);
+					$stg_obj->load($prestd->studiengang_kz);
+					if($_POST['rolle_kurzbz']=='Bewerber' && $prestd->zgvmas_code=='' && $stg_obj->typ=='m')
+					{
+						$error = true;
+						$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung Master eingetragen sein.";
+						$anzahl_fehler++;
+					}
+					
 					if(!$error)
 					{
 						if($prestd->getLastStatus($prestudent_id))

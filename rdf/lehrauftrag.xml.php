@@ -291,7 +291,7 @@ function drawLehrauftrag($uid)
 			}
 	
 			$lehreinheit_id=$row->lehreinheit_id;
-			$lehrveranstaltung = CutString($row->lv_bezeichnung,30).' '.$row->lehrform_kurzbz.' '.$row->semester.'. Semester';
+			$lehrveranstaltung = CutString($row->lv_bezeichnung,30).' '.$row->lehrform_kurzbz.' '.$row->lv_semester.'. Semester';
 			$fachbereich = $row->fachbereich_kurzbz;
 	
 			if($row->gruppe_kurzbz!='')

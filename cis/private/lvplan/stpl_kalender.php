@@ -130,7 +130,7 @@ else if ($format=='ical')
 	header("Content-type: text/calendar");
 	header("Pragma: public");
 	header("Expires: 0");
-	echo 'BEGIN:VCALENDAR'.$crlf.'VERSION:'.$version.'.0';
+	echo 'BEGIN:VCALENDAR'.$crlf.'VERSION:'.$version.'.0'.$crlf.'PRODID:'.CAMPUS_NAME;
 }
 // Print in HTML-File
 else
