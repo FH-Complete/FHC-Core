@@ -548,21 +548,7 @@
 			  	<td class="tdwidth10" nowrap>&nbsp;</td>
 				<td class="tdwrap"><a class="Item" href="public/rektortw.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Rektor Technikum Wien</a></td>
 			</tr>
-  			<tr>
-			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a href="public/kollegium.html" class="MenuItem" onClick="js_toggle_container('Kollegium');" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Fachhochschulkollegium</a></td>
-			</tr>
-			<tr>
-				<td class="tdwidth10" nowrap></td>
-				<td class="tdwrap">
-		  		<table class="tabcontent" id="Kollegium" style="display: none;">
-				<tr>
-					<td class="tdwidth10" nowrap>&nbsp;</td>
-					<td class="tdwrap"><a class="Item" href="private/info/kollegiumswahl.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Kollegiumswahl 2008</a></td>
-				</tr>
-				</table>
-				</td>
-			</tr>
+  		
 			<tr>
 			    <td class="tdwidth10" nowrap>&nbsp;</td>
 				<td class="tdwrap"><a href="?Jahresplan" class="MenuItem" onClick="return(js_toggle_container('Jahresplan'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Jahresplan</a>
@@ -592,6 +578,19 @@
 			</table>
 		</td>
   		</tr>
+  			<tr>
+				<td class="tdwrap"><a href="public/kollegium.html" class="MenuItem" onClick="js_toggle_container('Kollegium');" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Fachhochschulkollegium</a></td>
+			</tr>
+			<tr>
+				<td class="tdwrap">
+		  		<table class="tabcontent" id="Kollegium" style="display: none;">
+				<tr>
+					<td class="tdwidth10" nowrap>&nbsp;</td>
+					<td class="tdwrap"><a class="Item" href="private/info/kollegiumswahl.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Kollegiumswahl 2008</a></td>
+				</tr>
+				</table>
+				</td>
+			</tr>
 		<!-- Hauptmenue Studentenvertretung -->
 	<!--	<tr>
           <td class="tdwrap"><a href="?Studentenvertretung" class="MenuItem" onClick="return(js_toggle_container('Studentenvertretung'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Studentenvertretung</a></td>
