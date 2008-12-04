@@ -301,7 +301,7 @@ function js_toggle_container(conid)
 					echo '	<tr>
 					    <td class="tdwrap">
 					    	<a href="?Location" class="MenuItem" onClick="return(js_toggle_container(\'MeineLVs\'));">
-					    		<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Meine LV
+					    		<img src="../../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Meine LV
 					    	</a>
 					    </td>
 					</tr>
