@@ -9,16 +9,31 @@ require_once('../include/studiengang.class.php');
 
 $rdf_url='http://www.technikum-wien.at/lehrverbandsgruppe/';
 
-$uid=get_uid();
-
 if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
-// Berechtigungen ermitteln
+$berechtigt_studiengang=array();
+$uid='';
 $berechtigung=new benutzerberechtigung($conn);
-$berechtigung->getBerechtigungen($uid);
-//$berechtigt_studiengang=$berechtigung->getStgKz();
-$berechtigt_studiengang=$berechtigung->getStgKz('admin');
+
+// Berechtigungen ermitteln
+if(!isset($_SERVER['REMOTE_USER']))
+{
+	if(!isset($_GET['studiengang_kz']))
+	{
+		die('Wenn keine Authentifizierung stattfindet, muss eine studiengang_kz uebergeben werden');
+	}
+	else 
+	{
+		$berechtigt_studiengang=array($_GET['studiengang_kz']);
+	}
+}
+else 
+{
+	$uid=get_uid();
+	$berechtigung->getBerechtigungen($uid);
+	$berechtigt_studiengang=$berechtigung->getStgKz('admin');
+}
 $orgform_sequence=array();
 
 if(isset($_GET['prestudent']) && $_GET['prestudent']=='false')
