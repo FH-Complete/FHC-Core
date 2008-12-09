@@ -21,9 +21,17 @@
 					<fo:block-container position="absolute" top="30mm" left="30mm" height="20mm">
 						<fo:block text-align="left" line-height="18pt" font-family="sans-serif" font-size="16pt">
 							<fo:inline font-weight="900">
-							<xsl:text>Zeugnis </xsl:text>
-							<xsl:text>\n </xsl:text><xsl:value-of select="semester_bezeichnung" />
-								<xsl:text> (</xsl:text><xsl:value-of select="studiensemester" /><xsl:text>)</xsl:text>
+							<xsl:text>Zeugnis \n </xsl:text>
+							<xsl:choose>
+								<xsl:when test="string-length(semester_bezeichnung)=0">
+									<xsl:value-of select="stsem" />	
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="semester_bezeichnung" />
+									<xsl:text> (</xsl:text><xsl:value-of select="stsem" /><xsl:text>)</xsl:text>
+								</xsl:otherwise>
+							</xsl:choose>
+														
 							</fo:inline>
 						</fo:block>
 					</fo:block-container> 

@@ -375,6 +375,7 @@ $ueberschreiben = (isset($_REQUEST['ueberschreiben'])?$_REQUEST['ueberschreiben'
 $studiensemester_kurzbz = (isset($_REQUEST['studiensemester_kurzbz'])?$_REQUEST['studiensemester_kurzbz']:'');
 $ausbildungssemester = (isset($_REQUEST['ausbildungssemester'])?$_REQUEST['ausbildungssemester']:'0');
 $incoming = (isset($_REQUEST['incoming'])?true:false);
+$orgform_kurzbz = (isset($_REQUEST['orgform_kurzbz'])?$_REQUEST['orgform_kurzbz']:'');
 //end Parameter
 $geburtsdatum_error=false;
 
@@ -740,6 +741,7 @@ if(isset($_POST['save']))
 			$rolle->rolle_kurzbz = 'Incoming';
 		$rolle->studiensemester_kurzbz = $studiensemester_kurzbz;
 		$rolle->ausbildungssemester = $ausbildungssemester;
+		$rolle->orgform_kurzbz = $orgform_kurzbz;
 		$rolle->datum = date('Y-m-d');
 		$rolle->insertamum = date('Y-m-d H:i:s');
 		$rolle->insertvon = $user;
@@ -990,6 +992,12 @@ for ($i=1;$i<9;$i++)
 	echo '<OPTION value="'.$i.'" '.($i==$ausbildungssemester?'selected':'').'>'.$i.'. Semester</OPTION>';
 echo '</SELECT>';
 echo '</td></tr>';
+echo '<tr><td>OrgForm</td><td><SELECT name="orgform_kurzbz">';
+echo '<OPTION value="VZ" '.($orgform_kurzbz=='VZ'?'selected':'').'>Vollzeit</OPTION>';
+echo '<OPTION value="BB" '.($orgform_kurzbz=='BB'?'selected':'').'>Berufsbegleitend</OPTION>';
+echo '<OPTION value="FST" '.($orgform_kurzbz=='FST'?'selected':'').'>Fernstudium</OPTION>';
+echo '</SELECT>';
+echo '</td></tr>';
 echo '<tr><td>Incoming:</td><td><input type="checkbox" id="incoming" name="incoming" '.($incoming?'checked':'').' onclick="cmdIncoming()" /></td></tr>';
 echo '<tr><tr><td></td><td>';
 
@@ -1037,7 +1045,7 @@ if($where!='')
 	
 	if($result = pg_query($conn, $qry))
 	{
-		echo '<table><tr><th></th><th>Nachname</th><th>Vorname</th><th>GebDatum</th><th>SVNR</th><th>Geschlecht</th><th>Adresse</th><th>Status</th></tr>';
+		echo '<table><tr><th></th><th>Nachname</th><th>Vorname</th><th>GebDatum</th><th>SVNR</th><th>Geschlecht</th><th>Adresse</th><th>Status</th><th>Details</th></tr>';
 		while($row = pg_fetch_object($result))
 		{
 			$status = '';
@@ -1062,6 +1070,7 @@ if($where!='')
 					echo "$row_adr->plz $row_adr->ort, $row_adr->strasse<br>";
 			echo '</td>';
 			echo '<td>'.$status.'</td>';
+			echo '<td><a href="../personendetails.php?id='.$row->person_id.'" target="_blank">Details</a></td>';
 			echo '</tr>';
 		}
 		echo '<tr><td><input type="radio" name="person_id" value="0" onclick="disablefields(this)"></td><td>Neue Person anlegen</td></tr>';

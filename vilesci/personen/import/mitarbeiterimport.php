@@ -567,7 +567,7 @@ if($where!='')
 	
 	if($result = pg_query($conn, $qry))
 	{
-		echo '<table><tr><th></th><th>Nachname</th><th>Vorname</th><th>GebDatum</th><th>SVNR</th><th>Geschlecht</th><th>Adresse</th><th>Status</th></tr>';
+		echo '<table><tr><th></th><th>Nachname</th><th>Vorname</th><th>GebDatum</th><th>SVNR</th><th>Geschlecht</th><th>Adresse</th><th>Status</th><th>Details</th></tr>';
 		while($row = pg_fetch_object($result))
 		{
 			$status = '';
@@ -591,6 +591,7 @@ if($where!='')
 					echo "$row_adr->plz $row_adr->ort, $row_adr->strasse<br>";
 			echo '</td>';
 			echo "<td>$status</td>";
+			echo '<td><a href="../personendetails.php?id='.$row->person_id.'" target="_blank">Details</a></td>';
 			echo '</tr>';
 		}
 		echo '<tr><td><input type="radio" name="person_id" value="0" checked onclick="disablefields(this)"></td><td>Neue Person anlegen</td></tr>';

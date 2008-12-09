@@ -19,11 +19,27 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+/*
+ * Erstellt eine Statistik ueber die verschiedenen Stati der Bewerber
+ * mit Aufteilung nach Studiengaengen und Geschlecht.
+ * Mischformen werden nochmals getrennt aufgelistet (VZ/BB)
+ * Ausserdem erfolgt noch eine Auflistung in wie vielen verschiedenen Studiengaengen 
+ * sich die Personen Beworben haben.
+ *
+ * GET-Parameter:
+ * stsem ... Studiensemester fuer die Statistik
+ * mail  ... Wenn der Parameter "mail" uebergeben wird, dann wird die Statistik 
+ *           per Mail an "tw_sek" und "tw_stgl" versandt
+ *
+ */
 
 require_once('../../vilesci/config.inc.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/functions.inc.php');
+require_once('../../include/mail.class.php');
+require_once('../../include/aufmerksamdurch.class.php');
+require_once('../../include/studiengang.class.php');
 
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim Connecten zur DB');
@@ -32,55 +48,103 @@ if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
 else
 	$stsem = '';
-	
-$rechte = new benutzerberechtigung($conn);
-$rechte->getBerechtigungen(get_uid());
+if(isset($_GET['mail']))
+{
+	$mail=true;
+	$stsem_obj = new studiensemester($conn);
+	$stsem_obj->getNextStudiensemester();
+	$stsem = $stsem_obj->studiensemester_kurzbz;
+}
+else 
+	$mail=false;
 
-echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+//wenn die Statistik per Mail versandt wird (Chronjob), 
+//keine Ruecksicht auf Berechtigungen nehmen
+//das Mail enthaelt alle Studiengaenge
+if(!$mail)
+{
+	$rechte = new benutzerberechtigung($conn);
+	$rechte->getBerechtigungen(get_uid());
+}
+$content='';
+
+$content.= '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 	<html>
 	<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
-	<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">';
+if($mail)
+{
+	//Wenn die Statistik per Mail versandt wird, wird das CSS File direkt mitgeliefert
+	$content.='<style>';
+	$content.= file_get_contents('../../skin/vilesci.css');
+	$content.='</style>';
+}
+else 
+{
+	$content.='	<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">';
+}
+$content.='
 	<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 	<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 	</head>
-	<body>
+	<body>';
+if($mail)
+{
+	//im Kopf des Mails Links zu den anderen Statistiken anzeigen
+	$content.='Dies ist ein automatisches Mail!<br><br>';
+	$content.='<b>Links zu den Statistiken:</b><br>
+	- <a href="'.APP_ROOT.'content/statistik/lektorenstatistik.php" target="_blank">Lektorenstatisitk</a><br>
+	- <a href="'.APP_ROOT.'content/statistik/mitarbeiterstatistik.php" target="_blank">Mitarbeiterstatistik</a><br>
+	- <a href="'.APP_ROOT.'content/statistik/bewerberstatistik.php" target="_blank">Bewerberstatistik</a><br>
+	- <a href="'.APP_ROOT.'content/statistik/studentenstatistik.php" target="_blank">Studentenstatistik</a><br>
+	- <a href="'.APP_ROOT.'content/statistik/absolventenstatistik.php" target="_blank">Absolventenstatistik</a><br><br>
+	';
+}
+$content.='
 	<h2>Bewerberstatistik '.$stsem.'<span style="position:absolute; right:15px;">'.date('d.m.Y').'</span></h2><br>
 	';
 
 
-	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">Studiensemester: <SELECT name="stsem">';
-	$studsem = new studiensemester($conn);
-	$studsem->getAll();
-
-	foreach ($studsem->studiensemester as $stsemester)
+	if(!$mail)
 	{
-		if($stsemester->studiensemester_kurzbz==$stsem)
-			$selected='selected';
-		else 
-			$selected='';
-		
-		echo '<option value="'.$stsemester->studiensemester_kurzbz.'" '.$selected.'>'.$stsemester->studiensemester_kurzbz.'</option>';
+		$content.= '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">Studiensemester: <SELECT name="stsem">';
+		$studsem = new studiensemester($conn);
+		$studsem->getAll();
+	
+		foreach ($studsem->studiensemester as $stsemester)
+		{
+			if($stsemester->studiensemester_kurzbz==$stsem)
+				$selected='selected';
+			else 
+				$selected='';
+			
+			$content.= '<option value="'.$stsemester->studiensemester_kurzbz.'" '.$selected.'>'.$stsemester->studiensemester_kurzbz.'</option>';
+		}
+		$content.= '</SELECT>
+			<input type="submit" value="Anzeigen" /></form><br><br>';
 	}
-	echo '</SELECT>
-		<input type="submit" value="Anzeigen" /></form><br><br>';
 
 if($stsem!='')
 {
-	$stgs = $rechte->getStgKz();
-	
-	if($stgs[0]=='')
-		$stgwhere='';
-	else 
+	if(!$mail)
 	{
-		$stgwhere=' AND studiengang_kz in(';
-		foreach ($stgs as $stg)
-			$stgwhere.="'$stg',";
-		$stgwhere = substr($stgwhere,0, strlen($stgwhere)-1);
-		$stgwhere.=' )';
-	}
+		$stgs = $rechte->getStgKz();
 	
-	// SELECT count(*) FROM public.tbl_prestudent WHERE studiengang_kz=stg.studiengang_kz) AS prestd,
+		if($stgs[0]=='')
+			$stgwhere='';
+		else 
+		{
+			$stgwhere=' AND studiengang_kz in(';
+			foreach ($stgs as $stg)
+				$stgwhere.="'$stg',";
+			$stgwhere = substr($stgwhere,0, strlen($stgwhere)-1);
+			$stgwhere.=' )';
+		}
+	}
+	else 
+		$stgwhere='';
+	
+	//Bewerberdaten holen
 	$qry = "SELECT studiengang_kz, kurzbz, typ, kurzbzlang, bezeichnung, orgform_kurzbz,
 
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
@@ -147,25 +211,11 @@ if($stsem!='')
 				public.tbl_studiengang stg
 			WHERE
 				studiengang_kz>0 AND studiengang_kz<10000 AND aktiv $stgwhere
-			ORDER BY kurzbzlang; ";
-/*
-(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
-	   			 	AND reihungstest_id IS NOT NULL) AS interessentenrttermin,
-				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id) JOIN public.tbl_person USING(person_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem' AND geshclecht='m'
-	   			 	AND reihungstest_id IS NOT NULL) AS interessentenrttermin_m,
-				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id) JOIN public.tbl_person USING(person_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem' AND geshclecht='w'
-	   			 	AND reihungstest_id IS NOT NULL) AS interessentenrttermin_w,
-	   			 	   			 
-				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
-	   			 	AND reihungstestangetreten) AS interessentenrtabsolviert,
-*/
+			ORDER BY typ, kurzbz; ";
+
 	if($result = pg_query($conn, $qry))
 	{
-		echo "<table class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>
+		$content.= "\n<table class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>
 				<thead>
 					<tr>
 						<th class='table-sortable:default'>Studiengang</th>
@@ -179,24 +229,21 @@ if($stsem!='')
 				</thead>
 				<tbody>
 			 ";
-		//<th class='table-sortable:numeric'>Interessenten mit RT Termin</th>
-		//<th class='table-sortable:numeric'>Interessenten mit absolviertem RT</th>
 		
 		while($row = pg_fetch_object($result))
 		{
-			echo '<tr>';
-			echo "<td>".strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
-			echo "<td align='center'>$row->interessenten ($row->interessenten_m / $row->interessenten_w)</td>";
-			echo "<td align='center'>$row->interessentenzgv ($row->interessentenzgv_m / $row->interessentenzgv_w)</td>";
-			echo "<td align='center'>$row->interessentenrtanmeldung ($row->interessentenrtanmeldung_m / $row->interessentenrtanmeldung_w)</td>";
-			//echo "<td align='center'>$row->interessentenrttermin</td>";
-			//echo "<td align='center'>$row->interessentenrtabsolviert</td>";
-			echo "<td align='center'>$row->bewerber ($row->bewerber_m / $row->bewerber_w)</td>";
-			echo "<td align='center'>$row->aufgenommener ($row->aufgenommener_m / $row->aufgenommener_w)</td>";
-			echo "<td align='center'>$row->student1sem ($row->student1sem_m / $row->student1sem_w)</td>";
-			echo "</tr>";
+			$content.= "\n";
+			$content.= '<tr>';
+			$content.= "<td>".strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
+			$content.= "<td align='center'>$row->interessenten ($row->interessenten_m / $row->interessenten_w)</td>";
+			$content.= "<td align='center'>$row->interessentenzgv ($row->interessentenzgv_m / $row->interessentenzgv_w)</td>";
+			$content.= "<td align='center'>$row->interessentenrtanmeldung ($row->interessentenrtanmeldung_m / $row->interessentenrtanmeldung_w)</td>";
+			$content.= "<td align='center'>$row->bewerber ($row->bewerber_m / $row->bewerber_w)</td>";
+			$content.= "<td align='center'>$row->aufgenommener ($row->aufgenommener_m / $row->aufgenommener_w)</td>";
+			$content.= "<td align='center'>$row->student1sem ($row->student1sem_m / $row->student1sem_w)</td>";
+			$content.= "</tr>";
 		}
-		echo '</tbody></table>';
+		$content.= '</tbody></table>';
 	}
 	
 	//Aufsplittungen für Mischformen holen
@@ -263,8 +310,8 @@ if($stsem!='')
 	{
 		if(pg_num_rows($result)>0)
 		{
-			echo "<br><br><h2>Aufsplittung Mischformen</h2><br>";
-			echo "<table class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>
+			$content.= "<br><br><h2>Aufsplittung Mischformen</h2><br>";
+			$content.= "\n<table class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>
 					<thead>
 						<tr>
 							<th class='table-sortable:default'>Studiengang</th>
@@ -278,28 +325,26 @@ if($stsem!='')
 					</thead>
 					<tbody>
 				 ";
-			//<th class='table-sortable:numeric'>Interessenten mit RT Termin VZ / BB</th>
-			//<th class='table-sortable:numeric'>Interessenten mit absolviertem RT VZ / BB</th>
+			
 			while($row = pg_fetch_object($result))
 			{
-				echo '<tr>';
-				echo "<td>".strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
-				echo "<td align='center'>$row->interessenten_vz / $row->interessenten_bb</td>";
-				echo "<td align='center'>$row->interessentenzgv_vz / $row->interessentenzgv_bb</td>";
-				echo "<td align='center'>$row->interessentenrtanmeldung_vz / $row->interessentenrtanmeldung_bb</td>";
-				//echo "<td align='center'>$row->interessentenrttermin_vz / $row->interessentenrttermin_bb</td>";
-				//echo "<td align='center'>$row->interessentenrtabsolviert_vz / $row->interessentenrtabsolviert_bb</td>";
-				echo "<td align='center'>$row->bewerber_vz / $row->bewerber_bb</td>";
-				echo "<td align='center'>$row->aufgenommener_vz / $row->aufgenommener_bb</td>";
-				echo "<td align='center'>$row->student1sem_vz / $row->student1sem_bb</td>";
-				echo "</tr>";
+				$content.= "\n";
+				$content.= '<tr>';
+				$content.= "<td>".strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
+				$content.= "<td align='center'>$row->interessenten_vz / $row->interessenten_bb</td>";
+				$content.= "<td align='center'>$row->interessentenzgv_vz / $row->interessentenzgv_bb</td>";
+				$content.= "<td align='center'>$row->interessentenrtanmeldung_vz / $row->interessentenrtanmeldung_bb</td>";
+				$content.= "<td align='center'>$row->bewerber_vz / $row->bewerber_bb</td>";
+				$content.= "<td align='center'>$row->aufgenommener_vz / $row->aufgenommener_bb</td>";
+				$content.= "<td align='center'>$row->student1sem_vz / $row->student1sem_bb</td>";
+				$content.= "</tr>";
 			}
-			echo '</tbody></table>';
+			$content.= '</tbody></table>';
 		}
 	}
 	
 	//Verteilung
-	echo '<br><h2>Verteilung</h2><br>';
+	$content.= '<br><h2>Verteilung</h2><br>';
 	$qry = "SELECT 
 				count(anzahl) AS anzahlpers,anzahl AS anzahlstg 
 			FROM
@@ -318,7 +363,7 @@ if($stsem!='')
 			) AS prestd
 			GROUP BY anzahl; ";
 
-	echo "<table class='liste table-stripeclass:alternate table-autostripe' style='width:auto'>
+	$content.= "\n<table class='liste table-stripeclass:alternate table-autostripe' style='width:auto'>
 				<thead>
 					<tr>
 						<th>Personen</th>
@@ -333,12 +378,166 @@ if($stsem!='')
 		while($row = pg_fetch_object($result))
 		{
 			$summestudenten += $row->anzahlpers;
-			echo "<tr><td>$row->anzahlpers</td><td>$row->anzahlstg</td></tr>";
+			$content.= "\n<tr><td>$row->anzahlpers</td><td>$row->anzahlstg</td></tr>";
 		}
-		echo "<tr><td style='border-top: 1px solid black;'><b>$summestudenten</b></td><td></td></tr>";
+		$content.= "<tr><td style='border-top: 1px solid black;'><b>$summestudenten</b></td><td></td></tr>";
 	}
-	echo '</tbody></table>';
+	$content.= '</tbody></table>';
+	
+	//Aufmerksamdurch (Prestudent)
+	$content.= '<br><h2>Aufmerksam durch (Prestudent)</h2><br>';
+	$qry = "SELECT foo.studiengang_kz, aufmerksamdurch_kurzbz, anzahl FROM
+			(
+			SELECT
+				studiengang_kz,
+				aufmerksamdurch_kurzbz,
+				count(*) as anzahl
+			FROM
+				public.tbl_prestudent
+				JOIN public.tbl_prestudentrolle USING(prestudent_id)
+			WHERE
+				studiensemester_kurzbz='$stsem'
+				$stgwhere
+			GROUP BY
+				studiengang_kz, aufmerksamdurch_kurzbz
+			) as foo
+			JOIN public.tbl_studiengang USING(studiengang_kz)
+			ORDER BY typ, kurzbz";
+	if($result = pg_query($conn, $qry))
+	{
+		while($row = pg_fetch_object($result))
+		{
+			$hlp[$row->studiengang_kz][$row->aufmerksamdurch_kurzbz]=$row->anzahl;
+		}
+	}
+	$amd = new aufmerksamdurch($conn);
+	$amd->getAll();
+	
+	$content.= "\n<table class='liste table-stripeclass:alternate table-autostripe' style='width:auto'>
+				<thead>
+					<tr>
+						<th>Studiengang</th>";
+
+	foreach ($amd->result as $row) 
+	{
+		$content.="<th>$row->aufmerksamdurch_kurzbz</th>";
+	}
+	
+	$content.="</tr>
+				</thead>
+				<tbody>";
+	
+	$stg_obj = new studiengang($conn);
+	$stg_obj->getAll(true);
+	
+	foreach ($hlp as $studiengang_kz=>$row)
+	{
+		$content.='<tr>';
+		$content.='<td>'.$stg_obj->kuerzel_arr[$studiengang_kz].'</td>';
+		reset($amd->result);
+		foreach ($amd->result as $obj)
+		{
+			$content.='<td>';
+			if(isset($row[$obj->aufmerksamdurch_kurzbz]))
+				$content.=$row[$obj->aufmerksamdurch_kurzbz];
+			else 
+				$content.='0';
+			$content.='</td>';
+		}
+		$content.='</tr>';
+	}
+	$content.='</tbody></table>';	
+	
+	//Berufstaetigkeit
+	$content.= '<br><h2>Berufst&auml;tigkeit</h2><br>';
+	$qry = "SELECT foo.studiengang_kz, berufstaetigkeit_code, anzahl FROM
+			(
+			SELECT
+				studiengang_kz,
+				berufstaetigkeit_code,
+				count(*) as anzahl
+			FROM
+				public.tbl_prestudent
+				JOIN public.tbl_prestudentrolle USING(prestudent_id)
+			WHERE
+				studiensemester_kurzbz='$stsem'
+				$stgwhere
+			GROUP BY
+				studiengang_kz, berufstaetigkeit_code
+			) as foo
+			JOIN public.tbl_studiengang USING(studiengang_kz)
+			ORDER BY typ, kurzbz";
+	
+	if($result = pg_query($conn, $qry))
+	{
+		while($row = pg_fetch_object($result))
+		{
+			$hlp[$row->studiengang_kz][$row->berufstaetigkeit_code]=$row->anzahl;
+		}
+	}
+	
+	$content.= "\n<table class='liste table-stripeclass:alternate table-autostripe' style='width:auto'>
+				<thead>
+					<tr>
+						<th>Studiengang</th>";
+
+	$qry = "SELECT berufstaetigkeit_code, berufstaetigkeit_bez FROM bis.tbl_berufstaetigkeit ORDER BY berufstaetigkeit_bez";
+	$berufstaetigkeit=array();
+	
+	if($result = pg_query($conn, $qry))
+	{
+		while($row = pg_fetch_object($result))
+		{
+			$content.="<th>$row->berufstaetigkeit_bez</th>";
+			$berufstaetigkeit[]=$row->berufstaetigkeit_code;
+		}
+	}
+	
+	$content.="</tr>
+				</thead>
+				<tbody>";
+	
+	foreach ($hlp as $studiengang_kz=>$row)
+	{
+		$content.='<tr>';
+		$content.='<td>'.$stg_obj->kuerzel_arr[$studiengang_kz].'</td>';
+		reset($berufstaetigkeit);
+		foreach ($berufstaetigkeit as $bcode)
+		{
+			$content.='<td>';
+			if(isset($row[$bcode]))
+				$content.=$row[$bcode];
+			else 
+				$content.='0';
+			$content.='</td>';
+		}
+		$content.='</tr>';
+	}
+	$content.='</tbody></table>';	
+	
+}
+$content.= '</body>
+</html>';
+
+if(!$mail)
+{
+	echo $content;
+}
+else 
+{
+	//Mail versenden
+	echo 'Bewerberstatistik.php - Sende Mail ...';
+	$to = 'tw_sek@technikum-wien.at, tw_stgl@technikum-wien.at';
+	$mailobj = new mail($to, 'vilesci@technikum-wien.at','Bewerberstatistik','Sie muessen diese Mail als HTML-Mail anzeigen um die Statistik zu sehen');
+	$mailobj->setHTMLContent($content);
+	
+	if($mailobj->send())
+	{
+		echo 'Mail wurde erfolgreich versandt';
+	}
+	else 
+	{
+		echo 'Fehler beim Versenden des Mails';
+	}
 }
 ?>
-</body>
-</html>

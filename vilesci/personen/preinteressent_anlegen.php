@@ -244,13 +244,17 @@ function loadGemeindeData()
 	    anfrage.open("GET", url, true);
 	    anfrage.onreadystatechange = setGemeindeData;
 	    anfrage.send(null);
-	    document.getElementById('adresse-gemeinde-textfeld').type='hidden';
-		document.getElementById('adresse-ort-textfeld').type='hidden';
+	    document.getElementById('adresse-gemeinde-textfeld').style.display='none';
+		document.getElementById('adresse-ort-textfeld').style.display='none';
 	}
 	else
 	{
+		/*
 		document.getElementById('adresse-gemeinde-textfeld').type='text';
 		document.getElementById('adresse-ort-textfeld').type='text';
+		*/
+		document.getElementById('adresse-gemeinde-textfeld').style.display='block';
+		document.getElementById('adresse-ort-textfeld').style.display='block';
 		document.getElementById('gemeindediv').innerHTML='';
 		document.getElementById('ortdiv').innerHTML='';
 	}
@@ -700,7 +704,7 @@ else
 if($importort!='' && $gemeinde!=$importort)
 	echo ' ( '.$importort.' )';
 
-echo '</div><input type="'.($adresse_nation=='A'?'hidden':'text').'" id="adresse-gemeinde-textfeld" maxlength="256" name="gemeinde_txt" value="'.$gemeinde.'" />';
+echo '</div><input type="text" style="display:'.($adresse_nation=='A'?'none':'block').';" id="adresse-gemeinde-textfeld" maxlength="256" name="gemeinde_txt" value="'.$gemeinde.'" />';
 
 echo '</td></tr>';
 echo '<tr><td>Ort</td><td><div id="ortdiv">';
@@ -708,7 +712,7 @@ if($adresse_nation=='A' && $plz!='')
 {
 	echo getOrtDropDown($plz, $gemeinde);
 }
-echo '</div><input type="'.($adresse_nation=='A'?'hidden':'text').'" id="adresse-ort-textfeld" maxlength="256" name="ort_txt" value="'.$ort.'"/></td></tr>';
+echo '</div><input type="text" style="display: '.($adresse_nation=='A'?'none':'block').';" id="adresse-ort-textfeld" maxlength="256" name="ort_txt" value="'.$ort.'"/></td></tr>';
 
 echo '</table>';
 echo '<div style="display: none;" id="ueb1"><input type="radio" id="ueberschreiben1" name="ueberschreiben" value="Ja" onclick="disablefields2(false)">Bestehende Adresse überschreiben</div>';
@@ -827,7 +831,7 @@ if($where!='')
 		$stg_obj = new studiengang($conn);
 		$stg_obj->getAll('typ, kurzbz', false);
 		
-		echo '<table><tr><th></th><th>Nachname</th><th>Vorname</th><th>GebDatum</th><th>SVNR</th><th>Geschlecht</th><th>Adresse</th><th>Status</th></tr>';
+		echo '<table><tr><th></th><th>Nachname</th><th>Vorname</th><th>GebDatum</th><th>SVNR</th><th>Geschlecht</th><th>Adresse</th><th>Status</th><th>Details</th></tr>';
 		while($row = pg_fetch_object($result))
 		{
 			$status = '';
@@ -851,8 +855,10 @@ if($where!='')
 			if($result_adr = pg_query($conn, $qry_adr))
 				while($row_adr=pg_fetch_object($result_adr))
 					echo "$row_adr->plz $row_adr->ort, $row_adr->strasse<br>";
+			echo '</td>';
 			echo "<td>$status</td>";
-			echo "</td></tr>";
+			echo '<td><a href="personendetails.php?id='.$row->person_id.'" target="_blank">Details</a></td>';
+			echo "</tr>";
 		}
 		echo '<tr><td><input type="radio" name="person_id" value="0" checked onclick="disablefields(this)"></td><td>Neue Person anlegen</td></tr>';
 		echo '</table>';
