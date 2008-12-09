@@ -27,6 +27,7 @@ require_once('../../include/functions.inc.php');
 require_once('../../include/person.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/pruefling.class.php');
+require_once('../../include/studiengang.class.php');
 
 if (!$conn = pg_pconnect(CONN_STRING))
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -214,4 +215,37 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 		}
 	}
 }
+echo '<hr><br>';
+if(isset($_POST['savedummystg']) && isset($_POST['stg']))
+{
+	$qry = "UPDATE public.tbl_prestudent SET studiengang_kz='".addslashes($_POST['stg'])."' WHERE prestudent_id='13478';";	
+	if(pg_query($conn, $qry))
+		echo '<b>Studiengang geändert!</b><br>';
+	else 
+		echo '<b>Fehler beim Ändern des Studienganges!</b><br>';
+}
+$name='';
+$dummystg='';
+$qry = "SELECT studiengang_kz, vorname, nachname FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE prestudent_id='13478'";
+if($result = pg_query($conn, $qry))
+{
+	if($row = pg_fetch_object($result))
+	{
+		$name = $row->vorname.' '.$row->nachname;
+		$dummystg=$row->studiengang_kz;
+	}
+}
+echo "Prestudent Studiengang von $name ändern";
+echo '<form action="'.$_SERVER['PHP_SELF'].'" METHOD="POST">
+	<SELECT name="stg">';
+$stg_obj = new studiengang($conn);
+$stg_obj->getAll('typ, kurzbz');
+
+foreach ($stg_obj->result as $row)
+{
+	echo '<option value="'.$row->studiengang_kz.'" '.($row->studiengang_kz==$dummystg?'selected':'').'>'.$row->kuerzel.'</option>';
+}
+echo '</SELECT>
+<input type="submit" name="savedummystg" value="Speichern">
+';
 ?>

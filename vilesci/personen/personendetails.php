@@ -76,6 +76,7 @@ echo '<h2>Person</h2>';
 echo "ID: $person->person_id<br>";
 echo "Name: $person->titelpre $person->nachname $person->vorname $person->titelpost<br>";
 echo "Geburtsdatum: ".$datum_obj->formatDatum($person->gebdatum,'d.m.Y')."<br>";
+echo "Geschlecht: ".$person->geschlecht."<br>";
 
 $kontakt = new kontakt($conn);
 $kontakt->load_pers($person->person_id);
