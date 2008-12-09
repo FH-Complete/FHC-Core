@@ -87,6 +87,7 @@ foreach($stud->result as $row)
 		echo '<OPTION value="'.$row->studiengang_kz.'"'.($studiengang_kz==$row->studiengang_kz?'selected':'').'>'.$row->kuerzel.'</OPTION>';
 	}
 }
+
 echo '</SELECT>';
 echo '</form>';
 
@@ -377,12 +378,14 @@ if($type=='save')
 
 
 //Tree der Gruppen
+
 echo '<table style="font-size:large" width="100%"><tr><td>';
 if(!$admin)
 	$where = ' AND aktiv=true';
 else 
+{
 	$where = '';
-
+}
 $qry = "SELECT * FROM public.tbl_lehrverband WHERE studiengang_kz='$studiengang_kz' $where ORDER BY studiengang_kz, semester, verband, gruppe";
 
 if($result = pg_query($conn, $qry))
@@ -415,7 +418,9 @@ if($result = pg_query($conn, $qry))
 					if(!$admin)
 						$where=' AND aktiv AND lehre';
 					else 
-						$where='';
+					{
+						$where = '';
+					}
 					//Spezialgruppen des vorherigen Semesters
 					$qry_gruppe = "SELECT * FROM public.tbl_gruppe WHERE studiengang_kz='$studiengang_kz' AND semester='$lastsemester' $where ORDER BY sort, gruppe_kurzbz";
 					if($result_gruppe = pg_query($conn, $qry_gruppe))
@@ -497,7 +502,9 @@ if($result = pg_query($conn, $qry))
 		if(!$admin)
 			$where=' AND aktiv AND lehre';
 		else 
-			$where='';
+		{
+			$where = '';
+		}
 		//Spezialgruppen des vorherigen Semesters
 		$qry_gruppe = "SELECT * FROM public.tbl_gruppe WHERE studiengang_kz='$studiengang_kz' AND semester='$lastsemester' $where ORDER BY sort, gruppe_kurzbz";
 		if($result_gruppe = pg_query($conn, $qry_gruppe))
