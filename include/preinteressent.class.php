@@ -435,7 +435,7 @@ class preinteressent
 	// *        $studiensemester_kurzbz
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
-	function loadPreinteressenten($studiengang_kz='', $studiensemester_kurzbz=null, $filter='', $nichtfreigegeben=null, $uebernommen=null, $aufmerksamdurch=null)
+	function loadPreinteressenten($studiengang_kz='', $studiensemester_kurzbz=null, $filter='', $nichtfreigegeben=null, $uebernommen=null, $kontaktmedium=null, $absage=false, $erfassungsdatum_von=null, $erfassungsdatum_bis=null)
 	{
 		$qry = "SELECT distinct tbl_preinteressent.* FROM public.tbl_preinteressent JOIN public.tbl_person USING(person_id) LEFT JOIN public.tbl_preinteressentstudiengang USING(preinteressent_id) LEFT JOIN public.tbl_kontakt USING(person_id) WHERE true";
 				
@@ -452,14 +452,25 @@ class preinteressent
 		
 		if($filter!='')
 		{
-			$qry.=" AND lower(nachname) like '%".addslashes($filter)."%' OR lower(vorname) like '%".addslashes($filter)."%' OR erfassungsdatum like '".addslashes($filter)."' OR lower(kontakt) like '%".addslashes($filter)."%'";
+			$qry.=" AND (lower(nachname) like lower('%".addslashes($filter)."%') OR lower(vorname) like lower('%".addslashes($filter)."%') OR erfassungsdatum like '".addslashes($filter)."' OR lower(kontakt) like lower('%".addslashes($filter)."%'))";
 		}
 		if($nichtfreigegeben==true)
 			$qry.=" AND tbl_preinteressentstudiengang.freigabedatum is null";
 		if($uebernommen==true)
 			$qry.=" AND tbl_preinteressentstudiengang.freigabedatum is not null AND tbl_preinteressentstudiengang.uebernahmedatum is null";
-		if(!is_null($aufmerksamdurch))
-			$qry.=" AND tbl_preinteressent.aufmerksamdurch_kurzbz='".addslashes($aufmerksamdurch)."'";
+		if(!is_null($kontaktmedium))
+			$qry.=" AND tbl_preinteressent.kontaktmedium_kurzbz='".addslashes($kontaktmedium)."'";
+
+		if(!is_null($erfassungsdatum_bis))
+			$qry.=" AND erfassungsdatum<='".addslashes($erfassungsdatum_bis)."'";
+		
+		if(!is_null($erfassungsdatum_von))
+			$qry.=" AND erfassungsdatum>='".addslashes($erfassungsdatum_von)."'";
+		
+		if($absage)
+			$qry.=" AND absagedatum is not null";
+		else 
+			$qry.=" AND absagedatum is null";
 		
 		if($result = pg_query($this->conn, $qry))
 		{

@@ -71,7 +71,7 @@
     <TR>
     	<?php
 	  	echo '<th>Monat<br>Tag</th>';
-		for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
+		for ($ts=$ts_beginn;$ts<=$ts_ende; $ts+=$datum_obj->ts_day)
 		{
 			$tag=date('d',$ts);
 			$wt=date('w',$ts);
@@ -92,7 +92,7 @@
 		$zs->getzeitsperren($ma->uid);
 		echo '<TR>';
 		echo "<td>$ma->nachname $ma->vorname</td>";
-		for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
+		for ($ts=$ts_beginn;$ts<=$ts_ende; $ts+=$datum_obj->ts_day)
 		{
 			$tag=date('d',$ts);
 			$monat=date('M',$ts);

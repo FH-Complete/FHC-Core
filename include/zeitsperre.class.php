@@ -68,7 +68,7 @@ class zeitsperre
 		$this->result=array();
 		$qry = "SELECT tbl_zeitsperre.*, tbl_zeitsperretyp.*, tbl_erreichbarkeit.farbe  AS erreichbarkeit_farbe
 				FROM (campus.tbl_zeitsperre JOIN campus.tbl_zeitsperretyp USING (zeitsperretyp_kurzbz))
-					JOIN campus.tbl_erreichbarkeit USING (erreichbarkeit_kurzbz)
+					LEFT JOIN campus.tbl_erreichbarkeit USING (erreichbarkeit_kurzbz)
 				WHERE mitarbeiter_uid='".addslashes($uid)."'";
 
 		if($bisgrenze)

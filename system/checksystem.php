@@ -35,6 +35,22 @@ if (!$conn = pg_pconnect(CONN_STRING))
 echo '<H1>Systemcheck!</H1>';
 echo '<H2>DB-Updates!</H2>';
 
+// ************** bis.tbl_orgform.rolle **********************************************
+if (!@pg_query($conn,'SELECT rolle FROM bis.tbl_orgform LIMIT 1;'))
+{
+	$sql="	ALTER TABLE bis.tbl_orgform ADD COLUMN rolle boolean;
+			COMMENT ON COLUMN bis.tbl_orgform.rolle IS 'Kann diese Orgform fuer die Studentenrolle verwendet werden?';
+			UPDATE bis.tbl_orgform SET rolle=TRUE;
+			UPDATE bis.tbl_orgform SET rolle=FALSE WHERE orgform_kurzbz IN ('VBB', 'ZGS');
+			ALTER TABLE bis.tbl_orgform ALTER COLUMN rolle SET NOT NULL;
+			ALTER TABLE bis.tbl_orgform ALTER COLUMN rolle SET DEFAULT FALSE;
+		";
+	if (!@pg_query($conn,$sql))
+		echo '<strong>bis.tbl_orgform: '.pg_last_error($conn).' </strong><BR>';
+	else
+		echo '	bis wurde bei bis.tbl_orgform hinzugefuegt!<BR>';
+}
+
 // ************** campus.vw_lehreinheit.lv_semester **********************************************
 if (!@pg_query($conn,'SELECT lv_semester FROM campus.vw_lehreinheit LIMIT 1;'))
 {
@@ -788,7 +804,7 @@ $tabellen=array(
 	"bis.tbl_hauptberuf"  => array("hauptberufcode","bezeichnung"),
 	"bis.tbl_mobilitaetsprogramm"  => array("mobilitaetsprogramm_code","kurzbz","beschreibung"),
 	"bis.tbl_nation"  => array("nation_code","entwicklungsstand","eu","ewr","kontinent","kurztext","langtext","engltext","sperre"),
-	"bis.tbl_orgform"  => array("orgform_kurzbz","code","bezeichnung"),
+	"bis.tbl_orgform"  => array("orgform_kurzbz","code","bezeichnung","rolle"),
 	"bis.tbl_verwendung"  => array("verwendung_code","verwendungbez"),
 	"bis.tbl_zgv"  => array("zgv_code","zgv_bez","zgv_kurzbz"),
 	"bis.tbl_zgvmaster"  => array("zgvmas_code","zgvmas_bez","zgvmas_kurzbz"),

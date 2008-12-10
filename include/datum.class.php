@@ -166,9 +166,11 @@ class datum
 	 *       zB '---'
 	 * @param $datum
 	 * @param $format
+	 * @param $strict wenn das Datum aus einem Suchfeld komment, dann strict auf TRUE setzen da sonst
+	 * 				  Eintraege wie zB 'last Monday' oder 'a' auch in ein Datum umgewandelt werden.
 	 * @return Formatierten Timestamp wenn ok, false im Fehlerfall
 	 */
-	function formatDatum($datum, $format='Y-m-d H:i:s')
+	function formatDatum($datum, $format='Y-m-d H:i:s', $strict=false)
 	{
 		if(trim($datum)=='')
 			return '';
@@ -200,7 +202,7 @@ class datum
 		if(ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})",$datum, $regs))
 			$ts = mktime($regs[4],$regs[5],$regs[6],$regs[2],$regs[1],$regs[3]);
 		
-		if($ts=='')
+		if($ts=='' && !$strict)
 		{
 			$ts = strtotime($datum);
 			if(!$ts || $ts==-1)
@@ -209,7 +211,7 @@ class datum
 				$error = true;
 			}
 		}
-		
+
 		if($ts!='' && !$error)
 			return date($format, $ts);
 			

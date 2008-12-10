@@ -30,7 +30,6 @@ require_once('../../include/datum.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/log.class.php');
-require_once('../../include/aufmerksamdurch.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
    die("Konnte Verbindung zur Datenbank nicht herstellen");
@@ -52,7 +51,7 @@ else
 if(isset($_GET['studiensemester_kurzbz']))
 	$studiensemester_kurzbz = $_GET['studiensemester_kurzbz'];
 else 
-	$studiensemester_kurzbz = $stsem_aktuell;
+	$studiensemester_kurzbz = '-1'; //$stsem_aktuell;
 
 if(isset($_GET['bool_nichtfreigegeben']))
 	$bool_nichtfreigegeben = true;
@@ -64,19 +63,40 @@ if(isset($_GET['bool_uebernommen']))
 else 
 	$bool_uebernommen = null;
 
+if(isset($_GET['bool_absage']))
+	$bool_absage = true;
+else 
+	$bool_absage = false;
+
 if(isset($_GET['filter']))
 	$filter = $_GET['filter'];
 else 
 	$filter = '';
-if(isset($_GET['aufmerksamdurch']))
+	
+//Wenn auf Anzeigen geklickt wird, das Suchfeld nicht beruecksichtigen
+if(isset($_GET['anzeigen']))
+	$filter='';
+
+if(isset($_GET['kontaktmedium']))
 {
-	$aufmerksamdurch = $_GET['aufmerksamdurch'];
-	if($aufmerksamdurch=='')
-		$aufmerksamdurch=null;
+	$kontaktmedium = $_GET['kontaktmedium'];
+	if($kontaktmedium=='')
+		$kontaktmedium=null;
 }
 else 
-	$aufmerksamdurch = null;
-echo '<html>
+	$kontaktmedium = null;
+if(isset($_GET['erfassungsdatum_bis']) && $_GET['erfassungsdatum_bis']!='')
+	$erfassungsdatum_bis = $_GET['erfassungsdatum_bis'];
+else
+	$erfassungsdatum_bis=null;
+	
+if(isset($_GET['erfassungsdatum_von']) && $_GET['erfassungsdatum_von']!='')
+	$erfassungsdatum_von = $_GET['erfassungsdatum_von'];
+else
+	$erfassungsdatum_von=null;
+echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+<html>
 	<head>
 		<title>PreInteressenten</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
@@ -95,7 +115,8 @@ echo '<html>
 		-->
 		</script>
 	</head>
-	<body class="Background_main">
+	<body class="Background_main" style="margin-top:0px; padding-top:0px;">
+	<div style="position: fixed; background-color: white; width: 99%; padding-top:5px;">
 	<h2>PreInteressenten</h2>
 	';
 
@@ -135,27 +156,34 @@ foreach ($stg->result as $row)
 	echo "<option value='$row->studiengang_kz' $selected>$row->kuerzel</option>";
 }
 echo '</SELECT></td><td>';
-echo '<input type="checkbox" name="bool_nichtfreigegeben" '.($bool_nichtfreigegeben?'checked':'').'> nicht freigegeben<br>';
+echo '<input type="checkbox" name="bool_nichtfreigegeben" '.($bool_nichtfreigegeben?'checked':'').'> nicht freigegeben';
+echo '<input type="checkbox" name="bool_absage" '.($bool_absage?'checked':'').'> Absage<br>';
 echo '<input type="checkbox" name="bool_uebernommen" '.($bool_uebernommen?'checked':'').'> freigegeben aber nicht &uuml;bernommen</td><td>';
-echo '&nbsp;&nbsp;&nbsp;<input type="submit" value="Anzeigen"></td></tr>';
-echo '<tr><td>Aufmerksam durch: <SELECT name="aufmerksamdurch">';
-$aufmerksam_obj = new aufmerksamdurch($conn);
-$aufmerksam_obj->getAll('beschreibung');
+echo '&nbsp;&nbsp;&nbsp;<input type="submit" name="anzeigen" value="Anzeigen"></td></tr>';
+echo '<tr><td>Kontaktmedium: <SELECT name="kontaktmedium">';
+$qry="SELECT * FROM public.tbl_kontaktmedium ORDER BY beschreibung";
 echo "<option value='' >-- Alle --</option>";
-foreach ($aufmerksam_obj->result as $row)
+if($result = pg_query($conn, $qry))
 {
-	if($row->aufmerksamdurch_kurzbz==$aufmerksamdurch)
-		$selected='selected';
-	else 
-		$selected='';
-	echo "<option value='$row->aufmerksamdurch_kurzbz' $selected>$row->beschreibung</option>";
+	while($row = pg_fetch_object($result))
+	{
+		if($row->kontaktmedium_kurzbz==$kontaktmedium)
+			$selected='selected';
+		else 
+			$selected='';
+		echo "<option value='$row->kontaktmedium_kurzbz' $selected>$row->beschreibung</option>";	
+	}
 }
-echo '</SELECT></td></tr>';
+echo '</SELECT></td><td>';
+echo 'Erf. von <input type="text" size="10" maxlength="10" name="erfassungsdatum_von" value="'.$erfassungsdatum_von.'">';
+echo 'Erf. bis <input type="text" size="10" maxlength="10" name="erfassungsdatum_bis" value="'.$erfassungsdatum_bis.'">';
+echo '</td></tr>';
 echo '</table>';
-echo '</form></td><td>';
-echo "<form action='".$_SERVER['PHP_SELF']."' method='GET'>";
+//echo '</form>';
+echo '</td><td>';
+//echo "<form action='".$_SERVER['PHP_SELF']."' method='GET'>";
 echo "<input type='text' value='".htmlentities($filter,ENT_QUOTES)."' name='filter'>&nbsp;";
-echo "<input type='submit' size='10' value='Suchen'>";
+echo "<input type='submit' size='10' name='suchen' value='Suchen'>";
 echo '</form></td>';
 echo '<td align="right"><a href="preinteressent_anlegen.php" target="_blank">neuen Preinteressenten anlegen</a></td></tr></table>';
 
@@ -270,38 +298,21 @@ if(isset($_GET['action']))
 	
 }
 
-//TABELLE ANZEIGEN
-echo '<br>';	
-echo "<table class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>
-	<thead>
-		<tr>
-		<th class='table-sortable:numeric'>ID</th>
-		<th class='table-sortable:default'>Nachname</th>
-		<th class='table-sortable:default'>Vorname</th>
-		<th class='table-sortable:default'>StSem</th>
-		<th class='table-sortable:default'>Erf.datum</th>
-		<th class='table-sortable:default'>Geschlecht</th>
-		<th class='table-sortable:default'>E-Mail</th>
-		<th class='table-sortable:default'>Status</th>
-		<th class='table-sortable:default'>Freigabe</th>
-		<th class='table-sortable:default'>&Uuml;bernahme</th>
-		<th class='table-sortable:default'>Anmerkung</th>
-		<th>Aktion</th>
-		</tr>
-	</thead>
-	<tbody>";
+
 
 
 $preinteressent = new preinteressent($conn);
-if($filter=='')
-	$preinteressent->loadPreinteressenten($studiengang_kz, ($studiensemester_kurzbz!='-1'?$studiensemester_kurzbz:null), null, $bool_nichtfreigegeben, $bool_uebernommen, $aufmerksamdurch);
-else 
+//if($filter=='')
+if($datum_obj->formatDatum($filter, 'Y-m-d', true))
+	$filter = $datum_obj->formatDatum($filter, 'Y-m-d', true);
+$preinteressent->loadPreinteressenten($studiengang_kz, ($studiensemester_kurzbz!='-1'?$studiensemester_kurzbz:null), $filter, $bool_nichtfreigegeben, $bool_uebernommen, $kontaktmedium, $bool_absage, $erfassungsdatum_von, $erfassungsdatum_bis);
+/*else 
 {
 	//Falls im Filter-Feld ein Datum steht dann wird dieses umformatiert
 	if($datum_obj->formatDatum($filter, 'Y-m-d'))
 		$filter = $datum_obj->formatDatum($filter, 'Y-m-d');
 	$preinteressent->loadPreinteressenten(null, null, $filter);
-}
+}*/
 $stg_obj = new studiengang($conn);
 $stg_obj->getAll('typ, kurzbz', false);
 
@@ -316,6 +327,30 @@ function CutString($strVal, $limit)
 		return $strVal;
 	}
 }
+echo 'Anzahl: '.count($preinteressent->result);
+echo '</div>'; // Fixiertes Div mit den Filtern
+echo '<br><br><br><br><br><br><br>';
+
+//TABELLE ANZEIGEN
+echo '<br>';	
+echo "<table class='liste table-autosort:4 table-stripeclass:alternate table-autostripe' style='font-size:15px;'>
+	<thead>
+		<tr>
+		<th class='table-sortable:numeric'>ID</th>
+		<th class='table-sortable:default'>Nachname</th>
+		<th class='table-sortable:default'>Vorname</th>
+		<th class='table-sortable:default'>StSem</th>
+		<th class='table-sortable:default'>Erf.datum</th>
+		<th class='table-sortable:default'>G</th>
+		<th class='table-sortable:default'>E-Mail</th>
+		<th class='table-sortable:default'>Status</th>
+		<th class='table-sortable:default'>Freigabe</th>
+		<th class='table-sortable:default'>&Uuml;bernahme</th>
+		<th class='table-sortable:default'>Anmerkung</th>
+		<th>Aktion</th>
+		</tr>
+	</thead>
+	<tbody>";
 
 foreach ($preinteressent->result as $row)
 {
@@ -328,13 +363,8 @@ foreach ($preinteressent->result as $row)
 	//echo "<td>".$datum_obj->convertISODate($person->gebdatum)."</td>";
 	echo "<td>$row->studiensemester_kurzbz</td>";
 	echo "<td><span style='display: none'>$row->erfassungsdatum</span>".$datum_obj->formatDatum($row->erfassungsdatum,'d.m.Y')."</td>";
-	switch ($person->geschlecht)
-	{
-		case 'm': $geschlecht='männlich'; break;
-		case 'w': $geschlecht='weiblich'; break;
-		default: $geschlecht='';
-	}
-	echo "<td>$geschlecht</td>";
+	
+	echo "<td>$person->geschlecht</td>";
 	//EMail
 	$qry = "SELECT kontakt FROM public.tbl_kontakt WHERE person_id='$person->person_id' AND kontakttyp='email' 
 			ORDER BY zustellung DESC LIMIT 1";
@@ -399,10 +429,10 @@ foreach ($preinteressent->result as $row)
 	echo "<td>$uebernahme</td>";
 	echo "<td title='".htmlentities($row->anmerkung,ENT_QUOTES)."'>".htmlentities(CutString($row->anmerkung, 20),ENT_QUOTES)."</td>";
 	echo '<td>';
-	echo "<input type='button' onclick=\"window.open('personendetails.php?id=$row->person_id','_blank')\" value='Gesamtübersicht' title='Zeigt die Details dieser Person an'>";
-	echo "<input type='button' onclick='parent.preinteressent_detail.location.href = \"preinteressent_detail.php?id=$row->preinteressent_id&selection=\"+parent.preinteressent_detail.selection; return false;' value='Bearbeiten' title='Zeigt die Details dieser Person an'>";
-	echo "<input type='button' onclick=\"window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=freigabe&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'\" value='Freigeben' title='Gibt alle Studiengänge mit der höchsten Priorität frei'>";
-	echo "<input type='button' onclick=\"if(confdel()) {window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=loeschen&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'}\" value='Löschen' title='Löscht diesen Preinteressenten'>";
+	echo " <input style='padding:0px;' type='button' onclick=\"window.open('personendetails.php?id=$row->person_id','_blank')\" value='Gesamtübersicht' title='Zeigt die Details dieser Person an'>";
+	echo " <input style='padding:0px;' type='button' onclick='parent.preinteressent_detail.location.href = \"preinteressent_detail.php?id=$row->preinteressent_id&selection=\"+parent.preinteressent_detail.selection; return false;' value='Bearbeiten' title='Zeigt die Details dieser Person an'>";
+	echo " <input style='padding:0px;' type='button' onclick=\"window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=freigabe&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'\" value='Freigeben' title='Gibt alle Studiengänge mit der höchsten Priorität frei'>";
+	echo " <input style='padding:0px;' type='button' onclick=\"if(confdel()) {window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=loeschen&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'}\" value='Löschen' title='Löscht diesen Preinteressenten'>";
 	echo '</td>';
 	echo '</tr>';
 }

@@ -419,31 +419,24 @@
   			<tr>
     		  <td class="tdwidth10">&nbsp;</td>
 			  <td>
-			  <p>Um das Technikum-Wien LDAP Adressbuch nutzen zu k&ouml;nnen sind folgende Einstellungen notwendig:<br></p>
-			    <table class="tabcontent">
-  				  <tr>
-    		  	  	<td width="20">&nbsp;</td>
-    		  	  	<td>
-	  				  	<table border="0">
-  					  		<tr>
-  					  			<td>&#8226 Server:</td>
-  					  			<td width="10">&nbsp;</td>
-  				  				<td>ldap.technikum-wien.at</td>
-  					  		</tr>
-  					  		<tr>
-  					  			<td>&#8226 Suchbereich:</td>
-  					  			<td width="10">&nbsp;</td>
-  				  				<td>ou=People,dc=technikum-wien,dc=at</td>
-  					  		</tr>
-  					  		<tr>
-  					  			<td>&#8226 Port:</td>
-  					  			<td width="10">&nbsp;</td>
-  				  				<td>389</td>
-  					  		</tr>
-  					  	</table>
-					</td>
-				  </tr>
+			  	Die Einstellungen für den Zugriff auf das Technikum-Wien LDAP Adressbuch hängen davon ab, ob man intern (TW LAN) oder extern auf das LDAP-Adressbuch zugreifen möchte.<br>
+				<br>
+				<b>interner Zugriff:</b><br>
+				Um das Technikum-Wien LDAP Adressbuch intern nutzen zu können sind folgende Einstellungen notwendig:<br>
+				<br>
+				<table>
+					<tr><td>Server:</td><td>ldap.technikum-wien.at</td></tr>
+					<tr><td>Suchbereich:</td><td>ou=people,dc=technikum-wien,dc=at</td></tr>
+					<tr><td>Port:</td><td>389</td></tr>
 				</table>
+				<br>
+				<b>externer Zugriff:</b><br>
+				Um von extern auf das Technikum-Wien LDAP Adressbuch zugreifen zu können ist eine Authentifizierung am LDAP-Server erforderlich. <br>
+				<br>
+				Anleitung für Konfiguration MailClient finden Sie <a href="../cisdocs/LDAP_externerZugriff.doc" class="Item">hier</a>.<br>
+				<br>
+				In beiden Fällen ist die Konfiguration via SSL (verschlüsselte Verbindung) Port: 636 möglich
+			  </td>
 			</tr>
 		  </table>
 		</td>
