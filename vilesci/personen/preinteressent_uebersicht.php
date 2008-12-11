@@ -115,7 +115,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 		-->
 		</script>
 	</head>
-	<body class="Background_main" style="margin-top:0px; padding-top:0px;">
+	<body class="Background_main" style="margin-top:0px; padding-top:0px;" onload="Table.sort(document.getElementById(\'mytab\'),\'asc\')">
 	<div style="position: fixed; background-color: white; width: 99%; padding-top:5px;">
 	<h2>PreInteressenten</h2>
 	';
@@ -333,7 +333,7 @@ echo '<br><br><br><br><br><br><br>';
 
 //TABELLE ANZEIGEN
 echo '<br>';	
-echo "<table class='liste table-autosort:4 table-stripeclass:alternate table-autostripe' style='font-size:15px;'>
+echo "<table id='mytab' class='liste table-autosort:4 table-stripeclass:alternate table-autostripe' style='font-size:15px;'>
 	<thead>
 		<tr>
 		<th class='table-sortable:numeric'>ID</th>
