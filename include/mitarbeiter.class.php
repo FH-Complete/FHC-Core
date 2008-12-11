@@ -753,7 +753,7 @@ class mitarbeiter extends benutzer
 	{
 		$qry = "SELECT
 					distinct on(mitarbeiter_uid) *, tbl_benutzer.aktiv as aktiv, tbl_mitarbeiter.insertamum,
-					tbl_mitarbeiter.insertvon
+					tbl_mitarbeiter.insertvon, tbl_mitarbeiter.updateamum, tbl_mitarbeiter.updatevon
 				FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id))  LEFT JOIN campus.tbl_resturlaub USING(mitarbeiter_uid)
 				WHERE nachname ~* '".addslashes($filter)."' OR
 				      vorname ~* '".addslashes($filter)."' OR
@@ -804,6 +804,8 @@ class mitarbeiter extends benutzer
 				$obj->alias = $row->alias;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
 
 				$obj->urlaubstageprojahr = $row->urlaubstageprojahr;
 				$obj->resturlaubstage = $row->resturlaubstage;

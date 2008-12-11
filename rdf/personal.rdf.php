@@ -161,9 +161,9 @@ function draw_row($mitarbeiter)
     		<MITARBEITER:insertamum><![CDATA['.date('d.m.Y H:i:s',$datum->mktime_fromtimestamp($mitarbeiter->insertamum)).']]></MITARBEITER:insertamum>
     		<MITARBEITER:insertamum_iso><![CDATA['.$mitarbeiter->insertamum.']]></MITARBEITER:insertamum_iso>
     		<MITARBEITER:insertvon><![CDATA['.$mitarbeiter->insertvon.']]></MITARBEITER:insertvon>
-    		<MITARBEITER:updateamum><![CDATA['.date('d.m.Y H:i:s',$datum->mktime_fromtimestamp($mitarbeiter->insertamum)).']]></MITARBEITER:updateamum>
-    		<MITARBEITER:updateamum_iso><![CDATA['.$mitarbeiter->insertamum.']]></MITARBEITER:updateamum_iso>
-    		<MITARBEITER:updatevon><![CDATA['.$mitarbeiter->insertvon.']]></MITARBEITER:updatevon>
+    		<MITARBEITER:updateamum><![CDATA['.date('d.m.Y H:i:s',$datum->mktime_fromtimestamp($mitarbeiter->updateamum)).']]></MITARBEITER:updateamum>
+    		<MITARBEITER:updateamum_iso><![CDATA['.$mitarbeiter->updateamum.']]></MITARBEITER:updateamum_iso>
+    		<MITARBEITER:updatevon><![CDATA['.$mitarbeiter->updatevon.']]></MITARBEITER:updatevon>
     		<MITARBEITER:resturlaubstage><![CDATA['.$mitarbeiter->resturlaubstage.']]></MITARBEITER:resturlaubstage>
     		<MITARBEITER:urlaubstageprojahr><![CDATA['.$mitarbeiter->urlaubstageprojahr.']]></MITARBEITER:urlaubstageprojahr>
       	</RDF:Description>

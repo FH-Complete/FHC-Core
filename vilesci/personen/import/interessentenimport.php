@@ -993,9 +993,15 @@ for ($i=1;$i<9;$i++)
 echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><td>OrgForm</td><td><SELECT name="orgform_kurzbz">';
-echo '<OPTION value="VZ" '.($orgform_kurzbz=='VZ'?'selected':'').'>Vollzeit</OPTION>';
-echo '<OPTION value="BB" '.($orgform_kurzbz=='BB'?'selected':'').'>Berufsbegleitend</OPTION>';
-echo '<OPTION value="FST" '.($orgform_kurzbz=='FST'?'selected':'').'>Fernstudium</OPTION>';
+echo '<OPTION value="">-- keine Auswahl --</OPTION>';
+$qry = "SELECT orgform_kurzbz, bezeichnung FROM bis.tbl_orgform WHERE rolle ORDER BY bezeichnung";
+if($result = pg_query($conn, $qry))
+{
+	while($row = pg_fetch_object($result))
+	{
+		echo '<OPTION value="'.$row->orgform_kurzbz.'" '.($orgform_kurzbz==$row->orgform_kurzbz?'selected':'').'>'.$row->bezeichnung.'</OPTION>';
+	}
+}
 echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><td>Incoming:</td><td><input type="checkbox" id="incoming" name="incoming" '.($incoming?'checked':'').' onclick="cmdIncoming()" /></td></tr>';

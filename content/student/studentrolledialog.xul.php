@@ -156,8 +156,16 @@ if($prestudent_id!='')
 					<menulist id="student-rolle-menulist-orgform_kurzbz" >
 						<menupopup>
 						<menuitem value="" label="-- keine Auswahl --"/>
-						<menuitem value="VZ" label="Vollzeit"/>
-						<menuitem value="BB" label="Berufsbegleitend"/>
+						<?php
+						$qry = "SELECT orgform_kurzbz, bezeichnung FROM bis.tbl_orgform WHERE rolle ORDER BY bezeichnung";
+						if($result = pg_query($conn, $qry))
+						{
+							while($row = pg_fetch_object($result))
+							{
+								echo '<menuitem value="'.$row->orgform_kurzbz.'" label="'.$row->bezeichnung.'"/>';
+							}
+						}
+						?>
 						</menupopup>
 					</menulist>
       			</row>
