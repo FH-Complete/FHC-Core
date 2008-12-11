@@ -151,8 +151,8 @@ if($stsem!='')
 		}
 		echo '<tr>';
 		echo '<td><b>SUMME</b></td>';
-		echo "<td align='center'><b>$gesamt_fix</b></td>";
-		echo "<td align='center'><b>$gesamt_extern</b></td>";
+		echo "<td align='center'>&nbsp;</td>";
+		echo "<td align='center'>&nbsp;</td>";
 		echo "<td align='center'><b>$gesamt_ws</b></td>";
 		echo "<td align='center'><b>$gesamt_ss</b></td>";
 		echo "</tr>";
