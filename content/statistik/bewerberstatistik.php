@@ -100,29 +100,112 @@ if($mail)
 	- <a href="'.APP_ROOT.'content/statistik/absolventenstatistik.php" target="_blank">Absolventenstatistik</a><br><br>
 	';
 }
+
+
+//Details fuer einen bestimmten Studiengang anzeigen
+if(isset($_GET['showdetails']))
+{
+	$studiengang_kz  = $_GET['studiengang_kz'];
+	$stgwhere = " AND studiengang_kz='".addslashes($studiengang_kz)."'";
+	
+	$stg_obj = new studiengang($conn);
+	if(!$stg_obj->load($studiengang_kz))
+		die('Studiengang existiert nicht');
+
+	$content.='
+	<h2>Bewerberstatistik Details - '.$stg_obj->kuerzel.' '.$stsem.'<span style="position:absolute; right:15px;">'.date('d.m.Y').'</span></h2><br>
+	';
+	$content.='<center>GRAFIK</center>';
+	
+	$hlp=array();
+	//Aufmerksamdurch (Prestudent)
+	$content.= '<br><h2>Aufmerksam durch (Prestudent)</h2><br>';
+	$qry = "SELECT beschreibung, COALESCE(a.anzahl,0) as anzahl
+			FROM public.tbl_aufmerksamdurch LEFT JOIN 
+				(SELECT aufmerksamdurch_kurzbz, count(*) as anzahl 
+				FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING(prestudent_id) 
+				WHERE studiensemester_kurzbz='".addslashes($stsem)."' AND studiengang_kz='".addslashes($studiengang_kz)."' 
+				GROUP BY aufmerksamdurch_kurzbz) as a USING(aufmerksamdurch_kurzbz) 
+			";
+	$content.= "\n<table class='liste table-stripeclass:alternate table-autostripe' style='width:auto'>
+				<thead>
+					<tr>
+						<th>Aufmerksam durch</th>
+						<th>Anzahl</th>
+					</tr>
+				</thead>
+				<tbody>";
+	if($result = pg_query($conn, $qry))
+	{
+		while($row = pg_fetch_object($result))
+		{
+			$content.='<tr>';
+			$content.="<td>$row->beschreibung</td>";
+			$content.="<td>$row->anzahl</td>";
+			$content.='</tr>';
+		}
+	}
+
+	$content.='</tbody></table>';	
+	
+	//Berufstaetigkeit
+	$content.= '<br><h2>Berufst&auml;tigkeit</h2><br>';
+	$qry = "SELECT berufstaetigkeit_bez, COALESCE(a.anzahl,0) as anzahl
+			FROM bis.tbl_berufstaetigkeit LEFT JOIN 
+				(SELECT berufstaetigkeit_code, count(*) as anzahl 
+				FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING(prestudent_id) 
+				WHERE studiensemester_kurzbz='".addslashes($stsem)."' AND studiengang_kz='".addslashes($studiengang_kz)."' 
+				GROUP BY berufstaetigkeit_code) as a USING(berufstaetigkeit_code) 
+			";
+
+	$content.= "\n<table class='liste table-stripeclass:alternate table-autostripe' style='width:auto'>
+				<thead>
+					<tr>
+						<th>Berufst&auml;tigkeit</th>
+						<th>Anzahl</th>
+					</tr>
+				</thead>
+				<tbody>";
+	if($result = pg_query($conn, $qry))
+	{
+		while($row = pg_fetch_object($result))
+		{
+			$content.='<tr>';
+			$content.="<td>$row->berufstaetigkeit_bez</td>";
+			$content.="<td>$row->anzahl</td>";
+			$content.='</tr>';
+		}
+	}
+	
+	$content.='</tbody></table>';	
+	
+	echo $content;
+	echo '</body></html>';
+	exit;
+}
+
 $content.='
 	<h2>Bewerberstatistik '.$stsem.'<span style="position:absolute; right:15px;">'.date('d.m.Y').'</span></h2><br>
 	';
 
+if(!$mail)
+{
+	$content.= '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">Studiensemester: <SELECT name="stsem">';
+	$studsem = new studiensemester($conn);
+	$studsem->getAll();
 
-	if(!$mail)
+	foreach ($studsem->studiensemester as $stsemester)
 	{
-		$content.= '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">Studiensemester: <SELECT name="stsem">';
-		$studsem = new studiensemester($conn);
-		$studsem->getAll();
-	
-		foreach ($studsem->studiensemester as $stsemester)
-		{
-			if($stsemester->studiensemester_kurzbz==$stsem)
-				$selected='selected';
-			else 
-				$selected='';
-			
-			$content.= '<option value="'.$stsemester->studiensemester_kurzbz.'" '.$selected.'>'.$stsemester->studiensemester_kurzbz.'</option>';
-		}
-		$content.= '</SELECT>
-			<input type="submit" value="Anzeigen" /></form><br><br>';
+		if($stsemester->studiensemester_kurzbz==$stsem)
+			$selected='selected';
+		else 
+			$selected='';
+		
+		$content.= '<option value="'.$stsemester->studiensemester_kurzbz.'" '.$selected.'>'.$stsemester->studiensemester_kurzbz.'</option>';
 	}
+	$content.= '</SELECT>
+		<input type="submit" value="Anzeigen" /></form><br><br>';
+}
 
 if($stsem!='')
 {
@@ -234,7 +317,7 @@ if($stsem!='')
 		{
 			$content.= "\n";
 			$content.= '<tr>';
-			$content.= "<td>".strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
+			$content.= "<td><a href='".$_SERVER['PHP_SELF']."?showdetails=true&studiengang_kz=$row->studiengang_kz&stsem=$stsem'>".strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</a></td>";
 			$content.= "<td align='center'>$row->interessenten ($row->interessenten_m / $row->interessenten_w)</td>";
 			$content.= "<td align='center'>$row->interessentenzgv ($row->interessentenzgv_m / $row->interessentenzgv_w)</td>";
 			$content.= "<td align='center'>$row->interessentenrtanmeldung ($row->interessentenrtanmeldung_m / $row->interessentenrtanmeldung_w)</td>";
@@ -383,138 +466,6 @@ if($stsem!='')
 		$content.= "<tr><td style='border-top: 1px solid black;'><b>$summestudenten</b></td><td></td></tr>";
 	}
 	$content.= '</tbody></table>';
-	
-	//Aufmerksamdurch (Prestudent)
-	$content.= '<br><h2>Aufmerksam durch (Prestudent)</h2><br>';
-	$qry = "SELECT foo.studiengang_kz, aufmerksamdurch_kurzbz, anzahl FROM
-			(
-			SELECT
-				studiengang_kz,
-				aufmerksamdurch_kurzbz,
-				count(*) as anzahl
-			FROM
-				public.tbl_prestudent
-				JOIN public.tbl_prestudentrolle USING(prestudent_id)
-			WHERE
-				studiensemester_kurzbz='$stsem'
-				$stgwhere
-			GROUP BY
-				studiengang_kz, aufmerksamdurch_kurzbz
-			) as foo
-			JOIN public.tbl_studiengang USING(studiengang_kz)
-			ORDER BY typ, kurzbz";
-	if($result = pg_query($conn, $qry))
-	{
-		while($row = pg_fetch_object($result))
-		{
-			$hlp[$row->studiengang_kz][$row->aufmerksamdurch_kurzbz]=$row->anzahl;
-		}
-	}
-	$amd = new aufmerksamdurch($conn);
-	$amd->getAll();
-	
-	$content.= "\n<table class='liste table-stripeclass:alternate table-autostripe' style='width:auto'>
-				<thead>
-					<tr>
-						<th>Studiengang</th>";
-
-	foreach ($amd->result as $row) 
-	{
-		$content.="<th>$row->aufmerksamdurch_kurzbz</th>";
-	}
-	
-	$content.="</tr>
-				</thead>
-				<tbody>";
-	
-	$stg_obj = new studiengang($conn);
-	$stg_obj->getAll(true);
-	
-	foreach ($hlp as $studiengang_kz=>$row)
-	{
-		$content.='<tr>';
-		$content.='<td>'.$stg_obj->kuerzel_arr[$studiengang_kz].'</td>';
-		reset($amd->result);
-		foreach ($amd->result as $obj)
-		{
-			$content.='<td>';
-			if(isset($row[$obj->aufmerksamdurch_kurzbz]))
-				$content.=$row[$obj->aufmerksamdurch_kurzbz];
-			else 
-				$content.='0';
-			$content.='</td>';
-		}
-		$content.='</tr>';
-	}
-	$content.='</tbody></table>';	
-	
-	//Berufstaetigkeit
-	$content.= '<br><h2>Berufst&auml;tigkeit</h2><br>';
-	$qry = "SELECT foo.studiengang_kz, berufstaetigkeit_code, anzahl FROM
-			(
-			SELECT
-				studiengang_kz,
-				berufstaetigkeit_code,
-				count(*) as anzahl
-			FROM
-				public.tbl_prestudent
-				JOIN public.tbl_prestudentrolle USING(prestudent_id)
-			WHERE
-				studiensemester_kurzbz='$stsem'
-				$stgwhere
-			GROUP BY
-				studiengang_kz, berufstaetigkeit_code
-			) as foo
-			JOIN public.tbl_studiengang USING(studiengang_kz)
-			ORDER BY typ, kurzbz";
-	
-	if($result = pg_query($conn, $qry))
-	{
-		while($row = pg_fetch_object($result))
-		{
-			$hlp[$row->studiengang_kz][$row->berufstaetigkeit_code]=$row->anzahl;
-		}
-	}
-	
-	$content.= "\n<table class='liste table-stripeclass:alternate table-autostripe' style='width:auto'>
-				<thead>
-					<tr>
-						<th>Studiengang</th>";
-
-	$qry = "SELECT berufstaetigkeit_code, berufstaetigkeit_bez FROM bis.tbl_berufstaetigkeit ORDER BY berufstaetigkeit_bez";
-	$berufstaetigkeit=array();
-	
-	if($result = pg_query($conn, $qry))
-	{
-		while($row = pg_fetch_object($result))
-		{
-			$content.="<th>$row->berufstaetigkeit_bez</th>";
-			$berufstaetigkeit[]=$row->berufstaetigkeit_code;
-		}
-	}
-	
-	$content.="</tr>
-				</thead>
-				<tbody>";
-	
-	foreach ($hlp as $studiengang_kz=>$row)
-	{
-		$content.='<tr>';
-		$content.='<td>'.$stg_obj->kuerzel_arr[$studiengang_kz].'</td>';
-		reset($berufstaetigkeit);
-		foreach ($berufstaetigkeit as $bcode)
-		{
-			$content.='<td>';
-			if(isset($row[$bcode]))
-				$content.=$row[$bcode];
-			else 
-				$content.='0';
-			$content.='</td>';
-		}
-		$content.='</tr>';
-	}
-	$content.='</tbody></table>';	
-	
 }
 $content.= '</body>
 </html>';
