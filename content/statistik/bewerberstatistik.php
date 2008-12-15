@@ -86,7 +86,7 @@ else
 $content.='
 	<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 	<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-	</head>
+</head>
 	<body>';
 if($mail)
 {
@@ -115,7 +115,7 @@ if(isset($_GET['showdetails']))
 	$content.='
 	<h2>Bewerberstatistik Details - '.$stg_obj->kuerzel.' '.$stsem.'<span style="position:absolute; right:15px;">'.date('d.m.Y').'</span></h2><br>
 	';
-	$content.='<center>GRAFIK</center>';
+	//$content.='<center><iframe src="http://10.63.0.44/portal/ezcomponents/bewerberstatistik.svg.php?stsem='.$stsem.'&studiengang_kz='.$studiengang_kz.'" width="500" height="500" ></iframe></center>';
 	
 	$hlp=array();
 	//Aufmerksamdurch (Prestudent)
