@@ -28,6 +28,7 @@
 	require_once('../../../include/person.class.php');
 	require_once('../../../include/benutzer.class.php');
 	require_once('../../../include/mitarbeiter.class.php');
+	require_once('../../../include/mail.class.php');
 
 	//DB Verbindung herstellen
 	if (!$conn = @pg_pconnect(CONN_STRING))
@@ -238,7 +239,8 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 				   }
 				   $message.="\nSie können diesen unter folgender Adresse freigeben:\n".
 				   APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".date("Y", strtotime($akette[0]));
-		if(mail($to, 'Freigabeansuchen Urlaub', $message,'From: vilesci@'.DOMAIN))
+		$mail = new mail($to, 'vilesci@'.DOMAIN,'Freigabeansuchen Urlaub', $message);
+		if($mail->send())
 		{
 			$vgmail="<br><b>Freigabemail wurde an $to versandt!</b>";
 		}

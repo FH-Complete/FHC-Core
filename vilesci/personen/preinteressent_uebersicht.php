@@ -30,6 +30,7 @@ require_once('../../include/datum.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/log.class.php');
+require_once('../../include/mail.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
    die("Konnte Verbindung zur Datenbank nicht herstellen");
@@ -94,6 +95,8 @@ if(isset($_GET['erfassungsdatum_von']) && $_GET['erfassungsdatum_von']!='')
 	$erfassungsdatum_von = $_GET['erfassungsdatum_von'];
 else
 	$erfassungsdatum_von=null;
+	
+//Doctype muss strict sein da sonst im IE der DIV nicht am oberen Rand fixiert ist
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "http://www.w3.org/TR/html4/strict.dtd">
 <html>
@@ -245,7 +248,8 @@ if(isset($_GET['action']))
 												"im FAS unter 'Extras->Preinteressenten übernehmen' oder unter folgendem Link\n\n".
 												APP_ROOT."vilesci/personen/preinteressent_uebernahme.php?studiengang_kz=$row->studiengang_kz \n".
 												"ins FAS übertragen";
-									if(mail($to, 'Preinteressent Freigabe', $message, 'FROM: vilesci@'.DOMAIN))
+									$mail = new mail($to, 'vilesci@'.DOMAIN, 'Preinteressent Freigabe', $message);
+									if($mail->send())
 										echo "<br><b>Freigabemail wurde an $to versendet</b>";
 									else 
 										echo "<br><b>Fehler beim Versenden des Freigabemails an $to</b>";
@@ -298,8 +302,11 @@ if(isset($_GET['action']))
 	
 }
 
-
-
+//Datum pruefen
+if($erfassungsdatum_bis!='' && !$datum_obj->formatDatum($erfassungsdatum_bis))
+	die('Erf.bis Datum ist ungueltig');
+if($erfassungsdatum_von!='' && !$datum_obj->formatDatum($erfassungsdatum_von))
+	die('Erf.von Datum ist ungueltig');	
 
 $preinteressent = new preinteressent($conn);
 //if($filter=='')

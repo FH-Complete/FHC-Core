@@ -32,6 +32,7 @@ require_once('../../include/studiensemester.class.php');
 require_once('../../include/aufmerksamdurch.class.php');
 require_once('../../include/firma.class.php');
 require_once('../../include/nation.class.php');
+require_once('../../include/mail.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
    die("Konnte Verbindung zur Datenbank nicht herstellen");
@@ -408,7 +409,8 @@ if(isset($_POST['freigabe']))
 								"im FAS unter 'Extras->Preinteressenten übernehmen' oder unter folgendem Link\n\n".
 								APP_ROOT."vilesci/personen/preinteressent_uebernahme.php?studiengang_kz=$zuordnung->studiengang_kz \n".
 								"ins FAS übertragen";
-					if(mail($to, 'Preinteressent Freigabe', $message, 'FROM: vilesci@'.DOMAIN))
+					$mail = new mail($to, 'vilesci@'.DOMAIN, 'Preinteressent Freigabe', $message);
+					if($mail->send())
 						echo "<br><b>Freigabemail wurde an $to versendet</b>";
 					else 
 						echo "<br><b>Fehler beim Versenden des Freigabemails an $to</b>";

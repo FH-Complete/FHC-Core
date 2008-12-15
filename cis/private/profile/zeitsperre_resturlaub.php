@@ -31,6 +31,7 @@
 	require_once('../../../include/person.class.php');
 	require_once('../../../include/benutzer.class.php');
 	require_once('../../../include/mitarbeiter.class.php');
+	require_once('../../../include/mail.class.php');
 
 	$uid = get_uid();
 
@@ -202,6 +203,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 						$to='';
 						foreach($ma->vorgesetzte as $vg)
 							$to.=$vg.'@'.DOMAIN.',';
+						$to = substr($to, 0, strlen($to)-1);
 						//$to = 'oesi@technikum-wien.at';
 						$benutzer = new benutzer($conn);
 						$benutzer->load($uid);
@@ -210,7 +212,9 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 								   "$zeitsperre->bezeichnung von $zeitsperre->vondatum bis $zeitsperre->bisdatum\n\n".
 								   "Sie können diesen unter folgender Adresse freigeben:\n".
 								   APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".$datum_obj->formatDatum($zeitsperre->vondatum, 'Y');
-						if(mail($to, 'Freigabeansuchen', $message,'From: vilesci@'.DOMAIN))
+						$from='vilesci@'.DOMAIN;
+						$mail = new mail($to, $from, 'Freigabeansuchen', $message);
+						if($mail->send())
 						{
 							echo "<br><b>Freigabemail wurde an $to versandt</b>";
 						}
@@ -285,7 +289,7 @@ if(count($zeit->result)>0)
 							<td nowrap>".$datum_obj->convertISODate($row->vondatum)." ".($row->vonstunde!=''?'('.$row->vonstunde.')':'')."</td>
 							<td nowrap>".$datum_obj->convertISODate($row->bisdatum)." ".($row->bisstunde!=''?'('.$row->bisstunde.')':'')."</td>
 							<td>".(isset($row_vertretung->kurzbz)?$row_vertretung->kurzbz:'')."</td>
-							<td>".$erreichbarkeit_arr[$row->erreichbarkeit]."</td>
+							<td>".(isset($erreichbarkeit_arr[$row->erreichbarkeit])?$erreichbarkeit_arr[$row->erreichbarkeit]:'')."</td>
 							<td align='center'>".($row->freigabeamum!=''?'Ja':'')."</td>";
 		if($row->freigabeamum=='' || $row->zeitsperretyp_kurzbz!='Urlaub')
 		{
