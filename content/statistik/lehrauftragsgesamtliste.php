@@ -20,13 +20,15 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 /**
- *
+ * Erstellt ein Excel File mit allen Lektoren und den Studiengaengen in denen diese Unterrichten
+ * Diese Liste wird dann per Mail an die Geschaeftsstelle gesendet.
  */
 require_once('../../vilesci/config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/Excel/excel.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/studiensemester.class.php');
+require_once('../../include/mail.class.php');
 
 if (!$conn=pg_pconnect(CONN_STRING))
    	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
@@ -269,43 +271,16 @@ $workbook->close();
 //Mail versenden mit Excel File im Anhang
 	
 	$to = MAIL_GST; 
-    $from = "vilesci@technikum-wien.at"; 
+    
     $subject = "Lehrauftragsgesamtliste ".date('d.m.Y');
     $message = "Dies ist eine automatische eMail!\nAnbei die Lehrauftragsgesamtliste vom ".date('d.m.Y');
     $fileatttype = "application/xls"; 
     $fileattname = "lehrauftragsgesamtliste_".date('Y_m_d').".xls";
 
-    $headers = "From: $from";
-        
-    $fileobj = fopen($file, 'rb');
-    $data = fread($fileobj, filesize($file));
-    fclose($fileobj);
-      
-    $semi_rand = md5(time());
-    $mime_boundary = "==Multipart_Boundary_x{$semi_rand}x"; 
-
-    $headers .= "\nMIME-Version: 1.0\n" . 
-                "Content-Type: multipart/mixed;\n" . 
-                " boundary=\"{$mime_boundary}\"";
-
-    $message = "This is a multi-part message in MIME format.\n\n" . 
-            "--{$mime_boundary}\n" . 
-            "Content-Type: text/plain; charset=\"iso-8859-1\"\n" . 
-            "Content-Transfer-Encoding: 7bit\n\n" . 
-            $message . "\n\n";
-
-    $data = chunk_split(base64_encode($data));
-             
-    $message .= "--{$mime_boundary}\n" . 
-             "Content-Type: {$fileatttype};\n" . 
-             " name=\"{$fileattname}\"\n" . 
-             "Content-Disposition: attachment;\n" . 
-             " filename=\"{$fileattname}\"\n" . 
-             "Content-Transfer-Encoding: base64\n\n" . 
-             $data . "\n\n" . 
-             "--{$mime_boundary}--\n"; 
-          
-    if(mail($to, $subject, $message, $headers )) 
+    $mail = new mail($to, 'vilesci@'.DOMAIN, $subject, $message);
+    $mail->addAttachmentBinary($file, $fileatttype, $fileattname);
+    
+    if($mail->send())
 		echo "Email mit Lehrauftragsgesamtliste wurde versandt"; 
      else    
         echo "Fehler beim Versenden der Lehrauftragsgesamtliste"; 

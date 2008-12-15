@@ -19,8 +19,12 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+/*
+ * Formular zum Senden eins Feedbacks an die CIS-Administratoren
+ */
     require_once('../../config.inc.php');
     require_once('../../../include/functions.inc.php');
+    require_once('../../../include/mail.class.php');
 
     //Connection Herstellen
     if(!$sql_conn = pg_pconnect(CONN_STRING))
@@ -28,13 +32,12 @@
 
 	$user = get_uid();
 
-	if(check_lektor($user,$sql_conn))
-       $is_lector=true;
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <?php
-	if(isset($feedback_submit) && (!isset($message_sent) || $message_sent == "no"))
+	//Mail versenden
+	if(isset($feedback_submit))
 	{
 		$destination = MAIL_CIS;
 
@@ -48,41 +51,31 @@
 			{
 				if($row = pg_fetch_object($result))
 				{
-					if(mail($destination, "[CIS-Feedback]", $feedback_message, "FROM: feedback@".DOMAIN."\nREPLY-TO: $row->emailtw\n\n"))
+					$mail = new mail($destination,'feedback@'.DOMAIN, "[CIS-Feedback]", $feedback_message);
+					$mail->setReplyTo($row->emailtw);
+					if($mail->send())
 					{
-						echo '<script language="JavaScript">';
-						echo '	document.location.href = document.location.href + "?message_sent=yes";';
-						echo '</script>';
+						$message_sent=true;
 					}
 					else
 					{
-						echo '<script language="JavaScript">';
-						echo '	document.location.href = document.location.href + "?message_sent=no";';
-						echo '</script>';
+						$message_sent=false;
 					}
 				}
 				else
 				{
-					echo '<script language="JavaScript">';
-					echo '	document.location.href = document.location.href + "?message_sent=no";';
-					echo '</script>';
+					$message_sent=false;
 				}
 			}
 			else
 			{
-				echo '<script language="JavaScript">';
-				echo '	document.location.href = document.location.href + "?message_sent=no";';
-				echo '</script>';
+				$message_sent=false;
 			}
 		}
 		else
 		{
-			echo '<script language="JavaScript">';
-			echo '	document.location.href = document.location.href + "?message_sent=no";';
-			echo '</script>';
+			$message_sent=false;
 		}
-
-		exit;
 	}
 ?>
 <head>
@@ -117,14 +110,14 @@
 	  	<td>
 		  <form name="FeedbackFormular" method="post">
 		  <?php
-			if(isset($message_sent) && $message_sent == "yes")
+			if(isset($message_sent) && $message_sent)
 			{
 				echo "<h3>Vielen Dank f&uuml;r Ihr Feedback!</h3>";
 		  		echo "<h3>Ihre Nachricht wurde an das zust&auml;ndige Personal weitergeleitet.</h3></td>";
 
 				exit;
 			}
-			else if(isset($message_sent) && $message_sent == "no")
+			else if(isset($message_sent) && !$message_sent)
 			{
 				echo "<h3>Ihr Feedback wurde nicht weitergeleitet!</h3>";
 		  		echo "<h3>Bitte wenden Sie sich an die Administration.</h3></td>";

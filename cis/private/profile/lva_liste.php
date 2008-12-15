@@ -19,12 +19,15 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-
+/*
+ * Erstellt eine Liste mit dem Lehrveranstaltungen und Betreuungen denen der Lektor zugeteilt ist
+ */
 	require_once('../../config.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/studiengang.class.php');
 	require_once('../../../include/person.class.php');
 	require_once('../../../include/benutzer.class.php');
+	require_once('../../../include/mail.class.php');
 
 	$adress=MAIL_ADMIN;
 
@@ -37,9 +40,9 @@
 
 	if ($uid!=$user)
 	{
-		mail($adress,"Unerlaubter Zugriff auf Lehrveranstaltungen",
-			"User $user hat versucht die LVAs von User $uid zu betrachten!",
-			"From: vilesci@".DOMAIN);
+		//wenn der UID Parameter nicht dem eingeloggten User entspricht wird ein Mail an die Administratoren gesendet.
+		$mail = new mail($adress,'vilesci@'.DOMAIN,'Unerlaubter Zugriff auf Lehrveranstaltungen',"User $user hat versucht die LVAs von User $uid zu betrachten!");
+		$mail->send();
 		die("Keine Berechtigung!");
 	}
 
