@@ -261,13 +261,13 @@ if($stsem!='')
 	   			 	AND anmeldungreihungstest IS NOT NULL) AS interessentenrtanmeldung_w,
 	   				   			 
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
-	   				WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Bewerber' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1
+	   				WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Bewerber' AND studiensemester_kurzbz='$stsem'
 					) AS bewerber,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id) JOIN public.tbl_person USING(person_id)
-	   				WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Bewerber' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1 AND geschlecht='m'
+	   				WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Bewerber' AND studiensemester_kurzbz='$stsem' AND geschlecht='m'
 					) AS bewerber_m,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id) JOIN public.tbl_person USING(person_id)
-	   				WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Bewerber' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1 AND geschlecht='w'
+	   				WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Bewerber' AND studiensemester_kurzbz='$stsem' AND geschlecht='w'
 					) AS bewerber_w,
 					
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
@@ -288,7 +288,16 @@ if($stsem!='')
 				) AS student1sem_m,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id) JOIN public.tbl_person USING(person_id)
 					WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1 AND geschlecht='w'
-				) AS student1sem_w
+				) AS student1sem_w,
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
+					WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=3
+				) AS student3sem,
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id) JOIN public.tbl_person USING(person_id)
+					WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=3 AND geschlecht='m'
+				) AS student3sem_m,
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id) JOIN public.tbl_person USING(person_id)
+					WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=3 AND geschlecht='w'
+				) AS student3sem_w
 
 			FROM
 				public.tbl_studiengang stg
@@ -305,9 +314,10 @@ if($stsem!='')
 						<th class='table-sortable:numeric'>Interessenten (m/w)</th>
 						<th class='table-sortable:numeric'>Interessenten mit ZGV (m/w)</th>
 						<th class='table-sortable:numeric'>Interessenten mit RT Anmeldung (m/w)</th>
-						<th class='table-sortable:numeric'>Bewerber 1S (m/w)</th>
+						<th class='table-sortable:numeric'>Bewerber (m/w)</th>
 						<th class='table-sortable:numeric'>Aufgenommener (m/w)</th>
 						<th class='table-sortable:numeric'>Student 1S (m/w)</th>
+						<th class='table-sortable:numeric'>Student 3S (m/w)</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -324,6 +334,7 @@ if($stsem!='')
 			$content.= "<td align='center'>$row->bewerber ($row->bewerber_m / $row->bewerber_w)</td>";
 			$content.= "<td align='center'>$row->aufgenommener ($row->aufgenommener_m / $row->aufgenommener_w)</td>";
 			$content.= "<td align='center'>$row->student1sem ($row->student1sem_m / $row->student1sem_w)</td>";
+			$content.= "<td align='center'>$row->student3sem ($row->student3sem_m / $row->student3sem_w)</td>";
 			$content.= "</tr>";
 		}
 		$content.= '</tbody></table>';
@@ -340,11 +351,18 @@ if($stsem!='')
 	   			 	AND orgform_kurzbz='BB'
 					) AS interessenten_bb,	
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
+	   			 	AND orgform_kurzbz='FST'
+					) AS interessenten_fst,	
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
 	   				WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
 	   				AND (zgv_code IS NOT NULL OR zgvmas_code IS NOT NULL) AND orgform_kurzbz='BB') AS interessentenzgv_bb,
 	   			(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
 	   				WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
 	   				AND (zgv_code IS NOT NULL OR zgvmas_code IS NOT NULL) AND orgform_kurzbz='VZ') AS interessentenzgv_vz,
+	   			(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
+	   				WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
+	   				AND (zgv_code IS NOT NULL OR zgvmas_code IS NOT NULL) AND orgform_kurzbz='FST') AS interessentenzgv_FST,
 
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
@@ -352,6 +370,10 @@ if($stsem!='')
 	   			(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
 	   			 	AND anmeldungreihungstest IS NOT NULL AND orgform_kurzbz='BB') AS interessentenrtanmeldung_bb,
+	   			(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
+	   			 	AND anmeldungreihungstest IS NOT NULL AND orgform_kurzbz='FST') AS interessentenrtanmeldung_fst,
+
 	   			 (SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
 	   			 	AND reihungstest_id IS NOT NULL  AND orgform_kurzbz='BB') AS interessentenrttermin_bb,
@@ -360,29 +382,57 @@ if($stsem!='')
 	   			 	AND reihungstest_id IS NOT NULL  AND orgform_kurzbz='VZ') AS interessentenrttermin_vz,
 	   			 (SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
+	   			 	AND reihungstest_id IS NOT NULL  AND orgform_kurzbz='FST') AS interessentenrttermin_fst,
+	   			 	
+	   			 (SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
 	   			 	AND reihungstestangetreten AND orgform_kurzbz='VZ') AS interessentenrtabsolviert_vz,
 	   			 (SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
 	   			 	AND reihungstestangetreten AND orgform_kurzbz='BB') AS interessentenrtabsolviert_bb,
+	   			 (SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
+	   			 	AND reihungstestangetreten AND orgform_kurzbz='FST') AS interessentenrtabsolviert_fst,
+	   			 	
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
-	   				WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Bewerber' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1
+	   				WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Bewerber' AND studiensemester_kurzbz='$stsem'
 					AND orgform_kurzbz='BB') AS bewerber_bb,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
-	   				WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Bewerber' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1
+	   				WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Bewerber' AND studiensemester_kurzbz='$stsem'
 					AND orgform_kurzbz='VZ') AS bewerber_vz,
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
+	   				WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Bewerber' AND studiensemester_kurzbz='$stsem'
+					AND orgform_kurzbz='FST') AS bewerber_fst,
+					
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
 					WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem'
 					AND orgform_kurzbz='VZ') AS aufgenommener_vz,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
 					WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem'
 					AND orgform_kurzbz='BB') AS aufgenommener_bb,
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
+					WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem'
+					AND orgform_kurzbz='FST') AS aufgenommener_fst,
 
-					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
 					WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1
 					AND orgform_kurzbz='BB') AS student1sem_bb,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
 					WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1
-					AND orgform_kurzbz='VZ') AS student1sem_vz
+					AND orgform_kurzbz='VZ') AS student1sem_vz,
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
+					WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1
+					AND orgform_kurzbz='FST') AS student1sem_fst,
+					
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
+					WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=3
+					AND orgform_kurzbz='BB') AS student3sem_bb,
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
+					WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=3
+					AND orgform_kurzbz='VZ') AS student3sem_vz,
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
+					WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=3
+					AND orgform_kurzbz='FST') AS student3sem_fst
 			FROM
 				public.tbl_studiengang stg
 			WHERE
@@ -398,12 +448,13 @@ if($stsem!='')
 					<thead>
 						<tr>
 							<th class='table-sortable:default'>Studiengang</th>
-							<th class='table-sortable:numeric'>Interessenten VZ / BB</th>
-							<th class='table-sortable:numeric'>Interessenten mit ZGV VZ / BB</th>
-							<th class='table-sortable:numeric'>Interessenten mit RT Anmeldung VZ / BB</th>
-							<th class='table-sortable:numeric'>Bewerber 1S VZ / BB</th>
-							<th class='table-sortable:numeric'>Aufgenommener VZ / BB</th>
-							<th class='table-sortable:numeric'>Student 1S VZ / BB</th>
+							<th class='table-sortable:numeric'>Interessenten VZ / BB / FST</th>
+							<th class='table-sortable:numeric'>Interessenten mit ZGV VZ / BB / FST</th>
+							<th class='table-sortable:numeric'>Interessenten mit RT Anmeldung VZ / BB / FST</th>
+							<th class='table-sortable:numeric'>Bewerber 1S VZ / BB / FST</th>
+							<th class='table-sortable:numeric'>Aufgenommener VZ / BB / FST</th>
+							<th class='table-sortable:numeric'>Student 1S VZ / BB / FST</th>
+							<th class='table-sortable:numeric'>Student 3S VZ / BB / FST</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -414,12 +465,13 @@ if($stsem!='')
 				$content.= "\n";
 				$content.= '<tr>';
 				$content.= "<td>".strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
-				$content.= "<td align='center'>$row->interessenten_vz / $row->interessenten_bb</td>";
-				$content.= "<td align='center'>$row->interessentenzgv_vz / $row->interessentenzgv_bb</td>";
-				$content.= "<td align='center'>$row->interessentenrtanmeldung_vz / $row->interessentenrtanmeldung_bb</td>";
-				$content.= "<td align='center'>$row->bewerber_vz / $row->bewerber_bb</td>";
-				$content.= "<td align='center'>$row->aufgenommener_vz / $row->aufgenommener_bb</td>";
-				$content.= "<td align='center'>$row->student1sem_vz / $row->student1sem_bb</td>";
+				$content.= "<td align='center'>$row->interessenten_vz / $row->interessenten_bb / $row->interessenten_fst</td>";
+				$content.= "<td align='center'>$row->interessentenzgv_vz / $row->interessentenzgv_bb / $row->interessentenzgv_fst</td>";
+				$content.= "<td align='center'>$row->interessentenrtanmeldung_vz / $row->interessentenrtanmeldung_bb / $row->interessentenrtanmeldung_fst</td>";
+				$content.= "<td align='center'>$row->bewerber_vz / $row->bewerber_bb / $row->bewerber_fst</td>";
+				$content.= "<td align='center'>$row->aufgenommener_vz / $row->aufgenommener_bb / $row->aufgenommener_fst</td>";
+				$content.= "<td align='center'>$row->student1sem_vz / $row->student1sem_bb / $row->student1sem_fst</td>";
+				$content.= "<td align='center'>$row->student3sem_vz / $row->student3sem_bb / $row->student3sem_fst</td>";
 				$content.= "</tr>";
 			}
 			$content.= '</tbody></table>';
