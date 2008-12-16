@@ -198,6 +198,18 @@ if($stsem!='')
 		
 	}
 	
+	$gesamtsumme = $gesamt;
+	$gesamtsumme_prozent = $gesamt_prozent;
+	$gesamtsumme_bb = $gesamt_bb;
+	$gesamtsumme_vz = $gesamt_vz;
+	$gesamtsumme_m = $gesamt_m;
+	$gesamtsumme_w = $gesamt_w;
+	$gesamtsumme_at = $gesamt_at;
+	$gesamtsumme_eu = $gesamt_eu;
+	$gesamtsumme_noteu = $gesamt_noteu;
+	$gesamtsumme_inc = $gesamt_inc;
+	$gesamtsumme_out = $gesamt_out;
+	
 	//Master
 	echo '
 	<tr>
@@ -306,6 +318,28 @@ if($stsem!='')
 		echo "</tr>";
 		
 	}
+	$gesamtsumme += $gesamt;
+	$gesamtsumme_prozent = 100;
+	$gesamtsumme_bb += $gesamt_bb;
+	$gesamtsumme_vz += $gesamt_vz;
+	$gesamtsumme_m += $gesamt_m;
+	$gesamtsumme_w += $gesamt_w;
+	$gesamtsumme_at += $gesamt_at;
+	$gesamtsumme_eu += $gesamt_eu;
+	$gesamtsumme_noteu += $gesamt_noteu;
+	$gesamtsumme_inc += $gesamt_inc;
+	$gesamtsumme_out += $gesamt_out;
+	echo '<tr>';
+	echo '<td><b>GESAMTSUMME</b></td>';
+	echo "<td>&nbsp;</td>";
+	echo "<td align='center'><b>$gesamtsumme / ".sprintf('%0.2f', $gesamtsumme_prozent)." %</b></td>";
+	echo "<td align='center'><b>$gesamtsumme_inc / $gesamtsumme_out</b></td>";
+	echo "<td align='center'><b>$gesamtsumme_bb / $gesamtsumme_vz</b></td>";
+	echo "<td align='center'><b>$gesamtsumme_m / $gesamtsumme_w</b></td>";
+	echo "<td align='center'><b>$gesamtsumme_at</b></td>";
+	echo "<td align='center'><b>$gesamtsumme_eu</b></td>";
+	echo "<td align='center'><b>$gesamtsumme_noteu</b></td>";
+	echo "</tr>";
 	echo '</tbody></table>';
 }
 ?>
