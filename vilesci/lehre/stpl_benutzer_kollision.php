@@ -19,16 +19,20 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-
+/*
+ * Fuehrt eine Kollisionspruefung im Stundenplan auf Studentenebene durch
+ */
 require_once('../config.inc.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/functions.inc.php');
+require_once('../../include/studiengang.class.php');
 
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim Herstellen der Datenbankverbindung');
 
 $beginn = (isset($_GET['beginn'])?$_GET['beginn']:'');
 $ende = (isset($_GET['ende'])?$_GET['ende']:'');
+$stg_kz = (isset($_GET['stg_kz'])?$_GET['stg_kz']:'');
 $dontloadcontent=false;
 
 $user = get_uid();
@@ -85,6 +89,21 @@ echo '</SELECT>';
 echo " Beginn <INPUT type='text' size='10' id='beginn' name='beginn' value='$beginn'>";
 echo " Ende <INPUT type='text' size='10' id='ende' name='ende' value='$ende'>";
 
+$stg = new studiengang($conn);
+$stg->getAll('typ, kurzbzlang', true);
+echo ' Studiengang <SELECT name="stg_kz">';
+echo '<option value="">-- Alle --</option>';
+foreach ($stg->result as $row) 
+{
+	if($stg_kz==$row->studiengang_kz)
+		$selected='selected';
+	else 
+		$selected='';
+	
+	echo '<option value="'.$row->studiengang_kz.'" '.$selected.'>'.$row->kuerzel.'</option>';
+}
+echo '</SELECT>';
+
 echo " <INPUT type='submit' value='OK'>";
 
 echo '</form>';
@@ -92,14 +111,26 @@ echo '</form>';
 if($dontloadcontent)
 	exit;
 
-$qry = "SELECT datum, stunde, student_uid, count(student_uid) AS anzahl
-		FROM  lehre.vw_".$db_stpl_table."_student_unr
-		WHERE datum>='$beginn' AND datum<='$ende'
-		GROUP BY datum, stunde, student_uid
-		HAVING count(student_uid)>1
-		ORDER BY datum, stunde, student_uid LIMIT 30; 
-	   ";
-
+if($stg_kz=='')
+{
+	$qry = "SELECT datum, stunde, student_uid, count(student_uid) AS anzahl
+			FROM  lehre.vw_".$db_stpl_table."_student_unr
+			WHERE datum>='$beginn' AND datum<='$ende'
+			GROUP BY datum, stunde, student_uid
+			HAVING count(student_uid)>1
+			ORDER BY datum, stunde, student_uid LIMIT 30; 
+		   ";
+}
+else 
+{
+	$qry = "SELECT datum, stunde, student_uid, count(student_uid) AS anzahl
+			FROM  lehre.vw_".$db_stpl_table."_student_unr JOIN public.tbl_student USING(student_uid)
+			WHERE datum>='$beginn' AND datum<='$ende' AND studiengang_kz='$stg_kz'
+			GROUP BY datum, stunde, student_uid
+			HAVING count(student_uid)>1
+			ORDER BY datum, stunde, student_uid LIMIT 30; 
+		   ";
+}
 //echo $qry;
 echo '<table class="liste table-autosort:0 table-stripeclass:alternate table-autostripe">
 	<thead>';
@@ -129,5 +160,7 @@ if($result = pg_query($conn, $qry))
 }
 
 echo '</tbody></table>';
+if(pg_num_rows($result)>=30)
+	echo 'Info: Es werden nur die ersten 30 Eintr&auml;ge angezeigt!';
 echo '</body></html';
 ?>
