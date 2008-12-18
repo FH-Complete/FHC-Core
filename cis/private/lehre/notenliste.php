@@ -1,3 +1,34 @@
+<?php
+/* Copyright (C) 2008 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
+ */
+/*
+ * Erstellt eine Liste mit den Noten des eingeloggten Studenten
+ * das betreffende Studiensemester kann ausgewaehlt werden
+ */
+require_once('../../config.inc.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/studiensemester.class.php');
+require_once('../../../include/datum.class.php');
+?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 	<html>
 	<head>
@@ -32,15 +63,6 @@
 	    	<tr>
 	    	<td>
 <?php
-/*
- * Erstellt eine Notenliste des aktuellen Studiensemesters
- * zur Information fuer Studenten
- */
-
-
-require('../../../include/functions.inc.php');
-require('../../../include/studiensemester.class.php');
-require('../../config.inc.php');
 
 if(!$conn=pg_connect(CONN_STRING))
 	die("Die Datenbankverbindung konnte nicht hergestellt werden.");
@@ -51,6 +73,7 @@ else
 	$stsem = '';
 	
 $user = get_uid();
+$datum_obj = new datum();
 
 $error = '';
 
@@ -102,7 +125,7 @@ else
 
 	//Lehrveranstaltungen und Noten holen
 	$qry = "SELECT
-				tbl_lehrveranstaltung.bezeichnung, tbl_zeugnisnote.note, tbl_lvgesamtnote.note as lvnote
+				tbl_lehrveranstaltung.bezeichnung, tbl_zeugnisnote.note, tbl_lvgesamtnote.note as lvnote, tbl_zeugnisnote.benotungsdatum
 			FROM
 				lehre.tbl_lehrveranstaltung, lehre.tbl_zeugnisnote
 			LEFT OUTER JOIN
@@ -119,7 +142,7 @@ else
 	if($result=pg_query($conn,$qry))
 	{
 		//Tabelle anzeigen
-		$tbl= "<table><tr class='liste'><th>Lehrveranstaltung</th><th>LV-Note</th><th>Zeugnisnote</th></tr>";
+		$tbl= "<table><tr class='liste'><th>Lehrveranstaltung</th><th>LV-Note</th><th>Zeugnisnote</th><th>Benotungsdatum der Zeugnisnote</th></tr>";
 		$i=0;
 		while($row=pg_fetch_object($result))
 		{
@@ -168,6 +191,7 @@ else
 				case 13: $tbl.= "nicht erfolgreich Absolviert";	break;
 			}
 			$tbl .= "</td>";
+			$tbl .= '<td>'.$datum_obj->formatDatum($row->benotungsdatum,'d.m.Y').'</td>';
 			$tbl .= "</tr>";
 		}
 		
