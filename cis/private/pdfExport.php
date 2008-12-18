@@ -60,6 +60,11 @@ else
 $params='?xmlformat=xml';
 //if(isset($_GET['uid']))
 //	$params.='&uid='.$_GET['uid'];
+
+//Admins duerfen Dokumente anderer Personen drucken
+if($rechte->isBerechtigt('admin'))
+	$user = $_GET['uid'];
+
 $params.='&uid='.$user;
 if(isset($_GET['person_id']))
 	$params.='&person_id='.$_GET['person_id'];
@@ -78,9 +83,6 @@ if(isset($_GET['typ']))
 $konto = new konto($conn);
 if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 {
-	//Admins duerfen Dokumente anderer Personen drucken
-	if($rechte->isBerechtigt('admin'))
-		$user = $_GET['uid'];
 		
 	if($xsl=='Inskription' && (!$konto->checkStudienbeitrag($user, $_GET["ss"])))
 		die('Der Studienbeitrag wurde noch nicht bezahlt');		

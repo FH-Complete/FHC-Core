@@ -236,12 +236,15 @@ class zeitsperre
 	 * Speichert den aktuellen Datensatz
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function save()
+	function save($new = null)
 	{
 		//Gueltigkeit der Variablen pruefen
 		if(!$this->checkvars())
 			return false;
 
+		if(!is_null($new))
+			$this->new = $new;
+		
 		if($this->new)
 		{
 			//Neuen Datensatz anlegen
