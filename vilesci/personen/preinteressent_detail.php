@@ -73,6 +73,27 @@ echo '<html>
 		<!--
 		var selection = "'.htmlentities($selection).'";
 		
+		function checkschulid(schuleid)
+		{
+			if(schuleid!="")
+			{
+				dd = document.getElementById("firma")
+				//preufen ob die id im DD vorhanden ist
+				myoptions = dd.getElementsByTagName("option");
+				id="";
+				for(i=0;i<myoptions.length;i++)
+				{
+		
+					node = myoptions[i];
+					if(node.value==schuleid)
+						id=schuleid;
+				}
+				
+				document.getElementById("firma").value=id;
+			}
+			return true;
+		}
+		
 		function changeTo(id)
 		{
 			selection=id;
@@ -697,6 +718,7 @@ echo '</tr><tr>';
 $schule = new firma($conn);
 if($preinteressent->firma_id!='')
 	$schule->load($preinteressent->firma_id);
+	/*
 //SCHULTYP
 echo "<td>Schultyp:</td><td> <SELECT name='schultyp' id='schultyp' onchange='reloadSchulen()'>";
 echo "<option value=''>-- Alle --</option>";
@@ -711,23 +733,38 @@ foreach ($firmentyp->result as $row)
 		
 	echo "<option value='$row->firmentyp_kurzbz' $selected>$row->beschreibung</option>";
 }
-echo "</SELECT></td>";
+echo "</SELECT></td>";*/
+echo '<td>Schule ID:</td><td><input type="text" size="3" name="schule_id" id="schule_id" value="'.$preinteressent->firma_id.'" onkeyup="checkschulid(this.value)"></td>';
 
 //SCHULE
-echo "<td>Schule:</td><td colspan='5'> <SELECT id='firma' name='firma'>";
-$firma = new firma($conn);
-$firma->getFirmen($schule->firmentyp_kurzbz);
+echo "<td>Schule:</td><td colspan='5'> <SELECT id='firma' name='firma' onchange='document.getElementById(\"schule_id\").value=this.value'>";
+$qry = "SELECT plz, ort, strasse, tbl_firma.name, firma_id 
+		FROM public.tbl_firma LEFT JOIN public.tbl_adresse USING(firma_id) 
+		WHERE schule ORDER BY plz, name";
 echo "<option value='' >-- keine Angabe --</option>";
-foreach ($firma->result as $row)
+function shortname($name)
 {
-	if($row->firma_id==$preinteressent->firma_id)
-		$selected='selected';
-	else
-		$selected='';
-		
-	echo "<option value='$row->firma_id' $selected>$row->name</option>";
+	if(strlen($name)>40)
+	{
+		return substr($name, 0, 20).' ... '.substr($name, strlen($name)-20);
+	}
+	else 
+		return $name;
 }
-echo "</SELECT> <a href='../stammdaten/firma_frameset.html' target='_blank'>Schulverwaltung</a></td>";
+if($result = pg_query($conn, $qry))
+{
+	while($row = pg_fetch_object($result))
+	{
+		if($row->firma_id==$preinteressent->firma_id)
+			$selected='selected';
+		else
+			$selected='';
+		
+	echo "<option value='$row->firma_id' $selected>$row->plz $row->ort - ".shortname($row->name)." ($row->firma_id)</option>";
+	}
+}
+
+echo "</SELECT> <a href='../stammdaten/firma_frameset.html' target='_blank'><img src='../../skin/images/preferences-system.png' alt='Schulverwaltung' /></a></td>";
 
 echo '</tr><tr>';
 

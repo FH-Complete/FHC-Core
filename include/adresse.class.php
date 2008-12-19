@@ -182,6 +182,55 @@ class adresse
 		}
 		return true;
 	}
+	
+	// *************************************************************************
+	// * Laedt alle adressen zu der Firma die uebergeben wird
+	// * @param $firma_id ID der Firma zu der die Adressen geladen werden sollen
+	// * @return true wenn ok, false im Fehlerfall
+	// *************************************************************************
+	function load_firma($firma_id)
+	{
+		//Pruefen ob pers_id eine gueltige Zahl ist
+		if(!is_numeric($firma_id) || $firma_id == '')
+		{
+			$this->errormsg = 'firma_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		//Lesen der Daten aus der Datenbank
+		$qry = "SELECT * FROM public.tbl_adresse WHERE firma_id='$firma_id'";
+
+		if(!$res = pg_query($this->conn,$qry))
+		{
+			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
+			return false;
+		}
+
+		while($row = pg_fetch_object($res))
+		{
+			$adr_obj = new adresse($this->conn, null, null);
+
+			$adr_obj->adresse_id      = $row->adresse_id;
+			$adr_obj->heimatadresse = ($row->heimatadresse=='t'?true:false);
+			$adr_obj->gemeinde        = $row->gemeinde;
+			$adr_obj->name            = $row->name;
+			$adr_obj->nation          = $row->nation;
+			$adr_obj->ort             = $row->ort;
+			$adr_obj->person_id       = $row->person_id;
+			$adr_obj->plz             = $row->plz;
+			$adr_obj->strasse         = $row->strasse;
+			$adr_obj->typ             = $row->typ;
+			$adr_obj->firma_id		  = $row->firma_id;
+			$adr_obj->updateamum      = $row->updateamum;
+			$adr_obj->updatevon       = $row->updatevon;
+			$adr_obj->insertamum      = $row->insertamum;
+			$adr_obj->insertvon       = $row->insertvon;
+			$adr_obj->zustelladresse  = ($row->zustelladresse=='t'?true:false);
+
+			$this->result[] = $adr_obj;
+		}
+		return true;
+	}
 
 	// *******************************************
 	// * Prueft die Variablen auf Gueltigkeit
@@ -190,7 +239,7 @@ class adresse
 	function validate()
 	{
 		//Zahlenfelder pruefen
-		if(!is_numeric($this->person_id))
+		if(!is_numeric($this->person_id) && $this->person_id!='')
 		{
 			$this->errormsg='person_id enthaelt ungueltige Zeichen:'.$this->person_id.' - adresse: '.$this->adresse_id."\n";
 			return false;
