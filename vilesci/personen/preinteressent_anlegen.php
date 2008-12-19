@@ -365,9 +365,9 @@ $stsem = new studiensemester($conn);
 $stsem->getNextStudiensemester('WS');
 $studiensemester_kurzbz = (isset($_POST['studiensemester_kurzbz'])?$_POST['studiensemester_kurzbz']:$stsem->studiensemester_kurzbz);
 
-if(isset($_POST['schule_id']) && $_POST['schule_id']!='')
+if(isset($_REQUEST['schule_id']) && $_REQUEST['schule_id']!='')
 {
-	$schule = $_POST['schule_id'];
+	$schule = $_REQUEST['schule_id'];
 }
 elseif(isset($_POST['schule']))
 {
@@ -602,7 +602,7 @@ if(isset($_POST['save']))
 				window.opener.StudentProjektbetreuerMenulistPersonLoad(window.opener.document.getElementById('student-projektbetreuer-menulist-person'), '$nachname');
 				window.opener.MenulistSelectItemOnValue('student-projektbetreuer-menulist-person', $person->person_id);
 			</script>*/
-		die("<b>Person $vorname $nachname wurde erfolgreich angelegt</b><br><br><a href='preinteressent_anlegen.php'>Neuen Preinteressenten anlegen</a><br>");
+		die("<b>Person $vorname $nachname wurde erfolgreich angelegt</b><br><br><a href='preinteressent_anlegen.php?schule_id=".$schule."'>Neuen Preinteressenten anlegen</a><br>");
 	}
 	else
 	{
@@ -742,10 +742,11 @@ foreach ($stsem->studiensemester as $row)
 	echo "<option value='$row->studiensemester_kurzbz' $selected>$row->studiensemester_kurzbz</option>";
 }
 echo '</SELECT></td></tr>';
-echo '<tr><td>Schule: </td><td><SELECT id="schuledd" name="schule">';
+echo '<tr><td>Schule: </td><td><SELECT id="schuledd" name="schule" onchange="document.getElementById(\'schule_id\').value=this.value">';
 echo "<option value=''>-- keine Auswahl --</option>";
-$qry = "SELECT * FROM public.tbl_firma WHERE schule ORDER BY name";
-
+$qry = "SELECT plz, ort, strasse, tbl_firma.name, firma_id 
+		FROM public.tbl_firma LEFT JOIN public.tbl_adresse USING(firma_id) 
+		WHERE schule ORDER BY plz, name";
 //bei namen die laenger als 40 zeichen sind wird ein teil aus der mitte
 //herausgeschnitten damit das DD nicht zu gross wird
 function shortname($name)
@@ -767,11 +768,11 @@ if($result = pg_query($conn, $qry))
 		else 
 			$selected='';
 			
-		echo "<option value='$row->firma_id' title='$row->name' $selected>".shortname($row->name)." ( $row->firma_id )</option>";
+		echo "<option value='$row->firma_id' title='$row->name' $selected>$row->plz $row->ort - ".shortname($row->name)." ( $row->firma_id )</option>";
 	}
 }
 echo '</SELECT></td></tr>';
-echo '</tr><td>Schule ID:</td><td><input type="text" size="3" name="schule_id" value="'.$schule.'" onkeyup="checkschulid(this.value)"></td></tr>';
+echo '</tr><td>Schule ID:</td><td><input type="text" size="3" name="schule_id" id="schule_id" value="'.$schule.'" onkeyup="checkschulid(this.value)"></td></tr>';
 echo '<tr><td></td><td>';
 if(($vorname!='' && $geburtsdatum=='' && $nachname=='') 
    || ($vorname=='' && $geburtsdatum=='' && $nachname!='') 

@@ -115,10 +115,16 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 			else
 				return false;
 		}
+		
+		function sorttable()
+		{
+			//Meister IE braucht ein Timeout sonst sortiert er nicht
+			window.setTimeout("Table.sort(document.getElementById(\'mytab\'),\'asc\')",10);
+		}
 		-->
 		</script>
 	</head>
-	<body class="Background_main" style="margin-top:0px; padding-top:0px;" onload="Table.sort(document.getElementById(\'mytab\'),\'asc\')">
+	<body class="Background_main" style="margin-top:0px; padding-top:0px;" onload="sorttable()" >
 	<div style="position: fixed; background-color: white; width: 99%; padding-top:5px;">
 	<h2>PreInteressenten</h2>
 	';
