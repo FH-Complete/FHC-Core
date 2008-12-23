@@ -1,7 +1,7 @@
 body
 {
 	background-color: #F6F7FF;
-	font-family: Arial, Helvetica, Verdana, Geneva, sans-serif;
+	font-family: Tahoma, Arial, Helvetica, Verdana, Geneva, sans-serif;
 	font-size: small;
 	/*IE hack*/
 	voice-family: "\"}\"";
@@ -46,7 +46,6 @@ td.button
 	border-bottom: 1px solid #706D41;
 	border-left: 1px solid #FFFFFF;
 	cursor:	pointer;
-	font-family: arial, tahoma, verdana, helvetica, sans-serif, serif;
 	font-size: smaller; /*0.8em;*/
 	padding-left: 6px;
 	padding-right: 6px;
@@ -274,7 +273,6 @@ h3
 td
 {
 	margin:	4px;
-	font-family: arial, tahoma, verdana, helvetica, sans-serif, serif;
 	padding: 0px;
 	font-size: smaller; /*0.8em;*/
 }
@@ -286,7 +284,6 @@ div.logo
 	background-color: #CECF9C;
 	margin:	0px;
 	padding: 0px;
-	font-family: arial, tahoma, verdana, helvetica, sans-serif, serif;
 	font-size: smaller; /* 1em; */
 	border: none;
 	border-bottom: 2px solid #000000;
@@ -307,7 +304,6 @@ h2
 {
 	color: #666633;
 	font-size: medium; /*1.3em;*/
-	font-family: arial, tahoma, verdana, helvetica, sans-serif, serif;
 	font-weight: bold;
 	border: 2px solid #E6E6CC;
 	background-color: #F3F3E9;
@@ -319,7 +315,6 @@ h3
 {
 	color: #666633;
 	font-size: small;
-	font-family: arial, tahoma, verdana, helvetica, sans-serif, serif;
 	font-weight: bold;
 }
 
@@ -343,7 +338,6 @@ table.navbar td
 	color: #000000;
 	background-color: #F3F3E9;
 	text-align: center;
-	font-family: arial, tahoma, verdana, helvetica, sans-serif, serif;
 	font-size: smaller; /* 0.9em */
 	font-weight: bold;
 }
@@ -357,7 +351,6 @@ th.data
 {
 	color: #000000;
 	background-color: #E6E6CC;
-	font-family: arial, tahoma, verdana, helvetica, sans-serif, serif;
 	font-size: smaller; /* 0.9em */
 }
 
@@ -381,7 +374,6 @@ td.topbar
 	background-color: #CECF9C;
 	margin:	0px	0px;
 	padding: 0px;
-	font-family: arial, tahoma, verdana, helvetica, sans-serif, serif;
 	font-size: smaller; /*0.8em;*/
 	text-align: left;
 }
@@ -444,7 +436,6 @@ td.topbar
 a:active 
 {
 	color: #989973;
-	font-family: arial, tahoma, verdana, helvetica, sans-serif, serif;
 	font-weight: normal;
 	text-decoration: underline;
 }
@@ -452,28 +443,24 @@ a:active
 a,a:link
 {
 	color: #336699;
-	font-family: arial, tahoma, verdana, helvetica, sans-serif, serif;
 	text-decoration: none;
 }
 
 a:visited
 {
 	color: #336699;
-	font-family: arial, tahoma, verdana, helvetica, sans-serif, serif;
 	text-decoration: none;
 }
 
 a:hover
 {
 	color: #cc0000;
-	font-family: arial, tahoma, verdana, helvetica, sans-serif, serif;
 	text-decoration: none;
 }
 
 a.navlink:link, a.toplink:link
 {
 	color: #336699;
-	font-family: arial, tahoma, verdana, helvetica, sans-serif, serif;
 	font-weight: bold;
 	text-decoration: none;
 }
@@ -481,7 +468,6 @@ a.navlink:link, a.toplink:link
 a.navlink:visited, a.toplink:visited
 {
 	color: #336699;
-	font-family: arial, tahoma, verdana, helvetica, sans-serif, serif;
 	font-weight: bold;
 	text-decoration: none;
 }
@@ -489,7 +475,6 @@ a.navlink:visited, a.toplink:visited
 a.navlink:hover, a.toplink:hover
 {
 	color: #cc0000;
-	font-family: arial, tahoma, verdana, helvetica, sans-serif, serif;
 	font-weight: bold;
 	text-decoration: none;
 }
@@ -497,7 +482,6 @@ a.navlink:hover, a.toplink:hover
 a.navlink:active, a.toplink:active
 {
 	color: #cc0000;
-	font-family: arial, tahoma, verdana, helvetica, sans-serif, serif;
 	font-weight: bold;
 	text-decoration: none;
 }
@@ -522,7 +506,6 @@ pre
 
 pre.data
 {
-	font-family: arial, tahoma, verdana, helvetica, sans-serif, serif;
 	font-size: 100%;
 }
 
