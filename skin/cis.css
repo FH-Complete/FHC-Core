@@ -19,6 +19,7 @@ iframe
 	padding:0px;
 }
 
+@media screen {
 #menue
 {
 	top:8%;
@@ -42,7 +43,41 @@ html>body #content
 {
 	position:absolute;
 }
+}
 
+
+/*   Druckausgabe */
+
+
+@media print {
+
+.home_logo
+{
+display:none;
+}
+.header_line
+{
+display:none;
+}
+
+#menue
+{
+display:none;
+}
+#GlobalMenu
+{
+display:none;
+}
+
+#content
+{
+	width:800px;
+	height:900px;
+	left:0px;
+	overflow: hidden;
+}
+
+}
 
 input.TextBox					
 {
@@ -294,8 +329,9 @@ font.ContentHeader
 #news .news .titel
 {
 	font-weight: bold;
-	font-size: normal;
+	font-size: smaller;
 	padding: 0px 10px 0px 10px;
+	white-space: nowrap;
 }
 #news .news .text
 {
