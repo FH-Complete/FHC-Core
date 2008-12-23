@@ -49,9 +49,6 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<title>VileSci Men&uuml;</title>
 	<link href="../skin/vilesci.css" rel="stylesheet" type="text/css">
-	<style type="text/css">
-	</style>
-
 	<script language="JavaScript" type="text/javascript">
 	<!--
 		function js_toggle_container(conid)
@@ -76,12 +73,14 @@
 	</script>
 </head>
 
-<body style="background-color:#eeeeee;">
+<body>
+<!-- 23.12.2008 simane 
 <div class="logo">
 	<a href="intro.php" target="detail">
 		<img src="../skin/images/logo.png" width="200" height="50" alt="VileSci (FASonline)" title="VileSci" />
 	</a>
 </div>
+-->
 
 <?php
 function checkpermission($permissions)
