@@ -138,7 +138,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#anmerkung"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="lehrveranstaltung-treecol-fachbereich" label="Fachbereich" flex="1" hidden="false" persist="hidden, width, ordinal"
+				<treecol id="lehrveranstaltung-treecol-fachbereich" label="Institut" flex="1" hidden="false" persist="hidden, width, ordinal"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#fachbereich"/>
 				<splitter class="tree-splitter"/>
