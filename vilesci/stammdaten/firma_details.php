@@ -45,6 +45,7 @@
 	
 	$htmlstr = '';
 	$errorstr = '';
+	$messagestr='';
 	$reloadstr = '';
 	$error = false;
 	$firma_id = (isset($_REQUEST["firma_id"])?$_REQUEST['firma_id']:'');
@@ -128,7 +129,7 @@
 			}
 			else
 			{
-				$errorstr = 'Daten wurden gespeichert';
+				$messagestr = 'Adressdaten wurden erfolgreich gespeichert';
 			}
 		}
 	}
@@ -175,6 +176,7 @@
 				$reloadstr .= "	parent.uebersicht_firma.location.href='firma_uebersicht.php?filter='+parent.uebersicht_firma.filter+'&firmentypfilter='+parent.uebersicht_firma.firmentypfilter;";
 				$reloadstr .= " window.top.opener.StudentProjektarbeitFirmaRefresh();";
 				$reloadstr .= "</script>\n";
+				$messagestr='Firmendaten wurden erfolgreich gespeichert';
 			}
 			else
 			{
@@ -191,6 +193,7 @@
 <html>
 <head>
 <title>Firma - Details</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <script src="../../include/js/mailcheck.js"></script>
 <script src="../../include/js/datecheck.js"></script>
@@ -198,7 +201,7 @@
 
 function confdel()
 {
-	if(confirm("Diesen Datensatz wirklick loeschen?"))
+	if(confirm("Diesen Datensatz wirklich loeschen?"))
 	  return true;
 	return false;
 }
@@ -209,6 +212,10 @@ function confdel()
 
 <?php
 	//Formular fuer die Firmendaten
+	if($errorstr!='')
+		echo "<div class='inserterror'>".$errorstr."</div>\n";
+	elseif($messagestr!='')
+		echo "<div class='insertok'>".$messagestr."</div>\n";
 	
 	$firma = new firma($conn);
 	if($firma_id!='')
@@ -249,7 +256,11 @@ function confdel()
 			echo "				<option value='".$row->firmentyp_kurzbz."' ".$sel.">".$row->firmentyp_kurzbz."</option>";
 		}
 	}
-	echo "		</select></td></tr><tr>\n";
+	echo "		</select></td>";
+	
+	echo "		<td>Schule: </td>";
+	echo "		<td><input type='checkbox' name='schule' ".($firma->schule?'checked':'')."></td>\n";
+	echo "</tr><tr>\n";
 		
 	echo "		<td>EMail: </td>";
 	echo "		<td><input type='text' name='email' value='".htmlentities($firma->email)."' size='40' maxlength='128' /></td>\n";
@@ -262,13 +273,10 @@ function confdel()
 	echo "</tr><tr valign='top'>";
 	echo "		<td>Anmerkung: </td>";
 	echo "		<td colspan='5'><textarea style='width:100%' name='anmerkung'/>".htmlentities($firma->anmerkung)."</textarea></td>\n";
-	echo "		<td>Schule: </td>";
-	echo "		<td><input type='checkbox' name='schule' ".($firma->schule?'checked':'')."<br><input type='submit' name='save' value='speichern'></td>";
+	echo "		<td></td><td valign='bottom'><input type='submit' name='save' value='speichern'></td>\n";
 	echo "	</tr></table>\n";
 	echo "</form>\n";
-				
-	echo "<div class='inserterror'>".$errorstr."</div>\n";
-	
+		
 	//Nationen laden
 	$nation_arr = array();
 	$nation = new nation($conn);
@@ -280,9 +288,9 @@ function confdel()
 	$adresstyp_arr = array('h'=>'Hauptwohnsitz','n'=>'Nebenwohnsitz','f'=>'Firma',''=>'');
 
 	// Formular fuer die Adressdaten
-	echo "<h3>Adressen:</h3>";
+	//echo "<h3>Adressen:</h3>";
 	echo "<form action='".$_SERVER['PHP_SELF']."?firma_id=$firma_id' method='POST' />";
-	echo "<table class='liste'><tr><th>STRASSE</th><th>PLZ</th><th>ORT</th><th>GEMEINDE</th><th>NATION</th><th>TYP</th><th>HEIMAT</th><th>ZUSTELLUNG</th></tr>";
+	echo "<table class='liste'><tr><th>STRASSE</th><th>PLZ</th><th>ORT</th><th>GEMEINDE</th><th>NATION</th><th>TYP</th><th><font size='0'>Heimatadr.</font></th><th><font size='0'>Zustelladr.</font></th></tr>";
 	$adresse_obj = new adresse($conn);
 	$adresse_obj->load_firma($firma_id);
 
@@ -298,8 +306,8 @@ function confdel()
 		echo "<td>".$adresstyp_arr[$row->typ]."</td>";
 		echo "<td>".($row->heimatadresse?'Ja':'Nein')."</td>";
 		echo "<td>".($row->zustelladresse?'Ja':'Nein')."</td>";
-		echo "<td><a href='".$_SERVER['PHP_SELF']."?editadresse=true&adresse_id=$row->adresse_id&firma_id=$firma_id'>bearbeiten</a></td>";
-		echo "<td><a href='".$_SERVER['PHP_SELF']."?deleteadresse=true&adresse_id=$row->adresse_id&firma_id=$firma_id' onclick='return confdel()'>loeschen</a></td>";
+		echo "<td><a href='".$_SERVER['PHP_SELF']."?editadresse=true&adresse_id=$row->adresse_id&firma_id=$firma_id'><img src='../../skin/images/application_form_edit.png' alt='bearbeiten' title='bearbeiten' /></a></td>";
+		echo "<td><a href='".$_SERVER['PHP_SELF']."?deleteadresse=true&adresse_id=$row->adresse_id&firma_id=$firma_id' onclick='return confdel()'><img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";
 	}
 
 	$savebuttonvalue='Neu';
@@ -366,7 +374,7 @@ function confdel()
 	echo "</SELECT></td>";
 	echo "<td><input type='checkbox' name='heimatadresse' ".($heimatadresse?'checked':'')." /></td>";
 	echo "<td><input type='checkbox' name='zustelladresse' ".($zustelladresse?'checked':'')." /></td>";
-	echo "<td><input type='submit' name='saveadresse' value='$savebuttonvalue' /></td>";
+	echo "<td colspan='2'><input type='submit' name='saveadresse' value='$savebuttonvalue' /></td>";
 
 	echo "</table>";
 	echo "</form>";

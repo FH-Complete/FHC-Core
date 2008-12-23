@@ -564,6 +564,12 @@ input, textarea, select
 	width:100%;
 	text-align:center;
 }
+.insertok
+{
+	background-color:#68AC50;
+	width:100%;
+	text-align:center;
+}
 
 /* Sortable tables */
 table.sortable thead 
