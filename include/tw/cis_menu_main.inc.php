@@ -387,6 +387,11 @@
 						<td class="tdwrap"><a class="Item" href="public/info/verordnungen/EDV_Richtlinien.doc" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;EDV Richtlinien</a></td>
 					</tr>
 					<tr>
+					  	<td class="tdwidth10" nowrap>&nbsp;</td>
+						<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Datensicherung_und_Archivierung.doc" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Datensicherung und Archivierung</a></td>
+					</tr>
+					
+					<tr>
 					    <td class="tdwidth10" nowrap>&nbsp;</td>
 						<td class="tdwrap"><a href="?Verordnungen" class="MenuItem" onClick="return(js_toggle_container('Laborordnung'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Laborordnung</a>
 						  	<table class="tabcontent" id="Laborordnung" style="display: none">

@@ -208,6 +208,7 @@ class moodle_user
 					return false;
 				}
 				
+				$this->createGlobaleGastrolle($this->mdl_user_id);				
 			}
 			
 			//Lektoren loeschen die nicht mehr zugeordnet sind
@@ -364,6 +365,9 @@ class moodle_user
 							$this->errormsg = 'Fehler beim Auslesen der Rollen';
 							return false;
 						}
+						
+						//globale Gastrolle anlegen
+						$this->createGlobaleGastrolle($this->mdl_user_id);
 					
 						//Gruppenzuteilung
 						if($gruppensync)
@@ -665,6 +669,43 @@ class moodle_user
 		else 
 		{
 			$this->errormsg = 'Fehler beim Speichern der Zuteilung';
+			return false;
+		}
+	}
+	
+	// *********************************************
+	// * Fuegt dem User die globale Gastrolle hinzu
+	// * @param $mdl_user_id Moodle ID des Users der
+	// *                     die GastRolle bekommt
+	// * @return true wenn ok, false wenn Fehler
+	// *********************************************
+	function createGlobaleGastrolle($mdl_user_id)
+	{
+	
+		//Nachschauen ob diese Person bereits eine globale Gastrolle hat
+		$qry = "SELECT 1 FROM public.mdl_role_assignments 
+				WHERE 
+				userid='".addslashes($mdl_user_id)."' AND 
+				contextid='1' AND
+				roleid='6'";
+		
+		if($result = pg_query($this->conn_moodle, $qry))
+		{
+			if(pg_num_rows($result)==0)
+			{
+				//noch nicht zugeteilt
+				if($this->createZuteilung($mdl_user_id, 1, 6))
+				{
+					$this->log.="\n$this->mdl_user_firstname $this->mdl_user_lastname wurde die globale Gastrolle zugeteilt";
+					$this->log_public.="\n$this->mdl_user_firstname $this->mdl_user_lastname wurde die globale Gastrolle zugeteilt";
+				}
+				else 
+					$this->log.="\nFehler beim Anlegen der Gast-Zuteilung: $this->errormsg";
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Auslesen der Rollen';
 			return false;
 		}
 	}
