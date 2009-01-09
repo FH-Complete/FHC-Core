@@ -34,6 +34,69 @@ if (!$conn = pg_pconnect(CONN_STRING))
 
 echo '<H1>Systemcheck!</H1>';
 echo '<H2>DB-Updates!</H2>';
+// ************** campus.tbl_paabgabetyp **************************************************
+if(!@pg_query($conn, 'SELECT * FROM campus.tbl_paabgabetyp LIMIT 1;'))
+{
+	$sql =" ALTER TABLE lehre.tbl_projektarbeit ADD COLUMN seitenanzahl integer;
+			ALTER TABLE lehre.tbl_projektarbeit ADD COLUMN abgabedatum date;
+			ALTER TABLE lehre.tbl_projektarbeit ADD COLUMN kontrollschlagwoerter varchar(150);
+			ALTER TABLE lehre.tbl_projektarbeit ADD COLUMN schlagwoerter varchar(150);	
+			ALTER TABLE lehre.tbl_projektarbeit ADD COLUMN schlagwoerter_de varchar(150);
+			ALTER TABLE lehre.tbl_projektarbeit ADD COLUMN abstract text;
+			ALTER TABLE lehre.tbl_projektarbeit ADD COLUMN abstract_en text;
+			
+			CREATE TABLE campus.tbl_paabgabe
+			(
+   				paabgabe_id Serial NOT NULL,
+   				projektarbeit_id integer NOT NULL,
+   				paabgabetyp_kurzbz Varchar(16) NOT NULL,
+   				fixtermin Boolean NOT NULL Default FALSE,
+   				datum Date NOT NULL,
+   				kurzbz Varchar(256),
+   				abgabedatum Date,
+   				insertvon Varchar(32),
+   				insertamum Timestamp,
+   				updatevon Varchar(32),
+   				updateamum Timestamp,
+				constraint pk_paabgabe primary key (paabgabe_id)
+			);
+			
+			Create table campus.tbl_paabgabetyp
+			(
+   				paabgabetyp_kurzbz Varchar(16) NOT NULL,
+   				bezeichnung Varchar(64),
+				constraint pk_paabgabetyp primary key (paabgabetyp_kurzbz)
+			); 
+			
+			Comment on column campus.tbl_paabgabe.fixtermin Is 'Gibt es eine harte oder weiche Deadline?';
+			Comment on column campus.tbl_paabgabe.datum Is 'Wann soll abgegeben werden?';
+			Comment on column campus.tbl_paabgabe.abgabedatum Is 'Wann wurde wirklich abgegeben?';
+			
+			Alter table campus.tbl_paabgabe add Constraint projektarbeit_paabgabe foreign key (projektarbeit_id) references lehre.tbl_projektarbeit (projektarbeit_id) on update cascade on delete restrict;
+			Alter table campus.tbl_paabgabe add Constraint paabgabetyp_paabgabe foreign key (paabgabetyp_kurzbz) references campus.tbl_paabgabetyp (paabgabetyp_kurzbz) on update cascade on delete restrict;
+			
+			Grant select on lehre.tbl_projektarbeit to group web;
+			Grant update on lehre.tbl_projektarbeit to group web;
+			Grant select on campus.tbl_paabgabe to group admin;
+			Grant update on campus.tbl_paabgabe to group admin;
+			Grant delete on campus.tbl_paabgabe to group admin;
+			Grant insert on campus.tbl_paabgabe to group admin;
+			Grant select on campus.tbl_paabgabe to group web;
+			Grant update on campus.tbl_paabgabe to group web;
+			Grant delete on campus.tbl_paabgabe to group web;
+			Grant insert on campus.tbl_paabgabe to group web;
+			Grant select on campus.tbl_paabgabetyp to group admin;
+			Grant update on campus.tbl_paabgabetyp to group admin;
+			Grant delete on campus.tbl_paabgabetyp to group admin;
+			Grant insert on campus.tbl_paabgabetyp to group admin;
+			Grant select on campus.tbl_paabgabetyp to group web; 
+	";
+	
+	if(!@pg_query($conn, $sql))
+		echo '<strong>campus.tbl_paabgabe: '.pg_last_error($conn).' </strong><br>';
+	else 
+		echo ' campus.tbl_paabgabe wurde hinzugefuegt!<br>';
+}
 
 // ************** bis.tbl_orgform.rolle **********************************************
 if (!@pg_query($conn,'SELECT rolle FROM bis.tbl_orgform LIMIT 1;'))

@@ -376,9 +376,9 @@ class moodle_course
 		$this->getContext(40, $id_sem);
 		
 		//Eintrag in tbl_mdl_course
-		$qry = "INSERT INTO public.mdl_course(category, sortorder, fullname, shortname, format, showgrades, newsitems, enrollable)
+		$qry = "INSERT INTO public.mdl_course(category, sortorder, fullname, shortname, format, showgrades, newsitems, enrollable, guest)
 				VALUES (".$this->addslashes($id_sem).", (SELECT max(sortorder)+1 FROM public.mdl_course), ".$this->addslashes($this->mdl_fullname).", ".
-				$this->addslashes($this->mdl_shortname).",'topics', 1, 5, 0);";
+				$this->addslashes($this->mdl_shortname).",'topics', 1, 5, 0, 1);";
 		
 		if($result = pg_query($this->conn_moodle, $qry))
 		{
@@ -812,9 +812,9 @@ class moodle_course
 		$this->getContext(40, $id_stsem);
 		
 		//Eintrag in tbl_mdl_course
-		$qry = "INSERT INTO public.mdl_course(category, sortorder, fullname, shortname, format, showgrades, newsitems, enrollable)
+		$qry = "INSERT INTO public.mdl_course(category, sortorder, fullname, shortname, format, showgrades, newsitems, enrollable, guest)
 				VALUES (".$this->addslashes($id_stsem).", (SELECT max(sortorder)+1 FROM public.mdl_course), ".$this->addslashes($this->mdl_fullname).", ".
-				$this->addslashes($this->mdl_shortname).",'topics', 1, 5, 0);";
+				$this->addslashes($this->mdl_shortname).",'topics', 1, 5, 0, 1);";
 		
 		if($result = pg_query($this->conn_moodle, $qry))
 		{
