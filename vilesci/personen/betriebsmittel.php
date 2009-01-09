@@ -48,7 +48,7 @@ echo '<html>
 		<script language="Javascript">
 		function confdel()
 		{
-			return confirm("Wollen Sie diesen Eintrag wirklick loeschen");
+			return confirm("Wollen Sie diesen Eintrag wirklich loeschen");
 		}
 		</script>
 	</head>

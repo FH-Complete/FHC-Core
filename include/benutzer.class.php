@@ -64,7 +64,7 @@ class benutzer extends person
 	// ***********************************************************
 	function load($uid)
 	{
-		$qry = "SELECT * FROM public.tbl_benutzer WHERE uid='$uid'";
+		$qry = "SELECT * FROM public.tbl_benutzer WHERE uid='".addslashes($uid)."'";
 		if($result = pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($result))

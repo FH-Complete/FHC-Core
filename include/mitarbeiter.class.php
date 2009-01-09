@@ -81,7 +81,7 @@ class mitarbeiter extends benutzer
 		if(!benutzer::load($uid))
 			return false;
 
-		$qry = "SELECT * FROM public.tbl_mitarbeiter LEFT JOIN campus.tbl_resturlaub USING(mitarbeiter_uid) WHERE mitarbeiter_uid='$uid'";
+		$qry = "SELECT * FROM public.tbl_mitarbeiter LEFT JOIN campus.tbl_resturlaub USING(mitarbeiter_uid) WHERE mitarbeiter_uid='".addslashes($uid)."'";
 		if($result = pg_query($this->conn, $qry))
 		{
 			if($row = pg_fetch_object($result))

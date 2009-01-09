@@ -512,15 +512,28 @@ $datum_obj = new datum();
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 
+//wenn eine Uebung oder LE-Gesamtnote existiert die Note aus dem Uebungstool uebernehmen
+//sonst aus dem Moodle
 $qry = "SELECT 
-			* 
+			1 
 		FROM 
 			lehre.tbl_lehrveranstaltung 
 			JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id)
 			JOIN campus.tbl_uebung USING(lehreinheit_id)
 		WHERE 
 			studiensemester_kurzbz='".addslashes($stsem)."' AND
-			lehrveranstaltung_id='".addslashes($lvid)."'";
+			lehrveranstaltung_id='".addslashes($lvid)."'
+		UNION
+		SELECT 
+			1
+		FROM
+			campus.tbl_legesamtnote 
+		WHERE 
+			lehreinheit_id in (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit 
+								WHERE studiensemester_kurzbz='".addslashes($stsem)."' AND
+								lehrveranstaltung_id='".addslashes($lvid)."')
+		
+		";
 if($result = pg_query($conn, $qry))
 {
 	if(pg_num_rows($result)>0)
