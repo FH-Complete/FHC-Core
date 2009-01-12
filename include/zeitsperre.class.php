@@ -345,6 +345,5 @@ class zeitsperre
 		}
 		return $erbk;
 	}
-
 }
 ?>
