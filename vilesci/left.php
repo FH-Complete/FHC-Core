@@ -57,12 +57,12 @@
 				if (document.getElementById(conid).style.display=='none')
 				{
 					document.getElementById(conid).style.display='block';
-					document.getElementById(conid+'_dot').innerHTML='&#8211; ';
+					document.getElementById(conid+'_dot').innerHTML='<img src="../skin/images/page_green.png" alt="page close" border="0">&nbsp;';
 				}
 	        	else
 	        	{
 					document.getElementById(conid).style.display='none';
-					document.getElementById(conid+'_dot').innerHTML='+ ';
+					document.getElementById(conid+'_dot').innerHTML='<img src="../skin/images/page_go.png" alt="page go" border="0">&nbsp;';
 				}
    			}
    			catch(e){alert(e)}
@@ -72,14 +72,16 @@
 	</script>
 </head>
 
-<body>
-<!-- 23.12.2008 simane 
-<div class="logo">
-	<a href="intro.php" target="detail">
-		<img src="../skin/images/logo.png" width="200" height="50" alt="VileSci (FASonline)" title="VileSci" />
+
+
+<body  style="background-color:#eeeeee;">
+
+<div class="logo" style="background-color:#FFFFFF;">
+	<a href="index.html" target="_top">
+		<img border="0" src="../skin/images/Vilesci_klein.gif" alt="VileSci (FASonline)" title="VileSci" />
 	</a>
 </div>
--->
+
 
 <?php
 function checkpermission($permissions)
@@ -99,12 +101,20 @@ function checkpermission($permissions)
 
 if ($berechtigung->isBerechtigt('admin'))
 {
-	echo '<div>
-			<a href="admin/menu.html" target="main">Admin</a>
+
+
+	echo '
+	<div class="logo">
+		<div>
+			<a href="admin/menu.html" target="main"><img src="../skin/images/application_go.png" alt="go" border="0">&nbsp;Admin</a>
 		</div>
 		<div>
-			<a href="https://sdtools.technikum-wien.at" target="main">SDTools</a>
-		</div><hr>';
+			<a href="https://sdtools.technikum-wien.at" target="main"><img src="../skin/images/application_go.png" alt="go" border="0">&nbsp;SDTools</a>
+		</div>
+	</div>		
+		';
+		
+
 }
 foreach($menu AS $m)
 {
@@ -122,11 +132,11 @@ foreach($menu AS $m)
 	
 	if ($opener)
 	{
-		echo '<SPAN style="cursor: pointer;" id="'.$m['name'].'_dot" onclick="js_toggle_container('."'".$m['name']."'".')" style="font-weight:bold">';
+		echo '<SPAN style="cursor: pointer;" id="'.$m['name'].'_dot" onclick="js_toggle_container('."'".$m['name']."'".')">';
 		if ($hide)
-			echo '+ ';
+			echo '<img src="../skin/images/page_go.png" alt="page go" border="0">&nbsp;';
 		else
-			echo '&#8211; ';
+			echo '<img src="../skin/images/page_green.png" alt="page close" border="0">&nbsp;';
 		echo '</SPAN>';
 	}
 	else
@@ -138,15 +148,20 @@ foreach($menu AS $m)
 		echo 'target="'.$m['target'].'" ';
 	if (isset($m['link']))
 		echo '>';
-	if (isset($m['name']))
+
+	if (isset($m['name']) && isset($m['link']))
 		echo '<u><strong>'.$m['name'].'</strong></u>';
+	else if (isset($m['name']) )
+		echo '<u><strong  style="cursor: pointer;" id="'.$m['name'].'_dot" onclick="js_toggle_container('."'".$m['name']."'".')">'.$m['name'].'</strong></u>';
+		
 	if (isset($m['link']))
 		echo '</a>';
+		
 	if ($hide)
 		$display='none';
 	else
 		$display='block';
-	echo "\n<DIV>\n".'<SPAN id="'.$m['name'].'" style="display:'.$display.'">';
+	echo "\n<DIV >\n".'<SPAN id="'.$m['name'].'" style="display:'.$display.'">';
 	foreach($m AS $m1)
 		if (is_array($m1) && isset($m1['name']))
 		{
@@ -166,22 +181,29 @@ foreach($menu AS $m)
 			{
 				echo "\n\t".'<SPAN style="cursor: pointer;" onclick="js_toggle_container('."'".$m1['name']."'".')">';
 				if ($hide)
-					echo '+ ';
+					echo '<img src="../skin/images/page_go.png" alt="page go" border="0">&nbsp;';
 				else
-					echo '&#8211; ';
+					echo '<img src="../skin/images/page_green.png" alt="page close" border="0">&nbsp;';
 				echo "\n\t\t</SPAN>";
 			}
+			else if (isset($m1['link']))
+				echo "\t &nbsp;&nbsp;&nbsp;<img src=\"../skin/images/bullet_go.png\" alt=\"page go\" border=\"0\">";
 			else
-				echo "\t &nbsp;&nbsp;&nbsp;&nbsp;&middot; ";
-
+				echo "\t &nbsp;&nbsp;&nbsp;&nbsp;";
+			
 			if (isset($m1['link']))
 				echo '<a href="'.$m1['link'].'" ';
 			if (isset($m1['target']))
 				echo 'target="'.$m1['target'].'" ';
 			if (isset($m1['link']))
 				echo '>';
-			if (isset($m1['name']))
+			if (isset($m1['name']) && $opener )
 				echo '<strong>'.$m1['name'].'</strong>';
+			else if (isset($m1['name']) && !isset($m1['link']) )
+				echo '<strong style="font-size: smaller;">'.$m1['name'].'</strong>';
+			else
+				echo '<strong>'.$m1['name'].'</strong>';
+				
 			if (isset($m1['link']))
 				echo '</a>';
 			if ($hide)
@@ -196,11 +218,11 @@ foreach($menu AS $m)
 					if (isset($m2['permissions']) && !checkpermission($m2['permissions']))
 						continue;
 					if (isset($m2['link']))
-						echo "\n\t\t".'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&middot; <a href="'.$m2['link'].'" ';
+						echo "\n\t\t".'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$m2['link'].'" ';
 					if (isset($m2['target']))
 						echo 'target="'.$m2['target'].'" ';
 					if (isset($m2['link']))
-						echo '>';
+						echo '><img title="'.$m2['name'].'" src="../skin/images/bullet_go.png" alt="page go" border="0">&nbsp;';
 					if (isset($m2['name']))
 						echo $m2['name'];
 					if (isset($m2['link']))
@@ -212,5 +234,7 @@ foreach($menu AS $m)
 }
 
 ?>
+<hr />
+<a href="index.html" target="_top"><img title="'.$m2['name'].'" src="../skin/images/application_home.png" alt="page go" border="0">&nbsp;Home</a>
 </body>
 </html>
