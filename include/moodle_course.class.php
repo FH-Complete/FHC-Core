@@ -48,7 +48,16 @@ class moodle_course
 	var $mdl_context_instanceid;
 	var $mdl_context_path;	
 	var $mdl_context_depth;
-	
+
+	var $lehrveranstaltung_bezeichnung;
+	var $lehrveranstaltung_semester;			
+	var	$lehrveranstaltung_studiengang_kz;
+
+	var	$mdl_benotungen;
+	var	$mdl_resource;
+	var	$mdl_quiz;
+	var	$mdl_chat;
+		
 	var $note;
 
 	// **********************************************
@@ -94,7 +103,7 @@ class moodle_course
 			return false;
 		}
 	}
-
+	
 	// **********************************************
 	// * Laedt alle MoodleKurse die zu einer LV/Stsem
 	// * plus die MoodleKurse die auf dessen LE haengen
@@ -150,6 +159,144 @@ class moodle_course
 		}
 					
 	}
+
+
+	// **********************************************
+	// * Laedt alle MoodleKurse die zu einer LV/Stsem
+	// * plus die MoodleKurse die auf dessen LE haengen
+	// * @param lehrveranstaltung_id
+	// *        studiensemester_kurzbz
+	// * @return true wenn ok, false im Fehlerfall
+	// **********************************************
+	function getAllVariant($lehrveranstaltung_id='',$studiensemester_kurzbz='',$studiengang='',$semester='',$detail=false)
+	{
+			// Initialisierung
+			$this->errormsg = '';
+			$this->result=array();
+			
+#				,tbl_moodle.*
+				
+			$qry = "SELECT distinct tbl_lehreinheit.studiensemester_kurzbz,tbl_lehrveranstaltung.semester
+				,tbl_lehrveranstaltung.bezeichnung,tbl_lehrveranstaltung.kurzbz,tbl_lehrveranstaltung.lehrveranstaltung_id,tbl_lehrveranstaltung.studiengang_kz,tbl_lehrveranstaltung.semester 
+				,tbl_moodle.mdl_course_id
+			FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit,lehre.tbl_moodle
+			where tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id 
+			 and ((tbl_moodle.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
+			 		and tbl_moodle.studiensemester_kurzbz=lehre.tbl_lehreinheit.studiensemester_kurzbz)
+			  OR
+				 (tbl_moodle.lehreinheit_id=tbl_lehreinheit.lehreinheit_id))
+			";
+		
+		if ($lehrveranstaltung_id!='')
+			$qry.=" and tbl_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."' ";
+
+		if ($studiensemester_kurzbz!='')
+			$qry.=" and tbl_lehreinheit.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' ";
+
+		if ($studiengang!='')
+			$qry.=" and tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang)."' ";
+
+		if ($semester!='')
+			$qry.=" and tbl_lehrveranstaltung.semester='".addslashes($semester)."' ";
+
+		$qry.=";";					
+#exit($qry);
+		
+					
+		if(!$result = @pg_query($this->conn, $qry))
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+
+		while($row=@pg_fetch_object($result))
+		{
+			$obj = new moodle_course($this->conn, $this->conn_moodle);
+#			$obj->moodle_id = $row->moodle_id;
+			$obj->mdl_course_id = $row->mdl_course_id;
+#			$obj->lehreinheit_id = $row->lehreinheit_id;
+			$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+			$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+#			$obj->insertamum = $row->insertamum;
+#			$obj->insertvon = $row->insertvon;
+#			$obj->gruppen = ($row->gruppen=='t'?true:false);
+			$obj->lehrveranstaltung_kurzbz=$row->kurzbz;
+			
+			$obj->lehrveranstaltung_bezeichnung=$row->bezeichnung;
+			$obj->lehrveranstaltung_semester=$row->semester;			
+			$obj->lehrveranstaltung_studiengang_kz=$row->studiengang_kz;
+
+			$qry_mdl = "SELECT * FROM public.mdl_course WHERE id='".addslashes($row->mdl_course_id)."'";
+			if($result_mdl = @pg_query($this->conn_moodle, $qry_mdl))
+			{
+				if($row_mdl = @pg_fetch_object($result_mdl))
+				{
+					$obj->mdl_fullname = $row_mdl->fullname;
+					$obj->mdl_shortname = $row_mdl->shortname;
+				}
+			}
+
+
+
+			// Anzahl Benotungen
+			$obj->mdl_benotungen = 0;
+			
+			// Anzahl Aktivitaeten und Lehrmaterial
+			$obj->mdl_resource = 0;
+			$obj->mdl_quiz = 0;
+			$obj->mdl_chat = 0;
+			
+
+			// Anzahl Noten je Kurs und User			
+			$qry_mdl = "select count(*) as anz
+				from mdl_grade_grades , mdl_grade_items
+				where mdl_grade_items.itemtype='course'
+				and mdl_grade_grades.finalgrade IS NOT NULL 
+				and mdl_grade_grades.itemid=mdl_grade_items.id
+				and mdl_grade_items.courseid ='".addslashes($row->mdl_course_id)."'; ";
+
+			if($detail && $result_mdl = @pg_query($this->conn_moodle, $qry_mdl))
+			{
+				if($row_mdl = @pg_fetch_object($result_mdl))
+				{
+					$obj->mdl_benotungen = (empty($row_mdl->anz)?0:$row_mdl->anz);
+				}
+			}					
+			
+			
+			$qry_mdl = "select count(course) as anz from public.mdl_chat where mdl_chat.course='".addslashes($row->mdl_course_id)."'; ";
+			if($detail && $result_mdl = @pg_query($this->conn_moodle, $qry_mdl))
+			{
+				if($row_mdl = @pg_fetch_object($result_mdl))
+				{
+					$obj->mdl_chat = (empty($row_mdl->anz)?0:$row_mdl->anz);
+				}
+			}					
+
+			$qry_mdl = "select count(course) as anz from public.mdl_resource where mdl_resource.course='".addslashes($row->mdl_course_id)."'; ";
+			if($detail && $result_mdl = @pg_query($this->conn_moodle, $qry_mdl))
+			{
+				if($row_mdl = @pg_fetch_object($result_mdl))
+				{
+					$obj->mdl_resource = (empty($row_mdl->anz)?0:$row_mdl->anz);
+				}
+			}					
+
+			
+			$qry_mdl = "select count(course) as anz from public.mdl_quiz where mdl_quiz.course='".addslashes($row->mdl_course_id)."'; ";
+			if($detail && $result_mdl = @pg_query($this->conn_moodle, $qry_mdl))
+			{
+				if($row_mdl = @pg_fetch_object($result_mdl))
+				{
+					$obj->mdl_quiz = (empty($row_mdl->anz)?0:$row_mdl->anz);
+				}
+			}					
+			$this->result[] = $obj;
+		}
+		return true;
+					
+	}
+
 	
 	// **********************************************
 	// * Schaut ob fuer diese LV/StSem schon ein 
@@ -473,6 +620,7 @@ class moodle_course
 		}
 
 	}
+	
 	
 	// ************************************************************
 	// * Laedt eine CourseCategorie anhand der Bezeichnung und der
@@ -1007,7 +1155,6 @@ class moodle_course
 				$this->errormsg.=(empty($student_uid)?' Student':$student_uid);								
 				return false;
 			}
-	
 		// --------------------------------------------------------------------
 		// Ermitteln die Lehreinheiten und Moodle ID
 		//		mit dem studiensemester_kurzbz ( bsp WS2008 )
@@ -1032,6 +1179,7 @@ class moodle_course
 			$this->errormsg = 'Fehler beim Lesen der Kurse ';
 			return false;
 		}	
+
 		// init
 		$lehreinheit_kpl = array(); // Gesamte Information der Lehreinheit und Moodle IDs
 		$lehreinheit=array();	// Lehreinheiten zum lesen Studenten im Campus (Student und LE im FAS) 
@@ -1151,9 +1299,6 @@ class moodle_course
 			 and mdl_grade_grades.userid=mdl_user.id
 			";
 		$usr_qry="";
-		
-
-		
 	    while (list( $user_key, $course_ids ) = each($lehrveranstaltMOODLE) )
 		{
 			if(empty($usr_qry))
