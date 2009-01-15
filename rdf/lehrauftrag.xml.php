@@ -222,7 +222,7 @@ function drawLehrauftrag($uid)
 			<familienname>'.$row->nachname.'</familienname>
 			<titelpost>'.$row->titelpost.'</titelpost>
 			<anschrift>'.$strasse.'</anschrift>
-			<name_gesamt>'.$name_gesamt.'</name_gesamt>
+			<name_gesamt><![CDATA['.$name_gesamt.']]></name_gesamt>
 			<zuhanden>'.$zuhanden.'</zuhanden>
 			<plz>'.$plz.'</plz>
 			<ort>'.$ort.'</ort>
