@@ -1,6 +1,6 @@
 body
 {
-	background-color: #F6F7FF;
+	background-color: #F5F5F5;
 	font-family: Tahoma, Arial, Helvetica, Verdana, Geneva, sans-serif;
 	font-size: small;
 	/*IE hack*/
@@ -12,6 +12,7 @@ body
 
 table.menue
 {
+
 	border-right-width:1px;
 	border-right-color:#BCBCBC;
 	width:	100%;
@@ -527,6 +528,7 @@ table.detail
     border-width:1px;
     width:100%;
     padding:2px;
+
 }
 
 .kopf
