@@ -53,10 +53,13 @@ class moodle_course
 	var $lehrveranstaltung_semester;			
 	var	$lehrveranstaltung_studiengang_kz;
 
+	// Kurs Resourcen - Anzahl 	
 	var	$mdl_benotungen;
 	var	$mdl_resource;
 	var	$mdl_quiz;
 	var	$mdl_chat;
+	var	$mdl_forum;
+	var	$mdl_choice;
 		
 	var $note;
 
@@ -237,16 +240,16 @@ class moodle_course
 			}
 
 
-
+		// Detailandaten - Param: $detail=true
 			// Anzahl Benotungen
 			$obj->mdl_benotungen = 0;
-			
 			// Anzahl Aktivitaeten und Lehrmaterial
 			$obj->mdl_resource = 0;
 			$obj->mdl_quiz = 0;
 			$obj->mdl_chat = 0;
+			$obj->mdl_forum = 0;
+			$obj->mdl_choice= 0;
 			
-
 			// Anzahl Noten je Kurs und User			
 			$qry_mdl = "select count(*) as anz
 				from mdl_grade_grades , mdl_grade_items
@@ -291,6 +294,26 @@ class moodle_course
 					$obj->mdl_quiz = (empty($row_mdl->anz)?0:$row_mdl->anz);
 				}
 			}					
+
+			$qry_mdl = "select count(course) as anz from public.mdl_forum where mdl_forum.course='".addslashes($row->mdl_course_id)."'; ";
+			if($detail && $result_mdl = @pg_query($this->conn_moodle, $qry_mdl))
+			{
+				if($row_mdl = @pg_fetch_object($result_mdl))
+				{
+					$obj->mdl_forum = (empty($row_mdl->anz)?0:$row_mdl->anz);
+				}
+			}					
+			
+			$qry_mdl = "select count(course) as anz from public.mdl_choice where mdl_choice.course='".addslashes($row->mdl_course_id)."'; ";
+			if($detail && $result_mdl = @pg_query($this->conn_moodle, $qry_mdl))
+			{
+				if($row_mdl = @pg_fetch_object($result_mdl))
+				{
+					$obj->mdl_choice = (empty($row_mdl->anz)?0:$row_mdl->anz);
+				}
+			}					
+
+			
 			$this->result[] = $obj;
 		}
 		return true;
