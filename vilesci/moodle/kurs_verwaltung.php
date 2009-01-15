@@ -1,4 +1,10 @@
 <?php 
+//@version $Id$
+/*
+	Dieses Programm listet nach Selektinskreterien alle Moodelkurse zu einem Studiengang auf. 
+	Fuer jede MoodleID werden die Anzahl Benotungen, und erfassten sowie angelegte Zusaetze angezeigt.
+	Jeder der angezeigten Moodle IDs kann geloescht werden nach bestaetigung eines PopUp Fenster.
+*/
 // ---------------- Standart Include Dateien einbinden
 	require_once('../config.inc.php');
 	require_once('../../include/functions.inc.php');
