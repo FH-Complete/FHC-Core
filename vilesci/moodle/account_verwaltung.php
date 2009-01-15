@@ -1,4 +1,12 @@
 <?php
+//@version $Id$
+/*
+	Dieses Programm listet nach einem Suchbegriff bestehender Benutzer auf. 
+	Fuer jede UserID wird geprueft ob dieser bereits einen Moodle ID besitzt.
+	Bestehende Moodle IDs werden angezeigt, fuer alle anderen wird die moeglichkeit
+	der neuanlage geboten.
+*/
+
 // ---------------- Standart Include Dateien einbinden
 	require_once('../config.inc.php');
 	require_once('../../include/functions.inc.php');
