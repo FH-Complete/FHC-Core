@@ -207,8 +207,6 @@ class moodle_user
 					$this->errormsg = 'Fehler beim Auslesen der Rollen';
 					return false;
 				}
-				
-				$this->createGlobaleGastrolle($this->mdl_user_id);				
 			}
 			
 			//Lektoren loeschen die nicht mehr zugeordnet sind
@@ -366,9 +364,6 @@ class moodle_user
 							return false;
 						}
 						
-						//globale Gastrolle anlegen
-						$this->createGlobaleGastrolle($this->mdl_user_id);
-					
 						//Gruppenzuteilung
 						if($gruppensync)
 						{
