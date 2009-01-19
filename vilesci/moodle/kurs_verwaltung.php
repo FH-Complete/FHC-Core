@@ -200,7 +200,7 @@
 						$content.= '<input style="display:none" type="text" name="studiensemester_kurzbz" value="'.htmlentities($studiensemester_kurzbz).'" />';
 						$content.= '<input style="display:none" type="text" name="studiengang_kz" value="'.htmlentities($studiengang_kz).'" />';
 						$content.= '<input style="display:none" type="text" name="semester" value="'.htmlentities($semester).'" />';
-						$content.= '<img height="15" src="../../skin/images/icon_delete.gif" border="0" title="MoodleKurs entfernen" alt="entfernen" />';					
+						$content.= '<img height="15" src="../../skin/images/table_row_delete.png" border="0" title="MoodleKurs entfernen" alt="table_row_delete.png" />';					
 						$content.= '<input onclick="this.checked=false;" onblur="this.checked=false;" type="checkbox" value="" style="'.(!stristr($_SERVER['HTTP_USER_AGENT'],'OPERA') && !stristr($_SERVER['HTTP_USER_AGENT'],'Safari')?'display:none;':'').'font-size: 4px;border:0px solid transparent;text-decoration:none; background-color: transparent;" name="check_va_detail_kal'.$i.'" />';
 						$content.= 'entfernen';					
 					$content.='</form>';
