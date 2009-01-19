@@ -140,7 +140,7 @@
 								$content.='<form style="display: inline;border:0px;" name="work'.$iTmpCounter.'" method="GET" target="_self" action="'.$_SERVER["PHP_SELF"].'">';
 								  	$content.= '<input style="display:none" type="text" name="uid" value="'.htmlentities($row->uid).'" />';
 								  	$content.= '<input style="display:none" type="text" name="searchstr" value="'.htmlentities($cSearchstr).'" />';
-									$content.= '<img height="12" src="../../skin/images/edit.png" border="0" title="MoodleUser anlegen" alt="anlegen" />';					
+									$content.= '<img height="12" src="../../skin/images/table_row_insert.png" border="0" title="MoodleUser anlegen" alt="table_row_insert.png" />';					
 									$content.= '<input onclick="this.checked=false;" onblur="this.checked=false;" type="checkbox" value="" style="'.(!stristr($_SERVER['HTTP_USER_AGENT'],'OPERA') && !stristr($_SERVER['HTTP_USER_AGENT'],'Safari')?'display:none;':'').'font-size: 4px;border:0px solid transparent;text-decoration:none; background-color: transparent;" name="check_va_detail_kal'.$iTmpCounter.'" />';
 									$content.= 'anlegen';					
 								$content.='</form>';
