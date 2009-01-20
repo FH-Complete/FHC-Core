@@ -102,8 +102,23 @@
 	          		<td class="tdwrap"><a class="Item" href="public/tw_international.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;TW International</a></td>
 	  			</tr>
 	  			<tr>
+	  				<!--
 					<td class="tdwidth10" nowrap>&nbsp;</td>
 	          		<td class="tdwrap"><a class="Item" href="http://student.ephorus.de" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Plagiatspr&uuml;fung</a></td>
+	          		-->
+	          		<td class="tdwrap"></td>
+					<td><a href="#" class="MenuItem" onClick="js_toggle_container('Plagiatspruefung');"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Plagiatspr&uuml;fung</a>
+				  	<table class="tabcontent" id="Plagiatspruefung" style="display: none">
+						<tr>
+							<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="public/plagiatspruefung_lektor.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;f&uuml;r LektorInnen</a></td>
+						</tr>
+						<tr>
+							<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="public/plagiatspruefung_student.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;f&uuml;r StudentInnen</a></td>
+						</tr>
+					</table>
+					</td>
 	  			</tr>
 
 				<tr>
