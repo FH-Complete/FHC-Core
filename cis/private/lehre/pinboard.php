@@ -340,7 +340,20 @@ function show(id)
 				{
 					if($row_course_leader->telefonklappe != "")
 					{
-						echo '01 333 40 77 - '.$row_course_leader->telefonklappe;
+						$hauptnummer='';
+						$qry_standort = "SELECT tbl_firma.telefon as nummer FROM public.tbl_standort, public.tbl_adresse, public.tbl_firma
+								WHERE standort_kurzbz='".addslashes($row_course_leader->standort_kurzbz)."' AND
+								tbl_adresse.adresse_id=tbl_standort.adresse_id AND
+								tbl_adresse.firma_id=tbl_firma.firma_id";
+						if($result_standort = pg_query($sql_conn, $qry_standort))
+						{
+							if($row_standort = pg_fetch_object($result_standort))
+							{
+								$hauptnummer = $row_standort->nummer;
+							}
+						}
+						
+						echo $hauptnummer.' - '.$row_course_leader->telefonklappe;
 					}
 					else
 					{
@@ -412,7 +425,20 @@ function show(id)
 				{
 					if($row_course_leader_deputy->telefonklappe != "")
 					{
-						echo '01 333 40 77 - '.$row_course_leader_deputy->telefonklappe;
+						$hauptnummer='';
+						$qry_standort = "SELECT tbl_firma.telefon as nummer FROM public.tbl_standort, public.tbl_adresse, public.tbl_firma
+								WHERE standort_kurzbz='".addslashes($row_course_leader_deputy->standort_kurzbz)."' AND
+								tbl_adresse.adresse_id=tbl_standort.adresse_id AND
+								tbl_adresse.firma_id=tbl_firma.firma_id";
+						if($result_standort = pg_query($sql_conn, $qry_standort))
+						{
+							if($row_standort = pg_fetch_object($result_standort))
+							{
+								$hauptnummer = $row_standort->nummer;
+							}
+						}
+
+						echo $hauptnummer.' - '.$row_course_leader_deputy->telefonklappe;
 					}
 					else
 					{
@@ -479,7 +505,20 @@ function show(id)
 						{
 							if($row_course_secretary->telefonklappe != "")
 							{
-								echo '01 333 40 77 - '.$row_course_secretary->telefonklappe;
+								$hauptnummer='';
+								$qry_standort = "SELECT tbl_firma.telefon as nummer FROM public.tbl_standort, public.tbl_adresse, public.tbl_firma
+										WHERE standort_kurzbz='".addslashes($row_course_secretary->standort_kurzbz)."' AND
+										tbl_adresse.adresse_id=tbl_standort.adresse_id AND
+										tbl_adresse.firma_id=tbl_firma.firma_id";
+								if($result_standort = pg_query($sql_conn, $qry_standort))
+								{
+									if($row_standort = pg_fetch_object($result_standort))
+									{
+										$hauptnummer = $row_standort->nummer;
+									}
+								}
+
+								echo $hauptnummer.' - '.$row_course_secretary->telefonklappe;
 							}
 							else
 							{
