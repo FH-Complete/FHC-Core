@@ -86,12 +86,16 @@
 			$host = 'dav.technikum-wien.at';
 		else
 			$host = 'cis.technikum-wien.at';
+			
 	// Variable Daten Initialisieren
 		$uri = "/moodle/xmlrpc/xmlrpc.php";
 		$method = "DeleteCourseByID";
 		$args['CourseID']="$mdl_course_id";
 		$port=$_SERVER["SERVER_PORT"];
-		
+		if ($debug_switch)
+		{
+			$content.="<br />Host:$host , Port:$port , Uri:$uri , Method:$method <br />";
+		}
 		$callspec = array(
 			'method' => $method,
 			'host' => $host,
