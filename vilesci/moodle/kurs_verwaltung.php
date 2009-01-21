@@ -81,11 +81,11 @@
 	{
 			include(dirname(__FILE__)."/xmlrpcutils/utils.php");
 	// Achtung! 
-	// Im Produktion muss die vilesci.technikum-wien gegen cis.technikum-wien getauscht werden
-			if ($_SERVER["HTTP_HOST"]=="cis.technikum-wien.at" || $_SERVER["HTTP_HOST"]=="vilesci.technikum-wien.at" )
-				$host = 'cis.technikum-wien.at';
-			else
-				$host = 'dav.technikum-wien.at';
+	// Im Produktion muss cis.technikum-wien als Moodle Host genommen werden
+		if ($_SERVER["HTTP_HOST"]=="dav.technikum-wien.at" )
+			$host = 'dav.technikum-wien.at';
+		else
+			$host = 'cis.technikum-wien.at';
 	// Variable Daten Initialisieren
 		$uri = "/moodle/xmlrpc/xmlrpc.php";
 		$method = "DeleteCourseByID";
