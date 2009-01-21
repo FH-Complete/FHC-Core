@@ -165,6 +165,12 @@ class betriebsmittelperson
 			$this->errormsg = 'Anmerkung darf nicht laenger als 256 Zeichen sein';
 			return false;
 		}
+						
+		if($this->kaution!='' && $this->kaution>9999.99)
+		{
+			$this->errormsg = 'Kaution darf nicht groesser als 9999.99 sein';
+			return false;
+		}
 		
 		return true;
 	}

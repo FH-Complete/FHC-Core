@@ -46,15 +46,6 @@ $user = get_uid();
 //$user = 'if06b172';
 //$user = 'if06b144';
 $lektorenansicht = 0;
-if(check_lektor($user, $conn) and $_GET["uid"] != "")
-{
-	$rights = new benutzerberechtigung($conn);
-	$rights->getBerechtigungen($user); 
-	if(!check_lektor_lehreinheit($conn, $user, $_GET["lehreinheit_id"]) && !$rights->isBerechtigt('admin',0))
-		die("Sie haben keine Berechtigung für diese Lehreinheit");
-	$lektorenansicht = 1;
-	$user = $_GET["uid"];
-}
 
 #$rechte = new benutzerberechtigung($conn);
 #$rechte->getBerechtigungen($user);
@@ -69,6 +60,17 @@ if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id'])) //Lehr
 else
 	$lehreinheit_id = '';
 
+if(check_lektor($user, $conn) && (isset($_GET['uid']) && $_GET["uid"] != ""))
+{
+	$rights = new benutzerberechtigung($conn);
+	$rights->getBerechtigungen($user); 
+	//if(!check_lektor_lehreinheit($conn, $user, $_GET["lehreinheit_id"]) && !$rights->isBerechtigt('admin',0))
+	$lehreinheit=new lehreinheit($conn, $_GET["lehreinheit_id"]);
+	if(!check_lektor_lehrveranstaltung($conn, $user, $lehreinheit->lehrveranstaltung_id, $lehreinheit->studiensemester_kurzbz) && !$rights->isBerechtigt('admin',0))
+		die("Sie haben keine Berechtigung für diese Lehreinheit");
+	$lektorenansicht = 1;
+	$user = $_GET["uid"];
+}
 
 //Laden der Lehrveranstaltung
 $lv_obj = new lehrveranstaltung($conn);
