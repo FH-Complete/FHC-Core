@@ -79,44 +79,51 @@
 	if ($mdl_course_id!='' && $studiensemester_kurzbz!='')
 	{
 			include(dirname(__FILE__)."/xmlrpcutils/utils.php");
-
-			// Variable Daten  
-			$uri = "/moodle/xmlrpc/xmlrpc.php";
-			$method = "DeleteCourseByID";
-			$args['CourseID']="$mdl_course_id";
-
 	// Achtung! 
 	// Im Produktion muss die vilesci.technikum-wien gegen cis.technikum-wien getauscht werden
-	// Secure sollte nur bei Port 80 True sein
-			$callspec = array(
+			if ($_SERVER["HTTP_HOST"]=="cis.technikum-wien.at" || $_SERVER["HTTP_HOST"]=="vilesci.technikum-wien.at" )
+				$host = 'cis.technikum-wien.at';
+			else
+				$host = 'dav.technikum-wien.at';
+	// Variable Daten Initialisieren
+		$uri = "/moodle/xmlrpc/xmlrpc.php";
+		$method = "DeleteCourseByID";
+		$args['CourseID']="$mdl_course_id";
+		$port=$_SERVER["SERVER_PORT"];
+		
+		$callspec = array(
 			'method' => $method,
-			'host' => str_replace('vilesci.','cis.',$_SERVER["SERVER_NAME"]),
-			'port' => $_SERVER["SERVER_PORT"],
+			'host' => $host,
+			'port' => $port,
 			'uri' => $uri,
 			'user' => (isset($_SERVER["PHP_AUTH_USER"])?$_SERVER["PHP_AUTH_USER"]:""),
 			'pass' => (isset($_SERVER["PHP_AUTH_PW"])?$_SERVER["PHP_AUTH_PW"]:""),
-			'secure' => (isset($_SERVER["SERVER_PORT"]) && $_SERVER["SERVER_PORT"]=="80"?false:true),
+			'secure' =>false,
 			'debug' => 0, 
 			'args' => $args);
-			 $result = xu_rpc_http_concise($callspec);
-			
-			$del_moodle=false;
+			$result = xu_rpc_http_concise($callspec);
+			// Return Information
+			// $result[0] = Status true/false
+			// $result[1] = Informationstext
+			// $result[2] = Ausgabetext von Moodle
 			if (!is_array($result)) // Server wurde nicht erreicht.
 			{
 				$content.="Fehler xmlrpc call $result";
 			}	
 			else if ($result[0]==1) // Methodenaufruf erfolgreich	
 			{
-#				$content.=(isset($result[1])?$result[1]:"Moodel-Kurs gel&ouml;scht ");
+				#$content.=(isset($result[1])?$result[1]:"Moodel-Kurs gel&ouml;scht ");
 				$qry = "DELETE FROM lehre.tbl_moodle WHERE mdl_course_id='".addslashes($mdl_course_id)."' ";
 				if ($moodle_id!='')
 					$qry.= " and moodle_id='".addslashes($moodle_id)."'"; 
 				if(!pg_query($conn, $qry))
-					$content.="<p>Moodlekurs $mdl_course_id in Lehre wurde NICHT gel&ouml;scht.</p>";
+					$content.="<p>Moodlekurs $mdl_course_id wurde NICHT gel&ouml;scht in Lehre.</p>";
 				$content.="<h3>Moodlekurs $mdl_course_id wurde gel&ouml;scht.</h3>";
 			}	
 			else 
+			{
 				$content.=(isset($result[1])?$result[1]:"Fehler beim Kurs l&ouml;schen ");
+			}	
 	}
 
 	
