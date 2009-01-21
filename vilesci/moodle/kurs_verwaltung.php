@@ -79,14 +79,20 @@
 	//	Moodlekurs wird zum bearbeiten (loeschen) freigegeben
 	if ($mdl_course_id!='' && $studiensemester_kurzbz!='')
 	{
-			include(dirname(__FILE__)."/xmlrpcutils/utils.php");
-	// Achtung! 
-	// Im Produktion muss cis.technikum-wien als Moodle Host genommen werden
-		if ($_SERVER["HTTP_HOST"]=="dav.technikum-wien.at" )
+		include(dirname(__FILE__)."/xmlrpcutils/utils.php");
+	    // Aktuellen Moodle Server ermitteln.
+		if (defined('MOODLE_PATH')) // Eintrag MOODLE_PATH in Vilesci config.inc.php. Hostname herausfiltern
+		{
+			$host = str_replace('https://','',str_replace('http://','',str_replace('/moodle','',str_replace('/moodle/','',MOODLE_PATH))));
+		}
+		elseif ($_SERVER["HTTP_HOST"]=="dav.technikum-wien.at" ) // Vilesci config.inc.php nicht erweitert HTTP_HOST pruefen
+		{
 			$host = 'dav.technikum-wien.at';
-		else
+		}	
+		else // Produktivessystem
+		{
 			$host = 'cis.technikum-wien.at';
-			
+		}	
 	// Variable Daten Initialisieren
 		$uri = "/moodle/xmlrpc/xmlrpc.php";
 		$method = "DeleteCourseByID";
@@ -106,17 +112,17 @@
 			'secure' =>false,
 			'debug' => $debug_switch, 
 			'args' => $args);
-			$result = xu_rpc_http_concise($callspec);
-			// Return Information
-			// $result[0] = Status true/false
-			// $result[1] = Informationstext
-			// $result[2] = Ausgabetext von Moodle
-			if (!is_array($result)) // Server wurde nicht erreicht.
-			{
+		$result = xu_rpc_http_concise($callspec);
+		// Return Information
+		// $result[0] = Status true/false
+		// $result[1] = Informationstext
+		// $result[2] = Ausgabetext von Moodle
+		if (!is_array($result)) // Server wurde nicht erreicht.
+		{
 				$content.="Fehler xmlrpc call $result";
-			}	
-			else if ($result[0]==1) // Methodenaufruf erfolgreich	
-			{
+		}	
+		else if ($result[0]==1) // Methodenaufruf erfolgreich	
+		{
 				#$content.=(isset($result[1])?$result[1]:"Moodel-Kurs gel&ouml;scht ");
 				$qry = "DELETE FROM lehre.tbl_moodle WHERE mdl_course_id='".addslashes($mdl_course_id)."' ";
 				if ($moodle_id!='')
@@ -124,14 +130,12 @@
 				if(!pg_query($conn, $qry))
 					$content.="<p>Moodlekurs $mdl_course_id wurde NICHT gel&ouml;scht in Lehre.</p>";
 				$content.="<h3>Moodlekurs $mdl_course_id wurde gel&ouml;scht.</h3>";
-			}	
-			else 
-			{
+		}	
+		else 
+		{
 				$content.=(isset($result[1])?$result[1]:"Fehler beim Kurs l&ouml;schen ");
-			}	
+		}	
 	}
-
-	
 // ***********************************************************************************************
 //	HTML Auswahlfelder (Teil 1)
 // ***********************************************************************************************
