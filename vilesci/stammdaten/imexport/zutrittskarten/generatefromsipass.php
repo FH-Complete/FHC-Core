@@ -234,16 +234,16 @@ if($result = pg_query($conn, $qry))
 				$sipass[$i]->card_no=str_replace(" ","",$row->cardnumber);
 				$sipass[$i]->start_date=$row->tag.'.'.$row->monat.'.'.$row->jahr;
 				$sipass[$i]->end_date=$row->tag.'.'.$row->monat.'.'.($row->jahr+5);
-				$sipass[$j]->uid=trim($row->uid);
-				$sipass[$j]->matrikelnr=trim($row->matrikelnr);
+				$sipass[$i]->uid=trim($row->uid);
+				$sipass[$i]->matrikelnr=trim($row->matrikelnr);
 				if($row->personalnummer!='' && $row->personalnummer!= NULL)
 				{
-					$sipass[$j]->acc_grp_name="Verwaltung";
+					$sipass[$i]->acc_grp_name="Verwaltung";
 
 				}
 				else
 				{
-					$sipass[$j]->acc_grp_name=$stg_kurzbz;
+					$sipass[$i]->acc_grp_name=$stg_kurzbz;
 				}
 				$key_nummer++;
 				$i++;
