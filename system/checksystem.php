@@ -40,11 +40,11 @@ if(!@pg_query($conn, 'SELECT * FROM campus.tbl_paabgabetyp LIMIT 1;'))
 	$sql =" ALTER TABLE lehre.tbl_projektarbeit ADD COLUMN seitenanzahl integer;
 			ALTER TABLE lehre.tbl_projektarbeit ADD COLUMN abgabedatum date;
 			ALTER TABLE lehre.tbl_projektarbeit ADD COLUMN kontrollschlagwoerter varchar(150);
-			ALTER TABLE lehre.tbl_projektarbeit ADD COLUMN schlagwoerter varchar(150);	
-			ALTER TABLE lehre.tbl_projektarbeit ADD COLUMN schlagwoerter_de varchar(150);
+			ALTER TABLE lehre.tbl_projektarbeit ADD COLUMN schlagwoerter varchar(150);
+			ALTER TABLE lehre.tbl_projektarbeit ADD COLUMN schlagwoerter_en varchar(150);
 			ALTER TABLE lehre.tbl_projektarbeit ADD COLUMN abstract text;
 			ALTER TABLE lehre.tbl_projektarbeit ADD COLUMN abstract_en text;
-			
+
 			CREATE TABLE campus.tbl_paabgabe
 			(
    				paabgabe_id Serial NOT NULL,
@@ -60,21 +60,21 @@ if(!@pg_query($conn, 'SELECT * FROM campus.tbl_paabgabetyp LIMIT 1;'))
    				updateamum Timestamp,
 				constraint pk_paabgabe primary key (paabgabe_id)
 			);
-			
+
 			Create table campus.tbl_paabgabetyp
 			(
    				paabgabetyp_kurzbz Varchar(16) NOT NULL,
    				bezeichnung Varchar(64),
 				constraint pk_paabgabetyp primary key (paabgabetyp_kurzbz)
-			); 
-			
+			);
+
 			Comment on column campus.tbl_paabgabe.fixtermin Is 'Gibt es eine harte oder weiche Deadline?';
 			Comment on column campus.tbl_paabgabe.datum Is 'Wann soll abgegeben werden?';
 			Comment on column campus.tbl_paabgabe.abgabedatum Is 'Wann wurde wirklich abgegeben?';
-			
+
 			Alter table campus.tbl_paabgabe add Constraint projektarbeit_paabgabe foreign key (projektarbeit_id) references lehre.tbl_projektarbeit (projektarbeit_id) on update cascade on delete restrict;
 			Alter table campus.tbl_paabgabe add Constraint paabgabetyp_paabgabe foreign key (paabgabetyp_kurzbz) references campus.tbl_paabgabetyp (paabgabetyp_kurzbz) on update cascade on delete restrict;
-			
+
 			Grant select on lehre.tbl_projektarbeit to group web;
 			Grant update on lehre.tbl_projektarbeit to group web;
 			Grant select on campus.tbl_paabgabe to group admin;
@@ -89,12 +89,12 @@ if(!@pg_query($conn, 'SELECT * FROM campus.tbl_paabgabetyp LIMIT 1;'))
 			Grant update on campus.tbl_paabgabetyp to group admin;
 			Grant delete on campus.tbl_paabgabetyp to group admin;
 			Grant insert on campus.tbl_paabgabetyp to group admin;
-			Grant select on campus.tbl_paabgabetyp to group web; 
+			Grant select on campus.tbl_paabgabetyp to group web;
 	";
-	
+
 	if(!@pg_query($conn, $sql))
 		echo '<strong>campus.tbl_paabgabe: '.pg_last_error($conn).' </strong><br>';
-	else 
+	else
 		echo ' campus.tbl_paabgabe wurde hinzugefuegt!<br>';
 }
 
@@ -154,7 +154,7 @@ if (!@pg_query($conn,'SELECT lv_semester FROM campus.vw_lehreinheit LIMIT 1;'))
 			   JOIN lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id)
 			   JOIN tbl_mitarbeiter USING (mitarbeiter_uid)
 			   JOIN lehre.tbl_lehreinheitgruppe USING (lehreinheit_id)
-			   JOIN tbl_studiengang ON tbl_lehreinheitgruppe.studiengang_kz = tbl_studiengang.studiengang_kz; 
+			   JOIN tbl_studiengang ON tbl_lehreinheitgruppe.studiengang_kz = tbl_studiengang.studiengang_kz;
 			GRANT SELECT ON campus.vw_lehreinheit TO 'admin';
 			GRANT SELECT ON campus.vw_lehreinheit TO 'web';
 		";
