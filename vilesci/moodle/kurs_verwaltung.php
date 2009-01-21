@@ -1,5 +1,8 @@
 <?php 
 //@version $Id$
+
+$HeadURL$ 
+
 /* Copyright (C) 2008 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
