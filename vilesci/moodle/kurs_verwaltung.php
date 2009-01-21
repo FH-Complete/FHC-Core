@@ -96,7 +96,7 @@
 			'user' => (isset($_SERVER["PHP_AUTH_USER"])?$_SERVER["PHP_AUTH_USER"]:""),
 			'pass' => (isset($_SERVER["PHP_AUTH_PW"])?$_SERVER["PHP_AUTH_PW"]:""),
 			'secure' => (isset($_SERVER["SERVER_PORT"]) && $_SERVER["SERVER_PORT"]=="80"?false:true),
-			'debug' => 0,
+			'debug' => 0, 
 			'args' => $args);
 			 $result = xu_rpc_http_concise($callspec);
 			
