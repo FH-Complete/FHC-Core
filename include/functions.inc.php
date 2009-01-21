@@ -33,7 +33,7 @@ function get_uid()
 {
 	return strtolower(trim($_SERVER['REMOTE_USER']));
 	// fuer Testzwecke
-	//return 'pam';
+	//return 'oesi';
 }
 
 function crlf()
@@ -72,6 +72,23 @@ function check_lektor_lehreinheit($conn, $uid, $lehreinheit_id)
 {
 	// uid von View 'Lektor' holen
 	$sql_query="SELECT mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter WHERE mitarbeiter_uid='$uid' AND lehreinheit_id = '$lehreinheit_id'";
+	//echo $sql_query;
+	$result=pg_query($conn, $sql_query) or die(pg_last_error($conn));
+	$num_rows=pg_num_rows($result);
+	// Wenn kein ergebnis return 0 sonst ID
+	if ($num_rows>0)
+	{
+		$row=pg_fetch_object($result);
+		return $row->mitarbeiter_uid;
+	}
+	else
+		return 0;
+}
+
+function check_lektor_lehrveranstaltung($conn, $uid, $lehrveranstaltung_id, $studiensemester_kurzbz)
+{
+	// uid von View 'Lektor' holen
+	$sql_query="SELECT mitarbeiter_uid FROM campus.vw_lehreinheit WHERE mitarbeiter_uid='$uid' AND lehrveranstaltung_id = '$lehrveranstaltung_id' AND studiensemester_kurzbz='$studiensemester_kurzbz'";
 	//echo $sql_query;
 	$result=pg_query($conn, $sql_query) or die(pg_last_error($conn));
 	$num_rows=pg_num_rows($result);

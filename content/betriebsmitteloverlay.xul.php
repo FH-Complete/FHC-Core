@@ -178,7 +178,7 @@ else
 					      			<row>
 										<label value="Kaution" control="betriebsmittel-textbox-kaution"/>
 										<hbox>
-					      					<textbox id="betriebsmittel-textbox-kaution" disabled="true" maxlength="8"/>
+					      					<textbox id="betriebsmittel-textbox-kaution" disabled="true" maxlength="7"/>
 					      					<spacer flex="1" />
 					      				</hbox>
 									</row>
