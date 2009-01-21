@@ -61,6 +61,7 @@
 	
 // @cCharset Zeichensatz - Ajax mit UTF-8
 	$cCharset= (isset($_REQUEST['client_encode'])?trim($_REQUEST['client_encode']):'iso-8859-15');
+	$debug_switch= (isset($_REQUEST['debug'])?$_REQUEST['debug']:0);
 	
 	
 // ***********************************************************************************************
@@ -99,7 +100,7 @@
 			'user' => (isset($_SERVER["PHP_AUTH_USER"])?$_SERVER["PHP_AUTH_USER"]:""),
 			'pass' => (isset($_SERVER["PHP_AUTH_PW"])?$_SERVER["PHP_AUTH_PW"]:""),
 			'secure' =>false,
-			'debug' => 0, 
+			'debug' => $debug_switch, 
 			'args' => $args);
 			$result = xu_rpc_http_concise($callspec);
 			// Return Information
@@ -180,7 +181,7 @@
 		}
 		$content.='</select></td>';
 		$content.='
-			<td><input name="anzeige" type="submit" value=" anzeigen "></td>
+			<td><input name="anzeige" type="submit" value=" anzeigen "><input style="display:none" type="text" name="debug" value="'.htmlentities($debug_switch).'" /></td>
 	</tr></table>
 	</form>
 	<hr>';
@@ -247,6 +248,7 @@
 						$content.= '<input style="display:none" type="text" name="studiensemester_kurzbz" value="'.htmlentities($studiensemester_kurzbz).'" />';
 						$content.= '<input style="display:none" type="text" name="studiengang_kz" value="'.htmlentities($studiengang_kz).'" />';
 						$content.= '<input style="display:none" type="text" name="semester" value="'.htmlentities($semester).'" />';
+						$content.= '<input style="display:none" type="text" name="debug" value="'.htmlentities($debug_switch).'" />';
 						$content.= '<img height="15" src="../../skin/images/table_row_delete.png" border="0" title="MoodleKurs entfernen" alt="table_row_delete.png" />';					
 						$content.= '<input onclick="this.checked=false;" onblur="this.checked=false;" type="checkbox" value="" style="'.(!stristr($_SERVER['HTTP_USER_AGENT'],'OPERA') && !stristr($_SERVER['HTTP_USER_AGENT'],'Safari')?'display:none;':'').'font-size: 4px;border:0px solid transparent;text-decoration:none; background-color: transparent;" name="check_va_detail_kal'.$i.'" />';
 						$content.= 'entfernen';					
