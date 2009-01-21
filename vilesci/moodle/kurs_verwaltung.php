@@ -1,5 +1,28 @@
 <?php 
 //@version $Id$
+/* Copyright (C) 2008 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
+
+
 /*
 	Dieses Programm listet nach Selektinskreterien alle Moodelkurse zu einem Studiengang auf. 
 	Fuer jede MoodleID werden die Anzahl Benotungen, und erfassten sowie angelegte Zusaetze angezeigt.
@@ -11,7 +34,6 @@
 	require_once('../../include/globals.inc.php');
 // ---------------- Moodle Daten Classe
 	include_once('../../include/moodle_course.class.php');
-
 // ***********************************************************************************************	
 // Variable Initialisieren
 // ***********************************************************************************************
@@ -56,27 +78,45 @@
 	//	Moodlekurs wird zum bearbeiten (loeschen) freigegeben
 	if ($mdl_course_id!='' && $studiensemester_kurzbz!='')
 	{
-		require_once("/var/www/htdocs/moodle/config.php");
-	    if (! $course = get_record("course", "id", $mdl_course_id)) 
-		{
-			$content.="<h3>Moodlekurs $mdl_course_id wurde NICHT gel&ouml;scht.</h3>";
-		}
-		else
-		{
-			// Moodle config Einbinden
-		    add_to_log(SITEID, "course", "delete", "view.php?id=$mdl_course_id", $course->fullname." (ID $mdl_course_id)");
-			delete_course($course);
-			ob_clean();
+			include(dirname(__FILE__)."/xmlrpcutils/utils.php");
 
-		    fix_course_sortorder(); //update course count in catagories
+			// Variable Daten  
+			$uri = "/moodle/xmlrpc/xmlrpc.php";
+			$method = "DeleteCourseByID";
+			$args['CourseID']="$mdl_course_id";
 
-			$qry = "DELETE FROM lehre.tbl_moodle WHERE mdl_course_id='".addslashes($mdl_course_id)."' ";
-			if ($moodle_id!='')
-				$qry.= " and moodle_id='".addslashes($moodle_id)."'"; 
-			if(!pg_query($conn, $qry))
-				$content.="<p>Moodlekurs $mdl_course_id in Lehre wurde NICHT gel&ouml;scht.</p>";
-			$content.="<h3>Moodlekurs $mdl_course_id wurde gel&ouml;scht.</h3>";
-		}
+	// Achtung! 
+	// Im Produktion muss die vilesci.technikum-wien gegen cis.technikum-wien getauscht werden
+	// Secure sollte nur bei Port 80 True sein
+			$callspec = array(
+			'method' => $method,
+			'host' => str_replace('vilesci.','cis.',$_SERVER["SERVER_NAME"]),
+			'port' => $_SERVER["SERVER_PORT"],
+			'uri' => $uri,
+			'user' => (isset($_SERVER["PHP_AUTH_USER"])?$_SERVER["PHP_AUTH_USER"]:""),
+			'pass' => (isset($_SERVER["PHP_AUTH_PW"])?$_SERVER["PHP_AUTH_PW"]:""),
+			'secure' => (isset($_SERVER["SERVER_PORT"]) && $_SERVER["SERVER_PORT"]=="80"?false:true),
+			'debug' => 0,
+			'args' => $args);
+			 $result = xu_rpc_http_concise($callspec);
+			
+			$del_moodle=false;
+			if (!is_array($result)) // Server wurde nicht erreicht.
+			{
+				$content.="Fehler xmlrpc call $result";
+			}	
+			else if ($result[0]==1) // Methodenaufruf erfolgreich	
+			{
+#				$content.=(isset($result[1])?$result[1]:"Moodel-Kurs gel&ouml;scht ");
+				$qry = "DELETE FROM lehre.tbl_moodle WHERE mdl_course_id='".addslashes($mdl_course_id)."' ";
+				if ($moodle_id!='')
+					$qry.= " and moodle_id='".addslashes($moodle_id)."'"; 
+				if(!pg_query($conn, $qry))
+					$content.="<p>Moodlekurs $mdl_course_id in Lehre wurde NICHT gel&ouml;scht.</p>";
+				$content.="<h3>Moodlekurs $mdl_course_id wurde gel&ouml;scht.</h3>";
+			}	
+			else 
+				$content.=(isset($result[1])?$result[1]:"Fehler beim Kurs l&ouml;schen ");
 	}
 
 	
