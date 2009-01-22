@@ -1,8 +1,5 @@
 <?php 
 //@version $Id$
-
-$HeadURL$ 
-
 /* Copyright (C) 2008 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
@@ -25,18 +22,23 @@ $HeadURL$
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-
 /*
-	Dieses Programm listet nach Selektinskreterien alle Moodelkurse zu einem Studiengang auf. 
-	Fuer jede MoodleID werden die Anzahl Benotungen, und erfassten sowie angelegte Zusaetze angezeigt.
-	Jeder der angezeigten Moodle IDs kann geloescht werden nach bestaetigung eines PopUp Fenster.
+*	Dieses Programm listet nach Selektinskreterien alle Moodelkurse zu einem Studiengang auf. 
+*   Fuer jede MoodleID werden die Anzahl Benotungen, und erfassten sowie angelegte Zusaetze angezeigt.
+*	Jeder der angezeigten Moodle IDs kann geloescht werden nach bestaetigung eines PopUp Fenster.
 */
+
+
+// ***********************************************************************************************	
+// Include Dateien
+// ***********************************************************************************************
 // ---------------- Standart Include Dateien einbinden
 	require_once('../config.inc.php');
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/globals.inc.php');
 // ---------------- Moodle Daten Classe
 	include_once('../../include/moodle_course.class.php');
+	
 // ***********************************************************************************************	
 // Variable Initialisieren
 // ***********************************************************************************************
@@ -44,6 +46,7 @@ $HeadURL$
 	$content='';
 	// Vergleichsdatum Jahr und Monat fuer Studiensemester (Select-Auswahl)
 	$cYYYYMM=date("Ym", mktime(0,0,0,date("m"),date("d"),date("y")));
+
 	
 // ***********************************************************************************************
 // POST oder GET Parameter einlesen 
@@ -58,12 +61,11 @@ $HeadURL$
 	$mdl_course_id= (isset($_REQUEST['mdl_course_id'])?$_REQUEST['mdl_course_id']:'');
 // @$moodle_id Moodle SubKurs (Unterkat.) ID zu Moodle Kurs ID (mdl_course_id)
 	$moodle_id= (isset($_REQUEST['moodle_id'])?$_REQUEST['moodle_id']:'');
-
 // @$bAnzeige Listenanzeige wenn Submitbottom Anzeige gedrueckt wurde
 	$bAnzeige= ($studiensemester_kurzbz!=''?True:False);
-	
 // @cCharset Zeichensatz - Ajax mit UTF-8
 	$cCharset= (isset($_REQUEST['client_encode'])?trim($_REQUEST['client_encode']):'iso-8859-15');
+// @debug_switch Anzeige der xml-rfc Daten moegliche Stufen sind 0,1,2,3
 	$debug_switch= (isset($_REQUEST['debug'])?$_REQUEST['debug']:0);
 	
 	
@@ -75,12 +77,13 @@ $HeadURL$
 	$conn_moodle = pg_pconnect(CONN_STRING_MOODLE) or die('<div style="text-align:center;"><br />MOODLE Datenbank zurzeit NICHT Online.<br />Bitte etwas Geduld.<br />Danke</div>');
 	// Classen Instanzen
 	$objMoodle = new moodle_course($conn, $conn_moodle);	
+
 	
 // ***********************************************************************************************
 //	Verarbeitung einer Moodle-Kurs Loeschaktion
 // ***********************************************************************************************
-	//	Moodlekurs wird zum bearbeiten (loeschen) freigegeben
-	if ($mdl_course_id!='' && $studiensemester_kurzbz!='')
+	
+	if ($mdl_course_id!='' && $studiensemester_kurzbz!='') // Kurs wird zum bearbeiten (loeschen) freigegeben
 	{
 		include(dirname(__FILE__)."/xmlrpcutils/utils.php");
 	    // Aktuellen Moodle Server ermitteln.
@@ -96,6 +99,7 @@ $HeadURL$
 		{
 			$host = 'cis.technikum-wien.at';
 		}	
+
 	// Variable Daten Initialisieren
 		$uri = "/moodle/xmlrpc/xmlrpc.php";
 		$method = "DeleteCourseByID";
@@ -134,15 +138,18 @@ $HeadURL$
 					$content.="<p>Moodlekurs $mdl_course_id wurde NICHT gel&ouml;scht in Lehre.</p>";
 				$content.="<h3>Moodlekurs $mdl_course_id wurde gel&ouml;scht.</h3>";
 		}	
-		else 
+		else // Result = 0 ein Fehler im RFC wurde festgestellt
 		{
-				$content.=(isset($result[1])?$result[1]:"Fehler beim Kurs l&ouml;schen ");
+			$content.=(isset($result[1])?$result[1]:"Fehler beim Kurs l&ouml;schen ");
 		}	
 	}
+
+
+
 // ***********************************************************************************************
 //	HTML Auswahlfelder (Teil 1)
 // ***********************************************************************************************
-	// Formname erzeugen 
+	// FormName erzeugen
 	$cFormName='searchMoodleCurse'.$studiensemester_kurzbz.$studiengang_kz.$semester;
 	$content.='
 		<form name="'.$cFormName.'" method="GET">	
