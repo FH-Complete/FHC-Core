@@ -25,12 +25,12 @@
  * 			für Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 
-require_once('../../config.inc.php');
-require_once('../../../include/functions.inc.php');
-require_once('../../../include/datum.class.php');
-require_once('../../../include/person.class.php');
-require_once('../../../include/benutzer.class.php');
-require_once('../../../include/mitarbeiter.class.php');
+require_once('../../cis/config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/datum.class.php');
+require_once('../../include/person.class.php');
+require_once('../../include/benutzer.class.php');
+require_once('../../include/mitarbeiter.class.php');
 
 //DB Verbindung herstellen
 if (!$conn = @pg_pconnect(CONN_STRING))
@@ -139,10 +139,10 @@ else
 		<html>
 		<head>
 		<title>DA/BA-Benotung</title>
-		<link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
-		<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
+		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 		<meta http-equiv="content-type" content="text/html; charset=ISO-8859-9" />
-		<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
+		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 		<script language="Javascript">
 
 			function berechne() 
@@ -336,11 +336,11 @@ else
 		$htmlstr .= "<tr><td>0 - 50 Punkte = 5</td><td>51 - 64 Punkte = 4</td><td>65 - 77 Punkte = 3</td><td>78 - 90 Punkte = 2</td><td>91 - 100 Punkte = 1</td></tr>";
 		if($row->projekttyp_kurzbz=='Diplom')
 		{
-			$htmlstr .= "<tr><td colspan='5'>Ein Kriterium mit weniger als 50 Punkte &rArr; Diplomarbeit gesamt negativ</td></tr>";
+			$htmlstr .= "<tr><td colspan='5'>Ein Kriterium mit weniger als 50 Punkten &rArr; Diplomarbeit gesamt negativ</td></tr>";
 		}
 		else 
 		{
-			$htmlstr .= "<tr><td colspan='5'>Ein Kriterium mit weniger als 50 Punkte &rArr; Bachelorarbeit gesamt negativ</td></tr>";
+			$htmlstr .= "<tr><td colspan='5'>Ein Kriterium mit weniger als 50 Punkten &rArr; Bachelorarbeit gesamt negativ</td></tr>";
 		}
 		$htmlstr .= "</table>";
 		$htmlstr .= "<br><input type='submit' name='drucken' value='Formular ausdrucken'>";
