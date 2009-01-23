@@ -32,9 +32,10 @@
 	require_once('../../../include/benutzer.class.php');
 	require_once('../../../include/mitarbeiter.class.php');
 	require_once('../../../include/mail.class.php');
+	require_once('../../../include/benutzerberechtigung.class.php');
 
 	$uid = get_uid();
-
+	
 	$PHP_SELF = $_SERVER['PHP_SELF'];
 
 	if(isset($_GET['type']))
@@ -43,6 +44,21 @@
 	if (!$conn = @pg_pconnect(CONN_STRING))
 	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
 
+	//Wenn User Administrator ist und UID uebergeben wurde, dann die Zeitsperren 
+	//des uebergebenen Users anzeigen
+	if(isset($_GET['uid']))
+	{
+		$rechte = new benutzerberechtigung($conn);
+		$rechte->getBerechtigungen($uid);
+		if($rechte->isBerechtigt('admin'))
+		{
+			$uid = $_GET['uid'];
+		}
+		else 
+		{
+			die('Fuer diese Aktion benoetigen Sie Administratorenrechte');
+		}
+	}
 	$datum_obj = new datum();
 	$ma= new mitarbeiter($conn);
 
@@ -56,7 +72,7 @@
 "http://www.w3.org/TR/html4/loose.dtd"><html>
 <head>
 <title>Zeitsperre</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
 <link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 <script language="Javascript">
 function conf_del()
