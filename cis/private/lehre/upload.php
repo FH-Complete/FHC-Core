@@ -217,13 +217,18 @@ A:hover {
 							{
 								$ids='-1';
 								foreach ($arr as $elem)
-									$ids.=",'$elem'";
+								{
+									if($elem!='')
+										$ids.=",'$elem'";
+								}
 
 								$sql_query = "SELECT studiengang_kz, kurzbzlang, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM public.tbl_studiengang WHERE studiengang_kz IN(".$ids.")";
-								$result_stg_kurzbzlang=pg_exec($sql_conn, $sql_query);
-								while($row = pg_fetch_object($result_stg_kurzbzlang))
-									if(!array_key_exists($row->studiengang_kz,$stg_arr))
-										$stg_arr[$row->studiengang_kz]=$row->kurzbz;
+								if($result_stg_kurzbzlang=pg_query($sql_conn, $sql_query))
+								{
+									while($row = pg_fetch_object($result_stg_kurzbzlang))
+										if(!array_key_exists($row->studiengang_kz,$stg_arr))
+											$stg_arr[$row->studiengang_kz]=$row->kurzbz;
+								}
 							}
 						}
 

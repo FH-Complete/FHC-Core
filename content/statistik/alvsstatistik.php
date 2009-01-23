@@ -211,7 +211,7 @@ else
 
 
 
-	echo "<h2>ALVS</h2>";
+	echo "<h2>ALVS $stsem</h2>";
 
 	echo '<table class="liste" style="border: 1px solid black" cellspacing="0"><tr class="liste"><th>'.$stsem.'</th>';
 	$summe_fb = array();
@@ -248,7 +248,7 @@ else
 		echo "<td>";
 		if(isset($data[$key]['betreuungen']))
 		{
-			echo $data[$key]['betreuungen'];
+			echo number_format($data[$key]['betreuungen'],2);
 			$summe_fb['betreuungen']+=$data[$key]['betreuungen'];
 		}
 		else
@@ -271,7 +271,7 @@ else
 	}
 	echo "<td><b>";
 		if(isset($summe_fb['betreuungen']))
-			echo $summe_fb['betreuungen'];
+			echo number_format($summe_fb['betreuungen'],2);
 		else
 			echo "&nbsp;";
 		echo "</b></td>";

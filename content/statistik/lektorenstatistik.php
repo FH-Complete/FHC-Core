@@ -64,7 +64,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 		$ss = $stsem;
 	}
 	
-	echo "<h2>Lektorenstatistik (Lehrauftrag) $ws / $ss";
+	echo "<h2>Lektorenstatistik (Lehrauftrag ohne Betreuungen) $ws / $ss";
 	echo '<span style="position:absolute; right:15px;">'.date('d.m.Y').'</span></h2><br>';
 	echo '</h2>';
 	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">Studiensemester: <SELECT name="stsem">';
@@ -110,13 +110,13 @@ if($stsem!='')
 				<tbody>
 				
 			 ";
-	//Bachelor
+	
 	$qry = "SELECT 
 				bezeichnung, 
 				(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE studiensemester_kurzbz in('$ws','$ss') AND fachbereich_kurzbz=a.fachbereich_kurzbz AND fixangestellt) a) as fix,
 				(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE studiensemester_kurzbz in('$ws','$ss') AND fachbereich_kurzbz=a.fachbereich_kurzbz AND NOT fixangestellt) a) as extern,
-				(SELECT sum(semesterstunden) FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE studiensemester_kurzbz='$ws' AND fachbereich_kurzbz=a.fachbereich_kurzbz) as ws,
-				(SELECT sum(semesterstunden) FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE studiensemester_kurzbz='$ss' AND fachbereich_kurzbz=a.fachbereich_kurzbz) as ss
+				(SELECT sum(semesterstunden) FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE studiensemester_kurzbz='$ws' AND fachbereich_kurzbz=a.fachbereich_kurzbz AND faktor>0 AND stundensatz>0) as ws,
+				(SELECT sum(semesterstunden) FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE studiensemester_kurzbz='$ss' AND fachbereich_kurzbz=a.fachbereich_kurzbz AND faktor>0 AND stundensatz>0) as ss
 			FROM public.tbl_fachbereich a WHERE aktiv ORDER BY bezeichnung";
 	/*
 	Mitarbeiter laut institutszuordnung

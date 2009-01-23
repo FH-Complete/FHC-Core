@@ -28,11 +28,15 @@ require_once('../../../include/person.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/resturlaub.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim Connecten zur Datenbank');
 
 $user = get_uid();
+
+$rechte = new benutzerberechtigung($conn);
+$rechte->getBerechtigungen($user);
 
 if(isset($_GET['year']) && is_numeric($_GET['year']))
 	$year = $_GET['year'];
@@ -76,7 +80,7 @@ echo '<html>
 $mitarbeiter = new mitarbeiter($conn);
 $mitarbeiter->getUntergebene($user);
 
-if(count($mitarbeiter->untergebene)==0)
+if(count($mitarbeiter->untergebene)==0 && !$rechte->isBerechtigt('admin'))
 	die('Es sind Ihnen keine Mitarbeiter zugeteilt für die sie den Urlaub freigeben dürfen');
 $untergebene = '';
 foreach ($mitarbeiter->untergebene as $row)
@@ -84,6 +88,13 @@ foreach ($mitarbeiter->untergebene as $row)
 	if($untergebene!='')
 		$untergebene.=',';
 	$untergebene .= "'".$row."'";
+}
+
+if($rechte->isBerechtigt('admin'))
+{
+	if($untergebene!='')
+			$untergebene.=',';
+	$untergebene .= "'".$uid."'";
 }
 $qry = "SELECT * FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid in($untergebene)";
 
@@ -98,7 +109,7 @@ if($result = pg_query($conn, $qry))
 		$mitarbeiter[$row->uid]['titelpost']=$row->titelpost;
 	}
 }
-if($uid!='' && !isset($mitarbeiter[$uid]) && $uid!=$user)
+if($uid!='' && !isset($mitarbeiter[$uid]) && $uid!=$user && !$rechte->isBerechtigt('admin'))
 	die('Sie haben keine Berechtigung fuer diesen Mitarbeiter');
 
 //Freigeben eines Urlaubes
