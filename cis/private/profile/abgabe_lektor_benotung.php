@@ -312,7 +312,7 @@ else
 			$htmlstr .= "<td width='30%'><b>Qualit&auml;t der Hintergrundinformation</b><br>
 			Werden Gesamtzusammenhänge erkannt, wird Bedeutung und Gewicht der Einflussfaktoren / Daten / Informationen richtig bewertet?<br>
 			Intelligente Darstellung des relevanten Stands der Technik und des Firmenumfelds<br>
-			Aufdecken und Darstellen von gr&ouml;&szlig;eren (z.B. wirtschaftlichen und sozialen) Zusammenh&auml;ngen und Entsprechende Diskussion</td>
+			Aufdecken und Darstellen von gr&ouml;&szlig;eren (z.B. wirtschaftlichen und sozialen) Zusammenh&auml;ngen und entsprechende Diskussion</td>
 			<td width='40%'><textarea name='hintergrund' value='".$hintergrund."' cols='60'  rows='10'></textarea></td>\n
 			<td width='10%' align='center'><input type='hidden' name='weight' id='weight3' value='0.25'>
 			<input  type='text' name='punkte3' value='".$punkte3."' size='5' maxlength='5' id='punkte3' style='text-align:right' onkeyup='berechne()'></td>\n
