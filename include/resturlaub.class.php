@@ -205,7 +205,7 @@ class resturlaub
 	function getResturlaubFixangestellte()
 	{
 		$qry = "SELECT * FROM campus.vw_mitarbeiter LEFT JOIN campus.tbl_resturlaub ON(uid=mitarbeiter_uid) 
-				WHERE fixangestellt=true ORDER BY nachname, vorname";
+				WHERE fixangestellt=true AND aktiv=true ORDER BY nachname, vorname";
 		
 		if($result = pg_query($this->conn, $qry))
 		{

@@ -109,6 +109,7 @@ foreach ($obj->result as $row)
 				<NOTE:student_nachname><![CDATA['.$benutzer->nachname.']]></NOTE:student_nachname>
 				<NOTE:student_vorname><![CDATA['.$benutzer->vorname.']]></NOTE:student_vorname>
 				<NOTE:studiengang><![CDATA['.$stg_arr[$benutzer->studiengang_kz].']]></NOTE:studiengang>
+				<NOTE:studiengang_lv><![CDATA['.$stg_arr[$lv_obj->studiengang_kz].']]></NOTE:studiengang_lv>
 				<NOTE:student_semester><![CDATA['.$benutzer->semester.']]></NOTE:student_semester>
 	         </RDF:Description>
 	      </RDF:li>';
