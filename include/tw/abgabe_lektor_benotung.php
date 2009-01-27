@@ -120,8 +120,7 @@ else
 	$pdf->SetXY(30,30);
 
 	//Logo
-	$pdf->Image("../../skin/images/logo.jpg","430","25","120","35","jpg","");
-	//$pdf->Image("../../../skin/images/tw_logo_02.jpg","400","30","116","43","jpg","");
+	$pdf->Image("../../skin/images/logo.jpg","400","25","160","54","jpg","");
 	
 	$pdf->SetFont('Arial','',12);
 	$pdf->SetFillColor(190,190,190);
@@ -390,7 +389,14 @@ else
 	$pdf->MultiCell(53,12,$summe2,1,'C',0);
 	//Feld Umrechnung Punkte=>Note
 	$pdf->SetFont('Arial','',7);
-	$maxY=705;
+	if($stgtyp=='Bachelor')
+	{
+		$maxY=680;
+	}
+	else 
+	{
+		$maxY=705;
+	}
 	$maxX=160;
 	$pdf->SetXY($maxX,$maxY);
 	$pdf->MultiCell(80,12,'0 - 50 Punkte = 5',1,'C',0);
@@ -576,7 +582,7 @@ else
 		<body class="Background_main"  style="background-color:#eeeeee;" onload="berechne()">';
 				
 		$htmlstr = "<br>";
-		$htmlstr .= "<table class='detail' border='1'>\n";
+		$htmlstr .= "<table border='1'  class='detail'>\n";
 		$htmlstr .= "<form action='$PHP_SELF' method='POST' name='note'>";
 		$htmlstr .= "<tr><td style='font-size:16px' colspan='5'>Student: <b>".$uid.", ".$row->vorname." ".$row->nachname."</b></td>";
 		$htmlstr .= "<tr><td style='font-size:16px' colspan='5'>Titel: <b>".$titel."</b>";
@@ -608,9 +614,9 @@ else
 		$htmlstr .= "</td></tr>";
 		$htmlstr .= "<td>&nbsp;</td><td align='center'>Kurze verbale Beurteilung</td><td align='center'>Punkte (0-100)</td><td align='center'>Gewicht</td><td align='center'>Punkte * Gewicht</td>\n";
 		$htmlstr .= "<tr>\n";
-		if($row->projekttyp_kurzbz=='Diplom')
+		if($row->projekttyp_kurzbz!='Bachelor')
 		{
-			$htmlstr .= "<td width='30%'><b>Qualit&auml;t des eigenen Beitrags<br>
+			$htmlstr .= "<td width='40%'><b>Qualit&auml;t des eigenen Beitrags<br>
 			Angewandte Methodik, z.B.</b><br>Projektm&auml;&szlig;ige Vorgangsweise<br>
 			Wissenschaftlich - systematische Methoden in der Analyse bzw. L&ouml;sungsfindung<br>
 			<b>Art der Probleml&ouml;sung</b><br>
@@ -622,7 +628,7 @@ else
 		}
 		else 
 		{
-			$htmlstr .= "<td width='30%'><b>Qualit&auml;t des eigenen Beitrags<br>
+			$htmlstr .= "<td width='40%'><b>Qualit&auml;t des eigenen Beitrags<br>
 			Angewandte Methodik, z.B.</b><br>wissenschaftlich fundierte, systematische, ingenieurm&auml;&szlig;ige Vorgangsweise<br>
 			Ist der eigene Beitrag deutlich sichtbar?<br>
 			Eigenst&auml;ndigkeit und Kreativit&auml;t der L&ouml;sung<br>
@@ -630,12 +636,12 @@ else
 			Qualit&auml;t der L&ouml;sung</td>";
 			$weight1='0.6';
 		}
-		$htmlstr .= "<td width='40%'><textarea name='qualitaet' value='".$qualitaet."' cols='60'  rows='10' 
-		onKeyDown='txtcount(this.form.qualitaet,this.form.remLen,125);' onKeyUp='txtcount(this.form.qualitaet,this.form.remLen,125);'></textarea>
-		<br>Buchstaben noch zur Verf&uuml;gung<input readonly type=text name=remLen size=3 maxlength=3 value='125' style='text-align:right'> </td>\n
+		$htmlstr .= "<td width='30%'><textarea name='qualitaet' value='".$qualitaet."' cols='50'  rows='10' 
+		onKeyDown='txtcount(this.form.qualitaet,this.form.remLen,500);' onKeyUp='txtcount(this.form.qualitaet,this.form.remLen,500);'></textarea>
+		<br>Buchstaben noch zur Verf&uuml;gung<input readonly type=text name=remLen size=3 maxlength=3 value='500' style='text-align:right'> </td>\n
 		<td width='10%' align='center'><input type='hidden' name='weight' id='weight1' value='".$weight1."'>
 		<input  type='text' name='punkte1' value='".$punkte1."' size='5' maxlength='5' id='punkte1' onkeyup='berechne()' style='text-align:right'></td>\n";
-		if($row->projekttyp_kurzbz=='Diplom')
+		if($row->projekttyp_kurzbz!='Bachelor')
 		{
 			$htmlstr.="<td width='10%' align='center'>0.55</td>";
 		}
@@ -644,33 +650,33 @@ else
 			$htmlstr.="<td width='10%' align='center'>0.60</td>";
 		}
 		$htmlstr .="<td width='10%' align='center'><input  type='text' name='punkteges1' value='".$punkteges1."' id='punkteges1' style='text-align:right' size='5' maxlength='5' readonly></td></tr>\n";
-		if($row->projekttyp_kurzbz=='Diplom')
+		if($row->projekttyp_kurzbz!='Bachelor')
 		{
-			$htmlstr .= "<td width='30%'><b>Form / Stil</b><br>
+			$htmlstr .= "<td width='40%'><b>Form / Stil</b><br>
 			Hat die Diplomarbeit eine klare Stuktur, entspricht der Vorgabe?<br>
 			Wird einwandfrei zitiert?<br>
 			Abbildungen<br>
 			Sprache: benötigte &Uuml;berarbeitungen seitens der Betreuerin / des Betreuers</td>
-			<td width='40%'><textarea name='form' value='".$form."' cols='60'  rows='10' 
-			onKeyDown='txtcount(this.form.form,this.form.remLen2,125);' onKeyUp='txtcount(this.form.form,this.form.remLen2,125);'></textarea>
-			<br>Buchstaben noch zur Verf&uuml;gung<input readonly type=text name=remLen2 size=3 maxlength=3 value='125' style='text-align:right'></td>\n";
+			<td width='30%'><textarea name='form' value='".$form."' cols='50'  rows='10' 
+			onKeyDown='txtcount(this.form.form,this.form.remLen2,500);' onKeyUp='txtcount(this.form.form,this.form.remLen2,500);'></textarea>
+			<br>Buchstaben noch zur Verf&uuml;gung<input readonly type=text name=remLen2 size=3 maxlength=3 value='500' style='text-align:right'></td>\n";
 			$weight2='0.2';
 		}
 		else 
 		{
-			$htmlstr .= "<td width='30%'><b>Form / Stil</b><br>
+			$htmlstr .= "<td width='40%'><b>Form / Stil</b><br>
 			Hat die Bachelorarbeit eine klare Stuktur, entspricht der Vorgabe?<br>
 			Wird einwandfrei zitiert?<br>
 			Abbildungen<br>
 			Sprache</td>
-			<td width='40%'><textarea name='form' value='".$form."' cols='60'  rows='10' 
-			onKeyDown='txtcount(this.form.form,this.form.remLen2,125);' onKeyUp='txtcount(this.form.form,this.form.remLen2,125);'></textarea>
-			<br>Buchstaben noch zur Verf&uuml;gung<input readonly type=text name=remLen2 size=3 maxlength=3 value='125' style='text-align:right'></td>\n";
+			<td width='30%'><textarea name='form' value='".$form."' cols='50'  rows='10' 
+			onKeyDown='txtcount(this.form.form,this.form.remLen2,500);' onKeyUp='txtcount(this.form.form,this.form.remLen2,500);'></textarea>
+			<br>Buchstaben noch zur Verf&uuml;gung<input readonly type=text name=remLen2 size=3 maxlength=3 value='500' style='text-align:right'></td>\n";
 			$weight2='0.4';
 		}
 		$htmlstr .= "<td width='10%' align='center'><input type='hidden' name='weight' id='weight2' value='".$weight2."'>
 		<input  type='text' name='punkte2' value='".$punkte2."' size='5' maxlength='5' id='punkte2' onkeyup='berechne()' style='text-align:right'></td>\n";
-		if($row->projekttyp_kurzbz=='Diplom')
+		if($row->projekttyp_kurzbz!='Bachelor')
 		{
 			$htmlstr .="<td width='10%' align='center'>0.20</td>";
 		}
@@ -679,15 +685,15 @@ else
 			$htmlstr .="<td width='10%' align='center'>0.40</td>";
 		}
 		$htmlstr .="<td width='10%' align='center'><input  type='text' name='punkteges2' value='".$punkteges2."' style='text-align:right' size='5' maxlegnth='3' id='punkteges2' readonly></td></tr>\n";
-		if($row->projekttyp_kurzbz=='Diplom')
+		if($row->projekttyp_kurzbz!='Bachelor')
 		{
-			$htmlstr .= "<td width='30%'><b>Qualit&auml;t der Hintergrundinformation</b><br>
+			$htmlstr .= "<td width='40%'><b>Qualit&auml;t der Hintergrundinformation</b><br>
 			Werden Gesamtzusammenhänge erkannt, wird Bedeutung und Gewicht der Einflussfaktoren / Daten / Informationen richtig bewertet?<br>
 			Intelligente Darstellung des relevanten Stands der Technik und des Firmenumfelds<br>
 			Aufdecken und Darstellen von gr&ouml;&szlig;eren (z.B. wirtschaftlichen und sozialen) Zusammenh&auml;ngen und entsprechende Diskussion</td>
-			<td width='40%'><textarea name='hintergrund' value='".$hintergrund."' cols='60'  rows='10' 
-			onKeyDown='txtcount(this.form.hintergrund,this.form.remLen3,125);' onKeyUp='txtcount(this.form.hintergrund,this.form.remLen3,125);'></textarea>
-			<br>Buchstaben noch zur Verf&uuml;gung<input readonly type=text name=remLen3 size=3 maxlength=3 value='125' style='text-align:right'></td>\n
+			<td width='30%'><textarea name='hintergrund' value='".$hintergrund."' cols='50'  rows='10' 
+			onKeyDown='txtcount(this.form.hintergrund,this.form.remLen3,500);' onKeyUp='txtcount(this.form.hintergrund,this.form.remLen3,500);'></textarea>
+			<br>Buchstaben noch zur Verf&uuml;gung<input readonly type=text name=remLen3 size=3 maxlength=3 value='500' style='text-align:right'></td>\n
 			<td width='10%' align='center'><input type='hidden' name='weight' id='weight3' value='0.25'>
 			<input  type='text' name='punkte3' value='".$punkte3."' size='5' maxlength='5' id='punkte3' style='text-align:right' onkeyup='berechne()'></td>\n
 			<td width='10%' align='center'>0.25</td>
@@ -708,7 +714,7 @@ else
 		$htmlstr .="</table>";
 		$htmlstr .= "<br><table border='1' align='center' width='60%'>";
 		$htmlstr .= "<tr><td>0 - 50 Punkte = 5</td><td>51 - 64 Punkte = 4</td><td>65 - 77 Punkte = 3</td><td>78 - 90 Punkte = 2</td><td>91 - 100 Punkte = 1</td></tr>";
-		if($row->projekttyp_kurzbz=='Diplom')
+		if($row->projekttyp_kurzbz!='Bachelor')
 		{
 			$htmlstr .= "<tr><td colspan='5'>Ein Kriterium mit weniger als 50 Punkten &rArr; Diplomarbeit gesamt negativ</td></tr>";
 		}
