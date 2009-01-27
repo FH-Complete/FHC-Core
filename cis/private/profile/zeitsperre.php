@@ -199,23 +199,26 @@
 	$zs=new zeitsperre($conn);
 	foreach ($mitarbeiter as $ma)
 	{
-		$zs->getzeitsperren($ma->uid, false);
-		echo '<TR>';
-		echo "<td>$ma->nachname $ma->vorname</td>";
-		for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
+		if($ma->aktiv)
 		{
-			$tag=date('d',$ts);
-			$monat=date('M',$ts);
-			$wt=date('w',$ts);
-			if ($wt==0 || $wt==6)
-				$class='feiertag';
-			else
-				$class='';
-			$grund=$zs->getTyp($ts);
-			$erbk=$zs->getErreichbarkeit($ts);
-			echo "<td class='$class'>$grund<br>$erbk</td>";
+			$zs->getzeitsperren($ma->uid, false);
+			echo '<TR>';
+			echo "<td>$ma->nachname $ma->vorname</td>";
+			for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
+			{
+				$tag=date('d',$ts);
+				$monat=date('M',$ts);
+				$wt=date('w',$ts);
+				if ($wt==0 || $wt==6)
+					$class='feiertag';
+				else
+					$class='';
+				$grund=$zs->getTyp($ts);
+				$erbk=$zs->getErreichbarkeit($ts);
+				echo "<td class='$class'>$grund<br>$erbk</td>";
+			}
+			echo '</TR>';
 		}
-		echo '</TR>';
 	}
 	?>
 

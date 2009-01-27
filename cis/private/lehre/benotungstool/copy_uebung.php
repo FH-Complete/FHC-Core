@@ -263,12 +263,17 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 			echo "<span class='error'>Fehler beim Datenbankzugriff!</span>";
 			
 		if ($error == 0)
+		{
 			echo "Übung erfolgreich kopiert! (Ü: ".$copy_insert."/".$copy_update."; B: ".$copy_insert_bsp."/".$copy_update_bsp.")";
+			echo '<br><br><a href="'.$_SERVER['PHP_SELF'].'" class="Item">noch eine Übung Kopieren</a>';
+		}
+			
 	}
 }
 else 
 {
 	echo '
+		<h1>Kopieren von Übungen in eine andere Lehreinheit</h1>
 		Script zum Kopieren einer Übung in eine beliebige Lehreinheit:<br><br>
 		<form action="'.$_SERVER['PHP_SELF'].'" method="GET">
 			ÜbungID die Kopiert werden soll: <input type="text" name="uebung_id_source"><br>

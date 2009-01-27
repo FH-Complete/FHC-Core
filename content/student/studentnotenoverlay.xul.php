@@ -94,7 +94,11 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 			<splitter class="tree-splitter"/>
 			<treecol id="student-noten-tree-studiengang" label="Studiengang" flex="2" hidden="true" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#Studiengang" />
+				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang" />
+			<splitter class="tree-splitter"/>
+			<treecol id="student-noten-tree-studiengang_lv" label="StudiengangLV" flex="2" hidden="true" persist="hidden, width, ordinal"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang_lv" />
 			<splitter class="tree-splitter"/>
 			<treecol id="student-noten-tree-lehrform" label="Lehrform" flex="2" hidden="true" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator"
@@ -120,6 +124,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#student_uid"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#lehrveranstaltung_id"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang"/>
+						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang_lv"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#lehrveranstaltung_lehrform"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#lehrveranstaltung_kurzbz"/>
 					</treerow>

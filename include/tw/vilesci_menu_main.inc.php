@@ -56,7 +56,8 @@ $menu=array
 			'name'=>'Lehreinheit', 'permissions'=>array('admin','lv-plan','support'),
 			'Verwaltung'=>array('name'=>'Verwaltung', 'link'=>'lehre/lv_verteilung/lv_verteilung.php', 'target'=>'main'),
 			'Wartung'=>array('name'=>'Wartung', 'link'=>'stammdaten/le_wartung.php', 'target'=>'main'),
-			'Vorrueckung'=>array('name'=>'Vorrueckung', 'link'=>'lehre/lehreinheiten_vorrueckung.php', 'target'=>'main')
+			'Vorrueckung'=>array('name'=>'Vorrueckung', 'link'=>'lehre/lehreinheiten_vorrueckung.php', 'target'=>'main'),
+			'Kreuzerllisten kopieren'=>array('name'=>'Kreuzerllisten kopieren', 'link'=>'https://cis.technikum-wien.at/cis/private/lehre/benotungstool/copy_uebung.php', 'target'=>'_blank')
 		),
 		'Freifach'=>array
 		(
