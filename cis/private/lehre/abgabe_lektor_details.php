@@ -134,7 +134,7 @@ else
 $qry="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$projektarbeit_id."' ORDER BY datum;";
 $htmlstr .= "<table width=100%>\n";
 $htmlstr .= "<tr><td style='font-size:16px'>Student: <b>".$uid."</b></td>";
-$htmlstr .= "<td width=20% align=center><form action='../../../include/'.EXT_FKT_PATH.'/abgabe_lektor_benotung.php' target='_blank' method='GET'>";
+$htmlstr .= "<td width=20% align=center><form action='../../../include/".EXT_FKT_PATH."/abgabe_lektor_benotung.php' target='_blank' method='GET'>";
 $htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
 $htmlstr .= "<input type='hidden' name='titel' value='".$titel."'>\n";
 $htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
