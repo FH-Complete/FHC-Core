@@ -482,9 +482,76 @@ else
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 		<meta http-equiv="content-type" content="text/html; charset=ISO-8859-9" />
+		<style type="text/css">			
+			.textInput,textarea 
+			{
+				background-color: #FFFFFF;
+			}
+			
+			.inputHighlighted 
+			{
+				background-color: #EEFFEE;
+				color: #000;
+			}
+
+		</style>
+
 		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 		<script language="Javascript">
-
+			var currentlyActiveInputRef = false;
+			var currentlyActiveInputClassName = false;
+			
+			function highlightActiveInput() 
+			{
+				if(currentlyActiveInputRef) 
+				{
+					currentlyActiveInputRef.className = currentlyActiveInputClassName;
+				}
+				currentlyActiveInputClassName = this.className;
+				this.className = "inputHighlighted";
+				currentlyActiveInputRef = this;
+			}
+				
+			function blurActiveInput() 
+			{
+				this.className = currentlyActiveInputClassName;
+			}
+			
+			function initInputHighlightScript() 
+			{
+				var tags = ["INPUT","TEXTAREA"];
+				for(tagCounter=0;tagCounter<tags.length;tagCounter++)
+				{
+					var inputs = document.getElementsByTagName(tags[tagCounter]);
+					for(var no=0;no<inputs.length;no++)
+					{
+						if(inputs[no].className && inputs[no].className=="doNotHighlightThisInput")
+						{
+							continue;
+						}
+						if((inputs[no].tagName.toLowerCase()=="textarea" || (inputs[no].tagName.toLowerCase()=="input" && inputs[no].type.toLowerCase()=="text"))&&inputs[no].readOnly==false)
+						{
+							inputs[no].onfocus = highlightActiveInput;
+							inputs[no].onblur = blurActiveInput;
+						}
+					}
+				}
+			}
+			
+			function inputcheck()
+			{
+				if(document.getElementById("summe2").value=="NaN")
+				{
+					alert("Eingabe ungültig! Bitte nur Ziffern eingeben.");
+					document.getElementById("drucken").disabled=false;
+					return false;
+				}
+				else
+				{
+					return true;
+				}
+			}
+			
 			function berechne() 
 			{
 				ergebnis=document.getElementById("punkte1").value*document.getElementById("weight1").value;
@@ -583,7 +650,7 @@ else
 				
 		$htmlstr = "<br>";
 		$htmlstr .= "<table border='1'  class='detail'>\n";
-		$htmlstr .= "<form action='$PHP_SELF' method='POST' name='note'>";
+		$htmlstr .= "<form action='$PHP_SELF' method='POST' name='note' onsubmit='return inputcheck()'>";
 		$htmlstr .= "<tr><td style='font-size:16px' colspan='5'>Student: <b>".$uid.", ".$row->vorname." ".$row->nachname."</b></td>";
 		$htmlstr .= "<tr><td style='font-size:16px' colspan='5'>Titel: <b>".$titel."</b>";
 		$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
@@ -708,8 +775,8 @@ else
 		}
 		$htmlstr .= "<td colspan='2'>Gesamtpunkte</td>";
 		$htmlstr .="<td align='center'><input  type='text' name='summe1' value='".$summe1."' id='summe1' style='text-align:right' size='5' maxlength='5' readonly></td>
-		<td align='center'>1</td>
-		<td align='center'><input  type='text' name='summe2' value='".$summe2."' id='summe2' style='text-align:right' size='5' maxlength='5' readonly></td><tr>";
+			<td align='center'>1</td>
+			<td align='center'><input  type='text' name='summe2' value='".$summe2."' id='summe2' style='text-align:right' size='5' maxlength='5' readonly></td><tr>";
 		$htmlstr .= "<td colspan='4'>Note</td><td align='center'><input  type='text' name='note' value='".$note."' id='note' style='text-align:right' size='5' maxlength='5' readonly></td></tr>";
 		$htmlstr .="</table>";
 		$htmlstr .= "<br><table border='1' align='center' width='60%'>";
@@ -723,7 +790,7 @@ else
 			$htmlstr .= "<tr><td colspan='5'>Ein Kriterium mit weniger als 50 Punkten &rArr; Bachelorarbeit gesamt negativ</td></tr>";
 		}
 		$htmlstr .= "</table>";
-		$htmlstr .= "<br><input type='submit' name='drucken' value='Formular ausdrucken'>";
+		$htmlstr .= "<br><input type='submit' name='drucken' value='Formular ausdrucken' id='drucken' onclick='this.disabled=true;'>";
 		$htmlstr .="</form>";
 		$htmlstr .="</body></html>";
 		echo $htmlstr;
@@ -733,5 +800,10 @@ else
 		die('Betreuung nicht gefunden!');
 	}	
 }
+echo '<script type="text/javascript">
+<!--
+	initInputHighlightScript();
+//-->
+</script>';
 
 ?>
