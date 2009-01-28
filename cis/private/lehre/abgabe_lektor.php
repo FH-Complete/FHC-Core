@@ -50,6 +50,7 @@ $sql_query = "SELECT * FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_
 								WHERE public.tbl_benutzer.person_id=lehre.tbl_projektbetreuer.person_id 
 								AND public.tbl_benutzer.uid='sommert')
 		AND lehre.tbl_projektarbeit.note IS NULL 
+		AND (betreuerart_kurzbz='Betreuer' OR betreuerart_kurzbz='Begutachter' OR betreuerart_kurzbz='Erstbegutachter' OR betreuerart_kurzbz='Erstbetreuer')
 		ORDER BY tbl_projektarbeit.projektarbeit_id, betreuerart_kurzbz desc) as xy 
 		ORDER BY nachname";
 if(!$erg=pg_query($conn, $sql_query))
