@@ -49,8 +49,8 @@ if(!isset($_POST['uid']))
 	$datum = '01.01.1980';
 	$kurzbz = '';
 	$kontrollschlagwoerter = '';
-	$schlagwoerter_de = '';
 	$schlagwoerter = '';
+	$schlagwoerter_en = '';
 	$abstract = '';
 	$abstract_en = '';
 	$seitenanzahl = '';
@@ -70,8 +70,8 @@ else
 	$kurzbz = (isset($_POST['kurzbz'])?$_POST['kurzbz']:'');
 	$betreuer = (isset($_POST['betreuer'])?$_POST['betreuer']:'-1');
 	$kontrollschlagwoerter = (isset($_POST['kontrollschlagwoerter'])?$_POST['kontrollschlagwoerter']:'-1');
-	$schlagwoerter_de = (isset($_POST['schlagwoerter_de'])?$_POST['schlagwoerter_de']:'-1');
 	$schlagwoerter = (isset($_POST['schlagwoerter'])?$_POST['schlagwoerter']:'-1');
+	$schlagwoerter_en = (isset($_POST['schlagwoerter_en'])?$_POST['schlagwoerter_en']:'-1');
 	$abstract = (isset($_POST['abstract'])?$_POST['abstract']:'-1');
 	$abstract_en = (isset($_POST['abstract_en'])?$_POST['abstract_en']:'-1');
 	$seitenanzahl = (isset($_POST['seitenanzahl'])?$_POST['seitenanzahl']:'-1');
@@ -113,8 +113,8 @@ if($command=='add')
 				seitenanzahl = '".$seitenanzahl."', 
 				abgabedatum = '".$abgabedatum."', 
 				kontrollschlagwoerter = '".$kontrollschlagwoerter."', 
+				schlagwoerter_en = '".$schlagwoerter_en."', 
 				schlagwoerter = '".$schlagwoerter."', 
-				schlagwoerter_de = '".$schlagwoerter_de."', 
 				abstract = '".$abstract."', 
 				abstract_en = '".$abstract_en."' 
 				WHERE projektarbeit_id = '".$projektarbeit_id."'";
@@ -183,7 +183,7 @@ if($command=="update" || $error==true)
 				$result_zd=@pg_query($conn, $qry_zd);
 				$row_zd=@pg_fetch_object($result_zd);
 				$htmlstr = "<div>Betreuer: <b>".$betreuer."</b><br>Titel: <b>".$titel."<b><br><br></div>\n";
-				$htmlstr .= "<table class='detail' style='padding-top:10px;' >\n";
+				$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
 				$htmlstr .= "<tr></tr>\n";
 				$htmlstr .= "<form action='$PHP_SELF' method='POST' name='".$projektarbeit_id."'>\n";
 				$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
@@ -192,20 +192,15 @@ if($command=="update" || $error==true)
 				$htmlstr .= "<input type='hidden' name='titel' value='".$titel."'>\n";
 				$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
 				$htmlstr .= "<input type='hidden' name='betreuer' value='".$betreuer."'>\n";
-				$htmlstr .= "<input type='hidden' name='kontrollschlagwoerter' value='".$kontrollschlagwoerter."'>\n";
-				$htmlstr .= "<input type='hidden' name='schlagwoerter_de' value='".$schlagwoerter_de."'>\n";
-				$htmlstr .= "<input type='hidden' name='schlagwoerter' value='".$schlagwoerter."'>\n";
-				$htmlstr .= "<input type='hidden' name='abstract' value='".$abstract."'>\n";
-				$htmlstr .= "<input type='hidden' name='abstract' value='".$abstract_en."'>\n";
-				$htmlstr .= "<input type='hidden' name='seitenanzahl' value='".$seitenanzahl."'>\n";
 				$htmlstr .= "<input type='hidden' name='command' value='add'>\n";
 				$htmlstr .= "<tr>\n";
-				$htmlstr .= "<td><b>Kontrollierte Schlagw&ouml;rter:</b></td><td><input  type='text' name='kontrollschlagwoerter' value='".$row_zd->kontrollschlagwoerter."' size='60' maxlength='150'></td></tr>\n";
-				$htmlstr .= "<td><b>Dt. Schlagw&ouml;rter:</b></td><td><input  type='text' name='schlagwoerter_de' value='".$row_zd->schlagwoerter_de."' size='60' maxlength='150'></td></tr>\n";
-				$htmlstr .= "<td><b>Engl. Schlagw&ouml;rter:</b></td><td><input  type='text' name='schlagwoerter' value='".$row_zd->schlagwoerter."' size='60' maxlength='150'></td></tr>\n";
-				$htmlstr .= "<td valign='top'><b>Abstract </b>(max. 5000 Zeichen):</td><td><textarea name='abstract' value='".$row_zd->abstract."' cols='60'  rows='15'></textarea></td></tr>\n";
-				$htmlstr .= "<td valign='top'><b>Engl. Abstract </b>(max. 5000 Zeichen):</td><td><textarea name='abstract' value='".$row_zd->abstract_en."' cols='60'  rows='15'></textarea></td></tr>\n";
-				$htmlstr .= "<td><b>Seitenanzahl:</b></td><td><input  type='text' name='seitenanzahl' value='".$row_zd->seitenanzahl."' size='5' maxlength='4'></td></tr>\n";
+				$htmlstr .= "<td width='30%'><b>Kontrollierte Schlagw&ouml;rter:</b></td><td width='40%'><input  type='text' name='kontrollschlagwoerter'  id='kontrollschlagwoerter' value='".$kontrollschlagwoerter."' size='60' maxlength='150'></td>
+					<td  width='30%' align='left'><input type='button' name='SWD' value='    SWD    ' onclick='window.open(\"abgabe_student_swd.php\")'></td></tr>\n";
+				$htmlstr .= "<td><b>Dt. Schlagw&ouml;rter:</b></td><td><input  type='text' name='schlagwoerter' value='".$schlagwoerter."' size='60' maxlength='150'></td></tr>\n";
+				$htmlstr .= "<td><b>Engl. Schlagw&ouml;rter:</b></td><td><input  type='text' name='schlagwoerter_en' value='".$schlagwoerter_en."' size='60' maxlength='150'></td></tr>\n";
+				$htmlstr .= "<td valign='top'><b>Abstract </b>(max. 5000 Zeichen):</td><td><textarea name='abstract' cols='46'  rows='7'>$abstract</textarea></td></tr>\n";
+				$htmlstr .= "<td valign='top'><b>Engl. Abstract </b>(max. 5000 Zeichen):</td><td><textarea name='abstract_en' cols='46'  rows='7'>$abstract_en</textarea></td></tr>\n";
+				$htmlstr .= "<td><b>Seitenanzahl:</b></td><td><input  type='text' name='seitenanzahl' value='".$seitenanzahl."' size='5' maxlength='4'></td></tr>\n";
 				$htmlstr .= "<td><input type='submit' name='schick' value='abschicken'></td>";
 				$htmlstr .= "</tr>\n";
 				$htmlstr .= "</form>\n";
@@ -244,7 +239,7 @@ if($command!="add")
 	<meta http-equiv="content-type" content="text/html; charset=ISO-8859-9" />
 	<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
 	</head>
-	<body class="Background_main"  style="background-color:#eeeeee;">
+	<body class="Background_main"  style="background-color:#eeeeee;" onload="a()">
 	<h3>Abgabe Studentenbereich</h3>';
 
 	//Einlesen der Termine
@@ -266,10 +261,10 @@ if($command!="add")
 			$htmlstr .= "<input type='hidden' name='betreuer' value='".$betreuer."'>\n";
 			$htmlstr .= "<input type='hidden' name='command' value='update'>\n";
 			$htmlstr .= "<input type='hidden' name='kontrollschlagwoerter' value='".$kontrollschlagwoerter."'>\n";
-			$htmlstr .= "<input type='hidden' name='schlagwoerter_de' value='".$schlagwoerter_de."'>\n";
 			$htmlstr .= "<input type='hidden' name='schlagwoerter' value='".$schlagwoerter."'>\n";
+			$htmlstr .= "<input type='hidden' name='schlagwoerter_en' value='".$schlagwoerter_en."'>\n";
 			$htmlstr .= "<input type='hidden' name='abstract' value='".$abstract."'>\n";
-			$htmlstr .= "<input type='hidden' name='abstract' value='".$abstract_en."'>\n";
+			$htmlstr .= "<input type='hidden' name='abstract_en' value='".$abstract_en."'>\n";
 			$htmlstr .= "<input type='hidden' name='seitenanzahl' value='".$seitenanzahl."'>\n";
 			$htmlstr .= "<tr id='".$row->projektarbeit_id."'>\n";
 			if(!$row->abgabedatum)
