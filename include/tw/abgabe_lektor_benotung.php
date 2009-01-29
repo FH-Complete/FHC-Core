@@ -286,7 +286,7 @@ else
 		$maxY=$pdf->GetY();
 		$maxX=30;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(159,12,"Form / Stil\n  - Hat die Bachelorarbeit eine\n     klare Struktur, entspricht der\n     Vorgabe\n   - Wird einwandfrei zitiert\n   - Abbildungen\   - Sprache",0,'L',0);
+		$pdf->MultiCell(159,12,"Form / Stil\n  - Hat die Bachelorarbeit eine\n     klare Struktur, entspricht der\n     Vorgabe\n   - Wird einwandfrei zitiert\n   - Abbildungen\n   - Sprache",0,'L',0);
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(159,144,'',1,'L',0);
 		$maxX +=159;

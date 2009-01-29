@@ -40,18 +40,18 @@ $getuid=get_uid();
 $htmlstr = "";
 	
 $sql_query = "SELECT * FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) * FROM lehre.tbl_projektarbeit LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id) 
-		LEFT JOIN public.tbl_benutzer on(uid=student_uid) 
-		LEFT JOIN public.tbl_person on(tbl_benutzer.person_id=tbl_person.person_id)
-		LEFT JOIN lehre.tbl_lehreinheit using(lehreinheit_id) 
-		LEFT JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id) 
-		LEFT JOIN public.tbl_studiengang using(studiengang_kz)
-		WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
-		AND tbl_projektbetreuer.person_id IN (SELECT person_id FROM public.tbl_benutzer 
-								WHERE public.tbl_benutzer.person_id=lehre.tbl_projektbetreuer.person_id 
-								AND public.tbl_benutzer.uid='sommert')
-		AND lehre.tbl_projektarbeit.note IS NULL 
-		AND (betreuerart_kurzbz='Betreuer' OR betreuerart_kurzbz='Begutachter' OR betreuerart_kurzbz='Erstbegutachter' OR betreuerart_kurzbz='Erstbetreuer')
-		ORDER BY tbl_projektarbeit.projektarbeit_id, betreuerart_kurzbz desc) as xy 
+			LEFT JOIN public.tbl_benutzer on(uid=student_uid) 
+			LEFT JOIN public.tbl_person on(tbl_benutzer.person_id=tbl_person.person_id)
+			LEFT JOIN lehre.tbl_lehreinheit using(lehreinheit_id) 
+			LEFT JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id) 
+			LEFT JOIN public.tbl_studiengang using(studiengang_kz)
+			WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
+			AND tbl_projektbetreuer.person_id IN (SELECT person_id FROM public.tbl_benutzer 
+									WHERE public.tbl_benutzer.person_id=lehre.tbl_projektbetreuer.person_id 
+									AND public.tbl_benutzer.uid='sommert')
+			AND lehre.tbl_projektarbeit.note IS NULL 
+			AND (betreuerart_kurzbz='Betreuer' OR betreuerart_kurzbz='Begutachter' OR betreuerart_kurzbz='Erstbegutachter' OR betreuerart_kurzbz='Erstbetreuer')
+			ORDER BY tbl_projektarbeit.projektarbeit_id, betreuerart_kurzbz desc) as xy 
 		ORDER BY nachname";
 if(!$erg=pg_query($conn, $sql_query))
 {
