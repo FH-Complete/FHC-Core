@@ -48,7 +48,7 @@ $sql_query = "SELECT * FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_
 			WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
 			AND tbl_projektbetreuer.person_id IN (SELECT person_id FROM public.tbl_benutzer 
 									WHERE public.tbl_benutzer.person_id=lehre.tbl_projektbetreuer.person_id 
-									AND public.tbl_benutzer.uid='sommert')
+									AND public.tbl_benutzer.uid='$getuid')
 			AND lehre.tbl_projektarbeit.note IS NULL 
 			AND (betreuerart_kurzbz='Betreuer' OR betreuerart_kurzbz='Begutachter' OR betreuerart_kurzbz='Erstbegutachter' OR betreuerart_kurzbz='Erstbetreuer')
 			ORDER BY tbl_projektarbeit.projektarbeit_id, betreuerart_kurzbz desc) as xy 
