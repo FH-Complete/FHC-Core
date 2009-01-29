@@ -81,7 +81,7 @@
 				    </td>
 				</tr>
 				<tr>
-          			<td class="tdwidth10" nowrap>&nbsp;</td>
+          				<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap">
 		  			<table class="tabcontent" id="MeineLVs" style="display: visible;">
 					<tr>
@@ -108,6 +108,14 @@
 					</tr>
 					</table>
 		  			</td>
+				</tr>
+				<tr>
+					<td class="tdwidth10" nowrap>&nbsp;</td>
+				    <td class="tdwrap">
+				    	<a href="lehre/abgabe_student_frameset.html" class="Item" target="content">
+				    		<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Bachelor- und Diplomarbeitsabgabe
+				    	</a>
+				    </td>
 				</tr>';
 			}
 
@@ -188,8 +196,17 @@
 					</table>
 		  			</td>
 				</tr>
+				<tr>
+					<td class="tdwidth10" nowrap>&nbsp;</td>
+				    <td class='tdwrap'>
+				    	<a href="lehre/abgabe_lektor_frameset.html" class="Item" target="content">
+				    		<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Bachelor- und Diplomarbeitsabgabe
+				    	</a>
+				    </td>
+				</tr>
 			<?php
 			}
+			
 			if ($rechte->isFix())
 			{
 				?>
