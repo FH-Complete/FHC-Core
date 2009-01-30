@@ -31,6 +31,8 @@ require_once('../../../include/studiengang.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/datum.class.php');
+require_once('../../../include/mail.class.php');
+
 $fixtermin=false;
 
 if (!$conn = pg_pconnect(CONN_STRING))
@@ -98,33 +100,138 @@ if($datum)
 	// Speichern eines Termines
 	if(isset($_POST["schick"]))
 	{
-		if($command=='insert')
+		$qry_std="SELECT * FROM campus.vw_benutzer where uid='$uid'";
+		if(!$result_std=pg_query($conn, $qry_std))
 		{
-			//neuer Termin
-			$qry="INSERT INTO campus.tbl_paabgabe (projektarbeit_id, paabgabetyp_kurzbz, fixtermin, datum, kurzbz, abgabedatum, insertvon, insertamum, updatevon, updateamum) 
-				VALUES ('$projektarbeit_id', '$paabgabetyp_kurzbz', ".($fixtermin==1?'true':'false').", '$datum', '$kurzbz', NULL, '$user', now(), NULL, NULL)";
+			echo "<font color=\"#FF0000\">Student konnte nicht gefunden werden!</font><br>&nbsp;";
 		}
-		if($command=='update')
+		else
 		{
-			//Terminänderung
-			$qry="UPDATE campus.tbl_paabgabe SET
-				projektarbeit_id = '".$projektarbeit_id."', 
-				paabgabetyp_kurzbz = '".$paabgabetyp_kurzbz."', 
-				fixtermin = ".($fixtermin==1?'true':'false').", 
-				datum = '".$datum."', 
-				kurzbz = '".$kurzbz."', 
-				updatevon = '".$user."', 
-				updateamum = now() 
-				WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";
+			$row_std=@pg_fetch_object($result_std);
+			if($command=='insert')
+			{
+				//neuer Termin
+				$qry="INSERT INTO campus.tbl_paabgabe (projektarbeit_id, paabgabetyp_kurzbz, fixtermin, datum, kurzbz, abgabedatum, insertvon, insertamum, updatevon, updateamum) 
+					VALUES ('$projektarbeit_id', '$paabgabetyp_kurzbz', ".($fixtermin==1?'true':'false').", '$datum', '$kurzbz', NULL, '$user', now(), NULL, NULL)";
+				//echo $qry;	
+				if(!$result=pg_query($conn, $qry))
+				{
+					echo "<font color=\"#FF0000\">Termin konnte nicht eingetragen werden!</font><br>&nbsp;";	
+				}
+				else 
+				{
+					$row=@pg_fetch_object($result);
+					$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$paabgabetyp_kurzbz."'";
+					if($result_typ=pg_query($conn, $qry_typ))
+					{
+						$row_typ=@pg_fetch_object($result_typ);
+					}
+					else 
+					{
+						$row_typ->bezeichnung='';
+					}
+					$mail = new mail($uid."@".DOMAIN, "vilesci@".DOMAIN, "Neuer Termin Bachelor-/Diplomarbeitsbetreuung",
+					"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr Betreuer hat einen neuen Termin angelegt:\n".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+				}
+			}
+			if($command=='update')
+			{
+				//Terminänderung
+				//Ermittlung der alten Daten
+				$qry_old="SELECT * FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";
+				if(!$result_old=pg_query($conn, $qry_old))
+				{
+					echo "<font color=\"#FF0000\">Termin konnte nicht gefunden werden!</font><br>&nbsp;";	
+				}
+				else 
+				{
+					$row_old=@pg_fetch_object($result_old);
+					//Abgabetyp
+					$qry_told="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$row_old->paabgabetyp_kurzbz."'";
+					if($result_told=pg_query($conn, $qry_told))
+					{
+						$row_told=@pg_fetch_object($result_told);
+					}
+					else 
+					{
+						$row_told->bezeichnung='';
+					}
+					//Termin updaten
+					$qry="UPDATE campus.tbl_paabgabe SET
+						projektarbeit_id = '".$projektarbeit_id."', 
+						paabgabetyp_kurzbz = '".$paabgabetyp_kurzbz."', 
+						fixtermin = ".($fixtermin==1?'true':'false').", 
+						datum = '".$datum."', 
+						kurzbz = '".$kurzbz."', 
+						updatevon = '".$user."', 
+						updateamum = now() 
+						WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";
+					//echo $qry;	
+					if(!$result=pg_query($conn, $qry))
+					{
+						echo "<font color=\"#FF0000\">Termin&auml;nderung konnte nicht eingetragen werden!</font><br>&nbsp;";	
+					}
+					else 
+					{
+						//Abgabetyp
+						$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$paabgabetyp_kurzbz."'";
+						if(!$result=pg_query($conn, $qry))
+						{
+							$row_typ=@pg_fetch_object($result_typ);
+						}
+						else 
+						{
+							$row_typ->bezeichnung='';
+						}
+						$mail = new mail($uid."@".DOMAIN, "vilesci@".DOMAIN, "Terminänderung Bachelor-/Diplomarbeitsbetreuung",
+						"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr Betreuer hat einen Termin geändert:\nVon: ".$datum_obj->formatDatum($row_old->datum,'d.m.Y').", ".$row_told->bezeichnung.", ".$row_old->kurzbz."\nAuf: ".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung." ".$kurzbz."\n\nMfG\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+					}
+				}
+			}
+			$mail->setReplyTo($user."@".DOMAIN);
+			if(!$mail->send())
+			{
+				echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails!</font><br>&nbsp;";	
+			}
 		}
-		//echo $qry;	
-		$result=pg_query($conn, $qry);	
 	}
 	//Löschen eines Termines
 	if(isset($_POST["del"]))
 	{
-		$qry="DELETE FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";	
-		$result=pg_query($conn, $qry);
+		//Ermittlung der alten Daten
+		$qry_old="SELECT * FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";
+		if(!$result_old=pg_query($conn, $qry_old))
+		{
+			echo "<font color=\"#FF0000\">Termin konnte nicht gefunden werden!</font><br>&nbsp;";	
+		}
+		else 
+		{
+			$row_old=@pg_fetch_object($result_old);
+			$qry_std="SELECT * FROM campus.vw_benutzer where uid='$uid'";
+			if(!$result_std=pg_query($conn, $qry_std))
+			{
+				echo "<font color=\"#FF0000\">Student konnte nicht gefunden werden!</font><br>&nbsp;";
+			}
+			else
+			{
+				$row_std=@pg_fetch_object($result_std);
+				$qry="DELETE FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";	
+				if(!$result=pg_query($conn, $qry))
+				{
+					echo "<font color=\"#FF0000\">Fehler beim Löschen des Termins!</font><br>&nbsp;";
+				}
+				else 
+				{
+					$mail = new mail($uid."@".DOMAIN, "vilesci@".DOMAIN, "Termin Bachelor-/Diplomarbeitsbetreuung",
+					"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr Betreuer hat einen Termin entfernt:\n".$datum_obj->formatDatum($row_old->datum,'d.m.Y').", ".$row_old->kurzbz."\n\nMfG\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+					$mail->setReplyTo($user."@".DOMAIN);
+					if(!$mail->send())
+					{
+						echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails!</font><br>&nbsp;";	
+					}
+				}
+			}
+		}
 	}
 }
 else 
@@ -195,7 +302,7 @@ $result=@pg_query($conn, $qry);
 		}		
 		$htmlstr .= "		</select></td>\n";
 		$htmlstr .= "		<td><input  type='text' name='kurzbz' value='".$row->kurzbz."' size='60' maxlegth='256'></td>\n";		
-		$htmlstr .= "		<td>".$row->abgabedatum=''?'':$datum_obj->formatDatum($row->abgabedatum,'d.m.Y')."</td>\n";		
+		$htmlstr .= "		<td>".($row->abgabedatum==''?'&nbsp;':$datum_obj->formatDatum($row->abgabedatum,'d.m.Y'))."</td>\n";		
 		$htmlstr .= "		<td><input type='submit' name='schick' value='speichern'></td>";
 		if(!$row->abgabedatum)
 		{
@@ -203,11 +310,15 @@ $result=@pg_query($conn, $qry);
 		}
 		else 
 		{
-			$htmlstr .= "		<td>&nbsp;</td>";
+			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>";
 		}
 		if(file_exists($_SERVER['DOCUMENT_ROOT'].PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf'))
 		{
 			$htmlstr .= "		<td><a href='".PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf'."' target='_blank'><img src='../../../skin/images/pdf.ico' alt='PDF' border=0></a></td>";
+		}
+		else 
+		{
+			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
 		}
 		$htmlstr .= "	</tr>\n";
 		
@@ -240,7 +351,7 @@ $htmlstr .= "		<td><input  type='text' name='kurzbz' size='60' maxlegth='256'></
 $htmlstr .= "		<td>&nbsp;</td>\n";		
 $htmlstr .= "		<td><input type='submit' name='schick' value='speichern'></td>";
 
-$htmlstr .= "	</tr>\n";
+$htmlstr .= "</tr>\n";
 $htmlstr .= "</form>\n";
 $htmlstr .= "</table>\n";
 $htmlstr .= "</body></html>\n";

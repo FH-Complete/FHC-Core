@@ -47,6 +47,7 @@ if (!$conn = @pg_pconnect(CONN_STRING))
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $getuid=get_uid();
+$datum_obj = new datum();
 $htmlstr = "";
 $qualitaet='';
 $form='';
@@ -438,7 +439,7 @@ else
 	$maxX=+40;
 	$maxY=$pdf->GetY();
 	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(160,12,'Letzter Abgabetermin: '.$ende,0,'L',0);
+	$pdf->MultiCell(160,12,'Letzter Abgabetermin: '.$datum_obj->formatDatum($ende,'d.m.Y'),0,'L',0);
 	$maxX +=300;
 	$pdf->SetXY($maxX,$maxY);
 	$pdf->MultiCell(240,12,"Unterschrift:__________________________",0,'C',0);
