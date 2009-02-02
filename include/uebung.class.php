@@ -587,7 +587,7 @@ function abgabe_save($new=null)
 			return false;
 		}
 		
-		// subübungen wegräumen
+		// subuebungen wegraeumen
 		$qry = "SELECT * FROM campus.tbl_uebung WHERE liste_id = '".$uebung_id."'";
 		if($result=pg_query($this->conn, $qry))
 		{
@@ -603,8 +603,8 @@ function abgabe_save($new=null)
 							DELETE FROM campus.tbl_abgabe WHERE abgabe_id IN(SELECT abgabe_id FROM campus.tbl_studentuebung WHERE uebung_id='$row->uebung_id');
 							DELETE FROM campus.tbl_studentuebung WHERE uebung_id='$row->uebung_id';
 							DELETE FROM campus.tbl_beispiel WHERE uebung_id='$row->uebung_id';
-							DELETE FROM campus.tbl_uebung WHERE uebung_id='$row->uebung_id';
-							DELETE FROM campus.tbl_studentuebung WHERE uebung_id = '$row->uebung_id'";
+							DELETE FROM campus.tbl_studentuebung WHERE uebung_id = '$row->uebung_id';
+							DELETE FROM campus.tbl_uebung WHERE uebung_id='$row->uebung_id';";
 			
 					if(!pg_query($qry))
 					{
@@ -624,8 +624,8 @@ function abgabe_save($new=null)
 				DELETE FROM campus.tbl_abgabe WHERE abgabe_id IN(SELECT abgabe_id FROM campus.tbl_studentuebung WHERE uebung_id='$uebung_id');
 				DELETE FROM campus.tbl_studentuebung WHERE uebung_id='$uebung_id';
 				DELETE FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id';
-				DELETE FROM campus.tbl_uebung WHERE uebung_id='$uebung_id';
-				DELETE FROM campus.tbl_studentuebung WHERE uebung_id = '$uebung_id'";
+				DELETE FROM campus.tbl_studentuebung WHERE uebung_id = '$uebung_id';
+				DELETE FROM campus.tbl_uebung WHERE uebung_id='$uebung_id';";
 
 		if(pg_query($qry))
 			return true;
@@ -651,7 +651,7 @@ function abgabe_save($new=null)
 			return false;
 		}
 		
-		// subübungen wegräumen
+		// subuebungen wegraeumen
 		$qry = "SELECT * FROM campus.tbl_abgabe WHERE abgabe_id = '".$abgabe_id."'";
 		if($result=pg_query($this->conn, $qry))
 		{
