@@ -66,7 +66,7 @@ else
 	$paabgabetyp_kurzbz = (isset($_POST['paabgabetyp_kurzbz'])?$_POST['paabgabetyp_kurzbz']:'-1');
 	$fixtermin = (isset($_POST['fixtermin'])?1:0);
 	$datum = (isset($_POST['datum'])?$_POST['datum']:'');
-	$abgabedatum = (isset($_POST['abgabedatum'])?$_POST['abgabedatum']:'');
+	$abgabedatum = (isset($_POST['abgabedatum'])?$_POST['abgabedatum']:'01.01.1980');
 	$kurzbz = (isset($_POST['kurzbz'])?$_POST['kurzbz']:'');
 	$betreuer = (isset($_POST['betreuer'])?$_POST['betreuer']:'-1');
 	$kontrollschlagwoerter = (isset($_POST['kontrollschlagwoerter'])?$_POST['kontrollschlagwoerter']:'-1');
@@ -108,17 +108,17 @@ if($command=='add')
 		$error=true;
 	}
 	if(!$error)
-	{
+	{	
 		$qry_upd="UPDATE lehre.tbl_projektarbeit SET
 				seitenanzahl = '".$seitenanzahl."', 
-				abgabedatum = '".$abgabedatum."', 
-				kontrollschlagwoerter = '".$kontrollschlagwoerter."', 
-				schlagwoerter_en = '".$schlagwoerter_en."', 
-				schlagwoerter = '".$schlagwoerter."', 
-				abstract = '".$abstract."', 
-				abstract_en = '".$abstract_en."' 
+				abgabedatum = now(), 
+				kontrollschlagwoerter = '".addslashes($kontrollschlagwoerter)."', 
+				schlagwoerter_en = '".addslashes($schlagwoerter_en)."', 
+				schlagwoerter = '".addslashes($schlagwoerter)."', 
+				abstract = '".addslashes($abstract)."', 
+				abstract_en = '".addslashes($abstract_en)."' 
 				WHERE projektarbeit_id = '".$projektarbeit_id."'";
-		
+		$result=pg_query($conn, $qry_upd);
 		$command="update";
 	}
 	else 
@@ -189,6 +189,7 @@ if($command=="update" || $error==true)
 				$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
 				$htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$paabgabe_id."'>\n";
 				$htmlstr .= "<input type='hidden' name='paabgabetyp_kurzbz' value='".$paabgabetyp_kurzbz."'>\n";
+				$htmlstr .= "<input type='hidden' name='abgabedatum' value='".$abgabedatum."'>\n";
 				$htmlstr .= "<input type='hidden' name='titel' value='".$titel."'>\n";
 				$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
 				$htmlstr .= "<input type='hidden' name='betreuer' value='".$betreuer."'>\n";
