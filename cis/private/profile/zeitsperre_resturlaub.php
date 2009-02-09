@@ -109,6 +109,29 @@ function checkdatum()
 		return false;
 	}
 
+      var Datum, Tag, Monat,Jahr,vonDatum,bisDatum; 
+	  
+	  Datum=document.getElementById('vondatum').value;
+      Tag=parseInt(Datum.substring(0,2),10); 
+      Monat=parseInt(Datum.substring(3,5),10); 
+      Jahr=parseInt(Datum.substring(6,10),10); 
+	  
+	  vonDatum=Jahr+Monat+Tag;
+	  
+	  Datum=document.getElementById('bisdatum').value;
+      Tag=parseInt(Datum.substring(0,2),10); 
+      Monat=parseInt(Datum.substring(3,5),10); 
+      Jahr=parseInt(Datum.substring(6,10),10); 
+	  
+	  bisDatum=Jahr+Monat+Tag;	  	
+	
+	  if (vonDatum>bisDatum)  {
+		alert('Von-Datum '+ document.getElementById('vondatum').value+ ' ist groesser als das Bis-Datum '+document.getElementById('bisdatum').value);
+		document.getElementById('vondatum').focus();
+	  	return false;
+	  }
+	
+	
 	return true;
 }
 </script>
@@ -158,6 +181,40 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		$error_msg .= 'Bis-Datum ist ung&uuml;ltig ';
 	}
 
+	//von - bis-datum pruefen von darf nicht groesser als bis sein
+	// 09.02.2009 simane
+	$date=explode('.',$_POST['vondatum']);
+	$vondatum=0;
+	if (@checkdate($date[1], $date[0], $date[2]))
+	{
+		 $vondatum=$date[2].$date[1].$date[0];	
+	}	 
+	else
+	{
+		$error=true;
+		$error_msg .= 'kein g&uuml;ltiges VON-Datum ';
+	}			 	
+
+	$bisdatum=0;
+	$date=explode('.',$_POST['bisdatum']);
+	if (@checkdate($date[1], $date[0], $date[2]))
+	{
+		 $bisdatum=$date[2].$date[1].$date[0];		
+	}	 
+	else
+	{
+		$error=true;
+		$error_msg .= 'kein g&uuml;ltiges BIS-Datum ';
+	}
+	
+	if($vondatum > $bisdatum)
+	{
+		$error=true;
+		$error_msg .= 'VON-Datum gr&ouml;&szlig;er als Bis-Datum! ';
+	}
+	
+	
+	
 	$zeitsperre = new zeitsperre($conn);
 
 	if($_GET['type']=='edit_sperre')
@@ -358,7 +415,7 @@ if($result = pg_query($conn, $qry))
 }
 $content_form.= '</SELECT>';
 $content_form.= '<tr><td>Bezeichnung</td><td><input type="text" name="bezeichnung" maxlength="32" value="'.$zeitsperre->bezeichnung.'"></td></tr>';
-$content_form.= '<tr><td>von</td><td><input type="text" size="10" maxlength="10" name="vondatum" id="vondatum" value="'.($zeitsperre->vondatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->vondatum)):date('d.m.Y')).'"> ';
+$content_form.= '<tr><td>von</td><td><input type="text" size="10" maxlength="10" name="vondatum" id="vondatum" value="'.($zeitsperre->vondatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->vondatum)):(!isset($_POST['vondatum'])?date('d.m.Y'):$_POST['vondatum'])).'"> ';
 //dropdown fuer vonstunde
 $content_form.= "Stunde (inklusive)";
 
@@ -380,7 +437,7 @@ for($i=0;$i<$num_rows_stunde;$i++)
 
 $content_form.= "</SELECT></td></tr>";
 
-$content_form.= '<tr><td>bis</td><td><input type="text" size="10" maxlength="10" name="bisdatum" id="bisdatum" value="'.($zeitsperre->bisdatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->bisdatum)):date('d.m.Y')).'"> ';
+$content_form.= '<tr><td>bis</td><td><input type="text" size="10" maxlength="10" name="bisdatum" id="bisdatum" value="'.($zeitsperre->bisdatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->bisdatum)):(!isset($_POST['bisdatum'])?date('d.m.Y'):$_POST['bisdatum'])).'"> ';
 //dropdown fuer bisstunde
 $content_form.= "Stunde (inklusive)";
 $content_form.= "<SELECT name='bisstunde'>\n";
