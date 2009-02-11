@@ -56,8 +56,9 @@ $qry = "
 	FROM
 		tbl_studentlehrverband stdlvb JOIN tbl_studiengang USING(studiengang_kz)
 	WHERE
-		studiensemester_kurzbz='$stsem' AND semester>0 AND semester<9
+		studiensemester_kurzbz='$stsem' AND semester>0 AND semester<9 AND aktiv
 	GROUP BY typ, kurzbz, studiengang_kz
+	ORDER BY typ, kurzbz, studiengang_kz
 ";
 if(!$result = pg_query($conn, $qry))
 	die('Fehler bei Datenbankabfrage');
