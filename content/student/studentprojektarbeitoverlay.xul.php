@@ -160,11 +160,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<rows>
 						<row>
 							<label value="Titel" control="student-projektarbeit-textbox-titel"/>
-							<textbox id="student-projektarbeit-textbox-titel" disabled="true" maxlength="256" />
+							<textbox id="student-projektarbeit-textbox-titel" disabled="true" maxlength="1024" />
 						</row>
 						<row>
 							<label value="Titel Englisch" control="student-projektarbeit-textbox-titel_english"/>
-							<textbox id="student-projektarbeit-textbox-titel_english" disabled="true" maxlength="256" />
+							<textbox id="student-projektarbeit-textbox-titel_english" disabled="true" maxlength="1024" />
 						</row>
 						<row>
 							<label value="Themenbereich" control="student-projektarbeit-textbox-themenbereich"/>
