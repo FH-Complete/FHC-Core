@@ -1153,6 +1153,11 @@ class wochenplan
 		$sql_query="SELECT DISTINCT datum, stunde, ort_kurzbz FROM $stpl_view
 			WHERE datum>='$this->datum_begin' AND datum<'$this->datum_end' AND unr!=$unr";
 		//echo $sql_query; NATURAL JOIN tbl_ortraumtyp AND ($rtype) "
+		
+		// Reservierungen beruecksichtigen
+		$sql_query.=" UNION SELECT DISTINCT datum, stunde, ort_kurzbz FROM campus.tbl_reservierung
+			WHERE datum>='$this->datum_begin' AND datum<'$this->datum_end' ";
+		
 		if(!$result_besetzt=pg_exec($this->conn, $sql_query))
 			die(pg_last_error($this->conn));
 		$num_b=pg_numrows($result_besetzt);
@@ -1165,7 +1170,7 @@ class wochenplan
 			$tag=date("w",mktime(12,0,0,$month,$mtag,$jahr));
 			$raster[$tag][$row->stunde]->ort[]=$row->ort_kurzbz;
 		}
-
+				
 		// freie Plaetze in den Stundenplan eintragen.
 		for ($t=1;$t<=TAGE_PRO_WOCHE;$t++)
 			for ($s=1;$s<=$max_stunde;$s++)
@@ -1431,6 +1436,11 @@ class wochenplan
 			if (is_numeric($unr))
 				$sql_query.=" AND unr!=$unr";
 			//echo $sql_query;
+			
+			// Reservierungen beruecksichtigen
+			$sql_query.=" UNION SELECT distinct datum, stunde, ort_kurzbz FROM campus.tbl_reservierung
+						WHERE datum>='$datum_begin' AND datum<'$datum_end'";
+			
 			if(!$result_besetzt=pg_query($this->conn, $sql_query))
 			{
 				$this->errormsg=pg_last_error($this->conn).$sql_query;

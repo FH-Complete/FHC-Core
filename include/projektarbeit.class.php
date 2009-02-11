@@ -170,6 +170,11 @@ class projektarbeit
 			$this->errormsg = 'Titel darf nicht länger als 1024 Zeichen sein';
 			return false;
 		}
+		if(strlen($this->titel_english)>1024)
+		{
+			$this->errormsg = 'Titel darf nicht länger als 1024 Zeichen sein';
+			return false;
+		}
 		if(strlen($this->themenbereich)>64)
 		{
 			$this->errormsg = 'Themenbereich darf nicht länger als 64 Zeichen sein';
