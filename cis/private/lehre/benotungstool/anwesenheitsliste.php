@@ -203,23 +203,40 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				$lehreinheit_id = $_GET['lehreinheit_id'];
 				$gruppe_bez = 'Alle Studienrende';
 				//Alle Studenten die dieser Lehreinheit zugeordnet sind
-				$qry_stud = "SELECT vw_student.uid, vorname, nachname, matrikelnr, vw_student.semester, vw_student.verband, vw_student.gruppe FROM campus.vw_student, public.tbl_benutzergruppe, lehre.tbl_lehreinheitgruppe 
-							WHERE tbl_lehreinheitgruppe.lehreinheit_id='$lehreinheit_id' AND 
-							vw_student.uid = tbl_benutzergruppe.uid AND
-							tbl_benutzergruppe.gruppe_kurzbz = tbl_lehreinheitgruppe.gruppe_kurzbz
+				$qry_stud = "SELECT 
+								vw_student.uid, vorname, nachname, matrikelnr, 
+								tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe 
+							FROM 
+								campus.vw_student, public.tbl_benutzergruppe, lehre.tbl_lehreinheitgruppe, 
+								public.tbl_studentlehrverband, lehre.tbl_lehreinheit
+							WHERE 
+								tbl_lehreinheitgruppe.lehreinheit_id='$lehreinheit_id' AND 
+								tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitgruppe.lehreinheit_id AND
+								vw_student.uid = tbl_benutzergruppe.uid AND
+								tbl_benutzergruppe.gruppe_kurzbz = tbl_lehreinheitgruppe.gruppe_kurzbz AND
+								vw_student.uid=tbl_studentlehrverband.student_uid AND
+								tbl_studentlehrverband.studiensemester_kurzbz=tbl_lehreinheit.studiensemester_kurzbz
 							UNION
-							SELECT vw_student.uid, vorname, nachname, matrikelnr, vw_student.semester, vw_student.verband, vw_student.gruppe FROM campus.vw_student, lehre.tbl_lehreinheitgruppe WHERE
-							tbl_lehreinheitgruppe.lehreinheit_id='$lehreinheit_id' AND
-							tbl_lehreinheitgruppe.studiengang_kz=vw_student.studiengang_kz AND
-							tbl_lehreinheitgruppe.semester = vw_student.semester AND
+							SELECT 
+								vw_student.uid, vorname, nachname, matrikelnr, tbl_studentlehrverband.semester, 
+								tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe 
+							FROM 
+								campus.vw_student, lehre.tbl_lehreinheitgruppe, public.tbl_studentlehrverband, lehre.tbl_lehreinheit
+							WHERE
+								tbl_lehreinheitgruppe.lehreinheit_id='$lehreinheit_id' AND
+								tbl_lehreinheitgruppe.studiengang_kz=tbl_studentlehrverband.studiengang_kz AND
+								tbl_lehreinheitgruppe.semester = tbl_studentlehrverband.semester AND
+								tbl_studentlehrverband.student_uid=vw_student.uid AND
+								tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitgruppe.lehreinheit_id AND
+								tbl_lehreinheit.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz AND
 							((tbl_lehreinheitgruppe.verband<>'' AND 
 							  tbl_lehreinheitgruppe.gruppe<>'' AND 
-							  trim(tbl_lehreinheitgruppe.verband) = trim(vw_student.verband) AND
-							  trim(tbl_lehreinheitgruppe.gruppe) = trim(vw_student.gruppe))
+							  trim(tbl_lehreinheitgruppe.verband) = trim(tbl_studentlehrverband.verband) AND
+							  trim(tbl_lehreinheitgruppe.gruppe) = trim(tbl_studentlehrverband.gruppe))
 							OR
 							(tbl_lehreinheitgruppe.verband<>'' AND 
 							  (trim(tbl_lehreinheitgruppe.gruppe)='' OR tbl_lehreinheitgruppe.gruppe is null) AND
-							  trim(tbl_lehreinheitgruppe.verband) = trim(vw_student.verband))
+							  trim(tbl_lehreinheitgruppe.verband) = trim(tbl_studentlehrverband.verband))
 							  OR (tbl_lehreinheitgruppe.verband is null AND tbl_lehreinheitgruppe.gruppe is null)
 							  )
 							 ORDER BY nachname, vorname";

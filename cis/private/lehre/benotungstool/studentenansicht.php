@@ -257,39 +257,45 @@ $qry = "SELECT distinct lehreinheit_id, kurzbz FROM lehre.tbl_lehreinheit JOIN l
 			SELECT lehreinheit_id FROM lehre.tbl_lehreinheit JOIN campus.tbl_uebung USING(lehreinheit_id)
 			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND tbl_lehreinheit.studiensemester_kurzbz='$stsem')
 		UNION
-		SELECT lehreinheit_id FROM public.tbl_student, lehre.tbl_lehreinheitgruppe
-		WHERE tbl_student.student_uid='$user' AND
-		tbl_student.studiengang_kz=tbl_lehreinheitgruppe.studiengang_kz AND
-		trim(tbl_student.semester)=trim(tbl_lehreinheitgruppe.semester) AND
-		(
+		SELECT 
+			lehreinheit_id 
+		FROM 
+			public.tbl_student, lehre.tbl_lehreinheitgruppe, public.tbl_studentlehrverband
+		WHERE 
+			tbl_student.student_uid='$user' AND
+			tbl_studentlehrverband.student_uid=tbl_student.student_uid AND
+			tbl_studentlehrverband.studiensemester_kurzbz='$stsem' AND
+			tbl_student.studiengang_kz=tbl_lehreinheitgruppe.studiengang_kz AND
+			trim(tbl_studentlehrverband.semester)=trim(tbl_lehreinheitgruppe.semester) AND
 			(
-			  (
-			  tbl_lehreinheitgruppe.verband<>'' AND
-			  tbl_lehreinheitgruppe.gruppe<>'' AND
-			  trim(tbl_lehreinheitgruppe.verband) = trim(tbl_student.verband) AND
-			  trim(tbl_lehreinheitgruppe.gruppe) = trim(tbl_student.gruppe)
-			  )
-			  OR
-			  (
-			    tbl_lehreinheitgruppe.verband<>'' AND
-			  	(
-			  	trim(tbl_lehreinheitgruppe.gruppe)='' OR
-			  	tbl_lehreinheitgruppe.gruppe is null
-			  	)
-			  	AND
-			  	trim(tbl_lehreinheitgruppe.verband) = trim(tbl_student.verband)
-			  )
-			  OR
-			  (
-				(trim(tbl_lehreinheitgruppe.verband)='' OR tbl_lehreinheitgruppe.verband is null)
-				 AND
-				 (trim(tbl_lehreinheitgruppe.gruppe)='' OR tbl_lehreinheitgruppe.gruppe is null)
-			  )
+				(
+				  (
+				  tbl_lehreinheitgruppe.verband<>'' AND
+				  tbl_lehreinheitgruppe.gruppe<>'' AND
+				  trim(tbl_lehreinheitgruppe.verband) = trim(tbl_studentlehrverband.verband) AND
+				  trim(tbl_lehreinheitgruppe.gruppe) = trim(tbl_studentlehrverband.gruppe)
+				  )
+				  OR
+				  (
+				    tbl_lehreinheitgruppe.verband<>'' AND
+				  	(
+				  	trim(tbl_lehreinheitgruppe.gruppe)='' OR
+				  	tbl_lehreinheitgruppe.gruppe is null
+				  	)
+				  	AND
+				  	trim(tbl_lehreinheitgruppe.verband) = trim(tbl_studentlehrverband.verband)
+				  )
+				  OR
+				  (
+					(trim(tbl_lehreinheitgruppe.verband)='' OR tbl_lehreinheitgruppe.verband is null)
+					 AND
+					 (trim(tbl_lehreinheitgruppe.gruppe)='' OR tbl_lehreinheitgruppe.gruppe is null)
+				  )
+				)
 			)
-		)
-		AND
-		tbl_lehreinheitgruppe.lehreinheit_id IN(SELECT lehreinheit_id FROM lehre.tbl_lehreinheit JOIN campus.tbl_uebung USING(lehreinheit_id)
-			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND tbl_lehreinheit.studiensemester_kurzbz='$stsem'))";
+			AND
+			tbl_lehreinheitgruppe.lehreinheit_id IN(SELECT lehreinheit_id FROM lehre.tbl_lehreinheit JOIN campus.tbl_uebung USING(lehreinheit_id)
+				WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND tbl_lehreinheit.studiensemester_kurzbz='$stsem'))";
 //echo $qry;
 if($result = pg_query($conn, $qry))
 {
