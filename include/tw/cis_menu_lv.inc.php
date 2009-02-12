@@ -365,7 +365,12 @@
 		} 
 		else 
 		{
-			echo '<a href="benotungstool/studentenansicht.php?lvid='.$lvid.'" class="Item">
+			if(isset($angezeigtes_stsem))
+				$studiensem = '&stsem='.$angezeigtes_stsem;
+			else
+				$studiensem = '';
+
+			echo '<a href="benotungstool/studentenansicht.php?lvid='.$lvid.$studiensem.'" class="Item">
 	    			<img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
 	    			<strong>&Uuml;bungstool<br>("Kreuzerl"-Tool)</strong></a>';
 	
