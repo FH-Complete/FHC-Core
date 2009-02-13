@@ -296,7 +296,7 @@ $qry = "SELECT distinct lehreinheit_id, kurzbz FROM lehre.tbl_lehreinheit JOIN l
 			AND
 			tbl_lehreinheitgruppe.lehreinheit_id IN(SELECT lehreinheit_id FROM lehre.tbl_lehreinheit JOIN campus.tbl_uebung USING(lehreinheit_id)
 				WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND tbl_lehreinheit.studiensemester_kurzbz='$stsem'))";
-//echo $qry;
+
 if($result = pg_query($conn, $qry))
 {
 	if(pg_num_rows($result)>1)
