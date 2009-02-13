@@ -48,7 +48,10 @@ if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
 else
 	$stsem = '';
-if(isset($_GET['mail']))
+	
+// Wenn der Parameter Mail per GET oder Commandline Argument uebergeben wird,
+// dann wird die Statistik per Mail versandt
+if(isset($_GET['mail']) || (isset($_SERVER['argv']) && in_array('mail',$_SERVER['argv'])))
 {
 	$mail=true;
 	$stsem_obj = new studiensemester($conn);
