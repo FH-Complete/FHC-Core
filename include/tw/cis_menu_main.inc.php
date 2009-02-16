@@ -53,6 +53,7 @@
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" target="_blank" href="http://alumni.technikum-wien.at/member_area/"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Jobb&ouml;rse</a></td>
 		  		</tr>
+				
 		  		<tr>
 	<!--		  		<td class="tdwrap"></td>
 					<td><a href="private/info/oeh/index.php" target="content" class="Item" ><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;&Ouml;H-Wahl</a></td>
@@ -66,8 +67,13 @@
 						</tr>
 					</table>
 					</td>
-	
 		  		</tr>
+
+		  		<tr>
+		  			<td class="tdwidth10" nowrap>&nbsp;</td>
+					<td class="tdwrap"><a class="Item" target="_blank" href="http://www.groll-gars.at/mensa.htm"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Mensa</a></td>
+		  		</tr>
+
 		  		
 			  	</table>
 			</td>
