@@ -43,13 +43,13 @@
 					</fo:block>
 				
 					<!-- NAME - MATRIKELNUMMER -->
-					<fo:block-container position="absolute" top="30mm" left="15mm" height="10mm">
+					<fo:block-container position="absolute" top="32mm" left="15mm" height="10mm">
 						<fo:block text-align="left" line-height="14pt" font-family="sans-serif" font-size="12pt" font-weight="bold">
 							<xsl:value-of select="titelpre" /><xsl:text> </xsl:text><xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="nachname" /><xsl:text> </xsl:text><xsl:value-of select="titelpost" />
 						</fo:block>
 					</fo:block-container>
 									
-					<fo:block-container position="absolute" top="35mm" left="15mm" height="20mm">
+					<fo:block-container position="absolute" top="36mm" left="15mm" height="20mm">
 						<fo:block text-align="left" line-height="14pt" font-family="sans-serif" font-size="12pt">
 							<xsl:text>Personenkennzeichen: </xsl:text><xsl:value-of select="matrikelnr" />
 						</fo:block>
@@ -61,7 +61,7 @@
 								<fo:table-body>
 						            <fo:table-row line-height="14pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left" font-weight="bold">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="200mm" text-align="left" font-weight="bold">
 												<xsl:text> Prüfungssenat:</xsl:text>
 											</fo:block>
 										</fo:table-cell>
@@ -69,27 +69,40 @@
 							</fo:table-body>
 						</fo:table>
 						<fo:table table-layout="fixed" border-collapse="separate">
-						    <fo:table-column column-width="261.6mm"/>				
+						    	<fo:table-column column-width="200.3mm"/>	
+							<fo:table-column column-width="24mm"/>
+							<fo:table-column column-width="36.8mm"/>
 								<fo:table-body>
-						            <fo:table-row line-height="14pt">
+						            <fo:table-row line-height="12pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="261.6mm" text-align="left" font-weight="bold">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="200mm" text-align="left" font-weight="bold">
 												<xsl:text> 1. Prüfungsteil</xsl:text>
 											</fo:block>
 										</fo:table-cell>
+										<fo:table-cell border-top-width="0.2mm" border-top-style="solid" border-top-color="black" border-left-width="0.2mm" border-left-style="solid" border-left-color="black" border-right-width="0.2mm" border-right-style="solid" border-right-color="black" border-bottom-width="0.2mm" border-bottom-style="solid" border-bottom-color="white">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="24mm" text-align="left">
+												<xsl:text> Note DA</xsl:text>
+											</fo:block>
+										</fo:table-cell>
+										<fo:table-cell border-right-width="0.2mm" border-right-style="solid" border-right-color="black" border-top-width="0.2mm" border-top-style="solid" border-top-color="black">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="36.4mm" text-align="left">
+												<xsl:text> Note Präsentation</xsl:text>
+											</fo:block>
+										</fo:table-cell>
 								</fo:table-row>
+								
 							</fo:table-body>
 						</fo:table>
 						<fo:table table-layout="fixed" border-collapse="separate">
-						    <fo:table-column column-width="80mm"/>
+						    	<fo:table-column column-width="80mm"/>
 							<fo:table-column column-width="120mm"/>
 							<fo:table-column column-width="24mm"/>
-							<fo:table-column column-width="36.4mm"/>
+							<fo:table-column column-width="36.6mm"/>
 								<fo:table-body>
-						            <fo:table-row line-height="14pt">
-										<fo:table-cell border-width="0.2mm" border-style="solid">
+						            <fo:table-row line-height="12pt">
+										<fo:table-cell border-width="0.2mm" border-style="solid" border-color="black">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
-												<xsl:text> DA-Betreuer</xsl:text>
+												<xsl:text> Prüfer/in</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
@@ -97,19 +110,27 @@
 												<xsl:text> Diplomarbeitsthema</xsl:text>
 											</fo:block>
 										</fo:table-cell>
-										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
-												<xsl:text> Note DA</xsl:text>
+										<fo:table-cell border-width="0.2mm" border-style="solid" border-color="white" border-left-style="solid" border-left-color="black" border-right-width="0.2mm" border-right-style="solid" border-right-color="black">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="24mm" text-align="left">
+												<xsl:text> (Information)</xsl:text>
 											</fo:block>
 										</fo:table-cell>
-										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
-												<xsl:text> Note Präsentation DA</xsl:text>
+										<fo:table-cell border-right-width="0.2mm" border-right-style="solid" border-right-color="black" border-top-width="0.2mm" border-top-style="solid" border-top-color="white">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="36.4mm" text-align="left">
+												<xsl:text> und Diskussion DA</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 									</fo:table-row>
+							</fo:table-body>
+						</fo:table>
+						<fo:table table-layout="fixed" border-collapse="separate">
+						    	<fo:table-column column-width="80mm"/>
+							<fo:table-column column-width="120mm"/>
+							<fo:table-column column-width="24mm"/>
+							<fo:table-column column-width="36.4mm"/>
+								<fo:table-body>
 									<fo:table-row line-height="14pt">
-										<fo:table-cell border-width="0.2mm" border-style="solid">
+										<fo:table-cell border-width="0.2mm" border-style="solid" border-color="black">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="80mm" text-align="left">
 												<xsl:text> </xsl:text><xsl:value-of select="betreuer" />
 											</fo:block>
@@ -135,7 +156,7 @@
 						<fo:table table-layout="fixed" border-collapse="separate">
 						    <fo:table-column column-width="261.6mm"/>				
 								<fo:table-body>
-						            <fo:table-row line-height="14pt">
+						            <fo:table-row line-height="12pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="261.6mm" text-align="left" font-weight="bold">
 												<xsl:text> 2. Prüfungsteil</xsl:text>
@@ -151,10 +172,10 @@
 							<fo:table-column column-width="24mm"/>
 							<fo:table-column column-width="36mm"/>
 								<fo:table-body>
-						            <fo:table-row line-height="14pt">
+						            <fo:table-row line-height="12pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
-												<xsl:text> Prüfer</xsl:text>
+												<xsl:text> Prüfer/in</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
@@ -163,22 +184,22 @@
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="24mm" text-align="left">
 												<xsl:text> Beginn</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="24mm" text-align="left">
 												<xsl:text> Ende</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="36mm" text-align="left">
 												<xsl:text> Note</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 									</fo:table-row>
-									<fo:table-row line-height="14pt">
+									<fo:table-row line-height="20pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="80mm" text-align="left">
 												<xsl:text> </xsl:text><xsl:value-of select="pruefer1_nachname" />\n
@@ -190,17 +211,17 @@
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="24mm" text-align="left">
 												\n
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="24mm" text-align="left">
 												\n
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="36mm" text-align="left">
 												\n
 											</fo:block>
 										</fo:table-cell>
@@ -210,26 +231,26 @@
 						<fo:table table-layout="fixed" border-collapse="separate">
 							<fo:table-column column-width="261.6mm"/>				
 								<fo:table-body>
-						            <fo:table-row line-height="14pt">
+						            	<fo:table-row line-height="12pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="261.6mm" text-align="left" font-weight="bold">
 												<xsl:text> 3. Prüfungsteil</xsl:text>
 											</fo:block>
 										</fo:table-cell>
-								</fo:table-row>
-							</fo:table-body>
+									</fo:table-row>
+								</fo:table-body>
 						</fo:table>					
 						<fo:table table-layout="fixed" border-collapse="separate">
-						    <fo:table-column column-width="80mm"/>
+						    	<fo:table-column column-width="80mm"/>
 							<fo:table-column column-width="96mm"/>
 							<fo:table-column column-width="24mm"/>
 							<fo:table-column column-width="24mm"/>
 							<fo:table-column column-width="36mm"/>
-								<fo:table-body>
-								 <fo:table-row line-height="14pt">
+							<fo:table-body>
+								<fo:table-row line-height="12pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
-												<xsl:text> Prüfer</xsl:text>
+												<xsl:text> Prüfer/in</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
@@ -238,22 +259,22 @@
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="24mm" text-align="left">
 												<xsl:text> Beginn</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="24mm" text-align="left">
 												<xsl:text> Ende</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="36mm" text-align="left">
 												<xsl:text> Note</xsl:text>
 											</fo:block>
 										</fo:table-cell>
-									</fo:table-row>
-									<fo:table-row line-height="10pt">
+								</fo:table-row>
+								<fo:table-row line-height="20pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="80mm" text-align="left">
 												<xsl:text> </xsl:text><xsl:value-of select="pruefer2_nachname" />\n
@@ -265,26 +286,27 @@
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="24mm" text-align="left">
 												\n
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="24mm" text-align="left">
 												\n
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="10pt" content-width="36mm" text-align="left">
 												\n
 											</fo:block>
 										</fo:table-cell>
-									</fo:table-row>
+								</fo:table-row>
+
 							</fo:table-body>
 						</fo:table>
 					</fo:block-container>
 					
-					<fo:block-container position="absolute" top="125mm" left="15mm">
+					<fo:block-container position="absolute" top="120mm" left="15mm">
 						<fo:block text-align="left" line-height="9pt" font-family="sans-serif" font-size="7pt">
 							Die kommissionelle Diplomprüfung vor einem facheinschlägigen Prüfungssenat setzt sich aus der Präsentation der Diplomarbeit (1. Prüfungsteil), 
 							einem Prüfungsgespräch, das auf die Querverbindungen des Themas der Diplomarbeit zu den relevanten Fächern des Studienplanes eingeht (2. Prüfungsteil) 
@@ -301,40 +323,40 @@
 					
 					<fo:block-container position="absolute" top="150mm" left="15mm" height="20mm">
 						<fo:block text-align="left" line-height="10pt" font-family="sans-serif" font-size="8pt">
-							(mit ausgezeichnetem Erfolg bestanden, mit gutem Erfolg bestanden, bestanden, nicht bestanden)
+							(mit ausgezeichnetem Erfolg bestanden, mit gutem Erfolg bestanden, bestanden, nicht bestanden)	
 						</fo:block>
 					</fo:block-container>
 					
-					<fo:block-container position="absolute" top="170mm" left="15mm">
+					<fo:block-container position="absolute" top="175mm" left="15mm">
 						<fo:table table-layout="fixed" border-collapse="separate">
-						    <fo:table-column column-width="65mm"/>
+						    	<fo:table-column column-width="65mm"/>
 							<fo:table-column column-width="65mm"/>
 							<fo:table-column column-width="65mm"/>
 							<fo:table-column column-width="65mm"/>
-								<fo:table-body>
-						            <fo:table-row line-height="14pt">
-										<fo:table-cell>
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="65mm" text-align="center" font-weight="bold">
-												______________________________
-											</fo:block>
-										</fo:table-cell>
-										<fo:table-cell>
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="65mm" text-align="center" font-weight="bold">
-												______________________________
-											</fo:block>
-										</fo:table-cell>
-										<fo:table-cell>
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="65mm" text-align="center" font-weight="bold">
-												______________________________
-											</fo:block>
-										</fo:table-cell>
-										<fo:table-cell>
-											<fo:block font-family="sans-serif" font-size="10pt" content-width="65mm" text-align="center" font-weight="bold">
-												______________________________
-											</fo:block>
-										</fo:table-cell>
+							<fo:table-body>
+						      	<fo:table-row line-height="14pt">
+									<fo:table-cell>
+										<fo:block font-family="sans-serif" font-size="10pt" content-width="65mm" text-align="center" font-weight="bold">
+											____________________________
+										</fo:block>
+									</fo:table-cell>
+									<fo:table-cell>
+										<fo:block font-family="sans-serif" font-size="10pt" content-width="65mm" text-align="center" font-weight="bold">
+											____________________________
+										</fo:block>
+									</fo:table-cell>
+									<fo:table-cell>
+										<fo:block font-family="sans-serif" font-size="10pt" content-width="65mm" text-align="center" font-weight="bold">
+											____________________________
+										</fo:block>
+									</fo:table-cell>
+									<fo:table-cell>
+										<fo:block font-family="sans-serif" font-size="10pt" content-width="65mm" text-align="center" font-weight="bold">
+											____________________________
+										</fo:block>
+									</fo:table-cell>
 								</fo:table-row>
-					            <fo:table-row line-height="14pt">
+					            	<fo:table-row line-height="14pt">
 									<fo:table-cell>
 										<fo:block font-family="sans-serif" font-size="10pt" content-width="65mm" text-align="center" font-weight="bold">
 											<xsl:value-of select="vorsitz_nachname" />\n
@@ -366,3 +388,5 @@
 	</xsl:template>
 	
 </xsl:stylesheet>
+
+
