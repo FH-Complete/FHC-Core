@@ -274,7 +274,7 @@ else
 			  <td class='tdwrap'>Termin nach Vereinbarung</td>
 			</tr>
 			<tr>
-			  <td width="260" class='tdwrap'>&Ouml;sterreicher Andreas</td>
+			  <td width="260" class='tdwrap'>Ing. &Ouml;sterreicher Andreas</td>
 			  <td width="50" class='tdwrap'>241</td>
 			  <td  class='tdwrap'><?php echo ($visible?'<a class="Item" href="mailto:andreas.oesterreicher@technikum-wien.at">andreas.oesterreicher@technikum-wien.at</a>':'')?></td>
 			  <td width="56" class='tdwrap'>&nbsp;</td>
