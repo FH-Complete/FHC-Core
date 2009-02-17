@@ -1,0 +1,243 @@
+eZ Components - ImageConversion
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. contents:: Table of Contents
+   :depth: 2
+
+Introduction
+============
+
+The ImageConversion component provides image manipulation tools. It
+enables you to perform filter actions (such as scaling, changing the 
+colorspace, adding a swirl effect) and to convert between different MIME image
+types. Filters and conversions are grouped as
+"transformations", which can be globally configured and accessed from anywhere
+in the application. Conversions and filters can be performed through different
+handlers (currently supported are PHP's GD extension and the external ImageMagick
+program). ImageConversion is capable of automatically selecting an appropriate
+handler. You can also set handler priorities.
+
+Class overview
+==============
+
+This section gives you an overview of the main classes.
+
+ezcImageConverter
+  This is the main class that collects all transformations, communicates with
+  the handlers and applies filters and conversions.
+
+ezcImageFilter
+  This class is used to represent the configuration of a filter.
+
+ezcImageTransformation
+  A transformation can contain any number of filters. It also specifies which
+  output MIME types are acceptable for the transformation.
+
+
+Usage
+=====
+
+Converting MIME types
+---------------------
+
+The following example creates a very simple transformation to convert any other
+image type into JPEG:
+
+.. include:: tutorial_example_01_simpleconvert.php
+   :literal:
+
+First, the settings for ezcImageConverter are defined (lines 7 to 12) using
+ezcImageConverterSettings. Whenever ezcImageConverter is
+instantiated, it needs to know which handlers are available. The order in the
+ezcImageHandlerSettings array defines the priority of the handlers. In this
+case, ezcImageConverter will check if a given filter or conversion can be
+performed by the GD handler. If not, it will check the ImageMagick handler. On
+line 14, ezcImageConverter is instantiated using the defined settings.
+
+Line 16 shows how a transformation is created. The first parameter to
+ezcImageConverter::createTransformation() defines the name of the
+transformation, while the second parameter would usually contain filters (which
+are not used here). Instead, just one output MIME type is defined as the third
+parameter. As a result, this transformation returns images of the type
+"image/jpeg".
+
+On lines 21 to 24, the transformation is applied. The first
+parameter to ezcImageConverter::transform() contains the name of the
+transformation to apply. The second one specifies the file to transform, while the
+third one specifies the desired output filename. Aside from
+exceptions of the type ezcBaseFileException, the ezcImageTransformation::transform() 
+method can only throw exceptions of the type ezcImageTransformationException, which 
+we catch here to print out an error message.
+
+The input and output images are shown below:
+
+=================== ====================
+|example_01_before| |example_01_after|
+BMP version (92k)   Converted JPEG (24k)
+=================== ====================
+
+.. |example_01_before| image:: img/imageconversion_example_01_before.bmp
+                       :alt:   Original BMP (92k).
+
+.. |example_01_after| image:: img/imageconversion_example_01_after.jpg
+                      :alt:   Converted JPEG (24k).
+
+Simple filtering
+----------------
+
+The next example shows a transformation that, in addition to the converting to
+JPEG, uses a filter to scale images:
+
+.. include:: tutorial_example_02_simpletrans.php
+   :literal:
+
+After instantiating ezcImageConverter, we define the filters to apply. We apply
+only one filter in this example. Each filter definition must be an instance of
+ezcImageFilter. The first parameter to the constructor of ezcImageFilter
+(ezcImageFilter::__construct()) is the name of the filter to use. The second
+parameter is an array of settings for the filter. The filter name must
+correspond to a method name for one of the filter interfaces:
+
+- ezcImageGeometryFilters
+- ezcImageColorspaceFilters
+- ezcImageEffectFilters
+
+The settings array must contain all parameters that the specific filter method
+expects and the array keys must correspond to the names of the
+parameters. For example, the scale filter used here is defined in 
+ezcImageGeometryFilters::scale(). The available image handlers support the
+following filters:
+
+- ezcImageGdFilters
+
+ * ezcImageGeometryFilters
+ * ezcImageColorspaceFilters
+
+- ezcImageImagemagickFilters
+
+ * ezcImageGeometryFilters
+ * ezcImageColorspaceFilters
+ * ezcImageEffectFilters
+
+The filter definition shown here makes ezcImageConverter scale images to a box
+of 320x240 pixels. Images will only be scaled if they are larger than the
+given size, but not if they are already smaller or fit exactly.
+
+The rest of the example is pretty much the same as example 1. To keep the
+example images web-friendly, we use a JPEG image as the source file here:
+
+Original image (450x246)
+++++++++++++++++++++++++
+
+.. image:: img/imageconversion_example_02_before.jpg
+   :alt: Original JPEG image.
+
+Converted image (320x175)
++++++++++++++++++++++++++
+
+.. image:: img/imageconversion_example_02_after.jpg
+   :alt: Converted JPEG image.
+
+Complex transformations
+-----------------------
+
+The next example shows a more advanced transformation and some other features:
+
+.. include:: tutorial_example_03_complextrans.php
+   :literal:
+
+In this example, there is a second parameter to the constructor of
+ezcImageConverterSettings::__construct(), which defines explicit conversions
+between MIME types (line 13). In this case, we define that GIF images should be 
+converted to PNG. When the transformation takes place, it will first check if an
+explicit conversion has been defined for the input MIME type. If this is the
+case, the explicit conversion will be performed. If not, the first available
+output MIME type will be chosen. Note that you have to add the new MIME output
+type "image/png" to the allowed output types of the transformation (see line
+43).
+
+In the transformation definition we define 3 filters. Note that the
+order of filters is important here. The first filter is "scale" again,
+after which the colorspace of the image is reduced to greyscale. The last
+filter adds a 5-pixel border with a near-white grey value to the image.
+
+For this web tutorial, a JPEG image is once again used as the source: 
+
+Original image (400x300):
++++++++++++++++++++++++++
+
+.. image:: img/imageconversion_example_03_before.jpg
+   :alt: Original JPEG image.
+
+Converted image (330x250):
+++++++++++++++++++++++++++
+
+.. image:: img/imageconversion_example_03_after.jpg
+   :alt: Converted JPEG image.
+
+.. _`downloaded here`: img/imageconversion_example_03.bmp
+
+Adding watermarks
+-----------------
+
+A very convenient filter is the watermark filter, which allows you to place a
+your personal sign onto an image to ensure your copyright being kept:
+
+.. include:: tutorial_example_04_watermark.php
+   :literal:
+
+This code snippet creates a simple transformation to place the watermark. The
+'image' parameter contains the path to the watermark image, while posX and posY
+define, where the watermark will be placed on the converted image. The
+positions are defined from the bottom left corner, so in this case therer will
+be 10 pixel left between the watermark and the image border.
+
+Original image (without watermark):
++++++++++++++++++++++++++++++++++++
+
+.. image:: img/imageconversion_example_04_before.jpg
+   :alt: Original JPEG image without watermark.
+
+Converted image (with watermark):
++++++++++++++++++++++++++++++++++
+
+.. image:: img/imageconversion_example_04_after.jpg
+   :alt: Converted JPEG image with watermark.
+
+It is also possible to get the size of the watermark image adjusted on the fly
+and a second filter is available, which allows to define all values as
+percentage values, in respect to the destination image.
+
+Creating thumbnails
+-------------------
+
+The following example shows how to create a thumbnail from an image very
+easily:
+
+.. include:: tutorial_example_05_thumbnail.php
+   :literal:
+
+While there is also a 'croppedThumbnail' filter available, which croppes
+overhead from the scaled image, this filter fills the overhead from scaling
+with the given fill color. The image is automatically scaled down to fit the
+given thumbnail size.
+
+Original image (original size):
++++++++++++++++++++++++++++++++
+
+.. image:: img/imageconversion_example_05_before.jpg
+   :alt: Original JPEG image without watermark.
+
+Converted image (thumbnail):
+++++++++++++++++++++++++++++
+
+.. image:: img/imageconversion_example_05_after.jpg
+   :alt: Converted JPEG image with watermark.
+
+
+..
+   Local Variables:
+   mode: rst
+   fill-column: 79
+   End: 
+   vim: et syn=rst tw=79
