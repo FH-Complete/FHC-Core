@@ -152,7 +152,19 @@ $preinteressent->getPreinteressenten($person->person_id);
 if(count($preinteressent->result)>0)
 {
 	echo '<br><h2>Preinteressent</h2>';
-	echo '<table class="liste table-autosort:0 table-stripeclass:alternate table-autostripe"><thead><tr><th>ID</th><th>Studiensemester</th><th>Erfassungsdatum</th><th>Anmerkung</th><th>Studiengänge</th></tr></thead><tbody>';
+	echo '<table class="liste table-autosort:0 table-stripeclass:alternate table-autostripe">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Studiensemester</th>
+					<th>Erfassungsdatum</th>
+					<th>Anmerkung</th>
+					<th>AufmerksamDurch</th>
+					<th>Kontaktmedium (Woher)</th>
+					<th>Studiengänge</th>
+				</tr>
+			</thead>
+			<tbody>';
 	foreach ($preinteressent->result as $row)
 	{
 		echo '<tr>';
@@ -160,6 +172,8 @@ if(count($preinteressent->result)>0)
 		echo "<td>$row->studiensemester_kurzbz</td>";
 		echo "<td>".$datum_obj->formatDatum($row->erfassungsdatum, 'd.m.Y')."</td>";
 		echo "<td title='".htmlentities($row->anmerkung,ENT_QUOTES)."'>".htmlentities(CutString($row->anmerkung, 50),ENT_QUOTES)."</td>";
+		echo "<td>".$row->aufmerksamdurch_kurzbz."</td>";
+		echo "<td>".$row->kontaktmedium_kurzbz."</td>";
 		echo '<td>';
 		$preinteressent1 = new preinteressent($conn);
 		$preinteressent1->loadZuordnungen($row->preinteressent_id);
