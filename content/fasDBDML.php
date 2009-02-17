@@ -449,7 +449,7 @@ if(!$error)
 			if(isset($_POST['wert']) && $_POST['wert']!=0)
 			{
 				$stsem = new studiensemester($conn);
-				$studiensemester_kurzbz = $stsem->jump($_POST['stsem'], $wert);
+				$studiensemester_kurzbz = $stsem->jump($_POST['stsem'], $_POST['wert']);
 			}
 			else 
 				$studiensemester_kurzbz = $_POST['stsem'];
