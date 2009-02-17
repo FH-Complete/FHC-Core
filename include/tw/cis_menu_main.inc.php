@@ -302,6 +302,10 @@
 			</tr>
 			<tr>
 			  	<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td class="tdwrap"><a class="Item" href="private/info/vpn/index.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;VPN-Zugang</a></td>
+			</tr>
+			<tr>
+			  	<td class="tdwidth10" nowrap>&nbsp;</td>
 				<td class="tdwrap"><a class="Item" href="private/info/security.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Security</a></td>
 			</tr>
 			<tr>
