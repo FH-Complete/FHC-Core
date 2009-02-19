@@ -82,12 +82,27 @@
 	}
 	if(!($erg_lekt=pg_query($conn, "SELECT * FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='$uid'")))
 		die(pg_last_error($conn));
+
+		
 	$lekt_num_rows=pg_num_rows($erg_lekt);
 	if ($lekt_num_rows==1)
 	{
 		$row=pg_fetch_object($erg_lekt,0);
 		$kurzbz=$row->kurzbz;
 		$tel=$row->telefonklappe;
+
+		$vorwahl = '';
+		if($tel != "")
+		{
+			$vorwahl = '+43 1 333 40 77-';
+			if($row->standort_kurzbz!='')
+			{
+						$qry = "SELECT telefon FROM public.tbl_standort, public.tbl_adresse, public.tbl_firma WHERE tbl_standort.standort_kurzbz='$row->standort_kurzbz' AND tbl_standort.adresse_id=tbl_adresse.adresse_id AND tbl_adresse.firma_id=tbl_firma.firma_id";
+						if($result_tel = pg_query($conn, $qry))
+						if($row_tel = pg_fetch_object($result_tel))
+						$vorwahl = $row_tel->telefon;
+			}
+		}	
 	}
 
 	// Mail-Groups
@@ -259,9 +274,10 @@ function RefreshImage()
 				<b>Lektor</b><br><br>
 			Kurzzeichen: $kurzbz<BR>";
 			
+								
 			if($tel!='')
-				echo "Telefon TW: +43 1 333 40 77- $tel<BR><BR>";
-
+				echo "Telefon TW: $vorwahl $tel<BR><BR>";
+				
 			if(!$ansicht)
 			{
 				echo '
