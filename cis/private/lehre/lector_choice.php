@@ -125,7 +125,7 @@
 				if(!$is_berechtigt)
 					die('Sie haben keine Berechtigung fuer diesen Bereich');
 
-				echo '<span class="error">ACHTUNG: Der Studentenupload steht nur noch bis zum Ende des Wintersemesters 2008 zur Verfügung</span><br><br>';
+				//echo '<span class="error">ACHTUNG: Der Studentenupload steht nur noch bis zum Ende des Wintersemesters 2008 zur Verfügung</span><br><br>';
 				echo "<form method=\"POST\" action=\"lector_choice.php?lvid=$lvid\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmDir(this);\">";
 
 				if(isset($delete_dir))
