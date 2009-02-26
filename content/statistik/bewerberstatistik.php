@@ -118,7 +118,7 @@ if(isset($_GET['showdetails']))
 	$content.='
 	<h2>Bewerberstatistik Details - '.$stg_obj->kuerzel.' '.$stsem.'<span style="position:absolute; right:15px;">'.date('d.m.Y').'</span></h2><br>
 	';
-	$content.='<center><iframe src="bewerberstatistik.svg.php?stsem='.$stsem.'&studiengang_kz='.$studiengang_kz.'" width="500" height="500" ></iframe></center>';
+	//$content.='<center><iframe src="bewerberstatistik.svg.php?stsem='.$stsem.'&studiengang_kz='.$studiengang_kz.'" width="500" height="500" ></iframe></center>';
 	
 	$hlp=array();
 	//Aufmerksamdurch (Prestudent)
