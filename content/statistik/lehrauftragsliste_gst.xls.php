@@ -96,7 +96,8 @@ $qry = "SELECT * FROM (
 			tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 			studiengang_kz='$studiengang_kz' AND studiensemester_kurzbz='$semester_aktuell' AND 
 			tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND tbl_lehreinheitmitarbeiter.semesterstunden is not null 
-			AND tbl_lehreinheitmitarbeiter.stundensatz<>0 AND tbl_lehreinheitmitarbeiter.faktor<>0";
+			AND tbl_lehreinheitmitarbeiter.stundensatz<>0 AND tbl_lehreinheitmitarbeiter.faktor<>0 AND
+			EXISTS (SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=tbl_lehreinheit.lehreinheit_id)";
 if($semester!='')
 	$qry.=" AND semester='$semester'";
 
