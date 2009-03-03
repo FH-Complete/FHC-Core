@@ -45,7 +45,7 @@ echo '
 		<head>
 		<title>Institutsliste</title>
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-		<meta http-equiv="content-type" content="text/html; charset=ISO-8859-9" />
+		<meta http-equiv="content-type" content="text/html; charset=ISO-8859-15" />
 		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 		</head>
@@ -55,8 +55,6 @@ echo '
 $stsem = new studiensemester($conn);
 $ws = $stsem->getNearest(1);
 $ss = $stsem->getNearest(2);
-$ws = 'WS2007';
-$ss = 'SS2008';
 
 if($rechte->isBerechtigt('admin', 0) || $rechte->isBerechtigt('mitarbeiter', 0))
 	$where = '';
