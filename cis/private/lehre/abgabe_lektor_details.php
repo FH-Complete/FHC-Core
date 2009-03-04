@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2008 Technikum-Wien
+/* Copyright (C) 2009 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,9 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> 
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>
+ * Authors: Christian Paminger 		< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 /*******************************************************************************************************
  *				abgabe_lektor
