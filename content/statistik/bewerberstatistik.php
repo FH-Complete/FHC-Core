@@ -19,18 +19,23 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-/*
+/**
  * Erstellt eine Statistik ueber die verschiedenen Stati der Bewerber
  * mit Aufteilung nach Studiengaengen und Geschlecht.
  * Mischformen werden nochmals getrennt aufgelistet (VZ/BB)
  * Ausserdem erfolgt noch eine Auflistung in wie vielen verschiedenen Studiengaengen 
  * sich die Personen Beworben haben.
+ * 
+ * Wenn Showdetails gesetzt ist wird ein SVG Graph mit Interessent/Bewerber/Student angezeigt
+ * und eine Uebersicht ueber die Berufstaetigkeit und Aufmerksamdurch
  *
  * GET-Parameter:
- * stsem ... Studiensemester fuer die Statistik
- * mail  ... Wenn der Parameter "mail" uebergeben wird, dann wird die Statistik 
- *           per Mail an "tw_sek" und "tw_stgl" versandt
- *
+ * stsem          ... Studiensemester fuer die Statistik
+ * mail           ... Wenn der Parameter "mail" uebergeben wird, dann wird die Statistik 
+ *                    per Mail an "tw_sek" und "tw_stgl" versandt
+ *                    per CLI (Cronjob) wird das Script mit "php bewerberstatistik.php mail" aufgerufen
+ * showdetails    ... wenn true, dann wird die Detailansicht fuer einen Studiengang geliefert
+ * studiengang_kz ... gibt den Studiengang an der angezeigt werden soll, wenn showdetails=true
  */
 
 require_once('../../vilesci/config.inc.php');
@@ -325,6 +330,27 @@ if($stsem!='')
 				</thead>
 				<tbody>
 			 ";
+		$interessenten_sum = 0;
+		$interessenten_m_sum = 0;
+		$interessenten_w_sum = 0;
+		$interessentenzgv_sum = 0;
+		$interessentenzgv_m_sum = 0;
+		$interessentenzgv_w_sum = 0;
+		$interessentenrtanmeldung_sum = 0;
+		$interessentenrtanmeldung_m_sum = 0;
+		$interessentenrtanmeldung_w_sum = 0;
+		$bewerber_sum = 0;
+		$bewerber_m_sum = 0;
+		$bewerber_w_sum = 0;
+		$aufgenommener_sum = 0;
+		$aufgenommener_m_sum = 0;
+		$aufgenommener_w_sum = 0;
+		$student1sem_sum = 0;
+		$student1sem_m_sum = 0;
+		$student1sem_w_sum = 0;
+		$student3sem_sum = 0;
+		$student3sem_m_sum = 0;
+		$student3sem_w_sum = 0;
 		
 		while($row = pg_fetch_object($result))
 		{
@@ -339,8 +365,44 @@ if($stsem!='')
 			$content.= "<td align='center'>$row->student1sem ($row->student1sem_m / $row->student1sem_w)</td>";
 			$content.= "<td align='center'>$row->student3sem ($row->student3sem_m / $row->student3sem_w)</td>";
 			$content.= "</tr>";
+			
+			//Summe berechnen
+			$interessenten_sum += $row->interessenten;
+			$interessenten_m_sum += $row->interessenten_m;
+			$interessenten_w_sum += $row->interessenten_w;
+			$interessentenzgv_sum += $row->interessentenzgv;
+			$interessentenzgv_m_sum += $row->interessentenzgv_m;
+			$interessentenzgv_w_sum += $row->interessentenzgv_w;
+			$interessentenrtanmeldung_sum += $row->interessentenrtanmeldung;
+			$interessentenrtanmeldung_m_sum += $row->interessentenrtanmeldung_m;
+			$interessentenrtanmeldung_w_sum += $row->interessentenrtanmeldung_w;
+			$bewerber_sum += $row->bewerber;
+			$bewerber_m_sum += $row->bewerber_m;
+			$bewerber_w_sum += $row->bewerber_w;
+			$aufgenommener_sum += $row->aufgenommener;
+			$aufgenommener_m_sum += $row->aufgenommener_m;
+			$aufgenommener_w_sum += $row->aufgenommener_w;
+			$student1sem_sum += $row->student1sem;
+			$student1sem_m_sum += $row->student1sem_m;
+			$student1sem_w_sum += $row->student1sem_w;
+			$student3sem_sum += $row->student3sem;
+			$student3sem_m_sum += $row->student3sem_m;
+			$student3sem_w_sum += $row->student3sem_w;
 		}
-		$content.= '</tbody></table>';
+		
+		$content.= "\n";
+		$content.= '</tbody><tfoot style="font-weight: bold;"><tr>';
+		$content.= "<td>Summe</td>";
+		$content.= "<td align='center'>$interessenten_sum ($interessenten_m_sum / $interessenten_w_sum)</td>";
+		$content.= "<td align='center'>$interessentenzgv_sum ($interessentenzgv_m_sum / $interessentenzgv_w_sum)</td>";
+		$content.= "<td align='center'>$interessentenrtanmeldung_sum ($interessentenrtanmeldung_m_sum / $interessentenrtanmeldung_w_sum)</td>";
+		$content.= "<td align='center'>$bewerber_sum ($bewerber_m_sum / $bewerber_w_sum)</td>";
+		$content.= "<td align='center'>$aufgenommener_sum ($aufgenommener_m_sum / $aufgenommener_w_sum)</td>";
+		$content.= "<td align='center'>$student1sem_sum ($student1sem_m_sum / $student1sem_w_sum)</td>";
+		$content.= "<td align='center'>$student3sem_sum ($student3sem_m_sum / $student3sem_w_sum)</td>";
+		$content.= "</tr>";
+		
+		$content.= '</tfoot></table>';
 	}
 	
 	//Aufsplittungen für Mischformen holen
@@ -463,6 +525,28 @@ if($stsem!='')
 					<tbody>
 				 ";
 			
+			$interessenten_vz_sum = 0;
+			$interessenten_bb_sum = 0;
+			$interessenten_fst_sum = 0;
+			$interessentenzgv_vz_sum = 0;
+			$interessentenzgv_bb_sum = 0;
+			$interessentenzgv_fst_sum = 0;
+			$interessentenrtanmeldung_vz_sum = 0;
+			$interessentenrtanmeldung_bb_sum = 0;
+			$interessentenrtanmeldung_fst_sum = 0;
+			$bewerber_vz_sum = 0;
+			$bewerber_bb_sum = 0;
+			$bewerber_fst_sum = 0;
+			$aufgenommener_vz_sum = 0;
+			$aufgenommener_bb_sum = 0;
+			$aufgenommener_fst_sum = 0;
+			$student1sem_vz_sum = 0;
+			$student1sem_bb_sum = 0;
+			$student1sem_fst_sum = 0;
+			$student3sem_vz_sum = 0;
+			$student3sem_bb_sum = 0;
+			$student3sem_fst_sum = 0;
+			
 			while($row = pg_fetch_object($result))
 			{
 				$content.= "\n";
@@ -476,8 +560,42 @@ if($stsem!='')
 				$content.= "<td align='center'>$row->student1sem_vz / $row->student1sem_bb / $row->student1sem_fst</td>";
 				$content.= "<td align='center'>$row->student3sem_vz / $row->student3sem_bb / $row->student3sem_fst</td>";
 				$content.= "</tr>";
+				
+				//Summe berechnen
+				$interessenten_vz_sum += $row->interessenten_vz;
+				$interessenten_bb_sum += $row->interessenten_bb;
+				$interessenten_fst_sum += $row->interessenten_fst;
+				$interessentenzgv_vz_sum += $row->interessentenzgv_vz;
+				$interessentenzgv_bb_sum += $row->interessentenzgv_bb;
+				$interessentenzgv_fst_sum += $row->interessentenzgv_fst;
+				$interessentenrtanmeldung_vz_sum += $row->interessentenrtanmeldung_vz;
+				$interessentenrtanmeldung_bb_sum += $row->interessentenrtanmeldung_bb;
+				$interessentenrtanmeldung_fst_sum += $row->interessentenrtanmeldung_fst;
+				$bewerber_vz_sum += $row->bewerber_vz;
+				$bewerber_bb_sum += $row->bewerber_bb;
+				$bewerber_fst_sum += $row->bewerber_fst;
+				$aufgenommener_vz_sum += $row->aufgenommener_vz;
+				$aufgenommener_bb_sum += $row->aufgenommener_bb;
+				$aufgenommener_fst_sum += $row->aufgenommener_fst;
+				$student1sem_vz_sum += $row->student1sem_vz;
+				$student1sem_bb_sum += $row->student1sem_bb;
+				$student1sem_fst_sum += $row->student1sem_fst;
+				$student3sem_vz_sum += $row->student3sem_vz;
+				$student3sem_bb_sum += $row->student3sem_bb;
+				$student3sem_fst_sum += $row->student3sem_fst;
 			}
-			$content.= '</tbody></table>';
+			$content.= "\n";
+			$content.= '</tbody><tfoot style="font-weight: bold;"><tr>';
+			$content.= "<td>Summe</td>";
+			$content.= "<td align='center'>$interessenten_vz_sum / $interessenten_bb_sum / $interessenten_fst_sum</td>";
+			$content.= "<td align='center'>$interessentenzgv_vz_sum / $interessentenzgv_bb_sum / $interessentenzgv_fst_sum</td>";
+			$content.= "<td align='center'>$interessentenrtanmeldung_vz_sum / $interessentenrtanmeldung_bb_sum / $interessentenrtanmeldung_fst_sum</td>";
+			$content.= "<td align='center'>$bewerber_vz_sum / $bewerber_bb_sum / $bewerber_fst_sum</td>";
+			$content.= "<td align='center'>$aufgenommener_vz_sum / $aufgenommener_bb_sum / $aufgenommener_fst_sum</td>";
+			$content.= "<td align='center'>$student1sem_vz_sum / $student1sem_bb_sum / $student1sem_fst_sum</td>";
+			$content.= "<td align='center'>$student3sem_vz_sum / $student3sem_bb_sum / $student3sem_fst_sum</td>";
+			$content.= "</tfoot></tr>";
+			$content.= '</table>';
 		}
 	}
 	
@@ -533,7 +651,7 @@ else
 {
 	//Mail versenden
 	echo 'Bewerberstatistik.php - Sende Mail ...';
-	$to = 'tw_sek@technikum-wien.at, tw_stgl@technikum-wien.at';
+	$to = 'tw_sek@technikum-wien.at, tw_stgl@technikum-wien.at, russ@technikum-wien.at, ott@technikum-wien.at, vilesci@technikum-wien.at';
 	$mailobj = new mail($to, 'vilesci@technikum-wien.at','Bewerberstatistik','Sie muessen diese Mail als HTML-Mail anzeigen um die Statistik zu sehen');
 	$mailobj->setHTMLContent($content);
 	
