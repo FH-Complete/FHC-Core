@@ -126,6 +126,12 @@ function draw_row($row)
 	}
 	$mitarbeiter = '('.$mitarbeiter.')';
 	
+	$anzahl_studenten=0;		
+	$qry = "SELECT count(*) as anz FROM campus.vw_student_lehrveranstaltung WHERE lehreinheit_id='".addslashes($row->lehreinheit_id)."'";
+	if($result_std = pg_query($conn, $qry))
+		if($row_std = pg_fetch_object($result_std))
+			$anzahl_studenten = $row_std->anz;
+	
 	$lehrfach = new lehrfach($conn, null, true);
 	$lehrfach->load($row->lehrfach_id);
 	
@@ -148,6 +154,7 @@ function draw_row($row)
             <LEHREINHEIT:unr><![CDATA['.$row->unr.']]></LEHREINHEIT:unr>
             <LEHREINHEIT:lvnr><![CDATA['.$row->lvnr.']]></LEHREINHEIT:lvnr>
             <LEHREINHEIT:bezeichnung><![CDATA['.$lehrfach->kurzbz.'-'.$row->lehrform_kurzbz.' '.$lehrfach->bezeichnung.' '.$grp.' '.$mitarbeiter.']]></LEHREINHEIT:bezeichnung>
+            <LEHREINHEIT:anzahl_studenten><![CDATA['.$anzahl_studenten.']]></LEHREINHEIT:anzahl_studenten>
          </RDF:Description>
       </RDF:li>
       ';

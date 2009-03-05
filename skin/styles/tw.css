@@ -31,9 +31,10 @@ hr
 	color:#CCCCCC;
 	height:1px;
 }
+@media screen {
 #menue
 {
-	top:80px;
+	top:8%;
 	width:19%;
 	height:80%;
 	z-index:1000;
@@ -55,7 +56,40 @@ html>body #content
 {
 	position:absolute;
 }
+}
 
+/*   Druckausgabe */
+
+
+@media print {
+
+.home_logo
+{
+display:none;
+}
+.header_line
+{
+display:none;
+}
+
+#menue
+{
+display:none;
+}
+#GlobalMenu
+{
+display:none;
+}
+
+#content
+{
+	width:800px;
+	height:900px;
+	left:0px;
+	overflow: hidden;
+}
+
+}
 input.TextBox					
 {
 	background-color: White;
@@ -421,8 +455,9 @@ font.ContentHeader
 #news .news .titel
 {
 	font-weight: bold;
-	/*font-size: normal;*/
+	font-size: normal;
 	padding: 0px 10px 0px 10px;
+	white-space: nowrap;
 }
 #news .news .text
 {
@@ -486,6 +521,31 @@ img#layout
 }
 
 
+.studentnote
+{
+	font-weight:bold;
+}
+
+.benotungstool_tabs
+{
+	border-top: 1px solid gray;
+	border-left: 1px solid gray;
+	border-right: 1px solid gray;
+	text-align: center;
+}
+.benotungstool_tabs_active
+{
+	border-top: 2px solid gray;
+	border-left: 2px solid gray;
+	border-right: 2px solid gray;
+	background-color: #eeeeee;
+	text-align: center;
+}
+.benotungstool_subtab
+{
+	border-top: 1px solid gray;
+	border-bottom: 1px solid gray;
+}
 
 /*aussortiert*/
 

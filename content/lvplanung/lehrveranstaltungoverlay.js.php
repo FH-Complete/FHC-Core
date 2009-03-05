@@ -776,6 +776,7 @@ function LeAuswahl()
 	anmerkung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
 	studiensemester=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiensemester_kurzbz" ));
 	lehrform=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehrform_kurzbz" ));
+	anzahl_studenten=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anzahl_studenten" ));
 
 	//Lehrfach drop down setzen
 
@@ -830,6 +831,7 @@ function LeAuswahl()
 	document.getElementById('lehrveranstaltung-detail-menulist-lehrform').value=lehrform;
 	document.getElementById('lehrveranstaltung-detail-checkbox-new').checked=false;
 	document.getElementById('lehrveranstaltung-detail-textbox-lehreinheit_id').value=lehreinheit_id;
+	document.getElementById('lehrveranstaltung-detail-groupbox-caption').label='Details - Anzahl TeilnehmerInnen: '+anzahl_studenten;
 
 	//Lehreinheitmitarbeiter tree setzen
 	url='<?php echo APP_ROOT;?>rdf/lehreinheitmitarbeiter.rdf.php?lehreinheit_id='+lehreinheit_id+"&"+gettimestamp();

@@ -250,7 +250,7 @@ if(!$result = pg_query($conn, $qry))
 			if($result_fb = pg_query($conn, $qry))
 				if($row_fb = pg_fetch_object($result_fb))
 					$fachbereich = $row_fb->bezeichnung;
-
+			
 			echo "
       		<RDF:Description  id=\"".$row_le->lehreinheit_id."\"  about=\"".$rdf_url.'/'.$row_lva->lehrveranstaltung_id."/$row_le->lehreinheit_id\" >
 				<LVA:lehrveranstaltung_id>".$row_lva->lehrveranstaltung_id."</LVA:lehrveranstaltung_id>

@@ -78,7 +78,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	</vbox>
 	<hbox>
 	<groupbox orientation="horizontal">
-		<caption label="Details" />
+		<caption id="lehrveranstaltung-detail-groupbox-caption" label="Details" />
 		<!--Details-->
 		<hbox>
 		<grid datasources="rdf:null"

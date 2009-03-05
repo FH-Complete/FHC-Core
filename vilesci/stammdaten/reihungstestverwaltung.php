@@ -27,6 +27,9 @@
 	require_once('../../include/ort.class.php');
 	require_once('../../include/datum.class.php');
 	require_once('../../include/benutzerberechtigung.class.php');
+	require_once('../../include/pruefling.class.php');
+	require_once('../../include/person.class.php');
+	require_once('../../include/prestudent.class.php');
 	
 	require_once('../../include/Excel/excel.php');
 	
@@ -37,6 +40,8 @@
 	$datum_obj = new datum();
 	$stg_kz = (isset($_GET['stg_kz'])?$_GET['stg_kz']:'-1');
 	$reihungstest_id = (isset($_GET['reihungstest_id'])?$_GET['reihungstest_id']:'');
+	$prestudent_id = (isset($_GET['prestudent_id'])?$_GET['prestudent_id']:'');
+	$rtpunkte = (isset($_GET['rtpunkte'])?$_GET['rtpunkte']:'');
 	$neu = (isset($_GET['neu'])?true:false);
 	$stg_arr = array();
 	$error = false;
@@ -218,6 +223,63 @@
 			}
 			$neu=false;
 		}
+
+		// Uebertraegt die Punkte eines Prestudenten ins FAS
+		if(isset($_GET['type']) && $_GET['type']=='savertpunkte')
+		{
+			$prestudent = new prestudent($conn);
+			$prestudent->load($prestudent_id);
+			
+			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz', $prestudent->studiengang_kz, 'suid'))
+			{
+				$prestudent->rt_punkte1 = $rtpunkte;
+				$prestudent->punkte = $prestudent->rt_punkte1 + $prestudent->rt_punkte2;
+				
+				$prestudent->save(false);
+			}
+			else 
+			{
+				echo '<span class="input_error"><br>Sie haben keine Berechtigung zur Uebernahme der Punkte fuer '.$row->nachname.' '.$row->vorname.'</span>';
+			}
+		}
+		
+		// Uebertraegt alle Punkte eines Reihungstests ins FAS
+		if(isset($_GET['type']) && $_GET['type']=='saveallrtpunkte')
+		{
+			$errormsg='';
+			$qry = "SELECT prestudent_id, studiengang_kz, nachname, vorname 
+					FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) 
+					WHERE reihungstest_id='".addslashes($reihungstest_id)."'";
+			// AND (rt_punkte1='' OR rt_punkte1 is null)";
+			if($result = pg_query($conn, $qry))
+			{
+				while($row = pg_fetch_object($result))
+				{
+					if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid'))
+					{
+						$prestudent = new prestudent($conn);
+						$prestudent->load($row->prestudent_id);
+						
+						$pruefling = new pruefling($conn);
+						$rtpunkte = $pruefling->getReihungstestErgebnis($row->prestudent_id);
+						
+						$prestudent->rt_punkte1 = $rtpunkte;
+						$prestudent->punkte = $prestudent->rt_punkte1 + $prestudent->rt_punkte2;
+						
+						$prestudent->save(false);
+					}
+					else 
+					{
+						$errormsg .= "<br>Sie haben keine Berechtigung zur Uebernahme der Punkte fuer $row->nachname $row->vorname";
+					}
+				}
+				if($errormsg!='')
+				{
+					echo '<span class="input_error">'.$errormsg.'</span>';
+				}
+			}			
+		}
+		
 		echo '<br><table width="100%"><tr><td>';
 		
 		//Studiengang DropDown
@@ -354,17 +416,36 @@
 		
 		if($reihungstest_id!='')
 		{
-			echo "<a href='".$_SERVER['PHP_SELF']."?reihungstest_id=$reihungstest_id&excel=true'>Excel Export</a><br><br>";
+			echo '<table width="100%"><tr><td>';
+			echo "<a href='".$_SERVER['PHP_SELF']."?reihungstest_id=$reihungstest_id&excel=true'>Excel Export</a>";
+			echo '</td><td align="right">';
+			echo "<a href='".$_SERVER['PHP_SELF']."?reihungstest_id=$reihungstest_id&type=saveallrtpunkte'>alle Punkte ins FAS &uuml;bertragen</a>";
+			echo '</td></tr></table>';
+			
 			//Liste der Interessenten die zum Reihungstest angemeldet sind
 			$qry = "SELECT *, (SELECT kontakt FROM tbl_kontakt WHERE kontakttyp='email' AND person_id=tbl_prestudent.person_id ORDER BY zustellung desc, insertamum desc LIMIT 1) as email FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE reihungstest_id='$reihungstest_id' ORDER BY nachname, vorname";
 			$mailto = '';
 			if($result = pg_query($conn, $qry))
 			{
 				echo 'Anzahl: '.pg_num_rows($result);
+				$pruefling = new pruefling($conn);
 				
-				echo "<table class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'><thead><tr class='liste'><th class='table-sortable:default'>Vorname</th><th class='table-sortable:default'>Nachname</th><th class='table-sortable:default'>Studiengang</th><th class='table-sortable:default'>Geburtsdatum</th><th>EMail</th></tr></thead><tbody>";
+				echo "<table class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>
+						<thead>
+						<tr class='liste'>
+							<th class='table-sortable:default'>Vorname</th>
+							<th class='table-sortable:default'>Nachname</th>
+							<th class='table-sortable:default'>Studiengang</th>
+							<th class='table-sortable:default'>Geburtsdatum</th>
+							<th class='table-sortable:default'>EMail</th>
+							<th class='table-sortable:default'>Ergebnis</th>
+							<th class='table-sortable:default'>FAS</th>
+						</tr>
+						</thead>
+						<tbody>";
 				while($row = pg_fetch_object($result))
 				{
+					$rtergebnis = $pruefling->getReihungstestErgebnis($row->prestudent_id);
 					echo "
 						<tr>
 							<td>$row->vorname</td>
@@ -372,6 +453,8 @@
 							<td>".$stg_arr[$row->studiengang_kz]."</td>
 							<td>".$datum_obj->convertISODate($row->gebdatum)."</td>
 							<td><a href='mailto:$row->email'>$row->email</a></td>
+							<td align='right'>".number_format($rtergebnis,2,'.','')."</td>
+							<td align='right'>".($rtergebnis>0 && $row->rt_punkte1==''?'<a href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$stg_kz.'&type=savertpunkte&prestudent_id='.$row->prestudent_id.'&rtpunkte='.$rtergebnis.'" >&uuml;bertragen</a>':$row->rt_punkte1)."</td>
 						</tr>";
 					
 					$mailto.= ($mailto!=''?',':'').$row->email;

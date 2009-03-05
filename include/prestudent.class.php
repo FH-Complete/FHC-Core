@@ -39,7 +39,9 @@ class prestudent extends person
 	var $anmeldungreihungstest;
 	var $reihungstestangetreten;
 	var $reihungstest_id;
-	var $punkte;
+	var $punkte; //rt_gesamtpunkte
+	var $rt_punkte1;
+	var $rt_punkte2;
 	var $bismelden;
 	var $anmerkung;
 	var $ext_id_prestudent;
@@ -118,7 +120,9 @@ class prestudent extends person
 				$this->anmeldungreihungstest = $row->anmeldungreihungstest;
 				$this->reihungstestangetreten = ($row->reihungstestangetreten=='t'?true:false);
 				$this->reihungstest_id = $row->reihungstest_id;
-				$this->punkte = $row->punkte;
+				$this->punkte = $row->rt_gesamtpunkte;
+				$this->rt_punkte1 = $row->rt_punkte1;
+				$this->rt_punkte2 = $row->rt_punkte2;
 				$this->bismelden = ($row->bismelden=='t'?true:false);
 				$this->person_id = $row->person_id;
 				$this->anmerkung = $row->anmerkung;
@@ -150,6 +154,21 @@ class prestudent extends person
 	// *******************************************
 	function validate()
 	{
+		if($this->punkte>9999.9999)
+		{
+			$this->errormsg = 'Reihungstestgesamtpunkte darf nicht groesser als 9999.9999 sein';
+			return false;
+		}
+		if($this->rt_punkte1>9999.9999)
+		{
+			$this->errormsg = 'Reihungstestpunkte1 darf nicht groesser als 9999.9999 sein';
+			return false;
+		}
+		if($this->rt_punkte2>9999.9999)
+		{
+			$this->errormsg = 'Reihungstestpunkte2 darf nicht groesser als 9999.9999 sein';
+			return false;
+		}
 		return true;
 	}
 	
@@ -171,7 +190,7 @@ class prestudent extends person
 		
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = 'BEGIN;INSERT INTO public.tbl_prestudent (aufmerksamdurch_kurzbz, person_id, studiengang_kz, berufstaetigkeit_code, ausbildungcode, zgv_code, zgvort, zgvdatum, zgvmas_code, zgvmaort, zgvmadatum, aufnahmeschluessel, facheinschlberuf, reihungstest_id, anmeldungreihungstest, reihungstestangetreten, punkte, bismelden, insertamum, insertvon, updateamum, updatevon, ext_id, anmerkung, dual) VALUES('.
+			$qry = 'BEGIN;INSERT INTO public.tbl_prestudent (aufmerksamdurch_kurzbz, person_id, studiengang_kz, berufstaetigkeit_code, ausbildungcode, zgv_code, zgvort, zgvdatum, zgvmas_code, zgvmaort, zgvmadatum, aufnahmeschluessel, facheinschlberuf, reihungstest_id, anmeldungreihungstest, reihungstestangetreten, rt_gesamtpunkte, rt_punkte1, rt_punkte2, bismelden, insertamum, insertvon, updateamum, updatevon, ext_id, anmerkung, dual) VALUES('.
 			       $this->addslashes($this->aufmerksamdurch_kurzbz).",".
 			       $this->addslashes($this->person_id).",".
 			       $this->addslashes($this->studiengang_kz).",".
@@ -189,6 +208,8 @@ class prestudent extends person
 			       $this->addslashes($this->anmeldungreihungstest).",".
 			       ($this->reihungstestangetreten?'true':'false').",".
 			       $this->addslashes($this->punkte).",".
+			       $this->addslashes($this->rt_punkte1).",".
+			       $this->addslashes($this->rt_punkte2).",".
 			       ($this->bismelden?'true':'false').",".
 			       $this->addslashes($this->insertamum).",".
 			       $this->addslashes($this->insertvon).",".
@@ -217,7 +238,9 @@ class prestudent extends person
 			       ' reihungstest_id='.$this->addslashes($this->reihungstest_id).",".
 			       ' anmeldungreihungstest='.$this->addslashes($this->anmeldungreihungstest).",".
 			       ' reihungstestangetreten='.($this->reihungstestangetreten?'true':'false').",".
-			       ' punkte='.$this->addslashes($this->punkte).",".
+			       ' rt_gesamtpunkte='.$this->addslashes($this->punkte).",".
+			       ' rt_punkte1='.$this->addslashes($this->rt_punkte1).",".
+			       ' rt_punkte2='.$this->addslashes($this->rt_punkte2).",".
 			       ' bismelden='.($this->bismelden?'true':'false').",".
 			       ' updateamum='.$this->addslashes($this->updateamum).",".
 			       ' updatevon='.$this->addslashes($this->updatevon).",".
@@ -329,6 +352,8 @@ class prestudent extends person
 			$ps->anmeldungreihungstest = $row->anmeldungreihungstest;
 			$ps->reihungstestangetreten = $row->reihungstestangetreten;
 			$ps->punkte = $row->punkte;
+			$ps->rt_punkte1 = $row->rt_punkte1;
+			$ps->rt_punkte2 = $row->rt_punkte2;
 			$ps->bismelden = $row->bismelden;
 			$ps->rt_studiengang_kz = $row->rt_studiengang_kz;
 			$ps->rt_ort = $row->rt_ort;
@@ -551,7 +576,9 @@ class prestudent extends person
 				$ps->anmeldungreihungstest = $row->anmeldungreihungstest;
 				$ps->reihungstestangetreten = ($row->reihungstestangetreten=='t'?true:false);
 				$ps->reihungstest_id = $row->reihungstest_id;
-				$ps->punkte = $row->punkte;
+				$ps->punkte = $row->rt_gesamtpunkte;
+				$ps->rt_punkte1 = $row->rt_punkte1;
+				$ps->rt_punkte2 = $row->rt_punkte2;
 				$ps->bismelden = ($row->bismelden=='t'?true:false);
 				$ps->anmerkung = $row->anmerkung;
 				$ps->dual = ($row->dual=='t'?true:false);
@@ -835,7 +862,9 @@ class prestudent extends person
 				$obj->anmeldungreihungstest = $row->anmeldungreihungstest;
 				$obj->reihungstestangetreten = ($row->reihungstestangetreten=='t'?true:false);
 				$obj->reihungstest_id = $row->reihungstest_id;
-				$obj->punkte = $row->punkte;
+				$obj->punkte = $row->rt_gesamtpunkte;
+				$obj->rt_punkte1 = $row->rt_punkte1;
+				$obj->rt_punkte2 = $row->rt_punkte2;
 				$obj->bismelden = ($row->bismelden=='t'?true:false);
 				$obj->person_id = $row->person_id;
 				$obj->anmerkung = $row->anmerkung;

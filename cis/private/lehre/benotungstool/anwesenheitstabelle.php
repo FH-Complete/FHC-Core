@@ -35,9 +35,9 @@ require_once('../../../../include/datum.class.php');
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../../skin/cis.css" rel="stylesheet" type="text/css">
-<title>Kreuzerltool</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
+<title>Benotungstool</title>
 <script language="JavaScript">
 <!--
 	function MM_jumpMenu(targ, selObj, restore)
@@ -102,7 +102,7 @@ $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 echo '<table class="tabcontent">';
 echo ' <tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
-echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;Benotungsool';
+echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;Benotungstool';
 echo '</font></td><td  class="ContentHeader" align="right">'."\n";
 
 //Studiensemester laden

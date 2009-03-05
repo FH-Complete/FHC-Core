@@ -21,36 +21,57 @@
  */
 
 require_once('../config.inc.php');
-//require_once('../../include/functions.inc.php');
 require_once('../../include/person.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/pruefling.class.php');
-//require_once('../../include/lehrveranstaltung.class.php');
+require_once('../../include/studiengang.class.php');
 
 session_start();
 $reload=false;
 $reload_parent=false;
 
-if (isset($_POST['logout']))
+if (isset($_GET['logout']))
 {
-	$reload = true;
-	session_destroy();
+	if(isset($_SESSION['prestudent_id']))
+	{
+		$reload = true;
+		session_destroy();
+	}
 }
 
 //Connection Herstellen
 if(!$db_conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim oeffnen der Datenbankverbindung');
+	die('Fehler beim Oeffnen der Datenbankverbindung');
 
 if (isset($_POST['prestudent']) && isset($_POST['gebdatum']))
 {
 	$ps=new prestudent($db_conn,$_POST['prestudent']);
 	if ($_POST['gebdatum']==$ps->gebdatum)
 	{
+		$pruefling = new pruefling($db_conn);
+		if($pruefling->getPruefling($ps->prestudent_id))
+		{
+			$studiengang = $pruefling->studiengang_kz;
+			$semester = $pruefling->semester;
+		}
+		else 
+		{
+			$studiengang = $ps->studiengang_kz;
+			$ps->getLastStatus($ps->prestudent_id);
+			$semester = $ps->ausbildungssemester;
+		}
+		if($semester=='')
+			$semester=1;
+		
 		$_SESSION['prestudent_id']=$_POST['prestudent'];
-		$_SESSION['studiengang_kz']=$ps->studiengang_kz;
+		$_SESSION['studiengang_kz']=$studiengang;
 		$_SESSION['nachname']=$ps->nachname;
 		$_SESSION['vorname']=$ps->vorname;
 		$_SESSION['gebdatum']=$ps->gebdatum;
+		$stg_obj = new studiengang($db_conn, $studiengang);
+		$_SESSION['sprache']=$stg_obj->sprache;
+				
+		$_SESSION['semester']=$semester;
 	}
 }
 	
@@ -64,6 +85,33 @@ else
 	$ps->getPrestudentRT($datum,true);
 	if ($ps->num_rows==0)
 		$ps->getPrestudentRT($datum);
+}
+
+if(isset($_GET['type']) && $_GET['type']=='sprachechange' && isset($_GET['sprache']))
+{
+	$_SESSION['sprache']=$_GET['sprache'];
+}
+
+if(isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']))
+{
+	$pruefling = new pruefling($db_conn);
+	
+	if(!$pruefling->getPruefling($_SESSION['prestudent_id']))
+	{
+		$pruefling->new = true;
+					
+		$pruefling->studiengang_kz = $_SESSION['studiengang_kz'];
+		$pruefling->semester = $_SESSION['semester'];
+		
+		$pruefling->idnachweis = '';
+		$pruefling->registriert = date('Y-m-d H:i:s');
+		$pruefling->prestudent_id = $_SESSION['prestudent_id'];
+		if($pruefling->save())
+		{
+			$_SESSION['pruefling_id']=$pruefling->pruefling_id;
+			$reload_parent=true;
+		}
+	}
 }
 
 if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
@@ -81,10 +129,11 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 	$pruefling->idnachweis = $_POST['idnachweis'];
 	$pruefling->registriert = date('Y-m-d H:i:s');
 	$pruefling->prestudent_id = $_SESSION['prestudent_id'];
-	$pruefling->gruppe_kurzbz = $_POST['gruppe'];
+	$pruefling->semester = $_POST['semester'];
 	if($pruefling->save())
 	{
 		$_SESSION['pruefling_id']=$pruefling->pruefling_id;
+		$_SESSION['semester']=$pruefling->semester;
 		$reload_parent=true;
 	}
 }
@@ -92,8 +141,8 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-	<link href="../../skin/cis.css" rel="stylesheet" type="text/css">
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 <?php 
 	if($reload_parent)
 		echo '<script language="Javascript">parent.menu.location.reload()</script>';
@@ -107,41 +156,66 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 <?php
 	if (isset($prestudent_id))
 	{	
-		echo '<form method="post">';	
+		echo '<form method="GET">';	
 		echo '<br>Sie sind angemeldet als '.$_SESSION['vorname'].' '.$_SESSION['nachname'];
 		echo ' ('.$_SESSION['gebdatum'].') ID: '.$_SESSION['prestudent_id'];		
 		echo '&nbsp; <INPUT type="submit" value="Logout" name="logout" />';
 		echo '</form>';
 		echo '<br><br>';
+				
+		$prestudent = new prestudent($db_conn, $prestudent_id);
+		$stg_obj = new studiengang($db_conn, $prestudent->studiengang_kz);
 		
 		$pruefling = new pruefling($db_conn);
-		$pruefling->getPruefling($prestudent_id);
-		if($pruefling->pruefling_id!='')
+		if($pruefling->getPruefling($prestudent_id))
 		{
-			$_SESSION['pruefling_id']=$pruefling->pruefling_id;
-			echo '<script language="Javascript">parent.menu.location.reload()</script>';
-		}
-		echo '<FORM METHOD="POST">';
-		echo '<input type="hidden" name="pruefling_id" value="'.$pruefling->pruefling_id.'">';
-		echo '<table>';
-		echo '<tr><td>Gruppe:</td><td><SELECT name="gruppe">';
-		$qry = "SELECT * FROM testtool.tbl_gruppe ORDER BY gruppe_kurzbz";
-		if($result = pg_query($db_conn, $qry))
-		{
-			while($row = pg_fetch_object($result))
+		
+			echo '<FORM METHOD="POST">';
+			echo '<input type="hidden" name="pruefling_id" value="'.$pruefling->pruefling_id.'">';
+			echo '<table>';
+			echo '<tr><td>Semester:</td><td><input type="text" name="semester" size="1" maxlength="1" value="'.htmlentities($pruefling->semester).'"></td></tr>';
+			echo '<tr><td>ID Nachweis:</td><td><INPUT type="text" maxsize="50" name="idnachweis" value="'.htmlentities($pruefling->idnachweis).'"></td></tr>';
+			echo '<tr><td></td><td><input type="submit" name="save" value="OK"></td>';
+			echo '</table>';
+			echo '</FORM><br><br>';
+			
+			//Wenn die Sprachwahl fuer diesen Studiengang aktiviert ist, dann die Sprachen anzeigen
+			if($stg_obj->testtool_sprachwahl)
 			{
-				if($row->gruppe_kurzbz==$pruefling->gruppe_kurzbz)
-					echo '<OPTION value="'.$row->gruppe_kurzbz.'" selected>'.$row->gruppe_kurzbz.'</OPTION>';
-				else 
-					echo '<OPTION value="'.$row->gruppe_kurzbz.'" >'.$row->gruppe_kurzbz.'</OPTION>';
+				//Liste der Sprachen
+				$qry = "SELECT distinct sprache 
+						FROM 
+							testtool.tbl_pruefling 
+							JOIN testtool.tbl_ablauf USING(studiengang_kz)
+							JOIN testtool.tbl_frage USING(gebiet_id)
+							JOIN testtool.tbl_frage_sprache USING(frage_id)						
+						WHERE
+							tbl_pruefling.pruefling_id='".addslashes($pruefling->pruefling_id)."'
+						ORDER BY sprache DESC";
+				echo 'Sprache:';
+				if($result = pg_query($db_conn, $qry))
+				{
+					while($row = pg_fetch_object($result))
+					{
+						if($_SESSION['sprache']==$row->sprache)
+							$selected='style="border:1px solid black;"';
+						else 
+							$selected='';
+						echo " <a href='".$_SERVER['PHP_SELF']."?type=sprachechange&sprache=$row->sprache' class='Item' $selected><img src='bild.php?src=flag&amp;sprache=$row->sprache' alt='$row->sprache' title='$row->sprache'/></a>";
+					}
+				}
+			}
+			
+			if($pruefling->pruefling_id!='')
+			{
+				$_SESSION['pruefling_id']=$pruefling->pruefling_id;
+				echo '<script language="Javascript">parent.menu.location.reload()</script>';
 			}
 		}
-		echo '</SELECT></td></tr>';
-		echo '<tr><td>ID Nachweis:</td><td><INPUT type="text" maxsize="50" name="idnachweis" value="'.htmlentities($pruefling->idnachweis).'"></td></tr>';
-		echo '<tr><td></td><td><input type="submit" name="save" value="OK"></td>';
-		echo '</table>';
-		echo '</FORM>';
-		
+		else 
+		{
+			echo 'Kein Pueflingseintrag vorhanden';
+		}
 	}
 	else
 	{

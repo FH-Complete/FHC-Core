@@ -34,6 +34,36 @@ if (!$conn = pg_pconnect(CONN_STRING))
 
 echo '<H1>Systemcheck!</H1>';
 echo '<H2>DB-Updates!</H2>';
+
+// **************** public.tbl_sprache.flagge *******************************
+if(!$result = @pg_query($conn, "SELECT flagge FROM public.tbl_sprache LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_sprache ADD COLUMN locale varchar(5);
+			ALTER TABLE public.tbl_sprache ADD COLUMN flagge text;";
+			
+	if(!pg_query($conn, $qry))
+		echo '<strong>public.tbl_sprache: '.pg_last_error($conn).' </strong><br>';
+	else
+		echo ' public.tbl_sprache: spalte locale und flagge hinzugefuegt!<br>';
+}
+
+// **************** lehre.tbl_projektarbeit.titel *******************************
+if($result = pg_query($conn, "SELECT atttypmod FROM pg_class JOIN pg_attribute ON(pg_class.oid=pg_attribute.attrelid) WHERE relname='tbl_projektarbeit' AND attname='titel'"))
+{
+	if($row = pg_fetch_object($result))
+	{
+		if($row->atttypmod=='260')
+		{
+			$qry = "ALTER TABLE lehre.tbl_projektarbeit ALTER COLUMN titel TYPE varchar(1024);
+					ALTER TABLE lehre.tbl_projektarbeit ALTER COLUMN titel_english TYPE varchar(1024);";
+			
+			if(!@pg_query($conn, $qry))
+				echo '<strong>lehre.tbl_projektarbeit: '.pg_last_error($conn).' </strong><br>';
+			else
+				echo ' lehre.tbl_projektarbeit: spalte titel und titel_english wurde auf 1024 Zeichen verbreitert!<br>';
+		}
+	}
+}
 // ************** campus.tbl_paabgabetyp **************************************************
 if(!@pg_query($conn, 'SELECT * FROM campus.tbl_paabgabetyp LIMIT 1;'))
 {
@@ -90,6 +120,9 @@ if(!@pg_query($conn, 'SELECT * FROM campus.tbl_paabgabetyp LIMIT 1;'))
 			Grant delete on campus.tbl_paabgabetyp to group admin;
 			Grant insert on campus.tbl_paabgabetyp to group admin;
 			Grant select on campus.tbl_paabgabetyp to group web;
+			
+			GRANT SELECT ON campus.tbl_paabgabe_paabgabe_id_seq TO GROUP web;
+			GRANT UPDATE ON campus.tbl_paabgabe_paabgabe_id_seq TO GROUP web;
 	";
 
 	if(!@pg_query($conn, $sql))
@@ -885,6 +918,8 @@ $tabellen=array(
 	"campus.tbl_newssprache"  => array("sprache","news_id","betreff","text","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_notenschluessel"  => array("lehreinheit_id","note","punkte"),
 	"campus.tbl_notenschluesseluebung"  => array("uebung_id","note","punkte"),
+	"campus.tbl_paabgabetyp"  => array("paabgabetyp_kurzbz","bezeichnung"),
+	"campus.tbl_paabgabe"  => array("paabgabe_id","projektarbeit_id","paabgabetyp_kurzbz","fixtermin","datum","kurzbz","abgabedatum", "insertvon","insertamum","updatevon","updateamum"),
 	"campus.tbl_reservierung"  => array("reservierung_id","ort_kurzbz","studiengang_kz","uid","stunde","datum","titel","beschreibung","semester","verband","gruppe","gruppe_kurzbz","veranstaltung_id"),
 	"campus.tbl_resturlaub"  => array("mitarbeiter_uid","resturlaubstage","mehrarbeitsstunden","updateamum","updatevon","insertamum","insertvon","urlaubstageprojahr"),
 	"campus.tbl_studentbeispiel"  => array("student_uid","beispiel_id","vorbereitet","probleme","updateamum","updatevon","insertamum","insertvon"),
@@ -919,7 +954,8 @@ $tabellen=array(
 	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english","orgform_kurzbz"),
 	"lehre.tbl_moodle"  => array("lehrveranstaltung_id","lehreinheit_id","moodle_id","mdl_course_id","studiensemester_kurzbz","gruppen","insertamum","insertvon"),
 	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe"),
-	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","titel_english"),
+	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe"),
+	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","titel_english","seitenanzahl","abgabedatum","kontrollschlagwoerter","schlagwoerter","schlagwoerter_en","abstract", "abstract_en"),
 	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung"),
 	"lehre.tbl_pruefung"  => array("pruefung_id","lehreinheit_id","student_uid","mitarbeiter_uid","note","pruefungstyp_kurzbz","datum","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id"),
@@ -966,31 +1002,33 @@ $tabellen=array(
 	"public.tbl_personfunktionfirma"  => array("personfunktionfirma_id","funktion_kurzbz","person_id","firma_id","position","anrede"),
 	"public.tbl_preinteressent"  => array("preinteressent_id","person_id","studiensemester_kurzbz","firma_id","erfassungsdatum","einverstaendnis","absagedatum","anmerkung","maturajahr","infozusendung","aufmerksamdurch_kurzbz","kontaktmedium_kurzbz","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preinteressentstudiengang"  => array("studiengang_kz","preinteressent_id","freigabedatum","uebernahmedatum","prioritaet","insertamum","insertvon","updateamum","updatevon"),
-	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","punkte","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id"),
+	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_prestudentrolle"  => array("prestudent_id","rolle_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung"),
 	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_rolle"  => array("rolle_kurzbz","beschreibung","anmerkung","ext_id"),
 	"public.tbl_semesterwochen"  => array("semester","studiengang_kz","wochen"),
-	"public.tbl_sprache"  => array("sprache"),
+	"public.tbl_sprache"  => array("sprache","locale","flagge"),
 	"public.tbl_standort"  => array("standort_kurzbz","adresse_id"),
 	"public.tbl_student"  => array("student_uid","matrikelnr","prestudent_id","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","organisationsform","moodle"),
+	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","organisationsform","moodle","sprache","testtool_sprachwahl"),
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","ext_id"),
 	"public.tbl_variable"  => array("name","uid","wert"),
 	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung"),
 	"public.tbl_vorlagestudiengang"  => array("vorlage_kurzbz","studiengang_kz","version","text"),
 	"sync.tbl_zutrittskarte"  => array("key","name","firstname","groupe","logaswnumber","physaswnumber","validstart","validend","text1","text2","text3","text4","text5","text6","pin"),
-	"testtool.tbl_ablauf"  => array("gebiet_id","studiengang_kz","reihung","gewicht"),
-	"testtool.tbl_antwort"  => array("antwort_id","frage_id","pruefling_id","antwort","begintime","endtime"),
-	"testtool.tbl_frage"  => array("frage_id","kategorie_kurzbz","gebiet_id","gruppe_kurzbz","loesung","nummer","demo","text","bild"),
-	"testtool.tbl_gebiet"  => array("gebiet_id","kurzbz","bezeichnung","beschreibung","zeit","abzug","kategorien"),
-	"testtool.tbl_gruppe"  => array("gruppe_kurzbz"),
+	"testtool.tbl_ablauf"  => array("ablauf_id","gebiet_id","studiengang_kz","reihung","gewicht","semester", "insertamum","insertvon","updateamum", "updatevon"),
+	"testtool.tbl_antwort"  => array("antwort_id","pruefling_id","vorschlag_id"),
+	"testtool.tbl_frage"  => array("frage_id","kategorie_kurzbz","gebiet_id","level","nummer","demo","insertamum","insertvon","updateamum","updatevon"),
+	"testtool.tbl_gebiet"  => array("gebiet_id","kurzbz","bezeichnung","beschreibung","zeit","multipleresponse","kategorien","maxfragen","zufallfrage","zufallvorschlag","levelgleichverteilung","maxpunkte","insertamum", "insertvon", "updateamum", "updatevon", "level_start","level_sprung_auf","level_sprung_ab"),
 	"testtool.tbl_kategorie"  => array("kategorie_kurzbz","gebiet_id"),
 	"testtool.tbl_kriterien"  => array("gebiet_id","kategorie_kurzbz","punkte","typ"),
-	"testtool.tbl_pruefling"  => array("pruefling_id","prestudent_id","studiengang_kz","idnachweis","registriert","gruppe_kurzbz"),
-	"testtool.tbl_vorschlag"  => array("vorschlag_id","frage_id","nummer","antwort","text","bild")
+	"testtool.tbl_pruefling"  => array("pruefling_id","prestudent_id","studiengang_kz","idnachweis","registriert"),
+	"testtool.tbl_vorschlag"  => array("vorschlag_id","frage_id","nummer","punkte","insertamum","insertvon","updateamum","updatevon"),
+	"testtool.tbl_pruefling_frage"  => array("prueflingfrage_id","pruefling_id","frage_id","nummer","begintime","endtime"),
+	"testtool.tbl_frage_sprache"  => array("frage_id","sprache","text","bild","audio","insertamum","insertvon","updateamum","updatevon"),
+	"testtool.tbl_vorschlag_sprache"  => array("vorschlag_id","sprache","text","bild","audio","insertamum","insertvon","updateamum","updatevon"),
 );
 
 $tabs=array_keys($tabellen);
