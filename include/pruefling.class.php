@@ -28,8 +28,8 @@ class pruefling
 	var $idnachweis;
 	var $registriert;
 	var $prestudent_id;
-	var $gruppe_kurzbz;
-		
+	var $semester;
+	
 	// ErgebnisArray
 	var $result=array();
 	var $num_rows=0;
@@ -79,7 +79,7 @@ class pruefling
 				$this->idnachweis = $row->idnachweis;
 				$this->registriert = $row->registriert;
 				$this->prestudent_id = $row->prestudent_id;
-				$this->gruppe_kurzbz = $row->gruppe_kurzbz;
+				$this->semester = $row->semester;
 				return true;
 			}
 			else 
@@ -130,12 +130,12 @@ class pruefling
 		
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = 'BEGIN;INSERT INTO testtool.tbl_pruefling (studiengang_kz, idnachweis, registriert, prestudent_id, gruppe_kurzbz) VALUES('.
+			$qry = 'BEGIN;INSERT INTO testtool.tbl_pruefling (studiengang_kz, idnachweis, registriert, prestudent_id, semester) VALUES('.
 			       $this->addslashes($this->studiengang_kz).",".
 			       $this->addslashes($this->idnachweis).",".
 			       $this->addslashes($this->registriert).",".
 			       $this->addslashes($this->prestudent_id).",".
-			       $this->addslashes($this->gruppe_kurzbz).");";
+			       $this->addslashes($this->semester).");";
 		}
 		else
 		{			
@@ -143,8 +143,8 @@ class pruefling
 			       ' studiengang_kz='.$this->addslashes($this->studiengang_kz).','.
 			       ' idnachweis='.$this->addslashes($this->idnachweis).','.
 			       ' registriert='.$this->addslashes($this->registriert).','.
-			       ' prestudent_id='.$this->addslashes($this->prestudent_id).','.
-			       ' gruppe_kurzbz='.$this->addslashes($this->gruppe_kurzbz).
+			       ' semester='.$this->addslashes($this->semester).','.
+			       ' prestudent_id='.$this->addslashes($this->prestudent_id).
 			       " WHERE pruefling_id='".addslashes($this->pruefling_id)."';";
 		}
 		
@@ -164,14 +164,14 @@ class pruefling
 					else 
 					{
 						pg_query($this->conn, 'ROLLBACK;');
-						$this->errormsg = 'Fehler beim lesen der Sequence';
+						$this->errormsg = 'Fehler beim Lesen der Sequence';
 						return false;
 					}
 				}
 				else
 				{
 					pg_query($this->conn, 'ROLLBACK;');
-					$this->errormsg = 'Fehler beim lesen der Sequence';
+					$this->errormsg = 'Fehler beim Lesen der Sequence';
 					return false;
 				}
 			}
@@ -200,7 +200,7 @@ class pruefling
 				$this->idnachweis = $row->idnachweis;
 				$this->registriert = $row->registriert;
 				$this->prestudent_id = $row->prestudent_id;
-				$this->gruppe_kurzbz = $row->gruppe_kurzbz;
+				$this->semester = $row->semester;
 				return true;
 			}
 			else 
@@ -214,6 +214,137 @@ class pruefling
 			$this->errormsg = "Fehler beim laden: $qry";
 			return false;
 		}		
+	}
+	
+	/**
+	 * Ermittelt den aktuellen Level (schwierigkeitsgrad der Frage) 
+	 * des Prueflings fuer das uebergebene Gebiet
+	 *
+	 * @param $pruefling_id
+	 * @param $gebiet_id
+	 */
+	function getPrueflingLevel($pruefling_id, $gebiet_id)
+	{
+		$gebiet = new gebiet($this->conn, $gebiet_id);
+				
+		//wenn Levelsystem fuer dieses Gebiet aktiviert ist
+		if($gebiet->level_start!='')
+		{
+			//Maximal und Minimal Level fuer dieses Gebiet ermitteln
+			$max_level = 0;
+			$min_level = 0;
+					
+			$qry = "SELECT max(level) as max, min(level) as min FROM testtool.tbl_frage WHERE gebiet_id='".addslashes($gebiet_id)."'";
+			
+			if($result = pg_query($this->conn, $qry))
+			{
+				if($row = pg_fetch_object($result))
+				{
+					$max_level = $row->max;
+					$min_level = $row->min;
+				}
+				else 
+				{
+					$this->errormsg = 'unbekannter Fehler in getPrueflingLevel';
+					return false;
+				}
+			}
+			else 
+			{
+				$this->errormsg = 'Fehler beim Ermitteln des Pruefling-Levels';
+				return false;
+			}
+			
+			//alle bisherigen Antworten fuer dieses Gebiet holen
+			$qry = "SELECT
+						tbl_vorschlag.punkte
+					FROM 
+						testtool.tbl_pruefling_frage 
+						JOIN testtool.tbl_vorschlag USING(frage_id) 
+						JOIN testtool.tbl_antwort USING(vorschlag_id)
+						JOIN testtool.tbl_frage USING(frage_id)
+					WHERE
+						tbl_frage.gebiet_id='".addslashes($gebiet_id)."' AND
+						tbl_pruefling_frage.pruefling_id='".addslashes($pruefling_id)."' AND
+						tbl_antwort.pruefling_id = tbl_pruefling_frage.pruefling_id
+					ORDER BY tbl_pruefling_frage.nummer ASC";
+			
+			$aktueller_level=$gebiet->level_start;
+			$anzahl_richtig=0;
+			$anzahl_falsch=0;
+			if($result = pg_query($this->conn, $qry))
+			{
+				while($row = pg_fetch_object($result))
+				{
+					if($row->punkte>0)
+					{
+						//wenn die Frage richtig beantwortet wurde dann richtig-zaehler erhoehen
+						$anzahl_richtig++;
+						$anzahl_falsch=0;
+					}
+					else 
+					{
+						//wenn die Frage falsch beantwortet wurde dann falsch-zaehler erhoehen
+						$anzahl_richtig=0;
+						$anzahl_falsch++;
+					}
+					
+					//wenn einer der Zaehler das Sprunglevel erreicht hat, dann
+					//in ein anderes Level springen
+					if($anzahl_richtig==$gebiet->level_sprung_auf)
+					{
+						$aktueller_level++;
+						$anzahl_richtig=0;
+						$anzahl_falsch=0;
+					}
+					elseif($anzahl_falsch==$gebiet->level_sprung_ab)
+					{
+						$aktueller_level--;
+						$anzahl_richtig=0;
+						$anzahl_falsch=0;
+					}
+					
+					//aktueller level darf nicht kleiner/groesser als der minimal/maximal Level sein
+					if($aktueller_level<$min_level)
+						$aktueller_level=$min_level;
+					if($aktueller_level>$max_level)
+						$aktueller_level=$max_level;
+				}
+				
+				return $aktueller_level;
+			}
+		}
+		else 
+			return -1;
+	}
+	
+	/**
+	 * Berechnet das Reihungstestergebnis fuer einen Prestudenten
+	 *
+	 * @param $prestudent_id
+	 * @return Endpunkte des Reihungstests
+	 */
+	function getReihungstestErgebnis($prestudent_id)
+	{
+		$qry = "SELECT * FROM testtool.vw_auswertung 
+				WHERE prestudent_id='".addslashes($prestudent_id)."'";
+		
+		$ergebnis=0;
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			while($row = pg_fetch_object($result))
+			{
+				//wenn maxpunkte ueberschritten wurde -> 100%
+				if($row->punkte>=$row->maxpunkte)
+					$prozent=100;
+				else
+					$prozent = ($row->punkte/$row->maxpunkte)*100;
+						
+				$ergebnis+=$prozent*$row->gewicht;		
+			}
+			return $ergebnis;
+		}
 	}
 }
 ?>

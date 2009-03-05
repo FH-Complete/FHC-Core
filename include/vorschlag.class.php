@@ -26,10 +26,17 @@ class vorschlag
 	var $vorschlag_id;
 	var $frage_id;
 	var $nummer;
-	var $antwort;
+	var $punkte;
+	
 	var $text;
 	var $bild;
-
+	var $audio;
+	
+	var $insertamum;
+	var $insertvon;
+	var $updateamum;
+	var $updatevon;
+	
 	// ErgebnisArray
 	var $result=array();
 	var $num_rows=0;
@@ -66,7 +73,7 @@ class vorschlag
 	// * Laedt Vorschlag mit der uebergebenen ID
 	// * @param $vorschlag_id ID des Vorschlages der geladen werden soll
 	// ***********************************************************
-	function load($vorschlag_id)
+	function load($vorschlag_id, $sprache='German')
 	{
 		$qry = "SELECT * FROM testtool.tbl_vorschlag WHERE vorschlag_id='".addslashes($vorschlag_id)."'";
 
@@ -76,22 +83,36 @@ class vorschlag
 			{
 				$this->vorschlag_id = $row->vorschlag_id;
 				$this->frage_id = $row->frage_id;
-				$this->antwort = $row->antwort;
+				$this->punkte = $row->punkte;
 				$this->nummer = $row->nummer;
-				$this->text = $row->text;
-				$this->bild = $row->bild;
+				$this->loadVorschlagSprache($vorschlag_id, $sprache);
 				return true;
 			}
 			else
 			{
-				$this->errormsg = "Kein Eintrag gefunden fuer $vorschlag_id";
+				$this->errormsg = "Kein Eintrag gefunden fuer $vorschlag_id $sprache";
 				return false;
 			}
 		}
 		else
 		{
-			$this->errormsg = "Fehler beim laden: $qry";
+			$this->errormsg = "Fehler beim Laden: $qry";
 			return false;
+		}
+	}
+	
+	function loadVorschlagSprache($vorschlag_id, $sprache)
+	{
+		$qry = "SELECT * FROM testtool.tbl_vorschlag_sprache 
+						WHERE vorschlag_id='".addslashes($vorschlag_id)."' AND sprache='".addslashes($sprache)."'";
+		if($result_sprache = pg_query($this->conn, $qry))
+		{
+			if($row_sprache = pg_fetch_object($result_sprache))
+			{				
+				$this->text = $row_sprache->text;
+				$this->bild = $row_sprache->bild;
+				$this->audio = $row_sprache->audio;
+			}
 		}
 	}
 
@@ -130,29 +151,57 @@ class vorschlag
 
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = 'INSERT INTO testtool.tbl_vorschlag (frage_id, nummer, antwort, text, bild) VALUES('.
-			       "'".addslashes($this->frage_id)."',".
-			       $this->addslashes($this->nummer).",".
-				   $this->addslashes($this->antwort).",'".
-			       $this->text."',".
-			       $this->addslashes($this->bild).");";
+			$qry = 'BEGIN;INSERT INTO testtool.tbl_vorschlag (frage_id, nummer, punkte, insertamum, insertvon, updateamum, updatevon) VALUES('.
+			       $this->addslashes($this->frage_id).','.
+			       $this->addslashes($this->nummer).','.
+				   $this->addslashes($this->punkte).','.
+				   $this->addslashes($this->insertamum).','.
+				   $this->addslashes($this->insertvon).','.
+				   $this->addslashes($this->updateamum).','.
+				   $this->addslashes($this->updatevon).');';
 		}
 		else
 		{
 			$qry = 'UPDATE testtool.tbl_vorschlag SET'.
 			       ' frage_id='.$this->addslashes($this->frage_id).','.
 			       ' nummer='.$this->addslashes($this->nummer).','.
-			       ' antwort='.$this->addslashes($this->antwort).','.
-			       " text='".$this->text."'";
-			if($this->bild!='')
-				$qry.=' , bild='.$this->addslashes($this->bild);
-			$qry.=" WHERE vorschlag_id='".addslashes($this->vorschlag_id)."';";
+			       ' punkte='.$this->addslashes($this->punkte).','.
+			       ' updateamum='.$this->addslashes($this->updateamum).','.
+			       ' updatevon='.$this->addslashes($this->updatevon).
+					" WHERE vorschlag_id='".addslashes($this->vorschlag_id)."';";
 		}
 
 		if(pg_query($this->conn,$qry))
 		{
-			//Log schreiben
-			return true;
+			if($this->new)
+			{
+				$qry = "SELECT currval('testtool.tbl_vorschlag_vorschlag_id_seq') as id";
+				if($result = pg_query($this->conn, $qry))
+				{
+					if($row = pg_fetch_object($result))
+					{
+						$this->vorschlag_id = $row->id;
+						pg_query($this->conn, 'COMMIT;');
+						return true;
+					}
+					else 
+					{
+						$this->errormsg = 'Fehler beim Auslesen der Sequence';
+						pg_query($this->conn, 'ROLLBACK');
+						return false;
+					}
+				}
+				else 
+				{
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+					pg_query($this->conn, 'ROLLBACK');
+					return false;
+				}
+			}
+			else 
+			{
+				return true;
+			}
 		}
 		else
 		{
@@ -161,9 +210,84 @@ class vorschlag
 		}
 	}
 
-	function getVorschlag($frage_id)
+	/**
+	 * Pueft die Daten vor dem Speichern
+	 *
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	function validate_vorschlagsprache()
 	{
-		$qry = "SELECT * FROM testtool.tbl_vorschlag WHERE frage_id='".addslashes($frage_id)."' ORDER BY nummer";
+		return true;	
+	}
+	
+	/**
+	 * Speichert einen Eintrag in tbl_vorschlag_sprache
+	 *
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	function save_vorschlagsprache()
+	{
+		//Variablen auf Gueltigkeit pruefen
+		if(!$this->validate_vorschlagsprache())
+			return false;
+
+		$qry = "SELECT * FROM testtool.tbl_vorschlag_sprache 
+				WHERE vorschlag_id='".addslashes($this->vorschlag_id)."' AND
+				sprache='".addslashes($this->sprache)."'";
+		if($result = pg_query($this->conn, $qry))
+		{
+			if(pg_num_rows($result)>0)
+				$this->new=false;
+			else 
+				$this->new=true;
+		}
+		
+		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
+		{
+			$qry = 'INSERT INTO testtool.tbl_vorschlag_sprache (vorschlag_id, sprache, text, bild, audio, 
+					insertamum, insertvon, updateamum, updatevon) VALUES('.
+			       $this->addslashes($this->vorschlag_id).','.
+			       $this->addslashes($this->sprache).','.
+				   $this->addslashes($this->text).','.
+				   $this->addslashes($this->bild).','.
+				   $this->addslashes($this->audio).','.
+				   $this->addslashes($this->insertamum).','.
+				   $this->addslashes($this->insertvon).','.
+				   $this->addslashes($this->updateamum).','.
+				   $this->addslashes($this->updatevon).');';
+		}
+		else
+		{
+			$qry = 'UPDATE testtool.tbl_vorschlag_sprache SET'.
+			       ' text='.$this->addslashes($this->text).',';
+			if($this->bild!='')
+				$qry.=' bild='.$this->addslashes($this->bild).',';
+			if($this->audio!='')
+				$qry.=' audio='.$this->addslashes($this->audio).',';
+			
+			$qry.= ' updateamum='.$this->addslashes($this->updateamum).','.
+			       ' updatevon='.$this->addslashes($this->updatevon).
+					" WHERE vorschlag_id='".addslashes($this->vorschlag_id)."' AND sprache='".addslashes($this->sprache)."';";
+		}
+		
+		if($result = pg_query($this->conn, $qry))
+		{
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Speichern der Daten';
+			return false;
+		}
+	}
+
+	function getVorschlag($frage_id, $sprache, $random)
+	{
+		$qry = "SELECT * FROM testtool.tbl_vorschlag WHERE frage_id='".addslashes($frage_id)."'";
+		if($random)
+			$qry.=" ORDER BY random()";
+		else 
+			$qry.=" ORDER BY nummer";
 
 		if($result = pg_query($this->conn, $qry))
 		{
@@ -173,9 +297,19 @@ class vorschlag
 				$vs->vorschlag_id = $row->vorschlag_id;
 				$vs->frage_id = $row->frage_id;
 				$vs->nummer = $row->nummer;
-				$vs->antwort = $row->antwort;
-				$vs->text = $row->text;
-				$vs->bild = $row->bild;
+				$vs->punkte = $row->punkte;
+			
+				$qry = "SELECT * FROM testtool.tbl_vorschlag_sprache 
+						WHERE vorschlag_id='".addslashes($row->vorschlag_id)."' AND sprache='".addslashes($sprache)."'";
+				if($result_sprache = pg_query($this->conn, $qry))
+				{
+					if($row_sprache = pg_fetch_object($result_sprache))
+					{				
+						$vs->text = $row_sprache->text;
+						$vs->bild = $row_sprache->bild;
+						$vs->audio = $row_sprache->audio;
+					}
+				}
 
 				$this->result[] = $vs;
 
@@ -188,6 +322,7 @@ class vorschlag
 			return false;
 		}
 	}
+	
 	function delete($vorschlag_id)
 	{
 		$qry = "DELETE FROM testtool.tbl_vorschlag WHERE vorschlag_id='".addslashes($vorschlag_id)."'";

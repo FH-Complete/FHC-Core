@@ -21,6 +21,7 @@
  */
 
 require_once('../config.inc.php');
+require_once('../../include/gebiet.class.php');
 
 session_start();
 
@@ -32,8 +33,8 @@ if(!$db_conn = pg_pconnect(CONN_STRING))
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../skin/cis.css" rel="stylesheet" type="text/css">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
 
 <body>
@@ -50,16 +51,33 @@ if (isset($_SESSION['pruefling_id']))
 	echo '<tr><td nowrap>';
 	echo '<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible;">';
 	  	
-	$qry = 'SELECT * FROM testtool.vw_ablauf WHERE studiengang_kz='.$_SESSION['studiengang_kz'].' ORDER BY reihung';
+	$qry = "SELECT * FROM testtool.vw_ablauf WHERE studiengang_kz='".addslashes($_SESSION['studiengang_kz'])."' AND semester='".addslashes($_SESSION['semester'])."' ORDER BY reihung";
 	//echo $qry;
 	if($result = pg_query($db_conn, $qry))
+	{
 		while($row = pg_fetch_object($result))
-			echo '<tr>
-						<td width="10" nowrap>&nbsp;</td>
-				   		<td nowrap>
-				   			<a class="Item" href="frage.php?gebiet_id='.$row->gebiet_id.'" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;'.$row->gebiet_bez.'</a>
-				   		</td>
-				   	</tr>';
+		{
+			$gebiet = new gebiet($db_conn);
+			if($gebiet->check_gebiet($row->gebiet_id))
+			{
+				echo '<tr>
+							<td width="10" nowrap>&nbsp;</td>
+					   		<td nowrap>
+					   			<a class="Item" href="frage.php?gebiet_id='.$row->gebiet_id.'" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;'.$row->gebiet_bez.'</a>
+					   		</td>
+					   	</tr>';
+			}
+			else 
+			{
+				echo '<tr>
+							<td width="10" nowrap>&nbsp;</td>
+					   		<td nowrap>
+					   			<span class="error"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;'.$row->gebiet_bez.' (invalid)</span>
+					   		</td>
+					   	</tr>';
+			}
+		}
+	}
 	echo '</table>';
 	echo '</td></tr></table>';
 }

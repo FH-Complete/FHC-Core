@@ -349,8 +349,17 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     					<row>
       						<label value="Zum Reihungstest angetreten" control="student-prestudent-checkbox-reihungstestangetreten"/>
       						<checkbox id="student-prestudent-checkbox-reihungstestangetreten" checked="true" disabled="true"/>
-      						<label value="Reihungstestpunkte" control="student-prestudent-textbox-punkte"/>
-      						<hbox><textbox id="student-prestudent-textbox-punkte" disabled="true" maxlength="9" size="9" onchange="StudentReihungstestPunkteChange();"/></hbox>
+      						<hbox>
+      							<label value="Punkte1" control="student-prestudent-textbox-punkte1" />
+      							<toolbarbutton id="student-prestudent-button-reihungstest-punktesync" image="../skin/images/transmit.png" tooltiptext="Reihungstest Ergebnis holen" onclick="StudentReihungstestPunkteTransmit()"/>
+      						</hbox>
+      						<hbox>
+      						<textbox id="student-prestudent-textbox-punkte1" disabled="true" maxlength="9" size="9" onchange="StudentReihungstestPunkteChange();" oninput="StudentReihungstestPunkteSum();"/>
+      						<label value="Punkte2" control="student-prestudent-textbox-punkte2"/>
+      						<textbox id="student-prestudent-textbox-punkte2" disabled="true" maxlength="9" size="9" onchange="StudentReihungstestPunkteChange();" oninput="StudentReihungstestPunkteSum();"/>
+      						<label value="Gesamtpunkte" control="student-prestudent-textbox-punkte"/>
+      						<textbox id="student-prestudent-textbox-punkte" disabled="true" maxlength="9" size="9" onchange="StudentReihungstestPunkteChange();"/>
+      						</hbox>
     					</row>
     				</rows>
     			</grid>

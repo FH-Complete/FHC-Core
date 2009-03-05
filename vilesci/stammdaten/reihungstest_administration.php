@@ -97,7 +97,8 @@ echo '<hr><br><a href="'.$_SERVER['PHP_SELF'].'?action=deletedummyanswers" oncli
 
 if(isset($_GET['action']) && $_GET['action']=='deletedummyanswers')
 {
-	$qry = "DELETE FROM testtool.tbl_antwort WHERE pruefling_id=841";
+	$qry = "DELETE FROM testtool.tbl_antwort WHERE pruefling_id=841;
+			DELETE FROM testtool.tbl_pruefling_frage where pruefling_id=841;";
 	if(pg_query($conn, $qry))
 		echo ' <b>Antworten wurden gelöscht</b>';
 	else 
@@ -154,7 +155,9 @@ if(isset($_POST['deleteteilgebiet']))
 	
 		$qry = "DELETE FROM testtool.tbl_antwort 
 				WHERE pruefling_id='$pruefling->pruefling_id' AND 
-				frage_id IN (SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id='".$_POST['gebiet']."')";
+				frage_id IN (SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id='".$_POST['gebiet']."');
+				DELETE FROM testtool.tbl_pruefling_frage where pruefling_id='$pruefling->pruefling_id' AND
+				frage_id IN (SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id='".$_POST['gebiet']."');";
 		if($result = pg_query($conn, $qry))
 		{
 			echo '<b>'.pg_affected_rows($result).' Antworten wurden gelöscht</b>';
@@ -169,8 +172,9 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 {
 	if(is_numeric($_POST['prestudent_id']) && $_POST['prestudent_id']!='')
 	{
-		$qry="SELECT nachname,vorname,tbl_frage.gruppe_kurzbz,person_id,prestudent_id,pruefling_id,kurzbz,nummer,antwort,loesung
+		$qry="SELECT nachname,vorname,person_id,prestudent_id,pruefling_id,kurzbz,tbl_frage.nummer, tbl_vorschlag.nummer as antwortnummer, tbl_vorschlag.punkte
 				FROM testtool.tbl_antwort
+				JOIN testtool.tbl_vorschlag USING(vorschlag_id)
 				JOIN testtool.tbl_frage USING (frage_id)
 				JOIN testtool.tbl_gebiet USING (gebiet_id)
 				JOIN testtool.tbl_pruefling USING (pruefling_id)
@@ -185,14 +189,13 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 					<tr>
 						<th>Nachname</th>
 						<th>Vorname</th>
-						<th>Gruppe</th>
 						<th>PersonID</th>
 						<th>PrestudentID</th>
 						<th>PrueflingID</th>
 						<th>Kurzbz</th>
-						<th>Nummer</th>
-						<th>Antwort</th>
-						<th>Lösung</th>
+						<th>Frage Nummer</th>
+						<th>Antwort Nummer</th>
+						<th>Punkte</th>
 					</tr>
 					</thead>
 					<tbody>';
@@ -201,14 +204,13 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 				echo '<tr>';
 				echo "<td>$row->nachname</td>";
 				echo "<td>$row->vorname</td>";
-				echo "<td>$row->gruppe_kurzbz</td>";
 				echo "<td>$row->person_id</td>";
 				echo "<td>$row->prestudent_id</td>";
 				echo "<td>$row->pruefling_id</td>";
 				echo "<td>$row->kurzbz</td>";
 				echo "<td>$row->nummer</td>";
-				echo "<td>$row->antwort</td>";
-				echo "<td>$row->loesung</td>";
+				echo "<td>$row->antwortnummer</td>";
+				echo "<td>$row->punkte</td>";
 				echo '</tr>';
 			}
 			echo '</tbody></table>';

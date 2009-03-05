@@ -41,28 +41,24 @@ if(!$conn = pg_pconnect(CONN_STRING))
 $qry = '';
 if(isset($_GET['src']) && $_GET['src']=='frage' && isset($_GET['frage_id']))
 {
-	$qry = "SELECT bild FROM testtool.tbl_frage_sprache WHERE frage_id='".addslashes($_GET['frage_id'])."' AND sprache='".addslashes($_GET['sprache'])."'";
+	$qry = "SELECT audio FROM testtool.tbl_frage_sprache WHERE frage_id='".addslashes($_GET['frage_id'])."' AND sprache='".addslashes($_GET['sprache'])."'";
 }
 elseif(isset($_GET['src']) && $_GET['src']=='vorschlag' && isset($_GET['vorschlag_id']))
 {
-	$qry = "SELECT bild FROM testtool.tbl_vorschlag_sprache WHERE vorschlag_id='".addslashes($_GET['vorschlag_id'])."' AND sprache='".addslashes($_GET['sprache'])."'";
+	$qry = "SELECT audio FROM testtool.tbl_vorschlag_sprache WHERE vorschlag_id='".addslashes($_GET['vorschlag_id'])."' AND sprache='".addslashes($_GET['sprache'])."'";
 }
-elseif(isset($_GET['src']) && $_GET['src']=='flag' && isset($_GET['sprache']))
-{
-	$qry = "SELECT flagge as bild FROM public.tbl_sprache WHERE sprache='".addslashes($_GET['sprache'])."'";
-}
-
 else 
 	echo 'Unkown type';
 
 if($qry!='')
 {
-	//Header fuer Bild schicken
-	header("Content-type: image/gif");
+	//Header fuer Sound schicken
+	header("Content-type: audio/mpeg");
+	//header("Content-type: audio/wav");
 	$result = pg_query($conn, $qry);
 	$row = pg_fetch_object($result);
 	//HEX Werte in Zeichen umwandeln und ausgeben
-	echo hexstr($row->bild);
+	echo hexstr($row->audio);
 }
 ?>
 	

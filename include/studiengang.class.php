@@ -49,6 +49,8 @@ class studiengang
 	var $ext_id;				// bigint
 	var $orgform_kurzbz;
 	var $zusatzinfo_html;
+	var $sprache;
+	var $testtool_sprachwahl;
 
 	var $kuerzel;			// = typ + kurzbz (Bsp: BBE)
 
@@ -126,6 +128,8 @@ class studiengang
 				$this->kuerzel = strtoupper($row->typ.$row->kurzbz);
 				$this->orgform_kurzbz = $row->orgform_kurzbz;
 				$this->zusatzinfo_html = $row->zusatzinfo_html;
+				$this->sprache = $row->sprache;
+				$this->testtool_sprachwahl = $row->testtool_sprachwahl;
 
 				$this->telefon=$row->telefon;
             	$this->titelbescheidvom=$row->titelbescheidvom;
@@ -185,6 +189,8 @@ class studiengang
 			$stg_obj->kuerzel = strtoupper($row->typ.$row->kurzbz);
 			$stg_obj->orgform_kurzbz = $row->orgform_kurzbz;
 			$stg_obj->zusatzinfo_html = $row->zusatzinfo_html;
+			$stg_obj->sprache = $row->sprache;
+			$stg_obj->testtool_sprachwahl = $row->testtool_sprachwahl;
 
             $stg_obj->telefon=$row->telefon;
             $stg_obj->titelbescheidvom=$row->titelbescheidvom;

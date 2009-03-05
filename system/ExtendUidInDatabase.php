@@ -144,6 +144,7 @@ if($result = pg_query($conn, $qry))
 	Grant select on vw_studiensemester to group "admin";
 	Grant select on public.vw_benutzerfunktion to group "admin";
 	Grant select on public.vw_prestudent to group "admin";
+	GRANT SELECT ON public.vw_prestudent to group web;
 	GRANT SELECT ON lehre.vw_stundenplandev_student_unr TO GROUP web;
 	GRANT SELECT ON lehre.vw_stundenplandev_student_unr TO GROUP admin;
 	';

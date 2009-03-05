@@ -24,11 +24,8 @@ class antwort
 {
 	//Tabellenspalten
 	var $antwort_id;
-	var $frage_id;
-	var $antwort;
-	var $begintime;
-	var $endtime;
 	var $pruefling_id;
+	var $vorschlag_id;
 		
 	// ErgebnisArray
 	var $result=array();
@@ -75,11 +72,8 @@ class antwort
 			if($row = pg_fetch_object($result))
 			{
 				$this->antwort_id = $row->antwort_id;
-				$this->frage_id = $row->frage_id;
-				$this->antwort = $row->antwort;
-				$this->begintime = $row->begintime;
-				$this->endtime = $row->endtime;
 				$this->pruefling_id = $row->pruefling_id;
+				$this->vorschlag_id = $row->vorschlag_id;
 				return true;
 			}
 			else 
@@ -90,7 +84,7 @@ class antwort
 		}
 		else 
 		{
-			$this->errormsg = "Fehler beim laden: $qry";
+			$this->errormsg = "Fehler beim Laden der Antwort";
 			return false;
 		}		
 	}
@@ -130,19 +124,16 @@ class antwort
 		
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = 'INSERT INTO testtool.tbl_antwort (frage_id, antwort, begintime, endtime, pruefling_id) VALUES('.
-			       "'".addslashes($this->frage_id)."',".
-			       $this->addslashes($this->antwort).",".
-			       $this->addslashes($this->begintime).",".
-			       $this->addslashes($this->endtime).",".
-			       $this->addslashes($this->pruefling_id).");";
+			$qry = 'INSERT INTO testtool.tbl_antwort (pruefling_id, vorschlag_id) VALUES('.
+			       $this->addslashes($this->pruefling_id).",".
+			       $this->addslashes($this->vorschlag_id).");";
 		}
 		else
 		{			
 			$qry = 'UPDATE testtool.tbl_antwort SET'.
-			       ' antwort='.$this->addslashes($this->antwort).','.
-			       " endtime='".$this->endtime."'".
-			       " WHERE frage_id='".addslashes($this->frage_id)."' AND pruefling_id='".addslashes($this->pruefling_id)."'";
+			       ' vorschlag_id='.$this->addslashes($this->vorschlag_id).','.
+			       " pruefling_id='".$this->pruefling_id."'".
+			       " WHERE antwort_id='".addslashes($this->antwort_id)."'";
 		}
 		
 		if(pg_query($this->conn,$qry))
@@ -157,26 +148,57 @@ class antwort
 		}
 	}
 	
+	/**
+	 * Loescht einen Eintrag aus der Tabelle tbl_antwort
+	 *
+	 * @param $antwort_id
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function delete($antwort_id)
+	{
+		if(!is_numeric($antwort_id) || $antwort_id=='')
+		{
+			$this->errormsg = 'Antwort_id ist ungueltig';
+			return false;
+		}
+		
+		$qry = "DELETE FROM testtool.tbl_antwort WHERE antwort_id='".addslashes($antwort_id)."'";
+		if(pg_query($this->conn, $qry))
+		{
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Löschen der Antwort';
+			return false;
+		}
+	}
+	
 	function getAntwort($pruefling_id, $frage_id)
 	{
-		$qry = "SELECT * FROM testtool.tbl_antwort WHERE pruefling_id='".addslashes($pruefling_id)."' AND frage_id='".addslashes($frage_id)."'";
+		$qry = "SELECT * FROM testtool.tbl_antwort JOIN testtool.tbl_pruefling_frage USING(pruefling_id) 
+				JOIN testtool.tbl_vorschlag USING(vorschlag_id) 
+				WHERE 
+					tbl_vorschlag.frage_id=tbl_pruefling_frage.frage_id AND 
+					pruefling_id='".addslashes($pruefling_id)."' AND 
+					tbl_vorschlag.frage_id='".addslashes($frage_id)."'";
 		if($result = pg_query($this->conn, $qry))
 		{
-			if($row = pg_fetch_object($result))
+			while($row = pg_fetch_object($result))
 			{
-				$this->antwort_id = $row->antwort_id;
-				$this->frage_id = $row->frage_id;
-				$this->antwort = $row->antwort;
-				$this->begintime = $row->begintime;
-				$this->endtime = $row->endtime;
-				$this->pruefling_id = $row->pruefling_id;
-				return true;
+				$obj = new antwort($this->conn, null, null);
+				
+				$obj->antwort_id = $row->antwort_id;
+				$obj->frage_id = $row->frage_id;
+				$obj->vorschlag_id = $row->vorschlag_id;
+				$obj->begintime = $row->begintime;
+				$obj->endtime = $row->endtime;
+				$obj->pruefling_id = $row->pruefling_id;
+				
+				$this->result[] = $obj;
 			}
-			else 
-			{
-				$this->errormsg = 'Antwort wurde nicht gefunden';
-				return false;
-			}				
+			
+			return true;
 		}
 		else 
 		{

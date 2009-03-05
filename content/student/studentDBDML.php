@@ -56,6 +56,7 @@ require_once('../../include/projektbetreuer.class.php');
 require_once('../../include/lehrverband.class.php');
 require_once('../../include/gruppe.class.php');
 require_once('../../include/datum.class.php');
+require_once('../../include/pruefling.class.php');
 
 $user = get_uid();
 
@@ -394,6 +395,8 @@ if(!$error)
 				$prestudent->anmeldungreihungstest = $_POST['anmeldungreihungstest'];
 				$prestudent->reihungstestangetreten = ($_POST['reihungstestangetreten']=='true'?true:false);
 				$prestudent->punkte = str_replace(',','.',$_POST['punkte']);
+				$prestudent->rt_punkte1 = str_replace(',','.',$_POST['punkte1']);
+				$prestudent->rt_punkte2 = str_replace(',','.',$_POST['punkte2']);
 				$prestudent->bismelden = ($_POST['bismelden']=='true'?true:false);
 				$prestudent->dual = ($_POST['dual']=='true'?true:false);
 				$prestudent->anmerkung = $_POST['anmerkung'];
@@ -2967,6 +2970,16 @@ if(!$error)
 		{
 			$return = false;
 			$errormsg = 'Fehlerhafte Parameteruebergabe';
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='getReihungstestPunkte')
+	{
+		//Liefert die Reihungstestpunkte eines Prestudenten
+		if(isset($_POST['prestudent_id']))
+		{
+			$pruefling = new pruefling($conn);
+			$data = $pruefling->getReihungstestErgebnis($_POST['prestudent_id']);
+			$return = true;
 		}
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='getstundensatz')
