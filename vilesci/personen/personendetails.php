@@ -31,6 +31,7 @@ require_once('../../include/datum.class.php');
 require_once('../../include/kontakt.class.php');
 require_once('../../include/adresse.class.php');
 require_once('../../include/nation.class.php');
+require_once('../../include/firma.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
    die("Konnte Verbindung zur Datenbank nicht herstellen");
@@ -162,6 +163,7 @@ if(count($preinteressent->result)>0)
 					<th>AufmerksamDurch</th>
 					<th>Kontaktmedium (Woher)</th>
 					<th>Studiengänge</th>
+					<th>Schule</th>
 				</tr>
 			</thead>
 			<tbody>';
@@ -186,6 +188,11 @@ if(count($preinteressent->result)>0)
 			$stgs.= $studiengang->kuerzel_arr[$row_zuordnung->studiengang_kz]."(".$preinteressent1->prioritaet_arr[$row_zuordnung->prioritaet].")";
 		}
 		echo $stgs;
+		echo '</td>';
+		echo '<td>';
+		$firma = new firma($conn);
+		$firma->load($row->firma_id);
+		echo $firma->name;
 		echo '</td>';
 		echo '</tr>';
 	}
