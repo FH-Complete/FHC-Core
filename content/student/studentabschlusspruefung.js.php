@@ -898,8 +898,8 @@ function StudentAbschlusspruefungTypChange()
 	}
 	else
 	{
-		document.getElementById('student-abschlusspruefung-label-pruefer1').value='Pruefer 1 (nicht technisch)';
-		document.getElementById('student-abschlusspruefung-label-pruefer2').value='Pruefer 2 (technisch)';
+		document.getElementById('student-abschlusspruefung-label-pruefer1').value='Pruefer 1 (Diplomarbeit)';
+		document.getElementById('student-abschlusspruefung-label-pruefer2').value='Pruefer 2';
 		document.getElementById('student-abschlusspruefung-menulist-pruefer3').hidden=true;
 		document.getElementById('student-abschlusspruefung-label-pruefer3').hidden=true;
 	}

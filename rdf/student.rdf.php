@@ -179,6 +179,8 @@ function draw_content_liste($row)
 			<STUDENT:orgform><![CDATA['.$orgform.']]></STUDENT:orgform>
 			<STUDENT:aufmerksamdurch_kurzbz><![CDATA['.$row->aufmerksamdurch_kurzbz.']]></STUDENT:aufmerksamdurch_kurzbz>
 			<STUDENT:punkte><![CDATA['.$row->punkte.']]></STUDENT:punkte>
+			<STUDENT:punkte1><![CDATA['.$row->rt_punkte1.']]></STUDENT:punkte1>
+			<STUDENT:punkte2><![CDATA['.$row->rt_punkte2.']]></STUDENT:punkte2>
 			<STUDENT:dual><![CDATA['.($row->dual=='t'?'true':'false').']]></STUDENT:dual>
 			<STUDENT:dual_bezeichnung><![CDATA['.($row->dual=='t'?'Ja':'Nein').']]></STUDENT:dual_bezeichnung>
       	</RDF:Description>
@@ -341,6 +343,7 @@ if($xmlformat=='rdf')
 	<RDF:RDF
 		xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 		xmlns:STUDENT="'.$rdf_url.'/rdf#"
+		xmlns:NC="http://home.netscape.com/NC-rdf#"
 	>
 
 
@@ -402,7 +405,9 @@ if($xmlformat=='rdf')
 							LIMIT 1
 						)
 						AS email_privat,
-						(SELECT rt_gesamtpunkte as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as punkte, tbl_prestudent.dual as dual
+						(SELECT rt_gesamtpunkte as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as punkte,
+						(SELECT rt_punkte1 as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as rt_punkte1,
+						(SELECT rt_punkte2 as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as rt_punkte2, tbl_prestudent.dual as dual
 						FROM public.tbl_student 
 							JOIN public.tbl_benutzer ON (student_uid=uid) JOIN public.tbl_person p USING (person_id)  JOIN public.tbl_prestudent USING(prestudent_id) ";
 		if($gruppe_kurzbz!=null)
