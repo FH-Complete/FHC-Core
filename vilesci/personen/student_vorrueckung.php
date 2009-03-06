@@ -192,7 +192,7 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 				{
 					$s=$row->semester_stlv+1;
 				}
-				if($row_status->ausbildungssemester>=$max[$stg_kz] || $row_status->rolle_kurzbz=="Unterbrecher")
+				if($row_status->ausbildungssemester>=$max[$stg_kz] || $row_status->rolle_kurzbz=="Unterbrecher" || $row_status->rolle_kurzbz=="Incoming")
 				{
 					$ausbildungssemester=$row_status->ausbildungssemester;
 				}
