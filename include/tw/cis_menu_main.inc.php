@@ -279,6 +279,10 @@
 		<tr>
         	<td class="tdwrap">
 		  	<table class="tabcontent" id="Infrastruktur" style="display: none">
+		  	<tr>
+				<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td class="tdwrap"><a class="Item" href="private/info/twbook/" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;twbook</a></td>
+			</tr>
 			<tr>
 				<td class="tdwidth10" nowrap>&nbsp;</td>
 				<td class="tdwrap"><a class="Item" href="public/ansprechpartner.php" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Ansprechpartner</a></td>
