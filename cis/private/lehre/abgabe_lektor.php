@@ -62,8 +62,15 @@ else
 {
 	$htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form><table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>\n";
 	$htmlstr .= "<thead><tr class='liste'>\n";
-	$htmlstr .= "<th class='table-sortable:default'>UID</th><th>Email</th><th class='table-sortable:default'>Vorname</th><th class='table-sortable:alphanumeric'>Nachname</th>";
-	$htmlstr .= "<th>Typ</th><th>Stg.</th><th>Sem.</th><th>Titel</th><th>Betreuerart</th>";
+	$htmlstr .= "<th class='table-sortable:default'>UID</th>
+				<th>Email</th>
+				<th class='table-sortable:default'>Vorname</th>
+				<th class='table-sortable:alphanumeric'>Nachname</th>";
+	$htmlstr .= "<th>Typ</th>
+				<th>Stg.</th>
+				<th>Sem.</th>
+				<th>Titel</th>
+				<th>Betreuerart</th>";
 	$htmlstr .= "</tr></thead><tbody>\n";
 	$i = 0;
 	while($row=pg_fetch_object($erg))
