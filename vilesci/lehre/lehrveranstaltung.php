@@ -25,6 +25,7 @@ require_once('../../include/studiengang.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/fachbereich.class.php');
+require_once('../../include/lvinfo.class.php');
 
 if(!$conn=pg_pconnect(CONN_STRING))
    die("Konnte Verbindung zur Datenbank nicht herstellen");
@@ -98,6 +99,15 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 				echo "Fehler beim Speichern!";
 			else
 				echo "Erfolgreich gespeichert";
+		}
+		
+		if(isset($_POST['source_id']))
+		{
+			$lvinfo = new lvinfo($conn);
+			if(!$lvinfo->copy($_POST['source_id'], $_GET['lvid']))
+				echo 'Fehler beim Kopieren';
+			else 
+				echo 'Erfolgreich gespeichert';
 		}
 	}
 	
@@ -352,7 +362,8 @@ if ($result_lv!=0)
 		  <th class='table-sortable:numeric'>Sort</th>
 		  <th class='table-sortable:default'>Zeugnis</th>
 		  <th class='table-sortable:default'>BA/DA</th>
-		  <th class='table-sortable:default'>FBK</th>\n";
+		  <th class='table-sortable:default'>FBK</th>
+		  <th class='table-sortable:default'>LVInfo</th>\n";
 	echo "</tr></thead>";
 	echo "<tbody>";
 	for($i=0;$i<$num_rows;$i++)
@@ -453,6 +464,25 @@ if ($result_lv!=0)
 		}
 		echo "</SELECT><input type='submit' value='ok' name='submitfbk'></form>";
 		echo "</td>";
+		echo '<td nowrap>';
+		//LVInfo
+		$lvinfo = new lvinfo($conn);
+		if(!$lvinfo->exists($row->lehrveranstaltung_id))
+		{
+			if($rechte->isBerechtigt('admin'))
+			{
+				echo '
+				<form action="'.$_SERVER['PHP_SELF'].'?lvid='.$row->lehrveranstaltung_id.'&stg_kz='.$stg_kz.'&semester='.$semester.'&fachbereich_kurzbz='.$fachbereich_kurzbz.'&isaktiv='.$isaktiv.'" method="POST">
+					kopieren von id: <input type="text" size="3" name="source_id" value="" />
+					<input type="submit" name="submitlvinfo" value="ok">
+				</form>';
+			}
+			else 
+				echo 'fehlt';
+		}
+		else 
+			echo 'vorhanden';
+		echo '</td>';
 		echo "</tr>\n";
 	}
 
