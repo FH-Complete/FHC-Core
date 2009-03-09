@@ -220,7 +220,8 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 echo '<hr><br>';
 if(isset($_POST['savedummystg']) && isset($_POST['stg']))
 {
-	$qry = "UPDATE public.tbl_prestudent SET studiengang_kz='".addslashes($_POST['stg'])."' WHERE prestudent_id='13478';";	
+	$qry = "UPDATE public.tbl_prestudent SET studiengang_kz='".addslashes($_POST['stg'])."' WHERE prestudent_id='13478';
+	UPDATE testtool.tbl_pruefling SET studiengang_kz='".addslashes($_POST['stg'])."' WHERE prestudent_id='13478';";	
 	if(pg_query($conn, $qry))
 		echo '<b>Studiengang geändert!</b><br>';
 	else 
