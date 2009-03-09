@@ -279,7 +279,7 @@ class lvinfo
 		}
 	}
 
-	function exists($lehrveranstaltung_id, $sprache)
+	function exists($lehrveranstaltung_id, $sprache=null)
 	{
 		if(!is_numeric($lehrveranstaltung_id))
 		{
@@ -287,7 +287,10 @@ class lvinfo
 			return false;
 		}
 
-		$qry = "SELECT count(*) as anzahl FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$lehrveranstaltung_id' AND sprache='".addslashes($sprache)."'";
+		$qry = "SELECT count(*) as anzahl FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$lehrveranstaltung_id'";
+		
+		if(!is_null($sprache))
+			$qry = " AND sprache='".addslashes($sprache)."'";
 
 		if($result=pg_query($this->conn, $qry))
 		{
@@ -313,6 +316,47 @@ class lvinfo
 			$this->errormsg = 'Fehler bei einer Abfrage';
 			return false;
 		}
+	}
+	
+	/**
+	 * Kopiert eine LVInfo von einer LV in eine andere
+	 *
+	 * @param $source ID der Lehrveranstaltung von der wegkopiert wird
+	 * @param $target ID der Lehrveranstaltung zu der die LV-Info kopiert werden soll
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	function copy($source, $target)
+	{
+		if(!is_numeric($source) || $source=='')
+		{
+			$this->errormsg ='source muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		if(!is_numeric($target) || $target=='')
+		{
+			$this->errormsg ='target muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "
+		INSERT INTO campus.tbl_lvinfo(lehrveranstaltung_id, sprache, titel, lehrziele,
+			lehrinhalte, methodik, voraussetzungen, unterlagen, pruefungsordnung, anmerkung, kurzbeschreibung, genehmigt,
+			aktiv, updateamum, updatevon, insertamum, insertvon) 
+		SELECT $target, sprache, titel, lehrziele,
+		lehrinhalte, methodik, voraussetzungen, unterlagen, pruefungsordnung, anmerkung, kurzbeschreibung, genehmigt,
+		aktiv, updateamum, updatevon, insertamum, insertvon FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id=$source";
+		
+		if(pg_query($this->conn, $qry))
+		{
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Kopieren der LVInfo';
+			return false;
+		}
+		
 	}
 }
 ?>
