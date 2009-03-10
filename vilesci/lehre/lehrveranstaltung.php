@@ -100,17 +100,17 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 			else
 				echo "Erfolgreich gespeichert";
 		}
-		
-		if(isset($_POST['source_id']))
-		{
-			$lvinfo = new lvinfo($conn);
-			if(!$lvinfo->copy($_POST['source_id'], $_GET['lvid']))
-				echo 'Fehler beim Kopieren';
-			else 
-				echo 'Erfolgreich gespeichert';
-		}
 	}
 	
+	//LVInfo kopieren
+	if(isset($_POST['source_id']))
+	{
+		$lvinfo = new lvinfo($conn);
+		if(!$lvinfo->copy($_POST['source_id'], $_GET['lvid']))
+			echo 'Fehler beim Kopieren';
+		else 
+			echo 'Erfolgreich gespeichert';
+	}
 	
 	//Lehre Feld setzen
 	if(isset($_GET['lehre']))
@@ -469,16 +469,11 @@ if ($result_lv!=0)
 		$lvinfo = new lvinfo($conn);
 		if(!$lvinfo->exists($row->lehrveranstaltung_id))
 		{
-			if($rechte->isBerechtigt('admin'))
-			{
-				echo '
+			echo '
 				<form action="'.$_SERVER['PHP_SELF'].'?lvid='.$row->lehrveranstaltung_id.'&stg_kz='.$stg_kz.'&semester='.$semester.'&fachbereich_kurzbz='.$fachbereich_kurzbz.'&isaktiv='.$isaktiv.'" method="POST">
 					kopieren von id: <input type="text" size="3" name="source_id" value="" />
 					<input type="submit" name="submitlvinfo" value="ok">
 				</form>';
-			}
-			else 
-				echo 'fehlt';
 		}
 		else 
 			echo 'vorhanden';
