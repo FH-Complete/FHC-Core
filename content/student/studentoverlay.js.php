@@ -1627,6 +1627,16 @@ function StudentReihungstestPunkteSum()
 {
 	punkte1 = document.getElementById('student-prestudent-textbox-punkte1').value;
 	punkte2 = document.getElementById('student-prestudent-textbox-punkte2').value;
+	if(punkte1=='')
+	{
+		punkte1=0;
+		document.getElementById('student-prestudent-textbox-punkte1').value=0;
+	}
+	if(punkte2=='')
+	{
+		punkte2=0;
+		document.getElementById('student-prestudent-textbox-punkte2').value=0;
+	}
 	
 	document.getElementById('student-prestudent-textbox-punkte').value=parseFloat(punkte1)+parseFloat(punkte2);
 }
