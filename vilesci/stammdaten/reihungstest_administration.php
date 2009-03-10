@@ -155,7 +155,8 @@ if(isset($_POST['deleteteilgebiet']))
 	
 		$qry = "DELETE FROM testtool.tbl_antwort 
 				WHERE pruefling_id='$pruefling->pruefling_id' AND 
-				frage_id IN (SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id='".$_POST['gebiet']."');
+				vorschlag_id IN (SELECT vorschlag_id FROM testtool.tbl_vorschlag WHERE frage_id IN 
+				(SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id='".$_POST['gebiet']."'));
 				DELETE FROM testtool.tbl_pruefling_frage where pruefling_id='$pruefling->pruefling_id' AND
 				frage_id IN (SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id='".$_POST['gebiet']."');";
 		if($result = pg_query($conn, $qry))
