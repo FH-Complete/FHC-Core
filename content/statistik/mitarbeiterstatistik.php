@@ -66,8 +66,8 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 	//Bachelor
 	$qry = "SELECT 
 				bezeichnung, 
-				(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND fixangestellt AND funktion_kurzbz='Institut' AND aktiv) a) as fix,
-				(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND NOT fixangestellt AND funktion_kurzbz='Institut' AND aktiv) a) as extern
+				(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv) a) as fix,
+				(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND NOT fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv) a) as extern
 			FROM public.tbl_fachbereich a WHERE aktiv ORDER BY bezeichnung";
 	
 	if($result = pg_query($conn, $qry))
@@ -92,8 +92,8 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 		}
 		
 		$qry = "SELECT 
-					(SELECT count(*) FROM campus.vw_mitarbeiter WHERE uid NOT in(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='Institut') AND aktiv AND fixangestellt) as fix,
-					(SELECT count(*) FROM campus.vw_mitarbeiter WHERE uid NOT in(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='Institut') AND aktiv AND NOT fixangestellt) as extern
+					(SELECT count(*) FROM campus.vw_mitarbeiter WHERE uid NOT in(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='oezuordnung') AND aktiv AND fixangestellt) as fix,
+					(SELECT count(*) FROM campus.vw_mitarbeiter WHERE uid NOT in(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='oezuordnung') AND aktiv AND NOT fixangestellt) as extern
 				";
 		if($result = pg_query($conn, $qry))
 		{

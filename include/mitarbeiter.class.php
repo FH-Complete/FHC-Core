@@ -829,7 +829,7 @@ class mitarbeiter extends benutzer
 	{
 		$sql_query="SELECT DISTINCT campus.vw_mitarbeiter.* FROM campus.vw_mitarbeiter
 					JOIN public.tbl_benutzerfunktion USING (uid)
-					WHERE funktion_kurzbz='Institut' AND fachbereich_kurzbz='$institut' ORDER BY nachname, vorname";
+					WHERE funktion_kurzbz='oezuordnung' AND fachbereich_kurzbz='$institut' ORDER BY nachname, vorname";
 
 		if($erg=pg_query($this->conn, $sql_query))
 		{
@@ -890,7 +890,7 @@ class mitarbeiter extends benutzer
 						    WHEN studiengang_kz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz=a.studiengang_kz AND funktion_kurzbz='stgl' LIMIT 1)
 						    ELSE ''
 					   END as vorgesetzter
-						FROM public.tbl_benutzerfunktion a WHERE funktion_kurzbz='Institut' AND uid='$uid'";
+						FROM public.tbl_benutzerfunktion a WHERE funktion_kurzbz='oezuordnung' AND uid='$uid'";
 		$result = pg_query($this->conn, $qry);
 		while($row = pg_fetch_object($result))
 		{
@@ -960,7 +960,7 @@ class mitarbeiter extends benutzer
 		}
 		
 		//Alle Personen holen die diesen Studiengaengen/Fachbereichen untergeordnet sind
-		$qry = "SELECT distinct uid FROM public.tbl_benutzerfunktion WHERE (funktion_kurzbz='Institut' AND (false ";
+		$qry = "SELECT distinct uid FROM public.tbl_benutzerfunktion WHERE (funktion_kurzbz='oezuordnung' AND (false ";
 		
 		if($institut!='')
 			$qry.=" OR fachbereich_kurzbz in($institut)"; 

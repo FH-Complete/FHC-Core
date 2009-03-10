@@ -120,8 +120,8 @@ if($stsem!='')
 			FROM public.tbl_fachbereich a WHERE aktiv ORDER BY bezeichnung";
 	/*
 	Mitarbeiter laut institutszuordnung
-	(SELECT count(*) FROM public.tbl_benutzerfunktion JOIN public.tbl_mitarbeiter on (uid=mitarbeiter_uid) WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND funktion_kurzbz='Institut' AND fixangestellt AND aktiv) as fix,
-	(SELECT count(*) FROM public.tbl_benutzerfunktion JOIN public.tbl_mitarbeiter on (uid=mitarbeiter_uid) WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND funktion_kurzbz='Institut' AND NOT fixangestellt AND aktiv) as extern,
+	(SELECT count(*) FROM public.tbl_benutzerfunktion JOIN public.tbl_mitarbeiter on (uid=mitarbeiter_uid) WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND funktion_kurzbz='oezuordnung' AND fixangestellt AND aktiv) as fix,
+	(SELECT count(*) FROM public.tbl_benutzerfunktion JOIN public.tbl_mitarbeiter on (uid=mitarbeiter_uid) WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND funktion_kurzbz='oezuordnung' AND NOT fixangestellt AND aktiv) as extern,
 	*/
 	//echo '<pre>'.$qry.'</pre><br><br>';
 	if($result = pg_query($conn, $qry))
