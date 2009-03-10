@@ -104,7 +104,7 @@ $qry = "SELECT
 					public.tbl_benutzerfunktion
 				WHERE
 					uid=tbl_mitarbeiter.mitarbeiter_uid AND
-					funktion_kurzbz='Institut'
+					funktion_kurzbz='oezuordnung'
 				LIMIT 1
 			) as hauptzuteilung
 		FROM 

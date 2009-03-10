@@ -108,7 +108,9 @@
 					</tr>
 					</table>
 		  			</td>
-				</tr>
+				</tr>';
+				/*
+				echo '
 				<tr>
 					<td class="tdwidth10" nowrap>&nbsp;</td>
 				    <td class="tdwrap">
@@ -117,6 +119,7 @@
 				    	</a>
 				    </td>
 				</tr>';
+				*/
 			}
 
 			//Eigene LVs des eingeloggten Lektors anzeigen
@@ -196,6 +199,7 @@
 					</table>
 		  			</td>
 				</tr>
+				<!--
 				<tr>
 					<td class="tdwidth10" nowrap>&nbsp;</td>
 				    <td class='tdwrap'>
@@ -204,6 +208,7 @@
 				    	</a>
 				    </td>
 				</tr>
+				-->
 			<?php
 			}
 			
@@ -274,7 +279,7 @@
 					}
 				}
 
-				$qry = "SELECT distinct uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='Institut' AND (false ";
+				$qry = "SELECT distinct uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='oezuordnung' AND (false ";
 
 				if($institut!='')
 					$qry.=" OR fachbereich_kurzbz in($institut)";

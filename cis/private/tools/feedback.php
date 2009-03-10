@@ -128,7 +128,7 @@
 		  <h3>Ihre Meinung z&auml;hlt!</h3>
 		  <h3>Hier k&ouml;nnen Sie uns Feedback geben.</h3>
 		  <p>Helfen Sie mit, unseren Service zu verbessern und geben Sie uns hier Ihr Feedback. Haben Sie spezielle W&uuml;nsche und Anregungen f&uuml;r uns, vermissen Sie wichtige Informationen oder wollen Sie uns mal richtig die Meinung sagen? F&uuml;r Ihre Beitr&auml;ge haben wir immer ein offenes Ohr. Denn nur wenn wir Ihre Meinung kennen, k&ouml;nnen wir auf Ihre Belange und W&uuml;nsche eingehen.</p>
-		  <p>Für technische Gebrechen verwenden Sie bitte das <a href='http://bug.technikum-wien.at' target="_blank" class='Item'>Bugtracking-System</a></p>
+		  <p>Für technische Gebrechen verwenden Sie bitte das <a href='https://bug.technikum-wien.at' target="_blank" class='Item'>Bugtracking-System</a></p>
 		  <table class="tabcontent">
 		  	<tr>
 			  <td nowrap><br>
