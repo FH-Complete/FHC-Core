@@ -902,25 +902,7 @@ class mitarbeiter extends benutzer
 		}
 		
 		$this->vorgesetzte = array_unique($this->vorgesetzte);
-	
-		if ($return)
-			return $return;
-		// Suche nach Assistenz
-		$qry = "SELECT 	CASE WHEN fachbereich_kurzbz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND funktion_kurzbz='fbl' LIMIT 1)
-							 WHEN studiengang_kz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz=a.studiengang_kz AND funktion_kurzbz='stgl' LIMIT 1)
-					    ELSE ''
-						END as vorgesetzter
-				FROM public.tbl_benutzerfunktion a WHERE funktion_kurzbz='ass' AND uid='$uid'";
-		$result = pg_query($this->conn, $qry);
-		while($row = pg_fetch_object($result))
-		{
-			if ($row->vorgesetzter!='')
-			{
-				$this->vorgesetzte[]=$row->vorgesetzter;
-				$return=true;
-			}
-		}
-		$this->vorgesetzte = array_unique($this->vorgesetzte);
+
 		return $return;
 	}
 	
