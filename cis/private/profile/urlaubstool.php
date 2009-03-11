@@ -379,6 +379,10 @@ function checkval()
 <style type="text/css">
 a:link { text-decoration:none; font-weight:bold; color:blue; }
 a:visited { text-decoration:none; font-weight:bold; color:blue; }
+th, td, table
+{
+-moz-border-radius:10px;-khtml-border-radius:10px;
+}
 </style>
 <title>Urlaubstool</title>
 </head>
@@ -590,7 +594,7 @@ $content.='</td></tr>';
 $content.='</table>';
 $content.='<table border=1 width="95%" align="center">';
 
-$content.='<th width="14%">Montag</th><th width="14%">Dienstag</th><th width="14%">Mittwoch</th><th width="15%">Donnerstag</th><th width="14%">Freitag</th><th width="14%">Samstag</th><th width="14%">Sonntag</th>';
+$content.='<th style="width:14%;">Montag</div><th width="14%">Dienstag</th><th width="14%">Mittwoch</th><th width="15%">Donnerstag</th><th width="14%">Freitag</th><th width="14%">Samstag</th><th width="14%">Sonntag</th>';
 for ($i=0;$i<6;$i++)
 {
 	$content.='<tr height="50" style="font-family:Arial,sans-serif; font-size:34px; color:blue">';
