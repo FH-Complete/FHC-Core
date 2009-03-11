@@ -2933,7 +2933,7 @@ if(!$error)
 			{
 				if(is_numeric($person_id))
 				{
-					$qry = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id='$person_id' ORDER BY zustellung DESC LIMIT 1";
+					$qry = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id='$person_id' AND zustellung=true LIMIT 1";
 					if($result = pg_query($conn, $qry))
 					{
 						if($row = pg_fetch_object($result))

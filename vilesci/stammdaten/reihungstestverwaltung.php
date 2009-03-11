@@ -92,7 +92,7 @@
 			$worksheet->write(2,++$i,"ORT", $format_bold);
 			$maxlength[$i] = 3;
 			
-			$qry = "SELECT *, (SELECT kontakt FROM tbl_kontakt WHERE kontakttyp='email' AND person_id=tbl_prestudent.person_id ORDER BY zustellung desc, insertamum desc LIMIT 1) as email FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE reihungstest_id='$reihungstest->reihungstest_id' ORDER BY nachname, vorname";
+			$qry = "SELECT *, (SELECT kontakt FROM tbl_kontakt WHERE kontakttyp='email' AND person_id=tbl_prestudent.person_id AND zustellung=true LIMIT 1) as email FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE reihungstest_id='$reihungstest->reihungstest_id' ORDER BY nachname, vorname";
 
 			if($result = pg_query($conn, $qry))
 			{
@@ -121,7 +121,7 @@
 					if(strlen($row->email)>$maxlength[$i])
 						$maxlength[$i] = strlen($row->email);
 					
-					$qry = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id' ORDER BY zustelladresse LIMIT 1";
+					$qry = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id' AND zustelladresse=true LIMIT 1";
 					if($result_adresse = pg_query($conn, $qry))
 					{
 						if($row_adresse = pg_fetch_object($result_adresse))
@@ -423,7 +423,7 @@
 			echo '</td></tr></table>';
 			
 			//Liste der Interessenten die zum Reihungstest angemeldet sind
-			$qry = "SELECT *, (SELECT kontakt FROM tbl_kontakt WHERE kontakttyp='email' AND person_id=tbl_prestudent.person_id ORDER BY zustellung desc, insertamum desc LIMIT 1) as email FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE reihungstest_id='$reihungstest_id' ORDER BY nachname, vorname";
+			$qry = "SELECT *, (SELECT kontakt FROM tbl_kontakt WHERE kontakttyp='email' AND person_id=tbl_prestudent.person_id AND zustellung=true LIMIT 1) as email FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE reihungstest_id='$reihungstest_id' ORDER BY nachname, vorname";
 			$mailto = '';
 			if($result = pg_query($conn, $qry))
 			{
@@ -453,7 +453,7 @@
 							<td>".$stg_arr[$row->studiengang_kz]."</td>
 							<td>".$datum_obj->convertISODate($row->gebdatum)."</td>
 							<td><a href='mailto:$row->email'>$row->email</a></td>
-							<td align='right'>".number_format($rtergebnis,2,'.','')."</td>
+							<td align='right'>".($rtergebnis==0?'-':number_format($rtergebnis,2,'.',''))."</td>
 							<td align='right'>".($rtergebnis>0 && $row->rt_punkte1==''?'<a href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$stg_kz.'&type=savertpunkte&prestudent_id='.$row->prestudent_id.'&rtpunkte='.$rtergebnis.'" >&uuml;bertragen</a>':$row->rt_punkte1)."</td>
 						</tr>";
 					
