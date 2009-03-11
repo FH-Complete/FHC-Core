@@ -129,7 +129,7 @@ class studiengang
 				$this->orgform_kurzbz = $row->orgform_kurzbz;
 				$this->zusatzinfo_html = $row->zusatzinfo_html;
 				$this->sprache = $row->sprache;
-				$this->testtool_sprachwahl = $row->testtool_sprachwahl;
+				$this->testtool_sprachwahl = ($row->testtool_sprachwahl=='t'?true:false);
 
 				$this->telefon=$row->telefon;
             	$this->titelbescheidvom=$row->titelbescheidvom;
@@ -190,7 +190,7 @@ class studiengang
 			$stg_obj->orgform_kurzbz = $row->orgform_kurzbz;
 			$stg_obj->zusatzinfo_html = $row->zusatzinfo_html;
 			$stg_obj->sprache = $row->sprache;
-			$stg_obj->testtool_sprachwahl = $row->testtool_sprachwahl;
+			$stg_obj->testtool_sprachwahl = ($row->testtool_sprachwahl=='t'?true:false);
 
             $stg_obj->telefon=$row->telefon;
             $stg_obj->titelbescheidvom=$row->titelbescheidvom;
