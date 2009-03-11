@@ -252,7 +252,7 @@ loadVariables($conn, $user);
 		
 		//Zustelladresse
 		//Zustelladresse aus der Datenbank holen und dazuhaengen
-		$qry_1 = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id' ORDER BY zustelladresse DESC LIMIT 1";
+		$qry_1 = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id' AND zustelladresse=true LIMIT 1";
 		if($result_1 = pg_query($conn, $qry_1))
 		{
 			if($row_1 = pg_fetch_object($result_1))
@@ -451,7 +451,7 @@ loadVariables($conn, $user);
 			$i+=3;
 			
 		//Telefon
-		$qry_1 = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp in('mobil','telefon','so.tel') AND person_id='$row->person_id' ORDER BY zustellung DESC LIMIT 1";
+		$qry_1 = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp in('mobil','telefon','so.tel') AND person_id='$row->person_id' AND zustellung=true LIMIT 1";
 		if($result_1 = pg_query($conn, $qry_1))
 		{
 			if($row_1 = pg_fetch_object($result_1))
