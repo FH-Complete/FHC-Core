@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2009 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -16,13 +16,18 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>.
  */
 /**
- * Exportiert die Studentendaten in ein Excel File.
- * Die zu exportierenden Spalten werden per GET uebergeben.
- * Die Adressen werden immer dazugehaengt
+ * Exportiert die Daten von Prestudenten und Studenten in ein Excel File.
+ * 
+ * Parameter:
+ * GET:
+ * studiensemester_kurzbz ... Studiensemester
+ * POST:
+ * data ... Liste der PrestudentIDs der Personen die im Export aufscheinen sollen getrennt durch ','
  */
 require_once('../../vilesci/config.inc.php');
 require_once('../../include/functions.inc.php');
@@ -42,7 +47,7 @@ $datum_obj = new datum();
 loadVariables($conn, $user);
 	
 	//Parameter holen
-	$data = $_POST['data'];
+	$data = $_REQUEST['data'];
 	$studiensemester_kurzbz = $_GET['studiensemester_kurzbz'];
 	//$typ = $_GET['typ'];
 	$maxlength= array();
@@ -103,16 +108,6 @@ loadVariables($conn, $user);
 	$maxlength[$i]=9;
 	$worksheet->write($zeile,++$i,"EMail Privat", $format_bold);
 	$maxlength[$i]=12;
-	$maxlength[$i]=12;
-	$worksheet->write($zeile,++$i,"STRASSE", $format_bold);
-	$maxlength[$i]=7;
-	$worksheet->write($zeile-1,$i,"Zustelladresse", $format_bold);
-	$worksheet->write($zeile,++$i,"PLZ", $format_bold);
-	$maxlength[$i]=3;
-	$worksheet->write($zeile,++$i,"ORT", $format_bold);
-	$maxlength[$i]=3;
-	$worksheet->write($zeile,++$i,"NATION", $format_bold);
-	$maxlength[$i]=6;
 	$worksheet->write($zeile,++$i,"GEBURTSDATUM", $format_bold);
 	$maxlength[$i]=12;
 	$worksheet->write($zeile,++$i,"PERSONENKENNZEICHEN", $format_bold);
@@ -148,15 +143,10 @@ loadVariables($conn, $user);
 	
 	$worksheet->write($zeile,++$i,"STATUS", $format_bold);
 	$maxlength[$i]=6;
+	$worksheet->write($zeile,++$i,"STATI IN ANDEREN STUDIENGÄNGEN", $format_bold);
+	$maxlength[$i]=8;
 	$worksheet->write($zeile,++$i,"EMail Intern", $format_bold);
 	$maxlength[$i]=12;
-	$worksheet->write($zeile,++$i,"STRASSE", $format_bold);
-	$maxlength[$i]=7;
-	$worksheet->write($zeile-1,$i,"Nebenwohnsitz", $format_bold);
-	$worksheet->write($zeile,++$i,"PLZ", $format_bold);
-	$maxlength[$i]=3;
-	$worksheet->write($zeile,++$i,"ORT", $format_bold);
-	$maxlength[$i]=3;
 	$worksheet->write($zeile,++$i,"TELEFON", $format_bold);
 	$maxlength[$i]=3;
 	$worksheet->write($zeile,++$i,"GRUPPEN", $format_bold);
@@ -167,6 +157,12 @@ loadVariables($conn, $user);
 	$maxlength[$i]=7;
 	$worksheet->write($zeile,++$i,"VORNAMEN", $format_bold);
 	$maxlength[$i]=8;
+	$worksheet->write($zeile,++$i,"RT_PUNKTE1", $format_bold);
+	$maxlength[$i]=10;
+	$worksheet->write($zeile,++$i,"RT_PUNKTE2", $format_bold);
+	$maxlength[$i]=10;
+	$worksheet->write($zeile,++$i,"RT_GESAMTPUNKTE", $format_bold);
+	$maxlength[$i]=18;
 	
 	$zeile++;
 	
@@ -183,7 +179,7 @@ loadVariables($conn, $user);
 		}
 	}
 	// Student holen
-	$qry = "SELECT * FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) LEFT JOIN public.tbl_student USING(prestudent_id) WHERE prestudent_id in($prestudent_ids) ORDER BY nachname, vorname";
+	$qry = "SELECT *, tbl_prestudent.studiengang_kz as prestgkz FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) LEFT JOIN public.tbl_student USING(prestudent_id) WHERE prestudent_id in($prestudent_ids) ORDER BY nachname, vorname";
 
 	if($result = pg_query($conn, $qry))
 		while($row = pg_fetch_object($result))
@@ -249,40 +245,7 @@ loadVariables($conn, $user);
 			}
 		}
 		$i++;
-		
-		//Zustelladresse
-		//Zustelladresse aus der Datenbank holen und dazuhaengen
-		$qry_1 = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id' AND zustelladresse=true LIMIT 1";
-		if($result_1 = pg_query($conn, $qry_1))
-		{
-			if($row_1 = pg_fetch_object($result_1))
-			{	
-				if(strlen($row_1->strasse)>$maxlength[$i])
-					$maxlength[$i]=strlen($row_1->strasse);
-				$worksheet->write($zeile,$i, $row_1->strasse);
-				$i++;
-				
-				if(strlen($row_1->plz)>$maxlength[$i])
-					$maxlength[$i]=strlen($row_1->plz);
-				$worksheet->writeString($zeile,$i, $row_1->plz);
-				$i++;
-				
-				if(strlen($row_1->ort)>$maxlength[$i])
-					$maxlength[$i]=strlen($row_1->ort);
-				$worksheet->write($zeile,$i, $row_1->ort);
-				$i++;
-				
-				if(strlen($row_1->nation)>$maxlength[$i])
-					$maxlength[$i]=strlen($row_1->nation);
-				$worksheet->write($zeile,$i, $row_1->nation);
-				$i++;
-			}
-			else 
-				$i+=4;
-		}
-		else 
-			$i+=4;
-		
+						
 		//Geburtsdatum
 		if(strlen($row->gebdatum)>$maxlength[$i])
 			$maxlength[$i] = strlen($row->gebdatum);
@@ -407,10 +370,30 @@ loadVariables($conn, $user);
 		$worksheet->write($zeile,$i, $row->zgvmadatum);
 		$i++;
 		
-		//Status		
+		//Status
 		if(strlen($status)>$maxlength[$i])
 			$maxlength[$i] = strlen($status);
 		$worksheet->write($zeile,$i, $status);
+		$i++;
+		
+		//Stati in anderen Studiengaengen
+		$stati='';
+		$qry_1 = "SELECT UPPER(typ::varchar(1) || kurzbz) as stg, get_rolle_prestudent(prestudent_id, null) as status FROM
+				public.tbl_prestudent JOIN public.tbl_studiengang USING(studiengang_kz) 
+				WHERE person_id='$row->person_id' AND tbl_prestudent.studiengang_kz<>'$row->prestgkz'";
+		
+		if($result_1 = pg_query($conn, $qry_1))
+		{
+			while($row_1 = pg_fetch_object($result_1))
+			{
+				if($stati!='')
+					$stati.=', ';
+				$stati.= $row_1->status.' ('.$row_1->stg.')';
+			}
+		}
+		if(strlen($stati)>$maxlength[$i])
+			$maxlength[$i] = strlen($stati);
+		$worksheet->write($zeile,$i, $stati);
 		$i++;
 		
 		//Email Intern
@@ -422,34 +405,6 @@ loadVariables($conn, $user);
 		}
 		$i++;
 				
-		//Nebenwohnsitz
-		//Nebenwohnsitz aus der Datenbank holen und dazuhaengen
-		$qry_1 = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id' AND typ='n' LIMIT 1";
-		if($result_1 = pg_query($conn, $qry_1))
-		{
-			if($row_1 = pg_fetch_object($result_1))
-			{	
-				if(strlen($row_1->strasse)>$maxlength[$i])
-					$maxlength[$i]=strlen($row_1->strasse);
-				$worksheet->write($zeile,$i, $row_1->strasse);
-				$i++;
-				
-				if(strlen($row_1->plz)>$maxlength[$i])
-					$maxlength[$i]=strlen($row_1->plz);
-				$worksheet->writeString($zeile,$i, $row_1->plz);
-				$i++;
-				
-				if(strlen($row_1->ort)>$maxlength[$i])
-					$maxlength[$i]=strlen($row_1->ort);
-				$worksheet->write($zeile,$i, $row_1->ort);
-				$i++;
-			}
-			else 
-				$i+=3;
-		}
-		else 
-			$i+=3;
-			
 		//Telefon
 		$qry_1 = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp in('mobil','telefon','so.tel') AND person_id='$row->person_id' AND zustellung=true LIMIT 1";
 		if($result_1 = pg_query($conn, $qry_1))
@@ -500,6 +455,25 @@ loadVariables($conn, $user);
 		if(strlen($row->vornamen)>$maxlength[$i])
 			$maxlength[$i] = strlen($row->vornamen);
 		$worksheet->write($zeile,$i, $row->vornamen);
+		$i++;
+		
+		
+		//RT_Punkte1
+		if(strlen($row->rt_punkte1)>$maxlength[$i])
+			$maxlength[$i] = strlen($row->rt_punkte1);
+		$worksheet->write($zeile,$i, $row->rt_punkte1);
+		$i++;
+		
+		//RT_Punkte2
+		if(strlen($row->rt_punkte2)>$maxlength[$i])
+			$maxlength[$i] = strlen($row->rt_punkte2);
+		$worksheet->write($zeile,$i, $row->rt_punkte2);
+		$i++;
+		
+		//RT_Gesamtpunkte
+		if(strlen($row->rt_gesamtpunkte)>$maxlength[$i])
+			$maxlength[$i] = strlen($row->rt_gesamtpunkte);
+		$worksheet->write($zeile,$i, $row->rt_gesamtpunkte);
 		$i++;
 	}
 		

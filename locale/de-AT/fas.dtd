@@ -148,6 +148,10 @@
 <!ENTITY menu-statistic-mitarbeiterstatistik.label		"Mitarbeiterstatistik">
 <!ENTITY menu-statistic-mitarbeiterstatistik.accesskey	"M">
 
+<!ENTITY menu-statistic-studentendetails.key		"P">
+<!ENTITY menu-statistic-studentendetails.label		"Personendetails Excel">
+<!ENTITY menu-statistic-studentendetails.accesskey	"P">
+
 <!-- Dokumente -->
 <!ENTITY menu-dokumente.label		"Dokumente">
 <!ENTITY menu-dokumente.accesskey	"D">
