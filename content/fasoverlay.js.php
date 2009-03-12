@@ -995,6 +995,49 @@ function StatistikPrintMitarbeiterstatistik()
 	window.open('<?php echo APP_ROOT ?>content/statistik/mitarbeiterstatistik.php?stsem='+stsem,'Mitarbeiterstatistik');
 }
 
+function StatistikPrintStudentExportExtended()
+{
+	var tree = document.getElementById('student-tree');
+	var data='';
+	//Wenn nichts markiert wurde -> alle exportieren
+	if(tree.currentIndex==-1)
+	{
+		if(tree.view)
+			var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+		else
+			return false;
+			
+		for (var v=0; v < items; v++)
+		{
+			prestudent_id = getTreeCellText(tree, 'student-treecol-prestudent_id', v);
+			data = data+';'+prestudent_id;
+		}
+	}
+	else
+	{	
+		var start = new Object();
+		var end = new Object();
+		var numRanges = tree.view.selection.getRangeCount();
+		var paramList= '';
+		var anzahl=0;
+	
+		//alle markierten personen holen
+		for (var t = 0; t < numRanges; t++)
+		{
+	  		tree.view.selection.getRangeAt(t,start,end);
+			for (var v = start.value; v <= end.value; v++)
+			{
+				prestudent_id = getTreeCellText(tree, 'student-treecol-prestudent_id', v);
+				data = data+';'+prestudent_id;
+			}
+		}
+	}
+	
+	stsem = getStudiensemester();
+	action = '<?php echo APP_ROOT; ?>content/statistik/studentenexportextended.xls.php?studiensemester_kurzbz='+stsem;
+	OpenWindowPost(action, data);
+}
+
 // ****
 // * Zeigt HTML Seite zur Bearbeitung der Reihungstests an
 // ****

@@ -98,6 +98,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-statistic-absolventenstatistik:command" oncommand="StatistikPrintAbsolventenstatistik();"/>
   <command id="menu-statistic-studentenstatistik:command" oncommand="StatistikPrintStudentenstatistik();"/>
   <command id="menu-statistic-mitarbeiterstatistik:command" oncommand="StatistikPrintMitarbeiterstatistik();"/>
+  <command id="menu-statistic-studentendetails:command" oncommand="StatistikPrintStudentExportExtended();"/>
   <command id="menu-statistic-lektorenstatistik:command" oncommand="StatistikPrintLektorenstatistik();"/>
   <command id="menu-dokumente-inskriptionsbestaetigung:command" oncommand="StudentPrintInskriptionsbestaetigung();"/>
   <command id="menu-dokumente-zeugnis:command" oncommand="StudentCreateZeugnis();"/>
@@ -278,6 +279,12 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                label     = "&menu-statistic-fehlendedokumente.label;"
                command   =  "menu-statistic-fehlendedokumente:command"
                accesskey = "&menu-statistic-fehlendedokumente.accesskey;"/>
+             <menuitem
+               id        =  "menu-statistic-studentendetails"
+               key       =  "menu-statistic-studentendetails:key"
+               label     = "&menu-statistic-studentendetails.label;"
+               command   =  "menu-statistic-studentendetails:command"
+               accesskey = "&menu-statistic-studentendetails.accesskey;"/>
              <menu id="menu-statistic-subnotenspiegel" label="&menu-statistic-subnotenspiegel.label;" accesskey="&menu-statistic-subnotenspiegel.accesskey;">
 				<menupopup id="menu-statistic-subnotenspiegel-popup">
 		             <menuitem
