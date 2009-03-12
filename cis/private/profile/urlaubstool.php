@@ -381,7 +381,8 @@ a:link { text-decoration:none; font-weight:bold; color:blue; }
 a:visited { text-decoration:none; font-weight:bold; color:blue; }
 th, td, table
 {
--moz-border-radius:10px;-khtml-border-radius:10px;
+	-moz-border-radius:10px;
+	-khtml-border-radius:10px;
 }
 </style>
 <title>Urlaubstool</title>
