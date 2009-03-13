@@ -1,0 +1,104 @@
+		/* Standart Einstellungen */
+		body{	font-size:  larger;	letter-spacing : 1px; font-family: Verdana,  "Times New Roman", Times, serif MS Courier New,Tahoma,Arial, Helvetica, sans-serif,Trebuchet MS;}
+		form {display:inline;border:0;}
+	
+	    table.content { height:100%;}
+
+		
+	    table.news { background-color: #CCC;width:100%;border: 0px inset #FFF;font-size: small;}
+		tr.news_row_0  {background:#FEFFEC;vertical-align: top;}
+		tr.news_row_1  {background:#F7F7F7;vertical-align: top;}
+		
+		
+		tr.keyinput   {color:#FFFFFF;background-color:#FFFFFF;border:0 none #FFFFFF;	} 	
+		td.keyinput   {background-color:#FFFFFF;border:0 none #FFFFFF;	} 	
+		#key_input { height: 1px;font-size:1px;color:#FFFFFF;	background-color:#FFFFFF;border:0;padding:0px;margin: 0px; } 	
+		
+		h1 {margin-top:5px;padding-bottom:2px;padding-top:2px;text-indent : 8px; width:100%;font-size:larger;color: #ffffff; background-color: #009e84; }
+		a{text-decoration: none;}
+	
+		/* Knopf Blau */
+		b.blau_rtop, b.blau_rbottom{display:block;background-color: transparent;}
+		b.blau_rtop b, b.blau_rbottom b{display:block;height: 1px; overflow: hidden; background-color: #0085D0;}
+		b.blau_r1{margin: 0 5px}
+		b.blau_r2{margin: 0 3px}
+		b.blau_r3{margin: 0 2px}
+		b.blau_rtop b.blau_r4, b.blau_rbottom b.blau_r4{margin: 0 1px;height: 2px}
+		span.blau_mitteText{text-align:center;font-size: x-large;color: #000; background-color: #0085D0;width:100%;display:block;}
+	
+		/* Knopf Gruen */
+		b.gruen_rtop, b.gruen_rbottom{display:block;background-color: transparent;}
+		b.gruen_rtop b, b.gruen_rbottom b{display:block;height: 1px; overflow: hidden; background-color: #00EE47;}
+		b.gruen_r1{margin: 0 5px}
+		b.gruen_r2{margin: 0 3px}
+		b.gruen_r3{margin: 0 2px}
+		b.gruen_rtop b.gruen_r4, b.gruen_rbottom b.gruen_r4{margin: 0 1px;height: 2px}
+		span.gruen_mitteText{ text-align:center;font-size: x-large;color: #000; background-color: #00EE47;width:100%;display:block;}
+		
+		/* Knopf Rot */
+		b.rot_rtop, b.rot_rbottom{display:block;background-color: transparent;}
+		b.rot_rtop b, b.rot_rbottom b{display:block;height: 1px; overflow: hidden; background-color: #FF0000;}
+		b.rot_r1{margin: 0 5px}
+		b.rot_r2{margin: 0 3px}
+		b.rot_r3{margin: 0 2px}
+		b.rot_rtop b.rot_r4, b.rot_rbottom b.rot_r4{margin: 0 1px;height: 2px}
+		span.rot_mitteText{ text-align:center;font-size: x-large;color: #000; background-color: #FF0000;width:100%;display:block;}
+		
+		/* Knopf Orange */
+		b.orange_rtop, b.orange_rbottom{display:block;background-color: transparent;}
+		b.orange_rtop b, b.orange_rbottom b{display:block;height: 1px; overflow: hidden; background-color: #FFA500;}
+		b.orange_r1{margin: 0 5px}
+		b.orange_r2{margin: 0 3px}
+		b.orange_r3{margin: 0 2px}
+		b.orange_rtop b.orange_r4, b.orange_rbottom b.orange_r4{margin: 0 1px;height: 2px}
+		span.orange_mitteText{ text-align:center;font-size: x-large;color: #000; background-color: #FFA500;width:100%;display:block;}
+	
+	
+		/* Diverse Hilfs css */	
+		.cursor_hand {cursor:pointer;white-space : nowrap;}
+		.ausblenden {display:none;}
+		.einblenden {display:block;}	
+		.footer_zeile {color: silver;}
+		.error_zeile {color: red;font-size: medium;}
+		.news_zeile {font-size: xx-small;}
+		 span.error_text{padding:10px 10px 10px 10px; text-align:center;font-size: xx-large;color: #FFF; background-color: #FF0000;width:100%;display:block;}
+	
+		/* Orte - Raum Auswahlliste */
+		 table.ort_liste{height:100%;}	
+		
+		/* Orte - Raum Auswahlliste */
+		 table.raum_auswahlliste{width:100%;}
+	
+		/* Raumanzeige Belegung */ 
+		 table.raum_liste { background-color: #CCC;width:100%;border: 1px inset #FFF;}
+		 table.raum_liste tr{border: 0px;background-color: #FFF;}
+		 table.raum_liste td{border: 0px;width:10%;  }
+	
+		 /* Raumanzeige Belegung je Tag */ 
+		 table.raum_liste_detail {border:0px;width:100%;}
+		 table.raum_liste_detail tr{border:0px;}	 
+		 table.raum_liste_detail th{color:#FFF;padding-bottom : 2px; padding-top : 2px; background-color: #009e84;font-weight: bold;font-size:smaller;}
+		 table.raum_liste_detail td{padding-left:2px; padding-bottom : 2px; padding-top : 2px; font-size:smaller;}
+	
+		 table.raum_liste_detail .raum_liste_detail_stundenplan_aktuell {height:50px;background-color: yellow;}
+		 table.raum_liste_detail .raum_liste_detail_stundenplan_normal {height: 50px;background-color: #0085D0;}
+	
+		/* Stundenplan */ 
+		 
+		 table.stundenplan {border:0px;}
+		
+	 	 table.stundenplan tr{height: 20px;}
+
+		 table.stundenplan th{color:#FFF;background-color: #009e84;font-weight: bold;border: 1px solid #FFF;font-size:smaller;}
+		 table.stundenplan td{background-color: #FFF;border: 0px;font-size:smaller;}
+		
+		 table.stundenplan .stundenplan_stunden_detail {color:#FFF;vertical-align: top;font-size:xx-small;font-weight: bold;vertical-align: top;padding: 4px 4px 4px 4px;text-align:center;background-color: #009e84;}
+		 table.stundenplan .stundenplan_detail_aktuell {width:14%;vertical-align: top;font-size:x-small;background-color: yellow;}
+		 table.stundenplan .stundenplan_detail_normal {width:14%;vertical-align: top;font-size:x-small;background-color: #0085D0;}
+	
+	
+		/* Meine Persoenlichendaten */ 
+	
+		 table.persoenlichedaten {border:0px;background-color: #FFF; 	font-size: large; }
+		 .persoenlichedaten_titel {background-color: #009e84; padding: 4px 4px 4px 4px;}
+		 .persoenlichedaten_wert {background-color: #EFEFEF; padding: 4px 4px 4px 4px;}
