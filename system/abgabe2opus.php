@@ -81,7 +81,7 @@ $qry="SELECT tbl_fachbereich.bezeichnung as fb_bez, tbl_lehrveranstaltung.studie
 	JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
 	JOIN lehre.tbl_lehrfach USING(lehrfach_id) 
 	JOIN public.tbl_fachbereich USING(fachbereich_kurzbz) 
-	WHERE tbl_projektarbeit.note>0 AND tbl_projektarbeit.note<5 
+	WHERE tbl_projektarbeit.note>0 AND tbl_projektarbeit.note<5 AND tbl_projektarbeit.freigegeben 
 	AND abgabedatum>".mktime(0, 0, 0, date('m')-3, date('d'), date('Y'));
 
 if($erg=pg_query($conn, $qry))
@@ -104,11 +104,11 @@ if($erg=pg_query($conn, $qry))
 				{
 					if(trim($verfasser)=='')
 					{
-						$verfasser=trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost);
+						$verfasser=trim($row_std->nachname.", ".$row_std->vorname);
 					}
 					else 
 					{
-						$verfasser.=" , ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost);
+						$verfasser.=" , ".trim($row_std->nachname.", ".$row_std->vorname);
 					}
 				}
 			}
@@ -136,11 +136,11 @@ if($erg=pg_query($conn, $qry))
 				{
 					if(trim($begutachter1)=='')
 					{
-						$begutachter1=trim($row_bet->titelpre." ".$row_bet->vorname." ".$row_bet->nachname." ".$row_bet->titelpost);
+						$begutachter1=trim($row_bet->nachname.", ".$row_bet->vorname);
 					}
 					else 
 					{
-						$begutachter1.=" , ".trim($row_bet->titelpre." ".$row_bet->vorname." ".$row_bet->nachname." ".$row_bet->titelpost);
+						$begutachter1.=" , ".trim($row_bet->nachname.", ".$row_bet->vorname);
 					}
 				}
 			}
@@ -293,86 +293,97 @@ if($erg=pg_query($conn, $qry))
 					$row_opus=$row_src->source+1;
 				}
 			}
-			$qry_ins="INSERT INTO opus 
-				(source_opus, title, title_en, publisher_university, type, stg_nr, datum, begutachter1, begutachter2, subject_swd, 
-				subject_uncontrolled_german, subject_uncontrolled_english, description, description2, description_lang, description2_lang, 
-				sachgruppe_ddc, date_year, seitenanzahl, studiensemester_kurzbz, projektarbeit_id, language, bereich_id, date_creation) values 
-				('".$row_opus."', '".addslashes($row->titel)."', '".addslashes($row->titel_english)."', 'FHTW', '".$typ."', '".$stg."', '".$row->abgabedatum."', '".addslashes($begutachter1)."', '".addslashes($begutachter2)."', '".addslashes($row->kontrollschlagwoerter)."', 
-				'".addslashes($row->schlagwoerter)."', '".addslashes($row->schlagwoerter_en)."', '".addslashes($row->abstract)."', '".addslashes($row->abstract_en)."', 'ger', 'eng', 
-				'000', '".$datum_obj->formatDatum($row->abgabedatum,'Y')."', '".$row->seitenanzahl."', '".$row->studiensemester_kurzbz."', '".$row->projektarbeit_id."', 'ger', '".$bereich."', UNIX_TIMESTAMP())";
-			$qry_cre="INSERT INTO opus_autor (source_opus, creator_name, reihenfolge) VALUES ('".$row_opus."', '".$verfasser."', '1')";
-			$qry_inst="INSERT INTO opus_inst (source_opus, inst_nr) VALUES ('".$row_opus."', '".$institut."')";
-			
-			$opus_url.="/".$datum_obj->formatDatum($row->abgabedatum,'Y')."/".$row_opus."/pdf/";
-			
-			$qry="START TRANSACTION";
-
-			//echo $qry.$qry_ins.$qry_cre.$qry_inst;
-			if(!$result=mysql_query($qry))
+			$qry_chk="SELECT projektarbeit_id FROM opus WHERE projektarbeit_id=".$row->projektabeit_id.";";
+			if(!$result_chk=mysql_query($qry_chk))
 			{
-				echo nl2br("\n\nTransaktion nicht begonnen! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext));
-			}
-			else 
-			{
-				if(!$result=mysql_query($qry_ins))
+				if(mysql_num_rows($result_chk)>0)
 				{
-					echo nl2br("\n\nTransaktion abgebrochen! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext));
-					mysql_query('ROLLBACK',$conn_ext);
+					//Datensatz bereits eingetragen
 				}
 				else 
 				{
-					if(!$result=mysql_query($qry_cre))
+					$qry_ins="INSERT INTO opus 
+						(source_opus, title, title_en, publisher_university, type, stg_nr, datum, begutachter1, begutachter2, subject_swd, 
+						subject_uncontrolled_german, subject_uncontrolled_english, description, description2, description_lang, description2_lang, 
+						sachgruppe_ddc, date_year, seitenanzahl, studiensemester_kurzbz, projektarbeit_id, language, bereich_id, date_creation) values 
+						('".$row_opus."', '".addslashes($row->titel)."', '".addslashes($row->titel_english)."', 'FHTW', '".$typ."', '".$stg."', '".$row->abgabedatum."', '".addslashes($begutachter1)."', '".addslashes($begutachter2)."', '".addslashes($row->kontrollschlagwoerter)."', 
+						'".addslashes($row->schlagwoerter)."', '".addslashes($row->schlagwoerter_en)."', '".addslashes($row->abstract)."', '".addslashes($row->abstract_en)."', 'ger', 'eng', 
+						'000', '".$datum_obj->formatDatum($row->abgabedatum,'Y')."', '".$row->seitenanzahl."', '".$row->studiensemester_kurzbz."', '".$row->projektarbeit_id."', 'ger', '".$bereich."', UNIX_TIMESTAMP())";
+					$qry_cre="INSERT INTO opus_autor (source_opus, creator_name, reihenfolge) VALUES ('".$row_opus."', '".$verfasser."', '1')";
+					$qry_inst="INSERT INTO opus_inst (source_opus, inst_nr) VALUES ('".$row_opus."', '".$institut."')";
+					
+					$opus_url.="/".$datum_obj->formatDatum($row->abgabedatum,'Y')."/".$row_opus."/pdf/";
+					
+					$qry="START TRANSACTION";
+		
+					//echo $qry.$qry_ins.$qry_cre.$qry_inst;
+					if(!$result=mysql_query($qry))
 					{
-						echo nl2br("\n\nTransaktion abgebrochen!! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext));
-						if(!$result=mysql_query('ROLLBACK',$conn_ext))
-						{
-							echo nl2br("\n\nRollback nicht durchgef&uuml;hrt. \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext));
-						}
+						echo nl2br("\n\nTransaktion nicht begonnen! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext));
 					}
 					else 
 					{
-						if(!$result=mysql_query($qry_inst))
+						if(!$result=mysql_query($qry_ins))
 						{
-							echo nl2br("\n\nTransaktion abgebrochen!!! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext));
+							echo nl2br("\n\nTransaktion abgebrochen! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext));
 							mysql_query('ROLLBACK',$conn_ext);
 						}
 						else 
 						{
-							//Kopieren der Abgabedatei
-							$qry_file="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$row->projektabgabe_id."' and projektabgabetyp_kurzbz='end' ORDER BY abgabedatum desc LIMIT 1";
-							if($result=mysql_query($qry))
+							if(!$result=mysql_query($qry_cre))
 							{
-								if($row_inst=mysql_fetch_object($result_inst))
+								echo nl2br("\n\nTransaktion abgebrochen!! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext));
+								if(!$result=mysql_query('ROLLBACK',$conn_ext))
 								{
-									copy($_SERVER['DOCUMENT_ROOT'].PAABGABE_PATH.$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf',$opus_url.$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf');
-									//Überprüfen, ob Datei wirklich kopiert wurde
-									if(isfile($opus_url.$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf'))
+									echo nl2br("\n\nRollback nicht durchgef&uuml;hrt. \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext));
+								}
+							}
+							else 
+							{
+								if(!$result=mysql_query($qry_inst))
+								{
+									echo nl2br("\n\nTransaktion abgebrochen!!! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext));
+									mysql_query('ROLLBACK',$conn_ext);
+								}
+								else 
+								{
+									//Kopieren der Abgabedatei
+									$qry_file="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$row->projektabgabe_id."' and projektabgabetyp_kurzbz='end' ORDER BY abgabedatum desc LIMIT 1";
+									if($result=mysql_query($qry))
 									{
-										//COMMIT durchführen
-										if(!$result=mysql_query('COMMIT',$conn_ext))
+										if($row_inst=mysql_fetch_object($result_inst))
+										{
+											copy($_SERVER['DOCUMENT_ROOT'].PAABGABE_PATH.$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf',$opus_url.$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf');
+											//Überprüfen, ob Datei wirklich kopiert wurde
+											if(isfile($opus_url.$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf'))
+											{
+												//COMMIT durchführen
+												if(!$result=mysql_query('COMMIT',$conn_ext))
+												{
+													mysql_query('ROLLBACK',$conn_ext);
+													echo "Commit nicht ausgef&um;hrt! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
+												}
+											}
+											else 
+											{
+												mysql_query('ROLLBACK',$conn_ext);
+												echo "Datei wurde nicht kopiert! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
+											}
+										}
+										else 
 										{
 											mysql_query('ROLLBACK',$conn_ext);
-											echo "Commit nicht ausgef&um;hrt! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
+											echo "Abgabe konnte nicht geladen werden! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
 										}
 									}
 									else 
 									{
 										mysql_query('ROLLBACK',$conn_ext);
-										echo "Datei wurde nicht kopiert! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
-									}
-								}
-								else 
-								{
-									mysql_query('ROLLBACK',$conn_ext);
-									echo "Abgabe konnte nicht geladen werden! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
+										echo "Eintragung der Abgabe nicht gefunden! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
+									}	
+									
 								}
 							}
-							else 
-							{
-								mysql_query('ROLLBACK',$conn_ext);
-								echo "Eintragung der Abgabe nicht gefunden! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
-							}	
-							
 						}
 					}
 				}
