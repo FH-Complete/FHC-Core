@@ -39,6 +39,7 @@
 	
 $getuid=get_uid();
 $htmlstr = "";
+
 	
 $sql_query = "SELECT * FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) * FROM lehre.tbl_projektarbeit LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id) 
 			LEFT JOIN public.tbl_benutzer on(uid=student_uid) 
@@ -75,9 +76,9 @@ else
 	$i = 0;
 	while($row=pg_fetch_object($erg))
 	{
-		$htmlstr .= "   <tr>\n";
+		$htmlstr .= "   <tr class='liste".($i%2)."'>\n";
 		$htmlstr .= "       <td><a href='abgabe_lektor_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&titel=".$row->titel."' target='al_detail'>".$row->uid."</a></td>\n";
-		$htmlstr .= "	   <td align= center><a href='mailto:$row->uid@".DOMAIN."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung'><img src='../../../skin/images/email.png' alt='email'></a></td>";
+		$htmlstr .= "	    <td align= center><a href='mailto:$row->uid@".DOMAIN."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung'><img src='../../../skin/images/email.png' alt='email'></a></td>";
 		$htmlstr .= "       <td>".$row->vorname."</td>\n";
 		$htmlstr .= "       <td>".$row->nachname."</td>\n";
 		$htmlstr .= "       <td>".$row->projekttyp_kurzbz."</td>\n";
