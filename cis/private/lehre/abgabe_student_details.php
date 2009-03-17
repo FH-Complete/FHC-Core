@@ -57,7 +57,6 @@ if(!isset($_POST['uid']))
 	$seitenanzahl = '';
 	$abgabedatum = '01.01.1980';
 	$work_lang='German';
-	$abstract_lang='German';
 }
 else 
 {
@@ -76,7 +75,6 @@ else
 	$kontrollschlagwoerter = (isset($_POST['kontrollschlagwoerter'])?$_POST['kontrollschlagwoerter']:'-1');
 	$schlagwoerter = (isset($_POST['schlagwoerter'])?$_POST['schlagwoerter']:'-1');
 	$schlagwoerter_en = (isset($_POST['schlagwoerter_en'])?$_POST['schlagwoerter_en']:'-1');
-	$abstract_lang = (isset($_POST['abstract_lang'])?$_POST['abstract_lang']:'German');
 	$abstract = (isset($_POST['abstract'])?$_POST['abstract']:'-1');
 	$abstract_en = (isset($_POST['abstract_en'])?$_POST['abstract_en']:'-1');
 	$seitenanzahl = (isset($_POST['seitenanzahl'])?$_POST['seitenanzahl']:'-1');
@@ -117,11 +115,10 @@ if($command=='add')
 		$qry_upd="UPDATE lehre.tbl_projektarbeit SET
 				seitenanzahl = '".$seitenanzahl."', 
 				abgabedatum = now(),
-				work_lang = '".addslashes($work_lang)."',  
+				sprache = '".addslashes($work_lang)."',  
 				kontrollschlagwoerter = '".addslashes($kontrollschlagwoerter)."', 
 				schlagwoerter_en = '".addslashes($schlagwoerter_en)."', 
-				schlagwoerter = '".addslashes($schlagwoerter)."', 
-				abstract_lang = '".addslashes($abstract_lang)."', 
+				schlagwoerter = '".addslashes($schlagwoerter)."',  
 				abstract = '".addslashes($abstract)."', 
 				abstract_en = '".addslashes($abstract_en)."' 
 				WHERE projektarbeit_id = '".$projektarbeit_id."'";
@@ -220,32 +217,15 @@ if($command=="update" || $error==true)
 			        $htmlstr .= "</SELECT> \n";
 			    }
 			    $htmlstr .= "</td></tr>\n";
-				$htmlstr .= "<td width='30%'><b>Kontrollierte Schlagw&ouml;rter:</b></td><td width='40%'><input  type='text' name='kontrollschlagwoerter'  id='kontrollschlagwoerter' value='".$kontrollschlagwoerter."' size='60' maxlength='150'></td>
+				$htmlstr .= "<tr><td width='30%'><b>Kontrollierte Schlagw&ouml;rter:*</b></td><td width='40%'><input  type='text' name='kontrollschlagwoerter'  id='kontrollschlagwoerter' value='".$kontrollschlagwoerter."' size='60' maxlength='150'></td>
 					<td  width='30%' align='left'><input type='button' name='SWD' value='    SWD    ' onclick='window.open(\"abgabe_student_swd.php\")'></td></tr>\n";
-				$htmlstr .= "<td><b>Dt. Schlagw&ouml;rter:</b></td><td><input  type='text' name='schlagwoerter' value='".$schlagwoerter."' size='60' maxlength='150'></td></tr>\n";
-				$htmlstr .= "<td><b>Engl. Schlagw&ouml;rter:</b></td><td><input  type='text' name='schlagwoerter_en' value='".$schlagwoerter_en."' size='60' maxlength='150'></td></tr>\n";
-				$htmlstr .= "<td><b>Sprache des Abstracts:</b></td><td>";
-				$sprache = @pg_query($conn, "SELECT sprache FROM tbl_sprache");
-			    $num = pg_num_rows($sprache);
-			    if ($num > 0) 
-			    {
-			        $htmlstr .= "<SELECT NAME=\"abstract_lang\" SIZE=1> \n";
-			        while ($mrow=@pg_fetch_object($sprache)) 
-			        {
-			            $htmlstr .= "<OPTION VALUE=\"$mrow->sprache\"";
-			            if ($mrow->sprache == $abstract_lang) 
-            			{
-            				$htmlstr .= " SELECTED";
-            			}
-			            $htmlstr .= ">$mrow->sprache \n";
-			        }
-			        $htmlstr .= "</SELECT> \n";
-			    }
-			    $htmlstr .= "</td></tr>\n";
-				$htmlstr .= "<td valign='top'><b>Abstract </b>(max. 5000 Zeichen):</td><td><textarea name='abstract' cols='46'  rows='7'>$abstract</textarea></td></tr>\n";
-				$htmlstr .= "<td valign='top'><b>Abstract engl.</b>(max. 5000 Zeichen):</td><td><textarea name='abstract_en' cols='46'  rows='7'>$abstract_en</textarea></td></tr>\n";
-				$htmlstr .= "<td><b>Seitenanzahl:</b></td><td><input  type='text' name='seitenanzahl' value='".$seitenanzahl."' size='5' maxlength='4'></td></tr>\n";
-				$htmlstr .= "<td><input type='submit' name='schick' value='abschicken'></td>";
+				$htmlstr .= "<tr><td><b>Dt. Schlagw&ouml;rter:</b></td><td><input  type='text' name='schlagwoerter' value='".$schlagwoerter."' size='60' maxlength='150'></td></tr>\n";
+				$htmlstr .= "<tr><td><b>Engl. Schlagw&ouml;rter:</b></td><td><input  type='text' name='schlagwoerter_en' value='".$schlagwoerter_en."' size='60' maxlength='150'></td></tr>\n";
+				$htmlstr .= "<tr><td valign='top'><b>Abstract </b>(max. 5000 Zeichen):*</td><td><textarea name='abstract' cols='46'  rows='7'>$abstract</textarea></td></tr>\n";
+				$htmlstr .= "<tr><td valign='top'><b>Abstract engl.</b>(max. 5000 Zeichen):*</td><td><textarea name='abstract_en' cols='46'  rows='7'>$abstract_en</textarea></td></tr>\n";
+				$htmlstr .= "<tr><td><b>Seitenanzahl:*</b></td><td><input  type='text' name='seitenanzahl' value='".$seitenanzahl."' size='5' maxlength='4'></td></tr>\n";
+				$htmlstr .= "<tr></tr><td>&nbsp;</td><tr><td style='font-size:70%'>* Pflichtfeld - bitte immer bef&uuml;llen</td></tr><tr><td>&nbsp;</td></tr>\n";
+				$htmlstr .= "<tr><td><input type='submit' name='schick' value='abschicken'></td>";
 				$htmlstr .= "</tr>\n";
 				$htmlstr .= "</form>\n";
 				$htmlstr .= "</table>\n";	
@@ -310,7 +290,6 @@ if($command!="add")
 			$htmlstr .= "<input type='hidden' name='abstract' value='".$abstract."'>\n";
 			$htmlstr .= "<input type='hidden' name='abstract_en' value='".$abstract_en."'>\n";
 			$htmlstr .= "<input type='hidden' name='seitenanzahl' value='".$seitenanzahl."'>\n";
-			$htmlstr .= "<input type='hidden' name='abstract_lang' value='".$abstract_lang."'>\n";
 			$htmlstr .= "<input type='hidden' name='work_lang' value='".$work_lang."'>\n";
 			$htmlstr .= "<tr id='".$row->projektarbeit_id."'>\n";
 			if(!$row->abgabedatum)
