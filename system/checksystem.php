@@ -35,11 +35,29 @@ if (!$conn = pg_pconnect(CONN_STRING))
 echo '<H1>Systemcheck!</H1>';
 echo '<H2>DB-Updates!</H2>';
 
+// **************** lehre.tbl_projektarbeit.sprache *******************************
+if(!$result = @pg_query($conn, "SELECT sprache FROM lehre.tbl_projektarbeit LIMIT 1;"))
+{
+	$qry = "ALTER TABLE lehre.tbl_projektarbeit ADD COLUMN sprache varchar(16);
+			ALTER TABLE lehre.tbl_projektarbeit ADD CONSTRAINT tbl_projektarbeit_sprache FOREIGN KEY (sprache) references public.tbl_sprache (sprache) on update cascade on delete restrict;
+			";
+			
+	if(!pg_query($conn, $qry))
+		echo '<strong>lehre.tbl_projektarbeit: '.pg_last_error($conn).' </strong><br>';
+	else
+		echo ' lehre.tbl_projektarbeit: spalte sprache hinzugefuegt!<br>';
+}
+
 // **************** public.tbl_sprache.flagge *******************************
 if(!$result = @pg_query($conn, "SELECT flagge FROM public.tbl_sprache LIMIT 1;"))
 {
 	$qry = "ALTER TABLE public.tbl_sprache ADD COLUMN locale varchar(5);
-			ALTER TABLE public.tbl_sprache ADD COLUMN flagge text;";
+			ALTER TABLE public.tbl_sprache ADD COLUMN flagge text;
+			ALTER TABLE public.tbl_sprache ADD CONSTRAINT tbl_sprache_locale UNIQUE (locale);
+			UPDATE public.tbl_sprache SET flagge='47494638396110000b00d50000fafafaf8f8f8ec0000f30000fa3535fda2a2f67272f74b4bf6f6f6fa4444f43333f93c3dfd6b6bff7b7af4f5f5e60000fd8a8afb8a8af74444fe7676f53b3bf41c1cf22e2ef0f0f0f26565f26969fe5e5eeeeeeef85252f95455fdfdfdf98080e2e2e2f97d7df10f0ffb6161f72d2df56e6efc6666f90000fa5d5dfefefee00000fb8585fc4c4cfe8f8ff52323fbfbfbfe9091fd5454f6797adfdfdff95858fe5959fd5151f77676fd7071fb2f2ff62929dd0000fcfcfce9e9e9fd0000ff000021f90400000000002c0000000010000b00000686c09ff0e72bfa4ec8815220f8359e93098ec1308d5034cea1d9d0686a311b2b91581014a42da1006b4120ab4f48763394329f472f95f2f0782f0000010117173d0e207b7e8082840886888a8c818301080e171b883339051111717375771818322a27266566243a2e151522b316a957341d5a121214140a0a16163b4a034cc60fc82a2a3bcc41003b' WHERE sprache='German';
+			UPDATE public.tbl_sprache SET flagge='47494638396110000b00d50000fc5c5cfa5353f5f525f6f62bf42d2dfc6363e6e600fe7273fefe76f31616fdfd00fcfc4cec0000f30000fdfd6df2f213fefe5afbfb45f74b4bfa4444f43333f93c3df0f241f4f53bfd6b6bff7a7af74444ec6855f53b3be50000f83636f10d0df6f630f3f319f90000f4f41ff8f836e00000f9f93cf5c3b1fdfd53f17e57eedf4eede08df52121ecd3d4f9f1d6f5eae2b6bb9dece142f8f44bdfdf00f2f355f4ee57ec5351fc4c4cf2bdb0c0cea8e08c51e4a74aebc94bdd0000fd0000ff000021f90400000000002c0000000010000b00000685c09ff0e72bfa44c88692c1f8659e99c301832914008180a4990178b3b7c9a4e2a110b60a04045253c9221113093410c80c69082db55959e474022317780828271b2d383173752321840a0e0b2e3a362f2a818f0f9193393c3b30168e210f0f20332205636404042c2c09091f1f0425aa5f5a1a1a1c1c1466043d4a0d4cc51dc725253dcb41003b' WHERE sprache='Espanol';
+			UPDATE public.tbl_sprache SET flagge='47494638396110000b00c40000fe514e5065b100146d90b6d3f9918dcdd5eaf83435984b69fdfdfb182b8ebacfedbf99b5a1add6fcaeafea6055f9857c6183c18a99cffe63627b9bc4ffebea3c52ac851b377184c7dbe1f4ac617fe1bedf6473b5c2c4ddd9ddedfefeffffffff21f90400000000002c0000000010000b0000058160a44c50d96559170415744c4ce3610ce311841745dc830c1045a3f1897c2492cfa541f83012104644f3f81c01474aa17249743cd630001bfe780a190272cc36b8dd00cbb7fc718711f86d2450a024ed750b090102150c1f0f041b7506081508040e1102031e0f1c17171e63082b1c080e1b13070109a60516160502ac09030921003b' WHERE sprache='English';
+			";
 			
 	if(!pg_query($conn, $qry))
 		echo '<strong>public.tbl_sprache: '.pg_last_error($conn).' </strong><br>';
@@ -955,7 +973,7 @@ $tabellen=array(
 	"lehre.tbl_moodle"  => array("lehrveranstaltung_id","lehreinheit_id","moodle_id","mdl_course_id","studiensemester_kurzbz","gruppen","insertamum","insertvon"),
 	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe"),
 	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe"),
-	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","titel_english","seitenanzahl","abgabedatum","kontrollschlagwoerter","schlagwoerter","schlagwoerter_en","abstract", "abstract_en"),
+	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","titel_english","seitenanzahl","abgabedatum","kontrollschlagwoerter","schlagwoerter","schlagwoerter_en","abstract", "abstract_en", "sprache"),
 	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung"),
 	"lehre.tbl_pruefung"  => array("pruefung_id","lehreinheit_id","student_uid","mitarbeiter_uid","note","pruefungstyp_kurzbz","datum","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id"),
