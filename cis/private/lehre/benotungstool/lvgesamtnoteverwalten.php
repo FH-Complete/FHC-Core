@@ -788,7 +788,7 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 		{
 			$lv = new lehrveranstaltung($conn, $lvid);
 			$sg = new studiengang($conn, $lv->studiengang_kz);
-			$debug_adressen = $user."@".DOMAIN;
+			$lektor_adresse = $user."@".DOMAIN;
 			$adressen = $sg->email.", ".$user."@".DOMAIN;
 			
 			
@@ -799,6 +799,7 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 			$mail = new mail($adressen, 'vilesci@'.DOMAIN, 'Notenfreigabe '.$lv->bezeichnung,'');
 			$htmlcontent="<html><body><b>".$lv->bezeichnung." - ".$stsem."</b> (".$lv->semester.". Sem.) <br><br>Benutzer ".$freigeber." (".$mit->kurzbz.") hat die LV-Noten f&uuml;r folgende Studenten freigegeben:<br><br>".$studlist."<br>Mail wurde verschickt an: ".$adressen."</body></html>";
 			$mail->setHTMLContent($htmlcontent);
+			$mail->setReplyTo($lektor_adresse);
 			$mail->send();
 			//mail($adressen,"Notenfreigabe ".$lv->bezeichnung,"<html><body><b>".$lv->bezeichnung." - ".$stsem."</b> (".$lv->semester.". Sem.) <br><br>Benutzer ".$freigeber." (".$mit->kurzbz.") hat die LV-Noten f&uuml;r folgende Studenten freigegeben:<br><br>".$studlist."<br>Mail wurde verschickt an: ".$adressen."</body></html>","From: vilesci@".DOMAIN."\nContent-Type: text/html\n");
 		}	
