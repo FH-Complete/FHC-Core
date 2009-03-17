@@ -3096,7 +3096,9 @@ function StudentNotenTreeSelectDifferent()
 {
 	var zeugnistree = document.getElementById("student-noten-tree");
 	var lvgesamttree = document.getElementById("student-lvgesamtnoten-tree");
-	
+	//bestehende markierung entfernen
+	lvgesamttree.view.selection.clearSelection();
+
 	if(StudentNotenTreeloaded && StudentGesamtNotenTreeloaded)
 	{
 		if(lvgesamttree.view)
@@ -3130,7 +3132,7 @@ function StudentNotenTreeSelectDifferent()
 				col = zeugnistree.columns ? zeugnistree.columns["student-noten-tree-benotungsdatum-iso"] : "student-noten-tree-benotungsdatum-iso";
 				var zeugnisbenotungsdatum=zeugnistree.view.getCellText(j,col);
 				
-				if(zeugnislehrveranstaltung_id==lvgesamtlehrveranstaltung_id && zeugnisnote==lvgesamtnote)
+				if(zeugnislehrveranstaltung_id==lvgesamtlehrveranstaltung_id && zeugnisnote==lvgesamtnote && zeugnisbenotungsdatum==lvgesamtbenotungsdatum)
 				{
 					found=true;
 					break;
