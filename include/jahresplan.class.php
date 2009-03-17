@@ -646,13 +646,16 @@ class jahresplan extends postgre_sql
 			$this->setError('Keine Veranstaltungs ID gefunden !');
 			return false;
 		}	
-		
+
+		if (!isset($param['veranstaltungskategorie_kurzbz']) || empty($param['veranstaltungskategorie_kurzbz']) ) 
+			$param['veranstaltungskategorie_kurzbz']=$this->getVeranstaltungskategorie_kurzbz();
 		if (empty($param['veranstaltungskategorie_kurzbz']) ) 
 		{
 			$this->setError('Keine Veranstaltungskategorie gefunden !');
 			return false;
 		}	
-
+		$this->setVeranstaltungskategorie_kurzbz($param['veranstaltungskategorie_kurzbz']);
+		
 		$bTmpMerkNew=$this->getNewRecord();	
 		// Check ob Daten vorhanden sind - Update wenn key_old belegt, 
 		// oder Neuanlage und es duerfen keine Daten vorhanden sein
@@ -838,7 +841,6 @@ class jahresplan extends postgre_sql
 			$iTmpMax=$this->getResultSQL();
 			$this->setVeranstaltung_id($iTmpMax->max);
 			$param['veranstaltung_id']=$this->getVeranstaltung_id();
-
 		}
        	elseif (!$this->dbQuery())
 		{
@@ -874,6 +876,8 @@ class jahresplan extends postgre_sql
 		$cTmpVeranstaltung_id=$this->getVeranstaltung_id();
 		
 		$cTmpVeranstaltungskategorie_kurzbz="";
+		if (!isset($param['veranstaltungskategorie_kurzbz']) || empty($param['veranstaltungskategorie_kurzbz']) ) 
+			$param['veranstaltungskategorie_kurzbz']=$this->getVeranstaltungskategorie_kurzbz();
 		if (is_array($param) && isset($param['veranstaltungskategorie_kurzbz']))
 			$this->setVeranstaltungskategorie_kurzbz($param['veranstaltungskategorie_kurzbz']);
 		$cTmpVeranstaltungskategorie_kurzbz=$this->getVeranstaltungskategorie_kurzbz();
@@ -909,13 +913,13 @@ class jahresplan extends postgre_sql
 			else 
 				$cTmpSQL.=" WHERE ".$cSchemaSQL.$constTableStrukturSQL.".veranstaltung_id =".$cTmpVeranstaltungskategorie_kurzbz."; ";
 			$cTmpSQL.=" COMMIT; ";   
-
+	
 		$this->setStringSQL($cTmpSQL);
        	$this->setResultSQL(null);
        	if (!$this->dbQuery())
 		{
-			$this->setError($cTmpSQL);
-         	return false;
+			if ($this->getError())
+        	 	return false;
 		}
 		// Beim Lesen ist ein Fehler aufgetreten
 		if (!$this->loadVeranstaltung()) 
@@ -928,7 +932,7 @@ class jahresplan extends postgre_sql
    	unset($cTmpSQL);
 
 	$this->setResultSQL(null);       
-	return $this->getVeranstaltung();
+	return true;
 }
 
 	   
@@ -1000,6 +1004,10 @@ class jahresplan extends postgre_sql
 			$cTmpSQL.=", to_char(tbl_veranstaltung.start, 'Q') as \"start_quartal\" ";
 			$cTmpSQL.=", to_char(tbl_veranstaltung.ende, 'Q') as \"ende_quartal\" ";
 			
+			$cTmpSQL.=", EXTRACT(EPOCH FROM tbl_veranstaltung.start) as \"start_timestamp\" ";
+			$cTmpSQL.=", EXTRACT(EPOCH FROM tbl_veranstaltung.ende) as \"ende_timestamp\" ";
+
+
 			$cTmpSQL.=", to_char(tbl_veranstaltung.start, 'DD.MM.YYYY') as \"start_datum\" ";
 			$cTmpSQL.=", to_char(tbl_veranstaltung.ende, 'DD.MM.YYYY') as \"ende_datum\" ";
 
@@ -1008,12 +1016,15 @@ class jahresplan extends postgre_sql
 
 			$cTmpSQL.=", to_char(tbl_veranstaltung.insertamum, 'DD.MM.YYYY') as \"insertamum_datum\" ";
 			$cTmpSQL.=", to_char(tbl_veranstaltung.insertamum, 'HH24:MI') as \"insertamum_zeit\" ";
+			$cTmpSQL.=", EXTRACT(EPOCH FROM tbl_veranstaltung.insertamum) as \"insertamum_timestamp\" ";
 
 			$cTmpSQL.=", to_char(tbl_veranstaltung.updateamum, 'DD.MM.YYYY') as \"updateamum_datum\" ";
 			$cTmpSQL.=", to_char(tbl_veranstaltung.updateamum, 'HH24:MI') as \"updateamum_zeit\" ";
+			$cTmpSQL.=", EXTRACT(EPOCH FROM tbl_veranstaltung.updateamum) as \"updateamum_timestamp\" ";
 		
 			$cTmpSQL.=", to_char(tbl_veranstaltung.freigabeamum, 'DD.MM.YYYY') as \"freigabeamum_datum\" ";
 			$cTmpSQL.=", to_char(tbl_veranstaltung.freigabeamum, 'HH24:MI') as \"freigabeamum_zeit\" ";
+			$cTmpSQL.=", EXTRACT(EPOCH FROM tbl_veranstaltung.freigabeamum) as \"freigabeamum_timestamp\" ";
 
      		$cTmpSQL.=",tbl_veranstaltungskategorie.*,tbl_veranstaltungskategorie.veranstaltungskategorie_kurzbz as kategorie_kurzbz  ";
 
@@ -1077,10 +1088,6 @@ class jahresplan extends postgre_sql
 		}
 
 
-	 // Start ID==0 ist nur bei einer Neuanlage
-	if ($cTmpVeranstaltung_id!='0' )
-	{
-	
 		if (!empty($cTmpStart) && empty($cTmpEnde) )
 	   		$cTmpSQL.=" AND ".$cSchemaSQL."tbl_veranstaltung.start=to_timestamp(".$cTmpStart.") ";	
 		else if (empty($cTmpStart) && !empty($cTmpEnde) )
@@ -1097,9 +1104,10 @@ class jahresplan extends postgre_sql
 	   		$cTmpSQL.=" AND to_char(".$cSchemaSQL."tbl_veranstaltung.ende, 'YYYY')='".$cTmpEnde_jahr."'";	
 		elseif (empty($cTmpStart_jahr) && !empty($cTmpEnde_jahr) )
 		{
-	   		$cTmpSQL.=" AND to_char(".$cSchemaSQL."tbl_veranstaltung.start, 'YYYY')>='".$cTmpStart_jahr."'";	
-	   		$cTmpSQL.=" AND to_char(".$cSchemaSQL."tbl_veranstaltung.ende, 'YYYY')<='".$cTmpEnde_jahr."'";	
+	   		$cTmpSQL.=" AND '".$cTmpStart_jahr."' between to_char(".$cSchemaSQL."tbl_veranstaltung.start, 'YYYY') AND to_char(".$cSchemaSQL."tbl_veranstaltung.ende, 'YYYY') ";	
+	   		$cTmpSQL.=" AND '".$cTmpEnde_jahr."' between to_char(".$cSchemaSQL."tbl_veranstaltung.start, 'YYYY') AND to_char(".$cSchemaSQL."tbl_veranstaltung.ende, 'YYYY') ";	
 		}
+
 			
 		if (!empty($cTmpStart_jahr_monat) && empty($cTmpEnde_jahr_monat) )
 	   		$cTmpSQL.=" AND '".$cTmpStart_jahr_monat."' between to_char(".$cSchemaSQL."tbl_veranstaltung.start, 'YYYYMM') and  to_char(".$cSchemaSQL."tbl_veranstaltung.ende, 'YYYYMM')";	
@@ -1107,10 +1115,9 @@ class jahresplan extends postgre_sql
 	   		$cTmpSQL.=" AND '".$cTmpStart_jahr_monat."' between to_char(".$cSchemaSQL."tbl_veranstaltung.start, 'YYYYMM') and  to_char(".$cSchemaSQL."tbl_veranstaltung.ende, 'YYYYMM')";	
 		elseif (!empty($cTmpStart_jahr_monat) && !empty($cTmpEnde_jahr_monat) )
 		{
-	   		$cTmpSQL.=" AND to_char(".$cSchemaSQL."tbl_veranstaltung.start, 'YYYYMM')>='".$cTmpStart_jahr_monat."'";	
-	   		$cTmpSQL.=" AND to_char(".$cSchemaSQL."tbl_veranstaltung.ende, 'YYYYMM')<='".$cTmpEnde_jahr_monat."'";	
+	   		$cTmpSQL.=" AND '".$cTmpStart_jahr_monat."' between to_char(".$cSchemaSQL."tbl_veranstaltung.start, 'YYYYMM') AND to_char(".$cSchemaSQL."tbl_veranstaltung.ende, 'YYYYMM') ";	
+	   		$cTmpSQL.=" AND '".$cTmpEnde_jahr_monat."' between to_char(".$cSchemaSQL."tbl_veranstaltung.start, 'YYYYMM') AND to_char(".$cSchemaSQL."tbl_veranstaltung.ende, 'YYYYMM') ";	
 		}
-			
 			
 		if (!empty($cTmpStart_jahr_woche) && empty($cTmpEnde_jahr_woche) )
 	   		$cTmpSQL.=" AND '".$cTmpStart_jahr_woche."' between to_char(".$cSchemaSQL."tbl_veranstaltung.start, 'YYYYIW'') and  to_char(".$cSchemaSQL."tbl_veranstaltung.ende, 'YYYYIW'')";	
@@ -1118,8 +1125,8 @@ class jahresplan extends postgre_sql
 	   		$cTmpSQL.=" AND '".$cTmpStart_jahr_woche."' between to_char(".$cSchemaSQL."tbl_veranstaltung.start, 'YYYYIW'') and  to_char(".$cSchemaSQL."tbl_veranstaltung.ende, 'YYYYIW'')";	
 		elseif (!empty($cTmpStart_jahr_woche) && !empty($cTmpEnde_jahr_woche) )
 		{
-	   		$cTmpSQL.=" AND to_char(".$cSchemaSQL."tbl_veranstaltung.start, 'YYYYIW'')>='".$cTmpStart_jahr_woche."'";	
-	   		$cTmpSQL.=" AND to_char(".$cSchemaSQL."tbl_veranstaltung.ende, 'YYYYIW'')<='".$cTmpEnde_jahr_woche."'";	
+	   		$cTmpSQL.=" AND '".$cTmpStart_jahr_woche."' between to_char(".$cSchemaSQL."tbl_veranstaltung.start, 'YYYYIW'') AND to_char(".$cSchemaSQL."tbl_veranstaltung.ende, 'YYYYIW'') ";	
+	   		$cTmpSQL.=" AND '".$cTmpEnde_jahr_woche."' between to_char(".$cSchemaSQL."tbl_veranstaltung.start, 'YYYYIW'') AND to_char(".$cSchemaSQL."tbl_veranstaltung.ende, 'YYYYIW'') ";	
 		}			
 					
 		if (!empty($cTmpStart_jahr_monat_tag) && empty($cTmpEnde_jahr_monat_tag) )
@@ -1128,8 +1135,8 @@ class jahresplan extends postgre_sql
 	   		$cTmpSQL.=" AND to_char(".$cSchemaSQL."tbl_veranstaltung.ende, 'YYYYMMDD')<='".$cTmpEnde_jahr_monat_tag."'";	
 		elseif (!empty($cTmpStart_jahr_monat_tag) && !empty($cTmpEnde_jahr_monat_tag) )
 		{
-	   		$cTmpSQL.=" AND to_char(".$cSchemaSQL."tbl_veranstaltung.start, 'YYYYMMDD')>='".$cTmpStart_jahr_monat_tag."'";	
-	   		$cTmpSQL.=" AND to_char(".$cSchemaSQL."tbl_veranstaltung.ende, 'YYYYMMDD')<='".$cTmpEnde_jahr_monat_tag."'";	
+	   		$cTmpSQL.=" AND '".$cTmpStart_jahr_monat_tag."' between to_char(".$cSchemaSQL."tbl_veranstaltung.start, 'YYYYMMDD') AND to_char(".$cSchemaSQL."tbl_veranstaltung.ende, 'YYYYMMDD') ";	
+	   		$cTmpSQL.=" AND '".$cTmpEnde_jahr_monat_tag."' between to_char(".$cSchemaSQL."tbl_veranstaltung.start, 'YYYYMMDD') AND to_char(".$cSchemaSQL."tbl_veranstaltung.ende, 'YYYYMMDD') ";	
 		}
 
 		if ($cTmpSuchtext)
@@ -1139,7 +1146,6 @@ class jahresplan extends postgre_sql
 			$cTmpSuchtext=str_replace('%%','%',addslashes(strtoupper(trim($cTmpSuchtext))));
 	   		$cTmpSQL.=" AND ( UPPER(".$cSchemaSQL."tbl_veranstaltungskategorie.veranstaltungskategorie_kurzbz) like E'".$cTmpSuchtext."'
 						OR   UPPER(".$cSchemaSQL."tbl_veranstaltungskategorie.bezeichnung) like E'".$cTmpSuchtext."'
-						OR UPPER(".$cSchemaSQL."tbl_veranstaltung.titel) like E'".$cTmpSuchtext."'
 						OR UPPER(".$cSchemaSQL."tbl_veranstaltung.beschreibung) like E'".$cTmpSuchtext."'
 						OR UPPER(".$cSchemaSQL."tbl_veranstaltung.inhalt) like E'".$cTmpSuchtext."' ) ";	
 		}		
@@ -1147,25 +1153,18 @@ class jahresplan extends postgre_sql
 		// Kategorien nur fuer Mietarbeiter		
 		if (!$Veranstaltungkategorie_mitarbeiter)
     	   	$cTmpSQL.=" AND NOT UPPER(".$cSchemaSQL."tbl_veranstaltungskategorie.veranstaltungskategorie_kurzbz) like '*%' ";	
-
 	
 		if (!empty($cTmpStart) || !empty($cTmpEnde) || !empty($cTmpStart_jahr) || !empty($cTmpEnde_jahr) || !empty($cTmpStart_jahr_monat) || !empty($cTmpEnde_jahr_monat)  || !empty($cTmpStart_jahr_monat_tag) || !empty($cTmpEnde_jahr_monat_tag) )
-    	   		$cTmpSQL.=" ORDER BY ".$cSchemaSQL."tbl_veranstaltung.start, tbl_veranstaltungskategorie.bezeichnung,tbl_veranstaltung.titel  ";	
+    	   		$cTmpSQL.=" ORDER BY ".$cSchemaSQL."tbl_veranstaltung.start, tbl_veranstaltungskategorie.bezeichnung  ";	
 		else
-	     		$cTmpSQL.=" ORDER BY ".$cSchemaSQL."tbl_veranstaltungskategorie.bezeichnung, tbl_veranstaltung.start, tbl_veranstaltung.titel  ";	
-	} // Ende ID==0
+	     		$cTmpSQL.=" ORDER BY ".$cSchemaSQL."tbl_veranstaltungskategorie.bezeichnung, tbl_veranstaltung.start  ";	
 
-   if ($cTmpVeranstaltung_id=='0') // Kennzeichen Neuanlage
-       $cTmpSQL.=" OFFSET 0 LIMIT 1 ;";	
-   else	
- 	  	 $cTmpSQL.=" OFFSET 0 LIMIT ALL ;";	
+	$cTmpSQL.=" OFFSET 0 LIMIT ALL ;";	
 
        // Entfernen der Temporaeren Variablen aus dem Speicher
-	 if (isset($cSchemaSQL)) unset($cSchemaSQL);
-	 if (isset($cTmpVeranstaltungskategorie_kurzbzE)) unset($cTmpVeranstaltungskategorie_kurzbzE);
-     if (isset($cTmpVeranstaltungskategorie_kurzbz)) unset($cTmpVeranstaltungskategorie_kurzbz);
-
-#	 exit($cTmpSQL);
+	if (isset($cSchemaSQL)) unset($cSchemaSQL);
+	if (isset($cTmpVeranstaltungskategorie_kurzbzE)) unset($cTmpVeranstaltungskategorie_kurzbzE);
+     	if (isset($cTmpVeranstaltungskategorie_kurzbz)) unset($cTmpVeranstaltungskategorie_kurzbz);
 	 
        // Datenbankabfrage
 		$this->setStringSQL($cTmpSQL);
@@ -1235,23 +1234,22 @@ class jahresplan extends postgre_sql
 			return false;
 		}	
 
-		if (!is_array($param) || count($param)<1 )
-			return false; // Fehler : es wurden keine Datenuebergeben 
-			
-		if (isset($param['reservierung_id'])) 
+		if (is_array($param) && count($param)>0 && isset($param['reservierung_id'])) 
 			$this->setReservierung_id($param['reservierung_id']);
+		if (!is_array($param) && !empty($param)) 
+			$this->setReservierung_id($param);
 		$reservierung_id=$this->getReservierung_id();
-
 		if ( empty($reservierung_id) ) 
 		{
 			$this->setError('Keine Reservierung ID gefunden !');
 			return false;
 		}	
-
-		if (isset($param['veranstaltung_id'])) 
+		if (is_array($param) && count($param)>0 && isset($param['veranstaltung_id'])) 
+		{
 			$this->setVeranstaltung_id($param['veranstaltung_id']);
-
+		}	
 		$veranstaltung_id=$this->getVeranstaltung_id();
+
 		$cTmpSQLS="";
 		$cTmpSQLS.=" update ".$cSchemaSQL."tbl_reservierung set veranstaltung_id=".(!empty($veranstaltung_id)?"'$veranstaltung_id'":"null")." WHERE reservierung_id='".$reservierung_id."'; " ;
 
@@ -1313,7 +1311,7 @@ class jahresplan extends postgre_sql
 		
 		// Selektion
 		
-		$cTmpSQL="";
+			$cTmpSQL="";
      		$cTmpSQL.="SELECT tbl_reservierung.* ";
      		
 			$cTmpSQL.=", to_char(tbl_reservierung.datum, 'YYYYMMDD') as \"datum_jjjjmmtt\" ";
@@ -1330,9 +1328,11 @@ class jahresplan extends postgre_sql
 			$cTmpSQL.=", to_char(lehre.tbl_stunde.beginn, 'HH24:MI') as \"beginn_anzeige\" ";
 			$cTmpSQL.=", to_char(lehre.tbl_stunde.ende, 'HH24:MI') as \"ende_anzeige\" ";
 
+			$cTmpSQL.=", EXTRACT(EPOCH FROM tbl_reservierung.datum) as \"datum_timestamp\" ";
 
+			
      		$cTmpSQL.=" FROM ".$cSchemaSQL."tbl_reservierung  ";
-   			$cTmpSQL.=" LEFT JOIN lehre.tbl_stunde ON lehre.tbl_stunde.stunde=".$cSchemaSQL."tbl_reservierung.stunde ";
+   			$cTmpSQL.=" RIGHT JOIN lehre.tbl_stunde ON lehre.tbl_stunde.stunde=".$cSchemaSQL."tbl_reservierung.stunde ";
 
 		if (!empty($cTmpStartZeit) && empty($cTmpEndeZeit) )
 	   		$cTmpSQL.=" AND to_char(lehre.tbl_stunde.beginn, 'HH24MI')='".$cTmpStartZeit."' ";	
@@ -1399,11 +1399,11 @@ class jahresplan extends postgre_sql
 	   		$cTmpSQL.=" to_char(".$cSchemaSQL."tbl_reservierung.datum, 'YYYYMMDD')='".$cTmpEnde."' ";	
 		else if (!empty($cTmpStart) && !empty($cTmpEnde) )
 		{
-	   		$cTmpSQL.=" AND to_char(".$cSchemaSQL."tbl_reservierung.datum, 'YYYYMMDD') >='".$cTmpStart."' ";	
-	   		$cTmpSQL.=" AND to_char(".$cSchemaSQL."tbl_reservierung.datum, 'YYYYMMDD') <= '".$cTmpEnde.",' ";	
+	   		$cTmpSQL.=" AND '".$cTmpStart."' between to_char(".$cSchemaSQL."tbl_reservierung.datum, 'YYYYMMDD') AND to_char(".$cSchemaSQL."tbl_reservierung.datum, 'YYYYMMDD') ";	
+	   		$cTmpSQL.=" AND '".$cTmpEnde."' between to_char(".$cSchemaSQL."tbl_reservierung.datum, 'YYYYMMDD') AND to_char(".$cSchemaSQL."tbl_reservierung.datum, 'YYYYMMDD') ";	
 		}	
 
-   		$cTmpSQL.=" ORDER BY ".$cSchemaSQL."tbl_reservierung.datum  ";	
+   		$cTmpSQL.=" ORDER BY ".$cSchemaSQL."tbl_reservierung.datum,tbl_reservierung.stunde  ";	
    	  	$cTmpSQL.=" OFFSET 0 LIMIT ALL ;";	
 
        // Entfernen der Temporaeren Variablen aus dem Speicher
