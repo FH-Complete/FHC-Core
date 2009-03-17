@@ -44,10 +44,15 @@
 <!--		  		<tr>
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" target="content" href="private/lehre/pinboard.php?fachbereich_kurzbz=Senat"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Senatsbeschl&uuml;sse</a></td>
-		  		</tr>-->
+		  		</tr>
 		  		<tr>
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" target="_blank" href="http://www.technikum-wien.at/service/termine/"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Veranstaltungen</a></td>
+		  		</tr>
+-->
+		  		<tr>
+		  			<td class="tdwidth10" nowrap>&nbsp;</td>
+					<td class="tdwrap"><a class="Item" target="content" href="private/jahresplan/index.php"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Eventkalender</a></td>
 		  		</tr>
 		  		<tr>
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
@@ -582,16 +587,20 @@
 			  	<td class="tdwidth10" nowrap>&nbsp;</td>
 				<td class="tdwrap"><a class="Item" href="public/rektortw.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Rektor Technikum Wien</a></td>
 			</tr>
-  		
+		<?php
+		$check=date('Y').date('m'); 
+		if ($check <'200909')  		
+		{ 
+		?>
 			<tr>
 			    <td class="tdwidth10" nowrap>&nbsp;</td>
 				<td class="tdwrap"><a href="?Jahresplan" class="MenuItem" onClick="return(js_toggle_container('Jahresplan'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Jahresplan</a>
 				  	<table class="tabcontent" id="Jahresplan" style="display: none">
-					<tr>
+					<tr onclick="alert('Den Jahresplan finden sie unter News -> Eventkalender');">
 					  	<td class="tdwidth10" nowrap>&nbsp;</td>
 						<td class="tdwrap"><a class="Item" href="private/info/jahresplan_WS2008.php" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;WS 2008</a></td>
 					</tr>
-					<tr>
+					<tr onclick="alert('Den Jahresplan finden sie unter News -> Eventkalender');">
 					  	<td class="tdwidth10" nowrap>&nbsp;</td>
 						<td class="tdwrap"><a class="Item" href="private/info/jahresplan_SS2009.php" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;SS 2009</a></td>
 					</tr>
@@ -599,6 +608,7 @@
 					</table>
 				</td>
 			</tr>
+		<?php } ?>	
 <!--			<tr>
         		<td class="tdwidth10" nowrap>&nbsp;</td>
 				<td class="tdwrap"><a class="Item" href="public/linkliste.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Links</a></td>
