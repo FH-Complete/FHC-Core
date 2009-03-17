@@ -163,6 +163,13 @@ class person
 	// *******************************************
 	function validate()
 	{
+		$this->nachname = trim($this->nachname);
+		$this->vorname = trim($this->vorname);
+		$this->vornamen = trim($this->vornamen);
+		$this->anrede = trim($this->anrede);
+		$this->titelpost = trim($this->titelpost);
+		$this->titelpre = trim($this->titelpre);
+		
 		if(utf8_strlen($this->sprache)>16)
 		{
 			$this->errormsg = 'Sprache darf nicht laenger als 16 Zeichen sein';
