@@ -103,7 +103,7 @@ font-size: 10pt;
 <body>
 <h1>
 	<div style="float:left">Testtool - Administrationsseite</div>
-	<div style="text-align:right"><a href="auswertung.php" class="Item">Auswertung</a></div>
+	<div style="text-align:right; padding-right: 5px;"><a href="auswertung.php" class="Item">Auswertung</a> | <a href="Testtool.pdf" class="Item" target="_blank">Hilfe</a></div>
 </h1>
 <?php
 
