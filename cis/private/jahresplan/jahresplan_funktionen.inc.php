@@ -67,14 +67,11 @@ function jahresplan_veranstaltung_detailanzeige($conn,$veranstaltung,$wartungsbe
 	// Initialisieren HTML Code Ausgabe
 	$showHTML='<div id="news">'; 
 	// Start Detailanzeige
-	$showHTML.='<table class="news" cellpadding="1" cellspacing="1" title="Veranstaltungsdetail ID '.$veranstaltung_detail["veranstaltung_id"].'">';
+	$showHTML.='<table class="news" cellpadding="6" cellspacing="1" title="Veranstaltungsdetail ID '.$veranstaltung_detail["veranstaltung_id"].'">';
 		
 		// Kategorie
 		$showHTML.='<tr style="background-color:#'.$veranstaltung_detail['farbe'].';"><th>&nbsp;'.$veranstaltung_detail['bild_image'].'&nbsp;'.$veranstaltung_detail['bezeichnung'].'&nbsp;</th></tr>';
-					
-		$showHTML.='<tr><td>&nbsp;</td></tr>';		
 		$showHTML.='<tr><td><b>'.nl2br($veranstaltung_detail['beschreibung']).'</b></td></tr>';
-		
 		// Veranstaltungstermin - Block			
 		// Anzeige Veranstaltungsdatum - Unterschiedlich wenn Start und Ende Datum gleich sind
 			$showHTML.='<tr><td><table border="0" cellpadding="0" cellspacing="0">';	
