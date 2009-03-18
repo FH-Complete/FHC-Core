@@ -56,7 +56,7 @@ if(!isset($_POST['uid']))
 	$abstract_en = '';
 	$seitenanzahl = '';
 	$abgabedatum = '01.01.1980';
-	$work_lang='German';
+	$sprache='German';
 }
 else 
 {
@@ -71,7 +71,7 @@ else
 	$abgabedatum = (isset($_POST['abgabedatum'])?$_POST['abgabedatum']:'01.01.1980');
 	$kurzbz = (isset($_POST['kurzbz'])?$_POST['kurzbz']:'');
 	$betreuer = (isset($_POST['betreuer'])?$_POST['betreuer']:'-1');
-	$work_lang = (isset($_POST['work_lang'])?$_POST['work_lang']:'German');
+	$sprache = (isset($_POST['sprache'])?$_POST['sprache']:'German');
 	$kontrollschlagwoerter = (isset($_POST['kontrollschlagwoerter'])?$_POST['kontrollschlagwoerter']:'-1');
 	$schlagwoerter = (isset($_POST['schlagwoerter'])?$_POST['schlagwoerter']:'-1');
 	$schlagwoerter_en = (isset($_POST['schlagwoerter_en'])?$_POST['schlagwoerter_en']:'-1');
@@ -115,7 +115,7 @@ if($command=='add')
 		$qry_upd="UPDATE lehre.tbl_projektarbeit SET
 				seitenanzahl = '".$seitenanzahl."', 
 				abgabedatum = now(),
-				sprache = '".addslashes($work_lang)."',  
+				sprache = '".addslashes($sprache)."',  
 				kontrollschlagwoerter = '".addslashes($kontrollschlagwoerter)."', 
 				schlagwoerter_en = '".addslashes($schlagwoerter_en)."', 
 				schlagwoerter = '".addslashes($schlagwoerter)."',  
@@ -204,11 +204,11 @@ if($command=="update" || $error==true)
 			    $num = pg_num_rows($sprache);
 			    if ($num > 0) 
 			    {
-			        $htmlstr .= "<SELECT NAME=\"work_lang\" SIZE=1> \n";
+			        $htmlstr .= "<SELECT NAME=\"sprache\" SIZE=1> \n";
 			        while ($mrow=@pg_fetch_object($sprache)) 
 			        {
 			            $htmlstr .= "<OPTION VALUE=\"$mrow->sprache\"";
-			            if ($mrow->sprache == $work_lang) 
+			            if ($mrow->sprache == $sprache) 
             			{
             				$htmlstr .= " SELECTED";
             			}
@@ -290,7 +290,7 @@ if($command!="add")
 			$htmlstr .= "<input type='hidden' name='abstract' value='".$abstract."'>\n";
 			$htmlstr .= "<input type='hidden' name='abstract_en' value='".$abstract_en."'>\n";
 			$htmlstr .= "<input type='hidden' name='seitenanzahl' value='".$seitenanzahl."'>\n";
-			$htmlstr .= "<input type='hidden' name='work_lang' value='".$work_lang."'>\n";
+			$htmlstr .= "<input type='hidden' name='sprache' value='".$sprache."'>\n";
 			$htmlstr .= "<tr id='".$row->projektarbeit_id."'>\n";
 			if(!$row->abgabedatum)
 			{
