@@ -603,7 +603,7 @@ if($stsem!='')
 	}
 	
 	//Verteilung
-	$content.= '<br><h2>Verteilung</h2><br>';
+	$content.= '<br><h2>Verteilung '.$stsem.'</h2><br>';
 	$qry = "SELECT 
 				count(anzahl) AS anzahlpers,anzahl AS anzahlstg 
 			FROM
@@ -688,7 +688,17 @@ if($stsem!='')
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Interessent' 
 	   			 	AND studiensemester_kurzbz='$stsem' AND geschlecht='w'  AND datum<='$datum'
 					) AS interessenten_w,
-									   			 
+
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem' AND datum<='$datum'
+	   			 	AND (anmeldungreihungstest<='$datum' AND anmeldungreihungstest IS NOT NULL)) AS interessentenrtanmeldung,
+	   			(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id) JOIN public.tbl_person USING(person_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m' AND datum<='$datum'
+	   			 	AND (anmeldungreihungstest<='$datum' AND anmeldungreihungstest IS NOT NULL)) AS interessentenrtanmeldung_m,
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id) JOIN public.tbl_person USING(person_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem' AND geschlecht='w' AND datum<='$datum'
+	   			 	AND (anmeldungreihungstest<='$datum' AND anmeldungreihungstest IS NOT NULL)) AS interessentenrtanmeldung_w,
+	   			    			 
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
 	   				WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Bewerber' 
 	   				AND studiensemester_kurzbz='$stsem' AND datum<='$datum'
@@ -766,6 +776,9 @@ if($stsem!='')
 		$interessenten_sum = 0;
 		$interessenten_m_sum = 0;
 		$interessenten_w_sum = 0;
+		$interessentenrt_sum = 0;
+		$interessentenrt_m_sum = 0;
+		$interessentenrt_w_sum = 0;
 		$bewerber_sum = 0;
 		$bewerber_m_sum = 0;
 		$bewerber_w_sum = 0;
@@ -786,7 +799,7 @@ if($stsem!='')
 			$content.= "<td>".strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
 			$content.= "<td align='center'>$row->interessenten ($row->interessenten_m / $row->interessenten_w)</td>";
 			$content.= "<td align='center'>k.A.</td>";
-			$content.= "<td align='center'>k.A.</td>";
+			$content.= "<td align='center'>$row->interessentenrtanmeldung ($row->interessentenrtanmeldung_m / $row->interessentenrtanmeldung_w)</td>";
 			$content.= "<td align='center'>$row->bewerber ($row->bewerber_m / $row->bewerber_w)</td>";
 			$content.= "<td align='center'>$row->aufgenommener ($row->aufgenommener_m / $row->aufgenommener_w)</td>";
 			$content.= "<td align='center'>$row->student1sem ($row->student1sem_m / $row->student1sem_w)</td>";
@@ -797,6 +810,9 @@ if($stsem!='')
 			$interessenten_sum += $row->interessenten;
 			$interessenten_m_sum += $row->interessenten_m;
 			$interessenten_w_sum += $row->interessenten_w;
+			$interessentenrt_sum += $row->interessentenrtanmeldung;
+			$interessentenrt_m_sum += $row->interessentenrtanmeldung_m;
+			$interessentenrt_w_sum += $row->interessentenrtanmeldung_w;
 			$bewerber_sum += $row->bewerber;
 			$bewerber_m_sum += $row->bewerber_m;
 			$bewerber_w_sum += $row->bewerber_w;
@@ -816,7 +832,7 @@ if($stsem!='')
 		$content.= "<td>Summe</td>";
 		$content.= "<td align='center'>$interessenten_sum ($interessenten_m_sum / $interessenten_w_sum)</td>";
 		$content.= "<td align='center'>k.A.</td>";
-		$content.= "<td align='center'>k.A.</td>";
+		$content.= "<td align='center'>$interessentenrt_sum ($interessentenrt_m_sum / $interessentenrt_w_sum)</td>";
 		$content.= "<td align='center'>$bewerber_sum ($bewerber_m_sum / $bewerber_w_sum)</td>";
 		$content.= "<td align='center'>$aufgenommener_sum ($aufgenommener_m_sum / $aufgenommener_w_sum)</td>";
 		$content.= "<td align='center'>$student1sem_sum ($student1sem_m_sum / $student1sem_w_sum)</td>";
@@ -824,6 +840,47 @@ if($stsem!='')
 		$content.= "</tr>";
 		
 		$content.= '</tfoot></table>';
+		
+		//Verteilung
+		$content.= '<br><h2>Verteilung '.$stsem.'</h2><br>';
+		$qry = "SELECT 
+					count(anzahl) AS anzahlpers,anzahl AS anzahlstg 
+				FROM
+				(
+					SELECT 
+						count(*) AS anzahl
+					FROM 
+						public.tbl_person JOIN public.tbl_prestudent USING (person_id) 
+						JOIN public.tbl_prestudentrolle USING (prestudent_id)
+					WHERE 
+						true $stgwhere
+					GROUP BY 
+						person_id,rolle_kurzbz,studiensemester_kurzbz
+					HAVING 
+						rolle_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
+				) AS prestd
+				GROUP BY anzahl; ";
+	
+		$content.= "\n<table class='liste table-stripeclass:alternate table-autostripe' style='width:auto'>
+					<thead>
+						<tr>
+							<th>Personen</th>
+							<th>Stg</th>
+						</tr>
+					</thead>
+					<tbody>";
+		if($result = pg_query($conn, $qry))
+		{
+			$summestudenten=0;
+			
+			while($row = pg_fetch_object($result))
+			{
+				$summestudenten += $row->anzahlpers;
+				$content.= "\n<tr><td>$row->anzahlpers</td><td>$row->anzahlstg</td></tr>";
+			}
+			$content.= "<tr><td style='border-top: 1px solid black;'><b>$summestudenten</b></td><td></td></tr>";
+		}
+		$content.= '</tbody></table>';
 	}
 }
 $content.= '</body>
