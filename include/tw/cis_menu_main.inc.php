@@ -592,17 +592,23 @@
 		if ($check <'200909')  		
 		{ 
 		?>
-			<tr>
+			<tr onclick="alert('Den Jahresplan finden sie unter News -> Eventkalender');">
 			    <td class="tdwidth10" nowrap>&nbsp;</td>
 				<td class="tdwrap"><a href="?Jahresplan" class="MenuItem" onClick="return(js_toggle_container('Jahresplan'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Jahresplan</a>
 				  	<table class="tabcontent" id="Jahresplan" style="display: none">
 					<tr onclick="alert('Den Jahresplan finden sie unter News -> Eventkalender');">
 					  	<td class="tdwidth10" nowrap>&nbsp;</td>
+						<td class="tdwrap"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;WS 2008</td>
+<!--
 						<td class="tdwrap"><a class="Item" href="private/info/jahresplan_WS2008.php" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;WS 2008</a></td>
+-->
 					</tr>
 					<tr onclick="alert('Den Jahresplan finden sie unter News -> Eventkalender');">
 					  	<td class="tdwidth10" nowrap>&nbsp;</td>
+						<td class="tdwrap"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;SS 2009</td>
+<!--
 						<td class="tdwrap"><a class="Item" href="private/info/jahresplan_SS2009.php" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;SS 2009</a></td>
+-->
 					</tr>
 
 					</table>
