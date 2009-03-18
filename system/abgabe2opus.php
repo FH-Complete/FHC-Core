@@ -271,14 +271,14 @@ if($erg=pg_query($conn, $qry))
 			//	Schlagwörter en							subject_uncontrolled_english
 			//	Abstract								description
 			//	Abstract en								description2
-			//	Abstract Sprache 1						description_lang = ger
+			//	Abstract Sprache 1						sprache
 			//	Abstract Sprache 2						description2_lang = eng
 			//	Sachgrupppe								sachgruppe_ddc = 000						000=Allgemeines, Wissenschaft
 			//	Jahr									date_year
 			//	Seitenanzahl							seitenanzahl
 			//	Studiensemester							studiensemester_kurzbz
 			//	Projektabeit ID							projektarbeit_id
-			//	Sprache									language = ger			
+			//	Sprache									sprache			
 			//	Zugriffsbeschränkung					bereich_id									1=uneingeschränkt, 2=innerh. Campus
 			
 			if($row->projekttyp_kurzbz=='Diplom')
@@ -307,9 +307,11 @@ if($erg=pg_query($conn, $qry))
 						(source_opus, title, title_en, publisher_university, type, stg_nr, datum, begutachter1, begutachter2, subject_swd, 
 						subject_uncontrolled_german, subject_uncontrolled_english, description, description2, description_lang, description2_lang, 
 						sachgruppe_ddc, date_year, seitenanzahl, studiensemester_kurzbz, projektarbeit_id, language, bereich_id, date_creation) values 
-						('".$row_opus."', '".addslashes($row->titel)."', '".addslashes($row->titel_english)."', 'FHTW', '".$typ."', '".$stg."', '".$row->abgabedatum."', '".addslashes($begutachter1)."', '".addslashes($begutachter2)."', '".addslashes($row->kontrollschlagwoerter)."', 
-						'".addslashes($row->schlagwoerter)."', '".addslashes($row->schlagwoerter_en)."', '".addslashes($row->abstract)."', '".addslashes($row->abstract_en)."', 'ger', 'eng', 
-						'000', '".$datum_obj->formatDatum($row->abgabedatum,'Y')."', '".$row->seitenanzahl."', '".$row->studiensemester_kurzbz."', '".$row->projektarbeit_id."', 'ger', '".$bereich."', UNIX_TIMESTAMP())";
+						('".$row_opus."', '".addslashes($row->titel)."', '".addslashes($row->titel_english)."', 'FHTW', '".$typ."', '".$stg."', '".$row->abgabedatum."', '"
+						.addslashes($begutachter1)."', '".addslashes($begutachter2)."', '".addslashes($row->kontrollschlagwoerter)."', '".addslashes($row->schlagwoerter)
+						."', '".addslashes($row->schlagwoerter_en)."', '".addslashes($row->abstract)."', '".addslashes($row->abstract_en)."', '".$row->sprache."', 'eng', '"
+						."000', '".$datum_obj->formatDatum($row->abgabedatum,'Y')."', '".$row->seitenanzahl."', '".$row->studiensemester_kurzbz."', '"
+						.$row->projektarbeit_id."', '".$row->sprache."', '".$bereich."', UNIX_TIMESTAMP())";
 					$qry_cre="INSERT INTO opus_autor (source_opus, creator_name, reihenfolge) VALUES ('".$row_opus."', '".$verfasser."', '1')";
 					$qry_inst="INSERT INTO opus_inst (source_opus, inst_nr) VALUES ('".$row_opus."', '".$institut."')";
 					
