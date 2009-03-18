@@ -111,56 +111,61 @@ function jahresplan_veranstaltung_detailanzeige($conn,$veranstaltung,$wartungsbe
 				$showHTML.='<tr><td><table>';
 				reset($res);
 				$checkReservierung=null;
+
+				$sort_res=array();
 				for ($iTmpZehler=0;$iTmpZehler<count($res);$iTmpZehler++)
-				{			
-					$readReservierung=(isset($res[$iTmpZehler]['ort_kurzbz'])?$res[$iTmpZehler]['ort_kurzbz']:$res[$iTmpZehler]['reservierung_ort_kurzbz']).(isset($res[$iTmpZehler]['titel'])?$res[$iTmpZehler]['titel']:$res[$iTmpZehler]['reservierung_titel']).(isset($res[$iTmpZehler]['beschreibung'])?$res[$iTmpZehler]['beschreibung']:$res[$iTmpZehler]['reservierung_beschreibung']);
-					if ($checkReservierung!=$readReservierung)
+				{
+					$readReservierung=(isset($res[$iTmpZehler]['ort_kurzbz'])?$res[$iTmpZehler]['ort_kurzbz']:$res[$iTmpZehler]['reservierung_ort_kurzbz']).(isset($res[$iTmpZehler]['titel'])?$res[$iTmpZehler]['titel']:$res[$iTmpZehler]['reservierung_titel']);
+					if (!isset($sort_res[$readReservierung]))
 					{
 						$checkReservierung=$readReservierung;
-
-						// nach einer Reservierung eine Leerzeile einfuegen zur besseren Trennung
-						$showHTML.=($iTmpZehler!=0?'<tr><td>&nbsp;</td></tr>':'');
-						$unicode=null;
-						$userNAME=$res[$iTmpZehler]["uid"];;
-						$pers = new benutzer($conn,$userNAME,$unicode); // Lesen Person - Benutzerdaten
-						if (isset($pers->nachname))
-						{
-							$userNAME=(isset($pers->anrede) ? $pers->anrede.' ':'');
-							$userNAME.=(isset($pers->titelpre) ? $pers->titelpre.' ':'');
-							$userNAME.=(isset($pers->vorname) ? $pers->vorname.' ':'');
-							$userNAME.=(isset($pers->nachname) ? $pers->nachname.' ':'');		
-							if ($pers->foto)
-							{
-								$cURL='jahresplan_bilder.php?time='.time().'&amp;'.(strlen($pers->foto)<800?'heximg='.$pers->foto:'userUID='.$pers->uid);
-								$res[$iTmpZehler]["bild"]='<img width="16" border="0" title="'.$userNAME.'" alt="Reservierung von Benutzer" src="'.$cURL.'" >';
-							}
-						}
-				
-						$showHTML.='<tr>';
-							$showHTML.='<td>Titel:</td><td>'.(isset($res[$iTmpZehler]['titel'])?$res[$iTmpZehler]['titel']:$res[$iTmpZehler]['reservierung_titel']).'</td>';
-						$showHTML.='</tr>';
-			
-						$showHTML.='<tr>';
-							$showHTML.='<td>Ort:</td><td>'.(isset($res[$iTmpZehler]['ort_kurzbz'])?$res[$iTmpZehler]['ort_kurzbz']:$res[$iTmpZehler]['reservierung_ort_kurzbz']).'</td>';
-						$showHTML.='</tr>';
-
-						// Suchen zu dieser Reservierung den letzten Eintrag						
 						$lastReservierung=jahresplan_veranstaltung_zusammenfassen($res,$iTmpZehler,$checkReservierung);
-						$showHTML.='<tr>';
-							$showHTML.='<td>Datum/Uhrzeit:</td><td>'.(isset($res[$iTmpZehler]['datum_anzeige'])?$res[$iTmpZehler]['datum_anzeige']:$res[$iTmpZehler]['res_datum_anzeige']);
-							if (isset($res[$iTmpZehler]['beginn']))	
-								$showHTML.=' / '.$res[$iTmpZehler]['beginn_anzeige'].' - '. (isset($lastReservierung['ende_anzeige'])?$lastReservierung['ende_anzeige']:$res[$iTmpZehler]['ende_anzeige']);
-							$showHTML.='</td>';
-						$showHTML.='</tr>';
-			
-						$showHTML.='<tr>';
-							$showHTML.='<td>Anlage:</td><td>'.$userNAME.'</td><td valign="top" rowspan="2">'.(isset($res[$iTmpZehler]["bild"])?$res[$iTmpZehler]["bild"]:'').'</td>';
-						$showHTML.='</tr>';
-	
-						$showHTML.='<tr>';
-							$showHTML.='<td>Beschreibung:</td><td>'.(isset($res[$iTmpZehler]['beschreibung'])?$res[$iTmpZehler]['beschreibung']:$res[$iTmpZehler]['reservierung_beschreibung']).'</td>';
-						$showHTML.='</tr>';
+						if (isset($lastReservierung['ende_anzeige']))
+						{						
+							$res[$iTmpZehler]['ende_anzeige']=$lastReservierung['ende_anzeige'];
+						}	
+						$sort_res[$readReservierung]=$res[$iTmpZehler];
+					}	
+				}
+				while (list( $tmp_key, $tmp_value ) = each($sort_res) ) 
+				{	
+					$reserv=$tmp_value;		
+					$readReservierung=(isset($reserv['ort_kurzbz'])?$reserv['ort_kurzbz']:$reserv['reservierung_ort_kurzbz']).(isset($reserv['titel'])?$reserv['titel']:$reserv['reservierung_titel']);
+					// nach einer Reservierung eine Leerzeile einfuegen zur besseren Trennung
+					$showHTML.=($iTmpZehler!=0?'<tr><td>&nbsp;</td></tr>':'');
+					$unicode=null;
+					$userNAME=$reserv["uid"];;
+					$pers = new benutzer($conn,$userNAME,$unicode); // Lesen Person - Benutzerdaten
+					if (isset($pers->nachname))
+					{
+						$userNAME=(isset($pers->anrede) ? $pers->anrede.' ':'');
+						$userNAME.=(isset($pers->titelpre) ? $pers->titelpre.' ':'');
+						$userNAME.=(isset($pers->vorname) ? $pers->vorname.' ':'');
+						$userNAME.=(isset($pers->nachname) ? $pers->nachname.' ':'');		
+						if ($pers->foto)
+						{
+							$cURL='jahresplan_bilder.php?time='.time().'&amp;'.(strlen($pers->foto)<800?'heximg='.$pers->foto:'userUID='.$pers->uid);
+							$reserv["bild"]='<img width="16" border="0" title="'.$userNAME.'" alt="Reservierung von Benutzer" src="'.$cURL.'" >';
 						}
+					}
+					$showHTML.='<tr>';
+						$showHTML.='<td>Titel:</td><td>'.(isset($reserv['titel'])?$reserv['titel']:$reserv['reservierung_titel']).'</td>';
+					$showHTML.='</tr>';
+					$showHTML.='<tr>';
+						$showHTML.='<td>Ort:</td><td>'.(isset($reserv['ort_kurzbz'])?$reserv['ort_kurzbz']:$reserv['reservierung_ort_kurzbz']).'</td>';
+					$showHTML.='</tr>';
+					$showHTML.='<tr>';
+						$showHTML.='<td>Datum/Uhrzeit:</td><td>'.(isset($reserv['datum_anzeige'])?$reserv['datum_anzeige']:$reserv['res_datum_anzeige']);
+						if (isset($reserv['beginn']))	
+							$showHTML.=' / '.$reserv['beginn_anzeige'].' - '. (isset($lastReservierung['ende_anzeige'])?$lastReservierung['ende_anzeige']:$reserv['ende_anzeige']);
+						$showHTML.='</td>';
+					$showHTML.='</tr>';
+					$showHTML.='<tr>';
+						$showHTML.='<td>Anlage:</td><td>'.$userNAME.'</td><td valign="top" rowspan="2">'.(isset($reserv["bild"])?$reserv["bild"]:'').'</td>';
+					$showHTML.='</tr>';
+					$showHTML.='<tr>';
+						$showHTML.='<td>Beschreibung:</td><td>'.(isset($reserv['beschreibung'])?$reserv['beschreibung']:$reserv['reservierung_beschreibung']).'</td>';
+					$showHTML.='</tr>';
 				}			
 				$showHTML.='</table></td></tr></table></td></tr>';
 			}
@@ -194,20 +199,20 @@ function jahresplan_veranstaltung_detailanzeige($conn,$veranstaltung,$wartungsbe
 function jahresplan_veranstaltung_zusammenfassen($res,$iZehler)
 {
 		reset($res);
-		$checkReservierung=(isset($res[$iZehler]['ort_kurzbz'])?$res[$iZehler]['ort_kurzbz']:$res[$iZehler]['reservierung_ort_kurzbz']).(isset($res[$iZehler]['titel'])?$res[$iZehler]['titel']:$res[$iZehler]['reservierung_titel']).(isset($res[$iZehler]['beschreibung'])?$res[$iZehler]['beschreibung']:$res[$iZehler]['reservierung_beschreibung']);
+		$checkReservierung=(isset($res[$iZehler]['ort_kurzbz'])?$res[$iZehler]['ort_kurzbz']:$res[$iZehler]['reservierung_ort_kurzbz']).(isset($res[$iZehler]['titel'])?$res[$iZehler]['titel']:$res[$iZehler]['reservierung_titel']);
 		$gefReservierung=$res[$iZehler];
 		for ($iTmpZehler=$iZehler;$iTmpZehler<count($res);$iTmpZehler++)
 		{			
-			$readReservierung=(isset($res[$iTmpZehler]['ort_kurzbz'])?$res[$iTmpZehler]['ort_kurzbz']:$res[$iTmpZehler]['reservierung_ort_kurzbz']).(isset($res[$iTmpZehler]['titel'])?$res[$iTmpZehler]['titel']:$res[$iTmpZehler]['reservierung_titel']).(isset($res[$iTmpZehler]['beschreibung'])?$res[$iTmpZehler]['beschreibung']:$res[$iTmpZehler]['reservierung_beschreibung']);
+			$readReservierung=(isset($res[$iTmpZehler]['ort_kurzbz'])?$res[$iTmpZehler]['ort_kurzbz']:$res[$iTmpZehler]['reservierung_ort_kurzbz']).(isset($res[$iTmpZehler]['titel'])?$res[$iTmpZehler]['titel']:$res[$iTmpZehler]['reservierung_titel']);
 			if ($checkReservierung==$readReservierung)
 			{
 				$checkReservierung=$readReservierung;
 				$gefReservierung=$res[$iTmpZehler];
 			}
-			else
-			{
-				$iTmpZehler=9999999;
-			}
+#			else
+#			{
+#				$iTmpZehler=9999999;
+#			}
 		}		
 		return $gefReservierung;
 }
