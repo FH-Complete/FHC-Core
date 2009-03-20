@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 require_once('../../config.inc.php');
+require_once('../../../include/ort.class.php');
 
 // Variablen uebernehmen
 if (isset($_GET['type']))
@@ -94,6 +95,7 @@ Stunde: <?php echo $stunde; ?><BR><BR>
 <?php
 if ($num_rows_stpl>0)
 echo '<tr> <th>UNr</th><th>Lektor</th><th>Ort</th><th>Lehrfach</th><th>Bezeichnung</th><th>Verband</th><th>Einheit</th> </tr>';
+$ort = new ort($conn);
 for ($i=0; $i<$num_rows_stpl; $i++)
 {
     $unr=pg_result($erg_stpl,$i,"unr");
@@ -110,11 +112,12 @@ for ($i=0; $i<$num_rows_stpl; $i++)
     $verband=trim(pg_result($erg_stpl,$i,"verband"));
     $gruppe=trim(pg_result($erg_stpl,$i,"gruppe"));
     $gruppe_kurzbz=trim(pg_result($erg_stpl,$i,"gruppe_kurzbz"));
+    $ort->load($ortkurzbz);
     ?>
     <tr class="<?php echo 'liste'.$i%2; ?>">
         <td><?php echo $unr; ?></td>
         <td><A class="Item" href="mailto:<?php echo $pers_email; ?>"><?php echo $titelpre.' '.$pers_vorname.' '.$pers_nachname; ?></A></td>
-        <td><?php echo $ortkurzbz; ?></td>
+        <td title="<?php echo $ort->bezeichnung;?>"><?php echo $ortkurzbz.' '.$ort->planbezeichnung.' '.$ort->standort_kurzbz; ?></td>
         <td><?php echo $lehrfachkurzbz; ?></td>
         <td><?php echo $bezeichnung; ?></td>
         <td><A class="Item" href="mailto:<?php echo $stgkurzbz.$semester.strtolower($verband).$gruppe.'@'.DOMAIN; ?>">
