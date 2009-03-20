@@ -72,7 +72,7 @@
 		  	</tr>
 		  	<tr>
 		      <td width="260" class='tdwrap'><strong>Helpdesk</strong></td>
-			  <td width="50" class='tdwrap'>&nbsp;</td>
+			  <td width="50" class='tdwrap'><a href="../cisdocs/remotesupport.exe" target="_blank">RST</a></td>
 			  <td  class='tdwrap'>&nbsp;</td>
 			  <td width="56" class='tdwrap'>&nbsp;</td>
 			  <td class='tdwrap'>&nbsp;</td>
