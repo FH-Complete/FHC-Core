@@ -57,7 +57,7 @@ $typ='';
 $bereich=1;
 $stg='';
 $row_opus=0;
-$opus_url=OPUS_PATH_PAA;			//http://cis.technikum-wien.at/opus/htdocs/volltexte/		campus/2008/10/
+$opus_url=OPUS_PATH_PAA;			//http://cis.technikum-wien.at/opus/htdocs/volltexte/		2008/10/
 
 
 //****************************************************************************************************
