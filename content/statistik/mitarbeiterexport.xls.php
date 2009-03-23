@@ -157,7 +157,7 @@ array_multisort($nachname, SORT_ASC, $vorname, SORT_ASC, $mitarbeiterDAO->result
 		}
 		
 		//Zustelladresse aus der Datenbank holen und dazuhaengen
-		$qry = "SELECT * FROM public.tbl_adresse WHERE person_id='$mitarbeiter->person_id' WHERE zustelladresse=true LIMIT 1";
+		$qry = "SELECT * FROM public.tbl_adresse WHERE person_id='$mitarbeiter->person_id' AND zustelladresse=true LIMIT 1";
 		if($result = pg_query($conn, $qry))
 		{
 			if($row = pg_fetch_object($result))
