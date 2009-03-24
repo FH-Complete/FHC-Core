@@ -43,7 +43,6 @@ require_once('../include/mail.class.php');
 	mysql_select_db(OPUS_DB, $conn_ext);
 
 
-
 $datum_obj = new datum();
 $fehler='';
 $error=false;
@@ -58,7 +57,7 @@ $bereich=1;
 $stg='';
 $row_opus=0;
 $opus_url=OPUS_PATH_PAA;			//http://cis.technikum-wien.at/opus/htdocs/volltexte/		2008/10/
-
+$url_paa='http://dav.technikum-wien.at/ruhan/PaUpload/';
 
 //****************************************************************************************************
 //Einlesen Projektarbeiten
@@ -340,20 +339,20 @@ if($erg=pg_query($conn, $qry))
 								else 
 								{
 									//Kopieren der Abgabedatei
-									$qry_file="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$row->projektarbeit_id."' and projektabgabetyp_kurzbz='end' ORDER BY abgabedatum desc LIMIT 1";
-									if($result_file=mysql_query($qry_file))
+									$qry_file="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$row->projektarbeit_id."' and paabgabetyp_kurzbz='end' ORDER BY abgabedatum desc LIMIT 1";
+									if($result_file=@pg_query($conn, $qry_file))
 									{
-										if($row_file=mysql_fetch_object($result_file))
+										if($row_file=pg_fetch_object($result_file))
 										{
-											copy($_SERVER['DOCUMENT_ROOT'].PAABGABE_PATH.$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf',$opus_url."".$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf');
+											copy($url_paa.$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf',$opus_url."".$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf');
 											//Überprüfen, ob Datei wirklich kopiert wurde
-											if(isfile($opus_url.$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf'))
+											if(is_file($opus_url.$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf'))
 											{
 												//COMMIT durchführen
 												if(!$result=mysql_query('COMMIT',$conn_ext))
 												{
 													mysql_query('ROLLBACK',$conn_ext);
-													echo "Commit nicht ausgef&um;hrt! <br>".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
+													echo "Commit nicht ausgef&um;hrt! <br>".$row_opus."/".$verfasser."<br>".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
 												}
 											}
 											else 
@@ -365,13 +364,13 @@ if($erg=pg_query($conn, $qry))
 										else 
 										{
 											mysql_query('ROLLBACK',$conn_ext);
-											echo "Abgabe konnte nicht geladen werden! <br>".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
+											echo "Abgabe konnte nicht geladen werden! <br>".$row_opus."/".$verfasser."<br>".pg_last_error();
 										}
-									}
+									} 
 									else 
 									{
 										mysql_query('ROLLBACK',$conn_ext);
-										echo "Eintragung der Abgabe nicht gefunden! <br>".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
+										echo "Eintragung der Abgabe nicht gefunden! <br>".$row_opus."/".$verfasser."/".$qry_file."<br>".pg_last_error();
 									}	
 									
 								}
@@ -382,7 +381,7 @@ if($erg=pg_query($conn, $qry))
 			}
 			else 
 			{
-				echo "<br>&Uuml;berprüfung, ob bereits vorhanden, konnte nicht durchgef&uuml;hrt werden! <br>".mysql_errno() . ": " . mysql_error()."<br>".$qry_chk."<br>";
+				echo "<br>&Uuml;berprüfung, ob bereits vorhanden, konnte nicht durchgef&uuml;hrt werden! <br>".pg_last_error($conn_ext)."<br>".$qry_chk."<br>";
 			}
 			
 		}
