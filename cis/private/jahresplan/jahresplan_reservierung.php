@@ -37,7 +37,7 @@
 	// Datenbankverbindung - ohne erfolg kann hier bereits beendet werden
 	if (!$conn=pg_pconnect(CONN_STRING))
 	{
-		die('Jahresplan<br />Keine Veranstaltungen zurzeit Online.<br />Bitte etwas Geduld.<br />Danke'); 
+		die('Jahresplan<br>Keine Veranstaltungen zurzeit Online.<br>Bitte etwas Geduld.<br>Danke'); 
 	}
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/globals.inc.php');
@@ -65,13 +65,17 @@
 	{
 		exit('keine Veranstaltungs ID &uuml;bergeben');
 	}
-   	$start=trim((isset($_REQUEST['start']) ? $_REQUEST['start']:mktime(12,0,0,date("m"),date("d"),date("y")) ));
-   	$ende=trim((isset($_REQUEST['ende']) ? $_REQUEST['ende']:mktime(13,0,0,date("m"),date("d"),date("y")) ));
 
+  	$start=trim((isset($_REQUEST['start']) ? $_REQUEST['start']:mktime(12,0,0,date("m"),date("d"),date("y")) ));
+	$start=$start-7200;
+	
+   	$ende=trim((isset($_REQUEST['ende']) ? $_REQUEST['ende']:mktime(13,0,0,date("m"),date("d"),date("y")) ));
+	$ende=$ende+7200;
 	// Verarbeiten einer Reservierung
    	$work=trim((isset($_REQUEST['work']) ? $_REQUEST['work']:''));
    	$veranstaltung_id_zuordnen=trim((isset($_REQUEST['veranstaltung_id_zuordnen']) ? $_REQUEST['veranstaltung_id_zuordnen']:''));
    	$reservierung_id=trim((isset($_REQUEST['reservierung_id']) ? $_REQUEST['reservierung_id']:''));
+   	$reservierung_key=trim((isset($_REQUEST['reservierung_key']) ? $_REQUEST['reservierung_key']:''));
 
 // ------------------------------------------------------------------------------------------
 //	Personen Classe 
@@ -135,15 +139,30 @@
 		// Der Reservierung die Veranstaltungsnummer eintragen bzw. leer wenn die Zuordnung aufgehoben wird
 		if (!empty($reservierung_id))
 		{
-
-			$Jahresplan->InitReservierung();	
-			$Jahresplan->setReservierung_id($reservierung_id);
-			$Jahresplan->setVeranstaltung_id($veranstaltung_id_zuordnen);			
-			if (!$Jahresplan->saveReservierung())
+			$reservierung_id=explode('|',$reservierung_id);
+			if (is_array($reservierung_id))
 			{
-				$error.="Fehler ".$Jahresplan->getError();
+				for ($updRes=0;$updRes<count($reservierung_id);$updRes++)
+				{
+					$Jahresplan->InitReservierung();	
+					$Jahresplan->setVeranstaltung_id($veranstaltung_id_zuordnen);			
+					$Jahresplan->setReservierung_id($reservierung_id[$updRes]);
+					if (!$Jahresplan->saveReservierung())
+					{
+						$error.=($error?'<br>':'')."Fehler ".$Jahresplan->getError();
+					}
+				}
 			}
-			echo"";
+			else
+			{	
+				$Jahresplan->InitReservierung();	
+				$Jahresplan->setVeranstaltung_id($veranstaltung_id_zuordnen);			
+				$Jahresplan->setReservierung_id($reservierung_id);				
+				if (!$Jahresplan->saveReservierung())
+				{
+					$error.=($error?'<br>':'')."Fehler ".$Jahresplan->getError();
+				}
+			}	
 		}
 	}	
 	
@@ -152,8 +171,8 @@
 <html>
 <head>
 <title>Reservierungen zu ID <?php echo $veranstaltung_id.' - '.$userNAME;?> </title>
-
-	<script language="JavaScript">
+	<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+	<script language="JavaScript" type="text/javascript">
 	<!--
 		if (window.opener && !window.opener.closed) {
 			if (confirm("Soll die Hauptseite neu aufgebaut werden?")) {
@@ -216,6 +235,31 @@
 	if ($Jahresplan->loadReservierung())
 	{
 		$reservierungierung=$Jahresplan->getReservierung();
+		if (is_array($reservierungierung) && count($reservierungierung)>0)
+		{
+			
+			for ($iTmpZehler=0;$iTmpZehler<count($reservierungierung);$iTmpZehler++)
+			{				
+				$key='';
+				$key.=$reservierungierung[$iTmpZehler]['ort_kurzbz'];
+				$key.=$reservierungierung[$iTmpZehler]['titel'];
+				$key.=$reservierungierung[$iTmpZehler]['reservierung_id'];
+
+				$reservierungierung[$iTmpZehler]['key']=$reservierungierung[$iTmpZehler]['ort_kurzbz'].'|'.$reservierungierung[$iTmpZehler]['titel'].'|'.$reservierungierung[$iTmpZehler]['datum_anzeige'];
+				
+				$reservierungierung_sort[$key][]=$reservierungierung[$iTmpZehler];
+			}	
+			if (sort($reservierungierung_sort))
+			{
+				$reservierungierung=array();
+				while (list( $tmp_key, $tmp_value ) = each($reservierungierung_sort) ) 
+				{
+						$reservierungierung[]=$tmp_value[0];			
+				}
+#				echo Test($reservierungierung);
+			}	
+			
+		}
 	}
 	$showHTML.=$Jahresplan->getError();		
 
@@ -225,15 +269,15 @@
 				<td>Ort</td>
 				<td>Titel</td>
 				<td colspan="2">Datum</td>
-				<td>Anlage</td>				
+				<td colspan="2">Anlage</td>				
 				<td>Veranstaltung</td>				
 			</tr>';
-			
+
+	$lastkey=null;		
+	$alleReservierung_id=null;		
+
 	for ($iTmpZehler=0;$iTmpZehler<count($reservierungierung);$iTmpZehler++)
 	{			
-#			if ($reservierungierung[$iTmpZehler]['veranstaltung_id']==$veranstaltung_id )
-#				continue;
-
 			$unicode=null;
 			$userNAME=$reservierungierung[$iTmpZehler]['uid'];
 			$pers = new benutzer($conn,$userNAME,$unicode); // Lesen Person - Benutzerdaten
@@ -246,10 +290,38 @@
 				if ($pers->foto)
 				{
 					$cURL='jahresplan_bilder.php?time='.time().'&'.(strlen($pers->foto)<800?'heximg='.$pers->foto:'userUID='.$pers->uid);
-					$reservierungierung[$iTmpZehler]["bild"]='<img width="16" border="0" title="'.$userNAME.'" alt="Reservierung von Benutzer" src="'.$cURL.'" />';
+					$reservierungierung[$iTmpZehler]["bild"]='<img width="16" border="0" title="'.$userNAME.'" alt="Reservierung von Benutzer" src="'.$cURL.'">';
 				}
 			}			
 
+		if ($lastkey && $lastkey !=$reservierungierung[$iTmpZehler]['key'])
+		{	
+			$showHTML.='
+			<tr '.($iTmpZehler%2? ' class="header_liste_row_0" ':' class="header_liste_row_1" ').'>
+			<form name="selJahresplanReservierung'.($iTmpZehler<0?'':$iTmpZehler).'_alle" target="_self" action="'. $_SERVER['PHP_SELF'] .'"  method="post" enctype="multipart/form-data">
+				<td align="center"><a href="javascript:window.document.selJahresplanReservierung'.($iTmpZehler<0?'':$iTmpZehler).'_alle.work.value=\'save\';window.document.selJahresplanReservierung'.($iTmpZehler<0?'':$iTmpZehler).'_alle.submit();">alle</a></td>
+				<td>'. implode("</td><td>",explode('|',$lastkey)).'</td>
+					<td colspan="4">
+					<input class="ausblenden" name="reservierung_id" value="'.$alleReservierung_id.'">
+					<input class="ausblenden" name="start" value="'.$start.'">
+					<input class="ausblenden" name="ende" value="'.$ende.'">
+					<input class="ausblenden" name="veranstaltung_id" value="'.$veranstaltung_id.'">
+					<input class="ausblenden" name="veranstaltung_id_zuordnen" value="'.$veranstaltung_id.'">
+					<input class="ausblenden" name="reservierung_key" value="'.$reservierungierung[$iTmpZehler]['key'].'">
+					<input class="ausblenden" name="work" value="nix">
+					</td>
+				';	
+				$showHTML.='<td class="zahlen"><a href="javascript:window.document.selJahresplanReservierung'.($iTmpZehler<0?'':$iTmpZehler).'_alle.work.value=\'save\';window.document.selJahresplanReservierung'.($iTmpZehler<0?'':$iTmpZehler).'_alle.submit();">alle</a></td>';
+				$showHTML.='</tr>';
+			$showHTML.='
+			</form>
+			</tr>
+			<tr '.($iTmpZehler%2? ' class="header_liste_row_0" ':' class="header_liste_row_1" ').'><td colspan="9"><hr></td></tr>
+			';
+			$alleReservierung_id=null;
+		}
+			
+		
 		$showHTML.='
 			<tr '.($iTmpZehler%2? ' class="header_liste_row_0" ':' class="header_liste_row_1" ').'>
 			<form name="selJahresplanReservierung'.($iTmpZehler<0?'':$iTmpZehler).'" target="_self" action="'. $_SERVER['PHP_SELF'] .'"  method="post" enctype="multipart/form-data">
@@ -259,20 +331,30 @@
 					<input class="ausblenden" name="ende" value="'.$ende.'">
 					<input class="ausblenden" name="veranstaltung_id" value="'.$veranstaltung_id.'">
 					<input class="ausblenden" name="work" value="nix">
-					</td>
-				<td>'.$reservierungierung[$iTmpZehler]['ort_kurzbz'].'</td>
-				<td>'.$reservierungierung[$iTmpZehler]['titel'].'</td>
-				<td>'.$reservierungierung[$iTmpZehler]['datum_anzeige'].'</td>
-				';	
+					</td>';
+				
+				if ($lastkey ==$reservierungierung[$iTmpZehler]['key'])
+				{	
+					$showHTML.='<td colspan="3"><hr></td>';
+				}
+				else
+				{	
+				$showHTML.='	
+					<td>'.$reservierungierung[$iTmpZehler]['ort_kurzbz'].'</td>
+					<td>'.$reservierungierung[$iTmpZehler]['titel'].'</td>
+					<td>'.$reservierungierung[$iTmpZehler]['datum_anzeige'].'</td>
+					';	
+				}	
+		
 				$showHTML.='<td>'.$reservierungierung[$iTmpZehler]['beginn_anzeige'].'-'.$reservierungierung[$iTmpZehler]['ende_anzeige'].'</td>';				
-				$showHTML.='<td>'.(isset($userNAME)?$userNAME:$reservierungierung[$iTmpZehler]['uid']).' '.(isset($reservierungierung[$iTmpZehler]["bild"])?$reservierungierung[$iTmpZehler]["bild"]:'').'</td>';
+				$showHTML.='<td>'.(isset($userNAME)?$userNAME:$reservierungierung[$iTmpZehler]['uid']).'</td><td>'.(isset($reservierungierung[$iTmpZehler]["bild"])?$reservierungierung[$iTmpZehler]["bild"]:'').'</td>';
 				
 				$showHTML.='<td class="zahlen">'.($reservierungierung[$iTmpZehler]['veranstaltung_id']!=$veranstaltung_id?$reservierungierung[$iTmpZehler]['veranstaltung_id']:'').'</td>';
 				$cTmpResScript=' onclick="window.document.selJahresplanReservierung'.($iTmpZehler<0?'':$iTmpZehler).'.work.value=\'save\';window.document.selJahresplanReservierung'.($iTmpZehler<0?'':$iTmpZehler).'.submit();" ' ;	
 	
 				// Checkbox Reservierung zuteilen oder aufheben
 				$showHTML.='<td>';
-				$showHTML.='<input '.(empty($reservierungierung[$iTmpZehler]['veranstaltung_id'])?'':' checked="checked " ').' '.$cTmpResScript.' type="checkbox" value="'.$veranstaltung_id.'" name="veranstaltung_id_zuordnen" />';
+				$showHTML.='<input '.(empty($reservierungierung[$iTmpZehler]['veranstaltung_id'])?'':' checked="checked " ').' '.$cTmpResScript.' type="checkbox" value="'.$veranstaltung_id.'" name="veranstaltung_id_zuordnen">';
 				if (!empty($reservierungierung[$iTmpZehler]['veranstaltung_id']) &&  $reservierungierung[$iTmpZehler]['veranstaltung_id']!=$veranstaltung_id)
 				{
 					$showHTML.='&nbsp;bereits zugeordnet zu Veranstaltung '.$reservierungierung[$iTmpZehler]['veranstaltung_id'];
@@ -283,6 +365,9 @@
 		</form>
 		</tr>
 		';
+			$lastkey=$reservierungierung[$iTmpZehler]['key'];
+			$alleReservierung_id.=($alleReservierung_id?'|':'').$reservierungierung[$iTmpZehler]['reservierung_id'];		
+
 		}
 		$showHTML.='		
 		</table>';

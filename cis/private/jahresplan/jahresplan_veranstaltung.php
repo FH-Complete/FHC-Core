@@ -41,7 +41,7 @@
 	// Datenbankverbindung - ohne erfolg kann hier bereits beendet werden
 	if (!$conn=pg_pconnect(CONN_STRING))
 	{
-		die('Jahresplan<br />Keine Veranstaltungen zurzeit Online.<br />Bitte etwas Geduld.<br />Danke'); 
+		die('Jahresplan<br>Keine Veranstaltungen zurzeit Online.<br>Bitte etwas Geduld.<br>Danke'); 
 	}
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/globals.inc.php');
@@ -86,7 +86,6 @@
 		$userNAME.=(isset($pers->vorname) ? $pers->vorname.' ':'');
 		$userNAME.=(isset($pers->nachname) ? $pers->nachname.' ':'');		
 	}
-	
 // ------------------------------------------------------------------------------------------
 //	Benutzer Classe 
 //		Berechtigungen ermitteln
@@ -95,7 +94,6 @@
 	$is_wartungsberechtigt=false;
 	if (isset($pers->nachname))
 	{
-	
 		$benutzerberechtigung = new benutzerberechtigung($conn,$userUID);
 		$benutzerberechtigung->getBerechtigungen($userUID,true);
 		// Nur Lektoren oder Mitarbeiter duerfen alle Termine sehen , Studenten nur Freigegebene Kategorien
@@ -103,7 +101,6 @@
 			$is_lector=true;
 		else
 			$is_lector=false;
-
 		// Kennzeichen setzen fuer Berechtigungspruefung
 		$berechtigung='veranstaltung';
 		$studiengang_kz=null;
@@ -148,7 +145,7 @@
 			if(!$veranstaltung=$Jahresplan->saveVeranstaltung($_REQUEST))
 			{	
 				$error='Fehler beim anlegen ! '.$Jahresplan->getError()." ".$Jahresplan->getVeranstaltung_id();
-				$error.= "<br />" . $Jahresplan->getStringSQL() ."<br />";
+				$error.= "<br>" . $Jahresplan->getStringSQL() ."<br>";
 				
 			}
 			else
@@ -253,8 +250,9 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>Jahresplan</title>
-<script language="JavaScript">
+	<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+	<title>Jahresplan</title>
+<script language="JavaScript" type="text/javascript">
 <!--
 //-->
 </script>
@@ -403,7 +401,7 @@
 
 	
 			if (!window.opener || window.opener.closed) {
-				document.write('<?php echo '[&nbsp;<a href="index.php">Veranstaltungen</a>&nbsp;|&nbsp;<a href="jahresplan_veranstaltung.php">Veranstaltung bearbeiten</a>&nbsp;|&nbsp;<a href="jahresplan_kategorie.php">Kategorie</a>&nbsp;]&nbsp;'.$userNAME; ?>');
+				document.write('[&nbsp;<a href="index.php">Veranstaltungen</a>&nbsp;|&nbsp;<a href="jahresplan_veranstaltung.php">Veranstaltung bearbeiten</a>&nbsp;|&nbsp;<a href="jahresplan_kategorie.php">Kategorie</a>&nbsp;]&nbsp;<?php echo $userNAME; ?>');
 			} else {
 				window.resizeTo(800,800);
 			}
@@ -451,11 +449,11 @@
 					<td><label for="veranstaltung_id">ID</label></td>
 					<td>
 						<?php echo (isset($veranstaltung['veranstaltung_id'])?$veranstaltung['veranstaltung_id']:$veranstaltung_id); ?>
-						<input class="ausblenden" id="veranstaltung_id" name="veranstaltung_id" type="text" size="4" maxlength="10" value="<?php echo (isset($veranstaltung['veranstaltung_id'])?$veranstaltung['veranstaltung_id']:$veranstaltung_id); ?>" />
-						<input class="ausblenden" name="veranstaltung_id_old" type="text" value="<?php echo (isset($veranstaltung['veranstaltung_id'])?$veranstaltung['veranstaltung_id']:$veranstaltung_id);?>" />
+						<input class="ausblenden" id="veranstaltung_id" name="veranstaltung_id" type="text" size="4" maxlength="10" value="<?php echo (isset($veranstaltung['veranstaltung_id'])?$veranstaltung['veranstaltung_id']:$veranstaltung_id); ?>" >
+						<input class="ausblenden" name="veranstaltung_id_old" type="text" value="<?php echo (isset($veranstaltung['veranstaltung_id'])?$veranstaltung['veranstaltung_id']:$veranstaltung_id);?>" >
 					</td>
 
-					<td title="Neuanlage <?php echo date("d.m.Y",$veranstaltung['start_timestamp']);?>"  class="cursor_hand" onclick="self.location.href='<?php echo $_SERVER['PHP_SELF'].'?start_timestamp='.(isset($veranstaltung['start_timestamp'])?$veranstaltung['start_timestamp']:$cTmpTimestampStart).'&amp;ende_timestamp='.(isset($veranstaltung['ende_timestamp'])?$veranstaltung['ende_timestamp']:$cTmpTimestampEnde) ;?>';" >Neuanlage&nbsp;<img border="0" alt="Neuanlage" src="../../../skin/images/date_add.png" /></td>
+					<td title="Neuanlage <?php echo date("d.m.Y",$veranstaltung['start_timestamp']);?>"  class="cursor_hand" onclick="self.location.href='<?php echo $_SERVER['PHP_SELF'].'?start_timestamp='.(isset($veranstaltung['start_timestamp'])?$veranstaltung['start_timestamp']:$cTmpTimestampStart).'&amp;ende_timestamp='.(isset($veranstaltung['ende_timestamp'])?$veranstaltung['ende_timestamp']:$cTmpTimestampEnde) ;?>';" >Neuanlage&nbsp;<img border="0" alt="Neuanlage" src="../../../skin/images/date_add.png" ></td>
 					
 				</tr>				
 				
@@ -474,7 +472,7 @@
 								$veranstaltungskategorie[$iTmpZehler]["bezeichnung"]=trim($veranstaltungskategorie[$iTmpZehler]["bezeichnung"]);
 		
 								$cURL='jahresplan_bilder.php?time='.time().'&'.(strlen($veranstaltungskategorie[$iTmpZehler]["bild"])<800?'heximg='.$veranstaltungskategorie[$iTmpZehler]["bild"]:'veranstaltungskategorie_kurzbz='.$veranstaltungskategorie[$iTmpZehler]["veranstaltungskategorie_kurzbz"]);
-								$veranstaltungskategorie[$iTmpZehler]["bild_image"]='<img height="20" border="0" alt="Kategoriebild" titel="'.$veranstaltungskategorie[$iTmpZehler]["bezeichnung"].'" src="'.$cURL.'" />';
+								$veranstaltungskategorie[$iTmpZehler]["bild_image"]='<img height="20" border="0" alt="Kategoriebild" titel="'.$veranstaltungskategorie[$iTmpZehler]["bezeichnung"].'" src="'.$cURL.'">';
 		
 								echo '<option  '.(!empty($veranstaltungskategorie[$iTmpZehler]["farbe"])?' style="background-color:#'.$veranstaltungskategorie[$iTmpZehler]["farbe"].'" ':'').'  '.(isset($veranstaltung['veranstaltungskategorie_kurzbz']) && $veranstaltung['veranstaltungskategorie_kurzbz']==$veranstaltungskategorie[$iTmpZehler]["veranstaltungskategorie_kurzbz"]?' selected="selected" ':'').' value="'.$veranstaltungskategorie[$iTmpZehler]["veranstaltungskategorie_kurzbz"].'">'.$veranstaltungskategorie[$iTmpZehler]["bezeichnung"].'</option>';
 							}	
@@ -488,8 +486,8 @@
 				<tr>
 					<td><label for="Datum1">Datum von</label></td>
 					<td>
-						<input class="ausblenden" name="start" type="text" value="<?php echo $veranstaltung['start_timestamp']=trim((isset($veranstaltung['start_timestamp'])?$veranstaltung['start_timestamp']:mktime(8,0,0,date("m"),date("d"),date("y")))) ;?>" />
-						<input id="Datum1" name="Datum1" type="text" size="11" maxlength="11" value="<?php echo $veranstaltung['start_datum']=trim(date("d.m.Y",$veranstaltung['start_timestamp']));?>"  onchange="window.document.selVeranstaltung.tmpGanztag.checked=false;var time_stamp=TimestampDatumZeit(window.document.selVeranstaltung.Datum1.value,window.document.selVeranstaltung.Zeit1.value);  if (!time_stamp) {this.focus();return false;} else {window.document.selVeranstaltung.start.value=time_stamp; }; if (window.document.selVeranstaltung.start.value > window.document.selVeranstaltung.ende.value) {alert('Datum von ist kleiner als bis');this.focus(); } ; " />
+						<input class="ausblenden" name="start" type="text" value="<?php echo $veranstaltung['start_timestamp']=trim((isset($veranstaltung['start_timestamp'])?$veranstaltung['start_timestamp']:mktime(8,0,0,date("m"),date("d"),date("y")))) ;?>" >
+						<input id="Datum1" name="Datum1" type="text" size="11" maxlength="11" value="<?php echo $veranstaltung['start_datum']=trim(date("d.m.Y",$veranstaltung['start_timestamp']));?>"  onchange="window.document.selVeranstaltung.tmpGanztag.checked=false;var time_stamp=TimestampDatumZeit(window.document.selVeranstaltung.Datum1.value,window.document.selVeranstaltung.Zeit1.value);  if (!time_stamp) {this.focus();return false;} else {window.document.selVeranstaltung.start.value=time_stamp; }; if (window.document.selVeranstaltung.start.value > window.document.selVeranstaltung.ende.value) {alert('Datum von ist kleiner als bis');this.focus(); } ; " >
 						&nbsp;
 						<select  id="Zeit1" name="Zeit1"  onchange="window.document.selVeranstaltung.tmpGanztag.checked=false;var time_stamp=TimestampDatumZeit(window.document.selVeranstaltung.Datum1.value,window.document.selVeranstaltung.Zeit1.value);  if (!time_stamp) {this.focus();return false;} else {window.document.selVeranstaltung.start.value=time_stamp; }; if (window.document.selVeranstaltung.start.value > window.document.selVeranstaltung.ende.value) {alert('Datum von ist kleiner als bis');this.focus(); } ; ">
 						<?php
@@ -515,8 +513,8 @@
 				<tr>
 					<td><label for="Datum2">Datum bis</label></td>
 					<td>
-						<input class="ausblenden" name="ende" type="text" value="<?php echo $veranstaltung['ende_timestamp']=trim((isset($veranstaltung['ende_timestamp'])?$veranstaltung['ende_timestamp']:mktime(18,0,0,date("m"),date("d"),date("y")))) ;?>" />
-						<input id="Datum2" name="Datum2" type="text" size="11" maxlength="11" value="<?php echo $veranstaltung['ende_datum']=trim(date("d.m.Y",$veranstaltung['ende_timestamp']));?>"   onchange="window.document.selVeranstaltung.tmpGanztag.checked=false;var time_stamp=TimestampDatumZeit(window.document.selVeranstaltung.Datum2.value,window.document.selVeranstaltung.Zeit2.value);  if (!time_stamp) {this.focus();return false; } else {window.document.selVeranstaltung.ende.value=time_stamp; }; if (window.document.selVeranstaltung.start.value > window.document.selVeranstaltung.ende.value) {alert('Datum von ist kleiner als bis');this.focus(); } ;" />
+						<input class="ausblenden" name="ende" type="text" value="<?php echo $veranstaltung['ende_timestamp']=trim((isset($veranstaltung['ende_timestamp'])?$veranstaltung['ende_timestamp']:mktime(18,0,0,date("m"),date("d"),date("y")))) ;?>" >
+						<input id="Datum2" name="Datum2" type="text" size="11" maxlength="11" value="<?php echo $veranstaltung['ende_datum']=trim(date("d.m.Y",$veranstaltung['ende_timestamp']));?>"   onchange="window.document.selVeranstaltung.tmpGanztag.checked=false;var time_stamp=TimestampDatumZeit(window.document.selVeranstaltung.Datum2.value,window.document.selVeranstaltung.Zeit2.value);  if (!time_stamp) {this.focus();return false; } else {window.document.selVeranstaltung.ende.value=time_stamp; }; if (window.document.selVeranstaltung.start.value > window.document.selVeranstaltung.ende.value) {alert('Datum von ist kleiner als bis');this.focus(); } ;" >
 						&nbsp;
 						<select  id="Zeit2" name="Zeit2"  onchange="window.document.selVeranstaltung.tmpGanztag.checked=false;var time_stamp=TimestampDatumZeit(window.document.selVeranstaltung.Datum2.value,window.document.selVeranstaltung.Zeit2.value);  if (!time_stamp) {this.focus();return false; } else {window.document.selVeranstaltung.ende.value=time_stamp; }; if (window.document.selVeranstaltung.start.value > window.document.selVeranstaltung.ende.value) {alert('Datum von ist kleiner als bis');this.focus(); } ;">
 						<?php
@@ -536,7 +534,7 @@
 						?>	
 						</select> 
 					 &nbsp;Ganztägige Veranstaltung
-					 &nbsp;<input  <?php echo ( ($veranstaltung['start_zeit']=='00:00' && $veranstaltung['ende_zeit']=='23:45')?' checked="checked" ':'' );   ?> type="checkbox"  value="1" onclick="if (this.checked!=false) {window.document.selVeranstaltung.Zeit1.options.selectedIndex=0;window.document.selVeranstaltung.Zeit2.options.selectedIndex=(window.document.selVeranstaltung.Zeit2.options.length - 1); }; var time_stamp=TimestampDatumZeit(window.document.selVeranstaltung.Datum1.value,window.document.selVeranstaltung.Zeit1.value);  if (time_stamp) {window.document.selVeranstaltung.start.value=time_stamp; }; time_stamp=TimestampDatumZeit(window.document.selVeranstaltung.Datum2.value,window.document.selVeranstaltung.Zeit2.value);  if (time_stamp) {window.document.selVeranstaltung.ende.value=time_stamp; };" name="tmpGanztag" />
+					 &nbsp;<input  <?php echo ( ($veranstaltung['start_zeit']=='00:00' && $veranstaltung['ende_zeit']=='23:45')?' checked="checked" ':'' );   ?> type="checkbox"  value="1" onclick="if (this.checked!=false) {window.document.selVeranstaltung.Zeit1.options.selectedIndex=0;window.document.selVeranstaltung.Zeit2.options.selectedIndex=(window.document.selVeranstaltung.Zeit2.options.length - 1); }; var time_stamp=TimestampDatumZeit(window.document.selVeranstaltung.Datum1.value,window.document.selVeranstaltung.Zeit1.value);  if (time_stamp) {window.document.selVeranstaltung.start.value=time_stamp; }; time_stamp=TimestampDatumZeit(window.document.selVeranstaltung.Datum2.value,window.document.selVeranstaltung.Zeit2.value);  if (time_stamp) {window.document.selVeranstaltung.ende.value=time_stamp; };" name="tmpGanztag" >
 					</td>	
 				</tr>				
 
@@ -556,7 +554,7 @@
 						<table>
 						<tr>
 							<td><label for="inhalt">Freigabe</label></td>
-							<td><input type="checkbox" <?php echo (!isset($veranstaltung['freigabeamum']) || empty($veranstaltung['freigabeamum'])?'':' checked="checked" ' ); ?>  value="1" onclick="if (this.checked!=false) {window.document.selVeranstaltung.freigabevon.value='<?php echo $userUID;?>';window.document.selVeranstaltung.freigabeamum.value='<?php echo time();?>';} else {window.document.selVeranstaltung.freigabeamum.value='';};" name="tmpFreigabe" /></td>
+							<td><input type="checkbox" <?php echo (!isset($veranstaltung['freigabeamum']) || empty($veranstaltung['freigabeamum'])?'':' checked="checked" ' ); ?>  value="1" onclick="if (this.checked!=false) {window.document.selVeranstaltung.freigabevon.value='<?php echo $userUID;?>';window.document.selVeranstaltung.freigabeamum.value='<?php echo time();?>';} else {window.document.selVeranstaltung.freigabeamum.value='';};" name="tmpFreigabe" ></td>
 
 						</tr>
 						</table>
@@ -566,15 +564,15 @@
 						<table>
 						<tr>
 							<td>&nbsp;</td>
-							<td class="cursor_hand" onclick="if (window.document.selVeranstaltung.start.value > window.document.selVeranstaltung.ende.value) {alert('Datum von ist kleiner als bis');window.document.selVeranstaltung.Datum1.focus();return false; } ; window.document.selVeranstaltung.work.value='save';window.document.selVeranstaltung.submit();" >speichern&nbsp;<img class="cursor_hand" height="14px" border="0" alt="sichern - save" src="../../../skin/images/date_edit.png" /></td>
+							<td class="cursor_hand" onclick="if (window.document.selVeranstaltung.start.value > window.document.selVeranstaltung.ende.value) {alert('Datum von ist kleiner als bis');window.document.selVeranstaltung.Datum1.focus();return false; } ; window.document.selVeranstaltung.work.value='save';window.document.selVeranstaltung.submit();" >speichern&nbsp;<img class="cursor_hand" height="14px" border="0" alt="sichern - save" src="../../../skin/images/date_edit.png" ></td>
 							<td>&nbsp;</td>
 							<td>&nbsp;</td>
 							<td>&nbsp;</td>
-							<td <?php echo (empty($veranstaltung_id)?' class="ausblenden" ':' class="cursor_hand" '); ?>  onclick="window.document.selVeranstaltung.work.value='del';window.document.selVeranstaltung.submit();" >l&ouml;schen&nbsp;<img height="14px" border="0" alt="entfernen - delete" src="../../../skin/images/date_delete.png" /></td>
+							<td <?php echo (empty($veranstaltung_id)?' class="ausblenden" ':' class="cursor_hand" '); ?>  onclick="window.document.selVeranstaltung.work.value='del';window.document.selVeranstaltung.submit();" >l&ouml;schen&nbsp;<img height="14px" border="0" alt="entfernen - delete" src="../../../skin/images/date_delete.png" ></td>
 							<td>&nbsp;</td>
 							<td>&nbsp;</td>
 							<td>&nbsp;</td>
-							<td  class="cursor_hand"  onclick="callWindows('jahresplan_detail.php?work=update&amp;veranstaltung_id=<?php echo $veranstaltung_id; ?>','Veranstaltung_Detail').focus(); ">Voransicht&nbsp;<img  title="Voransicht" src="../../../skin/images/date_magnify.png" alt="Voransicht" /></td>
+							<td  class="cursor_hand"  onclick="callWindows('jahresplan_detail.php?work=update&amp;veranstaltung_id=<?php echo $veranstaltung_id; ?>','Veranstaltung_Detail').focus(); ">Voransicht&nbsp;<img  title="Voransicht" src="../../../skin/images/date_magnify.png" alt="Voransicht" ></td>
 							<td>&nbsp;</td>
 						</tr>
 						</table>
@@ -605,16 +603,16 @@
 	  </fieldset>
 
 	<?php
-	echo '<br />'.$error;
+	echo '<br>'.$error;
 	$veranstaltung_id=(isset($veranstaltung['veranstaltung_id'])?$veranstaltung['veranstaltung_id']:$veranstaltung_id);
 	if (!empty($veranstaltung_id))
 	{
-		echo '<hr />'.jahresplan_veranstaltung_detail_user($conn,$veranstaltung,$is_wartungsberechtigt);
+		echo '<hr>'.jahresplan_veranstaltung_detail_user($conn,$veranstaltung,$is_wartungsberechtigt);
 		echo '<iframe id="reservierung" src="jahresplan_reservierung.php?veranstaltung_id='.$veranstaltung_id.'&amp;start='.(isset($veranstaltung['start_timestamp'])?$veranstaltung['start_timestamp']:mktime(12,0,0,date("m"),date("d"),date("y"))).'&amp;ende='.(isset($veranstaltung['ende_timestamp'])?$veranstaltung['ende_timestamp']:mktime(13,0,0,date("m"),date("d"),date("y"))).'"></iframe>';
 	}
 	else
 	{
-		echo '<hr /><span class="footer_zeile">Reservierungen k&ouml;nnen erst nach dem speichern der Veranstaltung zugeordnet werden.</span>';
+		echo '<hr><span class="footer_zeile">Reservierungen k&ouml;nnen erst nach dem speichern der Veranstaltung zugeordnet werden.</span>';
 	}
 	?>	
 
