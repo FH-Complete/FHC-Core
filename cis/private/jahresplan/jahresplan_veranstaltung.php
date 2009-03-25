@@ -394,7 +394,7 @@
 		if (InfoWin) {
 			InfoWin.close();
 	 	}
-	       InfoWin=window.open(url,nameID,"copyhistory=no,directories=no,location=no,dependent=no,toolbar=yes,menubar=no,status=no,resizable=yes,scrollbars=yes, width=500,height=600,left=60, top=15");  
+	       InfoWin=window.open(url,nameID,"copyhistory=no,directories=no,location=no,dependent=no,toolbar=yes,menubar=no,status=no,resizable=yes,scrollbars=yes, width=800,height=800,left=60, top=15");  
 		InfoWin.focus();
 		InfoWin.setTimeout("window.close()",800000);
 	}
@@ -608,7 +608,9 @@
 	if (!empty($veranstaltung_id))
 	{
 		echo '<hr>'.jahresplan_veranstaltung_detail_user($conn,$veranstaltung,$is_wartungsberechtigt);
+		echo '<a href="javascript:callWindows(\'jahresplan_reservierung.php?veranstaltung_id='.$veranstaltung_id.'&amp;openfirst=1&amp;start='.(isset($veranstaltung['start_timestamp'])?$veranstaltung['start_timestamp']:mktime(12,0,0,date("m"),date("d"),date("y"))).'&amp;ende='.(isset($veranstaltung['ende_timestamp'])?$veranstaltung['ende_timestamp']:mktime(13,0,0,date("m"),date("d"),date("y"))).'\',\'Reservierung\');">Reservierungen in einem neuen Fenster anzeigen.</a>';	
 		echo '<iframe id="reservierung" src="jahresplan_reservierung.php?veranstaltung_id='.$veranstaltung_id.'&amp;start='.(isset($veranstaltung['start_timestamp'])?$veranstaltung['start_timestamp']:mktime(12,0,0,date("m"),date("d"),date("y"))).'&amp;ende='.(isset($veranstaltung['ende_timestamp'])?$veranstaltung['ende_timestamp']:mktime(13,0,0,date("m"),date("d"),date("y"))).'"></iframe>';
+
 	}
 	else
 	{
