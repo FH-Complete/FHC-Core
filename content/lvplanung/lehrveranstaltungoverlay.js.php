@@ -1366,7 +1366,8 @@ function LehrveranstaltungGesamtNotenTreeSelectDifferent()
 {
 	var zeugnistree = document.getElementById("lehrveranstaltung-noten-tree");
 	var lvgesamttree = document.getElementById("lehrveranstaltung-lvgesamtnoten-tree");
-
+	lvgesamttree.view.selection.clearSelection();
+	
 	if(lehrveranstaltungNotenTreeloaded && lehrveranstaltungGesamtNotenTreeloaded)
 	{
 		lvgesamttree.view.selection.clearSelection();
@@ -1402,7 +1403,7 @@ function LehrveranstaltungGesamtNotenTreeSelectDifferent()
 				var zeugnisbenotungsdatum=zeugnistree.view.getCellText(j,col);
 				
 				//debug(zeugnisuid+'=='+lvgesamtuid+' && '+zeugnisnote+'=='+lvgesamtnote);
-				if(zeugnisuid==lvgesamtuid && zeugnisnote==lvgesamtnote)
+				if(zeugnisuid==lvgesamtuid && zeugnisnote==lvgesamtnote && zeugnisbenotungsdatum==lvgesamtbenotungsdatum)
 				{
 					found=true;
 					break;
