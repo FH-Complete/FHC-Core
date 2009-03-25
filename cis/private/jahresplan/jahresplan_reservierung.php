@@ -66,11 +66,9 @@
 		exit('keine Veranstaltungs ID &uuml;bergeben');
 	}
 
+  	$openfirst=trim((isset($_REQUEST['openfirst']) ? $_REQUEST['openfirst']:''));
   	$start=trim((isset($_REQUEST['start']) ? $_REQUEST['start']:mktime(12,0,0,date("m"),date("d"),date("y")) ));
-	$start=$start-7200;
-	
    	$ende=trim((isset($_REQUEST['ende']) ? $_REQUEST['ende']:mktime(13,0,0,date("m"),date("d"),date("y")) ));
-	$ende=$ende+7200;
 	// Verarbeiten einer Reservierung
    	$work=trim((isset($_REQUEST['work']) ? $_REQUEST['work']:''));
    	$veranstaltung_id_zuordnen=trim((isset($_REQUEST['veranstaltung_id_zuordnen']) ? $_REQUEST['veranstaltung_id_zuordnen']:''));
@@ -165,7 +163,6 @@
 			}	
 		}
 	}	
-	
 ?> 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -174,7 +171,8 @@
 	<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
 	<script language="JavaScript" type="text/javascript">
 	<!--
-		if (window.opener && !window.opener.closed) {
+		var openfirst='<?php echo $openfirst; ?>';
+		if (window.opener && !window.opener.closed && openfirst!='1') {
 			if (confirm("Soll die Hauptseite neu aufgebaut werden?")) {
 			window.opener.location.reload();
 	//		this.close();
@@ -228,11 +226,31 @@
 	$Jahresplan->setVeranstaltung_id('');
 	$Jahresplan->setReservierung_id('');
 
-	$Jahresplan->setStart($start);
-	$Jahresplan->setEnde($ende);	
+#	echo "<br>1111 Start : $start ".Date("Y-m-d H:s",$start)." - Ende :$ende ".Date("Y-m-d H:s",$ende);
+	if (Date("H",$ende)>2) // Plausib das mit den 2h abzug nicht die 00:00 Grenze unterschritten wird
+	{
+		$RESstart=$start-7200;
+	}
+	else
+	{
+		$RESstart=@mktime(0, 1, 0, date("m",$start),date("d",$start),date("Y",$start));
+	}
+
+	if (Date("H",$ende)<22) // Plausib das mit den 2h dazu nicht die 24:00 Grenze ueberschritten wird
+	{
+		$RESende=$ende+7200;
+	}
+	else
+	{
+		$RESende=@mktime(23, 59, 0, date("m",$ende),date("d",$ende),date("Y",$ende));
+	}
+#	echo "<br>2222 Start : $start ".Date("Y-m-d H:s",$start)." - Ende :$ende ".Date("Y-m-d H:s",$ende);
+
+	$Jahresplan->setStart($RESstart);
+	$Jahresplan->setEnde($RESende);	
 
 	$reservierungierung=array();
-	if ($Jahresplan->loadReservierung())
+	if ($reservierungierung_bak=$Jahresplan->loadReservierung())
 	{
 		$reservierungierung=$Jahresplan->getReservierung();
 		if (is_array($reservierungierung) && count($reservierungierung)>0)
@@ -254,13 +272,19 @@
 				$reservierungierung=array();
 				while (list( $tmp_key, $tmp_value ) = each($reservierungierung_sort) ) 
 				{
-						$reservierungierung[]=$tmp_value[0];			
+					$reservierungierung[]=$tmp_value[0];			
 				}
-#				echo Test($reservierungierung);
 			}	
-			
 		}
 	}
+	
+#echo "<br>".$Jahresplan->getStringSQL().Test($reservierungierung_bak);
+	
+	if (is_array($reservierungierung_bak) && (!is_array($reservierungierung) || count($reservierungierung)<1) )
+	{	
+		$reservierungierung=$reservierungierung_bak;
+	}	
+	
 	$showHTML.=$Jahresplan->getError();		
 
 	$showHTML.='<table class="reservierungen_liste" cellpadding="1" cellspacing="1">
