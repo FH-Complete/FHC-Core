@@ -290,7 +290,7 @@ class lvinfo
 		$qry = "SELECT count(*) as anzahl FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$lehrveranstaltung_id'";
 		
 		if(!is_null($sprache))
-			$qry = " AND sprache='".addslashes($sprache)."'";
+			$qry .= " AND sprache='".addslashes($sprache)."'";
 
 		if($result=pg_query($this->conn, $qry))
 		{
