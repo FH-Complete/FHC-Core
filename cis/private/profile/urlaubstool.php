@@ -358,7 +358,7 @@ $datum_obj = new datum();
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
-<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
 <script language="Javascript">
 function conf_del()
 {
