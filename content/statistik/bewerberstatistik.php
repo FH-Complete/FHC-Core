@@ -894,7 +894,7 @@ else
 {
 	//Mail versenden
 	echo 'Bewerberstatistik.php - Sende Mail ...';
-	$to = 'tw_sek@technikum-wien.at, tw_stgl@technikum-wien.at, russ@technikum-wien.at, ott@technikum-wien.at, vilesci@technikum-wien.at';
+	$to = 'tw_sek@technikum-wien.at, tw_stgl@technikum-wien.at, russ@technikum-wien.at, ott@technikum-wien.at, vilesci@technikum-wien.at, lehner@technikum-wien.at, teschl@technikum-wien.at, maderdon@technikum-wien.at';
 	$mailobj = new mail($to, 'vilesci@technikum-wien.at','Bewerberstatistik','Sie muessen diese Mail als HTML-Mail anzeigen um die Statistik zu sehen');
 	$mailobj->setHTMLContent($content);
 	
