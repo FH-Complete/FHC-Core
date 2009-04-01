@@ -50,7 +50,7 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 	if(!$fachbereich->load($_GET['fachbereich_kurzbz']))
 		die('Institut existiert nicht');
 	
-	echo "<h2>Lektorenstatistik (Lehrauftrag ohne Betreuungen) - ".$fachbereich->bezeichnung.'</h2>';
+	echo "<h2>Mitarbeiterstatistik (Hauptzuordnung) - ".$fachbereich->bezeichnung.'</h2>';
 	$qry = "SELECT distinct uid, nachname, vorname, titelpre, titelpost 
 			FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) 
 			WHERE fachbereich_kurzbz='".addslashes($fachbereich->fachbereich_kurzbz)."' 
