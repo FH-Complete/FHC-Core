@@ -130,7 +130,7 @@ function stpltableChange(db_stpl_table)
    		document.getElementById("statusbarpanel-text").label = "Tabelle erfolgreich geaendert";
    		document.getElementById("statusbarpanel-db_table").label = db_stpl_table;
 	}
-   
+	updatedbstpltable();
 	return true;
 }
 
@@ -264,6 +264,8 @@ function variableChange(variable, id, wert)
 	{
 		if(variable=='ignore_kollision')
 			updateignorekollision();
+		if(variable=='db_stpl_table')
+			updateidbstpltable();
 		//Statusbar setzen
    		document.getElementById("statusbarpanel-text").label = "Variable erfolgreich geaendert";
 	}
@@ -285,6 +287,21 @@ function updateignorekollision()
 		panel.label='Kollisionscheck AN';
 		panel.style.backgroundColor='';
 		document.getElementById('menu-prefs-ignore_kollision').setAttribute('checked','false');
+	}		
+}
+
+// markiert den eintrag in der statusleiste rot wenn auf die
+// echte stpl tabelle zugegriffen wird
+function updatedbstpltable()
+{
+	var panel = document.getElementById('statusbarpanel-db_table');
+	if(panel.label=='stundenplan')
+	{
+		panel.style.backgroundColor='red';
+	}
+	else
+	{
+		panel.style.backgroundColor='';
 	}		
 }
 
