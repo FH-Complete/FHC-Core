@@ -158,7 +158,7 @@ if (isset($_REQUEST["deleteabgabe"]))
 if (isset($_POST["abgabe"]))
 {
 	$abgabedatei_up = $_FILES["abgabedatei"]["tmp_name"];
-	$abgabe_anmerkung = $_POST["abgabe_anmerkung"];
+	$abgabe_anmerkung = (isset($_POST["abgabe_anmerkung"])?$_POST["abgabe_anmerkung"]:'');
 	
 	if ($abgabedatei_up)
 	{
