@@ -64,7 +64,7 @@
 					<td><a href="private/info/oeh/index.php" target="content" class="Item" ><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;&Ouml;H-Wahl</a></td>
 	-->
 		  			<td class="tdwrap"></td>
-					<td><a href="private/info/oeh/index.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;&Ouml;H-Wahl</a>
+					<td><a href="private/info/oeh/index.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;&Ouml;H-Wahl 2009</a>
 				  	<table class="tabcontent" id="oehwahl" style="display: visible;">
 						<tr style="display:none;">
 							<td class="tdwidth10" nowrap>&nbsp;</td>
