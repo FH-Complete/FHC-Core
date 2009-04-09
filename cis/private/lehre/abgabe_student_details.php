@@ -135,107 +135,114 @@ if($command=="update" || $error==true)
 	//Dateiupload bearbeiten
 	if ((isset($_FILES['datei']) and ! $_FILES['datei']['error']) || $error==true)
 	{
-		if($paabgabetyp_kurzbz!='end')
+		if(strtoupper(end(explode(".", $_FILES['datei']['name'])))=='PDF')
 		{
-			//"normaler" Upload
-			move_uploaded_file($_FILES['datei']['tmp_name'], $_SERVER['DOCUMENT_ROOT'].PAABGABE_PATH.$paabgabe_id.'_'.$user.'.pdf');
-			if(file_exists($_SERVER['DOCUMENT_ROOT'].PAABGABE_PATH.$paabgabe_id.'_'.$user.'.pdf'))
+			if($paabgabetyp_kurzbz!='end')
 			{
-				$qry="UPDATE campus.tbl_paabgabe SET
-					abgabedatum = now(),
-					updatevon = '".$user."', 
-					updateamum = now() 
-					WHERE paabgabe_id='".$paabgabe_id."'";
-				$result=pg_query($conn, $qry);
-			} 
+				//"normaler" Upload
+				move_uploaded_file($_FILES['datei']['tmp_name'], PAABGABE_PATH.$paabgabe_id.'_'.$user.'.pdf');
+				if(file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$user.'.pdf'))
+				{
+					$qry="UPDATE campus.tbl_paabgabe SET
+						abgabedatum = now(),
+						updatevon = '".$user."', 
+						updateamum = now() 
+						WHERE paabgabe_id='".$paabgabe_id."'";
+					$result=pg_query($conn, $qry);
+				} 
+				else 
+				{
+					echo "Upload nicht gefunden! Bitte wiederholen Sie den Fileupload.";
+				}
+			}
 			else 
 			{
-				echo "Upload nicht gefunden! Bitte wiederholen Sie den Fileupload.";
+				//Upload der Endabgabe - Eingabe der Zusatzdaten
+				$command='add';
+				if(!$error)
+				{
+					move_uploaded_file($_FILES['datei']['tmp_name'], PAABGABE_PATH.$paabgabe_id.'_'.$user.'.pdf');
+				}
+				if(file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$user.'.pdf'))
+				{
+					$qry="UPDATE campus.tbl_paabgabe SET
+						abgabedatum = now(),
+						updatevon = '".$user."', 
+						updateamum = now() 
+						WHERE paabgabe_id='".$paabgabe_id."'";
+					$result=pg_query($conn, $qry);
+				
+					
+					echo '
+					<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+					<html>
+					<head>
+					<title>PA-Abgabe</title>
+					<link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
+					<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
+					<meta http-equiv="content-type" content="text/html; charset=ISO-8859-9" />
+					<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
+					</head>
+					<body class="Background_main"  style="background-color:#eeeeee;">
+					<h3>Abgabe Studentenbereich - Zus&auml;tzliche Daten f&uuml;r die Abgabe</h3>';
+					$qry_zd="SELECT * FROM lehre.tbl_projektarbeit WHERE projektarbeit_id='".$projektarbeit_id."'";
+					$result_zd=@pg_query($conn, $qry_zd);
+					$row_zd=@pg_fetch_object($result_zd);
+					$htmlstr = "<div>Betreuer: <b>".$betreuer."</b><br>Titel: <b>".$titel."<b><br><br></div>\n";
+					$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
+					$htmlstr .= "<tr></tr>\n";
+					$htmlstr .= "<form action='$PHP_SELF' method='POST' name='".$projektarbeit_id."'>\n";
+					$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
+					$htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$paabgabe_id."'>\n";
+					$htmlstr .= "<input type='hidden' name='paabgabetyp_kurzbz' value='".$paabgabetyp_kurzbz."'>\n";
+					$htmlstr .= "<input type='hidden' name='abgabedatum' value='".$abgabedatum."'>\n";
+					$htmlstr .= "<input type='hidden' name='titel' value='".$titel."'>\n";
+					$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
+					$htmlstr .= "<input type='hidden' name='betreuer' value='".$betreuer."'>\n";
+					$htmlstr .= "<input type='hidden' name='command' value='add'>\n";
+					$htmlstr .= "<tr>\n";
+					$htmlstr .= "<td><b>Sprache der Arbeit:</b></td><td>";
+					$sprache = @pg_query($conn, "SELECT sprache FROM tbl_sprache");
+				    $num = pg_num_rows($sprache);
+				    if ($num > 0) 
+				    {
+				        $htmlstr .= "<SELECT NAME=\"sprache\" SIZE=1> \n";
+				        while ($mrow=@pg_fetch_object($sprache)) 
+				        {
+				            $htmlstr .= "<OPTION VALUE=\"$mrow->sprache\"";
+				            if ($mrow->sprache == $sprache) 
+	            			{
+	            				$htmlstr .= " SELECTED";
+	            			}
+				            $htmlstr .= ">$mrow->sprache \n";
+				        }
+				        $htmlstr .= "</SELECT> \n";
+				    }
+				    $htmlstr .= "</td></tr>\n";
+					$htmlstr .= "<tr><td width='30%'><b>Kontrollierte Schlagw&ouml;rter:*</b></td><td width='40%'><input  type='text' name='kontrollschlagwoerter'  id='kontrollschlagwoerter' value='".$kontrollschlagwoerter."' size='60' maxlength='150'></td>
+						<td  width='30%' align='left'><input type='button' name='SWD' value='    SWD    ' onclick='window.open(\"abgabe_student_swd.php\")'></td></tr>\n";
+					$htmlstr .= "<tr><td><b>Dt. Schlagw&ouml;rter:</b></td><td><input  type='text' name='schlagwoerter' value='".$schlagwoerter."' size='60' maxlength='150'></td></tr>\n";
+					$htmlstr .= "<tr><td><b>Engl. Schlagw&ouml;rter:</b></td><td><input  type='text' name='schlagwoerter_en' value='".$schlagwoerter_en."' size='60' maxlength='150'></td></tr>\n";
+					$htmlstr .= "<tr><td valign='top'><b>Abstract </b>(max. 5000 Zeichen):*</td><td><textarea name='abstract' cols='46'  rows='7'>$abstract</textarea></td></tr>\n";
+					$htmlstr .= "<tr><td valign='top'><b>Abstract engl.</b>(max. 5000 Zeichen):*</td><td><textarea name='abstract_en' cols='46'  rows='7'>$abstract_en</textarea></td></tr>\n";
+					$htmlstr .= "<tr><td><b>Seitenanzahl:*</b></td><td><input  type='text' name='seitenanzahl' value='".$seitenanzahl."' size='5' maxlength='4'></td></tr>\n";
+					$htmlstr .= "<tr></tr><td>&nbsp;</td><tr><td style='font-size:70%'>* Pflichtfeld - bitte immer bef&uuml;llen</td></tr><tr><td>&nbsp;</td></tr>\n";
+					$htmlstr .= "<tr><td><input type='submit' name='schick' value='abschicken'></td>";
+					$htmlstr .= "</tr>\n";
+					$htmlstr .= "</form>\n";
+					$htmlstr .= "</table>\n";	
+					$htmlstr .= "</body></html>";
+					echo $htmlstr;
+				} 
+				else 
+				{
+					echo "Upload nicht gefunden! Bitte wiederholen Sie den Fileupload.";
+				}
 			}
 		}
 		else 
 		{
-			//Upload der Endabgabe - Eingabe der Zusatzdaten
-			$command='add';
-			if(!$error)
-			{
-				move_uploaded_file($_FILES['datei']['tmp_name'], $_SERVER['DOCUMENT_ROOT'].PAABGABE_PATH.$paabgabe_id.'_'.$user.'.pdf');
-			}
-			if(file_exists($_SERVER['DOCUMENT_ROOT'].PAABGABE_PATH.$paabgabe_id.'_'.$user.'.pdf'))
-			{
-				$qry="UPDATE campus.tbl_paabgabe SET
-					abgabedatum = now(),
-					updatevon = '".$user."', 
-					updateamum = now() 
-					WHERE paabgabe_id='".$paabgabe_id."'";
-				$result=pg_query($conn, $qry);
-			
-				
-				echo '
-				<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-				<html>
-				<head>
-				<title>PA-Abgabe</title>
-				<link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
-				<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
-				<meta http-equiv="content-type" content="text/html; charset=ISO-8859-9" />
-				<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
-				</head>
-				<body class="Background_main"  style="background-color:#eeeeee;">
-				<h3>Abgabe Studentenbereich - Zus&auml;tzliche Daten f&uuml;r die Abgabe</h3>';
-				$qry_zd="SELECT * FROM lehre.tbl_projektarbeit WHERE projektarbeit_id='".$projektarbeit_id."'";
-				$result_zd=@pg_query($conn, $qry_zd);
-				$row_zd=@pg_fetch_object($result_zd);
-				$htmlstr = "<div>Betreuer: <b>".$betreuer."</b><br>Titel: <b>".$titel."<b><br><br></div>\n";
-				$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
-				$htmlstr .= "<tr></tr>\n";
-				$htmlstr .= "<form action='$PHP_SELF' method='POST' name='".$projektarbeit_id."'>\n";
-				$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
-				$htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$paabgabe_id."'>\n";
-				$htmlstr .= "<input type='hidden' name='paabgabetyp_kurzbz' value='".$paabgabetyp_kurzbz."'>\n";
-				$htmlstr .= "<input type='hidden' name='abgabedatum' value='".$abgabedatum."'>\n";
-				$htmlstr .= "<input type='hidden' name='titel' value='".$titel."'>\n";
-				$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
-				$htmlstr .= "<input type='hidden' name='betreuer' value='".$betreuer."'>\n";
-				$htmlstr .= "<input type='hidden' name='command' value='add'>\n";
-				$htmlstr .= "<tr>\n";
-				$htmlstr .= "<td><b>Sprache der Arbeit:</b></td><td>";
-				$sprache = @pg_query($conn, "SELECT sprache FROM tbl_sprache");
-			    $num = pg_num_rows($sprache);
-			    if ($num > 0) 
-			    {
-			        $htmlstr .= "<SELECT NAME=\"sprache\" SIZE=1> \n";
-			        while ($mrow=@pg_fetch_object($sprache)) 
-			        {
-			            $htmlstr .= "<OPTION VALUE=\"$mrow->sprache\"";
-			            if ($mrow->sprache == $sprache) 
-            			{
-            				$htmlstr .= " SELECTED";
-            			}
-			            $htmlstr .= ">$mrow->sprache \n";
-			        }
-			        $htmlstr .= "</SELECT> \n";
-			    }
-			    $htmlstr .= "</td></tr>\n";
-				$htmlstr .= "<tr><td width='30%'><b>Kontrollierte Schlagw&ouml;rter:*</b></td><td width='40%'><input  type='text' name='kontrollschlagwoerter'  id='kontrollschlagwoerter' value='".$kontrollschlagwoerter."' size='60' maxlength='150'></td>
-					<td  width='30%' align='left'><input type='button' name='SWD' value='    SWD    ' onclick='window.open(\"abgabe_student_swd.php\")'></td></tr>\n";
-				$htmlstr .= "<tr><td><b>Dt. Schlagw&ouml;rter:</b></td><td><input  type='text' name='schlagwoerter' value='".$schlagwoerter."' size='60' maxlength='150'></td></tr>\n";
-				$htmlstr .= "<tr><td><b>Engl. Schlagw&ouml;rter:</b></td><td><input  type='text' name='schlagwoerter_en' value='".$schlagwoerter_en."' size='60' maxlength='150'></td></tr>\n";
-				$htmlstr .= "<tr><td valign='top'><b>Abstract </b>(max. 5000 Zeichen):*</td><td><textarea name='abstract' cols='46'  rows='7'>$abstract</textarea></td></tr>\n";
-				$htmlstr .= "<tr><td valign='top'><b>Abstract engl.</b>(max. 5000 Zeichen):*</td><td><textarea name='abstract_en' cols='46'  rows='7'>$abstract_en</textarea></td></tr>\n";
-				$htmlstr .= "<tr><td><b>Seitenanzahl:*</b></td><td><input  type='text' name='seitenanzahl' value='".$seitenanzahl."' size='5' maxlength='4'></td></tr>\n";
-				$htmlstr .= "<tr></tr><td>&nbsp;</td><tr><td style='font-size:70%'>* Pflichtfeld - bitte immer bef&uuml;llen</td></tr><tr><td>&nbsp;</td></tr>\n";
-				$htmlstr .= "<tr><td><input type='submit' name='schick' value='abschicken'></td>";
-				$htmlstr .= "</tr>\n";
-				$htmlstr .= "</form>\n";
-				$htmlstr .= "</table>\n";	
-				$htmlstr .= "</body></html>";
-				echo $htmlstr;
-			} 
-			else 
-			{
-				echo "Upload nicht gefunden! Bitte wiederholen Sie den Fileupload.";
-			}
+			echo "Upload keine pdf-Datei! Bitte wiederholen Sie den Fileupload.";
 		}
 	}
 	$error=false;		
