@@ -111,9 +111,10 @@ function confdel()
 </head>
 
 <body class="background_main">
-<h2>Bachelor-/Diplomarbeitsbetreuungen</h2>
-
 <?php 
+echo "<h2>Bachelor-/Diplomarbeitsbetreuungen ($getuid)</h2>";
+
+
     echo $htmlstr;
 ?>
 
