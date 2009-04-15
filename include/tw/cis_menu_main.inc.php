@@ -39,7 +39,7 @@
 				<table class="tabcontent" id="NEWS" style="display: visible;">
 				<tr>
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
-					<td class="tdwrap"><a class="Item" target="_blank" href="http://www.technikum-wien.at/service/intern"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Newsletter</a></td>
+					<td class="tdwrap"><a class="Item" target="_blank" href="http://www.technikum-wien.at/fh/aktuelles/news/"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Newsletter</a></td>
 		  		</tr>
 <!--		  		<tr>
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
