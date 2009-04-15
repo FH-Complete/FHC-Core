@@ -191,12 +191,12 @@
 			//Datum und Uhrzeit pruefen
 			if($_POST['datum']!='' && !$datum_obj->checkDatum($_POST['datum']))
 			{
-				echo 'Datum ist ungueltig';
+				echo '<span class="input_error">Datum ist ungueltig. Das Datum muss im Format DD.MM.JJJJ eingegeben werden<br></span>';
 				$error = true;
 			}
 			if($_POST['uhrzeit']!='' && !$datum_obj->checkUhrzeit($_POST['uhrzeit']))
 			{
-				echo 'Uhrzeit ist ungueltig:'.$_POST['uhrzeit'];
+				echo '<span class="input_error">Uhrzeit ist ungueltig:'.$_POST['uhrzeit'].'. Die Uhrzeit muss im Format HH:MM:SS angegeben werden!<br></span>';
 				$error = true;
 			}
 			
@@ -212,13 +212,13 @@
 				
 				if($reihungstest->save())
 				{
-					echo 'Daten wurden erfolgreich gespeichert <script>window.opener.StudentReihungstestDropDownRefresh();</script>';
+					echo '<b>Daten wurden erfolgreich gespeichert</b> <script>window.opener.StudentReihungstestDropDownRefresh();</script>';
 					$reihungstest_id = $reihungstest->reihungstest_id;
 					$stg_kz = $reihungstest->studiengang_kz;
 				}
 				else
 				{
-					echo 'Fehler beim Speichern der Daten: '.$reihungstest->errormsg;
+					echo '<span class="input_error">Fehler beim Speichern der Daten: '.$reihungstest->errormsg.'</span>';
 				}
 			}
 			$neu=false;
@@ -402,7 +402,7 @@
 		echo '</SELECT></td></tr>';
 		echo '<tr><td>Anmerkung</td><td><input type="input" name="anmerkung" value="'.$reihungstest->anmerkung.'"></td></tr>';
 		echo '<tr><td>Datum</td><td><input type="input" name="datum" value="'.$datum_obj->convertISODate($reihungstest->datum).'"></td></tr>';
-		echo '<tr><td>Uhrzeit</td><td><input type="input" name="uhrzeit" value="'.$reihungstest->uhrzeit.'"></td></tr>';
+		echo '<tr><td>Uhrzeit</td><td><input type="input" name="uhrzeit" value="'.$reihungstest->uhrzeit.'"> (Format: HH:MM:SS)</td></tr>';
 		if(!$neu)
 			$val = 'Änderung Speichern';
 		else 
