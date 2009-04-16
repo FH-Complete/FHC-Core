@@ -36,16 +36,16 @@
    $user=get_uid();
 
    $is_lector=check_lektor($user,$conn);
-
-   //Studentenvertreter duerfen die Verteiler genauso wie Lektoren verwenden
-   /*doch nicht
+   $is_stdv=false;
+   
+   //Studentenvertreter duerfen den Verteiler tw_std oeffnen
    if(!$is_lector)
    {
    		$fkt = new benutzerfunktion($conn);
    		if($fkt->benutzerfunktion_exists($user, 'stdv'))
-   			$is_lector=true;
+   			$is_stdv=true;
    }
-   */
+
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -140,7 +140,8 @@
 				echo "<td width=\"20\">";
 				if(!$row1->aktiv && MAILVERTEILER_SPERRE)
 				{
-					if($is_lector)
+					//Studentenvertreter duerfen den Verteiler fuer alle Studenten oeffnen
+					if($is_lector || ($is_stdv && strtolower($row1->gruppe_kurzbz)=='tw_std'))
 					{
 						/* open a popup containing the final dispatcher address */
 						if(MAILVERTEILER_SPERRE)
