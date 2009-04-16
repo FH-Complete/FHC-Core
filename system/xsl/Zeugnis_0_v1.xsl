@@ -50,28 +50,28 @@
 					</fo:block-container> 
 
 
-					<fo:block-container position="absolute" top="65mm" left="140mm">
+					<fo:block-container position="absolute" top="75mm" left="140mm">
 						<fo:block line-height="14pt" font-family="sans-serif" font-size="10pt">
 							<xsl:text>Personenkennzeichen: </xsl:text>
 						</fo:block>
 					</fo:block-container>
-					<fo:block-container position="absolute" top="65mm" left="177mm">
+					<fo:block-container position="absolute" top="75mm" left="177mm">
 						<fo:block content-width="80mm" line-height="14pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
 							<xsl:value-of select="matrikelnr" />
 						</fo:block>
 					</fo:block-container>
-					<fo:block-container position="absolute" top="70mm" left="143mm">
+					<fo:block-container position="absolute" top="80mm" left="143mm">
 						<fo:block line-height="14pt" font-family="sans-serif" font-size="10pt">
 							<xsl:text>Kennzahl des Studiengangs: </xsl:text>
 						</fo:block>
 					</fo:block-container>
-					<fo:block-container position="absolute" top="70mm" left="189mm">
+					<fo:block-container position="absolute" top="80mm" left="189mm">
 						<fo:block content-width="80mm" line-height="14pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
 							<xsl:value-of select="studiengang_kz" />
 						</fo:block>
 					</fo:block-container> 
 
-					<fo:block-container position="absolute" top="80mm" left="30mm" height="10mm">
+					<fo:block-container position="absolute" top="100mm" left="30mm" height="10mm">
 						<fo:table table-layout="fixed" border-collapse="separate">
 						    <fo:table-column column-width="45mm"/>
 						    <fo:table-column column-width="100mm"/>
@@ -104,8 +104,8 @@
 						</fo:table>
 					</fo:block-container>
  
- 					<fo:block-container position="absolute" top="96mm" left="30mm">
-						<fo:table table-layout="fixed" border-collapse="separate" border-width="2pt" border-style="solid">
+ 					<fo:block-container position="absolute" top="116mm" left="30mm">
+						<fo:table table-layout="fixed" border-collapse="separate" border-width="0.2pt" border-style="solid">
 						<fo:table-column column-width="100mm"/>
 						<fo:table-column column-width="25mm"/>
 						<fo:table-column column-width="20mm"/>
@@ -147,6 +147,7 @@
 								    
 							</fo:table-body>
 						</fo:table>
+						<fo:block font-size="7pt">\n</fo:block>
 						<fo:table>
 						<fo:table-column column-width="20mm"/>
 						<fo:table-column column-width="155mm"/>
@@ -171,7 +172,7 @@
 						</fo:table>
 					</fo:block-container>
 					
-					<fo:block-container position="absolute" top="265mm" left="30mm" height="10mm">
+					<fo:block-container position="absolute" top="255mm" left="30mm" height="10mm">
 						<fo:table table-layout="fixed" border-collapse="separate">
 						<fo:table-column column-width="75mm"/>
 						<fo:table-column column-width="15mm"/>
@@ -256,7 +257,7 @@
 	<xsl:template match="unterrichtsfach">
 		<fo:table-row  line-height="12pt">
 			<fo:table-cell border-width="0.2mm" border-style="solid" >
-				<fo:block font-size="9pt" content-width="85mm"><xsl:text> </xsl:text>
+				<fo:block font-size="10pt" content-width="85mm"><xsl:text> </xsl:text>
 					<xsl:choose>
 					  <xsl:when test="bisio_von">
 					    Auslandsaufenthalt: <xsl:value-of select="bisio_von" />-<xsl:value-of select="bisio_bis" />, <xsl:value-of select="bisio_ort" />, <xsl:value-of select="bisio_universitaet" />
@@ -279,7 +280,7 @@
 	<xsl:template match="fussnote">
 		<fo:table-row line-height="10pt">
 			<fo:table-cell border-width="0.2mm" border-style="solid" >
-				<fo:block font-size="8pt" content-width="58mm">
+				<fo:block font-size="9pt" content-width="58mm">
 					<xsl:value-of select="fussnotenzeichen" /><xsl:text> </xsl:text>
 					<fo:inline font-weight="bold"><xsl:value-of select="themenbereich_bezeichnung" /><xsl:text> </xsl:text></fo:inline>
 					<xsl:value-of select="themenbereich" /><xsl:text> </xsl:text>
