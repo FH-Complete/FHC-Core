@@ -310,18 +310,7 @@ function utf8_strlen($str)
 // ****************************************************************
 function strtoupperFULL($str)
 {
-   // convert to entities
-   $subject = htmlentities($str,ENT_QUOTES);
-   $pattern = '/&([a-z])(uml|acute|circ';
-   $pattern.= '|tilde|ring|elig|grave|slash|horn|cedil|th);/e';
-   $replace = "'&'.strtoupper('\\1').'\\2'.';'";
-   $result = preg_replace($pattern, $replace, $subject);
-   // convert from entities back to characters
-   $htmltable = get_html_translation_table(HTML_ENTITIES);
-   foreach($htmltable as $key => $value) {
-      $result = ereg_replace(addslashes($value),$key,$result);
-   }
-   return(strtoupper($result));
+   return(mb_strtoupper($str, "iso-8859-15"));
 }
 
 // ****************************************************************
