@@ -270,7 +270,7 @@ if($command!="add")
 	<meta http-equiv="content-type" content="text/html; charset=ISO-8859-9" />
 	<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
 	</head>
-	<body class="Background_main"  style="background-color:#eeeeee;" onload="a()">
+	<body class="Background_main"  style="background-color:#eeeeee;">
 	<h3>Abgabe Studentenbereich</h3>';
 
 	//Einlesen der Termine

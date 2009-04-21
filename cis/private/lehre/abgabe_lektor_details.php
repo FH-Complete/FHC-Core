@@ -48,7 +48,7 @@ if(!isset($_POST['uid']))
 	$command = '';
 	$paabgabe_id = '';
 	$fixtermin = false;
-	$datum = '01.01.1980';
+	$datum = '';
 	$kurzbz = '';
 }
 else 
@@ -76,7 +76,19 @@ if($uid==-1 && $projektarbeit_id==-1&& $titel==-1)
 	//echo "Fehler bei der Daten&uuml;bergabe";
 	exit;
 }
-		
+
+if(isset($_GET['id']) && isset($_GET['uid']))
+{
+	if(!is_numeric($_GET['id']) || $_GET['id']=='')
+		die('Fehler bei Parameteruebergabe');
+	
+	$file = $_GET['id'].'_'.$_GET['uid'].'.pdf';
+	$filename = PAABGABE_PATH.$file;
+	header('Content-Type: application/octet-stream');
+	header('Content-disposition: attachment; filename="'.$file.'"');
+	readfile($filename);
+	exit;
+}
 
 echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
@@ -85,7 +97,7 @@ echo '
 <title>Abgabe Lektor Details</title>
 <link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
 <link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
-<meta http-equiv="content-type" content="text/html; charset=ISO-8859-9" />
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-15" />
 <script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
 <script language="Javascript">
 	function confdel()
@@ -96,10 +108,11 @@ echo '
 </head>
 <body class="Background_main"  style="background-color:#eeeeee;">
 <h3>Abgabe Lektorenbereich</h3>';
-if($datum)
+
+// Speichern eines Termines
+if(isset($_POST["schick"]))
 {
-	// Speichern eines Termines
-	if(isset($_POST["schick"]))
+	if($datum)
 	{
 		$qry_std="SELECT * FROM campus.vw_benutzer where uid='$uid'";
 		if(!$result_std=pg_query($conn, $qry_std))
@@ -196,8 +209,15 @@ if($datum)
 			}
 		}
 	}
-	//Löschen eines Termines
-	if(isset($_POST["del"]))
+	else 
+	{
+		echo "<font color=\"#FF0000\">Datumseingabe ung&uuml;ltig!</font><br>&nbsp;";
+	}
+}
+//Löschen eines Termines
+if(isset($_POST["del"]))
+{
+	if($datum)
 	{
 		//Ermittlung der alten Daten
 		$qry_old="SELECT * FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";
@@ -234,11 +254,12 @@ if($datum)
 			}
 		}
 	}
+	else 
+	{
+		echo "<font color=\"#FF0000\">Datumseingabe ung&uuml;ltig!</font><br>&nbsp;";
+	}
 }
-else 
-{
-	echo "<font color=\"#FF0000\">Datumseingabe ung&uuml;ltig!</font><br>&nbsp;";
-}
+
 $qry="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$projektarbeit_id."' ORDER BY datum;";
 $htmlstr .= "<table width=100%>\n";
 $htmlstr .= "<tr><td style='font-size:16px'>Student: <b>".$uid."</b></td>";
@@ -313,15 +334,16 @@ $result=@pg_query($conn, $qry);
 		{
 			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>";
 		}
-		if(file_exists($_SERVER['DOCUMENT_ROOT'].PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf'))
+		if(file_exists(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf'))
 		{
-			$htmlstr .= "		<td><a href='".PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf'."' target='_blank'><img src='../../../skin/images/pdf.ico' alt='PDF' border=0></a></td>";
+			$htmlstr .= "		<td><a href='".$_SERVER['PHP_SELF']."?id=".$row->paabgabe_id."&uid=$uid' target='_blank'><img src='../../../skin/images/pdf.ico' alt='PDF' border=0></a></td>";
 		}
 		else 
 		{
 			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
 		}
 		$htmlstr .= "	</tr>\n";
+		
 		
 		$htmlstr .= "</form>\n";
 	}	
