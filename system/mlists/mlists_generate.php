@@ -154,7 +154,7 @@ $error_msg='';
 	// Lektoren holen die nicht mehr in den Verteiler gehoeren
 	echo '<BR>'.$mlist_name.' wird abgeglichen!<BR>';
 	flush();
-	$sql_query="SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE fixangestellt)";
+	$sql_query="SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid) WHERE fixangestellt AND aktiv)";
 	if(!($result=pg_query($conn, $sql_query)))
 		$error_msg.=pg_errormessage($conn);
 	while($row=pg_fetch_object($result))
@@ -167,7 +167,7 @@ $error_msg='';
 	}
 	// Lektoren holen die nicht im Verteiler sind
 	echo '<BR>';
-	$sql_query="SELECT mitarbeiter_uid AS uid FROM public.tbl_mitarbeiter WHERE fixangestellt AND mitarbeiter_uid NOT LIKE '\\\\_%' AND mitarbeiter_uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name'))";
+	$sql_query="SELECT mitarbeiter_uid AS uid FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid) WHERE fixangestellt AND aktiv AND mitarbeiter_uid NOT LIKE '\\\\_%' AND mitarbeiter_uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name'))";
 	if(!($result=pg_query($conn, $sql_query)))
 		$error_msg.=pg_errormessage($conn);
 	while($row=pg_fetch_object($result))
@@ -186,7 +186,7 @@ $error_msg='';
 	// Lektoren holen die nicht mehr in den Verteiler gehoeren
 	echo '<BR>'.$mlist_name.' wird abgeglichen!<BR>';
 	flush();
-	$sql_query="SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE fixangestellt AND lektor)";
+	$sql_query="SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid) WHERE aktiv AND fixangestellt AND lektor)";
 	if(!($result=pg_query($conn, $sql_query)))
 		$error_msg.=pg_errormessage($conn);
 	while($row=pg_fetch_object($result))
@@ -199,7 +199,7 @@ $error_msg='';
 	}
 	// Lektoren holen die nicht im Verteiler sind
 	echo '<BR>';
-	$sql_query="SELECT mitarbeiter_uid AS uid FROM public.tbl_mitarbeiter WHERE fixangestellt AND lektor AND mitarbeiter_uid NOT LIKE '\\\\_%' AND mitarbeiter_uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name'))";
+	$sql_query="SELECT mitarbeiter_uid AS uid FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid) WHERE fixangestellt AND lektor AND aktiv AND mitarbeiter_uid NOT LIKE '\\\\_%' AND mitarbeiter_uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name'))";
 	if(!($result=pg_query($conn, $sql_query)))
 		$error_msg.=pg_errormessage($conn);
 	while($row=pg_fetch_object($result))
