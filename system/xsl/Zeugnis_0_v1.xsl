@@ -236,9 +236,9 @@
 		</fo:page-sequence>
 	</xsl:template>
 	<xsl:template match="unterrichtsfach">
-		<fo:table-row line-height="11pt">
+		<fo:table-row line-height="12pt">
 			<fo:table-cell display-align="center" border-width="0.2mm" border-style="solid">
-				<fo:block font-size="9pt" content-width="85mm">
+				<fo:block font-size="10pt" content-width="85mm">
 					<xsl:text> </xsl:text>
 					<xsl:choose>
 						<xsl:when test="bisio_von">
@@ -252,19 +252,19 @@
 				</fo:block>
 			</fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
-				<fo:block font-size="9pt" content-width="25mm" text-align="center">
+				<fo:block font-size="10pt" content-width="25mm" text-align="center">
 					<xsl:text> </xsl:text>
 					<xsl:value-of select="note"/>
 				</fo:block>
 			</fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
-				<fo:block font-size="9pt" content-width="20mm" text-align="center">
+				<fo:block font-size="10pt" content-width="20mm" text-align="center">
 					<xsl:text> </xsl:text>
 					<xsl:value-of select="sws"/>
 				</fo:block>
 			</fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
-				<fo:block font-size="9pt" content-width="20mm" text-align="center">
+				<fo:block font-size="10pt" content-width="20mm" text-align="center">
 					<xsl:text> </xsl:text>
 					<xsl:value-of select="ects"/>
 				</fo:block>
