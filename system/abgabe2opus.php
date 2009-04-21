@@ -1491,7 +1491,7 @@ if($erg=pg_query($conn, $qry))
 												}
 												else 
 												{
-													if (file_exists("$opus_url")) 
+													if (file_exists($opus_url)) 
 													{
 											            $fd = fopen($opus_url."/index.html", 'w');
 											            if ($fd == 0) 
