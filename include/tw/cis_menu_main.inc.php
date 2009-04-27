@@ -708,10 +708,20 @@
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" href="public/faq_upload.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Upload Lehre FAQ</a></td>
 		  		</tr>
-		  		<tr>
+		  		
+				<tr>
+			  		<td class="tdwidth11" nowrap>&nbsp;</td>
+					<td class="tdwrap"><a class="Item" href="public/faq_telefonbeschreibung.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Telefon FAQ</a></td>
+				</tr>
+				
+				
+				<tr>
 			  		<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" href="public/info/mail.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Einrichten des Mails</a></td>
 				</tr>
+				
+
+
 			  	</table>
 			</td>
 		</tr>
