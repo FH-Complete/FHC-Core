@@ -11,6 +11,7 @@
 
 require_once('../../config.inc.php');
 require_once('../../../include/ort.class.php');
+require_once('../../../include/functions.inc.php');
 
 // Variablen uebernehmen
 if (isset($_GET['type']))
@@ -41,8 +42,17 @@ if (!$conn = pg_pconnect(CONN_STRING))
 if(!$erg_std=pg_query($conn, "SET datestyle TO ISO; SET search_path TO campus;"))
 	die(pg_last_error($conn));
 
+$stsem = getStudiensemesterFromDatum($conn, $datum);
+	
 //Stundenplan
 $sql_query='SELECT vw_stundenplan.*, tbl_lehrfach.bezeichnung, vw_mitarbeiter.titelpre, vw_mitarbeiter.nachname, vw_mitarbeiter.vorname';
+$sql_query.=", (SELECT count(*) FROM public.tbl_studentlehrverband 
+				WHERE studiengang_kz=vw_stundenplan.studiengang_kz AND semester=vw_stundenplan.semester
+				AND (verband=vw_stundenplan.verband OR vw_stundenplan.verband is null OR trim(vw_stundenplan.verband)='')
+				AND (gruppe=vw_stundenplan.gruppe OR vw_stundenplan.gruppe is null OR trim(vw_stundenplan.gruppe)='')
+				AND studiensemester_kurzbz='$stsem') as anzahl_lvb
+			, (SELECT count(*) FROM public.tbl_benutzergruppe 
+				WHERE gruppe_kurzbz=vw_stundenplan.gruppe_kurzbz AND studiensemester_kurzbz='$stsem') as anzahl_grp";
 $sql_query.=' FROM (vw_stundenplan JOIN lehre.tbl_lehrfach USING (lehrfach_id)) JOIN vw_mitarbeiter USING (uid)';
 $sql_query.=" WHERE datum='$datum' AND stunde=$stunde";
 if ($type=='lektor')
@@ -94,7 +104,7 @@ Stunde: <?php echo $stunde; ?><BR><BR>
 <table class="stdplan">
 <?php
 if ($num_rows_stpl>0)
-echo '<tr> <th>UNr</th><th>Lektor</th><th>Ort</th><th>Lehrfach</th><th>Bezeichnung</th><th>Verband</th><th>Einheit</th> </tr>';
+echo '<tr> <th>UNr</th><th>Lektor</th><th>Ort</th><th>Lehrfach</th><th>Bezeichnung</th><th>Verband</th><th>Einheit</th></tr>';
 $ort = new ort($conn);
 for ($i=0; $i<$num_rows_stpl; $i++)
 {
@@ -112,6 +122,9 @@ for ($i=0; $i<$num_rows_stpl; $i++)
     $verband=trim(pg_result($erg_stpl,$i,"verband"));
     $gruppe=trim(pg_result($erg_stpl,$i,"gruppe"));
     $gruppe_kurzbz=trim(pg_result($erg_stpl,$i,"gruppe_kurzbz"));
+    $anzahl_lvb=trim(pg_result($erg_stpl,$i,"anzahl_lvb"));
+    $anzahl_grp=trim(pg_result($erg_stpl,$i,"anzahl_grp"));
+    $gesamtanzahl = ($anzahl_grp!=0?$anzahl_grp:$anzahl_lvb);
     $ort->load($ortkurzbz);
     ?>
     <tr class="<?php echo 'liste'.$i%2; ?>">
@@ -120,10 +133,11 @@ for ($i=0; $i<$num_rows_stpl; $i++)
         <td title="<?php echo $ort->bezeichnung;?>"><?php echo $ortkurzbz.' '.$ort->planbezeichnung.' '.$ort->standort_kurzbz; ?></td>
         <td><?php echo $lehrfachkurzbz; ?></td>
         <td><?php echo $bezeichnung; ?></td>
-        <td><A class="Item" href="mailto:<?php echo $stgkurzbz.$semester.strtolower($verband).$gruppe.'@'.DOMAIN; ?>">
+        <td><A class="Item" title="<?php echo $anzahl_lvb.' Studierende';?>" href="mailto:<?php echo $stgkurzbz.$semester.strtolower($verband).$gruppe.'@'.DOMAIN; ?>">
         <?php echo $stgkurzbz.'-'.$semester.$verband.$gruppe; ?></A></td>
-        <td><A class="Item" href="mailto:<?php echo strtolower($gruppe_kurzbz).'@'.DOMAIN; ?>">
+        <td><A class="Item" title="<?php echo $anzahl_grp.' Studierende';?>" href="mailto:<?php echo strtolower($gruppe_kurzbz).'@'.DOMAIN; ?>">
         <?php echo $gruppe_kurzbz; ?></A></td>
+        
     </tr>
     <?php
 }
