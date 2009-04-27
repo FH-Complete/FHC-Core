@@ -238,7 +238,7 @@ Reihungstest w&auml;hlen:&nbsp;
 			else 
 				$selected = '';
 				
-			echo '<OPTION value="'.$rt->reihungstest_id.'" '.$selected.'>'.(isset($stg_arr[$rt->studiengang_kz])?$stg_arr[$rt->studiengang_kz]:'').' '.$rt->ort_kurzbz.' '.$rt->anmerkung.' '.$rt->datum."</OPTION>\n";
+			echo '<OPTION value="'.$rt->reihungstest_id.'" '.$selected.'>'.$rt->datum.' '.(isset($stg_arr[$rt->studiengang_kz])?$stg_arr[$rt->studiengang_kz]:'').' '.$rt->ort_kurzbz.' '.$rt->anmerkung."</OPTION>\n";
 		}
 		?>
 	</SELECT>
