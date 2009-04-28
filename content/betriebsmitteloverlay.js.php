@@ -341,7 +341,11 @@ function BetriebsmittelDetailSpeichern()
 		alert('RetourAm Datum ist ungueltig');
 		return false;
 	}
-
+	if(betriebsmitteltyp=='Zutrittskarte' && isNaN(nummer))
+	{
+		alert('Bei Zutrittskarten muss die Nummer eine gueltige Zahl sein');
+		return false;
+	}
 	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-studenten'))
 		studiengang_kz=window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 	else
