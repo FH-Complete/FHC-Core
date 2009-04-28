@@ -43,10 +43,18 @@ if (isset($_GET['logout']))
 if(!$db_conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim Oeffnen der Datenbankverbindung');
 
-if (isset($_POST['prestudent']) && isset($_POST['gebdatum']))
+if(isset($_POST['tag']) && isset($_POST['monat']) && isset($_POST['jahr']))
+{
+	if($_POST['tag']!='' && $_POST['monat']!='' && $_POST['jahr']!='')
+		$gebdatum = $_POST['jahr'].'-'.$_POST['monat'].'-'.$_POST['tag'];
+	else
+		$gebdatum='';
+}
+
+if (isset($_POST['prestudent']) && isset($gebdatum))
 {
 	$ps=new prestudent($db_conn,$_POST['prestudent']);
-	if ($_POST['gebdatum']==$ps->gebdatum)
+	if ($gebdatum==$ps->gebdatum)
 	{
 		$pruefling = new pruefling($db_conn);
 		if($pruefling->getPruefling($ps->prestudent_id))
@@ -72,6 +80,10 @@ if (isset($_POST['prestudent']) && isset($_POST['gebdatum']))
 		$_SESSION['sprache']=$stg_obj->sprache;
 				
 		$_SESSION['semester']=$semester;
+	}
+	else 
+	{
+		echo '<span class="error">Ihr Geburtsdatum stimmt nicht mit unseren Daten überein</span>';
 	}
 }
 	
@@ -225,9 +237,34 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 		foreach($ps->result as $prestd)
 			echo '<OPTION value="'.$prestd->prestudent_id.'">'.$prestd->nachname.' '.$prestd->vorname."</OPTION>\n";
 		echo '</SELECT>';
-		echo '&nbsp; Geburtsdatum: <INPUT type="text" maxlength="10" size="10" name="gebdatum" />(YYYY-MM-TT)';
+		echo '&nbsp; Geburtsdatum: ';
+		//<INPUT type="text" maxlength="10" size="10" name="gebdatum" />(YYYY-MM-TT)';
+		echo ' <SELECT name="tag">';
+		echo '<OPTION value="">Tag</OPTION>';
+		for($i=1;$i<=31;$i++)
+			echo '<OPTION value="'.($i<10?'0':'').$i.'">'.$i.'</OPTION>';
+		echo '</SELECT>';
+		echo ' <SELECT name="monat">';
+		echo '<OPTION value="">Monat</OPTION>';
+		for($i=1;$i<=12;$i++)
+			echo '<OPTION value="'.($i<10?'0':'').$i.'">'.date('F',mktime(0,0,0,$i,1,date('Y'))).'</OPTION>';
+		echo '</SELECT>';
+		echo ' <SELECT name="jahr">';
+		echo '<OPTION value="">Jahr</OPTION>';
+		for($i=date('Y');$i>date('Y')-99;$i--)
+			echo '<OPTION value="'.$i.'">'.$i.'</OPTION>';
+		echo '</SELECT>';
 		echo '&nbsp; <INPUT type="submit" value="Login" />';
 		echo '</form>';
+		
+		echo '<br /><br /><br />
+		<center>
+		<span style="font-size: 1.2em; font-style: italic;">
+			Herzlich Willkommen zum Reihungstest der Fachhochschule Technikum-Wien<br /><br />
+			Bitte warten Sie mit dem Login auf die Anweisung der Aufsichtsperson<br /><br />
+			Wir wünschen Ihnen einen erfolgreichen Start ins Studium
+		</span>
+		</center>';
 	}
 ?>
 
