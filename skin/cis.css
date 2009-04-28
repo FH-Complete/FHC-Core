@@ -157,73 +157,85 @@ A.stpl_detail:hover
 
 
 /* Tables */
+
+/* ---- gruen */
 td.ContentHeader
 {
-	background-color: #008381; //gr¸n
+	background-color: #008381; 
 	font-weight: bold;
 	height: 19px;
 }
+/* ---- mittel-grau */
 td.ContentHeader2
 {
-	background-color: #CCCCCC; //mittel-grau
+	background-color: #CCCCCC; 
 	font-weight: normal;
-	height: 19px
+	height: 19px;
 }
+/* ---- mittel-grau */
 td.ContentHeader3					
 {
-	background-color: #CCCCCC; //mittel-grau
+	background-color: #CCCCCC; 
 	font-weight: bold;
-	height: 19px
+	height: 19px;
 }
+/* ---- wie #EEEEEE; also grau fast weiss  */
 td.MarkLine
 {
-	background-color: #F2F2F2; //wie #EEEEEE; also grau fast weiﬂ
+	background-color: #F2F2F2; 
 }
+/* ---- grau wie #DDDDDD  */
 TR.liste
 {
-	background-color: #D3DCE3; //grau wie #DDDDDD
+	background-color: #D3DCE3; 
 }
+/* weiss */
 TR.liste0						
 {
-	background-color: #FFFFFF; //weiﬂ
+	background-color: #FFFFFF; 
 }
+/* grau fast weiﬂ */
 TR.liste1						
 {
-	background-color: #EEEEEE; //grau fast weiﬂ
+	background-color: #EEEEEE; 
 }
 
 /* private/profile/zeitsperre.php */
 TABLE#zeitsperren
-{  
+{
 	border: 1;
-	cellspacing: 0;
-	cellpadding: 0;
+	border-spacing: 0;	
+	padding: 0px 0px 0px 0px;
 	font-size: small;
 	width:100%;
 }
+/* hellgrau */
 TABLE#zeitsperren TH
 {
-	background-color: #DDDDDD; //hellgrau
+	background-color: #DDDDDD;
 }
+/* grelles gelb */
 TABLE#zeitsperren TH.feiertag
 {
-	background-color: #FFFF00;//grelles gelb
+	background-color: #FFFF00;
 }
+/* bissi helleres gelb */
 TABLE#zeitsperren TD.feiertag
 {
-	background-color: #FFFF22; //bissi helleres gelb
+	background-color: #FFFF22; 
 }
+/* grau fast weiss */
 TABLE#zeitsperren TD
 {
-	background-color: #EEEEEE //grau fast weiﬂ
+	background-color: #EEEEEE 
 }
 
 /* Stundeplan */
 TABLE.stdplan
 {  
 	border: 1;
-	cellspacing: 0;
-	cellpadding: 0;
+	border-spacing: 0;
+	padding: 0px 0px 0px 0px;
 	font-size: small;
 }
 TABLE.stdplan TH
@@ -319,7 +331,7 @@ font.ContentHeader
 }
 #news .news
 {
-	//-moz-border-radius-topright: 20px;
+	/* /-moz-border-radius-topright: 20px;*/
 	-moz-border-radius-topleft: 10px;
 	width: 100%;
 	border: 1px solid #E0E0E0;
@@ -365,8 +377,12 @@ TABLE.tabcontent
 	padding: 0px;
 	border-style: none;
 	width: 100%;
+
+	border-spacing: 0;
+/*	
 	cellspacing: 0;
 	cellpadding: 0;
+*/
 }
 
 TABLE.tabcontent2
@@ -374,8 +390,11 @@ TABLE.tabcontent2
 	margin: 0px;
 	padding: 0px;
 	border-style: none;
+	border-spacing: 0;
+/*	
 	cellspacing: 0;
 	cellpadding: 0;
+*/
 }
 
 td.tdwidth10
@@ -406,8 +425,12 @@ a.head:hover
 
 TABLE.tabborder
 {
+   padding: 1;
+	border-spacing: 0;
+/*	
 	cellspacing: 0;
 	cellpadding: 1;
+*/
 	width: 100%;
 	border: 1;
 }
@@ -435,7 +458,6 @@ div.tip
 	text-align: left;
 }
 
-
 td.tdborder
 {
 	text-align: center;
@@ -445,8 +467,12 @@ td.tdborder
 
 TABLE#tabterm
 {
-	cellpadding: 0;
+    padding: 0;
+	border-spacing: 0;
+/*	
 	cellspacing: 0;
+	cellpadding: 0;
+*/
 	margin:auto;
 }
 
