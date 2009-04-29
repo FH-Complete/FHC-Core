@@ -30,8 +30,7 @@ require_once('config.inc.php');
 
 <script language="JavaScript" type="text/javascript">
 <!--
-	__js_page_array = new Array();
-
+	var __js_page_array = new Array();
     function js_toggle_container(conid)
     {
 		if (document.getElementById)
@@ -39,17 +38,44 @@ require_once('config.inc.php');
         	var block = "table-row";
 			if (navigator.appName.indexOf('Microsoft') > -1)
 				block = 'block';
+				
+			// Aktueller Anzeigemode ermitteln	
             var status = __js_page_array[conid];
             if (status == null)
-            	status=document.getElementById(conid).style.display; //status = "none";
+			{
+		 		if (document.getElementById && document.getElementById(conid)) 
+				{  
+					status=document.getElementById(conid).style.display;
+				} else if (document.all && document.all[conid]) {      
+					status=document.all[conid].style.display;
+		      	} else if (document.layers && document.layers[conid]) {                          
+				 	status=document.layers[conid].style.display;
+		        }							
+			}	
+			
+			// Anzeigen oder Ausblenden
             if (status == "none")
             {
-            	document.getElementById(conid).style.display = block;
-            	__js_page_array[conid] = "visible";
+		 		if (document.getElementById && document.getElementById(conid)) 
+				{  
+					document.getElementById(conid).style.display = block;
+				} else if (document.all && document.all[conid]) {      
+					document.all[conid].style.display=block;
+		      	} else if (document.layers && document.layers[conid]) {                          
+				 	document.layers[conid].style.display=block;
+		        }				
+            	__js_page_array[conid] = block;
             }
             else
             {
-            	document.getElementById(conid).style.display = 'none';
+		 		if (document.getElementById && document.getElementById(conid)) 
+				{  
+					document.getElementById(conid).style.display = 'none';
+				} else if (document.all && document.all[conid]) {      
+					document.all[conid].style.display='none';
+		      	} else if (document.layers && document.layers[conid]) {                          
+				 	document.layers[conid].style.display='none';
+		        }				
             	__js_page_array[conid] = "none";
             }
             return false;
@@ -59,9 +85,7 @@ require_once('config.inc.php');
   	}
 //-->
 </script>
-
 </head>
-
 <body>
 <?php
 	require_once('../include/'.EXT_FKT_PATH.'/cis_menu_main.inc.php');
