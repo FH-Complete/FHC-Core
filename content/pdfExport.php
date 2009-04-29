@@ -80,7 +80,7 @@ else
 	if(isset($_GET['stg_kz']))
 		$xsl_stg_kz=$_GET['stg_kz'];
 	else
-		if(isset($_GET['uid']))
+		if(isset($_GET['uid']) && $_GET['uid']!='')
 		{
 			if(strstr(';',$_GET['uid']))
 				$uids = explode(';',$_GET['uid']);
