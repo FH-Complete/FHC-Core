@@ -31,43 +31,30 @@ require_once('config.inc.php');
 	<link href="../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
 </head>
-
 <body>
-
 <table class="tabcontent">
-  <tr>
-    <td width="170" class="tdwrap">
-		<a href="index.html" target="_top"><div class="home_logo"></div></a>
-    </td>
-    	    <td id="header">
+	  <tr>
+	    <td width="170" class="tdwrap">
+			<a href="index.html" target="_top">
+				<div class="home_logo">&nbsp;</div>
+			</a>
+	    </td>
+        <td id="header">
     	    	<div class="header_line" ></div>
-    	    </td>
-    	  </tr>
-    	  <tr>
-		  <td id="footer"></td>
-    	    <td>
-    	    	<?php
-    	    	require_once('../include/'.EXT_FKT_PATH.'/cis_menu_global.inc.php');
-    	    	?>
-    	    </td>
-    	  </tr>
-    	</table>
-    </td>
-	<td class="tdwidth30">&nbsp;</td>
-  </tr>
-  <tr ></tr>
+        </td>
+ 	</tr>
+   	 <tr>
+			<td id="footer">&nbsp;</td>
+    	    <td><?php require_once('../include/'.EXT_FKT_PATH.'/cis_menu_global.inc.php'); 	?></td>
+	</tr>
 </table>
-
 <iframe id="menue" src="menu.php" name="menu" frameborder="0">
 	No iFrames
 </iframe>
-
 <iframe id="content" src="public/news.php" name="content" frameborder="0">
 	No iFrames
 </iframe>
-
 </body>
-
 <!--<frameset rows="77,*,1" cols="*" frameborder="NO" border="0" framespacing="0">
 	<frame src="topbar.html" name="topbar" scrolling="NO" noresize>
 	<frameset rows="*" cols="200,*" framespacing="0" frameborder="NO" border="0">
