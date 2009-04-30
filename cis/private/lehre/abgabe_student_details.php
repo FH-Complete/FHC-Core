@@ -90,6 +90,7 @@ $error = false;
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
 $htmlstr='';
+
 if($command=='add')
 {
 	//zusätzliche Daten bearbeiten
@@ -112,7 +113,7 @@ if($command=='add')
 	}
 	if(!$error)
 	{	
-		$qry_upd="UPDATE lehre.tbl_projektarbeit SET
+		$qry_upd="UPDATE lehre.tbl_projektarbeit SET 
 				seitenanzahl = '".$seitenanzahl."', 
 				abgabedatum = now(),
 				sprache = '".addslashes($sprache)."',  
@@ -334,9 +335,10 @@ if($command!="add")
 			$htmlstr .= "</form>\n";
 		}
 		
-	
+	$command!="";
 	$htmlstr .= "</table>\n";
 	echo $htmlstr;
 	echo '</body></html>';
 }
+
 ?>

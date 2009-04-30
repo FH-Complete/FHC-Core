@@ -25,6 +25,7 @@
  * 		abgabe_lektor ist die Lektorenmaske des Abgabesystems 
  * 			für Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
+//echo Test($_REQUEST);
 
 require_once('../../config.inc.php');
 require_once('../../../include/functions.inc.php');
@@ -124,28 +125,45 @@ if(isset($_POST["schick"]))
 			$row_std=@pg_fetch_object($result_std);
 			if($command=='insert')
 			{
-				//neuer Termin
-				$qry="INSERT INTO campus.tbl_paabgabe (projektarbeit_id, paabgabetyp_kurzbz, fixtermin, datum, kurzbz, abgabedatum, insertvon, insertamum, updatevon, updateamum) 
-					VALUES ('$projektarbeit_id', '$paabgabetyp_kurzbz', ".($fixtermin==1?'true':'false').", '$datum', '$kurzbz', NULL, '$user', now(), NULL, NULL)";
-				//echo $qry;	
-				if(!$result=pg_query($conn, $qry))
+				$qrychk="SELECT * FROM campus.tbl_paabgabe 
+					WHERE projektarbeit_id='$projektarbeit_id' AND paabgabetyp_kurzbz='$paabgabetyp_kurzbz' AND fixtermin=".($fixtermin==1?'true':'false')." AND datum='$datum' AND kurzbz='$kurzbz'";
+				if($result=pg_query($conn, $qrychk))
 				{
-					echo "<font color=\"#FF0000\">Termin konnte nicht eingetragen werden!</font><br>&nbsp;";	
-				}
-				else 
-				{
-					$row=@pg_fetch_object($result);
-					$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$paabgabetyp_kurzbz."'";
-					if($result_typ=pg_query($conn, $qry_typ))
+					if(pg_num_rows($result)>0)
 					{
-						$row_typ=@pg_fetch_object($result_typ);
+						//Datensatz bereits vorhanden
 					}
 					else 
 					{
-						$row_typ->bezeichnung='';
+						//neuer Termin
+						$qry="INSERT INTO campus.tbl_paabgabe (projektarbeit_id, paabgabetyp_kurzbz, fixtermin, datum, kurzbz, abgabedatum, insertvon, insertamum, updatevon, updateamum) 
+							VALUES ('$projektarbeit_id', '$paabgabetyp_kurzbz', ".($fixtermin==1?'true':'false').", '$datum', '$kurzbz', NULL, '$user', now(), NULL, NULL)";
+						//echo $qry;	
+						if(!$result=pg_query($conn, $qry))
+						{
+							echo "<font color=\"#FF0000\">Termin konnte nicht eingetragen werden!</font><br>&nbsp;";	
+						}
+						else 
+						{
+							$row=@pg_fetch_object($result);
+							$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$paabgabetyp_kurzbz."'";
+							if($result_typ=pg_query($conn, $qry_typ))
+							{
+								$row_typ=@pg_fetch_object($result_typ);
+							}
+							else 
+							{
+								$row_typ->bezeichnung='';
+							}
+							$mail = new mail($uid."@".DOMAIN, "vilesci@".DOMAIN, "Neuer Termin Bachelor-/Diplomarbeitsbetreuung",
+							"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr(e) Betreuer(in) hat einen neuen Termin angelegt:\n".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\nIhr(e) Betreuer(in)\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+						}
+						$command='';
 					}
-					$mail = new mail($uid."@".DOMAIN, "vilesci@".DOMAIN, "Neuer Termin Bachelor-/Diplomarbeitsbetreuung",
-					"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr(e) Betreuer(in) hat einen neuen Termin angelegt:\n".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\nIhr(e) Betreuer(in)\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+				}
+				else 
+				{
+					echo "Datenbank-Zugriffsfehler!";
 				}
 			}
 			if($command=='update')
@@ -201,11 +219,15 @@ if(isset($_POST["schick"]))
 						"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr(e) Betreuer(in) hat einen Termin geändert:\nVon: ".$datum_obj->formatDatum($row_old->datum,'d.m.Y').", ".$row_told->bezeichnung.", ".$row_old->kurzbz."\nAuf: ".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung." ".$kurzbz."\n\nMfG\nIhr(e) Betreuer(in)\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
 					}
 				}
+				$command='';
 			}
-			$mail->setReplyTo($user."@".DOMAIN);
-			if(!$mail->send())
+			if(isset($mail))
 			{
-				echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails!</font><br>&nbsp;";	
+				$mail->setReplyTo($user."@".DOMAIN);
+				if(!$mail->send())
+				{
+					echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails!</font><br>&nbsp;";	
+				}
 			}
 		}
 	}
@@ -213,6 +235,7 @@ if(isset($_POST["schick"]))
 	{
 		echo "<font color=\"#FF0000\">Datumseingabe ung&uuml;ltig!</font><br>&nbsp;";
 	}
+	unset($_POST["schick"]);
 }
 //Löschen eines Termines
 if(isset($_POST["del"]))
@@ -258,6 +281,7 @@ if(isset($_POST["del"]))
 	{
 		echo "<font color=\"#FF0000\">Datumseingabe ung&uuml;ltig!</font><br>&nbsp;";
 	}
+	unset($_POST["del"]);
 }
 
 $qry="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$projektarbeit_id."' ORDER BY datum;";
@@ -380,5 +404,73 @@ $htmlstr .= "</table>\n";
 $htmlstr .= "</body></html>\n";
 
 	echo $htmlstr;
+function Test($arr=constLeer,$lfd=0,$displayShow=true,$onlyRoot=false )
 
+{
+
+    $tmpArrayString='';
+
+    if (!is_array($arr) && !is_object($arr)) return $arr;
+
+    if (is_array($arr) && count($arr)<1 && $displayShow) return '';
+
+    if (is_array($arr) && count($arr)<1 && $displayShow) return "<br><b>function Test (???)</b><br>";
+
+  
+
+    $lfdnr=$lfd + 1;
+
+    $tmpAnzeigeStufe='';
+
+    for ($i=1;$i<$lfdnr;$i++) $tmpAnzeigeStufe.="=";
+
+    $tmpAnzeigeStufe.="=>";
+
+        while (list( $tmp_key, $tmp_value ) = each($arr) )
+
+        {
+
+        if (!$onlyRoot && (is_array($tmp_value) || is_object($tmp_value)) && count($tmp_value) >0)
+
+        {
+
+                   $tmpArrayString.="<br>$tmpAnzeigeStufe <b>$tmp_key</b>".Test($tmp_value,$lfdnr);
+
+        } else if ( (is_array($tmp_value) || is_object($tmp_value)) )
+
+        {
+
+                   $tmpArrayString.="<br>$tmpAnzeigeStufe <b>$tmp_key -- 0 Records</b>";
+
+                } else if ($tmp_value!='')
+
+                {
+
+                   $tmpArrayString.="<br>$tmpAnzeigeStufe $tmp_key :== ".$tmp_value;
+
+                } else {
+
+                   $tmpArrayString.="<br>$tmpAnzeigeStufe $tmp_key :-- (is Empty :: $tmp_value)";
+
+                } 
+
+    }
+
+     if ($lfd!='') { return $tmpArrayString; }
+
+     if (!$displayShow) { return $tmpArrayString; }
+
+      
+
+    $tmpArrayString.="<br>";
+
+    $tmpArrayString="<br><hr><br>******* START *******<br>".$tmpArrayString."<br>******* ENDE *******<br><hr><br>";
+
+    $tmpArrayString.="<br>Server:: ".$_SERVER['PHP_SELF']."<br>";
+
+    return "$tmpArrayString";
+
+}
+
+//===========================================================================================  
 ?>
