@@ -172,12 +172,18 @@
 	<script language="JavaScript" type="text/javascript">
 	<!--
 		var openfirst='<?php echo $openfirst; ?>';
+//		if (window.opener && !window.opener.closed && openfirst!='1') {
+//			if (confirm("Soll die Hauptseite neu aufgebaut werden?")) {
+//			window.opener.location.reload();
+//			}	
+//		}	
+
 		if (window.opener && !window.opener.closed && openfirst!='1') {
 			if (confirm("Soll die Hauptseite neu aufgebaut werden?")) {
-			window.opener.location.reload();
-	//		this.close();
+			window.opener.location.selVeranstaltung.submit();
 			}	
 		}	
+
 	//-->
 	</script>
 
@@ -202,7 +208,7 @@
 	</style>
 
 </head>
-<body>
+<body onunload="reloadOpener();">
 	<h1>Reservierung</h1>
 <?php
 // ------------------------------------------------------------------------------------------
@@ -330,6 +336,8 @@
 					<input class="ausblenden" name="start" value="'.$start.'">
 					<input class="ausblenden" name="ende" value="'.$ende.'">
 					<input class="ausblenden" name="veranstaltung_id" value="'.$veranstaltung_id.'">
+					<input class="ausblenden" name="veranstaltung_id_old" value="'.$veranstaltung_id.'">
+					
 					<input class="ausblenden" name="veranstaltung_id_zuordnen" value="'.$veranstaltung_id.'">
 					<input class="ausblenden" name="reservierung_key" value="'.$reservierungierung[$iTmpZehler]['key'].'">
 					<input class="ausblenden" name="work" value="nix">
@@ -354,6 +362,7 @@
 					<input class="ausblenden" name="start" value="'.$start.'">
 					<input class="ausblenden" name="ende" value="'.$ende.'">
 					<input class="ausblenden" name="veranstaltung_id" value="'.$veranstaltung_id.'">
+					<input class="ausblenden" name="veranstaltung_id_old" value="'.$veranstaltung_id.'">
 					<input class="ausblenden" name="work" value="nix">
 					</td>';
 				
