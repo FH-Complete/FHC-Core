@@ -55,6 +55,7 @@ $datum_obj = new datum();
 //$jahr='';
 //$source_opus='';
 $fehler='';
+$fehler1='';
 $error=false;
 $begutachter1='';
 $begutachter2='';
@@ -68,6 +69,7 @@ $stg='';
 $row_opus=0;
 $opus_url=OPUS_PATH_PAA;			
 $url_paa=PAABGABE_PATH;
+
 function formatDatum($datum, $format='Y-m-d H:i:s')
 {
 	if(trim($datum)=='')
@@ -117,6 +119,14 @@ function formatDatum($datum, $format='Y-m-d H:i:s')
 }
 function indexdatei($source_opus, $fd)
 {
+	$la="de";
+	$search_creator='';
+	$startfile='';
+	$dir_array=array();
+	$mod_gpg='';
+	$publisher_faculty='';
+	$advisor='';
+	$date_accepted='';
 	require '../opus/lib/opus.class.php';
 	$opus = new OPUS('../opus/lib/opus.conf');
 	$php = $opus->value("php");
@@ -232,6 +242,7 @@ function indexdatei($source_opus, $fd)
 	    $datum = $mrow[36];
 	    $gutachter1 = $mrow[37];
 	    $gutachter2 = $mrow[38];
+	    $studiensemester = $mrow[39];
 	    //********************************************************************************************************************************
 	    $opus->free_result($res);
 	    /***** Schriftenreihe Start *****/
@@ -1222,7 +1233,7 @@ if($erg=pg_query($conn, $qry))
 			}
 			else 
 			{
-				$fehler.="<br>Kein Verfasser zugeordnet!";
+				$fehler.="\nKein Verfasser zugeordnet!";
 				$error=true;
 			}
 		}
@@ -1255,7 +1266,7 @@ if($erg=pg_query($conn, $qry))
 			}
 			else 
 			{
-				$fehler.="<br>Kein Begutachter zugeordnet!";
+				$fehler.="\nKein Begutachter zugeordnet!";
 				$error=true;
 			}
 		}
@@ -1289,7 +1300,7 @@ if($erg=pg_query($conn, $qry))
 				}
 				else 
 				{
-					$fehler.="<br>Kein Zweitbegutachter zugeordnet!";
+					$fehler.="\nKein Zweitbegutachter zugeordnet!";
 					$error=true;
 				}
 			}
@@ -1302,7 +1313,7 @@ if($erg=pg_query($conn, $qry))
 		//Institute
 		if($row->fb_bez==NULL || trim($row->fb_bez)=='')
 		{
-			$fehler.="<br>Institut nicht gefunden!";
+			$fehler.="\nInstitut nicht gefunden!";
 			$error=true;	
 		}
 		else 
@@ -1319,42 +1330,42 @@ if($erg=pg_query($conn, $qry))
 				}
 				else 
 				{
-					$fehler.="<br>Institutsname nicht gefunden!";
+					$fehler.="\nInstitutsname nicht gefunden!";
 					$error=true;	
 				}
 			}
 		}
 		if($row->kontrollschlagwoerter==NULL || $row->kontrollschlagwoerter=='' || $row->abstract==NULL || $row->abstract=='' || $row->abstract_en==NULL || $row->abstract_en=='' )
 		{			
-			$fehler=$row->student_uid.": Projektarbeit (".$row->projekttyp_kurzbz.") ".$row->projektarbeit_id.$fehler;
+			$fehler.=$row->student_uid.": Projektarbeit (".$row->projekttyp_kurzbz.") ".$row->projektarbeit_id.$fehler;
 			if($row->kontrollschlagwoerter==NULL || $row->kontrollschlagwoerter=='')
 			{
-				$fehler.="<br>Kontrollierte Schlagwörter nicht eingegeben!";
+				$fehler.="\nKontrollierte Schlagwörter nicht eingegeben!";
 				$error=true;
 			}
 			if($row->abstract==NULL || $row->abstract=='')
 			{
-				$fehler.="<br>Abstract nicht eingegeben!";
+				$fehler.="\nAbstract nicht eingegeben!";
 				$error=true;
 			}
 			if($row->abstract_en==NULL || $row->abstract_en=='')
 			{
-				$fehler.="<br>Englischer Abstract nicht eingegeben!";
+				$fehler.="\nEnglischer Abstract nicht eingegeben!";
 				$error=true;
 			}
 			if($row->seitenanzahl==NULL || $row->seitenanzahl=='')
 			{
-				$fehler.="<br>Seitenanzahl nicht eingegeben!";
+				$fehler.="\nSeitenanzahl nicht eingegeben!";
 				$error=true;
 			}
 			if($row->stg_kz==NULL || $row->stg_kz=='' || $row->stg_kz==0)
 			{
-				$fehler.="<br>Studiengang nicht gefunden!";
+				$fehler.="\nStudiengang nicht gefunden!";
 				$error=true;
 			}
 			if($row->studiensemester_kurzbz==NULL || $row->studiensemester_kurzbz=='')
 			{
-				$fehler.="<br>Studiensemester nicht gefunden!";
+				$fehler.="\nStudiensemester nicht gefunden!";
 				$error=true;
 			}
 		}
@@ -1431,30 +1442,30 @@ if($erg=pg_query($conn, $qry))
 					//echo $qry.$qry_ins.$qry_cre.$qry_inst;
 					if(!$result=mysql_query($qry))
 					{
-						echo nl2br("<br><br>Transaktion nicht begonnen! <br>".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext));
+						$fehler1.="\n\nTransaktion nicht begonnen! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
 					}
 					else 
 					{
 						if(!$result=mysql_query($qry_ins))
 						{
-							echo nl2br("<br><br>Transaktion abgebrochen! <br>".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext));
+							$fehler1.="\n\nTransaktion abgebrochen! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
 							mysql_query('ROLLBACK',$conn_ext);
 						}
 						else 
 						{
 							if(!$result=mysql_query($qry_cre))
 							{
-								echo nl2br("<br><br>Transaktion abgebrochen!! <br>".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext));
+								$fehler1.="\n\nTransaktion abgebrochen!! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
 								if(!$result=mysql_query('ROLLBACK',$conn_ext))
 								{
-									echo nl2br("<br><br>Rollback nicht durchgef&uuml;hrt. <br>".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext));
+									$fehler1.="\n\nRollback nicht durchgeführt. \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
 								}
 							}
 							else 
 							{
 								if(!$result=mysql_query($qry_inst))
 								{
-									echo nl2br("<br><br>Transaktion abgebrochen!!! <br>".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext));
+									echo nl2br("\n\nTransaktion abgebrochen!!! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext));
 									mysql_query('ROLLBACK',$conn_ext);
 								}
 								else 
@@ -1478,7 +1489,7 @@ if($erg=pg_query($conn, $qry))
 											{
 												mkdir($opus_url."/pdf/", 0775);
 											}
-											//echo "<br>Quelle: ".$url_paa.$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf'." -> ".$opus_url."".$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf';
+											//echo "\nQuelle: ".$url_paa.$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf'." -> ".$opus_url."".$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf';
 											copy($url_paa.$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf',$opus_url."/pdf/".$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf');
 											//Überprüfen, ob Datei wirklich kopiert wurde
 											if(is_file($opus_url."/pdf/".$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf'))
@@ -1487,7 +1498,7 @@ if($erg=pg_query($conn, $qry))
 												if(!$result=mysql_query('COMMIT',$conn_ext))
 												{
 													mysql_query('ROLLBACK',$conn_ext);
-													echo "Commit nicht ausgef&um;hrt! <br>".$row_opus."/".$verfasser."<br>".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
+													$fehler1.="\nCommit nicht ausgef&um;hrt! \n".$row_opus."/".$verfasser."\n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
 												}
 												else 
 												{
@@ -1496,7 +1507,7 @@ if($erg=pg_query($conn, $qry))
 											            $fd = fopen($opus_url."/index.html", 'w');
 											            if ($fd == 0) 
 											            {
-											                echo ("Error: $ERRMSG <BR>\n");
+											                $fehler1.="\nError: $ERRMSG \n\n";
 											                exit;
 											            } 
 											            else 
@@ -1506,26 +1517,26 @@ if($erg=pg_query($conn, $qry))
 											                #print ("Indexdatei zu Dokument $source_opus wurde in die Datei <a href=\"$volltext_url/$jahr/$source_opus/index.html\">index.html</a> geschrieben.<P> \n");
 											            }
 											        } else {
-											            print ($opus_url."/pdf/ nicht vorhanden.<BR> \n");
+											            $fehler1.="\n".$opus_url."/pdf/ nicht vorhanden.\n \n";
 											        }
 												}
 											}
 											else 
 											{
 												mysql_query('ROLLBACK',$conn_ext);
-												echo "Datei wurde nicht kopiert! <br>".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
+												$fehler1.="\nDatei wurde nicht kopiert! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
 											}
 										}
 										else 
 										{
 											mysql_query('ROLLBACK',$conn_ext);
-											echo "Abgabe konnte nicht geladen werden! <br>".$row_opus."/".$verfasser."<br>".pg_last_error();
+											$fehler1.="\nAbgabe konnte nicht geladen werden! \n".$row_opus."/".$verfasser."\n".pg_last_error();
 										}
 									} 
 									else 
 									{
 										mysql_query('ROLLBACK',$conn_ext);
-										echo "Eintragung der Abgabe nicht gefunden! <br>".$row_opus."/".$verfasser."/".$qry_file."<br>".pg_last_error();
+										$fehler1.="\nEintragung der Abgabe nicht gefunden! \n".$row_opus."/".$verfasser."/".$qry_file."\n".pg_last_error();
 									}	
 									
 								}
@@ -1536,27 +1547,36 @@ if($erg=pg_query($conn, $qry))
 			}
 			else 
 			{
-				echo "<br>&Uuml;berprüfung, ob bereits vorhanden, konnte nicht durchgef&uuml;hrt werden! <br>".pg_last_error($conn_ext)."<br>".$qry_chk."<br>";
+				$fehler1.="\nÜberprüfung, ob bereits vorhanden, konnte nicht durchgeführt werden! \n".pg_last_error($conn_ext)."\n".$qry_chk."\n";
 			}
-			
+			if($fehler1!='')
+			{
+				$fehler.="-->".$fehler1;
+				$fehler.="\n-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------";
+				$fehler.="\nBegutachter1: ".$begutachter1."\nBegutachter2: ".$begutachter2."\nTitel: ".$row->titel."\nTitel en: ".$row->titel_english."\n";
+				$fehler.="Verfasser: ".$verfasser."\nInstitut: ".$institut."\nStudiengang: ".($row->stg_kz<1000?'0'.$row->stg_kz:$row->stg_kz)."\nDatum: ".$datum_obj->formatDatum($row->abgabedatum,'d.m.Y')."\n";
+				$fehler.="Kontr. Schlagwörter: ".$row->kontrollschlagwoerter."\nSchlagwörter dt: ".$row->schlagwoerter."\nSchlagwörter en: ".$row->schlagwoerter_en."\n";
+				$fehler.="Abstract: ".$row->abstract."\nAbstract_en: ".$row->abstract_en."\nSeitenanzahl: ".$row->seitenanzahl."\nStudiensemester: ".$row->studiensemester_kurzbz."\n";
+				$fehler.="Projektarbeit ID: ".$row->projektarbeit_id."\nTyp der Arbeit: ".$row->projekttyp_kurzbz."\n";
+				$fehler1='';
+			}
 		}
 		else 
 		{
-			$fehler.="<br>-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------";
-			echo nl2br($fehler."<br>Begutachter1: <b>".$begutachter1."</b><br>Begutachter2: <b>".$begutachter2."</b><br>Titel: <b>".$row->titel."</b><br>Titel en: <b>".$row->titel_english."</b><br>");
-			echo nl2br("Verfasser: <b>".$verfasser."</b><br>Institut: <b>".$institut."</b><br>Studiengang: <b>".($row->stg_kz<1000?'0'.$row->stg_kz:$row->stg_kz)."</b><br>Datum: <b>".$datum_obj->formatDatum($row->abgabedatum,'d.m.Y')."</b><br>");
-			echo nl2br("Kontr. Schlagw&ouml;rter: <b>".$row->kontrollschlagwoerter."</b><br>Schlagw&ouml;rter dt: <b>".$row->schlagwoerter."</b><br>Schlagw&ouml;rter en: <b>".$row->schlagwoerter_en."</b><br>");
-			echo nl2br("Abstract: <b>".$row->abstract."</b><br>Abstract_en: <b>".$row->abstract_en."</b><br>Seitenanzahl: <b>".$row->seitenanzahl."</b><br>Studiensemester: <b>".$row->studiensemester_kurzbz."</b><br>");
-			echo nl2br("Projektarbeit ID: <b>".$row->projektarbeit_id."</b><br>Typ der Arbeit: <b>".$row->projekttyp_kurzbz."</b><br>");
-			$fehler='';
-			
-			$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Aufgetretene Fehler: <br>'.$fehler);
-			$mail->send();
-			
+			$fehler.="\n-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------";
+			$fehler.="\nBegutachter1: ".$begutachter1."\nBegutachter2: ".$begutachter2."\nTitel: ".$row->titel."\nTitel en: ".$row->titel_english."\n";
+			$fehler.="Verfasser: ".$verfasser."\nInstitut: ".$institut."\nStudiengang: ".($row->stg_kz<1000?'0'.$row->stg_kz:$row->stg_kz)."\nDatum: ".$datum_obj->formatDatum($row->abgabedatum,'d.m.Y')."\n";
+			$fehler.="Kontr. Schlagwörter: ".$row->kontrollschlagwoerter."\nSchlagwörter dt: ".$row->schlagwoerter."\nSchlagwörter en: ".$row->schlagwoerter_en."\n";
+			$fehler.="Abstract: ".$row->abstract."\nAbstract_en: ".$row->abstract_en."\nSeitenanzahl: ".$row->seitenanzahl."\nStudiensemester: ".$row->studiensemester_kurzbz."\n";
+			$fehler.="Projektarbeit ID: ".$row->projektarbeit_id."\nTyp der Arbeit: ".$row->projekttyp_kurzbz."\n";
+			$error=false;			
 		}
-		
-		
-
+	}
+	if($fehler!='')
+	{
+		$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', "Aufgetretene Fehler: \n".$fehler);
+		$mail->send();
+		$fehler='';
 	}
 }
 else 
